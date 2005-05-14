@@ -34,6 +34,9 @@ functionality and correctness at the moment.
 .namespace [ "PGE::Exp" ]
 
 .const int PGE_INF = 2147483647                    # XXX: arbitrary limit
+.const int PGE_MATCH_FAIL = 1                      # pos of failed match
+.const int PGE_CUT_GROUP = -1                      # cutting current group
+.const int PGE_CUT_RULE = -2                       # cutting current rule
 
 .sub __onload 
     .local pmc hashclass
@@ -416,10 +419,10 @@ register.
     emit(code, "    push gpad, -1")
     emit(code, "    push cpad, mob")
     emit(code, "    from = getattribute mob, \"PGE::Match\\x0$:from\"")
-    emit(code, "    cutting = 0")
     emit(code, "    if pos >= 0 goto try_at_pos")
     emit(code, "    pos = 0")
     emit(code, "  try_match:")
+    emit(code, "    cutting = 0")
     emit(code, "    if pos > lastpos goto fail_forever")
     $I0 = exists self["firstchars"]
     unless $I0 goto gen_1
@@ -433,7 +436,7 @@ register.
   gen_1:
     emit(code, "    from = pos")
     self.emitsub(code, label, "pos", "from", 0)
-    emit(code, "    if cutting != 0 goto fail_forever")
+    emit(code, "    if cutting == %d goto fail_forever", PGE_CUT_RULE)
     emit(code, "  try_again:")
     emit(code, "    inc pos")
     emit(code, "    goto try_match")
@@ -865,7 +868,7 @@ register.
     token = self["token"]
     cutting = "gpad[-1]"                           # :: cut alternation
     unless token == ":::" goto cut_1               # ::: cut rule
-    cutting = "-1"
+    cutting = PGE_CUT_RULE
   cut_1:
     emit = find_global "PGE::Exp", "emit"
     emit(code, "\n  %s:", label)
