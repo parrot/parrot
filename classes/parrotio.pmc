@@ -69,16 +69,25 @@ Open the file with the given mode and use the IO given layer.
             return pmc_new(INTERP, enum_class_Undef);
         if (l) {
             ParrotIO *io = PMC_data(pio);
-            /* XXX layer is stored twice - which is used when
-             * XXX and move this into the open function of the layer
+            int is_mmap = strcmp(c_layer, "mmap") == 0;
+            /*
+             * XXX move this into the layer
              */
-            l = interpreter->piodata->default_stack;
-            if (!strcmp(l->name, "buf"))
-                l = l->down;
-            io->stack = PMC_struct_val(pio) = l;
-            /* push the layer */
-            PIO_push_layer_str(INTERP, pio, layer);
+            if ((is_mmap && (io->b.flags & PIO_BF_MMAP)) || !is_mmap) {
+                l = interpreter->piodata->default_stack;
+                if (!strcmp(l->name, "buf"))
+                    l = l->down;
+                /* XXX layer is stored twice - which is used when */
+                io->stack = PMC_struct_val(pio) = l;
+                /* push the layer */
+                PIO_push_layer_str(INTERP, pio, layer);
+            }
+            else {
+                l = interpreter->piodata->default_stack;
+                io->stack = PMC_struct_val(pio) = l;
+            }
         }
+        /* XXX leaks as in ops/io.ops: open */
         return pio;
     }
 
