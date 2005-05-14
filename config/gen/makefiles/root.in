@@ -184,7 +184,7 @@ GEN_CONFIGS = \
     $(SRC_DIR)/nci_test$(O) \
     libparrot.def \
     ast/ast.y.flag \
-    dynclasses/build.pl \
+    build_tools/build_dynclasses.pl \
     imcc/imcc.y.flag \
     ops/core_ops.c \
     ops/core_ops_switch.c
