@@ -2408,12 +2408,9 @@ string_unescape_cstring(Interp * interpreter,
         result->strlen = d;
         result->bufused = iter.bytepos;
     }
-#if 0
-    /* XXX gdbmhash.t fails with that */
     if (!CHARSET_VALIDATE(interpreter, result, 0)) {
         internal_exception(INVALID_STRING_REPRESENTATION, "Malformed string");
     }
-#endif
     return result;
 }
 

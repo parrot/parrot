@@ -192,16 +192,13 @@ CODE
 1
 OUTPUT
 
-SKIP: {
-  skip("not enabled yet because of gdbmhah failures", 1);
-output_is( <<'CODE', <<OUTPUT, "UTF8 as malformed ascii" );
+output_like( <<'CODE', <<OUTPUT, "UTF8 as malformed ascii" );
     set S0, ascii:"«"
     length I0, S0
     print I0
     print "\n"
     end
 CODE
-Malformed string
+/Malformed string/
 OUTPUT
-}
 
