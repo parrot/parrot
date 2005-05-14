@@ -92,14 +92,31 @@ Like above with a chracter set attached to the string. Valid character
 sets are currently: C<ascii> (the default), C<binary>, C<unicode>
 (with UTF-8 as the default encoding), and C<iso-8859-1>.
 
-=item charset:encoding:"string constant"
+=head2 String escape sequences
 
-Like above with an extra encoding attached to the string.
-Currently unimplemented.
+Inside double-quoted strings the following escape sequences are processed.
+
+  \xhh        1..2 hex digits
+  \ooo        1..3 oct digits
+  \cX         control char X
+  \x{h..h}    1..8 hex digits
+  \uhhhh      4 hex digits
+  \Uhhhhhhhh  8 hex digits
+  \a, \b, \t, \n, \v, \f, \r, \e, \\
+
+=item encoding:charset:"string constant"
+
+Like above with an extra encoding attached to the string. For eample:
+
+  set S0, utf8:unicode:"«"
+
+The encoding and charset gets attaced to the string, no further processing
+is done, specifically escape sequences are not honored.
 
 =item 'char constant'
 
-Are delimited by B<'>. They are taken to be C<ascii> encoded.
+Are delimited by B<'>. They are taken to be C<ascii> encoded. No escape
+sequences are processed.
 
 =item numeric constants
 
@@ -143,6 +160,16 @@ Define a named constant of style I<type> and value I<const>.
 Defines the range of a namespace. Local variables inside a namespace
 are mangled as <namespaceidentifier::varidentifier>.
 
+=item .pcc_*
+
+Directives used for Parrot Calling Conventions.
+
+=back
+
+=head2 Deprecated stack calling convention directive
+
+=over 4
+
 =item .param <type> <identifier>
 
 Like B<.local> and generates PASM B<restore identifier>.
@@ -158,10 +185,6 @@ B<restore> from stack.
 =item .return <var>
 
 B<save> on stack.
-
-=item .pcc_*
-
-Directives used for Parrot Calling Conventions.
 
 =back
 

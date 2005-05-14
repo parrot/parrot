@@ -2344,7 +2344,7 @@ Unescapes the specified C string. These sequences are covered:
 
 STRING *
 string_unescape_cstring(Interp * interpreter,
-    const char *cstring, char delimiter, const char *charset)
+    const char *cstring, char delimiter, const char *enc_char)
 {
     size_t clength = strlen(cstring);
     STRING *result;
@@ -2353,37 +2353,38 @@ string_unescape_cstring(Interp * interpreter,
     UINTVAL flags;
     String_iter iter;
     ENCODING *encoding;
-    int utf8 = 0;
+    CHARSET *charset;
+    char *p;
 
     if (delimiter && clength)
         --clength;
+    /* we are constructing const table strings here */
     flags = PObj_constant_FLAG;
-    if (!charset)
-        charset = "ascii";
-    else
-        flags |= PObj_private7_FLAG;  /* Pythonic unicode flag */
-    if (memcmp(charset, "utf8:", 5) == 0) {
-        result = string_make(interpreter, cstring, clength, charset+5, flags);
-        utf8 = 1;
-    }
-    else
-        result = string_make(interpreter, cstring, clength, charset, flags);
-    result->strlen = clength;
-
-    ENCODING_ITER_INIT(interpreter, result, &iter);
-    /*
-     * reset encoding so that the destination encoding isn't used
-     * TODO if an encoding is given too just use it
-     */
-    encoding = result->encoding;
-    if (utf8) {
-        result->strlen = ENCODING_CODEPOINTS(interpreter, result);;
+    /* default is ascii */
+    if (!enc_char)
+        enc_char = "ascii";
+    /* check for encoding: */
+    if ( (p = strchr(enc_char, ':')) != 0) {
+        *p = '\0';
+        encoding = Parrot_find_encoding(interpreter, enc_char);
+        if (!encoding) {
+            internal_exception(UNIMPLEMENTED,
+                    "Can't make '%s' encoding strings", enc_char);
+        }
+        charset = Parrot_find_charset(interpreter, p + 1);
+        if (!charset) {
+            internal_exception(UNIMPLEMENTED,
+                    "Can't make '%s' charset strings", p + 1);
+        }
+        result = string_make_direct(interpreter, cstring, clength,
+                encoding, charset, flags);
+        string_compute_strlen(interpreter, result);
     }
     else {
-        result->encoding = Parrot_fixed_8_encoding_ptr;
-
+        result = string_make(interpreter, cstring, clength, enc_char, flags);
+        ENCODING_ITER_INIT(interpreter, result, &iter);
         for (offs = d = 0; offs < clength; ++offs) {
-            r = CHARSET_GET_CODEPOINT(interpreter, result, offs);
+            r = (Parrot_UInt4)((unsigned char*)result->strstart)[offs];
             /* There cannot be any NULs within this string.  */
             assert(r != '\0');
             /* It's also a logic bug if we encounter the delimiter.  */
@@ -2404,12 +2405,18 @@ string_unescape_cstring(Interp * interpreter,
             iter.set_and_advance(interpreter, &iter, r);
             ++d;
         }
-        result->encoding = encoding;
         result->strlen = d;
         result->bufused = iter.bytepos;
+        encoding = result->encoding;
     }
     if (!CHARSET_VALIDATE(interpreter, result, 0)) {
         internal_exception(INVALID_STRING_REPRESENTATION, "Malformed string");
+    }
+    if (encoding == Parrot_utf8_encoding_ptr) {
+        /* Pythonic unicode flag - get rid of that, Python will
+         * probably need a second string class anyway
+         */
+        PObj_get_FLAGS(result) |= PObj_private7_FLAG;
     }
     return result;
 }

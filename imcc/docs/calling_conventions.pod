@@ -72,7 +72,7 @@ Instead of the label a Subroutine object can be used too:
   .end
 
 An alternative syntaxs allow to express a return in one line.
-The surrounded parentheses are mandatory . Besides making
+The surrounded parentheses are mandatory. Besides making
 sequence break more conspiscuous, this is necessary to
 distinguish this syntax from other uses of the .return directive
 that will be probably deprecated.
@@ -80,6 +80,10 @@ that will be probably deprecated.
   .return ( a, b )      # return the values of a and b
 
   .return ()            # return no value
+
+  .return func_call()   # tail call function
+
+  .return o."meth"()    # tail method call
 
 Similarly, one can yield using the .yield directive
 

@@ -36,7 +36,7 @@ Parrot_find_encoding(Interp *interpreter, const char *encodingname)
         return Parrot_fixed_8_encoding_ptr;
     }
     if (!strcmp("utf8", encodingname)) {
-        return Parrot_fixed_8_encoding_ptr;
+        return Parrot_utf8_encoding_ptr;
     }
     return NULL;
 }

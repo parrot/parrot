@@ -329,6 +329,9 @@ string_unescape_one(Interp *interpreter, UINTVAL *offset,
         case 'n':
             ++*offset;
             return 10;
+        case 'v':
+            ++*offset;
+            return 11;
         case 'f':
             ++*offset;
             return 12;
