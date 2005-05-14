@@ -4,6 +4,9 @@ PGE::Dumper - various methods for displaying PGE structures
 
 =cut
 
+.sub __onload
+.end
+
 .namespace [ "PGE::Exp" ]
 
 .sub "dumpindent" method
@@ -49,9 +52,9 @@ PGE::Dumper - various methods for displaying PGE structures
     .local pmc literal
     literal = self["literal"]
     self."dumpindent"(indent)
-    print "LITERAL «"
+    print "LITERAL <<"
     print literal
-    print "» "
+    print ">> "
     $S0 = self."quant"()
     print $S0
     print "\n"
@@ -64,9 +67,9 @@ PGE::Dumper - various methods for displaying PGE structures
     .local pmc cname
     cname = self["cname"]
     self."dumpindent"(indent)
-    print "BACKREF «"
+    print "BACKREF <<"
     print cname
-    print "» "
+    print ">> "
     $S0 = self."quant"()
     print $S0
     print "\n"
@@ -91,10 +94,10 @@ PGE::Dumper - various methods for displaying PGE structures
     print "CharClass "
     $S0 = self["charmatch"]
     print $S0
-    print " «"
+    print " <<" 
     $S0 = self["charclass"]
     print $S0
-    print "» "
+    print ">> "
     $S0 = self."quant"()
     print $S0
     print "\n"

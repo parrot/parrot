@@ -425,6 +425,8 @@ register.
     unless $I0 goto gen_1
     firstchars = self["firstchars"]
     unless firstchars > "" goto gen_1
+    $P0 = find_global "Data::Escape", "String"
+    firstchars = $P0(firstchars, '"')
     emit(code, "    $S0 = substr target, pos, 1")
     emit(code, "    $I0 = index \"%s\", $S0", firstchars)
     emit(code, "    if $I0 < 0 goto try_again")
@@ -488,9 +490,9 @@ register.
     $S0 = self."quant"()
     $S1 = self["literal"]
     $P0 = find_global "Data::Escape", "String"
-    $S1 = $P0($S1, "'")
+    $S1 = $P0($S1, '"')
     emit(code, "\n  %s:  # literal %s", label, $S0)
-    emit(code, "    lit = '%s'", $S1)
+    emit(code, "    lit = \"%s\"", $S1)
     self.genliteral(code, label, next)
 .end
 
@@ -705,7 +707,7 @@ register.
   lazy_2:
     emit(code, "  %s_1:", label)
     emit(code, "    $S0 = substr target, pos, 1")
-    emit(code, "    $I0 = index \"%s\", pos")
+    emit(code, "    $I0 = index \"%s\", $S0", charclass)
     emit(code, "    %s $I0 == -1 goto fail", charmatch)
     emit(code, "    inc rep")
     emit(code, "    inc pos")
