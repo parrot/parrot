@@ -522,12 +522,13 @@ register.
     .return self.genliteral(code, label, next)
   named:
     $P0 = find_global "Data::Escape", "String"
-    $S1 = $P0(cname)
+    $S1 = cname
+    $S1 = $P0($S1)
     emit(code, "\n  %s:  # backref $<%s> %s", label, $S1, $S0)
     emit(code, "    lit = ''")
     emit(code, "    $P0 = getattribute mob, \"PGE::Match\\x0%:capt\"")
     emit(code, "    isnull $P0, %s_1", label)
-    emit(code, "    $P1 = $P0[\"%s\"]", $S1)       # XXX: quote $S1
+    emit(code, "    $P1 = $P0[\"%s\"]", $S1)
     emit(code, "    lit = $P1[-1]")
     emit(code, "  %s_1:", label)
     .return self.genliteral(code, label, next)
@@ -1006,7 +1007,9 @@ register.
     captattrtype = "PerlArray"
     goto init
   captsubrule:
-    captname = $P0                                 # XXX: use literal maker
+    captname = $P0
+    $P1 = find_global "Data::Escape", "String"
+    captname = $P1(captname, '"')
     captname = concat '"', captname
     captname = concat captname, '"'
     captattr = "PGE::Match\\x0%:capt"
