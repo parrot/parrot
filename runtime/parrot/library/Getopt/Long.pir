@@ -70,22 +70,31 @@ A Hash PMC is returned.
 =cut
 
 .sub get_options 
-  .param pmc argv
-  .param pmc spec
+  # TODO: Check whether these are really arrays  
+  .param pmc argv                    # An Array containing command line args
+  .param pmc spec                    # An Array containing the spec
 
-  # TODO: actually us PGE
-  .local pmc p6rule_compile
-  find_global p6rule_compile, "PGE", "p6rule"
+  # setting up PGE
+  # TODO: compile patterns in __onload
+  .local pmc    p6rule
+  find_global p6rule, "PGE", "p6rule"
+  .local pmc    isnt_binary_rule, is_long_option, is_short_option 
+  isnt_binary_rule = p6rule( '=' )
+  is_long_option   = p6rule( '--' )
+  is_short_option  = p6rule( '-' )
+  .local pmc    match
 
   # Loop over the array spec and build up two simple hashes
-  .local pmc type                    # the type of the option: binary, string, integer
+  .local pmc    type                 # the type of the option: binary, string, integer
   type = new Hash
-  .local int curr_spec               # a counter for looping over the array 'spec'
+  .local int    curr_spec            # a counter for looping over the array 'spec'
   curr_spec = 0
-  .local int max_spec                # for end condition of loop over 'spec'
+  .local int    max_spec             # for end condition of loop over 'spec'
   max_spec = spec
   .local int    spec_index           # searching for patterns in 'spec'
   .local string opt_name, opt_type   # name and type of specified option
+
+  # TODO: put this block into a sub
   goto CHECK_PARSE_SPEC
   NEXT_PARSE_SPEC:                   # Look at next element in 'spec'
     opt_name = spec[curr_spec]
@@ -93,20 +102,21 @@ A Hash PMC is returned.
     # the substr below modifies this hash key in place, so we
     # have to clone it
     opt_name = clone opt_name
-    spec_index = index opt_name, '=' # when '=' is not in 'opt_name' then it's binary
-    if spec_index != -1 goto NOT_A_BINARY_OPTION
+    match = isnt_binary_rule( opt_name ) 
+    if match goto NOT_A_BINARY_OPTION
     opt_type = 'b'
     goto OPTION_TYPE_IS_NOW_KNOWN
   NOT_A_BINARY_OPTION:
-    inc spec_index                        # we know where '=', thus the type is one further
-    opt_type = substr opt_name, spec_index, 1
-    dec spec_index                        # Go back to the '='
+    spec_index = match.from()        # position of the '=' in opt_name     
+    inc spec_index                   # we know where '=', thus the type is one further
+    opt_type = substr opt_name, spec_index, 1, ''
+    dec spec_index                   # Go back to the '='
     # TODO: what if we have something like    name=xy ?
-    opt_name = substr spec_index, 2, ''   # The stuff before '=' is the option name
+    substr opt_name, spec_index, 1, ''   # remove the '='
   OPTION_TYPE_IS_NOW_KNOWN:
     type[opt_name] = opt_type
     inc curr_spec
-  CHECK_PARSE_SPEC:                    # check whether loop over 'spec' is complete
+  CHECK_PARSE_SPEC:                  # check whether loop over 'spec' is complete
   if curr_spec < max_spec goto NEXT_PARSE_SPEC
 
   # uncomment this if you want debug output
@@ -120,11 +130,12 @@ A Hash PMC is returned.
   # shift from argv until a non-option is encountered
   .local pmc opt              # the return PMC
   opt = new Hash
-  .local string arg                 # element of argument array
-  .local string value               # element of argument array
-  .local int    num_remaining_args  # for checking whether loop is complete
-  .local int    arg_index           # holds result if 'index' op
-  .local int    is_known_option     # flag whether the option is known
+  .local string arg                  # element of argument array
+  .local string value                # element of argument array
+  .local int    num_remaining_args   # for checking whether loop is complete
+  .local int    arg_index            # holds result if 'index' op
+  .local int    is_known_option      # flag whether the option is known
+  .local int    prefix_end, prefix_len
   goto CHECK_PARSE_ARGV
   NEXT_PARSE_ARGV:
     # first we take a peek at the first remaining element
@@ -136,22 +147,28 @@ A Hash PMC is returned.
 
     # Is arg a long option string like '--help'
     # TODO: how about asdf--jkl ???
-    arg_index = index arg, '--'
-    if arg_index > -1 goto HANDLE_LONG_OPTION
+    match = is_long_option( arg ) 
+    if match goto HANDLE_LONG_OPTION
 
     # Is arg a short option string like '-v'
+    match = is_short_option( arg ) 
+    if match goto HANDLE_SHORT_OPTION
     arg_index = index arg, '-'
     if arg_index > -1 goto HANDLE_SHORT_OPTION
     # We are done, and don't want to loose the nonoption argument
     goto FINISH_PARSE_ARGV
 
     HANDLE_SHORT_OPTION:
+    # TODO: make it work for short options
     HANDLE_LONG_OPTION:
     # we take the current option off argv
     arg = shift argv
     arg = clone arg
-    # get rid of the leading '--'
-    arg = substr arg_index, 2, ''
+    # get rid of the leading '--' or '-'
+    arg_index = match.from()
+    prefix_end = match.to()
+    prefix_len = prefix_end - arg_index
+    arg = substr arg_index, prefix_len, ''
     # recover the value if any
     arg_index = index arg, '='
     if arg_index > -1 goto VALUE_PASSED
