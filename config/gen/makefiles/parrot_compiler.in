@@ -11,7 +11,7 @@ RM_F     = ${rm_f}
 PARROT   = ../../${test_prog}$(EXE)
 
 default: all
-all : runtime parrot.pbc parrot_compiler.pbc parrot_compiler.pasm
+all : parrot.pbc parrot_compiler.pbc parrot_compiler.pasm
 
 help :
 	@echo ""
