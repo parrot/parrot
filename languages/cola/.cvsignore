@@ -6,3 +6,4 @@ a.pasm
 colacc
 imcc
 Makefile
+*.o

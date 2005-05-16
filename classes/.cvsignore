@@ -1,6 +1,7 @@
 Makefile
 *.c
 *.h
+*.o
 *.tmp
 *.dump
 *.str

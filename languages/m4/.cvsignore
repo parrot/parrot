@@ -1,2 +1,4 @@
-m4.pbc
 Makefile
+eval.o
+m4.pbc
+runtime

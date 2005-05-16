@@ -1,3 +1,5 @@
+*.o
+*.str
 core_pmcs.c
 exec_cpu.c
 fingerprint.c
@@ -10,4 +12,3 @@ platform.c
 platform_asm.s
 parrot_config.h
 revision.c
-*.str
