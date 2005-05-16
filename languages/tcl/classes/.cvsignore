@@ -1,2 +1,4 @@
-*.dump
 *.c
+*.dump
+*.h
+*.so
