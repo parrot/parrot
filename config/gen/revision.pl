@@ -1,4 +1,4 @@
-# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2005 The Perl Foundation.  All Rights Reserved.
 # $Id: revision.pl 7804 2005-04-11 14:12:16Z jrieks $
 
 =head1 NAME
@@ -18,7 +18,7 @@ use strict;
 use vars qw($description);
 use Parrot::Revision;
 
-$description="Determining Parrot's revision";
+$description = "Determining Parrot's revision";
 
 sub runstep {
     my $revision = $Parrot::Revision::current;

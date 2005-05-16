@@ -7,8 +7,8 @@ Parrot::Distribution - Parrot Distribution Directory
 
 =head1 SYNOPSIS
 
-	use Parrot::Distribution;
-	$dist = Parrot::Distribution->new;
+    use Parrot::Distribution;
+    $dist = Parrot::Distribution->new();
 
 =head1 DESCRIPTION
 
@@ -30,6 +30,12 @@ package Parrot::Distribution;
 
 use strict;
 
+use Data::Dumper;
+use ExtUtils::Manifest;
+use File::Spec;
+use Parrot::Revision;
+use Parrot::Configure::Step qw(capture_output);
+
 use Parrot::Docs::Directory;
 @Parrot::Distribution::ISA = qw(Parrot::Docs::Directory);
 
@@ -50,22 +56,20 @@ my $dist;
 
 sub new
 {
-	my $self = shift;
-	
-	return $dist if defined $dist;
-	
-	my $path = '.';
-	
-	while ( $self = $self->SUPER::new($path) )
-	{
-		return $dist = $self 
-			if $self->file_exists_with_name('README')
-			and $self->file_with_name('README')->read =~ /^This is Parrot/os;
-		
-		$path = $self->parent_path;
-	}
-	
-	die "Failed to find Parrot distribution root\n";
+    my $self = shift;
+    
+    return $dist if defined $dist;
+    
+    my $path = '.';
+    
+    while ( $self = $self->SUPER::new($path) ) {
+        return $dist = $self if $self->file_exists_with_name('README') and 
+                                $self->file_with_name('README')->read =~ /^This is Parrot/os;
+        
+        $path = $self->parent_path();
+    }
+    
+    die "Failed to find Parrot distribution root\n";
 }
 
 =back
@@ -84,14 +88,14 @@ This is not really a complete list, for example F<icu> is ignored.
 
 sub c_source_file_directories
 {
-	my $self = shift;
-	
-	return $self->directory_with_name('src'),
-		$self->directory_with_name('encodings'),
-		$self->directory_with_name('io'),
-		$self->directory_with_name('pf'),
-		$self->directory_with_name('types'),
-		$self->directory_with_name('examples')->directory_with_name('c'),;
+    my $self = shift;
+    
+    return $self->directory_with_name('src'),
+        $self->directory_with_name('encodings'),
+        $self->directory_with_name('io'),
+        $self->directory_with_name('pf'),
+        $self->directory_with_name('types'),
+        $self->directory_with_name('examples')->directory_with_name('c'),;
 }
 
 =item C<c_source_file_with_name($name)>
@@ -102,19 +106,19 @@ Returns the C source file with the specified name.
 
 sub c_source_file_with_name
 {
-	my $self = shift;
-	my $name = shift || return undef;
-	
-	$name .= '.c' unless $name =~ /\.[Cc]$/o;
-	
-	foreach my $dir ($self->c_source_file_directories)
-	{
-		return $dir->file_with_name($name)
-			if $dir->file_exists_with_name($name);
-	}
-	
-	print 'WARNING: ' . __FILE__ . ':' . __LINE__ . ' File not found:' . $name ."\n";
-	return undef;
+    my $self = shift;
+    my $name = shift || return undef;
+    
+    $name .= '.c' unless $name =~ /\.[Cc]$/o;
+    
+    foreach my $dir ($self->c_source_file_directories)
+    {
+        return $dir->file_with_name($name)
+            if $dir->file_exists_with_name($name);
+    }
+    
+    print 'WARNING: ' . __FILE__ . ':' . __LINE__ . ' File not found:' . $name ."\n";
+    return undef;
 }
 
 =item C<c_header_file_directories()>
@@ -127,9 +131,9 @@ Currently only F<include/parrot>.
 
 sub c_header_file_directories
 {
-	my $self = shift;
-	
-	return $self->directory_with_relative_path('include/parrot');
+    my $self = shift;
+    
+    return $self->directory_with_relative_path('include/parrot');
 }
 
 =item C<c_header_file_with_name($name)>
@@ -140,18 +144,18 @@ Returns the C header file with the specified name.
 
 sub c_header_file_with_name
 {
-	my $self = shift;
-	my $name = shift || return undef;
-	
-	$name .= '.h' unless $name =~ /\.[Hh]$/o;
-	
-	foreach my $dir ($self->c_header_file_directories)
-	{
-		return $dir->file_with_name($name)
-			if $dir->file_exists_with_name($name);
-	}
-	
-	return undef;
+    my $self = shift;
+    my $name = shift || return undef;
+    
+    $name .= '.h' unless $name =~ /\.[Hh]$/o;
+    
+    foreach my $dir ($self->c_header_file_directories)
+    {
+        return $dir->file_with_name($name)
+            if $dir->file_exists_with_name($name);
+    }
+    
+    return undef;
 }
 
 =item C<file_for_perl_module($module)>
@@ -162,21 +166,22 @@ Returns the Perl module file for the specified module.
 
 sub file_for_perl_module
 {
-	my $self = shift;
-	my $module = shift || return undef;
-	my @path = split '::', $module;
-	
-	$module = pop @path;
-	$module .= '.pm';
-	
-	my $dir = $self->existing_directory_with_name('lib');
-	
-	foreach my $name (@path)
-	{
-		return undef unless $dir = $dir->existing_directory_with_name($name);
-	}
-	
-	return $dir->existing_file_with_name($module);
+    my $self = shift;
+    my $module = shift || return undef;
+
+    my @path = split '::', $module;
+    
+    $module = pop @path;
+    $module .= '.pm';
+    
+    my $dir = $self->existing_directory_with_name('lib');
+    
+    foreach my $name (@path)
+    {
+        return undef unless $dir = $dir->existing_directory_with_name($name);
+    }
+    
+    return $dir->existing_file_with_name($module);
 }
 
 =item C<docs_directory()>
@@ -188,8 +193,8 @@ Returns the documentation directory.
 sub docs_directory
 {
     my $self = shift;
-	
-	return $self->existing_directory_with_name('docs');
+    
+    return $self->existing_directory_with_name('docs');
 }
 
 =item C<html_docs_directory()>
@@ -201,8 +206,8 @@ Returns the HTML documentation directory.
 sub html_docs_directory
 {
     my $self = shift;
-	
-	return $self->docs_directory->directory_with_name('html');
+    
+    return $self->docs_directory->directory_with_name('html');
 }
 
 =item C<delete_html_docs()>
@@ -214,8 +219,43 @@ Deletes the HTML documentation directory.
 sub delete_html_docs
 {
     my $self = shift;
-	
-	return $self->html_docs_directory->delete;
+    
+    return $self->html_docs_directory->delete();
+}
+
+=iten <gen_manifest_skip>
+
+Ask svn of svk about svn:ignore and generate the lines for MANIFEST.SKIP.
+
+=cut
+
+sub gen_manifest_skip {
+
+   # manicheck.pl is propably only useful for checked out revisions
+   # Checkout is done either with svn or svk
+   my $svn_cmd = $Parrot::Revision::svn_entries =~ m/\.svn/ ? 'svn' : 'svk';
+
+   # cd to the distribution root first
+   my $file_list = ExtUtils::Manifest::manifind();
+   my %dir_list  = map { ( File::Spec->splitpath( $_ ) )[1] => 1 } keys %{$file_list};
+ 
+   my @skip;     # regular expressions for files to skip
+   foreach my $dir ( sort keys %dir_list ) {
+       next if $dir =~ m/\.svn/;
+       next if ( $dir && ! -d $dir ); 
+
+       my $patterns = capture_output( "$svn_cmd propget svn:ignore $dir" );
+       # TODO: escape chars that are special in regular expressions
+       push @skip, qq{# generated from svn:ignore of '$dir'},
+                   map { my $end = $dir_list{ $dir . $_} ? '$' : '/'; # ignore file or dir
+                         s/\*/.*/g;                           # * is any amount of chars
+                         s/\./\./g;                           # . is simple a dot
+                         "^${dir}${_}\$",                     # SVN globs are specific to a dir
+                         "^${dir}${_}/",                      # SVN globs are specific to a dir
+                       } split( /\n/, $patterns );
+    }
+
+    return \@skip;
 }
 
 =back
