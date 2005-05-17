@@ -347,6 +347,8 @@ Marks the continuation as live.
 
     void mark () {
         struct Parrot_sub * sub = PMC_sub(SELF);
+        if (!sub)
+            return;
         if (sub->name)
             pobject_lives(INTERP, (PObj *) sub->name);
         if (!PMC_IS_NULL(sub->name_space))
