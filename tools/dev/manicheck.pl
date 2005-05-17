@@ -1,6 +1,6 @@
 #! perl -w
 ################################################################################
-# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
 ################################################################################
 
@@ -24,35 +24,58 @@ then any extra files are listed.
 ################################################################################
 
 use strict;
+use FindBin;
+use lib "$FindBin::Bin/../../lib";
+
+use Data::Dumper;
+use ExtUtils::Manifest;
+use File::Spec;
+use Parrot::Distribution;
+use Parrot::Revision;
+use Parrot::Configure::Step qw(capture_output);
 
 # CVS built-in patterns
-my @base_patterns = qw(^\.svn$ ^\.cvsignore$ ^core$ ^.*\.o$);
+my @base_patterns = qw(^\.svn$ ^core$ ^.*\.o$);
 
-use ExtUtils::Manifest;
+my $manifest  = ExtUtils::Manifest::maniread();
+my $file_list = ExtUtils::Manifest::manifind();
+my %dir_list  = map { ( File::Spec->splitpath( $_ ) )[1] => 1 } keys %{$file_list};
+$dir_list{'./'} = 1;
 
-my $manifest = ExtUtils::Manifest::maniread();
-my $filelist = ExtUtils::Manifest::manifind();
+# manicheck.pl is propably only useful for checked out revisions
+# Checkout is done either with svn or svk
+my $svn_cmd = $Parrot::Revision::svn_entries =~ m/\.svn/ ? 'svn' : 'svk';
+my $dist = Parrot::Distribution->new();
+my $skip = $dist->gen_manifest_skip( );
+die Dumper( $skip );
 
-my @ignore_dirs = grep { m#(^|/)\.cvsignore$#; } keys %$filelist;
+# directories with
+my @ignore_dirs; 
 
-@ignore_dirs = map { s#(^|/)\.cvsignore$##; $_ } @ignore_dirs;
-
+# Ask all directories about svn:ignore file patterns
 my %ignore_dirs;
 
-foreach my $dir (@ignore_dirs) {
-  my $cvsignore = $dir ne '' ? "$dir/.cvsignore" : '.cvsignore';
+foreach my $dir ( keys %dir_list ) {
+  
+  next unless $dir;
+  next if $dir =~ m/\.svn/;
+  next unless -d $dir; 
+  #my $cvsignore = $dir ne '' ? "$dir/.cvsignore" : '.cvsignore';
 
-  open CVSIGNORE, "<$cvsignore" or die "Could not open $cvsignore.\n";
-  my @patterns = <CVSIGNORE>;
-  close CVSIGNORE;
+  #open CVSIGNORE, "<$cvsignore" or die "Could not open $cvsignore.\n";
+  #my @patterns = <CVSIGNORE>;
+  #close CVSIGNORE;
+  my @patterns = `$svn_cmd propget svn:ignore $dir`;
   @patterns = map { chomp; s/\*/.*/g; "^$_\$"; } @patterns;
+die Dumper( $dir, \@patterns );
 
-  $ignore_dirs{$dir} = [ @patterns, @base_patterns ];
+  $ignore_dirs{$dir} = \@patterns if scalar(@patterns);
 }
+die Dumper( \%ignore_dirs );
 
 my %matches;
 
-foreach (keys %$filelist) { $matches{$_}++; }
+foreach (keys %$file_list) { $matches{$_}++; }
 foreach (keys %$manifest) { $matches{$_}--; }
 
 my @missing;
@@ -123,11 +146,11 @@ sub ignore
   foreach my $element (@path) {
     if ($ignore_dirs{$dir}) {
       foreach my $pattern (@{$ignore_dirs{$dir}}) {
-	return 1 if $element =~ m/$pattern/;
+        return 1 if $element =~ m/$pattern/;
       }
     } else {
       foreach my $pattern (@base_patterns) {
-	return 1 if $element =~ m/$pattern/;
+        return 1 if $element =~ m/$pattern/;
       }
     }
 
@@ -139,5 +162,35 @@ sub ignore
   }
 
   return 0;
+}
+
+
+=head2 gen_manifest_skip
+
+Take a list of dirs and ask svn of svk about them and generate a MANIFEST.SKIP.
+
+=cut
+
+sub gen_manifest_skip {
+   my ( $dir_list, $svn_cmd ) = @_;
+ 
+   my @skip;     # regular expressions for files to skip
+   foreach my $dir ( sort keys %dir_list ) {
+  
+       next unless $dir;
+       next unless $dir =~ m/\/$/;
+       next if $dir =~ m/\.svn/;
+       next unless -d $dir; 
+
+       my $patterns = capture_output( "$svn_cmd propget svn:ignore $dir" );
+       # TODO: escape chars that are special in regular expressions
+       push @skip, qq{# generated from svn:ignore of '$dir'},
+                   map { s/\*/.*/g;       # * is any amount of chars
+                         s/\./\./g;       # . is simple a dot
+                         "^${dir}${_}\$"; # SVN globs are specific to a dir
+                       } split( /\n/, $patterns );
+    }
+
+     return \@skip;
 }
 

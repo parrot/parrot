@@ -230,7 +230,7 @@ sub files_worth_describing {
     my @files;
     find(sub {
 	my $name = $File::Find::name;
-	return if $name =~ /CVS|cvsignore|core|\.[oa]|\.(so|brk|dsp|tmp)$/;
+	return if $name =~ /\.svn|core|\.[oa]|\.(so|brk|dsp|tmp)$/;
 	return if $name =~ /locales\W[a-z_]+\.txt$/i;
 	return if $name =~ /icu\Wsource/; # icu cleanup code above needs work
 	return if -d $_;
@@ -246,4 +246,3 @@ sub clip_excess_lines {
 	if $_[0] =~ tr/\n/\n/ > $cnt;
     return undef;
 }
-

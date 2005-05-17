@@ -1,9 +1,0 @@
-PMC.pm
-Jit.pm
-Config.pm
-blib
-pm_to_blib
-PakFile2.c
-PakFile2.bs
-Makefile
-*.tmp

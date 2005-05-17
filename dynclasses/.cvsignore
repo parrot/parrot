@@ -1,8 +1,0 @@
-Makefile
-*.dump
-*.c
-*.h
-*.dylib
-*.bundle
-*.so
-*.o

@@ -1,5 +1,5 @@
 #! perl -w
-# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 =head1 NAME
@@ -8,7 +8,7 @@ t/src/manifest.t - MANIFEST File
 
 =head1 SYNOPSIS
 
-	% perl -Ilib t/src/manifest.t
+	% perl t/src/manifest.t
 
 =head1 DESCRIPTION
 
@@ -16,81 +16,66 @@ Checks that the distribution and the MANIFEST file agree.
 
 =cut
 
-use Test::More tests => 4;
+use strict;
+use FindBin;
+use lib "$FindBin::Bin/../../lib";
 
+use Test::More tests => 6;
+
+use Data::Dumper;
 use File::Find qw(find);
 use ExtUtils::Manifest;
+use Parrot::Distribution;
+use Parrot::Revision;
 
-my $ignore_re = qr,(?:   \.cvsignore $ ),x;
+ok(-e $ExtUtils::Manifest::MANIFEST, 'MANIFEST exists');
 
-ok (-e $ExtUtils::Manifest::MANIFEST, 'MANIFEST exists');
+my $manifest_skip = $ExtUtils::Manifest::MANIFEST . '.SKIP'; 
+ok(-e $manifest_skip, 'MANIFEST.SKIP exists');
 
-$ExtUtils::Manifest::Quiet = 1;
-my @missing = ExtUtils::Manifest::manicheck ();
-unless (ok (!@missing, 'manicheck ()')) {
-  print "# Missing files:\n";
-  print "# $_\n" foreach @missing;
+
+sub list_diff {
+    my ($a, $b) = @_;
+
+    my %elem;
+    grep { $elem{$_}++ } @$a;
+    grep { $elem{$_}-- } @$b;
+
+    return ( [ sort grep { $elem{$_} < 0 } keys %elem ],
+	     [ sort grep { $elem{$_} > 0 } keys %elem ] );
 }
 
-sub scan_cvs;
-sub list_diff (\@\@);
-sub read_manifest;
+SKIP:
+{
+    # check that MANIFEST.SKIP is in sync with svn:ignore
+    # An new MANIFEST.SKIP can be generated with tools/dev/gen_manifest_skip.pl
+    skip 'Not a working copy', 4 unless $Parrot::Revision::svn_entries;
 
-SKIP: {
-  skip ('No CVS version', 2) unless -e 'CVS';
+    my $dist = Parrot::Distribution->new();
+    my @from_svn = grep { $_ && $_ !~ m/^#/ } @{ $dist->gen_manifest_skip() };
+    unshift @from_svn, '\B\.svn\b';   # added in gen_manifest_skip.pl
+    open( MANIFEST_SKIP, '<', $manifest_skip ) or die "Can't open $manifest_skip: $!";
+    my @from_manifest_skip = grep { $_ ne "\n" && $_ !~ m/^#/ } ( <MANIFEST_SKIP> );
+    close( MANIFEST_SKIP );
+    chomp(@from_manifest_skip);
+    my ($svn_miss, $manifest_skip_miss) = list_diff(\@from_svn, \@from_manifest_skip);
+    # print Dumper( $svn_miss, $manifest_skip_miss, \@from_svn, \@from_manifest_skip);
 
-  local @cvs_entries;
-  find(\&scan_cvs, '.');
+    local $" = "\n\t";
 
-  @cvs_entries = grep { s,^./,, && !m/$ignore_re/ } @cvs_entries;
+    ok(!@$svn_miss, 'all files in MANIFEST.SKIP are also in svn:ignore')
+        or diag("Missing files in MANIFEST.SKIP:\n\t@$svn_miss");
 
-  my @manifest = sort keys %{ExtUtils::Manifest::maniread()};
+    ok(!@$manifest_skip_miss, 'all files in svn:ignore are in MANIFEST.SKIP')
+        or diag("Missing files in svn:ignore:\n\t@$manifest_skip_miss");
 
-  my ($cvs_miss, $mani_miss);
+    $ExtUtils::Manifest::Quiet = 1;
 
-  ($cvs_miss, $mani_miss) = list_diff @cvs_entries, @manifest;
+    my @missing = ExtUtils::Manifest::manicheck();
+    ok(!@missing, 'manicheck()')
+        or diag("Missing files:\n\t@missing");
 
-  local $" = "\n\t";
-
-  ok (!@$cvs_miss, 'all files in MANIFEST are in CVS')
-    or diag ("Missing files in CVS:\n\t@$cvs_miss");
-
-  ok (!@$mani_miss, 'all files in CVS are in MANIFEST')
-    or diag ("Missing files in Manifest:\n\t@$mani_miss");
-}
-
-sub scan_cvs {
-  my $file = $_;
-
-  if ( $file eq 'CVS') {
-    # Need to localise $_, as the while loop assigns to it, at the end of the
-    # loop it will be undef, and File::Find then does stat tests on $_
-    local (*CVS, $_);
-
-    open CVS, 'CVS/Entries';
-
-    while (<CVS>) {
-      chop;
-      next if m/^D/; # directories are will be further scanned
-
-      my (undef, $entry, $rev) = split '/';
-      push @cvs_entries, "$File::Find::dir/$entry" if $rev !~ m/^-/;
-    }
-
-    close CVS;
-
-    $File::Find::prune = 1;
-  }
-}
-
-sub list_diff (\@\@) {
-  my ($a, $b) = @_;
-
-  my %elem;
-  grep { $elem{$_}++ } @$a;
-  grep { $elem{$_}-- } @$b;
-
-  return ( [ sort grep { $elem{$_} < 0 } keys %elem ],
-	   [ sort grep { $elem{$_} > 0 } keys %elem ] );
-}
-
+    my @extra = ExtUtils::Manifest::filecheck();
+    ok(!@extra, 'filecheck()')
+        or diag("Extra files:\n\t@extra");
+};
