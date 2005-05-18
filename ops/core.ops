@@ -1195,7 +1195,23 @@ op dlvar (out PMC, in PMC, in STR) {
 }
 
 inline op compile(out PMC, in PMC, in STR) {
-  $1 = VTABLE_invoke(interpreter, $2, $3);
+  opcode_t *dest;
+  PMC *compiler = $2;
+  if (VTABLE_isa(interpreter, compiler, const_string(interpreter, "Sub"))) {
+    dest = expr NEXT();
+    REG_PMC(2) = NULL;
+    REG_STR(5) = $3;
+    REG_INT(0) = 1;
+    REG_INT(1) = 0;
+    REG_INT(2) = 1;
+    REG_INT(3) = 0;
+    REG_INT(4) = 0;
+    REG_PMC(1) = new_ret_continuation_pmc(interpreter, dest);
+    dest = (opcode_t *)p->vtable->invoke(interpreter, compiler, dest);
+    goto ADDRESS(dest);
+  }
+  else
+    $1 = VTABLE_invoke(interpreter, compiler, $3);
   goto NEXT();
 }
 
