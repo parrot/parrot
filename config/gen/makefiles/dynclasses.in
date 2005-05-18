@@ -39,7 +39,7 @@ PMCS = \
   subproxy \
   foo
 
-BUILD = $(PERL) ${build_dir}${slash}build_tools${slash}build_dynclasses.pl
+BUILD = $(PERL) "${build_dir}${slash}build_tools${slash}build_dynclasses.pl"
 
 all :
 	@$(BUILD) generate $(PMCS)

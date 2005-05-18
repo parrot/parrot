@@ -72,9 +72,9 @@ sub partial_link_cmd {
     }
 
     return
-        "$LD $LDFLAGS $LD_LOAD_FLAGS $liblist $LIBPARROT ".
+        "$LD $LDFLAGS $LD_LOAD_FLAGS $liblist $PATHQUOTE$LIBPARROT$PATHQUOTE ".
         "${ld_out}" . $target . " " .
-        join(" ", @$sources);
+        join(" ", map {"$PATHQUOTE$_$PATHQUOTE"} @$sources);
 }
 
 our $NOW = time();
