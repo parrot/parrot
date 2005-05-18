@@ -1,4 +1,4 @@
-# Copyright: 2001-2004 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 =head1 NAME
@@ -19,43 +19,37 @@ through the questions below and read the ones that apply to you.
 
 =item *
 
-If you're just interested in browsing the CVS repository without downloading 
-anything, a few interfaces exist.
+There is a webinterface to the subversion repository, in case you just want to browse
+the source.
 
-http://cvs.perl.org/cvsweb/parrot/
-
-http://cvs.perl.org/viewcvs/parrot/
+http://svn.perl.org/viewcvs/parrot/
 
 =item *
 
-The easiest solution is to grab the most recent snapshot of the Parrot CVS 
+The easiest solution is to grab the most recent snapshot of the Parrot SVN 
 repository. It's a tar-gzipped download of a recent checkout of Parrot, 
 updated every six hours. You can find it here:
 
-http://cvs.perl.org/snapshots/parrot/parrot-latest.tar.gz
+http://svn.perl.org/snapshots/parrot/parrot-latest.tar.gz
 
 =item *
 
-Even better is the option to use CVS, which gets you the very latest copy of 
+Even better is the option to use SVN, which gets you the very latest copy of 
 the Parrot distribution. The procedure for this is:
 
-C<cvs -d :pserver:anonymous@cvs.perl.org:/cvs/public login>
-
-C<[press enter at the password prompt]>
-
-C<cvs -d :pserver:anonymous@cvs.perl.org:/cvs/public co parrot>
+C<svn checkout https://svn.perl.org/parrot/trunk parrot>
 
 =item *
 
 Or, if you're one of those rsync folks, you can access the repository with:
 
-C<rsync -av --delete cvs.perl.org::parrot-HEAD parrot>
+C<rsync -av --delete svn.perl.org::parrot-HEAD parrot>
 
 =back
 
-For the Parrot CVS website with the above instructions, check out:
+The abobe instructions are also on the Parrot website:
 
-http://cvs.perl.org/
+http://www.parrotcode.org/source.html
 
 =head2 Now that I've got Parrot, what do I do?
 
@@ -94,7 +88,7 @@ There is also some experimental auto-generated HTML documentation
 available by running the following command in the Parrot distribution's
 root directory:
 
-    % perl tools/docs/write_docs.pl -s
+    % make html
 
 To view the HTML documentation start with the page F<docs/html/index.html>.
 
@@ -193,7 +187,7 @@ http://lists.perl.org/showlist.cgi?name=perl6-announce
 
 =back
 
-In addition, there is a mailing list which logs all commits to the Parrot CVS 
+In addition, there is a mailing list which logs all commits to the Parrot SVN 
 repository. If you're interested in Parrot development, you might find it 
 very helpful to subscribe and keep up on changes that people are making.
 
@@ -289,56 +283,9 @@ Located at:
 http://www.vendian.org/parrot/wiki/
 
 A collection of various other pieces of useful Parrot information and
-documentation that have yet to make it into the CVS repository. Includes
+documentation that have yet to make it into the SVN repository. Includes
 a comprehensive guide to getting started with Parrot development (called,
 unsurprisingly, 'Getting Started with Parrot Development').
-
-=item * Tinderbox
-
-The tinderbox consists of a number of different computers running various OS 
-and platform configurations, downloading the latest Parrot distribution every 
-few hours and running the test suite to verify that it works on that given 
-combination of software and hardware.
-
-To view the results of the tinderbox system, check out:
-
-http://tinderbox.perl.org/tinderbox/bdshowbuild.cgi?tree=parrot
-
-=item * Tinderbox Failure Summary
-
-A brief summary of the current status of the various tinderbox machines.
-Useful for finding out which tests are failing (if any).
-
-=item * Test Coverage Results
-
-The Parrot test suite is intended to test all aspects of Parrot's code. You 
-can see how successful we are at this goal by checkout the test coverage. It 
-gives line, branch, and call coverage percentages on a per-file or 
-per-function breakdown. Find it here:
-
-http://www.hitchhiker.org/parrot_coverage/
-
-=item * Bonsai
-
-Bonsai is a cvs tree control tool to monitor the status of cvs trees. 
-Whenever a checkin occurs, bonsai adds that person to the "hook," a list of 
-those responsible for the current state of the tree (this should be cleared 
-whenever we know that things are working for sure). Users can then run 
-queries to find out who has changed what files and access their checkin 
-comments in addition to generating diffs.
-
-=over 4
-
-=item * Query
-
-http://tinderbox.perl.org/bonsai/cvsqueryform.cgi?cvsroot=/home/tinder/perlcvs&module=parrot
-
-=item * Browse
-
-http://tinderbox.perl.org/bonsai/rview.cgi?cvsroot=/home/tinder/perlcvs&dir=parrot&module=parrot
-
-
-=back
 
 =back
 

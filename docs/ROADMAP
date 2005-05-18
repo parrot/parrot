@@ -76,7 +76,7 @@ compatibility will be listed here.
 
 =item *
 
-To be included: docs/pmc, docs/resources, docs/*.pod, anything in CVS not
+To be included: docs/pmc, docs/resources, docs/*.pod, anything in SVN not
 in docs, RT. (That is, quite a bit.)
 
 =back

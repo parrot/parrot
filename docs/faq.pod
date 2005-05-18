@@ -546,7 +546,7 @@ Really.: http://developer.apple.com/techpubs/mac/PPCSoftware/PPCSoftware-13.html
 =head1 VERSION
 
 The FAQ is now in version control and "Revision" isn't really being tracked.
-The most recent CVS ID is C<$Id$>
+The most recent SVN ID is C<$Id$>
 
 =over 4
 

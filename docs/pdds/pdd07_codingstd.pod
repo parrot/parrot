@@ -1,4 +1,4 @@
-# Copyright: 2001-2004 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 =head1 NAME
@@ -630,9 +630,9 @@ The POD documentation should follow the standard POD layout:
 
 The Parrot copyright statement.
 
-=item CVS
+=item SVN
 
-A CVS id string.
+A SVN id string.
 
 =item NAME
 

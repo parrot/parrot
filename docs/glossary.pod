@@ -1,4 +1,4 @@
-# Copyright: 2001-2004 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 =head1 NAME
@@ -177,10 +177,7 @@ run PBC files, PASM files or IMC files).
 =head2 Packfile
 
 Another name for a PBC file, due to the names used for data structures
-in one of the early implementations. You can see the initial commit of
-the PackFile.pm implementation, with the rationale for the name here:
-
-http://cvs.perl.org/cgi/viewcvs.cgi/parrot/lib/Parrot/PackFile.pm?sortby=log
+in one of the early implementations in Perl5.
 
 =head2 PBC
 
