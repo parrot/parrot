@@ -20,7 +20,7 @@ use strict;
 use FindBin;
 use lib "$FindBin::Bin/../../lib";
 
-use Test::More tests => 6;
+use Test::More tests => 5;
 
 use Data::Dumper;
 use File::Find qw(find);
@@ -49,7 +49,7 @@ SKIP:
 {
     # check that MANIFEST.SKIP is in sync with svn:ignore
     # An new MANIFEST.SKIP can be generated with tools/dev/gen_manifest_skip.pl
-    skip 'Not a working copy', 4 unless $Parrot::Revision::svn_entries;
+    skip 'Not a working copy', 3 unless $Parrot::Revision::svn_entries;
 
     my $dist = Parrot::Distribution->new();
     my @from_svn = grep { $_ && $_ !~ m/^#/ } @{ $dist->gen_manifest_skip() };
@@ -75,7 +75,8 @@ SKIP:
     ok(!@missing, 'manicheck()')
         or diag("Missing files:\n\t@missing");
 
-    my @extra = ExtUtils::Manifest::filecheck();
-    ok(!@extra, 'filecheck()')
-        or diag("Extra files:\n\t@extra");
+    # Extra files are bound to turn up, no need to complain about it
+    # my @extra = ExtUtils::Manifest::filecheck();
+    # ok(!@extra, 'filecheck()')
+    #     or diag("Extra files:\n\t@extra");
 };
