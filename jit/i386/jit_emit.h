@@ -2249,8 +2249,8 @@ jit_set_p_ki_i(Parrot_jit_info_t *jit_info, Interp* interpreter, size_t offset)
     return L4;
 }
 
-#undef ROFFS_PMC(x)
-#undef ROFFS_INT(x)
+#undef ROFFS_PMC
+#undef ROFFS_INT
 #undef NATIVECODE
 
 /*
