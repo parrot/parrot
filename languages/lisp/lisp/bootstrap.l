@@ -1,8 +1,8 @@
 ;; Export external symbols from the COMMON-LISP package
 (sys:%export (sys:%find-package "COMMON-LISP")
 	     ;; List related functions
-	     "CAAR" "CADR" "CDAR" "CDDR" "CAAAR" "CAADR" "CADAR" "CADDR"
-	     "CDAAR" "CDADR" "CDDAR" "CDDDR" "CAAAAR" "CAAADR" "CAADAR"
+	     "APPEND" "CAAR" "CADR" "CDAR" "CDDR" "CAAAR" "CAADR" "CADAR"
+	     "CADDR" "CDAAR" "CDADR" "CDDAR" "CDDDR" "CAAAAR" "CAAADR" "CAADAR"
 	     "CAADDR" "CADAAR" "CADADR" "CADDAR" "CDAAAR" "CDAADR" "CDADAR"
 	     "CDADDR" "CDDAAR" "CDDADR" "CDDDAR" "CDDDDR"
 
@@ -25,8 +25,8 @@
 	     "DEFUN"
 
 	     ;; Miscellaneous functions
-	     "APPLY" "ATOM" "EQ" "EQL" "EVAL" "FUNCTION" "GENSYM" "LET" "NOT"
-	     "NULL" "PACKAGE-NAME" "PRINT" "PROGN" "QUOTE" "READ"
+	     "APPLY" "ATOM" "CHAR" "EQ" "EQL" "EVAL" "FUNCTION" "GENSYM" "LET"
+	     "NOT" "NULL" "PACKAGE-NAME" "PRINT" "PROGN" "QUOTE" "READ"
 	     "READ-DELIMITED-LIST" "RPLACA" "RPLACD" "SETQ" "SYMBOL-FUNCTION"
 	     "SYMBOL-NAME" "SYMBOL-PACKAGE" "TYPE-OF" "VALUES"
 	     "IN-PACKAGE" 

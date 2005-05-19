@@ -45,6 +45,13 @@
 (defun ninth (x) (car (cddddr (cddddr x))))
 (defun tenth (x) (cadr (cddddr (cddddr x))))
 
+;; Appends list A to list B
+(sys:set-symbol-function 'append
+			 #'(lambda (a b)
+			     (if (null a)
+				 b
+			       (cons (car a) (append (cdr a) b)))))
+
 ;; Copies and returns the passed tree.
 (defun copy-tree (tree)
   (if (consp tree)

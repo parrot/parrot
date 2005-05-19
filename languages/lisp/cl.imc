@@ -58,6 +58,8 @@
 
   .DEFUN(symbol, package, "CDR", _cdr)
 
+  .DEFUN(symbol, package, "CHAR", _char)
+
   .DEFUN(symbol, package, "CONS", _cons)
 
   .DEFUN(symbol, package, "EQ", _eq)
@@ -267,6 +269,43 @@ ERROR_NARGS:
 
 DONE:
   .return(retv)
+.end
+
+.sub _char
+ .param pmc args
+ .local pmc retval
+ .local pmc ke
+ .local string str
+ .local string sstr
+ .local int k
+ .local int leng
+
+ .ASSERT_LENGTH(args, 2, ERROR_NARGS)
+
+  str = args[0]
+  ke = args[1]
+  k = ke[0]
+
+  length leng, str
+
+  if k > leng goto BOUNDS
+  if k < 0 goto BOUNDS
+
+  sstr = str[k]
+  retval = new "LispString"
+  retval = sstr
+  goto DONE
+
+BOUNDS:
+ .NIL(retval)
+  goto DONE
+
+ERROR_NARGS:
+ .ERROR_0("program-error", "wrong number of arguments to CHAR")
+  goto DONE
+
+DONE:
+ .return(retval)
 .end
 
 .sub _cons
