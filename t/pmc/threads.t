@@ -263,8 +263,6 @@ CODE
 500500
 OUTPUT
 
-SKIP: {
-  skip("detach broken on $^O", 1) if ($^O =~ /MSWin32/);
 output_like(<<'CODE', <<'OUTPUT', "detach");
     find_global P5, "_foo"
     new P2, .ParrotThread
@@ -292,7 +290,6 @@ wait:
 CODE
 /(done\nthread\n)|(thread\ndone\n)/
 OUTPUT
-}
 
 output_is(<<'CODE', <<'OUTPUT', "share a PMC");
     find_global P5, "_foo"
