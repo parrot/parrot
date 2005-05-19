@@ -168,7 +168,8 @@ E: jquelin@cpan.org
 S: Lyon, France
 
 N: Jerry Gay
-D: remove Win32 compile warnings; pcre update
+E: Jerry.Gay@gmail.com
+D: remove Win32 compile warnings; pcre update; cleanup of internal exceptions
 
 N: John Paul Wallington
 D: pir-mode.el: fix for xemacs plus bugfixes and cleanups

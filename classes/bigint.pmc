@@ -203,141 +203,169 @@ bigint_neg(Interp *interpreter, PMC* self, PMC *dest)
 
 static void
 bigint_init(Interp *interpreter, PMC *self) {
-    internal_exception(1, "no bigint lib loaded");
+    real_exception(interpreter, NULL, E_LibraryNotLoadedError,
+        "no bigint lib loaded");
 }
 static void
 bigint_clear(Interp *interpreter, PMC *self) {
-    internal_exception(1, "no bigint lib loaded");
+    real_exception(interpreter, NULL, E_LibraryNotLoadedError,
+        "no bigint lib loaded");
 }
 static void
 bigint_set_long(Interp *interpreter, PMC *self, long value) {
-    internal_exception(1, "no bigint lib loaded");
+    real_exception(interpreter, NULL, E_LibraryNotLoadedError,
+        "no bigint lib loaded");
 }
 static void
 bigint_set(Interp *interpreter, PMC *dest, PMC *src) {
-    internal_exception(1, "no bigint lib loaded");
+    real_exception(interpreter, NULL, E_LibraryNotLoadedError,
+        "no bigint lib loaded");
 }
 static void
 bigint_set_double(Interp *interpreter, PMC *self, double value) {
-    internal_exception(1, "no bigint lib loaded");
+    real_exception(interpreter, NULL, E_LibraryNotLoadedError,
+        "no bigint lib loaded");
 }
 static void
 bigint_set_str(Interp *interpreter, PMC *self, char* value, int base) {
-    internal_exception(1, "no bigint lib loaded");
+    real_exception(interpreter, NULL, E_LibraryNotLoadedError,
+        "no bigint lib loaded");
 }
 static void
 bigint_set_self(Interp *interpreter, PMC *self, BIGNUM *value) {
-    internal_exception(1, "no bigint lib loaded");
+    real_exception(interpreter, NULL, E_LibraryNotLoadedError,
+        "no bigint lib loaded");
 }
 static BIGNUM*
 bigint_get_self(Interp *interpreter, PMC *self) {
-    internal_exception(1, "no bigint lib loaded");
+    real_exception(interpreter, NULL, E_LibraryNotLoadedError,
+        "no bigint lib loaded");
     return NULL;
 }
 
 static char *
 bigint_get_string(Interp *interpreter, PMC *self, int base) {
-    internal_exception(1, "no bigint lib loaded");
+    real_exception(interpreter, NULL, E_LibraryNotLoadedError,
+        "no bigint lib loaded");
     return NULL;
 }
 
 static long
 bigint_get_long(Interp *interpreter, PMC *self) {
-    internal_exception(1, "no bigint lib loaded");
+    real_exception(interpreter, NULL, E_LibraryNotLoadedError,
+        "no bigint lib loaded");
     return 0L;
 }
 static long
 bigint_get_bool(Interp *interpreter, PMC *self) {
-    internal_exception(1, "no bigint lib loaded");
+    real_exception(interpreter, NULL, E_LibraryNotLoadedError,
+        "no bigint lib loaded");
     return 0L;
 }
 static double
 bigint_get_double(Interp *interpreter, PMC *self) {
-    internal_exception(1, "no bigint lib loaded");
+    real_exception(interpreter, NULL, E_LibraryNotLoadedError,
+        "no bigint lib loaded");
     return 0.0;
 }
 static void
 bigint_add_bigint(Interp *interpreter, PMC* self, PMC *value, PMC *dest)
 {
-    internal_exception(1, "no bigint lib loaded");
+    real_exception(interpreter, NULL, E_LibraryNotLoadedError,
+        "no bigint lib loaded");
 }
 static void
 bigint_add_bigint_int(Interp *interpreter, PMC* self, INTVAL value, PMC *dest)
 {
-    internal_exception(1, "no bigint lib loaded");
+    real_exception(interpreter, NULL, E_LibraryNotLoadedError,
+        "no bigint lib loaded");
 }
 static void
 bigint_sub_bigint(Interp *interpreter, PMC* self, PMC *value, PMC *dest)
 {
-    internal_exception(1, "no bigint lib loaded");
+    real_exception(interpreter, NULL, E_LibraryNotLoadedError,
+        "no bigint lib loaded");
 }
 static void
 bigint_sub_bigint_int(Interp *interpreter, PMC* self, INTVAL value, PMC *dest)
 {
-    internal_exception(1, "no bigint lib loaded");
+    real_exception(interpreter, NULL, E_LibraryNotLoadedError,
+        "no bigint lib loaded");
 }
 static void
 bigint_mul_bigint(Interp *interpreter, PMC* self, PMC *value, PMC *dest)
 {
-    internal_exception(1, "no bigint lib loaded");
+    real_exception(interpreter, NULL, E_LibraryNotLoadedError,
+        "no bigint lib loaded");
 }
 static void
 bigint_mul_bigint_int(Interp *interpreter, PMC* self, INTVAL value,
         PMC *dest)
 {
-    internal_exception(1, "no bigint lib loaded");
+    real_exception(interpreter, NULL, E_LibraryNotLoadedError,
+        "no bigint lib loaded");
 }
 static void
 bigint_div_bigint(Interp *interpreter, PMC* self, PMC *value, PMC *dest)
 {
-    internal_exception(1, "no bigint lib loaded");
+    real_exception(interpreter, NULL, E_LibraryNotLoadedError,
+        "no bigint lib loaded");
 }
 static void
 bigint_div_bigint_int(Interp *interpreter, PMC* self, INTVAL value, PMC *dest)
 {
-    internal_exception(1, "no bigint lib loaded");
+    real_exception(interpreter, NULL, E_LibraryNotLoadedError,
+        "no bigint lib loaded");
 }
 static void
 bigint_fdiv_bigint(Interp *interpreter, PMC* self, PMC *value, PMC *dest)
 {
-    internal_exception(1, "no bigint lib loaded");
+    real_exception(interpreter, NULL, E_LibraryNotLoadedError,
+        "no bigint lib loaded");
 }
 static void
 bigint_fdiv_bigint_int(Interp *interpreter, PMC* self, INTVAL value, PMC *dest)
 {
-    internal_exception(1, "no bigint lib loaded");
+    real_exception(interpreter, NULL, E_LibraryNotLoadedError,
+        "no bigint lib loaded");
 }
 static void
 bigint_mod_bigint(Interp *interpreter, PMC* self, PMC *value, PMC *dest)
 {
-    internal_exception(1, "no bigint lib loaded");
+    real_exception(interpreter, NULL, E_LibraryNotLoadedError,
+        "no bigint lib loaded");
 }
 static void
 bigint_mod_bigint_int(Interp *interpreter, PMC* self, INTVAL value, PMC *dest)
 {
-    internal_exception(1, "no bigint lib loaded");
+    real_exception(interpreter, NULL, E_LibraryNotLoadedError,
+        "no bigint lib loaded");
 }
 static INTVAL
 bigint_cmp(Interp *interpreter, PMC* self, PMC *value)
 {
-    internal_exception(1, "no bigint lib loaded");
+    real_exception(interpreter, NULL, E_LibraryNotLoadedError,
+        "no bigint lib loaded");
     return 0;
 }
 static INTVAL
 bigint_cmp_int(Interp *interpreter, PMC* self, INTVAL value)
 {
-    internal_exception(1, "no bigint lib loaded");
+    real_exception(interpreter, NULL, E_LibraryNotLoadedError,
+        "no bigint lib loaded");
     return 0;
 }
 static void
 bigint_abs(Interp *interpreter, PMC* self, PMC *dest)
 {
-    internal_exception(1, "no bigint lib loaded");
+    real_exception(interpreter, NULL, E_LibraryNotLoadedError,
+        "no bigint lib loaded");
 }
 static void
 bigint_neg(Interp *interpreter, PMC* self, PMC *dest)
 {
-    internal_exception(1, "no bigint lib loaded");
+    real_exception(interpreter, NULL, E_LibraryNotLoadedError,
+        "no bigint lib loaded");
 }
 #endif
 

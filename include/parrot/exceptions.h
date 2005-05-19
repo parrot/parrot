@@ -47,6 +47,7 @@ typedef enum {
         E_EOFError,
         E_RuntimeError,
           E_NotImplementedError,
+          E_LibraryNotLoadedError,
         E_NameError,
           E_UnboundLocalError,
         E_AttributeError,
