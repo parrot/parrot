@@ -408,9 +408,24 @@ string_make_empty(Interp *interpreter,
 }
 
 CHARSET *
-string_rep_compatible (Interp *interpreter, STRING *a, const STRING *b)
+string_rep_compatible (Interp *interpreter, STRING *a, const STRING *b,
+        ENCODING **e)
 {
-    if (a->encoding != b->encoding)     /* XXX utf8 ascii */
+    if (e)
+        *e = a->encoding;
+    if (a->encoding == Parrot_utf8_encoding_ptr &&
+            b->charset == Parrot_ascii_charset_ptr) {
+        return a->charset;
+    }
+    if (b->encoding == Parrot_utf8_encoding_ptr &&
+            a->charset == Parrot_ascii_charset_ptr) {
+        if (e)
+            *e = Parrot_utf8_encoding_ptr;
+        else
+            a->encoding = Parrot_utf8_encoding_ptr;
+        return b->charset;
+    }
+    if (a->encoding != b->encoding)
         return NULL;
     if (a->charset == b->charset)
         return a->charset;
@@ -482,7 +497,7 @@ string_append(Interp *interpreter,
     /* A is now ready to receive the contents of B */
 
     /* if compatible rep, can memcopy */
-    if ( (cs = string_rep_compatible(interpreter, a, b))) {
+    if ( (cs = string_rep_compatible(interpreter, a, b, NULL))) {
         a->charset = cs;
         /* Tack B on the end of A */
         mem_sys_memcopy((void *)((ptrcast_t)a->strstart + a->bufused),
@@ -1139,7 +1154,7 @@ string_replace(Interp *interpreter, STRING *src,
     true_length = (UINTVAL)length;
 
     /* may have different reps..... */
-    if ( !(cs = string_rep_compatible(interpreter, src, rep))) {
+    if ( !(cs = string_rep_compatible(interpreter, src, rep, NULL))) {
         internal_exception(UNIMPLEMENTED,
                 "Cross-type string replace (%s/%s) (%s/%s) unsupported",
                 ((ENCODING *)(src->encoding))->name,
@@ -1173,6 +1188,7 @@ string_replace(Interp *interpreter, STRING *src,
 
         dest = string_make_empty(interpreter, enum_stringrep_one, true_length);
         dest->charset = src->charset;
+        dest->encoding = src->encoding;
 
         mem_sys_memcopy(dest->strstart,
                 (char *)src->strstart
@@ -1435,6 +1451,7 @@ string_bitwise_and(Interp *interpreter, STRING *s1,
     size_t minlen = 0;
     parrot_string_representation_t maxrep = enum_stringrep_one;
     CHARSET *cs;
+    ENCODING *enc;
 
     /* think about case of dest string is one of the operands */
     if (s1 && s2) {
@@ -1456,7 +1473,7 @@ string_bitwise_and(Interp *interpreter, STRING *s1,
         res->strlen = 0;
         return res;
     }
-    if ( !(cs = string_rep_compatible(interpreter, s1, s2))) {
+    if ( !(cs = string_rep_compatible(interpreter, s1, s2, &enc))) {
         internal_exception(UNIMPLEMENTED,
                 "Cross-type string bitwise_and (%s/%s) (%s/%s) unsupported",
                 ((ENCODING *)(s1->encoding))->name,
@@ -1472,6 +1489,7 @@ string_bitwise_and(Interp *interpreter, STRING *s1,
 
     make_writable(interpreter, &res, minlen, enum_stringrep_one);
     res->charset = cs;
+    res->encoding = enc;
 
     BITWISE_AND_STRINGS(Parrot_UInt1, Parrot_UInt1,
             Parrot_UInt1, s1, s2, res, minlen);
@@ -1547,6 +1565,7 @@ string_bitwise_or(Interp *interpreter,
     size_t maxlen = 0;
     parrot_string_representation_t maxrep = enum_stringrep_one;
     CHARSET *cs;
+    ENCODING *enc = NULL;
 
     maxlen = s1 ? s1->bufused: 0;
     if (s2 && s2->bufused > maxlen)
@@ -1570,7 +1589,7 @@ string_bitwise_or(Interp *interpreter,
     else if (!s2)
         cs = s1->charset;
     else {
-        if ( !(cs = string_rep_compatible(interpreter, s1, s2))) {
+        if ( !(cs = string_rep_compatible(interpreter, s1, s2, &enc))) {
             internal_exception(UNIMPLEMENTED,
                     "Cross-type string bitwise_or (%s/%s) (%s/%s) unsupported",
                     ((ENCODING *)(s1->encoding))->name,
@@ -1587,6 +1606,8 @@ string_bitwise_or(Interp *interpreter,
 
     make_writable(interpreter, &res, maxlen, enum_stringrep_one);
     res->charset = cs;
+    if (enc)
+        res->encoding = enc;
 
     BITWISE_OR_STRINGS(Parrot_UInt1, Parrot_UInt1, Parrot_UInt1,
             s1, s2, res, maxlen, |);
@@ -1621,6 +1642,7 @@ string_bitwise_xor(Interp *interpreter,
     size_t maxlen = 0;
     parrot_string_representation_t maxrep = enum_stringrep_one;
     CHARSET *cs;
+    ENCODING *enc = NULL;
 
     maxlen = s1 ? s1->bufused: 0;
     if (s2 && s2->bufused > maxlen)
@@ -1644,7 +1666,7 @@ string_bitwise_xor(Interp *interpreter,
     else if (!s2)
         cs = s1->charset;
     else {
-        if ( !(cs = string_rep_compatible(interpreter, s1, s2))) {
+        if ( !(cs = string_rep_compatible(interpreter, s1, s2, &enc))) {
             internal_exception(UNIMPLEMENTED,
                     "Cross-type string bitwise_xor (%s/%s) (%s/%s) unsupported",
                     ((ENCODING *)(s1->encoding))->name,
@@ -1660,7 +1682,9 @@ string_bitwise_xor(Interp *interpreter,
 #endif
 
     make_writable(interpreter, &res, maxlen, enum_stringrep_one);
-    res->charset = cs;
+    res->charset = cs;  /* XXX binary for all bit ops --leo */
+    if (enc)
+        res->encoding = enc;
 
     BITWISE_OR_STRINGS(Parrot_UInt1, Parrot_UInt1, Parrot_UInt1,
             s1, s2, res, maxlen, ^);

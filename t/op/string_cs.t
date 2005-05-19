@@ -16,7 +16,7 @@ Tests charset support.
 
 =cut
 
-use Parrot::Test tests => 30;
+use Parrot::Test tests => 31;
 use Test::More;
 
 output_is( <<'CODE', <<OUTPUT, "basic syntax" );
@@ -471,4 +471,21 @@ CODE
 ok 1
 ok 2
 42
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', "concat ascii, utf8" );
+.sub main
+    .local string s, t, u
+    s = "abcd"
+    t = unicode:"efg\n"
+    u = s . t
+    print u
+    s = unicode:"abcd"
+    t = "efg\n"
+    u = s . t
+    print u
+.end
+CODE
+abcdefg
+abcdefg
 OUTPUT
