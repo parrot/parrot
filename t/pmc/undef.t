@@ -17,7 +17,7 @@ Tests mainly morphing undef to other types.
 =cut
 
 use Parrot::Test tests => 10;
-use Test::More qw(skip);
+use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "morph to string");
         new P0, .String

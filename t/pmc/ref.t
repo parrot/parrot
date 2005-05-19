@@ -17,7 +17,7 @@ Tests that vtable method delegation works on a C<Ref> PMC.
 =cut
 
 use Parrot::Test tests => 12;
-use Test::More qw(skip);
+use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "new ref");
 	new P2, .Integer

@@ -173,7 +173,7 @@ my $builder = Test::Builder->new();
 sub import {
     my($class, $plan, @args) = @_;
 
-    Test::Builder->plan( $plan, @args );
+    $builder->plan( $plan, @args );
 
     __PACKAGE__->export_to_level( 2, __PACKAGE__ );
 }
