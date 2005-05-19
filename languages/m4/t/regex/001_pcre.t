@@ -1,6 +1,8 @@
 # $Id$
 
 use strict;
+use FindBin;
+use lib "$FindBin::Bin/../../../../lib";
 
 use Parrot::Test tests => 1;
 
@@ -8,7 +10,7 @@ use Parrot::Test tests => 1;
 pir_output_is( << 'END_PIR', << 'OUTPUT', "call parrot and do something" );
 
 .sub test @MAIN
-    load_bytecode "library/pcre.imc"
+    load_bytecode "pcre.imc"
 
     .local pmc init_func
     init_func    = find_global 'PCRE', 'init'

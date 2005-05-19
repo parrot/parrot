@@ -78,10 +78,11 @@ A Hash PMC is returned.
   # TODO: compile patterns in __onload
   .local pmc    p6rule
   find_global p6rule, "PGE", "p6rule"
-  .local pmc    isnt_binary_rule, is_long_option, is_short_option 
+  .local pmc    isnt_binary_rule, is_long_option, is_short_option, key_val_rule 
   isnt_binary_rule = p6rule( '=' )
   is_long_option   = p6rule( '--' )
   is_short_option  = p6rule( '-' )
+  key_val_rule     = p6rule( '=' )
   .local pmc    match
 
   # Loop over the array spec and build up two simple hashes
@@ -153,9 +154,8 @@ A Hash PMC is returned.
     # Is arg a short option string like '-v'
     match = is_short_option( arg ) 
     if match goto HANDLE_SHORT_OPTION
-    arg_index = index arg, '-'
-    if arg_index > -1 goto HANDLE_SHORT_OPTION
-    # We are done, and don't want to loose the nonoption argument
+    # We are done with the option
+    # and we don't want to loose the remaining arguments
     goto FINISH_PARSE_ARGV
 
     HANDLE_SHORT_OPTION:
@@ -170,11 +170,13 @@ A Hash PMC is returned.
     prefix_len = prefix_end - arg_index
     arg = substr arg_index, prefix_len, ''
     # recover the value if any
-    arg_index = index arg, '='
-    if arg_index > -1 goto VALUE_PASSED
+    match = key_val_rule( arg ) 
+    if match goto VALUE_PASSED
     opt[arg] = 1
     goto VALUE_OF_OPTION_IS_NOW_KNOWN
     VALUE_PASSED:
+    # TODO: let PGE capture the value
+    arg_index = match.from()
     inc arg_index    # Go one past the '='
     .local int len_value
     len_value = length arg
@@ -210,7 +212,6 @@ A Hash PMC is returned.
 
 =head1 TODO
 
-- Use PGE
 - Remove need to clone argument vector
 - Make it work for all cases, short options, long options and bundling.
 - Recognise type of return value: string, integer, binary, array, hash.

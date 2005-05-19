@@ -49,7 +49,7 @@ Looks at the command line arguments and acts accordingly.
 .sub m4 @MAIN 
   .param pmc argv
 
-  load_bytecode "library/pcre.imc"
+  load_bytecode "pcre.imc"
   load_bytecode "Getopt/Long.pbc"
   .local pmc get_options
   find_global get_options, "Getopt::Long", "get_options"

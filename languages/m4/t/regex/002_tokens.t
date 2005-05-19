@@ -1,14 +1,11 @@
 # $Id$
 
 use strict;
+use FindBin;
+use lib "$FindBin::Bin/../../../../lib";
 
 use Parrot::Test tests => 5;
 use Parrot::Test::PGE;
-
-#p6rule_is  ($str, '^abc', 'BOS abc');
-#p6rule_isnt($str, '^bc', 'BOS bc');
-#p6rule_like('zzzabcdefzzz', '(a.)..(..)', qr/1: <ab @ 3>/, 'basic $1');
-
 
 # Assemble PIR for simple pattern matching with PCRE
 sub get_pir_pcre
@@ -20,7 +17,7 @@ sub get_pir_pcre
   return q{
 
 .sub test @MAIN
-    load_bytecode "library/pcre.imc"
+    load_bytecode "pcre.imc"
 
     .local pmc init_func
     init_func    = find_global 'PCRE', 'init'
@@ -87,6 +84,7 @@ sub get_pir_pge
                 comment       => q{^#[^\n]*\n},
               );
   return << "END_PIR";
+
 .sub pge
     .param string target
     .param string pattern 
@@ -98,11 +96,11 @@ sub get_pir_pge
     print target
     print "\\n"
 
-    .local pmc pge_compile
-    find_global pge_compile,  "PGE", "_pge_compile"  # get the compiler
+    .local pmc p6rule
+    p6rule = find_global "PGE", "p6rule"  # get the compiler
 
     .local pmc rulesub                     
-    rulesub = pge_compile(pattern)        # compile it to rulesub
+    rulesub = p6rule(pattern)        # compile it to rulesub
 
     .local pmc match
     match = rulesub(target)                   # execute rule on target string
@@ -111,61 +109,21 @@ match_loop:
     unless match goto match_fail           # if match fails stop
     print "match succeeded\\n"
 
-    match."_print"()                       # display captures
+    match."dump"()                       # display captures
 
-    match."_next"()                        # find the next match
+    match."next"()                        # find the next match
     goto match_loop
 
 match_fail:
     print "match failed\\n"   
     .return()
 .end
-load_bytecode "library/pcre.imc"
-.sub _main \@MAIN
-  load_bytecode "pge.pir"
-  pge( "$string", "$regex{$token}" ) 
-  print	"\\n"
-  .local pmc lib
-  .PCRE_INIT(lib)
-  .local string error
-  .local int errptr
-  .local pmc regex
-  .local string pat
-  pat = "$regex{$token}"
-  .PCRE_COMPILE(pat, 0, regex, error, errptr)
-  \$I0 = defined regex
-  unless \$I0 goto match_err
 
-  .local int ok
-  .local pmc result
-  .local string s
-  s = "$string"
-  .PCRE_MATCH(regex, s, 0, 0, ok, result)
-  if ok < 0 goto nomatch
-  print ok
-  print " match(es):\\n"
-  .local int i
-  i = 0
-  .local string match
-  .local string s
-lp: .PCRE_DOLLAR(s, ok, result, i, match)
-  print match
-  print "\\n"
-  inc i
-  if i < ok goto lp
-  end
-nomatch:
-  print "no match\\n"
-  end
-match_err:
-  print "error in regex: "
-  print "at: '"
-  length \$I0, pat
-  \$I0 = \$I0 - errptr
-  substr \$S0, pat, errptr, \$I0
-  print \$S0
-  print "'\\n"
+.sub main \@MAIN
+    load_bytecode "PGE.pbc"
+    pge( "$string", "$regex{$token}" ) 
 .end
+
 END_PIR
 }
 

@@ -1,10 +1,12 @@
 # $Id$
 
 use strict;
+use FindBin;
+use lib "$FindBin::Bin/../../../../lib";
 
 use Parrot::Test tests => 1;
 
-# See whethe to regexes can be compiled
+# See whether two regexes can be compiled
 pir_output_is( << 'END_PIR', << 'OUTPUT', "compile two regexes" );
 
 .sub test @MAIN
