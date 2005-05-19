@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Parrot::Test tests => 15;
+use Parrot::Test tests => 17;
 use Parrot::Test::PGE;
 
 
@@ -23,6 +23,15 @@ p6rule_is  ('foo-  bar', ':w foo -? bar', 'basic ws match \s* \s+');
 p6rule_is  ('foo-bar', ':w foo -? bar', 'basic ws match \s* \s*');
 p6rule_isnt('foobar', ':w foo -? bar', 'basic ws non-match');
 
+# with :w not separated by a space
+# XXX: These forms of modifier separation do not yet work
+#p6rule_is  ('foo - bar', ':w()foo -? bar', 'basic ws match');
+#p6rule_is  ('foo - bar', ':w[]foo -? bar', 'basic ws match');
+p6rule_is  ('foo - bar', ':w\bfoo -? bar',
+    'basic ws match with boundary modifier separation');
+p6rule_is  ('foo - bar', ':w::foo -? bar',
+    'basic ws match with backtrack no-op modifier separation');
+
 # XXX: When available, add tests for full form :words modifier
 
-# dont forget to change the number of tests :-)
+# Don't forget to change the number of tests :-)

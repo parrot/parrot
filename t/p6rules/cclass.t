@@ -1,8 +1,10 @@
-use Parrot::Test tests => 15;
+use strict;
+use warnings;
+use Parrot::Test tests => 14;
 use Parrot::Test::PGE;
 
-p6rule_is  ('abcdef', 'a\N+?f', 'lazy newline');
 
+# character class
 p6rule_is  ('abcdef', '<[c]>', 'character class');
 p6rule_is  ('abcdef', '<[dcb]>**{3}', 'repeated character class');
 p6rule_is  ('abcdef', '^<[a]>', 'anchored character class');
@@ -11,6 +13,7 @@ p6rule_isnt('abcdef', '<-[dcb]>**{3}', 'repeated character class');
 p6rule_is  ('abcdef', '^<-[e]>', 'anchored character class');
 p6rule_isnt('abcdef', '^<-[a]>', 'anchored character class');
 
+# character class range
 p6rule_is  ('abcdef', '<[b..d]>', 'character range');
 p6rule_is  ('abxxef', '<[b..d]>', 'character range');
 p6rule_is  ('axcxef', '<[b..d]>', 'character range');
