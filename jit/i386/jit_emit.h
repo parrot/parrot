@@ -2685,8 +2685,8 @@ Parrot_jit_vtable_newp_ic_op(Parrot_jit_info_t *jit_info,
 #    define jit_emit_end(pc) { \
        jit_emit_add_ri_i(pc, emit_ESP, 4); \
        emitm_popl_r(pc, emit_EDI); \
-       emitm_popl_r(pc, emit_EBX); \
        emitm_popl_r(pc, emit_ESI); \
+       emitm_popl_r(pc, emit_EBX); \
        emitm_popl_r(pc, emit_EBP); \
        emitm_ret(pc); \
      }
