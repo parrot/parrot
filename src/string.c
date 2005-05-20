@@ -2606,6 +2606,12 @@ string_increment(Interp *interpreter, const STRING *s)
     return NULL;
 }
 
+const char *
+Parrot_string_cstring(const STRING *str)
+{
+    return str->strstart;
+}
+
 INTVAL
 Parrot_string_is_whitespace(Interp *interpreter, STRING *s, INTVAL offset)
 {
