@@ -421,7 +421,7 @@ compilation_unit:
    | '\n'          { $$ = 0; }
    ;
 
-pragma: PRAGMA pragma_1 "\n"   { $$ = 0; }
+pragma: PRAGMA pragma_1 '\n'   { $$ = 0; }
    ;
 
 pragma_1: FASTCALL  { IMCC_INFO(interp)->state->pragmas |= PR_FASTCALL; }

@@ -345,7 +345,8 @@ to_infix(Interp *interpreter, char *name, SymReg **r, int *n, int mmd_op)
     int is_n;
 
     assert(*n >= 2);
-    is_n = (name[0] == 'n' && name[1] == '_') ||
+    is_n = (IMCC_INFO(interpreter)->state->pragmas & PR_N_OPERATORS) ||
+        (name[0] == 'n' && name[1] == '_') ||
         (mmd_op == MMD_LOR || mmd_op == MMD_LOR || mmd_op == MMD_LOR);
     if (*n == 3 && r[0] == r[1] && !is_n) {       /* cvt to inplace */
         sprintf(buf, "%d", mmd_op + 1);  /* XXX */
