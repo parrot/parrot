@@ -180,6 +180,7 @@ struct parser_state_t {
     const char *file;
     int line;
     int pasm_file;      /* pasm_file mode of this frame */
+    int pragmas;        /* n_operators ... */
 };
 
 typedef enum _AsmState {

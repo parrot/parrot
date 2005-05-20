@@ -41,11 +41,7 @@ char temp_buffer[4096];
  * we AFAIK need this hack as flex doesn't export YY_BUFFER_STATE
  */
 struct macro_frame_t {
-    struct macro_frame_t *next;
-    Interp *interpreter;        /* for yywrap */
-    const char *file;
-    int line;
-    int pasm_file;      /* pasm_file mode of this frame */
+    struct parser_state_t s;
 
     /* macro stuff */
     YY_BUFFER_STATE buffer;
@@ -123,10 +119,10 @@ SP              [ ]
             expect_pasm = 2;
             BEGIN(emit);
         }
-        if (frames->pasm_file && YYSTATE == INITIAL && !in_pod) {
+        if (frames->s.pasm_file && YYSTATE == INITIAL && !in_pod) {
             if (0)
                 yy_top_state(); /* silent warning */
-            if (frames->pasm_file == 1) {
+            if (frames->s.pasm_file == 1) {
                 BEGIN(emit);
                 return EMIT;
 	    }
@@ -475,8 +471,8 @@ SP              [ ]
 
 <emit><<EOF>> {
         BEGIN (INITIAL);
-        if (frames->pasm_file) {
-            frames->pasm_file = 2;
+        if (frames->s.pasm_file) {
+            frames->s.pasm_file = 2;
             return EOM;
         }
         return 0;
@@ -545,10 +541,10 @@ int yywrap() {
     yy_delete_buffer(YY_CURRENT_BUFFER);
 
     /* pop old frame */
-    if (frames->next) {
-        pop_parser_state(frames->interpreter);
+    if (frames->s.next) {
+        pop_parser_state(frames->s.interpreter);
         if (YYSTATE == INITIAL || YYSTATE == emit)
-            BEGIN(frames->pasm_file ? emit : INITIAL);
+            BEGIN(frames->s.pasm_file ? emit : INITIAL);
         return 0;
     }
 
@@ -563,12 +559,13 @@ new_frame (Interp* interp)
 
     tmp = mem_sys_allocate_zeroed(sizeof(struct macro_frame_t));
     tmp->label = ++label;
-    tmp->line = line;
+    tmp->s.line = line;
     if (frames) {
-        tmp->pasm_file = frames->pasm_file;
-        tmp->file = frames->file;
+        tmp->s.pasm_file = frames->s.pasm_file;
+        tmp->s.file = frames->s.file;
+        tmp->s.pragmas = frames->s.pragmas;
     }
-    tmp->interpreter = interp;
+    tmp->s.interpreter = interp;
 
     return tmp;
 }
@@ -577,7 +574,7 @@ static void
 scan_string (struct macro_frame_t *frame, const char *expansion)
 {
     frame->buffer = YY_CURRENT_BUFFER;
-    frame->next = frames;
+    frame->s.next = (struct parser_state_t*) frames;
     frames = frame;
 
     yy_scan_string(expansion);
@@ -595,8 +592,8 @@ destroy_frame (struct macro_frame_t *frame)
 	free(frame->expansion.name[i]);
     }
 
-    line = frame->line;
-    /* FIXME if frame->file was allocated free it */
+    line = frame->s.line;
+    /* FIXME if frame->s.file was allocated free it */
 
     mem_sys_free(frame);
 
@@ -727,7 +724,7 @@ find_macro_param (const char *name)
     struct macro_frame_t *f;
     int i;
 
-    for (f = frames; f; f = f->next) {
+    for (f = frames; f; f = (struct macro_frame_t*)f->s.next) {
 	if (f->params) {
 	    for (i = 0; i < f->params->num_param; i++) {
 		if (strcmp(f->params->name[i], name) == 0) {
@@ -785,7 +782,7 @@ expand_macro (YYSTYPE *valp, void *interp, const char *name)
     if (m) {
         /* remember macro name for error reporting
          */
-        frame->file = const_cast(name);
+        frame->s.file = const_cast(name);
 	/* whitespace can be savely ignored */
 	do {
 	    c = input();
@@ -867,16 +864,16 @@ include_file (Interp* interp, char *file_name)
     }
     else
         IMCC_fataly(interp, E_IOError, strerror(errno));
-    frame->file = s;
+    frame->s.file = s;
 
     ext = strrchr(file_name, '.');
     if (ext) {
         if (strcmp (ext, ".pasm") == 0) {
-            frame->pasm_file = 1;
+            frame->s.pasm_file = 1;
             BEGIN(emit);
         }
         else if (strcmp (ext, ".imc") == 0) {
-            frame->pasm_file = 0;
+            frame->s.pasm_file = 0;
             BEGIN(INITIAL);
         }
     }
@@ -888,7 +885,7 @@ static void
 scan_file (struct macro_frame_t *frame, FILE *file)
 {
     frame->buffer = YY_CURRENT_BUFFER;
-    frame->next = frames;
+    frame->s.next = (struct parser_state_t*)frames;
     frames = frame;
 
     line = 1;
@@ -902,9 +899,9 @@ IMCC_push_parser_state(Interp* interp)
     struct macro_frame_t *frame;
 
     frame = new_frame(interp);
-    frame->next = frames;
+    frame->s.next = (struct parser_state_t*)frames;
     frames = frame;
-    frame->line = line = 1;
+    frame->s.line = line = 1;
     IMCC_INFO(interp)->state = (struct parser_state_t *) frames;
 }
 
@@ -914,7 +911,7 @@ pop_parser_state(Interp* interp)
     struct macro_frame_t *tmp;
     tmp = frames;
     if (tmp) {
-        frames = frames->next;
+        frames = (struct macro_frame_t*) frames->s.next;
         destroy_frame(tmp);
     }
     IMCC_INFO(interp)->state = (struct parser_state_t *) frames;
@@ -925,7 +922,7 @@ compile_file(Interp *interp, FILE *file)
 {
     YY_BUFFER_STATE buffer;
 
-    frames->next = NULL;
+    frames->s.next = NULL;
     buffer = YY_CURRENT_BUFFER;
     yy_switch_to_buffer(yy_create_buffer(file, YY_BUF_SIZE));
 
@@ -941,7 +938,7 @@ compile_string(Interp *interp, char *s)
 {
     YY_BUFFER_STATE buffer;
 
-    frames->next = NULL;
+    frames->s.next = NULL;
     buffer = YY_CURRENT_BUFFER;
 
     yy_scan_string(s);
@@ -959,16 +956,16 @@ IMCC_print_inc(Interp *interp)
 
     UNUSED(interp);
     if (frames && frames->is_macro)
-        fprintf(stderr, "\nin macro '.%s' line %d\n", frames->file, line);
+        fprintf(stderr, "\nin macro '.%s' line %d\n", frames->s.file, line);
     else
-        fprintf(stderr, "\nin file '%s' line %d\n", frames->file, line);
-    old = frames->file;
-    for (f = frames; f; f = f->next) {
-        if (strcmp(f->file, old)) {
+        fprintf(stderr, "\nin file '%s' line %d\n", frames->s.file, line);
+    old = frames->s.file;
+    for (f = frames; f; f = (struct macro_frame_t *)f->s.next) {
+        if (strcmp(f->s.file, old)) {
             fprintf(stderr, "\tincluded from '%s' line %d\n",
-                f->file, f->line);
+                f->s.file, f->s.line);
         }
-        old = f->file;
+        old = f->s.file;
     }
 }
 

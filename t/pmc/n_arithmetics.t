@@ -17,7 +17,7 @@ various combinations of Parrot integer and number types.
 
 =cut
 
-use Parrot::Test tests => 17;
+use Parrot::Test tests => 18;
 use Test::More;
 
 ###
@@ -530,4 +530,22 @@ not_broken:
 CODE
 -0.0307789
 -32.4898
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "verify new PMC");
+.sub main @MAIN
+    P0 = new Integer
+    P1 = P0
+    P0 = n_add P0, 1
+    print P0
+    print "\n"
+    eq_addr P0, P1, nok
+    print "ok\n"
+    end
+nok:
+    print "not ok\n"
+.end
+CODE
+1
+ok
 OUTPUT
