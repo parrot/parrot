@@ -39,7 +39,7 @@ INTVAL string_compare(Interp *, STRING *, STRING *);
 INTVAL string_equal(Interp *, STRING *, STRING *);
 INTVAL string_bool(Interp *, const STRING *);
 STRING *string_increment(Interp *, const STRING *);
-const char *Parrot_string_cstring(const STRING *);
+const char *Parrot_string_cstring(Interp *, const STRING *);
 
 /* Declarations of other functions */
 UINTVAL string_length(Interp *, const STRING *);

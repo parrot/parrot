@@ -2606,9 +2606,21 @@ string_increment(Interp *interpreter, const STRING *s)
     return NULL;
 }
 
+/*
+
+=item C<const char *Parrot_string_cstring(Interp *, const STRING *)>
+
+Return a C string from a Parrot string.  Both sides are treated
+as constants -- i.e. do not resize the result.
+
+=cut
+
+*/
+
 const char *
-Parrot_string_cstring(const STRING *str)
+Parrot_string_cstring(Interp *interpreter, const STRING *str)
 {
+    /* TODO handle NUL and friends */
     return str->strstart;
 }
 
