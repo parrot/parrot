@@ -49,7 +49,7 @@ expand_sub(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
     /* For expand sub, we check the unit->type only, since the
      * pragma might be overridden.
      */
-    if (pragmas.fastcall) {
+    if (unit->type == IMC_FASTSUB) {
         expand_fast_sub(interp, unit, ins);
     }
     /* IMC_PCCSUB */
@@ -70,7 +70,7 @@ expand_sub_ret(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
     PIO_eprintf(NULL, "expand_sub_ret\n");
 #endif
     /* IMC_FASTSUB */
-    if (pragmas.fastcall) {
+    if (unit->type == IMC_FASTSUB) {
         expand_fast_sub_ret(interp, unit, ins);
     }
     /* IMC_PCCSUB */
@@ -90,7 +90,7 @@ expand_sub_call(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
     PIO_eprintf(NULL, "expand_sub_call\n");
 #endif
     /* IMC_FASTSUB */
-    if (pragmas.fastcall) {
+    if (unit->type == IMC_FASTSUB) {
         expand_fast_sub_call(interp, unit, ins);
     }
     /* IMC_PCCSUB */
@@ -108,7 +108,7 @@ void
 sub_optimize(Parrot_Interp interp, IMC_Unit * unit)
 {
     /* IMC_FASTSUB */
-    if (pragmas.fastcall) {
+    if (unit->type == IMC_FASTSUB) {
         pcc_sub_optimize(interp, unit);
     }
     /* IMC_PCCSUB */

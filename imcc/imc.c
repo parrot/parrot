@@ -15,7 +15,7 @@
 static void imc_free_unit(Parrot_Interp interp, IMC_Unit * unit);
 
 
-/* AST doesn't honor COMPILE_IMMEDIATE yet. So we need to make sure that 
+/* AST doesn't honor COMPILE_IMMEDIATE yet. So we need to make sure that
  * the units get compiled.
  */
 void
@@ -170,22 +170,6 @@ imc_free_unit(Parrot_Interp interp, IMC_Unit * unit)
 
     free(unit);
 }
-
-/*
- * Set a global compiler option. No fancy parsing needed.
- */
-void
-imc_pragma(char * str)
-{
-#if IMC_TRACE
-    fprintf(stderr, "imc_pragma %s\n", str);
-#endif
-    if     (!strcmp(str, "fastcall"))   pragmas.fastcall = 1;
-    else if (!strcmp(str, "prototyped")) pragmas.prototyped = 1;
-    else return;
-    /* More options here */
-}
-
 
 /*
  * Local variables:

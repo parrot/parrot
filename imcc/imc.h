@@ -126,20 +126,16 @@ void expand_fast_sub_ret(Parrot_Interp interpreter, IMC_Unit *, Instruction *ins
 void expand_fast_sub_call(Parrot_Interp interpreter, IMC_Unit *, Instruction *ins);
 void fast_sub_optimize(Parrot_Interp interpreter, IMC_Unit *);
 
-
-
-/* globals */
-
 /* Compiler pragma options that may affect the whole module being compiled */
-struct _imc_pragmas {
-  int fastcall;          /* Use low level branch op, pass/return on stack
+typedef enum {
+  PR_FASTCALL = 0x01,       /* Use low level branch op, pass/return on stack
                           * as opposed to pcc convention and invoke */
                          /* more to come */
-  int prototyped;        /* Currently undefined which will be the default */
-};
+  PR_PROTOTYPED = 0x02,     /* Currently undefined which will be the default */
+  PR_N_OPERATORS = 0x04
+} _imc_pragmas;
 
-EXTERN struct _imc_pragmas pragmas;
-
+/* globals XXX */
 EXTERN int        line;	/* and line */
 
 

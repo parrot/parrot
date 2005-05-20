@@ -334,7 +334,7 @@ begin_return_or_yield(Interp *interp, int yield)
 %nonassoc '\n'
 %nonassoc <t> PARAM
 
-%token <t> PRAGMA
+%token <t> PRAGMA FASTCALL N_OPERATORS
 %token <t> CALL GOTO ARG FLATTEN_ARG FLATTEN IF UNLESS END SAVEALL RESTOREALL
 %token <t> NEW NEWSUB NEWCLOSURE NEWCOR NEWCONT
 %token <t> NAMESPACE ENDNAMESPACE CLASS ENDCLASS FIELD DOT_METHOD
@@ -356,11 +356,11 @@ begin_return_or_yield(Interp *interp, int yield)
 %token <s> IREG NREG SREG PREG IDENTIFIER REG MACRO ENDM
 %token <s> STRINGC INTC FLOATC USTRINGC
 %token <s> PARROT_OP
-%type <t> type newsub ptr
+%type <t> type newsub ptr pragma_1
 %type <i> program class class_body member_decls member_decl field_decl
 %type <i> method_decl class_namespace
 %type <i> global constdef sub emit pcc_sub  pcc_ret
-%type <i> compilation_units compilation_unit pmc_const
+%type <i> compilation_units compilation_unit pmc_const pragma
 %type <s> classname relop
 %type <i> labels _labels label  statement sub_call
 %type <i> pcc_sub_call
@@ -416,8 +416,21 @@ compilation_unit:
    | sub           { $$ = $1; imc_close_unit(interp, cur_unit); cur_unit = 0; }
    | pcc_sub       { $$ = $1; imc_close_unit(interp, cur_unit); cur_unit = 0; }
    | emit          { $$ = $1; imc_close_unit(interp, cur_unit); cur_unit = 0; }
-   | MACRO '\n'    { $$ = 0;  }
+   | MACRO '\n'    { $$ = 0; }
+   | pragma        { $$ = 0; }
    | '\n'          { $$ = 0; }
+   ;
+
+pragma: PRAGMA pragma_1 "\n"   { $$ = 0; }
+   ;
+
+pragma_1: FASTCALL  { IMCC_INFO(interp)->state->pragmas |= PR_FASTCALL; }
+   |      N_OPERATORS INTC
+                    { if ($2)
+                          IMCC_INFO(interp)->state->pragmas |= PR_N_OPERATORS;
+                      else
+                          IMCC_INFO(interp)->state->pragmas &= ~PR_N_OPERATORS;
+                    }
    ;
 
 global:
@@ -573,8 +586,9 @@ method_decl:
 sub:
      SUB
         {
-           cur_unit = (pragmas.fastcall ? imc_open_unit(interp, IMC_FASTSUB)
-                                          : imc_open_unit(interp, IMC_PCCSUB));
+           cur_unit = (IMCC_INFO(interp)->state->pragmas & PR_FASTCALL ?
+                  imc_open_unit(interp, IMC_FASTSUB)
+                : imc_open_unit(interp, IMC_PCCSUB));
         }
      sub_label_op_c
         {
