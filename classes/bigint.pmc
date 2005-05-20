@@ -95,7 +95,9 @@ bigint_get_bool(Interp *interpreter, PMC *self) {
 }
 static char *
 bigint_get_string(Interp *interpreter, PMC *self, int base) {
-    return mpz_get_str(NULL, base, BN(self));
+    size_t n = mpz_sizeinbase(BN(self), base) + 2;
+    char *s = mem_sys_allocate(n);
+    return mpz_get_str(s, base, BN(self));
 }
 
 static double
@@ -570,14 +572,14 @@ appended.
     STRING* get_string() {
         char *s = bigint_get_string(INTERP, SELF, 10);
         STRING *ps = string_from_cstring(INTERP, s, 0);
-        free(s);
+        mem_sys_free(s);
         return ps;
     }
 
     STRING* get_string_keyed_int(INTVAL base) {
         char *s = bigint_get_string(INTERP, SELF, base);
         STRING *ps = string_from_cstring(INTERP, s, 0);
-        free(s);
+        mem_sys_free(s);
         return ps;
     }
     STRING* get_repr() {
