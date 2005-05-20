@@ -131,26 +131,37 @@ If you have a new feature to add to Parrot, such as a new test.
 
 =item 1
 
-Create a plain text email.
+Add your new file path(s), relative to F<parrot>, to the file MANIFEST. Create a patch for the MANIFEST file according to the instructions above in B<How To Submit A Patch>
 
 =item 2
 
-Set the recipient to B<parrotbug> I<at> B<parrotcode> I<dot> B<org>.
+If you have a new test script ending in .t, some mailers may become confused and consider it an application/x-troff. One way around this (for *nix users) is to diff the file against /dev/null like this:
+
+    cd parrot
+    diff -u /dev/null newfile.t > newfile.patch
 
 =item 3
+
+Create a plain text email.
+
+=item 4
+
+Set the recipient to B<parrotbug> I<at> B<parrotcode> I<dot> B<org>.
+
+=item 5
 
 Give the message a clear and concise subject.
 
 Prefix it with a C<[NEW]> identifier.
 
-=item 4
+=item 6
 
 The message body should contain an explanation of the purpose of the
 feature you are adding.
 
-=item 5
+=item 7
 
-Attach the file(s).
+Attach the patch for MANIFEST and your new file(s).
 
 Double-check that you've actually done this, because it's easy to
 forget.
@@ -158,7 +169,7 @@ forget.
 B<DO NOT> paste the content of the new file or files into the body of
 the message.
 
-=item 6
+=item 8
 
 Send the mail.
 
@@ -181,6 +192,8 @@ review of their changes.
 You can check the progress of your submission at the Parrot bugs page
 L<http://bugs6.perl.org/>. If you have trouble logging in try username
 C<guest> with password C<guest>.
+
+A Parrot Bug Summary page is also generated and can be viewed here L<http://rt.perl.org/rt3/NoAuth/parrot/Overview.html>
 
 A list of all the unresolved patches is at
 L<http://www.parrotcode.org/openpatches.html>
