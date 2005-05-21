@@ -26,7 +26,8 @@ my $has_pcre = Parrot::Test::run_command("pcre-config --version",
     STDERR => '/dev/null') == 0;
 
 SKIP: {
-    skip("no pcre-config", Test::Builder->expected_tests()) unless $has_pcre;
+    skip("no pcre-config", Test::Builder->new()->expected_tests())
+        unless $has_pcre;
 
 ## 1
 pir_output_is( <<'CODE', <<'OUT', 'soup to nuts' );
