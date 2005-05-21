@@ -26,7 +26,7 @@ PMC * hash_get_idx(Interp *interpreter, Hash *hash, PMC *key);
 /*
 
 =item C<static size_t
-key_hash_object(Interp *interpreter, Hash *hash, void *value)>
+key_hash_object(Interp *interpreter, void *value, size_t seed)>
 
 Return the hashed value of the object C<value>.
 
@@ -35,9 +35,9 @@ Return the hashed value of the object C<value>.
 */
 
 static size_t
-key_hash_object(Interp *interpreter, Hash *hash, void *value)
+key_hash_object(Interp *interpreter, void *value, size_t seed)
 {
-    return VTABLE_hash(interpreter, (PMC*)value) ^ hash->seed;
+    return VTABLE_hash(interpreter, (PMC*)value, seed);
 }
 
 static void

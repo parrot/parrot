@@ -149,15 +149,15 @@ Return the hashed value of the string C<value>.
 /* see also string.c */
 
 static size_t
-key_hash_STRING(Interp *interpreter, Hash *hash, void *value)
+key_hash_STRING(Interp *interpreter, void *value, size_t seed)
 {
     STRING *s = value;
 
     if (s->hashval) {
-        return s->hashval ^ hash->seed;
+        return s->hashval;
     }
 
-    return string_hash(interpreter, s) ^ hash->seed;
+    return string_hash(interpreter, s, seed);
 }
 
 /*
@@ -189,9 +189,9 @@ key_hash_cstring(Interp *interpreter, Hash* hash, void *value)>
 */
 
 static size_t
-key_hash_cstring(Interp *interpreter, Hash* hash, void *value)
+key_hash_cstring(Interp *interpreter, void *value, size_t seed)
 {
-    register size_t h = hash->seed;
+    register size_t h = seed;
     unsigned char * p = (unsigned char *) value;
     while (*p) {
         h += h << 5;
@@ -477,7 +477,7 @@ expand_hash(Interp *interpreter, Hash *hash)
             BucketIndex bucketIdx = *bucketIdxP;
             bucket = getBucket(hash, bucketIdx);
             new_loc =
-                (hash->hash_val)(interpreter, hash, bucket->key) &
+                (hash->hash_val)(interpreter, bucket->key, hash->seed) &
                     new_max_chain;
             if (new_loc != hi) {
                 /* Remove from table */
@@ -798,7 +798,7 @@ Returns the bucket for C<key>.
 HashBucket *
 hash_get_bucket(Interp *interpreter, Hash *hash, void *key)
 {
-    UINTVAL hashval = (hash->hash_val)(interpreter, hash, key);
+    UINTVAL hashval = (hash->hash_val)(interpreter, key, hash->seed);
     HashIndex *table = (HashIndex *) PObj_bufstart(&hash->buffer);
     BucketIndex chain = table[hashval & hash->max_chain];
     return find_bucket(interpreter, hash, chain, key);
@@ -863,7 +863,7 @@ hash_put(Interp *interpreter, Hash *hash, void *key, void *value)
 
     /*      dump_hash(interpreter, hash); */
 
-    hashval = (hash->hash_val)(interpreter, hash, key);
+    hashval = (hash->hash_val)(interpreter, key, hash->seed);
     table = (BucketIndex *) PObj_bufstart(&hash->buffer);
     assert(table);
     chain = table[hashval & hash->max_chain];
@@ -916,7 +916,7 @@ hash_delete(Interp *interpreter, Hash *hash, void *key)
     HashBucket *bucket;
     HashBucket *prev = NULL;
 
-    hashval = (hash->hash_val)(interpreter, hash, key);
+    hashval = (hash->hash_val)(interpreter, key, hash->seed);
     slot = hashval & hash->max_chain;
 
     /*

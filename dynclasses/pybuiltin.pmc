@@ -551,7 +551,7 @@ Returns the hash of C<value>.
 
     METHOD PMC* hash(PMC *value) {
         PMC *ret = pmc_new_noinit(INTERP, PyBuiltin_PyInt);
-        VTABLE_set_integer_native(INTERP, ret, VTABLE_hash(INTERP, value));
+        VTABLE_set_integer_native(INTERP, ret, VTABLE_hash(INTERP, value, 0));
         return ret;
     }
 

@@ -582,9 +582,9 @@ find_not_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags, STRING *source_s
  * TODO pass in the Hash's seed value as initial hashval
  */
 size_t
-ascii_compute_hash(Interp *interpreter, STRING *source_string)
+ascii_compute_hash(Interp *interpreter, STRING *source_string, size_t seed)
 {
-    size_t hashval = 0;
+    size_t hashval = seed;
 
     char *buffptr = (char *)source_string->strstart;
     UINTVAL len = source_string->strlen;

@@ -143,7 +143,7 @@ Returns the result of comparing the string with C<*value>.
 
 /*
 
-=item C<INTVAL hash()>
+=item C<INTVAL hash(size_t seed)>
 
 Returns a unique hash for this value
 
@@ -151,8 +151,8 @@ Returns a unique hash for this value
 
 */
 
-    INTVAL hash () {
-        return string_hash(INTERP, PMC_str_val(pmc));
+    INTVAL hash (size_t seed) {
+        return string_hash(INTERP, PMC_str_val(pmc), seed);
     }
 
 /*

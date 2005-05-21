@@ -343,10 +343,10 @@ string_from_codepoint(Interp *interpreter, UINTVAL codepoint)
 }
 
 static size_t
-compute_hash(Interp *interpreter, STRING *src)
+compute_hash(Interp *interpreter, STRING *src, size_t seed)
 {
     String_iter iter;
-    size_t hashval = 0;
+    size_t hashval = seed;
     UINTVAL offs, c;
 
     ENCODING_ITER_INIT(interpreter, src, &iter);

@@ -76,7 +76,7 @@ typedef INTVAL (*charset_find_newline_t)(Interp *, STRING *source_string, UINTVA
 typedef INTVAL (*charset_find_not_newline_t)(Interp *, STRING *source_string, UINTVAL offset);
 typedef INTVAL (*charset_find_word_boundary_t)(Interp *, STRING *source_string, UINTVAL offset);
 typedef STRING *(*charset_string_from_codepoint_t)(Interp *, UINTVAL codepoint);
-typedef size_t (*charset_compute_hash_t)(Interp *, STRING *source_string);
+typedef size_t (*charset_compute_hash_t)(Interp *, STRING *, size_t seed);
 
 CHARSET *Parrot_new_charset(Interp *);
 CHARSET *Parrot_load_charset(Interp *, const char *charsetname);
@@ -179,7 +179,7 @@ struct _charset {
 #define CHARSET_FIND_NEWLINE(interp, source, offset) ((CHARSET *)source->charset)->find_newline(interpreter, source, offset)
 #define CHARSET_FIND_NOT_NEWLINE(interp, source, offset) ((CHARSET *)source->charset)->find_not_newline(interpreter, source, offset)
 #define CHARSET_FIND_WORD_BOUNDARY(interp, source, offset) ((CHARSET *)source->charset)->find_word_boundary(interpreter, source, offset)
-#define CHARSET_COMPUTE_HASH(interp, source) ((CHARSET *)source->charset)->compute_hash(interpreter, source)
+#define CHARSET_COMPUTE_HASH(interp, source, seed) ((CHARSET *)source->charset)->compute_hash(interpreter, source, seed)
 #define CHARSET_GET_PREFERRED_ENCODING(interp, source) ((CHARSET *)source->charset)->preferred_encoding
 
 #define CHARSET_TO_ENCODING(interp, source, offset, count) ((ENCODING *)source->encoding)->to_encoding(interp, source, offset, count)

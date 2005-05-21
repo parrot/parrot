@@ -38,7 +38,7 @@ INTVAL ascii_cs_index(Interp *, STRING *source_string,
         STRING *search_string, UINTVAL offset);
 INTVAL ascii_cs_rindex(Interp *, STRING *source_string,
         STRING *search_string, UINTVAL offset);
-size_t ascii_compute_hash(Interp *, STRING *source_string);
+size_t ascii_compute_hash(Interp *, STRING *source_string, size_t seed);
 INTVAL mixed_cs_index(Interp *, STRING *src, STRING *search, UINTVAL offs);
 
 static void compose(Interp *, STRING *source_string);

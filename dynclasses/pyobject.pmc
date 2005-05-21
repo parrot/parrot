@@ -210,7 +210,7 @@ Returns the hash value of C<self>.
 
     METHOD PMC* __hash__(PMC *self) {
         PMC * ret = pmc_new(INTERP, PyBuiltin_PyInt);
-        INTVAL value = VTABLE_hash(INTERP, self);
+        INTVAL value = VTABLE_hash(INTERP, self, 0);
         VTABLE_set_integer_native(INTERP, ret, value);
         return ret;
     }

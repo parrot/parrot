@@ -345,7 +345,7 @@ Returns a unique hash for this value
 
 */
 
-    INTVAL hash () {
+    INTVAL hash (size_t seed) {
         PMC *ret = Parrot_PyClass_call_meth_fromc_P(INTERP, SELF,
             PyString_hash);
 

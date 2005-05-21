@@ -2309,17 +2309,17 @@ C<s->hashval>.
 */
 
 size_t
-string_hash(Interp * interpreter, STRING *s)
+string_hash(Interp * interpreter, STRING *s, size_t seed)
 {
     register size_t h;
 
     if (!s)
-        return 0;
+        return seed;
 
     /* ZZZZZ workaround for something not setting up encodings right */
     saneify_string(s);
 
-    h = CHARSET_COMPUTE_HASH(interpreter, s);
+    h = CHARSET_COMPUTE_HASH(interpreter, s, seed);
     s->hashval = h;
 
     return h;

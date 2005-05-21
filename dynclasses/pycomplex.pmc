@@ -109,7 +109,7 @@ Returns the string representation of the integer.
 
 /*
 
-=item C<INTVAL hash()>
+=item C<INTVAL hash(size_t seed)>
 
 Returns a unique hash for this value
 
@@ -117,7 +117,7 @@ Returns a unique hash for this value
 
 */
 
-    INTVAL hash () {
+    INTVAL hash (size_t seed) {
         return VTABLE_get_integer(INTERP, SELF);
     }
 

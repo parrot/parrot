@@ -552,18 +552,17 @@ shift_opcode_string(Parrot_Interp interpreter, IMAGE_IO *io)
 =over 4
 
 =item C<static size_t
-key_hash_int(Interp *interp, Hash *hash, void *value)>
+key_hash_int(Interp *interp, void *value, size_t seed)>
 
 =cut
 
 */
 
 static size_t
-key_hash_int(Interp *interp, Hash *hash, void *value)
+key_hash_int(Interp *interp, void *value, size_t seed)
 {
     UNUSED(interp);
-    UNUSED(hash);
-    return (size_t) value;
+    return (size_t)value ^ seed;
 }
 
 /*

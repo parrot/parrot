@@ -503,7 +503,7 @@ Parrot_create_mro(Interp *interpreter, INTVAL type)
 /*
 
 =item C<static size_t
-key_hash_int(Interp *interp, Hash *hash, void *value)>
+key_hash_int(Interp *interp, void *value, size_t seed)>
 
 Simply returns C<value>. C<hash> is ignored.
 
@@ -514,11 +514,10 @@ Used in C<dod_register_pmc()>.
 */
 
 static size_t
-key_hash_int(Interp *interp, Hash *hash, void *value)
+key_hash_int(Interp *interp, void *value, size_t seed)
 {
     UNUSED(interp);
-    UNUSED(hash);
-    return (size_t) value;
+    return (size_t)value ^ seed;
 }
 
 /*

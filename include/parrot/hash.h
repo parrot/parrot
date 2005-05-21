@@ -48,8 +48,9 @@ struct _hashbucket {
 
 typedef int    (*hash_comp_fn)(Parrot_Interp, void*, void*);
 typedef void   (*hash_mark_key_fn)(Parrot_Interp, PObj *);
-typedef size_t (*hash_hash_key_fn)(Parrot_Interp, struct _hash*, void*);
+typedef size_t (*hash_hash_key_fn)(Parrot_Interp, void*, size_t seed);
 
+/* XXX */
 typedef enum {
     Hash_key_type_none,
     Hash_key_type_int,
