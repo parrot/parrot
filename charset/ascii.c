@@ -253,7 +253,6 @@ titlecase_first(Interp *interpreter, STRING *source_string)
 INTVAL
 ascii_compare(Interp *interpreter, STRING *lhs, STRING *rhs)
 {
-    INTVAL retval;
     UINTVAL offs, l_len, r_len, min_len;
     String_iter iter;
 
@@ -263,7 +262,9 @@ ascii_compare(Interp *interpreter, STRING *lhs, STRING *rhs)
 
     if (lhs->encoding == Parrot_fixed_8_encoding_ptr &&
             rhs->encoding == Parrot_fixed_8_encoding_ptr) {
-        retval = memcmp(lhs->strstart, rhs->strstart, min_len);
+        int ret_val = memcmp(lhs->strstart, rhs->strstart, min_len);
+        if (ret_val)
+            return ret_val;
     }
     else {
         UINTVAL cl, cr;
@@ -271,24 +272,17 @@ ascii_compare(Interp *interpreter, STRING *lhs, STRING *rhs)
         for (offs = 0; offs < min_len; ++offs) {
             cl = ENCODING_GET_BYTE(interpreter, lhs, offs);
             cr = iter.get_and_advance(interpreter, &iter);
-            retval = cl - cr;
-            if (retval)
-                break;
+            if (cl != cr)
+                return cl < cr ? -1 : 1;
         }
     }
-    if (!retval) {
-        if (l_len < r_len) {
-            return -1;
-        }
-        if (l_len > r_len) {
-            return 1;
-        }
-        if (l_len == r_len) {
-            return 0;
-        }
+    if (l_len < r_len) {
+        return -1;
     }
-    retval = retval > 0 ? 1 : -1;
-    return retval;
+    if (l_len > r_len) {
+        return 1;
+    }
+    return 0;
 }
 
 INTVAL

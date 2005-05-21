@@ -8,6 +8,11 @@ src/new_hash.c - Hash table
 
 =head1 DESCRIPTION
 
+A hashtable contains an array of bucket indexes. Buckets are nodes in a
+linked list, each containing a C<void *> key and value. During hash
+creation the types of key and value as well as appropriate compare and
+hashing functions can be set.
+
 This hash implementation uses just one piece of malloced memory. The
 C<hash->bu> union points into this regions. At positive indices are
 bucket pointers, at negative indices is the bucket store itself.

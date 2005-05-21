@@ -146,7 +146,27 @@ titlecase_first(Interp *interpreter, STRING *source_string)
 static INTVAL
 compare(Interp *interpreter, STRING *lhs, STRING *rhs)
 {
-    UNIMPL;
+    String_iter l_iter, r_iter;
+    UINTVAL offs, cl, cr, min_len, l_len, r_len;
+
+    /* TODO make optimized equal - strings are equal length then already */
+    ENCODING_ITER_INIT(interpreter, lhs, &l_iter);
+    ENCODING_ITER_INIT(interpreter, rhs, &r_iter);
+    l_len = lhs->strlen;
+    r_len = rhs->strlen;
+    min_len = l_len > r_len ? r_len : l_len;
+    for (offs = 0; offs < min_len; ++offs) {
+        cl = l_iter.get_and_advance(interpreter, &l_iter);
+        cr = r_iter.get_and_advance(interpreter, &r_iter);
+        if (cl != cr)
+            return cl < cr ? -1 : 1;
+    }
+    if (l_len < r_len) {
+        return -1;
+    }
+    if (l_len > r_len) {
+        return 1;
+    }
     return 0;
 }
 

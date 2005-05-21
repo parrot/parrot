@@ -1319,11 +1319,6 @@ string_compare(Interp *interpreter,
     saneify_string(s1);
     saneify_string(s2);
 
-#  if ! DISABLE_GC_DEBUG
-    /* It's easy to forget that string comparison can trigger GC */
-    if (GC_DEBUG(interpreter))
-        Parrot_do_dod_run(interpreter, DOD_trace_stack_FLAG);
-#  endif
     return CHARSET_COMPARE(interpreter, s1, s2);
 }
 
@@ -1364,24 +1359,10 @@ string_equal(Interp *interpreter, STRING *s1, STRING *s2)
     else if (!s1->strlen) {   /* s2->strlen is the same here */
         return 0;
     }
-
-    else if (s1->strstart == s2->strstart) { /* COWed strings */
-        /*
-         * XXX when compiled -O3 this added compare makes suddenly
-         * t/pmc/threads 6, 8-9 fail with --gc-debug
-         * It segfaults in thread.c:67 with a destroyed interpreter
-         * gcc error?
-         *
-         * -leo
-         */
+    else if (s1->strstart == s2->strstart &&
+            s1->bufused == s2->bufused) { /* COWed strings */
         return 0;
     }
-
-#  if ! DISABLE_GC_DEBUG
-    /* It's easy to forget that string comparison can trigger GC */
-    if (GC_DEBUG(interpreter))
-        Parrot_do_dod_run(interpreter, DOD_trace_stack_FLAG);
-#  endif
 
     /*
      * now,
