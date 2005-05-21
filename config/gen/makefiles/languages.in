@@ -19,24 +19,19 @@ help:
 	@echo ""
 	@echo "  clean:        Clean up a lot of languages."
 	@echo ""
-	@echo "  update:       Get newest sources from CVS."
-	@echo ""
 	@echo "  help:         Print this help message."
 	@echo ""
 	@echo "Following languages are available:"
 	@echo "  $(LANGUAGES)"
-	@echo "A particular language <lang> can be built, tested and cleand up" 
+	@echo "A particular language <lang> can be built, tested and cleand up"
 	@echo "  make <lang>"
 	@echo "  make <lang>.test"
 	@echo "  make <lang>.clean"
 	@echo "For the status of individual languages see LANGUAGES.STATUS"
 	@echo ""
 
-test: 
+test:   all
 	$(PERL) -I ../lib testall
-
-update:
-	cvs -q update -dP
 
 clean: BASIC.clean befunge.clean bf.clean cola.clean forth.clean jako.clean lisp.clean m4.clean miniperl.clean ook.clean parrot_compiler.clean perl6.clean regex.clean scheme.clean tcl.clean urm.clean
 
@@ -151,7 +146,7 @@ regex.dummy:
 regex.test :
 	$(MAKE_C) regex test
 regex.clean :
-# No target clean for regex 
+# No target clean for regex
 
 scheme: scheme.dummy
 scheme.dummy:
