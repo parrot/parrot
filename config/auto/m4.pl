@@ -26,7 +26,7 @@ $description = "Determining whether GNU m4 is installed...";
 sub runstep {
     # This seems to work for GNU m4 1.4.2
     my $a = capture_output( 'm4', '--version' ) || '';
-    my $has_gnu_m4 = ( $a =~ m/^GNU m4 / ) ? 1 : 0;
+    my $has_gnu_m4 = ( $a =~ m/^GNU [mM]4 / ) ? 1 : 0;
 
     Configure::Data->set(has_gnu_m4 => $has_gnu_m4);
 
