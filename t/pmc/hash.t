@@ -19,7 +19,7 @@ well.
 
 =cut
 
-use Parrot::Test tests => 35;
+use Parrot::Test tests => 36;
 use Test::More;
 
 output_is(<<CODE, <<OUTPUT, "Initial Hash tests");
@@ -271,6 +271,95 @@ start
 1
 23
 0
+OUTPUT
+
+## stuff them in, and check periodically that we can pull selected ones out.
+pir_output_is(<<'CODE', <<OUTPUT, "stress test: lots of keys");
+.sub set_multiple_keys prototyped
+	.param pmc hash
+        .param int key_index
+        .param int step
+	.param int count
+
+again:
+	if count <= 0 goto ret
+	S0 = key_index
+	S1 = concat "key", S0
+	S2 = concat "value", S0
+	hash[S1] = S2
+	key_index = key_index + step
+	count = count - 1
+	goto again
+ret:
+.end
+
+.sub print_multiple_keys prototyped
+	.param pmc hash
+        .param int key_index
+        .param int step
+	.param int count
+
+again:
+	if count <= 0 goto ret
+	S0 = key_index
+	S1 = concat "key", S0
+	print S1
+	print " => "
+	I2 = exists hash[S1]
+	if I2 goto print_value
+	print "(undef)"
+	goto print_end
+print_value:
+	S2 = hash[S1]
+	print S2
+	print "\n"
+	key_index = key_index + step
+	count = count - 1
+	goto again
+ret:
+.end
+
+.sub _main @MAIN
+	new	P30, .Hash
+	print "round 1\n"
+	I29 = 1
+	I30 = 1000
+	I31 = 1000
+	set_multiple_keys(P30, I29, I30, I31)
+	I20 = 3
+	print_multiple_keys(P30, I29, I30, I20)
+	print "round 2\n"
+	I21 = 100000
+	set_multiple_keys(P30, I21, I30, I31)
+	print_multiple_keys(P30, I29, I30, I20)
+	print_multiple_keys(P30, I21, I30, I20)
+	print "round 3\n"
+	I22 = 50000
+	set_multiple_keys(P30, I22, I29, I22)
+	print_multiple_keys(P30, I29, I30, I20)
+	print_multiple_keys(P30, I22, I30, I20)
+	print "done.\n"
+.end
+CODE
+round 1
+key1 => value1
+key1001 => value1001
+key2001 => value2001
+round 2
+key1 => value1
+key1001 => value1001
+key2001 => value2001
+key100000 => value100000
+key101000 => value101000
+key102000 => value102000
+round 3
+key1 => value1
+key1001 => value1001
+key2001 => value2001
+key50000 => value50000
+key51000 => value51000
+key52000 => value52000
+done.
 OUTPUT
 
 # Check all values after setting all of them
