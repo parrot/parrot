@@ -37,8 +37,6 @@ This is the Array PMC for the Tcl implementation.
 #define TclFloat_type (pmc_type(interpreter, string_from_cstring(interpreter, "TclFloat", 8)))
 
 
-STRING * hash_get_idx(Interp *interpreter, Hash *hash, PMC *key);
-
 /*
 
 =item C<static STRING* make_hash_key(Interp *interpreter, PMC *key)>

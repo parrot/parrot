@@ -21,8 +21,6 @@ These are the vtable functions for the Python Dictionary class
 #include "parrot/parrot.h"
 #include "pyconsts.h"
 
-PMC * hash_get_idx(Interp *interpreter, Hash *hash, PMC *key);
-
 /*
 
 =item C<static size_t
@@ -89,22 +87,30 @@ Class initialization. Allocates the memory for the hash.
 
 Initializes the instance.
 
+=item C<void destroy()>
+
+Free hash structure.
+
 =cut
 
 */
 
     void init () {
         PMC_struct_val(SELF) = NULL;
-        PObj_custom_mark_SET(SELF);
+        PObj_custom_mark_destroy_SETALL(SELF);
         new_pmc_hash_x(INTERP, SELF,
             enum_type_PMC,
-            0,
-            Hash_key_type_none,
+            Hash_key_type_PMC,
             object_compare,     /* object compare */
-            key_hash_object,    /* object hash    */
-            pobject_lives_fn);     /* object mark    */
+            key_hash_object);    /* object hash    */
     }
 
+    void destroy () {
+        if (PMC_struct_val(SELF)) {
+            hash_destroy(INTERP, (Hash*) PMC_struct_val(SELF));
+            PMC_struct_val(SELF) = NULL;
+        }
+    }
 /*
 
 =item C<void mark()>

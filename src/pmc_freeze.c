@@ -756,10 +756,10 @@ todo_list_init(Parrot_Interp interpreter, visit_info *info)
     /* we must use PMCs here, so that they get marked properly */
     info->todo = pmc_new(interpreter, enum_class_Array);
     info->seen = pmc_new_noinit(interpreter, enum_class_Hash);
-    new_hash_x(interpreter, &hash, enum_type_ptr, 0, Hash_key_type_int,
-            int_compare, key_hash_int, (hash_mark_key_fn) NULL);
-    PObj_custom_mark_SET(info->seen);
+    new_hash_x(interpreter, &hash, enum_type_ptr, Hash_key_type_int,
+            int_compare, key_hash_int);
     PMC_struct_val(info->seen) = hash;
+    PObj_active_destroy_SET(info->seen);
 
     ft_init(interpreter, info);
 }

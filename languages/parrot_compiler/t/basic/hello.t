@@ -87,29 +87,8 @@ TODO: {
 
 # PAST tests
 
-# There is a reason why the PAST code isn't invoked as naively expected.
-# Leo explains why:
-
-#   When you run the .imc version of the program, C<emit_open> is
-#   called in imcc/main.c:526, which sends the output to the to be generated
-#   PBC. If you run the .pbc version of your compiler, the emit_open()
-#   function isn't executed and the default emitter (number 0) is used,
-#   which produces assembly listings (as parrot -o- does).
-# 
-#   The problem is that such output options can't be passed on to secondary
-#   compile runs. They use just what imcc/main used. We probably need a
-#   scheme to pass options from the C<compile> opcode to the compiler.
-
 $ENV{TEST_PROG_ARGS} = 'parrot_compiler.pbc --language=PAST';
-language_output_is( 'ParrotCompiler', $code{PAST}, << 'END_PASM_FROM_PAST', $ENV{TEST_PROG_ARGS} );
-__main__:
-	new_pad 0 
-	print_item 'Hello, this is PAST.' 
-	print_newline  
-	end  
-
-
-END_PASM_FROM_PAST
+language_output_is( 'ParrotCompiler', $code{PAST}, $out{PAST}, $ENV{TEST_PROG_ARGS} );
 
 $ENV{TEST_PROG_ARGS} = 'parrot_compiler.imc --language=PAST';
 language_output_is( 'ParrotCompiler', $code{PAST}, $out{PAST},

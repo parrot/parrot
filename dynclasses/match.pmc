@@ -27,8 +27,6 @@ anyone who reads this to hurl. Violently.
 
 extern int MatchRange_type_id;
 
-STRING * hash_get_idx(Interp *interpreter, Hash *hash, PMC *key);
-
 static STRING* make_hash_key(Interp* interpreter, PMC * key)
 {
     if (key == NULL) {

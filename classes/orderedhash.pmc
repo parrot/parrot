@@ -62,6 +62,10 @@ pmclass OrderedHash extends PerlArray need_ext does array does hash {
 
 Initializes the ordered hash.
 
+=item C<void destroy()>
+
+Destroys the ordered hash.
+
 =cut
 
 */
@@ -70,6 +74,10 @@ Initializes the ordered hash.
         /* clear the Hash ptr - its not yet existing */
         PMC_struct_val(SELF) = NULL;
         SUPER();
+        Hash.SUPER();
+    }
+
+    void destroy () {
         Hash.SUPER();
     }
 

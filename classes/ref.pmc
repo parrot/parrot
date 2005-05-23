@@ -40,6 +40,11 @@ Sets the referenced PMC to C<PMCNULL>.
         SELF.init_pmc(PMCNULL);
     }
 
+    void destroy() {
+        SELF.init_pmc(NULL);
+        /* don't pass it on */
+    }
+
 /*
 
 =item C<void init_pmc(PMC *initializer)>

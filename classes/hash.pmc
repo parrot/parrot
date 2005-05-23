@@ -111,8 +111,6 @@ static PMC * get_string_pmc(Interp* interpreter, INTVAL base_type ) {
 }
 
 
-STRING * hash_get_idx(Interp *interpreter, Hash *hash, PMC *key);
-
 /*
 
 =item C<static STRING* make_hash_key(Interp *interpreter, PMC *key)>
@@ -157,16 +155,26 @@ Class initialization. Creates a buffer-like memory pool for the hash.
 
 Initializes the instance.
 
+=item C<void destroy()>
+
+Free hash structure.
+
 =cut
 
 */
 
     void init () {
         PMC_struct_val(SELF) = NULL;
-        PObj_custom_mark_SET(SELF);
+        PObj_custom_mark_destroy_SETALL(SELF);
         new_pmc_hash(INTERP, SELF);
     }
 
+    void destroy () {
+        if (PMC_struct_val(SELF)) {
+            hash_destroy(INTERP, (Hash*) PMC_struct_val(SELF));
+            PMC_struct_val(SELF) = NULL;
+        }
+    }
 /*
 
 =item C<void mark()>
@@ -243,7 +251,7 @@ Creates and returns a clone of the hash.
 
     PMC* clone () {
         PMC* dest = pmc_new_noinit(INTERP, SELF->vtable->base_type);
-        PObj_custom_mark_SET(dest);
+        PObj_custom_mark_destroy_SETALL(dest);
         hash_clone(INTERP, (Hash *)PMC_struct_val(SELF),
                    (Hash**)&PMC_struct_val(dest));
         ((Hash*)PMC_struct_val(dest))->container = dest;

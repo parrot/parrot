@@ -67,11 +67,6 @@ typedef long INTVAL;
 /* a bit more stress */
 #define INITIAL_BUCKETS 4	/* min is 4 */
 
-typedef struct _hashbucket {
-    struct _hashbucket *next;
-    void *key;
-    void *value;
-} HashBucket;
 
 struct _hash;
 
@@ -102,7 +97,6 @@ typedef struct _hash {
                                    updated for each new hash */
     hash_comp_fn   compare;     /* compare two keys, 0 = equal */
     hash_hash_key_fn hash_val;  /* generate a hash value for key */
-    hash_mark_key_fn mark_key;  /* mark a key being alive */
 } Hash;
 
 /* code */
