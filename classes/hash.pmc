@@ -137,20 +137,6 @@ pmclass Hash need_ext does hash {
 
 /*
 
-=item C<void class_init()>
-
-Class initialization. Creates a buffer-like memory pool for the hash.
-
-=cut
-
-*/
-
-    void class_init() {
-        make_bufferlike_pool(INTERP, sizeof(struct _hash));
-    }
-
-/*
-
 =item C<void init()>
 
 Initializes the instance.

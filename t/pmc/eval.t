@@ -17,7 +17,7 @@ Tests on-the-fly PASM, PIR and PAST compilation and invocation.
 
 =cut
 
-use Parrot::Test tests => 9;
+use Parrot::Test tests => 11;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "eval_sc");
@@ -263,4 +263,94 @@ PASM: before
 8
 PASM: after
 PIR: after
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "PIR compiler sub PASM");
+.sub main @MAIN
+  register_compiler()
+
+  .local pmc compiler, invokable
+  compiler = compreg "PUTS"
+
+  invokable = compile compiler, "ok 1"
+  invokable()
+
+.end
+
+.sub register_compiler
+  $P0 = find_global "puts"
+  compreg "PUTS", $P0
+.end
+
+.sub puts
+  .param string printme
+
+  .local pmc pasm_compiler, retval
+  pasm_compiler = compreg "PASM"
+
+  .local string code
+
+  code = "print \""
+  code .= printme
+  code .= "\\n\"\n"
+  code .= "null I0\n"
+  code .= "null I3\n"
+  code .= "returncc\n"
+
+  retval = compile pasm_compiler, code
+
+  .return (retval)
+.end
+CODE
+ok 1
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "PIR compiler sub PIR");
+.sub main @MAIN
+  register_compiler()
+
+  .local pmc compiler, invokable
+  compiler = compreg "PUTS"
+
+  invokable = compile compiler, "ok 1"
+  invokable()
+
+.end
+
+.sub register_compiler
+ .local pmc counter
+ counter = new Integer
+ counter = 0
+ store_global "counter", counter
+
+  $P0 = find_global "_puts"
+  compreg "PUTS", $P0
+.end
+
+.sub _puts
+  .param string printme
+
+  .local pmc pir_compiler, retval
+  pir_compiler = compreg "PIR"
+
+  .local pmc counter
+  counter = find_global "counter"
+  inc counter
+
+  .local string code
+  code = ".sub anonymous"
+  $S0 = counter
+  code .= $S0
+  code .= " @ANON\n"
+  code .= "print \""
+  code .= printme
+  code .= "\\n\"\n"
+  code .=".end\n"
+
+  retval = compile pir_compiler, code
+
+  .return (retval)
+.end
+CODE
+ok 1
 OUTPUT

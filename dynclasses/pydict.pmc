@@ -66,23 +66,6 @@ pmclass PyDict extends PyObject need_ext does hash dynpmc group python_group {
 
 /*
 
-=item C<void class_init()>
-
-Class initialization. Allocates the memory for the hash.
-
-=cut
-
-*/
-
-    void class_init() {
-        /* class_init_code */
-        if (pass) {
-            make_bufferlike_pool(INTERP, sizeof(struct _hash));
-        }
-    }
-
-/*
-
 =item C<void init()>
 
 Initializes the instance.
