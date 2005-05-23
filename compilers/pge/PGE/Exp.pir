@@ -747,17 +747,17 @@ register.
     emit(code, "    $I0 = is_cclass %d, target, pos", .CCLASS_WORD)
     emit(code, "    unless $I0 goto %s_1", label)
     emit(code, "    $I0 = pos - 1")
-    emit(code, "    $I0 = is_cclass %d, target, $I0", .CCLASS_WORD)
-    emit(code, "    if $I0 goto fail")
+    emit(code, "    $I1 = is_cclass %d, target, $I0", .CCLASS_WORD)
+    emit(code, "    if $I1 goto fail")
     emit(code, "  %s_1:", label)
+    emit(code, "    rep = pos")
+    emit(code, "    pos = find_not_cclass %d, target, pos, lastpos", .CCLASS_WHITESPACE)
     $I0 = self["iscut"]
     unless $I0 goto backtrack
-    emit(code, "    pos = find_not_cclass %d, target, pos, lastpos", .CCLASS_WHITESPACE)
     emit(code, "    goto %s", next)
     goto end
   backtrack:
-    emit(code, "    rep = $I0 - pos")
-    emit(code, "    pos = $I0")
+    emit(code, "    rep = pos - rep")
     emit(code, "  %s_2:", label)
     emit(code, "    if rep == 0 goto %s", next)
     self.emitsub(code, next, "pos", "rep")
