@@ -71,7 +71,7 @@ over:
 	@make all
 
 test:
-	t/harness
+#	t/harness
 #	cd $(TOOL_DIR); $(INTERP) $(DIR)/test.pbc
 #	cd $(TOOL_DIR); $(INTERP) $(DIR)/and.pbc
 #	cd $(TOOL_DIR); $(INTERP) $(DIR)/foo.pbc

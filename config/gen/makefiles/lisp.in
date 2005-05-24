@@ -1,6 +1,6 @@
 RM_F = ${rm_f}
 PERL = ${perl}
-PARROT = ../../parrot
+PARROT = ..${slash}..${slash}parrot${exe}
 
 all: build
 
