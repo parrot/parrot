@@ -213,6 +213,11 @@ providing a compreg-compatible method.
   # register the TCL compiler.
   $P1 = find_global "_Tcl", "_tcl_compile"
   compreg "TCL", $P1
+  
+  # Setup a global to keep a unique id for compiled subs.
+  $P1 = new Integer
+  $P1 = 0
+  store_global "_Tcl", "compiled_num", $P1
 
 .end
 
@@ -227,17 +232,19 @@ providing a compreg-compatible method.
  
   pir_compiler = compreg "PIR"
 
-  # should generate a new sub each time, or no?
-  # yes, we should.
-  pir_code = ".namespace [ \"_Tcl\" ]\n.sub _sub @ANON\n.local pmc code\n.local pmc zero\nzero = new Integer\nzero = 0\ncode=new String\ncode = \""
+  .local pmc compiled_num  
+  compiled_num = find_global "_Tcl", "compiled_num"
+
+  pir_code = ".namespace [ \"_Tcl\" ]\n.sub _compiled_sub"
+  $S0 = compiled_num
+  pir_code .= $S0
+  pir_code .= " @ANON\n.local pmc code\n.local pmc zero\nzero = new Integer\nzero = 0\ncode=new String\ncode = \""
   tcl_code = escaper(tcl_code,"\"")
   pir_code .= tcl_code
   pir_code .= "\"\n.local pmc parser\n.local pmc tcl_interpret\nparser = find_global \"_Tcl\", \"parser\"\ntcl_interpret = find_global \"_Tcl\", \"__interpret\"\n$P1 = parser.\"parse\"(code,zero,zero)\n($I0,$P3) = tcl_interpret($P1)\n.return($I0,$P3)\n .end\n"
-
-  # XXX Change this to a tail call
-  .local pmc compiled_sub
-  compiled_sub = compile pir_compiler, pir_code
-  .return(compiled_sub)
+ 
+  $P1 = compile pir_compiler, pir_code
+  .return ($P1)
 .end
 
 ${INCLUDES}
