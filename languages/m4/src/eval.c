@@ -24,7 +24,8 @@
 #include "parrot/parrot.h"
 #include "parrot/embed.h"
 
-typedef int boolean;
+/* boolean might be defined in other header files */
+typedef int boolean_for_m4;
 typedef int eval_t;
 
 /* Error handling.  */
@@ -83,7 +84,7 @@ static eval_error          mult_term( eval_token, eval_t * );
 static eval_error          exp_term( eval_token, eval_t * );
 static eval_error          unary_term( eval_token, eval_t * );
 static eval_error          simple_term( eval_token, eval_t * );
-boolean                    evaluate (const char *, eval_t *);
+boolean_for_m4             evaluate (const char *, eval_t *);
 PMC *                      m4_eval_compiler(Parrot_Interp, const char *);
 void                       Parrot_lib_m4_eval_compiler_init(Parrot_Interp , PMC* );
 
@@ -268,7 +269,7 @@ static eval_token eval_lex( eval_t *val )
 | Main entry point, called from "eval".	 |
 `---------------------------------------*/
 
-boolean
+boolean_for_m4
 evaluate (const char *expr, eval_t *val)
 {
     eval_token et;
@@ -316,7 +317,7 @@ evaluate (const char *expr, eval_t *val)
       abort ();
     }
 
-  return (boolean) (err != NO_ERROR);
+  return (boolean_for_m4) (err != NO_ERROR);
 }
 
 /*---------------------------.
