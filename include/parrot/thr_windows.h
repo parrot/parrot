@@ -15,6 +15,7 @@
 
 #  undef CONST
 #  include <windows.h>
+#  undef FASTCALL
 #  include <process.h>
 #  include <limits.h>
 
@@ -107,7 +108,7 @@ typedef HANDLE Parrot_thread;
 #    define THREAD_CREATE_JOINABLE(t, func, arg) \
        do { \
          DWORD tid; \
-         t = CreateThread( NULL, 0, (PTHREAD_START_ROUTINE)func, (PVOID)arg, 0, &tid ); \
+         t = CreateThread( NULL, 0, (LPTHREAD_START_ROUTINE)func, (PVOID)arg, 0, &tid ); \
        } while (0)
 #  endif
 
