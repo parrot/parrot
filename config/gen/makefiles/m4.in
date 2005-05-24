@@ -49,11 +49,7 @@ help:
 test: build
 	cd .. && $(PERL) -I../lib m4/t/harness $(USE_GNU_M4)
 
-build: runtime $(M4_EVAL_COMPILER_SO) m4.pbc 
-
-# TODO: get rid of this, as soon as _PARROTLIB is the default
-runtime:
-	$(LN_SF) ../../runtime
+build: $(M4_EVAL_COMPILER_SO) m4.pbc 
 
 m4.pbc: src/m4.pbc 
 	$(LN_SF) src/m4.pbc 
@@ -73,7 +69,6 @@ html:
 clean:
 	$(RM_RF) \
 m4.pbc \
-runtime \
 src/*.pbc \
 src/*/*.pbc \
 src/*~ \
