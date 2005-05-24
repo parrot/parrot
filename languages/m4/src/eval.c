@@ -845,7 +845,7 @@ m4_eval_compiler( Parrot_Interp interp, const char *program )
     /*
      * need a packfile segment
      */
-    cur_cs = (struct PackFile_ByteCode*)PackFile_Segment_new_seg(interp,&interp->code->base.dir, PF_BYTEC_SEG, "m4_eval_bc", 1);
+    cur_cs = (struct PackFile_ByteCode*)PackFile_Segment_new_seg(interp, interp->code->base.dir, PF_BYTEC_SEG, "m4_eval_bc", 1);
     old_cs = Parrot_switch_to_cs(interp, cur_cs, 0);
     /*
      * alloc byte code mem
