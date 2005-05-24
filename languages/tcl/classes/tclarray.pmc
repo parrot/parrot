@@ -28,14 +28,7 @@ This is the Array PMC for the Tcl implementation.
 
 #include "parrot/parrot.h"
 
-/* This shouldn't be necessary, IMO */
-#define enum_class_TclArray -1
-
-/* this is, I'm sure, terribly inefficient. */
-#define TclString_type (pmc_type(interpreter, string_from_cstring(interpreter, "TclString", 9)))
-#define TclInt_type (pmc_type(interpreter, string_from_cstring(interpreter, "TclInt", 6)))
-#define TclFloat_type (pmc_type(interpreter, string_from_cstring(interpreter, "TclFloat", 8)))
-
+static INTVAL dynclass_TclInt;
 
 /*
 
@@ -57,25 +50,25 @@ static STRING* make_hash_key(Interp* interpreter, PMC * key)
     return key_string(interpreter, key);
 }
 
-/* Albeit TclArray doesn't use PMC_data, it needs the next_for_GC pointer
- * We would get recursive marking of a deeply nested HoHoH...
- */
-pmclass TclArray need_ext does hash dynpmc group tcl_group {
+
+pmclass TclArray extends ResizablePMCArray need_ext does hash dynpmc group tcl_group {
 
 /*
 
 =item C<void class_init()>
 
-Class initialization. Allocates the memory for the hash.
+Initializes variables needed by the class.
 
 =cut
 
 */
 
-    void class_init() {
-        /* class_init_code */
-        make_bufferlike_pool(INTERP, sizeof(struct _hash));
+    void class_init () {
+        if (pass) {
+            dynclass_TclInt = Parrot_PMC_typenum(INTERP,"TclInt");
+        }
     }
+
 /*
 
 =item C<void init()>
@@ -101,72 +94,9 @@ Marks the hash as live.
 =cut
 
 */
-
     void mark () {
         if (PMC_struct_val(SELF))
             mark_hash(INTERP, PMC_struct_val(SELF));
-    }
-
-/*
-
-=item C<INTVAL type_keyed_str(STRING *key)>
-
-Returns the type of the element for C<*key>.
-
-=cut
-
-*/
-
-    INTVAL type_keyed_str (STRING* key) {
-        HashBucket* b = hash_get_bucket(INTERP, (Hash*) PMC_struct_val(SELF),
-                                        key);
-        if (!b)
-            return 0;
-        return VTABLE_type(INTERP, (PMC*) b->value);
-    }
-
-/*
-
-=item C<INTVAL type_keyed (PMC *key)>
-
-Returns the type of the element for C<*key>.
-
-=cut
-
-*/
-
-    INTVAL type_keyed (PMC* key) {
-        PMC* valpmc;
-        PMC* nextkey;
-        STRING* keystr = make_hash_key(INTERP, key);
-        HashBucket* b = hash_get_bucket(INTERP, (Hash*) PMC_struct_val(SELF),
-                                            keystr);
-        if (b == NULL) {
-            return 0;
-        }
-        nextkey = key_next(INTERP, key);
-        valpmc = b->value;
-        if (!nextkey)
-            return VTABLE_type(INTERP, valpmc);
-        return VTABLE_type_keyed(INTERP, valpmc, nextkey);
-    }
-
-/*
-
-=item C<PMC *clone()>
-
-Creates and returns a clone of the hash.
-
-=cut
-
-*/
-
-    PMC* clone () {
-        PMC* dest = pmc_new_noinit(INTERP, SELF->vtable->base_type);
-        PObj_custom_mark_SET(dest);
-        hash_clone(INTERP, (Hash *)PMC_struct_val(SELF),
-                   (Hash**)&PMC_struct_val(dest));
-        return dest;
     }
 
 /*
@@ -181,23 +111,6 @@ Returns the size of the hash.
 
     INTVAL get_integer () {
         return hash_size(INTERP, PMC_struct_val(SELF));
-    }
-
-/*
-
-=item C<INTVAL get_integer_keyed_str(STRING *key)>
-
-=cut
-
-*/
-
-    INTVAL get_integer_keyed_str (STRING* key) {
-        HashBucket *b = hash_get_bucket(INTERP, (Hash*) PMC_struct_val(SELF),
-                                        key);
-        if (b == NULL) {
-            return 0;
-        }
-        return VTABLE_get_integer(INTERP, (PMC*) b->value);
     }
 
 /*
@@ -228,207 +141,6 @@ Returns the integer value for the element at C<*key>.
 
 /*
 
-=item C<FLOATVAL get_number_keyed_str(STRING *key)>
-
-=cut
-
-*/
-
-    FLOATVAL get_number_keyed_str (STRING* key) {
-        HashBucket *b = hash_get_bucket(INTERP, (Hash*) PMC_struct_val(SELF),
-                                        key);
-        if (b == NULL) {
-            /* XXX Warning: Use of uninitialized value */
-            return 0.0;
-        }
-        return VTABLE_get_number(INTERP, (PMC*) b->value);
-    }
-
-/*
-
-=item C<FLOATVAL get_number_keyed(PMC *key)>
-
-Returns the floating-point value for the element at C<*key>.
-
-=cut
-
-*/
-
-    FLOATVAL get_number_keyed (PMC* key) {
-        PMC* valpmc;
-        STRING* keystr = make_hash_key(INTERP, key);
-        HashBucket *b = hash_get_bucket(INTERP, (Hash*) PMC_struct_val(SELF),
-                                        keystr);
-        PMC* nextkey;
-        if (b == NULL) {
-            /* XXX Warning: Use of uninitialized value */
-            return 0.0;
-        }
-        nextkey = key_next(INTERP, key);
-        valpmc = b->value;
-        if (!nextkey)
-            return VTABLE_get_number(INTERP, valpmc);
-        return VTABLE_get_number_keyed(INTERP, valpmc, nextkey);
-    }
-
-/*
-
-=item C<BIGNUM *get_bignum_keyed_str(STRING *key)>
-
-=cut
-
-*/
-
-    BIGNUM* get_bignum_keyed_str (STRING* key) {
-        HashBucket *b = hash_get_bucket(INTERP, (Hash*) PMC_struct_val(SELF),
-                                        key);
-        if (b == NULL) {
-            /* XXX Warning: Use of uninitialized value */
-            return NULL;
-        }
-        return VTABLE_get_bignum(INTERP, (PMC*) b->value);
-    }
-
-/*
-
-=item C<BIGNUM *get_bignum_keyed(PMC *key)>
-
-Returns the big number value for the element at C<*key>.
-
-=cut
-
-*/
-
-    BIGNUM* get_bignum_keyed (PMC* key) {
-        PMC* valpmc;
-        STRING* keystr = make_hash_key(INTERP, key);
-        HashBucket *b = hash_get_bucket(INTERP, (Hash*) PMC_struct_val(SELF),
-                                        keystr);
-        PMC* nextkey;
-        if (b == NULL) {
-            return NULL;
-        }
-        nextkey = key_next(INTERP, key);
-        valpmc = b->value;
-        if (!nextkey)
-            return VTABLE_get_bignum(INTERP, valpmc);
-        return VTABLE_get_bignum_keyed(INTERP, valpmc, nextkey);
-    }
-
-/*
-
-=item C<STRING *get_string()>
-
-Returns a string representation of the hash, showing its class name and
-memory address.
-
-=cut
-
-*/
-
-    STRING* get_string () {
-        return Parrot_sprintf_c(INTERP, "TclArray[0x%x]", SELF);
-    }
-
-/*
-
-=item C<STRING *get_string_keyed_str(STRING *key)>
-
-=cut
-
-*/
-
-    STRING* get_string_keyed_str (STRING* key) {
-        HashBucket *b = hash_get_bucket(INTERP, (Hash*) PMC_struct_val(SELF),
-                                        key);
-        if (b == NULL) {
-            return NULL;
-        }
-        return VTABLE_get_string(INTERP, (PMC*) b->value);
-    }
-
-/*
-
-=item C<STRING *get_string_keyed(PMC *key)>
-
-Returns the big number value for the element at C<*key>.
-
-=cut
-
-*/
-
-    STRING* get_string_keyed (PMC* key) {
-        PMC* valpmc;
-        STRING* keystr;
-        HashBucket *b;
-        PMC* nextkey;
-
-        switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
-            case KEY_integer_FLAG:
-                /* called from iterator with an integer idx in key */
-                return hash_get_idx(INTERP, (Hash*) PMC_struct_val(SELF), key);
-            default:
-                keystr = make_hash_key(INTERP, key);
-        }
-        b = hash_get_bucket(INTERP, (Hash*) PMC_struct_val(SELF), keystr);
-        if (b == NULL) {
-            /* XXX Warning: use of uninitialized value */
-            return NULL;
-        }
-        nextkey = key_next(INTERP, key);
-        valpmc = b->value;
-        if (!nextkey)
-            return VTABLE_get_string(INTERP, valpmc);
-        return VTABLE_get_string_keyed(INTERP, valpmc, nextkey);
-    }
-
-/*
-
-=item C<INTVAL get_bool()>
-
-Returns true if the hash size is not zero.
-
-=cut
-
-*/
-
-    INTVAL get_bool () {
-        return hash_size(INTERP, PMC_struct_val(SELF)) != 0;
-    }
-
-/*
-
-=item C<INTVAL elements()>
-
-Returns the number of elements in the hash.
-
-=cut
-
-*/
-
-    INTVAL elements () {
-        return hash_size(INTERP, PMC_struct_val(SELF));
-    }
-
-/*
-
-=item C<PMC *get_pmc_keyed_str(STRING *key)>
-
-=cut
-
-*/
-
-    PMC* get_pmc_keyed_str (STRING* key) {
-        HashBucket *b = hash_get_bucket(INTERP, (Hash*) PMC_struct_val(SELF),
-                                        key);
-        if (b == NULL) {
-            return NULL;
-        }
-        return b->value;
-    }
-
-/*
-
 =item C<PMC *get_pmc_keyed(PMC *key)>
 
 Returns the PMC value for the element at C<*key>.
@@ -453,21 +165,6 @@ Returns the PMC value for the element at C<*key>.
 
 /*
 
-=item C<INTVAL is_same(PMC *other)>
-
-Returns whether the hash is the same as C<*other>.
-
-=cut
-
-*/
-
-    INTVAL is_same (PMC* other) {
-        return (INTVAL)( other->vtable == SELF->vtable &&
-            PMC_struct_val(other) == PMC_struct_val(SELF));
-    }
-
-/*
-
 =item C<void set_integer_keyed(PMC *key, INTVAL value)>
 
 =cut
@@ -484,7 +181,7 @@ Returns whether the hash is the same as C<*other>.
         keystr = make_hash_key(INTERP, key);
         nextkey = key_next(INTERP, key);
         if (nextkey == NULL) {
-            val = pmc_new(INTERP, TclInt_type);
+            val = pmc_new(INTERP, dynclass_TclInt);
             VTABLE_set_integer_native(INTERP, val, value);
             hash_put(INTERP, PMC_struct_val(SELF), keystr, val);
             return;
@@ -499,143 +196,12 @@ Returns whether the hash is the same as C<*other>.
 
 /*
 
-=item C<void set_integer_keyed_str(STRING *key, INTVAL value)>
-
-=cut
-
-*/
-
-    void set_integer_keyed_str (STRING* key, INTVAL value) {
-        PMC *val = pmc_new(INTERP, TclInt_type);
-        PMC_int_val(val) = value;
-        hash_put(INTERP, PMC_struct_val(SELF), key, val);
-    }
-
-/*
-
-=item C<void set_number_keyed (PMC *key, FLOATVAL value)>
-
-=cut
-
-*/
-
-    void set_number_keyed (PMC* key, FLOATVAL value) {
-        STRING* keystr;
-        PMC* nextkey;
-        PMC* box;
-        PMC* val;
-
-        if (!key) return;
-        keystr = make_hash_key(INTERP, key);
-        nextkey = key_next(INTERP, key);
-        if (nextkey == NULL) {
-            val = pmc_new(INTERP, TclFloat_type);
-            PMC_num_val(val) = value;
-            hash_put(INTERP, PMC_struct_val(SELF), keystr, val);
-            return;
-        }
-        box = SELF.get_pmc_keyed_str(keystr);
-        if (box == NULL) {
-            /* autovivify an TclArray */
-            box = pmc_new(INTERP, DYNSELF.type());
-        }
-        VTABLE_set_number_keyed(INTERP, box, nextkey, value);
-    }
-
-/*
-
-=item C<void set_number_keyed_str(STRING *key, FLOATVAL value)>
-
-Sets C<value> as the value for C<*key>.
-
-=cut
-
-*/
-
-    void set_number_keyed_str (STRING* key, FLOATVAL value) {
-        PMC *val = pmc_new(INTERP, TclFloat_type);
-        PMC_num_val(val) = value;
-        hash_put(INTERP, PMC_struct_val(SELF), key, val);
-    }
-
-/*
-
-=item C<void set_bignum_keyed(PMC *key, BIGNUM *value)>
-
-=cut
-
-*/
-
-    void set_bignum_keyed (PMC* key, BIGNUM* value) {
-        /* XXX */
-    }
-
-/*
-
-=item C<void set_bignum_keyed_str(STRING *key, BIGNUM *value)>
-
-These two methods are unimplemented.
-
-=cut
-
-*/
-
-    void set_bignum_keyed_str (STRING* key, BIGNUM* value) {
-        /* XXX */
-    }
-
-/*
-
-=item C<void set_string_keyed(PMC *key, STRING *value)>
-
-=cut
-
-*/
-
-    void set_string_keyed (PMC* key, STRING* value) {
-        STRING* keystr;
-        PMC* nextkey;
-        PMC* box;
-        PMC* val;
-
-        if (!key) return;
-        keystr = make_hash_key(INTERP, key);
-        nextkey = key_next(INTERP, key);
-        if (nextkey == NULL) {
-            val = pmc_new(INTERP, TclString_type);
-            VTABLE_set_string_native(INTERP, val, value);
-            hash_put(INTERP, PMC_struct_val(SELF), keystr, val);
-            return;
-        }
-        box = SELF.get_pmc_keyed_str(keystr);
-        if (box == NULL) {
-            /* autovivify an TclArray */
-            box = pmc_new(INTERP, DYNSELF.type());
-        }
-        VTABLE_set_string_keyed(INTERP, box, nextkey, value);
-    }
-
-/*
-
-=item C<void set_string_keyed_str(STRING *key, STRING *value)>
-
-=cut
-
-*/
-
-    void set_string_keyed_str (STRING* key, STRING* value) {
-        PMC *val = pmc_new(INTERP, TclString_type);
-        VTABLE_set_string_native(INTERP, val, value);
-        hash_put(INTERP, PMC_struct_val(SELF), key, val);
-    }
-
-/*
-
 =item C<void set_pmc_keyed(PMC *dest_key, PMC *value)>
 
 =cut
 
 */
+
 
     void set_pmc_keyed (PMC* key, PMC* value) {
         STRING* keystr;
@@ -657,244 +223,11 @@ These two methods are unimplemented.
         VTABLE_set_pmc_keyed(INTERP, box, nextkey, value);
     }
 
-/*
-
-=item C<void set_pmc_keyed_str(STRING *key, PMC *value)>
-
-Sets C<*value> as the value for C<*key>.
-
-=cut
-
-*/
-
-    void set_pmc_keyed_str (STRING* key, PMC* value) {
-        hash_put(INTERP, PMC_struct_val(SELF), key, value);
-    }
-
-/*
-
-=item C<INTVAL is_equal(PMC *value)>
-
-The C<==> operation.
-
-Currently just returns false, C<*value> is ignored.
-
-=cut
-
-*/
-
-    INTVAL is_equal (PMC* value) {
-        return 0;
-    }
-
-/*
-
-=item C<INTVAL exists_keyed_str(STRING *key)>
-
-=cut
-
-*/
-
-    INTVAL exists_keyed_str(STRING* key) {
-        HashBucket *b = hash_get_bucket(INTERP, (Hash*) PMC_struct_val(SELF),
-                                        key);
-        return b != NULL;
-    }
-
-/*
-
-=item C<INTVAL exists_keyed(PMC *key)>
-
-Returns whether a key C<*key> exists in the hash.
-
-=cut
-
-*/
-
-    INTVAL exists_keyed(PMC* key) {
-        STRING * sx;
-        Hash * h = (Hash *)PMC_struct_val(SELF);
-        HashBucket *b;
-        sx = key_string(INTERP, key);
-        key = key_next(INTERP, key);
-        b = hash_get_bucket(INTERP, h, sx);
-        if (b == NULL)
-            return 0;       /* no such key */
-        if (key == NULL)
-            return 1;       /* lookup stops here */
-        return VTABLE_exists_keyed(INTERP, (PMC*)b->value, key);
-    }
-
-/*
-
-=item C<INTVAL defined_keyed_str(STRING *key)>
-
-=cut
-
-*/
-
-    INTVAL defined_keyed_str(STRING* key) {
-        HashBucket *b = hash_get_bucket(INTERP, (Hash*) PMC_struct_val(SELF),
-                                        key);
-        if (b == NULL)
-            return 0;       /* no such key */
-        return VTABLE_defined(INTERP, (PMC*)b->value);
-    }
-
-/*
-
-=item C<INTVAL defined_keyed(PMC *key)>
-
-Returns whether the value for C<*key> is defined.
-
-=cut
-
-*/
-
-    INTVAL defined_keyed(PMC* key) {
-        STRING * sx;
-        Hash * h = (Hash *)PMC_struct_val(SELF);
-        HashBucket *b;
-        sx = key_string(INTERP, key);
-        key = key_next(INTERP, key);
-        b = hash_get_bucket(INTERP, h, sx);
-        if (b == NULL)
-            return 0;       /* no such key */
-        if (key == NULL)
-            return VTABLE_defined(INTERP, (PMC*)b->value);
-        else
-            return VTABLE_defined_keyed( INTERP, (PMC*)b->value, key);
-    }
-
-/*
-
-=item C<void delete_keyed_str(STRING *key)>
-
-=cut
-
-*/
-
-    void delete_keyed_str(STRING* key) {
-        hash_delete(INTERP, (Hash *)PMC_struct_val(SELF), key);
-    }
-
-/*
-
-=item C<void delete_keyed(PMC *key)>
-
-Deletes the element associated with C<*key>.
-
-=cut
-
-*/
-
-    void delete_keyed(PMC* key) {
-        STRING * sx;
-        Hash * h = (Hash *)PMC_struct_val(SELF);
-        HashBucket *b;
-        sx = key_string(INTERP, key);
-        key = key_next(INTERP, key);
-        b = hash_get_bucket(INTERP, h, sx);
-        if (b == NULL)
-                return;  /* no such key */
-        else if (key == NULL)
-            hash_delete(INTERP, h, sx);
-        else
-            VTABLE_delete_keyed(INTERP, (PMC*)b->value, key);
-    }
-
-/*
-
-=item C<PMC *nextkey_keyed(PMC *key, INTVAL what)>
-
-Returns the next key relative to the location specified in C<what>.
-
-=cut
-
-*/
-
-    PMC* nextkey_keyed (PMC* key, INTVAL what) {
-        PMC *ret = key;
-
-        INTVAL n = SELF.elements();
-        PObj_get_FLAGS(ret) &= ~KEY_type_FLAGS;
-        PObj_get_FLAGS(ret) |= KEY_integer_FLAG;
-        switch (what) {
-            case ITERATE_FROM_START:    /* reset key */
-            case ITERATE_FROM_START_KEYS:
-                PMC_int_val(ret) = 0;
-                if (!n)
-                    PMC_int_val(ret) = -1;
-                PMC_data(ret) = (void *)INITBucketIndex;
-                break;
-            case ITERATE_GET_NEXT:
-                /* do nothing: hash_get_idx does increment the idx */
-                break;
-            default:
-                internal_exception(1, "Can't iterate from end");
-                break;
-        }
-        return ret;
-    }
-
-/*
-
-=item C<void visit(visit_info *info)>
-
-Used during archiving to visit the elements in the hash.
-
-=cut
-
-*/
-
-    void visit(visit_info *info) {
-        hash_visit(INTERP, (Hash*)PMC_struct_val(SELF), info);
-        SUPER(info);
-    }
-
-/*
-
-=item C<void freeze(visit_info *info)>
-
-Used to archive the hash.
-
-=cut
-
-*/
-
-    void freeze(visit_info *info) {
-        IMAGE_IO *io = info->image_io;
-        SUPER(info);
-        io->vtable->push_integer(INTERP, io, VTABLE_elements(INTERP, SELF));
-    }
-
-/*
-
-=item C<void thaw(visit_info *info)>
-
-Used to unarchive the hash.
-
-=cut
-
-*/
-
-    void thaw(visit_info *info) {
-        IMAGE_IO *io = info->image_io;
-        SUPER(info);
-        if (info->extra_flags == EXTRA_IS_NULL) {
-            info->extra_flags = EXTRA_IS_COUNT;
-            info->extra = (void *)io->vtable->shift_integer(INTERP, io);
-        }
-    }
 }
 
 /*
 
 =back
-
-=head1 SEE ALSO
-
-F<docs/pdds/pdd08_keys.pod>.
 
 =cut
 

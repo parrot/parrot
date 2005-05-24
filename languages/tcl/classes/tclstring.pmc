@@ -13,9 +13,6 @@
 
 #include "parrot/parrot.h"
 
-static INTVAL dynclass_TclString;
-static INTVAL dynclass_TclFloat;
-static INTVAL dynclass_TclInt;
 static STRING *true, *false, *yes, *no;
 
 pmclass TclString extends TclObject extends String dynpmc group tcl_group {
@@ -24,9 +21,6 @@ pmclass TclString extends TclObject extends String dynpmc group tcl_group {
         PMC *string_anchor;
         INTVAL fixedstringarray_typenum;
         if (pass) {
-            dynclass_TclString = Parrot_PMC_typenum(INTERP,"TclString");
-            dynclass_TclInt    = Parrot_PMC_typenum(INTERP,"TclInt");
-            dynclass_TclFloat  = Parrot_PMC_typenum(INTERP,"TclFloat");
             true  = string_from_const_cstring(INTERP, "true",4);
             false = string_from_const_cstring(INTERP, "false",5);
             yes   = string_from_const_cstring(INTERP, "yes",3);
@@ -43,26 +37,6 @@ pmclass TclString extends TclObject extends String dynpmc group tcl_group {
         }
     }
 
-
-   STRING* get_repr() {
-     return SELF.get_string();
-   }
-
-    STRING* get_string () {
-	return (STRING*) PMC_str_val(SELF);
-    }
-
-    INTVAL get_integer () {
-        STRING* s = (STRING*) PMC_str_val(SELF);
-        return string_to_int(INTERP, s);
-    }
-
-    FLOATVAL get_number () {
-        STRING* s = (STRING*) PMC_str_val(SELF);
-        return string_to_num(INTERP, s);
-    }
-
-
     INTVAL get_bool () {
 
         STRING* s = (STRING*) PMC_str_val(SELF);
@@ -78,32 +52,4 @@ pmclass TclString extends TclObject extends String dynpmc group tcl_group {
 
         return 0; /* XXX Throw exception about invalid boolean type. */
     }
-
-    INTVAL is_same (PMC* other) {
-        STRING* s1 = (STRING*)PMC_str_val(SELF);
-        STRING* s2 = (STRING*)PMC_str_val(other);
-        return (INTVAL)( other->vtable == SELF->vtable &&
-                          s1->bufused   == s2->bufused  &&
-            (memcmp(s1->strstart,PObj_bufstart(s2),(size_t)s1->bufused)==0));
-    }
-
-    void set_integer_native (INTVAL value) {
-        DYNSELF.morph(dynclass_TclInt);
-        DYNSELF.set_integer_native(value);
-    }
-
-    void set_number_native (FLOATVAL value) {
-        DYNSELF.morph(dynclass_TclFloat);
-        DYNSELF.set_number_native(value);
-    }
-
-    void set_string_native (STRING * value) {
-        PMC_str_val(SELF) = string_set(INTERP, PMC_str_val(SELF), value);
-    }
-
-    void set_string_same (PMC * value) {
-        PMC_str_val(SELF) = string_set(INTERP, PMC_str_val(SELF),
-        PMC_str_val(value));
-    }
-
 }

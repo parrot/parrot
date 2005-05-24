@@ -23,11 +23,6 @@ These are the vtable functions for the TclList base class
 /* cache of classes referenced */
 
 static INTVAL dynclass_TclInt;
-static INTVAL dynclass_TclString;
-
-/*
-static INTVAL dynclass_PyNone;
-*/
 
 pmclass TclList extends Array need_ext does array dynpmc group tcl_group {
 
@@ -45,69 +40,7 @@ they will be used frequently here.
     void class_init() {
         if (pass) {
             dynclass_TclInt    = Parrot_PMC_typenum(INTERP, "TclInt");
-            dynclass_TclString  = Parrot_PMC_typenum(INTERP, "TclString");
-/*
-            dynclass_PyNone    = Parrot_PMC_typenum(INTERP, "PyNone");
-*/
         }
-    }
-
-/*
-
-=item C<void init()>
-
-Initializes the PMC by calling the underlying C<list_new()> function.
-
-=cut
-
-*/
-
-    void init () {
-        list_pmc_new(INTERP, SELF);
-        PObj_custom_mark_SET(SELF);
-    }
-
-/*
-
-=item C<INTVAL elements()>
-
-Returns the number of elements in the array.
-
-=cut
-
-*/
-
-    INTVAL elements () {
-        return ((List *) PMC_data(SELF))->length;
-    }
-
-/*
-
-=item C<INTVAL get_integer()>
-
-Returns the number of elements in the array.
-
-=cut
-
-*/
-
-    INTVAL get_integer () {
-        return DYNSELF.elements();
-    }
-
-/*
-
-=item C<PMC* get_pmc_keyed(PMC* key)>
-
-Returns the PMC value of the element at index C<key>.
-
-=cut
-
-*/
-
-    PMC* get_pmc_keyed (PMC* key) {
-        INTVAL ix = key_integer(INTERP, key);
-        return SELF.get_pmc_keyed_int(ix);
     }
 
 /*
@@ -128,10 +61,6 @@ Returns the PMC value of the element at index C<key>.
             /* XXX throw IndexError: list index out of range */ ;
         else {
             ret = *(PMC**) ret;
-/*
-            if (ret == NULL)
-                ret = pmc_new(INTERP, dynclass_PyNone);
-*/
         }
 
         return ret;
@@ -146,11 +75,6 @@ Returns the list as a string
 =cut
 
 */
-
-    STRING* get_repr () {
-        return SELF.get_string(); 
-    }
-
 
     STRING* get_string () {
         STRING *res, *vals;
@@ -177,54 +101,6 @@ Returns the list as a string
 
 /*
 
-=item C<void push_integer (INTVAL value)>
-
-Extends the array by adding an element of value C<value> to the end of
-the array.
-
-=cut
-
-*/
-
-    void push_integer (INTVAL value) {
-        INTVAL nextix = DYNSELF.elements();
-        DYNSELF.set_integer_keyed_int(nextix, value);
-    }
-
-/*
-
-=item C<void push_pmc (PMC* value)>
-
-Extends the array by adding an element of value C<*value> to the end of
-the array.
-
-=cut
-
-*/
-
-    void push_pmc (PMC* value) {
-        INTVAL nextix = DYNSELF.elements();
-        DYNSELF.set_pmc_keyed_int(nextix, value);
-    }
-
-/*
-
-=item C<void push_string (STRING* value)>
-
-Extends the array by adding an element of value C<*value> to the end of
-the array.
-
-=cut
-
-*/
-
-    void push_string (STRING* value) {
-        INTVAL nextix = DYNSELF.elements();
-        DYNSELF.set_string_keyed_int(nextix, value);
-    }
-
-/*
-
 =item C<void set_integer_keyed_int (INTVAL key, INTVAL value)>
 
 Sets the integer value of the PMC at element C<key> to C<value>.
@@ -241,62 +117,18 @@ Sets the integer value of the PMC at element C<key> to C<value>.
 
 /*
 
-=item C<void set_integer_native(INTVAL size)>
-
-Sets the length of the array to C<size>.
-
-=cut
-
-*/
-
-    void set_integer_native (INTVAL size) {
-        list_set_length(INTERP, (List *) PMC_data(SELF) ,size);
-    }
-
-/*
-
-=item C<void set_pmc_keyed(PMC* key)>
-
-Sets the PMC at element C<key> to C<*value>.
-
-=cut
-
-*/
-
-    void set_pmc_keyed (PMC* key, PMC* value) {
-        INTVAL ix = key_integer(INTERP, key);
-        SELF.set_pmc_keyed_int(ix, value);
-    }
-
-/*
-
 =item C<void set_pmc_keyed_int(INTVAL key, PMC *src)>
 
 Assigns C<*src> to the array at index C<key>.
 
 =cut
 
-*/
 
+*/
     void set_pmc_keyed_int (INTVAL key, PMC* src) {
         list_assign(INTERP, (List *) PMC_data(SELF), key, src, enum_type_PMC);
     }
 
-/*
-
-=item C<void set_string_keyed_int(INTVAL key, STRING* value)>
-
-Sets the string value of the PMC at element C<key> to C<value>.
-
-=cut
-
-*/
-
-    void set_string_keyed_int (INTVAL key, STRING* value) {
-        PMC *src = pmc_new_noinit(INTERP, dynclass_TclString);
-        VTABLE_set_string_native(INTERP, src, value);
-        list_assign(INTERP, (List *) PMC_data(SELF), key, src, enum_type_PMC);
-    }
 
 /*
 

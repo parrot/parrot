@@ -7,32 +7,12 @@
  *  Data Structure and Algorithms:
  *  History:
  *  Notes:
- *     Please remove unneeded entries.
  *  References:
  */
 
 #include "parrot/parrot.h"
 
-/* This shouldn't be necessary, IMO */
-#define enum_class_TclFloat -1
-
-/* this is, I'm sure, terribly inefficient. */
-#define TclString_type (pmc_type(interpreter, string_from_cstring(interpreter, "TclString", 9)))
-#define TclInt_type (pmc_type(interpreter, string_from_cstring(interpreter, "TclInt", 6)))
-#define TclFloat_type (pmc_type(interpreter, string_from_cstring(interpreter, "TclFloat", 8)))
-
-
-
 pmclass TclFloat extends TclObject extends Float dynpmc group tcl_group {
-
-    void init () {
-        PMC_num_val(SELF) = 0.0;
-    }
-
-    INTVAL get_integer () {
-        return (INTVAL)PMC_num_val(SELF);
-    }
-
 
     STRING* get_string () {
         char* buff = mem_sys_allocate(80);
@@ -67,28 +47,6 @@ pmclass TclFloat extends TclObject extends Float dynpmc group tcl_group {
         s = string_make(INTERP,buff,buflen,"iso-8859-1",0);
         mem_sys_free(buff);
         return s;
-    }
-
-    INTVAL get_bool () {
-        return (INTVAL)(PMC_num_val(SELF) != 0.0);
-    }
-
-    void set_integer_native (INTVAL value) {
-        DYNSELF.morph(TclInt_type);
-        DYNSELF.set_integer_native(value);
-    }
-
-    void set_number_native (FLOATVAL value) {
-        PMC_num_val(SELF) = value;
-    }
-
-    void set_number_same (PMC* value) {
-        PMC_num_val(SELF) = PMC_num_val(value);
-    }
-
-    void set_string_native (STRING * value) {
-        DYNSELF.morph(TclString_type);
-        DYNSELF.set_string_native(value);
     }
 }
 
