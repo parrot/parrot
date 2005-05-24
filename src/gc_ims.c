@@ -613,7 +613,7 @@ parrot_gc_ims_mark(Interp* interpreter)
     }
     else
         work_factor = 1.0;
-    todo = (size_t)g_ims->alloc_trigger * g_ims->throttle * work_factor;
+    todo = (size_t)(g_ims->alloc_trigger * g_ims->throttle * work_factor);
     assert(arena_base->lazy_dod == 0);
     Parrot_dod_trace_children(interpreter, todo);
     /*

@@ -1195,7 +1195,6 @@ op dlvar (out PMC, in PMC, in STR) {
 }
 
 inline op compile(out PMC, in PMC, in STR) {
-  opcode_t *dest;
   PMC *compiler = $2;
   if (VTABLE_isa(interpreter, compiler, const_string(interpreter, "Sub"))) {
     $1 = Parrot_runops_fromc_args(interpreter, compiler, "PS", $3);

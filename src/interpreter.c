@@ -929,7 +929,10 @@ dynop_register_xx(Parrot_Interp interpreter, PMC* lib_pmc,
     op_lib_t *cg_lib, *new_lib;
     void **ops_addr = NULL;
     size_t i, n_tot;
+#if 0
+    /* related to CG and CGP ops issue below */
     STRING *op_variant;
+#endif
     oplib_init_f new_init_func;
     PMC *lib_variant;
 

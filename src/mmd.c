@@ -810,7 +810,6 @@ Parrot_run_maybe_mmd_meth(Interp* interpreter, PMC *object,
     INTVAL mmd_func;
     char *c_meth, *c_sig;
     int ret = 0, inplace, compare;
-    PMC *dest;
 
 
     /*
@@ -1574,8 +1573,8 @@ distance_cmp(Interp *interpreter, INTVAL a, INTVAL b)
     if (da < db)
         return -1;
     /* end then by index in candidate list */
-    da = a >> 16;
-    db = b >> 16;
+    da = (short)(a >> 16);
+    db = (short)(b >> 16);
     return da > db ? 1 : da < db ? -1 : 0;
 }
 

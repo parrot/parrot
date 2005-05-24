@@ -238,7 +238,9 @@ void *
 parrot_pic_opcode(Interp *interpreter, int op)
 {
     int core = interpreter->run_core;
+#ifdef HAVE_COMPUTED_GOTO
     op_lib_t *cg_lib;
+#endif
 
     if (core == PARROT_SWITCH_CORE)
         return (void*) op;
