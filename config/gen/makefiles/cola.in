@@ -1,18 +1,22 @@
 #
 # Makefile for languages/cola
 #
-PARROT = ..${slash}..${slash}parrot${exe}
-PERL   = ${perl}
-RM_F  = ${rm_f}
-RM_RF  = ${rm_rf}
+PARROT  = ..${slash}..${slash}parrot${exe}
+PERL    = ${perl}
+RM_F    = ${rm_f}
+RM_RF   = ${rm_rf}
+CHMOD   = $(PERL) -e ${PQ}chmod @ARGV${PQ}
 
-CC 	= ${cc}
+CC 	    = ${cc}
 CFLAGS 	= ${ccflags}
 DEBUG 	= ${cc_debug}
 LINK 	= ${link}
 
 YACC 	= ${yacc}
 LEX 	= ${lex}
+
+O       = ${o}
+EXE     = ${exe}
 
 # Libraries:  Ordinarily, no special libraries are needed
 # for cola, but one of the following settings might be helpful
@@ -38,19 +42,19 @@ LIBS 	=
 HEADERS = cola.h parser.h
 
 default :
-	chmod 775 colac
-	$(MAKE) colacc
+	$(CHMOD) 775 colac$(EXE)
+	$(MAKE) colacc$(EXE)
 
-nogen : gen.o semant.o sym.o type.o
+nogen : gen$(O) semant$(O) sym$(O) type$(O)
 	$(CC) $(DEBUG) -c parser.c
 	$(CC) $(DEBUG) -c lexer.c
-	$(CC) $(DEBUG) -o colacc parser.o lexer.o gen.o semant.o sym.o type.o $(LIBS)
+	$(CC) $(DEBUG) -o colacc$(EXE) parser$(O) lexer$(O) gen$(O) semant$(O) sym$(O) type$(O) $(LIBS)
 
 clean :
 	$(RM_F) core
-	$(RM_F) *.o
+	$(RM_F) *$(O)
 	$(RM_F) parser.output
-	$(RM_F) colacc
+	$(RM_F) colacc$(EXE)
 
 # Don't run this target unless you have bison and flex
 # installed to regenerate the needed files.
@@ -70,24 +74,24 @@ parser.c : cola.y
 lexer.c : cola.l $(HEADERS)
 	$(LEX) cola.l
 
-lexer.o : lexer.c $(HEADERS)
+lexer$(O) : lexer.c $(HEADERS)
 	$(CC) $(DEBUG) -c lexer.c
 
-parser.o : parser.c $(HEADERS)
+parser$(O) : parser.c $(HEADERS)
 	$(CC) $(DEBUG) -c parser.c
 
-semant.o : semant.c $(HEADERS)
+semant$(O) : semant.c $(HEADERS)
 	$(CC) $(DEBUG) -c semant.c
 
-sym.o : sym.c $(HEADERS)
+sym$(O) : sym.c $(HEADERS)
 	$(CC) $(DEBUG) -c sym.c
 
-type.o : type.c $(HEADERS)
+type$(O) : type.c $(HEADERS)
 	$(CC) $(DEBUG) -c type.c
 
-gen.o : gen.c $(HEADERS)
+gen$(O) : gen.c $(HEADERS)
 	$(CC) $(DEBUG) -c gen.c
 
-colacc : parser.o lexer.o gen.o semant.o sym.o type.o
-	$(CC) $(DEBUG) -o colacc parser.o lexer.o gen.o semant.o sym.o type.o $(LIBS)
+colacc$(EXE) : parser$(O) lexer$(O) gen$(O) semant$(O) sym$(O) type$(O)
+	$(CC) $(DEBUG) -o colacc$(EXE) parser$(O) lexer$(O) gen$(O) semant$(O) sym$(O) type$(O) $(LIBS)
 
