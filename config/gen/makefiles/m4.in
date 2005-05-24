@@ -4,13 +4,14 @@
 
 # Setup of some commands
 LN_SF          = ln -s -f
-PARROT         = ../../parrot${exe}
+PARROT         = ..${slash}..${slash}parrot${exe}
 PERL           = ${perl}
 RM_RF          = ${rm_rf}
+O              = ${o}
 
 # Compile commands and flags
 CC             = ${cc}
-CFLAGS         = ${ccflags} -I../../include
+CFLAGS         = ${ccflags} -I..${slash}..${slash}include
 CC_SHARED      = ${cc_shared} # e.g. -fpic
 DEBUG          = ${cc_debug}
 WARN           = ${ccwarn}
@@ -21,7 +22,7 @@ LDFLAGS        = ${ldflags}
 LD_SHARE_FLAGS = ${ld_share_flags} # e.g. -shared
 
 # some constants
-M4_EVAL_COMPILER_SO = ../../runtime/parrot/dynext/m4_eval_compiler.so
+M4_EVAL_COMPILER_SO = ..${slash}..${slash}runtime${slash}parrot${slash}dynext${slash}m4_eval_compiler${share_ext}
 #CONDITIONED_LINE(has_gnu_m4):USE_GNU_M4 = -use-gnu-m4
 #INVERSE_CONDITIONED_LINE(has_gnu_bc):USE_GNU_M4 = 
 
@@ -56,7 +57,7 @@ m4.pbc: src/m4.pbc
 
 $(M4_EVAL_COMPILER_SO): src/eval.c
 	$(CC) $(CFLAGS) $(CC_SHARED) $(DEBUG) $(WARN) -c src/eval.c
-	$(LD) $(LD_SHARE_FLAGS) $(LDFLAGS) -o $@ eval.o
+	$(LD) $(LD_SHARE_FLAGS) $(LDFLAGS) ${ld_out}$@ eval$(O)
 
 
 src/m4.pir: src/builtin.pir src/freeze.pir src/input.pir src/macro.pir 
