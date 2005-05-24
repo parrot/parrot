@@ -8,6 +8,7 @@ BUILD   = $(PERL) ${build_dir}${slash}build_tools${slash}build_dynclasses.pl
 DESTDIR = ${build_dir}${slash}runtime${slash}parrot${slash}dynext
 O       = ${o}
 CLASSDIR = classes${slash}
+LOAD_EXT = ${load_ext}
 
 PMCS = \
  tclobject \
@@ -93,7 +94,7 @@ devtest:
 	cd t && $(PERL) -e 'use Test::Harness qw($$verbose runtests) ; $$Test::Harness::verbose=1;runtests(glob("*.t"))' && cd ..
 
 clean:
-	$(RM_F) lib${slash}tcllib.imc tcl.pbc lib${slash}*.pbc classes/*.c classes/*$(O)
+	$(RM_F) lib${slash}tcllib.imc tcl.pbc lib${slash}*.pbc $(CLASSDIR)pmc_*.h $(CLASSDIR)*_group.h $(CLASSDIR)*$(LOAD_EXT) $(CLASSDIR)*.dump $(CLASSDIR)*.c $(CLASSDIR)*$(O)
 
 distclean: clean
 	$(RM_F) Makefile
