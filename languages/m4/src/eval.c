@@ -41,7 +41,7 @@ typedef int eval_t;
 /* Evaluates token types.  */
 typedef enum eval_token
   {
-    ERROR,
+    ERROR_FOR_M4,
     PLUS, MINUS,
     EXPONENT,
     TIMES, DIVIDE, MODULO,
@@ -58,7 +58,7 @@ eval_token;
 
 typedef enum eval_error
   {
-    NO_ERROR,
+    NO_ERROR_FOR_M4,
     MISSING_RIGHT,
     SYNTAX_ERROR,
     UNKNOWN_INPUT,
@@ -149,7 +149,7 @@ static eval_token eval_lex( eval_t *val )
 	      while (isdigit (*eval_text) && base <= 36)
 		base = 10 * base + *eval_text++ - '0';
 	      if (base == 0 || base > 36 || *eval_text != ':')
-		return ERROR;
+		return ERROR_FOR_M4;
 	      eval_text++;
 	      break;
 
@@ -261,7 +261,7 @@ static eval_token eval_lex( eval_t *val )
     case ')':
       return RIGHTP;
     default:
-      return ERROR;
+      return ERROR_FOR_M4;
     }
 }
 
@@ -279,12 +279,12 @@ evaluate (const char *expr, eval_t *val)
     et = eval_lex (val);
     err = logical_or_term( et, val );
 
-  if (err == NO_ERROR && *eval_text != '\0')
+  if (err == NO_ERROR_FOR_M4 && *eval_text != '\0')
     err = EXCESS_INPUT;
 
   switch (err)
     {
-    case NO_ERROR:
+    case NO_ERROR_FOR_M4:
       break;
 
     case MISSING_RIGHT:
@@ -317,7 +317,7 @@ evaluate (const char *expr, eval_t *val)
       abort ();
     }
 
-  return (boolean_for_m4) (err != NO_ERROR);
+  return (boolean_for_m4) (err != NO_ERROR_FOR_M4);
 }
 
 /*---------------------------.
@@ -330,25 +330,25 @@ logical_or_term (eval_token et, eval_t *v1)
   eval_t v2;
   eval_error er;
 
-  if ((er = logical_and_term (et, v1)) != NO_ERROR)
+  if ((er = logical_and_term (et, v1)) != NO_ERROR_FOR_M4)
     return er;
 
   while ((et = eval_lex (&v2)) == LOR)
     {
       et = eval_lex (&v2);
-      if (et == ERROR)
+      if (et == ERROR_FOR_M4)
 	return UNKNOWN_INPUT;
 
-      if ((er = logical_and_term (et, &v2)) != NO_ERROR)
+      if ((er = logical_and_term (et, &v2)) != NO_ERROR_FOR_M4)
 	return er;
 
       *v1 = *v1 || v2;
     }
-  if (et == ERROR)
+  if (et == ERROR_FOR_M4)
     return UNKNOWN_INPUT;
 
   eval_undo ();
-  return NO_ERROR;
+  return NO_ERROR_FOR_M4;
 }
 
 static eval_error
@@ -357,25 +357,25 @@ logical_and_term (eval_token et, eval_t *v1)
   eval_t v2;
   eval_error er;
 
-  if ((er = or_term (et, v1)) != NO_ERROR)
+  if ((er = or_term (et, v1)) != NO_ERROR_FOR_M4)
     return er;
 
   while ((et = eval_lex (&v2)) == LAND)
     {
       et = eval_lex (&v2);
-      if (et == ERROR)
+      if (et == ERROR_FOR_M4)
 	return UNKNOWN_INPUT;
 
-      if ((er = or_term (et, &v2)) != NO_ERROR)
+      if ((er = or_term (et, &v2)) != NO_ERROR_FOR_M4)
 	return er;
 
       *v1 = *v1 && v2;
     }
-  if (et == ERROR)
+  if (et == ERROR_FOR_M4)
     return UNKNOWN_INPUT;
 
   eval_undo ();
-  return NO_ERROR;
+  return NO_ERROR_FOR_M4;
 }
 
 static eval_error
@@ -384,25 +384,25 @@ or_term (eval_token et, eval_t *v1)
   eval_t v2;
   eval_error er;
 
-  if ((er = xor_term (et, v1)) != NO_ERROR)
+  if ((er = xor_term (et, v1)) != NO_ERROR_FOR_M4)
     return er;
 
   while ((et = eval_lex (&v2)) == OR)
     {
       et = eval_lex (&v2);
-      if (et == ERROR)
+      if (et == ERROR_FOR_M4)
 	return UNKNOWN_INPUT;
 
-      if ((er = xor_term (et, &v2)) != NO_ERROR)
+      if ((er = xor_term (et, &v2)) != NO_ERROR_FOR_M4)
 	return er;
 
       *v1 = *v1 | v2;
     }
-  if (et == ERROR)
+  if (et == ERROR_FOR_M4)
     return UNKNOWN_INPUT;
 
   eval_undo ();
-  return NO_ERROR;
+  return NO_ERROR_FOR_M4;
 }
 
 static eval_error
@@ -411,25 +411,25 @@ xor_term (eval_token et, eval_t *v1)
   eval_t v2;
   eval_error er;
 
-  if ((er = and_term (et, v1)) != NO_ERROR)
+  if ((er = and_term (et, v1)) != NO_ERROR_FOR_M4)
     return er;
 
   while ((et = eval_lex (&v2)) == XOR)
     {
       et = eval_lex (&v2);
-      if (et == ERROR)
+      if (et == ERROR_FOR_M4)
 	return UNKNOWN_INPUT;
 
-      if ((er = and_term (et, &v2)) != NO_ERROR)
+      if ((er = and_term (et, &v2)) != NO_ERROR_FOR_M4)
 	return er;
 
       *v1 = *v1 ^ v2;
     }
-  if (et == ERROR)
+  if (et == ERROR_FOR_M4)
     return UNKNOWN_INPUT;
 
   eval_undo ();
-  return NO_ERROR;
+  return NO_ERROR_FOR_M4;
 }
 
 static eval_error
@@ -438,25 +438,25 @@ and_term (eval_token et, eval_t *v1)
   eval_t v2;
   eval_error er;
 
-  if ((er = not_term (et, v1)) != NO_ERROR)
+  if ((er = not_term (et, v1)) != NO_ERROR_FOR_M4)
     return er;
 
   while ((et = eval_lex (&v2)) == AND)
     {
       et = eval_lex (&v2);
-      if (et == ERROR)
+      if (et == ERROR_FOR_M4)
 	return UNKNOWN_INPUT;
 
-      if ((er = not_term (et, &v2)) != NO_ERROR)
+      if ((er = not_term (et, &v2)) != NO_ERROR_FOR_M4)
 	return er;
 
       *v1 = *v1 & v2;
     }
-  if (et == ERROR)
+  if (et == ERROR_FOR_M4)
     return UNKNOWN_INPUT;
 
   eval_undo ();
-  return NO_ERROR;
+  return NO_ERROR_FOR_M4;
 }
 
 static eval_error
@@ -467,18 +467,18 @@ not_term (eval_token et, eval_t *v1)
   if (et == NOT)
     {
       et = eval_lex (v1);
-      if (et == ERROR)
+      if (et == ERROR_FOR_M4)
 	return UNKNOWN_INPUT;
 
-      if ((er = not_term (et, v1)) != NO_ERROR)
+      if ((er = not_term (et, v1)) != NO_ERROR_FOR_M4)
 	return er;
       *v1 = ~*v1;
     }
   else
-    if ((er = logical_not_term (et, v1)) != NO_ERROR)
+    if ((er = logical_not_term (et, v1)) != NO_ERROR_FOR_M4)
       return er;
 
-  return NO_ERROR;
+  return NO_ERROR_FOR_M4;
 }
 
 static eval_error
@@ -489,18 +489,18 @@ logical_not_term (eval_token et, eval_t *v1)
   if (et == LNOT)
     {
       et = eval_lex (v1);
-      if (et == ERROR)
+      if (et == ERROR_FOR_M4)
 	return UNKNOWN_INPUT;
 
-      if ((er = logical_not_term (et, v1)) != NO_ERROR)
+      if ((er = logical_not_term (et, v1)) != NO_ERROR_FOR_M4)
 	return er;
       *v1 = !*v1;
     }
   else
-    if ((er = cmp_term (et, v1)) != NO_ERROR)
+    if ((er = cmp_term (et, v1)) != NO_ERROR_FOR_M4)
       return er;
 
-  return NO_ERROR;
+  return NO_ERROR_FOR_M4;
 }
 
 static eval_error
@@ -510,7 +510,7 @@ cmp_term (eval_token et, eval_t *v1)
   eval_t v2;
   eval_error er;
 
-  if ((er = shift_term (et, v1)) != NO_ERROR)
+  if ((er = shift_term (et, v1)) != NO_ERROR_FOR_M4)
     return er;
 
   while ((op = eval_lex (&v2)) == EQ || op == NOTEQ
@@ -519,10 +519,10 @@ cmp_term (eval_token et, eval_t *v1)
     {
 
       et = eval_lex (&v2);
-      if (et == ERROR)
+      if (et == ERROR_FOR_M4)
 	return UNKNOWN_INPUT;
 
-      if ((er = shift_term (et, &v2)) != NO_ERROR)
+      if ((er = shift_term (et, &v2)) != NO_ERROR_FOR_M4)
 	return er;
 
       switch (op)
@@ -556,11 +556,11 @@ cmp_term (eval_token et, eval_t *v1)
 	  abort ();
 	}
     }
-  if (op == ERROR)
+  if (op == ERROR_FOR_M4)
     return UNKNOWN_INPUT;
 
   eval_undo ();
-  return NO_ERROR;
+  return NO_ERROR_FOR_M4;
 }
 
 static eval_error
@@ -570,17 +570,17 @@ shift_term (eval_token et, eval_t *v1)
   eval_t v2;
   eval_error er;
 
-  if ((er = add_term (et, v1)) != NO_ERROR)
+  if ((er = add_term (et, v1)) != NO_ERROR_FOR_M4)
     return er;
 
   while ((op = eval_lex (&v2)) == LSHIFT || op == RSHIFT)
     {
 
       et = eval_lex (&v2);
-      if (et == ERROR)
+      if (et == ERROR_FOR_M4)
 	return UNKNOWN_INPUT;
 
-      if ((er = add_term (et, &v2)) != NO_ERROR)
+      if ((er = add_term (et, &v2)) != NO_ERROR_FOR_M4)
 	return er;
 
       switch (op)
@@ -598,11 +598,11 @@ shift_term (eval_token et, eval_t *v1)
 	  abort ();
 	}
     }
-  if (op == ERROR)
+  if (op == ERROR_FOR_M4)
     return UNKNOWN_INPUT;
 
   eval_undo ();
-  return NO_ERROR;
+  return NO_ERROR_FOR_M4;
 }
 
 static eval_error
@@ -612,16 +612,16 @@ add_term (eval_token et, eval_t *v1)
   eval_t v2;
   eval_error er;
 
-  if ((er = mult_term (et, v1)) != NO_ERROR)
+  if ((er = mult_term (et, v1)) != NO_ERROR_FOR_M4)
     return er;
 
   while ((op = eval_lex (&v2)) == PLUS || op == MINUS)
     {
       et = eval_lex (&v2);
-      if (et == ERROR)
+      if (et == ERROR_FOR_M4)
 	return UNKNOWN_INPUT;
 
-      if ((er = mult_term (et, &v2)) != NO_ERROR)
+      if ((er = mult_term (et, &v2)) != NO_ERROR_FOR_M4)
 	return er;
 
       if (op == PLUS)
@@ -629,11 +629,11 @@ add_term (eval_token et, eval_t *v1)
       else
 	*v1 = *v1 - v2;
     }
-  if (op == ERROR)
+  if (op == ERROR_FOR_M4)
     return UNKNOWN_INPUT;
 
   eval_undo ();
-  return NO_ERROR;
+  return NO_ERROR_FOR_M4;
 }
 
 static eval_error
@@ -643,16 +643,16 @@ mult_term (eval_token et, eval_t *v1)
   eval_t v2;
   eval_error er;
 
-  if ((er = exp_term (et, v1)) != NO_ERROR)
+  if ((er = exp_term (et, v1)) != NO_ERROR_FOR_M4)
     return er;
 
   while ((op = eval_lex (&v2)) == TIMES || op == DIVIDE || op == MODULO)
     {
       et = eval_lex (&v2);
-      if (et == ERROR)
+      if (et == ERROR_FOR_M4)
 	return UNKNOWN_INPUT;
 
-      if ((er = exp_term (et, &v2)) != NO_ERROR)
+      if ((er = exp_term (et, &v2)) != NO_ERROR_FOR_M4)
 	return er;
 
       switch (op)
@@ -680,11 +680,11 @@ mult_term (eval_token et, eval_t *v1)
 	  abort ();
 	}
     }
-  if (op == ERROR)
+  if (op == ERROR_FOR_M4)
     return UNKNOWN_INPUT;
 
   eval_undo ();
-  return NO_ERROR;
+  return NO_ERROR_FOR_M4;
 }
 
 static eval_error
@@ -694,17 +694,17 @@ exp_term (eval_token et, eval_t *v1)
   eval_t v2;
   eval_error er;
 
-  if ((er = unary_term (et, v1)) != NO_ERROR)
+  if ((er = unary_term (et, v1)) != NO_ERROR_FOR_M4)
     return er;
   result = *v1;
 
   while ((et = eval_lex (&v2)) == EXPONENT)
     {
       et = eval_lex (&v2);
-      if (et == ERROR)
+      if (et == ERROR_FOR_M4)
 	return UNKNOWN_INPUT;
 
-      if ((er = exp_term (et, &v2)) != NO_ERROR)
+      if ((er = exp_term (et, &v2)) != NO_ERROR_FOR_M4)
 	return er;
 
       result = 1;
@@ -712,11 +712,11 @@ exp_term (eval_token et, eval_t *v1)
 	result *= *v1;
       *v1 = result;
     }
-  if (et == ERROR)
+  if (et == ERROR_FOR_M4)
     return UNKNOWN_INPUT;
 
   eval_undo ();
-  return NO_ERROR;
+  return NO_ERROR_FOR_M4;
 }
 
 static eval_error
@@ -728,20 +728,20 @@ unary_term (eval_token et, eval_t *v1)
   if (et == PLUS || et == MINUS)
     {
       et2 = eval_lex (v1);
-      if (et2 == ERROR)
+      if (et2 == ERROR_FOR_M4)
 	return UNKNOWN_INPUT;
 
-      if ((er = simple_term (et2, v1)) != NO_ERROR)
+      if ((er = simple_term (et2, v1)) != NO_ERROR_FOR_M4)
 	return er;
 
       if (et == MINUS)
 	*v1 = -*v1;
     }
   else
-    if ((er = simple_term (et, v1)) != NO_ERROR)
+    if ((er = simple_term (et, v1)) != NO_ERROR_FOR_M4)
       return er;
 
-  return NO_ERROR;
+  return NO_ERROR_FOR_M4;
 }
 
 static eval_error
@@ -754,14 +754,14 @@ simple_term (eval_token et, eval_t *v1)
     {
     case LEFTP:
       et = eval_lex (v1);
-      if (et == ERROR)
+      if (et == ERROR_FOR_M4)
 	return UNKNOWN_INPUT;
 
-      if ((er = logical_or_term (et, v1)) != NO_ERROR)
+      if ((er = logical_or_term (et, v1)) != NO_ERROR_FOR_M4)
 	return er;
 
       et = eval_lex (&v2);
-      if (et == ERROR)
+      if (et == ERROR_FOR_M4)
 	return UNKNOWN_INPUT;
 
       if (et != RIGHTP)
@@ -776,7 +776,7 @@ simple_term (eval_token et, eval_t *v1)
       return SYNTAX_ERROR;
     }
 
-  return NO_ERROR;
+  return NO_ERROR_FOR_M4;
 }
 
 /*
