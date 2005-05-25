@@ -97,7 +97,7 @@ typedef HANDLE Parrot_thread;
    the Win32 API CreateThread(). _beginthreadXX guards call to the thread start routine
    with SEH to implement runtime errors and signal support. Also it frees calloc-ed
    per-thread data block at exit */
-#  ifdef _MCS_VER
+#  ifdef _MCS_VER1
 #    define THREAD_CREATE_JOINABLE(t, func, arg) \
        do { \
          unsigned tid; \
