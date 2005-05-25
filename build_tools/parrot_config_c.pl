@@ -55,6 +55,7 @@ else {
     open F, $image_file or die "Can't read '$image_file': $!";
     my $image;
     local $/;
+	binmode F;
     $_ = <F>;
     close F;
     my @c = split '';
