@@ -209,7 +209,7 @@ the array.
 
 =item C<void push_integer(INTVAL value)>
 
-=item C<void push_string(INTVAL value)>
+=item C<void push_string(STRING* value)>
 
 Extends the array by adding an element of value C<*value> to the end of
 the array.
@@ -243,6 +243,78 @@ the array.
 
         return;
     }
+
+/*
+
+=item C<PMC *pop_pmc()>
+
+Removes and returns the last element in the array.
+
+=cut
+
+*/
+
+    PMC* pop_pmc() {
+        INTVAL size = PMC_int_val(SELF);
+        PMC* data;
+
+        if (0 == size) {
+            internal_exception(OUT_OF_BOUNDS,
+                    "ResizablePMCArray: Can't pop from an empty array!");
+        }
+        
+        data = ((PMC**)PMC_data(SELF))[--size];
+        PMC_int_val(SELF)= size;
+        return data;
+    }
+
+/*
+
+=item C<INTVAL pop_integer()>
+
+=item C<STRING* pop_string()>
+
+Extends the array by adding an element of value C<*value> to the end of
+the array.
+
+=cut
+
+*/
+
+    INTVAL pop_integer() {
+        INTVAL size = PMC_int_val(SELF);
+        PMC* data;
+        INTVAL value;
+
+        if (0 == size) {
+            internal_exception(OUT_OF_BOUNDS,
+                    "ResizablePMCArray: Can't pop from an empty array!");
+        }
+
+        data = ((PMC**)PMC_data(SELF))[--size];
+        PMC_int_val(SELF)= size;
+
+        value= VTABLE_get_integer(INTERP, data);
+        return value;
+    }
+
+    STRING* pop_string() {
+        INTVAL size = PMC_int_val(SELF);
+        PMC* data;
+        STRING* value;
+
+        if (0 == size) {
+            internal_exception(OUT_OF_BOUNDS,
+                    "ResizablePMCArray: Can't pop from an empty array!");
+        }
+
+        data = ((PMC**)PMC_data(SELF))[--size];
+        PMC_int_val(SELF)= size;
+
+        value= VTABLE_get_string(INTERP, data);
+        return value;
+    }
+
 /*
 
 =item C<void unshift_pmc (PMC* value)>

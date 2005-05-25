@@ -17,7 +17,7 @@ out-of-bounds test. Checks INT and PMC keys.
 
 =cut
 
-use Parrot::Test tests => 21;
+use Parrot::Test tests => 24;
 use Test::More;
 
 my $fp_equality_macro = <<'ENDOFMACRO';
@@ -618,4 +618,81 @@ ok 1
 ResizablePMCArray
 FixedPMCArray
 OUT
+
+pir_output_is(<< 'CODE', << 'OUTPUT', "pop_pmc");
+
+.sub test @MAIN
+    .local pmc pmc_arr, pmc_9999, res_pmc
+    pmc_arr = new ResizablePMCArray
+    pmc_9999 = new Float
+    pmc_9999 = 123.123
+    pmc_arr[9999] = pmc_9999
+    .local int elements
+    elements = pmc_arr
+    print elements
+    print "\n"
+    pop res_pmc, pmc_arr
+    elements = pmc_arr
+    print elements
+    print "\n"
+    print res_pmc
+    print "\n"
+    end
+.end
+CODE
+10000
+9999
+123.123
+OUTPUT
+
+pir_output_is(<< 'CODE', << 'OUTPUT', "pop_integer");
+
+.sub test @MAIN
+    .local pmc pmc_arr
+    pmc_arr = new ResizablePMCArray
+    pmc_arr[9999] = 123
+    .local int elements
+    elements = pmc_arr
+    print elements
+    print "\n"
+	.local int res_int
+    pop res_int, pmc_arr
+    elements = pmc_arr
+    print elements
+    print "\n"
+    print res_int
+    print "\n"
+    end
+.end
+CODE
+10000
+9999
+123
+OUTPUT
+
+pir_output_is(<< 'CODE', << 'OUTPUT', "pop_string");
+
+.sub test @MAIN
+    .local pmc pmc_arr
+    pmc_arr = new ResizablePMCArray
+    pmc_arr[9999] = "123"
+    .local int elements
+    elements = pmc_arr
+    print elements
+    print "\n"
+	.local string res_str
+    pop res_str, pmc_arr
+    elements = pmc_arr
+    print elements
+    print "\n"
+    print res_str
+    print "\n"
+    end
+.end
+CODE
+10000
+9999
+123
+OUTPUT
+
 
