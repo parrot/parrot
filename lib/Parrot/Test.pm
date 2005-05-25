@@ -158,6 +158,7 @@ require Test::More;
               pbc_output_is      pbc_output_like      pbc_output_isnt
               c_output_is        c_output_like        c_output_isnt
               language_output_is language_output_like language_output_isnt
+			  plan
               skip
               slurp_file
 	      run_command
@@ -267,6 +268,7 @@ sub generate_code {
 }
 
 # We can inherit from Test::More, so we do it.
+*plan = \&Test::More::plan;
 *skip = \&Test::More::skip;
 
 # What about File::Slurp?
