@@ -16,7 +16,7 @@ Tests the multi-method dispatch.
 
 =cut
 
-use Parrot::Test tests => 25;
+use Parrot::Test tests => 26;
 
 pir_output_is(<<'CODE', <<'OUTPUT', "PASM divide");
 
@@ -840,4 +840,41 @@ pir_output_is(<<'CODE', <<'OUTPUT', "override builtin n_add");
 CODE
 62
 2
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "mmd bug reported by Jeff");
+.namespace ['Foo']
+
+.sub bar method, @MULTI(Foo, string)
+    print "string\n"
+.end
+
+.sub bar method, @MULTI(Foo, pmc)
+    print "PMC\n"
+.end
+
+.sub bar method, @MULTI(Foo)
+    print "nothing\n"
+.end
+
+.namespace ['']
+
+.sub main @MAIN
+    newclass $P0, 'Foo'
+
+    $I0 = find_type 'Foo'
+    $P0 = new $I0
+
+    $P0.'bar'('Bar!')
+
+    $P1 = new PerlString
+    $P1 = "Bar!"
+    $P0.'bar'($P1)
+
+    $P0.'bar'()
+.end
+CODE
+string
+PMC
+nothing
 OUTPUT

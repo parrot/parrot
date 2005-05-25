@@ -1645,7 +1645,7 @@ mmd_distance(Interp *interpreter, PMC *pmc, PMC *arg_tuple)
         return MMD_BIG_DISTANCE;
     dist = 0;
     if (args > n)
-        dist = 1;
+        dist = 1000;   /* XXX arbitrary > max_class_depth * n */
     /*
      * now go through args
      */
