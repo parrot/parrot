@@ -8,7 +8,6 @@
   .param pmc body_p
 
   .local pmc retval
-  retval = new String
 
   # XXX no bad arg handling...
 
@@ -19,6 +18,7 @@
   .local pmc interpret
   .local pmc expression_p
   .local pmc expression_i
+
   parser = find_global "_Tcl", "parser"
   interpret = find_global "_Tcl", "__interpret"
   expression_p = find_global "_Tcl", "__expression_parse"
@@ -48,7 +48,7 @@ done:
   goto done_done
 
 done_cleaned:
-  retval = $S0 
+  retval = ""
 
 done_done:
   # while always returns "", regardless of the code it may have executed
