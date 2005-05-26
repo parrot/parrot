@@ -17,7 +17,7 @@ out-of-bounds test. Checks INT and PMC keys.
 
 =cut
 
-use Parrot::Test tests => 24;
+use Parrot::Test tests => 22;
 use Test::More;
 
 my $fp_equality_macro = <<'ENDOFMACRO';
@@ -363,38 +363,6 @@ CODE
 0
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "append method");
-
-.sub test @MAIN
-    .local pmc ar
-    .local pmc temp
-    ar = new ResizablePMCArray
-
-    temp = new Integer
-    set temp, 4
-    ar.append(temp)
-
-    temp = new Integer
-    set temp, 2
-    ar.append(temp)
-
-    .local pmc it
-    iter it, ar
-lp:
-    unless it goto done
-    $P0 = shift it
-    print $P0
-    print " "
-    goto lp
-done:
-    print "x\n"
-
-    end
-.end
-CODE
-4 2 x
-OUTPUT
-
 pir_output_is(<< 'CODE', << 'OUTPUT', "inherited sort method");
 
 .sub test @MAIN
@@ -619,80 +587,191 @@ ResizablePMCArray
 FixedPMCArray
 OUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "pop_pmc");
+pir_output_is(<< 'CODE', << 'OUTPUT', "push and pop");
 
 .sub test @MAIN
-    .local pmc pmc_arr, pmc_9999, res_pmc
-    pmc_arr = new ResizablePMCArray
-    pmc_9999 = new Float
-    pmc_9999 = 123.123
-    pmc_arr[9999] = pmc_9999
-    .local int elements
-    elements = pmc_arr
+    .local float f, f_elem
+    .local int i, i_elem, elements
+    .local pmc p, p_elem, pmc_arr
+    .local string s, s_elem
+
+    f= 123.123
+    i= 123
+    p= new Float
+    p= 456.456
+    s= "abc"
+
+    pmc_arr= new ResizablePMCArray
+
+    elements= pmc_arr
     print elements
     print "\n"
-    pop res_pmc, pmc_arr
-    elements = pmc_arr
+
+    push pmc_arr, s
+    print s
+    print ' '
+    elements= pmc_arr
     print elements
     print "\n"
-    print res_pmc
+
+    push pmc_arr, p
+    print p
+    print ' '
+    elements= pmc_arr
+    print elements
     print "\n"
-    end
+
+    push pmc_arr, i
+    print i
+    print ' '
+    elements= pmc_arr
+    print elements
+    print "\n"
+
+    push pmc_arr, f
+    print f
+    print ' '
+    elements= pmc_arr
+    print elements
+    print "\n"
+
+    elements= pmc_arr
+    print elements
+    print "\n"
+
+    f_elem= pop pmc_arr
+    print f_elem
+    print ' '
+    elements= pmc_arr
+    print elements
+    print "\n"
+
+    i_elem= pop pmc_arr
+    print i_elem
+    print ' '
+    elements= pmc_arr
+    print elements
+    print "\n"
+
+    p_elem= pop pmc_arr
+    print p_elem
+    print ' '
+    elements= pmc_arr
+    print elements
+    print "\n"
+
+    s_elem= pop pmc_arr
+    print s_elem
+    print ' '
+    elements= pmc_arr
+    print elements
+    print "\n"
+
 .end
 CODE
-10000
-9999
-123.123
+0
+abc 1
+456.456 2
+123 3
+123.123000 4
+4
+123.123000 3
+123 2
+456.456 1
+abc 0
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "pop_integer");
+pir_output_is(<< 'CODE', << 'OUTPUT', "unshift and shift");
 
 .sub test @MAIN
-    .local pmc pmc_arr
-    pmc_arr = new ResizablePMCArray
-    pmc_arr[9999] = 123
-    .local int elements
-    elements = pmc_arr
+    .local float f, f_elem
+    .local int i, i_elem, elements
+    .local pmc p, p_elem, pmc_arr
+    .local string s, s_elem
+
+    f= 123.123
+    i= 123
+    p= new Float
+    p= 456.456
+    s= "abc"
+
+    pmc_arr= new ResizablePMCArray
+
+    elements= pmc_arr
     print elements
     print "\n"
-	.local int res_int
-    pop res_int, pmc_arr
-    elements = pmc_arr
+
+    unshift pmc_arr, f
+    print f
+    print ' '
+    elements= pmc_arr
     print elements
     print "\n"
-    print res_int
+
+    unshift pmc_arr, i
+    print i
+    print ' '
+    elements= pmc_arr
+    print elements
     print "\n"
-    end
+
+    unshift pmc_arr, p
+    print p
+    print ' '
+    elements= pmc_arr
+    print elements
+    print "\n"
+
+    unshift pmc_arr, s
+    print s
+    print ' '
+    elements= pmc_arr
+    print elements
+    print "\n"
+
+    print elements
+    print "\n"
+
+    s_elem= shift pmc_arr
+    print s_elem
+    print ' '
+    elements= pmc_arr
+    print elements
+    print "\n"
+
+    p_elem= shift pmc_arr
+    print p_elem
+    print ' '
+    elements= pmc_arr
+    print elements
+    print "\n"
+
+    i_elem= shift pmc_arr
+    print i_elem
+    print ' '
+    elements= pmc_arr
+    print elements
+    print "\n"
+
+    f_elem= shift pmc_arr
+    print f_elem
+    print ' '
+    elements= pmc_arr
+    print elements
+    print "\n"
+
 .end
 CODE
-10000
-9999
-123
+0
+123.123000 1
+123 2
+456.456 3
+abc 4
+4
+abc 3
+456.456 2
+123 1
+123.123000 0
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "pop_string");
-
-.sub test @MAIN
-    .local pmc pmc_arr
-    pmc_arr = new ResizablePMCArray
-    pmc_arr[9999] = "123"
-    .local int elements
-    elements = pmc_arr
-    print elements
-    print "\n"
-	.local string res_str
-    pop res_str, pmc_arr
-    elements = pmc_arr
-    print elements
-    print "\n"
-    print res_str
-    print "\n"
-    end
-.end
-CODE
-10000
-9999
-123
-OUTPUT
-
-
+# don't forget to change the number of tests

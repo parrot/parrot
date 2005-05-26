@@ -80,30 +80,107 @@ Resizes the array to C<size> elements.
 
 /*
 
+=item C<FLOATVAL shift_float()>
+
+=item C<INTVAL shift_integer()>
+
 =item C<PMC* shift_pmc()>
 
-Removes and returns a PMC from the start of the array.
+=item C<STRING* shift_string()>
+
+Removes and returns an item from the start of the array.
 
 =cut
 
-TODO: The does always moves the array memory, which is not very performant
+TODO: This always moves the array memory, which is not very performant
 TODO: Check whether there is already an element that can be shifted
 
 */
 
-    PMC* shift_pmc () {
-        PMC *item;
-        PMC **data;
-        INTVAL cur, size;
-        item = SELF.get_pmc_keyed_int(0);
-        size = PMC_int_val(SELF);
-        cur  = PMC_int_val2(SELF);
-        PMC_int_val(SELF) = --size;
-        data = PMC_data(SELF);
-        mem_sys_memmove( data, data+1, size * sizeof(PMC*) );
-        data[size] = PMCNULL;
+    FLOATVAL shift_float () {
+        INTVAL size= PMC_int_val(SELF);
+        PMC* data;
+        PMC** item;
+        FLOATVAL value;
 
-        return item;
+        if (0 == size) {
+            internal_exception(OUT_OF_BOUNDS,
+                    "ResizablePMCArray: Can't shift from an empty array!");
+        }
+
+        data= ((PMC**)PMC_data(SELF))[0];
+        value= VTABLE_get_number(INTERP, data);
+        PMC_int_val(SELF)= --size;
+
+        item= (PMC**)PMC_data(SELF);
+        mem_sys_memmove(item, item + 1, size * sizeof(PMC*));
+        item[size]= PMCNULL;
+
+        return value;
+    }
+
+    INTVAL shift_integer () {
+        INTVAL size= PMC_int_val(SELF);
+        PMC* data;
+        PMC** item;
+        INTVAL value;
+
+        if (0 == size) {
+            internal_exception(OUT_OF_BOUNDS,
+                    "ResizablePMCArray: Can't shift from an empty array!");
+        }
+
+        data= ((PMC**)PMC_data(SELF))[0];
+        value= VTABLE_get_integer(INTERP, data);
+        PMC_int_val(SELF)= --size;
+
+        item= (PMC**)PMC_data(SELF);
+        mem_sys_memmove(item, item + 1, size * sizeof(PMC*));
+        item[size]= PMCNULL;
+
+        return value;
+    }
+
+    PMC* shift_pmc () {
+        INTVAL size= PMC_int_val(SELF);
+        PMC* data;
+        PMC** item;
+
+        if (0 == size) {
+            internal_exception(OUT_OF_BOUNDS,
+                    "ResizablePMCArray: Can't shift from an empty array!");
+        }
+
+        data= ((PMC**)PMC_data(SELF))[0];
+        PMC_int_val(SELF)= --size;
+                
+        item= (PMC**)PMC_data(SELF);
+        mem_sys_memmove(item, item + 1, size * sizeof(PMC*));
+        item[size]= PMCNULL;
+
+        return data;
+    }
+
+    STRING* shift_string () {
+        INTVAL size= PMC_int_val(SELF);
+        PMC* data;
+        PMC** item;
+        STRING* value;
+
+        if (0 == size) {
+            internal_exception(OUT_OF_BOUNDS,
+                    "ResizablePMCArray: Can't shift from an empty array!");
+        }
+
+        data= ((PMC**)PMC_data(SELF))[0];
+        value= VTABLE_get_string(INTERP, data);
+        PMC_int_val(SELF)= --size;
+
+        item= (PMC**)PMC_data(SELF);
+        mem_sys_memmove(item, item + 1, size * sizeof(PMC*));
+        item[size]= PMCNULL;
+
+        return value;
     }
 
 
@@ -182,7 +259,13 @@ If key is a slice, do a splice as set that item.
 
 /*
 
-=item C<void push_pmc (PMC* value)>
+=item C<void push_float(FLOATVAL value)>
+
+=item C<void push_integer(INTVAL value)>
+
+=item C<void push_pmc(PMC* value)>
+
+=item C<void push_string(STRING* value)>
 
 Extends the array by adding an element of value C<*value> to the end of
 the array.
@@ -190,6 +273,30 @@ the array.
 =cut
 
 */
+
+    void push_float(FLOATVAL value) {
+        INTVAL size= PMC_int_val(SELF);
+        PMC* val;
+
+        val= pmc_new(INTERP, enum_class_Float);
+        VTABLE_set_number_native(INTERP, val, value);
+        /* let set_pmc_keyed_int() worry about memory allocation */
+        DYNSELF.set_pmc_keyed_int(size, val);
+
+        return;
+    }
+
+    void push_integer(INTVAL value) {
+        INTVAL size= PMC_int_val(SELF);
+        PMC* val;
+
+        val= pmc_new(INTERP, enum_class_Integer);
+        VTABLE_set_integer_native(INTERP, val, value);
+        /* let set_pmc_keyed_int() worry about memory allocation */
+        DYNSELF.set_pmc_keyed_int(size, val);
+
+        return;
+    }
 
     void push_pmc(PMC* value) {
         INTVAL size = PMC_int_val(SELF);
@@ -201,42 +308,11 @@ the array.
         return;
     }
 
-    METHOD void append(PMC* value) {
-        Parrot_ResizablePMCArray_push_pmc(INTERP, SELF, value);
-    }
-
-/*
-
-=item C<void push_integer(INTVAL value)>
-
-=item C<void push_string(STRING* value)>
-
-Extends the array by adding an element of value C<*value> to the end of
-the array.
-
-=cut
-
-*/
-
-    void push_integer(INTVAL value) {
-        PMC *val;
-        INTVAL size;
-
-        size = PMC_int_val(SELF);
-        val = pmc_new(INTERP, enum_class_Integer);
-        VTABLE_set_integer_native(INTERP, val, value);
-        /* let set_pmc_keyed_int() worry about memory allocation */
-        DYNSELF.set_pmc_keyed_int(size, val);
-
-        return;
-    }
-
     void push_string(STRING* value) {
-        PMC *val;
-        INTVAL size;
+        INTVAL size= PMC_int_val(SELF);
+        PMC* val;
 
-        size = PMC_int_val(SELF);
-        val = pmc_new(INTERP, enum_class_String);
+        val= pmc_new(INTERP, enum_class_String);
         VTABLE_assign_string_native(INTERP, val, value);
         /* let set_pmc_keyed_int() worry about memory allocation */
         DYNSELF.set_pmc_keyed_int(size, val);
@@ -246,43 +322,39 @@ the array.
 
 /*
 
-=item C<PMC *pop_pmc()>
-
 Removes and returns the last element in the array.
+
+=item C<INTVAL pop_float()>
+
+=item C<INTVAL pop_integer()>
+
+=item C<PMC* pop_pmc()>
+
+=item C<STRING* pop_string()>
 
 =cut
 
 */
 
-    PMC* pop_pmc() {
-        INTVAL size = PMC_int_val(SELF);
+    FLOATVAL pop_float() {
+        INTVAL size= PMC_int_val(SELF);
         PMC* data;
+        FLOATVAL value;
 
         if (0 == size) {
             internal_exception(OUT_OF_BOUNDS,
                     "ResizablePMCArray: Can't pop from an empty array!");
         }
-        
-        data = ((PMC**)PMC_data(SELF))[--size];
+
+        data= ((PMC**)PMC_data(SELF))[--size];
         PMC_int_val(SELF)= size;
-        return data;
+
+        value= VTABLE_get_number(INTERP, data);
+        return value;
     }
 
-/*
-
-=item C<INTVAL pop_integer()>
-
-=item C<STRING* pop_string()>
-
-Extends the array by adding an element of value C<*value> to the end of
-the array.
-
-=cut
-
-*/
-
     INTVAL pop_integer() {
-        INTVAL size = PMC_int_val(SELF);
+        INTVAL size= PMC_int_val(SELF);
         PMC* data;
         INTVAL value;
 
@@ -291,15 +363,29 @@ the array.
                     "ResizablePMCArray: Can't pop from an empty array!");
         }
 
-        data = ((PMC**)PMC_data(SELF))[--size];
+        data= ((PMC**)PMC_data(SELF))[--size];
         PMC_int_val(SELF)= size;
 
         value= VTABLE_get_integer(INTERP, data);
         return value;
     }
 
+    PMC* pop_pmc() {
+        INTVAL size= PMC_int_val(SELF);
+        PMC* data;
+
+        if (0 == size) {
+            internal_exception(OUT_OF_BOUNDS,
+                    "ResizablePMCArray: Can't pop from an empty array!");
+        }
+        
+        data= ((PMC**)PMC_data(SELF))[--size];
+        PMC_int_val(SELF)= size;
+        return data;
+    }
+
     STRING* pop_string() {
-        INTVAL size = PMC_int_val(SELF);
+        INTVAL size= PMC_int_val(SELF);
         PMC* data;
         STRING* value;
 
@@ -308,7 +394,7 @@ the array.
                     "ResizablePMCArray: Can't pop from an empty array!");
         }
 
-        data = ((PMC**)PMC_data(SELF))[--size];
+        data= ((PMC**)PMC_data(SELF))[--size];
         PMC_int_val(SELF)= size;
 
         value= VTABLE_get_string(INTERP, data);
@@ -317,7 +403,13 @@ the array.
 
 /*
 
+=item C<void unshift_float (FLOATVAL value)>
+
+=item C<void unshift_integer (INTVAL value)>
+
 =item C<void unshift_pmc (PMC* value)>
+
+=item C<void unshift_string (STRING* value)>
 
 Extends the array by adding an element of value C<*value> to the begin of
 the array.
@@ -326,20 +418,82 @@ the array.
 
 */
 
+    void unshift_float(FLOATVAL value) {
+        INTVAL size= PMC_int_val(SELF);
+        PMC* val;
+        PMC** data;
+        INTVAL i;
+
+        val= pmc_new(INTERP, enum_class_Float);
+        VTABLE_set_number_native(INTERP, val, value);
+
+        /* let set_integer_native() worry about memory allocation */
+        DYNSELF.set_integer_native(size + 1);
+        /* make room */
+        data= (PMC**)PMC_data(SELF);
+        for (i= size; i; --i) {
+            data[i]= data[i-1];
+        }
+        data[0]= val;
+        return;
+    }
+
+    void unshift_integer(INTVAL value) {
+        INTVAL size= PMC_int_val(SELF);
+        PMC* val;
+        PMC** data;
+        INTVAL i;
+
+        val= pmc_new(INTERP, enum_class_Integer);
+        VTABLE_set_integer_native(INTERP, val, value);
+
+        /* let set_integer_native() worry about memory allocation */
+        DYNSELF.set_integer_native(size + 1);
+        /* make room */
+        data= (PMC**)PMC_data(SELF);
+        for (i= size; i; --i) {
+            data[i]= data[i-1];
+        }
+        data[0]= val;
+        return;
+    }
+
     void unshift_pmc(PMC* value) {
-        INTVAL size = PMC_int_val(SELF);
-        PMC **data;
+        INTVAL size= PMC_int_val(SELF);
+        PMC** data;
         INTVAL i;
 
         /* let set_integer_native() worry about memory allocation */
         DYNSELF.set_integer_native(size + 1);
         /* make room */
-        data = (PMC**)PMC_data(SELF);
-        for (i = size; i; --i) {
-            data[i] = data[i-1];
+        data= (PMC**)PMC_data(SELF);
+        for (i= size; i; --i) {
+            data[i]= data[i-1];
         }
-        data[0] = value;
+        data[0]= value;
+        return;
     }
+
+    void unshift_string(STRING* value) {
+        INTVAL size= PMC_int_val(SELF);
+        PMC* val;
+        PMC** data;
+        INTVAL i;
+
+        val= pmc_new(INTERP, enum_class_String);
+        VTABLE_set_string_native(INTERP, val, value);
+
+        /* let set_integer_native() worry about memory allocation */
+        DYNSELF.set_integer_native(size + 1);
+        /* make room */
+        data= (PMC**)PMC_data(SELF);
+        for (i= size; i; --i) {
+            data[i]= data[i-1];
+        }
+        data[0]= val;
+        return;
+    }
+
 /*
 
 =item C<PMC *clone()>
