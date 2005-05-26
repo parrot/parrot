@@ -51,7 +51,7 @@ static STRING* make_hash_key(Interp* interpreter, PMC * key)
 }
 
 
-pmclass TclArray extends ResizablePMCArray need_ext does hash dynpmc group tcl_group {
+pmclass TclArray extends Hash need_ext does hash dynpmc group tcl_group {
 
 /*
 
@@ -71,83 +71,16 @@ Initializes variables needed by the class.
 
 /*
 
-=item C<void init()>
-
-Initializes the instance.
-
-=cut
-
-*/
-
-    void init () {
-        PMC_struct_val(SELF) = NULL;
-        PObj_custom_mark_SET(SELF);
-        new_pmc_hash(INTERP, SELF);
-    }
-
-/*
-
-=item C<void mark()>
-
-Marks the hash as live.
-
-=cut
-
-*/
-    void mark () {
-        if (PMC_struct_val(SELF))
-            mark_hash(INTERP, PMC_struct_val(SELF));
-    }
-
-/*
-
-=item C<INTVAL get_integer()>
-
-Returns the size of the hash.
-
-=cut
-
-*/
-
-    INTVAL get_integer () {
-        return hash_size(INTERP, PMC_struct_val(SELF));
-    }
-
-/*
-
-=item C<INTVAL get_integer_keyed(PMC *key)>
-
-Returns the integer value for the element at C<*key>.
-
-=cut
-
-*/
-
-    INTVAL get_integer_keyed (PMC* key) {
-        PMC* valpmc;
-        STRING* keystr = make_hash_key(INTERP, key);
-        HashBucket *b = hash_get_bucket(INTERP, (Hash*) PMC_struct_val(SELF),
-                                        keystr);
-        PMC* nextkey;
-        if (b == NULL) {
-            return 0;
-        }
-        nextkey = key_next(INTERP, key);
-        valpmc = b->value;
-        if (!nextkey)
-            return VTABLE_get_integer(INTERP, valpmc);
-        return VTABLE_get_integer_keyed(INTERP, valpmc, nextkey);
-    }
-
-/*
-
 =item C<PMC *get_pmc_keyed(PMC *key)>
 
 Returns the PMC value for the element at C<*key>.
 
+XXX - Why is Hash's implementation insufficient here??
+
 =cut
 
 */
+
 
     PMC* get_pmc_keyed (PMC* key) {
         STRING* keystr = make_hash_key(INTERP, key);
@@ -162,67 +95,6 @@ Returns the PMC value for the element at C<*key>.
             return b->value;
         return VTABLE_get_pmc_keyed(INTERP, (PMC*)b->value, nextkey);
     }
-
-/*
-
-=item C<void set_integer_keyed(PMC *key, INTVAL value)>
-
-=cut
-
-*/
-
-    void set_integer_keyed (PMC* key, INTVAL value) {
-        STRING* keystr;
-        PMC* nextkey;
-        PMC* box;
-        PMC* val;
-
-        if (!key) return;
-        keystr = make_hash_key(INTERP, key);
-        nextkey = key_next(INTERP, key);
-        if (nextkey == NULL) {
-            val = pmc_new(INTERP, dynclass_TclInt);
-            VTABLE_set_integer_native(INTERP, val, value);
-            hash_put(INTERP, PMC_struct_val(SELF), keystr, val);
-            return;
-        }
-        box = SELF.get_pmc_keyed_str(keystr);
-        if (box == NULL) {
-            /* autovivify an Hash */
-            box = pmc_new(INTERP, DYNSELF.type());
-        }
-        VTABLE_set_integer_keyed(INTERP, box, nextkey, value);
-    }
-
-/*
-
-=item C<void set_pmc_keyed(PMC *dest_key, PMC *value)>
-
-=cut
-
-*/
-
-
-    void set_pmc_keyed (PMC* key, PMC* value) {
-        STRING* keystr;
-        PMC* nextkey;
-        PMC* box;
-
-        if (!key) return;
-        keystr = make_hash_key(INTERP, key);
-        nextkey = key_next(INTERP, key);
-        if (nextkey == NULL) {
-            hash_put(INTERP, PMC_struct_val(SELF), keystr, value);
-            return;
-        }
-        box = SELF.get_pmc_keyed_str(keystr);
-        if (box == NULL) {
-            /* autovivify an TclArray */
-            box = pmc_new(INTERP, DYNSELF.type());
-        }
-        VTABLE_set_pmc_keyed(INTERP, box, nextkey, value);
-    }
-
 }
 
 /*

@@ -30,8 +30,7 @@ pmclass TclList extends Array need_ext does array dynpmc group tcl_group {
 
 =item C<void class_init()>
 
-Class initialization. Caches the type id of various PMCs because
-they will be used frequently here.
+Class initialization. Caches the type id of various PMCs.
 
 =cut
 
@@ -48,6 +47,8 @@ they will be used frequently here.
 =item C<PMC* get_pmc_keyed_int(INTVAL key)>
 
 Returns the PMC value of the element at index C<key>.
+
+XXX why do we need to override here?
 
 =cut
 
@@ -105,6 +106,9 @@ Returns the list as a string
 
 Sets the integer value of the PMC at element C<key> to C<value>.
 
+XXX Should probably have String and Float variants, though this 
+isn't tested.
+
 =cut
 
 */
@@ -121,14 +125,15 @@ Sets the integer value of the PMC at element C<key> to C<value>.
 
 Assigns C<*src> to the array at index C<key>.
 
+XXX why do we need to override this ?
+
 =cut
 
-
 */
+
     void set_pmc_keyed_int (INTVAL key, PMC* src) {
         list_assign(INTERP, (List *) PMC_data(SELF), key, src, enum_type_PMC);
     }
-
 
 /*
 
