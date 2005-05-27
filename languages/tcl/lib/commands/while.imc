@@ -24,11 +24,9 @@
   expression_p = find_global "_Tcl", "__expression_parse"
   expression_i = find_global "_Tcl", "__expression_interpret"
 
-  .local pmc zero
-  zero = new Integer
-  zero = 0 
 while_loop:
-  parsed_code = parser."parse"(body_p,zero,zero)
+  $S0 = body_p
+  parsed_code = parser."parse"($S0,0,0)
   (return_type,retval) = expression_p(cond_p)
   if return_type == TCL_ERROR goto done_done
   (return_type,retval) = expression_i(retval)

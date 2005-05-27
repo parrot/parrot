@@ -33,12 +33,12 @@
   expression_i = find_global "_Tcl", "__expression_interpret"
 
   # Parse the bits that are code.
-  .local pmc zero
-  zero = new Integer
-  zero = 0
-  start_parsed = parser."parse"(start_p,zero,zero)
-  next_parsed  = parser."parse"(next_p,zero,zero)
-  body_parsed  = parser."parse"(body_p,zero,zero)
+  $S0 = start_p
+  start_parsed = parser."parse"($S0,0,0)
+  $S0 = next_p
+  next_parsed  = parser."parse"($S0,0,0)
+  $S0 = body_p
+  body_parsed  = parser."parse"($S0,0,0)
 
   # first, execute start.
   (return_type,joe) = interpret(start_parsed)

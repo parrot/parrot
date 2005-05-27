@@ -100,13 +100,7 @@ do_else:
   code = else
 
 done:
-  .local pmc zero
-  zero = new Integer
-  .local pmc pmcString
-  pmcString = new String
-  pmcString = code
- 
-  $P1 = parser."parse"(pmcString,zero,zero)
+  $P1 = parser."parse"(code,0,0)
 
   .return interpret($P1) #tailcall
 

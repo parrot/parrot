@@ -19,17 +19,7 @@
   .local pmc parser 
   parser = find_global "_Tcl", "parser"
 
-  .local pmc pmcString
-  pmcString = new String
-  pmcString = str
-  .local pmc zero
-  .local pmc one
-  zero = new Integer
-  zero = 0
-  one = new Integer
-  one = 1
-
-  parsed_str = parser."parse"(pmcString,zero,one)
+  parsed_str = parser."parse"(str,0,1)
   
   $I0 = parsed_str
   if $I0 == 0 goto done

@@ -13,7 +13,7 @@
   .local int return_type
   .local pmc retval
   .local string varname
-  .local pmc code
+  .local string code
   .local pmc parser
   .local pmc interpret
   return_type = TCL_OK
@@ -27,10 +27,7 @@
   if argc == 0 goto badargs
   if argc  > 2 goto badargs
   code = argv[0]
-  .local pmc zero
-  zero = new Integer
-  zero = 0  
-  $P1 = parser."parse"(code,zero,zero)
+  $P1 = parser."parse"(code,0,0)
   # ignoring $P0 here.
   ($I0,$P0) = interpret($P1)
   retval = new Integer

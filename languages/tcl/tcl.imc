@@ -30,18 +30,12 @@
   .local pmc parser,interpret
   parser = find_global "_Tcl", "parser"
   interpret = find_global "_Tcl", "__interpret"
-  .local pmc input_line_PMC
-  .local pmc zero
-  zero = new Integer
-  zero = 0
   
 input_loop:
   print "% " # XXX Doesn't respect a set tcl_prompt1
   STDOUT."flush"()
   input_line = readline STDIN
-  input_line_PMC = new String
-  input_line_PMC = input_line
-  $P1 = parser."parse"(input_line_PMC,zero,zero)
+  $P1 = parser."parse"(input_line,0,0)
   (retcode,retval) = interpret($P1)
   # print out the result of the evaluation.
   print retval

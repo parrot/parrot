@@ -29,7 +29,8 @@
   TclList = find_type "TclList"
 
   # Compartmentalize our arguments
-  .local pmc varnames, arglists, body
+  .local pmc varnames, arglists
+  .local string body
   varnames = new TclList
   arglists  = new TclList
   varnames = argc
@@ -74,10 +75,8 @@ got_list:
   max_size = size_of
   goto arg_loop
 arg_done: 
-  .local pmc parsed,zero
-  zero = new Integer
-  zero = 0
-  parsed = parser."parse"(body,zero,zero)
+  .local pmc parsed
+  parsed = parser."parse"(body,0,0)
 
   .local pmc iterator
   iterator = new Integer

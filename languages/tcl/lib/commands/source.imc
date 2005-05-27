@@ -42,13 +42,7 @@ loop:
   goto loop
 
 gotfile:
-  .local pmc pmcString
-  pmcString = new String
-  pmcString = contents
-  .local pmc zero
-  zero = new Integer
-  zero = 0
-  $P1 = parser."parse"(pmcString,zero,zero)
+  $P1 = parser."parse"(contents,0,0)
   (code,retval) = interpret($P1)
   goto done
  

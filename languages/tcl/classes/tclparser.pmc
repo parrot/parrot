@@ -86,7 +86,7 @@ Initializes the instance.
 
 /*
 
-=item C<METHOD PMC* "parse"(PMC *code, PMC *pws, PMC *bi)
+=item C<METHOD PMC* "parse"(STRING *code, INTVAL preserve_whitespace, INTVAL block_interpolation)
 
 Given a string of Tcl Code, return a chunk of data we can then pass
 to the expression sub.
@@ -97,7 +97,7 @@ XXX: Skip the evaluate step, and just return an invokable.
 
 */
 
-    METHOD PMC* parse(PMC *code, PMC *psw, PMC *bi) {
+    METHOD PMC* parse(STRING *code, INTVAL preserve_whitespace, INTVAL block_interpolation) {
       INTVAL start_word=0;  /* position of the start of the word */
       INTVAL word_length; /* length of the word */
       INTVAL word_trailing_length;  /* include the last char in the word? */
@@ -112,9 +112,7 @@ XXX: Skip the evaluate step, and just return an invokable.
       INTVAL buffer_length;
       INTVAL old_length,chunk_start,escape_length,temppos;
 
-      STRING *buffer = Parrot_PMC_get_string(INTERP, code);
-      INTVAL preserve_whitespace = Parrot_PMC_get_intval(INTERP, psw);
-      INTVAL block_interpolation = Parrot_PMC_get_intval(INTERP, bi);
+      STRING *buffer = Parrot_make_COW_reference(INTERP, code);
       PMC *word;
       INTVAL I0,I1,I2;
       STRING *S0, *S1;
@@ -234,17 +232,7 @@ space_loop_end:
     word_length-=2;
     S0 = string_substr(INTERP, buffer, start_word, word_length, NULL, 0);
 
-    /* XXX Really need to switch parse to not need PMC's passed in,
-         basic types are really what we need - GC may be an issue */
-
-    P1 = pmc_new(INTERP, StringClass);
-    Parrot_PMC_set_string(INTERP, P1, S0);
-    P2 = pmc_new(INTERP, IntegerClass);
-    VTABLE_set_integer_native(INTERP,P2,1);
-    P3 = pmc_new(INTERP, IntegerClass);
-    VTABLE_set_integer_native(INTERP,P3,0);
-
-    P0 = Parrot_TclParser_parse(INTERP, SELF, P1, P2, P3);
+    P0 = Parrot_TclParser_parse(INTERP, SELF, S0, 1, 0);
     P4 = VTABLE_find_method(INTERP, word, ConcatWords);
     /* XXX This method on the object currently causes a bus error */
     Parrot_call_method(INTERP, P4, word, ConcatWords, "vP", P0);

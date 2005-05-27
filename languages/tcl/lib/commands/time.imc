@@ -19,7 +19,7 @@
   parser = find_global "_Tcl", "parser"
   interpret = find_global "_Tcl", "__interpret"
 
-  .local pmc script
+  .local string script
   .local int count
 
   count = 1
@@ -37,11 +37,8 @@ twoargs:
 
 run:
   script = argv[0]
-  .local pmc zero
-  zero = new Integer
-  zero = 0 
  
-  $P1 = parser."parse"(script,zero,zero)
+  $P1 = parser."parse"(script,0,0)
 
   time $N1 
   $I1 = count

@@ -226,13 +226,7 @@ later interpretation.
 
   .local pmc parser 
   parser = find_global "_Tcl", "parser"
-  .local pmc zero
-  zero = new Integer
-  zero = 0
-  .local pmc pmcString
-  pmcString = new String
-  pmcString = cmd
-  parsed_cmd  = parser."parse"(pmcString,zero,zero)
+  parsed_cmd  = parser."parse"(cmd,0,0)
 
   chunk = new FixedPMCArray
   chunk = 2
