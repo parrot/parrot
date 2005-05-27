@@ -35,19 +35,21 @@ pmclass TclParser dynpmc group tcl_group {
       PMC *string_anchor;    
       INTVAL fixedstringarray_typenum;
       if (pass) {
-          TclList = Parrot_PMC_typenum(INTERP, "TclList");
-          StringClass = Parrot_PMC_typenum(INTERP, "String");
-          IntegerClass = Parrot_PMC_typenum(INTERP, "Integer");
+          TclList       = Parrot_PMC_typenum(INTERP, "TclList");
+          StringClass   = Parrot_PMC_typenum(INTERP, "String");
+          IntegerClass  = Parrot_PMC_typenum(INTERP, "Integer");
+          
           bs_nl = string_from_const_cstring(INTERP, "\\\n",2);
           nl    = string_from_const_cstring(INTERP, "\n",1);
-          cb    = string_from_const_cstring(INTERP, "\175",1);
+          cb    = string_from_const_cstring(INTERP, "}",1);
           cp    = string_from_const_cstring(INTERP, ")",1);
           space = string_from_const_cstring(INTERP, " ",1);
-          ConcatWords = string_from_const_cstring(INTERP, "concat_words",12);
-          ConcatConst = string_from_const_cstring(INTERP, "concat_const",12);
+          
+          ConcatWords    = string_from_const_cstring(INTERP, "concat_words",12);
+          ConcatConst    = string_from_const_cstring(INTERP, "concat_const",12);
           ConcatVariable = string_from_const_cstring(INTERP, "concat_variable",15);
-          ConcatChar = string_from_const_cstring(INTERP, "concat_char",11);
-          ConcatCommand = string_from_const_cstring(INTERP, "concat_command", 14);
+          ConcatChar     = string_from_const_cstring(INTERP, "concat_char",11);
+          ConcatCommand  = string_from_const_cstring(INTERP, "concat_command", 14);
 
           /* Hack to avoid having these ``constant'' strings GC'd. */
           fixedstringarray_typenum = 
@@ -106,9 +108,7 @@ XXX: Skip the evaluate step, and just return an invokable.
       PMC *command;  /* The current command */
       INTVAL bs_marker = 0;
       INTVAL bs_pos;
-      INTVAL bs_retval;
       INTVAL bs_diff;
-      INTVAL bs_a_byte;
       INTVAL buffer_length;
       INTVAL old_length,chunk_start,escape_length,temppos;
 
@@ -128,23 +128,15 @@ XXX: Skip the evaluate step, and just return an invokable.
 
       /* Possible regression here if we do the bs_nl substitution >1 */
       bs_pos = string_str_index(INTERP, buffer, bs_nl, bs_marker);
-
-      /* bs_loop_outer: */
       while (bs_marker <= buffer_length && bs_pos != -1) {
         bs_marker = bs_pos;
-
-        bs_pos+=1;
-        /* bs_loop_inner */
-        bs_retval = 1;
-        while (bs_retval) {
-          bs_a_byte = string_index(INTERP,buffer,bs_pos++);
-          if (bs_a_byte < 33 && bs_a_byte != 10) {
-            bs_retval = 1;
-          } else {
-            bs_retval = 0;
-          }
+        
+        bs_pos++;
+        INTVAL chr = string_index(INTERP, buffer, bs_pos++);
+        while (chr < 33 && chr != '\n') {
+            chr = string_index(INTERP, buffer, bs_pos++);
         }
-
+        
         /* delete the items from marker to pos */
         bs_diff = bs_pos - bs_marker;
         string_replace(INTERP,buffer,bs_marker,bs_diff,space,NULL);
@@ -173,27 +165,18 @@ begin_word:
   end_of_word = 0;
   /* Skip any leading whitespace, unless we're preserving. */
 
-  if (preserve_whitespace == 1) {
+  if (preserve_whitespace)
     goto pre_middle;
-  }
 
 space_loop:
-  if (start_word >= buffer_length) {
+  if (start_word >= buffer_length)
     goto end_scope;
-  }
-
+  
   I0 = string_index(INTERP, buffer, start_word);
-  if (I0 < 33 && I0 != 10) {
-    I1 = 1;
-  } else {
-    I1 = 0;
+  if (I0 < 33 && I0 != '\n') {
+    start_word++;
+    goto space_loop;
   }
-
-  if (I1 == 0) {
-    goto space_loop_end;
-  }
-  start_word++;
-  goto space_loop;
 
 space_loop_end:
   /* 
@@ -205,13 +188,13 @@ space_loop_end:
 
   character = string_index(INTERP, buffer, start_word);
 
-  if (character == 123) {
+  if (character == '{') {
     /* brace-encrusted block */
 
     word_length = Parrot_TclParser_match_close(INTERP, SELF, buffer,start_word);
-    if (word_length < 0) {
+    if (word_length < 0)
       real_exception(INTERP, NULL, E_Exception, "missing close-brace");
-    }
+    
     end_of_word = 1;
 
     /* figure out where the new word is going to start.*/
@@ -227,14 +210,13 @@ space_loop_end:
     start_word = I1;
     word_length = 0;
     goto middle_word;
-  } else if (character == 34) {
+  } else if (character == '"') {
     /* "string" */
 
     word_length = Parrot_TclParser_match_close(INTERP, SELF, buffer,start_word);
-
-    if (word_length < 0) {
+    if (word_length < 0)
       real_exception(INTERP, NULL, E_Exception, "missing \"");
-    }
+    
     end_of_word = 1 ;
 
     /*figure out where the new word is going to start.*/
@@ -271,8 +253,8 @@ space_loop_end:
   }
 
   /* #comment */
-  if (character == 35 && Parrot_PMC_get_intval(INTERP,command) == 0) {
-    I0 = string_str_index(INTERP, buffer, nl, start_word);
+  if (character == '#' && Parrot_PMC_get_intval(INTERP,command) == 0) {
+    INTVAL I0 = string_str_index(INTERP, buffer, nl, start_word);
     if (I0 == -1) {
       /* If the comment is all that's left, quit. */
       goto end_command;
@@ -289,28 +271,20 @@ pre_middle:
 
 middle_word:
   I0 = start_word+word_length;
-  if (I0 >= buffer_length) {
+  if (I0 >= buffer_length)
    goto end_command;
-  }
 
   character = string_index(INTERP, buffer, I0);
 
-  if (preserve_whitespace == 1) {
+  if (preserve_whitespace)
     goto middle_word_2;
-  }
-  if (character < 33 && character != 10) {
-    I0 = 1;
-  } else {
-    I0 = 0;
-  }
-  if (I0 == 1) {
+  
+  if (character < 33 && character != '\n')
     goto end_word;
-  }
 
   /* if this isn't a newline, skip */
-  if (character != 10) {
+  if (character != '\n')
     goto middle_word_2;
-  }
 
 middle_word_1:
   word_trailing_length=1;
@@ -318,30 +292,26 @@ middle_word_1:
 
 middle_word_2:
   /* wait, this was a semicolon - go back and deal with it.*/
-  if (character == 59) {
+  if (character == ';')
     goto middle_word_1;
-  }
 
   /* If we've gotten this far and we're in a brace-block, die */
   /* XXX gives wrong exception on quoted string */
-  if (end_of_word == 1) {
+  if (end_of_word == 1)
     real_exception(INTERP, NULL, E_Exception,
       "extra characters after close-brace");
-  }
 
-  if (block_interpolation) {
+  if (block_interpolation)
     goto check_bs;
-  }
 
-  if (character == 91) {
+  if (character == '[') {
     /* command block */
     old_length = word_length;
     chunk_start = start_word + word_length;
     word_length = Parrot_TclParser_match_close(INTERP, SELF, buffer,chunk_start);
 
-    if (word_length < 0) {
+    if (word_length < 0)
       real_exception(INTERP, NULL, E_Exception, "missing close-bracket");
-    }
 
     if (old_length) {
       /* if there's any word so far, save it*/
@@ -363,16 +333,13 @@ middle_word_2:
     goto middle_word;
   }
 
-  /* $ */
-  if (character == 36) {
+  if (character == '$')
     goto handle_variable;
-  }
 
 check_bs:
   /* backslash */
-  if (character == 92) {
+  if (character == '\\')
     goto handle_backslash;
-  }
 
   last_character = character;
   word_length++;
@@ -396,9 +363,8 @@ end_command:
    * if we're preserving whitespace and we're at the end of the command,
    * we must really be done.
    */
-  if (preserve_whitespace==1) {
+  if (preserve_whitespace)
     goto end_command_0;
-  }
 
   /*
    * If this was an empty line, we'll have a 0 word length but
@@ -406,48 +372,44 @@ end_command:
    */
 
   /* unless we finished the word, in which case... */
-  if (end_of_word == 1) {
+  if (end_of_word == 1)
     goto end_command_0;
-  }
 
   /*
    * Because of how we grabbed the command, we could have a word_length
    * of zero, but have a word object in process.
    */
   I0 = Parrot_PMC_get_intval(INTERP, word);
-  if (I0 != 0) {
+  if (I0 != 0)
     goto end_command_0;
-  }
 
   /* If word_length is zero now, don't bother adding the word. */
   /* (unless we're preserving whitespace...) */
-  if (word_length == 0) {
+  if (word_length == 0)
     goto end_command_1;
-  }
 
 end_command_0:
   S0 = string_substr(INTERP, buffer, start_word, word_length, NULL, 0);
   P1 = VTABLE_find_method(INTERP, word, ConcatConst);
   Parrot_call_method(INTERP, P1, word, ConcatConst, "vS", S0);
   VTABLE_push_pmc(INTERP, command, word);
-  if (preserve_whitespace == 1) {
+  if (preserve_whitespace)
     goto preserve_end_scope;
-  }
+  
 
 end_command_1:
   /* go to the next word*/
 
   I0 = Parrot_PMC_get_intval(INTERP, command);
-  if (I0 == 0) {
+  if (I0 == 0)
     goto end_command_2;
-  }
+  
   VTABLE_push_pmc(INTERP, commands, command);
 
 end_command_2:
   start_word += word_length;
   start_word += word_trailing_length;
   goto begin_command;
-
 
 
 handle_variable:
@@ -457,24 +419,23 @@ handle_variable:
   word_length = Parrot_TclParser_match_close(INTERP, SELF, buffer,chunk_start);
 
   /* if there's any word so far, save it*/
-  if (old_length == 0) {
+  if (old_length == 0)
     goto handle_variable_1;
-  }
+  
   S0 = string_substr(INTERP, buffer, start_word, old_length, NULL, 0);
   P1 = VTABLE_find_method(INTERP, word, ConcatConst);
   Parrot_call_method(INTERP, P1, word, ConcatConst, "vS", S0);
 
 handle_variable_1:
   /* Are we dealing with a braced-var name? */
-  if (string_index(INTERP, buffer, ++chunk_start) != 123) {
+  if (string_index(INTERP, buffer, ++chunk_start) != '{')
     goto handle_variable_nobrace;
-  }
 
   /* Get the closing brace, but we don't have to have matched pairs here. */
   I1 = string_str_index(INTERP, buffer, cb, chunk_start);
-  if (I1 > buffer_length) {
+  if (I1 > buffer_length)
     real_exception(INTERP, NULL, E_Exception, "XXX invalid variable");
-  }
+  
   /* Save the new start word for when we go to middle word.*/
   I1++;
   start_word = I1;
@@ -492,16 +453,15 @@ handle_variable_nobrace:
   temppos = chunk_start;
 
 inner:
-  if (++temppos >= buffer_length) {
+  if (++temppos >= buffer_length)
     goto inner_done;
-  }
 
   I0 = string_index(INTERP, buffer, temppos);
   if (
-       (I0 >= 65 && I0 <= 90)  || /* A-Z */
-       (I0 >= 97 && I0 <= 122) || /* a-z */
-       (I0 >= 48 && I0 <= 57)  || /* 0-9 */
-       (I0 == 95)                 /* _   */
+       (I0 >= 'A' && I0 <= 'Z') ||
+       (I0 >= 'a' && I0 <= 'z') ||
+       (I0 >= '0' && I0 <= '9') ||
+       (I0 == '_')
      ) {
     goto inner;
   }
@@ -539,9 +499,8 @@ gotword:
 
 handle_backslash:
   /* dump anything so far as a constant.*/
-  if (word_length == 0)  {
+  if (word_length == 0)
     goto backslash_escape;
-  }
 
   S0 = string_substr(INTERP, buffer, start_word, word_length, NULL, 0);
   P1 = VTABLE_find_method(INTERP, word, ConcatConst);
@@ -561,56 +520,113 @@ backslash_escape:
   I0 = string_index(INTERP, buffer, start_word);
   /* add this escape as a sequence.*/
   P1 = VTABLE_find_method(INTERP, word, ConcatChar);
-  if (I0 != 97) {
-    goto backslash_escape_b;
+  switch (I0) {
+    case 'a':
+        Parrot_call_method(INTERP, P1, word, ConcatChar, "vI", 7);
+        break;
+    case 'b':
+        Parrot_call_method(INTERP, P1, word, ConcatChar, "vI", 8);
+        break;
+    case 'f':
+        Parrot_call_method(INTERP, P1, word, ConcatChar, "vI", 12);
+        break;
+    case 'n':
+        Parrot_call_method(INTERP, P1, word, ConcatChar, "vI", 10);
+        break;
+    case 'r':
+        Parrot_call_method(INTERP, P1, word, ConcatChar, "vI", 13);
+        break;
+    case 't':
+        Parrot_call_method(INTERP, P1, word, ConcatChar, "vI", 9);
+        break;
+    case 'v':
+        Parrot_call_method(INTERP, P1, word, ConcatChar, "vI", 11);
+        break;
+    /*
+     * Unicode Excape:
+     * Take 1-4 hex digits.
+     */
+    case 'u':
+        I0 = 0;
+        while (escape_length <= 4) {
+            I1 = string_index(INTERP, buffer, start_word + escape_length);
+            if (I1 >='0' && I1 <='9') {
+                I0 = I0 * 16 + I1-'0';
+            } else if (I1>='A' && I1<='F') {
+                I0 = I0 * 16 + (I1 - 'A' + 10);
+            } else if (I1>='a' && I1<='f') {
+                I0 = I0 * 16 + (I1 - 'a' + 10);
+            } else {
+                break;
+            }
+            escape_length++;
+        }
+        if (escape_length == 1) {
+            Parrot_call_method(INTERP, P1, word, ConcatChar, "vI", 'u');
+        } else {
+            Parrot_call_method(INTERP, P1, word, ConcatChar, "vI", I0);
+        }
+        break;
+    /*
+     * Hex Excape:
+     * Take as many hex digit as we can get, but only the last
+     * two are used to generate the character.
+     */
+    case 'x':
+        /* loop, getting characters. Keep a running total in I0 */
+        I0 = 0;
+        while (1) {
+            I1 = string_index(INTERP, buffer, start_word + escape_length);
+            if (I1 >='0' && I1 <='9') {
+                I0 = I0 * 16 + I1-'0';
+            } else if (I1>='A' && I1<='F') {
+                I0 = I0 * 16 + (I1 - 'A' + 10);
+            } else if (I1>='a' && I1<='f') {
+                I0 = I0 * 16 + (I1 - 'a' + 10);
+            } else {
+                break;
+            }
+            I0 = I0 % 256;  /* Toss away anything bigger than two digits. */
+            escape_length++;
+        }
+        if (escape_length == 1) {
+            Parrot_call_method(INTERP, P1, word, ConcatChar, "vI", 120);
+        } else {
+            Parrot_call_method(INTERP, P1, word, ConcatChar, "vI", I0);
+        }
+        break;
+    /* Octal Escape (XXX: Too ASCII?) */
+    /* We can take one to three digits. */
+    case '0':
+    case '1':
+    case '2':
+    case '3':
+    case '4':
+    case '5':
+    case '6':
+    case '7':
+    case '8':
+    case '9':
+        I0 -= '0';
+        I1 = string_index(INTERP, buffer, start_word+1);
+        if (I1 >='0' && I1 <='9') {
+            escape_length++;
+            I0 = 8*I0 + I1-'0';
+            I1 = string_index(INTERP, buffer, start_word+2);
+            if (I1 >='0' && I1 <='9') {
+                escape_length++;
+                I0 = 8*I0 + I1-'0';
+            }
+        }
+        Parrot_call_method(INTERP, P1, word, ConcatChar, "vI", I0);
+        break;
+    /* A backslash that didn't have any special meaning */
+    default:
+        Parrot_call_method(INTERP, P1, word, ConcatChar, "vI", I0);
   }
-  Parrot_call_method(INTERP, P1, word, ConcatChar, "vI", 7);
-  goto escape_done;
-backslash_escape_b:
-  if (I0 != 98) {
-    goto backslash_escape_f;
-  }
-  Parrot_call_method(INTERP, P1, word, ConcatChar, "vI", 8);
-  goto escape_done;
-backslash_escape_f:
-  if (I0 != 102) {
-    goto backslash_escape_n;
-  }
-  Parrot_call_method(INTERP, P1, word, ConcatChar, "vI", 12);
-  goto escape_done;
-backslash_escape_n:
-  if (I0 != 110) {
-    goto backslash_escape_r;
-  }
-  Parrot_call_method(INTERP, P1, word, ConcatChar, "vI", 10);
-  goto escape_done;
-backslash_escape_r:
-  if (I0 != 114) {
-    goto backslash_escape_t;
-  }
-  Parrot_call_method(INTERP, P1, word, ConcatChar, "vI", 13);
-  goto escape_done;
-backslash_escape_t:
-  if (I0 != 116) {
-    goto backslash_escape_v;
-  }
-  Parrot_call_method(INTERP, P1, word, ConcatChar, "vI", 9);
-  goto escape_done;
-backslash_escape_v:
-  if (I0 != 118) {
-    goto backslash_escape_not;
-  }
-  Parrot_call_method(INTERP, P1, word, ConcatChar, "vI", 11);
-  goto escape_done;
-
-/* XXX - here is where the \o, \x, \u escapes will go, pending more
-   trans-charset joy */
-
-backslash_escape_not:
-  Parrot_call_method(INTERP, P1, word, ConcatChar, "vI", I0);
-
+  
 escape_done:
-  /* skip the escaped char*/
+  /* skip the escaped char(s) */
   start_word = start_word + escape_length;
   goto middle_word;
 
@@ -649,21 +665,26 @@ end_scope:
     bufferlen = string_length(INTERP, buffer);
     opener = string_index(INTERP, buffer, index);
 
-    if (opener == 123) { /* {} */
-      hierarchical = 1;
-      closer = 125;
-    } else if (opener == 91) { /* [] */
-      hierarchical = 1;
-      closer = 93;
-    } else if (opener == 34) { /* "" */
-      closer = opener;
-    } else if (opener == 40) { /* () */
-      hierarchical = 1;
-      closer = 41;
-    } else {
-      return -1;
-      /* invalid matching char. */
-      /* XXX - generate an exception? */
+    switch (opener) {
+        case '{':
+            hierarchical = 1;
+            closer = '}';
+            break;
+        case '[':
+            hierarchical = 1;
+            closer = ']';
+            break;
+        case '(':
+            hierarchical = 1;
+            closer = ')';
+            break;
+        case '"':
+            closer = '"';
+            break;
+        default:
+            return -1;
+            /* invalid matching char. */
+            /* XXX - generate an exception? */
     }
 
     /* state == 1, normal; 2, saw a backslash */
@@ -685,7 +706,7 @@ end_scope:
         }
       } else if ((peekchar == opener) && hierarchical) {
         count++;
-      } else if (peekchar == 92) {
+      } else if (peekchar == '\\') {
         state = 2;
       }
     }
