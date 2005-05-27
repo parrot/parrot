@@ -32,19 +32,19 @@ static STRING *ConcatChar, *ConcatCommand;
 pmclass TclParser dynpmc group tcl_group {
 
     void class_init() {
-      PMC *string_anchor;    
+      PMC *string_anchor;
       INTVAL fixedstringarray_typenum;
       if (pass) {
           TclList       = Parrot_PMC_typenum(INTERP, "TclList");
           StringClass   = Parrot_PMC_typenum(INTERP, "String");
           IntegerClass  = Parrot_PMC_typenum(INTERP, "Integer");
-          
+
           bs_nl = string_from_const_cstring(INTERP, "\\\n",2);
           nl    = string_from_const_cstring(INTERP, "\n",1);
           cb    = string_from_const_cstring(INTERP, "}",1);
           cp    = string_from_const_cstring(INTERP, ")",1);
           space = string_from_const_cstring(INTERP, " ",1);
-          
+
           ConcatWords    = string_from_const_cstring(INTERP, "concat_words",12);
           ConcatConst    = string_from_const_cstring(INTERP, "concat_const",12);
           ConcatVariable = string_from_const_cstring(INTERP, "concat_variable",15);
@@ -52,7 +52,7 @@ pmclass TclParser dynpmc group tcl_group {
           ConcatCommand  = string_from_const_cstring(INTERP, "concat_command", 14);
 
           /* Hack to avoid having these ``constant'' strings GC'd. */
-          fixedstringarray_typenum = 
+          fixedstringarray_typenum =
             Parrot_PMC_typenum(INTERP, "FixedStringArray");
           string_anchor = pmc_new(INTERP,fixedstringarray_typenum);
           VTABLE_set_integer_native(INTERP,string_anchor,10);
@@ -129,14 +129,15 @@ XXX: Skip the evaluate step, and just return an invokable.
       /* Possible regression here if we do the bs_nl substitution >1 */
       bs_pos = string_str_index(INTERP, buffer, bs_nl, bs_marker);
       while (bs_marker <= buffer_length && bs_pos != -1) {
+	INTVAL chr;
+
         bs_marker = bs_pos;
-        
         bs_pos++;
-        INTVAL chr = string_index(INTERP, buffer, bs_pos++);
+        chr = string_index(INTERP, buffer, bs_pos++);
         while (chr < 33 && chr != '\n') {
             chr = string_index(INTERP, buffer, bs_pos++);
         }
-        
+
         /* delete the items from marker to pos */
         bs_diff = bs_pos - bs_marker;
         string_replace(INTERP,buffer,bs_marker,bs_diff,space,NULL);
@@ -149,7 +150,7 @@ XXX: Skip the evaluate step, and just return an invokable.
   start_word = 0;
 
   commands = pmc_new(INTERP,TclList);
-  
+
   /*
    * (Do this after the newline_subst since this could change the
    *  size of the buffer.)  ... don't fall off the end
@@ -171,7 +172,7 @@ begin_word:
 space_loop:
   if (start_word >= buffer_length)
     goto end_scope;
-  
+
   I0 = string_index(INTERP, buffer, start_word);
   if (I0 < 33 && I0 != '\n') {
     start_word++;
@@ -179,7 +180,7 @@ space_loop:
   }
 
 space_loop_end:
-  /* 
+  /*
    * At this point, we know start_word is correct.
    * Now to figure out where the word ends.
    */
@@ -194,7 +195,7 @@ space_loop_end:
     word_length = Parrot_TclParser_match_close(INTERP, SELF, buffer,start_word);
     if (word_length < 0)
       real_exception(INTERP, NULL, E_Exception, "missing close-brace");
-    
+
     end_of_word = 1;
 
     /* figure out where the new word is going to start.*/
@@ -203,7 +204,7 @@ space_loop_end:
     /* This gets added as a constant.*/
     start_word++;
     word_length-=2;
-  
+
     S0 = string_substr(INTERP, buffer, start_word, word_length, NULL, 0);
     P1 = VTABLE_find_method(INTERP, word, ConcatConst);
     Parrot_call_method(INTERP, P1, word, ConcatConst, "vS", S0);
@@ -216,7 +217,7 @@ space_loop_end:
     word_length = Parrot_TclParser_match_close(INTERP, SELF, buffer,start_word);
     if (word_length < 0)
       real_exception(INTERP, NULL, E_Exception, "missing \"");
-    
+
     end_of_word = 1 ;
 
     /*figure out where the new word is going to start.*/
@@ -278,7 +279,7 @@ middle_word:
 
   if (preserve_whitespace)
     goto middle_word_2;
-  
+
   if (character < 33 && character != '\n')
     goto end_word;
 
@@ -395,7 +396,7 @@ end_command_0:
   VTABLE_push_pmc(INTERP, command, word);
   if (preserve_whitespace)
     goto preserve_end_scope;
-  
+
 
 end_command_1:
   /* go to the next word*/
@@ -403,7 +404,7 @@ end_command_1:
   I0 = Parrot_PMC_get_intval(INTERP, command);
   if (I0 == 0)
     goto end_command_2;
-  
+
   VTABLE_push_pmc(INTERP, commands, command);
 
 end_command_2:
@@ -421,7 +422,7 @@ handle_variable:
   /* if there's any word so far, save it*/
   if (old_length == 0)
     goto handle_variable_1;
-  
+
   S0 = string_substr(INTERP, buffer, start_word, old_length, NULL, 0);
   P1 = VTABLE_find_method(INTERP, word, ConcatConst);
   Parrot_call_method(INTERP, P1, word, ConcatConst, "vS", S0);
@@ -435,7 +436,7 @@ handle_variable_1:
   I1 = string_str_index(INTERP, buffer, cb, chunk_start);
   if (I1 > buffer_length)
     real_exception(INTERP, NULL, E_Exception, "XXX invalid variable");
-  
+
   /* Save the new start word for when we go to middle word.*/
   I1++;
   start_word = I1;
@@ -624,7 +625,7 @@ backslash_escape:
     default:
         Parrot_call_method(INTERP, P1, word, ConcatChar, "vI", I0);
   }
-  
+
 escape_done:
   /* skip the escaped char(s) */
   start_word = start_word + escape_length;
