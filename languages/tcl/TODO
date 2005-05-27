@@ -8,11 +8,11 @@ let me know, and I'll work on clarifying.
 
 =item interactive tclsh
 
-simple interactive mode now exists. 
+simple interactive mode now exists. Still have to:
 
  o Should catch any real_exceptions thrown.
  o respect tcl_prompt1, tcl_prompt2 (Depends on true global support)
- o deal with incomplete input
+ o deal with incomplete input (needs better error handling)
  o give invalid commands to the system.
 
 =item [interpinfo name]
@@ -78,12 +78,6 @@ global variables provided by tcl interpreter. L<tclsh>
 
 source per-user settings. L<tclsh>
 
-=item misc
-
-hex & unicode escapes are not currently supported in 
-C<dynclasses/tclparser.pmc>'s C<parse>. - I have a version of this in my
-sandbox, but it requires more work from parrot guts.
-
 =item unimplemented commands/subcommands 
 
 [after] [array get] [array names] [array unset] 
@@ -145,12 +139,6 @@ Left in:
 ./lib/get_var.imc
 ./lib/tclword.imc
 
-=item tail call optimizations
-
-tail call optimizations - there are several cases where I could use this
-and save myself a call. Possible to do right now with PASM - wait for
-PIR support before welding in.
-
 =item provide a way to access existing library PIR from Tcl.
 
 =item TclWord
@@ -159,8 +147,6 @@ implement C<is_const> to allow for some optimizations in the compiler.
 (which isn't written yet.)
 when adding words, default to true, but if at any point we add a variable
 or a command, invalidate that. (mostly done!)
-
-Move TclWord namespace into _Tcl::Word, less clutter?
 
 =item multiple level lists
 
