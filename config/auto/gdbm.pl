@@ -25,6 +25,7 @@ $description="Determining if your platform supports gdbm...";
 sub runstep {
     my ($verbose) = @_;
 
+    my $cc        = Configure::Data->get('cc');
     my $libs      = Configure::Data->get('libs');
     my $linkflags = Configure::Data->get('linkflags');
     my $ccflags   = Configure::Data->get('ccflags');
@@ -48,7 +49,11 @@ sub runstep {
 
     cc_gen('config/auto/gdbm/gdbm.in');
     if ($^O =~ /mswin32/i) {
-        eval { cc_build('', 'gdbm.lib'); };
+        if ($cc =~ /^gcc/i) {
+            eval { cc_build('', '-llibgdbm'); };
+        } else {
+            eval { cc_build('', 'gdbm.lib'); };
+        }
     } else { 
         eval { cc_build('', '-lgdbm'); };
     }

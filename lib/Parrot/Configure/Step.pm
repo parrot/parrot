@@ -346,7 +346,7 @@ sub cc_build {
       'test.cco', 'test.cco')
         and confess "C compiler failed (see test.cco)";
 
-    _run_command("$link $linkflags $link_args test$o ${cc_exe_out}test$exe $libs",
+    _run_command("$link $linkflags test$o $link_args ${cc_exe_out}test$exe $libs",
       'test.ldo', 'test.ldo')
         and confess "Linker failed (see test.ldo)";
 }
