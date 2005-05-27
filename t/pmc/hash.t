@@ -312,7 +312,25 @@ again:
 print_value:
 	S2 = hash[S1]
 	print S2
+print_end:
 	print "\n"
+	key_index = key_index + step
+	count = count - 1
+	goto again
+ret:
+.end
+
+.sub delete_multiple_keys prototyped
+	.param pmc hash
+	.param int key_index
+	.param int step
+	.param int count
+
+again:
+	if count <= 0 goto ret
+	S0 = key_index
+	S1 = concat "key", S0
+	delete hash[S1]
 	key_index = key_index + step
 	count = count - 1
 	goto again
@@ -338,6 +356,10 @@ ret:
 	set_multiple_keys(P30, I22, I29, I22)
 	print_multiple_keys(P30, I29, I30, I20)
 	print_multiple_keys(P30, I22, I30, I20)
+	print "round 4\n"
+	delete_multiple_keys(P30, I22, I29, I22)
+	print_multiple_keys(P30, I29, I30, I20)
+	print_multiple_keys(P30, I22, I30, I20)
 	print "done.\n"
 .end
 CODE
@@ -359,6 +381,13 @@ key2001 => value2001
 key50000 => value50000
 key51000 => value51000
 key52000 => value52000
+round 4
+key1 => value1
+key1001 => value1001
+key2001 => value2001
+key50000 => (undef)
+key51000 => (undef)
+key52000 => (undef)
 done.
 OUTPUT
 
