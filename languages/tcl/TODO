@@ -47,11 +47,6 @@ to properly escape string elements.
 
 Should be moved to tcllist's set_string method.
 
-=item tclword
-
-An object is probably too heavyweight for this. A PMC with a few overloaded
-methods is probably sufficient.
-
 =item Use PMCs to handle numifying
 
 not the pir routines we now have. Verify that [expr 2a + 2b] behaves
