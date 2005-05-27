@@ -24,13 +24,18 @@ $description="Determining if your platform supports GMP...";
 sub runstep {
     my ($verbose) = @_;
 
+    my $cc = Configure::Data->get('cc');
     my $libs = Configure::Data->get('libs');
     my $linkflags = Configure::Data->get('linkflags');
     my $ccflags = Configure::Data->get('ccflags');
     if ($^O =~ /mswin32/i) {
-      Configure::Data->add(' ', 'libs', 'gmp.lib');
+        if ($cc =~ /^gcc/i) {
+            Configure::Data->add(' ', 'libs', '-lgmp');
+        } else {
+            Configure::Data->add(' ', 'libs', 'gmp.lib');
+        }
     } else {
-    Configure::Data->add(' ', 'libs', '-lgmp');
+        Configure::Data->add(' ', 'libs', '-lgmp');
     }
 
     my $archname = $Config{archname};
