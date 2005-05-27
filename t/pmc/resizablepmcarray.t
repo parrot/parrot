@@ -17,8 +17,7 @@ out-of-bounds test. Checks INT and PMC keys.
 
 =cut
 
-use Parrot::Test tests => 22;
-use Test::More;
+use Parrot::Test tests => 23;
 
 my $fp_equality_macro = <<'ENDOFMACRO';
 .macro fp_eq (	J, K, L )
@@ -772,6 +771,26 @@ abc 3
 456.456 2
 123 1
 123.123000 0
+OUTPUT
+
+# An Integer Matrix, as used by befunge as a playing field 
+pir_output_is(<< 'CODE', << 'OUTPUT', "multi key access");
+
+.sub test @MAIN
+    .local pmc matrix, row_in, row_out
+    matrix = new ResizablePMCArray
+    row_in = new ResizableIntegerArray
+    push row_in, 42
+    push matrix, row_in
+
+    .local int elem
+    print "int in ResizableIntegerArray: "
+    elem = matrix[0;0]
+    print elem
+    print "\n"
+.end
+CODE
+int in ResizableIntegerArray: 42
 OUTPUT
 
 # don't forget to change the number of tests
