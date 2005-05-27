@@ -36,13 +36,13 @@ by the constant C< >.
 
 =item lib/tcllib.pbc
 
-This .imc file is used to load all the various commands, ops, etc. into
+This file is used to load all the various commands, ops, etc. into
 the appropriate namespaces, as well as declare and register the TCL
 compiler for the C<compile> opcode.
 
 =item tcl.pbc
 
-This is roughly equivalent to C<tclsh> - It takes the command line argument
+This is roughly equivalent to C<tclsh> - It takes the command line arguments
 (currently, the name of the file you wish to parse), and reads in the file,
 and uses the tcl library to parse those contents as tcl.
 
