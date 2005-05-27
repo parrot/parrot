@@ -21,7 +21,7 @@ use Test::More;
 use Parrot::Config;
 
 if ($PConfig{gmp}) {
-    plan tests => 22;
+    plan tests => 26;
 }
 else {
     plan skip_all => "No BigInt Lib configured";
@@ -657,3 +657,105 @@ CODE
 81857780532171226806613001927876611195909216420198
 
 OUTPUT
+
+output_is(<<'CODE', <<'OUT', "shl_bigint");
+   new P0, .BigInt
+   set P0, "2"
+   new P1, .BigInt
+   set P1, 2
+   new P2, .BigInt
+   shl P2, P0, P1
+   set S0, P2
+   print S0
+   print "\n"
+   set P0, "100000000000"
+   set P1, 10
+   shl P2, P0, P1
+   set S0, P2
+   print S0
+   print "\n"
+   end
+CODE
+8
+102400000000000
+OUT
+
+output_is(<<'CODE', <<'OUT', "shl_int");
+   new P0, .BigInt
+   set P0, 2
+   new P1, .Integer
+   set P1, 1
+   new P2, .BigInt
+   shl P2, P0, P1
+   set S0, P2
+   print S0
+   print "\n"
+   set P0, "100000000000"
+   set P1, 1
+   shl P2, P0, P1
+   set S0, P2
+   print S0
+   print "\n"
+   set P0, "100000000000"
+   set P1, 10
+   shl P2, P0, P1
+   set S0, P2
+   print S0
+   print "\n"
+   end
+CODE
+4
+200000000000
+102400000000000
+OUT
+
+output_is(<<'CODE', <<'OUT', "shr_bigint");
+   new P0, .BigInt
+   set P0, 8
+   new P1, .BigInt
+   set P1, 2
+   new P2, .BigInt
+   shr P2, P0, P1
+   set S0, P2
+   print S0
+   print "\n"
+   set P0, "102400000000000"
+   set P1, 10
+   shr P2, P0, P1
+   set S0, P2
+   print S0
+   print "\n"
+   end
+CODE
+2
+100000000000
+OUT
+
+output_is(<<'CODE', <<'OUT', "shr_int");
+   new P0, .BigInt
+   set P0, 4
+   new P1, .Integer
+   set P1, 1
+   new P2, .BigInt
+   shr P2, P0, P1
+   set S0, P2
+   print S0
+   print "\n"
+   set P0, "200000000000"
+   set P1, 1
+   shr P2, P0, P1
+   set S0, P2
+   print S0
+   print "\n"
+   set P0, "102400000000000"
+   set P1, 10
+   shr P2, P0, P1
+   set S0, P2
+   print S0
+   print "\n"
+   end
+CODE
+2
+100000000000
+100000000000
+OUT

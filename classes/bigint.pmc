@@ -203,42 +203,9 @@ bigint_neg(Interp *interpreter, PMC* self, PMC *dest)
 }
 
 static void
-bigint_bitwise_shl_bigint(Interp *interpreter, PMC* self, PMC *value, PMC *dest)
-{
-    mpz_t bn_1;
-    mpz_t bn_2;
-    mpz_init(bn_1);
-    mpz_init(bn_2);
-    mpz_set_ui(bn_1, 1);
-    mpz_set_ui(bn_2, 2);
-
-    mpz_powm(BN(dest), bn_2, BN(value), bn_1);
-    mpz_mul(BN(dest), BN(self), BN(dest));
-
-    mpz_clear(bn_1);
-    mpz_clear(bn_2);
-}
-static void
 bigint_bitwise_shl_bigint_int(Interp *interpreter, PMC* self, INTVAL value, PMC *dest)
 {
     mpz_mul_2exp(BN(dest), BN(self), value);
-}
-
-static void
-bigint_bitwise_shr_bigint(Interp *interpreter, PMC* self, PMC *value, PMC *dest)
-{
-    mpz_t bn_1;
-    mpz_t bn_2;
-    mpz_init(bn_1);
-    mpz_init(bn_2);
-    mpz_set_ui(bn_1, 1);
-    mpz_set_ui(bn_2, 2);
-
-    mpz_powm(BN(dest), bn_2, BN(value), bn_1);
-    mpz_fdiv_q(BN(dest), BN(self), BN(dest));
-
-    mpz_clear(bn_1);
-    mpz_clear(bn_2);
 }
 static void
 bigint_bitwise_shr_bigint_int(Interp *interpreter, PMC* self, INTVAL value, PMC *dest)
@@ -1103,7 +1070,7 @@ MMD_BigInt: {
                 VTABLE_morph(interpreter, dest, SELF->vtable->base_type);
             else
                 dest = pmc_new(INTERP, SELF->vtable->base_type);
-            bigint_bitwise_shl_bigint(INTERP, SELF, value, dest);
+            bigint_bitwise_shl_bigint_int(INTERP, SELF, VTABLE_get_integer(INTERP, value), dest);
             return dest;
         }
 MMD_Integer: {
@@ -1132,7 +1099,7 @@ MMD_DEFAULT: {
 
     void i_bitwise_shl (PMC* value) {
 MMD_BigInt: {
-                bigint_bitwise_shl_bigint(INTERP, SELF, value, SELF);
+                bigint_bitwise_shl_bigint_int(INTERP, SELF, VTABLE_get_integer(INTERP, value), SELF);
             }
 MMD_Integer: {
                 bigint_bitwise_shl_bigint_int(INTERP, SELF, PMC_int_val(value), SELF);
@@ -1146,16 +1113,83 @@ MMD_DEFAULT: {
         bigint_bitwise_shl_bigint_int(INTERP, SELF, value, SELF);
     }
 
-}
-
 /*
 
-=back
+=item C<PMC* bitwise_shr(PMC *value, PMC *dest)>
+
+=item C<PMC* bitwise_shr_int(INTVAL value, PMC *dest)>
+
+Returns in C<*dest> the shift right of the BigInt by C<*value>.
+
+=item C<void i_bitwise_shr(PMC *value)>
+
+=item C<void i_bitwise_shr_int(INTVAL value)>
+
+Inplace shift left.
 
 =cut
 
 */
 
+    PMC* bitwise_shr (PMC* value, PMC* dest) {
+MMD_BigInt: {
+            if (dest)
+                VTABLE_morph(interpreter, dest, SELF->vtable->base_type);
+            else
+                dest = pmc_new(INTERP, SELF->vtable->base_type);
+            bigint_bitwise_shr_bigint_int(INTERP, SELF, VTABLE_get_integer(INTERP, value), dest);
+            return dest;
+        }
+MMD_Integer: {
+            if (dest)
+                VTABLE_morph(interpreter, dest, SELF->vtable->base_type);
+            else
+                dest = pmc_new(INTERP, SELF->vtable->base_type);
+            bigint_bitwise_shr_bigint_int(INTERP, SELF, PMC_int_val(value), dest);
+            return dest;
+         }
+MMD_DEFAULT: {
+            internal_exception(1, "unimp shr");
+            return dest;
+         }
+    }
+
+    PMC* bitwise_shr_int (INTVAL value, PMC* dest) {
+        if (dest)
+            VTABLE_morph(interpreter, dest, SELF->vtable->base_type);
+        else
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
+        bigint_bitwise_shr_bigint_int(INTERP, SELF, value, dest);
+        return dest;
+    }
+
+
+    void i_bitwise_shr (PMC* value) {
+MMD_BigInt: {
+                bigint_bitwise_shr_bigint_int(INTERP, SELF, VTABLE_get_integer(INTERP, value), SELF);
+            }
+MMD_Integer: {
+                bigint_bitwise_shr_bigint_int(INTERP, SELF, PMC_int_val(value), SELF);
+             }
+MMD_DEFAULT: {
+                internal_exception(1, "unimp shr");
+             }
+    }
+
+    void i_bitwise_shr_int (INTVAL value) {
+        bigint_bitwise_shr_bigint_int(INTERP, SELF, value, SELF);
+    }
+
+}
+
+/*
+
+=back
+  
+=cut
+
+*/
+   
 /*
  * Local variables:
  * c-indentation-style: bsd
