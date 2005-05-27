@@ -806,15 +806,22 @@ characters, not bytes. If second string is not specified, then return
 
 INTVAL
 string_str_index(Interp *interpreter, const STRING *s,
-        const STRING *s2, UINTVAL start)
+        const STRING *s2, INTVAL start)
 {
     STRING *src, *search;
+    UINTVAL len;
+
     union {
         const void * __c_ptr;
         void * __ptr;
     } __ptr_u;
 
-    if (!string_length(interpreter, s))
+    if (start < 0)
+        return -1;
+    len = string_length(interpreter, s);
+    if (!len)
+        return -1;
+    if (start >= (INTVAL)len)
         return -1;
     if (!string_length(interpreter, s2))
         return -1;

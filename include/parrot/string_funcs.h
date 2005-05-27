@@ -72,7 +72,7 @@ void *string_pointer_to_index(Interp *,
 								const STRING *s, UINTVAL idx);
 INTVAL string_index(Interp *, const STRING *, UINTVAL idx);
 INTVAL string_str_index(Interp *interpreter, const STRING *s,
-        const STRING *s2, UINTVAL start);
+        const STRING *s2, INTVAL start);
 STRING *string_from_cstring(Interp *, const void *, UINTVAL);
 STRING *string_from_const_cstring(Interp *, const void *, UINTVAL);
 STRING *const_string(Interp *, const char *);

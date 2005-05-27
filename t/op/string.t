@@ -16,7 +16,7 @@ Tests Parrot's string registers and operations.
 
 =cut
 
-use Parrot::Test tests => 155;
+use Parrot::Test tests => 156;
 use Test::More;
 
 output_is( <<'CODE', <<OUTPUT, "set_s_s|sc" );
@@ -1515,6 +1515,18 @@ binary - binary:
 -1
 OUTPUT
 
+output_is(<<'CODE',<<'OUTPUT',"negative index #35959");
+    index I1, "u", "t", -123456
+    print I1
+    print "\n"
+    index I1, "u", "t", -123456789
+    print I1
+    print "\n"
+    end
+CODE
+-1
+-1
+OUTPUT
 
 SKIP: {
 skip("Pending rework of creating non-ascii literals",2);
