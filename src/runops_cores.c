@@ -98,10 +98,12 @@ because C<Parrot_destroy()> fails to cleanup of C<ctx> correctly.
 
 */
 
+#define USE_TRACE_INTERP 0
+
 opcode_t *
 runops_slow_core(Interp *interpreter, opcode_t *pc)
 {
-#ifdef USE_TRACE_INTERP
+#if USE_TRACE_INTERP
     Interp * trace_i;
     struct Parrot_Context *trace_ctx;
 #endif
@@ -120,8 +122,12 @@ runops_slow_core(Interp *interpreter, opcode_t *pc)
         interpreter->code->base.size)
 
 
-#ifdef USE_TRACE_INTERP
+#if USE_TRACE_INTERP
     if (Interp_flags_TEST(interpreter, PARROT_TRACE_FLAG)) {
+        /* XXX reentering run loop: store this interpreter in
+         * some debug structure
+         * XXX leak
+         */
         trace_i = make_interpreter(interpreter, NO_FLAGS);
         Parrot_init(trace_i);
         /* remember old context */
@@ -147,9 +153,10 @@ runops_slow_core(Interp *interpreter, opcode_t *pc)
         DO_OP(pc, interpreter);
 
         if (Interp_flags_TEST(interpreter, PARROT_TRACE_FLAG)) {
-#ifdef USE_TRACE_INTERP
+#if USE_TRACE_INTERP
             mem_sys_memcopy(&trace_i->ctx, &interpreter->ctx,
                     sizeof(struct Parrot_Context));
+            trace_i->code = interpreter->code;
             trace_op(trace_i, code_start, code_end, pc);
 #else
             trace_op(interpreter, code_start, code_end, pc);
@@ -164,7 +171,7 @@ runops_slow_core(Interp *interpreter, opcode_t *pc)
             }
         }
     }
-#ifdef USE_TRACE_INTERP
+#if USE_TRACE_INTERP
     if (Interp_flags_TEST(interpreter, PARROT_TRACE_FLAG)) {
         /* restore trace context */
         mem_sys_memcopy(&trace_i->ctx, trace_ctx,
