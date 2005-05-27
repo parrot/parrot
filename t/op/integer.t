@@ -16,7 +16,7 @@ Tests the use of Parrot's integer registers.
 
 =cut
 
-use Parrot::Test tests => 39;
+use Parrot::Test tests => 40;
 
 output_is(<<CODE, <<OUTPUT, "set_i_ic");
 	# XXX: Need a test for writing outside the set of available
@@ -335,6 +335,38 @@ CODE
 1
 -2
 222
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "mod - negative, zero rest (#36003)");
+.sub test @MAIN
+
+   $I1 = mod 3, 3
+   print "3 mod 3 = "
+   print $I1
+   print "\n"
+
+   $I1 = mod -3, 3
+   print "-3 mod 3 = "
+   print $I1
+   print "\n"
+
+   $I1 = mod 3, -3
+   print "3 mod -3 = "
+   print $I1
+   print "\n"
+
+   $I1 = mod -3, -3
+   print "-3 mod -3 = "
+   print $I1
+   print "\n"
+
+   end
+.end
+CODE
+3 mod 3 = 0
+-3 mod 3 = 0
+3 mod -3 = 0
+-3 mod -3 = 0
 OUTPUT
 
 output_is(<<CODE, <<OUTPUT, "cmod_i");
