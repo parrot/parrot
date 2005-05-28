@@ -96,7 +96,7 @@ funcptr_t
 get_mmd_dispatch_type(Interp *interpreter, INTVAL func_nr, INTVAL left_type,
         INTVAL right_type, int *is_pmc)
 {
-    funcptr_t func;
+    funcptr_t func, func_;
     UINTVAL offset, x_funcs, y_funcs;
     INTVAL r;
     MMD_table *table = interpreter->binop_mmd_funcs + func_nr;
@@ -158,13 +158,17 @@ get_mmd_dispatch_type(Interp *interpreter, INTVAL func_nr, INTVAL left_type,
         return func;
     }
     *is_pmc = (UINTVAL)func & 3;
-    func = (funcptr_t)((UINTVAL)func & ~3);
+    func_ = (funcptr_t)((UINTVAL)func & ~3);
 #ifndef PARROT_HAS_ALIGNED_FUNCPTR
-    if (*is_pmc && !is_pmc_ptr(interpreter, F2DPTR(func))) {
-        *is_pmc = 0;
+    if (!*is_pmc) {
+        return func;
+    }
+    else if (!is_pmc_ptr(interpreter, F2DPTR(func_))) {
+      *is_pmc = 0;
+      return func;
     }
 #endif
-    return func;
+    return func_;
 }
 
 
