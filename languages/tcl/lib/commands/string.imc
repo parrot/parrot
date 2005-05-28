@@ -179,12 +179,12 @@ repeat:
   the_string = argv[1]
   the_repeat = argv[2]
   
-  $I0 = length $S2 
+  #$I0 = length $S2 
   # XXX - uncomment this, need to setup the sub call
   #(index_1,$I2,$P1) = __expr_get_number(the_repeat,0)
   #if $I2 != INTEGER goto bad_arg
   #if index_1 != $I0 goto bad_arg
-  $I3 = $P1
+  $I3 = the_repeat
   $S0 = repeat the_string, $I3
   retval = new String
   retval = $S0
@@ -193,7 +193,7 @@ repeat:
 bad_repeat:
   return_type = TCL_ERROR
   retval = new String
-  retval = "wrong # args: should be \"string repeat string count\""
+  retval = "wrong # args: should be \"string repeat string count\"\n"
   goto done
 
 badargs:
