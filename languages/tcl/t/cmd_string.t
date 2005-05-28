@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 35;
+use Parrot::Test tests => 37;
 use vars qw($TODO);
 
 my($tcl,$expected);
@@ -228,3 +228,16 @@ TCL
 1
 OUT
 }
+
+language_output_is("tcl",<<TCL,<<OUT,"string repeat: simple");
+  puts [string repeat a 5]
+TCL
+aaaaa
+OUT
+
+language_output_is("tcl",<<TCL,<<OUT,"string repeat: bad args");
+  string repeat a\
+
+TCL
+wrong # args: should be "string repeat string count"
+OUT
