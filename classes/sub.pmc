@@ -228,7 +228,7 @@ Invokes the subroutine.
         struct parrot_regs_t *caller_regs;
         PMC *ccont;
 
-        if (Interp_flags_TEST(INTERP, PARROT_TRACE_FLAG)) {
+        if (Interp_trace_TEST(INTERP, PARROT_TRACE_SUB_CALL_FLAG)) {
             print_sub_name(INTERP, SELF);
         }
         if (INTERP->code != sub->seg) {

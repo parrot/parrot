@@ -44,7 +44,7 @@ Parrot_Interp
 Parrot_new(Parrot_Interp parent)
 {
     /* interpreter.c:make_interpreter builds a new Parrot_Interp. */
-    return make_interpreter(parent, NO_FLAGS);
+    return make_interpreter(parent, PARROT_NO_FLAGS);
 }
 
 extern void Parrot_initialize_core_pmcs(Interp *interp);
@@ -95,16 +95,22 @@ Parrot_init_stacktop(Interp *interpreter, void *stack_top)
 
 /*
 
-=item C<void
-Parrot_set_flag(Interp *interpreter, Parrot_Interp_flag flag)>
+=item C<void Parrot_set_flag(Interp *interpreter, Parrot_Interp_flag flag)>
 
 Sets a flag in the interpreter specified by C<flag>, any of
-C<PARROT_DEBUG_FLAG>, C<PARROT_TRACE_FLAG>, or C<PARROT_BOUNDS_FLAG>, or
-C<PARROT_PROFILE_FLAG> to enable debugging, tracing, profiling, and bounds
-checking respectively or C<PARROT_THR_TYPE_1>, C<PARROT_THR_TYPE_2>, or
+C<PARROT_BOUNDS_FLAG>, or C<PARROT_PROFILE_FLAG> to enable profiling, and
+bounds checking respectively or C<PARROT_THR_TYPE_1>, C<PARROT_THR_TYPE_2>, or
 C<PARROT_THR_TYPE_3> to disable thread communication and variable sharing,
 disable variable sharing but enable thread communication, or to enable variable
 sharing.
+
+=item C<void Parrot_set_debug(Interp *interpreter, UINTVAL flag)>
+
+Set a debug flag: C<PARROT_DEBUG_FLAG>.
+
+=item C<void Parrot_set_trace(Interp *interpreter, UINTVAL flag)>
+
+Set a trace flag: C<PARROT_TRACE_FLAG>
 
 =cut
 
@@ -119,7 +125,6 @@ Parrot_set_flag(Interp *interpreter, Parrot_Interp_flag flag)
     switch (flag) {
         case PARROT_BOUNDS_FLAG:
         case PARROT_PROFILE_FLAG:
-        case PARROT_TRACE_FLAG:
             Interp_core_SET(interpreter, PARROT_SLOW_CORE);
             break;
         default:
@@ -127,10 +132,27 @@ Parrot_set_flag(Interp *interpreter, Parrot_Interp_flag flag)
     }
 }
 
+void
+Parrot_set_debug(Interp *interpreter, UINTVAL flag)
+{
+    interpreter->debug_flags |= flag;
+}
+
+void
+Parrot_set_trace(Interp *interpreter, UINTVAL flag)
+{
+
+    interpreter->ctx.trace_flags |= flag;
+    Interp_core_SET(interpreter, PARROT_SLOW_CORE);
+}
+
 /*
 
-=item C<void
-Parrot_clear_flag(Parrot_Interp interpreter, Parrot_Interp_flag flag)>
+=item C<void Parrot_clear_flag(Interp *, Parrot_Interp_flag flag)>
+
+=item C<void Parrot_clear_debug(Interp *, UINTVAL flag)>
+
+=item C<void Parrot_clear_trace(Interp *, UINTVAL flag)>
 
 Clears a flag in the interpreter.
 
@@ -144,21 +166,51 @@ Parrot_clear_flag(Parrot_Interp interpreter, Parrot_Interp_flag flag)
     Interp_flags_CLEAR(interpreter, flag);
 }
 
+void
+Parrot_clear_debug(Interp *interpreter, UINTVAL flag)
+{
+    interpreter->debug_flags &= ~flag;
+}
+
+void
+Parrot_clear_trace(Interp *interpreter, UINTVAL flag)
+{
+    interpreter->ctx.trace_flags &= ~flag;
+}
+
 /*
 
 =item C<Parrot_Int
-Parrot_test_flag(Parrot_Interp interpreter, Parrot_Interp_flag flag)>
+Parrot_test_flag(Interp*, Parrot_Interp_flag flag)>
 
-Set, clear, or test the interpreter flags specified in C<flag>.
+=item C<UINTVAL
+Parrot_test_debug(Interp*, UINTVAL flag)>
+
+=item C<UINTVAL
+Parrot_test_trace(Interp*, UINTVAL flag)>
+
+Test the interpreter flags specified in C<flag>.
 
 =cut
 
 */
 
 Parrot_Int
-Parrot_test_flag(Parrot_Interp interpreter, Parrot_Interp_flag flag)
+Parrot_test_flag(Interp* interpreter, Parrot_Interp_flag flag)
 {
     return Interp_flags_TEST(interpreter, flag);
+}
+
+UINTVAL
+Parrot_test_debug(Interp *interpreter, UINTVAL flag)
+{
+    return interpreter->debug_flags & flag;
+}
+
+UINTVAL
+Parrot_test_trace(Interp *interpreter, UINTVAL flag)
+{
+    return interpreter->ctx.trace_flags & flag;
 }
 
 /*
@@ -402,7 +454,7 @@ setup_argv(Interp *interpreter, int argc, char ** argv)
     INTVAL i;
     PMC *userargv;
 
-    if (Interp_flags_TEST(interpreter, PARROT_DEBUG_FLAG)) {
+    if (Interp_debug_TEST(interpreter, PARROT_START_DEBUG_FLAG)) {
         PIO_eprintf(interpreter,
                 "*** Parrot VM: Setting up ARGV array in P5.  Current argc: %d ***\n",
                 argc);
@@ -422,7 +474,7 @@ setup_argv(Interp *interpreter, int argc, char ** argv)
         STRING *arg = string_make(interpreter, argv[i], strlen(argv[i]),
                                   NULL, PObj_external_FLAG);
 
-        if (Interp_flags_TEST(interpreter, PARROT_DEBUG_FLAG)) {
+        if (Interp_debug_TEST(interpreter, PARROT_START_DEBUG_FLAG)) {
             PIO_eprintf(interpreter, "\t%vd: %s\n", i, argv[i]);
         }
 
@@ -635,7 +687,7 @@ static void
 print_debug(int status, void *p)
 {
     Parrot_Interp interpreter = (Parrot_Interp) p;
-    if (Interp_flags_TEST(interpreter, PARROT_DEBUG_FLAG)) {
+    if (Interp_debug_TEST(interpreter, PARROT_MEM_STAT_DEBUG_FLAG)) {
         /* Give the souls brave enough to activate debugging an earful
          * about GC. */
 
@@ -704,7 +756,7 @@ Parrot_runcode(Interp *interpreter, int argc, char *argv[])
 {
     if (!interpreter->lo_var_ptr) {
         int top;
-        if (Interp_flags_TEST(interpreter, PARROT_DEBUG_FLAG)) {
+        if (Interp_debug_TEST(interpreter, PARROT_START_DEBUG_FLAG)) {
             PIO_eprintf(interpreter,
                     "*** Parrot VM: Setting stack top. ***\n");
         }
@@ -714,12 +766,12 @@ Parrot_runcode(Interp *interpreter, int argc, char *argv[])
         return;
     }
     /* Debugging mode nonsense. */
-    if (Interp_flags_TEST(interpreter, PARROT_DEBUG_FLAG)) {
+    if (Interp_debug_TEST(interpreter, PARROT_START_DEBUG_FLAG)) {
         if (Interp_flags_TEST(interpreter, PARROT_BOUNDS_FLAG)) {
             PIO_eprintf(interpreter,
                     "*** Parrot VM: Bounds checking enabled. ***\n");
         }
-        if (Interp_flags_TEST(interpreter, PARROT_TRACE_FLAG)) {
+        if (Interp_trace_TEST(interpreter, PARROT_TRACE_OPS_FLAG)) {
             PIO_eprintf(interpreter, "*** Parrot VM: Tracing enabled. ***\n");
         }
         PIO_eprintf(interpreter, "*** Parrot VM: ");

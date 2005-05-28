@@ -37,19 +37,31 @@ static void
 help_debug(void)
 {
     printf(
-    "parrot ... -d [Flags] ...\n"
-    "  Flags:\n"
-    "    0x0001    parrot\n"
-    "    0x0002    lexer\n"
-    "    0x0004    parser\n"
-    "    0x0008    imc\n"
-    "    0x0010    CFG\n"
-    "    0x0020    optimization 1\n"
-    "    0x0040    optimization 2\n"
-    "    0x0100    AST\n"
-    "    0x1000    PBC\n"
-    "    0x2000    PBC constants\n"
-    "    0x4000    PBC fixups\n");
+    "--imcc-debug -d [Flags] ...\n"
+    "    0002    lexer\n"
+    "    0004    parser\n"
+    "    0008    imc\n"
+    "    0010    CFG\n"
+    "    0020    optimization 1\n"
+    "    0040    optimization 2\n"
+    "    0100    AST\n"
+    "    1000    PBC\n"
+    "    2000    PBC constants\n"
+    "    4000    PBC fixups\n"
+    "\n"
+    "--parrot-debug -D [Flags] ...\n"
+    "    0001    memory statistics\n"
+    "    0002    print backtrace on exception\n"
+    "    0004    JIT debuggin\n"
+    "    0008    interpreter startup\n"
+    "    0010    thread debugging\n"
+    "    0020    eval/compile\n"
+    "\n"
+    "--trace -t [Flags] ...\n"
+    "    0001    opcodes\n"
+    "    0002    find_method\n"
+    "    0004    function calls\n"
+    );
 }
 
 static void
@@ -68,9 +80,9 @@ help(void)
     "    -j --jit-core\n"
     "    -p --profile\n"
     "    -S --switched-core\n"
-    "    -t --trace\n"
+    "    -t --trace [flags]\n"
     "   <VM options>\n"
-    "    -d --debug[=HEXFLAGS]\n"
+    "    -D --parrot-debug[=HEXFLAGS]\n"
     "       --help-debug\n"
     "    -w --warnings\n"
     "    -G --no-gc\n"
@@ -78,6 +90,7 @@ help(void)
     "       --leak-test|--destroy-at-end\n"
     "    -. --wait    Read a keystroke before starting\n"
     "   <Compiler options>\n"
+    "    -d --imcc_debug[=HEXFLAGS]\n"
     "    -v --verbose\n"
     "    -E --pre-process-only\n"
     "    -o --output=FILE\n"
@@ -122,8 +135,10 @@ the GNU General Public License or the Artistic License for more details.\n\n");
     Parrot_exit(0);
 }
 
-#define setopt(flag)   Parrot_set_flag(interp, flag)
-#define setcore(core)  Parrot_set_run_core(interp, core)
+#define SET_FLAG(flag)   Parrot_set_flag(interp, flag)
+#define SET_DEBUG(flag)  Parrot_set_debug(interp, flag)
+#define SET_TRACE(flag)  Parrot_set_trace(interp, flag)
+#define SET_CORE(core)   Parrot_set_run_core(interp, core)
 
 #define OPT_GC_DEBUG     128
 #define OPT_DESTROY_FLAG 129
@@ -132,6 +147,7 @@ the GNU General Public License or the Artistic License for more details.\n\n");
 static struct longopt_opt_decl options[] = {
     { '.', '.', 0, { "--wait" } },
     { 'C', 'C', 0, { "--CGP-core" } },
+    { 'D', 'D', OPTION_optional_FLAG, { "---parrot-debug" } },
     { 'E', 'E', 0, { "--pre-process-only" } },
     { 'G', 'G', 0, { "--no-gc" } },
     { 'O', 'O', OPTION_optional_FLAG, { "--optimize" } },
@@ -142,7 +158,7 @@ static struct longopt_opt_decl options[] = {
     { 'a', 'a', 0, { "--pasm" } },
     { 'b', 'b', 0, { "--bounds-checks", "--slow-core" } },
     { 'c', 'c', 0, { "--pbc" } },
-    { 'd', 'd', OPTION_optional_FLAG, { "--debug" } },
+    { 'd', 'd', OPTION_optional_FLAG, { "--imcc-debug" } },
     { '\0', OPT_HELP_DEBUG, 0, { "--help-debug" } },
     { 'f', 'f', 0, { "--fast-core" } },
     { 'g', 'g', 0, { "--computed-goto-core" } },
@@ -152,12 +168,21 @@ static struct longopt_opt_decl options[] = {
     { '\0', OPT_PBC_OUTPUT, 0, { "--output-pbc" } },
     { 'p', 'p', 0, { "--profile" } },
     { 'r', 'r', 0, { "--run-pbc" } },
-    { 't', 't', 0, { "--trace" } },
+    { 't', 't', OPTION_optional_FLAG, { "--trace" } },
     { 'v', 'v', 0, { "--verbose" } },
     { 'w', 'w', 0, { "--warnings" } },
     { 'y', 'y', 0, { "--yydebug" } },
     { 0, 0, 0, { NULL } }
 };
+
+static int
+is_all_hex_digitis(const char *s)
+{
+    for (; *s; s++)
+        if (!isxdigit(*s) )
+            return 0;
+    return 1;
+}
 
 /* most stolen from test_main.c */
 static char *
@@ -174,38 +199,47 @@ parseflags(Parrot_Interp interp, int *argc, char **argv[])
     while ((status = longopt_get(interp, *argc, *argv, options, &opt)) > 0) {
         switch (opt.opt_id) {
             case 'b':
-                setopt(PARROT_BOUNDS_FLAG);
+                SET_FLAG(PARROT_BOUNDS_FLAG);
                 break;
             case 'p':
-                setopt(PARROT_PROFILE_FLAG);
+                SET_FLAG(PARROT_PROFILE_FLAG);
                 break;
             case 't':
-                setopt(PARROT_TRACE_FLAG);
+                if (opt.opt_arg && is_all_hex_digitis(opt.opt_arg)) {
+                    SET_TRACE(strtoul(opt.opt_arg, 0, 16));
+                }
+                else
+                    SET_TRACE(PARROT_TRACE_OPS_FLAG);
                 break;
             case 'j':
-                setcore(PARROT_JIT_CORE);
+                SET_CORE(PARROT_JIT_CORE);
                 break;
             case 'S':
-                setcore(PARROT_SWITCH_CORE);
+                SET_CORE(PARROT_SWITCH_CORE);
                 break;
             case 'C':
-                setcore(PARROT_CGP_CORE);
+                SET_CORE(PARROT_CGP_CORE);
                 break;
             case 'f':
-                setcore(PARROT_FAST_CORE);
+                SET_CORE(PARROT_FAST_CORE);
                 break;
             case 'g':
-                setcore(PARROT_CGOTO_CORE);
+                SET_CORE(PARROT_CGOTO_CORE);
                 break;
             case 'd':
-                if (opt.opt_arg) {
+                if (opt.opt_arg && is_all_hex_digitis(opt.opt_arg)) {
                     IMCC_INFO(interp)->debug = strtoul(opt.opt_arg, 0, 16);
                 }
                 else {
                     IMCC_INFO(interp)->debug++;
                 }
-                if (IMCC_INFO(interp)->debug & 1)
-                    setopt(PARROT_DEBUG_FLAG);
+                break;
+            case 'D':
+                if (opt.opt_arg && is_all_hex_digitis(opt.opt_arg)) {
+                    SET_DEBUG(strtoul(opt.opt_arg, 0, 16));
+                }
+                else
+                    SET_DEBUG(PARROT_MEM_STAT_DEBUG_FLAG);
                 break;
             case 'w':
                 Parrot_setwarnings(interp, PARROT_WARNINGS_ALL_FLAG);
@@ -291,12 +325,12 @@ parseflags(Parrot_Interp interp, int *argc, char **argv[])
 #endif
                 }
                 if (strchr(optimizer_opt, 't')) {
-                    setcore(PARROT_SWITCH_CORE);
+                    SET_CORE(PARROT_SWITCH_CORE);
 #ifdef HAVE_COMPUTED_GOTO
-                    setcore(PARROT_CGP_CORE);
+                    SET_CORE(PARROT_CGP_CORE);
 #endif
 #if JIT_CAPABLE
-                    setcore(PARROT_JIT_CORE);
+                    SET_CORE(PARROT_JIT_CORE);
 #endif
                 }
                 break;
@@ -307,10 +341,10 @@ parseflags(Parrot_Interp interp, int *argc, char **argv[])
                         "PARROT_GC_DEBUG is set but the binary was "
                         "compiled with DISABLE_GC_DEBUG.");
 #endif
-                setopt(PARROT_GC_DEBUG_FLAG);
+                SET_FLAG(PARROT_GC_DEBUG_FLAG);
                 break;
             case OPT_DESTROY_FLAG:
-                setopt(PARROT_DESTROY_FLAG);
+                SET_FLAG(PARROT_DESTROY_FLAG);
                 break;
             default:
                 IMCC_fatal(interp, 1, "main: Invalid flag '%s' used."

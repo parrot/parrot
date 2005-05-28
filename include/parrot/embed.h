@@ -30,6 +30,14 @@ void Parrot_set_flag(Parrot_Interp, Parrot_Interp_flag);
 void Parrot_clear_flag(Parrot_Interp, Parrot_Interp_flag);
 Parrot_Int Parrot_test_flag(Parrot_Interp, Parrot_Interp_flag);
 
+void Parrot_set_trace(Parrot_Interp, Parrot_UInt);
+void Parrot_clear_trace(Parrot_Interp, Parrot_UInt);
+Parrot_UInt Parrot_test_trace(Parrot_Interp, Parrot_UInt);
+
+void Parrot_set_debug(Parrot_Interp, Parrot_UInt);
+void Parrot_clear_debug(Parrot_Interp, Parrot_UInt);
+Parrot_UInt Parrot_test_debug(Parrot_Interp, Parrot_UInt);
+
 void Parrot_set_run_core( Parrot_Interp, Parrot_Run_core_t core);
 
 void Parrot_setwarnings(Parrot_Interp, Parrot_warnclass);

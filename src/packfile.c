@@ -2141,7 +2141,7 @@ Parrot_switch_to_cs(Interp *interpreter,
     /* compiling source code uses this function too,
      * which gives misleading trace messages
      */
-    if (really && Interp_flags_TEST(interpreter, PARROT_TRACE_FLAG))
+    if (really && Interp_trace_TEST(interpreter, PARROT_TRACE_SUB_CALL_FLAG))
         PIO_eprintf(interpreter, "*** switching to %s\n",
                 new_cs->base.name);
     interpreter->code = new_cs;

@@ -1090,7 +1090,7 @@ debug_trace_find_meth(Interp* interpreter, PMC *class, STRING *name, PMC *sub)
 {
     STRING *class_name;
     const char *result;
-    if (!Interp_flags_TEST(interpreter, PARROT_TRACE_FLAG))
+    if (!Interp_trace_TEST(interpreter, PARROT_TRACE_FIND_METH_FLAG))
         return;
     if (PObj_is_class_TEST(class)) {
         SLOTTYPE *class_array = PMC_data(class);

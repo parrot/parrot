@@ -30,7 +30,7 @@ Parrot_PyClass_runops_fromc(Interp* interpreter, PMC *sub)
 
     bp_save = interpreter->ctx.bp;
 
-    if (Interp_flags_TEST(interpreter, PARROT_TRACE_FLAG)) {
+    if (Interp_trace_TEST(interpreter, PARROT_TRACE_SUB_CALL_FLAG)) {
         PIO_eprintf(interpreter, "# Invoking %Ss on %Ss\n",
            REG_STR(0), REG_PMC(2)->vtable->whoami);
     }

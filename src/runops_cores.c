@@ -144,7 +144,7 @@ runops_slow_core(Interp *interpreter, opcode_t *pc)
 
     dod = arena_base->dod_runs;
     gc = arena_base->collect_runs;
-    if (Interp_flags_TEST(interpreter, PARROT_TRACE_FLAG)) {
+    if (Interp_trace_TEST(interpreter, PARROT_TRACE_OPS_FLAG)) {
         trace_op(interpreter, code_start, code_end, pc);
     }
     while (pc) {/* && pc >= code_start && pc < code_end) {*/
@@ -152,7 +152,7 @@ runops_slow_core(Interp *interpreter, opcode_t *pc)
 
         DO_OP(pc, interpreter);
 
-        if (Interp_flags_TEST(interpreter, PARROT_TRACE_FLAG)) {
+        if (Interp_trace_TEST(interpreter, PARROT_TRACE_OPS_FLAG)) {
 #if USE_TRACE_INTERP
             mem_sys_memcopy(&trace_i->ctx, &interpreter->ctx,
                     sizeof(struct Parrot_Context));
@@ -172,7 +172,7 @@ runops_slow_core(Interp *interpreter, opcode_t *pc)
         }
     }
 #if USE_TRACE_INTERP
-    if (Interp_flags_TEST(interpreter, PARROT_TRACE_FLAG)) {
+    if (Interp_trace_TEST(interpreter, PARROT_TRACE_OPS_FLAG)) {
         /* restore trace context */
         mem_sys_memcopy(&trace_i->ctx, trace_ctx,
                 sizeof(struct Parrot_Context));

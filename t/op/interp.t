@@ -17,7 +17,7 @@ C<interpinfo> opcode.
 
 =cut
 
-use Parrot::Test tests => 12;
+use Parrot::Test tests => 11;
 
 output_is(<<'CODE', <<'OUTPUT', "runinterp - new style");
 	new P0, .ParrotInterpreter
@@ -107,26 +107,6 @@ ok2:
 CODE
 ok 1
 ok 2
-OUTPUT
-
-output_like(<<'CODE', <<'OUTPUT', "runinterp - set flags");
-    .include "interpflags.pasm"
-    new P0, .ParrotInterpreter
-    print "calling\n"
-    set P0[-1], .INTERPFLAG_PARROT_TRACE_FLAG
-    runinterp P0, foo
-    print "ending\n"
-    end
-    print "bad things!\n"
-foo:
-    print "In 2\n"
-    end
-CODE
-/calling\n
-\s+\d+.*\n
-In\s2\n
-\s+\d+.*\n
-ending\n/x
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "check_events");

@@ -362,7 +362,7 @@ pt_thread_join(Parrot_Interp parent, UINTVAL tid)
         }
         interpreter_array[tid] = NULL;
         running_threads--;
-        if (Interp_flags_TEST(parent, PARROT_DEBUG_FLAG))
+        if (Interp_debug_TEST(parent, PARROT_THREAD_DEBUG_FLAG))
             fprintf(stderr, "running threads %d\n", running_threads);
         Parrot_really_destroy(0, interpreter);
         CLEANUP_POP(1);
@@ -565,7 +565,7 @@ pt_add_to_interpreters(Parrot_Interp interpreter, Parrot_Interp new_interp)
     new_interp->thread_data = mem_sys_allocate_zeroed(sizeof(Thread_data));
     INTERPRETER_LOCK_INIT(new_interp);
     running_threads++;
-    if (Interp_flags_TEST(interpreter, PARROT_DEBUG_FLAG))
+    if (Interp_debug_TEST(interpreter, PARROT_THREAD_DEBUG_FLAG))
         fprintf(stderr, "running threads %d\n", running_threads);
     /*
      * look for an empty slot

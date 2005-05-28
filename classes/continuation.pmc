@@ -201,7 +201,7 @@ destination to continue execution.
 
         caller_regs = INTERP->ctx.bp;
         restore_context(INTERP, &cc->ctx);
-        if (Interp_flags_TEST(INTERP, PARROT_TRACE_FLAG)) {
+        if (Interp_trace_TEST(INTERP, PARROT_TRACE_SUB_CALL_FLAG)) {
             PMC *sub = INTERP->ctx.current_sub;
             STRING *unk = CONST_STRING(INTERP, "(unknown");
             PIO_eprintf(INTERP, "# Back in sub '%Ss'\n",

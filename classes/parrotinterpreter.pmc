@@ -521,8 +521,6 @@ Sets the interpreter info for C<key> to C<val>.
         switch (key) {
             case -1:    /* set interpreter flags */
             allowed =
-                PARROT_DEBUG_FLAG |
-                PARROT_TRACE_FLAG |
                 PARROT_BOUNDS_FLAG |
                 PARROT_PROFILE_FLAG |
                 PARROT_GC_DEBUG_FLAG;

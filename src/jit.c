@@ -1547,7 +1547,7 @@ build_asm(Interp *interpreter, opcode_t *pc,
 
     /* assume gdb is available: generate symbol information  */
 #if defined __GNUC__ || defined __IBMC__
-    if (Interp_flags_TEST(interpreter, PARROT_DEBUG_FLAG)) {
+    if (Interp_debug_TEST(interpreter, PARROT_JIT_DEBUG_FLAG)) {
         /*
          * TODO same like above here e.g. create ASM listing of code
          *      if real debug support isn't available

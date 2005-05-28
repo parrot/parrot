@@ -683,13 +683,13 @@ affecting its subsequent operation.
 
 =item B<debug>(in INT)
 
-If $1 is zero, turn off debugging. Otherwise turn it on.
+If $1 is zero, turn off debugging. Otherwise turn debug flag $1 on.
 
 =cut
 
 inline op debug(in INT) {
-  if ($1 != 0) { Interp_flags_SET(interpreter,   PARROT_DEBUG_FLAG); }
-  else         { Interp_flags_CLEAR(interpreter, PARROT_DEBUG_FLAG); }
+  if ($1 != 0) { Interp_debug_SET(interpreter,   $1); }
+  else         { Interp_debug_CLEAR(interpreter, PARROT_ALL_DEBUG_FLAGS); }
   restart NEXT();
 }
 
@@ -728,13 +728,13 @@ inline op profile(in INT) {
 
 =item B<trace>(in INT)
 
-If $1 is zero, turn off tracing. Otherwise turn it on.
+If $1 is zero, turn off tracing. Otherwise turn trace flag $1 on.
 
 =cut
 
 inline op trace(in INT) {
-  if ($1 != 0) { Parrot_set_flag(interpreter,   PARROT_TRACE_FLAG); }
-  else         { Interp_flags_CLEAR(interpreter, PARROT_TRACE_FLAG); }
+  if ($1 != 0) { Parrot_set_trace(interpreter,   $1); }
+  else         { Parrot_clear_trace(interpreter, PARROT_ALL_TRACE_FLAGS); }
   restart NEXT();
 }
 

@@ -55,7 +55,7 @@ static PMC *
 find_meth(Interp* interpreter, PMC *pmc, STRING *meth) {
     PMC *class = pmc;
 
-    if (Interp_flags_TEST(interpreter, PARROT_TRACE_FLAG)) {
+    if (Interp_trace_TEST(interpreter, PARROT_TRACE_SUB_CALL_FLAG)) {
         char *name = string_to_cstring(interpreter, meth);
         PIO_eprintf(interpreter, "# Calling meth '%s'\n#", name);
         string_cstring_free(name);
@@ -132,7 +132,7 @@ noarg_noreturn(Interp* interpreter, PMC *obj, PMC* class,
     PMC *method = die ? find_or_die(interpreter, class, meth) :
         find_meth(interpreter, class, meth);
     if (PMC_IS_NULL(method)) {
-        if (Interp_flags_TEST(interpreter, PARROT_TRACE_FLAG)) {
+        if (Interp_trace_TEST(interpreter, PARROT_TRACE_FIND_METH_FLAG)) {
             PIO_eprintf(interpreter, "# not found\n");
         }
         return;

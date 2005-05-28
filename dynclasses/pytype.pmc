@@ -54,13 +54,13 @@ Looks up the method for C<*method_name> and returns it.
         PMC *method = VTABLE_getprop(INTERP, SELF, method_name);
         if (method && VTABLE_defined(INTERP, method)) {
             PMC *get;
-           
+
             PMC *object = INTERP->ctx.current_object;
             if (!object) object = SELF;
 
-            if (Interp_flags_TEST(INTERP, PARROT_TRACE_FLAG)) {
+            if (Interp_trace_TEST(interpreter, PARROT_TRACE_FIND_METH_FLAG)) {
                 PIO_eprintf(INTERP, "# Found %Ss method %Ss on %Ss\n",
-                   method->vtable->whoami, method_name, 
+                   method->vtable->whoami, method_name,
                    VTABLE_name(INTERP, object));
             }
 
@@ -248,7 +248,7 @@ Create a new integer
             /* TODO: multiple bases */
             /* TODO: vars */
             PMC *base = VTABLE_get_pmc_keyed_int(INTERP, bases, 0);
-            PMC *type = VTABLE_subclass(INTERP, base, 
+            PMC *type = VTABLE_subclass(INTERP, base,
                 VTABLE_get_string(INTERP, name));
             return type;
         }

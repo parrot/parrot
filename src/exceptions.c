@@ -702,7 +702,7 @@ real_exception(Interp *interpreter, void *ret_addr,
     the_exception->error = exitcode;
     the_exception->msg = msg;
     the_exception->resume = ret_addr;
-    if (Interp_flags_TEST(interpreter, PARROT_DEBUG_FLAG)) {
+    if (Interp_debug_TEST(interpreter, PARROT_BACKTRACE_DEBUG_FLAG)) {
 	PIO_eprintf(interpreter, "real_exception (severity:%d error:%d): %Ss\n",
 	    EXCEPT_error, exitcode, msg );
 	PDB_backtrace(interpreter);

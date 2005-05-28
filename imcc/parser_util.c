@@ -673,7 +673,7 @@ imcc_compile(Parrot_Interp interp, const char *s, int pasm_file)
     cur_namespace = NULL;
     IMCC_INFO(interp)->cur_namespace = NULL;
     /* spit out the sourcefile */
-    if (Interp_flags_TEST(interp, PARROT_DEBUG_FLAG)) {
+    if (Interp_debug_TEST(interp, PARROT_EVAL_DEBUG_FLAG)) {
         FILE *fp = fopen(name, "w");
         if (fp) {
             fputs(s, fp);

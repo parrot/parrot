@@ -16,11 +16,9 @@
 /* These should be visible to embedders. */
 
 /* General flags */
-/* &gen_from_enum(interpflags.pasm) prefix(INTERPFLAG_) */
+/* &gen_from_enum(interpflags.pasm) */
 typedef enum {
-    NO_FLAGS                = 0x00,
-    PARROT_DEBUG_FLAG       = 0x01,  /* We're debugging */
-    PARROT_TRACE_FLAG       = 0x02,  /* We're tracing execution */
+    PARROT_NO_FLAGS         = 0x00,
     PARROT_BOUNDS_FLAG      = 0x04,  /* We're tracking byte code bounds */
     PARROT_PROFILE_FLAG     = 0x08,  /* gathering profile information */
     PARROT_GC_DEBUG_FLAG    = 0x10,  /* debugging memory management */
@@ -38,7 +36,29 @@ typedef enum {
                         PARROT_THR_THREAD_POOL
 
 } Parrot_Interp_flag;
+/* &end_gen */
 
+/* &gen_from_enum(interpdebug.pasm) */
+typedef enum {
+    PARROT_NO_DEBUG                 = 0x00,
+    PARROT_MEM_STAT_DEBUG_FLAG      = 0x01,  /* memory usage summary */
+    PARROT_BACKTRACE_DEBUG_FLAG     = 0x02,  /* print bt in exception */
+    PARROT_JIT_DEBUG_FLAG           = 0x04,
+    PARROT_START_DEBUG_FLAG         = 0x08,
+    PARROT_THREAD_DEBUG_FLAG        = 0x10,
+    PARROT_EVAL_DEBUG_FLAG          = 0x20,
+    PARROT_ALL_DEBUG_FLAGS          = 0xffff
+} Parrot_debug_flags;
+/* &end_gen */
+
+/* &gen_from_enum(interptrace.pasm) */
+typedef enum {
+    PARROT_NO_TRACE                 = 0x00,
+    PARROT_TRACE_OPS_FLAG           = 0x01,  /* op execution trace */
+    PARROT_TRACE_FIND_METH_FLAG     = 0x02,  /* find_method */
+    PARROT_TRACE_SUB_CALL_FLAG      = 0x04,  /* invoke/retcc */
+    PARROT_ALL_TRACE_FLAGS          = 0xffff
+} Parrot_trace_flags;
 /* &end_gen */
 
 /* &gen_from_enum(interpcores.pasm) */
@@ -63,12 +83,20 @@ typedef struct parrot_interp_t *Parrot_Interp;
 typedef Parrot_Interp_flag Interp_flags;
 typedef Parrot_Run_core_t Run_Cores;
 
-#define Interp_flags_SET(interp, flag)   (/*@i1@*/ (interp)->flags |= (flag))
-#define Interp_flags_CLEAR(interp, flag) (/*@i1@*/ (interp)->flags &= ~(flag))
-#define Interp_flags_TEST(interp, flag)  (/*@i1@*/ (interp)->flags & (flag))
+#define Interp_flags_SET(interp, flag)   ((interp)->flags |= (flag))
+#define Interp_flags_CLEAR(interp, flag) ((interp)->flags &= ~(flag))
+#define Interp_flags_TEST(interp, flag)  ((interp)->flags & (flag))
 
-#define Interp_core_SET(interp, core)   (/*@i1@*/ (interp)->run_core = (core))
-#define Interp_core_TEST(interp, core)  (/*@i1@*/ (interp)->run_core == (core))
+#define Interp_debug_SET(interp, flag)   ((interp)->debug_flags |= (flag))
+#define Interp_debug_CLEAR(interp, flag) ((interp)->debug_flags &= ~(flag))
+#define Interp_debug_TEST(interp, flag)  ((interp)->debug_flags & (flag))
+
+#define Interp_trace_SET(interp, flag)   ((interp)->ctx.trace_flags |= (flag))
+#define Interp_trace_CLEAR(interp, flag) ((interp)->ctx.trace_flags &= ~(flag))
+#define Interp_trace_TEST(interp, flag)  ((interp)->ctx.trace_flags & (flag))
+
+#define Interp_core_SET(interp, core)   ((interp)->run_core = (core))
+#define Interp_core_TEST(interp, core)  ((interp)->run_core == (core))
 
 #include "parrot/register.h"
 #include "parrot/parrot.h"
@@ -167,6 +195,7 @@ typedef struct Parrot_Context {
     UINTVAL warns;             /* Keeps track of what warnings
                                  * have been activated */
     UINTVAL errors;            /* fatals that can be turned off */
+    UINTVAL trace_flags;
     UINTVAL recursion_depth;    /* Sub call resursion depth */
     int runloop_level;                  /* for reentering run loop */
     /*
@@ -235,6 +264,7 @@ struct parrot_interp_t {
 #endif
 
     Interp_flags flags;         /* Various interpreter flags that */
+    UINTVAL debug_flags;        /* debug settings */
     Run_Cores run_core;         /* type of core to run the ops */
 
     /* TODO profile per code segment or global */
