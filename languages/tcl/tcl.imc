@@ -35,6 +35,7 @@ input_loop:
   print "% " # XXX Doesn't respect a set tcl_prompt1
   STDOUT."flush"()
   input_line = readline STDIN
+  unless STDIN goto done
   $P1 = parser."parse"(input_line,0,0)
   (retcode,retval) = interpret($P1)
   # print out the result of the evaluation.
