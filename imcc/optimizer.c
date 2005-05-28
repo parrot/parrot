@@ -264,6 +264,50 @@ strength_reduce(Interp *interpreter, IMC_Unit * unit)
         }
         if (found)
             continue;
+         /*
+         * add Ix, Iy, 0 => set Ix, Iy
+         * add Ix, 0, Iy => set Ix, Iy
+         * add Ix, 0     => delete
+         */
+        if ( ( ( ( ins->opsize >= 3 &&
+                          ins->r[1]->type == VTCONST &&
+                          atof(ins->r[1]->name) == 0.0) ||
+                      (ins->opsize == 4 &&
+                       ins->r[2]->type == VTCONST &&
+                       atof(ins->r[2]->name) == 0.0)) &&
+                  !strcmp(ins->op, "add")) ||
+         /*
+         * sub Ix, Iy, 0 => set Ix, Iy
+         * sub Ix, 0     => delete
+         */
+             ( ( ( ins->opsize == 3 &&
+                          ins->r[1]->type == VTCONST &&
+                          atof(ins->r[1]->name) == 0.0) ||
+                      (ins->opsize == 4 &&
+                       ins->r[2]->type == VTCONST &&
+                       atof(ins->r[2]->name) == 0.0)) &&
+                  !strcmp(ins->op, "sub"))) {
+            IMCC_debug(interpreter, DEBUG_OPT1, "opt1 %I => ", ins);
+            if (ins->opsize == 3) {
+                /* add Ix, 0 */
+                ins = delete_ins(unit, ins, 1);
+                ins = ins->prev ? ins->prev : unit->instructions;
+                IMCC_debug(interpreter, DEBUG_OPT1, "deleted\n");
+                continue;
+            }
+            if (ins->r[1]->type == VTCONST) {
+                --ins->r[1]->use_count;
+                ins->r[1] = ins->r[2];
+            }
+            else {
+                --ins->r[2]->use_count;
+            }
+            tmp = INS(interpreter, unit, "set", "", ins->r, 2, 0, 0);
+            IMCC_debug(interpreter, DEBUG_OPT1, "%I\n", tmp);
+            subst_ins(unit, ins, tmp, 1);
+            ins = tmp;
+            continue;
+        }
         /*
          * mul Ix, Iy, 0 => set Ix, 0
          * mul Ix, 0, Iy => set Ix, 0

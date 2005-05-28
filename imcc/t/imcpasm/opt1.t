@@ -3,7 +3,7 @@
 # $Id$
 
 use strict;
-use Parrot::Test tests => 49;
+use Parrot::Test tests => 56;
 
 # these tests are run with -O1 by TestCompiler and show
 # generated PASM code for various optimizations at level 1
@@ -541,6 +541,102 @@ _main:
 OUT
 
 ##############################
+pir_2_pasm_is(<<'CODE', <<'OUT', "strength add I, 0");
+.sub _main
+   add I0, 0
+   end
+.end
+CODE
+# IMCC does produce b0rken PASM files
+# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
+_main:
+   end
+OUT
+
+##############################
+pir_2_pasm_is(<<'CODE', <<'OUT', "strength add I, I, 0");
+.sub _main
+   add I0, I1, 0
+   end
+.end
+CODE
+# IMCC does produce b0rken PASM files
+# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
+_main:
+   set I0, I1
+   end
+OUT
+
+##############################
+pir_2_pasm_is(<<'CODE', <<'OUT', "strength add I, 0, I");
+.sub _main
+   add I0, 0, I1
+   end
+.end
+CODE
+# IMCC does produce b0rken PASM files
+# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
+_main:
+   set I0,  I1
+   end
+OUT
+
+##############################
+pir_2_pasm_is(<<'CODE', <<'OUT', "strength add N, 0, N");
+.sub _main
+   add N0, 0.0, N1
+   end
+.end
+CODE
+# IMCC does produce b0rken PASM files
+# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
+_main:
+   set N0, N1
+   end
+OUT
+
+###############################
+pir_2_pasm_is(<<'CODE', <<'OUT', "strength sub I, 0");
+.sub _main
+   sub I0, 0
+   end
+.end
+CODE
+# IMCC does produce b0rken PASM files
+# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
+_main:
+   end
+OUT
+
+##############################
+pir_2_pasm_is(<<'CODE', <<'OUT', "strength sub I, I, 0");
+.sub _main
+   sub I0, I1, 0
+   end
+.end
+CODE
+# IMCC does produce b0rken PASM files
+# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
+_main:
+   set I0, I1
+   end
+OUT
+
+##############################
+pir_2_pasm_is(<<'CODE', <<'OUT', "strength sub N, N, 0");
+.sub _main
+   sub N0, N1, 0
+   end
+.end
+CODE
+# IMCC does produce b0rken PASM files
+# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
+_main:
+   set N0, N1
+   end
+OUT
+
+#############################
 pir_2_pasm_is(<<'CODE', <<'OUT', "strength mul I, 0");
 .sub _main
    mul I0, 0
