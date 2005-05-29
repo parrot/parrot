@@ -85,6 +85,7 @@ providing a compreg-compatible method.
   load_bytecode "languages/tcl/lib/tclword.pbc"
   load_bytecode "library/Data/Escape.pbc"
   load_bytecode "library/PGE.pbc"
+  load_bytecode "library/PGE/Glob.pir"
  
   .local int TclArray
   TclArray = find_type "TclArray" # happy case.
@@ -221,30 +222,38 @@ providing a compreg-compatible method.
 
 .end
 
-.sub _tcl_compile 
+.sub _tcl_compile
   .param string tcl_code
 
   .local pmc pir_compiler
   .local string pir_code
 
   .local pmc escaper
-  escaper = find_global "Data::Escape", "String" 
- 
+  escaper = find_global "Data::Escape", "String"
+
   pir_compiler = compreg "PIR"
 
-  .local pmc compiled_num  
+  .local pmc compiled_num
   compiled_num = find_global "_Tcl", "compiled_num"
+  inc compiled_num
+
+  .local int TclParser
+  TclParser = find_type "TclParser"
 
   pir_code = ".namespace [ \"_Tcl\" ]\n.sub _compiled_sub"
   $S0 = compiled_num
   pir_code .= $S0
-  pir_code .= " @ANON\n.local pmc code\n.local pmc zero\nzero = new Integer\nzero = 0\ncode=new String\ncode = \""
+  pir_code .= " @ANON\n.local string code\ncode = \""
   tcl_code = escaper(tcl_code,"\"")
   pir_code .= tcl_code
-  pir_code .= "\"\n.local pmc parser\n.local pmc tcl_interpret\nparser = find_global \"_Tcl\", \"parser\"\ntcl_interpret = find_global \"_Tcl\", \"__interpret\"\n$P1 = parser.\"parse\"(code,zero,zero)\n($I0,$P3) = tcl_interpret($P1)\n.return($I0,$P3)\n .end\n"
- 
+  pir_code .= "\"\n.local pmc parser\n.local pmc tcl_interpret\nparser = new "
+  $S0 = TclParser
+  pir_code .= $S0
+  pir_code .= "\ntcl_interpret = find_global \"_Tcl\", \"__interpret\"\n$P1 = parser.\"parse\"(code,0,0)\n.return tcl_interpret($P1)\n.end\n"
+
   $P1 = compile pir_compiler, pir_code
   .return ($P1)
 .end
+
 
 ${INCLUDES}
