@@ -162,9 +162,6 @@ EOTCL
 $expected = "abcde";
 language_output_is("tcl",$tcl,$expected,"range, overextended");
 
-TODO: {
-local $TODO = "New version of PGE\n";
-
 language_output_is("tcl",<<TCL,<<OUT,"string match * only");
   puts [string match * foo]
 TCL
@@ -177,6 +174,8 @@ TCL
 1
 OUT
 
+TODO: {
+local $TODO = "character classes not implemented in PGE globs";
 language_output_is("tcl",<<TCL,<<OUT,"string match charset");
   puts [string match {a[bc]c} abc]
 TCL
@@ -188,6 +187,7 @@ language_output_is("tcl",<<TCL,<<OUT,"string match charset, fail");
 TCL
 0
 OUT
+}
 
 language_output_is("tcl",<<TCL,<<OUT,"string match \*");
   puts [string match {\*} *]
@@ -207,6 +207,8 @@ TCL
 0
 OUT
 
+TODO: {
+ local $TODO = "PGE doesn't support no case yet, though we could just fake it.";
 language_output_is("tcl",<<TCL,<<OUT,"string match nocase");
   puts [string match -nocase ABC abc ]
 TCL

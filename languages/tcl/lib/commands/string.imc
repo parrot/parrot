@@ -115,8 +115,8 @@ match_next:
   .local pmc globber
   globber = find_global "PGE", "glob"
  
-  .local pmc rule
-  rule = globber(pattern)
+  .local pmc rule, pir, exp
+  (rule, pir, exp) = globber(pattern)
 
   .local pmc match
   match = rule(the_string)
