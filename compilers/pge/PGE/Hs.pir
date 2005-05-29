@@ -63,6 +63,11 @@ whole thing may be taken out or refactored away at any moment.
     load = find_global "PGE::P6Rule", "__onload"
     load()
     load_bytecode "library/Data/Escape.imc"
+    add_perl6_builtin_rules()
+.end
+
+.sub "add_perl6_builtin_rules" method
+    add_rule("ident", "\w+")
 .end
 
 .sub "add_rule" method
