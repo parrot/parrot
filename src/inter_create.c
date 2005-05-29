@@ -114,6 +114,7 @@ make_interpreter(Parrot_Interp parent, Interp_flags flags)
     else {
         SET_NULL(interpreter->parent_interpreter);
         SET_NULL(interpreter->lo_var_ptr);
+        MUTEX_INIT(class_count_mutex);
     }
     interpreter->resume_flag = RESUME_INITIAL;
     interpreter->recursion_limit = 1000;
@@ -406,6 +407,7 @@ Parrot_really_destroy(int exit_code, void *vinterp)
         mem_sys_free(interpreter->evc_func_table);
     /* strings, chartype, encodings */
     if (!interpreter->parent_interpreter) {
+        MUTEX_DESTROY(class_count_mutex);
         string_deinit(interpreter);
         /*
            chartype_destroy();
