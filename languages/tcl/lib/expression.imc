@@ -278,7 +278,7 @@ converter_loop:
   if $I2 == OP   goto is_opfunc
   if $I2 == FUNC goto is_opfunc # XXX should eventually go away as we make functions part of "CHUNK", above.
 
-  # Should never be reached
+  # Should never be reached (XXX then shouldn't we die horribly?)
   goto converter_next 
 
 is_opfunc:

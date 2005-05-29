@@ -1,5 +1,3 @@
-.include "runtime/parrot/library/dumper.imc"
-
 ###
 # [expr]
 
@@ -40,10 +38,6 @@ loop:
 
 loop_done:
   (return_type,retval) = expression_p(expr)
-  #_dumper(retval,"RETVAL")
-  #print "rt:"
-  #print return_type
-  #print "\n"
   if return_type==TCL_ERROR goto done
   (return_type,retval) = expression_i(retval) 
 done:
