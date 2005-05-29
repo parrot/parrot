@@ -788,9 +788,17 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "multi key access");
     elem = matrix[0;0]
     print elem
     print "\n"
+
+    matrix[0;1] = 43
+    print "int in ResizableIntegerArray: "
+    elem = matrix[0;1]
+    print elem
+    print "\n"
+    
 .end
 CODE
 int in ResizableIntegerArray: 42
+int in ResizableIntegerArray: 43
 OUTPUT
 
 # don't forget to change the number of tests

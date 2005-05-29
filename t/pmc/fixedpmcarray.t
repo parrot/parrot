@@ -1,6 +1,5 @@
 #! perl -w
-
-# Copyright: 2001-2004 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 =head1 NAME
@@ -18,7 +17,7 @@ out-of-bounds test. Checks INT and PMC keys.
 
 =cut
 
-use Parrot::Test tests => 12;
+use Parrot::Test tests => 13;
 use Test::More;
 
 my $fp_equality_macro = <<'ENDOFMACRO';
@@ -402,4 +401,120 @@ pir_output_like(<<'CODE', <<'OUTPUT', "Getting unitialized elements");
 .end
 CODE
 /Null PMC access in name()/
+OUTPUT
+
+pir_output_is(<< 'CODE', << 'OUTPUT', "Multi keys");
+
+.sub test @MAIN
+    .local pmc    matrix, row
+    .local pmc    elem_in_pmc
+    .local pmc    elem_out_pmc
+    .local int    elem_out_int
+    .local num    elem_out_num
+    .local string elem_out_string
+
+    matrix = new FixedPMCArray
+    matrix = 1
+    row = new FixedPMCArray
+    row = 4           # assing with an integer, number, pmc, string
+    matrix[0] = row
+    matrix[0;0] = 128
+    matrix[0;1] = 128.128
+    elem_in_pmc = new Integer
+    elem_in_pmc = 256
+    matrix[0;2] = elem_in_pmc
+    matrix[0;3] = "asdf"
+
+    elem_out_int = matrix[0;0]
+    print "set_integer_keyed, get_integer_keyed: "
+    print elem_out_int
+    print "\n"
+
+    print "set_integer_keyed, get_pmc_keyed: "
+    elem_out_pmc = matrix[0;0]
+    print elem_out_pmc
+    print "\n"
+
+    print "set_integer_keyed, get_number_keyed: "
+    elem_out_num = matrix[0;0]
+    print elem_out_num
+    print "\n"
+
+    print "set_integer_keyed, get_string_keyed: "
+    elem_out_string = matrix[0;0]
+    print elem_out_string
+    print "\n"
+
+    print "set_number_keyed, get_pmc_keyed: "
+    elem_out_pmc = matrix[0;1]
+    print elem_out_pmc
+    print "\n"
+
+    print "set_number_keyed, get_number_keyed: "
+    elem_out_num = matrix[0;1]
+    print elem_out_num
+    print "\n"
+
+    print "set_number_keyed, get_string_keyed: "
+    elem_out_string = matrix[0;1]
+    print elem_out_string
+    print "\n"
+
+    elem_out_int = matrix[0;2]
+    print "set_pmc_keyed, get_integer_keyed: "
+    print elem_out_int
+    print "\n"
+
+    print "set_pmc_keyed, get_pmc_keyed: "
+    elem_out_pmc = matrix[0;2]
+    print elem_out_pmc
+    print "\n"
+
+    print "set_pmc_keyed, get_number_keyed: "
+    elem_out_num = matrix[0;2]
+    print elem_out_num
+    print "\n"
+
+    print "set_pmc_keyed, get_string_keyed: "
+    elem_out_string = matrix[0;2]
+    print elem_out_string
+    print "\n"
+
+    elem_out_int = matrix[0;0]
+    print "set_integer_keyed, get_integer_keyed: "
+    print elem_out_int
+    print "\n"
+
+    print "set_integer_keyed, get_pmc_keyed: "
+    elem_out_pmc = matrix[0;0]
+    print elem_out_pmc
+    print "\n"
+
+    print "set_integer_keyed, get_number_keyed: "
+    elem_out_num = matrix[0;0]
+    print elem_out_num
+    print "\n"
+
+    print "set_integer_keyed, get_string_keyed: "
+    elem_out_string = matrix[0;0]
+    print elem_out_string
+    print "\n"
+
+.end
+CODE
+set_integer_keyed, get_integer_keyed: 128
+set_integer_keyed, get_pmc_keyed: 128
+set_integer_keyed, get_number_keyed: 128.000000
+set_integer_keyed, get_string_keyed: 128
+set_number_keyed, get_pmc_keyed: 128.128
+set_number_keyed, get_number_keyed: 128.128000
+set_number_keyed, get_string_keyed: 128.128
+set_pmc_keyed, get_integer_keyed: 256
+set_pmc_keyed, get_pmc_keyed: 256
+set_pmc_keyed, get_number_keyed: 256.000000
+set_pmc_keyed, get_string_keyed: 256
+set_integer_keyed, get_integer_keyed: 128
+set_integer_keyed, get_pmc_keyed: 128
+set_integer_keyed, get_number_keyed: 128.000000
+set_integer_keyed, get_string_keyed: 128
 OUTPUT

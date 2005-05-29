@@ -26,7 +26,7 @@ LOAD_EOF:
         concat S1, "\n"         # Add a trailing newline if needed.
         length I0, S1           # I0 = length of the buffer
         set I1, -1              # I1 = character offset in the file
-        new P1, .PerlArray      # P1 = the playing field
+        new P1, .ResizablePMCArray      # P1 = the playing field
         new P2, .PerlArray      # P2 = the current line (array of ints)
 
 LOAD_PARSE_BUFFER:

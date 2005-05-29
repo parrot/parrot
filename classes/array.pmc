@@ -689,17 +689,18 @@ Sets the PMC at element C<idx> to C<*src>.
 
 =item C<void set_pmc_keyed (PMC* key, PMC* value)>
 
-Sets the PMC at element C<key> to C<*value>.
+Sets the PMC at index C<key> to C<value>.
 
 =cut
 
 */
 
     void set_pmc_keyed (PMC* key, PMC* value) {
-        INTVAL ix = key_integer(INTERP, key);
+        INTVAL ix;
         PMC* nextkey;
         PMC* box;
 
+        ix = key_integer(INTERP, key);
         nextkey = key_next(INTERP, key);
         if (nextkey == NULL) {
             VTABLE_set_pmc_keyed_int(INTERP, SELF, ix, value);

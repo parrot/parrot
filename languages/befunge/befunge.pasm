@@ -38,6 +38,23 @@ ARGV_DONE:
         set S2, ""              # S2 = user input
 
 TICK:
+         
+         typeof S12, P1
+         #print S12
+         ##print " "
+         #print I1
+         #print " "
+         #print I0
+         #print " "
+         set P6, P1[I1]
+         typeof S12, P6
+         #print S12
+         #print " "
+         set P7, P6[I0]
+         typeof S12, P7
+         #print S12
+         #print " "
+         ##print "\n"
         set I20, P1[I1;I0]
         chr S0, I20             # S0 = current instruction
         eq I5, 0, TICK_NODEBUG
