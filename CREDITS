@@ -90,6 +90,9 @@ D: Many PIR tests and fixes
 N: Cory Spencer
 D: Peek opcode and PIO implementation
 
+N: Curtis Rawls
+D: imcc optimizer patches and tests
+
 N: Dan Sugalski
 D: The big cheese emeritus
 E: dan@sidhe.org

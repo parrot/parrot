@@ -3,7 +3,7 @@
 # $Id$
 
 use strict;
-use Parrot::Test tests => 56;
+use Parrot::Test tests => 62;
 
 # these tests are run with -O1 by TestCompiler and show
 # generated PASM code for various optimizations at level 1
@@ -623,6 +623,20 @@ _main:
 OUT
 
 ##############################
+pir_2_pasm_is(<<'CODE', <<'OUT', "strength sub I, 0, I");
+.sub _main
+   sub I0, 0, I1
+   end
+.end
+CODE
+# IMCC does produce b0rken PASM files
+# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
+_main:
+   sub I0, 0, I1
+   end
+OUT
+
+##############################
 pir_2_pasm_is(<<'CODE', <<'OUT', "strength sub N, N, 0");
 .sub _main
    sub N0, N1, 0
@@ -775,9 +789,78 @@ _main:
 OUT
 
 ##############################
+pir_2_pasm_is(<<'CODE', <<'OUT', "strength div I, 1, I");
+.sub _main
+   div I0, 1, I1
+   end
+.end
+CODE
+# IMCC does produce b0rken PASM files
+# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
+_main:
+   div I0, 1, I1
+   end
+OUT
+
+##############################
 pir_2_pasm_is(<<'CODE', <<'OUT', "strength div N, N, 1");
 .sub _main
    div N0, N1, 1
+   end
+.end
+CODE
+# IMCC does produce b0rken PASM files
+# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
+_main:
+   set N0, N1
+   end
+OUT
+
+##############################
+pir_2_pasm_is(<<'CODE', <<'OUT', "strength fdiv I, 1");
+.sub _main
+   fdiv I0, 1
+   end
+.end
+CODE
+# IMCC does produce b0rken PASM files
+# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
+_main:
+   end
+OUT
+
+##############################
+pir_2_pasm_is(<<'CODE', <<'OUT', "strength fdiv I, I, 1");
+.sub _main
+   fdiv I0, I1, 1
+   end
+.end
+CODE
+# IMCC does produce b0rken PASM files
+# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
+_main:
+   set I0, I1
+   end
+OUT
+
+##############################
+pir_2_pasm_is(<<'CODE', <<'OUT', "strength fdiv I, 1, I");
+.sub _main
+   fdiv I0, 1, I1
+   end
+.end
+CODE
+# IMCC does produce b0rken PASM files
+# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
+_main:
+   fdiv I0, 1, I1
+   end
+OUT
+
+##############################
+pir_2_pasm_is(<<'CODE', <<'OUT', "strength fdiv N, N, 1");
+.sub _main
+   fdiv N0, N1, 1
    end
 .end
 CODE

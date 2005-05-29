@@ -9,6 +9,7 @@
 #include <string.h>
 #include "imc.h"
 #include "optimizer.h"
+#include "parrot/oplib/ops.h"
 
 
 /*
@@ -232,69 +233,123 @@ static void
 strength_reduce(Interp *interpreter, IMC_Unit * unit)
 {
     Instruction *ins, *tmp;
-    const char *ops[] = { "add", "sub", "mul", "div", "fdiv" };
-    size_t i;
-    int found;
     SymReg *r;
 
     IMCC_info(interpreter, 2, "\tstrength_reduce\n");
     for (ins = unit->instructions; ins; ins = ins->next) {
         /*
          * add Ix, Ix, Iy => add Ix, Iy
+         * add Ix, Iy, Ix => add Ix, Iy
          * sub Ix, Ix, Iy => sub Ix, Iy
-         * ...
+         * mul Ix, Ix, Iy => sub Ix, Iy
+         * mul Ix, Iy, Ix => sub Ix, Iy
+         * div Ix, Ix, Iy => sub Ix, Iy
+         * fdiv Ix, Ix, Iy => sub Ix, Iy
+         * add Nx, Nx, Ny => add Nx, Ny
+         * add Nx, Ny, Nx => add Nx, Ny
+         * sub Nx, Nx, Ny => sub Nx, Ny
+         * mul Nx, Nx, Ny => sub Nx, Ny
+         * mul Nx, Ny, Nx => sub Nx, Ny
+         * div Nx, Nx, Ny => sub Nx, Ny
+         * fdiv Nx, Nx, Ny => sub Nx, Ny
          */
-        found = 0;
-        if (ins->opsize < 3 || ins->r[0]->set == 'P')
-            continue;
-        for (i = 0; i < sizeof(ops)/sizeof(ops[0]); i++) {
-            if (ins->opsize == 4 &&
-                    ins->r[0] == ins->r[1] &&
-                    (ins->r[0]->set == 'I' || ins->r[0]->set == 'N') &&
-                    !strcmp(ins->op, ops[i])) {
-                IMCC_debug(interpreter, DEBUG_OPT1, "opt1 %I => ", ins);
+        if ( ( (ins->opnum == PARROT_OP_add_i_i_i ||
+                ins->opnum == PARROT_OP_sub_i_i_i ||
+                ins->opnum == PARROT_OP_mul_i_i_i ||
+                ins->opnum == PARROT_OP_div_i_i_i ||
+                ins->opnum == PARROT_OP_fdiv_i_i_i ||
+                ins->opnum == PARROT_OP_add_n_n_n ||
+                ins->opnum == PARROT_OP_sub_n_n_n ||
+                ins->opnum == PARROT_OP_mul_n_n_n ||
+                ins->opnum == PARROT_OP_div_n_n_n ||
+                ins->opnum == PARROT_OP_fdiv_n_n_n) &&
+             ins->r[0] == ins->r[1])
+          || ( (ins->opnum == PARROT_OP_add_i_i_i ||
+                ins->opnum == PARROT_OP_mul_i_i_i ||
+                ins->opnum == PARROT_OP_add_n_n_n ||
+                ins->opnum == PARROT_OP_mul_n_n_n) &&
+             (ins->r[0] == ins->r[1] || ins->r[0] == ins->r[2]))) {
+            IMCC_debug(interpreter, DEBUG_OPT1, "opt1 %I => ", ins);
+            if(ins->r[0] == ins->r[1]) {
                 ins->r[1] = ins->r[2];
-                tmp = INS(interpreter, unit, ins->op, "", ins->r, 2, 0, 0);
-                IMCC_debug(interpreter, DEBUG_OPT1, "%I\n", tmp);
-                subst_ins(unit, ins, tmp, 1);
-                ins = tmp;
-                found = 1;
-                break;
             }
-        }
-        if (found)
+            tmp = INS(interpreter, unit, ins->op, "", ins->r, 2, 0, 0);
+            IMCC_debug(interpreter, DEBUG_OPT1, "%I\n", tmp);
+            subst_ins(unit, ins, tmp, 1);
+            ins = tmp;
             continue;
-         /*
+        }
+        /*
+         * add Ix, 0     => delete
+         * sub Ix, 0     => delete
+         * mul Ix, 1     => delete
+         * div Ix, 1     => delete
+         * fdiv Ix, 1    => delete
+         * add Nx, 0     => delete
+         * sub Nx, 0     => delete
+         * mul Nx, 1     => delete
+         * div Nx, 1     => delete
+         * fdiv Nx, 1    => delete
+         */
+        if ( ( (ins->opnum == PARROT_OP_add_i_ic ||
+                ins->opnum == PARROT_OP_sub_i_ic) &&
+                      IMCC_int_from_reg(interpreter, ins->r[1]) == 0)
+          || ( (ins->opnum == PARROT_OP_mul_i_ic ||
+                ins->opnum == PARROT_OP_div_i_ic ||
+                ins->opnum == PARROT_OP_fdiv_i_ic) &&
+                      IMCC_int_from_reg(interpreter, ins->r[1]) == 1)
+          || ( (ins->opnum == PARROT_OP_add_n_nc ||
+                ins->opnum == PARROT_OP_sub_n_nc) &&
+                      atof(ins->r[2]->name) == 0.0) 
+          || ( (ins->opnum == PARROT_OP_mul_n_nc ||
+                ins->opnum == PARROT_OP_div_n_nc ||
+                ins->opnum == PARROT_OP_fdiv_n_nc) &&
+                      atof(ins->r[2]->name) == 1.0) ) {
+            IMCC_debug(interpreter, DEBUG_OPT1, "opt1 %I => ", ins);
+            ins = delete_ins(unit, ins, 1);
+            ins = ins->prev ? ins->prev : unit->instructions;
+            IMCC_debug(interpreter, DEBUG_OPT1, "deleted\n");
+            continue;
+        }
+        /*
          * add Ix, Iy, 0 => set Ix, Iy
          * add Ix, 0, Iy => set Ix, Iy
-         * add Ix, 0     => delete
-         */
-        if ( ( ( ( ins->opsize >= 3 &&
-                          ins->r[1]->type == VTCONST &&
-                          atof(ins->r[1]->name) == 0.0) ||
-                      (ins->opsize == 4 &&
-                       ins->r[2]->type == VTCONST &&
-                       atof(ins->r[2]->name) == 0.0)) &&
-                  !strcmp(ins->op, "add")) ||
-         /*
          * sub Ix, Iy, 0 => set Ix, Iy
-         * sub Ix, 0     => delete
+         * mul Ix, Iy, 1 => set Ix, Iy
+         * mul Ix, 1, Iy => set Ix, Iy
+         * div Ix, Iy, 1 => set Ix, Iy
+         * fdiv Ix, Iy, 1 => set Ix, Iy
+         * add Nx, Ny, 0 => set Nx, Ny
+         * add Nx, 0, Ny => set Nx, Ny
+         * sub Nx, Ny, 0 => set Nx, Ny
+         * mul Nx, Ny, 1 => set Nx, Ny
+         * mul Nx, 1, Ny => set Nx, Ny
+         * div Nx, Ny, 1 => set Nx, Ny
+         * fdiv Nx, Ny, 1 => set Nx, Ny
          */
-             ( ( ( ins->opsize == 3 &&
-                          ins->r[1]->type == VTCONST &&
-                          atof(ins->r[1]->name) == 0.0) ||
-                      (ins->opsize == 4 &&
-                       ins->r[2]->type == VTCONST &&
-                       atof(ins->r[2]->name) == 0.0)) &&
-                  !strcmp(ins->op, "sub"))) {
+        if ( ( (ins->opnum == PARROT_OP_add_i_i_ic ||
+                ins->opnum == PARROT_OP_sub_i_i_ic) &&
+                      IMCC_int_from_reg(interpreter, ins->r[2]) == 0)
+          || (  ins->opnum == PARROT_OP_add_i_ic_i &&
+                      IMCC_int_from_reg(interpreter, ins->r[1]) == 0)
+          || ( (ins->opnum == PARROT_OP_mul_i_i_ic ||
+                ins->opnum == PARROT_OP_div_i_i_ic ||
+                ins->opnum == PARROT_OP_fdiv_i_i_ic) &&
+                      IMCC_int_from_reg(interpreter, ins->r[2]) == 1)
+          || (  ins->opnum == PARROT_OP_mul_i_ic_i &&
+                      IMCC_int_from_reg(interpreter, ins->r[1]) == 1)
+          || ( (ins->opnum == PARROT_OP_add_n_n_nc ||
+                ins->opnum == PARROT_OP_sub_n_n_nc) &&
+                      atof(ins->r[2]->name) == 0.0)
+          || (  ins->opnum == PARROT_OP_add_n_nc_n &&
+                      atof(ins->r[1]->name) == 0.0)
+          || ( (ins->opnum == PARROT_OP_mul_n_n_nc ||
+                ins->opnum == PARROT_OP_div_n_n_nc ||
+                ins->opnum == PARROT_OP_fdiv_n_n_nc) &&
+                      atof(ins->r[2]->name) == 1.0)
+          || (  ins->opnum == PARROT_OP_mul_n_nc_n &&
+                      atof(ins->r[1]->name) == 1.0)) {
             IMCC_debug(interpreter, DEBUG_OPT1, "opt1 %I => ", ins);
-            if (ins->opsize == 3) {
-                /* add Ix, 0 */
-                ins = delete_ins(unit, ins, 1);
-                ins = ins->prev ? ins->prev : unit->instructions;
-                IMCC_debug(interpreter, DEBUG_OPT1, "deleted\n");
-                continue;
-            }
             if (ins->r[1]->type == VTCONST) {
                 --ins->r[1]->use_count;
                 ins->r[1] = ins->r[2];
@@ -313,13 +368,16 @@ strength_reduce(Interp *interpreter, IMC_Unit * unit)
          * mul Ix, 0, Iy => set Ix, 0
          * mul Ix, 0     => set Ix, 0
          */
-    if ( ( ( ins->opsize >= 3 &&
-                    ins->r[1]->type == VTCONST &&
-                    atof(ins->r[1]->name) == 0.0) ||
-                    (ins->opsize == 4 &&
-                     ins->r[2]->type == VTCONST &&
-                     atof(ins->r[2]->name) == 0.0)) &&
-                !strcmp(ins->op, "mul")) {
+        if ( (ins->opnum == PARROT_OP_mul_i_i_ic &&
+                      IMCC_int_from_reg(interpreter, ins->r[2]) == 0)
+          || ( (ins->opnum == PARROT_OP_mul_i_ic_i ||
+                ins->opnum == PARROT_OP_mul_i_ic) &&
+                      IMCC_int_from_reg(interpreter, ins->r[1]) == 0)
+          || (ins->opnum == PARROT_OP_mul_n_n_nc &&
+                      atof(ins->r[2]->name) == 0.0)
+          || ( (ins->opnum == PARROT_OP_mul_n_nc_n ||
+                ins->opnum == PARROT_OP_mul_n_nc) &&
+                      atof(ins->r[1]->name) == 0.0)) {
             IMCC_debug(interpreter, DEBUG_OPT1, "opt1 %I => ", ins);
             r = mk_const(interpreter, str_dup("0"), ins->r[0]->set);
             --ins->r[1]->use_count;
@@ -331,53 +389,6 @@ strength_reduce(Interp *interpreter, IMC_Unit * unit)
             subst_ins(unit, ins, tmp, 1);
             ins = tmp;
             continue;
-        }
-        /*
-         * mul Ix, Iy, 1 => set Ix, Iy
-         * mul Ix, 1, Iy => set Ix, Iy
-         * mul Ix, 1     => delete
-         */
-        if ( ( ( ins->opsize >= 3 &&
-                        ins->r[1]->type == VTCONST &&
-                        atof(ins->r[1]->name) == 1.0) ||
-                    (ins->opsize == 4 &&
-                     ins->r[2]->type == VTCONST &&
-                     atof(ins->r[2]->name) == 1.0)) &&
-                !strcmp(ins->op, "mul")) {
-set_it:
-            IMCC_debug(interpreter, DEBUG_OPT1, "opt1 %I => ", ins);
-            if (ins->opsize == 3) {
-                /* mul Ix, 1 */
-                ins = delete_ins(unit, ins, 1);
-                ins = ins->prev ? ins->prev : unit->instructions;
-                IMCC_debug(interpreter, DEBUG_OPT1, "deleted\n");
-                continue;
-            }
-            if (ins->r[1]->type == VTCONST) {
-                --ins->r[1]->use_count;
-                ins->r[1] = ins->r[2];
-            }
-            else {
-                --ins->r[2]->use_count;
-            }
-            tmp = INS(interpreter, unit, "set", "", ins->r, 2, 0, 0);
-            IMCC_debug(interpreter, DEBUG_OPT1, "%I\n", tmp);
-            subst_ins(unit, ins, tmp, 1);
-            ins = tmp;
-            continue;
-        }
-        /*
-         * div Ix, Iy, 1 => set Ix, Iy
-         * div Ix, 1     => delete
-         */
-        if ( ( ( ins->opsize == 3 &&
-                        ins->r[1]->type == VTCONST &&
-                        atof(ins->r[1]->name) == 1.0) ||
-                    (ins->opsize == 4 &&
-                     ins->r[2]->type == VTCONST &&
-                     atof(ins->r[2]->name) == 1.0)) &&
-                !strcmp(ins->op, "div")) {
-            goto set_it;
         }
     }
 }
