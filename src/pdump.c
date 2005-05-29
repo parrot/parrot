@@ -220,7 +220,7 @@ main(int argc, char **argv)
     if (argc < 2) {
         help();
     }
-    interpreter = make_interpreter(NULL, NO_FLAGS);
+    interpreter = make_interpreter(NULL, PARROT_NO_FLAGS);
     Parrot_init(interpreter);
     while ((status = longopt_get(interpreter,
                     argc, argv, options, &opt)) > 0) {

@@ -82,6 +82,7 @@ static struct PackFile_Segment * pf_debug_new (Interp*, struct PackFile *,
 static size_t pf_debug_packed_size (Interp*, struct PackFile_Segment *self);
 static opcode_t * pf_debug_pack (Interp*, struct PackFile_Segment *self,
         opcode_t *);
+static void pf_debug_dump (Interp *, struct PackFile_Segment *);
 static opcode_t * pf_debug_unpack (Interp *,
         struct PackFile_Segment *self, opcode_t *);
 static void pf_debug_destroy (Interp*, struct PackFile_Segment *self);
@@ -1129,7 +1130,7 @@ pf_register_standard_funcs(Interp* interpreter, struct PackFile *pf)
         pf_debug_packed_size,
         pf_debug_pack,
         pf_debug_unpack,
-        default_dump
+        pf_debug_dump
     };
     PackFile_funcs_register(interpreter, pf, PF_DIR_SEG, dirf);
     PackFile_funcs_register(interpreter, pf, PF_UNKNOWN_SEG, defaultf);
@@ -2031,6 +2032,29 @@ pf_debug_unpack (Interp *interpreter,
     code->debugs = debug;
     debug->code = code;
     return cursor;
+}
+
+static void
+pf_debug_dump (Parrot_Interp interpreter, struct PackFile_Segment *self)
+{
+    size_t i;
+    struct PackFile_Debug *debug = (struct PackFile_Debug *) self;
+
+    default_dump_header(interpreter, self);
+    PIO_printf(interpreter, "file => \"%s\"\n", debug->filename);
+    i = self->data ? 0: self->file_offset + 4;
+    if (i % 8)
+        PIO_printf(interpreter, "\n %04x:  ", (int) i);
+
+    for ( ; i < (self->data ? self->size :
+            self->file_offset + self->op_count); i++) {
+        if (i % 8 == 0) {
+            PIO_printf(interpreter, "\n %04x:  ", (int) i);
+        }
+        PIO_printf(interpreter, "%08lx ", (unsigned long)
+                self->data ? self->data[i] : self->pf->src[i]);
+    }
+    PIO_printf(interpreter, "\n]\n");
 }
 
 /*

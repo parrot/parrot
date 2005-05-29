@@ -70,7 +70,7 @@ main(int argc, char **argv)
     Interp *interpreter;
     struct PackFile_Segment *seg;
 
-    interpreter = make_interpreter(NULL, NO_FLAGS);
+    interpreter = make_interpreter(NULL, PARROT_NO_FLAGS);
     Parrot_init(interpreter);
 
     pf = Parrot_readbc(interpreter, argv[1]);
