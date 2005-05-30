@@ -24,9 +24,9 @@ how to do this from inside parrot?
 
 TODO tests would also suffice, where possible -- For those of you
 who know tcl, this would be a great place to contribute code - tests
-based on the latest Tcl man pages will *really* help.
+based on the latest Tcl man pages will B<really> help.
 
-=item update docs/* 
+=item update docs
 
 =item add pod to all .imc
 
@@ -41,7 +41,14 @@ based on the latest Tcl man pages will *really* help.
 =item List to String
 
 The current list to string logic in C<dynclasses/tcllist.pmc> is missing logic
-to properly escape string elements.
+to properly escape string elements. 
+
+These should go into TODO tests:
+
+[list a\[ b\]] should generate {a\[} b\\] (note the difference in handling of [ and ] !)
+
+"\n" should be escaped as \n. "\t" as \t, etc. \, $, ; should be back-
+whacked to \\, \$, \;
 
 =item string to list 
 
