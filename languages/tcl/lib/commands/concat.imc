@@ -10,18 +10,17 @@
   .local int argc 
   argc = argv
 
+  .local int TclString
+  TclString = find_type "TclString"
+
   .local pmc retval
-  .local int return_type
+  retval = new TclString
+  retval = ""
 
   .local int arg_num
   arg_num = 0
   .local string current_arg, trimmed_string
   .local int start_pos,end_pos,str_length,current_char
-  .local pmc results
-
-  .local int TclList
-  TclList = find_type "TclList"
-  results  = new TclList
 
 arg_loop:
   if arg_num == argc goto arg_loop_done
@@ -30,6 +29,12 @@ arg_loop:
   current_arg = $P1
   # empty elements don't count
   if current_arg == "" goto arg_loop_next
+
+  if arg_num == 0 goto loop_init
+  retval .= " "
+
+loop_init:
+
   # Trim off leading and trailing space on the arg. 
   start_pos = 0
   length end_pos, current_arg
@@ -68,16 +73,14 @@ right_done:
 
   # Escape any special characters from string. Currently,
   # this is backslashes.
-
-  push results, trimmed_string
+ 
+  retval .= trimmed_string
 
 arg_loop_next:
   inc arg_num
   goto arg_loop 
 
 arg_loop_done:
-   $S0 = join " ", results 
-   retval = $S0
  
 done:
   .return(TCL_OK,retval)

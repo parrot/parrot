@@ -3,10 +3,7 @@
 use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
 use Parrot::Test tests => 6;
-use vars qw($TODO);
 
-TODO: {
-local $TODO = "concat appears to be entirely broken at the moment.";
 language_output_is("tcl",<<TCL,<<OUT,"concat nothing");
   puts [concat]
 TCL
@@ -42,4 +39,3 @@ language_output_is("tcl",<<TCL,<<OUT,"concat sub sub list");
 TCL
 a b c {d e}
 OUT
-}
