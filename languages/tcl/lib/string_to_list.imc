@@ -6,9 +6,7 @@
   .param string str
   # buffer contains the string we are working on.
 
-  .local int buflen,TclList
-  length buflen, str
-
+  .local int TclList
   TclList = find_type "TclList"
 
   .local pmc list
