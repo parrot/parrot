@@ -119,7 +119,7 @@ PackFile_destroy(Interp *interpreter, struct PackFile *pf)
     pf->header = NULL;
     mem_sys_free(pf->dirp);
     pf->dirp = NULL;
-    directory_destroy (interpreter, &pf->directory.base);
+    PackFile_Segment_destroy(interpreter, &pf->directory.base);
     return;
 }
 
@@ -1560,9 +1560,8 @@ directory_destroy (Interp* interpreter, struct PackFile_Segment *self)
     }
     if (dir->segments) {
         mem_sys_free (dir->segments);
-	dir->segments = NULL;
+        dir->segments = NULL;
     }
-    default_destroy(interpreter, self);
 }
 
 /*

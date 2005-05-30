@@ -822,7 +822,7 @@ Parrot_dod_sweep(Interp *interpreter,
                     if (PObj_active_destroy_TEST(p))
                         VTABLE_destroy(interpreter, p);
 
-                    if (PObj_is_PMC_EXT_TEST(p)) {
+                    if (PObj_is_PMC_EXT_TEST(p) && p->pmc_ext != NULL) {
                         /* if the PMC has a PMC_EXT structure,
                          * return it to the pool/arena
                          */
