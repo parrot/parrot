@@ -1,16 +1,18 @@
+# $Id$
+
 # Initialize the debug structure.
 # P3 = [ 1, { "<" => 1, "10,10" => 1, "r:6" => 1, "c:3" => 1, ... } ]
 # P3[0] = stop at each step
-# P3[1] = a PerlHash which keys are either the char to break upon
+# P3[1] = a Hash which keys are either the char to break upon
 #         when reaching it, or a location "y,x", or a column "c:nn"
 #         or a row "r:nn"
 DEBUG_INITIALIZE:
         pushi
         pushs
-        new P3, .PerlArray
+        new P3, .ResizablePMCArray
         set P3[0], 1          # Stop at first step.
         repeat S10, "0", 128  # No char to break on.
-        new P4, .PerlHash
+        new P4, .Hash
         set P3[1], P4         # The breakpoints.
         pops
         popi

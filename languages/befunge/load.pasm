@@ -1,7 +1,9 @@
+# $Id$
+
 # Load a file given as parameter.
 # Parrot stack:
 #   before:     ... filename
-#   after:      ... PerlArray
+#   after:      ... ResizablePMCArray
 # The perlarray is a perlarray of perlarrays filled with the
 # ordinal values of the content of the file, 80x25.
 LOAD:
@@ -27,7 +29,7 @@ LOAD_EOF:
         length I0, S1           # I0 = length of the buffer
         set I1, -1              # I1 = character offset in the file
         new P1, .ResizablePMCArray      # P1 = the playing field
-        new P2, .PerlArray      # P2 = the current line (array of ints)
+        new P2, .ResizablePMCArray      # P2 = the current line (array of ints)
 
 LOAD_PARSE_BUFFER:
         inc I1
@@ -45,14 +47,14 @@ LOAD_FILL_LINE:
 LOAD_TRUNCATE_LINE:
         set P2, 80              # Truncate the line.
         push P1, P2             # Store the line.
-        new P2, .PerlArray      # Create a new line.
+        new P2, .ResizablePMCArray      # Create a new line.
         branch LOAD_PARSE_BUFFER
 
 # Fill playfield to 25 rows.
 LOAD_END_BUFFER:
         set I15, P1
         ge I15, 25, LOAD_COMPLETE
-        new P2, .PerlArray
+        new P2, .ResizablePMCArray
 LOAD_FILL_EMPTY_LINE:
         set I10, P2
         ge I10, 80, LOAD_STORE_EMPTY_LINE
@@ -60,7 +62,7 @@ LOAD_FILL_EMPTY_LINE:
         branch LOAD_FILL_EMPTY_LINE
 LOAD_STORE_EMPTY_LINE:
         push P1, P2
-        new P2, .PerlArray
+        new P2, .ResizablePMCArray
         branch LOAD_END_BUFFER
 
 # Truncate playfield to 25 rows.

@@ -1,3 +1,5 @@
+# $Id$
+
 # Duplicate.
 # Befunge stack:        
 #   before:     ... v

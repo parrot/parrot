@@ -1,3 +1,4 @@
+# $Id$
         branch MAIN
 
 .include "debug.pasm"
@@ -28,7 +29,7 @@ ARGV_DONE:
         save S10
         bsr LOAD
         restore P1              # P1 = the playfield
-        new P2, .PerlArray      # P2 = the stack
+        new P2, .ResizablePMCArray      # P2 = the stack
         set I0, 0               # I0 = x coord of the PC
         set I1, 0               # I1 = y coord of the PC
         set I2, 1               # I2 = direction of the PC
@@ -38,23 +39,6 @@ ARGV_DONE:
         set S2, ""              # S2 = user input
 
 TICK:
-         
-         typeof S12, P1
-         #print S12
-         ##print " "
-         #print I1
-         #print " "
-         #print I0
-         #print " "
-         set P6, P1[I1]
-         typeof S12, P6
-         #print S12
-         #print " "
-         set P7, P6[I0]
-         typeof S12, P7
-         #print S12
-         #print " "
-         ##print "\n"
         set I20, P1[I1;I0]
         chr S0, I20             # S0 = current instruction
         eq I5, 0, TICK_NODEBUG

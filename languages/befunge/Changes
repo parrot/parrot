@@ -1,6 +1,11 @@
+# $Id$
+
 Revision history for a Befunge interpreter written for Parrot.
 
-0.2.0 Sat Oct 23 19:43:11 CEST 2004
+0.2.2 Tue May 30 20:59:09 CEST 2005
+        Use standard PMCs instead of Perl* PMCs
+
+0.2.1 Sat May 9 2005 21:38:40 CEST 2005
         Add t/harness and t/basic.t in order to be able to include
         befunge in unified languages testing
 

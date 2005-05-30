@@ -1,3 +1,5 @@
+# $Id$
+
 # String mode.
 # Befunge stack:        
 #   before:     ...

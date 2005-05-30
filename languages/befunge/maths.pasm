@@ -1,3 +1,5 @@
+# $Id$
+
 # Create a pseudo-random number.
 # Parrot's stack:
 #   before:     ... max
