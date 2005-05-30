@@ -3,7 +3,7 @@
 # $Id$
 
 use strict;
-use Parrot::Test tests => 62;
+use Parrot::Test tests => 70;
 
 # these tests are run with -O1 by TestCompiler and show
 # generated PASM code for various optimizations at level 1
@@ -541,6 +541,34 @@ _main:
 OUT
 
 ##############################
+pir_2_pasm_is(<<'CODE', <<'OUT', "strength set I, 0");
+.sub _main
+   set I0, 0
+   end
+.end
+CODE
+# IMCC does produce b0rken PASM files
+# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
+_main:
+   null I0
+   end
+OUT
+
+##############################
+pir_2_pasm_is(<<'CODE', <<'OUT', "strength set N, 0");
+.sub _main
+   set N0, 0.0
+   end
+.end
+CODE
+# IMCC does produce b0rken PASM files
+# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
+_main:
+   null N0
+   end
+OUT
+
+##############################
 pir_2_pasm_is(<<'CODE', <<'OUT', "strength add I, 0");
 .sub _main
    add I0, 0
@@ -582,6 +610,20 @@ _main:
 OUT
 
 ##############################
+pir_2_pasm_is(<<'CODE', <<'OUT', "strength add I, 1");
+.sub _main
+   add I0, 1
+   end
+.end
+CODE
+# IMCC does produce b0rken PASM files
+# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
+_main:
+   inc I0
+   end
+OUT
+
+##############################
 pir_2_pasm_is(<<'CODE', <<'OUT', "strength add N, 0, N");
 .sub _main
    add N0, 0.0, N1
@@ -592,6 +634,20 @@ CODE
 # see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
 _main:
    set N0, N1
+   end
+OUT
+
+##############################
+pir_2_pasm_is(<<'CODE', <<'OUT', "strength add N, 1");
+.sub _main
+   add N0, 1
+   end
+.end
+CODE
+# IMCC does produce b0rken PASM files
+# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
+_main:
+   inc N0
    end
 OUT
 
@@ -637,6 +693,20 @@ _main:
 OUT
 
 ##############################
+pir_2_pasm_is(<<'CODE', <<'OUT', "strength sub I, 1");
+.sub _main
+   sub I0, 1
+   end
+.end
+CODE
+# IMCC does produce b0rken PASM files
+# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
+_main:
+   dec I0
+   end
+OUT
+
+##############################
 pir_2_pasm_is(<<'CODE', <<'OUT', "strength sub N, N, 0");
 .sub _main
    sub N0, N1, 0
@@ -647,6 +717,20 @@ CODE
 # see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
 _main:
    set N0, N1
+   end
+OUT
+
+##############################
+pir_2_pasm_is(<<'CODE', <<'OUT', "strength sub N, 1");
+.sub _main
+   sub N0, 1
+   end
+.end
+CODE
+# IMCC does produce b0rken PASM files
+# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
+_main:
+   dec N0
    end
 OUT
 
@@ -803,6 +887,19 @@ _main:
 OUT
 
 ##############################
+pir_2_pasm_is(<<'CODE', <<'OUT', "strength div N, 1");
+.sub _main
+   div N0, 1
+   end
+.end
+CODE
+# IMCC does produce b0rken PASM files
+# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
+_main:
+   end
+OUT
+
+##############################
 pir_2_pasm_is(<<'CODE', <<'OUT', "strength div N, N, 1");
 .sub _main
    div N0, N1, 1
@@ -858,6 +955,19 @@ _main:
 OUT
 
 ##############################
+pir_2_pasm_is(<<'CODE', <<'OUT', "strength fdiv N, 1");
+.sub _main
+   fdiv N0, 1
+   end
+.end
+CODE
+# IMCC does produce b0rken PASM files
+# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
+_main:
+   end
+OUT
+
+##############################
 pir_2_pasm_is(<<'CODE', <<'OUT', "strength fdiv N, N, 1");
 .sub _main
    fdiv N0, N1, 1
@@ -885,10 +995,10 @@ CODE
 # IMCC does produce b0rken PASM files
 # see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
 _main:
-   set I0, 0
+   null I0
    set I1, 1
    set N0, 1
-   set N0, 0
+   null N0
    set N0, 1
    end
 OUT

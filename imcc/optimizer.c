@@ -70,7 +70,7 @@ static int branch_branch(Interp *interpreter, IMC_Unit *);
 static int unused_label(Interp *interpreter, IMC_Unit *);
 static int dead_code_remove(Interp *interpreter, IMC_Unit *);
 
-static void strength_reduce(Interp *interpreter, IMC_Unit *);
+static int strength_reduce(Interp *interpreter, IMC_Unit *);
 
 static int constant_propagation(Interp *interpreter, IMC_Unit *);
 static int used_once(Interp *, IMC_Unit *);
@@ -229,11 +229,12 @@ if_branch(Interp *interpreter, IMC_Unit * unit)
  * These are run after constant simplification, so it is
  * guaranteed that one operand is non constant if opsize == 4
  */
-static void
+static int
 strength_reduce(Interp *interpreter, IMC_Unit * unit)
 {
     Instruction *ins, *tmp;
     SymReg *r;
+    int changes = 0;
 
     IMCC_info(interpreter, 2, "\tstrength_reduce\n");
     for (ins = unit->instructions; ins; ins = ins->next) {
@@ -277,6 +278,7 @@ strength_reduce(Interp *interpreter, IMC_Unit * unit)
             IMCC_debug(interpreter, DEBUG_OPT1, "%I\n", tmp);
             subst_ins(unit, ins, tmp, 1);
             ins = tmp;
+            changes = 1;
             continue;
         }
         /*
@@ -300,15 +302,58 @@ strength_reduce(Interp *interpreter, IMC_Unit * unit)
                       IMCC_int_from_reg(interpreter, ins->r[1]) == 1)
           || ( (ins->opnum == PARROT_OP_add_n_nc ||
                 ins->opnum == PARROT_OP_sub_n_nc) &&
-                      atof(ins->r[2]->name) == 0.0) 
+                      atof(ins->r[1]->name) == 0.0) 
           || ( (ins->opnum == PARROT_OP_mul_n_nc ||
                 ins->opnum == PARROT_OP_div_n_nc ||
                 ins->opnum == PARROT_OP_fdiv_n_nc) &&
-                      atof(ins->r[2]->name) == 1.0) ) {
+                      atof(ins->r[1]->name) == 1.0) ) {
             IMCC_debug(interpreter, DEBUG_OPT1, "opt1 %I => ", ins);
             ins = delete_ins(unit, ins, 1);
             ins = ins->prev ? ins->prev : unit->instructions;
             IMCC_debug(interpreter, DEBUG_OPT1, "deleted\n");
+            changes = 1;
+            continue;
+        }
+        /*
+         * set Ix, 0     => null Ix
+         * set Nx, 0     => null Nx
+         */
+        if ( (ins->opnum == PARROT_OP_set_i_ic &&
+                      IMCC_int_from_reg(interpreter, ins->r[1]) == 0)
+          || (ins->opnum == PARROT_OP_set_n_nc &&
+                      atof(ins->r[1]->name) == 0.0)) { 
+            IMCC_debug(interpreter, DEBUG_OPT1, "opt1 %I => ", ins);
+            --ins->r[1]->use_count;
+            tmp = INS(interpreter, unit, "null", "", ins->r, 1, 0, 0);
+            subst_ins(unit, ins, tmp, 1);
+            IMCC_debug(interpreter, DEBUG_OPT1, "%I\n", tmp);
+            ins = tmp;
+            changes = 1;
+            continue;
+        }
+        /*
+         * add Ix, 1     => inc Ix
+         * add Nx, 1     => inc Nx
+         * sub Ix, 1     => dec Ix
+         * sub Nx, 1     => dec Nx
+         */
+        if ( ( (ins->opnum == PARROT_OP_add_i_ic ||
+                ins->opnum == PARROT_OP_sub_i_ic) &&
+                      IMCC_int_from_reg(interpreter, ins->r[1]) == 1)
+          || ( (ins->opnum == PARROT_OP_add_n_nc ||
+                ins->opnum == PARROT_OP_sub_n_nc) &&
+                      atof(ins->r[1]->name) == 1.0)) { 
+            IMCC_debug(interpreter, DEBUG_OPT1, "opt1 %I => ", ins);
+            --ins->r[1]->use_count;
+            if (ins->opnum == PARROT_OP_add_i_ic ||
+                ins->opnum == PARROT_OP_add_n_nc)
+                tmp = INS(interpreter, unit, "inc", "", ins->r, 1, 0, 0);
+            else
+                tmp = INS(interpreter, unit, "dec", "", ins->r, 1, 0, 0);
+            subst_ins(unit, ins, tmp, 1);
+            IMCC_debug(interpreter, DEBUG_OPT1, "%I\n", tmp);
+            ins = tmp;
+            changes = 1;
             continue;
         }
         /*
@@ -361,6 +406,7 @@ strength_reduce(Interp *interpreter, IMC_Unit * unit)
             IMCC_debug(interpreter, DEBUG_OPT1, "%I\n", tmp);
             subst_ins(unit, ins, tmp, 1);
             ins = tmp;
+            changes = 1;
             continue;
         }
         /*
@@ -388,9 +434,11 @@ strength_reduce(Interp *interpreter, IMC_Unit * unit)
             IMCC_debug(interpreter, DEBUG_OPT1, "%I\n", tmp);
             subst_ins(unit, ins, tmp, 1);
             ins = tmp;
+            changes = 1;
             continue;
         }
     }
+    return changes;
 }
 
 
