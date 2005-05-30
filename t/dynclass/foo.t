@@ -16,7 +16,7 @@ Tests the Foo PMC.
 
 =cut
 
-use Parrot::Test tests => 3;
+use Parrot::Test tests => 7;
 use Parrot::Config;
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "get_integer");
@@ -26,6 +26,99 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "get_integer");
     find_type $I0, "Foo"
     new $P1, $I0
 
+    $I1 = $P1
+    print $I1
+    print "\n"
+.end
+CODE
+42
+OUTPUT
+
+pir_output_is(<< 'CODE', << 'OUTPUT', "loadlib with relative pathname, no ext");
+.sub main @MAIN
+    ## load a relative pathname without the extension.  loadlib will convert the
+    ## '/' characters to '\\' on windows.
+    $S0 = "runtime/parrot/dynext/foo"
+    loadlib P1, $S0
+
+    ## ensure that we can still make Foo instances.
+    find_type $I0, "Foo"
+    new $P1, $I0
+    $I1 = $P1
+    print $I1
+    print "\n"
+.end
+CODE
+42
+OUTPUT
+
+pir_output_is(<< 'CODE', << 'OUTPUT', "loadlib with absolute pathname, no ext");
+.sub main @MAIN
+    ## get cwd in $S0.
+    .include "iglobals.pasm"
+    $P11 = getinterp
+    $P12 = $P11[.IGLOBALS_CONFIG_HASH]
+    $S0 = $P12["prefix"]
+
+    ## convert cwd to an absolute pathname without the extension, and load it.
+    ## this should always find the version in the build directory, since that's
+    ## the only place "make test" will work.
+    $S0 = concat "/runtime/parrot/dynext/foo"
+    loadlib P1, $S0
+
+    ## ensure that we can still make Foo instances.
+    find_type $I0, "Foo"
+    new $P1, $I0
+    $I1 = $P1
+    print $I1
+    print "\n"
+.end
+CODE
+42
+OUTPUT
+
+pir_output_is(<< 'CODE', << 'OUTPUT', "loadlib with relative pathname & ext");
+.sub main @MAIN
+    ## get share_ext in $S0.
+    .include "iglobals.pasm"
+    $P11 = getinterp
+    $P12 = $P11[.IGLOBALS_CONFIG_HASH]
+    $S0 = $P12["share_ext"]
+
+    ## load a relative pathname with an extension.
+    $S0 = concat "runtime/parrot/dynext/foo", $S0
+    loadlib P1, $S0
+
+    ## ensure that we can still make Foo instances.
+    find_type $I0, "Foo"
+    new $P1, $I0
+    $I1 = $P1
+    print $I1
+    print "\n"
+.end
+CODE
+42
+OUTPUT
+
+pir_output_is(<< 'CODE', << 'OUTPUT', "loadlib with absolute pathname & ext");
+.sub main @MAIN
+    ## get cwd in $S0, share_ext in $S1.
+    .include "iglobals.pasm"
+    $P11 = getinterp
+    $P12 = $P11[.IGLOBALS_CONFIG_HASH]
+    $S0 = $P12["prefix"]
+    $S1 = $P12["share_ext"]
+
+    ## convert $S0 to an absolute pathname with extension, and load it.
+    ## this should always find the version in the build directory, since that's
+    ## the only place "make test" will work.
+    $S0 = concat $S0, "/runtime/parrot/dynext/foo"
+    $S0 = concat $S0, $S1
+    loadlib P1, $S0
+
+    ## ensure that we can still make Foo instances.
+    find_type $I0, "Foo"
+    new $P1, $I0
     $I1 = $P1
     print $I1
     print "\n"

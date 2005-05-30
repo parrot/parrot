@@ -123,26 +123,41 @@ is_loaded(Parrot_Interp interpreter, STRING *path)
 /*
 
 =item C<static STRING *
-get_path(Interp *interpreter, STRING *lib, void **handle)>
+get_path(Interp *interpreter, STRING *lib, void **handle, char **lib_name)>
 
-Return path and handle of a dynamic lib.
+Return path and handle of a dynamic lib, setting lib_name to just the filestem
+(i.e. without path or extension) as a freshly-allocated C string.
 
 =cut
 
 */
 
 static STRING *
-get_path(Interp *interpreter, STRING *lib, void **handle)
+get_path(Interp *interpreter, STRING *lib, void **handle, char **lib_name)
 {
     STRING *path;
     char *full_name, *file_name, *file_w_ext = NULL;
+    char *tmp_lib_name, *path_end, *ext_start;
     const char *err;
 
-    /*
-     * first try file with extension if it got none
-     */
+    /* Find the pure library name, without path or extension.  */
     file_name = string_to_cstring(interpreter, lib);
-    if (!strchr(file_name, '.')) {
+    tmp_lib_name = file_name;
+    path_end = strrchr(tmp_lib_name, '/');
+    if (! path_end)
+        path_end = strrchr(tmp_lib_name, '\\');
+    if (path_end)
+        tmp_lib_name = path_end+1;
+    *lib_name = malloc(strlen(tmp_lib_name)+1);
+    strcpy(*lib_name, tmp_lib_name);
+    ext_start = strrchr(*lib_name, '.');
+    if (ext_start)
+        *ext_start = '\0';
+
+    /*
+     * first, try to add an extension to the file if it has none.
+     */
+    if (! ext_start) {
         file_w_ext = malloc(strlen(file_name) +
                 strlen(PARROT_LOAD_EXT) + 1);
         strcpy(file_w_ext, file_name);
@@ -154,6 +169,7 @@ get_path(Interp *interpreter, STRING *lib, void **handle)
             if (*handle) {
                 path = string_from_cstring(interpreter, full_name, 0);
                 string_cstring_free(file_name);
+                string_cstring_free(full_name);
                 string_cstring_free(file_w_ext);
                 return path;
             }
@@ -207,16 +223,25 @@ get_path(Interp *interpreter, STRING *lib, void **handle)
         }
     }
     /*
-     * then the given file name as is
+     * finally, try the given file name as is.  we still use
+     * Parrot_locate_runtime_file so that (a) relative pathnames are searched in
+     * the standard locations, and (b) the angle of the slashes are adjusted as
+     * required for non-Unix systems.
      */
-    *handle = Parrot_dlopen(file_name);
-    if (*handle) {
-        path = string_from_cstring(interpreter, file_name, 0);
-        string_cstring_free(file_name);
-        return path;
+    full_name = Parrot_locate_runtime_file(interpreter, file_name,
+                                           PARROT_RUNTIME_FT_DYNEXT);
+    if (full_name) {
+        *handle = Parrot_dlopen(full_name);
+        if (*handle) {
+            path = string_from_cstring(interpreter, full_name, 0);
+            string_cstring_free(file_name);
+            string_cstring_free(full_name);
+            return path;
+        }
     }
     /*
      * and on windows strip a leading "lib"
+     * [shouldn't this happen in Parrot_locate_runtime_file instead?]
      */
 #ifdef WIN32
     if (memcmp(file_name, "lib", 3) == 0) {
@@ -297,9 +322,10 @@ Parrot_load_lib(Interp *interpreter, STRING *lib, PMC *initializer)
     void (*init_func)(Interp *, PMC *);
     char *cinit_func_name, *cload_func_name;
     PMC *lib_pmc;
+    char *lib_name;	/* library stem without path or extension.  */
 
     UNUSED(initializer);
-    path = get_path(interpreter, lib, &handle);
+    path = get_path(interpreter, lib, &handle, &lib_name);
     if (!path || !handle) {
         /*
          * XXX internal_exception? return PMCNULL?
@@ -325,17 +351,20 @@ Parrot_load_lib(Interp *interpreter, STRING *lib, PMC *initializer)
      */
     Parrot_block_DOD(interpreter);
     /* get load_func */
-    load_func_name = Parrot_sprintf_c(interpreter, "Parrot_lib_%Ss_load", lib);
+    load_func_name = Parrot_sprintf_c(interpreter, "Parrot_lib_%s_load",
+                                      lib_name);
     cload_func_name = string_to_cstring(interpreter, load_func_name);
     load_func = (PMC * (*)(Interp *))D2FPTR(Parrot_dlsym(handle,
                 cload_func_name));
     string_cstring_free(cload_func_name);
     /* get init_func */
-    init_func_name = Parrot_sprintf_c(interpreter, "Parrot_lib_%Ss_init", lib);
+    init_func_name = Parrot_sprintf_c(interpreter, "Parrot_lib_%s_init",
+                                      lib_name);
     cinit_func_name = string_to_cstring(interpreter, init_func_name);
     init_func = (void (*)(Interp *, PMC *))D2FPTR(Parrot_dlsym(handle,
                 cinit_func_name));
     string_cstring_free(cinit_func_name);
+    string_cstring_free(lib_name);
 
     lib_pmc = Parrot_init_lib(interpreter, load_func, init_func);
 
