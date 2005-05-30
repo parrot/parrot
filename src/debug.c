@@ -1329,7 +1329,7 @@ PDB_escape(const char *string, INTVAL length)
     end = string + length;
 
     /* Return if there is no string to escape*/
-    if (!string || !*string)
+    if (!string)
         return NULL;
 
     fill = new = (char *)mem_sys_allocate(length * 2 + 1);
