@@ -130,17 +130,24 @@ dump_loops(IMC_Unit * unit)
 {
     int i, j;
     Set *loop;
+    Set *exits;
     Loop_info ** loop_info = unit->loop_info;
 
     fprintf(stderr, "Loop info\n---------\n");
     for (i = 0; i < unit->n_loops; i++) {
         loop = loop_info[i]->loop;
+        exits = loop_info[i]->exits;
         fprintf(stderr,
-                "loop %d,  depth %d, size %d, entry %d, contains blocks:\n",
+                "Loop %d, depth %d, size %d, header %d, preheader %d\n",
                 i, loop_info[i]->depth,
-                loop_info[i]->size, loop_info[i]->entry);
+                loop_info[i]->size, loop_info[i]->header, loop_info[i]->preheader);
+        fprintf(stderr, "  Contains blocks: ");
         for (j = 0; j < unit->n_basic_blocks; j++)
             if (set_contains(loop, j))
+                fprintf(stderr, "%d ", j);
+        fprintf(stderr, "\n  Exit blocks: ");
+        for (j = 0; j < unit->n_basic_blocks; j++)
+            if (set_contains(exits, j))
                 fprintf(stderr, "%d ", j);
         fprintf(stderr, "\n");
     }

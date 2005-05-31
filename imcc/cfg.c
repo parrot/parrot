@@ -917,6 +917,7 @@ static void
 mark_loop (Parrot_Interp interpreter, IMC_Unit * unit, Edge* e)
 {
     Set* loop;
+    Set* exits;
     Basic_block *header, *footer, *enter;
     int i;
     Edge *edge;
@@ -959,6 +960,17 @@ mark_loop (Parrot_Interp interpreter, IMC_Unit * unit, Edge* e)
         search_predecessors_not_in (footer, loop);
     }
 
+    exits = set_make(unit->n_basic_blocks);
+    for (i = 1; i < unit->n_basic_blocks; i++) {
+        if (set_contains(loop, i)) {
+            for (edge = unit->bb_list[i]->succ_list; edge; edge = edge->succ_next) {
+                if (!set_contains(loop, edge->to->index)) {
+                    set_add(exits, i);
+                }
+            }
+        }
+    }
+
     /* now 'loop' contains the set of nodes inside the loop.
     */
     n_loops = unit->n_loops;
@@ -971,9 +983,11 @@ mark_loop (Parrot_Interp interpreter, IMC_Unit * unit, Edge* e)
                 (n_loops+1)*sizeof(Loop_info *));
     loop_info[n_loops] = mem_sys_allocate(sizeof(Loop_info));
     loop_info[n_loops]->loop = loop;
+    loop_info[n_loops]->exits = exits;
     loop_info[n_loops]->depth = footer->loop_depth;
     loop_info[n_loops]->n_entries = i;
-    loop_info[n_loops]->entry = enter ? enter->index : -1;
+    loop_info[n_loops]->header = header->index;
+    loop_info[n_loops]->preheader = i == 1 ? enter->index : -1;
     unit->n_loops++;
 }
 
@@ -983,6 +997,7 @@ free_loops(IMC_Unit * unit)
     int i;
     for (i = 0; i < unit->n_loops; i++) {
         set_free(unit->loop_info[i]->loop);
+        set_free(unit->loop_info[i]->exits);
         free(unit->loop_info[i]);
     }
     if (unit->loop_info)

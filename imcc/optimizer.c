@@ -1149,8 +1149,8 @@ find_outer(IMC_Unit * unit, Basic_block * blk)
     /* loops are sorted depth last */
     for (i = n_loops-1; i >= 0; i--)
         if (set_contains(loop_info[i]->loop, bb))
-            if (loop_info[i]->entry >= 0)
-                return unit->bb_list[loop_info[i]->entry];
+            if (loop_info[i]->preheader >= 0)
+                return unit->bb_list[loop_info[i]->preheader];
     return 0;
 }
 #endif
