@@ -439,8 +439,8 @@ hll_def: HLL STRINGC COMMA STRINGC
             STRING *hll_name, *hll_lib;
             hll_name = string_unescape_cstring(interp, $2 + 1, '"', NULL);
             hll_lib =  string_unescape_cstring(interp, $4 + 1, '"', NULL);
-            IMCC_INFO(interp)->HLL_name = hll_name;
-            Parrot_register_HLL(interp, hll_name, hll_lib);
+            IMCC_INFO(interp)->HLL_id =
+                Parrot_register_HLL(interp, hll_name, hll_lib);
             $$ = 0;
          }
    ;

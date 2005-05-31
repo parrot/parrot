@@ -23,6 +23,15 @@ These are the vtable functions for the PyFloat base class
 
 pmclass PyFloat extends Float extends PyObject dynpmc group python_group {
 
+    void class_init() {
+        if (pass) {
+            INTVAL py = Parrot_get_HLL_id(interp,
+                    const_string(interp, "Python"));
+            if (py > 0)
+                Parrot_register_HLL_type(interp, py, enum_class_Float, entry);
+        }
+    }
+
 /*
 
 =item C<PMC* "__new__"(PMC *class, PMC *source)>

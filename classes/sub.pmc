@@ -308,6 +308,7 @@ Invokes the subroutine.
 is_tail_call:
             INTERP->ctx.current_sub = SELF;
         }
+        INTERP->ctx.current_HLL = sub->HLL_id;
         return sub->address;
     }
 
@@ -423,6 +424,7 @@ Archives the subroutine.
          * - flags  (i.e. @LOAD pragma and such)
          * - name of the sub's label
          * - name_space
+         * - HLL_id
          * - multi_signature
          */
 
@@ -444,6 +446,7 @@ Archives the subroutine.
         io->vtable->push_integer(INTERP, io,
                 PObj_get_FLAGS(pmc) & SUB_FLAG_PF_MASK);
         io->vtable->push_string(INTERP, io, sub->name);
+        io->vtable->push_integer(INTERP, io, sub->HLL_id);
     }
 
 /*
@@ -475,6 +478,7 @@ Unarchives the subroutine.
             flags = io->vtable->shift_integer(INTERP, io);
             PObj_get_FLAGS(SELF) |= flags & SUB_FLAG_PF_MASK;
             sub->name = io->vtable->shift_string(INTERP, io);
+            sub->HLL_id  = io->vtable->shift_integer(INTERP, io);
         }
     }
 

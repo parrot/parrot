@@ -637,7 +637,6 @@ Finish thawing.
         PMC *hll_info, *entry, *lib_pmc;
         STRING *lib_name;
 
-
         hll_info = INTERP->HLL_info;
         n = VTABLE_elements(INTERP, hll_info);
         for (i = 0; i < n; ++i) {

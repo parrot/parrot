@@ -40,6 +40,7 @@ typedef struct _IMC_Unit {
     int local_count;
     SymReg *namespace;
     int pasm_file;
+    INTVAL HLL_id;
 } IMC_Unit;
 
 

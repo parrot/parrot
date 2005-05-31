@@ -50,6 +50,7 @@ typedef struct Parrot_sub {
     opcode_t *end;              /* end of bytecode */
     STRING   *name;             /* name of the sub */
     PMC *name_space;            /* where this Sub is in */
+    INTVAL HLL_id;              /* see src/hll.c XXX or per segment? */
     PMC *multi_signature;       /* list of types for MMD */
     /* - end common */
     struct Stack_Chunk *pad_stack;      /* only for closure */
@@ -66,6 +67,7 @@ typedef struct Parrot_coro {
     opcode_t *end;
     STRING   *name;
     PMC *name_space;         /* where this Sub is in */
+    INTVAL HLL_id;              /* see src/hll.c XXX or per segment? */
     PMC *multi_signature;       /* list of types for MMD */
     /* - end common */
     struct Parrot_Context ctx;          /* XXX 2 continuations */

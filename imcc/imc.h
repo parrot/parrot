@@ -211,7 +211,7 @@ typedef struct _imc_info_t {
     struct nodeType_t *top_node;
 
     struct parser_state_t *state;
-    STRING *HLL_name;
+    INTVAL HLL_id;
 
 } imc_info_t;
 

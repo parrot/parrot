@@ -650,9 +650,12 @@ add_const_pmc_sub(Interp *interpreter, SymReg *r,
     int ns_const = -1;
     char *real_name;
     struct PackFile_ConstTable *ct;
+    IMC_Unit *unit;
 
-    if (globals.cs->subs->unit->namespace) {
-        ns = globals.cs->subs->unit->namespace->reg;
+    unit = globals.cs->subs->unit;
+
+    if (unit->namespace) {
+        ns = unit->namespace->reg;
         if (ns->set == 'K')
             ns->color = build_key(interpreter, ns);
         IMCC_debug(interpreter, DEBUG_PBC_CONST,
@@ -701,6 +704,7 @@ add_const_pmc_sub(Interp *interpreter, SymReg *r,
     sub->name_space = name_space;
     sub->address = (opcode_t*)(long)offs;
     sub->end = (opcode_t*)(long)end;
+    sub->HLL_id = unit->HLL_id;
     /*
      * check if it's declared multi
      */

@@ -2125,8 +2125,8 @@ yyreduce:
             STRING *hll_name, *hll_lib;
             hll_name = string_unescape_cstring(interp, yyvsp[-2].s + 1, '"', NULL);
             hll_lib =  string_unescape_cstring(interp, yyvsp[0].s + 1, '"', NULL);
-            IMCC_INFO(interp)->HLL_name = hll_name;
-            Parrot_register_HLL(interp, hll_name, hll_lib);
+            IMCC_INFO(interp)->HLL_id =
+                Parrot_register_HLL(interp, hll_name, hll_lib);
             yyval.t = 0;
          }
     break;

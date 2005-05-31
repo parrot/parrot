@@ -1011,7 +1011,8 @@ Sets C<dest> to the absolute value of SELF that is the distance from (0.0).
     PMC* absolute(PMC *dest) {
         FLOATVAL d = sqrt(RE(SELF)*RE(SELF) + IM(SELF)*IM(SELF));
         if (!dest)
-            dest = pmc_new(INTERP, enum_class_Float);   /* XXX */
+            dest = pmc_new(INTERP,
+                Parrot_get_ctx_HLL_type(INTERP, enum_class_Float));
         VTABLE_set_number_native(INTERP, dest, d);
         return dest;
     }

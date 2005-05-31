@@ -728,6 +728,7 @@ set_current_sub(Interp *interpreter)
                 offs = sub->address - code_start;
                 if (offs == interpreter->resume_offset) {
                     interpreter->ctx.current_sub = sub_pmc;
+                    interpreter->ctx.current_HLL = sub->HLL_id;
                     return;
                 }
                 break;

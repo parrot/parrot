@@ -24,6 +24,7 @@
 
 # please insert tab separated entries at the top of the list
 
+2005.05.31	leo	added HLL_id to frozen sub structure
 2005.05.11	leo	MMD function number change (rm MMD_I_LOGICAL...)
 2005.05.08	leo	0.2.0 release
 2005.04.22	leo	removed add_p_* and friends, insert infix ops
