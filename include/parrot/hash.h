@@ -79,6 +79,9 @@ void new_hash_x(Interp *, Hash**, PARROT_DATA_TYPES,
 void new_pmc_hash_x(Interp *, PMC*, PARROT_DATA_TYPES,
         Hash_key_type, hash_comp_fn, hash_hash_key_fn);
 void new_cstring_hash(Interp *interpreter, Hash **);
+
+PMC* Parrot_new_INTVAL_hash(Interp *interpreter, UINTVAL flags);
+
 void hash_clone(Interp * interpreter, Hash * src, Hash **dest);
 INTVAL hash_size(Interp * interpreter, Hash *hash);
 void hash_set_size(Interp * interpreter, Hash *hash, UINTVAL size);

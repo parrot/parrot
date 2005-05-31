@@ -85,12 +85,33 @@ void
 Parrot_register_HLL_type(Interp *interpreter, INTVAL hll_id,
 	INTVAL core_type, INTVAL *hll_type)
 {
+    PMC *entry, *type_hash, *hll_info;
+    Hash *hash;
+
+    hll_info = interpreter->HLL_info;
+    entry = VTABLE_get_pmc_keyed_int(interpreter, hll_info, hll_id);
+    type_hash = VTABLE_get_pmc_keyed_int(interpreter, entry, 1);
+    if (PMC_IS_NULL(type_hash)) {
+        type_hash = Parrot_new_INTVAL_hash(interpreter, PObj_constant_FLAG);
+        VTABLE_set_pmc_keyed_int(interpreter, entry, 1, type_hash);
+    }
+    hash = PMC_struct_val(type_hash);
+    hash_put(interpreter, hash, (void*)core_type, (void*)hll_type);
 }
 
 INTVAL
 Parrot_get_HLL_type(Interp *interpreter, INTVAL hll_id, INTVAL core_type)
 {
-    return 0;
+    PMC *entry, *type_hash, *hll_info;
+    Hash *hash;
+
+    hll_info = interpreter->HLL_info;
+    entry = VTABLE_get_pmc_keyed_int(interpreter, hll_info, hll_id);
+    type_hash = VTABLE_get_pmc_keyed_int(interpreter, entry, 1);
+    if (PMC_IS_NULL(type_hash))
+        return 0;
+    hash = PMC_struct_val(type_hash);
+    return (INTVAL)hash_get(interpreter, hash, (void*)core_type);
 }
 
 /*

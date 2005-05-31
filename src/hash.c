@@ -121,6 +121,34 @@ cstring_compare(Parrot_Interp interp, void *a, void *b)
     return strcmp(a, b);
 }
 
+/*
+
+=item C<static size_t
+key_hash_int(Interp *interp, void *value, size_t seed)>
+
+=item C<static int
+int_compare(Parrot_Interp interp, void *a, void *b)>
+
+Custom C<key_hash> and C<compare> functions.
+
+=cut
+
+*/
+
+static size_t
+key_hash_int(Interp *interp, void *value, size_t seed)
+{
+    UNUSED(interp);
+    return (size_t)value ^ seed;
+}
+
+static int
+int_compare(Parrot_Interp interp, void *a, void *b)
+{
+    UNUSED(interp);
+    return a != b;
+}
+
 static void
 pobject_lives_fn(Interp *interp, PObj *o)
 {
@@ -529,6 +557,30 @@ new_pmc_hash_x(Interp *interpreter, PMC *container,
             compare, keyhash);
 }
 
+/*
+
+=item C<PMC* Parrot_new_INTVAL_hash(Interp *interpreter, UINTVAL flags)>
+
+Create a new Hash PMC with INTVAL keys and values. C<flags> can be
+C<PObj_constant_FLAG> or 0.
+
+=cut
+
+*/
+PMC*
+Parrot_new_INTVAL_hash(Interp *interpreter, UINTVAL flags)
+{
+    PMC *h;
+
+    if (flags & PObj_constant_FLAG)
+        h = constant_pmc_new_noinit(interpreter, enum_class_Hash);
+    else
+        h = pmc_new_noinit(interpreter, enum_class_Hash);
+    new_pmc_hash_x(interpreter, h, enum_type_INTVAL, Hash_key_type_int,
+            int_compare, key_hash_int);
+    PObj_active_destroy_SET(h);
+    return h;
+}
 /*
 
 =item C<INTVAL

@@ -551,37 +551,9 @@ shift_opcode_string(Parrot_Interp interpreter, IMAGE_IO *io)
 
 =over 4
 
-=item C<static size_t
-key_hash_int(Interp *interp, void *value, size_t seed)>
-
 =cut
 
 */
-
-static size_t
-key_hash_int(Interp *interp, void *value, size_t seed)
-{
-    UNUSED(interp);
-    return (size_t)value ^ seed;
-}
-
-/*
-
-=item C<static int
-int_compare(Parrot_Interp interp, void *a, void *b)>
-
-Custom C<key_hash> and C<compare> functions.
-
-=cut
-
-*/
-
-static int
-int_compare(Parrot_Interp interp, void *a, void *b)
-{
-    UNUSED(interp);
-    return a != b;
-}
 
 /*
 
@@ -755,11 +727,7 @@ todo_list_init(Parrot_Interp interpreter, visit_info *info)
     info->visit_pmc_later = add_pmc_todo_list;
     /* we must use PMCs here, so that they get marked properly */
     info->todo = pmc_new(interpreter, enum_class_Array);
-    info->seen = pmc_new_noinit(interpreter, enum_class_Hash);
-    new_hash_x(interpreter, &hash, enum_type_ptr, Hash_key_type_int,
-            int_compare, key_hash_int);
-    PMC_struct_val(info->seen) = hash;
-    PObj_active_destroy_SET(info->seen);
+    info->seen = Parrot_new_INTVAL_hash(interpreter, 0);
 
     ft_init(interpreter, info);
 }
