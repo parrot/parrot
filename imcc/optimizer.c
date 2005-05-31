@@ -21,25 +21,25 @@
  * variable. This phase is handled by two functions: pre_optimize() and
  * cfg_optimize().
  *
- * pre_optimize() runs before the construction of the CFG begins. It calls 
- * strength_reduce() to perform simple strength reduction, and if_branch() 
- * to rewrite certain if/branch/label constructs (for details, see 
+ * pre_optimize() runs before the construction of the CFG begins. It calls
+ * strength_reduce() to perform simple strength reduction, and if_branch()
+ * to rewrite certain if/branch/label constructs (for details, see
  * if_branch() below).
  *
- * [pre_optimize() may also be called later, during the main optimization 
+ * [pre_optimize() may also be called later, during the main optimization
  *  phase, but this is not guaranteed.]
  *
- * cfg_optimize() runs during the construction of the CFG. It calls 
+ * cfg_optimize() runs during the construction of the CFG. It calls
  * branch_branch() to perform jump optimization (i.e. branches to
- * branch statements or jumps to jumps are converted into single 
+ * branch statements or jumps to jumps are converted into single
  * branches/jumps to the final destination), unused_label() to remove
- * unused labels and dead_code_remove() to remove unreachable code 
+ * unused labels and dead_code_remove() to remove unreachable code
  * (e.g. basic blocks which are never entered or instructions after
  *  and unconditional branch which are never branched to).
- * 
+ *
  * cfg_optimize may be called multiple times during the construction of the
  * CFG depending on whether or not it finds anything to optimize.
- * 
+ *
  * XXX: subst_constants ... rewrite e.g. add_i_ic_ic -- where does this happen?
  *
  * optimizer
@@ -136,7 +136,7 @@ optimize(Interp *interpreter, IMC_Unit * unit)
     return any;
 }
 
-/* 
+/*
  * Get negated form of operator. If no negated form is known, return 0.
  */
 const char *
@@ -165,7 +165,7 @@ get_neg_op(char *op, int *n)
 
 /*
  * Convert if/branch/label constructs of the form:
- * 
+ *
  *   if cond L1
  *   branch L2
  *   L1
@@ -223,8 +223,8 @@ if_branch(Interp *interpreter, IMC_Unit * unit)
     }
 }
 
-/* 
- * strength_reduce ... rewrites e.g add Ix, Ix, y => add Ix, y 
+/*
+ * strength_reduce ... rewrites e.g add Ix, Ix, y => add Ix, y
  *
  * These are run after constant simplification, so it is
  * guaranteed that one operand is non constant if opsize == 4
@@ -302,14 +302,17 @@ strength_reduce(Interp *interpreter, IMC_Unit * unit)
                       IMCC_int_from_reg(interpreter, ins->r[1]) == 1)
           || ( (ins->opnum == PARROT_OP_add_n_nc ||
                 ins->opnum == PARROT_OP_sub_n_nc) &&
-                      atof(ins->r[1]->name) == 0.0) 
+                      atof(ins->r[1]->name) == 0.0)
           || ( (ins->opnum == PARROT_OP_mul_n_nc ||
                 ins->opnum == PARROT_OP_div_n_nc ||
                 ins->opnum == PARROT_OP_fdiv_n_nc) &&
                       atof(ins->r[1]->name) == 1.0) ) {
             IMCC_debug(interpreter, DEBUG_OPT1, "opt1 %I => ", ins);
             ins = delete_ins(unit, ins, 1);
-            ins = ins->prev ? ins->prev : unit->instructions;
+            if (ins)
+                ins = ins->prev ? ins->prev : unit->instructions;
+            else
+                break;
             IMCC_debug(interpreter, DEBUG_OPT1, "deleted\n");
             changes = 1;
             continue;
@@ -321,7 +324,7 @@ strength_reduce(Interp *interpreter, IMC_Unit * unit)
         if ( (ins->opnum == PARROT_OP_set_i_ic &&
                       IMCC_int_from_reg(interpreter, ins->r[1]) == 0)
           || (ins->opnum == PARROT_OP_set_n_nc &&
-                      atof(ins->r[1]->name) == 0.0)) { 
+                      atof(ins->r[1]->name) == 0.0)) {
             IMCC_debug(interpreter, DEBUG_OPT1, "opt1 %I => ", ins);
             --ins->r[1]->use_count;
             tmp = INS(interpreter, unit, "null", "", ins->r, 1, 0, 0);
@@ -342,7 +345,7 @@ strength_reduce(Interp *interpreter, IMC_Unit * unit)
                       IMCC_int_from_reg(interpreter, ins->r[1]) == 1)
           || ( (ins->opnum == PARROT_OP_add_n_nc ||
                 ins->opnum == PARROT_OP_sub_n_nc) &&
-                      atof(ins->r[1]->name) == 1.0)) { 
+                      atof(ins->r[1]->name) == 1.0)) {
             IMCC_debug(interpreter, DEBUG_OPT1, "opt1 %I => ", ins);
             --ins->r[1]->use_count;
             if (ins->opnum == PARROT_OP_add_i_ic ||
