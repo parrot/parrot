@@ -23,6 +23,7 @@ These are the vtable functions for the TclList base class
 /* cache of classes referenced */
 
 static INTVAL dynclass_TclInt;
+static STRING *space, *ob, *cb;
 
 pmclass TclList extends Array need_ext does array dynpmc group tcl_group {
 
@@ -37,8 +38,24 @@ Class initialization. Caches the type id of various PMCs.
 */
 
     void class_init() {
+        PMC *string_anchor;
+        INTVAL fixedstringarray_typenum;
         if (pass) {
             dynclass_TclInt    = Parrot_PMC_typenum(INTERP, "TclInt");
+ 
+            space = string_from_const_cstring(INTERP, " ", 1);
+            ob    = string_from_const_cstring(INTERP, "{", 1);
+            cb    = string_from_const_cstring(INTERP, "}", 1);
+
+            /* Avoid having these strings GC'd */ 
+            fixedstringarray_typenum =
+              Parrot_PMC_typenum(INTERP, "FixedStringArray");
+            string_anchor = pmc_new(INTERP,fixedstringarray_typenum);
+            VTABLE_set_integer_native(INTERP, string_anchor, 3);
+            VTABLE_set_string_keyed_int(INTERP,string_anchor,0,space);
+            VTABLE_set_string_keyed_int(INTERP,string_anchor,1,ob);
+            VTABLE_set_string_keyed_int(INTERP,string_anchor,2,cb);
+            dod_register_pmc(INTERP,string_anchor);
         }
     }
 
@@ -79,7 +96,7 @@ Returns the list as a string
 
     STRING* get_string () {
         STRING *res, *vals;
-        INTVAL j, n;
+        INTVAL j, n, pos;
         PMC *val;
 
         res = string_from_const_cstring(INTERP, NULL, 0);
@@ -90,12 +107,17 @@ Returns the list as a string
          */
         for (j = 0; j < n; ++j) {
             val = SELF.get_pmc_keyed_int(j);
-            REG_INT(3) = 0;
             vals = VTABLE_get_string(INTERP, val);
+
+            pos = string_str_index(INTERP,vals,space,0);
+            if (pos != -1) {
+              vals = string_append(INTERP, ob, vals, 0);
+              vals = string_append(INTERP, vals, cb, 0);
+            } 
+
             res = string_append(INTERP, res, vals, 0);
             if (j < n - 1)
-                res = string_append(INTERP, res,
-                        const_string(INTERP, " "), 0);
+                res = string_append(INTERP, res, space, 0);
         }
         return res;
     }

@@ -3,7 +3,6 @@
 use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
 use Parrot::Test tests => 4;
-use vars qw($TODO);
 
 language_output_is("tcl",<<'TCL',<<OUT,"no elements");
   puts [lrepeat 1 a]

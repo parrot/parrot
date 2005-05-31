@@ -51,7 +51,7 @@ pmclass TclParser dynpmc group tcl_group {
           ConcatChar     = string_from_const_cstring(INTERP, "concat_char",11);
           ConcatCommand  = string_from_const_cstring(INTERP, "concat_command", 14);
 
-          /* Hack to avoid having these ``constant'' strings GC'd. */
+          /* Avoid having these strings GC'd. */
           fixedstringarray_typenum =
             Parrot_PMC_typenum(INTERP, "FixedStringArray");
           string_anchor = pmc_new(INTERP,fixedstringarray_typenum);

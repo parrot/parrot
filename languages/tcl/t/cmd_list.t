@@ -23,8 +23,6 @@ TCL
 a b
 OUT
 
-TODO: {
-local $TODO = "TclList -> string doesn't handle spaces yet.";
 language_output_is("tcl",<<'TCL',<<OUT,"spaces with braces");
   puts [list a b {c {d e}}]
 TCL
@@ -36,7 +34,6 @@ language_output_is("tcl",<<'TCL',<<OUT,"spaces with quotes");
 TCL
 a b {c {d e}}
 OUT
-}
 
 TODO: {
 local $TODO = "TclList -> string doesn't handle braces yet.";
