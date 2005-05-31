@@ -389,6 +389,7 @@ INTERP_O_FILES = \
     $(SRC_DIR)/debug$(O) \
     $(SRC_DIR)/smallobject$(O) \
     $(SRC_DIR)/headers$(O) \
+    $(SRC_DIR)/hll$(O) \
     $(SRC_DIR)/dod$(O) \
     $(SRC_DIR)/gc_ims$(O) \
     $(SRC_DIR)/gc_gms$(O) \
@@ -869,6 +870,8 @@ $(SRC_DIR)/dod$(O) : $(GENERAL_H_FILES)
 $(SRC_DIR)/gc_ims$(O) : $(GENERAL_H_FILES)
 
 $(SRC_DIR)/gc_gms$(O) : $(GENERAL_H_FILES)
+
+$(SRC_DIR)/hll$(O) : $(GENERAL_H_FILES)
 
 $(SRC_DIR)/resources$(O) : $(GENERAL_H_FILES)
 

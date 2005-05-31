@@ -726,6 +726,7 @@ include/parrot/global_setup.h                     [devel]include
 include/parrot/global.h                           [devel]include
 include/parrot/hash.h                             [devel]include
 include/parrot/headers.h                          [devel]include
+include/parrot/hll.h                              [devel]include
 include/parrot/interp_guts.h                      [devel]include
 include/parrot/interpreter.h                      [devel]include
 include/parrot/intlist.h                          [devel]include
@@ -1626,6 +1627,7 @@ src/global.c                                      []
 src/global_setup.c                                []
 src/hash.c                                        []
 src/headers.c                                     []
+src/hll.c                                         []
 src/interpreter.c                                 []
 src/inter_cb.c                                    []
 src/inter_create.c                                []
