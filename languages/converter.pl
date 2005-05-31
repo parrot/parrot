@@ -1,5 +1,15 @@
 #! perl -w
 
+=head1 NAME
+
+converter.pl - convert BNF grammar to a Parse::RecDescent grammar
+
+=head1 DESCRIPTION
+
+An early attempt at Python support for Parrot. 
+
+=cut
+
 use strict;
 use YAML;
 use Parse::RecDescent;

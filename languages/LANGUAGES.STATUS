@@ -50,7 +50,10 @@ N: Common Lisp
 A: Cory Spencer
 D: Aspires to implement a significant subset of the Common Lisp language.
 M: Yes
-V: o.1.2
+V: 0.1.2
+
+N: conversion
+D: An early attempt to support grammars in Bachus-Naur-Format
 
 N: forth
 A: Dan Sugalski
@@ -111,6 +114,7 @@ W: http://www.daca.net:8080/Parakeet-0.1.tgz
 V: 0.0.11
 
 N: parrot_compiler
+D: An example on how the builtin compilers can be used
 
 N: Perl6
 A: Sean O'Rourke

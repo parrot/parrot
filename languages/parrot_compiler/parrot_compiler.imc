@@ -11,7 +11,7 @@
   # Assemble specification for get_options
   # in an array of format specifiers
   .local pmc opt_spec    
-  opt_spec = new PerlArray
+  opt_spec = new ResizableStringArray
   push opt_spec, "language=s"
 
   # the program name is the first element in argv

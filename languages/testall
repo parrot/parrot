@@ -48,8 +48,8 @@ have already been built.
 
 # These could all be tested:
 #
-# BASIC                No t/harness
-# cola                 No t/harness
+# BASIC                No t/harness, two implementations
+# cola                 No t/harness, no standard test suite
 # conversion           No t/harness
 # forth                No t/harness
 # jako                 No t/harness
@@ -58,11 +58,11 @@ have already been built.
 # parakeet             No t/harness
 # perl6                t/harness has no --files
 # python               needs testing
-# regex               No t/harness
-# ruby                No t/harness
+# regex                No t/harness
+# ruby                 No t/harness
 
 
-my @unified_testable_languages = 1 ?
+my @unified_testable_languages = 
    qw( befunge
        bf
        m4
@@ -70,8 +70,7 @@ my @unified_testable_languages = 1 ?
        parrot_compiler
        scheme
        tcl
-       urm ) :
-   ( 'tcl' );
+       urm );
 
 my @harnesses =
     grep {-f $_}
