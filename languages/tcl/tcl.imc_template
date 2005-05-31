@@ -78,7 +78,7 @@ providing a compreg-compatible method.
 
 .namespace [ "_Tcl" ]
 
-.sub __prepare_lib @LOAD
+.sub __prepare_lib @LOAD,@ANON
 
   # Load any dependant libraries.
   $P0 = loadlib "tcl_group"
