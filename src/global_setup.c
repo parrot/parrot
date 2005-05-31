@@ -23,6 +23,7 @@ I<What are these global variables?>
 
 #define INSIDE_GLOBAL_SETUP
 #include "parrot/parrot.h"
+#include "global_setup.str"
 
 /* These functions are defined in the auto-generated file core_pmcs.c */
 extern void Parrot_initialize_core_pmcs(Interp *interp);
@@ -94,6 +95,17 @@ init_world(Interp *interpreter)
      * create runtime config hash
      */
     create_config_hash(interpreter, iglobals);
+    /*
+     * HLL support
+     */
+    if (interpreter->parent_interpreter)
+        interpreter->HLL_info = interpreter->parent_interpreter->HLL_info;
+    else {
+        STRING *parrot = CONST_STRING(interpreter, "parrot");
+        interpreter->HLL_info = constant_pmc_new(interpreter,
+                enum_class_ResizablePMCArray);
+        Parrot_register_HLL(interpreter, parrot, NULL);
+    }
 }
 
 /*

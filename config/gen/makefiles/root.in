@@ -518,6 +518,7 @@ STR_FILES = \
     $(SRC_DIR)/inter_cb.str \
     $(SRC_DIR)/inter_misc.str \
     $(SRC_DIR)/global.str \
+    $(SRC_DIR)/global_setup.str \
     $(SRC_DIR)/library.str \
     $(SRC_DIR)/mmd.str \
     $(SRC_DIR)/pmc.str \
@@ -827,7 +828,7 @@ examples/assembly/hello$(EXE):	examples/assembly/hello$(O)
 #
 ###############################################################################
 
-$(SRC_DIR)/global_setup$(O) : $(GENERAL_H_FILES)
+$(SRC_DIR)/global_setup$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/global_setup.str
 
 $(SRC_DIR)/global$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/global.str
 

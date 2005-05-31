@@ -296,6 +296,7 @@ struct parrot_interp_t {
 /* 4:   PMC *ParrotInterpreter       that's me */
 /* 5:   PMC *Dyn_libs           Array of dynamically loaded ParrotLibrary  */
     PMC* DOD_registry;          /* registered PMCs added to the root set */
+    PMC* HLL_info;              /* storage for HLL names and types */
     MMD_table *binop_mmd_funcs; /* Table of MMD functions */
     UINTVAL n_binop_mmd_funcs;   /* function count */
     struct _Caches * caches;            /* s. caches.h */
