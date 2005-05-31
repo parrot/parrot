@@ -17,7 +17,7 @@ this feature.
    interpreter->HLL_info
 
    @HLL_info = [
-     [ HLL_name, { core_type => HLL_type, ... } ],
+     [ hll_name, hll_lib, { core_type => HLL_type, ... } ],
      ...
      ]
 
@@ -70,15 +70,21 @@ Parrot_register_HLL(Interp *interpreter,
     entry = constant_pmc_new(interpreter, enum_class_FixedPMCArray);
     VTABLE_push_pmc(interpreter, hll_info, entry);
 
-    VTABLE_set_integer_native(interpreter, entry, 2);
+    VTABLE_set_integer_native(interpreter, entry, 3);
+
     name = constant_pmc_new_noinit(interpreter, enum_class_String);
     hll_name = string_as_const_string(interpreter, hll_name);
     VTABLE_set_string_native(interpreter, name, hll_name);
     VTABLE_set_pmc_keyed_int(interpreter, entry, 0, name);
 
-    /* load lib */
-    if (string_length(interpreter, hll_lib))
+    if (string_length(interpreter, hll_lib)) {
+        name = constant_pmc_new_noinit(interpreter, enum_class_String);
+        hll_lib = string_as_const_string(interpreter, hll_lib);
+        VTABLE_set_string_native(interpreter, name, hll_lib);
+        VTABLE_set_pmc_keyed_int(interpreter, entry, 1, name);
+        /* load lib */
         Parrot_load_lib(interpreter, hll_lib, NULL);
+    }
 
     /* UNLOCK */
     return idx;
@@ -93,10 +99,10 @@ Parrot_register_HLL_type(Interp *interpreter, INTVAL hll_id,
 
     hll_info = interpreter->HLL_info;
     entry = VTABLE_get_pmc_keyed_int(interpreter, hll_info, hll_id);
-    type_hash = VTABLE_get_pmc_keyed_int(interpreter, entry, 1);
+    type_hash = VTABLE_get_pmc_keyed_int(interpreter, entry, 2);
     if (PMC_IS_NULL(type_hash)) {
         type_hash = Parrot_new_INTVAL_hash(interpreter, PObj_constant_FLAG);
-        VTABLE_set_pmc_keyed_int(interpreter, entry, 1, type_hash);
+        VTABLE_set_pmc_keyed_int(interpreter, entry, 2, type_hash);
     }
     hash = PMC_struct_val(type_hash);
     hash_put(interpreter, hash, (void*)core_type, (void*)hll_type);
@@ -110,7 +116,7 @@ Parrot_get_HLL_type(Interp *interpreter, INTVAL hll_id, INTVAL core_type)
 
     hll_info = interpreter->HLL_info;
     entry = VTABLE_get_pmc_keyed_int(interpreter, hll_info, hll_id);
-    type_hash = VTABLE_get_pmc_keyed_int(interpreter, entry, 1);
+    type_hash = VTABLE_get_pmc_keyed_int(interpreter, entry, 2);
     if (PMC_IS_NULL(type_hash))
         return 0;
     hash = PMC_struct_val(type_hash);

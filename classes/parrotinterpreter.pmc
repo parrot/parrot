@@ -575,6 +575,80 @@ have the same thread id.
             return 1;
         return 0;
     }
+
+/*
+
+=item C<void visit(visit_info *info)>
+
+This is used by freeze/thaw to visit the contents of the interpreter.
+
+C<*info> is the visit info, (see F<include/parrot/pmc_freeze.h>).
+
+=item C<void freeze(visit_info *info)>
+
+Used to archive the interpreter. Actually not the whole interpreter is
+frozen but the state of the interpreter, which includes everything that
+has changes since creating an empty interpreter.
+
+=item C<void thaw(visit_info *info)>
+
+Used to unarchive the interpreter. This merges the changes into this
+interpreter instance.
+
+=item C<void thawfinish(visit_info *info)>
+
+Finish thawing.
+
+=cut
+
+*/
+
+    void visit(visit_info *info) {
+        PMC **pos;
+        /* 1. HLL_info */
+        pos = &INTERP->HLL_info;
+        info->thaw_ptr = pos;
+        /* pass in the existing structure
+         * TODO pass a dummy PMC and merge the two structs
+         */
+        info->extra = *pos;
+        info->extra_flags = EXTRA_CLASS_EXISTS;
+        (info->visit_pmc_now)(INTERP, *pos, info);
+    }
+
+    void freeze(visit_info *info) {
+        IMAGE_IO *io = info->image_io;
+        SUPER(info);
+    }
+
+    void thaw(visit_info *info) {
+        IMAGE_IO *io = info->image_io;
+        if (info->extra_flags == EXTRA_IS_PROP_HASH) {
+            SUPER(info);
+        }
+        else if (info->extra_flags == EXTRA_IS_NULL) {
+            PMC_data(SELF) = INTERP;
+            info->what = VISIT_THAW_CONSTANTS;
+        }
+    }
+
+    void thawfinish(visit_info *info) {
+        INTVAL i, n;
+        PMC *hll_info, *entry, *lib_pmc;
+        STRING *lib_name;
+
+
+        hll_info = INTERP->HLL_info;
+        n = VTABLE_elements(INTERP, hll_info);
+        for (i = 0; i < n; ++i) {
+            entry = VTABLE_get_pmc_keyed_int(INTERP, hll_info, i);
+            lib_pmc = VTABLE_get_pmc_keyed_int(INTERP, entry, 1);
+            if (PMC_IS_NULL(lib_pmc))
+                continue;
+            lib_name = VTABLE_get_string(INTERP, lib_pmc);
+            Parrot_load_lib(INTERP, lib_name, NULL);
+        }
+    }
 }
 
 /*

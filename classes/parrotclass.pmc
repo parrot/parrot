@@ -153,7 +153,7 @@ Create the class from the thawed parents and attributes array.
 
         /* 2) direct parents array */
         if (info->what == VISIT_THAW_NORMAL ||
-                info->what == VISIT_FREEZE_AT_DESTRUCT)
+                info->what == VISIT_THAW_CONSTANTS)
             pos = class_data + PCD_MAX;
         else
             pos = class_data + PCD_PARENTS;
@@ -162,7 +162,7 @@ Create the class from the thawed parents and attributes array.
 
         /* 3) attributes array */
         if (info->what == VISIT_THAW_NORMAL ||
-                info->what == VISIT_FREEZE_AT_DESTRUCT)
+                info->what == VISIT_THAW_CONSTANTS)
             pos = class_data + PCD_MAX + 1;
         else
             pos = class_data + PCD_CLASS_ATTRIBUTES;

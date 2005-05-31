@@ -132,9 +132,20 @@ e_pbc_open(Interp * interpreter, void *param)
      * we need some segments
      */
     if (!interpreter->code) {
+        PMC *self;
+        int k;
+
         cs->seg = interpreter->code =
             PF_create_default_segs(interpreter,
                     IMCC_INFO(interpreter)->state->file, 1);
+        /*
+         * create a PMC constant holding the interpreter state
+         */
+        self = VTABLE_get_pmc_keyed_int(interpreter, interpreter->iglobals,
+                IGLOBALS_INTERPRETER);
+        k = PDB_extend_const_table(interpreter);
+        interpreter->code->const_table->constants[k]->type = PFC_PMC;
+        interpreter->code->const_table->constants[k]->u.key = self;
     }
     globals.cs = cs;
     return 0;
