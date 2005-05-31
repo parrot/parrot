@@ -745,8 +745,8 @@
 # generated from svn:ignore of 'languages/tcl/t/'
 ^languages/tcl/t/.*.tcl$
 ^languages/tcl/t/.*.tcl/
-^languages/tcl/t/.*.imc$
-^languages/tcl/t/.*.imc/
+^languages/tcl/t/.*.pir$
+^languages/tcl/t/.*.pir/
 # generated from svn:ignore of 'languages/urm/'
 ^languages/urm/Makefile$
 ^languages/urm/Makefile/
