@@ -157,6 +157,7 @@ make_interpreter(Parrot_Interp parent, Interp_flags flags)
     init_object_cache(interpreter);
 
     /* initialize classes - this needs mmd func table */
+    SET_NULL(interpreter->HLL_info);
     Parrot_init(interpreter);
 
     /* context data */

@@ -45,6 +45,7 @@ Get an equivalent HLL type number for the language C<hll_id> or 0 on error.
 */
 
 #include "parrot/parrot.h"
+#include "parrot/dynext.h"
 #include <assert.h>
 
 static STRING*
@@ -75,7 +76,9 @@ Parrot_register_HLL(Interp *interpreter,
     VTABLE_set_string_native(interpreter, name, hll_name);
     VTABLE_set_pmc_keyed_int(interpreter, entry, 0, name);
 
-    /* TODO load lib */
+    /* load lib */
+    if (string_length(interpreter, hll_lib))
+        Parrot_load_lib(interpreter, hll_lib, NULL);
 
     /* UNLOCK */
     return idx;

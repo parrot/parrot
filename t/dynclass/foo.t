@@ -16,7 +16,7 @@ Tests the Foo PMC.
 
 =cut
 
-use Parrot::Test tests => 7;
+use Parrot::Test tests => 9;
 use Parrot::Config;
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "get_integer");
@@ -169,4 +169,30 @@ pir_output_is(<<'CODE', <<'OUTPUT', "Foo subclass isa Integer");
 .end
 CODE
 144
+OUTPUT
+
+pir_output_is(<< 'CODE', << 'OUTPUT', ".HLL 1");
+# load our Foo test (pseudo) language
+# it defines one PMC type "Foo"
+.HLL "Fool", "foo"
+.sub main @MAIN
+    new $P1, "Foo"      # load by name
+    $I1 = $P1
+    print $I1
+    print "\n"
+.end
+CODE
+42
+OUTPUT
+
+pir_output_is(<< 'CODE', << 'OUTPUT', ".HLL 2");
+.HLL "Fool", "foo"
+.sub main @MAIN
+    new $P1, .Foo       # load by index
+    $I1 = $P1
+    print $I1
+    print "\n"
+.end
+CODE
+42
 OUTPUT

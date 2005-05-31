@@ -334,7 +334,7 @@ begin_return_or_yield(Interp *interp, int yield)
 %nonassoc '\n'
 %nonassoc <t> PARAM
 
-%token <t> PRAGMA FASTCALL N_OPERATORS
+%token <t> PRAGMA FASTCALL N_OPERATORS HLL
 %token <t> CALL GOTO ARG FLATTEN_ARG FLATTEN IF UNLESS END SAVEALL RESTOREALL
 %token <t> NEW NEWSUB NEWCLOSURE NEWCOR NEWCONT
 %token <t> NAMESPACE ENDNAMESPACE CLASS ENDCLASS FIELD DOT_METHOD
@@ -356,7 +356,7 @@ begin_return_or_yield(Interp *interp, int yield)
 %token <s> IREG NREG SREG PREG IDENTIFIER REG MACRO ENDM
 %token <s> STRINGC INTC FLOATC USTRINGC
 %token <s> PARROT_OP
-%type <t> type newsub ptr pragma_1
+%type <t> type newsub ptr pragma_1 hll_def
 %type <i> program class class_body member_decls member_decl field_decl
 %type <i> method_decl class_namespace
 %type <i> global constdef sub emit pcc_sub  pcc_ret
@@ -422,6 +422,7 @@ compilation_unit:
    ;
 
 pragma: PRAGMA pragma_1 '\n'   { $$ = 0; }
+   | hll_def            '\n'   { $$ = 0; }
    ;
 
 pragma_1: FASTCALL  { IMCC_INFO(interp)->state->pragmas |= PR_FASTCALL; }
@@ -431,6 +432,17 @@ pragma_1: FASTCALL  { IMCC_INFO(interp)->state->pragmas |= PR_FASTCALL; }
                       else
                           IMCC_INFO(interp)->state->pragmas &= ~PR_N_OPERATORS;
                     }
+   ;
+
+hll_def: HLL STRINGC COMMA STRINGC
+         {
+            STRING *hll_name, *hll_lib;
+            hll_name = string_unescape_cstring(interp, $2 + 1, '"', NULL);
+            hll_lib =  string_unescape_cstring(interp, $4 + 1, '"', NULL);
+            IMCC_INFO(interp)->HLL_name = hll_name;
+            Parrot_register_HLL(interp, hll_name, hll_lib);
+            $$ = 0;
+         }
    ;
 
 global:

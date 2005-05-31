@@ -212,6 +212,7 @@ typedef struct Parrot_Context {
                                     currently found method */
     opcode_t *current_pc;       /* program counter of Sub invocation */
     String *current_package;    /* The package we're currently in */
+    INTVAL current_HLL;         /* see also src/hll.c */
 } parrot_context_t;
 
 struct _Thread_data;    /* in thread.h */

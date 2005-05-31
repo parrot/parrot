@@ -220,6 +220,7 @@ SP              [ ]
 ".class"        return(CLASS);
 ".endclass"     return(ENDCLASS);
 <emit,INITIAL>".namespace"    return(NAMESPACE);
+<emit,INITIAL>".HLL"    return(HLL);
 ".endnamespace" return(ENDNAMESPACE);
 ".field"        return(FIELD);
 ".method"       return(DOT_METHOD);
