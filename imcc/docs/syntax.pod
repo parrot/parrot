@@ -128,6 +128,20 @@ B<0x> and B<0b> denote hex and binary constants.
 
 =over 4
 
+=item .pragma n_operators
+
+Convert arithmethic infix shortcuts to n_infix operations. E.g.
+
+ .pragma n_operators
+ .sub foo
+   $P0 = $P1 + $P2           # n_add $P0, $P1, $P2
+
+=item .HLL "hll_name", "hll_lib"
+
+Define the HLL for the current module. If the string C<hll_lib> isn't empty
+this B<compile time pragma> also loads the shared lib for the HLL, so that
+integer types are working for creatin new PMCs.
+
 =item .sub <identifier>
 
 =item .end
@@ -194,10 +208,6 @@ Instructions may be a valid PASM instruction or anything listed here
 below:
 
 =over 4
-
-=item call <identifier>
-
-B<bsr> <identifier>.
 
 =item goto <identifier>
 
