@@ -3,7 +3,7 @@
 # $Id$
 
 use strict;
-use Parrot::Test tests => 70;
+use Parrot::Test tests => 72;
 
 # these tests are run with -O1 by TestCompiler and show
 # generated PASM code for various optimizations at level 1
@@ -1035,3 +1035,33 @@ _main:
 OUT
 }
 
+pir_2_pasm_like(<<'CODE', <<'OUT', "segv - last ins changed");
+.sub main @MAIN
+    func()
+.end
+.sub func
+    $I0 += 1
+.end
+CODE
+/func:
+ inc I\d+
+ null I0
+ null I3
+ returncc
+/
+OUT
+
+pir_2_pasm_like(<<'CODE', <<'OUT', "segv - last ins deleted");
+.sub main @MAIN
+    func()
+.end
+.sub func
+    $I0 += 0
+.end
+CODE
+/func:
+ null I0
+ null I3
+ returncc
+/
+OUT
