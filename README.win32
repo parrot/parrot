@@ -74,6 +74,32 @@ really wants it and the binary packages don't contain it.  It doesn't
 need to contain anything though, as the data is pulled in from
 F<lib/icudt.lib>, which contains the standard data in binary form.
 
+=item Optional librairies
+
+The availability of these librairies is checked by Configure.pl.
+
+B<gdbm> - GNU database manager 
+L<http://gnuwin32.sourceforge.net/>
+
+B<GMP> - GNU multiple precision arithmetic library 
+L<http://developer.berlios.de/projects/win32gmp/>
+
+=item Optional utilities
+
+The availability of these utilities is checked by Configure.pl.
+
+B<antlr> - ANother Tool for Language Recognition 
+L<http://www.antlr.org/>
+
+B<bc> - arbitrary-precision arithmetic language and calculator 
+L<http://gnuwin32.sourceforge.net/>
+
+B<m4> - macro language processor 
+L<http://gnuwin32.sourceforge.net/>
+
+B<Python> - an interpreted, interactive, object-oriented programming language
+L<http://www.python.org/>  
+
 =item Inno Setup
 
 Inno Setup is a I<free> installer for Windows programs.
@@ -169,6 +195,8 @@ XXX
 
 =item Ron Blaschke E<lt>ron@rblasch.orgE<gt>
 
+=item François Perrad  E<lt>francois.perrad@gadz.orgE<gt>
+
 =back
 
 This document is maintained by The Parrot Developers
@@ -182,6 +210,8 @@ This document is maintained by The Parrot Developers
 
 This document borrows heavily from Perl's README.win32.
 
-Last updated: 14 April 2005
+GCC/mingw32 support was added in 0.1.2 (François Perrad).
+
+Last updated: 31 May 2005
 
 =cut
