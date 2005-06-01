@@ -6,7 +6,7 @@
 
 =head1 NAME
 
-MD5.imc - calculate MD5 checksums
+MD5.imc - calculates MD5 checksums
 
 =head1 SYNOPSIS
 
@@ -41,21 +41,8 @@ Pass it the Integer array to print the checksum.
 
 =head1 BUGS
 
-This section provides a list of bugs.
-
-=over 4
-
-=item *
-
-By all accounts, doesn't seem to work on big endian systems, but I
-don't have access to investigate.
-
-=item *
-
-There is some scope to optimise things a little further, perhaps removing
-some of the 'and's (for 64-bit) which may be superflouous.
-
-=back
+Still has some limitations on input buffer size, largely due to memory
+consumption which should be resolved soon.
 
 =cut
 
@@ -63,32 +50,15 @@ some of the 'and's (for 64-bit) which may be superflouous.
 # Export function entries to globals
 
 .sub onload @LOAD
-    .local pmc endian
-    endian = new Integer
-    endian = 0
-
-    $P0 = _config()
-
-    $I0 = $P0["bigendian"]
-    unless $I0 goto is_little_endian
-    endian = 1
-    printerr "This appears to be a big endian processor: "
-    printerr "Please verify the MD5 checksum\n"
-
-is_little_endian:
-
-    store_global "Digest", "_md5_swap_endian", endian
 
     .local pmc f
     f = find_global "Digest", "_md5sum"
-    global "_md5sum" = f
+    global "_md5sum"    = f
     f = find_global "Digest", "_md5_hex"
-    global "_md5_hex" = f
+    global "_md5_hex"   = f
     f = find_global "Digest", "_md5_print"
     global "_md5_print" = f
 .end
-
-.include "library/config.imc"
 
 ###########################################################################
 # Main backend entry point
@@ -98,85 +68,73 @@ is_little_endian:
 .sub _md5sum
     .param string str
 
-    .local pmc buffer, context
-    buffer = new FixedIntegerArray
-
+    .local pmc context
     context = new FixedIntegerArray
     context = 4
 
-    $P0 = find_global "Digest", "_md5_swap_endian"
-    $I0 = $P0
-    _md5_create_buffer (str, buffer, $I0)
+    .local pmc buffer
+    buffer = _md5_create_buffer (str)
 
     _md5_init (context)
     _md5_process_buffer (context, buffer)
 
-    .return(context)
-
+    .return (context)
 .end
 
 
 ###########################################################################
 # Low-level macros used in MD5
 
-# A parrot rol instruction might be good (as it can often be JIT'd)
-.macro rol (x,n,  out)
-    #.out  = .x << .n
-    #tmp2  = 32 - .n
-    #tmp2  = .x >>> tmp2
-    #.out |= tmp2
-    rot .out, .x, .n, 32
-.endm
-
 .macro FF (b,c,d)
-    tmp1 = .c ~ .d
-    tmp1 &= .b
-    tmp1 ~= .d
+    tmp  = .c ~ .d
+    tmp &= .b
+    tmp ~= .d
 .endm
 
 .macro FH (b,c,d)
-    tmp1 = .b   ~ .c
-    tmp1 ~= .d
+    tmp  = .b ~ .c
+    tmp ~= .d
 .endm
 
 .macro FI (b,c,d)
-    tmp1 = ~.d
-    tmp1 |= .b
-    tmp1 ~= .c
+    tmp  = ~.d
+    tmp |= .b
+    tmp ~= .c
 .endm
 
 ###########################################################################
 # Higher level MD5 operations
 
 .macro common (a, b, k, s, T)
-    .a += tmp1
+    .a += tmp
     .a += .T
-    tmp2 = .k + idx
-    tmp1 = buffer[tmp2]
-    .a += tmp1
+    tmp = .k + idx
+    tmp = buffer[tmp]
+    .a += tmp
     .a &= 0xffffffff
-    .rol (.a, .s, tmp1)
-    .a  = .b + tmp1
+    tmp = rot .a, .s, 32
+    .a  = .b + tmp
     .a &= 0xffffffff
 .endm
 
+
 .macro OP1 (aa,bb,cc,dd, kk, ss, TT)
-    .FF (.bb,.cc,.dd)
+    .FF     (.bb,.cc,.dd)
     .common (.aa, .bb, .kk, .ss, .TT)
 .endm
 
 .macro OP2 (aa,bb,cc,dd, kk, ss, TT)
-    .FF (.dd,.bb,.cc)
+    .FF     (.dd,.bb,.cc)
     .common (.aa, .bb, .kk, .ss, .TT)
 .endm
 
 .macro OP3 (aa,bb,cc,dd, kk, ss, TT)
-    .FH (.bb,.cc,.dd)
+    .FH     (.bb,.cc,.dd)
     .common (.aa, .bb, .kk, .ss, .TT)
 .endm
 
 .macro OP4 (aa,bb,cc,dd, kk, ss, TT)
-    .FI (.bb,.cc,.dd)
+    .FI     (.bb,.cc,.dd)
     .common (.aa, .bb, .kk, .ss, .TT)
 .endm
 
@@ -197,11 +155,10 @@ is_little_endian:
 
      $I10 |= $I11
      $I10 |= $I12
-     .w   =  $I10 | $I13
+     $I10 |= $I13
 
      # For 64-bit architectures
-     .w &= 0xffffffff
-
+     .w = $I10 & 0xffffffff
 .endm
 
 ###########################################################################
@@ -224,8 +181,9 @@ is_little_endian:
 
 .sub _md5_create_buffer
     .param string str
-    .param pmc    buffer
-    .param int    endian
+
+    .local pmc buffer
+    buffer = new FixedIntegerArray
 
     .local int counter
     .local int subcounter
@@ -239,7 +197,7 @@ is_little_endian:
 
      # Work out how many words to allocate
      .local int words
-     words = len + 8
+     words  = len + 8
      words |= 63
      inc words
      words /= 4
@@ -251,11 +209,11 @@ is_little_endian:
      subcounter   = 0
      slow_counter = 0
 
-md5_create_buffer_loop:
+create_buffer_loop:
 
      $I5 = counter + subcounter
 
-     if $I5 > len goto md5_create_buffer_break
+     if $I5 > len goto create_buffer_break
 
      # MD5 pad character, which goes last
      $I4 = 0x80
@@ -266,37 +224,32 @@ md5_create_buffer_loop:
 string_char:
 
      word <<= 8
-     word |= $I4
+     word  |= $I4
 
      inc subcounter
-     if subcounter != 4 goto md5_create_buffer_loop
+     if subcounter != 4 goto create_buffer_loop
 
-     if endian goto endian_ok1
      .swap (word)
-endian_ok1:
 
      buffer[slow_counter] = word
 
-     word         = 0
-     counter      +=  4
-     subcounter   = 0
+     word       = 0
+     counter   += 4
+     subcounter = 0
      inc slow_counter
 
-     goto md5_create_buffer_loop
+     goto create_buffer_loop
 
-md5_create_buffer_break:
+create_buffer_break:
 
      # Check for a partial word
 
      if subcounter == 0 goto complete
      subcounter = 4 - subcounter
-     .local int shift
-     shift = 8*subcounter
-     word <<= shift
+     $I0    = 8*subcounter
+     word <<= $I0
 
-     if endian goto endian_ok2
      .swap (word)
-endian_ok2:
 
      buffer[slow_counter] = word
 
@@ -304,13 +257,15 @@ complete:
 
      # The number of bits in the string go into the last two words
 
-     $I1 = len >>> 29
+     $I0 = len >>> 29
      dec words
-     buffer[words] = $I1
+     buffer[words] = $I0
 
      $I0 = len << 3
      dec words
      buffer[words] = $I0
+
+     .return (buffer)
 
 .end
 
@@ -323,7 +278,7 @@ complete:
     .local int A, B, C, D
     .local int A_save, B_save, C_save, D_save
 
-    .local int tmp1, tmp2, idx, len
+    .local int tmp, idx, len
 
     idx = 0
     len = elements buffer
@@ -333,7 +288,7 @@ complete:
     C = context[2]
     D = context[3]
 
-md5_loop:
+loop:
 
     A_save = A
     B_save = B
@@ -419,7 +374,7 @@ md5_loop:
 
     idx += 16
 
-    if idx < len goto md5_loop
+    if idx < len goto loop
 
     context[0] = A
     context[1] = B
@@ -446,8 +401,8 @@ md5_loop:
     $P0[2] = C
     $P0[3] = D
 
-    sprintf $S0, "%08lx%08lx%08lx%08lx", $P0
-    .return($S0)
+    $S0 = sprintf "%08lx%08lx%08lx%08lx", $P0
+    .return ($S0)
 .end
 
 ###########################################################################
@@ -464,80 +419,22 @@ md5_loop:
     C = context[2]
     D = context[3]
 
-    $P0 = find_global "Digest", "_md5_swap_endian"
-    if $P0 goto dont_swap
-
     .swap (A)
     .swap (B)
     .swap (C)
     .swap (D)
 
-dont_swap:
-
     $S0 = _md5_format_vals (A,B,C,D)
-    .return($S0)
+    .return ($S0)
 .end
 
-# Convenience subroutine to print the MD5 string
+# Convenience subroutine to print the MD5 hash for a string
 
 .sub _md5_print
     .param pmc context
 
     $S0 = _md5_hex (context)
     print $S0
-.end
 
-###########################################################################
-
-# For debugging
-
-.sub _md5_print_buffer
-    .param pmc buffer
-    .param int word_size
-
-    .local int size
-
-    size = buffer
-
-    .local int counter
-    .local int value
-
-    counter = 0
-
-print_buffer_loop:
-    if counter >= size goto print_buffer_done
-    value = buffer[counter]
-    $S0 = _md5_number_as_hex (value, word_size)
-    print $S0
-    print " | "
-    counter = counter + 1
-    goto print_buffer_loop
-
-print_buffer_done:
-
-    print "\n"
-
-.end
-
-###########################################################################
-
-# Also for debugging
-
-.sub _md5_number_as_hex
-    .param int number
-    .param int word_size
-
-    $P0 = new FixedIntegerArray
-    $P0 = 1
-    $P0[0] = number
-
-    $S1 = "%0"
-    $S0 = word_size
-    concat $S1, $S0
-    concat $S1, "lx"
-
-    sprintf $S0, $S1, $P0
-
-    .return($S0)
-
+    .return ($S0)
 .end

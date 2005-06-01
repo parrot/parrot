@@ -12,20 +12,9 @@
 use strict;
 use Parrot::Test tests => 6;
 
-use Parrot::Config;
-
-my $bigendian = $PConfig{bigendian};
-
-SKIP: {
-
-if ($bigendian)
-{
-    skip('MD5 only known to work on little endian bit processors', 6)
-}
-
 
 ##############################
-# Stress IMCC and parrot using MD5 library
+# Stress parrot using MD5 library
 
 pir_output_is(<<'CODE', <<'OUT', "Miscellaneous words");
 .sub _main
@@ -808,5 +797,3 @@ f67fa138069da8fce68c131106492372
 8408bf5f0144309374e66278bec290b2
 982e0fde28cd2f62ef8db2d8dfd0f0d7
 OUT
-
-}
