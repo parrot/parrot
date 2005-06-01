@@ -1,7 +1,7 @@
 # Parrot md5sum; Nick Glencross <nickg@glencros.demon.co.uk>
 #                Improvements from Leo
 #
-# Harness for the Digest/MD5.imc library
+# Harness for the Digest/MD5.pir library
 
 =head1 NAME
 

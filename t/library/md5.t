@@ -18,7 +18,7 @@ use Parrot::Test tests => 6;
 
 pir_output_is(<<'CODE', <<'OUT', "Miscellaneous words");
 .sub _main
-    load_bytecode "library/Digest/MD5.imc"
+    load_bytecode "library/Digest/MD5.pbc"
     $P0 = _md5sum ("Hello")
     _md5_print ($P0)
     print "\n"
@@ -48,7 +48,7 @@ OUT
 
 pir_output_is(<<'CODE', <<'OUT', "Funny chars");
 .sub _main
-    load_bytecode "library/Digest/MD5.imc"
+    load_bytecode "library/Digest/MD5.pbc"
     $P0 = _md5sum ("\n\n\n\n\t")
     _md5_print ($P0)
     print "\n"
@@ -189,7 +189,7 @@ CODE
 
 pir_output_is(<<CODE, <<'OUT', "String lengths");
 .sub _main
-    load_bytecode "library/Digest/MD5.imc"
+    load_bytecode "library/Digest/MD5.pbc"
     $code
     end
 .end
@@ -313,7 +313,7 @@ my $text = "Hello Parrot World! " x 50_000;
 
 pir_output_is(<<CODE, <<'OUT', "REALLY long string");
 .sub _main
-    load_bytecode "library/Digest/MD5.imc"
+    load_bytecode "library/Digest/MD5.pbc"
     \$P0 = _md5sum ("$text")
     _md5_print (\$P0)
     print "\\n"
@@ -340,7 +340,7 @@ done
 
 pir_output_is(<<'CODE', <<'OUT', "recursive md5sum (1)");
 .sub _main
-    load_bytecode "library/Digest/MD5.imc"
+    load_bytecode "library/Digest/MD5.pbc"
 
     $S0 = "Hello World!"
     $I0 = 0
@@ -576,7 +576,7 @@ done
 
 pir_output_is(<<'CODE', <<'OUT', "recursive md5sum (2)");
 .sub _main
-    load_bytecode "library/Digest/MD5.imc"
+    load_bytecode "library/Digest/MD5.pbc"
 
     $S0 = "Hello World!"
     $I0 = 0
