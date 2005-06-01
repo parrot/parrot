@@ -1,3 +1,5 @@
+# $Id$
+
 # First, read the file.
         set S20, P5[1]      # Name of the Ook source.
 	open P20, S20, "<"  # P20 = file descriptor
@@ -15,11 +17,11 @@ EOF:
         length I20, S21      # Total length of file.
         set I21, 0           # Char number in the file.
         set I22, 1           # Line number (for error reporting).
-        new P21, .PerlArray  # While-level.
+        new P21, .ResizablePMCArray  # While-level.
         push P21, 0
         set S22, ""          # Current char.
         set S23, ""          # Current instruction.
-        set S24, "\tnew P20,.PerlArray\n\tset I20,0\n"       # Code generated.
+        set S24, "\tnew P20, .ResizablePMCArray\n\tset I20,0\n"       # Code generated.
         branch LOOP_END
 LOOP:
         length I24, S23
