@@ -185,12 +185,12 @@ ICU Options
 
 =item C<--icu-config=/path/to/icu-config>
 
-Use the specified icu-config script to determine the neccessary ICU options.
+Use the specified icu-config script to determine the necessary ICU options.
 
 Use --icu-config=none to disable the autodetect feature. Parrot will
 then be build with its own ICU.
 
-B<Note:> If you specifiy another ICU option than --icu-config, the
+B<Note:> If you specify another ICU option than --icu-config, the
 autodetection functionality will be disabled.
 
 =item C<--icuplatform=(platform)>

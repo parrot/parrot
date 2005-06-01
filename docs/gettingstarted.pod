@@ -47,7 +47,7 @@ C<rsync -av --delete svn.perl.org::parrot-HEAD parrot>
 
 =back
 
-The abobe instructions are also on the Parrot website:
+The above instructions are also on the Parrot website:
 
 http://www.parrotcode.org/source.html
 

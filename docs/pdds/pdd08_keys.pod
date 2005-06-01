@@ -235,7 +235,7 @@ specified using two words. The first word is a type specifier:
 
     1 - Integer constant
     2 - Number constant
-    4 - String contant
+    4 - String constant
     7 - Integer register
     8 - Number register
     9 - PMC register

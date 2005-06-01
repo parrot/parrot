@@ -410,7 +410,7 @@ and invoke'ing it.
 
 =item B<returncc>()
 
-Return from the sub or method via the current continuatio.
+Return from the sub or method via the current continuation.
 
 =cut
 

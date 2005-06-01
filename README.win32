@@ -138,7 +138,7 @@ XXX
 
     $MAKE win32-inno-installer
     
-This command creats a setup-parrot-x.y.z.exe that contains all parrot install 
+This command creates a setup-parrot-x.y.z.exe that contains all parrot install 
 directories.
 
 =head2 Usage Hints

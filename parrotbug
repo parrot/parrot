@@ -568,7 +568,7 @@ Usage:           $0 [OPTIONS] [ACTIONS]
 
 Options:
   --ok                   Report successful build on this system to parrot
-                         developpers. Only use --ok if *everything* was ok:
+                         developers. Only use --ok if *everything* was ok:
                          if there were *any* problems at all, use --nok.
   --nok                  Report unsuccessful build on this system.
   --subject <subject>    Subject to include with the message.
@@ -580,7 +580,7 @@ Options:
   --input-file           File containing the body of the report. Use this
                          to quickly send a prepared message.
   --output-file          File where parrotbug will save its bug report.
-  --to <address>         Email adress to send report to. (testing only)
+  --to <address>         Email address to send report to. (testing only)
 
   Note: you will be prompted if the program miss some information.
 
@@ -731,11 +731,11 @@ Note: you will be prompted if the program miss some information.
 
 =item B<--nok>
 
-Report unsuccessful build on this system to parrot developpers.
+Report unsuccessful build on this system to parrot developers.
 
 =item B<--ok>
 
-Report successful build on this system to parrot developpers Only use
+Report successful build on this system to parrot developers Only use
 C<--ok> if B<everything> was ok; if there were B<any> problems at all,
 use C<--nok>.
 
@@ -778,7 +778,7 @@ File where parrotbug will save its bug report, if you ask it to do so.
 
 =item B<--to>
 
-Email adress to send report to. (for testing purposes only)
+Email address to send report to. (for testing purposes only)
 
 =back
 

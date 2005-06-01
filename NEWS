@@ -29,7 +29,7 @@ Parrot 0.1.1 is an intermediate release with tons of updates and fixes.
  - MMD - multi method dispatch for binary vtable methods
  - Library improvement and cleanup
  - BigInt, Complex, *Array, Slice, Enumerate, None PMC classes
- - IA64 and hppa JIT supprt
+ - IA64 and hppa JIT support
  - Tons of fixes, improvements, new tests, and documentation updates.
 A lot is unfinished and keeps changing. Nethertheless Parrot is stable
 and usable at the surface, while internals are moving.
@@ -240,7 +240,7 @@ New in 0.0.3
 - Jako updates: subroutines, more example programs, optimizations
 - test_prog renamed to 'parrot'
 
-- Added fatures to the assembler: @ for current location, and global
+- Added features to the assembler: @ for current location, and global
   labels
 - Build tweaks for VMS
 - Bytecode typing clean-ups

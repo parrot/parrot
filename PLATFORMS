@@ -1,4 +1,4 @@
-Parrot was reported to compile and run tests successfuly on these platforms:
+Parrot was reported to compile and run tests successfully on these platforms:
 
 Platform                B8    Runloops      Feature Comp Test Inst YYYYMMDD
                            CGoto JIT EXEC   Thr Sig

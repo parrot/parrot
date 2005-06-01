@@ -393,7 +393,7 @@
 
 2002-03-16 16:50  ajgough
 
-	* types/: bignum.c, bignum.h: More documentation, seperate
+	* types/: bignum.c, bignum.h: More documentation, separate
 	functions into public and private sorts, some initial stuff to cope
 	with over and underflow correctly.
 
@@ -702,7 +702,7 @@
 2002-03-08 21:12  ajgough
 
 	* include/parrot/string.h: Added private flags to string.h, mostly
-	so that other GCed stuff can also have it's very own private flags.
+	so that other GCed stuff can also have its very own private flags.
 
 2002-03-08 19:53  simon
 
@@ -1281,7 +1281,7 @@
 
 	* Configure.pl, embed.c, pdump.c, hints/mswin32.pl,
 	include/parrot/parrot.h: this patch adds support for the freely
-	availabe borland c++ 5.5.1 compiler
+	available borland c++ 5.5.1 compiler
 
 	depends on: - josh's patch to remove ssize_t from CPrederef.pm -
 	working borland compiler (compiler must know where to find headers
@@ -2604,7 +2604,7 @@
 
 2002-01-19 07:12  mrjoltcola
 
-	* MANIFEST, core.ops, io.ops, pbc2c.pl: Seperate pure ParrotIO ops
+	* MANIFEST, core.ops, io.ops, pbc2c.pl: Separate pure ParrotIO ops
 	into io.ops, leave the STDIO wrappers	     in core.ops until they
 	disappear.  Added debug op for switching on VM debug flag
 
@@ -2729,7 +2729,7 @@
 	current code. But it will make adding some opcodes easier in the
 	future, and cleans up a small nit in the current bsr.
 
-	Courtesty of Steve Fink <steve@fink.com>
+	Courtesy of Steve Fink <steve@fink.com>
 
 2002-01-15 08:48  brentdax
 
@@ -3284,7 +3284,7 @@
 2002-01-07 11:43  simon
 
 	* Configure.pl:
-	Gobble the + before catenating.
+	Gobble the + before concatenating.
 
 2002-01-07 03:53  dan
 
@@ -4488,7 +4488,7 @@
 	take as
 	    argument the address where is the opcode number to jump to.
 
-	  * There is a bug at some point, but I will start writting
+	  * There is a bug at some point, but I will start writing
 	    jit/i386/string.jit and jit/i386/stacks.jit so that we don't
 	have use
 	    calls, which make the jit as slow as the interpreter.
@@ -4724,7 +4724,7 @@
 	The goal is to remove the additional test in the inner loop that
 	was checking for NULL to decide whether or not to call the
 	prederef() function. Also moved pc & pc_prederef syncing outside
-	the innner loop.
+	the inner loop.
 
 	  * Changed the prototype of the prederef() function in
 	    interpreter.c to match that of an opfunc.
@@ -5004,7 +5004,7 @@
 	We assume that sizeof(INTVAL) <= sizeof(void *), so we can continue
 	to have inline INTVAL constants.
 
-	I've been getting about a 22% speed increase over vanila code path
+	I've been getting about a 22% speed increase over vanilla code path
 	when I compile with -O0. Advantage decreases at -O9 here. I tested
 	with mops.pbc, and also by temporarily putting the -P flag in
 	Parrot/Test.pm and running all the tests. So, this code is as
@@ -5168,7 +5168,7 @@
 
 	* Makefile.in: D'oh! Fixed looping makefile bug.
 
-	Courtesty of: "Jaen Saul" <jaen@saul.ee>
+	Courtesy of: "Jaen Saul" <jaen@saul.ee>
 
 2001-12-12 16:23  jgoff
 
@@ -6069,7 +6069,7 @@
 2001-11-02 12:13  gregor
 
 	* MANIFEST, time.c, include/parrot/time.h:
-	  * Removed time.[hc], since they have been superceded by the new
+	  * Removed time.[hc], since they have been superseded by the new
 	platform
 	    stuff.
 
@@ -6476,7 +6476,7 @@
 	    hand-modified version of the assembly code produced by the
 	    Jako compiler from queens.jako. A few unnecessary ops have
 	    been removed, lots of unnecessary labels have been removed,
-	    and all the Jako soure code comments have been removed.
+	    and all the Jako source code comments have been removed.
 
 	  * Makefile and .cvsignore in languages/jako modified so that
 	    the assembler produces listings when assembling the programs,
@@ -6956,7 +6956,7 @@
 	result for %
 		are machine-dependent for negative operands, as is the
 	action taken
-		on overflow or underlfow.
+		on overflow or underflow.
 								     --
 	[1], page 41
 
@@ -7049,7 +7049,7 @@
 	Programming
 		  Language*, Second Edition. Prentice Hall, 1988.
 
-	  * Added and modified tests as appropropriate for the above.
+	  * Added and modified tests as appropriate for the above.
 
 2001-10-08 08:49  thgibbs
 
@@ -7256,7 +7256,7 @@
 	The Assembler.pm module was changed to do late binding of arguments
 	so that 0 could be treated like 0.0 without having to be so
 	declared.  Also, only strings now use the [sc:N] intermediate form
-	as it was unneccesary for integer and float types.
+	as it was unnecessary for integer and float types.
 
 2001-10-05 21:59  gregor
 
@@ -7907,7 +7907,7 @@
 
 2001-09-20 22:41  dan
 
-	* packfile.c: Had some no-value returns. Naugty
+	* packfile.c: Had some no-value returns. Naughty
 
 2001-09-20 22:40  dan
 
@@ -8619,7 +8619,7 @@
 
 	Added in the first mini-language that targets Parrot.
 
-	Courtesty of: "Gregor N. Purdy" <gregor@focusresearch.com>
+	Courtesy of: "Gregor N. Purdy" <gregor@focusresearch.com>
 
 2001-09-14 15:20  dan
 
@@ -8809,7 +8809,7 @@
 
 2001-09-12 19:48  dan
 
-	* t/euclid.pasm: Implementation of Euclid's Algorithm, courtesty of
+	* t/euclid.pasm: Implementation of Euclid's Algorithm, courtesy of
 	Gregor Purdy
 
 2001-09-12 19:39  dan
