@@ -70,6 +70,8 @@ html:
 clean:
 	$(RM_RF) \
 m4.pbc \
+*.pdb \
+*.obj \
 src/*.pbc \
 src/*/*.pbc \
 src/*~ \

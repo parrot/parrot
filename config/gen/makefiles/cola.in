@@ -52,6 +52,7 @@ nogen : gen$(O) semant$(O) sym$(O) type$(O)
 
 clean :
 	$(RM_F) core
+	$(RM_F) *.obj *.pdb *.ilk
 	$(RM_F) *$(O)
 	$(RM_F) parser.output
 	$(RM_F) colacc$(EXE)
