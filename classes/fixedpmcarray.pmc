@@ -746,8 +746,6 @@ Used to unarchive the array.
 
 =head1 TODO
 
-currently this uses Perl types.
-
 =head1 SEE ALSO
 
 F<docs/pdds/pdd17_basic_types.pod>.

@@ -668,7 +668,7 @@ Return length of the string.
                     return iter;
                 }
         }
-        internal_exception(1, "PerlString: Unknown slice type");
+        internal_exception(1, "String: Unknown slice type");
         return NULL;
     }
 
