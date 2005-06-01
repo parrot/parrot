@@ -31,9 +31,6 @@ however, then we're returning the invokable PMC.
   .local pmc parser
   parser = find_global "_Tcl", "parser"
 
-  .local int TclList
-  TclList = find_type "TclList"
-
   if I3 == 1 goto pmc_arg
   # if I2 isn't one here, we should blow up. But who's counting.
   expr = S5
@@ -44,8 +41,6 @@ pmc_arg:
 
 got_arg:
   .local pmc undef
-  #.local int TclObject
-  #TclObject = find_type "TclObject"
   # -- this causes auto-coercion to Perl*'s, which screws us up.
   # This is apparently because the MMD of a PerlInt * a TclInt is a TclFloat. 
   undef = new PerlUndef
@@ -343,13 +338,6 @@ converter_done:
 .sub __expression_interpret
   .param pmc args
 
-  .local int TclInt
-  TclInt = find_type "TclInt"
-  .local int TclList
-  TclList = find_type "TclList"
-  .local int TclFloat
-  TclFloat = find_type "TclFloat"
-
    # is this dup neeeded?
   .local pmc program_stack
   # _dumper(args,"ARGS")
@@ -642,9 +630,6 @@ evaluation_return:
   .local int flag
   .local pmc value
   value = new Integer
-
-  .local int TclList
-  TclList = find_type "TclList"
 
   pos = start
   if pos >= len goto failure

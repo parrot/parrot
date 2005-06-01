@@ -48,8 +48,6 @@ LOOP:
 DONE:
   argv_list = splice argv, the_index, 0
 
-  .local int TclList
-  TclList = find_type "TclList"
   .local pmc retval
   retval = new TclList
 

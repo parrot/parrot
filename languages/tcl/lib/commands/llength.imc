@@ -13,8 +13,7 @@
 
 =for when we have set_string_native working in tcllist
 
-  $I0 = find_type "TclList"
-  $P0 = new $I0
+  $P0 = new TclList
   $S0 = listval
   $P0 = $S0
   listval = $P0
@@ -30,9 +29,8 @@
 list_like:
   $I0 = listval
 
-  $I1 = find_type "TclInt"
   .local pmc retval
-  retval = new $I1
+  retval = new TclInt
 
   retval = $I0
 

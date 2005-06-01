@@ -10,9 +10,6 @@
   .local int argc 
   argc = argv
   
-  .local int TclArray
-  TclArray = find_type "TclArray"
-
   .local int return_type
   return_type = TCL_OK
   .local pmc retval

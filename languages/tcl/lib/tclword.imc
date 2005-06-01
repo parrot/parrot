@@ -40,6 +40,8 @@ constant. I<Used as a hint at compile time.>
 
 .namespace [ "TclWord" ]
 
+.HLL "Tcl", "tcl_group"
+
 =head1 Methods
 
 TclWord defines the following methods:
@@ -65,9 +67,7 @@ Initialize the attributes for an instance of the class
 .sub __init method
   .local pmc emptyArray
   .local pmc constant
-  .local int TclList
 
-  TclList = find_type "TclList" 
   emptyArray = new TclList
 
   setattribute self, "TclWord\x00chunks", emptyArray

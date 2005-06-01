@@ -13,19 +13,12 @@
   .local string position
   position = pmc_position
 
-  .local int TclString,TclInt
-  TclString = find_type "TclString"
-  TclInt = find_type "TclInt"
-
   .local int is_end
   is_end = 1
 
   .local pmc retval
   .local int return_type
   return_type = TCL_OK
-
-  .local int TclInt
-  TclInt = find_type "TclInt"
 
   .local int index_length,number_length,number_type
   .local pmc number_result

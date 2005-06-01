@@ -24,10 +24,6 @@
   .local int argc
   argc = argv
 
-  # lookup dynclasses
-  .local int TclList
-  TclList = find_type "TclList"
-
   # Compartmentalize our arguments
   .local pmc varnames, arglists
   .local string body
@@ -58,7 +54,7 @@ arg_loop:
   $P0 = argv[arg_num]
   # Avoid shimmer if possible. (XXX this is inelegant)
   $I0 = typeof $P0
-  if $I0 == TclList goto got_list
+  if $I0 == .TclList goto got_list
   $S0 = $P0
   $P0 = string2list($S0)
 got_list:

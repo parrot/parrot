@@ -10,8 +10,6 @@
   .local pmc call_level,current_call_level,retval
   call_level = argv[0]
   current_call_level = find_global "_Tcl", "call_level"
-  .local int TclString
-  TclString = find_type "TclString"
   retval = new TclString
   retval = ""
 

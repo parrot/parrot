@@ -13,9 +13,6 @@
   .local int argc
   argc = argv
 
-  .local int TclArray
-  TclArray = find_type "TclArray"
-
   .local int call_level
   $P1 = find_global "_Tcl", "call_level"
   call_level = $P1
@@ -60,7 +57,7 @@ get_indexed:
   if .PerlUndef == $I0 goto no_such_variable
   isnull lexical, no_such_variable
   typeof type, lexical
-  if type != TclArray goto get_indexed_bad
+  if type != .TclArray goto get_indexed_bad
 
 get_indexed_ok:
   retval = lexical[windex]
@@ -88,7 +85,7 @@ get_scalar:
   if .PerlUndef == $I0 goto no_such_variable
 
   # XXX ideally, we shouldn't be so Tcl specific here.
-  if $I0 != TclArray goto get_scalar_ok
+  if $I0 != .TclArray goto get_scalar_ok
 
 get_scalar_bad:
   return_type =TCL_ERROR

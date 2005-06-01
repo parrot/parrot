@@ -19,10 +19,8 @@
   # We expect a list here. We should take one if we get it,
   # otherwise, convert it to a string value, and then convert that to a list.
   # XXX evilly just using Tcl* variants here.
-  .local int TclList
-  TclList = find_type "TclList"
   $I0 = typeof a_list
-  if $I0 == TclList goto got_list  
+  if $I0 == .TclList goto got_list  
  
   .local pmc string2list
   string2list = find_global "_Tcl", "__stringToList"

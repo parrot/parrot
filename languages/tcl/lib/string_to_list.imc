@@ -6,9 +6,6 @@
   .param string str
   # buffer contains the string we are working on.
 
-  .local int TclList
-  TclList = find_type "TclList"
-
   .local pmc list
   list = new TclList
  

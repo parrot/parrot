@@ -52,7 +52,8 @@ whacked to \\, \$, \;
 
 =item string to list 
 
-Should be moved to tcllist's set_string method.
+Should be moved to tcllist's set_string method. ... except that it turns
+out this is non-trivial.
 
 =item Use PMCs to handle numifying
 
@@ -157,6 +158,7 @@ Left in:
 ./lib/tclword.imc
 
 =item provide a way to access existing library PIR from Tcl.
+
 
 =item TclWord
 

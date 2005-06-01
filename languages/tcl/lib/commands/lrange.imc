@@ -45,8 +45,6 @@
   cnt_out = 0
   cnt_in = first
 
-  .local int TclList
-  TclList = find_type "TclList"
   .local pmc retval
   retval = new TclList
   .local int last_pos

@@ -52,8 +52,6 @@ end_scope:
   isnull my_cmd, no_command
 
   .local pmc folded_args
-  .local int TclList
-  TclList = find_type "TclList"
   folded_args = new TclList
   .local pmc current_word
 

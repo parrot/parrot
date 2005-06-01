@@ -11,9 +11,6 @@
   .local int len
   .local int type
 
-  .local int TclArray
-  TclArray = find_type "TclArray"  
-
   .local int argc 
   argc = argv
 
