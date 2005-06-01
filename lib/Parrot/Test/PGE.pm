@@ -10,6 +10,13 @@ In a .t file:
   use Parrot::Test::PGE;
 
   p6rule_is('abc', '^abc', 'BOS abc');
+  p6rule_is("   int argc ",
+    [
+        [ type    => 'int | double | float | char' ],
+        [ ident   => '\w+' ],
+        [ _MASTER => ':w<type> <ident>' ],
+    ],
+    "simple subrules test");
   p6rule_isnt('abc', '^bc', 'BOS bc');
   p6rule_like('abcdef', 'bcd', qr/0: <bcd @ 1>/, '$0 capture');
 
@@ -31,33 +38,63 @@ require Parrot::Test;
 =item C<p6rule_is($target, $pattern, $description)>
 
 Runs the target string against the Perl 6 pattern, passing the test
-if they match.  Note that the pattern should be specified as a string
-and without leading/trailing pattern delimiters.  (Hint: if you try
-using qr// for the $pattern then you're misreading what this does.)
+if they match.  Note that patterns should be specified as strings
+and without leading/trailing pattern delimiters.
+
+(Hint: if you try using qr// for the $pattern then you're misreading
+what this does.)
+
+subrules: In addition to a simple scalar string, the pattern can be a
+reference to an array of arrays. Containing subrules that refer to each
+other. In this form:
+
+    [
+        [ name1 => 'pattern 1' ],
+        [ name2 => 'pattern 2' ],
+        [ name3 => '<name1> pattern 3' ],
+        [ _MASTER => '<name1> <name2> <name3>' ],
+    ],
+
+The last rule, labelled with _MASTER, is the rule that your target string
+will be matched against. The 'outer rule' if you will.
 
 =cut
 
 sub p6rule_is {
     my ($target, $pattern, $description) = @_;
-    Parrot::Test::pir_output_is(
+    if (ref $pattern) {
+        Parrot::Test::pir_output_is(
+            Parrot::Test::PGE::_generate_subrule_pir($target, $pattern),
+            'matched',
+            $description);
+    } else {
+        Parrot::Test::pir_output_is(
             Parrot::Test::PGE::_generate_pir_for($target, $pattern),
             'matched',
             $description);
+    }
 }
 
 =item C<p6rule_isnt($target, $pattern, $description)>
 
-Runs the target string against the Perl 6 pattern, passing the test
-if they do not match.
+Runs the target string against the Perl 6 pattern, passing the test if
+they do not match. The same pattern argument syntax above applies here.
 
 =cut
 
 sub p6rule_isnt {
     my ($target, $pattern, $description) = @_;
-    Parrot::Test::pir_output_is(
+    if (ref $pattern) {
+        Parrot::Test::pir_output_is(
+            Parrot::Test::PGE::_generate_subrule_pir($target, $pattern),
+            'failed',
+            $description);
+    } else {
+        Parrot::Test::pir_output_is(
             Parrot::Test::PGE::_generate_pir_for($target, $pattern),
             'failed',
             $description);
+    }
 }
 
 =item C<p6rule_like($target, $pattern, $expected, $description)>
@@ -125,7 +162,58 @@ sub _generate_pir_for {
           match_end:
         .end\n);
 }
-     
+
+sub _generate_subrule_pir {
+    my($target, $pattern) = @_;
+    $target = _parrot_stringify($target);
+
+    # Beginning of the pir code
+    my $pirCode = qq(
+        .sub _PGE_Test
+            .local pmc p6rule_compile
+            load_bytecode "PGE.pbc"
+            find_global p6rule_compile, "PGE", "p6rule"
+
+            .local string target
+            .local pmc rulesub
+            .local pmc match
+            .local string name
+            .local string subpat
+
+            target = "$target"\n\n);
+
+    # Loop to create the subrules pir code 
+    for my $ruleRow (@$pattern) {
+        my ($name, $subpat) = @$ruleRow;
+        $subpat = _parrot_stringify($subpat);
+
+        $pirCode .= qq(
+            name = "$name"
+            subpat = "$subpat"
+            rulesub = p6rule_compile(subpat)\n);
+
+        last if $name eq '_MASTER';
+
+        $pirCode .= qq(
+            store_global name, rulesub\n\n);
+    }
+
+    # End of the pir code
+    $pirCode .= qq(
+            match = rulesub(target)
+
+            unless match goto match_fail
+          match_success:
+            print "matched"
+            goto match_end
+          match_fail:
+            print "failed"
+          match_end:
+        .end\n);
+
+    return $pirCode;
+}
+
 =back
 
 =head1 AUTHOR

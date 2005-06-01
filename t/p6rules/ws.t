@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Parrot::Test tests => 17;
+use Parrot::Test tests => 19;
 use Parrot::Test::PGE;
 
 
@@ -31,6 +31,11 @@ p6rule_is  ('foo - bar', ':w\bfoo -? bar',
     'basic ws match with boundary modifier separation');
 p6rule_is  ('foo - bar', ':w::foo -? bar',
     'basic ws match with backtrack no-op modifier separation');
+
+p6rule_like('dog := spot', ':w(\w+) \:= (\S+)', qr/mob 0: <dog @ 0>/,
+    'words and capture together');
+p6rule_like('dog := spot', ':w(\w+) \:= (\S+)', qr/mob 1: <spot @ 7>/,
+    'words and capture together');
 
 # XXX: When available, add tests for full form :words modifier
 

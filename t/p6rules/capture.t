@@ -1,5 +1,8 @@
-use Parrot::Test tests => 34;
+use strict;
+use warnings;
+use Parrot::Test tests => 38;
 use Parrot::Test::PGE;
+
 
 p6rule_is  ('zzzabcdefzzz', '(a.)..(..)', 'basic match');
 p6rule_like('zzzabcdefzzz', '(a.)..(..)', qr/mob: <abcdef @ 3>/, 'basic $0');
@@ -56,6 +59,15 @@ p6rule_like('abcdefg', '$1:=[ (.) (.) (.) ] (.)', qr/mob 4: <c @ 2>/,
 p6rule_like('abcdefg', '$1:=[ (.) (.) (.) ] (.)', qr/mob 5: <d @ 3>/,
             'perl5 numbered captures $1');
 
+p6rule_like('   abc = 123', ':w $<key>:=[\w+] = $<val>:=[\S+]',
+            qr/mob<key>: <abc @ 3>/, 'named capture');
+p6rule_like('   abc = 123', ':w $<key>:=[\w+] = $<val>:=[\S+]',
+            qr/mob<val>: <123 @ 9>/, 'named capture');
+p6rule_like('   abc def ghi', ':w (\w+) $<foo>:=(\w+) (\w+)',
+            qr/mob<foo>: <def @ 7>/, 'mixing named and unnamed capture');
+p6rule_like('   abc def ghi', ':w (\w+) $<foo>:=(\w+) (\w+)',
+            qr/mob 1: <ghi @ 11>/, 'mixing named and unnamed capture');
+
 p6rule_is  ('bookkeeper', '[(.)$0]+', 'backreference');
 p6rule_like('bookkeeper', '[(.)$0]+', 
             qr/mob 0 0: <o @ 1>/, 'backref $1');
@@ -65,8 +77,7 @@ p6rule_like('bookkeeper', '[(.)$0]+',
             qr/mob 0 2: <e @ 5>/, 'backref $1');
 
 p6rule_like('123x', '(.)*x',
-            qr/mob: <123x @ 0>/, 'repeated dot capture')
+            qr/mob: <123x @ 0>/, 'repeated dot capture');
 
 
-
-# dont forget to change the number of test :-)
+# Don't forget to change the number of test :-)
