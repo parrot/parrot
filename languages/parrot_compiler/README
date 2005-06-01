@@ -2,11 +2,5 @@
 # $Id$
 
 'languages/parrot_compiler' is not really a language implementation.
-It servers as an example on how the builtin PASM, PIR and PAST compiler
-can be uses in PIR, PASM and PAST scripts.
-# Copyright: 2005 The Perl Foundation.  All Rights Reserved.
-# $Id$
-
-'languages/parrot_compiler' is not really a language implementation.
-It servers as an example on how the builtin PASM, PIR and PAST compiler
-can be uses in PIR, PASM and PAST scripts.
+It servers as an example on how the builtin PASM, PIR and PAST compilers
+can be used in PIR, PASM and PAST scripts.
