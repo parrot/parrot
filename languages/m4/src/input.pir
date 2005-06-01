@@ -37,7 +37,7 @@ TODO: recognize nested quoted strings
   # setup of stacks
   empty_array = new ResizablePMCArray
   state['token_stack'] = empty_array
-  empty_array = new PerlArray
+  empty_array = new ResizablePMCArray
   state['input_stack'] = empty_array
   empty_array = new ResizablePMCArray
   state['wrapup_stack'] = empty_array

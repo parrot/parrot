@@ -105,7 +105,7 @@ FINISH_EXPAND_TOKEN:
 
 The macro expansion is handled by expand_macro().
 It parses the arguments in collect_arguments() and
-builds a PerlArray containing the arguments.
+builds a ResizablePMCArray containing the arguments.
 The arguments themselves are stored on a local obstack.
 expand_macro() uses call_macro() to do the call of the macro.	
 
@@ -132,7 +132,7 @@ NESTING_LIMIT_NOT_REACHED_YET:
   state['expansion_level'] = expansion_level
 
   .local pmc arguments
-  arguments = new PerlArray
+  arguments = new ResizablePMCArray
   collect_arguments( state, arguments )
 
   .local string text
@@ -149,7 +149,7 @@ NESTING_LIMIT_NOT_REACHED_YET:
 .end
 
 
-=head2 string processed_token call_macro( PerlArray macro, string token )
+=head2 string processed_token call_macro( ResizablePMCArray macro, string token )
 
 Apply macro to a token.
 
