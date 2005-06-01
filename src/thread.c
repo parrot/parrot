@@ -432,7 +432,6 @@ pt_join_threads(Parrot_Interp interpreter)
         }
     }
     UNLOCK(interpreter_array_mutex);
-    MUTEX_DESTROY(interpreter_array_mutex);
     return;
 }
 

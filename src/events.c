@@ -237,10 +237,6 @@ init_events_first(Parrot_Interp interpreter)
     if (event_queue)
         PANIC("event queue already exists - missing parent_interp?");
     /*
-     * we need a global mutex to protect the interpreter array
-     */
-    MUTEX_INIT(interpreter_array_mutex);
-    /*
      * create event queue
      */
     event_queue = queue_init(TASK_PRIO);
