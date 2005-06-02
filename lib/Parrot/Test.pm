@@ -31,6 +31,13 @@ The parameter C<$expected> is the expected result.
 The parameter C<$unexpected> is the unexpected result.
 The parameter C<$description> should describe the test.
 
+Any optional parameters can follow.  For example, to mark a test as a TODO test (where you know the implementation does not yet work), pass:
+
+	todo => 'reason to consider this TODO'
+
+at the end of the argument list.  Valid reasons include C<bug>,
+C<unimplemented>, and so on.
+
 =over 4
 
 =item C<pasm_output_is($code, $expected, $description)> or C<output_is($code, $expected, $description)>
@@ -158,11 +165,11 @@ require Test::More;
               pbc_output_is      pbc_output_like      pbc_output_isnt
               c_output_is        c_output_like        c_output_isnt
               language_output_is language_output_like language_output_isnt
-			  plan
+              plan
               skip
               slurp_file
-	      run_command
-	    );
+              run_command
+          );
 @ISA = qw(Exporter);
 
 # tell parrot it's being tested.  this disables searching of installed libraries
@@ -313,8 +320,8 @@ sub _generate_functions {
     foreach my $func ( keys %parrot_test_map ) {
         no strict 'refs';
 
-        *{$package.'::'.$func} = sub ($$;$) {
-            my( $code, $expected, $desc) = @_;
+        *{$package.'::'.$func} = sub ($$;$%) {
+            my( $code, $expected, $desc, %extra ) = @_;
 
             # Strange Win line endings
             $expected =~ s/\cM\cJ/\n/g;
@@ -421,6 +428,12 @@ sub _generate_functions {
 	        $expected =~ s/[\t ]+/ /gm;
 	        $expected =~ s/[\t ]+$//gm;
             }
+
+            # set a TODO for Test::Builder to find
+            my $call_pkg = $builder->exported_to();
+            local *{ $call_pkg . '::TODO' }
+                = defined $extra{todo} ? \$extra{todo} : '';
+
             my $pass = $builder->$meth( $real_output, $expected, $desc );
             $builder->diag("'$cmd' failed with exit code $exit_code")
                   if $exit_code and not $pass;
@@ -512,9 +525,9 @@ sub _generate_functions {
             }
 
             my $iculibs = "";
-	    if ($PConfig{'has_icu'}) {
-		$iculibs = $PConfig{icu_shared};
-	    }
+            if ($PConfig{'has_icu'}) {
+                $iculibs = $PConfig{icu_shared};
+            }
 
             my ($cmd, $exit_code);
             $cmd = "$PConfig{cc} $PConfig{ccflags} $PConfig{cc_debug} " .
