@@ -28,15 +28,13 @@ Native compilers include:
 
 =item Make
 
-You need "nmake" to build Parrot under Windows with Microsoft compilers.  
-It should be available via Microsoft Visual Studio .NET 2003 or the 
-Microsoft .NET Framework SDK 1.1.  The later can be downloaded from the 
-Microsoft .NET Framework Homepage L<http://msdn.microsoft.com/netframework/>.
+You need "nmake" to build Parrot under Windows with Microsoft compilers.  It
+should be available via Microsoft Visual Studio .NET 2003 or the Microsoft .NET
+Framework SDK 1.1.  Download the latter from the Microsoft .NET Framework
+Homepage L<http://msdn.microsoft.com/netframework/>.
 
-nmake should also be available at:
-http://download.microsoft.com/download/vc15/Patch/1.52/W95/EN-US/Nmake15.exe
-or
-ftp://ftp.microsoft.com/Softlib/MSLFILES/nmake15.exe
+Note: Parrot will not build using nmake v1.5 from the MS web site.  Download
+one of the above toolkits to obtain a later version, either v7 or v8.
 
 MinGW works with its GNU "make" (v 3.80) port and its name is
 'mingw32-make.exe'.
