@@ -36,7 +36,7 @@ sub runstep {
     }
     elsif ($^O eq 'hpux' && $Config{ccflags} !~ /DD64/) {
         # HP-UX 10.20/32 hangs in this test.
-        my $align = 4;
+        $align = 4;
         Configure::Data->set(ptr_alignment => $align);
         $result = "for hpux: ";
     }
