@@ -228,47 +228,107 @@ C<pinfo> is the visit info, (see include/parrot/pmc_freeze.h>).
 
 */
 
+static void
+hash_thaw(Interp *interpreter, Hash *hash, visit_info* info)
+{
+    size_t i, n;
+    STRING *s_key;
+    INTVAL i_key;
+    IMAGE_IO *io = info->image_io;
+    HashBucket *b;
+
+    /*
+     * during thaw info->extra is the key/value count
+     */
+    assert(info->extra_flags == EXTRA_IS_COUNT);
+    n = (size_t) info->extra;
+    for (i = 0; i < n; ++i) {
+        switch (hash->key_type) {
+            case Hash_key_type_STRING:
+                s_key = io->vtable->shift_string(interpreter, io);
+                b = hash_put(interpreter, hash, s_key, NULL);
+                break;
+            case Hash_key_type_int:
+                i_key = io->vtable->shift_integer(interpreter, io);
+                b = hash_put(interpreter, hash, (void*)i_key, NULL);
+                break;
+            default:
+                internal_exception(1, "unimplemented key type");
+                b = NULL;
+                break;
+        }
+        switch (hash->entry_type) {
+            case enum_hash_pmc:
+                info->thaw_ptr = (PMC**)&b->value;
+                (info->visit_pmc_now)(interpreter, NULL, info);
+                break;
+            case enum_hash_int:
+                b->value = (void*)io->vtable->shift_integer(interpreter, io);
+                break;
+            default:
+                internal_exception(1, "unimplemented value type");
+                break;
+        }
+    }
+}
+
+static void
+hash_freeze(Interp *interpreter, Hash *hash, visit_info* info)
+{
+    size_t i, n;
+    STRING *s_key;
+    INTVAL i_key;
+    IMAGE_IO *io = info->image_io;
+    HashBucket *b;
+
+    for (i = 0; i <= hash->mask; i++) {
+        b = hash->bu.bi[i];
+        while (b) {
+            switch (hash->key_type) {
+                case Hash_key_type_STRING:
+                    io->vtable->push_string(interpreter, io, b->key);
+                    break;
+                case Hash_key_type_int:
+                    io->vtable->push_integer(interpreter, io, (INTVAL)b->key);
+                    break;
+                default:
+                    internal_exception(1, "unimplemented key type");
+                    b = NULL;
+                    break;
+            }
+            switch (hash->entry_type) {
+                case enum_hash_pmc:
+                    (info->visit_pmc_now)(interpreter, b->value, info);
+                    break;
+                case enum_hash_int:
+                    io->vtable->push_integer(interpreter, io, (INTVAL)b->value);
+                    break;
+                default:
+                    internal_exception(1, "unimplemented value type");
+                    break;
+            }
+            b = b->next;
+        }
+    }
+}
+
 void
 hash_visit(Interp *interpreter, Hash *hash, void* pinfo)
 {
     visit_info* info = (visit_info*) pinfo;
-    size_t i, n;
-    STRING *key;
-    IMAGE_IO *io = info->image_io;
-    HashBucket *b;
-    int freezing =
-        info->what == VISIT_FREEZE_NORMAL ||
-        info->what == VISIT_FREEZE_AT_DESTRUCT;
-    /*
-     * during thaw info->extra is the key/value count
-     *
-     * TODO implement different key/value items
-     */
-    assert(hash->entry_type == enum_hash_pmc);
-    assert(hash->key_type == Hash_key_type_STRING);
 
     switch (info->what) {
         case VISIT_THAW_NORMAL:
         case VISIT_THAW_CONSTANTS:
-            assert(info->extra_flags == EXTRA_IS_COUNT);
-            n = (size_t) info->extra;
-            for (i = 0; i < n; ++i) {
-                key = io->vtable->shift_string(interpreter, io);
-                b = hash_put(interpreter, hash, key, NULL);
-                info->thaw_ptr = (PMC**)&b->value;
-                (info->visit_pmc_now)(interpreter, NULL, info);
-            }
+            hash_thaw(interpreter, hash, info);
+            break;
+        case VISIT_FREEZE_NORMAL:
+        case VISIT_FREEZE_AT_DESTRUCT:
+            hash_freeze(interpreter, hash, info);
             break;
         default:
-            for (i = 0; i <= hash->mask; i++) {
-                b = hash->bu.bi[i];
-                while (b) {
-                    if (freezing)
-                        io->vtable->push_string(interpreter, io, b->key);
-                    (info->visit_pmc_now)(interpreter, b->value, info);
-                    b = b->next;
-                }
-            }
+            internal_exception(1, "unimplemented visit mode");
+            break;
     }
 }
 

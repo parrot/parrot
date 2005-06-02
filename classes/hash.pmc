@@ -17,6 +17,7 @@ These are the vtable functions for the Hash PMC.
 */
 
 #include "parrot/parrot.h"
+#include <assert.h>
 
 
 /* These are set in class_init */
@@ -1037,8 +1038,12 @@ Used to archive the hash.
 
     void freeze(visit_info *info) {
         IMAGE_IO *io = info->image_io;
+        Hash *hash = (Hash *)PMC_struct_val(SELF);;
+
         SUPER(info);
         io->vtable->push_integer(INTERP, io, VTABLE_elements(INTERP, SELF));
+        io->vtable->push_integer(INTERP, io, hash->key_type);
+        io->vtable->push_integer(INTERP, io, hash->entry_type);
     }
 
 /*
@@ -1053,10 +1058,32 @@ Used to unarchive the hash.
 
     void thaw(visit_info *info) {
         IMAGE_IO *io = info->image_io;
-        SUPER(info);
+        Hash *hash;
+        PMC *dummy;
+
         if (info->extra_flags == EXTRA_IS_NULL) {
+            INTVAL elems = io->vtable->shift_integer(INTERP, io);
+            INTVAL k_type = io->vtable->shift_integer(INTERP, io);
+            INTVAL v_type = io->vtable->shift_integer(INTERP, io);
             info->extra_flags = EXTRA_IS_COUNT;
-            info->extra = (void *)io->vtable->shift_integer(INTERP, io);
+            info->extra = (void *)elems;
+            /* TODO make a better interface for hash creation
+             * TODO create hash with needed size in the first place
+             */
+            if (k_type == Hash_key_type_int && v_type == enum_hash_int) {
+                dummy = Parrot_new_INTVAL_hash(INTERP, 0);
+                PMC_struct_val(SELF) = PMC_struct_val(dummy);
+                PMC_struct_val(dummy) = NULL;
+            }
+            else
+                SELF.init();
+            hash = PMC_struct_val(SELF);
+            assert((INTVAL)hash->key_type == k_type);
+            assert(hash->entry_type == v_type);
+            hash->container = SELF;
+        }
+        else {
+            SUPER(info);
         }
     }
 }
