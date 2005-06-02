@@ -51,7 +51,7 @@ setup_argv(Interp *interpreter, int argc, char ** argv)
     INTVAL i;
     PMC *userargv;
 
-    if (Interp_flags_TEST(interpreter, PARROT_DEBUG_FLAG)) {
+    if (Interp_debug_TEST(interpreter, PARROT_START_DEBUG_FLAG)) {
         PIO_eprintf(interpreter,
         "*** Parrot VM: Setting up ARGV array in P5.  Current argc: %d ***\n",
                 argc);
@@ -70,7 +70,7 @@ setup_argv(Interp *interpreter, int argc, char ** argv)
         STRING *arg = string_make(interpreter, argv[i], strlen(argv[i]),
                                   "binary", PObj_external_FLAG);
 
-        if (Interp_flags_TEST(interpreter, PARROT_DEBUG_FLAG)) {
+        if (Interp_debug_TEST(interpreter, PARROT_START_DEBUG_FLAG)) {
             PIO_eprintf(interpreter, "\t%vd: %s\n", i, argv[i]);
         }
 
