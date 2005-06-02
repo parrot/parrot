@@ -431,8 +431,8 @@ sub _generate_functions {
 
             # set a TODO for Test::Builder to find
             my $call_pkg = $builder->exported_to();
-            local *{ $call_pkg . '::TODO' }
-                = defined $extra{todo} ? \$extra{todo} : '';
+            local *{ $call_pkg . '::TODO' } = \$extra{todo}
+                if defined $extra{todo};
 
             my $pass = $builder->$meth( $real_output, $expected, $desc );
             $builder->diag("'$cmd' failed with exit code $exit_code")
