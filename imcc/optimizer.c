@@ -254,21 +254,37 @@ strength_reduce(Interp *interpreter, IMC_Unit * unit)
          * div Nx, Nx, Ny => sub Nx, Ny
          * fdiv Nx, Nx, Ny => sub Nx, Ny
          */
-        if ( ( (ins->opnum == PARROT_OP_add_i_i_i ||
-                ins->opnum == PARROT_OP_sub_i_i_i ||
-                ins->opnum == PARROT_OP_mul_i_i_i ||
+        if ( ( (ins->opnum == PARROT_OP_sub_i_i_i ||
+                ins->opnum == PARROT_OP_sub_i_i_ic ||
+                ins->opnum == PARROT_OP_sub_i_ic_i ||
                 ins->opnum == PARROT_OP_div_i_i_i ||
+                ins->opnum == PARROT_OP_div_i_i_ic ||
+                ins->opnum == PARROT_OP_div_i_ic_i ||
                 ins->opnum == PARROT_OP_fdiv_i_i_i ||
-                ins->opnum == PARROT_OP_add_n_n_n ||
+                ins->opnum == PARROT_OP_fdiv_i_i_ic ||
+                ins->opnum == PARROT_OP_fdiv_i_ic_i ||
                 ins->opnum == PARROT_OP_sub_n_n_n ||
-                ins->opnum == PARROT_OP_mul_n_n_n ||
+                ins->opnum == PARROT_OP_sub_n_n_nc ||
+                ins->opnum == PARROT_OP_sub_n_nc_n ||
                 ins->opnum == PARROT_OP_div_n_n_n ||
-                ins->opnum == PARROT_OP_fdiv_n_n_n) &&
+                ins->opnum == PARROT_OP_div_n_n_nc ||
+                ins->opnum == PARROT_OP_div_n_nc_n ||
+                ins->opnum == PARROT_OP_fdiv_n_n_n ||
+                ins->opnum == PARROT_OP_fdiv_n_n_nc ||
+                ins->opnum == PARROT_OP_fdiv_n_nc_n) &&
              ins->r[0] == ins->r[1])
           || ( (ins->opnum == PARROT_OP_add_i_i_i ||
+                ins->opnum == PARROT_OP_add_i_i_ic ||
+                ins->opnum == PARROT_OP_add_i_ic_i ||
                 ins->opnum == PARROT_OP_mul_i_i_i ||
+                ins->opnum == PARROT_OP_mul_i_i_ic ||
+                ins->opnum == PARROT_OP_mul_i_ic_i ||
                 ins->opnum == PARROT_OP_add_n_n_n ||
-                ins->opnum == PARROT_OP_mul_n_n_n) &&
+                ins->opnum == PARROT_OP_add_n_n_nc ||
+                ins->opnum == PARROT_OP_add_n_nc_n ||
+                ins->opnum == PARROT_OP_mul_n_n_n ||
+                ins->opnum == PARROT_OP_mul_n_n_nc ||
+                ins->opnum == PARROT_OP_mul_n_nc_n) &&
              (ins->r[0] == ins->r[1] || ins->r[0] == ins->r[2]))) {
             IMCC_debug(interpreter, DEBUG_OPT1, "opt1 %I => ", ins);
             if(ins->r[0] == ins->r[1]) {
@@ -279,7 +295,6 @@ strength_reduce(Interp *interpreter, IMC_Unit * unit)
             subst_ins(unit, ins, tmp, 1);
             ins = tmp;
             changes = 1;
-            continue;
         }
         /*
          * add Ix, 0     => delete
@@ -314,23 +329,6 @@ strength_reduce(Interp *interpreter, IMC_Unit * unit)
             else
                 break;
             IMCC_debug(interpreter, DEBUG_OPT1, "deleted\n");
-            changes = 1;
-            continue;
-        }
-        /*
-         * set Ix, 0     => null Ix
-         * set Nx, 0     => null Nx
-         */
-        if ( (ins->opnum == PARROT_OP_set_i_ic &&
-                      IMCC_int_from_reg(interpreter, ins->r[1]) == 0)
-          || (ins->opnum == PARROT_OP_set_n_nc &&
-                      atof(ins->r[1]->name) == 0.0)) {
-            IMCC_debug(interpreter, DEBUG_OPT1, "opt1 %I => ", ins);
-            --ins->r[1]->use_count;
-            tmp = INS(interpreter, unit, "null", "", ins->r, 1, 0, 0);
-            subst_ins(unit, ins, tmp, 1);
-            IMCC_debug(interpreter, DEBUG_OPT1, "%I\n", tmp);
-            ins = tmp;
             changes = 1;
             continue;
         }
@@ -436,6 +434,22 @@ strength_reduce(Interp *interpreter, IMC_Unit * unit)
             tmp = INS(interpreter, unit, "set", "", ins->r, 2, 0, 0);
             IMCC_debug(interpreter, DEBUG_OPT1, "%I\n", tmp);
             subst_ins(unit, ins, tmp, 1);
+            ins = tmp;
+            changes = 1;
+        }
+        /*
+         * set Ix, 0     => null Ix
+         * set Nx, 0     => null Nx
+         */
+        if ( (ins->opnum == PARROT_OP_set_i_ic &&
+                      IMCC_int_from_reg(interpreter, ins->r[1]) == 0)
+          || (ins->opnum == PARROT_OP_set_n_nc &&
+                      atof(ins->r[1]->name) == 0.0)) {
+            IMCC_debug(interpreter, DEBUG_OPT1, "opt1 %I => ", ins);
+            --ins->r[1]->use_count;
+            tmp = INS(interpreter, unit, "null", "", ins->r, 1, 0, 0);
+            subst_ins(unit, ins, tmp, 1);
+            IMCC_debug(interpreter, DEBUG_OPT1, "%I\n", tmp);
             ins = tmp;
             changes = 1;
             continue;

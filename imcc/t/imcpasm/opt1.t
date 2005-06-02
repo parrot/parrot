@@ -744,7 +744,7 @@ CODE
 # IMCC does produce b0rken PASM files
 # see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
 _main:
-   set I0, 0
+   null I0
    end
 OUT
 
@@ -758,7 +758,7 @@ CODE
 # IMCC does produce b0rken PASM files
 # see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
 _main:
-   set I0, 0
+   null I0
    end
 OUT
 
@@ -772,7 +772,7 @@ CODE
 # IMCC does produce b0rken PASM files
 # see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
 _main:
-   set I0, 0
+   null I0
    end
 OUT
 
@@ -786,7 +786,7 @@ CODE
 # IMCC does produce b0rken PASM files
 # see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
 _main:
-   set N0, 0
+   null N0
    end
 OUT
 
