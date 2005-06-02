@@ -24,12 +24,27 @@ $description = "Determining whether GNU m4 is installed...";
 @args = qw(verbose);
 
 sub runstep {
-    # This seems to work for GNU m4 1.4.2
-    my $a = capture_output( 'm4', '--version' ) || '';
-    my $has_gnu_m4 = ( $a =~ m/^GNU [mM]4 / ) ? 1 : 0;
+    my $archname =  $Config{archname};
+    my ($cpuarch, $osname)       =  split('-', $archname);
+    if (!defined $osname) {
+        ($osname, $cpuarch) = ($cpuarch, "");
+    }
+
+    my $has_gnu_m4;
+
+    # Calling 'm4 --version' hangs under FreeBSD
+    my %m4_hangs = ( freebsd => 1 
+                   );
+
+    if ( $m4_hangs{$osname} ) {
+        $has_gnu_m4 = 0;
+    } else {
+        # This seems to work for GNU m4 1.4.2
+        my $output = capture_output( 'm4', '--version' ) || '';
+        $has_gnu_m4 = ( $output =~ m/^GNU [mM]4 / ) ? 1 : 0;
+    }
 
     Configure::Data->set(has_gnu_m4 => $has_gnu_m4);
-
     $Configure::Step::result = $has_gnu_m4 ? 'yes' : 'no';
 }
 
