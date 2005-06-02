@@ -79,11 +79,11 @@ OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "loadlib with relative pathname & ext");
 .sub main @MAIN
-    ## get share_ext in $S0.
+    ## get load_ext in $S0.
     .include "iglobals.pasm"
     $P11 = getinterp
     $P12 = $P11[.IGLOBALS_CONFIG_HASH]
-    $S0 = $P12["share_ext"]
+    $S0 = $P12["load_ext"]
 
     ## load a relative pathname with an extension.
     $S0 = concat "runtime/parrot/dynext/foo", $S0
@@ -102,12 +102,12 @@ OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "loadlib with absolute pathname & ext");
 .sub main @MAIN
-    ## get cwd in $S0, share_ext in $S1.
+    ## get cwd in $S0, load_ext in $S1.
     .include "iglobals.pasm"
     $P11 = getinterp
     $P12 = $P11[.IGLOBALS_CONFIG_HASH]
     $S0 = $P12["prefix"]
-    $S1 = $P12["share_ext"]
+    $S1 = $P12["load_ext"]
 
     ## convert $S0 to an absolute pathname with extension, and load it.
     ## this should always find the version in the build directory, since that's
