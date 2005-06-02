@@ -530,9 +530,9 @@ attaches the symbol file, after it got built in F<build_asm>.
     # dddp
     # run ddd parrot with given file
     # gdb confirmations should be off
-    parrot -o $1.pbc -d $1.pasm
+    parrot -o $1.pbc -d1 $1.pasm
     echo "b runops_jit
-    r -d -j $1.pbc
+    r -D4 -j $1.pbc
     n
     add-symbol-file $1.o 0
     s

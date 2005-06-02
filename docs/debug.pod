@@ -13,11 +13,11 @@ This document describes how to debug various parts of Parrot.
 
 =head2 Using a debugger
 
-Per default the C<parrot> binary is being built with 
-debugging symbols. This means that you can run C<parrot> under 
-an debugger like C<gdb>. 
+Per default the C<parrot> binary is being built with
+debugging symbols. This means that you can run C<parrot> under
+an debugger like C<gdb>.
 
-Debugging support can be explicitly enabled with: 
+Debugging support can be explicitly enabled with:
 
     shell> perl Configure.pl --debugging
     shell> make
@@ -30,8 +30,8 @@ So debugging can also be turned off with:
 
 =head2 Using a memory checker
 
-You could, and should, also run the tests with a memory checker 
-such as C<valgrind>. 
+You could, and should, also run the tests with a memory checker
+such as C<valgrind>.
 You can enable C<valgrind>, by running:
 
   shell> make test VALGRIND="valgrind --logfile=/tmp/grind"
@@ -58,13 +58,13 @@ afoul of the garbage collector.
 Within the C<--gc-debug> mode, there is another tool to help narrow down the
 problem. You can edit F<src/dod.c> and C<#define> the C<GC_VERBOSE> flag to 1.
 After recompiling C<parrot>, the garbage collector will perform additional
-checks. After the garbage collector has traced all objects to find which 
-ones are still alive, it will scan through all of the dead objects to see 
-if any of them believe they are alive (which will happen for infants, since 
-they come into existence marked live.) If it finds any, it will print them 
-out. You can then re-run the program with a breakpoint set on the routine 
-that allocated the object (e.g. C<get_free_object> in F<src/smallobject.c>). 
-You'll probably want to make the breakpoint conditional on the object having 
+checks. After the garbage collector has traced all objects to find which
+ones are still alive, it will scan through all of the dead objects to see
+if any of them believe they are alive (which will happen for infants, since
+they come into existence marked live.) If it finds any, it will print them
+out. You can then re-run the program with a breakpoint set on the routine
+that allocated the object (e.g. C<get_free_object> in F<src/smallobject.c>).
+You'll probably want to make the breakpoint conditional on the object having
 the version number that was reported, because the same memory location
 will probably hold many different objects over the lifetime of the
 program.
@@ -112,7 +112,7 @@ Step 3: Set a breakpoint on runops_jit
 
 Step 4: Run your program under C<gdb> with JIT and debugging on
 
-  gdb> run -j -d test.pbc
+  gdb> run -j -D4 test.pbc
 
 Step 5: C<gdb> will stop at the beginning of runops_jit. Step through the
 lines until just before the JITted code is executed (the line will be
@@ -153,7 +153,7 @@ better technique, please let the mailing list know
 
 The C<parrot> binary has a bunch of debugging flags for spewing out
 information about various aspects of its processing. See
-F<imcc/docs/running.pod> for a list of flags. Or have a look at the 
+F<imcc/docs/running.pod> for a list of flags. Or have a look at the
 information provided by:
 
   shell> parrot --help
@@ -168,7 +168,7 @@ or
 
 =item Version 1.1
 
-Updates to remove references to C<imcc> by 
+Updates to remove references to C<imcc> by
 <Bernhard.Schmalhofer@biomax.de>
 
 =item Version 1.0
