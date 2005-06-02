@@ -126,6 +126,10 @@ shifted down.
         Parrot_csub_t func = (Parrot_csub_t)D2FPTR(PMC_data(SELF));
         PMC *obj;
         UINTVAL flags;
+
+        if (!func)
+            real_exception(INTERP, NULL, INVALID_OPERATION,
+                "attempt to call NULL function");
         /*
          * If the invocant is a class or there is no invocant
          * shift down arguments.

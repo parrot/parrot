@@ -587,8 +587,11 @@ Parrot_Context_info(Interp *interpreter, struct Parrot_Context *ctx,
     }
 
     /* fetch struct Parrot_sub of the current sub in the given context */
-    sub = PMC_sub(ctx->current_sub);
+    if (!VTABLE_isa(interpreter, ctx->current_sub,
+                const_string(interpreter, "Sub")))
+        return 1;
 
+    sub = PMC_sub(ctx->current_sub);
     /* set the sub name */
     info->subname = sub->name;
 

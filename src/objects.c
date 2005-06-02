@@ -201,14 +201,10 @@ create_deleg_pmc_vtable(Interp *interpreter, PMC *class, STRING *class_name)
         }
     }
     /*
-     * TODO create a MMD name mapping and call mmd_register
+     * a cruel hash to disceren a delegate from a deleg_pmc vtable
+     * see also src/mmd.c:isa_deleg_pmc
      */
-
-    /*
-     * finally if the methods are changed dynamically
-     * this vtable must be changed too
-     * s. src/global.c:Parrot_store_global()
-     */
+    class->vtable->mark = vtable->mark;
 }
 
 /*
@@ -503,6 +499,7 @@ parrot_class_register(Interp* interpreter, STRING *class_name,
     new_vtable = Parrot_clone_vtable(interpreter, parent_vtable);
     new_vtable->base_type = new_type;
     new_vtable->mro = mro;
+    new_vtable->class =  new_class;
     set_attrib_num(new_class, (SLOTTYPE*)PMC_data(new_class), PCD_OBJECT_VTABLE,
             vtable_pmc = constant_pmc_new(interpreter, enum_class_VtableCache));
     PMC_struct_val(vtable_pmc) = new_vtable;
