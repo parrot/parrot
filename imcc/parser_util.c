@@ -453,12 +453,22 @@ INS(Interp *interpreter, IMC_Unit * unit, char *name,
     int op;
     Instruction * ins;
     op_info_t * op_info;
-    char format[128];
+    char format[128], buf[10];
     int len;
 
     if ( (op = is_infix(name, n, r)) >= 0) {
         /* sub x, y, z  => infix .MMD_SUBTRACT, x, y, z */
         name = to_infix(interpreter, name, r, &n, op);
+    }
+    else if ((IMCC_INFO(interpreter)->state->pragmas & PR_N_OPERATORS) &&
+            (!strcmp(name, "abs")
+             || !strcmp(name, "neg")
+             || !strcmp(name, "not")
+             || !strcmp(name, "bnot")
+             || !strcmp(name, "bnots"))) {
+        strcpy(buf, "n_");
+        strcat(buf, name);
+        name = buf;
     }
 
 

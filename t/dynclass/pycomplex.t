@@ -17,7 +17,7 @@ Tests the Python Integer PMC.
 
 =cut
 
-use Parrot::Test tests => 3;
+use Parrot::Test tests => 4;
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "eq");
 
@@ -83,6 +83,24 @@ CODE
 PyFloat
 OUTPUT
 
+pir_output_is(<< 'CODE', << 'OUTPUT', "n_abs - test registered type");
+.pragma n_operators 1
+.HLL "Python", "python_group"
+.sub main @MAIN
+    .local pmc d, c
+    c = new .PyComplex
+    c = "3+4j"
+    d = abs c
+    print d
+    print "\n"
+    $S0 = typeof d
+    print $S0
+    print "\n"
+.end
 
 
+CODE
+5.0
+PyFloat
+OUTPUT
 

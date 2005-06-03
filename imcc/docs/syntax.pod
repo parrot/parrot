@@ -130,11 +130,16 @@ B<0x> and B<0b> denote hex and binary constants.
 
 =item .pragma n_operators
 
-Convert arithmethic infix shortcuts to n_infix operations. E.g.
+Convert arithmethic infix operators to n_infix operations. The unary opcodes
+C<abs>, C<not>, C<bnot>, C<bnots>, and C<neg> are also changed to use a B<n_>
+prefix.
 
- .pragma n_operators
+ .pragma n_operators 1
  .sub foo
+   ...
    $P0 = $P1 + $P2           # n_add $P0, $P1, $P2
+   $P2 = abs $P0             # n_abs $P2, $P0
+
 
 =item .HLL "hll_name", "hll_lib"
 
