@@ -42,7 +42,13 @@ Parrot_Run_OS_Command(Parrot_Interp interpreter, STRING *command) {
     if( free_it ) free( shell );
     mem_sys_free( cmd );
 
-    return status;
+	/* 
+		Shifting the returned status left 8 bits compensates for the shr 8 in spawnw.t
+		I'm not sure what if anything should be put into the 8 lsbs for compatibility?
+		Nor really if throwing away the upper 8 bits of the status makes sense? 
+		But it fixes the failing tests.
+	*/
+    return status << 8;
 }
 
 INTVAL
