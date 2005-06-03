@@ -34,6 +34,9 @@ sub runstep {
     ($osname, $cpuarch) = ($cpuarch, "");
   }
 
+  # This was added to convert 9000/800 to 9000_800 on HP-UX
+  $cpuarch =~ s|/|_|g;
+
   # On OS X if you are using the Perl that shipped with the system
   # the above split fails because archname is "darwin-thread-multi-2level".
   
