@@ -45,8 +45,8 @@ if ( grep { m/^--files$/ } @ARGV ) {
 } else { 
     my @files;
     # TODO: use Getopt::Long or such
-    my $use_gnu_m4 = ( grep { m/^-use-gnu-m4$/ } @ARGV ) ? 1 : 0;
-    @ARGV = grep { ! m/^-use-gnu-m4$/ } @ARGV;
+    my $use_gnu_m4 = ( grep { m/^--use-gnu-m4$/ } @ARGV ) ? 1 : 0;
+    @ARGV = grep { ! m/^--use-gnu-m4$/ } @ARGV;
     if ( scalar(@ARGV) ) {
         # Someone specified tests for me to run.
         @files = grep { -f $_ } @ARGV
