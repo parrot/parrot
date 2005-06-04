@@ -1,3 +1,13 @@
+New in 0.2.1
+
+- better HLL support (short names for object attributes, and
+  .HLL and n_operators pragmas)
+- string encoding and charset can now be set independently
+- experimental mmap IO layer for slurping files
+- distinct debug and trace flag settings
+- glob support in PGE
+- new character classification opcodes and interfaces
+
 New in 0.2.0
 
 - parrot repository is now under subversion

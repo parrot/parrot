@@ -1,4 +1,4 @@
-This is Parrot, version 0.2.0
+This is Parrot, version 0.2.1
 -----------------------------
 
 Parrot is Copyright (C) 2001-2005 The Perl Foundation. All Rights Reserved.
@@ -63,7 +63,7 @@ For systems like HPUX that don't have inet_pton please run
 
 If you want to install Parrot into a non-standard location use
 
-    perl Configure.pl --prefix=/Users/foo/parrot-0.2.0
+    perl Configure.pl --prefix=/Users/foo/parrot-0.2.1
 
 Running Configure.pl will generate a config.h header, a Parrot::Config
 module, platform files and some Makefiles.

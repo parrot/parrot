@@ -1,3 +1,17 @@
+2005.06.04    leo
+	* Released 0.2.1
+	* allow short names for object attributes
+	* string encoding and charset can now be set independently
+	* experimental mmap IO layer for slurping files
+	* enable compile opcode support for compilers written in PASM/PIR
+	* improved HLL support with .HLL and n_operators pragmas
+	* simplified hash code
+	* more strength reduce optimizations
+	* distinct debug and trace flag settings
+	* glob support in PGE
+	* new character classification opcodes and interfaces
+	* numerous bug fixes and enhancements
+
 2005-05-08    leo
 	* Released 0.2.0
 	* parrot repository is now under subversion

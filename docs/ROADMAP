@@ -22,9 +22,9 @@ Strictly speaking, this document is not a roadmap - that requires input from
 the Architect and the Pumpking. However, its goal is to help improve project
 management for parrot, and enable an actual roadmap.
 
-=head1 CURRENT RELEASE (0.2.0)
+=head1 CURRENT RELEASE (0.2.1)
 
-Parrot 0.2.0 has been released on May 8th 2005. For a list of new and
+Parrot 0.2.1 has been released on June 4th 2005. For a list of new and
 fixed feature see L<ChangeLog>.
 
 =head1 OVERVIEW
