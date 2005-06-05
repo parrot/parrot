@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 11;
+use Parrot::Test tests => 12;
 use vars qw($TODO);
 
 language_output_is("tcl",<<'TCL',<<OUT,"array exists yes");
@@ -63,6 +63,21 @@ b
 d
 f
 OUT
+
+TODO: {
+local $TODO = "array set currently misimplemented - doesn't reuse existing array";
+language_output_is("tcl",<<'TCL',<<OUT,"array set preserve old values");
+ set a(a) b
+ array set a [list c d e f]
+ puts $a(a)
+ puts $a(c)
+ puts $a(e)
+TCL
+b
+d
+f
+OUT
+}
 
 TODO: {
 local $TODO = "array set currently misimplemented - doesn't understand {}";
