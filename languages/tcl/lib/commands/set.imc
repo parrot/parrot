@@ -43,20 +43,20 @@ getting:
   # ends with )
   .local int char
 
-  ord char, arg0, -1
+  char = ord arg0, -1
   if char != 41 goto get_scalar
   # contains a (
-  index char, arg0, "("
+  char = index arg0, "("
   if char == -1 goto get_scalar
 
 get_array:
-  substr var, arg0, 0, char
-  length len, arg0
+  var = substr arg0, 0, char
+  len = length arg0
 
   len = len - char
   len = len - 2
   inc char
-  substr key, arg0, char, len
+  key = substr arg0, char, len
 
   $P1 = new FixedPMCArray
   $P1 = 2
@@ -76,19 +76,19 @@ setting:
   value = argv[1]
   # Is this an array variable?
   # ends with )
-  ord char, arg0, -1
+  char = ord arg0, -1
   if char != 41 goto set_scalar
   # contains a (
-  index char, arg0, "("
+  char = index arg0, "("
   if char == -1 goto set_scalar
 set_array:
-  substr var, arg0, 0, char
-  length len, arg0
+  var = substr arg0, 0, char
+  len = length arg0
 
   len = len - char
   len = len - 2
   inc char
-  substr key, arg0, char, len
+  key = substr arg0, char, len
 
   # We need to check to see if this variable already
   # exists, as we cannot switch between array and scalar.
@@ -97,7 +97,7 @@ set_array:
   clear_eh
   isnull lexical, set_array_new
   
-  typeof type, lexical 
+  type = typeof lexical 
   $S0 = typeof lexical
   # XXX Too Tcl specific
   $I0 = does lexical, "hash"
@@ -117,12 +117,8 @@ set_array_bad:
   goto done
 
 set_array_ok:
-
-  lexical[key] =  value
-
+  lexical[key] = value
   store_lex call_level, var, lexical
-
- 
   goto done
 
 set_scalar:
@@ -142,7 +138,7 @@ no_such_variable:
   goto done
 
 error:
-  return_type =TCL_ERROR 
+  return_type = TCL_ERROR 
   retval = "wrong # args: should be \"set varName ?newValue?\"\n"
 
 done:
