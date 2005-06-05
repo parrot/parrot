@@ -58,7 +58,9 @@ language_output_is("tcl",<<'TCL',<<OUT,"default args");
   puts $a
  }
  me
+ me 7
 TCL
 2
+7
 OUT
 }
