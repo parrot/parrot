@@ -1,8 +1,23 @@
-=head1 Administrative Issues
+=head1 Primary Goal
 
-For all my prodding on top level parrot issues, tcl really has no
-roadmap, either. If you're at all interested in working on this project,
-let me know, and I'll work on clarifying.
+Primary goal right now should be to pass a single test from a single file in
+the tcl suite of tests.
+
+Let's pick C<concat.test>, as we already would pass several of those tests
+if they were recast into the tcl test suite.
+
+To get this to work, we need to get (at least partial) implementations of:
+
+  [lsearch]
+  [namespace children]
+  [namespace import -force]
+  [package require]
+
+the test scripts import the library C<tcltest>, which in turn uses quite
+a bit more. We can use a stripped down version of C<tcltest> that does
+the bare minimum to get things started.
+
+=head1 Various
 
 =over 4
 
@@ -24,7 +39,7 @@ how to do this from inside parrot?
 
 TODO tests would also suffice, where possible -- For those of you
 who know tcl, this would be a great place to contribute code - tests
-based on the latest Tcl man pages will B<really> help.
+based on the latest Tcl man pages will B<really> help. 
 
 =item update docs
 
@@ -42,8 +57,6 @@ based on the latest Tcl man pages will B<really> help.
 
 The current list to string logic in C<dynclasses/tcllist.pmc> is missing logic
 to properly escape string elements. 
-
-These should go into TODO tests:
 
 [list a\[ b\]] should generate {a\[} b\\] (note the difference in handling of [ and ] !)
 
@@ -131,9 +144,7 @@ tests so they're consistent.
 
 =item [lrange]
 
-=back 4
-
-=item pass any one test in the tcl test suite ^_^
+=back
 
 =back
 
@@ -159,13 +170,13 @@ Left in:
 
 =item provide a way to access existing library PIR from Tcl.
 
-
 =item TclWord
 
 implement C<is_const> to allow for some optimizations in the compiler. 
 (which isn't written yet.)
 when adding words, default to true, but if at any point we add a variable
-or a command, invalidate that. (mostly done!)
+or a command, invalidate that. (This is, I think, done now, but we don't
+actually take advantage of it)
 
 =item multiple level lists
 
