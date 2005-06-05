@@ -14,4 +14,4 @@ tclsh:
 
 # (for development testing)
 test:
-	cd $(UP_PATH) && $(PARROT) -t $(DOWN_PATH)tcl.pbc $(DOWN_PATH)examples${slash}foo.tcl
+	cd $(UP_PATH) && $(PARROT) -t1 $(DOWN_PATH)tcl.pbc $(DOWN_PATH)examples${slash}foo.tcl
