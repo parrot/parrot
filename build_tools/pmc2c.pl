@@ -157,6 +157,9 @@ The default is "scalar". Other currently used interfaces are:
     hash
     library
     ref
+    scalar
+
+This is not a canonical list, but merely a snapshot of what's in use.
 
 =item C<dynpmc>
 
