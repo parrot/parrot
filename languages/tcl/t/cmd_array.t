@@ -46,15 +46,6 @@ TCL
 0
 OUT
 
-TODO: {
-local $TODO = "array set currently misimplemented - needs to take list, not N elements";
-language_output_is("tcl",<<'TCL',<<OUT,"array set");
- array set a {a b}
- puts $a(a)
-TCL
-b
-OUT
-
 language_output_is("tcl",<<'TCL',<<OUT,"array set list");
  array set a [list a b]
  puts $a(a)
@@ -62,8 +53,8 @@ TCL
 b
 OUT
 
-language_output_is("tcl",<<'TCL',<<OUT,"array set multi");
- array set a {a b c d e f}
+language_output_is("tcl",<<'TCL',<<OUT,"array set multi list");
+ array set a [list a b c d e f]
  puts $a(a)
  puts $a(c)
  puts $a(e)
@@ -73,8 +64,17 @@ d
 f
 OUT
 
-language_output_is("tcl",<<'TCL',<<OUT,"array set multi list");
- array set a [list a b c d e f]
+TODO: {
+local $TODO = "array set currently misimplemented - doesn't understand {}";
+language_output_is("tcl",<<'TCL',<<OUT,"array set");
+ array set a {a b}
+ puts $a(a)
+TCL
+b
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"array set multi");
+ array set a {a b c d e f}
  puts $a(a)
  puts $a(c)
  puts $a(e)

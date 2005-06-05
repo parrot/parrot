@@ -77,27 +77,41 @@ size_none:
 set:
   retval = new String
   retval = ""
-  # even only..
-  $I0 = argc % 2
-  if $I0 == 1 goto set_bad_args
-  if argc == 3 goto set_bad_args
   
-  # starting at argv[3]/argv[4], pull out all the key/value pairs and
-  # set them.
+  if argc != 3 goto set_bad_args
+  
+  .local pmc elems
+  .local int count
+  elems = argv[2]
+  count = elems
+  
+  $S0 = typeof elems
+  if $S0 != 'TclList' goto set_bad_args
+  $I0 = count % 2
+  if $I0 == 1 goto set_bad_args
+  
+  # pull out all the key/value pairs and set them.
   .local int loop 
-  loop = 2
+  loop = 0
   .local string key
   .local string val
+  the_array = new TclArray
 set_loop:
-  key = argv[loop]
+  key = elems[loop]
   inc loop
-  val = argv[loop]
+  val = elems[loop]
   inc loop
   the_array[key] = val
-  if loop >= argc goto set_loop_done
-  goto set_loop
-
-set_loop_done:
+  if loop < count goto set_loop
+  
+  # set the actual variable
+  .local int call_level
+  $P0 = find_global "_Tcl", "call_level"
+  call_level = $P0
+  
+  retval = the_array
+  store_lex call_level, array_name, the_array
+  
   goto done
 
 set_bad_args:
