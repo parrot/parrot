@@ -192,6 +192,8 @@ inline op can(out INT, in PMC, in STR) :object_base {
 
 Sets $1 to true or false, depending on whether $2 ->does the interface in $3.
 
+See L<build_tools/pmc2c.pl> for a list of available interfaces.
+
 =item B<isa>(out INT, in PMC, in STR)
 
 Sets $1 to true or false, depending on whether $2 isa $3.
