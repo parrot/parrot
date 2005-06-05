@@ -16,7 +16,7 @@ Tests the multi-method dispatch.
 
 =cut
 
-use Parrot::Test tests => 26;
+use Parrot::Test tests => 27;
 
 pir_output_is(<<'CODE', <<'OUTPUT', "PASM divide");
 
@@ -878,3 +878,59 @@ string
 PMC
 nothing
 OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "use a core func for an object");
+.sub main @MAIN
+    .local pmc d, l, r, cl
+    cl = newclass "AInt"
+    addattribute cl, ".i"
+    d = new "AInt"
+    l = new "AInt"
+    r = new "AInt"
+    .local pmc func
+    .local int typ
+    .include "mmd.pasm"
+    func = mmdvtfind .MMD_ADD, .Float, .Float
+    typ = typeof l
+    mmdvtregister .MMD_ADD, typ, typ, func
+    l = 4
+    r = 38
+    print l
+    print "\n"
+    print r
+    print "\n"
+    add d, l, r
+    print d
+    print "\n"
+.end
+.namespace ["AInt"]
+.sub __init method
+    $P0 = new Integer
+    setattribute self, ".i", $P0
+.end
+.sub __set_integer_native method
+    .param int i
+    $P0 = getattribute self, ".i"
+    $P0 = i
+.end
+.sub __set_number_native method
+    .param float f
+    $P0 = getattribute self, ".i"
+    $P0 = f
+.end
+.sub __get_string method
+    $P0 = getattribute self, ".i"
+    $S0 = $P0
+    .return ($S0)
+.end
+.sub __get_number method
+    $P0 = getattribute self, ".i"
+    $N0 = $P0
+    .return ($N0)
+.end
+CODE
+4
+38
+42
+OUTPUT
+

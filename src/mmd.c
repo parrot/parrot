@@ -1159,8 +1159,16 @@ mmd_register_sub(Interp *interpreter,
              INTVAL left_type, INTVAL right_type,
              PMC *sub)
 {
-    PMC *fake = (PMC*)((UINTVAL) sub | 1);
-    mmd_register(interpreter, func_nr, left_type, right_type, D2FPTR(fake));
+    PMC *fake;
+    if (sub->vtable->base_type == enum_class_CSub) {
+        /* returned from mmdvt_find */
+        mmd_register(interpreter, func_nr, left_type, right_type,
+                D2FPTR(PMC_struct_val(sub)));
+    }
+    else {
+        fake = (PMC*)((UINTVAL) sub | 1);
+        mmd_register(interpreter, func_nr, left_type, right_type, D2FPTR(fake));
+    }
 }
 
 /*
@@ -1210,8 +1218,12 @@ mmd_vtfind(Parrot_Interp interpreter, INTVAL func_nr, INTVAL left, INTVAL right)
     PMC *f;
     funcptr_t func = get_mmd_dispatch_type(interpreter,
             func_nr, left, right, &is_pmc);
-    if (func && is_pmc)
+    if (func && is_pmc) {
+        /* TODO if is_pmc == 2 a Bound_NCI is returned, which actually
+         * should be filled with one of the wrapper functions
+         */
         return (PMC*)F2DPTR(func);
+    }
     f = pmc_new(interpreter, enum_class_CSub);
     PMC_struct_val(f) = F2DPTR(func);
     return f;
