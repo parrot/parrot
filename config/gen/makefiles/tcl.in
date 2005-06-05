@@ -44,6 +44,7 @@ lib${slash}commands${slash}list.imc \
 lib${slash}commands${slash}llength.imc \
 lib${slash}commands${slash}lrange.imc \
 lib${slash}commands${slash}lrepeat.imc \
+lib${slash}commands${slash}namespace.imc \
 lib${slash}commands${slash}open.imc \
 lib${slash}commands${slash}proc.imc \
 lib${slash}commands${slash}puts.imc \
