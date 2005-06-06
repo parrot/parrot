@@ -2,8 +2,17 @@ If you submit a language compiler please write a one-liner below
 indicating roughly the state of your language. Does it have
 samples, do they work? Is there a README and an easy way
 to build it? The fields are: (N) Language name, (A) authors/maintainers, (D)
-description, (S) status, (M) maintained, (V) minimum Parrot version required.
+description, (S) status, (M) maintained, (V) minimum Parrot version
+required, (W) website.
 
+
+N: Amber for parrot
+A: Roger Browne
+D: Scripting language inspired by Eiffel and ruby
+S: Incomplete - but all examples and test cases are working
+M: Yes
+V: 0.2.1
+W: http://xamber.org/
 
 N: BASIC/compiler
 A: Clint Pierce
