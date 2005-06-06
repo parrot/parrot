@@ -86,6 +86,8 @@ CC         = ${cc}
 CC_INC     = ${cc_inc}
 CFLAGS     = ${ccflags} ${cc_debug} ${ccwarn} $(CC_INC) ${cc_hasjit} ${cg_flag} ${gc_flag}
 C_LIBS     = ${libs}
+CC_SHARED  = ${cc_shared}
+CCDLFLAGS  = ${ccdlflags}
 LINK       = ${link}
 LINKFLAGS  = ${linkflags} ${link_debug} ${ld_debug}
 LD         = ${ld}
@@ -649,8 +651,8 @@ runtime/parrot/include/config.fpmc : myconfig config_lib.pasm $(MINIPARROT)
 $(PARROT) : $(IMCC_DIR)/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
 		lib/Parrot/OpLib/core.pm $(SRC_DIR)/parrot_config$(O) \
 		$(MINIPARROT)
-	$(LINK) ${ld_out}$(PARROT) $(LINKFLAGS) $(IMCC_DIR)/main$(O) \
-	    $(ALL_PARROT_LIBS) $(SRC_DIR)/parrot_config$(O)
+	$(LINK) ${ld_out}$(PARROT) $(LINKFLAGS) $(CCDLFLAGS) \
+	  $(IMCC_DIR)/main$(O) $(ALL_PARROT_LIBS) $(SRC_DIR)/parrot_config$(O)
 #
 # TODO build the real miniparrot
 #

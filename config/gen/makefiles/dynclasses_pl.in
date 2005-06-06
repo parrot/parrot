@@ -31,7 +31,7 @@ our $O = qq[${o}];
 our $LIBPARROT = qq[${build_dir}/src/extend${o}];
     # XXX: ultimately, this should be replaced with:
     #  $LIBPARROT = qq[-L../blib/lib -lparrot];
-our $CFLAGS = qq[${ccflags} ${cc_debug} ${ccwarn} ${cc_hasjit} ${cg_flag} ${gc_flag}];
+our $CFLAGS = qq[${ccflags} ${cc_shared} ${cc_debug} ${ccwarn} ${cc_hasjit} ${cg_flag} ${gc_flag}];
 
 # Here comes some stuff for Win32.
 our $PATHQUOTE = '';

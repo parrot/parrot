@@ -13,6 +13,11 @@ src/py_func.c     +{-Iclasses}           # include pmc_default.h
 # io should be -Wunsed clean
 {^io/}              s/-Wno-unused/-Wunused/
 
+# files which make their way into dynamically loaded files should be compiled
+# with shared library options
+src/extend.c        +{${cc_shared}}
+src/nci_test.c      +{${cc_shared}}
+
 # imcc file settings
 {^imcc/}            -{-Wwrite-strings -Wcast-qual} s/-Wno-unused/-Wunused/
 imcc/instructions.c -{-Wformat-nonliteral} # noisy

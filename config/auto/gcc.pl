@@ -154,6 +154,10 @@ sub runstep {
     gccversion => $gccversion,
     HAS_aligned_funcptr => 1
   );
+
+  Configure::Data->set(
+    HAS_aligned_funcptr => 0)
+      if $^O eq 'hpux';
 }
 
 1;

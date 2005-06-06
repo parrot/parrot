@@ -51,6 +51,10 @@ sub runstep {
     # with position-independent code suitable for dynamic loading.
     cc_shared => $Config{cccdlflags}, # e.g. -fpic for GNU cc.
 
+    # Compiler flags used to allow dynamic libraries to access the
+    # binary's symbols
+    ccdlflags => $Config{ccdlflags}, # e.g. -Wl,-E on HP-UX
+
     # C++ compiler -- used to compile parts of ICU.  ICU's configure
     # will try to find a suitable compiler, but it prefers GNU c++ over
     # a system c++, which might not be appropriate.  This setting
@@ -100,7 +104,7 @@ sub runstep {
     cc_ldflags    => '',                  # prefix for ldflags (necessary for Win32)
 
     ld_out        => '-o ',               # ld output file.  Keep the trailing space.
-    ld_debug      => '-g ',               # include debug info in executable
+    ld_debug      => '',                  # include debug info in executable
 
     # should we have a dependancy upon arc to generate .a's?
     blib_lib_libparrot_a => 'blib/lib/libparrot$(A)',
