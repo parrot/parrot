@@ -1,0 +1,42 @@
+OPS_DIR = ../ops
+VIM_DIR = $(HOME)/.vim
+VIM_FT_DIR = $(VIM_DIR)/ftdetect
+VIM_IN_DIR = $(VIM_DIR)/indent
+VIM_SYN_DIR = $(VIM_DIR)/syntax
+
+PERL = ${perl}
+CP = ${cp}
+MKDIR = $(PERL) -e ${PQ}-d or mkdir $$_,0777 or die foreach @ARGV${PQ}
+RM_F = ${rm_f}
+
+default: all
+
+all: imc.vim vim-install
+
+imc.vim: imc.vim.in $(OPS_DIR)/*.ops
+	$(CP) imc.vim.in imc.vim
+	$(PERL) ops2vim.pl $(OPS_DIR)/*.ops >> imc.vim
+
+vim-install:
+	$(MKDIR) $(VIM_DIR)
+	$(MKDIR) $(VIM_SYN_DIR)
+	$(CP) imc.vim $(VIM_SYN_DIR)
+	$(CP) pasm.vim $(VIM_SYN_DIR)
+	$(CP) pmc.vim $(VIM_SYN_DIR)
+	$(MKDIR) $(VIM_FT_DIR)
+	$(CP) filetype_parrot.vim $(VIM_FT_DIR)/parrot.vim
+	$(MKDIR) $(VIM_IN_DIR)
+	$(CP) indent_imc.vim $(VIM_IN_DIR)/imc.vim
+
+imc.kate:
+	$(PERL) kate_syntax.pl '..${slash}' > imcc.xml
+
+clean:
+	$(RM_F) $(VIM_SYN_DIR)/imc.vim
+	$(RM_F) $(VIM_SYN_DIR)/pasm.vim
+	$(RM_F) $(VIM_SYN_DIR)/pmc.vim
+	$(RM_F) $(VIM_FT_DIR)/parrot.vim
+	$(RM_F) $(VIM_IN_DIR)/imc.vim
+
+realclean: clean
+	$(RM_F) Makefile
