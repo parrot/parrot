@@ -33,7 +33,26 @@ TODO: How do we install Kate syntax files?
 
 Included here is an Emacs mode for editing pasm files, in C<pasm.el>.
 
-TODO: How do we install Emacs modes?
+To install the pasm major mode copy C<pasm.el> to a directory where Emacs
+looks for external packages and add the following to your C<~/.emacs> file:
+
+    (load "pasm")
+
+To automatically associate .pasm files with this major mode add:
+
+    (add-to-list 'auto-mode-alist (cons "\\.pasm\\'" 'pasm-mode))
+
+to your C<~/.emacs> or you can alternatively type C<M-x pasm-mode> for every
+file that you want to use the major mode in.
+
+Additionally, you might want to add:
+
+    (add-hook 'pasm-mode-hook
+              (function (lambda ()
+                          (setq indent-tabs-mode nil))))
+
+to C<~/.emacs> as this seems to prevent the odd behavior that is noted when 
+using tabs in the pasm mode.
 
 =head2 TAGS file
 

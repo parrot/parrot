@@ -1,7 +1,7 @@
 ;;;; pasm.el
 ;;;;
 ;;;; this is a simple major mode for working with parrot assembler
-;;;; files.
+;;;; (and, to a certain extent, parrot imc) files.
 ;;;;
 ;;;; first off: this file is 'it works for me' quality, use at your
 ;;;; own risk
@@ -77,12 +77,21 @@ absolute path")
                                 ;; the assembler be damned.
                                 (,(concat "^" *pasm-label-regexp*) . font-lock-constant-face)
                                 ;; assembler directives
-                                ("^\\.[a-zA-Z]*" . font-lock-builtin-face)
+                                ("^\\s-*\\.[a-zA-Z]*" . font-lock-builtin-face)
                                 ;; ops that jump: bsr, branch, jsr,
                                 ;; jump, eq, ne, lt, le, gt, ge, if,
-                                ;; unless, ret
-                                ("\\<\\(b\\(sr\\|ranch\\)\\|e\\(q\\|nd\\)\\|g[te]\\|if\\|j\\(ump\\|sr\\)\\|l[te]\\|ne\\|ret\\|unless\\)\\>" .
-                                 font-lock-keyword-face)))
+                                ;; unless, ret and goto
+                                ("\\<\\(b\\(sr\\|ranch\\)\\|e\\(q\\|nd\\)\\|g[te]\\|if\\|j\\(ump\\|sr\\)\\|l[te]\\|ne\\|ret\\|unless\\|goto\\)\\>" .
+                                 font-lock-keyword-face)
+                                ;; imcc temporary registers
+                                ("\\$\\(I\\|S\\|P\\|N\\)[0-9]+" .
+                                 font-lock-variable-name-face)
+                                ;; pasm registers
+                                ("\\<\\(I\\|S\\|P\\|N\\)\\([0-9]\\|[12][0-9]\\|3[01]\\)\\>" .
+                                 font-lock-variable-name-face)
+                                ;; basic types: int, string, pmc and float 
+                                ("\\<\\(int\\|string\\|pmc\\|float\\)\\>" .
+                                 font-lock-type-face)))
                                 
 (defun pasm-mode ()
   "Simple Emacs mode for editing Parrot Assembler"
