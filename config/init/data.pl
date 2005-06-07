@@ -51,10 +51,6 @@ sub runstep {
     # with position-independent code suitable for dynamic loading.
     cc_shared => $Config{cccdlflags}, # e.g. -fpic for GNU cc.
 
-    # Compiler flags used to allow dynamic libraries to access the
-    # binary's symbols
-    ccdlflags => $Config{ccdlflags}, # e.g. -Wl,-E on HP-UX
-
     # C++ compiler -- used to compile parts of ICU.  ICU's configure
     # will try to find a suitable compiler, but it prefers GNU c++ over
     # a system c++, which might not be appropriate.  This setting
@@ -71,6 +67,10 @@ sub runstep {
     # make a reasonable guess at defaults.
     link          => $Config{cc},
     linkflags     => $Config{ldflags},
+    # Linker Flags to have this binary work with the shared and dynamically 
+    # loadable libraries we're building.  On HP-UX, for example, we need to
+    # allow dynamic libraries to access the binary's symbols
+    link_dynamic  => $Config{ccdlflags}, # e.g. -Wl,-E on HP-UX
 
     # ld: Tool used to build shared libraries and dynamically loadable
     # modules. Often $cc on Unix-ish systems, but apparently sometimes
