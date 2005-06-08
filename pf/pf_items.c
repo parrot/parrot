@@ -747,6 +747,7 @@ PackFile_assign_transforms(struct PackFile *pf)
             pf->fetch_nv = fetch_buf_le_8;
     }
 #endif
+    pf->fetch_iv = pf->fetch_op;
 }
 
 /*

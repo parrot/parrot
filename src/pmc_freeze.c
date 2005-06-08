@@ -472,9 +472,9 @@ static INTVAL
 shift_opcode_integer(Parrot_Interp interpreter, IMAGE_IO *io)
 {
     INTVAL i;
-    size_t len = PF_size_integer() * sizeof(opcode_t);
-    i = PF_fetch_integer(NULL, (opcode_t**) &io->image->strstart);
-    io->image->bufused -= len;
+    char *start = (char*)io->image->strstart;
+    i = PF_fetch_integer(io->pf, (opcode_t**) &io->image->strstart);
+    io->image->bufused -= ((char*)io->image->strstart - start);
     assert((int)io->image->bufused >= 0);
     return i;
 }
@@ -513,9 +513,9 @@ static FLOATVAL
 shift_opcode_number(Parrot_Interp interpreter, IMAGE_IO *io)
 {
     FLOATVAL f;
-    size_t len = PF_size_number() * sizeof(opcode_t);
-    f = PF_fetch_number(NULL, (opcode_t**) &io->image->strstart);
-    io->image->bufused -= len;
+    char *start = (char*)io->image->strstart;
+    f = PF_fetch_number(io->pf, (opcode_t**) &io->image->strstart);
+    io->image->bufused -= ((char*)io->image->strstart - start);
     assert((int)io->image->bufused >= 0);
     return f;
 }
@@ -537,7 +537,7 @@ shift_opcode_string(Parrot_Interp interpreter, IMAGE_IO *io)
     char *start;
     STRING *s;
     start = (char*)io->image->strstart;
-    s = PF_fetch_string(interpreter, NULL, (opcode_t**) &io->image->strstart);
+    s = PF_fetch_string(interpreter, io->pf, (opcode_t**) &io->image->strstart);
     io->image->bufused -= ((char*)io->image->strstart - start);
     assert((int)io->image->bufused >= 0);
     return s;
@@ -691,13 +691,36 @@ Initializes the freeze/thaw subsystem.
 static void
 ft_init(Parrot_Interp interpreter, visit_info *info)
 {
+    STRING *s = info->image;
+    struct PackFile *pf;
+
     info->image_io = &io_init;
-    info->image_io->image = info->image;
+    info->image_io->image = s = info->image;
 #if FREEZE_ASCII
     info->image_io->vtable = &ascii_funcs;
 #else
     info->image_io->vtable = &opcode_funcs;
 #endif
+    pf = info->image_io->pf = PackFile_new(interpreter, 0);
+    if (info->what == VISIT_FREEZE_NORMAL ||
+        info->what == VISIT_FREEZE_AT_DESTRUCT) {
+
+        op_check_size(interpreter, s, 16);
+        mem_sys_memcopy(s->strstart, pf->header, 16);
+        s->bufused += 16;
+        s->strlen += 16;
+    }
+    else {
+        if (string_length(interpreter, s) < 16) {
+            real_exception(interpreter, NULL, E_IOError,
+                    "bad string too thaw");
+        }
+        mem_sys_memcopy(pf->header, s->strstart, 16);
+        PackFile_assign_transforms(pf);
+        s->bufused -= 16;
+        LVALUE_CAST(char *, s->strstart) += 16;
+    }
+
     info->last_type = -1;
     info->id_list = pmc_new(interpreter, enum_class_Array);
     info->id = 0;
