@@ -86,14 +86,25 @@ set:
   if argc != 3 goto set_bad_args
   
   .local pmc elems
-  .local int count
   elems = argv[2]
-  count = elems
+
+  # XXX should probably change this to use "does"  
+  $S0 = typeof elems
+  if $S0 == 'TclList' goto set_pre_loop
+  if $S0 == 'String'  goto set_with_string
+  goto set_bad_args
   
-  $I0 = does elems, "array"
-  unless $I0 goto set_bad_args
+set_with_string:
+  $P0 = find_global "_Tcl", "__stringToList"
+  $S0 = elems
+  elems = $P0($S0)
+    
+set_pre_loop:
+  .local int count
+  count = elems
   $I0 = count % 2
-  if $I0 == 1 goto set_bad_args
+  # XXX this label doesn't exist which is why the test fails.
+  if $I0 == 1 goto set_odd_args
   
   # pull out all the key/value pairs and set them.
   .local int loop 
@@ -115,12 +126,14 @@ set_loop:
   call_level = $P0
   
   retval = the_array
-if call_level goto save_lex
-  store_global "Tcl", array_name, the_array
-save_lex:
-  store_lex call_level, array_name, the_array
+  if call_level goto save_lex
+    store_global "Tcl", array_name, the_array
+    goto done
+  save_lex:
+    store_lex call_level, array_name, the_array
   
   goto done
+
 
 set_bad_args:
  return_type = TCL_ERROR

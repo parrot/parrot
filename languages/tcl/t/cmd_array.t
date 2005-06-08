@@ -79,8 +79,6 @@ f
 OUT
 }
 
-TODO: {
-local $TODO = "array set currently misimplemented - doesn't understand {}";
 language_output_is("tcl",<<'TCL',<<OUT,"array set");
  array set a {a b}
  puts $a(a)
@@ -99,6 +97,8 @@ d
 f
 OUT
 
+TODO: {
+local $TODO = "condition is detected, but no code exists to handle. see XXX comment";
 language_output_is("tcl",<<'TCL',<<OUT,"array set uneven");
  array set a a
 TCL
