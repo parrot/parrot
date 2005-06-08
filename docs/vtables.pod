@@ -243,7 +243,7 @@ multimethod.
 
 =item C<set_number>
 
-Set yourself to the passed-in float value. This is an floating-point
+Set yourself to the passed-in float value. This is a floating-point
 multimethod.
 
 =item C<set_string>
