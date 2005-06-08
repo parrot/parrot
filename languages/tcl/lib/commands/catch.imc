@@ -46,6 +46,10 @@
   #return_type = TCL_OK
  
   varname = argv[1]
+if call_level goto save_lex
+  store_global "Tcl", varname, $P0
+  goto done
+save_lex:
   store_lex call_level, varname, $P0
   goto done
 

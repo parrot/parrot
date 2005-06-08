@@ -7,15 +7,13 @@
   .local pmc argv 
   argv = foldup
 
-  .local pmc lexical
-  .local int len
-  .local int type
+  .local pmc variable
+  null variable # we do an isnull before, can't rely on a null init val.
 
-  .local int argc 
+  .local int len, argc  
   argc = argv
 
-  .local string var
-  .local string key
+  .local string var, key
 
   .local pmc get_var
   get_var = find_global "_Tcl", "__get_var"
@@ -58,18 +56,11 @@ get_array:
   inc char
   key = substr arg0, char, len
 
-  $P1 = new FixedPMCArray
-  $P1 = 2
-  $P1[0] = var
-  $P1[1] = key
-  (return_type,retval) = get_var($P1)
+  (return_type,retval) = get_var(var,key)
   goto done
 
 get_scalar:
-   $P1 = new FixedPMCArray
-   $P1 = 1
-   $P1[0] = arg0
-   (return_type,retval) = get_var($P1)
+   (return_type,retval) = get_var(arg0)
   goto done
 
 setting:
@@ -90,22 +81,27 @@ set_array:
   inc char
   key = substr arg0, char, len
 
+
   # We need to check to see if this variable already
   # exists, as we cannot switch between array and scalar.
+
+  # Shouldn't this be using get_var ?
   push_eh catch
-    lexical = find_lex call_level, var
+    if call_level  goto get_lexical
+    variable = find_global "Tcl", var
+    goto resume
+get_lexical:
+    variable = find_lex call_level, var
+resume:
   clear_eh
-  isnull lexical, set_array_new
-  
-  type = typeof lexical 
-  $S0 = typeof lexical
-  # XXX Too Tcl specific
-  $I0 = does lexical, "hash"
-  if $I0 == 0 goto set_array_bad
+
+  isnull variable, set_array_new
+  $I0 = does variable, "hash"
+  unless $I0 goto set_array_bad
   goto set_array_ok
 
 set_array_new:
-  lexical = new TclArray
+  variable = new TclArray
   goto set_array_ok
 
 set_array_bad:
@@ -117,15 +113,22 @@ set_array_bad:
   goto done
 
 set_array_ok:
-  lexical[key] = value
-  store_lex call_level, var, lexical
+  variable[key] = value
+  if call_level goto store_array_variable
+  store_global "Tcl", var, variable
+  goto done
+store_array_variable:
+  store_lex call_level, var, variable
   goto done
 
 set_scalar:
   retval = value
+  if call_level goto store_scalar_variable
+  store_global "Tcl", arg0, retval
+  goto done
+store_scalar_variable:
   store_lex call_level, arg0, retval
-
-  goto done 
+  goto done
 
   # fall through to a bad call.
 
@@ -145,6 +148,5 @@ done:
   .return(return_type,retval)
 
 catch:
-  P4 = P5["_invoke_cc"]
-  invoke P4
+  goto resume
 .end

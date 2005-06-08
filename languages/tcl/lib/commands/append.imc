@@ -27,7 +27,12 @@
   looper = 1
 
   $S1 = argv[0] 
-  find_lex $P1, call_level, $S1
+if call_level goto find_lexical
+  $P1 = find_global "Tcl", $S1
+  goto found_variable
+find_lexical:
+  $P1 = find_lex call_level, $S1
+found_variable:
   value = $P1 
 
 loop:
@@ -40,8 +45,12 @@ loop:
 
 loop_done:
 
-  $P1 = new String
+  $P1 = new TclString
   $P1 = value
+if call_level goto set_lexical
+  store_global "Tcl", $S1, $P1
+  goto done
+set_lexical:
   store_lex call_level, $S1, $P1
 
   goto done 

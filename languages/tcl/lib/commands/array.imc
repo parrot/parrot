@@ -26,7 +26,12 @@
   call_level = $P0
 
   push_eh catch
-    find_lex the_array, call_level, array_name
+    if call_level goto find_lexical
+    the_array = find_global "Tcl", array_name
+    goto resume
+find_lexical:
+    the_array = find_lex call_level, array_name
+resume:
   clear_eh
 
   isnull the_array, array_no 
@@ -85,8 +90,8 @@ set:
   elems = argv[2]
   count = elems
   
-  $S0 = typeof elems
-  if $S0 != 'TclList' goto set_bad_args
+  $I0 = does elems, "array"
+  unless $I0 goto set_bad_args
   $I0 = count % 2
   if $I0 == 1 goto set_bad_args
   
@@ -110,6 +115,9 @@ set_loop:
   call_level = $P0
   
   retval = the_array
+if call_level goto save_lex
+  store_global "Tcl", array_name, the_array
+save_lex:
   store_lex call_level, array_name, the_array
   
   goto done
@@ -129,7 +137,6 @@ done:
   .return(return_type,retval)
 
 catch:
-  P4 = P5["_invoke_cc"]
-  invoke P4
+  goto resume
 
 .end

@@ -19,19 +19,34 @@
   .local int return_type
 
   retval = new String
+  retval = ""
 
   .local int call_level
   $P0 = find_global "_Tcl", "call_level"
   call_level = $P0
 
+  .local pmc search_variable
+  # XXX Should use get_var?
   push_eh catch
-    $P1 = find_lex call_level, varname
+    if call_level goto get_lexical
+    search_variable = find_global "Tcl", varname
+    goto resume
+get_lexical:
+    search_variable = find_lex call_level, varname
+resume:
   clear_eh
 
-  isnull $P1, error
+  isnull search_variable, error
 
-  null $P1
-  store_lex call_level, varname, $P1
+  null search_variable
+
+  if call_level goto set_lexical
+  store_global "Tcl", varname, search_variable
+  goto set_done
+set_lexical:
+  store_lex call_level, varname, search_variable
+set_done:
+
   return_type=TCL_OK
   goto done
 
@@ -46,6 +61,5 @@ done:
   .return(return_type,retval) 
 
 catch:
-  P4=P5["_invoke_cc"]
-  invoke P4
+  goto resume
 .end

@@ -1,9 +1,9 @@
-###
-# [incr]
+=head2 [incr]
 
-#
-# incr foo
-# incr foo offset
+ incr foo
+ incr foo offset
+
+=cut
 
 .namespace [ "Tcl" ]
 
@@ -19,6 +19,7 @@
   argc = argv
 
   .local pmc retval
+  .local pmc original_pmc
 
   .local int return_type
   return_type = TCL_OK 
@@ -31,8 +32,12 @@
 
   $S1 = argv[0] 
 
-  find_lex $P1, call_level, $S1
-  value = $P1 
+  if call_level goto get_lexical
+  original_pmc = find_global "Tcl", $S1
+  goto got_variable
+get_lexical:
+  original_pmc = find_lex call_level, $S1
+got_variable:
   if argc == 1 goto do_incr
   if argc == 2 goto offset
   if argc > 2 goto error
@@ -41,14 +46,16 @@ offset:
   increment = argv[1]
 
 do_incr:
-  value = value + increment
+  original_pmc += increment
   retval = new Integer
   retval = value
+  retval = original_pmc
+if call_level goto set_lexical
+  store_global $S1, retval
+  goto done
+set_lexical:
   store_lex call_level, $S1, retval
-
   goto done 
-
-  # fall through to a bad call.
 
 error:
   return_type = TCL_ERROR 

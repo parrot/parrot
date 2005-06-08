@@ -1,109 +1,64 @@
-###
-# get_var - return the value of the variable specified
-# by the parameters - Param 1 is the name of the var.
-# param2, if it exists, is the index of the variable.
-# (as with the [procs], the args are passed in as a
-# perlarray
+=head2 _Tcl::get_var
+
+Utility multi-method to return the value of the variable
+specified.
+
+If a single string param is passed, then we lookup a scalar.
+
+If two params are passed, then we lookup a TclArray (first param)
+the value for a specific key (second param)
+
+Use the call level to determine if we are referring to a 
+global variable or a lexical variable - will no doubt
+require further refinement later as we support namespaces
+other than the default, and multiple interpreters.
+
+=cut
 
 .namespace [ "_Tcl" ]
 
-.sub __get_var
-  .param pmc argv
+.sub __get_var @MULTI(STRING)
+  .param string argv0
 
-  .local int argc
-  argc = argv
-
-  .local int call_level
+  .local int call_level, return_type
   $P1 = find_global "_Tcl", "call_level"
   call_level = $P1
-
-# with recent changes, argv2 is always set (sometimes to a PerlUndef)
-# This tweaks it act as if only one had been passed in. This will
-# eventually need a cleanup.
-
-  if argc == 1 goto continue
-  $P0 = argv[1]
-  isnull $P0, continue
-  $I0 = typeof $P0
-  if $I0 != .PerlUndef goto continue
-  argc=1
-
-continue:
-  .local string name
-  .local pmc lexical
-
-  .local string windex
-  .local int type
-
-  .local pmc value
-  .local pmc retval
-
-  .local int return_type
   return_type = TCL_OK
 
-  name=argv[0] 
-  if argc == 1 goto get_scalar
-  $P9 = argv[1]
-  isnull $P9, get_scalar # mix of various calling types.
-  windex = $P9
-
-get_indexed:
-  push_eh catch
-    find_lex lexical, call_level, name
-  clear_eh
-  isnull lexical, no_such_variable
-  $I0 = typeof lexical
-  # get rid of PerlUndef when switch to Tcl*
-  if .PerlUndef == $I0 goto no_such_variable
-  isnull lexical, no_such_variable
-  typeof type, lexical
-  if type != .TclArray goto get_indexed_bad
-
-get_indexed_ok:
-  retval = lexical[windex]
-  goto done
-
-get_indexed_bad:
-  return_type = TCL_ERROR
-  $S0 =  "can't read \""
-  $S0 .= name
-  $S0 .= "("
-  $S0 .= windex
-  $S0 .= ")\": variable isn't array\n"
-  retval = new String
-  retval = $S0
-  goto done
+  .local pmc value, retval, variable
+  null variable
 
 get_scalar:
   push_eh catch
-    find_lex lexical, call_level, name
+    if call_level == 0 goto get_scalar_global
+    variable = find_lex call_level, argv0
+    goto resume
+get_scalar_global:
+    variable = find_global "Tcl", argv0
+resume:
   clear_eh
 
-  isnull lexical, no_such_variable 
-  $I0 = typeof lexical
-  # Remove perlundef when we switch back to Tcl*
-  if .PerlUndef == $I0 goto no_such_variable
-
-  # XXX ideally, we shouldn't be so Tcl specific here.
-  if $I0 != .TclArray goto get_scalar_ok
+  isnull variable, no_such_variable 
+  $I0 = does variable, "hash"
+  unless $I0 goto get_scalar_ok
 
 get_scalar_bad:
-  return_type =TCL_ERROR
+  return_type = TCL_ERROR
   $S0 = "can't read \""
-  $S0 .= name
+  $S0 .= argv0
   $S0 .= "\": variable is an array\n"
   retval = new String
   retval = $S0
   goto done
 
 get_scalar_ok:
-  retval = lexical
+  retval = variable
   goto done
 
 no_such_variable:
-  return_type =TCL_ERROR
+  return_type = TCL_ERROR
   $S0 = "can't read \""
-  $S0 .= name
+  $S0 .= argv0
   $S0 .= "\": no such variable\n"
   retval = new String
   retval = $S0
@@ -112,8 +67,67 @@ no_such_variable:
 done:
   .return(return_type,retval)
 
+# simple error handler that silently catches the exception
 catch:
-  P4 = P5["_invoke_cc"]
-  invoke P4
+  goto resume
+.end
 
+.sub __get_var @MULTI(STRING,STRING)
+  .param string argv0
+  .param string argv1
+
+  .local int call_level
+  $P1 = find_global "_Tcl", "call_level"
+  call_level = $P1
+
+  .local int type, return_type
+  return_type = TCL_OK
+
+  .local pmc value, retval, variable
+
+get_indexed:
+  push_eh catch
+    if call_level == 0 goto get_indexed_global
+    variable = find_lex call_level, argv0
+    goto resume
+get_indexed_global:
+    variable = find_global "Tcl", argv0
+resume:
+  clear_eh
+
+  isnull variable, no_such_variable
+  $I0 = does variable, "hash"
+  unless $I0 goto get_indexed_bad
+
+get_indexed_ok:
+  retval = variable[argv1]
+  goto done
+
+get_indexed_bad:
+  return_type = TCL_ERROR
+  $S0 =  "can't read \""
+  $S0 .= argv0
+  $S0 .= "("
+  $S1 = argv1
+  $S0 .= $S1
+  $S0 .= ")\": variable isn't array\n"
+  retval = new String
+  retval = $S0
+  goto done
+
+no_such_variable:
+  return_type = TCL_ERROR
+  $S0 = "can't read \""
+  $S0 .= argv0
+  $S0 .= "\": no such variable\n"
+  retval = new String
+  retval = $S0
+  # goto done            
+
+done:
+  .return(return_type,retval)
+
+# simple error handler that silently catches the exception
+catch:
+  goto resume
 .end

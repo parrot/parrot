@@ -8,8 +8,12 @@
 
   .local int return_type
   .local pmc parser,interpret,retval,string2list
-  retval = new String
+  retval = new TclString
   retval = ""
+
+  .local int call_level
+  $P0 = find_global "_Tcl", "call_level"
+  call_level = $P0
 
   # Were we passed the right # of arguments? (2n+1)
   if argcP == 0 goto error
@@ -99,13 +103,24 @@ loop_inner:
   $I2 = iterator
   if $I1 <= $I2 goto empty_var
   value = $P0[$I2]
-  store_lex -1, varname, value
+
+  if call_level goto store_lex
+    store_global "Tcl", varname, value
+    goto store_done
+store_lex:
+    store_lex -1, varname, value
+store_done:
+
   got_one = 1
   goto loop_inner
 empty_var:
-  $P0 = new String
+  $P0 = new TclString
   $P0 = ""
-  store_lex -1, varname, $P0
+  if call_level goto store_lex2
+    store_global "Tcl", varname, $P0
+    goto loop_inner
+store_lex2:
+    store_lex -1, varname, $P0
   goto loop_inner
 loop_inner_done_good:
   got_one = 1

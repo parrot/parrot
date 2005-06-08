@@ -179,14 +179,12 @@ providing a compreg-compatible method.
   store_global "_Tcl", "proc_exec", $P1
 
   # Global variable initialization
-  # XXX Are outer level tcl scopes true globals, or are they merely top
-  # level lexicals?
-  #$P0 = new String
-  #$P0 = "0.1"
-  #store_lex 0, "tcl_patchLevel", $P0
-  #$P0 = new String
-  #$P0 = "0.1"
-  #store_lex 0, "tcl_version", $P0
+  $P0 = new String
+  $P0 = "0.1"
+  store_global "Tcl", "tcl_patchLevel", $P0
+  $P0 = new String
+  $P0 = "0.1"
+  store_global "Tcl", "tcl_version", $P0
  
   # Setup the default channelIds
   $P1 = new TclArray

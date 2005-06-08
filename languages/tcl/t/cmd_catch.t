@@ -66,10 +66,10 @@ TCL
 OUT
 
 language_output_is("tcl",<<'TCL',<<OUT,"error, invalid command");
-  catch perl var
+  catch blorg var
   puts $var
 TCL
-invalid command name "perl"
+invalid command name "blorg"
 
 OUT
 

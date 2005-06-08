@@ -11,22 +11,13 @@
 
   if I3 != 4 goto bad_args
 
-  .local string start
-  .local string next
-  .local string body
-  .local pmc start_parsed
-  .local pmc next_parsed
-  .local pmc body_parsed
+  .local string start,        next,        body
+  .local pmc    start_parsed, next_parsed, body_parsed, test_parsed
   .local pmc retval
-  retval = new String
   .local int return_type
 
-  .local pmc joe # just a placeholder, not saved.
-
-  .local pmc parser
-  .local pmc interpret
-  .local pmc expression_p
-  .local pmc expression_i
+  .local pmc parser, interpret
+  .local pmc expression_p, expression_i
   parser = find_global "_Tcl", "parser"
   interpret = find_global "_Tcl", "__interpret"
   expression_p = find_global "_Tcl", "__expression_parse"
@@ -40,35 +31,73 @@
   $S0 = body_p
   body_parsed  = parser."parse"($S0,0,0)
 
+
   # first, execute start.
-  (return_type,joe) = interpret(start_parsed)
+  (return_type,$P0) = interpret(start_parsed)
   if return_type != TCL_OK goto done
 
 for_loop:
+  #print "FOR_LOOP:\n"
   # then execute body
-  (return_type,joe) = interpret(body_parsed)
+  (return_type,$P0) = interpret(body_parsed)
   if return_type == TCL_CONTINUE goto continue
   if return_type != TCL_OK goto done
 
 continue:
   # then execute next
-  (return_type,joe) = interpret(next_parsed)
+  #print "FOR_CONTINUE:\n"
+  (return_type,$P0) = interpret(next_parsed)
   if return_type != TCL_OK goto done
-  
+  #print "RETURN_TYPE ="
+  #print return_type
+  #print "\n"
+  #print "FOR_CONTINUE2:\n"
   # then check condition
-  (return_type,retval) = expression_p(test_p)
+  (return_type,test_parsed) = expression_p(test_p)
+  #print "RETURN_TYPE ="
+  #print return_type
+  #print "\n"
+  #print "TEST_PARSED = "
+  #$I0  = test_parsed
+  #print $I0
+  $P0 = test_parsed[0]
+  $P1 = test_parsed[1]
+  $P2 = test_parsed[2]
+  #print "$P0="
+  #print $P0
+  #print "\n"
+  #print "$P1="
+  #print $P1
+  #print "\n"
+  #print "$P2="
+  #print $P2
+  #print "\n"
+  #retval = test_parsed
+  #retval = test_parsed
+  retval = test_parsed
   if return_type == TCL_ERROR goto done_cleansed
-  (return_type,retval) = expression_i(retval)
+  #print "test_parsed ="
+  #print test_parsed
+  #print "\n"
+  (return_type,retval) = expression_i(test_parsed)
+  #print "RETURN_TYPE ="
+  #print return_type
+  #print "\n"
+  #print "RETVAL = "
+  #print retval
+  #print "\n"
   if return_type == TCL_ERROR goto done_cleansed
   if retval goto for_loop
   goto done
 
 bad_args:
+  retval = new String
   retval = "wrong # args: should be \"for start test next command\"\n"
   return_type = TCL_ERROR
   goto done_cleansed
 
 done:
+  #print "FOR_DONE:\n"
   retval = new String
   retval = ""
   # Propogate an error out, but not a break or continue.

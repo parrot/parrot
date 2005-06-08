@@ -287,16 +287,12 @@ variable:
   .local pmc get_var
   get_var = find_global "_Tcl", "__get_var"
   .local int return_type
-  $P1 = new FixedPMCArray
-  $P1 = 2
   $S1 = chunk_value
-  $P1[0] = $S1
   $S2 = chunk[2]
   if $S2 == "" goto get_variable
-  $P1[1] = $S2
+  .return get_var($S1,$S2)
 get_variable:
-  (return_type,$P9) = get_var($P1)
-  .return(return_type,$P9)
+  .return get_var($S1)
 .end
 
 =head2 __get_string
@@ -377,16 +373,17 @@ command:
   goto loop_done
 
 variable:
-  $P1 = new FixedPMCArray
-  $P1 = 2
   $S1 = $P0[1]
-  $P1[0] = $S1
   $S2 = $P0[2]
   if $S2 == "" goto get_variable
-  $P1[1] = $S2
+  ($I2,$P9) = get_var($S1,$S2)
+  goto got_variable
+
 get_variable:
-  ($I2,$P9) = get_var($P1)
+  ($I2,$P9) = get_var($S1)
   $S0 = $P9
+
+got_variable:
   if $I2 == 0 goto loop_next 
   return_type = $I2
   retval = $S0

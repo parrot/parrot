@@ -48,6 +48,7 @@ end_scope:
   null my_cmd
   push_eh catch
     my_cmd = find_global "Tcl", proc
+resume:
   clear_eh 
   isnull my_cmd, no_command
 
@@ -90,7 +91,6 @@ done:
   .return(return_type,retval)
 
 catch:
-  P4 = P5["_invoke_cc"]
-  invoke P4
+  goto resume
 
 .end

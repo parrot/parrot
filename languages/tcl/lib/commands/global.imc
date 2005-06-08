@@ -13,7 +13,7 @@
   .local pmc retval
   .local int return_type
 
-  retval = new String
+  retval = new TclString
   retval = ""
   return_type = TCL_OK
 
@@ -31,9 +31,10 @@ loop:
   $S0 = argv[ii]
 
   push_eh catch
-    find_lex $P1, 0, $S0
+    $P1 = find_global "Tcl", $S0
     store_lex call_level, $S0, $P1
   clear_eh
+resume:
 
   inc ii
   goto loop
@@ -47,7 +48,6 @@ done:
   .return(return_type,retval)
 
 catch:
-  P4 = P5["_invoke_cc"]
-  invoke P4
+  goto resume
 
 .end

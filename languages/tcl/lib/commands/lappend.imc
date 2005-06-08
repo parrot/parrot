@@ -18,8 +18,12 @@
   call_level = $P0
 
   .local pmc listvar
+  if call_level goto find_lexical
+   listvar = find_global "Tcl", listname
+  goto got_var
+find_lexical:
   listvar = find_lex call_level, listname
-
+got_var:
 
   .local int cnt
   cnt = 1

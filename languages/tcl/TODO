@@ -26,7 +26,7 @@ the bare minimum to get things started.
 simple interactive mode now exists. Still have to:
 
  o Should catch any real_exceptions thrown.
- o respect tcl_prompt1, tcl_prompt2 (Depends on true global support)
+ o respect tcl_prompt1, tcl_prompt2
  o deal with incomplete input (needs better error handling)
  o give invalid commands to the system.
 
@@ -80,11 +80,15 @@ hex.
 
 =over 4
 
-=item globals vs. lexicals
+=item clean up variable access
 
-Right now, globals are done with lexicals. get_var/set_var needs to be 
-updated to check the call_level - if we're at 0, then use a global. [global]
-and [upvar] will need attention once this is done.
+Currently wherever a normal C<find_lex> or C<store_lex>  might be, we have a 
+snippet of code
+to lookup the call_level (shouldn't even have this as a global), and based on
+that, treat the variable like a global instead. This should all be re-factored
+out into a single location. We also hardcode the default global namespace, 
+which in parrot is "Tcl". Refactoring this will save us pain when we add
+[namespace] support.
 
 =item implement default globals, etc.
 
@@ -94,7 +98,7 @@ global variables provided by tcl interpreter. L<tclsh>
 
 source per-user settings. L<tclsh>
 
-=item unimplemented commands/subcommands 
+=item unimplemented commands/subcommands
 
 [after] [array get] [array names] [array unset] 
 [array statistics] [array anymore] [array donesearch]
@@ -170,13 +174,7 @@ Left in:
 
 =item provide a way to access existing library PIR from Tcl.
 
-=item TclWord
-
-implement C<is_const> to allow for some optimizations in the compiler. 
-(which isn't written yet.)
-when adding words, default to true, but if at any point we add a variable
-or a command, invalidate that. (This is, I think, done now, but we don't
-actually take advantage of it)
+Perhaps via C<namespace import>
 
 =item multiple level lists
 
@@ -226,7 +224,7 @@ need to specify the correct errors to throw.
 
 =item misc
 
-complete [error] (need global var support)
+complete [error]
 
 =back
 

@@ -38,6 +38,9 @@ however, then we're returning the invokable PMC.
 
 pmc_arg:
   expr = P5
+  #print "GOT AN EXPR OF:"
+  #print expr
+  #print "\n"
 
 got_arg:
   .local pmc undef
@@ -112,13 +115,33 @@ get_parenthetical:
   goto chunk_loop
  
 get_variable:
-  #print "GET_VAR\n"
   .local pmc varname
+
+  # XXX expr_get_variable should just call __get_var for us, 
+  # so we don't have to jump through these hoops.
 
   (op_length,retval) = __expr_get_variable(expr,chunk_start) 
   if op_length == 0 goto get_function
+ 
+  $I0 = retval
+  if $I0 == 2 goto got_array
+  $S0 = retval[0]
+  ($I0,retval) = __get_var($S0)
+  goto get_variable_continue
+got_array:
+  $S0 = retval[0]
+  $S1 = retval[1]
+  ($I0,retval) = __get_var($S0,$S1)
 
-  ($I0,retval) = __get_var(retval)
+get_variable_continue:
+  # XXX This is a hack until we deal with types better in 
+  $N1 = retval
+  retval = new TclFloat
+  retval = $N1
+  #print "__get_var returned something of type:"
+  $S0 = typeof retval
+  #print $S0
+  #print "\n"
   # XXX ignoring $I0 at the minute.
   #(return_type,retval) = __expression($P0)
   #error_S = retval
@@ -337,7 +360,7 @@ converter_done:
 
 .sub __expression_interpret
   .param pmc args
-
+  
    # is this dup neeeded?
   .local pmc program_stack
   # _dumper(args,"ARGS")
@@ -348,6 +371,7 @@ converter_done:
   .local int return_type
 # evaluate the stack.
 stack_evaluator:
+  #print "STACK_EVALUATOR\n"
  # while the prog stack exists:
  .local int size
  size = program_stack
@@ -392,17 +416,23 @@ do_op:
   op_result = new TclInt
   l_arg = pop result_stack
   l_arg = l_arg[1]
-  #$S0 = typeof l_arg
-  #print "l-arG:"
+  $S0 = typeof l_arg
+  #print "l-arG (type):"
   #print $S0
+  #print "\n"
+  #print "l-arG:"
+  #print l_arg
   #print "\n"
 
   if func >= FUNCTION_ABS goto func_list
   r_arg = pop result_stack
   r_arg = r_arg[1]
-  #$S0 = typeof r_arg
-  #print "r-arG:"
+  $S0 = typeof r_arg
+  #print "r-arG (type):"
   #print $S0
+  #print "\n"
+  #print "r-arG:"
+  #print r_arg
   #print "\n"
 
   # Is there a more efficient way to do this dispatch?
@@ -574,13 +604,15 @@ func_tanh:
   # fallthrough to done_op
 
 done_op:
-  #$S0 = typeof op_result
+  $S0 = typeof op_result
   #print $S0
+  #print "\n"
   #print "-<\n"
   #print "DID OP:"
   #print func
   #print "\n"
-  $P5 = new TclList
+  $P5 = new FixedPMCArray
+  $P5 = 2
   $P5[0] = INTEGER
   $P5[1] = op_result
   push result_stack, $P5
@@ -593,6 +625,7 @@ done_op:
   #goto evaluation_done
 
 stack_done:
+  #print "STACK_DONE\n"
   $I0 = result_stack
   #error_S = "no stack left."
   if $I0 == 0 goto die_horribly
@@ -607,11 +640,14 @@ die_horribly:
   goto evaluation_return
 
 evaluation_done:
+  #print "EVALUATION_DONE:\n"
   return_type = TCL_OK 
-  retval = retval[1] # skip the extra PMC here.
+  #retval = retval[1] # skip the extra PMC here.
+  $P1 = retval[1]
 
 evaluation_return:
-  .return(return_type,retval)
+  .return(return_type,$P1)
+  #.return(return_type,retval)
    
 .end
 
@@ -715,18 +751,11 @@ real_done:
   .param string expr
   .param int start
 
-  #print "get_variable,expr="
-  #print expr
-  #print ",start="
-  #print start
-  #print "\n"
-
   .local int pos
   pos = 0 
 
   .local pmc varname
   varname = new FixedPMCArray
-  varname = 2
 
   .local int expr_length
   length expr_length, expr
@@ -773,6 +802,7 @@ var_loop_done:
   $I0 = pos - start
   
   substr $S0, expr, start, $I0
+  varname = 1
   varname[0] = $S0
   goto real_done
 
@@ -781,6 +811,7 @@ indexed_var:
   dec pos
   $I0 = pos - start
   substr $S0, expr, start, $I0
+  varname = 2 
   varname[0] = $S0
   
   # now, move to the beginning of the index, find the closing paren
