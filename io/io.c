@@ -890,7 +890,9 @@ PIO_write(theINTERP, PMC *pmc, const void *buffer, size_t len)
     if (io->flags & PIO_F_WRITE) {
         /* TODO skip utf8 translation layers if any */
         fake.strstart = const_cast(buffer);
-        fake.bufused = len;
+        fake.strlen = fake.bufused = len;
+        fake.charset = Parrot_default_charset_ptr;
+        fake.encoding = Parrot_default_encoding_ptr;
         return PIO_write_down(interpreter, l, io, &fake);
     }
     else
