@@ -103,7 +103,6 @@ set_pre_loop:
   .local int count
   count = elems
   $I0 = count % 2
-  # XXX this label doesn't exist which is why the test fails.
   if $I0 == 1 goto set_odd_args
   
   # pull out all the key/value pairs and set them.
@@ -139,6 +138,12 @@ set_bad_args:
  return_type = TCL_ERROR
  retval = new String
  retval = "wrong # args: should be array set arrayName list" 
+ goto done
+
+set_odd_args:
+ return_type = TCL_ERROR
+ retval = new String
+ retval = "list must have an even number of elements\n"
  goto done
 
 error:

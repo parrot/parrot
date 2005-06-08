@@ -97,11 +97,8 @@ d
 f
 OUT
 
-TODO: {
-local $TODO = "condition is detected, but no code exists to handle. see XXX comment";
 language_output_is("tcl",<<'TCL',<<OUT,"array set uneven");
  array set a a
 TCL
 list must have an even number of elements
 OUT
-}
