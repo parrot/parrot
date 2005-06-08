@@ -4,6 +4,8 @@
 # Setup the information the interpreter needs to run, 
 # then parse and interpret the tcl code we were passed.
 
+.HLL "Tcl", "tcl_group"
+
 .sub _main @MAIN
   .param pmc argv
 
@@ -18,8 +20,14 @@
 
   source = find_global "Tcl", "source"
 
+  .local pmc tcl_interactive
+  tcl_interactive = new TclInt
+  store_global "Tcl", "tcl_interactive", tcl_interactive
+
   argc = argv
   if argc > 1 goto open_file
+
+  tcl_interactive = 1
 
   # If no file was specified, read from stdin.
 
@@ -27,10 +35,11 @@
   .local pmc STDIN,STDOUT
   STDIN = getstdin
   STDOUT = getstdout
+
   .local pmc parser,interpret
   parser = find_global "_Tcl", "parser"
   interpret = find_global "_Tcl", "__interpret"
-  
+
 input_loop:
   print "% " # XXX Doesn't respect a set tcl_prompt1
   STDOUT."flush"()
@@ -48,6 +57,7 @@ input_loop:
 
 
 open_file: 
+  tcl_interactive = 0
   filename = new String
   filename = argv[1]
   (retcode,retval) = source(filename)
