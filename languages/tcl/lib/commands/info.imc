@@ -1,0 +1,170 @@
+=head2 [incr]
+
+ Provide introspection about the tcl interpreter. (And by extension, parrot.) 
+
+=cut
+
+.namespace [ "Tcl" ]
+
+.sub "info"
+  .local pmc argv, retval
+  argv = foldup
+
+  unless I3 goto bad_subcommand
+
+  .local pmc subcommand
+  subcommand = shift argv
+
+  if subcommand == "args" goto args
+  if subcommand == "body" goto body
+  if subcommand == "cmdcount" goto cmdcount #TODO
+  if subcommand == "commands" goto commands #TODO
+  if subcommand == "complete" goto complete #TODO
+  if subcommand == "default" goto default #TODO
+  if subcommand == "exists" goto exists #TODO
+  if subcommand == "functions" goto functions #TODO
+  if subcommand == "globals" goto globals #TODO
+  if subcommand == "hostname" goto hostname #TODO
+  if subcommand == "level" goto level #TODO
+  if subcommand == "library" goto library #TODO
+  if subcommand == "loaded" goto loaded #TODO
+  if subcommand == "locals" goto locals #TODO
+  if subcommand == "nameofexecutable" goto nameofexecutable #TODO
+  if subcommand == "patchlevel" goto patchlevel #TODO
+  if subcommand == "procs" goto procs #TODO
+  if subcommand == "script" goto scripts #TODO
+  if subcommand == "sharedlibextension" goto sharedlibextension #TODO
+  if subcommand == "tclversion" goto tclversion
+  if subcommand == "vars" goto vars #TODO
+  goto bad_subcommand
+
+args:
+  if I3 != 2 goto bad_args_args
+  .local string procname
+  procname = shift argv
+  $P1 = find_global "_Tcl", "proc_args"
+  $P2 = $P1[procname]
+  isnull $P2, no_args
+  .return(TCL_OK,$P2)
+
+no_args:
+  retval = new String
+  retval = "\""
+  retval .= procname
+  retval .= "\" isn't a procedure"
+  .return (TCL_OK,retval)
+ 
+bad_args_args:
+  retval = new String
+  retval = "wrong # args: should be \"info args procname\"\n"
+  .return (TCL_ERROR,retval) 
+
+body:
+  if I3 != 2 goto bad_body_args
+  .local string procname
+  procname = shift argv
+  $P1 = find_global "_Tcl", "proc_body"
+  $P2 = $P1[procname]
+  isnull $P2, no_body
+  .return(TCL_OK,$P2)
+
+no_body:
+  retval = new String
+  retval = "\""
+  retval .= procname
+  retval .= "\" isn't a procedure"
+  .return (TCL_OK,retval)
+ 
+bad_body_args:
+  retval = new String
+  retval = "wrong # args: should be \"info body procname\"\n"
+  .return (TCL_ERROR,retval) 
+
+functions:
+  # XXX not dealing with ?pattern? right now..
+  if I3 != 1 goto bad_functions_args
+  $P1 = find_global "_Tcl", "math_funcs"
+  $P2 = $P1[procname]
+  isnull $P2, no_args
+  .return(TCL_OK,$P2)
+
+bad_function_args:
+  retval = new String
+  retval = "wrong # args: should be \"info args procname\"\n"
+  .return (TCL_ERROR,retval) 
+
+
+exists:
+  if I3 != 2 goto bad_exists_args
+  .local string varname
+  varname = shift argv
+  .local pmc value,retval
+  null value
+  retval = new TclInt
+  push_eh exists_global_catch
+    $P1 = find_global "Tcl", varname
+exists_global_resume:
+  clear_eh 
+  isnull $P1, exists_lex
+  retval = 1
+  .return(TCL_OK,retval)
+
+
+exists_global_catch:
+  goto exists_global_resume
+
+exists_lex:
+  $P1 = find_global "_Tcl", "call_level"
+  $I1 = $P1
+  push_eh exists_lex_catch
+    $P1 = find_lex $I1, varname
+exists_lex_resume:
+  clear_eh 
+  isnull $P1, exists_nope
+  retval = 1
+  .return(TCL_OK,retval)
+
+exists_lex_catch:
+  goto exists_lex_resume
+
+
+exists_nope:
+  retval = 0
+  # These noops avoided tickling a memory allocation issue in IMCC. 
+  noop  # a test
+  noop  # a test
+  noop  # a test
+  noop  # a test
+  noop  # a test
+  noop  # a test
+  noop  # a test
+  noop  # a test
+  noop  # a test
+  noop  # a test
+  noop  # a test
+  noop  # a test
+  noop  # a test
+  noop  # a test
+  noop  # a test
+  noop  # a test
+  noop  # a test
+  .return(TCL_OK,retval)
+
+bad_exists_args:
+  retval = new String
+  retval = "wrong # args: should be \"info exists varName\"\n"
+  .return (TCL_ERROR,retval) 
+
+tclversion:
+  retval = find_global "Tcl", "tcl_version"
+  .return(TCL_OK,retval) 
+
+bad_subcommand:
+  retval = new String
+
+  retval = "bad option \""
+  retval .= subcommand
+  retval .= "\": must be args, body, cmdcount, commands, complete, default, exists, functions, globals, hostname, level, library, loaded, locals, nameofexecutable, patchlevel, procs, script, sharedlibextension, tclversion, or vars\n"
+
+  .return(TCL_ERROR,retval)
+.end

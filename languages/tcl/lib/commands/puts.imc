@@ -14,10 +14,11 @@
 
   .local int return_type  
   .local pmc retval
+
   retval = new String
+  retval = ""
 
   return_type = TCL_OK
-  retval = ""
  
   if argc == 1 goto one_arg
   if argc == 2 goto two_arg
@@ -55,8 +56,7 @@ two_arg_channel:
   goto done
 
 one_arg:
-  $P99 = argv[0]
-  $S1 = $P99
+  $S1 = argv[0]
   print $S1
   print "\n"
   goto done  

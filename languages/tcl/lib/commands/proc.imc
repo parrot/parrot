@@ -45,9 +45,14 @@ Create a PIR sub on the fly for this user defined proc.
   $P0 = find_global "_Tcl", "proc_parsed"
   $P0[name] = parsed_body
 
-  # Save the code for the proc.
+  # Save the code for the proc for [info body]
   $P1 = find_global "_Tcl", "proc_body"
   $P1[name] = body_p
+
+  # Save the args for the proc for [info body]
+  # XXX When dealing with defaults, this will have to be updated.
+  $P1 = find_global "_Tcl", "proc_args"
+  $P1[name] = args_p
 
   .local pmc escaper
   escaper = find_global "Data::Escape", "String"

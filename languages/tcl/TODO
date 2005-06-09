@@ -105,7 +105,7 @@ source per-user settings. L<tclsh>
 [array nextelement] [array startsearch] [bgerror] [binary] 
 [case] [clock] [close] [cd] [dde] [encoding] [eof] [exec]
 [fblocked] [fconfigure] [fcopy] [file] [fileevent]
-[flush] [gets] [glob] [http] [info] [interp] [library]
+[flush] [gets] [glob] [http] [interp] [library]
 [lindex] [load] [lreplace] [lsearch] [lset] [lsort] 
 [memory] [msgcat] [namespace] [open] [package] [pid] [pwd]
 [read] [registry] [regexp] [regsub] [resource] 
@@ -131,6 +131,10 @@ tests so they're consistent.
 =item Add tests for...
 
 =over 4
+
+=item info
+
+tclversion, body, args, exists
 
 =item tclword.imc
 
