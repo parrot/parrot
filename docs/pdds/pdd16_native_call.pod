@@ -165,7 +165,7 @@ signature, when creating the callback PMC:
 
 Given a Parrot function C<cb_Sub>, and a C<user_data> PMC, this creates
 a callback PMC C<cb_PMC>, which expects the user data as the second argument.
-The information returned by the callback (C<library_data) is a C string.
+The information returned by the callback (C<library_data>) is a C string.
 
 Since parrot needs more than just a pointer to a generic function to
 figure out what to do, it stuffs all the extra information into the
