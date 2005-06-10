@@ -110,7 +110,22 @@ set_pre_loop:
   loop = 0
   .local string key
   .local string val
+  
+  # see if there's an existing array with this name to add to
+  # and if not create a new array
+  push_eh set_new_array
+    if call_level goto get_lex
+    the_array = find_global "Tcl", array_name
+    goto set_has_array
+  get_lex:
+    the_array = find_lex call_level, array_name
+set_has_array:
+  clear_eh
+  goto set_loop
+  
+set_new_array:
   the_array = new TclArray
+  
 set_loop:
   key = elems[loop]
   inc loop

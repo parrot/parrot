@@ -64,8 +64,6 @@ d
 f
 OUT
 
-TODO: {
-local $TODO = "array set currently misimplemented - doesn't reuse existing array";
 language_output_is("tcl",<<'TCL',<<OUT,"array set preserve old values");
  set a(a) b
  array set a [list c d e f]
@@ -77,7 +75,6 @@ b
 d
 f
 OUT
-}
 
 language_output_is("tcl",<<'TCL',<<OUT,"array set");
  array set a {a b}
