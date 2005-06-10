@@ -223,26 +223,27 @@ sub genfile {
             $_ = $2;
         }
     }
+    s{
+      \$\{(\w+)\}
+    }{
+      if(defined(my $val=Configure::Data->get($1))) {
+        #use Data::Dumper;warn Dumper("val for $1 is ",$val);
+        $val;
+      }
+      else {
+        warn "value for '$1' in $source is undef";
+        '';
+      }
+    }egx;
     if ( $options{replace_slashes} ) {
       s{(/+)}{
-	my $len = length $1;
-	my $slash = Configure::Data->get('slash');
-	'/' x ($len/2) . ($len%2 ? $slash : ''); }eg;
-      }
-      s{
-	\$\{(\w+)\}
-      }{
-	if(defined(my $val=Configure::Data->get($1))) {
-          #use Data::Dumper;warn Dumper("val for $1 is ",$val);
-	  $val;
-	}
-	else {
-	  warn "value for '$1' in $source is undef";
-	  '';
-	}
-      }egx;
-      print OUT;
+        my $len = length $1;
+        my $slash = Configure::Data->get('slash');
+        '/' x ($len/2) . ($len%2 ? $slash : '');
+      }eg;
     }
+    print OUT;
+  }
 
     close IN  or die "Can't close $source: $!";
     close OUT or die "Can't close $target: $!";

@@ -411,7 +411,11 @@ open(SOURCE, "<$source") || die "Error re-reading $source: $!\n";
 my $line = 0; while (<SOURCE>) { $line++; } $line+=2;
 close(SOURCE);
 open(SOURCE, ">>$source") || die "Error appending to $source: $!\n";
-print SOURCE qq{#line $line "$source"\n} unless $nolines_flag;
+unless ($nolines_flag) {
+    my $source_escaped = $source;
+    $source_escaped =~ s|(\\)|$1$1|g; # escape backslashes
+    print SOURCE qq{#line $line "$source_escaped"\n};
+}
 
 
 #

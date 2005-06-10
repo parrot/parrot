@@ -564,7 +564,9 @@ sub make_op
 
         $body =~ s/\$(\d+)/{{\@$1}}/mg;
 
-        $op->body( $nolines ? $body : qq{#line $line "$file"\n$body} );
+        my $file_escaped = $file;
+        $file_escaped =~ s|(\\)|$1$1|g; # escape backslashes
+        $op->body( $nolines ? $body : qq{#line $line "$file_escaped"\n$body} );
 
         # Constants here are defined in include/parrot/op.h
         or_flag(\$jumps, "PARROT_JUMP_RELATIVE")   if ($branch);

@@ -160,8 +160,10 @@
 				'link' => 'gcc',
 				'linkflags' => '-s ',
 				'make' => 'mingw32-make',
+				'make_set_make' => 'MAKE = mingw32-make',
 				'ncilib_link_extra' => 'src/libnci_test.def',
 				'o' => '.o',
+				'slash' => '\\',
 			);
 		} elsif ($make =~ /dmake/i) {
 			# mingw Perl

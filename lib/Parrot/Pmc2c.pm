@@ -260,7 +260,11 @@ sub line_directive {
     my ($self, $line, $file) = @_;
 
     return '' if $self->{opt}{nolines};
-    return qq{#line $line "$file"\n} if defined $file;
+    if (defined $file) {
+        my $file_escaped = $file;
+        $file_escaped =~ s|(\\)|$1$1|g; # escape backslashes
+        return qq{#line $line "$file_escaped"\n};
+    }
     return qq{#line $line\n};
 }
 

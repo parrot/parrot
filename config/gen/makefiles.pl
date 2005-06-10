@@ -128,18 +128,21 @@ sub makefiles {
     Configure::Data->set(pod => $pod);
   
     genfile('config/gen/makefiles/docs.in',      'docs/Makefile',
-            commentType => '#');
+            commentType     => '#',
+            replace_slashes => 1);
   
     Configure::Data->set(pod => undef);
   
     open MAKEFILE, ">> docs/Makefile" or die "open >> docs/Makefile: $!";
   
+    my $slash = Configure::Data->get('slash');
+  
     foreach my $ops (@ops) {
         my $pod = $ops;
         $pod =~ s/\.ops$/.pod/;
         print MAKEFILE <<"EOM";
-ops/$pod: ../ops/$ops
-	perldoc -u ../ops/$ops > ops/$pod
+ops$slash$pod: ..${slash}ops${slash}$ops
+	perldoc -ud ops${slash}$pod ..${slash}ops${slash}$ops
 
 EOM
     }

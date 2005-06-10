@@ -37,7 +37,7 @@ doc-prep:
 	$(MKDIR) ops
 
 packfile-c.pod: ../src/packfile.c
-	perldoc -u ../src/packfile.c > packfile-c.pod
+	perldoc -ud packfile-c.pod ../src/packfile.c 
 
 clean:
 	$(RM_F) packfile-c.pod $(POD)
