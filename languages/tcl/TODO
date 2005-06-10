@@ -80,6 +80,18 @@ hex.
 
 =over 4
 
+=item subcommand processing
+
+Convert any commands that use subcommands to [info] style dispatch to ease
+maintenance. Subcommands invoked in this style get a single container PMC
+with all their args, but *NOT* the invoking command. so, given the tcl:
+
+  info args foo
+
+Tcl::info is called with (args, foo), which then dispatched to:
+
+_Tcl::builtins::info::args ((foo)).
+
 =item clean up variable access
 
 Currently wherever a normal C<find_lex> or C<store_lex>  might be, we have a 
