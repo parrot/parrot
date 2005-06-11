@@ -18,9 +18,9 @@ for an idea of when they can expect a release.
 This document is not meant to contain all the metadata regarding particular
 tasks, but merely provide a summary of the tasks.
 
-Strictly speaking, this document is not a roadmap - that requires input from
-the Architect and the Pumpking. However, its goal is to help improve project
-management for parrot, and enable an actual roadmap.
+This document is now becoming a roadmap, because the Architect is deep
+in a weeklong mindmeld with the Pumpking and the results are being
+encoded in this document, among others.
 
 =head1 CURRENT RELEASE (0.2.1)
 
@@ -79,11 +79,94 @@ compatibility will be listed here.
 To be included: docs/pmc, docs/resources, docs/*.pod, anything in SVN not
 in docs, RT. (That is, quite a bit.)
 
+[[What does this item mean, exactly?  --Chip]]
+
+=back
+
+=head2 DOCUMENTATION
+
+=over 4
+
+=item *
+
+Eliminate dead documentation.  Let historians dig through our
+subversion history.  We look forward toward successful deployment.
+
+=item *
+
+When docs and code disagree, they must be brought into agreement
+immediately.  At the I<very> least, appropriately mark docs that are
+apparently wrong but may eventually become right, e.g.: "C<[NOTE: this
+does not currently work.  Why?  --committer]>".
+
+PDDs are not exceptions to this rule!  Fix them when they're wrong.
+Delete them when they're obsolete.  (Never delete docs lightly,
+though.  Check first with someone who should know.)
+
+=item *
+
+Document project goals and priorities, based on Chip's talk to APW
+as found at L<http://feather.perl6.nl/~chip/Chip_APW.sxi>.
+
+=item *
+
+L<memory_internals.pod> has a question about whether or not
+string reuse is limited to a single user or multiple users.
+
 =back
 
 =head2 DESIGN
 
 =over 4
+
+=item *
+
+Variable-length register frames are an approved feature, but the
+design still needs fleshing out.  Then there are the minor details of
+documentation and implementation.  :-,
+
+=item *
+
+Calling conventions are definitely changing for the better, but not in
+a way that need change much of substance for language implementors.
+Chip/Leo mind meld is in progress; stay tuned.
+
+BTW: Don't panic!  Life is getting better for you, the Parrot user.
+It had already become obvious recently to us that Parrot needed a nice
+opcode-based interface for automated collection and extraction of call
+parameters and return values.  That's what you were going to write to
+anyway.  How it works, precisely, shouldn't matter much.  (You I<were>
+writing to pir instead of pasm, right?)
+
+=item *
+
+Design the standard library to replace all those opcodes that should
+never have been opcodes in the first place, e.g. the IO and
+transcendental math features.
+
+(Note: Whatever tech we use to implement transcendental math should at
+*worst* compile to function calls under JIT.  And I'll consider making
+exceptions for the transcendantal math if someone can show me why.)
+
+I expect pir will still let you pretend they're opcodes, though, to
+avoid immediate howls of outrage.  (But only silicon-based life forms
+write pasm, so we're not worried about that.)
+
+=item *
+
+Do detailed design on new Chip/Leo-agreed-in-principle lexical system.
+
+The key change learns a lesson that Perl 5 only half learned: Lexical
+values may be dynamic, but their names and scopes are known at compile
+time.  It's just silly to add '$x' to a newly created pad at runtime,
+over and over and over, every time the same scope is entered.  Silly.
+
+So the names and scopes will be static data attached to the
+subroutine, while the data will be in dynamically created pad entries.
+
+Think of a pseudohash: the static data are like the index hash, which
+can be shared and immutable; the storage slots are like the rest of
+the array, which can be mutable even when the index hash isn't.
 
 =item *
 
@@ -104,23 +187,11 @@ Specify what we need to serialize continuations
 
 =item *
 
-Spec out threading system.
-
-=item *
-
 Final namespace spec
 
 =item *
 
-Final lexical pad spec
-
-=item *
-
 Solidify design for Truly Evil speed hack for fast regex/string matching
-
-=item *
-
-multi key opcodes
 
 =item *
 
@@ -147,7 +218,7 @@ Describe the components of a C<struct PMC_EXT>. L<PDD04>
 
 =item *
 
- requester: leo
+requester: leo
 
 Ok. In the long run I expect a multi-stage config system. First is to
 get miniparrot built and running, then Parrot core. Extensions like gdbm
@@ -382,17 +453,6 @@ dynamic library loading
 
 =back
 
-=head2 DOCUMENTATION
-
-=over 4
-
-=item *
-
-L<memory_internals.pod> has a question about whether or not
-string reuse is limited to a single user or multiple users.
-
-=back
-
 =head2 HIGH LEVEL LANGUAGES
 
 =over 4
@@ -413,8 +473,10 @@ Pass the pie-thon test suite.
 
 =head1 FUTURE
 
-This document should eventually be obsoleted by use of the RT ticketing
-system. Every task that is to be done should be documented in the system, and
-reports generated based on that information.
+This document should eventually be obsoleted by use of the RT
+ticketing system, except to the extent that it documents things that
+show promise but have not yet been committed to.  Every task that is
+actually ready to be done should be documented in RT, and reports
+generated based on that information.
 
 =cut
