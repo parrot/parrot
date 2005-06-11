@@ -27,96 +27,18 @@ which has more explicit guarantees of stability.
 
 =head2 Integer data types
 
-Integer data types are generically referred to as C<INT>s. C<INT>s are
-conceptual things and there is no data structure that corresponds to them.
-
-=over 4
-
-=item Platform-native integer
-
-These are whatever size native integer was chosen at Parrot configuration 
-time. The C-level typedefs C<INTVAL> and C<UINTVAL> get you a
-platform-native signed and unsigned integer respectively.
-
-=item Arbitrary precision integers
-
-Big integers, or bigints, are arbitrary-length integer numbers. The
-only limit to the number of digits in a bigint is the lesser of the
-amount of memory available or the maximum value that can be
-represented by a C<UINTVAL>. This will generally allow at least 4 billion
-digits, which ought to be far more than enough for anyone.
-
-The internal representation of a bigint has not yet been determined.
-One possible implementation is described below; for an alternative
-implementation, see F<docs/pdds/pdd14_bignum.pod>.
-
-=item A possible bigint implementation
-
-We can represent a bigint with:
-
-    struct bigint {
-         void *buffer;
-         UINTVAL length;
-         INTVAL exponent;
-         UINTVAL flags;
-    }
-
-=begin question
-
-Should we scrap the buffer pointer and just tack the buffer on the end
-of the structure? Saves a level of indirection, but means if we need
-to make the buffer bigger we have to adjust anything pointing to it.
-
-=end question
-
-The C<buffer> pointer points to the buffer holding the actual
-number, C<length> is the length of the buffer, C<exponent> is the base
-10 exponent for the number (so 2e4532 doesn't take up much space), and
-C<flags> are some flags for the bigint.
+Integer data types are generically referred to as C<INT>s.  These are whatever
+size native integer was chosen at Parrot configuration time. The C-level
+typedefs C<INTVAL> and C<UINTVAL> get you a platform-native signed and unsigned
+integer respectively.
 
 =back
 
 =head2 Floating point data types
 
-Floating point data types are generically referred to as C<NUM>s. Like
-C<INT>s, C<NUM>s are conceptual things, not real data structures.
-
-=over 4
-
-=item Platform native float
-
-These are whatever size float was chosen when parrot was configured. The
-C level typedef C<FLOATVAL> will get you one of these.
-
-=item Arbitrary precision decimal numbers
-
-Arbitrary precision decimal numbers, or bignums, can have any number
-of digits before and after the decimal point.
-
-The internal representation of a bigint has not yet been determined.
-One possible implementation is described below; for an alternative
-implementation, see F<docs/pdds/pdd14_bignum.pod>.
-
-=item A possible bignum implementation
-
-Bignums could be represented by the structure:
-
-    struct bignum {
-        void *buffer;
-        UINTVAL length;
-        INTVAL exponent;
-        UINTVAL flags;
-    }
-
-The similarity to the suggested bigint structure is not accidental; we
-want upgrading from bigint to bignum to be quick.
-
-=begin question
-
-Like the bigint structure, should we toss the data pointer and just
-tack the data on the end?
-
-=end question
+Floating point data types are generically referred to as C<NUM>s.  These are
+whatever size float was chosen when parrot was configured. The C level typedef
+C<FLOATVAL> will get you one of these.
 
 =back
 
