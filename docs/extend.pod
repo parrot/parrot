@@ -43,11 +43,9 @@ extend.pod - Parrot extension system
 =item C<Parrot_call_method(Parrot_INTERP interp, Parrot_PMC sub
        Parrot_PMC object, Parrot_STRING method, const char *signature, ...)>
 
-Calls a method on C<object> with the given signature and arguments. If C<sub>
-is not NULL, then it is used as the method that's being called. C<method> will
-then be used as the name of the method in the call stack. This is useful for
-calling aliased methods. If C<sub> is NULL, then C<method> is looked up and the
-method returned by that is used.
+Calls a method on C<object> with the given signature and arguments. C<sub> is
+the method that's being called, and C<method> is the name of the method in the
+call stack. This is useful for calling aliased methods.
 
 =back
 
