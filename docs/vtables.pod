@@ -74,7 +74,7 @@ now look at how one is supposed to do this.
 =head2 Starting out
 
 If you're adding data types to the core of Parrot, (and you've checked
-with Dan that you're supposed to be doing so) you should be creating a
+with Chip that you're supposed to be doing so) you should be creating a
 file in the F<classes/> subdirectory; this is where all the built-in PMC
 classes live. (And a good source of examples to plunder even if you're
 not writing a core data type.)
