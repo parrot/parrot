@@ -233,15 +233,17 @@ Cookies (PMCs).
      Maintainer: Dan Sugalski <dan@sidhe.org>
      Class: Internals
      PDD Number: 4
-     Version: 1.4
+     Version: 1.5
      Status: Developing
-     Last Modified: 20 February 2004
+     Last Modified: 11 June 2005
      PDD Format: 1
      Language: English
 
 =head2 HISTORY
 
 =over 4
+
+=item Version 1.5, 11 June 2005
 
 =item Version 1.4, 20 February 2004
 
@@ -258,6 +260,11 @@ Cookies (PMCs).
 =head1 CHANGES
 
 =over 4
+
+=item Version 1.5
+
+Removed BigInt and BigNum from the definition of I* and N* registers --
+according to Leo they are now always PMCs, never register types of their own.
 
 =item Version 1.4
 
