@@ -1,0 +1,58 @@
+# Copyright: 2001-2005 The Perl Foundation.  All rights reserved.
+# $Id$
+
+=head1 NAME
+
+extend.pod - Parrot extension system
+
+=head1 SYNOPSIS 
+
+    #include "parrot/extend.h"
+    
+    int main(int argc, char *argv[]) {
+    }
+
+=head1 FILES
+
+=over 4
+
+=item F<include/parrot/extend.h>
+
+=item F<extend.c>
+
+=back
+
+=head1 DESCRIPTION
+
+=head2 Data Structures
+
+=over 4
+
+=back
+
+=head2 Constants
+
+=over 4
+
+=back
+
+=head2 Functions
+
+=over 4
+
+=item C<Parrot_call_method(Parrot_INTERP interp, Parrot_PMC sub
+       Parrot_PMC object, Parrot_STRING method, const char *signature, ...)>
+
+Calls a method on C<object> with the given signature and arguments. If C<sub>
+is not NULL, then it is used as the method that's being called. C<method> will
+then be used as the name of the method in the call stack. This is useful for
+calling aliased methods. If C<sub> is NULL, then C<method> is looked up and the
+method returned by that is used.
+
+=back
+
+=head1 SEE ALSO
+
+F<extend.c> and F<extend.h> for the implementation.
+
+=cut
