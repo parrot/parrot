@@ -24,13 +24,24 @@ $description = "Determining whether GNU bc is installed...";
 @args = qw(verbose);
 
 sub runstep {
-    # This seems to work for GNU bc 1.06
-    my $a = capture_output( 'bc', '-v' ) || '';
-    my $has_gnu_bc = ( $a =~ m/^bc / &&
-                       $a =~ m/Free Software Foundation/ ) ? 1 : 0;
+    my $has_gnu_bc;
+    my $osname =  $Config{osname};
+
+    # This is not really important, let's stick to Linux for now
+    my %bc_does_not_hang = ( linux => 1 
+                           );
+
+    if ( $bc_does_not_hang{$osname} ) {
+      # This seems to work for GNU bc 1.06
+      my $answer = capture_output( 'bc', '-v' ) || '';
+      $has_gnu_bc = ( $answer =~ m/^bc / &&
+                      $answer =~ m/Free Software Foundation/ ) ? 1 : 0;
+
+    } else {
+      $has_gnu_bc = 0;
+    }
 
     Configure::Data->set(has_gnu_bc => $has_gnu_bc);
-
     $Configure::Step::result = $has_gnu_bc ? 'yes' : 'no';
 }
 
