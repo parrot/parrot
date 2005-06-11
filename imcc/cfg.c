@@ -911,6 +911,32 @@ find_loops (Parrot_Interp interpreter, IMC_Unit * unit)
         dump_loops(unit);
 }
 
+/*
+ * For loop_info, finds the natural preheader of the loop, if any, and returns 
+ * its index, otherwise returns -1.  A natural preheader exists if there is 
+ * only one predecessor to the loop header outside of the loop body, and if it 
+ * always transfers control directly to the header.
+ */
+int
+natural_preheader (IMC_Unit * unit, Loop_info* loop_info)
+{
+    int preheader = -1;
+    Edge* edge;
+ 
+    for (edge = unit->bb_list[loop_info->header]->pred_list; edge; edge = edge->pred_next) {
+        if (!set_contains(loop_info->loop, edge->from->index)) {
+            if (preheader == -1 && unit->bb_list[edge->from->index]->succ_list->to->index == loop_info->header && 
+                    !unit->bb_list[edge->from->index]->succ_list->succ_next) {
+                preheader = unit->bb_list[edge->from->index]->index;
+                continue;
+            } else {
+                return -1;
+            }
+        }
+    }
+    return preheader;
+}
+
 /* Increases the loop_depth of all the nodes in a loop */
 
 static void
@@ -987,7 +1013,7 @@ mark_loop (Parrot_Interp interpreter, IMC_Unit * unit, Edge* e)
     loop_info[n_loops]->depth = footer->loop_depth;
     loop_info[n_loops]->n_entries = i;
     loop_info[n_loops]->header = header->index;
-    loop_info[n_loops]->preheader = i == 1 ? enter->index : -1;
+    loop_info[n_loops]->preheader = natural_preheader(unit, loop_info[n_loops]);
     unit->n_loops++;
 }
 
