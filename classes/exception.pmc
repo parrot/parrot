@@ -23,7 +23,7 @@ Textual representation of the exception.
 
 =item 1 C<_type>
 
-The exception type, (see F<src/exceptions.h>, F<except_type.pasm>).
+The exception type, (see F<include/parrot/exceptions.h>, F<except_type.pasm>).
 
 =item 2 C<_severity>
 
