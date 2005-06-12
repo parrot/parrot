@@ -905,6 +905,96 @@ inline op tan(out NUM, in NUM) :base_math {
 
 ########################################
 
+=item B<sec>(out NUM, in INT)
+
+=item B<sec>(out NUM, in NUM)
+
+Set $1 to the secant of $2 (given in radians).
+
+=cut
+
+inline op sec(out NUM, in NUM) :base_math {
+  $1 = ((FLOATVAL)1) / cos((FLOATVAL)$2);
+  goto NEXT();
+}
+
+########################################
+
+=item B<sech>(out NUM, in INT)
+
+=item B<sech>(out NUM, in NUM)
+
+Set $1 to the hyperbolic secant of $2 (given in radians).
+
+=cut
+
+inline op sech(out NUM, in NUM) :base_math {
+  $1 = ((FLOATVAL)1) / cosh((FLOATVAL)$2);
+  goto NEXT();
+}
+
+########################################
+
+=item B<sec>(out NUM, in INT)
+
+=item B<sec>(out NUM, in NUM)
+
+Set $1 to the secant of $2 (given in radians).
+
+=cut
+
+inline op sec(out NUM, in NUM) :base_math {
+  $1 = ((FLOATVAL)1) / cos((FLOATVAL)$2);
+  goto NEXT();
+}
+
+########################################
+
+=item B<sech>(out NUM, in INT)
+
+=item B<sech>(out NUM, in NUM)
+
+Set $1 to the hyperbolic secant of $2 (given in radians).
+
+=cut
+
+inline op sech(out NUM, in NUM) :base_math {
+  $1 = ((FLOATVAL)1) / cosh((FLOATVAL)$2);
+  goto NEXT();
+}
+
+########################################
+
+=item B<sec>(out NUM, in INT)
+
+=item B<sec>(out NUM, in NUM)
+
+Set $1 to the secant of $2 (given in radians).
+
+=cut
+
+inline op sec(out NUM, in NUM) :base_math {
+  $1 = ((FLOATVAL)1) / cos((FLOATVAL)$2);
+  goto NEXT();
+}
+
+########################################
+
+=item B<sech>(out NUM, in INT)
+
+=item B<sech>(out NUM, in NUM)
+
+Set $1 to the hyperbolic secant of $2 (given in radians).
+
+=cut
+
+inline op sech(out NUM, in NUM) :base_math {
+  $1 = ((FLOATVAL)1) / cosh((FLOATVAL)$2);
+  goto NEXT();
+}
+
+########################################
+
 =item B<tanh>(out NUM, in NUM)
 
 Set $1 to the hyperbolic tangent of $2 (given in radians).
