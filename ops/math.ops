@@ -854,21 +854,6 @@ inline op acos(out NUM, in NUM) :base_math {
 
 ########################################
 
-=item B<asec>(out NUM, in INT)
-
-=item B<asec>(out NUM, in NUM)
-
-Set $1 to the arc secant (in radians) of $2.
-
-=cut
-
-inline op asec(out NUM, in NUM) :base_math {
-  $1 = acos(((FLOATVAL)1) / ((FLOATVAL)$2));
-  goto NEXT();
-}
-
-########################################
-
 =item B<asin>(out NUM, in INT)
 
 =item B<asin>(out NUM, in NUM)
@@ -1002,36 +987,6 @@ Set $1 to the base 2 logarithm of $2.
 op log2(out NUM, in NUM) :base_math {
    FLOATVAL temp = log((FLOATVAL)2.0);
   $1 = log((FLOATVAL)$2) / temp;
-  goto NEXT();
-}
-
-########################################
-
-=item B<sec>(out NUM, in INT)
-
-=item B<sec>(out NUM, in NUM)
-
-Set $1 to the secant of $2 (given in radians).
-
-=cut
-
-inline op sec(out NUM, in NUM) :base_math {
-  $1 = ((FLOATVAL)1) / cos((FLOATVAL)$2);
-  goto NEXT();
-}
-
-########################################
-
-=item B<sech>(out NUM, in INT)
-
-=item B<sech>(out NUM, in NUM)
-
-Set $1 to the hyperbolic secant of $2 (given in radians).
-
-=cut
-
-inline op sech(out NUM, in NUM) :base_math {
-  $1 = ((FLOATVAL)1) / cosh((FLOATVAL)$2);
   goto NEXT();
 }
 
