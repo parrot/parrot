@@ -404,7 +404,10 @@ loop_done:
 
 =head2 __dump
 
-Allow us to be rendered by Data::Dumper
+Allow us to be rendered by Data::Dumper 
+
+Not tested, uses pmcPerlArray dumper method because of the way Dumper is written.
+Shouldn't have to.
 
 =cut
 
@@ -451,7 +454,7 @@ skip:
 command:
   $P1 = $P0[1]
   # XXX This will need to change.
-  dumper.pmcPerlArray($P1)
+  dumper.pmcPerlArray($P1) 
   goto loop_next
 
 var:
