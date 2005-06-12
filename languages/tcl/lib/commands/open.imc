@@ -22,7 +22,7 @@
   $S1 = argv[0] 
   open $P1, $S1, ">"
   $I0 = typeof $P1
-  if $I0 == .PerlUndef goto file_error
+  if $I0 == .Undef goto file_error
   retval = "file"
   $P2 = find_global "_Tcl", "channels"
   # get a new file channel name
