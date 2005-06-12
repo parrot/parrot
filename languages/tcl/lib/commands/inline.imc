@@ -15,7 +15,7 @@
   $S2 = code
   $P1 = compreg $S1
   $I1 = typeof $P1
-  if $I1 == .PerlUndef goto fail
+  if $I1 == .None goto fail
   $P0 = compile $P1, $S2
   $P0()
 
@@ -23,6 +23,8 @@
 
 fail:
   $P1 = new String
-  $P1 = "invalid language specified"
+  $P1 = "invalid language \""
+  $P1 .= $S1
+  $P1 .= "\" specified\n"
   .return (TCL_ERROR, $P1)
 .end
