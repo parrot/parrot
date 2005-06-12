@@ -1,8 +1,0 @@
-# $Id$
-
-Revision history for Perl extension M4::Test.
-
-0.01  Wed Aug 13 17:33:14 2003
-	- original version; created by h2xs 1.22 with options
-		-XA --name=M4::Test
-

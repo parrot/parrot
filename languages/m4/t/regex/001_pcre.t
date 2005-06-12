@@ -2,7 +2,7 @@
 
 use strict;
 use FindBin;
-use lib "$FindBin::Bin/../../../../lib";
+use lib "$FindBin::Bin/../../lib", "$FindBin::Bin/../../../../lib";
 
 use Parrot::Test tests => 1;
 

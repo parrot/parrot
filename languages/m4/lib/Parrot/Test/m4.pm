@@ -1,4 +1,4 @@
-# $Id$
+# $Id: m4.pm 7964 2005-05-03 21:14:35Z bernhard $
 
 package Parrot::Test::m4;
 

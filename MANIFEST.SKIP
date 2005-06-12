@@ -271,6 +271,7 @@
 ^dynoplibs/Makefile$
 ^dynoplibs/Makefile/
 # generated from svn:ignore of 'editor/'
+^editor/Makefile$
 # generated from svn:ignore of 'encodings/'
 ^encodings/.*.o$
 ^encodings/.*.o/

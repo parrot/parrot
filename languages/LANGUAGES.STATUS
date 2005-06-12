@@ -166,7 +166,7 @@ A: Jeffrey Goff
 A: Juergen Boemmels
 S: Functioning, as far as implemented. Lists and functions are working
 S: but many functions are missing implementation.
-S: Two test failures on Mac OS X
+S: Two test failures on Mac OS X and Linux
 M: Yes
 V: 0.0.11
 

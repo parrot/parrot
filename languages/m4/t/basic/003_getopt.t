@@ -1,7 +1,8 @@
 # $Id$
 
-# pragmata
 use strict;
+use FindBin;
+use lib "$FindBin::Bin/../../lib", "$FindBin::Bin/../../../../lib";
 
 use Test::More tests => 25; 
 
@@ -32,7 +33,7 @@ END_OUT
 #--------------------------------------------
 $real_out     = `$parrot_m4 --version 2>&1`; 
 is( $real_out, << 'END_OUT', '--version' );
-Parrot m4 0.0.11
+Parrot m4 0.0.12
 END_OUT
 
 
