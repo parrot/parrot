@@ -565,7 +565,13 @@ inline op inc(in PMC) :base_core {
 
 ########################################
 
+=item B<mod>(inout INT, in INT)
+
 =item B<mod>(out INT, in INT, in INT)
+
+=item B<mod>(out NUM, in NUM, in NUM)
+
+=item B<mod>(inout NUM, in NUM)
 
 NOTE: This "corrected mod" algorithm is based on the C code on page 70
 of [1]. Assuming correct behavior of the built-in mod operator (%) with
@@ -585,18 +591,6 @@ References:
   [2] Ronald L. Graham, Donald E. Knuth and Oren Patashnik, *Concrete
       Mathematics*, Second Edition. Addison-Wesley, 1994.
 
-=item B<mod>(in PMC, in PMC, in PMC)
-
-=item B<mod>(in PMC, in PMC, in INT)
-
-=item B<mod>(in PMC, in PMC, in NUM)
-
-Sets $1 to the modulus of $2 and $3.
-
-=item B<mod>(in PMC, in INT)
-
-Sets $1 to the modulus of $1 and $2.
-
 =cut
 
 op mod(inout INT, in INT) :base_core {
@@ -608,25 +602,6 @@ op mod(out INT, in INT, in INT) :base_core {
   $1 = intval_mod($2, $3);
   goto NEXT();
 }
-
-
-########################################
-
-=item B<mod>(out NUM, in NUM, in NUM)
-
-NOTE: This "corrected mod" algorithm is based on the formula of [1]:
-
-  x mod y = x - y * floor(x / y)
-
-For more information on this definition of mod, see section 3.4 of [1],
-pages 81-85.
-
-References:
-
-  [1] Ronald L. Graham, Donald E. Knuth and Oren Patashnik, *Concrete
-      Mathematics*, Second Edition. Addison-Wesley, 1994.
-
-=cut
 
 op mod(out NUM, in NUM, in NUM) :base_core {
   $1 = floatval_mod($2, $3);
@@ -1133,61 +1108,6 @@ Implementations of various mathematical operations
 =over 4
 
 =cut
-
-########################################
-
-=item B<gcd>(out INT, in INT, in INT)
-
-Greatest Common divisor of $2 and $3.
-
-=cut
-
-inline op gcd(out INT, in INT, in INT) :advanced_math {
-
-  UINTVAL q = 0;
-  UINTVAL c = 0;
-  INTVAL temp2 = $2 < 0 ? -$2 : $2;
-  INTVAL temp3 = $3 < 0 ? -$3 : $3;
-  while (temp3 != 0) {
-    q = (UINTVAL)floor( (FLOATVAL)temp2/temp3 );
-    c = temp2 - temp3*q;
-    temp2 = temp3;
-    temp3 = c;
-  }
-  $1 = temp2;
-  goto NEXT();
-}
-
-########################################
-
-=item B<lcm>(out INT, in INT, in INT)
-
-Least Common Multiple of $2 and $3
-
-=cut
-
-inline op lcm(out INT, in INT, in INT) :advanced_math {
-  UINTVAL q = 0;
-  UINTVAL c = 0;
-  INTVAL temp2 = $2;
-  INTVAL temp3 = $3;
-  INTVAL saved_var2 = temp2;
-  INTVAL saved_var3 = temp3;
-  while (temp3 != 0) {
-    q = (UINTVAL)floor( (FLOATVAL)temp2/temp3 );
-    c = temp2 - temp3*q;
-    temp2 = temp3;
-    temp3 = c;
-  }
-  if (saved_var2 == 0) {
-    $1 = 0;
-  }
-  else {
-    saved_var2 = saved_var2 / temp2;
-    $1 = saved_var2*saved_var3;
-  }
-  goto NEXT();
-}
 
 ########################################
 
