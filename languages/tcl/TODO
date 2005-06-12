@@ -148,12 +148,6 @@ tests so they're consistent.
 
 tclversion, body, args, exists
 
-=item tclword.imc
-
-=item PMCs
-
-=item the macros
-
 =item expr's precedence and parens and missing functionality.
 
 =item [puts]'s ability to write to other channels
