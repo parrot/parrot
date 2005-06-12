@@ -44,9 +44,7 @@ pmc_arg:
 
 got_arg:
   .local pmc undef
-  # -- this causes auto-coercion to Perl*'s, which screws us up.
-  # This is apparently because the MMD of a PerlInt * a TclInt is a TclFloat. 
-  undef = new PerlUndef
+  undef = new Undef
 
   .local pmc chunks
   chunks = new TclList
@@ -209,7 +207,7 @@ two_char:
   $P11 = ops[test_op]
   isnull $P11, one_char
   $I1 = typeof $P11
-  if $I1 == .PerlUndef goto one_char
+  if $I1 == .Undef goto one_char
   goto op_done
   # Does this op exist?
 
@@ -219,7 +217,7 @@ one_char:
   $P11 = ops[test_op]
   isnull $P11, op_fail
   $I1 = typeof $P11
-  if $I1 == .PerlUndef goto op_fail
+  if $I1 == .Undef goto op_fail
   goto op_done
 
 op_fail:
@@ -289,7 +287,7 @@ converter_loop:
   our_op = chunks[stack_index]
   isnull our_op, converter_next
   typeof $I0, our_op
-  if $I0 == .PerlUndef goto converter_next
+  if $I0 == .Undef goto converter_next
   $I2 = our_op[0]
   if $I2 == INTEGER goto converter_next
   if $I2 == CHUNK   goto converter_next
@@ -383,7 +381,7 @@ stack_evaluator:
  pop chunk, program_stack
  #print "stack_eval3?\n"
  $I10 = typeof chunk
- if $I10 == .PerlUndef goto stack_evaluator
+ if $I10 == .Undef goto stack_evaluator
  type = chunk[0] 
  #print "stack_eval4?\n"
 
@@ -407,7 +405,7 @@ do_op:
 
   # XXX protect against unknown operands... 
   #typeof $I0, func
-  #if $I0 == .PerlUndef goto die_horribly  
+  #if $I0 == .Undef goto die_horribly  
 
   # XXX assume all operands take two args.
   .local pmc r_arg
@@ -880,7 +878,7 @@ dd:
   func = $P1[$S0]
   isnull func, fail 
   typeof $I0, func
-  if $I0 == .PerlUndef goto fail
+  if $I0 == .Undef goto fail
 
   # and the operand is what's between the ()'s - get the result
   # of /that/ expression and return it.
