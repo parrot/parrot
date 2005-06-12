@@ -87,17 +87,9 @@ inline op chopn(out STR, in STR, in INT) :base_core {
 
 =item B<concat>(inout STR, in STR)
 
-=item B<concat>(in PMC, in STR)
-
-=item B<concat>(in PMC, in PMC)
-
 Append the string in $2 to the string in $1.
 
 =item B<concat>(out STR, in STR, in STR)
-
-=item B<concat>(in PMC, in PMC, in PMC)
-
-=item B<concat>(in PMC, in PMC, in STR)
 
 Append the string $3 to $2 and places the result into $1.
 
@@ -116,10 +108,6 @@ inline op concat(out STR, in STR, in STR) :base_mem {
 #######################################
 
 =item B<repeat>(out STR, in STR, in INT)
-
-=item B<repeat>(in PMC, in PMC, in PMC)
-
-=item B<repeat>(in PMC, in PMC, in INT)
 
 Repeats string $2 $3 times and stores result in $1.
 
@@ -199,7 +187,9 @@ op unpin(inout STR) :base_mem {
 
 =item B<substr>(out STR, in STR, in INT, in INT)
 
-=item B<substr>(out STR, in STR, in INT, in INT, in STR)
+=item B<substr_r>(out STR, in STR, in INT, in INT)
+
+=item B<substr>(out STR, inout STR, in INT, in INT, in STR)
 
 =item B<substr>(inout STR, in INT, in INT, in STR)
 
@@ -298,9 +288,9 @@ inline op index(out INT, in STR, in STR, in INT) :base_core {
 
 =item B<pack>(inout STR, in INT, in INT, in INT)
 
-=item B<pack>(inout STR, in INT, in NUM, in INT)
+#=item B<pack>(inout STR, in INT, in NUM, in INT) (B<unimplemented>)
 
-=item B<pack>(inout STR, in INT, in STR, in INT)
+#=item B<pack>(inout STR, in INT, in STR, in INT) (B<unimplemented>)
 
 Concat $2 bytes from $3 at the end of $1 or replace them at $4 if provided.
 
@@ -383,9 +373,9 @@ inline op pack(inout STR, in INT, in INT, in INT) :base_core {
 
 =item B<sprintf>(out PMC, in PMC, in PMC)
 
-=item B<sprintf>(out STR, in STR) [unimplemented]
+#=item B<sprintf>(out STR, in STR) [unimplemented] [[what is this op supposed to do? --jrieks]]
 
-=item B<sprintf>(out PMC, in PMC) [unimplemented]
+#=item B<sprintf>(out PMC, in PMC) [unimplemented] [[what is this op supposed to do? --jrieks]]
 
 Sets $1 to the result of calling C<Parrot_psprintf> with the
 given format ($2) and arguments ($3, which should be an ordered
@@ -414,10 +404,6 @@ inline op sprintf(out PMC, in PMC, in PMC) :base_core {
 =item B<new>(out STR)
 
 =item B<new>(out STR, in INT)
-
-=item B<new>(out STR, in INT, in INT)
-
-=item B<new>(out STR, in INT, in INT, in INT)
 
 Allocate a new empty string, of length $2 (optional), encoding $3
 (optional) and type $4. (optional)

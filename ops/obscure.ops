@@ -36,7 +36,7 @@ Reference:
 
 ########################################
 
-=item B<covers>(n, n)
+=item B<covers>(out NUM, in NUM)
 
 Set $1 to the coversine (in radians) of $2.
 
@@ -50,7 +50,7 @@ inline op covers(out NUM, in NUM) :advanced_math {
 
 ########################################
 
-=item B<exsec>(n, n)
+=item B<exsec>(out NUM, in NUM)
 
 Set $1 to the exsecant of $2 (given in radians).
 
@@ -65,7 +65,7 @@ inline op exsec(out NUM, in NUM) :advanced_math {
 
 ########################################
 
-=item B<hav>(n, n)
+=item B<hav>(out NUM, in NUM)
 
 Set $1 to the haversine (in radians) of $2.
 
@@ -79,7 +79,7 @@ inline op hav(out NUM, in NUM) {
 
 ########################################
 
-=item B<vers>(n, n)
+=item B<vers>(out NUM, in NUM)
 
 Set $1 to the versine (in radians) of $2.
 

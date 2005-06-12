@@ -268,7 +268,7 @@ op ne_addr(in PMC, in PMC, labelconst INT) :base_core {
 
 =item B<lt>(in NUM, in NUM, labelconst INT)
 
-=item B<lt>(in STR, in STR, inconst INT)
+=item B<lt>(in STR, in STR, labelconst INT)
 
 =item B<lt>(in PMC, in PMC, labelconst INT)
 
@@ -440,12 +440,6 @@ op le_num (in PMC, in PMC, labelconst INT) :base_core {
 
 ########################################
 
-=item B<gt>(in INT, in INT, labelconst INT)
-
-=item B<gt>(in NUM, in NUM, labelconst INT)
-
-=item B<gt>(in STR, in STR, labelconst INT)
-
 =item B<gt>(in PMC, in PMC, labelconst INT)
 
 =item B<gt>(in PMC, in INT, labelconst INT)
@@ -506,12 +500,6 @@ op gt_num (in PMC, in PMC, labelconst INT) :base_core {
 }
 
 ########################################
-
-=item B<ge>(in INT, in INT, labelconst INT)
-
-=item B<ge>(in NUM, in NUM, labelconst INT)
-
-=item B<ge>(in STR, in STR, labelconst INT)
 
 =item B<ge>(in PMC, in PMC, labelconst INT)
 
@@ -686,8 +674,6 @@ These operations apply logical functions to their arguments.
 
 =item B<and>(out INT, in INT, in INT)
 
-=item B<and>(in PMC, in PMC, in PMC)
-
 Short-circuiting logical and.  Returns $2 if it's false, else returns $3.
 
 =cut
@@ -699,7 +685,7 @@ inline op and(out INT, in INT, in INT) :base_core {
 
 ########################################
 
-=item B<not>(out INT)
+=item B<not>(inout INT)
 
 =item B<not>(in PMC)
 
@@ -744,8 +730,6 @@ inline op n_not(out PMC, in PMC) :base_core {
 
 =item B<or>(out INT, in INT, in INT)
 
-=item B<or>(in PMC, in PMC, in PMC)
-
 Short-circuiting logical or.  Returns $2 if it's true, else returns $3.
 
 =cut
@@ -758,8 +742,6 @@ inline op or(out INT, in INT, in INT) :base_core {
 ########################################
 
 =item B<xor>(out INT, in INT, in INT)
-
-=item B<xor>(in PMC, in PMC, in PMC)
 
 Logical xor.  Returns $2 if it's true and $3 isn't,
 returns $3 if it's true and $2 isn't, else returns false.
@@ -847,12 +829,6 @@ inline op isfalse(out INT, in PMC) {
     goto NEXT();
 }
 
-=item B<isgt>(out INT, in INT, in INT)
-
-=item B<isgt>(out INT, in NUM, in NUM)
-
-=item B<isgt>(out INT, in STR, in STR)
-
 =item B<isgt>(out INT, in PMC, in PMC)
 
 Sets $1 to 1 if $2 is greater than $3
@@ -863,12 +839,6 @@ inline op isgt(out INT, in PMC, in PMC) {
   $1 = (mmd_dispatch_i_pp(interpreter, $2, $3, MMD_CMP) > 0);
   goto NEXT();
 }
-
-=item B<isge>(out INT, in INT, in INT)
-
-=item B<isge>(out INT, in NUM, in NUM)
-
-=item B<isge>(out INT, in STR, in STR)
 
 =item B<isge>(out INT, in PMC, in PMC)
 

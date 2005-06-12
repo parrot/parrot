@@ -184,6 +184,8 @@ inline op open(out PMC, in STR) :filesys_open {
 
 =item B<print>(in STR)
 
+=item B<write>(in PMC)
+
 Print $1 to standard output.
 
 =cut
@@ -223,6 +225,7 @@ op write(in PMC) :base_io {
   }
   goto NEXT();
 }
+
 ##########################################
 
 =item B<printerr>(in INT)

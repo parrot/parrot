@@ -135,6 +135,12 @@ inline op gcd(out INT, out INT, out INT, in INT, in INT) :advanced_math {
 
 ########################################
 
+=item B<set_eh>(in PMC)
+
+Install $1 as an exception handler.
+
+=cut
+
 inline op set_eh(in PMC) {
   /* use push_eh */
   push_exception(interpreter, $1);
@@ -145,6 +151,8 @@ inline op set_eh(in PMC) {
 ########################################
 
 =item B<die>()
+
+=item B<die>(in INT)
 
 Die. Hard. Calls _exit, and won't do any process cleanup
 
@@ -161,6 +169,12 @@ op die(in INT) :base_debug {
   _exit($1);
   goto NEXT();
 }
+
+=item B<new>(out PMC, in INT, in KEY)
+
+XXX
+
+=cut
 
 op new(out PMC, in INT, in KEY) {
   if ($2 <= 0 || $2 >= enum_class_max) {

@@ -36,8 +36,6 @@ type information.
 
 =item B<new>(out PMC, in INT, in PMC)
 
-=item B<new>(out PMC, in INT, in KEY)
-
 Create a new PMC of class $2; look in F<core_pmcs.h> for the base
 vtable types. The assembler allows you to specify PMCs by type
 name as well as by integer - you should do this for compatibility,

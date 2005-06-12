@@ -13,6 +13,44 @@ dotgnu.ops
 
 =head1 DESCRIPTION
 
+=item B<conv_i1>(inout INT)
+
+=item B<conv_i1_ovf>(inout INT)
+
+=item B<conv_u1>(inout INT)
+
+=item B<conv_u1_ovf>(inout INT)
+
+=item B<conv_i2>(inout INT)
+
+=item B<conv_i2_ovf>(inout INT)
+
+=item B<conv_u2>(inout INT)
+
+=item B<conv_u2_ovf>(inout INT)
+
+=item B<conv_i4>(out INT, in NUM)
+
+=item B<conv_i4>(out INT, in PMC)
+
+=item B<conv_u4>(out INT, in NUM)
+
+=item B<conv_u4>(out INT, in PMC)
+
+=item B<conv_i8>(in PMC, in INT)
+
+=item B<conv_i8>(in PMC, in PMC)
+
+=item B<conv_i8>(in PMC, in NUM)
+
+=item B<conv_r4>(inout NUM)
+
+=item B<conv_r4>(out NUM, in PMC)
+
+=item B<conv_r8>(inout NUM)
+
+=item B<conv_r8>(out NUM, in PMC)
+
 Additional opcodes for C# compilation needed by cscc PM codegen
 
 =cut

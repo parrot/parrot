@@ -395,6 +395,16 @@ Remove attribute $2 from class $1, specified either by name or offset.
 
 =cut
 
+op removeattribute(in PMC, in STR) {
+    internal_exception(NOT_IMPLEMENTED, "removeattribute is not implemented");
+    goto NEXT();
+}
+
+op removeattribute(in PMC, in INT) {
+    internal_exception(NOT_IMPLEMENTED, "removeattribute is not implemented");
+    goto NEXT();
+}
+
 =item B<getattribute>(out PMC, in PMC, in INT)
 
 =item B<getattribute>(out PMC, in PMC, in STR)
@@ -461,21 +471,15 @@ implement.
 
 =cut
 
-###############################################################################
+op adddoes(in PMC, in STR) :object_classes {
+    internal_exception(NOT_IMPLEMENTED, "removedoes is not implemented");
+    goto NEXT();
+}
 
-=item B<makemmd>(in PMC, in INT)   B<(unimplemented)>
-
-Makes vtable entry $2 use Parrot's multimethod dispatch system
-
-=item B<mmdfunc>(in INT, in PMC, in PMC, in PMC)  B<(unimplemented)>
-
-Make $4 the function called when MMD function $1 is called for
-types $2 and $3.
-
-=item B<mmddispatch>(out PMC, in INT, in PMC, in PMC)   B<(unimplemented)>
-
-Do a multimethod dispatch for binary MMD function $2 on PMCs $3 and $4, and
-put the result in $1.
+op removedoes(in PMC, in STR) :object_classes {
+    internal_exception(NOT_IMPLEMENTED, "removedoes is not implemented");
+    goto NEXT();
+}
 
 =back
 

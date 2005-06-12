@@ -23,17 +23,9 @@ The variant with an appended B<s> like B<bands> work on strings.
 
 =item B<band>(inout INT, in INT)
 
-=item B<band>(in PMC, in INT)
-
-=item B<band>(in PMC, in PMC)
-
 Set the bits of $1 according to the B<and> of the corresponding bits from $1 and $2.
 
 =item B<band>(out INT, in INT, in INT)
-
-=item B<band>(in PMC, in PMC, in INT)
-
-=item B<band>(in PMC, in PMC, in PMC)
 
 Set the bits of $1 according to the B<and> of the corresponding bits from $2 and $3.
 
@@ -51,17 +43,9 @@ inline op band(out INT, in INT, in INT) :base_core {
 
 =item B<bands>(inout STR, in STR)
 
-=item B<bands>(in PMC, in STR)
-
-=item B<bands>(in PMC, in PMC)
-
 Set the bits of $1 according to the B<and> of the corresponding bits from $1 and $2.
 
 =item B<bands>(out STR, in STR, in STR)
-
-=item B<bands>(in PMC, in PMC, in STR)
-
-=item B<bands>(in PMC, in PMC, in PMC)
 
 Set the bits of $1 according to the B<and> of the corresponding bits from $2 and $3.
 
@@ -149,12 +133,12 @@ inline op bnots(in PMC) :base_core {
   goto NEXT();
 }
 
-inline op bnots(in PMC, in PMC) :base_core {
+inline op bnots(out PMC, in PMC) :base_core {
   $1 = $2->vtable->bitwise_nots(interpreter, $2, $1);
   goto NEXT();
 }
 
-inline op n_bnots(in PMC, in PMC) :base_core {
+inline op n_bnots(out PMC, in PMC) :base_core {
   $1 = $2->vtable->bitwise_nots(interpreter, $2, NULL);
   goto NEXT();
 }
@@ -163,17 +147,9 @@ inline op n_bnots(in PMC, in PMC) :base_core {
 
 =item B<bor>(inout INT, in INT)
 
-=item B<bor>(in PMC, in INT)
-
-=item B<bor>(in PMC, in PMC)
-
 Set the bits of $1 according to the B<or> of the corresponding bits from $1 and $2.
 
 =item B<bor>(out INT, in INT, in INT)
-
-=item B<bor>(in PMC, in PMC, in INT)
-
-=item B<bor>(in PMC, in PMC, in PMC)
 
 Set the bits of $1 according to the B<or> of the corresponding bits from $2 and $3.
 
@@ -191,17 +167,9 @@ inline op bor(out INT, in INT, in INT) :base_core {
 
 =item B<bors>(inout STR, in STR)
 
-=item B<bors>(in PMC, in STR)
-
-=item B<bors>(in PMC, in PMC)
-
 Set the bits of $1 according to the B<or> of the corresponding bits from $1 and $2.
 
 =item B<bors>(out STR, in STR, in STR)
-
-=item B<bors>(in PMC, in PMC, in STR)
-
-=item B<bors>(in PMC, in PMC, in PMC)
 
 Set the bits of $1 according to the B<or> of the corresponding bits from $2 and $3.
 
@@ -221,17 +189,9 @@ inline op bors(out STR, in STR, in STR) :base_core {
 
 =item B<shl>(inout INT, in INT)
 
-=item B<shl>(in PMC, in INT)
-
-=item B<shl>(in PMC, in PMC)
-
 Shift left $1 by $2 bits.
 
 =item B<shl>(out INT, in INT, in INT)
-
-=item B<shl>(in PMC, in PMC, in PMC)
-
-=item B<shl>(in PMC, in PMC, in INT)
 
 Set $1 to the value of $2 shifted left by $3 bits.
 
@@ -251,17 +211,9 @@ inline op shl(out INT, in INT, in INT) :base_core {
 
 =item B<shr>(inout INT, in INT)
 
-=item B<shr>(in PMC, in INT)
-
-=item B<shr>(in PMC, in PMC)
-
 Shift right $1 by $2 bits.
 
 =item B<shr>(out INT, in INT, in INT)
-
-=item B<shr>(in PMC, in PMC, in PMC)
-
-=item B<shr>(in PMC, in PMC, in INT)
 
 Set $1 to the value of $2 shifted right by $3 bits.
 
@@ -279,19 +231,11 @@ inline op shr(out INT, in INT, in INT) :base_core {
 
 ########################################
 
-=item B<lsr>(inout INT, in INT)
-
-=item B<lsr>(in PMC, in INT)
-
-=item B<lsr>(in PMC, in PMC)
+=item B<lsr>(out INT, in INT)
 
 Shift $1 logically shifted right by $2 bits.
 
 =item B<lsr>(out INT, in INT, in INT)
-
-=item B<lsr>(out PMC, in PMC, in INT)
-
-=item B<lsr>(out PMC, in PMC, in PMC)
 
 Set $1 to the value of $2 logically shifted right by $3 bits.
 
@@ -338,17 +282,9 @@ inline op rot(out INT, in INT, in INT, inconst INT) {
 
 =item B<bxor>(inout INT, in INT)
 
-=item B<bxor>(in PMC, in INT)
-
-=item B<bxor>(in PMC, in PMC)
-
 Set the bits of $1 according to the B<xor> of the corresponding bits from $1 and $2.
 
 =item B<bxor>(out INT, in INT, in INT)
-
-=item B<bxor>(in PMC, in PMC, in INT)
-
-=item B<bxor>(in PMC, in PMC, in PMC)
 
 Set the bits of $1 according to the B<xor> of the corresponding bits from $2 and $3.
 
@@ -366,17 +302,9 @@ inline op bxor(out INT, in INT, in INT) :base_core {
 
 =item B<bxors>(inout STR, in STR)
 
-=item B<bxors>(in PMC, in STR)
-
-=item B<bxors>(in PMC, in PMC)
-
 Set the bits of $1 according to the B<xor> of the corresponding bits from $1 and $2.
 
 =item B<bxors>(out STR, in STR, in STR)
-
-=item B<bxors>(in PMC, in PMC, in STR)
-
-=item B<bxors>(in PMC, in PMC, in PMC)
 
 Set the bits of $1 according to the B<xor> of the corresponding bits from $2 and $3.
 

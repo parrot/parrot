@@ -503,8 +503,6 @@ inline op save(in STR) :base_core {
 
 =item B<savec>(in STR)
 
-=item B<savec>(in PMC)
-
 Save a clone of register or constant $1 onto the user stack.
 
 =cut

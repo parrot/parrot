@@ -188,7 +188,7 @@ op rx_compile(out str, in str, in str) {
 
 =over 4
 
-=item B<rx_pushindex>(in pmc)
+=item B<rx_pushindex>(in int)
 
 Pushes the current index onto the stack contained in the info structure.
 
@@ -200,10 +200,14 @@ op rx_pushindex(in int) {
 	goto NEXT();
 }
 
+=item B<rx_initstack>()
+
 op rx_initstack() {
 	interpreter->ctx.intstack = intstack_new(interpreter);
 	goto NEXT();
 }
+
+=item B<rx_clearstack>()
 
 op rx_clearstack () {
 	intstack_free(interpreter, interpreter->ctx.intstack);
@@ -401,7 +405,7 @@ op rx_is_s(in str, inout int, labelconst int) {
 
 ########################################
 
-=item B<rx_oneof>(in str, inout int, in pmc, labelconst int)
+=item B<rx_oneof>(in str, inout int, in str, labelconst int)
 
 Matches if the current character is one of the characters in the third
 parameter.
@@ -534,7 +538,7 @@ Additionally, this op can be used to optimize matches of the type:
 
 =over 4
 
-=item B<rx_search>(in str, out int, inout int, in str, labelconst in)
+=item B<rx_search>(in str, out int, inout int, in str, labelconst int)
 
 Searches for the literal $4 on the string $1 starting at $3. Sets $2
 to the current index in the string (after the literal), and $3 to
@@ -590,7 +594,7 @@ op rx_search(in str, out int, inout int, in str, labelconst int) {
 
 ###########################################
 
-=item B<rx_search_char> (in str, out int, inout int, in str, labelconst in)
+=item B<rx_search_char> (in str, inout int, inout int, in int, labelconst int)
 
 Searches for the char $4 on the string $1 starting at $3. Sets $2 to
 the current index in the string (after the char)
@@ -727,7 +731,7 @@ op rx_char_all (in str, inout int, in int) {
 ########################################
 
 
-=item B<rx_oneof_bmp_all> (in str, inout in, in pmc, inconst int)
+=item B<rx_oneof_bmp_all> (in str, inout int, in pmc)
 
 Matches the greedy repetition of rx_one_of_bmp. Like its cousins, it
 never fails and it doesn't push the intermediate position in the stack
