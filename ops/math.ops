@@ -30,33 +30,33 @@ These operations take an infix operation number and PMC arguments.
 
 =cut
 
-=item C<infix(inconst INT, in PMC, in INT)>
+=item B<infix>(inconst INT, in PMC, in INT)
 
-=item C<infix(inconst INT, in PMC, in NUM)>
+=item B<infix>(inconst INT, in PMC, in NUM)
 
-=item C<infix(inconst INT, in PMC, in STR)>
+=item B<infix>(inconst INT, in PMC, in STR)
 
-=item C<infix(inconst INT, in PMC, in PMC)>
+=item B<infix>(inconst INT, in PMC, in PMC)
 
 General inplace infix dispatch opcode. $1 is the MMD function number.
 
-=item C<infix(inconst INT, out PMC, in PMC, in INT)>
+=item B<infix>(inconst INT, out PMC, in PMC, in INT)
 
-=item C<infix(inconst INT, out PMC, in PMC, in NUM)>
+=item B<infix>(inconst INT, out PMC, in PMC, in NUM)
 
-=item C<infix(inconst INT, out PMC, in PMC, in STR)>
+=item B<infix>(inconst INT, out PMC, in PMC, in STR)
 
-=item C<infix(inconst INT, out PMC, in PMC, in PMC)>
+=item B<infix>(inconst INT, out PMC, in PMC, in PMC)
 
 General infix dispatch opcode. $1 is the MMD function number.
 
-=item C<n_infix(inconst INT, out PMC, in PMC, in INT)>
+=item B<n_infix>(inconst INT, out PMC, in PMC, in INT)
 
-=item C<n_infix(inconst INT, out PMC, in PMC, in NUM)>
+=item B<n_infix>(inconst INT, out PMC, in PMC, in NUM)
 
-=item C<n_infix(inconst INT, out PMC, in PMC, in STR)>
+=item B<n_infix>(inconst INT, out PMC, in PMC, in STR)
 
-=item C<n_infix(inconst INT, out PMC, in PMC, in PMC)>
+=item B<n_infix>(inconst INT, out PMC, in PMC, in PMC)
 
 General infix dispatch opcode. $1 is the MMD function number.
 These opcodes return a new result PMC $2.

@@ -32,7 +32,7 @@ These operations take an infix operation number and PMC arguments.
 
 =cut
 
-=item C<pic_infix__(inconst INT, in PMC, in PMC)>
+=item B<pic_infix__>(inconst INT, in PMC, in PMC)
 
 One for fun and MOPS.
 
@@ -72,7 +72,7 @@ runit_v_pp:
     goto OFFSET(0);
 }
 
-=item C<pic_inline_sub__(inconst INT, in PMC, in PMC)>
+=item B<pic_inline_sub__>(inconst INT, in PMC, in PMC)
 
 And for more fun an inlined variant too.
 
