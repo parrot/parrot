@@ -21,6 +21,112 @@ Parrot ops or not. They are included here for testing purposes only!
 
 ###############################################################################
 
+=head2 Mathematical operations
+
+Implementations of various mathematical operations
+
+=over 4
+
+=cut
+
+########################################
+
+=item B<gcd>(out INT, in NUM, in NUM)
+
+Greatest Common divisor of $2 and $3.
+
+=item B<gcd>(out INT, out INT, out INT, in INT, in INT)
+
+Given $4 and $5, it calculates $1, $2 and $3 so that
+
+$1 = gcd($4, $5) = $2 * $4 + $3 * $5 (d = gcd(a,b) = x*a + y*b)
+
+=cut
+
+inline op gcd(out INT, in NUM, in NUM) :advanced_math {
+
+  FLOATVAL q = 0;
+  FLOATVAL c = 0;
+  FLOATVAL temp2 = $2 < 0.0 ? -$2 : $2;
+  FLOATVAL temp3 = $3 < 0.0 ? -$3 : $3;
+  while (temp3 != 0) {
+    q = floor( (FLOATVAL)temp2/temp3 );
+    c = temp2 - temp3*q;
+    temp2 = temp3;
+    temp3 = c;
+  }
+  $1 = (INTVAL)temp2;
+  goto NEXT();
+}
+
+inline op gcd(out INT, out INT, out INT, in INT, in INT) :advanced_math {
+  /* r0 = q1*r1 + r2 */
+  INTVAL r0 = $4 < 0 ? -$4 : $4;
+  INTVAL r1 = $5 < 0 ? -$5 : $5;
+  INTVAL r2 = 0;
+  INTVAL q1 = 0;
+
+  INTVAL xkm1 = 1;
+  INTVAL xk = 0;
+  INTVAL xkp1 = 0;
+
+  INTVAL ykm1 = 0;
+  INTVAL yk = 1;
+  INTVAL ykp1 = 0;
+
+  INTVAL n = 1;
+
+  INTVAL x;
+  INTVAL y;
+
+  while (1) {
+    q1 = r0/r1;
+    r2 = r0 - q1*r1;
+    if (r2 == 0) {
+      break;
+    }
+    r0 = r1;
+    r1 = r2;
+
+    xkp1 = q1*xk + xkm1;
+    xkm1 = xk;
+    xk = xkp1;
+
+    ykp1 = q1*yk + ykm1;
+    ykm1 = yk;
+    yk = ykp1;
+  }
+  $1 = r1;
+  $2 = (INTVAL)( xk * pow( -1, n ) );
+  $3 = (INTVAL)( yk * pow( -1, n+1 ) );
+
+  x = $2 * $4;
+  y = $3 * $5;
+
+  /* correct the sign (can be wrong because we used abs($4) and abs($5) */
+  if ( x + y == r1 ) {
+    /* no correction necessary */
+  }
+  else if ( x + y == -r1 ) {
+    $2 = -$2;
+    $3 = -$3;
+  }
+  else if ( x - y == r1 ) {
+    $3 = -$3;
+  }
+  else if ( -x + y == r1 ) {
+    $2 = -$2;
+  }
+
+  goto NEXT();
+}
+
+=back
+
+=cut
+
+###############################################################################
+
 =head2 Misc other ops
 
 =over 4

@@ -14,7 +14,7 @@ obscure.ops
 
 =head1 DESCRIPTION
 
-Parrot's library of obscure and uncommon ops.
+Parrot's library of obscure ops.
 
 =cut
 
@@ -87,52 +87,6 @@ Set $1 to the versine (in radians) of $2.
 
 inline op vers(out NUM, in NUM) :advanced_math {
   $1 = 1.0 - cos($2);
-  goto NEXT();
-}
-
-
-########################################
-
-=item B<asec>(out NUM, in INT)
-
-=item B<asec>(out NUM, in NUM)
-
-Set $1 to the arc secant (in radians) of $2.
-
-=cut
-
-inline op asec(out NUM, in NUM) :base_math {
-  $1 = acos(((FLOATVAL)1) / ((FLOATVAL)$2));
-  goto NEXT();
-}
-
-########################################
-
-=item B<sec>(out NUM, in INT)
-
-=item B<sec>(out NUM, in NUM)
-
-Set $1 to the secant of $2 (given in radians).
-
-=cut
-
-inline op sec(out NUM, in NUM) :base_math {
-  $1 = ((FLOATVAL)1) / cos((FLOATVAL)$2);
-  goto NEXT();
-}
-
-########################################
-
-=item B<sech>(out NUM, in INT)
-
-=item B<sech>(out NUM, in NUM)
-
-Set $1 to the hyperbolic secant of $2 (given in radians).
-
-=cut
-
-inline op sech(out NUM, in NUM) :base_math {
-  $1 = ((FLOATVAL)1) / cosh((FLOATVAL)$2);
   goto NEXT();
 }
 
