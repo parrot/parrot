@@ -172,25 +172,9 @@ tclversion, body, args, exists
 
 =over 4
 
-=item Remove Perl*
-
-Mostly done. All that seems to be left is PerlUndef. Much was already
-converted to the internal types. PerlUndef removal will probably result
-(finally) in the use of null checks where it's being used for that, and
-TclObject where it's being used for shimmering.
-
-Left in:
-
-./lib/commands/inline.imc
-./lib/commands/open.imc
-./lib/commands/source.imc
-./lib/expression.imc
-./lib/get_var.imc
-./lib/tclword.imc
-
 =item provide a way to access existing library PIR from Tcl.
 
-Perhaps via C<namespace import>
+Perhaps via [namespace import]? Can fake it right now with [inline]
 
 =item multiple level lists
 
