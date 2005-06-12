@@ -40,11 +40,11 @@ output_is(<<'CODE', <<'OUTPUT', "push_eh - throw");
     print "not reached\n"
     end
 _handler:
-    print "catched it\n"
+    print "caught it\n"
     end
 CODE
 main
-catched it
+caught it
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "set_eh - throw - message");
@@ -58,14 +58,14 @@ output_is(<<'CODE', <<'OUTPUT', "set_eh - throw - message");
     print "not reached\n"
     end
 _handler:
-    print "catched it\n"
+    print "caught it\n"
     set S0, P5["_message"]	# P5 is the exception object
     print S0
     print "\n"
     end
 CODE
 main
-catched it
+caught it
 something happend
 OUTPUT
 
@@ -82,7 +82,7 @@ output_is(<<'CODE', <<'OUTPUT', "set_eh - throw - message, check P5");
     print "not reached\n"
     end
 _handler:
-    print "catched it\n"
+    print "caught it\n"
     set S0, P5["_message"]	# P5 is the exception object
     print S0
     print "\n"
@@ -93,7 +93,7 @@ _handler:
     end
 CODE
 main
-catched it
+caught it
 something happend
 a string
 OUTPUT
@@ -112,14 +112,14 @@ output_is(<<'CODE', <<'OUTPUT', "set_eh - throw - lexical");
     print "not reached\n"
     end
 _handler:
-    print "catched it\n"
+    print "caught it\n"
     find_lex P0, "$a"
     print P0
     print "\n"
     end
 CODE
 main
-catched it
+caught it
 42
 OUTPUT
 
@@ -134,7 +134,7 @@ output_is(<<'CODE', <<'OUTPUT', "set_eh - throw - return");
     print "back again\n"
     end
 _handler:
-    print "catched it\n"
+    print "caught it\n"
     set S0, P5["_message"]	# P5 is the exception object
     print S0
     print "\n"
@@ -142,7 +142,7 @@ _handler:
     invoke P2
 CODE
 main
-catched it
+caught it
 something happend
 back again
 OUTPUT
@@ -165,7 +165,7 @@ output_is(<<'CODE', <<'OUTPUT', "set_eh - throw - return, change lexical");
     print "\n"
     end
 _handler:
-    print "catched it\n"
+    print "caught it\n"
     set S0, P5["_message"]	# P5 is the exception object
     print S0
     print "\n"
@@ -177,7 +177,7 @@ _handler:
     invoke P2
 CODE
 main
-catched it
+caught it
 something happend
 42
 back again
@@ -230,20 +230,20 @@ output_is(<<'CODE', <<'OUTPUT', "2 exception handlers");
     print "not reached\n"
     end
 _handler1:
-    print "catched it in 1\n"
+    print "caught it in 1\n"
     set S0, P5["_message"]
     print S0
     print "\n"
     end
 _handler2:
-    print "catched it in 2\n"
+    print "caught it in 2\n"
     set S0, P5["_message"]
     print S0
     print "\n"
     end
 CODE
 main
-catched it in 2
+caught it in 2
 something happend
 OUTPUT
 
@@ -260,13 +260,13 @@ output_is(<<'CODE', <<'OUTPUT', "2 exception handlers, throw next");
     print "not reached\n"
     end
 _handler1:
-    print "catched it in 1\n"
+    print "caught it in 1\n"
     set S0, P5["_message"]
     print S0
     print "\n"
     end
 _handler2:
-    print "catched it in 2\n"
+    print "caught it in 2\n"
     set S0, P5["_message"]
     print S0
     print "\n"
@@ -274,9 +274,9 @@ _handler2:
     end
 CODE
 main
-catched it in 2
+caught it in 2
 something happend
-catched it in 1
+caught it in 1
 something happend
 OUTPUT
 
@@ -293,14 +293,14 @@ output_is(<<'CODE', <<'OUTPUT', "2 exception handlers, throw next - return");
     print "back in main\n"
     end
 _handler1:
-    print "catched it in 1\n"
+    print "caught it in 1\n"
     set S0, P5["_message"]
     print S0
     print "\n"
     set P2, P5["_invoke_cc"]	# the return continuation
     invoke P2
 _handler2:
-    print "catched it in 2\n"
+    print "caught it in 2\n"
     set S0, P5["_message"]
     print S0
     print "\n"
@@ -311,9 +311,9 @@ _handler2:
     end
 CODE
 main
-catched it in 2
+caught it in 2
 something happend
-catched it in 1
+caught it in 1
 something happend
 back in 2
 OUTPUT
@@ -325,10 +325,10 @@ output_is(<<'CODE', <<OUT, "die_hard");
     print "not reached\n"
     end
 _handler:
-    print "catched it\n"
+    print "caught it\n"
     end
 CODE
-catched it
+caught it
 OUT
 
 output_is(<<'CODE', <<OUT, "die_hard, error, severity");
@@ -338,7 +338,7 @@ output_is(<<'CODE', <<OUT, "die_hard, error, severity");
     print "not reached\n"
     end
 _handler:
-    print "catched it\n"
+    print "caught it\n"
     set I0, P5["_type"]
     print "error "
     print I0
@@ -349,7 +349,7 @@ _handler:
     print "\n"
     end
 CODE
-catched it
+caught it
 error 100
 severity 3
 OUT
@@ -359,7 +359,7 @@ output_like(<<'CODE', <<OUT, "die_hard - no handler");
     print "not reached\n"
     end
 _handler:
-    print "catched it\n"
+    print "caught it\n"
     end
 CODE
 /No exception handler and no message/
@@ -373,14 +373,14 @@ output_like(<<'CODE', <<OUT, "find_lex");
     print "resumed\n"
     end
 _handler:
-    print "catched it\n"
+    print "caught it\n"
     set S0, P5["_message"]
     print S0
     print "\n"
     set P1, P5["_invoke_cc"]
     invoke P1
 CODE
-/^catched it
+/^caught it
 Lexical 'no_such_thing' not found
 resumed
 /
@@ -437,7 +437,7 @@ _sub:
     invoke P1
 
 _handler:
-    print "catched it\n"
+    print "caught it\n"
     set S0, P5["_message"]
     print S0
     print "\n"
@@ -507,12 +507,12 @@ output_is(<<'CODE', <<'OUTPUT', "push_eh - throw");
     print "not reached\n"
     end
 handler:
-    print "catched it\n"
+    print "caught it\n"
     end
 CODE
 main
 ok
-catched it
+caught it
 OUTPUT
 1;
 
