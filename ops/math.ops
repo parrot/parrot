@@ -147,8 +147,6 @@ Set $1 to its absolute value.
 
 =item B<abs>(out INT, in INT)
 
-=item B<abs>(out NUM, in INT)
-
 =item B<abs>(out NUM, in NUM)
 
 =item B<abs>(out PMC, in PMC)
@@ -161,7 +159,7 @@ Create new $1 as the absolute of $2.
 
 =cut
 
-inline op abs( inout INT) :base_core {
+inline op abs(inout INT) :base_core {
   $1 = abs( $1 );
   goto NEXT();
 }
@@ -210,29 +208,13 @@ inline op n_abs(out PMC, in PMC) :base_core {
 
 =item B<add>(inout INT, in INT)
 
-=item B<add>(inout NUM, in INT)
-
 =item B<add>(inout NUM, in NUM)
-
-=item B<add>(in PMC, in INT)
-
-=item B<add>(in PMC, in NUM)
-
-=item B<add>(in PMC, in PMC)
 
 Increase $1 by the amount in $2.
 
 =item B<add>(out INT, in INT, in INT)
 
-=item B<add>(out NUM, in NUM, in INT)
-
 =item B<add>(out NUM, in NUM, in NUM)
-
-=item B<add>(in PMC, in PMC, in INT)
-
-=item B<add>(in PMC, in PMC, in NUM)
-
-=item B<add>(in PMC, in PMC, in PMC)
 
 Set $1 to the sum of $2 and $3.
 
@@ -304,12 +286,6 @@ inline op cmod(out INT, in INT, in INT) :base_core {
   goto NEXT();
 }
 
-=item B<cmod>(in PMC, in PMC, in PMC)
-
-=item B<cmod>(in PMC, in PMC, in INT)
-
-=item B<cmod>(in PMC, in PMC, in NUM)
-
 =cut
 
 ########################################
@@ -379,61 +355,16 @@ inline op dec(in PMC) :base_core {
 
 =item B<div>(inout INT, in INT)
 
-=item B<div>(inout NUM, in INT)
-
 =item B<div>(inout NUM, in NUM)
-
-=item B<div>(in PMC, in INT)
-
-=item B<div>(in PMC, in NUM)
-
-=item B<div>(in PMC, in PMC)
 
 Divide $1 by $2.
 
 =item B<div>(out INT, in INT, in INT)
 
-=item B<div>(out NUM, in NUM, in INT)
-
 =item B<div>(out NUM, in NUM, in NUM)
-
-=item B<div>(in PMC, in PMC, in INT)
-
-=item B<div>(in PMC, in PMC, in NUM)
-
-=item B<div>(in PMC, in PMC, in PMC)
 
 Set $1 to the quotient of $2 divided by $3. In the case of INTVAL division, the
 result is truncated (NOT rounded or floored).
-
-=item B<fdiv>(inout INT, in INT)
-
-=item B<fdiv>(inout NUM, in INT)
-
-=item B<fdiv>(inout NUM, in NUM)
-
-=item B<fdiv>(in PMC, in INT)
-
-=item B<fdiv>(in PMC, in NUM)
-
-=item B<fdiv>(in PMC, in PMC)
-
-Floor divide $1 by $2.
-
-=item B<fdiv>(out INT, in INT, in INT)
-
-=item B<fdiv>(out NUM, in NUM, in INT)
-
-=item B<fdiv>(out NUM, in NUM, in NUM)
-
-=item B<fdiv>(in PMC, in PMC, in INT)
-
-=item B<fdiv>(in PMC, in PMC, in NUM)
-
-=item B<fdiv>(in PMC, in PMC, in PMC)
-
-Set $1 to the quotient of $2 divided by $3. The result is the floor()
-of the division i.e. the next whole integer towards -inf.
 
 =cut
 
@@ -456,6 +387,23 @@ inline op div(out NUM, in NUM, in NUM) :base_core {
   $1 = $2 / $3;
   goto NEXT();
 }
+
+=back
+
+=item B<fdiv>(inout INT, in INT)
+
+=item B<fdiv>(inout NUM, in NUM)
+
+Floor divide $1 by $2.
+
+=item B<fdiv>(out INT, in INT, in INT)
+
+=item B<fdiv>(out NUM, in NUM, in NUM)
+
+Set $1 to the quotient of $2 divided by $3. The result is the floor()
+of the division i.e. the next whole integer towards -inf.
+
+=cut
 
 inline op fdiv(inout INT, in INT) :base_core {
   $1 = (INTVAL)floor($1 / $2);
@@ -617,29 +565,13 @@ op mod(inout NUM, in NUM) :base_core {
 
 =item B<mul>(inout INT, in INT)
 
-=item B<mul>(inout NUM, in INT)
-
 =item B<mul>(inout NUM, in NUM)
-
-=item B<mul>(in PMC, in INT)
-
-=item B<mul>(in PMC, in NUM)
-
-=item B<mul>(in PMC, in PMC)
 
 Set $1 to the product of $1 and $2.
 
 =item B<mul>(out INT, in INT, in INT)
 
-=item B<mul>(out NUM, in NUM, in INT)
-
 =item B<mul>(out NUM, in NUM, in NUM)
-
-=item B<mul>(in PMC, in PMC, in INT)
-
-=item B<mul>(in PMC, in PMC, in NUM)
-
-=item B<mul>(in PMC, in PMC, in PMC)
 
 Set $1 to the product of $2 and $3.
 
@@ -726,19 +658,7 @@ inline op n_neg(out PMC, in PMC) :base_core {
 
 ########################################
 
-=item B<pow>(out NUM, in INT, in INT)
-
-=item B<pow>(out NUM, in INT, in NUM)
-
-=item B<pow>(out NUM, in NUM, in INT)
-
 =item B<pow>(out NUM, in NUM, in NUM)
-
-=item B<pow>(in PMC, in PMC, in PMC)
-
-=item B<pow>(in PMC, in PMC, in NUM)
-
-=item B<pow>(in PMC, in PMC, in INT)
 
 Set $1 to $2 raised to the power $3.
 
@@ -753,29 +673,13 @@ inline op pow(out NUM, in NUM, in NUM) :base_core {
 
 =item B<sub>(inout INT, in INT)
 
-=item B<sub>(inout NUM, in INT)
-
 =item B<sub>(inout NUM, in NUM)
-
-=item B<sub>(in PMC, in INT)
-
-=item B<sub>(in PMC, in NUM)
-
-=item B<sub>(in PMC, in PMC)
 
 Decrease $1 by the amount in $2.
 
 =item B<sub>(out INT, in INT, in INT)
 
-=item B<sub>(out NUM, in NUM, in INT)
-
 =item B<sub>(out NUM, in NUM, in NUM)
-
-=item B<sub>(in PMC, in PMC, in INT)
-
-=item B<sub>(in PMC, in PMC, in NUM)
-
-=item B<sub>(in PMC, in PMC, in PMC)
 
 Set $1 to $2 minus $3.
 
@@ -803,15 +707,9 @@ inline op sub(out NUM, in NUM, in NUM) :base_core {
 
 ########################################
 
-=item B<sqrt>(out NUM, in INT)
-
 =item B<sqrt>(out NUM, in NUM)
 
 Set $1 to the square root of $2.
-
-Please note that for all these opcodes the variant with an INTVAL
-argument is deprecated. Actually code is generated that uses a
-FLOATVAL argument instead.
 
 =cut
 
@@ -839,8 +737,6 @@ and trigonometrics.
 
 ########################################
 
-=item B<acos>(out NUM, in INT)
-
 =item B<acos>(out NUM, in NUM)
 
 Set $1 to the arc cosine (in radians) of $2.
@@ -853,8 +749,6 @@ inline op acos(out NUM, in NUM) :base_math {
 }
 
 ########################################
-
-=item B<asin>(out NUM, in INT)
 
 =item B<asin>(out NUM, in NUM)
 
@@ -869,15 +763,7 @@ inline op asin(out NUM, in NUM) :base_math {
 
 ########################################
 
-=item B<atan>(out NUM, in INT)
-
 =item B<atan>(out NUM, in NUM)
-
-=item B<atan>(out NUM, in INT, in INT)
-
-=item B<atan>(out NUM, in INT, in NUM)
-
-=item B<atan>(out NUM, in NUM, in INT)
 
 =item B<atan>(out NUM, in NUM, in NUM)
 
@@ -901,8 +787,6 @@ inline op atan(out NUM, in NUM, in NUM) :base_math {
 
 ########################################
 
-=item B<cos>(out NUM, in INT)
-
 =item B<cos>(out NUM, in NUM)
 
 Set $1 to the cosine of $2 (given in radians).
@@ -915,8 +799,6 @@ inline op cos(out NUM, in NUM) :base_math {
 }
 
 ########################################
-
-=item B<cosh>(out NUM, in INT)
 
 =item B<cosh>(out NUM, in NUM)
 
@@ -931,8 +813,6 @@ inline op cosh(out NUM, in NUM) :base_math {
 
 ########################################
 
-=item B<exp>(out NUM, in INT)
-
 =item B<exp>(out NUM, in NUM)
 
 Set $1 to I<e> raised to the power $2. I<e> is the base of the natural logarithm.
@@ -945,8 +825,6 @@ inline op exp(out NUM, in NUM) :base_math {
 }
 
 ########################################
-
-=item B<ln>(out NUM, in INT)
 
 =item B<ln>(out NUM, in NUM)
 
@@ -961,8 +839,6 @@ inline op ln(out NUM, in NUM) :base_math {
 
 ########################################
 
-=item B<log10>(out NUM, in INT)
-
 =item B<log10>(out NUM, in NUM)
 
 Set $1 to the base 10 logarithm of $2.
@@ -975,8 +851,6 @@ inline op log10(out NUM, in NUM) :base_math {
 }
 
 ########################################
-
-=item B<log2>(out NUM, in INT)
 
 =item B<log2>(out NUM, in NUM)
 
@@ -992,8 +866,6 @@ op log2(out NUM, in NUM) :base_math {
 
 ########################################
 
-=item B<sin>(out NUM, in INT)
-
 =item B<sin>(out NUM, in NUM)
 
 Set $1 to the sine of $2 (given in radians).
@@ -1006,8 +878,6 @@ inline op sin(out NUM, in NUM) :base_math {
 }
 
 ########################################
-
-=item B<sinh>(out NUM, in INT)
 
 =item B<sinh>(out NUM, in NUM)
 
@@ -1022,8 +892,6 @@ inline op sinh(out NUM, in NUM) :base_math {
 
 ########################################
 
-=item B<tan>(out NUM, in INT)
-
 =item B<tan>(out NUM, in NUM)
 
 Set $1 to the tangent of $2 (given in radians).
@@ -1036,8 +904,6 @@ inline op tan(out NUM, in NUM) :base_math {
 }
 
 ########################################
-
-=item B<tanh>(out NUM, in INT)
 
 =item B<tanh>(out NUM, in NUM)
 
