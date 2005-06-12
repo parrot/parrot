@@ -2,9 +2,8 @@
 
 use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 1;
+use Parrot::Test tests => 2;
 use vars qw($TODO);
-
 
 my($tcl,$expected);
 
@@ -34,4 +33,10 @@ EOF
 language_output_is("tcl",$tcl,$expected,"simple source");
 unlink($source_filename);
 }
+
+language_output_is("tcl",<<'TCL',<<'OUT',"invalid file");
+ source "hopefullynonexistantfile.tcl"
+TCL
+couldn't read file "hopefullynonexistantfile.tcl": no such file or directory
+OUT
 

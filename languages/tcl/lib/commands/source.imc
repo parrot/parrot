@@ -32,7 +32,7 @@ file:
   $S1="<"
   open handle, filename, $S1
   $I0 = typeof handle
-  if $I0 == .PerlUndef goto badfile
+  if $I0 == .Undef goto badfile
   contents = ""
  
 loop:
