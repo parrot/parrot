@@ -29,19 +29,19 @@ fixed feature see L<ChangeLog>.
 
 =head1 OVERVIEW
 
-The tasks that are remaining are broken down into the following categories,
+The remaining tasks are broken down into the following categories,
 roughly listed in the order through which a task might progress.
 
 =head2 METADATA
 
 Each task has certain metadata associated with it which must be tracked.
-Eventually all metadata should be stored in RT at http://rt.perl.org/rt3/
+Eventually all metadata should be stored in RT at L<https://rt.perl.org/rt3/>
 
 =head2 DESIGN
 
 These are pending design decisions which must be made before any code can
-be written to implement them. Note - DESIGN is a special kind of documentation
-task. Due to the nature of this kind of documentation, it deserves to be
+be written to implement them. Note - DESIGN I<is> a special kind of documentation
+task, but due to the nature of this kind of documentation, it deserves to be
 broken out into its own category.
 
 =head2 TODO
@@ -106,7 +106,8 @@ though.  Check first with someone who should know.)
 =item *
 
 Document project goals and priorities, based on Chip's talk to APW
-as found at L<http://feather.perl6.nl/~chip/Chip_APW.sxi>.
+as found at L<http://feather.perl6.nl/~chip/Chip_APW.sxi> or 
+L<http://feather.perl6.nl/~chip/Chip_APW.pdf>.
 
 =item *
 
@@ -136,7 +137,7 @@ It had already become obvious recently to us that Parrot needed a nice
 opcode-based interface for automated collection and extraction of call
 parameters and return values.  That's what you were going to write to
 anyway.  How it works, precisely, shouldn't matter much.  (You I<were>
-writing to pir instead of pasm, right?)
+writing to PIR instead of PASM, right?)
 
 =item *
 
@@ -148,9 +149,9 @@ transcendental math features.
 *worst* compile to function calls under JIT.  And I'll consider making
 exceptions for the transcendantal math if someone can show me why.)
 
-I expect pir will still let you pretend they're opcodes, though, to
+I expect PIR will still let you pretend they're opcodes, though, to
 avoid immediate howls of outrage.  (But only silicon-based life forms
-write pasm, so we're not worried about that.)
+write PASM, so we're not worried about that.)
 
 =item *
 
@@ -218,7 +219,7 @@ Describe the components of a C<struct PMC_EXT>. L<PDD04>
 
 =item *
 
-requester: leo
+ requester: leo
 
 Ok. In the long run I expect a multi-stage config system. First is to
 get miniparrot built and running, then Parrot core. Extensions like gdbm
@@ -289,10 +290,6 @@ hierarchy should be reworked (e.g. Boolean->PerlInt->Scalar).
 
 =item *
 
-lib/Parrot/PackFile* is outdated and unused
-
-=item *
-
 Configuration - missing tests for processor features
 
 =item *
@@ -313,7 +310,7 @@ Overflow detection/promotion to bigint/float types.
 
 =item *
 
-Create opcode_process.pl L<PDD05>
+Create C<opcode_process.pl>. L<PDD05>
 
 =item *
 
@@ -322,6 +319,8 @@ suite still passes, integrate the library into the rest of Parrot,
 provide PMC types and suitable opcodes.  Conversion to and from Parrot
 strings, conversion to and from floating point types, sprintf output
 of bignumbers. L<PDD14>
+
+[[What's an EDA? --Coke]]
 
 =item *
 
