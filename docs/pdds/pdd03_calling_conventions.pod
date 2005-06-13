@@ -119,7 +119,7 @@ the C<get_params> opcode to tell Parrot where the subroutine's or
 method's arguments should be stored and how they should be expanded.
 
 Similarly, just I<before> (yes, I<before>) calling such a subroutine
-or method, use the C<set_returns> opcode to tell Parrot where the
+or method, use the C<get_results> opcode to tell Parrot where the
 return values should be stored and how to expand them for your use.
 
 NOTE: It should be obvious, but in case it's not: You must name only
