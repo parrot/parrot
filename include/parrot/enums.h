@@ -52,6 +52,7 @@ typedef enum {
     PARROT_ARG_STRING           = 0x01,
     PARROT_ARG_PMC              = 0x02,
     PARROT_ARG_FLOATVAL         = 0x03,
+    PARROT_ARG_TYPE_MASK        = 0x03,
     /* argument meaning and conversion bits */
     PARROT_ARG_CONSTANT         = 0x04,
     PARROT_ARG_FLATTEN          = 0x08       /* .flatten_arg */

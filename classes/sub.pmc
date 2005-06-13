@@ -19,6 +19,7 @@ These are the vtable functions for the Sub (subroutine) base class
 */
 
 #include "parrot/parrot.h"
+#include "parrot/oplib/ops.h"
 #include <assert.h>
 
 static void
@@ -58,6 +59,60 @@ print_sub_name(Interp* interpreter, PMC* sub)
     PIO_eprintf(interpreter, "# Calling sub '%Ss'\n#",
         Parrot_full_sub_name(interpreter, sub));
     print_pbc_location(interpreter);
+}
+
+static void
+copy_args_from_caller(Interp *interpreter, struct Parrot_sub * sub,
+        struct parrot_regs_t *caller_regs)
+{
+    PMC *args_signature, *param_signature;
+    INTVAL i, n, sig;
+    opcode_t *pc, *param_pc;
+    struct PackFile_Constant **constants;
+    INTVAL i_arg;
+    FLOATVAL f_arg;
+    PMC *p_arg;
+    STRING *s_arg;
+
+    constants = interpreter->code->const_table->constants;
+    /* check if there is a get_params */
+    param_pc = sub->address;
+    if (*param_pc == PARROT_OP_get_params_pc) {
+        param_signature = constants[param_pc[1]]->u.key;
+        assert(PObj_is_PMC_TEST(param_signature));
+        assert(param_signature->vtable->base_type ==
+                enum_class_FixedIntegerArray);
+    }
+    else
+        internal_exception(1, "unhandled calling convention mix");
+
+    /* we point to the set_args opcode */
+    pc = interpreter->current_args;
+    assert(*pc == PARROT_OP_set_args_pc);
+    args_signature = constants[pc[1]]->u.key;
+    assert(PObj_is_PMC_TEST(args_signature));
+    assert(args_signature->vtable->base_type == enum_class_FixedIntegerArray);
+
+
+    n = VTABLE_elements(interpreter, args_signature);
+
+    for (i = 0, pc += 2, param_pc += 2; i < n; ++i) {
+        sig = VTABLE_get_integer_keyed_int(interpreter, args_signature, i);
+        switch (sig & PARROT_ARG_TYPE_MASK) {
+            case PARROT_ARG_INTVAL:
+                i_arg = pc[i];
+                if (!(sig & PARROT_ARG_CONSTANT)) {
+                    i_arg = BP_REG_INT(caller_regs, i_arg);
+                }
+                /* TODO verify param_signature */
+                REG_INT(param_pc[i]) = i_arg;
+                break;
+        }
+    }
+
+
+    /* invalidate */
+    interpreter->current_args = NULL;
 }
 
 /*
@@ -227,11 +282,13 @@ Invokes the subroutine.
         struct Parrot_sub * sub = PMC_sub(SELF);
         struct parrot_regs_t *caller_regs;
         PMC *ccont;
+        struct PackFile_ByteCode * old_seg;
 
         if (Interp_trace_TEST(INTERP, PARROT_TRACE_SUB_CALL_FLAG)) {
             print_sub_name(INTERP, SELF);
         }
-        if (INTERP->code != sub->seg) {
+        old_seg = INTERP->code;
+        if (old_seg != sub->seg) {
             Parrot_switch_to_cs(INTERP, sub->seg, 1);
         }
         /*
@@ -299,8 +356,14 @@ Invokes the subroutine.
          * called from runops_fromc
          */
         if (next) {
-            /* copy function arguments */
-            copy_regs(INTERP, caller_regs);
+            /* XXX temporary hack during call syntax switch */
+            if (INTERP->current_args) {
+                copy_args_from_caller(INTERP, sub, caller_regs);
+            }
+            else {
+                /* copy function arguments */
+                copy_regs(INTERP, caller_regs);
+            }
             /*
              * and copy set context variables
              */

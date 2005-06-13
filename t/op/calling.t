@@ -16,7 +16,7 @@ Tests Parrot calling conventions.
 
 =cut
 
-use Parrot::Test tests => 4;
+use Parrot::Test tests => 5;
 use Test::More;
 
 # Test calling convention operations
@@ -178,4 +178,25 @@ Ok 2
 Ok 3
 Ok 4
 Ok 5
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "call - i, ic");
+.pcc_sub main:
+    set I16, 77
+    set_args "(0b100, 0)", 42, I16
+    find_name P1, "foo"
+    invokecc P1
+    print "back\n"
+    end
+.pcc_sub foo:
+    get_params "(0, 0)", I16, I17
+    print I16
+    print "\n"
+    print I17
+    print "\n"
+    returncc
+CODE
+42
+77
+back
 OUTPUT
