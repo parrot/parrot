@@ -75,9 +75,9 @@ return-value opcodes:
 
     0b0011  TYPE
                0b00 = I    XXX Why force the user to encode this,
-               0b00 = S    XXX   even in pasm?  The register types
-               0b00 = P    XXX   are right there on the very same
-               0b00 = N    XXX   pasm source line.
+               0b01 = S    XXX   even in pasm?  The register types
+               0b10 = P    XXX   are right there on the very same
+               0b11 = N    XXX   pasm source line.
 
 
 =head2 Passing Arguments, Returning Values
