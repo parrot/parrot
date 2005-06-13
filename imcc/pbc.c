@@ -902,32 +902,13 @@ IMCC_int_from_reg(Interp *interpreter, SymReg *r)
 static void
 make_pmc_const(Interp *interpreter, SymReg *r)
 {
-    STRING *s, *s5;
-    PMC *p, *class, *p2;
-    INTVAL i2, i3;
+    STRING *s;
+    PMC *p, *class;
     int k;
 
     s = string_from_cstring(interpreter, r->name, 0);
-    /* preserver registers */
-    i2 = REG_INT(2);
-    i3 = REG_INT(3);
-    s5 = REG_STR(5);
-    p2 = REG_PMC(2);
-
-    class = REG_PMC(2) = Parrot_base_vtables[r->pmc_type]->class;
-    REG_INT(2) = 1;
-    REG_INT(3) = 0;
-    REG_STR(5) = s;
-    /* TODO create constant PMCs
-     * maybe VTABLE_instantiate_const
-     */
-    p = VTABLE_instantiate(interpreter, class);
-    /* restore regs */
-    REG_INT(2) = i2;
-    REG_INT(3) = i3;
-    REG_INT(2) = i2;
-    REG_STR(5) = s5;
-    REG_PMC(2) = p2;
+    class = Parrot_base_vtables[r->pmc_type]->class;
+    p = VTABLE_new_from_string(interpreter, class, s, PObj_constant_FLAG);
     /* append PMC constant */
     k = PDB_extend_const_table(interpreter);
     interpreter->code->const_table->constants[k]->type = PFC_PMC;

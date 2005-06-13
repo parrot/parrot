@@ -100,6 +100,23 @@ op new(out PMC, in INT, in PMC, in PMC) {
   goto NEXT();
 }
 
+=item B<new>(out PMC, in INT, in STR)
+
+Create a new PMC of the type $2 according to the PMCs string representation
+in $3. See also B<instantiate> for a more general form.
+
+=cut
+
+op new(out PMC, in INT, in STR) {
+  PMC *class;
+  if ($2 <= 0 || $2 >= enum_class_max) {
+    internal_exception(1, "Illegal PMC enum (%d) in new", (int)$2);
+  }
+  class = Parrot_base_vtables[$2]->class;
+  $1 = VTABLE_new_from_string(interpreter, class, $3, 0);
+  goto NEXT();
+}
+
 =item B<instantiate>(out PMC)
 
 Create a new PMC of the type of class REG_PMC(2). This is a classmethod.

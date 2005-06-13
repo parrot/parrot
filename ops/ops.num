@@ -1345,3 +1345,7 @@ spawnw_i_p                     1314
 rot_i_i_i_ic                   1315
 rot_i_ic_i_ic                  1316
 rot_i_i_ic_ic                  1317
+new_p_i_s                      1318
+new_p_ic_s                     1319
+new_p_i_sc                     1320
+new_p_ic_sc                    1321

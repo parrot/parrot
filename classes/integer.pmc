@@ -88,6 +88,10 @@ Initializes the integer with a default value of C<0>.
 
 /*
 
+=item C<PMC new_from_string(STRING *rep)>
+
+Class method to construct an Integer from the string representation C<rep>.
+
 =item C<PMC* instantiate()>
 
 Class method to construct an Integer according to passed arguments.
@@ -95,6 +99,20 @@ Class method to construct an Integer according to passed arguments.
 =cut
 
 */
+    PMC* new_from_string(STRING *rep, INTVAL flags) {
+        INTVAL type;
+        PMC *res;
+
+        type = SELF->vtable->base_type;
+        if (flags & PObj_constant_FLAG)
+            res = constant_pmc_new(INTERP, type);
+        else
+            res = pmc_new(INTERP, type);
+        /* TODO bigint overflow */
+        PMC_int_val(res) = string_to_int(INTERP, rep);
+        return res;
+    }
+
     PMC* instantiate() {
         PMC *class = REG_PMC(2);
         int argcP = REG_INT(3);
@@ -108,11 +126,9 @@ Class method to construct an Integer according to passed arguments.
         type = class->vtable->base_type;
         if (!argcP) {
             res = pmc_new(INTERP, type);
-            if (argcS) {
-                /* TODO bigint overflow */
-                PMC_int_val(res) = string_to_int(INTERP, REG_STR(5));
-            }
-            return res;
+            if (!argcS)
+                return res;
+            return DYNSELF.new_from_string(REG_STR(5), 0);
         }
         base = 10;
         if (argcP == 2)
