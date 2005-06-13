@@ -304,6 +304,42 @@ inline op find_not_cclass(out INT, in INT, in STR, in INT, in INT) {
 
 ###############################################################################
 
+=head2 Function argument opcode
+
+Implementations of function argument and params handling
+
+=over 4
+
+=item B<set_args>(inconst PMC /* , ... */)
+
+Define arguments for the next function call.
+
+=item B<get_results>(inconst PMC /* , ... */)
+
+Define return values for the next function call.
+
+=item B<get_params>(inconst PMC /* , ... */)
+
+Define function parameters for this subroutine.
+
+=item B<set_returns>(inconst PMC /* , ... */)
+
+Define return results for the subroutine return statement.
+
+=cut
+
+
+op set_args(inconst PMC) {
+    opcode_t *next = CUR_OPCODE;
+    PMC *signature = $1;
+    INTVAL argc;
+
+    argc = VTABLE_elements(interpreter, signature);
+    goto ADDRESS(next + 2 + argc);
+}
+
+###############################################################################
+
 =head1 COPYRIGHT
 
 Copyright (C) 2001-2004 The Perl Foundation.  All rights reserved.

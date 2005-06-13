@@ -21,6 +21,7 @@
 #include "parrot/interp_guts.h"
 #include "parrot/dynext.h"
 #include "parrot/embed.h"
+#include "parrot/oplib/ops.h"
 #include "pbc.h"
 #include "parser.h"
 
@@ -432,6 +433,48 @@ is_infix(char *name, int n, SymReg **r)
     return -1;
 }
 
+static Instruction *
+var_arg_ins(Interp *interpreter, IMC_Unit * unit, char *name,
+        SymReg **r, int n, int emit)
+{
+    int i, op;
+    Instruction *ins;
+    int dirs;
+    char fullname[64];
+    char *p;
+
+    r[0]->set = 'P';    /* PMC constant */
+    if (*r[0]->name == '"') {
+        p = str_dup(r[0]->name + 1);
+        p[strlen(p) - 1] = '\0';
+        mem_sys_free(r[0]->name);
+        r[0]->name = p;
+    }
+
+    r[0]->pmc_type = enum_class_FixedIntegerArray;
+    dirs = 1;           /* in constant */
+    op_fullname(fullname, name, r, 1, 0);
+    op = interpreter->op_lib->op_code(fullname, 1);
+    assert(op >= 0);
+    for (i = 1; i < n; i++) {
+        switch (op) {
+            case PARROT_OP_set_args_pc:
+                dirs |= 1 << i ;        /* IN */
+                break;
+            case 777:
+                dirs |= 1 << (16 + i);  /* OUT */
+                break;
+        }
+    }
+
+    ins = _mk_instruction(name, "", r, dirs);
+    ins->opnum = op;
+    ins->opsize = n + 1;
+
+    if (emit)
+        emitb(unit, ins);
+    return ins;
+}
 
 /* make a instruction
  * name ... op name
@@ -455,6 +498,9 @@ INS(Interp *interpreter, IMC_Unit * unit, char *name,
     op_info_t * op_info;
     char format[128], buf[10];
     int len;
+
+    if (!strcmp(name, "set_args"))
+        return var_arg_ins(interpreter, unit, name, r, n, emit);
 
     if ( (op = is_infix(name, n, r)) >= 0) {
         /* sub x, y, z  => infix .MMD_SUBTRACT, x, y, z */
@@ -533,7 +579,7 @@ INS(Interp *interpreter, IMC_Unit * unit, char *name,
         IMCC_fataly(interpreter, E_SyntaxError,
                 "arg count mismatch: op #%d '%s' needs %d given %d",
                 op, fullname, op_info->arg_count-1, n);
-    for (i = 0; i < op_info->arg_count-1; i++) {
+    for (i = 0; i < n; i++) {
         switch (op_info->dirs[i+1]) {
             case PARROT_ARGDIR_INOUT:
                 dirs |= 1 << (16 + i);
@@ -574,7 +620,7 @@ INS(Interp *interpreter, IMC_Unit * unit, char *name,
     ins->keys |= keyvec;
     /* fill in oplib's info */
     ins->opnum = op;
-    ins->opsize = op_info->arg_count;
+    ins->opsize = n + 1;
     /* mark end as absolute branch */
     if (!strcmp(name, "end")) {
         ins->type |= ITBRANCH | IF_goto;

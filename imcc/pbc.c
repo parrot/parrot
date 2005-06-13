@@ -1187,6 +1187,14 @@ e_pbc_emit(Interp *interpreter, void *param, IMC_Unit * unit, Instruction * ins)
                     break;
             }
         }
+        /* emit var_args part */
+        for (; i < ins->opsize - 1; ++i) {
+                r = ins->r[i];
+                if (r->type & VT_CONSTP)
+                    r = r->reg;
+                *pc++ = (opcode_t) r->color;
+                IMCC_debug(interpreter, DEBUG_PBC," %d", r->color);
+        }
         IMCC_debug(interpreter, DEBUG_PBC, "\t%I\n", ins);
         npc += ins->opsize;
     }

@@ -16,7 +16,7 @@ Tests Parrot calling conventions.
 
 =cut
 
-use Parrot::Test tests => 2;
+use Parrot::Test tests => 3;
 use Test::More;
 
 # Test calling convention operations
@@ -143,4 +143,15 @@ _foo:
 CODE
 Foobar!
 Baxman!
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "set_args - parsing");
+    noop
+    set_args "(0b10, 0)", P0, I0
+    print "Ok 1\n"
+    print "Ok 2\n"
+    end
+CODE
+Ok 1
+Ok 2
 OUTPUT
