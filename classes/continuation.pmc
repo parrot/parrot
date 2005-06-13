@@ -22,6 +22,8 @@ See the L<Glossary|docs/glossary.pod> for more information.
 
 
 #include "parrot/parrot.h"
+#include "parrot/oplib/ops.h"
+#include <assert.h>
 
 
 /*
@@ -43,6 +45,54 @@ See the L<Glossary|docs/glossary.pod> for more information.
  * To avoid deep recursion during marking of nested subroutines, we
  * need the next_for_GC pointer in the pmc_ext area.
  */
+
+static void
+copy_args_from_callee(Interp *interpreter,
+        struct parrot_regs_t *caller_regs)
+{
+    /*  returns           results */
+    PMC *args_signature, *param_signature;
+    INTVAL i, n, sig;
+    opcode_t *pc, *param_pc;
+    struct PackFile_Constant **constants;
+    INTVAL i_arg;
+    FLOATVAL f_arg;
+    PMC *p_arg;
+    STRING *s_arg;
+
+    constants = interpreter->code->const_table->constants;
+    /* check if there is a get_params */
+    param_pc = interpreter->current_results;  /* XXX ctx. */
+    assert(*param_pc == PARROT_OP_get_results_pc);
+    param_signature = constants[param_pc[1]]->u.key;
+    assert(PObj_is_PMC_TEST(param_signature));
+    assert(param_signature->vtable->base_type == enum_class_FixedIntegerArray);
+
+    /* we point to the set_return opcode */
+    pc = interpreter->current_returns;
+    assert(*pc == PARROT_OP_set_returns_pc);
+    args_signature = constants[pc[1]]->u.key;
+    assert(PObj_is_PMC_TEST(args_signature));
+    assert(args_signature->vtable->base_type == enum_class_FixedIntegerArray);
+
+    /* never get more then the caller expects */
+    n = VTABLE_elements(interpreter, param_signature);
+
+    for (i = 0, pc += 2, param_pc += 2; i < n; ++i) {
+        /* fetch from args aka returns */
+        sig = VTABLE_get_integer_keyed_int(interpreter, args_signature, i);
+        switch (sig & PARROT_ARG_TYPE_MASK) {
+            case PARROT_ARG_INTVAL:
+                i_arg = pc[i];
+                if (!(sig & PARROT_ARG_CONSTANT)) {
+                    i_arg = BP_REG_INT(caller_regs, i_arg);
+                }
+                /* TODO verify param_signature */
+                REG_INT(param_pc[i]) = i_arg;
+                break;
+        }
+    }
+}
 
 pmclass Continuation need_ext {
 
@@ -207,8 +257,14 @@ destination to continue execution.
             PIO_eprintf(INTERP, "# Back in sub '%Ss'\n",
                 Parrot_full_sub_name(INTERP, sub));
         }
-        if (cc->address)
-            copy_regs(INTERP, caller_regs);
+        if (cc->address) {
+            if (INTERP->current_results) {      /* XXX ctx. */
+                copy_args_from_callee(INTERP, caller_regs);
+            }
+            else {
+                copy_regs(INTERP, caller_regs);
+            }
+        }
         else if (!cc->seg) {
             /* no address and no segment */
             return NULL;

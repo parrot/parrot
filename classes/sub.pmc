@@ -94,6 +94,9 @@ copy_args_from_caller(Interp *interpreter, struct Parrot_sub * sub,
     assert(args_signature->vtable->base_type == enum_class_FixedIntegerArray);
 
 
+    /* TODO factor out common bits with copy_from_callee in
+     * classes/continuation.pmc
+     */
     n = VTABLE_elements(interpreter, args_signature);
 
     for (i = 0, pc += 2, param_pc += 2; i < n; ++i) {
@@ -109,7 +112,6 @@ copy_args_from_caller(Interp *interpreter, struct Parrot_sub * sub,
                 break;
         }
     }
-
 
     /* invalidate */
     interpreter->current_args = NULL;
@@ -338,6 +340,7 @@ Invokes the subroutine.
          *   impact on possible continuations executing later here.
          *
          */
+        pc = sub->address;
         if (!PMC_IS_NULL(ccont)) {
             if (PObj_get_FLAGS(ccont) & SUB_FLAG_TAILCALL) {
                 PObj_get_FLAGS(ccont) &= ~SUB_FLAG_TAILCALL;
@@ -357,7 +360,6 @@ Invokes the subroutine.
          * new frame, e.g.
          * called from runops_fromc
          */
-        pc = sub->address;
         if (next) {
             /* XXX temporary hack during call syntax switch */
             if (INTERP->current_args) {
