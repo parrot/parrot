@@ -358,10 +358,11 @@ docs/pmc/struct.pod                               [main]doc
 docs/pmc/subs.pod                                 [main]doc
 docs/porting_intro.pod                            [main]doc
 docs/practical_notes.pod                          [main]doc
-docs/resources/favicon.ico                        [devel]
-docs/resources/parrot.small.png                   [devel]
-docs/resources/perl.css                           [devel]
-docs/resources/up.gif                             [devel]
+docs/req/model_users.pod                          [main]doc
+docs/resources/favicon.ico                        [main]doc
+docs/resources/parrot.small.png                   [main]doc
+docs/resources/perl.css                           [main]doc
+docs/resources/up.gif                             [main]doc
 docs/running.pod                                  [main]doc
 docs/strings.pod                                  [main]doc
 docs/submissions.pod                              [main]doc

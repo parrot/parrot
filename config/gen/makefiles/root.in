@@ -1279,7 +1279,7 @@ clean : \
     imcc-clean \
     compilers-clean
 	${TEMP_cg_r}
-	$(RM_F) *.s *~ $(FLUID_FILES)
+	$(RM_F) chartypes *.s *~ $(FLUID_FILES)
 
 prog-clean :
 	$(RM_F) \

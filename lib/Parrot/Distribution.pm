@@ -223,9 +223,9 @@ sub delete_html_docs
     return $self->html_docs_directory->delete();
 }
 
-=iten <gen_manifest_skip>
+=item C<gen_manifest_skip>
 
-Ask svn of svk about svn:ignore and generate the lines for MANIFEST.SKIP.
+Query the svn:ignore property and generate the lines for MANIFEST.SKIP.
 
 =cut
 
@@ -248,8 +248,8 @@ sub gen_manifest_skip {
        # TODO: escape chars that are special in regular expressions
        push @skip, qq{# generated from svn:ignore of '$dir'},
                    map { my $end = $dir_list{ $dir . $_} ? '$' : '/'; # ignore file or dir
+                         s/\./\\./g;                          # . is simply a dot
                          s/\*/.*/g;                           # * is any amount of chars
-                         s/\./\./g;                           # . is simple a dot
                          "^${dir}${_}\$",                     # SVN globs are specific to a dir
                          "^${dir}${_}/",                      # SVN globs are specific to a dir
                        } split( /\n/, $patterns );

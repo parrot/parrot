@@ -8,12 +8,12 @@ tools/dev/gen_manifest_skip.pl - generated the file MANIFEST.SKIP
 
 =head1 SYNOPSIS
 
-    % perl tools/dev/gen_manifest_skip.pl
+    % perl tools/dev/gen_manifest_skip.pl > MANIFEST.SKIP
 
 =head1 DESCRIPTION
 
 Goes through the Parrot directories and ask about the svn:ignore property.
-Generate a MANIFEST.SKIP file from that.
+Print content for  a MANIFEST.SKIP file to STDOUT.
 
 =cut
 
