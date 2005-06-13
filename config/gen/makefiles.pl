@@ -128,26 +128,29 @@ sub makefiles {
     Configure::Data->set(pod => $pod);
   
     genfile('config/gen/makefiles/docs.in',      'docs/Makefile',
-            commentType     => '#',
-            replace_slashes => 1);
+            commentType       => '#',
+            replace_slashes   => 1,
+            conditioned_lines => 1);
   
     Configure::Data->set(pod => undef);
   
     open MAKEFILE, ">> docs/Makefile" or die "open >> docs/Makefile: $!";
   
     my $slash = Configure::Data->get('slash');
-  
+    my $new_perldoc = Configure::Data->get('new_perldoc');
+
     foreach my $ops (@ops) {
         my $pod = $ops;
         $pod =~ s/\.ops$/.pod/;
-        print MAKEFILE <<"EOM";
-ops$slash$pod: ..${slash}ops${slash}$ops
-	perldoc -ud ops${slash}$pod ..${slash}ops${slash}$ops
-
-EOM
+	print MAKEFILE "ops$slash$pod: ..${slash}ops${slash}$ops\n";
+	if ($new_perldoc == 1) {
+	    print MAKEFILE "\tperldoc -ud ops${slash}$pod ..${slash}ops${slash}$ops\n\n";
+	} else {
+	    print MAKEFILE "\tperldoc -u ..${slash}ops${slash}$ops > ops${slash}$pod\n\n";
+	}
     }
   
-    close MAKEFILE
+    close MAKEFILE;
   } else {
     print "\nNo Perldoc, not generating a docs makefile.\n";
   }
