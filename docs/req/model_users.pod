@@ -73,7 +73,7 @@ Dick:
 
 =head2 "Tom": Embedded system creator
 
-Phil loves Perl 6, so wants to write his special-purpose embedded
+Tom loves Perl 6, so wants to write his special-purpose embedded
 system to run on Parrot.  The platform is very limited, and speed
 is not particularly crucial.
 
