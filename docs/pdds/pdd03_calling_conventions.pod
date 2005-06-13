@@ -9,253 +9,223 @@ docs/pdds/pdd03_calling_conventions.pod - Parrot Calling Conventions
 
 This PDD describes Parrot's inter-routine calling conventions.
 
+=head1 AND NOW FOR SOMETHING COMPLETELY DIFFERENT
+
+This document's current contents are a complete change of direction
+from the original direction of Parrot design.  Brand new and/or
+improved!  Share and enjoy!
+
 =head1 DESCRIPTION
 
-Please note that the following conventions are I<only> necessary when
-exposing subs and methods via the generic parrot routine exposure
-mechanism. What does this mean?
-
-It means the caller needs to follow these conventions I<only> when
-calling into subs and methods that it has looked up symbolically via
-parrot's default lookup system. If a language has a lighter-weight
-calling mechanism that's safe to use in some circumstances, it's
-perfectly fine to use that.
-
-This means that if you write a C compiler that targets Parrot, for
-example, you don't need to use parrot's caller-save, full-on calling
-conventions when one C function calls another if the compiler knows
-at compile (or possibly link) time what parameters are being passed
-into the function.
-
-This can potentially save a significant amount of time when dealing
-with languages that are fully, or nearly fully, bound at compile
-time, and especially when dealing with languages, such as Forth, that
-would otherwise spend an inordinate amount of time calling small
-functions.
-
-If a function isn't exposed at all, it doesn't need to have any way
-to call into it with the standard calling conventions. It's also
-perfectly acceptable for there to be two ways to call into a
-function--one with a language's private calling method, and another
-that follows the standard conventions.
-
-When this document refers to an "array PMC", used for passing
-overflow parameters in and out, this means a PMC that can be accessed
-by integer index and which can return its length. It doesn't need to
-be of any particular class, it just needs to I<act> like an
-array. It specifically does I<not> need to be able to extend itself,
-and may be considered (and actually be) a constant array.
+This document describes how to pass arguments from registers to
+subroutines, and how subroutines can extract their parameters into
+registers for use.
 
 Since Parrot's calling conventions are continuation-based, there is
 arguably very little difference between a call and a return. Because
-of this, the registers are set the same regardless of whether code is
-invoking a subroutine or a return continuation.
+of this, the conversion rules are the same regardless of whether code
+is invoking a subroutine or a return continuation.
 
-Please note that, in the interest of speed, there is a count-free
-version of sub calling. This mechanism should only be used when
-calling a static subroutine (never a method) with a fixed-arg-count
-signature that is known at compile time and guaranteed not to
-change. It should not be used when writing code for/in dynamic
-languages.
+=head2 Common Features of Argument/Return Opcodes
 
-=head2 Responsibility for environment preservation
+XXX FIXME: PIR should have pretty syntactical sugar around this, but
+it doesn't.  Document here what it should look like.
 
-Parrot uses a fully continuation passing style for control flow. As
-such there is no 'return' environment as such. The object being
-invoked is responsible for any saving of registers -- parrot itself
-makes no guarantees here.
-
-The return continuation PMC type, used to create return continuations
-used for call/return style programming, guarantees that registers
-16-31 for all types (P, N, S, and I) will be set such that the
-contents of those registers are identical to the content of the
-registers when the return continuation was I<created>. Note that if a
-return continuation object is created explicitly, rather than by an
-invocation op, the preserved registers will be in the state they were
-at the time the continuation was made, rather than the state they were
-at the time the continuation was passed into an invocation.
-
-=head2 Calling conventions
-
-The following registers are used in calling all subs and methods. The
-registers must be set by the I<caller>, either explicitly or
-implicitly. (Implicit setting of these registers may be done by ops
-which document they do so. For example the callcc op notes that it
-creates and provides a return continuation) Some, but not all, of the
-registers are passed in to the callee. Parrot does, however, consume
-some of these values.
-
-Note that registers 16-31 of each of the four types are, for security
-reasons, I<never> passed into the invoked subroutine, method, or
-continuation. They are guaranteed to be garbage.
-
-The registers as set up by the I<caller>:
+There are four opcodes involved in parameter and return value
+propagation:
 
 =over 4
 
-=item P0
+=item *
 
-Holds the object representing the subroutine.
+C<set_args>, for passing arguments;
 
-=item P1
+=item *
 
-Holds the return continuation for the caller.
+C<set_returns>, for returning values;
 
-=item P2
+=item *
 
-Holds the object the sub was called on. (For method calls)
+C<get_params>, for accepting parameters; and
 
-=item P3
+=item *
 
-The overflow parameters. Everything that wouldn't fit in a register
-is in here. This PMC should act as an array, and belongs to the
-called sub/function/method. The caller should not assume anything
-about the state of the PMC passed in here after the call is made.
-
-=item S0
-
-The fully qualified name of the method or sub being called
-
-=item S1
-
-Call signature used for MMD only.
-
-=item I0
-
-1 if the sub is being called with fully prototyped parameters,
-including P/I/S/N counts.
-
-0 if all the parameters are jammed in P registers and the overflow
-array, with a count of parameters passed in PMC registers
-
--1 if the count registers aren't filled in.
-
-=item I1
-
-The number of params in integer registers
-
-=item I2
-
-The number of string parameters
-
-=item I3
-
-The number of parameters in PMC registers.
-
-=item I4
-
-The number of numeric parameters
+C<get_results>, for accepting return values.
 
 =back
 
-The following registers, with the exception of P registers, are used
-I<only> when calling a subroutine for which there is a compile-time
-prototype. The first 11 PMC parameters may be passed in registers P5
-through P15.
+The common syntax of these opcodes is:
+
+    <set_opcode> "(flags0, flags1, ..., flagsN)", VAL0, VAL1, ... VALN
+    <get_opcode> "(flags0, flags1, ..., flagsN)", REG0, REG1, ... REGN
+
+The flags string is a literal quoted string denoting a list of zero or
+more comma-separated integers.  The list as a whole may be surrounded
+by parentheses.  Integers may be specified either in decimal, or if
+prefixed with "0b", in binary.  There must be exactly one integer for
+each value or register given.
+
+=head3 Flag Words; Common Flag Word Bits
+
+Each integer in the flag string controls the processing of the
+corresponding value or register.
+
+These bits of each flag word have common meanings for all argument/
+return-value opcodes:
+
+    0b0011  TYPE
+               0b00 = I    XXX Why force the user to encode this,
+               0b00 = S    XXX   even in pasm?  The register types
+               0b00 = P    XXX   are right there on the very same
+               0b00 = N    XXX   pasm source line.
+
+
+=head2 Passing Arguments, Returning Values
+
+Just before calling a subroutine with C<invokecc> or calling a method
+with <call_methodcc>, use the C<set_args> opcode to tell Parrot where
+the subroutine's or method's arguments will come from and how they
+should be expanded by the target.
+
+Similarly, just before returning from such a subroutine or method, use
+the C<set_returns> opcode to tell Parrot where the return values will
+come from and how to expand them for the caller's use.
+
+=head3 Flag Word Bits For 'Setting'
+
+These bits of each flag word have these meanings specific to
+C<set_args> and C<set_returns>:
+
+    0b0100  CONSTANT
+               the value is a literal constant, not a register
+               XXX  Again, why not figure this out from
+               XXX    the source code?
+
+    0b1000  FLATTEN
+               If this bit is set on a PMC value, then the PMC must
+               be an aggregate or a scalar containing a reference to
+               an aggregate.  The contents of the aggregate, rather
+               than the aggregate itself, will be passed.
+
+               The meaning of this bit is undefined when applied to
+               integer, number, and string values.
+
+
+=head2 Accepting Parameters, Accepting Return Values
+
+As the I<first opcode> in a subroutine that will be called with
+C<invokecc> or a method that will be called with <call_methodcc>, use
+the C<get_params> opcode to tell Parrot where the subroutine's or
+method's arguments should be stored and how they should be expanded.
+
+Similarly, just I<before> (yes, I<before>) calling such a subroutine
+or method, use the C<set_returns> opcode to tell Parrot where the
+return values should be stored and how to expand them for your use.
+
+NOTE: It should be obvious, but in case it's not: You must name only
+registers as targets of these opcodes, not constants.  (You can't
+store anything into a constant.  That would make it a variable.)
+
+=head3 Flag Word Bits For 'Getting'
+
+These bits of each flag word have these meanings specific to
+C<get_params> and C<get_results>:
+
+    0b1000  FLATTEN
+               If this bit is set on a PMC register, then the PMC
+               will be populated with an aggregate (e.g. Array)
+               that will contain all of the remaining values that
+               have not already been stored in other registers.
+
+               All such values will be converted to PMCs according
+               to the detailed rules below, and those PMCs will be
+               stored into the new aggregate.
+
+               The meaning of this bit is undefined when applied to
+               integer, number, and string registers.
+
+=head3 Overflow
+
+If too many values are provided to fit into the given target
+registers, Parrot will throw an exception.  Note that if the final
+target is a P register with the FLATTEN flag bit, then this exception
+can never occur.
+
+XXX - FIXME - which exception?  We really could use an exception
+subsystem.  Oh, wait, that's my job.  Never mind.  --Chip
+
+=head3 Underflow
+
+If too few values are provided so that some target registers are left
+unset, this too results in an exception.
+
+=head3 Type Conversions
+
+Unlike the C<set_*> opcodes, the C<get_*> opcodes must perform
+conversion from one register type to another.  Here are the conversion
+rules:
 
 =over 4
 
-=item I5 through I15
+=item *
 
-The first 11 integer parameters.
+When the target is an I, N, or S register, storage will behave like an
+C<assign> (standard conversion).
 
-=item S5 through S15
+=item *
 
-The first 11 string parameters.
+When the target and source are both P registers, storage will behave
+like a C<set> (pass by reference).
 
-=item N5 through N15
+=item *
 
-The first 11 numeric parameters.
+When the target is a P register and the source is an integer, the P
+will be set to a new .Integer which has been C<assign>ed the given
+integer.
 
-=item P5 through P15
+=item *
 
-The first 11 PMC parameters.
+When the target is a P register and the source is a number, the P will
+be set to a new .Float which has been C<assign>ed the given number.
+
+=item *
+
+When the target is a P register and the source is a string, the P will
+be set to a new .String which has been C<assign>ed the given string.
 
 =back
 
-Overflow parameters go in the array PMC passed in P3. Overflow
-entries are in there in order, so element 0 is the first overflow
-parameter, element 1 the second, and so on.
+=head1 BUGS
 
-The PMC for a hash, array, or list is passed if one of the entries in
-the parameter list is a hash, array, or list. The aggregate is B<not>
-flattened. (Though when accessing the parameters it may be)
-
-Parameters are passed in S, I, and N registers only if the sub's
-prototype specifically indicates it takes parameters of that type. I0
-must be set to 1 if that is the case. If I0 is 0, then the S, I, and
-N registers can be assumed to be garbage.
-
-Note that it doesn't matter what the order of the integer, string,
-numeric, and PMC parameters are in the parameter list up until
-overflow occurs. Once overflow occurs the parameters must be taken in
-the exact order that they appear in the signature.
-
-The registers of the above set as seen by the callee are:
+Required features are missing:
 
 =over 4
 
-=item P3
+=item *
 
-I<Only> if there are overflow parameters. Otherwise garbage
+Type checking
 
-=item S0
+=item *
 
-=item I0
+Default values
 
-=item I1-I4
+=item *
 
-I<Only> if I0 indicates that a prototyped call was made. Otherwise garbage
+Optional parameters
 
-=item used parameter registers P5 through P15
+=item *
 
-=item used parameter registers I5 through I15
+Named parameters
 
-=item used parameter registers S5 through S15
+=item *
 
-=item used parameter registers N5 through N15
+Specific exceptions to throw for specific errors.
 
 =back
 
-Note particularly that P0-P2 are not passed. They are consumed by
-Parrot and placed into the interpreter structure, and may be fetched
-with the interpinfo op if necessary. Fetching the return continuation
-may be expensive, and should only be done if truly necessary.
-
-The I<callee> must assume that any unused registers are garbage. This
-includes registers which could hold a parameter but don't due to lack
-of parameters. (For example, if only one PMC parameter is passed then
-PMC registers 6-15 are garbage)
-
-=head2 Prototyped parameters
-
-A sub or method can be called in two ways--either prototyped or
-non-prototyped.
-
-A prototyped call means that the caller has an idea of what
-parameters the sub takes, and has placed its parameters in the
-appropriate S, I, N, and P registers. I0 will be true in this case.
-
-An unprototyped call means the caller doesn't know what the sub
-takes, so has stuffed all its parameters into PMCs, and put those
-PMCs first in the PMC registers with any overflow in the overflow
-array. I0 will be false in this case.
-
-The sub being called is responsible for runtime checking the parameter
-types to see if there is a parameter mismatch problem, if it
-cares. (Often it doesn't) This isn't a replacement for that sort of
-parameter type checking. What it is, instead, is a means of allowing
-shortcutting parameter placement checking for the called sub.
-
-For example, assume we have a subroutine with a signature that looks
-like:
-
-    sub foo(int a, int b, string c, PMC d, float e);
-
-If we were calling without prototyping, all five parameters would be
-passed in as PMCs, in registers P5 through P9. If, on the other hand,
-we were calling with prototyping, a would be in I5, b in I6, c in S5,
-d in P5, and e in N5.
+Also, PIR should have pretty syntactical sugar around the get and set
+opcodes, but it doesn't.  This document should specify what that looks
+like, too.
 
 =head1 REFERENCES
 
@@ -263,22 +233,26 @@ None.
 
 =head1 VERSION
 
-1.4
+2.0
 
 =head2 CURRENT
 
-    Maintainer: Dan Sugalski
+    Maintainer: Chip Salzenberg
     Class: Internals
     PDD Number: 03
-    Version: 1.4
-    Status: Developing
-    Last Modified: 17 November 2003
+    Version: 2.0
+    Status: Overhauled
+    Last Modified: 13 June 2005
     PDD Format: 1
     Language: English
 
 =head2 HISTORY
 
 =over 4
+
+=item Version 2.0
+
+13 June 2005
 
 =item Version 1.4
 
@@ -305,6 +279,12 @@ None. First version
 =head1 CHANGES
 
 =over 4
+
+=item Version 2.0
+
+Meet the new boss, definitely not the same as the old boss.
+All the register-window fixed-register-number ideas are gone.
+In their place are specialized conversion opcodes.
 
 =item Version 1.4
 
