@@ -213,6 +213,7 @@ typedef struct Parrot_Context {
     opcode_t *current_pc;       /* program counter of Sub invocation */
     String *current_package;    /* The package we're currently in */
     INTVAL current_HLL;         /* see also src/hll.c */
+    opcode_t *current_params;   /* ptr into code with get_params opcode */
 } parrot_context_t;
 
 struct _Thread_data;    /* in thread.h */
@@ -310,6 +311,9 @@ struct parrot_interp_t {
     struct _Thread_data *thread_data;   /* thread specific items */
     UINTVAL recursion_limit;    /* Sub call resursion limit */
     UINTVAL gc_generation;      /* GC generation number */
+    opcode_t *current_args;      /* ptr into code with set_args opcode */
+    opcode_t *current_results;   /* ptr into code with get_results opcode */
+    opcode_t *current_returns;   /* ptr into code with get_returns opcode */
 };
 
 /* typedef struct parrot_interp_t Interp;    done in parrot.h so that

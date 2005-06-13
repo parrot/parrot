@@ -326,16 +326,55 @@ Define function parameters for this subroutine.
 
 Define return results for the subroutine return statement.
 
+For all of these opcodes the passed in PMC constant is the string
+representation of a fixed integer array with one flag word per argument.
+The flags are documented currently in F<include/parrrot/enum.h> only.
+
+After this argument a variable amount of arguments must follow according
+to the elements of the signature array.
+
 =cut
 
 
 op set_args(inconst PMC) {
-    opcode_t *next = CUR_OPCODE;
+    opcode_t *this = CUR_OPCODE;
     PMC *signature = $1;
     INTVAL argc;
 
+    /* for now just point to the opcode */
+    interpreter->current_args = this;
     argc = VTABLE_elements(interpreter, signature);
-    goto ADDRESS(next + 2 + argc);
+    goto ADDRESS(this + 2 + argc);
+}
+
+op get_results(inconst PMC) {
+    opcode_t *this = CUR_OPCODE;
+    PMC *signature = $1;
+    INTVAL argc;
+
+    interpreter->current_results = this;
+    argc = VTABLE_elements(interpreter, signature);
+    goto ADDRESS(this + 2 + argc);
+}
+
+op get_params(inconst PMC) {
+    opcode_t *this = CUR_OPCODE;
+    PMC *signature = $1;
+    INTVAL argc;
+
+    interpreter->ctx.current_params = this;
+    argc = VTABLE_elements(interpreter, signature);
+    goto ADDRESS(this + 2 + argc);
+}
+
+op set_returns(inconst PMC) {
+    opcode_t *this = CUR_OPCODE;
+    PMC *signature = $1;
+    INTVAL argc;
+
+    interpreter->current_returns = this;
+    argc = VTABLE_elements(interpreter, signature);
+    goto ADDRESS(this + 2 + argc);
 }
 
 ###############################################################################

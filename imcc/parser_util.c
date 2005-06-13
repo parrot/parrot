@@ -499,9 +499,12 @@ INS(Interp *interpreter, IMC_Unit * unit, char *name,
     char format[128], buf[10];
     int len;
 
-    if (!strcmp(name, "set_args"))
+    if (!strcmp(name, "set_args") ||
+        !strcmp(name, "get_results") ||
+        !strcmp(name, "get_params") ||
+        !strcmp(name, "set_returns")) {
         return var_arg_ins(interpreter, unit, name, r, n, emit);
-
+    }
     if ( (op = is_infix(name, n, r)) >= 0) {
         /* sub x, y, z  => infix .MMD_SUBTRACT, x, y, z */
         name = to_infix(interpreter, name, r, &n, op);
