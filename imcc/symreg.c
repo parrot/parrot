@@ -50,6 +50,18 @@ pop_namespace(char * name)
     free(ns);
 }
 
+/* Gets a symbol from the hash */
+static SymReg *
+_get_sym_typed(SymReg * hsh[], const char * name, int t)
+{
+    SymReg * p;
+    int i = hash_str(name) % HASH_SIZE;
+    for (p = hsh[i]; p; p = p->next) {
+	if (!strcmp(name, p->name) && t == p->set)
+	    return p;
+    }
+    return 0;
+}
 /* symbolic registers */
 
 /* Makes a new SymReg from its varname and type
@@ -64,7 +76,7 @@ SymReg *
 _mk_symreg(SymReg* hsh[], char * name, int t)
 {
     SymReg * r;
-    if ((r = _get_sym(hsh, name)) && r->set == t) {
+    if ((r = _get_sym_typed(hsh, name, t))) {
 	free(name);
         return r;
     }

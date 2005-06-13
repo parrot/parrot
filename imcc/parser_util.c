@@ -441,16 +441,8 @@ var_arg_ins(Interp *interpreter, IMC_Unit * unit, char *name,
     Instruction *ins;
     int dirs;
     char fullname[64];
-    char *p;
 
-    r[0]->set = 'P';    /* PMC constant */
-    if (*r[0]->name == '"') {
-        p = str_dup(r[0]->name + 1);
-        p[strlen(p) - 1] = '\0';
-        mem_sys_free(r[0]->name);
-        r[0]->name = p;
-    }
-
+    r[0] = mk_const(interpreter, str_dup(r[0]->name), 'P');
     r[0]->pmc_type = enum_class_FixedIntegerArray;
     dirs = 1;           /* in constant */
     op_fullname(fullname, name, r, 1, 0);

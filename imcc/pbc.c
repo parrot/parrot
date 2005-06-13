@@ -906,7 +906,13 @@ make_pmc_const(Interp *interpreter, SymReg *r)
     PMC *p, *class;
     int k;
 
-    s = string_from_cstring(interpreter, r->name, 0);
+    if (*r->name == '"')
+        s = string_unescape_cstring(interpreter, r->name + 1, '"', NULL);
+    else
+    if (*r->name == '\'')
+        s = string_unescape_cstring(interpreter, r->name + 1, '\'', NULL);
+    else
+        s = string_unescape_cstring(interpreter, r->name, 0, NULL);
     class = Parrot_base_vtables[r->pmc_type]->class;
     p = VTABLE_new_from_string(interpreter, class, s, PObj_constant_FLAG);
     /* append PMC constant */
