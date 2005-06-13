@@ -46,6 +46,78 @@ Initializes the array.
 
 /*
 
+=item C<PMC new_from_string(STRING *rep)>
+
+Class method to construct an array from the string representation C<rep>,
+which is a string I<"(el0, el1, ...)">.
+
+=cut
+
+*/
+    PMC* new_from_string(STRING *rep, INTVAL flags) {
+        INTVAL type, n, elem;
+        char *p, *start;
+        UINTVAL i, l;
+        int base;
+
+        type = SELF->vtable->base_type;
+        if (flags & PObj_constant_FLAG)
+            SELF = constant_pmc_new(INTERP, type);
+        else
+            SELF = pmc_new(INTERP, type);
+        if (! (l = string_length(INTERP, rep)) )
+            return SELF;
+        if (rep->encoding != Parrot_fixed_8_encoding_ptr)
+            real_exception(INTERP, NULL, E_ValueError,
+                    "unhandled string encoding in constructor");
+        /* count commas */
+        p = rep->strstart;
+        for (i = l, n = 0; i; --i, ++p) {
+            if (*p == ',')
+                ++n;
+        }
+        /* presize the array */
+        SELF.set_integer_native(n + 1);
+        /* parse string */
+        p = rep->strstart;
+        for (i = l, n = 0; i; --i, ++p) {
+            switch (*p) {
+                case ' ': continue;
+                case '\t': continue;
+                case '(': continue;
+                case ')': break;
+                case ',':
+                          n++;
+                          break;
+                default:
+                          base = 10;
+                          if (*p == '0') {
+                              ++p;
+                              --i;
+                              if (*p == 'b' || *p == 'B') {
+                                  base = 2;
+                                  ++p;
+                                  --i;
+                              }
+                              else if (*p == 'x' || *p == 'X') {
+                                  base = 16;
+                                  ++p;
+                                  --i;
+                              }
+                          }
+                          start = p;
+                          elem = strtoul(p, &p, base);
+                          --p;
+                          i -= (p - start);
+                          SELF.set_integer_keyed_int(n, elem);
+                          break;
+            }
+        }
+        return SELF;
+    }
+
+/*
+
 =item C<void morph(INTVAL type)>
 
 Const classes must have a C<morph()>.
