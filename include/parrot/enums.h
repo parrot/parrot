@@ -45,6 +45,22 @@ typedef enum {
 
 /* &end_gen */
 
+/* &gen_from_enum(call_bits.pasm) */
+typedef enum {
+    /* 2 low bits are argument types */
+    PARROT_ARG_INTVAL           = 0x00,
+    PARROT_ARG_STRING           = 0x01,
+    PARROT_ARG_PMC              = 0x02,
+    PARROT_ARG_FLOATVAL         = 0x03,
+    /* argument meaning and conversion bits */
+    PARROT_ARG_CONSTANT         = 0x04,
+    PARROT_ARG_FLATTEN          = 0x08       /* .flatten_arg */
+    /* more to come soon */
+
+} Call_bits_enum_t;
+
+/* &end_gen */
+
 #endif /* PARROT_ENUMS_H_GUARD */
 
 /*
