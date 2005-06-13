@@ -61,7 +61,7 @@ print_sub_name(Interp* interpreter, PMC* sub)
     print_pbc_location(interpreter);
 }
 
-static void
+static opcode_t *
 copy_args_from_caller(Interp *interpreter, struct Parrot_sub * sub,
         struct parrot_regs_t *caller_regs)
 {
@@ -113,6 +113,7 @@ copy_args_from_caller(Interp *interpreter, struct Parrot_sub * sub,
 
     /* invalidate */
     interpreter->current_args = NULL;
+    return param_pc + n;
 }
 
 /*
@@ -283,6 +284,7 @@ Invokes the subroutine.
         struct parrot_regs_t *caller_regs;
         PMC *ccont;
         struct PackFile_ByteCode * old_seg;
+        opcode_t *pc;
 
         if (Interp_trace_TEST(INTERP, PARROT_TRACE_SUB_CALL_FLAG)) {
             print_sub_name(INTERP, SELF);
@@ -355,10 +357,11 @@ Invokes the subroutine.
          * new frame, e.g.
          * called from runops_fromc
          */
+        pc = sub->address;
         if (next) {
             /* XXX temporary hack during call syntax switch */
             if (INTERP->current_args) {
-                copy_args_from_caller(INTERP, sub, caller_regs);
+                pc = copy_args_from_caller(INTERP, sub, caller_regs);
             }
             else {
                 /* copy function arguments */
@@ -372,7 +375,7 @@ is_tail_call:
             INTERP->ctx.current_sub = SELF;
         }
         INTERP->ctx.current_HLL = sub->HLL_id;
-        return sub->address;
+        return pc;
     }
 
 /*
