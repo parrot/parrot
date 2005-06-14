@@ -160,7 +160,18 @@ Creates and returns a copy of the array.
 
     PMC* clone () {
         INTVAL size;
-        PMC * dest = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC * dest;
+        /* a quick hack to create a clone in the constant PMC arena
+         * this is needed for the call signatures
+         *
+         * a better way would be probably to supply a flag to the clone
+         * vtable
+         */
+
+        if (PObj_constant_TEST(SELF))
+            dest = constant_pmc_new(INTERP, SELF->vtable->base_type);
+        else
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
 
         if (!PMC_data(SELF))
             return dest;

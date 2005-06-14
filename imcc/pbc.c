@@ -1,6 +1,7 @@
 #include "imc.h"
 #include "pbc.h"
 #include "parrot/packfile.h"
+#include "parrot/oplib/ops.h"
 
 /*
  * pbc.c
@@ -1026,6 +1027,56 @@ e_pbc_end_sub(Interp *interpreter, void *param, IMC_Unit * unit)
     return 0;
 }
 
+static void
+verify_signature(Interp *interpreter, Instruction *ins, opcode_t *pc)
+{
+    PMC *sig_arr = interpreter->code->const_table->constants[pc[-1]]->u.key;
+    INTVAL i, n, sig;
+    SymReg *r;
+    int no_consts, needed;
+    PMC *changed_sig = NULL;
+
+    assert(PObj_is_PMC_TEST(sig_arr));
+    assert(sig_arr->vtable->base_type == enum_class_FixedIntegerArray);
+    no_consts = (ins->opnum == PARROT_OP_get_results_pc ||
+        ins->opnum == PARROT_OP_get_params_pc);
+    n = VTABLE_elements(interpreter, sig_arr);
+    for (i = 0; i < n; ++i) {
+        r = ins->r[i + 1];
+        if (no_consts && (r->type & VTCONST))
+                IMCC_fatal(interpreter, 1, "e_pbc_emit: "
+                        "constant argument '%s' in get param/result\n",
+                        r->name);
+        sig = VTABLE_get_integer_keyed_int(interpreter, sig_arr, i);
+        if ((r->type & VTCONST) && !(sig & PARROT_ARG_CONSTANT)) {
+            if (!changed_sig)
+                changed_sig = VTABLE_clone(interpreter, sig_arr);
+            sig |= PARROT_ARG_CONSTANT;
+            VTABLE_set_integer_keyed_int(interpreter, changed_sig, i, sig);
+        }
+        switch (r->set) {
+            case 'I': needed = PARROT_ARG_INTVAL; break;
+            case 'S': needed = PARROT_ARG_STRING; break;
+            case 'P': needed = PARROT_ARG_PMC; break;
+            case 'N': needed = PARROT_ARG_FLOATVAL; break;
+        }
+        if (needed != (sig & PARROT_ARG_TYPE_MASK)) {
+            if (!changed_sig)
+                changed_sig = VTABLE_clone(interpreter, sig_arr);
+            sig &= ~PARROT_ARG_TYPE_MASK;
+            sig |= needed;
+            VTABLE_set_integer_keyed_int(interpreter, changed_sig, i, sig);
+        }
+    }
+    if (changed_sig) {
+        /* append PMC constant */
+        int k = PDB_extend_const_table(interpreter);
+        interpreter->code->const_table->constants[k]->type = PFC_PMC;
+        interpreter->code->const_table->constants[k]->u.key = changed_sig;
+        pc[-1] = k;
+    }
+}
+
 /*
  * now let the fun begin, actually emit code for one ins
  */
@@ -1193,13 +1244,19 @@ e_pbc_emit(Interp *interpreter, void *param, IMC_Unit * unit, Instruction * ins)
                     break;
             }
         }
-        /* emit var_args part */
-        for (; i < ins->opsize - 1; ++i) {
+        if (ins->opnum == PARROT_OP_set_args_pc ||
+                ins->opnum == PARROT_OP_get_results_pc ||
+                ins->opnum == PARROT_OP_get_params_pc ||
+                ins->opnum == PARROT_OP_set_returns_pc) {
+            verify_signature(interpreter, ins, pc);
+            /* emit var_args part */
+            for (; i < ins->opsize - 1; ++i) {
                 r = ins->r[i];
                 if (r->type & VT_CONSTP)
                     r = r->reg;
                 *pc++ = (opcode_t) r->color;
                 IMCC_debug(interpreter, DEBUG_PBC," %d", r->color);
+            }
         }
         IMCC_debug(interpreter, DEBUG_PBC, "\t%I\n", ins);
         npc += ins->opsize;
