@@ -174,20 +174,12 @@ parrot_pass_args(Interp *interpreter, struct Parrot_sub * sub,
                     PMC *dst_ar = REG_PMC(dst_pc[dst_i]);
                     INTVAL i;
 
-                    if (PMC_IS_NULL(dst_ar)) {
-                        /* create array if NULL is passed in */
-                        dst_ar = pmc_new(interpreter, enum_class_FixedPMCArray);
-                        VTABLE_set_integer_native(interpreter, dst_ar,
-                                src_n - src_i);
-                        REG_PMC(dst_pc[dst_i]) = dst_ar;
-                        i = 0;
-                    }
-                    else if (!VTABLE_does(interpreter, dst_ar, _array)) {
-                        /* append on existing array - do we need it? */
-                        real_exception(interpreter, NULL, E_ValueError,
-                                "param doesn't array");
-                        i = VTABLE_elements(interpreter, dst_ar);
-                    }
+                    /* create array */
+                    dst_ar = pmc_new(interpreter, enum_class_FixedPMCArray);
+                    VTABLE_set_integer_native(interpreter, dst_ar,
+                            src_n - src_i);
+                    REG_PMC(dst_pc[dst_i]) = dst_ar;
+                    i = 0;
                     /* set already fetched arg */
                     VTABLE_set_pmc_keyed_int(interpreter, dst_ar, i++, p_arg);
                     for (++src_i; src_i < src_n; ++src_i, ++i) {
