@@ -119,6 +119,10 @@ B<@MAIN>.
 Do not install this subroutine in the namespace. Allows the subroutine
 name to be reused.
 
+=item * @MULTI(Type1, Type2...)
+
+Engage in multiple dispatch with the listed types.
+
 =item * method
 
 Declare subroutine being a method.
