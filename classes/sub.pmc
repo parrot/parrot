@@ -114,6 +114,7 @@ parrot_pass_args(Interp *interpreter, struct Parrot_sub * sub,
                 src_i);
         switch (src_sig & PARROT_ARG_TYPE_MASK) {
             /* TODO verify param_signature */
+            /* XXX pdd03 Type Conversions */
             case PARROT_ARG_INTVAL:
                 i_arg = src_pc[src_i];
                 if (!(src_sig & PARROT_ARG_CONSTANT)) {
@@ -185,6 +186,7 @@ parrot_pass_args(Interp *interpreter, struct Parrot_sub * sub,
                     for (++src_i; src_i < src_n; ++src_i, ++i) {
                         src_sig = VTABLE_get_integer_keyed_int(interpreter,
                                 args_signature, src_i);
+                        /* XXX pdd03 Type Conversions */
                         if ((src_sig & PARROT_ARG_TYPE_MASK) !=
                                 PARROT_ARG_PMC) {
                             real_exception(interpreter, NULL, E_ValueError,
