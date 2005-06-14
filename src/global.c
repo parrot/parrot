@@ -210,7 +210,7 @@ Parrot_get_name(Interp* interpreter, STRING *name)
     if (!g)
         g = Parrot_find_builtin(interpreter, name);
     if (g) {
-        if (g->vtable->base_type == enum_class_MultiSub) {
+        if (g->vtable->base_type == enum_class_MultiSub && REG_STR(1)) {
             /*
              * signature is currently passed in S1
              * see also imcc/pcc.c

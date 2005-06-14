@@ -939,6 +939,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "multisub vs find_name");
     $P0 = find_name "foo"
     $S0 = classname $P0
     print $S0
+    print "\n"
 .end
 .sub foo method, @MULTI(string)
     .param pmc x
