@@ -152,7 +152,8 @@ variables), emit code to push a lexical pad:
 
     new_pad n
 
-where C<n> is the lexical depth of the block. You can also use
+where C<n> is the lexical depth of the block.  After the first
+C<new_pad 0>, you can also use:
 
     new_pad -1
 
@@ -199,6 +200,16 @@ can access much the same way:
 
     find_global $P0, "bar"
     assign $P0, value_to_store
+
+=head2 How do I resolve a variable name?
+
+Use C<find_name>:
+
+    $P0 = find_name "$x"
+    find_name $P0, "foo"    # same thing
+
+This will find the name C<foo> in lexical, global or builtin namespace,
+in that order, and store it in C<$P0>.
 
 =head2 How do I fetch a variable from the current lexical pad?
 
