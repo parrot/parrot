@@ -61,12 +61,16 @@ print_sub_name(Interp* interpreter, PMC* sub)
     print_pbc_location(interpreter);
 }
 
-static opcode_t *
-copy_args_from_caller(Interp *interpreter, struct Parrot_sub * sub,
-        struct parrot_regs_t *caller_regs)
+/* XXX interface, when finsished */
+opcode_t * parrot_pass_args(Interp *, struct Parrot_sub * sub,
+        struct parrot_regs_t *caller_regs, int what);
+
+opcode_t *
+parrot_pass_args(Interp *interpreter, struct Parrot_sub * sub,
+        struct parrot_regs_t *caller_regs, int what)
 {
     PMC *args_signature, *param_signature;
-    INTVAL i, n, sig;
+    INTVAL i, n, sig, args_op;
     opcode_t *pc, *param_pc;
     struct PackFile_Constant **constants;
     INTVAL i_arg;
@@ -75,45 +79,77 @@ copy_args_from_caller(Interp *interpreter, struct Parrot_sub * sub,
     STRING *s_arg;
 
     constants = interpreter->code->const_table->constants;
-    /* check if there is a get_params */
-    param_pc = sub->address;
-    if (*param_pc == PARROT_OP_get_params_pc) {
-        param_signature = constants[param_pc[1]]->u.key;
-        assert(PObj_is_PMC_TEST(param_signature));
-        assert(param_signature->vtable->base_type ==
-                enum_class_FixedIntegerArray);
+    if (what == PARROT_OP_get_params_pc) {
+        param_pc = sub->address;
+        args_op = PARROT_OP_set_args_pc;
+        pc = interpreter->current_args;
     }
-    else
-        internal_exception(1, "unhandled calling convention mix");
+    else {
+        param_pc = interpreter->ctx.current_results;
+        args_op = PARROT_OP_set_returns_pc;
+        pc = interpreter->current_returns;
+    }
+
+    assert(*param_pc == what);
+    param_signature = constants[param_pc[1]]->u.key;
+    assert(PObj_is_PMC_TEST(param_signature));
+    assert(param_signature->vtable->base_type == enum_class_FixedIntegerArray);
 
     /* we point to the set_args opcode */
-    pc = interpreter->current_args;
-    assert(*pc == PARROT_OP_set_args_pc);
+    assert(*pc == args_op);
     args_signature = constants[pc[1]]->u.key;
     assert(PObj_is_PMC_TEST(args_signature));
     assert(args_signature->vtable->base_type == enum_class_FixedIntegerArray);
 
-
-    /* TODO factor out common bits with copy_from_callee in
-     * classes/continuation.pmc
-     */
     n = VTABLE_elements(interpreter, args_signature);
+    /* never get more then the caller expects */
+    n = VTABLE_elements(interpreter, param_signature);
 
     for (i = 0, pc += 2, param_pc += 2; i < n; ++i) {
         sig = VTABLE_get_integer_keyed_int(interpreter, args_signature, i);
         switch (sig & PARROT_ARG_TYPE_MASK) {
+            /* TODO verify param_signature */
             case PARROT_ARG_INTVAL:
                 i_arg = pc[i];
                 if (!(sig & PARROT_ARG_CONSTANT)) {
                     i_arg = BP_REG_INT(caller_regs, i_arg);
                 }
-                /* TODO verify param_signature */
                 REG_INT(param_pc[i]) = i_arg;
+                break;
+            case PARROT_ARG_STRING:
+                i_arg = pc[i];
+                if ((sig & PARROT_ARG_CONSTANT)) {
+                    s_arg = constants[i_arg]->u.string;
+                }
+                else {
+                    s_arg = BP_REG_STR(caller_regs, i_arg);
+                }
+                REG_STR(param_pc[i]) = s_arg;
+                break;
+            case PARROT_ARG_PMC:
+                i_arg = pc[i];
+                if ((sig & PARROT_ARG_CONSTANT)) {
+                    p_arg = constants[i_arg]->u.key;
+                }
+                else {
+                    p_arg = BP_REG_PMC(caller_regs, i_arg);
+                }
+                REG_PMC(param_pc[i]) = p_arg;
+                break;
+            case PARROT_ARG_FLOATVAL:
+                i_arg = pc[i];
+                if ((sig & PARROT_ARG_CONSTANT)) {
+                    f_arg = constants[i_arg]->u.number;
+                }
+                else {
+                    f_arg = BP_REG_NUM(caller_regs, i_arg);
+                }
+                REG_NUM(param_pc[i]) = f_arg;
                 break;
         }
     }
 
-    /* invalidate */
+    /* invalidate XXX */
     interpreter->current_args = NULL;
     return param_pc + n;
 }
@@ -363,7 +399,8 @@ Invokes the subroutine.
         if (next) {
             /* XXX temporary hack during call syntax switch */
             if (INTERP->current_args) {
-                pc = copy_args_from_caller(INTERP, sub, caller_regs);
+                pc = parrot_pass_args(INTERP, sub, caller_regs,
+                        PARROT_OP_get_params_pc);
             }
             else {
                 /* copy function arguments */
