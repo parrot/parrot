@@ -16,7 +16,7 @@ Tests the multi-method dispatch.
 
 =cut
 
-use Parrot::Test tests => 27;
+use Parrot::Test tests => 28;
 
 pir_output_is(<<'CODE', <<'OUTPUT', "PASM divide");
 
@@ -934,3 +934,20 @@ CODE
 42
 OUTPUT
 
+pir_output_is(<<'CODE', <<'OUTPUT', "multisub vs find_name");
+.sub main @MAIN
+    $P0 = find_name "foo"
+    $S0 = classname $P0
+    print $S0
+.end
+.sub foo method, @MULTI(string)
+    .param pmc x
+    print "  foo\n"
+.end
+.sub foo method, @MULTI(pmc)
+    .param pmc x
+    print "  foo\n"
+.end
+CODE
+MultiSub
+OUTPUT
