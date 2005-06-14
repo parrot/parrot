@@ -5,6 +5,12 @@
 
 docs/mmd.pod - Multimethod dispatch for binary opcode functions
 
+=head1 CAVEATS
+
+XXX - Part or all of this document is outdated.  Especially the "the MMD system
+doesn't handle inheritance" bit.  Please refer to PDD03 at this moment while 
+we rewrite or merge this document.  We apologize for the inconvenience.
+
 =head1 SYNOPSIS
 
 This system is set up to handle type-based dispatching for binary
