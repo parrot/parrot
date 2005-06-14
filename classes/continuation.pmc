@@ -62,7 +62,7 @@ copy_args_from_callee(Interp *interpreter,
 
     constants = interpreter->code->const_table->constants;
     /* check if there is a get_params */
-    param_pc = interpreter->current_results;  /* XXX ctx. */
+    param_pc = interpreter->ctx.current_results;
     assert(*param_pc == PARROT_OP_get_results_pc);
     param_signature = constants[param_pc[1]]->u.key;
     assert(PObj_is_PMC_TEST(param_signature));
@@ -258,7 +258,7 @@ destination to continue execution.
                 Parrot_full_sub_name(INTERP, sub));
         }
         if (cc->address) {
-            if (INTERP->current_results) {      /* XXX ctx. */
+            if (INTERP->ctx.current_results) {
                 copy_args_from_callee(INTERP, caller_regs);
             }
             else {

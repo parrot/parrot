@@ -352,7 +352,7 @@ op get_results(inconst PMC) {
     PMC *signature = $1;
     INTVAL argc;
 
-    interpreter->current_results = this;
+    interpreter->ctx.current_results = this;
     argc = VTABLE_elements(interpreter, signature);
     goto ADDRESS(this + 2 + argc);
 }
