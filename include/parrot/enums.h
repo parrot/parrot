@@ -55,7 +55,9 @@ typedef enum {
     PARROT_ARG_TYPE_MASK        = 0x03,
     /* argument meaning and conversion bits */
     PARROT_ARG_CONSTANT         = 0x04,
-    PARROT_ARG_FLATTEN          = 0x08       /* .flatten_arg */
+    /* bits a user has to define */
+    PARROT_ARG_FLATTEN          = 0x08,       /* .flatten_arg */
+    PARROT_ARG_SLURPY_ARRAY     = PARROT_ARG_FLATTEN  /* i.e. foldup  */
     /* more to come soon */
 
 } Call_bits_enum_t;

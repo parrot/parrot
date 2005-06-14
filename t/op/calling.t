@@ -16,7 +16,7 @@ Tests Parrot calling conventions.
 
 =cut
 
-use Parrot::Test tests => 9;
+use Parrot::Test tests => 10;
 use Test::More;
 
 # Test calling convention operations
@@ -341,5 +341,37 @@ ok 2
 ok 3
 ok 4
 ok 5
+back
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "slurpy param");
+.pcc_sub main:
+    new P16, .String
+    set P16, "ok 1\n"
+    new P17, .String
+    set P17, "ok 2\n"
+    new P18, .String
+    set P18, "ok 3\n"
+    set_args "(0, 0, 0)", P16, P17, P18
+    find_name P1, "foo"
+    invokecc P1
+    print "back\n"
+    end
+.pcc_sub foo:
+    get_params "(0, 0x8)", P1, P2
+    print P1
+    set I0, P2
+    print I0
+    print "\n"
+    set S0, P2[0]
+    print S0
+    set S0, P2[1]
+    print S0
+    returncc
+CODE
+ok 1
+2
+ok 2
+ok 3
 back
 OUTPUT

@@ -139,10 +139,17 @@ parrot_pass_args(Interp *interpreter, struct Parrot_sub * sub,
                 else {
                     p_arg = BP_REG_PMC(caller_regs, i_arg);
                 }
+                dst_sig = VTABLE_get_integer_keyed_int(interpreter,
+                        param_signature, dst_i);
                 if (src_sig & PARROT_ARG_FLATTEN) {
                     INTVAL i, n;
                     PMC *elem;
 
+                    if (dst_sig & PARROT_ARG_SLURPY_ARRAY) {
+                        /* just alias these two array */
+                        REG_PMC(dst_pc[dst_i]) = p_arg;
+                        break;
+                    }
                     if (!VTABLE_does(interpreter, p_arg, _array)) {
                         real_exception(interpreter, NULL, E_ValueError,
                                 "argument doesn't array");
@@ -162,6 +169,44 @@ parrot_pass_args(Interp *interpreter, struct Parrot_sub * sub,
                         REG_PMC(dst_pc[dst_i]) = elem;
                     }
                     --dst_i;
+                }
+                else if (dst_sig & PARROT_ARG_SLURPY_ARRAY) {
+                    PMC *dst_ar = REG_PMC(dst_pc[dst_i]);
+                    INTVAL i;
+
+                    if (PMC_IS_NULL(dst_ar)) {
+                        /* create array if NULL is passed in */
+                        dst_ar = pmc_new(interpreter, enum_class_FixedPMCArray);
+                        VTABLE_set_integer_native(interpreter, dst_ar,
+                                src_n - src_i);
+                        REG_PMC(dst_pc[dst_i]) = dst_ar;
+                        i = 0;
+                    }
+                    else if (!VTABLE_does(interpreter, dst_ar, _array)) {
+                        /* append on existing array - do we need it? */
+                        real_exception(interpreter, NULL, E_ValueError,
+                                "param doesn't array");
+                        i = VTABLE_elements(interpreter, dst_ar);
+                    }
+                    /* set already fetched arg */
+                    VTABLE_set_pmc_keyed_int(interpreter, dst_ar, i++, p_arg);
+                    for (++src_i; src_i < src_n; ++src_i, ++i) {
+                        src_sig = VTABLE_get_integer_keyed_int(interpreter,
+                                args_signature, src_i);
+                        if ((src_sig & PARROT_ARG_TYPE_MASK) !=
+                                PARROT_ARG_PMC) {
+                            real_exception(interpreter, NULL, E_ValueError,
+                                    "arg isn't a PMC");
+                        }
+                        i_arg = src_pc[src_i];
+                        if ((src_sig & PARROT_ARG_CONSTANT)) {
+                            p_arg = constants[i_arg]->u.key;
+                        }
+                        else {
+                            p_arg = BP_REG_PMC(caller_regs, i_arg);
+                            VTABLE_set_pmc_keyed_int(interpreter, dst_ar, i, p_arg);
+                        }
+                    }
                 }
                 else {
                     REG_PMC(dst_pc[dst_i]) = p_arg;
