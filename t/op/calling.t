@@ -16,7 +16,7 @@ Tests Parrot calling conventions.
 
 =cut
 
-use Parrot::Test tests => 10;
+use Parrot::Test tests => 11;
 use Test::More;
 
 # Test calling convention operations
@@ -374,4 +374,21 @@ ok 1
 ok 2
 ok 3
 back
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "use it in PIR");
+.sub main @MAIN
+    $P0 = new String
+    $P0 = "hello\n"
+    find_name $P1, "foo"
+    # set_args and invoke must be adjacent
+    set_args "(0)", $P0
+    invokecc $P1
+.end
+.sub foo
+    get_params "(0)", $P0
+    print $P0
+.end
+CODE
+hello
 OUTPUT

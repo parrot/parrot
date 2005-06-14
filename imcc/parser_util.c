@@ -450,10 +450,12 @@ var_arg_ins(Interp *interpreter, IMC_Unit * unit, char *name,
     assert(op >= 0);
     for (i = 1; i < n; i++) {
         switch (op) {
+            case PARROT_OP_set_returns_pc:
             case PARROT_OP_set_args_pc:
                 dirs |= 1 << i ;        /* IN */
                 break;
-            case 777:
+            case PARROT_OP_get_params_pc:
+            case PARROT_OP_get_results_pc:
                 dirs |= 1 << (16 + i);  /* OUT */
                 break;
         }
