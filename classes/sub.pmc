@@ -20,6 +20,7 @@ These are the vtable functions for the Sub (subroutine) base class
 
 #include "parrot/parrot.h"
 #include "parrot/oplib/ops.h"
+#include "sub.str"
 #include <assert.h>
 
 static void
@@ -70,88 +71,118 @@ parrot_pass_args(Interp *interpreter, struct Parrot_sub * sub,
         struct parrot_regs_t *caller_regs, int what)
 {
     PMC *args_signature, *param_signature;
-    INTVAL i, n, sig, args_op;
-    opcode_t *pc, *param_pc;
+    INTVAL src_i, dst_i, src_n, dst_n, src_sig, dst_sig, args_op;
+    opcode_t *src_pc, *dst_pc;
     struct PackFile_Constant **constants;
     INTVAL i_arg;
     FLOATVAL f_arg;
     PMC *p_arg;
     STRING *s_arg;
+    STRING *_array;
 
+    _array = CONST_STRING(interpreter, "array");
     constants = interpreter->code->const_table->constants;
     if (what == PARROT_OP_get_params_pc) {
-        param_pc = sub->address;
+        dst_pc = sub->address;
         args_op = PARROT_OP_set_args_pc;
-        pc = interpreter->current_args;
+        src_pc = interpreter->current_args;
     }
     else {
-        param_pc = interpreter->ctx.current_results;
+        dst_pc = interpreter->ctx.current_results;
         args_op = PARROT_OP_set_returns_pc;
-        pc = interpreter->current_returns;
+        src_pc = interpreter->current_returns;
     }
 
-    assert(*param_pc == what);
-    param_signature = constants[param_pc[1]]->u.key;
+    assert(*dst_pc == what);
+    param_signature = constants[dst_pc[1]]->u.key;
     assert(PObj_is_PMC_TEST(param_signature));
     assert(param_signature->vtable->base_type == enum_class_FixedIntegerArray);
 
     /* we point to the set_args opcode */
-    assert(*pc == args_op);
-    args_signature = constants[pc[1]]->u.key;
+    assert(*src_pc == args_op);
+    args_signature = constants[src_pc[1]]->u.key;
     assert(PObj_is_PMC_TEST(args_signature));
     assert(args_signature->vtable->base_type == enum_class_FixedIntegerArray);
 
-    n = VTABLE_elements(interpreter, args_signature);
+    src_n = VTABLE_elements(interpreter, args_signature);
     /* never get more then the caller expects */
-    n = VTABLE_elements(interpreter, param_signature);
+    dst_n = VTABLE_elements(interpreter, param_signature);
 
-    for (i = 0, pc += 2, param_pc += 2; i < n; ++i) {
-        sig = VTABLE_get_integer_keyed_int(interpreter, args_signature, i);
-        switch (sig & PARROT_ARG_TYPE_MASK) {
+    for (src_i = dst_i = 0, src_pc += 2, dst_pc += 2;
+            src_i < src_n && dst_i < dst_n; ++src_i, ++dst_i) {
+        src_sig = VTABLE_get_integer_keyed_int(interpreter, args_signature,
+                src_i);
+        switch (src_sig & PARROT_ARG_TYPE_MASK) {
             /* TODO verify param_signature */
             case PARROT_ARG_INTVAL:
-                i_arg = pc[i];
-                if (!(sig & PARROT_ARG_CONSTANT)) {
+                i_arg = src_pc[src_i];
+                if (!(src_sig & PARROT_ARG_CONSTANT)) {
                     i_arg = BP_REG_INT(caller_regs, i_arg);
                 }
-                REG_INT(param_pc[i]) = i_arg;
+                REG_INT(dst_pc[dst_i]) = i_arg;
                 break;
             case PARROT_ARG_STRING:
-                i_arg = pc[i];
-                if ((sig & PARROT_ARG_CONSTANT)) {
+                i_arg = src_pc[src_i];
+                if ((src_sig & PARROT_ARG_CONSTANT)) {
                     s_arg = constants[i_arg]->u.string;
                 }
                 else {
                     s_arg = BP_REG_STR(caller_regs, i_arg);
                 }
-                REG_STR(param_pc[i]) = s_arg;
+                REG_STR(dst_pc[dst_i]) = s_arg;
                 break;
             case PARROT_ARG_PMC:
-                i_arg = pc[i];
-                if ((sig & PARROT_ARG_CONSTANT)) {
+                i_arg = src_pc[src_i];
+                if ((src_sig & PARROT_ARG_CONSTANT)) {
                     p_arg = constants[i_arg]->u.key;
                 }
                 else {
                     p_arg = BP_REG_PMC(caller_regs, i_arg);
                 }
-                REG_PMC(param_pc[i]) = p_arg;
+                if (src_sig & PARROT_ARG_FLATTEN) {
+                    INTVAL i, n;
+                    PMC *elem;
+
+                    if (!VTABLE_does(interpreter, p_arg, _array)) {
+                        real_exception(interpreter, NULL, E_ValueError,
+                                "argument doesn't array");
+                    }
+                    n = VTABLE_elements(interpreter, p_arg);
+                    /* src ought to be an array */
+                    for (i = 0; i < n && dst_i < dst_n; ++i, ++dst_i) {
+                        dst_sig = VTABLE_get_integer_keyed_int(interpreter,
+                                param_signature, dst_i);
+                        if ((dst_sig & PARROT_ARG_TYPE_MASK) !=
+                                PARROT_ARG_PMC) {
+                            real_exception(interpreter, NULL, E_ValueError,
+                                    "param isn't a PMC");
+                        }
+                        elem = VTABLE_get_pmc_keyed_int(interpreter,
+                                p_arg, i);
+                        REG_PMC(dst_pc[dst_i]) = elem;
+                    }
+                    --dst_i;
+                }
+                else {
+                    REG_PMC(dst_pc[dst_i]) = p_arg;
+                }
                 break;
             case PARROT_ARG_FLOATVAL:
-                i_arg = pc[i];
-                if ((sig & PARROT_ARG_CONSTANT)) {
+                i_arg = src_pc[src_i];
+                if ((src_sig & PARROT_ARG_CONSTANT)) {
                     f_arg = constants[i_arg]->u.number;
                 }
                 else {
                     f_arg = BP_REG_NUM(caller_regs, i_arg);
                 }
-                REG_NUM(param_pc[i]) = f_arg;
+                REG_NUM(dst_pc[dst_i]) = f_arg;
                 break;
         }
     }
 
     /* invalidate XXX */
     interpreter->current_args = NULL;
-    return param_pc + n;
+    return dst_pc + dst_n;
 }
 
 /*
