@@ -381,7 +381,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "Coroutines - M. Wallace yield example");
 
     newsub return, .Continuation, return_here
     loop:
-        .pcc_begin non_prototyped
+        .pcc_begin
             .pcc_call itr, return
             .result counter
         .pcc_end
@@ -397,7 +397,7 @@ return_here:
     end
 .end
 
-.pcc_sub _iterator prototyped
+.pcc_sub _iterator
     .local object x
     x = new Integer
     x = 0

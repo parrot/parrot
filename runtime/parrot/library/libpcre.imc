@@ -15,7 +15,7 @@ See 'library/pcre.imc' for details on the user interface.
 .namespace ['PCRE::NCI']
 
 
-.sub compile prototyped
+.sub compile
     .param string pat
     .param int options
 
@@ -52,7 +52,7 @@ RETURN:
 .end
 
 
-.sub exec prototyped
+.sub exec
     .param pmc regex
     .param string s
     .param int start
@@ -91,7 +91,7 @@ RETURN:
 .end
 
 
-.sub result prototyped
+.sub result
     .param string s
     .param int ok
     .param pmc ovector
@@ -136,7 +136,7 @@ NOMATCH:
     i = 0
     repeat match, " ", 500
 loop:
-    .pcc_begin prototyped
+    .pcc_begin
     .arg s
     .arg ovector
     .arg ok

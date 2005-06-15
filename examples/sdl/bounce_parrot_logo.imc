@@ -82,7 +82,7 @@ Use the Escape key or close the window when you've had enough.
 
 .end
 
-.sub _main_loop prototyped
+.sub _main_loop
 	.param pmc main_screen
 	.param pmc sprite
 

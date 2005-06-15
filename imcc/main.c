@@ -426,8 +426,6 @@ do_pre_process(Parrot_Interp interp)
             case PCC_END_RETURN:      printf(".pcc_end_return"); break;
             case PCC_BEGIN_YIELD:     printf(".pcc_begin_yield"); break;
             case PCC_END_YIELD:       printf(".pcc_end_yield"); break;
-            case PROTOTYPED:          printf("prototyped"); break;
-            case NON_PROTOTYPED:      printf("non_prototyped"); break;
             case FILECOMMENT:   printf("setfile \"%s\"\n", val.s); break;
             case LINECOMMENT:   printf("setline %d\n", val.t); break;
 

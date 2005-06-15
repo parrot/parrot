@@ -8,8 +8,6 @@
  * .pragma fastcall
  * at the start of an IMC module.
  *
- * TODO enable default non/prototyped too with this pragma.
- *
  * This will allow library developers (or non-Perl languages) to turn
  * on very efficient optimizations and a lightweight calling convention.
  * It could also be used for internal libs that do not callout to PCC
@@ -263,7 +261,7 @@ pcc_put_args(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins,
             }
             if (arg->type & VTREGISTER) {
                 if (set == REGSET_P &&
-                        (flatten || (arg->type & VT_FLATTEN)))
+                        (flatten || (arg->type & VT_FLAT)))
                     goto flatten;
                 /*
                  * a remark WRT want_regno
@@ -310,7 +308,7 @@ overflow:
                 insert_ins(unit, ins, tmp);
                 ins = tmp;
             }
-            if (flatten || (arg->type & VT_FLATTEN))
+            if (flatten || (arg->type & VT_FLAT))
                 goto flatten;
             regs[0] = p3;
             regs[1] = arg;
@@ -326,7 +324,7 @@ flatten:
     } /* for i */
 
     /* set prototyped: I0  (1=prototyped, 0=non-prototyped) */
-    ins = set_I_const(interp, unit, ins, REG_PROTO_FLAG, proto);
+    ins = set_I_const(interp, unit, ins, REG_PROTO_FLAG, 1);
 
     /* Ireg param count in: I1 */
     ins = set_I_const(interp, unit, ins, REG_I_PARAM_COUNT,
@@ -374,7 +372,7 @@ expand_pcc_sub(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
 {
     SymReg *sub;
     int nargs;
-    int proto, ps, pe;
+    int ps, pe;
     Instruction *tmp;
     SymReg *i0, *regs[IMCC_MAX_REGS], *label1, *label2;
     char buf[128];
@@ -384,60 +382,14 @@ expand_pcc_sub(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
     /* Don't generate any parameter checking code if there
      * are no named arguments.
      */
-    if(sub->pcc_sub->nargs <= 0)
-        goto NONAMEDPARAMS;
+    if (sub->pcc_sub->nargs) {
+        i0 = NULL;
+        label1 = label2 = NULL;
 
-    i0 = NULL;
-    label1 = label2 = NULL;
-    ps = pe = sub->pcc_sub->pragma & P_PROTOTYPED;
-    if (!pe && (sub->pcc_sub->pragma & P_NONE)) {
-        int i, all_pmc;
-
-        /* subroutine can handle both */
-        ps = 0; pe = 1;
-        /* check if PMC only */
-        for (all_pmc = 1, i = 0; i < sub->pcc_sub->nargs; ++i)
-            if (sub->pcc_sub->args[i]->set != 'P') {
-                all_pmc = 0;
-                break;
-            }
-        if (all_pmc) {
-            ps = pe = 1;
-        }
-        else {
-            /* and subroutine has mixed args */
-            i0 = get_pasm_reg(interp, "I0");
-            regs[0] = i0;
-            sprintf(buf, "%csub_%s_p1", IMCC_INTERNAL_CHAR, sub->name);
-            regs[1] = label1 =
-                mk_address(interp, str_dup(buf), U_add_uniq_label);
-            ins = insINS(interp, unit, ins, "if", regs, 2);
-        }
-    }
-    for (proto = ps; proto <= pe; ++proto) {
         nargs = sub->pcc_sub->nargs;
         ins = pcc_get_args(interp, unit, ins, sub->pcc_sub, nargs,
-                proto, sub->pcc_sub->args);
-        if (ps != pe) {
-            if (!proto) {
-                /* branch to the end */
-                sprintf(buf, "%csub_%s_p0", IMCC_INTERNAL_CHAR, sub->name);
-                regs[0] = label2 =
-                    mk_address(interp, str_dup(buf), U_add_uniq_label);
-                ins = insINS(interp, unit, ins, "branch", regs, 1);
-                tmp = INS_LABEL(unit, label1, 0);
-                insert_ins(unit, ins, tmp);
-                ins = tmp;
-            }
-            else {
-                tmp = INS_LABEL(unit, label2, 0);
-                insert_ins(unit, ins, tmp);
-                ins = tmp;
-            }
-        }
-    } /* proto */
-
-NONAMEDPARAMS: /* If no named params, don't generate any param code */
+                           1, sub->pcc_sub->args);
+    }
 
     /*
      * if this sub references self, fetch it
@@ -450,10 +402,10 @@ NONAMEDPARAMS: /* If no named params, don't generate any param code */
         regs[1] = get_const(interp, buf, 'I');
         ins = insINS(interp, unit, ins, "interpinfo", regs, 2);
     }
+
     /*
      * check if there is a return
      */
-
     if (unit->last_ins->type != (ITPCCSUB|ITLABEL) &&
             strcmp(unit->last_ins->op, "ret") &&
             strcmp(unit->last_ins->op, "exit") &&
@@ -474,6 +426,7 @@ NONAMEDPARAMS: /* If no named params, don't generate any param code */
         IMCC_debug(interp, DEBUG_IMC, "add sub ret - %I\n", tmp);
         insert_ins(unit, unit->last_ins, tmp);
     }
+
     /*
      * a coroutine (generator) needs a small hook that gets called
      * from the shift_pmc() vtable
@@ -505,15 +458,12 @@ expand_pcc_sub_ret(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
     int  n, is_yield;
 
     is_yield = ins->type & ITPCCYIELD;
-    /* FIXME
-     * fake prototyped
-     * TODO implement return conventions
-     */
+
+    /* TODO implement return conventions */
     sub = ins->r[0];
-    sub->pcc_sub->pragma = P_PROTOTYPED;
     n = sub->pcc_sub->nret;
     ins = pcc_put_args(interp, unit, ins, sub->pcc_sub, n,
-                1, sub->pcc_sub->ret);
+                       1, sub->pcc_sub->ret);
 
     /*
      * we have a pcc_begin_yield
@@ -621,8 +571,6 @@ check_tail_call(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
 ok:
 
     call = ins->r[0]->pcc_sub;
-    if (!(call->pragma & P_PROTOTYPED))
-        return 0;
     IMCC_debug(interp, DEBUG_OPT1, "\tcall call retvals %d retvals %d\n",
             call->nret, nrets);
     if (call->nret != nrets)
@@ -754,7 +702,7 @@ pcc_emit_flatten(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins,
     sprintf(buf, "%carg_last_%d_%d", IMCC_INTERNAL_CHAR, lin, i);
     *last = mk_address(interp, str_dup(buf), U_add_uniq_label);
 
-    if (arg->type & VT_FLATTEN) {
+    if (arg->type & VT_FLAT) {
         regs[0] = i0;
         ins = insINS(interp, unit, ins, "null", regs, 1);
         regs[0] = i1;
@@ -792,7 +740,7 @@ pcc_emit_flatten(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins,
     regs[0] = i3;
     ins = insINS(interp, unit, ins, "inc", regs, 1);
 
-    regs[0] = (arg->type & VT_FLATTEN) ? loop : next;
+    regs[0] = (arg->type & VT_FLAT) ? loop : next;
     ins = insINS(interp, unit, ins, "branch", regs, 1);
     tmp = INS_LABEL(unit, over1, 0);
     insert_ins(unit, ins, tmp);
@@ -809,7 +757,7 @@ pcc_emit_flatten(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins,
     ins = insINS(interp, unit, ins, "push", regs, 2);
     regs[0] = i3;
     ins = insINS(interp, unit, ins, "inc", regs, 1);
-    regs[0] = (arg->type & VT_FLATTEN) ? loop : next;
+    regs[0] = (arg->type & VT_FLAT) ? loop : next;
     ins = insINS(interp, unit, ins, "branch", regs, 1);
     tmp = INS_LABEL(unit, next, 0);
     insert_ins(unit, ins, tmp);
@@ -857,7 +805,6 @@ expand_pcc_sub_call(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
     int  n;
     int need_cc;
     int tail_call;
-    int proto;
     int meth_call = 0;
     SymReg *s0 = NULL;
     Instruction *get_name;
@@ -915,9 +862,8 @@ expand_pcc_sub_call(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
      * insert arguments
      */
     n = sub->pcc_sub->nargs;
-    proto = sub->pcc_sub->pragma & P_PROTOTYPED;
     ins = pcc_put_args(interp, unit, ins, sub->pcc_sub, n,
-                proto, sub->pcc_sub->args);
+                       1, sub->pcc_sub->args);
     /*
      * insert get_name after args have been setup, so that
      * a possible MMD call can inspect the passed arguments
@@ -1061,9 +1007,8 @@ move_sub:
      * handle return results
      */
     n = sub->pcc_sub->nret;
-    proto = 1;  /* XXX how to specify return proto or not */
     ins = pcc_get_args(interp, unit, ins, sub->pcc_sub, n,
-                proto, sub->pcc_sub->ret);
+                       1, sub->pcc_sub->ret);
 }
 
 

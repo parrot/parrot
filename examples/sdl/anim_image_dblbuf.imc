@@ -120,7 +120,7 @@ To run this file, run the following command from the Parrot root directory:
 	end
 .end
 
-.sub _animate_on_x_axis prototyped
+.sub _animate_on_x_axis
 	.param pmc screen
 	.param pmc sprite
 	.param int start_pos

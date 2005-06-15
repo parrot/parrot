@@ -94,7 +94,7 @@ Returns pmc B<regex>, string B<error> and int B<errptr>.
 
 =cut
 
-.sub compile prototyped
+.sub compile
     .param string pattern
     .param int options
     .local pmc pcre_function
@@ -120,7 +120,7 @@ in pmc B<result>.
 
 =cut
 
-.sub match prototyped
+.sub match
     .param pmc regex
     .param string str
     .param int start
@@ -145,7 +145,7 @@ Returns the match.
 
 =cut
 
-.sub dollar prototyped
+.sub dollar
     .param string str
     .param int ok
     .param pmc res

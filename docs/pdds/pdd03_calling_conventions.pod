@@ -117,6 +117,26 @@ C<set_args> and C<set_returns>:
                slurpy flag on the corresponding parameter, then
                the content of this aggregate is flattened.
 
+    0b000000000
+            INVOCANT
+            INVOCANT2
+
+    0b000000000
+            OPTIONAL
+
+    0b000000001
+            NAMED
+
+    0b000000001
+            LEXICAL
+
+    0b000000000
+            COPY
+
+    0b000000000
+            WRITABLE
+
+
 
 =head2 Accepting Parameters, Accepting Return Values
 

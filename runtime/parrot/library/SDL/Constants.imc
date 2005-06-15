@@ -40,7 +40,7 @@ For example, C<8> corresponds to C<backspace>.
 
 =cut
 
-.sub _load_key_names prototyped
+.sub _load_key_names
 	.local pmc key_names
 
 	key_names = new SArray

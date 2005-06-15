@@ -189,8 +189,6 @@ SP              [ ]
 
 ".sym"          return(LOCAL);
 ".arg"          return(ARG);
-".flatten"      return(FLATTEN);
-".flatten_arg"  return(FLATTEN_ARG);
 ".sub"          return(SUB);
 ".end"          return(ESUB);
 ".pcc_begin"    return(PCC_BEGIN);
@@ -204,8 +202,7 @@ SP              [ ]
 ".pcc_end_return"      return(PCC_END_RETURN);
 ".pcc_begin_yield"    return(PCC_BEGIN_YIELD);
 ".pcc_end_yield"      return(PCC_END_YIELD);
-"prototyped"    return(PROTOTYPED);
-"non_prototyped"    return(NON_PROTOTYPED);
+
 "method"        return(METHOD);
 <emit,INITIAL>"@MULTI"   return(MULTI);
 <emit,INITIAL>"@MAIN"    return(MAIN);
@@ -215,8 +212,13 @@ SP              [ ]
 <emit,INITIAL>"@ANON"    return(ANON);
 
 ".result"       return(RESULT);
-".yield"       return(YIELDT);
+".yield"        return(YIELDT);
 ".return"       return(RETURN);
+
+":flat"         return(ADV_FLAT);
+":slurpy"       return(ADV_SLURPY);
+":optional"     return(ADV_OPTIONAL);
+
 ".class"        return(CLASS);
 ".endclass"     return(ENDCLASS);
 <emit,INITIAL>".namespace"    return(NAMESPACE);

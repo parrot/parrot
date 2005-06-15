@@ -48,11 +48,17 @@ typedef struct Parrot_sub {
     struct PackFile_ByteCode *seg;      /* bytecode segment */
     opcode_t *address;          /* start of bytecode, addr to continue */
     opcode_t *end;              /* end of bytecode */
+
+    INTVAL   HLL_id;            /* see src/hll.c XXX or per segment? */
+    PMC      *name_space;       /* where this Sub is in */
     STRING   *name;             /* name of the sub */
-    PMC *name_space;            /* where this Sub is in */
-    INTVAL HLL_id;              /* see src/hll.c XXX or per segment? */
-    PMC *multi_signature;       /* list of types for MMD */
+    PMC      *multi_signature;  /* list of types for MMD */
+
+    PMC      *lexicals;         /* OrderedHash of Lexicals */
+    PMC      *enclosing_sub;    /* enclosing subroutine, to find lexicals */
+
     /* - end common */
+
     struct Stack_Chunk *pad_stack;      /* only for closure */
 } * parrot_sub_t;
 
@@ -62,18 +68,24 @@ typedef struct Parrot_sub {
  * these two to the other type
  */
 typedef struct Parrot_coro {
-    struct PackFile_ByteCode *seg;
+    struct PackFile_ByteCode *seg;      /* bytecode segment */
     opcode_t *address;          /* start of bytecode, addr to continue */
-    opcode_t *end;
-    STRING   *name;
-    PMC *name_space;         /* where this Sub is in */
-    INTVAL HLL_id;              /* see src/hll.c XXX or per segment? */
-    PMC *multi_signature;       /* list of types for MMD */
+    opcode_t *end;              /* end of bytecode */
+
+    INTVAL   HLL_id;            /* see src/hll.c XXX or per segment? */
+    PMC      *name_space;       /* where this Sub is in */
+    STRING   *name;             /* name of the sub */
+    PMC      *multi_signature;  /* list of types for MMD */
+
+    PMC      *lexicals;         /* OrderedHash of Lexicals */
+    PMC      *enclosing_sub;    /* enclosing subroutine, to find lexicals */
+
     /* - end common */
+
     struct Parrot_Context ctx;          /* XXX 2 continuations */
     struct Stack_Chunk *co_control_base;
     struct Stack_Chunk *co_control_stack;  /* control stack top of the cor.*/
-    struct PackFile_ByteCode *caller_seg;      /* bytecode segment */
+    struct PackFile_ByteCode *caller_seg;  /* bytecode segment */
 } * parrot_coro_t;
 
 #define PMC_coro(pmc) LVALUE_CAST(parrot_coro_t, PMC_struct_val(pmc))

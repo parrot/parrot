@@ -7,17 +7,7 @@ PIR - calling conventions
 
 =head1 VERSION
 
-=over 4
-
-=item 0.1 initial proposal
-
-=item 0.2 initial, checked in
-
-=item 0.3 updated parrot calling conventions and invoke
-
-=item 0.4 methods and shortcuts documented
-
-=back
+0.5
 
 =head1 OVERVIEW
 
@@ -36,10 +26,13 @@ subroutines.
   newsub $P0, .Sub, _sub_label
   newsub $P1, .Continuation, ret_addr
   ...
-  .pcc_begin prototyped|non_prototyped
-  .arg x	# I5
-  .arg y	# I6
-  .arg z	# I7
+  .local int x
+  .local num y
+  .local str z
+  .pcc_begin
+  .arg x
+  .arg y
+  .arg z
   .pcc_call $P0, $P1	# r = _sub_label(x, y, z)
   ret_addr:
   .local int r  # optional - new result var
@@ -99,10 +92,6 @@ following meaning:
 
 =over 4
 
-=item * B<prototyped>, B<non_prototyped>
-
-Specify calling convention
-
 =item * @MAIN
 
 Define "main" entry point to start execution. If multiple subroutines
@@ -132,11 +121,6 @@ Declare subroutine being a method.
 Notes:
 
 =over 4
-
-=item * B<prototyped>, B<non_prototyped>
-
-If a subroutine definition has no prototyped specifier, code gets
-emitted to receive parameters by both flavors.
 
 =item * B<newsub>
 
@@ -170,13 +154,6 @@ Parrot provides an B<invoke P1> as last instruction automatically.
 
 =back
 
-=head2 Getting the Parameter Count
-
-The reserved words C<argcI>, C<argcS>, C<argcP>, and C<argcN> hold the
-count of passed parameters (or return values) according to
-F<docs/pdds/pdd03_calling_conventions.pod>. The variable
-C<is_prototyped> is an alias for C<I0>.
-
 =head2 Calling Methods
 
 The syntax is very similar to subroutine calls. The call is done with
@@ -187,10 +164,10 @@ C<meth_call> which must immediately be preceded by the C<.invocant>:
    newclass class, "Foo"
    find_type $I0, "Foo"
    new obj, $I0
-  .pcc_begin prototyped|non_prototyped
-  .arg x	# I5
-  .arg y	# I6
-  .arg z	# I7
+  .pcc_begin
+  .arg x
+  .arg y
+  .arg z
   .invocant obj
   .meth_call "_method" [, $P1 ]	# r = obj."_method"(x, y, z)
   .local int r  # optional - new result var
@@ -237,10 +214,10 @@ Proposed syntax:
   load_lib $P0, "libname"
   dlfunc $P1, $P0, "funcname", "signature"
   ...
-  .pcc_begin prototyped
-  .arg x	# I5
-  .arg y	# I6
-  .arg z	# I7
+  .pcc_begin
+  .arg x
+  .arg y
+  .arg z
   .nci_call $P1	# r = funcname(x, y, z)
   .local int r  # optional - new result var
   .result r
@@ -342,7 +319,22 @@ F<imcc/t/syn/objects.t>, F<docs/pdds/pdd03_calling_conventions.pod>
 
 Leopold Toetsch <lt@toetsch.at>
 
+=head1 CHANGES
+
+=over 4
+
+=item 0.5 eliminate {non_,}prototyped distinction
+
+=item 0.4 methods and shortcuts documented
+
+=item 0.3 updated parrot calling conventions and invoke
+
+=item 0.2 initial, checked in
+
+=item 0.1 initial proposal
+
+=back
+
 =cut
 
 # vim: expandtab shiftwidth=4 tw=70:
-

@@ -51,7 +51,7 @@ FIN:
         end
 .end
 
-.sub adder prototyped
+.sub adder
         .param pmc a0
 	.param pmc a1
 	.param pmc a2

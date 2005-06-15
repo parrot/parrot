@@ -96,7 +96,7 @@ ok 1
 OUT
 
 pir_output_is(<<'CODE', <<'OUT', "perlish func label - .pcc_sub");
-.pcc_sub _main::test prototyped
+.pcc_sub _main::test
 	print "ok 1\n"
 	end
 .end

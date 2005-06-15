@@ -710,7 +710,6 @@ exp_Function(Interp* interpreter, nodeType *p)
 
     ins->r[1] = mk_pcc_sub(interpreter, str_dup(ins->r[0]->name), 0);
     add_namespace(interpreter, cur_unit);
-    ins->r[1]->pcc_sub->pragma = P_PROTOTYPED ;
 
     regs[0] = get_const(interpreter, "-1", 'I');
     insINS(interpreter, cur_unit, ins, "new_pad", regs, 1);
@@ -871,7 +870,6 @@ exp_PCC_Sub(Interp* interpreter, nodeType *p)
 
     ins->r[1] = mk_pcc_sub(interpreter, str_dup(ins->r[0]->name), 0);
     add_namespace(interpreter, cur_unit);
-    ins->r[1]->pcc_sub->pragma = P_PROTOTYPED ;
     regs[0] = get_const(interpreter, "0", 'I');
     insINS(interpreter, cur_unit, ins, "new_pad", regs, 1);
     /*
@@ -906,7 +904,7 @@ exp_Py_Module(Interp* interpreter, nodeType *p)
 
     ins->r[1] = mk_pcc_sub(interpreter, str_dup(ins->r[0]->name), 0);
     add_namespace(interpreter, cur_unit);
-    ins->r[1]->pcc_sub->pragma = P_MAIN|P_PROTOTYPED ;
+    ins->r[1]->pcc_sub->pragma = P_MAIN;
     regs[0] = get_const(interpreter, "0", 'I');
     insINS(interpreter, cur_unit, ins, "new_pad", regs, 1);
     /*

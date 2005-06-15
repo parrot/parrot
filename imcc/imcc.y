@@ -281,18 +281,16 @@ mk_sub_address_fromc(Interp *interp, char * name)
 void
 IMCC_itcall_sub(Interp* interp, SymReg* sub)
 {
-   current_call->r[0]->pcc_sub->sub = sub;
-   if (cur_obj) {
-       if (cur_obj->set != 'P')
-        IMCC_fataly(interp, E_SyntaxError, "object isn't a PMC");
-       current_call->r[0]->pcc_sub->object = cur_obj;
-       cur_obj = NULL;
-   }
-   /* FIXME use the default settings from .pragma */
-   current_call->r[0]->pcc_sub->pragma = P_PROTOTYPED;
-   if (current_call->r[0]->pcc_sub->sub->pmc_type == enum_class_NCI)
-       current_call->r[0]->pcc_sub->flags |= isNCI;
-   if (cur_unit->type == IMC_PCCSUB)
+    current_call->r[0]->pcc_sub->sub = sub;
+    if (cur_obj) {
+        if (cur_obj->set != 'P')
+            IMCC_fataly(interp, E_SyntaxError, "object isn't a PMC");
+        current_call->r[0]->pcc_sub->object = cur_obj;
+        cur_obj = NULL;
+    }
+    if (current_call->r[0]->pcc_sub->sub->pmc_type == enum_class_NCI)
+        current_call->r[0]->pcc_sub->flags |= isNCI;
+    if (cur_unit->type == IMC_PCCSUB)
         cur_unit->instructions->r[1]->pcc_sub->calls_a_sub |= 1;
 }
 
@@ -335,7 +333,8 @@ begin_return_or_yield(Interp *interp, int yield)
 %nonassoc <t> PARAM
 
 %token <t> PRAGMA FASTCALL N_OPERATORS HLL
-%token <t> CALL GOTO ARG FLATTEN_ARG FLATTEN IF UNLESS END SAVEALL RESTOREALL
+%token <t> CALL GOTO ARG IF UNLESS END SAVEALL RESTOREALL
+%token <t> ADV_FLAT ADV_SLURPY ADV_OPTIONAL
 %token <t> NEW NEWSUB NEWCLOSURE NEWCOR NEWCONT
 %token <t> NAMESPACE ENDNAMESPACE CLASS ENDCLASS FIELD DOT_METHOD
 %token <t> SUB SYM LOCAL CONST
@@ -349,7 +348,7 @@ begin_return_or_yield(Interp *interp, int yield)
 %token <t> COMMA ESUB DOTDOT
 %token <t> PCC_BEGIN PCC_END PCC_CALL PCC_SUB PCC_BEGIN_RETURN PCC_END_RETURN
 %token <t> PCC_BEGIN_YIELD PCC_END_YIELD NCI_CALL METH_CALL INVOCANT
-%token <t> PROTOTYPED NON_PROTOTYPED MAIN LOAD IMMEDIATE POSTCOMP METHOD ANON
+%token <t> MAIN LOAD IMMEDIATE POSTCOMP METHOD ANON
 %token <t> MULTI
 %token <s> LABEL
 %token <t> EMIT EOM
@@ -366,8 +365,9 @@ begin_return_or_yield(Interp *interp, int yield)
 %type <i> pcc_sub_call
 %type <sr> sub_param sub_params pcc_arg pcc_result pcc_args pcc_results
 %type <sr> pcc_returns pcc_return pcc_call arg the_sub multi_type
+%type <t> argtype_list argtype paramtype_list paramtype
 %type <t> pcc_return_many
-%type <t> pcc_proto pcc_sub_proto proto sub_proto multi multi_types
+%type <t> pcc_sub_proto proto sub_proto multi multi_types
 %type <i> instruction assignment if_statement labeled_inst opt_label op_assign
 %type <i> func_assign
 %type <i> opt_invocant
@@ -625,11 +625,11 @@ sub_param:
    ;
 
 sub_proto:
-     /* empty */    {  $$ = P_NONE; }
-   | sub_proto COMMA proto  { $$ |= $3; }
-   | sub_proto COMMA multi { $$ = $1; }
-   | proto          { $$ |= $1; }
-   | multi          { $$ = P_NONE; }
+     /* empty */              { $$ = 0;  }
+   | sub_proto COMMA proto    { $$ = $1 | $3; }
+   | sub_proto COMMA multi    { $$ = $1 | $3; }
+   | proto                    { $$ = $1; }
+   | multi                    { $$ = $1; }
    ;
 
 multi: MULTI '(' multi_types ')'  { $$ = 0; }
@@ -678,7 +678,7 @@ pcc_sub:
    ;
 
 pcc_sub_call:
-     PCC_BEGIN pcc_proto '\n'
+     PCC_BEGIN '\n'
          {
             char name[128];
             SymReg * r, *r1;
@@ -686,7 +686,6 @@ pcc_sub_call:
 
             sprintf(name, "%cpcc_sub_call_%d", IMCC_INTERNAL_CHAR, cnr++);
             $<sr>$ = r = mk_pcc_sub(interp, str_dup(name), 0);
-            r->pcc_sub->pragma = $2;
             /* this mid rule action has the semantic value of the
              * sub SymReg.
              * This is used below to append args & results
@@ -719,24 +718,20 @@ opt_invocant:
    | INVOCANT var '\n'
                    { $$ = NULL;  current_call->r[0]->pcc_sub->object = $2; }
    ;
-pcc_proto:
-     PROTOTYPED     {  $$ = P_PROTOTYPED ; }
-   | NON_PROTOTYPED {  $$ = P_NON_PROTOTYPED ; }
-   ;
 
 pcc_sub_proto:
-     /* empty */    {  $$ = P_NONE; }
-   | pcc_sub_proto COMMA proto  { $$ |= $3; }
-   | proto          { $$ |= $1; }
+     /* empty */                { $$ = 0; }
+   | proto                      { $$ = $1; }
+   | pcc_sub_proto COMMA proto  { $$ = $1 | $3; }
    ;
 
-proto: pcc_proto
-   | LOAD           {  $$ = P_LOAD; }
+proto:
+     LOAD           {  $$ = P_LOAD; }
    | MAIN           {  $$ = P_MAIN; }
    | IMMEDIATE      {  $$ = P_IMMEDIATE; }
    | POSTCOMP       {  $$ = P_POSTCOMP; }
    | ANON           {  $$ = P_ANON; }
-   | METHOD         {  $$ = P_METHOD | P_NONE ; }
+   | METHOD         {  $$ = P_METHOD; }
    ;
 
 pcc_call:
@@ -766,18 +761,16 @@ pcc_call:
          }
    ;
 
+
 pcc_args:
      /* empty */                       {  $$ = 0; }
-   | pcc_args pcc_arg '\n'             {  add_pcc_arg(current_call->r[0], $2);}
+   | pcc_args pcc_arg '\n'             {  add_pcc_arg(current_call->r[0], $2); }
    ;
 
 pcc_arg:
-     ARG var                           {  $$ = $2; }
-   | FLATTEN target                    { $2->type |= VT_FLATTEN; $$ = $2; }
-   /* .flatten is preferred, for symmetry with pcc_return, but .flatten_arg is
-      accepted for backwards compatibility. */
-   | FLATTEN_ARG target                {  $2->type |= VT_FLATTEN; $$ = $2; }
+     ARG arg                           {  $$ = $2; }
    ;
+
 
 pcc_results:
      /* empty */                       {  $$ = 0; }
@@ -785,11 +778,21 @@ pcc_results:
    ;
 
 pcc_result:
-     RESULT target
-         {  $$ = $2; }
-   | LOCAL { is_def=1; } type IDENTIFIER
-         {  mk_ident(interp, $4, $3); is_def=0; $$=0; }
+     RESULT target paramtype_list      {  $$ = $2; $$->type |= $3; }
+   | LOCAL { is_def=1; }
+             type IDENTIFIER           {  mk_ident(interp, $4, $3); is_def=0; $$=0; }
    ;
+
+paramtype_list:
+     /* empty */                       {  $$ = 0; }
+   | paramtype_list paramtype        {  $$ = $1 | $2; }
+   ;
+
+paramtype:
+     ADV_SLURPY                        {  $$ = VT_FLAT;   }
+   | ADV_OPTIONAL                      {  $$ = VT_OPTIONAL; }
+   ;
+
 
 begin_ret_or_yield:
      PCC_BEGIN_RETURN { $$ = 0; }
@@ -821,8 +824,7 @@ pcc_returns:
    ;
 
 pcc_return:
-     RETURN var    {  $$ = $2; }
-   | FLATTEN target                {  $2->type |= VT_FLATTEN; $$ = $2; }
+     RETURN var argtype_list   {  $$ = $2; $$->type |= $3; }
    ;
 
 pcc_return_many:
@@ -939,7 +941,7 @@ labeled_inst:
                                 1, mk_ident(interp, $4, $3));is_def=0; }
    | PARAM reg                        { $$ = MK_I(interp, cur_unit, "restore", 1, $2); }
    | RESULT var                       { $$ = MK_I(interp, cur_unit, "restore", 1, $2); }
-   | ARG var                          { $$ = MK_I(interp, cur_unit, "save", 1, $2); }
+   | ARG arg                          { $$ = MK_I(interp, cur_unit, "save", 1, $2); }
    | RETURN var                       { $$ = MK_I(interp, cur_unit, "save", 1, $2); }
    | RETURN  sub_call   { $$ = NULL;
                            current_call->r[0]->pcc_sub->flags |= isTAIL_CALL;
@@ -1148,13 +1150,16 @@ arglist:
    ;
 
 arg:
-     var
-                   { $$ = $1; }
-   | FLATTEN target                    { $2->type |= VT_FLATTEN; $$ = $2; }
-   /* .flatten is preferred, for symmetry with pcc_return, but .flatten_arg is
-      accepted for backwards compatibility. */
-   | FLATTEN_ARG target
-                   { $2->type |= VT_FLATTEN; $$ = $2; }
+     var argtype_list        {  $$ = $1; $$->type |= $2; }
+   ;
+
+argtype_list:
+     /* empty */             {  $$ = 0; }
+   | argtype_list argtype    {  $$ = $1 | $2; }
+   ;
+
+argtype:
+     ADV_FLAT                {  $$ = VT_FLAT; }
    ;
 
 targetlist:

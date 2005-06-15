@@ -17,7 +17,8 @@ enum VARTYPE {		/* variable type can be */
     VTPASM	= 1 << 5,	/* parrot register, colored from .emit */
     VT_CONSTP	= 1 << 6,	/* pointer to constant value */
     VT_PCC_SUB  = 1 << 7,	/* PCC subroutine call */
-    VT_FLATTEN  = 1 << 8,	/* .flatten_arg IDENT | VTIDENT ... */
+    VT_FLAT     = 1 << 8,	/* var :flat */
+    VT_OPTIONAL = 1 << 9,	/* var :optional */
     /* include/parrot/packfile.h */
     VT_START_SLICE = PF_VT_START_SLICE ,   /* x .. y slice range */
     VT_END_SLICE   = PF_VT_END_SLICE   ,
@@ -131,9 +132,9 @@ void add_pcc_multi(SymReg *r, SymReg * arg);
 void add_namespace(Parrot_Interp interpreter, struct _IMC_Unit *);
 
 typedef enum {
-	P_NON_PROTOTYPED = 0x00,	/* must be 0 */
-	P_PROTOTYPED     = 0x01,	/* must be 1 */
-	P_NONE           = 0x02,
+	//P_NON_PROTOTYPED = 0x00,	/* must be 0 */
+	//P_PROTOTYPED     = 0x01,	/* must be 1 */
+	//P_NONE           = 0x02,
 	P_METHOD         = 0x04,
 
 	P_ANON           = SUB_FLAG_PF_ANON,  /* 0x8 - private3 */

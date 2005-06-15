@@ -222,7 +222,7 @@ no_v2:
     find_global entry, entry_label
     newsub retc, .RetContinuation, retl
 
-    .pcc_begin prototyped
+    .pcc_begin
     .arg n
     .pcc_call entry, retc
     retl:

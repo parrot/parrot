@@ -275,7 +275,7 @@ OUTPUT
 
 ## stuff them in, and check periodically that we can pull selected ones out.
 pir_output_is(<<'CODE', <<OUTPUT, "stress test: lots of keys");
-.sub set_multiple_keys prototyped
+.sub set_multiple_keys
 	.param pmc hash
         .param int key_index
         .param int step
@@ -293,7 +293,7 @@ again:
 ret:
 .end
 
-.sub print_multiple_keys prototyped
+.sub print_multiple_keys
 	.param pmc hash
         .param int key_index
         .param int step
@@ -320,7 +320,7 @@ print_end:
 ret:
 .end
 
-.sub delete_multiple_keys prototyped
+.sub delete_multiple_keys
 	.param pmc hash
 	.param int key_index
 	.param int step

@@ -13,7 +13,6 @@ $ENV{TEST_PROG_ARGS} = '-Oc';
 pir_output_is(<<'CODE', <<'OUT', "tail call optimization, final position");
 
 .sub _main @MAIN
-
 	$P1 = new Integer
 	$P1 = 20
 	$P2 = new Integer
@@ -40,10 +39,9 @@ pir_output_is(<<'CODE', <<'OUT', "tail call optimization, final position");
 	print ".\n"
 .end
 
-.sub _funcall non_prototyped
+.sub _funcall
 	.param pmc function
-	.local pmc argv
-	argv = foldup 1
+	.param pmc argv :slurp
 
 	print "[doing _funcall]\n"
 	$I33 = defined function
@@ -52,12 +50,8 @@ bad_func:
 	printerr "_funcall:  Bad function.\n"
 	die
 doit:
-	.pcc_begin prototyped
-	.flatten_arg argv
-	.pcc_call function
-	.pcc_end
-	.pcc_begin_return
-	.pcc_end_return
+	function(argv :flatten)
+	.pcc_tail_return
 .end
 
 ## Return quotient and remainder as two integers.
@@ -101,7 +95,6 @@ OUT
 pir_output_is(<<'CODE', <<'OUT', "tail call optimization, intermediate position");
 
 .sub _main @MAIN
-
 	$P1 = new Integer
 	$P1 = 20
 	$P2 = new Integer
@@ -128,21 +121,16 @@ pir_output_is(<<'CODE', <<'OUT', "tail call optimization, intermediate position"
 	print ".\n"
 .end
 
-.sub _funcall non_prototyped
+.sub _funcall
 	.param pmc function
-	.local pmc argv
-	argv = foldup 1
+	.param pmc argv :slurp
 
 	print "[doing _funcall]\n"
 	$I33 = defined function
 	unless $I33 goto bad_func
 doit:
-	.pcc_begin prototyped
-	.flatten_arg argv
-	.pcc_call function
-	.pcc_end
-	.pcc_begin_return
-	.pcc_end_return
+	function(argv :flatten)
+	.pcc_tail_return
 bad_func:
 	printerr "_funcall:  Bad function.\n"
 	die
@@ -216,10 +204,9 @@ pir_output_is(<<'CODE', <<'OUT', "tail call optimization, implicit final return"
 	print ".\n"
 .end
 
-.sub _funcall non_prototyped
+.sub _funcall
 	.param pmc function
-	.local pmc argv
-	argv = foldup 1
+	.param pmc argv :slurp
 
 	print "[doing _funcall]\n"
 	$I33 = defined function
@@ -228,10 +215,7 @@ bad_func:
 	printerr "_funcall:  Bad function.\n"
 	die
 doit:
-	.pcc_begin prototyped
-	.flatten_arg argv
-	.pcc_call function
-	.pcc_end
+	function(argv :flatten)
 .end
 
 ## Return quotient and remainder as two integers.
@@ -272,7 +256,7 @@ _floor returned 2 values, 6 and 2.
 _fib_step returned 3 values, 23, 20, and 3.
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', ".flatten_arg in return");
+pir_output_is(<<'CODE', <<'OUT', ":flatten in .return");
 
 .sub _main @MAIN
 
@@ -293,25 +277,20 @@ pir_output_is(<<'CODE', <<'OUT', ".flatten_arg in return");
 	print ".\n"
 .end
 
-.sub _funcall non_prototyped
+.sub _funcall
 	.param pmc function
-	.local pmc argv
-	argv = foldup 1
+	.param pmc argv :slurp
 
 	$I33 = defined function
 	unless $I33 goto bad_func
 doit:
-	.pcc_begin prototyped
-	.flatten_arg argv
-	.pcc_call function
-	.pcc_end
-	$P35 = foldup
+	($P35 :slurp) = function(argv :flatten)
         $I35 = $P35
         print "[got "
         print $I35
         print " results]\n"
 	.pcc_begin_return
-	.flatten $P35
+	.return $P35 :flatten
 	.pcc_end_return
 bad_func:
 	printerr "_funcall:  Bad function.\n"

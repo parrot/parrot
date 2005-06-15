@@ -43,7 +43,7 @@ Call Interface.  The function is defined as:-
 	
 	# Invoke MessageBoxA.
 	.local int retVal
-	.pcc_begin prototyped
+	.pcc_begin
 		.arg phWnd
 		.arg message
 		.arg caption

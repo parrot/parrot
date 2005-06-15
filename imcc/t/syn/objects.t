@@ -194,7 +194,7 @@ pir_output_is(<<'CODE', <<'OUT', "explicit meth call syntax");
     newclass class, "Foo"
     find_type $I0, "Foo"
     new obj, $I0
-    .pcc_begin prototyped
+    .pcc_begin
     .invocant obj
     .meth_call "_meth"
     .pcc_end
@@ -222,7 +222,7 @@ pir_output_is(<<'CODE', <<'OUT', "explicit meth call syntax, meth var");
     new obj, $I0
     meth = "_me"
     meth = meth . "th" 	# test concat to
-    .pcc_begin prototyped
+    .pcc_begin
     .invocant obj
     .meth_call meth
     .pcc_end
@@ -246,7 +246,7 @@ pir_output_is(<<'CODE', <<'OUT', "explicit meth call syntax, args");
     newclass class, "Foo"
     find_type $I0, "Foo"
     new obj, $I0
-    .pcc_begin prototyped
+    .pcc_begin
     .arg "hello"
     .arg "\n"
     .invocant obj
@@ -286,7 +286,7 @@ pir_output_is(<<'CODE', <<'OUT', "explicit meth call syntax, retcont");
     new obj, $I0
     .local pmc retc
     newsub retc, .RetContinuation, label
-    .pcc_begin prototyped
+    .pcc_begin
     .invocant obj
     .meth_call "_meth", retc
 label:

@@ -7,7 +7,7 @@
 .include "library/sdl_types.imc"
 .include "datatypes.pasm"
 
-.pcc_sub _init prototyped
+.pcc_sub _init
 	.include "library/sdl.pasm"
 	_init_SDL_types()
 	.pcc_begin_return
@@ -30,12 +30,12 @@
 	SDL_FillRect   = global "SDL::SDL_FillRect"
 	new_SDL_Rect   = global "new_SDL_Rect"
 
-	.pcc_begin prototyped
+	.pcc_begin
 		.arg 65535
 		.nci_call SDL_Init
 	.pcc_end
 
-	.pcc_begin prototyped
+	.pcc_begin
 		.arg 640
 		.arg 480
 		.arg  0
@@ -64,7 +64,7 @@
 	set blue_rect['x'], 270
 	set blue_rect['y'], 190
 
-	.pcc_begin prototyped
+	.pcc_begin
 		.arg screen
 		.arg blue_rect
 		.arg blue
@@ -74,7 +74,7 @@
 	.pcc_end
 
 	# update full screen (all 0 arguments)
-	.pcc_begin prototyped
+	.pcc_begin
 		.arg screen
 		.arg 0
 		.arg 0
@@ -85,7 +85,7 @@
 
 	sleep 2
 
-	.pcc_begin prototyped
+	.pcc_begin
 		.nci_call SDL_Quit
 	.pcc_end
 

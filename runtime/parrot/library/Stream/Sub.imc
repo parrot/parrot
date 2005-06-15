@@ -94,7 +94,7 @@ END:
     newsub ret, .Continuation, _sub_write_ret
     assign self, ret
 
-    .pcc_begin prototyped
+    .pcc_begin
     .arg str
     .pcc_call _write, ret
 _sub_write_ret:

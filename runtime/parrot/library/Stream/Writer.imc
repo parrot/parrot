@@ -181,7 +181,7 @@ END:
     newsub cont, .Continuation, _CONT
     self."setSource"( cont )
 
-    .pcc_begin prototyped
+    .pcc_begin
     .pcc_call writer
 _CONT:
     .result str

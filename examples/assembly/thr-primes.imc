@@ -59,7 +59,7 @@ From C<perldoc perlthrtut>:
 #  ARENA_DOD_FLAGS = 0    MAX=1000  (~ 168 threads)
 
 
-.sub _main prototyped
+.sub _main
     .param pmc argv
     .const int MAX = 500
     .sym int max
@@ -84,7 +84,7 @@ no_arg:
     $P2 = 2
     .sym pmc Thread_new
     find_method Thread_new, kid, "thread3"
-    .pcc_begin prototyped
+    .pcc_begin
     .arg Check_num
     .arg stream
     .arg $P2
@@ -113,7 +113,7 @@ lp:
     tid = kid
     .sym pmc Thread_join
     find_method Thread_join, kid, "join"
-    .pcc_begin prototyped
+    .pcc_begin
     .arg tid
     .nci_call Thread_join
     .pcc_end
@@ -123,7 +123,7 @@ lp:
 #       19 sub check_num {
 #       20     my ($upstream, $cur_prime) = @_;
 # XXX still no comments inside pcc param block
-.sub _check_num prototyped
+.sub _check_num
    .param pmc sub
    .param pmc upstream
    .param pmc cur_prime
@@ -161,7 +161,7 @@ no_kid1:
     kid = new ParrotThread
     .sym pmc Thread_new
     find_method Thread_new, kid, "thread3"
-    .pcc_begin prototyped
+    .pcc_begin
     .arg sub
     .arg downstream
     .arg Num
@@ -184,7 +184,7 @@ ewhile:
     tid = kid
     .sym pmc Thread_join
     find_method Thread_join, kid, "join"
-    .pcc_begin prototyped
+    .pcc_begin
     .arg tid
     .nci_call Thread_join
     .pcc_end

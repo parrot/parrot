@@ -10,7 +10,7 @@ use Parrot::Test tests => 6;
 
 
 ##############################
-# prototyped calls, invokecc
+# invokecc
 SKIP: {
     skip("PCC changes", 6);
 
@@ -22,7 +22,7 @@ pir_2_pasm_like(<<'CODE', <<'OUT', "in P param");
     noop
     end
 .end
-.sub foo prototyped
+.sub foo
     .param Undef a
     print a
 .end
@@ -57,7 +57,7 @@ pir_2_pasm_like(<<'CODE', <<'OUT', "in, out P param");
     x = new Undef
     x = 42
     newsub sub, .Sub, _sub
-    .pcc_begin prototyped
+    .pcc_begin
     .arg x
     .pcc_call sub
     ret:
@@ -66,7 +66,7 @@ pir_2_pasm_like(<<'CODE', <<'OUT', "in, out P param");
     print x
     end
 .end
-.pcc_sub _sub prototyped
+.pcc_sub _sub
     .param Undef a
     a = a + 1
     .pcc_begin_return
@@ -109,7 +109,7 @@ pir_2_pasm_like(<<'CODE', <<'OUT', "in, out P param, P var");
     y = new Undef
     y = 10
     newsub sub, .Sub, _sub
-    .pcc_begin prototyped
+    .pcc_begin
     .arg x
     .pcc_call sub
     ret:
@@ -119,7 +119,7 @@ pir_2_pasm_like(<<'CODE', <<'OUT', "in, out P param, P var");
     print y
     end
 .end
-.pcc_sub _sub prototyped
+.pcc_sub _sub
     .param Undef a
     a = a + 1
     .pcc_begin_return
@@ -162,7 +162,7 @@ pir_2_pasm_like(<<'CODE', <<'OUT', "in, out different P param");
     x = new Undef
     x = 42
     newsub sub, .Sub, _sub
-    .pcc_begin prototyped
+    .pcc_begin
     .arg x
     .pcc_call sub
     ret:
@@ -172,7 +172,7 @@ pir_2_pasm_like(<<'CODE', <<'OUT', "in, out different P param");
     print y
     end
 .end
-.pcc_sub _sub prototyped
+.pcc_sub _sub
     .param Undef a
     a = a + 1
     .pcc_begin_return
@@ -212,7 +212,7 @@ pir_2_pasm_like(<<'CODE', <<'OUT', "in, out different P param, interfer");
     x = new Undef
     x = 42
     newsub sub, .Sub, _sub
-    .pcc_begin prototyped
+    .pcc_begin
     .arg x
     .pcc_call sub
     ret:
@@ -223,7 +223,7 @@ pir_2_pasm_like(<<'CODE', <<'OUT', "in, out different P param, interfer");
     print y
     end
 .end
-.pcc_sub _sub prototyped
+.pcc_sub _sub
     .param Undef a
     a = a + 1
     .pcc_begin_return
@@ -262,16 +262,16 @@ pir_2_pasm_like(<<'CODE', <<'OUT', "tail call");
 .sub _main
     .local Sub sub
     newsub sub, .Sub, _sub1
-    .pcc_begin prototyped
+    .pcc_begin
     .pcc_call sub
     ret:
     .pcc_end
     end
 .end
-.pcc_sub _sub1 prototyped
+.pcc_sub _sub1
     .local Sub sub
     newsub sub, .Sub, _sub2
-    .pcc_begin prototyped
+    .pcc_begin
     .arg P16
     .pcc_call sub
     ret:
@@ -281,7 +281,7 @@ pir_2_pasm_like(<<'CODE', <<'OUT', "tail call");
     .return P16
     .pcc_end_return
 .end
-.pcc_sub _sub2 prototyped
+.pcc_sub _sub2
     .pcc_begin_return
     .pcc_end_return
 .end

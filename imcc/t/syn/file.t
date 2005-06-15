@@ -150,7 +150,7 @@ OUT
 # write sub2
 open FOO, ">temp.imc" or die "Can't write temp.imc\n";
 print FOO <<'ENDF';
-.pcc_sub _sub2 prototyped
+.pcc_sub _sub2
     print "sub2\n"
     end
 .end
@@ -161,12 +161,12 @@ close FOO;
 system("$PARROT -o temp.pbc temp.imc");
 
 pir_output_is(<<'CODE', <<'OUT', "call sub in external pbc");
-.pcc_sub _sub1 prototyped
+.pcc_sub _sub1
     print "sub1\n"
     load_bytecode "temp.pbc"
     print "loaded\n"
     $P0 = global "_sub2"
-    .pcc_begin prototyped
+    .pcc_begin
     .pcc_call $P0
     ret:
     .pcc_end
@@ -181,7 +181,7 @@ OUT
 # write sub2
 open FOO, ">temp.imc" or die "Can't write temp.imc\n";
 print FOO <<'ENDF';
-.pcc_sub _sub2 prototyped
+.pcc_sub _sub2
     print "sub2\n"
    .pcc_begin_return
    .pcc_end_return
@@ -194,12 +194,12 @@ close FOO;
 system("$PARROT -o temp.pbc temp.imc");
 
 pir_output_is(<<'CODE', <<'OUT', "call sub in external pbc, return");
-.pcc_sub _sub1 prototyped
+.pcc_sub _sub1
     print "sub1\n"
     load_bytecode "temp.pbc"
     print "loaded\n"
     $P0 = global "_sub2"
-    .pcc_begin prototyped
+    .pcc_begin
     .pcc_call $P0
     ret:
     .pcc_end
@@ -216,12 +216,12 @@ OUT
 # write sub2
 open FOO, ">temp.imc" or die "Can't write temp.imc\n";
 print FOO <<'ENDF';
-.pcc_sub _not_sub2 prototyped
+.pcc_sub _not_sub2
     print "not sub2\n"
     end
 .end
 
-.pcc_sub _sub2 prototyped
+.pcc_sub _sub2
     print "sub2\n"
     end
 .end
@@ -232,12 +232,12 @@ close FOO;
 system("$PARROT -o temp.pbc temp.imc");
 
 pir_output_is(<<'CODE', <<'OUT', "call sub in external pbc with 2 subs");
-.pcc_sub _sub1 prototyped
+.pcc_sub _sub1
     print "sub1\n"
     load_bytecode "temp.pbc"
     print "loaded\n"
     $P0 = global "_sub2"
-    .pcc_begin prototyped
+    .pcc_begin
     .pcc_call $P0
     ret:
     .pcc_end
@@ -252,7 +252,7 @@ OUT
 # write sub2
 open FOO, ">temp.imc" or die "Can't write temp.imc\n";
 print FOO <<'ENDF';
-.pcc_sub _sub2 prototyped
+.pcc_sub _sub2
     print "sub2\n"
    .pcc_begin_return
    .pcc_end_return
@@ -263,12 +263,12 @@ close FOO;
 # compile it
 
 pir_output_is(<<'CODE', <<'OUT', "call sub in external imc, return");
-.pcc_sub _sub1 prototyped
+.pcc_sub _sub1
     print "sub1\n"
     load_bytecode "temp.imc"
     print "loaded\n"
     $P0 = global "_sub2"
-    .pcc_begin prototyped
+    .pcc_begin
     .pcc_call $P0
     ret:
     .pcc_end
@@ -284,10 +284,10 @@ OUT
 
 
 pir_output_is(<<'CODE', <<'OUT', "call internal sub like external");
-.pcc_sub _sub1 prototyped
+.pcc_sub _sub1
     print "sub1\n"
     $P0 = global "_sub2"
-    .pcc_begin prototyped
+    .pcc_begin
     .pcc_call $P0
     ret:
     .pcc_end
@@ -295,7 +295,7 @@ pir_output_is(<<'CODE', <<'OUT', "call internal sub like external");
     end
 .end
 
-.pcc_sub _sub2 prototyped
+.pcc_sub _sub2
     print "sub2\n"
    .pcc_begin_return
    .pcc_end_return
@@ -310,10 +310,10 @@ OUT
 # write subs
 open FOO, ">temp.imc" or die "Can't write temp.imc\n";
 print FOO <<'ENDF';
-.pcc_sub _sub1 prototyped
+.pcc_sub _sub1
     print "sub1\n"
     $P0 = global "_sub2"
-    .pcc_begin prototyped
+    .pcc_begin
     .pcc_call $P0
     ret:
     .pcc_end
@@ -321,7 +321,7 @@ print FOO <<'ENDF';
     end
 .end
 
-.pcc_sub _sub2 prototyped
+.pcc_sub _sub2
     print "sub2\n"
     .pcc_begin_return
     .pcc_end_return
@@ -398,12 +398,12 @@ SKIP:
   skip("multiple loading not speced - failing", 1);
 
   pir_output_is(<<'CODE', <<'OUT', "twice call sub in external imc, return");
-.pcc_sub _sub1 prototyped
+.pcc_sub _sub1
     print "sub1\n"
     load_bytecode "temp.imc"
     print "loaded\n"
     $P0 = global "_sub2"
-    .pcc_begin prototyped
+    .pcc_begin
     .pcc_call $P0
     ret:
     .pcc_end
@@ -412,7 +412,7 @@ SKIP:
     load_bytecode "temp.imc"
     print "loaded again\n"
     $P0 = global "_sub2"
-    .pcc_begin prototyped
+    .pcc_begin
     .pcc_call $P0
     ret_again:
     .pcc_end

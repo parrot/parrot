@@ -235,25 +235,17 @@ DONE:
   goto INTERPRETED_FUNCTION
 
 COMPILED_FUNCTION:
-  is_prototyped = 1			# Prototyped function call
-  argcP = 1				# One argument coming in
-  P0 = body				# The function being called
-  P5 = args				# First argument
+  set_args "0", args			# First argument
   goto CALL_FUNCTION
 
 INTERPRETED_FUNCTION:
   scope = function._get_scope()
 
-  is_prototyped = 1			# Prototyped call
-  argcP = 3				# Expect 3 PMC arguments
-  argcI = 0				# No integer values
-  argcN = 0				# No float values
-  argcS = 0				# No string values
-  P5 = body				# 1st arg - the code to evaluate
-  P6 = proto				# 2nd arg - the arg prototype
-  P7 = args				# 3rd arg - the args to evaluate
-  P0 = scope				# The closure
-
+  					# 1st arg - the code to evaluate
+  					# 2nd arg - the arg prototype
+  					# 3rd arg - the args to evaluate
+  					# The closure
+  set_args "0,0,0", body, proto, args
   goto CALL_FUNCTION
 
 CALL_FUNCTION:

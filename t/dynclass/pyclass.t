@@ -166,7 +166,7 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "nested subclasses");
     end
 .end
 
-.sub _m non_prototyped
+.sub _m
     find_type $I0, "PyInt"
     new $P0, $I0
     $P0 = 2

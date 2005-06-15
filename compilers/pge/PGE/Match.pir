@@ -79,7 +79,7 @@ Tell a Match object to continue the previous match from where it left off.
     .local pmc yield
 
     yield = getattribute self, "PGE::Match\x0&:yield"
-    .pcc_begin prototyped
+    .pcc_begin
     .pcc_call yield
     .pcc_end
 .end

@@ -304,7 +304,7 @@ pir_output_like(<<'CODE',
      sort_ar()
      sort_ar(1)
 .end
-.sub sort_ar prototyped
+.sub sort_ar
     .local pmc cmp_fun
     .local pmc compares
     compares = global "compares"
@@ -344,7 +344,7 @@ done:
      print "\n"
 .end
 
-.sub cmp_fun prototyped
+.sub cmp_fun
     .param pmc a
     .param pmc b
     $I0 = cmp a, b

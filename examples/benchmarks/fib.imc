@@ -16,7 +16,7 @@ unspecified).
 
 =cut
 
-.sub _main prototyped
+.sub _main
     .param pmc argv
     .sym int argc
     argc = argv
@@ -44,7 +44,7 @@ noarg:
     end
 .end
 
-.sub _fib prototyped
+.sub _fib
     .param int n
     if n < 2 goto ret
     .sym int n1, n2, r1, r2

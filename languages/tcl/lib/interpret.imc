@@ -70,7 +70,7 @@ loop:
 
 loop_done: 
   # Have to use the old style syntax to take advantage of C<.flatten_arg>
-  .pcc_begin prototyped
+  .pcc_begin
     .flatten_arg folded_args
     .pcc_call my_cmd
 requiredlabelusedbyIMCC:

@@ -48,7 +48,7 @@ The subsystem initalizers include:
 
 .namespace [ 'SDL' ]
 
-.sub _sdl_init non_prototyped, @LOAD
+.sub _sdl_init @LOAD
 	_init_video()
 
 	.local pmc layouts
@@ -74,7 +74,7 @@ In fact, don't count on it sticking around.  It may not.  Then again, it might.
 
 =cut
 
-.sub _init_video prototyped
+.sub _init_video
 	.local pmc libsdl
 	.local pmc sdl_function
 
@@ -151,7 +151,7 @@ SDL::Image library anyway, which calls this for you.
 
 =cut
 
-.sub _init_image prototyped
+.sub _init_image
 	.local pmc image_lib
 	.local pmc nci_sub
 
@@ -192,7 +192,7 @@ SDL::Font library anyway, which calls this for you.
 
 =cut
 
-.sub _init_ttf prototyped
+.sub _init_ttf
 	.local pmc ttf_lib
 	.local pmc nci_sub
 
@@ -240,7 +240,7 @@ success:
 	store_global 'SDL::NCI::TTF', 'WasInit', nci_sub
 .end
 
-.sub _set_Event_layout prototyped
+.sub _set_Event_layout
 	.param pmc layouts
 
 	.local pmc layout
@@ -670,7 +670,7 @@ felt when I wrote it!
 
 .namespace [ 'SDL::NCI' ]
 
-.sub fetch_struct prototyped
+.sub fetch_struct
 	.param string struct_name
 	.param int    managed
 
@@ -695,7 +695,7 @@ built_struct:
 	.pcc_end_return
 .end
 
-.sub fetch_layout prototyped
+.sub fetch_layout
 	.param string layout_name
 
 	.local pmc layouts

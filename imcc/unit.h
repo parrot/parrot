@@ -29,6 +29,7 @@ typedef struct _IMC_Unit {
     int n_loops;
     Loop_info ** loop_info;
     Edge * edge_list;
+
     /* register allocation */
     int n_spilled;
     SymReg * p31;
@@ -37,7 +38,10 @@ typedef struct _IMC_Unit {
     int n_symbols;
     struct _IMC_Unit * prev;
     struct _IMC_Unit * next;
-    int local_count;
+
+    /* a comment in ast/node claims this field has a purpose */
+    /* int local_count; */
+
     SymReg *namespace;
     int pasm_file;
     INTVAL HLL_id;

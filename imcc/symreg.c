@@ -121,7 +121,8 @@ symreg_to_str(SymReg * s)
     if (t & VTPASM)       { strcat(buf, "VTPASM ");       }
     if (t & VT_CONSTP)    { strcat(buf, "VT_CONSTP ");    }
     if (t & VT_PCC_SUB)   { strcat(buf, "VT_PCC_SUB ");   }
-    if (t & VT_FLATTEN)   { strcat(buf, "VT_FLATTEN ");   }
+    if (t & VT_FLAT)      { strcat(buf, "VT_FLAT ");      }
+    if (t & VT_OPTIONAL)  { strcat(buf, "VT_OPTIONAL ");  }
     strcat(buf, "]");
     return str_dup(buf);
 }

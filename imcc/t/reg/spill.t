@@ -433,7 +433,7 @@ pir_output_is(<<'CODE', <<'OUT', "bug #32996");
 
 .namespace ["Foo"]
 
-.sub __biginit prototyped, @MAIN
+.sub __biginit @MAIN
 	newclass $P0, "Foo"
 	$I1 = find_type "Foo"
 	$P1 = new $I1
@@ -530,13 +530,13 @@ pir_output_is(<<'CODE', <<'OUT', "bug #32996");
 	end
 .end
 
-.sub method1 prototyped, method
+.sub method1 method
 	print "In method 1\n"
 	.pcc_begin_return
 	.pcc_end_return
 .end
 
-.sub method2 prototyped, method
+.sub method2 method
 	print "In method 2\n"
 	.pcc_begin_return
 	.pcc_end_return
@@ -648,7 +648,7 @@ fail:
     print "failed\n"
     end
 .end
-.pcc_sub _sub prototyped
+.pcc_sub _sub
     =PARAMS=
     =TESTS=
     print "all params ok\n"

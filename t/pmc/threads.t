@@ -211,7 +211,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "join, get retval");
     to = MAX
     .sym pmc Thread_new
     find_method Thread_new, kid, "thread3"
-    .pcc_begin prototyped
+    .pcc_begin
     .arg Adder
     .arg from
     .arg to
@@ -223,7 +223,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "join, get retval");
     tid = kid
     .sym pmc Thread_join
     find_method Thread_join, kid, "join"
-    .pcc_begin prototyped
+    .pcc_begin
     .arg tid
     .nci_call Thread_join
     .sym pmc result
@@ -243,7 +243,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "join, get retval");
     end
 .end
 
-.sub _add prototyped
+.sub _add
    .param pmc sub
    .param pmc from
    .param pmc to

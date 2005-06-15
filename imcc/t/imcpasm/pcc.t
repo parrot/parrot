@@ -23,18 +23,18 @@ OUT
 SKIP: {
     skip("PCC changes", 10);
 
-pir_2_pasm_like(<<'CODE', <<'OUT', "proto call, proto sub, invokecc");
+pir_2_pasm_like(<<'CODE', <<'OUT', "invokecc");
 .sub _main
     .local Sub sub
     newsub sub, .Sub, _sub
-    .pcc_begin prototyped
+    .pcc_begin
     .arg 10
     .pcc_call sub
     ret:
     .pcc_end
     end
 .end
-.pcc_sub _sub prototyped
+.pcc_sub _sub
     .param int a
     print a
     end
@@ -66,7 +66,7 @@ pir_2_pasm_like(<<'CODE', <<'OUT', "basic syntax - constants");
     .local Continuation cc
     newsub sub, .Sub, _sub
     newsub cc, .Continuation, ret
-    .pcc_begin prototyped
+    .pcc_begin
     .arg 10
     .arg 20
     .pcc_call sub, cc
@@ -76,7 +76,7 @@ pir_2_pasm_like(<<'CODE', <<'OUT', "basic syntax - constants");
     .pcc_end
     end
 .end
-.pcc_sub _sub prototyped
+.pcc_sub _sub
     .param int a
     .param int b
     .local int c
@@ -125,7 +125,7 @@ pir_2_pasm_is(<<'CODE', <<'OUT', "basic syntax - sym constants");
     print "ok 1\n"
     .const int x = 10
     .const float y = 20.0
-    .pcc_begin prototyped
+    .pcc_begin
     .arg x
     .arg y
     .pcc_call P0, P1
@@ -164,7 +164,7 @@ pir_2_pasm_like(<<'CODE', <<'OUT', "basic syntax - vars");
     .local int y
     x = 10
     y = 20
-    .pcc_begin prototyped
+    .pcc_begin
     .arg x
     .arg y
     .pcc_call P0, P1
@@ -195,11 +195,11 @@ ret:
   end/
 OUT
 
-pir_2_pasm_like(<<'CODE', <<'OUT', "non prototyped, I,S");
+pir_2_pasm_like(<<'CODE', <<'OUT', "I,S");
 .sub _main
     .local Sub sub
     newsub sub, .Sub, _sub
-    .pcc_begin non_prototyped
+    .pcc_begin
     .arg 10
     .arg $S0
     .pcc_call sub
@@ -231,16 +231,16 @@ ret:
   end/
 OUT
 
-pir_2_pasm_like(<<'CODE', <<'OUT', "non prototyped, P");
+pir_2_pasm_like(<<'CODE', <<'OUT', "P");
 .sub _main
     .local Sub sub
     newsub sub, .Sub, _sub
-    .pcc_begin non_prototyped
+    .pcc_begin
     .arg $P0
     .arg $P1
     .pcc_call sub
     ret:
-    .local Undef k
+    .local pmc k
     .result k
     .pcc_end
     end
@@ -265,18 +265,18 @@ ret:
   end/
 OUT
 
-pir_2_pasm_like(<<'CODE', <<'OUT', "non proto call, non proto sub, invokecc");
+pir_2_pasm_like(<<'CODE', <<'OUT', "invokecc");
 .sub _main
     .local Sub sub
     newsub sub, .Sub, _sub
-    .pcc_begin non_prototyped
+    .pcc_begin
     .arg 10
     .pcc_call sub
     ret:
     .pcc_end
     end
 .end
-.pcc_sub _sub non_prototyped
+.pcc_sub _sub
     .param int a
     print a
     end
@@ -309,11 +309,11 @@ _sub:
   end/
 OUT
 
-pir_2_pasm_like(<<'CODE', <<'OUT', "proto call, un proto sub, invokecc");
+pir_2_pasm_like(<<'CODE', <<'OUT', "invokecc");
 .sub _main
     .local Sub sub
     newsub sub, .Sub, _sub
-    .pcc_begin prototyped
+    .pcc_begin
     .arg 10
     .pcc_call sub
     ret:
@@ -355,11 +355,11 @@ _sub:
   end/
 OUT
 
-pir_2_pasm_like(<<'CODE', <<'OUT', "proto call, un proto sub, invokecc, P param");
+pir_2_pasm_like(<<'CODE', <<'OUT', "invokecc, P param");
 .sub _main
     .local Sub sub
     newsub sub, .Sub, _sub
-    .pcc_begin prototyped
+    .pcc_begin
     .arg $P0
     .pcc_call sub
     ret:
@@ -399,17 +399,17 @@ _sub:
 \2:/
 OUT
 
-pir_2_pasm_like(<<'CODE', <<'OUT', "proto call, sub multiple returns");
+pir_2_pasm_like(<<'CODE', <<'OUT', "sub multiple returns");
 .sub _main
     .local Sub sub
     newsub sub, .Sub, _sub
-    .pcc_begin prototyped
+    .pcc_begin
     .pcc_call sub
     ret:
     .pcc_end
     end
 .end
-.pcc_sub _sub prototyped
+.pcc_sub _sub
     .pcc_begin_return
     .return P16
     .pcc_end_return

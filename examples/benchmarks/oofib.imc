@@ -1,5 +1,5 @@
 
-.pcc_sub _main prototyped
+.pcc_sub _main
     .param pmc argv
     .sym int argc
     argc = argv

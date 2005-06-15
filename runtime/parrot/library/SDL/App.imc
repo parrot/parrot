@@ -59,7 +59,7 @@ The SDL::App object has the following methods:
 
 .namespace [ 'SDL::App' ]
 
-.sub _initialize prototyped, @LOAD 
+.sub _initialize @LOAD 
 
 	.include 'datatypes.pasm'
 	load_bytecode 'library/SDL.imc'
