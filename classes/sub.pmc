@@ -265,6 +265,23 @@ normal_pmc:
         if (slurp_ar)
             --dst_i;
     }
+    /*
+     * check for arg count mismatch
+     */
+    if (src_i != src_n) {
+        real_exception(interpreter, NULL, E_ValueError,
+                "too many arguments passed (%d) - %d params/results expected",
+                src_n, dst_n);
+    }
+    else if (dst_i != dst_n) {
+        dst_sig = VTABLE_get_integer_keyed_int(interpreter,
+                    param_signature, dst_i);
+        if (!(dst_sig & (PARROT_ARG_OPTIONAL|PARROT_ARG_SLURPY_ARRAY))) {
+            real_exception(interpreter, NULL, E_ValueError,
+                    "too few arguments passed (%d) - %d params/results expected",
+                    src_n, dst_n);
+        }
+    }
 
     /* invalidate XXX */
     interpreter->current_args = NULL;

@@ -16,7 +16,7 @@ Tests Parrot calling conventions.
 
 =cut
 
-use Parrot::Test tests => 16;
+use Parrot::Test tests => 19;
 use Test::More;
 
 # Test calling convention operations
@@ -571,3 +571,55 @@ ok 6
 back
 OUTPUT
 
+pir_output_like(<<'CODE', <<'OUTPUT', "argc mismatch, too few");
+.sub main @MAIN
+    $P0 = new String
+    $P0 = "hello\n"
+    find_name $P1, "foo"
+    set_args "(0)", $P0
+    invokecc $P1
+.end
+.sub foo
+    get_params "(0,0)", $P0, $P1
+    print $P0
+.end
+CODE
+/too few arguments passed/
+OUTPUT
+
+pir_output_like(<<'CODE', <<'OUTPUT', "argc mismatch, too many");
+.sub main @MAIN
+    $P0 = new String
+    $P0 = "hello\n"
+    find_name $P1, "foo"
+    set_args "(0,0)", $P0,77
+    invokecc $P1
+.end
+.sub foo
+    get_params "(0)", $P0
+    print $P0
+.end
+CODE
+/too many arguments passed/
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "argc mismatch, optional");
+.sub main @MAIN
+    $P0 = new String
+    $P0 = "hello\n"
+    find_name $P1, "foo"
+    set_args "(0)", $P0
+    invokecc $P1
+.end
+.sub foo
+    get_params "(0,0x20)", $P0, $P1
+    print $P0
+    isnull $P1, ok
+    print "not "
+ok:
+    print "ok\n"
+.end
+CODE
+hello
+ok
+OUTPUT
