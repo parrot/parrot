@@ -209,14 +209,20 @@ parrot_pass_args(Interp *interpreter, struct Parrot_sub * sub,
                 else {
                     p_arg = BP_REG_PMC(caller_regs, i_arg);
                 }
-                if (src_sig & PARROT_ARG_FLATTEN) {
-                    INTVAL i, n;
+                if ((src_sig & PARROT_ARG_FLATTEN) ||
+                        (slurp_ar && (src_sig & PARROT_ARG_MAYBE_FLATTEN))) {
+                    INTVAL i, n, is_array;
                     PMC *elem;
 
-                    /* src ought to be an array */
-                    if (!VTABLE_does(interpreter, p_arg, _array)) {
-                        real_exception(interpreter, NULL, E_ValueError,
-                                "argument doesn't array");
+                    is_array = VTABLE_does(interpreter, p_arg, _array);
+                    if (!is_array) {
+                        if (src_sig & PARROT_ARG_FLATTEN) {
+                            /* src ought to be an array */
+                            real_exception(interpreter, NULL, E_ValueError,
+                                    "argument doesn't array");
+                        }
+                        /* maybe_flatten takes normal PMCs too */
+                        goto normal_pmc;
                     }
                     n = VTABLE_elements(interpreter, p_arg);
                     for (i = 0; i < n && dst_i < dst_n; ++i) {
@@ -238,6 +244,7 @@ parrot_pass_args(Interp *interpreter, struct Parrot_sub * sub,
                         --dst_i;
                 }
                 else {
+normal_pmc:
                     if (slurp_ar) {
                         VTABLE_push_pmc(interpreter, slurp_ar, p_arg);
                     }
