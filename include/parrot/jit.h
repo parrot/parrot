@@ -30,8 +30,8 @@ typedef struct Parrot_jit_fixup {
     int                         type;
     ptrdiff_t                   native_offset;
     char                        skip;
-    char                        dummy[3]; /* For alignment */
-    union {
+    char                        dummy[3]; /* For alignment ??? XXX */
+    union {                               /* What has to align with what? */
         opcode_t                opcode;
         void                    (*fptr)(void);
     } param;
@@ -124,8 +124,8 @@ typedef struct Parrot_jit_optimizer_section {
     char                                 isjit;
     char                                 done;
     char                                 ins_count;
-    char                                 dummy; /* For alignment */
-    int                                  block;
+    char                                 dummy; /* For alignment ??? XXX */
+    int                                  block; /* What has to align with what? */
     Parrot_jit_optimizer_section_ptr     branch_target;
     Parrot_jit_optimizer_section_ptr     prev;
     Parrot_jit_optimizer_section_ptr     next;
@@ -151,8 +151,8 @@ typedef struct {
     char                            *map_branch;
     opcode_t                       **branch_list;
     unsigned char                    has_unpredictable_jump;
-    unsigned char                    dummy[3]; /* For alignment */
-} Parrot_jit_optimizer_t;
+    unsigned char                    dummy[3]; /* For alignment ??? XXX */
+} Parrot_jit_optimizer_t;                      /* What has to align with what? */
 
 /*  Parrot_jit_constant_pool_t
  *      Constants pool information.

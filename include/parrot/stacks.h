@@ -28,13 +28,20 @@ typedef struct Stack_Chunk {
     int size;
     const char * name;
     struct Stack_Chunk *prev;
-#if ! DISABLE_GC_DEBUG
-    void * dummy;   /* force 8 byte align */
+#if ! DISABLE_GC_DEBUG && defined(I386)
+    void * dummy;   /* force 8 byte align for mmx and sse moves */
 #endif
-    void *data;
+    union { /* force appropriate alignment of 'data' */
+	void *data;
+#ifdef I386
+        void * _align_for_mmx;
+#else
+	double d_dummy;         /* align double values on stack */
+#endif
+    } u;
 } Stack_Chunk_t;
 
-#define STACK_DATAP(chunk)    &chunk->data
+#define STACK_DATAP(chunk)    &chunk->u.data
 /* #define STACK_ITEMSIZE(chunk) PObj_buflen(chunk) */
 
 

@@ -58,7 +58,7 @@ register_new_stack(Interp *interpreter, const char *name, size_t item_size)
 {
     Stack_Chunk_t *chunk;
 
-    item_size += offsetof(Stack_Chunk_t, data);
+    item_size += offsetof(Stack_Chunk_t, u.data);
     item_size += 7;
     item_size &= ~7;    /* round up to 8 so that the chunk is aligned at
                            the same size - the aligned MMX memcpy needs it */

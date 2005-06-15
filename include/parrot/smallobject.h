@@ -52,6 +52,7 @@ typedef void  (*alloc_objects_fn_type)(Interp *,
  *
  * XXX this could lead to unaligned FLOATVALs in the adjacent PMC
  *     if that's true either insert a dummy or reorder PMC members
+ *     ??? How is that possible? 
  */
 typedef struct _gc_gms_hdr {
     struct _gc_gms_hdr *prev;
