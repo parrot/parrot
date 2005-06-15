@@ -187,25 +187,48 @@ Directives used for Parrot Calling Conventions.
 
 =back
 
-=head2 Deprecated stack calling convention directive
+=head2 Deprecated directives for subroutine parameters and return
 
 =over 4
 
-=item .param <type> <identifier>
+=item .param <type> <identifier> [:<flag> ...]
 
-Like B<.local> and generates PASM B<restore identifier>.
+At the top of a subroutine, declare a local variable, in the mannter
+of B<.local>, into which parameter(s) of the current subroutine should
+be stored.  Available flags, not yet implemented in the old calling
+convention: C<:slurpy> and C<:optional>.  [XXX Chip - finish this
+update]
 
-=item .param <reg>
+=item .param <reg> [:<flag> ...]
 
-=item .result <var>
+At the top of a subroutine, specify where parameter(s) of the current
+subroutine should be stored.  Available flags, not yet implemented in
+the old calling convention: C<:slurpy> and C<:optional>.  [XXX Chip -
+finish this update]
 
-B<restore> from stack.
+=item .return <var> [:<flag> ...]
 
-=item .arg <var>
+Between B<.pcc_begin_return> and B<.pcc_end_return>, specify one or
+more of the return value(s) of the current subroutine.  Available
+flags: C<:flat>.  [XXX Chip - finish this update]
 
-=item .return <var>
+=back
 
-B<save> on stack.
+=head2 Deprecated directives for making a PCC call
+
+=over 4
+
+=item .arg <var> [:<flag> ...]
+
+Between B<.pcc_begin> and B<.pcc_call>, specify an argument to be
+passed.  Available flags: C<:flat>.  [XXX Chip - finish this update]
+
+=item .result <var> [:<flag> ...]
+
+Between B<.pcc_call> and B<.pcc_end>, specify where one or more return
+value(s) should be stored.  Available flags, not yet implemented in
+the old calling convention: C<:slurpy> and C<:optional>.  [XXX Chip -
+finish this update]
 
 =back
 

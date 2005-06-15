@@ -9,6 +9,19 @@ PIR - calling conventions
 
 0.5
 
+=head1 NOTE ABOUT CHANGES IN PROGRES
+
+The syntax here is going to stay, but the calling convention is in the
+middle of a transition.  Instead of fixed registers, the new
+convention allows the user to use any registers in any order, and
+converts types as required.  Additional syntax features, like the
+":flat" adverb for arguments and ":slurpy" for parameters, will make
+sense to explain here once the document as a whole is updated.
+
+One thing that's handy: If you have a list in a PMC and you want it to
+be flattened out into a list, append ":flat" to the argument name in
+the ".arg" directive or in the shortcut parameter list.
+
 =head1 OVERVIEW
 
 This document describes subroutine and method calling conventions.
