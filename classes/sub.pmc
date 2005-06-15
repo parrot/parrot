@@ -115,12 +115,17 @@ parrot_pass_args(Interp *interpreter, struct Parrot_sub * sub,
         src_sig = VTABLE_get_integer_keyed_int(interpreter,
                 args_signature, src_i);
         if (!slurp_ar) {
+            /* TODO create some means to reuse a user-provided
+             *      result array
+             */
             dst_sig = VTABLE_get_integer_keyed_int(interpreter,
                     param_signature, dst_i);
             dst_typ = dst_sig & PARROT_ARG_TYPE_MASK;
             if (dst_sig & PARROT_ARG_SLURPY_ARRAY) {
                 /* create array */
-                slurp_ar = pmc_new(interpreter, enum_class_ResizablePMCArray);
+                slurp_ar = pmc_new(interpreter,
+                        Parrot_get_ctx_HLL_type(interpreter,
+                            enum_class_ResizablePMCArray));
                 REG_PMC(dst_pc[dst_i]) = slurp_ar;
             }
         }
@@ -236,8 +241,17 @@ parrot_pass_args(Interp *interpreter, struct Parrot_sub * sub,
                     if (slurp_ar) {
                         VTABLE_push_pmc(interpreter, slurp_ar, p_arg);
                     }
-                    else
+                    else if (dst_sig == PARROT_ARG_PMC)
                         REG_PMC(dst_pc[dst_i]) = p_arg;
+                    else if (dst_sig == PARROT_ARG_INTVAL)
+                        REG_INT(dst_pc[dst_i]) =
+                            VTABLE_get_integer(interpreter, p_arg);
+                    else if (dst_sig == PARROT_ARG_FLOATVAL)
+                        REG_NUM(dst_pc[dst_i]) =
+                            VTABLE_get_number(interpreter, p_arg);
+                    else if (dst_sig == PARROT_ARG_STRING)
+                        REG_STR(dst_pc[dst_i]) =
+                            VTABLE_get_string(interpreter, p_arg);
                 }
                 break;
         }

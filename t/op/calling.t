@@ -16,7 +16,7 @@ Tests Parrot calling conventions.
 
 =cut
 
-use Parrot::Test tests => 14;
+use Parrot::Test tests => 15;
 use Test::More;
 
 # Test calling convention operations
@@ -465,7 +465,7 @@ CODE
 hello
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "type conversion");
+pir_output_is(<<'CODE', <<'OUTPUT', "type conversion - autobox");
 .sub main @MAIN
     $P0 = new String
     $P0 = "hello"
@@ -486,4 +486,32 @@ pir_output_is(<<'CODE', <<'OUTPUT', "type conversion");
 .end
 CODE
 hello 42 bar
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "type conversion - fetch");
+.sub main @MAIN
+    $P0 = new .String
+    $P0 = "hello"
+    $P1 = new .Integer
+    $P1 = 42
+    $P2 = new .String
+    $P2 = "again"
+    $P3 = new .Float
+    $P3 = 47.11
+    find_name $P10, "foo"
+    # set_args and invoke must be adjacent
+    set_args "(0,0,0,0)", $P0, $P1, $P2, $P3
+    invokecc $P10
+.end
+.sub foo
+    get_params "(0,0,0,0)", $P0, $I0, $S0, $N0
+    print_item $P0
+    print_item $I0
+    print_item $S0
+    print_item $N0
+    print_newline
+    returncc
+.end
+CODE
+hello 42 again 47.11
 OUTPUT
