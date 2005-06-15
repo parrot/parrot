@@ -1,0 +1,314 @@
+/*
+Copyright: 2005 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+classes/pair.pmc - Pair PMC
+
+=head1 DESCRIPTION
+
+A Pair PMC represents one key => value mapping like a one element hash.
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+
+#define PObj_key_is_string_SET(p) \
+    PObj_get_FLAGS(p) |= PObj_private0_FLAG
+#define PObj_key_is_string_TEST(p) \
+    PObj_get_FLAGS(p) & PObj_private0_FLAG
+
+pmclass Pair need_ext {
+
+/*
+
+=item C<void init()>
+
+Initializes the instance.
+
+=item C<PMC* instantiate()>
+
+Class method to construct an Integer according to passed arguments.
+
+=cut
+
+*/
+
+    void init () {
+        PMC_struct_val(SELF) = NULL;  /* key */
+        PMC_pmc_val(SELF)    = NULL;  /* value */
+        PObj_custom_mark_SET(SELF);
+    }
+
+    PMC* instantiate() {
+        PMC *class = REG_PMC(2);
+        int argcP = REG_INT(3);
+        int argcS = REG_INT(2);
+
+        SELF = pmc_new(INTERP, class->vtable->base_type);
+        if (argcS == 1 && argcP == 1) {
+            PMC_struct_val(SELF) = REG_STR(5);
+            PObj_key_is_string_SET(SELF);
+            PMC_pmc_val(SELF) = REG_PMC(5);
+        }
+        else if (argcP == 2) {
+            PMC_struct_val(SELF) = REG_PMC(5);
+            PMC_pmc_val(SELF) = REG_PMC(6);
+        }
+        else
+            real_exception(INTERP, NULL, E_ValueError,
+                    "wrong argument count for Pair creation");
+        return SELF;
+    }
+/*
+
+=item C<void mark()>
+
+Marks the hash as live.
+
+=cut
+
+*/
+
+    void mark () {
+        if (PMC_struct_val(SELF))
+            pobject_lives(INTERP, (PObj*)PMC_struct_val(SELF));
+        if (PMC_pmc_val(SELF))
+            pobject_lives(INTERP, (PObj*)PMC_pmc_val(SELF));
+    }
+
+/*
+
+=item C<PMC *get_pmc_keyed_str(STRING *key)>
+
+=item C<PMC *get_pmc_keyed(PMC *key)>
+
+=cut
+
+*/
+
+    PMC* get_pmc_keyed_str (STRING* key) {
+        /* check key ? */
+        return PMC_pmc_val(SELF);
+    }
+
+    PMC* get_pmc_keyed (PMC* key) {
+        /* check key ? */
+        return PMC_pmc_val(SELF);
+    }
+
+
+/*
+
+=item C<void set_pmc_keyed(PMC *key, PMC *value)>
+
+=item C<void set_pmc_keyed_str(STRING *key, PMC *value)>
+
+Set key and value. The key can only set once.
+
+=item C<void assign_pmc (PMC* value)>
+
+Set the value of the Pair.
+
+=cut
+
+*/
+
+    void set_pmc_keyed (PMC* key, PMC* value) {
+        if (PMC_struct_val(SELF))
+            real_exception(INTERP, NULL, E_IndexError,
+                    "attempt to set existing Pair key");
+        PMC_struct_val(SELF) = key;
+        PMC_pmc_val(SELF)    = value;
+    }
+
+
+    void set_pmc_keyed_str (STRING* key, PMC* value) {
+        if (PMC_struct_val(SELF))
+            real_exception(INTERP, NULL, E_IndexError,
+                    "attempt to set existing Pair key");
+        PObj_key_is_string_SET(SELF);
+        PMC_struct_val(SELF) = key;
+        PMC_pmc_val(SELF)    = value;
+    }
+
+    void assign_pmc (PMC* value) {
+        PMC_pmc_val(SELF) = value;
+    }
+
+/*
+
+=item C<INTVAL is_equal(PMC *value)>
+
+The C<==> operation.
+
+Check if two Pairs hold the same keys and values.
+
+=cut
+
+*/
+
+    INTVAL is_equal (PMC* value) {
+        STRING *s1, *s2;
+        PMC *k1, *k2, *p1, *p2;
+        if (value->vtable->base_type != SELF->vtable->base_type)
+            return 0;
+        s1 = PMC_struct_val(SELF);
+        s2 = PMC_struct_val(value);
+        if (PObj_key_is_string_TEST(SELF) && PObj_key_is_string_TEST(value)) {
+            if (string_equal(INTERP, s1, s2))
+                return 0;
+        }
+        if (PObj_key_is_string_TEST(SELF)) {
+            k1 = pmc_new(INTERP, enum_class_String);
+            PMC_str_val(k1) = PMC_struct_val(SELF);
+        }
+        else
+            k1 = PMC_struct_val(SELF);
+        if (PObj_key_is_string_TEST(value)) {
+            k2 = pmc_new(INTERP, enum_class_String);
+            PMC_str_val(k2) = PMC_struct_val(value);
+        }
+        else
+            k2 = PMC_struct_val(value);
+        if (!mmd_dispatch_i_pp(INTERP, k1, k2, MMD_EQ))
+            return 0;
+        p1 = PMC_pmc_val(SELF);
+        p2 = PMC_pmc_val(value);
+        if (!p1 && !p2)
+            return 1;
+        if (p1 || p2)
+            return 0;
+        if (!mmd_dispatch_i_pp(INTERP, p1, p2, MMD_EQ))
+            return 0;
+        return 1;
+    }
+
+/*
+=item C<void visit(visit_info *info)>
+
+Used during archiving to visit the elements in the pair.
+
+=item C<void freeze(visit_info *info)>
+
+Used to archive the Pair.
+
+=item C<void thaw(visit_info *info)>
+
+Used to unarchive the Pair.
+
+=cut
+
+*/
+
+    void visit(visit_info *info) {
+        IMAGE_IO *io = info->image_io;
+        PMC **pos;
+
+        io->vtable->push_integer(INTERP, io, PObj_key_is_string_TEST(SELF));
+        if (PObj_key_is_string_TEST(SELF)) {
+            io->vtable->push_string(INTERP, io, PMC_struct_val(SELF));
+        }
+        else {
+            pos = (PMC**)&PMC_struct_val(SELF);
+            info->thaw_ptr = pos;
+            (info->visit_pmc_now)(INTERP, *pos, info);
+        }
+        pos = &PMC_pmc_val(SELF);
+        info->thaw_ptr = pos;
+        (info->visit_pmc_now)(INTERP, *pos, info);
+        SUPER(info);
+    }
+
+    void freeze(visit_info *info) {
+        IMAGE_IO *io = info->image_io;
+        SUPER(info);
+        io->vtable->push_integer(INTERP, io, PObj_key_is_string_TEST(SELF));
+        if (PObj_key_is_string_TEST(SELF)) {
+            io->vtable->push_string(INTERP, io, PMC_struct_val(SELF));
+        }
+    }
+
+    void thaw(visit_info *info) {
+        IMAGE_IO *io = info->image_io;
+        Hash *hash;
+        PMC *dummy;
+
+        SUPER(info);
+        if (info->extra_flags == EXTRA_IS_NULL) {
+            INTVAL flag = io->vtable->shift_integer(INTERP, io);
+            if (flag) {
+                PObj_key_is_string_SET(SELF);
+                PMC_struct_val(SELF) = io->vtable->shift_string(INTERP, io);
+            }
+        }
+    }
+/*
+
+=head2 Methods
+
+=over 4
+
+=item C<METHOD PMC* key()>
+
+=item C<METHOD PMC* value()>
+
+=item C<METHOD PMC* kv()>
+
+Return the key, the value, or a tuple of (key, value) respectively.
+
+=cut
+
+*/
+
+    METHOD PMC* key() {
+        if (PObj_key_is_string_TEST(SELF)) {
+            PMC *k = pmc_new(INTERP,
+                Parrot_get_ctx_HLL_type(INTERP, enum_class_String));
+            PMC_str_val(k) = PMC_struct_val(SELF);
+            return k;
+        }
+        return PMC_struct_val(SELF);
+    }
+
+    METHOD PMC* value() {
+        return PMC_pmc_val(SELF);
+    }
+    METHOD PMC* kv() {
+        PMC *t = pmc_new(INTERP,
+            Parrot_get_ctx_HLL_type(INTERP, enum_class_FixedPMCArray));
+        VTABLE_set_integer_native(INTERP, t, 2);
+        if (PObj_key_is_string_TEST(SELF))
+            VTABLE_set_string_keyed_int(INTERP, t, 0, PMC_struct_val(SELF));
+        else
+            VTABLE_set_pmc_keyed_int(INTERP, t, 0, PMC_struct_val(SELF));
+        VTABLE_set_pmc_keyed_int(INTERP, t, 1, PMC_pmc_val(SELF));
+        return t;
+    }
+
+}
+
+/*
+
+=back
+
+=cut
+
+*/
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+*/
