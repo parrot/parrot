@@ -16,7 +16,7 @@ Tests Parrot calling conventions.
 
 =cut
 
-use Parrot::Test tests => 11;
+use Parrot::Test tests => 13;
 use Test::More;
 
 # Test calling convention operations
@@ -373,6 +373,78 @@ ok 1
 2
 ok 2
 ok 3
+back
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "use it in PIR");
+.sub main @MAIN
+    $P0 = new String
+    $P0 = "hello\n"
+    find_name $P1, "foo"
+    # set_args and invoke must be adjacent
+    set_args "(0)", $P0
+    invokecc $P1
+.end
+.sub foo
+    get_params "(0)", $P0
+    print $P0
+.end
+CODE
+hello
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "flatten + slurpy param");
+.pcc_sub main:
+    new P16, .String
+    set P16, "ok 1\n"
+    new P19, .ResizablePMCArray
+    new P17, .String
+    set P17, "ok 2\n"
+    push P19, P17
+    new P18, .String
+    set P18, "ok 3\n"
+    push P19, P18
+    new P20, .ResizablePMCArray
+    new P17, .String
+    set P17, "ok 4\n"
+    push P20, P17
+    new P18, .String
+    set P18, "ok 5\n"
+    push P20, P18
+    new P21, .String
+    set P21, "ok 6\n"
+    set_args "(0, 0x8, 0x8, 0)", P16, P19, P20, P21
+    find_name P1, "foo"
+    invokecc P1
+    print "back\n"
+    end
+.pcc_sub foo:
+    get_params "(0, 0x8)", P1, P2
+    print P1
+    set I0, P2
+    print I0
+    print "\n"
+    set S0, P2[0]
+    print S0
+    set S0, P2[1]
+    print S0
+    set S0, P2[2]
+    print S0
+    set S0, P2[3]
+    print S0
+    set S0, P2[4]
+    print S0
+    set S0, P2[5]
+    print S0
+    returncc
+CODE
+ok 1
+5
+ok 2
+ok 3
+ok 4
+ok 5
+ok 6
 back
 OUTPUT
 

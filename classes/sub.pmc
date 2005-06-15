@@ -71,7 +71,7 @@ parrot_pass_args(Interp *interpreter, struct Parrot_sub * sub,
         struct parrot_regs_t *caller_regs, int what)
 {
     PMC *args_signature, *param_signature;
-    INTVAL src_i, dst_i, src_n, dst_n, src_sig, dst_sig, args_op;
+    INTVAL src_i, dst_i, src_n, dst_n, src_sig, dst_sig, args_op, dst_typ;
     opcode_t *src_pc, *dst_pc;
     struct PackFile_Constant **constants;
     INTVAL i_arg;
@@ -79,6 +79,7 @@ parrot_pass_args(Interp *interpreter, struct Parrot_sub * sub,
     PMC *p_arg;
     STRING *s_arg;
     STRING *_array;
+    PMC *slurp_ar;
 
     _array = CONST_STRING(interpreter, "array");
     constants = interpreter->code->const_table->constants;
@@ -108,10 +109,21 @@ parrot_pass_args(Interp *interpreter, struct Parrot_sub * sub,
     /* never get more then the caller expects */
     dst_n = VTABLE_elements(interpreter, param_signature);
 
+    slurp_ar = NULL;
     for (src_i = dst_i = 0, src_pc += 2, dst_pc += 2;
             src_i < src_n && dst_i < dst_n; ++src_i, ++dst_i) {
-        src_sig = VTABLE_get_integer_keyed_int(interpreter, args_signature,
-                src_i);
+        src_sig = VTABLE_get_integer_keyed_int(interpreter,
+                args_signature, src_i);
+        if (!slurp_ar) {
+            dst_sig = VTABLE_get_integer_keyed_int(interpreter,
+                    param_signature, dst_i);
+            dst_typ = dst_sig & PARROT_ARG_TYPE_MASK;
+            if (dst_sig & PARROT_ARG_SLURPY_ARRAY) {
+                /* create array */
+                slurp_ar = pmc_new(interpreter, enum_class_ResizablePMCArray);
+                REG_PMC(dst_pc[dst_i]) = slurp_ar;
+            }
+        }
         switch (src_sig & PARROT_ARG_TYPE_MASK) {
             /* TODO verify param_signature */
             /* XXX pdd03 Type Conversions */
@@ -120,7 +132,21 @@ parrot_pass_args(Interp *interpreter, struct Parrot_sub * sub,
                 if (!(src_sig & PARROT_ARG_CONSTANT)) {
                     i_arg = BP_REG_INT(caller_regs, i_arg);
                 }
-                REG_INT(dst_pc[dst_i]) = i_arg;
+                if (slurp_ar) {
+                    VTABLE_push_integer(interpreter, slurp_ar, i_arg);
+                }
+                else if (dst_sig == PARROT_ARG_INTVAL)
+                    REG_INT(dst_pc[dst_i]) = i_arg;
+                else if (dst_sig == PARROT_ARG_PMC) {
+                    PMC *d = pmc_new(interpreter,
+                            Parrot_get_ctx_HLL_type(interpreter,
+                                enum_class_Integer));
+                    VTABLE_set_integer_native(interpreter, d, i_arg);
+                    REG_PMC(dst_pc[dst_i]) = d;
+                }
+                else
+                    real_exception(interpreter, NULL, E_ValueError,
+                            "argument type mismatch");
                 break;
             case PARROT_ARG_STRING:
                 i_arg = src_pc[src_i];
@@ -130,81 +156,21 @@ parrot_pass_args(Interp *interpreter, struct Parrot_sub * sub,
                 else {
                     s_arg = BP_REG_STR(caller_regs, i_arg);
                 }
-                REG_STR(dst_pc[dst_i]) = s_arg;
-                break;
-            case PARROT_ARG_PMC:
-                i_arg = src_pc[src_i];
-                if ((src_sig & PARROT_ARG_CONSTANT)) {
-                    p_arg = constants[i_arg]->u.key;
+                if (slurp_ar) {
+                    VTABLE_push_string(interpreter, slurp_ar, s_arg);
                 }
-                else {
-                    p_arg = BP_REG_PMC(caller_regs, i_arg);
+                else if (dst_sig == PARROT_ARG_STRING)
+                    REG_STR(dst_pc[dst_i]) = s_arg;
+                else if (dst_sig == PARROT_ARG_PMC) {
+                    PMC *d = pmc_new(interpreter,
+                            Parrot_get_ctx_HLL_type(interpreter,
+                                enum_class_String));
+                    VTABLE_set_string_native(interpreter, d, s_arg);
+                    REG_PMC(dst_pc[dst_i]) = d;
                 }
-                dst_sig = VTABLE_get_integer_keyed_int(interpreter,
-                        param_signature, dst_i);
-                if (src_sig & PARROT_ARG_FLATTEN) {
-                    INTVAL i, n;
-                    PMC *elem;
-
-                    if (dst_sig & PARROT_ARG_SLURPY_ARRAY) {
-                        /* just alias these two array */
-                        REG_PMC(dst_pc[dst_i]) = p_arg;
-                        break;
-                    }
-                    if (!VTABLE_does(interpreter, p_arg, _array)) {
-                        real_exception(interpreter, NULL, E_ValueError,
-                                "argument doesn't array");
-                    }
-                    n = VTABLE_elements(interpreter, p_arg);
-                    /* src ought to be an array */
-                    for (i = 0; i < n && dst_i < dst_n; ++i, ++dst_i) {
-                        dst_sig = VTABLE_get_integer_keyed_int(interpreter,
-                                param_signature, dst_i);
-                        if ((dst_sig & PARROT_ARG_TYPE_MASK) !=
-                                PARROT_ARG_PMC) {
-                            real_exception(interpreter, NULL, E_ValueError,
-                                    "param isn't a PMC");
-                        }
-                        elem = VTABLE_get_pmc_keyed_int(interpreter,
-                                p_arg, i);
-                        REG_PMC(dst_pc[dst_i]) = elem;
-                    }
-                    --dst_i;
-                }
-                else if (dst_sig & PARROT_ARG_SLURPY_ARRAY) {
-                    PMC *dst_ar = REG_PMC(dst_pc[dst_i]);
-                    INTVAL i;
-
-                    /* create array */
-                    dst_ar = pmc_new(interpreter, enum_class_FixedPMCArray);
-                    VTABLE_set_integer_native(interpreter, dst_ar,
-                            src_n - src_i);
-                    REG_PMC(dst_pc[dst_i]) = dst_ar;
-                    i = 0;
-                    /* set already fetched arg */
-                    VTABLE_set_pmc_keyed_int(interpreter, dst_ar, i++, p_arg);
-                    for (++src_i; src_i < src_n; ++src_i, ++i) {
-                        src_sig = VTABLE_get_integer_keyed_int(interpreter,
-                                args_signature, src_i);
-                        /* XXX pdd03 Type Conversions */
-                        if ((src_sig & PARROT_ARG_TYPE_MASK) !=
-                                PARROT_ARG_PMC) {
-                            real_exception(interpreter, NULL, E_ValueError,
-                                    "arg isn't a PMC");
-                        }
-                        i_arg = src_pc[src_i];
-                        if ((src_sig & PARROT_ARG_CONSTANT)) {
-                            p_arg = constants[i_arg]->u.key;
-                        }
-                        else {
-                            p_arg = BP_REG_PMC(caller_regs, i_arg);
-                            VTABLE_set_pmc_keyed_int(interpreter, dst_ar, i, p_arg);
-                        }
-                    }
-                }
-                else {
-                    REG_PMC(dst_pc[dst_i]) = p_arg;
-                }
+                else
+                    real_exception(interpreter, NULL, E_ValueError,
+                            "argument type mismatch");
                 break;
             case PARROT_ARG_FLOATVAL:
                 i_arg = src_pc[src_i];
@@ -214,9 +180,69 @@ parrot_pass_args(Interp *interpreter, struct Parrot_sub * sub,
                 else {
                     f_arg = BP_REG_NUM(caller_regs, i_arg);
                 }
-                REG_NUM(dst_pc[dst_i]) = f_arg;
+                if (slurp_ar) {
+                    VTABLE_push_float(interpreter, slurp_ar, f_arg);
+                }
+                else if (dst_sig == PARROT_ARG_FLOATVAL)
+                    REG_NUM(dst_pc[dst_i]) = f_arg;
+                else if (dst_sig == PARROT_ARG_PMC) {
+                    PMC *d = pmc_new(interpreter,
+                            Parrot_get_ctx_HLL_type(interpreter,
+                                enum_class_Float));
+                    VTABLE_set_number_native(interpreter, d, f_arg);
+                    REG_PMC(dst_pc[dst_i]) = d;
+                }
+                else
+                    real_exception(interpreter, NULL, E_ValueError,
+                            "argument type mismatch");
+                break;
+            case PARROT_ARG_PMC:
+                i_arg = src_pc[src_i];
+                if ((src_sig & PARROT_ARG_CONSTANT)) {
+                    p_arg = constants[i_arg]->u.key;
+                }
+                else {
+                    p_arg = BP_REG_PMC(caller_regs, i_arg);
+                }
+                if (src_sig & PARROT_ARG_FLATTEN) {
+                    INTVAL i, n;
+                    PMC *elem;
+
+                    /* src ought to be an array */
+                    if (!VTABLE_does(interpreter, p_arg, _array)) {
+                        real_exception(interpreter, NULL, E_ValueError,
+                                "argument doesn't array");
+                    }
+                    n = VTABLE_elements(interpreter, p_arg);
+                    for (i = 0; i < n && dst_i < dst_n; ++i) {
+                        if (dst_typ != PARROT_ARG_PMC) {
+                            real_exception(interpreter, NULL, E_ValueError,
+                                    "param isn't a PMC");
+                        }
+                        elem = VTABLE_get_pmc_keyed_int(interpreter, p_arg, i);
+                        if (slurp_ar)
+                            VTABLE_push_pmc(interpreter, slurp_ar, elem);
+                        else {
+                            REG_PMC(dst_pc[dst_i++]) = elem;
+                            dst_sig = VTABLE_get_integer_keyed_int(interpreter,
+                                    param_signature, dst_i);
+                            dst_typ = dst_sig & PARROT_ARG_TYPE_MASK;
+                        }
+                    }
+                    if (!slurp_ar)
+                        --dst_i;
+                }
+                else {
+                    if (slurp_ar) {
+                        VTABLE_push_pmc(interpreter, slurp_ar, p_arg);
+                    }
+                    else
+                        REG_PMC(dst_pc[dst_i]) = p_arg;
+                }
                 break;
         }
+        if (slurp_ar)
+            --dst_i;
     }
 
     /* invalidate XXX */
