@@ -172,12 +172,14 @@ them with commas:
 
 Define a named constant of style I<type> and value I<const>.
 
-=item .namespace <identifier>
+=item .namespace [ <identifier> ]
 
-=item .endnamespace <identifier>
+=item .namespace [ <identifier> ; <identifier> ]
 
-Defines the range of a namespace. Local variables inside a namespace
-are mangled as <namespaceidentifier::varidentifier>.
+Defines the namespace from this point onwards.  By default the program is not
+in any namespace.  If you specify more than one, separated by semicolons, it
+creates nested namespaces, by storing the inner namespace object with a C<\0>
+prefix in the outer namespace's global pad.
 
 =item .pcc_*
 
