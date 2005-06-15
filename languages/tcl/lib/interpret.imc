@@ -70,14 +70,7 @@ loop:
 
 loop_done: 
   # Have to use the old style syntax to take advantage of C<.flatten_arg>
-  .pcc_begin
-    .flatten_arg folded_args
-    .pcc_call my_cmd
-requiredlabelusedbyIMCC:
-    .result return_type
-    .result retval
-  .pcc_end
-
+  (return_type, retval) = my_cmd(folded_args :flat)
   goto end_scope
 
 no_command:
