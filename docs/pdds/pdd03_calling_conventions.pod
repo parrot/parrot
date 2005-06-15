@@ -62,8 +62,8 @@ The common syntax of these opcodes is:
 The flags string is a literal quoted string denoting a list of zero or
 more comma-separated integers.  The list as a whole may be surrounded
 by parentheses.  Integers may be specified either in decimal, or if
-prefixed with "0b", in binary.  There must be exactly one integer for
-each value or register given.
+prefixed with "0b"/"0x", in binary/hexadecimal.  There must be exactly one
+integer for each value or register given.
 
 =head3 Flag Words; Common Flag Word Bits
 
@@ -96,12 +96,12 @@ come from and how to expand them for the caller's use.
 These bits of each flag word have these meanings specific to
 C<set_args> and C<set_returns>:
 
-    0b0100  CONSTANT
+    0b00100  CONSTANT
                the value is a literal constant, not a register
                XXX  Again, why not figure this out from
                XXX    the source code?
 
-    0b1000  FLATTEN
+    0b01000  FLATTEN
                If this bit is set on a PMC value, then the PMC must
                be an aggregate or a scalar containing a reference to
                an aggregate.  The contents of the aggregate, rather
@@ -109,6 +109,13 @@ C<set_args> and C<set_returns>:
 
                The meaning of this bit is undefined when applied to
                integer, number, and string values.
+
+    0b10000  MAY_FLATTEN
+               If this bit is set on a PMC value, and the PMC is
+               an aggregate or a scalar containing a reference to
+               an aggregate, _and_ when the called function has a
+               slurpy flag on the corresponding parameter, then
+               the content of this aggregate is flattened.
 
 
 =head2 Accepting Parameters, Accepting Return Values
