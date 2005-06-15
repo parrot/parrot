@@ -129,7 +129,7 @@ Parrot_runops_fromc(Parrot_Interp interpreter, PMC *sub)
      */
     dest = VTABLE_invoke(interpreter, sub, (void*) 1);
     if (!dest)
-        internal_exception(1, "Subroutine retuned a NULL address");
+        internal_exception(1, "Subroutine returned a NULL address");
     bp = interpreter->ctx.bp;
     offset = dest - interpreter->code->base.data;
     runops(interpreter, offset);
@@ -226,7 +226,7 @@ runops_args(Parrot_Interp interpreter, PMC *sub, PMC *obj,
     interpreter->ctx.current_object = obj;
     dest = VTABLE_invoke(interpreter, sub, NULL);
     if (!dest)
-        internal_exception(1, "Subroutine retuned a NULL address");
+        internal_exception(1, "Subroutine returned a NULL address");
 
     /*
      * count arguments, check for overflow
@@ -419,7 +419,7 @@ Parrot_run_meth_fromc(Parrot_Interp interpreter,
     interpreter->ctx.current_object = obj;
     dest = VTABLE_invoke(interpreter, sub, (void*)1);
     if (!dest)
-        internal_exception(1, "Subroutine retuned a NULL address");
+        internal_exception(1, "Subroutine returned a NULL address");
     bp = interpreter->ctx.bp;
     offset = dest - interpreter->code->base.data;
     runops(interpreter, offset);
