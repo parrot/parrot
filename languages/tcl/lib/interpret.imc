@@ -40,8 +40,8 @@ end_scope:
   num_args = command
   arg_num = 1
   
-  # The subs we're calling expect flattened args. There's no opcode to
-  # flatten args, so instead we use the PIR directive C<.flatten_arg> 
+  # The subs we're calling expect flattened args,
+  #  as passed with the ":flag" arg adverb.
 
   .local string caller_sub_text
 
@@ -69,8 +69,7 @@ loop:
   goto loop
 
 loop_done: 
-  # Have to use the old style syntax to take advantage of C<.flatten_arg>
-  (return_type, retval) = my_cmd(folded_args :flat)
+  (return_type,retval) = my_cmd(folded_args :flat)
   goto end_scope
 
 no_command:
