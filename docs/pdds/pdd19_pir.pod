@@ -1,0 +1,47 @@
+=head1 NAME
+
+docs/pdds/pdd19_pir.pod - Parrot Intermediate Representation
+
+=head1 ABSTRACT
+
+This PDD describes PIR, a stable, middle-level language for both compiler
+and human to target on.
+
+=head1 DESCRIPTION
+
+XXX - Currently under-specified.  We need to move the actively supported
+parts of F<docs/imcc/syntax.pod> here.
+
+=head1 VERSION
+
+=head2 CURRENT
+
+    Maintainer: Chip SalzenBerg
+    Class: Internal
+    PDD Number: 19
+    Version: 1.0
+    Status: Developing
+    Last Modified: 15 June 2005
+    PDD Format: 1
+    Language: English
+
+=head2 HISTORY
+
+=over 4
+
+=item version 1
+
+None. First version
+
+=back
+
+=head1 CHANGES
+
+=over 4
+
+=item Version 1.0
+
+None. First version
+
+=back
+
