@@ -37,6 +37,7 @@ have the same number of elements since there is a one-to-one mapping.
 #include "parrot/interp_guts.h"
 #include "parrot/oplib/core_ops.h"
 #include "parrot/oplib/core_ops_switch.h"
+#include "parrot/oplib/ops.h"
 #include "parrot/runops_cores.h"
 #if JIT_CAPABLE
 #  include "parrot/exec.h"
@@ -361,6 +362,14 @@ init_prederef(Interp *interpreter, int which)
             opinfo = &interpreter->op_info_table[*pc];
             temp[i] = pred_func;
             n = opinfo->arg_count;
+            if (*pc == PARROT_OP_set_args_pc ||
+                    *pc == PARROT_OP_get_results_pc ||
+                    *pc == PARROT_OP_get_params_pc ||
+                    *pc == PARROT_OP_set_returns_pc) {
+                PMC *sig;
+                sig = interpreter->code->const_table->constants[pc[1]]->u.key;
+                n += VTABLE_elements(interpreter, sig);
+            }
             pc += n;
             i += n;
             /* count ops that need a PIC */
