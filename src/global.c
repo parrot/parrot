@@ -115,7 +115,7 @@ Parrot_find_global(Parrot_Interp interpreter, STRING *class, STRING *globalname)
 PMC *
 Parrot_find_global_p(Parrot_Interp interpreter, PMC *ns, STRING *name)
 {
-    PMC *stash;
+    PMC *stash, *ns_next;
     STRING *class, *ns_name;
 
     if (PMC_IS_NULL(ns))
@@ -134,11 +134,12 @@ Parrot_find_global_p(Parrot_Interp interpreter, PMC *ns, STRING *name)
                     return NULL;
                 }
                 stash = VTABLE_get_pmc_keyed_str(interpreter, stash, ns_name);
-                ns = key_next(interpreter, ns);
-                if (!ns)
+                ns_next = key_next(interpreter, ns);
+                if (!ns_next)
                     break;
+                ns = ns_next;
             }
-            assert(ns->vtable->base_type == enum_class_Hash);
+            return Parrot_find_global_p(interpreter, stash, name);
             /* fall through */
         case enum_class_Hash:
             if (!VTABLE_exists_keyed_str(interpreter, ns, name)) {

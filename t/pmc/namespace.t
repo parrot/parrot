@@ -16,7 +16,7 @@ Tests the namespace manipulation.
 
 =cut
 
-use Parrot::Test tests => 14;
+use Parrot::Test tests => 15;
 use Test::More;
 
 pir_output_is(<<'CODE', <<'OUTPUT', "find_global bar");
@@ -321,3 +321,15 @@ baz
 Foo::Bar
 OUTPUT
 
+pir_output_is(<<'CODE', <<'OUTPUT', "segv in get_name");
+.namespace ['pugs';'main']
+.sub main @MAIN
+    $P0 = find_name "&say"
+    $P0()
+.end
+.sub "&say"
+    say "ok"
+.end
+CODE
+ok
+OUTPUT
