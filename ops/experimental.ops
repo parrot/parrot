@@ -361,8 +361,20 @@ op get_params(inconst PMC) {
     opcode_t *this = CUR_OPCODE;
     PMC *signature = $1;
     INTVAL argc;
+    struct Parrot_sub * sub = PMC_sub(interpreter->ctx.current_sub);
 
     interpreter->ctx.current_params = this;
+    if (sub->address != this) {
+	struct parrot_regs_t *caller_regs;
+	PMC *cont_pmc = interpreter->ctx.current_cont;
+	opcode_t *pc;
+
+	caller_regs = PMC_cont(cont_pmc)->ctx.bp;
+	pc = parrot_pass_args(interpreter, sub, caller_regs,
+		PARROT_OP_get_params_pc);
+	goto ADDRESS(pc);
+    }
+
     argc = VTABLE_elements(interpreter, signature);
     goto ADDRESS(this + 2 + argc);
 }

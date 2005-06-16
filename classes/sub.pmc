@@ -84,7 +84,12 @@ parrot_pass_args(Interp *interpreter, struct Parrot_sub * sub,
     _array = CONST_STRING(interpreter, "array");
     constants = interpreter->code->const_table->constants;
     if (what == PARROT_OP_get_params_pc) {
-        dst_pc = sub->address;
+        if (interpreter->ctx.current_params)
+            dst_pc = interpreter->ctx.current_params;
+        else if (*sub->address != what)
+            return sub->address;
+        else
+            dst_pc = sub->address;
         args_op = PARROT_OP_set_args_pc;
         src_pc = interpreter->current_args;
     }
