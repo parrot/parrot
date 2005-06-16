@@ -161,9 +161,9 @@ http://oss.software.ibm.com/icu/index.html
 
 =head2 IMC
 
-Parrot Intermediate Code. A medium-level assembly language for Parrot
-that hides messy details like register allocation so language
-compiler writers who target IMC don't have to roll their own.
+Parrot InterMediate Code, or another name for PIR.  A convention once
+arose to name input files to IMCC with the extension ".imc", so the
+name IMC became synonymous with PIR.
 
 See also IMCC, PIR.
 
@@ -172,7 +172,9 @@ See also IMCC, PIR.
 Parrot's Intermediate Code Compiler, which started its life as an
 improved Parrot assembler, and eventually became so integrated with
 Parrot that it became the Parrot executable (being able to load and
-run PBC files, PASM files or IMC files).
+run PBC files, PASM files or PIR files).
+
+See also PIR.
 
 =head2 Packfile
 
@@ -189,10 +191,9 @@ See also Packfile.
 
 =head2 PIR
 
-Parrot Intermediate Representation. The original name for IMC. Since
-it has become the convention to name input files to IMCC with the
-extension ".imc", IMC is a more natural name, although PIR is still
-sighted regularly on the E<lt>perl-internals@perl.orgE<gt> email list.
+Parrot Intermediate Representation. A medium-level assembly language
+for Parrot that hides messy details like register allocation so
+language compiler writers who target PIR don't have to roll their own.
 
 See also IMC.
 
