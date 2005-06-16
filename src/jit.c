@@ -31,6 +31,7 @@ used and not per subroutine or even opcode, it works per bytecode segment.
 #define JIT_EMIT 0
 #include "parrot/jit_emit.h"
 #include "parrot/packfile.h"
+#include "parrot/oplib/ops.h"
 
 extern int jit_op_count(void);
 /*
@@ -65,6 +66,17 @@ void Parrot_jit_debug(Interp* interpreter);
 
 char **Parrot_exec_rel_addr;
 int Parrot_exec_rel_count;
+
+#define ADD_OP_VAR_PART(interpreter, pc, n) do { \
+    if (*pc == PARROT_OP_set_args_pc || \
+            *pc == PARROT_OP_get_results_pc || \
+            *pc == PARROT_OP_get_params_pc || \
+            *pc == PARROT_OP_set_returns_pc) { \
+        PMC *sig; \
+        sig = interpreter->code->const_table->constants[pc[1]]->u.key; \
+        n += VTABLE_elements(interpreter, sig); \
+    } \
+} while (0)
 
 /*
 
@@ -256,6 +268,7 @@ make_branch_list(Interp *interpreter,
             optimizer->has_unpredictable_jump = 1;
         }
         /* Move to the next opcode */
+        ADD_OP_VAR_PART(interpreter, cur_op, n);
         cur_op += n;
     }
     insert_fixup_targets(interpreter, branch, code_end - code_start);
@@ -423,6 +436,7 @@ make_sections(Interp *interpreter,
 
         /* Calculate the next pc */
         next_op = cur_op + op_info->arg_count;
+        ADD_OP_VAR_PART(interpreter, cur_op, next_op);
 
         /* Update op_count */
         cur_section->op_count++;
@@ -707,7 +721,7 @@ assign_registers(Interp *interpreter,
 {
     char *map;
     op_info_t *op_info;
-    int i, op_arg, typ;
+    int i, op_arg, typ, n;
     opcode_t * cur_op;
     char * maps[] = {0, 0, 0, 0};
     maps[0] = intval_map;
@@ -749,7 +763,9 @@ assign_registers(Interp *interpreter,
         }
 
         /* Move to the next opcode */
-        cur_op += op_info->arg_count;
+        n = op_info->arg_count;
+        ADD_OP_VAR_PART(interpreter, cur_op, n);
+        cur_op += n;
     }
 }
 
@@ -810,7 +826,7 @@ debug_sections(Interp *interpreter,
 #  if JIT_DEBUG > 1
     char * map = optimizer->map_branch;
 #  endif
-    int i, typ;
+    int i, typ, n;
     unsigned int j;
     const char *types = "IPSN";
     int types_to_list[] = {0,3};
@@ -840,7 +856,9 @@ debug_sections(Interp *interpreter,
             PIO_eprintf(interpreter, "\n");
 #  endif
 
-            cur_op += op_info->arg_count;
+            n = op_info->arg_count;
+            ADD_OP_VAR_PART(interpreter, cur_op, n);
+            cur_op += n;
         }
         PIO_eprintf(interpreter, "\tbegin:\t%#p\t(%Ou)\n",
                 cur_section->begin, *cur_section->begin);
@@ -945,7 +963,7 @@ optimize_imcc_jit(Interp *interpreter, opcode_t *cur_op,
              struct PackFile_Segment *jit_seg)
 {
     Parrot_jit_optimizer_t *optimizer;
-    size_t size, i, typ;
+    size_t size, i, typ, n;
     int j;
     opcode_t *ptr, offs;
     Parrot_jit_optimizer_section_ptr section, prev;
@@ -997,7 +1015,9 @@ optimize_imcc_jit(Interp *interpreter, opcode_t *cur_op,
             set_register_usage(interpreter, optimizer, section,
                     op_info, cur_op, code_start);
             section->op_count++;
-            cur_op += op_info->arg_count;
+            n = op_info->arg_count;
+            ADD_OP_VAR_PART(interpreter, cur_op, n);
+            cur_op += n;
         }
         assign_registers(interpreter, optimizer, section, code_start, 1);
     }
@@ -1283,6 +1303,8 @@ build_asm(Interp *interpreter, opcode_t *pc,
 #if EXEC_CAPABLE
     Parrot_exec_objfile_t *obj = (Parrot_exec_objfile_t *)objfile;
 #endif
+    op_info_t *op_info;
+    int n;
 
     /* XXX assume, we restart */
     if (interpreter->code->jit_info) {
@@ -1462,12 +1484,13 @@ build_asm(Interp *interpreter, opcode_t *pc,
             /* Update the previous opcode */
             jit_info->prev_op = cur_op;
 
+            op_info = &interpreter->op_info_table[*cur_op];
+            n = op_info->arg_count;
+            ADD_OP_VAR_PART(interpreter, cur_op, n);
+            cur_op += n;
             /* update op_i and cur_op accordingly */
-            jit_info->op_i +=
-                interpreter->op_info_table[cur_opcode_byte].arg_count;
-            jit_info->cur_op +=
-                interpreter->op_info_table[cur_opcode_byte].arg_count;
-            cur_op = jit_info->cur_op;
+            jit_info->op_i += n;
+            jit_info->cur_op += n;
 
             /* if this is a branch target, align it */
 #ifdef jit_emit_noop
