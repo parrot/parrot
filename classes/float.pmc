@@ -407,17 +407,120 @@ Used to unarchive the number.
 
 =over 4
 
+=item C<METHOD PMC* acos()>
+
+=item C<METHOD PMC* asec()>
+
+=item C<METHOD PMC* asin()>
+
 =item C<METHOD PMC* cos()>
 
-Return a new PMC of the type of C<SELF> with the cosine of SELF.
+=item C<METHOD PMC* cosh()>
+
+=item C<METHOD PMC* exp()>
+
+=item C<METHOD PMC* ln()>
+
+=item C<METHOD PMC* log10()>
+
+=item C<METHOD PMC* log2()>
+
+=item C<METHOD PMC* sec()>
+
+=item C<METHOD PMC* sech()>
+
+=item C<METHOD PMC* sin()>
+
+=item C<METHOD PMC* sinh()>
+
+=item C<METHOD PMC* tan()>
+
+=item C<METHOD PMC* tanh()>
+
+Return a new PMC of the type of C<SELF> with I<FUNC>(value) of SELF.
 
 =cut
 
 */
 
+    METHOD PMC* acos() {
+        PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC_num_val(d) = acos(PMC_num_val(SELF));
+        return d;
+    }
     METHOD PMC* cos() {
         PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
-        PMC_num_val(d) = cos((double)PMC_num_val(SELF));
+        PMC_num_val(d) = cos(PMC_num_val(SELF));
+        return d;
+    }
+    METHOD PMC* asec() {
+        PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC_num_val(d) = acos(1.0 / PMC_num_val(SELF));
+        return d;
+    }
+    METHOD PMC* asin() {
+        PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC_num_val(d) = asin(PMC_num_val(SELF));
+        return d;
+    }
+    METHOD PMC* atan() {
+        PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC_num_val(d) = atan(PMC_num_val(SELF));
+        return d;
+    }
+    METHOD PMC* cosh() {
+        PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC_num_val(d) = cosh(PMC_num_val(SELF));
+        return d;
+    }
+    METHOD PMC* exp() {
+        PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC_num_val(d) = exp(PMC_num_val(SELF));
+        return d;
+    }
+    METHOD PMC* ln() {
+        PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC_num_val(d) = log(PMC_num_val(SELF));
+        return d;
+    }
+    METHOD PMC* log10() {
+        PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC_num_val(d) = log10(PMC_num_val(SELF));
+        return d;
+    }
+    METHOD PMC* log2() {
+        PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC_num_val(d) = log(PMC_num_val(SELF)) / log(2.0);
+        return d;
+    }
+    METHOD PMC* sec() {
+        PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC_num_val(d) = 1.0 / cos(PMC_num_val(SELF));
+        return d;
+    }
+    METHOD PMC* sech() {
+        PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC_num_val(d) = 1.0 / cosh(PMC_num_val(SELF));
+        return d;
+    }
+    METHOD PMC* sin() {
+        PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC_num_val(d) = sin(PMC_num_val(SELF));
+        return d;
+    }
+    METHOD PMC* sinh() {
+        PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC_num_val(d) = sinh(PMC_num_val(SELF));
+        return d;
+    }
+    METHOD PMC* tan() {
+        PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC_num_val(d) = tan(PMC_num_val(SELF));
+        return d;
+    }
+    METHOD PMC* tanh() {
+        PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC_num_val(d) = tanh(PMC_num_val(SELF));
         return d;
     }
 

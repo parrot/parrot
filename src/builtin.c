@@ -32,7 +32,22 @@ typedef struct _builtin {
 } Builtins;
 
 static Builtins builtins[] = {
+    { "acos", 	"PJO", 		"Float", 	0, 0 },
+    { "asec", 	"PJO", 		"Float", 	0, 0 },
+    { "asin", 	"PJO", 		"Float", 	0, 0 },
+    { "atan", 	"PJO", 		"Float", 	0, 0 },
     { "cos", 	"PJO", 		"Float", 	0, 0 },
+    { "cosh", 	"PJO", 		"Float", 	0, 0 },
+    { "exp", 	"PJO", 		"Float", 	0, 0 },
+    { "ln", 	"PJO", 		"Float", 	0, 0 },
+    { "log10", 	"PJO", 		"Float", 	0, 0 },
+    { "log2", 	"PJO", 		"Float", 	0, 0 },
+    { "sec", 	"PJO", 		"Float", 	0, 0 },
+    { "sech", 	"PJO", 		"Float", 	0, 0 },
+    { "sin", 	"PJO", 		"Float", 	0, 0 },
+    { "sinh", 	"PJO", 		"Float", 	0, 0 },
+    { "tan", 	"PJO", 		"Float", 	0, 0 },
+    { "tanh", 	"PJO", 		"Float", 	0, 0 },
     { "index",  "IJSS.I",       "String",       0, 0 },
     { "lower", 	"PJO",	        "String", 	0, 0 },
     { "open", 	"PJS.S",	"ParrotIO", 	0, 0 },
