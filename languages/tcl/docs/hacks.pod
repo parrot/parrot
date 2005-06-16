@@ -82,6 +82,13 @@ two happy return cases, the two cases that interact with loops, and the error ca
 into parrot's normal return/exception handler in a way that works for tcl and will
 allow interoperability
 
+Note: The reason we're not using parrot exceptions is that we're unable
+at the moment to redefine them ourselves - I don't see any easy way to get the
+nice stacktraces that tcl gives you using the parrot exception handling
+mechanism. So we could potentially use exceptions for TCL_ERROR in the long
+term. But then [catch] will need to be re-written to cope with exceptions
+or not (as opposed to now, where all codes are equal).
+
 =head1 stack depth
 
 Cheating and keeping a global around right now, so we can figure out if we should
