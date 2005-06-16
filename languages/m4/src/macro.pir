@@ -178,7 +178,7 @@ NO_TOKEN_TEXT:
 TOKEN_FUNC:
   .local pmc func
   func = symbol['func']
-  .pcc_begin prototyped 
+  .pcc_begin 
     .arg state
     .arg arguments
   .pcc_call func
