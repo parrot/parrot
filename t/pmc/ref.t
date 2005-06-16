@@ -95,6 +95,8 @@ CODE
 1.5
 OUTPUT
 
+TODO: {
+    local $TODO = 'pending new Ref semantic';
 output_is(<<'CODE', <<'OUTPUT', "assign ref");
 	new P2, .Integer
 	new P3, .Float
@@ -118,6 +120,7 @@ CODE
 0
 0.5
 OUTPUT
+}
 
 output_is(<<'CODE', <<'OUTPUT', "typeof SharedRef");
 	new P2, .Integer
