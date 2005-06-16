@@ -98,13 +98,13 @@ OUTPUT
 output_is(<<'CODE', <<'OUTPUT', "assign ref");
 	new P2, .Integer
 	new P3, .Float
+        set P2, 0
 	set P3, 0.5
 	new P1, .Ref, P2
-	inc P1
+	assign P1, 1
 	print P1
 	print "\n"
 	assign P1, P3
-	inc P1
 	print P1
 	print "\n"
 	print P2
@@ -114,8 +114,8 @@ output_is(<<'CODE', <<'OUTPUT', "assign ref");
 	end
 CODE
 1
-1.5
-1.5
+0.5
+0
 0.5
 OUTPUT
 
