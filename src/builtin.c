@@ -36,6 +36,7 @@ static Builtins builtins[] = {
     { "asec", 	"PJO", 		"Float", 	0, 0 },
     { "asin", 	"PJO", 		"Float", 	0, 0 },
     { "atan", 	"PJO", 		"Float", 	0, 0 },
+    { "atan2", 	"PJOP",		"Float", 	0, 0 },
     { "cos", 	"PJO", 		"Float", 	0, 0 },
     { "cosh", 	"PJO", 		"Float", 	0, 0 },
     { "exp", 	"PJO", 		"Float", 	0, 0 },

@@ -468,6 +468,11 @@ Return a new PMC of the type of C<SELF> with I<FUNC>(value) of SELF.
         PMC_num_val(d) = atan(PMC_num_val(SELF));
         return d;
     }
+    METHOD PMC* atan2(PMC *val) {
+        PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC_num_val(d) = atan2(PMC_num_val(SELF), PMC_num_val(val));
+        return d;
+    }
     METHOD PMC* cosh() {
         PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
         PMC_num_val(d) = cosh(PMC_num_val(SELF));

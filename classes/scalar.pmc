@@ -76,8 +76,8 @@ according to the type of C<*value>.
             DYNSELF.set_string_native(v);
             return;
         }
-        DYNSELF.morph(value->vtable->base_type);
-        SUPER(value);
+        DYNSELF.morph(enum_class_Ref);
+        DYNSELF.set_pmc(value);
     }
 
 /*
