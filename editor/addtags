@@ -4,7 +4,7 @@ use strict;
 my %seen;
 
 open T, ">>tags" or die "Can't append tags";
-while (<@ARGV>) {
+while (<>) {
     if (/\bop \s+ (\w+) \s* \(/x) {
         next if $seen{$1}++;
 	# tag file excmd xflags

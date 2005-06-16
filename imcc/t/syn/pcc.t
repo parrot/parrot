@@ -3,7 +3,7 @@
 # $Id$
 
 use strict;
-use Parrot::Test tests => 47;
+use Parrot::Test tests => 46;
 
 ##############################
 # Parrot Calling Conventions
@@ -810,7 +810,7 @@ all params ok
 OUT
 
 
-pir_output_is(<<'CODE', <<'OUT', ".arg :flatten 1");
+pir_output_is(<<'CODE', <<'OUT', ".arg :flat 1");
 .pcc_sub _main
     .local Sub sub
     newsub sub, .Sub, _sub
@@ -819,7 +819,7 @@ pir_output_is(<<'CODE', <<'OUT', ".arg :flatten 1");
     push ar, "ok 1\n"
     push ar, "ok 2\n"
     .pcc_begin
-    .arg ar :flatten
+    .arg ar :flat
     .pcc_call sub
     ret:
     .pcc_end
@@ -837,7 +837,7 @@ ok 1
 ok 2
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', ".arg :flatten non-prototyped 2");
+pir_output_is(<<'CODE', <<'OUT', ".arg :flat non-prototyped 2");
 .pcc_sub _main
     .local Sub sub
     newsub sub, .Sub, _sub
@@ -850,7 +850,7 @@ pir_output_is(<<'CODE', <<'OUT', ".arg :flatten non-prototyped 2");
     push ar, "ok 2\n"
     .pcc_begin
     .arg x
-    .arg ar :flatten
+    .arg ar :flat
     .pcc_call sub
     ret:
     .pcc_end
@@ -868,7 +868,7 @@ first
 ok 1
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', ".arg :flatten non-prototyped 3");
+pir_output_is(<<'CODE', <<'OUT', ".arg :flat non-prototyped 3");
 .pcc_sub _main
     .local Sub sub
     newsub sub, .Sub, _sub
@@ -884,7 +884,7 @@ pir_output_is(<<'CODE', <<'OUT', ".arg :flatten non-prototyped 3");
     push ar, "ok 2\n"
     .pcc_begin
     .arg x
-    .arg ar :flatten
+    .arg ar :flat
     .arg y
     .pcc_call sub
     ret:
@@ -909,7 +909,7 @@ ok 2
 last
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', ".arg :flatten non-prototyped 4");
+pir_output_is(<<'CODE', <<'OUT', ".arg :flat non-prototyped 4");
 .pcc_sub _main
     .local Sub sub
     newsub sub, .Sub, _sub
@@ -933,9 +933,9 @@ pir_output_is(<<'CODE', <<'OUT', ".arg :flatten non-prototyped 4");
     push ar2, "ok 5\n"
     .pcc_begin
     .arg x
-    .arg ar :flatten
+    .arg ar :flat
     .arg y
-    .arg ar2 :flatten
+    .arg ar2 :flat
     .arg z
     .pcc_call sub
     ret:
@@ -976,7 +976,7 @@ ok 5
 last
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', ".arg :flatten prototyped 1");
+pir_output_is(<<'CODE', <<'OUT', ".arg :flat prototyped 1");
 .pcc_sub _main
     .local Sub sub
     newsub sub, .Sub, _sub
@@ -1000,9 +1000,9 @@ pir_output_is(<<'CODE', <<'OUT', ".arg :flatten prototyped 1");
     push ar2, "ok 5\n"
     .pcc_begin
     .arg x
-    .arg ar :flatten
+    .arg ar :flat
     .arg y
-    .arg ar2 :flatten
+    .arg ar2 :flat
     .arg z
     .pcc_call sub
     ret:
@@ -1047,7 +1047,7 @@ ok 5
 last
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', ".arg :flatten - overflow");
+pir_output_is(<<'CODE', <<'OUT', ".arg :flat - overflow");
 .pcc_sub _main
     .local Sub sub
     newsub sub, .Sub, _sub
@@ -1078,9 +1078,9 @@ pir_output_is(<<'CODE', <<'OUT', ".arg :flatten - overflow");
     push ar2, "ok 12\n"
     .pcc_begin
     .arg x
-    .arg ar :flatten
+    .arg ar :flat
     .arg y
-    .arg ar2 :flatten
+    .arg ar2 :flat
     .arg z
     .pcc_call sub
     ret:
@@ -1142,7 +1142,7 @@ ok 12
 last
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', ".arg :flatten multiple instances");
+pir_output_is(<<'CODE', <<'OUT', ".arg :flat multiple instances");
 .pcc_sub _main
     .local Sub sub
     newsub sub, .Sub, _sub
@@ -1151,12 +1151,12 @@ pir_output_is(<<'CODE', <<'OUT', ".arg :flatten multiple instances");
     push ar, "ok 1\n"
     push ar, "ok 2\n"
     .pcc_begin
-    .arg ar :flatten
+    .arg ar :flat
     .pcc_call sub
     ret:
     .pcc_end
     .pcc_begin
-    .arg ar :flatten
+    .arg ar :flat
     .pcc_call sub
     ret2:
     .pcc_end
