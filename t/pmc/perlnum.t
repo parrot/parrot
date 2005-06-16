@@ -16,7 +16,7 @@ Tests the C<PerlNum> PMC. Checks Perl-specific numeric behaviour.
 
 =cut
 
-use Parrot::Test tests => 54;
+use Parrot::Test tests => 55;
 
 my $fp_equality_macro = <<'ENDOFMACRO';
 .macro fp_eq (    J, K, L )
@@ -1098,3 +1098,18 @@ CODE
 0
 OUTPUT
 
+pir_output_is(<<'CODE', <<'OUT', "perlint should morph to num on cos()ing");
+.sub main @MAIN
+    .local pmc x, y
+    # integer morphing for perlint
+    print "perlint morph"
+    x = new PerlInt
+    x = assign 1
+    x = new PerlUndef
+    y = cos x
+    print y
+    print "\n"
+.end
+CODE
+perlint morph 0.540302
+OUT

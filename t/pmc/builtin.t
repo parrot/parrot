@@ -56,14 +56,6 @@ pir_output_is(<<'CODE', <<'OUT', "six ways to call a method");
     y = m()
     print y
     print "\n"
-    # integer morphing for perlint
-    print "perlint morph"
-    x = new PerlInt
-    x = assign 1
-    x = new PerlUndef
-    y = cos x
-    print y
-    print "\n"
 .end
 CODE
 opcode        0.540302
@@ -72,7 +64,6 @@ method        0.540302
 class method  0.540302
 bound class m 0.540302
 bound obj met 0.540302
-perlint morph 0.540302
 OUT
 
 pir_output_is(<<'CODE', <<'OUT', "ParrotIO.puts");
