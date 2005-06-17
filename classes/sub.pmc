@@ -288,8 +288,6 @@ normal_pmc:
         }
     }
 
-    /* invalidate XXX */
-    interpreter->current_args = NULL;
     return dst_pc + dst_n;
 }
 

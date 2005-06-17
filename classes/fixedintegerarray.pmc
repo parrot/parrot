@@ -65,7 +65,7 @@ which is a string I<"(el0, el1, ...)">.
             SELF = constant_pmc_new(INTERP, type);
         else
             SELF = pmc_new(INTERP, type);
-        if (! (l = string_length(INTERP, rep)) )
+        if ((l = string_length(INTERP, rep)) <= 2)      /* "()" - no args */
             return SELF;
         if (rep->encoding != Parrot_fixed_8_encoding_ptr)
             real_exception(INTERP, NULL, E_ValueError,

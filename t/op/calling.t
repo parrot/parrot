@@ -16,7 +16,7 @@ Tests Parrot calling conventions.
 
 =cut
 
-use Parrot::Test tests => 24;
+use Parrot::Test tests => 25;
 use Test::More;
 
 # Test calling convention operations
@@ -777,4 +777,23 @@ ok 1
 ok 2
 ok 3
 back
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "empty args");
+.sub main @MAIN
+    $P0 = new String
+    $P0 = "hello\n"
+    find_name $P1, "foo"
+    set_args "()"
+    invokecc $P1
+.end
+.sub foo
+    get_params "(0x20)", $P1
+    isnull $P1, ok
+    print "not "
+ok:
+    print "ok\n"
+.end
+CODE
+ok
 OUTPUT
