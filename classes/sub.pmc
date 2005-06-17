@@ -80,6 +80,7 @@ parrot_pass_args(Interp *interpreter, struct Parrot_sub * sub,
     STRING *s_arg;
     STRING *_array;
     PMC *slurp_ar;
+    const char *action;
 
     _array = CONST_STRING(interpreter, "array");
     constants = interpreter->code->const_table->constants;
@@ -94,12 +95,14 @@ parrot_pass_args(Interp *interpreter, struct Parrot_sub * sub,
         src_pc = interpreter->current_args;
 
         interpreter->ctx.current_params = NULL;
+        action = "params";
     }
     else {
         dst_pc = interpreter->ctx.current_results;
         args_op = PARROT_OP_set_returns_pc;
         src_pc = interpreter->current_returns;
         interpreter->ctx.current_results = NULL;
+        action = "results";
     }
 
     assert(*dst_pc == what);
@@ -278,16 +281,16 @@ normal_pmc:
      */
     if (src_i != src_n) {
         real_exception(interpreter, NULL, E_ValueError,
-                "too many arguments passed (%d) - %d params/results expected",
-                src_n, dst_n);
+                "too many arguments passed (%d) - %d %s expected",
+                src_n, dst_n, action);
     }
     else if (dst_i != dst_n) {
         dst_sig = VTABLE_get_integer_keyed_int(interpreter,
                 param_signature, dst_i);
         if (!(dst_sig & (PARROT_ARG_OPTIONAL|PARROT_ARG_SLURPY_ARRAY))) {
             real_exception(interpreter, NULL, E_ValueError,
-                    "too few arguments passed (%d) - %d params/results expected",
-                    src_n, dst_n);
+                    "too few arguments passed (%d) - %d %s expected",
+                    src_n, dst_n, action);
         }
     }
 

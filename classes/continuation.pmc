@@ -122,7 +122,7 @@ Creates and returns a clone of the continuation.
         sub = PMC_cont(ret) = mem_sys_allocate(sizeof(struct Parrot_cont));
         memcpy(sub, cc_self, sizeof(struct Parrot_cont));
 
-        sub->ctx.current_params = sub->ctx.current_results = NULL;
+        /* sub->ctx.current_params = sub->ctx.current_results = NULL; */
         PMC_pmc_val(ret) = PMC_pmc_val(SELF);
         return ret;
     }
@@ -205,6 +205,7 @@ destination to continue execution.
     void* invoke (void* next) {
         struct Parrot_cont * cc = PMC_cont(SELF);
         struct parrot_regs_t *caller_regs;
+        opcode_t *pc;
 
         caller_regs = INTERP->ctx.bp;
         restore_context(INTERP, &cc->ctx);
@@ -214,10 +215,17 @@ destination to continue execution.
             PIO_eprintf(INTERP, "# Back in sub '%Ss'\n",
                 Parrot_full_sub_name(INTERP, sub));
         }
-        if (cc->address) {
+        pc = cc->address;
+        if (pc) {
             if (INTERP->ctx.current_results) {
-                parrot_pass_args(INTERP, NULL, caller_regs,
-                        PARROT_OP_get_results_pc);
+                /* possibly a true continuation that acts as a Sub */
+                if (*pc == PARROT_OP_get_params_pc)
+                    pc = parrot_pass_args(INTERP, (struct Parrot_sub*)cc,
+                            caller_regs,
+                            PARROT_OP_get_params_pc);
+                else
+                    parrot_pass_args(INTERP, NULL, caller_regs,
+                            PARROT_OP_get_results_pc);
             }
             else {
                 copy_regs(INTERP, caller_regs);
@@ -230,7 +238,7 @@ destination to continue execution.
         if (INTERP->code != cc->seg) {
             Parrot_switch_to_cs(INTERP, cc->seg, 1);
         }
-        return cc->address;
+        return pc;
     }
 
 /*
