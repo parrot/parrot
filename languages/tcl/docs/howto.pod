@@ -14,7 +14,7 @@ should merge with the TODO to avoid redundancy.
 
 =item speed
 
-We're currently a bit slow, compared to tclsh. Switching over to a compiler
+We're currently quite slow, compared to tclsh. Switching over to a compiler
 instead of an interpreter might help here, though I'm having a hard time
 envisioning a compiler that doesn't have to do all the things we already do
 as an interpreter. 
@@ -62,7 +62,7 @@ we use the C<foldup> opcode.
 
 Note that there are two return values for each command, an int and a PMC.
 The integer contains the Tcl return value for that command (OK, BREAK,
-RETRUN, etc.). The PMC is usually a string at this point, but could be
+RETURN, etc.). The PMC is usually a string at this point, but could be
 any valid PMC. Note - right now, if there's an error condition, create
 a new string-like PMC and put the error condition in it. Eventually this
 will be some kind of structure.
