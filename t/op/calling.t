@@ -16,7 +16,7 @@ Tests Parrot calling conventions.
 
 =cut
 
-use Parrot::Test tests => 20;
+use Parrot::Test tests => 24;
 use Test::More;
 
 # Test calling convention operations
@@ -651,5 +651,130 @@ CODE
 77
 99
 88
+back
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "tailcall 1");
+.sub main @MAIN
+    .const .Sub f = "foo"
+    print "main\n"
+    get_results "(0)", $S0
+    invokecc f
+    print $S0
+.end
+.sub foo
+    .const .Sub b = "bar"
+    print "foo\n"
+    set_returns "(0)", "foo_ret\n"
+    tailcall b
+.end
+.sub bar
+    print "bar\n"
+    set_returns "(0)", "bar_ret\n"
+    returncc
+.end
+CODE
+main
+foo
+bar
+bar_ret
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "tailcall 2 - pass arg");
+.sub main @MAIN
+    .const .Sub f = "foo"
+    print "main\n"
+    get_results "(0)", $S0
+    invokecc f
+    print $S0
+.end
+.sub foo
+    .const .Sub b = "bar"
+    print "foo\n"
+    set_args "(0)", "from_foo\n"
+    set_returns "(0)", "foo_ret\n"
+    tailcall b
+.end
+.sub bar
+    get_params "(0)", $S0
+    print "bar\n"
+    print $S0
+    set_returns "(0)", "bar_ret\n"
+    returncc
+.end
+CODE
+main
+foo
+bar
+from_foo
+bar_ret
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "tailcall 3 - pass arg");
+.sub main @MAIN
+    .const .Sub f = "foo"
+    print "main\n"
+    get_results "(0)", $S0
+    invokecc f
+    print $S0
+.end
+.sub foo
+    .const .Sub b = "bar"
+    print "foo\n"
+    set_args "(0)", "from_foo\n"
+    set_returns "(0)", "foo_ret\n"
+    tailcall b
+.end
+.sub bar
+    print "bar\n"
+    get_params "(0)", $S0
+    print $S0
+    set_returns "(0)", "bar_ret\n"
+    returncc
+.end
+CODE
+main
+foo
+bar
+from_foo
+bar_ret
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "get_params twice");
+.pcc_sub main:
+    new P16, .String
+    set P16, "ok 1\n"
+    new P17, .String
+    set P17, "ok 2\n"
+    new P18, .String
+    set P18, "ok 3\n"
+    set_args "(0, 0, 0)", P16, P17, P18
+    find_name P1, "foo"
+    invokecc P1
+    print "back\n"
+    end
+.pcc_sub foo:
+    get_params "(0, 0x8)", P1, P2
+    print P1
+    set I0, P2
+    print I0
+    print "\n"
+    set S0, P2[0]
+    print S0
+    set S0, P2[1]
+    print S0
+    get_params "(0, 0, 0)", P1, P2, P3
+    print P1
+    print P2
+    print P3
+    returncc
+CODE
+ok 1
+2
+ok 2
+ok 3
+ok 1
+ok 2
+ok 3
 back
 OUTPUT

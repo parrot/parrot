@@ -520,6 +520,10 @@ Invokes the subroutine.
             if (PObj_get_FLAGS(ccont) & SUB_FLAG_TAILCALL) {
                 PObj_get_FLAGS(ccont) &= ~SUB_FLAG_TAILCALL;
                 assert(ccont == REG_PMC(1));
+                if (INTERP->current_args) {
+                    pc = parrot_pass_args(INTERP, sub, caller_regs,
+                            PARROT_OP_get_params_pc);
+                }
                 goto is_tail_call;
             }
         }
