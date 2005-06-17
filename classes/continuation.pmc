@@ -122,6 +122,7 @@ Creates and returns a clone of the continuation.
         sub = PMC_cont(ret) = mem_sys_allocate(sizeof(struct Parrot_cont));
         memcpy(sub, cc_self, sizeof(struct Parrot_cont));
 
+        sub->ctx.current_params = sub->ctx.current_results = NULL;
         PMC_pmc_val(ret) = PMC_pmc_val(SELF);
         return ret;
     }

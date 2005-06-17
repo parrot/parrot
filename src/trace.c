@@ -113,9 +113,12 @@ trace_pmc_dump(Interp *interpreter, PMC* pmc)
     else if (pmc->vtable->base_type == enum_class_RetContinuation
             ||  pmc->vtable->base_type == enum_class_Continuation
             ||  pmc->vtable->base_type == enum_class_Sub) {
-        PIO_eprintf(interpreter, "%S=PMC(%#p Adr:%#p)",
+        opcode_t *pc, *seg;
+        pc = PMC_sub(pmc)->address;
+        seg = PMC_sub(pmc)->seg->base.data;
+        PIO_eprintf(interpreter, "%S=PMC(%#p pc:%#p)",
                 VTABLE_name(interpreter, pmc), pmc,
-                VTABLE_get_pointer(interpreter, pmc));
+                pc - seg);
     }
     else if (PObj_is_object_TEST(pmc)) {
         PIO_eprintf(interpreter, "Object(%Ss)=PMC(%#p)",

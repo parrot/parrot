@@ -66,11 +66,6 @@ C<Parrot_instantiate_object()>.
             "use the registered class instead");
     }
 
-    void* invoke(void* next) {
-        SELF.init();
-        return next;
-    }
-
 /*
 
 =item C<void init_pmc(PMC *init)>
