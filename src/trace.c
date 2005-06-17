@@ -24,6 +24,7 @@ src/test_main.c
 */
 
 #include "parrot/trace.h"
+#include "parrot/oplib/ops.h"
 
 /*
 
@@ -198,6 +199,30 @@ trace_key_dump(Interp *interpreter, PMC *key)
 
     PIO_eprintf(interpreter, "]");
 }
+static int
+get_var_type(Interp *interpreter, PMC *sig_pmc, int i)
+{
+    INTVAL sig = VTABLE_get_integer_keyed_int(interpreter, sig_pmc, i);
+    switch (sig & (PARROT_ARG_TYPE_MASK|PARROT_ARG_CONSTANT)) {
+        case PARROT_ARG_INTVAL:
+            return PARROT_ARG_I;
+        case PARROT_ARG_INTVAL|PARROT_ARG_CONSTANT:
+            return PARROT_ARG_IC;
+        case PARROT_ARG_FLOATVAL:
+            return PARROT_ARG_N;
+        case PARROT_ARG_FLOATVAL|PARROT_ARG_CONSTANT:
+            return PARROT_ARG_NC;
+        case PARROT_ARG_STRING:
+            return PARROT_ARG_S;
+        case PARROT_ARG_STRING|PARROT_ARG_CONSTANT:
+            return PARROT_ARG_SC;
+        case PARROT_ARG_PMC:
+            return PARROT_ARG_P;
+        case PARROT_ARG_PMC|PARROT_ARG_CONSTANT:
+            return PARROT_ARG_PC;
+    }
+    return 0;
+}
 
 /*
 
@@ -217,40 +242,58 @@ void
 trace_op_dump(Interp *interpreter, opcode_t *code_start,
               opcode_t *pc)
 {
-    INTVAL i, s;
+    INTVAL i, s, n;
     char *escaped;
-    int more = 0;
+    int more = 0, var_args;
     op_info_t *info = &interpreter->op_info_table[*pc];
+    PMC *sig;
+    int type;
 
     s = 1;
     PIO_eprintf(interpreter, "%6vu ", (UINTVAL)(pc - code_start));
     if (strcmp(info->name, "infix") == 0) {
-            PIO_eprintf(interpreter, "%s",
-                    Parrot_MMD_method_name(interpreter, pc[1]) + 2);
-            s = 2;
+        PIO_eprintf(interpreter, "%s",
+                Parrot_MMD_method_name(interpreter, pc[1]) + 2);
+        s = 2;
     }
     else if (strcmp(info->name, "n_infix") == 0) {
-            PIO_eprintf(interpreter, "n_%s",
-                    Parrot_MMD_method_name(interpreter, pc[1]) + 2);
-            s = 2;
+        PIO_eprintf(interpreter, "n_%s",
+                Parrot_MMD_method_name(interpreter, pc[1]) + 2);
+        s = 2;
     }
     else
         PIO_eprintf(interpreter, "%s", info->name);
 
-    if (info->arg_count > 1) {
+    n = info->arg_count;
+    var_args = 0;
+
+    if (*pc == PARROT_OP_set_args_pc ||
+            *pc == PARROT_OP_get_results_pc ||
+            *pc == PARROT_OP_get_params_pc ||
+            *pc == PARROT_OP_set_returns_pc) {
+        sig = interpreter->code->const_table->constants[pc[1]]->u.key;
+        var_args = VTABLE_elements(interpreter, sig);
+        n += var_args;
+    }
+
+    if (n > 1) {
         PIO_eprintf(interpreter, " ");
         /* pass 1 print arguments */
-        for (i = s; i < info->arg_count; i++) {
+        for (i = s; i < n; i++) {
             opcode_t o = *(pc + i);
+            if (i < info->arg_count)
+                type = info->types[i];
+            else
+                type = get_var_type(interpreter, sig, i - 2);
             if (i > s &&
-                    info->types[i] != PARROT_ARG_KC &&
-                    info->types[i] != PARROT_ARG_KIC &&
-                    info->types[i] != PARROT_ARG_KI &&
-                    info->types[i] != PARROT_ARG_K
-                    ) {
+                    type != PARROT_ARG_KC &&
+                    type != PARROT_ARG_KIC &&
+                    type != PARROT_ARG_KI &&
+                    type != PARROT_ARG_K
+               ) {
                 PIO_eprintf(interpreter, ", ");
             }
-            switch (info->types[i]) {
+            switch (type) {
                 case PARROT_ARG_IC:
                     PIO_eprintf(interpreter, "%vd", o);
                     break;
@@ -258,7 +301,11 @@ trace_op_dump(Interp *interpreter, opcode_t *code_start,
                     PIO_eprintf(interpreter, "%vg", PCONST(o)->u.number);
                     break;
                 case PARROT_ARG_PC:
-                    PIO_eprintf(interpreter, "PMC_C[%d]", (int)o);
+                    if (var_args)
+                        PIO_eprintf(interpreter, "PMC_C[%d] (%d)",
+                                (int)o, var_args);
+                    else
+                        PIO_eprintf(interpreter, "PMC_C[%d]", (int)o);
                     break;
                 case PARROT_ARG_SC:
                     escaped = PDB_escape(PCONST(o)->u.string->strstart,
@@ -307,12 +354,16 @@ trace_op_dump(Interp *interpreter, opcode_t *code_start,
             goto done;
         PIO_eprintf(interpreter, "  \t- ");
         /* pass 2 print argument details if needed */
-        for (i = 1; i < info->arg_count; i++) {
+        for (i = 1; i < n; i++) {
             opcode_t o = *(pc + i);
+            if (i < info->arg_count)
+                type = info->types[i];
+            else
+                type = get_var_type(interpreter, sig, i - 2);
             if (i > s) {
                 PIO_eprintf(interpreter, ", ");
             }
-            switch (info->types[i]) {
+            switch (type) {
                 case PARROT_ARG_I:
                     PIO_eprintf(interpreter, "I%vd=%vd", o, REG_INT(o));
                     break;
