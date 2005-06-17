@@ -348,6 +348,7 @@ docs/pdds/pdd15_objects.pod                       [main]doc
 docs/pdds/pdd16_native_call.pod                   [main]doc
 docs/pdds/pdd17_basic_types.pod			  [main]doc
 docs/pdds/pdd18_security.pod			  [main]doc
+docs/pdds/pdd19_pir.pod		  	          [main]doc
 docs/pdds/pdd_template.pod                        [main]doc
 docs/pmc.pod                                      [main]doc
 docs/pmc/array.pod                                [main]doc
@@ -1321,6 +1322,7 @@ languages/tcl/classes/tclstring.pmc               [tcl]
 languages/tcl/classes/tclobject.pmc               [tcl]
 languages/tcl/classes/tclparser.pmc               [tcl]
 languages/tcl/docs/expr.pod                       [tcl]
+languages/tcl/docs/hacks.pod                      [tcl]
 languages/tcl/docs/howto.pod			  [tcl]
 languages/tcl/docs/overview.pod                   [tcl]
 languages/tcl/examples/bench.tcl                  [tcl]
