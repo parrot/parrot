@@ -389,6 +389,36 @@ op set_returns(inconst PMC) {
     goto ADDRESS(this + 2 + argc);
 }
 
+########################################
+
+=item B<if_null>(in PMC, labelconst INT)
+
+Branch to $2 if $1 is a NULL PMC.
+
+=cut
+
+op if_null(in PMC, labelconst INT) {
+  if (PMC_IS_NULL($1)) {
+    goto OFFSET($2);
+  }
+  goto NEXT();
+}
+
+########################################
+
+=item B<unless_null>(in PMC, labelconst INT)
+
+Branch to $2 if $1 is I<not> a NULL PMC.
+
+=cut
+
+op unless_null(in PMC, labelconst INT) {
+  if (!PMC_IS_NULL($1)) {
+    goto OFFSET($2);
+  }
+  goto NEXT();
+}
+
 ###############################################################################
 
 =head1 COPYRIGHT

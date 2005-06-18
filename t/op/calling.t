@@ -149,6 +149,7 @@ output_is(<<'CODE', <<'OUTPUT', "set_args - parsing");
     noop
     set_args "(0b10, 0)", P0, I0
     print "Ok 1\n"
+    set_args "()"
     print "Ok 2\n"
     end
 CODE
@@ -614,7 +615,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "argc mismatch, optional");
 .sub foo
     get_params "(0,0x20)", $P0, $P1
     print $P0
-    isnull $P1, ok
+    if_null $P1, ok
     print "not "
 ok:
     print "ok\n"
@@ -789,7 +790,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "empty args");
 .end
 .sub foo
     get_params "(0x20)", $P1
-    isnull $P1, ok
+    if_null $P1, ok
     print "not "
 ok:
     print "ok\n"
