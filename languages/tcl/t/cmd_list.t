@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 7;
+use Parrot::Test tests => 14;
 use vars qw($TODO);
 
 language_output_is("tcl",<<'TCL',<<OUT,"no elements");
@@ -36,16 +36,62 @@ a b {c {d e}}
 OUT
 
 TODO: {
-local $TODO = "TclList -> string doesn't handle braces yet.";
-language_output_is("tcl",<<'TCL',<<'OUT',"braces");
-  puts [list \{ \} ]
-TCL
-\{ \}
-OUT
+local $TODO = "TclList -> string doesn't escape things yet.";
 
 language_output_is("tcl",<<'TCL',<<'OUT',"braces with spaces");
   puts [list "} {" ]
 TCL
 \}\ \{
 OUT
+
+language_output_is("tcl",<<'TCL',<<'OUT',"braces");
+  puts [list \{ \} ]
+TCL
+\{ \}
+OUT
+
+language_output_is("tcl",<<'TCL',<<'OUT',"newline");
+  puts [list "\n" ]
+TCL
+{
 }
+OUT
+
+language_output_is("tcl",<<'TCL',<<'OUT',"semicolon");
+  puts [list ";" ]
+TCL
+{;}
+OUT
+
+language_output_is("tcl",<<'TCL',<<'OUT',"tab");
+  puts [list "\t" ]
+TCL
+{	}
+OUT
+
+language_output_is("tcl",<<'TCL',<<'OUT',"dollar");
+  puts [list "$" ]
+TCL
+{$}
+OUT
+
+language_output_is("tcl",<<'TCL',<<'OUT',"backslash");
+  puts [list "\\" ]
+TCL
+\\
+OUT
+
+language_output_is("tcl",<<'TCL',<<'OUT',"open bracket");
+  puts [list \[ ]
+TCL
+{[}
+OUT
+
+language_output_is("tcl",<<'TCL',<<'OUT',"close bracket");
+  puts [list \] ]
+TCL
+\]
+OUT
+
+}
+

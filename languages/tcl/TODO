@@ -53,16 +53,6 @@ based on the latest Tcl man pages will B<really> help.
 
 =over 4
 
-=item List to String
-
-The current list to string logic in C<dynclasses/tcllist.pmc> is missing logic
-to properly escape string elements. 
-
-[list a\[ b\]] should generate {a\[} b\\] (note the difference in handling of [ and ] !)
-
-"\n" should be escaped as \n. "\t" as \t, etc. \, $, ; should be back-
-whacked to \\, \$, \;
-
 =item string to list 
 
 Should be moved to tcllist's set_string method. ... except that it turns
