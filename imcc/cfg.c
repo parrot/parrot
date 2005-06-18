@@ -203,6 +203,26 @@ find_basic_blocks (Parrot_Interp interpreter, IMC_Unit * unit, int first)
     }
 }
 
+static void
+bb_check_newsub(Parrot_Interp interpreter, IMC_Unit * unit,
+        Basic_block *bb, SymReg *label)
+{
+    Instruction *ins;
+    for (ins = unit->instructions; ins; ins = ins->next) {
+            if (ins->opnum == PARROT_OP_newsub_p_ic_ic &&
+                    !strcmp(label->name, ins->r[2]->name)) {
+                IMCC_debug(interpreter, DEBUG_CFG, "newsub %s\n", ins->r[2]->name);
+                /*
+                 * connect this block with first and last block
+                 */
+                bb_add_edge(unit, unit->bb_list[0], bb);
+                bb_add_edge(unit, unit->bb_list[unit->n_basic_blocks - 1], bb);
+                /* and mark the instruction as being kind of a branch */
+                bb->start->type |= ITADDR;
+                break;
+            }
+    }
+}
 /* Once the basic blocks have been computed, build_cfg computes
    the dependencies between them. */
 
@@ -221,7 +241,11 @@ build_cfg(Parrot_Interp interpreter, IMC_Unit * unit)
         /* if the block can fall-through */
         if (i > 0 && ! (last->end->type & IF_goto) )
             bb_add_edge(unit, last, bb);
-        /* look if instruction is a branch */
+        /* check first ins, if label try to find a newsub op */
+        if (bb->start->type & ITLABEL) {
+            bb_check_newsub(interpreter, unit, bb, bb->start->r[0]);
+        }
+        /* look if last instruction is a branch */
         addr = get_branch_reg(bb->end);
         if (addr)
             bb_findadd_edge(interpreter, unit, bb, addr);
@@ -526,7 +550,7 @@ analyse_life_symbol(Parrot_Interp interpreter, IMC_Unit * unit, SymReg* r)
 
     for (i=0; i < unit->n_basic_blocks; i++) {
 	if (r->life_info[i]->flags & LF_use) {
-            Instruction *ins;
+            Instruction *ins, *prev;
 
             ins = unit->bb_list[i]->start;
 
@@ -535,8 +559,16 @@ analyse_life_symbol(Parrot_Interp interpreter, IMC_Unit * unit, SymReg* r)
              * was a sub call, and the symbol is live/use here, it needs
              * allocation in the non-volatile register range
              */
-            if (ins->prev && (ins->prev->type & (ITPCCSUB|ITPCCYIELD)))
-                r->usage |= U_NON_VOLATILE;
+            if (ins->prev) {
+                prev = ins->prev;
+                if (prev->type & (ITPCCSUB|ITPCCYIELD))
+                    r->usage |= U_NON_VOLATILE;
+                else if (prev->opnum == PARROT_OP_invokecc ||
+                         prev->opnum == PARROT_OP_invokecc_p)
+                    r->usage |= U_NON_VOLATILE;
+                else if (ins->type & ITADDR)
+                    r->usage |= U_NON_VOLATILE;
+            }
 
 	    /* This block uses r, so it must be live at
 	       the beginning */
@@ -912,9 +944,9 @@ find_loops (Parrot_Interp interpreter, IMC_Unit * unit)
 }
 
 /*
- * For loop_info, finds the natural preheader of the loop, if any, and returns 
- * its index, otherwise returns -1.  A natural preheader exists if there is 
- * only one predecessor to the loop header outside of the loop body, and if it 
+ * For loop_info, finds the natural preheader of the loop, if any, and returns
+ * its index, otherwise returns -1.  A natural preheader exists if there is
+ * only one predecessor to the loop header outside of the loop body, and if it
  * always transfers control directly to the header.
  */
 int
@@ -922,10 +954,10 @@ natural_preheader (IMC_Unit * unit, Loop_info* loop_info)
 {
     int preheader = -1;
     Edge* edge;
- 
+
     for (edge = unit->bb_list[loop_info->header]->pred_list; edge; edge = edge->pred_next) {
         if (!set_contains(loop_info->loop, edge->from->index)) {
-            if (preheader == -1 && unit->bb_list[edge->from->index]->succ_list->to->index == loop_info->header && 
+            if (preheader == -1 && unit->bb_list[edge->from->index]->succ_list->to->index == loop_info->header &&
                     !unit->bb_list[edge->from->index]->succ_list->succ_next) {
                 preheader = unit->bb_list[edge->from->index]->index;
                 continue;
