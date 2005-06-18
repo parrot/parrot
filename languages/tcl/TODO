@@ -172,18 +172,6 @@ Perhaps via [namespace import]? Can fake it right now with [inline]
 
 =item multiple level lists
 
-=item compiler vs. interpreter
-
-it should be possible to further extend our interpreter
-this to make an actual compiler, where the compiler emits PIR. 
-
-And once we have the pir_code, we can either emit the necessary
-PIR (ala parrot's -o option) or we can compile and run it.
-
-Caveat: how to support -o with user defined procs - right now, proc is defining
-the sub on the fly, where, with a compiler, we may want to defer compilation,
-and simply be able to extract the generated PIR.
-
 =item expr
 
 Clean up [expr]. MUUUUCH room for improvement there. [expr] is the source

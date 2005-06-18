@@ -12,6 +12,35 @@ should merge with the TODO to avoid redundancy.
 
 =over 4
 
+=item interperter -> compiler
+
+Right now, partcl is an interpreter. The parser generates an AST of sorts,
+which the interpreter then walks through the ast, finds the command to execute,
+(e.g., C<Tcl::puts>), gets the values for each of the args (Evaluation is
+deferred until just before the function is called.)
+
+To switch to a compiler, we need to basically use the same interpreter loop,
+but generate it specifically for the series of commands being invoked. Once
+we have the PIR, we can then C<compile> it, and return that anonymous PIR
+sub. Then, instead of calling "interpret", we can just invoke that sub.
+
+Some optimizations we can do:
+
+TclWord (which we call to get the PMC for
+the various arguments), has an "is_const" method - If we look up the
+value and it's constant, we can hardcode it right into the PIR. Same goes
+for the commands.
+
+A non-tcl option we can provide is a command line option to just dump the
+generated PIR/bytecode. (e.g. tclsh -o foo.pir or tclsh -o foo.pbc)
+
+One algorithm to cache the builtins - keep a global counter (in some places,
+called epoch) - every time [rename] is called, epoch is bumped up and we have
+to re-fetch the method. But, if it hasn't changed, we're allowed to cheat.
+And if we can cheat on something like C<puts foo>, we can translate that
+*in place* to a simple C<print "foo\n"> and not have to go through all
+the overhead.
+
 =item speed
 
 We're currently quite slow, compared to tclsh. Switching over to a compiler
