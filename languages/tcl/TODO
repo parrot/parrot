@@ -35,15 +35,13 @@ simple interactive mode now exists. Still have to:
 how to do this from inside parrot?
 [ there's a RT ticket for this now, someone should put the # here.]
 
-=item migrate all these issues to RT.
+=item migrate all these issues to RT or TODO tests
 
-TODO tests would also suffice, where possible -- For those of you
-who know tcl, this would be a great place to contribute code - tests
-based on the latest Tcl man pages will B<really> help. 
+=item provide a way to test a recent tcl suite. [matt]
 
-=item update docs
+=item update docs [will]
 
-=item add pod to all .imc
+(including add pod to all .imc)
 
 =back
 
@@ -57,12 +55,6 @@ based on the latest Tcl man pages will B<really> help.
 
 Should be moved to tcllist's set_string method. ... except that it turns
 out this is non-trivial.
-
-=item Use PMCs to handle numifying
-
-not the pir routines we now have. Verify that [expr 2a + 2b] behaves
-appropriately when doing this. Include proper numification of octal and
-hex.
 
 =back
 
