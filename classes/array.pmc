@@ -208,6 +208,28 @@ size, number of dimensions, etc.
 
 /*
 
+=item C<void set_pmc(PMC *other)>
+
+Copy the contents of other to self.
+
+=cut
+
+*/
+
+    void set_pmc (PMC *other) {
+        INTVAL size;
+        INTVAL i;
+
+        size = VTABLE_elements(INTERP,other);
+        DYNSELF.set_integer_native(size);
+        for(i = 0; i < size; i++) {
+            PMC* elem = VTABLE_get_pmc_keyed_int(INTERP, other, i);
+            DYNSELF.set_pmc_keyed_int(i, elem);
+        }
+    }
+
+/*
+
 =item C<void mark()>
 
 Mark the array and its contents as live.
