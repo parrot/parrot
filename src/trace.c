@@ -116,7 +116,7 @@ trace_pmc_dump(Interp *interpreter, PMC* pmc)
         opcode_t *pc, *seg;
         pc = PMC_sub(pmc)->address;
         seg = PMC_sub(pmc)->seg->base.data;
-        PIO_eprintf(interpreter, "%S=PMC(%#p pc:%#p)",
+        PIO_eprintf(interpreter, "%S=PMC(%#p pc:%d)",
                 VTABLE_name(interpreter, pmc), pmc,
                 pc - seg);
     }

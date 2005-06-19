@@ -372,7 +372,6 @@ expand_pcc_sub(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
 {
     SymReg *sub;
     int nargs;
-    int ps, pe;
     Instruction *tmp;
     SymReg *i0, *regs[IMCC_MAX_REGS], *label1, *label2;
     char buf[128];

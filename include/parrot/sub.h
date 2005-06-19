@@ -121,6 +121,9 @@ void swap_context(Interp *, PMC *);
 void restore_context(Interp *, struct Parrot_Context *);
 void mark_context(Interp *, struct Parrot_Context *);
 
+opcode_t * parrot_pass_args(Interp *, struct Parrot_sub * sub,
+        struct parrot_regs_t *caller_regs, int what);
+
 void copy_regs(Interp *, struct parrot_regs_t *caller_regs);
 void mark_reg_stack(Interp *, Stack_Chunk_t *);
 

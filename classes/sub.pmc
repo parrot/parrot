@@ -62,10 +62,6 @@ print_sub_name(Interp* interpreter, PMC* sub)
     print_pbc_location(interpreter);
 }
 
-/* XXX interface, when finsished */
-opcode_t * parrot_pass_args(Interp *, struct Parrot_sub * sub,
-        struct parrot_regs_t *caller_regs, int what);
-
 opcode_t *
 parrot_pass_args(Interp *interpreter, struct Parrot_sub * sub,
         struct parrot_regs_t *caller_regs, int what)
@@ -151,9 +147,9 @@ parrot_pass_args(Interp *interpreter, struct Parrot_sub * sub,
                 if (slurp_ar) {
                     VTABLE_push_integer(interpreter, slurp_ar, i_arg);
                 }
-                else if (dst_sig == PARROT_ARG_INTVAL)
+                else if (dst_typ == PARROT_ARG_INTVAL)
                     REG_INT(dst_pc[dst_i]) = i_arg;
-                else if (dst_sig == PARROT_ARG_PMC) {
+                else if (dst_typ == PARROT_ARG_PMC) {
                     PMC *d = pmc_new(interpreter,
                             Parrot_get_ctx_HLL_type(interpreter,
                                 enum_class_Integer));
@@ -175,9 +171,9 @@ parrot_pass_args(Interp *interpreter, struct Parrot_sub * sub,
                 if (slurp_ar) {
                     VTABLE_push_string(interpreter, slurp_ar, s_arg);
                 }
-                else if (dst_sig == PARROT_ARG_STRING)
+                else if (dst_typ == PARROT_ARG_STRING)
                     REG_STR(dst_pc[dst_i]) = s_arg;
-                else if (dst_sig == PARROT_ARG_PMC) {
+                else if (dst_typ == PARROT_ARG_PMC) {
                     PMC *d = pmc_new(interpreter,
                             Parrot_get_ctx_HLL_type(interpreter,
                                 enum_class_String));
@@ -199,9 +195,9 @@ parrot_pass_args(Interp *interpreter, struct Parrot_sub * sub,
                 if (slurp_ar) {
                     VTABLE_push_float(interpreter, slurp_ar, f_arg);
                 }
-                else if (dst_sig == PARROT_ARG_FLOATVAL)
+                else if (dst_typ == PARROT_ARG_FLOATVAL)
                     REG_NUM(dst_pc[dst_i]) = f_arg;
-                else if (dst_sig == PARROT_ARG_PMC) {
+                else if (dst_typ == PARROT_ARG_PMC) {
                     PMC *d = pmc_new(interpreter,
                             Parrot_get_ctx_HLL_type(interpreter,
                                 enum_class_Float));
@@ -259,15 +255,15 @@ normal_pmc:
                     if (slurp_ar) {
                         VTABLE_push_pmc(interpreter, slurp_ar, p_arg);
                     }
-                    else if (dst_sig == PARROT_ARG_PMC)
+                    else if (dst_typ == PARROT_ARG_PMC)
                         REG_PMC(dst_pc[dst_i]) = p_arg;
-                    else if (dst_sig == PARROT_ARG_INTVAL)
+                    else if (dst_typ == PARROT_ARG_INTVAL)
                         REG_INT(dst_pc[dst_i]) =
                             VTABLE_get_integer(interpreter, p_arg);
-                    else if (dst_sig == PARROT_ARG_FLOATVAL)
+                    else if (dst_typ == PARROT_ARG_FLOATVAL)
                         REG_NUM(dst_pc[dst_i]) =
                             VTABLE_get_number(interpreter, p_arg);
-                    else if (dst_sig == PARROT_ARG_STRING)
+                    else if (dst_typ == PARROT_ARG_STRING)
                         REG_STR(dst_pc[dst_i]) =
                             VTABLE_get_string(interpreter, p_arg);
                 }

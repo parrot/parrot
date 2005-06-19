@@ -211,7 +211,22 @@ bb_check_newsub(Parrot_Interp interpreter, IMC_Unit * unit,
     for (ins = unit->instructions; ins; ins = ins->next) {
             if (ins->opnum == PARROT_OP_newsub_p_ic_ic &&
                     !strcmp(label->name, ins->r[2]->name)) {
-                IMCC_debug(interpreter, DEBUG_CFG, "newsub %s\n", ins->r[2]->name);
+                IMCC_debug(interpreter, DEBUG_CFG, "newsub %s\n",
+                        ins->r[2]->name);
+                /*
+                 * connect this block with first and last block
+                 */
+                bb_add_edge(unit, unit->bb_list[0], bb);
+                bb_add_edge(unit, unit->bb_list[unit->n_basic_blocks - 1], bb);
+                /* and mark the instruction as being kind of a branch */
+                bb->start->type |= ITADDR;
+                break;
+            }
+            else if (ins->opnum == PARROT_OP_set_addr_p_ic &&
+                    !strcmp(label->name, ins->r[1]->name)) {
+                IMCC_debug(interpreter, DEBUG_CFG, "set_addr %s\n",
+                        ins->r[1]->name);
+
                 /*
                  * connect this block with first and last block
                  */

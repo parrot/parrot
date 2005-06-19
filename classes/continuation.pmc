@@ -38,9 +38,6 @@ See the L<Glossary|docs/glossary.pod> for more information.
 
 */
 
-/* XXX interface, when finsished */
-opcode_t * parrot_pass_args(Interp *, struct Parrot_sub * sub,
-        struct parrot_regs_t *caller_regs, int what);
 
 /*
  * A Continuation (and RetContinuation, Exception_Handler) has in its
