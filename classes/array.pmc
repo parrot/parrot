@@ -208,7 +208,7 @@ size, number of dimensions, etc.
 
 /*
 
-=item C<void set_pmc(PMC *other)>
+=item C<void assign_pmc(PMC *other)>
 
 Copy the contents of other to self.
 
@@ -216,7 +216,7 @@ Copy the contents of other to self.
 
 */
 
-    void set_pmc (PMC *other) {
+    void assign_pmc (PMC *other) {
         INTVAL size;
         INTVAL i;
 
@@ -226,6 +226,21 @@ Copy the contents of other to self.
             PMC* elem = VTABLE_get_pmc_keyed_int(INTERP, other, i);
             DYNSELF.set_pmc_keyed_int(i, elem);
         }
+    }
+
+
+/*
+
+=item C<void set_pmc(PMC *other)>
+
+Currently, an alias to C<assign_pmc>.  Expected to go away soon.
+
+=cut
+
+*/
+
+    void set_pmc (PMC *other) {
+        DYNSELF.assign_pmc(other);
     }
 
 /*
