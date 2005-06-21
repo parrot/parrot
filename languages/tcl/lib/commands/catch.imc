@@ -56,7 +56,7 @@ save_lex:
 badargs:
   return_type = TCL_ERROR
   retval = new String
-  retval = "wrong # args: should be \"catch command ?varName?\"\n"
+  retval = "wrong # args: should be \"catch command ?varName?\""
 
 done:
   .return(return_type,retval)

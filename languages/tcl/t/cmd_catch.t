@@ -70,7 +70,6 @@ language_output_is("tcl",<<'TCL',<<OUT,"error, invalid command");
   puts $var
 TCL
 invalid command name "blorg"
-
 OUT
 
 language_output_is("tcl",<<'TCL',<<OUT,"bad args");

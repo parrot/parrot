@@ -20,7 +20,7 @@
   $P0 = find_global "_Tcl", "call_level"
   call_level = $P0
 
-  .local string value
+  .local pmc value
   .local int looper
  
   if argc == 0 goto error
@@ -33,7 +33,7 @@ if call_level goto find_lexical
 find_lexical:
   $P1 = find_lex call_level, $S1
 found_variable:
-  value = $P1 
+  value = clone $P1 
 
 loop:
   if looper == argc goto loop_done
@@ -44,9 +44,9 @@ loop:
   goto loop
 
 loop_done:
-
-  $P1 = new TclString
-  $P1 = value
+  # clone so that the return value won't change if the stored
+  # lexical/global is changed
+  $P1 = clone value
 if call_level goto set_lexical
   store_global "Tcl", $S1, $P1
   goto done
@@ -58,12 +58,10 @@ set_lexical:
   # fall through to a bad call.
 
 error:
-  return_type = TCL_ERROR 
+  return_type = TCL_ERROR
+  value = new TclString
   value = "wrong # args: should be \"append varName ?value value ...?\""
 
 done:
-  # clone so that the return value won't change if the stored
-  # lexical/global is changed
-  $P2 = clone $P1
-  .return(return_type,$P2)
+  .return(return_type, value)
 .end

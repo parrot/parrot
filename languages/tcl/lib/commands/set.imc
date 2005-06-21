@@ -142,7 +142,7 @@ no_such_variable:
 
 error:
   return_type = TCL_ERROR 
-  retval = "wrong # args: should be \"set varName ?newValue?\"\n"
+  retval = "wrong # args: should be \"set varName ?newValue?\""
 
 done:
   .return(return_type,retval)

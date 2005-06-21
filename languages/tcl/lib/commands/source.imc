@@ -51,7 +51,7 @@ badfile:
   retval = new String
   retval = "couldn't read file \""
   retval = retval . filename
-  retval = retval . "\": no such file or directory\n"
+  retval = retval . "\": no such file or directory"
   goto done
 
 fail:

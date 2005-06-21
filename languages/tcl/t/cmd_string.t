@@ -52,31 +52,31 @@ language_output_is("tcl",$tcl,$expected,"first, index");
 $tcl = <<'EOTCL';
  puts -nonewline [string first c abcd joe]
 EOTCL
-$expected = "bad index \"joe\": must be integer or end?-integer?";
+$expected = "bad index \"joe\": must be integer or end?-integer?\n";
 language_output_is("tcl",$tcl,$expected,"first, index, invalid index");
 
 $tcl = <<'EOTCL';
  puts -nonewline [string first]
 EOTCL
-$expected = "wrong # args: should be \"string first subString string ?startIndex?\"";
+$expected = "wrong # args: should be \"string first subString string ?startIndex?\"\n";
 language_output_is("tcl",$tcl,$expected,"first, too few args");
 
 $tcl = <<'EOTCL';
  puts -nonewline [string first a b c d]
 EOTCL
-$expected = "wrong # args: should be \"string first subString string ?startIndex?\"";
+$expected = "wrong # args: should be \"string first subString string ?startIndex?\"\n";
 language_output_is("tcl",$tcl,$expected,"first, too many args");
 
 $tcl = <<'EOTCL';
  puts -nonewline [string index a b c]
 EOTCL
-$expected = "wrong # args: should be \"string index string charIndex\"";
+$expected = "wrong # args: should be \"string index string charIndex\"\n";
 language_output_is("tcl",$tcl,$expected,"index, too many args");
 
 $tcl = <<'EOTCL';
  puts -nonewline [string index]
 EOTCL
-$expected = "wrong # args: should be \"string index string charIndex\"";
+$expected = "wrong # args: should be \"string index string charIndex\"\n";
 language_output_is("tcl",$tcl,$expected,"index, too few args");
 
 $tcl = <<'EOTCL';
@@ -111,13 +111,13 @@ language_output_is("tcl",$tcl,$expected,"index, too near?");
 $tcl = <<'EOTCL';
  puts -nonewline [string length a b]
 EOTCL
-$expected = "wrong # args: should be \"string length string\"";
+$expected = "wrong # args: should be \"string length string\"\n";
 language_output_is("tcl",$tcl,$expected,"length, too many args");
 
 $tcl = <<'EOTCL';
  puts -nonewline [string length]
 EOTCL
-$expected = "wrong # args: should be \"string length string\"";
+$expected = "wrong # args: should be \"string length string\"\n";
 language_output_is("tcl",$tcl,$expected,"length, too few args");
 
 $tcl = <<'EOTCL';
@@ -135,13 +135,13 @@ language_output_is("tcl",$tcl,$expected,"length, simple");
 $tcl = <<'EOTCL';
  puts -nonewline [string range a b]
 EOTCL
-$expected = "wrong # args: should be \"string range string first last\"";
+$expected = "wrong # args: should be \"string range string first last\"\n";
 language_output_is("tcl",$tcl,$expected,"range, too many args");
 
 $tcl = <<'EOTCL';
  puts -nonewline [string range a b c d]
 EOTCL
-$expected = "wrong # args: should be \"string range string first last\"";
+$expected = "wrong # args: should be \"string range string first last\"\n";
 language_output_is("tcl",$tcl,$expected,"range, too few args");
 
 $tcl = <<'EOTCL';

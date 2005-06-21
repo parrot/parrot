@@ -76,7 +76,7 @@ no_command:
   return_type = TCL_ERROR
   $S0 = "invalid command name \""
   $S0 .= proc
-  $S0 .= "\"\n"
+  $S0 .= "\""
   retval = $S0
 
 done:

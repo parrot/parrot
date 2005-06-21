@@ -150,7 +150,7 @@ loop_outer_done:
 
 error:
   return_type = TCL_ERROR
-  retval = "wrong # args: should be \"foreach varList list ?varList list ...? command\"\n"
+  retval = "wrong # args: should be \"foreach varList list ?varList list ...? command\""
   goto done
 
 done:

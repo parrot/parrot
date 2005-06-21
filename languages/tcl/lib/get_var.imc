@@ -46,7 +46,7 @@ get_scalar_bad:
   return_type = TCL_ERROR
   $S0 = "can't read \""
   $S0 .= argv0
-  $S0 .= "\": variable is an array\n"
+  $S0 .= "\": variable is an array"
   retval = new String
   retval = $S0
   goto done
@@ -59,7 +59,7 @@ no_such_variable:
   return_type = TCL_ERROR
   $S0 = "can't read \""
   $S0 .= argv0
-  $S0 .= "\": no such variable\n"
+  $S0 .= "\": no such variable"
   retval = new String
   retval = $S0
   # goto done            
@@ -110,7 +110,7 @@ get_indexed_bad:
   $S0 .= "("
   $S1 = argv1
   $S0 .= $S1
-  $S0 .= ")\": variable isn't array\n"
+  $S0 .= ")\": variable isn't array"
   retval = new String
   retval = $S0
   goto done
@@ -119,7 +119,7 @@ no_such_variable:
   return_type = TCL_ERROR
   $S0 = "can't read \""
   $S0 .= argv0
-  $S0 .= "\": no such variable\n"
+  $S0 .= "\": no such variable"
   retval = new String
   retval = $S0
   # goto done            

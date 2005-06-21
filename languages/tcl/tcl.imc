@@ -63,6 +63,7 @@ done:
   # XXX 1 == TCL_ERROR
   if retcode != 1 goto realdone
   print retval
+  print "\n"
   exit 1
 
 realdone:

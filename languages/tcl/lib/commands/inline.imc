@@ -25,6 +25,6 @@ fail:
   $P1 = new String
   $P1 = "invalid language \""
   $P1 .= $S1
-  $P1 .= "\" specified\n"
+  $P1 .= "\" specified"
   .return (TCL_ERROR, $P1)
 .end

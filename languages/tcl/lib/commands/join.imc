@@ -38,7 +38,7 @@ doit:
 
 bad_args:
   return_type = TCL_ERROR
-  retval = "wrong # args: should be \"join list ?joinString?\"\n"
+  retval = "wrong # args: should be \"join list ?joinString?\""
 
 done:
   .local pmc rv

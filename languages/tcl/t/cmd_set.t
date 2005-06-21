@@ -30,5 +30,5 @@ $tcl = <<'EOTCL';
  set b 1
  set b(c) 2
 EOTCL
-$expected = "can't set \"b(c)\": variable isn't array";
+$expected = "can't set \"b(c)\": variable isn't array\n";
 language_output_is("tcl",$tcl,$expected,"not an array");

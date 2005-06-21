@@ -8,7 +8,7 @@ use Parrot::Test tests => 1;
 # Also needs TODO tests for missing functionality.
 
 language_output_is("tcl",<<'TCL',<<OUT,"simple error");
-  error "dead\n"
+  error "dead"
 TCL
 dead
 OUT

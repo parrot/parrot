@@ -35,14 +35,14 @@ TCL
 12abclong string
 OUT
 
-TODO: {
-local $TODO = "error messages currently unimplemented";
 language_output_is('tcl', <<'TCL', <<'OUT', 'wrong # args error');
  append
 TCL
 wrong # args: should be "append varName ?value value ...?"
 OUT
 
+TODO: {
+local $TODO = "error messages currently unimplemented";
 language_output_is('tcl', <<'TCL', <<'OUT', 'variable isn\'t array error');
  set x ""
  append x(0) 44
