@@ -62,5 +62,8 @@ error:
   value = "wrong # args: should be \"append varName ?value value ...?\""
 
 done:
-  .return(return_type,$P1)
+  # clone so that the return value won't change if the stored
+  # lexical/global is changed
+  $P2 = clone $P1
+  .return(return_type,$P2)
 .end
