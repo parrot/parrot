@@ -28,11 +28,21 @@
 
   $S1 = argv[0] 
 if call_level goto find_lexical
-  $P1 = find_global "Tcl", $S1
-  goto found_variable
+  push_eh new_variable
+    $P1 = find_global "Tcl", $S1
+    goto found_variable
 find_lexical:
-  $P1 = find_lex call_level, $S1
+  push_eh new_variable
+    $P1 = find_lex call_level, $S1
+    goto found_variable
+
+new_variable:
+  value = new TclString
+  value = ""
+  goto loop
+
 found_variable:
+  clear_eh
   value = clone $P1 
 
 loop:

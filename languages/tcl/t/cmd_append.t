@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 7;
+use Parrot::Test tests => 8;
 use vars qw($TODO);
 
 language_output_is('tcl', <<'TCL', <<'OUT', 'noarg');
@@ -29,6 +29,13 @@ OUT
 
 language_output_is('tcl', <<'TCL', <<'OUT', 'empty with several args');
  set x ""
+ append x 1 2 abc "long string"
+ puts $x
+TCL
+12abclong string
+OUT
+
+language_output_is('tcl', <<'TCL', <<'OUT', 'unset variable');
  append x 1 2 abc "long string"
  puts $x
 TCL
