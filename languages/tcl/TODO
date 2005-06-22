@@ -142,6 +142,12 @@ tclversion, body, args, exists
 
 =back
 
+=item Add tcl tests to tcl, and remove from partcl
+
+Add tcl tests to the tcl test suite, which is currently run by partcl, 
+and remove duplicated tests from the partcl test suite. The partcl 
+test suite should only test parrot-related functionality.
+
 =back
 
 =head1 Uncategorized Issues
