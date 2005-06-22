@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 14;
+use Parrot::Test tests => 15;
 use vars qw($TODO);
 
 language_output_is("tcl",<<'TCL',<<OUT,"no elements");
@@ -33,6 +33,12 @@ language_output_is("tcl",<<'TCL',<<OUT,"spaces with quotes");
   puts [list a b "c {d e}"]
 TCL
 a b {c {d e}}
+OUT
+
+language_output_is("tcl",<<'TCL',<<'OUT',"spaces in two elements");
+puts [list {1 2} {3 4}]
+TCL
+{1 2} {3 4}
 OUT
 
 TODO: {

@@ -110,14 +110,16 @@ Returns the list as a string
             vals = VTABLE_get_string(INTERP, val);
 
             pos = string_str_index(INTERP,vals,space,0);
-            if (pos != -1) {
-              vals = string_append(INTERP, ob, vals, 0);
-              vals = string_append(INTERP, vals, cb, 0);
-            } 
+            if (pos != -1)
+              string_append(INTERP, res, ob, 0);
 
-            res = string_append(INTERP, res, vals, 0);
+            string_append(INTERP, res, vals, 0);
+            
+            if (pos != -1)
+              string_append(INTERP, res, cb, 0);
+            
             if (j < n - 1)
-                res = string_append(INTERP, res, space, 0);
+                string_append(INTERP, res, space, 0);
         }
         return res;
     }
