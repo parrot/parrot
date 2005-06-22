@@ -140,11 +140,13 @@ END
     for my $name (sort keys %tests) {
         my ($expl, $body, $out) = @{ $tests{$name} };
         $string .= <<"END";
-language_output_is('tcl', <<'TCL', <<'OUT', '$name - $expl');
+language_output_is('tcl', <<'TCL', <<'OUT', <<'DESC');
 $body
 TCL
 $out
 OUT
+$name - $expl
+DESC
 
 END
     }
