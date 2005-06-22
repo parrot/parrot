@@ -6,34 +6,46 @@
 .sub "lappend"
 
   .local pmc argv
-  argv = foldup  
+  argv = foldup 
 
-  # XXX Need error handling.
+  .local pmc value
+  .local int return_type
+  return_type = TCL_OK
+
+  .local int argc
+  argc = argv
+  if argc == 0 goto error
 
   .local string listname
-  listname = argv[0]
+  listname = argv[0] 
 
   .local int call_level
   $P0 = find_global "_Tcl", "call_level"
   call_level = $P0
 
-  .local pmc listvar
   if call_level goto find_lexical
-   listvar = find_global "Tcl", listname
+   value = find_global "Tcl", listname
   goto got_var
 find_lexical:
-  listvar = find_lex call_level, listname
+  value = find_lex call_level, listname
 got_var:
 
   .local int cnt
   cnt = 1
-LOOP:
-  if cnt >= I3 goto DONE
+loop:
+  if cnt >= I3 goto loop_done
   $P0 = argv[cnt]
-  push listvar, $P0
+  push value, $P0
   inc cnt
-  goto LOOP
-DONE:
+  goto loop
+loop_done:
+  goto done
 
-  .return(0,listvar)
+error:
+  return_type = TCL_ERROR
+  value = new TclString
+  value = "wrong # args: should be \"lappend varName ?value value ...?\""
+
+done:
+  .return(return_type,value)
 .end

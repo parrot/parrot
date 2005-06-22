@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 3;
+use Parrot::Test tests => 4;
 
 language_output_is("tcl",<<'TCL',<<OUT,"append nothing");
   set a [list a b]
@@ -26,4 +26,10 @@ language_output_is("tcl",<<'TCL',<<OUT,"append multiple");
   puts $a
 TCL
 a b c d e f g
+OUT
+
+language_output_is('tcl', <<'TCL', <<'OUT', 'wrong # args error');
+  lappend
+TCL
+wrong # args: should be "lappend varName ?value value ...?"
 OUT
