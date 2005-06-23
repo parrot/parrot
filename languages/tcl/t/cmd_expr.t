@@ -2,7 +2,8 @@
 
 use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 40;
+use Parrot::Test tests => 42;
+use vars qw($TODO);
 
 language_output_is("tcl",<<TCL,<<OUT,"mul");
  puts [expr 2 * 3]
@@ -253,3 +254,20 @@ language_output_is("tcl",<<TCL,<<OUT,"parens");
 TCL
 28
 OUT
+
+TODO: {
+local $TODO = "bugs";
+
+language_output_is("tcl",<<'TCL',<<'OUT',"int vs. float");
+ set n 1
+ puts [expr {$n * 1}]
+TCL
+1
+OUT
+
+language_output_is("tcl",<<'TCL',<<'OUT',"nested expr");
+ puts [expr {2 * [expr {2 - 1}]}];
+TCL
+2
+OUT
+}
