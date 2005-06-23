@@ -4,7 +4,7 @@ use strict;
 use FindBin;
 use lib "$FindBin::Bin/../../lib", "$FindBin::Bin/../../../../lib";
 
-use Parrot::Test tests => 5;
+use Parrot::Test tests => 7;
 use Parrot::Test::PGE;
 
 # Assemble PIR for simple pattern matching with PCRE
@@ -12,8 +12,12 @@ sub get_pir_pcre
 {
   my ( $string, $token ) = @_;
 
-  my %regex = ( name     => q{[_a-zA-Z][_a-zA-Z0-9]*},
-                quoted   => q{^`[^`]*'} );
+  my %regex = ( word     => q{^[_a-zA-Z][_a-zA-Z0-9]*},
+                string   => q{^`[^`]*'},    #'
+                simple   => q{^[^`#_a-zA-Z]}, 
+                comment  => q{^#[^\n]*\n}, 
+              );
+
   return q{
 
 .sub test @MAIN
@@ -129,38 +133,53 @@ END_PIR
 
 
 {
-  my $code = get_pir_pcre( 'foo', 'name' );
-  pir_output_is( $code, << 'OUTPUT', "'foo' is a name" );
+  my $code = get_pir_pcre( 'foo', 'word' );
+  pir_output_is( $code, << 'OUTPUT', "'foo' is a word" );
 1 match(es):
 foo
 OUTPUT
 }
 {
-  my $code = get_pir_pcre( '_tmp', 'name' );
-  pir_output_is( $code, << 'OUTPUT', "'_tmp' is a name" );
+  my $code = get_pir_pcre( '_tmp', 'word' );
+  pir_output_is( $code, << 'OUTPUT', "'_tmp' is a word" );
 1 match(es):
 _tmp
 OUTPUT
 }
 {
-  my $code = get_pir_pcre( 'name2', 'name' );
-  pir_output_is( $code, << 'OUTPUT', "'name2' is a name" );
+  my $code = get_pir_pcre( 'name2', 'word' );
+  pir_output_is( $code, << 'OUTPUT', "'name2' is a word" );
 1 match(es):
 name2
 OUTPUT
 }
 {
-  my $code = get_pir_pcre( "`quoted'", 'quoted' );
-  pir_output_is( $code, << 'OUTPUT', "'`quoted'' is a quoted string" );
+  my $code = get_pir_pcre( "`quoted'", 'string' );
+  pir_output_is( $code, << 'OUTPUT', "'`string'' is a quoted string" );
 1 match(es):
 `quoted'
 OUTPUT
 }
 {
-  my $code = get_pir_pcre( "`'", 'quoted' );
+  my $code = get_pir_pcre( "`'", 'string' );
   pir_output_is( $code, << 'OUTPUT', "'`'' is a quoted string" );
 1 match(es):
 `'
+OUTPUT
+}
+{
+  my $code = get_pir_pcre( "+", 'simple' );
+  pir_output_is( $code, << 'OUTPUT', "+ is a simple token" );
+1 match(es):
++
+OUTPUT
+}
+{
+  my $code = get_pir_pcre( '# asdf\n', 'comment' );
+  pir_output_is( $code, << 'OUTPUT', '# asdf\n is a comment' );
+1 match(es):
+# asdf
+
 OUTPUT
 }
 
@@ -174,7 +193,7 @@ my %regex = ( word          => q{^(a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w
             );
 # Test whether words are recognised
 {
-  foreach my $target ( q{foo}, q{_tmp}, q{name} )
+  foreach my $target ( q{foo}, q{_tmp}, q{word} )
   {
     p6rule_is( $target, $regex{word}, "'$target' is a word" );
   }

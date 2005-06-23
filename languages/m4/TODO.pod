@@ -8,6 +8,14 @@
 
 =back
 
+=head1 Internal
+
+=over
+
+=item For matching use PGE instead of PCRE.
+
+=back
+
 =head1 Testing
 
 =over
@@ -23,8 +31,6 @@
 =head1 Perl5
 
 =over
-
-=item Create module Language::m4 or Text::m4
 
 =item Test with Perl 5.005
 
