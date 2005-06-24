@@ -2,7 +2,8 @@
 
 use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 8;
+use Parrot::Test tests => 9;
+use vars qw($TODO);
 
 my($tcl,$expected);
 
@@ -58,3 +59,15 @@ $tcl = <<'EOTCL';
 EOTCL
 $expected = "test\n";
 language_output_is("tcl",$tcl,$expected,"no arg command with spaced semicolon");
+
+TODO: {
+$TODO = "bug(s)";
+
+language_output_is("tcl",<<'TCL',<<'OUT',"\$ is only a variable if it's followed by \\w or {");
+set x $
+puts $x
+TCL
+$
+OUT
+
+}

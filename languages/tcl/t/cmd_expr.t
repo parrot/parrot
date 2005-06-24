@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 42;
+use Parrot::Test tests => 43;
 use vars qw($TODO);
 
 language_output_is("tcl",<<TCL,<<OUT,"mul");
@@ -257,6 +257,12 @@ OUT
 
 TODO: {
 local $TODO = "bugs";
+
+language_output_is("tcl",<<'TCL',<<'OUT',"float division");
+puts [expr 1 / 3.0]
+TCL
+0.333333333333
+OUT
 
 language_output_is("tcl",<<'TCL',<<'OUT',"int vs. float");
  set n 1
