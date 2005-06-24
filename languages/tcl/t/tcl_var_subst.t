@@ -56,7 +56,7 @@ OUT
 
 TODO: {
 local $TODO = "bugs";
-  language_output_is("tcl",<<'TCL',<<'OUT',"${} substitute an array");
+  language_output_is("tcl",<<'TCL',<<'OUT','${} substitute an array');
   set x(0) 44
   puts ${x(0)}
 TCL
