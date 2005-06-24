@@ -60,8 +60,10 @@ sub check_op_doc {
             if ($item =~ /^([BC])\<(.*)\>\s*\((.*?)\)/) {
                 print "$filename:$lineno: use B<...> instead of C<...>\n"
                     if $1 eq "C";
-                $op{$2}{$3}{doc} = $lineno;
-                $op{$2}{$3}{status} |= 1;
+		my ($op, $args) = ($2, $3);
+		$args =~ s!\s*/\*.*?\*/!!;  # del C comment in args
+                $op{$op}{$args}{doc} = $lineno;
+                $op{$op}{$args}{status} |= 1;
             }
         } elsif ($line =~ /^(inline )?\s*op\s*(\S+)\s*\((.*?)\)/) {
             $op{$2}{$3}{def} = $lineno;
