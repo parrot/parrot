@@ -56,6 +56,8 @@ will be to use Perl 6 to write and compile a better (faster) rules parser.
     p6meta[')'] = u
     $P0 = find_global "PGE::P6Rule", "p6rule_parse_alias"
     p6meta['$<'] = $P0
+    p6meta['@<'] = $P0
+    p6meta['%<'] = $P0
     p6meta['$0'] = $P0
     p6meta['$1'] = $P0
     p6meta['$2'] = $P0
@@ -349,11 +351,20 @@ Parses subrules.
     p6rule_parse_skip(pattern, lex, 1)
     pos = lex["pos"]
     $I0 = pos
+    $S0 = substr pattern, pos, 1
+    unless $S0 == '?' goto subrule_1
+    inc pos
+    inc $I0
   subrule_1:
     $I1 = is_wordchar pattern, pos 
-    unless $I1 goto subrule_2
+    unless $I1 goto subrule_1b
+  subrule_1_inc:
     inc pos
     goto subrule_1
+  subrule_1b:
+    $S0 = substr pattern, pos, 1
+    if $S0 == '.' goto subrule_1_inc
+    if $S0 == ':' goto subrule_1_inc
   subrule_2:
     $I1 = pos - $I0
     if $I1 > 0 goto subrule_3
@@ -399,6 +410,8 @@ Parse an alias or backreference.
     pos = lex["pos"]                               # get current position
     inc pos                                        # skip past '$'
     if token == '$<' goto name                     # $< == named capture
+    if token == '@<' goto name                     # @< == named capture
+    if token == '%<' goto name                     # %< == named capture
     $I0 = pos                                      # aha, numeric capture
     plen = lex["plen"]                             # now let's scan for digits
   num_0:
