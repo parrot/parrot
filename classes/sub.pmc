@@ -242,6 +242,8 @@ parrot_pass_args(Interp *interpreter, struct Parrot_sub * sub,
                             VTABLE_push_pmc(interpreter, slurp_ar, elem);
                         else {
                             REG_PMC(dst_pc[dst_i++]) = elem;
+                            if (dst_i == dst_n)
+                                break;
                             dst_sig = VTABLE_get_integer_keyed_int(interpreter,
                                     param_signature, dst_i);
                             dst_typ = dst_sig & PARROT_ARG_TYPE_MASK;
