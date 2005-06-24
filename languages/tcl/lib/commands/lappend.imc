@@ -17,21 +17,30 @@
   if argc == 0 goto error
 
   .local string listname
-  listname = argv[0] 
+  listname = argv[0]
+  .local int cnt
+  cnt = 1
 
   .local int call_level
   $P0 = find_global "_Tcl", "call_level"
   call_level = $P0
 
-  if call_level goto find_lexical
-   value = find_global "Tcl", listname
-  goto got_var
+if call_level goto find_lexical
+  push_eh new_variable
+    value = find_global "Tcl", listname
+    goto got_var
 find_lexical:
-  value = find_lex call_level, listname
-got_var:
+  push_eh new_variable
+    value = find_lex call_level, listname
+    goto got_var
 
-  .local int cnt
-  cnt = 1
+got_var:
+  clear_eh
+  goto loop
+
+new_variable:
+  value = new TclList
+  
 loop:
   if cnt >= I3 goto loop_done
   $P0 = argv[cnt]
