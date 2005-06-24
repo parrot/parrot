@@ -10,6 +10,8 @@
   .local int argc 
   argc = argv
 
+  unless argc goto no_args
+
   .local pmc elseifs
   elseifs = new TclList
   .local pmc retval,condition
@@ -103,4 +105,9 @@ done:
 
 done_error:
   .return(return_type,retval)
+
+no_args:
+  retval = new TclString
+  retval = "wrong # args: no expression after \"if\" argument"
+  .return(TCL_ERROR,retval)
 .end
