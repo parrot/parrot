@@ -48,6 +48,7 @@ input_loop:
   $P1 = parser."parse"(input_line,0,0)
   (retcode,retval) = interpret($P1)
   # print out the result of the evaluation.
+  isnull retval, input_loop
   if retval == "" goto input_loop
   print retval
   print "\n"
