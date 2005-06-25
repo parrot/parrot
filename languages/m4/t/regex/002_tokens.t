@@ -4,10 +4,10 @@ use strict;
 use FindBin;
 use lib "$FindBin::Bin/../../lib", "$FindBin::Bin/../../../../lib";
 
-use Parrot::Test tests => 7;
+use Parrot::Test tests => 29;
 use Parrot::Test::PGE;
 
-# Assemble PIR for simple pattern matching with PCRE
+# Assemble PIR for pattern matching with PCRE
 sub get_pir_pcre
 {
   my ( $string, $token ) = @_;
@@ -76,62 +76,8 @@ match_err:
   }
 }
 
-# Assemble PIR for simple pattern matching with PGE
-# This is not used yet
-sub get_pir_pge
-{
-  my ( $string, $token ) = @_;
 
-  my %regex = ( word          => q{^(a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z|A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z)(a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z|A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z|0|1|2|3|4|5|6|7|8|9)*},
-                quoted_string => q{^`[^`]*'},
-                simple        => q{^[^`#_a-zA-Z]},
-                comment       => q{^#[^\n]*\n},
-              );
-  return << "END_PIR";
-
-.sub pge
-    .param string target
-    .param string pattern 
-
-    print "pattern: "
-    print pattern
-    print "\\n"
-    print "target: "
-    print target
-    print "\\n"
-
-    .local pmc p6rule
-    p6rule = find_global "PGE", "p6rule"  # get the compiler
-
-    .local pmc rulesub                     
-    rulesub = p6rule(pattern)        # compile it to rulesub
-
-    .local pmc match
-    match = rulesub(target)                   # execute rule on target string
-
-match_loop:
-    unless match goto match_fail           # if match fails stop
-    print "match succeeded\\n"
-
-    match."dump"()                       # display captures
-
-    match."next"()                        # find the next match
-    goto match_loop
-
-match_fail:
-    print "match failed\\n"   
-    .return()
-.end
-
-.sub main \@MAIN
-    load_bytecode "PGE.pbc"
-    pge( "$string", "$regex{$token}" ) 
-.end
-
-END_PIR
-}
-
-
+# Tests for PCRE
 {
   my $code = get_pir_pcre( 'foo', 'word' );
   pir_output_is( $code, << 'OUTPUT', "'foo' is a word" );
@@ -183,44 +129,46 @@ OUTPUT
 OUTPUT
 }
 
-# Do not use PGE yet
-if ( 0 )
+# Tests for PGE
 {
-my %regex = ( word          => q{^(a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z|A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z)(a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z|A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z|0|1|2|3|4|5|6|7|8|9)*},
-              quoted_string => q{^`[^`]*'},
-              simple        => q{^[^`#_a-zA-Z]},
-              comment       => q{^#[^\n]*\n},
-            );
-# Test whether words are recognised
-{
-  foreach my $target ( q{foo}, q{_tmp}, q{word} )
+  my %regex = ( word     => q{^<[_a..zA..Z]><[_a..zA..Z0..9]>*},
+                string   => q{^`<-[`]>*'},
+                simple   => q{^<-[`#_a..zA..Z]>}, 
+                comment  => q{^\#\N*\n}, 
+              );
+  foreach my $target ( qw{ foo Korrekturfluid _Gebietsverkaufsleiter a1 b2_c3_ } )
   {
-    p6rule_is( $target, $regex{word}, "'$target' is a word" );
+    p6rule_is( $target, $regex{word}, "q{$target} is a word" );
+  }
+  foreach my $target ( qw{ 1a +a1 }, "  with_leading_space" )
+  {
+    p6rule_isnt( $target, $regex{word}, "q{$target} is not a word" );
+  }
+
+  foreach my $target ( qw{ `Korrekturfluid' `' } )
+  {
+    p6rule_is( $target, $regex{string}, "q{$target} is a quoted string" );
+  }
+  foreach my $target ( qw{ 1a +a1 `asdf asdf' } )
+  {
+    p6rule_isnt( $target, $regex{string}, "q{$target} is not a quoted string" );
+  }
+
+  foreach my $target ( "+# asdf", "'", '123', '0' )
+  {
+    p6rule_is( $target, $regex{simple}, "q{$target} is passed through" );
+  }
+  foreach my $target ( "# asdf\n", '_x' )
+  {
+    p6rule_isnt( $target, $regex{simple}, "q{$target} is not passed through" );
+  }
+
+  foreach my $target ( "# asdf\n" )
+  {
+    p6rule_is( $target, $regex{comment}, "q{$target} is a comment" );
+  }
+  foreach my $target ( " # asdf\n" )
+  {
+    p6rule_isnt( $target, $regex{comment}, "q{$target} is not a comment" );
   }
 }
-
-# TODO: Test whether non-words are not recognised
-
-# Test whether quoted strings are recognised
-{
-  foreach my $target ( q{`quoted'}, q{`'} )
-  {
-    my $code = get_pir_pge( $target, 'quoted_string' );
-    pir_output_is( $code, << "OUTPUT", "'$target' is a quoted string" );
-
-1 match(es):
-$target
-OUTPUT
-  }
-}
-}
-
-# TODO: Test whether non-quoted are not recognised
-
-# TODO: Test whether comments are recognised
-
-# TODO: Test whether non-comments are not recognised
-
-# TODO: Test whether simple tokens are recognised
-
-# TODO: Test whether non-simple tokens are not recognised
