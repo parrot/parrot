@@ -181,13 +181,13 @@ GEN_CONFIGS = \
 #CONDITIONED_LINE(platform_asm):    $(SRC_DIR)/platform_asm.s \
     $(SRC_DIR)/core_pmcs.c \
     CFLAGS \
-    imcc/CFLAGS \
+    $(IMCC_DIR)/CFLAGS \
     config_lib.pasm \
     $(SRC_DIR)/nci_test$(O) \
     libparrot.def \
     ast/ast.y.flag \
     build_tools/build_dynclasses.pl \
-    imcc/imcc.y.flag \
+    $(IMCC_DIR)/imcc.y.flag \
     ops/core_ops.c \
     ops/core_ops_switch.c
 
@@ -441,23 +441,23 @@ OPS_FILES = ${ops} $(GEN_OPSFILES)
 ###############################################################################
 
 # Executables
-PARROT          = $(CUR_DIR)/${test_prog}$(EXE)
-MINIPARROT      = $(CUR_DIR)${slash_exec}miniparrot$(EXE)
-INSTALLABLEPARROT      = $(CUR_DIR)/installable_parrot$(EXE)
-PARROT_SO       = $(CUR_DIR)/${test_prog}_so$(EXE)
-DIS             = $(CUR_DIR)/disassemble$(EXE)
-PDUMP           = $(CUR_DIR)/pdump$(EXE)
-PINFO           = $(CUR_DIR)/pbc_info$(EXE)
-PDB             = $(CUR_DIR)/pdb$(EXE)
+PARROT            = $(CUR_DIR)/${test_prog}$(EXE)
+MINIPARROT        = $(CUR_DIR)${slash_exec}miniparrot$(EXE)
+INSTALLABLEPARROT = $(CUR_DIR)/installable_parrot$(EXE)
+PARROT_SO         = $(CUR_DIR)/${test_prog}_so$(EXE)
+DIS               = $(CUR_DIR)/disassemble$(EXE)
+PDUMP             = $(CUR_DIR)/pdump$(EXE)
+PINFO             = $(CUR_DIR)/pbc_info$(EXE)
+PDB               = $(CUR_DIR)/pdb$(EXE)
 
 # libs
-LIBPARROT       = ${blib_lib_libparrot_a}
+LIBPARROT         = ${blib_lib_libparrot_a}
 #CONDITIONED_LINE(has_icu):ICU_SHARED      = ${icu_shared}
-ALL_PARROT_LIBS = $(LIBPARROT) $(ICU_SHARED) $(C_LIBS)
+ALL_PARROT_LIBS   = $(LIBPARROT) $(ICU_SHARED) $(C_LIBS)
 
 # dynamic extensions
-DYNEXT_DIR      = runtime/parrot/dynext
-LIBNCI_TEST_SO  = $(DYNEXT_DIR)/libnci_test$(LOAD_EXT)
+DYNEXT_DIR        = runtime/parrot/dynext
+LIBNCI_TEST_SO    = $(DYNEXT_DIR)/libnci_test$(LOAD_EXT)
 
 ###############################################################################
 #
@@ -1162,8 +1162,9 @@ TEST_FILES      = t/library/*.t \
     t/op/*.t \
     t/pmc/*.t \
     t/native_pbc/*.t \
-    imcc/t/*/*.t \
-    t/dynclass/*.t
+    $(IMCC_DIR)/t/*/*.t \
+    t/dynclass/*.t \
+    t/p6rules/*.t
 
 # Common prep for all test targets.
 # We propably need a complete build before running the tests.
@@ -1336,6 +1337,10 @@ test-clean :
 	$(RM_F) t/pmc/*.out
 	$(RM_F) t/pmc/*.o
 	$(RM_F) t/pmc/*.stabs.s
+	$(RM_F) t/p6rules/*.pir
+	$(RM_F) t/p6rules/*.pbc
+	$(RM_F) t/p6rules/*.pasm
+	$(RM_F) t/p6rules/*.out
 	$(RM_F) t/stress/*.pasm
 	$(RM_F) t/stress/*.pbc
 	$(RM_F) t/stress/*.out
