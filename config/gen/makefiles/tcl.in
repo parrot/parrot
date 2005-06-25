@@ -66,6 +66,7 @@ lib${slash}interpret.imc \
 lib${slash}list.imc \
 lib${slash}macros${slash}is_space.imc \
 lib${slash}string_to_list.imc \
+lib${slash}variables.pir \
 tcl.imc_template \
 tcl.pl
 
