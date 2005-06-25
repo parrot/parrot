@@ -15,63 +15,46 @@ This file implements match objects returned by the Parrot Grammar Engine.
     newclass base, "PGE::Match"
     addattribute base, "$:target"                  # target
     addattribute base, "$:from"                    # start of match
-    addattribute base, "$:to"                      # end of match
+    addattribute base, "$:pos"                     # current match position
     addattribute base, "&:yield"                   # match's yield
     addattribute base, "@:capt"                    # subpattern captures
     addattribute base, "%:capt"                    # subpattern captures
 .end
 
-=head2 Functions
-
-=item C<start(STR target, PMC yield)>
-
-This subroutine is normally called from a rule subroutine to
-initiate a match object on C<target> using the rule coroutine
-given by C<yield>.
-
-=cut
-
-.sub "start"
-    .param string target                           # target
-    .param pmc yield                               # coroutine
-    .param int pos                                 # where to start
-    .param int lastpos                             # length of target
-    .local pmc me                                  # newly created match obj
-    .local int offset                              # offset for attributes
-
-    $P0 = new String
-    $P0 = target
-    $I0 = find_type "PGE::Match"
-    me = new $I0, $P0
-    setattribute me, "PGE::Match\x0&:yield", yield
-    yield(me, target, pos, lastpos)                  # start match
-    .return (me)
-.end
-
 =head2 Methods
 
-=item C<__init(PMC target)>
+=item C<newat(PMC mob, INT pos)>
 
-Initializes a Match object with the string given by C<target>.  
+Create a new match object in the same class as the invocant, from
+the match state given by C<mob>, and initialized to start from
+C<pos>.
 
 =cut
 
-.sub "__init" method
-    .param pmc target
-    $I0 = classoffset self, "PGE::Match"
-    setattribute self, $I0, target
-    inc $I0
-    $P0 = new Integer
-    setattribute self, $I0, $P0
-    inc $I0
-    $P0 = new Integer
+.sub "newat" method
+    .param pmc mob
+    .param int pos
+    .local pmc me
+    $S0 = classname self
+    $I0 = find_type $S0
+    me = new $I0
+    $P0 = getattribute mob, "PGE::Match\x0$:target"
+    setattribute me, "PGE::Match\x0$:target", $P0
+    $P0 = new PerlInt
+    $P0 = pos
+    setattribute me, "PGE::Match\x0$:from", $P0
+    $P0 = new PerlInt
     $P0 = -1
-    setattribute self, $I0, $P0
+    setattribute me, "PGE::Match\x0$:pos", $P0
+    .return (me)
 .end
+    
+=head2 Methods
 
 =item C<next()>
 
-Tell a Match object to continue the previous match from where it left off.
+Tell a Match object to continue the previous match from where 
+it left off.
 
 =cut
 
@@ -79,9 +62,17 @@ Tell a Match object to continue the previous match from where it left off.
     .local pmc yield
 
     yield = getattribute self, "PGE::Match\x0&:yield"
+    isnull yield, next_1
+    goto next_2
+  next_1:
+    $P0 = getattribute self, "PGE::Match\x0$:pos"
+    $P0 = -1
+    goto end
+  next_2:
     .pcc_begin
     .pcc_call yield
     .pcc_end
+  end:
 .end
 
 =item C<from()>
@@ -106,7 +97,7 @@ Returns the offset at the end of this match.
 
 .sub "to" method
     .local pmc to
-    to = getattribute self, "PGE::Match\x0$:to"
+    to = getattribute self, "PGE::Match\x0$:pos"
     $I0 = to
     .return ($I0)
 .end
@@ -119,7 +110,7 @@ Returns 1 if this object successfully matched the target string,
 =cut
 
 .sub "__get_bool" method
-    $P0 = getattribute self, "PGE::Match\x0$:to"
+    $P0 = getattribute self, "PGE::Match\x0$:pos"
     $I0 = $P0
     isge $I1, $I0, 0
     .return ($I1)
@@ -158,7 +149,7 @@ Returns the portion of the target string matched by this object.
 .sub "__get_string" method
     $P0 = getattribute self, "PGE::Match\x0$:target"
     $P1 = getattribute self, "PGE::Match\x0$:from"
-    $P2 = getattribute self, "PGE::Match\x0$:to"
+    $P2 = getattribute self, "PGE::Match\x0$:pos"
     if $P2 < 0 goto false
     if $P2 <= $P1 goto false
     $I1 = $P1

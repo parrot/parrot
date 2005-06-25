@@ -24,6 +24,8 @@ defined.
     load()
     load = find_global "PGE::Match", "__onload"
     load()
+    load = find_global "PGE::Rule", "__onload"
+    load()
     load = find_global "PGE::P6Rule", "__onload"
     load()
 .end
@@ -31,4 +33,5 @@ defined.
 .include "compilers/pge/PGE/TokenHash.pir"
 .include "compilers/pge/PGE/Exp.pir"
 .include "compilers/pge/PGE/Match.pir"
+.include "compilers/pge/PGE/Rule.pir"
 .include "compilers/pge/PGE/P6Rule.pir"

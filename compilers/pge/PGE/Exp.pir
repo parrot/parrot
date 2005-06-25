@@ -30,6 +30,8 @@ functionality and correctness at the moment.
 =cut
 
 .include "cclass.pasm"
+.include "errors.pasm"
+.include "interpinfo.pasm"
 
 .namespace [ "PGE::Exp" ]
 
@@ -387,25 +389,35 @@ register.
     emit(code, ".sub _pge_rule")
     emit(code, "    .param string target")
     emit(code, "    .param int pos")
-    emit(code, "    .param int lastpos")
-    emit(code, "    .local pmc mob")
-    emit(code, "    unless argcI < 2 goto rule_1")
-    emit(code, "    lastpos = length target")
-    emit(code, "  rule_1:")
+    emit(code, "    .param pmc mob")
+    emit(code, "    .local pmc yield")
+    emit(code, "    if argcP > 0 goto start_match")
+    emit(code, "  new_match:")
+    emit(code, "    $I0 = find_type \"PGE::Rule\"")
+    emit(code, "    mob = new $I0")
+    emit(code, "    $P0 = new String")
+    emit(code, "    $P0 = target")
+    emit(code, "    setattribute mob, \"PGE::Match\\x0$:target\", $P0")
+    emit(code, "    $P0 = new PerlInt")
+    emit(code, "    setattribute mob, \"PGE::Match\\x0$:from\", $P0")
+    emit(code, "    $P0 = new PerlInt")
+    emit(code, "    $P0 = -1")
+    emit(code, "    setattribute mob, \"PGE::Match\\x0$:pos\", $P0")
     emit(code, "    unless argcI < 1 goto rule_2")
     emit(code, "    pos = -1")
-    emit(code, "  rule_2:")
-    emit(code, "    newsub $P0, .Coroutine, _pge_rule_coroutine")
-    emit(code, "    $P1 = find_global \"PGE::Match\", \"start\"")
-    emit(code, "    .return $P1(target, $P0, pos, lastpos)")
+    emit(code, "  start_match:")
+    emit(code, "    newsub yield, .Coroutine, _pge_rule_coroutine")
+    emit(code, "    setattribute mob, \"PGE::Match\\x0&:yield\", yield")
+    emit(code, "    yield(mob, pos)")
+    emit(code, "    .return (mob)")
     emit(code, ".end")
     emit(code, "")
     emit(code, ".sub _pge_rule_coroutine")
     emit(code, "    .param pmc mob")
-    emit(code, "    .param string target")
     emit(code, "    .param int pos")
-    emit(code, "    .param int lastpos")
-    emit(code, "    .param int cutting")
+    emit(code, "    .local string target")
+    emit(code, "    .local int lastpos")
+    emit(code, "    .local int cutting")
     emit(code, "    .local int rep, maxrep")
     emit(code, "    .local int litlen")
     emit(code, "    .local string lit")
@@ -419,6 +431,9 @@ register.
     emit(code, "    push gpad, -1")
     emit(code, "    push cpad, mob")
     emit(code, "    from = getattribute mob, \"PGE::Match\\x0$:from\"")
+    emit(code, "    $P0 = getattribute mob, \"PGE::Match\\x0$:target\"")
+    emit(code, "    target = $P0")
+    emit(code, "    lastpos = length target")
     emit(code, "    if pos >= 0 goto try_at_pos")
     emit(code, "    pos = 0")
     emit(code, "  try_match:")
@@ -435,7 +450,7 @@ register.
     emit(code, "    if $I0 < 0 goto try_again")
   gen_1:
     emit(code, "    from = pos")
-    self.emitsub(code, label, "pos", "from", 0)
+    self.emitsub(code, label, "pos", "from", "lastpos", 0)
     emit(code, "    if cutting == %d goto fail_forever", PGE_CUT_RULE)
     emit(code, "  try_again:")
     emit(code, "    inc pos")
@@ -462,7 +477,7 @@ register.
     .local pmc emit
     emit = find_global "PGE::Exp", "emit"
     emit(code, "\n  %s:", label)
-    emit(code, "    $P0 = getattribute mob, \"PGE::Match\\x0$:to\"")
+    emit(code, "    $P0 = getattribute mob, \"PGE::Match\\x0$:pos\"")
     emit(code, "    $P0 = pos")
     emit(code, "    .yield(pos)")
     emit(code, "    $P0 = -1")
@@ -1071,7 +1086,7 @@ register.
     emit(code, "    capt = gpad[-3]")
     emit(code, "    unless rep > 0 goto %s_2", label)
     emit(code, "    $P0 = capt[-1]")
-    emit(code, "    $P1 = getattribute $P0, \"PGE::Match\\x0$:to\"")
+    emit(code, "    $P1 = getattribute $P0, \"PGE::Match\\x0$:pos\"")
     emit(code, "    $P1 = pos")
   greedy:
     emit(code, "  %s_2:", label)
@@ -1128,11 +1143,7 @@ register.
     goto end
   subpat_1:
     emit(code, "  %s:", sublabel)
-    emit(code, "    $P1 = getattribute mob, \"PGE::Match\\x0$:target\"")
-    emit(code, "    $I0 = find_type \"PGE::Match\"")
-    emit(code, "    $P0 = new $I0, $P1")
-    emit(code, "    $P1 = getattribute $P0, \"PGE::Match\\x0$:from\"")
-    emit(code, "    $P1 = pos")
+    emit(code, "    $P0 = mob.\"newat\"(mob,pos)")
     $I0 = self["cscope"]
     unless $I0 goto subpat_2
     emit(code, "    cpad[-1] = $P0")
@@ -1149,9 +1160,32 @@ register.
     goto end
   subrule:
     emit(code, "  %s:", sublabel)
-    emit(code, "    $P1 = find_name '%s'", rname)
     emit(code, "    saveall")
-    emit(code, "    $P0 = $P1(target, pos, lastpos)")
+    $I0 = 0
+  subrule_1:
+    $I1 = index rname, '::', $I0                   # see if we have grammar
+    if $I1 == -1 goto subrule_2
+    $I0 = $I1 + 2
+    goto subrule_1
+  subrule_2:
+    if $I0 == 0 goto subrule_simple_name
+    $S0 = substr rname, $I0                        # get rule name
+    $I0 -= 2
+    $S1 = substr rname, 0, $I0                     # get grammar name
+    emit(code, "    $P2 = getclass \"%s\"", $S1)
+    emit(code, "    $P2 = $P2.\"newat\"(mob, pos)")
+    emit(code, "    $P1 = find_method $P2, \"%s\"", $S0)
+    goto subrule_invoke
+  subrule_simple_name:
+    emit(code, "    $P2 = mob.\"newat\"(mob, pos)")
+    emit(code, "    errorsoff %d", .PARROT_ERRORS_GLOBALS_FLAG)
+    emit(code, "    $P1 = find_name \"%s\"", rname)
+    emit(code, "    $I0 = defined $P1")
+    emit(code, "    if $I0 goto %s_s1", label)
+    emit(code, "    $P1 = find_method $P2, \"%s\"", rname)
+    emit(code, "  %s_s1:", label)
+  subrule_invoke:
+    emit(code, "    $P0 = $P1($P2, pos)")
     emit(code, "    pos = $P0.to()")
     emit(code, "    save pos")
     emit(code, "    save $P0")
