@@ -14,11 +14,6 @@
   argc = argv
 
   .local int return_type
-  return_type = TCL_OK
-
-  .local int call_level
-  $P0 = find_global "_Tcl", "call_level"
-  call_level = $P0
 
   .local pmc value
   .local int looper
@@ -26,24 +21,19 @@
   if argc == 0 goto error
   looper = 1
 
-  $S1 = argv[0] 
-if call_level goto find_lexical
-  push_eh new_variable
-    $P1 = find_global "Tcl", $S1
-    goto found_variable
-find_lexical:
-  push_eh new_variable
-    $P1 = find_lex call_level, $S1
-    goto found_variable
+  .local pmc read
+  read = find_global "_Tcl", "__read"
+  $S1 = argv[0]
+  (return_type, $P1) = read($S1)
+  
+  if return_type == TCL_ERROR goto new_variable
+  value = clone $P1
+  goto loop
 
 new_variable:
   value = new TclString
   value = ""
-  goto loop
-
-found_variable:
-  clear_eh
-  value = clone $P1 
+  #goto loop
 
 loop:
   if looper == argc goto loop_done
@@ -54,18 +44,10 @@ loop:
   goto loop
 
 loop_done:
-  # clone so that the return value won't change if the stored
-  # lexical/global is changed
-  $P1 = clone value
-if call_level goto set_lexical
-  store_global "Tcl", $S1, $P1
+  .local pmc set
+  set = find_global "_Tcl", "__set"
+  (return_type, value) = set($S1, value)
   goto done
-set_lexical:
-  store_lex call_level, $S1, $P1
-
-  goto done 
-
-  # fall through to a bad call.
 
 error:
   return_type = TCL_ERROR

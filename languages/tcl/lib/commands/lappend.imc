@@ -10,7 +10,6 @@
 
   .local pmc value
   .local int return_type
-  return_type = TCL_OK
 
   .local int argc
   argc = argv
@@ -21,33 +20,28 @@
   .local int cnt
   cnt = 1
 
-  .local int call_level
-  $P0 = find_global "_Tcl", "call_level"
-  call_level = $P0
-
-if call_level goto find_lexical
-  push_eh new_variable
-    value = find_global "Tcl", listname
-    goto got_var
-find_lexical:
-  push_eh new_variable
-    value = find_lex call_level, listname
-    goto got_var
-
-got_var:
-  clear_eh
+  .local pmc read
+  read = find_global "_Tcl", "__read"
+  (return_type, $P1) = read(listname)
+  value = clone $P1
+  
+  if return_type == TCL_ERROR goto new_variable
   goto loop
 
 new_variable:
   value = new TclList
+  # goto loop
   
 loop:
-  if cnt >= I3 goto loop_done
+  if cnt == argc goto loop_done
   $P0 = argv[cnt]
   push value, $P0
   inc cnt
   goto loop
 loop_done:
+  .local pmc set
+  set = find_global "_Tcl", "__set"
+  (return_type, value) = set($S1, value)
   goto done
 
 error:

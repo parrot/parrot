@@ -3,7 +3,6 @@
 use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
 use Parrot::Test tests => 8;
-use vars qw($TODO);
 
 language_output_is("tcl",<<'TCL',<<OUT,"middle");
   set a whee
@@ -54,12 +53,9 @@ TCL
 can't read \"a\": variable is an array
 OUT
 
-TODO: {
-local $TODO = "bugs";
-  language_output_is("tcl",<<'TCL',<<'OUT','${} substitute an array');
+language_output_is("tcl",<<'TCL',<<'OUT','${} substitute an array');
   set x(0) 44
   puts ${x(0)}
 TCL
 44
 OUT
-}

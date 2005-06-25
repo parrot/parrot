@@ -7,137 +7,34 @@
   .local pmc argv 
   argv = foldup
 
-  .local pmc variable
-  null variable # we do an isnull before, can't rely on a null init val.
-
   .local int len, argc  
   argc = argv
 
-  .local string var, key
-
-  .local pmc get_var
-  get_var = find_global "_Tcl", "__get_var"
-
-  .local int call_level
-  $P0 = find_global "_Tcl", "call_level"
-  call_level = $P0
-
-  .local pmc value
   .local pmc retval
   .local int return_type
   return_type = TCL_OK
-  retval = new String
  
   if argc == 0 goto error
-
-  .local string arg0
-  arg0 = argv[0] 
-  if argc == 2 goto setting
-  if argc == 1 goto getting
   if argc > 2 goto error
 
+  .local string name
+  name = argv[0] 
+  if argc == 2 goto setting
+  if argc == 1 goto getting
+
 getting:
-  # Is this an array variable?
-  # ends with )
-  .local int char
-
-  char = ord arg0, -1
-  if char != 41 goto get_scalar
-  # contains a (
-  char = index arg0, "("
-  if char == -1 goto get_scalar
-
-get_array:
-  var = substr arg0, 0, char
-  len = length arg0
-
-  len = len - char
-  len = len - 2
-  inc char
-  key = substr arg0, char, len
-
-  (return_type,retval) = get_var(var,key)
-  goto done
-
-get_scalar:
-   (return_type,retval) = get_var(arg0)
+  .local pmc read
+  read = find_global "_Tcl", "__read"
+  (return_type, retval) = read(name)
   goto done
 
 setting:
+  .local pmc set
+  set = find_global "_Tcl", "__set"
+
+  .local pmc value
   value = argv[1]
-  # Is this an array variable?
-  # ends with )
-  char = ord arg0, -1
-  if char != 41 goto set_scalar
-  # contains a (
-  char = index arg0, "("
-  if char == -1 goto set_scalar
-set_array:
-  var = substr arg0, 0, char
-  len = length arg0
-
-  len = len - char
-  len = len - 2
-  inc char
-  key = substr arg0, char, len
-
-
-  # We need to check to see if this variable already
-  # exists, as we cannot switch between array and scalar.
-
-  # Shouldn't this be using get_var ?
-  push_eh catch
-    if call_level  goto get_lexical
-    variable = find_global "Tcl", var
-    goto resume
-get_lexical:
-    variable = find_lex call_level, var
-resume:
-  clear_eh
-
-  isnull variable, set_array_new
-  $I0 = does variable, "hash"
-  unless $I0 goto set_array_bad
-  goto set_array_ok
-
-set_array_new:
-  variable = new TclArray
-  goto set_array_ok
-
-set_array_bad:
-  return_type = TCL_ERROR
-  $S0 =  "can't set \""
-  $S0 .= arg0
-  $S0 .= "\": variable isn't array"
-  retval = $S0
-  goto done
-
-set_array_ok:
-  variable[key] = value
-  if call_level goto store_array_variable
-  store_global "Tcl", var, variable
-  goto done
-store_array_variable:
-  store_lex call_level, var, variable
-  goto done
-
-set_scalar:
-  retval = value
-  if call_level goto store_scalar_variable
-  store_global "Tcl", arg0, retval
-  goto done
-store_scalar_variable:
-  store_lex call_level, arg0, retval
-  goto done
-
-  # fall through to a bad call.
-
-no_such_variable:
-  return_type = TCL_ERROR 
-  $S0 = "can't read \""
-  $S0 .= var
-  $S0 .= "\": no such variable"
-  retval = $S0
+  (return_type, retval) = set(name, value)
   goto done
 
 error:

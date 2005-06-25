@@ -27,14 +27,14 @@ opendir(CMDDIR,$macro_dir);
 my @macro_files = readdir(CMDDIR);
 closedir(CMDDIR);
 
-my @cmd_includes = map {"$command_dir/$_"} grep {m/\.imc$/} @cmd_files;
-my @macro_includes = map {"$macro_dir/$_"} grep {m/\.imc$/} @macro_files;
+my @cmd_includes = map {"$command_dir/$_"} grep {m/\.(imc|pir)$/} @cmd_files;
+my @macro_includes = map {"$macro_dir/$_"} grep {m/\.(imc|pir)$/} @macro_files;
 
-my @commands = grep {s/\.imc$//} @cmd_files;
+my @commands = grep {s/\.(imc|pir)$//} @cmd_files;
 
 my $lib_dir = "lib";
 opendir(LIBDIR,$lib_dir) or die;
-my @libs = map {"$lib_dir/$_"} grep {m/\.imc$/} grep {! m/^tcl(lib|word).imc$/} readdir(LIBDIR);
+my @libs = map {"$lib_dir/$_"} grep {m/\.(imc|pir)$/} grep {! m/^tcl(lib|word).imc$/} readdir(LIBDIR);
 closedir(LIBDIR);
 
 my $includes;

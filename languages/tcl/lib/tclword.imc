@@ -284,6 +284,8 @@ constant:
   .return(0,chunk_value) 
 
 variable:
+  .local pmc read
+  read = find_global "_Tcl", "__read"
   .local pmc get_var
   get_var = find_global "_Tcl", "__get_var"
   .local int return_type
@@ -292,7 +294,7 @@ variable:
   if $S2 == "" goto get_variable
   .return get_var($S1,$S2)
 get_variable:
-  .return get_var($S1)
+  .return read($S1)
 .end
 
 =head2 __get_string

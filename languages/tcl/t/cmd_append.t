@@ -3,7 +3,6 @@
 use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
 use Parrot::Test tests => 8;
-use vars qw($TODO);
 
 language_output_is('tcl', <<'TCL', <<'OUT', 'noarg');
  set a 2
@@ -48,8 +47,6 @@ TCL
 wrong # args: should be "append varName ?value value ...?"
 OUT
 
-TODO: {
-local $TODO = "error messages currently unimplemented";
 language_output_is('tcl', <<'TCL', <<'OUT', 'variable isn\'t array error');
  set x ""
  append x(0) 44
@@ -57,9 +54,8 @@ TCL
 can't set "x(0)": variable isn't array
 OUT
 
-language_output_is('tcl', <<'TCL', <<'OUT', 'no such variable error');
+# Tcl currently throughs an error for this code
+# but a bug has been filed for it at http://tcl.sf.net (#1227172)
+language_output_is('tcl', <<'TCL', '', 'return empty value');
  append x
 TCL
-can't read "x": no such variable
-OUT
-}
