@@ -223,4 +223,5 @@ whole thing may be taken out or refactored away at any moment.
 .include "compilers/pge/PGE/TokenHash.pir"
 .include "compilers/pge/PGE/Exp.pir"
 .include "compilers/pge/PGE/Match.pir"
+.include "compilers/pge/PGE/Rule.pir"
 .include "compilers/pge/PGE/P6Rule.pir"

@@ -41,7 +41,7 @@ Match a single alphabetic character.
 
 =cut
 
-.sub alpha
+.sub "alpha"
     .param pmc mob
     .local string target
     .local int pos
@@ -50,6 +50,28 @@ Match a single alphabetic character.
     $P1 = getattribute mob, "PGE::Match\x0$:target"
     target = $P1
     $I0 = is_cclass .CCLASS_ALPHABETIC, target, pos
+    unless $I0 goto end
+    inc pos
+    $P1 = getattribute mob, "PGE::Match\x0$:pos"
+    $P1 = pos
+  end:
+.end
+
+=item C<alpha()>
+
+Match a single alphabetic character.
+
+=cut
+
+.sub "digit"
+    .param pmc mob
+    .local string target
+    .local int pos
+    $P0 = getattribute mob, "PGE::Match\x0$:from"
+    pos = $P0
+    $P1 = getattribute mob, "PGE::Match\x0$:target"
+    target = $P1
+    $I0 = is_cclass .CCLASS_NUMERIC, target, pos
     unless $I0 goto end
     inc pos
     $P1 = getattribute mob, "PGE::Match\x0$:pos"
