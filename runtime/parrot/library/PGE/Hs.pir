@@ -49,19 +49,11 @@ whole thing may be taken out or refactored away at any moment.
 .namespace [ "PGE::Hs" ]
 
 .const string PGE_FAIL = "PGE_Fail"
-.const string PGE_SUB_POS = "PGE::Match\x0@:capt"
-.const string PGE_SUB_NAMED = "PGE::Match\x0%:capt"
+.const string PGE_SUB_POS = "@:capt"
+.const string PGE_SUB_NAMED = "%:capt"
 
 .sub "__onload" @LOAD
     .local pmc load
-    load = find_global "PGE::TokenHash", "__onload"
-    load()
-    load = find_global "PGE::Exp", "__onload"
-    load()
-    load = find_global "PGE::Match", "__onload"
-    load()
-    load = find_global "PGE::P6Rule", "__onload"
-    load()
     load_bytecode "library/Data/Escape.imc"
 .end
 
@@ -219,8 +211,3 @@ whole thing may be taken out or refactored away at any moment.
     out .= "]"
     .return (out)
 .end
-
-.include "compilers/pge/PGE/TokenHash.pir"
-.include "compilers/pge/PGE/Exp.pir"
-.include "compilers/pge/PGE/Match.pir"
-.include "compilers/pge/PGE/P6Rule.pir"
