@@ -2,7 +2,7 @@
 
 =head2 _Tcl::__read
 
-Read a variable from it's name. It may be a scalar or an
+Read a variable from its name. It may be a scalar or an
 array.
 
 Use the call level to determine if we are referring to a 
@@ -90,7 +90,7 @@ done:
 
 =head2 _Tcl::__set
 
-Set a variable by it's name. It may be a scalar or an array.
+Set a variable by its name. It may be a scalar or an array.
 
 Use the call level to determine if we are referring to a 
 global variable or a lexical variable - will no doubt
