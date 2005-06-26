@@ -190,6 +190,30 @@ depending on the rule.
     .return ($P0)
 .end
 
+=item C<get_hash()>
+
+Returns the hash component of the match object.
+
+=cut
+
+.sub "get_hash" method
+    .param pmc hash
+    hash = getattribute self, "PGE::Match\x0%:capt"
+    .return (hash)
+.end
+
+=item C<get_array()>
+
+Returns the array component of the match object.
+
+=cut
+
+.sub "get_array" method
+    .param pmc array
+    array = getattribute self, "PGE::Match\x0@:capt"
+    .return (array)
+.end
+
 =item C<dump()>
 
 Produces a data dump of the match object and all of its subcaptures.

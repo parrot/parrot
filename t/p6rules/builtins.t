@@ -1,4 +1,4 @@
-use Parrot::Test tests => 11;
+use Parrot::Test tests => 10;
 use Parrot::Test::PGE;
 
 p6rule_is  ("abc", '<alpha>', '<alpha>');

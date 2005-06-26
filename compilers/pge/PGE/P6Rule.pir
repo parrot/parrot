@@ -495,15 +495,15 @@ near future, so don't rely on this code too strongly just yet.
     plen = lex["plen"]
     $I0 = length token
     pos += $I0
-    charclass = ''
+    charclass = ""
     range = 0
   scan:
     if pos >= plen goto no_close_err
     $S0 = substr pattern, pos, 1
-    if $S0 == ']' goto end_class
-    if $S0 == '-' goto unescaped_hyphen
-    if $S0 == '.' goto start_range
-    unless $S0 == '\\' goto add_char
+    if $S0 == "]" goto end_class
+    if $S0 == "-" goto unescaped_hyphen
+    if $S0 == "." goto start_range
+    unless $S0 == "\\" goto add_char
   backslash:
     inc pos
     $S0 = substr pattern, pos, 1
@@ -846,12 +846,16 @@ C<p6rule_parse_group> above.
     .return (exp)
 .end
 
-=item C<(PMC rule, PMC code, PMC expr) = p6rule(STR pattern)>
+=item C<(PMC rule, PMC code, PMC expr) = p6rule(STR pattern, STR gmr, STR name)>
 
 Compile C<pattern> containing a Perl 6 rule expression into
 a subroutine that can match that expression, returned as C<rule>.
 The C<p6rule> subroutine also returns the PIR code and expression
 tree used to generate the rule (generally for debugging purposes).
+
+This function optionally takes a grammar and rule name, and automatically
+installs the compiled rule into the grammar (creating the grammar if
+needed).
 
 =cut
 
@@ -859,11 +863,18 @@ tree used to generate the rule (generally for debugging purposes).
 
 .sub "p6rule"
     .param string pattern
+    .param string grammar
+    .param string name
     .local pmc lex
     .local pmc exp
     .local pmc code
     .local pmc rule
+    .local int install
 
+    install = 0
+    if argcS < 3 goto p6rule_1
+    install = 1
+  p6rule_1:
     lex = new Hash
     lex["pos"] = 0
     lex["subp"] = 0
@@ -884,10 +895,17 @@ tree used to generate the rule (generally for debugging purposes).
 
     code = new String
     exp.gen(code, "R", "fail")
-    # print code
     compreg $P0, "PIR"
     $S0 = code
     rule = compile $P0, $S0
+    unless install goto p6rule_3
+    $I0 = findclass grammar
+    if $I0 goto p6rule_2
+    $P0 = getclass "PGE::Rule"
+    $P1 = subclass $P0, grammar
+  p6rule_2:
+    store_global grammar, name, rule
+  p6rule_3:
     .return (rule, code, exp)
 .end
 

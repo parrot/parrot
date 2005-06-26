@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Parrot::Test tests => 14;
+use Parrot::Test tests => 18;
 use Parrot::Test::PGE;
 
 
@@ -21,5 +21,11 @@ p6rule_is  ('axxdef', '<[b..d]>', 'character range');
 p6rule_isnt('axxxef', '<[b..d]>', 'character range');
 p6rule_is  ('abcdef', '<-[b..d]>', 'negated character range');
 p6rule_isnt('bbccdd', '<-[b..d]>', 'negated character range');
+
+# escaped hyphen
+p6rule_is  ('ab-def', '<[\-]>', 'escaped hyphen');
+p6rule_isnt('abcdef', '<[\-]>', 'escaped hyphen');
+p6rule_is  ('---x--', '<-[\-]>', 'negated escaped hyphen');
+p6rule_isnt('------', '<-[\-]>', 'negated escaped hyphen');
 
 # dont forget to change the number of tests :-)

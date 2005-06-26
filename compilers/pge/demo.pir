@@ -10,6 +10,8 @@
     .local pmc p6rule_compile
     .local pmc glob_compile
     .local int istrace
+    .local pmc gparse
+    .local string gname
 
     load_bytecode "PGE.pbc"
     load_bytecode "PGE/Dumper.pir"
@@ -18,6 +20,9 @@
     find_global glob_compile, "PGE", "glob"
     istrace = 0
     null rulesub
+
+    gparse = p6rule_compile(":w ( (grammar) <ident> ; | (rule) <ident> \{$<rulex>:=[<-[{]>*]\} )*")
+
 
   read_loop:
     print "\ninput \"rule <pattern>\", \"glob <pattern>\", \"save <name>\",\n"
@@ -39,6 +44,7 @@
     if $S0 == "pir" goto print_pir
     if $S0 == "exp" goto print_exp
     if $S0 == "trace" goto toggle_trace
+    if $S0 == "use" goto use_grammar
 
     isnull rulesub, match_nopattern
     match = rulesub(x)
@@ -97,5 +103,40 @@
   trace_off:
     print "Tracing is now off\n"
     goto read_loop
+
+  use_grammar:
+    x = substr x, 4
+    $P0 = open x, "<"
+    $S0 = read $P0, 65535
+    close $P0
+    $P0 = gparse($S0)
+    # $P0.dump()
+    $P1 = $P0."get_array"()
+    $P1 = $P1[0]
+    $I0 = elements $P1
+    $I1 = 0
+  use_grammar_stmt:
+    if $I1 >= $I0 goto read_loop
+    $P3 = $P1[$I1]
+    inc $I1
+    $P9 = $P3[0]
+    $S0 = $P9
+    $P9 = $P3['ident']
+    $S1 = $P9
+    if $S0 == 'grammar' goto grammar_stmt
+    $P9 = $P3['rulex']
+    $S2 = $P9
+    p6rule_compile($S2, gname, $S1)
+    print "Loaded "
+    print gname
+    print "::"
+    print $S1
+    print "\n"
+    goto use_grammar_stmt
+  grammar_stmt:
+    $P9 = $P3['ident']
+    gname = $P9
+    goto use_grammar_stmt
+
   end_demo:
 .end

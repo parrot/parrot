@@ -15,12 +15,11 @@ a number of built-in rules.
 
 .sub "__onload" 
     .local pmc base
+    .local pmc p6rule
     base = getclass "PGE::Match"
     $P0 = subclass base, "PGE::Rule"
-    $P0 = find_global "PGE", "p6rule"
-    ($P1, $P2) = $P0("[_ | <?alpha>] \w*")
-    #print $P2
-    store_global "PGE::Rule", "ident", $P1
+    p6rule = find_global "PGE", "p6rule"
+    p6rule("[_ | <?alpha>] \w*", "PGE::Rule", "ident")
 .end
 
 =head2 Built-in rules
