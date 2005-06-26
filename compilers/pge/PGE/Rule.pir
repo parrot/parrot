@@ -17,6 +17,10 @@ a number of built-in rules.
     .local pmc base
     base = getclass "PGE::Match"
     $P0 = subclass base, "PGE::Rule"
+    $P0 = find_global "PGE", "p6rule"
+    ($P1, $P2) = $P0("[_ | <alpha>] \w*")
+    #print $P2
+    store_global "PGE::Rule", "ident", $P1
 .end
 
 =head2 Built-in rules
@@ -57,9 +61,9 @@ Match a single alphabetic character.
   end:
 .end
 
-=item C<alpha()>
+=item C<digit()>
 
-Match a single alphabetic character.
+Match a single digit.
 
 =cut
 
@@ -72,6 +76,28 @@ Match a single alphabetic character.
     $P1 = getattribute mob, "PGE::Match\x0$:target"
     target = $P1
     $I0 = is_cclass .CCLASS_NUMERIC, target, pos
+    unless $I0 goto end
+    inc pos
+    $P1 = getattribute mob, "PGE::Match\x0$:pos"
+    $P1 = pos
+  end:
+.end
+
+=item C<alnum()>
+
+Match a single alphanumeric character.
+
+=cut
+
+.sub "alnum"
+    .param pmc mob
+    .local string target
+    .local int pos
+    $P0 = getattribute mob, "PGE::Match\x0$:from"
+    pos = $P0
+    $P1 = getattribute mob, "PGE::Match\x0$:target"
+    target = $P1
+    $I0 = is_cclass .CCLASS_ALPHANUMERIC, target, pos
     unless $I0 goto end
     inc pos
     $P1 = getattribute mob, "PGE::Match\x0$:pos"

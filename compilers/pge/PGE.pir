@@ -24,9 +24,9 @@ defined.
     load()
     load = find_global "PGE::Match", "__onload"
     load()
-    load = find_global "PGE::Rule", "__onload"
-    load()
     load = find_global "PGE::P6Rule", "__onload"
+    load()
+    load = find_global "PGE::Rule", "__onload"
     load()
 .end
 

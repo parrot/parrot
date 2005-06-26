@@ -19,9 +19,6 @@
     istrace = 0
     null rulesub
 
-    (rulesub, pir, exp) = p6rule_compile("\w+")
-    store_global "ident", rulesub
-   
   read_loop:
     print "\ninput \"rule <pattern>\", \"glob <pattern>\", \"save <name>\",\n"
     print "target string, \"pir\", \"exp\", \"trace\", or \"next\"\n"

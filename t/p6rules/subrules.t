@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Parrot::Test tests => 4;
+use Parrot::Test tests => 6;
 use Parrot::Test::PGE;
 
 
@@ -35,5 +35,20 @@ p6rule_isnt("0-900-04-41-59",
         [ _MASTER => ':w<exch> <digits>-<digits>' ],
     ],
     "nested subrules");
+
+p6rule_is("ab",
+    [
+        [ alpha => '<[aeiou]>' ],
+        [ _MASTER => '^ <alpha> <PGE::Rule::alpha>' ],
+    ],
+    "named and lexical subrules");
+
+p6rule_isnt("ba",
+    [
+        [ alpha => '<[aeiou]>' ],
+        [ _MASTER => '^ <alpha> <PGE::Rule::alpha>' ],
+    ],
+    "named and lexical subrules");
+
 
 # Don't forget to change the number of tests :-)
