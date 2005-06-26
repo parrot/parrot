@@ -37,8 +37,6 @@ how to do this from inside parrot?
 
 =item migrate all these issues to RT or TODO tests
 
-=item provide a way to test a recent tcl suite. [matt]
-
 =item update docs [will]
 
 (including add pod to all .imc)
