@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 9;
+use Parrot::Test tests => 10;
 use vars qw($TODO);
 
 my($tcl,$expected);
@@ -68,6 +68,12 @@ set x $
 puts $x
 TCL
 $
+OUT
+
+language_output_is("tcl",<<'TCL',<<'OUT',"bad argument error");
+puts 4 # comment
+TCL
+bad argument "comment": should be "nonewline"
 OUT
 
 }
