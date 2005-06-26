@@ -1,22 +1,3 @@
-=head1 Primary Goal
-
-Primary goal right now should be to pass a single test from a single file in
-the tcl suite of tests.
-
-Let's pick C<concat.test>, as we already would pass several of those tests
-if they were recast into the tcl test suite.
-
-To get this to work, we need to get (at least partial) implementations of:
-
-  [lsearch]
-  [namespace children]
-  [namespace import -force]
-  [package require]
-
-the test scripts import the library C<tcltest>, which in turn uses quite
-a bit more. We can use a stripped down version of C<tcltest> that does
-the bare minimum to get things started.
-
 =head1 Various
 
 =over 4
