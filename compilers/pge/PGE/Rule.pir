@@ -18,7 +18,7 @@ a number of built-in rules.
     base = getclass "PGE::Match"
     $P0 = subclass base, "PGE::Rule"
     $P0 = find_global "PGE", "p6rule"
-    ($P1, $P2) = $P0("[_ | <alpha>] \w*")
+    ($P1, $P2) = $P0("[_ | <?alpha>] \w*")
     #print $P2
     store_global "PGE::Rule", "ident", $P1
 .end

@@ -70,6 +70,7 @@ will be to use Perl 6 to write and compile a better (faster) rules parser.
     p6meta['$9'] = $P0
     $P0 = find_global "PGE::P6Rule", "p6rule_parse_subrule" 
     p6meta['<'] = $P0
+    p6meta['<?'] = $P0
     p6meta['>'] = u
     $P0 = find_global "PGE::P6Rule", "p6rule_parse_ccshortcut"
     p6meta['\d'] = $P0
@@ -348,13 +349,10 @@ Parses subrules.
     .param string token
     .local int pos
     .local pmc exp
-    p6rule_parse_skip(pattern, lex, 1)
+    $I0 = length token
+    p6rule_parse_skip(pattern, lex, $I0)
     pos = lex["pos"]
     $I0 = pos
-    $S0 = substr pattern, pos, 1
-    unless $S0 == '?' goto subrule_1
-    inc pos
-    inc $I0
   subrule_1:
     $I1 = is_wordchar pattern, pos 
     unless $I1 goto subrule_1b
@@ -375,6 +373,7 @@ Parses subrules.
     exp = $P0("PGE::Exp::Group", $P1)
     $S0 = substr pattern, $I0, $I1
     exp["rname"] = $S0
+    if token == '<?' goto subrule_4
     exp["cname"] = $S0
     $I0 = exists lex["cname"]
     unless $I0 goto subrule_4

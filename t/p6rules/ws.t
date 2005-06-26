@@ -24,9 +24,10 @@ p6rule_is  ('foo-bar', ':w foo -? bar', 'basic ws match \s* \s*');
 p6rule_isnt('foobar', ':w foo -? bar', 'basic ws non-match');
 
 # with :w not separated by a space
-# XXX: These forms of modifier separation do not yet work
-#p6rule_is  ('foo - bar', ':w()foo -? bar', 'basic ws match');
-#p6rule_is  ('foo - bar', ':w[]foo -? bar', 'basic ws match');
+# p6rule_is  ('foo - bar', ':w()foo -? bar', 'basic ws match',
+#     todo => 'words modifier () separation not implemented');
+# p6rule_is  ('foo - bar', ':w[]foo -? bar', 'basic ws match',
+#     todo => 'words modifier [] separation not implemented');
 p6rule_is  ('foo - bar', ':w\bfoo -? bar',
     'basic ws match with boundary modifier separation');
 p6rule_is  ('foo - bar', ':w::foo -? bar',

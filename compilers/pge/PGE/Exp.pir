@@ -1193,7 +1193,9 @@ register.
     emit(code, "    restore $P0")
     emit(code, "    restore pos")
     emit(code, "    unless $P0 goto %s_s4", label)
+    unless iscapture goto subrule_3
     emit(code, "    push capt, $P0")
+  subrule_3:
     emit(code, "  %s_s2:", label)
     self.emitsub(code, label, "pos", "$P0", 0)
     emit(code, "    unless cutting == 0 goto %s_s3", label)
@@ -1205,7 +1207,9 @@ register.
     emit(code, "    restore pos")
     emit(code, "    if $P0 goto %s_s2", label)
     emit(code, "  %s_s3:", label)
+    unless iscapture goto subrule_4
     emit(code, "    $P1 = pop capt")
+  subrule_4:
     emit(code, "  %s_s4:", label)
     emit(code, "    ret")
   end:
