@@ -74,16 +74,6 @@ Tcl::info is called with (args, foo), which then dispatched to:
 
 _Tcl::builtins::info::args ((foo)).
 
-=item clean up variable access
-
-Currently wherever a normal C<find_lex> or C<store_lex>  might be, we have a 
-snippet of code
-to lookup the call_level (shouldn't even have this as a global), and based on
-that, treat the variable like a global instead. This should all be re-factored
-out into a single location. We also hardcode the default global namespace, 
-which in parrot is "Tcl". Refactoring this will save us pain when we add
-[namespace] support.
-
 =item implement default globals, etc.
 
 global variables provided by tcl libary. L<tclvars>.
