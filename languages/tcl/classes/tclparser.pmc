@@ -110,7 +110,7 @@ XXX: Skip the evaluate step, and just return an invokable.
       INTVAL bs_pos;
       INTVAL bs_diff;
       INTVAL buffer_length;
-      INTVAL old_length,chunk_start,escape_length,temppos;
+      INTVAL chunk_start,escape_length,temppos;
 
       STRING *buffer = Parrot_make_COW_reference(INTERP, code);
       PMC *word;
@@ -265,24 +265,15 @@ middle_word:
 
   character = string_index(INTERP, buffer, I0);
 
-  if (preserve_whitespace)
-    goto middle_word_2;
-
-  if (character < 33 && character != '\n')
+  if (!preserve_whitespace && character < 33 && character != '\n')
     goto end_word;
 
-  /* if this isn't a newline, skip */
-  if (character != '\n')
-    goto middle_word_2;
-
-middle_word_1:
-  word_trailing_length=1;
-  goto end_command;
-
-middle_word_2:
   /* wait, this was a semicolon - go back and deal with it.*/
-  if (character == ';')
-    goto middle_word_1;
+  if (character == ';' || character == '\n')
+  {
+    word_trailing_length=1;
+    goto end_command;
+  }
 
   /* If we've gotten this far and we're in a brace-block, die */
   /* XXX gives wrong exception on quoted string */
@@ -293,26 +284,24 @@ middle_word_2:
   if (block_interpolation)
     goto check_bs;
 
-  if (character == '[') {
+  if (character == '[')
+  {
+    /* if there's any word so far, save it*/
+    if (word_length) {
+      S0 = string_substr(INTERP, buffer, start_word, word_length, NULL, 0);
+      P1 = VTABLE_find_method(INTERP, word, ConcatConst);
+      Parrot_call_method(INTERP, P1, word, ConcatConst, "vS", S0);
+    }
+
     /* command block */
-    old_length = word_length;
     chunk_start = start_word + word_length;
     word_length = Parrot_TclParser_match_close(INTERP, SELF, buffer,chunk_start);
 
     if (word_length < 0)
       real_exception(INTERP, NULL, E_Exception, "missing close-bracket");
 
-    if (old_length) {
-      /* if there's any word so far, save it*/
-      S0 = string_substr(INTERP, buffer, start_word, old_length, NULL, 0);
-      P1 = VTABLE_find_method(INTERP, word, ConcatConst);
-      Parrot_call_method(INTERP, P1, word, ConcatConst, "vS", S0);
-    }
-
     /* Save this as a command (skip the []'s)*/
-    I0 = chunk_start + 1;
-    I1 = word_length - 2;
-    S0 = string_substr(INTERP, buffer, I0, I1, NULL, 0);
+    S0 = string_substr(INTERP, buffer, chunk_start + 1, word_length - 2, NULL, 0);
     P1 = VTABLE_find_method(INTERP, word, ConcatCommand);
     Parrot_call_method(INTERP, P1, word, ConcatCommand, "vS", S0);
 
@@ -321,9 +310,75 @@ middle_word_2:
 
     goto middle_word;
   }
+  else if (character == '$')
+  {
+      /* First, save off anything we've gotten so far as a constant.*/
+      if (word_length != 0)
+      {
+          S0 = string_substr(INTERP, buffer, start_word, word_length, NULL, 0);
+          P1 = VTABLE_find_method(INTERP, word, ConcatConst);
+          Parrot_call_method(INTERP, P1, word, ConcatConst, "vS", S0);
+      }
+      
+      chunk_start = start_word + word_length;
+      word_length = Parrot_TclParser_match_close(INTERP, SELF, buffer,chunk_start);
+      
+      /* Are we dealing with a braced-var name? */
+      if (string_index(INTERP, buffer, ++chunk_start) == '{')
+      {
+          /* Get the closing brace, but we don't have to have matched pairs here. */
+          I1 = string_str_index(INTERP, buffer, cb, chunk_start);
+          if (I1 > buffer_length)
+            real_exception(INTERP, NULL, E_Exception, "XXX invalid variable");
 
-  if (character == '$')
-    goto handle_variable;
+          /* Save the new start word for when we go to middle word.*/
+          I1++;
+          start_word = I1;
+          word_length = 0;
+
+          /* Name of variable is between the braces..*/
+          chunk_start++;
+          I2 = I1 - chunk_start - 1;
+          S0 = string_substr(INTERP, buffer, chunk_start, I2, NULL, 0);
+          P1 = VTABLE_find_method(INTERP, word, ConcatVariable);
+          Parrot_call_method(INTERP, P1, word, ConcatVariable, "vS", S0);
+      }
+      else
+      {
+          temppos = chunk_start;
+
+        inner:
+          if (++temppos >= buffer_length)
+            goto inner_done;
+
+          if ( Parrot_string_is_wordchar(INTERP, buffer, temppos) )
+            goto inner;
+
+        inner_done:
+          /* Once we get here, we could also have a () to deal with..   */
+          /* () */
+          I1 = temppos - chunk_start;
+          S0 = string_substr(INTERP, buffer, chunk_start, I1, NULL, 0);
+          start_word = chunk_start + I1;
+          word_length = 0;
+
+          if (string_index(INTERP, buffer, temppos) != '(') {
+            goto gotword;
+          }
+          temppos = string_str_index(INTERP, buffer, cp, start_word);
+          if (temppos == -1) {
+            real_exception(INTERP, NULL, E_Exception, "XXX bad array");
+          }
+          /* $S0($S1) */
+          start_word++;
+          I1 = temppos - start_word;
+          S1 = string_substr(INTERP, buffer, start_word, I1, NULL, 0);
+          start_word = temppos + 1;
+          P1 = VTABLE_find_method(INTERP, word, ConcatVariable);
+          Parrot_call_method(INTERP, P1, word, ConcatVariable, "vSS", S0, S1);
+      }
+      goto middle_word;
+  }
 
 check_bs:
   /* backslash */
@@ -399,85 +454,6 @@ end_command_2:
   start_word += word_length;
   start_word += word_trailing_length;
   goto begin_command;
-
-
-handle_variable:
-  /* First, save off anything we've gotten so far as a constant.*/
-  old_length = word_length;
-  chunk_start = start_word + word_length;
-  word_length = Parrot_TclParser_match_close(INTERP, SELF, buffer,chunk_start);
-
-  /* if there's any word so far, save it*/
-  if (old_length == 0)
-    goto handle_variable_1;
-
-  S0 = string_substr(INTERP, buffer, start_word, old_length, NULL, 0);
-  P1 = VTABLE_find_method(INTERP, word, ConcatConst);
-  Parrot_call_method(INTERP, P1, word, ConcatConst, "vS", S0);
-
-handle_variable_1:
-  /* Are we dealing with a braced-var name? */
-  if (string_index(INTERP, buffer, ++chunk_start) != '{')
-    goto handle_variable_nobrace;
-
-  /* Get the closing brace, but we don't have to have matched pairs here. */
-  I1 = string_str_index(INTERP, buffer, cb, chunk_start);
-  if (I1 > buffer_length)
-    real_exception(INTERP, NULL, E_Exception, "XXX invalid variable");
-
-  /* Save the new start word for when we go to middle word.*/
-  I1++;
-  start_word = I1;
-  word_length = 0;
-
-  /* Name of variable is between the braces..*/
-  chunk_start++;
-  I2 = I1 - chunk_start - 1;
-  S0 = string_substr(INTERP, buffer, chunk_start, I2, NULL, 0);
-  P1 = VTABLE_find_method(INTERP, word, ConcatVariable);
-  Parrot_call_method(INTERP, P1, word, ConcatVariable, "vS", S0);
-  goto middle_word;
-
-handle_variable_nobrace:
-  temppos = chunk_start;
-
-inner:
-  if (++temppos >= buffer_length)
-    goto inner_done;
-
-  I0 = string_index(INTERP, buffer, temppos);
-  if (
-       (I0 >= 'A' && I0 <= 'Z') ||
-       (I0 >= 'a' && I0 <= 'z') ||
-       (I0 >= '0' && I0 <= '9') ||
-       (I0 == '_')
-     ) {
-    goto inner;
-  }
-
-inner_done:
-  /* Once we get here, we could also have a () to deal with..   */
-  /* () */
-  I1 = temppos - chunk_start;
-  S0 = string_substr(INTERP, buffer, chunk_start, I1, NULL, 0);
-  start_word = chunk_start + I1;
-  word_length = 0;
-
-  if (I0 != 40) {
-    goto gotword;
-  }
-  temppos = string_str_index(INTERP, buffer, cp, start_word);
-  if (temppos == -1) {
-    real_exception(INTERP, NULL, E_Exception, "XXX bad array");
-  }
-  /* $S0($S1) */
-  start_word++;
-  I1 = temppos - start_word;
-  S1 = string_substr(INTERP, buffer, start_word, I1, NULL, 0);
-  start_word = temppos + 1;
-  P1 = VTABLE_find_method(INTERP, word, ConcatVariable);
-  Parrot_call_method(INTERP, P1, word, ConcatVariable, "vSS", S0, S1);
-  goto middle_word;
 
 gotword:
   /* $S0 was set to the name of the variable above. */
