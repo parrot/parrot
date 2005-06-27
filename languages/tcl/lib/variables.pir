@@ -70,7 +70,7 @@ cant_read_array:
   return_type = TCL_ERROR
   $S0 = "can't read \""
   $S0 .= name
-  $S0 .= "\": variable is an array"
+  $S0 .= "\": variable is array"
   variable = new String
   variable = $S0
   goto done
