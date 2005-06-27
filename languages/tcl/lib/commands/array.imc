@@ -139,7 +139,6 @@ set_loop:
   $P0 = find_global "_Tcl", "call_level"
   call_level = $P0
   
-  retval = the_array
   if call_level goto save_lex
     store_global "Tcl", array_name, the_array
     goto done

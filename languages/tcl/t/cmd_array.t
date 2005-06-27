@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 12;
+use Parrot::Test tests => 13;
 use vars qw($TODO);
 
 language_output_is("tcl",<<'TCL',<<OUT,"array exists yes");
@@ -98,4 +98,10 @@ language_output_is("tcl",<<'TCL',<<OUT,"array set uneven");
  array set a a
 TCL
 list must have an even number of elements
+OUT
+
+language_output_is("tcl",<<'TCL',<<'OUT',"array set return value");
+  puts [array set a [list a b]]
+TCL
+
 OUT
