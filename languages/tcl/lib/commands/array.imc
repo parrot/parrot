@@ -33,6 +33,7 @@ find_lexical:
     the_array = find_lex call_level, array_name
 resume:
   clear_eh
+  catch:
 
   isnull the_array, array_no 
   $I99 = does the_array, "hash"
@@ -80,9 +81,10 @@ size_none:
   goto done
 
 set:
-  retval = new String
-  retval = ""
-  
+  # array_name is getting stomped on here
+  # print "array name: '"
+  # print array_name
+  # print "'\n"
   if argc != 3 goto set_bad_args
   
   .local pmc elems
@@ -135,16 +137,13 @@ set_loop:
   if loop < count goto set_loop
   
   # set the actual variable
-  .local int call_level
-  $P0 = find_global "_Tcl", "call_level"
-  call_level = $P0
+  .local pmc set
+  set = find_global  "_Tcl", "__set"
+  (return_type, retval) = set(array_name, the_array)
+  if return_type == TCL_ERROR goto done
   
-  if call_level goto save_lex
-    store_global "Tcl", array_name, the_array
-    goto done
-  save_lex:
-    store_lex call_level, array_name, the_array
-  
+  retval = new String
+  retval = ""
   goto done
 
 
@@ -167,8 +166,5 @@ error:
 
 done:
   .return(return_type,retval)
-
-catch:
-  goto resume
 
 .end
