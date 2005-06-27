@@ -56,6 +56,8 @@ OUT
 
 # Tcl currently throughs an error for this code
 # but a bug has been filed for it at http://tcl.sf.net (#1227172)
-language_output_is('tcl', <<'TCL', '', 'return empty value');
+language_output_is('tcl', <<'TCL', <<'OUT', 'append unset variable');
  append x
 TCL
+can't read "x": no such variable
+OUT
