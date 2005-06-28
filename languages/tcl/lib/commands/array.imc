@@ -7,9 +7,9 @@
   .local pmc argv
   argv = foldup
 
-  .local int argc 
+  .local int argc
   argc = argv
-  
+
   .local int return_type
   return_type = TCL_OK
   .local pmc retval
@@ -35,17 +35,17 @@ resume:
   clear_eh
   catch:
 
-  isnull the_array, array_no 
+  isnull the_array, array_no
   $I99 = does the_array, "hash"
   if $I99==0 goto array_no
 
   is_array = 1
-  goto subcommand
+  goto scommand
 
 array_no:
   is_array = 0
 
-subcommand:
+scommand:
 
   .local string subcommand
   subcommand = argv[0]
@@ -56,7 +56,7 @@ subcommand:
   #if subcommand == "get" goto NOTDONEYET
   #if subcommand == "names" goto NOTDONEYET
   #if subcommand == "nextelement" goto NOTDONEYET
-  if subcommand == "set" goto set
+  if subcommand == "set" goto set_it
   if subcommand == "size" goto size
   #if subcommand == "startsearch" goto NOTDONEYET
   #if subcommand == "statistics" goto NOTDONEYET
@@ -80,39 +80,39 @@ size_none:
   retval = 0
   goto done
 
-set:
+set_it:
   # array_name is getting stomped on here
   # print "array name: '"
   # print array_name
   # print "'\n"
   if argc != 3 goto set_bad_args
-  
+
   .local pmc elems
   elems = argv[2]
 
-  # XXX should probably change this to use "does"  
+  # XXX should probably change this to use "does"
   $S0 = typeof elems
   if $S0 == 'TclList' goto set_pre_loop
   if $S0 == 'String'  goto set_with_string
   goto set_bad_args
-  
+
 set_with_string:
   $P0 = find_global "_Tcl", "__stringToList"
   $S0 = elems
   elems = $P0($S0)
-    
+
 set_pre_loop:
   .local int count
   count = elems
   $I0 = count % 2
   if $I0 == 1 goto set_odd_args
-  
+
   # pull out all the key/value pairs and set them.
-  .local int loop 
+  .local int loop
   loop = 0
   .local string key
   .local string val
-  
+
   # see if there's an existing array with this name to add to
   # and if not create a new array
   push_eh set_new_array
@@ -124,10 +124,10 @@ set_pre_loop:
 set_has_array:
   clear_eh
   goto set_loop
-  
+
 set_new_array:
   the_array = new TclArray
-  
+
 set_loop:
   key = elems[loop]
   inc loop
@@ -135,13 +135,13 @@ set_loop:
   inc loop
   the_array[key] = val
   if loop < count goto set_loop
-  
+
   # set the actual variable
   .local pmc set
   set = find_global  "_Tcl", "__set"
   (return_type, retval) = set(array_name, the_array)
   if return_type == TCL_ERROR goto done
-  
+
   retval = new String
   retval = ""
   goto done
@@ -150,7 +150,7 @@ set_loop:
 set_bad_args:
  return_type = TCL_ERROR
  retval = new String
- retval = "wrong # args: should be array set arrayName list" 
+ retval = "wrong # args: should be array set arrayName list"
  goto done
 
 set_odd_args:
