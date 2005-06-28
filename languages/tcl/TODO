@@ -1,6 +1,21 @@
+From autrijus's talk:
+
+PIR Tree - can we use this instead of the craptacular "compile a string"
+version of compile we are currently using.
+
+
+
 =head1 Various
 
 =over 4
+
+=item change how we run parrot
+
+Right now we cd  up to parrot's root directory and then path down to tcl
+
+Leo has asked to change this to instead do ../../parrot tcl.pbc foo.tcl
+
+This is fine by me but didn't work as of a year ago. =-)
 
 =item interactive tclsh
 
@@ -78,7 +93,7 @@ source per-user settings. L<tclsh>
 [string compare] [string equal] [string last]
 [string bytelength] [string is] [string map]
 [string wordstart] [string wordend] [switch] [tcltest]
-[tell] [update] [variable] [vwait]
+[tell] [update] [variable] [vwait] [trace]
 
 =back
 
@@ -99,7 +114,7 @@ tests so they're consistent.
 
 tclversion, body, args, exists
 
-=item expr's precedence and parens and missing functionality.
+=item [expr]'s precedence and parens and missing functionality.
 
 =item [puts]'s ability to write to other channels
 
@@ -129,7 +144,7 @@ Perhaps via [namespace import]? Can fake it right now with [inline]
 
 =item multiple level lists
 
-=item expr
+=item [expr]
 
 Clean up [expr]. MUUUUCH room for improvement there. [expr] is the source
 of most of our abysmal performance in bench.tcl.
