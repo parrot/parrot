@@ -358,10 +358,59 @@ the arguments as key/value pairs:
 
 =head2 How do I access module/class variables?
 
+=head1 Exceptions
+
+=head2 How do I throw an exception in PIR?
+
+Create an Exception object and throw it!
+
+    $P0 = new Exception
+    throw $P0
+
+Not too hard, is it?
+
+=head2 How do I throw an exception with an error message in PIR?
+
+    $P0 = new Exception
+    $P0["_message"] = "something happened"
+    throw $P0
+
+=head2 How do I catch an exception in PIR?
+
+Use C<push_eh> to push an exception handler onto the stack.
+
+    push_eh handler
+    $P0 = new Exception
+    throw $P0
+    clear_eh
+    exit 0
+    
+  handler:
+    print "Exception caught!\n"
+    exit 1
+
+=head2 How do I access the error message of an exception I've caught?
+
+P5 is the register used for the Exception object.
+
+    push_eh handler
+    $P0 = new Exception
+    $P0["_message"] = "something happened"
+    throw $P0
+    clear_eh
+    exit 0
+    
+  handler:
+    print "Exception: "
+    $S0 = P5["_message"]
+    print $S0
+    print "\n"
+    exit 1
+
 =head1 VERSION
 
 =over 4
 
-=item Revision 0.3 - 17 May 2004
+=item Revision 0.4 - 28 June 2005
 
 =back
