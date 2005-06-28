@@ -94,4 +94,16 @@ or not (as opposed to now, where all codes are equal).
 Cheating and keeping a global around right now, so we can figure out if we should
 be using a global or a lexical (and if so, how far down or up).
 
+=head1 [trace]'ing
+
+There are two ways we can go about the tracing - either we can keep the 
+information about the traces in a global, and check that global every time
+the appropriate action is taken; or, we can tie that information into the
+actual commands and variables. I think the latter would be somewhat cleaner,
+and, if any other languages support this feature, this would give us a chance
+to interoperate.
+
 =cut
+
+
+
