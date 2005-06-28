@@ -109,7 +109,7 @@ sub extract_tests {
     ]sx;
     
     while ($source =~ m[$regex]go) {
-        my ($name, $expl, $body, $out) = ($1, $2, $3, choose($4, $5, $6));
+        my ($name, $expl, $body, $out) = ($1, $2, $3, choose($4, unescape($5), $6));
         
         # make the test print the last line of output
         $body =~ s/^(\s*)([^\n]+)\s*\Z/$1puts [$2]/m;
@@ -165,6 +165,20 @@ sub run_tests {
     
     return unless @files;
     runtests(@files);
+}
+
+##
+## my $string = unescape( $original )
+##
+## Unescape backslashes from a Tcl string.
+##
+sub unescape {
+    my ($string) = @_;
+    return if not $string;
+    
+    $string =~ s/\\([^abfnrtvoxu])/$1/g;
+    
+    return $string;
 }
 
 ##
