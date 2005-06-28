@@ -26,7 +26,7 @@
 
   read_loop:
     print "\ninput \"rule <pattern>\", \"glob <pattern>\", \"save <name>\",\n"
-    print "target string, \"pir\", \"exp\", \"trace\", or \"next\"\n"
+    print "target string, \"pir\", \"exp\", \"trace\", \"next\", or \"use <file>\"\n"
     getstdin stdin
     readline x, stdin
     length $I0, x 
