@@ -24,7 +24,9 @@
  
   .local pmc string2list
   string2list = find_global "_Tcl", "__stringToList"
-  a_list = string2list(a_list)
+  (return_type, retval) = string2list(a_list)
+  if return_type == TCL_ERROR goto done
+  a_list = retval
 
 got_list:
   if argcP == 2 goto got_joiner

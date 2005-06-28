@@ -99,7 +99,9 @@ set_it:
 set_with_string:
   $P0 = find_global "_Tcl", "__stringToList"
   $S0 = elems
-  elems = $P0($S0)
+  (return_type, retval) = $P0($S0)
+  if return_type == TCL_ERROR goto done
+  elems = retval
 
 set_pre_loop:
   .local int count

@@ -8,7 +8,7 @@
   .local pmc argv
   argv = foldup 
 
-  .local pmc value
+  .local pmc value, retval
   .local int return_type
 
   .local int argc
@@ -26,12 +26,22 @@
   value = clone $P1
   
   if return_type == TCL_ERROR goto new_variable
+  $S0 = typeof $P1
+  if $S0 == "String" goto parse_string
   goto loop
 
 new_variable:
   value = new TclList
+  goto loop
+
+parse_string:
+  $P0 = find_global "_Tcl", "__stringToList"
+  $S0 = $P1
+  (return_type, retval) = $P0($S0)
+  if return_type == TCL_ERROR goto done
+  $P1 = retval
   # goto loop
-  
+
 loop:
   if cnt == argc goto loop_done
   $P0 = argv[cnt]
@@ -41,14 +51,14 @@ loop:
 loop_done:
   .local pmc set
   set = find_global "_Tcl", "__set"
-  (return_type, value) = set($S1, value)
+  (return_type, retval) = set($S1, value)
   goto done
 
 error:
   return_type = TCL_ERROR
-  value = new TclString
-  value = "wrong # args: should be \"lappend varName ?value value ...?\""
+  retval = new TclString
+  retval = "wrong # args: should be \"lappend varName ?value value ...?\""
 
 done:
-  .return(return_type,value)
+  .return(return_type,retval)
 .end

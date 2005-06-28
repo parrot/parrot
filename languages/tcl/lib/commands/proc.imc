@@ -15,9 +15,7 @@ Create a PIR sub on the fly for this user defined proc.
 
   .local int return_type
   .local pmc retval
-  retval = new String 
   return_type = TCL_OK
-  retval = ""
 
   .local pmc parser,string2list
   parser = find_global "_Tcl", "parser"
@@ -29,7 +27,9 @@ Create a PIR sub on the fly for this user defined proc.
   args = args_p
 
   .local pmc arg_list
-  arg_list = string2list(args)
+  (return_type, retval) = string2list(args)
+  if return_type == TCL_ERROR goto done
+  arg_list = retval
 
   # Save the parsed body.
   .local pmc parsed_body
@@ -113,10 +113,14 @@ arg_loop_done:
   # to our newly compiled function or run the risk of having it garbage collected
   $P1 = find_global "_Tcl", "proc_exec"
   $P1[name] = $P0
+  
+  retval = new String
+  retval = ""
   goto done
  
 error:
   return_type = TCL_ERROR
+  retval = new String
   retval = "wrong # args: should be \"proc name args body\"\n"
 
 done:

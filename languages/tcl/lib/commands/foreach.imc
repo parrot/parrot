@@ -60,7 +60,10 @@ arg_loop:
   $I0 = typeof $P0
   if $I0 == .TclList goto got_list
   $S0 = $P0
-  $P0 = string2list($S0)
+  (return_type, retval) = string2list($S0)
+  if return_type == TCL_ERROR goto done
+  $P0 = retval
+
 got_list:
   arglists[index_num] = $P0
 

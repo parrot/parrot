@@ -192,7 +192,7 @@ space_loop_end:
 
     word_length = Parrot_TclParser_match_close(INTERP, SELF, buffer,start_word);
     if (word_length < 0)
-      real_exception(INTERP, NULL, E_Exception, "missing close-brace");
+      real_exception(INTERP, NULL, E_Exception, "unmatched open brace in list");
 
     end_of_word = 1;
 

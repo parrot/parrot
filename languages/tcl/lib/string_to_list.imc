@@ -4,26 +4,39 @@
 
 .sub __stringToList
   .param string str
-  # buffer contains the string we are working on.
 
-  .local pmc list
-  list = new TclList
+  .local int return_type
+  return_type = TCL_OK
+  
+  .local pmc retval
+  retval = new TclList
  
   .local pmc parsed_str
 
   .local pmc parser 
   parser = find_global "_Tcl", "parser"
-
-  parsed_str = parser."parse"(str,0,1)
+  
+  push_eh parse_error
+    parsed_str = parser."parse"(str,0,1)
+  clear_eh
   
   $I0 = parsed_str
   if $I0 == 0 goto done
 
-  shift list, parsed_str
+  retval = shift parsed_str
 
   # XXX If there is more than one entry in the parsed_str array, then
   # there's probably an error condition we need to raise.
+  
+  goto done
+  
+parse_error:
+  return_type = TCL_ERROR
+  $S0 = P5["_message"]
+  retval = new String
+  retval = $S0
+  # goto done
 
 done:
-  .return(list)
+  .return(return_type, retval)
 .end
