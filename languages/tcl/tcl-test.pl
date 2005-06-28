@@ -11,8 +11,8 @@ use File::Spec;
 use Getopt::Std;
 use Test::Harness;
 
-our ($opt_u, $opt_h);
-getopts('uh');
+our ($opt_u, $opt_h, $opt_c);
+getopts('uhc');
 
 =head1 NAME
 
@@ -35,6 +35,7 @@ sub main {
     usage() and exit if $opt_h;
     checkout_tests() and convert_tests() if not -d $DIR;
     update_tests()   and convert_tests() if $opt_u;
+    convert_tests() if $opt_c;
     run_tests(grep {-f $_} @ARGV);
 }
 
@@ -185,6 +186,7 @@ sub update_tests {
 sub usage {
     print <<"USAGE";
 Usage: tcl-test.pl [-cu]
+    -c Convert the .test files to .t files
     -u Update the tests from CVS.
 USAGE
     1;
