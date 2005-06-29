@@ -17,14 +17,20 @@ use Parrot::Test tests => 1;
     p6rule = find_global "PGE", "p6rule"  # get the compiler
 
     .local string pattern       
-    .local pmc rulesub                     
-    pattern = "^(From|Subject):"          # pattern to compile
-    rulesub = p6rule(pattern)             # compile it to rulesub
+    pattern = "^<[_a..zA..Z]><[_a..zA..Z0..9]>*"          # pattern to compile
 
-    .local pmc match
+    .local pmc state
+    state = new Hash
+    .local pmc rulesub                     
+    rulesub = p6rule(pattern)             # compile it to rulesub
+    state['word_rulesub'] = rulesub
+
     .local string target
-    target = "From: pmichaud@pobox.com"   # target string
-    match = rulesub(target)               # execute rule on target string
+    target = "Hello World"                # target string
+    .local pmc match
+    .local pmc word_rulesub
+    word_rulesub = state['word_rulesub']
+    match = word_rulesub(target)               # execute rule on target string
 
 match_loop:
     unless match goto match_fail          # if match fails stop
@@ -41,8 +47,15 @@ match_fail:
 .end
 END_PIR
 match succeeded
-: <From @ 0> 0
-[0]: <From @ 0> 0
+: <Hello @ 0> 0
+match succeeded
+: <Hell @ 0> 0
+match succeeded
+: <Hel @ 0> 0
+match succeeded
+: <He @ 0> 0
+match succeeded
+: <H @ 0> 0
 match failed
 OUTPUT
 }

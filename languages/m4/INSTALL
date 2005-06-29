@@ -2,11 +2,7 @@
 
 The source of Parrot m4 is part of the Parrot distribution.
 
-Internally Parrot m4 uses the "Perl Compatible Regular Expressions"-library.
-The source of the PCRE-library can be fetched fromt http://www.pcre.org/.
-Please follow the the instructions in INSTALL in the fetched distribution.
-When the shared library 'libpcre' is installed in a non-default location,
-make sure that LD_LIBRARY_PATH is set accordingly.
+Internally Parrot m4 uses the "Parrot Grammar Enging PGE".
 
 Build and test with:
 

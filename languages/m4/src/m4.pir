@@ -39,6 +39,18 @@ References: http://www.gnu.org/software/m4/m4.html
 
 
 =head1 SUBROUTINES
+ 
+=head2 __onload
+
+Load needed libraries
+
+=cut
+
+.sub "__onload" @LOAD
+
+
+.end
+
 
 =head2 m4
 
@@ -49,8 +61,10 @@ Looks at the command line arguments and acts accordingly.
 .sub m4 @MAIN 
   .param pmc argv
 
-  load_bytecode "pcre.imc"
-  load_bytecode "Getopt/Long.pbc"
+  # TODO: put this into __onload
+  # load_bytecode "PGE.pbc"        # Loaded by Getopt/Long.pbc
+  load_bytecode "Getopt/Long.pbc"  # This also loads PGE
+
   .local pmc get_options
   find_global get_options, "Getopt::Long", "get_options"
 
@@ -120,7 +134,7 @@ Looks at the command line arguments and acts accordingly.
   # Was '--version' passed ?
   is_defined = defined opt["version"]
   unless is_defined goto NO_VERSION_FLAG
-    print "Parrot m4 0.0.12\n"
+    print "Parrot m4 0.0.13\n"
     end
 NO_VERSION_FLAG: 
 

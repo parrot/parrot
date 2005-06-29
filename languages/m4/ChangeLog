@@ -1,5 +1,9 @@
 # $Id$
 
+2005-06-29     Bernhard Schmalhofer
+        * Switch from PCRE to PGE
+	* Call it Parrot m4 0.0.13
+
 2005-06-12     Bernhard Schmalhofer
         * Move Parrot::Test::m4 to 'languages/m4/lib'
 	* Yank it up to 0.0.12

@@ -4,8 +4,15 @@ use strict;
 use FindBin;
 use lib "$FindBin::Bin/../../lib", "$FindBin::Bin/../../../../lib";
 
-use Parrot::Test tests => 2;
+use Parrot::Test tests => 3;
 
+{
+  language_output_is( 'm4', <<'CODE', <<'OUT', 'hello' );
+`foo'
+CODE
+foo
+OUT
+}
 {
   language_output_is( 'm4', <<'CODE', <<'OUT', 'hello' );
 define(`foo', `Hello World')

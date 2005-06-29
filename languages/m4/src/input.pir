@@ -15,13 +15,15 @@ References: http://www.gnu.org/software/m4/m4.html
 
 =head2 void input_init( Hash state )
 
-Initialise the input stack and various regexes.
+Initialise some stacks and some regexes
 
+'token_stack'
 'input_stack'   contains files, strings and macro definitions
-'word_regex'    recognizes TOKEN_WORD.
-'string_regex'  recognizes TOKEN_STRING
-'simple_regex'  recognizes TOKEN_SIMPLE
-'comment_regex' recognizes comments, returned as TOKEN_SIMPLE
+'wrapup_stack'
+'word_rulesub'    recognizes TOKEN_WORD.
+'string_rulesub'  recognizes TOKEN_STRING
+'simple_rulesub'  recognizes TOKEN_SIMPLE
+'comment_rulesub' recognizes comments, returned as TOKEN_SIMPLE
 
 TODO: recognize nested quoted strings
 
@@ -30,11 +32,10 @@ TODO: recognize nested quoted strings
 .include "datatypes.pasm"
 
 .sub input_init 
-  .param pmc state 
-
-  .local pmc empty_array
+  .param pmc state         
 
   # setup of stacks
+  .local pmc empty_array
   empty_array = new ResizablePMCArray
   state['token_stack'] = empty_array
   empty_array = new ResizablePMCArray
@@ -42,60 +43,19 @@ TODO: recognize nested quoted strings
   empty_array = new ResizablePMCArray
   state['wrapup_stack'] = empty_array
 
-  # setup of regexes
-  # regular expressions are needed for finding words and quoted strings
-  .local pmc regex
-  .local pmc erroffset
-  erroffset = new Integer
-  erroffset = 0
-  .local pmc NULL
-  NULL = null
-
-  .local pmc init_func, compile_func, match_func, dollar_func, pcre_lib
-  init_func    = find_global 'PCRE', 'init'
-  compile_func = find_global 'PCRE', 'compile'
-  dollar_func  = find_global 'PCRE', 'dollar'
-  match_func   = find_global 'PCRE', 'match'
-  state['pcre_match_func'] = match_func
-  pcre_lib     = init_func()
-
-  .local pmc err_decl
-  .local pmc err  
-  err_decl = new ResizablePMCArray
-  push err_decl, .DATATYPE_CSTR
-  push err_decl, 0
-  push err_decl, 0
-  err = new .ManagedStruct
-  assign err, err_decl
-
-  # pcre *pcre_compile( const char *pattern, int options,
-  #                     const char **errptr, int *erroffset,
-  #                     const unsigned char *tableptr
-  .local pmc pcre_compile
-  pcre_compile = dlfunc pcre_lib, "pcre_compile", "ptip3P"
-
-  #int pcre_exec( const pcre *code, const pcre_extra *extra,
-  #               const char *subject, int length, int startoffset,
-  #               int options, int *ovector, int ovecsize );
-  .local pmc pcre_exec
-  pcre_exec = dlfunc pcre_lib, "pcre_exec", "ipPtiiipi"
-  state['pcre_exec'] = pcre_exec
-
-  #int pcre_copy_substring( const char *subject, int *ovector,
-  #                         int stringcount, int stringnumber, char *buffer,
-  #                         int buffersize );
-  .local pmc pcre_copy_substring
-  pcre_copy_substring = dlfunc pcre_lib, "pcre_copy_substring", "itpiibi"
-  state['pcre_copy_substring'] = pcre_copy_substring
-
-  regex = pcre_compile( '^[^`#_a-zA-Z]', 0, err, erroffset, NULL )
-  state['simple_regex'] = regex
-  regex = pcre_compile( '^#[^\n]*\n', 0, err, erroffset, NULL )
-  state['comment_regex'] = regex
-  regex = pcre_compile( '^[_a-zA-Z][_a-zA-Z0-9]*', 0, err, erroffset, NULL )
-  state['word_regex'] = regex
-  regex = pcre_compile( "^`[^`]*'", 0, err, erroffset, NULL )
-  state['string_regex'] = regex
+  # setup of some rules
+  # these rules should be kept in sync with t/regex/002_tokens.t
+  .local pmc p6rule
+  find_global p6rule, "PGE", "p6rule"
+  .local pmc rulesub
+  rulesub = p6rule( "^<[_a..zA..Z]><[_a..zA..Z0..9]>*" )
+  state['word_rulesub'] = rulesub
+  rulesub = p6rule( "^`<-[`]>*'" )
+  state['string_rulesub'] = rulesub
+  rulesub = p6rule( "^<-[`#_a..zA..Z]>" )
+  state['simple_rulesub'] = rulesub
+  rulesub = p6rule( "^\#\N*\n" )
+  state['comment_rulesub'] = rulesub
 
 .end
 
@@ -175,53 +135,38 @@ Uses regular expressions for finding tokens.
   input_string = input_block['string']
   .local int current_file_len
   current_file_len = length input_string    
-  .local pmc pcre_exec    
-  pcre_exec = state['pcre_exec']
-  .local pmc NULL
-  null NULL
-  .local pmc ovector
-  ovector = new ManagedStruct
-  ovector = 120       # 1/(2/3) * 4  * 2 * 10 for 10 result pairs
-  .local int is_match
-  .local pmc regex    
+  .local pmc rulesub   
   .local string token_type
   token_type = 'TOKEN_EOF'
   .local string token_data
   token_data = ''
-  .local int is_string_match
-  is_string_match = 0
+  .local pmc match
     
   # look for 'TOKEN_SIMPLE'
   # read a whole bunch of non-macro and non-word charcters
-  regex = state['simple_regex']
+  rulesub = state['simple_rulesub']
   token_type = 'TOKEN_SIMPLE'
-  is_match = pcre_exec( regex, NULL, input_string, current_file_len, 0, 0, ovector, 10 )
-  if is_match ==  1 goto MATCH
-  if is_match != -1 goto MATCH_FAILED
+  match = rulesub( input_string ) 
+  if match goto MATCH
 
   # look for comments and return it as 'TOKEN_SIMPLE'
-  regex = state['comment_regex']
+  rulesub = state['comment_rulesub']
   token_type = 'TOKEN_SIMPLE'
-  is_match = pcre_exec( regex, NULL, input_string, current_file_len, 0, 0, ovector, 10 )
-  if is_match ==  1 goto MATCH
-  if is_match != -1 goto MATCH_FAILED
+  match = rulesub( input_string ) 
+  if match goto MATCH
 
   # look for 'TOKEN_STRING'
-  regex = state['string_regex']
+  rulesub = state['string_rulesub']
   token_type = 'TOKEN_STRING'
-  is_string_match = 1
-  is_match = pcre_exec( regex, NULL, input_string, current_file_len, 0, 0, ovector, 10 )
-  if is_match ==  1 goto MATCH
-  if is_match != -1 goto MATCH_FAILED
-  is_string_match = 0
+  match = rulesub( input_string ) 
+  if match goto MATCH
 
   # look for 'TOKEN_WORD'
   # this will be checked for macro substitution
-  regex = state['word_regex']
+  rulesub = state['word_rulesub']
   token_type = 'TOKEN_WORD'
-  is_match = pcre_exec( regex, NULL, input_string, current_file_len, 0, 0, ovector, 10 )
-  if is_match ==  1 goto MATCH
-  if is_match != -1 goto MATCH_FAILED
+  match = rulesub( input_string ) 
+  if match goto MATCH
 
   if current_file_len != 0 goto MATCH_FAILED 
   token_type = 'TOKEN_EOF'
@@ -229,22 +174,26 @@ Uses regular expressions for finding tokens.
   goto FINISH_NEXT_TOKEN 
 
   MATCH:
-    # ovector is an int arrary containing start stop coords
-    .local int start_line, end_line
-    .local pmc struct
-    struct = new SArray
-    struct = 3
-    struct[0] = .DATATYPE_INT
-    struct[1] = 2
-    struct[2] = 0
-    assign ovector, struct
-    start_line = ovector[0;0]
-    end_line   = ovector[0;1]
-    token_data = substr input_string, start_line, end_line, ''
-    unless is_string_match goto NO_STRING_MATCH
-      substr token_data, 0, 1, ''
-      substr token_data, -1, 1, ''
-    NO_STRING_MATCH: 
+  # TODO: is there a method for extraction the matched string?
+  .local int token_from, token_to
+  token_from = match.from()
+  token_to = match.to()
+  token_data = substr input_string, token_from, token_to, ''
+  goto SKIP_DEBUG_1
+  print "\ntoken_type: "
+  print token_type
+  print "\ntoken_from: "
+  print token_from
+  print "\ntoken_to: "
+  print token_to
+  print "\ntoken_data: "
+  print token_data
+  print "\n"
+  SKIP_DEBUG_1:
+  ne token_type, 'TOKEN_STRING', NO_STRING_MATCH
+    substr token_data, 0, 1, ''
+    substr token_data, -1, 1, ''
+  NO_STRING_MATCH: 
   goto FINISH_NEXT_TOKEN
 
   MATCH_FAILED:
