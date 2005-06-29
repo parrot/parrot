@@ -464,6 +464,7 @@ examples/assembly/small.xml                       [main]doc
 examples/assembly/stack.pasm                      [main]doc
 examples/assembly/sub.pasm                        [main]doc
 examples/assembly/substr.pasm                     [main]doc
+examples/assembly/sudoku.pir                      [main]doc
 examples/assembly/thr-primes.imc                  [main]doc
 examples/assembly/trace.pasm                      [main]doc
 examples/assembly/uniq.pasm                       [main]doc
