@@ -41,6 +41,19 @@ TCL
 {1 2} {3 4}
 OUT
 
+language_output_is("tcl",<<'TCL',<<'OUT',"newline");
+  puts [list "\n" ]
+TCL
+{
+}
+OUT
+
+language_output_is("tcl",<<'TCL',<<'OUT',"tab");
+  puts [list "\t" ]
+TCL
+{	}
+OUT
+
 TODO: {
 local $TODO = "TclList -> string doesn't escape things yet.";
 
@@ -56,23 +69,10 @@ TCL
 \{ \}
 OUT
 
-language_output_is("tcl",<<'TCL',<<'OUT',"newline");
-  puts [list "\n" ]
-TCL
-{
-}
-OUT
-
 language_output_is("tcl",<<'TCL',<<'OUT',"semicolon");
   puts [list ";" ]
 TCL
 {;}
-OUT
-
-language_output_is("tcl",<<'TCL',<<'OUT',"tab");
-  puts [list "\t" ]
-TCL
-{	}
 OUT
 
 language_output_is("tcl",<<'TCL',<<'OUT',"dollar");

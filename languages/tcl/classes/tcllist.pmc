@@ -95,33 +95,15 @@ Returns the list as a string
 */
 
     STRING* get_string () {
-        STRING *res, *vals;
-        INTVAL j, n, pos;
-        PMC *val;
-
-        res = string_from_const_cstring(INTERP, NULL, 0);
-        n = VTABLE_elements(INTERP, SELF);
-        /* XXX Need to properly tcl-escape these elements.
-         * Anything containing whitespace needs to be {}'d
-         * Anything with a { or } in it needs to have that escaped.
-         */
-        for (j = 0; j < n; ++j) {
-            val = SELF.get_pmc_keyed_int(j);
-            vals = VTABLE_get_string(INTERP, val);
-
-            pos = string_str_index(INTERP,vals,space,0);
-            if (pos != -1)
-              string_append(INTERP, res, ob, 0);
-
-            string_append(INTERP, res, vals, 0);
-            
-            if (pos != -1)
-              string_append(INTERP, res, cb, 0);
-            
-            if (j < n - 1)
-                string_append(INTERP, res, space, 0);
-        }
-        return res;
+        PMC *listToString;
+        STRING *namespace, *sub, *value;
+        
+        namespace    = string_from_const_cstring(INTERP, "_Tcl", 4);
+        sub          = string_from_const_cstring(INTERP, "__listToString", 14);
+        listToString = Parrot_get_global(INTERP, namespace, sub, NULL);
+        value        = Parrot_call_sub(INTERP, listToString, "SP", SELF);
+        
+        return value;
     }
 
 /*
