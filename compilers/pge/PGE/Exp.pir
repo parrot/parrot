@@ -456,6 +456,7 @@ register.
     emit(code, "    inc pos")
     emit(code, "    goto try_match")
     emit(code, "  try_at_pos:")
+    emit(code, "    cutting = 0")
     emit(code, "    from = pos")
     self.emitsub(code, label, 0)
     emit(code, "  fail_forever:")
