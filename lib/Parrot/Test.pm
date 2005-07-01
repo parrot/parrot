@@ -417,7 +417,7 @@ sub _generate_functions {
             my $meth = $parrot_test_map{$func};
             my $real_output = slurp_file($out_f);
             if ( $func =~ /^pir_2_pasm_/ ) {
-                # The parrot open '--outfile=file.pasm' seems to create unnecessare whitespace
+                # The parrot open '--outfile=file.pasm' seems to create unnecessary whitespace
                 $real_output =~ s/^\s*$//gm;
                 $real_output =~ s/[\t ]+/ /gm;
                 $real_output =~ s/[\t ]+$//gm;
@@ -430,7 +430,7 @@ sub _generate_functions {
             }
 
             # set a TODO for Test::Builder to find
-            my $call_pkg = $builder->exported_to();
+            my $call_pkg = $builder->exported_to() || '';
             local *{ $call_pkg . '::TODO' } = \$extra{todo}
                 if defined $extra{todo};
 
