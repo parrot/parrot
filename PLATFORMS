@@ -5,7 +5,7 @@ Platform                B8    Runloops      Feature Comp Test Inst YYYYMMDD
 ---------------------------------------------------------------------------
 aix-pwr-xlc6            B    -    Y    -     Y   -   Y    Y
 aix-pwr64-xlc6          B8   -    -    -     Y   -   Y    Y/20
-darwin                  B    Y    Y    Y     Y   Y   Y    Y     Y  20050507
+darwin                  B    Y    Y    Y     Y   Y   Y    Y     Y  20050701
 freebsd5.2-i386              Y    Y/4  Y     Y   -   Y*6  Y
 hpux-pa_risc2.0-gcc2.9  B         -    -     Y   Y   Y*2  Y
 ?-ia64

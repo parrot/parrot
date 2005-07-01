@@ -103,6 +103,9 @@ Get the referenced PMC.
         DOD_WRITE_BARRIER(INTERP, SELF, PMC_pmc_val(SELF), other);
         SELF.init_pmc(other);
     }
+    void assign_pmc(PMC* other) {
+        SELF.set_pmc(other);   /* autrijus */
+    }
 
     PMC* get_pmc() {
         return PMC_pmc_val(SELF);
