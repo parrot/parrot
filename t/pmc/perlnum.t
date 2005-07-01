@@ -17,6 +17,7 @@ Tests the C<PerlNum> PMC. Checks Perl-specific numeric behaviour.
 =cut
 
 use Parrot::Test tests => 55;
+use Test::More;
 
 my $fp_equality_macro = <<'ENDOFMACRO';
 .macro fp_eq (    J, K, L )
