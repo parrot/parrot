@@ -74,11 +74,14 @@ These bits of each flag word have common meanings for all argument/
 return-value opcodes:
 
     0b0011  TYPE
-               0b00 = I    XXX Why force the user to encode this,
-               0b01 = S    XXX   even in pasm?  The register types
-               0b10 = P    XXX   are right there on the very same
-               0b11 = N    XXX   pasm source line.
+               0b00 = I
+               0b01 = S
+               0b10 = P
+               0b11 = N
 
+You can just set these bits (as well as the I<CONSTANT> bit below) to
+zero as the assembler calculates the correct setting depending on the
+given arguments.
 
 =head2 Passing Arguments, Returning Values
 
@@ -98,8 +101,7 @@ C<set_args> and C<set_returns>:
 
     0b00100  CONSTANT
                the value is a literal constant, not a register
-               XXX  Again, why not figure this out from
-               XXX    the source code?
+	       (also set by the assembler, if a onstant is given)
 
     0b01000  FLATTEN
                If this bit is set on a PMC value, then the PMC must
@@ -124,10 +126,10 @@ C<set_args> and C<set_returns>:
     0b000000000
             OPTIONAL
 
-    0b000000001
+    0b000000000
             NAMED
 
-    0b000000001
+    0b000000000
             LEXICAL
 
     0b000000000
