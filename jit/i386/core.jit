@@ -916,12 +916,12 @@ Parrot_abs_n_n {
 
 TEMPLATE Parrot_ifunless_x_ic {
  /*
-  * FIXME
+  * FIXME  - the compare prev_op[1] == cur_op[1] should do it
   * dec I1
   * inc I0
   * if I1, boom
   */
-    if (P_ARITH) {
+    if ( P_ARITH && jit_info->prev_op[1] == jit_info->cur_op[1]) {
         jit_emit_jcc(jit_info, <jnz>, *INT_CONST[2]);
     }
     else if (MAP[1]) {
