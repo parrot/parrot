@@ -8,7 +8,7 @@ classes/ - Parrot Object
 
 =head1 DESCRIPTION
 
-A Parrot Object is reasonably simple. It's data pointer points to an
+A Parrot Object is reasonably simple. Its data pointer points to an
 array with the attributes of the object in it. The int cache value holds
 the offset in that array of the first attribute, so we can front-load
 the array with invisible options.

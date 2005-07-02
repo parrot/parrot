@@ -13,7 +13,7 @@ to user programs through PMCs, and the default back-end class scheme.
 
 Note that the class system is I<not> the single mandated class
 scheme, merely the one designed to express the semantics needed for
-perl 6, ruby, and python. Alternate class systems are certainly
+Perl 6, ruby, and python. Alternate class systems are certainly
 possible, and direct compatibility with the system as described here
 isn't strictly necessary.
 
