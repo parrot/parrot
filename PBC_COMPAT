@@ -24,6 +24,7 @@
 
 # please insert tab separated entries at the top of the list
 
+2005.07.03	leo	0.2.2 release; add fixedintegerarray.freeze
 2005.06.04	leo	0.2.1 release
 2005.05.31	leo	added HLL_id to frozen sub structure
 2005.05.11	leo	MMD function number change (rm MMD_I_LOGICAL...)

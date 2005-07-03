@@ -1,3 +1,12 @@
+New in 0.2.2
+
+- new call scheme: docs/pdds/pdd03_calling_conventions.pod
+- partial implementation of the new calling conventions
+  PASM only, don't mix PIR foo() call syntax with the new scheme
+- grammar and rule support in PGE - the Parrot Grammar Engine
+- TCL passes >10% of the tcl test suite
+- the usual bugfixes and improvements
+
 New in 0.2.1
 
 - better HLL support (short names for object attributes, and

@@ -22,9 +22,9 @@ This document is now becoming a roadmap, because the Architect is deep
 in a weeklong mindmeld with the Pumpking and the results are being
 encoded in this document, among others.
 
-=head1 CURRENT RELEASE (0.2.1)
+=head1 CURRENT RELEASE (0.2.2)
 
-Parrot 0.2.1 has been released on June 4th 2005. For a list of new and
+Parrot 0.2.2 has been released on July 3rd 2005. For a list of new and
 fixed feature see L<ChangeLog>.
 
 =head1 OVERVIEW
@@ -106,7 +106,7 @@ though.  Check first with someone who should know.)
 =item *
 
 Document project goals and priorities, based on Chip's talk to APW
-as found at L<http://feather.perl6.nl/~chip/Chip_APW.sxi> or 
+as found at L<http://feather.perl6.nl/~chip/Chip_APW.sxi> or
 L<http://feather.perl6.nl/~chip/Chip_APW.pdf>.
 
 =item *
