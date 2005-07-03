@@ -517,6 +517,64 @@ C<value>.
         DYNSELF.set_pmc_keyed_int(k, value);
     }
 
+/*
+
+=item C<void visit(visit_info *info)>
+
+This is used by freeze/thaw to visit the contents of the array.
+
+C<*info> is the visit info, (see F<include/parrot/pmc_freeze.h>).
+
+=item C<void freeze(visit_info *info)>
+
+Used to archive the array.
+
+=item C<void thaw(visit_info *info)>
+
+Used to unarchive the array.
+
+=cut
+
+*/
+
+    void visit(visit_info *info) {
+        SUPER(info);
+    }
+
+    void freeze(visit_info *info) {
+        IMAGE_IO *io = info->image_io;
+        INTVAL i, n;
+        INTVAL *ar;
+
+        SUPER(info);
+        n = VTABLE_elements(INTERP, SELF);
+        io->vtable->push_integer(INTERP, io, n);
+        ar = (INTVAL *)PMC_data(SELF);
+        for (i = 0; i < n; ++i) {
+            io->vtable->push_integer(INTERP, io, ar[i]);
+        }
+    }
+
+    void thaw(visit_info *info) {
+        IMAGE_IO *io = info->image_io;
+        INTVAL i, n;
+        INTVAL *ar;
+
+        if (info->extra_flags == EXTRA_IS_NULL) {
+            PMC_int_val(SELF) = 0;
+            PMC_data(SELF) = NULL;
+            n = io->vtable->shift_integer(INTERP, io);
+            if (!n)
+                return;
+            DYNSELF.set_integer_native(n);
+            ar = (INTVAL *)PMC_data(SELF);
+            for (i = 0; i < n; ++i) {
+                ar[i] = io->vtable->shift_integer(INTERP, io);
+            }
+        }
+        else
+            SUPER(info);
+    }
 }
 
 /*
