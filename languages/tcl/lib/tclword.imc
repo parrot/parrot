@@ -76,6 +76,31 @@ Initialize the attributes for an instance of the class
   setattribute self, "TclWord\x00constant", constant
 .end
 
+=head2 clone
+
+Clone a TclWord object.
+
+=cut
+
+.sub __clone method
+  .local pmc chunks
+  .local pmc constant
+  
+  chunks   = getattribute self, "TclWord\x00chunks"
+  constant = getattribute self, "TclWord\x00constant"
+  
+  chunks   = clone chunks
+  constant = clone constant
+  
+  .local pmc value
+  $I0 = typeof self
+  value = new $I0
+  setattribute value, "TclWord\x00chunks", chunks
+  setattribute value, "TclWord\x00constant", constant
+  
+  .return(value)
+.end
+
 =head2 concat_words
 
 Given an array of words, append the chunks of a given word to the existing word 
