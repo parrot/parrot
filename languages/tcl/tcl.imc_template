@@ -88,6 +88,9 @@ providing a compreg-compatible method.
   load_bytecode "library/Data/Escape.pbc"
   load_bytecode "library/PGE.pbc"
   load_bytecode "library/PGE/Glob.pir"
+  
+  # Load any grammars
+  #_load_grammar("languages/tcl/lib/tcl.p6r")
  
   .local pmc operators
   .local pmc math_funcs
@@ -248,5 +251,56 @@ providing a compreg-compatible method.
   .return ($P1)
 .end
 
+# Read in any of the perl6-ian grammars that have been defined for Tcl's
+# use. This code copied from compilers/pge/demo.pir, when it should be
+# added to PGE's library, I think. -coke
+
+.sub "_load_grammar"
+  .param string filename
+
+   .local pmc p6rule_compile,gparse,gname
+   .local string gname
+
+    find_global p6rule_compile, "PGE", "p6rule"
+    gparse = p6rule_compile(":w ( (grammar) <ident> ; | (rule) <ident> \{$<rulex>:=[<-[{]>*]\} )*")
+    $P99 = open filename, "<"
+    $S0 = read $P99, 65535 #cheat
+    close $P99
+    $P0 = gparse($S0)
+    #$P0.dump("$/")
+    $P1 = $P0."get_array"()
+    $P1 = $P1[0]
+    $I0 = elements $P1
+    $I1 = 0
+  use_grammar_stmt:
+    if $I1 >= $I0 goto done
+    $P3 = $P1[$I1]
+    inc $I1
+    $P9 = $P3[0]
+    $S0 = $P9
+    $P9 = $P3['ident']
+    $S1 = $P9
+    if $S0 == 'grammar' goto grammar_stmt
+    $P9 = $P3['rulex']
+    $S2 = $P9
+    p6rule_compile($S2, gname, $S1)
+    #print "Loaded "
+    #print gname
+    #print "::"
+    #print $S1
+    #print "\n"
+    goto use_grammar_stmt
+  grammar_stmt:
+    $P9 = $P3['ident'] 
+    gname = $P9
+    #$S31 = $P9
+    #$P31 = subclass "PGE::Rule", $S31
+    #print "GRAMMAR NAME: '"
+    #print gname
+    #print "'\n"
+    goto use_grammar_stmt
+done:
+    .return()
+.end
 
 ${INCLUDES}
