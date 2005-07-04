@@ -1,7 +1,7 @@
 grammar _Tcl_Rules;
 
 rule command  { \[ (.*?) \] }
-rule string   { "  (.*?) "   }
+rule string   { " ([\\.|<-["]>]*) : " }
 rule variable { \$ [
  (<[A..Za..z_0..9]>+) |
  (<[A..Za..z_0..9]>) \((<[A..Za..z_0..9]>*)\)  
