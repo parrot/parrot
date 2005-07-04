@@ -224,6 +224,9 @@ i	JPiii
 i	JPt
 P	JOSSS
 
+# Needed by string.pmc
+v	JOSS
+
 # Py_func signatures
 P	JP
 P	JPP

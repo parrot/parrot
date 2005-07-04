@@ -628,6 +628,28 @@ Replace the string at C<key> with the chr of C<value>.
     }
 /*
 
+=item C<void replace(STRING* orig, STRING* new)>
+
+Replace every occurence of C<orig> with C<new>.
+
+=cut
+
+*/
+
+    METHOD void replace(STRING* orig, STRING* new) {
+        INTVAL i  = 0;
+        STRING *s = PMC_str_val(SELF);
+        INTVAL old_len = string_length(INTERP, orig);
+        INTVAL new_len = string_length(INTERP, new);
+        
+        while (-1 != (i = string_str_index(INTERP, s, orig, i)))
+        {
+            (void)string_replace(INTERP, s, i, old_len, new, NULL);
+            i += new_len;
+        }
+    }
+/*
+
 =back
 
 =head2 Iterator Interface

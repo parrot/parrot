@@ -16,7 +16,7 @@ Tests the C<String> PMC.
 
 =cut
 
-use Parrot::Test tests => 34;
+use Parrot::Test tests => 35;
 use Test::More; # Included for skip().
 
 my $fp_equality_macro = <<'ENDOFMACRO';
@@ -1168,4 +1168,23 @@ output_is( <<'CODE', <<OUTPUT, "set P[x], s");
   end
 CODE
 abABef
+OUTPUT
+
+pir_output_is( <<'CODE', <<OUTPUT, 'String."replace"' );
+.sub _main
+  $P0 = new String
+  $P0 = "hello world\n"
+  print $P0
+  $P0."replace"("l", "-")
+  print $P0
+  $P0."replace"("wo", "!!!!")
+  print $P0
+  $P0."replace"("he-", "")
+  print $P0
+.end
+CODE
+hello world
+he--o wor-d
+he--o !!!!r-d
+-o !!!!r-d
 OUTPUT
