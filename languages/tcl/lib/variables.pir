@@ -116,7 +116,7 @@ other than the default, and multiple interpreters.
   char = index name, "("
   if char == -1 goto scalar
 
-array:
+find_array:
   .local string var
   var = substr name, 0, char
   

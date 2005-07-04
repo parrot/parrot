@@ -18,15 +18,76 @@ loop:
   $S0 = $P0
 
 check_list:
-  # check to see if this is a list
-  # (then we don't need to escape the braces)
-  push_eh escape_left_brace
-  $P0 = __stringToList($S0)
-  clear_eh
+  .local int count
+  .local int chars
+  chars = length $S0
+  if chars == 0 goto empty
+  count = 0
+  $I0   = 0
+check_list_loop:
+  if $I0 >= chars goto check_list_done
+  $I1 = ord $S0, $I0
+  if $I1 == 123 goto left_brace
+  if $I1 == 125 goto right_brace
+check_list_next:
+  inc $I0
+  goto check_list_loop
+left_brace:
+  inc count
+  goto check_list_next
+right_brace:
+  dec count
+  if count < 0 goto escape
+  goto check_list_next
+check_list_done:
+  if count != 0 goto escape
+
+check_right_bracket:
+  $I0 = index $S0, "]"
+  if $I0 != -1 goto escape
+
+check_backslash:
+  $I0 = index $S0, "\\"
+  if $I0 != -1 goto escape
+
+  goto check_spaces
+
+escape:
+  $P0 = new String
+  $P0 = $S0
+  
+  $P0."replace"("\\", "\\\\")
+  $P0."replace"("}", "\\}")
+  $P0."replace"("{", "\\{")
+  $P0."replace"(" ", "\\ ")
+  $P0."replace"("]", "\\]")
+  
+  $S0 = $P0
+  goto append_elem
 
 check_spaces:
   $I0 = find_whitespace $S0, 0
-  if $I0 == -1 goto append_elem
+  if $I0 != -1 goto quote
+
+check_left_bracket:
+  $I0 = index $S0, "["
+  if $I0 != -1 goto quote
+
+check_dollar_sign:
+  $I0 = index $S0, "$"
+  if $I0 != -1 goto quote
+
+check_semi_colon:
+  $I0 = index $S0, ";"
+  if $I0 != -1 goto quote 
+
+  goto append_elem
+
+empty:
+  $S0 = "{}"
+  goto append_elem
+
+quote:
   $S0 = "{" . $S0
   $S0 = $S0 . "}"
 
@@ -35,24 +96,6 @@ append_elem:
   retval .= " "
   inc i
   goto loop
-
-escape_left_brace:
-  $I0 = 0
-escape_left_loop:
-  $I0 = index $S0, "{"
-  if $I0 == -1 goto escape_right_brace
-  substr $S0, $I0, 1, "\\{"
-  $I0 += 2
-  goto escape_left_loop
-
-escape_right_brace:
-  $I0 = 0
-escape_right_loop:
-  $I0 = index $S0, "}"
-  if $I0 == -1 goto check_spaces
-  substr $S0, $I0, 1, "\\}"
-  $I0 += 2
-  goto escape_right_loop
 
 done:
   $I0 = length retval

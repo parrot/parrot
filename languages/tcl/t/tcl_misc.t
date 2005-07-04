@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 10;
+use Parrot::Test tests => 11;
 use vars qw($TODO);
 
 my($tcl,$expected);
@@ -60,15 +60,21 @@ EOTCL
 $expected = "test\n";
 language_output_is("tcl",$tcl,$expected,"no arg command with spaced semicolon");
 
-TODO: {
-$TODO = "bug(s)";
-
 language_output_is("tcl",<<'TCL',<<'OUT',"\$ is only a variable if it's followed by \\w or {");
 set x $
 puts $x
 TCL
 $
 OUT
+
+language_output_is("tcl",<<'TCL',<<'OUT',"semi-colon in a string");
+puts ";"
+TCL
+;
+OUT
+
+TODO: {
+$TODO = "bug(s)";
 
 language_output_is("tcl",<<'TCL',<<'OUT',"bad argument error");
 puts 4 # comment

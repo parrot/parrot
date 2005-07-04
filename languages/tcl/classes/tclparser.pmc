@@ -269,7 +269,7 @@ middle_word:
     goto end_word;
 
   /* wait, this was a semicolon - go back and deal with it.*/
-  if (character == ';' || character == '\n')
+  if (!preserve_whitespace && (character == ';' || character == '\n'))
   {
     word_trailing_length=1;
     goto end_command;
@@ -310,7 +310,8 @@ middle_word:
 
     goto middle_word;
   }
-  else if (character == '$')
+  else if (character == '$' && (Parrot_string_is_wordchar(INTERP, buffer, I0+1)
+                                || string_index(INTERP, buffer, I0+1) == '{'))
   {
       /* First, save off anything we've gotten so far as a constant.*/
       if (word_length != 0)
