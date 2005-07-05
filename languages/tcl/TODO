@@ -81,40 +81,14 @@ source per-user settings. L<tclsh>
 
 =head2 Tests
 
-=over 4
+We should be using the tcl-test target as our language goal. For now, keep
+enough tests in our local test harness (C<t/>) so that we don't get any
+regressions. (Running the tcl test suite takes a while). This means we
+can get by with basic tests in C<t/> for now.
 
-=item standards
-
-Any future tests, write more like t/tcl_var_subst.t. Eventually cleanup
-tests so they're consistent.
-
-=item Add tests for...
-
-=over 4
-
-=item info
-
-tclversion, body, args, exists
-
-=item [expr]'s precedence and parens and missing functionality.
-
-=item [puts]'s ability to write to other channels
-
-=item [uplevel]
-
-=item [upvar]
-
-=item [lrange]
-
-=back
-
-=item Add tcl tests to tcl, and remove from partcl
-
-Add tcl tests to the tcl test suite, which is currently run by partcl,
-and remove duplicated tests from the partcl test suite. The partcl
-test suite should only test parrot-related functionality.
-
-=back
+Long term goal would be to remove any tests in C<t/> that are testing things
+that are already tested in tcl. Partcl's checked in test suite should just
+be checking partcl-specific functionaliity.
 
 =head1 Uncategorized Issues
 
