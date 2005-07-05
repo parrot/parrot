@@ -24,7 +24,8 @@
 
   expr = ""
   looper = 0
-  argc = argv
+  argc = argv 
+  unless argc goto no_args
 
 loop:
   if looper == argc goto loop_done
@@ -42,4 +43,9 @@ loop_done:
   (return_type,retval) = expression_i(retval) 
 done:
   .return(return_type,retval)
+
+no_args:
+  retval = new String
+  retval = "wrong # args: should be \"expr arg ?arg ...?\""
+  .return(TCL_ERROR,retval)
 .end
