@@ -3,7 +3,7 @@
 use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
 use Parrot::Test tests => 5;
-use vars qw($TODO);
+use vars qw($SKIP $TODO);
 
 my($tcl,$expected);
 
@@ -51,8 +51,9 @@ TCL
 OUT
 }
 
-TODO: {
-local $TODO = "Not doable until multiple-level lists are usable";
+SKIP: {
+# Skip instead of TODO, this spins on many systems.
+local $SKIP = "Not doable until multiple-level lists are usable";
 language_output_is("tcl",<<'TCL',<<OUT,"default args");
  proc me {{a 2}} {
   puts $a
