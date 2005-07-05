@@ -75,7 +75,7 @@ loop_done:
 
 no_command:
   $P1 = find_global "Tcl", "tcl_interactive"
-  unless $P1 goto no_command_run_interactive
+  unless $P1 goto no_command_non_interactive
 
   # XXX Should probably make sure this wasn't redefined on us.
   my_cmd = find_global "Tcl", "unknown"
