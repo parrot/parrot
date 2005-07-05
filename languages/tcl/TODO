@@ -1,17 +1,19 @@
 From autrijus's talk:
 
-PIR Tree - can we use this instead of the craptacular "compile a string"
-version of compile we are currently using.
-
-
+PIR Tree - can we use this instead of the current string-based compilation.
 
 =head1 Various
 
 =over 4
 
+=item keyed access
+
+tcl is not using Keys when getting from aggregates. It probalby should,
+at least for language interoperability.
+
 =item change how we run parrot
 
-Right now we cd  up to parrot's root directory and then path down to tcl
+Right now we cd up to parrot's root directory and then path down to tcl
 
 Leo has asked to change this to instead do ../../parrot tcl.pbc foo.tcl
 
@@ -19,12 +21,11 @@ This is fine by me but didn't work as of a year ago. =-)
 
 =item interactive tclsh
 
-simple interactive mode now exists. Still have to:
+Still have to:
 
- o Should catch any real_exceptions thrown.
+ o catch any real_exceptions thrown.
  o respect tcl_prompt1, tcl_prompt2
  o deal with incomplete input (needs better error handling)
- o give invalid commands to the system.
 
 =item [interpinfo name]
 
@@ -45,7 +46,7 @@ how to do this from inside parrot?
 
 =over 4
 
-=item string to list 
+=item string to list
 
 Should be moved to tcllist's set_string method. ... except that it turns
 out this is non-trivial.
@@ -62,7 +63,7 @@ Convert any commands that use subcommands to [info] style dispatch to ease
 maintenance. Subcommands invoked in this style get a single container PMC
 with all their args, but *NOT* the invoking command. so, given the tcl:
 
-  info args foo
+ info args foo
 
 Tcl::info is called with (args, foo), which then dispatched to:
 
@@ -75,25 +76,6 @@ global variables provided by tcl libary. L<tclvars>.
 global variables provided by tcl interpreter. L<tclsh>
 
 source per-user settings. L<tclsh>
-
-=item unimplemented commands/subcommands
-
-[after] [array get] [array names] [array unset] 
-[array statistics] [array anymore] [array donesearch]
-[array nextelement] [array startsearch] [bgerror] [binary] 
-[case] [clock] [close] [cd] [dde] [encoding] [eof] [exec]
-[fblocked] [fconfigure] [fcopy] [file] [fileevent]
-[flush] [gets] [glob] [http] [interp] [library]
-[lindex] [load] [lreplace] [lsearch] [lset] [lsort] 
-[memory] [msgcat] [namespace] [open] [package] [pid] [pwd]
-[read] [registry] [regexp] [regsub] [resource] 
-[safe] [scan] [seek] [socket] [subst]
-[string replace] [string tolower] [string totitle] [string toupper]
-[string trim] [string trimleft] [string trimright]
-[string compare] [string equal] [string last]
-[string bytelength] [string is] [string map]
-[string wordstart] [string wordend] [switch] [tcltest]
-[tell] [update] [variable] [vwait] [trace]
 
 =back
 
@@ -128,8 +110,8 @@ tclversion, body, args, exists
 
 =item Add tcl tests to tcl, and remove from partcl
 
-Add tcl tests to the tcl test suite, which is currently run by partcl, 
-and remove duplicated tests from the partcl test suite. The partcl 
+Add tcl tests to the tcl test suite, which is currently run by partcl,
+and remove duplicated tests from the partcl test suite. The partcl
 test suite should only test parrot-related functionality.
 
 =back
@@ -158,10 +140,10 @@ to have CONST vs. VARIABLE types.)
 
 The type indicator is also used to disambiguate operators and function calls
 from operands. We can easily remove it for operands, but how to cleanly
-remove this for operators? 
+remove this for operators?
 
 TBD: strings, floats as operands - (many of the math funcs return floats
-but you can't specify them, and not everything takes them 
+but you can't specify them, and not everything takes them
 (try, for example, [expr sin(1) + sin(1)] vs [expr sin(1) * sin(1)].)
 
 TBD: blocks, commands, and strings as operands

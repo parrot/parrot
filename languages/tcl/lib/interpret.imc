@@ -52,6 +52,7 @@ resume:
   clear_eh 
   isnull my_cmd, no_command
 
+got_command:
   .local pmc folded_args
   folded_args = new TclList
   .local pmc current_word
@@ -73,6 +74,19 @@ loop_done:
   goto end_scope
 
 no_command:
+  $P1 = find_global "Tcl", "tcl_interactive"
+  unless $P1 goto no_command_run_interactive
+
+  # XXX Should probably make sure this wasn't redefined on us.
+  my_cmd = find_global "Tcl", "unknown"
+  
+  # Add the command into the unknown handler, and fix our bookkeeping
+  unshift command, proc
+  inc num_args
+
+  goto got_command
+
+no_command_non_interactive:
   return_type = TCL_ERROR
   $S0 = "invalid command name \""
   $S0 .= proc

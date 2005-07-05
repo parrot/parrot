@@ -55,6 +55,7 @@ lib${slash}commands${slash}set.imc \
 lib${slash}commands${slash}source.imc \
 lib${slash}commands${slash}string.imc \
 lib${slash}commands${slash}time.imc \
+lib${slash}commands${slash}unknown.imc \
 lib${slash}commands${slash}unset.imc \
 lib${slash}commands${slash}uplevel.imc \
 lib${slash}commands${slash}upvar.imc \
