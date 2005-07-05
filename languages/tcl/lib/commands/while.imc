@@ -7,11 +7,9 @@
   .param pmc cond_p
   .param pmc body_p
 
-  .local pmc retval
+  if argcP != 2 goto bad_args
 
-  # XXX no bad arg handling...
-
-  .local pmc parsed_code
+  .local pmc retval, parsed_code
   .local int return_type
 
   .local pmc parser
@@ -53,4 +51,10 @@ done_done:
   # XXX - (unless there's an error)
 
   .return(return_type,retval)
+
+bad_args:
+  $P1 = new String
+  $P1 = "wrong # args: should be \"while test command\""
+  .return (TCL_ERROR, $P1)
+
 .end
