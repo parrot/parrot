@@ -172,7 +172,8 @@ V: 0.0.11
 
 N: Tcl ("partcl")
 A: Will Coleda
-S: Two GC test failures
+A: Matt Diephouse
+S: passes about 10% of *tcl*'s test suite (modulo clock)
 M: Yes
 V: Current
 
