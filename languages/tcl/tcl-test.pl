@@ -11,6 +11,8 @@ use File::Spec;
 use Getopt::Std;
 use Test::Harness;
 
+$|=1;
+
 our ($opt_u, $opt_h, $opt_c);
 getopts('uhc');
 
@@ -56,11 +58,21 @@ sub convert_tests {
             or die "Couldn't open $file\n";
         my %tests = extract_tests( do{local $/;<$ffh>} );
         close $ffh;
-        
-        open my $tfh, ">>", $test
-            or die "Couldn't open $test\n";
-        print $tfh format_tests(%tests);
-        close $tfh;
+       
+	# Only generate output test file if we can find tests... 
+        my $output;
+        eval {  
+            $output = format_tests(%tests);
+        };
+        if ($@) {
+            warn "Warning! Unable to extract tests for $file\n";
+        } else {
+            warn "Extracting tests for $file\n";
+            open my $tfh, ">>", $test
+                or die "Couldn't open $test\n";
+            print $tfh $output;
+            close $tfh;
+        };
     }
     1;
 }
@@ -72,7 +84,7 @@ sub convert_tests {
 ##
 sub checkout_tests {
     print "Checking out tests from CVS\n";
-    system "cvs -Q -d :pserver:anonymous\@cvs.sourceforge.net:/cvsroot/tcl co -d $DIR tcl/tests";
+    system "cvs -d :pserver:anonymous\@cvs.sourceforge.net:/cvsroot/tcl co -d $DIR tcl/tests";
     1;
 }
 
@@ -112,6 +124,7 @@ sub extract_tests {
         my ($name, $expl, $body, $out) = ($1, $2, $3, choose($4, unescape($5), $6));
         
         # make the test print the last line of output
+        # XXX This should be "print the last command". Which is harder.
         $body =~ s/^(\s*)([^\n]+)\s*\Z/$1puts [$2]/m;
         
         $tests{$name} = [$expl, $body, $out];
@@ -129,6 +142,8 @@ sub format_tests {
     my (%tests) = @_;
     
     my $count = scalar keys %tests;
+    die unless $count;
+
     my $string = <<"END";
 #!/usr/bin/perl
     
@@ -137,10 +152,12 @@ use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
 use Parrot::Test tests => $count;
 
 END
-    
+
+    my $counter = 1;    
     for my $name (sort keys %tests) {
         my ($expl, $body, $out) = @{ $tests{$name} };
         $string .= <<"END";
+# TEST NUMBER: $counter
 language_output_is('tcl', <<'TCL', <<'OUT', <<'DESC');
 $body
 TCL
@@ -150,6 +167,8 @@ $name - $expl
 DESC
 
 END
+   
+        $counter++;
     }
     
     return $string;
