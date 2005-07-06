@@ -40,6 +40,7 @@ lib${slash}commands${slash}info.imc \
 lib${slash}commands${slash}inline.imc \
 lib${slash}commands${slash}join.imc \
 lib${slash}commands${slash}lappend.imc \
+lib${slash}commands${slash}lindex.pir \
 lib${slash}commands${slash}linsert.imc \
 lib${slash}commands${slash}list.imc \
 lib${slash}commands${slash}llength.imc \
