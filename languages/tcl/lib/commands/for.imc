@@ -92,7 +92,7 @@ continue:
 
 bad_args:
   retval = new String
-  retval = "wrong # args: should be \"for start test next command\"\n"
+  retval = "wrong # args: should be \"for start test next command\""
   return_type = TCL_ERROR
   goto done_cleansed
 
