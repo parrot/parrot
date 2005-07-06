@@ -8,7 +8,8 @@
   .local pmc argv 
   argv = foldup
 
-  # convert the Array ireturned by foldup into a TclList.
+  # convert the Array returned by foldup into a TclList.
+  # XXX Is there a more efficient way to do this?
 
   .local int argc
   argc = argv
