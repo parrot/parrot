@@ -13,7 +13,7 @@
   if I3 == 0 goto noargs
 
   return_type = TCL_ERROR
-  retval = "wrong # args: should be \"break\"\n"
+  retval = "wrong # args: should be \"continue\"\n"
   goto done
 
 noargs:
