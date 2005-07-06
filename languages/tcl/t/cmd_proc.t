@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 5;
+use Parrot::Test tests => 4;
 use vars qw($SKIP $TODO);
 
 my($tcl,$expected);
@@ -50,6 +50,8 @@ TCL
 3 4 5 6
 OUT
 }
+
+__END__
 
 SKIP: {
 # Skip instead of TODO, this spins on many systems.
