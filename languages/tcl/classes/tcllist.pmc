@@ -61,31 +61,6 @@ Class initialization. Caches the type id of various PMCs.
 
 /*
 
-=item C<PMC* get_pmc_keyed_int(INTVAL key)>
-
-Returns the PMC value of the element at index C<key>.
-
-XXX why do we need to override here?
-
-=cut
-
-*/
-
-    PMC* get_pmc_keyed_int (INTVAL key) {
-        List *list = (List *)PMC_data(SELF);
-        PMC *ret = list_get(INTERP, list, key, enum_type_PMC);
-
-        if (ret == (void*) -1)
-            /* XXX throw IndexError: list index out of range */ ;
-        else {
-            ret = *(PMC**) ret;
-        }
-
-        return ret;
-    }
-
-/*
-
 =item C<STRING *get_string()>
 
 Returns the list as a string
