@@ -4,16 +4,19 @@
 .namespace [ "Tcl" ]
 
 .sub "join"
-  .local string retval
+  .param pmc a_list
+  .param pmc joiner_pmc
+
+  .local pmc retval
   .local int return_type
+  .local string rv
+  rv = ""
 
   if argcP == 0 goto bad_args
   if argcP > 2 goto bad_args
+
   .local pmc a_list,joiner_pmc
   .local string a_joiner
-  a_list = P5
-  joiner_pmc = P6
-  return_type = TCL_OK
 
   .local pmc results
   # We expect a list here. We should take one if we get it,
@@ -24,7 +27,9 @@
  
   .local pmc string2list
   string2list = find_global "_Tcl", "__stringToList"
-  (return_type, retval) = string2list(a_list)
+  $S0 = a_list
+  (return_type, retval) = string2list($S0)
+  $S0 = retval
   if return_type == TCL_ERROR goto done
   a_list = retval
 
@@ -35,16 +40,16 @@ got_list:
 got_joiner: 
   a_joiner=joiner_pmc
 doit:
-  retval = join a_joiner, a_list
-  goto done
+  rv = join a_joiner, a_list
+
+  retval = new String
+  retval = rv
+done:
+  .return(return_type,retval)
 
 bad_args:
-  return_type = TCL_ERROR
-  retval = "wrong # args: should be \"join list ?joinString?\""
+  $P1 = new String
+  $P1 = "wrong # args: should be \"join list ?joinString?\""
+  .return(TCL_ERROR, $P1)
 
-done:
-  .local pmc rv
-  rv = new String
-  rv = retval
-  .return(return_type,rv)
 .end
