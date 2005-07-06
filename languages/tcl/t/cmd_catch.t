@@ -72,8 +72,8 @@ TCL
 invalid command name "blorg"
 OUT
 
-language_output_is("tcl",<<'TCL',<<OUT,"bad args");
+language_output_is("tcl",<<'TCL',<<'OUT',"bad args");
   catch
 TCL
-wrong # args: should be "catch command ?varName?"
+wrong # args: should be "catch script ?resultVarName? ?optionVarName?"
 OUT
