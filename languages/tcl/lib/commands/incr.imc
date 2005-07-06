@@ -60,7 +60,7 @@ set_lexical:
 error:
   return_type = TCL_ERROR 
   retval = new String
-  retval = "wrong # args: should be \"incr varName ?increment?\"\n"
+  retval = "wrong # args: should be \"incr varName ?increment?\""
 
 done:
   .return(return_type,retval)
