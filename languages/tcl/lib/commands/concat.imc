@@ -19,6 +19,7 @@
   .local string current_arg, trimmed_string
   .local int start_pos,end_pos,str_length,current_char
 
+
 arg_loop:
   if arg_num == argc goto arg_loop_done
 
@@ -27,8 +28,6 @@ arg_loop:
   # empty elements don't count
   if current_arg == "" goto arg_loop_next
 
-  if arg_num == 0 goto loop_init
-  retval .= " "
 
 loop_init:
 
@@ -71,6 +70,9 @@ right_done:
   # Escape any special characters from string. Currently,
   # this is backslashes.
  
+  if arg_num == 0 goto append_string
+  retval .= " "
+append_string:
   retval .= trimmed_string
 
 arg_loop_next:
