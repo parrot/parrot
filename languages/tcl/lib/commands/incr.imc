@@ -15,7 +15,8 @@
   .local int increment 
   increment = 1
   
-  .local int argc 
+  .local pmc argc
+  argc = new Integer # persist across function calls...
   argc = argv
 
   .local pmc retval
@@ -26,18 +27,12 @@
  
   if argc == 0 goto error
 
-  .local int call_level
-  $P0 = find_global "_Tcl", "call_level"
-  call_level = $P0
-
+  .local pmc read
+  read = find_global "_Tcl", "__read"
   $S1 = argv[0] 
+  (return_type,original_pmc) = read($S1)
+  if return_type == TCL_ERROR goto bad_variable
 
-  if call_level goto get_lexical
-  original_pmc = find_global "Tcl", $S1
-  goto got_variable
-get_lexical:
-  original_pmc = find_lex call_level, $S1
-got_variable:
   if argc == 1 goto do_incr
   if argc == 2 goto offset
   if argc > 2 goto error
@@ -46,15 +41,10 @@ offset:
   increment = argv[1]
 
 do_incr:
-  original_pmc += increment
-  retval = new Integer
-  retval = value
+  $I0 = original_pmc
+  $I0 += increment
+  original_pmc = $I0
   retval = original_pmc
-if call_level goto set_lexical
-  store_global $S1, retval
-  goto done
-set_lexical:
-  store_lex call_level, $S1, retval
   goto done 
 
 error:
@@ -64,4 +54,13 @@ error:
 
 done:
   .return(return_type,retval)
+
+bad_variable:
+  $P1 = new String
+  $P1 = "can't read \""
+  $S0 = argv[0]
+  $P1 .= $S0
+  $P1 .= "\": no such variable"
+  .return(TCL_ERROR,$P1)
+
 .end
