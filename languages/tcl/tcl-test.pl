@@ -26,6 +26,13 @@ Run the tests from the Tcl distribution. This script will download
 the tests from Tcl CVS, extract them, and use Test::Harness to
 run them and report the results.
 
+=head1 SYNOPSIS
+
+  tcl-test.pl [-c] [-u]
+
+  -c Convert the .test files to .t files
+  -u Update the tests from CVS.
+
 =cut
 
 main();
@@ -224,3 +231,4 @@ Usage: tcl-test.pl [-cu]
 USAGE
     1;
 }
+
