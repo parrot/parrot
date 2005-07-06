@@ -174,8 +174,6 @@ TCL
 1
 OUT
 
-TODO: {
-local $TODO = "character classes not implemented in PGE globs";
 language_output_is("tcl",<<TCL,<<OUT,"string match charset");
   puts [string match {a[bc]c} abc]
 TCL
@@ -187,7 +185,6 @@ language_output_is("tcl",<<TCL,<<OUT,"string match charset, fail");
 TCL
 0
 OUT
-}
 
 language_output_is("tcl",<<TCL,<<OUT,"string match \*");
   puts [string match {\*} *]

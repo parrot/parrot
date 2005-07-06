@@ -3,12 +3,8 @@
 use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
 use Parrot::Test tests => 2;
-use vars qw($TODO);
 
 my($tcl,$expected);
-
-TODO: {
-local $TODO = "GC BUG! FIX IT! FIIIIIX IT!";
 
 $tcl = <<'EOTCL';
  for {set a 0} {$a < 20} {incr a} {
@@ -30,4 +26,3 @@ $tcl = <<'EOTCL';
 EOTCL
 $expected = "9\n";
 language_output_is("tcl",$tcl,$expected,"break from while");
-}

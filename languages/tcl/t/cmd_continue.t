@@ -7,9 +7,6 @@ use vars qw($TODO);
 
 my($tcl,$expected);
 
-TODO: {
-local $TODO = "GC BUG! FIX IT! FIIIIIX IT!";
-
 $tcl = <<'EOTCL';
  for {set a 0} {$a < 10} {incr a} {
    if {$a > 5} { continue }
@@ -51,4 +48,3 @@ $expected = <<EOF;
 11
 EOF
 language_output_is("tcl",$tcl,$expected,"continue from while");
-}
