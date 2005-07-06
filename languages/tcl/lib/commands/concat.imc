@@ -19,7 +19,8 @@
   .local string current_arg, trimmed_string
   .local int start_pos,end_pos,str_length,current_char
 
-
+  .local int first_time
+  first_time = 1
 arg_loop:
   if arg_num == argc goto arg_loop_done
 
@@ -69,10 +70,11 @@ right_done:
 
   # Escape any special characters from string. Currently,
   # this is backslashes.
- 
-  if arg_num == 0 goto append_string
+
+  if first_time goto append_string
   retval .= " "
 append_string:
+  first_time = 0
   retval .= trimmed_string
 
 arg_loop_next:
