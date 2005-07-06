@@ -20,6 +20,7 @@ a number of built-in rules.
     $P0 = subclass base, "PGE::Rule"
     p6rule = find_global "PGE", "p6rule"
     p6rule("[_ | <?alpha>] \w*", "PGE::Rule", "ident")
+    p6rule("<ident> [ \: \: <ident> ]*", "PGE::Rule", "name")
 .end
 
 =head2 Built-in rules

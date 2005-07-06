@@ -1180,9 +1180,14 @@ register.
   subrule_simple_name:
     emit(code, "    $P2 = mob.\"newat\"(mob, pos)")
     emit(code, "    errorsoff %d", .PARROT_ERRORS_GLOBALS_FLAG)
-    emit(code, "    $P1 = find_name \"%s\"", rname)
-    emit(code, "    $I0 = defined $P1")
-    emit(code, "    if $I0 goto %s_s1", label)
+#    emit(code, "    $P1 = find_lex \"%s\"", rname)
+#    emit(code, "    $I0 = defined $P1")
+#    emit(code, "    if $I0 goto %s_s1", label)
+    emit(code, "    $I0 = can $P2, \"%s\"", rname)
+    emit(code, "    if $I0 goto %s_s0", label)
+    emit(code, "    $P1 = find_global \"%s\"", rname)
+    emit(code, "    goto %s_s1", label)
+    emit(code, "  %s_s0:", label)
     emit(code, "    $P1 = find_method $P2, \"%s\"", rname)
     emit(code, "  %s_s1:", label)
   subrule_invoke:

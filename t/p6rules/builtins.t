@@ -1,4 +1,4 @@
-use Parrot::Test tests => 38;
+use Parrot::Test tests => 41;
 use Parrot::Test::PGE;
 
 $str = 
@@ -14,13 +14,12 @@ p6rule_like($str,  '<?upper>',
 p6rule_like($str,  '<?upper>+', 
     qr/mob: <ABCDEFGHIJ @ 45>/, '<?upper>+');
 
-# XXX: "lower" has an issue in the Parrot symbol table
-#p6rule_like($str,  '<lower>',
-#    qr/mob<lower>: <a @ 55>/, '<lower>');
-#p6rule_like($str,  '<?lower>',
-#    qr/mob: <a @ 55>/, '<?lower>');
-#p6rule_like($str,  '<?lower>+', 
-#    qr/mob: <abcdefghij @ 55>/, '<?lower>+');
+p6rule_like($str,  '<lower>',
+    qr/mob<lower>: <a @ 55>/, '<lower>');
+p6rule_like($str,  '<?lower>',
+    qr/mob: <a @ 55>/, '<?lower>');
+p6rule_like($str,  '<?lower>+', 
+    qr/mob: <abcdefghij @ 55>/, '<?lower>+');
 
 p6rule_like($str,  '<alpha>',
     qr/mob<alpha>: <A @ 45>/, '<alpha>');

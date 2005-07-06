@@ -97,7 +97,6 @@ Parse alternations of the form {a,b,c} where a,b, and c are the alternatives.
 
   lit_end:
     .return (exp1)
-
 .end
 
 .sub "glob_parse_literal"		# literal strings
@@ -129,10 +128,57 @@ Parse alternations of the form {a,b,c} where a,b, and c are the alternatives.
 .sub "glob_parse_cc"			# character classes
     .param string pattern
     .param pmc lex
+    .local int pos, plen
+    .local string charclass, range
     .local pmc exp
-
-    "glob_error"(pattern,lex, "Character classes unimplemented")
-.end
+    pos = lex["pos"]
+    plen = lex["plen"]
+    charclass = ""
+    $P0 = find_global "PGE::Exp", "new"
+    exp = $P0("PGE::Exp::CharClass")
+    $S0 = substr pattern, pos, 1
+    if $S0 == "!" goto negate
+    if $S0 == "^" goto negate
+    exp["charmatch"] = "if"
+    goto first_bracket
+  negate:
+    exp["charmatch"] = "unless"
+    inc pos
+  first_bracket:
+    $S0 = substr pattern, pos, 1
+    if $S0 == "]" goto add_char
+    if $S0 == "-" goto add_char
+  scan:
+    if pos > plen goto no_close_err
+    $S0 = substr pattern, pos, 1
+    if $S0 == "]" goto end_class
+    if $S0 == "-" goto add_hyphen
+  add_char:
+    concat charclass, $S0
+    inc pos
+    goto scan
+  add_hyphen:
+    $I0 = pos + 1
+    $S1 = substr pattern, $I0, 1
+    if $S1 == "]" goto add_char
+    pos += 2
+    $I1 = ord $S1
+    $I2 = ord charclass, -1
+  add_range:
+    inc $I2
+    if $I2 > $I1 goto scan
+    $S1 = chr $I2
+    concat charclass, $S1
+    goto add_range
+  no_close_err:
+    "glob_error"(pattern, lex, "Missing close ']' of character class")
+  end_class:
+    inc pos
+    lex["pos"] = pos
+    exp["charclass"] = charclass
+  end:
+    .return (exp)
+.end  
 
 .sub "glob_parse_expr"
     .param string pattern
@@ -236,5 +282,7 @@ Parse alternations of the form {a,b,c} where a,b, and c are the alternatives.
 
  Jonathan Scott Duff
  duff@pobox.com
+
+ Character class support added by Patrick R. Michaud (pmichaud@pobox.com)
 
 =cut
