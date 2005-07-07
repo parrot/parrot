@@ -28,8 +28,8 @@
   if argc == 2 goto twoargs
 
   return_type = TCL_ERROR
-  retval =  "bad call to time"
-  goto real_done
+  retval =  "wrong # args: should be \"time command ?count?\""
+  .return (TCL_ERROR,retval)
 
 twoargs:
   # verify this is a number?
