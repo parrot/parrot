@@ -1,17 +1,16 @@
-PARROT = .${slash}parrot${exe}
-UP_PATH = ..${slash}..${slash}..${slash}
-DOWN_PATH = languages${slash}tcl${slash}
+PARROT = ..${slash}..${slash}..${slash}parrot${exe}
+PARROT_ARRGS = --gc-debug
 
 default:
 	@echo "to run <foo>.tcl, type 'make <foo>'"
 	@echo "to run an interactive tclsh, type 'make tclsh'"
 
 %:%.tcl
-	cd $(UP_PATH) && $(PARROT) --gc-debug $(DOWN_PATH)tcl.pbc $(DOWN_PATH)examples${slash}$@.tcl
+	$(PARROT) $(PARROT_ARRGS)  ..${slash}tcl.pbc $@.tcl
 
 tclsh:
-	cd $(UP_PATH) && $(PARROT) --gc-debug $(DOWN_PATH)tcl.pbc
+	$(PARROT) $(PARROT_ARRGS) ..${slash}tcl.pbc
 
 # (for development testing)
 test:
-	cd $(UP_PATH) && $(PARROT) -tf $(DOWN_PATH)tcl.pbc $(DOWN_PATH)examples${slash}foo.tcl
+	$(PARROT) -tf $(PARROT_ARRGS) ..${slash}tcl.pbc foo.tcl

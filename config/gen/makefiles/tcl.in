@@ -1,9 +1,7 @@
 RM_F    = ${rm_f}
 PERL    = ${perl}
-PARROT  = .${slash}parrot${exe}
-RELPATH = ..${slash}..${slash}
-MYPATH  = languages${slash}tcl${slash}
-LIBPATH  = $(MYPATH)lib${slash}
+PARROT  = ..${slash}..${slash}parrot${exe}
+LIBPATH  = lib${slash}
 BUILD   = $(PERL) ${build_dir}${slash}build_tools${slash}build_dynclasses.pl
 DESTDIR = ${build_dir}${slash}runtime${slash}parrot${slash}dynext
 O       = ${o}
@@ -19,7 +17,7 @@ PMCS = \
  tclarray \
  tclparser
 
-DEPS = $(RELPATH)$(PARROT) \
+DEPS = $(PARROT) \
 lib${slash}commands${slash}append.imc \
 lib${slash}commands${slash}array.imc \
 lib${slash}commands${slash}break.imc \
@@ -73,7 +71,7 @@ tcl.imc_template \
 tcl.pl
 
 tcl.pbc: pmcs lib${slash}tcllib.pbc lib${slash}tclword.pbc tcl.imc
-	(cd $(RELPATH) && $(PARROT) --output=$(MYPATH)tcl.pbc $(MYPATH)tcl.imc)
+	$(PARROT) --output=tcl.pbc tcl.imc
 
 pmcs:
 	@cd $(CLASSDIR) && $(BUILD) generate $(PMCS)
@@ -85,13 +83,13 @@ lib${slash}tcllib.imc: $(DEPS)
 	$(PERL) tcl.pl > lib${slash}tcllib.imc
 
 lib${slash}tcllib.pbc: lib${slash}tcllib.imc
-	(cd $(RELPATH) && $(PARROT) --output=$(LIBPATH)tcllib.pbc $(LIBPATH)tcllib.imc)
+	$(PARROT) --output=$(LIBPATH)tcllib.pbc $(LIBPATH)tcllib.imc
 
 lib${slash}tclword.pbc: lib${slash}tclword.imc
-	(cd $(RELPATH) && $(PARROT) --output=$(LIBPATH)tclword.pbc $(LIBPATH)tclword.imc)
+	$(PARROT) --output=$(LIBPATH)tclword.pbc $(LIBPATH)tclword.imc
 
 tclsh: tcl.pbc
-	(cd $(RELPATH) && $(PARROT) --gc-debug $(MYPATH)tcl.pbc)
+	$(PARROT) --gc-debug tcl.pbc
 
 test:	tcl.pbc
 	$(PERL) t/harness

@@ -8,16 +8,8 @@ PIR Tree - can we use this instead of the current string-based compilation.
 
 =item keyed access
 
-tcl is not using Keys when getting from aggregates. It probalby should,
+tcl is not using Keys when getting from aggregates. It probably should,
 at least for language interoperability.
-
-=item change how we run parrot
-
-Right now we cd up to parrot's root directory and then path down to tcl
-
-Leo has asked to change this to instead do ../../parrot tcl.pbc foo.tcl
-
-This is fine by me but didn't work as of a year ago. =-)
 
 =item interactive tclsh
 
