@@ -28,10 +28,9 @@ Create a PIR sub on the fly for this user defined proc.
   if $I0 == .TclList goto got_args
   args = args_p
 
-  .local pmc arg_list
   (return_type, retval) = string2list(args)
   if return_type == TCL_ERROR goto done
-  arg_list = retval
+  args_p = retval
 
 got_args:
 
@@ -69,7 +68,7 @@ got_args:
   proc_body .= "\"\n.param pmc args\nargs = foldup\nnew_pad 1\n"
   proc_body .= ".local pmc call_level\ncall_level = find_global \"_Tcl\", \"call_level\"\ninc call_level\n"
   .local int arg_count 
-  arg_count = arg_list
+  arg_count = args_p
   .local int ii
   ii = 0
 arg_loop:
@@ -79,7 +78,7 @@ arg_loop:
   proc_body .= $S1
   proc_body .= "]\nstore_lex -1,\""
   # XXX This should be Escape'd
-  $S1 = arg_list[ii]
+  $S1 = args_p[ii]
   proc_body .= $S1
   proc_body .= "\", $P1\n"
   ii = ii + 1
