@@ -123,12 +123,12 @@ runops_slow_core(Interp *interpreter, opcode_t *pc)
 
 
 #if USE_TRACE_INTERP
-    if (Interp_flags_TEST(interpreter, PARROT_TRACE_FLAG)) {
+    if (Interp_trace_TEST(interpreter, PARROT_TRACE_OPS_FLAG)) {
         /* XXX reentering run loop: store this interpreter in
          * some debug structure
          * XXX leak
          */
-        trace_i = make_interpreter(interpreter, NO_FLAGS);
+        trace_i = make_interpreter(interpreter, 0);
         Parrot_init(trace_i);
         /* remember old context */
         trace_ctx = mem_sys_allocate(sizeof(struct Parrot_Context));
