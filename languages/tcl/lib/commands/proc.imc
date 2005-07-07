@@ -21,15 +21,19 @@ Create a PIR sub on the fly for this user defined proc.
   parser = find_global "_Tcl", "parser"
   string2list = find_global "_Tcl", "__stringToList"
 
-  .local string name,args
+  .local string name, args
 
   name = name_p
+  $I0 = typeof args_p
+  if $I0 == .TclList goto got_args
   args = args_p
 
   .local pmc arg_list
   (return_type, retval) = string2list(args)
   if return_type == TCL_ERROR goto done
   arg_list = retval
+
+got_args:
 
   # Save the parsed body.
   .local pmc parsed_body
