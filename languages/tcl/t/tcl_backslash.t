@@ -64,55 +64,51 @@ EOTCL
 $expected = "a b\n";
 language_output_is("tcl",$tcl,$expected,"backslash newline substitution");
 
-TODO: {
-local $TODO = "neither octal escapes nor expr currently work.";
-
 language_output_is("tcl",<<'TCL',<<OUT,"octal single char");
   set a \a
-  set b \7
-  puts [expr {$a} eq {$b}]
+  puts $a
 TCL
-1
+\cG
 OUT
+
+TODO: {
+local $TODO = "this octal don't seem to work.";
 
 language_output_is("tcl",<<'TCL',<<OUT,"octal single char, extra");
-  set a "\a9"
-  set b \79
-  puts [expr {$a} eq {$b}]
+  set a \79
+  puts $a
 TCL
-1
+\cG9
 OUT
+}
 
 language_output_is("tcl",<<'TCL',<<OUT,"octal double char");
-  set a \n
-  set b \12
-  puts [expr {$a} eq {$b}]
+  set a \12
+  puts $a
 TCL
-1
+\cJ
 OUT
 
+TODO: {
+local $TODO = "this octal escape doesn't work.";
 language_output_is("tcl",<<'TCL',<<OUT,"octal double char, extra");
-  set a "\n9"
-  set b \129
-  puts [expr {$a} eq {$b}]
+  set a \129
+  puts $a
 TCL
-1
+\cJ9
 OUT
+}
 
 language_output_is("tcl",<<'TCL',<<OUT,"octal triple char");
-  set a S
-  set b \123
-  puts [expr {$a} eq {$b}]
+  set a \123
+  puts $a
 TCL
-1
+S
 OUT
 
 language_output_is("tcl",<<'TCL',<<OUT,"octal triple char, extra");
-  set a S4
-  set b \1234
-  puts [expr {$a} eq {$b}]
+  set a \1234
+  puts $a
 TCL
-1
+S4
 OUT
-
-}
