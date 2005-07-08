@@ -12,6 +12,9 @@
  
   .local string expr
   .local int argc
+  argc = argv
+  unless argc goto no_args
+ 
   .local int looper
  
   .local pmc parser
@@ -21,7 +24,6 @@
 
   expr = ""
   looper = 0
-  argc = argv
 
 loop:
   if looper == argc goto loop_done
@@ -36,5 +38,11 @@ loop:
 loop_done:
   $P1 = parser."parse"(expr,0,0)
 
-  .return interpret($P1) #tailcall
+  .return interpret($P1) 
+
+no_args:
+  $P1 = new String
+  $P1 = "wrong # args: should be \"eval arg ?arg ...?\""
+  .return(TCL_ERROR, $P1)
+
 .end
