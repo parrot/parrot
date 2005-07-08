@@ -23,22 +23,18 @@
   .local pmc read
   read = find_global "_Tcl", "__read"
   (return_type, value) = read(listname)
-  
   if return_type == TCL_ERROR goto new_variable
-  $S0 = typeof value
-  if $S0 == "String" goto parse_string
+  
+  .local pmc __list
+  __list = find_global "_Tcl", "__list"
+  
+  (return_type, retval) = __list(value)
+  if return_type == TCL_ERROR goto done
+  value = retval
   goto loop
 
 new_variable:
   value = new TclList
-  goto loop
-
-parse_string:
-  $P0 = find_global "_Tcl", "__stringToList"
-  $S0 = value
-  (return_type, retval) = $P0($S0)
-  if return_type == TCL_ERROR goto done
-  value = retval
   # goto loop
 
 loop:

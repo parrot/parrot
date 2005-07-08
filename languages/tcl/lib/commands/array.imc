@@ -90,16 +90,9 @@ set_it:
   .local pmc elems
   elems = argv[2]
 
-  # XXX should probably change this to use "does"
-  $S0 = typeof elems
-  if $S0 == 'TclList' goto set_pre_loop
-  if $S0 == 'String'  goto set_with_string
-  goto set_bad_args
-
-set_with_string:
-  $P0 = find_global "_Tcl", "__stringToList"
-  $S0 = elems
-  (return_type, retval) = $P0($S0)
+  .local pmc __list
+  __list = find_global "_Tcl", "__list"
+  (return_type, retval) = __list(elems)
   if return_type == TCL_ERROR goto done
   elems = retval
 

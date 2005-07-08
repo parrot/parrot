@@ -11,30 +11,16 @@
   .local pmc retval
   .local int return_type
 
-  $S0 = typeof listval
-  if $S0 == "TclList" goto list_like
+  .local pmc __list
+  __list = find_global "_Tcl", "__list"
 
-=for when we have set_string_native working in tcllist
-
-  $P0 = new TclList
-  $S0 = listval
-  $P0 = $S0
-  listval = $P0
-
-=cut
-
-  # what we use in the meantime
-  $P0 = find_global "_Tcl", "__stringToList"
-  $S0 = listval
-  (return_type, retval) = $P0($S0)
+  (return_type, retval) = __list(listval)
   if return_type == TCL_ERROR goto done
   listval = retval
  
 list_like:
   $I0 = listval
-
   retval = new TclInt
-
   retval = $I0
 
 done:

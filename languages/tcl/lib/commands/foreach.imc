@@ -7,7 +7,7 @@
   argv = foldup
 
   .local int return_type
-  .local pmc parser,interpret,retval,string2list
+  .local pmc parser,interpret,retval
   retval = new TclString
   retval = ""
 
@@ -20,9 +20,11 @@
   $I0 = argcP % 2
   if $I0 != 1 goto error
 
+  .local pmc __list
+  __list = find_global "_Tcl", "__list"
+
   parser = find_global "_Tcl", "parser"
   interpret = find_global "_Tcl", "__interpret"
-  string2list = find_global "_Tcl", "__stringToList"
   return_type = TCL_OK
 
   .local int argc
@@ -56,11 +58,7 @@ arg_loop:
   varnames[index_num] = $P0
   inc arg_num
   $P0 = argv[arg_num]
-  # Avoid shimmer if possible. (XXX this is inelegant)
-  $I0 = typeof $P0
-  if $I0 == .TclList goto got_list
-  $S0 = $P0
-  (return_type, retval) = string2list($S0)
+  (return_type, retval) = __list($P0)
   if return_type == TCL_ERROR goto done
   $P0 = retval
 

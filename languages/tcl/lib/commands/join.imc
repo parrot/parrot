@@ -20,17 +20,10 @@ continue:
 
   .local pmc a_list
 
-  # We expect a list here. We should take one if we get it,
-  # otherwise, convert it to a string value, and then convert that to a list.
-  # XXX evilly just using Tcl* variants here.
-  $I0 = typeof a_list
-  if $I0 == .TclList goto got_list  
- 
-  .local pmc string2list
-  string2list = find_global "_Tcl", "__stringToList"
-  $S0 = a_list
-  (return_type, retval) = string2list($S0)
-  $S0 = retval
+  .local pmc __list
+  __list = find_global "_Tcl", "__list"
+  
+  (return_type, retval) = __list(a_list)
   if return_type == TCL_ERROR goto done
   a_list = retval
 

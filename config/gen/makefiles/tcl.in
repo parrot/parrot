@@ -59,6 +59,7 @@ lib${slash}commands${slash}unset.imc \
 lib${slash}commands${slash}uplevel.imc \
 lib${slash}commands${slash}upvar.imc \
 lib${slash}commands${slash}while.imc \
+lib${slash}conversions.pir \
 lib${slash}expression.imc \
 lib${slash}get_var.imc \
 lib${slash}interpret.imc \

@@ -17,20 +17,19 @@ Create a PIR sub on the fly for this user defined proc.
   .local pmc retval
   return_type = TCL_OK
 
-  .local pmc parser,string2list
+  .local pmc parser
   parser = find_global "_Tcl", "parser"
-  string2list = find_global "_Tcl", "__stringToList"
+
+  .local pmc __list
+  __list = find_global "_Tcl", "__list"
 
   .local string name, args
 
   name = name_p
-  $I0 = typeof args_p
-  if $I0 == .TclList goto got_args
-  args = args_p
-
-  (return_type, retval) = string2list(args)
+  (return_type, retval) = __list(args_p)
   if return_type == TCL_ERROR goto done
   args_p = retval
+  args = args_p
 
 got_args:
 
