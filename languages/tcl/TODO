@@ -6,6 +6,10 @@ PIR Tree - can we use this instead of the current string-based compilation.
 
 =over 4
 
+=item .pir file extensions
+
+All .imc files should be renamed to .pir files.
+
 =item keyed access
 
 tcl is not using Keys when getting from aggregates. It probably should,
@@ -21,8 +25,7 @@ Still have to:
 
 =item [interpinfo name]
 
-how to do this from inside parrot?
-[ there's a RT ticket for this now, someone should put the # here.]
+how to do this from inside parrot? RT#36277
 
 =item migrate all these issues to RT or TODO tests
 
@@ -40,14 +43,19 @@ how to do this from inside parrot?
 
 =item string to list
 
-Should be moved to tcllist's set_string method. ... except that it turns
-out this is non-trivial.
+TclList's new_from_string method should use the string to list code
+...except that it turnsout this is non-trivial.
 
 =back
 
 =head2 PIR-level tasks
 
 =over 4
+
+=item __set/__read
+
+All commands should use the __set and __read functions defined in
+variables.pir instead of get_var.
 
 =item subcommand processing
 
