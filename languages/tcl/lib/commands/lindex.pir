@@ -24,7 +24,8 @@
 from_string:
   .local pmc stringToList
   stringToList = find_global "_Tcl", "__stringToList"
-  (return_type, retval) = stringToList(list)
+  $S0 = list
+  (return_type, retval) = stringToList($S0)
   if return_type == TCL_ERROR goto done
   list = retval
 
