@@ -569,7 +569,7 @@ PIO_peek(theINTERP, PMC *pmc, void *buffer)>
 INTVAL
 PIO_peek(theINTERP, PMC *pmc, STRING **buffer)
 {
-    ParrotIOLayer *l = pmc->obj.u.struct_val;
+    ParrotIOLayer *l = PMC_struct_val(pmc);
     ParrotIO *io = PMC_data0(pmc);
     if(!io)
         return -1;
