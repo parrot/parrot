@@ -206,7 +206,6 @@ typedef struct PMC_EXT PMC_EXT;
 #define PMC_union(pmc)        (pmc)->obj.u
 
 /* macro for accessing union data */
-#define cache obj.u
 #define next_for_GC pmc_ext->_next_for_GC
 #define metadata pmc_ext->_metadata
 #define synchronize pmc_ext->_synchronize
