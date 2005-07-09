@@ -1,56 +1,54 @@
-grammar _Tcl_Rules;
-
-rule command  { \[ (.*?) \] }
-rule string   { " ([\\.|<-["]>]*) : " }
+rule command  { \[ (.*?) \] };
+rule string   { " ([\\.|<-["]>]*) : " };
 rule variable { \$ [
  (<[A..Za..z_0..9]>+) |
  (<[A..Za..z_0..9]>* \( <[A..Za..z_0..9]>* \)) |
  \{ (<-[\}]>*) \}  
  ]
-}
+};
 
-rule float   { [<[0..9]>+|0+]\.<[0..9]>* }
-rule decimal { <[1..9]><[0..9]>*] }
-rule octal   { 0<[0..7]>*: }
-rule hex     { 0<[xX]><[0..9A..Fa..f]>+ }
-rule number  { [<float> | <decimal> | <octal> | <hex> ] }
+rule float   { [<[0..9]>+|0+]\.<[0..9]>* };
+rule decimal { <[1..9]><[0..9]>*] };
+rule octal   { 0<[0..7]>*: };
+rule hex     { 0<[xX]><[0..9A..Fa..f]>+ };
+rule number  { [<float> | <decimal> | <octal> | <hex> ] };
 
-rule nullary_functions { rand }
+rule nullary_functions { rand };
 
 rule unary_functions { 
   abs | acos | asin | atan | ceil | cosh? | double | exp | floor | int |
   log | log10 | round | sinh? | sqrt | srand | tanh? | wide
-}
+};
 
-rule binary_functions { atan2 | fmod | hypot | pow }
+rule binary_functions { atan2 | fmod | hypot | pow };
 
 rule function {
   <nullary_functions> \( \) |
   <unary_functions>   \( <factor> \) |
   <binary_functions>  \( <factor> , <factor> \)
-}
+};
 
-rule unaryop { <[\-+~!]> }
+rule unaryop { <[\-+~!]> };
 
-rule factor { <unaryop>* [ <operand> | <power> | \( <factor> \) ]}
+rule factor { <unaryop>* [ <operand> | <power> | \( <factor> \) ]};
 
-rule power   {:w <term>    [ (\*\*)          <term>    ]* }
-rule term    {:w <sum>     [ (<[*/%]>)       <sum>     ]* }
-rule sum     {:w <shifted> [ (<[+\-]>)       <shifted> ]* }
-rule shifted {:w <compare> [ (\<\<|\>\>)     <compare> ]* }
-rule compare {:w <equals>  [ (\<|\>|\<=|\>=) <equals>  ]* }
-rule equals  {:w <streq>   [ (\==|\!=)       <streq>   ]* }
-rule streq   {:w <listin>  [ (eq|ne)         <listin>  ]* }
-rule listin  {:w <bitand>  [ (in|ni)         <bitand>  ]* }
-rule bitand  {:w <bitxor>  [ (&)             <bitxor>  ]* }
-rule bitxor  {:w <bitor>   [ (\^)            <bitor>   ]* }
-rule bitor   {:w <logand>  [ (\|)            <logand>  ]* }
-rule logand  {:w <logor>   [ (&&)            <logor>   ]* }
-rule logor   {:w <ternary> [ (\|\|)          <ternary> ]* }
+rule power   {:w <term>    [ (\*\*)          <term>    ]* };
+rule term    {:w <sum>     [ (<[*/%]>)       <sum>     ]* };
+rule sum     {:w <shifted> [ (<[+\-]>)       <shifted> ]* };
+rule shifted {:w <compare> [ (\<\<|\>\>)     <compare> ]* };
+rule compare {:w <equals>  [ (\<|\>|\<=|\>=) <equals>  ]* };
+rule equals  {:w <streq>   [ (\==|\!=)       <streq>   ]* };
+rule streq   {:w <listin>  [ (eq|ne)         <listin>  ]* };
+rule listin  {:w <bitand>  [ (in|ni)         <bitand>  ]* };
+rule bitand  {:w <bitxor>  [ (&)             <bitxor>  ]* };
+rule bitxor  {:w <bitor>   [ (\^)            <bitor>   ]* };
+rule bitor   {:w <logand>  [ (\|)            <logand>  ]* };
+rule logand  {:w <logor>   [ (&&)            <logor>   ]* };
+rule logor   {:w <ternary> [ (\|\|)          <ternary> ]* };
 
-rule ternary {:w <operand> | <operand> \? <any> : <operand> }
+rule ternary {:w <operand> | <operand> \? <any> : <operand> };
 
-rule operand { <number> | <function> | <command> | <string> | <variable> }
+rule operand { <number> | <function> | <command> | <string> | <variable> };
 
-rule expr { ^^ <factor> $$ }
+rule expr { ^^ <factor> $$ };
 
