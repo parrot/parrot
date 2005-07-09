@@ -31,6 +31,7 @@
   read = find_global "_Tcl", "__read"
   $S1 = argv[0] 
   (return_type,original_pmc) = read($S1)
+  # XXX this should probably just return what read did if there's an error.
   if return_type == TCL_ERROR goto bad_variable
 
   if argc == 1 goto do_incr
