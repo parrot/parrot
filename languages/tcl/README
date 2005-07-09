@@ -10,10 +10,7 @@ parrot directory:
 Then, type C<make> in this directory. This will
 generate the file C<tcl.pbc> which can then be used to run tcl programs.
 
-I<Note - due to a bug in the current parrot implementation, you must be
-in the root development directory.>
-
- ./parrot languages/tcl/tcl.pbc foo.tcl
+ ../../parrot tcl.pbc foo.tcl
 
 =head2 Interactive tclsh
 
