@@ -690,48 +690,6 @@ Dumps a Float PMC.
     .return ( 1 )
 .end
 
-=head2 Various Tcl PMCs
-
-=cut
-
-.sub pmcTclList method
-    .param string name
-    .param pmc array
-    self."pmcResizablePMCArray"( name, array )
-.end
-
-.sub pmcTclArray method
-    .param string name
-    .param pmc array
-    self."pmcHash"( name, array )
-.end
-
-.sub pmcTclInt method
-    .param string name
-    .param pmc array
-    self."pmcInteger"( name, array )
-.end
-
-.sub pmcTclFloat method
-    .param string name
-    .param pmc array
-    self."pmcFloat"( name, array )
-.end
-
-.sub pmcTclList method
-    .param string name
-    .param pmc array
-    self."pmcArray"( name, array )
-.end
-
-.sub pmcTclString method
-    .param string name
-    .param pmc array
-    self."pmcString"( name, array )
-.end
-
-=back
-
 =head1 AUTHOR
 
 Jens Rieks E<lt>parrot at jensbeimsurfen dot deE<gt> is the author
