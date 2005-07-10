@@ -6,6 +6,10 @@ PIR Tree - can we use this instead of the current string-based compilation.
 
 =over 4
 
+=item fix Data::Dumper
+
+Now dumps all Tcl data pmcs except TclArray properly.
+
 =item .pir file extensions
 
 All .imc files should be renamed to .pir files.

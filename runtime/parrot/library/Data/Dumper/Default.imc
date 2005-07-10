@@ -208,7 +208,7 @@ END:
 
 =item style."pmcPMCArray"( name, array )
 
-Dumps an (PMC) Array.
+Dumps a PMC Array.
 
 =cut
 
@@ -220,7 +220,7 @@ Dumps an (PMC) Array.
 
 =item style."pmcResizablePMCArray"( name, array )
 
-Dumps an resizable (PMC) Array.
+Dumps a resizable (PMC) Array.
 
 =cut
 
@@ -232,7 +232,7 @@ Dumps an resizable (PMC) Array.
 
 =item style."pmcResizableStringArray"( name, array )
 
-Dumps an resizable (string) Array.
+Dumps a resizable (string) Array.
 
 =cut
 
@@ -244,7 +244,7 @@ Dumps an resizable (string) Array.
 
 =item style."pmcResizableIntegerArray"( name, array )
 
-Dumps an resizable (Integer) Array.
+Dumps a resizable (Integer) Array.
 
 =cut
 
@@ -256,7 +256,7 @@ Dumps an resizable (Integer) Array.
 
 =item style."pmcResizableFloatArray"( name, array )
 
-Dumps an resizable (Float) Array.
+Dumps a resizable (Float) Array.
 
 =cut
 
@@ -268,7 +268,7 @@ Dumps an resizable (Float) Array.
 
 =item style."pmcFixedPMCArray"( name, array )
 
-Dumps an fixed (PMC) Array.
+Dumps a fixed (PMC) Array.
 
 =cut
 
@@ -280,7 +280,7 @@ Dumps an fixed (PMC) Array.
 
 =item style."pmcFixedStringArray"( name, array )
 
-Dumps an fixed (string) Array.
+Dumps a fixed (string) Array.
 
 =cut
 
@@ -292,7 +292,7 @@ Dumps an fixed (string) Array.
 
 =item style."pmcFixedIntegerArray"( name, array )
 
-Dumps an fixed (Integer) Array.
+Dumps a fixed (Integer) Array.
 
 =cut
 
@@ -304,7 +304,7 @@ Dumps an fixed (Integer) Array.
 
 =item style."pmcFixedFloatArray"( name, array )
 
-Dumps an fixed (Float) Array.
+Dumps a fixed (Float) Array.
 
 =cut
 
@@ -316,7 +316,7 @@ Dumps an fixed (Float) Array.
 
 =item style."pmcPMCArray"( name, array )
 
-Dumps an (PMC) Array.
+Dumps a (PMC) Array.
 
 =cut
 
@@ -328,7 +328,7 @@ Dumps an (PMC) Array.
 
 =item style."pmcStringArray"( name, array )
 
-Dumps an (string) Array.
+Dumps a (string) Array.
 
 =cut
 
@@ -405,7 +405,7 @@ iter_end:
 
 =item style."pmcPerlArray"( name, array )
 
-Dumps an (Perl) Array.
+Dumps a (Perl) Array.
 
 =cut
 
@@ -480,7 +480,10 @@ Dumps a PerlHash PMC.
     .param pmc hash
     .local string indent
 
-    print "PerlHash "
+    $S0 = typeof hash
+  
+    print $S0
+    print " "
 
     self."dumpHash"( name, hash )
 
@@ -674,7 +677,7 @@ Dumps an Integer PMC.
 
 =item style."pmcFloat"( name, val )
 
-Dumps an Float PMC.
+Dumps a Float PMC.
 
 =cut
 
@@ -685,6 +688,46 @@ Dumps an Float PMC.
     print val
 
     .return ( 1 )
+.end
+
+=head2 Various Tcl PMCs
+
+=cut
+
+.sub pmcTclList method
+    .param string name
+    .param pmc array
+    self."pmcResizablePMCArray"( name, array )
+.end
+
+.sub pmcTclArray method
+    .param string name
+    .param pmc array
+    self."pmcHash"( name, array )
+.end
+
+.sub pmcTclInt method
+    .param string name
+    .param pmc array
+    self."pmcInteger"( name, array )
+.end
+
+.sub pmcTclFloat method
+    .param string name
+    .param pmc array
+    self."pmcFloat"( name, array )
+.end
+
+.sub pmcTclList method
+    .param string name
+    .param pmc array
+    self."pmcArray"( name, array )
+.end
+
+.sub pmcTclString method
+    .param string name
+    .param pmc array
+    self."pmcString"( name, array )
 .end
 
 =back

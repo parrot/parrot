@@ -51,7 +51,7 @@ This is the public (non object) interface to the dumper library.
 
 =item name
 
-Required. The name of the PMC.
+Optional. The name of the PMC.
 
 =item pmc
 
