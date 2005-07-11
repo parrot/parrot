@@ -6,9 +6,16 @@ PIR Tree - can we use this instead of the current string-based compilation.
 
 =over 4
 
-=item fix Data::Dumper
+=item Makefile deps
 
-Now dumps all Tcl data pmcs except TclArray properly.
+Should be more explicit about the PMC dependencies in the makefile. *something*
+is causing things to get rebuilt unecessarily each time "make tclsh" is run.
+
+=item Data::Dumper
+
+It would be nice to have a core-approved way to dump tcl pmcs... preferably
+by having someone re-write the core dumper to be smarter about "does hash",
+etc.
 
 =item .pir file extensions
 
