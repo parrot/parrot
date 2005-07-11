@@ -2,7 +2,8 @@
 
 use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 8;
+use Parrot::Test tests => 10;
+use vars qw($TODO);
 
 my($tcl,$expected);
 
@@ -19,6 +20,13 @@ $tcl = <<'EOTCL';
 EOTCL
 $expected = "5b\n";
 language_output_is("tcl",$tcl,$expected,"leading");
+
+language_output_is("tcl",<<'TCL',<<'OUT',"trailing");
+ set a 5
+ puts b[set a]
+TCL
+b5
+OUT
 
 $tcl = <<'EOTCL';
  set a "St\[ring Parsing"
@@ -60,3 +68,14 @@ $tcl = <<'EOTCL';
 EOTCL
 $expected = "2\n";
 language_output_is("tcl",$tcl,$expected,"nested command subst");
+
+TODO: {
+$TODO = "bugs";
+
+language_output_is("tcl",<<'TCL',<<'OUT',"] in \"\"s");
+ puts [set a "]"]
+TCL
+]
+OUT
+
+}
