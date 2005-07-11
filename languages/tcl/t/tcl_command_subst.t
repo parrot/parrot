@@ -5,21 +5,19 @@ use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
 use Parrot::Test tests => 10;
 use vars qw($TODO);
 
-my($tcl,$expected);
-
-$tcl = <<'EOTCL';
+language_output_is("tcl",<<'TCL', <<'OUT',"all");
  set a 5
  puts [set a]
-EOTCL
-$expected = "5\n";
-language_output_is("tcl",$tcl,$expected,"all");
+TCL
+5
+OUT
 
-$tcl = <<'EOTCL';
+language_output_is("tcl",<<'TCL',<<'OUT',"leading");
  set a 5
  puts [set a]b
-EOTCL
-$expected = "5b\n";
-language_output_is("tcl",$tcl,$expected,"leading");
+TCL
+5b
+OUT
 
 language_output_is("tcl",<<'TCL',<<'OUT',"trailing");
  set a 5
@@ -28,46 +26,46 @@ TCL
 b5
 OUT
 
-$tcl = <<'EOTCL';
+language_output_is("tcl",<<'TCL',<<'OUT',"escaped brace");
  set a "St\[ring Parsing"
  puts $a
-EOTCL
-$expected = "St[ring Parsing\n";
-language_output_is("tcl",$tcl,$expected,"escaped brace");
+TCL
+St[ring Parsing
+OUT
 
-$tcl = <<'EOTCL';
+language_output_is("tcl",<<'TCL',<<'OUT',"escaped brace");
  set a "St\\\[ring Parsing"
  puts $a
-EOTCL
-$expected = "St\\[ring Parsing\n";
-language_output_is("tcl",$tcl,$expected,"escaped brace");
+TCL
+St\[ring Parsing
+OUT
 
-$tcl = <<'EOTCL';
+language_output_is("tcl",<<'TCL',<<'OUT',"embedded escaped open brace");
  set a [set b \[]
- puts -nonewline $a
-EOTCL
-$expected = "[";
-language_output_is("tcl",$tcl,$expected,"embedded escaped open brace");
+ puts $a
+TCL
+[
+OUT
 
-$tcl = <<'EOTCL';
+language_output_is("tcl",<<'TCL',<<'OUT',"embedded escaped close brace");
  set a [set b \]]
- puts -nonewline $a
-EOTCL
-$expected = "]";
-language_output_is("tcl",$tcl,$expected,"embedded escaped close brace");
+ puts $a
+TCL
+]
+OUT
 
-$tcl = <<'EOTCL';
+language_output_is("tcl",<<'TCL',<<'OUT',"command subst inside string");
  set a "2 [set b 3]"
- puts -nonewline $a
-EOTCL
-$expected = "2 3";
-language_output_is("tcl",$tcl,$expected,"command subst inside string");
+ puts $a
+TCL
+2 3
+OUT
 
-$tcl = <<'EOTCL';
+language_output_is("tcl",<<'TCL',<<'OUT',"nested command subst");
  puts [set a [set b 2]]
-EOTCL
-$expected = "2\n";
-language_output_is("tcl",$tcl,$expected,"nested command subst");
+TCL
+2
+OUT
 
 TODO: {
 $TODO = "bugs";
