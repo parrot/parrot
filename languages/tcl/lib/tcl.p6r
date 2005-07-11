@@ -1,5 +1,6 @@
 rule command  { \[ (.*?) \] };
-rule string   { " ([\\.|<-["]>]*) : " };
+rule quotes   { " ([\\.|<-["]>]*) : " };
+rule braces   { \{ : ([\\.|<braces>|<-[\{\}]>]*) : \} }
 rule variable { \$ [
  (<[A..Za..z_0..9]>+) |
  (<[A..Za..z_0..9]>* \( <[A..Za..z_0..9]>* \)) |
@@ -48,7 +49,7 @@ rule logor   {:w <ternary> [ (\|\|)          <ternary> ]* };
 
 rule ternary {:w <operand> | <operand> \? <any> : <operand> };
 
-rule operand { <number> | <function> | <command> | <string> | <variable> };
+rule operand { <number> | <function> | <command> | <quotes> | <braces> | <variable> };
 
 rule expr { ^^ <factor> $$ };
 
