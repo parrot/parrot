@@ -1,3 +1,12 @@
+Status
+======
+
+This prototype of the perl6 compiler was abandoned in June 2004. Current
+work on the compiler may be found in the development of the Pugs
+prototype (www.pugscode.org) and in the Parrot grammar engine (PGE) in
+the Parrot repository at compilers/pge. You can track the development of
+both on the perl6-compiler mailing list (perl6-compiler@perl.org).
+
 Roadmap
 =======
 
