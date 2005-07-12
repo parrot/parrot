@@ -1,0 +1,48 @@
+#! perl -w
+
+use strict;
+
+use Test::Harness;
+use File::Spec;
+
+my $language = "punie";
+
+=pod
+
+This test harness is largely a copy of languages/tcl/t/harness.
+There's room for abstraction here.
+
+conformant to a recent post on p6i, if I'm called with a single
+argument of "-files", I just return a list of files to process.
+This list is one per line, and is relative to the languages dir.
+
+If I'm called with no args, I run the suite.
+
+=cut
+
+my @files;
+
+# Per Leo on 18APR2005, run the test suite with --gc-debug
+
+if ($ENV{TEST_PROG_ARGS} && $ENV{TEST_PROG_ARGS} !~ /\b--gc-debug\b/) {
+  $ENV{TEST_PROG_ARGS} .= " --gc-debug"; 
+}
+
+if ( grep { /^--files$/ } @ARGV ) {
+    # I must be running out of languages/
+    my $dir = File::Spec->catfile( $language, "t" );
+    my @files = glob( File::Spec->catfile( $dir, "*.t" ) );
+    print join("\n",@files);
+    print "\n" if @files;
+    exit;
+} elsif (@ARGV) {
+    # Someone specified tests for me to run.
+    @files = grep {-f $_} @ARGV
+} else {
+    # I must be running out of languages/$language
+    # You may want a deeper search than this.
+    @files = glob( File::Spec->catfile( "t", "*.t" ) );
+}
+
+exit unless @files;
+runtests(@files);

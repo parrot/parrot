@@ -1,0 +1,42 @@
+This is Punie, version 0.0.1
+-----------------------------
+
+Punie is Copyright (C) 2005 The Perl Foundation.
+
+LICENSE INFORMATION
+-------------------
+
+This code is distributed under the same license as Parrot; you can
+redistribute it and/or modify it under the terms of either:
+
+    a) the GNU General Public License
+
+    b) the "Artistic License"
+
+as found in the "LICENSES" directory at the top level of the Parrot
+distribution.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See either
+the GNU General Public License or the Artistic License for more
+details.
+
+PREREQUISITES
+-------------
+
+Punie depends on Parrot, particularly on version 0.2.2 or higher, when
+grammar support was introduced to PGE (the Parrot grammar engine).
+
+INSTRUCTIONS
+------------
+
+Compile Punie to bytecode and run its test suite:
+
+  $ make
+  $ make test
+
+Run the Punie compiler via Parrot, passing it the path to a Perl 1
+source file as the only argument:
+
+  $ ../../parrot punie.pbc script.p1
