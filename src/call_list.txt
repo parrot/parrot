@@ -297,3 +297,10 @@ P	JOPPPPP
 # Added for Tcl
 I	JOSI
 P	JOSII
+
+# libpast
+p       Ji
+p       Jipp
+p       Jbip
+v       Jp
+v       JS
