@@ -204,18 +204,19 @@ destination to continue execution.
         struct parrot_regs_t *caller_regs;
         opcode_t *pc;
 
-        caller_regs = INTERP->ctx.bp;
-        restore_context(INTERP, &cc->ctx);
         if (Interp_trace_TEST(INTERP, PARROT_TRACE_SUB_CALL_FLAG)) {
-            PMC *sub = INTERP->ctx.current_sub;
+            PMC *sub = cc->ctx.current_sub;
             STRING *unk = CONST_STRING(INTERP, "(unknown");
             PIO_eprintf(INTERP, "# Back in sub '%Ss'\n",
                 Parrot_full_sub_name(INTERP, sub));
         }
+        caller_regs = INTERP->ctx.bp;
+        restore_context(INTERP, &cc->ctx);
         pc = cc->address;
         if (pc) {
             if (INTERP->ctx.current_results) {
                 /* possibly a true continuation that acts as a Sub */
+                Parrot_block_DOD(INTERP);
                 if (*pc == PARROT_OP_get_params_pc)
                     pc = parrot_pass_args(INTERP, (struct Parrot_sub*)cc,
                             caller_regs,
@@ -223,6 +224,7 @@ destination to continue execution.
                 else
                     parrot_pass_args(INTERP, NULL, caller_regs,
                             PARROT_OP_get_results_pc);
+                Parrot_unblock_DOD(INTERP);
             }
             else {
                 copy_regs(INTERP, caller_regs);

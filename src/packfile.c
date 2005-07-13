@@ -362,16 +362,12 @@ do_sub_pragmas(Interp* interpreter, struct PackFile_ByteCode *self, int action)
  * a property isn't constructed const so we have to mark them
  */
 static void
-mark_1_seg(Parrot_Interp interpreter, struct PackFile_ByteCode *cs)
+mark_1_seg(Parrot_Interp interpreter, struct PackFile_ConstTable *ct)
 {
     opcode_t i;
-    struct PackFile_ConstTable *ct;
     PMC *pmc;
 
-    ct = cs->const_table;
-    if (!ct)
-        return;
-    /* fprintf(stderr, "mark %s\n", cs->base.name); */
+    /* fprintf(stderr, "mark %s\n", ct->base.name); */
     for (i = 0; i < ct->const_count; i++) {
         switch (ct->constants[i]->type) {
             case PFC_PMC:
@@ -383,15 +379,15 @@ mark_1_seg(Parrot_Interp interpreter, struct PackFile_ByteCode *cs)
 }
 
 static INTVAL
-find_code_iter(Interp* interpreter,
+find_const_iter(Interp* interpreter,
         struct PackFile_Segment *seg, void *user_data)
 {
     if (seg->type == PF_DIR_SEG) {
 	PackFile_map_segments(interpreter, (struct PackFile_Directory*)seg,
-                find_code_iter, user_data);
+                find_const_iter, user_data);
     }
-    else if (seg->type == PF_BYTEC_SEG) {
-        mark_1_seg(interpreter, (struct PackFile_ByteCode *)seg);
+    else if (seg->type == PF_CONST_SEG) {
+        mark_1_seg(interpreter, (struct PackFile_ConstTable *)seg);
     }
     return 0;
 }
@@ -403,19 +399,16 @@ mark_const_subs(Parrot_Interp interpreter)
     struct PackFile_Directory *dir;
 
     self = interpreter->initial_pf;
-    if (!self || !self->cur_cs)
+    if (!self)
         return;
     /*
      * locate top level dir
      */
-    for (dir = &self->directory;
-            self != (struct PackFile *)&self->directory ;
-            dir = dir->base.dir)
-        ;
+    dir = &self->directory;
     /*
      * iterate over all dir/segs
      */
-    PackFile_map_segments(interpreter, dir, find_code_iter, NULL);
+    PackFile_map_segments(interpreter, dir, find_const_iter, NULL);
 }
 
 /*
