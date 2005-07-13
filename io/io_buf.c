@@ -551,14 +551,12 @@ PIO_buf_readline(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
     ParrotIOBuf *b = &io->b;
     size_t len;
     STRING *s;
-    int may_realloc;
 
     if (*buf == NULL) {
         *buf = new_string_header(interpreter, 0);
     }
     s = *buf;
     s->strlen = 0;
-    may_realloc = s->strstart == NULL;
 
     /* fill empty buffer */
     if (!(b->flags & PIO_BF_READBUF)) {
@@ -581,17 +579,11 @@ PIO_buf_readline(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
         if (b->next == b->endb) {
             len = b->endb - buf_start;
             if (s->bufused < l) {
-                if (may_realloc) {
-                    s->charset = Parrot_iso_8859_1_charset_ptr;
-                    s->encoding = Parrot_fixed_8_encoding_ptr;
-                    if (s->strstart) {
-                        Parrot_reallocate_string(interpreter, s, l);
-                    } else {
-                        Parrot_allocate_string(interpreter, s, l);
-                    }
+                if (s->strstart) {
+                    Parrot_reallocate_string(interpreter, s, l);
+                } else {
+                    Parrot_allocate_string(interpreter, s, l);
                 }
-                else
-                    internal_exception(1, "readline: buffer too short");
             }
             out_buf = (unsigned char*)s->strstart + s->strlen;
             memcpy(out_buf, buf_start, len);
@@ -602,17 +594,11 @@ PIO_buf_readline(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
         }
     }
     if (s->bufused < l) {
-        if (may_realloc) {
-            s->charset = Parrot_iso_8859_1_charset_ptr;
-            s->encoding = Parrot_fixed_8_encoding_ptr;
-            if (s->strstart) {
-                Parrot_reallocate_string(interpreter, s, l);
-            } else {
-                Parrot_allocate_string(interpreter, s, l);
-            }
+        if (s->strstart) {
+            Parrot_reallocate_string(interpreter, s, l);
+        } else {
+            Parrot_allocate_string(interpreter, s, l);
         }
-        else
-            internal_exception(1, "readline: buffer too short");
     }
     out_buf = (unsigned char*)s->strstart + s->strlen;
     len = b->next - buf_start;

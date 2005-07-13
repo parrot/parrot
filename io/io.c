@@ -98,30 +98,19 @@ gets allocated.
 */
 
 STRING *
-PIO_make_io_string(Interp *interpreter, STRING **buf, size_t default_len)
+PIO_make_io_string(Interp *interpreter, STRING **buf, size_t len)
 {
-    size_t len;
     STRING *s;
     /*
      * when we get a NULL string, we read a default len
      */
     if (*buf == NULL) {
-	*buf = new_string_header(interpreter, 0);
-        (*buf)->bufused = default_len;
+	*buf = string_make_empty(interpreter, enum_stringrep_one, len);
+        return *buf;
     }
     s = *buf;
-    len = s->bufused;
-    if (!s->strstart && len) {
-        PObj_bufstart(s) = s->strstart = mem_sys_allocate(len);
-        PObj_buflen(s) = len;
-        PObj_sysmem_SET(s);
-        PObj_external_SET(s);
-        s->charset = Parrot_iso_8859_1_charset_ptr;
-        s->encoding = Parrot_fixed_8_encoding_ptr;
-        /*
-         * TODO encoding = raw
-         */
-    }
+    if (s->bufused < len)
+        Parrot_allocate_string(interpreter, s, len);
     return s;
 }
 
@@ -839,7 +828,7 @@ PIO_reads(theINTERP, PMC *pmc, size_t len)
         res->encoding = Parrot_fixed_8_encoding_ptr;
     }
     else
-        res = PIO_make_io_string(interpreter, &res, len );
+        res = PIO_make_io_string(interpreter, &res, len);
 
     res->bufused = len;
     PIO_read_down(interpreter, l, io, &res);
@@ -1010,6 +999,11 @@ PIO_putps(theINTERP, PMC *pmc, STRING *s)
     ParrotIO *io = PMC_data0(pmc);
     assert((unsigned int)l != 0xdeadbeefU);
     assert(io != 0);
+#if ! DISABLE_GC_DEBUG
+    /* trigger GC for debug - but not during tests */
+    if (0 && GC_DEBUG(interpreter))
+        Parrot_do_dod_run(interpreter, DOD_trace_stack_FLAG);
+#endif
     return PIO_write_down(interpreter, l, io, s);
 }
 
