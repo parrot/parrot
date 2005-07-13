@@ -37,6 +37,7 @@ loop:
 
 loop_done:
   $P1 = parser."parse"(expr,0,0)
+  register $P1
 
   .return interpret($P1) 
 

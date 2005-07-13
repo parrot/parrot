@@ -78,6 +78,7 @@ got_list:
 arg_done: 
   .local pmc parsed
   parsed = parser."parse"(body,0,0)
+  register parsed
 
   .local pmc iterator
   iterator = new Integer

@@ -37,6 +37,7 @@ got_args:
   .local pmc parsed_body
   $S0 = body_p
   parsed_body = parser."parse"($S0,0,0)
+  register parsed_body
 
   # XXX these need to go away - for now, we'll just escape
   # the code portion and put it, escaped, into the proc 

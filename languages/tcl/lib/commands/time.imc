@@ -39,6 +39,7 @@ run:
   script = argv[0]
  
   $P1 = parser."parse"(script,0,0)
+  register $P1
 
   time $N1 
   $I1 = count

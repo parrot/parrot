@@ -25,6 +25,7 @@
 while_loop:
   $S0 = body_p
   parsed_code = parser."parse"($S0,0,0)
+  register parsed_code
   (return_type,retval) = expression_p(cond_p)
   if return_type == TCL_ERROR goto done_done
   (return_type,retval) = expression_i(retval)

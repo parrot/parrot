@@ -110,6 +110,7 @@ do_else:
 
 done:
   $P1 = parser."parse"(code,0,0)
+  register $P1
 
   .return interpret($P1) #tailcall
 

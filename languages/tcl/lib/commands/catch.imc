@@ -28,6 +28,7 @@
   if argc  > 2 goto badargs
   code = argv[0]
   $P1 = parser."parse"(code,0,0)
+  register $P1
   # ignoring $P0 here.
   ($I0,$P0) = interpret($P1)
   retval = new Integer

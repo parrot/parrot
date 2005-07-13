@@ -26,10 +26,13 @@
   # Parse the bits that are code.
   $S0 = start_p
   start_parsed = parser."parse"($S0,0,0)
+  register start_parsed
   $S0 = next_p
   next_parsed  = parser."parse"($S0,0,0)
+  register next_parsed
   $S0 = body_p
   body_parsed  = parser."parse"($S0,0,0)
+  register body_parsed
 
 
   # first, execute start.

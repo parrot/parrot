@@ -19,6 +19,7 @@
   push_eh parse_error
     parsed_str = parser."parse"(str,0,1)
   clear_eh
+  register parsed_str
   
   $I0 = parsed_str
   if $I0 == 0 goto done

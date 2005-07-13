@@ -25,8 +25,7 @@
 getting:
   .local pmc read
   read = find_global "_Tcl", "__read"
-  (return_type, retval) = read(name)
-  goto done
+  .return read(name)
 
 setting:
   .local pmc set
@@ -34,14 +33,11 @@ setting:
 
   .local pmc value
   value = argv[1]
-  (return_type, retval) = set(name, value)
-  goto done
+  .return set(name,value)
 
 error:
   return_type = TCL_ERROR 
   retval = "wrong # args: should be \"set varName ?newValue?\""
-
-done:
   .return(return_type,retval)
 
 catch:
