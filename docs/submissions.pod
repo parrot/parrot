@@ -123,6 +123,26 @@ run:
     cd parrotdev
     patch -p0 < recursive.patch
 
+=head2 Configuration of to be ignored files
+
+Sometimes new files will be created in the configuration and build process
+of Parrot. These files should not show up when checking the distribution with
+
+    svn status
+
+or
+
+    perl tools/dev/manicheck.pl
+
+The list of these ignore files can be set up with:
+
+    svn propedit svn:ignore <PATH>
+
+In order to keep the two different checks synchronized, the MANIFEST.SKIP file
+should be regenerated with:
+
+    perl tools/dev/gen_manifest_skip.pl > MANIFEST.SKIP
+
 =head1 How To Submit Something New
 
 If you have a new feature to add to Parrot, such as a new test.

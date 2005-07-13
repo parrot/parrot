@@ -16,8 +16,11 @@ tools/dev/manicheck.pl - Check the MANIFEST file
 
 Check the contents of the F<MANIFEST> file against the files present in
 this directory tree, accounting for .svn dirs. Prints out the
-number of I<missing>, I<expected>, I<ignored> and I<extra> files, and
+number of I<missing>, I<expected> and I<extra> files, and
 then any extra files are listed.
+
+Files that match the patterns in MANIFEST.SKIP are not reported as extra
+files. 
 
 =cut
 
@@ -41,7 +44,6 @@ printf "Found %d distinct files among MANIFEST and directory contents.\n\n",
   scalar( keys %{$file_list} );
 
 printf "  %5d missing\n",  scalar @missing;
-# printf "  %5d ignored\n",  scalar @ignored;
 printf "  %5d extra\n",    scalar @extra;
 
 # TODO: Use Data::Dumper
