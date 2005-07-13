@@ -83,7 +83,6 @@ providing a compreg-compatible method.
 .sub __prepare_lib @LOAD,@ANON
 
   # Load any dependant libraries.
-  $P0 = loadlib "tcl_group"
   load_bytecode "languages/tcl/lib/tclword.pbc"
   load_bytecode "library/Data/Escape.pbc"
   load_bytecode "library/PGE.pbc"
