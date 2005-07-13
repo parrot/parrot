@@ -663,7 +663,7 @@ print_profile(int status, void *p)
             }
         }
 
-        PIO_printf(interpreter, " %4vu - %-20s %8vu  %10vf  %10.6vf\n",
+        PIO_printf(interpreter, " %4vu - %-25s %8vu  %10vf  %10.6vf\n",
                 op_count,
                 "-",
                 call_count,
