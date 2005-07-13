@@ -624,7 +624,7 @@ print_profile(int status, void *p)
         RunProfile *profile = interpreter->profile;
         FLOATVAL empty = calibrate(interpreter);
 
-        PIO_printf(interpreter, " Code J Name                    Calls  Total/s       Avg/ms\n");
+        PIO_printf(interpreter, " Code J Name                         Calls  Total/s       Avg/ms\n");
         for (j = 0; j < interpreter->op_count + PARROT_PROF_EXTRA; j++) {
             UINTVAL n = profile->data[j].numcalls;
             profile->data[j].op = j;
@@ -652,7 +652,7 @@ print_profile(int status, void *p)
                     op_jit[k - PARROT_PROF_EXTRA].extcall != 1)
                     jit = 'j';
 #endif
-                PIO_printf(interpreter, " %4d %c %-20s %8vu  %10vf  %10.6vf\n",
+                PIO_printf(interpreter, " %4d %c %-25s %8vu  %10vf  %10.6vf\n",
                         k - PARROT_PROF_EXTRA,
                         jit,
                         op_name(interpreter, k),
