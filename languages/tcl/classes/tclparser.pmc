@@ -116,7 +116,7 @@ XXX: Skip the evaluate step, and just return an invokable.
       PMC *word;
       INTVAL I0,I1,I2;
       STRING *S0, *S1;
-      PMC *P0,*P1,*P2,*P3,*P4;
+      PMC *P0,*P1,*P4;
 
       /* XXX running this in class_init is apparently too soon, so run it here */
       TclWord = Parrot_PMC_typenum(INTERP, "TclWord");
@@ -177,7 +177,7 @@ space_loop:
     goto space_loop;
   }
 
-space_loop_end:
+/* space_loop_end: */
   /*
    * At this point, we know start_word is correct.
    * Now to figure out where the word ends.
@@ -591,7 +591,7 @@ backslash_escape:
         Parrot_call_method(INTERP, P1, word, ConcatChar, "vI", I0);
   }
 
-escape_done:
+/* escape_done: */
   /* skip the escaped char(s) */
   start_word = start_word + escape_length;
   goto middle_word;
