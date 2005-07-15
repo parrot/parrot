@@ -1,11 +1,11 @@
-From autrijus's talk:
-
-PIR Tree - can we use this instead of the current string-based compilation.
-
 =head1 Various
 
 =over 4
 
+=item PIR Tree
+
+From autrijus's talk.
+can we use this instead of the current string-based compilation.
 =item Makefile deps
 
 Should be more explicit about the PMC dependencies in the makefile. *something*
