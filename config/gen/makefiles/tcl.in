@@ -1,11 +1,11 @@
 RM_F    = ${rm_f}
 PERL    = ${perl}
 PARROT  = ..${slash}..${slash}parrot${exe}
-LIBPATH  = lib${slash}
+LIBPATH  = lib
 BUILD   = $(PERL) ${build_dir}${slash}build_tools${slash}build_dynclasses.pl
 DESTDIR = ${build_dir}${slash}runtime${slash}parrot${slash}dynext
 O       = ${o}
-CLASSDIR = classes${slash}
+CLASSDIR = classes
 LOAD_EXT = ${load_ext}
 
 PMCS = \
@@ -84,10 +84,10 @@ lib${slash}tcllib.imc: $(DEPS)
 	$(PERL) tcl.pl > lib${slash}tcllib.imc
 
 lib${slash}tcllib.pbc: lib${slash}tcllib.imc
-	$(PARROT) --output=$(LIBPATH)tcllib.pbc $(LIBPATH)tcllib.imc
+	$(PARROT) --output=$(LIBPATH)${slash}tcllib.pbc $(LIBPATH)${slash}tcllib.imc
 
 lib${slash}tclword.pbc: lib${slash}tclword.imc
-	$(PARROT) --output=$(LIBPATH)tclword.pbc $(LIBPATH)tclword.imc
+	$(PARROT) --output=$(LIBPATH)${slash}tclword.pbc $(LIBPATH)${slash}tclword.imc
 
 tclsh: tcl.pbc
 	$(PARROT) --gc-debug tcl.pbc
@@ -105,7 +105,7 @@ devtest:
 	cd t && $(PERL) -e 'use Test::Harness qw($$verbose runtests) ; $$Test::Harness::verbose=1;runtests(glob("*.t"))' && cd ..
 
 clean:
-	$(RM_F) lib${slash}tcllib.imc tcl.pbc lib${slash}*.pbc $(CLASSDIR)pmc_*.h $(CLASSDIR)*_group.h $(CLASSDIR)*$(LOAD_EXT) $(CLASSDIR)*.dump $(CLASSDIR)*.c $(CLASSDIR)*$(O)
+	$(RM_F) lib${slash}tcllib.imc tcl.pbc lib${slash}*.pbc $(CLASSDIR)${slash}pmc_*.h $(CLASSDIR)${slash}*_group.h $(CLASSDIR)${slash}*$(LOAD_EXT) $(CLASSDIR)${slash}*.dump $(CLASSDIR)${slash}*.c $(CLASSDIR)${slash}*$(O)
 
 distclean: clean
 	$(RM_F) Makefile
