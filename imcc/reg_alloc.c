@@ -32,6 +32,7 @@
 # define MAX_COLOR 6
 #endif
 
+void graph_coloring_reg_alloc(Interp *interpreter, IMC_Unit * unit);
 static void make_stat(IMC_Unit *, int *sets, int *cols);
 static void imc_stat_init(IMC_Unit *);
 static void print_stat(Parrot_Interp, IMC_Unit *);
@@ -104,7 +105,6 @@ static unsigned int* ig_allocate(int N)
 void
 imc_reg_alloc(Interp *interpreter, IMC_Unit * unit)
 {
-    int to_spill;
     int todo, first;
     int loop_counter;
     char *function;
@@ -180,6 +180,44 @@ imc_reg_alloc(Interp *interpreter, IMC_Unit * unit)
                 pre_optimize(interpreter, unit);
         }
     }
+
+    graph_coloring_reg_alloc(interpreter, unit);
+
+    if (IMCC_INFO(interpreter)->optimizer_level & OPT_SUB)
+        sub_optimize(interpreter, unit);
+    if (IMCC_INFO(interpreter)->debug & DEBUG_IMC)
+        dump_instructions(interpreter, unit);
+    if (IMCC_INFO(interpreter)->verbose  ||
+            (IMCC_INFO(interpreter)->debug & DEBUG_IMC))
+        print_stat(interpreter, unit);
+    imcstack_free(nodeStack);
+}
+
+void
+free_reglist(IMC_Unit * unit)
+{
+#if IMC_TRACE
+    fprintf(stderr, "reg_alloc.c: free_reglist\n");
+#endif
+    if (unit->interference_graph) {
+        free(unit->interference_graph);
+        unit->interference_graph =  0;
+    }
+    if (unit->reglist) {
+        int i;
+        for (i = 0; i < unit->n_symbols; i++)
+            free_life_info(unit, unit->reglist[i]);
+        free(unit->reglist);
+        unit->reglist = NULL;
+        unit->n_symbols = 0;
+    }
+}
+
+void
+graph_coloring_reg_alloc(Interp *interpreter, IMC_Unit * unit)
+{
+    int to_spill, todo, loop_counter;
+
     todo = 1;
     loop_counter = 0;
 #if !DOIT_AGAIN_SAM
@@ -220,34 +258,6 @@ imc_reg_alloc(Interp *interpreter, IMC_Unit * unit)
             /* the process is finished */
             todo = 0;
         }
-    }
-    if (IMCC_INFO(interpreter)->optimizer_level & OPT_SUB)
-        sub_optimize(interpreter, unit);
-    if (IMCC_INFO(interpreter)->debug & DEBUG_IMC)
-        dump_instructions(interpreter, unit);
-    if (IMCC_INFO(interpreter)->verbose  ||
-            (IMCC_INFO(interpreter)->debug & DEBUG_IMC))
-        print_stat(interpreter, unit);
-    imcstack_free(nodeStack);
-}
-
-void
-free_reglist(IMC_Unit * unit)
-{
-#if IMC_TRACE
-    fprintf(stderr, "reg_alloc.c: free_reglist\n");
-#endif
-    if (unit->interference_graph) {
-        free(unit->interference_graph);
-        unit->interference_graph =  0;
-    }
-    if (unit->reglist) {
-        int i;
-        for (i = 0; i < unit->n_symbols; i++)
-            free_life_info(unit, unit->reglist[i]);
-        free(unit->reglist);
-        unit->reglist = NULL;
-        unit->n_symbols = 0;
     }
 }
 
