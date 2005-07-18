@@ -307,11 +307,11 @@ dump_dominators(IMC_Unit * unit)
     fprintf(stderr, "\nDumping the Dominators Tree:"
             "\n-------------------------------\n");
     for (i=0; i < unit->n_basic_blocks; i++) {
-	fprintf (stderr, "%d <- ", i);
+	fprintf (stderr, "%2d <- (%2d)", i, unit->idoms[i]);
 
 	for(j=0; j < unit->n_basic_blocks; j++) {
             if (set_contains(unit->dominators[i], j)) {
-		fprintf(stderr, " %d", j);
+		fprintf(stderr, " %2d", j);
 	    }
 	}
 

@@ -772,7 +772,7 @@ propagate_need(Basic_block *bb, SymReg* r, int i)
 void
 compute_dominators (Parrot_Interp interpreter, IMC_Unit * unit)
 {
-#define USE_BFS 1
+#define USE_BFS 0
 
 #if !USE_BFS
     int i, change, pred_index;
@@ -781,14 +781,14 @@ compute_dominators (Parrot_Interp interpreter, IMC_Unit * unit)
     int *q;
     Set *visited;
 #endif
-    int n;
+    int n, b, runner, wrong;
     Edge *edge;
     Set** dominators;
 
     n = unit->n_basic_blocks;
     IMCC_info(interpreter, 2, "compute_dominators\n");
     dominators = unit->dominators = malloc(sizeof(Set*) * n);
-
+    unit->idoms = malloc(sizeof(int) * n);
 
     dominators[0] = set_make(n);
     set_add(dominators[0], 0);
@@ -844,6 +844,29 @@ compute_dominators (Parrot_Interp interpreter, IMC_Unit * unit)
         }
     }
 #endif
+    /* calc idoms */
+    unit->idoms[0] = unit->bb_list[0]->index;
+    for (b = 1; b < n; b++) {
+        unit->idoms[b] = 0;
+        for (i = n - 1; i > 0; i--) {
+            if (i != b && set_contains(dominators[b], i)) {
+                wrong = 0;
+                for (runner = 0; runner < n; runner++) {
+                    if (runner != b && runner != i && set_contains(dominators[b], runner)) {
+                        if (set_contains(dominators[runner], i)) {
+                            wrong = 1;
+                            break;
+                        } 
+                    }
+                }
+                if (!wrong) { 
+                    unit->idoms[b] = unit->bb_list[i]->index;
+                    break;
+                }
+            }       
+       }
+   }
+
     if (IMCC_INFO(interpreter)->debug & DEBUG_CFG)
         dump_dominators(unit);
 #if USE_BFS
@@ -864,6 +887,7 @@ free_dominators(IMC_Unit * unit)
     }
     free(unit->dominators);
     unit->dominators = 0;
+    free(unit->idoms);
 }
 
 

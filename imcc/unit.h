@@ -26,6 +26,7 @@ typedef struct _IMC_Unit {
     int n_basic_blocks;
     Basic_block **bb_list;
     Set** dominators;
+    int* idoms;
     int n_loops;
     Loop_info ** loop_info;
     Edge * edge_list;
