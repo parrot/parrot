@@ -128,9 +128,14 @@ D: An example on how the builtin compilers can be used
 N: Perl6
 A: Sean O'Rourke
 D: Perl6 compiler written in Perl5
-S: Largely functional, but changing rapidly
+S: Largely functional, but stalled
 M: Yes
 V: 0.0.11
+
+N: Pint
+A: Alan Knowles
+D: An experimental implementation of PHP
+W: http://devel.akbkhome.com/svn/index.php/PintCompiler/
 
 N: Python
 A: Michal J Wallace
