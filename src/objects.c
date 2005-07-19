@@ -290,7 +290,7 @@ Parrot_single_subclass(Interp* interpreter, PMC *base_class,
     ATTRIB_COUNT(child_class) = parent_is_class ? ATTRIB_COUNT(base_class) : 0;
 
     /* Our parent class array has a single member in it */
-    parents = pmc_new(interpreter, enum_class_Array);
+    parents = pmc_new(interpreter, enum_class_ResizablePMCArray);
     VTABLE_set_integer_native(interpreter, parents, 1);
     VTABLE_set_pmc_keyed_int(interpreter, parents, 0, base_class);
     set_attrib_num(child_class, child_class_array, PCD_PARENTS, parents);
@@ -365,7 +365,7 @@ Parrot_new_class(Interp* interpreter, PMC *class, STRING *class_name)
 
     /* Our parent class array has nothing in it */
     set_attrib_num(class, class_array, PCD_PARENTS,
-                   pmc_new(interpreter, enum_class_Array));
+                   pmc_new(interpreter, enum_class_ResizablePMCArray));
     /* TODO create all class structures in constant PMC pool
      */
 
@@ -700,8 +700,8 @@ instantiate_object(Interp* interpreter, PMC *object, PMC *init)
 /*
 
 =item C<PMC *
-Parrot_add_parent(Interp* interpreter, PMC *new_base_class,
-           PMC *existing_class)>
+Parrot_add_parent(Interp* interpreter, PMC *class,
+           PMC *parent)>
 
 Add the parent class to the current class' parent list. This also
 involved adding all the parent's parents, as well as all attributes of
@@ -711,113 +711,98 @@ the parent classes that we're adding in.
 
 */
 
-PMC *
-Parrot_add_parent(Interp* interpreter, PMC *current_class_obj,
-           PMC *add_on_class_obj)
+static PMC*
+not_empty(Interp* interpreter, PMC *seqs)
 {
-    SLOTTYPE *current_class;
-    SLOTTYPE *add_on_class;
-    PMC *current_class_array;
-    PMC *current_parent_array;
-    PMC *add_on_class_array;
-    INTVAL current_count, add_on_count, current_offset, add_on_offset;
-    INTVAL current_size;
-
-    if (!PObj_is_class_TEST(current_class_obj))
-        internal_exception(1, "Class isn't a ParrotClass");
-    if (!PObj_is_class_TEST(add_on_class_obj))
-        internal_exception(1, "Parent isn't a ParrotClass");
-
-    /* Grab the useful stuff from the guts of the class PMC */
-    current_class = PMC_data(current_class_obj);
-
-    /* Start with the current list */
-    current_parent_array = get_attrib_num(current_class,
-            PCD_PARENTS);
-    current_size = VTABLE_elements(interpreter, current_parent_array);
-    /*
-     * first check, if the add_on class isn't already in our immediate
-     * parents list
-     */
-    for (current_offset = 0;
-            current_offset < current_size;
-            current_offset++) {
-        if (add_on_class_obj == VTABLE_get_pmc_keyed_int(interpreter,
-                    current_parent_array,
-                    current_offset)) {
-            /*
-             * XXX emit warning? error?
-             */
-            return NULL;
-        }
+    PMC *nseqs, *list;
+    INTVAL i;
+    nseqs = pmc_new(interpreter, enum_class_ResizablePMCArray);
+    for (i = 0; i < VTABLE_elements(interpreter, seqs); ++i) {
+        list = VTABLE_get_pmc_keyed_int(interpreter, seqs, i);
+        if (VTABLE_elements(interpreter, list))
+            VTABLE_push_pmc(interpreter, nseqs, list);
     }
+    return nseqs;
+}
 
-    /* Tack on the new parent class to the end of the immediate parent
-       list */
-    VTABLE_set_integer_native(interpreter, current_parent_array,
-            current_size + 1);
-    VTABLE_set_pmc_keyed_int(interpreter, current_parent_array, current_size,
-            add_on_class_obj);
+static PMC*
+class_mro_merge(Interp* interpreter, PMC *seqs)
+{
+    PMC *res, *seq, *cand, *nseqs, *s;
+    INTVAL i, j, k;
 
-    /*
-     * now check all parents
-     */
-    current_class_array = current_class_obj->vtable->mro;
-    /* Loop through them. We can assume that we can just tack on any
-       new classes to the end of the current class array. Attributes
-       are a bit more interesting, unfortunately */
-    current_count = VTABLE_elements(interpreter, current_class_array);
-
-    add_on_class = PMC_data(add_on_class_obj);
-    add_on_class_array = add_on_class_obj->vtable->mro;
-    add_on_count = VTABLE_elements(interpreter, add_on_class_array);
-
-    /* put all the parents mro on the list
-     * if they're not there already
-     *
-     */
-    for (add_on_offset = 0; add_on_offset < add_on_count;
-            add_on_offset++) {
-        INTVAL found = 0;
-        PMC *potential = VTABLE_get_pmc_keyed_int(interpreter,
-                add_on_class_array,
-                add_on_offset);
-        for (current_offset = 0;
-                current_offset < current_count;
-                current_offset++) {
-            if (potential == VTABLE_get_pmc_keyed_int(interpreter,
-                        current_class_array,
-                        current_offset)) {
-                found = 1;
+    res = pmc_new(interpreter, enum_class_ResizablePMCArray);
+    while (1) {
+        nseqs = not_empty(interpreter, seqs);
+        if (!VTABLE_elements(interpreter, nseqs))
+            return res;
+        for (i = 0; i < VTABLE_elements(interpreter, nseqs); ++i) {
+            seq = VTABLE_get_pmc_keyed_int(interpreter, nseqs, i);
+            cand = VTABLE_get_pmc_keyed_int(interpreter, seq, 0);
+            for (j = 0; j < VTABLE_elements(interpreter, nseqs); ++j) {
+                s = VTABLE_get_pmc_keyed_int(interpreter, nseqs, j);
+                for (k = 1; k < VTABLE_elements(interpreter, s); ++k)
+                    if (VTABLE_get_pmc_keyed_int(interpreter, s, k) == cand) {
+                        cand = NULL;
+                        break;
+                    }
+            }
+            if (cand)
                 break;
+        }
+        if (!cand)
+            real_exception(interpreter, NULL, E_TypeError,
+                    "inconsisten class hierarchy");
+        VTABLE_push_pmc(interpreter, res, cand);
+        for (i = 0; i < VTABLE_elements(interpreter, nseqs); ++i) {
+            seq = VTABLE_get_pmc_keyed_int(interpreter, nseqs, i);
+            if (VTABLE_get_pmc_keyed_int(interpreter, seq, 0) == cand) {
+                VTABLE_shift_pmc(interpreter, seq);
             }
         }
-        if (found) {
-            /*
-             * diamond problem - the deepest parent of a duplicate
-             * has to remain. We remove the already present
-             * class at current_offset
-             *
-             * TODO use splice - fow now grab array internals
-             */
-#if 1
-            PMC **data = PMC_data(current_class_array);
-            INTVAL i;
-            assert(current_class_array->vtable->base_type ==
-                    enum_class_ResizablePMCArray);
-            for (i = current_offset; i < current_count - 1; ++i)
-                data[i] = data[i + 1];
-            PMC_int_val(current_class_array)--;
-            current_count--;
-#else
-            /* splice array */
-#endif
-
-        }
-        current_count++;
-        VTABLE_push_pmc(interpreter, current_class_array, potential);
     }
-    rebuild_attrib_stuff(interpreter, current_class_obj);
+    return res;
+}
+
+static PMC*
+create_class_mro(Interp* interpreter, PMC *class)
+{
+    PMC *lall, *lc, *lmap, *lparents, *bases, *base;
+    INTVAL i;
+
+    lall = pmc_new(interpreter, enum_class_ResizablePMCArray);
+
+    lc = pmc_new(interpreter, enum_class_ResizablePMCArray);
+    VTABLE_push_pmc(interpreter, lc, class);
+    VTABLE_push_pmc(interpreter, lall, lc);
+
+    bases = get_attrib_num(PMC_data(class), PCD_PARENTS);
+    for (i = 0; i < VTABLE_elements(interpreter, bases); ++i) {
+        base = VTABLE_get_pmc_keyed_int(interpreter, bases, i);
+        lmap = create_class_mro(interpreter, base);
+        VTABLE_push_pmc(interpreter, lall, lmap);
+    }
+    lparents = VTABLE_clone(interpreter, bases);
+    VTABLE_push_pmc(interpreter, lall, lparents);
+    return class_mro_merge(interpreter, lall);
+}
+
+PMC *
+Parrot_add_parent(Interp* interpreter, PMC *class, PMC *parent)
+{
+    PMC *current_parent_array;
+
+    if (!PObj_is_class_TEST(class))
+        internal_exception(1, "Class isn't a ParrotClass");
+    if (!PObj_is_class_TEST(parent))
+        internal_exception(1, "Parent isn't a ParrotClass");
+
+    current_parent_array = get_attrib_num(PMC_data(class), PCD_PARENTS);
+    VTABLE_push_pmc(interpreter, current_parent_array, parent);
+
+    class->vtable->mro = create_class_mro(interpreter, class);
+
+    rebuild_attrib_stuff(interpreter, class);
     return NULL;
 }
 
