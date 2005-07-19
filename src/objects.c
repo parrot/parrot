@@ -707,10 +707,15 @@ Add the parent class to the current class' parent list. This also
 involved adding all the parent's parents, as well as all attributes of
 the parent classes that we're adding in.
 
+The MRO (method resolution order) is the C3 algorithm used by Perl6
+and Python (>= 2.3). See also L<http://use.perl.org/~autrijus/journal/25768>.
+
 =cut
 
 */
 
+
+/* create a list if non-empty lists */
 static PMC*
 not_empty(Interp* interpreter, PMC *seqs)
 {
@@ -725,6 +730,7 @@ not_empty(Interp* interpreter, PMC *seqs)
     return nseqs;
 }
 
+/* merge the list if lists */
 static PMC*
 class_mro_merge(Interp* interpreter, PMC *seqs)
 {
@@ -739,6 +745,7 @@ class_mro_merge(Interp* interpreter, PMC *seqs)
         for (i = 0; i < VTABLE_elements(interpreter, nseqs); ++i) {
             seq = VTABLE_get_pmc_keyed_int(interpreter, nseqs, i);
             cand = VTABLE_get_pmc_keyed_int(interpreter, seq, 0);
+            /* check if candidate is valid */
             for (j = 0; j < VTABLE_elements(interpreter, nseqs); ++j) {
                 s = VTABLE_get_pmc_keyed_int(interpreter, nseqs, j);
                 for (k = 1; k < VTABLE_elements(interpreter, s); ++k)
@@ -753,7 +760,9 @@ class_mro_merge(Interp* interpreter, PMC *seqs)
         if (!cand)
             real_exception(interpreter, NULL, E_TypeError,
                     "inconsisten class hierarchy");
+        /* push candidate onto mro result */
         VTABLE_push_pmc(interpreter, res, cand);
+        /* remove candidate from head of lists */
         for (i = 0; i < VTABLE_elements(interpreter, nseqs); ++i) {
             seq = VTABLE_get_pmc_keyed_int(interpreter, nseqs, i);
             if (VTABLE_get_pmc_keyed_int(interpreter, seq, 0) == cand) {
@@ -764,12 +773,16 @@ class_mro_merge(Interp* interpreter, PMC *seqs)
     return res;
 }
 
+/* create C3 MRO */
 static PMC*
 create_class_mro(Interp* interpreter, PMC *class)
 {
     PMC *lall, *lc, *lmap, *lparents, *bases, *base;
     INTVAL i;
 
+    /* list of lists
+     * [ [class] [mro of bases] [bases] ]
+     */
     lall = pmc_new(interpreter, enum_class_ResizablePMCArray);
 
     lc = pmc_new(interpreter, enum_class_ResizablePMCArray);
