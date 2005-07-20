@@ -59,14 +59,12 @@ got_command:
 
 loop:
   if arg_num == num_args goto loop_done
-  $I0 = arg_num - 1
   current_word = command[arg_num]
   (return_type,retval) = current_word.__get_pmc()
   if return_type != TCL_OK goto done
 
   push folded_args, retval
   inc arg_num
-  if arg_num == num_args goto loop_done
   goto loop
 
 loop_done: 
