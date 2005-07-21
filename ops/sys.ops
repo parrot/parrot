@@ -30,6 +30,9 @@ Spawn a subprocess whose program name and arguments are contained in the array
 $2 and wait for it to finish. The return status, which is very
 system-dependent, goes in $1.
 
+TODO: spawnw should return something less system-dependent, and more
+object-like. see RT ticket [perl #36619] for more info.
+
 =cut
 
 inline op spawnw(out INT, in STR) {

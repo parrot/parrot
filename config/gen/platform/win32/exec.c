@@ -42,22 +42,72 @@ Parrot_Run_OS_Command(Parrot_Interp interpreter, STRING *command) {
     if( free_it ) free( shell );
     mem_sys_free( cmd );
 
-	/* 
-		Shifting the returned status left 8 bits compensates for the shr 8 in spawnw.t
-		I'm not sure what if anything should be put into the 8 lsbs for compatibility?
-		Nor really if throwing away the upper 8 bits of the status makes sense? 
-		But it fixes the failing tests.
-	*/
+    /* Return exit code left shifted by 8 for POSIX emulation. */
     return status << 8;
 }
 
 INTVAL
 Parrot_Run_OS_Command_Argv(Parrot_Interp interpreter, PMC *cmdargs)
 {
-    Parrot_warn(NULL, PARROT_WARNINGS_PLATFORM_FLAG,
-	    "Parrot_Run_OS_Command_Argv not implemented");
-    return 0;
+    DWORD status = 0;
+    STARTUPINFO si;
+    PROCESS_INFORMATION pi;
+    unsigned int pmclen;
+    int cmdlinelen = 1000;
+    int cmdlinepos = 0;
+    char *cmdline = mem_sys_allocate(cmdlinelen);
+    int i;
+    
+    /* Ensure there's something in the PMC array. */
+    pmclen = VTABLE_elements(interpreter, cmdargs);
+    if (pmclen == 0) {
+        internal_exception(NOSPAWN, "Empty argument array for spawnw");
+    }
+    
+    /* Now build command line. */
+    for (i = 0; i < pmclen; i++) {
+    	   STRING *s = VTABLE_get_string_keyed_int(interpreter, cmdargs, i);
+           char *cs = string_to_cstring(interpreter, s);
+    	   if (cmdlinepos + s->strlen + 3 > cmdlinelen)
+           {
+    	       cmdlinelen += s->strlen + 4;
+               mem_sys_realloc(cmdline, cmdlinelen);
+        }
+        strcpy(cmdline + cmdlinepos, "\"");
+        strcpy(cmdline + cmdlinepos + 1, cs);
+        strcpy(cmdline + cmdlinepos + 1 + s->strlen, "\" ");
+        cmdlinepos += s->strlen + 3;
+    }
+    
+    /* Start the child process. */
+    memset(&si, 0, sizeof(si));
+    si.cb = sizeof(si);
+    memset(&pi, 0, sizeof(pi));
+    if(
+        !CreateProcess(NULL, cmdline,
+        NULL, NULL, TRUE, 0, NULL, NULL, &si, &pi)
+    )
+    {
+        internal_exception(NOSPAWN, "Can't spawn child process");
+    }
+    WaitForSingleObject( pi.hProcess, INFINITE );
+    
+    /* Get exit code. */
+    if (!GetExitCodeProcess(pi.hProcess, &status)) {
+        /* XXX njs Should call GetLastError for failure message? */
+        Parrot_warn( interpreter, PARROT_WARNINGS_PLATFORM_FLAG,
+            "Process completed: Failed to get exit code.");
+    }
+    	
+    /* Clean up. */
+    CloseHandle(pi.hProcess);
+    CloseHandle(pi.hThread);
+    mem_sys_free(cmdline);
+
+    /* Return exit code left shifted by 8 for POSIX emulation. */
+    return status << 8;
 }
+
 void
 Parrot_Exec_OS_Command(Parrot_Interp interpreter, STRING *command)
 {
