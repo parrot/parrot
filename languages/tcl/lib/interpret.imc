@@ -45,11 +45,11 @@ end_scope:
 
   .local string caller_sub_text
 
-  null my_cmd
-  push_eh catch
+  push_eh no_command
     my_cmd = find_global "Tcl", proc
-resume:
-  clear_eh 
+  clear_eh
+  # we can't delete commands, so we store deleted commands
+  # as null PMCs
   isnull my_cmd, no_command
 
 got_command:
@@ -93,8 +93,4 @@ no_command_non_interactive:
 
 done:
   .return(return_type,retval)
-
-catch:
-  goto resume
-
 .end
