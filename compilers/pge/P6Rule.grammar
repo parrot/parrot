@@ -1,0 +1,115 @@
+=pod
+
+PGE::P6Rule Grammar
+
+=head1 DESCRIPTION
+
+This file contains a "reference grammar" that closely describes the syntax
+for perl 6 rules.  It closely models the parser used by PGE's
+"p6rule" compiler function, which is presently a recursive descent
+parser.  Eventually the parser is likely to be replaced by a table-based
+(shift/reduce) parser, so that some of the rules below will disappear.
+
+Still, this grammar may be useful for testing and for understanding
+the syntax of Perl 6 grammars.  Patches, discussion, and comments
+welcome on the perl6-compiler mailing list.
+
+=cut
+
+grammar PGE::P6Rule;
+
+rule pattern { <flag>* <alternation> }
+
+# XXX: PGE understands :flag, but it doesn't yet
+# understand :flag() or :flag[]
+rule flag { \:<ident> [ \( <code> \) | \[ <code> \] ]? }
+
+rule alternation { <conjunction> [ \| <alternation> ]? }
+rule conjunction { <concatenation> [ \& <conjunction> ]? }
+rule concatenation { <quantified_term>* }
+rule quantified_term { <term> <comment> <quantifier> <comment> <singlecut> }
+
+# rule quantifier { \*\* \{ <code> \} | <[?*+]> \?? }
+rule quantifier { \*\* \{ \d+ [ \.\. [\d+ | \.]]? \} | <[?*+]> \?? }
+
+# XXX: PGE doesn't understand <!':'> yet
+rule singlecut { \: <!':'> }
+
+# Internally PGE currently handles terms using a p6meta token hash, 
+# i.e., it does the equivalent of
+#       rule term { %p6meta }
+# and then the entries in %p6meta take care of routing us to the 
+# correct rule.  However, for descriptive and test-parsing
+# purposes we'll go ahead and write it out here.
+rule term { 
+      <whitemeta>
+    | <subpattern>
+    | <subrule>
+    | <charclass>
+    | <string_assertion>
+    | <indirect_rule>
+    | <symbolic_indirect_rule>
+    | <closure_rule>
+    | <match_alias>
+    | <interpolate_alias>
+    | <closure>
+    | <simple_assertions>
+    | <rxmodinternal>
+    | <dot>
+    | \:\:?\:?
+    | <literal>
+}
+
+rule whitemeta { \s+ | [ \# \N* \n \s* ]+  }
+
+rule subpattern { \( <pattern> \) | \[ <pattern> \] }
+
+rule subrule { \< <[!?]>? <name> [\s <pattern> ]? \> }
+
+rule enumerated_class { \<-\[ .*? <-[\\]> \]\> }
+rule charclass { \<[<[+\-]> [ <name> | \[ [ \\. | <-[]]> ]+ \] ]+ \> }
+
+rule string_assertion { \<' .*? <-[\\]>'\> | <" .*? <-[\\]>"\> }
+
+rule indirect_rule { \< <[$@%]> <name> \> }
+
+rule symbolic_indirect_rule { \<\:\:\( \$<name> \)\> }
+
+rule closure_rule { \<\{ <code> \}\> }
+
+rule match_alias { <[$@%]> [ \< <ident> \> | \d+ ] [ \s* \:= <term> ]? }
+
+rule interpolate_alias { <[$@%]> <name> [ \s* \:= <term> ]? }
+
+rule closure { \{ <code> \} }
+
+rule assertions { \^\^? | \$\$? }
+
+# XXX: This rule will eventually be managed by the %p6meta hash
+# in conjunction with the rxmodinternal: syntax category.
+# In the meantime, we'll explicitly list the backslash-metas
+# that PGE knows about or will know about soon.
+rule rxmodinternal { \\ <[bBdDeEfFhHnNrRsStTvVwW]> }
+
+# XXX: PGE doesn't know how to handle \s in enumerated character
+# classes yet, so we'll explicitly list a space below.
+rule metachar { <[ \\<>{}[]()@#$%^&|]> }
+
+rule literal { 
+   [ <-[ \\%*+?:|.^$@[]()<>{}]>         # actually, should be <-metachar>
+   | <hexadecimal_character>
+   | <named_character>
+   | \\<metachar> 
+   ]+ }
+
+rule hexadecimal_character { \\ <[xX]> <xdigit>+ }
+
+rule named_character { \\[cC] \[ <-[]]>+ \] }
+
+=head1 AUTHOR
+
+Patrick Michaud (pmichaud@pobox.com) is the author and maintainer.
+Patches and suggestions are welcome on the Perl 6 compiler list
+(perl6-compiler@perl.org).
+
+=cut
