@@ -27,7 +27,7 @@ rule flag { \:<ident> [ \( <code> \) | \[ <code> \] ]? }
 rule alternation { <conjunction> [ \| <alternation> ]? }
 rule conjunction { <concatenation> [ \& <conjunction> ]? }
 rule concatenation { <quantified_term>* }
-rule quantified_term { <term> <comment> <quantifier> <comment> <singlecut> }
+rule quantified_term { <term> \s* <quantifier> \s* <singlecut> }
 
 # rule quantifier { \*\* \{ <code> \} | <[?*+]> \?? }
 rule quantifier { \*\* \{ \d+ [ \.\. [\d+ | \.]]? \} | <[?*+]> \?? }
