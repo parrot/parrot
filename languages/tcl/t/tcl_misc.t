@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 11;
+use Parrot::Test tests => 12;
 use vars qw($TODO);
 
 my($tcl,$expected);
@@ -80,6 +80,13 @@ language_output_is("tcl",<<'TCL',<<'OUT',"bad argument error");
 puts 4 # comment
 TCL
 bad argument "comment": should be "nonewline"
+OUT
+
+language_output_is("tcl",<<'TCL',<<'OUT',"variables and procs with same name");
+set a 2
+a
+TCL
+invalid command name "a"
 OUT
 
 }
