@@ -140,10 +140,6 @@ to get any that require int-only args, as we can now /generate/ floats,
 even if we cannot specify them. This is all supportable by MMD - we just
 need to specify the correct errors to throw.
 
-=item misc
-
-complete [error]
-
 =back
 
 =cut
