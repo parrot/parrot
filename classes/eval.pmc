@@ -134,12 +134,80 @@ for writing to disc and later loading via C<load_bytecode>.
         if (seg->fixups)
             PackFile_add_segment(INTERP, &pf->directory,
                     (struct PackFile_Segment *)seg->fixups);
+        if (seg->pic_index)
+            PackFile_add_segment(INTERP, &pf->directory,
+                    (struct PackFile_Segment *)seg->pic_index);
         size = PackFile_pack_size(INTERP, pf) * sizeof(opcode_t);
         res = string_make_empty(INTERP, enum_stringrep_one, size);
         res->strlen = res->bufused = size;
         PackFile_pack(INTERP, pf, res->strstart);
-        /* XXX leak the pf */
+        /* now remove all segments from directory again and destroy
+         * the packfile
+         */
+        pf->directory.num_segments = 0;
+        PackFile_destroy(INTERP, pf);
         return res;
+    }
+
+/*
+
+=item C<void freeze(visit_info *info)>
+
+Archives the evaled code
+
+=item C<void thaw(visit_info *info)>
+
+Unarchives the code.
+
+=item C<void thawfinish(visit_info *info)>
+
+Final code fixup after thawing.
+
+=cut
+
+*/
+
+    void freeze(visit_info *info) {
+        IMAGE_IO *io = info->image_io;
+        STRING *packed = SELF.get_string();
+        io->vtable->push_string(INTERP, io, packed);
+        SUPER(info);
+    }
+
+    void thaw(visit_info *info) {
+        IMAGE_IO *io = info->image_io;
+        struct PackFile *pf;
+        STRING *packed;
+        size_t i;
+        struct PackFile_Segment *seg;
+        struct Parrot_sub * sub;
+
+        packed = io->vtable->shift_string(INTERP, io);
+        SUPER(info);
+        sub = PMC_sub(SELF);
+        pf = PackFile_new(INTERP, 0);
+        if (!PackFile_unpack(INTERP, pf, packed->strstart, packed->strlen))
+            real_exception(INTERP, NULL, E_IOError,
+                    "couldn't unpack packfile");
+        for (i = 0; i < pf->directory.num_segments; ++i) {
+            seg = pf->directory.segments[i];
+            if (seg->type == PF_BYTEC_SEG) {
+                PMC_sub(SELF)->seg = (struct PackFile_ByteCode *)seg;
+                break;
+            }
+        }
+        pf->directory.num_segments = 0;
+        PackFile_destroy(INTERP, pf);
+    }
+
+    void thawfinish(visit_info *info) {
+        struct Parrot_sub * sub = PMC_sub(SELF);
+        struct PackFile_ByteCode *seg = sub->seg;
+        /* XXX why - maybe somewhere interp->code is
+         * used instead of pf->cur_cs
+         */
+        sub->address = seg->base.data;
+        sub->end = sub->address + seg->base.size;
     }
 
 }

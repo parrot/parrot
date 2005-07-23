@@ -675,7 +675,6 @@ static image_funcs opcode_funcs = {
     shift_opcode_number
 };
 #endif
-static IMAGE_IO io_init;
 
 /*
 
@@ -694,7 +693,7 @@ ft_init(Parrot_Interp interpreter, visit_info *info)
     STRING *s = info->image;
     struct PackFile *pf;
 
-    info->image_io = &io_init;
+    info->image_io = mem_sys_allocate(sizeof(IMAGE_IO));
     info->image_io->image = s = info->image;
 #if FREEZE_ASCII
     info->image_io->vtable = &ascii_funcs;
@@ -1500,6 +1499,7 @@ run_thaw(Parrot_Interp interpreter, STRING* image, visit_enum_type what)
         Parrot_unblock_DOD(interpreter);
         Parrot_unblock_GC(interpreter);
     }
+    mem_sys_free(info.image_io);
     return info.thaw_result;
 }
 
@@ -1540,6 +1540,7 @@ Parrot_freeze_at_destruct(Parrot_Interp interpreter, PMC* pmc)
     visit_loop_next_for_GC(interpreter, pmc, &info);
 
     Parrot_unblock_DOD(interpreter);
+    mem_sys_free(info.image_io);
     return info.image;
 }
 
@@ -1576,6 +1577,7 @@ Parrot_freeze(Parrot_Interp interpreter, PMC* pmc)
 
     visit_loop_todo_list(interpreter, pmc, &info);
 
+    mem_sys_free(info.image_io);
     return info.image;
 #endif
 }

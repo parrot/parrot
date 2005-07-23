@@ -805,8 +805,6 @@ PackFile_remove_segment_by_name (Interp* interpreter,
                        (dir->num_segments - i) *
                        sizeof (struct PackFile_Segment *));
             }
-            dir->segments = mem_sys_realloc (dir->segments,
-                       sizeof (struct PackFile_Segment *) * dir->num_segments);
             return seg;
         }
     }
