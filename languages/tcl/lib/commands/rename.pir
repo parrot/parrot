@@ -3,7 +3,7 @@
 
 .namespace [ "Tcl" ]
 
-.sub "rename"
+.sub "&rename"
   .param pmc old_p
   .param pmc new_p
 
@@ -21,7 +21,9 @@
   .local pmc commands
  
   oldName = old_p
+  oldName = "&" . oldName
   newName = new_p
+  newName = "&" . newName
 
   .local pmc theSub
 

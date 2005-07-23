@@ -3,7 +3,7 @@
 
 .namespace [ "Tcl" ]
 
-.sub "while"
+.sub "&while"
   .param pmc cond_p
   .param pmc body_p
 

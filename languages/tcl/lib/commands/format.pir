@@ -6,7 +6,7 @@
 
 .namespace [ "Tcl" ]
 
-.sub "format"
+.sub "&format"
   .local pmc argv 
   argv = foldup
   

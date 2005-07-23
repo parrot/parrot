@@ -73,15 +73,6 @@ TCL
 ;
 OUT
 
-TODO: {
-$TODO = "bug(s)";
-
-language_output_is("tcl",<<'TCL',<<'OUT',"bad argument error");
-puts 4 # comment
-TCL
-bad argument "comment": should be "nonewline"
-OUT
-
 language_output_is("tcl",<<'TCL',<<'OUT',"variables and procs with same name");
 set a 2
 a
@@ -89,4 +80,12 @@ TCL
 invalid command name "a"
 OUT
 
+TODO: {
+local $TODO = "bug(s)";
+
+language_output_is("tcl",<<'TCL',<<'OUT',"bad argument error");
+puts 4 # comment
+TCL
+bad argument "comment": should be "nonewline"
+OUT
 }

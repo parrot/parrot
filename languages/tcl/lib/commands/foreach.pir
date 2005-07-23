@@ -1,6 +1,6 @@
 .namespace [ "Tcl" ]
 
-.sub "foreach"
+.sub "&foreach"
   # Requires multiple of 3 args.
 
   .local pmc argv

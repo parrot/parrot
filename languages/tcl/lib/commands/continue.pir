@@ -3,7 +3,7 @@
 
 .namespace [ "Tcl" ]
 
-.sub "continue"
+.sub "&continue"
 
   .local int return_type
 

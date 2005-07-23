@@ -7,7 +7,7 @@
 
 .namespace [ "Tcl" ]
 
-.sub "incr"
+.sub "&incr"
   .local pmc argv 
   argv = foldup
 

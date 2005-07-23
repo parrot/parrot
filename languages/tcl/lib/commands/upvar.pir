@@ -3,7 +3,7 @@
 
 .namespace [ "Tcl" ]
 
-.sub "upvar"
+.sub "&upvar"
   .local pmc argv 
   argv = foldup
 

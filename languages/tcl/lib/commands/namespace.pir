@@ -11,7 +11,7 @@ real top level namespace.
 
 .namespace [ "Tcl" ]
 
-.sub "namespace"
+.sub "&namespace"
    .local pmc argv 
   argv = foldup
 

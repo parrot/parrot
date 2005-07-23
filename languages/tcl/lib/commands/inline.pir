@@ -7,7 +7,7 @@
 
 .namespace [ "Tcl" ]
 
-.sub inline
+.sub "&inline"
   .param pmc language
   .param pmc code
 

@@ -3,7 +3,7 @@
 
 .namespace [ "Tcl" ]
 
-.sub "join"
+.sub "&join"
   .param pmc a_list
   .param pmc joiner_pmc
 

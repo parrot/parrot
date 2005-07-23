@@ -3,7 +3,7 @@
 
 .namespace [ "Tcl" ]
 
-.sub "llength"
+.sub "&llength"
   .param pmc listval
 
   if argcP != 1 goto bad_args

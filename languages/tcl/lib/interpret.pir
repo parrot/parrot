@@ -19,7 +19,7 @@ Given a pre-parsed chunk of Tcl, interpret it.
   command_num = -1
   num_commands = commands
   .local pmc command
-  .local string proc
+  .local string proc,sigil_proc
   .local pmc args,my_cmd,parsed_body,argument_list
 
 end_scope:
@@ -35,6 +35,7 @@ end_scope:
 
   if return_type != TCL_OK goto done
   proc = retval 
+  sigil_proc = "&" . proc
 
   .local int num_args,arg_num
   num_args = command
@@ -46,7 +47,7 @@ end_scope:
   .local string caller_sub_text
 
   push_eh no_command
-    my_cmd = find_global "Tcl", proc
+    my_cmd = find_global "Tcl", sigil_proc
   clear_eh
   # we can't delete commands, so we store deleted commands
   # as null PMCs

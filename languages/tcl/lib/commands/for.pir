@@ -3,7 +3,7 @@
 
 .namespace [ "Tcl" ]
 
-.sub "for"
+.sub "&for"
   .param pmc start_p
   .param pmc test_p
   .param pmc next_p

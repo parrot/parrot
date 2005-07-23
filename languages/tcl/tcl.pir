@@ -18,7 +18,7 @@
   # start with a new pad...
   new_pad 0
 
-  source = find_global "Tcl", "source"
+  source = find_global "Tcl", "&source"
 
   .local pmc tcl_interactive
   tcl_interactive = new TclInt

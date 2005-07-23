@@ -6,7 +6,7 @@
 
 .namespace [ "Tcl" ]
 
-.sub "eval"
+.sub "&eval"
   .local pmc argv
   argv = foldup  
  

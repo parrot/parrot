@@ -4,7 +4,7 @@
 
 .namespace [ "Tcl" ]
 
-.sub "linsert"
+.sub "&linsert"
   
   .local pmc argv
   argv = foldup
