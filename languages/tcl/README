@@ -23,8 +23,7 @@ in this directory.
 =head2 Examples
 
 To run an example, change to the C<examples>, and type C<make>
-for instructions. Running examples from here automatically handles
-cd'ing to the proper directory to run.
+for instructions.
 
 =head2 Test Suite
 
