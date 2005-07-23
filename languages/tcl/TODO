@@ -12,12 +12,6 @@ can we use this instead of the current string-based compilation.
 Should be more explicit about the PMC dependencies in the makefile. *something*
 is causing things to get rebuilt unecessarily each time "make tclsh" is run.
 
-=item Data::Dumper
-
-It would be nice to have a core-approved way to dump tcl pmcs... preferably
-by having someone re-write the core dumper to be smarter about "does hash",
-etc.
-
 =item keyed access
 
 tcl is not using Keys when getting from aggregates. It probably should,
