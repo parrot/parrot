@@ -1,6 +1,6 @@
 =head1 ParTcl
 
-A from scratch implementation of Tcl on Parrot.
+A from scratch implementation of Tcl on Parrot, called partcl.
 
 To build the tcl interpreter, first build parrot.  From the top level
 parrot directory:
