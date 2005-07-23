@@ -151,8 +151,6 @@ imc_reg_alloc(Interp *interpreter, IMC_Unit * unit)
         find_basic_blocks(interpreter, unit, first);
         build_cfg(interpreter, unit);
 
-        if (first && (IMCC_INFO(interpreter)->debug & DEBUG_CFG))
-            dump_cfg(unit);
         first = 0;
         todo = cfg_optimize(interpreter, unit);
     }
