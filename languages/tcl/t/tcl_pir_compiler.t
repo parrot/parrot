@@ -25,7 +25,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "test tcl compiler global variable interop")
      .local pmc tcl_compiler,compiled_sub
      $P1 = new String
      $P1 = "ok 1" 
-     store_global "Tcl", "a", $P1
+     store_global "Tcl", "$a", $P1
      tcl_compiler = compreg "TCL"
      compiled_sub = compile tcl_compiler, "puts $a"
      compiled_sub()

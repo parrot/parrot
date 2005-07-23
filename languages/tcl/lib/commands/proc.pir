@@ -76,7 +76,7 @@ arg_loop:
   $S1 = ii
   proc_body .= "$P1 = args["
   proc_body .= $S1
-  proc_body .= "]\nstore_lex -1,\""
+  proc_body .= "]\nstore_lex -1,\"$"
   # XXX This should be Escape'd
   $S1 = args_p[ii]
   proc_body .= $S1

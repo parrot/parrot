@@ -12,7 +12,7 @@
 
   .local int return_type
   .local pmc retval
-  .local string varname
+  .local string varname,sigil_varname
   .local string code
   .local pmc parser
   .local pmc interpret
@@ -47,11 +47,13 @@
   #return_type = TCL_OK
  
   varname = argv[1]
+  sigil_varname = "$" . varname
+
 if call_level goto save_lex
-  store_global "Tcl", varname, $P0
+  store_global "Tcl", sigil_varname, $P0
   goto done
 save_lex:
-  store_lex call_level, varname, $P0
+  store_lex call_level, sigil_varname, $P0
   goto done
 
 badargs:

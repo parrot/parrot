@@ -25,14 +25,17 @@
   
   .local int ii
   ii = 0
+  .local string varname
+  .local string sigil_varname
 
 loop:
   if ii == argc goto done
-  $S0 = argv[ii]
+  varname = argv[ii]
+  sigil_varname = "$" . varname
 
   push_eh catch
-    $P1 = find_global "Tcl", $S0
-    store_lex call_level, $S0, $P1
+    $P1 = find_global "Tcl", sigil_varname
+    store_lex call_level, sigil_varname, $P1
   clear_eh
 resume:
 

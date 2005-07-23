@@ -97,9 +97,10 @@ loop_inner:
   inc counter
   if counter >= end_counter goto loop_inner_done_good
 
-  .local string varname
+  .local string varname,sigil_varname
   .local pmc value
   varname = varnames[counter]
+  sigil_varname = "$" . varname
   $P0 = arglists[counter]
   $I1 = $P0
   $I2 = iterator
@@ -107,10 +108,10 @@ loop_inner:
   value = $P0[$I2]
 
   if call_level goto store_lex
-    store_global "Tcl", varname, value
+    store_global "Tcl", sigil_varname, value
     goto store_done
 store_lex:
-    store_lex -1, varname, value
+    store_lex -1, sigil_varname, value
 store_done:
 
   got_one = 1
@@ -119,10 +120,10 @@ empty_var:
   $P0 = new TclString
   $P0 = ""
   if call_level goto store_lex2
-    store_global "Tcl", varname, $P0
+    store_global "Tcl", sigil_varname, $P0
     goto loop_inner
 store_lex2:
-    store_lex -1, varname, $P0
+    store_lex -1, sigil_varname, $P0
   goto loop_inner
 loop_inner_done_good:
   got_one = 1

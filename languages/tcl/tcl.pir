@@ -22,7 +22,7 @@
 
   .local pmc tcl_interactive
   tcl_interactive = new TclInt
-  store_global "Tcl", "tcl_interactive", tcl_interactive
+  store_global "Tcl", "$tcl_interactive", tcl_interactive
 
   argc = argv
   if argc > 1 goto open_file

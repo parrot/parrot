@@ -184,7 +184,9 @@ Gets the actual variable from memory and returns it.
   .local int call_level
   $P1 = find_global "_Tcl", "call_level"
   call_level = $P1
-  
+
+  name = "$" . name
+ 
   push_eh done
   if call_level == 0 goto global_var
 lexical_var:
@@ -218,6 +220,8 @@ Sets the actual variable from memory.
   .local int call_level
   $P1 = find_global "_Tcl", "call_level"
   call_level = $P1
+
+  name = "$" . name
 
   if call_level == 0 goto global_var
 lexical_var:

@@ -12,8 +12,9 @@
   .local int argc
   argc = argv
 
-  .local string varname
+  .local string varname,sigil_varname
   varname = argv[0]
+  sigil_varname = "$" . varname
 
   .local pmc retval
   .local int return_type
@@ -29,10 +30,10 @@
   # XXX Should use get_var?
   push_eh catch
     if call_level goto get_lexical
-    search_variable = find_global "Tcl", varname
+    search_variable = find_global "Tcl", sigil_varname
     goto resume
 get_lexical:
-    search_variable = find_lex call_level, varname
+    search_variable = find_lex call_level, sigil_varname
 resume:
   clear_eh
 
@@ -41,10 +42,10 @@ resume:
   null search_variable
 
   if call_level goto set_lexical
-  store_global "Tcl", varname, search_variable
+  store_global "Tcl", sigil_varname, search_variable
   goto set_done
 set_lexical:
-  store_lex call_level, varname, search_variable
+  store_lex call_level, sigil_varname, search_variable
 set_done:
 
   return_type=TCL_OK

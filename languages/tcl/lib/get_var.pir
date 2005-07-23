@@ -20,6 +20,9 @@ other than the default, and multiple interpreters.
 .sub __get_var @MULTI(STRING)
   .param string argv0
 
+  .local string sigil_argv0
+  sigil_argv0 = "$" . argv0
+
   .local int call_level, return_type
   $P1 = find_global "_Tcl", "call_level"
   call_level = $P1
@@ -31,10 +34,10 @@ other than the default, and multiple interpreters.
 get_scalar:
   push_eh catch
     if call_level == 0 goto get_scalar_global
-    variable = find_lex call_level, argv0
+    variable = find_lex call_level, sigil_argv0
     goto resume
 get_scalar_global:
-    variable = find_global "Tcl", argv0
+    variable = find_global "Tcl", sigil_argv0
 resume:
   clear_eh
 
@@ -76,6 +79,9 @@ catch:
   .param string argv0
   .param string argv1
 
+  .local string sigil_argv0
+  sigil_argv0 = "$" . argv0
+
   .local int call_level
   $P1 = find_global "_Tcl", "call_level"
   call_level = $P1
@@ -88,10 +94,10 @@ catch:
 get_indexed:
   push_eh catch
     if call_level == 0 goto get_indexed_global
-    variable = find_lex call_level, argv0
+    variable = find_lex call_level, sigil_argv0
     goto resume
 get_indexed_global:
-    variable = find_global "Tcl", argv0
+    variable = find_global "Tcl", sigil_argv0
 resume:
   clear_eh
 

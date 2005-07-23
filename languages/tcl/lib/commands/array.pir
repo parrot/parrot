@@ -15,11 +15,12 @@
   .local pmc retval
 
   if argc < 2 goto error
-  .local string array_name
+  .local string array_name,sigil_array_name
   .local pmc the_array
   .local int is_array
 
   array_name = argv[1]
+  sigil_array_name = "$" . array_name
 
   .local int call_level
   $P0 = find_global "_Tcl", "call_level"
@@ -27,10 +28,10 @@
 
   push_eh catch
     if call_level goto find_lexical
-    the_array = find_global "Tcl", array_name
+    the_array = find_global "Tcl", sigil_array_name
     goto resume
 find_lexical:
-    the_array = find_lex call_level, array_name
+    the_array = find_lex call_level, sigil_array_name
 resume:
   clear_eh
   catch:
@@ -112,10 +113,10 @@ set_pre_loop:
   # and if not create a new array
   push_eh set_new_array
     if call_level goto get_lex
-    the_array = find_global "Tcl", array_name
+    the_array = find_global "Tcl", sigil_array_name
     goto set_has_array
   get_lex:
-    the_array = find_lex call_level, array_name
+    the_array = find_lex call_level, sigil_array_name
 set_has_array:
   clear_eh
   goto set_loop

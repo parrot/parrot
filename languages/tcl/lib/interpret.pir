@@ -73,11 +73,11 @@ loop_done:
   goto end_scope
 
 no_command:
-  $P1 = find_global "Tcl", "tcl_interactive"
+  $P1 = find_global "Tcl", "$tcl_interactive"
   unless $P1 goto no_command_non_interactive
 
   # XXX Should probably make sure this wasn't redefined on us.
-  my_cmd = find_global "Tcl", "unknown"
+  my_cmd = find_global "Tcl", "&unknown"
   
   # Add the command into the unknown handler, and fix our bookkeeping
   unshift command, proc

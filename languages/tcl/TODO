@@ -68,6 +68,9 @@ with the way tclparser splits things up - it over-helpfully tries to
 break the variable part out into array and index - while read is
 already doing that for us.
 
+On a related note: No builtins or library code should be dealing with var
+sigils (i.e. C<$>) other than __set and __read. 
+
 =item subcommand processing
 
 Convert any commands that use subcommands to [info] style dispatch to ease

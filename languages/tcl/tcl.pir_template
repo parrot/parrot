@@ -185,10 +185,10 @@ providing a compreg-compatible method.
   # Global variable initialization
   $P0 = new String
   $P0 = "0.1"
-  store_global "Tcl", "tcl_patchLevel", $P0
+  store_global "Tcl", "$tcl_patchLevel", $P0
   $P0 = new String
   $P0 = "0.1"
-  store_global "Tcl", "tcl_version", $P0
+  store_global "Tcl", "$tcl_version", $P0
  
   # Setup the default channelIds
   $P1 = new TclArray
