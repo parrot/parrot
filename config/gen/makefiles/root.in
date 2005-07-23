@@ -1474,10 +1474,10 @@ miniparrot-update :
 ###############################################################################
 
 exec : $(SRC_DIR)/exec_start$(O) $(SRC_DIR)/parrot_config$(O) $(LIBPARROT)
-	$(LINK) ${ld_out}$(EXEC) $(LINKFLAGS) $(EXEC)$(O) $(SRC_DIR)/exec_start$(O) $(SRC_DIR)/parrot_config$(O) $(ALL_PARROT_LIBS)
+	$(LINK) ${ld_out}$(EXEC)$(EXE) $(LINKFLAGS) $(EXEC)$(O) $(SRC_DIR)/exec_start$(O) $(SRC_DIR)/parrot_config$(O) $(ALL_PARROT_LIBS)
 
 exec_so : $(SRC_DIR)/exec_start$(O) blib/lib/libparrot$(SHARE_EXT)
-	$(LINK) ${ld_out}$(EXEC) $(LINKFLAGS) $(EXEC)$(O) $(SRC_DIR)/exec_start$(O) $(SRC_DIR)/parrot_config$(O) -lparrot $(C_LIBS)
+	$(LINK) ${ld_out}$(EXEC)$(SHARE_EXT) $(LINKFLAGS) $(EXEC)$(O) $(SRC_DIR)/exec_start$(O) $(SRC_DIR)/parrot_config$(O) -lparrot $(C_LIBS)
 
 ###### OS depend targets ##########
 

@@ -26,6 +26,7 @@
 #define PARROT_EXEC_CAPABLE     ${execcapable}
 #define PARROT_SHARE_EXT        "${share_ext}"
 #define PARROT_LOAD_EXT         "${load_ext}"
+#define PARROT_OBJ_EXT          "${o}"
 
 typedef ${iv}                   Parrot_Int;
 typedef unsigned ${iv}          Parrot_UInt;

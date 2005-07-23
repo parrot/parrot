@@ -512,7 +512,7 @@ main(int argc, char * argv[])
         if (ext && strcmp (ext, ".pbc") == 0) {
             write_pbc = 1;
         }
-        else if (ext && strcmp (ext, ".o") == 0) {
+        else if (ext && strcmp (ext, PARROT_OBJ_EXT) == 0) {
 #if EXEC_CAPABLE
             load_pbc = 1;
             write_pbc = 0;
