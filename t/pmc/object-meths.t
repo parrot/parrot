@@ -16,7 +16,7 @@ Tests PMC object methods.
 
 =cut
 
-use Parrot::Test tests => 29;
+use Parrot::Test tests => 30;
 use Test::More;
 
 output_like(<<'CODE', <<'OUTPUT', "callmethod - unknown method");
@@ -954,3 +954,28 @@ ex:
 CODE
 F C D A B E
 OUTPUT
+
+
+pir_output_is(<<'CODE', <<'OUTPUT', "kind of a super");
+.sub main @MAIN
+    .local pmc cl, o
+    cl = subclass "String", "MyString"
+    o = new "MyString"
+    o = "foo"
+    print o
+    print "\n"
+.end
+
+.namespace ["MyString"]
+.sub __set_string_native method
+    .param string s
+    classoffset $I0, self, "MyString"
+    $P0 = getattribute self, $I0
+    s .= s
+    $P0 = s
+.end
+CODE
+foofoo
+OUTPUT
+
+
