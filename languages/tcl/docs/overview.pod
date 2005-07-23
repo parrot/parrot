@@ -41,9 +41,9 @@ the appropriate namespaces, as well as declare and register the TCL
 compiler for the C<compile> opcode.
 
 This file is actually built in two steps. The first step uses C<tcl.pl>
-to generate C<lib/tcllib.imc>, using C<tcl.imc_template> as a template.
+to generate C<lib/tcllib.pir>, using C<tcl.pir_template> as a template.
 The file is basically passed through unchanged, except for a few C<${ }>
--style substitutions. C<INCLUDES> make sure all the required C<.imc> files
+-style substitutions. C<INCLUDES> make sure all the required C<.pir> files
 are included properly. It adds a C<HEADER>, and removes any C<XXX> comments.
 
 =item tcl.pbc
