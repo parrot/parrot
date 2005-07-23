@@ -34,7 +34,7 @@ Nigel Sandever - L<nigelsandever@btconnect.com>
 
 =cut
 
-use Parrot::Test tests => 6;
+use Parrot::Test tests => 7;
 
 # perl command coded this way to avoid platform 
 # quoting issue.
@@ -131,4 +131,32 @@ output_is(<<'CODE', <<'OUTPUT', "exit code: 3");
         end
 CODE
 return code: 3
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "grow argv buffer");
+.sub test @MAIN
+        .local pmc args
+
+        $S0 = "exit length(qq{"
+        $I0 = 0
+loop:
+        if $I0 >= 1000 goto end
+        $S0 = concat $S0, "A"
+        inc $I0
+        branch loop
+end:
+        $S0 = concat $S0, "}) / 100"
+        new args, .PerlArray
+        push args, "perl"
+        push args, "-e"
+        push args, $S0
+        $I0 = spawnw args
+        shr $I1, $I0, 8
+        print   "return code: "
+        print   $I1
+        print   "\n"
+        end
+.end
+CODE
+return code: 10
 OUTPUT
