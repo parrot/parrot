@@ -164,6 +164,7 @@ Parrot_locate_runtime_file(Interp *interpreter, const char *file_name,
         enum_runtime_ft type)
 {
     char *full_name, *ext;
+    char *parrot_path = NULL;
     const char **ptr;
     const char *prefix;
     int free_prefix = 0;
@@ -218,70 +219,133 @@ Parrot_locate_runtime_file(Interp *interpreter, const char *file_name,
             (strncmp(file_name+1, ":\\", 2) == 0 ||
              strncmp(file_name+1, ":/",  2) == 0)))
 #else
-        if (file_name[0] == '/')
+    if (file_name[0] == '/')
 #endif
+    {
+        length = strlen(file_name) + 1;
+        full_name = mem_sys_allocate(length);
+        strcpy(full_name, file_name);
+        return full_name;
+    }
+
+    /* Otherwise look at possible library paths. */
+    length = 0;
+    for (ptr = paths; *ptr; ++ptr) {
+        int len = strlen(*ptr);
+        length = (len > length) ? len : length;
+    }
+    length += strlen(prefix) + strlen(file_name) + 2;
+    full_name = mem_sys_allocate(length);
+
+    /* If we're on Win32, the current path to the Parrot install will feature in our search. */
+#ifdef WIN32
         {
-            length = strlen(file_name) + 1;
-            full_name = mem_sys_allocate(length);
-            strcpy(full_name, file_name);
+            int parrot_path_len;
+            parrot_path = mem_sys_allocate(256 + length);
+            if ((parrot_path_len = GetModuleFileName(NULL, parrot_path, 256)) > 0)
+            {
+                /* Snip off executable name. */
+                char *c = parrot_path + parrot_path_len;
+                while (*c != '\\' && c >= parrot_path)
+                    c--;
+                *c = 0;
+
+                /* If parrot is in a bin directory, runtime will be above that. */
+                if (c - 4 > parrot_path && strcmp(c - 4, "\\bin") == 0)
+                    *(c - 4) = 0;
+
+                /* Put on a \. */
+                strcat(parrot_path, "\\");
+            }
+            else
+            {
+                string_cstring_free(parrot_path);
+                parrot_path = NULL;
+            }
+        }
+#endif
+
+    for (ptr = paths; *ptr; ++ptr) {
+        /* Add prefix and suggested path. */
+        strcpy(full_name, prefix);
+        if (*prefix) {
+#ifdef WIN32
+            strcat(full_name, "\\");
+#else
+            strcat(full_name, "/");
+#endif
+        }
+        strcat(full_name, *ptr);
+        strcat(full_name, file_name);
+#ifdef WIN32
+        {
+            char *p;
+            while ( (p = strchr(full_name, '/')) )
+                *p = '\\';
+        }
+#endif
+        str = string_from_cstring(interpreter, full_name, strlen(full_name));
+        if (Parrot_stat_info_intval(interpreter, str, STAT_EXISTS)) {
+            if (free_prefix)
+                string_cstring_free(prefix);
             return full_name;
         }
 
-        length = 0;
-        for (ptr = paths; *ptr; ++ptr) {
-            int len = strlen(*ptr);
-            length = (len > length) ? len : length;
-        }
-        length += strlen(prefix) + strlen(file_name) + 2;
-        full_name = mem_sys_allocate(length);
+        /* If we are on Win32, we'll also look relative to the executable. */
+#ifdef WIN32
+        {
+            if (parrot_path)
+            {
+                /* Save current string length. */
+                int old_parrot_path_len = strlen(parrot_path);
+                char *p;
 
-        for (ptr = paths; *ptr; ++ptr) {
-            strcpy(full_name, prefix);
-            if (*prefix) {
-#ifdef WIN32
-                strcat(full_name, "\\");
-#else
-                strcat(full_name, "/");
-#endif
-            }
-            strcat(full_name, *ptr);
-            strcat(full_name, file_name);
-#ifdef WIN32
-            {
-                char *p;
-                while ( (p = strchr(full_name, '/')) )
+                /* Pop library path and file name on it. */
+                strcat(parrot_path, *ptr);
+                strcat(parrot_path, file_name);
+
+                /* Fix up any forward slashes. */
+                while ((p = strchr(parrot_path, '/')))
                     *p = '\\';
-            }
-#endif
-            str = string_from_cstring(interpreter, full_name, strlen(full_name));
-            if (Parrot_stat_info_intval(interpreter, str, STAT_EXISTS)) {
-                if (free_prefix)
-                    string_cstring_free(prefix);
-                return full_name;
+                
+                /* And try it. */
+                str = string_from_cstring(interpreter, parrot_path, strlen(parrot_path));
+                if (Parrot_stat_info_intval(interpreter, str, STAT_EXISTS)) {
+                    if (free_prefix)
+                        string_cstring_free(prefix);
+                    return parrot_path;
+                }
+                else
+                {
+                    *(parrot_path + old_parrot_path_len) = 0;
+                }
             }
         }
-        /*
-         * finally if prefix is set, try current location
-         */
-        if (*prefix) {
-            strcpy(full_name, file_name);
-#ifdef WIN32
-            {
-                char *p;
-                while ( (p = strchr(full_name, '/')) )
-                    *p = '\\';
-            }
 #endif
-            str = string_from_cstring(interpreter, full_name, strlen(full_name));
-            if (Parrot_stat_info_intval(interpreter, str, STAT_EXISTS)) {
-                if (free_prefix)
-                    string_cstring_free(prefix);
-                return full_name;
-            }
+    }
+
+    /*
+     * finally if prefix is set, try current location
+     */
+    if (*prefix) {
+        strcpy(full_name, file_name);
+#ifdef WIN32
+        {
+            char *p;
+            while ( (p = strchr(full_name, '/')) )
+                *p = '\\';
         }
-        if (free_prefix)
-            string_cstring_free(prefix);
-        return NULL;
+#endif
+        str = string_from_cstring(interpreter, full_name, strlen(full_name));
+        if (Parrot_stat_info_intval(interpreter, str, STAT_EXISTS)) {
+            if (free_prefix)
+                string_cstring_free(prefix);
+            return full_name;
+        }
+    }
+    if (free_prefix)
+        string_cstring_free(prefix);
+    return NULL;
 }
 
 /*
