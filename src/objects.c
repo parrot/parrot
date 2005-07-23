@@ -448,13 +448,15 @@ parrot_class_register(Interp* interpreter, STRING *class_name,
     INTVAL new_type;
     VTABLE *new_vtable, *parent_vtable;
     PMC *vtable_pmc;
+    char *c_error;
 
     /*
      * register the class in the PMCs name class_hash
      */
     if ((new_type = pmc_type(interpreter, class_name)) > enum_type_undef) {
-        internal_exception(1, "Class %s already registered!\n",
-                string_to_cstring(interpreter, class_name));
+        c_error = string_to_cstring(interpreter, class_name);
+        internal_exception(1, "Class %s already registered!\n", c_error);
+        string_cstring_free(c_error);
     }
     new_type = pmc_register(interpreter, class_name);
     /* Build a new vtable for this class
@@ -1190,6 +1192,7 @@ Parrot_add_attribute(Interp* interpreter, PMC* class, STRING* attr)
     PMC *attr_hash = NULL;
     PMC *attr_array;
     STRING *full_attr_name;
+    char *c_error;
 
     class_array = (SLOTTYPE *)PMC_data(class);
     class_name = VTABLE_get_string(interpreter,
@@ -1204,8 +1207,11 @@ Parrot_add_attribute(Interp* interpreter, PMC* class, STRING* attr)
     full_attr_name = string_concat(interpreter, full_attr_name, attr, 0);
     /* TODO escape NUL char */
     if (VTABLE_exists_keyed_str(interpreter, attr_hash, full_attr_name))
-        internal_exception(1, "Attribute '%s' already exists",
-                string_to_cstring(interpreter, full_attr_name));
+    {
+        c_error = string_to_cstring(interpreter, full_attr_name);
+        internal_exception(1, "Attribute '%s' already exists", c_error);
+        string_cstring_free(c_error);
+    }
 
     /*
      * TODO check if someone is trying to add attributes to a parent class

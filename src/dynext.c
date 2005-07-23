@@ -176,6 +176,9 @@ get_path(Interp *interpreter, STRING *lib, void **handle, char **lib_name)
             err = Parrot_dlerror();
             fprintf(stderr, "Couldn't load '%s': %s\n",
                     full_name, err ? err : "unknown reason");
+            string_cstring_free(file_name);
+            string_cstring_free(full_name);
+            string_cstring_free(file_w_ext);
             return NULL;
         }
         /*
@@ -207,6 +210,8 @@ get_path(Interp *interpreter, STRING *lib, void **handle, char **lib_name)
                 err = Parrot_dlerror();
                 fprintf(stderr, "Couldn't load '%s': %s\n",
                         full_name, err ? err : "unknown reason");
+                string_cstring_free(file_name);
+                string_cstring_free(file_w_ext);
                 return NULL;
             }
             /*
@@ -256,6 +261,7 @@ get_path(Interp *interpreter, STRING *lib, void **handle, char **lib_name)
     err = Parrot_dlerror();
     fprintf(stderr, "Couldn't load '%s': %s\n",
             file_name, err ? err : "unknown reason");
+    string_cstring_free(file_name);
     return NULL;
 }
 

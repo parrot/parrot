@@ -130,6 +130,7 @@ scratchpad_store(Interp * interp, PMC *pad, STRING * name, PMC* value)
     PMC *ohash;
     HashBucket *b;
     INTVAL i;
+    char *c_name;
 
     for (i = PMC_int_val(pad) - 1; i >= 0; i--) {
         ohash = ((PMC**)PMC_data(pad))[i];
@@ -140,10 +141,15 @@ scratchpad_store(Interp * interp, PMC *pad, STRING * name, PMC* value)
             return;
         }
     }
-
-    internal_exception(-1, "Lexical '%s' not found",
-                               (name == NULL) ? "???"
-                               : string_to_cstring(interp, name));
+    
+    if (name)
+    {
+        c_name = string_to_cstring(interp, name);
+        internal_exception(-1, "Lexical '%s' not found", c_name);
+        string_cstring_free(c_name);
+    }
+    else
+        internal_exception(-1, "Attempt to find lexical with null name string");
 }
 
 /*
