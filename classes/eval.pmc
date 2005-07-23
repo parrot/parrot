@@ -103,6 +103,44 @@ pmclass Eval extends Closure need_ext {
         PMC_sub(SELF) = NULL;
     }
 
+/*
+
+=item C<STRING* get_string>
+
+Get a STRING representing the bytecode for this code segment, suitable
+for writing to disc and later loading via C<load_bytecode>.
+
+=cut
+
+*/
+
+    STRING* get_string() {
+        STRING *res;
+        struct PackFile *pf;
+        size_t size;
+        opcode_t *packed;
+        struct PackFile_ByteCode *seg;
+
+        pf = PackFile_new(INTERP, 0);
+        seg = PMC_sub(SELF)->seg;
+        PackFile_add_segment(INTERP, &pf->directory,
+                (struct PackFile_Segment *)seg);
+        if (seg->const_table)
+            PackFile_add_segment(INTERP, &pf->directory,
+                    (struct PackFile_Segment *)seg->const_table);
+        if (seg->debugs)
+            PackFile_add_segment(INTERP, &pf->directory,
+                    (struct PackFile_Segment *)seg->debugs);
+        if (seg->fixups)
+            PackFile_add_segment(INTERP, &pf->directory,
+                    (struct PackFile_Segment *)seg->fixups);
+        size = PackFile_pack_size(INTERP, pf) * sizeof(opcode_t);
+        res = string_make_empty(INTERP, enum_stringrep_one, size);
+        res->strlen = res->bufused = size;
+        PackFile_pack(INTERP, pf, res->strstart);
+        /* XXX leak the pf */
+        return res;
+    }
 
 }
 

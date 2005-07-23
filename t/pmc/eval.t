@@ -17,7 +17,7 @@ Tests on-the-fly PASM, PIR and PAST compilation and invocation.
 
 =cut
 
-use Parrot::Test tests => 11;
+use Parrot::Test tests => 12;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "eval_sc");
@@ -354,3 +354,47 @@ pir_output_is(<<'CODE', <<'OUTPUT', "PIR compiler sub PIR");
 CODE
 ok 1
 OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "eval.get_string");
+.sub main @MAIN
+
+  .local pmc f1, f2
+  .local pmc io
+  f1 = compi("foo_1", "hello from foo_1")
+  $S0 = f1
+  io = open "temp.pbc", ">"
+  print io, $S0
+  close io
+  load_bytecode "temp.pbc"
+  f2 = compi("foo_2", "hello from foo_2")
+  io = open "temp.pbc", ">"
+  print io, f2
+  close io
+  load_bytecode "temp.pbc"
+.end
+
+.sub compi
+  .param string name
+  .param string printme
+  .local string code
+  .local pmc pir_compiler, retval
+  pir_compiler = compreg "PIR"
+  code = ".sub "
+  code .= name
+  code .= " @LOAD\n"
+  code .= "print \""
+  code .= printme
+  code .= "\\n\"\n"
+  code .= ".end\n"
+
+  retval = compile pir_compiler, code
+  .return (retval)
+.end
+CODE
+hello from foo_1
+hello from foo_2
+OUTPUT
+
+END {
+	unlink "temp.pnc";
+};
