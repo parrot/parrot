@@ -6,6 +6,7 @@
 
 From autrijus's talk.
 can we use this instead of the current string-based compilation.
+
 =item Makefile deps
 
 Should be more explicit about the PMC dependencies in the makefile. *something*
@@ -16,10 +17,6 @@ is causing things to get rebuilt unecessarily each time "make tclsh" is run.
 It would be nice to have a core-approved way to dump tcl pmcs... preferably
 by having someone re-write the core dumper to be smarter about "does hash",
 etc.
-
-=item .pir file extensions
-
-All .imc files should be renamed to .pir files.
 
 =item keyed access
 
@@ -42,7 +39,7 @@ how to do this from inside parrot? RT#36277
 
 =item update docs [will]
 
-(including add pod to all .imc)
+(including add pod to all .pir)
 
 =back
 
@@ -66,7 +63,10 @@ TclList's new_from_string method should use the string to list code
 =item __set/__read
 
 All commands should use the __set and __read functions defined in
-variables.pir instead of get_var.
+variables.pir instead of get_var. __read's interface conflicts slightly
+with the way tclparser splits things up - it over-helpfully tries to 
+break the variable part out into array and index - while read is
+already doing that for us.
 
 =item subcommand processing
 
@@ -74,11 +74,11 @@ Convert any commands that use subcommands to [info] style dispatch to ease
 maintenance. Subcommands invoked in this style get a single container PMC
 with all their args, but *NOT* the invoking command. so, given the tcl:
 
- info args foo
+ [info args foo]
 
-Tcl::info is called with (args, foo), which then dispatched to:
+C<Tcl::info> is called with (args, foo), which then dispatched to:
 
-_Tcl::builtins::info::args ((foo)).
+C<_Tcl::builtins::info::args((foo))>
 
 =item implement default globals, etc.
 

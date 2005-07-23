@@ -18,61 +18,62 @@ PMCS = \
  tclparser
 
 DEPS = $(PARROT) \
-lib${slash}commands${slash}append.imc \
-lib${slash}commands${slash}array.imc \
-lib${slash}commands${slash}break.imc \
-lib${slash}commands${slash}catch.imc \
-lib${slash}commands${slash}concat.imc \
-lib${slash}commands${slash}continue.imc \
-lib${slash}commands${slash}error.imc \
-lib${slash}commands${slash}eval.imc \
-lib${slash}commands${slash}exit.imc \
-lib${slash}commands${slash}expr.imc \
-lib${slash}commands${slash}for.imc \
-lib${slash}commands${slash}foreach.imc \
-lib${slash}commands${slash}format.imc \
-lib${slash}commands${slash}global.imc \
-lib${slash}commands${slash}if.imc \
-lib${slash}commands${slash}incr.imc \
-lib${slash}commands${slash}info.imc \
-lib${slash}commands${slash}inline.imc \
-lib${slash}commands${slash}join.imc \
-lib${slash}commands${slash}lappend.imc \
+lib${slash}commands${slash}append.pir \
+lib${slash}commands${slash}array.pir \
+lib${slash}commands${slash}break.pir \
+lib${slash}commands${slash}catch.pir \
+lib${slash}commands${slash}concat.pir \
+lib${slash}commands${slash}continue.pir \
+lib${slash}commands${slash}error.pir \
+lib${slash}commands${slash}eval.pir \
+lib${slash}commands${slash}exit.pir \
+lib${slash}commands${slash}expr.pir \
+lib${slash}commands${slash}for.pir \
+lib${slash}commands${slash}foreach.pir \
+lib${slash}commands${slash}format.pir \
+lib${slash}commands${slash}global.pir \
+lib${slash}commands${slash}if.pir \
+lib${slash}commands${slash}incr.pir \
+lib${slash}commands${slash}info.pir \
+lib${slash}commands${slash}inline.pir \
+lib${slash}commands${slash}join.pir \
+lib${slash}commands${slash}lappend.pir \
 lib${slash}commands${slash}lindex.pir \
-lib${slash}commands${slash}linsert.imc \
-lib${slash}commands${slash}list.imc \
-lib${slash}commands${slash}llength.imc \
-lib${slash}commands${slash}lrange.imc \
-lib${slash}commands${slash}lrepeat.imc \
-lib${slash}commands${slash}namespace.imc \
-lib${slash}commands${slash}open.imc \
-lib${slash}commands${slash}proc.imc \
-lib${slash}commands${slash}puts.imc \
-lib${slash}commands${slash}rename.imc \
-lib${slash}commands${slash}return.imc \
-lib${slash}commands${slash}set.imc \
-lib${slash}commands${slash}source.imc \
-lib${slash}commands${slash}string.imc \
-lib${slash}commands${slash}time.imc \
-lib${slash}commands${slash}unknown.imc \
-lib${slash}commands${slash}unset.imc \
-lib${slash}commands${slash}uplevel.imc \
-lib${slash}commands${slash}upvar.imc \
-lib${slash}commands${slash}while.imc \
+lib${slash}commands${slash}linsert.pir \
+lib${slash}commands${slash}list.pir \
+lib${slash}commands${slash}llength.pir \
+lib${slash}commands${slash}lrange.pir \
+lib${slash}commands${slash}lrepeat.pir \
+lib${slash}commands${slash}namespace.pir \
+lib${slash}commands${slash}open.pir \
+lib${slash}commands${slash}package.pir \
+lib${slash}commands${slash}proc.pir \
+lib${slash}commands${slash}puts.pir \
+lib${slash}commands${slash}rename.pir \
+lib${slash}commands${slash}return.pir \
+lib${slash}commands${slash}set.pir \
+lib${slash}commands${slash}source.pir \
+lib${slash}commands${slash}string.pir \
+lib${slash}commands${slash}time.pir \
+lib${slash}commands${slash}unknown.pir \
+lib${slash}commands${slash}unset.pir \
+lib${slash}commands${slash}uplevel.pir \
+lib${slash}commands${slash}upvar.pir \
+lib${slash}commands${slash}while.pir \
 lib${slash}conversions.pir \
-lib${slash}expression.imc \
-lib${slash}get_var.imc \
-lib${slash}interpret.imc \
-lib${slash}list.imc \
-lib${slash}macros${slash}is_space.imc \
-lib${slash}string_to_list.imc \
+lib${slash}expression.pir \
+lib${slash}get_var.pir \
+lib${slash}interpret.pir \
+lib${slash}list.pir \
+lib${slash}macros${slash}is_space.pir \
+lib${slash}string_to_list.pir \
 lib${slash}tcl.p6r \
 lib${slash}variables.pir \
-tcl.imc_template \
+tcl.pir_template \
 tcl.pl
 
-tcl.pbc: pmcs lib${slash}tcllib.pbc lib${slash}tclword.pbc tcl.imc
-	$(PARROT) --output=tcl.pbc tcl.imc
+tcl.pbc: pmcs lib${slash}tcllib.pbc lib${slash}tclword.pbc tcl.pir
+	$(PARROT) --output=tcl.pbc tcl.pir
 
 pmcs:
 	@cd $(CLASSDIR) && $(BUILD) generate $(PMCS)
@@ -80,14 +81,14 @@ pmcs:
 	@cd $(CLASSDIR) && $(BUILD) linklibs $(PMCS)
 	@cd $(CLASSDIR) && $(BUILD) copy "--destination=$(DESTDIR)" $(PMCS)
 
-lib${slash}tcllib.imc: $(DEPS)
-	$(PERL) tcl.pl > lib${slash}tcllib.imc
+lib${slash}tcllib.pir: $(DEPS)
+	$(PERL) tcl.pl > lib${slash}tcllib.pir
 
-lib${slash}tcllib.pbc: lib${slash}tcllib.imc
-	$(PARROT) --output=$(LIBPATH)${slash}tcllib.pbc $(LIBPATH)${slash}tcllib.imc
+lib${slash}tcllib.pbc: lib${slash}tcllib.pir
+	$(PARROT) --output=$(LIBPATH)${slash}tcllib.pbc $(LIBPATH)${slash}tcllib.pir
 
-lib${slash}tclword.pbc: lib${slash}tclword.imc
-	$(PARROT) --output=$(LIBPATH)${slash}tclword.pbc $(LIBPATH)${slash}tclword.imc
+lib${slash}tclword.pbc: lib${slash}tclword.pir
+	$(PARROT) --output=$(LIBPATH)${slash}tclword.pbc $(LIBPATH)${slash}tclword.pir
 
 tclsh: tcl.pbc
 	$(PARROT) --gc-debug tcl.pbc
@@ -105,7 +106,7 @@ devtest:
 	cd t && $(PERL) -e 'use Test::Harness qw($$verbose runtests) ; $$Test::Harness::verbose=1;runtests(glob("*.t"))' && cd ..
 
 clean:
-	$(RM_F) lib${slash}tcllib.imc tcl.pbc lib${slash}*.pbc $(CLASSDIR)${slash}pmc_*.h $(CLASSDIR)${slash}*_group.h $(CLASSDIR)${slash}*$(LOAD_EXT) $(CLASSDIR)${slash}*.dump $(CLASSDIR)${slash}*.c $(CLASSDIR)${slash}*$(O)
+	$(RM_F) lib${slash}tcllib.pir tcl.pbc lib${slash}*.pbc $(CLASSDIR)${slash}pmc_*.h $(CLASSDIR)${slash}*_group.h $(CLASSDIR)${slash}*$(LOAD_EXT) $(CLASSDIR)${slash}*.dump $(CLASSDIR)${slash}*.c $(CLASSDIR)${slash}*$(O)
 
 distclean: clean
 	$(RM_F) Makefile
