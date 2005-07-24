@@ -3,6 +3,7 @@
 use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
 use Parrot::Test tests => 6;
+use Test::More;
 
 language_output_is("tcl",<<TCL,<<OUT,"concat nothing");
   puts [concat]

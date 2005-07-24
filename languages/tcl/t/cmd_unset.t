@@ -3,6 +3,7 @@
 use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
 use Parrot::Test tests => 3;
+use Test::More;
 
 language_output_is("tcl",<<'TCL',"can't unset \"a\": no such variable\n","unset nothing");
  unset a

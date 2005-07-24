@@ -3,6 +3,7 @@
 use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
 use Parrot::Test tests => 9;
+use Test::More;
 
 language_output_is("tcl",<<'TCL',<<OUT,"bad args 1");
   foreach

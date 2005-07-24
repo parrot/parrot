@@ -2,8 +2,10 @@
 
 use strict;
 
-use Test::Harness;
+use Test::Harness qw/&runtests $verbose/;
 use File::Spec;
+
+$verbose = 0;
 
 my $language = "tcl";
 

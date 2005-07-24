@@ -3,6 +3,7 @@
 use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
 use Parrot::Test tests => 4;
+use Test::More;
 
 language_output_is("tcl",<<'TCL',<<OUT,"append nothing");
   set a [list a b]

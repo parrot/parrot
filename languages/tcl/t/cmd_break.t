@@ -3,6 +3,7 @@
 use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
 use Parrot::Test tests => 2;
+use Test::More;
 
 my($tcl,$expected);
 
