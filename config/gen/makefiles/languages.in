@@ -20,6 +20,7 @@ LANGUAGES = \
     ook \
     parrot_compiler \
     perl6 \
+    punie \
     regex \
     scheme \
     tcl \
@@ -66,6 +67,7 @@ clean: \
     ook.clean \
     parrot_compiler.clean \
     perl6.clean \
+    punie.clean \
     regex.clean \
     scheme.clean \
     tcl.clean \
@@ -175,6 +177,14 @@ perl6.test:
 	- $(MAKE_C) perl6 test
 perl6.clean:
 	- $(MAKE_C) perl6 clean
+
+punie : punie.dummy
+punie.dummy:
+	- $(MAKE_C) punie
+punie.test:
+	- $(MAKE_C) punie test
+punie.clean:
+	- $(MAKE_C) punie clean
 
 regex: regex.dummy
 regex.dummy:

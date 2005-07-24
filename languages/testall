@@ -74,6 +74,7 @@ my @unified_testable_languages =
        m4
        ook
        parrot_compiler
+       punie
        scheme
        tcl
        urm );

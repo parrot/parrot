@@ -137,6 +137,13 @@ A: Alan Knowles
 D: An experimental implementation of PHP
 W: http://devel.akbkhome.com/svn/index.php/PintCompiler/
 
+N: Punie
+A: Allison Randal
+D: An implementation of Perl1, implemented in PIR with PGE
+S: 'print 1' is working
+M: Yes
+V: 0.2.2
+
 N: Python
 A: Michal J Wallace
 S: Mostly working except for classes/exec/import. For licensing
