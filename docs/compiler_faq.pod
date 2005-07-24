@@ -20,6 +20,12 @@ Parrot.
 =head2 How can I implement a compiler to use as a compiler object from within
 Parrot? (For example, with the C<compile> op.)
 
+Define a sub that takes as input a string, and returns something invokable.
+The easiest way to create something invokable at the moment is to use the builtin
+C<PIR> or C<PASM> compilers.
+
+See C<languages/tcl/tcl.pir_template>'s C<.sub _tcl_compile> as an example.
+
 =head2 How do I embed source locations in my code for debugging?
 
 You can do this using the C<setfile> and C<setline> opcodes. Simply
