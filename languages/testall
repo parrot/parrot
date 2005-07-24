@@ -16,11 +16,17 @@ There are 3 ways to run a language test:
 
 =item * Overall Harness
 
-C<cd languages && make test>
+C<make languages-test> 
+
+or
+
+C<cd languages && make test> or
 
 =item * Per Language Harness
 
-e.g., C<cd languages/tcl && make test>
+For well behaved languages you can do something like:
+
+C<cd languages/tcl && make test>
 
 =item * Run a single test for more detailed output.
 
@@ -86,7 +92,7 @@ foreach my $harness (@harnesses) {
     push @testfiles, <FILES>;
     close(FILES);
 }
-chomp( @testfiles );
+chomp(@testfiles);
 
 # Step 3: test.
 
