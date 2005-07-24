@@ -282,6 +282,12 @@ void PDB_help(Interp *interpreter, const char *command);
 
 void PDB_backtrace(Interp *interpreter);
 
+/*
+ * These constants correspond to the debugger commands and are
+ * used in src/debug.c. To map command strings to their
+ * numeric values, use the algorithm from parse_command() in that file.
+ */
+
 #define c_b             25245
 #define c_c             25500
 #define c_d             25755
