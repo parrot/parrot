@@ -427,7 +427,7 @@ Portable fcntl() replacement for platforms without it
 
 =item *
 
-See PORTABILITY. Test suite should have no failure on supported platforms.
+See L<PORTABILITY>. Test suite should have no failure on supported platforms.
 
 =item *
 
