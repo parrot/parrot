@@ -1,9 +1,29 @@
 # $Id$
 
-PERL = ${perl}
+# setup of commands
 ${make_set_make}
-MAKE_C = ${make_c}
-LANGUAGES = BASIC befunge bf cola forth jako lisp m4 miniperl ook parrot_compiler perl6 regex scheme tcl urm
+PERL      = ${perl}
+MAKE_C    = ${make_c}
+
+# add new languages here
+# remove obsolete languages here
+LANGUAGES = \
+    BASIC \
+    befunge \
+    bf \
+    cola \
+    forth \
+    jako \
+    lisp \
+    m4 \
+    miniperl \
+    ook \
+    parrot_compiler \
+    perl6 \
+    regex \
+    scheme \
+    tcl \
+    urm
 
 # the default target
 all: $(LANGUAGES)
@@ -33,7 +53,23 @@ help:
 test:   all
 	$(PERL) -I ../lib testall
 
-clean: BASIC.clean befunge.clean bf.clean cola.clean forth.clean jako.clean lisp.clean m4.clean miniperl.clean ook.clean parrot_compiler.clean perl6.clean regex.clean scheme.clean tcl.clean urm.clean
+clean: \
+    BASIC.clean \
+    befunge.clean \
+    bf.clean \
+    cola.clean \
+    forth.clean \
+    jako.clean \
+    lisp.clean \
+    m4.clean \
+    miniperl.clean \
+    ook.clean \
+    parrot_compiler.clean \
+    perl6.clean \
+    regex.clean \
+    scheme.clean \
+    tcl.clean \
+    urm.clean
 
 
 #
@@ -52,25 +88,25 @@ BASIC.clean:
 
 befunge : befunge.dummy
 befunge.dummy:
-	$(MAKE_C) befunge
+	- $(MAKE_C) befunge
 befunge.test:
-	$(MAKE_C) befunge test
+	- $(MAKE_C) befunge test
 befunge.clean:
-	$(MAKE_C) befunge clean
+	- $(MAKE_C) befunge clean
 
 bf : bf.dummy
 bf.dummy:
-	$(MAKE_C) bf
+	- $(MAKE_C) bf
 bf.test:
-	$(MAKE_C) bf test
+	- $(MAKE_C) bf test
 bf.clean:
-	$(MAKE_C) bf clean
+	- $(MAKE_C) bf clean
 
 cola : cola.dummy
 cola.dummy:
-	$(MAKE_C) cola
+	- $(MAKE_C) cola
 cola.test:
-	$(MAKE_C) cola test
+	- $(MAKE_C) cola test
 cola.clean:
 # don't clean cola, as files in MANIFEST are removed
 
@@ -86,65 +122,65 @@ jako: jako.dummy
 jako.dummy:
 # don't make jako, as tests are executed by default
 jako.test:
-	$(MAKE_C) jako test
+	- $(MAKE_C) jako test
 jako.clean:
-	$(MAKE_C) jako clean
+	- $(MAKE_C) jako clean
 
 lisp: lisp.dummy
 lisp.dummy:
-	$(MAKE_C) lisp
+	- $(MAKE_C) lisp
 lisp.test:
-	$(MAKE_C) lisp test
+	- $(MAKE_C) lisp test
 lisp.clean:
-	$(MAKE_C) lisp clean
+	- $(MAKE_C) lisp clean
 
 m4: m4.dummy
 m4.dummy:
-	$(MAKE_C) m4
+	- $(MAKE_C) m4
 m4.test:
-	$(MAKE_C) m4 test
+	- $(MAKE_C) m4 test
 m4.clean:
-	$(MAKE_C) m4 clean
+	- $(MAKE_C) m4 clean
 
 miniperl : miniperl.dummy
 miniperl.dummy:
 # miniperl is missing t/harness
 # $(MAKE_C) miniperl
 miniperl.test:
-	$(MAKE_C) miniperl test
+	- $(MAKE_C) miniperl test
 miniperl.clean:
-	$(MAKE_C) miniperl clean
+	- $(MAKE_C) miniperl clean
 
 ook : ook.dummy
 ook.dummy:
-	$(MAKE_C) ook
+	- $(MAKE_C) ook
 ook.test:
-	$(MAKE_C) ook test
+	- $(MAKE_C) ook test
 ook.clean:
-	$(MAKE_C) ook clean
+	- $(MAKE_C) ook clean
 
 parrot_compiler: parrot_compiler.dummy
 parrot_compiler.dummy:
-	$(MAKE_C) parrot_compiler
+	- $(MAKE_C) parrot_compiler
 parrot_compiler.test:
 # no target test in parrot_compiler/Makefile
 # (MAKE_C) parrot_compiler test
 parrot_compiler.clean:
-	$(MAKE_C) parrot_compiler clean
+	- $(MAKE_C) parrot_compiler clean
 
 perl6 : perl6.dummy
 perl6.dummy:
-	$(MAKE_C) perl6
+	- $(MAKE_C) perl6
 perl6.test:
-	$(MAKE_C) perl6 test
+	- $(MAKE_C) perl6 test
 perl6.clean:
-	$(MAKE_C) perl6 clean
+	- $(MAKE_C) perl6 clean
 
 regex: regex.dummy
 regex.dummy:
-	$(MAKE_C) regex
+	- $(MAKE_C) regex
 regex.test :
-	$(MAKE_C) regex test
+	- $(MAKE_C) regex test
 regex.clean :
 # No target clean for regex
 
@@ -152,22 +188,22 @@ scheme: scheme.dummy
 scheme.dummy:
 	@echo "SKIPPED: scheme: (nothing to make, but should not default to make test)"
 scheme.test :
-	$(MAKE_C) scheme test
+	- $(MAKE_C) scheme test
 scheme.clean :
-	$(MAKE_C) scheme clean
+	- $(MAKE_C) scheme clean
 
 tcl: tcl.dummy
 tcl.dummy:
-	$(MAKE_C) tcl
+	- $(MAKE_C) tcl
 tcl.test:
-	$(MAKE_C) tcl test
+	- $(MAKE_C) tcl test
 tcl.clean:
-	$(MAKE_C) tcl clean
+	- $(MAKE_C) tcl clean
 
 urm: urm.dummy
 urm.dummy:
-	$(MAKE_C) urm
+	- $(MAKE_C) urm
 urm.test:
-	$(MAKE_C) urm test
+	- $(MAKE_C) urm test
 urm.clean:
-	$(MAKE_C) urm clean
+	- $(MAKE_C) urm clean
