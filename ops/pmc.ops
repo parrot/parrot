@@ -322,8 +322,6 @@ inline op delete(in PMC, in INTKEY) {
   goto NEXT();
 }
 
-=cut
-
 ########################################
 
 =item B<elements>(out INT, in PMC)
@@ -635,6 +633,8 @@ inline op mmdvtfind(out PMC, in INT, in INT, in INT) {
 }
 
 =back
+
+=cut
 
 ###############################################################################
 

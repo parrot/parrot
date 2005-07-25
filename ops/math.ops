@@ -18,17 +18,11 @@ math.ops - Mathematical Operations
 Operations that perform some sort of mathematics, including both basic
 math and transcendental functions.
 
-###############################################################################
-
 =head2 General infix operations
 
 These operations take an infix operation number and PMC arguments.
 
 =over 4
-
-########################################
-
-=cut
 
 =item B<infix>(inconst INT, in PMC, in INT)
 
@@ -286,8 +280,6 @@ inline op cmod(out INT, in INT, in INT) :base_core {
   goto NEXT();
 }
 
-=cut
-
 ########################################
 
 =item B<cmod>(out NUM, in NUM, in NUM)
@@ -387,8 +379,6 @@ inline op div(out NUM, in NUM, in NUM) :base_core {
   $1 = $2 / $3;
   goto NEXT();
 }
-
-=back
 
 =item B<fdiv>(inout INT, in INT)
 

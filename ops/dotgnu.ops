@@ -13,6 +13,8 @@ dotgnu.ops
 
 =head1 DESCRIPTION
 
+=over 4
+
 =item B<conv_i1>(inout INT)
 
 =item B<conv_i1_ovf>(inout INT)
@@ -52,6 +54,8 @@ dotgnu.ops
 =item B<conv_r8>(out NUM, in PMC)
 
 Additional opcodes for C# compilation needed by cscc PM codegen
+
+=back
 
 =cut
 

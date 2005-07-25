@@ -244,7 +244,6 @@ inline op morph(in PMC, in INT) {
   VTABLE_morph(interpreter, $1, $2);
   goto NEXT();
 }
-=cut
 
 =item B<exec>(in STR)
 
@@ -300,9 +299,9 @@ inline op find_not_cclass(out INT, in INT, in STR, in INT, in INT) {
   goto NEXT();
 }
 
-=back
-
 ###############################################################################
+
+=back
 
 =head2 Function argument opcode
 
@@ -420,6 +419,8 @@ op unless_null(in PMC, labelconst INT) {
 }
 
 ###############################################################################
+
+=back
 
 =head1 COPYRIGHT
 
