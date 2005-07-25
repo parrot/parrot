@@ -22,12 +22,6 @@ which stores FLOATVALs. It uses Float PMCs to do all necessary conversions.
 
 #include "parrot/parrot.h"
 
-typedef struct _SizeFloatData {
-    INTVAL size;
-    FLOATVAL data[1];
-} SizeFloatData;
-#define NEEDED_SIZE(n) ((n-1)*sizeof(FLOATVAL) + sizeof(SizeFloatData))
-
 pmclass ResizableFloatArray extends FixedFloatArray need_ext does array {
     
 
@@ -42,15 +36,15 @@ Returns the floating-point value of the element at index C<key>.
 */
 
     FLOATVAL get_number_keyed_int (INTVAL key) {
-        SizeFloatData *sd;
+        FLOATVAL *data;
         if (key < 0)
             internal_exception(OUT_OF_BOUNDS, 
                 "ResizableFloatArray: index out of bounds!");
         if (key >= PMC_int_val(SELF))
             DYNSELF.set_integer_native(key+1);
         
-        sd = (SizeFloatData *)PMC_data(SELF);
-        return sd->data[key];
+        data = (FLOATVAL *)PMC_data(SELF);
+        return data[key];
     }
 
 /*
@@ -65,15 +59,15 @@ C<value>.
 */
 
     void set_number_keyed_int (INTVAL key, FLOATVAL value) {
-        SizeFloatData *sd;
+        FLOATVAL *data;
         if (key < 0)
             internal_exception(OUT_OF_BOUNDS, 
                 "ResizableFloatArray: index out of bounds!");
         if(key >= PMC_int_val(SELF))
             DYNSELF.set_integer_native(key+1);
 
-        sd = (SizeFloatData *)PMC_data(SELF);
-        sd->data[key] = value;
+        data = (FLOATVAL *)PMC_data(SELF);
+        data[key] = value;
     }
 
 /*
@@ -94,28 +88,42 @@ equal to three quarters of the old size).
 */
 
     void set_integer_native (INTVAL size) {
-        SizeFloatData *sd;
         if (size < 0)
             internal_exception(OUT_OF_BOUNDS, 
                     "ResizableFloatArray: Can't resize to negative value!");
 
-        sd = PMC_data(SELF);
-        PMC_int_val(SELF) = size;
-        if (sd == NULL) {
-            sd = mem_sys_allocate(NEEDED_SIZE(size));
-            sd->size = size;
-        } else if (size >= sd->size) {
-            sd->size = size < 2 * sd->size ? 2 * sd->size : size;
-            sd = mem_sys_realloc(sd, NEEDED_SIZE(sd->size));
-        } else if (size < sd->size / 2) {
-            sd->size = size * 3 / 2;
-            sd = mem_sys_realloc(sd, NEEDED_SIZE(sd->size));
-        } else {
+        if(!PMC_data(SELF)) {
+            /* empty - used fixed routine */
+            if (size < 8) {
+                SUPER(8);
+                PMC_int_val(SELF) = size;
+                PMC_int_val2(SELF) = 8;
+            }
+            else {
+                SUPER(size);
+                PMC_int_val2(SELF) = size;
+            }
+        }
+        else if (size <= PMC_int_val2(SELF)) {
+            PMC_int_val(SELF) = size;
+            /* we could shrink here if necessary */
             return;
         }
-
-        PMC_data(SELF) = sd;
-        PObj_active_destroy_SET(SELF);
+        else {
+            INTVAL cur, needed;
+            cur = PMC_int_val2(SELF);
+            if (cur < 8192)
+                cur = size < 2 * cur ? 2 * cur : size;
+            else {
+                needed = size - cur;
+                cur += needed + 4096;
+                cur &= ~0xfff;
+            }
+            PMC_data(SELF) = mem_sys_realloc(PMC_data(SELF),
+                    cur * sizeof(FLOATVAL));
+            PMC_int_val2(SELF) = cur;
+            PMC_int_val(SELF) = size;
+        }
     }
 
 /*
@@ -129,18 +137,10 @@ Creates and returns a copy of the array.
 */
 
     PMC* clone () {
-        SizeFloatData *sd;
-        PMC * dest = pmc_new(INTERP, SELF->vtable->base_type);
-    
-        if (!PMC_data(SELF))
-            return dest;
-        PMC_int_val(dest) = PMC_int_val(SELF);
-        sd = PMC_data(SELF);
-        
-        PMC_data(dest) = mem_sys_allocate(NEEDED_SIZE(sd->size));
-        mem_sys_memcopy(PMC_data(dest), PMC_data(SELF), NEEDED_SIZE(sd->size));
-        PObj_active_destroy_SET(dest);
-        return dest;
+        PMC *copy = SUPER();
+        /* copy trimmed extra space */
+        PMC_int_val2(copy) = PMC_int_val(SELF);
+        return copy;
     }
 
 /*
@@ -154,13 +154,8 @@ Adds C<value> to the end of the array.
 */
 
     void push_float (FLOATVAL value) {
-        INTVAL size;
-        SizeFloatData *sd;
-
-        size = PMC_int_val(SELF);
-        DYNSELF.set_integer_native(size+1);
-        sd = (SizeFloatData *)PMC_data(SELF);
-        sd->data[size] = value;
+        INTVAL nextix = DYNSELF.elements();
+        DYNSELF.set_number_keyed_int(nextix, value);
     }
 
 /*
@@ -176,19 +171,16 @@ Removes and returns the last element in the array.
     FLOATVAL pop_float() {
         INTVAL size;
         FLOATVAL value;
-        SizeFloatData *sd;
 
         size = PMC_int_val(SELF);
-        sd = (SizeFloatData *)PMC_data(SELF);
 
-        if (sd == NULL || size == 0) {
+        if (size == 0) {
             internal_exception(OUT_OF_BOUNDS, 
                     "ResizableFloatArray: Can't pop from an empty array!");
         }
 
-	value = sd->data[size - 1];
+        value = DYNSELF.get_number_keyed_int(size-1);
         DYNSELF.set_integer_native(size - 1);
-
         return value;
     }
 
@@ -206,6 +198,7 @@ F<docs/pdds/pdd17_basic_types.pod>.
 
 Initial version                  - Matt Fowles 2004-06-11
 Changed allocator to double size - Matt Fowles 2004-06-15
+moved available size to int_val2 - Matt Fowles 2005-07-22
 
 =cut
 

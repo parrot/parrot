@@ -21,11 +21,6 @@ It uses Integer PMCs for all of the conversions.
 
 #include "parrot/parrot.h"
 
-typedef struct _SizeIntData {
-    INTVAL size;
-    INTVAL data[1];
-} SizeIntData;
-#define NEEDED_SIZE(n) ((n-1)*sizeof(INTVAL) + sizeof(SizeIntData))
 
 pmclass ResizableIntegerArray extends FixedIntegerArray need_ext does array {
 
@@ -40,15 +35,15 @@ Returns the integer value of the element at index C<key>.
 */
 
     INTVAL get_integer_keyed_int (INTVAL key) {
-        SizeIntData *sd;
+        INTVAL *data;
         if (key < 0)
             internal_exception(OUT_OF_BOUNDS,
                 "ResizableIntegerArray: index out of bounds!");
         if(key >= PMC_int_val(SELF))
             DYNSELF.set_integer_native(key+1);
 
-        sd = (SizeIntData *)PMC_data(SELF);
-        return sd->data[key];
+        data = (INTVAL *)PMC_data(SELF);
+        return data[key];
     }
 
 /*
@@ -62,15 +57,15 @@ Sets the integer value of the element at index C<key> to C<value>.
 */
 
     void set_integer_keyed_int (INTVAL key, INTVAL value) {
-        SizeIntData *sd;
+        INTVAL *data;
         if (key < 0)
             internal_exception(OUT_OF_BOUNDS,
                 "ResizableIntegerArray: index out of bounds!");
         if(key >= PMC_int_val(SELF))
             DYNSELF.set_integer_native(key+1);
 
-        sd = (SizeIntData *)PMC_data(SELF);
-        sd->data[key] = value;
+        data = (INTVAL *)PMC_data(SELF);
+        data[key] = value;
     }
 
 /*
@@ -84,35 +79,50 @@ Resizes the array to C<size> elements.
 */
 
     void set_integer_native (INTVAL size) {
-        SizeIntData *sd;
         if (size < 0)
             internal_exception(OUT_OF_BOUNDS,
-                    "ResizableIntegerArray: Can't resize!");
+                    "ResizableStringArray: Can't resize!");
 
-        sd = PMC_data(SELF);
-        PMC_int_val(SELF) = size;
-        if(sd == NULL) {
-            sd = mem_sys_allocate_zeroed(NEEDED_SIZE(size));
-            sd->size = size;
-        } else if(size >= sd->size) {
-            INTVAL old = sd->size;
-            sd->size =  size < 2*sd->size ? sd->size*2 : size;
-            sd = mem_sys_realloc(sd, NEEDED_SIZE(sd->size));
-            memset(sd->data + old, 0, (sd->size - old) * sizeof(INTVAL));
-        } else {
+        if(!PMC_data(SELF)) {
+            /* empty - used fixed routine */
+            if (size < 8) {
+                SUPER(8);
+                PMC_int_val(SELF) = size;
+                PMC_int_val2(SELF) = 8;
+            }
+            else {
+                SUPER(size);
+                PMC_int_val2(SELF) = size;
+            }
+        }
+        else if (size <= PMC_int_val2(SELF)) {
+            PMC_int_val(SELF) = size;
+            /* we could shrink here if necessary */
             return;
         }
-
-        PMC_data(SELF) = sd;
-        PObj_active_destroy_SET(SELF);
+        else {
+            INTVAL cur, needed;
+            cur = PMC_int_val2(SELF);
+            if (cur < 8192)
+                cur = size < 2 * cur ? 2 * cur : size;
+            else {
+                needed = size - cur;
+                cur += needed + 4096;
+                cur &= ~0xfff;
+            }
+            PMC_data(SELF) = mem_sys_realloc(PMC_data(SELF),
+                    cur * sizeof(INTVAL));
+            PMC_int_val2(SELF) = cur;
+            PMC_int_val(SELF) = size;
+        }
     }
 
 /*
 
 =item C<void push_integer (INTVAL value)>
 
-Extends the array by adding an element of value C<value> to the end of
-the array.
+Extends the array by adding an element of value C<value> to the end
+of the array.
 
 =cut
 
@@ -136,19 +146,14 @@ Removes and returns the last element in the array.
     INTVAL pop_integer() {
         INTVAL size;
         INTVAL value;
-        SizeIntData *sd;
 
         size = PMC_int_val(SELF);
-        sd = (SizeIntData *)PMC_data(SELF);
-
-        if (sd == NULL || size == 0) {
+        if (size == 0) {
             internal_exception(OUT_OF_BOUNDS,
                     "ResizableIntegerArray: Can't pop from an empty array!");
         }
-
-	value = sd->data[size - 1];
+        value = DYNSELF.get_integer_keyed_int(size-1);
         DYNSELF.set_integer_native(size - 1);
-
         return value;
     }
 
@@ -163,18 +168,10 @@ Creates and returns a copy of the array.
 */
 
     PMC* clone () {
-        SizeIntData *sd;
-        PMC * dest = pmc_new(INTERP, SELF->vtable->base_type);
-
-        if (!PMC_data(SELF))
-            return dest;
-        PMC_int_val(dest) = PMC_int_val(SELF);
-        sd = PMC_data(SELF);
-
-        PMC_data(dest) = mem_sys_allocate(NEEDED_SIZE(sd->size));
-        mem_sys_memcopy(PMC_data(dest), PMC_data(SELF), NEEDED_SIZE(sd->size));
-        PObj_active_destroy_SET(dest);
-        return dest;
+        PMC *copy = SUPER();
+        /* copy trimmed extra space */
+        PMC_int_val2(copy) = PMC_int_val(SELF);
+        return copy;
     }
 
 }
@@ -192,6 +189,7 @@ F<docs/pdds/pdd17_basic_types.pod>.
 Initial version                  - Matt Fowles 2004-06-11
 Changed allocator to double size - Matt Fowles 2004-06-15
 Added push_integer               - Bernhard Schmalhofer 2004-10-17
+moved available size to int_val2 - Matt Fowles 2005-07-22
 
 =cut
 

@@ -506,7 +506,7 @@ Creates and returns a copy of the array.
 
     PMC* clone () {
         PMC *copy = SUPER();
-
+        /* copy trimmed extra space */
         PMC_int_val2(copy) = PMC_int_val(SELF);
         return copy;
     }

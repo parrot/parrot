@@ -8,10 +8,10 @@ classes/resizablebooleanarray.pmc - resizable array for booleans only
 
 =head1 DESCRIPTION
 
-The C<ResizableBooleanArray PMC> implements an array of resizable size,
-which stores booleans.
+The C<ResizableBooleanArray PMC> implements an array of resizable
+size, which stores booleans.
 It uses the C<Boolean PMC> for all conversions.
-The C<ResizableBooleanArray PMC> extends the C<FixedBooleanArray PMC>.
+C<ResizableBooleanArray PMC> extends C<FixedBooleanArray PMC>
 
 =head2 Functions
 
@@ -49,7 +49,6 @@ Returns the integer value of the element at index C<key>.
 */
 
     INTVAL get_integer_keyed_int (INTVAL key) {
-        Parrot_UInt1 *sd;
         if (key < 0)
             internal_exception(OUT_OF_BOUNDS,
                 "ResizableBooleanArray: index out of bounds!");
@@ -90,22 +89,34 @@ Resizes the array to C<size> elements.
 */
 
     void set_integer_native (INTVAL size) {
-        Parrot_UInt1 *sd;
         if (size < 0)
             internal_exception(OUT_OF_BOUNDS,
                     "ResizableBooleanArray: Can't resize!");
 
         if ( ! PMC_data(SELF) ) {
             SUPER(size);
-        } else if ( size > PMC_int_val2(SELF) ) {
-            INTVAL old_size = PMC_int_val2(SELF);
-            PMC_int_val2(SELF) = size < 2*old_size ? 2*old_size : (size/BITS_PER_CHAR+1)*BITS_PER_CHAR;
-            sd = PMC_data(SELF);
-            PMC_data(SELF) = mem_sys_realloc(sd, PMC_int_val2(SELF)/BITS_PER_CHAR);
+        }
+        else if (size <= PMC_int_val2(SELF)) {
             PMC_int_val(SELF) = size;
-        } else {
-            PMC_int_val(SELF) = size;
+            /* we could shrink here if necessary */
             return;
+        }
+        else {
+            INTVAL cur, needed;
+            cur = PMC_int_val2(SELF);
+            if (cur < 8192) {
+                cur = size < 2 * cur ? 2 * cur
+                    : (size/BITS_PER_CHAR+1)*BITS_PER_CHAR;
+            }
+            else {
+                needed = size - cur;
+                cur += needed + 4096;
+                cur &= ~0xfff;
+            }
+            PMC_data(SELF) = mem_sys_realloc(PMC_data(SELF),
+                    cur/BITS_PER_CHAR);
+            PMC_int_val(SELF) = size;
+            PMC_int_val2(SELF) = cur;
         }
     }
 
@@ -123,7 +134,6 @@ F<docs/pdds/pdd17_basic_types.pod>.
 
 Initial version                  - Matt Fowles 2004-06-11
 Changed allocator to double size - Matt Fowles 2004-06-15
-Added push_integer               - Bernhard Schmalhofer 2004-10-17
 
 =cut
 
