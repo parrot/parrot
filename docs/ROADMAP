@@ -122,6 +122,14 @@ string reuse is limited to a single user or multiple users.
 
 =item *
 
+MMD Roundup 2, from the mailing list:
+
+http://xrl.us/gvfw (Link to groups-beta.google.com)
+
+Section 1 of that email needs a decision from the Architect.
+
+=item *
+
 Variable-length register frames are an approved feature, but the
 design still needs fleshing out.  Then there are the minor details of
 documentation and implementation.  :-,
