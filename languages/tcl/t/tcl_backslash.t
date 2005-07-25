@@ -4,11 +4,17 @@
 
 use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 15;
+use Parrot::Test tests => 16;
 use Test::More;
 use vars qw($TODO);
 
 my($tcl,$expected);
+
+language_output_is("tcl",<<'TCL',<<'OUT',"in braces");
+ puts {a\n}
+TCL
+a\n
+OUT
 
 $tcl = <<'EOTCL';
  puts -nonewline "\n"
