@@ -371,12 +371,21 @@ Destroys the subroutine.
 
 Returns the name of the subroutine.
 
+=item C<void set_string_native(STRING *subname)>
+
+Sets the name of the subroutine.
+
 =cut
 
 */
 
     STRING* get_string () {
         return Parrot_full_sub_name(INTERP, SELF);
+    }
+
+    void set_string_native(STRING *subname) {
+        struct Parrot_sub * sub = PMC_sub(SELF);
+        sub->name = string_copy(INTERP, subname);
     }
 
 /*
