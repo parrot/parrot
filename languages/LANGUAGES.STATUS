@@ -197,6 +197,15 @@ S: passes about 10% of *tcl*'s test suite (modulo clock)
 M: Yes
 V: Current
 
+N: unlamba
+A: Leopold Tötsch
+D: unlambda is a pure functional programming language with mostly eager
+D: evaluation following the SKI calculus (+ a few extensions)
+S: Errors on HEAD branch, which will go away after complete merge of 
+S: Leo's branch,
+W: http://www.madore.org/~david/programs/unlambda/
+V: 0.2.2
+
 N: URM
 A: Marcus Thiesen
 S: Functioning, all examples working

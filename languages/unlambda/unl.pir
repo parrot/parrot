@@ -1,7 +1,22 @@
-#
-# unlambda interpreter
-# http://www.madore.org/~david/programs/unlambda/
-# by leo
+# $Id$
+
+=head1 DESCRIPTION
+
+This is an unlambda interpreter.
+unlambda is a pure functional programming language with mostly eager
+evaluation following the SKI calculus (+ a few extensions).
+
+The parrot implementation uses closures, continuations, and tailcalls.
+
+=head1 AUTHOR
+
+leo
+
+=head1 SEE ALSO
+
+L<http://www.madore.org/~david/programs/unlambda/>
+
+=cut
 
 .sub _main @MAIN
     .param pmc argv
@@ -149,7 +164,7 @@ nl:
 	cl = 'r'
 	goto done
 
-no_pr:
+unlno_pr:
 	$S0 = f
 	cl = $S0
 done:
