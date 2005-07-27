@@ -152,12 +152,12 @@ which the class implements).
 
 The default is "scalar". Other currently used interfaces are:
 
-    array
-    event
-    hash
-    library
-    ref
-    scalar
+    array    : container PMC with numerically-keyed elements
+    event    : PMC that can be used with event queue
+    hash     : container PMC with string-keyed elements
+    library  : PMC that corresponds to a dynamic library
+    ref      : PMC that references another PMC
+    scalar   : (only used by the sample dynclasses/foo.pmc)
 
 This is not a canonical list, but merely a snapshot of what's in use.
 
