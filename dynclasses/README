@@ -58,8 +58,10 @@ and then in your .imc or .pasm file:
 =item 2
 
 Edit C<../config/gen/makefiles/dynclasses.in> and append your PMC(s) to
-the build target and:
-
+the build target. The dynclasses.in file is processed by Configure.pl to 
+create the real makefiles. So, invoke the configure script, then make:
+		
+	$ perl Configure.pl
 	$ make
 
 =item 3
