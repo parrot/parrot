@@ -1,8 +1,9 @@
 #!perl
 
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 2;
+use Parrot::Test tests => 3;
 use Test::More;
+use vars qw($TODO);
 
 pir_output_is(<<'CODE', <<'OUTPUT', "test tcl compiler, verify double call works");
   .sub main @MAIN
@@ -34,3 +35,25 @@ CODE
 ok 1
 OUTPUT
 
+TODO: {
+  local $TODO = "stack too deep?";
+
+pir_output_is(<<'CODE', <<'OUTPUT', "pass arguments to a tcl proc from PIR");
+.sub main @MAIN
+
+  load_bytecode "languages/tcl/lib/tcllib.pbc"
+
+  $P0 = compreg "TCL"
+  $P1 = compile $P0, "proc _tmp {a} {puts $a}"
+  $P1()
+
+  $P2 = find_global "Tcl", "&_tmp"
+
+  $P3 = new String
+  $P3 = "hello"
+  $P2($P3)
+.end
+CODE
+hello
+OUTPUT
+}
