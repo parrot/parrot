@@ -2,6 +2,13 @@
 # $Id$
 
 ###############################################################################
+# NOTES:
+#
+# This makefile makes use of specific .dummy targets (rather than .PHONY
+# or .VIRTUAL targets) in an effort to work with various flavors of make.
+###############################################################################
+
+###############################################################################
 #
 # INSTALL CONFIGURATIONS:
 #
@@ -1184,7 +1191,7 @@ test : test_prep
 	$(PERL) t/harness $(EXTRA_TEST_ARGS) $(PARROT_ARGS) $(TEST_FILES) $(SRC_TEST_FILES) $(PERL_TEST_FILES)
 
 # Test various run cores and other stuff
-# 'testC', 'testg' and 'testj' are tested only,
+# 'testC', 'testg' and 'testj' are tested only
 # when the needed runcores are available
 fulltest : \
     testb \
