@@ -62,6 +62,8 @@ dynext-clean :
 	$(RM_F)	*.ilk
 # win32 exported functions and data items
 	$(RM_F) *.exp
+# win32 export definition files
+	$(RM_F) *.def
 
 clean : testclean dynext-clean
 	$(RM_F) *.c pmc_*.h *_group.h *$(LOAD_EXT) *.dump lib-* *$(O)

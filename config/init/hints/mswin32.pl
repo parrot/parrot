@@ -69,7 +69,19 @@
 			$linkflags =~ s/-opt:\S+//;
 			Configure::Data->set('linkflags', $linkflags);
 		}
-	    }
+		
+		# We need to build a .def file to export parrot.exe symbols.
+		Configure::Data->set(
+			ld_parrot_exe_def	=> '-def:parrot.def',
+			parrot_exe_def	=> 'parrot.def'
+		);
+				
+		# When building dynclasses we need to flag up the need to
+		# mark shared variables with __declspec(dllimport).
+		Configure::Data->set(
+			cc_building_dynclass_flag => '-DPARROT_BUILDING_WIN32_DLL'
+		);
+	}
 	elsif( $is_intel ) {
 		Configure::Data->set(
 			share_ext  => '.dll',

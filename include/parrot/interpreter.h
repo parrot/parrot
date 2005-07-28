@@ -408,7 +408,11 @@ typedef enum {
 #define PARROT_CATCH_NULL 1
 
 #if PARROT_CATCH_NULL
-extern PMC * PMCNULL;                     /* Holds single Null PMC         */
+#    if !defined(PARROT_BUILDING_WIN32_DLL)
+extern PMC * PMCNULL;                        /* Holds single Null PMC         */
+#    else
+__declspec(dllimport) extern PMC * PMCNULL;  /* Holds single Null PMC         */
+#    endif /* PARROT_BUILDING_WIN32_DLL */
 #  define PMC_IS_NULL(p) (!(p) || (p) == PMCNULL)
 #else
 #  define PMCNULL NULL
