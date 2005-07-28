@@ -1175,6 +1175,7 @@ PERL_TEST_FILES = t/perl/*.t
 TEST_FILES      = t/library/*.t \
     t/op/*.t \
     t/pmc/*.t \
+	t/run/*.t \
     t/native_pbc/*.t \
     $(IMCC_DIR)/t/*/*.t \
     t/dynclass/*.t \
