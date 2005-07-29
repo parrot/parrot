@@ -266,9 +266,18 @@ PIO_init(theINTERP)
             internal_exception(PIO_ERROR, "PIO init stacks failed.");
         }
 
-        if (!PIO_STDIN(interpreter) || !PIO_STDOUT(interpreter)
-            || !PIO_STDERR(interpreter)) {
-            internal_exception(PIO_ERROR, "PIO init std handles failed.");
+        /*
+         * see also #36677
+         *
+         */
+        if (!PIO_STDIN(interpreter)) {
+            PIO_STDIN(interpreter) = pmc_new(interpreter, enum_class_Undef);
+        }
+        if (!PIO_STDOUT(interpreter)) {
+            PIO_STDOUT(interpreter) = pmc_new(interpreter, enum_class_Undef);
+        }
+        if (!PIO_STDERR(interpreter)) {
+            PIO_STDERR(interpreter) = pmc_new(interpreter, enum_class_Undef);
         }
 
         if (Interp_debug_TEST(interpreter, PARROT_START_DEBUG_FLAG)) {
@@ -417,9 +426,13 @@ PIO_init_stacks(theINTERP)
     for (p = bottom; p; p = p->up) {
         if (p->api->Init) {
             if ((*p->api->Init) (interpreter, p) != 0) {
+                /* ignore err
+                 * see also #36677
                 char buf[1024];
                 sprintf(buf, "Parrot IO: Failed init layer(%s).\n", p->name);
                 internal_exception(PIO_ERROR, buf);
+                */
+                ;
             }
         }
     }
