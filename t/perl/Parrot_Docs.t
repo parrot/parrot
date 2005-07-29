@@ -121,9 +121,9 @@ teardown();
 
 sub teardown
 {
-    Parrot::Docs::File->new(tmp_file_path('file.pod'))->delete;
-    Parrot::Docs::Directory->new(tmp_dir_path('src'));
-    Parrot::Docs::Directory->new(tmp_dir_path('tgt'));
+    Parrot::Docs::File->new(tmp_file_path('file.pod'))->delete();
+    Parrot::Docs::Directory->new(tmp_dir_path('src'))->delete();
+    Parrot::Docs::Directory->new(tmp_dir_path('tgt'))->delete();
 }
 
 # tmp_dir_path(@dirs)
