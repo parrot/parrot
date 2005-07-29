@@ -7,7 +7,7 @@ PGE::P6Rule - Parse and compile Perl 6 rules
 This file implements the Perl 6 rules compiler -- it parses strings
 using Perl 6 rules syntax into a rule expression tree (see L<PGE::Exp>),
 generates the PIR code from the expression tree, and compiles the
-PIR code into a subroutine object.  
+PIR code into a subroutine object.
 
 The parser here is implemented as a hybrid top-down parser, with a
 token lookup table for individual pattern terms.  This parser is
@@ -20,7 +20,7 @@ will be to use Perl 6 to write and compile a better (faster) rules parser.
 
 .namespace [ "PGE::P6Rule" ]
 
-.const int PGE_INF    = 2147483647                # XXX: arbitrary limit
+.const int PGE_INF = 2147483647                # XXX: arbitrary limit
 
 .sub "__onload"
     .local pmc p6meta
@@ -68,7 +68,7 @@ will be to use Perl 6 to write and compile a better (faster) rules parser.
     p6meta['$7'] = $P0
     p6meta['$8'] = $P0
     p6meta['$9'] = $P0
-    $P0 = find_global "PGE::P6Rule", "p6rule_parse_subrule" 
+    $P0 = find_global "PGE::P6Rule", "p6rule_parse_subrule"
     p6meta['<'] = $P0
     p6meta['<?'] = $P0
     p6meta['>'] = u
@@ -85,12 +85,13 @@ will be to use Perl 6 to write and compile a better (faster) rules parser.
     p6meta['<['] = $P0
     p6meta['<-['] = $P0
     p6meta['<+['] = $P0
+    .return ()
 .end
 
 =item C<p6rule_parse_skip(STR pattern, PMC lex, INT skip)>
 
-Advance the lexical context over the next C<skip> characters and 
-scan until the next token is found in C<pattern>.  
+Advance the lexical context over the next C<skip> characters and
+scan until the next token is found in C<pattern>.
 
 =cut
 
@@ -103,14 +104,14 @@ scan until the next token is found in C<pattern>.
 
     plen = lex["plen"]
     pos = lex["pos"]
-    pos += skip                      
+    pos += skip
     lex["ws"] = 0
     unless pos < plen goto end
     $I0 = is_whitespace pattern, pos
     lex["ws"] = $I0
   skipws:
     unless pos < plen goto end
-    $I0 = is_whitespace pattern, pos 
+    $I0 = is_whitespace pattern, pos
     unless $I0 goto skipcomments
     inc pos
     goto skipws
@@ -165,7 +166,7 @@ the C<lex["pos"]> pointer as it goes.
     lex["pos"] = pos
     .return (val)
 .end
-    
+
 =item C<p6rule_parse_error(STR pattern, PMC lex, STR message)>
 
 Generates error messages during parsing.  Gracefully recovering
@@ -192,6 +193,7 @@ from errors in rule expressions still needs a fair amount of work
     $S0 .= ">>)\n"
     $P0["_message"] = $S0
     throw $P0
+    .return ()
 .end
 
 =item C<p6rule_parse_literal(STR pattern, PMC lex)>
@@ -259,7 +261,7 @@ Parse a dot (.) token and return a C<PGE::Exp::Dot> object for it.
 
 =item C<p6rule_parse_anchor(STR pattern, PMC lex)>
 
-Parse one of the ^, ^^, $, or $$ anchors and return a 
+Parse one of the ^, ^^, $, or $$ anchors and return a
 C<PGE::Exp::Anchor> object for it.  Note that $ will be
 a little tricky here, because it can also be used to represent
 backreferences or variables.
@@ -311,7 +313,7 @@ subcaptures.
     delete lex["cname"]                            # and then remove it
   group_1:
     subp = lex["subp"]                             # current subpattern count
-    unless token == '(' goto group_2               
+    unless token == '(' goto group_2
     exp["cscope"] = 1                              # '(' == scoped capture
     lex["subp"] = 0                                # restart subpattern #'s
     if isaliased goto group_2                      # if not aliased
@@ -328,7 +330,7 @@ subcaptures.
     p6rule_parse_error(pattern, lex, "group missing ')'")
     goto end
   group_3:                                         # unscoped capture
-    if $S0 == ']' goto group_4                     
+    if $S0 == ']' goto group_4
     p6rule_parse_error(pattern, lex, "group missing ']'")
     goto end
   group_4:
@@ -354,7 +356,7 @@ Parses subrules.
     pos = lex["pos"]
     $I0 = pos
   subrule_1:
-    $I1 = is_wordchar pattern, pos 
+    $I1 = is_wordchar pattern, pos
     unless $I1 goto subrule_1b
   subrule_1_inc:
     inc pos
@@ -414,7 +416,7 @@ Parse an alias or backreference.
     $I0 = pos                                      # aha, numeric capture
     plen = lex["plen"]                             # now let's scan for digits
   num_0:
-    if $I0 >= plen goto num_1            
+    if $I0 >= plen goto num_1
     $I1 = is_digit pattern, $I0
     unless $I1 goto num_1
     inc $I0
@@ -426,7 +428,7 @@ Parse an alias or backreference.
     subp = $S0                                     # convert to integer
     lex["cname"] = subp                            # this capture
     inc subp                                       # store next subpattern #
-    lex["subp"] = subp                             # 
+    lex["subp"] = subp                             #
     p6rule_parse_skip(pattern, lex, 0)             # skip ws
     goto alias
   name:
@@ -438,7 +440,7 @@ Parse an alias or backreference.
   alias:
     pos = lex["pos"]                               # get current pos
     $S0 = substr pattern, pos, 2                   # check for ':='
-    unless $S0 == ':=' goto backref                
+    unless $S0 == ':=' goto backref
     p6rule_parse_skip(pattern, lex, 2)             # skip ':='
     exp = p6rule_parse_term(pattern, lex)          # parse a term to capture
     goto end
@@ -587,7 +589,7 @@ handled as a special quantifier.
 Parse a single term in a rule expression, such as a literal,
 anchor, assertion, backslash sequence, etc.  We use a TokenHash
 here as a lookup table to find the longest sequence of matching
-characters.  
+characters.
 
 =cut
 
@@ -612,7 +614,7 @@ characters.
 =item C<p6rule_parse_quant(STR pattern, PMC lex)>
 
 Parse a quantified term expressions, as well as the C<:> backtracking
-control.  Currently does not handle **{m..n} quantifiers, but that 
+control.  Currently does not handle **{m..n} quantifiers, but that
 will be coming soon.
 
 =cut
@@ -634,13 +636,13 @@ will be coming soon.
     if $I0 < 0 goto end
     $I0 = isa exp, "PGE::Exp::Literal"             # break multichar literals
     unless $I0 goto quant                          # not a literal
-    $S0 = exp["literal"]                           
-    $I0 = length $S0                          
+    $S0 = exp["literal"]
+    $I0 = length $S0
     unless $I0 > 1 goto quant                      # not multichar
     $S1 = substr $S0, -1, 1                        # split off last char
     chopn $S0, 1                                   # else split off last char
     exp["literal"] = $S0                           # save shorter literal
-    $P1 = find_global "PGE::Exp", "new"            
+    $P1 = find_global "PGE::Exp", "new"
     qexp = $P1("PGE::Exp::Literal")                # create quantified literal
     qexp["literal"] = $S1
     exp = $P1("PGE::Exp::Concat", exp, qexp)       # and concat
@@ -754,7 +756,7 @@ terminate the expression.
     (exp) = $P0("PGE::Exp::WS")
     lex["ws"] = 0
     goto concat_2
-  concat_1:  
+  concat_1:
     (exp) = "p6rule_parse_quant"(pattern, lex)
     unless words goto concat_2
     $I0 = lex["ws"]
@@ -805,7 +807,7 @@ to adjust the subpattern counts here.
   end:
     .return (exp)
 .end
-   
+
 =item C<p6rule_parse_exp(STR pattern, PMC lex)>
 
 Parse a complete rule expression and return its expression object.
@@ -846,7 +848,7 @@ C<p6rule_parse_group> above.
     .return (exp)
 .end
 
-=item C<(PMC rule, PMC code, PMC expr) = p6rule(STR pattern, STR gmr, STR name)>
+=item C<(rule, code, expr) = p6rule(STR pattern [, STR gmr, STR name])>
 
 Compile C<pattern> containing a Perl 6 rule expression into
 a subroutine that can match that expression, returned as C<rule>.
@@ -862,19 +864,17 @@ needed).
 .namespace [ "PGE" ]
 
 .sub "p6rule"
-    .param string pattern
-    .param string grammar
-    .param string name
+    .param string pattern                          # pattern to compile
+    .param string grammar      #:optional           # grammar to store in
+    .param string name         #:optional           # name of rule
+    #.param int    opt_argc     :opt_count
+    .local int argc
     .local pmc lex
     .local pmc exp
     .local pmc code
     .local pmc rule
-    .local int install
 
-    install = 0
-    if argcS < 3 goto p6rule_1
-    install = 1
-  p6rule_1:
+    argc = argcS
     lex = new Hash
     lex["pos"] = 0
     lex["subp"] = 0
@@ -895,10 +895,10 @@ needed).
 
     code = new String
     exp.gen(code, "R", "fail")
-    compreg $P0, "PIR"
+    $P0 = compreg "PIR"
     $S0 = code
-    rule = compile $P0, $S0
-    unless install goto p6rule_3
+    rule = compile $P0, $S0 
+    if argc < 3 goto p6rule_3
     $I0 = findclass grammar
     if $I0 goto p6rule_2
     $P0 = getclass "PGE::Rule"

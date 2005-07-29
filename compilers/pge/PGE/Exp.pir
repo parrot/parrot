@@ -33,14 +33,13 @@ functionality and correctness at the moment.
 .include "errors.pasm"
 .include "interpinfo.pasm"
 
+.const int PGE_INF = 2147483647                    # XXX: arbitrary limit
+.const int PGE_CUT_GROUP = -1                      # cut current alt/group
+.const int PGE_CUT_RULE = -2                       # cut current rule
+
 .namespace [ "PGE::Exp" ]
 
-.const int PGE_INF = 2147483647                    # XXX: arbitrary limit
-.const int PGE_MATCH_FAIL = 1                      # pos of failed match
-.const int PGE_CUT_GROUP = -1                      # cutting current group
-.const int PGE_CUT_RULE = -2                       # cutting current rule
-
-.sub __onload 
+.sub __onload
     .local pmc hashclass
     .local pmc expclass
     .local pmc hash
@@ -71,21 +70,23 @@ functionality and correctness at the moment.
     hash['\W'] = "$I0=is_wordchar target, pos \n if $I0 goto %s_f"
     $P0 = new Integer
     store_global "PGE::Exp", "$_serno", $P0
+    .return ()
 .end
 
 =head2 Functions
 
 =item C<new(STR class [, PMC exp1 [, PMC exp2]])>
 
-Creates and returns  a new C<Exp> object of C<class>, initializing 
+Creates and returns  a new C<Exp> object of C<class>, initializing
 min/max/greedy/etc.  values and C<exp1> and C<exp2> objects if provided.
 
 =cut
 
 .sub "new"
-    .param string expclass                         # class from find_type
-    .param pmc exp1                                # left expression
-    .param pmc exp2                                # right expression
+    .param string expclass     #:optional           # class from find_type
+    .param pmc exp1            #:optional           # left expression
+    .param pmc exp2            #:optional           # right expression
+    #.param int argc            :opt_count
     .local pmc me                                  # new expression object
 
     if argcS > 0 goto buildme
@@ -163,11 +164,14 @@ Typical entries in the pad include:
 =cut
 
 .sub "analyze" method
+    .param pmc next
+    .param pmc pad
     self["firstchars"] = ""
+    .return ()
 .end
 
 
-=item C<firstchars(PMC exp1, PMC exp2)>
+=item C<firstchars([PMC exp1 [, PMC exp2]])>
 
 The firstchars method sets the "firstchars" optimization hint
 based on the concatenation of the firstchars of any expressions
@@ -177,8 +181,10 @@ hint, then we have have no firstchars either.
 =cut
 
 .sub "firstchars" method
-    .param pmc exp1
-    .param pmc exp2
+    .param pmc exp1            #:optional
+    .param pmc exp2            #:optional
+    #.param int argc            :opt_count
+
     if argcP < 1 goto exp_1
     $S0 = exp1["firstchars"]
     unless $S0 > "" goto exp_1
@@ -191,113 +197,174 @@ hint, then we have have no firstchars either.
     $S0 = ""
   end:
     self["firstchars"] = $S0
+    .return ()
 .end
 
-=item C<(INT, STR) = serno(INT start, STR prefix)>
+=item C<(STR, INT) = serno([STR prefix [, INT start]])>
 
-This method simply returns integers and labels usable for 
-serialization, e.g., for generating unique labels and identifiers 
+This method simply returns integers and labels usable for
+serialization, e.g., for generating unique labels and identifiers
 within generated code.  The C<start> parameter allows the serial
 number to be set to a given value.  XXX: I'm assuming overflow
-won't be a problem, but is the use of the start parameter thread-safe?  
+won't be a problem, but is the use of the start parameter thread-safe?
 
 =cut
 
 .sub "serno" method
-    .param int start
-    .param string prefix
-    unless argcS < 1 goto serno_1
+    .param string prefix       #:optional
+    .param int start           #:optional
+    #.param int argc            :opt_count
+
+    if argcS > 0 goto serno_1
     prefix = "R"
   serno_1:
     $P0 = find_global "PGE::Exp", "$_serno"
     inc $P0
-    unless argcI > 0 goto serno_2
+    if argcI < 1 goto serno_2
     $P0 = start
   serno_2:
     $I0 = $P0
     $S0 = $I0
     concat prefix, $S0
-    .return ($I0, prefix)
+    .return (prefix, $I0)
 .end
 
 
-=item C<emit(PMC code, STR fmt, STR str1, STR str2, INT int1)>
+=item C<emit(PMC code, STR fmt [, STR str1 [, STR str2]])>
 
-Adds to the current code string, replacing %s by str1/str2 and %d
-by int1 as needed.
+Adds to the current code string, replacing %s by str1/str2.
 
 =cut
 
 .sub "emit" method
-    .param pmc code
-    .param string out
-    .param string str1
-    .param string str2
-    .param int int1
-    concat out, "\n"
-    $I0 = index out, "%s"
-    if $I0 < 1 goto emit_1
-    substr out, $I0, 2, str1
-    $I0 = index out, "%s"
-    if $I0 < 1 goto emit_1
-    substr out, $I0, 2, str2
+    .param pmc code                                # append to code
+    .param string fmt                              # string to output
+    .param string str1         #:optional           # first %s substitution
+    .param string str2         #:optional           # second %s substitution
+    .param string str3         #:optional           # third %s substitution
+    .param int int1                                # first %d substitution
+
+    concat fmt, "\n"
+    $I0 = index fmt, "%s"
+    if $I0 < 0 goto emit_1
+    substr fmt, $I0, 2, str1
+    $I0 = index fmt, "%s"
+    if $I0 < 0 goto emit_1
+    substr fmt, $I0, 2, str2
+    $I0 = index fmt, "%s"
+    if $I0 < 0 goto emit_1
+    substr fmt, $I0, 2, str3
   emit_1:
-    $I0 = index out, "%d"
-    if $I0 < 1 goto emit_2
+    $I0 = index fmt, "%d"
+    if $I0 < 0 goto emit_2
     $S0 = int1
-    substr out, $I0, 2, $S0
+    substr fmt, $I0, 2, $S0
   emit_2:
-    concat code, out
+    concat code, fmt
+    .return ()
 .end
 
-=item C<emitsub(PMC code, STR next, STR str1, STR str2, STR str3, STR str4)>
+=item C<emitsub(PMC code, STR next, [STR save [, ...]])
 
 Generate a subroutine call to C<next>, preserving and restoring
-the values of C<str1> through C<str4> in the process.
+any save parameters in the process.  The special parameter "NOCUT"
+says not to intercept cutting operations.
 
 =cut
 
-.sub "emitsub" method
-    .param pmc code
-    .param string next
-    .param string str1
-    .param string str2
-    .param string str3
-    .param string str4
-    .param int docut
-    .local pmc emit
+.sub "emitsub-newcc" method
+    .param pmc code                                # append to code
+    .param string next                             # sub label
+    .param pmc save         #:slurpy                # registers to save
+    .local int nocut                               # flag for "NOCUT"
+    .local pmc emit                                # emit subroutine
+    .local int savec                               # number of save items
 
-    unless argcI < 1 goto emitsub_0
-    docut = 1
-  emitsub_0:
     emit = find_global "PGE::Exp", "emit"
-    $I0 = argcS
-    if $I0 < 2 goto emitsub_1
-    emit(code, "    save %s", str1)
-    if $I0 < 3 goto emitsub_1
-    emit(code, "    save %s", str2)
-    if $I0 < 4 goto emitsub_1
-    emit(code, "    save %s", str3)
-    if $I0 < 5 goto emitsub_1
-    emit(code, "    save %s", str4)
-  emitsub_1:
+    nocut = 0
+    savec = elements save
+    $I0 = 0
+  saveregs_0:
+    if $I0 >= savec goto emitsub_0
+    $S0 = save[$I0]
+    inc $I0
+    if $S0 == "NOCUT" goto set_nocut
+    emit(code, "    save %s", $S0)
+    goto saveregs_0
+  set_nocut:
+    nocut = 1
+    goto saveregs_0
+  emitsub_0:
     emit(code, "    bsr %s", next)
-    if $I0 < 5 goto emitsub_5
-    emit(code, "    restore %s", str4)
-  emitsub_5:
-    if $I0 < 4 goto emitsub_4
-    emit(code, "    restore %s", str3)
-  emitsub_4:
-    if $I0 < 3 goto emitsub_3
-    emit(code, "    restore %s", str2)
-  emitsub_3:
-    if $I0 < 2 goto emitsub_2
-    emit(code, "    restore %s", str1)
-  emitsub_2:
-    unless docut goto end
+    $I0 = savec - 1
+  restoreregs_0:
+    if $I0 < 0 goto generate_cut
+    $S0 = save[$I0]
+    dec $I0
+    if $S0 == "NOCUT" goto restoreregs_0
+    emit(code, "    restore %s", $S0)
+    goto restoreregs_0
+  generate_cut:
+    if nocut goto end
     emit(code, "    if cutting != 0 goto fail")
   end:
+    .return ()
 .end
+
+.sub "emitsub" method    # old calling conventions
+    .param pmc code                                # append to code
+    .param string next                             # sub label
+    .param string save2                            # string 1
+    .param string save3                            # string 2
+    .param string save4                            # string 3
+    .param string save5                            # string 4
+    .local int nocut                               # flag for "NOCUT"
+    .local pmc emit                                # emit subroutine
+    .local int argc
+
+    argc = argcS
+
+    emit = find_global "PGE::Exp", "emit"
+    nocut = 0
+    if argc < 2 goto emitsub_0
+    if save2 == "NOCUT" goto set_nocut
+    emit(code, "    save %s", save2)
+    if argc < 3 goto emitsub_0
+    if save3 == "NOCUT" goto set_nocut
+    emit(code, "    save %s", save3)
+    if argc < 4 goto emitsub_0
+    if save4 == "NOCUT" goto set_nocut
+    emit(code, "    save %s", save4)
+    if argc < 5 goto emitsub_0
+    if save5 == "NOCUT" goto set_nocut
+    emit(code, "    save %s", save5)
+    goto emitsub_0
+  set_nocut:
+    nocut = 1
+  emitsub_0:
+    emit(code, "    bsr %s", next)
+    if argc < 5 goto res4
+    if save5 == "NOCUT" goto res4
+    emit(code, "    restore %s", save5)
+  res4:
+    if argc < 4 goto res3
+    if save4 == "NOCUT" goto res3
+    emit(code, "    restore %s", save4)
+  res3:
+    if argc < 3 goto res2
+    if save3 == "NOCUT" goto res2
+    emit(code, "    restore %s", save3)
+  res2:
+    if argc < 2 goto generate_cut
+    if save2 == "NOCUT" goto generate_cut
+    emit(code, "    restore %s", save2)
+  generate_cut:
+    if nocut goto end
+    emit(code, "    if cutting != 0 goto fail")
+  end:
+    .return ()
+.end
+
 
 =item C<genliteral(PMC code, STR label, STR next)>
 
@@ -309,7 +376,7 @@ literal to be matched has already been placed in the C<str> string
 register.
 
 =cut
-    
+
 .sub "genliteral" method
     .param pmc code
     .param string label
@@ -346,7 +413,7 @@ register.
     emit(code, "    dec rep")
     emit(code, "    pos -= litlen")
     emit(code, "    goto %s_lit2", label)
-    .return()
+    .return ()
 
   lazy:
     emit(code, "  %s_lit1:", label)
@@ -364,6 +431,7 @@ register.
     emit(code, "    inc rep")
     emit(code, "    pos += litlen")
     emit(code, "    goto %s_lit1", label)
+    .return ()
 .end
 
 .namespace [ "PGE::Exp::Start" ]
@@ -375,6 +443,7 @@ register.
     $P0 = self["exp1"]
     $P0.analyze(self, pad)                         # analyze our subexp
     self.firstchars($P0)                           # set firstchars
+    .return ()
 .end
 
 .sub "gen" method
@@ -387,24 +456,36 @@ register.
 
     emit = find_global "PGE::Exp", "emit"
     emit(code, ".sub _pge_rule")
-    emit(code, "    .param string target")
+    emit(code, "    .param pmc pmc1")
+    emit(code, "    .param string str1")                
     emit(code, "    .param int pos")
-    emit(code, "    .param pmc mob")
+    emit(code, "    .local pmc mob")
     emit(code, "    .local pmc yield")
-    emit(code, "    if argcP > 0 goto start_match")
+    emit(code, "    if argcP < 1 goto new_match")
+    emit(code, "    $I0 = isa pmc1, \"PGE::Match\"")
+    emit(code, "    unless $I0 goto new_match")
+    emit(code, "    mob = pmc1")
+    emit(code, "    goto init_pos")
     emit(code, "  new_match:")
     emit(code, "    $I0 = find_type \"PGE::Rule\"")
     emit(code, "    mob = new $I0")
     emit(code, "    $P0 = new String")
-    emit(code, "    $P0 = target")
+    emit(code, "    if argcP > 0 goto from_pmc")
+    emit(code, "    assign $P0, str1")
+    emit(code, "    goto init_match")
+    emit(code, "  from_pmc:")
+    emit(code, "    assign $P0, pmc1")
+    emit(code, "  init_match:")
     emit(code, "    setattribute mob, \"PGE::Match\\x0$:target\", $P0")
     emit(code, "    $P0 = new PerlInt")
     emit(code, "    setattribute mob, \"PGE::Match\\x0$:from\", $P0")
     emit(code, "    $P0 = new PerlInt")
     emit(code, "    $P0 = -1")
     emit(code, "    setattribute mob, \"PGE::Match\\x0$:pos\", $P0")
-    emit(code, "    unless argcI < 1 goto rule_2")
-    emit(code, "    pos = -1")
+    emit(code, "  init_pos:")
+    emit(code, "    if argcI > 0 goto start_match")
+    emit(code, "    $P0 = getattribute mob, \"PGE::Match\\x0$:pos\"")
+    emit(code, "    pos = $P0")
     emit(code, "  start_match:")
     emit(code, "    newsub yield, .Coroutine, _pge_rule_coroutine")
     emit(code, "    setattribute mob, \"PGE::Match\\x0&:yield\", yield")
@@ -450,15 +531,16 @@ register.
     emit(code, "    if $I0 < 0 goto try_again")
   gen_1:
     emit(code, "    from = pos")
-    self.emitsub(code, label, "pos", "from", "lastpos", 0)
-    emit(code, "    if cutting == %d goto fail_forever", PGE_CUT_RULE)
+    self.emitsub(code, label, "pos", "from", "lastpos", "NOCUT")
+    #emit(code, "    if cutting == %d goto fail_forever", PGE_CUT_RULE)
+    emit(code, "    if cutting == %d goto fail_forever", -2)  # XXX
     emit(code, "  try_again:")
     emit(code, "    inc pos")
     emit(code, "    goto try_match")
     emit(code, "  try_at_pos:")
     emit(code, "    cutting = 0")
     emit(code, "    from = pos")
-    self.emitsub(code, label, 0)
+    self.emitsub(code, label, "NOCUT")
     emit(code, "  fail_forever:")
     emit(code, "    .yield(-2)")
     emit(code, "    goto fail_forever")
@@ -467,6 +549,7 @@ register.
     exp1.gen(code, label, next)
 
     emit(code, ".end")
+    .return ()
 .end
 
 .namespace [ "PGE::Exp::End" ]
@@ -484,8 +567,9 @@ register.
     emit(code, "    $P0 = -1")
     emit(code, "  fail:")
     emit(code, "    ret")
+    .return ()
 .end
-    
+
 .namespace [ "PGE::Exp::Literal" ]
 
 .sub "analyze" method
@@ -498,6 +582,7 @@ register.
     unless $I0 < 1 goto end                        # then add firstchars
     self.firstchars(self, next)                    # of the following exp
   end:
+    .return ()
 .end
 
 .sub "gen" method
@@ -513,6 +598,7 @@ register.
     emit(code, "\n  %s:  # literal %s", label, $S0)
     emit(code, "    lit = \"%s\"", $S1)
     self.genliteral(code, label, next)
+    .return ()
 .end
 
 
@@ -595,7 +681,7 @@ register.
     emit(code, "    dec rep")
     emit(code, "    dec pos")
     emit(code, "    goto %s_2", label)
-    .return()
+    .return ()
   lazy:
     emit(code, "    rep = %d", min)
     emit(code, "    pos += rep", min)
@@ -603,13 +689,14 @@ register.
     emit(code, "    if rep > maxrep goto fail")
     unless iscut goto lazy_1
     emit(code, "    goto %s", next)
-    .return()
+    .return ()
   lazy_1:
     emit(code, "    if rep == maxrep goto %s", next)
     self.emitsub(code, next, "pos", "rep", "maxrep")
     emit(code, "    inc rep")
     emit(code, "    inc pos")
     emit(code, "    goto %s_3", label)
+    .return ()
 .end
 
 .namespace [ "PGE::Exp::CCShortcut" ]
@@ -668,6 +755,7 @@ register.
     emit(code, "    goto %s_0", label)
     emit(code, "  %s_f:", label)
     emit(code, "    goto fail")
+    .return ()
 .end
 
 .namespace [ "PGE::Exp::CharClass" ]
@@ -731,7 +819,8 @@ register.
     emit(code, "    %s $I0 == -1 goto fail", charmatch)
     emit(code, "    inc rep")
     emit(code, "    inc pos")
-    emit(code, "    goto %s_0", label) 
+    emit(code, "    goto %s_0", label)
+    .return ()
 .end
 
 .namespace [ "PGE::Exp::WS" ]
@@ -748,6 +837,7 @@ register.
     unless $I0 == $I1 goto end
     self["iscut"] = 1
   end:
+    .return ()
 .end
 
 .sub "gen" method
@@ -781,6 +871,7 @@ register.
     emit(code, "    dec pos")
     emit(code, "    goto %s_2", label)
   end:
+    .return ()
 .end
 
 
@@ -790,6 +881,7 @@ register.
     .param pmc next
     .param pmc pad
     self.firstchars(next)
+    .return ()
 .end
 
 .sub "gen" method
@@ -834,6 +926,7 @@ register.
     emit(code, "    if $I0 == $I1 goto %s", next)
   end:
     emit(code, "    goto fail")
+    .return ()
 .end
 
 
@@ -848,8 +941,9 @@ register.
     exp1 = self["exp1"]
     exp1.analyze(exp2, pad)
     self.firstchars(exp1)
+    .return ()
 .end
-   
+
 .sub "gen" method
     .param pmc code
     .param string label
@@ -858,12 +952,13 @@ register.
     .local pmc exp1, exp2
     emit = find_global "PGE::Exp", "emit"
     emit(code, "\n  %s:", label)
-    $S0 = self.serno()
-    $S1 = self.serno()
+    ($S0, $I0) = self.serno()
+    ($S1, $I1) = self.serno()
     exp1 = self["exp1"]
     exp1.gen(code, $S0, $S1)
     exp2 = self["exp2"]
     exp2.gen(code, $S1, next)
+    .return ()
 .end
 
 .namespace [ "PGE::Exp::Cut" ]
@@ -872,6 +967,7 @@ register.
     .param pmc next
     .param int pad
     self.firstchars(next)
+    .return ()
 .end
 
 .sub "gen" method
@@ -888,9 +984,10 @@ register.
   cut_1:
     emit = find_global "PGE::Exp", "emit"
     emit(code, "\n  %s:", label)
-    self.emitsub(code, next, 0)
+    self.emitsub(code, next, "NOCUT")
     emit(code, "    cutting = %s", cutting)
     emit(code, "    goto fail")
+    .return ()
 .end
 
 .namespace [ "PGE::Exp::Alt" ]
@@ -914,6 +1011,7 @@ register.
     pad["creps"] = creps
     exp1.analyze(next, pad)
     self.firstchars(exp1, exp2)
+    .return ()
 .end
 
 .sub "gen" method
@@ -923,17 +1021,18 @@ register.
     .local pmc emit
     .local pmc exp1, exp2
     emit = find_global "PGE::Exp", "emit"
-    emit(code, "\n  %s:", label)
-    $S0 = self.serno()
-    $S1 = self.serno()
+    emit(code, "\n  %s:  # alt", label)
+    ($S0, $I0) = self.serno()
+    ($S1, $I1) = self.serno()
     self.emitsub(code, $S0, "pos")
     emit(code, "    goto %s", $S1)
     exp1 = self["exp1"]
     exp1.gen(code, $S0, next)
     exp2 = self["exp2"]
     exp2.gen(code, $S1, next)
+    .return ()
 .end
-    
+
 
 .namespace [ "PGE::Exp::Group" ]
 
@@ -963,7 +1062,7 @@ register.
   creps_2:
     $I0 = exists creps[cname]                      # have seen capture name?
     unless $I0 goto creps_3                        #
-    $P0 = creps[cname]                             # yes, so prev is now 
+    $P0 = creps[cname]                             # yes, so prev is now
     $P0["isarray"] = 1                             # an array capture
     self["isarray"] = 1                            # and so is self
   creps_3:
@@ -972,7 +1071,7 @@ register.
   isarray_0:
     psave = pad["isarray"]                         # get current isarray status
     isarray = self["isarray"]                      # combine with group's
-    isarray |= psave                               # 
+    isarray |= psave                               #
     self["isarray"] = isarray                      # and pass to nested
     pad["isarray"] = isarray
     $I0 = self["cscope"]                           # new scope resets
@@ -996,8 +1095,9 @@ register.
     self.firstchars(exp1)
   end:
     pad["creps"] = creps
+    .return ()
 .end
- 
+
 .sub "gen" method
     .param pmc code
     .param string label
@@ -1011,7 +1111,7 @@ register.
     .local int myserno
     emit = find_global "PGE::Exp", "emit"
     (min, max, isgreedy, iscut) = self."_getattributes"()
-    (myserno, sublabel) = self.serno()
+    (sublabel, myserno) = self.serno()
     iscapture = defined self["cname"]
     isarray = self["isarray"]
     rname = self["rname"]
@@ -1104,7 +1204,7 @@ register.
     emit(code, "    $I0 = pop gpad")
     emit(code, "    $P0 = pop gpad")
     emit(code, "    $P0 = pop cpad")
-    self.emitsub(code, next, "capt", "rep", "$P0", 0)
+    self.emitsub(code, next, "capt", "rep", "$P0", "NOCUT")
     emit(code, "    push cpad, $P0")
     emit(code, "    push gpad, capt")
     emit(code, "    push gpad, rep")
@@ -1120,7 +1220,7 @@ register.
     emit(code, "    $I0 = pop gpad")
     emit(code, "    $P0 = pop gpad")
     emit(code, "    $P0 = pop cpad")
-    self.emitsub(code, next, "capt", "rep", "pos", "$P0", 0)
+    self.emitsub(code, next, "capt", "rep", "pos", "$P0", "NOCUT")
     emit(code, "    push cpad, $P0")
     emit(code, "    push gpad, capt")
     emit(code, "    push gpad, rep")
@@ -1203,7 +1303,7 @@ register.
     emit(code, "    push capt, $P0")
   subrule_3:
     emit(code, "  %s_s2:", label)
-    self.emitsub(code, label, "pos", "$P0", 0)
+    self.emitsub(code, label, "pos", "$P0", "NOCUT")
     emit(code, "    unless cutting == 0 goto %s_s3", label)
     emit(code, "    saveall")
     emit(code, "    $P0.next()")
@@ -1219,8 +1319,9 @@ register.
     emit(code, "  %s_s4:", label)
     emit(code, "    ret")
   end:
+    .return ()
 .end
-   
+
 =head1 AUTHOR
 
 Patrick Michaud (pmichaud@pobox.com) is the author and maintainer.
@@ -1228,4 +1329,4 @@ Patches and suggestions should be sent to the Perl 6 compiler list
 (perl6-compiler@perl.org).
 
 =cut
- 
+

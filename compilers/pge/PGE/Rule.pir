@@ -21,6 +21,7 @@ a number of built-in rules.
     p6rule = find_global "PGE", "p6rule"
     p6rule("[_ | <?alpha>] \w*", "PGE::Rule", "ident")
     p6rule("<ident> [ \: \: <ident> ]*", "PGE::Rule", "name")
+    .return ()
 .end
 
 =head2 Built-in rules

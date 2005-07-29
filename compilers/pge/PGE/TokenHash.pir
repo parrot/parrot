@@ -11,6 +11,7 @@ PGE::TokenHash - hash implementation to speed up Token lookups
     class = newclass "PGE::TokenHash"
     addattribute class, ".ihash"
     addattribute class, ".vhash"
+    .return ()
 .end
 
 .sub "__init" method
@@ -19,6 +20,7 @@ PGE::TokenHash - hash implementation to speed up Token lookups
     vhash = new Hash
     setattribute self, "PGE::TokenHash\x0.ihash", ihash
     setattribute self, "PGE::TokenHash\x0.vhash", vhash
+    .return ()
 .end
 
 .sub "__get_pmc_keyed" method
@@ -48,6 +50,7 @@ PGE::TokenHash - hash implementation to speed up Token lookups
     if $I0 >= len goto end
     ihash[c] = len
   end:
+    .return ()
 .end
 
 .sub "__exists_keyed" method

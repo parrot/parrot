@@ -23,7 +23,6 @@
 
     gparse = p6rule_compile(":w ( (grammar) <ident> ; | (rule) <ident> \{$<rulex>:=[<-[{]>*]\} )*")
 
-
   read_loop:
     print "\ninput \"rule <pattern>\", \"glob <pattern>\", \"save <name>\",\n"
     print "target string, \"pir\", \"exp\", \"trace\", \"next\", or \"use <file>\"\n"
