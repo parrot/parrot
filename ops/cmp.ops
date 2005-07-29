@@ -762,7 +762,7 @@ inline op xor(out INT, in INT, in INT) :base_core {
 
 =head2 Non-flow control comparison ops
 
-These ops do comparisons and truth testing without doing flow control
+These ops do comparisons and truth testing without doing flow control.
 
 =over 4
 
@@ -785,11 +785,11 @@ Sets $1 to 0 or 1, depending on the identity of the 2 objects.
 
 =item B<istrue>(out INT, in PMC)
 
-Sets $1 to 1 or 0, depending on whether $2 is true or not
+Sets $1 to 1 or 0, depending on whether $2 is true or not.
 
 =item B<isfalse>(out INT, in PMC)
 
-Sets $1 to 1 or 0, depending on whether $2 is false or not
+Sets $1 to 1 or 0, depending on whether $2 is false or not.
 
 =cut
 
@@ -831,7 +831,7 @@ inline op isfalse(out INT, in PMC) {
 
 =item B<isgt>(out INT, in PMC, in PMC)
 
-Sets $1 to 1 if $2 is greater than $3
+Sets $1 to 1 if $2 is greater than $3.
 
 =cut
 
@@ -842,7 +842,7 @@ inline op isgt(out INT, in PMC, in PMC) {
 
 =item B<isge>(out INT, in PMC, in PMC)
 
-Sets $1 to 1 if $2 is greater than or equal to $3
+Sets $1 to 1 if $2 is greater than or equal to $3.
 
 =cut
 
@@ -859,7 +859,7 @@ inline op isge(out INT, in PMC, in PMC) {
 
 =item B<isle>(out INT, in PMC, in PMC)
 
-Sets $1 to 1 if $2 is less than or equal to $3
+Sets $1 to 1 if $2 is less than or equal to $3.
 
 =cut
 
@@ -891,7 +891,7 @@ inline op isle(out INT, in PMC, in PMC) {
 
 =item B<islt>(out INT, in PMC, in PMC)
 
-Sets $1 to 1 if $2 is less than $3
+Sets $1 to 1 if $2 is less than $3.
 
 =cut
 
@@ -923,7 +923,7 @@ inline op islt(out INT, in PMC, in PMC) {
 
 =item B<iseq>(out INT, in PMC, in PMC)
 
-Sets $1 to 1 if $2 is equal to $3
+Sets $1 to 1 if $2 is equal to $3.
 
 =cut
 
@@ -958,7 +958,7 @@ inline op iseq(out INT, in PMC, in PMC) {
 
 =item B<isne>(out INT, in PMC, in PMC)
 
-Sets $1 to 1 if $2 is not equal to $3
+Sets $1 to 1 if $2 is not equal to $3.
 
 =cut
 
