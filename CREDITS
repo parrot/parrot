@@ -350,7 +350,8 @@ N: Vladimir Lipsky
 D: Win32, IO fixes
 
 N: Will Coleda
-D: Tcl language and misc fixes
+E: will@coleda.com
+D: Tcl language (partcl) and misc fixes
 
 N: OOLLEY kj
 D: Miscellaneous cleanup and PDD07-conformance
