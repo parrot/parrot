@@ -93,8 +93,8 @@ You can run the full test suite with
 
     make fulltest
 
-Note: due to string code changes some of the string tests fail with
-"make testr", which is part of "make fulltest".
+Note: PLATFORMS contains notes about whether test failures are expected
+on your system.
 
 On some systems you can install parrot:
 
