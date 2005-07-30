@@ -117,7 +117,7 @@ for writing to disc and later loading via C<load_bytecode>.
     STRING* get_string() {
         STRING *res;
         struct PackFile *pf;
-        size_t size;
+        size_t size, aligned_size;
         opcode_t *packed;
         struct PackFile_ByteCode *seg;
 
@@ -138,8 +138,23 @@ for writing to disc and later loading via C<load_bytecode>.
             PackFile_add_segment(INTERP, &pf->directory,
                     (struct PackFile_Segment *)seg->pic_index);
         size = PackFile_pack_size(INTERP, pf) * sizeof(opcode_t);
-        res = string_make_empty(INTERP, enum_stringrep_one, size);
+        /*
+         * work around packfile bug:
+         * as far as I have checked it the story is:
+         * - PackFile_pack_size() assumes 16 byte alignment but doesn't
+         *   have the actual start of the code (packed)
+         * - PackFile_pack() uses 16 bye alignment relative to the start
+         *   of the code, which isn't really the same
+         * Therefore align code at 16, which should give the desired
+         * effect
+         */    
+        aligned_size = size + 15;
+        res = string_make_empty(INTERP, enum_stringrep_one, aligned_size);
         res->strlen = res->bufused = size;
+        if ((size_t)res->strstart & 0xf) {
+            LVALUE_CAST(char*,res->strstart) += 
+                16 - ((size_t)res->strstart & 0xf);
+        }
         PackFile_pack(INTERP, pf, res->strstart);
         /* now remove all segments from directory again and destroy
          * the packfile
