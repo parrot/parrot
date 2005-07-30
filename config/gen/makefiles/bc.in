@@ -37,7 +37,9 @@ python/lib/bc/BcParser.py: grammar/bc_python.g
 
 clean:
 	$(RM_RF) \
-    python/lib/bc/Bc*.py
+    python/lib/bc/*.pyc \
+    python/lib/antlr/*.pyc \
+    t/*.bc t/*.pir t/*.posix_out t/*.parrot_out
 
 realclean: clean
 	$(RM_RF) \
