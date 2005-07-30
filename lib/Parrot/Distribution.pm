@@ -235,10 +235,11 @@ sub gen_manifest_skip {
    # Checkout is done either with svn or svk
    my $svn_cmd = $Parrot::Revision::svn_entries =~ m/\.svn/ ? 'svn' : 'svk';
 
-   # cd to the distribution root first
-   my $file_list = ExtUtils::Manifest::manifind();
-   my %dir_list  = map { ( File::Spec->splitpath( $_ ) )[1] => 1 } keys %{$file_list};
- 
+   # Find all directories in the Parrot distribution
+   my %dir_list  = map { my $dir = ( File::Spec->splitpath( $_ ) )[1];
+                         $dir =~ s!\.svn/$!!;
+                         $dir => 1 
+                       } keys %{ ExtUtils::Manifest::manifind() };
    my @skip;     # regular expressions for files to skip
    foreach my $dir ( sort keys %dir_list ) {
        next if $dir =~ m/\.svn/;

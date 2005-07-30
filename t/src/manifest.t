@@ -64,10 +64,10 @@ SKIP:
     local $" = "\n\t";
 
     ok(!@$svn_miss, 'all files in MANIFEST.SKIP are also in svn:ignore')
-        or diag("Missing files in MANIFEST.SKIP:\n\t@$svn_miss");
+        or diag("File in MANIFEST.SKIP but not ignored by SVN:\n\t@$svn_miss");
 
     ok(!@$manifest_skip_miss, 'all svn:ignore files are in MANIFEST.SKIP')
-        or diag("Files ignored by svn:ignore but not in MANIFEST.SKIP:\n\t@$manifest_skip_miss");
+        or diag("Files ignored by SVN but not in MANIFEST.SKIP:\n\t@$manifest_skip_miss");
 
     $ExtUtils::Manifest::Quiet = 1;
 
