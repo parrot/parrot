@@ -1,0 +1,88 @@
+# $Id$
+
+=head1 NAME
+
+languages/bc/t/harness - A harness for Parrot bc
+
+=head1 SYNOPSIS
+
+  cd languages && perl -I../lib bc/t/harness --files
+
+  cd languages && perl -I../lib bc/t/harness 
+
+  cd languages && perl -I../lib bc/t/harness --use-gnu-bc
+
+  cd languages && perl -I../lib bc/t/harness \
+                   bc/t/basic/integer.t 
+
+=head1 DESCRIPTION
+
+If I'm called with a single
+argument of "--files", I just return a list of files to process.
+This list is one per line, and is relative to the languages dir.
+
+If I'm called with no args, I run the complete suite.
+
+Otherwise I run the tests that were passed on the command line.
+
+=cut
+
+use strict;
+use lib '..';
+
+use Cwd();
+use Data::Dumper;
+use File::Spec;
+use Test::Harness();
+
+my $language = 'bc';
+
+if ( grep { m/^--files$/ } @ARGV ) {
+    # Only the Makefile in 'parrot/languages' uses --files
+    my $dir = File::Spec->catfile( $language, 't' );
+    my @files = glob( File::Spec->catfile( $dir, '*.t' ) );
+    print join( "\n", @files );
+    print "\n" if scalar(@files);
+} else { 
+    my @files;
+    # TODO: use Getopt::Long or such
+    my $use_gnu_bc = ( grep { m/^--use-gnu-bc$/ } @ARGV ) ? 1 : 0;
+    @ARGV = grep { ! m/^--use-gnu-bc$/ } @ARGV;
+    if ( scalar(@ARGV) ) {
+        # Someone specified tests for me to run.
+        @files = grep { -f $_ } @ARGV
+    } else {
+        ( undef, undef, my $current_dir ) = File::Spec->splitpath( Cwd::getcwd() );
+        if ( $current_dir eq 'languages' ) {
+            @files = glob( File::Spec->catfile( $language, 't', '*.t' ) );
+        }
+        elsif ( $current_dir eq $language ) {
+            @files = glob( File::Spec->catfile( 't', '*.t' ) );
+        }
+    }
+
+    # Always test Parrot bc
+    eval
+    {
+        $ENV{PARROT_BC_TEST_PROG} = '';
+        Test::Harness::runtests( @files ) if scalar( @files );
+    };
+    if ( $use_gnu_bc ) {
+       $ENV{PARROT_BC_TEST_PROG} = 'bc --standard --quiet';
+       Test::Harness::runtests( @files ) if scalar( @files );
+    }
+}
+
+=head1 HISTORY
+
+Mostly taken from m4/t/harness.
+
+=head1 SEE ALSO
+
+  F<languages/tcl/t/harness>, F<languages/scheme/t/harness>, F<languages/m4/t/harness>, F<languages/python/t/harness>
+
+=head1 AUTHOR
+
+Bernhard Schmalhofer - <Bernhard.Schmalhofer@gmx.de>
+
+=cut
