@@ -92,6 +92,8 @@ Like above with a chracter set attached to the string. Valid character
 sets are currently: C<ascii> (the default), C<binary>, C<unicode>
 (with UTF-8 as the default encoding), and C<iso-8859-1>.
 
+=back
+
 =head2 String escape sequences
 
 Inside double-quoted strings the following escape sequences are processed.
@@ -103,6 +105,8 @@ Inside double-quoted strings the following escape sequences are processed.
   \uhhhh      4 hex digits
   \Uhhhhhhhh  8 hex digits
   \a, \b, \t, \n, \v, \f, \r, \e, \\
+
+=over 4
 
 =item encoding:charset:"string constant"
 
