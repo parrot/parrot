@@ -219,6 +219,11 @@ Describe the behavior of C<share>. L<PDD02>
 
 Describe the components of a C<struct PMC_EXT>. L<PDD04>
 
+=item *
+
+Define what bits of the Parrot internals should be exposed as part of
+the Parrot API for extension writers.
+
 =back
 
 =head2 TODO
