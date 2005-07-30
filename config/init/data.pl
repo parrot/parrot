@@ -82,10 +82,16 @@ sub runstep {
     # modules that can be dynamically loaded.
     # Flags to tell ld to build a shared library, e.g.  -shared for GNU ld.
     ld_share_flags => $Config{lddlflags},
-
+    
+    # These relate to building of dynclasses.
+    cc_building_dynclass_flag => '',
+    
     # Flags to tell ld to build a dynamically loadable module, e.g.  -shared for GNU ld.
+    # Also some platforms (Win32) need to generate and pass the linker an export list.
     # Dynamically loadable modules
-    ld_load_flags => $Config{lddlflags},
+    ld_load_flags       => $Config{lddlflags},
+    parrot_exe_def      => '',
+    ld_parrot_exe_def   => '',
 
     libs          => $Config{libs},
 
