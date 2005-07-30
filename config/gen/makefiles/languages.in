@@ -9,6 +9,7 @@ MAKE_C    = ${make_c}
 # remove obsolete languages here
 LANGUAGES = \
     BASIC \
+    bc \
     befunge \
     bf \
     cola \
@@ -56,6 +57,7 @@ test:   all
 
 clean: \
     BASIC.clean \
+    bc.clean \
     befunge.clean \
     bf.clean \
     cola.clean \
@@ -87,6 +89,14 @@ BASIC.test:
 # Don't know how to test BASIC
 BASIC.clean:
 # Don't know how to clean BASIC
+
+bc : bc.dummy
+bc.dummy:
+	$(MAKE_C) bc
+bc.test:
+	$(MAKE_C) bc test
+bc.clean:
+	$(MAKE_C) bc clean
 
 befunge : befunge.dummy
 befunge.dummy:

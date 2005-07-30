@@ -118,6 +118,8 @@ sub makefiles {
   genfile('config/gen/makefiles/parrot_compiler.in' => 'languages/parrot_compiler/Makefile',
           commentType       => '#',
           replace_slashes   => 1);
+  genfile('config/gen/makefiles/bc.in',        'languages/bc/Makefile',
+          commentType => '#', replace_slashes => 1);
 
   if ( Configure::Data->get('has_perldoc') ) {
     # set up docs/Makefile, partly based on the .ops in the root dir

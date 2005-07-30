@@ -1,0 +1,46 @@
+# Copyright: 2005 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+# Setup of some commands
+PERL           = ${perl}
+RM_RF          = ${rm_rf}
+
+# the default target
+all: build 
+
+# This is a listing of all targets, that are meant to be called by users
+help:
+	@echo ""
+	@echo "Following targets are available for the user:"
+	@echo ""
+	@echo "  all:               BcLexer.py and BcParser.py"
+	@echo "                     This is the default."
+	@echo "Testing:"
+	@echo "  test:              Run the test suite."
+	@echo ""
+	@echo "Cleaning:"
+	@echo "  clean:             Basic cleaning up."
+	@echo "  distclean:         Remove everything not in MANIFEST."
+	@echo ""
+	@echo "Misc:"
+	@echo "  help:              Print this help message."
+	@echo ""
+
+test: build
+	cd .. && $(PERL) -I../lib -I bc/lib bc/t/harness --use-gnu-bc
+
+build: python/lib/bc/BcParser.py 
+
+# BcLexer.py will be created too
+python/lib/bc/BcParser.py: grammar/bc_python.g
+	antlr -o python/lib/bc grammar/bc_python.g
+
+clean:
+	$(RM_RF) \
+    python/lib/bc/Bc*.py
+
+realclean: clean
+	$(RM_RF) \
+    Makefile
+
+distclean: realclean

@@ -1,0 +1,23 @@
+# Copyright: 2005 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 Overview
+
+This implementation of bc is based on ANTLR.
+
+=head2 Vision
+
+Be compatible with Pirate and Pugs.
+Switch to Perl6 after Gary Evans has made a Perl6 backend for ANTLR.
+
+=head1 SEE ALSO
+
+L<http://www.funet.fi/pub/doc/posix/p1003.2/d11.2/4.3>
+L<http://en.wikipedia.org/wiki/Bc_%28Unix%29>
+L<http://parrotcode.org>
+L<http://pugscode.org>
+L<http://pirate.tangentcode.com/>
+L<http://www.javadude.com/articles/antlrtut/>
+
+
+=cut

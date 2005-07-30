@@ -31,10 +31,10 @@ V: 0.0.11
 
 N: bc
 A: Bernhard Schmalhofer
-D: Needs antlr and Python
-S: Not working and not yet in Parrot SVN
+D: Needs ANTLR and Python
+S: basic arithmetics working
 M: Yes
-V: 0.1.2
+V: 0.2.2
 
 N: befunge
 A: Jerome Quelin
