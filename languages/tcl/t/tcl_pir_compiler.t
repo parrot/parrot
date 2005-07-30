@@ -1,7 +1,7 @@
 #!perl
 
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 3;
+use Parrot::Test tests => 4;
 use Test::More;
 use vars qw($TODO);
 
@@ -55,5 +55,17 @@ pir_output_is(<<'CODE', <<'OUTPUT', "pass arguments to a tcl proc from PIR");
 .end
 CODE
 hello
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "invoke argless tcl proc from PIR");
+.sub _main @MAIN
+  load_bytecode "languages/tcl/lib/tcllib.pbc"
+  $S1 = 'proc hey {} { puts 11 }; hey; '
+  $P1 = compreg 'TCL'
+  $P0 = compile $P1, $S1
+  $P0()
+.end
+CODE
+11
 OUTPUT
 }
