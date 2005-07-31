@@ -92,7 +92,8 @@ ex:
 
 =item _register_dumper( id, sub )
 
-Registers a dumper for new PMC type.
+Registers a dumper for new PMC type. B<UNIMPLEMENTED>
+But see B<method __dunp> below.
 
 =over 4
 
@@ -123,6 +124,11 @@ This function returns nothing.
     find_global $P2, "Data::Dumper", "global"
     $P2."registerDumper"(id, s)
 .end
+
+=item __dump(pmc dumper, str label) method
+
+If a method C<__dump> exists in the namespace of the class, it will be
+called with the current dumper object and the label of the PMC.
 
 =item dumper =_global_dumper() B<(internal)>
 

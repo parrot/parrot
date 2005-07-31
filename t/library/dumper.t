@@ -18,7 +18,7 @@ Tests data dumping.
 
 use strict;
 
-use Parrot::Test tests => 26;
+use Parrot::Test tests => 27;
 
 # no. 1
 pir_output_is(<<'CODE', <<'OUT', "dumping array of sorted numbers");
@@ -930,6 +930,46 @@ CODE
     "hello",
     "world"
 ]
+OUTPUT
+
+# no. 27
+pir_output_is(<<'CODE', <<'OUTPUT', "custom dumper");
+.sub main @MAIN
+    .local pmc o, s,ds, cl
+    cl = subclass 'ResizablePMCArray', 'bar'
+    .local int id
+    id = typeof cl
+    o = new id
+    _dumper(s)
+.end
+
+.namespace ["bar"]
+.sub __init method
+    .local pmc ar
+    ar = getattribute self, '__value'
+    push ar, 1
+    push ar, 2
+.end
+
+.sub __dump method
+    .param pmc dumper
+    .param string label
+    print " __value => { \n"
+    .local pmc ar
+    ar = getattribute self, '__value'
+    dumper.'dump'('attr', ar)
+    print "\n}"
+.end
+.namespace ['']
+.include 'library/dumper.imc'
+
+CODE
+"VAR1" => PMC 'bar'  __value => { 
+ResizablePMCArray (size:2) [
+    1,
+    2
+]
+}
 OUTPUT
 
 # pir_output_is(<<'CODE', <<'OUTPUT', "dumping IntegerArray PMC");
