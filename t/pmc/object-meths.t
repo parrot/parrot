@@ -16,7 +16,7 @@ Tests PMC object methods.
 
 =cut
 
-use Parrot::Test tests => 30;
+use Parrot::Test tests => 31;
 use Test::More;
 
 output_like(<<'CODE', <<'OUTPUT', "callmethod - unknown method");
@@ -978,4 +978,34 @@ CODE
 foofoo
 OUTPUT
 
+pir_output_is(<<'CODE', <<'OUTPUT', "super 1");
+.sub main @MAIN
+    .local pmc o, cl
+    cl = newclass 'Parent'
+    cl = subclass cl, 'Child'
+    o = new 'Child'
+    o."foo"()
+.end
+
+.namespace ['Parent']
+.sub foo method
+    print "Parent foo\n"
+    self."bar"()
+.end
+.sub bar method
+    print "Parent bar\n"
+.end
+
+.namespace ['Child']
+.sub foo method
+    print "Child foo\n"
+    .local pmc s
+    s = new .Super, self
+    s."foo"()
+.end
+CODE
+Child foo
+Parent foo
+Parent bar
+OUTPUT
 

@@ -1,0 +1,137 @@
+/*
+Copyright: 2005 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+classes/super.pmc - Super Class
+
+=head1 DESCRIPTION
+
+A Super PMC holds an object and redirects method lookup to the parent
+of the object's class.
+
+=head1 SYNOPSIS
+
+  .sub meth method
+      .local pmc s
+      s = new .Super, self
+      s."meth"()
+  .end
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+#include "parrot/method_util.h"
+
+pmclass Super need_ext {
+
+/*
+
+=item C<void init(PMC *obj)>
+
+Create an unbound super instance.
+
+=item C<void init_pmc(PMC *obj)>
+
+Initialize a new super instance, bound to the C<obj>.
+
+=item C<void set_pmc(PMC *obj)>
+
+Bind the object C<obj> to this Super instance.
+
+=item C<PMC* get_pmc(void)>
+
+Return the bound object.
+
+=item C<void mark()>
+
+Set the bound object live.
+
+=item C<PMC *find_method(STRING *name)>
+
+Find the method for C<*name> in the parent class of the bound object.
+
+=cut
+
+*/
+
+    void init() {
+	PMC_pmc_val(SELF) = PMC_struct_val(SELF) = PMCNULL;
+    }
+
+    void init_pmc(PMC *obj) {
+	PMC_struct_val(SELF) = PMCNULL;
+	SELF.set_pmc(obj);
+    }
+
+    void set_pmc(PMC *obj) {
+        PMC_pmc_val(SELF) = obj;
+        if (!PMC_IS_NULL(obj)) {
+	    PMC *mro = obj->vtable->mro;
+	    if (VTABLE_elements(INTERP, mro) <= 1)
+		real_exception(INTERP, NULL, E_TypeError,
+                        "object has no parent");
+            PObj_custom_mark_SET(SELF);
+        }
+    }
+
+    PMC* get_pmc() {
+        return PMC_pmc_val(SELF);
+    }
+
+
+    void mark() {
+        if (PMC_pmc_val(SELF))
+            pobject_lives(INTERP, (PObj *)PMC_pmc_val(SELF));
+	if (PMC_struct_val(SELF))
+	    pobject_lives(INTERP, (PObj *)PMC_struct_val(SELF));
+    }
+
+    PMC* find_method(STRING* name) {
+        PMC *obj, *mro, *class;
+
+        obj = PMC_pmc_val(SELF);
+        if (PMC_IS_NULL(obj)) {
+		real_exception(INTERP, NULL, E_TypeError,
+                        "no object bound to super");
+        }
+        interpreter->ctx.current_object = obj;
+        mro = obj->vtable->mro;
+        class = VTABLE_get_pmc_keyed_int(INTERP, mro, 1);
+        return VTABLE_find_method(INTERP, class, name);
+    }
+}
+
+/*
+
+=back
+
+=head1 SEE ALSO
+
+F<classes/parrotobject.pmc>
+
+=head1 HISTORY
+
+Initial revision by leo 2005.07.31.
+
+=cut
+
+*/
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+*/
+
