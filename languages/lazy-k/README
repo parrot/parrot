@@ -1,0 +1,17 @@
+This is an incomplete implementation of Lazy-k - only 'ski parsing is
+done currently.
+
+Lazy K programs live in the same timeless Platonic realm as mathematical
+functions, what the Unlambda page calls "the blessed realm of the pure untyped
+lambda calculus."
+
+There is no special syntax for IO, lazy-k programs get their input (from stdin)
+as a list of church numerals and create a list of these, which is converted to
+8-bit characters as output of the computation, 256 is serving as EOF.
+
+References:
+
+http://homepages.cwi.nl/~tromp/cl/lazy-k.html
+http://en.wikipedia.org/wiki/Lazy_K_programming_language
+
+The 2 example files are copyrighted GPL by the author of Lazy-k.

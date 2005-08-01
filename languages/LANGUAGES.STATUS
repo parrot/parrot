@@ -87,6 +87,13 @@ S: generation was written, causing some breakage.
 M: Yes
 V: 0.0.11
 
+N: lazy-k
+A: Leopold Tötsch
+D: lazy-k is a pure functional programming language according to the
+D: SKI calculus.
+W: http://homepages.cwi.nl/~tromp/cl/lazy-k.html
+V: 0.2.2
+
 N: m4
 A: Bernhard Schmalhofer
 D: Port of GNU m4 to PIR
@@ -119,7 +126,7 @@ D: variables, nested words and classes and (as a result) nested
 D: compile-time and run-time lexical word, class and variable scopes.
 S: Under development;
 S: Not in Parrot CVS
-W: http://www.daca.net:8080/Parakeet-0.1.tgz 
+W: http://www.daca.net:8080/Parakeet-0.1.tgz
 V: 0.0.11
 
 N: parrot_compiler
@@ -201,7 +208,7 @@ N: unlamba
 A: Leopold Tötsch
 D: unlambda is a pure functional programming language with mostly eager
 D: evaluation following the SKI calculus (+ a few extensions)
-S: Errors on HEAD branch, which will go away after complete merge of 
+S: Errors on HEAD branch, which will go away after complete merge of
 S: Leo's branch,
 W: http://www.madore.org/~david/programs/unlambda/
 V: 0.2.2
