@@ -185,7 +185,9 @@ D: Lexical pads, CPS.
 N: Jonathan Stowe
 
 N: Jonathan Worthington
-D: Win32 building
+D: Win32 dynclasses support, Win32 fixes and various other patches
+E: jonathan@jwcs.net
+W: http://www.jwcs.net/~jonathan/
 
 N: Jos Visser
 D: fortytwo opcode
@@ -286,6 +288,9 @@ N: Ritz Daniel
 
 N: Robert Spier
 D: Keeps us running
+
+N: Roland Illing
+D: Building Parrot with pkgsrc
 
 N: Ron Blaschke
 D: Win32 patches

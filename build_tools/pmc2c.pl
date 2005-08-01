@@ -269,6 +269,10 @@ main();
 sub find_file {
     my ($include, $file, $die_unless_found) = @_;
 
+    if (File::Spec->file_name_is_absolute($file) && -e $file) {
+        return $file;
+    }
+
     foreach my $dir ( @$include ) {
         my $path = File::Spec->catfile( $dir, $file );
         return $path if -e $path;
