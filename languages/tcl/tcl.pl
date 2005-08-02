@@ -66,10 +66,11 @@ EOH
 my $rule = join("",<RULES>);
 $rule =~ s/\n//g;
 
-while ($rule =~ m/rule\s+(\w+)\s*{(.*?)};/g) {
+while ($rule =~ m/rule\s+(\w+)\s*{\s*(.*?)\s*};?/g) {
   my $rule_name = $1;
   my $rule_def = $2;
-  $rule_def =~ s:\\:\\\\:g;
+  $rule_def =~ s:\s+: :g;    # remove extra whitespace
+  $rule_def =~ s:\\:\\\\:g;   
   $rule_def =~ s:":\\":g;
 
   $rules .= <<EORULE
