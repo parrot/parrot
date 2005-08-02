@@ -17,9 +17,9 @@
  
   .local int looper
  
-  .local pmc parser
+  .local pmc parse
   .local pmc interpret 
-  parser = find_global "_Tcl", "parser"  
+  parse = find_global "_Tcl", "parse"
   interpret = find_global "_Tcl", "__interpret"
 
   expr = ""
@@ -36,7 +36,7 @@ loop:
   goto loop
 
 loop_done:
-  $P1 = parser."parse"(expr,0,0)
+  $P1 = parse(expr)
   register $P1
 
   .return interpret($P1) 

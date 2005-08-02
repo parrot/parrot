@@ -16,22 +16,22 @@
   .local pmc retval
   .local int return_type
 
-  .local pmc parser, interpret
+  .local pmc parse, interpret
   .local pmc expression_p, expression_i
-  parser = find_global "_Tcl", "parser"
+  parse = find_global "_Tcl", "parse"
   interpret = find_global "_Tcl", "__interpret"
   expression_p = find_global "_Tcl", "__expression_parse"
   expression_i = find_global "_Tcl", "__expression_interpret"
 
   # Parse the bits that are code.
   $S0 = start_p
-  start_parsed = parser."parse"($S0,0,0)
+  start_parsed = parse($S0)
   register start_parsed
   $S0 = next_p
-  next_parsed  = parser."parse"($S0,0,0)
+  next_parsed  = parse($S0)
   register next_parsed
   $S0 = body_p
-  body_parsed  = parser."parse"($S0,0,0)
+  body_parsed  = parse($S0)
   register body_parsed
 
 

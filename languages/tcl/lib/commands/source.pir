@@ -14,9 +14,9 @@
 
   .local string chunk, filename, contents
   .local int code,type
-  .local pmc retval, handle, parser
+  .local pmc retval, handle, parse
 
-  parser = find_global "_Tcl", "parser"
+  parse = find_global "_Tcl", "parse"
 
   .local pmc interpret
   interpret = find_global "_Tcl", "__interpret"
@@ -42,7 +42,7 @@ loop:
   goto loop
 
 gotfile:
-  $P1 = parser."parse"(contents,0,0)
+  $P1 = parse(contents)
   register $P1
   (code,retval) = interpret($P1)
   goto done

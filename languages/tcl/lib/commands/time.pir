@@ -15,8 +15,8 @@
   .local int return_type
   return_type = TCL_OK
 
-  .local pmc parser,interpret
-  parser = find_global "_Tcl", "parser"
+  .local pmc parse,interpret
+  parse = find_global "_Tcl", "parse"
   interpret = find_global "_Tcl", "__interpret"
 
   .local string script
@@ -38,7 +38,7 @@ twoargs:
 run:
   script = argv[0]
  
-  $P1 = parser."parse"(script,0,0)
+  $P1 = parse(script)
   register $P1
 
   time $N1 

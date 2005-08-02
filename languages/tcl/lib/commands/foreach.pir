@@ -7,7 +7,7 @@
   argv = foldup
 
   .local int return_type
-  .local pmc parser,interpret,retval
+  .local pmc parse,interpret,retval
   retval = new TclString
   retval = ""
 
@@ -23,7 +23,7 @@
   .local pmc __list
   __list = find_global "_Tcl", "__list"
 
-  parser = find_global "_Tcl", "parser"
+  parse = find_global "_Tcl", "parse"
   interpret = find_global "_Tcl", "__interpret"
   return_type = TCL_OK
 
@@ -77,7 +77,7 @@ got_list:
   goto arg_loop
 arg_done: 
   .local pmc parsed
-  parsed = parser."parse"(body,0,0)
+  parsed = parse(body)
   register parsed
 
   .local pmc iterator

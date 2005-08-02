@@ -24,9 +24,9 @@
   handling_else = 0
   .local int counter
 
-  .local pmc parser,interpret
+  .local pmc parse,interpret
   .local pmc expression_p,expression_i
-  parser = find_global "_Tcl", "parser"
+  parse = find_global "_Tcl", "parse"
   interpret = find_global "_Tcl", "__interpret"
   expression_p = find_global "_Tcl", "__expression_parse"
   expression_i = find_global "_Tcl", "__expression_interpret"
@@ -109,7 +109,7 @@ do_else:
   code = else
 
 done:
-  $P1 = parser."parse"(code,0,0)
+  $P1 = parse(code)
   register $P1
 
   .return interpret($P1) #tailcall

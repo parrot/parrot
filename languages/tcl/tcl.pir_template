@@ -83,6 +83,9 @@ providing a compreg-compatible method.
 .sub __prepare_lib @LOAD,@ANON
 
   # Load any dependant libraries.
+  load_bytecode "languages/tcl/lib/tclcommand.pbc"
+  load_bytecode "languages/tcl/lib/tclconst.pbc"
+  load_bytecode "languages/tcl/lib/tclvar.pbc"
   load_bytecode "languages/tcl/lib/tclword.pbc"
   load_bytecode "library/Data/Escape.pbc"
   load_bytecode "library/PGE.pbc"
@@ -156,12 +159,6 @@ providing a compreg-compatible method.
   store_global "_Tcl", "operators", operators
   store_global "_Tcl", "functions", math_funcs
   store_global "_Tcl", "precedence", precedence
-
-  # Grab a (for now) global instance of TclParser
-  .local pmc parser
-  parser = new TclParser
- 
-  store_global "_Tcl", "parser", parser
 
   # Eventually, we'll need to register MMD for the various Tcl PMCs
   # (Presuming we don't do this from the .pmc definitions.)
@@ -242,8 +239,10 @@ providing a compreg-compatible method.
   pir_code .= " @ANON\n.local string code\ncode = \""
   tcl_code = escaper(tcl_code,"\"")
   pir_code .= tcl_code
-  pir_code .= "\"\n.local pmc parser\n.local pmc tcl_interpret\nparser = new TclParser"
-  pir_code .= "\ntcl_interpret = find_global \"_Tcl\", \"__interpret\"\n$P1 = parser.\"parse\"(code,0,0)\n.return tcl_interpret($P1)\n.end\n"
+  pir_code .= "\"\n.local pmc tcl_interpret\n.local pmc parse\n"
+  pir_code .= "tcl_interpret = find_global \"_Tcl\", \"__interpret\"\n"
+  pir_code .= "parse = find_global \"_Tcl\", \"parse\"\n"
+  pir_code .= "$P1 = parse(code)\n.return tcl_interpret($P1)\n.end\n"
 
   $P1 = compile pir_compiler, pir_code
   .return ($P1)

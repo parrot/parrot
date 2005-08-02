@@ -12,20 +12,21 @@
   .local pmc retval, parsed_code
   .local int return_type
 
-  .local pmc parser
+  .local pmc parse
   .local pmc interpret
   .local pmc expression_p
   .local pmc expression_i
 
-  parser = find_global "_Tcl", "parser"
+  parse = find_global "_Tcl", "parse"
   interpret = find_global "_Tcl", "__interpret"
   expression_p = find_global "_Tcl", "__expression_parse"
   expression_i = find_global "_Tcl", "__expression_interpret"
 
-while_loop:
   $S0 = body_p
-  parsed_code = parser."parse"($S0,0,0)
+  parsed_code = parse($S0)
   register parsed_code
+
+while_loop:
   (return_type,retval) = expression_p(cond_p)
   if return_type == TCL_ERROR goto done_done
   (return_type,retval) = expression_i(retval)

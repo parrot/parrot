@@ -36,8 +36,8 @@
   STDIN = getstdin
   STDOUT = getstdout
 
-  .local pmc parser,interpret
-  parser = find_global "_Tcl", "parser"
+  .local pmc parse,interpret
+  parse = find_global "_Tcl", "parse"
   interpret = find_global "_Tcl", "__interpret"
 
 input_loop:
@@ -45,7 +45,7 @@ input_loop:
   STDOUT."flush"()
   input_line = readline STDIN
   unless STDIN goto done
-  $P1 = parser."parse"(input_line,0,0)
+  $P1 = parse(input_line)
   register $P1
   (retcode,retval) = interpret($P1)
   # print out the result of the evaluation.

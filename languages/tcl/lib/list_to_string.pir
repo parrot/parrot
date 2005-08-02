@@ -42,29 +42,7 @@ right_brace:
 check_list_done:
   if count != 0 goto escape
 
-check_right_bracket:
-  $I0 = index $S0, "]"
-  if $I0 != -1 goto escape
-
-check_backslash:
-  $I0 = index $S0, "\\"
-  if $I0 != -1 goto escape
-
-  goto check_spaces
-
-escape:
-  $P0 = new String
-  $P0 = $S0
-  
-  $P0."replace"("\\", "\\\\")
-  $P0."replace"("}", "\\}")
-  $P0."replace"("{", "\\{")
-  $P0."replace"(" ", "\\ ")
-  $P0."replace"("]", "\\]")
-  
-  $S0 = $P0
-  goto append_elem
-
+  # {}'d constructs
 check_spaces:
   $I0 = find_whitespace $S0, 0
   if $I0 != -1 goto quote
@@ -79,8 +57,35 @@ check_dollar_sign:
 
 check_semi_colon:
   $I0 = index $S0, ";"
-  if $I0 != -1 goto quote 
+  if $I0 != -1 goto quote
 
+  # \'d constructs
+check_right_bracket:
+  $I0 = index $S0, "]"
+  if $I0 != -1 goto escape
+
+check_backslash:
+  $I0 = index $S0, "\\"
+  if $I0 != -1 goto escape
+
+check_quotes:
+  $I0 = index $S0, "\""
+  if $I0 != -1 goto escape
+
+  goto append_elem
+
+escape:
+  $P0 = new String
+  $P0 = $S0
+  
+  $P0."replace"("\\", "\\\\")
+  $P0."replace"("}", "\\}")
+  $P0."replace"("{", "\\{")
+  $P0."replace"(" ", "\\ ")
+  $P0."replace"("]", "\\]")
+  $P0."replace"("\"", "\\\"")
+  
+  $S0 = $P0 
   goto append_elem
 
 empty:

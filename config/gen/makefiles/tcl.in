@@ -14,8 +14,7 @@ PMCS = \
  tclint \
  tclfloat \
  tcllist \
- tclarray \
- tclparser
+ tclarray
 
 DEPS = $(PARROT) \
 lib${slash}commands${slash}append.pir \
@@ -64,14 +63,16 @@ lib${slash}expression.pir \
 lib${slash}get_var.pir \
 lib${slash}interpret.pir \
 lib${slash}list.pir \
+lib${slash}list_to_string.pir \
 lib${slash}macros${slash}is_space.pir \
+lib${slash}parser.pir \
 lib${slash}string_to_list.pir \
 lib${slash}tcl.p6r \
 lib${slash}variables.pir \
 tcl.pir_template \
 tcl.pl
 
-tcl.pbc: pmcs lib${slash}tcllib.pbc lib${slash}tclword.pbc tcl.pir
+tcl.pbc: pmcs lib${slash}tcllib.pbc lib${slash}tclcommand.pbc lib${slash}tclconst.pbc lib${slash}tclvar.pbc lib${slash}tclword.pbc tcl.pir
 	$(PARROT) --output=tcl.pbc tcl.pir
 
 pmcs:
@@ -88,6 +89,15 @@ lib${slash}tcllib.pir: $(DEPS)
 
 lib${slash}tcllib.pbc: lib${slash}tcllib.pir
 	$(PARROT) --output=$(LIBPATH)${slash}tcllib.pbc $(LIBPATH)${slash}tcllib.pir
+
+lib${slash}tclcommand.pbc: lib${slash}tclcommand.pir
+	$(PARROT) --output=$(LIBPATH)${slash}tclcommand.pbc $(LIBPATH)${slash}tclcommand.pir
+
+lib${slash}tclconst.pbc: lib${slash}tclconst.pir
+	$(PARROT) --output=$(LIBPATH)${slash}tclconst.pbc $(LIBPATH)${slash}tclconst.pir
+
+lib${slash}tclvar.pbc: lib${slash}tclvar.pir
+	$(PARROT) --output=$(LIBPATH)${slash}tclvar.pbc $(LIBPATH)${slash}tclvar.pir
 
 lib${slash}tclword.pbc: lib${slash}tclword.pir
 	$(PARROT) --output=$(LIBPATH)${slash}tclword.pbc $(LIBPATH)${slash}tclword.pir

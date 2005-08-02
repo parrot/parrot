@@ -28,9 +28,6 @@ however, then we're returning the invokable PMC.
   .local pmc precedences  # Global list of operator precedence
   precedences = find_global "_Tcl", "precedence"
 
-  .local pmc parser
-  parser = find_global "_Tcl", "parser"
-
   if I3 == 1 goto pmc_arg
   # if I2 isn't one here, we should blow up. But who's counting.
   expr = S5
@@ -85,15 +82,34 @@ get_parenthetical:
   # string and call ourselves recursively.
   # (XXX should unroll this recursion.)
 
-  if char != 40 goto get_variable
-  # where do we close?  
-  $I1 = parser."match_close"(expr,chunk_start)
-  #.match_close(expr,chunk_start,$I1)
-  #error_S = "missing close parenthesis"
-  if $I1 <= 0 goto die_horribly 
-  $I1 = $I1 - 2
-  inc chunk_start 
-  substr $S1, expr, chunk_start, $I1
+  if char != 40 goto get_variable # (
+  .local int depth
+  depth = 1
+  $I1   = chunk_start
+get_paren_loop:
+  inc $I1
+  if $I1 >= expr_length goto die_horribly
+  $I0 = ord expr, $I1
+  if $I0 == 41 goto get_paren_loop_right
+  if $I0 == 40 goto get_paren_loop_left
+  if $I0 == 92 goto get_paren_loop_backslash
+  goto get_paren_loop
+get_paren_loop_right:
+  dec depth
+  if depth == 0 goto get_paren_done
+  goto get_paren_loop
+get_paren_loop_left:
+  inc depth
+  goto get_paren_loop
+get_paren_loop_backslash:
+  inc $I1
+  goto get_paren_loop
+
+get_paren_done:
+  $I0 = $I1 - chunk_start
+  dec $I0
+  inc chunk_start
+  substr $S1, expr, chunk_start, $I0
   
   $P9 = new String
   $P9 = $S1 
@@ -108,7 +124,7 @@ get_parenthetical:
   chunk[1] = retval
 
   push chunks, chunk
-  chunk_start = chunk_start + $I1
+  chunk_start += $I0
   inc chunk_start
   goto chunk_loop
  
@@ -854,21 +870,42 @@ dd:
   .local pmc func,operand
 
   .local int start_paren_pos
-
-  .local pmc parser
-  parser = find_global "_Tcl", "parser"
+  .local int expr_length
+  expr_length = length expr
 
   # if we are starting with the text of a defined function,
   # and it's followed by a (), 
  
   index start_paren_pos, expr, "(", start
   if start_paren_pos == -1 goto fail
-  #.match_close(expr,start_paren_pos,$I1)
-  $I1 = parser."match_close"(expr,start_paren_pos)
-  if $I1 <= 0 goto fail
+
+  .local int depth
+  depth = 1
+  $I0 = start_paren_pos
+loop:
+  inc $I0
+  if $I0 >= expr_length goto fail
+  $I1 = ord expr, $I0
+  if $I1 == 40 goto left
+  if $I1 == 41 goto right
+  if $I1 == 92 goto backslash
+  goto loop
+left:
+  inc depth
+  goto loop
+right:
+  dec depth
+  if depth == 0 goto loop_done
+  goto loop
+backslash:
+  inc $I0
+  goto loop
+
+loop_done:
+  $I1 = $I0 - start_paren_pos
+  dec $I1
  
   # so, we know that the function name must be before the first (
- 
   .local int len
   len = start_paren_pos - start
 
@@ -888,7 +925,7 @@ dd:
 
   inc start_paren_pos
   .local int len_operand
-  len_operand = $I1 - 2
+  len_operand = $I1
 
   substr $S1, expr, start_paren_pos, len_operand
   $P9 = new String
