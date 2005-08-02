@@ -35,7 +35,7 @@ win32-bcc
 win32-cygwin_1.5.11_1        Y    Y    -     Y*5 Y   Y    Y        20041006
 win32-icl_8.0.48             -    Y    -     -   -   Y    Y/2
 win32-mingw-gcc3.2.3         Y    Y    Y     -   -   Y    Y/81  Y  20050603
-win32-msvc_7.1               -    Y    -     -   -   Y    Y/77     20050701
+win32-msvc_7.1               -    Y    -     -   -   Y    Y        20050802
 
 -   ... no
 Y   ... yes
