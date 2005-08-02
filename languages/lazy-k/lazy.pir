@@ -225,7 +225,6 @@ not_k:
     unless ch == 's' goto not_s
 	.return (S)
 not_s:
-not_e:
     unless ch == '#' goto not_comment
     swallow:
 	ch = read io, 1
