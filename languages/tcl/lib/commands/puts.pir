@@ -73,7 +73,8 @@ bad_channel:
 bad_option:
   return_type = TCL_ERROR
   $S0 = "bad argument \""
-  $S0 .= $S1
+  $S3 = argv[2]
+  $S0 .= $S3
   $S0 .= "\": should be \"nonewline\""
   retval = $S0
   goto done

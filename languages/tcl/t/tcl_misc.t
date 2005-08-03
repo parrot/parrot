@@ -81,12 +81,8 @@ TCL
 invalid command name "a"
 OUT
 
-TODO: {
-local $TODO = "bug(s)";
-
-language_output_is("tcl",<<'TCL',<<'OUT',"bad argument error");
+language_output_is("tcl",<<'TCL',<<'OUT',"comments must *start* commands");
 puts 4 # comment
 TCL
 bad argument "comment": should be "nonewline"
 OUT
-}
