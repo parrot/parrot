@@ -217,28 +217,28 @@ language_output_is("tcl",<<'TCL',<<OUT,"unicode three chars");
   set a \u666
   puts $a
 TCL
-\x666
+\x{666}
 OUT
 
 language_output_is("tcl",<<'TCL',<<OUT,"unicode three chars, extra");
   set a \u666q
   puts $a
 TCL
-\x666q
+\x{666}q
 OUT
 
 language_output_is("tcl",<<'TCL',<<OUT,"unicode four chars");
   set a \u6666
   puts $a
 TCL
-\x6666
+\x{6666}
 OUT
 
 language_output_is("tcl",<<'TCL',<<OUT,"unicode four chars, extra");
   set a \u6666q
   puts $a
 TCL
-\x6666q
+\x{6666}q
 OUT
 
 }
