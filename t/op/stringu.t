@@ -20,7 +20,7 @@ Tests Parrot's unicode string system.
 
 use Parrot::Test tests => 17;
 use Test::More;
-use vars qw($TODO);
+#use vars qw($TODO);
 
 output_is( <<'CODE', <<OUTPUT, "angstrom" );
     getstdout P0
@@ -203,8 +203,8 @@ CODE
 /Malformed string/
 OUTPUT
 
-TODO: {
-local $TODO = "bug #36794";
+#TODO: {
+#local $TODO = "bug #36794";
 
 output_is( <<'CODE', <<OUTPUT, "substr with a UTF8 replacement" );
     set S0, "\\u666"
@@ -212,7 +212,7 @@ output_is( <<'CODE', <<OUTPUT, "substr with a UTF8 replacement" );
     chr S1, I0 
     substr S0, 0, 5, S1
 CODE
-\x666
+\x{666}
 OUTPUT
-}
+#}
 
