@@ -1,10 +1,8 @@
 #!/usr/bin/perl
 
-#XXX need TODO tests for unicode
-
 use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 24;
+use Parrot::Test tests => 32;
 use Test::More;
 use vars qw($TODO);
 
@@ -114,7 +112,9 @@ S4
 OUT
 
 TODO: {
-local $TODO = "hex escapes recently un-implemented. Fix soon.";
+local $TODO = "hex & unicode escapes recently un-implemented. Fix soon.";
+
+# XXX Should suppress warnings about wide characters in Test::*... how?
 
 language_output_is("tcl",<<'TCL',<<OUT,"hex single char");
   set a \x7
@@ -171,4 +171,61 @@ language_output_is("tcl",<<'TCL',<<OUT,"hex many char, extra");
 TCL
 jq
 OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"unicode one char");
+  set a \u7
+  puts $a
+TCL
+\cG
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"unicode one char, extra");
+  set a \u7q
+  puts $a
+TCL
+\cGq
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"unicode two chars");
+  set a \u6a
+  puts $a
+TCL
+j
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"unicode two chars, extra");
+  set a \u6aq
+  puts $a
+TCL
+jq
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"unicode three chars");
+  set a \u666
+  puts $a
+TCL
+\x{666}
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"unicode three chars, extra");
+  set a \u666q
+  puts $a
+TCL
+\x{666}q
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"unicode four chars");
+  set a \u6666
+  puts $a
+TCL
+\x{6666}
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"unicode four chars, extra");
+  set a \u6666q
+  puts $a
+TCL
+\x{6666}q
+OUT
+
 }
