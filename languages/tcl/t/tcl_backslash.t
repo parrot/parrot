@@ -6,7 +6,6 @@ use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
 use Parrot::Test tests => 16;
 use Test::More;
-use vars qw($TODO);
 
 my($tcl,$expected);
 
@@ -72,14 +71,11 @@ $expected = "a b\n";
 language_output_is("tcl",$tcl,$expected,"backslash newline substitution");
 
 language_output_is("tcl",<<'TCL',<<OUT,"octal single char");
-  set a \a
+  set a \7
   puts $a
 TCL
 \cG
 OUT
-
-TODO: {
-local $TODO = "this octal don't seem to work.";
 
 language_output_is("tcl",<<'TCL',<<OUT,"octal single char, extra");
   set a \79
@@ -87,7 +83,6 @@ language_output_is("tcl",<<'TCL',<<OUT,"octal single char, extra");
 TCL
 \cG9
 OUT
-}
 
 language_output_is("tcl",<<'TCL',<<OUT,"octal double char");
   set a \12
@@ -96,15 +91,12 @@ TCL
 \cJ
 OUT
 
-TODO: {
-local $TODO = "this octal escape doesn't work.";
 language_output_is("tcl",<<'TCL',<<OUT,"octal double char, extra");
   set a \129
   puts $a
 TCL
 \cJ9
 OUT
-}
 
 language_output_is("tcl",<<'TCL',<<OUT,"octal triple char");
   set a \123
