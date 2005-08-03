@@ -111,11 +111,6 @@ TCL
 S4
 OUT
 
-TODO: {
-local $TODO = "hex & unicode escapes recently un-implemented. Fix soon.";
-
-# XXX Should suppress warnings about wide characters in Test::*... how?
-
 language_output_is("tcl",<<'TCL',<<OUT,"hex single char, invalid");
   set a \xq
   puts $a
@@ -178,6 +173,11 @@ language_output_is("tcl",<<'TCL',<<OUT,"hex many char, extra");
 TCL
 jq
 OUT
+
+TODO: {
+local $TODO = "unicode escapes recently un-implemented. Fix soon.";
+
+# XXX Should suppress warnings about wide characters in Test::*... how?
 
 language_output_is("tcl",<<'TCL',<<OUT,"unicode single char, invalid");
   set a \uq

@@ -29,6 +29,33 @@ Define the attributes required for the class.
   $P0[118] = "\v"
   
   store_global "_Tcl", "backslashes", $P0
+
+  $P0 = new Hash
+  $P0[ 48] =  0 # "0"
+  $P0[ 49] =  1
+  $P0[ 50] =  2
+  $P0[ 51] =  3
+  $P0[ 52] =  4
+  $P0[ 53] =  5
+  $P0[ 54] =  6
+  $P0[ 55] =  7
+  $P0[ 56] =  8
+  $P0[ 57] =  9
+  $P0[ 65] = 10 # "A"
+  $P0[ 66] = 11
+  $P0[ 67] = 12
+  $P0[ 68] = 13
+  $P0[ 69] = 14
+  $P0[ 70] = 15
+  $P0[ 97] = 10 # "a"
+  $P0[ 98] = 11
+  $P0[ 99] = 12
+  $P0[100] = 13
+  $P0[101] = 14
+  $P0[102] = 15
+  
+  store_global "_Tcl", "hexadecimal", $P0
+
 .end
 
 .sub __clone method
@@ -45,8 +72,9 @@ Define the attributes required for the class.
   .local int value_length
   value_length = length value
 
-  .local pmc backslashes
+  .local pmc backslashes, hexadecimal
   find_global backslashes, "_Tcl", "backslashes"
+  find_global hexadecimal, "_Tcl", "hexadecimal"
   
   .local int pos
   pos = 0
@@ -56,11 +84,11 @@ loop:
  
   $I0 = pos + 1
   $I0 = ord value, $I0
-  if $I0 == 120 goto hexidecimal # x
-  if $I0 == 117 goto unicode     # u
-  if $I0 <   48 goto simple      # < 0
-  if $I0 <=  55 goto octal       # 0..7  
-                                 # > 7
+  if $I0 == 120 goto hex      # x
+  if $I0 == 117 goto unicode  # u
+  if $I0 <   48 goto simple   # < 0
+  if $I0 <=  55 goto octal    # 0..7  
+                              # > 7
 simple:
   $I1 = exists backslashes[$I0]
   if $I1 goto special
@@ -139,13 +167,44 @@ octal3:
 
 =for comment
 
-Hexidecimal escapes consist of an C<x>, followed by any number of hexidecimal
+Hexadecimal escapes consist of an C<x>, followed by any number of hexadecimal
 digits. However, only the last two are used.
 
 =cut
 
-hexidecimal:
-  inc pos
+ .local int hex_pos, hex_digit, hex_value
+hex:
+  # at this point, pos is set to the backslash
+  hex_value = 0
+  hex_pos = pos + 2 # skip the backslash and the x
+  
+hex_loop:
+  if hex_pos >= value_length goto hex_done
+  $I0 = ord value, hex_pos
+  $I1 = exists hexadecimal[$I0]
+  unless $I1 goto hex_done 
+  hex_digit = hexadecimal[$I0]
+  band hex_value, 15     # high byte discarded
+  hex_value *= 16        # low byte promoted
+  hex_value += hex_digit # new low byte added.
+
+  inc hex_pos
+
+  goto hex_loop
+
+hex_done:
+  $I0 = hex_pos - pos
+  if $I0 == 2 goto hex_not_really
+  $S0 = chr hex_value
+  substr value, pos, $I0, $S0 
+
+  pos = hex_pos
+  goto loop
+
+hex_not_really:
+  # This was a \x escape that had no hex value..
+  substr value, pos, 2, "x"
+  pos = hex_pos
   goto loop
 
 =for comment
