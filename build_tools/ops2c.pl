@@ -1,5 +1,5 @@
 #! perl -w
-# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 =head1 NAME
@@ -108,6 +108,7 @@ Do not generate C<#line> directives in the generated C code.
 use strict;
 use lib 'lib';
 
+use Pod::Usage;
 use Getopt::Long;
 
 use Parrot::OpsFile;
@@ -123,27 +124,24 @@ my %arg_dir_mapping = (
 #
 # Look at the command line options
 #
+sub Usage {
+    pod2usage(-exitval => 1, -verbose => 0, -output => \*STDERR);
+}
 
-# TODO: Use Pod::Usage
 my ( $nolines_flag, $help_flag, $dynamic_flag, $core_flag );
 GetOptions( "no-lines"      => \$nolines_flag,
             "help"          => \$help_flag,
             "dynamic|d"     => \$dynamic_flag,
             "core"          => \$core_flag,
-          );
-
-sub Usage {
-    print STDERR <<_EOF_;
-usage: $0 trans [--help] [--no-lines] [--dynamic] [--core | input.ops [input2.ops ...]]
-       trans := C | CGoto | CGP | CSwitch | CPrederef
-_EOF_
-    exit 1;
-}
+          ) || Usage();
 
 Usage() if $help_flag;
 Usage() unless @ARGV;
 
-my $trans_class = "Parrot::OpTrans::" . shift @ARGV;
+my $class_name = shift @ARGV;
+my %is_allowed = map { $_ => 1 } qw(C CGoto CGP CSwitch CPrederef);
+Usage() unless $is_allowed{$class_name};
+my $trans_class = "Parrot::OpTrans::" . $class_name;
 
 eval "require $trans_class";
 
