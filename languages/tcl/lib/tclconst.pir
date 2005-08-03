@@ -213,9 +213,44 @@ Unicode escapes consist of an C<u>, followed by one to four hexadecimal digits.
 
 =cut
 
+ .local int uni_pos, uni_digit, uni_value, uni_digit_count
 unicode:
-  inc pos
+  # at this point, pos is set to the backslash
+  uni_value = 0
+  uni_digit_count = 0
+  uni_pos = pos + 2 # skip the backslash and the u
+  
+uni_loop:
+  if uni_digit_count == 4 goto uni_done     #only four digits allowed
+  if uni_pos >= value_length goto uni_done
+  $I0 = ord value, uni_pos
+  $I1 = exists hexadecimal[$I0]
+  unless $I1 goto uni_done 
+  uni_digit = hexadecimal[$I0]
+  uni_value *= 16        # low byte promoted
+  uni_value += uni_digit # new low byte added.
+
+  inc uni_pos
+  inc uni_digit_count
+
+  goto uni_loop
+
+uni_done:
+  $I0 = uni_pos - pos
+  if $I0 == 2 goto uni_not_really
+  $S0 = chr uni_value
+  substr value, pos, $I0, $S0 
+
+  pos = uni_pos
   goto loop
+
+uni_not_really:
+  # This was a \x escape that had no uni value..
+  substr value, pos, 2, "u"
+  pos = uni_pos
+  goto loop
+
+
 
 special:
   $S0 = backslashes[$I0]
