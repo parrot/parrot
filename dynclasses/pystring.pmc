@@ -304,7 +304,7 @@ Returns pythons string repr (w/o any escaping, just single quotes around)
             i_q = -1;
         }
 
-        if (PObj_get_FLAGS(s) & PObj_private7_FLAG)
+        if (s->charset == Parrot_binary_charset_ptr)
             repr = string_copy(INTERP, const_string(INTERP, "u'"));
         else
             repr = string_copy(INTERP, q);

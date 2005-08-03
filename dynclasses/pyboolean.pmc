@@ -159,6 +159,18 @@ Returns the negated value of the boolean.
 
 /*
 
+=item C<void set_bool (INTVAL value)>
+
+=cut
+
+*/
+
+    void set_bool (INTVAL value) {
+        PMC_int_val(SELF) = (value != 0);
+    }
+
+/*
+
 =item C<void set_integer_native (INTVAL value)>
 
 =cut
