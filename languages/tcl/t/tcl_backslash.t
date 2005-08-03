@@ -209,9 +209,6 @@ TCL
 jq
 OUT
 
-# XXX Should suppress warnings about wide characters in Test::*... how?
-binmode *STDOUT, ':utf8';
-
 TODO: {
 
 local $TODO = "These four tests tickle a seg-fault in parrot: [#36794]";
@@ -220,28 +217,28 @@ language_output_is("tcl",<<'TCL',<<OUT,"unicode three chars");
   set a \u666
   puts $a
 TCL
-\x{666}
+\x666
 OUT
 
 language_output_is("tcl",<<'TCL',<<OUT,"unicode three chars, extra");
   set a \u666q
   puts $a
 TCL
-\x{666}q
+\x666q
 OUT
 
 language_output_is("tcl",<<'TCL',<<OUT,"unicode four chars");
   set a \u6666
   puts $a
 TCL
-\x{6666}
+\x6666
 OUT
 
 language_output_is("tcl",<<'TCL',<<OUT,"unicode four chars, extra");
   set a \u6666q
   puts $a
 TCL
-\x{6666}q
+\x6666q
 OUT
 
 }

@@ -212,7 +212,7 @@ output_is( <<'CODE', <<OUTPUT, "substr with a UTF8 replacement" );
     chr S1, I0 
     substr S0, 0, 5, S1
 CODE
-\x{666}
+\x666
 OUTPUT
 }
 
