@@ -1,11 +1,12 @@
 #!/usr/bin/perl
 
-#XXX need TODO tests for hex, unicode
+#XXX need TODO tests for unicode
 
 use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 16;
+use Parrot::Test tests => 24;
 use Test::More;
+use vars qw($TODO);
 
 my($tcl,$expected);
 
@@ -111,3 +112,63 @@ language_output_is("tcl",<<'TCL',<<OUT,"octal triple char, extra");
 TCL
 S4
 OUT
+
+TODO: {
+local $TODO = "hex escapes recently un-implemented. Fix soon.";
+
+language_output_is("tcl",<<'TCL',<<OUT,"hex single char");
+  set a \x7
+  puts $a
+TCL
+\cG
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"hex single char, extra");
+  set a \x7q
+  puts $a
+TCL
+\cGq
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"hex double char");
+  set a \x6a
+  puts $a
+TCL
+j
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"hex double char, extra");
+  set a \x6aq
+  puts $a
+TCL
+jq
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"hex triple char, skip ok?");
+  set a \xb6a
+  puts $a
+TCL
+j
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"hex triple char, extra");
+  set a \xb6aq
+  puts $a
+TCL
+jq
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"hex many char");
+  set a \xaaaaaaaaaaab6a
+  puts $a
+TCL
+j
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"hex many char, extra");
+  set a \xaaaaaaaaaaab6aq
+  puts $a
+TCL
+jq
+OUT
+}
