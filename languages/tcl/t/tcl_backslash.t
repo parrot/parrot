@@ -214,7 +214,7 @@ binmode *STDOUT, ':utf8';
 
 TODO: {
 
-local $TODO = "These four tests tickle a seg-fault in parrot";
+local $TODO = "These four tests tickle a seg-fault in parrot: [#36794]";
 
 language_output_is("tcl",<<'TCL',<<OUT,"unicode three chars");
   set a \u666
