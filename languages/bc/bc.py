@@ -118,6 +118,33 @@ def main():
 #!/usr/bin/env parrot
 
 .sub "main" @MAIN
+   .local pmc a_lex, b_lex, c_lex, d_lex, e_lex, f_lex, g_lex, h_lex, i_lex, j_lex, k_lex, l_lex, m_lex, n_lex, o_lex, p_lex, q_lex, r_lex, s_lex, t_lex, u_lex, v_lex, w_lex, x_lex, y_lex, z_lex
+   a_lex = new .Float
+   b_lex = new .Float
+   c_lex = new .Float
+   d_lex = new .Float
+   e_lex = new .Float
+   f_lex = new .Float
+   g_lex = new .Float
+   h_lex = new .Float
+   i_lex = new .Float
+   j_lex = new .Float
+   k_lex = new .Float
+   l_lex = new .Float
+   m_lex = new .Float
+   n_lex = new .Float
+   o_lex = new .Float
+   p_lex = new .Float
+   q_lex = new .Float
+   r_lex = new .Float
+   s_lex = new .Float
+   t_lex = new .Float
+   u_lex = new .Float
+   v_lex = new .Float
+   w_lex = new .Float
+   x_lex = new .Float
+   y_lex = new .Float
+   z_lex = new .Float
    """
    pir_ast = W.getAST();
    print '# ' + pir_ast.toStringList();

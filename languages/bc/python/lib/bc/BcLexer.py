@@ -16,33 +16,28 @@ if version < '2.3':
 ### preamble action <<< 
 ### >>>The Literals<<<
 literals = {}
-literals[u"newLine"] = 53
-literals[u"elsif"] = 47
-literals[u"get"] = 52
-literals[u"if"] = 45
-literals[u"type"] = 34
-literals[u"quit"] = 31
-literals[u"while"] = 49
-literals[u"var"] = 32
-literals[u"record"] = 37
-literals[u"end"] = 38
-literals[u"of"] = 36
-literals[u"then"] = 46
-literals[u"or"] = 58
-literals[u"else"] = 48
-literals[u"Boolean"] = 40
-literals[u"constant"] = 33
-literals[u"array"] = 35
-literals[u"when"] = 43
-literals[u"Integer"] = 39
-literals[u"skipLine"] = 54
-literals[u"and"] = 57
-literals[u"not"] = 55
-literals[u"loop"] = 50
-literals[u"exit"] = 42
-literals[u"procedure"] = 41
-literals[u"put"] = 51
-literals[u"return"] = 44
+literals[u"newLine"] = 50
+literals[u"elsif"] = 44
+literals[u"get"] = 49
+literals[u"if"] = 41
+literals[u"define"] = 36
+literals[u"quit"] = 33
+literals[u"while"] = 46
+literals[u"var"] = 37
+literals[u"end"] = 42
+literals[u"then"] = 43
+literals[u"or"] = 55
+literals[u"else"] = 45
+literals[u"Boolean"] = 35
+literals[u"when"] = 39
+literals[u"Integer"] = 34
+literals[u"skipLine"] = 51
+literals[u"and"] = 54
+literals[u"not"] = 52
+literals[u"loop"] = 47
+literals[u"exit"] = 38
+literals[u"put"] = 48
+literals[u"return"] = 40
 
 
 ### import antlr.Token 
@@ -64,56 +59,53 @@ LETTER = 10
 DOT = 11
 BECOMES = 12
 COLON = 13
-SEMI = 14
+SEMICOLON = 14
 COMMA = 15
 ASSIGN_OP = 16
 LBRACKET = 17
 RBRACKET = 18
-DOTDOT = 19
-LPAREN = 20
-RPAREN = 21
-REL_OP = 22
-PLUS = 23
-MINUS = 24
-INCR_DECR = 25
-MUL = 26
-DIV = 27
-MOD = 28
-PIR_OP = 29
-UNARY_MINUS = 30
-LITERAL_quit = 31
-LITERAL_var = 32
-LITERAL_constant = 33
-LITERAL_type = 34
-LITERAL_array = 35
-LITERAL_of = 36
-LITERAL_record = 37
-LITERAL_end = 38
-LITERAL_Integer = 39
-LITERAL_Boolean = 40
-LITERAL_procedure = 41
-LITERAL_exit = 42
-LITERAL_when = 43
-LITERAL_return = 44
-LITERAL_if = 45
-LITERAL_then = 46
-LITERAL_elsif = 47
-LITERAL_else = 48
-LITERAL_while = 49
-LITERAL_loop = 50
-LITERAL_put = 51
-LITERAL_get = 52
-LITERAL_newLine = 53
-LITERAL_skipLine = 54
-LITERAL_not = 55
-NOT_EQUALS = 56
-LITERAL_and = 57
-LITERAL_or = 58
-PIR_FOOTER = 59
-PIR_HEADER = 60
-PIR_NOOP = 61
-PIR_COMMENT = 62
-PIR_NEWLINE = 63
+LCURLY = 19
+RCURLY = 20
+DOTDOT = 21
+LPAREN = 22
+RPAREN = 23
+REL_OP = 24
+PLUS = 25
+MINUS = 26
+INCR_DECR = 27
+MUL = 28
+DIV = 29
+MOD = 30
+PIR_OP = 31
+UNARY_MINUS = 32
+LITERAL_quit = 33
+LITERAL_Integer = 34
+LITERAL_Boolean = 35
+LITERAL_define = 36
+LITERAL_var = 37
+LITERAL_exit = 38
+LITERAL_when = 39
+LITERAL_return = 40
+LITERAL_if = 41
+LITERAL_end = 42
+LITERAL_then = 43
+LITERAL_elsif = 44
+LITERAL_else = 45
+LITERAL_while = 46
+LITERAL_loop = 47
+LITERAL_put = 48
+LITERAL_get = 49
+LITERAL_newLine = 50
+LITERAL_skipLine = 51
+LITERAL_not = 52
+NOT_EQUALS = 53
+LITERAL_and = 54
+LITERAL_or = 55
+PIR_FOOTER = 56
+PIR_HEADER = 57
+PIR_NOOP = 58
+PIR_COMMENT = 59
+PIR_NEWLINE = 60
 
 class Lexer(antlr.CharScanner) :
     ### user action >>>
@@ -150,7 +142,7 @@ class Lexer(antlr.CharScanner) :
                                 theRetToken = self._returnToken
                             elif la1 and la1 in u';':
                                 pass
-                                self.mSEMI(True)
+                                self.mSEMICOLON(True)
                                 theRetToken = self._returnToken
                             elif la1 and la1 in u',':
                                 pass
@@ -163,6 +155,14 @@ class Lexer(antlr.CharScanner) :
                             elif la1 and la1 in u']':
                                 pass
                                 self.mRBRACKET(True)
+                                theRetToken = self._returnToken
+                            elif la1 and la1 in u'{':
+                                pass
+                                self.mLCURLY(True)
+                                theRetToken = self._returnToken
+                            elif la1 and la1 in u'}':
+                                pass
+                                self.mRCURLY(True)
                                 theRetToken = self._returnToken
                             elif la1 and la1 in u'(':
                                 pass
@@ -454,11 +454,11 @@ class Lexer(antlr.CharScanner) :
         self.match(':')
         self.set_return_token(_createToken, _token, _ttype, _begin)
     
-    def mSEMI(self, _createToken):    
+    def mSEMICOLON(self, _createToken):    
         _ttype = 0
         _token = None
         _begin = self.text.length()
-        _ttype = SEMI
+        _ttype = SEMICOLON
         _saveIndex = 0
         pass
         self.match(';')
@@ -512,6 +512,26 @@ class Lexer(antlr.CharScanner) :
         _saveIndex = 0
         pass
         self.match(']')
+        self.set_return_token(_createToken, _token, _ttype, _begin)
+    
+    def mLCURLY(self, _createToken):    
+        _ttype = 0
+        _token = None
+        _begin = self.text.length()
+        _ttype = LCURLY
+        _saveIndex = 0
+        pass
+        self.match('{')
+        self.set_return_token(_createToken, _token, _ttype, _begin)
+    
+    def mRCURLY(self, _createToken):    
+        _ttype = 0
+        _token = None
+        _begin = self.text.length()
+        _ttype = RCURLY
+        _saveIndex = 0
+        pass
+        self.match('}')
         self.set_return_token(_createToken, _token, _ttype, _begin)
     
     def mDOTDOT(self, _createToken):    

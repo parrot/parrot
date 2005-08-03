@@ -1,12 +1,14 @@
 # Copyright: 2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
-Implement of 'bc' with the help Python code created from an ANTLR grammar.
+Implementation of 'POSIX bc' with the help Python code created from
+an ANTLR grammar.
 
 Requirements:
 
-Right now ANTLR 2.7.5, and thus Java, is required.
-In future the runtime files for Lexer and Parser will be distributed too.
+For development ANTLR 2.7.5, and thus Java, is required.
+The runtime files for Lexer and Parser are in the Parror SVN, thus only
+python is required for running.
 
 Building:
 
@@ -14,5 +16,5 @@ Building:
 
 Testing:
 
-'make test' When GNU bc is available, the test suite will be run against GNU bc as well.
+'make test'. When GNU bc is available, the test suite will be run against GNU bc as well.
 

@@ -5,6 +5,10 @@
 
 This implementation of bc is based on ANTLR.
 
+=head1 Why Parrot bc
+
+Self education.
+
 =head2 Vision
 
 Be compatible with Pirate and Pugs.
@@ -18,6 +22,5 @@ L<http://parrotcode.org>
 L<http://pugscode.org>
 L<http://pirate.tangentcode.com/>
 L<http://www.javadude.com/articles/antlrtut/>
-
 
 =cut

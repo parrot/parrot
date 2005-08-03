@@ -39,7 +39,7 @@ options
 {
   // charVocabulary = '\0'..'\377';
   // testLiterals = false;          // don't automatically test for literals
-  k = 1;                            // two characters of lookahead
+  k = 1;                            // no lookahead
 }
 
 // C-like comments
@@ -115,11 +115,13 @@ LETTER
 DOT        : '.'   ;
 BECOMES    : ":="  ;
 COLON      : ':'   ;
-SEMI       : ';'   ;
+SEMICOLON  : ';'   ;
 COMMA      : ','   ;
 ASSIGN_OP  : '=' | "^="      ;
 LBRACKET   : '['   ;
 RBRACKET   : ']'   ;
+LCURLY     : '{'   ;
+RCURLY     : '}'   ;
 DOTDOT     : ".."  ;
 LPAREN     : '('   ;
 RPAREN     : ')'   ;
@@ -148,7 +150,7 @@ MOD        : '%'   ;
 class BcParser extends Parser;
 options 
 {
-  k = 1;
+  k = 1;                           // no lookahead
   defaultErrorHandler = true;      // Don't generate parser error handlers
   buildAST = true;                 // Build an AST for treewalking
 }
@@ -161,79 +163,33 @@ tokens
 
 // "quit" is really a keyword
 program
-  : (expr_newline)* 
+  : (input_item)* 
     "quit"!
     // end-of-file
   ;
 
-expr_newline
-  : addingExpression NEWLINE!
+input_item
+  : semicolon_list NEWLINE!
+  ;
+
+semicolon_list
+  : statement
+  ;
+
+statement
+  : addingExpression (SEMICOLON addingExpression)*
   ;
 
 
 subprogramBody
-  : (basicDecl)*
-    (procedureDecl)*
-    statementList
+  : (function)*
+    statement_list
   ;
-
-
-basicDecl
-  :   varDecl
-    | constDecl
-    | typeDecl
-  ;
-
-
-varDecl
-  : "var" identList COLON typeName
-    (BECOMES constantValue)?
-    SEMI
-  ;
-
-
-constDecl
-  : "constant" identList COLON typeName
-    BECOMES constantValue SEMI
-  ;
-
 
 
 identList
   : LETTER (COMMA LETTER)*
   ;
-
-
-constantValue
-  :   NUMBER
-    | LETTER
-  ;
-
-
-typeDecl
-  : "type" LETTER ASSIGN_OP
-    (   arrayDecl
-      | recordDecl
-    )
-    SEMI
-  ;
-
-
-arrayDecl
-  : "array" LBRACKET integerConstant DOTDOT integerConstant RBRACKET
-    "of" typeName
-  ;
-
-integerConstant
-  :   NUMBER
-    | LETTER // again, a constant...
-  ;
-
-
-recordDecl
-  : "record" (identList COLON typeName SEMI)+ "end" "record"
-  ;
-
 
 typeName
   :   LETTER
@@ -242,15 +198,18 @@ typeName
   ;
 
 
-procedureDecl
-  : "procedure" LETTER (formalParameters)? ASSIGN_OP
+function
+  : "define" LETTER LPAREN opt_parameter_list RPAREN RCURLY NEWLINE statement_list LCURLY
         subprogramBody
-    SEMI
+    SEMICOLON
   ;
 
+opt_parameter_list
+  : parameterSpec (SEMICOLON parameterSpec)* RPAREN
+  ;
 
-formalParameters
-  : LPAREN parameterSpec (SEMI parameterSpec)* RPAREN
+opt_auto_define_list
+  : parameterSpec (SEMICOLON parameterSpec)* RPAREN
   ;
 
 
@@ -258,34 +217,34 @@ parameterSpec
   : ("var")? identList COLON typeName
   ;
 
-statement
+statement_from_tutorial
   :   exitStatement
     | returnStatement
     | ifStatement
     | loopStatement
     | ioStatement
-    | (LETTER (LPAREN|SEMI))=> procedureCallStatement
+    | (LETTER (LPAREN|SEMICOLON))=> procedureCallStatement
     | assignmentStatement
     | expression
   ;
 
 
-statementList
-  :   addingExpression statementList
+statement_list
+  :   addingExpression statement_list
     | // nothing
   ;
 
 assignmentStatement
-  : variableReference BECOMES expression SEMI
+  : variableReference BECOMES expression SEMICOLON
   ;
 
 
 exitStatement
-  : "exit" "when" expression SEMI
+  : "exit" "when" expression SEMICOLON
   ;
 
 procedureCallStatement
-  : LETTER (actualParameters)? SEMI
+  : LETTER (actualParameters)? SEMICOLON
   ;
 
 actualParameters
@@ -293,29 +252,29 @@ actualParameters
   ;
 
 returnStatement
-  : "return" SEMI
+  : "return" SEMICOLON
   ;
 
 ifStatement
-  : "if" ifPart "end" "if" SEMI
+  : "if" ifPart "end" "if" SEMICOLON
   ;
 
 ifPart
   : expression "then"
-    statementList
+    statement_list
     (   "elsif" ifPart
-      | "else" statementList
+      | "else" statement_list
     )?
   ;
 
 loopStatement
   : ("while" expression)? "loop"
-        statementList
-    "end" "loop" SEMI
+        statement_list
+    "end" "loop" SEMICOLON
   ;
 
 endStatement
-  : "end" SEMI
+  : "end" SEMICOLON
   ;
 
 variableReference
@@ -328,16 +287,15 @@ variableReference
 
 
 ioStatement
-  :   "put" LPAREN expression RPAREN SEMI
-    | "get" LPAREN variableReference RPAREN SEMI
-    | "newLine" (LPAREN RPAREN)? SEMI
-    | "skipLine" (LPAREN RPAREN)? SEMI
+  :   "put" LPAREN expression RPAREN SEMICOLON
+    | "get" LPAREN variableReference RPAREN SEMICOLON
+    | "newLine" (LPAREN RPAREN)? SEMICOLON
+    | "skipLine" (LPAREN RPAREN)? SEMICOLON
   ;
 
 
 primitiveElement
   :   variableReference
-    | constantValue
     | LPAREN expression RPAREN
   ;
 

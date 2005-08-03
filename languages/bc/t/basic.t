@@ -16,7 +16,7 @@ use FindBin;
 use lib "$FindBin::Bin/../../lib", "$FindBin::Bin/../../../../lib";
 
 use Test::More;
-use Parrot::Test tests => 27;
+use Parrot::Test tests => 28;
 
 sub run_tests
 {
@@ -65,11 +65,14 @@ my @tests =
        [ '2 * 2 + .4', '4.4' ],
        [ '.1 - 6 / 2', '-2.9' ],
        [ '2 % 2 + 4', '4' ],
+
      );
 my @todo_tests = 
      ( # floats
        [ '.1', '.1' ],
        [ '-.1', '-.1' ],
+       # semicolons
+       [ '1; 2', "1\n2" ],
      );
 
 run_tests( \@tests );
