@@ -18,9 +18,9 @@ use strict;
 use vars qw($description @args);
 use Parrot::Configure::Step ':auto';
 
-$description="Determining if your platform supports gdbm...";
+$description = "Determining if your platform supports gdbm...";
 
-@args=qw(verbose);
+@args = qw(verbose);
 
 sub runstep {
     my ($verbose) = @_;

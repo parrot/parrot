@@ -82,7 +82,11 @@ Class initialization. Allocates the memory for the hash.
 
     void class_init() {
         /* XXX: Name of the lib should be configurable */
+#ifdef WIN32
+        STRING *slib = string_from_cstring(INTERP, "gdbm3", 0);
+#else
         STRING *slib = string_from_cstring(INTERP, "libgdbm", 0);
+#endif
 
         /* XXX: What if libgdbm.so cannot be loaded */
         Parrot_load_lib(INTERP, slib, NULL);
