@@ -211,6 +211,8 @@ output_is( <<'CODE', <<OUTPUT, "substr with a UTF8 replacement" );
     set I0, 0x666
     chr S1, I0 
     substr S0, 0, 5, S1
+    print S0
+    print "\n"
 CODE
 \x{666}
 OUTPUT
