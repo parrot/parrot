@@ -2,6 +2,10 @@
 
 =over 4
 
+=item remove .is_space macro
+
+looks like <is_whitespace> opcode will handle this.
+
 =item PIR Tree
 
 From autrijus's talk.
