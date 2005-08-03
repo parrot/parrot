@@ -18,8 +18,9 @@ Tests Parrot's unicode string system.
 
 #'
 
-use Parrot::Test tests => 16;
+use Parrot::Test tests => 17;
 use Test::More;
+use vars qw($TODO);
 
 output_is( <<'CODE', <<OUTPUT, "angstrom" );
     getstdout P0
@@ -201,4 +202,17 @@ output_like( <<'CODE', <<OUTPUT, "UTF8 as malformed ascii" );
 CODE
 /Malformed string/
 OUTPUT
+
+TODO: {
+local $TODO = "bug #36794";
+
+output_is( <<'CODE', <<OUTPUT, "substr with a UTF8 replacement" );
+    set S0, "\\u666"
+    set I0, 0x666
+    chr S1, I0 
+    substr S0, 0, 5, S1
+CODE
+\x{666}
+OUTPUT
+}
 
