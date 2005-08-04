@@ -45,18 +45,31 @@ array:
   
   $I0 = does variable, "hash"
   unless $I0 goto cant_read_not_array
-  
+
+  #$P1 = new String
+  #$P1 = key
+  #$I0 = exists $I0variable, $P1
+  #unless $I0 goto bad_index
+
   variable = variable[key]
-  goto done
+  isnull variable,bad_index 
+  .return(TCL_OK, variable)
+
+bad_index:
+  $S0 = "can't read \""
+  $S0 .= name
+  $S0 .= "\": no such element in array"
+  variable = new String
+  variable = $S0
+  .return (TCL_ERROR, variable)
 
 cant_read_not_array:
-  return_type = TCL_ERROR
   $S0 =  "can't read \""
   $S0 .= name
   $S0 .= "\": variable isn't array"
   variable = new String
   variable = $S0
-  goto done
+  .return (TCL_ERROR, variable)
 
 scalar:
   variable = __find_var(name)
@@ -64,28 +77,23 @@ scalar:
   
   $I0 = does variable, "hash"
   if $I0 goto cant_read_array
-  goto done
+  .return(TCL_OK,variable)
 
 cant_read_array:
-  return_type = TCL_ERROR
   $S0 = "can't read \""
   $S0 .= name
   $S0 .= "\": variable is array"
   variable = new String
   variable = $S0
-  goto done
+  .return (TCL_ERROR, variable)
 
 no_such_variable:
-  return_type = TCL_ERROR
   $S0 = "can't read \""
   $S0 .= name
   $S0 .= "\": no such variable"
   variable = new String
   variable = $S0
-  # goto done
-
-done:
-  .return(return_type, variable)
+  .return (TCL_ERROR, variable)
 .end
 
 =head2 _Tcl::__set
@@ -140,31 +148,28 @@ find_array:
 set_array:
   array[key] = value
   variable = clone value
-  goto done
+  .return(TCL_OK,variable)
 
 create_array:
   array = new TclArray
   array[key] = value
   __store_var(var, array)
   variable = clone value
-  goto done
+  .return(TCL_OK,variable)
 
 cant_set_not_array:
-  return_type = TCL_ERROR
   $S0 =  "can't set \""
   $S0 .= name
   $S0 .= "\": variable isn't array"
   variable = new String
   variable = $S0
-  goto done
+  .return(TCL_ERROR,variable)
 
 scalar:
   __store_var(name, value)
   variable = clone value
-  # goto done
-  
-done:
   .return(return_type, variable)
+
 .end
 
 =head2 _Tcl::__find_var
@@ -199,7 +204,6 @@ global_var:
 
 found:
   clear_eh
-  # goto done
 
 done:
   .return(value)
@@ -226,11 +230,10 @@ Sets the actual variable from memory.
   if call_level == 0 goto global_var
 lexical_var:
   store_lex call_level, name, value
-  goto done
+  .return()
+
 global_var:
   store_global "Tcl", name, value
-  # goto done
 
-done:
   .return()
 .end
