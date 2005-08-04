@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 12;
+use Parrot::Test tests => 13;
 use Test::More;
 use vars qw($TODO);
 
@@ -81,8 +81,15 @@ TCL
 invalid command name "a"
 OUT
 
-language_output_is("tcl",<<'TCL',<<'OUT',"comments must *start* commands");
+language_output_is("tcl",<<'TCL',<<'OUT',"comments must *start* commands (doesn't)");
 puts 4 # comment
 TCL
 bad argument "comment": should be "nonewline"
+OUT
+
+language_output_is("tcl",<<'TCL',<<'OUT',"comments must *start* commands (does)");
+# comment
+puts 1
+TCL
+1
 OUT

@@ -46,15 +46,47 @@ get_commands:
   chars[59] = 1 # ;
   
 next_command:
+  # Do we have a comment? If so, skip to the next position where
+  # We might have a command.
+  pos = skip_comment(tcl_code, pos)
+
   .local pmc command
   (command, pos) = get_command(tcl_code, chars, pos)
   isnull command, done
   
   push commands, command
   goto next_command
-  
+ 
 done:
   .return(commands)
+.end
+
+.sub skip_comment
+  .param string tcl_code
+  .param int    pos
+
+  .local pmc chars
+  chars = new Hash
+  chars[10] = 1 # \n
+  .local int peek_pos
+get:
+  .local pmc command
+  null command
+
+  # try to get a command name
+  .local pmc word
+  (word, peek_pos) = get_word(tcl_code, chars, pos)
+  isnull word, check
+  $S0 = word
+  $I0 = ord $S0, 0
+  if $I0 == 35 goto got_comment
+check:
+  .return(pos)
+got_comment:
+  .local int new_pos
+  new_pos = index tcl_code, "\n", pos
+  inc new_pos
+  .return (new_pos)
 .end
 
 .sub get_command
@@ -65,7 +97,7 @@ done:
 get:
   .local pmc command
   null command
-  
+ 
   # try to get a command name
   .local pmc word
   (word, pos) = get_word(tcl_code, chars, pos)
