@@ -70,7 +70,6 @@ Define the attributes required for the class.
   .param string value
 
   .local int value_length
-  value_length = length value
 
   .local pmc backslashes, hexadecimal
   find_global backslashes, "_Tcl", "backslashes"
@@ -79,6 +78,7 @@ Define the attributes required for the class.
   .local int pos
   pos = 0
 loop:
+  value_length = length value
   pos = index value, "\\", pos
   if pos == -1 goto done
  
@@ -125,7 +125,7 @@ octal_only1:
   $S0 = chr octal_value
   substr value, pos, 2, $S0 
 
-  pos += 2 # skip \ and 1 char.
+  inc pos
   goto loop 
 
 octal2:
@@ -148,7 +148,7 @@ octal_only2:
   $S0 = chr octal_value
   substr value, pos, 3, $S0 
 
-  pos += 3 # skip \ and 2 characters
+  inc pos
   goto loop 
 
 octal3:
@@ -161,8 +161,7 @@ octal3:
   $S0 = chr octal_value
   substr value, pos, 4, $S0 
 
-  pos += 4 # skip \ and 3 characters
-
+  inc pos
   goto loop # can't have four digits, stop now.
 
 =for comment
@@ -198,13 +197,14 @@ hex_done:
   $S0 = chr hex_value
   substr value, pos, $I0, $S0 
 
-  pos = hex_pos
+  inc pos 
+
   goto loop
 
 hex_not_really:
   # This was a \x escape that had no hex value..
   substr value, pos, 2, "x"
-  pos = hex_pos
+  inc pos
   goto loop
 
 =for comment
@@ -241,16 +241,14 @@ uni_done:
   $S0 = chr uni_value
   substr value, pos, $I0, $S0 
 
-  pos = uni_pos
+  inc pos
   goto loop
 
 uni_not_really:
-  # This was a \x escape that had no uni value..
+  # This was a \u escape that had no uni value..
   substr value, pos, 2, "u"
-  pos = uni_pos
+  inc pos
   goto loop
-
-
 
 special:
   $S0 = backslashes[$I0]

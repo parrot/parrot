@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 34;
+use Parrot::Test tests => 35;
 use Test::More;
 
 my($tcl,$expected);
@@ -68,105 +68,105 @@ EOTCL
 $expected = "a b\n";
 language_output_is("tcl",$tcl,$expected,"backslash newline substitution");
 
-language_output_is("tcl",<<'TCL',<<OUT,"octal single char");
+language_output_is("tcl",<<'TCL',<<OUT,"octal single digit");
   set a \7
   puts $a
 TCL
 \cG
 OUT
 
-language_output_is("tcl",<<'TCL',<<OUT,"octal single char, extra");
+language_output_is("tcl",<<'TCL',<<OUT,"octal single digit, extra");
   set a \79
   puts $a
 TCL
 \cG9
 OUT
 
-language_output_is("tcl",<<'TCL',<<OUT,"octal double char");
+language_output_is("tcl",<<'TCL',<<OUT,"octal double digit");
   set a \12
   puts $a
 TCL
 \cJ
 OUT
 
-language_output_is("tcl",<<'TCL',<<OUT,"octal double char, extra");
+language_output_is("tcl",<<'TCL',<<OUT,"octal double digit, extra");
   set a \129
   puts $a
 TCL
 \cJ9
 OUT
 
-language_output_is("tcl",<<'TCL',<<OUT,"octal triple char");
+language_output_is("tcl",<<'TCL',<<OUT,"octal triple digit");
   set a \123
   puts $a
 TCL
 S
 OUT
 
-language_output_is("tcl",<<'TCL',<<OUT,"octal triple char, extra");
+language_output_is("tcl",<<'TCL',<<OUT,"octal triple digit, extra");
   set a \1234
   puts $a
 TCL
 S4
 OUT
 
-language_output_is("tcl",<<'TCL',<<OUT,"hex single char, invalid");
+language_output_is("tcl",<<'TCL',<<OUT,"hex single digit, invalid");
   set a \xq
   puts $a
 TCL
 xq
 OUT
 
-language_output_is("tcl",<<'TCL',<<OUT,"hex single char");
+language_output_is("tcl",<<'TCL',<<OUT,"hex single digit");
   set a \x7
   puts $a
 TCL
 \cG
 OUT
 
-language_output_is("tcl",<<'TCL',<<OUT,"hex single char, extra");
+language_output_is("tcl",<<'TCL',<<OUT,"hex single digit, extra");
   set a \x7q
   puts $a
 TCL
 \cGq
 OUT
 
-language_output_is("tcl",<<'TCL',<<OUT,"hex double char");
+language_output_is("tcl",<<'TCL',<<OUT,"hex double digit");
   set a \x6a
   puts $a
 TCL
 j
 OUT
 
-language_output_is("tcl",<<'TCL',<<OUT,"hex double char, extra");
+language_output_is("tcl",<<'TCL',<<OUT,"hex double digit, extra");
   set a \x6aq
   puts $a
 TCL
 jq
 OUT
 
-language_output_is("tcl",<<'TCL',<<OUT,"hex triple char, skip ok?");
+language_output_is("tcl",<<'TCL',<<OUT,"hex triple digit, skip ok?");
   set a \xb6a
   puts $a
 TCL
 j
 OUT
 
-language_output_is("tcl",<<'TCL',<<OUT,"hex triple char, extra");
+language_output_is("tcl",<<'TCL',<<OUT,"hex triple digit, extra");
   set a \xb6aq
   puts $a
 TCL
 jq
 OUT
 
-language_output_is("tcl",<<'TCL',<<OUT,"hex many char");
+language_output_is("tcl",<<'TCL',<<OUT,"hex many digit");
   set a \xaaaaaaaaaaab6a
   puts $a
 TCL
 j
 OUT
 
-language_output_is("tcl",<<'TCL',<<OUT,"hex many char, extra");
+language_output_is("tcl",<<'TCL',<<OUT,"hex many digit, extra");
   set a \xaaaaaaaaaaab6aq
   puts $a
 TCL
@@ -174,71 +174,74 @@ jq
 OUT
 
 
-language_output_is("tcl",<<'TCL',<<OUT,"unicode single char, invalid");
+language_output_is("tcl",<<'TCL',<<OUT,"unicode single digit, invalid");
   set a \uq
   puts $a
 TCL
 uq
 OUT
 
-language_output_is("tcl",<<'TCL',<<OUT,"unicode one char");
+language_output_is("tcl",<<'TCL',<<OUT,"unicode one digit");
   set a \u7
   puts $a
 TCL
 \cG
 OUT
 
-language_output_is("tcl",<<'TCL',<<OUT,"unicode one char, extra");
+language_output_is("tcl",<<'TCL',<<OUT,"unicode one digit, extra");
   set a \u7q
   puts $a
 TCL
 \cGq
 OUT
 
-language_output_is("tcl",<<'TCL',<<OUT,"unicode two chars");
+language_output_is("tcl",<<'TCL',<<OUT,"unicode two digits");
   set a \u6a
   puts $a
 TCL
 j
 OUT
 
-language_output_is("tcl",<<'TCL',<<OUT,"unicode two chars, extra");
+language_output_is("tcl",<<'TCL',<<OUT,"unicode two digits, extra");
   set a \u6aq
   puts $a
 TCL
 jq
 OUT
 
-TODO: {
+# expected values are in utf8 encoding.
 
-local $TODO = "These four tests tickle a seg-fault in parrot: [#36794]";
-
-language_output_is("tcl",<<'TCL',<<OUT,"unicode three chars");
+language_output_is("tcl",<<'TCL',<<OUT,"unicode three digits");
   set a \u666
   puts $a
 TCL
-\x{666}
+\xd9\xa6
 OUT
 
-language_output_is("tcl",<<'TCL',<<OUT,"unicode three chars, extra");
+language_output_is("tcl",<<'TCL',<<OUT,"unicode three digits, extra");
   set a \u666q
   puts $a
 TCL
-\x{666}q
+\xd9\xa6q
 OUT
 
-language_output_is("tcl",<<'TCL',<<OUT,"unicode four chars");
+language_output_is("tcl",<<'TCL',<<OUT,"unicode four digits");
   set a \u6666
   puts $a
 TCL
-\x{6666}
+\xe6\x99\xa6
 OUT
 
-language_output_is("tcl",<<'TCL',<<OUT,"unicode four chars, extra");
+language_output_is("tcl",<<'TCL',<<OUT,"unicode four digits, extra");
   set a \u6666q
   puts $a
 TCL
-\x{6666}q
+\xe6\x99\xa6q
 OUT
 
-}
+language_output_is("tcl",<<'TCL',<<OUT,"multiple substs, same word");
+  set a \\\a\007\xaaaa07\u0007\uq
+  puts $a
+TCL
+\\\cG\cG\cG\cGuq
+OUT
