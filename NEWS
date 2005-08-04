@@ -1,5 +1,15 @@
 # $Id$
 
+New in 0.2.3
+
+- Dynamic classes now compile on Windows (including ParTcl)
+- New Super PMC allows easy access to superclass methods
+- Implement C3 method resolution order (just like Perl6 & Python)
+- ParTcl has new PIR-based parser and passes more Tcl tests
+- added character class support in Globs to PGE
+- added language implementations of unlambda, Lazy-k
+- many bugfixes, including GC and memory leaks
+
 New in 0.2.2
 
 - new call scheme: docs/pdds/pdd03_calling_conventions.pod

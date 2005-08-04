@@ -31,9 +31,13 @@ N: Alex Gough
 D: bignum
 
 N: Allison Randal
-D: P6C
+D: P6C and Punie (Perl 1)
 
-A: Andrew Rodland
+N: Amir Karger
+D: editor bugfixes
+E: akarger@cgr.harvard.edu
+
+N: Andrew Rodland
 D: vim syntax files and editor doc
 
 N: Andy Dougherty
@@ -50,11 +54,14 @@ D: Buffered IO fix
 
 N: Ask Bjoern Hansen
 
+N: Autrijus Tang
+D: various bugfixes
+
 N: Benjamin Goldberg
 D: Numerous improvements and proposals.
 
 N: Bernhard Schmalhofer
-D: Bugfixes, m4, Getopt_Long.pir
+D: Bugfixes, m4, Getopt_Long.pir, Parrot bc, Configure bugfixes
 
 N: Bob Diertens
 D: patch regarding macro argument expansion
@@ -81,7 +88,7 @@ D: Designer and demagogue
 E: chip@pobox.com
 
 N: chromatic
-D: SDL library and examples
+D: SDL library and examples; Test::Builder; test suite cleanup
 
 N: Clayton O'Neill
 D: Fix for parrot linking issue on Solaris 8
@@ -93,7 +100,8 @@ N: Cory Spencer
 D: Peek opcode and PIO implementation
 
 N: Curtis Rawls
-D: imcc optimizer patches and tests
+D: imcc optimizer and register allocator patches and tests
+E: cgrawls@gmail.com
 
 N: Dan Sugalski
 D: The big cheese emeritus
@@ -111,11 +119,18 @@ N: David M. Loyd
 N: Dennis Rieks
 D: Win32 config and build
 
+N: Dino Morelli
+D: PGE tests
+E: dmorelli@reactorweb.net
+
 N: Eirik Berg Hanssen
 D: Use unix98 ps option in signal.t
 
 N: Felix Gallo
 D: delegate.pmc patch
+
+N: Francois Perrad
+D: build fixes for Cygwin and MinGW
 
 N: Garrett Rooney
 D: Fix typo in PARROT_BIGENDIAN case
@@ -125,6 +140,9 @@ D: Win98 and other fixes.
 
 N: Gordon Henriksen
 D: Unified PMC/PObj accessors
+
+N: Greg Bacon
+D: Memory reallocation test and patch
 
 N: Gregor N. Purdy
 D: Early Parrot core, including packfile and op processing code,
@@ -172,9 +190,11 @@ D: parrotbug, befunge interpreter, ook compiler.
 E: jquelin@cpan.org
 S: Lyon, France
 
-N: Jerry Gay
+N: Jerry Gay a.k.a particle
 E: Jerry.Gay@gmail.com
 D: remove Win32 compile warnings; pcre update; cleanup of internal exceptions
+D: add tests; doc cleanup; pick low hanging fruit
+S: Seattle, WA
 
 N: John Paul Wallington
 D: pir-mode.el: fix for xemacs plus bugfixes and cleanups
@@ -208,6 +228,10 @@ D: yield and other PIR improvements
 
 N: Kevin Falcone
 
+N: Klaas-Jan Stol
+D: dynclasses and doc updates
+E: vanderlay@home.nl
+
 N: Lars Balker Rasmussen
 D: FreeBSD and other build fixes
 
@@ -230,6 +254,7 @@ D: httpd.imc, bugfixes
 N: Matt Diephouse
 D: Turn off buffering layer in forth.pasm
 D: Various patches for pmc2c.pl
+D: Run Tcl test suite in ParTcl, and add various ParTcl bits
 
 N: Matt Fowles
 D: Resizable*Array classes
@@ -272,6 +297,10 @@ D: Win32, FreeBSD build fixes
 
 N: Nigelsandever
 D: Win32 patches
+
+N: Patrick R. Michaud
+D: Parrot Grammar Engine
+E: pmichaud@pobox.com
 
 N: Peter Gibbs
 D: String subsystem
@@ -343,10 +372,16 @@ E: steven@accognoscere.org
 W: http://www.accognoscere.org
 S: Winterthur, Switzerland
 
+N: Thilo Planz
+D: ParTcl tests and inspiration
+
 N: TOGoS
 D: Some FAQ questions and answers
 
 N: Tom Hughes
+
+E: tom@nekomimists.ddo.jp
+D: Nicer command line handling in ops2c.pl
 
 N: Uri Guttman
 D: Lot of general Parrot design hints
