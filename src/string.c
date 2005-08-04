@@ -1148,20 +1148,19 @@ string_replace(Interp *interpreter, STRING *src,
     INTVAL offset, INTVAL length, STRING *rep, STRING **d)
 {
     STRING *dest = NULL;
-    UINTVAL substart_off;       /* Offset from start of string to our
-                                 * piece */
-    UINTVAL subend_off;         /* Offset from start of string to the
-                                 * end of our piece */
+    UINTVAL start_byte, end_byte;
     UINTVAL true_offset;
     UINTVAL true_length;
     INTVAL diff;
     CHARSET *cs;
+    ENCODING *enc;
+    String_iter iter;
 
     true_offset = (UINTVAL)offset;
     true_length = (UINTVAL)length;
 
     /* may have different reps..... */
-    if ( !(cs = string_rep_compatible(interpreter, src, rep, NULL))) {
+    if ( !(cs = string_rep_compatible(interpreter, src, rep, &enc))) {
         internal_exception(UNIMPLEMENTED,
                 "Cross-type string replace (%s/%s) (%s/%s) unsupported",
                 ((ENCODING *)(src->encoding))->name,
@@ -1187,61 +1186,58 @@ string_replace(Interp *interpreter, STRING *src,
         true_length = (UINTVAL)(src->strlen - true_offset);
     }
 
+    /* get byte position of the part that will be replaced */
+    ENCODING_ITER_INIT(interpreter, src, &iter);
+    iter.set_position(interpreter, &iter, true_offset);
+    start_byte = iter.bytepos;
+    iter.set_position(interpreter, &iter, true_offset + true_length);
+    end_byte = iter.bytepos;
 
+    /* not possible.... */
+    if (end_byte < start_byte) {
+        internal_exception(SUBSTR_OUT_OF_STRING,
+                "replace: subend somehow is less than substart");
+    }
     /* Save the substring that is replaced for the return value */
-
     if (d != NULL) {
         UINTVAL length_bytes = string_max_bytes(interpreter, src, true_length);
 
-        dest = string_make_empty(interpreter, enum_stringrep_one, true_length);
+        dest = string_make_empty(interpreter, enum_stringrep_one, length_bytes);
         dest->charset = src->charset;
         dest->encoding = src->encoding;
 
         mem_sys_memcopy(dest->strstart,
-                (char *)src->strstart
-                + string_max_bytes(interpreter, src, true_offset),
-                length_bytes);
+                (char *)src->strstart + start_byte,
+                end_byte - start_byte);
 
-        dest->bufused = length_bytes;
+        dest->bufused = end_byte - start_byte;
         dest->strlen = true_length;
 
         *d = dest;
     }
 
     src->charset = cs;
+    src->encoding = enc;
     /* Now do the replacement */
-
-
-    /* XXXX: make sure the rest of this method is correct, vis-a-vis byte v.
-       character */
-    substart_off = string_max_bytes(interpreter, src, true_offset);
-
-    subend_off = substart_off + string_max_bytes(interpreter, src, true_length);
-
-    /* not possible.... */
-    if (subend_off < substart_off) {
-        internal_exception(SUBSTR_OUT_OF_STRING,
-                "replace: subend somehow is less than substart");
-    }
 
     /*
      * If the replacement string fits inside the original substring
      * don't create a new string, just pack it.
      */
-    diff = (subend_off - substart_off) - rep->bufused;
+    diff = (end_byte - start_byte) - rep->bufused;
 
     if(diff >= 0
             || ((INTVAL)src->bufused - (INTVAL)PObj_buflen(src)) <= diff) {
         Parrot_unmake_COW(interpreter, src);
 
         if(diff != 0) {
-            mem_sys_memmove((char*)src->strstart + substart_off + rep->bufused,
-                    (char*)src->strstart + subend_off,
-                    src->bufused - subend_off);
+            mem_sys_memmove((char*)src->strstart + start_byte + rep->bufused,
+                    (char*)src->strstart + end_byte,
+                    src->bufused - end_byte);
             src->bufused -= diff;
         }
 
-        mem_sys_memcopy((char*)src->strstart + substart_off,
+        mem_sys_memcopy((char*)src->strstart + start_byte,
                 rep->strstart, rep->bufused);
         if(diff != 0)
             (void)string_compute_strlen(interpreter, src);
@@ -1256,11 +1252,11 @@ string_replace(Interp *interpreter, STRING *src,
 
         /* Move the end of old string that isn't replaced to new offset
          * first */
-        mem_sys_memmove((char*)src->strstart + subend_off + diff,
-                (char*)src->strstart + subend_off,
-                src->bufused - subend_off);
+        mem_sys_memmove((char*)src->strstart + end_byte + diff,
+                (char*)src->strstart + end_byte,
+                src->bufused - end_byte);
         /* Copy the replacement in */
-        mem_sys_memcopy((char *)src->strstart + substart_off, rep->strstart,
+        mem_sys_memcopy((char *)src->strstart + start_byte, rep->strstart,
                 rep->bufused);
         src->bufused += diff;
         (void)string_compute_strlen(interpreter, src);

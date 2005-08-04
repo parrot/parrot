@@ -203,18 +203,15 @@ CODE
 /Malformed string/
 OUTPUT
 
-#TODO: {
-#local $TODO = "bug #36794";
-
-output_is( <<'CODE', <<OUTPUT, "substr with a UTF8 replacement" );
-    set S0, "\\u666"
+output_is( <<'CODE', <<OUTPUT, "substr with a UTF8 replacement #36794" );
+    set S0, "AAAAAAAAAA\\u666"
     set I0, 0x666
-    chr S1, I0 
-    substr S0, 0, 5, S1
+    chr S1, I0
+    substr S0, 10, 5, S1
     print S0
     print "\n"
+    end
 CODE
-\x{666}
+AAAAAAAAAA\xd9\xa6
 OUTPUT
-#}
 
