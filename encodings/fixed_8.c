@@ -188,7 +188,7 @@ static void
 fixed8_set_position(Interp *interpreter, String_iter *iter, UINTVAL pos)
 {
     iter->bytepos = iter->charpos = pos;
-    assert(pos < PObj_buflen(iter->str));
+    assert(pos <= PObj_buflen(iter->str));
 }
 
 
