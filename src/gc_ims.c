@@ -706,7 +706,7 @@ static int
 collect_cb(Interp *interpreter, struct Small_Object_Pool *pool, int flag,
         void *arg)
 {
-    int check_only = (int)arg;
+    int check_only = (int)(INTVAL)arg;
     struct Memory_Pool *mem_pool;
     /*
      * check if there is an associate memory pool
@@ -740,7 +740,7 @@ collect_cb(Interp *interpreter, struct Small_Object_Pool *pool, int flag,
 }
 
 static int
-parrot_gc_ims_collect(Interp* interpreter, int check_only)
+parrot_gc_ims_collect(Interp* interpreter, INTVAL check_only)
 {
     struct Arenas *arena_base = interpreter->arena_base;
     Gc_ims_private *g_ims;

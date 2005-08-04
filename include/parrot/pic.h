@@ -71,7 +71,7 @@ Parrot_PIC* parrot_PIC_alloc_pic(Interp*);
 
 void parrot_pic_find_infix_v_pp(Interp *, PMC *left, PMC *right,
                 Parrot_MIC *mic, opcode_t *cur_opcode);
-void * parrot_pic_opcode(Interp *, int op);
+void * parrot_pic_opcode(Interp *, INTVAL op);
 
 #endif /* PARROT_PIC_H_GUARD */
 

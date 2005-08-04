@@ -706,7 +706,7 @@ static int
 sweep_cb_buf(Interp *interpreter, struct Small_Object_Pool *pool, int flag,
         void *arg)
 {
-    int pass = (int)arg;
+    int pass = (int)(INTVAL)arg;
 
 #ifdef GC_IS_MALLOC
     if (pass == 0)
@@ -735,7 +735,7 @@ sweep_cb_pmc(Interp *interpreter, struct Small_Object_Pool *pool, int flag,
 void
 Parrot_destroy_header_pools(Interp *interpreter)
 {
-    int pass, start;
+    INTVAL pass, start;
 
     /* const/non const COW strings life in different pools
      * so in first pass

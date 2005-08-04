@@ -1010,7 +1010,7 @@ PIO_putps(theINTERP, PMC *pmc, STRING *s)
 {
     ParrotIOLayer *l = PMC_struct_val(pmc);
     ParrotIO *io = PMC_data0(pmc);
-    assert((unsigned int)l != 0xdeadbeefU);
+    assert((unsigned long)l != 0xdeadbeefUL);
     assert(io != 0);
 #if ! DISABLE_GC_DEBUG
     /* trigger GC for debug - but not during tests */

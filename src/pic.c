@@ -235,7 +235,7 @@ this opcode function is available. Called from C<do_prederef>.
 
 
 void *
-parrot_pic_opcode(Interp *interpreter, int op)
+parrot_pic_opcode(Interp *interpreter, INTVAL op)
 {
     int core = interpreter->run_core;
 #ifdef HAVE_COMPUTED_GOTO
@@ -389,7 +389,7 @@ parrot_pic_find_infix_v_pp(Interp *interpreter, PMC *left, PMC *right,
         mic->lru.f.sub = (PMC*)F2DPTR(func);
     }
     else {
-        int op = PARROT_OP_pic_infix___ic_p_p;
+        INTVAL op = PARROT_OP_pic_infix___ic_p_p;
 
 #if ENABLE_INLINING
         if (func == (funcptr_t)Parrot_Integer_i_subtract_Integer && !mic->pic)
