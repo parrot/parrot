@@ -2,6 +2,11 @@
 
 =over 4
 
+=item interactive tclsh
+
+new parser breaks ability to send interactive commands to the shell, add it
+back
+
 =item remove .is_space macro
 
 looks like <is_whitespace> opcode will handle this.
