@@ -117,6 +117,7 @@ my @funcnames = qw(
 	Parrot_string_find_punctuation
 	Parrot_string_find_newline
 	Parrot_string_find_word_boundary
+	Parrot_binary_charset_ptr
 	list_pmc_new
 	list_pmc_new_init
 	list_mark
