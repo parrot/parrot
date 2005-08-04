@@ -189,6 +189,10 @@ Parrot_locate_runtime_file(Interp *interpreter, const char *file_name,
     const char **paths;
     int length;
 
+    union {
+        const void * __c_ptr;
+        void * __ptr;
+    } __ptr_u;
     if (type & PARROT_RUNTIME_FT_DYNEXT)
         paths = dynext_paths;
     else if (type & (PARROT_RUNTIME_FT_PBC | PARROT_RUNTIME_FT_SOURCE))
@@ -287,7 +291,7 @@ Parrot_locate_runtime_file(Interp *interpreter, const char *file_name,
         str = string_from_cstring(interpreter, full_name, strlen(full_name));
         if (Parrot_stat_info_intval(interpreter, str, STAT_EXISTS)) {
             if (free_prefix)
-                string_cstring_free(prefix);
+                string_cstring_free(const_cast(prefix));
             return full_name;
         }
 
@@ -307,7 +311,7 @@ Parrot_locate_runtime_file(Interp *interpreter, const char *file_name,
                 /* Fix up any forward slashes. */
                 while ((p = strchr(parrot_path, '/')))
                     *p = '\\';
-                
+
                 /* And try it. */
                 str = string_from_cstring(interpreter, parrot_path, strlen(parrot_path));
                 if (Parrot_stat_info_intval(interpreter, str, STAT_EXISTS)) {
@@ -339,12 +343,12 @@ Parrot_locate_runtime_file(Interp *interpreter, const char *file_name,
         str = string_from_cstring(interpreter, full_name, strlen(full_name));
         if (Parrot_stat_info_intval(interpreter, str, STAT_EXISTS)) {
             if (free_prefix)
-                string_cstring_free(prefix);
+                string_cstring_free(const_cast(prefix));
             return full_name;
         }
     }
     if (free_prefix)
-        string_cstring_free(prefix);
+        string_cstring_free(const_cast(prefix));
     return NULL;
 }
 
