@@ -12,74 +12,84 @@ real top level namespace.
 .namespace [ "Tcl" ]
 
 .sub "&namespace"
-   .local pmc argv 
+  .local pmc argv, retval
   argv = foldup
 
-  unless argv goto failure
-  .local pmc subcommand
-  subcommand = shift argv
+  unless I3 goto no_args
 
-  if subcommand == "children"   goto children
-  if subcommand == "code"       goto code 
-  if subcommand == "current"    goto current
-  if subcommand == "delete"     goto delete
-  if subcommand == "ensemble"   goto ensemble
-  if subcommand == "eval"       goto eval
-  if subcommand == "exists"     goto exists
-  if subcommand == "export"     goto export
-  if subcommand == "forget"     goto forget
-  if subcommand == "import"     goto import
-  if subcommand == "inscope"    goto inscope
-  if subcommand == "origin"     goto origin
-  if subcommand == "parent"     goto parent
-  if subcommand == "qualifiers" goto qualifiers
-  if subcommand == "tail"       goto tail
-  if subcommand == "which"      goto which
+  .local string subcommand_name
+  subcommand_name = shift argv
+  .local pmc subcommand_proc
+  null subcommand_proc
 
-children:
-code:
-  goto failure
+  push_eh catch
+    subcommand_proc = find_global "_Tcl\0builtins\0namespace", subcommand_name
+resume:
+  clear_eh
+  isnull subcommand_proc, bad_args
+  .return subcommand_proc(argv)
 
-current:
+catch:
+  goto resume
+
+bad_args:
+  retval = new String
+
+  retval = "bad option \""
+  retval .= subcommand_name
+  retval .= "\": must be children, code, current, delete, eval, exists, export, forget, import, inscope, origin, parent, qualifiers, tail, or which"
+  .return(TCL_ERROR,retval)
+
+no_args:
+  retval = new String
+  retval = "wrong # args: should be \"namespace subcommand ?arg ...?\""
+  .return (TCL_ERROR, retval)
+
+.end
+
+.namespace [ "_Tcl\0builtins\0namespace" ]
+
+# TODO: hey, this is cheating!
+.sub "current"
+  .param pmc argv
+
+  .local int argc
+  argc = argv
+  if argc goto bad_args
+
   $P1 = new TclString
   $P1 = "::"
   .return(TCL_OK,$P1)
 
-delete:
-  if argv goto failure #XXX todo
+bad_args:
+  $P1 = new TclString
+  $P1 = "wrong # args: should be \"namespace current\"" 
+  .return(TCL_ERROR, $P1)
+
+.end
+
+.sub "delete"
+  .param pmc argv
+  
+  .local int argc
+  argc = argv
+  if argc !=0  goto not_done
  
   # No arg delete does nothing.
   $P1 = new String
   $P1 = ""
   .return(TCL_OK,$P1)
 
+not_done:
+  $P1 = new String
+  $P1 = "XXX: eek"
+  .return (TCL_ERROR,$P1)
+.end
 
-ensemble:
-eval:
-  goto failure
-
-exists:
+.sub "exists" # XXX 
+  .param pmc argv
   # canonicalize namespace.
   $P1 = new TclInt
   $P1 = 0
   .return(TCL_OK,$P1)
-
-export:
-forget:
-import:
-inscope:
-origin:
-parent:
-qualifiers:
-tail:
-which:
-failure:
-  # XXX lame error handling
-  .return(TCL_ERROR,"bad call to namespace")
-.end
-
-.namespace [ "_Tcl" ]
-
-.sub "_canon_namespace"
- ## this sub should convert the variable name to its canonical repr.
 .end
