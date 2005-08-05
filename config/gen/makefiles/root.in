@@ -659,7 +659,7 @@ runtime/parrot/include/config.fpmc : myconfig config_lib.pasm $(MINIPARROT)
 	@echo If the next line prints $(VERSION), it did help.
 	$(MINIPARROT) parrot-config.imc VERSION DEVEL
 
-parrot.def :
+parrot.def : build_tools\parrotdef.pl
 	perl build_tools/parrotdef.pl
 
 $(PARROT) : $(IMCC_DIR)/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
@@ -1028,6 +1028,8 @@ $(OPS_DIR)/core_ops_switch$(O) : $(GENERAL_H_FILES) $(OPS_DIR)/core_ops_switch.c
 
 $(OPS_DIR)/core_ops_switch.c $(INC_DIR)/oplib/core_ops_switch.h : $(OPS_FILES) $(BUILD_TOOLS_DIR)/ops2c.pl lib/Parrot/OpsFile.pm lib/Parrot/Op.pm $(INC_DIR)/config.h lib/Parrot/OpLib/core.pm
 	$(PERL) $(BUILD_TOOLS_DIR)/ops2c.pl CSwitch --core
+
+build_tools\parrotdef.pl : $(CLASS_PMC_FILES)
 
 ${TEMP_cg_c}
 
