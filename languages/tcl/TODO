@@ -86,6 +86,8 @@ C<Tcl::info> is called with (args, foo), which then dispatched to:
 
 C<_Tcl::builtins::info::args((foo))>
 
+left: [array] & [namespace]
+
 =item implement default globals, etc.
 
 global variables provided by tcl libary. L<tclvars>.
