@@ -2,166 +2,169 @@
 
 use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 37;
+use Parrot::Test tests => 38;
 use Test::More;
 use vars qw($TODO);
 
-my($tcl,$expected);
+language_output_is("tcl",<<TCL,<<OUT,"first, initial");
+ string
+TCL
+wrong # args: should be "string option arg ?arg ...?"
+OUT
 
-$tcl = <<'EOTCL';
- puts -nonewline [string first a abcdef]
-EOTCL
-$expected = "0";
-language_output_is("tcl",$tcl,$expected,"first, initial");
+language_output_is("tcl",<<TCL,<<OUT,"first, initial");
+ puts [string first a abcdef]
+TCL
+0
+OUT
 
-$tcl = <<'EOTCL';
- puts -nonewline [string first a federal]
-EOTCL
-$expected = "5";
-language_output_is("tcl",$tcl,$expected,"first, middle");
+language_output_is("tcl",<<TCL,<<OUT,"first, middle");
+ puts [string first a federal]
+TCL
+5
+OUT
 
-$tcl = <<'EOTCL';
- puts -nonewline [string first c green ]
-EOTCL
-$expected = "-1";
-language_output_is("tcl",$tcl,$expected,"first, failure");
+language_output_is("tcl",<<TCL,<<OUT,"first, failure");
+ puts [string first c green]
+TCL
+-1
+OUT
 
-$tcl = <<'EOTCL';
- puts -nonewline [string first c green 0]
-EOTCL
-$expected = "-1";
-language_output_is("tcl",$tcl,$expected,"first, index, failure");
+language_output_is("tcl",<<TCL,<<OUT,"first, index, failure");
+ puts [string first c green 0]
+TCL
+-1
+OUT
 
-$tcl = <<'EOTCL';
- puts -nonewline [string first c abcd end-3]
-EOTCL
-$expected = "2";
-language_output_is("tcl",$tcl,$expected,"first, index, end");
+language_output_is("tcl",<<TCL,<<OUT,"first, index, end");
+ puts [string first c abcd end-3]
+TCL
+2
+OUT
 
-$tcl = <<'EOTCL';
- puts -nonewline [string first c abcd 20]
-EOTCL
-$expected = "-1";
-language_output_is("tcl",$tcl,$expected,"first, index, overshot");
+language_output_is("tcl",<<TCL,<<OUT,"first, index, overshot");
+ puts [string first c abcd 20]
+TCL
+-1
+OUT
 
-$tcl = <<'EOTCL';
- puts -nonewline [string first c abcd 1]
-EOTCL
-$expected = "2";
-language_output_is("tcl",$tcl,$expected,"first, index");
+language_output_is("tcl",<<TCL,<<OUT,"first, index");
+ puts [string first c abcd 1]
+TCL
+2
+OUT
 
-$tcl = <<'EOTCL';
- puts -nonewline [string first c abcd joe]
-EOTCL
-$expected = "bad index \"joe\": must be integer or end?-integer?\n";
-language_output_is("tcl",$tcl,$expected,"first, index, invalid index");
+language_output_is("tcl",<<TCL,<<OUT,"first, index, invalid index");
+ puts [string first c abcd joe]
+TCL
+bad index "joe": must be integer or end?-integer?
+OUT
 
-$tcl = <<'EOTCL';
- puts -nonewline [string first]
-EOTCL
-$expected = "wrong # args: should be \"string first subString string ?startIndex?\"\n";
-language_output_is("tcl",$tcl,$expected,"first, too few args");
+language_output_is("tcl",<<TCL,<<OUT,"first, not enough args");
+ string first
+TCL
+wrong # args: should be "string first subString string ?startIndex?"
+OUT
 
-$tcl = <<'EOTCL';
- puts -nonewline [string first a b c d]
-EOTCL
-$expected = "wrong # args: should be \"string first subString string ?startIndex?\"\n";
-language_output_is("tcl",$tcl,$expected,"first, too many args");
+language_output_is("tcl",<<TCL,<<OUT,"first, too many args");
+ string first a b c d
+TCL
+wrong # args: should be "string first subString string ?startIndex?"
+OUT
 
-$tcl = <<'EOTCL';
- puts -nonewline [string index a b c]
-EOTCL
-$expected = "wrong # args: should be \"string index string charIndex\"\n";
-language_output_is("tcl",$tcl,$expected,"index, too many args");
+language_output_is("tcl",<<TCL,<<OUT,"index, too many args");
+ string index a b c
+TCL
+wrong # args: should be "string index string charIndex"
+OUT
 
-$tcl = <<'EOTCL';
- puts -nonewline [string index]
-EOTCL
-$expected = "wrong # args: should be \"string index string charIndex\"\n";
-language_output_is("tcl",$tcl,$expected,"index, too few args");
+language_output_is("tcl",<<TCL,<<OUT,"index, too few args");
+ string index
+TCL
+wrong # args: should be "string index string charIndex"
+OUT
 
-$tcl = <<'EOTCL';
- puts -nonewline [string index abcde 0]
-EOTCL
-$expected = "a";
-language_output_is("tcl",$tcl,$expected,"index, initial");
+language_output_is("tcl",<<TCL,<<OUT,"index, initial");
+ puts [string index abcde 0]
+TCL
+a
+OUT
 
-$tcl = <<'EOTCL';
- puts -nonewline [string index abcde end]
-EOTCL
-$expected = "e";
-language_output_is("tcl",$tcl,$expected,"index, end");
+language_output_is("tcl",<<TCL,<<OUT,"index, end");
+ puts [string index abcde end]
+TCL
+e
+OUT
 
-$tcl = <<'EOTCL';
- puts -nonewline [string index abcde 10]
-EOTCL
-$expected = "";
-language_output_is("tcl",$tcl,$expected,"index, too far");
+language_output_is("tcl",<<TCL,<<OUT,"index, overshot");
+ puts [string index abcde 10]
+TCL
 
+OUT
 
 TODO: {
-local $TODO = "don't handle negative indices yet.";
-$tcl = <<'EOTCL';
- puts -nonewline [string index abcde -1]
-EOTCL
-$expected = "";
-language_output_is("tcl",$tcl,$expected,"index, too near?");
+local $TODO="__string_index can't handle negative numbers yet.";
+
+language_output_is("tcl",<<TCL,<<OUT,"index, undershot");
+ puts [string index abcde -1]
+TCL
+
+OUT
 }
 
+language_output_is("tcl",<<TCL,<<OUT,"length, too many args");
+ puts [string length a b]
+TCL
+wrong # args: should be "string length string"
+OUT
 
-$tcl = <<'EOTCL';
- puts -nonewline [string length a b]
-EOTCL
-$expected = "wrong # args: should be \"string length string\"\n";
-language_output_is("tcl",$tcl,$expected,"length, too many args");
+language_output_is("tcl",<<TCL,<<OUT,"length, too few args");
+ string length
+TCL
+wrong # args: should be "string length string"
+OUT
 
-$tcl = <<'EOTCL';
- puts -nonewline [string length]
-EOTCL
-$expected = "wrong # args: should be \"string length string\"\n";
-language_output_is("tcl",$tcl,$expected,"length, too few args");
+language_output_is("tcl",<<TCL,<<OUT,"length, simple");
+ puts [string length 10]
+TCL
+2
+OUT
 
-$tcl = <<'EOTCL';
- puts -nonewline [string length 10]
-EOTCL
-$expected = "2";
-language_output_is("tcl",$tcl,$expected,"length, simple");
+language_output_is("tcl",<<TCL,<<OUT,"length, empty");
+ puts [string length ""]
+TCL
+0
+OUT
 
-$tcl = <<'EOTCL';
- puts -nonewline [string length ""]
-EOTCL
-$expected = "0";
-language_output_is("tcl",$tcl,$expected,"length, simple");
+language_output_is("tcl",<<TCL,<<OUT,"range, too many args");
+ string range a b c d 
+TCL
+wrong # args: should be "string range string first last"
+OUT
 
-$tcl = <<'EOTCL';
- puts -nonewline [string range a b]
-EOTCL
-$expected = "wrong # args: should be \"string range string first last\"\n";
-language_output_is("tcl",$tcl,$expected,"range, too many args");
+language_output_is("tcl",<<TCL,<<OUT,"range, too few args");
+ string range
+TCL
+wrong # args: should be "string range string first last"
+OUT
 
-$tcl = <<'EOTCL';
- puts -nonewline [string range a b c d]
-EOTCL
-$expected = "wrong # args: should be \"string range string first last\"\n";
-language_output_is("tcl",$tcl,$expected,"range, too few args");
+language_output_is("tcl",<<TCL,<<OUT,"range, total");
+ puts [string range abcde 0 end]
+TCL
+abcde
+OUT
 
-$tcl = <<'EOTCL';
- puts -nonewline [string range abcde 0 end]
-EOTCL
-$expected = "abcde";
-language_output_is("tcl",$tcl,$expected,"range, total");
+language_output_is("tcl",<<TCL,<<OUT,"range, partial");
+ puts [string range abcde 1 end-1]
+TCL
+bcd
+OUT
 
-$tcl = <<'EOTCL';
- puts -nonewline [string range abcde 1 end-1]
-EOTCL
-$expected = "bcd";
-language_output_is("tcl",$tcl,$expected,"range, partial");
-
-$tcl = <<'EOTCL';
- puts -nonewline [string range abcde end-20 20]
-EOTCL
-$expected = "abcde";
-language_output_is("tcl",$tcl,$expected,"range, overextended");
+language_output_is("tcl",<<TCL,<<OUT,"range, overextended");
+ puts [string range abcde end-20 20]
+TCL
+abcde
+OUT
 
 language_output_is("tcl",<<TCL,<<OUT,"string match * only");
   puts [string match * foo]

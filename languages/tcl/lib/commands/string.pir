@@ -4,40 +4,69 @@
 .namespace [ "Tcl" ] 
 
 .sub "&string"
-  .local pmc argv 
+  .local pmc argv, retval
   argv = foldup
 
+  unless I3 goto no_args
+
+  .local string subcommand_name
+  subcommand_name = shift argv
+  .local pmc subcommand_proc
+  null subcommand_proc
+
+  push_eh catch
+    subcommand_proc = find_global "_Tcl\0builtins\0string", subcommand_name
+resume:
+  clear_eh
+  isnull subcommand_proc, bad_args
+  .return subcommand_proc(argv)
+
+catch:
+  goto resume
+
+bad_args:
+  retval = new String
+
+  retval = "bad option \""
+  retval .= subcommand_name
+  retval .= "\": must be bytelength, compare, equal, first, index, is, last, length, map, match, range, repeat, replace, tolower, toupper, totitle, trim, trimleft, trimright, wordend, or wordstart"
+
+  .return(TCL_ERROR,retval)
+
+no_args:
+  retval = new String
+  retval = "wrong # args: should be \"string option arg ?arg ...?\""
+  .return (TCL_ERROR, retval)
+
+.end
+
+.namespace [ "_Tcl\0builtins\0string" ]
+
+.sub "first"
+  .param pmc argv
+  
   .local int argc
-  argc = argv
-
   .local int return_type
-  return_type = TCL_OK
   .local pmc retval
-  .local string command
 
+  return_type = TCL_OK
+
+  argc = argv
+  if argv > 3 goto bad_args
+  if argv < 2 goto bad_args
+  $S1 = argv[0]
+  $S2 = argv[1]
+  $I0 = 0
+  if argc == 2 goto first_do
+  $S3 = argv[2]
   .local pmc string_index
   string_index = find_global "_Tcl", "__string_index"
-
-  if argc == 0 goto noargs
-  command = argv[0]
-  if command == "first"  goto first
-  if command == "index"  goto index
-  if command == "length" goto length
-  if command == "match"  goto match
-  if command == "range"  goto range
-  if command == "repeat" goto repeat
-  goto badargs
-
-first:
-  if argv > 4 goto bad_first
-  if argv < 3 goto bad_first
-  $S1 = argv[1]
-  $S2 = argv[2]
-  $I0 = 0
-  if argv == 3 goto first_do
-  $S3 = argv[3]
   (return_type,retval) = string_index($S3,$S2)
-  if return_type == TCL_ERROR goto done
+  if return_type != TCL_ERROR goto first_all
+
+  .return(return_type,retval)
+
+first_all:
   $I0 = retval
 
 first_do:
@@ -45,21 +74,25 @@ first_do:
   index_1 = index $S2, $S1, $I0
   retval = new Integer
   retval = index_1
-  goto done
+  .return(TCL_OK,retval)
 
-bad_first:
+bad_args:
   retval = new String
   retval = "wrong # args: should be \"string first subString string ?startIndex?\""
-  return_type = TCL_ERROR
-  goto done
+  .return(TCL_ERROR,retval)
 
-index:
-  # XXX without this new String, we get a test failure.
-  #     Shouldn't be necessary.
-  #retval = new String
-  if argv != 3 goto bad_index
-  $S1 = argv[1]
-  $S2 = argv[2]
+.end
+
+.sub "index"
+  .param pmc argv
+
+  .local int return_type, index_1
+  .local pmc retval
+  if argv != 2 goto bad_index
+  $S1 = argv[0]
+  $S2 = argv[1]
+  .local pmc string_index
+  string_index = find_global "_Tcl", "__string_index"
   (return_type,retval) = string_index($S2,$S1)
   if return_type == TCL_ERROR goto done
   $I0 = retval
@@ -70,43 +103,104 @@ index:
   $S0 = substr $S1, $I0, 1 
   retval = new String
   retval = $S0
-  goto done
+  .return (TCL_OK,retval)
+
 index_null:
   retval = new String
   retval = ""
-  goto done
+  .return (TCL_OK, retval)
 
 bad_index:
   retval = new String
   retval = "wrong # args: should be \"string index string charIndex\""
-  return_type = TCL_ERROR
-  goto done
+  .return(TCL_ERROR, retval)
 
-length:
-  if argv != 2 goto bad_length
-  $S1 = argv[1]
+done:
+  .return (return_type, retval)
+.end
+
+.sub "length"
+  .param pmc argv
+
+  .local pmc retval
+
+  if argv != 1 goto bad_length
+  $S1 = argv[0]
   $I0 = length $S1
   retval = new Integer
   retval = $I0
-  goto done
+  .return(TCL_OK, retval)
 
 bad_length:
   retval = new String
   retval = "wrong # args: should be \"string length string\""
-  return_type = TCL_ERROR
-  goto done
+  .return (TCL_ERROR,retval)
+.end
 
-match:
+.sub "range"
+  .param pmc argv
+
+  .local int return_type, index_1
+  .local pmc retval
+
+  if argv != 3 goto bad_range
+  $S1 = argv[0]
+  $S2 = argv[1]
+  $S3 = argv[2]
+   
+  $I0 = length $S1
+  dec $I0 
+
+  .local pmc string_index
+  string_index = find_global "_Tcl", "__string_index"
+
+  (return_type,retval) = string_index($S2,$S1)
+  if return_type == TCL_ERROR goto done
+  index_1 = retval
+
+  (return_type,retval) = string_index($S3,$S1)
+  if return_type == TCL_ERROR goto done
+  $I2 = retval
+  
+range_do:
+  if index_1 > $I2 goto done
+  if index_1 >= 0  goto range_top
+  index_1 = 0
+range_top:
+  if $I2 <= $I0 goto range_doo
+  $I2 = $I0
+range_doo:
+  $I3 = $I2 - index_1
+  inc $I3
+  $S9 = substr $S1, index_1, $I3 
+  retval = new String
+  retval = $S9
+  .return(TCL_OK, retval)
+
+bad_range:
+  retval = new String
+  retval = "wrong # args: should be \"string range string first last\""
+  .return(TCL_ERROR,retval)
+.end
+
+.sub "match"
+  .param pmc argv
+
+  .local int argc
+  argc = argv
+
+  .local pmc retval
+
   # XXX PGE doesn't support -nocase yet, we don't either.
   # ?-nocase? pattern string 
-  if argc != 3 goto bad_match
+  if argc != 2 goto bad_match
  
 match_next:
   .local string pattern 
   .local string the_string
 
-  pattern = argv[1]
-  the_string = argv[2]
+  pattern = argv[0]
+  the_string = argv[1]
  
   .local pmc globber
   globber = find_global "PGE", "glob"
@@ -120,60 +214,27 @@ match_next:
   $I0 = match.__get_bool()
   retval = new TclInt
   retval = $I0
-  goto done
+  .return (TCL_OK, retval)
  
 bad_match:
   retval = new TclString
-  return_type = TCL_ERROR
   retval = "wrong # args: should be \"string match ?-nocase? pattern string\""
-  goto done
+  .return (TCL_ERROR,retval)
+.end
 
-range:
-  if argv != 4 goto bad_range
-  $S1 = argv[1]
-  $S2 = argv[2]
-  $S3 = argv[3]
-   
-  $I0 = length $S1
-  dec $I0 
- 
-  (return_type,retval) = string_index($S2,$S1)
-  if return_type == TCL_ERROR goto done
-  index_1 = retval
+.sub "repeat"
+  .param pmc argv
 
-  (return_type,retval) = string_index($S3,$S1)
-  if return_type == TCL_ERROR goto done
-  $I2 = retval
-  
-range_do:
-  if index_1 > $I2 goto range_null
-  if index_1 >= 0  goto range_top
-  index_1 = 0
-range_top:
-  if $I2 <= $I0 goto range_doo
-  $I2 = $I0
-range_doo:
-  $I3 = $I2 - index_1
-  inc $I3
-  $S9 = substr $S1, index_1, $I3 
-  retval = new String
-  retval = $S9
-  goto done
-range_null:
-  goto done
+  .local int argc
+  argc = argv
 
-bad_range:
-  retval = new String
-  retval = "wrong # args: should be \"string range string first last\""
-  return_type = TCL_ERROR
-  goto done
+  .local pmc retval
 
-repeat:
-  if argc != 3 goto bad_repeat
+  if argc != 2 goto bad_repeat
   .local string the_string
   .local int    the_repeat
-  the_string = argv[1]
-  the_repeat = argv[2]
+  the_string = argv[0]
+  the_repeat = argv[1]
   
   #$I0 = length $S2 
   # XXX - uncomment this, need to setup the sub call
@@ -184,142 +245,11 @@ repeat:
   $S0 = repeat the_string, $I3
   retval = new String
   retval = $S0
-  goto done
+  .return(TCL_OK, retval)
 
 bad_repeat:
-  return_type = TCL_ERROR
   retval = new String
   retval = "wrong # args: should be \"string repeat string count\""
-  goto done
+  .return (TCL_ERROR, retval)
 
-badargs:
-  # XXX Why is this new String needed?
-  retval = new String
-  $S9 = "bad option \""
-  $S9 .= command
-  $S9 .= "\": must be bytelength, compare, equal, first, index, is, last, length, map, match, range, repeat, replace, tolower, toupper, totitle, trim, trimleft, trimright, wordend, or wordstart"
-  retval = new String
-  retval = $S9
-  return_type = TCL_ERROR
-  goto done
-
-noargs:
-  retval = new String
-  retval = "wrong # args: should be \"string option arg ?arg ...?\""
-  return_type = TCL_ERROR
-
-done:
-  .return(return_type,retval)
 .end
-
-#
-# - string related helper subs.
-#
-
-# Given an index and a string, return an index 
-# or an error
-#
-# (given an int or "end-1" style string, and a string,
-# return the actual index position)
-
-.namespace [ "_Tcl" ]
-
-.sub __string_index 
-  .param string position
-  .param string the_string
-
-  .local int return_type
-  return_type = TCL_OK
-
-  .local pmc retval
-  .local int index_length
-  .local int number_length
-  .local int number_type
-  .local pmc number_result
-
-  .local int index_1
-
-  if position == "end" goto my_end
-
-  $S0 = substr position, 0, 4
-  if $S0 == "end-" goto has_end
-  index_length = length $S0
-  # is this an int?
-  (number_length,number_type,number_result) = __expr_get_number(position,0)
-  if number_type != INTEGER goto bad_arg
-  if number_length != index_length goto bad_arg
-  retval = number_result[1] 
-  goto done
-
-  #if not, fail.
-bad_arg:
-  # XXX We shouldn't need this String declaration here.
-  retval = new String
-  $S9  = "bad index \""
-  $S9 .= position
-  $S9 .= "\": must be integer or end?-integer?"
-  retval = $S9
-  return_type=TCL_ERROR
-  goto done
- 
-has_end:
-  #XXX this is currently somewhat messed up.
-  
-  # is this an int? if so, subtract it from -1 to get our parrot-style index.
-  index_length = length position
-  index_length -= 4  # ignore "end-"
-  # is this an int?
-  (number_length,number_type,number_result) = __expr_get_number(position,4)
-  if number_type != INTEGER goto bad_arg
-  if number_length != index_length goto bad_arg
-  # say, 1 if -1
-  $I0 = number_result[1]
-  # say, 2 if -2
-  inc $I0
- 
-  # say, length is 6
-  index_1 = length the_string
-  # so, if we had end-1, then we'd be at position 4. (end is 5, -1)
-  index_1 = index_1 - $I0
-  retval = new Integer
-  retval = index_1
-
-  goto done
-
-
-my_end:
-  $I0 = length the_string
-  dec $I0
-  retval = new Integer
-  retval = $I0
-
-done:
- .return(return_type,retval)
-.end
-
-# Imagine how much easier this would be to do with regular
-# expressions.
-
-# Ok, now deal with the fact that they don't exist yet. (but
-# plan on probably rewriting this when they do.)
-
-#.sub __string_match
-  #.param string a_pattern
-  #.param string a_string
-  #.param int match_case
-#
-  ###if match_case == 1 goto matching
-  #a_pattern = upcase a_pattern
-  #a_string  = upcase a_string
-
-#matching:
-  # Special Chars
-  # * (RE: .*)
-  # ? (RE: .)
-  # [chars] - simplified version of RE:'s [] (also sequence)
-  # \x - remove any special meaning to x.
-
-
-
-
-#.end
