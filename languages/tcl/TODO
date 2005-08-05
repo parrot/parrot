@@ -72,21 +72,8 @@ break the variable part out into array and index - while read is
 already doing that for us.
 
 On a related note: No builtins or library code should be dealing with var
-sigils (i.e. C<$>) other than __set and __read. 
-
-=item subcommand processing
-
-Convert any commands that use subcommands to [info] style dispatch to ease
-maintenance. Subcommands invoked in this style get a single container PMC
-with all their args, but *NOT* the invoking command. so, given the tcl:
-
- [info args foo]
-
-C<Tcl::info> is called with (args, foo), which then dispatched to:
-
-C<_Tcl::builtins::info::args((foo))>
-
-left: [array]
+sigils (i.e. C<$>) other than __set and __read {{ possibly array, since
+it needs to fetch the entire array: gen a new sub for this }}
 
 =item implement default globals, etc.
 

@@ -2,9 +2,27 @@
 
 use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 13;
+use Parrot::Test tests => 18;
 use Test::More;
 use vars qw($TODO);
+
+language_output_is("tcl",<<'TCL',<<OUT,"array, no args");
+ array
+TCL
+wrong # args: should be "array option arrayName ?arg ...?"
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"array, good subcommand, no array");
+ array exists
+TCL
+wrong # args: should be "array option arrayName ?arg ...?"
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"array, bad subcommand, bad arary");
+ array bork foo
+TCL
+bad option "bork": must be anymore, donesearch, exists, get, names, nextelement, set, size, startsearch, statistics, or unset
+OUT
 
 language_output_is("tcl",<<'TCL',<<OUT,"array exists yes");
  set b(c) 2
@@ -24,6 +42,18 @@ language_output_is("tcl",<<'TCL',<<OUT,"array exists missing");
  puts [array exists a]
 TCL
 0
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"array exists too many args");
+ puts [array exists a b]
+TCL
+wrong # args: should be "array exists arrayName"
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"array size too many args");
+ array size a b
+TCL
+wrong # args: should be "array size arrayName"
 OUT
 
 language_output_is("tcl",<<'TCL',<<OUT,"array size 1");

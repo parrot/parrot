@@ -3,38 +3,53 @@
 
 .namespace [ "Tcl" ]
 
+#
+# similar to but not exactly like [string]'s subcommand dispatch
+#   - we pass in a boolean (array or not), the array itself, and the name
+#   - we know we need an array name for *all* args, so we test for it here.
+
 .sub "&array"
-  .local pmc argv
+  .local pmc argv, retval
   argv = foldup
 
   .local int argc
   argc = argv
 
-  .local int return_type
-  return_type = TCL_OK
-  .local pmc retval
+  if argc < 2 goto few_args  # subcommand *and* array name
 
-  if argc < 2 goto error
-  .local string array_name,sigil_array_name
-  .local pmc the_array
+  .local string subcommand_name
+  subcommand_name = shift argv
+  .local pmc subcommand_proc
+  null subcommand_proc
+
+  push_eh catch
+    subcommand_proc = find_global "_Tcl\0builtins\0array", subcommand_name
+resume:
+  clear_eh
+  isnull subcommand_proc, bad_args
+
   .local int is_array
+  .local string array_name, sigil_array_name
+  .local pmc the_array
 
-  array_name = argv[1]
+  array_name = shift argv
   sigil_array_name = "$" . array_name
 
   .local int call_level
   $P0 = find_global "_Tcl", "call_level"
   call_level = $P0
+  null the_array
 
-  push_eh catch
+  push_eh catch_var
     if call_level goto find_lexical
     the_array = find_global "Tcl", sigil_array_name
-    goto resume
+    goto resume_var
 find_lexical:
     the_array = find_lex call_level, sigil_array_name
-resume:
+resume_var:
   clear_eh
-  catch:
+
+  catch_var:
 
   isnull the_array, array_no
   $I99 = does the_array, "hash"
@@ -47,49 +62,91 @@ array_no:
   is_array = 0
 
 scommand:
+  .return subcommand_proc(is_array,the_array,array_name,argv)
 
-  .local string subcommand
-  subcommand = argv[0]
+catch:
+  goto resume
 
-  #if subcommand == "anymore" goto NOTDONEYET
-  #if subcommand == "donesearch" goto NOTDONEYET
-  if subcommand == "exists" goto exists
-  #if subcommand == "get" goto NOTDONEYET
-  #if subcommand == "names" goto NOTDONEYET
-  #if subcommand == "nextelement" goto NOTDONEYET
-  if subcommand == "set" goto set_it
-  if subcommand == "size" goto size
-  #if subcommand == "startsearch" goto NOTDONEYET
-  #if subcommand == "statistics" goto NOTDONEYET
-  #if subcommand == "unset" goto NOTDONEYET
+bad_args:
+  retval = new String
 
-  goto error
+  retval = "bad option \""
+  retval .= subcommand_name
+  retval .= "\": must be anymore, donesearch, exists, get, names, nextelement, set, size, startsearch, statistics, or unset"
 
-# Is this really an array?
-exists:
-  retval = new Integer
-  retval = is_array
-  goto done
+  .return(TCL_ERROR,retval)
 
-size:
-  retval = new Integer
+few_args:
+  retval = new String
+  retval = "wrong # args: should be \"array option arrayName ?arg ...?\""
+  .return (TCL_ERROR, retval)
+
+.end
+
+.namespace [ "_Tcl\0builtins\0array" ]
+
+.sub "exists"
+  .param int is_array
+  .param pmc the_array
+  .param string array_name
+  .param pmc argv
+
+  .local int argc
+  argc = argv
+  if argc goto bad_args
+
+  $P1 = new Integer
+  $P1 = is_array
+  .return (TCL_OK, $P1)
+
+bad_args:
+  $P1 = new String
+  $P1 = "wrong # args: should be \"array exists arrayName\""
+  .return (TCL_ERROR, $P1)
+.end
+
+.sub "size"
+  .param int is_array
+  .param pmc the_array
+  .param string array_name
+  .param pmc argv
+  
+  .local int argc
+  argc = argv
+  if argc goto bad_args
+
   if is_array == 0 goto size_none
   $I0 = the_array
-  retval = $I0
-  goto done
-size_none:
-  retval = 0
-  goto done
+  $P1 = new Integer
+  $P1 = $I0
+  .return (TCL_OK, $P1)
 
-set_it:
-  # array_name is getting stomped on here
-  # print "array name: '"
-  # print array_name
-  # print "'\n"
-  if argc != 3 goto set_bad_args
+size_none:
+  $P1 = new Integer
+  $P1 = 0
+  .return (TCL_OK, $P1)
+
+bad_args:
+  $P1 = new String
+  $P1 = "wrong # args: should be \"array size arrayName\""
+  .return (TCL_ERROR, $P1)
+.end
+
+.sub "set"
+  .param int is_array
+  .param pmc the_array
+  .param string array_name
+  .param pmc argv
+  
+  .local int argc
+  argc = argv
+  if argc != 1 goto bad_args
+
+  .local int return_type
+  .local pmc retval
 
   .local pmc elems
-  elems = argv[2]
+  elems = argv[0]
 
   .local pmc __list
   __list = find_global "_Tcl", "__list"
@@ -97,11 +154,11 @@ set_it:
   if return_type == TCL_ERROR goto done
   elems = retval
 
-set_pre_loop:
+pre_loop:
   .local int count
   count = elems
   $I0 = count % 2
-  if $I0 == 1 goto set_odd_args
+  if $I0 == 1 goto odd_args
 
   # pull out all the key/value pairs and set them.
   .local int loop
@@ -109,20 +166,11 @@ set_pre_loop:
   .local string key
   .local string val
 
-  # see if there's an existing array with this name to add to
-  # and if not create a new array
-  push_eh set_new_array
-    if call_level goto get_lex
-    the_array = find_global "Tcl", sigil_array_name
-    goto set_has_array
-  get_lex:
-    the_array = find_lex call_level, sigil_array_name
-set_has_array:
-  clear_eh
+  isnull the_array, new_array
   goto set_loop
 
-set_new_array:
-  the_array = new TclArray
+new_array:
+  the_array = new .TclArray
 
 set_loop:
   key = elems[loop]
@@ -140,27 +188,19 @@ set_loop:
 
   retval = new String
   retval = ""
-  goto done
+  .return (TCL_OK, retval)
 
-
-set_bad_args:
- return_type = TCL_ERROR
+bad_args:
  retval = new String
  retval = "wrong # args: should be array set arrayName list"
- goto done
+ .return (TCL_ERROR, retval)
 
-set_odd_args:
- return_type = TCL_ERROR
+odd_args:
  retval = new String
  retval = "list must have an even number of elements"
- goto done
-
-error:
-  # XXX - this isn't the right error message.
-  print "Bad call to array: \n"
-  goto done
+ .return (TCL_ERROR, retval)
 
 done:
-  .return(return_type,retval)
+  .return (return_type,retval)
 
 .end
