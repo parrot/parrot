@@ -22,10 +22,10 @@ This document is now becoming a roadmap, because the Architect is deep
 in a weeklong mindmeld with the Pumpking and the results are being
 encoded in this document, among others.
 
-=head1 CURRENT RELEASE (0.2.2)
+=head1 CURRENT RELEASE (0.2.3)
 
-Parrot 0.2.2 has been released on July 3rd 2005. For a list of new and
-fixed feature see L<ChangeLog>.
+Parrot 0.2.3 has been released on Aug 5th 2005. For a list of new and
+fixed feature see L<NEWS>.
 
 =head1 OVERVIEW
 

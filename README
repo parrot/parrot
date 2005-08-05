@@ -1,4 +1,4 @@
-This is Parrot, version 0.2.2
+This is Parrot, version 0.2.3
 -----------------------------
 
 Parrot is Copyright (C) 2001-2005 The Perl Foundation. All Rights Reserved.
@@ -55,7 +55,7 @@ may need to explicitly tell Configure.pl which compiler and linker to
 use.  For example, to compile C files with 'cc', C++ files with
 'CC', and link everything together with 'CC', you would type
 
-    perl Configure.pl --cc=cc --cxx=CC --link=CC
+    perl Configure.pl --cc=cc --cxx=CC --link=CC --ld=CC
 
 See "perl Configure.pl --help" for more options.
 
@@ -65,7 +65,7 @@ For systems like HPUX that don't have inet_pton please run
 
 If you want to install Parrot into a non-standard location use
 
-    perl Configure.pl --prefix=/Users/foo/parrot-0.2.2
+    perl Configure.pl --prefix=/Users/foo/parrot-0.2.3
 
 Running Configure.pl will generate a config.h header, a Parrot::Config
 module, platform files and some Makefiles.

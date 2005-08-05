@@ -9,6 +9,7 @@ New in 0.2.3
 - added character class support in Globs to PGE
 - added language implementations of unlambda, Lazy-k
 - many bugfixes, including GC and memory leaks
+- the new calling scheme continued to evolve in branches/leo-ctx5
 
 New in 0.2.2
 
