@@ -2,21 +2,31 @@
 
 use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 2;
+use Parrot::Test tests => 4;
 use Test::More;
 
-my($tcl,$expected);
+# TODO:  Missing channelId tests.
 
-$tcl = <<'EOTCL';
- puts -nonewline "whee"
-EOTCL
-$expected = "whee";
-language_output_is("tcl",$tcl,$expected,"nonewline");
+language_output_is("tcl",<<'TCL',<<OUT,"no args");
+ puts
+TCL
+wrong # args: should be "puts ?-nonewline? ?channelId? string"
+OUT
 
-$tcl = <<'EOTCL';
- puts "whee"
-EOTCL
-$expected = "whee\n";
-language_output_is("tcl",$tcl,$expected,"with newline");
+language_output_is("tcl",<<'TCL',<<OUT,"too many args");
+ puts a b c d
+TCL
+wrong # args: should be "puts ?-nonewline? ?channelId? string"
+OUT
 
-# XXX Missing channelId tests.
+language_output_is("tcl",<<'TCL',<<OUT,"-nonewline");
+  puts -nonewline whee\n
+TCL
+whee
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"normal");
+ puts whee
+TCL
+whee
+OUT

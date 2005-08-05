@@ -81,6 +81,7 @@ bad_option:
  
 error:
   return_type = TCL_ERROR
+  retval = new String
   retval = "wrong # args: should be \"puts ?-nonewline? ?channelId? string\""
   goto done
 
