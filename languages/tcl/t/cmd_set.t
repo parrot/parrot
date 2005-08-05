@@ -5,31 +5,29 @@ use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
 use Parrot::Test tests => 4;
 use Test::More;
 
-my($tcl,$expected);
-
-$tcl = <<'EOTCL';
+language_output_is("tcl",<<'TCL',<<OUT,"set");
  set a 2
  puts $a
-EOTCL
-$expected = "2\n";
-language_output_is("tcl",$tcl,$expected,"set");
+TCL
+2
+OUT
 
-$tcl = <<'EOTCL';
+language_output_is("tcl",<<'TCL',<<OUT,"get");
  set a 1
  puts [set a]
-EOTCL
-$expected = "1\n";
-language_output_is("tcl",$tcl,$expected,"get");
+TCL
+1
+OUT
 
-$tcl = <<'EOTCL';
- puts -nonewline $a
-EOTCL
-$expected = "can't read \"a\": no such variable\n";
-language_output_is("tcl",$tcl,$expected,"missing lexical");
+language_output_is("tcl",<<'TCL',<<OUT,"missing global");
+ puts $a
+TCL
+can't read "a": no such variable
+OUT
 
-$tcl = <<'EOTCL';
+language_output_is("tcl",<<'TCL',<<OUT,"not an array");
  set b 1
  set b(c) 2
-EOTCL
-$expected = "can't set \"b(c)\": variable isn't array\n";
-language_output_is("tcl",$tcl,$expected,"not an array");
+TCL
+can't set "b(c)": variable isn't array
+OUT

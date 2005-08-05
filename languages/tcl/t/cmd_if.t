@@ -5,69 +5,57 @@ use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
 use Parrot::Test tests => 9;
 use Test::More;
 
-my($tcl,$expected);
-
-$tcl = <<'EOTCL';
+language_output_is("tcl",<<'TCL',<<OUT,"simple if");
  if { 1 == 1 } {
    puts true
  } {
    puts false
  }
-EOTCL
-$expected = <<EOL;
+TCL
 true
-EOL
-language_output_is("tcl",$tcl,$expected,"simple if");
+OUT
 
-$tcl = <<'EOTCL';
+language_output_is("tcl",<<'TCL',<<OUT,"simple if with else");
  if { 1 == 1 } {
    puts true
  } else {
    puts false
  }
-EOTCL
-$expected = <<EOL;
+TCL
 true
-EOL
-language_output_is("tcl",$tcl,$expected,"simple if with else");
+OUT
 
-$tcl = <<'EOTCL';
+language_output_is("tcl",<<'TCL',<<OUT,"simple if with then");
  if { 1 != 1 } then {
    puts true
  } {
    puts false
  }
-EOTCL
-$expected = <<EOL;
+TCL
 false
-EOL
-language_output_is("tcl",$tcl,$expected,"simple if with then");
+OUT
 
-$tcl = <<'EOTCL';
+language_output_is("tcl",<<'TCL',<<OUT,"simple if with then, else");
  if { 1 == 1 } then {
    puts true
  } else {
    puts false
  }
-EOTCL
-$expected = <<EOL;
+TCL
 true
-EOL
-language_output_is("tcl",$tcl,$expected,"simple if with then, else");
+OUT
 
-$tcl = <<'EOTCL';
+language_output_is("tcl",<<'TCL',<<OUT,"simple if with then, elseif");
  if { 1 != 1 } then {
    puts true
  } elseif { 2==2 } {
    puts blue
  }
-EOTCL
-$expected = <<EOL;
+TCL
 blue
-EOL
-language_output_is("tcl",$tcl,$expected,"simple if with then, elseif");
+OUT
 
-$tcl = <<'EOTCL';
+language_output_is("tcl",<<'TCL',<<OUT,"simple if with then, elseif, else");
  if { 1 != 1 } then {
    puts true
  } elseif { 2 != 2 } {
@@ -75,13 +63,11 @@ $tcl = <<'EOTCL';
  } else {
    puts whee
  }
-EOTCL
-$expected = <<EOL;
+TCL
 whee
-EOL
-language_output_is("tcl",$tcl,$expected,"simple if with then, elseif,else");
+OUT
 
-$tcl = <<'EOTCL';
+language_output_is("tcl",<<'TCL',<<OUT,"simple if with elseif, implicit else");
  if { 1 != 1 } {
    puts true
  } elseif { 2 != 2 } {
@@ -89,26 +75,20 @@ $tcl = <<'EOTCL';
  } {
    puts whee
  }
-EOTCL
-$expected = <<EOL;
+TCL
 whee
-EOL
-language_output_is("tcl",$tcl,$expected,"simple if with elseif, implicit else");
+OUT
 
-$tcl = <<'EOTCL';
+language_output_is("tcl",<<'TCL','',"simple if with implicit then, false");
  if { 1 != 1 } {
    puts true
  }
-EOTCL
-$expected = "";
-language_output_is("tcl",$tcl,$expected,"simple if with implicit then, false");
+TCL
 
-$tcl = <<'EOTCL';
+language_output_is("tcl",<<'TCL',<<OUT,"simple if with implicit then, true");
  if { 1 == 1 } {
    puts true
  }
-EOTCL
-$expected = <<EOL;
+TCL
 true
-EOL
-language_output_is("tcl",$tcl,$expected,"simple if with implicit then, true");
+OUT

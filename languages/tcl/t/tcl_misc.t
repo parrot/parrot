@@ -6,60 +6,59 @@ use Parrot::Test tests => 16;
 use Test::More;
 use vars qw($TODO);
 
-my($tcl,$expected);
+language_output_is("tcl",<<'TCL',<<OUT,"leading spacex2 should be ok");
+   puts Parsing
+TCL
+Parsing
+OUT
 
-$tcl = '  puts Parsing';
-$expected = "Parsing\n";
-language_output_is("tcl",$tcl,$expected,"leading spacex2 should be ok");
-
-
-$tcl = <<'EOTCL';
+language_output_is("tcl",<<'TCL',<<OUT,"double quoting words, puts");
  puts "Parsing"
-EOTCL
-$expected = "Parsing\n";
-language_output_is("tcl",$tcl,$expected,"double quoting words, puts");
+TCL
+Parsing
+OUT
 
-$tcl = <<'EOTCL';
+language_output_is("tcl",<<'TCL',<<OUT,"simple block quoting");
  puts {Parsing}
-EOTCL
-$expected = "Parsing\n";
-language_output_is("tcl",$tcl,$expected,"simple block quoting");
+TCL
+Parsing
+OUT
 
-$tcl = <<'EOTCL';
- puts Parsing;
-EOTCL
-$expected = "Parsing\n";
-language_output_is("tcl",$tcl,$expected,"bare words should be allowed");
+language_output_is("tcl",<<'TCL',<<OUT,"bare words should be allowed");
+ puts Parsing
+TCL
+Parsing
+OUT
 
-$tcl = <<'EOTCL';
+language_output_is("tcl",<<'TCL',<<OUT,"hash isn't a comment if it only starts a word (not a command)");
  puts #whee
  exit ;
-EOTCL
-$expected = "#whee\n";
-language_output_is("tcl",$tcl,$expected,"hash isn't a comment if it starts a word");
+TCL
+#whee
+OUT
 
-$tcl = <<'EOTCL';
+language_output_is("tcl",<<'TCL',<<OUT,"no arg command");
  puts {test}
  exit
  puts {bar}
-EOTCL
-$expected = "test\n";
-language_output_is("tcl",$tcl,$expected,"no arg command");
+TCL
+test
+OUT
 
-$tcl = <<'EOTCL';
+language_output_is("tcl",<<'TCL',<<OUT,"no arg command with semicolon");
  puts {test}
  exit;
  puts {bar}
-EOTCL
-$expected = "test\n";
-language_output_is("tcl",$tcl,$expected,"no arg command with semicolon");
+TCL
+test
+OUT
 
-$tcl = <<'EOTCL';
+language_output_is("tcl",<<'TCL',<<OUT,"no arg command with spaced semicolon");
  puts {test}
  exit ;
-EOTCL
-$expected = "test\n";
-language_output_is("tcl",$tcl,$expected,"no arg command with spaced semicolon");
+TCL
+test
+OUT
 
 language_output_is("tcl",<<'TCL',<<'OUT',"\$ is only a variable if it's followed by \\w or {");
 set x $

@@ -5,44 +5,42 @@ use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
 use Parrot::Test tests => 5;
 use Test::More;
 
-my($tcl,$expected);
-
-$tcl = <<'EOTCL';
+language_output_is("tcl",<<'TCL',<<OUT,"simple");
  set a 2
  incr a
  puts $a
-EOTCL
-$expected = "3\n";
-language_output_is("tcl",$tcl,$expected,"simple");
+TCL
+3
+OUT
 
-$tcl = <<'EOTCL';
+language_output_is("tcl",<<'TCL',<<OUT,"offset");
  set a 1
  incr a 5
  puts $a
-EOTCL
-$expected = "6\n";
-language_output_is("tcl",$tcl,$expected,"offset");
+TCL
+6
+OUT
 
-$tcl = <<'EOTCL';
+language_output_is("tcl",<<'TCL',<<OUT,"negative offset");
  set a 2
  incr a -1
  puts $a
-EOTCL
-$expected = "1\n";
-language_output_is("tcl",$tcl,$expected,"negative offset");
+TCL
+1
+OUT
 
-$tcl = <<'EOTCL';
+language_output_is("tcl",<<'TCL',<<OUT,"return value");
  set a 1
  set b [incr a]
  puts $b
-EOTCL
-$expected = "2\n";
-language_output_is("tcl",$tcl,$expected,"return value");
+TCL
+2
+OUT
 
-$tcl = <<'EOTCL';
+language_output_is("tcl",<<'TCL',<<OUT,"negative base");
  set a -2
  incr a
  puts $a
-EOTCL
-$expected = "-1\n";
-language_output_is("tcl",$tcl,$expected,"negative base");
+TCL
+-1
+OUT

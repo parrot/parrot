@@ -6,16 +6,13 @@ use Parrot::Test tests => 1;
 use Test::More;
 use vars qw($TODO);
 
-my($tcl,$expected);
-
 TODO: {
   local $TODO = "pending a language_output_like test.";
     
-$tcl = <<"EOTCL";
+language_output_is("tcl",<<'TCL',<<OUT,"simple time");
  puts [time { expr 2+2 }]
-EOTCL
-$expected = <<EOF;
+TCL
 20 microseconds per iteration
-EOF
-language_output_is("tcl",$tcl,$expected,"simple time");
+OUT
+
 }

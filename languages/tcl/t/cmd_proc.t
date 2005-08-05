@@ -6,8 +6,6 @@ use Parrot::Test tests => 4;
 use Test::More;
 use vars qw($SKIP $TODO);
 
-my($tcl,$expected);
-
 language_output_is("tcl",<<'TCL',<<OUT,"noarg");
  proc me {} {
   puts 2

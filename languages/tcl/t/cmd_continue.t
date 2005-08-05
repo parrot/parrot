@@ -4,18 +4,14 @@ use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
 use Parrot::Test tests => 2;
 use Test::More;
-use vars qw($TODO);
 
-my($tcl,$expected);
-
-$tcl = <<'EOTCL';
+language_output_is("tcl",<<'TCL',<<OUT,"continue from for");
  for {set a 0} {$a < 10} {incr a} {
    if {$a > 5} { continue }
    puts $a
  }
  puts $a
-EOTCL
-$expected = <<EOF;
+TCL
 0
 1
 2
@@ -23,11 +19,9 @@ $expected = <<EOF;
 4
 5
 10
-EOF
-language_output_is("tcl",$tcl,$expected,"continue from for");
+OUT
 
-
-$tcl = <<'EOTCL';
+language_output_is("tcl",<<'TCL',<<OUT,"continue from while");
  set a 0
  while {$a <= 10} {
    incr a
@@ -36,8 +30,7 @@ $tcl = <<'EOTCL';
  }
  puts "--"
  puts $a
-EOTCL
-$expected = <<EOF;
+TCL
 5
 6
 7
@@ -47,5 +40,4 @@ $expected = <<EOF;
 11
 --
 11
-EOF
-language_output_is("tcl",$tcl,$expected,"continue from while");
+OUT

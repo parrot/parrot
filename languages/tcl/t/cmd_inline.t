@@ -5,8 +5,6 @@ use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
 use Parrot::Test tests => 3;
 use Test::More;
 
-my($tcl,$expected);
-
 language_output_is("tcl",<<'TCL',<<'OUT',"PIR compiler");
  inline PIR {
    .sub test

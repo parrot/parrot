@@ -5,14 +5,12 @@ use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
 use Parrot::Test tests => 1;
 use Test::More;
 
-my($tcl,$expected);
-
-$tcl = <<'EOTCL';
+language_output_is("tcl",<<'TCL',<<OUT,"noarg");
  puts here
  exit
  puts nothere
-EOTCL
-$expected = "here\n";
-language_output_is("tcl",$tcl,$expected,"noarg");
+TCL
+here
+OUT
 
-# XXX should check return value of exit, also
+# TODO: should check return value of exit, also

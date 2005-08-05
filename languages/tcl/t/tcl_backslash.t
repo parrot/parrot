@@ -5,68 +5,65 @@ use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
 use Parrot::Test tests => 35;
 use Test::More;
 
-my($tcl,$expected);
-
 language_output_is("tcl",<<'TCL',<<'OUT',"in braces");
  puts {a\n}
 TCL
 a\n
 OUT
 
-$tcl = <<'EOTCL';
- puts -nonewline "\n"
-EOTCL
-$expected = chr(0xa);
-language_output_is("tcl",$tcl,$expected,"newline");
+language_output_is("tcl",<<'TCL',<<'OUT',"newline");
+ puts \n
+TCL
 
-$tcl = <<'EOTCL';
- puts -nonewline "\t"
-EOTCL
-$expected = chr(0x9);
-language_output_is("tcl",$tcl,$expected,"tab");
 
-$tcl = <<'EOTCL';
- puts -nonewline "\b"
-EOTCL
-$expected = chr(0x8);
-language_output_is("tcl",$tcl,$expected,"backspace");
+OUT
 
-$tcl = <<'EOTCL';
- puts -nonewline "\f"
-EOTCL
-$expected = chr(0xc);
-language_output_is("tcl",$tcl,$expected,"formfeed");
+language_output_is("tcl",<<'TCL',<<OUT,"tab");
+ puts \t
+TCL
+\t
+OUT
 
-$tcl = <<'EOTCL';
- puts -nonewline "\r"
-EOTCL
-$expected = chr(0xd);
-language_output_is("tcl",$tcl,$expected,"carriage return");
+language_output_is("tcl",<<'TCL',<<OUT,"backspace");
+ puts \b
+TCL
+\x08
+OUT
 
-$tcl = <<'EOTCL';
- puts -nonewline "\v"
-EOTCL
-$expected = chr(0xb);
-language_output_is("tcl",$tcl,$expected,"vertical tab");
+language_output_is("tcl",<<'TCL',<<OUT,"formfeed");
+ puts \f
+TCL
+\x0c
+OUT
 
-$tcl = <<'EOTCL';
- puts -nonewline "\\"
-EOTCL
-$expected = "\\";
-language_output_is("tcl",$tcl,$expected,"backslash");
+language_output_is("tcl",<<'TCL',chr(0xd),"carriage return");
+ puts -nonewline \r
+TCL
 
-$tcl = <<'EOTCL';
-puts -nonewline "\q"
-EOTCL
-$expected = "q";
-language_output_is("tcl",$tcl,$expected,"normal character");
+language_output_is("tcl",<<'TCL',<<OUT,"vertical tab");
+ puts \v
+TCL
+\x0b
+OUT
 
-$tcl = <<'EOTCL';
-puts "a\
-b"
-EOTCL
-$expected = "a b\n";
-language_output_is("tcl",$tcl,$expected,"backslash newline substitution");
+language_output_is("tcl",<<'TCL',<<OUT,"backslash");
+ puts \\
+TCL
+\\
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"normal character");
+ puts \q
+TCL
+q
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"backslash newline substitution");
+ puts "a\
+       b"
+TCL
+a b
+OUT
 
 language_output_is("tcl",<<'TCL',<<OUT,"octal single digit");
   set a \7
