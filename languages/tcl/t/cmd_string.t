@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 38;
+use Parrot::Test tests => 44;
 use Test::More;
 use vars qw($TODO);
 
@@ -124,10 +124,17 @@ TCL
 wrong # args: should be "string length string"
 OUT
 
-language_output_is("tcl",<<TCL,<<OUT,"length, simple");
+language_output_is("tcl",<<TCL,<<OUT,"length, ascii");
  puts [string length 10]
 TCL
 2
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"length, unicode");
+ set a \u6666
+ puts [string length $a]
+TCL
+1
 OUT
 
 language_output_is("tcl",<<TCL,<<OUT,"length, empty");
@@ -243,4 +250,34 @@ language_output_is("tcl",<<TCL,<<OUT,"string repeat: bad args");
 
 TCL
 wrong # args: should be "string repeat string count"
+OUT
+
+language_output_is("tcl",<<TCL,<<OUT,"string bytelength: no args");
+  string bytelength
+TCL
+wrong # args: should be "string bytelength string"
+OUT
+
+language_output_is("tcl",<<TCL,<<OUT,"string bytelength: too many args");
+  string bytelength a b
+TCL
+wrong # args: should be "string bytelength string"
+OUT
+
+language_output_is("tcl",<<TCL,<<OUT,"string bytelength: ascii");
+  puts [string bytelength hi]
+TCL
+2
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"string bytelength: unicode 1");
+  puts [string bytelength \u6666]
+TCL
+3
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"string bytelength: unicode 2");
+  puts [string bytelength \u666]
+TCL
+2
 OUT

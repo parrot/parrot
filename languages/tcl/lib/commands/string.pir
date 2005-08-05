@@ -119,12 +119,34 @@ done:
   .return (return_type, retval)
 .end
 
+.include "stringinfo.pasm"
+.sub "bytelength"
+  .param pmc argv
+
+  .local pmc retval
+  .local int argc
+  argc = argv
+  if argc != 1 goto bad_length
+  $S0 = argv[0]
+  $I0 = stringinfo $S0, .STRINGINFO_BUFUSED
+  retval = new Integer
+  retval = $I0
+  .return(TCL_OK, retval)
+
+bad_length:
+  retval = new String
+  retval = "wrong # args: should be \"string bytelength string\""
+  .return (TCL_ERROR,retval)
+.end
+
 .sub "length"
   .param pmc argv
 
   .local pmc retval
+  .local int argc
+  argc = argv
+  if argc != 1 goto bad_length
 
-  if argv != 1 goto bad_length
   $S1 = argv[0]
   $I0 = length $S1
   retval = new Integer
