@@ -27,16 +27,30 @@ loop:
   if $I0 == 123 goto list
   if $I0 == 34  goto quote
 
+  $I0 = pos
 not_list:
-  $I0 = find_whitespace str, pos
-  if $I0 == -1 goto loop_done
+  if $I0 >= len goto extract
   
+  $I1 = ord str, $I0
+  if $I1 == 92 goto not_list_backslash
+  $I1 = is_whitespace str, $I0
+  if $I1 == 1 goto extract
+  
+  inc $I0
+  goto not_list
+
+not_list_backslash:
+  $I0 += 2
+  goto not_list
+  
+extract:
   # extract the element
   $I1 = $I0 - pos
   $S0 = substr str, pos, $I1
   
   # add it to the list
-  $P0 = new String
+  $I1 = find_type "TclConst"
+  $P0 = new $I1
   $P0 = $S0
   push retval, $P0
   
@@ -110,7 +124,8 @@ found_close_bracket:
   pos += $I0
   pos += 2
   
-  $P0 = new String
+  $I0 = find_type "TclConst"
+  $P0 = new $I0
   $P0 = $S0
   push retval, $P0
   
