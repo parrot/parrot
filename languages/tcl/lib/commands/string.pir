@@ -281,7 +281,84 @@ bad_repeat:
   
   .local int argc
   argc = argv
+  if argc == 0 goto no_args
+  if argc > 3 goto bad_args
+  .local int nocase
+  nocase = 0
+  if argc == 2 goto setup
+  $S0 = shift argv
+  if $S0 != "-nocase" goto bad_option
+  nocase = 1
 
+setup:
+  .local string the_string,mapstr,teststr,replacementstr
+  .local pmc map_list
+  .local int strpos,strlen,mappos,maplen,skiplen,mapstrlen,replacementstrlen
+
+  .local pmc __list
+  __list = find_global "_Tcl", "__list"
+
+  $P0 = argv[0]
+  map_list = __list($P0)
+  the_string = argv[1]
+
+  maplen = map_list
+  $I1 = maplen % 2
+  if $I1 goto oddly_enough
+
+  strpos = 0
+
+outer_loop:
+  strlen = length the_string
+  if strpos >= strlen goto outer_done
+  skiplen = 1
+  mappos = 0
+
+inner_loop:
+  if mappos >= maplen goto inner_done
+  mapstr = map_list[mappos]
+  mapstrlen = length mapstr
+
+  teststr = substr the_string, strpos, mapstrlen
+  # if nocase, tweak 'em both to lc.
+
+  if teststr != mapstr goto inner_next
+  $I0 = mappos + 1
+  replacementstr = map_list [ $I0 ]
+  substr the_string, strpos, mapstrlen,replacementstr
+  skiplen = length replacementstr
+  goto outer_next
+
+inner_next:
+  mappos += 2
+  goto inner_loop
+
+inner_done:
+outer_next:
+  strpos += skiplen
+  goto outer_loop
+
+outer_done:
+  $P1 = new String
+  $P1 = the_string
+  .return (TCL_OK, $P1)
+
+
+oddly_enough:
+  $P1 = new String
+  $P1 = "char map list unbalanced"
+  .return (TCL_ERROR, $P1)
+
+
+bad_option:
+  $P1 = new String
+  $P1 = "bad option \""
+  $P1 .= $S0
+  $P1 .= "\": must be -nocase"
+  .return (TCL_ERROR, $P1)
+
+no_args:
+bad_args:
   $P1 = new String
   $P1 = "wrong # args: should be \"string map ?-nocase? charMap string\""
   .return (TCL_ERROR, $P1) 
