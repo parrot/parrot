@@ -213,8 +213,6 @@ bad_range:
 
   .local pmc retval
 
-  # XXX PGE doesn't support -nocase yet, we don't either.
-  # ?-nocase? pattern string 
   .local int nocase
   nocase = 0
   if argc == 2 goto match_next
