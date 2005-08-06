@@ -9,7 +9,8 @@
   argv = foldup
 
   # convert the Array returned by foldup into a TclList.
-  # XXX Is there a more efficient way to do this?
+  #   Is there a more efficient way to do this?
+  #   <@leo> coke: I don't think there is a better solution for this
 
   .local int argc
   argc = argv
@@ -27,5 +28,5 @@ LOOP:
   goto LOOP
 DONE: 
 
-  .return(0,retval)
+  .return(TCL_OK,retval)
 .end
