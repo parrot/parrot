@@ -94,6 +94,12 @@ D: SKI calculus.
 W: http://homepages.cwi.nl/~tromp/cl/lazy-k.html
 V: 0.2.2
 
+N: Lua for Pirate, formerly known as Pirate, a new name is sought
+A: Klaas-Jan Stol
+D: Making Lua work on Parrot
+W: http://members.home.nl/joeijoei/parrot/
+M: Yes
+
 N: m4
 A: Bernhard Schmalhofer
 D: Port of GNU m4 to PIR
