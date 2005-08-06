@@ -273,5 +273,16 @@ bad_repeat:
   retval = new String
   retval = "wrong # args: should be \"string repeat string count\""
   .return (TCL_ERROR, retval)
+.end
 
+# XXX stub
+.sub "map"
+  .param pmc argv
+  
+  .local int argc
+  argc = argv
+
+  $P1 = new String
+  $P1 = "wrong # args: should be \"string map ?-nocase? charMap string\""
+  .return (TCL_ERROR, $P1) 
 .end
