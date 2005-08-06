@@ -16,7 +16,9 @@
   
   .local pmc the_list
   the_list = shift argv
-  the_list = __list(the_list)
+  ($I0, $P0) = __list(the_list)
+  if $I0 == TCL_ERROR goto error
+  the_list = $P0 
  
   .local pmc position
   position = shift argv
@@ -68,10 +70,8 @@ LOOP2:
   inc cnt
   goto LOOP2
 DONE2:
-
   .return (TCL_OK,retval)
 
 error:
   .return($I0,$P0)
-
 .end
