@@ -9,7 +9,9 @@
   .local pmc argv
   argv = foldup
 
-  # XXX need error handling.
+  # make sure we have the right # of args
+  $I0 = argv
+  if $I0 < 3 goto wrong_args
 
   .local pmc __list
   __list = find_global "_Tcl", "__list"
@@ -71,6 +73,11 @@ LOOP2:
   goto LOOP2
 DONE2:
   .return (TCL_OK,retval)
+
+wrong_args:
+  $I0 = TCL_ERROR
+  $P0 = new TclString
+  $P0 = "wrong # args: should be \"linsert list index element ?element ...?\""
 
 error:
   .return($I0,$P0)
