@@ -322,7 +322,10 @@ inner_loop:
 
   teststr = substr the_string, strpos, mapstrlen
   # if nocase, tweak 'em both to lc.
-
+  if nocase == 0 goto test
+  downcase teststr
+  downcase mapstr
+test:
   if teststr != mapstr goto inner_next
   $I0 = mappos + 1
   replacementstr = map_list [ $I0 ]
