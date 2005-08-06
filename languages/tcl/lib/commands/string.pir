@@ -318,6 +318,7 @@ inner_loop:
   if mappos >= maplen goto inner_done
   mapstr = map_list[mappos]
   mapstrlen = length mapstr
+  if mapstrlen == 0 goto inner_next
 
   teststr = substr the_string, strpos, mapstrlen
   # if nocase, tweak 'em both to lc.
