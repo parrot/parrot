@@ -11,8 +11,12 @@
 
   # XXX need error handling.
 
+  .local pmc __list
+  __list = find_global "_Tcl", "__list"
+  
   .local pmc the_list
   the_list = shift argv
+  the_list = __list(the_list)
  
   .local pmc position
   position = shift argv
