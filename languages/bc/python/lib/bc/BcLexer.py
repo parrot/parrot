@@ -1,4 +1,4 @@
-### $ANTLR 2.7.5 (20050425): "bc_python.g" -> "BcLexer.py"$
+### $ANTLR 2.7.5 (20050416): "bc_python.g" -> "BcLexer.py"$
 ### import antlr and other modules ..
 import sys
 import antlr
@@ -16,28 +16,26 @@ if version < '2.3':
 ### preamble action <<< 
 ### >>>The Literals<<<
 literals = {}
-literals[u"newLine"] = 50
-literals[u"elsif"] = 44
-literals[u"get"] = 49
-literals[u"if"] = 41
-literals[u"define"] = 36
-literals[u"quit"] = 33
-literals[u"while"] = 46
-literals[u"var"] = 37
-literals[u"end"] = 42
-literals[u"then"] = 43
-literals[u"or"] = 55
-literals[u"else"] = 45
-literals[u"Boolean"] = 35
-literals[u"when"] = 39
-literals[u"Integer"] = 34
-literals[u"skipLine"] = 51
-literals[u"and"] = 54
-literals[u"not"] = 52
-literals[u"loop"] = 47
-literals[u"exit"] = 38
-literals[u"put"] = 48
-literals[u"return"] = 40
+literals[u"newLine"] = 51
+literals[u"elsif"] = 45
+literals[u"get"] = 50
+literals[u"if"] = 42
+literals[u"define"] = 37
+literals[u"quit"] = 34
+literals[u"while"] = 47
+literals[u"var"] = 38
+literals[u"end"] = 43
+literals[u"then"] = 44
+literals[u"else"] = 46
+literals[u"Boolean"] = 36
+literals[u"when"] = 40
+literals[u"Integer"] = 35
+literals[u"skipLine"] = 52
+literals[u"not"] = 53
+literals[u"loop"] = 48
+literals[u"exit"] = 39
+literals[u"put"] = 49
+literals[u"return"] = 41
 
 
 ### import antlr.Token 
@@ -78,34 +76,33 @@ DIV = 29
 MOD = 30
 PIR_OP = 31
 UNARY_MINUS = 32
-LITERAL_quit = 33
-LITERAL_Integer = 34
-LITERAL_Boolean = 35
-LITERAL_define = 36
-LITERAL_var = 37
-LITERAL_exit = 38
-LITERAL_when = 39
-LITERAL_return = 40
-LITERAL_if = 41
-LITERAL_end = 42
-LITERAL_then = 43
-LITERAL_elsif = 44
-LITERAL_else = 45
-LITERAL_while = 46
-LITERAL_loop = 47
-LITERAL_put = 48
-LITERAL_get = 49
-LITERAL_newLine = 50
-LITERAL_skipLine = 51
-LITERAL_not = 52
-NOT_EQUALS = 53
-LITERAL_and = 54
-LITERAL_or = 55
-PIR_FOOTER = 56
-PIR_HEADER = 57
-PIR_NOOP = 58
-PIR_COMMENT = 59
-PIR_NEWLINE = 60
+PIR_PRINT = 33
+LITERAL_quit = 34
+LITERAL_Integer = 35
+LITERAL_Boolean = 36
+LITERAL_define = 37
+LITERAL_var = 38
+LITERAL_exit = 39
+LITERAL_when = 40
+LITERAL_return = 41
+LITERAL_if = 42
+LITERAL_end = 43
+LITERAL_then = 44
+LITERAL_elsif = 45
+LITERAL_else = 46
+LITERAL_while = 47
+LITERAL_loop = 48
+LITERAL_put = 49
+LITERAL_get = 50
+LITERAL_newLine = 51
+LITERAL_skipLine = 52
+LITERAL_not = 53
+NOT_EQUALS = 54
+PIR_FOOTER = 55
+PIR_HEADER = 56
+PIR_NOOP = 57
+PIR_COMMENT = 58
+PIR_NEWLINE = 59
 
 class Lexer(antlr.CharScanner) :
     ### user action >>>

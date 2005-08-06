@@ -159,6 +159,7 @@ tokens
 {
   PIR_OP;         // A line of PIR code
   UNARY_MINUS;    // A line of PIR code
+  PIR_PRINT;      // A line of PIR code
 }
 
 // "quit" is really a keyword
@@ -173,11 +174,18 @@ input_item
   ;
 
 semicolon_list
-  : statement
+  : statement (SEMICOLON statement)*
   ;
 
 statement
-  : addingExpression (SEMICOLON addingExpression)*
+  : expression
+  ;
+
+expression!
+  : a:addingExpression
+      {
+        #expression = #( [ PIR_PRINT, "print" ], #a )
+      }
   ;
 
 
@@ -327,11 +335,6 @@ relationalExpression
   : addingExpression ((ASSIGN_OP|NOT_EQUALS|REL_OP) addingExpression)*
   ;
 
-expression
-  : relationalExpression (("and"|"or") relationalExpression)*
-  ;
-
-
 
 //----------------------------------------------------------------------------
 // Transform AST, so that it contains code
@@ -459,12 +462,8 @@ expr_list
   ;
 
 gen_pir!
-  :   A:expr_line
-      {
-        #gen_pir = #([PIR_HEADER, "pir header\n#"], #A, [PIR_FOOTER, "pir footer\nend\n#"]); 
-      }
-    | #( PIR_OP B:expr_line )
-      {
-        #gen_pir = #([PIR_HEADER, "pir header tree\n#"], #B, [PIR_FOOTER, "pir footer tree\nend\n#"]); 
-      }
+  : #( PIR_PRINT B:expr_line )
+    {
+      #gen_pir = #([PIR_HEADER, "pir header tree\n#"], #B, [PIR_FOOTER, "pir footer tree\nend\n#"]); 
+    }
   ;
