@@ -24,6 +24,8 @@
   .local pmc number_result
 
   if position == "end" goto my_end
+  $I0 = the_list
+  if pmc_position > $I0 goto my_end
   
   $S0 = substr position, 0, 4
   if $S0 == "end-" goto has_end

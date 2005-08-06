@@ -22,8 +22,9 @@
 
   ($I0,$P0,$I2) = list_index(the_list,position)
   if $I0 != TCL_OK goto error
-  if $I2 ==0 goto next
-  inc $P0 #linsert treats "end" differently 
+  #linsert treats "end" differently
+  if $I2 == 0 goto next
+  inc $P0
 
 next: 
   .local int the_index
