@@ -27,9 +27,11 @@ Copyright (c) 2004, the Perl Foundation.
     .local int argc
     argc = argv
     if argc < 2 goto usage
-    .local pmc conf_hash
+    .local pmc interp, conf_hash
     .local string key
-    conf_hash = _config()
+    .include "iglobals.pasm"
+    interp = getinterp
+    conf_hash = interp[.IGLOBALS_CONFIG_HASH]
     .local int i
     i = 1
 loop:
@@ -70,4 +72,3 @@ usage:
     printerr ": config-key\n"
     exit 1
 .end
-   .include "library/config.imc"
