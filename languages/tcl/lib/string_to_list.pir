@@ -76,7 +76,7 @@ found_quote:
   
   pos = $I1
   inc pos
-  goto loop
+  goto eat_space
 
 list:
   .local int depth
