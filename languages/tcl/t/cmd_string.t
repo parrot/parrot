@@ -215,14 +215,11 @@ TCL
 0
 OUT
 
-TODO: {
- local $TODO = "PGE doesn't support no case yet, though we could just fake it.";
 language_output_is("tcl",<<TCL,<<OUT,"string match nocase");
   puts [string match -nocase ABC abc ]
 TCL
 1
 OUT
-}
 
 TODO: {
 local $TODO = "Parser error";

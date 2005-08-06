@@ -215,15 +215,26 @@ bad_range:
 
   # XXX PGE doesn't support -nocase yet, we don't either.
   # ?-nocase? pattern string 
-  if argc != 2 goto bad_match
- 
+  .local int nocase
+  nocase = 0
+  if argc == 2 goto match_next
+  if argc < 2 goto bad_match
+  if argc > 3 goto bad_match
+  $S0 = shift argv
+  if $S0 != "-nocase" goto bad_option
+  nocase = 1
+
 match_next:
   .local string pattern 
   .local string the_string
 
   pattern = argv[0]
   the_string = argv[1]
- 
+  unless nocase goto match_continue
+  pattern = downcase pattern
+  pattern = downcase the_string
+
+match_continue:
   .local pmc globber
   globber = find_global "PGE", "glob"
  
@@ -237,7 +248,14 @@ match_next:
   retval = new TclInt
   retval = $I0
   .return (TCL_OK, retval)
- 
+
+bad_option:
+  retval = new TclString
+  retval = "bad option \""
+  retval .= $S0
+  retval = "\": must be -nocase"
+  .return (TCL_ERROR,retval)
+
 bad_match:
   retval = new TclString
   retval = "wrong # args: should be \"string match ?-nocase? pattern string\""
