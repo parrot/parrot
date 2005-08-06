@@ -34,16 +34,12 @@ loop_init:
 
   # Trim off leading and trailing space on the arg. 
   start_pos = 0
-  length end_pos, current_arg
+  end_pos = length current_arg
 
 left_loop:
   if start_pos == end_pos goto right_done
-  current_char = ord current_arg, start_pos
-  #is_space doesn't check for newlines...
-  if current_char == 10 goto left_next
-  .is_space(current_char,$I0)
+  $I0 = is_whitespace current_arg, start_pos
   if $I0 == 0 goto left_done
-left_cont:
   inc start_pos
   goto left_loop
 
@@ -51,12 +47,8 @@ left_done:
   dec end_pos
 
 right_loop:
-  current_char = ord current_arg, end_pos
-  #is_space doesn't check for newlines...
-  if current_char == 10 goto right_next
-  .is_space(current_char,$I0)
+  $I0 = is_whitespace current_arg, end_pos
   if $I0 == 0 goto right_done
-right_next:
   dec end_pos
   goto right_loop
 

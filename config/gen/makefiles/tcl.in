@@ -64,7 +64,6 @@ lib${slash}get_var.pir \
 lib${slash}interpret.pir \
 lib${slash}list.pir \
 lib${slash}list_to_string.pir \
-lib${slash}macros${slash}is_space.pir \
 lib${slash}parser.pir \
 lib${slash}string_to_list.pir \
 lib${slash}string.pir \

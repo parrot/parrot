@@ -68,9 +68,8 @@ chunk_loop:
   #print "CHUNK_LOOP\n"
   if chunk_start >= expr_length goto chunks_done
   
-  ord char, expr, chunk_start
   # Is this a space? skip it and try again, otherwise, fall through.
-  .is_space(char,$I0)
+  $I0 = is_whitespace expr, chunk_start
   if $I0 == 0 goto get_parenthetical
 
   inc chunk_start
@@ -82,6 +81,7 @@ get_parenthetical:
   # string and call ourselves recursively.
   # (XXX should unroll this recursion.)
 
+  char = ord expr, chunk_start
   if char != 40 goto get_variable # (
   .local int depth
   depth = 1
