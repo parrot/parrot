@@ -37,5 +37,5 @@ language_output_is("tcl",<<'TCL',<<OUT,"insert bad index");
   set a [list a c]
   puts [linsert $a q b]
 TCL
-bad index "q": must be integer or end?-integer?
+bad index "q": must be integer?[+-]integer? or end?[+-]integer?
 OUT

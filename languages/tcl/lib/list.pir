@@ -24,17 +24,21 @@
   .local pmc number_result
 
   if position == "end" goto my_end
-  $I0 = the_list
-  if pmc_position > $I0 goto my_end
   
   $S0 = substr position, 0, 4
   if $S0 == "end-" goto has_end
-  is_end = 0
-  index_length = length $S0 
+  index_length = length position
   (number_length,number_type,number_result) = __expr_get_number(position,0)
   if number_type != INTEGER goto bad_arg 
   if number_length != index_length goto bad_arg
   retval = number_result[1]
+  
+  # if the number is greater than the number of elements
+  # in the list, we want the end
+  $I0 = the_list
+  if retval > $I0 goto my_end
+  
+  is_end = 0
   goto done
 
 bad_arg:
@@ -42,7 +46,7 @@ bad_arg:
   retval = new TclString
   $S9  = "bad index \""
   $S9 .= position
-  $S9 .= "\": must be integer or end?-integer?"
+  $S9 .= "\": must be integer?[+-]integer? or end?[+-]integer?"
   retval = $S9
   return_type=TCL_ERROR
   goto done
