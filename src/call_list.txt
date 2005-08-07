@@ -285,6 +285,18 @@ i	JPP
 i	tp
 v	tiiiptt
 i	Pip
+p   J
+t   J
+t   Jp
+p   Jp
+t   Jpt
+i   Jp
+i   Jpi
+i   JPip
+v   ptt
+v   pit
+i   Jpii
+i   ip
 
 # PyBuiltins
 P	JOPP
