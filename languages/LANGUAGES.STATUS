@@ -1,10 +1,10 @@
-If you submit a language compiler please write a one-liner below
-indicating roughly the state of your language. Does it have
-samples, do they work? Is there a README and an easy way
-to build it? The fields are: (N) Language name, (A) authors/maintainers, (D)
+If you submit a language compiler please write a one-liner that roughly
+indicates the state of your language. Where can the source be found?
+Does it have samples and do they work?
+Is there a README and an easy way to build it? 
+The fields are: (N) Language name, (A) authors/maintainers, (D)
 description, (S) status, (M) maintained, (V) minimum Parrot version
 required, (W) website.
-
 
 N: Amber for parrot
 A: Roger Browne
@@ -31,10 +31,10 @@ V: 0.0.11
 
 N: bc
 A: Bernhard Schmalhofer
-D: Needs ANTLR and Python
-S: basic arithmetics working
+D: Based on ANTLR and Python
+S: very simple arithmetic expressions are working
 M: Yes
-V: 0.2.2
+V: 0.2.3
 
 N: befunge
 A: Jerome Quelin
@@ -97,6 +97,7 @@ V: 0.2.2
 N: Lua for Pirate, formerly known as Pirate, a new name is sought
 A: Klaas-Jan Stol
 D: Making Lua work on Parrot
+S: Not in Parrot CVS, source available from the website
 W: http://members.home.nl/joeijoei/parrot/
 M: Yes
 
@@ -141,8 +142,11 @@ D: An example on how the builtin compilers can be used
 N: Perl6
 A: Sean O'Rourke
 D: Perl6 compiler written in Perl5
-S: Largely functional, but stalled
-M: Yes
+S: This prototype of a Perl6 compiler was abandoned in June 2004. Current
+S: work on the compiler may be found in the development of Pugs,
+S: http://www.pugscode.org, and in the Parrot grammar engine (PGE) in
+S: the Parrot repository at compilers/pge.
+M: No
 V: 0.0.11
 
 N: Pint
