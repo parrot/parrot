@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 16;
+use Parrot::Test tests => 17;
 use Test::More;
 use vars qw($TODO);
 
@@ -102,6 +102,14 @@ OUT
 
 language_output_is("tcl",<<'TCL',<<'OUT',"comments end on newline, not ;");
  # comment ; puts 1
+ puts 2
+TCL
+2
+OUT
+
+language_output_is("tcl",<<'TCL',<<'OUT',"two comments in a row should work");
+ # comment1
+ # comment2
  puts 2
 TCL
 2

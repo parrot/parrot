@@ -48,8 +48,16 @@ get_commands:
 next_command:
   # Do we have a comment? If so, skip to the next position where
   # We might have a command.
-  pos = skip_comment(tcl_code, pos)
+  .local int check_pos
+  check_pos = skip_comment(tcl_code, pos)
+  if check_pos != pos goto found_comment
+  goto done_comment
 
+found_comment:
+  pos = check_pos
+  goto next_command
+
+done_comment:
   .local pmc command
   (command, pos) = get_command(tcl_code, chars, pos)
   isnull command, done
