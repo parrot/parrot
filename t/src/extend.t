@@ -388,7 +388,6 @@ Wibble
 OUTPUT
 
 my $temp = 'temp';;
-SKIP: { skip("Hangs on cygwin", 1) if $^O eq 'cygwin';
 open S, ">$temp.pasm" or die "Can't write $temp.pasm";
 print S <<'EOF';
   .pcc_sub _sub1:
@@ -462,7 +461,6 @@ back
 hello in sub2
 back
 OUTPUT
-};
 
 open S, ">$temp.pasm" or die "Can't write $temp.pasm";
 print S <<'EOF';

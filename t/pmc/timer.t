@@ -21,6 +21,7 @@ use Test::More;
 
 my %platforms = map {$_=>1} qw/
     aix
+    cygwin
     darwin
     dec_osf
     freebsd
