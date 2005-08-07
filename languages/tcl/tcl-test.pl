@@ -115,14 +115,14 @@ sub choose {
 sub extract_tests {
     my ($source) = @_;
     my %tests;
-    
+   
     my $regex = qr[
-        test \s+ (\S+)
-             \s+ \{ ([^{]+) \}
-             \s+ \{ \n
-                 ( (?:\s+ [^\n]+\n)+ )
+        test \s+ (\S+)                  # test ident
+             \s+ \{ ([^}]+) \}          # test description
+             \s+ (?:\S+ \s+)? \{ \n     # optional test harness info (ignoring)
+                 ( (?:\s+ [^\n]+\n)+ )  # test body
         \} \s+
-            (?: \{ ([^\n]+) \}
+            (?: \{ ([^\n]+) \}          # test result
               | " ((?:[^"\\]|\\.)+) "   #" (keep my editor happy)
               | (\w+) )
     ]sx;
