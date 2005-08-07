@@ -43,6 +43,7 @@ lib${slash}commands${slash}list.pir \
 lib${slash}commands${slash}llength.pir \
 lib${slash}commands${slash}lrange.pir \
 lib${slash}commands${slash}lrepeat.pir \
+lib${slash}commands${slash}lset.pir \
 lib${slash}commands${slash}namespace.pir \
 lib${slash}commands${slash}open.pir \
 lib${slash}commands${slash}proc.pir \
