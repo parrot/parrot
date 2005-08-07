@@ -1,4 +1,4 @@
-### $ANTLR 2.7.5 (20050416): "bc_python.g" -> "BcParser.py"$
+### $ANTLR 2.7.5 (20050425): "bc_python.g" -> "BcParser.py"$
 ### import antlr and other modules ..
 import sys
 import antlr
@@ -154,9 +154,6 @@ class Parser(antlr.LLkParser):
             while True:
                 if (self.LA(1)==SEMICOLON):
                     pass
-                    tmp10_AST = None
-                    tmp10_AST = self.astFactory.create(self.LT(1))
-                    self.addASTChild(currentAST, tmp10_AST)
                     self.match(SEMICOLON)
                     self.statement()
                     self.addASTChild(currentAST, self.returnAST)

@@ -1,8 +1,10 @@
 # Copyright: 2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
-A fairly concrete list of TODOs for Parrot bc. See docs/parrot_bc.pod for visions.
+A fairly concrete list of TODOs for Parrot bc.
+See docs/parrot_bc.pod for visions.
 
+- TODO in t/basic.t is no longer handled
 - Format 0.1 as .1
 
 - Open a ticket in RT

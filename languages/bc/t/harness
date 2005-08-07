@@ -69,7 +69,7 @@ if ( grep { m/^--files$/ } @ARGV ) {
     };
     if ( $use_gnu_bc ) {
        $ENV{PARROT_BC_TEST_PROG} = 'bc --standard --quiet';
-       # Test::Harness::runtests( @files ) if scalar( @files );
+       Test::Harness::runtests( @files ) if scalar( @files );
     }
 }
 

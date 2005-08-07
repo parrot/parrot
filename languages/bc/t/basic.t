@@ -16,7 +16,7 @@ use FindBin;
 use lib "$FindBin::Bin/../../lib", "$FindBin::Bin/../../../../lib";
 
 use Test::More;
-use Parrot::Test tests => 28;
+use Parrot::Test tests => 30;
 
 sub run_tests
 {
@@ -26,8 +26,15 @@ sub run_tests
     die "invalid test" unless ref( $test_case ) eq 'ARRAY';
     die "invalid test" unless scalar(@$test_case) == 2 || scalar(@$test_case) == 3;
 
-    my ( $bc, $expected, $desc ) = @{$test_case};
-    language_output_is( 'bc', "$bc\nquit\n", "$expected\n", $desc || "bc: $bc" );
+    my $bc_code  = $test_case->[0] . "\nquit\n";
+    my $expected = ref($test_case->[1]) eq '' ?
+                     $test_case->[1] 
+                     :
+                     ref($test_case->[1]) eq 'ARRAY' ?
+                       join( "\n", @{$test_case->[1]} ) :
+                       die "expected ARRAY reference";   
+    my $desc     = $test_case->[2] || "bc: $bc_code";
+    language_output_is( 'bc', $bc_code, "$expected\n", $desc );
   }
 } 
 
@@ -65,14 +72,16 @@ my @tests =
        [ '2 * 2 + .4', '4.4' ],
        [ '.1 - 6 / 2', '-2.9' ],
        [ '2 % 2 + 4', '4' ],
-
+       # semicolons
+       [ '1; 2', [1, 2] ],
+       [ '1+1*1; 2+2*2', [2, 6] ],
+       [ '3-3/3; 4+4%4;  5-5+5', [2, 4, 5] ],
      );
+
 my @todo_tests = 
      ( # floats
        [ '.1', '.1' ],
        [ '-.1', '-.1' ],
-       # semicolons
-       [ '1; 2', "1\n2" ],
      );
 
 run_tests( \@tests );

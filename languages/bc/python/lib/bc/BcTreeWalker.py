@@ -1,4 +1,4 @@
-### $ANTLR 2.7.5 (20050416): "bc_python.g" -> "BcTreeWalker.py"$
+### $ANTLR 2.7.5 (20050425): "bc_python.g" -> "BcTreeWalker.py"$
 ### import antlr and other modules ..
 import sys
 import antlr
@@ -131,7 +131,7 @@ class Walker(antlr.TreeParser):
             _t = _t109
             _t = _t.getNextSibling()
             plus_AST = currentAST.root
-            reg_name = "P%d" % self.reg_num
+            reg_name = "$P%d" % self.reg_num
             self.reg_num = self.reg_num + 1
             pir = "\n" + \
                  reg_name + " = new .Float\n" + \
@@ -254,7 +254,7 @@ class Walker(antlr.TreeParser):
             _t = _t111
             _t = _t.getNextSibling()
             minus_AST = currentAST.root
-            reg_name = "P%d" % self.reg_num
+            reg_name = "$P%d" % self.reg_num
             self.reg_num = self.reg_num + 1
             pir = "\n" + \
                  reg_name + " = new .Float\n" + \
@@ -313,7 +313,7 @@ class Walker(antlr.TreeParser):
             _t = _t113
             _t = _t.getNextSibling()
             mul_AST = currentAST.root
-            reg_name = "P%d" % self.reg_num
+            reg_name = "$P%d" % self.reg_num
             self.reg_num = self.reg_num + 1
             pir = "\n" + \
                  reg_name + " = new .Float\n" + \
@@ -372,7 +372,7 @@ class Walker(antlr.TreeParser):
             _t = _t115
             _t = _t.getNextSibling()
             div_AST = currentAST.root
-            reg_name = "P%d" % self.reg_num
+            reg_name = "$P%d" % self.reg_num
             self.reg_num = self.reg_num + 1
             pir = "\n" + \
                  reg_name + " = new .Float\n" + \
@@ -431,7 +431,7 @@ class Walker(antlr.TreeParser):
             _t = _t117
             _t = _t.getNextSibling()
             mod_AST = currentAST.root
-            reg_name = "P%d" % self.reg_num
+            reg_name = "$P%d" % self.reg_num
             self.reg_num = self.reg_num + 1
             pir = "\n" + \
                  reg_name + " = new .Float\n" + \
@@ -472,7 +472,7 @@ class Walker(antlr.TreeParser):
             self.match(_t,NUMBER)
             _t = _t.getNextSibling()
             integer_AST = currentAST.root
-            reg_name = "P%d" % self.reg_num
+            reg_name = "$P%d" % self.reg_num
             self.reg_num = self.reg_num + 1
             pir = "\n" + \
                  reg_name + " = new .Float\n" + \
@@ -587,11 +587,25 @@ class Walker(antlr.TreeParser):
         E = None
         try:      ## for error handling
             pass
+            _t123 = _t
+            tmp7_AST = None
+            tmp7_AST_in = None
+            tmp7_AST = self.astFactory.create(_t)
+            tmp7_AST_in = _t
+            self.addASTChild(currentAST, tmp7_AST)
+            _currentAST123 = currentAST.copy()
+            currentAST.root = currentAST.child
+            currentAST.child = None
+            self.match(_t,PIR_PRINT)
+            _t = _t.getFirstChild()
             E = antlr.ifelse(_t == antlr.ASTNULL, None, _t)
             reg_name=self.expr(_t)
             _t = self._retTree
             E_AST = self.returnAST
             self.addASTChild(currentAST, self.returnAST)
+            currentAST = _currentAST123
+            _t = _t123
+            _t = _t.getNextSibling()
             expr = antlr.make(self.astFactory.create(PIR_NOOP,"noop"), E_AST, self.astFactory.create(PIR_OP,"\nprint "), self.astFactory.create(PIR_OP,reg_name), self.astFactory.create(PIR_NEWLINE,"\nprint \"\\n\" # "))
             expr_line_AST = currentAST.root
         
@@ -613,20 +627,20 @@ class Walker(antlr.TreeParser):
         expr_list_AST = None
         try:      ## for error handling
             pass
-            _cnt125= 0
+            _cnt126= 0
             while True:
                 if not _t:
                     _t = antlr.ASTNULL
-                if (_tokenSet_0.member(_t.getType())):
+                if (_t.getType()==PIR_PRINT):
                     pass
-                    self.expr(_t)
+                    self.expr_line(_t)
                     _t = self._retTree
                     self.addASTChild(currentAST, self.returnAST)
                 else:
                     break
                 
-                _cnt125 += 1
-            if _cnt125 < 1:
+                _cnt126 += 1
+            if _cnt126 < 1:
                 raise antlr.NoViableAltException(_t)
             expr_list_AST = currentAST.root
         
@@ -650,23 +664,10 @@ class Walker(antlr.TreeParser):
         B = None
         try:      ## for error handling
             pass
-            _t127 = _t
-            tmp7_AST = None
-            tmp7_AST_in = None
-            tmp7_AST = self.astFactory.create(_t)
-            tmp7_AST_in = _t
-            _currentAST127 = currentAST.copy()
-            currentAST.root = currentAST.child
-            currentAST.child = None
-            self.match(_t,PIR_PRINT)
-            _t = _t.getFirstChild()
             B = antlr.ifelse(_t == antlr.ASTNULL, None, _t)
-            self.expr_line(_t)
+            self.expr_list(_t)
             _t = self._retTree
             B_AST = self.returnAST
-            currentAST = _currentAST127
-            _t = _t127
-            _t = _t.getNextSibling()
             gen_pir_AST = currentAST.root
             gen_pir_AST = antlr.make(self.astFactory.create(PIR_HEADER,"pir header tree\n#"), B_AST, self.astFactory.create(PIR_FOOTER,"pir footer tree\nend\n#"));
             currentAST.root = gen_pir_AST
@@ -748,10 +749,3 @@ _tokenNames = [
     "PIR_NEWLINE"
 ]
     
-
-### generate bit set
-def mk_tokenSet_0(): 
-    ### var1
-    data = [ 6274678816L, 0L]
-    return data
-_tokenSet_0 = antlr.BitSet(mk_tokenSet_0())

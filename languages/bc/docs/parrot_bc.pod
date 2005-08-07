@@ -3,11 +3,12 @@
 
 =head1 Overview
 
-This implementation of bc is based on ANTLR.
+This is an implementation of 'POSIX bc'. It is based on ANTLR.
 
 =head1 Why Parrot bc
 
-Self education.
+Self education. A fairly simple language but has symbols and subroutines.
+Test for decimal bignum libraries.
 
 =head2 Vision
 

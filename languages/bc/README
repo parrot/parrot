@@ -1,7 +1,7 @@
 # Copyright: 2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
-Implementation of 'POSIX bc' with the help Python code created from
+This in an implementation of 'POSIX bc' with the help Python code created from
 an ANTLR grammar.
 
 Requirements:
@@ -17,4 +17,4 @@ Building:
 Testing:
 
 'make test'. When GNU bc is available, the test suite will be run against GNU bc as well.
-
+For compatability with 'POSIX bc' the flags '--standard' and '--quiet' are used.

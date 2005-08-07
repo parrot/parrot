@@ -1,4 +1,4 @@
-### $ANTLR 2.7.5 (20050416): "bc_python.g" -> "BcLexer.py"$
+### $ANTLR 2.7.5 (20050425): "bc_python.g" -> "BcLexer.py"$
 ### import antlr and other modules ..
 import sys
 import antlr

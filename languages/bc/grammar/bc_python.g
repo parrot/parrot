@@ -174,7 +174,7 @@ input_item
   ;
 
 semicolon_list
-  : statement (SEMICOLON statement)*
+  : statement (SEMICOLON! statement)*
   ;
 
 statement
@@ -357,7 +357,7 @@ tokens
 plus! returns [reg_name]
   : #(PLUS reg_name_left=left:expr reg_name_right=right:expr)
   {
-    reg_name = "P%d" % self.reg_num
+    reg_name = "$P%d" % self.reg_num
     self.reg_num = self.reg_num + 1
     pir = "\n" + \
           reg_name + " = new .Float\n" + \
@@ -369,7 +369,7 @@ plus! returns [reg_name]
 minus! returns [reg_name]
   : #(MINUS reg_name_left=left:expr reg_name_right=right:expr)
   {
-    reg_name = "P%d" % self.reg_num
+    reg_name = "$P%d" % self.reg_num
     self.reg_num = self.reg_num + 1
     pir = "\n" + \
           reg_name + " = new .Float\n" + \
@@ -381,7 +381,7 @@ minus! returns [reg_name]
 mul! returns [reg_name]
   : #(MUL reg_name_left=left:expr reg_name_right=right:expr)
   {
-    reg_name = "P%d" % self.reg_num
+    reg_name = "$P%d" % self.reg_num
     self.reg_num = self.reg_num + 1
     pir = "\n" + \
           reg_name + " = new .Float\n" + \
@@ -393,7 +393,7 @@ mul! returns [reg_name]
 div! returns [reg_name]
   : #(DIV reg_name_left=left:expr reg_name_right=right:expr)
   {
-    reg_name = "P%d" % self.reg_num
+    reg_name = "$P%d" % self.reg_num
     self.reg_num = self.reg_num + 1
     pir = "\n" + \
           reg_name + " = new .Float\n" + \
@@ -405,7 +405,7 @@ div! returns [reg_name]
 mod! returns [reg_name]
   : #(MOD reg_name_left=left:expr reg_name_right=right:expr)
   {
-    reg_name = "P%d" % self.reg_num
+    reg_name = "$P%d" % self.reg_num
     self.reg_num = self.reg_num + 1
     pir = "\n" + \
           reg_name + " = new .Float\n" + \
@@ -417,7 +417,7 @@ mod! returns [reg_name]
 integer! returns [reg_name]
   : i:NUMBER
   {
-    reg_name = "P%d" % self.reg_num
+    reg_name = "$P%d" % self.reg_num
     self.reg_num = self.reg_num + 1
     pir = "\n" + \
           reg_name + " = new .Float\n" + \
@@ -451,18 +451,18 @@ expr returns [reg_name]
   ;
 
 expr_line
-  : reg_name=E:expr
+  : #( PIR_PRINT reg_name=E:expr )
     {
       #expr = #( [ PIR_NOOP, "noop" ], #E, [PIR_OP, "\nprint "], [PIR_OP,reg_name], [PIR_NEWLINE, "\nprint \"\\n\" # "] )
     }
   ;
 
 expr_list
-  : (expr)+
+  : (expr_line)+
   ;
 
 gen_pir!
-  : #( PIR_PRINT B:expr_line )
+  : B:expr_list
     {
       #gen_pir = #([PIR_HEADER, "pir header tree\n#"], #B, [PIR_FOOTER, "pir footer tree\nend\n#"]); 
     }
