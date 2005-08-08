@@ -18,7 +18,6 @@
 
   .local string oldName
   .local string newName
-  .local pmc commands
  
   oldName = old_p
   oldName = "&" . oldName
@@ -31,24 +30,30 @@
   if newName == "" goto delete
 
 add:
-  # Grab the original sub 
-  theSub = find_global "Tcl", oldName
+  # Grab the original sub
+  push_eh doesnt_exist
+    theSub = find_global "Tcl", oldName
+  clear_eh
   # Create the new sub
   store_global "Tcl", newName, theSub
 
 delete:
   null theSub 
   store_global "Tcl", oldName, theSub
-
   goto done 
+
+doesnt_exist:
+  return_type = TCL_ERROR
+  retval = "can't rename \""
+  $S0 = old_p
+  retval .= $S0
+  retval .= "\": command doesn't exist"
+  goto done
 
 error:
   return_type = TCL_ERROR
   retval = "wrong # args: should be \"rename oldName newName\""
 
 done:
-
-  store_global "commands", commands
-
   .return(return_type,retval)
 .end
