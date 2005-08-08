@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 17;
+use Parrot::Test tests => 18;
 use Test::More;
 use vars qw($TODO);
 
@@ -91,6 +91,15 @@ language_output_is("tcl",<<'TCL',<<'OUT',"comments must *start* commands (does)"
 puts 1
 TCL
 1
+OUT
+
+language_output_is("tcl",<<'TCL',<<'OUT',"comments with a blank line in between");
+#one
+
+#two
+puts foo
+TCL
+foo
 OUT
 
 language_output_is("tcl",<<'TCL',<<'OUT',"comments must *start* commands (does), with whitespace");

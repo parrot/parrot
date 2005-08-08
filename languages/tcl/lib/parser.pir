@@ -75,22 +75,27 @@ done:
   .local pmc chars
   chars = new Hash
   chars[10] = 1 # \n
+  
+  .local pmc word   
+  .local int orig, len
+  orig = pos
+  len  = length tcl_code
 
 get:
   # try to get a command name
-  .local pmc word
-  .local int peek_pos
-  (word, peek_pos) = get_word(tcl_code, chars, pos)
-  isnull word, check
+  if pos >= len goto check
+  (word, pos) = get_word(tcl_code, chars, pos)
+  inc pos
+  isnull word, get
   $S0 = word
   $I0 = ord $S0, 0
   if $I0 == 35 goto got_comment
 check:
-  .return(pos)
+  .return(orig)
 got_comment:
+  dec pos
   .local int new_pos
   new_pos = index tcl_code, "\n", pos
-  inc new_pos
   .return (new_pos)
 .end
 
