@@ -222,7 +222,8 @@ TCL
 OUT
 
 TODO: {
-local $TODO = "Parser error";
+local $TODO = "PGE Globbing doesn't do backslash escaping [#36820]"; 
+
 language_output_is("tcl",<<TCL,<<OUT,"string match \[");
   puts [string match {\[} {[}]
 TCL
