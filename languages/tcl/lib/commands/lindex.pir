@@ -14,12 +14,15 @@
   argc = argv
   if argc < 1 goto bad_args
   
-  .local pmc __list
-  __list = find_global "_Tcl", "__list"
+  .local pmc __list, _list_index
+  __list      = find_global "_Tcl", "__list"
+  _list_index = find_global "_Tcl", "_list_index"
 
+  .local pmc list
   $P0 = argv[0]
   (return_type, retval) = __list($P0)
   if return_type == TCL_ERROR goto done
+  list = retval
 
 have_list:
   if argc == 1 goto done
@@ -27,23 +30,25 @@ have_list:
 select_elem:
   $P0 = argv[1]
   .local pmc indices
-  (return_type, indices) = __list($P0)
+  (return_type, retval) = __list($P0)
   if return_type == TCL_ERROR goto done
+  indices = retval
   
   .local int index
   .local int elems
   elems = indices
   $I0 = 0
 select_loop:
-  if $I0 >= elems goto done
-  (return_type, retval) = __list(retval)
+  if $I0 >= elems goto have_elem
+  (return_type, retval) = __list(list)
   if return_type == TCL_ERROR goto done
+  list = retval
   
-  # use a string so we get the int value of the contents
-  # of the TclWord and not the size of the TclWord itself
-  $S0 = indices[$I0]
-  index = $S0
-  retval = retval[index]
+  $P0 = indices[$I0]
+  (return_type, retval) = _list_index(list, $P0)
+  if return_type == TCL_ERROR goto done
+  index = retval
+  list  = list[index]
   
   inc $I0
   goto select_loop
@@ -53,6 +58,8 @@ bad_args:
   retval = new TclString
   retval = "wrong # args: should be \"lindex list ?index...?\""
 
+have_elem:
+  retval = list
 done:
   .return(return_type, retval)
 .end
