@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 8;
+use Parrot::Test tests => 10;
 use Test::More;
 
 language_output_is("tcl",<<'TCL',<<OUT,"middle");
@@ -60,3 +60,18 @@ language_output_is("tcl",<<'TCL',<<'OUT','${} substitute an array');
 TCL
 44
 OUT
+
+language_output_is("tcl",<<'TCL',<<'OUT',"read global");
+  set x foo
+  puts $::x
+TCL
+foo
+OUT
+
+language_output_is("tcl",<<'TCL',<<'OUT',"write global");
+  set ::x foo
+  puts $x
+TCL
+foo
+OUT
+
