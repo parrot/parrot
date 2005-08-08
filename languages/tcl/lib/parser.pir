@@ -50,8 +50,7 @@ next_command:
   # We might have a command.
   .local int check_pos
   check_pos = skip_comment(tcl_code, pos)
-  if check_pos != pos goto found_comment
-  goto done_comment
+  if check_pos == pos goto done_comment
 
 found_comment:
   pos = check_pos
@@ -76,13 +75,11 @@ done:
   .local pmc chars
   chars = new Hash
   chars[10] = 1 # \n
-  .local int peek_pos
-get:
-  .local pmc command
-  null command
 
+get:
   # try to get a command name
   .local pmc word
+  .local int peek_pos
   (word, peek_pos) = get_word(tcl_code, chars, pos)
   isnull word, check
   $S0 = word
