@@ -189,5 +189,17 @@
 		} else {
 			warn "unknown configuration";
 		}
+
+		# We need to build a .def file to export parrot.exe symbols.
+		Configure::Data->set(
+			ld_parrot_exe_def	=> 'parrot.def',
+			parrot_exe_def	=> 'parrot.def',
+			link_dynamic	=> '-Wl,--out-implib,parrot.a',
+		);
+		# When building dynclasses we need to flag up the need to
+		# mark shared variables with __declspec(dllimport).
+		Configure::Data->set(
+			cc_building_dynclass_flag => '-DPARROT_BUILDING_WIN32_DLL'
+		);
 	}
 }

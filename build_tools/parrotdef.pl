@@ -31,6 +31,7 @@ my @funcnames = qw(
 	Parrot_debug
 	Parrot_disassemble
 	Parrot_load_bytecode
+	Parrot_load_lib
 	pmc_new
 	pmc_reuse
 	pmc_new_noinit
