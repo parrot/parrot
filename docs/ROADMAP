@@ -22,6 +22,9 @@ This document is now becoming a roadmap, because the Architect is deep
 in a weeklong mindmeld with the Pumpking and the results are being
 encoded in this document, among others.
 
+For a high level overview of parrot milestones, please see:
+http://www.perlfoundation.org/gc/grants/2005-p6-proposal.html
+
 =head1 CURRENT RELEASE (0.2.3)
 
 Parrot 0.2.3 has been released on Aug 5th 2005. For a list of new and
