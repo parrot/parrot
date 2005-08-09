@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 24;
+use Parrot::Test tests => 25;
 use Test::More;
 use vars qw($TODO);
 
@@ -135,6 +135,13 @@ language_output_is("tcl",<<'TCL',<<'OUT',"array set return value");
   puts [array set a [list a b]]
 TCL
 
+OUT
+
+language_output_is("tcl",<<'TCL',<<'OUT',"array set not array");
+  set a 44
+  array set a {1 2 3 4}
+TCL
+can't set "a(1)": variable isn't array
 OUT
 
 TODO: {

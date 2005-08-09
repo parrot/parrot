@@ -164,9 +164,11 @@ pre_loop:
   .local int loop
   loop = 0
   .local string key
-  .local string val
+  .local pmc    val
+  
+  .local pmc set
+  set = find_global  "_Tcl", "__set"
 
-  if is_array == 0 goto new_array
   isnull the_array, new_array
   goto set_loop
 
@@ -178,14 +180,16 @@ set_loop:
   inc loop
   val = elems[loop]
   inc loop
-  the_array[key] = val
-  if loop < count goto set_loop
-
-  # set the actual variable
-  .local pmc set
-  set = find_global  "_Tcl", "__set"
-  (return_type, retval) = set(array_name, the_array)
+  
+  # = makes an alias :-(
+  assign $S0, array_name
+  $S0 .= "("
+  $S0 .= key
+  $S0 .= ")"
+  (return_type, retval) = set($S0, val)
   if return_type == TCL_ERROR goto done
+  
+  if loop < count goto set_loop
 
   retval = new String
   retval = ""
