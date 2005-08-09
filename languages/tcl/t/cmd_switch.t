@@ -7,7 +7,7 @@ use Test::More;
 use vars qw($TODO);
 
 TODO: {
-  local $TODO = "switch not written yet."
+  local $TODO = "switch not written yet.";
 
 language_output_is("tcl",<<'TCL',<<OUT,"too few args, 0");
  switch
