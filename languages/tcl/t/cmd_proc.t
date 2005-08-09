@@ -2,9 +2,8 @@
 
 use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 5;
+use Parrot::Test tests => 9;
 use Test::More;
-use vars qw($SKIP $TODO);
 
 language_output_is("tcl",<<'TCL',<<OUT,"return value");
  set a [proc me {} {
@@ -46,8 +45,35 @@ TCL
 3
 OUT
 
-TODO: {
-local $TODO = "not done yet, but doable";
+language_output_is("tcl",<<'TCL',<<OUT,"too many args");
+ proc me {a b} {
+  puts $a
+  puts $b
+ }
+ me 2 3 4
+TCL
+wrong # args: should be "me a b"
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"too few args");
+ proc me {a b} {
+  puts $a
+  puts $b
+ }
+ me 2
+TCL
+wrong # args: should be "me a b"
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"bad varargs");
+ proc me {a b args} {
+  puts $a
+  puts $b
+ }
+ me 2
+TCL
+wrong # args: should be "me a b args"
+OUT
 
 language_output_is("tcl",<<'TCL',<<OUT,"vararg");
  proc me {a args} {
@@ -59,7 +85,17 @@ TCL
 2
 3 4 5 6
 OUT
-}
+
+language_output_is("tcl",<<'TCL',<<OUT,"vararg empty");
+ proc me {a args} {
+  puts $a
+  puts $args
+ }
+ me 2
+TCL
+2
+
+OUT
 
 __END__
 

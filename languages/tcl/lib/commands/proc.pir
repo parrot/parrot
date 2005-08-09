@@ -65,36 +65,94 @@ got_args:
   .local string proc_body
   proc_body  = ".namespace [\"Tcl\"]\n.sub \"&"
   proc_body .= name
-  proc_body .= "\"\n.param pmc args\nargs = foldup\nnew_pad 1\n"
-  proc_body .= ".local pmc call_level\ncall_level = find_global \"_Tcl\", \"call_level\"\ninc call_level\n"
+  proc_body .= "\"\n  .local pmc args\n  args = foldup\n  new_pad 1\n  "
+  proc_body .= ".local pmc call_level\n  call_level = find_global \"_Tcl\", \"call_level\"\n  inc call_level\n  "
   .local int arg_count 
   arg_count = args_p
-  .local int ii
+  .local int ii,is_slurpy
+  is_slurpy = 0 
   ii = 0
+  if arg_count == 0 goto arg_loop_done
+  $I0 = arg_count - 1
+  $S0 = args_p[$I0]
+
+  .local int last_arg
+  last_arg = arg_count
+
+  if $S0 != "args" goto check_args
+  is_slurpy = 1
+  dec last_arg
+
+check_args:
+  proc_body .= ".local int argc\n  argc=args\n  "
+
+  if is_slurpy goto slurpy_arg_count
+  proc_body .= "if argc != "
+  $S0 = arg_count
+  proc_body .=  $S0
+  proc_body .= " goto BAD_ARGS\n\n"
+  goto arg_loop
+  
+
+slurpy_arg_count:
+  proc_body .= "if argc < "
+  $I0 = arg_count - 1
+  $S0 = $I0
+  proc_body .=  $S0
+  proc_body .= " goto BAD_ARGS\n  "
+
 arg_loop:
-  if ii == arg_count goto arg_loop_done
+  if ii == last_arg goto arg_loop_done
   $S1 = ii
   proc_body .= "$P1 = args["
   proc_body .= $S1
-  proc_body .= "]\nstore_lex -1,\"$"
+  proc_body .= "]\n  "
+  proc_body .= "store_lex -1,\"$"
   # XXX This should be Escape'd
   $S1 = args_p[ii]
   proc_body .= $S1
-  proc_body .= "\", $P1\n"
+  proc_body .= "\", $P1\n  "
   ii = ii + 1
   goto arg_loop
-arg_loop_done:
 
-  proc_body .= ".local pmc interpret\ninterpret = find_global \"_Tcl\", \"__interpret\"\n.local pmc proc_body\n$P0 = find_global \"_Tcl\", \"proc_parsed\"\nproc_body=$P0[\""
+arg_loop_done:
+  unless is_slurpy goto body
+
+  # Convert the remaining elements returned by foldup into a TclList
+  # XXX This code lifted from Tcl::&list - eventually factor this out.
+  proc_body .= ".local int cnt,jj\n  cnt = "
+  $I0 = ii
+  $S0 = $I0
+  proc_body .= $S0
+  proc_body .= "\n  jj = 0\n  "
+  #proc_body .= "$I0 = argc - 1\n  "
+  proc_body .= "if cnt == argc goto NO_SLURPY_ARGS\n  "
+  
+  proc_body .= ".local pmc arg_list\n  arg_list = new .TclList\n  "
+  proc_body .= "\n\nSLURPY_LOOP:\n  "
+  proc_body .= "if cnt >= argc goto DONE\n  "
+  proc_body .= "$P0 = args[cnt]\n  "
+  proc_body .= "arg_list[jj] = $P0\n  "
+  proc_body .= "inc cnt\n  "
+  proc_body .= "inc jj\n  "
+  proc_body .= "goto SLURPY_LOOP\n\n"
+  proc_body .= "NO_SLURPY_ARGS:\n  arg_list= new .TclString\n  arg_list=\"\"\n\n"
+  proc_body .= "DONE:\n  "
+  proc_body .= "store_lex -1, \"$args\", arg_list\n  "
+  
+
+body:
+  proc_body .= ".local pmc interpret\n  interpret = find_global \"_Tcl\", \"__interpret\"\n  .local pmc proc_body\n  $P0 = find_global \"_Tcl\", \"proc_parsed\"\n  proc_body=$P0[\""
   proc_body .= esc_name
-  proc_body .= "\"]\nif I3 == "
-  $S1 = arg_count
-  proc_body .= $S1
-  proc_body .= " goto args_ok\nbad_args:\n.return(1,\"wrong # args: should be \\\""
+  proc_body .= "\"]\n  "
+
+done_args:
+  proc_body .= "  goto ARGS_OK\n\nBAD_ARGS:\n  $P1=new String\n  "
+  proc_body .= "$P1=\"wrong # args: should be \\\""
   proc_body .= name
   proc_body .= " "
   proc_body .= args
-  proc_body .= "\\\"\")\nargs_ok:\n"
+  proc_body .= "\\\"\"\n  .return(1,$P1)\n\nARGS_OK:\n  "
 
   # XXX Is the pop_pad necessary, or would it be  handled as a side
   #  effect of the .return?
@@ -102,12 +160,12 @@ arg_loop_done:
   # a TCL_RETURN (2) from a sub body should be transformed into a TCL_OK (0)
   # to stop propagation outward.  XXX Should use the real constants here
 
-  proc_body .= "($I0,$P0) = interpret(proc_body)\nif $I0 != 2 goto done\n$I0 = 0\ndone:\npop_pad\ndec call_level\n.return($I0,$P0)\n.end\n"
+  proc_body .= "($I0,$P0) = interpret(proc_body)\n  if $I0 != 2 goto done\n  $I0 = 0\n  done:\n  pop_pad\n  dec call_level\n  .return($I0,$P0)\n.end\n"
 
   #print "PROC_BODY=\n"
   #print proc_body
   #print "\n--\n"
-  
+
   .local pmc pir_compiler
   pir_compiler = compreg "PIR"
   $P0 = compile pir_compiler, proc_body 
