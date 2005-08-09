@@ -8,9 +8,9 @@ use Parrot::Test tests => 1 + 1;
 
 SKIP:
 {
+  skip( "`false' not available on $^O", 1 ) if ($^O =~ /MSWin32/);
   skip( "difference between running a process in a fork, or with system()", 1 );
-
-  language_output_is( 'm4', <<'CODE', <<'OUT', 'substring in middle of string' );
+  language_output_is( 'm4', <<'CODE', <<'OUT', 'output of "false"' );
 syscmd(`false')
 sysval()
 CODE
@@ -20,7 +20,9 @@ OUT
 }
 
 {
-  language_output_is( 'm4', <<'CODE', <<'OUT', 'substring in middle of string' );
+  skip( "`true' not available on $^O", 1 ) if ($^O =~ /MSWin32/);
+ 
+  language_output_is( 'm4', <<'CODE', <<'OUT', 'output of "true"' );
 syscmd(`true')
 sysval()
 CODE

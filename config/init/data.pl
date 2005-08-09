@@ -137,6 +137,8 @@ sub runstep {
 
     cp            => 'cp',
     lns           => $Config{lns},        # soft link
+    # On all platform slash == slash_exec, except with MinGW
+    # slash_exec is needed by pathname of executable in test or makefile
     slash         => '/',
     slash_exec    => '/',
 

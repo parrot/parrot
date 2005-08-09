@@ -4,10 +4,11 @@ use strict;
 use FindBin;
 use lib "$FindBin::Bin/../../lib", "$FindBin::Bin/../../../../lib";
 
+use Parrot::Config;
 use Test::More tests => 1; 
 
 my $real_out;
-my $parrot    = 'cd .. && ./parrot';
+my $parrot    = "cd .. && .$PConfig{slash_exec}parrot$PConfig{exe}";
 
 $real_out     = `$parrot languages/m4/examples/eval.imc 2>&1`; 
 is( $real_out, << 'END_OUT', 'single expression' );

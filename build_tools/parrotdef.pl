@@ -244,7 +244,7 @@ my @funcnames = qw(
 	scratchpad_store_by_index
 	scratchpad_get_current
 	lexicals_mark
-      scratchpad_delete
+	scratchpad_delete
 	Parrot_register_HLL
 	Parrot_register_HLL_type
 	Parrot_get_HLL_id
@@ -269,6 +269,8 @@ my @funcnames = qw(
 	Parrot_call_method
 	string_replace
 	Parrot_make_COW_reference
+	Parrot_switch_to_cs
+	PackFile_Segment_new_seg
 );
 push @funcnames, "PMCNULL	DATA";
 push @funcnames, "Parrot_base_vtables	DATA";

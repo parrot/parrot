@@ -4,10 +4,11 @@ use strict;
 use FindBin;
 use lib "$FindBin::Bin/../../lib", "$FindBin::Bin/../../../../lib";
 
+use Parrot::Config;
 use Test::More tests => 3; 
 
 my $real_out;
-my $parrot_m4 = 'cd .. && ./parrot languages/m4/m4.pbc';
+my $parrot_m4 = "cd .. && .$PConfig{slash_exec}parrot$PConfig{exe} languages/m4/m4.pbc";
 
 
 #--------------------------------------------
