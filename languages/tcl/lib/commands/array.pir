@@ -166,6 +166,7 @@ pre_loop:
   .local string key
   .local string val
 
+  if is_array == 0 goto new_array
   isnull the_array, new_array
   goto set_loop
 
