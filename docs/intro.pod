@@ -15,6 +15,7 @@ what on earth Parrot is.
 =head1 What is Parrot?
 
 =head2 Virtual Machines
+
 Parrot is a virtual machine. To understand what a virtual machine is, consider
 what happens when you write a program in a language such as Perl, the run it
 with the applicable interpreter (in the case of Perl, the perl executable).
