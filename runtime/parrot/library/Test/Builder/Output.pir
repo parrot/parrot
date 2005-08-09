@@ -126,6 +126,7 @@ unescaped newlines.
   SPLIT_LOOP:
   	newline_index = index message, "\n"
 	if newline_index == -1 goto END_LOOP
+	inc newline_index
 	line = substr message, 0, newline_index, ''
 	push lines, line
 	if message goto SPLIT_LOOP

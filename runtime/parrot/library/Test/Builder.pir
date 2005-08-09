@@ -59,17 +59,10 @@ This class defines the following methods:
 	addattribute tb_class, 'testplan'
 	addattribute tb_class, 'results'
 
-	.local pmc output
-	.local pmc testplan
-	.local pmc results
+	.local pmc single
+	single = new .Undef
 
-	output   = new .Undef
-	testplan = new .Undef
-	results  = new .Undef
-
-	store_global 'Test::Builder::_singleton',   'output',   output
-	store_global 'Test::Builder::_singleton', 'testplan', testplan
-	store_global 'Test::Builder::_singleton',  'results',  results
+	store_global 'Test::Builder::_singleton', 'singleton', single
 .end
 
 =item C<new( args_hash )>
@@ -97,13 +90,16 @@ the same state.
 
 =cut
 
+.sub __fake_init method
+.end
+
 .sub __init method
 	.param pmc args
 	.local pmc output
 	.local pmc testplan
 	.local pmc results
 
-	(output, testplan, results) = _assign_default_args( args )
+	(output, testplan, results) = self.'_assign_default_args'( args )
 	self.'_assign_args'( output, testplan, results )
 .end
 
@@ -128,7 +124,7 @@ This probably doesn't work correctly yet, but you will probably never use it.
 
 =cut
 
-.sub create method
+.sub create
 	.param pmc args
 
 	.local pmc output
@@ -158,35 +154,53 @@ This probably doesn't work correctly yet, but you will probably never use it.
   TESTPLAN_DEFINED:
 
     results    = new .ResizablePMCArray
+	.local int test_builder_type
 
-	self.'_assign_args'( output, testplan, results )
+	find_type test_builder_type, 'Test::Builder'
+	.local pmc real_init
+	.local pmc blank_init
+	real_init = find_global 'Test::Builder', '__init'
+	blank_init = find_global 'Test::Builder', '__fake_init'
+	store_global 'Test::Builder', '__init', blank_init
+
+	.local pmc test
+	test       = new test_builder_type
+	store_global 'Test::Builder', '__init', real_init
+
+	test.'_assign_args'( output, testplan, results )
+	.return( test )
 .end
 
-.sub _assign_default_args
+.sub _assign_default_args method
 	.param pmc args
+
+	.local pmc single
+	single = find_global 'Test::Builder::_singleton', 'singleton'
 
 	.local pmc output
 	.local pmc testplan
 	.local pmc results
-
-	output   = find_global 'Test::Builder::_singleton', 'output'
-	testplan = find_global 'Test::Builder::_singleton', 'testplan'
-	results  = find_global 'Test::Builder::_singleton', 'results'
-
 	.local int is_defined
 
 	# try for the global first
-	is_defined = isa output, 'Test::Builder::Output'
-	if is_defined goto OUTPUT_DEFINED
+	is_defined = isa single, 'Test::Builder'
+	unless is_defined goto CREATE_ATTRIBUTES
 
+	output   = single.'output'()
+	testplan = single.'testplan'()
+	results  = single.'results'()
+
+	goto RESULTS_DEFINED
+
+  CREATE_ATTRIBUTES:
 	# now look in the args hash
 	is_defined = exists args['output']
 	unless is_defined goto CREATE_OUTPUT
 	output     = args['output']
 	goto OUTPUT_DEFINED
 
-	# now create a Test::Builder::Output object
   CREATE_OUTPUT:
+	# create a Test::Builder::Output object
 	.local int output_type
 	find_type  output_type, 'Test::Builder::Output'
 
@@ -195,31 +209,25 @@ This probably doesn't work correctly yet, but you will probably never use it.
 	output     = new output_type, args_hash
 
   OUTPUT_DEFINED:
-	# look for the global testplan
-	is_defined = isa testplan, 'Test::Builder::TestPlan'
-	$S0 = typeof testplan
-	if is_defined goto TESTPLAN_DEFINED
-
 	# now try in the args hash
 	is_defined = exists args['testplan']
-	unless is_defined goto BACKUP_TESTPLAN
+	unless is_defined goto CREATE_TESTPLAN
 	testplan = args['testplan']
 	goto TESTPLAN_DEFINED
 
-  BACKUP_TESTPLAN:
+  CREATE_TESTPLAN:
 	testplan   = new .String
 	set testplan, 'global_testplan'
 
   TESTPLAN_DEFINED:
-  	is_defined = isa results, 'ResizablePMCArray'
+  	is_defined = defined results
 	if is_defined goto RESULTS_DEFINED
 	results    = new .ResizablePMCArray
 
-  RESULTS_DEFINED:
-	store_global 'Test::Builder::_singleton',   'output',   output
-	store_global 'Test::Builder::_singleton', 'testplan', testplan
-	store_global 'Test::Builder::_singleton',  'results',  results
+	# store this as the singleton
+	store_global 'Test::Builder::_singleton', 'singleton', self
 
+  RESULTS_DEFINED:
 	.return( output, testplan, results )
 .end
 
@@ -311,7 +319,10 @@ declared a plan or if you pass an invalid argument.
 	.local int is_defined
 
 	.local int is_equal
+	.local int is_plan
 
+	is_plan = isa testplan, 'Test::Builder::TestPlan'
+	eq is_plan, 1, CHECK_REPLAN
 	eq_str testplan, 'global_testplan', SET_GLOBAL_TESTPLAN
 	goto CHECK_REPLAN
 
@@ -497,7 +508,7 @@ why you've skipped them.
 
 	self.'report_test'( test_args )
 	inc loop_count
-	if loop_count < number goto LOOP
+	if loop_count <= number goto LOOP
 
 .end
 
