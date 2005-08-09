@@ -1,4 +1,4 @@
-# Copyright: 2001-2004 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 =head1 NAME
@@ -7,419 +7,414 @@ docs/intro.pod - The Parrot Primer
 
 =head1 Welcome to Parrot
 
-This is an update to the article 'Parrot: Some Assembly Required'
-which appeared on http://www.perl.com for the 0.0.2 release of Parrot. It's
-intended as being the best way for the newcomer to Parrot to learn
-what Parrot is and how to use it.
+This document provides a gentle introduction to the Parrot virtual machine for
+anyone considering writing code for Parrot by hand, writing a compiler that
+targets Parrot, getting involved with Parrot development or simply wondering
+what on earth Parrot is.
 
 =head1 What is Parrot?
 
-First, though, what is Parrot, and why are we making such a fuss about
-it? Well, if you haven't been living in a box for the past years, you'll
-know that the Perl community has embarked on the design and
-implementation of a new version of Perl, both the language and the
-interpreter.
+=head2 Virtual Machines
+Parrot is a virtual machine. To understand what a virtual machine is, consider
+what happens when you write a program in a language such as Perl, the run it
+with the applicable interpreter (in the case of Perl, the perl executable).
+First, the program you have written in a high level language is turned into
+simple instructions, for example I<fetch the value of the variable named x>,
+I<add 2 to this value>, I<store this value in the variable named y>, etc. A
+single line of code in a high level language may be converted into tens of these
+simple instructions. This stage is called I<compilation>.
 
-Parrot is related to Perl 6, but it is not Perl 6. To find out
-what it actually is, we need to know a little about how Perl works.
-When you feed your program into C<perl>, it is first compiled into an
-internal representation, or bytecode; then this bytecode is fed to an
-almost separate subsystem inside C<perl> to be interpreted. So there
-are two distinct phases of C<perl>'s operation - compilation to
-bytecode, and interpretation of bytecode. This is not unique to Perl;
-other languages following this design include Python, Ruby, Tcl and,
-believe it or not, even Java.
+The second stage involves executing these simple instructions. Some languages
+(for example, C) are often compiled to instructions that are understood by the
+CPU and as such can be executed by the hardware. Other languages, such as Perl,
+Python and Java, are usually compiled to CPU-independent instructions.  A
+I<virtual machine> (sometimes known as an I<interpreter>) is required to
+execute those instructions.
 
-In previous versions of Perl, this arrangement has been pretty I<ad
-hoc>: there hasn't been any overarching design to the interpreter or
-the compiler, and the interpreter has ended up being pretty reliant on
-certain features of the compiler. Nevertheless, the interpreter (some
-languages call it a Virtual Machine) can be thought of as a software
-CPU - the compiler produces "machine code" instructions for the virtual
-machine, which it then executes, much like a C compiler produces
-machine code to be run on a real CPU.
+While the central role of a virtual machine is to efficiently execute
+instructions, it also performs a number of other functions. One of these is to 
+abstract away the details of the hardware and operating system that a program is 
+running on. Once a program has been compiled to run on a virtual machine, it
+will run on any platform that the VM has been implemented on. VMs may also 
+provide security by allowing more fine-grained limitations to be placed on a 
+program, memory management functionality and support for high level language 
+features (such as objects, data structures, types, subroutines, etc).
 
-Perl 6 plans to separate out the design of the compiler and the
-interpreter. This is why we've come up with a subproject, which we've
-called Parrot, which has a certain, limited amount of independence from
-Perl 6. Parrot is destined to be the Perl 6 Virtual Machine, the
-software CPU on which we will run Perl 6 bytecode. We're working on
-Parrot before we work on the Perl 6 compiler because it's much easier
-to write a compiler once you've got a target to compile to!
+=head2 Design goals
 
-The name "Parrot" was chosen after the 2001 April Fool's Joke which
-had Perl and Python collaborating on the next version of their
-interpreters. This is meant to reflect the idea that we'd eventually
-like other languages to use Parrot as their VM; in a sense, we'd like
-Parrot to become a "common language runtime" for dynamic languages.
+Parrot is designed with the needs of dynamically typed languages (such as Perl 
+and Python) in mind, and should be able to run programs written in these
+languages more efficiently than VMs developed with static languages in mind (JVM,
+.NET). Parrot is also designed to provide interoperability between languages that
+compile to it. In theory, you will be able to write a class in Perl, subclass it
+in Python and then instantiate and use that subclass in a Tcl program.
 
-=head2 Where we're at
+Historically, Parrot started out as the runtime for Perl 6. Unlike Perl 5, the
+Perl 6 compiler and runtime (VM) are to be much more clearly separated. The name
+I<Parrot> was chosen after the 2001 April Fool's Joke which had Perl and Python
+collaborating on the next version of their languages. The name reflects the
+intention to build a VM to run not just Perl 6, but also many other languages.
 
-It should be stressed we're still in the early stages of
-development.
 
-But don't let that put you off! Parrot is still very much usable; we've already
-a lot of languages (in different state of completeness) which compile down to
-Parrot bytecode. Please have a look at the F<languages/> subdirectory.
+=head1 Parrot concepts and jargon
 
-At the moment, it's possible to write simple programs in Parrot
-assembly language, use an assembler to convert them to machine code and
-then execute them on a test interpreter. We have support for a wide
-variety of ordinary and transcendental mathematical operations, some
-rudimentary string support, and some conditional operators.
+=head2 Instruction formats
 
-=head2 How to get it
+Parrot can currently accept instructions to execute in four forms. PIR (Parrot
+Intermediate Representation) is designed to be written by people and generated
+by compilers. It hides away some low-level details, such as the way parameters
+are passed to functions. PASM (Parrot Assembly) is a level below PIR - it is
+still human readable/writable and can be generated by a compiler, but the author
+has to take care of details such as calling conventions and register spilling.
+PAST (Parrot Abstract Syntax Tree) enables Parrot to accept an abstract syntax
+tree style input - useful for those writing compilers.
 
-So let's get ourselves a copy of Parrot, so that we can start
-investigating how to program in the Parrot assembler.
+All of the above forms of input are automatically converted inside Parrot to PBC
+(Parrot Bytecode). This is much like machine code, but understood by the Parrot
+interpreter. It is not intended to be human-readable or human-writable, but
+unlike the other forms execution can start immediately, without the need for an
+assembly phase. Parrot bytecode is platform independent.
 
-Periodic, numbered releases will appear on CPAN (we're currently on
-version 0.2.3), but at this stage of the project an awful lot is
-changing between releases. To really keep up to date with Parrot,
-we should get our copy from the SVN repository. Here's how we do that:
+=head2 The instruction set
+
+The Parrot instruction set includes arithmetic and logical operators, compare
+and branch/jump (for implementing loops, if...then constructs, etc), finding and
+storing global and lexical variables, working with classes and objects, calling
+subroutines and methods along with their parameters, I/O, threads and more.
+
+=head2 Registers and fundamental data types
+
+The Parrot VM is register based. This means that, like a hardware CPU, it has a
+number of fast-access units of storage called registers. There are 4 types of
+register in Parrot: integers (I), numbers (N), strings (S) and PMCs (P). There
+are 32 of each of these, named I0..I31, N0..N31, etc. Integer registers are the
+same size as a word on the machine Parrot is running on and number registers also
+map to a native floating point type.
+
+=head2 PMCs
+
+PMC stands for Parrot Magic Cookie. PMCs represent any complex data structure or
+type, including aggregate data types (arrays, hash tables, etc). A PMC can
+implement its own behaviour for arithmetic, logical and string operations
+performed on it, allowing for language-specific behaviour to be introduced. PMCs
+can be built in to the Parrot executable or dynamically loaded when they are
+needed.
+
+=head2 Garbage Collection
+
+Parrot provides garbage collection, meaning that Parrot programs to do not need
+to free memory explicitly; it will be freed when it is no longer in use (that is,
+no longer referenced) whenever the garbage collector runs.
+
+
+=head1 Obtaining, building and testing Parrot
+
+=head2 Where to get Parrot
+
+Periodic, numbered releases will appear on CPAN.  At this stage of the project,
+an awful lot is changing between releases. You can get a copy of the latest
+Parrot from the SVN repository. This is done as follows:
 
   svn co https://svn.perl.org/parrot/trunk parrot
 
 You can find more instructions at: http://www.parrotcode.org/source.html
 
-Now we have downloaded Parrot, we need to build it; so:
+=head2 Building Parrot
 
- % cd parrot
- % perl Configure.pl
- Parrot Configure
- Copyright (C) 2001-2003 The Perl Foundation.  All Rights Reserved.
+The first step to building Parrot is to run the F<Configure.pl> program, which
+looks at your platform and decides how Parrot should be built. This is done by
+typing:
 
- Since you're running this script, you obviously have
- Perl 5--I'll be pulling some defaults from its configuration.
- ...
+  perl Configure.pl
 
-The Configure script will then attempt to discover your local
-configuration automatically; you can supply the --ask switch if
-you wish to configure the build manually. You might also have a
-look at:
+Once this is complete, run the C<make> program (sometimes called C<nmake> or
+C<dmake>).  This should complete, giving you a working Parrot executable.
 
- % perl Configure.pl --help
+Please report any problems that you encounter while building Parrot so the
+developers can fix them. You can do this by sending a message to
+L<bugs-parrot@bugs6.perl.org> containing a description of your problem. Please
+include the F<myconfig> file that was generated as part of the build process and
+any errors that you observed.
 
-Once Configure has finished successfully, type C<make> (or the name of your
-local C<make> program). With any luck, Parrot will successfully build. (If it
-doesn't, the address to complain to is at the end of this introduction...)
+=head2 The Parrot test suite
 
-=head2 The test suite
+Parrot has an extensive regression test suite. This can be run by typing:
 
-Now we should run some tests; so type C<make test> and you should see a
-readout like the following:
+  make test
 
- perl t/harness --gc-debug --running-make-test  -b t/op/*.t t/pmc/*.t \
-      t/native_pbc/*.t imcc/t/*/*.t t/src/*.t
- t/op/00ff-dos...........ok
- t/op/00ff-unix..........ok
- ...
- All tests successful, 40 subtests skipped.
- Files=95, Tests=1386, 125 wallclock secs (56.96 cusr + 23.71 csys = 80.67 CPU)
+Substituting make for the name of the make program on your platform. The output
+will look something like this:
 
-(Of course, there might be more tests than this, but you get the idea;
-tests may be skipped - for one reason or another - but none of them should
-fail!)
+  C:\Perl\bin\perl.exe t\harness --gc-debug --running-make-test
+    t\library\*.t  t\op\*.t  t\pmc\*.t  t\run\*.t  t\native_pbc\*.t
+    imcc\t\*\*.t  t\dynclass\*.t  t\p6rules\*.t t\src\*.t t\perl\*.t
+  t\library\dumper...............ok
+  t\library\getopt_long..........ok
+  ...
+  All tests successful, 4 test and 71 subtests skipped.
+  Files=163, Tests=2719, 192 wallclock secs ( 0.00 cusr +  0.00 csys =  0.00 CPU)
 
-=head2 Reporting Problems
+It is possible that a number of tests may fail. If this is a small number, then
+it is probably little to worry about, especially if you have the latest Parrot
+from the SVN repository. However, please do not let this discourage you from
+reporting test failures, using the same method as described for reporting build
+problems.
 
-If you have problems with parrot, please send a message to
-bugs-parrot@bugs6.perl.org with a description of your problem.  Please
-include the myconfig file that was generated as part of the build
-process.
 
-=head1 Parrot Concepts
+=head1 Some simple Parrot programs
 
-Before we dive into programming Parrot assembly, let's take a brief
-look at some of the concepts involved.
+=head2 Hello world!
+
+Create a file called F<hello.pir> that contains the following code.
+
+  .sub _main
+      print "Hello world!\n"
+      end
+  .end
+
+Then run it by typing:
+
+  parrot hello.pir
+
+As expected, this will display the text C<Hello world!> on the console, followed
+by a new line (due to the C<\n>).
+
+Let's take the program apart. C<.sub _main> states that the instructions that
+follow make up a subroutine named C<_main>, until a C<.end> is encountered. The
+second line contains the C<print> instruction. In this case, we are calling the
+variant of the instruction that accepts a constant string. The assembler takes
+care of deciding which variant of the instruction to use for us. The third line
+contains the C<end> instruction, which causes the interpreter to terminate.
 
-=head2 Types
+=head2 Using registers
 
-The Parrot CPU has four basic data types:
+We can modify hello.pir to first store the string C<Hello world!\n> in a
+register and then use that register with the print instruction.
 
-=over 4
+  .sub _main
+      set S0, "Hello world!\n"
+      print S0
+      end
+  .end
 
-=item C<INTVAL>
+Here we have stated exactly which register to use. However, by replacing C<S0>
+with C<$S0> we can delegate the choice of which register to use to Parrot, and
+itwill take care of any register spilling that needs to be done for us. It is
+also possible to use an C<=> notation instead of writing the C<set> instruction.
 
-An integer type; guaranteed to be wide enough to hold a pointer.
+  .sub _main
+      $S0 = "Hello world!\n"
+      print $S0
+      end
+  .end
 
-=item C<FLOATVAL>
+To make PIR even more readable, named registers can be used. These are later
+mapped to real numbered registers.
 
-An architecture-independent floating point type.
+  .sub _main
+      .local string hello
+      hello = "Hello world!\n"
+      print hello
+      end
+  .end
 
-=item C<STRING>
+The C<.local> directive indicates that the named register is only needed inside
+the current compilation unit (that is, between C<.sub> and C<.end>). Following
+C<.local> is a type. This can be C<int> (for I registers), C<float> (for N
+registers), C<string> (for S registers), C<pmc> (for P registers) or the name
+of a PMC type.
 
-An abstracted, encoding-independent string type.
-
-=item C<PMC>
-
-Other types like a (perl) scalar or an array.
-
-=back
-
-The first three types are pretty much self-explanatory; the final
-type, Parrot Magic Cookies, are slightly more difficult to understand.
-But that's OK! We'll talk more about PMCs at the end of the article.
-
-=head2 Registers
-
-The current Perl 5 virtual machine is a stack machine - it communicates
-values between operations by keeping them on a stack. Operations load
-values onto the stack, do whatever they need to do, and put the result
-back onto the stack. This is very easy to work with, but it's very
-slow: to add two numbers together, you need to perform three stack
-pushes and two stack pops. Worse, the stack has to grow at runtime, and
-that means allocating memory just when you don't want to be allocating
-it.
-
-So Parrot's going to break with the established tradition for virtual
-machines, and use a register architecture, more akin to the
-architecture of a real hardware CPU. This has another advantage: we can
-use all the existing literature on how to write compilers and
-optimizers for register-based CPUs for our software CPU!
-
-Parrot has specialist registers for each type: 32 INTVAL registers,
-32 FLOATVAL registers, 32 string registers and 32 PMC registers. In Parrot
-assembler, these are named C<I0>...C<I31>, C<N0>...C<N31>,
-C<S0>...C<S31>, C<P0>...C<P31>.
-
-Now let's look at some assembler. We can set these registers with the
-C<set> operator:
-
-    set I1, 10
-    set N1, 3.1415
-    set S1, "Hello, Parrot"
-
-
-All Parrot ops have the same format: the name of the operator, the
-destination register, and then the operands.
-
-=head2 Operations
-
-There are a variety of operations you can perform: the file
-F<docs/core_ops.pod> documents them, along with a little more
-about the assembler syntax. For instance, we can print out the contents
-of a register, or a constant:
-
-    print "The contents of register I1 is: "
-    print I1
-    print "\n"
-
-
-Or we can perform mathematical functions on registers:
-
-    add I1, I1, I2  # Add the contents of I2 to the contents of I1
-    mul I3, I2, I4  # Multiply I2 by I4 and store in I3
-    inc I1          # Increment I1 by one
-    dec N3, 1.5     # Decrement N3 by 1.5
-
-
-We can even perform some simple string manipulation:
-
-    set S1, "fish"
-    set S2, "bone"
-    concat S1, S2             # S1 is now "fishbone"
-    substr S4, S1, 0, 1, "w"  # S1 is now "wishbone"
-    length I1, S1             # I1 is 8
-    end
-
-=head2 Branches
-
-Code gets a little boring without flow control; for starters, Parrot
-knows about branching and labels. The C<branch> op is equivalent to
-Perl's C<goto>:
-
-          branch TERRY
- JOHN:    print "fjords\n"
-          branch END
- MICHAEL: print " pining"
-          branch GRAHAM
- TERRY:   print "It's"
-          branch MICHAEL
- GRAHAM:  print " for the "
-          branch JOHN
- END:     end
-
-
-It can also do simple tests for whether or not a register contains a
-true value:
-
-          set I1, 12
-          set I2, 5
-          mod I3, I1, I2
-          if I3, REMAIND
-          print "5 is an integer divisor of 12"
-          branch DONE
- REMAIND: print "5 divides 12 with remainder "
-          print I3
- DONE:    print "\n"
-          end
-
-Note that C<if> branches to C<REMAIND> if C<I3> contains a true
-(i.e. non-zero) value; if C<I3> is zero, execution falls through to the
-next statement. Here's what that would look like in Perl, for comparison:
-
-    $i1 = 12;
-    $i2 = 5;
-    $i3 = $i1 % $i2;
-    if ($i3) {
-      print "5 divides 12 with remainder ";
-      print $i3;
-    } else {
-      print "5 is an integer divisor of 12";
-    }
-    print "\n";
-    exit;
-
-
-And speaking of comparison, we have the full range of numeric
-comparators: C<eq>, C<ne>, C<lt>, C<gt>, C<le> and C<ge>. Note that you
-can't use these operators on arguments of disparate types; you may even
-need to add the suffix C<_i> or C<_n> to the op to tell it what type of
-argument you are using - although the assembler ought to divine this
-for you, by the time you read this.
-
-=head1 Some Parrot Programs
-
-Now let's have a look at a few simple Parrot programs to give you a
-feel for the language.
-
-=head2 Displaying the Time
-
-This little program displays the Unix epoch time every second: (or so)
-
-         set I3, 3000000
- REDO:   time I1
-         print I1
-         print "\n"
-         set I2, 0
- SPIN:   inc I2
-         le I2, I3, SPIN
-         branch REDO
-         end
-
-First, we set integer register 3 to contain 3 million - that's a
-completely arbitrary number, due to the fact that Parrot averages a
-massive six million ops per second on my machine. Then the program
-consists of two loops: the outer loop stores the current Unix time in
-integer register 1, prints it out, prints a new line, and resets
-register 2 to zero. The inner loop increments register 2 until it
-reaches the 3 million we stored in register 3. When it is no longer
-less than (or equal to) 3 million, we go back to the C<REDO> of the
-outer loop. In essence, we're just spinning around a busy loop to waste
-some time.
-
-How do we run this? Copy the assembler to a
-file F<showtime.pasm>, and inside your Parrot directory, run:
-
-      parrot showtime.pasm
-
-This will assemble and run the code in F<showtime.pasm>. You can also
-create an assembled bytecode from the assembler by running:
-
-      parrot -o showtime.pbc showtime.pasm
-
-(C<.pbc> is the file extension for Parrot bytecode.)
-
-To run this bytecode type
-
-      parrot showtime.pbc
-
-=head2 Finding a Fibonacci number
-
-The Fibonacci series is defined like this: take two numbers, 1 and 1.
-Then repeatedly add together the last two numbers in the series to make
-the next one: 1, 1, 2, 3, 5, 8, 13, and so on. The Fibonacci number
-C<fib(n)> is the n'th number in the series. Here's a simple Parrot
-assembler program which finds the first 20 Fibonacci numbers:
-
- # Some simple code to print some Fibonacci numbers
- # Leon Brocard <acme@astray.com>
-
-         print   "The first 20 fibonacci numbers are:\n"
-         set     I1, 0
-         set     I2, 20
-         set     I3, 0
-         set     I4, 1
- REDO:   set     I5, I4
-         add     I4, I3, I4
-         set     I3, I5
-         print   I3
-         print   "\n"
-         inc     I1
-         lt      I1, I2, REDO
- DONE:   end
-
-This is the equivalent code in Perl:
-
-        print "The first 20 fibonacci numbers are:\n";
-        my $i = 0;
-        my $target = 20;
-        my $a = 0;
-        my $b = 1;
-        until ($i == $target) {
-           my $num = $b;
-           $b += $a;
-           $a = $num;
-           print $a,"\n";
-           $i++;
-        }
-
-=head2 Further examples
-
-Additional examples of what can be done with Parrot assembler can be
-found in the F<parrot/examples/> subdirectory, and on the web at
-http://www.parrotcode.org/examples/.
-
-=head1 Where Next?
-
-Parrot is obviously developing very rapidly, and we've still got a long
-way to go before we are ready to a compiler to this platform. This
-section is for those who are interested in helping us take Parrot
-further.
-
-=head2 Vtable datatypes
-
-PMCs are almost like Perl 5's SVs and Python's Objects, only more so.
-A PMC is an object of some type, which can be instructed to perform
-various operations. So when we say
-
-      inc P1
-
-to increment the value in PMC register 1, the C<increment> method is
-called on the PMC - and it's up to the PMC how it handles that method.
-
-PMCs are how we plan to make Parrot language-independent - a Perl PMC
-would have different behavior from a Python PMC or a Tcl PMC. The
-individual methods are function pointers held in a structure called a
-B<vtable>, and each PMC has a pointer to the vtable which implements
-the methods of its "class". Hence a Perl interpreter would link in a
-library full of Perl-like classes and its PMCs would have Perl-like
-behaviour.
-
-The PMC types available are described in F<doc/vtables.pod>; you can
-create a new PMC with
-
-    new P0, <typename>
-
-and then use any of the instructions in F<ops/core.ops> and F<ops/pmc.ops>
-which support PMCs. F<doc/vtables.pod> also tells you how to implement
-your own PMC vtable classes.
-
-=head2 Getting involved
-
-We've got a good number of people working away on Parrot, but we could
-always use a few more. To help out, you'll need a subscription to the
-perl6-internals mailing list, (C<perl6-internals@perl.org>), where all
-the development takes place. You should also keep up to date with the SVN
-version of Parrot; if you want to be alerted to SVN commits,
-you can subscribe to the cvs-parrot mailing list (C<cvs-parrot@perl.org>).
-SVN commit access is given to those who take
-responsibility for a particular area of Parrot, or who often submit
-high-quality patches.
-
-The projects home page is L<http://www.parrotcode.org>.
-
-So don't delay - pick up a Parrot today!
+=head2 PIR vs PASM
+
+PIR can be turned into PASM by running:
+
+  parrot -o hello.pasm hello.pir
+
+The PASM for the final example looks like this:
+
+  _main:
+      set S30, "Hello world!\n"
+      print S30
+      end
+
+PASM does not handle register allocation or provide support for named registers.
+It also does not have the C<.sub> and C<.end> directives, instead replacing them
+with a label at the start of the instructions.
+
+=head2 Summing squares
+
+This example introduces some more instructions and PIR syntax. Lines starting
+with a C<#> are comments.
+
+  .sub _main
+      # State the number of squares to sum.
+      .local int maxnum
+      maxnum = 10
+      
+      # Some named registers we'll use. Note how we can declare many
+      # registers of the same type on one line.
+      .local int i, total, temp
+      total = 0
+      
+      # Loop to do the sum.
+      i = 1
+  loop:
+      temp = i * i
+      total += temp
+      inc i
+      if i <= maxnum goto loop
+      
+      # Output result.
+      print "The sum of the first "
+      print maxnum
+      print " squares is "
+      print total
+      print ".\n"
+      end
+  .end
+
+PIR provides a bit of syntactic sugar that makes it look more high level than
+assembly. For example:
+
+  temp = i * i
+
+Is just another way of writing the more assembly-ish:
+
+  mul temp, i, i
+
+And:
+
+  if i <= maxnum goto loop
+
+Is the same as:
+
+  le i, maxnum, loop
+
+And:
+
+  total += temp
+
+Is the same as:
+
+  add total, temp
+
+As a rule, whenever a Parrot instruction modifies the contents of a register,
+that will be the first register when writing the instruction in assembly form.
+
+As is usual in assembly languages, loops and selection are implemented in terms
+of conditional branch statements and labels, as shown above. Assembly programming
+is one place where using goto is not bad form!
+
+=head2 Recursively computing factorial
+
+In this example we define a factorial function and recursively call it to
+compute factorial.
+
+  .sub _fact
+      # Get input parameter.
+      .param int n
+      
+      # return (n > 1 ? n * _fact(n - 1) : 1)
+      .local int result
+      
+      if n > 1 goto recurse
+      result = 1
+      goto return
+  
+  recurse:
+      $I0 = n - 1
+      result = _fact($I0)
+      result *= n
+      
+  return:
+      .return (result)
+  .end
+  
+  
+  .sub _main @MAIN
+      .local int f, i
+      
+      # We'll do factorial 0 to 1.
+      i = 0
+  loop:
+      f = _fact(i)
+      
+      print "Factorial of "
+      print i
+      print " is "
+      print f
+      print ".\n"
+      
+      inc i
+      if i <= 10 goto loop
+      
+      # That's it.
+      end
+  .end
+
+Let's look at the C<_fact> sub first. A point that was glossed over earlier is
+why the names of subroutines all start with an underscore. This is done simply
+as a way of showing that the label is global rather than scoped to a particular
+subroutine. This is significant as the label is then visible to other
+subroutines.
+
+The first line, C<.param int n>, specifies that this subroutine takes one
+integer parameter and that we'd like to refer to the register it was passed in by
+the name C<n> for the rest of the sub.
+
+Much of what follows has been seen in previous examples, apart from the line
+reading:
+
+  result = _fact($I0)
+
+This single line of PIR actually represents quite a few lines of PASM. First,
+the value in register C<$I0> is moved into the appropriate register for it to be
+received as an integer parameter by the C<_fact> function. Other calling
+related registers are then set up, followed by C<_fact> being invoked. Then,
+once C<_fact> returns, the value returned by C<_fact> is placed into the
+register given the name C<result>.
+
+Right before the C<.end> of the C<_fact> sub, a C<.return> directive is used to
+ensure the value held in the register named C<result> is placed into the correct
+register for it to be seen as a return value by the code calling the sub.
+
+The call to C<_fact> in main works in just the same was as the recursive call
+to C<_fact> within the sub C<_fact> itself. The only remaining bit of new
+syntax is the C<@MAIN>, written after C<.sub _main>. By default, PIR assumes
+that execution begins with the first sub in the file. This behaviour can be
+changed by making the sub to start in with C<@MAIN>.
+
+=head2 Compiling to PBC
+
+To compile PIR to bytecode, use the C<-o> flag and specify an output file with
+the extension F<.pbc>.
+
+  parrot -o factorial.pbc factorial.pir
+
+
+=head1 Where next?
+
+=head2 Documentation
+
+What documentation you read next depends upon what you are looking to do with
+Parrot. The opcodes reference and built-in PMCs reference are useful to dip into
+for pretty much everyone. If you intend to write or compile to PIR then there
+are a number of documents about PIR that are worth a read. For compiler writers,
+the Compiler FAQ is essential reading. If you want to get involved with Parrot
+development, the PDDs (Parrot Design Documents) contain some details of the
+internals of Parrot; a few other documents fill in the gaps. One way of helping
+Parrot development is to write tests, and there is a document entitled I<Testing
+Parrot> that will help with this.
+
+=head2 The Parrot Mailing List
+
+Much Parrot development and discussion takes place on the perl6-internals
+mailing list. You can subscribe by sending an email to
+L<perl6-internals-subscribe@perl.org> or read the perl6-internals NNTP archive.
+
+=head2 IRC
+
+The Parrot IRC channel is hosted on irc.perl.org and is named C<#parrot>.
 
 =cut
+
