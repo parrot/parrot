@@ -17,8 +17,9 @@ however, then we're returning the invokable PMC.
 .const int MAX_PRECEDENCE =  9
 
 .sub __expression_parse
-
-  .local string expr      # String containing our expression
+  .param string expr
+  .param pmc foo
+  
   .local int return_type  # TCL return code
   return_type = TCL_OK
   .local pmc retval       # TCL return value
@@ -27,17 +28,6 @@ however, then we're returning the invokable PMC.
   ops = find_global "_Tcl", "operators"
   .local pmc precedences  # Global list of operator precedence
   precedences = find_global "_Tcl", "precedence"
-
-  if I3 == 1 goto pmc_arg
-  # if I2 isn't one here, we should blow up. But who's counting.
-  expr = S5
-  goto got_arg
-
-pmc_arg:
-  expr = P5
-  #print "GOT AN EXPR OF:"
-  #print expr
-  #print "\n"
 
 got_arg:
   .local pmc undef
@@ -111,10 +101,8 @@ get_paren_done:
   inc chunk_start
   substr $S1, expr, chunk_start, $I0
   
-  $P9 = new String
-  $P9 = $S1 
   # XXX this is now officially braindead. Fissit.
-  (return_type,retval) = __expression_parse($P9)
+  (return_type,retval) = __expression_parse($S1)
   if return_type == TCL_ERROR goto die_horribly
   (return_type,retval) = __expression_interpret(retval)
   if return_type == TCL_ERROR goto die_horribly
@@ -928,10 +916,8 @@ loop_done:
   len_operand = $I1
 
   substr $S1, expr, start_paren_pos, len_operand
-  $P9 = new String
-  $P9 = $S1
   # XXX should be checking return value here.
-  ($I9,operand) = __expression_parse($P9)  
+  ($I9,operand) = __expression_parse($S1)  
   ($I9,operand) = __expression_interpret(operand)  
   $P10 = new FixedPMCArray
   $P10 = 2

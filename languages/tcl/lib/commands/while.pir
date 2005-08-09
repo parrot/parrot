@@ -27,7 +27,8 @@
   register parsed_code
 
 while_loop:
-  (return_type,retval) = expression_p(cond_p)
+  $S0 = cond_p
+  (return_type,retval) = expression_p($S0)
   if return_type == TCL_ERROR goto done_done
   (return_type,retval) = expression_i(retval)
   if return_type == TCL_ERROR goto done_done

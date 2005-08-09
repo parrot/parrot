@@ -56,7 +56,8 @@ continue:
   #print "\n"
   #print "FOR_CONTINUE2:\n"
   # then check condition
-  (return_type,test_parsed) = expression_p(test_p)
+  $S0 = test_p
+  (return_type,test_parsed) = expression_p($S0)
   #print "RETURN_TYPE ="
   #print return_type
   #print "\n"

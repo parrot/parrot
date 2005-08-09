@@ -16,7 +16,7 @@
   elseifs = new TclList
   .local pmc retval,condition
   .local string code
-  .local pmc condition
+  .local string condition
   .local string body
   .local string else
   .local int return_type
