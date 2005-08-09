@@ -9,8 +9,8 @@
 ;; put this file in your `load-path' and add the following lines
 ;; to your `.emacs' file:
 
-;;   (autoload 'pir-mode \"pir-mode\" nil t)
-;;   (add-to-list 'auto-mode-alist '("\\.imc\\'" . pir-mode))
+;;   (autoload 'pir-mode "pir-mode" nil t)
+;;   (add-to-list 'auto-mode-alist '("\\.\\(imc\\|pir\\)\\'" . pir-mode))
 
 ;; If you have any problems with this, you're on your own,
 ;; You could always try asking on perl6-internals@perl.org.
