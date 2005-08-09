@@ -5,12 +5,14 @@
 =item interactive tclsh
 
 new parser breaks ability to send interactive commands to the shell, add it
-back
+back. Even better, come up with a way to *test* the thing.
 
 =item PIR Tree
 
 From autrijus's talk.
 can we use this instead of the current string-based compilation.
+
+"Um, perhaps Autrijus can tell me what I meant by this." -Coke
 
 =item Makefile deps
 
@@ -32,7 +34,7 @@ Still have to:
 
 =item [interpinfo name]
 
-how to do this from inside parrot? RT#36277
+how to do this from inside parrot? [#36277]
 
 =item migrate all these issues to RT or TODO tests
 
