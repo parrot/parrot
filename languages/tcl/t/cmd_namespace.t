@@ -18,9 +18,6 @@ TCL
 bad option "asdf": must be children, code, current, delete, eval, exists, export, forget, import, inscope, origin, parent, qualifiers, tail, or which
 OUT
 
-TODO: {
- local $TODO = "unimplemented";
-
 language_output_is("tcl",<<'TCL',<<OUT,"namespace qualifiers: no args");
    namespace qualifiers
 TCL
@@ -33,6 +30,8 @@ TCL
 wrong # args: should be "namespace qualifiers string"
 OUT
 
+TODO: {
+  local $TODO = "unimplemented";
 language_output_is("tcl",<<'TCL',<<OUT,"namespace qualifiers: simple");
    puts [namespace qualifiers ::a::b::c]
 TCL
@@ -44,6 +43,7 @@ language_output_is("tcl",<<'TCL',<<OUT,"namespace qualifiers: extra colons");
 TCL
 ::a::b
 OUT
+}
 
 language_output_is("tcl",<<'TCL',<<OUT,"namespace tail: no args");
    namespace tail
@@ -57,6 +57,8 @@ TCL
 wrong # args: should be "namespace tail string"
 OUT
 
+TODO: {
+  local $TODO = "unimplemented";
 language_output_is("tcl",<<'TCL',<<OUT,"namespace tail: simple");
    puts [namespace tail ::a::b::c]
 TCL
@@ -77,14 +79,12 @@ wrong # args: should be "namespace current"
 OUT
 
 # TODO : more tests once we can *change* the namespace
+
 language_output_is("tcl",<<'TCL',<<OUT,"namespace current: too many args");
    puts [namespace current]
 TCL
 ::
 OUT
-
-TODO: {
- local $TODO = "unimplemented";
 
 language_output_is("tcl",<<'TCL',<<OUT,"namespace exists: no args");
    namespace exists
@@ -97,7 +97,6 @@ language_output_is("tcl",<<'TCL',<<OUT,"namespace exists: too many args");
 TCL
 wrong # args: should be "namespace exists name"
 OUT
-} 
 
 language_output_is("tcl",<<'TCL',<<OUT,"namespace exists: failure");
    puts [namespace exists a]
@@ -106,8 +105,7 @@ TCL
 OUT
 
 TODO: {
- local $TODO = "unimplemented";
-
+  local $TODO = "unimplemented";
 language_output_is("tcl",<<'TCL',<<OUT,"namespace exists: global implicit");
    puts [namespace exists {}]
 TCL
@@ -119,5 +117,4 @@ language_output_is("tcl",<<'TCL',<<OUT,"namespace exists: global explicit");
 TCL
 1
 OUT
-
 }

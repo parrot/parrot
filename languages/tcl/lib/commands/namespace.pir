@@ -88,8 +88,44 @@ not_done:
 
 .sub "exists" # XXX 
   .param pmc argv
+
+  .local int argc
+  argc = argv
+  if argc != 1 goto bad_args
   # canonicalize namespace.
   $P1 = new TclInt
   $P1 = 0
   .return(TCL_OK,$P1)
+
+bad_args:
+  $P1 = new TclString
+  $P1 = "wrong # args: should be \"namespace exists name\"" 
+  .return(TCL_ERROR, $P1)
 .end
+
+.sub "qualifiers"
+  .param pmc argv
+  
+  .local int argc
+  if argc != 1 goto bad_args
+
+  bad_args:
+  $P1 = new String
+  $P1 = "wrong # args: should be \"namespace qualifiers string\""
+  .return (TCL_ERROR,$P1)
+
+.end
+
+.sub "tail"
+  .param pmc argv
+  
+  .local int argc
+  if argc != 1 goto bad_args
+
+  bad_args:
+  $P1 = new String
+  $P1 = "wrong # args: should be \"namespace tail string\""
+  .return (TCL_ERROR,$P1)
+
+.end
+
