@@ -5,6 +5,12 @@
 PERL           = ${perl}
 RM_RF          = ${rm_rf}
 
+# The runtime files are also in SVN, need to be generated only by maintainer
+PYTHON_RUNTIME_FILES = \
+    python/lib/bc/BcLexer.py \
+    python/lib/bc/BcParser.py \
+    python/lib/bc/BcTreeWalker.py
+
 # the default target
 all: build 
 
@@ -15,6 +21,10 @@ help:
 	@echo ""
 	@echo "  all:               BcLexer.py and BcParser.py"
 	@echo "                     This is the default."
+	@echo ""
+	@echo "  maintain:          Generate Python runtime files"
+	@echo "                     Needs ANTLR and Python"
+	@echo ""
 	@echo "Testing:"
 	@echo "  test:              Run the test suite."
 	@echo ""
@@ -29,10 +39,13 @@ help:
 test: build
 	cd .. && $(PERL) -I../lib -I bc/lib bc/t/harness --use-gnu-bc
 
-build: python/lib/bc/BcParser.py 
+build:
+# Nothing to do
+
+maintain: $(PYTHON_RUNTIME_FILES)
 
 # BcLexer.py will be created too
-python/lib/bc/BcParser.py: grammar/bc_python.g
+$(PYTHON_RUNTIME_FILES): grammar/bc_python.g
 	antlr -o python/lib/bc grammar/bc_python.g
 
 clean:

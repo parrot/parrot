@@ -92,11 +92,11 @@ BASIC.clean:
 
 bc : bc.dummy
 bc.dummy:
-	$(MAKE_C) bc
+	- $(MAKE_C) bc
 bc.test:
-	$(MAKE_C) bc test
+	- $(MAKE_C) bc test
 bc.clean:
-	$(MAKE_C) bc clean
+	- $(MAKE_C) bc clean
 
 befunge : befunge.dummy
 befunge.dummy:
