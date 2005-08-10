@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 44;
+use Parrot::Test tests => 46;
 use Test::More;
 use vars qw($TODO);
 
@@ -221,21 +221,29 @@ TCL
 1
 OUT
 
-TODO: {
-local $TODO = "PGE Globbing doesn't do backslash escaping [#36820]"; 
-
-language_output_is("tcl",<<TCL,<<OUT,"string match \[");
+language_output_is("tcl",<<'TCL',<<OUT,"string match \[");
   puts [string match {\[} {[}]
 TCL
 1
 OUT
 
-language_output_is("tcl",<<TCL,<<OUT,"string match \]");
+language_output_is("tcl",<<'TCL',<<OUT,"string match \]");
   puts [string match {\]} {]}]
 TCL
 1
 OUT
-}
+
+language_output_is("tcl",<<'TCL',<<OUT,"string match \*");
+  puts [string match {\*} {*}]
+TCL
+1
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"string match \?");
+  puts [string match {\?} {?}]
+TCL
+1
+OUT
 
 language_output_is("tcl",<<TCL,<<OUT,"string repeat: simple");
   puts [string repeat a 5]
