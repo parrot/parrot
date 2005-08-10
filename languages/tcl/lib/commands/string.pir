@@ -119,7 +119,6 @@ done:
   .return (return_type, retval)
 .end
 
-.include "stringinfo.pasm"
 .sub "bytelength"
   .param pmc argv
 
@@ -128,7 +127,7 @@ done:
   argc = argv
   if argc != 1 goto bad_length
   $S0 = argv[0]
-  $I0 = stringinfo $S0, .STRINGINFO_BUFUSED
+  $I0 = bytelength $S0
   retval = new Integer
   retval = $I0
   .return(TCL_OK, retval)
