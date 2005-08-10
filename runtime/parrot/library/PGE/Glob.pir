@@ -112,10 +112,17 @@ Parse alternations of the form {a,b,c} where a,b, and c are the alternatives.
   next_char:
     unless $I0 < $I1 goto lit_end
     c = substr pattern, $I0, 1
+    if c == "\\" goto backslash
     $I2 = index STOPCHARS, c
     if $I2 >= 0 goto lit_end
     inc $I0
     concat lit,c
+    goto next_char
+  backslash:
+    inc $I0
+    c = substr pattern, $I0, 1
+    inc $I0
+    concat lit, c
     goto next_char
   lit_end:
     lex['pos'] = $I0
