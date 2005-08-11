@@ -54,9 +54,9 @@ select_loop:
   goto select_loop
 
 bad_args:
-  return_type = TCL_ERROR
-  retval = new TclString
+  retval = new String
   retval = "wrong # args: should be \"lindex list ?index...?\""
+  .return (TCL_ERROR, retval)
 
 have_elem:
   retval = list
