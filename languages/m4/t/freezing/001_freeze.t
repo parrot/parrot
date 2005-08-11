@@ -8,10 +8,13 @@ use Parrot::Config;
 use Test::More tests => 1; 
 
 my $parrot_m4 = "cd .. && .$PConfig{slash_exec}parrot$PConfig{exe} languages/m4/m4.pbc"; 
+my $cat  = "$PConfig{perl} -MExtUtils::Command -e cat";
+my $rm_f = "$PConfig{perl} -MExtUtils::Command -e rm_f";
 
+my $real_out = `$parrot_m4 --reload-state=languages/m4/examples/only_builtin.frozen --freeze-state=languages/m4/examples/hello.frozen languages/m4/examples/hello.m4`;
+$real_out   .= `$cat m4/examples/hello.frozen`;
+$real_out   .= `$rm_f m4/examples/hello.frozen`;
 
-#--------------------------------------------
-my $real_out = `$parrot_m4 --reload-state=languages/m4/examples/only_builtin.frozen --freeze-state=languages/m4/examples/hello.frozen languages/m4/examples/hello.m4; cat languages/m4/examples/hello.frozen; rm languages/m4/examples/hello.frozen`; 
 is( $real_out, << 'END_OUT', '1 file' );
 Hello
 T8,8
