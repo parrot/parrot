@@ -1,5 +1,27 @@
 .namespace [ "_Tcl" ]
 
+=head1 NAME
+
+Tcl Parser
+
+=head1 DESCRIPTION
+
+This is the parser that makes up the heart of Partcl. It follows
+the 11 rules that are found in the Tcl manpage, available online
+at <http://www.tcl.tk/man/tcl8.4/TclCmd/Tcl.htm>.
+
+=head FUNCTIONS
+
+=over 4
+
+=item C<pmc commands = parse(string tcl_code)>
+
+Parses the Tcl code and returns an array of TclCommand objects.
+First, it performs the \<newline> substitution. Then it fetches
+commands, one at a time (skipping over comments).
+
+=cut
+
 .sub parse
   .param string tcl_code
   
@@ -68,6 +90,18 @@ done:
   .return(commands)
 .end
 
+=item C<int pos = skip_comment(string tcl_code, int pos)>
+
+Checks for a comment and returns either the original pos
+or the position after the comment.
+
+    Incoming: # comment\n
+              ^
+    Outgoing: # comment\n
+                       ^^
+
+=cut
+
 .sub skip_comment
   .param string tcl_code
   .param int    pos
@@ -98,6 +132,18 @@ got_comment:
   new_pos = index tcl_code, "\n", pos
   .return (new_pos)
 .end
+
+=item C<(pmc command, int pos) = get_command(string tcl_code, pmc chars, int pos)>
+
+Tries to get a command from the Tcl code at pos, stopping at the
+first character that's ord value exists in the chars hash.
+
+    Incoming: puts [lindex "a b c" 1]
+                    ^
+    Outgoing: puts [lindex "a b c" 1]
+                                    ^
+
+=cut
 
 .sub get_command
   .param string tcl_code
@@ -133,6 +179,20 @@ done:
   inc pos
   .return(command, pos)
 .end
+
+=item C<(pmc word, int pos) = get_word(string tcl_code, pmc chars, int pos)>
+
+Parses a word, starting at pos and ending at the first character
+that's ord value exists in the chars hash. Returns either a TclWord
+object or a TclConst, TclCommand, or TclVar object if the Tclword
+contains only one.
+
+    Incoming: puts foo\n
+              ^
+    Outgoing: puts foo\n
+                      ^^
+
+=cut
 
 .sub get_word
   .param string tcl_code
@@ -219,7 +279,8 @@ subcommand2:
   ($P0, pos) = get_subcommand(tcl_code, pos)
   push word, $P0
   
-  start = pos + 1
+  start = pos
+  dec pos
   goto loop
 
 have_word:
@@ -248,6 +309,18 @@ dispatch_sub:
 really_done:
   .return(word, pos)
 .end
+
+=item C<(pmc word, int pos) = get_quote(string tcl_code, int pos)>
+
+Parses a quote and returns a TclWord object containing the separate
+parts (or, if there's only one, it's child).
+
+    Incoming; puts [lindex "a b c" 1]
+                           ^
+    Outgoing: puts [lindex "a b c" 1]
+                                 ^
+
+=cut
 
 .sub get_quote
   .param string tcl_code
@@ -303,7 +376,8 @@ subcommand2:
   ($P0, pos) = get_subcommand(tcl_code, pos)
   push word, $P0
   
-  start = pos + 1
+  start = pos
+  dec pos
   goto loop
 
 missing_quote:
@@ -321,6 +395,17 @@ done:
   
   .return(word, pos)
 .end
+
+=item C<(pmc const, int pos) = get_brace(string tcl_code, int pos)>
+
+Parses a {} quoted expression, returning a TclConst object.
+
+    Incoming: puts {foo}
+                   ^
+    Outgoing: puts {foo}
+                       ^
+
+=cut
 
 .sub get_brace
   .param string tcl_code
@@ -372,6 +457,17 @@ done:
   .return($P0, pos)
 .end
 
+=item C<(pmc command, int pos) = get_subcommand(string tcl_code, int pos)>
+
+Parses a subcommand and returns a TclCommand object.
+
+    Incoming: puts [lindex "a b c" 1]
+                   ^
+    Outgoing: puts [lindex "a b c" 1]
+                                    ^
+
+=cut
+
 .sub get_subcommand
   .param string tcl_code
   .param int pos
@@ -381,11 +477,20 @@ done:
   chars = new Hash
   chars[93] = 1 # ]
   
-  ($P0, $I0) = get_command(tcl_code, chars, pos)
-  dec $I0
-  
-  .return($P0, $I0)
+  .return get_command(tcl_code, chars, pos)
 .end
+
+=item C<(pmc var, int pos) = parse_variable(string tcl_code, int pos)>
+
+If it's really a variable, returns a TclVar object. If it's
+something else, return a TclConst object.
+
+    Incoming: puts $foo\n
+                   ^
+    Outgoing: puts $foo\n
+                       ^^
+
+=cut
 
 .sub parse_variable
   .param string tcl_code
@@ -410,7 +515,7 @@ char:
   if $I0 goto char
   $I0 = ord tcl_code, pos
   if $I0 == 58 goto colon # :
-  if $I0 == 40 goto index #
+  if $I0 == 40 goto index # (
   # goto check_length
 
 check_length:
@@ -463,3 +568,7 @@ done:
   $P0 = $S0
   .return($P0, pos)
 .end
+
+=back
+
+=cut
