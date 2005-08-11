@@ -27,6 +27,7 @@ static void init_basic_blocks(IMC_Unit *);
 static void analyse_life_symbol(Parrot_Interp, IMC_Unit *, SymReg*);
 static void analyse_life_block(Parrot_Interp, Basic_block*, SymReg*);
 static void bb_add_edge(IMC_Unit *, Basic_block*, Basic_block*);
+static void bb_remove_edge(IMC_Unit *, Edge*);
 static Basic_block* make_basic_block(Interp *, IMC_Unit *, Instruction*);
 
 /* Code: */
@@ -238,13 +239,13 @@ bb_check_newsub(Parrot_Interp interpreter, IMC_Unit * unit,
             }
     }
 }
+
 /* Once the basic blocks have been computed, build_cfg computes
    the dependencies between them. */
-
 void
 build_cfg(Parrot_Interp interpreter, IMC_Unit * unit)
 {
-    int i, j;
+    int i, j, changes;
     SymReg * addr;
     Basic_block *last = NULL, *bb;
     Edge *pred;
@@ -343,6 +344,25 @@ invok:
         last = bb;
     }
 
+    /* Decouple unreachable blocks (not the first block, with no predecessors)
+     * from the CFG
+     */
+    do {
+        changes = 0;
+        for (i = 1; i < unit->n_basic_blocks; i++) {
+            bb = unit->bb_list[i];
+            if (!bb->pred_list) {
+                /* Remove all successor edges of block bb */
+                while (bb->succ_list) {
+                    bb_remove_edge(unit, bb->succ_list);
+                    IMCC_debug(interpreter, DEBUG_CFG,
+                            "remove edge from bb: %d\n", bb->index);
+                    changes = 1;
+                }
+            }
+        }
+    } while (changes);
+
     if (IMCC_INFO(interpreter)->debug & DEBUG_CFG)
         dump_cfg(unit);
 }
@@ -419,6 +439,44 @@ bb_add_edge(IMC_Unit * unit, Basic_block *from, Basic_block *to)
     else {
 	e->next = unit->edge_list;
 	unit->edge_list = e;
+    }
+}
+
+static void
+bb_remove_edge(IMC_Unit * unit, Edge * edge)
+{
+    Edge *prev;
+
+    if (edge->from->succ_list == edge) {
+        edge->from->succ_list = edge->succ_next;
+    } else {
+        for (prev = edge->from->succ_list; prev; prev = prev->succ_next) {
+            if (prev->succ_next == edge) {
+                prev->succ_next = edge->succ_next;
+            }
+        }
+    }
+
+    if (edge->to->pred_list == edge) {
+        edge->to->pred_list = edge->pred_next;
+    } else {
+        for (prev = edge->to->pred_list; prev; prev = prev->pred_next) {
+            if (prev->pred_next == edge) {
+                prev->pred_next = edge->pred_next;
+            }
+        }
+    }
+
+    if (unit->edge_list == edge) {
+        unit->edge_list = edge->next;
+	free(edge);
+    } else {
+        for (prev = unit->edge_list; prev; prev = prev->next) {
+            if (prev->next == edge) {
+                prev->next = edge->next;
+	        free(edge);
+            }
+        }
     }
 }
 
@@ -512,8 +570,8 @@ propagate_alias(Parrot_Interp interpreter)
 			   !instruction_reads(ins, r1)) {
 			add_instruct_reads(interpreter, ins, r1);
                         any = 1;
-		    }
-		    else if (instruction_reads(ins, r1) &&
+                    }
+                    else if (instruction_reads(ins, r1) &&
 			   !instruction_reads(ins, r0)) {
 			add_instruct_reads(interpreter, ins, r0);
                         any = 1;
@@ -796,7 +854,12 @@ compute_dominators (Parrot_Interp interpreter, IMC_Unit * unit)
     dominators[0] = set_make(n);
     set_add(dominators[0], 0);
     for (i = 1; i < n; i++) {
-        dominators[i] = set_make_full(n);
+        if (unit->bb_list[i]->pred_list) {
+            dominators[i] = set_make_full(n);
+        } else {
+            dominators[i] = set_make(n);
+            set_add(dominators[i], i);
+        }
     }
 
 #if USE_BFS
@@ -859,14 +922,14 @@ compute_dominators (Parrot_Interp interpreter, IMC_Unit * unit)
                         if (set_contains(dominators[runner], i)) {
                             wrong = 1;
                             break;
-                        } 
+                        }
                     }
                 }
-                if (!wrong) { 
+                if (!wrong) {
                     unit->idoms[b] = unit->bb_list[i]->index;
                     break;
                 }
-            }       
+            }
        }
    }
 
