@@ -20,9 +20,10 @@ however, then we're returning the invokable PMC.
   .param string expr
   .param pmc foo
   
-  .local int return_type  # TCL return code
+  .local pmc retval
+  .local int return_type
   return_type = TCL_OK
-  .local pmc retval       # TCL return value
+  
   .local pmc chunk        # the current chunk we're working on
   .local pmc ops          # Global list of available ops.
   ops = find_global "_Tcl", "operators"
@@ -44,7 +45,7 @@ got_arg:
   chunk_end = 0
   .local int char
   .local int expr_length
-  length expr_length, expr
+  expr_length = length expr
 
   #print "CALLED WITH "
   #print expr
@@ -99,7 +100,7 @@ get_paren_done:
   $I0 = $I1 - chunk_start
   dec $I0
   inc chunk_start
-  substr $S1, expr, chunk_start, $I0
+  $S1 = substr expr, chunk_start, $I0
   
   # XXX this is now officially braindead. Fissit.
   (return_type,retval) = __expression_parse($S1)
@@ -197,7 +198,7 @@ get_operator:
   .local int expr_len
   .local string test_op
 
-  length expr_len, expr 
+  expr_len = length expr 
 
   # cheat - right now there are only 2 and 1 character ops
   # 2 char trump one char.
@@ -207,7 +208,7 @@ get_operator:
 
 two_char:
   op_len = 2
-  substr test_op, expr, chunk_start, op_len
+  test_op = substr expr, chunk_start, op_len
   $P11 = ops[test_op]
   isnull $P11, one_char
   $I1 = typeof $P11
@@ -217,7 +218,7 @@ two_char:
 
 one_char:
   op_len = 1
-  substr test_op, expr, chunk_start, op_len
+  test_op = substr expr, chunk_start, op_len
   $P11 = ops[test_op]
   isnull $P11, op_fail
   $I1 = typeof $P11
@@ -290,7 +291,7 @@ converter_loop:
   if stack_index >= input_len goto precedence_done
   our_op = chunks[stack_index]
   isnull our_op, converter_next
-  typeof $I0, our_op
+  $I0 = typeof our_op
   if $I0 == .Undef goto converter_next
   $I2 = our_op[0]
   if $I2 == INTEGER goto converter_next
@@ -314,7 +315,7 @@ right_arg:
   isnull retval, left_arg
   chunks[$I2] = undef
   inc $I4
-  unshift program_stack, retval
+  program_stack = unshift retval
   
   # If we're a function, (XXX) assume a single arg (which
   # we've now pulled - so, go to the, skip the left arg.
@@ -329,11 +330,11 @@ left_arg:
   isnull retval, shift_op
   chunks[$I2] = undef
   inc $I4
-  unshift program_stack, retval
+  program_stack = unshift retval
 
 shift_op:
   #print "shift_op\n"
-  unshift program_stack,our_op
+  program_stack = unshift our_op
   chunks[stack_index] = undef
 
 converter_next:
@@ -662,7 +663,7 @@ evaluation_return:
   .param int start
 
   .local int len
-  length len, expr
+  len = length expr
   .local int pos 
   .local int char 
   .local int flag
@@ -676,7 +677,7 @@ evaluation_return:
 
 first_digit:
   # Is the first digit a 0? if so, this is octal or hex.
-  ord $I0, expr, pos
+  $I0 = ord expr, pos
   if $I0 != 48 goto decimal
   #inc pos
   #ord $I0, expr, pos
@@ -688,7 +689,7 @@ octal:
   inc pos
 octal_loop:
   if pos>=len goto octal_loop_done
-  ord $I0, expr,pos
+  $I0 = ord expr,pos
   if $I0 > 55 goto octal_loop_done # ">8"
   if $I0 < 48 goto octal_loop_done # "<0
   flag = 1
@@ -703,7 +704,7 @@ octal_finish_up:
   inc start
   dec pos
 
-  substr $S0, expr, start,pos
+  $S0 = substr expr, start, pos
   $P1 = new TclList
   $P1[0] = $S0
 
@@ -717,7 +718,7 @@ decimal:
 loop: 
   # cheat
   if pos >= len goto loop_done
-  ord $I0, expr, pos
+  $I0 = ord expr, pos
   if $I0 > 57 goto loop_done # > "9"
   if $I0 < 48 goto loop_done # < "0"
   flag = 1
@@ -732,7 +733,7 @@ failure:
    goto real_done
 
 finish_up:
-   substr $S0, expr, start,pos
+   $S0 = substr expr, start, pos
    $I0 = $S0
    value = new TclList
    value[0] = INTEGER
@@ -760,14 +761,14 @@ real_done:
   varname = new FixedPMCArray
 
   .local int expr_length
-  length expr_length, expr
+  expr_length = length expr
 
   # is this even a variable?
-  ord $I0, expr, start
+  $I0 = ord expr, start
   if $I0 != 36 goto real_done
  
   inc start 
-  ord $I0, expr, start
+  $I0 = ord expr, start
   if $I0 == 123 goto braced  
 
   pos = start
@@ -784,7 +785,7 @@ var_loop:
 
   if pos >= expr_length goto var_loop_done 
 
-  ord $I0, expr, pos
+  $I0 = ord expr, pos
   if $I0 == 40 goto indexed_var 
   if $I0 <  48 goto var_loop_done
   if $I0 <= 58 goto var_loop_next
@@ -803,7 +804,7 @@ var_loop_done:
 
   $I0 = pos - start
   
-  substr $S0, expr, start, $I0
+  $S0 = substr expr, start, $I0
   varname = 1
   varname[0] = $S0
   goto real_done
@@ -812,7 +813,7 @@ indexed_var:
   # just like var_loop_done, mark the name of the var
   dec pos
   $I0 = pos - start
-  substr $S0, expr, start, $I0
+  $S0 = substr expr, start, $I0
   varname = 2 
   varname[0] = $S0
   
@@ -821,7 +822,7 @@ indexed_var:
   index $I1, ")", expr, pos
  
   $I2 = $I1 - pos
-  substr $S0, expr, pos, $I2
+  $S0 = substr expr, pos, $I2
   varname[1] = $S0
   goto real_done 
  
@@ -834,7 +835,7 @@ braced:
   pos = $I0 
  
   $I1 = $I0 - start
-  substr $S0, expr, start, $I1
+  $S0 = substr expr, start, $I1
   varname[0] = $S0
 
   
@@ -897,12 +898,12 @@ loop_done:
   .local int len
   len = start_paren_pos - start
 
-  substr $S0, expr, start, len
+  $S0 = substr expr, start, len
   $P1 = find_global "_Tcl", "functions"
   
   func = $P1[$S0]
   isnull func, fail 
-  typeof $I0, func
+  $I0 = typeof func
   if $I0 == .Undef goto fail
 
   # and the operand is what's between the ()'s - get the result
@@ -915,7 +916,7 @@ loop_done:
   .local int len_operand
   len_operand = $I1
 
-  substr $S1, expr, start_paren_pos, len_operand
+  $S1 = substr expr, start_paren_pos, len_operand
   # XXX should be checking return value here.
   ($I9,operand) = __expression_parse($S1)  
   ($I9,operand) = __expression_interpret(operand)  
