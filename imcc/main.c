@@ -368,6 +368,7 @@ do_pre_process(Parrot_Interp interp)
     int c;
     YYSTYPE val;
 
+    IMCC_push_parser_state(interp);
     while ( (c = yylex(&val, interp)) ) {
         switch (c) {
             case EMIT:          printf(".emit\n"); break;
