@@ -24,7 +24,7 @@ OUT
 
 {
   language_output_is( 'm4', <<'CODE', <<'OUT', 'output of "true"' );
-syscmd(`$true')
+syscmd(`$true`)
 sysval()
 CODE
 
