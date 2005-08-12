@@ -11,42 +11,47 @@
  */
 
 #include "parrot/parrot.h"
+#include <assert.h>
 
 pmclass TclFloat extends TclObject extends Float dynpmc group tcl_group {
 
     STRING* get_string () {
-        char* buff = mem_sys_allocate(80);
-        int buflen,checklen;
+        UINTVAL buflen;
         int check_flag;
+        STRING * buff;
+        STRING * dot;
+        STRING * dot_zero;
 
-        STRING* s;
-#ifdef HAS_SNPRINTF
-        snprintf(buff,80,FLOATVAL_FMT,PMC_num_val(SELF));
-#else
-        sprintf(buff,FLOATVAL_FMT,PMC_num_val(SELF));  /* XXX buffer overflow! */
-#endif
-        check_flag = 1;
-        checklen = buflen = strlen(buff);
-        while (check_flag && buflen) {
-               if (buff[buflen-1] == 48) {  /* 0 */
+        buff = Parrot_sprintf_c(INTERP, "%.12vg",PMC_num_val(SELF));
+
+        /* 
+         * this sprintf variant will return something that looks like
+         * an int if it can : if we have no decimal point then tack on
+         * on and return
+         */
+        dot = string_from_cstring(INTERP,".",1);
+
+        if (string_str_index(INTERP,buff,dot,0) == -1 ) {
+            dot_zero = string_from_cstring(INTERP,".0",2);
+            buff = string_append(INTERP, buff, dot_zero,0);
+            return buff;
+        }
+
+        check_flag = 0;
+        buflen = string_length(INTERP,buff);
+        while (buflen) {
+               if (string_index(INTERP,buff,buflen-1) == '0') {
                        buflen--;
-               } else  {
-                       check_flag = 0;
+                       check_flag = 1;
+               } else {
+                       break;
                }
         }
-        /* if the last entry is now a ".", then add one zero back in. */
-        if (buff[buflen-1] == 46) {
-          buflen++;
-        }
 
-        /* paranoid? */
-        if (buflen > checklen) {
-              buflen = checklen;
-        }
-        buff[buflen] = 0; /* should this be necessary? */
-        s = string_make(INTERP,buff,buflen,"iso-8859-1",0);
-        mem_sys_free(buff);
-        return s;
+        /* truncate the string */
+        buff->strlen = buflen;
+        buff->bufused = buflen;
+        return buff;
     }
 }
 

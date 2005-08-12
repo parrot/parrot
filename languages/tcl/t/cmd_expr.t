@@ -151,13 +151,6 @@ TCL
 3
 OUT
 
-#
-# now, functions - the accuracy and int vs. float nature here is
-# still an issue - we're testing to make sure that the functions
-# exist, basically. better tests will need to be written (or the tcl
-# test suite used.) (XXX)
-#
-
 language_output_is("tcl",<<TCL,<<OUT,"abs");
  puts [expr abs(1-2)]
 TCL
@@ -167,61 +160,61 @@ OUT
 language_output_is("tcl",<<TCL,<<OUT,"acos");
  puts [expr acos(0)]
 TCL
-1.570796
+1.57079632679
 OUT
 
 language_output_is("tcl",<<TCL,<<OUT,"asin");
  puts [expr asin(1)]
 TCL
-1.570796
+1.57079632679
 OUT
 
 language_output_is("tcl",<<TCL,<<OUT,"atan");
  puts [expr atan(1)]
 TCL
-0.785398
+0.785398163397
 OUT
 
 language_output_is("tcl",<<TCL,<<OUT,"cos");
  puts [expr cos(1)]
 TCL
-0.540302
+0.540302305868
 OUT
 
 language_output_is("tcl",<<TCL,<<OUT,"cosh");
  puts [expr cosh(1)]
 TCL
-1.543081
+1.54308063482
 OUT
 
 language_output_is("tcl",<<TCL,<<OUT,"exp");
  puts [expr exp(1)]
 TCL
-2.718282
+2.71828182846
 OUT
 
 language_output_is("tcl",<<TCL,<<OUT,"log");
  puts [expr log(32)]
 TCL
-3.465736
+3.4657359028
 OUT
 
 language_output_is("tcl",<<TCL,<<OUT,"log10");
  puts [expr log10(32)]
 TCL
-1.50515
+1.50514997832
 OUT
 
 language_output_is("tcl",<<TCL,<<OUT,"sin");
  puts [expr sin(1)]
 TCL
-0.841471
+0.841470984808
 OUT
 
 language_output_is("tcl",<<TCL,<<OUT,"sinh");
  puts [expr sinh(1)]
 TCL
-1.175201
+1.17520119364
 OUT
 
 language_output_is("tcl",<<TCL,<<OUT,"sqrt");
@@ -233,13 +226,13 @@ OUT
 language_output_is("tcl",<<TCL,<<OUT,"tan");
  puts [expr tan(1)]
 TCL
-1.557408
+1.55740772465
 OUT
 
 language_output_is("tcl",<<TCL,<<OUT,"tanh");
  puts [expr tanh(1)]
 TCL
-0.761594
+0.761594155956
 OUT
 
 # misc.
@@ -265,7 +258,7 @@ TCL
 0.333333333333
 OUT
 
-language_output_is("tcl",<<'TCL',<<'OUT',"int vs. float");
+language_output_is("tcl",<<'TCL',<<'OUT',"braced operands.");
  set n 1
  puts [expr {$n * 1}]
 TCL
