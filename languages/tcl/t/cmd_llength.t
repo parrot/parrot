@@ -4,7 +4,6 @@ use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
 use Parrot::Test tests => 5;
 use Test::More;
-use vars qw($TODO);
 
 language_output_is("tcl",<<'TCL',<<OUT,"no elements");
   puts [llength [list]]
