@@ -303,14 +303,14 @@ done:
 dispatch_sub:
   $S0 = dispatch[char]
   $P0 = find_name $S0
-  (word, pos) = $P0(tcl_code, pos)
+  (word, pos) = $P0(tcl_code, chars, pos)
   inc pos
 
 really_done:
   .return(word, pos)
 .end
 
-=item C<(pmc word, int pos) = get_quote(string tcl_code, int pos)>
+=item C<(pmc word, int pos) = get_quote(string tcl_code, pmc chars, int pos)>
 
 Parses a quote and returns a TclWord object containing the separate
 parts (or, if there's only one, it's child).
@@ -324,6 +324,7 @@ parts (or, if there's only one, it's child).
 
 .sub get_quote
   .param string tcl_code
+  .param pmc chars
   .param int pos
   
   .local int start
@@ -343,7 +344,7 @@ loop:
   if $I0 == 92 goto backslash   # \
   if $I0 == 36 goto variable    # $
   if $I0 == 91 goto subcommand  # [
-  if $I0 == 34 goto done        # "
+  if $I0 == 34 goto check_chars # "
   goto loop
 backslash:
   inc pos
@@ -385,6 +386,19 @@ missing_quote:
   $P0["_message"] = "missing quote"
   throw $P0
 
+check_chars:
+  $I0 = pos + 1
+  if $I0 == len goto done
+  $I1 = is_whitespace tcl_code, $I0
+  if $I1 == 1 goto done
+  $I1 = ord tcl_code, $I0
+  $I1 = exists chars[$I1]
+  if $I1 == 1 goto done
+  
+  $P0 = new Exception
+  $P0["_message"] = "extra characters after close-quote"
+  throw $P0
+
 done:
   $I0 = pos - start
   $S0 = substr tcl_code, start, $I0
@@ -396,7 +410,7 @@ done:
   .return(word, pos)
 .end
 
-=item C<(pmc const, int pos) = get_brace(string tcl_code, int pos)>
+=item C<(pmc const, int pos) = get_brace(string tcl_code, pmc chars, int pos)>
 
 Parses a {} quoted expression, returning a TclConst object.
 
@@ -409,6 +423,7 @@ Parses a {} quoted expression, returning a TclConst object.
 
 .sub get_brace
   .param string tcl_code
+  .param pmc chars
   .param int pos
   
   .local int start, len
@@ -434,12 +449,25 @@ left:
   goto loop
 right:
   dec depth
-  if depth == 0 goto done
+  if depth == 0 goto check_chars
   goto loop
 
 missing_close_brace:
   $P0 = new Exception
   $P0["_message"] = "missing close-brace"
+  throw $P0
+
+check_chars:
+  $I0 = pos + 1
+  if $I0 == len goto done
+  $I1 = is_whitespace tcl_code, $I0
+  if $I1 == 1 goto done
+  $I1 = ord tcl_code, $I0
+  $I1 = exists chars[$I1]
+  if $I1 == 1 goto done
+  
+  $P0 = new Exception
+  $P0["_message"] = "extra characters after close-brace"
   throw $P0
 
 done:

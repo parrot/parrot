@@ -2,9 +2,8 @@
 
 use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 18;
+use Parrot::Test tests => 19;
 use Test::More;
-use vars qw($TODO);
 
 language_output_is("tcl",<<'TCL',<<OUT,"leading spacex2 should be ok");
    puts Parsing
@@ -124,15 +123,15 @@ TCL
 2
 OUT
 
-TODO: {
-local $TODO = "unimplemented";
-
-language_output_is("tcl",<<'TCL',<<'OUT',"no extra characters after close quote")
-set a 2
-puts [set "a"a]
-puts 1
+language_output_is("tcl",<<'TCL',<<'OUT',"extra characters after close-quote");
+  list "a"a
 TCL
-extra characters after close quote
+extra characters after close-quote
 OUT
 
-}
+language_output_is("tcl",<<'TCL',<<'OUT',"extra characters after close-brace");
+  list {a}a
+TCL
+extra characters after close-brace
+OUT
+
