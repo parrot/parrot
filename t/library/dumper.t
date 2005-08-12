@@ -935,12 +935,12 @@ OUTPUT
 # no. 27
 pir_output_is(<<'CODE', <<'OUTPUT', "custom dumper");
 .sub main @MAIN
-    .local pmc o, s,ds, cl
+    .local pmc o, cl
     cl = subclass 'ResizablePMCArray', 'bar'
     .local int id
     id = typeof cl
     o = new id
-    _dumper(s)
+    _dumper(o)
 .end
 
 .namespace ["bar"]
@@ -954,7 +954,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "custom dumper");
 .sub __dump method
     .param pmc dumper
     .param string label
-    print " __value => { \n"
+    print " __value => {\n"
     .local pmc ar
     ar = getattribute self, '__value'
     dumper.'dump'('attr', ar)
@@ -964,7 +964,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "custom dumper");
 .include 'library/dumper.imc'
 
 CODE
-"VAR1" => PMC 'bar'  __value => { 
+"VAR1" => PMC 'bar'  __value => {
 ResizablePMCArray (size:2) [
     1,
     2
