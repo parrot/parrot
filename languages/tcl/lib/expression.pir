@@ -187,7 +187,10 @@ get_number:
   if op_length == 0 goto get_operator
   # XXX otherwise, pull that number off
   # stuff the chunk onto the chunk_list
-  push chunks, value
+  chunk = new TclList
+  chunk[0] = INTEGER
+  chunk[1] = value
+  push chunks, chunk
   chunk_start = chunk_start + op_length
   goto chunk_loop
  
@@ -735,9 +738,8 @@ failure:
 finish_up:
    $S0 = substr expr, start, pos
    $I0 = $S0
-   value = new TclList
-   value[0] = INTEGER
-   value[1] = $I0 
+   value = new TclInt
+   value = $I0 
 
 real_done:
   .return(pos,INTEGER,value)
@@ -950,7 +952,6 @@ was this a valid tcl-style level, or did we get this value as a default?
 .sub __get_call_level
   .param pmc tcl_level
   .local pmc parrot_level, defaulted, orig_level
-  parrot_level = new Integer
   defaulted = new Integer
   defaulted = 0
 
@@ -959,7 +960,6 @@ was this a valid tcl-style level, or did we get this value as a default?
   orig_level = current_call_level
  
   .local int num_length, num_type
-  .local pmc num_result
 
 get_absolute:
   # Is this an absolute? 
@@ -967,25 +967,23 @@ get_absolute:
   $S1 = substr $S0, 0, 1
   if $S1 != "#" goto get_integer
   $S0 = tcl_level
-  (num_length,num_type,num_result) = __expr_get_number($S0,1)
+  (num_length,num_type,parrot_level) = __expr_get_number($S0,1)
   if num_type != INTEGER goto default 
   $S0 = tcl_level
   $I0 = length $S0
 
   dec $I0
   if $I0 != num_length goto default
-  parrot_level = num_result[1]
   goto bounds_check
  
 get_integer:
   # Is this an integer? 
   $S0 = tcl_level
-  (num_length,num_type,num_result) = __expr_get_number($S0,0)
+  (num_length,num_type,parrot_level) = __expr_get_number($S0,0)
   if num_type != INTEGER goto default 
   $S0 = tcl_level
   $I0 = length $S0
   if $I0 != num_length goto default
-  parrot_level = num_result[1]
   parrot_level = orig_level - parrot_level
   goto bounds_check
  

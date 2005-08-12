@@ -31,10 +31,9 @@
   if $S0 == "end-" goto has_end
   index_length = length $S0
   # is this an int?
-  (number_length,number_type,number_result) = __expr_get_number(position,0)
+  (number_length,number_type,retval) = __expr_get_number(position,0)
   if number_type != INTEGER goto bad_arg
   if number_length != index_length goto bad_arg
-  retval = number_result[1] 
   goto done
 
   #if not, fail.
@@ -55,7 +54,7 @@ has_end:
   if number_type != INTEGER goto bad_arg
   if number_length != index_length goto bad_arg
   # say, 1 if -1
-  $I0 = number_result[1]
+  $I0 = number_result
   # say, 2 if -2
   inc $I0
  
