@@ -593,8 +593,9 @@ help :
 	@echo "                     Valid cores are b, C, f, g, j, r, S."
 	@echo "  src_tests:         Run test in C-file."
 	@echo "  perl_tests:        Test the Perl modules in the distribution."
+	@echo "  testexex:          Testing the exex runcore."
 	@echo "  testbench:         Run all benchmarks."
-	@echo "  manitest:          Check for new files."
+	@echo "  manitest:          Check for new and missing files."
 	@echo ""
 	@echo "Benchmarks:"
 	@echo "  mopsbench:         Million operations"
@@ -1394,7 +1395,7 @@ reconfig : clean
 	$(PERL) Configure.pl --reconfig
 
 manitest :
-	$(PERL) "-MExtUtils::Manifest=fullcheck" -e fullcheck
+	$(PERL) tools/dev/manicheck.pl
 
 ###############################################################################
 #
@@ -1508,8 +1509,3 @@ tags:	tags.dummy
 	$(PERL) editor/addtags ops/*.ops
 
 tags.dummy:
-
-# test the EXEC stuff
-
-testexec: hello
-
