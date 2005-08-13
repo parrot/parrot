@@ -370,6 +370,9 @@ Parrot_jit_bytejump(Parrot_jit_info_t *jit_info,
                     Interp *interpreter, int reg_num)
 {
 
+    /* fixup where we have the Parrot registers - context switches */
+    emitm_ld_i(jit_info->native_ptr, emitm_i(0), offsetof(Interp, ctx.bp), Parrot_jit_regbase);
+
     /* Construct the starting address of the byte code */
     emitm_sethi(jit_info->native_ptr, emitm_hi22(interpreter->code->base.data),
         XSR1);
