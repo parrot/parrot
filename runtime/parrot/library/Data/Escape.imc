@@ -62,7 +62,7 @@ This function returns the quoted string.
 
     i = 0
     j = length str
-    null ret
+    ret = ""
 LOOP:
     if i >= j goto END
     tmp = str[i]
@@ -101,7 +101,7 @@ n13:
     $S0 = sprintf "%o", $P0
     concat tmp, $S0
     branch DONE
-    
+
 gt31: # ascii codes greater than 31 below
 
     # "
@@ -120,8 +120,8 @@ n39:
 
 gt40: # ascii codes greater than 40 below
 
-    if c != 92 goto DONE 
-    set tmp, "\\\\" 
+    if c != 92 goto DONE
+    set tmp, "\\\\"
     branch DONE
 
 DONE:
