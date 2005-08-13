@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 43;
+use Parrot::Test tests => 44;
 use Test::More;
 use vars qw($TODO);
 
@@ -247,6 +247,12 @@ language_output_is("tcl",<<TCL,<<OUT,"parens");
  puts [expr 2*(3+4)*2]
 TCL
 28
+OUT
+
+language_output_is("tcl",<<'TCL',<<'OUT',"premature end of expr '('");
+  puts [expr "("]
+TCL
+syntax error in expression "(": premature end of expression
 OUT
 
 TODO: {

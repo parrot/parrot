@@ -18,7 +18,6 @@ however, then we're returning the invokable PMC.
 
 .sub __expression_parse
   .param string expr
-  .param pmc foo
   
   .local pmc retval
   .local int return_type
@@ -30,7 +29,6 @@ however, then we're returning the invokable PMC.
   .local pmc precedences  # Global list of operator precedence
   precedences = find_global "_Tcl", "precedence"
 
-got_arg:
   .local pmc undef
   undef = new Undef
 
@@ -39,20 +37,13 @@ got_arg:
   .local pmc program_stack
   program_stack = new TclList
 
-  .local int chunk_start
+  .local int chunk_start, chunk_end
   chunk_start = 0
-  .local int chunk_end
-  chunk_end = 0
+  chunk_end   = 0
+  
   .local int char
   .local int expr_length
   expr_length = length expr
-
-  #print "CALLED WITH "
-  #print expr
-
-# Split the string into an array of chunks
-# right now we're just handling integer operands. that's it.
-
   .local int op_length
 
 chunk_loop:
@@ -79,7 +70,7 @@ get_parenthetical:
   $I1   = chunk_start
 get_paren_loop:
   inc $I1
-  if $I1 >= expr_length goto die_horribly
+  if $I1 >= expr_length goto premature_end
   $I0 = ord expr, $I1
   if $I0 == 41 goto get_paren_loop_right
   if $I0 == 40 goto get_paren_loop_left
@@ -356,6 +347,14 @@ die_horribly:
   return_type = TCL_ERROR 
   program_stack = new String
   program_stack = "An error occurred in EXPR"
+  goto converter_done
+
+premature_end:
+  return_type = TCL_ERROR
+  program_stack = new String
+  program_stack = "syntax error in expression \""
+  program_stack .= expr
+  program_stack .= "\": premature end of expression"
 
 converter_done: 
   #print "converter done\n"
