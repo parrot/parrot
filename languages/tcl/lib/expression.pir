@@ -109,44 +109,16 @@ get_paren_done:
   goto chunk_loop
  
 get_variable:
-  .local pmc varname
-
-  # XXX expr_get_variable should just call __get_var for us, 
-  # so we don't have to jump through these hoops.
-
-  (op_length,retval) = __expr_get_variable(expr,chunk_start) 
-  if op_length == 0 goto get_function
- 
-  $I0 = retval
-  if $I0 == 2 goto got_array
-  $S0 = retval[0]
-  ($I0,retval) = __get_var($S0)
-  goto get_variable_continue
-got_array:
-  $S0 = retval[0]
-  $S1 = retval[1]
-  ($I0,retval) = __get_var($S0,$S1)
-
-get_variable_continue:
-  # XXX This is a hack until we deal with types better in 
-  $N1 = retval
-  retval = new TclFloat
+  (retval, chunk_start) = parse_variable(expr, chunk_start)
+  $P0 = retval."interpret"()
+  $N1 = $P0
+  retval = new TclInt
   retval = $N1
-  #print "__get_var returned something of type:"
-  $S0 = typeof retval
-  #print $S0
-  #print "\n"
-  # XXX ignoring $I0 at the minute.
-  #(return_type,retval) = __expression($P0)
-  #error_S = retval
-  #if return_type == TCL_ERROR goto die_horribly
-  # Temporarily pump this out to the array.
+  
   chunk = new TclList
   chunk[0] = INTEGER
   chunk[1] = retval
   push chunks, chunk
- 
-  chunk_start = chunk_start + op_length
   dec chunk_start
   goto chunk_loop
 
@@ -744,114 +716,6 @@ finish_up:
 
 real_done:
   .return(pos,INTEGER,value)
-.end
-
-# given a string, starting at position, return the length
-# of the variable name found at that position. return 0
-# if this doesn't look like a variable. If the return value
-# is non zero, also return a array-ish PMC that either has a
-# single element ($name or ${name}), or two elements
-# $name{index}
-
-.sub __expr_get_variable
-  .param string expr
-  .param int start
-
-  .local int pos
-  pos = 0 
-
-  .local pmc varname
-  varname = new FixedPMCArray
-
-  .local int expr_length
-  expr_length = length expr
-
-  # is this even a variable?
-  $I0 = ord expr, start
-  if $I0 != 36 goto real_done
- 
-  inc start 
-  $I0 = ord expr, start
-  if $I0 == 123 goto braced  
-
-  pos = start
-var_loop:
-  # a regular variable, "letter, digit, underscore, two or more colons"
-  # (XXX not really handling multiple colons right now)
-  
-  # paren - 40  
-  # digit  48-57
-  # colon 58 
-  # LETTER 65-90
-  # underscore 95
-  # letter  97-122
-
-  if pos >= expr_length goto var_loop_done 
-
-  $I0 = ord expr, pos
-  if $I0 == 40 goto indexed_var 
-  if $I0 <  48 goto var_loop_done
-  if $I0 <= 58 goto var_loop_next
-  if $I0 <  65 goto var_loop_done
-  if $I0 <= 90 goto var_loop_next   
-  if $I0 == 95 goto var_loop_next
-  if $I0 <  97 goto var_loop_done
-  if $I0 > 122 goto var_loop_done
-  #  (only thing left is a letter, so fall through) 
-
-var_loop_next:
-  inc pos
-  goto var_loop
-
-var_loop_done:
-
-  $I0 = pos - start
-  
-  $S0 = substr expr, start, $I0
-  varname = 1
-  varname[0] = $S0
-  goto real_done
-
-indexed_var:
-  # just like var_loop_done, mark the name of the var
-  dec pos
-  $I0 = pos - start
-  $S0 = substr expr, start, $I0
-  varname = 2 
-  varname[0] = $S0
-  
-  # now, move to the beginning of the index, find the closing paren
-  pos = pos + 2
-  index $I1, ")", expr, pos
- 
-  $I2 = $I1 - pos
-  $S0 = substr expr, pos, $I2
-  varname[1] = $S0
-  goto real_done 
- 
-braced:   
-  inc start # now at the character right after the {
-  # "may contain any characters whatsoever except for close braces"
-  # (so, next close brace closes us.) - 125
-  index $I0, expr, "}", start
-  if $I0 == -1 goto real_done # XXX need to somehow error here.
-  pos = $I0 
- 
-  $I1 = $I0 - start
-  $S0 = substr expr, start, $I1
-  varname[0] = $S0
-
-  
-real_done:
-
-dd:
-  #print "pos is"
-  #print pos
-  #print "\n&&varname is"
-  #print $S0
-  #print "\n"
-
-  .return(pos,varname)
 .end
 
 .sub __expr_get_function

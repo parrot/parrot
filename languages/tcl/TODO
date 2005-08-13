@@ -61,18 +61,6 @@ TclList's new_from_string method should use the string to list code
 
 =over 4
 
-=item __set/__read
-
-All commands should use the __set and __read functions defined in
-variables.pir instead of get_var. __read's interface conflicts slightly
-with the way tclparser splits things up - it over-helpfully tries to 
-break the variable part out into array and index - while read is
-already doing that for us.
-
-On a related note: No builtins or library code should be dealing with var
-sigils (i.e. C<$>) other than __set and __read {{ possibly array, since
-it needs to fetch the entire array: gen a new sub for this }}
-
 =item implement default globals, etc.
 
 global variables provided by tcl libary. L<tclvars>.

@@ -61,7 +61,6 @@ lib${slash}commands${slash}upvar.pir \
 lib${slash}commands${slash}while.pir \
 lib${slash}conversions.pir \
 lib${slash}expression.pir \
-lib${slash}get_var.pir \
 lib${slash}interpret.pir \
 lib${slash}list.pir \
 lib${slash}list_to_string.pir \
