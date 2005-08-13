@@ -111,9 +111,9 @@ get_paren_done:
 get_variable:
   (retval, chunk_start) = parse_variable(expr, chunk_start)
   $P0 = retval."interpret"()
-  $N1 = $P0
+  $I0 = $P0
   retval = new TclInt
-  retval = $N1
+  retval = $I0
   
   chunk = new TclList
   chunk[0] = INTEGER
@@ -342,29 +342,24 @@ converter_done:
   
    # is this dup neeeded?
   .local pmc program_stack
-  # _dumper(args,"ARGS")
    program_stack = args
   .local pmc result_stack
   result_stack = new TclList
   .local pmc retval
   .local int return_type
-# evaluate the stack.
+  
 stack_evaluator:
-  #print "STACK_EVALUATOR\n"
  # while the prog stack exists:
  .local int size
  size = program_stack
  if size == 0 goto stack_done
- #print "stack_eval2?\n"
  
  .local int type
  .local pmc chunk
- pop chunk, program_stack
- #print "stack_eval3?\n"
+ chunk = pop program_stack
  $I10 = typeof chunk
  if $I10 == .Undef goto stack_evaluator
- type = chunk[0] 
- #print "stack_eval4?\n"
+ type = chunk[0]
 
  # move all non op non funcs to the value stack
  if type == OP goto do_op
@@ -604,30 +599,23 @@ done_op:
   #goto evaluation_done
 
 stack_done:
-  #print "STACK_DONE\n"
   $I0 = result_stack
-  #error_S = "no stack left."
   if $I0 == 0 goto die_horribly
-  pop retval, result_stack
+  retval = pop result_stack
   goto evaluation_done
 
 die_horribly:
-  #print "dying horribly\n"
   return_type = TCL_ERROR 
   retval = new String
   retval = "An error occurred in EXPR"
   goto evaluation_return
 
 evaluation_done:
-  #print "EVALUATION_DONE:\n"
   return_type = TCL_OK 
-  #retval = retval[1] # skip the extra PMC here.
-  $P1 = retval[1]
+  retval = retval[1]
 
 evaluation_return:
-  .return(return_type,$P1)
-  #.return(return_type,retval)
-   
+  .return(return_type,retval)
 .end
 
 # given a string, starting at position, return the length

@@ -255,6 +255,13 @@ TCL
 syntax error in expression "(": premature end of expression
 OUT
 
+language_output_is("tcl",<<'TCL',<<'OUT',"braced operands.");
+ set n 1
+ puts [expr {$n * 1}]
+TCL
+1
+OUT
+
 TODO: {
 local $TODO = "bugs";
 
@@ -262,13 +269,6 @@ language_output_is("tcl",<<'TCL',<<'OUT',"float division");
 puts [expr 1 / 3.0]
 TCL
 0.333333333333
-OUT
-
-language_output_is("tcl",<<'TCL',<<'OUT',"braced operands.");
- set n 1
- puts [expr {$n * 1}]
-TCL
-1
 OUT
 
 language_output_is("tcl",<<'TCL',<<'OUT',"nested expr (braces)");
