@@ -26,7 +26,7 @@
     subcommand_proc = find_global "_Tcl\0builtins\0array", subcommand_name
 resume:
   clear_eh
-  isnull subcommand_proc, bad_args
+  if_null subcommand_proc, bad_args
 
   .local int is_array
   .local string array_name, sigil_array_name
@@ -51,7 +51,7 @@ resume_var:
 
   catch_var:
 
-  isnull the_array, array_no
+  if_null the_array, array_no
   $I99 = does the_array, "hash"
   if $I99==0 goto array_no
 
@@ -169,7 +169,7 @@ pre_loop:
   .local pmc set
   set = find_global  "_Tcl", "__set"
 
-  isnull the_array, new_array
+  if_null the_array, new_array
   goto set_loop
 
 new_array:

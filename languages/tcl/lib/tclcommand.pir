@@ -61,7 +61,7 @@ Execute the command.
   
   # we can't delete commands, so we store deleted commands
   # as null PMCs
-  isnull cmd, no_command
+  if_null cmd, no_command
 
 execute:
   .local pmc args

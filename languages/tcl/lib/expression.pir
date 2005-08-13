@@ -206,7 +206,7 @@ two_char:
   op_len = 2
   test_op = substr expr, chunk_start, op_len
   $P11 = ops[test_op]
-  isnull $P11, one_char
+  if_null $P11, one_char
   $I1 = typeof $P11
   if $I1 == .Undef goto one_char
   goto op_done
@@ -216,7 +216,7 @@ one_char:
   op_len = 1
   test_op = substr expr, chunk_start, op_len
   $P11 = ops[test_op]
-  isnull $P11, op_fail
+  if_null $P11, op_fail
   $I1 = typeof $P11
   if $I1 == .Undef goto op_fail
   goto op_done
@@ -286,7 +286,7 @@ converter_loop:
   if precedence_level > MAX_PRECEDENCE goto converter_done
   if stack_index >= input_len goto precedence_done
   our_op = chunks[stack_index]
-  isnull our_op, converter_next
+  if_null our_op, converter_next
   $I0 = typeof our_op
   if $I0 == .Undef goto converter_next
   $I2 = our_op[0]
@@ -308,7 +308,7 @@ right_arg:
   $I2 = stack_index + 1
   if $I2 >= input_len goto left_arg
   retval = chunks[$I2]
-  isnull retval, left_arg
+  if_null retval, left_arg
   chunks[$I2] = undef
   inc $I4
   program_stack = unshift retval
@@ -323,7 +323,7 @@ left_arg:
   $I2 = stack_index - 1
   if $I2 < 0 goto shift_op
   retval = chunks[$I2]
-  isnull retval, shift_op
+  if_null retval, shift_op
   chunks[$I2] = undef
   inc $I4
   program_stack = unshift retval
@@ -905,7 +905,7 @@ loop_done:
   $P1 = find_global "_Tcl", "functions"
   
   func = $P1[$S0]
-  isnull func, fail 
+  if_null func, fail 
   $I0 = typeof func
   if $I0 == .Undef goto fail
 

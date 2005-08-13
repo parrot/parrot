@@ -81,7 +81,7 @@ found_comment:
 done_comment:
   .local pmc command
   (command, pos) = get_command(tcl_code, chars, pos)
-  isnull command, done
+  if_null command, done
   
   push commands, command
   goto next_command
@@ -120,7 +120,7 @@ get:
   if pos >= len goto check
   (word, pos) = get_word(tcl_code, chars, pos)
   inc pos
-  isnull word, get
+  if_null word, get
   $S0 = word
   $I0 = ord $S0, 0
   if $I0 == 35 goto got_comment
@@ -157,7 +157,7 @@ get:
   # try to get a command name
   .local pmc word
   (word, pos) = get_word(tcl_code, chars, pos)
-  isnull word, check
+  if_null word, check
   
   $I0 = find_type "TclCommand"
   command = new $I0
@@ -165,7 +165,7 @@ get:
   
 next_word:
   (word, pos) = get_word(tcl_code, chars, pos)
-  isnull word, done
+  if_null word, done
   push command, word
   goto next_word
 
@@ -294,7 +294,7 @@ have_word:
   goto done
 
 done:
-  isnull word, really_done
+  if_null word, really_done
   $I0 = word
   if $I0 != 1 goto really_done
   word = word[0]

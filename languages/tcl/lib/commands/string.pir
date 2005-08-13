@@ -18,7 +18,7 @@
     subcommand_proc = find_global "_Tcl\0builtins\0string", subcommand_name
 resume:
   clear_eh
-  isnull subcommand_proc, bad_args
+  if_null subcommand_proc, bad_args
   .return subcommand_proc(argv)
 
 catch:

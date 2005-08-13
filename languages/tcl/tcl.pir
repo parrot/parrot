@@ -49,7 +49,7 @@ input_loop:
   register $P1
   (retcode,retval) = interpret($P1)
   # print out the result of the evaluation.
-  isnull retval, input_loop
+  if_null retval, input_loop
   if retval == "" goto input_loop
   print retval
   print "\n"

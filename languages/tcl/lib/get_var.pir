@@ -41,7 +41,7 @@ get_scalar_global:
 resume:
   clear_eh
 
-  isnull variable, no_such_variable 
+  if_null variable, no_such_variable 
   $I0 = does variable, "hash"
   unless $I0 goto get_scalar_ok
 
@@ -101,7 +101,7 @@ get_indexed_global:
 resume:
   clear_eh
 
-  isnull variable, no_such_variable
+  if_null variable, no_such_variable
   $I0 = does variable, "hash"
   unless $I0 goto get_indexed_bad
 

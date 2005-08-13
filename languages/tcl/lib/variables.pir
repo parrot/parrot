@@ -41,7 +41,7 @@ array:
   key = substr name, char, len
   
   variable = __find_var(var)
-  isnull variable, no_such_variable
+  if_null variable, no_such_variable
   
   $I0 = does variable, "hash"
   unless $I0 goto cant_read_not_array
@@ -52,7 +52,7 @@ array:
   #unless $I0 goto bad_index
 
   variable = variable[key]
-  isnull variable,bad_index 
+  if_null variable, bad_index 
   .return(TCL_OK, variable)
 
 bad_index:
@@ -73,7 +73,7 @@ cant_read_not_array:
 
 scalar:
   variable = __find_var(name)
-  isnull variable, no_such_variable
+  if_null variable, no_such_variable
   
   $I0 = does variable, "hash"
   if $I0 goto cant_read_array
@@ -139,7 +139,7 @@ find_array:
   .local pmc array
   null array
   array = __find_var(var)
-  isnull array, create_array
+  if_null array, create_array
 
   $I0 = does array, "hash"
   unless $I0 goto cant_set_not_array
