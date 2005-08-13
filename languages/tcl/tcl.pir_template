@@ -25,8 +25,7 @@ providing a compreg-compatible method.
 
   .const int OP      = 20
   .const int FUNC    = 21
-  # XXX Should be changed to OPERAND
-  .const int INTEGER = 11
+  .const int OPERAND = 11
  
   # Still not sure if these are going to be useful
   .const int BLOCK   = 14

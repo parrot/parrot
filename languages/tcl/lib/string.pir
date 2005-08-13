@@ -20,7 +20,6 @@
   .local pmc retval
   .local int index_length
   .local int number_length
-  .local int number_type
   .local pmc number_result
 
   .local int index_1
@@ -31,9 +30,10 @@
   if $S0 == "end-" goto has_end
   index_length = length $S0
   # is this an int?
-  (number_length,number_type,retval) = __expr_get_number(position,0)
-  if number_type != INTEGER goto bad_arg
+  (number_length,retval) = __expr_get_number(position,0)
   if number_length != index_length goto bad_arg
+  $I0 = isa retval, "Integer"
+  if $I0 == 0 goto bad_arg
   goto done
 
   #if not, fail.
@@ -50,9 +50,10 @@ has_end:
   index_length = length position
   index_length -= 4  # ignore "end-"
   # is this an int?
-  (number_length,number_type,number_result) = __expr_get_number(position,4)
-  if number_type != INTEGER goto bad_arg
+  (number_length,number_result) = __expr_get_number(position,4)
   if number_length != index_length goto bad_arg
+  $I0 = isa number_result, "Integer"
+  if $I0 == 0 goto bad_arg
   # say, 1 if -1
   $I0 = number_result
   # say, 2 if -2

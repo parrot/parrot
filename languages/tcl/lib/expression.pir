@@ -101,7 +101,7 @@ get_paren_done:
   if return_type == TCL_ERROR goto die_horribly
 
   chunk = new TclList
-  chunk[0] = INTEGER
+  chunk[0] = OPERAND
   chunk[1] = retval
 
   push chunks, chunk
@@ -116,7 +116,7 @@ get_variable:
   retval = $I0
   
   chunk = new TclList
-  chunk[0] = INTEGER
+  chunk[0] = OPERAND
   chunk[1] = retval
   push chunks, chunk
   dec chunk_start
@@ -144,15 +144,14 @@ get_function:
 get_number:
   #print "GET_NUMBER\n"
   # If we got here, then char and chunk_start are already set properly
-  .local int num_type
   .local pmc value
-  (op_length,num_type,value) = __expr_get_number(expr,chunk_start)
+  (op_length,value) = __expr_get_number(expr,chunk_start)
   #print "GOT_NUMBER\n"
   if op_length == 0 goto get_operator
   # XXX otherwise, pull that number off
   # stuff the chunk onto the chunk_list
   chunk = new TclList
-  chunk[0] = INTEGER
+  chunk[0] = OPERAND
   chunk[1] = value
   push chunks, chunk
   chunk_start += op_length
@@ -262,7 +261,7 @@ converter_loop:
   $I0 = typeof our_op
   if $I0 == .Undef goto converter_next
   $I2 = our_op[0]
-  if $I2 == INTEGER goto converter_next
+  if $I2 == OPERAND goto converter_next
   if $I2 == CHUNK   goto converter_next
   if $I2 == OP   goto is_opfunc
   if $I2 == FUNC goto is_opfunc # XXX should eventually go away as we make functions part of "CHUNK", above.
@@ -587,7 +586,7 @@ done_op:
   #print "\n"
   $P5 = new FixedPMCArray
   $P5 = 2
-  $P5[0] = INTEGER
+  $P5[0] = OPERAND
   $P5[1] = op_result
   push result_stack, $P5
 
@@ -703,7 +702,7 @@ finish_up:
    value = $I0 
 
 real_done:
-  .return(pos,INTEGER,value)
+  .return(pos,value)
 .end
 
 .sub __expr_get_function
@@ -777,7 +776,7 @@ loop_done:
   ($I9,operand) = __expression_interpret(operand)  
   $P10 = new FixedPMCArray
   $P10 = 2
-  $P10[0] = INTEGER
+  $P10[0] = OPERAND
   $P10[1] = operand
   operand = $P10
   if $I9 == TCL_ERROR goto fail
@@ -812,7 +811,7 @@ was this a valid tcl-style level, or did we get this value as a default?
   current_call_level = find_global "_Tcl", "call_level"
   orig_level = current_call_level
  
-  .local int num_length, num_type
+  .local int num_length
 
 get_absolute:
   # Is this an absolute? 
@@ -820,8 +819,9 @@ get_absolute:
   $S1 = substr $S0, 0, 1
   if $S1 != "#" goto get_integer
   $S0 = tcl_level
-  (num_length,num_type,parrot_level) = __expr_get_number($S0,1)
-  if num_type != INTEGER goto default 
+  (num_length,parrot_level) = __expr_get_number($S0,1)
+  $I0 = isa parrot_level, "Integer"
+  if $I0 == 0 goto default
   $S0 = tcl_level
   $I0 = length $S0
 
@@ -832,8 +832,9 @@ get_absolute:
 get_integer:
   # Is this an integer? 
   $S0 = tcl_level
-  (num_length,num_type,parrot_level) = __expr_get_number($S0,0)
-  if num_type != INTEGER goto default 
+  (num_length,parrot_level) = __expr_get_number($S0,0)
+  $I0 = isa parrot_level, "Integer"
+  if $I0 == 0 goto default
   $S0 = tcl_level
   $I0 = length $S0
   if $I0 != num_length goto default
