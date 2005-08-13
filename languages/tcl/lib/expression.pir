@@ -37,34 +37,35 @@ however, then we're returning the invokable PMC.
   .local pmc program_stack
   program_stack = new TclList
 
-  .local int chunk_start, chunk_end
-  chunk_start = 0
-  chunk_end   = 0
-  
+  .local int chunk_start
+  chunk_start = -1 # we inc before we use it
+
   .local int char
   .local int expr_length
   expr_length = length expr
   .local int op_length
 
 chunk_loop:
-  #print "CHUNK_LOOP\n"
+  inc chunk_start
   if chunk_start >= expr_length goto chunks_done
   
-  # Is this a space? skip it and try again, otherwise, fall through.
   $I0 = is_whitespace expr, chunk_start
-  if $I0 == 0 goto get_parenthetical
-
-  inc chunk_start
-  inc chunk_end
-  goto chunk_loop
+  if $I0 == 1 goto chunk_loop
+  
+  $I0 = is_digit expr, chunk_start
+  if $I0 == 1 goto get_number
+  
+  $I0 = ord expr, chunk_start
+  if $I0 == 40 goto get_parenthetical # (
+  if $I0 == 36 goto get_variable      # $
+  if $I0 == 46 goto get_number        # .
+  
+  $I0 = is_wordchar expr, chunk_start
+  if $I0 == 1 goto get_function
+  
+  goto get_operator
 
 get_parenthetical:
-  # are we on an open paren? then figure out what's inside the
-  # string and call ourselves recursively.
-  # (XXX should unroll this recursion.)
-
-  char = ord expr, chunk_start
-  if char != 40 goto get_variable # (
   .local int depth
   depth = 1
   $I1   = chunk_start
@@ -105,7 +106,6 @@ get_paren_done:
 
   push chunks, chunk
   chunk_start += $I0
-  inc chunk_start
   goto chunk_loop
  
 get_variable:
@@ -147,7 +147,7 @@ get_variable_continue:
   push chunks, chunk
  
   chunk_start = chunk_start + op_length
-
+  dec chunk_start
   goto chunk_loop
 
 get_function:
@@ -165,7 +165,8 @@ get_function:
   chunk[2] = -1 # functions trump operands, for now.
   push chunks, chunk
   push chunks, result
-  chunk_start = chunk_start + op_length
+  chunk_start += op_length
+  dec chunk_start
   goto chunk_loop
 
 get_number:
@@ -182,7 +183,8 @@ get_number:
   chunk[0] = INTEGER
   chunk[1] = value
   push chunks, chunk
-  chunk_start = chunk_start + op_length
+  chunk_start += op_length
+  dec chunk_start
   goto chunk_loop
  
 get_operator:
@@ -237,8 +239,8 @@ op_done:
 
   push chunks, chunk
 
-  chunk_start = chunk_start + op_len
-
+  chunk_start += op_len
+  dec chunk_start
   goto chunk_loop
 
   # if we don't match any of the possible cases so far, then we must
