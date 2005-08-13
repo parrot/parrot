@@ -635,46 +635,6 @@ evaluation_return:
 
   pos = start
   if pos >= len goto failure
-  
-  goto decimal
-
-first_digit:
-  # Is the first digit a 0? if so, this is octal or hex.
-  $I0 = ord expr, pos
-  if $I0 != 48 goto decimal
-  #inc pos
-  #ord $I0, expr, pos
-  #if $I0 == 120 goto hexadecimal
-
-  # XXX The octal code path doesn't work.
-
-octal:
-  inc pos
-octal_loop:
-  if pos>=len goto octal_loop_done
-  $I0 = ord expr,pos
-  if $I0 > 55 goto octal_loop_done # ">8"
-  if $I0 < 48 goto octal_loop_done # "<0
-  flag = 1
-  inc pos
-  goto octal_loop
-octal_loop_done:
-  pos = pos - start
-  if flag == 1 goto octal_finish_up
-  goto failure
-octal_finish_up:
-  # get the string containing the octal digits.
-  inc start
-  dec pos
-
-  $S0 = substr expr, start, pos
-  $P1 = new TclList
-  $P1[0] = $S0
-
-  sprintf $S0, "%o", $P1
-  $I0 = $S0
-  value = $I0
-  goto real_done
 
 decimal:
   flag = 0 
