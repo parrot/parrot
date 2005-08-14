@@ -627,39 +627,30 @@ evaluation_return:
 
   .local int len
   len = length expr
-  .local int pos 
-  .local int char 
-  .local int flag
+  .local int pos
   .local pmc value
-  value = new Integer
+  null value
 
   pos = start
   if pos >= len goto failure
 
 decimal:
-  flag = 0 
-loop: 
   # cheat
   if pos >= len goto loop_done
   $I0 = ord expr, pos
   if $I0 > 57 goto loop_done # > "9"
   if $I0 < 48 goto loop_done # < "0"
-  flag = 1
   inc pos
-  goto loop 
+  goto decimal 
 loop_done:
-   pos = pos - start
-   if flag == 1 goto finish_up
-
-failure:
-   pos = 0
-   goto real_done
+   pos -= start
+   if pos == 0 goto real_done # failure
 
 finish_up:
    $S0 = substr expr, start, pos
    $I0 = $S0
    value = new TclInt
-   value = $I0 
+   value = $I0
 
 real_done:
   .return(pos,value)
