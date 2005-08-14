@@ -623,36 +623,54 @@ evaluation_return:
 
 .sub __expr_get_number
   .param string expr
-  .param int start
+  .param int pos
 
   .local int len
   len = length expr
-  .local int pos
+  .local int char, start
   .local pmc value
   null value
 
-  pos = start
+  start = pos
   if pos >= len goto failure
 
-decimal:
-  # cheat
-  if pos >= len goto loop_done
-  $I0 = ord expr, pos
-  if $I0 > 57 goto loop_done # > "9"
-  if $I0 < 48 goto loop_done # < "0"
+integer:
+  if pos >= len goto integer_done
+  char = ord expr, pos
+  if char > 57 goto integer_done # > "9"
+  if char < 48 goto integer_done # < "0"
   inc pos
-  goto decimal 
-loop_done:
-   pos -= start
-   if pos == 0 goto real_done # failure
+  goto integer 
+integer_done:
+  if char == 46 goto floating
+  pos -= start
+  if pos == 0 goto done # failure
+  
+  $S0 = substr expr, start, pos
+  $I0 = $S0
+  value = new TclInt
+  value = $I0
+  goto done
 
-finish_up:
-   $S0 = substr expr, start, pos
-   $I0 = $S0
-   value = new TclInt
-   value = $I0
+floating:
+  inc pos
+float_loop:
+  if pos >= len goto float_done
+  char = ord expr, pos
+  if char > 57 goto float_done # > "9"
+  if char < 48 goto float_done # < "0"
+  inc pos
+  goto float_loop
+float_done:
+  pos -= start
+  
+  $S0 = substr expr, start, pos
+  $N0 = $S0
+  value = new TclFloat
+  value = $N0
+  # goto done
 
-real_done:
+done:
   .return(pos,value)
 .end
 
