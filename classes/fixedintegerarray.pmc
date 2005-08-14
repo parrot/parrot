@@ -65,11 +65,14 @@ which is a string I<"(el0, el1, ...)">.
             SELF = constant_pmc_new(INTERP, type);
         else
             SELF = pmc_new(INTERP, type);
-        if ((l = string_length(INTERP, rep)) <= 2)      /* "()" - no args */
+        l = string_length(INTERP, rep);
+        if (!l)
             return SELF;
         if (rep->encoding != Parrot_fixed_8_encoding_ptr)
             real_exception(INTERP, NULL, E_ValueError,
                     "unhandled string encoding in constructor");
+        if (l <= 2 && ((char*)rep->strstart)[0] == '(')   /* "()" - no args */
+            return SELF;
         /* count commas */
         p = rep->strstart;
         for (i = l, n = 0; i; --i, ++p) {
