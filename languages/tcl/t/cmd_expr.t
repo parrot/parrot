@@ -262,14 +262,14 @@ TCL
 1
 OUT
 
-TODO: {
-local $TODO = "bugs";
-
 language_output_is("tcl",<<'TCL',<<'OUT',"float division");
 puts [expr 1 / 3.0]
 TCL
 0.333333333333
 OUT
+
+TODO: {
+local $TODO = "bugs";
 
 language_output_is("tcl",<<'TCL',<<'OUT',"nested expr (braces)");
  puts [expr {2 * [expr {2 - 1}]}];
