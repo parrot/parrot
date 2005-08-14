@@ -52,7 +52,7 @@ help_debug(void)
     "--parrot-debug -D [Flags] ...\n"
     "    0001    memory statistics\n"
     "    0002    print backtrace on exception\n"
-    "    0004    JIT debuggin\n"
+    "    0004    JIT debugging\n"
     "    0008    interpreter startup\n"
     "    0010    thread debugging\n"
     "    0020    eval/compile\n"

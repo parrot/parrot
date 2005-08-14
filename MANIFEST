@@ -654,7 +654,6 @@ imcc/docs/imcfaq.pod                              [main]doc
 imcc/docs/macros.pod                              [main]doc
 imcc/docs/operation.pod                           [main]doc
 imcc/docs/parsing.pod                             [main]doc
-imcc/docs/running.pod                             [main]doc
 imcc/docs/syntax.pod                              [main]doc
 imcc/examples/README                              [main]doc
 imcc/examples/sample.imc                          [main]doc
