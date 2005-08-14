@@ -42,6 +42,10 @@ This document describes parrot's command line options.
 If this environment variable is set, parrot will use this path as runtime
 prefix instead of the compiled in path.
 
+=item PARROT_GC_DEBUG
+
+Turn on the I<--gc-debug> flag.
+
 =back
 
 =head1 OPTIONS
