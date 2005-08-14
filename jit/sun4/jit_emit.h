@@ -371,13 +371,21 @@ Parrot_jit_bytejump(Parrot_jit_info_t *jit_info,
 {
 
     /* fixup where we have the Parrot registers - context switches */
-    emitm_ld_i(jit_info->native_ptr, emitm_i(0), offsetof(Interp, ctx.bp), Parrot_jit_regbase);
+    emitm_ld_i(jit_info->native_ptr, emitm_i(0), offsetof(Interp, ctx.bp),
+        Parrot_jit_regbase);
+
+    /* fix opmap address */
+    emitm_ld_i(jit_info->native_ptr, emitm_i(0), offsetof(Interp, code), XSR1);
+    emitm_ld_i(jit_info->native_ptr, XSR1,
+        offsetof(struct PackFile_ByteCode, jit_info), XSR1);
+    emitm_ld_i(jit_info->native_ptr, XSR1,
+      (offsetof(Parrot_jit_arena_t, op_map) + offsetof(Parrot_jit_info_t,  arena)),
+      Parrot_jit_opmap);
 
     /* Construct the starting address of the byte code */
-    emitm_sethi(jit_info->native_ptr, emitm_hi22(interpreter->code->base.data),
-        XSR1);
-    emitm_or_i(jit_info->native_ptr, XSR1,
-        emitm_lo10(interpreter->code->base.data), XSR1);
+    emitm_ld_i(jit_info->native_ptr, emitm_i(0), offsetof(Interp, code), XSR1);
+    emitm_ld_i(jit_info->native_ptr, XSR1, offsetof(struct PackFile_Segment, data),
+               XSR1);
 
     /* Calculates the offset into op_map shadow array
      * assuming sizeof(opcode_t) == sizeof(opmap array entry) */
