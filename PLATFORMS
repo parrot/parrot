@@ -30,6 +30,7 @@ openbsd                      Y    Y/5  Y     Y   -   Y    Y
 openbsd_beta_3.5-vax                                 Y*4  Y/26
 os2
 solaris8-sparc-cc       B    -    Y/425 -    -   -   Y    Y/15     20050804
+solaris9-sparc-gcc3.3.2 B    -    Y/2  -     Y       Y    Y/2      20050814
 solaris10-sparc-gcc3.4.3 B                           Y*7  Y/1      20050804
 tru64-alpha-gcc          8                   Y       Y    Y
 tru64-alpha-dec_c_v6.5   8                   Y       Y    Y        20040816
