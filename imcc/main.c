@@ -89,6 +89,7 @@ help(void)
     "       --gc-debug\n"
     "       --leak-test|--destroy-at-end\n"
     "    -. --wait    Read a keystroke before starting\n"
+    "       --runtime-prefix\n"
     "   <Compiler options>\n"
     "    -d --imcc_debug[=HEXFLAGS]\n"
     "    -v --verbose\n"
@@ -144,10 +145,12 @@ the GNU General Public License or the Artistic License for more details.\n\n");
 #define OPT_DESTROY_FLAG 129
 #define OPT_HELP_DEBUG   130
 #define OPT_PBC_OUTPUT   131
+#define OPT_RUNTIME_PREFIX  132
+
 static struct longopt_opt_decl options[] = {
     { '.', '.', 0, { "--wait" } },
     { 'C', 'C', 0, { "--CGP-core" } },
-    { 'D', 'D', OPTION_optional_FLAG, { "---parrot-debug" } },
+    { 'D', 'D', OPTION_optional_FLAG, { "--parrot-debug" } },
     { 'E', 'E', 0, { "--pre-process-only" } },
     { 'G', 'G', 0, { "--no-gc" } },
     { 'O', 'O', OPTION_optional_FLAG, { "--optimize" } },
@@ -168,6 +171,7 @@ static struct longopt_opt_decl options[] = {
     { '\0', OPT_PBC_OUTPUT, 0, { "--output-pbc" } },
     { 'p', 'p', 0, { "--profile" } },
     { 'r', 'r', 0, { "--run-pbc" } },
+    { '\0', OPT_RUNTIME_PREFIX, 0, { "--runtime-prefix" } },
     { 't', 't', OPTION_optional_FLAG, { "--trace" } },
     { 'v', 'v', 0, { "--verbose" } },
     { 'w', 'w', 0, { "--warnings" } },
@@ -262,6 +266,10 @@ parseflags(Parrot_Interp interp, int *argc, char **argv[])
             case OPT_HELP_DEBUG:
                 help_debug();
                 exit(EX_USAGE);
+                break;
+            case OPT_RUNTIME_PREFIX:
+                printf("%s\n", Parrot_get_runtime_prefix(interp, NULL));
+                exit(0);
                 break;
             case 'V':
                 imcc_version();

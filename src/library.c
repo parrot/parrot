@@ -367,6 +367,17 @@ Parrot_get_runtime_prefix(Interp *interpreter, STRING **prefix_str)
 {
     STRING *s, *key;
     PMC *config_hash;
+    int free_it;
+    char *env;
+
+    env = Parrot_getenv("PARROT_RUNTIME", &free_it);
+    if (env) {
+        if (!free_it)
+            env = strdup(env);
+        if (prefix_str)
+            *prefix_str = string_from_cstring(interpreter, env, 0);
+        return env;
+    }
 
     config_hash = VTABLE_get_pmc_keyed_int(interpreter, interpreter->iglobals,
             (INTVAL) IGLOBALS_CONFIG_HASH);

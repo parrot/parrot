@@ -33,6 +33,17 @@ This document describes parrot's command line options.
 
  parrot [-options] <file> [arguments ...]
 
+=head1 ENVIRONMENT
+
+=over 4
+
+=item PARROT_RUNTIME
+
+If this environment variable is set, parrot will use this path as runtime
+prefix instead of the compiled in path.
+
+=back
+
 =head1 OPTIONS
 
 =head2 Assembler options
@@ -72,6 +83,12 @@ Note: if the argument is separated by whitespace from the B<-d> switch,
 it has to start with a number.
 
 =item -h, --help
+
+Print commandline option summary.
+
+=item --help-debug
+
+Print debugging and tracing flag bits summary.
 
 =item -o outputfile, --output=outputfile
 
@@ -163,6 +180,7 @@ Prederefernce opcode function arguments on the fly.
 =item -t, --trace
 
 Run with the slow core and print trace information to B<stderr>.
+See 'parrot --help-debug' for aviable flag bits.
 
 =back
 
@@ -172,7 +190,11 @@ Run with the slow core and print trace information to B<stderr>.
 
 =item -w, --warnings
 
-Turn on warnings.
+Turn on warnings. See 'parrot --help-debug' for aviable flag bits.
+
+=item -D, --parrot-debug
+
+Turn on interpreter debug flag. See 'parrot --help-debug' for aviable flag bits.
 
 =item --gc-debug
 
@@ -181,7 +203,7 @@ GC subsystem and can slow down execution considerably.
 
 =item -G, --no-gc
 
-This turns off DOD (Dead Object Detection) and GC. This may be useful to find 
+This turns off DOD (Dead Object Detection) and GC. This may be useful to find
 GC related bugs. Don't use this option for longer running programs: as memory
 is no longer recycled, it may quickly become exhausted.
 
@@ -192,6 +214,10 @@ Free all memory of the last interpreter, so that leak checkers can be run.
 =item -., --wait
 
 Read a keystroke before starting.
+
+=item --runtime-prefix
+
+Print the runtime prefix path and exit.
 
 =back
 
