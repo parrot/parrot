@@ -130,7 +130,7 @@ get_function:
   .local pmc result
 
   (op_length,func,result) = __expr_get_function(expr,chunk_start)
-  if op_length == 0 goto get_number
+  if op_length == 0 goto get_operator
   chunk = new TclList
   chunk[0] = FUNC
   chunk[1] = func
@@ -425,6 +425,8 @@ do_op:
   if func == OPERATOR_BITAND goto op_bitand
   if func == OPERATOR_BITXOR goto op_bitxor
   if func == OPERATOR_BITOR goto op_bitor
+  if func == OPERATOR_NE goto op_ne
+  if func == OPERATOR_EQ goto op_eq
 func_list: 
   if func == FUNCTION_ABS goto func_abs
   if func == FUNCTION_ACOS goto func_acos
@@ -503,6 +505,20 @@ op_bitxor:
   goto done_op 
 op_bitor:
   op_result = bor l_arg, r_arg
+  goto done_op
+op_ne:
+  op_result = 1
+  $S0 = l_arg
+  $S1 = r_arg
+  if $S0 != $S1 goto done_op
+  op_result = 0
+  goto done_op
+op_eq:
+  op_result = 1
+  $S0 = l_arg
+  $S1 = r_arg
+  if $S0 == $S1 goto done_op
+  op_result = 0
   goto done_op
 func_abs:
   # XXX This isn't int only, izzit?

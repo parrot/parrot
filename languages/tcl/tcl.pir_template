@@ -35,6 +35,8 @@ providing a compreg-compatible method.
 
 # Constants for operator/function lookup.
 
+  .const int OPERATOR_EQ     = 28
+  .const int OPERATOR_NE     = 29
   .const int OPERATOR_BITAND = 30
   .const int OPERATOR_BITOR  = 31
   .const int OPERATOR_BITXOR = 32
@@ -147,7 +149,11 @@ providing a compreg-compatible method.
   operators["=="] = OPERATOR_EQUAL
   precedence["=="] = 5
   operators["!="] = OPERATOR_UNEQUAL
-  precedence["!="] = 5 
+  precedence["!="] = 5
+  operators["ne"] = OPERATOR_NE
+  precedence["ne"] = 6
+  operators["eq"] = OPERATOR_EQ 
+  precedence["eq"] = 6
   operators["&"] = OPERATOR_BITAND
   precedence["&"] = 7
   operators["^"] = OPERATOR_BITXOR
