@@ -281,6 +281,7 @@ PMC_int_val(-1) means end of iteration.
     PMC* nextkey_keyed (PMC* agg, INTVAL what) {
         INTVAL n = VTABLE_elements(INTERP, agg);
         PMC *ret = SELF;
+        STRING *_hash;
 
         switch (what) {
             case ITERATE_FROM_START_KEYS:
@@ -303,9 +304,8 @@ PMC_int_val(-1) means end of iteration.
                  * KEY_integer_FLAG alone is an indexed hash lookup
                  * with an Integer KEY
                  */
-                if (agg->vtable->base_type == enum_class_PerlHash)
-                    PObj_get_FLAGS(ret) |= KEY_hash_iterator_FLAGS;
-                if (agg->vtable->base_type == enum_class_Hash)
+                 _hash = CONST_STRING(interpreter, "Hash");
+                if (VTABLE_isa(INTERP, agg, _hash))
                     PObj_get_FLAGS(ret) |= KEY_hash_iterator_FLAGS;
         init:
                 PMC_int_val(ret) = 0;
