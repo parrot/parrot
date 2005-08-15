@@ -105,8 +105,7 @@ static unsigned int* ig_allocate(int N)
 void
 imc_reg_alloc(Interp *interpreter, IMC_Unit * unit)
 {
-    int todo, first;
-    int loop_counter;
+    int first;
     char *function;
 
     if (!unit)
@@ -136,48 +135,31 @@ imc_reg_alloc(Interp *interpreter, IMC_Unit * unit)
             (IMCC_INFO(interpreter)->debug & DEBUG_IMC))
         imc_stat_init(unit);
 
-    /* consecutive labels, if_branch, unused_labels ... */
-    pre_optimize(interpreter, unit);
-    if (IMCC_INFO(interpreter)->optimizer_level == OPT_PRE && unit->pasm_file)
+    if (IMCC_INFO(interpreter)->optimizer_level == OPT_PRE && unit->pasm_file) {
+        while (pre_optimize(interpreter, unit));
         return;
+    }
 
     nodeStack = imcstack_new();
     unit->n_spilled = 0;
 
-    todo = first = 1;
-    loop_counter = 0;
-    while (todo) {
-        loop_counter++;
-        find_basic_blocks(interpreter, unit, first);
-        build_cfg(interpreter, unit);
+    /* build CFG and life info, and optimize iteratively */
+    do {
+        first = 1;
+        do {
+            while (pre_optimize(interpreter, unit));
 
-        first = 0;
-        todo = cfg_optimize(interpreter, unit);
-    }
-    todo = first = 1;
-    loop_counter = 0;
-    while (todo) {
-        loop_counter++;
-        if (!first) {
-            find_basic_blocks(interpreter, unit, 0);
+            find_basic_blocks(interpreter, unit, first);
             build_cfg(interpreter, unit);
-        }
-        first = 0;
+            first = 0;
+        } while (cfg_optimize(interpreter, unit));
 
         compute_dominators(interpreter, unit);
         find_loops(interpreter, unit);
 
         build_reglist(interpreter, unit, 1);
         life_analysis(interpreter, unit);
-        /* optimize, as long as there is something to do */
-        if (IMCC_INFO(interpreter)->dont_optimize)
-            todo = 0;
-        else {
-            todo = optimize(interpreter, unit);
-            if (todo)
-                pre_optimize(interpreter, unit);
-        }
-    }
+    } while (!IMCC_INFO(interpreter)->dont_optimize && optimize(interpreter, unit));
 
     graph_coloring_reg_alloc(interpreter, unit);
 

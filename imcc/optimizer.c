@@ -64,7 +64,7 @@
 /* buggy - turned off */
 #define  DO_LOOP_OPTIMIZATION 0
 
-static void if_branch(Interp *, IMC_Unit *);
+static int if_branch(Interp *, IMC_Unit *);
 
 static int branch_branch(Interp *interpreter, IMC_Unit *);
 static int unused_label(Interp *interpreter, IMC_Unit *);
@@ -82,16 +82,19 @@ static int clone_remove(Interp *, IMC_Unit *);
 /*
  * Handles optimizations occuring before the construction of the CFG.
  */
-void
+int
 pre_optimize(Interp *interpreter, IMC_Unit * unit)
 {
+    int changed = 0;
+    
     if (IMCC_INFO(interpreter)->optimizer_level & OPT_PRE) {
         IMCC_info(interpreter, 2, "pre_optimize\n");
         /* TODO integrate all in one pass */
-        strength_reduce(interpreter, unit);
+        changed += strength_reduce(interpreter, unit);
         if (!IMCC_INFO(interpreter)->dont_optimize)
-            if_branch(interpreter, unit);
+            changed += if_branch(interpreter, unit);
     }
+    return changed;
 }
 
 /*
@@ -175,15 +178,15 @@ get_neg_op(char *op, int *n)
  *   unless cond L2
  *
  */
-static void
+static int
 if_branch(Interp *interpreter, IMC_Unit * unit)
 {
     Instruction *ins, *last;
-    int reg;
+    int reg, changed = 0;
 
     last = unit->instructions;
     if (!last->next)
-        return;
+        return changed;
     IMCC_info(interpreter, 2, "\tif_branch\n");
     for (ins = last->next; ins; ) {
         if ((last->type & ITBRANCH) &&          /* if ...L1 */
@@ -215,12 +218,14 @@ if_branch(Interp *interpreter, IMC_Unit * unit)
                     ostat.deleted_ins++;
                     ins = delete_ins(unit, ins, 1);
                     ostat.if_branch++;
+                    changed = 1;
                 }
             } /* label found */
         } /* branch detected */
         last = ins;
         ins = ins->next;
     }
+    return changed;
 }
 
 /*
