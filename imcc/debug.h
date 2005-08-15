@@ -32,6 +32,7 @@ void dump_labels(IMC_Unit *);
 void dump_symreg(IMC_Unit *);
 void dump_interference_graph(IMC_Unit *);
 void dump_dominators(IMC_Unit *);
+void dump_dominance_frontiers(IMC_Unit *);
 void dump_liveness_status(IMC_Unit *);
 void dump_liveness_status_var(IMC_Unit *, SymReg*);
 

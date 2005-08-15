@@ -941,6 +941,52 @@ compute_dominators (Parrot_Interp interpreter, IMC_Unit * unit)
 #endif
 }
 
+/* Algorithm to find dominance frontiers described in paper 
+ * "A Simple, Fast Dominance Algorithm", Cooper et al. (2001)
+ */
+void
+compute_dominance_frontiers (Parrot_Interp interpreter, IMC_Unit * unit)
+{
+    int i, n, b, runner;
+    Edge *edge;
+    Set** dominance_frontiers;
+
+    n = unit->n_basic_blocks;
+    IMCC_info(interpreter, 2, "compute_dominance_frontiers\n");
+    dominance_frontiers = unit->dominance_frontiers = malloc(sizeof(Set*) * n);
+
+    dominance_frontiers[0] = set_make(n);
+    for (i = 1; i < n; i++) {
+        dominance_frontiers[i] = set_make(n);
+    }
+
+    /* for all nodes, b */
+    for (b = 1; b < n; b++) {
+        edge = unit->bb_list[b]->pred_list;
+        /* if the number of predecessors of b >= 2 */
+        if (edge && edge->pred_next) {
+            /* for all predecessors, p, of b */
+            for (; edge; edge = edge->pred_next) {
+                /* runner = p */
+                runner = edge->from->index;
+                /* while runner != idoms[b] */
+                while (runner >= 0 && runner != unit->idoms[b]) {
+                    /* add b to runner's dominance frontier set */
+                    set_add(unit->dominance_frontiers[runner], b);
+                    /* runner = idoms[runner] */
+                    if (runner == 0)
+                        runner = -1;
+                    else
+                        runner = unit->idoms[runner];
+                }
+            }
+        }
+    }
+        
+    if (IMCC_INFO(interpreter)->debug & DEBUG_CFG)
+        dump_dominance_frontiers(unit);
+}
+
 static void
 free_dominators(IMC_Unit * unit)
 {
@@ -954,6 +1000,20 @@ free_dominators(IMC_Unit * unit)
     free(unit->dominators);
     unit->dominators = 0;
     free(unit->idoms);
+}
+
+static void
+free_dominance_frontiers(IMC_Unit * unit)
+{
+    int i;
+
+    if (!unit->dominance_frontiers)
+        return;
+    for (i=0; i < unit->n_basic_blocks; i++) {
+        set_free (unit->dominance_frontiers[i]);
+    }
+    free(unit->dominance_frontiers);
+    unit->dominance_frontiers = 0;
 }
 
 
@@ -1212,6 +1272,7 @@ clear_basic_blocks(IMC_Unit * unit)
     }
     free_edge(unit);
     free_dominators(unit);
+    free_dominance_frontiers(unit);
     free_loops(unit);
 }
 
