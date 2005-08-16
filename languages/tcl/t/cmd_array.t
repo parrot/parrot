@@ -144,9 +144,6 @@ TCL
 can't set "a(1)": variable isn't array
 OUT
 
-TODO: {
- local $TODO = "unimplemented";
-
 language_output_is("tcl",<<'TCL',<<'OUT',"array get");
   array set a [list a b]
   puts [array get a]
@@ -185,4 +182,3 @@ language_output_is("tcl",<<'TCL',<<'OUT',"array get, too many args");
 TCL
 wrong # args: should be "array get arrayName ?pattern?"
 OUT
-}
