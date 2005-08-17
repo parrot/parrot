@@ -30,6 +30,7 @@ lib${slash}commands${slash}expr.pir \
 lib${slash}commands${slash}for.pir \
 lib${slash}commands${slash}foreach.pir \
 lib${slash}commands${slash}format.pir \
+lib${slash}commands${slash}gets.pir \
 lib${slash}commands${slash}global.pir \
 lib${slash}commands${slash}if.pir \
 lib${slash}commands${slash}incr.pir \
