@@ -30,8 +30,6 @@ TCL
 wrong # args: should be "namespace qualifiers string"
 OUT
 
-TODO: {
-  local $TODO = "unimplemented";
 language_output_is("tcl",<<'TCL',<<OUT,"namespace qualifiers: simple");
    puts [namespace qualifiers ::a::b::c]
 TCL
@@ -41,9 +39,8 @@ OUT
 language_output_is("tcl",<<'TCL',<<OUT,"namespace qualifiers: extra colons");
    puts [namespace qualifiers :::a:::b::c]
 TCL
-::a::b
+:::a:::b
 OUT
-}
 
 language_output_is("tcl",<<'TCL',<<OUT,"namespace tail: no args");
    namespace tail
@@ -57,8 +54,6 @@ TCL
 wrong # args: should be "namespace tail string"
 OUT
 
-TODO: {
-  local $TODO = "unimplemented";
 language_output_is("tcl",<<'TCL',<<OUT,"namespace tail: simple");
    puts [namespace tail ::a::b::c]
 TCL
@@ -70,7 +65,6 @@ language_output_is("tcl",<<'TCL',<<OUT,"namespace tail: extra colons");
 TCL
 c
 OUT
-}
 
 language_output_is("tcl",<<'TCL',<<OUT,"namespace current: too many args");
    namespace current current

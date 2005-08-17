@@ -107,7 +107,31 @@ bad_args:
   .param pmc argv
   
   .local int argc
+  argc = argv
   if argc != 1 goto bad_args
+
+  .local pmc p6r,match
+  p6r = find_global "PGE", "p6rule"
+  match = p6r("(.*)\:\:+<-[:]>*$$")
+
+  $S0 = argv[0]
+  $P0 = match($S0)
+  unless $P0 goto WHOLE
+
+  # XXX pre leo-ctx5 this requires a PMC arg, but we can switch later
+  $P1 = new String
+  $P1 = "0"  
+
+  $P2 = $P0."__get_pmc_keyed"($P1)
+  
+  $S1 = $P2
+  $P3 = new String
+  $P3 = $S1
+  .return (TCL_OK,$P3)
+
+WHOLE:
+  $P0 = argv[0]
+  .return(TCL_OK,$P0)
 
   bad_args:
   $P1 = new String
@@ -120,7 +144,31 @@ bad_args:
   .param pmc argv
   
   .local int argc
+  argc = argv
   if argc != 1 goto bad_args
+
+  .local pmc p6r,match
+  p6r = find_global "PGE", "p6rule"
+  match = p6r("\:\:+(<-[:]>)$$")
+
+  $S0 = argv[0]
+  $P0 = match($S0)
+  unless $P0 goto WHOLE
+
+  # XXX pre leo-ctx5 this requires a PMC arg, but we can switch later
+  $P1 = new String
+  $P1 = "0"  
+
+  $P2 = $P0."__get_pmc_keyed"($P1)
+  
+  $S1 = $P2
+  $P3 = new String
+  $P3 = $S1
+  .return (TCL_OK,$P3)
+
+WHOLE:
+  $P0 = argv[0]
+  .return(TCL_OK,$P0)
 
   bad_args:
   $P1 = new String
@@ -128,4 +176,3 @@ bad_args:
   .return (TCL_ERROR,$P1)
 
 .end
-
