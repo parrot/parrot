@@ -66,7 +66,7 @@ be nice to have invoke() automatically figure this out and generate an exception
 that Tcl can use. (This also starts to drag in "how to do Tcl exceptions cleanly from
 parrot")
 
-=head1 [error], [catch], [break], continue...
+=item [error], [catch], [break], continue...
 
 Tcl kind of conflates normal returns and exceptional returns, and uses the same
 mechanism for [break]ing and [continue]'ing  out of loops. 
@@ -89,12 +89,12 @@ mechanism. So we could potentially use exceptions for TCL_ERROR in the long
 term. But then [catch] will need to be re-written to cope with exceptions
 or not (as opposed to now, where all codes are equal).
 
-=head1 stack depth
+=item stack depth
 
-Cheating and keeping a global around right now, so we can figure out if we should
-be using a global or a lexical (and if so, how far down or up).
+Cheating and keeping a global around right now, so we can figure out if we 
+should be using a global or a lexical (and if so, how far down or up).
 
-=head1 [trace]'ing
+=item [trace]'ing
 
 There are two ways we can go about the tracing - either we can keep the 
 information about the traces in a global, and check that global every time
