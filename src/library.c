@@ -212,9 +212,11 @@ Parrot_locate_runtime_file(Interp *interpreter, const char *file_name,
      * if the extension is given use it
      * TODO if not try extensions according to type
      */
+    /* let the failure propagate back for better error handling
     if (!ext) {
         internal_exception(UNIMPLEMENTED, "no extension: file '%s'", file_name);
     }
+    */
 
     /* use absolute paths as is */
 #ifdef WIN32
