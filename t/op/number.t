@@ -16,7 +16,7 @@ Tests the use of Parrot's floating-point number registers.
 
 =cut
 
-use Parrot::Test tests => 39;
+use Parrot::Test tests => 41;
 use Test::More;
 
 output_is(<<CODE, <<OUTPUT, "set_n_nc");
@@ -1076,5 +1076,14 @@ CODE
 0.500000
 OUTPUT
 
-1;
+output_is(<<'CODE', <<OUTPUT, "sqrt_n_n");
+	set N1, 2
+	sqrt N2, N1
+	print N2
+	print "\n"
+	end
+CODE
+1.414214
+OUTPUT
+
 
