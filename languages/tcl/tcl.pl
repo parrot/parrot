@@ -41,7 +41,7 @@ foreach my $file (@macro_includes, @cmd_includes, @libs) {
   $includes .= "  .include \"languages/tcl/$file\"\n";
 }
 
-=head2 rules
+=head1 rules
 
 Generate the PIR code that matches the various rules we have.
 
