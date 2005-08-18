@@ -261,6 +261,12 @@ TCL
 0.333333333333
 OUT
 
+language_output_is("tcl",<<'TCL',<<'OUT',"nested expr (braces)");
+ puts [expr {2 * [expr {2 - 1}]}];
+TCL
+2
+OUT
+
 TODO: {
 local $TODO = "bugs";
 
@@ -271,9 +277,4 @@ TCL
 1
 OUT
 
-language_output_is("tcl",<<'TCL',<<'OUT',"nested expr (braces)");
- puts [expr {2 * [expr {2 - 1}]}];
-TCL
-2
-OUT
 }

@@ -56,6 +56,7 @@ chunk_loop:
   if $I0 == 1 goto get_number
   
   $I0 = ord expr, chunk_start
+  if $I0 == 91 goto subcommand        # [
   if $I0 == 40 goto get_parenthetical # (
   if $I0 == 36 goto get_variable      # $
   if $I0 == 46 goto get_number        # .
@@ -111,6 +112,16 @@ get_paren_done:
 get_variable:
   (retval, chunk_start) = parse_variable(expr, chunk_start)
   
+  chunk = new TclList
+  chunk[0] = OPERAND
+  chunk[1] = retval
+  push chunks, chunk
+  dec chunk_start
+  goto chunk_loop
+
+subcommand:
+  (retval, chunk_start) = get_subcommand(expr, chunk_start)
+
   chunk = new TclList
   chunk[0] = OPERAND
   chunk[1] = retval
