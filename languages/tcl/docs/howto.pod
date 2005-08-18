@@ -111,6 +111,11 @@ Our final goal will be to pass (most of) the tcl test suite: run
 C<make tcl-test> to checkout the latest version of of the tcl test suite
 and run it. Warning: slow...
 
+Long term goal is remove any tests in C<t/> that are testing things
+that are already tested in the official tcl suite.
+Partcl's checked in test suite should just
+be checking partcl-specific functionaliity.
+
 =back
 
 

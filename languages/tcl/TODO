@@ -36,8 +36,6 @@ Still have to:
 
 how to do this from inside parrot? [#36277]
 
-=item migrate all these issues to RT or TODO tests
-
 =item update docs [will]
 
 (including add pod to all .pir)
@@ -53,7 +51,7 @@ how to do this from inside parrot? [#36277]
 =item string to list
 
 TclList's new_from_string method should use the string to list code
-...except that it turnsout this is non-trivial.
+...except that it turns out this is non-trivial.
 
 =back
 
@@ -70,17 +68,6 @@ global variables provided by tcl interpreter. L<tclsh>
 source per-user settings. L<tclsh>
 
 =back
-
-=head2 Tests
-
-We should be using the tcl-test target as our language goal. For now, keep
-enough tests in our local test harness (C<t/>) so that we don't get any
-regressions. (Running the tcl test suite takes a while). This means we
-can get by with basic tests in C<t/> for now.
-
-Long term goal would be to remove any tests in C<t/> that are testing things
-that are already tested in tcl. Partcl's checked in test suite should just
-be checking partcl-specific functionaliity.
 
 =head1 Uncategorized Issues
 
