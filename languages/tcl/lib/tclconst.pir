@@ -16,7 +16,7 @@ Define the attributes required for the class.
 =cut
 
 .sub __class_init @LOAD
-  $P0 = getclass "TclString"
+  $P0 = getclass "String"
   $P1 = subclass $P0, "TclConst"
   
   $P0 = new Hash

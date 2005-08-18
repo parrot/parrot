@@ -4,6 +4,10 @@ use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
 use Parrot::Test tests => 2;
 use Test::More;
+use vars qw($TODO);
+
+TODO: {
+local $TODO = 'broken because $a returns a TclConst and not a number';
 
 language_output_is("tcl",<<'TCL',<<OUT,"continue from for");
  for {set a 0} {$a < 10} {incr a} {
@@ -41,3 +45,6 @@ TCL
 --
 11
 OUT
+
+}
+

@@ -53,6 +53,10 @@ pmclass TclFloat extends TclObject extends Float dynpmc group tcl_group {
         buff->bufused = buflen;
         return buff;
     }
+
+    METHOD PMC* interpret() {
+        return SELF;
+    }
 }
 
 
