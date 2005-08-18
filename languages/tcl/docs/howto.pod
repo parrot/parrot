@@ -53,10 +53,16 @@ a PMC object - this would I<possibly> give us an improvement in speed also.
 
 =item features
 
-We're currently missing a lot of stuff that requires support from parrot
-before we can continue, like Unicode for the C<\u> escapes. I've tried to
-start documenting these in the TODO with sections like C<given Unicode>, 
-then listing the things that we can do once we have that. 
+We're currently missing some things that require support from parrot
+before we can continue, like [info nameofexecutable]. In general, though,
+a lot of what we need to do is possible with parrot.
+
+If you're looking for something to todo, check one of: TODO tests in 
+C<t/>; RT
+https://rt.perl.org/rt3/NoAuth/parrot/List.html?Field=Lang&Value=tcl
+or by their absence: every actual builtin at 
+http://www.tcl.tk/man/tcl8.5/TclCmd/contents.htm
+should have a corresponding file in C<lib/commands/>
 
 =back
 
@@ -64,7 +70,7 @@ then listing the things that we can do once we have that.
 
 =over 4
 
-=item pod 
+=item pod
 
 Every PIR .sub that's defined should probably have some POD to go along
 with it to document the arguments and return values.
@@ -96,18 +102,18 @@ any valid PMC. Note - right now, if there's an error condition, create
 a new string-like PMC and put the error condition in it. Eventually this
 will be some kind of structure.
 
-Once you write a command (or add a subcommand), you need to add a test file (
-or a test in an existing) file in C<t/> - tests for C<puts>, for example,
+Before adding new functionality, add a test (or a test in an existing) file 
+in C<t/> - tests for C<puts>, for example,
 go in C<t/cmd_puts.t> - we use the C<Test::Harness> framework, via 
-C<Parrot::Test>. To run your test, just say C<make test> in the top level
-tcl directory. Be sure to test each of the subcommands. While our eventual
-goal is to pass the tcl test suite, we really need to maintain a good one
-on our own in the meantime.
+C<Parrot::Test>. 
 
-To find a command to work on, just check out the TODO - several commands
-are currently not implemented, and others are missing various subcommands.
+Our final goal will be to pass (most of) the tcl test suite: run 
+C<make tcl-test> to checkout the latest version of of the tcl test suite
+and run it. Warning: slow...
 
 =back
+
+
 
 =cut
 

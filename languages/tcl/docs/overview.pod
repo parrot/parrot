@@ -52,7 +52,7 @@ This is roughly equivalent to C<tclsh> - It takes the command line arguments
 (currently, the name of the file you wish to parse), and reads in the file,
 and uses the tcl library to parse those contents as tcl.
 
-=back 4
+=back
 
 =head1 TESTS
 
