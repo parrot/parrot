@@ -1,23 +1,19 @@
-=head1 Various
+=head1 Tcl TODOs
+
+=head2 Generic tasks
 
 =over 4
-
-=item interactive tclsh
-
-new parser breaks ability to send interactive commands to the shell, add it
-back. Even better, come up with a way to *test* the thing.
-
-=item PIR Tree
-
-From autrijus's talk.
-can we use this instead of the current string-based compilation.
-
-"Um, perhaps Autrijus can tell me what I meant by this." -Coke
 
 =item Makefile deps
 
 Should be more explicit about the PMC dependencies in the makefile. *something*
 is causing things to get rebuilt unecessarily each time "make tclsh" is run.
+
+=back
+
+=head2 PIR tasks
+
+=over 4
 
 =item keyed access
 
@@ -26,38 +22,10 @@ at least for language interoperability.
 
 =item interactive tclsh
 
-Still have to:
-
  o catch any real_exceptions thrown.
  o respect tcl_prompt1, tcl_prompt2
  o deal with incomplete input (needs better error handling)
-
-=item [interpinfo name]
-
-how to do this from inside parrot? [#36277]
-
-=item update docs [will]
-
-(including add pod to all .pir)
-
-=back
-
-=head1 Programming Issues
-
-=head2 C-level tasks
-
-=over 4
-
-=item string to list
-
-TclList's new_from_string method should use the string to list code
-...except that it turns out this is non-trivial.
-
-=back
-
-=head2 PIR-level tasks
-
-=over 4
+ o add back in support for dispatch to shell.
 
 =item implement default globals, etc.
 
@@ -69,7 +37,7 @@ source per-user settings. L<tclsh>
 
 =back
 
-=head1 Uncategorized Issues
+=head2 Design tasks
 
 =over 4
 
@@ -77,9 +45,13 @@ source per-user settings. L<tclsh>
 
 Perhaps via [namespace import]? Can fake it right now with [inline]
 
-=item multiple level lists
+=back
 
-=item [expr]
+=head2 refactoring tasks
+
+=over 4
+
+=item [expr] mdiep is currently working on this.
 
 Clean up [expr]. MUUUUCH room for improvement there. [expr] is the source
 of most of our abysmal performance in bench.tcl.
@@ -95,11 +67,7 @@ The type indicator is also used to disambiguate operators and function calls
 from operands. We can easily remove it for operands, but how to cleanly
 remove this for operators?
 
-TBD: strings, floats as operands - (many of the math funcs return floats
-but you can't specify them, and not everything takes them
-(try, for example, [expr sin(1) + sin(1)] vs [expr sin(1) * sin(1)].)
-
-TBD: blocks, commands, and strings as operands
+TBD: blocks and strings as operands
 
 TBD: logical binary ops & ternary op (need deferred evaluation) ; unary ops;
 ops that work on strings only.
@@ -111,9 +79,21 @@ to get any that require int-only args, as we can now /generate/ floats,
 even if we cannot specify them. This is all supportable by MMD - we just
 need to specify the correct errors to throw.
 
+=back
+
+=head2 Things we can't do yet (need parrot)
+
+=over 4
+
 =item [pwd]
 
-need parrot support for this.
+Need to open an RT ticket on this.
+
+=item [interpinfo name] [#36277]
+
+how to do this from inside parrot? Design issue: what's the right
+answer? if we're called as C<parrot tcl.pbc foo.tcl>, do we report just
+C<parrot>, or C<parrot tcl.pbc> ?
 
 =back
 
