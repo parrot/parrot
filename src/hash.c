@@ -14,7 +14,7 @@ creation the types of key and value as well as appropriate compare and
 hashing functions can be set.
 
 This hash implementation uses just one piece of malloced memory. The
-C<hash->bu> union points into this regions. At positive indices are
+C<< hash->bu >> union points into this regions. At positive indices are
 bucket pointers, at negative indices is the bucket store itself.
 
 This hash doesn't move during GC, therefore a lot of the old caveats
@@ -573,7 +573,7 @@ init_hash(Interp *interpreter, Hash *hash,
 	bp->key = bp->value = NULL;
 	hash->free_list = bp;
     }
-    /* see the grafic in expand_hash */
+    /* see the graphic in expand_hash */
     hash->bu.bs = bp;
     for (i = 0; i < INITIAL_BUCKETS; ++i) {
 	hash->bu.bi[i] = NULL;
@@ -683,7 +683,7 @@ hash_get_idx(Interp *interpreter, Hash *hash, PMC * key)
     void *res;
 
     /* idx directly in the bucket store, which is at negative
-     * addressess from the data pointer
+     * address from the data pointer
      */
     /* locate initial */
     if (bi == INITBucketIndex) {
@@ -972,7 +972,7 @@ Future optimizations:
 =item * Stop reallocating the bucket pool, and instead add chunks on.
 (Saves pointer fixups and copying during C<realloc>.)
 
-=item * Hash contraction (dunno if it's worth it)
+=item * Hash contraction (don't if it's worth it)
 
 =back
 
