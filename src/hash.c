@@ -854,6 +854,7 @@ hash_delete(Interp *interpreter, Hash *hash, void *key)
             }
             hash->entries--;
             bucket->next = hash->free_list;
+            bucket->key = NULL;
             hash->free_list = bucket;
             return;
         }

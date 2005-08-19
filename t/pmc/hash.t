@@ -19,7 +19,7 @@ well.
 
 =cut
 
-use Parrot::Test tests => 36;
+use Parrot::Test tests => 37;
 use Test::More;
 
 output_is(<<CODE, <<OUTPUT, "Initial Hash tests");
@@ -1338,4 +1338,61 @@ CODE
 a
 OUTPUT
 
-1;
+pir_output_is(<< 'CODE', << 'OUTPUT', "broken delete, thx to azuroth on irc");
+.include "iterator.pasm"
+
+.sub main @MAIN
+  .local pmc thash
+
+  # just put in some dummy data...
+  thash = new Hash
+  thash["a"] = "b"
+  thash["c"] = "d"
+  thash["e"] = "f"
+
+  .local pmc iter
+  iter = new Iterator, thash
+  iter = .ITERATE_FROM_START
+
+  .local string key
+
+  # go through the hash, print out all the keys: should be a c and e
+preit_loop:
+  unless iter goto preit_end
+
+  key = shift iter
+  print key
+  print "\n"
+
+  branch preit_loop
+preit_end:
+
+  # get rid of the c element?
+  delete thash["c"]
+
+  print "after deletion\n"
+
+  iter = new Iterator, thash
+  iter = .ITERATE_FROM_START
+
+  # go through the hash, print out all the keys... I believe it should be a and e?
+  # it actually outputs a, c and e.
+postit_loop:
+  unless iter goto postit_end
+
+  key = shift iter
+  print key
+  print "\n"
+
+  branch postit_loop
+postit_end:
+
+.end
+CODE
+a
+c
+e
+after deletion
+a
+e
+OUTPUT
