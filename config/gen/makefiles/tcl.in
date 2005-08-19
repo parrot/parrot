@@ -17,6 +17,7 @@ PMCS = \
  tclarray
 
 DEPS = $(PARROT) \
+lib${slash}commands${slash}after.pir \
 lib${slash}commands${slash}append.pir \
 lib${slash}commands${slash}array.pir \
 lib${slash}commands${slash}break.pir \
