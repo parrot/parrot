@@ -95,6 +95,15 @@ how to do this from inside parrot? Design issue: what's the right
 answer? if we're called as C<parrot tcl.pbc foo.tcl>, do we report just
 C<parrot>, or C<parrot tcl.pbc> ?
 
+=item [split]
+
+There's already a split opcode that should do most of what we need, except
+it's not quite finished yet.
+
+=item [after], [vwait]
+
+pending the event system thunk.
+
 =back
 
 =cut
