@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 25;
+use Parrot::Test tests => 33;
 use Test::More;
 use vars qw($TODO);
 
@@ -165,6 +165,13 @@ TCL
 apple 1 aardvark 3
 OUT
 
+language_output_is("tcl",<<'TCL',<<'OUT',"array get, with bad pattern");
+  array set a [list apple 1 orange 2 aardvark 3]
+  puts [array get a zippy*]
+TCL
+
+OUT
+
 language_output_is("tcl",<<'TCL',<<'OUT',"array get, bad array");
   puts [array get a]
 TCL
@@ -181,4 +188,58 @@ language_output_is("tcl",<<'TCL',<<'OUT',"array get, too many args");
   array get a b c
 TCL
 wrong # args: should be "array get arrayName ?pattern?"
+OUT
+
+language_output_is("tcl", <<'TCL', <<'OUT',"array unset");
+  array set a [list a b]
+  puts [array unset a]
+  puts [array get a]
+TCL
+
+
+OUT
+
+language_output_is("tcl", <<'TCL', <<'OUT',"array unset, with pattern");
+  array set a [list a b c d]
+  puts [array unset a a]
+  puts [array get a]
+TCL
+
+c d
+OUT
+
+language_output_is("tcl", <<'TCL', <<'OUT',"array unset, with pattern");
+  array set a [list apple 1 orange 2 aardvark 3]
+  puts [array unset a a*]
+  puts [array get a]
+TCL
+
+orange 2
+OUT
+
+language_output_is("tcl", <<'TCL', <<'OUT',"array unset, with bad pattern");
+  array set a [list apple 1 orange 2 aardvark 3]
+  puts [array unset a zippy*]
+  puts [array get a]
+TCL
+
+apple 1 orange 2 aardvark 3
+OUT
+
+language_output_is("tcl", <<'TCL', <<'OUT',"array unset, bad array");
+  puts [array unset badarray]
+TCL
+
+OUT
+
+language_output_is("tcl", <<'TCL', <<'OUT',"array unset, bad array, pattern");
+  puts [array unset badarray monkey*]
+TCL
+
+OUT
+
+language_output_is("tcl", <<'TCL', <<'OUT',"array unset, too many args");
+  array unset monkey my monkey monkey
+TCL
+wrong # args: should be "array unset arrayName ?pattern?"
 OUT

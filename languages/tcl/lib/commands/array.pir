@@ -290,3 +290,68 @@ not_array:
   .return(TCL_ERROR, retval)
 .end
 
+.sub "unset"
+  .param int is_array
+  .param pmc the_array
+  .param string array_name
+  .param pmc argv
+
+  .local int argc
+  argc = argv
+  if argc > 1 goto bad_args
+
+
+  .local string match_str
+  # ?pattern? defaults to matching everything.
+  match_str = "*"
+
+  # if it's there, get it from the arglist
+  if argc == 0 goto no_args
+  match_str = shift argv
+
+no_args:
+  if is_array == 0 goto not_array
+
+  .local pmc retval
+
+  .local pmc iter, val
+  .local string str
+
+  .local pmc globber
+
+  globber = find_global "PGE", "glob"
+  .local pmc rule
+  (rule, $P0, $P1) = globber(match_str)
+
+  iter = new Iterator, the_array
+  iter = .ITERATE_FROM_START
+
+push_loop:
+  unless iter goto push_end
+  str = shift iter
+
+ # check for match
+  $P2 = rule(str)
+  unless $P2 goto push_loop
+
+  delete the_array[str]
+
+  branch push_loop
+push_end:
+
+  retval = new String
+  retval = ""
+  .return (TCL_OK, retval)
+
+
+bad_args:
+  retval = new String
+  retval = "wrong # args: should be \"array unset arrayName ?pattern?\""
+  .return(TCL_ERROR, retval)
+
+not_array:
+  retval = new String
+  retval = ""
+  # is there a better way to do this?
+  .return(TCL_ERROR, retval)
+.end
