@@ -58,7 +58,7 @@ chunk_loop:
   $I0 = ord expr, chunk_start
   if $I0 == 91 goto subcommand        # [
   if $I0 == 40 goto get_parenthetical # (
-  if $I0 == 36 goto get_variable      # $
+  if $I0 == 36 goto variable          # $
   if $I0 == 46 goto get_number        # .
   
   $I0 = is_wordchar expr, chunk_start
@@ -109,8 +109,8 @@ get_paren_done:
   chunk_start += $I0
   goto chunk_loop
  
-get_variable:
-  (retval, chunk_start) = parse_variable(expr, chunk_start)
+variable:
+  (retval, chunk_start) = get_variable(expr, chunk_start)
   
   chunk = new TclList
   chunk[0] = OPERAND

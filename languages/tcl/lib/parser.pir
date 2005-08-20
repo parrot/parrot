@@ -261,7 +261,7 @@ variable:
   push word, $P0
 
 variable2:
-  ($P0, pos) = parse_variable(tcl_code, pos)
+  ($P0, pos) = get_variable(tcl_code, pos)
   push word, $P0
   dec pos
   start = pos + 1
@@ -359,7 +359,7 @@ variable:
   push word, $P0
   
 variable2:
-  ($P0, pos) = parse_variable(tcl_code, pos)
+  ($P0, pos) = get_variable(tcl_code, pos)
   push word, $P0
   dec pos
   start = pos + 1
@@ -508,7 +508,7 @@ Parses a subcommand and returns a TclCommand object.
   .return get_command(tcl_code, chars, pos)
 .end
 
-=item C<(pmc var, int pos) = parse_variable(string tcl_code, int pos)>
+=item C<(pmc var, int pos) = get_variable(string tcl_code, int pos)>
 
 If it's really a variable, returns a TclVar object. If it's
 something else, return a TclConst object.
@@ -520,7 +520,7 @@ something else, return a TclConst object.
 
 =cut
 
-.sub parse_variable
+.sub get_variable
   .param string tcl_code
   .param int pos
   inc pos
