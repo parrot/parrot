@@ -202,10 +202,11 @@ This module defines the following public functions:
 	expect_out  = new .PerlArray
 	expect_diag = new .PerlArray
 
-	store_global 'Test::Builder::Tester', '_test',        test
-	store_global 'Test::Builder::Tester', '_test_output', test_output
-	store_global 'Test::Builder::Tester', '_expect_out',  expect_out
-	store_global 'Test::Builder::Tester', '_expect_diag', expect_diag
+	store_global 'Test::Builder::Tester', '_test',         test
+	store_global 'Test::Builder::Tester', '_default_test', default_test
+	store_global 'Test::Builder::Tester', '_test_output',  test_output
+	store_global 'Test::Builder::Tester', '_expect_out',   expect_out
+	store_global 'Test::Builder::Tester', '_expect_diag',  expect_diag
 .end
 
 =item C<plan( num_tests )>
@@ -224,6 +225,68 @@ Sets the number of tests you plan to run, where C<num_tests> is an int.
 .end
 
 .sub line_num
+.end
+
+=item C<test_pass( test_string )>
+
+Sets the expectation for a test to pass.  C<test_string> is the optional
+description of the test.
+
+=cut
+
+.sub test_pass
+	.param string description
+
+	set_output( 'ok', description )
+.end
+
+=item C<test_fail( test_string )>
+
+Sets the expectation for a test to fail.  C<test_string> is the optional
+description of the test.
+
+=cut
+
+.sub test_fail
+	.param string description
+
+	set_output( 'not ok', description )
+.end
+
+.sub set_output
+	.param string test_type
+	.param string description
+
+	.local pmc test
+	.local pmc results
+	.local int result_count
+	.local pmc next_result
+
+	test         = find_global 'Test::Builder::Tester', '_default_test'
+	results      = test.'results'()
+	result_count = results
+	inc result_count
+
+	next_result  = new .String
+	set next_result, result_count
+
+	.local pmc line_string
+	line_string = new .String
+	concat line_string, test_type
+	concat line_string, ' '
+	concat line_string, next_result
+
+	.local int string_defined
+	string_defined = length description
+	unless string_defined goto SET_EXPECT_OUTPUT
+	concat line_string, ' - '
+	concat line_string, description
+
+  SET_EXPECT_OUTPUT:
+	.local pmc expect_out
+	expect_out = find_global 'Test::Builder::Tester', '_expect_out'
+
+	push expect_out, line_string
 .end
 
 =item C<test_out( test_string )>
@@ -287,9 +350,6 @@ This and C<test_err()> are effectively the same.
 	expect_diag = find_global 'Test::Builder::Tester', '_expect_diag'
 
 	push expect_diag, line_string
-.end
-
-.sub test_fail
 .end
 
 =item C<test_test( test_description )>
