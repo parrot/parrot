@@ -74,7 +74,7 @@ lib${slash}variables.pir \
 tcl.pir_template \
 tcl.pl
 
-tcl.pbc: pmcs lib${slash}tcllib.pbc lib${slash}tclcommand.pbc lib${slash}tclconst.pbc lib${slash}tclvar.pbc lib${slash}tclword.pbc tcl.pir
+tcl.pbc: pmcs lib${slash}tcllib.pbc lib${slash}tclcommand.pbc lib${slash}tclconst.pbc lib${slash}tclfunc.pbc lib${slash}tclvar.pbc lib${slash}tclword.pbc tcl.pir
 	$(PARROT) --output=tcl.pbc tcl.pir
 
 pmcs:
@@ -97,6 +97,9 @@ lib${slash}tclcommand.pbc: lib${slash}tclcommand.pir
 
 lib${slash}tclconst.pbc: lib${slash}tclconst.pir
 	$(PARROT) --output=$(LIBPATH)${slash}tclconst.pbc $(LIBPATH)${slash}tclconst.pir
+
+lib${slash}tclfunc.pbc: lib${slash}tclfunc.pir
+	$(PARROT) --output=$(LIBPATH)${slash}tclfunc.pbc $(LIBPATH)${slash}tclfunc.pir
 
 lib${slash}tclvar.pbc: lib${slash}tclvar.pir
 	$(PARROT) --output=$(LIBPATH)${slash}tclvar.pbc $(LIBPATH)${slash}tclvar.pir

@@ -133,16 +133,13 @@ get_function:
   # Does the string of characters here match one of our pre-defined
   # functions? If so, put that function on the stack.
   .local pmc func
-  .local pmc result
 
-  (op_length,func,result) = __expr_get_function(expr,chunk_start)
+  (op_length,func) = __expr_get_function(expr,chunk_start)
   if op_length == 0 goto get_operator
   chunk = new TclList
-  chunk[0] = FUNC
+  chunk[0] = OPERAND
   chunk[1] = func
-  chunk[2] = -1 # functions trump operands, for now.
   push chunks, chunk
-  push chunks, result
   chunk_start += op_length
   dec chunk_start
   goto chunk_loop
@@ -266,7 +263,6 @@ converter_loop:
   if $I2 == OPERAND goto converter_next
   if $I2 == CHUNK   goto converter_next
   if $I2 == OP   goto is_opfunc
-  if $I2 == FUNC goto is_opfunc # XXX should eventually go away as we make functions part of "CHUNK", above.
 
   # Should never be reached (XXX then shouldn't we die horribly?)
   goto converter_next 
@@ -356,7 +352,6 @@ stack_evaluator:
 
  # move all non op non funcs to the value stack
  if type == OP goto do_op
- if type == FUNC goto do_op
  $P0 = chunk[1]
  $P0 = $P0."interpret"()
  chunk[1] = $P0
@@ -367,8 +362,8 @@ do_op:
   # right now, we assume binary ops. Later, each op will define the
   # number of and type of ops it takes, and we will respect it.
 
-  .local int func
-  func = chunk[1]
+  .local int op
+  op = chunk[1]
 
   # XXX assume all operands take two args.
   .local pmc r_arg
@@ -378,44 +373,28 @@ do_op:
   l_arg = pop result_stack
   l_arg = l_arg[1]
 
-  if func >= FUNCTION_ABS goto func_list
   r_arg = pop result_stack
   r_arg = r_arg[1]
 
   # Is there a more efficient way to do this dispatch?
-  if func == OPERATOR_MUL goto op_mul
-  if func == OPERATOR_DIV goto op_div
-  if func == OPERATOR_MOD goto op_mod
-  if func == OPERATOR_PLUS goto op_plus
-  if func == OPERATOR_MINUS goto op_minus
-  if func == OPERATOR_SHL goto op_shl
-  if func == OPERATOR_SHR goto op_shr
-  if func == OPERATOR_LT goto op_lt
-  if func == OPERATOR_GT goto op_gt
-  if func == OPERATOR_LTE goto op_lte
-  if func == OPERATOR_GTE goto op_gte
-  if func == OPERATOR_EQUAL goto op_equal
-  if func == OPERATOR_UNEQUAL goto op_unequal
-  if func == OPERATOR_BITAND goto op_bitand
-  if func == OPERATOR_BITXOR goto op_bitxor
-  if func == OPERATOR_BITOR goto op_bitor
-  if func == OPERATOR_NE goto op_ne
-  if func == OPERATOR_EQ goto op_eq
-func_list: 
-  if func == FUNCTION_ABS goto func_abs
-  if func == FUNCTION_ACOS goto func_acos
-  if func == FUNCTION_ASIN goto func_asin
-  if func == FUNCTION_ATAN goto func_atan
-  if func == FUNCTION_COS goto func_cos
-  if func == FUNCTION_COSH goto func_cosh
-  if func == FUNCTION_EXP goto func_exp
-  if func == FUNCTION_LOG goto func_log
-  if func == FUNCTION_LOG10 goto func_log10
-  if func == FUNCTION_SIN goto func_sin
-  if func == FUNCTION_SINH goto func_sinh
-  if func == FUNCTION_SQRT goto func_sqrt
-  if func == FUNCTION_TAN goto func_tan
-  if func == FUNCTION_TANH goto func_tanh
+  if op == OPERATOR_MUL goto op_mul
+  if op == OPERATOR_DIV goto op_div
+  if op == OPERATOR_MOD goto op_mod
+  if op == OPERATOR_PLUS goto op_plus
+  if op == OPERATOR_MINUS goto op_minus
+  if op == OPERATOR_SHL goto op_shl
+  if op == OPERATOR_SHR goto op_shr
+  if op == OPERATOR_LT goto op_lt
+  if op == OPERATOR_GT goto op_gt
+  if op == OPERATOR_LTE goto op_lte
+  if op == OPERATOR_GTE goto op_gte
+  if op == OPERATOR_EQUAL goto op_equal
+  if op == OPERATOR_UNEQUAL goto op_unequal
+  if op == OPERATOR_BITAND goto op_bitand
+  if op == OPERATOR_BITXOR goto op_bitxor
+  if op == OPERATOR_BITOR goto op_bitor
+  if op == OPERATOR_NE goto op_ne
+  if op == OPERATOR_EQ goto op_eq
 
   #error_S = "invalid function lookup returned"
   goto die_horribly
@@ -493,78 +472,7 @@ op_eq:
   $S1 = r_arg
   if $S0 == $S1 goto done_op
   op_result = 0
-  goto done_op
-func_abs:
-  # XXX This isn't int only, izzit?
-  $I0 = l_arg
-  $I1 = abs $I0
-  op_result = $I1
-  goto done_op
-func_acos:
-  $N0 = l_arg
-  $N1 = acos $N0
-  op_result = $N1
-  goto done_op
-func_asin:
-  $N0 = l_arg
-  $N1 = asin $N0
-  op_result = $N1
-  goto done_op
-func_atan:
-  $N0 = l_arg
-  $N1 = atan $N0
-  op_result = $N1
-  goto done_op
-func_cos:
-  $N0 = l_arg
-  $N1 = cos $N0
-  op_result = $N1
-  goto done_op
-func_cosh:
-  $N0 = l_arg
-  $N1 = cosh $N0
-  op_result = $N1
-  goto done_op
-func_exp:
-  $N0 = l_arg
-  $N1 = exp $N0
-  op_result = $N1
-  goto done_op
-func_log:
-  $N0 = l_arg
-  $N1 = ln $N0
-  op_result = $N1
-  goto done_op
-func_log10:
-  $N0 = l_arg
-  $N1 = log10 $N0
-  op_result = $N1
-  goto done_op
-func_sin:
-  $N0 = l_arg
-  $N1 = sin $N0
-  op_result = $N1
-  goto done_op
-func_sinh:
-  $N0 = l_arg
-  $N1 = sinh $N0
-  op_result = $N1
-  goto done_op
-func_sqrt:
-  $N0 = l_arg
-  $N1 = sqrt $N0
-  op_result = $N1
-  goto done_op
-func_tan:
-  $N0 = l_arg
-  $N1 = tan $N0
-  op_result = $N1
-  goto done_op
-func_tanh:
-  $N0 = l_arg
-  $N1 = tanh $N0
-  op_result = $N1
-  # fallthrough to done_op
+  # goto done_op
 
 done_op:
   $P5 = new FixedPMCArray
@@ -704,9 +612,13 @@ loop_done:
   $P1 = find_global "_Tcl", "functions"
   
   func = $P1[$S0]
-  if_null func, fail 
-  $I0 = typeof func
-  if $I0 == .Undef goto fail
+  if_null func, fail
+  
+  $I0 = find_type "TclFunc"
+  func = new $I0
+  $P0 = new String
+  $P0 = $S0
+  setattribute func, "TclFunc\x00name", $P0
 
   # and the operand is what's between the ()'s - get the result
   # of /that/ expression and return it.
@@ -719,26 +631,21 @@ loop_done:
   len_operand = $I1
 
   $S1 = substr expr, start_paren_pos, len_operand
-  # XXX should be checking return value here.
-  ($I9,operand) = __expression_parse($S1)  
-  ($I9,operand) = __expression_interpret(operand)  
-  $P10 = new FixedPMCArray
-  $P10 = 2
-  $P10[0] = OPERAND
-  $P10[1] = operand
-  operand = $P10
+  ($I9,operand) = __expression_parse($S1) 
   if $I9 == TCL_ERROR goto fail
+  
+  setattribute func, "TclFunc\x00argument", operand
 
-  len =  start_paren_pos + len_operand
+  len = start_paren_pos + len_operand
   inc len
-  len = len - start
+  len -= start
   goto done
 
 fail:
   len = 0
 
 done:
-  .return(len,func,operand)
+  .return(len,func)
 .end
 
 =head2 _Tcl::__get_call_level

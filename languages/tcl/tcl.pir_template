@@ -24,7 +24,6 @@ providing a compreg-compatible method.
 # so there's no conflict.
 
   .const int OP      = 20
-  .const int FUNC    = 21
   .const int OPERAND = 11
  
   # Still not sure if these are going to be useful
@@ -86,6 +85,7 @@ providing a compreg-compatible method.
   # Load any dependant libraries.
   load_bytecode "languages/tcl/lib/tclcommand.pbc"
   load_bytecode "languages/tcl/lib/tclconst.pbc"
+  load_bytecode "languages/tcl/lib/tclfunc.pbc"
   load_bytecode "languages/tcl/lib/tclvar.pbc"
   load_bytecode "languages/tcl/lib/tclword.pbc"
   load_bytecode "library/Data/Escape.pbc"
