@@ -193,39 +193,8 @@ fail:
   goto done
 
 subexpr:
-  .local int depth
-  depth = 1
-  start = pos + 1
-paren_loop:
-  inc pos
-  if pos >= len goto premature_end
-  $I0 = ord expr, pos
-  if $I0 == 41 goto paren_right
-  if $I0 == 40 goto paren_left
-  if $I0 == 92 goto paren_backslash
-  goto paren_loop
-paren_right:
-  dec depth
-  if depth == 0 goto paren_done
-  goto paren_loop
-paren_left:
-  inc depth
-  goto paren_loop
-paren_backslash:
-  inc $I1
-  goto paren_loop
-
-paren_done:
-  $I0 = pos - start
-  inc pos
-  $S1 = substr expr, start, $I0
+  (retval, pos) = get_subexpr(expr, pos)
   
-  # XXX this is now officially braindead. Fissit.
-  (return_type,retval) = __expression_parse($S1)
-  if return_type == TCL_ERROR goto die_horribly
-  (return_type,retval) = __expression_interpret(retval)
-  if return_type == TCL_ERROR goto die_horribly
-
   chunk = new TclList
   chunk[0] = OPERAND
   chunk[1] = retval
@@ -275,15 +244,6 @@ number:
 
 done:
   .return(chunk, pos)
-
-premature_end:
-  $P0 = new Exception
-  $S0 = new String
-  $S0 = "syntax error in expression \""
-  $S0 .= expr
-  $S0 .= "\": premature end of expression"
-  $P0["_message"] = $S0
-  throw $P0
 .end
 
 .sub get_operator
@@ -522,6 +482,64 @@ evaluation_done:
 
 evaluation_return:
   .return(return_type,retval)
+.end
+
+.sub get_subexpr
+  .param string expr
+  .param int pos
+  
+  .local pmc chunk, retval
+  .local int return_type
+  
+  .local int len, depth, start
+  len   = length expr
+  depth = 1
+  start = pos + 1
+paren_loop:
+  inc pos
+  if pos >= len goto premature_end
+  $I0 = ord expr, pos
+  if $I0 == 41 goto paren_right
+  if $I0 == 40 goto paren_left
+  if $I0 == 92 goto paren_backslash
+  goto paren_loop
+paren_right:
+  dec depth
+  if depth == 0 goto paren_done
+  goto paren_loop
+paren_left:
+  inc depth
+  goto paren_loop
+paren_backslash:
+  inc $I1
+  goto paren_loop
+
+paren_done:
+  $I0 = pos - start
+  inc pos
+  $S1 = substr expr, start, $I0
+  
+  # XXX this is now officially braindead. Fissit.
+  (return_type,retval) = __expression_parse($S1)
+  if return_type == TCL_ERROR goto die_horribly
+  (return_type,retval) = __expression_interpret(retval)
+  if return_type == TCL_ERROR goto die_horribly
+  
+  .return(retval, pos)
+
+die_horribly:
+  $P0 = new Exception 
+  $P0["_message"] = "An error occurred in EXPR"
+  throw $P0
+
+premature_end:
+  $P0 = new Exception
+  $S0 = new String
+  $S0 = "syntax error in expression \""
+  $S0 .= expr
+  $S0 .= "\": premature end of expression"
+  $P0["_message"] = $S0
+  throw $P0
 .end
 
 # given a string, starting at position, return the length
