@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 33;
+use Parrot::Test tests => 45;
 use Test::More;
 use vars qw($TODO);
 
@@ -243,3 +243,101 @@ language_output_is("tcl", <<'TCL', <<'OUT',"array unset, too many args");
 TCL
 wrong # args: should be "array unset arrayName ?pattern?"
 OUT
+
+TODO: {
+  local $TODO = "[array names] isn't implemented yet.";
+
+language_output_is("tcl", <<'TCL', <<'OUT',"array names, no array");
+  puts [array names a]
+TCL
+
+OUT
+
+language_output_is("tcl", <<'TCL', <<'OUT',"array names, bad option");
+  array names a b c
+TCL
+bad option "b": must be -exact, -glob, or -regexp
+OUT
+
+language_output_is("tcl", <<'TCL', <<'OUT',"array names, too many args");
+  array names a b c d
+TCL
+wrong # args: should be "array names arrayName ?mode? ?pattern?");
+OUT
+
+language_output_is("tcl", <<'TCL', <<'OUT',"array names, no pattern");
+  set a(monkey) see
+  puts [array names a]
+TCL
+monkey
+OUT
+
+language_output_is("tcl", <<'TCL', <<'OUT',"array names, default glob pattern");
+  set a(monkey1) see
+  set a(monkey2) do
+  puts [array names a monkey*]
+TCL
+monkey1 monkey2
+OUT
+
+language_output_is("tcl", <<'TCL', <<'OUT',"array names, default glob pattern failure");
+  set a(monkey1) see
+  set a(monkey2) do
+  puts [array names a cat*]
+TCL
+
+OUT
+
+language_output_is("tcl", <<'TCL', <<'OUT',"array names, explicit glob pattern");
+  set a(monkey1) see
+  set a(monkey2) do
+  puts [array names a -glob monkey*]
+TCL
+monkey1 monkey2
+OUT
+
+language_output_is("tcl", <<'TCL', <<'OUT',"array names, explicit glob pattern failure");
+  set a(monkey1) see
+  set a(monkey2) do
+  puts [array names a -glob cat*]
+TCL
+
+OUT
+
+language_output_is("tcl", <<'TCL', <<'OUT',"array names, explicit exact match");
+  set a(monkey1) see
+  set a(monkey2) do
+  puts [array names a -exact monkey1]
+TCL
+monkey1
+OUT
+
+language_output_is("tcl", <<'TCL', <<'OUT',"array names, explicit exact match failure");
+  set a(monkey1) see
+  set a(monkey2) do
+  puts [array names a -exact cat5]
+TCL
+
+OUT
+
+}
+
+TODO: {
+  local $TODO = "don't have tcl style regexp in PGE yet.";
+
+language_output_is("tcl", <<'TCL', <<'OUT',"array names, explicit regexp match");
+  set a(monkey1) see
+  set a(monkey2) do
+  puts [array names a -regexp ^mon.*]
+TCL
+monkey1 monkey2
+OUT
+
+language_output_is("tcl", <<'TCL', <<'OUT',"array names, explicit regexp match failure");
+  set a(monkey1) see
+  set a(monkey2) do
+  puts [array names a -regexp cat]
+TCL
+
+OUT
+}

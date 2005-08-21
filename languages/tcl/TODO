@@ -85,6 +85,10 @@ need to specify the correct errors to throw.
 
 =over 4
 
+=item [regexp], [regsub], -regexp
+
+Don't have a tcl-style RE PGE class avaialable yet.
+
 =item [pwd]
 
 Need to open an RT ticket on this.
