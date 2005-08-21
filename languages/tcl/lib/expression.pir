@@ -220,20 +220,16 @@ subcommand:
   goto done
 
 function:
-  # Does the string of characters here match one of our pre-defined
-  # functions? If so, put that function on the stack.
-  .local pmc func
-  .local int op_length
-  (op_length,func) = __expr_get_function(expr,pos)
-  if op_length == 0 goto get_operator
+  (retval, pos) = get_function(expr, pos)
+  
   chunk = new TclList
   chunk[0] = OPERAND
-  chunk[1] = func
+  chunk[1] = retval
   
-  pos += op_length
   goto done
 
 number:
+  .local int op_length
   (op_length,retval) = __expr_get_number(expr,pos)
   chunk = new TclList
   chunk[0] = OPERAND
@@ -599,30 +595,27 @@ done:
   .return(pos,value)
 .end
 
-.sub __expr_get_function
+.sub get_function
   .param string expr
-  .param int start
+  .param int pos
 
-  .local int len 
+  .local int len, start
+  len   = length expr
+  start = pos
+   
   .local pmc func,operand
 
-  .local int start_paren_pos
-  .local int expr_length
-  expr_length = length expr
+  # functions *must* have ()s 
+  pos = index expr, "(", start
+  if pos == -1 goto fail
 
-  # if we are starting with the text of a defined function,
-  # and it's followed by a (), 
- 
-  index start_paren_pos, expr, "(", start
-  if start_paren_pos == -1 goto fail
-
-  .local int depth
-  depth = 1
-  $I0 = start_paren_pos
+  .local int depth, paren_pos
+  depth     = 1
+  paren_pos = pos
 loop:
-  inc $I0
-  if $I0 >= expr_length goto fail
-  $I1 = ord expr, $I0
+  inc pos
+  if pos >= len goto missing_paren
+  $I1 = ord expr, pos
   if $I1 == 40 goto left
   if $I1 == 41 goto right
   if $I1 == 92 goto backslash
@@ -635,22 +628,17 @@ right:
   if depth == 0 goto loop_done
   goto loop
 backslash:
-  inc $I0
+  inc pos
   goto loop
 
 loop_done:
-  $I1 = $I0 - start_paren_pos
-  dec $I1
- 
-  # so, we know that the function name must be before the first (
-  .local int len
-  len = start_paren_pos - start
-
-  $S0 = substr expr, start, len
+  # the function name must be before the first (
+  $I0 = paren_pos - start
+  $S0 = substr expr, start, $I0
   $P1 = find_global "_Tcl", "functions"
   
   func = $P1[$S0]
-  if_null func, fail
+  if_null func, unknown_func
   
   $I0 = find_type "TclFunc"
   func = new $I0
@@ -663,27 +651,39 @@ loop_done:
   # XXX - If there are commas in the op, then split the operand
   #   and parse each one as an operand. needed for:
   #   atan2,pow,fmod,hypot
-
-  inc start_paren_pos
-  .local int len_operand
-  len_operand = $I1
-
-  $S1 = substr expr, start_paren_pos, len_operand
-  ($I9,operand) = __expression_parse($S1) 
-  if $I9 == TCL_ERROR goto fail
+  
+  inc paren_pos
+  $I0 = pos - paren_pos
+  $S1 = substr expr, paren_pos, $I0
+  ($I0,operand) = __expression_parse($S1) 
+  if $I0 == TCL_ERROR goto fail
   
   setattribute func, "TclFunc\x00argument", operand
 
-  len = start_paren_pos + len_operand
-  inc len
-  len -= start
-  goto done
+done:
+  inc pos
+  .return(func, pos)
 
 fail:
-  len = 0
+  $P0 = new Exception
+  $P0["_message"] = "error parsing function arguments!"
+  throw $P0
 
-done:
-  .return(len,func)
+missing_paren:
+  $P0 = new Exception
+  $S0 = "syntax error in expression \""
+  $S0 .= expr
+  $S0 .= "\": missing close parenthesis at end of function call"
+  $P0["_message"] = $S0
+  throw $P0
+
+unknown_func:
+  $P0 = new Exception
+  $S1 = "unknown math function \""
+  $S1 .= $S0
+  $S1 .= "\""
+  $P0["_message"] = $S0
+  throw $P0
 .end
 
 =head2 _Tcl::__get_call_level
