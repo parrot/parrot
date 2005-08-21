@@ -34,9 +34,14 @@ however, then we're returning the invokable PMC.
   pos = 0
 
 operand:
-  (chunk, pos) = get_operand(expr, pos)
-  if_null chunk, no_operand
+  (retval, pos) = get_operand(expr, pos)
+  if_null retval, no_operand
+  
+  chunk = new TclList
+  chunk[0] = OPERAND
+  chunk[1] = retval
   push chunks, chunk
+  
   goto operator
 
 no_operand:
@@ -159,7 +164,7 @@ converter_done:
   .param string expr
   .param int pos
 
-  .local pmc chunk, retval
+  .local pmc retval
   .local int return_type
 
   .local int start, len
@@ -182,63 +187,44 @@ eat_space:
   if $I0 == 40 goto subexpr     # (
   if $I0 == 36 goto variable    # $
   if $I0 == 46 goto number      # .
+  if $I0 == 45 goto unary       # -
+  if $I0 == 43 goto unary       # +
+  if $I0 == 47 goto unary       # ~
+  if $I0 == 33 goto unary       # !
   
   $I0 = is_wordchar expr, pos
   if $I0 == 1 goto function
-  
-  # unary
 
 fail:
-  null chunk
+  null retval
   goto done
 
 subexpr:
   (retval, pos) = get_subexpr(expr, pos)
-  
-  chunk = new TclList
-  chunk[0] = OPERAND
-  chunk[1] = retval
-  
   goto done
  
 variable:
   (retval, pos) = get_variable(expr, pos)
-  
-  chunk = new TclList
-  chunk[0] = OPERAND
-  chunk[1] = retval
-  
   goto done
 
 subcommand:
   (retval, pos) = get_subcommand(expr, pos)
-
-  chunk = new TclList
-  chunk[0] = OPERAND
-  chunk[1] = retval
-  
   goto done
 
 function:
   (retval, pos) = get_function(expr, pos)
-  
-  chunk = new TclList
-  chunk[0] = OPERAND
-  chunk[1] = retval
-  
   goto done
 
 number:
-  (retval, pos) = get_number(expr,pos)
-  
-  chunk = new TclList
-  chunk[0] = OPERAND
-  chunk[1] = retval
-  
+  (retval, pos) = get_number(expr, pos)
+  goto done
+
+unary:
+  (retval, pos) = get_unary(expr, pos)
   # goto done
 
 done:
-  .return(chunk, pos)
+  .return(retval, pos)
 .end
 
 .sub get_operator
@@ -680,4 +666,26 @@ unknown_func:
   $S1 .= "\""
   $P0["_message"] = $S0
   throw $P0
+.end
+
+.sub get_unary
+  .param string expr
+  .param int pos
+  
+  .local pmc name, operand
+  
+  $S0 = substr expr, pos, 1
+  name = new String
+  name = $S0
+  
+  inc pos
+  (operand, pos) = get_operand(expr, pos)
+  
+  .local pmc unary
+  $I0   = find_type "TclUnaryOp"
+  unary = new $I0
+  setattribute unary, "TclUnaryOp\x00name", name
+  setattribute unary, "TclUnaryOp\x00operand", operand
+  
+  .return(unary, pos)
 .end

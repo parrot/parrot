@@ -86,6 +86,7 @@ providing a compreg-compatible method.
   load_bytecode "languages/tcl/lib/tclcommand.pbc"
   load_bytecode "languages/tcl/lib/tclconst.pbc"
   load_bytecode "languages/tcl/lib/tclfunc.pbc"
+  load_bytecode "languages/tcl/lib/tclops.pbc"
   load_bytecode "languages/tcl/lib/tclvar.pbc"
   load_bytecode "languages/tcl/lib/tclword.pbc"
   load_bytecode "library/Data/Escape.pbc"
