@@ -22,197 +22,33 @@ however, then we're returning the invokable PMC.
   .local pmc retval
   .local int return_type
   return_type = TCL_OK
-  
-  .local pmc chunk        # the current chunk we're working on
-  .local pmc ops          # Global list of available ops.
-  ops = find_global "_Tcl", "operators"
-  .local pmc precedences  # Global list of operator precedence
-  precedences = find_global "_Tcl", "precedence"
 
   .local pmc undef
   undef = new Undef
 
-  .local pmc chunks
+  .local pmc chunk, chunks, program_stack
   chunks = new TclList
-  .local pmc program_stack
   program_stack = new TclList
 
-  .local int chunk_start
-  chunk_start = -1 # we inc before we use it
+  .local int pos
+  pos = 0
 
-  .local int char
-  .local int expr_length
-  expr_length = length expr
-  .local int op_length
-
-chunk_loop:
-  inc chunk_start
-  if chunk_start >= expr_length goto chunks_done
-  
-  $I0 = is_whitespace expr, chunk_start
-  if $I0 == 1 goto chunk_loop
-  
-  $I0 = is_digit expr, chunk_start
-  if $I0 == 1 goto get_number
-  
-  $I0 = ord expr, chunk_start
-  if $I0 == 91 goto subcommand        # [
-  if $I0 == 40 goto get_parenthetical # (
-  if $I0 == 36 goto variable          # $
-  if $I0 == 46 goto get_number        # .
-  
-  $I0 = is_wordchar expr, chunk_start
-  if $I0 == 1 goto get_function
-  
-  goto get_operator
-
-get_parenthetical:
-  .local int depth
-  depth = 1
-  $I1   = chunk_start
-get_paren_loop:
-  inc $I1
-  if $I1 >= expr_length goto premature_end
-  $I0 = ord expr, $I1
-  if $I0 == 41 goto get_paren_loop_right
-  if $I0 == 40 goto get_paren_loop_left
-  if $I0 == 92 goto get_paren_loop_backslash
-  goto get_paren_loop
-get_paren_loop_right:
-  dec depth
-  if depth == 0 goto get_paren_done
-  goto get_paren_loop
-get_paren_loop_left:
-  inc depth
-  goto get_paren_loop
-get_paren_loop_backslash:
-  inc $I1
-  goto get_paren_loop
-
-get_paren_done:
-  $I0 = $I1 - chunk_start
-  dec $I0
-  inc chunk_start
-  $S1 = substr expr, chunk_start, $I0
-  
-  # XXX this is now officially braindead. Fissit.
-  (return_type,retval) = __expression_parse($S1)
-  if return_type == TCL_ERROR goto die_horribly
-  (return_type,retval) = __expression_interpret(retval)
-  if return_type == TCL_ERROR goto die_horribly
-
-  chunk = new TclList
-  chunk[0] = OPERAND
-  chunk[1] = retval
-
+operand:
+  (chunk, pos) = get_operand(expr, pos)
+  if_null chunk, no_operand
   push chunks, chunk
-  chunk_start += $I0
-  goto chunk_loop
+  goto operator
+
+no_operand:
+  $P0 = new Exception
+  $P0["_message"] = "no operand!"
+  throw $P0
  
-variable:
-  (retval, chunk_start) = get_variable(expr, chunk_start)
-  
-  chunk = new TclList
-  chunk[0] = OPERAND
-  chunk[1] = retval
+operator:
+  (chunk, pos) = get_operator(expr, pos)
+  if_null chunk, chunks_done
   push chunks, chunk
-  dec chunk_start
-  goto chunk_loop
-
-subcommand:
-  (retval, chunk_start) = get_subcommand(expr, chunk_start)
-
-  chunk = new TclList
-  chunk[0] = OPERAND
-  chunk[1] = retval
-  push chunks, chunk
-  dec chunk_start
-  goto chunk_loop
-
-get_function:
-  # Does the string of characters here match one of our pre-defined
-  # functions? If so, put that function on the stack.
-  .local pmc func
-
-  (op_length,func) = __expr_get_function(expr,chunk_start)
-  if op_length == 0 goto get_operator
-  chunk = new TclList
-  chunk[0] = OPERAND
-  chunk[1] = func
-  push chunks, chunk
-  chunk_start += op_length
-  dec chunk_start
-  goto chunk_loop
-
-get_number:
-  # If we got here, then char and chunk_start are already set properly
-  .local pmc value
-  (op_length,value) = __expr_get_number(expr,chunk_start)
-  if op_length == 0 goto get_operator
-  # XXX otherwise, pull that number off
-  # stuff the chunk onto the chunk_list
-  chunk = new TclList
-  chunk[0] = OPERAND
-  chunk[1] = value
-  push chunks, chunk
-  chunk_start += op_length
-  dec chunk_start
-  goto chunk_loop
- 
-get_operator:
-  # If we got here, then char and chunk_start are already set properly
-  .local int op_len
-  .local int expr_len
-  .local string test_op
-
-  expr_len = length expr 
-
-  # cheat - right now there are only 2 and 1 character ops
-  # 2 char trump one char.
-
-  $I0 = chunk_start + 1
-  if $I0 == expr_len goto one_char
-
-two_char:
-  op_len = 2
-  test_op = substr expr, chunk_start, op_len
-  $P11 = ops[test_op]
-  if_null $P11, one_char
-  $I1 = typeof $P11
-  if $I1 == .Undef goto one_char
-  goto op_done
-  # Does this op exist?
-
-one_char:
-  op_len = 1
-  test_op = substr expr, chunk_start, op_len
-  $P11 = ops[test_op]
-  if_null $P11, op_fail
-  $I1 = typeof $P11
-  if $I1 == .Undef goto op_fail
-  goto op_done
-
-op_fail:
-  op_len = 0
-
-op_done:
-  $I5 = precedences[test_op]
-  # If we didn't find an operator here, then... die. we
-  # can handle this more gracefully later, I suppose. 
-  if op_len == 0 goto die_horribly
-
-  $I6 = ops[test_op]
-
-  chunk = new TclList
-  chunk[0] = OP
-  chunk[1] = $I6 # op lookup
-  chunk[2] = $I5 # precedence
-
-  push chunks, chunk
-
-  chunk_start += op_len
-  dec chunk_start
-  goto chunk_loop
+  goto operand
 
   # if we don't match any of the possible cases so far, then we must
   # be a string operand, but for now, die. #XXX
@@ -314,24 +150,208 @@ die_horribly:
   program_stack = "An error occurred in EXPR"
   goto converter_done
 
-premature_end:
-  return_type = TCL_ERROR
-  program_stack = new String
-  program_stack = "syntax error in expression \""
-  program_stack .= expr
-  program_stack .= "\": premature end of expression"
-
 converter_done:
   .return(return_type,program_stack)
 
 .end
 
-.sub __expression_interpret
-  .param pmc args
+.sub get_operand
+  .param string expr
+  .param int pos
+
+  .local pmc chunk, retval
+  .local int return_type
+
+  .local int start, len
+  start = pos
+  len   = length expr
+
+  dec pos
+eat_space:
+  inc pos
+  if pos >= len goto fail
   
-   # is this dup neeeded?
-  .local pmc program_stack
-   program_stack = args
+  $I0 = is_whitespace expr, pos
+  if $I0 == 1 goto eat_space
+  
+  $I0 = is_digit expr, pos
+  if $I0 == 1 goto number
+  
+  $I0 = ord expr, pos
+  if $I0 == 91 goto subcommand  # [
+  if $I0 == 40 goto subexpr     # (
+  if $I0 == 36 goto variable    # $
+  if $I0 == 46 goto number      # .
+  
+  $I0 = is_wordchar expr, pos
+  if $I0 == 1 goto function
+  
+  # unary
+
+fail:
+  null chunk
+  goto done
+
+subexpr:
+  .local int depth
+  depth = 1
+  start = pos + 1
+paren_loop:
+  inc pos
+  if pos >= len goto premature_end
+  $I0 = ord expr, pos
+  if $I0 == 41 goto paren_right
+  if $I0 == 40 goto paren_left
+  if $I0 == 92 goto paren_backslash
+  goto paren_loop
+paren_right:
+  dec depth
+  if depth == 0 goto paren_done
+  goto paren_loop
+paren_left:
+  inc depth
+  goto paren_loop
+paren_backslash:
+  inc $I1
+  goto paren_loop
+
+paren_done:
+  $I0 = pos - start
+  inc pos
+  $S1 = substr expr, start, $I0
+  
+  # XXX this is now officially braindead. Fissit.
+  (return_type,retval) = __expression_parse($S1)
+  if return_type == TCL_ERROR goto die_horribly
+  (return_type,retval) = __expression_interpret(retval)
+  if return_type == TCL_ERROR goto die_horribly
+
+  chunk = new TclList
+  chunk[0] = OPERAND
+  chunk[1] = retval
+  
+  goto done
+ 
+variable:
+  (retval, pos) = get_variable(expr, pos)
+  
+  chunk = new TclList
+  chunk[0] = OPERAND
+  chunk[1] = retval
+  
+  goto done
+
+subcommand:
+  (retval, pos) = get_subcommand(expr, pos)
+
+  chunk = new TclList
+  chunk[0] = OPERAND
+  chunk[1] = retval
+  
+  goto done
+
+function:
+  # Does the string of characters here match one of our pre-defined
+  # functions? If so, put that function on the stack.
+  .local pmc func
+  .local int op_length
+  (op_length,func) = __expr_get_function(expr,pos)
+  if op_length == 0 goto get_operator
+  chunk = new TclList
+  chunk[0] = OPERAND
+  chunk[1] = func
+  
+  pos += op_length
+  goto done
+
+number:
+  (op_length,retval) = __expr_get_number(expr,pos)
+  chunk = new TclList
+  chunk[0] = OPERAND
+  chunk[1] = retval
+  
+  pos += op_length
+  # goto done
+
+done:
+  .return(chunk, pos)
+
+premature_end:
+  $P0 = new Exception
+  $S0 = new String
+  $S0 = "syntax error in expression \""
+  $S0 .= expr
+  $S0 .= "\": premature end of expression"
+  $P0["_message"] = $S0
+  throw $P0
+.end
+
+.sub get_operator
+  .param string expr
+  .param int pos
+  
+  .local pmc chunk
+  null chunk
+  
+  .local pmc ops, precedences
+  # Global list of available ops.
+  ops = find_global "_Tcl", "operators"
+  # Global list of operator precedence
+  precedences = find_global "_Tcl", "precedence"
+  
+  .local int len
+  len = length expr
+  dec pos
+eat_space:
+  inc pos
+  if pos >= len goto done
+  $I0 = is_whitespace expr, pos
+  if $I0 == 1 goto eat_space
+
+  .local int op_len
+  .local string test_op
+
+  # cheat - right now there are only 2 and 1 character ops
+  # 2 char trump one char.
+
+  $I0 = pos + 1
+  if $I0 == len goto one_char
+
+two_char:
+  op_len = 2
+  test_op = substr expr, pos, op_len
+  $P11 = ops[test_op]
+  if_null $P11, one_char
+  $I1 = typeof $P11
+  if $I1 == .Undef goto one_char
+  goto op_done
+
+one_char:
+  op_len = 1
+  test_op = substr expr, pos, op_len
+  $P11 = ops[test_op]
+  if_null $P11, done
+  $I1 = typeof $P11
+  if $I1 == .Undef goto done
+
+op_done:
+  $I5 = precedences[test_op]
+  $I6 = ops[test_op]
+
+  chunk = new TclList
+  chunk[0] = OP
+  chunk[1] = $I6 # op lookup
+  chunk[2] = $I5 # precedence
+
+  pos += op_len
+
+done:  
+  .return(chunk, pos)
+.end
+
+.sub __expression_interpret
+  .param pmc program_stack
+
   .local pmc result_stack
   result_stack = new TclList
   .local pmc retval
