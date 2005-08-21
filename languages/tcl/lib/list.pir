@@ -20,7 +20,7 @@
   .local int return_type
   return_type = TCL_OK
 
-  .local int index_length,number_length
+  .local int index_length, pos
   .local pmc number_result
 
   if position == "end" goto my_end
@@ -28,8 +28,8 @@
   $S0 = substr position, 0, 4
   if $S0 == "end-" goto has_end
   index_length = length position
-  (number_length,retval) = __expr_get_number(position,0)
-  if number_length != index_length goto bad_arg
+  (retval, pos) = get_number(position,0)
+  if pos != index_length goto bad_arg
   $I0 = isa retval, "Integer"
   if $I0 == 0 goto bad_arg
   
@@ -54,10 +54,9 @@ bad_arg:
 has_end:
     # is this an int? if so, subtract it from -1 to get our parrot-style index.
   index_length = length position
-  index_length -= 4  # ignore "end-"
   # is this an int?
-  (number_length,number_result) = __expr_get_number(position,4)
-  if number_length != index_length goto bad_arg
+  (number_result, pos) = get_number(position,4)
+  if pos != index_length goto bad_arg
   $I0 = isa number_result, "Integer"
   if $I0 == 0 goto bad_arg
   # say, 1 if -1

@@ -19,7 +19,7 @@
 
   .local pmc retval
   .local int index_length
-  .local int number_length
+  .local int pos
   .local pmc number_result
 
   .local int index_1
@@ -30,8 +30,8 @@
   if $S0 == "end-" goto has_end
   index_length = length $S0
   # is this an int?
-  (number_length,retval) = __expr_get_number(position,0)
-  if number_length != index_length goto bad_arg
+  (retval, pos) = get_number(position,0)
+  if pos != index_length goto bad_arg
   $I0 = isa retval, "Integer"
   if $I0 == 0 goto bad_arg
   goto done
@@ -48,10 +48,9 @@ bad_arg:
 has_end:
   # is this an int? if so, subtract it from -1 to get our parrot-style index.
   index_length = length position
-  index_length -= 4  # ignore "end-"
   # is this an int?
-  (number_length,number_result) = __expr_get_number(position,4)
-  if number_length != index_length goto bad_arg
+  (number_result,pos) = get_number(position,4)
+  if pos != index_length goto bad_arg
   $I0 = isa number_result, "Integer"
   if $I0 == 0 goto bad_arg
   # say, 1 if -1

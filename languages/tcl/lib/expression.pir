@@ -229,13 +229,12 @@ function:
   goto done
 
 number:
-  .local int op_length
-  (op_length,retval) = __expr_get_number(expr,pos)
+  (retval, pos) = get_number(expr,pos)
+  
   chunk = new TclList
   chunk[0] = OPERAND
   chunk[1] = retval
   
-  pos += op_length
   # goto done
 
 done:
@@ -538,11 +537,10 @@ premature_end:
   throw $P0
 .end
 
-# given a string, starting at position, return the length
-# of the number starting at that position. return '0' if 
-# no number was found.
+# given a string, starting at position, return a PMC
+# for the number and the new position
 
-.sub __expr_get_number
+.sub get_number
   .param string expr
   .param int pos
 
@@ -564,7 +562,6 @@ integer:
   goto integer 
 integer_done:
   if char == 46 goto floating
-  pos -= start
   if pos == 0 goto done # failure
   
   $S0 = substr expr, start, pos
@@ -583,7 +580,6 @@ float_loop:
   inc pos
   goto float_loop
 float_done:
-  pos -= start
   
   $S0 = substr expr, start, pos
   $N0 = $S0
@@ -592,7 +588,7 @@ float_done:
   # goto done
 
 done:
-  .return(pos,value)
+  .return(value, pos)
 .end
 
 .sub get_function
