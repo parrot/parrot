@@ -4,7 +4,6 @@ use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
 use Parrot::Test tests => 44;
 use Test::More;
-use vars qw($TODO);
 
 language_output_is("tcl",<<TCL,<<OUT,"mul");
  puts [expr 2 * 3]
@@ -267,9 +266,6 @@ TCL
 2
 OUT
 
-TODO: {
-local $TODO = "bugs";
-
 language_output_is("tcl",<<'TCL',<<'OUT',"braced operands.");
  set n 1
  puts [expr {$n * 1}]
@@ -277,4 +273,3 @@ TCL
 1
 OUT
 
-}

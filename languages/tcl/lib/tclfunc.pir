@@ -59,15 +59,16 @@ Initialize the attributes for an instance of the class
   retval      = new TclInt
   return_type = TCL_OK
   
-  .local pmc funcs, expr_interpret
+  .local pmc funcs, expr_interpret, __number
   funcs = find_global "_Tcl", "functions"
   expr_interpret = find_global "_Tcl", "__expression_interpret"
+  __number = find_global "_Tcl", "__number"
   
   .local pmc arg, name
   arg  = getattribute self, "TclFunc\x00argument"
   (return_type, retval) = expr_interpret(arg)
   if return_type == TCL_ERROR goto done
-  arg  = retval
+  arg  = __number(retval)
   name = getattribute self, "TclFunc\x00name"
   
   $I0 = funcs[name]

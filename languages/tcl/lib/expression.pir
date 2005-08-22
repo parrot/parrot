@@ -333,9 +333,11 @@ do_op:
   op_result = new TclInt
   l_arg = pop result_stack
   l_arg = l_arg[1]
+  l_arg = __number(l_arg)
 
   r_arg = pop result_stack
   r_arg = r_arg[1]
+  r_arg = __number(r_arg)
 
   # Is there a more efficient way to do this dispatch?
   if op == OPERATOR_MUL goto op_mul
