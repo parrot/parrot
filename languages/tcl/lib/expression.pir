@@ -14,7 +14,7 @@ however, then we're returning the invokable PMC.
 
 =cut
 
-.const int MAX_PRECEDENCE =  9
+.const int MAX_PRECEDENCE =  11
 
 .sub __expression_parse
   .param string expr
@@ -358,6 +358,8 @@ do_op:
   if op == OPERATOR_BITOR goto op_bitor
   if op == OPERATOR_NE goto op_ne
   if op == OPERATOR_EQ goto op_eq
+  if op == OPERATOR_AND goto op_and
+  if op == OPERATOR_OR goto op_or
 
   #error_S = "invalid function lookup returned"
   goto die_horribly
@@ -434,6 +436,18 @@ op_eq:
   $S0 = l_arg
   $S1 = r_arg
   if $S0 == $S1 goto done_op
+  op_result = 0
+  goto done_op
+op_and:
+  op_result = 0
+  unless l_arg goto done_op
+  unless r_arg goto done_op
+  op_result = 1
+  goto done_op
+op_or:
+  op_result = 1
+  if l_arg goto done_op
+  if r_arg goto done_op
   op_result = 0
   # goto done_op
 

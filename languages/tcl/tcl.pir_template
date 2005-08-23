@@ -34,6 +34,8 @@ providing a compreg-compatible method.
 
 # Constants for operator/function lookup.
 
+  .const int OPERATOR_AND    = 26
+  .const int OPERATOR_OR     = 27
   .const int OPERATOR_EQ     = 28
   .const int OPERATOR_NE     = 29
   .const int OPERATOR_BITAND = 30
@@ -161,6 +163,10 @@ providing a compreg-compatible method.
   precedence["^"] =  8
   operators["|"] = OPERATOR_BITOR
   precedence["|"] = 9
+  operators["&&"] = OPERATOR_AND
+  precedence["&&"] = 10
+  operators["||"] = OPERATOR_OR
+  precedence["||"] = 11
 
   store_global "_Tcl", "operators", operators
   store_global "_Tcl", "functions", math_funcs
