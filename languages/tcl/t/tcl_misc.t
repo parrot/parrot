@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 19;
+use Parrot::Test tests => 20;
 use Test::More;
 
 language_output_is("tcl",<<'TCL',<<OUT,"leading spacex2 should be ok");
@@ -135,3 +135,11 @@ TCL
 extra characters after close-brace
 OUT
 
+TODO: {
+  local $TODO = "unimplemented";
+language_output_is("tcl",<<'TCL',<<'OUT',"subcommands with semicolons");
+  puts [set a [set b 1; set c 2]]
+TCL
+2
+OUT
+}
