@@ -18,7 +18,7 @@ DOD/GC related bugs.
 
 =cut
 
-use Parrot::Test tests => 19;
+use Parrot::Test tests => 22;
 
 output_is( <<'CODE', '1', "sweep 1" );
       interpinfo I1, 2   # How many DOD runs have we done already?
@@ -774,4 +774,103 @@ ok 1
 ok 2
 ok 3
 ok 4
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "AddrRegistry 1");
+.sub main @MAIN
+    .local pmc a, reg, nil
+    reg = new .AddrRegistry
+    a = new .String
+    null nil
+    $I0 = reg[a]
+    if $I0 == -1 goto ok1
+    print "not "
+ok1:
+    print "ok 1\n"
+    reg[a] = nil
+    $I0 = reg[a]
+    if $I0 == 1 goto ok2
+    print "not "
+ok2:
+    print "ok 2\n"
+    reg[a] = nil
+    $I0 = reg[a]
+    if $I0 == 2 goto ok3
+    print "not "
+ok3:
+    print "ok 3\n"
+
+    delete reg[a]
+    $I0 = reg[a]
+    if $I0 == 1 goto ok4
+    print "not "
+ok4:
+    print "ok 4\n"
+    delete reg[a]
+    $I0 = reg[a]
+    if $I0 == -1 goto ok5
+    print "not "
+ok5:
+    print "ok 5\n"
+.end
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
+ok 5
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "AddrRegistry 2");
+.sub main @MAIN
+    .local pmc a, b, reg, nil
+    null nil
+    reg = new .AddrRegistry
+    a = new .String
+    b = new .String
+    $I0 = elements reg
+    print $I0
+    reg[a] = nil
+    $I0 = elements reg
+    print $I0
+    reg[a] = nil
+    $I0 = elements reg
+    print $I0
+    reg[b] = nil
+    $I0 = elements reg
+    print $I0
+    print "\n"
+.end
+CODE
+0112
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "AddrRegistry 2");
+.sub main @MAIN
+    .local pmc a, b, c, reg, nil, it
+    null nil
+    reg = new .AddrRegistry
+    a = new .String
+    a = "k1"
+    b = new .String
+    b = "k2"
+    c = new .String
+    c = "k3"
+    reg[a] = nil
+    reg[b] = nil
+    reg[c] = nil
+
+    it = iter reg
+loop:
+    unless it goto done
+    $P0 = shift it
+    print $P0
+    goto loop
+done:
+    print "\n"
+.end
+# the current hash implementation returns entries in order
+# for a few keys, and if there were no deletes
+CODE
+k1k2k3
 OUTPUT

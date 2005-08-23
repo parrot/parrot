@@ -123,6 +123,8 @@ Parrot_Language Parrot_find_language(Parrot_INTERP, char*);
 
 void Parrot_register_pmc(Parrot_INTERP, Parrot_PMC);
 void Parrot_unregister_pmc(Parrot_INTERP, Parrot_PMC);
+Parrot_PMC Parrot_get_dod_registry(Parrot_INTERP);
+
 
 #endif /* PARROT_EXTEND_H_GUARD */
 

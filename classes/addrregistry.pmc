@@ -1,0 +1,220 @@
+/*
+Copyright: 2005 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+classes/addrregistry.pmc - A DOD Registry PMC
+
+=head1 DESCRIPTION
+
+The AddrRegistry class provides the equivalence of reference counts
+mainly for extenders and embeders of Parrot. The hash keys are the
+addressed of the key PMC, values are reference counts, i.e. the
+difference of (set_pmc_keyed - delete_pmc_keyed). If the reference
+goes to zero, the entry is deleted physically.
+
+Please not that you have to anchor an instance of AddrRegistry yourself
+e.g. with C<Parrot_register_pmc> if it isn't visible to Parrot.
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+#include <assert.h>
+#include "pmc_hash.h"
+
+static size_t
+key_hash_int(Interp *interp, void *value, size_t seed)
+{
+    UNUSED(interp);
+    return (size_t)value ^ seed;
+}
+
+static int
+int_compare(Interp *interp, void *a, void *b)
+{
+    UNUSED(interp);
+    return a != b;
+}
+
+static void
+pobject_lives_fn(Interp *interp, PObj *o)
+{
+    pobject_lives(interp, o);
+}
+
+pmclass AddrRegistry need_ext does hash {
+/*
+
+=item C<void init()>
+
+Initializes the instance.
+
+=item C<void destroy()>
+
+Free hash structure.
+
+=cut
+
+*/
+
+    void init () {
+        PMC_struct_val(SELF) = NULL;
+        PObj_custom_mark_destroy_SETALL(SELF);
+        new_pmc_hash_x(INTERP, SELF, enum_type_int, Hash_key_type_PMC,
+                int_compare, key_hash_int);
+    }
+
+    void destroy () {
+        if (PMC_struct_val(SELF)) {
+            hash_destroy(INTERP, (Hash*) PMC_struct_val(SELF));
+            PMC_struct_val(SELF) = NULL;
+        }
+    }
+
+/*
+
+=item C<void mark()>
+
+Marks the hash as live.
+
+=cut
+
+*/
+
+    void mark () {
+        if (PMC_struct_val(SELF))
+            mark_hash(INTERP, PMC_struct_val(SELF));
+    }
+
+/*
+
+=item C<INTVAL get_integer_keyed(PMC *key)>
+
+Returns the reference count for C<key> or -1, if the key
+doesn't exist.
+
+=item C<INTVAL elements()>
+
+Returns the number of elements in the hash.
+
+=item C<INTVAL get_bool()>
+
+Returns true if the hash size is not zero.
+
+=cut
+
+*/
+
+    INTVAL get_integer_keyed (PMC* key) {
+        Hash *hash = PMC_struct_val(SELF);
+        HashBucket *b;
+
+        b = hash_get_bucket(INTERP, hash, key);
+        if (b == NULL)
+	    return -1;
+	return (INTVAL) b->value;
+    }
+
+    INTVAL elements () {
+        return hash_size(INTERP, PMC_struct_val(SELF));
+    }
+
+    INTVAL get_bool () {
+        return hash_size(INTERP, PMC_struct_val(SELF)) != 0;
+    }
+/*
+
+=item C<void set_pmc_keyed(PMC *key, PMC *value)>
+
+Increment the reference count of C<key>. If the entry doesn't exist
+create it. The C<value> is always ignored.
+
+=item C<void delete_keyed(PMC *key)>
+
+Decrement the reference count of C<key>. If the reference count
+reaches 0, delete the entry.
+
+
+=cut
+
+*/
+
+    void set_pmc_keyed (PMC* key, PMC* value) {
+	Hash * hash = (Hash *)PMC_struct_val(SELF);
+	HashBucket *b;
+	b = hash_get_bucket(INTERP, hash, key);
+	if (b)
+	    LVALUE_CAST(long, b->value) ++;
+	else
+	    hash_put(INTERP, hash, key, (void *) 1);
+    }
+
+    void delete_keyed(PMC* key) {
+	Hash * hash = (Hash *)PMC_struct_val(SELF);
+	HashBucket *b;
+	b = hash_get_bucket(INTERP, hash, key);
+	if (b) {
+	    if ((long) b->value == 1L)
+		hash_delete(INTERP, hash, key);
+	    else
+		LVALUE_CAST(long, b->value) --;
+	}
+    }
+
+/*
+
+=item C<PMC* get_iter ()>
+
+Return a new iterator for the PMC.
+
+=item C<PMC *get_pmc_keyed(PMC *key)>
+
+If called from iteration, return the key PMC, else PMCNULL is returned.
+
+=cut
+
+*/
+
+    PMC* get_iter () {
+	return Parrot_Hash_get_iter(INTERP, SELF);
+    }
+
+    PMC* get_pmc_keyed (PMC* key) {
+	Hash *hash = PMC_struct_val(SELF);
+
+	if ((PObj_get_FLAGS(key) & KEY_type_FLAGS) ==
+		KEY_hash_iterator_FLAGS) {
+	    return hash_get_idx(INTERP, hash, key);
+	}
+	return PMCNULL;
+    }
+}
+
+/*
+
+=back
+
+=head1 SEE ALSO
+
+F<src/pmc.c:dod_register_pmc()>
+
+=cut
+
+*/
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+*/

@@ -502,52 +502,6 @@ Parrot_create_mro(Interp *interpreter, INTVAL type)
 
 /*
 
-=item C<static size_t
-key_hash_int(Interp *interp, void *value, size_t seed)>
-
-Simply returns C<value>. C<hash> is ignored.
-
-Used in C<dod_register_pmc()>.
-
-=cut
-
-*/
-
-static size_t
-key_hash_int(Interp *interp, void *value, size_t seed)
-{
-    UNUSED(interp);
-    return (size_t)value ^ seed;
-}
-
-/*
-
-=item C<static int
-int_compare(Parrot_Interp interp, void *a, void *b)>
-
-Returns whether C<a != b>.
-
-Used in C<dod_register_pmc()>.
-
-=cut
-
-*/
-
-static int
-int_compare(Interp *interp, void *a, void *b)
-{
-    UNUSED(interp);
-    return a != b;
-}
-
-static void
-pobject_lives_fn(Interp *interp, PObj *o)
-{
-    pobject_lives(interp, o);
-}
-
-/*
-
 =back
 
 =head2 DOD registry interface
@@ -566,29 +520,17 @@ Registers the PMC with the interpreter's DOD registery.
 void
 dod_register_pmc(Parrot_Interp interpreter, PMC* pmc)
 {
-    Hash *hash;
-    HashBucket *bucket;
-
+    PMC *registry;
     /* Better not trigger a DOD run with a potentially unanchored PMC */
     Parrot_block_DOD(interpreter);
 
     if (!interpreter->DOD_registry) {
-        PMC *registry;
-        registry = interpreter->DOD_registry = pmc_new_noinit(interpreter,
-                enum_class_Hash);
-        new_pmc_hash_x(interpreter, registry, enum_type_int, Hash_key_type_PMC,
-                int_compare, key_hash_int);
-        PObj_custom_mark_destroy_SETALL(registry);
-        hash = PMC_struct_val(registry);
+        registry = interpreter->DOD_registry =
+            pmc_new(interpreter, enum_class_AddrRegistry);
     }
     else
-        hash = PMC_struct_val(interpreter->DOD_registry);
-
-    bucket = hash_get_bucket(interpreter, hash, pmc);
-    if (bucket)
-        LVALUE_CAST(long, bucket->value) ++;
-    else
-        hash_put(interpreter, hash, pmc, (void *) 1);
+        registry = interpreter->DOD_registry;
+    VTABLE_set_pmc_keyed(interpreter, registry, pmc, NULL);
     Parrot_unblock_DOD(interpreter);
 
 }
@@ -607,20 +549,9 @@ Unregisters the PMC from the interpreter's DOD registery.
 void
 dod_unregister_pmc(Parrot_Interp interpreter, PMC* pmc)
 {
-    Hash *hash;
-    HashBucket *bucket;
-
     if (!interpreter->DOD_registry)
         return; /* XXX or signal exception? */
-    hash = PMC_struct_val(interpreter->DOD_registry);
-
-    bucket = hash_get_bucket(interpreter, hash, pmc);
-    if (bucket) {
-        if ((long) bucket->value == 1L)
-            hash_delete(interpreter, hash, pmc);
-        else
-            LVALUE_CAST(long, bucket->value) --;
-    }
+    VTABLE_delete_keyed(interpreter, interpreter->DOD_registry, pmc);
 }
 
 /*

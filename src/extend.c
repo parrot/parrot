@@ -1071,6 +1071,11 @@ Remove a reference of the PMC from the interpreters DOD registry. If the
 reference count reaches zero, the PMC will be destroyed during the next
 DOD run.
 
+=iterm <Parrot_PMC Parrot_get_dod_registry(Parrot_INTERP)>
+
+Return Parrot's internal DOD registry PMC.
+See also: F<classes/addrregistry.pmc>.
+
 =cut
 
 */
@@ -1081,6 +1086,19 @@ Parrot_unregister_pmc(Parrot_INTERP interp, Parrot_PMC pmc)
     PARROT_CALLIN_START(interp);
     dod_unregister_pmc(interp, pmc);
     PARROT_CALLIN_END(interp);
+}
+
+Parrot_PMC
+Parrot_get_dod_registry(Parrot_INTERP interp)
+{
+    PMC *registry = interp->DOD_registry;
+    PARROT_CALLIN_START(interp);
+    if (!registry) {
+        registry = interp->DOD_registry =
+            pmc_new(interp, enum_class_AddrRegistry);
+    }
+    PARROT_CALLIN_END(interp);
+    return registry;
 }
 
 /*
