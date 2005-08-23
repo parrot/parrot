@@ -63,9 +63,6 @@ Perhaps via [namespace import]? Can fake it right now with [inline]
 
 =item [expr] mdiep is currently working on this.
 
-Clean up [expr]. MUUUUCH room for improvement there. [expr] is the source
-of most of our abysmal performance in bench.tcl.
-
 the expr AST could use a rework. Be nice if it just passed around something
 invokable.
 
@@ -79,8 +76,7 @@ remove this for operators?
 
 TBD: blocks and strings as operands
 
-TBD: logical binary ops & ternary op (need deferred evaluation) ; unary ops;
-ops that work on strings only.
+TBD: ternary op
 
 TBD: functions that take > 1 arg.
 
