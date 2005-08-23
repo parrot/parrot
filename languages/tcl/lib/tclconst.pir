@@ -2,12 +2,7 @@
 
 .HLL "Tcl", "tcl_group"
 
-# return codes
- .const int TCL_OK = 0
- .const int TCL_ERROR = 1
- .const int TCL_RETURN = 2
- .const int TCL_BREAK = 3
- .const int TCL_CONTINUE = 4
+.include "languages/tcl/lib/returncodes.pir"
 
 =head2 __class_init
 

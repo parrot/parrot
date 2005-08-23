@@ -1,5 +1,15 @@
 =head1 Tcl TODOs
 
+=head2 Milestones
+
+The next *big* milestone is to be able to run tcl's test suite natively. That
+means being able to deal with all the commands in:
+
+http://cvs.sourceforge.net/viewcvs.py/tcl/tcl/library/tcltest/tcltest.tcl?view=markup
+
+This will require a lot of work. On the plus side, we'll be passing a lot more
+tests by then. =-)
+
 =head2 Generic tasks
 
 =over 4
@@ -89,9 +99,9 @@ need to specify the correct errors to throw.
 
 Don't have a tcl-style RE PGE class avaialable yet.
 
-=item [pwd]
+=item [pwd], [cd] [#???]
 
-Need to open an RT ticket on this.
+Need this to run tcltest
 
 =item [interpinfo name] [#36277]
 

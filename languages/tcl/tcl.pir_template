@@ -8,17 +8,12 @@ providing a compreg-compatible method.
 
 =cut
 
+.include "languages/tcl/lib/returncodes.pir"
+
 # don't pollute the global namespaces with our utility functions.
 
 # setup some global constants (a bit TOO global, we should confine these
 # to at least the _Tcl namespace)
-
-# return codes
- .const int TCL_OK = 0
- .const int TCL_ERROR = 1
- .const int TCL_RETURN = 2
- .const int TCL_BREAK = 3
- .const int TCL_CONTINUE = 4
 
 # expression codes - we use TCL_OK there, so move these out high enough
 # so there's no conflict.

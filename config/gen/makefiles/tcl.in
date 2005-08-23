@@ -67,6 +67,7 @@ lib${slash}interpret.pir \
 lib${slash}list.pir \
 lib${slash}list_to_string.pir \
 lib${slash}parser.pir \
+lib${slash}returncodes.pir \
 lib${slash}string_to_list.pir \
 lib${slash}string.pir \
 lib${slash}tcl.p6r \
