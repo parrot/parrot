@@ -1,0 +1,109 @@
+! $Id: $
+
+Include "declare.inf"; ! variable declarations
+Include "assert.inf"; ! p/f/pt (ok/not_ok) routines
+
+! ----------------------------------------------------------------------
+
+[ test_arithmetic;
+   print "# add^";
+   do_add( 5,  3,  8);
+   do_add( 3,  5,  8);
+   do_add(-5,  3, -2);
+   do_add(-5, -3, -8);
+   do_add(-3, -5, -8);
+   do_add(-3,  5,  2);
+   do_add(32765, 6, -32765);
+   
+   print "# sub^";
+   do_sub(8,   5,  3);
+   do_sub(8,   3,  5);
+   do_sub(-2, -5,  3);
+   do_sub(-8, -5, -3);
+   do_sub(-8, -3, -5);
+   do_sub(2,  -3,  5);
+   do_sub(-32765, 32765, 6);
+
+   print "# mul^";
+   do_mul(  0, 123,   0);
+   do_mul(123,   0,   0);
+   do_mul(  8,   9,  72);
+   do_mul(  9,   8,  72);
+   do_mul( 11,  -5, -55);
+   do_mul(-11,   5, -55);
+   do_mul(-11,  -5,  55);
+   do_mul(-32768, -1, -32768);
+   
+   print "# div^";
+   do_div(-11,  2, -5);
+   do_div(-11, -2,  5);
+   do_div( 11, -2, -5);
+   do_div(  5,  1,  5);
+   do_div(  5,  2,  2);
+   do_div(  5,  3,  1);
+   do_div(  5,  5,  1);
+   do_div(  5,  6,  0);
+   do_div(5, 32767, 0);
+   do_div(32767, -32768, 0);
+   do_div(-32768, 32767, -1);
+!   do_div(-32768, -1, -32768);
+
+   print "# mod^";
+   do_mod(-13,  5, -3);
+   do_mod( 13, -5,  3);
+   do_mod(-13, -5, -3);
+   do_mod(  5,  1,  0);
+   do_mod(  5,  2,  1);
+   do_mod(  5,  3,  2);
+   do_mod(  5,  5,  0);
+   do_mod(  5,  6,  5);
+   do_mod(5, 32767, 5);
+   do_mod(32767, -32768, 32767);
+   do_mod(-32768, 32767, -1);
+!   do_mod(-32768, -1, 0);
+
+   rtrue;
+];
+   
+[ do_add a b expect c;
+   @add a b -> c; Ga = a; Gb = b;
+   assert2(c, expect, "+");
+];
+
+[ do_sub a b expect c;
+   @sub a b -> c; Ga = a; Gb = b;
+   assert2(c, expect, "-");
+];
+
+[ do_mul a b expect c;
+   @mul a b -> c; Ga = a; Gb = b;
+   assert2(c, expect, "*");
+];
+
+[ do_div a b expect c;
+   @div a b -> c; Ga = a; Gb = b;
+   assert2(c, expect, "/");
+];
+
+[ do_mod a b expect c;
+   @mod a b -> c; Ga = a; Gb = b;
+   assert2(c, expect, "%");
+];
+
+
+!---------------------- MAIN
+
+[ Main;
+
+   Testnum = 0; Passed = 0; Failed = 0; Print_Tests = 0;
+
+   test_arithmetic();
+
+   print "1..", Testnum,"^";
+   @quit;
+   .bad_quit;
+   print "not ok Quit didn't work!^";
+   rtrue;
+];
+
+! vim: tw=78 sw=3

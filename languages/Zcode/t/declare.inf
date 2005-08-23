@@ -1,0 +1,75 @@
+!! Base on CZECH: Comprehensive Z-machine Emulation CHecker
+!!
+!! Fairly thoroughly test Parrot z-machine
+!!
+!! $Id: $
+
+
+! Force Inform to use abbreviations
+Switches e;
+Switches v3; ! for now...
+
+! Notes for writing tests:
+! - In general, use assembly (@ commands) instead of Inform. We're testing 
+!   how the Z-machine performs on the opcodes, not how Inform translates stuff
+!   E.g., Use @print instead of print so inform uses @print instead of 
+!   @print_paddr even for long strings.
+!   And I never use (string) or (char), which load in a bunch of extra code.
+! - Use assert whenever possible. Otherwise, call p() or f()
+!   after testing to increment the count of failed & passed tests
+!   Or call pt() for a print test, where the user needs to decide whether
+!   the test was successful. '.' is also printed for every call to p() or f()
+!   ("assert*()" appears to consistently map to @call_vn2.)
+! - Certain things are done in a roundabout way to avoid using complex opcodes.
+!   This is especially true of assert* routines, which can be called from
+!   anywhere in the testing process.
+! - This file is designed to require NO I/O. Other test files can test
+!   I/O stuff. We can still test opcodes like read/print by using streams.
+
+! Version-specific constants - Ifdef these to test only certain versions
+! Someday, we'll need a IS_V6 here for V6-specific opcodes.
+Iftrue #version_number >= 4;
+   Constant V4PLUS = 1;
+Endif;
+Iftrue #version_number >= 5;
+   Constant V5PLUS = 1;
+Endif;
+
+! [Evin] couldn't figure out how to do negative numbers in inform assembly, so
+! here's constants for the numbers I use
+Constant n1 -1;
+Constant n2 -2;
+Constant n3 -3;
+Constant n4 -4;
+Constant n5 -5;
+Constant n500 -500;
+Constant n32768 -32768;
+
+! TODO I could test globals by confirming that g00 changes when I try to
+! change the first Global I declare. 
+
+! CAREFUL about declaring new globals! Declaration order matters, e.g.
+! for "@load [i] -> j", where i refers to a Global var.
+Global count;
+Global Testnum;
+Global Passed;
+Global Failed;
+Global Print_Tests;
+Global Gtemp;
+!Global Gtemp2;
+Global Ga; Global Gb; ! hack used to get assert routines to work in v3
+!Global Standard;
+
+Abbreviate "xyzzy";
+
+Array mytable -> 256;
+!Array mysecond -> 256;
+
+! Make this sub the first in the test program, so that the string
+! in it is the first string in high memory.
+! TODO Don't know how to find first string's address, though!
+![ make_a_string;
+!    print "^print_paddr: This long string should be printed.^";
+!];
+
+! vim: tw=78 sw=3

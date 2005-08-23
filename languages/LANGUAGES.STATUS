@@ -238,3 +238,11 @@ S: code generation plays nicely together with Parrot opcodes.
 W: http://toetsch.at/yal/
 M: Yes
 V: 0.0.13
+
+N: Zcode
+A: Amir Karger (taken over from Leo)
+D: Infocom's Z-machine
+S: 25 out of 66 Z3 opcodes all or mostly done. A long way from Zork.
+M: Yes
+V: 0.2.3
+

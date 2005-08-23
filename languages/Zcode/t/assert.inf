@@ -1,0 +1,95 @@
+! ----------------------------------------------------------------------
+! Assert Routines: did we get expected output?
+
+! Main assert function.
+! desc is an optional arg which is a short string describing the exact
+! test run. Note that the program already writes which opcode we're testing,
+! so only use this for saying what *aspect* of that opcode is being tested.
+! See calls in the code for examples.
+[ assert0 actual expected desc;
+
+   if (expected ~= actual) {
+      print "not ok ",Testnum," ";
+      ! Print description if we got one
+#Ifdef V5PLUS;
+      @check_arg_count 3 ?~no_desc;
+#Ifnot; ! fake a check_arg_count
+      @jz desc ?no_desc;
+#Endif;
+      print "(";
+      @print_paddr desc;
+      print ")";
+
+      .no_desc;
+      f();
+      print " Expected ", expected, "; got ", actual, "^^";
+      !@quit;
+   } else {
+       p();
+   }
+];
+
+! Problem: the "(string)" command requires Inform to pull in a whole
+! bunch of code requiring a whole bunch of new ops, which I don't want
+! to use for assert commands
+
+! Special assert for Unary ops
+! TODO allow this to take an optional desc also, to give the test's REASON.
+[ assert1 actual expected op a;
+    a = Ga; ! Hack so we can call with only 3 args for v3.
+    if (expected ~= actual) {
+       f();
+       !print (string) op, a;
+       print "not ok ", Testnum, " (";
+       @print_paddr op;
+       print " ", a, ")";
+       print " Expected ", expected, "; got ", actual, "^";
+       !@quit;
+    } else {
+        p();
+    }
+];
+
+! Special assert for Binary ops
+! TODO allow this to take an optional desc also, to give the test's REASON.
+[ assert2 actual expected op a b;
+    a = Ga; b = Gb; ! Hack so we can call with only 3 args for v3.
+    if (expected ~= actual) {
+       f();
+!      print a, (string) op, b;
+       print "not ok ", Testnum, " (";
+       print a, " ";
+       @print_paddr op;
+       print " ", b, ")";
+       print " Expected ", expected, "; got ", actual, "^";
+       !@quit;
+    } else {
+        p();
+    }
+];
+
+! For a print test, don't print out a dot & don't try and figure out
+! if it was successful
+[ pt;
+    Testnum++;
+    Print_Tests++;
+    @print "ok ";
+    @print_num Testnum;
+    @print "^";
+];
+
+! Passed a test
+[ p;
+    Testnum++;
+    Passed++;
+    @print "ok ";
+    @print_num Testnum;
+    @print "^";
+];
+
+! Failed a test
+[ f;
+    Testnum++;
+    Failed++;
+];
+

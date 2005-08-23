@@ -1,0 +1,524 @@
+!! CZECH: Comprehensive Z-machine Emulation CHecker
+!!
+!! Fairly thoroughly test z-machine stuff.
+!!
+!! Based on nitfol test script, by Evin Robertson, which was placed in 
+!!     the public domain.
+!! Amir Karger massively modified it, changed its name, and un-public'ed it.
+!! See README.txt for license. (Basically, use/copy/modify, but be nice.)
+
+
+
+! Force Inform to use abbreviations
+Switches e;
+Switches v3;
+
+Constant TEST_VERSION "0.8";
+
+!!
+!! USAGE NOTES:
+!!
+!! * To run tests, just compile this with Inform (I used 6.21.) and run
+!!   the resulting file with your favorite intepreter.
+!!
+!! * After every test (except print tests) a '.' is printed. 
+!!   The current test number is printed each time a set of tests is started,
+!!   and whenever a test fails. 
+!!
+!! * At the end, you'll get a summary of passed tests, failed tests, and print
+!!   tests. (The computer can't test whether a print test was successful.)
+!!
+!! * Many tests print a string when they fail describing exactly what went
+!!   wrong, so you can look in the code for that string and see exactly
+!!   what test failed. If no string is printed out, count tests from the
+!!   beginning of the set until the test number that failed.
+!!
+!! * Compile with -v[3468] to test different Z-machine versions.
+!!   (Inform's default is -v5.)
+!!
+!! * A set of tests can be skipped. See Main().
+!!
+!! * subroutines, print, and some jumps are needed to do
+!!   most testing. If they have major bugs, the whole script may break.
+!!   (E.g., You need to call_vn2 (call in v3) just to get to "Main" routine.)
+!!   Local/Global variables and stack also need to work at least somewhat.
+
+!--------------------------------------------------------------------
+! Main() calls a bunch of test_* subs.
+! test_* subs each test a set of functionality, e.g., arithmetic operators
+! do_* subs generally test one op, sometimes two (like load/store)
+! assert* routines test that the expected value was obtained, and
+!     sometimes print a test description, too.
+!--------------------------------------------------------------------
+! Still need to test: 
+! - test globals, locals, stack as ops more thoroughly
+! - moreheader stuff
+! - IO (streams, read_char, fancy print stuff)
+! - *_table
+! - fancy IO: time, split_window, get_mouse, streams, etc.
+! - read, tokenise
+! - save/restore? restart?
+! - See TODO throughout the file for more stringent testing ideas
+! Steal David Kinder's Unicode.inf? (Win2002 Examples dir)
+! Steal etude stuff?
+! Steal nitfol's crashme.inf, randomization print test?
+!--------------------------------------------------------------------
+! More notes for writing tests:
+! - In general, use assembly (@ commands) instead of Inform. We're testing 
+!   how the Z-machine performs on the opcodes, not how Inform translates stuff
+!   E.g., Use @print instead of print so inform uses @print instead of 
+!   @print_paddr even for long strings.
+!   And I never use (string) or (char), which load in a bunch of extra code.
+! - Use assert whenever possible. Otherwise, call p() or f()
+!   after testing to increment the count of failed & passed tests
+!   Or call pt() for a print test, where the user needs to decide whether
+!   the test was successful. '.' is also printed for every call to p() or f()
+!   ("assert*()" appears to consistently map to @call_vn2.)
+! - Certain things are done in a roundabout way to avoid using complex opcodes.
+!   This is especially true of assert* routines, which can be called from
+!   anywhere in the testing process.
+! - This file is designed to require NO I/O. Other test files can test
+!   I/O stuff. We can still test opcodes like read/print by using streams.
+
+! Version-specific constants - Ifdef these to test only certain versions
+! Someday, we'll need a IS_V6 here for V6-specific opcodes.
+Iftrue #version_number >= 4;
+   Constant V4PLUS = 1;
+Endif;
+Iftrue #version_number >= 5;
+   Constant V5PLUS = 1;
+Endif;
+
+! [Evin] couldn't figure out how to do negative numbers in inform assembly, so
+! here's constants for the numbers I use
+Constant n1 -1;
+Constant n2 -2;
+Constant n3 -3;
+Constant n4 -4;
+Constant n5 -5;
+Constant n500 -500;
+Constant n32768 -32768;
+
+! TODO I could test globals by confirming that g00 changes when I try to
+! change the first Global I declare. 
+
+! CAREFUL about declaring new globals! Declaration order matters, e.g.
+! for "@load [i] -> j", where i refers to a Global var.
+Global count;
+Global Testnum;
+Global Passed;
+Global Failed;
+Global Print_Tests;
+Global Gtemp;
+!Global Gtemp2;
+Global Ga; Global Gb; ! hack used to get assert routines to work in v3
+!Global Standard;
+
+Abbreviate "xyzzy";
+
+Array mytable -> 256;
+!Array mysecond -> 256;
+
+! Make this sub the first in the test program, so that the string
+! in it is the first string in high memory.
+! TODO Don't know how to find first string's address, though!
+![ make_a_string;
+!    print "^print_paddr: This long string should be printed.^";
+!];
+
+! ----------------------------------------------------------------------
+! Assert Routines: did we get expected output?
+
+! Main assert function.
+! desc is an optional arg which is a short string describing the exact
+! test run. Note that the program already writes which opcode we're testing,
+! so only use this for saying what *aspect* of that opcode is being tested.
+! See calls in the code for examples.
+[ assert0 actual expected desc;
+
+   if (expected ~= actual) {
+      print "^^ERROR [",Testnum,"] ";
+      ! Print description if we got one
+#Ifdef V5PLUS;
+      @check_arg_count 3 ?~no_desc;
+#Ifnot; ! fake a check_arg_count
+      @jz desc ?no_desc;
+#Endif;
+      print "(";
+      @print_paddr desc;
+      print ")";
+
+      .no_desc;
+      f();
+      print " Expected ", expected, "; got ", actual, "^^";
+      !@quit;
+   } else {
+       p();
+   }
+];
+
+! Problem: the "(string)" command requires Inform to pull in a whole
+! bunch of code requiring a whole bunch of new ops, which I don't want
+! to use for assert commands
+
+! Special assert for Unary ops
+! TODO allow this to take an optional desc also, to give the test's REASON.
+[ assert1 actual expected op a;
+    a = Ga; ! Hack so we can call with only 3 args for v3.
+    if (expected ~= actual) {
+       f();
+       !print (string) op, a;
+       print "^^ERROR [", Testnum, "] (";
+       @print_paddr op;
+       print " ", a, ")";
+       print " Expected ", expected, "; got ", actual, "^";
+       !@quit;
+    } else {
+        p();
+    }
+];
+
+! Special assert for Binary ops
+! TODO allow this to take an optional desc also, to give the test's REASON.
+[ assert2 actual expected op a b;
+    a = Ga; b = Gb; ! Hack so we can call with only 3 args for v3.
+    if (expected ~= actual) {
+       f();
+!      print a, (string) op, b;
+       print "^^[", Testnum, "] (";
+       print a, " ";
+       @print_paddr op;
+       print " ", b, ")";
+       print " Expected ", expected, "; got ", actual, "^";
+       !@quit;
+    } else {
+        p();
+    }
+];
+
+! For a print test, don't print out a dot & don't try and figure out
+! if it was successful
+[ pt;
+    Testnum++;
+    Print_Tests++;
+];
+
+! Passed a test
+[ p;
+    @print ".";
+    Testnum++;
+    Passed++;
+];
+
+! Failed a test
+[ f;
+    Testnum++;
+    Failed++;
+];
+
+! ----------------------------------------------------------------------
+! These subs run tests on a particular set of ops
+! First argument is whether to skip the tests
+
+[ test_jumps skip i;
+   print "Jumps";
+   @jz skip ?skipped;
+   print " skipped";
+   rfalse;
+.skipped;
+   print " [", Testnum+1, "]: ";
+   print "jump";
+   jump j2; ! Using "@jump" with label name crashes
+   .j1;
+   print "bad!"; @quit;
+   .j2; p();
+
+   ! Note that some of these jumps are > 63 bytes away, some less,
+   ! so we'll test short and long form of branching.
+   print "je";
+   ! TODO test "je sp a b c" to make sure not multi-popping stack, etc.
+   @je  5  5 ?~bad; p();
+   @je  5 n5 ?bad; p();
+   @je n5  5 ?bad; p();
+   @je n5 n5 ?~bad; p();
+   @je  32767 n32768 ?bad; p();
+   @je n32768 n32768 ?~bad; p();
+!   @je 5 4 5 ?~bad; p();
+!   @je 5 4 3 5 ?~bad; p();
+!   @je 5 4 5 3 ?~bad; p();
+!   @je 5 4 3 2 ?bad; p();
+   
+   print "jg";
+   @jg  5  5 ?bad; p();
+   @jg  1  0 ?~bad; p();
+   @jg  0  1 ?bad; p();
+   @jg n1 n2 ?~bad; p();
+   @jg n2 n1 ?bad; p();
+   @jg  1 n1 ?~bad; p();
+   @jg n1  1 ?bad; p();
+   
+   print "jl";
+   @jl  5  5 ?bad; p();
+   @jl  1  0 ?bad; p();
+   @jl  0  1 ?~bad; p();
+   @jl n1 n2 ?bad; p();
+   @jl n2 n1 ?~bad; p();
+   @jl  1 n1 ?bad; p();
+   @jl n1  1 ?~bad; p();
+   
+   print "jz";
+   @jz 0 ?~bad; p();
+   @jz 1 ?bad; p();
+   @jz n4 ?bad; p();
+
+   print "offsets";
+   i = do_jump_return(0);
+   assert0(i, 0, "branch 0");
+   i = do_jump_return(1);
+   assert0(i, 1, "branch 1");
+   rtrue;
+
+.bad;
+   print "^bad [", Testnum, "]!^";
+   @print "Quitting tests because jumps don't work!";
+   @quit;   
+
+];
+
+! Test that offset of 0/1 returns instead of branching.
+! TODO in theory we should test all jump opcodes to make sure they can
+! return false/true
+[ do_jump_return i;
+   @je i 0 ?~j1;
+   @jz 0 ?rfalse;
+   return 97;
+   .j1;
+   @je i 1 ?~j2;
+   @jz 0 ?rtrue;
+   return 98;
+   .j2;
+   return 99;
+];
+
+! ---- ARITH ----------------------------------
+[ test_arithmetic skip;
+   print "Arithmetic ops";
+   @jz skip ?skipped;
+   print " skipped";
+   rfalse;
+.skipped;
+   print " [", Testnum+1, "]: ";
+
+   print "add";
+   do_add( 5,  3,  8);
+   do_add( 3,  5,  8);
+   do_add(-5,  3, -2);
+   do_add(-5, -3, -8);
+   do_add(-3, -5, -8);
+   do_add(-3,  5,  2);
+   do_add(32765, 6, -32765);
+   
+   print "sub";
+   do_sub(8,   5,  3);
+   do_sub(8,   3,  5);
+   do_sub(-2, -5,  3);
+   do_sub(-8, -5, -3);
+   do_sub(-8, -3, -5);
+   do_sub(2,  -3,  5);
+   do_sub(-32765, 32765, 6);
+
+   print "^    mul";
+   do_mul(  0, 123,   0);
+   do_mul(123,   0,   0);
+   do_mul(  8,   9,  72);
+   do_mul(  9,   8,  72);
+   do_mul( 11,  -5, -55);
+   do_mul(-11,   5, -55);
+   do_mul(-11,  -5,  55);
+   do_mul(-32768, -1, -32768);
+   
+   print "div";
+   do_div(-11,  2, -5);
+   do_div(-11, -2,  5);
+   do_div( 11, -2, -5);
+   do_div(  5,  1,  5);
+   do_div(  5,  2,  2);
+   do_div(  5,  3,  1);
+   do_div(  5,  5,  1);
+   do_div(  5,  6,  0);
+   do_div(5, 32767, 0);
+   do_div(32767, -32768, 0);
+   do_div(-32768, 32767, -1);
+!   do_div(-32768, -1, -32768);
+
+   print "mod";
+   do_mod(-13,  5, -3);
+   do_mod( 13, -5,  3);
+   do_mod(-13, -5, -3);
+   do_mod(  5,  1,  0);
+   do_mod(  5,  2,  1);
+   do_mod(  5,  3,  2);
+   do_mod(  5,  5,  0);
+   do_mod(  5,  6,  5);
+   do_mod(5, 32767, 5);
+   do_mod(32767, -32768, 32767);
+   do_mod(-32768, 32767, -1);
+!   do_mod(-32768, -1, 0);
+
+   rtrue;
+];
+   
+[ do_add a b expect c;
+   @add a b -> c; Ga = a; Gb = b;
+   assert2(c, expect, "+");
+];
+
+[ do_sub a b expect c;
+   @sub a b -> c; Ga = a; Gb = b;
+   assert2(c, expect, "-");
+];
+
+[ do_mul a b expect c;
+   @mul a b -> c; Ga = a; Gb = b;
+   assert2(c, expect, "*");
+];
+
+[ do_div a b expect c;
+   @div a b -> c; Ga = a; Gb = b;
+   assert2(c, expect, "/");
+];
+
+[ do_mod a b expect c;
+   @mod a b -> c; Ga = a; Gb = b;
+   assert2(c, expect, "%");
+];
+
+! ---- LOGICAL ----------------------------------
+[ test_logical skip;
+   print "Logical ops";
+   @jz skip ?skipped;
+   print " skipped";
+   rfalse;
+.skipped;
+   print " [", Testnum+1, "]: ";
+
+   print "not";
+   do_not(0, ~0);
+   do_not(123, ~123);
+   do_not($5555, $aaaa);
+   do_not($aaaa, $5555);
+   
+   print "and";
+   do_and( 5,  3,  1);
+   do_and( 3,  5,  1);
+   do_and(-3, -3, -3);
+   do_and(-3,  5,  5);
+   do_and(-3, -5, -7);
+   
+   print "or";
+   do_or($1234, $4321, $5335);
+   do_or($4321, $1234, $5335);
+   do_or($1234,     0, $1234);
+   do_or($1030, $ffff, $ffff);
+   do_or($ffff, $0204, $ffff);
+   
+#Ifdef V5PLUS;
+   print "art_shift";
+   do_art( 0,  1,  0);
+   do_art( 0, -1,  0);
+   do_art( 1,  5, 32);
+   do_art( 1, -1,  0);
+   do_art(85,  1, 170);
+   do_art(85, -2, 21);
+   do_art(-9,  5, -288);
+   do_art(-9, -5, -1);
+   
+   print "log_shift";
+   do_log( 0,  1,  0);
+   do_log( 0, -1,  0);
+   do_log( 1,  5, 32);
+   do_log( 1, -1,  0);
+   do_log(85,  1, 170);
+   do_log(85, -2, 21);
+   do_log(-9,  5, -288);
+   do_log(-9, -5, 2047);
+#Endif;
+
+   rtrue;
+];
+   
+#Ifdef V5PLUS;
+[ do_art a b expect c;
+   @art_shift a b -> c; Ga = a; Gb = b;
+   assert2(c, expect, "<<");
+];
+
+[ do_log a b expect c; 
+   @log_shift a b -> c; Ga = a; Gb = b;
+   assert2(c, expect, "<<");
+];
+#Endif;
+
+! Write 'not' instead of '~' so we can print with print_paddr
+[ do_not a expect c;
+   !@"VAR:56S" a -> c;     !   @not a -> c;   (bug in inform)
+   @not a -> c; !  (No longer a bug in inform?)
+   Ga = a;
+   assert1(c, expect, "not");
+];
+
+[ do_and a b expect c;
+   @and a b -> c; Ga = a; Gb = b;
+   assert2(c, expect, "&");
+];
+
+[ do_or a b expect c;
+   @or a b -> c; Ga = a; Gb = b;
+   assert2(c, expect, "|");
+];
+
+! ---- Header ----------------------------------
+! ----------------------------------------------------------------------
+! MAIN calls a bunch of subs. Each one runs a set of related tests.
+!---------------------- MAIN
+
+[ Main;
+
+   Testnum = 0; Passed = 0; Failed = 0; Print_Tests = 0;
+   @print "CZECH: the Comprehensive Z-machine Emulation CHecker, version ";
+   ! It's not entirely cool to be using print_paddr before testing.
+   ! So sue me.
+   @print_paddr TEST_VERSION;
+   @print "^Test numbers appear in [brackets].^";
+
+   pt();
+   @print "^print works or you wouldn't be seeing this.^^";
+
+   ! If jumps don't work, we just give up.
+
+   ! Now test sets of functionality.
+   ! Argument of 1 means SKIP tests, 0 means DON'T skip the tests
+   ! Note that there may be stack ops,e.g., in the arithmetic test, and
+   ! those won't get skipped just because you call test_stack with '1'.
+   ! MOST tests in earlier subs won't
+   ! depend on functionality tested in later subs, but simple
+   ! jump, stack, call, print functionality is needed for almost all tests.
+   test_jumps(0); @print "^";
+   test_arithmetic(0); @print "^";
+   test_logical(0); @print "^";
+
+   print "^^Performed ", Testnum, " tests.^";
+   print "Passed: ", Passed, ", Failed: ", Failed;
+   print ", Print tests: ", Print_Tests, "^";
+   print "Didn't crash: hooray!^";
+   print "Last test: quit!^";
+   @quit;
+   .bad_quit;
+   print "Quit didn't work!^";
+   rtrue;
+];
+
+!! [Evin wrote that "Stock Inform has too many bugs to compile this."
+!! but that seems not to be true with Inform 6.21.]
+
+! vim: tw=78 sw=3

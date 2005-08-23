@@ -1,0 +1,63 @@
+# $Id: befunge.in 8050 2005-05-10 19:33:29Z bernhard $
+
+# Makefile for languages/Zcode
+
+# Setup of some commands
+PARROT  = ..${slash}..${slash}parrot${exe}
+PERL       = ${perl}
+RM_F       = ${rm_f}
+
+EXAMPLES = examples${slash}small.z3 examples${slash}hello.z3
+
+default: all
+
+help :
+	@echo ""
+	@echo "Following targets are available for the user:"
+	@echo ""
+	@echo "  build:             Build files (Currently does nothing)"
+	@echo "                     This is the default."
+	@echo ""
+	@echo "  test:              run the test suite,"
+	@echo ""
+	@echo "  maintain:          Build examples and test files"
+	@echo "                     Requires an Inform compiler!"
+	@echo ""
+	@echo "  clean:             clean up temporary files (none presently)"
+	@echo ""
+	@echo "  realclean:         clean up generated files"
+	@echo ""
+	@echo "  maintclean:        clean up Z-code files"
+	@echo ""
+	@echo "  help:              print this help message"
+
+
+all: build
+
+build: build.dummy
+# Replacement for GNU make's .PHONY
+build.dummy:
+
+# Build inform files
+maintain: examples test_Zs
+
+test: build
+	$(PERL) t/harness
+
+test_Zs: $(TEST_ZFILES)
+
+examples: $(EXAMPLES)
+
+.inf.z3:
+	inform $< $@
+
+clean:
+	@echo "No temp files to clean"
+
+# Deletes z files. 
+# Don't do this unless you have an Inform compiler!
+realclean: clean
+	$(RM_RF) Makefile
+
+maintclean: realclean
+	$(RM_RF) $(EXAMPLES) $(TEST_ZFILES)

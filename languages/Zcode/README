@@ -1,0 +1,34 @@
+ZiPIR - Z-machine in PIR
+
+v0.2
+
+The program z3.imc translates version 3 Z-code files into PIR, the compiles
+and runs that PIR. In other words, it's a fancy Z-machine interpreter.
+
+Run it like:
+	parrot z3.pir [-debug] minizork.z3
+
+(Except it won't actually work on minizork. Yet.)
+
+Right now, the only sample programs are a hello world and a concise
+version of the test script. Be patient.
+
+
+TESTS:
+	cd languages/Zcode
+	make test (or perl t/harness)
+
+
+TODO:
+A lot. See the TODO file.
+
+HISTORY:
+v0.1 by Leo Toetsch 2005/02/23
+v0.2 by Amir karger 2005/08/23
+See the CHANGES file for more details.
+
+REQUIREMENTS:
+- parrot v0.2.3
+
+BUGS:
+A lot.

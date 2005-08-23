@@ -1,0 +1,13 @@
+Switches v3;
+
+[ Main;
+  Test(2);
+];
+
+[ Test x;
+  while (x) {
+    print "Hello World ", x, "^";
+    --x;
+  }
+  "ok^";
+];

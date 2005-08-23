@@ -1,0 +1,15 @@
+2005/08/23 v0.2
+- leo leaves Zcode to work on less important things. Amir is the new maintainer
+- 13 new opcodes: sub mul div mod je jl jg print_paddr or and not ret rfalse
+- README, TODO, CHANGES files
+- examples/small.inf exercises the old and new opcodes
+- Zcode has a Makefile
+- make test passes 84 tests
+
+2005/02/23 v0.1
+- written by leo
+- translates Z code files to PIR
+- does the hard stuff (declares a Zmachine class, reads subroutines, 
+    decodes ops and their arguments, handles Zmachine subs)
+- 12 opcodes: add call dec inc jump jz print print_ret print_num quit rtrue store
+- examples/hello.inf counts down from 3. Compiled z3 runs under PIR compiler/interpreter

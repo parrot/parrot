@@ -55,6 +55,7 @@ have already been built.
 # These could all be tested:
 #
 # BASIC                No t/harness, two implementations
+# Zcode		       Can't run *.t from here, only from subdir
 # cola                 No t/harness, no standard test suite
 # conversion           No t/harness
 # forth                No t/harness

@@ -1,0 +1,100 @@
+! $Id: $
+
+Include "declare.inf"; ! variable declarations
+Include "assert.inf"; ! p/f/pt (ok/not_ok) routines
+
+! ----------------------------------------------------------------------
+[ test_logical;
+   print "# not^";
+   do_not(0, ~0);
+   do_not(123, ~123);
+   do_not($5555, $aaaa);
+   do_not($aaaa, $5555);
+   
+   print "# and^";
+   do_and( 5,  3,  1);
+   do_and( 3,  5,  1);
+   do_and(-3, -3, -3);
+   do_and(-3,  5,  5);
+   do_and(-3, -5, -7);
+   
+   print "# or^";
+   do_or($1234, $4321, $5335);
+   do_or($4321, $1234, $5335);
+   do_or($1234,     0, $1234);
+   do_or($1030, $ffff, $ffff);
+   do_or($ffff, $0204, $ffff);
+   
+#Ifdef V5PLUS;
+   print "# art_shift^";
+   do_art( 0,  1,  0);
+   do_art( 0, -1,  0);
+   do_art( 1,  5, 32);
+   do_art( 1, -1,  0);
+   do_art(85,  1, 170);
+   do_art(85, -2, 21);
+   do_art(-9,  5, -288);
+   do_art(-9, -5, -1);
+   
+   print "# log_shift^";
+   do_log( 0,  1,  0);
+   do_log( 0, -1,  0);
+   do_log( 1,  5, 32);
+   do_log( 1, -1,  0);
+   do_log(85,  1, 170);
+   do_log(85, -2, 21);
+   do_log(-9,  5, -288);
+   do_log(-9, -5, 2047);
+#Endif;
+
+   rtrue;
+];
+   
+#Ifdef V5PLUS;
+[ do_art a b expect c;
+   @art_shift a b -> c; Ga = a; Gb = b;
+   assert2(c, expect, "<<");
+];
+
+[ do_log a b expect c; 
+   @log_shift a b -> c; Ga = a; Gb = b;
+   assert2(c, expect, "<<");
+];
+#Endif;
+
+! Write 'not' instead of '~' so we can print with print_paddr
+[ do_not a expect c;
+   !@"VAR:56S" a -> c;     !   @not a -> c;   (bug in inform)
+   @not a -> c; !  (No longer a bug in inform?)
+   Ga = a;
+   assert1(c, expect, "not");
+];
+
+[ do_and a b expect c;
+   @and a b -> c; Ga = a; Gb = b;
+   assert2(c, expect, "&");
+];
+
+[ do_or a b expect c;
+   @or a b -> c; Ga = a; Gb = b;
+   assert2(c, expect, "|");
+];
+
+
+
+!---------------------- MAIN
+
+[ Main;
+
+   Testnum = 0; Passed = 0; Failed = 0; Print_Tests = 0;
+
+   test_logical();
+
+   print "1..", Testnum,"^";
+   @quit;
+   .bad_quit;
+   print "not ok Quit didn't work!^";
+   rtrue;
+];
+
+! vim: tw=78 sw=3

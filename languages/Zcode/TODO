@@ -1,0 +1,52 @@
+TODO for PIR Zmachine
+---------------------
+
+OPCODES: about 1/3 of V3 is working
+-------
+
+Done: 20
+- jumps: jl jg jz jump
+- math: add sub mul div mod
+- logical: or and not
+- variables (indirect): inc dec
+- subroutines: ret rtrue rfalse
+- print: print print_paddr print_num
+
+Mostly done: 5
+- jumps: je
+- variables (indirect): store
+- print: print_ret
+- subroutines: call
+- state: quit
+
+Not done but not hard: 18
+- variables (indirect): dec_chk inc_chk
+- variables (indirect): load pop push pull
+- logical: test
+- memory: loadw loadb storew storeb
+- subroutines: ret_popped
+- print: print_addr new_line print_char
+- misc: nop verify random
+
+Not done and bigger jobs: 23
+- I/O (non-print): sread show_status split_window set_window output_stream
+- state: save restore restart
+- objects: jin insert_obj get_sibling get_child get_parent remove_obj print_obj
+- attributes: test_attr set_attr clear_attr
+- properties: get_prop get_prop_addr get_next_prop get_prop_len put_prop
+
+V4 and V5 opcodes...
+
+
+INCOMPLETE
+----------
+- je with >2 arguments (at least throw an error)
+- subs: set local defaults, get correct nlocals
+- decode_text abbrev
+- print_paddr variable address (and other opcodes taking vars)
+- print abbreviations, Zchars > 127
+- indirect varaibles taking vars
+
+INFRASTRUCTURE
+--------------
+- Create an include file with macros (and classes, if any)?
