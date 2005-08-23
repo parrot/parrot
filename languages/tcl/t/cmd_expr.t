@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 44;
+use Parrot::Test tests => 50;
 use Test::More;
 
 language_output_is("tcl",<<TCL,<<OUT,"mul");
@@ -150,6 +150,55 @@ TCL
 3
 OUT
 
+TODO: {
+  local $TODO = "&& doesn't evaluate in the right order";
+
+language_output_is("tcl",<<TCL,<<OUT,"&&, both sides");
+ proc true {} {puts 1; return 1}
+ proc false {} {puts 0; return 0}
+ puts [expr {[true] && [false]}]
+TCL
+1
+0
+0
+OUT
+
+language_output_is("tcl",<<TCL,<<OUT,"&&, both sides");
+ proc true {} {puts 1; return 1}
+ proc false {} {puts 0; return 0}
+ puts [expr {[false] || [true]}]
+TCL
+0
+1
+1
+OUT
+}
+
+TODO: {
+  local $TODO = "&&,||  doesn't short circuit yet.";
+
+language_output_is("tcl",<<TCL,<<OUT,"&&, short circuited");
+ proc true {} {puts 1; return 1}
+ proc false {} {puts 0; return 0}
+ puts [expr {[false] && [true]}]
+TCL
+0
+0
+OUT
+
+language_output_is("tcl",<<TCL,<<OUT,"||, short circuited");
+ proc true {} {puts 1; return 1}
+ proc false {} {puts 0; return 0}
+ puts [expr {[true] || [false]}]
+TCL
+1
+1
+OUT
+}
+
+
+
+
 language_output_is("tcl",<<TCL,<<OUT,"abs");
  puts [expr abs(1-2)]
 TCL
@@ -272,4 +321,25 @@ language_output_is("tcl",<<'TCL',<<'OUT',"braced operands.");
 TCL
 1
 OUT
+
+language_output_is("tcl",<<'TCL',<<'OUT',"puts inside an expr");
+  puts [expr {[puts 2]}]
+TCL
+2
+
+OUT
+
+TODO: {
+
+local $TODO = "multiple ;-separated subcommands in an expr are treated as one.";
+language_output_is("tcl",<<'TCL',<<'OUT',"2 commands inside an expr sub-command");
+  puts [expr {[puts 2;puts 3]}]
+TCL
+2
+3
+
+OUT
+}
+
+
 
