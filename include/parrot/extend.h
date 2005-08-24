@@ -62,6 +62,7 @@ Parrot_STRING Parrot_PMC_get_string_intkey(Parrot_INTERP, Parrot_PMC, Parrot_Int
 void *Parrot_PMC_get_pointer(Parrot_INTERP, Parrot_PMC);
 void *Parrot_PMC_get_pointer_intkey(Parrot_INTERP, Parrot_PMC, Parrot_Int);
 Parrot_Int Parrot_PMC_get_intval(Parrot_INTERP, Parrot_PMC);
+Parrot_Int Parrot_PMC_get_intval_pmckey(Parrot_INTERP, Parrot_PMC, Parrot_PMC);
 Parrot_Int Parrot_PMC_get_intval_intkey(Parrot_INTERP, Parrot_PMC, Parrot_Int);
 Parrot_Float Parrot_PMC_get_numval(Parrot_INTERP, Parrot_PMC);
 Parrot_Float Parrot_PMC_get_numval_intkey(Parrot_INTERP, Parrot_PMC, Parrot_Int);
@@ -72,6 +73,7 @@ char *Parrot_PMC_get_cstringn_intkey(Parrot_INTERP, Parrot_PMC, Parrot_Int *, Pa
 
 void Parrot_PMC_set_vtable(Parrot_INTERP, Parrot_PMC, Parrot_VTABLE);
 void Parrot_PMC_set_pmc_intkey(Parrot_INTERP, Parrot_PMC, Parrot_Int, Parrot_PMC);
+void Parrot_PMC_set_pmc_pmckey(Parrot_INTERP, Parrot_PMC, Parrot_PMC, Parrot_PMC);
 void Parrot_PMC_set_string(Parrot_INTERP, Parrot_PMC, Parrot_STRING);
 void Parrot_PMC_set_string_intkey(Parrot_INTERP, Parrot_PMC, Parrot_Int, Parrot_STRING);
 void Parrot_PMC_set_pointer(Parrot_INTERP, Parrot_PMC, void *);
@@ -88,6 +90,7 @@ void Parrot_PMC_push_intval(Parrot_INTERP, Parrot_PMC, Parrot_Int);
 void Parrot_PMC_push_numval(Parrot_INTERP, Parrot_PMC, Parrot_Float);
 void Parrot_PMC_push_string(Parrot_INTERP, Parrot_PMC, Parrot_STRING);
 void Parrot_PMC_push_pmc(Parrot_INTERP, Parrot_PMC, Parrot_PMC);
+void Parrot_PMC_delete_pmckey(Parrot_INTERP, Parrot_PMC, Parrot_PMC);
 
 Parrot_PMC Parrot_PMC_new(Parrot_INTERP, Parrot_Int);
 Parrot_PMC Parrot_PMC_null(void);

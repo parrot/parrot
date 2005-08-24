@@ -199,6 +199,26 @@ Parrot_Int Parrot_PMC_get_intval_intkey(Parrot_INTERP interp, Parrot_PMC pmc, Pa
 
 /*
 
+=item C<Parrot_Int
+Parrot_PMC_get_intval_pmckey(Parrot_INTERP interp, Parrot_PMC pmc,
+                             Parrot_PMC key)>
+
+Return the keyed, signed integer value of the value in the PMC.
+
+=cut
+
+*/
+
+Parrot_Int Parrot_PMC_get_intval_pmckey(Parrot_INTERP interp, Parrot_PMC pmc, Parrot_PMC key) {
+    Parrot_Int retval;
+    PARROT_CALLIN_START(interp);
+    retval = VTABLE_get_integer_keyed(interp, pmc, key);
+    PARROT_CALLIN_END(interp);
+    return retval;
+}
+
+/*
+
 =item C<Parrot_Float
 Parrot_PMC_get_numval(Parrot_INTERP interp, Parrot_PMC pmc)>
 
@@ -379,6 +399,25 @@ void Parrot_PMC_set_pmc_intkey(Parrot_INTERP interp, Parrot_PMC pmc,
                                Parrot_Int key, Parrot_PMC value) {
     PARROT_CALLIN_START(interp);
     VTABLE_set_pmc_keyed_int(interp, pmc, key, value);
+    PARROT_CALLIN_END(interp);
+}
+
+/*
+
+=item C<void
+Parrot_PMC_set_pmc_pmckey(Parrot_INTERP interp, Parrot_PMC pmc,
+                           Parrot_PMC key, Parrot_PMC value)>
+
+Assign the passed-in pmc to the passed-in slot of the passed-in PMC.
+
+=cut
+
+*/
+
+void Parrot_PMC_set_pmc_pmckey(Parrot_INTERP interp, Parrot_PMC pmc,
+                               Parrot_PMC key, Parrot_PMC value) {
+    PARROT_CALLIN_START(interp);
+    VTABLE_set_pmc_keyed(interp, pmc, key, value);
     PARROT_CALLIN_END(interp);
 }
 
@@ -617,6 +656,25 @@ void Parrot_PMC_push_pmc(Parrot_INTERP interp, Parrot_PMC pmc,
                          Parrot_PMC value) {
     PARROT_CALLIN_START(interp);
     VTABLE_push_pmc(interp, pmc, value);
+    PARROT_CALLIN_END(interp);
+}
+
+/*
+
+=item C<void
+Parrot_PMC_delete_pmckey(Parrot_INTERP interp, Parrot_PMC pmc,
+                         Parrot_PMC key)>
+
+Deletes the value associated with the passed-in PMC from the PMC.
+
+=cut
+
+*/
+
+void Parrot_PMC_delete_pmckey(Parrot_INTERP interp, Parrot_PMC pmc,
+                              Parrot_PMC key) {
+    PARROT_CALLIN_START(interp);
+    VTABLE_delete_keyed(interp, pmc, key);
     PARROT_CALLIN_END(interp);
 }
 
