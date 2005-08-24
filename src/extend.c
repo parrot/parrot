@@ -366,23 +366,6 @@ void Parrot_PMC_set_string_intkey(Parrot_INTERP interp, Parrot_PMC pmc,
 /*
 
 =item C<void
-Parrot_PMC_set_pointer(Parrot_INTERP interp, Parrot_PMC pmc, void *value)>
-
-Assign the passed-in pointer to the passed-in PMC.
-
-=cut
-
-*/
-
-void Parrot_PMC_set_pointer(Parrot_INTERP interp, Parrot_PMC pmc, void *value) {
-    PARROT_CALLIN_START(interp);
-    VTABLE_set_pointer(interp, pmc, value);
-    PARROT_CALLIN_END(interp);
-}
-
-/*
-
-=item C<void
 Parrot_PMC_set_pmc_intkey(Parrot_INTERP interp, Parrot_PMC pmc,
                            Parrot_Int key, Parrot_PMC value)>
 
@@ -396,6 +379,23 @@ void Parrot_PMC_set_pmc_intkey(Parrot_INTERP interp, Parrot_PMC pmc,
                                Parrot_Int key, Parrot_PMC value) {
     PARROT_CALLIN_START(interp);
     VTABLE_set_pmc_keyed_int(interp, pmc, key, value);
+    PARROT_CALLIN_END(interp);
+}
+
+/*
+
+=item C<void
+Parrot_PMC_set_pointer(Parrot_INTERP interp, Parrot_PMC pmc, void *value)>
+
+Assign the passed-in pointer to the passed-in PMC.
+
+=cut
+
+*/
+
+void Parrot_PMC_set_pointer(Parrot_INTERP interp, Parrot_PMC pmc, void *value) {
+    PARROT_CALLIN_START(interp);
+    VTABLE_set_pointer(interp, pmc, value);
     PARROT_CALLIN_END(interp);
 }
 
