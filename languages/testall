@@ -70,7 +70,8 @@ have already been built.
 
 
 my @unified_testable_languages = 
-   qw( befunge
+   qw( Zcode
+       befunge
        bf
        m4
        ook
