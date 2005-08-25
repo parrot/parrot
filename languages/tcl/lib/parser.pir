@@ -488,12 +488,12 @@ done:
 
 =item C<(pmc command, int pos) = get_subcommand(string tcl_code, int pos)>
 
-Parses a subcommand and returns a TclCommand object.
+Parses a subcommand and returns a TclCommand or TclCommandList object.
 
     Incoming: puts [lindex "a b c" 1]
                    ^
     Outgoing: puts [lindex "a b c" 1]
-                                    ^
+                                     ^
 
 =cut
 
@@ -502,11 +502,34 @@ Parses a subcommand and returns a TclCommand object.
   .param int pos
   inc pos
   
+  .local pmc command
   .local pmc chars
   chars = new Hash
   chars[93] = 1 # ]
+  chars[59] = 1 # ;
   
-  .return get_command(tcl_code, chars, pos)
+  (command, pos) = get_command(tcl_code, chars, pos)
+  dec pos
+  $I0 = ord tcl_code, pos
+  if $I0 == 59 goto list # ;
+  inc pos
+  .return(command, pos)
+
+list:
+  .local pmc commands
+  $I0 = find_type "TclCommandList"
+  commands = new $I0
+  push commands, command
+loop:
+  pos += 2
+  (command, pos) = get_command(tcl_code, chars, pos)
+  push commands, command
+  dec pos
+  $I0 = ord tcl_code, pos
+  if $I0 == 59 goto loop
+  
+  inc pos
+  .return(commands, pos)
 .end
 
 =item C<(pmc var, int pos) = get_variable(string tcl_code, int pos)>

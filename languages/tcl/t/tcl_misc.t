@@ -135,11 +135,9 @@ TCL
 extra characters after close-brace
 OUT
 
-TODO: {
-  local $TODO = "unimplemented";
 language_output_is("tcl",<<'TCL',<<'OUT',"subcommands with semicolons");
   puts [set a [set b 1; set c 2]]
 TCL
 2
 OUT
-}
+
