@@ -162,6 +162,9 @@ N: Ilya Martynov
 D: Patch to let pmc2c.pl run from any directory
 D: Minor documentation updates
 
+N: Imran Ghory
+D: Binary GCD / LCM
+
 N: Ion Alexandru Morega
 D: string.pmc, complex.pmc
 

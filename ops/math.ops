@@ -974,20 +974,30 @@ Greatest Common divisor of $2 and $3.
 =cut
 
 inline op gcd(out INT, in INT, in INT) :advanced_math {
+ INTVAL p = 0;
+ INTVAL a = $2 < 0 ? -$2 : $2;
+ INTVAL b = $3 < 0 ? -$3 : $3;
+ 
+ if(a==0) { $1=b; goto NEXT(); }
+ if(b==0) { $1=a; goto NEXT(); }
+ 
+ while( !((a | b) & 1) ) {
+   a>>=1;
+   b>>=1;
+   p++;
+ }
 
-  UINTVAL q = 0;
-  UINTVAL c = 0;
-  INTVAL temp2 = $2 < 0 ? -$2 : $2;
-  INTVAL temp3 = $3 < 0 ? -$3 : $3;
-  while (temp3 != 0) {
-    q = (UINTVAL)floor( (FLOATVAL)temp2/temp3 );
-    c = temp2 - temp3*q;
-    temp2 = temp3;
-    temp3 = c;
-  }
-  $1 = temp2;
-  goto NEXT();
+ while(a>0) {
+   if      (!(a & 1)) a>>=1;
+   else if (!(b & 1)) b>>=1;
+   else if (a<b)      b = (b-a)>>1;
+   else               a = (a-b)>>1;
+ }
+ 
+ $1 = b<<p;
+ goto NEXT();
 }
+ 
 
 ########################################
 
@@ -998,26 +1008,31 @@ Least Common Multiple of $2 and $3
 =cut
 
 inline op lcm(out INT, in INT, in INT) :advanced_math {
-  UINTVAL q = 0;
-  UINTVAL c = 0;
-  INTVAL temp2 = $2;
-  INTVAL temp3 = $3;
-  INTVAL saved_var2 = temp2;
-  INTVAL saved_var3 = temp3;
-  while (temp3 != 0) {
-    q = (UINTVAL)floor( (FLOATVAL)temp2/temp3 );
-    c = temp2 - temp3*q;
-    temp2 = temp3;
-    temp3 = c;
-  }
-  if (saved_var2 == 0) {
-    $1 = 0;
-  }
-  else {
-    saved_var2 = saved_var2 / temp2;
-    $1 = saved_var2*saved_var3;
-  }
-  goto NEXT();
+ INTVAL gcd = 0;
+ INTVAL p = 0;
+ INTVAL a = $2 < 0 ? -$2 : $2;
+ INTVAL b = $3 < 0 ? -$3 : $3;
+ INTVAL saved_var1 = a, saved_var2 = b; 
+
+ if(a==0 || b==0) { $1=0; goto NEXT(); }
+ 
+ while( !((a | b) & 1) ) {
+   a>>=1;
+   b>>=1;
+   p++;
+ }
+
+ while(a>0) {
+   if      (!(a & 1)) a>>=1;
+   else if (!(b & 1)) b>>=1;
+   else if (a<b)      b = (b-a)>>1;
+   else               a = (a-b)>>1;
+ }
+ 
+ gcd = b<<p;
+ saved_var1 /= gcd;
+ $1 = saved_var1*saved_var2;
+ goto NEXT();
 }
 
 ########################################
