@@ -176,6 +176,28 @@ them with commas:
 
 Define a named constant of style I<type> and value I<const>.
 
+=item .namespace <identifier>
+
+Open a new scope block. This "namespace" is not the same as the
+.namespace [ <identifier> ] syntax, which is used for storing subroutines
+in a particular namespace in the global symboltable.
+This directive is useful in cases such as (pseudocode):
+
+  local x = 1;
+  print(x);       # prints 1
+  do              # open a new namespace/scope block
+    local x = 2;  # this x hides the previous x
+    print(x);     # prints 2
+  end             # close the current namespace
+  print(x);       # prints 1 again
+
+All types of common language constructs such as if, for, while, repeat and such
+that have nested scopes, can use this directive.
+
+=item .endnamespace <identifier>
+
+Closes the scope block that was opened with .namespace <identifier>.
+
 =item .namespace [ <identifier> ]
 
 =item .namespace [ <identifier> ; <identifier> ]
