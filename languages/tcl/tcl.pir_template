@@ -81,6 +81,7 @@ providing a compreg-compatible method.
 
   # Load any dependant libraries.
   load_bytecode "languages/tcl/lib/tclcommand.pbc"
+  load_bytecode "languages/tcl/lib/tclcommandlist.pbc"
   load_bytecode "languages/tcl/lib/tclconst.pbc"
   load_bytecode "languages/tcl/lib/tclfunc.pbc"
   load_bytecode "languages/tcl/lib/tclops.pbc"
@@ -246,10 +247,9 @@ providing a compreg-compatible method.
   pir_code .= " @ANON\n.local string code\ncode = \""
   tcl_code = escaper(tcl_code,"\"")
   pir_code .= tcl_code
-  pir_code .= "\"\n.local pmc tcl_interpret\n.local pmc parse\n"
-  pir_code .= "tcl_interpret = find_global \"_Tcl\", \"__interpret\"\n"
+  pir_code .= "\"\n.local pmc parse\n"
   pir_code .= "parse = find_global \"_Tcl\", \"parse\"\n"
-  pir_code .= "$P1 = parse(code)\n.return tcl_interpret($P1)\n.end\n"
+  pir_code .= "$P1 = parse(code)\n.return $P1.\"interpret\"()\n.end\n"
 
   $P1 = compile pir_compiler, pir_code
   .return ($P1)

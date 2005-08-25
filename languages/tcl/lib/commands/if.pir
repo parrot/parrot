@@ -24,10 +24,9 @@
   handling_else = 0
   .local int counter
 
-  .local pmc parse,interpret
+  .local pmc parse
   .local pmc expression_p,expression_i
   parse = find_global "_Tcl", "parse"
-  interpret = find_global "_Tcl", "__interpret"
   expression_p = find_global "_Tcl", "__expression_parse"
   expression_i = find_global "_Tcl", "__expression_interpret"
  
@@ -112,7 +111,7 @@ done:
   $P1 = parse(code)
   register $P1
 
-  .return interpret($P1) #tailcall
+  .return $P1."interpret"() #tailcall
 
 done_error:
   .return(return_type,retval)

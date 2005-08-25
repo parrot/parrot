@@ -15,10 +15,8 @@
   .local string varname,sigil_varname
   .local string code
   .local pmc parse
-  .local pmc interpret
   return_type = TCL_OK
   parse = find_global "_Tcl", "parse"
-  interpret = find_global "_Tcl", "__interpret"
 
   .local int call_level
   $P0 = find_global "_Tcl", "call_level"
@@ -30,7 +28,7 @@
   $P1 = parse(code)
   register $P1
   # ignoring $P0 here.
-  ($I0,$P0) = interpret($P1)
+  ($I0,$P0) = $P1."interpret"()
   retval = new Integer
   retval = $I0
 

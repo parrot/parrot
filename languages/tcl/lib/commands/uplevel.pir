@@ -15,9 +15,7 @@
   .local int looper
  
   .local pmc parse
-  .local pmc interpret 
-  parse = find_global "_Tcl", "__parse"  
-  interpret = find_global "_Tcl", "__interpret"
+  parse = find_global "_Tcl", "__parse"
 
   # save the old call level
   .local pmc old_call_level
@@ -54,7 +52,7 @@ loop_done:
   store_global "_Tcl", "call_level", call_level
 
   $P1 = parse(expr,0,0)
-  ($I0,$P0) = interpret($P1) 
+  ($I0,$P0) = $P1."interpret"()
 
   #restore the old level
   store_global "_Tcl", "call_level", old_call_level

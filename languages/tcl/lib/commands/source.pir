@@ -18,9 +18,6 @@
 
   parse = find_global "_Tcl", "parse"
 
-  .local pmc interpret
-  interpret = find_global "_Tcl", "__interpret"
-
   $P1 = argv[0] 
   typeof type, $P1
   if type != .ParrotIO goto file
@@ -44,7 +41,7 @@ loop:
 gotfile:
   $P1 = parse(contents)
   register $P1
-  (code,retval) = interpret($P1)
+  (code,retval) = $P1."interpret"()
   goto done
  
 badfile:

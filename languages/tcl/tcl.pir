@@ -36,9 +36,8 @@
   STDIN = getstdin
   STDOUT = getstdout
 
-  .local pmc parse,interpret
+  .local pmc parse
   parse = find_global "_Tcl", "parse"
-  interpret = find_global "_Tcl", "__interpret"
 
 input_loop:
   print "% " # XXX Doesn't respect a set tcl_prompt1
@@ -47,7 +46,7 @@ input_loop:
   unless STDIN goto done
   $P1 = parse(input_line)
   register $P1
-  (retcode,retval) = interpret($P1)
+  (retcode,retval) = $P1."interpret"()
   # print out the result of the evaluation.
   if_null retval, input_loop
   if retval == "" goto input_loop

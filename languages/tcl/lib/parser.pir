@@ -56,7 +56,8 @@ not_space:
 get_commands:
   # an array of commands
   .local pmc commands
-  commands = new TclList
+  $I0 = find_type "TclCommandList"
+  commands = new $I0
   
   # position in the file
   .local int pos

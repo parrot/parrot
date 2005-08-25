@@ -142,7 +142,7 @@ arg_loop_done:
   
 
 body:
-  proc_body .= ".local pmc interpret\n  interpret = find_global \"_Tcl\", \"__interpret\"\n  .local pmc proc_body\n  $P0 = find_global \"_Tcl\", \"proc_parsed\"\n  proc_body=$P0[\""
+  proc_body .= ".local pmc proc_body\n  $P0 = find_global \"_Tcl\", \"proc_parsed\"\n  proc_body=$P0[\""
   proc_body .= esc_name
   proc_body .= "\"]\n  "
 
@@ -160,7 +160,7 @@ done_args:
   # a TCL_RETURN (2) from a sub body should be transformed into a TCL_OK (0)
   # to stop propagation outward.  XXX Should use the real constants here
 
-  proc_body .= "($I0,$P0) = interpret(proc_body)\n  if $I0 != 2 goto done\n  $I0 = 0\n  done:\n  pop_pad\n  dec call_level\n  .return($I0,$P0)\n.end\n"
+  proc_body .= "($I0,$P0) = proc_body.\"interpret\"()\n  if $I0 != 2 goto done\n  $I0 = 0\n  done:\n  pop_pad\n  dec call_level\n  .return($I0,$P0)\n.end\n"
 
   #print "PROC_BODY=\n"
   #print proc_body

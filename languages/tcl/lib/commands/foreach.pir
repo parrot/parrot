@@ -7,7 +7,7 @@
   argv = foldup
 
   .local int return_type
-  .local pmc parse,interpret,retval
+  .local pmc parse,retval
   retval = new TclString
   retval = ""
 
@@ -24,7 +24,6 @@
   __list = find_global "_Tcl", "__list"
 
   parse = find_global "_Tcl", "parse"
-  interpret = find_global "_Tcl", "__interpret"
   return_type = TCL_OK
 
   .local int argc
@@ -139,7 +138,7 @@ loop_inner_done:
   # XXX This should probably not create a new pad, exactly
   # Handle [break] and [continue]
 loop_outer_continue:
-  (return_type,retval) = interpret(parsed)
+  (return_type,retval) = parsed."interpret"()
   pop_pad 
   if return_type == TCL_BREAK goto done
   if return_type == TCL_ERROR goto done

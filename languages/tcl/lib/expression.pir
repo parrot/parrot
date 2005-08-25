@@ -314,8 +314,9 @@ stack_evaluator:
  # move all non op non funcs to the value stack
  if type == OP goto do_op
  $P0 = chunk[1]
- $P0 = $P0."interpret"()
- chunk[1] = $P0
+ (return_type, retval) = $P0."interpret"()
+ if return_type != TCL_OK goto evaluation_return
+ chunk[1] = retval
  push result_stack, chunk
  goto stack_evaluator
 

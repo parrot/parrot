@@ -15,9 +15,8 @@
   .local int return_type
   return_type = TCL_OK
 
-  .local pmc parse,interpret
+  .local pmc parse
   parse = find_global "_Tcl", "parse"
-  interpret = find_global "_Tcl", "__interpret"
 
   .local string script
   .local int count
@@ -45,7 +44,7 @@ run:
   $I1 = count
 loop:
   if $I1 == 0 goto done
-  ($I0,$P0) = interpret($P1)
+  ($I0,$P0) = $P1."interpret"()
   if $I0 != TCL_OK goto done
   dec $I1
   goto loop
