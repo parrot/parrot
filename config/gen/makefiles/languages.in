@@ -94,7 +94,7 @@ BASIC.clean:
 
 Zcode : Zcode.dummy
 Zcode.dummy:
-	# Do nothing. make Zcode requires an Inform compiler
+# Do nothing. make Zcode requires an Inform compiler
 Zcode.test:
 	$(MAKE_C) Zcode test
 Zcode.clean:
