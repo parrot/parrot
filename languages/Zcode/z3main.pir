@@ -443,22 +443,23 @@ done:
 .end
 
 # Print macros at beginning of translated Z-machine
+# image, the global var, will automatically be loaded in every sub
 .sub emit_macros method
-      $S1 = ".macro GET_WORD(w, im, a)\n"
-      $S1 .= "\t.w = .im[.a]\n"
+      $S1 = ".macro GET_WORD(w, a)\n"
+      $S1 .= "\t.w = image[.a]\n"
       $S1 .= "\t$I0 = .a\n"
       $S1 .= "\tinc $I0\n"
-      $S1 .= "\t$I1 = .im[$I0]\n"
+      $S1 .= "\t$I1 = image[$I0]\n"
       $S1 .= "\t.w <<= 8\n"
       $S1 .= "\t.w |= $I1\n"
       $S1 .= ".endm\n"
-      $S1 .= ".macro STORE_WORD(im, a, w)\n"
+      $S1 .= ".macro STORE_WORD(a, w)\n"
       $S1 .= "\t$I0 = .w >> 8\n"
-      $S1 .= "\t.im[.a] = $I0\n"
+      $S1 .= "\timage[.a] = $I0\n"
       $S1 .= "\t$I0 = .a\n"
       $S1 .= "\tinc $I0\n"
       $S1 .= "\t$I1 = .w & 0xff\n"
-      $S1 .= "\t.im[$I0] = $I1\n"
+      $S1 .= "\timage[$I0] = $I1\n"
       $S1 .= ".endm\n"
       self."code"($S1)
       .return(1)
@@ -846,7 +847,7 @@ done:
     $S1 = $I1
     $S0 .= "\t.GET_WORD("
     $S0 .= result
-    $S0 .= " , image, "
+    $S0 .= " , "
     $S0 .= $S1
     $S0 .= ")\n"
     self."code"($S0)
@@ -917,7 +918,7 @@ no_conv:
     $I1 *= 2
     $I1 += global_adr
     $S1 = $I1
-    $S0 .= "\t.STORE_WORD(image, "
+    $S0 .= "\t.STORE_WORD("
     $S0 .= $S1
     $S0 .= ", "
     $S0 .= value
