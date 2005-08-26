@@ -1,0 +1,140 @@
+! $Id$
+
+Include "declare.inf"; ! variable declarations
+Include "assert.inf"; ! p/f/pt (ok/not_ok) routines
+
+! ---- VARIABLES ----------------------------------
+[ test_variables i n;
+   print "# push/pull^";
+   @push 9;
+   @push 8;
+   @pull i;
+   assert0(i, 8, "pull to local");
+   print "not ok # TODO call with Global var arg (in pull to global)^"; Testnum++;
+!   @pull Gtemp;
+!   assert0(Gtemp, 9, "pull to global");
+
+#Ifndef V5PLUS;
+   print "# pop^";
+   @push 7;
+   @push 6;
+   @pop; ! popped value gets thrown away
+   @pull i;
+   assert0(i, 7);
+#Endif;
+
+   print "# store^";
+   @store i 5;
+   assert0(i, 5);
+   print "not ok # TODO implement load^"; Testnum++;
+!   print "# load";
+!   n = 5; i = 6;
+!   @load i sp;
+!   @pull n;
+!   assert0(i, n);
+
+   print "# dec^";
+   do_dec( 5,  4);
+   do_dec( 0, -1);
+   do_dec(-8, -9);
+   do_dec(-32768, 32767);  
+   ! Should decrement top of stack and not pop it
+   @push 1;
+   @push 10;
+   @dec sp;
+   @pull n;
+   assert0(n, 9, "dec sp");
+   @pull n;
+   assert0(n, 1, "dec sp");
+   print "not ok # TODO call with Global var arg (in dec global)^"; Testnum++;
+!   count = 3;
+!   @dec count;
+!   assert0(count, 2, "dec global");
+
+   print "# inc^";
+   do_inc( 5,  6);
+   do_inc(-1,  0);
+   do_inc(-8, -7);
+   do_inc(32767, -32768);  
+   @push 1;
+   @push 10;
+   @inc sp;
+   @pull n;
+   assert0(n, 11, "inc sp");
+   @pull n;
+   assert0(n, 1, "inc sp");
+   print "not ok # TODO call with Global var arg (in inc global)^"; Testnum++;
+!   count = 3;
+!   @inc count;
+!   assert0(count, 4, "inc global");
+   
+   print "# dec_chk^";
+   n = 3;
+   print "not ok # TODO implement dec_chk^"; Testnum++;
+!   @dec_chk n 1000 ?~bad1; p(); !  2
+!   @dec_chk n    1 ?bad1;  p(); !  1
+!   @dec_chk n    1 ?~bad1; p(); !  0
+!   @dec_chk n    0 ?~bad1; p(); ! -1
+!   @dec_chk n   n2 ?bad1;  p(); ! -2
+!   @dec_chk n   n2 ?~bad1; p(); ! -3
+!   @dec_chk n 1000 ?~bad1; p(); ! -4
+!   @dec_chk n n500 ?bad1;  p(); ! -5
+!   @push 1;
+!   @push 10;
+!   @dec_chk sp 5 ?bad1; p();
+!   @pull n;
+!   assert0(n, 9, "dec_chk sp");
+!   @pull n;
+!   assert0(n, 1, "dec_chk sp");
+!   jump not_bad1;
+!.bad1;
+!   f();
+!.not_bad1;
+   
+   print "# inc_chk^";
+   n = -6;
+   print "not ok # TODO implement inc_chk^"; Testnum++;
+!   @inc_chk n n500 ?~bad2; p(); ! -5
+!   @inc_chk n 1000 ?bad2;  p(); ! -4
+!   @inc_chk n   n3 ?bad2;  p(); ! -3
+!   @inc_chk n   n3 ?~bad2; p(); ! -2
+!   @inc_chk n    0 ?bad2;  p(); ! -1
+!   @inc_chk n    1 ?bad2;  p(); !  0
+!   @inc_chk n    1 ?bad2;  p(); !  1
+!   @inc_chk n    1 ?~bad2; p(); !  2
+!   @inc_chk n 1000 ?bad2;  p(); !  3
+!   jump not_bad2;
+!.bad2;
+!   f();
+!.not_bad2;
+
+   rtrue;
+];
+   
+[ do_inc a expect;
+   Ga = a;
+   @inc a;
+   assert1(a, expect, "++");
+];
+
+[ do_dec a expect;
+   Ga = a;
+   @dec a;
+   assert1(a, expect, "--");
+];
+
+
+!---------------------- MAIN
+
+[ Main;
+
+   Testnum = 0; Passed = 0; Failed = 0; Print_Tests = 0;
+
+   test_variables();
+
+   print "1..", Testnum,"^";
+   @quit;
+   rtrue;
+];
+
+! vim: tw=78 sw=3

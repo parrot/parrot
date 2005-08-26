@@ -598,6 +598,60 @@ done:
 # Warning: indirect variables live here!
 ##########
 
+# pop (takes no args)
+.sub zop_pop method
+  .param pmc im
+  .param int pc
+  .param pmc args
+  .param int pass
+  unless pass goto done
+    $S0 = "\trestore $I0\n" # restore to I0 and throw away
+    self."code"($S0)
+done:
+  .return (args, pc, 0, 0)
+.end
+
+# pull (variable)
+# variable is indirect
+.sub zop_pull method
+  .param pmc im
+  .param int pc
+  .param pmc args
+  .param int pass
+  .local string store_var, tvar
+  $I0 = args[0]
+  store_var = to_var($I0)
+  args[0] = store_var
+  unless pass goto done
+    tvar = self."temp"()
+    $S0 = "\trestore "
+    $S0 .= tvar
+    $S0 .= "\n"
+    self."code"($S0)
+    self."emit_store"(store_var, tvar)
+done:
+  .return (args, pc, 0, 0)
+.end
+
+# push value
+.sub zop_push method
+  .param pmc im
+  .param int pc
+  .param pmc args
+  .param int pass
+  .local string store_var, valget
+  unless pass goto done
+    store_var = args[0]
+    valget = self."emit_get"(store_var, 0)
+    $S0 = "\tsave "
+    $S0 .= valget
+    $S0 .= "\n"
+    self."code"($S0)
+done:
+  .return (args, pc, 0, 0)
+.end
+
+
 # store (var) value
 # var is indirect constant
 .sub zop_store method
@@ -612,7 +666,7 @@ done:
   unless pass goto done
     var = args[0]
     val = args[1]
-    valget  = self."emit_get"(val, 0)
+    valget = self."emit_get"(val, 0)
     self."emit_store"(var, valget)
 done:
   .return (args, pc, 0, 0)
@@ -724,6 +778,9 @@ done:
     dec n
     i = 1
 arg_loop:
+    # TODO BUG somewhere in here: calling @call R54a G5, 1, 3 breaks
+    # The G5 arg doesn't get switched to be a variable.
+    # Do we need to do an emit_get on everything?
     if i >= n goto end_args
       $S1 = args[i]
       $S0 .= $S1
