@@ -48,6 +48,7 @@ lib${slash}commands${slash}lrepeat.pir \
 lib${slash}commands${slash}lset.pir \
 lib${slash}commands${slash}namespace.pir \
 lib${slash}commands${slash}open.pir \
+lib${slash}commands${slash}parray.pir \
 lib${slash}commands${slash}proc.pir \
 lib${slash}commands${slash}puts.pir \
 lib${slash}commands${slash}rename.pir \
