@@ -798,11 +798,11 @@ Parrot_jit_emit_mov_rm_n(Interp * interpreter, int reg, char *mem)
 
 #    undef Parrot_jit_vtable_1r223_op
 #    undef Parrot_jit_vtable_1r332_op
-/*
+
 #    undef Parrot_jit_vtable_ifp_op
 #    undef Parrot_jit_vtable_unlessp_op
 #    undef Parrot_jit_vtable_newp_ic_op
-*/
+
 /* emit a call to a vtable func
  * $X->vtable(interp, $X [, $Y...] )
  */
@@ -1036,6 +1036,79 @@ Parrot_jit_vtable_1121_op(Parrot_jit_info_t *jit_info,
 {
     int a[] = { 1, 2, 1 };
     Parrot_jit_vtable_n_op(jit_info, interpreter, 3, a);
+}
+
+/* if_p_ic, unless_p_ic */
+static void
+Parrot_jit_vtable_if_unless_op(Parrot_jit_info_t *jit_info,
+                     Interp * interpreter, int unless)
+{
+    int ic = *(jit_info->cur_op + 2);  /* branch offset */
+
+    /* emit call to vtable function i.e. get_bool, result in o0 */
+    Parrot_jit_vtable1_op(jit_info, interpreter);
+
+    /* test the result - and branch (or not) accordingly */
+    emitm_subcc_r(jit_info->native_ptr, emitm_o(0), emitm_g(0), emitm_g(0));
+    Parrot_jit_bicc(jit_info, unless ? emitm_be : emitm_bne, 0, ic);
+
+    emitm_nop(jit_info->native_ptr);
+}
+
+static void
+Parrot_jit_vtable_ifp_op(Parrot_jit_info_t *jit_info,
+                     Interp * interpreter)
+{
+    Parrot_jit_vtable_if_unless_op(jit_info, interpreter, 0);
+}
+
+static void
+Parrot_jit_vtable_unlessp_op(Parrot_jit_info_t *jit_info,
+                     Interp * interpreter)
+{
+    Parrot_jit_vtable_if_unless_op(jit_info, interpreter, 1);
+}
+
+/* new_p_ic */
+static void
+Parrot_jit_vtable_newp_ic_op(Parrot_jit_info_t *jit_info,
+                     Interp * interpreter)
+{
+    void *igniter = (void (*)(void))pmc_new_noinit;
+    size_t offset = offsetof(struct _vtable, init);
+
+    int p1 = *(jit_info->cur_op + 1);
+    int i2 = *(jit_info->cur_op + 2);
+
+    if (i2 <= 0 || i2 >= enum_class_max)
+        internal_exception(1, "Illegal PMC enum (%d) in new", i2);
+
+    /* get "a" pmc first - calling function:  pmc_new_noinit(...) */
+    /* PMC* pmc_new_noinit(Interp *interpreter, INTVAL base_type) */
+    if (emitm_simm13_const(i2)) {
+        emitm_mov_i(jit_info->native_ptr, i2, emitm_o(1));
+    } else {
+        emitm_sethi(jit_info->native_ptr, emitm_hi22(i2), emitm_o(1));
+        emitm_or_i(jit_info->native_ptr, emitm_o(1), emitm_lo10(i2), emitm_o(1));
+    }
+
+    Parrot_jit_newfixup(jit_info);
+    jit_info->arena.fixups->type = JIT_CALL30;
+    jit_info->arena.fixups->param.fptr = D2FPTR(igniter);
+
+    emitm_call_30(jit_info->native_ptr, 0);
+    emitm_mov_r(jit_info->native_ptr, Parrot_jit_intrp, emitm_o(0));
+
+    /* got a new pmc, sync mem and prepare vtable call (regs) */
+    emitm_mov_r(jit_info->native_ptr, emitm_o(0), emitm_o(1));
+    emitm_st_i(jit_info->native_ptr, emitm_o(0), Parrot_jit_regbase,
+               Parrot_jit_regoff((int)&REG_PMC(p1), interpreter));
+
+    emitm_ld_i(jit_info->native_ptr, emitm_o(0), offsetof(struct PMC, vtable), XSR1);
+    emitm_ld_i(jit_info->native_ptr, XSR1, offset, XSR1);
+
+    emitm_jumpl_i(jit_info->native_ptr, XSR1, 0, emitm_o(7));
+    emitm_mov_r(jit_info->native_ptr, Parrot_jit_intrp, emitm_o(0));
 }
 
 #endif /* NO_JIT_VTABLE_OPS */
