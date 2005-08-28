@@ -28,7 +28,8 @@ sub runstep {
     my $osname =  $Config{osname};
 
     # This is not really important, let's stick to Linux for now
-    my %bc_does_not_hang = ( linux => 1 
+    my %bc_does_not_hang = ( linux => 1, 
+                             MSWin32 => 1,
                            );
 
     if ( $bc_does_not_hang{$osname} ) {
