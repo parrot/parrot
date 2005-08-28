@@ -4,8 +4,6 @@
 # Makefile for languages/parrot_compiler
 
 EXE      = ${exe}
-
-LN_SF    = ln -s -f
 PERL     = ${perl}
 RM_F     = ${rm_f}
 PARROT   = ../../${test_prog}$(EXE)
@@ -33,14 +31,12 @@ test :
 
 clean :
 	$(RM_F) *.pbc
+	$(RM_F) parrot_compiler.pasm
 	$(RM_F) t/*/*.pbc
 
 realclean : clean
 	$(RM_F) core
 	$(RM_F) *.pbc
-
-runtime :
-	$(LN_SF) ../../runtime
 
 parrot.pbc : parrot.pasm
 	$(PARROT) -o parrot.pbc parrot.pasm
