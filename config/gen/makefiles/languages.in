@@ -185,8 +185,7 @@ parrot_compiler: parrot_compiler.dummy
 parrot_compiler.dummy:
 	- $(MAKE_C) parrot_compiler
 parrot_compiler.test:
-# no target test in parrot_compiler/Makefile
-# (MAKE_C) parrot_compiler test
+	- $(MAKE_C) parrot_compiler test
 parrot_compiler.clean:
 	- $(MAKE_C) parrot_compiler clean
 
