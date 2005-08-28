@@ -62,8 +62,8 @@ if ($options{icudatadir}) {
 	my $icuroot = $options{icudatadir};
 	$icuroot =~ s/\\\w+$//;
 	$icu_section = qq{
-Source: "$icuroot\\share\\icu\\3.2\\license.html"; DestDir: "{app}\\icu"; Flags:
-Source: "$icuroot\\lib\\icu*.dll"; DestDir: "{app}\\bin"; Flags:
+Source: "$icuroot\\license.html"; DestDir: "{app}\\icu"; Flags:
+Source: "$icuroot\\bin\\icu*.dll"; DestDir: "{app}\\bin"; Flags:
 };
 }
 

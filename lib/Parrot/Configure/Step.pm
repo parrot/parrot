@@ -241,6 +241,7 @@ sub genfile {
         my $slash = Configure::Data->get('slash');
         '/' x ($len/2) . ($len%2 ? $slash : '');
       }eg;
+      s{(\\\*)}{\\$1}g; # replace \* with \\*, so make will not eat the \
     }
     print OUT;
   }

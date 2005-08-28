@@ -21,7 +21,7 @@ Native compilers include:
 
        Borland C++ (bcc)		version xxx or later
        Microsoft Visual C++ (cl)	version 13.10.3077 or later
-       MinGW32 with GCC (gcc)		version 3.2.3 or later
+       MinGW32 with GCC (gcc)		version 3.4.2 or later
        Intel C++ (icl)                  version 8.0.48 works
 
 =head2 Setting Up Parrot
@@ -61,13 +61,11 @@ C:\usr\lib), add the F<bin> directory to C<PATH>, and tell
 Configure.pl to use it.
 
     mkdir C:\usr\lib
-    unzip icu-3.2-Win32-msvc7.1.zip -d C:\usr\lib
+    unzip icu-3.4-Win32-msvc7.1.zip -d C:\usr\lib
     mkdir C:\usr\lib\data
     set PATH=%PATH%;C:\usr\lib\icu\bin
     cd <parrot directory>
     perl Configure.pl --icushared="C:\usr\lib\icu\lib\icudt.lib C:\usr\lib\icu\lib\icuuc.lib" --icuheaders="C:\usr\lib\icu\include" --icudatadir="C:\usr\local\icu\data"
-
-With MinGW32, use icu-3.2-Win32-msvc6.zip.
 
 Note the step of creating the F<C:\usr\lib\data> directory, as Parrot
 really wants it and the binary packages don't contain it.  It doesn't
@@ -104,7 +102,7 @@ L<http://www.python.org/>
 
 Inno Setup is a I<free> installer for Windows programs.
 
-The latest release of Inno Setup at the time of writing is 5.0.8. 
+The latest release of Inno Setup at the time of writing is 5.1.4. 
 
 The HomePage is on L<http://www.jrsoftware.org/>.
 
@@ -130,9 +128,9 @@ Microsoft Visual C++ Toolkit instructions here XXX
 
 =item MinGW32 with GCC
 
-The latest release of MinGW package at the time of writing is 3.1.0, 
-which contains gcc-3.2.3. It can be downloaded here: 
-L<http://prdownloads.sf.net/mingw/MinGW-3.1.0-1.exe>
+The latest release of MinGW package at the time of writing is 4.1.1, 
+which contains gcc-3.4.2. It can be downloaded here: 
+L<http://prdownloads.sf.net/mingw/MinGW-4.1.1.exe>
 
 The HomePage is on L<http://www.mingw.org/>.
 
@@ -212,6 +210,6 @@ This document borrows heavily from Perl's README.win32.
 
 GCC/mingw32 support was added in 0.1.2 (François Perrad).
 
-Last updated: 31 May 2005
+Last updated: 9 August 2005
 
 =cut

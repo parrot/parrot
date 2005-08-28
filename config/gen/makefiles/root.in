@@ -1462,7 +1462,7 @@ rpms : release
 
 win32-inno-installer : world install
 	$(PERL) tools/dev/mk_inno.pl --version=$(VERSION) --prefix=$(PREFIX) --icudatadir=${icu_datadir}
-	$(INNO_SETUP) /Q parrot.iss
+	$(INNO_SETUP) parrot.iss
 
 ###############################################################################
 #

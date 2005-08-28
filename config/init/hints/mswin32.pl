@@ -162,21 +162,26 @@
 				'a' => '.a',
 				'ar' => 'ar',
 				'cc' => 'gcc',
-				'ccflags' => '-s -O2 -DWIN32 ',
+				'ccflags' => '-DWIN32 ',
 				'cp' => '$(PERL) -MExtUtils::Command -e cp',
 				'ld' => 'g++',
 				'ld_load_flags' => '-shared ',
 				'ld_share_flags' => '-shared ',
-				'ldflags' => '-s ',
+				'ldflags' => '',
 				'libs' => '-lmsvcrt -lmoldname -lkernel32 -luser32 -lgdi32 -lwinspool -lcomdlg32 -ladvapi32 -lshell32 -lole32 -loleaut32 -lnetapi32 -luuid -lws2_32 -lmpr -lwinmm -lversion -lodbc32 ',
 				'link' => 'gcc',
-				'linkflags' => '-s ',
+				'linkflags' => '',
 				'make' => 'mingw32-make',
 				'make_set_make' => 'MAKE = mingw32-make',
 				'ncilib_link_extra' => 'src/libnci_test.def',
 				'o' => '.o',
 				'slash' => '\\',
 			);
+			if (Configure::Data->get(qw(optimize))) {
+				Configure::Data->set(
+					optimize => '-s -O2'
+				);
+			}
 		} elsif ($make =~ /dmake/i) {
 			# mingw Perl
 			Configure::Data->set(

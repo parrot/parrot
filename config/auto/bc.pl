@@ -27,7 +27,10 @@ sub runstep {
     my $has_gnu_bc;
     my $osname =  $Config{osname};
 
-    # This is not really important, let's stick to Linux for now
+    # There were some problems with a hanging bc reported.
+    # So check for bc only on selected platforms.
+    # Linux should be a safe bet. 
+    # For Win32 bc is available on http://gnuwin32.sourceforge.net/ 
     my %bc_does_not_hang = ( linux => 1, 
                              MSWin32 => 1,
                            );
