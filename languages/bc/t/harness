@@ -68,7 +68,11 @@ if ( grep { m/^--files$/ } @ARGV ) {
         Test::Harness::runtests( @files ) if scalar( @files );
     };
     if ( $use_gnu_bc ) {
-       $ENV{PARROT_BC_TEST_PROG} = 'bc --standard --quiet';
+       if ($^O =~ /MSWin32/) {
+           $ENV{PARROT_BC_TEST_PROG} = 'bc';
+       } else {
+           $ENV{PARROT_BC_TEST_PROG} = 'bc --standard --quiet';
+       }
        Test::Harness::runtests( @files ) if scalar( @files );
     }
 }

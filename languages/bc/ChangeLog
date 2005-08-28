@@ -1,5 +1,30 @@
 # $Id$
 
+2005-08-25     Bernhard Schmalhofer
+        * Start with assignment to lexicals
+
+2005-08-25     Bernhard Schmalhofer
+        * Start with parsing function definitions
+        * Printing of unitialized lexicals
+
+2005-08-23     Bernhard Schmalhofer
+        * Handle parentheses
+        * Start with code blocks
+
+2005-08-22     Bernhard Schmalhofer
+        * Simplify the grammar
+        * Handle keyword "quit"
+
+2005-08-21     Bernhard Schmalhofer
+        * Recognize numbers with leading digits
+
+2005-08-17     Bernhard Schmalhofer
+        * Start with handling strings
+
+2005-08-17     Bernhard Schmalhofer
+        * Allow empty lines
+        * Recognice comments
+
 2005-07-30     Bernhard Schmalhofer
         * Release initial version to the Parrot SVN repository
 	* '+', '-', '*', '/', '%' are evaluated

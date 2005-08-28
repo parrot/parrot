@@ -91,15 +91,19 @@ def main():
    visitor = Visitor()
 
    ###show tree
-   print "\n"
+   print ""
    print "=for comment\n"
-   print "AST after parsing\n"
+   print ""
+   print "AST after parsing " + bc_filenames[0] 
+   print ""
    print "toStringList: " + ast.toStringList()
-   print "visit>>\n"
+   print "visit>>"
+   print ""
    visitor.visit(ast);
    print "visit<<"
-   print "\n"
-   print "=cut\n"
+   print ""
+   print "=cut"
+   print ""
 
    W = bc.BcTreeWalker.Walker();
    W.gen_pir(ast);

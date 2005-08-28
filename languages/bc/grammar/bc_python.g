@@ -3,7 +3,7 @@
 
 
 // based on antrltut by javadude
-// based on POSIX ...
+// based on IEEE P1003.2 Draft 11.2 Section 4.3
 
 // Cheat sheet
 //
@@ -15,9 +15,15 @@
 //-----------------------------------------------------------------------------
 // gets inserted in the __init__ method of the generated Python class
 //-----------------------------------------------------------------------------
+
 header "BcTreeWalker.__init__" 
 {
-  self.reg_num = 0;        // counter for unlimited number of PMC registers
+  self.reg_num = 0;    // counter for unlimited number of PMC registers
+}
+
+header "BcParser.__init__" 
+{
+  self.do_print = 1;    // indicate whether an expression should be printed
 }
 
 
@@ -39,40 +45,13 @@ options
 {
   // charVocabulary = '\0'..'\377';
   // testLiterals = false;          // don't automatically test for literals
-  k = 1;                            // no lookahead
+  k = 2;                            // needed for comments LA(2)
 }
 
-// C-like comments
-//COMMENT
-  //: "//" (~('\n'|'\r'))*
-    //{ $setType(Token.SKIP); }
-  //;
 
+// Tokens as in POSIX spec
 
-// Literals
-
-// DIGIT is a subrule used by NUMBER
-protected 
-DIGIT
-  :   '0'..'9' | 'A' .. 'F'
-  ;
-
-NUMBER 
-  :   (DIGIT)+ 
-    |
-      '.' (DIGIT)+
-  ;
-  
-// String literals are everything in double quotes, no escaping
-STRING
-  : '"'!
-    ( '"' '"'!
-    | ~('"'|'\n'|'\r')
-    )*
-    ( '"'!
-    | // nothing -- write error message
-    )
-   ;
+// EOF is predefined by ANTLR
 
 NEWLINE
   options 
@@ -82,9 +61,77 @@ NEWLINE
   :   '\r'
     | '\n'
     | '\r' '\n'
-    ;
+  ;
 
+// String literals are everything in double quotes, no escaping
+STRING
+  : '"'!  ( ~'"' )* '"'!
+  ;
 
+LETTER
+  : 'a'..'z'
+  ;
+  
+// DIGIT is a subrule used only by INTEGER
+protected 
+DIGIT
+  :   '0' .. '9' 
+    | 'A' .. 'F'
+  ;
+
+// INTEGER is a subrule used only by NUMBER
+protected 
+INTEGER
+  : (DIGIT)+ 
+  ;
+
+NUMBER 
+  :   INTEGER ("." INTEGER)?
+    | '.' INTEGER
+  ;
+  
+// Operators
+
+// MUL_OP
+MUL        : '*'   ;
+DIV        : '/'   ;
+MOD        : '%'   ;
+
+//ASSIGN_OP  : '=' | "+=" | "-=" | "*=" | "/=" | "%=" | "^=" ;
+ASSIGN_OP  : '='   ; 
+
+REL_OP     : '<' | '>' | "==" | "<=" | ">=" | "!="   ;
+
+// INCR_DECR  : "++" | "--"   ;
+INCR       : "++" ;
+DECR       : "--" ;
+
+// TODO: is Lexeror Parser handling keywords
+//           Define    Break    Quit    Length
+//           Return    For    If    While    Sqrt
+//           Scale    Ibase    Obase    Auto
+Quit       : "quit";
+Define     : "define";
+Auto       : "auto";
+ 
+KEYWORDS: "break" | "length" |
+          "return" | "for" | "if" | "while" | "sqrt" |
+          "scale" | "ibase" | "obase";
+
+// See 4.3.7.2 item (16)
+LPAREN     : '('   ;
+RPAREN     : ')'   ;
+COMMA      : ','   ;
+PLUS       : '+'   ;
+MINUS      : '-'   ;
+SEMICOLON  : ';'   ;
+LBRACKET   : '['   ;
+RBRACKET   : ']'   ;
+CARET      : '^'   ;
+LCURLY     : '{'   ;
+RCURLY     : '}'   ;
+
+// not in POSIX spec
 
 // Whitespace -- ignored
 WS
@@ -95,53 +142,15 @@ WS
     { $setType(Token.SKIP); }
   ;
 
-
-// an identifier.  Note that testLiterals is set to true!  This means
-// that after we match the rule, we look in the literals table to see
-// if it's a literal or really an identifer
-IDENT
-  options 
-  {
-    testLiterals=true;
-  }
-  : ('a'..'z') ('a'..'z')*
+ML_COMMENT
+  : "/*"
+    (   { self.LA(2) != '/' }? '*'
+      | '\n' { $newline; }
+      | ~('*'|'\n')
+    )*
+    "*/"
+    { $setType(SKIP); }
   ;
-  
-LETTER
-  : 'a'..'z'
-  ;
-  
-// Operators
-DOT        : '.'   ;
-BECOMES    : ":="  ;
-COLON      : ':'   ;
-SEMICOLON  : ';'   ;
-COMMA      : ','   ;
-ASSIGN_OP  : '=' | "^="      ;
-LBRACKET   : '['   ;
-RBRACKET   : ']'   ;
-LCURLY     : '{'   ;
-RCURLY     : '}'   ;
-DOTDOT     : ".."  ;
-LPAREN     : '('   ;
-RPAREN     : ')'   ;
-REL_OP     : '<' | '>' | "==" | "<=" | ">=" | "!="   ;
-PLUS       : '+'   ;
-MINUS      : '-'   ;
-INCR_DECR  : "++" | "--"   ;
-MUL        : '*'   ;
-DIV        : '/'   ;
-MOD        : '%'   ;
-
-// TODO: is Lexeror Parser handling keywords
-//           Define    Break    Quit    Length
-// /*       'define', 'break', 'quit', 'length'     */
-//           Return    For    If    While    Sqrt
-// /*       'return', 'for', 'if', 'while', 'sqrt'  */
-
-//           Scale    Ibase    Obase    Auto
-// /*       'scale', 'ibase', 'obase', 'auto'       */
-
 
 
 //-----------------------------------------------------------------------------
@@ -157,184 +166,153 @@ options
 
 tokens 
 {
-  PIR_OP;         // A line of PIR code
-  UNARY_MINUS;    // A line of PIR code
-  PIR_PRINT;      // A line of PIR code
+  PIR_OP;           // A line of PIR code
+  UNARY_MINUS;     
+  PIR_PRINT_PMC;    // A line of PIR code
+  PIR_FUNCTION_DEF; // A function definition
+  PIR_ASSIGN;       // An assignment
 }
 
-// "quit" is really a keyword
+
+// Rules named as in Posix Spec
+
+// TODO: explicit check for EOF
 program
-  : (input_item)* 
-    "quit"!
-    // end-of-file
+  : (input_item)* EOF
   ;
 
 input_item
-  : semicolon_list NEWLINE!
+  :   semicolon_list NEWLINE!
+    | function
   ;
 
+// TODO: trailing SEMICOLON
+// empty lines are allowed
 semicolon_list
-  : statement (SEMICOLON! statement)*
+  : (statement (SEMICOLON! statement)*)?
   ;
 
-statement
-  : expression
-  ;
-
-expression!
-  : a:addingExpression
-      {
-        #expression = #( [ PIR_PRINT, "print" ], #a )
-      }
-  ;
-
-
-subprogramBody
-  : (function)*
-    statement_list
-  ;
-
-
-identList
-  : LETTER (COMMA LETTER)*
-  ;
-
-typeName
-  :   LETTER
-    | "Integer"
-    | "Boolean"
-  ;
-
-
-function
-  : "define" LETTER LPAREN opt_parameter_list RPAREN RCURLY NEWLINE statement_list LCURLY
-        subprogramBody
-    SEMICOLON
-  ;
-
-opt_parameter_list
-  : parameterSpec (SEMICOLON parameterSpec)* RPAREN
-  ;
-
-opt_auto_define_list
-  : parameterSpec (SEMICOLON parameterSpec)* RPAREN
-  ;
-
-
-parameterSpec
-  : ("var")? identList COLON typeName
-  ;
-
-statement_from_tutorial
-  :   exitStatement
-    | returnStatement
-    | ifStatement
-    | loopStatement
-    | ioStatement
-    | (LETTER (LPAREN|SEMICOLON))=> procedureCallStatement
-    | assignmentStatement
-    | expression
-  ;
-
-
+// Used for grouping of statements and in function definitions
+// TODO trailing newlines or semicolons
 statement_list
-  :   addingExpression statement_list
+  :   (statement|NEWLINE!)*
     | // nothing
   ;
 
-assignmentStatement
-  : variableReference BECOMES expression SEMICOLON
+statement
+  {
+    pir = "\n#\n";
+  }
+  : 
+      printable_expression
+    | a:STRING
+      {
+        pir += "print '" + a.getText() + "'\n # ";
+        #statement = #( [ PIR_OP, pir ] )
+      }
+    | Quit
+      {
+        pir += "end\n # ";
+        #statement = #( [ PIR_OP, pir ] )
+      }
+    | LCURLY! statement_list RCURLY!
   ;
 
-
-exitStatement
-  : "exit" "when" expression SEMICOLON
+// not implemented yet
+function              
+  : Define LETTER LPAREN opt_parameter_list RPAREN LCURLY NEWLINE opt_auto_define_list statement_list RCURLY
+    {
+      #function = #( [ PIR_FUNCTION_DEF, "function definition" ] )
+    }
   ;
 
-procedureCallStatement
-  : LETTER (actualParameters)? SEMICOLON
+opt_parameter_list
+  : (parameter_list)?
   ;
 
-actualParameters
-  : LPAREN (expression (COMMA expression)*)? RPAREN
+// TODO: Demand a trailing letter
+parameter_list
+  : define_list 
   ;
 
-returnStatement
-  : "return" SEMICOLON
+// TODO
+opt_auto_define_list
+  : ( Auto define_list (NEWLINE|SEMICOLON) )? 
   ;
 
-ifStatement
-  : "if" ifPart "end" "if" SEMICOLON
+// TODO: allow declaration of arrays
+define_list
+  : LETTER ( COMMA LETTER )*
   ;
 
-ifPart
-  : expression "then"
-    statement_list
-    (   "elsif" ifPart
-      | "else" statement_list
-    )?
+// TODO
+opt_argument_list
+  : argument_list 
   ;
 
-loopStatement
-  : ("while" expression)? "loop"
-        statement_list
-    "end" "loop" SEMICOLON
+// TODO
+argument_list
+  : expression
   ;
 
-endStatement
-  : "end" SEMICOLON
+//TODO
+relational_expression
+  : expression
   ;
 
-variableReference
+//TODO
+return_expression
+  : expression
+  ;
+
+printable_expression
+  :   e:expression 
+      {
+        if self.do_print:
+          #printable_expression = #( [ PIR_PRINT_PMC, "print" ], #e )
+        else:
+          #printable_expression = #( [ PIR_ASSIGN, "assign" ], #e )
+          self.do_print = 1
+      }
+  ;
+
+expression
+  :   named_expression ( ASSIGN_OP! expression { self.do_print = 0 } )?
+    | adding_expression
+  ;
+
+//TODO
+named_expression
   : LETTER
-    (   LBRACKET expression RBRACKET
-      | DOT LETTER
-    )*
   ;
 
+//
+// Not in POSIX Spec
+//
 
-
-ioStatement
-  :   "put" LPAREN expression RPAREN SEMICOLON
-    | "get" LPAREN variableReference RPAREN SEMICOLON
-    | "newLine" (LPAREN RPAREN)? SEMICOLON
-    | "skipLine" (LPAREN RPAREN)? SEMICOLON
+multiplying_expression
+  : sign_expression ((MUL^|DIV^|MOD^) sign_expression)*
   ;
 
-
-primitiveElement
-  :   variableReference
-    | LPAREN expression RPAREN
-  ;
-
-
-booleanNegationExpression
-  : ("not")* primitiveElement
-  ;
-
-multiplyingExpression
-  : signExpression ((MUL^|DIV^|MOD^) signExpression)*
-  ;
-
-signExpression!
-  :   MINUS i1:NUMBER
+sign_expression!
+  :   MINUS i1:paren_expression
       {
-        #signExpression = #( [ UNARY_MINUS ], #i1 ) 
+        #sign_expression = #( [ UNARY_MINUS ], #i1 ) 
       }
-    | i2:NUMBER
+    | i2:paren_expression
       {
-        #signExpression = #i2 
+        #sign_expression = #i2 
       }
   ;
 
-addingExpression
-  : multiplyingExpression ((PLUS^|MINUS^) multiplyingExpression)* 
+adding_expression
+  : multiplying_expression ((PLUS^|MINUS^) multiplying_expression)* 
   ;
 
-relationalExpression
-  : addingExpression ((ASSIGN_OP|NOT_EQUALS|REL_OP) addingExpression)*
+paren_expression
+  :   NUMBER
+    | LPAREN! adding_expression RPAREN!
   ;
-
 
 //----------------------------------------------------------------------------
 // Transform AST, so that it contains code
@@ -438,7 +416,13 @@ signExpression returns [reg_name]
               "neg " + reg_name + "\n#"
         #signExpression = #( [ PIR_NOOP, "noop" ],  #signExpression, [PIR_OP, pir] );
       }
-    
+  ;
+
+namedExpression returns [reg_name]
+  :   l:LETTER
+      {
+        reg_name = l.getText() + "_lex";
+      }
   ;
 
 expr returns [reg_name]
@@ -448,22 +432,30 @@ expr returns [reg_name]
     | reg_name=div
     | reg_name=mod
     | reg_name=signExpression
+    | reg_name=namedExpression
   ;
 
 expr_line
-  : #( PIR_PRINT reg_name=E:expr )
-    {
-      #expr = #( [ PIR_NOOP, "noop" ], #E, [PIR_OP, "\nprint "], [PIR_OP,reg_name], [PIR_NEWLINE, "\nprint \"\\n\" # "] )
-    }
+  :   #( PIR_PRINT_PMC reg_name=E1:expr )
+      {
+        #expr = #( [ PIR_NOOP, "noop" ], #E1, [PIR_OP, "\nprint "], [PIR_OP,reg_name], [PIR_NEWLINE, "\nprint \"\\n\" # "] )
+      }
+    | #( PIR_ASSIGN lex_name=namedExpression reg_name=E2:expr )
+      {
+        pir = "\n" + \
+              lex_name + " = " + reg_name + "\n # "
+        #expr = #( [ PIR_NOOP, "noop" ], #E2, [PIR_OP, pir] )
+      }
+    | PIR_OP
   ;
 
 expr_list
-  : (expr_line)+
+  : (expr_line|PIR_FUNCTION_DEF)+
   ;
 
 gen_pir!
   : B:expr_list
     {
-      #gen_pir = #([PIR_HEADER, "pir header tree\n#"], #B, [PIR_FOOTER, "pir footer tree\nend\n#"]); 
+      #gen_pir = #([PIR_HEADER, "pir header\n#"], #B, [PIR_FOOTER, "pir footer\n#"]); 
     }
   ;

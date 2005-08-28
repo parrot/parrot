@@ -16,26 +16,6 @@ if version < '2.3':
 ### preamble action <<< 
 ### >>>The Literals<<<
 literals = {}
-literals[u"newLine"] = 51
-literals[u"elsif"] = 45
-literals[u"get"] = 50
-literals[u"if"] = 42
-literals[u"define"] = 37
-literals[u"quit"] = 34
-literals[u"while"] = 47
-literals[u"var"] = 38
-literals[u"end"] = 43
-literals[u"then"] = 44
-literals[u"else"] = 46
-literals[u"Boolean"] = 36
-literals[u"when"] = 40
-literals[u"Integer"] = 35
-literals[u"skipLine"] = 52
-literals[u"not"] = 53
-literals[u"loop"] = 48
-literals[u"exit"] = 39
-literals[u"put"] = 49
-literals[u"return"] = 41
 
 
 ### import antlr.Token 
@@ -47,62 +27,46 @@ EOF_TYPE            = antlr.EOF_TYPE
 EOF                 = antlr.EOF
 NULL_TREE_LOOKAHEAD = antlr.NULL_TREE_LOOKAHEAD
 MIN_USER_TYPE       = antlr.MIN_USER_TYPE
-DIGIT = 4
-NUMBER = 5
-STRING = 6
-NEWLINE = 7
-WS = 8
-IDENT = 9
-LETTER = 10
-DOT = 11
-BECOMES = 12
-COLON = 13
-SEMICOLON = 14
-COMMA = 15
-ASSIGN_OP = 16
-LBRACKET = 17
-RBRACKET = 18
-LCURLY = 19
-RCURLY = 20
-DOTDOT = 21
-LPAREN = 22
-RPAREN = 23
-REL_OP = 24
-PLUS = 25
-MINUS = 26
-INCR_DECR = 27
-MUL = 28
-DIV = 29
-MOD = 30
-PIR_OP = 31
-UNARY_MINUS = 32
-PIR_PRINT = 33
-LITERAL_quit = 34
-LITERAL_Integer = 35
-LITERAL_Boolean = 36
-LITERAL_define = 37
-LITERAL_var = 38
-LITERAL_exit = 39
-LITERAL_when = 40
-LITERAL_return = 41
-LITERAL_if = 42
-LITERAL_end = 43
-LITERAL_then = 44
-LITERAL_elsif = 45
-LITERAL_else = 46
-LITERAL_while = 47
-LITERAL_loop = 48
-LITERAL_put = 49
-LITERAL_get = 50
-LITERAL_newLine = 51
-LITERAL_skipLine = 52
-LITERAL_not = 53
-NOT_EQUALS = 54
-PIR_FOOTER = 55
-PIR_HEADER = 56
-PIR_NOOP = 57
-PIR_COMMENT = 58
-PIR_NEWLINE = 59
+NEWLINE = 4
+STRING = 5
+LETTER = 6
+DIGIT = 7
+INTEGER = 8
+NUMBER = 9
+MUL = 10
+DIV = 11
+MOD = 12
+ASSIGN_OP = 13
+REL_OP = 14
+INCR = 15
+DECR = 16
+Quit = 17
+Define = 18
+Auto = 19
+KEYWORDS = 20
+LPAREN = 21
+RPAREN = 22
+COMMA = 23
+PLUS = 24
+MINUS = 25
+SEMICOLON = 26
+LBRACKET = 27
+RBRACKET = 28
+CARET = 29
+LCURLY = 30
+RCURLY = 31
+WS = 32
+ML_COMMENT = 33
+PIR_OP = 34
+UNARY_MINUS = 35
+PIR_PRINT_PMC = 36
+PIR_FUNCTION_DEF = 37
+PIR_ASSIGN = 38
+PIR_FOOTER = 39
+PIR_HEADER = 40
+PIR_NOOP = 41
+PIR_COMMENT = 42
+PIR_NEWLINE = 43
 
 class Lexer(antlr.CharScanner) :
     ### user action >>>
@@ -125,41 +89,25 @@ class Lexer(antlr.CharScanner) :
                             la1 = self.LA(1)
                             if False:
                                 pass
-                            elif la1 and la1 in u'"':
-                                pass
-                                self.mSTRING(True)
-                                theRetToken = self._returnToken
                             elif la1 and la1 in u'\n\r':
                                 pass
                                 self.mNEWLINE(True)
                                 theRetToken = self._returnToken
-                            elif la1 and la1 in u'\t\u000c ':
+                            elif la1 and la1 in u'"':
                                 pass
-                                self.mWS(True)
+                                self.mSTRING(True)
                                 theRetToken = self._returnToken
-                            elif la1 and la1 in u';':
+                            elif la1 and la1 in u'.0123456789ABCDEF':
                                 pass
-                                self.mSEMICOLON(True)
+                                self.mNUMBER(True)
                                 theRetToken = self._returnToken
-                            elif la1 and la1 in u',':
+                            elif la1 and la1 in u'*':
                                 pass
-                                self.mCOMMA(True)
+                                self.mMUL(True)
                                 theRetToken = self._returnToken
-                            elif la1 and la1 in u'[':
+                            elif la1 and la1 in u'%':
                                 pass
-                                self.mLBRACKET(True)
-                                theRetToken = self._returnToken
-                            elif la1 and la1 in u']':
-                                pass
-                                self.mRBRACKET(True)
-                                theRetToken = self._returnToken
-                            elif la1 and la1 in u'{':
-                                pass
-                                self.mLCURLY(True)
-                                theRetToken = self._returnToken
-                            elif la1 and la1 in u'}':
-                                pass
-                                self.mRCURLY(True)
+                                self.mMOD(True)
                                 theRetToken = self._returnToken
                             elif la1 and la1 in u'(':
                                 pass
@@ -169,66 +117,90 @@ class Lexer(antlr.CharScanner) :
                                 pass
                                 self.mRPAREN(True)
                                 theRetToken = self._returnToken
-                            elif la1 and la1 in u'*':
+                            elif la1 and la1 in u',':
                                 pass
-                                self.mMUL(True)
+                                self.mCOMMA(True)
                                 theRetToken = self._returnToken
-                            elif la1 and la1 in u'/':
+                            elif la1 and la1 in u';':
                                 pass
-                                self.mDIV(True)
+                                self.mSEMICOLON(True)
                                 theRetToken = self._returnToken
-                            elif la1 and la1 in u'%':
+                            elif la1 and la1 in u'[':
                                 pass
-                                self.mMOD(True)
+                                self.mLBRACKET(True)
+                                theRetToken = self._returnToken
+                            elif la1 and la1 in u']':
+                                pass
+                                self.mRBRACKET(True)
+                                theRetToken = self._returnToken
+                            elif la1 and la1 in u'^':
+                                pass
+                                self.mCARET(True)
+                                theRetToken = self._returnToken
+                            elif la1 and la1 in u'{':
+                                pass
+                                self.mLCURLY(True)
+                                theRetToken = self._returnToken
+                            elif la1 and la1 in u'}':
+                                pass
+                                self.mRCURLY(True)
+                                theRetToken = self._returnToken
+                            elif la1 and la1 in u'\t\u000c ':
+                                pass
+                                self.mWS(True)
                                 theRetToken = self._returnToken
                             else:
-                                if (_tokenSet_0.member(self.LA(1))):
+                                if (self.LA(1)==u'+') and (self.LA(2)==u'+'):
                                     pass
-                                    self.mNUMBER(True)
+                                    self.mINCR(True)
                                     theRetToken = self._returnToken
-                                elif ((self.LA(1) >= u'a' and self.LA(1) <= u'z')):
+                                elif (self.LA(1)==u'-') and (self.LA(2)==u'-'):
                                     pass
-                                    self.mIDENT(True)
+                                    self.mDECR(True)
                                     theRetToken = self._returnToken
-                                elif ((self.LA(1) >= u'a' and self.LA(1) <= u'z')):
+                                elif (self.LA(1)==u'q') and (self.LA(2)==u'u'):
+                                    pass
+                                    self.mQuit(True)
+                                    theRetToken = self._returnToken
+                                elif (self.LA(1)==u'd') and (self.LA(2)==u'e'):
+                                    pass
+                                    self.mDefine(True)
+                                    theRetToken = self._returnToken
+                                elif (self.LA(1)==u'a') and (self.LA(2)==u'u'):
+                                    pass
+                                    self.mAuto(True)
+                                    theRetToken = self._returnToken
+                                elif (_tokenSet_0.member(self.LA(1))) and (_tokenSet_1.member(self.LA(2))):
+                                    pass
+                                    self.mKEYWORDS(True)
+                                    theRetToken = self._returnToken
+                                elif (self.LA(1)==u'/') and (self.LA(2)==u'*'):
+                                    pass
+                                    self.mML_COMMENT(True)
+                                    theRetToken = self._returnToken
+                                elif ((self.LA(1) >= u'a' and self.LA(1) <= u'z')) and (True):
                                     pass
                                     self.mLETTER(True)
                                     theRetToken = self._returnToken
-                                elif (self.LA(1)==u'.'):
+                                elif (self.LA(1)==u'/') and (True):
                                     pass
-                                    self.mDOT(True)
+                                    self.mDIV(True)
                                     theRetToken = self._returnToken
-                                elif (self.LA(1)==u':'):
-                                    pass
-                                    self.mBECOMES(True)
-                                    theRetToken = self._returnToken
-                                elif (self.LA(1)==u':'):
-                                    pass
-                                    self.mCOLON(True)
-                                    theRetToken = self._returnToken
-                                elif (self.LA(1)==u'=' or self.LA(1)==u'^'):
+                                elif (self.LA(1)==u'=') and (True):
                                     pass
                                     self.mASSIGN_OP(True)
                                     theRetToken = self._returnToken
-                                elif (self.LA(1)==u'.'):
-                                    pass
-                                    self.mDOTDOT(True)
-                                    theRetToken = self._returnToken
-                                elif (_tokenSet_1.member(self.LA(1))):
+                                elif (_tokenSet_2.member(self.LA(1))) and (True):
                                     pass
                                     self.mREL_OP(True)
                                     theRetToken = self._returnToken
-                                elif (self.LA(1)==u'+'):
+                                elif (self.LA(1)==u'+') and (True):
                                     pass
                                     self.mPLUS(True)
                                     theRetToken = self._returnToken
-                                elif (self.LA(1)==u'-'):
+                                elif (self.LA(1)==u'-') and (True):
                                     pass
                                     self.mMINUS(True)
-                                    theRetToken = self._returnToken
-                                elif (self.LA(1)==u'+' or self.LA(1)==u'-'):
-                                    pass
-                                    self.mINCR_DECR(True)
                                     theRetToken = self._returnToken
                                 else:
                                     self.default(self.LA(1))
@@ -251,6 +223,59 @@ class Lexer(antlr.CharScanner) :
             except antlr.TryAgain:
                 pass
         
+    def mNEWLINE(self, _createToken):    
+        _ttype = 0
+        _token = None
+        _begin = self.text.length()
+        _ttype = NEWLINE
+        _saveIndex = 0
+        if (self.LA(1)==u'\r') and (self.LA(2)==u'\n'):
+            pass
+            self.match('\r')
+            self.match('\n')
+        elif (self.LA(1)==u'\r') and (True):
+            pass
+            self.match('\r')
+        elif (self.LA(1)==u'\n'):
+            pass
+            self.match('\n')
+        else:
+            self.raise_NoViableAlt(self.LA(1))
+        
+        self.set_return_token(_createToken, _token, _ttype, _begin)
+    
+    def mSTRING(self, _createToken):    
+        _ttype = 0
+        _token = None
+        _begin = self.text.length()
+        _ttype = STRING
+        _saveIndex = 0
+        pass
+        _saveIndex = self.text.length()
+        self.match('"')
+        self.text.setLength(_saveIndex)
+        while True:
+            if (_tokenSet_3.member(self.LA(1))):
+                pass
+                self.matchNot('"')
+            else:
+                break
+            
+        _saveIndex = self.text.length()
+        self.match('"')
+        self.text.setLength(_saveIndex)
+        self.set_return_token(_createToken, _token, _ttype, _begin)
+    
+    def mLETTER(self, _createToken):    
+        _ttype = 0
+        _token = None
+        _begin = self.text.length()
+        _ttype = LETTER
+        _saveIndex = 0
+        pass
+        self.matchRange(u'a', u'z')
+        self.set_return_token(_createToken, _token, _ttype, _begin)
+    
     def mDIGIT(self, _createToken):    
         _ttype = 0
         _token = None
@@ -271,6 +296,26 @@ class Lexer(antlr.CharScanner) :
             
         self.set_return_token(_createToken, _token, _ttype, _begin)
     
+    def mINTEGER(self, _createToken):    
+        _ttype = 0
+        _token = None
+        _begin = self.text.length()
+        _ttype = INTEGER
+        _saveIndex = 0
+        pass
+        _cnt9= 0
+        while True:
+            if (_tokenSet_4.member(self.LA(1))):
+                pass
+                self.mDIGIT(False)
+            else:
+                break
+            
+            _cnt9 += 1
+        if _cnt9 < 1:
+            self.raise_NoViableAlt(self.LA(1))
+        self.set_return_token(_createToken, _token, _ttype, _begin)
+    
     def mNUMBER(self, _createToken):    
         _ttype = 0
         _token = None
@@ -282,353 +327,18 @@ class Lexer(antlr.CharScanner) :
             pass
         elif la1 and la1 in u'0123456789ABCDEF':
             pass
-            _cnt4= 0
-            while True:
-                if (_tokenSet_2.member(self.LA(1))):
+            self.mINTEGER(False)
+            if (self.LA(1)==u'.'):
+                pass
+                self.match(".")
+                self.mINTEGER(False)
+            else: ## <m4>
                     pass
-                    self.mDIGIT(False)
-                else:
-                    break
                 
-                _cnt4 += 1
-            if _cnt4 < 1:
-                self.raise_NoViableAlt(self.LA(1))
         elif la1 and la1 in u'.':
             pass
             self.match('.')
-            _cnt6= 0
-            while True:
-                if (_tokenSet_2.member(self.LA(1))):
-                    pass
-                    self.mDIGIT(False)
-                else:
-                    break
-                
-                _cnt6 += 1
-            if _cnt6 < 1:
-                self.raise_NoViableAlt(self.LA(1))
-        else:
-                self.raise_NoViableAlt(self.LA(1))
-            
-        self.set_return_token(_createToken, _token, _ttype, _begin)
-    
-    def mSTRING(self, _createToken):    
-        _ttype = 0
-        _token = None
-        _begin = self.text.length()
-        _ttype = STRING
-        _saveIndex = 0
-        pass
-        _saveIndex = self.text.length()
-        self.match('"')
-        self.text.setLength(_saveIndex)
-        while True:
-            if (self.LA(1)==u'"'):
-                pass
-                self.match('"')
-                _saveIndex = self.text.length()
-                self.match('"')
-                self.text.setLength(_saveIndex)
-            elif (_tokenSet_3.member(self.LA(1))):
-                pass
-                self.match(_tokenSet_3)
-            else:
-                break
-            
-        if (self.LA(1)==u'"'):
-            pass
-            _saveIndex = self.text.length()
-            self.match('"')
-            self.text.setLength(_saveIndex)
-        else: ## <m4>
-                pass
-            
-        self.set_return_token(_createToken, _token, _ttype, _begin)
-    
-    def mNEWLINE(self, _createToken):    
-        _ttype = 0
-        _token = None
-        _begin = self.text.length()
-        _ttype = NEWLINE
-        _saveIndex = 0
-        if (self.LA(1)==u'\r'):
-            pass
-            self.match('\r')
-        elif (self.LA(1)==u'\n'):
-            pass
-            self.match('\n')
-        elif (self.LA(1)==u'\r'):
-            pass
-            self.match('\r')
-            self.match('\n')
-        else:
-            self.raise_NoViableAlt(self.LA(1))
-        
-        self.set_return_token(_createToken, _token, _ttype, _begin)
-    
-    def mWS(self, _createToken):    
-        _ttype = 0
-        _token = None
-        _begin = self.text.length()
-        _ttype = WS
-        _saveIndex = 0
-        pass
-        la1 = self.LA(1)
-        if False:
-            pass
-        elif la1 and la1 in u' ':
-            pass
-            self.match(' ')
-        elif la1 and la1 in u'\t':
-            pass
-            self.match('\t')
-        elif la1 and la1 in u'\u000c':
-            pass
-            self.match('\f')
-        else:
-                self.raise_NoViableAlt(self.LA(1))
-            
-        _ttype = Token.SKIP;
-        self.set_return_token(_createToken, _token, _ttype, _begin)
-    
-    def mIDENT(self, _createToken):    
-        _ttype = 0
-        _token = None
-        _begin = self.text.length()
-        _ttype = IDENT
-        _saveIndex = 0
-        pass
-        pass
-        self.matchRange(u'a', u'z')
-        while True:
-            if ((self.LA(1) >= u'a' and self.LA(1) <= u'z')):
-                pass
-                self.matchRange(u'a', u'z')
-            else:
-                break
-            
-        ### option { testLiterals=true } 
-        _ttype = self.testLiteralsTable(_ttype)
-        self.set_return_token(_createToken, _token, _ttype, _begin)
-    
-    def mLETTER(self, _createToken):    
-        _ttype = 0
-        _token = None
-        _begin = self.text.length()
-        _ttype = LETTER
-        _saveIndex = 0
-        pass
-        self.matchRange(u'a', u'z')
-        self.set_return_token(_createToken, _token, _ttype, _begin)
-    
-    def mDOT(self, _createToken):    
-        _ttype = 0
-        _token = None
-        _begin = self.text.length()
-        _ttype = DOT
-        _saveIndex = 0
-        pass
-        self.match('.')
-        self.set_return_token(_createToken, _token, _ttype, _begin)
-    
-    def mBECOMES(self, _createToken):    
-        _ttype = 0
-        _token = None
-        _begin = self.text.length()
-        _ttype = BECOMES
-        _saveIndex = 0
-        pass
-        self.match(":=")
-        self.set_return_token(_createToken, _token, _ttype, _begin)
-    
-    def mCOLON(self, _createToken):    
-        _ttype = 0
-        _token = None
-        _begin = self.text.length()
-        _ttype = COLON
-        _saveIndex = 0
-        pass
-        self.match(':')
-        self.set_return_token(_createToken, _token, _ttype, _begin)
-    
-    def mSEMICOLON(self, _createToken):    
-        _ttype = 0
-        _token = None
-        _begin = self.text.length()
-        _ttype = SEMICOLON
-        _saveIndex = 0
-        pass
-        self.match(';')
-        self.set_return_token(_createToken, _token, _ttype, _begin)
-    
-    def mCOMMA(self, _createToken):    
-        _ttype = 0
-        _token = None
-        _begin = self.text.length()
-        _ttype = COMMA
-        _saveIndex = 0
-        pass
-        self.match(',')
-        self.set_return_token(_createToken, _token, _ttype, _begin)
-    
-    def mASSIGN_OP(self, _createToken):    
-        _ttype = 0
-        _token = None
-        _begin = self.text.length()
-        _ttype = ASSIGN_OP
-        _saveIndex = 0
-        la1 = self.LA(1)
-        if False:
-            pass
-        elif la1 and la1 in u'=':
-            pass
-            self.match('=')
-        elif la1 and la1 in u'^':
-            pass
-            self.match("^=")
-        else:
-                self.raise_NoViableAlt(self.LA(1))
-            
-        self.set_return_token(_createToken, _token, _ttype, _begin)
-    
-    def mLBRACKET(self, _createToken):    
-        _ttype = 0
-        _token = None
-        _begin = self.text.length()
-        _ttype = LBRACKET
-        _saveIndex = 0
-        pass
-        self.match('[')
-        self.set_return_token(_createToken, _token, _ttype, _begin)
-    
-    def mRBRACKET(self, _createToken):    
-        _ttype = 0
-        _token = None
-        _begin = self.text.length()
-        _ttype = RBRACKET
-        _saveIndex = 0
-        pass
-        self.match(']')
-        self.set_return_token(_createToken, _token, _ttype, _begin)
-    
-    def mLCURLY(self, _createToken):    
-        _ttype = 0
-        _token = None
-        _begin = self.text.length()
-        _ttype = LCURLY
-        _saveIndex = 0
-        pass
-        self.match('{')
-        self.set_return_token(_createToken, _token, _ttype, _begin)
-    
-    def mRCURLY(self, _createToken):    
-        _ttype = 0
-        _token = None
-        _begin = self.text.length()
-        _ttype = RCURLY
-        _saveIndex = 0
-        pass
-        self.match('}')
-        self.set_return_token(_createToken, _token, _ttype, _begin)
-    
-    def mDOTDOT(self, _createToken):    
-        _ttype = 0
-        _token = None
-        _begin = self.text.length()
-        _ttype = DOTDOT
-        _saveIndex = 0
-        pass
-        self.match("..")
-        self.set_return_token(_createToken, _token, _ttype, _begin)
-    
-    def mLPAREN(self, _createToken):    
-        _ttype = 0
-        _token = None
-        _begin = self.text.length()
-        _ttype = LPAREN
-        _saveIndex = 0
-        pass
-        self.match('(')
-        self.set_return_token(_createToken, _token, _ttype, _begin)
-    
-    def mRPAREN(self, _createToken):    
-        _ttype = 0
-        _token = None
-        _begin = self.text.length()
-        _ttype = RPAREN
-        _saveIndex = 0
-        pass
-        self.match(')')
-        self.set_return_token(_createToken, _token, _ttype, _begin)
-    
-    def mREL_OP(self, _createToken):    
-        _ttype = 0
-        _token = None
-        _begin = self.text.length()
-        _ttype = REL_OP
-        _saveIndex = 0
-        la1 = self.LA(1)
-        if False:
-            pass
-        elif la1 and la1 in u'=':
-            pass
-            self.match("==")
-        elif la1 and la1 in u'!':
-            pass
-            self.match("!=")
-        else:
-            if (self.LA(1)==u'<'):
-                pass
-                self.match('<')
-            elif (self.LA(1)==u'>'):
-                pass
-                self.match('>')
-            elif (self.LA(1)==u'<'):
-                pass
-                self.match("<=")
-            elif (self.LA(1)==u'>'):
-                pass
-                self.match(">=")
-            else:
-                self.raise_NoViableAlt(self.LA(1))
-            
-        self.set_return_token(_createToken, _token, _ttype, _begin)
-    
-    def mPLUS(self, _createToken):    
-        _ttype = 0
-        _token = None
-        _begin = self.text.length()
-        _ttype = PLUS
-        _saveIndex = 0
-        pass
-        self.match('+')
-        self.set_return_token(_createToken, _token, _ttype, _begin)
-    
-    def mMINUS(self, _createToken):    
-        _ttype = 0
-        _token = None
-        _begin = self.text.length()
-        _ttype = MINUS
-        _saveIndex = 0
-        pass
-        self.match('-')
-        self.set_return_token(_createToken, _token, _ttype, _begin)
-    
-    def mINCR_DECR(self, _createToken):    
-        _ttype = 0
-        _token = None
-        _begin = self.text.length()
-        _ttype = INCR_DECR
-        _saveIndex = 0
-        la1 = self.LA(1)
-        if False:
-            pass
-        elif la1 and la1 in u'+':
-            pass
-            self.match("++")
-        elif la1 and la1 in u'-':
-            pass
-            self.match("--")
+            self.mINTEGER(False)
         else:
                 self.raise_NoViableAlt(self.LA(1))
             
@@ -664,35 +374,352 @@ class Lexer(antlr.CharScanner) :
         self.match('%')
         self.set_return_token(_createToken, _token, _ttype, _begin)
     
+    def mASSIGN_OP(self, _createToken):    
+        _ttype = 0
+        _token = None
+        _begin = self.text.length()
+        _ttype = ASSIGN_OP
+        _saveIndex = 0
+        pass
+        self.match('=')
+        self.set_return_token(_createToken, _token, _ttype, _begin)
+    
+    def mREL_OP(self, _createToken):    
+        _ttype = 0
+        _token = None
+        _begin = self.text.length()
+        _ttype = REL_OP
+        _saveIndex = 0
+        la1 = self.LA(1)
+        if False:
+            pass
+        elif la1 and la1 in u'=':
+            pass
+            self.match("==")
+        elif la1 and la1 in u'!':
+            pass
+            self.match("!=")
+        else:
+            if (self.LA(1)==u'<') and (self.LA(2)==u'='):
+                pass
+                self.match("<=")
+            elif (self.LA(1)==u'>') and (self.LA(2)==u'='):
+                pass
+                self.match(">=")
+            elif (self.LA(1)==u'<') and (True):
+                pass
+                self.match('<')
+            elif (self.LA(1)==u'>') and (True):
+                pass
+                self.match('>')
+            else:
+                self.raise_NoViableAlt(self.LA(1))
+            
+        self.set_return_token(_createToken, _token, _ttype, _begin)
+    
+    def mINCR(self, _createToken):    
+        _ttype = 0
+        _token = None
+        _begin = self.text.length()
+        _ttype = INCR
+        _saveIndex = 0
+        pass
+        self.match("++")
+        self.set_return_token(_createToken, _token, _ttype, _begin)
+    
+    def mDECR(self, _createToken):    
+        _ttype = 0
+        _token = None
+        _begin = self.text.length()
+        _ttype = DECR
+        _saveIndex = 0
+        pass
+        self.match("--")
+        self.set_return_token(_createToken, _token, _ttype, _begin)
+    
+    def mQuit(self, _createToken):    
+        _ttype = 0
+        _token = None
+        _begin = self.text.length()
+        _ttype = Quit
+        _saveIndex = 0
+        pass
+        self.match("quit")
+        self.set_return_token(_createToken, _token, _ttype, _begin)
+    
+    def mDefine(self, _createToken):    
+        _ttype = 0
+        _token = None
+        _begin = self.text.length()
+        _ttype = Define
+        _saveIndex = 0
+        pass
+        self.match("define")
+        self.set_return_token(_createToken, _token, _ttype, _begin)
+    
+    def mAuto(self, _createToken):    
+        _ttype = 0
+        _token = None
+        _begin = self.text.length()
+        _ttype = Auto
+        _saveIndex = 0
+        pass
+        self.match("auto")
+        self.set_return_token(_createToken, _token, _ttype, _begin)
+    
+    def mKEYWORDS(self, _createToken):    
+        _ttype = 0
+        _token = None
+        _begin = self.text.length()
+        _ttype = KEYWORDS
+        _saveIndex = 0
+        la1 = self.LA(1)
+        if False:
+            pass
+        elif la1 and la1 in u'b':
+            pass
+            self.match("break")
+        elif la1 and la1 in u'l':
+            pass
+            self.match("length")
+        elif la1 and la1 in u'r':
+            pass
+            self.match("return")
+        elif la1 and la1 in u'f':
+            pass
+            self.match("for")
+        elif la1 and la1 in u'w':
+            pass
+            self.match("while")
+        elif la1 and la1 in u'o':
+            pass
+            self.match("obase")
+        else:
+            if (self.LA(1)==u'i') and (self.LA(2)==u'f'):
+                pass
+                self.match("if")
+            elif (self.LA(1)==u's') and (self.LA(2)==u'q'):
+                pass
+                self.match("sqrt")
+            elif (self.LA(1)==u's') and (self.LA(2)==u'c'):
+                pass
+                self.match("scale")
+            elif (self.LA(1)==u'i') and (self.LA(2)==u'b'):
+                pass
+                self.match("ibase")
+            else:
+                self.raise_NoViableAlt(self.LA(1))
+            
+        self.set_return_token(_createToken, _token, _ttype, _begin)
+    
+    def mLPAREN(self, _createToken):    
+        _ttype = 0
+        _token = None
+        _begin = self.text.length()
+        _ttype = LPAREN
+        _saveIndex = 0
+        pass
+        self.match('(')
+        self.set_return_token(_createToken, _token, _ttype, _begin)
+    
+    def mRPAREN(self, _createToken):    
+        _ttype = 0
+        _token = None
+        _begin = self.text.length()
+        _ttype = RPAREN
+        _saveIndex = 0
+        pass
+        self.match(')')
+        self.set_return_token(_createToken, _token, _ttype, _begin)
+    
+    def mCOMMA(self, _createToken):    
+        _ttype = 0
+        _token = None
+        _begin = self.text.length()
+        _ttype = COMMA
+        _saveIndex = 0
+        pass
+        self.match(',')
+        self.set_return_token(_createToken, _token, _ttype, _begin)
+    
+    def mPLUS(self, _createToken):    
+        _ttype = 0
+        _token = None
+        _begin = self.text.length()
+        _ttype = PLUS
+        _saveIndex = 0
+        pass
+        self.match('+')
+        self.set_return_token(_createToken, _token, _ttype, _begin)
+    
+    def mMINUS(self, _createToken):    
+        _ttype = 0
+        _token = None
+        _begin = self.text.length()
+        _ttype = MINUS
+        _saveIndex = 0
+        pass
+        self.match('-')
+        self.set_return_token(_createToken, _token, _ttype, _begin)
+    
+    def mSEMICOLON(self, _createToken):    
+        _ttype = 0
+        _token = None
+        _begin = self.text.length()
+        _ttype = SEMICOLON
+        _saveIndex = 0
+        pass
+        self.match(';')
+        self.set_return_token(_createToken, _token, _ttype, _begin)
+    
+    def mLBRACKET(self, _createToken):    
+        _ttype = 0
+        _token = None
+        _begin = self.text.length()
+        _ttype = LBRACKET
+        _saveIndex = 0
+        pass
+        self.match('[')
+        self.set_return_token(_createToken, _token, _ttype, _begin)
+    
+    def mRBRACKET(self, _createToken):    
+        _ttype = 0
+        _token = None
+        _begin = self.text.length()
+        _ttype = RBRACKET
+        _saveIndex = 0
+        pass
+        self.match(']')
+        self.set_return_token(_createToken, _token, _ttype, _begin)
+    
+    def mCARET(self, _createToken):    
+        _ttype = 0
+        _token = None
+        _begin = self.text.length()
+        _ttype = CARET
+        _saveIndex = 0
+        pass
+        self.match('^')
+        self.set_return_token(_createToken, _token, _ttype, _begin)
+    
+    def mLCURLY(self, _createToken):    
+        _ttype = 0
+        _token = None
+        _begin = self.text.length()
+        _ttype = LCURLY
+        _saveIndex = 0
+        pass
+        self.match('{')
+        self.set_return_token(_createToken, _token, _ttype, _begin)
+    
+    def mRCURLY(self, _createToken):    
+        _ttype = 0
+        _token = None
+        _begin = self.text.length()
+        _ttype = RCURLY
+        _saveIndex = 0
+        pass
+        self.match('}')
+        self.set_return_token(_createToken, _token, _ttype, _begin)
+    
+    def mWS(self, _createToken):    
+        _ttype = 0
+        _token = None
+        _begin = self.text.length()
+        _ttype = WS
+        _saveIndex = 0
+        pass
+        la1 = self.LA(1)
+        if False:
+            pass
+        elif la1 and la1 in u' ':
+            pass
+            self.match(' ')
+        elif la1 and la1 in u'\t':
+            pass
+            self.match('\t')
+        elif la1 and la1 in u'\u000c':
+            pass
+            self.match('\f')
+        else:
+                self.raise_NoViableAlt(self.LA(1))
+            
+        _ttype = Token.SKIP;
+        self.set_return_token(_createToken, _token, _ttype, _begin)
+    
+    def mML_COMMENT(self, _createToken):    
+        _ttype = 0
+        _token = None
+        _begin = self.text.length()
+        _ttype = ML_COMMENT
+        _saveIndex = 0
+        pass
+        self.match("/*")
+        while True:
+            la1 = self.LA(1)
+            if False:
+                pass
+            elif la1 and la1 in u'\n':
+                pass
+                self.match('\n')
+                self.newline();
+            elif la1 and la1 in u'\u0000\u0001\u0002\u0003\u0004\u0005\u0006\u0007\u0008\t\u000b\u000c\r\u000e\u000f\u0010\u0011\u0012\u0013\u0014\u0015\u0016\u0017\u0018\u0019\u001a\u001b\u001c\u001d\u001e\u001f !"#$%&\'()+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~\u007f':
+                pass
+                self.match(_tokenSet_5)
+            else:
+                if ((self.LA(1)==u'*') and ((self.LA(2) >= u'\u0000' and self.LA(2) <= u'\u007f')) and ( self.LA(2) != '/' )):
+                    pass
+                    self.match('*')
+                else:
+                    break
+                
+        self.match("*/")
+        _ttype = SKIP;
+        self.set_return_token(_createToken, _token, _ttype, _begin)
+    
     
 
 ### generate bit set
 def mk_tokenSet_0(): 
     ### var1
-    data = [ 288019269919178752L, 126L, 0L, 0L]
+    data = [ 0L, 39567317494923264L, 0L, 0L]
     return data
 _tokenSet_0 = antlr.BitSet(mk_tokenSet_0())
 
 ### generate bit set
 def mk_tokenSet_1(): 
     ### var1
-    data = [ 8070450540837863424L, 0L, 0L]
+    data = [ 0L, 1831150716715008L, 0L, 0L]
     return data
 _tokenSet_1 = antlr.BitSet(mk_tokenSet_1())
 
 ### generate bit set
 def mk_tokenSet_2(): 
     ### var1
-    data = [ 287948901175001088L, 126L, 0L, 0L]
+    data = [ 8070450540837863424L, 0L, 0L]
     return data
 _tokenSet_2 = antlr.BitSet(mk_tokenSet_2())
 
 ### generate bit set
 def mk_tokenSet_3(): 
     ### var1
-    data = [ -17179878401L, -1L, 0L, 0L]
+    data = [ -17179869185L, -1L, 0L, 0L]
     return data
 _tokenSet_3 = antlr.BitSet(mk_tokenSet_3())
+
+### generate bit set
+def mk_tokenSet_4(): 
+    ### var1
+    data = [ 287948901175001088L, 126L, 0L, 0L]
+    return data
+_tokenSet_4 = antlr.BitSet(mk_tokenSet_4())
+
+### generate bit set
+def mk_tokenSet_5(): 
+    ### var1
+    data = [ -4398046512129L, -1L, 0L, 0L]
+    return data
+_tokenSet_5 = antlr.BitSet(mk_tokenSet_5())
     
 ### __main__ header action >>> 
 if __name__ == '__main__' :

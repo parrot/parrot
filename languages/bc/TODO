@@ -1,20 +1,37 @@
 # Copyright: 2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
-A fairly concrete list of TODOs for Parrot bc.
-See docs/parrot_bc.pod for visions.
+# Some tidbits on what is to do for Parrot bc.
+# See docs/parrot_bc.pod for visions.
 
-- TODO in t/basic.t is no longer handled
+- Custom PMCs for Parrot bc
+  - Decimal BigNum libraries
+ 
+- Handle newlines in strings
+
+- Print no output when there is a "quit" in the input item
+
+- 4.3.5.3: Honour locale settings from the environment
+
+- driver program bc.py
+  - 4.3.3: Implement command line switch '-l'
+  - use invoke() like in ast2past.py
+  - interactive mode
+  - 4.3.5.2: Allow multiple file on command line
+
+- Keep track of scale, and do the printing accordingly
+
+- Complete the Lexer and the Parser
+  - Test parsing only by putting things into functions
+  - handle keywords
+
 - Format 0.1 as .1
 
-- Open a ticket in RT
+- Administrative
+  - Open a ticket in RT, language 'bc' in RT
+  - Update ChangeLog according to 'svn log'
 
-- Find a test suite for bc.
+- Testing
+  - Find a test suite for bc
 
-- Fetch bc Spec from  POSIX P1003.2/D11 draft 
-
-- bc.py use invoke() like in ast2past.py
-
-- Decimal BigNum libraries
-
-- recognition of 1.2
+- Provide pointers to bc Spec POSIX P1003.2/D11 draft Section 4.3
