@@ -16,6 +16,6 @@ so there's something that works.
 
 #include "parrot/parrot.h"
 
-pmclass StringArray extends PerlArray need_ext {
+pmclass StringArray extends ResizablePMCArray need_ext {
 
 }
