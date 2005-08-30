@@ -704,19 +704,19 @@ ft_init(Parrot_Interp interpreter, visit_info *info)
     if (info->what == VISIT_FREEZE_NORMAL ||
         info->what == VISIT_FREEZE_AT_DESTRUCT) {
 
-        op_check_size(interpreter, s, 16);
-        mem_sys_memcopy(s->strstart, pf->header, 16);
-        s->bufused += 16;
-        s->strlen += 16;
+        op_check_size(interpreter, s, PACKFILE_HEADER_BYTES);
+        mem_sys_memcopy(s->strstart, pf->header, PACKFILE_HEADER_BYTES);
+        s->bufused += PACKFILE_HEADER_BYTES;
+        s->strlen += PACKFILE_HEADER_BYTES;
     }
     else {
-        if (string_length(interpreter, s) < 16) {
+        if (string_length(interpreter, s) < PACKFILE_HEADER_BYTES) {
             real_exception(interpreter, NULL, E_IOError,
                     "bad string too thaw");
         }
-        mem_sys_memcopy(pf->header, s->strstart, 16);
+        mem_sys_memcopy(pf->header, s->strstart, PACKFILE_HEADER_BYTES);
         PackFile_assign_transforms(pf);
-        s->bufused -= 16;
+        s->bufused -= PACKFILE_HEADER_BYTES;
         LVALUE_CAST(char *, s->strstart) += 16;
     }
 
@@ -1491,7 +1491,7 @@ run_thaw(Parrot_Interp interpreter, STRING* image, visit_enum_type what)
      * thaw does "consume" the image string by incrementing strstart
      * and decrementing bufused - restore that
      */
-    LVALUE_CAST(ptrdiff_t, image->strstart) -= bufused;
+    LVALUE_CAST(char *, image->strstart) -= bufused;
     image->bufused = bufused;
     assert(image->strstart >= PObj_bufstart(image));
 
