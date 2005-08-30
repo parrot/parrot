@@ -183,7 +183,7 @@ create_deleg_pmc_vtable(Interp *interpreter, PMC *class, STRING *class_name)
              * if the method exists, keep the ParrotObject aka delegate vtable
              * slot
              */
-            LVALUE_CAST(void **,vtable)[i] = ((void**)object_vtable)[i];
+            ((void **)vtable)[i] = ((void**)object_vtable)[i];
 #if 0
             PIO_eprintf(interpreter, "deleg_pmc class '%Ss' found '%s'\n",
                     class_name, meth);
@@ -195,9 +195,9 @@ create_deleg_pmc_vtable(Interp *interpreter, PMC *class, STRING *class_name)
              * but only if ParrotObject hasn't overridden the method
              */
             if (((void **)delegate_vtable)[i] == ((void**)object_vtable)[i])
-                LVALUE_CAST(void **,vtable)[i] = ((void**)deleg_pmc_vtable)[i];
+                ((void **)vtable)[i] = ((void**)deleg_pmc_vtable)[i];
             else
-                LVALUE_CAST(void **,vtable)[i] = ((void**)object_vtable)[i];
+                ((void **)vtable)[i] = ((void**)object_vtable)[i];
         }
     }
     /*

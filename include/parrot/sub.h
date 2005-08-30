@@ -62,7 +62,8 @@ typedef struct Parrot_sub {
     struct Stack_Chunk *pad_stack;      /* only for closure */
 } * parrot_sub_t;
 
-#define PMC_sub(pmc) LVALUE_CAST(parrot_sub_t, PMC_struct_val(pmc))
+#define PMC_sub(pmc)		  ((parrot_sub_t)PMC_struct_val(pmc))
+#define PMC_sub_ASSIGN(pmc,sub)	  VOIDPTR_ASSIGN(parrot_sub_t, PMC_struct_val(pmc), sub)
 
 /* the first entries must match Parrot_sub, so we can cast
  * these two to the other type
@@ -88,7 +89,8 @@ typedef struct Parrot_coro {
     struct PackFile_ByteCode *caller_seg;  /* bytecode segment */
 } * parrot_coro_t;
 
-#define PMC_coro(pmc) LVALUE_CAST(parrot_coro_t, PMC_struct_val(pmc))
+#define PMC_coro(pmc) 		  ((parrot_coro_t)PMC_struct_val(pmc))
+#define PMC_coro_ASSIGN(pmc,coro) VOIDPTR_ASSIGN(parrot_coro_t, PMC_struct_val(pmc), coro)
 
 typedef struct Parrot_cont {
     struct PackFile_ByteCode *seg;      /* bytecode segment */
@@ -96,7 +98,8 @@ typedef struct Parrot_cont {
     struct Parrot_Context ctx;  /* copy of interpreter context */
 } * parrot_cont_t;
 
-#define PMC_cont(pmc) LVALUE_CAST(parrot_cont_t, PMC_struct_val(pmc))
+#define PMC_cont(pmc)		  ((parrot_cont_t)PMC_struct_val(pmc))
+#define PMC_cont_ASSIGN(pmc,cont) VOIDPTR_ASSIGN(parrot_cont_t, PMC_struct_val(pmc), cont)
 
 struct Parrot_Context_info {
     STRING* subname;

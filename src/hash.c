@@ -418,7 +418,7 @@ expand_hash(Interp *interpreter, Hash *hash)
 	for (i = 0; i < old_size; ++i) {
 	    next_p = new_bi + i;
 	    while (*next_p) {
-		LVALUE_CAST(char*, *next_p) += offset;
+		*next_p = (HashBucket *)((char *)*next_p + offset);
 		b = *next_p;
 		next_p = &b->next;
 	    }

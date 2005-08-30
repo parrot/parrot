@@ -170,7 +170,12 @@ typedef struct parrot_interp_t Interp;
 #define PTR2OPCODE_T(p)    OPCODE_T2PTR(opcode_t,p)
 
 /*
- * some compilers don't like lvalue casts
+ * some compilers don't like lvalue casts, so macroize them
+ *
+ * NOTE: Under no circumstances is it permitted to use this macro on types
+ *       that are not effectivly guaranteed to be compatible.
+ *       Good:  int->unsigned; long->unsigned long; struct*->struct*; char*->void*
+ *       Bad:   integral->pointer;  struct*->char*
  */
 
 #ifdef __GCC__
@@ -179,6 +184,15 @@ typedef struct parrot_interp_t Interp;
 #define LVALUE_CAST(type, val) (*((type *)&(val)))
 #endif /* __GCC__ */
 
+/*
+ * assign to a void* in a way that produces compile-time warnings
+ * if the type isn't what was expected.
+ */
+#define VOIDPTR_ASSIGN(type, p, val) \
+    do { \
+        type _typed_ptr = (val); \
+        (p) = (val); \
+    } while (0)
 
 /* some SGI compilers have an offsetof()
  * definition that doesn't work for us. */

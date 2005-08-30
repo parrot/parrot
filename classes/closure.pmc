@@ -35,7 +35,7 @@ Initializes the closure.
 */
 
     void init () {
-        PMC_sub(SELF) = new_closure(INTERP);
+        PMC_sub_ASSIGN(SELF, new_closure(INTERP));
         PMC_pmc_val(SELF) = NULL;
         PObj_custom_mark_destroy_SETALL(SELF);
 #if 0

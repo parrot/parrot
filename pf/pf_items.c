@@ -590,7 +590,8 @@ PF_store_string(opcode_t *cursor, STRING *s)
         }
     }
     assert( ((long)charcursor & 3) == 0);
-    LVALUE_CAST(char *, cursor) = charcursor;
+    cursor = (opcode_t *)charcursor;
+
     return cursor;
 }
 

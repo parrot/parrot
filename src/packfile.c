@@ -87,10 +87,12 @@ static opcode_t * pf_debug_unpack (Interp *,
         struct PackFile_Segment *self, opcode_t *);
 static void pf_debug_destroy (Interp*, struct PackFile_Segment *self);
 
-#define ROUND_16(val) ((val) & 0xf) ? 16 - ((val) & 0xf) : 0
-#define ALIGN_16(st, cursor) do { \
-        LVALUE_CAST(unsigned char*, cursor) += \
-            ROUND_16((unsigned char*)(cursor) - (unsigned char*)(st)); \
+#define ROUND_16(val) ( ((val) & 0xf) ? 16 - ((val) & 0xf) : 0 )
+#define ALIGN_16(st, cursor) \
+    do { \
+        (cursor) = (opcode_t *) \
+		   ((char *)(cursor) \
+		    + ROUND_16((char *)(cursor) - (char *)(st))); \
     } while (0)
 
 /*

@@ -129,19 +129,17 @@ Parrot_reallocate(Interp *interpreter, void *from, size_t size)
     void *p;
     size_t oldlen = PObj_buflen(buffer);
     if (!PObj_bufstart(buffer)) {
-        PObj_bufstart(buffer) = xcalloc(1, size + sizeof(INTVAL));
-        LVALUE_CAST(INTVAL *, PObj_bufstart(buffer))++;
+        p = 1 + (INTVAL *)xcalloc(1, sizeof(INTVAL) + size);
     }
     else {
         if (!size) {    /* realloc(3) does free, if size == 0 here */
             return PObj_bufstart(buffer);    /* do nothing */
         }
-        p = xrealloc((INTVAL*)PObj_bufstart(buffer) - 1, size + sizeof(INTVAL));
-        *(LVALUE_CAST(INTVAL *, p)++) = 0;
-        if (size > PObj_buflen(buffer))
-            memset((char*)p + oldlen, 0, size - oldlen);
-        PObj_bufstart(buffer) = p;
+        p = 1 + (INTVAL *)xrealloc((INTVAL *)PObj_bufstart(buffer) - 1, sizeof(INTVAL) + size);
+        if (size > oldlen)
+            memset(p + oldlen, 0, size - oldlen);
     }
+    PObj_bufstart(buffer) = p;
     PObj_buflen(buffer) = size;
     return PObj_bufstart(buffer);
 }
@@ -162,8 +160,9 @@ void *
 Parrot_allocate(Interp *interpreter, void *buffer, size_t size)
 {
     Buffer * b = buffer;
-    PObj_bufstart(b) = xmalloc(size + sizeof(INTVAL));
-    *(LVALUE_CAST(INTVAL *, PObj_bufstart(b))++) = 0;
+    void *p = xmalloc(sizeof(INTVAL) + size);
+    *(INTVAL *)p = 0;
+    PObj_bufstart(b) = 1 + (INTVAL *)p;
     PObj_buflen(b) = size;
     return b;
 }
@@ -186,8 +185,7 @@ Parrot_allocate_zeroed(Interp *interpreter, void *buffer,
         size_t size)
 {
     Buffer * b = buffer;
-    PObj_bufstart(b) = xcalloc(1, size + sizeof(INTVAL));
-    *(LVALUE_CAST(INTVAL *, PObj_bufstart(b))++) = 0;  /*   *( (INTVAL*) PObj_bufstart(b) ++ ) = 0 */
+    PObj_bufstart(b) = 1 + (INTVAL *)xcalloc(1, sizeof(INTVAL) + size);
     PObj_buflen(b) = size;
     return b;
 }

@@ -100,7 +100,7 @@ pmclass Eval extends Closure need_ext {
         seg = (struct PackFile_Segment *)cur_cs;
         PackFile_Segment_destroy(INTERP, seg);
         sub_data->seg = NULL;
-        PMC_sub(SELF) = NULL;
+        PMC_sub_ASSIGN(SELF, NULL);
     }
 
 /*

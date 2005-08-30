@@ -38,7 +38,7 @@ Initializes the continuation.
 */
 
     void init () {
-        PMC_cont(SELF) = new_continuation(INTERP);
+        PMC_cont_ASSIGN(SELF, new_continuation(INTERP));
         PMC_pmc_val(SELF) = NULL;
         PObj_custom_mark_destroy_SETALL(SELF);
     }

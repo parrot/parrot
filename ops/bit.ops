@@ -242,6 +242,10 @@ Set $1 to the value of $2 logically shifted right by $3 bits.
 =cut
 
 inline op lsr(out INT, in INT) :base_core {
+  /*
+   * lvalue casts are evil, but this one isn't evil enough to kill.
+   * it's just casting a signed integral to the equivalent unsigned.
+   */
   LVALUE_CAST(UINTVAL, $1) >>= $2;
   goto NEXT();
 }

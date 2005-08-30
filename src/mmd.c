@@ -1806,7 +1806,7 @@ mmd_sort_candidates(Interp *interpreter, PMC *arg_tuple, PMC *cl)
             PMC_int_val(cl) = i;
             break;
         }
-        LVALUE_CAST(PMC*, helper[i]) = data[idx];
+        helper[i] = (INTVAL)data[idx];
     }
     /*
      * use helper structure

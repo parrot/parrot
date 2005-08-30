@@ -151,7 +151,7 @@ reaches 0, delete the entry.
 	HashBucket *b;
 	b = hash_get_bucket(INTERP, hash, key);
 	if (b)
-	    LVALUE_CAST(long, b->value) ++;
+	    LVALUE_CAST(char *, b->value) ++;
 	else
 	    hash_put(INTERP, hash, key, (void *) 1);
     }

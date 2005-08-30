@@ -1027,6 +1027,14 @@ e_pbc_end_sub(Interp *interpreter, void *param, IMC_Unit * unit)
     return 0;
 }
 
+/*----------------------------------------------------------------
+ * "Verify" the signature for a single set_{args,returns} or
+ * get_{params,results}.
+ *
+ * Actually it doesn't verify anything, but rather, it _corrects_ it,
+ * silently.  Which needs to change.  XXX CHS
+ */
+
 static void
 verify_signature(Interp *interpreter, Instruction *ins, opcode_t *pc)
 {

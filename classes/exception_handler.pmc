@@ -36,7 +36,7 @@ Initializes the exception handler.
 */
 
     void init() {
-        PMC_cont(SELF) = new_continuation(INTERP);
+        PMC_cont_ASSIGN(SELF, new_continuation(INTERP));
         PMC_pmc_val(SELF) = NULL;
         /*
          * an exception handler has no separate context, its
