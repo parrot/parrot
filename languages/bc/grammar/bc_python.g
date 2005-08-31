@@ -170,7 +170,6 @@ tokens
   UNARY_MINUS;     
   PIR_PRINT_PMC;    // A line of PIR code
   PIR_FUNCTION_DEF; // A function definition
-  PIR_ASSIGN;       // An assignment
 }
 
 
@@ -271,13 +270,15 @@ printable_expression
         if self.do_print:
           #printable_expression = #( [ PIR_PRINT_PMC, "print" ], #e )
         else:
-          #printable_expression = #( [ PIR_ASSIGN, "assign" ], #e )
+          #printable_expression = #e
           self.do_print = 1
       }
   ;
 
 expression
-  :   named_expression ( ASSIGN_OP! expression { self.do_print = 0 } )?
+  :   named_expression ( ASSIGN_OP^ expression { self.do_print = 0 } )?
+    | INCR^ named_expression { self.do_print = 0 }
+    | DECR^ named_expression { self.do_print = 0 }
     | adding_expression
   ;
 
@@ -435,19 +436,33 @@ expr returns [reg_name]
     | reg_name=namedExpression
   ;
 
-expr_line
+expr_line!
   :   #( PIR_PRINT_PMC reg_name=E1:expr )
       {
-        #expr = #( [ PIR_NOOP, "noop" ], #E1, [PIR_OP, "\nprint "], [PIR_OP,reg_name], [PIR_NEWLINE, "\nprint \"\\n\" # "] )
+        #expr_line = #( [ PIR_NOOP, "noop" ], #E1, [PIR_OP, "\nprint "], [PIR_OP,reg_name], [PIR_NEWLINE, "\nprint \"\\n\" # "] )
       }
-    | #( PIR_ASSIGN lex_name=namedExpression reg_name=E2:expr )
+    | #( ASSIGN_OP lex_name=namedExpression reg_name=E2:expr )
       {
         pir = "\n" + \
               lex_name + " = " + reg_name + "\n # "
-        #expr = #( [ PIR_NOOP, "noop" ], #E2, [PIR_OP, pir] )
+        #expr_line = #( [ PIR_NOOP, "noop" ], #E2, [PIR_OP, pir] )
       }
-    | PIR_OP
-  ;
+    | #( INCR lex_name=namedExpression )
+      {
+        pir = "\n" + \
+              lex_name + " = " + lex_name + " + 1 \n # "
+        #expr_line = #( [ PIR_NOOP, "noop" ], [PIR_OP, pir], [PIR_OP, "\nprint "], [PIR_OP,lex_name], [PIR_NEWLINE, "\nprint \"\\n\" # "] )
+      }
+    | #( DECR lex_name=namedExpression )
+      {
+        pir = "\n" + \
+              lex_name + " = " + lex_name + " - 1 \n # "
+        #expr_line = #( [ PIR_NOOP, "noop" ], [PIR_OP, pir], [PIR_OP, "\nprint "], [PIR_OP,lex_name], [PIR_NEWLINE, "\nprint \"\\n\" # "] )
+      }
+    | p:PIR_OP
+      {
+        #expr_line = #p
+      };
 
 expr_list
   : (expr_line|PIR_FUNCTION_DEF)+

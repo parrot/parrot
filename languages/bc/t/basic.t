@@ -16,7 +16,7 @@ use FindBin;
 use lib "$FindBin::Bin/../../lib", "$FindBin::Bin/../../../../lib";
 
 use Test::More;
-use Parrot::Test tests => 49;
+use Parrot::Test tests => 51;
 
 sub run_tests
 {
@@ -102,7 +102,9 @@ my @tests =
        [ "a", [0], 'uninitialized a' ],
        [ "a; a = 1; a", [0,1], 'assign number to lexical' ],
        [ 'a; b; a = 4; b = a; c = 1; "a = "; a;  "b = "; b;  "c = "; c', [ 0, 0, 'a = 4', 'b = 4', 'c = 1' ], 'assing lexical to lexical' ], 
-
+       # increment and decrement 
+       [ "a; a = 1; a; ++a; a", [0,1,2,2], 'increment' ],
+       [ "a; a = 1; a; --a; a", [0,1,0,0], 'decrement' ],
      );
 
 my @todo_tests = 
