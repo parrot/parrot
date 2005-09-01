@@ -84,6 +84,12 @@ in docs, RT. (That is, quite a bit.)
 
 [[What does this item mean, exactly?  --Chip]]
 
+The intention was to comb through the various sources of things to be done
+and collate them in some fashion. At the time of that writing, none of the
+tasks documented in those directories were documented in a central area.
+Something a little nicer than grep -r 'XXX', but that would certainly do for
+a start. Chromatic's recent email is another step on this path. --Coke
+
 =back
 
 =head2 DOCUMENTATION
@@ -493,5 +499,12 @@ ticketing system, except to the extent that it documents things that
 show promise but have not yet been committed to.  Every task that is
 actually ready to be done should be documented in RT, and reports
 generated based on that information.
+
+=head1 BUGS (in this document)
+
+As for the future development, it has been pointed out that RT is not the 
+best system for handling such things (though it does have the advantage 
+of being available). The main point is to have single point of contact to
+help volunteers check (and update) the status of issues important to them.
 
 =cut
