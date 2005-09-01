@@ -18,21 +18,12 @@ be a big deal.)
 
 =head1 RUNNING TCL
 
-When you make tcl, you're generating three files. 
+=head2 Generated Files
+
+When you make tcl, you're generating two files in addition to the classes that
+get compiled.  
 
 =over 4
-
-=item lib/tclword.pbc
-
-This is a parrot class that is used by the parser as the intermediate
-representation after parsing. So, for example, a line like
-
- set a "$b " 
-
-would, after parsing, be comprised of three tclwords. The first, the
-constant C<set>, the second, the constant C<a>, and the third would
-consist of two elements: the variable reference for C<b>, followed
-by the constant C< >.
 
 =item lib/tcllib.pbc
 
@@ -51,6 +42,38 @@ are included properly. It adds a C<HEADER>, and removes any C<XXX> comments.
 This is roughly equivalent to C<tclsh> - It takes the command line arguments
 (currently, the name of the file you wish to parse), and reads in the file,
 and uses the tcl library to parse those contents as tcl.
+
+=back
+
+=head2 Classes
+
+=over 4
+
+=item TclCommand
+
+A class representing a Tcl command made up of a name and arguments.
+
+=item TclCommandList
+
+A list of TclCommands used to represent a body of code. This returns the value
+of the last command.
+
+=item TclConst
+
+A constant Tcl value created during parsing.
+
+=item TclVar
+
+A class representing Tcl variables.
+
+=item TclWord
+
+A TclWord handles the concatenation of arguments. For instance, given
+
+  puts ab$c
+
+the parser will generate a word containing an "ab" TclConst and a "$c" TclVar.
+The values of these segments are concatenated together and passed to the puts command.
 
 =back
 
