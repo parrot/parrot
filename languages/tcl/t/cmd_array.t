@@ -244,8 +244,6 @@ TCL
 wrong # args: should be "array unset arrayName ?pattern?"
 OUT
 
-TODO: {
-  local $TODO = "[array names] isn't implemented yet.";
 
 language_output_is("tcl", <<'TCL', <<'OUT',"array names, no array");
   puts [array names a]
@@ -262,7 +260,7 @@ OUT
 language_output_is("tcl", <<'TCL', <<'OUT',"array names, too many args");
   array names a b c d
 TCL
-wrong # args: should be "array names arrayName ?mode? ?pattern?");
+wrong # args: should be "array names arrayName ?mode? ?pattern?"
 OUT
 
 language_output_is("tcl", <<'TCL', <<'OUT',"array names, no pattern");
@@ -320,7 +318,6 @@ TCL
 
 OUT
 
-}
 
 TODO: {
   local $TODO = "don't have tcl style regexp in PGE yet.";

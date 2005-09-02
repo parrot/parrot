@@ -355,3 +355,130 @@ not_array:
   # is there a better way to do this?
   .return(TCL_ERROR, retval)
 .end
+
+.sub "names"
+  .param int is_array
+  .param pmc the_array
+  .param string array_name
+  .param pmc argv
+
+  .local pmc retval
+  
+  .local int argc
+  argc = argv
+  if argc > 2 goto bad_args
+
+  .local string mode, pattern
+  mode = "-glob"
+  pattern = "*"
+  if argc == 0 goto skip_args
+  if argc == 1 goto skip_mode
+  
+  mode = shift argv
+skip_mode:
+  pattern = shift argv
+skip_args:
+
+  .local pmc match_proc
+  null match_proc
+
+  push_eh bad_mode
+    match_proc = find_global "_Tcl\0builtins\0array\0names_helper", mode
+  clear_eh
+  if_null match_proc, bad_mode
+
+  if is_array == 0 goto not_array
+
+  .return match_proc(the_array,  pattern)
+
+bad_args:
+  retval = new String
+  retval = "wrong # args: should be \"array names arrayName ?mode? ?pattern?\""
+  .return(TCL_ERROR, retval)
+
+bad_mode:
+  retval = new String
+  retval = "bad option \""
+  retval .= mode
+  retval .= "\": must be -exact, -glob, or -regexp"
+  .return(TCL_ERROR, retval)
+
+not_array:
+  retval = new String
+  retval = ""
+  .return(TCL_ERROR, retval)
+.end
+
+.namespace [ "_Tcl\0builtins\0array\0names_helper" ]
+
+.sub "-glob"
+  .param pmc the_array
+  .param string pattern
+
+  .local pmc iter
+  .local string name
+
+  .local pmc globber, retval
+
+  globber = find_global "PGE", "glob"
+  .local pmc rule
+  (rule, $P0, $P1) = globber(pattern)
+
+  iter = new Iterator, the_array
+  iter = .ITERATE_FROM_START
+
+  retval = new String
+
+  .local int count
+  count = 0
+
+check_loop:
+  unless iter goto check_end
+  name = shift iter
+  $P0 = rule(name)
+  unless $P0 goto check_loop
+  
+  unless count goto skip_space
+  retval .= " "
+skip_space:
+  inc count
+  retval .= name
+
+  branch check_loop
+check_end:
+
+  .return (TCL_OK, retval)
+.end
+
+.sub "-exact"
+  .param pmc the_array
+  .param string match
+
+  .local pmc iter, retval
+  .local string name
+
+  iter = new Iterator, the_array
+  iter = .ITERATE_FROM_START
+
+  retval = new String
+  retval = ""
+
+check_loop:
+  unless iter goto check_end
+  name = shift iter
+
+  if name == match goto found_match
+  branch check_loop
+check_end:
+  .return (TCL_OK, retval)
+
+found_match:
+  retval = name
+  .return (TCL_OK, retval)
+.end
+
+.sub "-regexp"
+.end
+
+
+.namespace [ "_Tcl\0builtins\0array" ]
