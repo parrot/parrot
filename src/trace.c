@@ -178,7 +178,7 @@ trace_key_dump(Interp *interpreter, PMC *key)
             break;
         case KEY_string_FLAG|KEY_register_FLAG:
             s = REG_STR(PMC_int_val(key));
-            escaped = PDB_escape(PObj_bufstart(s), s->strlen);
+            escaped = PDB_escape(s->strstart, s->strlen);
             PIO_eprintf(interpreter, "S%vd=\"%s\"", PMC_int_val(key),
                     escaped ? escaped : "(null");
                 if (escaped)
