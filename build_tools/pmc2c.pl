@@ -638,7 +638,7 @@ sub dump_pmc {
         $all{$class} = $res;
     }
 
-    $all{default} = read_dump($include, "classes/default.pmc")
+    $all{default} = read_dump($include, "default.pmc")
         if not $all{default};
 
     my $vt = read_dump($include, "vtable.pmc");
