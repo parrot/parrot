@@ -84,7 +84,7 @@ RM_RF      = ${rm_rf}
 AR_CR      = ${ar} ${ar_flags}
 RANLIB     = ${ranlib}
 PERL       = ${perl}
-TOUCH      = $(PERL) -e ${PQ}open(A,qq{>>$$_}) or die foreach @ARGV${PQ}
+TOUCH      = $(PERL) -MExtUtils::Command -e touch 
 YACC       = ${yacc}
 LEX        = ${lex}
 # do not die when dir already exits

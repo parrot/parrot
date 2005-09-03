@@ -18,8 +18,6 @@
 	my $is_bcc   = grep { $cc eq $_ } ( qw(bcc32 bcc32.exe) );
 
 	Configure::Data->set(
-		rm_f  => '$(PERL) -MExtUtils::Command -e rm_f',
-		rm_rf => '$(PERL) -MExtUtils::Command -e rm_rf',
                 PQ    => '"',
                 make_c=> '$(PERL) -e "chdir shift @ARGV; system \'$(MAKE)\', @ARGV; exit $$? >> 8;"',
 		ncilib_link_extra => '-def:src/libnci_test.def',
@@ -52,7 +50,6 @@
 			ld_out     => '-out:',
 			ldflags    => '-nologo -nodefaultlib',
 			blib_lib_libparrot_a => 'blib/lib/libparrot_s$(A)',
-			cp         => 'copy',
 			ar_flags   => '',
 			ar_out     => '-out:',
 			slash      => '\\',
@@ -100,7 +97,6 @@
 			ld_out     => '-out:',
 			ldflags    => '-nologo -nodefaultlib',
 			blib_lib_libparrot_a => 'blib/lib/libparrot_s$(A)',
-			cp         => 'copy',
 			ar         => 'xilib',
 			ar_flags   => '',
 			ar_out     => '-out:',
@@ -143,7 +139,6 @@
                         link => ${cc},
                         linkflags => '',
 
-			cp => 'copy',
                         ar => 'tlib',
                         ar_flags => '',
                         ar_out => '',
@@ -163,7 +158,6 @@
 				'ar' => 'ar',
 				'cc' => 'gcc',
 				'ccflags' => '-DWIN32 ',
-				'cp' => '$(PERL) -MExtUtils::Command -e cp',
 				'ld' => 'g++',
 				'ld_load_flags' => '-shared ',
 				'ld_share_flags' => '-shared ',
@@ -185,7 +179,6 @@
 		} elsif ($make =~ /dmake/i) {
 			# mingw Perl
 			Configure::Data->set(
-				'cp' => '$(PERL) -MExtUtils::Command -e cp',
 				'ld_load_flags' => '-shared ',
 				'ld_share_flags' => '-shared ',
 				'make' => 'mingw32-make',

@@ -117,8 +117,8 @@ sub runstep {
 
     perl          => $^X,
     test_prog     => 'parrot',
-    rm_f          => 'rm -f',
-    rm_rf         => 'rm -rf',
+    rm_f          => '$(PERL) -MExtUtils::Command -e rm_f',
+    rm_rf         => '$(PERL) -MExtUtils::Command -e rm_rf',
     ar            => $Config{ar},
     ar_flags      => 'cr',
     ar_out        => '',                  # for Win32
@@ -135,7 +135,7 @@ sub runstep {
     platform_asm  => 0,                   # if platform has a .s file that needs to be assembled
     as            => 'as',                # assembler
 
-    cp            => 'cp',
+    cp            => '$(PERL) -MExtUtils::Command -e cp',
     lns           => $Config{lns},        # soft link
     # On all platform slash == slash_exec, except with MinGW
     # slash_exec is needed by pathname of executable in test or makefile
