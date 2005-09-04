@@ -131,13 +131,13 @@ language_output_is("tcl",<<'TCL',<<'OUT',"info exists true");
 TCL
 1
 OUT
+}
 
 language_output_is("tcl",<<'TCL',<<'OUT',"info exists false");
   puts [info exists a]
 TCL
 0
 OUT
-}
 
 language_output_is("tcl",<<'TCL',<<'OUT',"info tclversion too many args");
   info tclversion v
