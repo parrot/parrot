@@ -1,3 +1,6 @@
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
+$Id$
+
 XXX
 XXX a lot of the JAPHs are currently broken due to recent core changes
 XXX
@@ -11,5 +14,8 @@ $ make -C examples/compilers  # [1]
 $ for f in examples/japh/japh*.pasm; do ./parrot $f ; done
 
 Note: japh16 is using a shared lib, which is built by [1]
+
+These JAPHs are also tested by 'make test' in the Parrot root directory.
+The test file is 't/examples/japh.t'.
 
 leo
