@@ -122,7 +122,7 @@ found_close_bracket:
   inc pos
   $S0 = substr str, pos, $I0
   pos += $I0
-  pos += 2
+  pos += 1
   
   $I0 = find_type "TclConst"
   $P0 = new $I0
