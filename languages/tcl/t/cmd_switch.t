@@ -2,12 +2,9 @@
 
 use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 6;
+use Parrot::Test tests => 8;
 use Test::More;
 use vars qw($TODO);
-
-TODO: {
-  local $TODO = "switch not written yet.";
 
 language_output_is("tcl",<<'TCL',<<OUT,"too few args, 0");
  switch
@@ -44,13 +41,34 @@ TCL
 OUT
 
 language_output_is("tcl",<<'TCL',<<OUT,"implied exact, --, two choices");
- switch -b -a {
+ switch -- -b -a {
    puts a
  } -b {
    puts b
  } 
 TCL
 b
+OUT
+
+TODO: {
+  local $TODO = "{ } seems to count newlines as elements";
+
+language_output_is("tcl",<<'TCL',<<OUT,"implied exact, single choice in list");
+  switch ab {
+    ab	{ puts AB }
+  }
+TCL
+AB
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"implied exact, choices in list");
+  switch ab {
+    b  { puts B }
+    ab { puts AB }
+    ba { puts BA }
+  }
+TCL
+AB
 OUT
 
 }

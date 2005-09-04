@@ -56,6 +56,7 @@ lib${slash}commands${slash}return.pir \
 lib${slash}commands${slash}set.pir \
 lib${slash}commands${slash}source.pir \
 lib${slash}commands${slash}string.pir \
+lib${slash}commands${slash}switch.pir \
 lib${slash}commands${slash}time.pir \
 lib${slash}commands${slash}unknown.pir \
 lib${slash}commands${slash}unset.pir \
