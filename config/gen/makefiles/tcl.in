@@ -39,6 +39,7 @@ lib${slash}commands${slash}info.pir \
 lib${slash}commands${slash}inline.pir \
 lib${slash}commands${slash}join.pir \
 lib${slash}commands${slash}lappend.pir \
+lib${slash}commands${slash}lassign.pir \
 lib${slash}commands${slash}lindex.pir \
 lib${slash}commands${slash}linsert.pir \
 lib${slash}commands${slash}list.pir \
