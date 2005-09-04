@@ -50,9 +50,6 @@ TCL
 b
 OUT
 
-TODO: {
-  local $TODO = "{ } seems to count newlines as elements";
-
 language_output_is("tcl",<<'TCL',<<OUT,"implied exact, single choice in list");
   switch ab {
     ab	{ puts AB }
@@ -70,5 +67,3 @@ language_output_is("tcl",<<'TCL',<<OUT,"implied exact, choices in list");
 TCL
 AB
 OUT
-
-}

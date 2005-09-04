@@ -129,7 +129,7 @@ found_close_bracket:
   $P0 = $S0
   push retval, $P0
   
-  goto loop
+  goto eat_space
 
 unmatched_open_brace:
   return_type = TCL_ERROR
