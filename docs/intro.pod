@@ -17,7 +17,7 @@ what on earth Parrot is.
 =head2 Virtual Machines
 
 Parrot is a virtual machine. To understand what a virtual machine is, consider
-what happens when you write a program in a language such as Perl, the run it
+what happens when you write a program in a language such as Perl, then run it
 with the applicable interpreter (in the case of Perl, the perl executable).
 First, the program you have written in a high level language is turned into
 simple instructions, for example I<fetch the value of the variable named x>,
@@ -43,12 +43,13 @@ features (such as objects, data structures, types, subroutines, etc).
 
 =head2 Design goals
 
-Parrot is designed with the needs of dynamically typed languages (such as Perl 
+Parrot is designed with the needs of dynamically typed languages (such as Perl
 and Python) in mind, and should be able to run programs written in these
-languages more efficiently than VMs developed with static languages in mind (JVM,
-.NET). Parrot is also designed to provide interoperability between languages that
-compile to it. In theory, you will be able to write a class in Perl, subclass it
-in Python and then instantiate and use that subclass in a Tcl program.
+languages more efficiently than VMs developed with static languages in mind
+(JVM, .NET). Parrot is also designed to provide interoperability between
+languages that compile to it. In theory, you will be able to write a class in
+Perl, subclass it in Python and then instantiate and use that subclass in a Tcl
+program.
 
 Historically, Parrot started out as the runtime for Perl 6. Unlike Perl 5, the
 Perl 6 compiler and runtime (VM) are to be much more clearly separated. The name
@@ -89,32 +90,32 @@ The Parrot VM is register based. This means that, like a hardware CPU, it has a
 number of fast-access units of storage called registers. There are 4 types of
 register in Parrot: integers (I), numbers (N), strings (S) and PMCs (P). There
 are 32 of each of these, named I0..I31, N0..N31, etc. Integer registers are the
-same size as a word on the machine Parrot is running on and number registers also
-map to a native floating point type.
+same size as a word on the machine Parrot is running on and number registers
+also map to a native floating point type.
 
 =head2 PMCs
 
 PMC stands for Parrot Magic Cookie. PMCs represent any complex data structure or
 type, including aggregate data types (arrays, hash tables, etc). A PMC can
-implement its own behaviour for arithmetic, logical and string operations
-performed on it, allowing for language-specific behaviour to be introduced. PMCs
+implement its own behavior for arithmetic, logical and string operations
+performed on it, allowing for language-specific behavior to be introduced. PMCs
 can be built in to the Parrot executable or dynamically loaded when they are
 needed.
 
 =head2 Garbage Collection
 
 Parrot provides garbage collection, meaning that Parrot programs to do not need
-to free memory explicitly; it will be freed when it is no longer in use (that is,
-no longer referenced) whenever the garbage collector runs.
+to free memory explicitly; it will be freed when it is no longer in use (that
+is, no longer referenced) whenever the garbage collector runs.
 
 
 =head1 Obtaining, building and testing Parrot
 
 =head2 Where to get Parrot
 
-Periodic, numbered releases will appear on CPAN.  At this stage of the project,
-an awful lot is changing between releases. You can get a copy of the latest
-Parrot from the SVN repository. This is done as follows:
+Periodically, numbered releases will appear on CPAN.  At this stage of the
+project, an awful lot is changing between releases. You can get a copy of the
+latest Parrot from the SVN repository. This is done as follows:
 
   svn co https://svn.perl.org/parrot/trunk parrot
 
@@ -157,9 +158,9 @@ will look something like this:
 
 It is possible that a number of tests may fail. If this is a small number, then
 it is probably little to worry about, especially if you have the latest Parrot
-from the SVN repository. However, please do not let this discourage you from
-reporting test failures, using the same method as described for reporting build
-problems.
+sources from the SVN repository. However, please do not let this discourage you
+from reporting test failures, using the same method as described for reporting
+build problems.
 
 
 =head1 Some simple Parrot programs
@@ -200,7 +201,7 @@ register and then use that register with the print instruction.
 
 Here we have stated exactly which register to use. However, by replacing C<S0>
 with C<$S0> we can delegate the choice of which register to use to Parrot, and
-itwill take care of any register spilling that needs to be done for us. It is
+it will take care of any register spilling that needs to be done for us. It is
 also possible to use an C<=> notation instead of writing the C<set> instruction.
 
   .sub _main
@@ -303,8 +304,8 @@ As a rule, whenever a Parrot instruction modifies the contents of a register,
 that will be the first register when writing the instruction in assembly form.
 
 As is usual in assembly languages, loops and selection are implemented in terms
-of conditional branch statements and labels, as shown above. Assembly programming
-is one place where using goto is not bad form!
+of conditional branch statements and labels, as shown above. Assembly
+programming is one place where using goto is not bad form!
 
 =head2 Recursively computing factorial
 
@@ -360,8 +361,8 @@ subroutine. This is significant as the label is then visible to other
 subroutines.
 
 The first line, C<.param int n>, specifies that this subroutine takes one
-integer parameter and that we'd like to refer to the register it was passed in by
-the name C<n> for the rest of the sub.
+integer parameter and that we'd like to refer to the register it was passed in
+by the name C<n> for the rest of the sub.
 
 Much of what follows has been seen in previous examples, apart from the line
 reading:
@@ -382,7 +383,7 @@ register for it to be seen as a return value by the code calling the sub.
 The call to C<_fact> in main works in just the same was as the recursive call
 to C<_fact> within the sub C<_fact> itself. The only remaining bit of new
 syntax is the C<@MAIN>, written after C<.sub _main>. By default, PIR assumes
-that execution begins with the first sub in the file. This behaviour can be
+that execution begins with the first sub in the file. This behavior can be
 changed by making the sub to start in with C<@MAIN>.
 
 =head2 Compiling to PBC
@@ -411,7 +412,8 @@ Parrot> that will help with this.
 
 Much Parrot development and discussion takes place on the perl6-internals
 mailing list. You can subscribe by sending an email to
-L<perl6-internals-subscribe@perl.org> or read the perl6-internals NNTP archive.
+L<perl6-internals-subscribe@perl.org> or read the perl6-internals NNTP archive
+at L<http://www.nntp.perl.org/group/perl.perl6.internals>.
 
 =head2 IRC
 
