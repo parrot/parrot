@@ -20,6 +20,9 @@
     set I3, 2
     invoke
 
+    # Give first thread some tim to print the first character
+    sleep 0.25
+
     # run second thread
     new P2, .ParrotThread
     set P6, "utaohrPro akr"
