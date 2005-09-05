@@ -7,6 +7,8 @@
   argc = argv
   
   .local pmc retval
+  .local string mode
+  mode = "-exact"
 
   if argc < 2 goto bad_args
 flag_loop:
@@ -16,6 +18,20 @@ flag_loop:
   if $S0 == "--" goto get_subj
   if $S1 != "-" goto skip_subj
 
+  # ouch!
+  if $S0 == "-exact" goto set_mode
+  if $S0 == "-glob" goto set_mode
+  if $S0 == "-regexp" goto set_mode
+  if $S0 == "-matchvar" goto set_fvar
+  if $S0 == "-indexvar" goto set_fvar
+  branch bad_flag
+
+set_mode:
+  mode = $S0
+  branch flag_loop
+
+set_fvar:
+  $S0 = shift argv
   branch flag_loop
 
 get_subj:
@@ -45,14 +61,40 @@ body_from_argv:
 
 got_body:
   .local string pattern, code
+  if mode == "-exact" goto exact_mode
+  if mode == "-glob" goto glob_mode
+  if mode == "-regexp" goto regex_mode
 
-body_loop:
+exact_mode:
+exact_loop:
   unless body goto body_end
   pattern = shift body
   code = shift body
 
   if subject == pattern goto body_match
-  branch body_loop
+  branch exact_loop
+
+glob_mode:
+  .local pmc globber, rule
+  globber = find_global "PGE", "glob"
+glob_loop:
+  unless body goto body_end
+  pattern = shift body
+  code = shift body
+
+  (rule, $P1, $P2) = globber(pattern)
+  $P0 = rule(subject)
+  if $P0 goto body_match
+  branch glob_loop
+
+regex_mode:
+regex_loop:
+  unless body goto body_end
+  pattern = shift body
+  code = shift body
+# fix this when we've got regexes
+  if subject == pattern goto body_match
+  branch glob_loop
 
 body_end:
   if pattern == "default" goto body_match
@@ -77,5 +119,12 @@ bad_args:
   .return (TCL_ERROR, retval)
 
 bad_list:
+  .return (TCL_ERROR, retval)
+
+bad_flag:
+  retval = new String
+  retval = "bad option \""
+  retval .= $S0
+  retval .= "\": must be -exact, -glob, -regexp, -matchvar, -indexvar, or --"
   .return (TCL_ERROR, retval)
 .end

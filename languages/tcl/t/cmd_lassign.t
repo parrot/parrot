@@ -2,8 +2,20 @@
 
 use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 5;
+use Parrot::Test tests => 7;
 use Test::More;
+
+language_output_is("tcl",<<'TCL',<<OUT,"bad args, 0");
+  lassign
+TCL
+wrong # args: should be "lassign list varName ?varName ...?"
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"bad args, 1");
+  lassign {a b}
+TCL
+wrong # args: should be "lassign list varName ?varName ...?"
+OUT
 
 language_output_is("tcl",<<'TCL',<<OUT,"assign list of two to one var");
   puts [lassign {x y} a]
