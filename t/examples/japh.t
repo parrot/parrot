@@ -25,10 +25,19 @@ use Test::More;
 
 {
   # these JAPHs should work
-  foreach my $japh_num ( 3, 8, 10, 12, 13 ) {
+  foreach my $japh_num ( 3, 8, 10, 12 ) {
     test_japh($japh_num);
   } 
 } 
+
+# See [perl #37082] in the Parrot RT
+SKIP: {
+  skip 'japh13.pasm has problems under MacOS', 1;
+
+  foreach my $japh_num ( 13 ) {
+    test_japh($japh_num);
+  } 
+};
 
 TODO:
 {
