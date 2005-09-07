@@ -14,30 +14,33 @@ t/examples/japh.t - Test some JAPHs
 
 =head1 DESCRIPTION
 
-Test the JAPHs in 'examples/japh'.
+Test the JAPHs in 'examples/japh'. 
 For now there are only JAPHs in PASM.
+
+Some JAPH are not really suitable for inclusion in automated tests.
+japh13.pasm depends on the actual machine load.
+japh8.pasm is only for little endian machines.
+ 
+=head1 TODO
+
+Get the TODO JAPHs working or decide that they are not suitable for testing.
+
+=head1 SEE ALSO
+
+[perl #37082] in the Parrot RT
 
 =cut
 
 use strict;
-use Parrot::Test tests => 15;
+use Parrot::Test tests => 13;
 use Test::More;
 
 {
   # these JAPHs should work
-  foreach my $japh_num ( 3, 8, 10, 12 ) {
+  foreach my $japh_num ( 3, 10, 12 ) {
     test_japh($japh_num);
   } 
 } 
-
-# See [perl #37082] in the Parrot RT
-SKIP: {
-  skip 'japh13.pasm has problems under MacOS', 1;
-
-  foreach my $japh_num ( 13 ) {
-    test_japh($japh_num);
-  } 
-};
 
 TODO:
 {

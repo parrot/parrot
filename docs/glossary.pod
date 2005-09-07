@@ -174,7 +174,7 @@ Parrot InterMediate Code, or another name for PIR.  A convention once arose to
 name input files to IMCC with the extension ".imc", so the name IMC became
 synonymous with PIR.
 
-See also IMCC, PIR.
+See also L<"IMCC">, L<"PIR">.
 
 =head2 IMCC
 
@@ -183,7 +183,12 @@ Parrot assembler, and eventually became so integrated with Parrot that it
 became the Parrot executable (being able to load and run PBC files, PASM files
 or PIR files).
 
-See also PIR.
+See also L<"PIR">.
+
+=head2 JAPH
+
+In the Parrot context a JAPH is a small script that prints the string
+"Just another Parrot Hacker\". 
 
 =head2 Packfile
 
@@ -196,7 +201,7 @@ Parrot Byte Code. The name for the "executable" files that can be passed to the
 Parrot interpreter for immediate execution (although PASM and IMC files can be
 executed directly, too).
 
-See also Packfile.
+See also L<"Packfile">.
 
 =head2 PIR
 
@@ -204,7 +209,7 @@ Parrot Intermediate Representation. A medium-level assembly language for Parrot
 that hides messy details like register allocation so language compiler writers
 who target PIR don't have to roll their own.
 
-See also IMC.
+See also L<"IMC">.
 
 =head2 PMC
 
