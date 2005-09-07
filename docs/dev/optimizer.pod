@@ -1,0 +1,141 @@
+=head1 NANE
+
+docs/dev/optimizer.pod - About the IMCC optimizer
+
+=head1 ABSTRACT
+
+This document describes how the IMCC optimizer works.
+
+=head1 DESCRIPTION
+
+The objective of the IMCC optimizer is to take a PASM function as input and  apply code-improving transformations to it to be more efficient, i.e. improving execution time and reducing code size.  It must do this while preserving the same code behavior.
+
+=head2 Data Structures
+
+The optimizer uses a number of data structures to build a model of the code to be optimized.
+
+=over 4
+
+=item IMC_Unit
+
+The IMC_Unit structure contains all the information known about a function.    It is passed in to each optimizer method.
+
+=item Instruction
+
+Each instruction line has an Instruction structure.  Pointers to the first and last Instruction are stored in IMC_Unit.  Instructions are stored as a linked list.  To iterate through all Instructions, use:
+
+Instruction *ins;
+for (ins = unit->instructions; ins; ins = ins->next) {
+    ...
+}
+
+=item Basic_block
+
+Basic blocks are the most important structure for optimization.  A basic block identifies a block of instructions that will all execute in sequence without jumps into or out of that block.  All labels will appear at the beginning of a block, and all conditional or unconditional jumps will appear at the end.  Basic_block structures are stored as an array of pointers, each with an index that denotes their position in the array.  Block 0 is implicitly the top block.  To iterate through all Basic_blocks, use:
+
+int i;
+for (i = 0; i < unit->n_basic_blocks; i++) {
+    ...
+}
+
+=item Edge
+
+Edges denote the flow of control between Basic_blocks.  Edges and Basic_blocks together make up the basic CFG.  Each Basic_block has *pred_list and *succ_list pointer to the first predecessor edge and successor edge, respectively.  Each edge has a *to and *from pointer to the  Basic_blocks it joins.  To iterate through all predecessor Edges, use:
+
+Edge *pred;
+for (pred = to->pred_list; pred; pred=pred->pred_next) {
+    ...
+}
+
+=item Loop_info
+
+Loop_info structures denote the presence of loops in the instructions.  They are found by identifying backedges, where control passes from a tail block to the head of the loop.  Loop_info stores the header, preheader, exit blocks, and depth of the loop.
+
+=item Set
+
+Set is a useful structure for defining sets of integers, which map to indexes of structures.  This is used most often to create sets of Basic_blocks.  Dominators, dominance frontiers, and loops use Set.  A Set must be a defined size, and cannot grow or shrink.  Most standard set operations are implemented: add, contains, copy, equal, union, and intersection.
+
+=back 4
+
+=head2 Optimizations
+
+Optimizations are organized into an optimization loop within imc_reg_alloc() in reg_alloc.c.  The ordering is based on the amount of CFG information needed by each group of optimizations: pre_optimize(), cfg_optimize(), and optimize().  Each optimization function (group and individual) returns an int, with TRUE denoting that an optimization has been performed and a change to the code has been made.  The power of the optimizer is that performing one optimization may often allow another to be performed as well.  Once all optimizations have been run without changes, the optimizer is finished.
+
+The optimizer loop works as follows:
+
+=over 4
+
+=item 1.  Run all pre_optimize() optimizations until none make a change.
+=item 2.  Build basic block info.
+=item 3.  Run all cfg_optimize() optimizations.  If one makes a change, go to step 1.
+=item 4.  Build all other CFG info (dominators, loops, life analysis).
+=item 5.  Run all optimize() optimizations.  If one makes a change, go to step 1.
+
+=back 4
+
+Two cfg_optimize() or optimize() optimizations cannot be run in a row.  This is because most of these make the CFG information invalid when a change is performed, and the CFG must be rebuilt.
+
+=head3 Pre optimizer
+
+Optimizations using only Instruction info, no CFG constructed.
+
+=over 4
+
+=item strength_reduce()
+
+Converts an expensive instruction to a simpler one
+
+=item if_branch()
+
+Converts if/branch/label constructs to a simpler form
+
+=back 4
+
+=head3 CFG optimizer
+
+Optimizations using Basic_block info.  These functions invalidate the CFG when a change is made.
+
+=over 4
+
+=item branch_branch()
+
+Replaces a branch directly to another branch with a single branch to the end of the chain
+
+=item unused_label()
+
+Removes unused labels
+
+=item dead_code_remove()
+
+Removes unreachable code
+
+=back 4
+
+=head3 Optimizer
+
+=over 4
+
+=item constant_propagation()
+
+Does conservative constant propagation, i.e. replaces "1 + 2" with "3"
+
+=item clone_remove()
+
+Removes a clone, TURNED OFF
+
+=item used_once()
+
+Removes an instruction when the register written is only used once (only appears in that instruction)
+
+=item loop_optimization()
+
+Moves an invariant instruction outside of the loop, TURNED OFF (not currently working)
+
+=back 4
+
+=head1 AUTHOR
+
+Curtis Rawls <cgrawls@gmail.com>
+
+=cut
+
