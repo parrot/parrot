@@ -7,33 +7,33 @@ ROADMAP - A plan for Parrot
 
 =head1 PURPOSE
 
-As of this writing, there is no one place in which all remaining
-parrot work is documented. There are various TODO files, the RT queue,
-comments in the source code and the documentation. This document is a
-first pass at unifying this information and providing a single point of
-reference for anyone interested in the current state of the parrot, whether
-they are developers looking for items to work on, or external users looking
-for an idea of when they can expect a release.
+As of this writing, there is no one place in which all remaining parrot work is
+documented. There are various TODO files, the RT queue, comments in the source
+code and the documentation. This document is a first pass at unifying this
+information and providing a single point of reference for anyone interested in
+the current state of the parrot, whether they are developers looking for items
+to work on, or external users looking for an idea of when they can expect a
+release.
 
 This document is not meant to contain all the metadata regarding particular
 tasks, but merely provide a summary of the tasks.
 
-This document is now becoming a roadmap, because the Architect is deep
-in a weeklong mindmeld with the Pumpking and the results are being
-encoded in this document, among others.
+This document is now becoming a roadmap, because the Architect is deep in a
+weeklong mindmeld with the Pumpking and the results are being encoded in this
+document, among others.
 
 For a high level overview of parrot milestones, please see:
-http://www.perlfoundation.org/gc/grants/2005-p6-proposal.html
+L<http://www.perlfoundation.org/gc/grants/2005-p6-proposal.html>
 
 =head1 CURRENT RELEASE (0.2.3)
 
-Parrot 0.2.3 has been released on Aug 5th 2005. For a list of new and
-fixed feature see L<NEWS>.
+Parrot 0.2.3 has been released on Aug 5th 2005. For a list of new and fixed
+feature see L<NEWS>.
 
 =head1 OVERVIEW
 
-The remaining tasks are broken down into the following categories,
-roughly listed in the order through which a task might progress.
+The remaining tasks are broken down into the following categories, roughly
+listed in the order through which a task might progress.
 
 =head2 METADATA
 
@@ -42,8 +42,8 @@ Eventually all metadata should be stored in RT at L<https://rt.perl.org/rt3/>
 
 =head2 DESIGN
 
-These are pending design decisions which must be made before any code can
-be written to implement them. Note - DESIGN I<is> a special kind of documentation
+These are pending design decisions which must be made before any code can be
+written to implement them. Note - DESIGN I<is> a special kind of documentation
 task, but due to the nature of this kind of documentation, it deserves to be
 broken out into its own category.
 
@@ -67,9 +67,9 @@ Any items pertaining to source, API, or user level documentation.
 
 =head2 HIGH LEVEL LANGUAGES
 
-Parrot currently ships with several partial language implementations. Any
-tasks which are specific to those languages, or affect cross-language
-compatibility will be listed here.
+Parrot currently ships with several partial language implementations. Any tasks
+which are specific to those languages, or affect cross-language compatibility
+will be listed here.
 
 =head1 ISSUES
 
@@ -79,16 +79,16 @@ compatibility will be listed here.
 
 =item *
 
-To be included: docs/pmc, docs/resources, docs/*.pod, anything in SVN not
-in docs, RT. (That is, quite a bit.)
+To be included: docs/pmc, docs/resources, docs/*.pod, anything in SVN not in
+docs, RT. (That is, quite a bit.)
 
 [[What does this item mean, exactly?  --Chip]]
 
-The intention was to comb through the various sources of things to be done
-and collate them in some fashion. At the time of that writing, none of the
-tasks documented in those directories were documented in a central area.
-Something a little nicer than grep -r 'XXX', but that would certainly do for
-a start. Chromatic's recent email is another step on this path. --Coke
+The intention was to comb through the various sources of things to be done and
+collate them in some fashion. At the time of that writing, none of the tasks
+documented in those directories were documented in a central area.  Something a
+little nicer than grep -r 'XXX', but that would certainly do for a start.
+Chromatic's recent email is another step on this path. --Coke
 
 =back
 
@@ -98,30 +98,30 @@ a start. Chromatic's recent email is another step on this path. --Coke
 
 =item *
 
-Eliminate dead documentation.  Let historians dig through our
-subversion history.  We look forward toward successful deployment.
+Eliminate dead documentation.  Let historians dig through our subversion
+history.  We look forward toward successful deployment.
 
 =item *
 
-When docs and code disagree, they must be brought into agreement
-immediately.  At the I<very> least, appropriately mark docs that are
-apparently wrong but may eventually become right, e.g.: "C<[NOTE: this
-does not currently work.  Why?  --committer]>".
+When docs and code disagree, they must be brought into agreement immediately.
+At the I<very> least, appropriately mark docs that are apparently wrong but may
+eventually become right, e.g.: "C<[NOTE: this does not currently work.  Why?
+--committer]>".
 
-PDDs are not exceptions to this rule!  Fix them when they're wrong.
-Delete them when they're obsolete.  (Never delete docs lightly,
-though.  Check first with someone who should know.)
+PDDs are not exceptions to this rule!  Fix them when they're wrong.  Delete
+them when they're obsolete.  (Never delete docs lightly, though.  Check first
+with someone who should know.)
 
 =item *
 
-Document project goals and priorities, based on Chip's talk to APW
-as found at L<http://feather.perl6.nl/~chip/Chip_APW.sxi> or
+Document project goals and priorities, based on Chip's talk to APW as found at
+L<http://feather.perl6.nl/~chip/Chip_APW.sxi> or
 L<http://feather.perl6.nl/~chip/Chip_APW.pdf>.
 
 =item *
 
-L<memory_internals.pod> has a question about whether or not
-string reuse is limited to a single user or multiple users.
+L<memory_internals.pod> has a question about whether or not string reuse is
+limited to a single user or multiple users.
 
 =back
 
@@ -133,58 +133,57 @@ string reuse is limited to a single user or multiple users.
 
 MMD Roundup 2, from the mailing list:
 
-http://xrl.us/gvfw (Link to groups-beta.google.com)
+L<http://xrl.us/gvfw> (Link to groups-beta.google.com)
 
 Section 1 of that email needs a decision from the Architect.
 
 =item *
 
-Variable-length register frames are an approved feature, but the
-design still needs fleshing out.  Then there are the minor details of
-documentation and implementation.  :-,
+Variable-length register frames are an approved feature, but the design still
+needs fleshing out.  Then there are the minor details of documentation and
+implementation.  :-,
 
 =item *
 
-Calling conventions are definitely changing for the better, but not in
-a way that need change much of substance for language implementors.
-Chip/Leo mind meld is in progress; stay tuned.
+Calling conventions are definitely changing for the better, but not in a way
+that need change much of substance for language implementors.  Chip/Leo mind
+meld is in progress; stay tuned.
 
-BTW: Don't panic!  Life is getting better for you, the Parrot user.
-It had already become obvious recently to us that Parrot needed a nice
-opcode-based interface for automated collection and extraction of call
-parameters and return values.  That's what you were going to write to
-anyway.  How it works, precisely, shouldn't matter much.  (You I<were>
-writing to PIR instead of PASM, right?)
+BTW: Don't panic!  Life is getting better for you, the Parrot user.  It had
+already become obvious recently to us that Parrot needed a nice opcode-based
+interface for automated collection and extraction of call parameters and return
+values.  That's what you were going to write to anyway.  How it works,
+precisely, shouldn't matter much.  (You I<were> writing to PIR instead of PASM,
+right?)
 
 =item *
 
-Design the standard library to replace all those opcodes that should
-never have been opcodes in the first place, e.g. the IO and
-transcendental math features.
+Design the standard library to replace all those opcodes that should never have
+been opcodes in the first place, e.g. the IO and transcendental math features.
 
-(Note: Whatever tech we use to implement transcendental math should at
-*worst* compile to function calls under JIT.  And I'll consider making
-exceptions for the transcendantal math if someone can show me why.)
+(Note: Whatever tech we use to implement transcendental math should at *worst*
+compile to function calls under JIT.  And I'll consider making exceptions for
+the transcendantal math if someone can show me why.)
 
-I expect PIR will still let you pretend they're opcodes, though, to
-avoid immediate howls of outrage.  (But only silicon-based life forms
-write PASM, so we're not worried about that.)
+I expect PIR will still let you pretend they're opcodes, though, to avoid
+immediate howls of outrage.  (But only silicon-based life forms write PASM, so
+we're not worried about that.)
 
 =item *
 
 Do detailed design on new Chip/Leo-agreed-in-principle lexical system.
 
-The key change learns a lesson that Perl 5 only half learned: Lexical
-values may be dynamic, but their names and scopes are known at compile
-time.  It's just silly to add '$x' to a newly created pad at runtime,
-over and over and over, every time the same scope is entered.  Silly.
+The key change learns a lesson that Perl 5 only half learned: Lexical values
+may be dynamic, but their names and scopes are known at compile time.  It's
+just silly to add '$x' to a newly created pad at runtime, over and over and
+over, every time the same scope is entered.  Silly.
 
-So the names and scopes will be static data attached to the
-subroutine, while the data will be in dynamically created pad entries.
+So the names and scopes will be static data attached to the subroutine, while
+the data will be in dynamically created pad entries.
 
-Think of a pseudohash: the static data are like the index hash, which
-can be shared and immutable; the storage slots are like the rest of
-the array, which can be mutable even when the index hash isn't.
+Think of a pseudohash: the static data are like the index hash, which can be
+shared and immutable; the storage slots are like the rest of the array, which
+can be mutable even when the index hash isn't.
 
 =item *
 
@@ -192,8 +191,8 @@ Finish event and IO specification
 
 =item *
 
-Finish specification of return continuation and sub being called
-slots in interpreter, with introspection
+Finish specification of return continuation and sub being called slots in
+interpreter, with introspection
 
 =item *
 
@@ -230,8 +229,8 @@ Describe the components of a C<struct PMC_EXT>. L<PDD04>
 
 =item *
 
-Define what bits of the Parrot internals should be exposed as part of
-the Parrot API for extension writers.
+Define what bits of the Parrot internals should be exposed as part of the
+Parrot API for extension writers.
 
 =back
 
@@ -243,9 +242,9 @@ the Parrot API for extension writers.
 
  requester: leo
 
-Ok. In the long run I expect a multi-stage config system. First is to
-get miniparrot built and running, then Parrot core. Extensions like gdbm
-could be configured at that point or even in a third step.
+Ok. In the long run I expect a multi-stage config system. First is to get
+miniparrot built and running, then Parrot core. Extensions like gdbm could be
+configured at that point or even in a third step.
 
 =item *
 
@@ -290,8 +289,7 @@ Sample programs and test suite
 =item *
 
 AIO - On many platforms we must fake async IO, are we doing a background
-thread/interp or an inline event queue function that is called
-every N ops?
+thread/interp or an inline event queue function that is called every N ops?
 
 =item *
 
@@ -307,8 +305,8 @@ Rearchitect internals for the string specifications.
 
 =item *
 
-To PerlClass or not to PerlClass, that is the question. The class
-hierarchy should be reworked (e.g. Boolean->PerlInt->Scalar).
+To PerlClass or not to PerlClass, that is the question. The class hierarchy
+should be reworked (e.g. Boolean->PerlInt->Scalar).
 
 =item *
 
@@ -336,18 +334,17 @@ Create C<opcode_process.pl>. L<PDD05>
 
 =item *
 
-Fill in the remaining functions from the EDA, verify that the test
-suite still passes, integrate the library into the rest of Parrot,
-provide PMC types and suitable opcodes.  Conversion to and from Parrot
-strings, conversion to and from floating point types, sprintf output
-of bignumbers. L<PDD14>
+Fill in the remaining functions from the EDA, verify that the test suite still
+passes, integrate the library into the rest of Parrot, provide PMC types and
+suitable opcodes.  Conversion to and from Parrot strings, conversion to and
+from floating point types, sprintf output of bignumbers. L<PDD14>
 
 [[What's an EDA? --Coke]]
 
 =item *
 
-Implement the parrot equivalent of perl5's C<$0>, based on recent
-(January 2005) mailing list activity.
+Implement the parrot equivalent of perl5's C<$0>, based on recent (January
+2005) mailing list activity.
 
 =item *
 
@@ -381,10 +378,9 @@ There is no way to do a case-insensitive match. L<ops/rx.ops>
 
 =item *
 
-You can add parents to a class with children and objects, and
-attributes to a class with children or objects. This is silently
-allowed and quietly corrupts the child classes and instantiated
-objects.
+You can add parents to a class with children and objects, and attributes to a
+class with children or objects. This is silently allowed and quietly corrupts
+the child classes and instantiated objects.
 
 =item *
 
@@ -404,7 +400,8 @@ Memory leak - regexen leak bitmaps
 
 =item *
 
-Memory leak - string_to_cstring returns a malloced string, which isn't freed everywhere
+Memory leak - string_to_cstring returns a malloced string, which isn't freed
+everywhere
 
 =item *
 
@@ -494,17 +491,16 @@ Pass the pie-thon test suite.
 
 =head1 FUTURE
 
-This document should eventually be obsoleted by use of the RT
-ticketing system, except to the extent that it documents things that
-show promise but have not yet been committed to.  Every task that is
-actually ready to be done should be documented in RT, and reports
-generated based on that information.
+This document should eventually be obsoleted by use of the RT ticketing system,
+except to the extent that it documents things that show promise but have not
+yet been committed to.  Every task that is actually ready to be done should be
+documented in RT, and reports generated based on that information.
 
 =head1 BUGS (in this document)
 
-As for the future development, it has been pointed out that RT is not the 
-best system for handling such things (though it does have the advantage 
-of being available). The main point is to have single point of contact to
-help volunteers check (and update) the status of issues important to them.
+As for the future development, it has been pointed out that RT is not the best
+system for handling such things (though it does have the advantage of being
+available). The main point is to have single point of contact to help
+volunteers check (and update) the status of issues important to them.
 
 =cut

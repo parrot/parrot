@@ -11,26 +11,26 @@ This document describes F<pdb>, the Parrot Debugger.
 
 =head1 DESCRIPTION
 
-Starting from version 0.0.6 Parrot has its own debugger, which is
-modeled after Perl's one. Its name is F<pdb>, and is an interactive
-environment that let you step through bytecode, set breakpoints,
-evaluate assembly instructions and peek at the interpreter status.
+Starting from version 0.0.6 Parrot has its own debugger, which is modeled after
+Perl's one. Its name is F<pdb>, and is an interactive environment that let you
+step through bytecode, set breakpoints, evaluate assembly instructions and peek
+at the interpreter status.
 
-A good (well, at least some) knowledge of the Parrot internals is
-obviously required to read this document. Some familiarity with
-debugging principles is also mandatory beyond this point.
+A good (well, at least some) knowledge of the Parrot internals is obviously
+required to read this document. Some familiarity with debugging principles is
+also mandatory beyond this point.
 
 =head1 BUILDING pdb
 
-The debugger is not built with Parrot, but you should make it with its
-specific target:
+The debugger is not built with Parrot, but you should make it with its specific
+target:
 
   make pdb
 
 (where C<make> is the same C<make> incarnation you used to build Parrot).
 
-If everything goes well, you should come up with a F<pdb> executable
-in the same directory as the Parrot program.
+If everything goes well, you should come up with a F<pdb> executable in the
+same directory as the Parrot program.
 
 =head1 THE DEBUGGER SHELL
 
@@ -38,12 +38,12 @@ To start the debugger type:
 
   pdb file.pbc
 
-That is, F<pdb> takes exactly one argument, which is the Parrot bytecode
-that you're going to debug. F<pdb> will automatically load and disassemble
-the bytecode file for you.
+That is, F<pdb> takes exactly one argument, which is the Parrot bytecode that
+you're going to debug. F<pdb> will automatically load and disassemble the
+bytecode file for you.
 
-Note that you can't pass command line arguments to your program when
-you invoke the debugger. See the C<run (r)> command below for this.
+Note that you can't pass command line arguments to your program when you invoke
+the debugger. See the C<run (r)> command below for this.
 
 After the version banner, you'll see the friendly debugger prompt:
 
@@ -52,35 +52,34 @@ After the version banner, you'll see the friendly debugger prompt:
 F<pdb> is ready to receive commands and give output. To list the available
 commands type 'h'. To quit the debugger type 'q'.
 
-As with the Perl debugger, whenever it halts and shows you a line of code,
-it is always the line it's I<about> to execute, not the one that it has
-just executed.
+As with the Perl debugger, whenever it halts and shows you a line of code, it
+is always the line it's I<about> to execute, not the one that it has just
+executed.
 
 =head1 DEBUGGER COMMANDS
 
-Always remember that you can enter 'h' to get a list of commands (this
-document may be outdated in respect to the actual debugger, so let it
-speak for itself).
+Always remember that you can enter 'h' to get a list of commands (this document
+may be outdated in respect to the actual debugger, so let it speak for itself).
 
-Most commands can be shortened to their first letter. When available,
-this is signaled by the letter in parentheses after the command name
-Thus, C<help (h)> means that the command can be given as 'help' or
-just 'h'. On the other hand, C<load> can only be given as 'load', verbatim.
-And the debugger is case sensitive.
+Most commands can be shortened to their first letter. When available, this is
+signaled by the letter in parentheses after the command name Thus, C<help (h)>
+means that the command can be given as 'help' or just 'h'. On the other hand,
+C<load> can only be given as 'load', verbatim.  And the debugger is case
+sensitive.
 
 A blank line always repeats the last command entered.
 
-Also note that at this point in its development, F<pdb> has very poor
-error checking on commands and their arguments, so type carefully or
-something bad will happen. Feel free to report bugs, or better yet
-patch the source code (see L</FILES> below).
+Also note that at this point in its development, F<pdb> has very poor error
+checking on commands and their arguments, so type carefully or something bad
+will happen. Feel free to report bugs, or better yet patch the source code (see
+L</FILES> below).
 
 =over 4
 
 =item disassemble
 
-Disassemble a loaded bytecode file. This will turn a file loaded with
-C<load> into proper Parrot assembler.
+Disassemble a loaded bytecode file. This will turn a file loaded with C<load>
+into proper Parrot assembler.
 
 =item load
 
@@ -94,15 +93,13 @@ List the source code. The syntax is:
 
   list [FROM] [NUM]
 
-Both arguments are optional. By default C<FROM> is from
-where the last list command ended (or the first line if
-this is the first invocation) and C<NUM> is 10. That is,
-it lists the source code ten lines at a time.
+Both arguments are optional. By default C<FROM> is from where the last list
+command ended (or the first line if this is the first invocation) and C<NUM> is
+10. That is, it lists the source code ten lines at a time.
 
-Note that the disassembled source code is not the same
-as the original source code: labels take the names C<L1 .. Ln>
-and opcodes are fully qualified (eg. C<set_i_ic> instead of just
-C<set>). See also C<eval (e)>.
+Note that the disassembled source code is not the same as the original source
+code: labels take the names C<L1 .. Ln> and opcodes are fully qualified (eg.
+C<set_i_ic> instead of just C<set>). See also C<eval (e)>.
 
 Example:
 
@@ -118,11 +115,11 @@ Run (or restart) the program. The syntax is:
 
   run [ARGUMENTS]
 
-Any arguments you give are passed as command line arguments
-to the program (ie. they populate P0).
+Any arguments you give are passed as command line arguments to the program (ie.
+they populate P0).
 
-After the program has ended, you can run it again with this
-command. See also the C<continue (c)> command.
+After the program has ended, you can run it again with this command. See also
+the C<continue (c)> command.
 
 Example:
 
@@ -143,16 +140,13 @@ Add a breakpoint. The syntax is:
 
   b LINE [if CONDITION]
 
-If you want a conditional breakpoint you should first
-specify the register that is involved in the
-condition (at least one must be), the comparison
-and then the third argument can be either another
-register or a constant, which must be of the same type as
-the first register specified.
+If you want a conditional breakpoint you should first specify the register that
+is involved in the condition (at least one must be), the comparison and then
+the third argument can be either another register or a constant, which must be
+of the same type as the first register specified.
 
-The command returns a number which is the
-breakpoint identifier. You should note this
-number for the C<delete (d)> command (see below).
+The command returns a number which is the breakpoint identifier. You should
+note this number for the C<delete (d)> command (see below).
 
 Example:
 
@@ -194,9 +188,8 @@ Delete a breakpoint. The syntax is:
 
   d NUM
 
-The C<NUM> argument is the breakpoint number (from 0 to N)
-as emitted by the C<break (b)> command. It is NOT the line that has
-the breakpoint.
+The C<NUM> argument is the breakpoint number (from 0 to N) as emitted by the
+C<break (b)> command. It is NOT the line that has the breakpoint.
 
 Example:
 
@@ -205,12 +198,12 @@ Example:
 
 =item disable
 
-Disable a breakpoint. The syntax is the same as for the C<delete>
-command. Disabled breakpoints can be reenabled with C<enable>.
+Disable a breakpoint. The syntax is the same as for the C<delete> command.
+Disabled breakpoints can be re-enabled with C<enable>.
 
 =item enable
 
-Reenable a disabled breakpoint. The syntax is:
+Re-enable a disabled breakpoint. The syntax is:
 
   enable [NUM]
 
@@ -222,14 +215,14 @@ Continue the program execution. The syntax of this command is:
 
   continue [NUM]
 
-Without arguments, the command just runs the source code until
-a breakpoint is found (or until the end of the program).
+Without arguments, the command just runs the source code until a breakpoint is
+found (or until the end of the program).
 
-If you specify a number, it will skip the next C<NUM>
-breakpoints it encounters.
+If you specify a number, it will skip the next C<NUM> breakpoints it
+encounters.
 
-When the program has ended, continue will do nothing. Use
-C<run (r)> to execute it again.
+When the program has ended, continue will do nothing. Use C<run (r)> to execute
+it again.
 
 =item next (n)
 
@@ -237,8 +230,8 @@ Run the next instruction. The syntax is:
 
   next [NUM]
 
-C<NUM> defaults to 1, but you can give a number of instructions
-to execute before stopping again.
+C<NUM> defaults to 1, but you can give a number of instructions to execute
+before stopping again.
 
 =item eval (e)
 
@@ -265,10 +258,9 @@ Trace the next instruction. The syntax is:
 
   trace [NUM]
 
-It executes the next C<NUM> instructions (default is 1)
-just as C<next (n)> does, but printing additional trace
-information. This is the same as the information you get when
-running Parrot with the C<-t> option.
+It executes the next C<NUM> instructions (default is 1) just as C<next (n)>
+does, but printing additional trace information. This is the same as the
+information you get when running Parrot with the C<-t> option.
 
 Example:
 
@@ -303,10 +295,9 @@ Looks up the given (integer- or string-valued) key in a PMC register.
 
 =back
 
-For PMC registers, the command will print the number, the
-class of the PMC (in square brackets) and its string
-representation (when available). It prints <null pmc> for
-uninitialized PMC registers.
+For PMC registers, the command will print the number, the class of the PMC (in
+square brackets) and its string representation (when available). It prints
+<null pmc> for uninitialized PMC registers.
 
 Example:
 
@@ -363,15 +354,13 @@ Examine the stack. The syntax is:
   stack TYPE [NUM]
   stack NUM
 
-The first form prints entries from the register stacks (eg.
-results from C<push_i>, C<push_n>, C<push_s> and C<push_p>).
-For the meaning of C<TYPE> see the C<print (p)> command.
-The C<NUM> argument is the frame number (defaults to 0).
-The whole frame (0..31) is printed out.
+The first form prints entries from the register stacks (eg.  results from
+C<push_i>, C<push_n>, C<push_s> and C<push_p>).  For the meaning of C<TYPE> see
+the C<print (p)> command.  The C<NUM> argument is the frame number (defaults to
+0).  The whole frame (0..31) is printed out.
 
-The second form prints a single entry (C<NUM>) from the generic
-stack (eg. results from C<save>), prepending the type of the
-entry on output.
+The second form prints a single entry (C<NUM>) from the generic stack (eg.
+results from C<save>), prepending the type of the entry on output.
 
 Example:
 
@@ -431,24 +420,21 @@ If C<COMMAND> is omitted, prints a list of the available commands.
 
 =item src/pdb.c
 
-This is the file that will produce the executable.
-Nothing fancy here, only the C<main> function.
+This is the file that will produce the executable.  Nothing fancy here, only
+the C<main> function.
 
 =item src/debug.c
 
-Most of the debugger is implemented here.
-You may want to start from the C<PDB_run_command>
-function and go down from there for the real meat.
+Most of the debugger is implemented here.  You may want to start from the
+C<PDB_run_command> function and go down from there for the real meat.
 
 =item src/embed.c
 
-C<Parrot_debug>, the function which launches the debugger, is
-implemented here.
+C<Parrot_debug>, the function which launches the debugger, is implemented here.
 
 =item include/parrot/debug.h
 
-This defines all the PDB structures, which hold
-data used by the debugger.
+This defines all the PDB structures, which hold data used by the debugger.
 
 =back
 

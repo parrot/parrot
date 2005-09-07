@@ -13,13 +13,12 @@ docs/parrotbyte.pod - The Parrot Bytecode (PBC) Format
   +----------+----------+----------+----------+
 
 The wordsize (or C<opcode_t> size) must be 4 (32-bit) or 8 (64 bit). The
-bytecode loader is responsible for transforming the file into the VM
-native wordsize on the fly. For performance, a utility F<pdump> is
-provided to convert PBCs on disk if they cannot be recompiled. See
-F<src/pdump.c> for more information.
+bytecode loader is responsible for transforming the file into the VM native
+wordsize on the fly. For performance, a utility F<pdump> is provided to convert
+PBCs on disk if they cannot be recompiled. See F<src/pdump.c> for more
+information.
 
-Byteorder currently supports two values:
-(0-Little Endian, 1-Big Endian)
+Byteorder currently supports two values: (0-Little Endian, 1-Big Endian)
 
   4          5
   +----------+----------+----------+----------+
@@ -30,35 +29,31 @@ Byteorder currently supports two values:
   |           core.ops is here                |
   +----------+----------+----------+----------+
 
-INT size (sizeof(INTVAL)) must be 4 or 8.
-FloatType 0 is IEEE 754 8 byte double, FloatType 1 is i386 little
-endian 12 byte long double.
+INT size (sizeof(INTVAL)) must be 4 or 8.  FloatType 0 is IEEE 754 8 byte
+double, FloatType 1 is i386 little endian 12 byte long double.
 
   16
   +----------+----------+----------+----------+
   |         Parrot Magic = 0x 13155a1         |
   +----------+----------+----------+----------+
 
-Magic is stored in native byteorder. The loader
-uses the byteorder header to convert the Magic
-to verify. More specifically, ALL words (non-bytes)
-in the bytecode file are stored in native order,
-unless otherwise specified.
+Magic is stored in native byteorder. The loader uses the byteorder header to
+convert the Magic to verify. More specifically, ALL words (non-bytes) in the
+bytecode file are stored in native order, unless otherwise specified.
 
   20*
   +----------+----------+----------+----------+
   |         Opcode Type (Perl = 0x5045524c)   |
   +----------+----------+----------+----------+
 
-The asterisk for the offset states, from here we have opcodes. The
-given offsets are for 32 bit opcode types only.
+The asterisk for the offset states, from here we have opcodes. The given
+offsets are for 32 bit opcode types only.
 
 =head1 PBC FORMAT 1
 
-All segments are aligned at a 16 byte boundary. All segments share a
-common header and are kept in directories, which itself is a PBC
-segment. All offsets and sizes are in native opcodes of the machine
-that produced the PBC.
+All segments are aligned at a 16 byte boundary. All segments share a common
+header and are kept in directories, which itself is a PBC segment. All offsets
+and sizes are in native opcodes of the machine that produced the PBC.
 
 =head2 Format 1 Header
 
@@ -69,8 +64,8 @@ that produced the PBC.
   |         padding         (0)               |
   +----------+----------+----------+----------+
 
-After this header, the first PBC directory follows at offset 32*
-starting with a:
+After this header, the first PBC directory follows at offset 32* starting with
+a:
 
 =head2 Format 1 Segment Header
 
@@ -84,14 +79,13 @@ starting with a:
   |         size of opcodes following         |
   +----------+----------+----------+----------+
 
-The B<size> entry may be followed by a stream of B<size> opcodes
-(starting 16 byte aligned), which may of course be no opcode stream
-at all for size zero.
+The B<size> entry may be followed by a stream of B<size> opcodes (starting 16
+byte aligned), which may of course be no opcode stream at all for size zero.
 
-After this common segment header there can be segment specific data
-determined by the segment type. A segment without additional data,
-like the bytecode segment, is a B<default> segment. No additional
-routines are required to unpack such a segment.
+After this common segment header there can be segment specific data determined
+by the segment type. A segment without additional data, like the bytecode
+segment, is a B<default> segment. No additional routines are required to unpack
+such a segment.
 
 =head2 Directory Segment
 
@@ -110,8 +104,8 @@ routines are required to unpack such a segment.
   | segment op_count                          |
   +----------+----------+----------+----------+
 
-The B<op_count> at B<offset> must match the segments B<op_count> and
-is used to verify the PBCs integrity.
+The B<op_count> at B<offset> must match the segments B<op_count> and is used to
+verify the PBCs integrity.
 
 Currently these segment types are defined:
 
@@ -149,10 +143,10 @@ This is not determined yet.
 
 =head2 Unknown (default) and byte code segments
 
-These have only the common segment header and the opcode stream
-appended. The opcode stream is an F<mmap()>ed memory region, if your
-operating system supports this (and if the PBC was read from a disk
-file). You have therefore to consider these data as readonly.
+These have only the common segment header and the opcode stream appended. The
+opcode stream is an F<mmap()>ed memory region, if your operating system
+supports this (and if the PBC was read from a disk file). You have therefore to
+consider these data as readonly.
 
 =head2 Fixup segment
 
@@ -169,8 +163,8 @@ file). You have therefore to consider these data as readonly.
   | label offset                              |
   +----------+----------+----------+----------+
 
-Currently fixup type B<0> is defined, which has a label symbol and an
-offset into the bytecode.
+Currently fixup type B<0> is defined, which has a label symbol and an offset
+into the bytecode.
 
 =head2 Debug Segment
 
@@ -179,8 +173,8 @@ offset into the bytecode.
   | ...        0x00       padding             |
   +----------+----------+----------+----------+
 
-The debug segment has one additional field with the source file name.
-The opcode stream holds one line number per bytecode instruction.
+The debug segment has one additional field with the source file name.  The
+opcode stream holds one line number per bytecode instruction.
 
 =head2 CONSTANT TABLE SEGMENT
 
@@ -250,8 +244,7 @@ If S' E<gt> S, then the extra bytes are filled with zeros.
 
 =head2 BYTE CODE SEGMENT
 
-The pieces that can be found in the byte code segment are as
-follows:
+The pieces that can be found in the byte code segment are as follows:
 
   +----------+----------+----------+----------+
   |              Operation Code               |
@@ -273,18 +266,17 @@ follows:
   |   Number Argument (Constant Table Index)  |
   +----------+----------+----------+----------+
 
-The number and types for each argument can be determined by
-consulting Parrot::Opcode.
+The number and types for each argument can be determined by consulting
+Parrot::Opcode.
 
 
 =head2 SOURCE CODE SEGMENT
 
-Currently there are no utilities that use this segment, even
-though it is mentioned in some of the early Parrot documents.
+Currently there are no utilities that use this segment, even though it is
+mentioned in some of the early Parrot documents.
 
-Eventually there will be a more complete and useful PackFile
-specification, but this simple format works well enough for
-now (c. Parrot 0.0.5).
+Eventually there will be a more complete and useful PackFile specification, but
+this simple format works well enough for now (c. Parrot 0.0.5).
 
 =head1 SEE ALSO
 
@@ -293,9 +285,9 @@ B<pdump> utility F<pdump.c>.
 
 =head1 AUTHOR
 
-Gregor N. Purdy E<lt>gregor@focusresearch.comE<gt>
+Gregor N. Purdy C<gregor@focusresearch.com>
 
-Format 1 description by Leopold Toetsch E<lt>lt@toetsch.atE<gt>
+Format 1 description by Leopold Toetsch C<lt@toetsch.at>
 
 =head1 VERSION
 

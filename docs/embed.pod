@@ -45,11 +45,11 @@ embed.pod - Parrot embedding system
 
 =head1 DESCRIPTION
 
-Parrot's embedding system is designed with one guiding principle in mind: 
-encapsulation.  Users of Parrot shouldn't have to know what the insides
-of a C<Parrot_Interp> structure look like or how to load a packfile.  They 
-should just know a few functions and constants.  The embedding system is
-designed to do just that.
+Parrot's embedding system is designed with one guiding principle in mind:
+encapsulation.  Users of Parrot shouldn't have to know what the insides of a
+C<Parrot_Interp> structure look like or how to load a packfile.  They should
+just know a few functions and constants.  The embedding system is designed to
+do just that.
 
 =head2 Data Structures
 
@@ -90,21 +90,21 @@ B<interpreter core setting> is done by a call of C<Parrot_set_run_core()> like:
 
   Parrot_set_run_core(interp, PARROT_JIT_CORE);
 
-See F</include/parrot/interpreter.h> for a list of available cores
-beside PARROT_PREDEREF_CORE, PARROT_JIT_CORE.
+See F</include/parrot/interpreter.h> for a list of available cores beside
+PARROT_PREDEREF_CORE, PARROT_JIT_CORE.
 
 =over
 
 =item C<PARROT_PREDEREF_CORE>
 
-This flag turns on predereferencing.  Parrot will transform many offsets 
-in the opcode stream to absolute pointers.  
+This flag turns on predereferencing.  Parrot will transform many offsets in the
+opcode stream to absolute pointers.  
 
 =item C<PARROT_JIT_CORE>
 
-This flag turns on just-in-time compilation.  Parrot will convert the 
-bytecode file into native machine code and run it, usually resulting in 
-substantial speedup. 
+This flag turns on just-in-time compilation.  Parrot will convert the bytecode
+file into native machine code and run it, usually resulting in substantial
+speedup. 
 
 =back
 
@@ -120,36 +120,35 @@ See F</include/parrot/interpreter.h> for an up to date list.
 
 =item C<PARROT_DEBUG_FLAG>
 
-This flag turns on debugging mode.  Debugging mode basically means that 
-Parrot's core prints out diagnostic messages.  This flag does not take
-any parameters.
+This flag turns on debugging mode.  Debugging mode basically means that
+Parrot's core prints out diagnostic messages.  This flag does not take any
+parameters.
 
 =item C<PARROT_TRACE_FLAG>
 
-This flag turns on opcode tracing.  Parrot will print out each opcode and
-the parameters passed to it as it is called.  This flag does not take any
+This flag turns on opcode tracing.  Parrot will print out each opcode and the
+parameters passed to it as it is called.  This flag does not take any
 parameters.
 
 =item C<PARROT_BOUNDS_FLAG>
 
-This flag turns on bounds checking.  Parrot will make sure that all 
-addresses returned by an opcode function are within the boundaries of the
-bytecode block.  This flag does not take any parameters.
+This flag turns on bounds checking.  Parrot will make sure that all addresses
+returned by an opcode function are within the boundaries of the bytecode block.
+This flag does not take any parameters.
 
 =item C<PARROT_PROFILE_FLAG>
 
 This flag turns on profiling.  Parrot will print out a list of each opcode
-called, the number of times it was called, the average time it took to run,
-and the total time it took over the life of the program.  This flag does
-not take any parameters.
+called, the number of times it was called, the average time it took to run, and
+the total time it took over the life of the program.  This flag does not take
+any parameters.
 
 =item C<PARROT_THR_TYPE_1>, C<PARROT_THR_TYPE_2>, C<PARROT_THR_TYPE_3>
 
-This flags control the threading behavior. With
-C<PARROT_THR_TYPE_1>, threads runs without sharing variables and
-do not communicate, With C<PARROT_THR_TYPE_2>, threads shares no
-variables and communicate by sending messages. With
-C<PARROT_THR_TYPE_3>, threads share variables. See
+This flags control the threading behavior. With C<PARROT_THR_TYPE_1>, threads
+runs without sharing variables and do not communicate, With
+C<PARROT_THR_TYPE_2>, threads shares no variables and communicate by sending
+messages. With C<PARROT_THR_TYPE_3>, threads share variables. See
 F<t/pmc/threads.t> for examples.
 
 =back
@@ -180,13 +179,12 @@ This constant contains the date that Configure was run to generate config.h.
 
 =item C<PARROT_JIT_CAPABLE>
 
-This constant is true if Parrot supports JIT on this platform, false 
-otherwise.
+This constant is true if Parrot supports JIT on this platform, false otherwise.
 
 =item C<PARROT_ARCHNAME>
 
-This constant contains a string representation of the Parrot JIT's name for
-the current architecture.
+This constant contains a string representation of the Parrot JIT's name for the
+current architecture.
 
 =item C<PARROT_CPU_ARCH>
 
@@ -194,8 +192,7 @@ This constant contains the name of your processor (as the JIT sees it).
 
 =item C<PARROT_OS_NAME>
 
-This constant contains the name of your operating system (as the JIT sees
-it).
+This constant contains the name of your operating system (as the JIT sees it).
 
 =back
 
@@ -205,8 +202,8 @@ it).
 
 =item C<Parrot_Interp Parrot_new(Parrot_Interp parent)>
 
-Allocates and returns a new Parrot interpreter. C<parent> is NULL for the
-main interpreter that will be destroyed last.
+Allocates and returns a new Parrot interpreter. C<parent> is NULL for the main
+interpreter that will be destroyed last.
 
 =item C<void Parrot_init(Parrot_Interp)>
 

@@ -8,26 +8,21 @@ docs/dev/dod.dev - Dead object detection (DOD)
 =head1 Overview
 
 The DOD code performs dead object detection and reclamation, thereby
-implementing a mark and copy garbage collector.  The official
-garbage collection PDD is PDD 9 and is located in the
-docs/pdds directory of the parrot distribution.  This .dev
-file is only meant to describe the current state of the code
-and is not meant to replace a thorough understanding of
-PDD 9.
+implementing a mark and copy garbage collector.  The official garbage
+collection PDD is PDD 9 and is located in the docs/pdds directory of the parrot
+distribution.  This .dev file is only meant to describe the current state of
+the code and is not meant to replace a thorough understanding of PDD 9.
 
 =head1 Data Structures and Algorithms
 
 =head2 Marking (pass 1)
 
-Each PMC has a C<flags> member which, among other things, is
-used to facilitate garbage collection.  The mark phase
-of the collection cycle goes though each PMC and sets
-the C<PMC_live_FLAG> bit in the C<flags> member.  It also
-appends the PMC to the end of a list used for
-further (pass 2) marking.  However, if the PMC
-has already been marked as used, the current
-end of list is returned (instead of appending
-the already processed PMC) to prevent endless looping.
+Each PMC has a C<flags> member which, among other things, is used to facilitate
+garbage collection.  The mark phase of the collection cycle goes though each
+PMC and sets the C<PMC_live_FLAG> bit in the C<flags> member.  It also appends
+the PMC to the end of a list used for further (pass 2) marking.  However, if
+the PMC has already been marked as used, the current end of list is returned
+(instead of appending the already processed PMC) to prevent endless looping.
 
 PMCs are detected in the following order
 
@@ -49,27 +44,19 @@ PMCs are detected in the following order
 
 =head2 Marking PMCs(pass 2)
 
-After all of the PMCs have been marked, then they
-are traversed a second time.  This second phase
-looks for aggregate PMCs.  In other words,
-some PMCs contain other PMCs, buffers, or
-buffers of PMCs.  The second phase looks
-for those aggregate PMCs and marks the
-contained PMCs or buffers thereby ensuring they
-will not be collected.  Furthermore,
-if the PMC has a custom mark function
-in its vtable, it is called at this point.
-It is important to note that those PMCs
-marked by this second phase will be added
-to the end of the traversal list in case
-they, themselves, have any aggregate PMCs
-that need to be marked.
+After all of the PMCs have been marked, then they are traversed a second time.
+This second phase looks for aggregate PMCs.  In other words, some PMCs contain
+other PMCs, buffers, or buffers of PMCs.  The second phase looks for those
+aggregate PMCs and marks the contained PMCs or buffers thereby ensuring they
+will not be collected.  Furthermore, if the PMC has a custom mark function in
+its vtable, it is called at this point.  It is important to note that those
+PMCs marked by this second phase will be added to the end of the traversal list
+in case they, themselves, have any aggregate PMCs that need to be marked.
 
 =head2 Marking Buffers
 
-After all PMCs have been marked, the non PMC
-buffers are examined. They are examined in
-the following order
+After all PMCs have been marked, the non PMC buffers are examined. They are
+examined in the following order
 
 =over 4
 
@@ -83,42 +70,34 @@ the following order
 
 =back
 
-Once a buffer is found to be live, the C<flags>
-member of the buffer structure has the
-C<BUFFER_live_FLAG> bit set on.
+Once a buffer is found to be live, the C<flags> member of the buffer structure
+has the C<BUFFER_live_FLAG> bit set on.
 
 =head2 Collection
 
-After all of the buffers and PMCs in use
-have been marked live, the collection
-stage is started.  First, PMCs are collected,
-followed by buffers.
+After all of the buffers and PMCs in use have been marked live, the collection
+stage is started.  First, PMCs are collected, followed by buffers.
 
 =over 4
 
 =item Collecting PMCs
 
-To collect PMCs, each PMC arena is examined,
-from the most recently created backwards.
-Each PMC is examined to see if it
-is live, already on the free list, or constant.
-If it is not, then it is added to the free
-list and marked as being already on the free
-list.
+To collect PMCs, each PMC arena is examined, from the most recently created
+backwards.  Each PMC is examined to see if it is live, already on the free
+list, or constant.  If it is not, then it is added to the free list and marked
+as being already on the free list.
 
 =item Collecting buffers
 
-To collect buffers, each Buffer arena is
-examined from the most recently created
-backwards.  If the buffer is not live,
-not already on the free list and it is not a constant
-or copy on write, then it is added to the free
-pool for reuse.
+To collect buffers, each Buffer arena is examined from the most recently
+created backwards.  If the buffer is not live, not already on the free list and
+it is not a constant or copy on write, then it is added to the free pool for
+reuse.
 
 =back
 
-In both cases (PMC and buffer), the live flag
-is reset after examination for reclamation.
+In both cases (PMC and buffer), the live flag is reset after examination for
+reclamation.
 
 =head1 History
 
@@ -126,24 +105,24 @@ Initial Version by Mike Lambert on 2002.05.27
 
 =head1 Notes
 
-The C<buffer_lives> function can be found in dod.h
-The C<add_to_free_pool> function can be found in headers.h
+The C<buffer_lives> function can be found in dod.h The C<add_to_free_pool>
+function can be found in headers.h
 
 =head1 References
 
-There are a number of references available for Garbage Collection.
-For example:
+There are a number of references available for Garbage Collection.  For
+example:
 
 =over 4
 
-=item Garbage Collection Algorithms for Automatic Dynamic Memory Management
-by Jones and Lins
+=item Garbage Collection Algorithms for Automatic Dynamic Memory Management by
+Jones and Lins
 
-=item http://www.cs.utexas.edu/users/oops/papers.html
+=item L<http://www.cs.utexas.edu/users/oops/papers.html>
 
 =back
 
-Also, the dev.perl.org web site has an archive of the perl6-internals
-mailing list which contains numerous discussions on the
-Parrot garbage collector.
+Also, the L<http://dev.perl.org> web site has an archive of the perl6-internals
+mailing list which contains numerous discussions on the Parrot garbage
+collector.
 

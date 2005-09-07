@@ -7,25 +7,21 @@ docs/dev/byteorder.dev - Byteorder Conversion Functions
 
 =head1 Overview
 
-The byteorder code will check the endianness of an C<INTVAL> or
-an C<opcode_t> value and swap from little to big, or big to little
-when appropriate.  Functions also exist to convert a 4, 8, 12,
-or 16 byte character buffer to big or little endian.
-The functions will be placed in the PackFile vtable and will be called 
-when necessary. The Parrot interpreter should be smart enough to avoid
-calling these functions when converting from and to the same byteorder.
+The byteorder code will check the endianness of an C<INTVAL> or an C<opcode_t>
+value and swap from little to big, or big to little when appropriate.
+Functions also exist to convert a 4, 8, 12, or 16 byte character buffer to big
+or little endian.  The functions will be placed in the PackFile vtable and will
+be called when necessary. The Parrot interpreter should be smart enough to
+avoid calling these functions when converting from and to the same byteorder.
 
 =head1 Data Structures and Algorithms
 
-The algorithm to change from one endianness to another is
-identical and simple to understand.  Basically,
-the size of an C<INTVAL> or C<opcode_t> is used to
-determine at compile time how many bits should
-be shifted around.  Then the correct bits are shifted
-by the correct amounts (please look at source code for
-exact amounts).  The buffer change functions are implemented
-by a straight forward algorithm that assigns swaps all
-of the bytes.
+The algorithm to change from one endianness to another is identical and simple
+to understand.  Basically, the size of an C<INTVAL> or C<opcode_t> is used to
+determine at compile time how many bits should be shifted around.  Then the
+correct bits are shifted by the correct amounts (please look at source code for
+exact amounts).  The buffer change functions are implemented by a straight
+forward algorithm that assigns swaps all of the bytes.
 
 =head1 Important Functions
 
@@ -33,41 +29,35 @@ of the bytes.
 
 =item C<fetch_iv_le> 
 
-This function will convert an C<INTVAL> into
-little endian format.  It is a no-op if the native
-format is already little endian.
+This function will convert an C<INTVAL> into little endian format.  It is a
+no-op if the native format is already little endian.
 
 =item C<fetch_iv_be>
 
-This function will convert an C<INTVAL> into
-big endian format. It is a no-op if the native
-format is already big endian.
+This function will convert an C<INTVAL> into big endian format. It is a no-op
+if the native format is already big endian.
 
 =item C<fetch_op_le>
 
-This function will convert an C<opcode_t> into
-little endian format. It is a no-op if the native
-format is already little endian.
+This function will convert an C<opcode_t> into little endian format. It is a
+no-op if the native format is already little endian.
 
 =item C<fetch_op_be>
 
-This function will convert an C<opcode_t> into
-big endian format. It is a no-op if the native
-format is already big endian.
+This function will convert an C<opcode_t> into big endian format. It is a no-op
+if the native format is already big endian.
 
 =item C<fetch_buf_le_>(4,8,12,16)
 
-This set of functions
-will convert an unsigned character buffer into
-little endian format.  Only a C<memcpy> is performed
-if the native format is already little endian.
+This set of functions will convert an unsigned character buffer into little
+endian format.  Only a C<memcpy> is performed if the native format is already
+little endian.
 
 =item C<fetch_buf_be_>(4,8,12,16)
 
-This set of functions
-will convert an unsigned character buffer into
-big endian format.  Only a C<memcpy> is performed
-if the native format is already big endian.
+This set of functions will convert an unsigned character buffer into big endian
+format.  Only a C<memcpy> is performed if the native format is already big
+endian.
 
 =back
 
@@ -91,9 +81,8 @@ Initial version by Melvin on 2002/05/01
 
 =head1 Notes
 
-This assumes big or little endianness...other, more
-esoteric forms (such as middle endian) are not supported.
-Also, an assumption of 4 or 8 byte C<INTVAL>'s
-and C<opcode_t>'s is made.
+This assumes big or little endianness...other, more esoteric forms (such as
+middle endian) are not supported.  Also, an assumption of 4 or 8 byte
+C<INTVAL>'s and C<opcode_t>'s is made.
 
 =head1 References

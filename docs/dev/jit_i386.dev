@@ -281,13 +281,13 @@ So this is rather simple once it gets going.
 
 =head1 BUGS
 
-The floating point registers do not get saved to Parrot before vtable
-calls. This assumes that external routines preserve the FP stack
-pointer and don't use more the 4 floating point registers at once.
+The floating point registers do not get saved to Parrot before vtable calls.
+This assumes that external routines preserve the FP stack pointer and don't use
+more the 4 floating point registers at once.
 
 =head1 AUTHOR
 
-Leopold Toetsch <lt@toetsch.at>
+Leopold Toetsch C<lt@toetsch.at>
 
 =head1 VERSION
 

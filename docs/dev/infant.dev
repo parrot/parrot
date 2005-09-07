@@ -7,50 +7,46 @@ docs/dev/infant.dev - Infant Mortality
 
 =head1 Overview
 
-We have a garbage collector that needs to detect all dead objects (the
-process is called DOD, for Dead Object Detection). Any Parrot
-operation that might allocate memory can potentially trigger a DOD run
-(if not enough memory is available, we need to free up some unused
-objects to give us enough room to allocate our new object. But in
-order to know what can be freed up, we need to know what's alive, so
-we do a DOD pass.)
+We have a garbage collector that needs to detect all dead objects (the process
+is called DOD, for Dead Object Detection). Any Parrot operation that might
+allocate memory can potentially trigger a DOD run (if not enough memory is
+available, we need to free up some unused objects to give us enough room to
+allocate our new object. But in order to know what can be freed up, we need to
+know what's alive, so we do a DOD pass.)
 
-The DOD pass begins with a "root set" of objects that are known to be
-in use -- the PMC and String registers, the Parrot stack, the global
-symbol table, etc. Each of these objects is scanned for references to
-other objects, recursively. All objects found during this search are
-regarded as live. Everything else is considered dead and so is
-available for reclamation.
+The DOD pass begins with a "root set" of objects that are known to be in use --
+the PMC and String registers, the Parrot stack, the global symbol table, etc.
+Each of these objects is scanned for references to other objects, recursively.
+All objects found during this search are regarded as live. Everything else is
+considered dead and so is available for reclamation.
 
-The question of what should be in the root set is problematic.
-Consider the case where you've created a PMC. If you immediately stuff
-it into a register, then you're all set. But what if you're putting it
-into an aggregate? If the aggregate isn't large enough, you'll need to
-resize it, which might allocate memory, which might trigger a DOD run.
-And that DOD run may free your freshly-created PMC.
+The question of what should be in the root set is problematic.  Consider the
+case where you've created a PMC. If you immediately stuff it into a register,
+then you're all set. But what if you're putting it into an aggregate? If the
+aggregate isn't large enough, you'll need to resize it, which might allocate
+memory, which might trigger a DOD run.  And that DOD run may free your
+freshly-created PMC.
 
-In this case, the solution is simple: resize the array, if necessary,
-before creating the PMC. But many situations are not so simple, and
-the set of operations which could conceivably require more memory is
-vast. This problem is referred to as the "infant mortality" problem.
+In this case, the solution is simple: resize the array, if necessary, before
+creating the PMC. But many situations are not so simple, and the set of
+operations which could conceivably require more memory is vast. This problem is
+referred to as the "infant mortality" problem.
 
-Peter Gibbs, Mike Lambert, Dan Sugalski and others have considered
-various solutions to this problem. Most of those solutions have been
-implemented in some form or other. This document is an attempt to
-compare and contrast all such proposals.
+Peter Gibbs, Mike Lambert, Dan Sugalski and others have considered various
+solutions to this problem. Most of those solutions have been implemented in
+some form or other. This document is an attempt to compare and contrast all
+such proposals.
 
 =head1 Solution 1: Stack Walking
 
-One possible solution is to add the C stack into the root set. This
-way, temporary PMCs that have not yet been anchored to the root set
-will be found on the stack and treated as live. Actually, the C stack
-is insufficient -- you must also scan through all processor registers,
-and for some processors there may be a separate backing store for
-those registers (eg the Sparc's register windows).
-Uninitialized data on the stack and high alignment requirements for
-stackframes can fool the DOD system with left over pointers from 
-previous calls. This is especially a problem for objects which need 
-early destruction.
+One possible solution is to add the C stack into the root set. This way,
+temporary PMCs that have not yet been anchored to the root set will be found on
+the stack and treated as live. Actually, the C stack is insufficient -- you
+must also scan through all processor registers, and for some processors there
+may be a separate backing store for those registers (eg the Sparc's register
+windows).  Uninitialized data on the stack and high alignment requirements for
+stackframes can fool the DOD system with left over pointers from previous
+calls. This is especially a problem for objects which need early destruction.
 
  + No slowdown in the common case of no DOD
  + Convenient: the programmer does not need to code differently to
@@ -78,12 +74,11 @@ early destruction.
 
 =head1 Solution 2: Neonate flag
 
-There are several possible variants of the neonate flag, but the basic
-idea is to set a flag on newly created objects that prevents them from
-being collected. At some point, this flag is cleared -- either as the
-newborn object is anchored to the root set, or during the first DOD
-pass after it was anchored, or explicitly when the object is no longer
-needed.
+There are several possible variants of the neonate flag, but the basic idea is
+to set a flag on newly created objects that prevents them from being collected.
+At some point, this flag is cleared -- either as the newborn object is anchored
+to the root set, or during the first DOD pass after it was anchored, or
+explicitly when the object is no longer needed.
 
  + Portable
  + Can return memory to the system when unneeded
@@ -97,8 +92,8 @@ needed.
 
 =head2 Subspecies of neonate flags
 
-The variants of the neonate idea all hinge on exactly how and when the
-flag is cleared.
+The variants of the neonate idea all hinge on exactly how and when the flag is
+cleared.
 
 =head2 Variant 1: explicit
 
@@ -114,8 +109,8 @@ The flag is always explicitly cleared by the coder.
 
 =head2 Variant 2: explicit for temporaries, cleared during anchoring
 
-The flag is explicitly set for temporaries. All routines which anchor
-an object to the root set also clear the flag.
+The flag is explicitly set for temporaries. All routines which anchor an object
+to the root set also clear the flag.
 
  + Simple
  + Fast DOD
@@ -128,10 +123,9 @@ an object to the root set also clear the flag.
 
 =head2 Variant 3: clear during DOD
 
-The neonate flag is cleared during DOD when an object is encountered
-during the recursive root set traversal. (Leopold Toetsch's trick of
-setting the live_FLAG during creation is equivalent to this variation,
-I think.)
+The neonate flag is cleared during DOD when an object is encountered during the
+recursive root set traversal. (Leopold Toetsch's trick of setting the live_FLAG
+during creation is equivalent to this variation, I think.)
 
  + Simple
  + Fast DOD (DOD already manipulates the flags)
@@ -140,11 +134,10 @@ I think.)
 
 =head2 Variant 4: generation count
 
-This is the same as variant 3, except a "generation count" is
-maintained in the interpreter so that the neonate flag is only cleared
-during a later generation. The generation is incremented only at major
-control points such between opcodes, so that there is no chance of
-unanchored temporaries.
+This is the same as variant 3, except a "generation count" is maintained in the
+interpreter so that the neonate flag is only cleared during a later generation.
+The generation is incremented only at major control points such between
+opcodes, so that there is no chance of unanchored temporaries.
 
  + Fast DOD (DOD already manipulates the flags)
  - Generation count must be maintained
@@ -153,23 +146,21 @@ unanchored temporaries.
  - Can temporarily use more memory (dead objects accumulate during the
    current generation)
 
-In order to allow recursive opcode calls, we could increment the
-generation count in more places and make sure nothing is left
-unanchored at those points, but that would gradually remove all
-advantages of this scheme and make it more difficult to call existing
-vtable methods (since you never know when they might start running
-pasm code.)
+In order to allow recursive opcode calls, we could increment the generation
+count in more places and make sure nothing is left unanchored at those points,
+but that would gradually remove all advantages of this scheme and make it more
+difficult to call existing vtable methods (since you never know when they might
+start running pasm code.)
 
 =head2 Variant 5: generation stack
 
-Notice that when using a generational count, you really only need to
-test whether the current generation is _different_ from an object's
-creation generation (which eliminates wraparound problems, too.) So
-rather than testing against a single "current" generation, allow a
-stack of multiple "current" generations. An object encountered during
-DOD will have its neonate flag cleared only if it doesn't match any of
-the "current" generation ids. This check can be optimized using a
-conservative bit mask as a preliminary test.
+Notice that when using a generational count, you really only need to test
+whether the current generation is _different_ from an object's creation
+generation (which eliminates wraparound problems, too.) So rather than testing
+against a single "current" generation, allow a stack of multiple "current"
+generations. An object encountered during DOD will have its neonate flag
+cleared only if it doesn't match any of the "current" generation ids. This
+check can be optimized using a conservative bit mask as a preliminary test.
 
  + Still faster DOD than stackwalking, though slower than the
    other neonate variants
@@ -181,13 +172,12 @@ conservative bit mask as a preliminary test.
 
 =head2 Variant 6: Generation based on stack depth
 
-Another similar idea is to use a generational system, with the
-"current generation" as a value on the C stack, passed as an extra
-argument after the interpreter. If a function creates temporary
-objects it calls other functions with an increased generational count.
-During a DOD run, any PMC with a generation less than the
-current generation is considered live.  Any PMC with a generation
-greater than the current generation is considered free. This works
+Another similar idea is to use a generational system, with the "current
+generation" as a value on the C stack, passed as an extra argument after the
+interpreter. If a function creates temporary objects it calls other functions
+with an increased generational count.  During a DOD run, any PMC with a
+generation less than the current generation is considered live.  Any PMC with a
+generation greater than the current generation is considered free. This works
 through longjmps and recursive run_cores.
 
  + Simple
@@ -202,10 +192,9 @@ through longjmps and recursive run_cores.
 
 =head2 Variant 1: Temporarily anchor objects
 
-Provide a mechanism to temporarily
-anchor an otherwise unanchored object to the root set. (eg, have an
-array of objects associated with the interpreter that are all
-considered to be part of the root set.) This has pretty much the same
+Provide a mechanism to temporarily anchor an otherwise unanchored object to the
+root set. (eg, have an array of objects associated with the interpreter that
+are all considered to be part of the root set.) This has pretty much the same
 advantages and disadvantages of explicit neonate flag setting:
 
  + Simple
@@ -219,14 +208,14 @@ advantages and disadvantages of explicit neonate flag setting:
  - longjmp() can bypass the unanchoring
 
 Many of the same or similar variations also apply: objects could be
-automatically removed from the temporary anchoring at generation
-boundaries, etc.
+automatically removed from the temporary anchoring at generation boundaries,
+etc.
 
 =head2 Variant 2: Anchor early, anchor often
 
-First place a new PMC in the root set (e.g. a register), then initialise
-it. If that's too cumbersome, disable DOD; if that's suboptimal, use
-active anchoring to some root set linked list for temporary PMCs.
+First place a new PMC in the root set (e.g. a register), then initialise it. If
+that's too cumbersome, disable DOD; if that's suboptimal, use active anchoring
+to some root set linked list for temporary PMCs.
 
  + Simple
  + Fast DOD (No stack-walking)
@@ -238,13 +227,12 @@ active anchoring to some root set linked list for temporary PMCs.
 
 =head2 Variant 3: Use a linked list of frames
 
-The signature of every Parrot function is extended with an extra
-parameter which is a parameter to a frame structure. All temporary
-PMCs needs to put into such a frame structure. The first parameter of
-this frame structure is a link to the previously used frame
-structure. If a function that can do a DOD run is called a pointer to
-the current frame is applied. The linked list of frames represents
-always an exact list of the active temporaries on the C-stack.
+The signature of every Parrot function is extended with an extra parameter
+which is a parameter to a frame structure. All temporary PMCs needs to put into
+such a frame structure. The first parameter of this frame structure is a link
+to the previously used frame structure. If a function that can do a DOD run is
+called a pointer to the current frame is applied. The linked list of frames
+represents always an exact list of the active temporaries on the C-stack.
 
  + Fast DOD-runs (only the known PMC-pointers are walked)
  + Exact
@@ -260,63 +248,63 @@ always an exact list of the active temporaries on the C-stack.
 
 =item What is neonate?
 
-http://groups.google.com/groups?th=468fc4aebca262f7
+L<http://groups.google.com/groups?th=468fc4aebca262f7>
 
 Brent Dax's better description of the problem than I have here
 
 =item Mike Lambert proposing Variant 1
 
-http://groups.google.com/groups?th=b2c1aebf64d6ed9a
+L<http://groups.google.com/groups?th=b2c1aebf64d6ed9a>>>>
 
 This also has some macro-heavy proposals that I ignored.
 
 =item Leopold Toetsch proposing Variant 3
 
-http://groups.google.com/groups?th=dc51f11f441bc7d0
+L<http://groups.google.com/groups?th=dc51f11f441bc7d0>
 
 Also includes Steve Fink proposing Variant 1
 
 =item Dan Sugalski proposing Variant 3
 
-http://groups.google.com/groups?th=da3012ceb99bab3c
+L<http://groups.google.com/groups?th=da3012ceb99bab3c>
 
 =item Peter Gibbs implementing Variant 4 and getting shot down
 
-http://groups.google.com/groups?th=d2cd475367fc81aa
+L<http://groups.google.com/groups?th=d2cd475367fc81aa>
 
 =item General discussion kicked off by this document
 
-http://groups.google.com/groups?th=66fe6f12e11a5f8d
+L<http://groups.google.com/groups?th=66fe6f12e11a5f8d>
 
 This thread also includes Benjamin Goldberg Variant 6
 
 =item Dan thinks the stackwalk is unavoidable
 
-http://groups.google.com/groups?th=f7e270609ef93161
+L<http://groups.google.com/groups?th=f7e270609ef93161>
 
 =item Infant mortality pain
 
-http://groups.google.com/groups?th=ad045a1baeba0c9a
+L<http://groups.google.com/groups?th=ad045a1baeba0c9a>
 
 This is a good thread for illustrating the pain that infant mortality
 causes -- in the context of Parrot, I mean.
 
 =item Numbers!
 
-http://groups.google.com/groups?th=d7cd4ca31dcb4414
+L<http://groups.google.com/groups?th=d7cd4ca31dcb4414>
 
 Gives some benchmark numbers for different approaches.
 
 =item Generational stuff
 
-http://groups.google.com/groups?th=808f38c656a49806
+L<http://groups.google.com/groups?th=808f38c656a49806>
 
 Early discussion that has some stuff I didn't go over here. Mostly
 involves generational schemes.
 
 =item Problems with stack-walking
 
-http://groups.google.com/groups?th=f9fc9c6d28eae2b5
+L<http://groups.google.com/groups?th=f9fc9c6d28eae2b5>
 
 This thread also includes Juergen Boemmels Variant 3 of Solution 3
 

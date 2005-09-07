@@ -13,9 +13,8 @@ This document describes how to debug various parts of Parrot.
 
 =head2 Using a debugger
 
-Per default the C<parrot> binary is being built with
-debugging symbols. This means that you can run C<parrot> under
-an debugger like C<gdb>.
+Per default the C<parrot> binary is being built with debugging symbols. This
+means that you can run C<parrot> under an debugger like C<gdb>.
 
 Debugging support can be explicitly enabled with:
 
@@ -30,9 +29,8 @@ So debugging can also be turned off with:
 
 =head2 Using a memory checker
 
-You could, and should, also run the tests with a memory checker
-such as C<valgrind>.
-You can enable C<valgrind>, by running:
+You could, and should, also run the tests with a memory checker such as
+C<valgrind>.  You can enable C<valgrind>, by running:
 
   shell> make test VALGRIND="valgrind --logfile=/tmp/grind"
 
@@ -40,57 +38,56 @@ Another possibility is to use Electric Fence, or ...
 
 =head2 MEMORY MANAGEMENT
 
-Some of the more frequent and exasperating C<parrot> bugs are related to
-memory management in general, and garbage collection in particular.
+Some of the more frequent and exasperating C<parrot> bugs are related to memory
+management in general, and garbage collection in particular.
 
 Infant mortality
 
 See F<docs/dev/infant.dev> for details of one frequent problem: infant
-mortality. Infant mortality is when you create a Parrot object, but
-the garbage collector runs before you put it into a Parrot register or
-in something else that is itself within a Parrot register.
+mortality. Infant mortality is when you create a Parrot object, but the garbage
+collector runs before you put it into a Parrot register or in something else
+that is itself within a Parrot register.
 
-To help in resolving these issues, the parrot binary accepts a
-C<--gc-debug> flag. This flag makes garbage collection occur as frequently as
-possible, which maximizes the probability that any newborn objects will run
-afoul of the garbage collector.
+To help in resolving these issues, the parrot binary accepts a C<--gc-debug>
+flag. This flag makes garbage collection occur as frequently as possible, which
+maximizes the probability that any newborn objects will run afoul of the
+garbage collector.
 
 Within the C<--gc-debug> mode, there is another tool to help narrow down the
 problem. You can edit F<src/dod.c> and C<#define> the C<GC_VERBOSE> flag to 1.
 After recompiling C<parrot>, the garbage collector will perform additional
-checks. After the garbage collector has traced all objects to find which
-ones are still alive, it will scan through all of the dead objects to see
-if any of them believe they are alive (which will happen for infants, since
-they come into existence marked live.) If it finds any, it will print them
-out. You can then re-run the program with a breakpoint set on the routine
-that allocated the object (e.g. C<get_free_object> in F<src/smallobject.c>).
-You'll probably want to make the breakpoint conditional on the object having
-the version number that was reported, because the same memory location
-will probably hold many different objects over the lifetime of the
-program.
+checks. After the garbage collector has traced all objects to find which ones
+are still alive, it will scan through all of the dead objects to see if any of
+them believe they are alive (which will happen for infants, since they come
+into existence marked live.) If it finds any, it will print them out. You can
+then re-run the program with a breakpoint set on the routine that allocated the
+object (e.g. C<get_free_object> in F<src/smallobject.c>).  You'll probably want
+to make the breakpoint conditional on the object having the version number that
+was reported, because the same memory location will probably hold many
+different objects over the lifetime of the program.
 
 =head1 PIR AND PASM CODE
 
-Let's say you have written (or generated) a huge .pasm or .imc file.
-It's not working. You'd like some help in figuring out why.
+Let's say you have written (or generated) a huge .pasm or .imc file.  It's not
+working. You'd like some help in figuring out why.
 
 =head2 pdb
 
-One possible tool is C<pdb>, the Parrot Debugger. See
-F<docs/debugger.pod> for details on it.
+One possible tool is C<pdb>, the Parrot Debugger. See F<docs/debugger.pod> for
+details on it.
 
 =head2 stabs
 
-If you are running on a jit-capable machine, you can also try using
-C<gdb> by having the JIT compiler generate C<stabs> metadata and then stepping
-through the code with C<gdb> as if it were any other language.
+If you are running on a jit-capable machine, you can also try using C<gdb> by
+having the JIT compiler generate C<stabs> metadata and then stepping through
+the code with C<gdb> as if it were any other language.
 
-To use this, you'll want to use C<parrot> to generate your bytecode
-(.pbc file). It is not strictly necessary, but you'll get more
-information into the bytecode this way.
+To use this, you'll want to use C<parrot> to generate your bytecode (.pbc
+file). It is not strictly necessary, but you'll get more information into the
+bytecode this way.
 
-Let's say your file is named C<test.pasm>. (Note: these instructions
-will also work if you use C<test.imc> everywhere C<test.pasm> occurs.)
+Let's say your file is named C<test.pasm>. (Note: these instructions will also
+work if you use C<test.imc> everywhere C<test.pasm> occurs.)
 
 Step 1: Generate the .pbc file with extra debugging information.
 
@@ -114,9 +111,9 @@ Step 4: Run your program under C<gdb> with JIT and debugging on
 
   gdb> run -j -D4 test.pbc
 
-Step 5: C<gdb> will stop at the beginning of runops_jit. Step through the
-lines until just before the JITted code is executed (the line will be
-something like C<(jit_code)(interpreter,pc)>.
+Step 5: C<gdb> will stop at the beginning of runops_jit. Step through the lines
+until just before the JITed code is executed (the line will be something like
+C<(jit_code)(interpreter,pc)>.
 
   gdb> n
   gdb> n
@@ -124,37 +121,34 @@ something like C<(jit_code)(interpreter,pc)>.
   .
   .
 
-Step 6: load in the debugging information from the symbol file that
-the jit just generated.
+Step 6: load in the debugging information from the symbol file that the jit
+just generated.
 
   gdb> add-symbol-file test.o 0
 
-Step 7: Step into the JITted code
+Step 7: Step into the JITed code
 
   gdb> s
 
-At this point, you can step through the instructions, or print out the
-various Parrot registers. C<gdb> will know about I0-I31, N0-N31, S0-S31,
-and P0-P31.
+At this point, you can step through the instructions, or print out the various
+Parrot registers. C<gdb> will know about I0-I31, N0-N31, S0-S31, and P0-P31.
 
 WARNING: Stepping too far
 
-One thing to watch out for is that C<gdb> gets confused when attempting
-to step over certain instructions. The only ones that I have noticed
-having problems is keyed operations. With my version of C<gdb>, if I do
-'n' to step over the instruction, C<gdb> will start running and only stop
-when the entire parrot program has finished. To work around this, do
-'si' twice just before executing any keyed op. For some reason, C<gdb>
-can then figure out when it's supposed to stop next. If you know of a
-better technique, please let the mailing list know
+One thing to watch out for is that C<gdb> gets confused when attempting to step
+over certain instructions. The only ones that I have noticed having problems is
+keyed operations. With my version of C<gdb>, if I do 'n' to step over the
+instruction, C<gdb> will start running and only stop when the entire parrot
+program has finished. To work around this, do 'si' twice just before executing
+any keyed op. For some reason, C<gdb> can then figure out when it's supposed to
+stop next. If you know of a better technique, please let the mailing list know
 (C<perl6-internals@perl.org>).
 
 =head1 PIR CODE GENERATION
 
-The C<parrot> binary has a bunch of debugging flags for spewing out
-information about various aspects of its processing. See
-F<imcc/docs/running.pod> for a list of flags. Or have a look at the
-information provided by:
+The C<parrot> binary has a bunch of debugging flags for spewing out information
+about various aspects of its processing. See F<imcc/docs/running.pod> for a
+list of flags. Or have a look at the information provided by:
 
   shell> parrot --help
 
@@ -169,10 +163,10 @@ or
 =item Version 1.1
 
 Updates to remove references to C<imcc> by
-<Bernhard.Schmalhofer@biomax.de>
+C<Bernhard.Schmalhofer@biomax.de>
 
 =item Version 1.0
 
-First version by Steve Fink <steve@fink.com>
+First version by Steve Fink C<steve@fink.com>
 
 =back

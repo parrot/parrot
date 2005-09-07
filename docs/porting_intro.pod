@@ -155,8 +155,8 @@ See F<thr_pthread.h> for an example of this.
 
 Parrot must be able to receive asynchronous imperative and advisory messages
 from the operating system and other local processes in a safe manner.
-Typically this is done by registering message-specific callback functions,
-to which the operating system transfers control when signals are generated.
+Typically this is done by registering message-specific callback functions, to
+which the operating system transfers control when signals are generated.
 
 =head2 How to help
 
@@ -184,7 +184,7 @@ thereof are greatly needed.
 Nearly all modern operating systems support runtime-specified importation of
 shared library object code, and Parrot must support this feature in order to
 use native libraries without relying on the system linker.  Notable APIs for
-this mechanism include dlopen on common *NIXes and LoadLibrary on Win32.
+this mechanism include C<dlopen()> on common *NIXes and LoadLibrary on Win32.
 
 =head2 How to help
 

@@ -7,24 +7,24 @@ docs/parrot.pod - Parrot
 
 =head1 The Parrot Bytecode Interpreter
 
-Parrot is a common bytecode format and interpreter for dynamic
-languages; it is designed to run Perl 6 code efficiently, but 
-is also intended to be language-agnostic. 
+Parrot is a common bytecode format and interpreter for dynamic languages; it is
+designed to run Perl 6 code efficiently, but is also intended to be
+language-agnostic. 
 
 =head2 Documentation
 
-The Parrot documentation is spread across a wide range of files.
-Good starting points are:
+The Parrot documentation is spread across a wide range of files.  Good starting
+points are:
 
 =over 4
 
 =item F<intro.pod>
 
-An introductory article on what Parrot is and how to do some
-interesting things with it.
+An introductory article on what Parrot is and how to do some interesting things
+with it.
 
-(Note that this was originally written around the time of Parrot v0.0.2,
-and is in need of some updating).
+(Note that this was originally written around the time of Parrot v0.0.2, and is
+in need of some updating).
 
 =item F<overview.pod>
 
@@ -32,8 +32,7 @@ An overview of the Parrot architecture and design.
 
 =item F<running.pod>
 
-Brief descriptions of the different executables and how to
-run them.
+Brief descriptions of the different executables and how to run them.
 
 =item F<faq.pod>
 
@@ -46,41 +45,41 @@ A guide to some of the jargon that crops up repeatedly in Parrot development
 
 =back
 
-More detailed information on the design and implementation of Parrot can
-be found in:
+More detailed information on the design and implementation of Parrot can be
+found in:
 
 =over 4
 
 =item F<pdds/>
 
 This subdirectory contains all of the current Parrot Design Documents (PDDs).
-These are intended to be detailed guides to the design of the various
-Parrot subsystems; for instance, F<pdd03_calling_conventions.pod> specifies 
-Parrot's inter-routine calling conventions.
+These are intended to be detailed guides to the design of the various Parrot
+subsystems; for instance, F<pdd03_calling_conventions.pod> specifies Parrot's
+inter-routine calling conventions.
 
 =item F<ops/>
 
-This subdirectory contains documentation files that are created from the 
-corresponding opcode files at build time. These files describe what each
-opcode does and specify what arguments they take. 
+This subdirectory contains documentation files that are created from the
+corresponding opcode files at build time. These files describe what each opcode
+does and specify what arguments they take. 
 
 =item F<pmc/>
 
-This subdirectory contains documentation on several of the PMC types 
-available to Parrot. Currently only a few of the available PMCs have 
-been documented. (Patches welcome!)
+This subdirectory contains documentation on several of the PMC types available
+to Parrot. Currently only a few of the available PMCs have been documented.
+(Patches welcome!)
 
 =item F<dev/>
 
 This subdirectory contains a number of files discussing various implementation
-decisions made during the course of the development of Parrot. The intent is
-to keep discussion of implementation-specific issues separate from the 
-basic design issues discussed in the PDDs.
+decisions made during the course of the development of Parrot. The intent is to
+keep discussion of implementation-specific issues separate from the basic
+design issues discussed in the PDDs.
 
 =item F<vtables.pod>
 
-A brief introduction to the vtable at the heart of all PMCs, and how
-to implement your own PMC type.
+A brief introduction to the vtable at the heart of all PMCs, and how to
+implement your own PMC type.
 
 =item F<embed.pod>
 
@@ -123,20 +122,24 @@ Documentation for C<pdb>, the Parrot debugger.
 
 =head2 Supported Platforms
 
-Parrot compiles and runs on a large number of platforms, including
-all common ones. The Parrot team is committed to supporting the 
-following combinations as "core platforms": Linux (x86), CygWin,
-Win32, Tru64, OpenVMS (Alpha), Solaris (Sparc), FreeBSD (x86).
+Parrot compiles and runs on a large number of platforms, including all common
+ones. The Parrot team is committed to supporting the following combinations as
+"core platforms": Linux (x86), CygWin, Win32, Tru64, OpenVMS (Alpha), Solaris
+(Sparc), FreeBSD (x86).
 
 =head2 Authors
 
 Parrot is developed and maintained by the members of the
 C<perl6-internals@perl.org> mailing list. The list is archived at:
-C<http://nntp.perl.org/group/perl.perl6.internals> 
+L<http://nntp.perl.org/group/perl.perl6.internals> 
 
 =over 4
 
-=item * Dan Sugalski (C<dan@sidhe.org>) is the chief architect.
+=item * Chip Salzenberg (C<chip@pobox.com>) is the chief architect.  The mental
+institution he escaped from to accept the role is still searching for him.
+
+=item * Dan Sugalski (C<dan@sidhe.org>) was the chief architect for the first
+I<5 years> of the project.  Parrot is largely his brainchild.
 
 =item * Leopold Toetsch (C<lt@toetsch.at>) is the current release manager.
 
@@ -155,11 +158,11 @@ See:
 
 =over 4
 
-=item * http://dev.perl.org/
+=item * L<http://dev.perl.org/>
 
-=item * http://svn.perl.org/
+=item * L<http://svn.perl.org/>
 
-=item * http://www.parrotcode.org/
+=item * L<http://www.parrotcode.org/>
 
 =back
 

@@ -11,21 +11,21 @@ How to submit bug reports, patches and new files to Parrot.
 
 =head1 How To Submit A Bug Report
 
-If you encounter an error while working with Parrot, and don't
-understand what is causing it, then submit a bug report using
-the F<parrotbug> utility. The simplest way to use it is to run 
+If you encounter an error while working with Parrot, and don't understand what
+is causing it, then submit a bug report using the F<parrotbug> utility. The
+simplest way to use it is to run 
 
     % ./parrotbug
 
 in the distribution's root directory, and follow the prompts.
 
-However, if you do know how to fix the problem you encountered,
-then think about submitting a patch.
+However, if you do know how to fix the problem you encountered, then think
+about submitting a patch.
 
 =head1 How To Submit A Patch
 
-Try to keep your patches specific to a single change, and ensure that
-your change does not break any tests.
+Try to keep your patches specific to a single change, and ensure that your
+change does not break any tests.
 
 =over
 
@@ -33,18 +33,17 @@ your change does not break any tests.
 
 Create the patch.
 
-In the following examples, F<parrot> contains the Parrot distribution,
-and F<parrotdev> contains F<parrot>. The name F<parrotdev> is just a
-placeholder for whatever the distribution's parent directory is called
-on your machine.
+In the following examples, F<parrot> contains the Parrot distribution, and
+F<parrotdev> contains F<parrot>. The name F<parrotdev> is just a placeholder
+for whatever the distribution's parent directory is called on your machine.
 
 =over
 
 =item Single C<diff>
 
-If the change you wish to make is small it will generally effect only
-one or two files, in which case supply a C<diff> for each file. The
-C<diff> should be created in F<parrot>.
+If the change you wish to make is small it will generally effect only one or
+two files, in which case supply a C<diff> for each file. The C<diff> should be
+created in F<parrot>.
 
     cd parrot
     diff -u docs/submissions.pod docs/submissions.new > submissions.patch
@@ -53,10 +52,10 @@ Win32 users will probably need C<-ub>.
 
 =item Recursive C<diff>
 
-If the change is more wide-ranging, then create an identical copy of
-F<parrot> in F<parrotdev> and rename it F<parrot.new>. Modify
-F<parrot.new> and run a recursive C<diff> on the two directories to
-create your patch. The C<diff> should be created in F<parrotdev>.
+If the change is more wide-ranging, then create an identical copy of F<parrot>
+in F<parrotdev> and rename it F<parrot.new>. Modify F<parrot.new> and run a
+recursive C<diff> on the two directories to create your patch. The C<diff>
+should be created in F<parrotdev>.
 
     cd parrotdev
     diff -ur --exclude='.svn' parrot parrot.new > docs.patch
@@ -88,16 +87,16 @@ Prefix it with a C<[PATCH]> identifier.
 
 =item 5
 
-The message body should contain an explanation of the purpose of the
-patch, and a list of all files affected with summary of the changes made
-in each file.
+The message body should contain an explanation of the purpose of the patch, and
+a list of all files affected with summary of the changes made in each file.
+Optionally, the output of the C<diffstat(1)> utility when run on your patch(s)
+may be included at the bottom of the message body.
 
 =item 6
 
 Attach the patch file(s).
 
-Double-check that you've actually done this, because it's easy to
-forget.
+Double-check that you've actually done this, because it's easy to forget.
 
 B<DO NOT> paste the patch file content into the body of the message.
 
@@ -109,24 +108,23 @@ Send the mail.
 
 =head2 Applying Patches
 
-You may wish to apply a patch submitted by someone else before the patch
-is incorporated into SVN.
+You may wish to apply a patch submitted by someone else before the patch is
+incorporated into SVN.
 
 For single C<diff> patches, copy the patch file to F<parrot>, and run:
 
     cd parrot
     patch -p0 < single.patch
 
-For recursive C<diff> patches, copy the patch file to F<parrotdev>, and
-run:
+For recursive C<diff> patches, copy the patch file to F<parrotdev>, and run:
 
     cd parrotdev
     patch -p0 < recursive.patch
 
 =head2 Configuration of to be ignored files
 
-Sometimes new files will be created in the configuration and build process
-of Parrot. These files should not show up when checking the distribution with
+Sometimes new files will be created in the configuration and build process of
+Parrot. These files should not show up when checking the distribution with
 
     svn status
 
@@ -151,11 +149,15 @@ If you have a new feature to add to Parrot, such as a new test.
 
 =item 1
 
-Add your new file path(s), relative to F<parrot>, to the file MANIFEST. Create a patch for the MANIFEST file according to the instructions above in B<How To Submit A Patch>
+Add your new file path(s), relative to F<parrot>, to the file MANIFEST. Create
+a patch for the MANIFEST file according to the instructions above in B<How To
+Submit A Patch>
 
 =item 2
 
-If you have a new test script ending in .t, some mailers may become confused and consider it an application/x-troff. One way around this (for *nix users) is to diff the file against /dev/null like this:
+If you have a new test script ending in .t, some mailers may become confused
+and consider it an application/x-troff. One way around this (for *nix users) is
+to diff the file against /dev/null like this:
 
     cd parrot
     diff -u /dev/null newfile.t > newfile.patch
@@ -176,15 +178,15 @@ Prefix it with a C<[NEW]> identifier.
 
 =item 6
 
-The message body should contain an explanation of the purpose of the
-feature you are adding.
+The message body should contain an explanation of the purpose of the feature
+you are adding.  Optionally, the output of the C<diffstat(1)> utility when run
+on your patch(s) may be included at the bottom of the message body.
 
 =item 7
 
 Attach the patch for MANIFEST and your new file(s).
 
-Double-check that you've actually done this, because it's easy to
-forget.
+Double-check that you've actually done this, because it's easy to forget.
 
 B<DO NOT> paste the content of the new file or files into the body of
 the message.
@@ -197,23 +199,24 @@ Send the mail.
 
 =head1 What Happens Next?
 
-RT creates a ticket for the submission, and you will receive an automatic
-reply with details of the ticket identifier. This identifier should be
-used in all further correspondence concerning the submission.
+RT creates a ticket for the submission, and you will receive an automatic reply
+with details of the ticket identifier. This identifier should be used in all
+further correspondence concerning the submission.
 
 Everyone on the list sees the submission, and can comment on it. A
 developer with SVN commit authority will commit it to SVN once it is
 clear that it is the right thing to do.
 
-Even those developers with SVN commit authority stick to this scheme for
-all but the most trivial of their own patches, to allow time for peer
-review of their changes.
+Even those developers with SVN commit authority stick to this scheme for all
+but the most trivial of their own patches, to allow time for peer review of
+their changes.
 
 You can check the progress of your submission at the Parrot bugs page
-L<http://bugs6.perl.org/>. If you have trouble logging in try username
-C<guest> with password C<guest>.
+L<http://bugs6.perl.org/>. If you have trouble logging in try username C<guest>
+with password C<guest>.
 
-A Parrot Bug Summary page is also generated and can be viewed here L<http://rt.perl.org/rt3/NoAuth/parrot/Overview.html>
+A Parrot Bug Summary page is also generated and can be viewed here
+L<http://rt.perl.org/rt3/NoAuth/parrot/Overview.html>
 
 A list of all the unresolved patches is at
 L<http://www.parrotcode.org/openpatches.html>

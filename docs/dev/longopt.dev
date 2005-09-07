@@ -7,27 +7,27 @@ docs/dev/longopt.dev - Long option parsing
 
 =head1 SUMMARY
 
-The files F<longopt.c> and F<longopt.h> implement rudimentary long option 
-parsing.  They have little to do with Parrot itself, other than that the 
-parrot binary and imcc both needed long options. So this gives it to them.
+The files F<longopt.c> and F<longopt.h> implement rudimentary long option
+parsing.  They have little to do with Parrot itself, other than that the parrot
+binary and imcc both needed long options. So this gives it to them.
 
 =head1 USAGE
 
-To use longopt, you first need to #include "parrot/longopt.h"
-(it comes with parrot/parrot.h, too).  Then you need to set up
-the options table, which is an array of C<struct longopt_opt_decl>s.
+To use longopt, you first need to #include "parrot/longopt.h" (it comes with
+parrot/parrot.h, too).  Then you need to set up the options table, which is an
+array of C<struct longopt_opt_decl>s.
 
-Each element of this array has four components:  the short option,
-the option id (generally the same as the short option), some flags,
-and finally a list of up to nine long options (all for this one behavior), 
-terminated with a NULL pointer.
+Each element of this array has four components:  the short option, the option
+id (generally the same as the short option), some flags, and finally a list of
+up to nine long options (all for this one behavior), terminated with a NULL
+pointer.
 
-There is currently one possible flag: OPTION_required_FLAG, which
-states that this option has a required argument.  Optional arguments
-are not supported, and they should be.
+There is currently one possible flag: OPTION_required_FLAG, which states that
+this option has a required argument.  Optional arguments are not supported, and
+they should be.
 
-The array should be terminated with an element that has 0 for the 
-option id.  So, for example:
+The array should be terminated with an element that has 0 for the option id.
+So, for example:
 
     struct longopt_opt_decl options[] = {
         { 'f', 'f', 0,                    { "--foo", NULL } },
@@ -46,22 +46,22 @@ Some various ways you could give these options on the command line follow:
     program -barg -f somefile
     program -fbarg somefile
 
-So it basically behaves how most GNU programs do.  It accepts - as a
-real argument, and -- as a non argument, but that specifies that
-only non-flags will follow.  Again, just like GNU.
+So it basically behaves how most GNU programs do.  It accepts - as a real
+argument, and -- as a non argument, but that specifies that only non-flags will
+follow.  Again, just like GNU.
 
-No options can follow a non-option, however.  This is because programs
-that this is written for, like parrot, usually want to pass options
-given after the file to the file they're executing.
+No options can follow a non-option, however.  This is because programs that
+this is written for, like parrot, usually want to pass options given after the
+file to the file they're executing.
 
 =head1 BUGS
 
-It won't complain if you don't give it an argument to an option expecting
-one.  It will just set the opt_arg pointer to NULL.
+It won't complain if you don't give it an argument to an option expecting one.
+It will just set the opt_arg pointer to NULL.
 
-It won't complain if you give an argument to an option not expecting one.
-It will just ignore it (this only applies to the --foo=bar style).
+It won't complain if you give an argument to an option not expecting one.  It
+will just ignore it (this only applies to the --foo=bar style).
 
 =head1 AUTHOR
 
-    Luke Palmer  <fibonaci@babylonia.flatirons.org>
+    Luke Palmer  C<fibonaci@babylonia.flatirons.org>

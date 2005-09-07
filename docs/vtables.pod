@@ -7,42 +7,38 @@ docs/vtables.pod - Parrot Vtables
 
 =head1 Implementing Variable Types with Vtables
 
-This is a guide to creating your own PMC (Parrot Magic Cookie) classes.
-It tells you what you need to write in order to add new variable types
-to Parrot.
+This is a guide to creating your own PMC (Parrot Magic Cookie) classes.  It
+tells you what you need to write in order to add new variable types to Parrot.
 
 =head2 Overview
 
-The guts of the Parrot interpreter are by design ignorant (or, if you
-want to be less disparaging, agnostic) of the intricacies of variable
-type behaviour. The standard example is the difference between Perl
-scalars and Python scalars. In Perl, if you have
+The guts of the Parrot interpreter are by design ignorant (or, if you want to
+be less disparaging, agnostic) of the intricacies of variable type behavior.
+The standard example is the difference between Perl scalars and Python scalars.
+In Perl, if you have
 
     $a = "a9";
     $a++;
 
 you end up with C<$a> being C<b0>. This is because of the magic of the Perl
-increment operator. In Python, on the other hand, you'd get a
-runtime error.
+increment operator. In Python, on the other hand, you'd get a runtime error.
 
 =over 3
 
 =item *
 
-To be perfectly honest, this is a slightly flawed example, since it's
-unlikely that there will be a distinct "Python scalar" PMC class.
-The Python compiler could well type-inference variables such that
-C<a> would be a C<PythonString> and C<b> would be a C<PythonNumber>.
-But the point remains - incrementing a C<PythonString> is very different
-from incrementing a C<PerlScalar>.
+To be perfectly honest, this is a slightly flawed example, since it's unlikely
+that there will be a distinct "Python scalar" PMC class.  The Python compiler
+could well type-inference variables such that C<a> would be a C<PythonString>
+and C<b> would be a C<PythonNumber>.  But the point remains - incrementing a
+C<PythonString> is very different from incrementing a C<PerlScalar>.
 
 =back
 
-Since the behaviour is a function of the "type" of the PMC, it's
-natural to consider the various different types of PMC as classes
-in an object-oriented system. The Parrot interpreter calls methods on
-the individual PMC objects to manipulate them. So the example above
-would translate to something like:
+Since the behavior is a function of the "type" of the PMC, it's natural to
+consider the various different types of PMC as classes in an object-oriented
+system. The Parrot interpreter calls methods on the individual PMC objects to
+manipulate them. So the example above would translate to something like:
 
 =over 3
 
@@ -60,47 +56,43 @@ Call a method to tell it to increment itself.
 
 =back
 
-And if you replace PerlScalar with PythonString, you get different
-behaviour but to the fundamental guts of the interpreter, the
-instructions are the same. PMCs are an abstract virtual class; the
-interpreter calls a method, the PMC object does the right thing, and the
-interpreter shouldn't have to care particularly what that right thing
-happens to be.
+And if you replace PerlScalar with PythonString, you get different behavior but
+to the fundamental guts of the interpreter, the instructions are the same. PMCs
+are an abstract virtual class; the interpreter calls a method, the PMC object
+does the right thing, and the interpreter shouldn't have to care particularly
+what that right thing happens to be.
 
-Hence, adding a new data type to Parrot is a question of providing
-methods which implement that data type's expected behaviour. Let's
-now look at how one is supposed to do this.
+Hence, adding a new data type to Parrot is a question of providing methods
+which implement that data type's expected behavior. Let's now look at how one
+is supposed to do this.
 
 =head2 Starting out
 
-If you're adding data types to the core of Parrot, (and you've checked
-with Chip that you're supposed to be doing so) you should be creating a
-file in the F<classes/> subdirectory; this is where all the built-in PMC
-classes live. (And a good source of examples to plunder even if you're
-not writing a core data type.)
+If you're adding data types to the core of Parrot, (and you've checked with
+Chip that you're supposed to be doing so) you should be creating a file in the
+F<classes/> subdirectory; this is where all the built-in PMC classes live. (And
+a good source of examples to plunder even if you're not writing a core data
+type.)
 
-You should almost always start by running F<classes/genclass.pl> to
-generate a skeleton for the class. Let's generate a number type for the
-beautifully non-existent Fooby language:
+You should almost always start by running F<classes/genclass.pl> to generate a
+skeleton for the class. Let's generate a number type for the beautifully
+non-existent Fooby language:
 
     % perl -I../lib genclass.pl FoobyNumber > foobynumber.pmc
 
 This will produce a skeleton C file (to be preprocessed by the
-F<build_tools/pmc2c.pl> program) with stubs for all the methods you need
-to fill in. The function C<init> allows you to set up anything you need
-to set up.
+F<build_tools/pmc2c.pl> program) with stubs for all the methods you need to
+fill in. The function C<init> allows you to set up anything you need to set up.
 
-Now you'll have to do something a little different depending on whether
-you're writing a built-in class or an extension class. If you're writing
-a built-in class, then you'll see a reference to
-C<enum_class_FoobyNumber> in the C<init> function. For built-in classes,
-this is automatically defined in F<pmc.h> when you run F<Configure.pl>.
-If you're not writing a built-in class, you need to indicate this by
-using the 'extension' keyword after the 'pmclass YOURCLASS' declaration
-in F<classes/YOURCLASS.pmc>. Then, change the
-type of the C<init> function to return C<struct _vtable>, and then
-return C<temp_base_vtable> instead of assigning to the
-C<Parrot_base_vtables> array.
+Now you'll have to do something a little different depending on whether you're
+writing a built-in class or an extension class. If you're writing a built-in
+class, then you'll see a reference to C<enum_class_FoobyNumber> in the C<init>
+function. For built-in classes, this is automatically defined in F<pmc.h> when
+you run F<Configure.pl>.  If you're not writing a built-in class, you need to
+indicate this by using the 'extension' keyword after the 'pmclass YOURCLASS'
+declaration in F<classes/YOURCLASS.pmc>. Then, change the type of the C<init>
+function to return C<struct _vtable>, and then return C<temp_base_vtable>
+instead of assigning to the C<Parrot_base_vtables> array.
 
 To finish up adding a built-in class:
 
@@ -118,18 +110,18 @@ Rerun F<Configure.pl> to add your new PMC to the set of built-in PMCs.
 
 =head2 What You Can and Cannot Do
 
-The usual way to continue from the F<genclass.pl>-generated skeleton
-is to define a structure that will hook onto the C<data>, if your data
-type needs to use that, and then also define some user-defined flags.
+The usual way to continue from the F<genclass.pl>-generated skeleton is to
+define a structure that will hook onto the C<data>, if your data type needs to
+use that, and then also define some user-defined flags.
 
-Flags are accessed by C<< pmc->flags >>. Most of the bits in the flag word
-are reserved for use by parrot itself, but a number of them have been
-assigned for general use by individual classes. These are referred to as
+Flags are accessed by C<< pmc->flags >>. Most of the bits in the flag word are
+reserved for use by parrot itself, but a number of them have been assigned for
+general use by individual classes. These are referred to as
 C<Pobj_private0_FLAG> .. C<Pobj_private7_FLAG>. (The '7' may change during the
 early development of parrot, but will become pretty fixed at some point.)
 
-Normally, you will want to alias these generic bit names to something
-more meaningful within your class:
+Normally, you will want to alias these generic bit names to something more
+meaningful within your class:
 
     enum {
         Foobynumber_is_bignum = Pobj_private0_FLAG,
@@ -137,37 +129,36 @@ more meaningful within your class:
         ....
     };
 
-You're quite at liberty to declare these in a separate header file, but I
-find it more convenient to keep everything together in F<foobynumber.c>.
-To manipulate the flags, use the macros listed in F<pobj.h>.
+You're quite at liberty to declare these in a separate header file, but I find
+it more convenient to keep everything together in F<foobynumber.c>.  To
+manipulate the flags, use the macros listed in F<pobj.h>.
 
-You may also use the C<cache> union in the PMC structure to remove
-some extraneous dereferences in your code if that would help.
+You may also use the C<cache> union in the PMC structure to remove some
+extraneous dereferences in your code if that would help.
 
 =head2 Multimethods
 
-One slightly (potentially) tricky element of implementing vtables
-is that several of the vtable functions have variant forms depending on
-the type of data that they're being called with.
+One slightly (potentially) tricky element of implementing vtables is that
+several of the vtable functions have variant forms depending on the type of
+data that they're being called with.
 
-For instance, the C<set_integer> method has multiple forms; the
-default C<set_integer> means that you are being called with a PMC,
-and you should probably use the C<get_integer> method of the PMC to
-find its integer value; C<set_integer_native> means you're being passed
-an C<INTVAL>. The final form is slightly special; if the
-interpreter calls C<set_integer_same>, you know that the PMC that you
-are being passed is of the same type as you. Hence, you can break the
-class abstraction to save a couple of dereferences - if you want to.
+For instance, the C<set_integer> method has multiple forms; the default
+C<set_integer> means that you are being called with a PMC, and you should
+probably use the C<get_integer> method of the PMC to find its integer value;
+C<set_integer_native> means you're being passed an C<INTVAL>. The final form is
+slightly special; if the interpreter calls C<set_integer_same>, you know that
+the PMC that you are being passed is of the same type as you. Hence, you can
+break the class abstraction to save a couple of dereferences - if you want to.
 
-Similar shortcuts exist for strings, (C<native> and C<same>) and
-floating point numbers.
+Similar shortcuts exist for strings, (C<native> and C<same>) and floating point
+numbers.
 
 =head2 Implementing methods
 
-The master list of vtable methods can be found in F<vtable.tbl> in
-the root directory of the Parrot source, with documentation in
-F<docs/pdds/pdd02_vtables.pod>. A few of these are very important, 
-for instance:
+The master list of vtable methods can be found in F<vtable.tbl> in the root
+directory of the Parrot source, with documentation in
+F<docs/pdds/pdd02_vtables.pod>. A few of these are very important, for
+instance:
 
 =over 3
 
@@ -185,9 +176,9 @@ Do any data set-up you need to do.
 
 =item C<is_equal>
 
-True if the passed-in PMC has the same B<value> as you. For instance,
-a Perl integer and a Python integer could have the same value, but
-could not be the same thing as defined by C<is_same>.
+True if the passed-in PMC has the same B<value> as you. For instance, a Perl
+integer and a Python integer could have the same value, but could not be the
+same thing as defined by C<is_same>.
 
 =item C<clone>
 
@@ -205,8 +196,8 @@ Turn yourself into the specified type.
 
 =item C<destroy>
 
-Do any data shut-down and finalization you need to do. To have this
-method called, you must set the C<Pobj_active_destroy_FLAG>.
+Do any data shut-down and finalization you need to do. To have this method
+called, you must set the C<Pobj_active_destroy_FLAG>.
 
 =item C<get_integer>
 
@@ -218,10 +209,10 @@ Return a floating-point representation of yourself.
 
 =item C<get_string>
 
-Return a string representation of yourself (a STRING* object), this
-should be a B<copy> of whatever string you are holding, not just a
-pointer to your own string so that anything that calls this method can
-happily modify this value without making a mess of your guts.
+Return a string representation of yourself (a STRING* object), this should be a
+B<copy> of whatever string you are holding, not just a pointer to your own
+string so that anything that calls this method can happily modify this value
+without making a mess of your guts.
 
 =item C<get_bool>
 
@@ -233,13 +224,12 @@ Return your private data as a raw pointer.
 
 =item C<is_same>
 
-True if the passed-in PMC refers to exactly the same B<data> as
-you. (Contrast C<is_equal>)
+True if the passed-in PMC refers to exactly the same B<data> as you. (Contrast
+C<is_equal>)
 
 =item C<set_integer>
 
-Set yourself to the passed-in integer value. This is an integer
-multimethod.
+Set yourself to the passed-in integer value. This is an integer multimethod.
 
 =item C<set_number>
 
@@ -252,20 +242,20 @@ Set yourself to the passed-in string. This is a string multimethod.
 
 =item C<set_value>
 
-Set your private data to the raw pointer passed in. This will only
-be used in exceptional circumstances.
+Set your private data to the raw pointer passed in. This will only be used in
+exceptional circumstances.
 
 =item C<add>
 
-Fetch the number part of C<value> and add your numeric value to it,
-storing the result in C<dest>. (Probably by calling its C<set_integer>
-or C<set_number> method) This is a numeric multimethod.
+Fetch the number part of C<value> and add your numeric value to it, storing the
+result in C<dest>. (Probably by calling its C<set_integer> or C<set_number>
+method) This is a numeric multimethod.
 
 =item C<subtract>
 
 Fetch the number part of C<value> and subtract your numeric value from it,
-storing the result in C<dest>. (Probably by calling its C<set_integer>
-or C<set_number> method) This is a numeric multimethod.
+storing the result in C<dest>. (Probably by calling its C<set_integer> or
+C<set_number> method) This is a numeric multimethod.
 
 =item C<multiply>
 
@@ -277,9 +267,9 @@ You get the picture.
 
 =item C<concatenate>
 
-Fetch the string part of C<value> and catenate it to yourself,
-storing the result in C<dest>. (Probably by calling its C<set_string>
-method) This is a string multimethod.
+Fetch the string part of C<value> and concatenate it to yourself, storing the
+result in C<dest>. (Probably by calling its C<set_string> method) This is a
+string multimethod.
 
 =item C<logical_or>
 
@@ -294,23 +284,21 @@ Set yourself to be a logical negation of the value passed in.
 
 =item C<repeat>
 
-Repeat your string representation C<value> times and store the result
-in C<dest>.
+Repeat your string representation C<value> times and store the result in
+C<dest>.
 
 =back
 
-If any method doesn't fit into your class, just don't implement it
-and don't provide an empty function body. The default class, which all
-classes inherit from, will throw an exception, if this method would
-be called.
+If any method doesn't fit into your class, just don't implement it and don't
+provide an empty function body. The default class, which all classes inherit
+from, will throw an exception, if this method would be called.
 
-If your class is a modification of an existing class, you may wish to
-use inheritance. At the beginning of your vtable specification in
-classes/YOURCLASS.pmc, add the C<extends SUPERCLASS> phrase. For
-example:
+If your class is a modification of an existing class, you may wish to use
+inheritance. At the beginning of your vtable specification in
+classes/YOURCLASS.pmc, add the C<extends SUPERCLASS> phrase. For example:
 
   pmclass PackedArray extends Array { ...
 
-See the POD documentation in F<build_tools/pmc2c.pl> for a list of
-useful keywords that you may use in the .pmc file. (Run
-C<perldoc -F pmc2c.pl> to view the POD.)
+See the POD documentation in F<build_tools/pmc2c.pl> for a list of useful
+keywords that you may use in the .pmc file. (Run C<perldoc -F pmc2c.pl> to view
+the POD.)

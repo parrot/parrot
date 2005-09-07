@@ -64,8 +64,8 @@ Assume PBC file on stdin, run it.
 
 =item -d, --debug [hexbits]
 
-The B<-d> switch takes an optional argument which is considered to hold
-a hex value of debug bits. Without a value, debug is set to 1.
+The B<-d> switch takes an optional argument which is considered to hold a hex
+value of debug bits. Without a value, debug is set to 1.
 
 The individual bits are:
 
@@ -82,9 +82,9 @@ The individual bits are:
 
 These can be listed on the command line by use of the B<--help-debug> switch.
 
-To produce really huge output on F<stderr> run "imcc B<-d 0ffff> ...".
-Note: if the argument is separated by whitespace from the B<-d> switch,
-it has to start with a number.
+To produce really huge output on F<stderr> run "imcc B<-d 0ffff> ...".  Note:
+if the argument is separated by whitespace from the B<-d> switch, it has to
+start with a number.
 
 =item -h, --help
 
@@ -97,9 +97,9 @@ Print debugging and tracing flag bits summary.
 =item -o outputfile, --output=outputfile
 
 Act like an assembler. Don't run code, unless B<-r> is given too. If the
-outputfile ends with B<.pbc>, a PBC file is written. If it ends with
-B<.pasm>, a PASM output is generated, even from PASM input. This can be
-handy to check various optimizations, including B<-Op>.
+outputfile ends with B<.pbc>, a PBC file is written. If it ends with B<.pasm>,
+a PASM output is generated, even from PASM input. This can be handy to check
+various optimizations, including B<-Op>.
 
 =item --output-pbc
 
@@ -109,15 +109,14 @@ does not end in B<.pbc>
 =item -r, --run-pbc
 
 Only useful after B<-o> or B<--output-pbc>. Run the program from the compiled
-in-memory image. If two B<-r> options are given, the B<.pbc> file is read
-from disc and run. This is mainly needed for tests.
+in-memory image. If two B<-r> options are given, the B<.pbc> file is read from
+disc and run. This is mainly needed for tests.
 
 =item -v, --verbose
 
-One B<-v> shows which files are worked on and prints a summary
-over register usage and optimization stats per I<compilation unit>.
-With two B<-v> switches, IMCC prints a line per individual processing
-step too.
+One B<-v> shows which files are worked on and prints a summary over register
+usage and optimization stats per I<compilation unit>.  With two B<-v> switches,
+IMCC prints a line per individual processing step too.
 
 =item -y, --yydebug
 
@@ -136,9 +135,8 @@ Optimize
  -Op rewrite I and N PASM registers most used first
  -Ot select fastest run core (default with -O1 and -O2)
 
-See F<imcc/docs/operation.pod> for more information on the optimizer.
-NB. Optimization is currently experimental and these options are likely
-to change.
+See F<imcc/docs/operation.pod> for more information on the optimizer.  NB.
+Optimization is currently experimental and these options are likely to change.
 
 =item -E, --pre-process-only
 
@@ -202,8 +200,8 @@ Turn on interpreter debug flag. See 'parrot --help-debug' for aviable flag bits.
 
 =item --gc-debug
 
-Turn on GC (Garbage Collection) debugging. This imposes some stress on the
-GC subsystem and can slow down execution considerably.
+Turn on GC (Garbage Collection) debugging. This imposes some stress on the GC
+subsystem and can slow down execution considerably.
 
 =item -G, --no-gc
 
@@ -229,9 +227,9 @@ Print the runtime prefix path and exit.
 
 If the file ends in B<.pbc> it will be interpreted immediately.
 
-If the file ends in B<.pasm>, then it is parsed as PASM code. Otherwise,
-it is parsed as PIR code. In both cases, it will then be run, unless the
-B<-o> flag was given.
+If the file ends in B<.pasm>, then it is parsed as PASM code. Otherwise, it is
+parsed as PIR code. In both cases, it will then be run, unless the B<-o> flag
+was given.
 
 If the B<file> is a single dash, input from B<stdin> is read.
 
@@ -281,6 +279,6 @@ F<main.c>
 
 =head1 AUTHOR
 
-Leopold Toetsch <lt@toetsch.at>
+Leopold Toetsch C<lt@toetsch.at>
 
 

@@ -273,7 +273,7 @@ None.
 =head1 REFERENCES
 
 Dan Sugalski's original PDD guidelines at
-http://www.mail-archive.com/perl6-internals@perl.org/msg01766.html
+L<http://www.mail-archive.com/perl6-internals@perl.org/msg01766.html>
 
 =head1 VERSION
 

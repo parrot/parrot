@@ -390,7 +390,7 @@ of bignumbers.
 =head1 REFERENCES
 
 IBM's Standard Decimal Arithmetic, with tests
-http://www2.hursley.ibm.com/decimal/
+L<http://www2.hursley.ibm.com/decimal/>
 
 Perl's Math::Big* modules.
 

@@ -7,39 +7,37 @@ docs/strings.pod - Parrot Strings
 
 =head1 ABSTRACT
 
-This document describes how Parrot abstracts the programmer's interface
-to string types.
+This document describes how Parrot abstracts the programmer's interface to
+string types.
 
 =head1 OVERVIEW
 
 For various reasons, some of which relate to the sequence-of-integer
-abstraction, and some of which relate to "infinite" strings and arrays,
-Parrot Strings are represented by a list of chunks, where each chunk
-is a sequence of integers of the same size or representation,
-but different chunks can have different integer sizes or representations.
-The Parrot String API hides this from any module that wishes to work
-at the abstract string level.  In particular, it must hide this from
-the regex engine, which works on pure sequences in the abstract.
+abstraction, and some of which relate to "infinite" strings and arrays, Parrot
+Strings are represented by a list of chunks, where each chunk is a sequence of
+integers of the same size or representation, but different chunks can have
+different integer sizes or representations.  The Parrot String API hides this
+from any module that wishes to work at the abstract string level.  In
+particular, it must hide this from the regex engine, which works on pure
+sequences in the abstract.
 
-So Parrot Strings are a wizzy internationalized equivalent of the
-old standard C library's string.h functions.
+So Parrot Strings are a wizzy internationalized equivalent of the old standard
+C library's string.h functions.
 
 =head1 The Parrot String API
 
-All strings used in the Parrot core should use the
-Parrot C<STRING> structure; Parrot programmers should not deal with
-C<char *> or other string-like types outside of this abstraction without
-very good reason.
+All strings used in the Parrot core should use the Parrot C<STRING> structure;
+Parrot programmers should not deal with C<char *> or other string-like types
+outside of this abstraction without very good reason.
 
 =head1 Interface functions on C<STRING>s
 
-In fact, programmers should hardly ever even access members of the
-C<STRING> structure directly. The reason for this is that the
-interpretation of the data inside the structure will be a function of
-the data's encoding. The idea is that Parrot's strings are
-encoding-aware so your functions don't need to be; if you break the
-abstraction, you suddenly have to start worrying about what the data
-actually means.
+In fact, programmers should hardly ever even access members of the C<STRING>
+structure directly. The reason for this is that the interpretation of the data
+inside the structure will be a function of the data's encoding. The idea is
+that Parrot's strings are encoding-aware so your functions don't need to be; if
+you break the abstraction, you suddenly have to start worrying about what the
+data actually means.
 
 =head2 String Constructors
 
@@ -48,14 +46,14 @@ C<string_make_direct>:
 
     STRING* string_make_direct(Interp *interpreter, const void *buffer, UINTVAL buflen, ENCODING *encoding, CHARSET *charset, UINTVAL flags)
 
-In here you pass a pointer to a buffer of a given encoding, and the
-number of bytes in that buffer to examine, the encoding, the charset, and the initial
-values of the C<flags>. These should usually be zero.
-In return, you'll get a brand new Parrot string. This string will
-have its own private copy of the buffer, so you don't need to keep it.
+In here you pass a pointer to a buffer of a given encoding, and the number of
+bytes in that buffer to examine, the encoding, the charset, and the initial
+values of the C<flags>. These should usually be zero.  In return, you'll get a
+brand new Parrot string. This string will have its own private copy of the
+buffer, so you don't need to keep it.
 
-Additionally there several convenience functions, that are wrapping string_make_direct. 
-See F<src/string.c> for details.
+Additionally there several convenience functions, that are wrapping
+string_make_direct.  See F<src/string.c> for details.
  
 =over 3
 
@@ -76,35 +74,34 @@ This is itself implemented in terms of C<string_make>.
 =head2 String Manipulation Functions
 
 Unless otherwise stated, all lengths, offsets, and so on, are given in
-characters; you are not allowed to care about the byte representation of
-a string, so it doesn't make sense to give the values in bytes.
+characters; you are not allowed to care about the byte representation of a
+string, so it doesn't make sense to give the values in bytes.
 
 To find out the length of a string, use
 
     INTVAL string_length(const STRING *s)
 
-You I<may> explicitly use C<< s->strlen >> for this since it is such a
-useful operation.
+You I<may> explicitly use C<< s->strlen >> for this since it is such a useful
+operation.
 
-To concatenate two strings - that is, to add the contents of string
-C<b> to the end of string C<a>, use:
+To concatenate two strings - that is, to add the contents of string C<b> to the
+end of string C<a>, use:
 
     STRING* string_concat(Interp *, STRING* a, STRING *b, INTVAL flag)
 
-C<a> is updated, and is also returned as a convenience. If the flag is
-set to a non-zero value, then C<b> will be transcoded to C<a>'s encoding
-before concatenation if the strings are of different encodings. You
-almost certainly don't want to stick, say, a UTF-32 string on the end of
-a Big-5 string.
+C<a> is updated, and is also returned as a convenience. If the flag is set to a
+non-zero value, then C<b> will be transcoded to C<a>'s encoding before
+concatenation if the strings are of different encodings. You almost certainly
+don't want to stick, say, a UTF-32 string on the end of a Big-5 string.
 
 To repeat a string, (ie, turn 'xyz' into 'xyzxyzxyz') use:
 
     STRING* string_repeat(Interp *, const STRING* s, UINTVAL n, STRING** d)
 
 Which will repeat string I<s> n times and store the result into I<d>, which it
-also returns.  If I<*d> or I<**d> is NULL, a new string will be allocated
-to hold the result.  I<s> is not modified by this operation.  If I<d> is
-not of the same type as I<s>, it will be upgraded appropriately.
+also returns.  If I<*d> or I<**d> is NULL, a new string will be allocated to
+hold the result.  I<s> is not modified by this operation.  If I<d> is not of
+the same type as I<s>, it will be upgraded appropriately.
 
 Chopping C<n> characters off the end of a string is achieved with the
 unlikely-sounding
@@ -115,10 +112,9 @@ To retrieve a substring of the string, call
 
     STRING* string_substr(Interp *, STRING* src, INTVAL offset, INTVAL length, STRING** dest)
 
-The result will be placed in C<dest>.
-(Passing in C<dest> avoids allocating a new string at runtime. If
-C<*dest> is a null pointer, a new string structure is created with the
-same encoding as C<src>.)
+The result will be placed in C<dest>.  (Passing in C<dest> avoids allocating a
+new string at runtime. If C<*dest> is a null pointer, a new string structure is
+created with the same encoding as C<src>.)
 
 To retrieve a single character of the string, call
 
@@ -127,8 +123,8 @@ To retrieve a single character of the string, call
 The result will be returned from the function. It checks for the existence of
 C<s>, and tests for C<n> being out of range. Currently it applies the method
 that perl uses on arrays to handle negative indices. That is to say, negative
-values count backwards from the end of the string. For example, index -1 is
-the last character in the string, -2 is the next-to-last, and so on.
+values count backwards from the end of the string. For example, index -1 is the
+last character in the string, -2 is the next-to-last, and so on.
 
 If C<s> is null or C<s> is zero-length, it throws an exception. If C<n> is out
 of range, it also throws an exception.
@@ -137,12 +133,11 @@ To compare two strings, use:
 
     INTVAL string_compare(Interp *, STRING* s1, STRING* s2)
 
-The value returned will be less than, equal to, or greater than zero
-depending on whether C<s1> is less than, equal to, or greater than C<s2>.
+The value returned will be less than, equal to, or greater than zero depending
+on whether C<s1> is less than, equal to, or greater than C<s2>.
 
-Strings whose encodings are not the same can be compared - in this
-case a UTF-32 copy will be made of each string and these copies will
-be compared.
+Strings whose encodings are not the same can be compared - in this case a
+UTF-32 copy will be made of each string and these copies will be compared.
 
 To test a string for truth, use:
 
@@ -164,23 +159,22 @@ To format output into a string, use
 C<dest> may be a null pointer, in which case a new string will be created. If
 C<len> is zero, the behaviour becomes more C<sprintf>ish than C<snprintf>-like.
 
-=head1 Notes for Implementors
+=head1 Notes for Implementers
 
 =head2 Termination
 
-The character buffer pointed to by *strstart is not expected to be
-terminated by a nul byte and functions which provide the string api
-will not add one.  Any functions which access the buffer directly and
-which require a terminating nul byte must place one there themselves
-and also be very careful about nul bytes within the used portion of
-the character buffer.  In particular, if C<bufused == buflen> more space
-must be allocated to hold a terminating byte.
+The character buffer pointed to by *strstart is not expected to be terminated
+by a NULL byte and functions which provide the string API will not add one.  Any
+functions which access the buffer directly and which require a terminating NULL
+byte must place one there themselves and also be very careful about NULL bytes
+within the used portion of the character buffer.  In particular, if C<bufused
+== buflen> more space must be allocated to hold a terminating byte.
 
 =head1 Elements of the C<STRING> structure
 
-Those implementing the C<STRING> API will obviously need to know about
-how the C<STRING> structure works. You can find the definition of this
-structure in F<pobj.h>:
+Those implementing the C<STRING> API will obviously need to know about how the
+C<STRING> structure works. You can find the definition of this structure in
+F<pobj.h>:
 
     struct parrot_string_t {
         pobj_t obj;
@@ -196,41 +190,41 @@ Let's look at each element of this structure in turn.
 
 =head2 C<obj.u.b.bufstart>
 
-This pointer points to the buffer which holds the string, encoded in
-whatever is the string's specified encoding. Because of this, you should
-not make any assumptions about what's in the buffer, and hence you
-shouldn't try and access it directly.
+This pointer points to the buffer which holds the string, encoded in whatever
+is the string's specified encoding. Because of this, you should not make any
+assumptions about what's in the buffer, and hence you shouldn't try and access
+it directly.
 
 =head2 C<obj.u.b.buflen>
 
-This is used for memory allocation; it tells you the currently allocated
-size of the buffer in bytes.
+This is used for memory allocation; it tells you the currently allocated size
+of the buffer in bytes.
 
 =head2 C<obj.flags>
 
-This is a general holding area for string flags. The exact flags
-required have not yet been determined.
+This is a general holding area for string flags. The exact flags required have
+not yet been determined.
 
 =head2 C<bufused>
 
-C<bufused> on the other hand, contains the number of bytes out of the
-allocated buffer which are actually in use. This, together with
-C<buflen>, is used by the buffer growing algorithm to determine when and
-by how much to grow the allocation buffer.
+C<bufused> on the other hand, contains the number of bytes out of the allocated
+buffer which are actually in use. This, together with C<buflen>, is used by the
+buffer growing algorithm to determine when and by how much to grow the
+allocation buffer.
 
 =head2 C<strstart>
 
-This stores the actual start of the string. In the case of COW strings
-holding references to portions of a larger string, (for example, in regex
-match variables), this is a pointer into the start of the string.
+This stores the actual start of the string. In the case of COW strings holding
+references to portions of a larger string, (for example, in regex match
+variables), this is a pointer into the start of the string.
 
 =head2 C<strlen>
 
-This is the length of the string in characters, as you would expect to
-find from C<length $string> in Perl. Again, because string buffers may
-be in one of a number of encodings, this must be computed by the
-appropriate encoding. C<string_compute_strlen(STRING)> updates
-this value, calling the encoding's C<characters()> function.
+This is the length of the string in characters, as you would expect to find
+from C<length $string> in Perl. Again, because string buffers may be in one of
+a number of encodings, this must be computed by the appropriate encoding.
+C<string_compute_strlen(STRING)> updates this value, calling the encoding's
+C<characters()> function.
 
 =head2 C<encoding>
 
@@ -242,19 +236,18 @@ machine.
 =head2 C<type>
 
 This specifies the character set for the string. There are currently two
-character sets in Parrot: US ASCII and Unicode. Each character set has
-a default encoding. The default character set is US ASCII.
+character sets in Parrot: US ASCII and Unicode. Each character set has a
+default encoding. The default character set is US ASCII.
 
 =head2 C<language>
 
-This field is currently unused; however, it can be used to hold a
-pointer to the correct vtable for foreign strings.
+This field is currently unused; however, it can be used to hold a pointer to
+the correct vtable for foreign strings.
 
 =head1 Non-user-visible String Manipulation Functions
 
-If you've read this far, I hope you're a Parrot implementor. If you're
-not helping construct the Parrot core itself, you probably want to look
-away now.
+If you've read this far, I hope you're a Parrot implementer. If you're not
+helping construct the Parrot core itself, you probably want to look away now.
 
 The first two functions to note are
 
@@ -279,18 +272,18 @@ To grow a string to a specified size, use
 
     void string_grow(Interp *, STRING *s, INTVAL newsize)
 
-The size is given in characters; C<string_max_bytes()> is called to turn
-this into a size in bytes, and then the buffer is grown to accommodate
-(at least) that many bytes.
+The size is given in characters; C<string_max_bytes()> is called to turn this
+into a size in bytes, and then the buffer is grown to accommodate (at least)
+that many bytes.
 
 =head1 Transcoding
 
-The fact that Parrot strings are encoding-abstracted really has to
-bottom out at some point, and it's usually when two strings of different
-encodings interact. When we try to append one type of string to another,
-we have the option of turning the later string into a string that
-matches the first string's encoding. This process, translating a string
-from one encoding into another, is called "transcoding".
+The fact that Parrot strings are encoding-abstracted really has to bottom out
+at some point, and it's usually when two strings of different encodings
+interact. When we try to append one type of string to another, we have the
+option of turning the later string into a string that matches the first
+string's encoding. This process, translating a string from one encoding into
+another, is called "transcoding".
 
 In Parrot, transcoding is implemented by C<Parrot_CharType_Transcode> functions
 which take two character sets (C<CHARTYPE>) and a character (C<Parrot_UInt>)
@@ -302,8 +295,8 @@ frequent use. The C<transcoders> array is currently not used.
 
 =head2 Foreign Encodings
 
-Fill this in later; if anyone wants to implement new encodings at this
-stage they must be mad.
+Fill this in later; if anyone wants to implement new encodings at this stage
+they must be mad.
 
 =head1 SEE ALSO
 

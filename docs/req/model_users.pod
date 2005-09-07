@@ -7,22 +7,21 @@ docs/req/model_users.pod - Model Users For Parrot Design Decisions
 
 =head1 RATIONALE
 
-This document exists to give Parrot design a direction.  Before we can
-make design decisions, we need a metric to evaluate them.  The best
-metrics are based on I<informed> intuition.  This document is designed
-to inform the intuition.
+This document exists to give Parrot design a direction.  Before we can make
+design decisions, we need a metric to evaluate them.  The best metrics are
+based on I<informed> intuition.  This document is designed to inform the
+intuition.
 
 Below are listed some model users with random (or, in some cases,
 not-so-random) names.
 
-Questions to ask yourself: Do you know anyone who fits these
-descriptions?  If so, what else would you write about them?
-How would you describe them?  What else do they care about?
-What do they I<not> care about?
+Questions to ask yourself: Do you know anyone who fits these descriptions?  If
+so, what else would you write about them?  How would you describe them?  What
+else do they care about?  What do they I<not> care about?
 
-And let's remember that, in the end, we can't really please everyone.
-So we have to pick who we'll please, and who we'll piss off.  It just
-can't be helped.
+And let's remember that, in the end, we can't really please everyone.  So we
+have to pick who we'll please, and who we'll piss off.  It just can't be
+helped.
 
 
 =head1 MODEL USERS
@@ -30,8 +29,7 @@ can't be helped.
 
 =head2 "Autrijus": Perl 6 implementer
 
-Autrijus has a favorite language, Perl 6, and he wants to target it
-to Parrot.
+Autrijus has a favorite language, Perl 6, and he wants to target it to Parrot.
 
 Autrijus:
 
@@ -43,7 +41,7 @@ Autrijus:
   chain still works after upgrading
 
 
-=head2 "Nick": Ponie implementor
+=head2 "Nick": Ponie implementer
 
 Nick is implementing Perl 5 with (over? under? inside?) Parrot.
 
@@ -55,9 +53,8 @@ Nick:
 
 =head2 "Dick": Scripting an existing application
 
-Dick has an application that needs some scripting features, so he's
-embedding Parrot to get PIR and the languages that target it, e.g.
-Perl 6.
+Dick has an application that needs some scripting features, so he's embedding
+Parrot to get PIR and the languages that target it, e.g.  Perl 6.
 
 Dick:
 
@@ -73,9 +70,9 @@ Dick:
 
 =head2 "Tom": Embedded system creator
 
-Tom loves Perl 6, so wants to write his special-purpose embedded
-system to run on Parrot.  The platform is very limited, and speed
-is not particularly crucial.
+Tom loves Perl 6, so wants to write his special-purpose embedded system to run
+on Parrot.  The platform is very limited, and speed is not particularly
+crucial.
 
 Tom:
 
@@ -92,8 +89,8 @@ Tom:
 
 =head2 "Ilya": Intensive CPU User
 
-Ilya writes high-performance CPU-bound code, typically involving
-either intense data structure manipulation or floating point math.
+Ilya writes high-performance CPU-bound code, typically involving either intense
+data structure manipulation or floating point math.
 
 Ilya:
 
@@ -105,9 +102,9 @@ Ilya:
 
 =head2 "Magpie": Lover of shiny things
 
-Magpie sees something shiny -- a new runtime, or a new language, or
-even better, a new language on a new runtime -- and is willing to do a
-lot to make it work, just so he can play with it.
+Magpie sees something shiny -- a new runtime, or a new language, or even
+better, a new language on a new runtime -- and is willing to do a lot to make
+it work, just so he can play with it.
 
 Magpie:
 

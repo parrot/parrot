@@ -7,31 +7,27 @@ docs/tests.pod - Testing Parrot
 
 =head1 A basic guide to writing tests for Parrot
 
-This is quick and dirty pointer to how tests for Parrot should be
-written.  The testing system is liable to change in the future, but
-tests written following the guidelines below should be easy to port
-into a new test suite.
+This is quick and dirty pointer to how tests for Parrot should be written.  The
+testing system is liable to change in the future, but tests written following
+the guidelines below should be easy to port into a new test suite.
 
 =head1 How to write a test
 
-New tests should be added to F<*.t> files. These test files 
-can be found in the directories F<t>, F<imcc/t> and F<languages/*/t>.
-If a new feature is tested,
+New tests should be added to F<*.t> files. These test files can be found in the
+directories F<t>, F<imcc/t> and F<languages/*/t>.  If a new feature is tested,
 it might also make sense to create a new F<*.t> file.
 
-The testing framework needs to know how many tests it should expect.
-So the number of planned tests needs to be
-incremented when adding a new test.
-This is done near the top of a test file, in a line that looks like:
+The testing framework needs to know how many tests it should expect.  So the
+number of planned tests needs to be incremented when adding a new test.  This
+is done near the top of a test file, in a line that looks like:
 
   use Parrot::Test tests => 8;
 
 =head2 Parrot Assembler
 
-PASM test are mostly used for testing ops.
-Appropriate test files for basic ops are F<t/op/*.t>.
-Perl Magic Cookies are tested in F<t/pmc/*.t>.
-Add the new test like this:
+PASM test are mostly used for testing ops.  Appropriate test files for basic
+ops are F<t/op/*.t>.  Perl Magic Cookies are tested in F<t/pmc/*.t>.  Add the
+new test like this:
 
     pasm_output_is(<<'CODE', <<'OUTPUT', "name for test");
         *** a big chunk of assembler, eg:
@@ -45,8 +41,8 @@ Add the new test like this:
 
 =head2 Parrot Intermediate Representation
 
-Tests can also be written in B<PIR>. This is done with 
-C<pir_output_is> and friends.
+Tests can also be written in B<PIR>. This is done with C<pir_output_is> and
+friends.
 
     pir_output_is(<<'CODE',<<'OUT','nothing useful');
         .include 'library/config.imc'
@@ -60,8 +56,7 @@ C<pir_output_is> and friends.
 
 =head2 C source tests
 
-C source tests are usually located in F<t/src/*.t>.
-A simple test looks like:
+C source tests are usually located in F<t/src/*.t>.  A simple test looks like:
  
     c_output_is(<<'CODE', <<'OUTPUT', "name for test");
     #include <stdio.h>
@@ -98,12 +93,12 @@ A simple test looks like:
     OUTPUT
 
 Note that it's always a good idea to output "done" to confirm that the compiled
-code executed completely. When mixing C<printf> and C<PIO_printf> always
-append a C<fflush(stdout);> after the former.
+code executed completely. When mixing C<printf> and C<PIO_printf> always append
+a C<fflush(stdout);> after the former.
 
 =head2 Testing language implementations
 
-Language implementations are usually tested with the test function 
+Language implementations are usually tested with the test function
 C<language_output_is>.
 
 =head1 Ideal tests:
@@ -112,21 +107,20 @@ C<language_output_is>.
 
 =item o
 
-Probe the boundaries (including edge cases, errors thrown etc.) of
-whatever code they're testing.  These should include potentially
-out of band input unless we decide that compilers should check for this
-themselves.
+Probe the boundaries (including edge cases, errors thrown etc.) of whatever
+code they're testing.  These should include potentially out of band input
+unless we decide that compilers should check for this themselves.
 
 =item o
 
-Are small and self contained, so that if the tested feature breaks we
-can identify where and why quickly.
+Are small and self contained, so that if the tested feature breaks we can
+identify where and why quickly.
 
 =item o
 
 Are valid. Essentially, they should conform to the additional documentation
-that accompanies the feature (if any). [If there isn't any documentation,
-then feel free to add some and/or complain to the mailing list].
+that accompanies the feature (if any). [If there isn't any documentation, then
+feel free to add some and/or complain to the mailing list].
 
 =item o
 
@@ -136,10 +130,9 @@ Are a chunk of assembler and a chunk of expected output.
 
 =head1 TODO tests
 
-In test driven development, tests are implemented first.
-So the tests are initially expected to fail.
-This can be expressed by marking the tests as TODO. 
-See L<Test::More> on how to do that.
+In test driven development, tests are implemented first.  So the tests are
+initially expected to fail.  This can be expressed by marking the tests as
+TODO.  See L<Test::More> on how to do that.
 
 =head1 SEE ALSO
 

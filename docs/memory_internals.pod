@@ -7,26 +7,26 @@ docs/memory_internals.pod - Memory Internals
 
 =head1 ABSTRACT
 
-This document tries to explain the internals of parrot structures related
-to memory management and should give the answer 42, when questions are
-related to the whole and everything and memory management.
+This document tries to explain the internals of parrot structures related to
+memory management and should give the answer 42, when questions are related to
+the whole and everything and memory management.
 
 =head1 OVERVIEW
 
-All allocated items are managed in memory pools. Memory pools hold
-collections of similar items. These pools can be roughly divided into
-two kinds: pools holding fixed sized items and variable sized items.
+All allocated items are managed in memory pools. Memory pools hold collections
+of similar items. These pools can be roughly divided into two kinds: pools
+holding fixed sized items and variable sized items.
 
-A pool is organized as a linked list of big chunks, holding many managed
-items of one kind.
+A pool is organized as a linked list of big chunks, holding many managed items
+of one kind.
 
 =head2 Abbreviations used here
 
 DOD ... dead object detection, see F<docs/pdds/pdd09_gc.pod> for details.
 
 By scanning through all the interpreter's registers, stacks and the processor
-stack, all objects that are detected here are marked as alive. Objects in
-all pools not alive are considered dead.
+stack, all objects that are detected here are marked as alive. Objects in all
+pools not alive are considered dead.
 
 =head1 Top down: the interpreter
 
@@ -38,8 +38,8 @@ A overall layout of the interpreter's memory management looks like so:
         ...
     } Interp;
 
-All object-like things that get allocated during the execution of
-parrot bytecode are managed here.
+All object-like things that get allocated during the execution of parrot
+bytecode are managed here.
 
 =head1 Arenas
 
@@ -67,12 +67,11 @@ the space for the fixed sized objects.
 
 =head1 Fixed sized items
 
-These items are either objects by themselves, like a C<PMC>, or are a
-header structure of a variable sized object like a C<STRING>.  The
-general object of this kind is a buffer-like object, which consists of a
-C<Buffer> or a C<PObj> at the beginning and a variable but fixed sized
-part after the buffer structure. Examples of this are a C<STRING> or an
-C<IntList>.
+These items are either objects by themselves, like a C<PMC>, or are a header
+structure of a variable sized object like a C<STRING>.  The general object of
+this kind is a buffer-like object, which consists of a C<Buffer> or a C<PObj>
+at the beginning and a variable but fixed sized part after the buffer
+structure. Examples of this are a C<STRING> or an C<IntList>.
 
 Buffer-like objects of the same size are maintained in the
 I<sized_header_pools>, which manage objects of the same size in one slot.
@@ -82,9 +81,9 @@ onto the pool's C<free_list>. When there is need for a new object it is taken
 off the free list, and when it stops being used, it will be put back on the
 free list again. DOD detects which objects are no longer being used.
 
-If the free list is empty then a DOD run is started, which may be able
-to refill the free list with dead objects it detects are free for re-use.
-If it finds none then a new pool is allocated to hold more objects.
+If the free list is empty then a DOD run is started, which may be able to
+refill the free list with dead objects it detects are free for re-use.  If it
+finds none then a new pool is allocated to hold more objects.
 
 These fixed sized objects are never freed during the lifetime of an
 interpreter, they just get reused or recycled.
@@ -100,11 +99,11 @@ interpreter, they just get reused or recycled.
     ...
     } PObj;
 
-This does not totally reflect the current implementation, but is the
-spirit of the abstraction of current objects. Above structure including
-C<flags> is the current C<Buffer>. With some additional fields like
-C<strstart> and C<bufused>, inserted at the ellipses, you get a C<STRING>.
-Adding a I<vtable> (and some other structure members) yields a C<PMC>.
+This does not totally reflect the current implementation, but is the spirit of
+the abstraction of current objects. Above structure including C<flags> is the
+current C<Buffer>. With some additional fields like C<strstart> and C<bufused>,
+inserted at the ellipses, you get a C<STRING>.  Adding a I<vtable> (and some
+other structure members) yields a C<PMC>.
 
 =head2 ARENA_DOD_FLAGS
 
@@ -191,15 +190,15 @@ The DOD_flag_* macros combine these constructions to access the flags.
 
 =head1 Variable sized items
 
-These items never live alone, they are part of a C<Buffer> structure,
-described above. They are allocated at C<bufstart>. This is, for example,
-used to manage the buffer's free list, where C<bufstart> is used as a pointer
-to the next object.
+These items never live alone, they are part of a C<Buffer> structure, described
+above. They are allocated at C<bufstart>. This is, for example, used to manage
+the buffer's free list, where C<bufstart> is used as a pointer to the next
+object.
 
 These items are managed in two different pools: the C<memory_pool> and the
 C<constant_string_pool>. The former holds all variable sized items, while the
-latter containing the word "string", holds constant strings only, as we
-don't have other variable sized constant items to store.
+latter containing the word "string", holds constant strings only, as we don't
+have other variable sized constant items to store.
 
 Here, different memory allocation schemes jump in:
 
@@ -214,31 +213,31 @@ living items of all used memory blocks into one new block, which holds
 thereafter only used items tightly packed together.
 
 The old memory blocks, containing sparse unused parts and used parts already
-copied to the new place, are then unused altogether and get free()ed
+copied to the new place, are then unused altogether and get C<free()>ed
 thereafter.
 
-When GC doesn't provide enough free space needed for a new item, a new
-block is added to the memory pool.
+When GC doesn't provide enough free space needed for a new item, a new block is
+added to the memory pool.
 
 This also implies that buffers are moved around during their life. Users of
-these buffers are therefore not allowed to hold pointers to buffers over
-pieces of code that might trigger a GC run, like C<Parrot_allocate()> or
+these buffers are therefore not allowed to hold pointers to buffers over pieces
+of code that might trigger a GC run, like C<Parrot_allocate()> or
 C<string_compare()>.
 
 =head2 Defragmenting allocator
 
-An alternative to the above is to use a memory allocator, which is as fast
-as the above and does reuse C<free()>ed items in a memory conserving way.
+An alternative to the above is to use a memory allocator, which is as fast as
+the above and does reuse C<free()>ed items in a memory conserving way.
 Actually, the malloc implementations in some systems' F<libc> efficiently
 provide this, such as the glibc malloc based on Doug Lea's allocator.
 
-Using this allocator, all variable sized items are just allocated via a
-plain C<malloc()> call, or resized with C<realloc()>, and after they lose
-their existence (ie when DOD detects that the managing buffer
-header is no longer in use) they are C<free()>ed. That's all. The underlying
-allocator collects these pieces, coalesces them if possible to form bigger
-pieces, and then puts them on free lists, sorted by size.  Eventually, when
-a new allocation request arrives, it may give them back to Parrot.
+Using this allocator, all variable sized items are just allocated via a plain
+C<malloc()> call, or resized with C<realloc()>, and after they lose their
+existence (ie when DOD detects that the managing buffer header is no longer in
+use) they are C<free()>ed. That's all. The underlying allocator collects these
+pieces, coalesces them if possible to form bigger pieces, and then puts them on
+free lists, sorted by size.  Eventually, when a new allocation request arrives,
+it may give them back to Parrot.
 
 So here, the variable length C<memory_pool> is unused. You can consider this
 pool to live inside the allocator.
@@ -257,26 +256,25 @@ string. They just use a C<new_string_header()> and set up a pointer
 (C<strstart>) pointing somewhere into the original string and remember the
 used length there in C<bufused>.
 
-This is all OK, as long as the original and the lazy copy of the string
-are not modified. So that's well-known and called COW (copy on write).
+This is all OK, as long as the original and the lazy copy of the string are not
+modified. So that's well-known and called COW (copy on write).
 
 Now, during GC (or freeing buffers) the problem arises: to whom does this
-string belong? You shouldn't copy the same string to different places,
-thus rendering COW to a noop, nor are you allowed to free this same
-string more then once (your debugger will tell you why...).
+string belong? You shouldn't copy the same string to different places, thus
+rendering COW to a noop, nor are you allowed to free this same string more then
+once (your debugger will tell you why...).
 
-Both allocation schemes therefore use a part of the allocated string to
-do this bookkeeping.
+Both allocation schemes therefore use a part of the allocated string to do this
+bookkeeping.
 
-Copying GC uses a C<Buffer_Tail> after the end of the actual variable
-length string and marks such COW strings with C<TAIL_moved> and stores
-the new address in the buffer header, so other users of this string can
-be updated to reuse the same string (XXX one or all other users?).
+Copying GC uses a C<Buffer_Tail> after the end of the actual variable length
+string and marks such COW strings with C<TAIL_moved> and stores the new address
+in the buffer header, so other users of this string can be updated to reuse the
+same string (XXX one or all other users?).
 
-The C<malloc()>/C<free()> approach stores a refcount at C<bufstart>. During
-DOD all dead users increment the refcount, living users set it to an
-huge value. When freeing the buffer, the string is only freed if the
-refcount reaches zero.
+The C<malloc()>/C<free()> approach stores a refcount at C<bufstart>. During DOD
+all dead users increment the refcount, living users set it to an huge value.
+When freeing the buffer, the string is only freed if the refcount reaches zero.
 
 =head1 Simplified Figure
 
@@ -301,10 +299,10 @@ refcount reaches zero.
                 +----------+
                  Buffer          Memory Block
 
-Now consider, that the I<Interpreter> shall be a C<PMC> living in
-C<Buffer X> of the underlying interpreter and is currently running
-F<perldoc docs/memory_internals.pod>, and then redo this figure, with
-all the blanks filled in ;-)
+Now consider, that the I<Interpreter> shall be a C<PMC> living in C<Buffer X>
+of the underlying interpreter and is currently running
+F<perldoc docs/memory_internals.pod>, and then redo this figure, with all the
+blanks filled in ;-)
 
 =head1 FILES
 
@@ -313,16 +311,16 @@ pobj.h.
 
 =head1 BUGS
 
-All spelling errors belong to those who honestly collected them, as well as
-all errors related to my abuse of the English language - I'm not natively
-speaking it.
+All spelling errors belong to those who honestly collected them, as well as all
+errors related to my abuse of the English language - I'm not natively speaking
+it.
 
-To minimize this bugs section - please patch this document and keep it
-up to date - thanks.
+To minimize this bugs section - please patch this document and keep it up to
+date - thanks.
 
 =head1 AUTHOR
 
-Leopold Tötsch <lt@toetsch.at>
+Leopold Tötsch C<lt@toetsch.at>
 
 =head1 VERSION
 

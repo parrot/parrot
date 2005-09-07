@@ -21,8 +21,8 @@ Parrot.
 Parrot? (For example, with the C<compile> op.)
 
 Define a sub that takes as input a string, and returns something invokable.
-The easiest way to create something invokable at the moment is to use the builtin
-C<PIR> or C<PASM> compilers.
+The easiest way to create something invokable at the moment is to use the
+builtin C<PIR> or C<PASM> compilers.
 
 See C<languages/tcl/tcl.pir_template>'s C<.sub _tcl_compile> as an example.
 
@@ -44,9 +44,8 @@ If you have a fixed-length parameter list, IMCC makes this blindingly easy:
 
    $P0( $P1, $P2, $P3 )
 
-where $P0 is the function object, and $P1, $P2, and $P3 are its
-parameters. You can also use a function's label in place of the
-object:
+where $P0 is the function object, and $P1, $P2, and $P3 are its parameters. You
+can also use a function's label in place of the object:
 
    somefunctionlabel( $P1, $P2, $P3 )
 
@@ -66,11 +65,11 @@ The method name may also be a string variable representing a method name:
   m = "bold"
   curses_obj.m()
 
-=head2 How do I generate a tailcall in PIR?
+=head2 How do I generate a tail call in PIR?
 
   .sub foo
       # do something
-      .return bar(42)           # tailcall sub bar
+      .return bar(42)           # tail call sub bar
   .end
 
   .sub bar
@@ -95,14 +94,12 @@ of that array with the C<.flatten_arg> directive.
 
 =head2 How to I retrieve the contents of a variable-length parameter list being passed to me?
 
-You can check the passed PMC parameter count in the subroutine
-with the argcP variable (an alias to I3). Remember, the first
-eleven PMC parameters are passed in P5 through P15, with
-overflow parameters an array-like PMC in P3.
+You can check the passed PMC parameter count in the subroutine with the argcP
+variable (an alias to I3). Remember, the first eleven PMC parameters are passed
+in P5 through P15, with overflow parameters an array-like PMC in P3.
 
-A simpler way is to use the
-C<foldup> opcode, which creates an array of all passed
-PMC arguments.
+A simpler way is to use the C<foldup> opcode, which creates an array of all
+passed PMC arguments.
 
   .sub _mysub non_prototyped
     .local pmc argv
@@ -111,8 +108,8 @@ PMC arguments.
     argc = argv
     ...
 
-If you have a few fixed parameters too, you can use a variant of
-C<foldup> to capture variable arguments from that position on.
+If you have a few fixed parameters too, you can use a variant of C<foldup> to
+capture variable arguments from that position on.
 
   .sub _mysub non_prototyped
     .param pmc arg0
@@ -126,8 +123,8 @@ C<foldup> to capture variable arguments from that position on.
 =head2 How do I create nested subroutines?
 
 PIR doesn't support nested subroutines. You have to emit subroutines one by
-one. If lexicals of the outer subroutine are visible inside the nested
-sub, you have to include the outer pad depth in C<new_pad> opcodes.
+one. If lexicals of the outer subroutine are visible inside the nested sub, you
+have to include the outer pad depth in C<new_pad> opcodes.
 
 =head1 Variables
 
@@ -143,8 +140,8 @@ or the C<find_global> op:
 
 =head2 How can I delete a global
 
-You can retrieve the namespace hash and use the C<delete> opcode.
-Nested namespace names have a NUL char prepended to their name.
+You can retrieve the namespace hash and use the C<delete> opcode.  Nested
+namespace names have a NULL char prepended to their name.
 
   .sub main @MAIN
     $P0 = new Integer
@@ -164,8 +161,8 @@ Nested namespace names have a NUL char prepended to their name.
 
 =head2 How do I use lexical pads to have both a function scope and a global scope?
 
-To create lexical variables, you'll need to keep track of how deeply
-nested each block of code is.  Say you have some HLL code like so:
+To create lexical variables, you'll need to keep track of how deeply nested
+each block of code is.  Say you have some HLL code like so:
 
     # depth 0
     lexical $bar
@@ -188,15 +185,15 @@ nested each block of code is.  Say you have some HLL code like so:
       }
     }
 
-When you are building your program tree, have each block reference
-its parent block, note its depth, and keep a list of all its lexical
-variables.  At the opening of each block (that has lexical
-variables), emit code to push a lexical pad:
+When you are building your program tree, have each block reference its parent
+block, note its depth, and keep a list of all its lexical variables.  At the
+opening of each block (that has lexical variables), emit code to push a lexical
+pad:
 
     new_pad n
 
-where C<n> is the lexical depth of the block.  After the first
-C<new_pad 0>, you can also use:
+where C<n> is the lexical depth of the block.  After the first C<new_pad 0>,
+you can also use:
 
     new_pad -1
 
@@ -206,8 +203,8 @@ At any point that you exit a block, you should emit
 
     pop_pad
 
-This isn't necessary if you leave a block by invoking a continuation
-(by C<return>ing from a subroutine, for instance), as the continuation will
+This isn't necessary if you leave a block by invoking a continuation (by
+C<return>ing from a subroutine, for instance), as the continuation will
 automatically put the lexical pad stack back the way it was when the
 continuation was created.
 
@@ -221,9 +218,8 @@ depth of the block in which you found it and emit some code like so:
 where C<2> is the depth the variable was found at, C<foo> is the name of the
 variable, and $P0 is a PMC register in which to store the variable.
 
-Note that, by convention (and confusing IMCC syntax), variables, not
-direct values, are stored. So to assign to this lexical variable, you
-would say:
+Note that, by convention (and confusing IMCC syntax), variables, not direct
+values, are stored. So to assign to this lexical variable, you would say:
 
     find_lex $P0, 2, "foo"
     assign $P0, some_value
@@ -236,10 +232,10 @@ You will still need to do a C<store_lex> at some point (probably at the start
 of the block in which it is declared) to create the variable in the first
 place. Put a C<Undef> PMC in it or something.
 
-If, on the other hand, you never find said lexical variable (or if a
-block declares that variable to be global, or whatever other tricks
-your compiler likes to do), you might assume it to be a global, which you
-can access much the same way:
+If, on the other hand, you never find said lexical variable (or if a block
+declares that variable to be global, or whatever other tricks your compiler
+likes to do), you might assume it to be a global, which you can access much the
+same way:
 
     find_global $P0, "bar"
     assign $P0, value_to_store
@@ -304,15 +300,15 @@ With the C<newclass> op:
 
 =head2 How do I add instance variables/attributes?
 
-Each class knows what attribute its object can have. You can add
-attributes to a class (not to individual objects) like so:
+Each class knows what attribute its object can have. You can add attributes to
+a class (not to individual objects) like so:
 
     addattribute $P0, "legs"
 
 =head2 How do I add instance methods to a class?
 
-Methods are declared as functions in the class namespace with the
-C<method> keyword appended to the function declaration:
+Methods are declared as functions in the class namespace with the C<method>
+keyword appended to the function declaration:
 
   .namespace [ "Animal" ]
 
@@ -348,19 +344,19 @@ or
 
 =head2 When should I use properties vs. attributes?
 
-Properties aren't inherited. If you have some additional data that
-don't fit into the classes hierarchy, you could use properties.
+Properties aren't inherited. If you have some additional data that don't fit
+into the classes hierarchy, you could use properties.
 
 =head2 How do I create a class that is a subclass of another class?
 
-You first have to get the class PMC of the class you want to subclass.
-Either you use the PMC returned by the C<newclass> op if you created
-the class, or use the C<getclass> op:
+You first have to get the class PMC of the class you want to subclass.  Either
+you use the PMC returned by the C<newclass> op if you created the class, or use
+the C<getclass> op:
 
     getclass $P0, "Animal"
 
-Then you can use the C<subclass> op to create a new class that is a subclass
-of this class:
+Then you can use the C<subclass> op to create a new class that is a subclass of
+this class:
 
     subclass $P1, $P0, "Dog"
 
@@ -394,8 +390,8 @@ Just define a method named C<__init> in the namespace if the class.
     .sub __init method
       # ...
 
-Or you can specify the constructor method by setting the BUILD property of
-the class PMC:
+Or you can specify the constructor method by setting the BUILD property of the
+class PMC:
 
     newclass $P0, "Dog"         # create a class named Dog
     new $P1, .PerlString        # create a string
@@ -420,9 +416,9 @@ During the C<new> opcode the constructor is called.
 
 =head2 How can I pass arguments to an constructor?
 
-You can pass only a single argument to a constructor.
-By convention, a hash PMC is passed to the constructor that contains
-the arguments as key/value pairs:
+You can pass only a single argument to a constructor.  By convention, a hash
+PMC is passed to the constructor that contains the arguments as key/value
+pairs:
 
     new $P0, .Hash
     set $P0["greeting"], "hello"
@@ -503,8 +499,8 @@ Create a new C<Env> PMC and access it like a hash.
     cfg = interp[.IGLOBALS_CONFIG_HASH]
     $S0 = cfg['VERSION']     "0.2.2"
 
-Seel F<config_lib.pasm> for all the keys in the config hash - or iterate
-over the config hash.
+See F<config_lib.pasm> for all the keys in the config hash - or iterate over
+the config hash.
 
 =head1 VERSION
 

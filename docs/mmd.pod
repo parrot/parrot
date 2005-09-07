@@ -8,77 +8,74 @@ docs/mmd.pod - Multimethod dispatch for binary opcode functions
 =head1 CAVEATS
 
 XXX - Part or all of this document is outdated.  Especially the "the MMD system
-doesn't handle inheritance" bit.  Please refer to PDD03 at this moment while 
-we rewrite or merge this document.  We apologize for the inconvenience.
+doesn't handle inheritance" bit.  Please refer to PDD03 at this moment while we
+rewrite or merge this document.  We apologize for the inconvenience.
 
 =head1 SYNOPSIS
 
-This system is set up to handle type-based dispatching for binary
-(i.e. two-arg) functions. This includes, though isn't necessarily
-limited to, binary operators such as addition or subtraction.
+This system is set up to handle type-based dispatching for binary (i.e.
+two-arg) functions. This includes, though isn't necessarily limited to, binary
+operators such as addition or subtraction.
 
 =head1 DESCRIPTION
 
-The MMD system is straightforward, and currently must be explicitly
-invoked, for example by a vtable function. (We may reserve the right
-to use MMD in all circumstances, but currently do not) 
+The MMD system is straightforward, and currently must be explicitly invoked,
+for example by a vtable function. (We may reserve the right to use MMD in all
+circumstances, but currently do not) 
 
 =head2 API
 
-For the purposes of the API, each MMD-able function is assigned a
-unique number which is used to find the correct function table. This 
-is the C<func_num> parameter in the following functions. While Parrot
-isn't restricted to a predefined set of functions, it I<does> set
-things up so that all the binary vtable functions have a MMD table
-preinstalled for them, with default behaviour.
+For the purposes of the API, each MMD-able function is assigned a unique number
+which is used to find the correct function table. This is the C<func_num>
+parameter in the following functions. While Parrot isn't restricted to a
+predefined set of functions, it I<does> set things up so that all the binary
+vtable functions have a MMD table preinstalled for them, with default
+behavior.
 
 =over 4
 
 =item mmd_add_by_class(interp, func_num, left_class, right_class, funcptr)
 
-Adds a new MMD function C<funcptr> to the C<func_num> function table
-that will be invoked when the left parameter is of class C<left_class>
-and the right parameter is of class C<right_class>. Both classes are
-C<STRING *>s that hold the PMC class names for the left and right
-sides. If either class isn't yet loaded, Parrot will cache the
-information such that the function will be installed if at some point
-in the future both classes are available.
+Adds a new MMD function C<funcptr> to the C<func_num> function table that will
+be invoked when the left parameter is of class C<left_class> and the right
+parameter is of class C<right_class>. Both classes are C<STRING *>s that hold
+the PMC class names for the left and right sides. If either class isn't yet
+loaded, Parrot will cache the information such that the function will be
+installed if at some point in the future both classes are available.
 
-Currently this is done by just assigning class numbers to the classes,
-which the classes will pick up and use if they're later loaded, but we
-may later put the functions into a deferred table that we scan when
-PMC classes are loaded. Either way, the function will be guaranteed to
-be installed when it's needed.
+Currently this is done by just assigning class numbers to the classes, which
+the classes will pick up and use if they're later loaded, but we may later put
+the functions into a deferred table that we scan when PMC classes are loaded.
+Either way, the function will be guaranteed to be installed when it's needed.
 
-The function table must exist, but if it is too small, it will
-automatically be expanded.
+The function table must exist, but if it is too small, it will automatically be
+expanded.
 
 =item mmd_register(interp, func_num, left_type, right_type, funcptr)
 
-Register a function C<funcptr> for MMD function table C<func_num> for
-classes C<left_type> and C<right_type>. The left and right types are
-C<INTVAL>s that represent the class ID numbers.
+Register a function C<funcptr> for MMD function table C<func_num> for classes
+C<left_type> and C<right_type>. The left and right types are C<INTVAL>s that
+represent the class ID numbers.
 
-The function table must exist, but if it is too small, it will
-automatically be expanded.
+The function table must exist, but if it is too small, it will automatically be
+expanded.
 
-Currently the MMD system doesn't handle inheritance and
-best match searching, as it assumes that all PMC types have no parent
-type. This can be considered a bug, and will be resolved at some point
-in the future.
+Currently the MMD system doesn't handle inheritance and best match searching,
+as it assumes that all PMC types have no parent type. This can be considered a
+bug, and will be resolved at some point in the future.
 
 =item mmd_dispatch_pmc(interp, left, right, dest, func_num)
 
-Dispatch to a multimethod that "returns" a PMC. C<left>, C<right>, and
-C<dest> are all PMC pointers, while C<func_num> is the MMD table that
-should be used to do the dispatching.
+Dispatch to a multimethod that "returns" a PMC. C<left>, C<right>, and C<dest>
+are all PMC pointers, while C<func_num> is the MMD table that should be used to
+do the dispatching.
 
-The MMD system will figure out which function should be called based
-on the types of C<left> and C<right> and call it, passing in C<left>,
-C<right>, and C<dest> like any other binary vtable function.
+The MMD system will figure out which function should be called based on the
+types of C<left> and C<right> and call it, passing in C<left>, C<right>, and
+C<dest> like any other binary vtable function.
 
-This function has a void return type, like all the "take two PMCs,
-return a PMC" vtable functions do.
+This function has a void return type, like all the "take two PMCs, return a
+PMC" vtable functions do.
 
 =item STRING *mmd_dispatch_string(interp, left, right, func_num)
 
@@ -97,12 +94,11 @@ Like C<mmd_dispatch_string>, only it returns a FLOATVAL.
 
 =item mmd_add_function(interp, func_num, default_func)
 
-Add a new function table to the list of functions the MMD system knows
-of. C<func_num> is the number of the new function, while
-C<default_func> is the function to be called when the system doesn't
-know which function it should call. (Because, for example, there
-hasn't been a function installed that matches the left and right types
-for a call)
+Add a new function table to the list of functions the MMD system knows of.
+C<func_num> is the number of the new function, while C<default_func> is the
+function to be called when the system doesn't know which function it should
+call. (Because, for example, there hasn't been a function installed that
+matches the left and right types for a call)
 
 =back
 
@@ -208,37 +204,35 @@ Bitwise xor of the string value
 
 =head2 Defaults
 
-By default, functions are installed for all the functions that have
-constants associated with them. They are all functions suitable for
-calling with C<mmd_dispatch_pmc>.
+By default, functions are installed for all the functions that have constants
+associated with them. They are all functions suitable for calling with
+C<mmd_dispatch_pmc>.
 
-The math functions (add, subtract, multiply, and divide) all work on
-the float values of the left and right sides.
+The math functions (add, subtract, multiply, and divide) all work on the float
+values of the left and right sides.
 
-The cmod function does a plan C-style mod (the C C<%> operator) on the
-integer value of the left and right sides.
+The cmod function does a plan C-style mod (the C C<%> operator) on the integer
+value of the left and right sides.
 
 The mod function does an fmod on the float values of the two sides.
 
-The bitwise functions (and, or, xor, left shift, right shift) work on
-the integer values of the two sides.
+The bitwise functions (and, or, xor, left shift, right shift) work on the
+integer values of the two sides.
 
-The concat function concatenates the string values of the left and
-right sides.
+The concat function concatenates the string values of the left and right sides.
 
-The logical functions (and, or, xor) use the boolean values of the
-left and right sides to see whether they should set_pmc the
-destination to the left or right sides. The C<and> and C<or> functions
-short-circuit, C<xor> does not.
+The logical functions (and, or, xor) use the boolean values of the left and
+right sides to see whether they should set_pmc the destination to the left or
+right sides. The C<and> and C<or> functions short-circuit, C<xor> does not.
 
-The repeat function gets the string value of the left side and the
-integer value of the right.
+The repeat function gets the string value of the left side and the integer
+value of the right.
 
-The numeric equal and numeric comparison functions work on the float
-values of both sides.
-
-The string equal and comparison functions work on the string values of
+The numeric equal and numeric comparison functions work on the float values of
 both sides.
 
-The string bitwise ops (and, or, xor) take the string values of both
-sides and do bitwise operations on the resulting bitstring.
+The string equal and comparison functions work on the string values of both
+sides.
+
+The string bitwise ops (and, or, xor) take the string values of both sides and
+do bitwise operations on the resulting bitstring.

@@ -16,9 +16,9 @@ code instructions and executes the generated instruction sequence directly.
 
 =head1 IMPLEMENTATION
 
-Currently works on B<ALPHA>, B<Arm>, B<Intel x86>, B<PPC>, and B<SPARC
-version 8> processor systems, on most operating systems.  Currently only
-32-bit INTVALs are supported.
+Currently works on B<ALPHA>, B<Arm>, B<Intel x86>, B<PPC>, and B<SPARC version
+8> processor systems, on most operating systems.  Currently only 32-bit INTVALs
+are supported.
 
 The initial step in generating native code is to invoke B<Parrot_jit_begin>,
 which generally provides architecture specific preamble code.  For each parrot
@@ -51,10 +51,10 @@ in native code where adjustments to the native code are required.
 =item jit/${jitcpuarch}/jit_emit.h
 
 This file defines B<Parrot_jit_begin>, B<Parrot_jit_dofixup>,
-B<Parrot_jit_normal_op>, B<Parrot_jit_cpcf_op>, B<Parrot_jit_restart_op>
-and optionally B<Parrot_jit_vtable*_op>.  In addition, this file defines
-the macros and static functions used in F<.jit> files to produce binary
-representations of native instructions.
+B<Parrot_jit_normal_op>, B<Parrot_jit_cpcf_op>, B<Parrot_jit_restart_op> and
+optionally B<Parrot_jit_vtable*_op>.  In addition, this file defines the macros
+and static functions used in F<.jit> files to produce binary representations of
+native instructions.
 
 For moving registers from processor to parrot and vice versa, the
 B<Parrot_jit_emit_mov*> functions have to be implemented.
@@ -73,11 +73,11 @@ This file contains definitions of generic structures used by the JIT subsystem.
 The B<op_jit> array of B<jit_fn_info_t> structures, provides for each opcode, a
 pointer to the function that generates native code for the opcode, whether the
 generic B<Parrot_jit_normal_op> or B<Parrot_jit_cpcf_op> functions or an opcode
-specific function. B<Parrot_jit_restart_op> is like
-B<Parrot_jit_cpcf_op> with the addition to check for a zero program
-counter. The B<Parrot_jit_vtable*_op> functions are defined as
-B<Parrot_jit_normal_op> or B<Parrot_jit_cpcf_op> and may be implemented
-to do native vtable calls (s. F<jit/i386/jit_emit.h> for an example).
+specific function. B<Parrot_jit_restart_op> is like B<Parrot_jit_cpcf_op> with
+the addition to check for a zero program counter. The B<Parrot_jit_vtable*_op>
+functions are defined as B<Parrot_jit_normal_op> or B<Parrot_jit_cpcf_op> and
+may be implemented to do native vtable calls (s. F<jit/i386/jit_emit.h> for an
+example).
 
 The B<Parrot_jit_fixup> structure records the offset in native code where a
 fixup must be applied, the type of fixup required and the specific information
@@ -106,8 +106,8 @@ of converting all offsets once, for the unknown cost of repeatedly converting
 these offsets while executing native code.
 
 If the architecture defines B<INT_REGISTERS_TO_MAP> and
-B<FLOAT_REGISTERS_TO_MAP> as nonzero, this amount of most used registers
-per code section are mapped to native processor registers.
+B<FLOAT_REGISTERS_TO_MAP> as nonzero, this amount of most used registers per
+code section are mapped to native processor registers.
 
 =item jit2h.pl
 
@@ -117,9 +117,9 @@ Preprocesses the .jit files to produce F<jit_cpu.c>.
 
 =head1 Defines in jit_emit.h
 
-The architecture specific F<jit_emit.h> file communicates some defines
-and tables with F<jit.c> and F<languages/imcc/imc.c>. The structure of
-the file and the defines must therefore follow a specific syntax.
+The architecture specific F<jit_emit.h> file communicates some defines and
+tables with F<jit.c> and F<languages/imcc/imc.c>. The structure of the file and
+the defines must therefore follow a specific syntax.
 
 =head2 Overall structure
 
@@ -145,22 +145,20 @@ the file and the defines must therefore follow a specific syntax.
 
 =item INT_REGISTERS_TO_MAP
 
-This is the amount of integer registers to be mapped to processor
-registers. The corresponding B<intval_map[]> has to have exactly this
-amount of register numbers. A register with the value of zero can not
-be in the list.
+This is the amount of integer registers to be mapped to processor registers.
+The corresponding B<intval_map[]> has to have exactly this amount of register
+numbers. A register with the value of zero can not be in the list.
 
 =item FLOAT_REGISTERS_TO_MAP
 
-When this is defined, it works like above for floating point
-registers.
+When this is defined, it works like above for floating point registers.
 
 =item PRESERVED_INT_REGS
 
-When this is defined, it's the amount of integer registers, that are
-preserved over function calls. These preserved registers have to be first in
-B<intval_map>. When this is not defined, it is assumed that B<all>
-registers are preserved over function calls.
+When this is defined, it's the amount of integer registers, that are preserved
+over function calls. These preserved registers have to be first in
+B<intval_map>. When this is not defined, it is assumed that B<all> registers
+are preserved over function calls.
 
 =item PRESERVED_FLOAT_REGS
 
@@ -170,25 +168,24 @@ Same for floating point registers.
 
 =item JUMP_ALIGN
 
-If these are defined, B<JUMP_ALIGN> should be a small number stating
-the desired alignment of jump targets is B<1 << JUMP_ALIGN>.  The
-B<jit_emit_noop> gets called with the unaligned B<pc> repeatedly,
-until the B<pc> has the desired alignment. So the function can either
-emit a one byte B<noop> instruction, or a B<noop> like instruction
-(sequence) with the desired size, to achieve the necessary padding.
-The emitted code must not have any side effects.
+If these are defined, B<JUMP_ALIGN> should be a small number stating the
+desired alignment of jump targets is B<1 << JUMP_ALIGN>.  The B<jit_emit_noop>
+gets called with the unaligned B<pc> repeatedly, until the B<pc> has the
+desired alignment. So the function can either emit a one byte B<noop>
+instruction, or a B<noop> like instruction (sequence) with the desired size, to
+achieve the necessary padding.  The emitted code must not have any side
+effects.
 
 =item ALLOCATE_REGISTERS_PER_SECTION
 
-Normally F<jit.c> does register allocation per section, but there is a
-somewhat experimental feature, to allocate registers per basic block.
+Normally F<jit.c> does register allocation per section, but there is a somewhat
+experimental feature, to allocate registers per basic block.
 
 =item MAP
 
-Jit code generated by the F<imcc> JIT optimizer used negative numbers
-for mapped registers and positive numbers for non mapped parrot
-registers. To use this feature, the definition of mapped registers can
-be redefined like so:
+Jit code generated by the F<imcc> JIT optimizer used negative numbers for
+mapped registers and positive numbers for non mapped parrot registers. To use
+this feature, the definition of mapped registers can be redefined like so:
 
     #define MAP(i) OMAP(i)
     #undef MAP
@@ -224,15 +221,15 @@ The closing curly brace has to be in the first column.
 
 =item Comment lines
 
-Comments are marked with a I<;> in the first column. These and empty
-lines are ignored.
+Comments are marked with a I<;> in the first column. These and empty lines are
+ignored.
 
 =item Identifiers
 
-In general, prefixing an identifier with I<&> yields an address.
-The I<*> prefix specifies a value.  Since Parrot register values vary
-during code execution, their values can not be obtained through
-identifier substitution alone.
+In general, prefixing an identifier with I<&> yields an address.  The I<*>
+prefix specifies a value.  Since Parrot register values vary during code
+execution, their values can not be obtained through identifier substitution
+alone.
 
 B<INT_REG[n]>
 
@@ -246,8 +243,8 @@ B<STRING_REG[n]>
 
 Gets replaced by the C<STRING> register specified in the I<n>th argument.
 
-To obtain register offsets, another set of macros exists, that have C<OFFS>
-in their names:
+To obtain register offsets, another set of macros exists, that have C<OFFS> in
+their names:
 
 B<REG_OFFS_INT(reg_no)> ...
 
@@ -271,31 +268,38 @@ Note: The register with the physical number zero can not be mapped.
 
 B<STRING_CONST_strstart[n]>
 
-Gets replaced by C<strstart> of the C<STRING> constant specified in the I<n>th argument.
+Gets replaced by C<strstart> of the C<STRING> constant specified in the I<n>th
+argument.
 
 B<STRING_CONST_buflen[n]>
 
-Gets replaced by C<buflen> of the C<STRING> constant specified in the I<n>th argument.
+Gets replaced by C<buflen> of the C<STRING> constant specified in the I<n>th
+argument.
 
 B<STRING_CONST_flags[n]>
 
-Gets replaced by C<flags> of the C<STRING> constant specified in the I<n>th argument.
+Gets replaced by C<flags> of the C<STRING> constant specified in the I<n>th
+argument.
 
 B<STRING_CONST_strlen[n]>
 
-Gets replaced by C<strlen> of the C<STRING> constant specified in the I<n>th argument.
+Gets replaced by C<strlen> of the C<STRING> constant specified in the I<n>th
+argument.
 
 B<STRING_CONST_encoding[n]>
 
-Gets replaced by C<encoding> of the C<STRING> constant specified in the I<n>th argument.
+Gets replaced by C<encoding> of the C<STRING> constant specified in the I<n>th
+argument.
 
 B<STRING_CONST_type[n]>
 
-Gets replaced by C<type> of the C<STRING> constant specified in the I<n>th argument.
+Gets replaced by C<type> of the C<STRING> constant specified in the I<n>th
+argument.
 
 B<STRING_CONST_language[n]>
 
-Gets replaced by C<language> of the C<STRING> constant specified in the I<n>th argument.
+Gets replaced by C<language> of the C<STRING> constant specified in the I<n>th
+argument.
 
 =end unimp
 
@@ -314,13 +318,13 @@ The I<n>th integer or floating point scratch register.
 
 =item B<TEMPLATE> I<template-name> { \n I<body> \n }
 
-Defines a template for similar functions, e.g. all the binary ops taking
-three variable parameters.
+Defines a template for similar functions, e.g. all the binary ops taking three
+variable parameters.
 
 =item I<template-name> I<perl-subst> ...
 
-Take a template and do all substitutions to generate the implementation
-for this jit function.
+Take a template and do all substitutions to generate the implementation for
+this jit function.
 
 Example:
 
@@ -342,9 +346,9 @@ Example:
     }
 
 The jit function B<Parrot_set_i_ic> is based on the template
-B<Parrot_set_x_ic>, the I<s/x/y/> are substitutions on the template
-body, to generate the actual function body. These substitutions are done
-before the other substitutions.
+B<Parrot_set_x_ic>, the I<s/x/y/> are substitutions on the template body, to
+generate the actual function body. These substitutions are done before the
+other substitutions.
 
 s. F<jit/i386/core.jit> for more.
 
@@ -361,8 +365,8 @@ jit_emit_I<<op>>_I<<args>>_I<<type>>
 
 =item I<<op>>
 
-This is the operation like B<mov>, B<add> or B<bxor>. In normal cases
-this is the PASM name of the op.
+This is the operation like B<mov>, B<add> or B<bxor>. In normal cases this is
+the PASM name of the op.
 
 =item I<<args>>
 
@@ -387,9 +391,8 @@ An immediate operand, i.e. an integer constant.
 
 =item I<<type>>
 
-Specifies if this operation works on integer or floating point
-arguments. If all arguments are of the same type, only one type
-specifier is needed.
+Specifies if this operation works on integer or floating point arguments. If
+all arguments are of the same type, only one type specifier is needed.
 
 =over 4
 
@@ -421,21 +424,20 @@ Move integer constant (immediate) to floating point register.
 
 =head1 ALPHA Notes
 
-The access to Parrot registers is done relative to C<$6>, all other
-memory access is done relative to C<$27>, to access float constants
-relative to C<$7> so you must preside the instruction with I<ldah
-$7,0($27)>.
+The access to Parrot registers is done relative to C<$6>, all other memory
+access is done relative to C<$27>, to access float constants relative to C<$7>
+so you must preside the instruction with I<ldah $7,0($27)>.
 
 =head1 i386 Notes
 
 Only 32 bit INTVALs are supported. Long double FLOATVALs are ok.
 
-There are four mapped integer registers B<%edi>, B<%esi>, B<%ecx>, and
-B<%edx>. The first 2 of these are callee saved, they preserve their
-value around extern function calls.
+There are four mapped integer registers B<%edi>, B<%esi>, B<%ecx>, and B<%edx>.
+The first 2 of these are callee saved, they preserve their value around extern
+function calls.
 
-Four floating point operations the registers B<ST1> ... B<ST4> are
-mapped and considered as preserved over function calls.
+Four floating point operations the registers B<ST1> ... B<ST4> are mapped and
+considered as preserved over function calls.
 
 The register C<%ebx> holds the register frame pointer.
 
@@ -461,8 +463,8 @@ B<Parrot Bytecode:> (only the bytecode segment is shown)
    |            +--------------------------------- set_i_i (2 arguments)
    +---------------------------------------------- set_i_ic (2 arguments)
 
-Please note that the opcode numbers used might have already changed.
-Also generated assembly code might be different.
+Please note that the opcode numbers used might have already changed.  Also
+generated assembly code might be different.
 
 B<Intel x86 assembly version of the Parrot ops:>
 
@@ -515,17 +517,17 @@ B<Parrot_jit_end>
     0x817de1c <jit_func+76>:    ret
 
 Please note the reverse argument direction. PASM and JIT notations use
-I<dest,src,src>, while F<gdb> and the internal macros in F<jit_emit.h>
-have I<src,dest>.
+I<dest,src,src>, while F<gdb> and the internal macros in F<jit_emit.h> have
+I<src,dest>.
 
 =head1 Debugging
 
-Above listing was generated by F<gdb>, the GNU debugger, with a little
-help from Parrot_jit_debug, which generates a symbol file in I<stabs>
-format, s. B<info stabs> for more (or less :-()
+Above listing was generated by F<gdb>, the GNU debugger, with a little help
+from Parrot_jit_debug, which generates a symbol file in I<stabs> format, s.
+B<info stabs> for more (or less :-()
 
-The following script calls F<ddd> (the graphic debugger fronted) and
-attaches the symbol file, after it got built in F<build_asm>.
+The following script calls F<ddd> (the graphic debugger fronted) and attaches
+the symbol file, after it got built in F<build_asm>.
 
     # dddp
     # run ddd parrot with given file
@@ -541,11 +543,11 @@ attaches the symbol file, after it got built in F<build_asm>.
     ddd --command .ddd parrot &
 
 Run this with e.g. I<dddp t/op/jit_2>, then turn on the register status,
-I<step> or I<nexti> through the source, or set break points as with any
-other language.
+I<step> or I<nexti> through the source, or set break points as with any other
+language.
 
-You can examine parrot registers via the debugger or even set them and
-you can always step into external opcode and look at I<*interpreter>.
+You can examine parrot registers via the debugger or even set them and you can
+always step into external opcode and look at I<*interpreter>.
 
 The tests F<t/op/jit*.t> have some test cases for testing register allocation.
 These tests are written for a mapping of 4 processor registers. If your

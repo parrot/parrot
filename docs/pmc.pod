@@ -22,8 +22,8 @@ value, especially the private flags are 0.
 
 There are no special rules, where to store what: use whatever fits best. If
 your PMC points to a B<STRING *>, hang it off the B<PMC_str_val()>, if it's an
-B<INTVAL>, place it in B<PMC_int_val()>. If you need to store two items, try
-to use union members that have distinct storage like B<PObj_bustart()> /
+B<INTVAL>, place it in B<PMC_int_val()>. If you need to store two items, try to
+use union members that have distinct storage like B<PObj_bustart()> /
 B<PObj_buf_len()> or B<PMC_struct_val()> / B<PMC_pmc_val()> in parallel with
 B<PMC_num_val()>.
 
@@ -45,10 +45,10 @@ which can be used for storing 8 bits.
 
 =head2 Overview
 
-The DOD system doesn't make any assumptions about your PMC's layout. Whenever
-a PMC is found in the root set, B<pobject_lives()> is called with that PMC.
-The PMC is responsible to mark all contained or referenced active Parrot
-objects (Buffers or other PMCs).
+The DOD system doesn't make any assumptions about your PMC's layout. Whenever a
+PMC is found in the root set, B<pobject_lives()> is called with that PMC.  The
+PMC is responsible to mark all contained or referenced active Parrot objects
+(Buffers or other PMCs).
 
 =head2 DOD related flags
 
@@ -59,8 +59,8 @@ objects (Buffers or other PMCs).
 =item PObj_is_PMC_ptr_FLAG
 
 B<PMC_data> points to a B<PObj> object. This PMC or Buffer gets marked
-automatically. (Since the unification of PMCs and Buffers, these two flags
-are the same).
+automatically. (Since the unification of PMCs and Buffers, these two flags are
+the same).
 
 =item PObj_is_buffer_of_PMCs_ptr_FLAG
 
@@ -85,8 +85,8 @@ connection, it has to take care of freeing or closing these system resources.
 
 =item PObj_active_destroy_FLAG
 
-The PMC's B<destroy> vtable is called, when this PMC is found to be dead
-during DOD.
+The PMC's B<destroy> vtable is called, when this PMC is found to be dead during
+DOD.
 
 =item PObj_needs_early_DOD_FLAG
 
@@ -101,7 +101,7 @@ F<include/parrot/pobj.h>, F<src/dod.c>, F<docs/pdds/pdd02_vtables.pod>
 
 =head1 AUTHOR
 
-Leopold Toetsch E<lt>lt@toetsch.atE<gt>
+Leopold Toetsch C<lt@toetsch.at>
 
 =head1 VERSION
 

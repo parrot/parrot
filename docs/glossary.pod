@@ -18,12 +18,11 @@ Please keep me alphabetical!
 =head2 Continuations
 
 Think of continuations as an execution "context". This context includes
-everything local to that execution path, not just the stack. It is a
-snapshot in time (minus global variables). While it is similar to C's
-C<setjmp> (taking the continuation)/C<longjmp> (invoking the continuation),
-C<longjmp>'ing only works "down" the stack; jumping "up"
-the stack (ie, back to a frame that has returned) is bad. Continuations
-can work either way. 
+everything local to that execution path, not just the stack. It is a snapshot
+in time (minus global variables). While it is similar to C's C<setjmp> (taking
+the continuation)/C<longjmp> (invoking the continuation), C<longjmp>'ing only
+works "down" the stack; jumping "up" the stack (ie, back to a frame that has
+returned) is bad. Continuations can work either way. 
 
 We can do two important things with continuations:
 
@@ -31,20 +30,19 @@ We can do two important things with continuations:
 
 =item 1
 
-Create and pass a continuation object to a subroutine, which may
-recursively pass that object up the call chain until, at some point,
-the continuation can be called/executed to handle the final
-computation or return value. This is pretty much tail recursion.
+Create and pass a continuation object to a subroutine, which may recursively
+pass that object up the call chain until, at some point, the continuation can
+be called/executed to handle the final computation or return value. This is
+pretty much tail recursion.
 
 =item 2
 
-Continuations can be taken at an arbitrary call depth, freezing the
-call chain (context) at that point in time. If we save that
-continuation object into a variable, we can later reinstate the
-complete context by its "handle". This allows neat things like
-backtracking that aren't easily done in conventional stacked languages,
-such as C. Since continuations represent "branches" in context, it
-requires an environment that uses some combination of heap-based
+Continuations can be taken at an arbitrary call depth, freezing the call chain
+(context) at that point in time. If we save that continuation object into a
+variable, we can later reinstate the complete context by its "handle". This
+allows neat things like backtracking that aren't easily done in conventional
+stacked languages, such as C. Since continuations represent "branches" in
+context, it requires an environment that uses some combination of heap-based
 stacks, stack trees and/or stack copying.
 
 =back
@@ -52,33 +50,31 @@ stacks, stack trees and/or stack copying.
 It is common in a system that supports continuations to implement
 L<co-routines|"Co-Routines"> on top of them.
 
-A continuation is a sort of super-closure. When you take a 
-continuation, it makes a note of the current call stack and lexical 
-scratchpads, along with the current location in the code. When you 
-invoke a continuation, the system drops what it's doing, puts the 
-call stack and scratchpads back, and jumps to the execution point you 
-were at when the continuation was taken. It is, in effect, like you 
-never left that point in your code.
+A continuation is a sort of super-closure. When you take a continuation, it
+makes a note of the current call stack and lexical scratchpads, along with the
+current location in the code. When you invoke a continuation, the system drops
+what it's doing, puts the call stack and scratchpads back, and jumps to the
+execution point you were at when the continuation was taken. It is, in effect,
+like you never left that point in your code.
 
-Note that, like with closures, it only puts the *scratchpads* back in 
-scope - it doesn't do anything with the values in the variables that 
-are in those scratchpads.
+Note that, like with closures, it only puts the *scratchpads* back in scope -
+it doesn't do anything with the values in the variables that are in those
+scratchpads.
 
-=for author
-Melvin Smith <mrjoltcola@mindspring.com>
-Dan Sugalski <dan@sidhe.org>
+=for author Melvin Smith C<mrjoltcola@mindspring.com> Dan Sugalski
+C<dan@sidhe.org>
 
 =head2 Co-Routines 
 
-Co-routines are virtually identical to normal subroutines, except
-while subroutines always execute from their starting instruction to where 
-they return, co-routines may suspend themselves (or be suspended asynchronously 
-if the language permits) and resume at that point later. We can implement 
-things like "factories" with co-routines. If the co-routine never returns, 
-every time we call it, we "resume" the routine.
+Co-routines are virtually identical to normal subroutines, except while
+subroutines always execute from their starting instruction to where they
+return, co-routines may suspend themselves (or be suspended asynchronously if
+the language permits) and resume at that point later. We can implement things
+like "factories" with co-routines. If the co-routine never returns, every time
+we call it, we "resume" the routine.
 
-A co-routine is a subroutine that can stop in the middle, and start back
-up later at the point you stopped. For example:
+A co-routine is a subroutine that can stop in the middle, and start back up
+later at the point you stopped. For example:
 
     sub sample : coroutine {
        print "A\n";
@@ -97,32 +93,29 @@ will print
      Foo!
      B
 
-Basically, the C<yield> keyword says, "Stop here, but the next time we're 
-called, pick up at the next statement." If you return from a 
-co-routine, the next invocation starts back at the beginning. 
-Co-routines remember all their state, local variables, and suchlike 
-things.
+Basically, the C<yield> keyword says, "Stop here, but the next time we're
+called, pick up at the next statement." If you return from a co-routine, the
+next invocation starts back at the beginning.  Co-routines remember all their
+state, local variables, and suchlike things.
 
 =for author
-Melvin Smith <mrjoltcola@mindspring.com>
-Dan Sugalski <dan@sidhe.org>
+Melvin Smith C<mrjoltcola@mindspring.com>
+Dan Sugalski C<dan@sidhe.org>
 
 =head2 COW
 
-COW stands for Copy On Write. This is a pure speed-hack technique that
-copies strings without actually copying the string data until it's
-absolutely necessary.
+COW stands for Copy On Write. This is a pure speed-hack technique that copies
+strings without actually copying the string data until it's absolutely
+necessary.
 
-If you have a string A, and make a copy of it to get string B, the two
-strings should be identical, at least to start. With COW, they are,
-because string A and string B aren't actually two separate
-strings - they're the same string, marked COW. If either string A or
-string B are changed, the system notes it and only at that point does
-it make a copy of the string and change it.
+If you have a string A, and make a copy of it to get string B, the two strings
+should be identical, at least to start. With COW, they are, because string A
+and string B aren't actually two separate strings - they're the same string,
+marked COW. If either string A or string B are changed, the system notes it and
+only at that point does it make a copy of the string and change it.
 
-If the program never actually changes the string - something that's
-fairly common - the program need never make a copy, saving both 
-memory and time. 
+If the program never actually changes the string - something that's fairly
+common - the program need never make a copy, saving both memory and time. 
 
 =for author
 Nicholas Clark <nick@ccl4.org>, as clarified by Leo
@@ -136,10 +129,9 @@ are adequate, may only happen as a side effect of program exit.
 =head2 DOD
 
 Dead Object Detection is the process of sweeping through all the objects,
-variables, and whatnot inside of Parrot, and deciding which ones are in
-use and which ones aren't. The ones that aren't in use are then freed
-up for later reuse. (After they're destroyed, if active destruction
-is warranted.)
+variables, and whatnot inside of Parrot, and deciding which ones are in use and
+which ones aren't. The ones that aren't in use are then freed up for later
+reuse. (After they're destroyed, if active destruction is warranted.)
 
 See also: L<"GC">
 
@@ -155,16 +147,14 @@ reclaimed by the related L<"destruction"> operation, as and when necessary.
 
 =head2 GC
 
-Garbage Collection is the process of sweeping through all the
-active objects, variables, and structures, marking the memory
-they're using as in use, and all other memory is freed up for later
-reuse. 
+Garbage Collection is the process of sweeping through all the active objects,
+variables, and structures, marking the memory they're using as in use, and all
+other memory is freed up for later reuse. 
 
-Garbage Collection and Dead Object Detection are separate in Parrot,
-since we generally chew through memory segments faster than we chew
-through objects. (This is a characteristic peculiar to Perl and other
-languages that do string processing. Other languages chew through
-objects faster than memory)
+Garbage Collection and Dead Object Detection are separate in Parrot, since we
+generally chew through memory segments faster than we chew through objects.
+(This is a characteristic peculiar to Perl and other languages that do string
+processing. Other languages chew through objects faster than memory)
 
 See also: L<"DOD">
 
@@ -172,112 +162,109 @@ See also: L<"DOD">
 
 International Components for Unicode
 
-ICU is a C and C++ library that provides support for Unicode on a
-variety of platforms.  It was added to Parrot with the 0.0.8 release to
-provide future unicode support.
+ICU is a C and C++ library that provides support for Unicode on a variety of
+platforms.  It was added to Parrot with the 0.0.8 release to provide future
+Unicode support.
 
-http://oss.software.ibm.com/icu/index.html
+L<http://oss.software.ibm.com/icu/index.html>
 
 =head2 IMC
 
-Parrot InterMediate Code, or another name for PIR.  A convention once
-arose to name input files to IMCC with the extension ".imc", so the
-name IMC became synonymous with PIR.
+Parrot InterMediate Code, or another name for PIR.  A convention once arose to
+name input files to IMCC with the extension ".imc", so the name IMC became
+synonymous with PIR.
 
 See also IMCC, PIR.
 
 =head2 IMCC
 
-Parrot's Intermediate Code Compiler, which started its life as an
-improved Parrot assembler, and eventually became so integrated with
-Parrot that it became the Parrot executable (being able to load and
-run PBC files, PASM files or PIR files).
+Parrot's Intermediate Code Compiler, which started its life as an improved
+Parrot assembler, and eventually became so integrated with Parrot that it
+became the Parrot executable (being able to load and run PBC files, PASM files
+or PIR files).
 
 See also PIR.
 
 =head2 Packfile
 
-Another name for a PBC file, due to the names used for data structures
-in one of the early implementations in Perl5.
+Another name for a PBC file, due to the names used for data structures in one
+of the early implementations in Perl5.
 
 =head2 PBC
 
-Parrot Byte Code. The name for the "executable" files that can be
-passed to the Parrot interpreter for immediate execution (although
-PASM and IMC files can be executed directly, too).
+Parrot Byte Code. The name for the "executable" files that can be passed to the
+Parrot interpreter for immediate execution (although PASM and IMC files can be
+executed directly, too).
 
 See also Packfile.
 
 =head2 PIR
 
-Parrot Intermediate Representation. A medium-level assembly language
-for Parrot that hides messy details like register allocation so
-language compiler writers who target PIR don't have to roll their own.
+Parrot Intermediate Representation. A medium-level assembly language for Parrot
+that hides messy details like register allocation so language compiler writers
+who target PIR don't have to roll their own.
 
 See also IMC.
 
 =head2 PMC
 
-PMC is an acronym for Parrot Magic Cookie. (Or Cracker, your choice.)  
-PMC classes are the primitives that Parrot-based languages use
-to represent their fundamental types, such as Perl's scalar values.
+PMC is an acronym for Parrot Magic Cookie. (Or Cracker, your choice.)  PMC
+classes are the primitives that Parrot-based languages use to represent their
+fundamental types, such as Perl's scalar values.
 
 =head2 Predereferencing
 
-A bytecode transformation technique which reduces the amount of
-pointer dereferencing done in the inner loop of the interpreter
-by pre-converting opcode numbers into pointers to their opfuncs,
-and also converting the register numbers and constant numbers in
-the arguments to the ops into pointers.
+A bytecode transformation technique which reduces the amount of pointer
+dereferencing done in the inner loop of the interpreter by pre-converting
+opcode numbers into pointers to their opfuncs, and also converting the register
+numbers and constant numbers in the arguments to the ops into pointers.
 
-The original implementation by Gregor Purdy was posted on 2001-12-11.
-On one test system, it resulted in a 22% speed increase on a test
-program with a tight inner loop.
+The original implementation by Gregor Purdy was posted on 2001-12-11.  On one
+test system, it resulted in a 22% speed increase on a test program with a tight
+inner loop.
 
-http://archive.develooper.com/perl6-internals@perl.org/msg06941.html
+L<http://archive.develooper.com/perl6-internals@perl.org/msg06941.html>
 
-On 2001-12-18, predereferencing got a speed boost (to about 47% faster
-than the regular DO_OP inner loop -- without compiler optimizations
-turned on). This was due to an off-list (actually over lunch)
-suggestion by John Kennedy that instead of pre-initializing the new
-copy of the bytecode with NULL pointers, we pre-initialize it with
-pointers to a pseudo-opfunc that does the predereferencing whenever
-it is encountered.
+On 2001-12-18, predereferencing got a speed boost (to about 47% faster than the
+regular DO_OP inner loop -- without compiler optimizations turned on). This was
+due to an off-list (actually over lunch) suggestion by John Kennedy that
+instead of pre-initializing the new copy of the bytecode with NULL pointers, we
+pre-initialize it with pointers to a pseudo-opfunc that does the
+predereferencing whenever it is encountered.
 
-On 2002-04-11, Jason Gloudon suggested combining aspects of the Computed
-Goto Core and the Prederef[erencing] Core.
+On 2002-04-11, Jason Gloudon suggested combining aspects of the Computed Goto
+Core and the Prederef[erencing] Core.
 
-http://archive.develooper.com/perl6-internals@perl.org/msg07064.html
+L<http://archive.develooper.com/perl6-internals@perl.org/msg07064.html>
 
 The week of 2003-02-09, Leopold Totsch combined Computed Goto and
 Predereferencing to produce the CGP core.
 
-http://dev.perl.org/perl6/list-summaries/2003/p6summary.2003-02-09.html#Week_of_the_alternative_runloops
+L<http://dev.perl.org/perl6/list-summaries/2003/p6summary.2003-02-09.html#Week_of_the_alternative_runloops>
 
-Later, on 2003-02-14, Leopold Totsch and Nicholas Clark combined the
-JIT and the Computed Goto Prederef cores to great effect.
+Later, on 2003-02-14, Leopold Totsch and Nicholas Clark combined the JIT and
+the Computed Goto Prederef cores to great effect.
 
-http://www.perl.com/pub/a/2003/02/p6pdigest/20030216.html
+L<http://www.perl.com/pub/a/2003/02/p6pdigest/20030216.html>
 
 
 =head2 Vtable
 
-A table of operations attached to some data types, such as PMCs and
-strings.  Vtables are used to avoid using switches or long C<if> chains to
-handle different data types.  They're similar to method calls, except
-that their names are pre-selected.
+A table of operations attached to some data types, such as PMCs and strings.
+Vtables are used to avoid using switches or long C<if> chains to handle
+different data types.  They're similar to method calls, except that their names
+are pre-selected.
 
 =for author
-From: "Brent Dax" <brentdax@cpan.org>
+From: "Brent Dax" C<brentdax@cpan.org>
 
 =head2 Warnock's Dilemma
 
-The dilemma you face when posting a message to a public forum about
-something and not even getting an acknowledgment of its
-existence. This leaves you wondering if your problem is unimportant or
-previously addressed, if everyone's waiting on someone else to answer
-you,  or if maybe your mail never actually made it to anyone else in
-the forum.
+The dilemma you face when posting a message to a public forum about something
+and not even getting an acknowledgment of its existence. This leaves you
+wondering if your problem is unimportant or previously addressed, if everyone's
+waiting on someone else to answer you,  or if maybe your mail never actually
+made it to anyone else in the forum.
 
 =head1 CORRECTIONS
 

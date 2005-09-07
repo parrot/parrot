@@ -7,98 +7,91 @@ docs/dev/events.pod - Design Notes for Events
 
 =head1 VERSION
 
-This document describes the current state, which might not be
-the final implementation.
+This document describes the current state, which might not be the final
+implementation.
 
 =head1 Overview
 
-Parrot has to deal with asynchronous events (from timers, signals,
-async IO, notifications, and so on). This document describes the
-current implementation.
+Parrot has to deal with asynchronous events (from timers, signals, async IO,
+notifications, and so on). This document describes the current implementation.
 
 =head1 Prelims
 
-As there is currently no good test if a threading library is included
-at link time, its assumed, that platforms having
-B<PARROT_HAS_HEADER_PTHREAD> link against B<libpthread>.
+As there is currently no good test if a threading library is included at link
+time, its assumed, that platforms having B<PARROT_HAS_HEADER_PTHREAD> link
+against B<libpthread>.
 
 =head1 DESCRIPTION
 
 On construction of the first interpreter (the one with no
-B<parent_interpreter>) two threads are started: The B<event_thread>,
-which manages the static global B<event_queue> and the B<io_thread>
-which is responsible for signal and IO related events.
+B<parent_interpreter>) two threads are started: The B<event_thread>, which
+manages the static global B<event_queue> and the B<io_thread> which is
+responsible for signal and IO related events.
 
 =head2 Events
 
-Events can be either timed (they are due after some elapsed time) or 
-untimed. For the former there is one API call: B<Parrot_new_timer_event>, 
-used by the F<dynoplibs/myops.ops>:B<alarm> opcode for testing.
+Events can be either timed (they are due after some elapsed time) or untimed.
+For the former there is one API call: B<Parrot_new_timer_event>, used by the
+F<dynoplibs/myops.ops>:B<alarm> opcode for testing.
 
 =head2 The B<event_thread>
 
-The B<event_thread> holds the B<event_queue> mutex first. When there
-is no event entry in the B<event_queue>, the B<event_thread> waits on
-the event condition until an event arrives. When there is an event
-with a timed entry, a timed wait is performed. (Waiting on the
-condition releases the mutex, so that other threads can insert events
-into the B<event_queue>.)
+The B<event_thread> holds the B<event_queue> mutex first. When there is no
+event entry in the B<event_queue>, the B<event_thread> waits on the event
+condition until an event arrives. When there is an event with a timed entry, a
+timed wait is performed. (Waiting on the condition releases the mutex, so that
+other threads can insert events into the B<event_queue>.)
 
-When an event arrives (or the timeout was reached) the B<event_thread>
-pops off all events and places the queue entries into the interpreter's
-B<task_queue>. This also enables event checking in the interpreter's
-run-core.
+When an event arrives (or the timeout was reached) the B<event_thread> pops off
+all events and places the queue entries into the interpreter's B<task_queue>.
+This also enables event checking in the interpreter's run-core.
 
-When the popped off entry is a timed event and has a repeat interval,
-the entry is duplicated and reinserted with the interval added to the
-current time.
+When the popped off entry is a timed event and has a repeat interval, the entry
+is duplicated and reinserted with the interval added to the current time.
 
 =head2 B<Signals>
 
-All signals that should be handled inside Parrot are blocked in all
-threads and only enabled in the B<io_thread>. The signal handler
-functions just sets an atomic flag, that this signal arrived and
-returns. This finally interrupts the select(2) loop in the
-B<io_thread>.
+All signals that should be handled inside Parrot are blocked in all threads and
+only enabled in the B<io_thread>. The signal handler functions just sets an
+atomic flag, that this signal arrived and returns. This finally interrupts the
+select(2) loop in the B<io_thread>.
 
 =head2 The B<io_thread>
 
-The B<io_thread> sleeps in a select(2) loop, which is interrupted
-when either a signal arrives or when one of the file descriptors has a
-ready condition. Additionally the file descriptor set contains the
-reader end of an internal pipe, which is used by other threads to
-communicate with the B<io_thread>.
+The B<io_thread> sleeps in a select(2) loop, which is interrupted when either a
+signal arrives or when one of the file descriptors has a ready condition.
+Additionally the file descriptor set contains the reader end of an internal
+pipe, which is used by other threads to communicate with the B<io_thread>.
 
-Signal events like SIGINT are broadcasted to all running
-interpreters, which then throw an appropriate exception.
+Signal events like SIGINT are broadcasted to all running interpreters, which
+then throw an appropriate exception.
 
 =head2 The interpreter event checking code
 
-We cannot interrupt the interpreter at arbitrary points and run some
-different code (e.g. a PASM subroutine handling timer events). So when
-an event is put into the interpreter's B<task_queue> the opcode
-dispatch table for the interpreter is changed.
+We cannot interrupt the interpreter at arbitrary points and run some different
+code (e.g. a PASM subroutine handling timer events). So when an event is put
+into the interpreter's B<task_queue> the opcode dispatch table for the
+interpreter is changed.
 
-Plain function cores get a function table with all entries filled with
-the B<check_events__> opcode. This opcode pops off and finally handles
-the event. The same scheme works for the CGOTO core, where the address
-table is replaced. The switched core does an explicit check if events
-are to be handled.
+Plain function cores get a function table with all entries filled with the
+B<check_events__> opcode. This opcode pops off and finally handles the event.
+The same scheme works for the CGOTO core, where the address table is replaced.
+The switched core does an explicit check if events are to be handled.
 
-Prederefed and especially the CGP core don't have an opcode dispatch
-table that is checked during running the opcodes. When an event is
-scheduled, the event handler replaces backward branches in the opcode
-image with the B<check_events__> opcode.
+Prederefed and especially the CGP core don't have an opcode dispatch table that
+is checked during running the opcodes. When an event is scheduled, the event
+handler replaces backward branches in the opcode image with the
+B<check_events__> opcode.
 
 The JIT core doesn't handle events yet.
 
-After all events are popped off and handled, the opcode dispatch table
-is restored to its original, and the B<check_events__> reexecutes the
-same instruction again, which is now the real one and thus normal
-execution flow continues.
+After all events are popped off and handled, the opcode dispatch table is
+restored to its original, and the B<check_events__> reexecutes the same
+instruction again, which is now the real one and thus normal execution flow
+continues.
 
-This scheme has zero overhead in the absence of scheduled events for
-all cores except switched and JIT.
+This scheme has zero overhead in the absence of scheduled events for all cores
+except switched and JIT.
 
 =head1 Missing
 
@@ -110,8 +103,8 @@ Sync events could be placed directly into the interpreter's task queue.
 
 =item Async IO
 
-That depends probably on the underlying OS, i.e. if it does async IO
-or we have to do it.
+That depends probably on the underlying OS, i.e. if it does async IO or we have
+to do it.
 
 =item Event priorities
 
@@ -121,7 +114,7 @@ or we have to do it.
 
 =head1 Author
 
-Leopold Toetsch <lt@toetsch.at>
+Leopold Toetsch C<lt@toetsch.at>
 
 =cut
 

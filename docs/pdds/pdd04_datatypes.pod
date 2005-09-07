@@ -210,7 +210,7 @@ None.
 
 The perl modules Math::BigInt and Math::BigFloat. Alex Gough's suggestions
 for bigint/bignum implementation, outlined in F<docs/pdds/pdd14_bignum.pod>.
-The Unicode standard at http://www.unicode.org.
+The Unicode standard at L<http://www.unicode.org>.
 
 =head1 GLOSSARY
 
