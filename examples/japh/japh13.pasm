@@ -7,6 +7,8 @@
 =head1 DESCRIPTION
 
 2 threads, synced by sleeping time only
+This is unreliable,
+especially on multiprocessor or heavily-loaded systems.
 
 =cut
 
