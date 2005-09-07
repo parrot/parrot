@@ -124,6 +124,15 @@ If the program never actually changes the string - something that's
 fairly common - the program need never make a copy, saving both 
 memory and time. 
 
+=for author
+Nicholas Clark <nick@ccl4.org>, as clarified by Leo
+
+=head2 destruction
+
+Destruction is low level memory clean up, such as calling C<free> on
+C<malloc>ed memory.  This happens after L<"finalization">, and if resources
+are adequate, may only happen as a side effect of program exit.
+
 =head2 DOD
 
 Dead Object Detection is the process of sweeping through all the objects,
@@ -133,6 +142,16 @@ up for later reuse. (After they're destroyed, if active destruction
 is warranted.)
 
 See also: L<"GC">
+
+=for author
+Nicholas Clark <nick@ccl4.org>, as clarified by Leo
+
+=head2 finalization
+
+Finalization is high-level, user visible cleanup of objects, such as closing an
+associated DB handle. Finalization reduces active objects down to passive
+blocks of memory, but does not actually reclaim that memory. Memory is
+reclaimed by the related L<"destruction"> operation, as and when necessary.
 
 =head2 GC
 
