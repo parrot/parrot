@@ -61,17 +61,20 @@ will be matched against. The 'outer rule' if you will.
 =cut
 
 sub p6rule_is {
-    my ($target, $pattern, $description) = @_;
+    my ($target, $pattern, $description, @todo) = @_;
+
     if (ref $pattern) {
         Parrot::Test::pir_output_is(
             Parrot::Test::PGE::_generate_subrule_pir($target, $pattern),
             'matched',
-            $description);
+            $description,
+            @todo);
     } else {
         Parrot::Test::pir_output_is(
             Parrot::Test::PGE::_generate_pir_for($target, $pattern),
             'matched',
-            $description);
+            $description,
+            @todo);
     }
 }
 
@@ -83,17 +86,20 @@ they do not match. The same pattern argument syntax above applies here.
 =cut
 
 sub p6rule_isnt {
-    my ($target, $pattern, $description) = @_;
+    my ($target, $pattern, $description, @todo) = @_;
+
     if (ref $pattern) {
         Parrot::Test::pir_output_is(
             Parrot::Test::PGE::_generate_subrule_pir($target, $pattern),
             'failed',
-            $description);
+            $description,
+            @todo);
     } else {
         Parrot::Test::pir_output_is(
             Parrot::Test::PGE::_generate_pir_for($target, $pattern),
             'failed',
-            $description);
+            $description,
+            @todo);
     }
 }
 
@@ -106,11 +112,12 @@ parameter.  Note that C<$expected> is a I<Perl 5> pattern.
 =cut
 
 sub p6rule_like {
-    my ($target, $pattern, $expected, $description) = @_;
+    my ($target, $pattern, $expected, $description, @todo) = @_;
     Parrot::Test::pir_output_like(
             Parrot::Test::PGE::_generate_pir_for($target, $pattern, 1),
             $expected,
-            $description);
+            $description,
+            @todo);
 }
 
 package Parrot::Test::PGE;
