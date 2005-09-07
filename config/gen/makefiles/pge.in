@@ -4,7 +4,7 @@
 LN_S     = ${lns}
 PERL     = ${perl}
 RM_RF    = ${rm_rf}
-PARROT   = ..${slash_exec}..${slash_exec}parrot${exe}
+PARROT   = ..${slash}..${slash}parrot${exe}
 CP       = ${cp}
 
 # Where to put things
