@@ -1,3 +1,5 @@
+# $Id$
+
 # The very first JaPH: obfuscated
     bounds 1
     trace 0

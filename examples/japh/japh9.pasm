@@ -1,3 +1,5 @@
+# $Id$
+
 # another one with an object
     newclass P0, "Japh"
     find_type I0,"Japh"

@@ -1,3 +1,5 @@
+# $Id$
+
     newclass P1, "JaPH"
     find_global P2, "get_s"
     store_global "JaPH", "__get_string", P2

@@ -1,3 +1,5 @@
+# $Id$
+
 # hack interpreters internals
     bsr _init
 

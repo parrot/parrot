@@ -6,6 +6,7 @@
 #
 # This makefile makes use of specific .dummy targets (rather than .PHONY
 # or .VIRTUAL targets) in an effort to work with various flavors of make.
+#
 ###############################################################################
 
 ###############################################################################
@@ -512,15 +513,16 @@ MAKE_C = ${make_c}
 #
 ###############################################################################
 
-all :   flags_dummy \
-	$(PARROT) \
-	runtime/parrot/include/parrotlib.pbc \
-	runtime/parrot/include/config.fpmc \
-	docs \
-	$(LIBNCI_TEST_SO) \
-	$(GEN_LIBRARY) \
-	dynclasses \
-	compilers
+all : \
+    flags_dummy \
+    $(PARROT) \
+    runtime/parrot/include/parrotlib.pbc \
+    runtime/parrot/include/config.fpmc \
+    docs \
+    $(LIBNCI_TEST_SO) \
+    $(GEN_LIBRARY) \
+    dynclasses \
+    compilers
 
 # constant string support
 .c.str :
@@ -544,9 +546,9 @@ $(INC_DIR)/string_private_cstring.h : $(STR_FILES) build_tools/c2str.pl
 	$(PERL) build_tools/c2str.pl --all
 
 # classes PMC build utils and rules
-PMC2CD=$(PERL) build_tools/pmc2c.pl --dump
-PMC2CC=$(PERL) build_tools/pmc2c.pl --c
-PMC2CV=$(PERL) build_tools/pmc2c.pl --vt
+PMC2CD = $(PERL) build_tools/pmc2c.pl --dump
+PMC2CC = $(PERL) build_tools/pmc2c.pl --c
+PMC2CV = $(PERL) build_tools/pmc2c.pl --vt
 
 .pmc.dump :
 	$(PMC2CD) $<
@@ -591,6 +593,7 @@ help :
 	@echo "  fulltest:          Run test suite with various options."
 	@echo "  test<core>:        Run the test suite with a specified core."
 	@echo "                     Valid cores are b, C, f, g, j, r, S."
+	@echo "  run_tests:         Various command lines and environments"
 	@echo "  src_tests:         Run test in C-file."
 	@echo "  perl_tests:        Test the Perl modules in the distribution."
 	@echo "  testexex:          Testing the exex runcore."
@@ -1174,8 +1177,12 @@ compilers-clean :
 # The --running-make-test argument is currently used by long-running tests
 # to disable GC_DEBUG.
 EXTRA_TEST_ARGS    = --gc-debug --running-make-test
-SRC_TEST_FILES     = t/src/*.t
-PERL_TEST_FILES    = t/perl/*.t
+RUN_TEST_FILES = \
+    t/run/*.t 
+SRC_TEST_FILES = \
+    t/src/*.t
+PERL_TEST_FILES = \
+    t/perl/*.t
 RUNCORE_TEST_FILES = \
     t/library/*.t \
     t/op/*.t \
@@ -1195,7 +1202,7 @@ test_prep : all
 # Users have to look at only one report.
 # Normal core
 test : test_prep
-	$(PERL) t/harness $(EXTRA_TEST_ARGS) $(PARROT_ARGS) $(RUNCORE_TEST_FILES) $(SRC_TEST_FILES) $(PERL_TEST_FILES)
+	$(PERL) t/harness $(EXTRA_TEST_ARGS) $(PARROT_ARGS) $(RUNCORE_TEST_FILES) $(RUN_TEST_FILES) $(SRC_TEST_FILES) $(PERL_TEST_FILES)
 
 # Test various run cores and other stuff
 # 'testC', 'testg' and 'testj' are tested only
@@ -1208,6 +1215,7 @@ fulltest : \
 #CONDITIONED_LINE(jitcapable):    testj \
     testr \
     testS \
+    run_tests \
     src_tests \
     perl_tests \
     testbench
@@ -1247,6 +1255,11 @@ testexec: test_prep
 # Test that need to be compiled by the C-compiler
 src_tests :
 	$(PERL) t/harness $(SRC_TEST_FILES)
+
+# Command line and varous environments
+run_tests :
+	$(PERL) t/harness $(RUN_TEST_FILES)
+
 
 # Test the Perl5 Modules in the Parrot distribution
 perl_tests :

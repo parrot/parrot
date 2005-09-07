@@ -1,3 +1,5 @@
+# $Id$
+
 # JaPH utilizing object
     newclass P1, "Japh"
     find_type I1, "Japh"

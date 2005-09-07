@@ -1,3 +1,5 @@
+# $Id$
+
 # JaPH utilizing a class
     newclass P0, "Japh"
     print P0

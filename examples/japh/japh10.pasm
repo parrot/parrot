@@ -1,3 +1,5 @@
+# $Id$
+
 # 2 threads are alternately printing the JaPH
 # synchronization is done via a TQueue
     find_global P5, "_th1"              # locate thread function

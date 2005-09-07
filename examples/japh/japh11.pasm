@@ -1,3 +1,5 @@
+# $Id$
+
 # delegated multimethod dispatch and obfuscated
     bsr _init
     new P0, .Integer
