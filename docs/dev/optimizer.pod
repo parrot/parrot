@@ -97,6 +97,10 @@ Optimizations using Basic_block info.  These functions invalidate the CFG when a
 
 =over 4
 
+=item branch_reorg()
+
+Moves statements following an unconditional jump in order to remove the jump
+
 =item branch_branch()
 
 Replaces a branch directly to another branch with a single branch to the end of the chain

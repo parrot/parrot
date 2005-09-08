@@ -64,13 +64,13 @@
 /* buggy - turned off */
 #define  DO_LOOP_OPTIMIZATION 0
 
+static int strength_reduce(Interp *interpreter, IMC_Unit *);
 static int if_branch(Interp *, IMC_Unit *);
 
 static int branch_branch(Interp *interpreter, IMC_Unit *);
+static int branch_reorg(Interp *interpreter, IMC_Unit *);
 static int unused_label(Interp *interpreter, IMC_Unit *);
 static int dead_code_remove(Interp *interpreter, IMC_Unit *);
-
-static int strength_reduce(Interp *interpreter, IMC_Unit *);
 
 static int constant_propagation(Interp *interpreter, IMC_Unit *);
 static int used_once(Interp *, IMC_Unit *);
@@ -110,6 +110,8 @@ cfg_optimize(Interp *interpreter, IMC_Unit * unit)
     if (IMCC_INFO(interpreter)->optimizer_level & OPT_PRE) {
         IMCC_info(interpreter, 2, "cfg_optimize\n");
         if (branch_branch(interpreter, unit))
+            return 1;
+        if (branch_reorg(interpreter, unit))
             return 1;
         /* XXX cfg / loop detection breaks e.g. in t/compiler/5_3 */
         if (unused_label(interpreter, unit))
@@ -853,6 +855,72 @@ branch_branch(Interp *interpreter, IMC_Unit * unit)
                     ostat.branch_branch++;
                     ins->r[0] = next->r[0];
                     changed = 1;
+                }
+            }
+        }
+    }
+    return changed;
+}
+
+/*
+ * branch L2  => ...
+ * L1:           branch L4
+ * ...           L1:
+ * branch L3     ...
+ * L2:           branch L3
+ * ...           L5:
+ * branch L4
+ * L5:
+ *
+ * Returns TRUE if any optimizations were performed. Otherwise, returns
+ * FALSE.
+ */
+static int
+branch_reorg(Interp *interpreter, IMC_Unit * unit)
+{
+    Instruction *ins, *start, *end;
+    SymReg * r;
+    Edge *edge;
+    int changed = 0, i, found;
+
+    IMCC_info(interpreter, 2, "\tbranch_reorg\n");
+    for (i = 0; i < unit->n_basic_blocks; i++) {
+	ins = unit->bb_list[i]->end;
+        /* if basic block ends with unconditional jump */
+        if ((ins->type & IF_goto) && !strcmp(ins->op, "branch")) {
+            r = get_sym(ins->r[0]->name);
+            if (r && (r->type & VTADDRESS) && r->first_ins) {
+                start = r->first_ins;
+                found = 0;
+                for (edge = unit->bb_list[start->bbindex]->pred_list; edge; edge = edge->pred_next) {
+                    if (edge->from->index == start->bbindex - 1) {
+                        found = 1;
+                        break;
+                    }
+                }
+                /* if target block is not reached by falling into it from another block */
+                if (!found) {
+                    /* move target block and its positional successors
+                     * to follow block with unconditional jump */
+                    for (end = start; end->next; end = end->next) {
+                        if ((end->type & IF_goto) && !strcmp(end->op, "branch")) {
+                            break;
+                        }
+                    }
+                    ins->next->prev = end;
+                    start->prev->next = end->next;
+                    if (end->next)
+                        end->next->prev = start->prev;
+                    end->next = ins->next;
+                    ins->next = start;
+                    start->prev = ins;
+                    IMCC_debug(interpreter, DEBUG_OPT1,
+                            "found branch to reorganize '%s' %I\n",
+                            r->first_ins->r[0]->name, ins);
+                    /* unconditional jump can be eliminated */
+                    ostat.deleted_ins++;
+                    ins = delete_ins(unit, ins, 1);
+                    return 1;
                 }
             }
         }

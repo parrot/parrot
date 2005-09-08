@@ -3,7 +3,7 @@
 # $Id$
 
 use strict;
-use Parrot::Test tests => 72;
+use Parrot::Test tests => 73;
 
 # these tests are run with -O1 by TestCompiler and show
 # generated PASM code for various optimizations at level 1
@@ -42,6 +42,36 @@ _main:
 	noop
 L2:
 	end
+OUT
+
+##############################
+pir_2_pasm_is(<<'CODE', <<'OUT', "branch reorg");
+.sub _main
+	if I0 > 1 goto L1
+	noop
+	branch L2
+L1:
+        noop
+	goto L3
+L2:
+        noop
+        print "ok\n"
+L3:
+	end
+.end
+CODE
+# IMCC does produce b0rken PASM files
+# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
+_main:
+ lt 1, I0, L1
+ noop
+ noop
+ print "ok\n"
+L3:
+ end
+L1:
+ noop
+ branch L3
 OUT
 
 ##############################
