@@ -321,6 +321,7 @@ docs/dev/events.pod                               [devel]doc
 docs/dev/infant.dev                               [devel]doc
 docs/dev/jit_i386.dev                             [main]doc
 docs/dev/longopt.dev                              [main]doc
+docs/dev/optimizer.pod                            [main]doc
 docs/dev/nanoparrot.c                             [main]doc
 docs/dev/pmc_freeze.pod                           [devel]doc
 docs/dev/rx.dev                                   [main]doc
