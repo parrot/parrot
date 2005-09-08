@@ -97,17 +97,10 @@ also map to a native floating point type.
 
 =head2 PMCs
 
-<<<<<<< .mine
-PMC stands for Parrot Magic Cookie. PMCs represent any complex data structure
-or type, including aggregate data types (arrays, hash tables, etc). A PMC can
-implement its own behavior for arithmetic, logical and string operations
-performed on it, allowing for language-specific behavior to be introduced. PMCs
-=======
 PMC stands for Parrot Magic Cookie. PMCs represent any complex data structure or
 type, including aggregate data types (arrays, hash tables, etc). A PMC can
 implement its own behavior for arithmetic, logical and string operations
 performed on it, allowing for language-specific behavior to be introduced. PMCs
->>>>>>> .r9142
 can be built in to the Parrot executable or dynamically loaded when they are
 needed.
 
