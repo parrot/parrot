@@ -783,7 +783,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "AddrRegistry 1");
     a = new .String
     null nil
     $I0 = reg[a]
-    if $I0 == -1 goto ok1
+    if $I0 == 0 goto ok1
     print "not "
 ok1:
     print "ok 1\n"
@@ -808,7 +808,7 @@ ok4:
     print "ok 4\n"
     delete reg[a]
     $I0 = reg[a]
-    if $I0 == -1 goto ok5
+    if $I0 == 0 goto ok5
     print "not "
 ok5:
     print "ok 5\n"

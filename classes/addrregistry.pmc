@@ -97,7 +97,7 @@ Marks the hash as live.
 
 =item C<INTVAL get_integer_keyed(PMC *key)>
 
-Returns the reference count for C<key> or -1, if the key
+Returns the reference count for C<key> or 0, if the key
 doesn't exist.
 
 =item C<INTVAL elements()>
@@ -118,7 +118,7 @@ Returns true if the hash size is not zero.
 
         b = hash_get_bucket(INTERP, hash, key);
         if (b == NULL)
-	    return -1;
+	    return 0;
 	return (INTVAL) b->value;
     }
 
