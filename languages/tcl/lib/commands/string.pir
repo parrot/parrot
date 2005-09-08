@@ -382,3 +382,65 @@ bad_args:
   $P1 = "wrong # args: should be \"string map ?-nocase? charMap string\""
   .return (TCL_ERROR, $P1) 
 .end
+
+.sub "equal"
+  .param pmc argv
+  .local int argc
+  .local pmc retval
+  argc = argv
+  
+  .local string a, b
+  .local int length, nocase
+  nocase = 0
+  length = -1
+
+  retval = new String
+  if argc < 2 goto bad_args
+  if argc == 2 goto flags_done
+
+  .local string flag
+flag_loop:
+  flag = shift argv
+  if flag == "-length" goto got_length
+  if flag == "-nocase" goto got_nocase
+  branch bad_args
+
+got_length:
+  length = shift argv
+  branch gotten
+got_nocase:
+  nocase = 1
+gotten:
+
+  argc = argv
+  if argc == 2 goto flags_done
+  if argc < 2 goto bad_args
+  branch flag_loop
+flag_end:
+
+flags_done:
+  a = shift argv
+  b = shift argv
+
+  unless nocase goto skip_lower
+    downcase a
+    downcase b
+skip_lower:
+
+  if length == -1 goto skip_shorten
+    a = substr a, 0, length
+    b = substr b, 0, length
+skip_shorten:
+
+check:
+  if a == b goto ret_one
+  retval = "0"
+  .return (TCL_OK, retval)
+ret_one:
+  retval = "1"
+  .return (TCL_OK, retval)
+
+bad_args:
+  retval = "wrong # args: should be \"string equal ?-nocase? ?-length int? string1 string2\""
+  .return (TCL_ERROR, retval)
+.end

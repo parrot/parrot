@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 46;
+use Parrot::Test tests => 57;
 use Test::More;
 use vars qw($TODO);
 
@@ -287,3 +287,72 @@ language_output_is("tcl",<<'TCL',<<OUT,"string bytelength: unicode 2");
 TCL
 2
 OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"string equal, bad args");
+  string equal banana
+TCL
+wrong # args: should be "string equal ?-nocase? ?-length int? string1 string2"
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"string equal, two diff strings");
+  puts [string equal oranges apples]
+TCL
+0
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"string equal, two diff strings");
+  puts [string equal oranges orANGes]
+TCL
+0
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"string equal, two equal strings");
+  set a banana
+  puts [string equal banana $a]
+TCL
+1
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"string equal, diff with -length");
+  puts [string equal -length 5 ferry ferrous]
+TCL
+0
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"string equal, diff with -length");
+  puts [string equal -length 4 ferry ferrous]
+TCL
+1
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"string equal, diff with length -1");
+  puts [string equal -length -1 banana bananarum]
+TCL
+0
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"string equal, same with length -1");
+  puts [string equal -length -1 banana banana]
+TCL
+1
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"string equal, diff with -nocase");
+  puts [string equal -nocase APPLEs oranGES]
+TCL
+0
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"string equal, same with -nocase");
+  puts [string equal -nocase baNAna BAnana]
+TCL
+1
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"string equal, -length and -nocase");
+  puts [string equal -nocase -length 4 fERry FeRroUs]
+TCL
+1
+OUT
+
+
