@@ -26,11 +26,11 @@ opcodes directly.
 
 These operations take an infix operation number and PMC arguments.
 
-=over 4
-
 ########################################
 
 =cut
+
+=over 4
 
 =item B<pic_infix__>(inconst INT, in PMC, in PMC)
 

@@ -32,15 +32,11 @@ size native integer was chosen at Parrot configuration time. The C-level
 typedefs C<INTVAL> and C<UINTVAL> get you a platform-native signed and unsigned
 integer respectively.
 
-=back
-
 =head2 Floating point data types
 
 Floating point data types are generically referred to as C<NUM>s.  These are
 whatever size float was chosen when parrot was configured. The C level typedef
 C<FLOATVAL> will get you one of these.
-
-=back
 
 =head2 String data types
 

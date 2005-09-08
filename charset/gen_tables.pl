@@ -33,6 +33,8 @@ my $header = <<"HEADER";
  */
 HEADER
 
+=over
+
 =item B<classify>( $chr )
 
 Character classification
@@ -65,6 +67,8 @@ sub classify {
 =item B<create_table>( $name )
 
 Create a whole character table
+
+=back
 
 =cut
 

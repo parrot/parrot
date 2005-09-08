@@ -999,6 +999,8 @@ will display the place where they start differing.
 Test::Differences and Test::Deep provide more in-depth functionality
 along these lines.
 
+=back
+
 =cut
 
 use vars qw(@Data_Stack %Refs_Seen);
@@ -1115,6 +1117,7 @@ C<is_deeply()> can do that better and with diagnostics.
 
 They may be deprecated in future versions.
 
+=over
 
 =item B<eq_array>
 
