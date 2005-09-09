@@ -599,6 +599,7 @@ help :
 	@echo "  testexex:          Testing the exex runcore."
 	@echo "  testbench:         Run all benchmarks."
 	@echo "  manitest:          Check for new and missing files."
+	@echo "  doc_tests:         Check sanit of the documentation."
 	@echo ""
 	@echo "Benchmarks:"
 	@echo "  mopsbench:         Million operations"
@@ -1218,7 +1219,8 @@ fulltest : \
     run_tests \
     src_tests \
     perl_tests \
-    testbench
+    testbench \
+    doc_tests
 
 # bounds checking, slow core
 testb : test_prep
@@ -1268,6 +1270,10 @@ perl_tests :
 # all benchmarks
 testbench: test_prep
 	$(PERL) t/harness t/benchmarks.t
+
+# doc tests
+doc_tests :
+	$(PERL) t/harness t/doc/pod.t
 
 # Running a benchmark
 mopsbench : test_prep

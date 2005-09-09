@@ -1,4 +1,6 @@
-=head1 NANE
+# $Id$
+
+=head1 NAME
 
 docs/dev/optimizer.pod - About the IMCC optimizer
 
@@ -55,7 +57,7 @@ Loop_info structures denote the presence of loops in the instructions.  They are
 
 Set is a useful structure for defining sets of integers, which map to indexes of structures.  This is used most often to create sets of Basic_blocks.  Dominators, dominance frontiers, and loops use Set.  A Set must be a defined size, and cannot grow or shrink.  Most standard set operations are implemented: add, contains, copy, equal, union, and intersection.
 
-=back 4
+=back
 
 =head2 Optimizations
 
@@ -71,7 +73,7 @@ The optimizer loop works as follows:
 =item 4.  Build all other CFG info (dominators, loops, life analysis).
 =item 5.  Run all optimize() optimizations.  If one makes a change, go to step 1.
 
-=back 4
+=back
 
 Two cfg_optimize() or optimize() optimizations cannot be run in a row.  This is because most of these make the CFG information invalid when a change is performed, and the CFG must be rebuilt.
 
@@ -89,7 +91,7 @@ Converts an expensive instruction to a simpler one
 
 Converts if/branch/label constructs to a simpler form
 
-=back 4
+=back
 
 =head3 CFG optimizer
 
@@ -113,7 +115,7 @@ Removes unused labels
 
 Removes unreachable code
 
-=back 4
+=back
 
 =head3 Optimizer
 
@@ -135,7 +137,7 @@ Removes an instruction when the register written is only used once (only appears
 
 Moves an invariant instruction outside of the loop, TURNED OFF (not currently working)
 
-=back 4
+=back
 
 =head1 AUTHOR
 
