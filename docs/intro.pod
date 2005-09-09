@@ -203,14 +203,9 @@ register and then use that register with the print instruction.
 
 Here we have stated exactly which register to use. However, by replacing C<S0>
 with C<$S0> we can delegate the choice of which register to use to Parrot, and
-<<<<<<< .mine
 it will take care of any register spilling that needs to be done for us. It is
 also possible to use an C<=> notation instead of writing the C<set>
 instruction.
-=======
-it will take care of any register spilling that needs to be done for us. It is
-also possible to use an C<=> notation instead of writing the C<set> instruction.
->>>>>>> .r9142
 
   .sub _main
       $S0 = "Hello world!\n"
@@ -421,13 +416,8 @@ entitled I<Testing Parrot> that will help with this.
 
 Much Parrot development and discussion takes place on the perl6-internals
 mailing list. You can subscribe by sending an email to
-<<<<<<< .mine
 C<perl6-internals-subscribe@perl.org> or read the perl6-internals NNTP archive
 at L<http://www.nntp.perl.org/group/perl.perl6.internals>.
-=======
-L<perl6-internals-subscribe@perl.org> or read the perl6-internals NNTP archive
-at L<http://www.nntp.perl.org/group/perl.perl6.internals>.
->>>>>>> .r9142
 
 =head2 IRC
 
