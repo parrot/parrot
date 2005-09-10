@@ -599,7 +599,7 @@ help :
 	@echo "  testexex:          Testing the exex runcore."
 	@echo "  testbench:         Run all benchmarks."
 	@echo "  manitest:          Check for new and missing files."
-	@echo "  doc_tests:         Check sanit of the documentation."
+	@echo "  doc_tests:         Check POD syntax of all file containing POD."
 	@echo ""
 	@echo "Benchmarks:"
 	@echo "  mopsbench:         Million operations"

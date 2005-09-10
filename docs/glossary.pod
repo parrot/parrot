@@ -217,6 +217,12 @@ PMC is an acronym for Parrot Magic Cookie. (Or Cracker, your choice.)  PMC
 classes are the primitives that Parrot-based languages use to represent their
 fundamental types, such as Perl's scalar values.
 
+=head2 POD
+
+POD is an acronym for Plain Old Documentation. This is for now the
+prefered form for all kinds of documentation in Parrot.
+See "perldoc perlpod" for details.
+
 =head2 Predereferencing
 
 A bytecode transformation technique which reduces the amount of pointer
