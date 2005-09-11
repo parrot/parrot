@@ -1,5 +1,5 @@
 #! perl -w
-# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 =head1 NAME
@@ -16,7 +16,7 @@ Tests the C<Env> PMC.
 
 =cut
 
-use Parrot::Test tests => 9;
+use Parrot::Test tests => 12;
 use Test::More;
 use Parrot::Config;
 
@@ -89,8 +89,35 @@ ok 1
 ok 2
 OUT
 
+output_is(<<'CODE', <<OUT, "iterate");
+    new P0, .Env
+    set P0["PARROT_1"], "hello"
+    set P0["PARROT_2"], "polly"
+    iter P1, P0
+    set I0, 0
+loop:
+    unless P1, loopend
+    shift S2, P1
+    eq S2, "PARROT_1", gotit
+    eq S2, "PARROT_2", gotit
+    branch notit
+gotit:
+    inc I0
+notit:
+    branch loop
+loopend:
+    eq I0, 2, isok
+    print "not "
+isok:
+    print "ok\n"
+    end
+CODE
+ok
+OUT
+
+
 SKIP: {
-    # won't work on our unsetenv implementation
+    # This will not work on our unsetenv implementation
     skip("no native unsetenv", 1) unless $PConfig{"unsetenv"};
 output_is(<<'CODE', <<OUT, "exists/delete");
     new P0, .Env
@@ -111,11 +138,11 @@ CODE
 ok 1
 ok 2
 OUT
-}
+};
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "check whether interface is done");
 
-.sub _main
+.sub main
     .local pmc pmc1
     pmc1 = new Env
     .local int bool1
@@ -130,6 +157,51 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "check whether interface is done");
 CODE
 1
 0
+OUTPUT
+
+pir_output_is(<< 'CODE', << 'OUTPUT', "get_integer()");
+
+.sub main
+    .local pmc env
+    .local int num_before, num_after, num_diff
+
+    # add three more keys in env
+    env = new Env
+    num_before = env
+    env["PARROT_TMP_ADD_1"] = "tmp_add_1"
+    env["PARROT_TMP_ADD_2"] = "tmp_add_2"
+    env["PARROT_TMP_ADD_3"] = "tmp_add_3"
+    num_after = env
+    num_diff = num_after - num_before
+    print num_diff
+    print "\n"
+    end
+.end
+CODE
+3
+OUTPUT
+
+
+pir_output_is(<< 'CODE', << 'OUTPUT', "get_number()");
+
+.sub main
+    .local pmc env
+    .local num num_before, num_after, num_diff
+
+    # add three more keys in env
+    env = new Env
+    num_before = env
+    env["PARROT_TMP_ADD_1"] = "tmp_add_1"
+    env["PARROT_TMP_ADD_2"] = "tmp_add_2"
+    env["PARROT_TMP_ADD_3"] = "tmp_add_3"
+    num_after = env
+    num_diff = num_after - num_before
+    print num_diff
+    print "\n"
+    end
+.end
+CODE
+3.000000
 OUTPUT
 
 output_is(<<'CODE', <<OUT, "getenv - null key");
