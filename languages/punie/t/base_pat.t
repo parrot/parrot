@@ -3,9 +3,10 @@
 use strict;
 use lib qw(t . lib ../lib ../../lib ../../../lib);
 use Parrot::Test tests => 1;
-use vars '$TODO';
+use Test::More;
 
-$TODO = 'unimplemented feature';
+TODO: {
+local $TODO = 'unimplemented feature';
 
 language_output_is('punie', <<'EOC', <<'OUT', 'base_cond.t');
 #!./perl
@@ -25,3 +26,5 @@ EOC
 ok 1
 ok 2
 OUT
+
+}
