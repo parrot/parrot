@@ -203,6 +203,13 @@ executed directly, too).
 
 See also L<"Packfile">.
 
+=head2 PDD
+
+Acronym for Parrot Design Document. These documents describe the
+features that the Parrot interpreter should implement.
+
+See also L<"pdd00_pdd">.
+
 =head2 PIR
 
 Parrot Intermediate Representation. A medium-level assembly language for Parrot
