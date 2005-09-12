@@ -25,7 +25,8 @@ about submitting a patch.
 =head1 How To Submit A Patch
 
 Try to keep your patches specific to a single change, and ensure that your
-change does not break any tests.
+change does not break any tests. If there is no test for the fixed bug, 
+please try to provide one.
 
 =over
 
@@ -106,7 +107,7 @@ Send the mail.
 
 =back
 
-=head2 Applying Patches
+=head1 Applying Patches
 
 You may wish to apply a patch submitted by someone else before the patch is
 incorporated into SVN.
@@ -220,6 +221,18 @@ L<http://rt.perl.org/rt3/NoAuth/parrot/Overview.html>
 
 A list of all the unresolved patches is at
 L<http://www.parrotcode.org/openpatches.html>
+
+=head1 Patches for the Parrot website
+
+The sources for L<http://www.parrotcode.org> are managed in a subversion repository.
+The repository can be fetched from https://svn.perl.org/perl.org/docs/live/parrotcode/.
+A read only copy can be retrieved with 'guest/guest'.
+
+You will notice that some of the content is generated directly from the Parrot
+repository. So the usual rules for Parrot patches apply for this content.
+
+For changes specific for parrotcode.org please send patches to   
+B<webmaster> I<at> B<perl> I<dot> B<org>.
 
 =head1 HISTORY
 
