@@ -35,6 +35,8 @@ TCL
 0
 OUT
 
+TODO: {
+local $TODO="globbing needs to be specialised for Tcl";
 language_output_is("tcl",<<'TCL',<<OUT,"character classes");
   puts [string match {[ab]*} apple]
   puts [string match {[ab]*} boot]
@@ -62,16 +64,14 @@ TCL
 1
 1
 0
-1
-1
-1
 0
 0
 0
+1
+1
+1
 OUT
 
-TODO: {
-local $TODO="globbing needs to be specialised for Tcl";
 language_output_is("tcl",<<'TCL',<<OUT,"braces should be literal");
   puts [string match {{az,bz}} "{az,bz}"]
   puts [string match {{az,bz}} "bz"]
