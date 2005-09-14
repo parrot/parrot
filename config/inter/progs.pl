@@ -1,4 +1,4 @@
-# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 =head1 NAME
@@ -29,20 +29,9 @@ sub runstep {
   @args{@args}=@_;
 
   my($cc, $cxx, $link, $ld, $ccflags, $ccwarn, $linkflags, $ldflags, $libs, $lex,
-     $yacc) =
-       Configure::Data->get(qw(cc cxx link ld ccflags ccwarn linkflags ldflags
-			       libs lex yacc));
-  $ccflags =~ s/-D((PERL|HAVE)_\w+\s*|USE_PERLIO)//g;
-  $ccflags =~ s/-fno-strict-aliasing//g;
-  $ccflags =~ s/-fnative-struct//g;
-  $linkflags =~ s/-libpath:\S+//g;
-  $ldflags =~ s/-libpath:\S+//g;
-  my $debug='n';
+     $yacc);
 
-  $libs=join ' ',
-  grep { $^O=~/VMS|MSWin/ || !/^-l(c|gdbm(_compat)?|dbm|ndbm|db)$/ }
-  split(' ', $libs);
-
+  # Find a working version of a program:
   # Try each alternative, until one works.
   # If none work, then set to null command.
   # XXX need config support for a null command.
@@ -54,20 +43,6 @@ sub runstep {
     }
     return $null;
   };
-  if ($args{'maintainer'}) {
-    $lex  = &$first_working($lex,  'flex', 'lex'                 );
-    $yacc = &$first_working($yacc, 'bison -v -y', 'yacc', 'byacc');
-  }
-  else {
-    $lex = $yacc = $null;
-  }
-
-  for my $var(qw(cc cxx link ld ccflags linkflags ldflags libs ccwarn lex yacc)) {
-    #Symrefs to lexicals are a no-no, so we have to use eval STRING.  %MY, anyone?
-    eval qq{ \$$var=integrate(\$$var, \$args{$var}) if defined \$args{$var} };
-  }
-
-  $debug='y'              if $args{debugging};
 
   if($args{ask}) {
     print <<'END';
@@ -80,20 +55,74 @@ sub runstep {
     configuration.
 
 END
+    }
 
-    $cc=prompt("What C compiler do you want to use?", $cc);
-    $link=prompt("How about your linker?", $link);
-    $ld=prompt("What program do you want to use to build shared libraries?",
-    $ld);
-    $ccflags=prompt("What flags should your C compiler receive?", $ccflags);
-    $linkflags=prompt("And your linker?", $linkflags);
-    $ldflags=prompt("And your $ld for building shared libraries?", $ldflags);
-    $libs=prompt("What libraries should your C compiler use?", $libs);
-    $cxx=prompt("What C++ compiler do you want to use?", $cxx);
-    $debug=prompt("Do you want a debugging build of Parrot?", $debug);
-    $lex=prompt("Do you have a lexical analyzer generator, like flex or lex?",$lex);
-    $yacc=prompt("Do you have a parser generator, like bison or yacc?",$yacc);
-  }
+    # Set each variable individually so that hints files can use them as
+    # triggers to help pick the correct defaults for later answers.
+
+    $cc = integrate(Configure::Data->get('cc'), $args{cc});
+    $cc = prompt("What C compiler do you want to use?", $cc) if $args{ask};
+    Configure::Data->set(cc =>  $cc);
+
+    $link = integrate(Configure::Data->get('link'), $args{link});
+    $link = prompt("How about your linker?", $link) if $args{ask};
+    Configure::Data->set(link =>  $link);
+
+    $ld = integrate(Configure::Data->get('ld'), $args{ld});
+    $ld = prompt("What program do you want to use to build shared libraries?", $ld) if $args{ask};
+    Configure::Data->set(ld =>  $ld);
+
+    $ccflags = Configure::Data->get('ccflags');
+    # Remove some perl5-isms.
+    $ccflags =~ s/-D((PERL|HAVE)_\w+\s*|USE_PERLIO)//g;
+    $ccflags =~ s/-fno-strict-aliasing//g;
+    $ccflags =~ s/-fnative-struct//g;
+    $ccflags = integrate($ccflags, $args{ccflags});
+    $ccflags = prompt("What flags should your C compiler receive?", $ccflags) if $args{ask};
+    Configure::Data->set(ccflags =>  $ccflags);
+
+    $linkflags = Configure::Data->get('linkflags');
+    $linkflags =~ s/-libpath:\S+//g;  # XXX No idea why.
+    $linkflags = integrate($linkflags, $args{linkflags});
+    $linkflags = prompt("And your linker?", $linkflags) if $args{ask};
+    Configure::Data->set(linkflags =>  $linkflags);
+
+    $ldflags = Configure::Data->get('ldflags');
+    $ldflags =~ s/-libpath:\S+//g;  # XXX No idea why.
+    $ldflags = integrate($ldflags, $args{ldflags});
+    $ldflags = prompt("And your $ld for building shared libraries?", $ldflags) if $args{ask};
+    Configure::Data->set(ldflags =>  $ldflags);
+
+    $libs = Configure::Data->get('libs');
+    $libs=join ' ',
+	grep { $^O=~/VMS|MSWin/ || !/^-l(c|gdbm(_compat)?|dbm|ndbm|db)$/ }
+	    split(' ', $libs);
+    $libs = integrate($libs, $args{libs});
+    $libs = prompt("What libraries should your C compiler use?", $libs) if $args{ask};
+    Configure::Data->set(libs =>  $libs);
+
+    $cxx = integrate(Configure::Data->get('cxx'), $args{cxx});
+    $cxx = prompt("What C++ compiler do you want to use?", $cxx) if $args{ask};
+    Configure::Data->set(cxx =>  $cxx);
+
+    my $debug='n';
+    $debug='y'  if $args{debugging};
+    $debug = prompt("Do you want a debugging build of Parrot?", $debug) if $args{ask};
+
+    if ($args{'maintainer'}) {
+	$lex = integrate(Configure::Data->get('lex'), $args{lex});
+	$lex  = &$first_working($lex,  'flex', 'lex');
+	$yacc = integrate(Configure::Data->get('yacc'), $args{yacc});
+	$yacc = &$first_working($yacc, 'bison -v -y', 'yacc', 'byacc');
+    }
+    else {
+	$lex = $yacc = $null;
+    }
+    $lex = prompt("Do you have a lexical analyzer generator, like flex or lex?",$lex) if $args{ask};
+    Configure::Data->set(lex =>  $lex);
+
+    $yacc = prompt("Do you have a parser generator, like bison or yacc?",$yacc) if $args{ask};
+    Configure::Data->set(yacc =>  $yacc);
 
   if(!$debug || $debug =~ /n/i) {
     Configure::Data->set(
@@ -103,19 +132,9 @@ END
     );
   }
 
-  Configure::Data->set(
-    cc      => $cc,
-    cxx      => $cxx,
-    link    => $link,
-    ld      => $ld,
-    ccflags => $ccflags,
-    linkflags => $linkflags,
-    ldflags => $ldflags,
-    libs    => $libs,
-    ccwarn => $ccwarn,
-    lex     => $lex,
-    yacc    => $yacc,
-  );
+  # This one isn't prompted for above.  I don't know why.
+  $ccwarn = integrate(Configure::Data->get('ccwarn'), $args{ccwarn});
+  Configure::Data->set(ccwarn => $ccwarn);
 }
 
 1;

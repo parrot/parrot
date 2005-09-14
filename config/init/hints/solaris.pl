@@ -1,5 +1,6 @@
 # Copyright: 2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
+use Parrot::Configure::Step qw(cc_gen cc_run);
 
 my $libs = Configure::Data->get('libs');
 if ( $libs !~ /-lpthread/ ) {
@@ -13,24 +14,51 @@ Configure::Data->set(
 );
 
 ################################################################
-my $link = Configure::Data->get('link');
-# Going to assume Sun's compiler
-# In which case we need to link with the C++ compiler (CC) rather than the
-# C compiler (cc)
-$link =~ s/\bcc\b/CC/;
-Configure::Data->set('link', $link);
-
-# if it turns out we're using gcc, then we need to make sure we're linking
-# with g++, not gcc.  We can't make this decision until the gccversion test
-# has been run.
+# If we're going to be using ICU (or any other C++-compiled library) we
+# need to use the c++ compiler as a linker.  As soon as the user
+# selects a compiler, we will run the gccversion test.  (If we were to
+# wait till it's normally run, the linker question would have already
+# been asked.)
 my $solaris_link_cb = sub {
-  my ($key, $gccversion) = @_;
-  if ($gccversion) {
-    Configure::Data->set('link', 'g++');
-    Configure::Data->deltrigger("gccversion", "solaris_link");
-  }
+    use Carp;
+    my ($key, $cc) = @_;
+    my %gnuc;
+    my $link = Configure::Data->get('link');
+    cc_gen("config/auto/gcc/test_c.in");
+    # Can't call cc_build since we haven't set all the flags yet.
+    # This should suffice for this test.
+    Parrot::Configure::Step::_run_command("$cc -o test test.c", 'test.cco', 'test.cco')
+        and confess "C compiler failed (see test.cco)";
+    %gnuc=eval cc_run() or die "Can't run the test program: $!";
+    if (defined $gnuc{__GNUC__}) {
+	$link = 'g++';
+    }
+    else {
+	$link =~ s/\bcc\b/CC/;
+    }
+    Configure::Data->set('link', $link);
+    Configure::Data->deltrigger("cc", "solaris_link");
 };
-Configure::Data->settrigger("gccversion", "solaris_link", $solaris_link_cb);
+Configure::Data->settrigger("cc", "solaris_link", $solaris_link_cb);
+
+################################################################
+# cc_shared:  Flags to instruct the compiler to use position-independent
+# code for use in shared libraries.  -KPIC for Sun's compiler, -fPIC for
+# gcc.  We don't know which compiler we're using till after the
+# gccversion test.
+# XXX Should this go into the shlibs.pl Configure.pl unit instead?
+my $solaris_cc_shared_cb = sub {
+    my ($key, $gccversion) = @_;
+    if ($gccversion) {
+	Configure::Data->set('cc_shared', '-fPIC');
+    }
+    else {
+	Configure::Data->set('cc_shared', '-KPIC');
+    }
+    Configure::Data->deltrigger("gccversion", "solaris_cc_shared");
+};
+Configure::Data->settrigger("gccversion", "solaris_cc_shared", 
+			$solaris_cc_shared_cb);
 
 ################################################################
 # Parrot usually aims for IEEE-754 compliance.

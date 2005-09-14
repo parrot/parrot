@@ -308,6 +308,7 @@ config/inter/encoding.pl                          []
 config/inter/exp.pl                               []
 config/inter/ops.pl                               []
 config/inter/pmc.pl                               []
+config/inter/shlibs.pl                            []
 config/inter/progs.pl                             []
 config/inter/types.pl                             []
 docs/ROADMAP                                      [devel]doc

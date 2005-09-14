@@ -1,4 +1,4 @@
-# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 =head1 NAME
@@ -9,6 +9,7 @@ config/init/optimize.pl - Optimization
 
 Enables optimization by adding the appropriate flags for the local
 platform to the C<CCFLAGS>.
+Should this be part of config/inter/progs.pl ? XXX
 
 =cut
 
@@ -20,9 +21,10 @@ use Parrot::Configure::Step;
 
 $description="Enabling optimization...";
 
-@args=qw(verbose);
+@args=qw(verbose optimize);
 
 sub runstep {
+  my ($verbose, $optimize) = @_;
   if (Configure::Data->get('optimize')) {
     my($ccflags, $optimize) =
       Configure::Data->get(qw(ccflags optimize));
@@ -33,7 +35,7 @@ sub runstep {
                         );
   }
   else {
-    print "(none requested) " if $_[0];
+    print "(none requested) " if $verbose;
   }
 }
 

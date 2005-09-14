@@ -76,7 +76,11 @@ Turn on profiled compile (gcc only for now)
 
 =item C<--optimize>
 
-Tell the compiler to do an optimization phase.
+Add perl5's $Config{optimize} to the compiler flags.
+
+=item C<--optimize=flags>
+
+Add C<flags> to the compiler flags.
 
 =item C<--inline>
 
@@ -314,6 +318,7 @@ e.g. : --ccflags="rem{-g} :add{-O2}"
    --debugging=0        Disable debugging, default = 1
    --profile            Turn on profiled compile (gcc only for now)
    --optimize           Optimized compile
+   --optimize=flags     Add given optimizer flags
    --inline             Compiler supports inline
 
    --cc=(compiler)      Use the given compiler

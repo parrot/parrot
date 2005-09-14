@@ -33,6 +33,7 @@ use vars qw(@steps);
     inter/progs.pl
     auto/gcc.pl
     init/optimize.pl
+    inter/shlibs.pl
     inter/charset.pl
     inter/encoding.pl
     inter/types.pl
