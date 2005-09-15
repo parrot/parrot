@@ -39,8 +39,8 @@ sub cflags {
   if (Configure::Data->get('cpuarch') =~ /sun4|sparc64/) {
       # CFLAGS entries must be left-aligned.
       print CFLAGS <<"EOF";
-jit_cpu.c -{-Wcast-align}        # lots of noise!
-nci.c     -{-Wstrict-prototypes} # lots of noise!
+src/jit_cpu.c -{-Wcast-align}        # lots of noise!
+src/nci.c     -{-Wstrict-prototypes} # lots of noise!
 EOF
   }
 
