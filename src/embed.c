@@ -406,6 +406,15 @@ again:
         return NULL;
     }
 
+    /*
+     * fixup constant subroutine objects
+     */
+    fixup_subs(interpreter, pf->cur_cs, PBC_PBC);
+    /*
+     * JITting and/or prederefing the sub/the bytecode is done
+     * in switch_to_cs before actual usage of the segment
+     */
+
 #ifdef PARROT_HAS_HEADER_SYSMMAN
 
     if (fd >= 0) {

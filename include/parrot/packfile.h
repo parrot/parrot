@@ -242,6 +242,7 @@ typedef enum {
 } pbc_action_enum_t;
 
 void PackFile_fixup_subs(Interp *interpreter, pbc_action_enum_t);
+void fixup_subs(Interp *interpreter, struct PackFile_ByteCode *self, int action);
 /*
  * directory functions
  */

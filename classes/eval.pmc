@@ -204,6 +204,7 @@ Final code fixup after thawing.
         if (!PackFile_unpack(INTERP, pf, packed->strstart, packed->strlen))
             real_exception(INTERP, NULL, E_IOError,
                     "couldn't unpack packfile");
+        fixup_subs(INTERP, pf->cur_cs, PBC_PBC);
         for (i = 0; i < pf->directory.num_segments; ++i) {
             seg = pf->directory.segments[i];
             if (seg->type == PF_BYTEC_SEG) {

@@ -426,7 +426,7 @@ B<PBC_PBC>, B<PBC_LOADED>, or B<PBC_MAIN>.
 
 */
 
-static void
+void
 fixup_subs(Interp *interpreter, struct PackFile_ByteCode *self, int action)
 {
     opcode_t i, ci;
@@ -648,14 +648,6 @@ PackFile_unpack(Interp *interpreter, struct PackFile *self,
     cursor = PackFile_Segment_unpack(interpreter,
                                      &self->directory.base, cursor);
     Parrot_unblock_DOD(interpreter);
-    /*
-     * fixup constant subroutine objects
-     */
-    fixup_subs(interpreter, self->cur_cs, PBC_PBC);
-    /*
-     * JITting and/or prederefing the sub/the bytecode is done
-     * in switch_to_cs before actual usage of the segment
-     */
 
 #ifdef PARROT_HAS_HEADER_SYSMMAN
     if (self->is_mmap_ped && (
