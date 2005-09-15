@@ -18,7 +18,8 @@
 
 header "BcTreeWalker.__init__" 
 {
-  self.reg_num = 0;    // counter for unlimited number of PMC registers
+  self.reg_num   = 0;  // counter for unlimited number of PMC registers
+  self.label_num = 0;  // counter for generation jump labels
 }
 
 header "BcParser.__init__" 
@@ -113,9 +114,10 @@ DECR       : "--" ;
 Quit       : "quit";
 Define     : "define";
 Auto       : "auto";
+If         : "if";
  
 KEYWORDS: "break" | "length" |
-          "return" | "for" | "if" | "while" | "sqrt" |
+          "return" | "for" | "while" | "sqrt" |
           "scale" | "ibase" | "obase";
 
 // See 4.3.7.2 item (16)
@@ -214,6 +216,7 @@ statement
         pir += "end\n # ";
         #statement = #( [ PIR_OP, pir ] )
       }
+    | If^ LPAREN! relational_expression RPAREN! statement
     | LCURLY! statement_list RCURLY!
   ;
 
@@ -256,7 +259,7 @@ argument_list
 
 //TODO
 relational_expression
-  : expression
+  : expression ( REL_OP expression )?
   ;
 
 //TODO
@@ -458,6 +461,12 @@ expr_line!
         pir = "\n" + \
               lex_name + " = " + lex_name + " - 1 \n # "
         #expr_line = #( [ PIR_NOOP, "noop" ], [PIR_OP, pir], [PIR_OP, "\nprint "], [PIR_OP,lex_name], [PIR_NEWLINE, "\nprint \"\\n\" # "] )
+      }
+    | #( If reg_name=E3:expr p2:expr_line )
+      {
+        pir = "\n" + \
+              "unless " + reg_name + " goto LABEL_%d\n#" % self.label_num 
+        #expr_line = #( [ PIR_NOOP, "noop" ], #E3, [PIR_OP, pir], #p2, [PIR_OP,"\nLABEL_0:\n#"] )
       }
     | p:PIR_OP
       {

@@ -22,9 +22,6 @@ class Visitor(antlr.ASTVisitor):
          return
       assert 0
 
-   def tabs(self):
-      print " " * self.level
-
    def printf(self,fmt,*args):
       if not args:
           sys.stdout.write(fmt)
@@ -92,32 +89,39 @@ def main():
 
    ###show tree
    print ""
-   print "=for comment\n"
+   print "=begin comment"
    print ""
    print "AST after parsing " + bc_filenames[0] 
    print ""
    print "toStringList: " + ast.toStringList()
+   print ""
    print "visit>>"
    print ""
    visitor.visit(ast);
    print "visit<<"
    print ""
-   print "=cut"
+   print "=end comment"
    print ""
 
    W = bc.BcTreeWalker.Walker();
    W.gen_pir(ast);
 
    pir_ast = W.getAST()
-   print "\n"
-   print "=for comment\n"
-   print "AST processed by TreeParser\n"
-   print "toStringList: " + pir_ast.toStringList()
+   print ""
+   print "=begin comment"
+   print ""
+   print "AST after being processed by TreeParser"
+   print ""
+   print "pir_ast.toStringList:" 
+   print pir_ast.toStringList()
+   print ""
    print "visit>>\n"
    visitor.visit(pir_ast);
    print "visit<<"
-   print "\n"
-   print "=cut\n"
+   print ""
+   print "=end comment"
+   print ""
+   print "=cut"
    print """
 #!/usr/bin/env parrot
 

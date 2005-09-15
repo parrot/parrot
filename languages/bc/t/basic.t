@@ -16,7 +16,7 @@ use FindBin;
 use lib "$FindBin::Bin/../../lib", "$FindBin::Bin/../../../../lib";
 
 use Test::More;
-use Parrot::Test tests => 51;
+use Parrot::Test tests => 53;
 
 sub run_tests
 {
@@ -105,6 +105,9 @@ my @tests =
        # increment and decrement 
        [ "a; a = 1; a; ++a; a", [0,1,2,2], 'increment' ],
        [ "a; a = 1; a; --a; a", [0,1,0,0], 'decrement' ],
+       # If 
+       [ "1; if ( 1 ) 2; 3", [1,2,3], 'if with a true condition' ],
+       [ "1; if ( 0 ) 2; 3", [1,3], 'if with a true condition' ],
      );
 
 my @todo_tests = 

@@ -40,29 +40,30 @@ DECR = 16
 Quit = 17
 Define = 18
 Auto = 19
-KEYWORDS = 20
-LPAREN = 21
-RPAREN = 22
-COMMA = 23
-PLUS = 24
-MINUS = 25
-SEMICOLON = 26
-LBRACKET = 27
-RBRACKET = 28
-CARET = 29
-LCURLY = 30
-RCURLY = 31
-WS = 32
-ML_COMMENT = 33
-PIR_OP = 34
-UNARY_MINUS = 35
-PIR_PRINT_PMC = 36
-PIR_FUNCTION_DEF = 37
-PIR_FOOTER = 38
-PIR_HEADER = 39
-PIR_NOOP = 40
-PIR_COMMENT = 41
-PIR_NEWLINE = 42
+If = 20
+KEYWORDS = 21
+LPAREN = 22
+RPAREN = 23
+COMMA = 24
+PLUS = 25
+MINUS = 26
+SEMICOLON = 27
+LBRACKET = 28
+RBRACKET = 29
+CARET = 30
+LCURLY = 31
+RCURLY = 32
+WS = 33
+ML_COMMENT = 34
+PIR_OP = 35
+UNARY_MINUS = 36
+PIR_PRINT_PMC = 37
+PIR_FUNCTION_DEF = 38
+PIR_FOOTER = 39
+PIR_HEADER = 40
+PIR_NOOP = 41
+PIR_COMMENT = 42
+PIR_NEWLINE = 43
 
 class Parser(antlr.LLkParser):
     ### user action >>>
@@ -93,9 +94,9 @@ class Parser(antlr.LLkParser):
                 else:
                     break
                 
-            tmp12_AST = None
-            tmp12_AST = self.astFactory.create(self.LT(1))
-            self.addASTChild(currentAST, tmp12_AST)
+            tmp13_AST = None
+            tmp13_AST = self.astFactory.create(self.LT(1))
+            self.addASTChild(currentAST, tmp13_AST)
             self.match(EOF_TYPE)
             program_AST = currentAST.root
         
@@ -115,7 +116,7 @@ class Parser(antlr.LLkParser):
             la1 = self.LA(1)
             if False:
                 pass
-            elif la1 and la1 in [NEWLINE,STRING,LETTER,NUMBER,INCR,DECR,Quit,LPAREN,MINUS,LCURLY]:
+            elif la1 and la1 in [NEWLINE,STRING,LETTER,NUMBER,INCR,DECR,Quit,If,LPAREN,MINUS,LCURLY]:
                 pass
                 self.semicolon_list()
                 self.addASTChild(currentAST, self.returnAST)
@@ -147,7 +148,7 @@ class Parser(antlr.LLkParser):
             la1 = self.LA(1)
             if False:
                 pass
-            elif la1 and la1 in [STRING,LETTER,NUMBER,INCR,DECR,Quit,LPAREN,MINUS,LCURLY]:
+            elif la1 and la1 in [STRING,LETTER,NUMBER,INCR,DECR,Quit,If,LPAREN,MINUS,LCURLY]:
                 pass
                 self.statement()
                 self.addASTChild(currentAST, self.returnAST)
@@ -181,39 +182,39 @@ class Parser(antlr.LLkParser):
         function_AST = None
         try:      ## for error handling
             pass
-            tmp15_AST = None
-            tmp15_AST = self.astFactory.create(self.LT(1))
-            self.addASTChild(currentAST, tmp15_AST)
-            self.match(Define)
             tmp16_AST = None
             tmp16_AST = self.astFactory.create(self.LT(1))
             self.addASTChild(currentAST, tmp16_AST)
-            self.match(LETTER)
+            self.match(Define)
             tmp17_AST = None
             tmp17_AST = self.astFactory.create(self.LT(1))
             self.addASTChild(currentAST, tmp17_AST)
-            self.match(LPAREN)
-            self.opt_parameter_list()
-            self.addASTChild(currentAST, self.returnAST)
+            self.match(LETTER)
             tmp18_AST = None
             tmp18_AST = self.astFactory.create(self.LT(1))
             self.addASTChild(currentAST, tmp18_AST)
-            self.match(RPAREN)
+            self.match(LPAREN)
+            self.opt_parameter_list()
+            self.addASTChild(currentAST, self.returnAST)
             tmp19_AST = None
             tmp19_AST = self.astFactory.create(self.LT(1))
             self.addASTChild(currentAST, tmp19_AST)
-            self.match(LCURLY)
+            self.match(RPAREN)
             tmp20_AST = None
             tmp20_AST = self.astFactory.create(self.LT(1))
             self.addASTChild(currentAST, tmp20_AST)
+            self.match(LCURLY)
+            tmp21_AST = None
+            tmp21_AST = self.astFactory.create(self.LT(1))
+            self.addASTChild(currentAST, tmp21_AST)
             self.match(NEWLINE)
             self.opt_auto_define_list()
             self.addASTChild(currentAST, self.returnAST)
             self.statement_list()
             self.addASTChild(currentAST, self.returnAST)
-            tmp21_AST = None
-            tmp21_AST = self.astFactory.create(self.LT(1))
-            self.addASTChild(currentAST, tmp21_AST)
+            tmp22_AST = None
+            tmp22_AST = self.astFactory.create(self.LT(1))
+            self.addASTChild(currentAST, tmp22_AST)
             self.match(RCURLY)
             function_AST = currentAST.root
             function_AST = antlr.make(self.astFactory.create(PIR_FUNCTION_DEF,"function definition"))
@@ -267,9 +268,9 @@ class Parser(antlr.LLkParser):
                 statement_AST = currentAST.root
             elif la1 and la1 in [Quit]:
                 pass
-                tmp22_AST = None
-                tmp22_AST = self.astFactory.create(self.LT(1))
-                self.addASTChild(currentAST, tmp22_AST)
+                tmp23_AST = None
+                tmp23_AST = self.astFactory.create(self.LT(1))
+                self.addASTChild(currentAST, tmp23_AST)
                 self.match(Quit)
                 statement_AST = currentAST.root
                 pir += "end\n # ";
@@ -280,6 +281,19 @@ class Parser(antlr.LLkParser):
                 else:
                     currentAST.child = statement_AST
                 currentAST.advanceChildToEnd()
+                statement_AST = currentAST.root
+            elif la1 and la1 in [If]:
+                pass
+                tmp24_AST = None
+                tmp24_AST = self.astFactory.create(self.LT(1))
+                self.makeASTRoot(currentAST, tmp24_AST)
+                self.match(If)
+                self.match(LPAREN)
+                self.relational_expression()
+                self.addASTChild(currentAST, self.returnAST)
+                self.match(RPAREN)
+                self.statement()
+                self.addASTChild(currentAST, self.returnAST)
                 statement_AST = currentAST.root
             elif la1 and la1 in [LCURLY]:
                 pass
@@ -311,7 +325,7 @@ class Parser(antlr.LLkParser):
                     la1 = self.LA(1)
                     if False:
                         pass
-                    elif la1 and la1 in [STRING,LETTER,NUMBER,INCR,DECR,Quit,LPAREN,MINUS,LCURLY]:
+                    elif la1 and la1 in [STRING,LETTER,NUMBER,INCR,DECR,Quit,If,LPAREN,MINUS,LCURLY]:
                         pass
                         self.statement()
                         self.addASTChild(currentAST, self.returnAST)
@@ -368,6 +382,40 @@ class Parser(antlr.LLkParser):
         
         self.returnAST = printable_expression_AST
     
+    def relational_expression(self):    
+        
+        self.returnAST = None
+        currentAST = antlr.ASTPair()
+        relational_expression_AST = None
+        try:      ## for error handling
+            pass
+            self.expression()
+            self.addASTChild(currentAST, self.returnAST)
+            la1 = self.LA(1)
+            if False:
+                pass
+            elif la1 and la1 in [REL_OP]:
+                pass
+                tmp30_AST = None
+                tmp30_AST = self.astFactory.create(self.LT(1))
+                self.addASTChild(currentAST, tmp30_AST)
+                self.match(REL_OP)
+                self.expression()
+                self.addASTChild(currentAST, self.returnAST)
+            elif la1 and la1 in [RPAREN]:
+                pass
+            else:
+                    raise antlr.NoViableAltException(self.LT(1), self.getFilename())
+                
+            relational_expression_AST = currentAST.root
+        
+        except antlr.RecognitionException, ex:
+            self.reportError(ex)
+            self.consume()
+            self.consumeUntil(_tokenSet_7)
+        
+        self.returnAST = relational_expression_AST
+    
     def opt_parameter_list(self):    
         
         self.returnAST = None
@@ -408,9 +456,9 @@ class Parser(antlr.LLkParser):
                 pass
             elif la1 and la1 in [Auto]:
                 pass
-                tmp26_AST = None
-                tmp26_AST = self.astFactory.create(self.LT(1))
-                self.addASTChild(currentAST, tmp26_AST)
+                tmp31_AST = None
+                tmp31_AST = self.astFactory.create(self.LT(1))
+                self.addASTChild(currentAST, tmp31_AST)
                 self.match(Auto)
                 self.define_list()
                 self.addASTChild(currentAST, self.returnAST)
@@ -419,20 +467,20 @@ class Parser(antlr.LLkParser):
                     pass
                 elif la1 and la1 in [NEWLINE]:
                     pass
-                    tmp27_AST = None
-                    tmp27_AST = self.astFactory.create(self.LT(1))
-                    self.addASTChild(currentAST, tmp27_AST)
+                    tmp32_AST = None
+                    tmp32_AST = self.astFactory.create(self.LT(1))
+                    self.addASTChild(currentAST, tmp32_AST)
                     self.match(NEWLINE)
                 elif la1 and la1 in [SEMICOLON]:
                     pass
-                    tmp28_AST = None
-                    tmp28_AST = self.astFactory.create(self.LT(1))
-                    self.addASTChild(currentAST, tmp28_AST)
+                    tmp33_AST = None
+                    tmp33_AST = self.astFactory.create(self.LT(1))
+                    self.addASTChild(currentAST, tmp33_AST)
                     self.match(SEMICOLON)
                 else:
                         raise antlr.NoViableAltException(self.LT(1), self.getFilename())
                     
-            elif la1 and la1 in [NEWLINE,STRING,LETTER,NUMBER,INCR,DECR,Quit,LPAREN,MINUS,LCURLY,RCURLY]:
+            elif la1 and la1 in [NEWLINE,STRING,LETTER,NUMBER,INCR,DECR,Quit,If,LPAREN,MINUS,LCURLY,RCURLY]:
                 pass
             else:
                     raise antlr.NoViableAltException(self.LT(1), self.getFilename())
@@ -471,20 +519,20 @@ class Parser(antlr.LLkParser):
         define_list_AST = None
         try:      ## for error handling
             pass
-            tmp29_AST = None
-            tmp29_AST = self.astFactory.create(self.LT(1))
-            self.addASTChild(currentAST, tmp29_AST)
+            tmp34_AST = None
+            tmp34_AST = self.astFactory.create(self.LT(1))
+            self.addASTChild(currentAST, tmp34_AST)
             self.match(LETTER)
             while True:
                 if (self.LA(1)==COMMA):
                     pass
-                    tmp30_AST = None
-                    tmp30_AST = self.astFactory.create(self.LT(1))
-                    self.addASTChild(currentAST, tmp30_AST)
+                    tmp35_AST = None
+                    tmp35_AST = self.astFactory.create(self.LT(1))
+                    self.addASTChild(currentAST, tmp35_AST)
                     self.match(COMMA)
-                    tmp31_AST = None
-                    tmp31_AST = self.astFactory.create(self.LT(1))
-                    self.addASTChild(currentAST, tmp31_AST)
+                    tmp36_AST = None
+                    tmp36_AST = self.astFactory.create(self.LT(1))
+                    self.addASTChild(currentAST, tmp36_AST)
                     self.match(LETTER)
                 else:
                     break
@@ -552,14 +600,14 @@ class Parser(antlr.LLkParser):
                     pass
                 elif la1 and la1 in [ASSIGN_OP]:
                     pass
-                    tmp32_AST = None
-                    tmp32_AST = self.astFactory.create(self.LT(1))
-                    self.makeASTRoot(currentAST, tmp32_AST)
+                    tmp37_AST = None
+                    tmp37_AST = self.astFactory.create(self.LT(1))
+                    self.makeASTRoot(currentAST, tmp37_AST)
                     self.match(ASSIGN_OP)
                     self.expression()
                     self.addASTChild(currentAST, self.returnAST)
                     self.do_print = 0
-                elif la1 and la1 in [EOF,NEWLINE,STRING,LETTER,NUMBER,INCR,DECR,Quit,LPAREN,MINUS,SEMICOLON,LCURLY,RCURLY]:
+                elif la1 and la1 in [EOF,NEWLINE,STRING,LETTER,NUMBER,REL_OP,INCR,DECR,Quit,If,LPAREN,RPAREN,MINUS,SEMICOLON,LCURLY,RCURLY]:
                     pass
                 else:
                         raise antlr.NoViableAltException(self.LT(1), self.getFilename())
@@ -567,9 +615,9 @@ class Parser(antlr.LLkParser):
                 expression_AST = currentAST.root
             elif la1 and la1 in [INCR]:
                 pass
-                tmp33_AST = None
-                tmp33_AST = self.astFactory.create(self.LT(1))
-                self.makeASTRoot(currentAST, tmp33_AST)
+                tmp38_AST = None
+                tmp38_AST = self.astFactory.create(self.LT(1))
+                self.makeASTRoot(currentAST, tmp38_AST)
                 self.match(INCR)
                 self.named_expression()
                 self.addASTChild(currentAST, self.returnAST)
@@ -577,9 +625,9 @@ class Parser(antlr.LLkParser):
                 expression_AST = currentAST.root
             elif la1 and la1 in [DECR]:
                 pass
-                tmp34_AST = None
-                tmp34_AST = self.astFactory.create(self.LT(1))
-                self.makeASTRoot(currentAST, tmp34_AST)
+                tmp39_AST = None
+                tmp39_AST = self.astFactory.create(self.LT(1))
+                self.makeASTRoot(currentAST, tmp39_AST)
                 self.match(DECR)
                 self.named_expression()
                 self.addASTChild(currentAST, self.returnAST)
@@ -600,24 +648,6 @@ class Parser(antlr.LLkParser):
             self.consumeUntil(_tokenSet_9)
         
         self.returnAST = expression_AST
-    
-    def relational_expression(self):    
-        
-        self.returnAST = None
-        currentAST = antlr.ASTPair()
-        relational_expression_AST = None
-        try:      ## for error handling
-            pass
-            self.expression()
-            self.addASTChild(currentAST, self.returnAST)
-            relational_expression_AST = currentAST.root
-        
-        except antlr.RecognitionException, ex:
-            self.reportError(ex)
-            self.consume()
-            self.consumeUntil(_tokenSet_1)
-        
-        self.returnAST = relational_expression_AST
     
     def return_expression(self):    
         
@@ -644,9 +674,9 @@ class Parser(antlr.LLkParser):
         named_expression_AST = None
         try:      ## for error handling
             pass
-            tmp35_AST = None
-            tmp35_AST = self.astFactory.create(self.LT(1))
-            self.addASTChild(currentAST, tmp35_AST)
+            tmp40_AST = None
+            tmp40_AST = self.astFactory.create(self.LT(1))
+            self.addASTChild(currentAST, tmp40_AST)
             self.match(LETTER)
             named_expression_AST = currentAST.root
         
@@ -674,15 +704,15 @@ class Parser(antlr.LLkParser):
                         pass
                     elif la1 and la1 in [PLUS]:
                         pass
-                        tmp36_AST = None
-                        tmp36_AST = self.astFactory.create(self.LT(1))
-                        self.makeASTRoot(currentAST, tmp36_AST)
+                        tmp41_AST = None
+                        tmp41_AST = self.astFactory.create(self.LT(1))
+                        self.makeASTRoot(currentAST, tmp41_AST)
                         self.match(PLUS)
                     elif la1 and la1 in [MINUS]:
                         pass
-                        tmp37_AST = None
-                        tmp37_AST = self.astFactory.create(self.LT(1))
-                        self.makeASTRoot(currentAST, tmp37_AST)
+                        tmp42_AST = None
+                        tmp42_AST = self.astFactory.create(self.LT(1))
+                        self.makeASTRoot(currentAST, tmp42_AST)
                         self.match(MINUS)
                     else:
                             raise antlr.NoViableAltException(self.LT(1), self.getFilename())
@@ -697,7 +727,7 @@ class Parser(antlr.LLkParser):
         except antlr.RecognitionException, ex:
             self.reportError(ex)
             self.consume()
-            self.consumeUntil(_tokenSet_11)
+            self.consumeUntil(_tokenSet_9)
         
         self.returnAST = adding_expression_AST
     
@@ -718,21 +748,21 @@ class Parser(antlr.LLkParser):
                         pass
                     elif la1 and la1 in [MUL]:
                         pass
-                        tmp38_AST = None
-                        tmp38_AST = self.astFactory.create(self.LT(1))
-                        self.makeASTRoot(currentAST, tmp38_AST)
+                        tmp43_AST = None
+                        tmp43_AST = self.astFactory.create(self.LT(1))
+                        self.makeASTRoot(currentAST, tmp43_AST)
                         self.match(MUL)
                     elif la1 and la1 in [DIV]:
                         pass
-                        tmp39_AST = None
-                        tmp39_AST = self.astFactory.create(self.LT(1))
-                        self.makeASTRoot(currentAST, tmp39_AST)
+                        tmp44_AST = None
+                        tmp44_AST = self.astFactory.create(self.LT(1))
+                        self.makeASTRoot(currentAST, tmp44_AST)
                         self.match(DIV)
                     elif la1 and la1 in [MOD]:
                         pass
-                        tmp40_AST = None
-                        tmp40_AST = self.astFactory.create(self.LT(1))
-                        self.makeASTRoot(currentAST, tmp40_AST)
+                        tmp45_AST = None
+                        tmp45_AST = self.astFactory.create(self.LT(1))
+                        self.makeASTRoot(currentAST, tmp45_AST)
                         self.match(MOD)
                     else:
                             raise antlr.NoViableAltException(self.LT(1), self.getFilename())
@@ -747,7 +777,7 @@ class Parser(antlr.LLkParser):
         except antlr.RecognitionException, ex:
             self.reportError(ex)
             self.consume()
-            self.consumeUntil(_tokenSet_12)
+            self.consumeUntil(_tokenSet_11)
         
         self.returnAST = multiplying_expression_AST
     
@@ -764,8 +794,8 @@ class Parser(antlr.LLkParser):
                 pass
             elif la1 and la1 in [MINUS]:
                 pass
-                tmp41_AST = None
-                tmp41_AST = self.astFactory.create(self.LT(1))
+                tmp46_AST = None
+                tmp46_AST = self.astFactory.create(self.LT(1))
                 self.match(MINUS)
                 self.paren_expression()
                 i1_AST = self.returnAST
@@ -796,7 +826,7 @@ class Parser(antlr.LLkParser):
         except antlr.RecognitionException, ex:
             self.reportError(ex)
             self.consume()
-            self.consumeUntil(_tokenSet_13)
+            self.consumeUntil(_tokenSet_12)
         
         self.returnAST = sign_expression_AST
     
@@ -811,9 +841,9 @@ class Parser(antlr.LLkParser):
                 pass
             elif la1 and la1 in [NUMBER]:
                 pass
-                tmp42_AST = None
-                tmp42_AST = self.astFactory.create(self.LT(1))
-                self.addASTChild(currentAST, tmp42_AST)
+                tmp47_AST = None
+                tmp47_AST = self.astFactory.create(self.LT(1))
+                self.addASTChild(currentAST, tmp47_AST)
                 self.match(NUMBER)
                 paren_expression_AST = currentAST.root
             elif la1 and la1 in [LPAREN]:
@@ -830,7 +860,7 @@ class Parser(antlr.LLkParser):
         except antlr.RecognitionException, ex:
             self.reportError(ex)
             self.consume()
-            self.consumeUntil(_tokenSet_13)
+            self.consumeUntil(_tokenSet_12)
         
         self.returnAST = paren_expression_AST
     
@@ -859,6 +889,7 @@ _tokenNames = [
     "Quit", 
     "Define", 
     "Auto", 
+    "If", 
     "KEYWORDS", 
     "LPAREN", 
     "RPAREN", 
@@ -888,7 +919,7 @@ _tokenNames = [
 ### generate bit set
 def mk_tokenSet_0(): 
     ### var1
-    data = [ 1109885552L, 0L]
+    data = [ 2220327536L, 0L]
     return data
 _tokenSet_0 = antlr.BitSet(mk_tokenSet_0())
 
@@ -902,7 +933,7 @@ _tokenSet_1 = antlr.BitSet(mk_tokenSet_1())
 ### generate bit set
 def mk_tokenSet_2(): 
     ### var1
-    data = [ 1109885554L, 0L]
+    data = [ 2220327538L, 0L]
     return data
 _tokenSet_2 = antlr.BitSet(mk_tokenSet_2())
 
@@ -916,70 +947,63 @@ _tokenSet_3 = antlr.BitSet(mk_tokenSet_3())
 ### generate bit set
 def mk_tokenSet_4(): 
     ### var1
-    data = [ 3324215920L, 0L]
+    data = [ 6649250416L, 0L]
     return data
 _tokenSet_4 = antlr.BitSet(mk_tokenSet_4())
 
 ### generate bit set
 def mk_tokenSet_5(): 
     ### var1
-    data = [ 3257107056L, 0L]
+    data = [ 6515032688L, 0L]
     return data
 _tokenSet_5 = antlr.BitSet(mk_tokenSet_5())
 
 ### generate bit set
 def mk_tokenSet_6(): 
     ### var1
-    data = [ 2147483648L, 0L]
+    data = [ 4294967296L, 0L]
     return data
 _tokenSet_6 = antlr.BitSet(mk_tokenSet_6())
 
 ### generate bit set
 def mk_tokenSet_7(): 
     ### var1
-    data = [ 4194304L, 0L]
+    data = [ 8388608L, 0L]
     return data
 _tokenSet_7 = antlr.BitSet(mk_tokenSet_7())
 
 ### generate bit set
 def mk_tokenSet_8(): 
     ### var1
-    data = [ 71303184L, 0L]
+    data = [ 142606352L, 0L]
     return data
 _tokenSet_8 = antlr.BitSet(mk_tokenSet_8())
 
 ### generate bit set
 def mk_tokenSet_9(): 
     ### var1
-    data = [ 3324215922L, 0L]
+    data = [ 6657655410L, 0L]
     return data
 _tokenSet_9 = antlr.BitSet(mk_tokenSet_9())
 
 ### generate bit set
 def mk_tokenSet_10(): 
     ### var1
-    data = [ 3324224114L, 0L]
+    data = [ 6657663602L, 0L]
     return data
 _tokenSet_10 = antlr.BitSet(mk_tokenSet_10())
 
 ### generate bit set
 def mk_tokenSet_11(): 
     ### var1
-    data = [ 3328410226L, 0L]
+    data = [ 6691209842L, 0L]
     return data
 _tokenSet_11 = antlr.BitSet(mk_tokenSet_11())
 
 ### generate bit set
 def mk_tokenSet_12(): 
     ### var1
-    data = [ 3345187442L, 0L]
+    data = [ 6691217010L, 0L]
     return data
 _tokenSet_12 = antlr.BitSet(mk_tokenSet_12())
-
-### generate bit set
-def mk_tokenSet_13(): 
-    ### var1
-    data = [ 3345194610L, 0L]
-    return data
-_tokenSet_13 = antlr.BitSet(mk_tokenSet_13())
     
