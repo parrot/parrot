@@ -163,8 +163,12 @@ consider these data as readonly.
   | label offset                              |
   +----------+----------+----------+----------+
 
-Currently fixup type B<0> is defined, which has a label symbol and an offset
+Fixup type B<0>, known as enum_fixup_label, has a label symbol and an offset
 into the bytecode.
+
+Fixup type B<1>, known as enum_fixup_sub, has a label symbol that is the name
+of the "sub" and an offset into the constant table, referencing a Sub, Closure
+or Coroutine PMC.
 
 =head2 Debug Segment
 
