@@ -1209,6 +1209,8 @@ RUNCORE_TEST_FILES = \
     t/dynclass/*.t \
     t/examples/*.t \
     t/p6rules/*.t
+TOOLS_TEST_FILES = \
+    t/tools/*.t
 
 # Common prep for all test targets.
 # We propably need a complete build before running the tests.
@@ -1218,7 +1220,8 @@ test_prep : all
 # Users have to look at only one report.
 # Normal core
 test : test_prep
-	$(PERL) t/harness $(EXTRA_TEST_ARGS) $(PARROT_ARGS) $(RUNCORE_TEST_FILES) $(RUN_TEST_FILES) $(SRC_TEST_FILES) $(PERL_TEST_FILES)
+	$(PERL) t/harness $(EXTRA_TEST_ARGS) $(PARROT_ARGS) $(RUNCORE_TEST_FILES) \
+		$(RUN_TEST_FILES) $(SRC_TEST_FILES) $(PERL_TEST_FILES) $(TOOLS_TEST_FILES)
 
 # Test various run cores and other stuff
 # 'testC', 'testg' and 'testj' are tested only
@@ -1405,6 +1408,8 @@ test-clean :
 	$(RM_F) t/stress/*.o
 	$(RM_F) t/stress/*.stabs.s
 	$(RM_F) t/src/*.c
+	$(RM_F) t/tools/*.imc
+	$(RM_F) t/tools/*.pbc
 	$(RM_F) $(IMCC_DIR)/t/*/*.out
 	$(RM_F) $(IMCC_DIR)/t/*/*.imc
 	$(RM_F) $(IMCC_DIR)/t/*/*.pir
