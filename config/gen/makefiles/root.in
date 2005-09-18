@@ -460,6 +460,7 @@ PARROT_SO         = $(CUR_DIR)/${test_prog}_so$(EXE)
 DIS               = $(CUR_DIR)/disassemble$(EXE)
 PDUMP             = $(CUR_DIR)/pdump$(EXE)
 PINFO             = $(CUR_DIR)/pbc_info$(EXE)
+PBCMERGE          = $(CUR_DIR)/pbc_merge$(EXE)
 PDB               = $(CUR_DIR)/pdb$(EXE)
 
 # libs
@@ -573,11 +574,12 @@ help :
 	@echo "  all:               'parrot' and the documentation."
 	@echo "                     This is the default."
 	@echo "  world:             'all' and 'parrot_utils'."
-	@echo "  parrot_utils:      $(PDUMP), $(DIS), $(PINFO) and $(PDB)"
+	@echo "  parrot_utils:      $(PDUMP), $(DIS), $(PINFO), $(PDB) and $(PBCMERGE)"
 	@echo "  $(PDUMP):             Parrot Dumper"
 	@echo "  $(DIS):       Parrot Disassembler"
 	@echo "  $(PINFO):          Information about Parrot Byte Code"
 	@echo "  $(PDB):               Parrot Debugger"
+	@echo "  $(PBCMERGE):         Parrot Debugger"
 	@echo ""
 	@echo "Installation:"
 	@echo "  install:           Install under '/usr/local/parrot' on Unix systems"
@@ -649,7 +651,7 @@ help :
 
 world : all parrot_utils
 
-parrot_utils : $(PDUMP) $(DIS) $(PINFO) $(PDB)
+parrot_utils : $(PDUMP) $(DIS) $(PINFO) $(PDB) $(PBCMERGE)
 
 flags_dummy :
 	@echo Compiling with:
@@ -790,6 +792,19 @@ $(PINFO) : $(SRC_DIR)/pbc_info$(O) $(LIBPARROT)
 	$(SRC_DIR)/pbc_info$(O) \
 	$(SRC_DIR)/null_config$(O) \
 	$(LINKFLAGS) $(ALL_PARROT_LIBS)
+
+#
+# Parrot Bytecode File Merger
+#
+
+# pbc_info
+$(PBCMERGE) : $(SRC_DIR)/pbc_merge$(O) $(LIBPARROT)
+	$(LINK) ${ld_out}$(PBCMERGE) \
+	$(SRC_DIR)/pbc_merge$(O) \
+	$(SRC_DIR)/null_config$(O) \
+	$(LINKFLAGS) $(ALL_PARROT_LIBS)
+
+
 
 ###############################################################################
 #
@@ -1331,6 +1346,7 @@ prog-clean :
     $(PDUMP) $(SRC_DIR)/pdump$(O) $(SRC_DIR)/packdump$(O) \
     $(SRC_DIR)/pbc_info$(O) $(PINFO) \
     $(PDB) $(SRC_DIR)/pdb$(O) \
+    $(PBCMERGE) $(SRC_DIR)/pbc_merge$(O) \
     $(DIS) $(SRC_DIR)/disassemble$(O) \
 	$(SRC_DIR)/null_config$(O) \
 	$(SRC_DIR)/parrot_config$(O) \
