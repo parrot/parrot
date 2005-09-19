@@ -1,23 +1,41 @@
-OPS_DIR = ../ops
-VIM_DIR = $(HOME)/.vim
-VIM_FT_DIR = $(VIM_DIR)/ftdetect
-VIM_IN_DIR = $(VIM_DIR)/indent
+# $Id$
+
+OPS_DIR     = ../ops
+VIM_DIR     = $(HOME)/.vim
+VIM_FT_DIR  = $(VIM_DIR)/ftdetect
+VIM_IN_DIR  = $(VIM_DIR)/indent
 VIM_SYN_DIR = $(VIM_DIR)/syntax
 
-PERL = ${perl}
-CP = ${cp}
+PERL  = ${perl}
+CP    = ${cp}
 MKDIR = $(PERL) -e ${PQ}-d or mkdir $$_,0777 or die foreach @ARGV${PQ}
-RM_F = ${rm_f}
+RM_F  = ${rm_f}
 
 default: all
 
-all: imc.vim vim-install
+all: imc.vim imc.kate
+
+# This is a listing of all targets, that are meant to be called by users
+help :
+	@echo ""
+	@echo "Following targets are available for the user:"
+	@echo ""
+	@echo "  all:               generate imc.vim and imc.kate but do not install it"
+	@echo "                     This is the default."
+	@echo "  vim-install:       Install syntax files for the magnificent vim"
+	@echo "  vim-uninstall:     Uninstall syntax files for vim"
+	@echo "  imc.kate:          Syntax file for Kate"
+	@echo ""
+	@echo "Cleaning:"
+	@echo "  clean:             clean up local files"
+	@echo "  realclean:         clean up local files including Makefile"
+	@echo ""
 
 imc.vim: imc.vim.in $(OPS_DIR)/*.ops
 	$(CP) imc.vim.in imc.vim
 	$(PERL) ops2vim.pl $(OPS_DIR)/*.ops >> imc.vim
 
-vim-install:
+vim-install: imc.vim
 	$(MKDIR) $(VIM_DIR)
 	$(MKDIR) $(VIM_SYN_DIR)
 	$(CP) imc.vim $(VIM_SYN_DIR)
@@ -28,15 +46,21 @@ vim-install:
 	$(MKDIR) $(VIM_IN_DIR)
 	$(CP) indent_imc.vim $(VIM_IN_DIR)/imc.vim
 
-imc.kate:
+imc.kate: imcc.xml
+
+imcc.xml:
 	$(PERL) kate_syntax.pl '..${slash}' > imcc.xml
 
-clean:
+vim-uninstall:
 	$(RM_F) $(VIM_SYN_DIR)/imc.vim
 	$(RM_F) $(VIM_SYN_DIR)/pasm.vim
 	$(RM_F) $(VIM_SYN_DIR)/pmc.vim
 	$(RM_F) $(VIM_FT_DIR)/parrot.vim
 	$(RM_F) $(VIM_IN_DIR)/imc.vim
+
+clean:
+	$(RM_F) imc.vim
+	$(RM_F) imcc.xml
 
 realclean: clean
 	$(RM_F) Makefile

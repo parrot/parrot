@@ -171,7 +171,8 @@ GEN_MAKEFILES = \
     languages/perl6/Makefile \
     languages/urm/Makefile \
     languages/tcl/Makefile \
-    languages/tcl/examples/Makefile
+    languages/tcl/examples/Makefile \
+    editor/Makefile
 
 GEN_CONFIGS = \
     include/parrot/config.h \
@@ -1186,6 +1187,15 @@ compilers-clean :
 
 ###############################################################################
 #
+# editors targets:
+#
+###############################################################################
+
+editor-clean :
+	$(MAKE_C) editor clean
+
+###############################################################################
+#
 # Testing Targets:
 #
 ###############################################################################
@@ -1335,7 +1345,8 @@ clean : \
     dynclasses-clean \
     examples-clean \
     imcc-clean \
-    compilers-clean
+    compilers-clean \
+    editor-clean
 	${TEMP_cg_r}
 	$(RM_F) chartypes *.s *~ $(FLUID_FILES)
 

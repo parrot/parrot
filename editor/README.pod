@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 NAME
 
 editor/README.pod - Productivity Comes in Pretty Colors
@@ -7,7 +9,8 @@ editor/README.pod - Productivity Comes in Pretty Colors
 Included in this directory are some add-ins for making working on parrot (or in
 parrot) easier, for various popular editors. Mostly that means
 syntax-highlighting and automatic indenting. Read on to see what's available for
-your favorite editor
+your favorite editor. For a summary on what is available do
+  make help
 
 =head2 Vim
 
@@ -18,8 +21,9 @@ filetype script that tells vim to associate the extensions .imc, .imcc, .pasm,
 and .pmc with the right syntax. The syntax files should be installed to
 C<~/.vim/syntax/>; C<filetype_parrot.vim> should be installed to
 C<~/.vim/ftdetect>; C<indent_imc.vim> should be called C<~/.vim/indent/imc.vim>.
-C<make> in the C<editor/> dir will do this automatically. If you want indenting,
-you should also place C<filetype indent on> somewhere in your vimrc.
+C<make vim-install> in the C<editor/> dir will do this automatically.
+If you want indenting, you should also place C<filetype indent on> somewhere in
+your vimrc.
 
 =head2 Kate
 
@@ -59,7 +63,7 @@ using tabs in the pasm mode.
 There is a script here to automatically generate a TAGS file, which works with
 Vim and other editors that recognize ctags-format files. The tool "exuberant
 ctags" is required. Run
- make tags
+  make tags
 in the parrot root directory to build the tags file.
 
 =cut
