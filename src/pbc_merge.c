@@ -166,7 +166,7 @@ pbc_merge_loadpbc(Interp *interpreter, char *fullname)
 /*
 
 =item C<static struct PackFile_ByteCode*
-pbc_merge_bytecode(Interp *interpreter, pbc_merge_inputs **inputs,
+pbc_merge_bytecode(Interp *interpreter, struct pbc_merge_input **inputs,
                    int num_inputs, struct PackFile *pf)>
 
 This function merges the bytecode from the input packfiles, storing the
@@ -234,7 +234,7 @@ pbc_merge_bytecode(Interp *interpreter, struct pbc_merge_input **inputs,
 /*
 
 =item C<static void
-pbc_merge_constants(Interp *interpreter, pbc_merge_inputs **inputs,
+pbc_merge_constants(Interp *interpreter, struct pbc_merge_input **inputs,
                     int num_inputs, struct PackFile *pf,
                     struct PackFile_ByteCode *bc)>
 
@@ -244,7 +244,7 @@ This function merges the constants tables from the input PBC files.
 
 */
 static void
-pbc_merge_constants(Interp *interpreter, pbc_merge_inputs **inputs,
+pbc_merge_constants(Interp *interpreter, struct pbc_merge_input **inputs,
                     int num_inputs, struct PackFile *pf,
                     struct PackFile_ByteCode *bc)
 {
@@ -339,9 +339,9 @@ pbc_merge_constants(Interp *interpreter, pbc_merge_inputs **inputs,
 /*
 
 =item C<static void
-pbc_merge_fixups(Interp *interpreter, pbc_merge_inputs **inputs,
+pbc_merge_fixups(Interp *interpreter, struct pbc_merge_input **inputs,
                  int num_inputs struct PackFile *pf,
-                 struct PackFile_ByteCode *bc)>
+                 struct PackFile_ByteCode *bc)
 
 This function merges the fixups tables from the input PBC files.
 
@@ -349,8 +349,8 @@ This function merges the fixups tables from the input PBC files.
 
 */
 static void
-pbc_merge_fixups(Interp *interpreter, pbc_merge_inputs **inputs,
-                 int num_inputs struct PackFile *pf,
+pbc_merge_fixups(Interp *interpreter, struct pbc_merge_input **inputs,
+                 int num_inputs, struct PackFile *pf,
                  struct PackFile_ByteCode *bc)
 {
     struct PackFile_FixupTable *fixup_seg;
@@ -444,7 +444,7 @@ pbc_merge_fixups(Interp *interpreter, pbc_merge_inputs **inputs,
 /*
 
 =item C<static void
-pbc_merge_ctpointers(Interp *interpreter, pbc_merge_inputs **inputs,
+pbc_merge_ctpointers(Interp *interpreter, struct pbc_merge_input **inputs,
                      int num_inputs, struct PackFile *pf, 
                      struct PackFile_ByteCode *bc)>
 
@@ -455,7 +455,7 @@ bytecode.
 
 */
 static void
-pbc_merge_ctpointers(Interp *interpreter, pbc_merge_inputs **inputs,
+pbc_merge_ctpointers(Interp *interpreter, struct pbc_merge_input **inputs,
                      int num_inputs, struct PackFile *pf, 
                      struct PackFile_ByteCode *bc)
 {
@@ -501,7 +501,7 @@ pbc_merge_ctpointers(Interp *interpreter, pbc_merge_inputs **inputs,
 /*
 
 =item C<static struct PackFile*
-pbc_merge_begin(Interp *interpreter, struct pbc_merge_inputs **inputs,
+pbc_merge_begin(Interp *interpreter, struct pbc_merge_input **inputs,
                 int num_inputs)>
 
 This is the function that drives PBC merging process.
@@ -510,7 +510,7 @@ This is the function that drives PBC merging process.
 
 */
 static struct PackFile*
-pbc_merge_begin(Interp *interpreter, struct pbc_merge_inputs **inputs,
+pbc_merge_begin(Interp *interpreter, struct pbc_merge_input **inputs,
                 int num_inputs)
 {
     struct PackFile *merged;
