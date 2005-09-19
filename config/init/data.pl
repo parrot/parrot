@@ -40,7 +40,7 @@ sub runstep {
     # A plain --optimize means use perl5's $Config{optimize}.  If an argument is
     # given, however, use that instead.  This logic really belongs in the optimize
     # unit.
-    optimize      => $optimize ? ($optimize eq "1" ? $Config{optimize} : $optimize) : '',
+    optimize      => $optimize ? ($optimize eq "1" ? ($Config{optimize} || "1") : $optimize) : '',
     verbose       => $verbose,
 
     build_dir     => $FindBin::Bin,

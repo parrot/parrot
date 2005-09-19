@@ -152,7 +152,7 @@
 	elsif( $is_mingw ) {
 		my $make=Configure::Data->get(qw(make));
 		if ($make =~ /nmake/i) {
-			# ActiveState Perl
+			# ActiveState Perl or PXPerl
 			Configure::Data->set(
 				'a' => '.a',
 				'ar' => 'ar',
@@ -171,9 +171,9 @@
 				'o' => '.o',
 				'slash' => '\\',
 			);
-			if (Configure::Data->get(qw(optimize))) {
+			if (Configure::Data->get(qw(optimize)) eq "1") {
 				Configure::Data->set(
-					optimize => '-s -O2'
+					optimize => '-O2'
 				);
 			}
 		} elsif ($make =~ /dmake/i) {

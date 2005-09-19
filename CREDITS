@@ -129,8 +129,8 @@ D: Use unix98 ps option in signal.t
 N: Felix Gallo
 D: delegate.pmc patch
 
-N: Francois Perrad
-D: build fixes for Cygwin and MinGW
+N: François PERRAD
+D: build fixes for MinGW
 
 N: Garrett Rooney
 D: Fix typo in PARROT_BIGENDIAN case
