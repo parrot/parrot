@@ -66,7 +66,7 @@ NEWLINE
 
 // String literals are everything in double quotes, no escaping
 STRING
-  : '"'!  ( ~'"' )* '"'!
+  : '"'!  ( ~'"' )* '"'!  
   ;
 
 LETTER
@@ -257,9 +257,9 @@ argument_list
   : expression
   ;
 
-//TODO
-relational_expression
-  : expression ( REL_OP expression )?
+// a relational expression
+relational_expression returns[reg_name]
+  : expression ( REL_OP^ expression )?
   ;
 
 //TODO
@@ -462,7 +462,7 @@ expr_line!
               lex_name + " = " + lex_name + " - 1 \n # "
         #expr_line = #( [ PIR_NOOP, "noop" ], [PIR_OP, pir], [PIR_OP, "\nprint "], [PIR_OP,lex_name], [PIR_NEWLINE, "\nprint \"\\n\" # "] )
       }
-    | #( If reg_name=E3:expr p2:expr_line )
+    | #( If reg_name=E3:relational_expr p2:expr_line )
       {
         pir = "\n" + \
               "unless " + reg_name + " goto LABEL_%d\n#" % self.label_num 
@@ -472,6 +472,20 @@ expr_line!
       {
         #expr_line = #p
       };
+
+relational_expr! returns[reg_name]
+  :   reg_name=e1:expr
+      {
+         #relational_expr = #e1
+      } 
+    | #( op:REL_OP reg_name_left=e2:expr reg_name_right=e3:expr ) 
+      {
+        reg_name = "temp_int"
+        pir = "\n" + \
+              "temp_int = islt " + reg_name_left + ", " + reg_name_right + "\n #"
+        #relational_expr = #( [ PIR_NOOP, "noop" ], #e2, e3, [PIR_OP, pir] )
+      }
+  ;
 
 expr_list
   : (expr_line|PIR_FUNCTION_DEF)+

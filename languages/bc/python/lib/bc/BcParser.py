@@ -383,6 +383,7 @@ class Parser(antlr.LLkParser):
         self.returnAST = printable_expression_AST
     
     def relational_expression(self):    
+        reg_name = None
         
         self.returnAST = None
         currentAST = antlr.ASTPair()
@@ -398,7 +399,7 @@ class Parser(antlr.LLkParser):
                 pass
                 tmp30_AST = None
                 tmp30_AST = self.astFactory.create(self.LT(1))
-                self.addASTChild(currentAST, tmp30_AST)
+                self.makeASTRoot(currentAST, tmp30_AST)
                 self.match(REL_OP)
                 self.expression()
                 self.addASTChild(currentAST, self.returnAST)
@@ -415,6 +416,7 @@ class Parser(antlr.LLkParser):
             self.consumeUntil(_tokenSet_7)
         
         self.returnAST = relational_expression_AST
+        return reg_name
     
     def opt_parameter_list(self):    
         

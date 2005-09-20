@@ -746,7 +746,7 @@ class Walker(antlr.TreeParser):
                 self.match(_t,If)
                 _t = _t.getFirstChild()
                 E3 = antlr.ifelse(_t == antlr.ASTNULL, None, _t)
-                reg_name=self.expr(_t)
+                reg_name=self.relational_expr(_t)
                 _t = self._retTree
                 E3_AST = self.returnAST
                 p2 = antlr.ifelse(_t == antlr.ASTNULL, None, _t)
@@ -793,6 +793,89 @@ class Walker(antlr.TreeParser):
         self.returnAST = expr_line_AST
         self._retTree = _t
     
+    def relational_expr(self, _t):    
+        reg_name = None
+        
+        relational_expr_AST_in = None
+        if _t != antlr.ASTNULL:
+            relational_expr_AST_in = _t
+        self.returnAST = None
+        currentAST = antlr.ASTPair()
+        relational_expr_AST = None
+        e1_AST = None
+        e1 = None
+        op = None
+        op_AST = None
+        e2_AST = None
+        e2 = None
+        e3_AST = None
+        e3 = None
+        try:      ## for error handling
+            if not _t:
+                _t = antlr.ASTNULL
+            la1 = _t.getType()
+            if False:
+                pass
+            elif la1 and la1 in [LETTER,NUMBER,MUL,DIV,MOD,PLUS,MINUS,UNARY_MINUS]:
+                pass
+                e1 = antlr.ifelse(_t == antlr.ASTNULL, None, _t)
+                reg_name=self.expr(_t)
+                _t = self._retTree
+                e1_AST = self.returnAST
+                relational_expr_AST = currentAST.root
+                relational_expr_AST = e1_AST
+                currentAST.root = relational_expr_AST
+                if (relational_expr_AST != None) and (relational_expr_AST.getFirstChild() != None):
+                    currentAST.child = relational_expr_AST.getFirstChild()
+                else:
+                    currentAST.child = relational_expr_AST
+                currentAST.advanceChildToEnd()
+            elif la1 and la1 in [REL_OP]:
+                pass
+                _t104 = _t
+                op = antlr.ifelse(_t == antlr.ASTNULL, None, _t)
+                op_AST_in = None
+                op_AST = self.astFactory.create(op)
+                _currentAST104 = currentAST.copy()
+                currentAST.root = currentAST.child
+                currentAST.child = None
+                self.match(_t,REL_OP)
+                _t = _t.getFirstChild()
+                e2 = antlr.ifelse(_t == antlr.ASTNULL, None, _t)
+                reg_name_left=self.expr(_t)
+                _t = self._retTree
+                e2_AST = self.returnAST
+                e3 = antlr.ifelse(_t == antlr.ASTNULL, None, _t)
+                reg_name_right=self.expr(_t)
+                _t = self._retTree
+                e3_AST = self.returnAST
+                currentAST = _currentAST104
+                _t = _t104
+                _t = _t.getNextSibling()
+                relational_expr_AST = currentAST.root
+                reg_name = "temp_int"
+                pir = "\n" + \
+                     "temp_int = islt " + reg_name_left + ", " + reg_name_right + "\n #"
+                relational_expr_AST = antlr.make(self.astFactory.create(PIR_NOOP,"noop"), e2_AST, e3_AST, self.astFactory.create(PIR_OP,pir))
+                currentAST.root = relational_expr_AST
+                if (relational_expr_AST != None) and (relational_expr_AST.getFirstChild() != None):
+                    currentAST.child = relational_expr_AST.getFirstChild()
+                else:
+                    currentAST.child = relational_expr_AST
+                currentAST.advanceChildToEnd()
+            else:
+                    raise antlr.NoViableAltException(_t)
+                
+        
+        except antlr.RecognitionException, ex:
+            self.reportError(ex)
+            if _t:
+                _t = _t.getNextSibling()
+        
+        self.returnAST = relational_expr_AST
+        self._retTree = _t
+        return reg_name
+    
     def expr_list(self, _t):    
         
         expr_list_AST_in = None
@@ -803,7 +886,7 @@ class Walker(antlr.TreeParser):
         expr_list_AST = None
         try:      ## for error handling
             pass
-            _cnt105= 0
+            _cnt107= 0
             while True:
                 if not _t:
                     _t = antlr.ASTNULL
@@ -827,8 +910,8 @@ class Walker(antlr.TreeParser):
                 else:
                         break
                     
-                _cnt105 += 1
-            if _cnt105 < 1:
+                _cnt107 += 1
+            if _cnt107 < 1:
                 raise antlr.NoViableAltException(_t)
             expr_list_AST = currentAST.root
         

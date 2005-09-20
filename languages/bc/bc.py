@@ -126,7 +126,8 @@ def main():
 #!/usr/bin/env parrot
 
 .sub "main" @MAIN
-   .local pmc a_lex, b_lex, c_lex, d_lex, e_lex, f_lex, g_lex, h_lex, i_lex, j_lex, k_lex, l_lex, m_lex, n_lex, o_lex, p_lex, q_lex, r_lex, s_lex, t_lex, u_lex, v_lex, w_lex, x_lex, y_lex, z_lex
+  .local int temp_int
+  .local pmc a_lex, b_lex, c_lex, d_lex, e_lex, f_lex, g_lex, h_lex, i_lex, j_lex, k_lex, l_lex, m_lex, n_lex, o_lex, p_lex, q_lex, r_lex, s_lex, t_lex, u_lex, v_lex, w_lex, x_lex, y_lex, z_lex
    a_lex = new .Float
    b_lex = new .Float
    c_lex = new .Float
