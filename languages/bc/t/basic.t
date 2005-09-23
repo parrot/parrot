@@ -16,7 +16,7 @@ use FindBin;
 use lib "$FindBin::Bin/../../lib", "$FindBin::Bin/../../../../lib";
 
 use Test::More;
-use Parrot::Test tests => 54;
+use Parrot::Test tests => 55;
 
 sub run_tests
 {
@@ -109,6 +109,7 @@ my @tests =
        [ "1; if ( 1 ) 2; 3", [1,2,3], 'if with a true condition' ],
        [ "1; if ( 0 ) 2; 3", [1,3], 'if with a true condition' ],
        [ "1; if ( 1 < 2 ) 2; 3", [1,2,3] ],
+       [ "1; if ( 3 + 4 < 8*2 - 10 ) 2; 3", [1,3] ],
      );
 
 my @todo_tests = 
