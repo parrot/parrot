@@ -15,8 +15,8 @@ use strict;
 use FindBin;
 use lib "$FindBin::Bin/../../lib", "$FindBin::Bin/../../../../lib";
 
+use Parrot::Test tests => 72;
 use Test::More;
-use Parrot::Test tests => 55;
 
 sub run_tests
 {
@@ -108,17 +108,28 @@ my @tests =
        # If 
        [ "1; if ( 1 ) 2; 3", [1,2,3], 'if with a true condition' ],
        [ "1; if ( 0 ) 2; 3", [1,3], 'if with a true condition' ],
-       [ "1; if ( 1 < 2 ) 2; 3", [1,2,3] ],
-       [ "1; if ( 3 + 4 < 8*2 - 10 ) 2; 3", [1,3] ],
-     );
-
-my @todo_tests = 
-     ( # floats
-       [ '.1', '.1', 'Parrot bc says 0.1' ],
-       [ '-.1', '-.1', 'Parrot bc says -0.1'],
-       [ '-1.0000001', '-1.0000001', 'propably limited precission of Float PMC' ],
-       # keyword quit
-       [ "0\n1; 2; quit;  3", [ 0 ], 'is that correct in GNU bc?' ],
+       [ "1; if ( 1 < 2 ) 2; 3", [1, 2, 3], 'if with a relational operator' ],
+       # If with '<'
+       [ "1; if ( 3 + 4 < 8*2 - 10 ) 2; 3", [1, 3] ],
+       [ "1; if ( 3 + 4 < 8*2 - 9 ) 2; 3", [1, 3] ],
+       [ "1; if ( 3 + 4 < 8*2 + 10 ) 2; 3", [1, 2, 3] ],
+       # If with '<='
+       [ "1; if ( 3 + 4 <= 8*2 - 10 ) 2; 3", [1, 3] ],
+       [ "1; if ( 3 + 4 <= 8*2 - 9 ) 2; 3", [1, 2, 3] ],
+       [ "1; if ( 3 + 4 <= 8*2 + 10 ) 2; 3", [1, 2, 3] ],
+       # If with '==', still TODO
+       # If with '!='
+       [ "1; if ( 3 + 4 != 8*2 - 10 ) 2; 3", [1, 2, 3] ],
+       [ "1; if ( 3 + 4 != 8*2 - 9 ) 2; 3", [1, 3] ],
+       [ "1; if ( 3 + 4 != 8*2 + 10 ) 2; 3", [1, 2, 3] ],
+       # If with '>='
+       [ "1; if ( 3 + 4 >= 8*2 - 10 ) 2; 3", [1, 2, 3] ],
+       [ "1; if ( 3 + 4 >= 8*2 - 9 ) 2; 3", [1, 2, 3] ],
+       [ "1; if ( 3 + 4 >= 8*2 + 10 ) 2; 3", [1, 3] ],
+       # If with '>'
+       [ "1; if ( 3 + 4 > 8*2 - 10 ) 2; 3", [1, 2, 3] ],
+       [ "1; if ( 3 + 4 > 8*2 - 9 ) 2; 3", [1, 3] ],
+       [ "1; if ( 3 + 4 > 8*2 + 10 ) 2; 3", [1, 3] ],
      );
 
 run_tests( \@tests );
@@ -126,5 +137,17 @@ run_tests( \@tests );
 TODO:
 {
   local $TODO = 'not implemented';
+  my @todo_tests = 
+     ( # floats
+       [ '.1', '.1', 'Parrot bc says 0.1' ],
+       [ '-.1', '-.1', 'Parrot bc says -0.1'],
+       [ '-1.0000001', '-1.0000001', 'propably limited precission of Float PMC' ],
+       # keyword quit
+       [ "0\n1; 2; quit;  3", [ 0 ], 'is that correct in GNU bc?' ],
+       # If with '==', propable not correctly parsed
+       [ "1; if ( 3 + 4 == 8*2 - 10 ) 2; 3", [1, 3], 'strange ==' ],
+       [ "1; if ( 3 + 4 == 8*2 - 9 ) 2; 3", [1, 2, 3], 'strange ==' ],
+       [ "1; if ( 3 + 4 == 8*2 + 10 ) 2; 3", [1, 3], 'strange ==' ],
+     );
   run_tests( \@todo_tests );
-} 
+}; 

@@ -66,7 +66,7 @@ NEWLINE
 
 // String literals are everything in double quotes, no escaping
 STRING
-  : '"'!  ( ~'"' )* '"'!  
+  : '"'!  ( ~'"' )* '"'!    
   ;
 
 LETTER
@@ -480,9 +480,16 @@ relational_expr! returns[reg_name]
       } 
     | #( op:REL_OP reg_name_left=e2:expr reg_name_right=e3:expr ) 
       {
-        reg_name = "temp_int"
+        reg_name = "temp_int"    // this will be returned
+        pir_op_for_rel_op = { "<":  "islt",
+                              "<=": "isle",
+                              ">":  "isgt",
+                              ">=": "isge",
+                              "==": "iseq",
+                              "!=": "isne",
+                            }
         pir = "\n" + \
-              "temp_int = islt " + reg_name_left + ", " + reg_name_right + "\n #"
+              reg_name + " = " + pir_op_for_rel_op[op.getText()] + ' ' + reg_name_left + ", " + reg_name_right + "\n #"
         #relational_expr = #( [ PIR_NOOP, "noop" ], #e2, e3, [PIR_OP, pir] )
       }
   ;

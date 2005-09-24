@@ -853,9 +853,16 @@ class Walker(antlr.TreeParser):
                 _t = _t104
                 _t = _t.getNextSibling()
                 relational_expr_AST = currentAST.root
-                reg_name = "temp_int"
+                reg_name = "temp_int"    # this will be returned
+                pir_op_for_rel_op = { "<":  "islt",
+                                     "<=": "isle",
+                                     ">":  "isgt",
+                                     ">=": "isge",
+                                     "==": "iseq",
+                                     "!=": "isne",
+                                   }
                 pir = "\n" + \
-                     "temp_int = islt " + reg_name_left + ", " + reg_name_right + "\n #"
+                     reg_name + " = " + pir_op_for_rel_op[op.getText()] + ' ' + reg_name_left + ", " + reg_name_right + "\n #"
                 relational_expr_AST = antlr.make(self.astFactory.create(PIR_NOOP,"noop"), e2_AST, e3_AST, self.astFactory.create(PIR_OP,pir))
                 currentAST.root = relational_expr_AST
                 if (relational_expr_AST != None) and (relational_expr_AST.getFirstChild() != None):
