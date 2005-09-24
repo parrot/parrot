@@ -152,7 +152,9 @@ V: 0.0.11
 N: Pint
 A: Alan Knowles
 D: An experimental implementation of PHP
-W: http://devel.akbkhome.com/svn/index.php/PintCompiler/
+S: This project has been abandoned. Any takers?
+W: http://www.akbkhome.com/svn.php/PintCompiler
+W: http://www.akbkhome.com/blog.php/View/44/Latest_in_Vapourware_PintCompiler__dbdo.html
 
 N: Pugs
 A: Autrijus Tang
