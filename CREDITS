@@ -221,6 +221,10 @@ D: PIR tests and fixes
 N: Joshua Gatcomb
 D: updated version of parrotbench.pl
 
+N: Joshua Hoblitt
+E: jhoblitt@cpan.org
+D: bug wrangling, doc & makefile cleanups
+
 N: Josh Wilmes
 
 N: Juergen Boemmels
