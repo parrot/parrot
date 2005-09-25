@@ -26,28 +26,28 @@ The IMC_Unit structure contains all the information known about a function.    I
 
 Each instruction line has an Instruction structure.  Pointers to the first and last Instruction are stored in IMC_Unit.  Instructions are stored as a linked list.  To iterate through all Instructions, use:
 
-Instruction *ins;
-for (ins = unit->instructions; ins; ins = ins->next) {
-    ...
-}
+    Instruction *ins;
+    for (ins = unit->instructions; ins; ins = ins->next) {
+        ...
+    }
 
 =item Basic_block
 
 Basic blocks are the most important structure for optimization.  A basic block identifies a block of instructions that will all execute in sequence without jumps into or out of that block.  All labels will appear at the beginning of a block, and all conditional or unconditional jumps will appear at the end.  Basic_block structures are stored as an array of pointers, each with an index that denotes their position in the array.  Block 0 is implicitly the top block.  To iterate through all Basic_blocks, use:
 
-int i;
-for (i = 0; i < unit->n_basic_blocks; i++) {
-    ...
-}
+    int i;
+    for (i = 0; i < unit->n_basic_blocks; i++) {
+        ...
+    }
 
 =item Edge
 
 Edges denote the flow of control between Basic_blocks.  Edges and Basic_blocks together make up the basic CFG.  Each Basic_block has *pred_list and *succ_list pointer to the first predecessor edge and successor edge, respectively.  Each edge has a *to and *from pointer to the  Basic_blocks it joins.  To iterate through all predecessor Edges, use:
 
-Edge *pred;
-for (pred = to->pred_list; pred; pred=pred->pred_next) {
-    ...
-}
+    Edge *pred;
+    for (pred = to->pred_list; pred; pred=pred->pred_next) {
+        ...
+    }
 
 =item Loop_info
 
@@ -68,9 +68,13 @@ The optimizer loop works as follows:
 =over 4
 
 =item 1.  Run all pre_optimize() optimizations until none make a change.
+
 =item 2.  Build basic block info.
+
 =item 3.  Run all cfg_optimize() optimizations.  If one makes a change, go to step 1.
+
 =item 4.  Build all other CFG info (dominators, loops, life analysis).
+
 =item 5.  Run all optimize() optimizations.  If one makes a change, go to step 1.
 
 =back

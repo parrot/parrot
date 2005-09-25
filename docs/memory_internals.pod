@@ -160,31 +160,39 @@ both the word containing the object's flags and a bitmask to isolate the flag.
 The flag word for object o is found as follows:
 
 - Get the C<dod_flags[]> array for the object's arena
+
     [GET_ARENA(o)->dod_flags]
 
 - Get the index of the object in its arena
+
     [n=GET_OBJ_N(arena,o)]
 
 - Determine which word in dod_flags contains the needed flag nibble
+
     [(obj index)/(obj flag sets per word) = n>>ARENA_FLAG_SHIFT]
 
 The composite expression to reference the flag word is then
-  GET_ARENA(o)->dod_flags[ GET_OBJ_N(GET_ARENA(o), o) >> ARENA_FLAG_SHIFT ]
+
+    GET_ARENA(o)->dod_flags[ GET_OBJ_N(GET_ARENA(o), o) >> ARENA_FLAG_SHIFT ]
 
 The bitmask for the desired flag is constructed as follows:
 
 - Determine the index into the flag word of the object's nibble
+
     [(obj index)%(nibbles per word) = n & ARENA_FLAG_MASK]
 
 - Convert nibble index into bit index
+
     [(nibble index)*(bits per nibble) = (n & ARENA_FLAG_MASK) << 2]
 
 - Create bitmask for desired flag by shifting base flag by bit index
+
     [d_PObj_whatever_FLAG << (nibble index)]
 
 The composite expression to form the bitmask is then
-  (d_PObj_ ## flag ## _FLAG << (( GET_OBJ_N(GET_ARENA(o), o) &
-     ARENA_FLAG_MASK ) << 2))
+
+    (d_PObj_ ## flag ## _FLAG << (( GET_OBJ_N(GET_ARENA(o), o) &
+        ARENA_FLAG_MASK ) << 2))
 
 The DOD_flag_* macros combine these constructions to access the flags.
 
