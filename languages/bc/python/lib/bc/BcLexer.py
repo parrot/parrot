@@ -101,13 +101,9 @@ class Lexer(antlr.CharScanner) :
                                 pass
                                 self.mNUMBER(True)
                                 theRetToken = self._returnToken
-                            elif la1 and la1 in u'*':
+                            elif la1 and la1 in u'!<=>':
                                 pass
-                                self.mMUL(True)
-                                theRetToken = self._returnToken
-                            elif la1 and la1 in u'%':
-                                pass
-                                self.mMOD(True)
+                                self.mREL_OP(True)
                                 theRetToken = self._returnToken
                             elif la1 and la1 in u'(':
                                 pass
@@ -133,10 +129,6 @@ class Lexer(antlr.CharScanner) :
                                 pass
                                 self.mRBRACKET(True)
                                 theRetToken = self._returnToken
-                            elif la1 and la1 in u'^':
-                                pass
-                                self.mCARET(True)
-                                theRetToken = self._returnToken
                             elif la1 and la1 in u'{':
                                 pass
                                 self.mLCURLY(True)
@@ -150,7 +142,11 @@ class Lexer(antlr.CharScanner) :
                                 self.mWS(True)
                                 theRetToken = self._returnToken
                             else:
-                                if (self.LA(1)==u'+') and (self.LA(2)==u'+'):
+                                if (_tokenSet_0.member(self.LA(1))) and (self.LA(2)==u'='):
+                                    pass
+                                    self.mASSIGN_OP(True)
+                                    theRetToken = self._returnToken
+                                elif (self.LA(1)==u'+') and (self.LA(2)==u'+'):
                                     pass
                                     self.mINCR(True)
                                     theRetToken = self._returnToken
@@ -174,7 +170,7 @@ class Lexer(antlr.CharScanner) :
                                     pass
                                     self.mIf(True)
                                     theRetToken = self._returnToken
-                                elif (_tokenSet_0.member(self.LA(1))) and (_tokenSet_1.member(self.LA(2))):
+                                elif (_tokenSet_1.member(self.LA(1))) and (_tokenSet_2.member(self.LA(2))):
                                     pass
                                     self.mKEYWORDS(True)
                                     theRetToken = self._returnToken
@@ -186,17 +182,17 @@ class Lexer(antlr.CharScanner) :
                                     pass
                                     self.mLETTER(True)
                                     theRetToken = self._returnToken
+                                elif (self.LA(1)==u'*') and (True):
+                                    pass
+                                    self.mMUL(True)
+                                    theRetToken = self._returnToken
                                 elif (self.LA(1)==u'/') and (True):
                                     pass
                                     self.mDIV(True)
                                     theRetToken = self._returnToken
-                                elif (self.LA(1)==u'=') and (True):
+                                elif (self.LA(1)==u'%') and (True):
                                     pass
-                                    self.mASSIGN_OP(True)
-                                    theRetToken = self._returnToken
-                                elif (_tokenSet_2.member(self.LA(1))) and (True):
-                                    pass
-                                    self.mREL_OP(True)
+                                    self.mMOD(True)
                                     theRetToken = self._returnToken
                                 elif (self.LA(1)==u'+') and (True):
                                     pass
@@ -205,6 +201,10 @@ class Lexer(antlr.CharScanner) :
                                 elif (self.LA(1)==u'-') and (True):
                                     pass
                                     self.mMINUS(True)
+                                    theRetToken = self._returnToken
+                                elif (self.LA(1)==u'^') and (True):
+                                    pass
+                                    self.mCARET(True)
                                     theRetToken = self._returnToken
                                 else:
                                     self.default(self.LA(1))
@@ -384,8 +384,30 @@ class Lexer(antlr.CharScanner) :
         _begin = self.text.length()
         _ttype = ASSIGN_OP
         _saveIndex = 0
-        pass
-        self.match('=')
+        la1 = self.LA(1)
+        if False:
+            pass
+        elif la1 and la1 in u'+':
+            pass
+            self.match("+=")
+        elif la1 and la1 in u'-':
+            pass
+            self.match("-=")
+        elif la1 and la1 in u'*':
+            pass
+            self.match("*=")
+        elif la1 and la1 in u'/':
+            pass
+            self.match("/=")
+        elif la1 and la1 in u'%':
+            pass
+            self.match("%=")
+        elif la1 and la1 in u'^':
+            pass
+            self.match("^=")
+        else:
+                self.raise_NoViableAlt(self.LA(1))
+            
         self.set_return_token(_createToken, _token, _ttype, _begin)
     
     def mREL_OP(self, _createToken):    
@@ -394,31 +416,31 @@ class Lexer(antlr.CharScanner) :
         _begin = self.text.length()
         _ttype = REL_OP
         _saveIndex = 0
-        la1 = self.LA(1)
-        if False:
-            pass
-        elif la1 and la1 in u'=':
+        if (self.LA(1)==u'=') and (self.LA(2)==u'='):
             pass
             self.match("==")
-        elif la1 and la1 in u'!':
+        elif (self.LA(1)==u'<') and (self.LA(2)==u'='):
+            pass
+            self.match("<=")
+        elif (self.LA(1)==u'>') and (self.LA(2)==u'='):
+            pass
+            self.match(">=")
+        elif (self.LA(1)==u'=') and (True):
+            pass
+            self.match('=')
+            _ttype = ASSIGN_OP;
+        elif (self.LA(1)==u'<') and (True):
+            pass
+            self.match('<')
+        elif (self.LA(1)==u'>') and (True):
+            pass
+            self.match('>')
+        elif (self.LA(1)==u'!'):
             pass
             self.match("!=")
         else:
-            if (self.LA(1)==u'<') and (self.LA(2)==u'='):
-                pass
-                self.match("<=")
-            elif (self.LA(1)==u'>') and (self.LA(2)==u'='):
-                pass
-                self.match(">=")
-            elif (self.LA(1)==u'<') and (True):
-                pass
-                self.match('<')
-            elif (self.LA(1)==u'>') and (True):
-                pass
-                self.match('>')
-            else:
-                self.raise_NoViableAlt(self.LA(1))
-            
+            self.raise_NoViableAlt(self.LA(1))
+        
         self.set_return_token(_createToken, _token, _ttype, _begin)
     
     def mINCR(self, _createToken):    
@@ -655,7 +677,7 @@ class Lexer(antlr.CharScanner) :
         else:
                 self.raise_NoViableAlt(self.LA(1))
             
-        _ttype = Token.SKIP;
+        _ttype = SKIP;
         self.set_return_token(_createToken, _token, _ttype, _begin)
     
     def mML_COMMENT(self, _createToken):    
@@ -693,21 +715,21 @@ class Lexer(antlr.CharScanner) :
 ### generate bit set
 def mk_tokenSet_0(): 
     ### var1
-    data = [ 0L, 39567317494923264L, 0L, 0L]
+    data = [ 189253438930944L, 1073741824L, 0L, 0L]
     return data
 _tokenSet_0 = antlr.BitSet(mk_tokenSet_0())
 
 ### generate bit set
 def mk_tokenSet_1(): 
     ### var1
-    data = [ 0L, 1830875838808064L, 0L, 0L]
+    data = [ 0L, 39567317494923264L, 0L, 0L]
     return data
 _tokenSet_1 = antlr.BitSet(mk_tokenSet_1())
 
 ### generate bit set
 def mk_tokenSet_2(): 
     ### var1
-    data = [ 8070450540837863424L, 0L, 0L]
+    data = [ 0L, 1830875838808064L, 0L, 0L]
     return data
 _tokenSet_2 = antlr.BitSet(mk_tokenSet_2())
 

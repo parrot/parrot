@@ -98,10 +98,11 @@ MUL        : '*'   ;
 DIV        : '/'   ;
 MOD        : '%'   ;
 
-//ASSIGN_OP  : '=' | "+=" | "-=" | "*=" | "/=" | "%=" | "^=" ;
-ASSIGN_OP  : '='   ; 
+ASSIGN_OP  : "+=" | "-=" | "*=" | "/=" | "%=" | "^=" ;
 
-REL_OP     : '<' | '>' | "==" | "<=" | ">=" | "!="   ;
+// TODO: what is difference between '=' vs. '==' and '<' vs. '<=' ?
+//       Why is specifying k=2 enough?
+REL_OP     : '=' { $setType(ASSIGN_OP); }| '<' | '>' | "==" | "<=" | ">=" | "!="   ;
 
 // INCR_DECR  : "++" | "--"   ;
 INCR       : "++" ;
@@ -141,7 +142,7 @@ WS
       | '\t'
       | '\f'
     )
-    { $setType(Token.SKIP); }
+    { $setType(SKIP); }
   ;
 
 ML_COMMENT

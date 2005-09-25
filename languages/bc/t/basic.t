@@ -118,6 +118,9 @@ my @tests =
        [ "1; if ( 3 + 4 <= 8*2 - 9 ) 2; 3", [1, 2, 3] ],
        [ "1; if ( 3 + 4 <= 8*2 + 10 ) 2; 3", [1, 2, 3] ],
        # If with '==', still TODO
+       [ "1; if ( 3 + 4 == 8*2 - 10 ) 2; 3", [1, 3] ],
+       [ "1; if ( 3 + 4 == 8*2 - 9 ) 2; 3", [1, 2, 3] ],
+       [ "1; if ( 3 + 4 == 8*2 + 10 ) 2; 3", [1, 3] ],
        # If with '!='
        [ "1; if ( 3 + 4 != 8*2 - 10 ) 2; 3", [1, 2, 3] ],
        [ "1; if ( 3 + 4 != 8*2 - 9 ) 2; 3", [1, 3] ],
@@ -144,10 +147,6 @@ TODO:
        [ '-1.0000001', '-1.0000001', 'propably limited precission of Float PMC' ],
        # keyword quit
        [ "0\n1; 2; quit;  3", [ 0 ], 'is that correct in GNU bc?' ],
-       # If with '==', propable not correctly parsed
-       [ "1; if ( 3 + 4 == 8*2 - 10 ) 2; 3", [1, 3], 'strange ==' ],
-       [ "1; if ( 3 + 4 == 8*2 - 9 ) 2; 3", [1, 2, 3], 'strange ==' ],
-       [ "1; if ( 3 + 4 == 8*2 + 10 ) 2; 3", [1, 3], 'strange ==' ],
      );
   run_tests( \@todo_tests );
 }; 
