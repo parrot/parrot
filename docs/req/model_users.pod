@@ -33,13 +33,19 @@ Autrijus has a favorite language, Perl 6, and he wants to target it to Parrot.
 
 Autrijus:
 
-* values speed, but not above all else
-* values interoperability of languages, especially with Perl 5
-* doesn't care about PBC particularly, though he knows his users
-  might, eventually
-* doesn't mind incompatible source changes, as long as the entire tool
-  chain still works after upgrading
+=over 4
 
+=item * values speed, but not above all else
+
+=item * values interoperability of languages, especially with Perl 5
+
+=item * doesn't care about PBC particularly, though he knows his users might,
+eventually
+
+=item * doesn't mind incompatible source changes, as long as the entire tool
+chain still works after upgrading
+
+=back
 
 =head2 "Nick": Ponie implementer
 
@@ -47,9 +53,13 @@ Nick is implementing Perl 5 with (over? under? inside?) Parrot.
 
 Nick:
 
-* doesn't care about dynamic loading of features
-* ???
+=over 4
 
+=item * doesn't care about dynamic loading of features
+
+=item * ???
+
+=back
 
 =head2 "Dick": Scripting an existing application
 
@@ -58,15 +68,21 @@ Parrot to get PIR and the languages that target it, e.g.  Perl 6.
 
 Dick:
 
-* cares mostly about ease and stability of embedding
-  (no memory leaks!  no seg faults!)
-* is probably not very sensitive to performance, since scripting
-  interfaces are never speed demons anyway
-* probably bundles a specific Parrot version (or linkage to a specific
-  version) and maybe precompiled pbcs with his program
-* may be more or less tolerant of changes depending on the system
-  into which Parrot is embedded
+=over 4
 
+=item * cares mostly about ease and stability of embedding (no memory leaks!
+no seg faults!)
+
+=item * is probably not very sensitive to performance, since scripting
+interfaces are never speed demons anyway
+
+=item * probably bundles a specific Parrot version (or linkage to a specific
+version) and maybe precompiled pbcs with his program
+
+=item * may be more or less tolerant of changes depending on the system into
+which Parrot is embedded
+
+=back
 
 =head2 "Tom": Embedded system creator
 
@@ -76,16 +92,22 @@ crucial.
 
 Tom:
 
-* cares mostly about stable long-term execution
-  (no memory leaks!  no seg faults!)
-* doesn't care about inter-version compatibility,
-  since he bundles Parrot with his product
-* doesn't care very much about performance
-* depends on PBC for space efficiency
-* wants to be able to strip down Parrot for deployment,
-  omitting subsystems that are large or which depend on
-  large external systems
+=over 4
 
+=item * cares mostly about stable long-term execution (no memory leaks!  no seg
+faults!)
+
+=item * doesn't care about inter-version compatibility, since he bundles Parrot
+with his product
+
+=item * doesn't care very much about performance
+
+=item * depends on PBC for space efficiency
+
+=item * wants to be able to strip down Parrot for deployment, omitting
+subsystems that are large or which depend on large external systems
+
+=back
 
 =head2 "Ilya": Intensive CPU User
 
@@ -94,11 +116,16 @@ data structure manipulation or floating point math.
 
 Ilya:
 
-* cares about performance to exclusion of most other factors
-* doesn't care about PBC one way or the other
-* can't handle incompatible source changes; is likely to pick
-  a favorite feature set and stick with it
+=over 4
 
+=item * cares about performance to exclusion of most other factors
+
+=item * doesn't care about PBC one way or the other
+
+=item * can't handle incompatible source changes; is likely to pick a favorite
+feature set and stick with it
+
+=back
 
 =head2 "Magpie": Lover of shiny things
 
@@ -108,10 +135,15 @@ it work, just so he can play with it.
 
 Magpie:
 
-* loves neat features
-* doesn't care about PBC, backwards compatibility, or any of the
-  things that make a platform stable and useful for users who
-  don't care about shiny tech
-* will put up with almost any change as long as the inconvenience
-  leads to something even more shiny
+=over 4
 
+=item * loves neat features
+
+=item * doesn't care about PBC, backwards compatibility, or any of the things
+that make a platform stable and useful for users who don't care about shiny
+tech
+
+=item * will put up with almost any change as long as the inconvenience leads
+to something even more shiny
+
+=back
