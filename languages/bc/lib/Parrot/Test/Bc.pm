@@ -51,8 +51,8 @@ foreach my $func ( keys %language_test_map ) {
         my $test_prog_args = $ENV{TEST_PROG_ARGS} || '';
         my $test_prog      = $ENV{PARROT_BC_TEST_PROG} ?
                                "$ENV{PARROT_BC_TEST_PROG}  ${test_prog_args} languages/${lang_f}" :
-                               "python languages/bc/bc.py languages/${lang_f} > languages/${pir_f} && $self->{parrot} languages/${pir_f}";
-         # die Dumper( $test_prog, \%ENV ) if $ENV:{PARROT_BC_TEST_PROG} ;
+                               "python languages/bc/bc.py languages/${lang_f} && $self->{parrot} languages/${pir_f}";
+        # die Dumper( $test_prog );
 
         # This does nor create byte code, but bc code
         my $parrotdir       = dirname( $self->{parrot} );

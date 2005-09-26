@@ -963,6 +963,39 @@ class Walker(antlr.TreeParser):
         self.returnAST = gen_pir_AST
         self._retTree = _t
     
+    def gen_p6(self, _t):    
+        
+        gen_p6_AST_in = None
+        if _t != antlr.ASTNULL:
+            gen_p6_AST_in = _t
+        self.returnAST = None
+        currentAST = antlr.ASTPair()
+        gen_p6_AST = None
+        B_AST = None
+        B = None
+        try:      ## for error handling
+            pass
+            B = antlr.ifelse(_t == antlr.ASTNULL, None, _t)
+            self.expr_list(_t)
+            _t = self._retTree
+            B_AST = self.returnAST
+            gen_p6_AST = currentAST.root
+            gen_p6_AST = antlr.make(self.astFactory.create(PIR_HEADER,"pir header\n#"), B_AST, self.astFactory.create(PIR_FOOTER,"pir footer\n#"));
+            currentAST.root = gen_p6_AST
+            if (gen_p6_AST != None) and (gen_p6_AST.getFirstChild() != None):
+                currentAST.child = gen_p6_AST.getFirstChild()
+            else:
+                currentAST.child = gen_p6_AST
+            currentAST.advanceChildToEnd()
+        
+        except antlr.RecognitionException, ex:
+            self.reportError(ex)
+            if _t:
+                _t = _t.getNextSibling()
+        
+        self.returnAST = gen_p6_AST
+        self._retTree = _t
+    
 
 _tokenNames = [
     "<0>", 

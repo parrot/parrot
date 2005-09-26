@@ -505,3 +505,10 @@ gen_pir!
       #gen_pir = #([PIR_HEADER, "pir header\n#"], #B, [PIR_FOOTER, "pir footer\n#"]); 
     }
   ;
+
+gen_p6!
+  : B:expr_list
+    {
+      #gen_p6 = #([PIR_HEADER, "pir header\n#"], #B, [PIR_FOOTER, "pir footer\n#"]); 
+    }
+  ;

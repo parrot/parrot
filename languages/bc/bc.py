@@ -3,6 +3,7 @@
 
 import os
 import sys
+import re
 import getopt
 
 lib_path = os.path.join( os.path.dirname(sys.argv[0]), 'python', 'lib' )
@@ -63,7 +64,11 @@ def main():
    (options, bc_filenames) = getopt.getopt(sys.argv[1:], 'l')
    # TODO: option checkint, consider option -l
    # TODO: allow multiple input files and STDIN
-   bc_fh = open(bc_filenames[0], 'r')
+   bc_fn  = bc_filenames[0]
+   bc_fh = open(bc_fn, 'r')
+   regexp = re.compile( r"bc$" )
+   pir_fh = open( regexp.sub("pir", bc_fn), 'w' )
+   p6_fh  = open( regexp.sub("p6", bc_fn), 'w' )
 
    L = bc.BcLexer.Lexer(bc_fh) 
    P = bc.BcParser.Parser(L)
@@ -88,6 +93,7 @@ def main():
    visitor = Visitor()
 
    ###show tree
+   sys.stdout = pir_fh
    print ""
    print "=begin comment"
    print ""
@@ -97,7 +103,7 @@ def main():
    print ""
    print "visit>>"
    print ""
-   visitor.visit(ast);
+   # visitor.visit(ast);
    print "visit<<"
    print ""
    print "=end comment"
@@ -105,7 +111,6 @@ def main():
 
    W = bc.BcTreeWalker.Walker();
    W.gen_pir(ast);
-
    pir_ast = W.getAST()
    print ""
    print "=begin comment"
@@ -116,7 +121,7 @@ def main():
    print pir_ast.toStringList()
    print ""
    print "visit>>\n"
-   visitor.visit(pir_ast);
+   #visitor.visit(pir_ast);
    print "visit<<"
    print ""
    print "=end comment"
@@ -161,6 +166,20 @@ def main():
    print """
 .end
    """
+
+   # Now dump the AST as Perl6
+   # TODO: This is a dummy implementation right now
+   sys.stdout = p6_fh
+   W.gen_p6(ast);
+   p6_ast = W.getAST()
+   print ""
+   print "=begin comment"
+   print ""
+   print "AST after being processed by TreeParser"
+   print ""
+   print "p6_ast.toStringList:" 
+   print p6_ast.toStringList()
+   print ""
 
 if __name__ == "__main__":
    main()
