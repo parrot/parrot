@@ -1,6 +1,5 @@
 # $Id$
 
-
 =head1 NAME
 
 eval.imc - Integer arithmetic evaluation for Parrot m4
@@ -37,7 +36,7 @@ COMPILE_CODE:
     print expression
     print "\n"
     .local pmc compiled_code
-    compile compiled_code, m4_eval_compiler, expression
+    compiled_code = m4_eval_compiler( expression )
     if compiled_code goto INVOKE_COMPILED_CODE
        printerr "Could not get the compiler.\n"     
        end
