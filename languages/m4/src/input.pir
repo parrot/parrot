@@ -68,8 +68,8 @@ TODO: open these files and complain when they don't or pass filehandles
 =cut
 
 .sub push_file 
-  .param pmc      state 
   .param string   filename    
+  .param pmc      state 
 
   # This is needed for m4___file__
   # TODO: this is badly broken, when there are multiple input files
