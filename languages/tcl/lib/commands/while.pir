@@ -10,29 +10,23 @@
 
   if argc != 2 goto bad_args
 
-  .local pmc    cond_p
-  cond_p = argv[0]
-  .local string body_p
-  body_p = argv[1]
+  .local string condition,body
+  condition = argv[0]
+  body      = argv[1]
 
   .local pmc retval, parsed_code
 
   .local pmc parse
-  .local pmc expression_p
-  .local pmc expression_i
+  .local pmc expression_p, compiled_condition
 
   parse = find_global "_Tcl", "parse"
   expression_p = find_global "_Tcl", "__expression_parse"
-  expression_i = find_global "_Tcl", "__expression_interpret"
 
-  $S0 = body_p
-  parsed_code = parse($S0)
-  register parsed_code
+  parsed_code = parse(body)
+  compiled_condition = expression_p(condition)
 
 while_loop:
-  $S0 = cond_p
-  retval = expression_p($S0)
-  retval = expression_i(retval)
+  retval = compiled_condition()
   unless retval goto done
   push_eh handle_continue
     retval = parsed_code."interpret"()

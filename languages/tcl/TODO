@@ -61,18 +61,8 @@ Perhaps via [namespace import]? Can fake it right now with [inline]
 
 =item [expr]
 
-the expr AST could use a rework. Be nice if it just passed around something
-invokable.
-
-clean up expr so that it's not passing around
-type indicators. - just use PMCs everywhere. (Though we may still need
-to have CONST vs. VARIABLE types.)
-
-The type indicator is also used to disambiguate operators and function calls
-from operands. We can easily remove it for operands, but how to cleanly
-remove this for operators?
-
-TBD: blocks and strings as operands
+Add "is_const" global which checks to see if something is, in fact,
+constant. (which will allow us to then constant fold)
 
 TBD: ternary op
 

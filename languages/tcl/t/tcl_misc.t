@@ -147,7 +147,3 @@ language_output_is("tcl",<<'TCL',<<'OUT',"GC bug?");
 TCL
 ok
 OUT
-
-
-
-

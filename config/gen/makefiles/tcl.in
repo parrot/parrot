@@ -77,7 +77,7 @@ lib${slash}variables.pir \
 tcl.pir_template \
 tcl.pl
 
-tcl.pbc: pmcs lib${slash}tcllib.pbc lib${slash}tclcommand.pbc lib${slash}tclcommandlist.pbc lib${slash}tclconst.pbc lib${slash}tclfunc.pbc lib${slash}tclops.pbc lib${slash}tclvar.pbc lib${slash}tclword.pbc tcl.pir
+tcl.pbc: pmcs lib${slash}tcllib.pbc lib${slash}tclbinaryops.pbc lib${slash}tclcommand.pbc lib${slash}tclcommandlist.pbc lib${slash}tclconst.pbc lib${slash}tclfunc.pbc lib${slash}tclops.pbc lib${slash}tclvar.pbc lib${slash}tclword.pbc tcl.pir
 	$(PARROT) --output=tcl.pbc tcl.pir
 
 pmcs:
@@ -94,6 +94,9 @@ lib${slash}tcllib.pir: $(DEPS)
 
 lib${slash}tcllib.pbc: lib${slash}tcllib.pir
 	$(PARROT) --output=$(LIBPATH)${slash}tcllib.pbc $(LIBPATH)${slash}tcllib.pir
+
+lib${slash}tclbinaryops.pbc: lib${slash}tclbinaryops.pir
+	$(PARROT) --output=$(LIBPATH)${slash}tclbinaryops.pbc $(LIBPATH)${slash}tclbinaryops.pir
 
 lib${slash}tclcommand.pbc: lib${slash}tclcommand.pir
 	$(PARROT) --output=$(LIBPATH)${slash}tclcommand.pbc $(LIBPATH)${slash}tclcommand.pir

@@ -47,25 +47,31 @@ Initialize the attributes for an instance of the class
   setattribute self, "TclFunc\x00argument", $P0
 .end
 
-.sub interpret method
+.sub compile method
+  .param int register_num
+
   .local pmc retval
-  # assigning a $Nx will change this to a TclFloat
-
-  retval      = new TclInt
-
-  .local pmc funcs, expr_interpret, __number
+  .local string pir_code
+  .local pmc funcs,  __number, compile
   funcs = find_global "_Tcl", "functions"
-  expr_interpret = find_global "_Tcl", "__expression_interpret"
   __number = find_global "_Tcl", "__number"
-  
-  .local pmc arg, name
-  arg  = getattribute self, "TclFunc\x00argument"
-  retval = expr_interpret(arg)
+  compile = find_global  "_Tcl", "compile" 
 
-  arg  = __number(retval)
+  # eventually, we'll need to deal with more than one arg.
+
+  .local pmc arg_code, arg_reg, name
+  $P1  = getattribute self, "TclFunc\x00argument"
+  (arg_reg,pir_code)  = compile($P1,register_num)
+  inc register_num
+
+  # XXX We shouldn't store the name. we should store the opcode, avoid
+  # the lookup cost. (at least for builtins)
+
   name = getattribute self, "TclFunc\x00name"
-  
   $I0 = funcs[name]
+
+  .local string opcode_name
+ 
   if $I0 == FUNCTION_ABS goto func_abs
   if $I0 == FUNCTION_ACOS goto func_acos
   if $I0 == FUNCTION_ASIN goto func_asin
@@ -82,75 +88,98 @@ Initialize the attributes for an instance of the class
   if $I0 == FUNCTION_TANH goto func_tanh
   
 func_abs:
-  retval = abs arg
-  goto done
+  .local pmc printf_args
+  printf_args = new .Array
+  printf_args = 2
+  printf_args[0] = register_num
+  printf_args[1] = arg_reg
+
+  pir_code .= "$P%i = abs $P%i\n"
+  goto done_all
+
 func_acos:
-  $N0 = arg
-  $N1 = acos $N0
-  retval = $N1
+  opcode_name = "acos"
   goto done
+
 func_asin:
-  $N0 = arg
-  $N1 = asin $N0
-  retval = $N1
+  opcode_name = "asin"
   goto done
+
 func_atan:
-  $N0 = arg
-  $N1 = atan $N0
-  retval = $N1
+  opcode_name = "atan"
   goto done
+
 func_cos:
-  $N0 = arg
-  $N1 = cos $N0
-  retval = $N1
+  opcode_name = "cos"
   goto done
+
 func_cosh:
-  $N0 = arg
-  $N1 = cosh $N0
-  retval = $N1
+  opcode_name = "cosh"
   goto done
+
 func_exp:
-  $N0 = arg
-  $N1 = exp $N0
-  retval = $N1
+  opcode_name = "exp"
   goto done
+
 func_log:
-  $N0 = arg
-  $N1 = ln $N0
-  retval = $N1
+  opcode_name = "ln"
   goto done
+
 func_log10:
-  $N0 = arg
-  $N1 = log10 $N0
-  retval = $N1
+  opcode_name = "log10"
   goto done
+
 func_sin:
-  $N0 = arg
-  $N1 = sin $N0
-  retval = $N1
+  opcode_name = "sin"
   goto done
+
 func_sinh:
-  $N0 = arg
-  $N1 = sinh $N0
-  retval = $N1
+  opcode_name = "sinh"
   goto done
+
 func_sqrt:
-  $N0 = arg
-  $N1 = sqrt $N0
-  retval = $N1
+  opcode_name = "sqrt"
   goto done
+
 func_tan:
-  $N0 = arg
-  $N1 = tan $N0
-  retval = $N1
+  opcode_name = "tan"
   goto done
+
 func_tanh:
-  $N0 = arg
-  $N1 = tanh $N0
-  retval = $N1
-  #goto done
+  opcode_name = "tanh"
+
 
 done:
-  .return(retval)
+  .local pmc printf_args
+  printf_args = new .Array
+  printf_args = 8
+  printf_args[0] = register_num
+  printf_args[1] = arg_reg
+  printf_args[2] = register_num
+  printf_args[3] = opcode_name
+  printf_args[4] = register_num
+  printf_args[5] = register_num
+  printf_args[6] = register_num
+  printf_args[7] = register_num
+
+  pir_code .= "$N%i=$P%i\n"
+  pir_code .= "$N%i=%s $N%i\n"
+  pir_code .= "$P%i = new .TclFloat\n"
+  pir_code .= "$P%i=$N%i\n"
+
+
+done_all:
+
+  pir_code = sprintf pir_code, printf_args
+  .return(register_num,pir_code)
 
 .end
+
+.sub __clone method
+  .local pmc obj
+  $I0 = typeof self
+  obj = new $I0
+  obj = self
+  .return(obj)
+.end
+

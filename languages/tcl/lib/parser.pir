@@ -163,7 +163,7 @@ get:
   $I0 = find_type "TclCommand"
   command = new $I0
   setattribute command, "TclCommand\x00name", word
-  
+
 next_word:
   (word, pos) = get_word(tcl_code, chars, pos)
   if_null word, done
@@ -493,13 +493,13 @@ Parses a subcommand and returns a TclCommand or TclCommandList object.
   .param string tcl_code
   .param int pos
   inc pos
-  
+
   .local pmc command
   .local pmc chars
   chars = new Hash
   chars[93] = 1 # ]
   chars[59] = 1 # ;
-  
+ 
   (command, pos) = get_command(tcl_code, chars, pos)
   dec pos
   $I0 = ord tcl_code, pos
@@ -609,6 +609,53 @@ done:
   .return($P0, pos)
 .end
 
+
+=item C<(int reg_num, str code) = compile(pmc thing, int reg_num)>
+
+Given an object, call its compile method, or assume it's constant
+and generate the code for it.
+
+=cut
+
+.sub compile
+  .param pmc thing
+  .param int register_num
+
+  .local string pir_code
+
+  $I0 = can thing, "compile"
+
+  if $I0 goto can_compile
+
+  .local string thing_type,quote_char
+  thing_type = typeof thing
+  quote_char = "" 
+  if thing_type == "TclString" goto stringish
+  if thing_type == "String" goto    stringish
+  goto set_args
+stringish:
+  quote_char = "\"" 
+set_args:
+
+  .local pmc printf_args
+  printf_args = new .Array
+  printf_args = 6
+  printf_args[0] = register_num
+  printf_args[1] = thing_type
+  printf_args[2] = register_num
+  printf_args[3] = quote_char
+  printf_args[4] = thing
+  printf_args[5] = quote_char
+ 
+  pir_code = sprintf "$P%i = new .%s\n$P%i=%s%s%s\n", printf_args
+
+  .return(register_num,pir_code)
+
+can_compile:
+  .return thing."compile"(register_num)
+.end
+
 =back
 
 =cut
+

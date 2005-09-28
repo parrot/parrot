@@ -17,14 +17,13 @@
   next_code  = argv[2]
   body_code  = argv[3]
 
-  .local pmc    start_parsed, next_parsed, body_parsed, test_parsed
+  .local pmc    start_parsed, next_parsed, body_parsed, test_compiled
   .local pmc retval
 
   .local pmc parse
-  .local pmc expression_p, expression_i
+  .local pmc expression_p
   parse = find_global "_Tcl", "parse"
   expression_p = find_global "_Tcl", "__expression_parse"
-  expression_i = find_global "_Tcl", "__expression_interpret"
 
   # Parse the bits that are code.
   start_parsed = parse(start_code)
@@ -44,8 +43,8 @@ continue:
   # then execute next
   next_parsed."interpret"()
   # then check condition
-  test_parsed = expression_p(test_code)
-  retval = expression_i(test_parsed)
+  test_compiled = expression_p(test_code)
+  retval = test_compiled()
   if retval goto for_loop
 
   .return ("") 

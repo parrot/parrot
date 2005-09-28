@@ -1,25 +1,23 @@
-.macro __pop_value_from_expr_stack(STACK,VALUE)
-  .VALUE = pop .STACK
-  .VALUE = .VALUE[1]
-  .VALUE = .VALUE."interpret"()
-  .VALUE = __number(.VALUE)  # XXX unnecessary ?
-.endm
-
 .namespace [ "_Tcl" ]
-
-=head1 _Tcl::__expression_parse
-
-Given a string (or String), return a single stack that contains the work to be
-done. This stack can then be passed to C<__expression_interpret> to actually
-invoke the items on the stack.
-
-=cut
 
 .const int MAX_PRECEDENCE =  11
 
+=head1 _Tcl::__expression_parse
+
+Given a string, return an invokable PMC that will generate the appropriate
+value described by this Tcl expression. An intermediate AST is generated,
+and the functions ends with a tailcall to the compiler.
+
+=cut
+
 .sub __expression_parse
   .param string expr
+  $P1 = __expression_ast(expr) 
+  .return __expression_compile($P1)
+.end
 
+.sub __expression_ast
+  .param string expr
   .local pmc retval
 
   .local pmc undef
@@ -40,11 +38,10 @@ operand:
   chunk[0] = OPERAND
   chunk[1] = retval
   push chunks, chunk
-
   goto operator
 
 no_operand:
-  .throw ("no operand!")
+  .throw ("XXX: no operand!")
 
 operator:
   (chunk, pos) = get_operator(expr, pos)
@@ -52,89 +49,103 @@ operator:
   push chunks, chunk
   goto operand
 
-  # if we don't match any of the possible cases so far, then we must
-  # be a string operand, but for now, die. #XXX
-
 chunks_done:
-# convert the chunks into a stack.
 
-  # to do this, we scan for our Operators in precedence order.
-  # as we find each one, put it on the program_stack with the appropriate
-  # args. Leave a "NOOP" placeholder when pulling things. If our target
-  # arg is a noop, we can either put it on the stack and ignore it when
-  # popping the stack, or not put it on the stack.
+=for comment
 
-  # XXX cheat for now , assume no precedence. means we can just
-  # walk through, grabbing ops. (hope nothing is orphaned?)
+Convert the chunks into a stack. For each level of precendence, 
+scan the chunk list for operators that match our level. As we find one, 
+grab the left and right operands. If the operand is null, instead use
+the value from the same location in the program stack as the operand (as it
+is the result of a previous operator.). If a value is pulled from the
+program_stack, then null it there.
+
+Now that we have an operand and two operators (unary ops are treated like
+operands during the parse phase. Ternary op is currently ignored, but we'd
+special case it here.), create a TclBinaryOp, and put it in the same
+index in the program stack as the left op here. Replace all three entries
+in the chunk list with a single NULL entry.
+
+When our list of chunks to process is a single NULL entry, we're done,
+and now have a program list containing a single element, which is something
+which supports C<compile>. (In most cases, a TclBinaryOp)
+
+=cut
 
   .local int stack_index
-  .local int input_len
-
   stack_index = 0
 
- # we're looping over this once - to handle precedence, I suggest
- # looping multiple times, leaving the NOOPS when we remove something
- # to faciliate processing on further runs. If we try to pull a
- # left or right arg and see a NO-OP, we know it's safe to skip because
- # walking the stack will convert it to a number by the time we get to it.
+  .local int input_len
+  input_len = chunks
+  if input_len == 1 goto singleton_chunk
 
-  .local pmc our_op
-  input_len  = chunks
-  if input_len == 0 goto die_horribly
-
-  # a single value, return now.
-  if input_len != 1 goto pre_converter_loop
-  # XXX (That's value, not an operator)
-  .return(chunks)
-
-pre_converter_loop:
   .local int precedence_level
-  precedence_level = -1 # start with functions
+  precedence_level = 1
+  .local pmc operand1, operand2, our_op
+
 converter_loop:
+  input_len = chunks
+
   if precedence_level > MAX_PRECEDENCE goto converter_done
-  if stack_index >= input_len goto precedence_done
+  if input_len == 1 goto converter_done # only one item left. should be null
+  if stack_index >= input_len goto precedence_done 
+
   our_op = chunks[stack_index]
-  if_null our_op, converter_next
-  $I0 = typeof our_op
-  if $I0 == .Undef goto converter_next
+  unless our_op, converter_next  # skip placeholders
+  $I0 = defined our_op
+  unless $I0, converter_next      # skip placeholders (redundant?)
   $I2 = our_op[0]
   if $I2 == OPERAND goto converter_next
-  if $I2 == CHUNK   goto converter_next
-  if $I2 == OP   goto is_opfunc
 
-  # Should never be reached (XXX then shouldn't we die horribly?)
-  goto converter_next
-
-is_opfunc:
+# an_operator
   $I3 = our_op[2]
-  if $I3 != precedence_level goto converter_next
+  if $I3 != precedence_level goto converter_next 
+
+# right precedence level.
 
 right_arg:
   $I2 = stack_index + 1
-  if $I2 >= input_len goto left_arg
-  retval = chunks[$I2]
-  if_null retval, left_arg
-  chunks[$I2] = undef
-  inc $I4
-  program_stack = unshift retval
+  ### XXX Should never occur? if $I2 >= input_len goto left_arg  
+  $P1 = chunks[$I2]
+  unless $P1, right_arg_precalc
+  operand2 = $P1[1]
+  goto left_arg
 
-  # If we're a function, (XXX) assume a single arg (which
-  # we've now pulled - so, go to the, skip the left arg.
-  if precedence_level == -1 goto shift_op
+right_arg_precalc:
+  operand2 = program_stack[$I2]
+  program_stack[$I2] = $P1 
 
-  # XXX we just deal with binary args at the moment.
 left_arg:
   $I2 = stack_index - 1
-  if $I2 < 0 goto shift_op
-  retval = chunks[$I2]
-  if_null retval, shift_op
-  chunks[$I2] = undef
-  inc $I4
-  program_stack = unshift retval
+  ### XXX Should never occur? if $I2 < 0 goto shift_op
+  $P1 = chunks[$I2]
+  unless $P1, left_arg_precalc
+  operand1 = $P1[1]
+  goto shift_op
+
+left_arg_precalc:
+  operand1 = program_stack[$I2]
+  program_stack[$I2] = $P1 
 
 shift_op:
-  program_stack = unshift our_op
-  chunks[stack_index] = undef
+  .local pmc type
+  type = our_op[1]
+  $I0 = find_type "TclBinaryOp" # XXX should cache this?
+  .local pmc binary_op
+  binary_op = new $I0
+
+ 
+  setattribute binary_op, "TclBinaryOp\x00type", type
+  setattribute binary_op, "TclBinaryOp\x00l_operand", operand1
+  setattribute binary_op, "TclBinaryOp\x00r_operand", operand2
+
+  program_stack[$I2] = binary_op
+
+  delete chunks[$I2] # delete the left arg.
+  chunks[$I2] = 0    # zero the operator
+  inc $I2            # skip the operator position 
+  delete chunks[$I2] # delete the right arg.
+  dec stack_index    
 
 converter_next:
   inc stack_index
@@ -145,11 +156,18 @@ precedence_done:
   stack_index = 0
   goto converter_loop
 
+singleton_chunk:
+  # a single value, return now.
+  $P1 = chunks[0] # first element..
+  $P1 = $P1[1]    # value of first element.
+  .return ($P1)
+
 die_horribly:
-  .throw ("XXX: An error occurred in [expr]")
+  .throw ("XXX: An error occurred parsing [expr]")
 
 converter_done:
-  .return(program_stack)
+  $P1 = program_stack[0]
+  .return ($P1)
 
 .end
 
@@ -278,228 +296,6 @@ done:
   .return(chunk, pos)
 .end
 
-.sub __expression_interpret
-  .param pmc program_stack
-
-  .local pmc result_stack
-  result_stack = new TclList
-  .local pmc retval
-stack_evaluator:
- # while the prog stack exists:
- .local int size
- size = program_stack
- if size == 0 goto stack_done
-
- .local int type
- .local pmc chunk
- chunk = pop program_stack
- $I10 = typeof chunk
- if $I10 == .Undef goto stack_evaluator
- type = chunk[0]
-
- # move all non op non funcs to the value stack
- if type == OP goto do_op
- push result_stack, chunk
- goto stack_evaluator
-
-do_op:
-  # right now, we assume binary ops. Later, each op will define the
-  # number of and type of ops it takes, and we will respect it.
-
-  .local int op
-  op = chunk[1]
-
-  # XXX assume all operands take two args.
-  # XXX looks like there is code to convert everything to numbers.
-  #     - this will have to be changed for string ops.
-
-  .local pmc r_arg,l_arg,op_result
-  op_result = new TclInt
-
-  # Is there a more efficient way to do this dispatch?
-  if op == OPERATOR_MUL goto op_mul
-  if op == OPERATOR_DIV goto op_div
-  if op == OPERATOR_MOD goto op_mod
-  if op == OPERATOR_PLUS goto op_plus
-  if op == OPERATOR_MINUS goto op_minus
-  if op == OPERATOR_SHL goto op_shl
-  if op == OPERATOR_SHR goto op_shr
-  if op == OPERATOR_LT goto op_lt
-  if op == OPERATOR_GT goto op_gt
-  if op == OPERATOR_LTE goto op_lte
-  if op == OPERATOR_GTE goto op_gte
-  if op == OPERATOR_EQUAL goto op_equal
-  if op == OPERATOR_UNEQUAL goto op_unequal
-  if op == OPERATOR_BITAND goto op_bitand
-  if op == OPERATOR_BITXOR goto op_bitxor
-  if op == OPERATOR_BITOR goto op_bitor
-  if op == OPERATOR_NE goto op_ne
-  if op == OPERATOR_EQ goto op_eq
-  if op == OPERATOR_AND goto op_and
-  if op == OPERATOR_OR goto op_or
-
-  goto die_horribly # XXX should never happen, of course.
-
-op_mul:
-  .__pop_value_from_expr_stack(result_stack,l_arg)
-  .__pop_value_from_expr_stack(result_stack,r_arg)
-  op_result = mul l_arg, r_arg
-  goto done_op
-op_div:
-  .__pop_value_from_expr_stack(result_stack,l_arg)
-  .__pop_value_from_expr_stack(result_stack,r_arg)
-  op_result = div l_arg, r_arg
-  goto done_op
-op_mod:
-  .__pop_value_from_expr_stack(result_stack,l_arg)
-  .__pop_value_from_expr_stack(result_stack,r_arg)
-  op_result = mod l_arg, r_arg
-  goto done_op
-op_plus:
-  .__pop_value_from_expr_stack(result_stack,l_arg)
-  .__pop_value_from_expr_stack(result_stack,r_arg)
-  op_result = l_arg + r_arg
-  goto done_op
-op_minus:
-  .__pop_value_from_expr_stack(result_stack,l_arg)
-  .__pop_value_from_expr_stack(result_stack,r_arg)
-  op_result = l_arg - r_arg
-  goto done_op
-op_shl:
-  .__pop_value_from_expr_stack(result_stack,l_arg)
-  .__pop_value_from_expr_stack(result_stack,r_arg)
-  op_result = shl l_arg, r_arg
-  goto done_op
-op_shr:
-  .__pop_value_from_expr_stack(result_stack,l_arg)
-  .__pop_value_from_expr_stack(result_stack,r_arg)
-  op_result = shr l_arg, r_arg
-  goto done_op
-op_lt:
-  .__pop_value_from_expr_stack(result_stack,l_arg)
-  .__pop_value_from_expr_stack(result_stack,r_arg)
-  op_result = 1
-  if l_arg < r_arg goto done_op
-  op_result = 0
-  goto done_op
-op_gt:
-  .__pop_value_from_expr_stack(result_stack,l_arg)
-  .__pop_value_from_expr_stack(result_stack,r_arg)
-  op_result = 1
-  if l_arg > r_arg goto done_op
-  op_result = 0
-  goto done_op
-op_lte:
-  .__pop_value_from_expr_stack(result_stack,l_arg)
-  .__pop_value_from_expr_stack(result_stack,r_arg)
-  op_result = 1
-  if l_arg <= r_arg goto done_op
-  op_result = 0
-  goto done_op
-op_gte:
-  .__pop_value_from_expr_stack(result_stack,l_arg)
-  .__pop_value_from_expr_stack(result_stack,r_arg)
-  op_result = 1
-  if l_arg >= r_arg goto done_op
-  op_result = 0
-  goto done_op
-op_equal:
-  .__pop_value_from_expr_stack(result_stack,l_arg)
-  .__pop_value_from_expr_stack(result_stack,r_arg)
-  op_result = 1
-  if l_arg == r_arg goto done_op
-  op_result = 0
-  goto done_op
-op_unequal:
-  .__pop_value_from_expr_stack(result_stack,l_arg)
-  .__pop_value_from_expr_stack(result_stack,r_arg)
-  op_result = 1
-  if l_arg != r_arg goto done_op
-  op_result = 0
-  goto done_op
-op_bitand:
-  .__pop_value_from_expr_stack(result_stack,l_arg)
-  .__pop_value_from_expr_stack(result_stack,r_arg)
-  op_result = band l_arg, r_arg
-  goto done_op
-op_bitxor:
-  .__pop_value_from_expr_stack(result_stack,l_arg)
-  .__pop_value_from_expr_stack(result_stack,r_arg)
-  op_result = bxor l_arg, r_arg
-  goto done_op
-op_bitor:
-  .__pop_value_from_expr_stack(result_stack,l_arg)
-  .__pop_value_from_expr_stack(result_stack,r_arg)
-  op_result = bor l_arg, r_arg
-  goto done_op
-op_ne:
-  .__pop_value_from_expr_stack(result_stack,l_arg)
-  .__pop_value_from_expr_stack(result_stack,r_arg)
-  op_result = 1
-  $S0 = l_arg
-  $S1 = r_arg
-  if $S0 != $S1 goto done_op
-  op_result = 0
-  goto done_op
-op_eq:
-  .__pop_value_from_expr_stack(result_stack,l_arg)
-  .__pop_value_from_expr_stack(result_stack,r_arg)
-  op_result = 1
-  $S0 = l_arg
-  $S1 = r_arg
-  if $S0 == $S1 goto done_op
-  op_result = 0
-  goto done_op
-op_and:
-  op_result = 0
-  .__pop_value_from_expr_stack(result_stack,l_arg)
-  unless l_arg goto done_op
-  .__pop_value_from_expr_stack(result_stack,r_arg)
-  unless r_arg goto done_op
-  op_result = 1
-  goto done_op
-op_or:
-  op_result = 1
-  .__pop_value_from_expr_stack(result_stack,l_arg)
-  if l_arg goto done_op
-  .__pop_value_from_expr_stack(result_stack,r_arg)
-  if r_arg goto done_op
-  op_result = 0
-  # goto done_op
-
-done_op:
-  $P5 = new TclList
-  $P5[0] = OPERAND
-  $P5[1] = op_result
-  push result_stack, $P5
-
-  # Ignoring exceptions for now.
-  goto stack_evaluator
-
-stack_done:
-  $I0 = result_stack
-  if $I0 == 0 goto die_horribly
-  retval = pop result_stack
-  goto evaluation_done
-
-die_horribly:
-  .throw ("XXX: an error occurred in [expr]")
-
-evaluation_done:
-  retval = retval[1]
-
-  # XXX This is a bit of a hack. We should insure that everything we get at this
-  # point is either interpret-able or not.
-
-  $I0 = can retval, "interpret"
-  if $I0 goto done_interp
-  .return (retval)
-
-done_interp:
-  .return retval."interpret"()
-
-.end
-
 .sub get_subexpr
   .param string expr
   .param int pos
@@ -534,14 +330,11 @@ paren_done:
   inc pos
   $S1 = substr expr, start, $I0
 
-  # XXX this is now officially braindead. Fissit.
-  retval = __expression_parse($S1)
-  retval = __expression_interpret(retval)
-
+  retval = __expression_ast($S1)
   .return(retval, pos)
 
 die_horribly:
-  .throw("XXX: An error occurred in EXPR")
+  .throw("XXX: An error occurred processing a sub-expression")
 
 premature_end:
   $S0 = "syntax error in expression \""
@@ -666,7 +459,7 @@ loop_done:
   $I0 = pos - paren_pos
   $S1 = substr expr, paren_pos, $I0
 
-  operand = __expression_parse($S1)
+  operand = __expression_ast($S1)
   setattribute func, "TclFunc\x00argument", operand
 
 done:
@@ -709,5 +502,44 @@ unknown_func:
   setattribute unary, "TclUnaryOp\x00operand", operand
 
   .return(unary, pos)
+.end
+
+=head1 _Tcl::__expression_compile
+
+Given the AST generated by the expression parser, render the various operands
+as PIR. 
+
+=cut
+
+.sub __expression_compile
+  .param pmc thing
+ 
+   .local pmc compile
+   compile = find_global "_Tcl", "compile"
+   .local string pir_code
+
+   ($I0,pir_code) = compile(thing,0)
+
+  .local pmc pir_compiler
+  pir_compiler = compreg "PIR"
+  # XXX deal with re-using sub name?
+
+  $P1 = new .Array
+  $P1 = 2
+  $P1[0] = pir_code
+  $P1[1] = $I0
+
+  # Use n_operators pragma to force generation of new pmcs 
+  sprintf pir_code, ".pragma n_operators 1\n.sub blah @ANON\n%s.return ($P%s)\n.end\n", $P1
+
+  #print pir_code # for debugging the compiler
+
+  # XXX HACK: can't tailcall these.  
+  $P1 = pir_compiler(pir_code)
+  .return ($P1)
+
+die_horribly:
+  .throw ("XXX: an error occurred compiling [expr]")
+
 .end
 

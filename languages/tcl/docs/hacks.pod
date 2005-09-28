@@ -80,14 +80,22 @@ actual commands and variables. I think the latter would be somewhat cleaner,
 and, if any other languages support this feature, this would give us a chance
 to interoperate.
 
-=back
-
 =item list splicing
 
 There are several cases where we convert TclLists or ResizablePMCArrays to
 Arrays so that we can use the splice opcode. Need to have better splice
 support in parrot array classes, as well as our own. 
 L<lib/commands/linsert.pir>
+
+=item marshalling/unmarshalling
+
+When compiling, there is currently no easy way to embed a PMC that exists
+at runtime into the compiled code. Because of this, we have to interrogate 
+the PMC at compile time for its type, and then handroll the appropriate PIR
+to intialize it's value. We should be able to freeze the PMC during compilation,
+And then have in the generated code C<$P1 = thaw "...">.
+
+=back
 
 =cut
 

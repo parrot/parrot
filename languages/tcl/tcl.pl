@@ -50,6 +50,8 @@ Generate the PIR code that matches the various rules we have.
 my $rulefile = "lib/tcl.p6r";
 my $rules;
 
+=for later
+
 open (RULES,$rulefile) or die "can't read rules file.\n";
 
 $rules = <<'EOH';
@@ -80,6 +82,10 @@ EORULE
 };
 
 $rules .= ".end\n";
+
+=cut
+
+$rules = q{};
 
 $contents =~ s/\${INCLUDES}/$includes/g;
 $contents =~ s/\${HEADER}/This file automatically generated, do not edit./g;

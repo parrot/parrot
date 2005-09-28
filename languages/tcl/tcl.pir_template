@@ -23,7 +23,6 @@ providing a compreg-compatible method.
  
   # Still not sure if these are going to be useful
   .const int BLOCK   = 14
-  .const int CHUNK   = 15
   .const int COMMAND = 16
 
 
@@ -49,6 +48,7 @@ providing a compreg-compatible method.
   .const int OPERATOR_SHL    = 43
   .const int OPERATOR_SHR    = 44
   .const int OPERATOR_UNEQUAL= 45
+
   .const int FUNCTION_ATAN2  = 46
   .const int FUNCTION_FMOD   = 47
   .const int FUNCTION_POW    = 48
@@ -120,7 +120,7 @@ providing a compreg-compatible method.
   operators = new TclArray
   precedence = new TclArray
 
-  # This precedence check should be shoved into [expr]. There's no need
+  # XXX This precedence check should be shoved into [expr]. There's no need
   # to make it this generic. 
 
   operators["*"] = OPERATOR_MUL

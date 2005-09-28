@@ -2,8 +2,14 @@
 
 use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 49;
+use Parrot::Test tests => 52;
 use Test::More;
+
+language_output_is("tcl",<<TCL,<<OUT,"int");
+ puts [expr 42]
+TCL
+42
+OUT
 
 language_output_is("tcl",<<TCL,<<OUT,"mul");
  puts [expr 2 * 3]
@@ -46,6 +52,19 @@ language_output_is("tcl",<<TCL,<<OUT,"right shift");
  puts [expr 16 >> 2]
 TCL
 4
+OUT
+
+language_output_is("tcl",<<TCL,<<OUT,"lt, numeric, not alpha...");
+ puts [expr 10 < 9]
+TCL
+0
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"lt, numeric, not alpha, with vars");
+ set a 10
+ puts [expr $a < 9]
+TCL
+0
 OUT
 
 language_output_is("tcl",<<TCL,<<OUT,"lt, true");
@@ -160,7 +179,7 @@ F
 0
 OUT
 
-language_output_is("tcl",<<TCL,<<OUT,"&&, both sides");
+language_output_is("tcl",<<TCL,<<OUT,"||, both sides");
  proc true {} {puts T; return 1}
  proc false {} {puts F; return 0}
  puts [expr {[false] || [true]}]

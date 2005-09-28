@@ -23,10 +23,9 @@
   .local int counter
 
   .local pmc parse
-  .local pmc expression_p,expression_i
+  .local pmc expression_p
   parse = find_global "_Tcl", "parse"
   expression_p = find_global "_Tcl", "__expression_parse"
-  expression_i = find_global "_Tcl", "__expression_interpret"
  
   .local string temp_str
   temp_str ="" 
@@ -73,8 +72,8 @@ get_final:
   if counter != argc goto more_than_else
 
 begin_parsing:
-  retval = expression_p(condition)
-  retval = expression_i(retval)
+  $P1 = expression_p(condition)
+  retval = $P1()
 
   unless retval goto do_elseifs
   code = body 
@@ -88,8 +87,8 @@ elseif_loop:
   if $I2 == $I1 goto do_else
   $P1 = elseifs[$I2]
   condition = $P1[0]
-  retval = expression_p(condition)
-  retval = expression_i(retval)
+  $P2 = expression_p(condition)
+  retval = $P2()
   if retval goto done_elseifs
   inc $I2
   goto elseif_loop  

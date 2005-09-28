@@ -17,7 +17,6 @@
   .local pmc expression_p
   .local pmc expression_i
   expression_p = find_global "_Tcl", "__expression_parse"
-  expression_i = find_global "_Tcl", "__expression_interpret"
 
   expr = ""
   looper = 0
@@ -35,8 +34,8 @@ loop:
   goto loop
 
 loop_done:
-  retval = expression_p(expr)
-  .return expression_i(retval) 
+  $P1 = expression_p(expr)
+  .return $P1()
 
 no_args:
   .throw("wrong # args: should be \"expr arg ?arg ...?\"")
