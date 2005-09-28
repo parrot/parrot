@@ -117,13 +117,31 @@ a\tb\nc
 OUT
 
 
-SKIP: {
-	skip 'tests not written' => 1;
-pir_output_is($PRE . <<CODE . $POST, <<'OUT', "escape_string: other characters less than 32", todo => 'test not written' );
+pir_output_is($PRE . <<CODE . $POST, <<'OUT', "escape_string: other characters less than 32" );
+	.local string str, x
+
+    .local int index
+	index = 0
+	str = ''
+
+LOOP:
+	if index >= 32 goto DONE
+
+	x = chr index
+	concat str, x
+
+	inc index
+	branch LOOP
+
+DONE:
+	str = escape_string( str, "'" )
+
+	print str
+	goto END
 CODE
-ok
+\000\001\002\003\004\005\006\007\010\t\n\013\014\015\016\017\020\021\022\023\024\025\026\027\030\031\032\033\034\035\036\037
 OUT
-}
+
 
 pir_output_is($PRE . <<'CODE' . $POST, <<'OUT', "escape_string: single quote" );
 	.local string str
