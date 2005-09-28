@@ -51,85 +51,85 @@ This function returns the quoted string.
 
 .namespace ["Data::Escape"]
 
+
 .sub String
     .param string str
-    .param string char
-    .local string ret
-    .local int i
-    .local int j
-    .local int c
+	.param string quote_char
+
+	.local string return
+    .local int index
+    .local int str_len
+    .local int test_char_ord
+    .local int quote_char_ord
+	.local int is_alphanum
     .local string tmp
+	.local int mask
 
-    i = 0
-    j = length str
-    ret = ""
+	.include 'cclass.pasm'
+
+	mask = .CCLASS_ALPHANUMERIC
+
+    index = 0
+    str_len = length str
+    return = ''
 LOOP:
-    if i >= j goto END
-    tmp = str[i]
-    ord c, tmp
+    if index >= str_len goto END
 
-    if c > 40 goto gt40
-    if c > 31 goto gt31
+    tmp = str[index]
+	is_alphanum = is_cclass mask, tmp, 0
+	if is_alphanum, DONE
 
-    if c > 0 goto n00
-    set tmp, "\\0"
-    branch DONE
-n00:
+    ord test_char_ord, tmp
 
-    # \t
-    if c != 9 goto n09
-    set tmp, "\\t"
-    branch DONE
-n09:
+	## allow spaces as is
+	if 32 == test_char_ord goto DONE
 
-    # \n
-    if c != 10 goto n10
-    set tmp, "\\n"
-    branch DONE
-n10:
+t_backslash:
+	## escape backslash to double backslash
+	if 92 != test_char_ord goto t_newline
+	tmp = '\\'
+	branch DONE
+	
+t_newline:
+	## escape newline to \n
+	if 10 != test_char_ord goto t_tab
+	tmp = '\n'
+	branch DONE
 
-    # \r
-    if c != 13 goto n13
-    set tmp, "\\r"
-    branch DONE
-n13:
+t_tab:
+	## escape tab to \t
+	if 9 != test_char_ord goto t_quote
+	tmp = '\t'
+	branch DONE
 
-    # encode the value as an octal number
-    tmp = "\\"
-    $P0 = new .PerlArray
-    push $P0, c
-    $S0 = sprintf "%o", $P0
-    concat tmp, $S0
-    branch DONE
+t_quote:
+	## escape quote character
+    ord quote_char_ord, quote_char
+	
+	if quote_char_ord == test_char_ord goto escape_quote_char
+	if 34 == test_char_ord goto DONE
+	if 39 == test_char_ord goto DONE
+	branch default
 
-gt31: # ascii codes greater than 31 below
+escape_quote_char:
+	tmp = '\'
+	concat tmp, quote_char
+	branch DONE
 
-    # "
-    ne char, '"', n34
-    if c != 34 goto n34
-    set tmp, "\\\""
-    branch DONE
-n34:
-
-    # '
-    ne char, "'", n39
-    if c != 34 goto n39
-    set tmp, "\\'"
-    branch DONE
-n39:
-
-gt40: # ascii codes greater than 40 below
-
-    if c != 92 goto DONE
-    set tmp, "\\\\"
+default:
+    ## otherwise encode the value as an octal number
+	.local pmc char
+    $P0 = new .ResizableIntegerArray
+    push $P0, test_char_ord
+    tmp = sprintf "\\%o", $P0
     branch DONE
 
 DONE:
-    concat ret, tmp
-    inc i
+    concat return, tmp
+    inc index
     branch LOOP
 END:
-    .return(ret)
+    .return( return )
 .end
 
 =back
@@ -139,6 +139,10 @@ END:
 Jens Rieks E<lt>parrot at jensbeimsurfen dot deE<gt> is the author
 and maintainer.
 Please send patches and suggestions to the Perl 6 Internals mailing list.
+
+=head1 HISTORY
+
+Modifications by Jerry Gay to escape backslash and use character class ops.
 
 =head1 COPYRIGHT
 
