@@ -18,6 +18,9 @@ math.ops - Mathematical Operations
 Operations that perform some sort of mathematics, including both basic
 math and transcendental functions.
 
+The variants with a prepended B<n_> like <n_abs> generate a new target PMC.
+If possible, they use the appropriate language type, specified with C<.HLL>.
+
 =head2 General infix operations
 
 These operations take an infix operation number and PMC arguments.

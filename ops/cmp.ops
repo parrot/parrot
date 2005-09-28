@@ -16,6 +16,9 @@ Operations that compare two registers against each other.
 Some of these operations affect control flow directly; others
 do not.
 
+The variants with a prepended B<n_> like <n_not> generate a new target PMC.
+If possible, they use the appropriate language type, specified with C<.HLL>.
+ 
 =cut
 
 ###############################################################################

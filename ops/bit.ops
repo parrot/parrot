@@ -15,6 +15,9 @@ or in groups.
 
 The variant with an appended B<s> like B<bands> work on strings.
 
+The variants with a prepended B<n_> like <n_bnot> generate a new target PMC.
+If possible, they use the appropriate language type, specified with C<.HLL>.
+
 =over 4
 
 =cut
