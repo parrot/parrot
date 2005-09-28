@@ -121,7 +121,7 @@ default:
 	.local pmc char
     $P0 = new .ResizableIntegerArray
     push $P0, test_char_ord
-    tmp = sprintf "\\%o", $P0
+    tmp = sprintf "\\%03o", $P0
     branch DONE
 
 DONE:

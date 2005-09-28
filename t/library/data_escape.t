@@ -181,12 +181,26 @@ pir_output_is($PRE . <<'CODE' . $POST, <<'OUT', "escape_string: backslash" );
 	.local string str
 
 	str = '\ abc \t'
-	str = escape_string( str )
+	str = escape_string( str, '"' )
 
 	print str
 	goto END
 CODE
 \\ abc \\t
+OUT
+
+
+pir_output_is($PRE . <<'CODE' . $POST, <<'OUT', "escape_string: unprintable followed by numbers" );
+	.local string str
+
+	str = chr 2
+	concat str, '123'
+	str = escape_string( str, '"' )
+
+	print str
+	goto END
+CODE
+\002123
 OUT
 
 
@@ -234,6 +248,6 @@ OUT
 }
 
 ## don't forget to change the number of tests!
-BEGIN { plan tests => 13; }
+BEGIN { plan tests => 14; }
 
 # vim: ft=imc :
