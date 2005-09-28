@@ -53,11 +53,16 @@ static int emitter;     /* XXX */
 /* Creates a new instruction */
 
 Instruction *
-_mk_instruction(const char *op, const char * fmt,
+_mk_instruction(const char *op, const char * fmt, int n,
 	SymReg ** r, int flags)
 {
-    int i;
-    Instruction * ins = calloc(1, sizeof(Instruction));
+    int i, reg_space;
+    Instruction * ins;
+
+    reg_space = 0;
+    if (n > 1)
+        reg_space = sizeof(SymReg *) * (n - 1);
+    ins = calloc(sizeof(Instruction) + reg_space, 1);
     if (ins == NULL) {
         fprintf(stderr, "Memory error at mk_instruction\n");
 	abort();
@@ -65,9 +70,9 @@ _mk_instruction(const char *op, const char * fmt,
 
     ins->op = str_dup(op);
     ins->fmt = str_dup(fmt);
-    for (i = 0; i < IMCC_MAX_REGS; i++)
-        if (r)
-            ins->r[i] = r[i];
+    ins->n_r = n;
+    for (i = 0; i < n; i++)
+        ins->r[i] = r[i];
     ins->flags = flags;
     ins->opnum = -1;
 
@@ -172,9 +177,23 @@ instruction_reads(Instruction* ins, SymReg* r) {
     SymReg *key;
     SymReg *ri;
 
+    if (ins->opnum == PARROT_OP_set_args_pc ||
+            ins->opnum == PARROT_OP_set_returns_pc) {
+        for (i = 0; i < ins->n_r; i++) {
+            ri = ins->r[i];
+            if (ri == r)
+                return 1;
+        }
+        return 0;
+    }
+    else if (ins->opnum == PARROT_OP_get_params_pc ||
+            ins->opnum == PARROT_OP_get_results_pc) {
+        return 0;
+    }
     f = ins->flags;
-    for (i = 0; (ri = ins->r[i]) && i < IMCC_MAX_REGS; i++) {
+    for (i = 0; i < ins->n_r; i++) {
 	if (f & (1<<i)) {
+            ri = ins->r[i];
             if (ri == r)
                 return 1;
             /* this additional test for _kc ops seems to slow
@@ -188,9 +207,16 @@ instruction_reads(Instruction* ins, SymReg* r) {
             }
         }
     }
-    if (ins->type & ITPCCSUB)
-        return pcc_sub_reads(ins, r);
+    /* a sub call reads the previous args */
+    if (ins->type & ITPCCSUB) {
+        assert(ins->r[0]->pcc_sub);
+        for (i = 0; i < ins->r[0]->pcc_sub->nargs; ++i) {
+            if (r == ins->r[0]->pcc_sub->args[i])
+                return 1;
+        }
 
+
+    }
     return 0;
 }
 
@@ -203,14 +229,24 @@ instruction_writes(Instruction* ins, SymReg* r) {
 
     f = ins->flags;
 
-    for (i = 0; ins->r[i] && i < IMCC_MAX_REGS; i++)
+    if (ins->opnum == PARROT_OP_get_params_pc ||
+            ins->opnum == PARROT_OP_get_results_pc) {
+        for (i = 0; i < ins->n_r; i++) {
+            if (ins->r[i] == r)
+                return 1;
+        }
+        return 0;
+    }
+    else if (ins->opnum == PARROT_OP_set_args_pc ||
+            ins->opnum == PARROT_OP_set_returns_pc) {
+        return 0;
+    }
+    for (i = 0; i < ins->n_r; i++)
 	if (f & (1<<(16+i))) {
             if (ins->r[i] == r)
                 return 1;
         }
 
-    if (ins->type & ITPCCSUB)
-        return pcc_sub_writes(ins, r);
     return 0;
 }
 
@@ -395,9 +431,9 @@ free_ins(Instruction *ins)
 int
 ins_print(Interp *interp, FILE *fd, Instruction * ins)
 {
-    char regb[IMCC_MAX_REGS][256];      /* XXX */
+    char regb[IMCC_MAX_FIX_REGS][256];      /* XXX */
     /* only long key constants can overflow */
-    char *regstr[IMCC_MAX_REGS];
+    char *regstr[IMCC_MAX_FIX_REGS];
     SymReg *p;
     int i;
     int len;
@@ -409,11 +445,7 @@ ins_print(Interp *interp, FILE *fd, Instruction * ins)
     if (!ins->r[0] || !strchr(ins->fmt, '%')) {	/* comments, labels and such */
 	return fprintf(fd, "%s", ins->fmt);
     }
-    for (i = 0; i < IMCC_MAX_REGS ; i++) {
-	if (!ins->r[i]) {
-	    regstr[i] = 0;
-            continue;
-        }
+    for (i = 0; i < ins->n_r; i++) {
         p = ins->r[i];
         if (!p)
             continue;

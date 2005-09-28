@@ -48,7 +48,7 @@ void
 REG_PUSH(Interp *interpreter, void *where)
 {
     void* top;
-    top = stack_prepare_push(interpreter, &interpreter->ctx.REG_STACK);
+    top = stack_prepare_push(interpreter, &CONTEXT(interpreter->ctx)->REG_STACK);
     Parrot_memcpy_aligned(top, where, sizeof(struct REG_FRAME));
 }
 
@@ -67,7 +67,7 @@ void
 REG_POP(Interp *interpreter, void *where)
 {
     void* top;
-    top = stack_prepare_pop(interpreter, &interpreter->ctx.REG_STACK);
+    top = stack_prepare_pop(interpreter, &CONTEXT(interpreter->ctx)->REG_STACK);
     Parrot_memcpy_aligned(where, top, sizeof(struct REG_FRAME));
 }
 

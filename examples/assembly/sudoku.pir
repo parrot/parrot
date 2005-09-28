@@ -797,7 +797,7 @@ ret_0:
 .end
 
 # count seen in one
-.sub check_seen method
+.sub check_seen
     .param pmc seen
     .local pmc it
     new it, .Iterator, seen
@@ -1391,19 +1391,19 @@ out:
 
 .namespace ["Dummy"]
 
-.sub "print" @MULTI(_, int, int, string)
+.sub "print" @MULTI(_, int, int, string), method
     .param int r
     .param int c
     .param string s
     print s
 .end
 
-.sub "print" @MULTI(_, string)
+.sub "print" @MULTI(_, string), method
     .param string s
     print s
 .end
 
-.sub "print" @MULTI(_, int)
+.sub "print" @MULTI(_, int), method
     .param int s
     print s
 .end

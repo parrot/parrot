@@ -61,6 +61,8 @@ CODE
 key 42 2 key 42
 OUT
 
+SKIP: {
+	skip("instantiate disabled", 1);
 pir_output_is(<<'CODE', <<'OUT', 'instantiate, assign');
 .sub main @MAIN
     .local pmc cl, p, kv, k, v
@@ -87,3 +89,4 @@ pir_output_is(<<'CODE', <<'OUT', 'instantiate, assign');
 CODE
 key value 77
 OUT
+}

@@ -6,7 +6,6 @@
 #
 # This makefile makes use of specific .dummy targets (rather than .PHONY
 # or .VIRTUAL targets) in an effort to work with various flavors of make.
-#
 ###############################################################################
 
 ###############################################################################
@@ -85,7 +84,7 @@ RM_RF      = ${rm_rf}
 AR_CR      = ${ar} ${ar_flags}
 RANLIB     = ${ranlib}
 PERL       = ${perl}
-TOUCH      = $(PERL) -MExtUtils::Command -e touch 
+TOUCH      = $(PERL) -MExtUtils::Command -e touch
 YACC       = ${yacc}
 LEX        = ${lex}
 # do not die when dir already exits
@@ -368,6 +367,7 @@ INTERP_O_FILES = \
     $(SRC_DIR)/exceptions$(O) \
     $(SRC_DIR)/global_setup$(O) \
     $(SRC_DIR)/interpreter$(O)  \
+    $(SRC_DIR)/inter_call$(O)  \
     $(SRC_DIR)/inter_cb$(O)  \
     $(SRC_DIR)/inter_create$(O)  \
     $(SRC_DIR)/inter_misc$(O)  \
@@ -532,6 +532,7 @@ all : \
 
 STR_FILES = \
     $(SRC_DIR)/builtin.str \
+    $(SRC_DIR)/inter_call.str \
     $(SRC_DIR)/inter_cb.str \
     $(SRC_DIR)/inter_misc.str \
     $(SRC_DIR)/global.str \
@@ -596,7 +597,6 @@ help :
 	@echo "  fulltest:          Run test suite with various options."
 	@echo "  test<core>:        Run the test suite with a specified core."
 	@echo "                     Valid cores are b, C, f, g, j, r, S."
-	@echo "  run_tests:         Various command lines and environments"
 	@echo "  src_tests:         Run test in C-file."
 	@echo "  perl_tests:        Test the Perl modules in the distribution."
 	@echo "  testexex:          Testing the exex runcore."
@@ -948,6 +948,9 @@ $(SRC_DIR)/extend$(O) : $(GENERAL_H_FILES) $(INC_DIR)/extend.h
 $(SRC_DIR)/interpreter$(O) : $(SRC_DIR)/interpreter.c $(GENERAL_H_FILES) \
     ${TEMP_jit_h}
 
+$(SRC_DIR)/inter_call$(O) : $(SRC_DIR)/inter_call.c $(GENERAL_H_FILES) \
+    $(SRC_DIR)/inter_call.str
+
 $(SRC_DIR)/inter_cb$(O) : $(SRC_DIR)/inter_cb.c $(GENERAL_H_FILES) \
     $(SRC_DIR)/inter_cb.str
 
@@ -1204,19 +1207,19 @@ editor-clean :
 # to disable GC_DEBUG.
 EXTRA_TEST_ARGS    = --gc-debug --running-make-test
 RUN_TEST_FILES = \
-    t/run/*.t 
+    t/run/*.t
 SRC_TEST_FILES = \
     t/src/*.t
 PERL_TEST_FILES = \
     t/perl/*.t
 RUNCORE_TEST_FILES = \
-    t/library/*.t \
     t/op/*.t \
     t/pmc/*.t \
     t/run/*.t \
     t/native_pbc/*.t \
     $(IMCC_DIR)/t/*/*.t \
-    t/dynclass/*.t \
+    t/library/*.t \
+    t/dynclass/foo.t t/dynclass/g*.t \
     t/examples/*.t \
     t/p6rules/*.t
 TOOLS_TEST_FILES = \
@@ -1244,7 +1247,6 @@ fulltest : \
 #CONDITIONED_LINE(jitcapable):    testj \
     testr \
     testS \
-    run_tests \
     src_tests \
     perl_tests \
     testbench \
@@ -1346,6 +1348,7 @@ clean : \
     examples-clean \
     imcc-clean \
     compilers-clean \
+    smoke-clean \
     editor-clean
 	${TEMP_cg_r}
 	$(RM_F) chartypes *.s *~ $(FLUID_FILES)
@@ -1562,3 +1565,17 @@ tags:	tags.dummy
 	$(PERL) editor/addtags ops/*.ops
 
 tags.dummy:
+
+
+###############################################################################
+#
+# smoke:
+#
+###############################################################################
+
+smoke : all
+	$(PERL) t/harness --html
+	$(PERL) util/smokeserv-client.pl smoke.html
+
+smoke-clean :
+	$(RM_F) smoke.html

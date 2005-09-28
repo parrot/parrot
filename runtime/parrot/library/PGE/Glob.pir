@@ -281,7 +281,7 @@ Parse alternations of the form {a,b,c} where a,b, and c are the alternatives.
     compreg $P0, "PIR"
     $S0 = code
 
-    glob = compile $P0, $S0
+    glob = $P0($S0)
     .return (glob, code, exp)
 .end
 

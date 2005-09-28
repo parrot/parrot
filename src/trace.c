@@ -115,7 +115,10 @@ trace_pmc_dump(Interp *interpreter, PMC* pmc)
             ||  pmc->vtable->base_type == enum_class_Sub) {
         opcode_t *pc, *seg;
         pc = PMC_sub(pmc)->address;
-        seg = PMC_sub(pmc)->seg->base.data;
+        if (pc)
+            seg = PMC_sub(pmc)->seg->base.data;
+        else
+            seg = NULL;
         PIO_eprintf(interpreter, "%S=PMC(%#p pc:%d)",
                 VTABLE_name(interpreter, pmc), pmc,
                 pc - seg);

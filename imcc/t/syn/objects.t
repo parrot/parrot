@@ -24,7 +24,7 @@ pir_output_is(<<'CODE', <<'OUT', "meth call syntax");
 .end
 
 .namespace [ "Foo" ]
-.sub _meth
+.sub _meth method
     print "in meth\n"
 .end
 CODE
@@ -48,7 +48,7 @@ pir_output_is(<<'CODE', <<'OUT', "meth call syntax m.o(arg)");
 .end
 
 .namespace [ "Foo" ]
-.sub _meth
+.sub _meth method
     .param pmc s
     print "in meth\n"
     print s
@@ -74,7 +74,7 @@ pir_output_is(<<'CODE', <<'OUT', "meth call ret = o.m(arg)");
 .end
 
 .namespace [ "Foo" ]
-.sub _meth
+.sub _meth method
     .param pmc s
     print "in meth\n"
     print s
@@ -107,7 +107,7 @@ pir_output_is(<<'CODE', <<'OUT', "meth call syntax, string");
     end
 .end
 .namespace [ "Foo" ]
-.sub _meth
+.sub _meth method
     print "in meth\n"
 .end
 CODE
@@ -126,28 +126,28 @@ pir_output_is(<<'CODE', <<'OUT', "initializer");
     find_type I1, "Baz"
     new P3, I1
     find_global P0, "_sub"
-    invokecc
+    invokecc P0
     print "done\n"
     end
 .end
 
 .namespace ["Foo"]
-.sub __init
+.sub __init method
     print "foo_init\n"
 .end
 
 .namespace ["Bar"]
-.sub __init
+.sub __init method
     print "bar_init\n"
 .end
 
 .namespace ["Baz"]
-.sub __init
+.sub __init method
     print "baz_init\n"
 .end
 
 .namespace [""]	# main again
-.sub _sub
+.sub _sub method
     print "in sub\n"
 .end
 CODE
@@ -203,7 +203,7 @@ pir_output_is(<<'CODE', <<'OUT', "explicit meth call syntax");
 .end
 
 .namespace [ "Foo" ]
-.sub _meth
+.sub _meth method
     print "in meth\n"
 .end
 CODE
@@ -231,7 +231,7 @@ pir_output_is(<<'CODE', <<'OUT', "explicit meth call syntax, meth var");
 .end
 
 .namespace [ "Foo" ]
-.sub _meth
+.sub _meth method
     print "in meth\n"
 .end
 CODE
@@ -259,7 +259,7 @@ pir_output_is(<<'CODE', <<'OUT', "explicit meth call syntax, args");
 .end
 
 .namespace [ "Foo" ]
-.sub _meth
+.sub _meth method
     .param string p1
     .param string p2
     print "in meth\n"
@@ -276,7 +276,7 @@ ok
 done
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "explicit meth call syntax, retcont");
+pir_output_is(<<'CODE', <<'OUT', "explicit meth call syntax");
 
 .sub test @MAIN
     .local pmc class
@@ -284,19 +284,16 @@ pir_output_is(<<'CODE', <<'OUT', "explicit meth call syntax, retcont");
     newclass class, "Foo"
     find_type $I0, "Foo"
     new obj, $I0
-    .local pmc retc
-    newsub retc, .RetContinuation, label
     .pcc_begin
     .invocant obj
-    .meth_call "_meth", retc
-label:
+    .meth_call "_meth"
     .pcc_end
     print "done\n"
     end
 .end
 
 .namespace [ "Foo" ]
-.sub _meth
+.sub _meth method
     print "in meth\n"
 .end
 CODE
@@ -318,7 +315,7 @@ pir_output_is(<<'CODE', <<'OUT', "meth call syntax - reserved word");
 .end
 
 .namespace [ "Foo" ]
-.sub open
+.sub open method
     print "in meth\n"
 .end
 CODE

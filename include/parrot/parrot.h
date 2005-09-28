@@ -277,6 +277,7 @@ typedef void (*funcptr_t)(void);
 #include "parrot/misc.h"
 #include "parrot/debug.h"
 #include "parrot/sub.h"
+#include "parrot/inter_call.h"
 #include "parrot/lexical.h"
 #include "parrot/key.h"
 #include "parrot/exit.h"

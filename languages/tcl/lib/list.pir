@@ -17,8 +17,6 @@
   is_end = 1
 
   .local pmc retval
-  .local int return_type
-  return_type = TCL_OK
 
   .local int index_length, pos
   .local pmc number_result
@@ -39,20 +37,16 @@
   if retval > $I0 goto my_end
   
   is_end = 0
-  goto done
+  .return(retval,is_end)
 
 bad_arg:
-  # XXX We shouldn't need this String declaration here.
-  retval = new TclString
   $S9  = "bad index \""
   $S9 .= position
   $S9 .= "\": must be integer?[+-]integer? or end?[+-]integer?"
-  retval = $S9
-  return_type=TCL_ERROR
-  goto done
+  .throw($S9)
 
 has_end:
-    # is this an int? if so, subtract it from -1 to get our parrot-style index.
+  # is this an int? if so, subtract it from -1 to get our parrot-style index.
   index_length = length position
   # is this an int?
   (number_result, pos) = get_number(position,4)
@@ -69,18 +63,11 @@ has_end:
   index_1 = the_list
   # so, if we had end-1, then we'd be at position 4. (end is 5, -1)
   index_1 = index_1 - $I0
-  retval = new TclInt
-  retval = index_1
-
-  goto done
+  .return (index_1,is_end)
 
 my_end:
   $I0 = the_list
   dec $I0
-  retval = new TclInt 
-  retval = $I0
-
-done:
-  .return(return_type,retval,is_end)
+  .return($I0,is_end)
   
 .end

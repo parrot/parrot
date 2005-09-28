@@ -4,15 +4,12 @@
 .namespace [ "Tcl" ]
 
 .sub "&set"
-  .local pmc argv 
-  argv = foldup
+  .param pmc argv :slurpy
 
   .local int len, argc  
   argc = argv
 
   .local pmc retval
-  .local int return_type
-  return_type = TCL_OK
  
   if argc == 0 goto error
   if argc > 2 goto error
@@ -36,11 +33,6 @@ setting:
   .return set(name,value)
 
 error:
-  return_type = TCL_ERROR 
-  retval = new String
-  retval = "wrong # args: should be \"set varName ?newValue?\""
-  .return(return_type,retval)
+  .throw ("wrong # args: should be \"set varName ?newValue?\"")
 
-catch:
-  goto resume
 .end

@@ -8,23 +8,28 @@
 .namespace [ "Tcl" ]
 
 .sub "&inline"
-  .param pmc language
-  .param pmc code
+  .param pmc argv :slurpy
 
-  $S1 = language
-  $S2 = code
-  $P1 = compreg $S1
+  .local int argc
+  argc = argv
+
+  .local string language,code
+
+  language = argv[0]
+  code     = argv[1]
+
+  $P1 = compreg language
   $I1 = typeof $P1
   if $I1 == .None goto fail
-  $P0 = compile $P1, $S2
+  $P0 = $P1(code)
   $P0()
 
-  .return (TCL_OK,"")
+  # XXX Should catch exceptions in the code and return the error message
+  .return ("")
 
 fail:
-  $P1 = new String
-  $P1 = "invalid language \""
-  $P1 .= $S1
-  $P1 .= "\" specified"
-  .return (TCL_ERROR, $P1)
+  $S0 = "invalid language \""
+  $S0 .= language
+  $S0 .= "\" specified"
+  .throw ($S0)
 .end

@@ -4,14 +4,11 @@
 .namespace [ "Tcl" ]
 
 .sub "&upvar"
-  .local pmc argv 
-  argv = foldup
+  .param pmc argv :slurpy
 
-  .local pmc call_level,current_call_level,retval
+  .local pmc call_level,current_call_level
   call_level = argv[0]
   current_call_level = find_global "_Tcl", "call_level"
-  retval = new TclString
-  retval = ""
 
   .local int defaulted
   (call_level,defaulted) = __get_call_level(call_level)
@@ -39,14 +36,14 @@ loop:
   push_eh catch 
     find_lex $P1, $I0, $S0
     store_lex $I1, $S1, $P1
-resume:
   clear_eh
+resume:
 
   inc counter
   goto loop
  
 done:
-  .return(TCL_OK,retval)
+  .return("")
 
 catch:
   goto resume

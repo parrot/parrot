@@ -83,8 +83,8 @@ END:
 =cut
 
 .sub cache method
-    .param pmc find
     .param string defname
+    .param pmc find
     .local pmc _cache
     .local int i
     .local pmc entry

@@ -56,6 +56,7 @@ help_debug(void)
     "    0008    interpreter startup\n"
     "    0010    thread debugging\n"
     "    0020    eval/compile\n"
+    "    0040    fill I, N registers with garbage\n"
     "\n"
     "--trace -t [Flags] ...\n"
     "    0001    opcodes\n"

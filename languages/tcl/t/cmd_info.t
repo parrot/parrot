@@ -122,16 +122,12 @@ TCL
 wrong # args: should be "info exists varName"
 OUT
 
-TODO: {
-  local $TODO = "info exists currently slightly borked";
-
 language_output_is("tcl",<<'TCL',<<'OUT',"info exists true");
   set a 1
   puts [info exists a]
 TCL
 1
 OUT
-}
 
 language_output_is("tcl",<<'TCL',<<'OUT',"info exists false");
   puts [info exists a]

@@ -124,9 +124,9 @@ shifted down.
 
     void* invoke (void * next) {
         Parrot_csub_t func = (Parrot_csub_t)D2FPTR(PMC_data(SELF));
-        PMC *obj;
         UINTVAL flags;
 
+        INTERP->current_cont = NULL;
         if (!func)
             real_exception(INTERP, NULL, INVALID_OPERATION,
                 "attempt to call NULL function");
@@ -141,26 +141,6 @@ shifted down.
          *   private1 ... created via dlfunc
          *
          */
-        obj = REG_PMC(2);
-        flags = PObj_get_FLAGS(SELF);
-        if (flags & PObj_private0_FLAG) {       /* MMD */
-            if (obj) {                          /* as method */
-                INTVAL i = REG_INT(3)++;
-                while (i--)
-                    REG_PMC(6+i)=REG_PMC(5+i);
-                REG_PMC(5) = REG_PMC(2);
-            }
-        }
-        else if (!(flags & PObj_private1_FLAG) &&
-                (PMC_IS_NULL(obj) || PObj_is_class_TEST(obj) ||
-                obj->vtable->class == obj)) {
-            INTVAL i, n;
-            REG_PMC(2) = REG_PMC(5);    /* obj = 1st arg */
-            n = --REG_INT(3);             /* argcP */
-            for (i = 0; i < n; ++i) {
-                REG_PMC(i) = REG_PMC(i+1);
-            }
-        }
         func(INTERP, SELF);
         return next;
     }

@@ -4,14 +4,12 @@
 .namespace [ "Tcl" ]
 
 .sub "&concat"
-  .local pmc argv 
-  argv = foldup
+  .param pmc argv :slurpy
  
   .local int argc 
   argc = argv
 
-  .local pmc retval
-  retval = new TclString
+  .local string retval
   retval = ""
 
   .local int arg_num
@@ -76,5 +74,5 @@ arg_loop_next:
 arg_loop_done:
  
 done:
-  .return(TCL_OK,retval)
+  .return(retval)
 .end

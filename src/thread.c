@@ -118,8 +118,9 @@ pt_thread_prepare_for_run(Parrot_Interp d, Parrot_Interp s)
      * are working - create it in the new interpreters mem space
      */
     ret_c = pmc_new(d, enum_class_RetContinuation);
+    PMC_cont(ret_c)->from_ctx = d->ctx;
     INTERP_REG_PMC(d, 1) =      /* XXX remove when done pdd03 */
-        d->ctx.current_cont = ret_c;
+        CONTEXT(d->ctx)->current_cont = ret_c;
 }
 
 /*
@@ -161,11 +162,8 @@ pt_thread_run(Parrot_Interp interp, PMC* dest_interp, PMC* sub)
     pt_thread_prepare_for_run(interpreter, interp);
     /*
      * set regs according to pdd03
-     * P0 = sub, P2 = object
-     * P5 is first argument
      */
-    REG_PMC(0) = sub;
-    REG_PMC(2) = dest_interp;
+    interpreter->current_object = dest_interp;
     /*
      * create a joinable thread
      */

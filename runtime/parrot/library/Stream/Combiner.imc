@@ -28,7 +28,7 @@ TBD
     .local int i
     .local pmc base
     .local pmc comb
-    
+
     find_type i, "Stream::Combiner"
     if i > 1 goto END
 
@@ -36,7 +36,7 @@ TBD
 
     getclass base, "Stream::Base"
     subclass comb, base, "Stream::Combiner"
-    
+
     addattribute comb, "combiner"
 END:
 .end
@@ -56,10 +56,10 @@ END:
 
 .sub __init method
     .local pmc temp
-    
+
     newsub temp, .Sub, _default_combiner
     self."combiner"( temp )
-    
+
     temp = new .ResizablePMCArray
     self."setSource"( temp )
 .end
@@ -71,11 +71,12 @@ Sets (or just returns) the combiner sub.
 =cut
 
 .sub combiner method
-    .param pmc _combiner
+    .param pmc _combiner :optional
+    .param int has_combiner :opt_flag
     .local pmc ret
-    
+
     classoffset $I0, self, "Stream::Combiner"
-    if argcP == 0 goto GET    
+    unless has_combiner goto GET
     setattribute self, $I0, _combiner
     ret = _combiner
     branch END
@@ -95,7 +96,7 @@ You can call assign several times to assign several sources to the stream.
 .sub __set_pmc method
     .param pmc arg
     .local pmc source
-    
+
     source = self."source"()
     push source, arg
 .end
@@ -113,7 +114,7 @@ Returns 1 if all assigned sources are connected, 0 otherwise.
 
     # get the sources
     sources = self."source"()
-    
+
     # check if at least one sources is defined
     i = sources
     if i == 0 goto NOT_CONNECTED
@@ -125,17 +126,17 @@ Returns 1 if all assigned sources are connected, 0 otherwise.
 LOOP:
     # stream is connected if no sources are left
     unless sources goto IS_CONNECTED
-    
+
     # check the next source
     source = shift sources
     i = source."connected"()
-        
+
     # proceed with the next source if connected
     if i goto LOOP
-    
+
 NOT_CONNECTED:
     .return(0)
-    
+
 IS_CONNECTED:
     .return(1)
 .end
@@ -157,7 +158,7 @@ Reads from all assigned sources and calls the combiner.
 
     # get the sources
     sources = self."source"()
-    
+
     # check if at least one sources is defined
     i = sources
     if i == 0 goto END_OF_STREAM
@@ -165,25 +166,25 @@ Reads from all assigned sources and calls the combiner.
     # create an iterator for the sources
     new sources, .Iterator, sources
     set sources, .ITERATE_FROM_START
-    
+
     # create the string array
     new args, .StringArray
-    
+
 READ_LOOP:
     unless sources goto CALL
-    
+
     # read from next stream
     source = shift sources
     str = source."read"()
-    
+
     # end of stream?
     isnull str, END_OF_STREAM
-    
+
     # push onto array
     push args, str
     branch READ_LOOP
 
-CALL:    
+CALL:
     classoffset i, self, "Stream::Combiner"
     getattribute combiner, self, i
 

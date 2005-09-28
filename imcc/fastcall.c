@@ -52,7 +52,7 @@ insINS(Interp *interpreter, IMC_Unit * unit, Instruction *ins,
 void
 expand_fast_sub(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
 {
-    SymReg *sub, *regs[IMCC_MAX_REGS];
+    SymReg *sub, *regs[1];
     int i, n;
 
 #if IMC_TRACE
@@ -74,7 +74,7 @@ expand_fast_sub(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
 void
 expand_fast_sub_ret(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
 {
-    SymReg *sub, *regs[IMCC_MAX_REGS];
+    SymReg *sub, *regs[1];
     int i;
 
 #if IMC_TRACE
@@ -98,7 +98,7 @@ expand_fast_sub_ret(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
 void
 expand_fast_sub_call(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
 {
-    SymReg *sub, *ret, *regs[IMCC_MAX_REGS];
+    SymReg *sub, *ret, *regs[1];
     int i;
 
 #if IMC_TRACE

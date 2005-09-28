@@ -39,7 +39,7 @@ pir_output_is(<<'CODE', <<'OUT', "dumping array of sorted numbers");
     push array, 8
     push array, 9
 
-    _dumper( "array", array )
+    _dumper( array, "array" )
 .end
 CODE
 "array" => PerlArray (size:10) [
@@ -75,7 +75,7 @@ pir_output_is(<<'CODE', <<'OUT', "dumping unsorted numbers");
     push array, 0
     push array, 5
 
-    _dumper( "array", array )
+    _dumper( array, "array" )
 .end
 CODE
 "array" => PerlArray (size:10) [
@@ -109,7 +109,7 @@ pir_output_is(<<'CODE', <<'OUT', "dumping sorted strings");
     push array, "golf"
     push array, "hotel"
 
-    _dumper( "strings", array )
+    _dumper( array, "strings" )
 .end
 CODE
 "strings" => PerlArray (size:8) [
@@ -140,7 +140,7 @@ pir_output_is(<<'CODE', <<'OUT', "sorting unsorted strings");
     push array, "bravo"
     push array, "echo"
 
-    _dumper( "strings", array )
+    _dumper( array, "strings" )
 .end
 .include "library/dumper.imc"
 CODE
@@ -184,7 +184,7 @@ pir_output_is(<<'CODE', <<'OUT', "dumping different types");
     push array, 0
     push array, "echo"
 
-    _dumper( "array", array )
+    _dumper( array, "array" )
 .end
 .include "library/dumper.imc"
 CODE
@@ -228,30 +228,30 @@ pir_output_is(<<'CODE', <<'OUT', "dumping complex data");
     new array1, .PerlArray
     new array2, .PerlArray
 
-    _dumper( "hash1", hash1 )
+    _dumper( hash1,"hash1" )
 
     S0 = "hello"
     S1 = "world"
     set hash1[S0], S1
 
-    _dumper( "hash1", hash1 )
+    _dumper( hash1,"hash1" )
 
     S0 = "hello2"
     S1 = "world2"
     set hash1[S0], S1
 
-    _dumper( "hash1", hash1 )
+    _dumper( hash1,"hash1" )
 
     S0 = "hash2"
     set hash1[S0], hash2
 
-    _dumper( "hash1", hash1 )
+    _dumper( hash1,"hash1" )
 
     S0 = "hello3"
     S1 = "world3"
     set hash2[S0], S1
 
-    _dumper( "hash1", hash1 )
+    _dumper( hash1,"hash1" )
 
     S0 = "name"
     S1 = "parrot"
@@ -269,7 +269,7 @@ pir_output_is(<<'CODE', <<'OUT', "dumping complex data");
     S0 = "array1"
     set hash2[S0], array1
 
-    _dumper( "hash1", hash1 )
+    _dumper( hash1,"hash1" )
 
 .end
 .include "library/dumper.imc"
@@ -374,8 +374,8 @@ pir_output_is(<<'CODE', <<'OUT', "indent string");
     setprop hash1, "array2", array2
     name = "hash"
     indent = "|  "
-    _dumper( name, hash1, indent )
-    _dumper( name, hash1, indent )
+    _dumper( hash1, name, indent )
+    _dumper( hash1, name, indent )
     print "name = '"
     print name
     print "'\nindent = '"
@@ -589,7 +589,7 @@ pir_output_is(<<'CODE', <<'OUT', "dumping 'null'");
     set temp, "0"
     push array, temp
 
-    _dumper( "array", array )
+    _dumper( array, "array" )
 .end
 .include "library/dumper.imc"
 CODE
@@ -624,7 +624,7 @@ pir_output_is( << 'CODE', << 'OUT', "dumping strings");
     string_1 = "This is a String"
     push array, string_1
 
-    _dumper( "array of various strings", array )
+    _dumper( array, "array of various strings" )
 .end
 CODE
 "array of various strings" => PerlArray (size:3) [
@@ -648,30 +648,30 @@ pir_output_is(<<'CODE', <<'OUT', "dumping complex data in Hash");
     new hash3, .Hash
     new array1, .PerlArray
 
-    _dumper( "hash1", hash1 )
+    _dumper( hash1,"hash1" )
 
     S0 = "hello"
     S1 = "world"
     set hash1[S0], S1
 
-    _dumper( "hash1", hash1 )
+    _dumper( hash1,"hash1" )
 
     S0 = "hello2"
     S1 = "world2"
     set hash1[S0], S1
 
-    _dumper( "hash1", hash1 )
+    _dumper( hash1,"hash1" )
 
     S0 = "hash2"
     set hash1[S0], hash2
 
-    _dumper( "hash1", hash1 )
+    _dumper( hash1,"hash1" )
 
     S0 = "hello3"
     S1 = "world3"
     set hash2[S0], S1
 
-    _dumper( "hash1", hash1 )
+    _dumper( hash1,"hash1" )
 
     S0 = "name"
     S1 = "parrot"
@@ -690,7 +690,7 @@ pir_output_is(<<'CODE', <<'OUT', "dumping complex data in Hash");
     S0 = "array1"
     set hash2[S0], array1
 
-    _dumper( "hash1", hash1 )
+    _dumper( hash1,"hash1" )
 
 .end
 .include "library/dumper.imc"
@@ -744,7 +744,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "dumping Integer PMC");
 
     new int1, .Integer
     int1 = 12345
-    _dumper( "Int:", int1 )
+    _dumper( int1, "Int:" )
 .end
 .include "library/dumper.imc"
 CODE
@@ -759,7 +759,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "dumping Float PMC");
 
     new float1, .Float
     float1 = 12345.678
-    _dumper( "Float:", float1 )
+    _dumper( float1, "Float:" )
 .end
 .include "library/dumper.imc"
 CODE
@@ -774,7 +774,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "dumping ResizablePMCArray PMC");
     new array, .ResizablePMCArray
     push array, 12345
     push array, "hello"
-    _dumper( "array:", array )
+    _dumper( array, "array:" )
 .end
 .include "library/dumper.imc"
 CODE
@@ -792,7 +792,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "dumping ResizableStringArray PMC");
     new array, .ResizableStringArray
     push array, "hello"
     push array, "world"
-    _dumper( "array:", array )
+    _dumper( array, "array:" )
 .end
 .include "library/dumper.imc"
 CODE
@@ -810,7 +810,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "dumping ResizableIntegerArray PMC");
     new array, .ResizableIntegerArray
     push array, 12345
     push array, 67890
-    _dumper( "array:", array )
+    _dumper( array, "array:" )
 .end
 .include "library/dumper.imc"
 CODE
@@ -828,7 +828,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "dumping ResizableFloatArray PMC");
     new array, .ResizableFloatArray
     push array, 123.45
     push array, 67.89
-    _dumper( "array:", array )
+    _dumper( array, "array:" )
 .end
 .include "library/dumper.imc"
 CODE
@@ -847,7 +847,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "dumping FixedPMCArray PMC");
     array = 2
     array[0] = 12345
     array[1] = "hello"
-    _dumper( "array:", array )
+    _dumper( array, "array:" )
 .end
 .include "library/dumper.imc"
 CODE
@@ -866,7 +866,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "dumping FixedStringArray PMC");
     array = 2
     array[0] = "hello"
     array[1] = "world"
-    _dumper( "array:", array )
+    _dumper( array, "array:" )
 .end
 .include "library/dumper.imc"
 CODE
@@ -885,7 +885,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "dumping FixedIntegerArray PMC");
     array = 2
     array[0] = 12345
     array[1] = 67890
-    _dumper( "array:", array )
+    _dumper( array, "array:" )
 .end
 .include "library/dumper.imc"
 CODE
@@ -904,7 +904,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "dumping FixedFloatArray PMC");
     array = 2
     array[0] = 123.45
     array[1] = 67.89
-    _dumper( "array:", array )
+    _dumper( array, "array:" )
 .end
 .include "library/dumper.imc"
 CODE
@@ -922,7 +922,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "dumping StringArray PMC");
     new array, .StringArray
     push array, "hello"
     push array, "world"
-    _dumper( "array:", array )
+    _dumper( array, "array:" )
 .end
 .include "library/dumper.imc"
 CODE

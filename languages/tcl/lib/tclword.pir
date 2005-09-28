@@ -32,8 +32,6 @@ the string values of the elements.
 
 .sub interpret method
   .local pmc retval
-  .local int return_type
-  return_type = TCL_OK
   
   .local int i, len
   i   = 0
@@ -46,8 +44,8 @@ loop:
   if i == len goto loop_done
   
   $P0 = self[i]
-  (return_type, retval) = $P0.interpret()
-  if return_type != TCL_OK goto done
+  retval = $P0."interpret"()
+  
   $S0 = retval
   word .= $S0
   
@@ -55,9 +53,6 @@ loop:
   goto loop
 
 loop_done:
-  retval = new TclString
-  retval = word
+  .return(word)
 
-done:
-  .return(return_type, retval)
 .end

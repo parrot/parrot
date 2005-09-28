@@ -16,7 +16,7 @@ Tests the multi-method dispatch.
 
 =cut
 
-use Parrot::Test tests => 28;
+use Parrot::Test tests => 30;
 
 pir_output_is(<<'CODE', <<'OUTPUT', "PASM divide");
 
@@ -271,7 +271,34 @@ CODE
 42
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "PASM INTVAL");
+output_is(<<'CODE', <<'OUTPUT', "PASM INTVAL - new result");
+.include "pmctypes.pasm"
+.include "datatypes.pasm"
+.include "mmd.pasm"
+    find_global P10, "Integer_bxor_Intval"
+    mmdvtregister .MMD_BXOR, .Integer, .DATATYPE_INTVAL, P10
+
+    new P1, .Integer
+    set P1, 3
+    n_bxor P9, P1, 2	# create new result
+    print P9
+    print "\n"
+    end
+.pcc_sub Integer_bxor_Intval:
+    get_params "(0,0)", P5, I5
+    print "ok\n"
+    set I10, P5
+    bxor I11, I10, I5
+    new P6, .Integer
+    set P6, I11
+    set_returns "(0)", P6
+    returncc
+CODE
+ok
+1
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "PASM INTVAL - existing result");
 .include "pmctypes.pasm"
 .include "datatypes.pasm"
 .include "mmd.pasm"
@@ -281,28 +308,58 @@ output_is(<<'CODE', <<'OUTPUT', "PASM INTVAL");
     new P0, .Integer
     new P1, .Integer
     set P1, 3
-    bxor P0, P1, 2
-    print P0
-    print "\n"
-    new P0, .PerlInt
-    new P1, .PerlInt
-    set P1, 5
-    bxor P0, P1, 2	# should call PerlInts builtin
+    bxor P0, P1, 2	# use result
     print P0
     print "\n"
     end
 .pcc_sub Integer_bxor_Intval:
+    get_params "(0,0,0)", P5, I5, P6
     print "ok\n"
     set I10, P5
     bxor I11, I10, I5
-    new P5, .Integer
-    set P5, I11
-    set I3, 1
+    set P6, I11
+    set_returns "(0)", P6
     returncc
 CODE
 ok
 1
-7
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "PASM INTVAL - mixed");
+.include "pmctypes.pasm"
+.include "datatypes.pasm"
+.include "mmd.pasm"
+    find_global P10, "Integer_bxor_Intval"
+    mmdvtregister .MMD_BXOR, .Integer, .DATATYPE_INTVAL, P10
+
+    new P0, .Integer
+    new P1, .Integer
+    set P1, 3
+    bxor P0, P1, 2      # reuse destination
+    print P0
+    print "\n"
+    n_bxor P9, P1, 2	# create new result
+    print P9
+    print "\n"
+    end
+.pcc_sub Integer_bxor_Intval:
+    # the destination is optional, depending on the infix op used
+    get_params "(0,0,0x20,0x40)", P5, I5, P6, I7
+    print "ok\n"
+    set I10, P5
+    bxor I11, I10, I5
+    if I7, has_dest
+    new P6, .Integer
+has_dest:
+    set P6, I11
+    set_returns "(0)", P6
+    returncc
+
+CODE
+ok
+1
+ok
+1
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUT', "first dynamic MMD call");
@@ -310,9 +367,9 @@ pir_output_is(<<'CODE', <<'OUT', "first dynamic MMD call");
 .sub main @MAIN
     .local pmc F, B, f, b, m, s
     newclass F, "Foo"
-    f = F."instantiate"()
+    f = new "Foo"
     newclass B, "Bar"
-    b = B."instantiate"()
+    b = new "Bar"
     # create a multi the hard way
     ## m = new MultiSub
     ## s = find_global "Foo", "foo"
@@ -657,6 +714,25 @@ Any    42
 Any    43
 OUT
 
+pir_output_is(<<'CODE', <<'OUTPUT', "__add as function - Int, Float");
+.sub main @MAIN
+    .local pmc d, l, r
+    d = new Integer
+    l = new Integer
+    r = new Float
+    l = 3
+    r = 39.42
+    "__add"(l, r, d)
+    print d
+    print "\n"
+    end
+.end
+CODE
+42.42
+OUTPUT
+
+SKIP: {
+	skip("MMD as method disabled", 5);
 pir_output_is(<<'CODE', <<'OUTPUT', "__add as method");
 .sub main @MAIN
     .local pmc d, l, r
@@ -696,23 +772,6 @@ pir_output_is(<<'CODE', <<'OUTPUT', "__add as method - Int, Float");
     l = 3
     r = 39.42
     d = l."__add"(r)
-    print d
-    print "\n"
-    end
-.end
-CODE
-42.42
-OUTPUT
-
-pir_output_is(<<'CODE', <<'OUTPUT', "__add as function - Int, Float");
-.sub main @MAIN
-    .local pmc d, l, r
-    d = new Integer
-    l = new Integer
-    r = new Float
-    l = 3
-    r = 39.42
-    "__add"(l, r, d)
     print d
     print "\n"
     end
@@ -779,6 +838,7 @@ CODE
 42
 42
 OUTPUT
+}
 
 pir_output_is(<<'CODE', <<'OUTPUT', "Integer subclasses, n_add");
 .sub main @MAIN
@@ -842,6 +902,8 @@ CODE
 2
 OUTPUT
 
+SKIP: {
+	skip("multi methods disabled - need pdd03 OO specs", 1);
 pir_output_is(<<'CODE', <<'OUTPUT', "mmd bug reported by Jeff");
 .namespace ['Foo']
 
@@ -878,6 +940,7 @@ string
 PMC
 nothing
 OUTPUT
+}
 
 pir_output_is(<<'CODE', <<'OUTPUT', "use a core func for an object");
 .sub main @MAIN

@@ -7,8 +7,7 @@
 .namespace [ "Tcl" ]
 
 .sub "&format"
-  .local pmc argv 
-  argv = foldup
+  .param pmc argv :slurpy
   
   .local string format
 
@@ -17,9 +16,5 @@
 
   sprintf $S0, format, argv 
 
-  $P0 = new String
-  $P0 = $S0
-
-done:
-  .return(TCL_OK,$P0)
+  .return($S0)
 .end

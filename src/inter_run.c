@@ -40,7 +40,7 @@ runops(Interp *interpreter, size_t offs)
 {
     volatile size_t offset = offs;
 
-    interpreter->ctx.runloop_level++;
+    CONTEXT(interpreter->ctx)->runloop_level++;
     /*
      * STACKED_EXCEPTIONS are necessary to catch exceptions in reentered
      * run loops, e.g. if a delegate methods throws an exception
@@ -51,7 +51,7 @@ runops(Interp *interpreter, size_t offs)
     {
         new_internal_exception(interpreter);
         interpreter->exceptions->runloop_level =
-            interpreter->ctx.runloop_level;
+            CONTEXT(interpreter->ctx)->runloop_level;
         if (setjmp(interpreter->exceptions->destination)) {
             /* an exception was thrown */
             offset = handle_exception(interpreter);
@@ -74,7 +74,7 @@ runops(Interp *interpreter, size_t offs)
      *    handler
      */
     if (1 || interpreter->exceptions->runloop_level ==
-            interpreter->ctx.runloop_level) {
+            CONTEXT(interpreter->ctx)->runloop_level) {
         /* if we are coming from an exception and it was thrown deeper
          * in a nested run loop, we just leave this loop
          */
@@ -87,7 +87,7 @@ runops(Interp *interpreter, size_t offs)
     if (STACKED_EXCEPTIONS) {
         free_internal_exception(interpreter);
     }
-    interpreter->ctx.runloop_level--;
+    CONTEXT(interpreter->ctx)->runloop_level--;
     /*
      * not yet - this needs classifying of exceptions and handlers
      * so that only an exit handler does catch this exception
@@ -113,13 +113,13 @@ is an invocable C<Sub> PMC.
 struct parrot_regs_t *
 Parrot_runops_fromc(Parrot_Interp interpreter, PMC *sub)
 {
-    PMC *ret_c, *p1;
+    PMC *ret_c;
     opcode_t offset, *dest;
     struct parrot_regs_t *bp;
 
     /* we need one return continuation with a NULL offset */
-    p1 = REG_PMC(1);
-    REG_PMC(1) = ret_c = new_ret_continuation_pmc(interpreter, NULL);
+    interpreter->current_cont = ret_c =
+        new_ret_continuation_pmc(interpreter, NULL);
 #if GC_VERBOSE
     PObj_report_SET(ret_c);     /* s. also dod.c */
 #endif
@@ -133,9 +133,55 @@ Parrot_runops_fromc(Parrot_Interp interpreter, PMC *sub)
     bp = interpreter->ctx.bp;
     offset = dest - interpreter->code->base.data;
     runops(interpreter, offset);
-    REG_PMC(1) = p1;
     return bp;
 }
+
+
+static struct parrot_regs_t *
+runops_args(Parrot_Interp interpreter, PMC *sub, PMC *obj,
+        STRING *meth, const char* sig, va_list ap)
+{
+    opcode_t offset, *dest;
+    struct parrot_regs_t *bp;
+    parrot_context_t old_ctx;
+    int i;
+    /*
+     * FIXME argument count limited - check strlen of sig
+     */
+    char new_sig[10];
+    const char *sig_p;
+
+    old_ctx = interpreter->ctx;
+    interpreter->current_cont  = new_ret_continuation_pmc(interpreter, NULL);
+    interpreter->current_object = obj;
+    dest = VTABLE_invoke(interpreter, sub, NULL);
+    if (!dest)
+        internal_exception(1, "Subroutine returned a NULL address");
+    if (PMC_IS_NULL(obj)) {
+        sig_p = sig + 1;
+    }
+    else if (sig[1] == 'O') {
+        sig_p = sig + 1;
+    }
+    else  {
+        size_t len = strlen(sig);
+        if (len > 8)
+            internal_exception(1, "too many arguments in runops_args");
+        new_sig[0] = 'O';
+        strcpy(new_sig + 1, sig + 1);
+        sig_p = new_sig;
+    }
+    if (*sig_p) {
+        dest = parrot_pass_args_fromc(interpreter, sig_p, dest,
+                &old_ctx, ap);
+    }
+
+    bp = interpreter->ctx.bp;
+    offset = dest - interpreter->code->base.data;
+    runops(interpreter, offset);
+    return bp;
+}
+
 
 /*
 
@@ -200,233 +246,22 @@ Signatures are similar to NCI:
 
 */
 
-static struct parrot_regs_t *
-runops_args(Parrot_Interp interpreter, PMC *sub, PMC *obj,
-        STRING *meth, const char* sig, va_list ap)
-{
-    opcode_t offset, *dest;
-    struct parrot_regs_t *bp;
-    int next[4], count[4];
-    int i;
-    PMC *ret_c;
-    const char *p;
-    PMC *p3 = PMCNULL;
-    int clear_p3, need_p3, max;
-    PMC *arg;
-
-    for (i = 0; i < 4; i++) {
-        next[i] = 5;
-        count[i] = 0;
-    }
-
-    bp = interpreter->ctx.bp;
-    ret_c = new_ret_continuation_pmc(interpreter, NULL);
-    interpreter->ctx.current_sub = sub;
-    interpreter->ctx.current_cont = ret_c;
-    interpreter->ctx.current_object = obj;
-    dest = VTABLE_invoke(interpreter, sub, NULL);
-    if (!dest)
-        internal_exception(1, "Subroutine returned a NULL address");
-
-    /*
-     * count arguments, check for overflow
-     */
-    for (p = sig + 1; *p; ++p) {
-        switch (*p) {
-            case 'v': break;
-            case 'I': ++count[0]; break;
-            case 'S': ++count[1]; break;
-            case 'P': ++count[2]; break;
-            case 'N': ++count[3]; break;
-        }
-    }
-    REG_INT(0) = 1;     /* kind of a prototyped call */
-    clear_p3 = need_p3 = max = 0;
-    for (i = 0; i < 4; ++i) {
-        if (count[i] < 11)
-            REG_INT(i+1) = count[i];     /* # of I params */
-        else if (count[i] == 11) {
-            REG_INT(i+1) = 11;
-            clear_p3 |= 1;
-        }
-        else {
-            REG_INT(i+1) = 11;
-            need_p3 |= 1;
-            if (count[i] > max)
-                max = count[i];
-        }
-    }
-    if (need_p3) {
-        p3 = pmc_new(interpreter, enum_class_Array);
-        VTABLE_set_integer_native(interpreter, p3, max - 11);
-        REG_PMC(3) = p3;
-    }
-    else if (clear_p3)
-        REG_PMC(3) = p3;
-
-    for (i = 0; *++sig; ) {
-        /*
-         * handle overflow: if any next[] reaches 16 create
-         * overflow array in P3 and pass additional args in the array
-         */
-        switch (*sig) {
-            case 'v':       /* void func, no params */
-                break;
-            case 'I':       /* REG_INT */
-                if (next[0] == 16)
-                    VTABLE_set_integer_keyed_int(interpreter,
-                            p3, i++, va_arg(ap, INTVAL));
-                else
-                    REG_INT(next[0]++) = va_arg(ap, INTVAL);
-                break;
-            case 'S':       /* REG_STR */
-                if (next[1] == 16)
-                    VTABLE_set_string_keyed_int(interpreter,
-                            p3, i++, va_arg(ap, STRING*));
-                else
-                    REG_STR(next[1]++) = va_arg(ap, STRING*);
-                break;
-            case 'P':       /* REG_PMC */
-                arg = va_arg(ap, PMC*);
-                /*
-                 * If this is a Key PMC with registers, we have to clone
-                 * the key.
-                 *
-                 * XXX make a distinct 'K' signature ?
-                 */
-                if (arg->vtable->base_type == enum_class_Key) {
-                    PMC *key;
-                    INTVAL any_registers;
-
-                    for (any_registers = 0, key = arg; key; ) {
-                        if (PObj_get_FLAGS(key) & KEY_register_FLAG) {
-                            any_registers = 1;
-                            break;
-                        }
-                        key = key_next(interpreter, key);
-                    }
-
-                    if (any_registers) {
-                        struct parrot_regs_t *new_bp;
-                        new_bp = interpreter->ctx.bp;
-                        /* need old context */
-                        interpreter->ctx.bp = bp;
-                        /* clone sets key values according to refered
-                         * register items
-                         */
-                        arg = VTABLE_clone(interpreter, arg);
-                        interpreter->ctx.bp = new_bp;
-                    }
-                }
-                if (next[2] == 16)
-                    VTABLE_set_pmc_keyed_int(interpreter, p3, i++, arg);
-                else
-                    REG_PMC(next[2]++) = arg;
-                break;
-            case 'N':       /* REG_NUM */
-                if (next[3] == 16)
-                    VTABLE_set_number_keyed_int(interpreter,
-                            p3, i++, va_arg(ap, FLOATVAL));
-                else
-                    REG_NUM(next[3]++) = va_arg(ap, FLOATVAL);
-                break;
-            default:
-                internal_exception(1,
-                        "unhandle signature '%c' in Parrot_runops_fromc_args",
-                        *sig);
-        }
-    }
-
-    bp = interpreter->ctx.bp;
-    offset = dest - interpreter->code->base.data;
-    runops(interpreter, offset);
-    return bp;
-}
-
-static void*
-set_retval(Parrot_Interp interpreter, int sig_ret, struct parrot_regs_t *bp)
-{
-    void *retval;
-    retval = NULL;
-    /*
-     * XXX should we trust the signature or the registers set
-     *     by the subroutine or both if possible, i.e. extract
-     *     e.g. an INTVAL from a returned PMC?
-     */
-    if (BP_REG_INT(bp, 3) == 1) {
-        /*
-         * pythons functions from pie-thon always return a PMC
-         */
-        switch (sig_ret) {
-            case 'S':
-                return VTABLE_get_string(interpreter, BP_REG_PMC(bp,5));
-            case 'P':
-            case 0:
-                return (void*) BP_REG_PMC(bp,5);
-        }
-    }
-    switch (sig_ret) {
-        case 0:
-        case 'v': break;
-        case 'S': retval = (void* ) BP_REG_STR(bp, 5); break;
-        case 'P': retval = (void* ) BP_REG_PMC(bp,5); break;
-        default:
-            internal_exception(1,
-                    "unhandle signature '%c' in set_retval", sig_ret);
-    }
-    return retval;
-}
-
-static INTVAL
-set_retval_i(Parrot_Interp interpreter, int sig_ret, struct parrot_regs_t *bp)
-{
-    if (sig_ret == 'I') {
-        if (BP_REG_INT(bp, 3) == 1)
-            return VTABLE_get_integer(interpreter, BP_REG_PMC(bp,5));
-        /* else if (BP_REG_INT(bp, 1) == 1) */
-            return BP_REG_INT(bp, 5);
-    }
-    Parrot_warn(interpreter, PARROT_WARNINGS_ALL_FLAG, "argument mismatch");
-    return 0;
-}
-
-static FLOATVAL
-set_retval_f(Parrot_Interp interpreter, int sig_ret, struct parrot_regs_t *bp)
-{
-    if (sig_ret == 'N') {
-        if (BP_REG_INT(bp, 3) == 1)
-            return VTABLE_get_number(interpreter, BP_REG_PMC(bp,5));
-        /* else if (BP_REG_INT(bp, 4) == 1) */
-            return BP_REG_NUM(bp, 5);
-    }
-    Parrot_warn(interpreter, PARROT_WARNINGS_ALL_FLAG, "argument mismatch");
-    return 0;
-}
-
 void *
 Parrot_run_meth_fromc(Parrot_Interp interpreter,
         PMC *sub, PMC *obj, STRING *meth)
 {
     struct parrot_regs_t *bp;
     opcode_t offset, *dest;
-    PMC *p1, *p2;
-    STRING *s0;
 
-    p1 = REG_PMC(1);
-    p2 = REG_PMC(2);
-    s0 = REG_STR(0);
-    REG_PMC(1) = new_ret_continuation_pmc(interpreter, NULL);
-    interpreter->ctx.current_object = obj;
+    interpreter->current_cont = new_ret_continuation_pmc(interpreter, NULL);
+    interpreter->current_object = obj;
     dest = VTABLE_invoke(interpreter, sub, (void*)1);
     if (!dest)
         internal_exception(1, "Subroutine returned a NULL address");
     bp = interpreter->ctx.bp;
     offset = dest - interpreter->code->base.data;
     runops(interpreter, offset);
-    REG_PMC(1) = p1;
-    REG_PMC(2) = p2;
-    REG_STR(0) = s0;
-    return set_retval(interpreter, 0, bp);
+    return set_retval(interpreter, 0, PMC_sub(sub)->seg, bp);
 }
 
 void *
@@ -439,7 +274,7 @@ Parrot_runops_fromc_args(Parrot_Interp interpreter, PMC *sub,
     va_start(args, sig);
     bp = runops_args(interpreter, sub, PMCNULL, NULL, sig, args);
     va_end(args);
-    return set_retval(interpreter, *sig, bp);
+    return set_retval(interpreter, *sig, PMC_sub(sub)->seg, bp);
 }
 
 
@@ -453,7 +288,7 @@ Parrot_runops_fromc_args_reti(Parrot_Interp interpreter, PMC *sub,
     va_start(args, sig);
     bp = runops_args(interpreter, sub, PMCNULL, NULL, sig, args);
     va_end(args);
-    return set_retval_i(interpreter, *sig, bp);
+    return set_retval_i(interpreter, *sig, PMC_sub(sub)->seg, bp);
 }
 
 FLOATVAL
@@ -466,7 +301,7 @@ Parrot_runops_fromc_args_retf(Parrot_Interp interpreter, PMC *sub,
     va_start(args, sig);
     bp = runops_args(interpreter, sub, PMCNULL, NULL, sig, args);
     va_end(args);
-    return set_retval_f(interpreter, *sig, bp);
+    return set_retval_f(interpreter, *sig, PMC_sub(sub)->seg, bp);
 }
 
 void*
@@ -479,7 +314,7 @@ Parrot_run_meth_fromc_args(Parrot_Interp interpreter,
     va_start(args, sig);
     bp = runops_args(interpreter, sub, obj, meth, sig, args);
     va_end(args);
-    return set_retval(interpreter, *sig, bp);
+    return set_retval(interpreter, *sig, PMC_sub(sub)->seg, bp);
 }
 
 INTVAL
@@ -492,7 +327,7 @@ Parrot_run_meth_fromc_args_reti(Parrot_Interp interpreter,
     va_start(args, sig);
     bp = runops_args(interpreter, sub, obj, meth, sig, args);
     va_end(args);
-    return set_retval_i(interpreter, *sig, bp);
+    return set_retval_i(interpreter, *sig, PMC_sub(sub)->seg, bp);
 }
 
 FLOATVAL
@@ -505,7 +340,7 @@ Parrot_run_meth_fromc_args_retf(Parrot_Interp interpreter,
     va_start(args, sig);
     bp = runops_args(interpreter, sub, obj, meth, sig, args);
     va_end(args);
-    return set_retval_f(interpreter, *sig, bp);
+    return set_retval_f(interpreter, *sig, PMC_sub(sub)->seg, bp);
 }
 
 void *
@@ -515,7 +350,7 @@ Parrot_runops_fromc_arglist(Parrot_Interp interpreter, PMC *sub,
     struct parrot_regs_t *bp;
 
     bp = runops_args(interpreter, sub, PMCNULL, NULL, sig, args);
-    return set_retval(interpreter, *sig, bp);
+    return set_retval(interpreter, *sig, PMC_sub(sub)->seg, bp);
 }
 
 INTVAL
@@ -525,7 +360,7 @@ Parrot_runops_fromc_arglist_reti(Parrot_Interp interpreter, PMC *sub,
     struct parrot_regs_t *bp;
 
     bp = runops_args(interpreter, sub, PMCNULL, NULL, sig, args);
-    return set_retval_i(interpreter, *sig, bp);
+    return set_retval_i(interpreter, *sig, PMC_sub(sub)->seg, bp);
 }
 
 FLOATVAL
@@ -535,7 +370,7 @@ Parrot_runops_fromc_arglist_retf(Parrot_Interp interpreter, PMC *sub,
     struct parrot_regs_t *bp;
 
     bp = runops_args(interpreter, sub, PMCNULL, NULL, sig, args);
-    return set_retval_f(interpreter, *sig, bp);
+    return set_retval_f(interpreter, *sig, PMC_sub(sub)->seg, bp);
 }
 
 void*
@@ -545,7 +380,7 @@ Parrot_run_meth_fromc_arglist(Parrot_Interp interpreter,
     struct parrot_regs_t *bp;
 
     bp = runops_args(interpreter, sub, obj, meth, sig, args);
-    return set_retval(interpreter, *sig, bp);
+    return set_retval(interpreter, *sig, PMC_sub(sub)->seg, bp);
 }
 
 INTVAL
@@ -555,7 +390,7 @@ Parrot_run_meth_fromc_arglist_reti(Parrot_Interp interpreter,
     struct parrot_regs_t *bp;
 
     bp = runops_args(interpreter, sub, obj, meth, sig, args);
-    return set_retval_i(interpreter, *sig, bp);
+    return set_retval_i(interpreter, *sig, PMC_sub(sub)->seg, bp);
 }
 
 FLOATVAL
@@ -565,7 +400,7 @@ Parrot_run_meth_fromc_arglist_retf(Parrot_Interp interpreter,
     struct parrot_regs_t *bp;
 
     bp = runops_args(interpreter, sub, obj, meth, sig, args);
-    return set_retval_f(interpreter, *sig, bp);
+    return set_retval_f(interpreter, *sig, PMC_sub(sub)->seg, bp);
 }
 
 /*

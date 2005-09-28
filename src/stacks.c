@@ -150,7 +150,7 @@ stack_entry(Interp *interpreter, Stack_Chunk_t *stack, INTVAL depth)
 
     /* For negative depths, look from the bottom of the stack up. */
     if (depth < 0) {
-        depth = stack_height(interpreter, interpreter->ctx.user_stack) + depth;
+        depth = stack_height(interpreter, CONTEXT(interpreter->ctx)->user_stack) + depth;
         if (depth < 0)
             return NULL;
         offset = (size_t)depth;
@@ -363,7 +363,7 @@ pop_dest(Interp *interpreter)
     /* We don't mind the extra call, so we do this: (previous comment
      * said we *do* mind, but I say let the compiler decide) */
     void *dest;
-    (void)stack_pop(interpreter, &interpreter->ctx.control_stack,
+    (void)stack_pop(interpreter, &CONTEXT(interpreter->ctx)->control_stack,
                     &dest, STACK_ENTRY_DESTINATION);
     return dest;
 }

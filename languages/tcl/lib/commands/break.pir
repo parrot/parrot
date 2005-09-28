@@ -4,24 +4,14 @@
 .namespace [ "Tcl" ]
 
 .sub "&break"
-  .local int return_type
+  .param pmc argv :slurpy
 
-  .local pmc retval
-  retval = new String
-  if I3 == 0 goto noargs
+  .local int argc
+  argc = argv
 
-  return_type = TCL_ERROR
-  retval = "wrong # args: should be \"break\""
-  goto done
+  if argc != 0 goto badargs
+  .tcl_break()
 
-noargs:
-  return_type = TCL_BREAK
-  retval = "" 
-
- # The sole purpose of this command (and break, and continue) is to 
- # generate a specific return code. Normally, when a proc finishes TCL_OK
- # control passes to the next item in the queue.
-
-done:
-  .return(return_type,retval)
+badargs:
+  .throw("wrong # args: should be \"break\"")
 .end

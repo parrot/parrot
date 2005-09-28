@@ -189,7 +189,7 @@ this feature, the definition of mapped registers can be redefined like so:
 
     #define MAP(i) OMAP(i)
     #undef MAP
-    #define MAP(i) (i) >= 0 : 0 ? OMAP(i)
+    #define MAP(i) (i) >= 0 ? 0 : OMAP(i)
 
 =item Parrot_jit_emit_get_base_reg_no(pc)
 

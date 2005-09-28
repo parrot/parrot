@@ -4,12 +4,8 @@
 .namespace [ "Tcl" ]
 
 .sub "&lindex"
-  .local pmc argv 
-  argv = foldup
+  .param pmc argv :slurpy
   
-  .local pmc retval
-  .local int return_type
-
   .local int argc 
   argc = argv
   if argc < 1 goto bad_args
@@ -19,10 +15,8 @@
   _list_index = find_global "_Tcl", "_list_index"
 
   .local pmc list
-  $P0 = argv[0]
-  (return_type, retval) = __list($P0)
-  if return_type == TCL_ERROR goto done
-  list = retval
+  list = argv[0]
+  list = __list(list)
 
 have_list:
   if argc == 1 goto done
@@ -30,36 +24,27 @@ have_list:
 select_elem:
   $P0 = argv[1]
   .local pmc indices
-  (return_type, retval) = __list($P0)
-  if return_type == TCL_ERROR goto done
-  indices = retval
+  indices = __list($P0)
   
   .local int index
   .local int elems
   elems = indices
   $I0 = 0
 select_loop:
-  if $I0 >= elems goto have_elem
-  (return_type, retval) = __list(list)
-  if return_type == TCL_ERROR goto done
-  list = retval
+  if $I0 >= elems goto done
+  list = __list(list)
   
   $P0 = indices[$I0]
-  (return_type, retval) = _list_index(list, $P0)
-  if return_type == TCL_ERROR goto done
-  index = retval
+  index = _list_index(list, $P0)
   list  = list[index]
   
   inc $I0
   goto select_loop
 
-bad_args:
-  retval = new String
-  retval = "wrong # args: should be \"lindex list ?index...?\""
-  .return (TCL_ERROR, retval)
-
-have_elem:
-  retval = list
 done:
-  .return(return_type, retval)
+  .return(list)
+
+bad_args:
+  .throw("wrong # args: should be \"lindex list ?index...?\"")
+
 .end

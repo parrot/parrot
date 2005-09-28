@@ -91,15 +91,17 @@ END:
     classoffset $I0, self, "Stream::Sub"
     getattribute _write, self, $I0
 
-    newsub ret, .Continuation, _sub_write_ret
-    assign self, ret
+    self."_call_writer"(_write, str)
+.end
 
-    .pcc_begin
-    .arg str
-    .pcc_call _write, ret
-_sub_write_ret:
-    .pcc_end
-    
+.sub _call_writer method
+    .param pmc writer
+    .param string str
+    .local pmc cont
+.include "interpinfo.pasm"
+    cont = interpinfo .INTERPINFO_CURRENT_CONT
+    assign self, cont
+    writer(str)
 .end
 
 =item source."rawRead"() (B<internal>)

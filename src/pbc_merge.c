@@ -41,6 +41,7 @@ segments from the input PBC files.
 
 #include "parrot/parrot.h"
 #include "parrot/embed.h"
+#include "parrot/oplib/ops.h"
 
 
 /* This struct describes an input file. */
@@ -233,7 +234,7 @@ pbc_merge_bytecode(Interp *interpreter, struct pbc_merge_input **inputs,
 
 /*
 
-=item C<static void
+=item C<static struct PackFile_ConstTable*
 pbc_merge_constants(Interp *interpreter, struct pbc_merge_input **inputs,
                     int num_inputs, struct PackFile *pf,
                     struct PackFile_ByteCode *bc)>
@@ -243,7 +244,7 @@ This function merges the constants tables from the input PBC files.
 =cut
 
 */
-static void
+static struct PackFile_ConstTable*
 pbc_merge_constants(Interp *interpreter, struct pbc_merge_input **inputs,
                     int num_inputs, struct PackFile *pf,
                     struct PackFile_ByteCode *bc)
@@ -329,10 +330,11 @@ pbc_merge_constants(Interp *interpreter, struct pbc_merge_input **inputs,
         }
     }
 
-    /* Stash merged constants table and count. */
+    /* Stash merged constants table and count and return the new segment. */
     const_seg->constants = constants;
     const_seg->const_count = cursor;
     const_seg->code = bc;
+    return const_seg;
 }
 
 
@@ -340,8 +342,8 @@ pbc_merge_constants(Interp *interpreter, struct pbc_merge_input **inputs,
 
 =item C<static void
 pbc_merge_fixups(Interp *interpreter, struct pbc_merge_input **inputs,
-                 int num_inputs struct PackFile *pf,
-                 struct PackFile_ByteCode *bc)
+                 int num_inputs, struct PackFile *pf,
+                 struct PackFile_ByteCode *bc)>
 
 This function merges the fixups tables from the input PBC files.
 
@@ -446,7 +448,8 @@ pbc_merge_fixups(Interp *interpreter, struct pbc_merge_input **inputs,
 =item C<static void
 pbc_merge_ctpointers(Interp *interpreter, struct pbc_merge_input **inputs,
                      int num_inputs, struct PackFile *pf, 
-                     struct PackFile_ByteCode *bc)>
+                     struct PackFile_ByteCode *bc,
+                     struct PackFile_ConstTable *ct)>
 
 This function corrects the pointers into the constants table found in the
 bytecode.
@@ -457,10 +460,12 @@ bytecode.
 static void
 pbc_merge_ctpointers(Interp *interpreter, struct pbc_merge_input **inputs,
                      int num_inputs, struct PackFile *pf, 
-                     struct PackFile_ByteCode *bc)
+                     struct PackFile_ByteCode *bc,
+                     struct PackFile_ConstTable *ct)
 {
     opcode_t *ops = bc->base.data;
     opcode_t cur_op = 0;
+	opcode_t op_num;
     op_info_t *op;
     int cur_input = 0;
     int cur_arg;
@@ -474,7 +479,8 @@ pbc_merge_ctpointers(Interp *interpreter, struct pbc_merge_input **inputs,
             cur_input++;
 
         /* Get info about this op and jump over it. */
-        op = &interpreter->op_info_table[ops[cur_op]];
+		op_num = ops[cur_op];
+        op = &interpreter->op_info_table[op_num];
         cur_op++;
         
         /* Loop over the arguments. */
@@ -493,6 +499,16 @@ pbc_merge_ctpointers(Interp *interpreter, struct pbc_merge_input **inputs,
 
             /* Move along the bytecode array. */
             cur_op++;
+        }
+
+        /* Handle special case variable argument opcodes. */
+        if (op_num == PARROT_OP_set_args_pc ||
+            op_num == PARROT_OP_get_results_pc ||
+            op_num == PARROT_OP_get_params_pc ||
+            op_num == PARROT_OP_set_returns_pc) {
+            PMC *sig;
+            sig = ct->constants[ops[cur_op - 1]]->u.key;
+            cur_op += VTABLE_elements(interpreter, sig);
         }
     }
 }
@@ -515,6 +531,7 @@ pbc_merge_begin(Interp *interpreter, struct pbc_merge_input **inputs,
 {
     struct PackFile *merged;
     struct PackFile_ByteCode *bc;
+    struct PackFile_ConstTable *ct;
 
     /* Create a new empty packfile. */
     merged = PackFile_new(interpreter, 0);
@@ -526,11 +543,11 @@ pbc_merge_begin(Interp *interpreter, struct pbc_merge_input **inputs,
 
     /* Merge the various stuff. */
     bc = pbc_merge_bytecode(interpreter, inputs, num_inputs, merged);
-    pbc_merge_constants(interpreter, inputs, num_inputs, merged, bc);
+    ct = pbc_merge_constants(interpreter, inputs, num_inputs, merged, bc);
     pbc_merge_fixups(interpreter, inputs, num_inputs, merged, bc);
 
     /* Walk bytecode and fix ops that reference the constants table. */
-    pbc_merge_ctpointers(interpreter, inputs, num_inputs, merged, bc);
+    pbc_merge_ctpointers(interpreter, inputs, num_inputs, merged, bc, ct);
     
     /* Return merged result. */
     return merged;

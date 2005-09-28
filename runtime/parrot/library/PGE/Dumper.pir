@@ -13,6 +13,7 @@ PGE::Dumper - various methods for displaying PGE structures
     .param int indent
     $S0 = repeat ' ', indent
     print $S0
+    .return ()
 .end
 
 .sub "dump" method
@@ -22,6 +23,7 @@ PGE::Dumper - various methods for displaying PGE structures
     $S0 = self."quant"()
     print $S0
     print "\n"
+    .return ()
 .end
 
 .namespace [ "PGE::Exp::Start" ]
@@ -35,6 +37,7 @@ PGE::Dumper - various methods for displaying PGE structures
     print "\n"
     exp1 = self["exp1"]
     exp1."dump"(0)
+    .return ()
 .end
 
 .namespace [ "PGE::Exp::End" ]
@@ -43,6 +46,7 @@ PGE::Dumper - various methods for displaying PGE structures
     .param int indent
     self."dumpindent"(indent)
     print "End\n"
+    .return ()
 .end
 
 .namespace [ "PGE::Exp::Literal" ]
@@ -58,6 +62,7 @@ PGE::Dumper - various methods for displaying PGE structures
     $S0 = self."quant"()
     print $S0
     print "\n"
+    .return ()
 .end
 
 .namespace [ "PGE::Exp::Scalar" ]
@@ -73,6 +78,7 @@ PGE::Dumper - various methods for displaying PGE structures
     $S0 = self."quant"()
     print $S0
     print "\n"
+    .return ()
 .end
 
 .namespace [ "PGE::Exp::Dot" ]
@@ -84,6 +90,7 @@ PGE::Dumper - various methods for displaying PGE structures
     $S0 = self."quant"()
     print $S0
     print "\n"
+    .return ()
 .end
 
 .namespace [ "PGE::Exp::CharClass" ]
@@ -101,6 +108,7 @@ PGE::Dumper - various methods for displaying PGE structures
     $S0 = self."quant"()
     print $S0
     print "\n"
+    .return ()
 .end
 
 .namespace [ "PGE::Exp::WS" ]
@@ -112,6 +120,7 @@ PGE::Dumper - various methods for displaying PGE structures
     $S0 = self."quant"()
     print $S0
     print "\n"
+    .return ()
 .end
 
 .namespace [ "PGE::Exp::Anchor" ]
@@ -124,6 +133,7 @@ PGE::Dumper - various methods for displaying PGE structures
     token = self["token"]
     print token
     print "\n"
+    .return ()
 .end
 
 
@@ -135,6 +145,7 @@ PGE::Dumper - various methods for displaying PGE structures
     $P0."dump"(indent)
     $P0 = self["exp2"]
     $P0."dump"(indent)
+    .return ()
 .end
 
 .namespace [ "PGE::Exp::Alt" ]
@@ -160,6 +171,7 @@ PGE::Dumper - various methods for displaying PGE structures
     $I1 += 4
   print_exp2:
     exp."dump"($I1)
+    .return ()
 .end
 
 
@@ -201,5 +213,6 @@ PGE::Dumper - various methods for displaying PGE structures
     exp = self["exp1"] 
     indent += 4
     exp."dump"(indent)
+    .return ()
 .end
 

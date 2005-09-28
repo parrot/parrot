@@ -53,7 +53,7 @@ pmclass MultiSub extends ResizablePMCArray need_ext does array {
     }
 
     void* invoke(void *next) {
-        PMC *func = Parrot_MMD_dispatch_func(INTERP, SELF, NULL, REG_STR(1));
+        PMC *func = Parrot_MMD_dispatch_func(INTERP, SELF, NULL);
         return VTABLE_invoke(INTERP, func, next);
     }
 }

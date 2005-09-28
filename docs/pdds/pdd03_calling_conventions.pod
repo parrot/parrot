@@ -119,12 +119,17 @@ C<set_args> and C<set_returns>:
                slurpy flag on the corresponding parameter, then
                the content of this aggregate is flattened.
 
+    0b100000  OPTIONAL
+                Optional arguments are not considered in an
+		argument count mismatch.
+
+    0b1000000 OPT_FLAG
+                A INT argument with this bit set receives a bit 1/0,
+		if the preceeding I<OPTIONAL> was passed or not.
+
     0b000000000
             INVOCANT
             INVOCANT2
-
-    0b000000000
-            OPTIONAL
 
     0b000000000
             NAMED

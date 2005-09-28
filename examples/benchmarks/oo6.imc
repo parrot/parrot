@@ -38,12 +38,13 @@ loop:
 .end
 
 .pcc_sub i method
-    .param pmc v
+    .param pmc v     :optional
+    .param int has_v :opt_flag
     .local int ofs
     ofs = classoffset self, "Foo"
     .local pmc r
     r = getattribute self, ofs
-    unless argcP goto get
+    unless has_v goto get
     assign r, v
 get:
     .pcc_begin_return
@@ -52,13 +53,14 @@ get:
 .end
 
 .pcc_sub j method
-    .param pmc v
+    .param pmc v     :optional
+    .param int has_v :opt_flag
     .local int ofs
     ofs = classoffset self, "Foo"
     inc ofs
     .local pmc r
     r = getattribute self, ofs
-    unless argcP goto get
+    unless has_v goto get
     assign r, v
 get:
     .pcc_begin_return

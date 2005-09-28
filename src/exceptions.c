@@ -156,7 +156,7 @@ push_exception(Interp * interpreter, PMC *handler)
 {
     if (handler->vtable->base_type != enum_class_Exception_Handler)
         PANIC("Tried to set_eh a non Exception_Handler");
-    stack_push(interpreter, &interpreter->ctx.control_stack, handler,
+    stack_push(interpreter, &CONTEXT(interpreter->ctx)->control_stack, handler,
             STACK_ENTRY_PMC, STACK_CLEANUP_NULL);
 }
 
@@ -178,14 +178,14 @@ Parrot_push_action(Interp * interpreter, PMC *sub)
                 const_string(interpreter, "Sub"))) {
         internal_exception(1, "Tried to push a non Sub PMC action");
     }
-    stack_push(interpreter, &interpreter->ctx.control_stack, sub,
+    stack_push(interpreter, &CONTEXT(interpreter->ctx)->control_stack, sub,
             STACK_ENTRY_ACTION, run_cleanup_action);
 }
 
 void
 Parrot_push_mark(Interp * interpreter, INTVAL mark)
 {
-    stack_push(interpreter, &interpreter->ctx.control_stack, &mark,
+    stack_push(interpreter, &CONTEXT(interpreter->ctx)->control_stack, &mark,
             STACK_ENTRY_MARK, STACK_CLEANUP_NULL);
 }
 
@@ -194,10 +194,10 @@ Parrot_pop_mark(Interp * interpreter, INTVAL mark)
 {
     Stack_Entry_t *e;
     do {
-        e = stack_entry(interpreter, interpreter->ctx.control_stack, 0);
+        e = stack_entry(interpreter, CONTEXT(interpreter->ctx)->control_stack, 0);
         if (!e)
             internal_exception(1, "mark not found");
-        (void)stack_pop(interpreter, &interpreter->ctx.control_stack,
+        (void)stack_pop(interpreter, &CONTEXT(interpreter->ctx)->control_stack,
                         NULL, e->entry_type);
         if (e->entry_type == STACK_ENTRY_MARK) {
             if (UVal_int(e->entry) == mark)
@@ -230,7 +230,7 @@ find_exception_handler(Interp * interpreter, PMC *exception)
     message = VTABLE_get_string_keyed_int(interpreter, exception, 0);
     do {
         Stack_Entry_t *e = stack_entry(interpreter,
-                interpreter->ctx.control_stack, 0);
+                CONTEXT(interpreter->ctx)->control_stack, 0);
         if (!e)
             break;
         if (e->entry_type == STACK_ENTRY_ACTION) {
@@ -241,9 +241,10 @@ find_exception_handler(Interp * interpreter, PMC *exception)
              */
             PMC *sub = UVal_pmc(e->entry);
             e->cleanup = STACK_CLEANUP_NULL;
+            Parrot_alloc_context(interpreter);
             Parrot_runops_fromc_args(interpreter, sub, "vI", 1);
         }
-        (void)stack_pop(interpreter, &interpreter->ctx.control_stack,
+        (void)stack_pop(interpreter, &CONTEXT(interpreter->ctx)->control_stack,
                         NULL, e->entry_type);
         if (e->entry_type == STACK_ENTRY_PMC) {
             handler = UVal_pmc(e->entry);
@@ -319,11 +320,11 @@ pop_exception(Interp * interpreter)
     Stack_entry_type type;
     PMC *handler;
 
-    handler = stack_peek(interpreter, interpreter->ctx.control_stack, &type);
+    handler = stack_peek(interpreter, CONTEXT(interpreter->ctx)->control_stack, &type);
     if (type != STACK_ENTRY_PMC ||
             handler->vtable->base_type != enum_class_Exception_Handler)
         return; /* no exception on TOS */
-    (void)stack_pop(interpreter, &interpreter->ctx.control_stack, NULL,
+    (void)stack_pop(interpreter, &CONTEXT(interpreter->ctx)->control_stack, NULL,
                     STACK_ENTRY_PMC);
 }
 

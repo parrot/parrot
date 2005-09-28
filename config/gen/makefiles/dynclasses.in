@@ -10,6 +10,10 @@ PMCS = \
 #CONDITIONED_LINE(has_gdbm):gdbmhash \
   match \
   matchrange \
+  subproxy \
+  foo
+
+DISABLED_PMCS = \
   pybuiltin \
   pyclass \
   pyobject \
@@ -35,9 +39,7 @@ PMCS = \
   pytuple \
   pyproxytype \
   pyproxyclass \
-  pyiter \
-  subproxy \
-  foo
+  pyiter
 
 BUILD = $(PERL) "${build_dir}${slash}build_tools${slash}build_dynclasses.pl"
 

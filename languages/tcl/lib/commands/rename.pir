@@ -4,56 +4,45 @@
 .namespace [ "Tcl" ]
 
 .sub "&rename"
-  .param pmc old_p
-  .param pmc new_p
+  .param pmc argv :slurpy
 
-  if I3 != 2 goto error
+  .local int argc
+  argc = argv
 
-  .local int return_type
-  .local pmc retval
-  retval = new String 
+  if argc != 2 goto error
+  .local string old_s
+  old_s = argv[0]
+  .local string new_s
+  new_s = argv[1]
 
-  return_type = TCL_OK
-  retval = ""
-
-  .local string oldName
-  .local string newName
- 
-  oldName = old_p
-  oldName = "&" . oldName
-  newName = new_p
-  newName = "&" . newName
+  .local string old_proc,new_proc
+  old_proc = "&" . old_s
+  new_proc = "&" . new_s
 
   .local pmc theSub
-
   # If newName is empty, then just delete
-  if newName == "" goto delete
+  if new_s == "" goto delete
 
 add:
   # Grab the original sub
   push_eh doesnt_exist
-    theSub = find_global "Tcl", oldName
+    theSub = find_global "Tcl", old_proc
   clear_eh
   # Create the new sub
-  store_global "Tcl", newName, theSub
+  store_global "Tcl", new_proc, theSub
 
 delete:
-  null theSub 
-  store_global "Tcl", oldName, theSub
-  goto done 
+  null theSub
+  store_global "Tcl", old_proc, theSub
+  .return("")
 
 doesnt_exist:
-  return_type = TCL_ERROR
-  retval = "can't rename \""
-  $S0 = old_p
-  retval .= $S0
-  retval .= "\": command doesn't exist"
-  goto done
+  $S0 = "can't rename \""
+  $S0 .= old_s
+  $S0 .= "\": command doesn't exist"
+  .throw ($S0)
 
 error:
-  return_type = TCL_ERROR
-  retval = "wrong # args: should be \"rename oldName newName\""
+  .throw ("wrong # args: should be \"rename oldName newName\"")
 
-done:
-  .return(return_type,retval)
 .end

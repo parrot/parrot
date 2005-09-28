@@ -38,27 +38,9 @@ C<Eval> PMC with a new PackFile attached.
 
     void* invoke (void * code_ptr) {
         Parrot_csub_t func = (Parrot_csub_t)D2FPTR(PMC_data(SELF));
-        PMC *sub, *p5;
-        STRING *s5;
-        INTVAL i0[5];
-
-        /*
-         * preserve regs - TODO if it's a Sub bump frame pointer
-         */
-        s5 = REG_STR(5);
-        p5 = REG_PMC(5);
-        REG_STR(5) = (String*) code_ptr;
-        mem_sys_memcopy(i0, &REG_INT(0), sizeof(INTVAL) * 5);
-
+        INTERP->current_cont = NULL;
         func(INTERP, SELF);
-
-        mem_sys_memcopy(&REG_INT(0), i0, sizeof(INTVAL) * 5);
-        /* return value PMC is in P5 */
-        sub = REG_PMC(5);
-        REG_PMC(5) = p5;
-        REG_STR(5) = s5;
-
-        return sub;
+        return code_ptr;
     }
 }
 

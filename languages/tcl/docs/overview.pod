@@ -1,27 +1,28 @@
-=head1 OVERVIEW
+=head1 HISTORY
 
 This was originally written as a perl5 script. Rather than doing bootstrapping,
 I foolishly decided it would be fun to write the parser IN parrot assembly,
 esp. as this would help implementing "eval" and "proc" (Of course, in
 retrospect, I really wish I had kept with the bootstrapping effort, as I think
 it would have generated usable results sooner. Ah well, I now know more than
-I want to about IMCC. =-)
+I want to about PIR.
 
-This is a from-scratch implementation, based only on the tcl man page(s).
+=head1 OVERVIEW 
+
+This is a from-scratch implementation, based primarily on the tcl man page(s),
+and the cvs-current test suite for tcl.
+
 Another interesting project would have been to modify the tcl source and 
 have it generate parrot directly. Many people smarter than I am have
 declared this I<hard>, so I'm rather happy I'm working on it this way.  
-
 (Apparently Tcl's bytecode engine is very optimized for Tcl (big surprise).
-So, converting the tcl-specific bytecodes there to parrot would apparently
-be a big deal.)
+So, converting the tcl-specific bytecodes there to parrot would be a big deal.)
 
 =head1 RUNNING TCL
 
 =head2 Generated Files
 
-When you make tcl, you're generating two files in addition to the classes that
-get compiled.  
+When you make tcl, you're generating several files:
 
 =over 4
 
@@ -32,9 +33,9 @@ the appropriate namespaces, as well as declare and register the TCL
 compiler for the C<compile> opcode.
 
 This file is actually built in two steps. The first step uses C<tcl.pl>
-to generate C<lib/tcllib.pir>, using C<tcl.pir_template> as a template.
+to generate C<lib/tcllib.imc>, using C<tcl.imc_template> as a template.
 The file is basically passed through unchanged, except for a few C<${ }>
--style substitutions. C<INCLUDES> make sure all the required C<.pir> files
+-style substitutions. C<INCLUDES> make sure all the required C<.imc> files
 are included properly. It adds a C<HEADER>, and removes any C<XXX> comments.
 
 =item tcl.pbc
@@ -46,6 +47,14 @@ and uses the tcl library to parse those contents as tcl.
 =back
 
 =head2 Classes
+
+The classes are not user-visible, but are internal helper classes designed
+to simplify the parser/interpreter. They are written in PIR and are in
+C<lib>. All the helper classes provide an C<interpret> method, which can be
+called to calculate its value. For C<TclConst>, this is a very
+straightforward return, while for C<TclCommandList> does dynamic lookup on
+the various commands, executing each in turn, returning the value of the
+last command.
 
 =over 4
 
@@ -77,12 +86,70 @@ The values of these segments are concatenated together and passed to the puts co
 
 =back
 
+=head2 PMCS
+
+The Tcl PMCs (Parrot Magic Cookies) are the user visible data types. These
+live in the C<*.pmc> files in C<classes/>. They are compiled into a
+dynamically loadable library. Most of the functionality associated with
+these pmcs is derived from the base parrot classes.
+
+=over 4
+
+=item TclString
+
+Scalar string, with an override for the boolean truth values.
+
+=item TclInt
+
+Scalar integer, with an override for various math. (For example, parrot
+automatically promotes to float division, while Tcl should not.)
+
+=item TclFloat
+
+Scalar float, with an override of the stringification: Tcl floats are
+somewhat unusual in that integer-valued floats stringify with a trailing C<.0>.
+
+=item TclList
+
+Ordered container, corresponding to C<[list]> values. Overrides the default
+stringification provided by parrot Arrays.
+
+=item TclArray
+
+Hash like container, corresponding to C<[array]> values.
+
+=item TclObject
+
+A virtual type, which is used to provide some shimmer (aka morph) methods
+common to all the scalar value types.
+
+=back
+
 =head1 TESTS
 
 To run the test suite, C<make test>. If you want to also get output from the
-TODO tests, C<make devtest> instead. This is NOT the tcl test suite, it's
-a very small subset of features that I was sick of fixing everytime I made
-a small change to the parser.
+TODO tests, C<make devtest> instead. This is NOT the tcl test suite.
+No failures are expected.
+
+To run the tcl test suite, type "make tcl-test". This will checkout the latest
+cvs copy of the tests from the tcl repository and run them. Warning:
+
+=over 4
+
+=item 1 Sloooow
+
+=item 2 Buggy
+
+several of the tests hang, you may have to run C<killall parrot> several times
+during the run.
+
+=item 3 Incomplete
+
+We convert the tests to use Perl's TAP instead of running
+them natively. The conversion process is flawed, and we don't claim to
+implement 100% of Tcl yet anyway. Expect a low pass rate.
+
+=back
 
 =head1 EXAMPLES
 

@@ -66,7 +66,7 @@ Returns a pointer to the current scratchpad.
 PMC *
 scratchpad_get_current(Interp * interp)
 {
-    return (PMC *)stack_peek(interp, interp->ctx.pad_stack, NULL);
+    return (PMC *)stack_peek(interp, CONTEXT(interp->ctx)->pad_stack, NULL);
 }
 
 /*

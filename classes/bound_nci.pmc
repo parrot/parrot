@@ -63,15 +63,11 @@ Set the bound object live.
              * see also classes/default.pmc:get_attr_str()
              * */
             PMC *multi = PMC_struct_val(SELF);
-            INTVAL i = REG_INT(3)++;
-            while (i--)
-                REG_PMC(6+i)=REG_PMC(5+i);
-            REG_PMC(5) = PMC_pmc_val(SELF);
             next = VTABLE_invoke(INTERP, multi, next);
         }
         else {
             PMC *p2 = REG_PMC(2);
-            REG_PMC(2) = PMC_pmc_val(SELF);
+            INTERP->current_object = REG_PMC(2) = PMC_pmc_val(SELF);
             SUPER(next);
             REG_PMC(2) = p2;
         }

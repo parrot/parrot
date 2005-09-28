@@ -865,16 +865,15 @@ needed).
 
 .sub "p6rule"
     .param string pattern                          # pattern to compile
-    .param string grammar      #:optional           # grammar to store in
-    .param string name         #:optional           # name of rule
-    #.param int    opt_argc     :opt_count
-    .local int argc
+    .param string grammar      :optional           # grammar to store in
+    .param int    has_gram     :opt_flag
+    .param string name         :optional           # name of rule
+    .param int    has_name     :opt_flag
     .local pmc lex
     .local pmc exp
     .local pmc code
     .local pmc rule
 
-    argc = argcS
     lex = new Hash
     lex["pos"] = 0
     lex["subp"] = 0
@@ -896,9 +895,10 @@ needed).
     code = new String
     exp.gen(code, "R", "fail")
     $P0 = compreg "PIR"
+    compreg $P0, "PIR"
     $S0 = code
-    rule = compile $P0, $S0 
-    if argc < 3 goto p6rule_3
+    rule = $P0($S0)
+    unless has_name goto p6rule_3
     $I0 = findclass grammar
     if $I0 goto p6rule_2
     $P0 = getclass "PGE::Rule"

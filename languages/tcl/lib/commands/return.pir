@@ -4,33 +4,21 @@
 .namespace [ "Tcl" ]
 
 .sub "&return"
-   .local pmc argv 
-  argv = foldup
+   .param pmc argv :slurpy
  
   .local int argc 
   argc = argv
 
-  .local pmc retval
-  retval = new String
   if argc == 0 goto noargs
   if argc == 1 goto onearg
 
-  # XXX use TCL_ERROR here...
-  print "bad call to return"
-  retval = ""
-  goto done
+  .throw ("XXX: bad call to return")
 
 onearg:
-  retval = argv[0]
-  goto done
+  $P0 = argv[0]
+  .tcl_return($P0)
 
 noargs:
-  retval = "" 
+  .tcl_return ("")
 
- # The sole purpose of this command (and break, and continue) is to 
- # generate a specific return code. Normally, when a proc finishes TCL_OK
- # control passes to the next item in the queue.
-
-done:
-  .return(TCL_RETURN,retval)
 .end

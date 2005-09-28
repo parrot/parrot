@@ -1,0 +1,78 @@
+Deprecated opcodes (branches/leo-ctx5 first)
+
+findclass(out INT, in STR)
+
+  returns a boolean bit if the class exists. The opocde name is misleading
+  doesn't conform to other find_ ops and the functionality is covered by
+  C<find_type>.
+
+  use find_type > 0 instead
+
+newsub(in INT, in INT, labelconst INT, labelconst INT)
+
+  Creates a sub in P0 and a continuation in P1. It was a premature
+  attempt to be able to create a return continuation outside a loop.
+  This isn't needed anymore due to continuation recycling and the opcode
+  also has implicit register usage (P0, P1).
+
+  use 3 arg newsub, find_global, set_p_pc, or just foo() syntax
+
+isnull(in PMC, labelconst INT)
+
+  Despite it's name this is a branching opcode. The name is misleading.
+
+  use if_null or unless_null instead.
+
+Register stack opcodes
+
+pop{i,s,p,n}, popbottom{i,s,p,n}, poptop{i,s,p,n},
+push{i,s,p,n}, pushbottom{i,s,p,n}, pushtop{i,s,p,n},
+savetop, restoretop,
+
+  With the upcoming variable-sized register frame handling these opcodes
+  will stop working and are useless anyway.
+
+  use saveall/restoreall (whole register frame) or
+  user stack opcodes save/restore instead.
+
+Integer stack opcodes
+
+intsave/intrestore/intdepth
+
+  The integer stack was an invention for rx_ opcodes, but as it's a
+  global stack, regexen using these opcodes aren't reentrant.
+
+  use a ResizableIntegerPMC instead and standard keyed access
+
+set_eh
+
+  already dprecated
+  use push_eh
+
+die, die(in INT), die_hard(int INT, in INT)
+
+  die is a special case of die_hard, but the name of the latter isn't
+  really nice. Therefore die_hard with be renamed to die, the 2 argument
+  form of die survives.
+
+Deprecated PIR directives and shortcuts.
+
+
+Stack calling convention PIR directives
+
+.param, .result, .arg, .return
+
+  All have a different functionality, if stack calling conventions are used.
+  This leads to unneeded complexity in the parser and to nasty workarounds
+  (.param works only directly after a .sub statement, .return var is always
+  'save' and so on.
+
+  use save or restore instead
+
+call xxx
+
+  This is one char longer then it's translation 'bsr' - it's just not needed.
+
+
+
+

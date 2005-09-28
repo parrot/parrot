@@ -203,13 +203,22 @@ SP              [ ]
 ".pcc_begin_yield"    return(PCC_BEGIN_YIELD);
 ".pcc_end_yield"      return(PCC_END_YIELD);
 
-"method"        return(METHOD);
+"method"        return(METHOD); /* old compat cruft -
+                                  the canonical colon names are below */
 <emit,INITIAL>"@MULTI"   return(MULTI);
 <emit,INITIAL>"@MAIN"    return(MAIN);
 <emit,INITIAL>"@LOAD"    return(LOAD);
 <emit,INITIAL>"@IMMEDIATE"    return(IMMEDIATE);
 <emit,INITIAL>"@POSTCOMP"    return(POSTCOMP);
 <emit,INITIAL>"@ANON"    return(ANON);
+
+":method"        return(METHOD);
+<emit,INITIAL>":multi"   return(MULTI);
+<emit,INITIAL>":main"    return(MAIN);
+<emit,INITIAL>":load"    return(LOAD);
+<emit,INITIAL>":immediate"    return(IMMEDIATE);
+<emit,INITIAL>":postcomp"    return(POSTCOMP);
+<emit,INITIAL>":anon"    return(ANON);
 
 ".result"       return(RESULT);
 ".yield"        return(YIELDT);
@@ -218,6 +227,7 @@ SP              [ ]
 ":flat"         return(ADV_FLAT);
 ":slurpy"       return(ADV_SLURPY);
 ":optional"     return(ADV_OPTIONAL);
+":opt_flag"     return(ADV_OPT_FLAG);
 
 ".class"        return(CLASS);
 ".endclass"     return(ENDCLASS);
@@ -392,33 +402,13 @@ SP              [ ]
 		    return VAR;
 		}
                 if (cur_unit && cur_unit->instructions &&
-                        (r = cur_unit->instructions->r[1]) &&
+                        (r = cur_unit->instructions->r[0]) &&
                         r->pcc_sub) {
                     if ((r->pcc_sub->pragma & P_METHOD) &&
                         !strcmp(yytext, "self")) {
                         valp->sr  = mk_ident(interp, str_dup("self"), 'P');
                         cur_unit->type |= IMC_HAS_SELF;
                         return VAR;
-                    }
-                    if (!strcmp(yytext, "argcI")) {
-                        valp->s = str_dup("I1");
-                        return REG;
-                    }
-                    if (!strcmp(yytext, "argcS")) {
-                        valp->s = str_dup("I2");
-                        return REG;
-                    }
-                    if (!strcmp(yytext, "argcP")) {
-                        valp->s = str_dup("I3");
-                        return REG;
-                    }
-                    if (!strcmp(yytext, "argcN")) {
-                        valp->s = str_dup("I4");
-                        return REG;
-                    }
-                    if (!strcmp(yytext, "is_prototyped")) {
-                        valp->s = str_dup("I0");
-                        return REG;
                     }
                 }
 	}

@@ -32,6 +32,7 @@ stopped. See the L<Glossary|docs/glossary.pod> for more information.
 
 #include "parrot/parrot.h"
 #include "parrot/method_util.h"
+#include "parrot/oplib/ops.h"
 #include <assert.h>
 
 /*
@@ -91,23 +92,71 @@ Swaps the "context".
 */
 
     void* invoke (void* next) {
-        struct Parrot_coro * sub = PMC_coro(SELF);
+        struct Parrot_coro * co = PMC_coro(SELF);
         struct PackFile_ByteCode *wanted_seg;
-        void * dest = sub->address;
-        int argcP = REG_INT(3);
+        opcode_t * dest = co->address;
+        parrot_context_t ctx;
 
-        sub->address = next;
+        ctx = INTERP->ctx;
+
+        if (!co->ctx.bp) {
+            PMC *pad, *ccont;
+
+            ccont = INTERP->current_cont;
+            if (ccont == NEED_CONTINUATION) {
+                ccont = new_ret_continuation_pmc(interpreter, next);
+            }
+            /*
+             * first time set current sub, cont, object
+             */
+            Parrot_alloc_context(INTERP);
+            co->ctx = INTERP->ctx;
+            wanted_seg = co->seg;
+            co->caller_seg = INTERP->code;
+            pad = scratchpad_get_current(INTERP);
+            if (pad) {
+                stack_push(INTERP, &CONTEXT(co->ctx)->pad_stack, pad,
+                        STACK_ENTRY_PMC, STACK_CLEANUP_NULL);
+            }
+            CONTEXT(co->ctx)->current_sub = SELF;
+            CONTEXT(co->ctx)->current_cont = ccont;
+            PMC_cont(ccont)->from_ctx = INTERP->ctx;
+            CONTEXT(co->ctx)->current_object = NULL;
+            INTERP->current_object = NULL;
+            INTERP->current_cont = NULL;
+
+            PObj_get_FLAGS(SELF) |= SUB_FLAG_CORO_FF;
+            CONTEXT(INTERP->ctx)->current_args = INTERP->current_args;
+            INTERP->current_args = NULL;
+            /* copy args from interpreter */
+            if (*dest == PARROT_OP_get_params_pc) {
+                INTERP->current_params = dest;
+                dest = parrot_pass_args(INTERP, wanted_seg,
+                        ctx.bp,
+                        PARROT_OP_get_params_pc);
+            }
+        }
         /* if calling the Coro we need the segment of the Coro */
-        if (!(PObj_get_FLAGS(SELF) & SUB_FLAG_CORO_FF)) {
-            wanted_seg = sub->seg;
+        else if (!(PObj_get_FLAGS(SELF) & SUB_FLAG_CORO_FF)) {
+            PObj_get_FLAGS(SELF) |= SUB_FLAG_CORO_FF;
+            wanted_seg = co->seg;
             /* remember segment of caller */
-            sub->caller_seg = INTERP->code;
+            INTERP->ctx = co->ctx;
         }
         else {
-            wanted_seg = sub->caller_seg;
+            PObj_get_FLAGS(SELF) &= ~SUB_FLAG_CORO_FF;
+            wanted_seg = co->caller_seg;
+            ctx.rctx = CONTEXT(ctx)->prev;
+            INTERP->ctx = ctx;
+            /* yield values */
+            if (INTERP->current_returns)
+                parrot_pass_args(INTERP, wanted_seg,
+                        co->ctx.bp,
+                        PARROT_OP_get_results_pc);
         }
-        swap_context(INTERP, SELF);
 
+        /* toggle address */
+        co->address = next;
         if (INTERP->code != wanted_seg) {
             Parrot_switch_to_cs(INTERP, wanted_seg, 1);
         }
@@ -126,10 +175,13 @@ Marks the coroutine as live.
 
     void mark () {
         struct Parrot_coro *c = PMC_coro(SELF);
+#if 0
         mark_stack(INTERP, c->co_control_stack);
         mark_stack(INTERP, c->co_control_base);
-        /* mark_stack(INTERP, c->co_pad_stack); */
-        mark_context(INTERP, &c->ctx);
+        mark_stack(INTERP, c->co_pad_stack);
+#endif
+        if (c && c->ctx.bp)
+            mark_context(INTERP, &c->ctx);
     }
 }
 

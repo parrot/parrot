@@ -73,6 +73,18 @@ void Parrot_exit(int status) {
 
     /* Must write the loop this way to protect against an exit handler calling
        exit and re-entering this function. */
+
+    /* we are well "below" the runloop now, where lo_var_ptr
+     * is set usually - exit handlers may run some resource-hungry
+     * stuff like printing profile stats - a DOD run would kill
+     * resources - reset stacktop
+     *
+     * ARGH  --leo: this damned function doesn't have an interpreter arg
+     * XXX FIXME - API
+     *
+     * XXX FIXME - and what about multiple interpreters - the first exit
+     *             call would run all exit handlers
+     */
     while (exit_handler_list) {
         handler_node_t *node = exit_handler_list;
         exit_handler_list = exit_handler_list->next;

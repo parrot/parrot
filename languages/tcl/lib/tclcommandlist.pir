@@ -11,18 +11,17 @@
 
 .sub interpret method
   .local pmc retval
-  .local int i, elems, return_type
+  .local int i, elems
   elems = self
   i     = 0
 
 loop:
   if i == elems goto done
   $P0 = self[i]
-  (return_type, retval) = $P0."interpret"()
+  retval = $P0."interpret"()
   inc i
-  if return_type != TCL_OK goto done
   goto loop
-
 done:
-  .return(return_type, retval)
+  .return (retval) 
+
 .end

@@ -321,6 +321,8 @@ baz
 Foo::Bar
 OUTPUT
 
+SKIP: {
+	skip("disabled class method", 1);
 pir_output_is(<<'CODE', <<'OUTPUT', "segv in get_name");
 .namespace ['pugs';'main']
 .sub main @MAIN
@@ -333,3 +335,5 @@ pir_output_is(<<'CODE', <<'OUTPUT', "segv in get_name");
 CODE
 ok
 OUTPUT
+
+}

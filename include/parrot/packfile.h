@@ -123,9 +123,9 @@ struct PackFile_FixupEntry {
 
 
 typedef enum {
+    enum_fixup_none,
     enum_fixup_label,
-    enum_fixup_sub,
-    enum_fixup_var
+    enum_fixup_sub
 } enum_fixup_t;
 
 struct PackFile_FixupTable {

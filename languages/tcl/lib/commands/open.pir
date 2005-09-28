@@ -1,14 +1,10 @@
 .namespace [ "Tcl" ]
 
 .sub "&open"
-  .local pmc argv 
-  argv = foldup
+  .param pmc argv :slurpy
 
-  .local int return_type
-  .local pmc retval,channel,next_channel_id,channels
+  .local pmc channel,next_channel_id,channels
   .local string channel_id
-
-  retval = new String
 
   .local int argc
   argc = argv
@@ -26,20 +22,12 @@
   channel_id .= $S0
   next_channel_id += 1
   channels[channel_id] = channel
-  goto done
+  .return(channel_id)
  
 file_error:
-  retval = new String
-  retval = "unable to open specified file"
-  .return(TCL_ERROR,retval)
+  .throw ("unable to open specified file")
  
 error:
-  retval = new String
-  retval = "bad call to open"
-  .return(TCL_ERROR,retval)
+  .throw ("XXX: bad call to open")
 
-done:
-  retval = new String
-  retval = channel_id
-  .return(return_type,retval)
 .end

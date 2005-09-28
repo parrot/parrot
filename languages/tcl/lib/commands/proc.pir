@@ -7,15 +7,21 @@ Create a PIR sub on the fly for this user defined proc.
 .namespace [ "Tcl" ]
 
 .sub "&proc"
-  .param pmc name_p
-  .param pmc args_p
-  .param pmc body_p
+  .param pmc argv :slurpy
 
-  if I3 != 3 goto error
+  .local int argc
+  argc = argv
 
-  .local int return_type
+  if argc != 3 goto error
+
+  .local string name
+  name   = argv[0]
+  .local pmc args_p
+  args_p = argv[1]
+  .local pmc body_p
+  body_p = argv[2]
+
   .local pmc retval
-  return_type = TCL_OK
 
   .local pmc parse
   parse = find_global "_Tcl", "parse"
@@ -23,12 +29,8 @@ Create a PIR sub on the fly for this user defined proc.
   .local pmc __list
   __list = find_global "_Tcl", "__list"
 
-  .local string name, args
-
-  name = name_p
-  (return_type, retval) = __list(args_p)
-  if return_type == TCL_ERROR goto done
-  args_p = retval
+  args_p = __list(args_p)
+  .local string args
   args = args_p
 
 got_args:
@@ -40,10 +42,10 @@ got_args:
   register parsed_body
 
   # XXX these need to go away - for now, we'll just escape
-  # the code portion and put it, escaped, into the proc 
+  # the code portion and put it, escaped, into the proc
   # definition. The arg list will be used to generate the proc's
   # indvidual argument handling code.
- 
+
   # Now, shove the parsed routine into the global hash...
   $P0 = find_global "_Tcl", "proc_parsed"
   $P0[name] = parsed_body
@@ -65,12 +67,14 @@ got_args:
   .local string proc_body
   proc_body  = ".namespace [\"Tcl\"]\n.sub \"&"
   proc_body .= name
-  proc_body .= "\"\n  .local pmc args\n  args = foldup\n  new_pad 1\n  "
+  proc_body .= "\"\n"
+  proc_body .= ".param pmc args :slurpy\n  new_pad 1\n  "
+  proc_body .= "  .include \"languages/tcl/lib/returncodes.pir\"\n  " 
   proc_body .= ".local pmc call_level\n  call_level = find_global \"_Tcl\", \"call_level\"\n  inc call_level\n  "
-  .local int arg_count 
+  .local int arg_count
   arg_count = args_p
   .local int ii,is_slurpy
-  is_slurpy = 0 
+  is_slurpy = 0
   ii = 0
   if arg_count == 0 goto arg_loop_done
   $I0 = arg_count - 1
@@ -92,7 +96,7 @@ check_args:
   proc_body .=  $S0
   proc_body .= " goto BAD_ARGS\n\n"
   goto arg_loop
-  
+
 
 slurpy_arg_count:
   proc_body .= "if argc < "
@@ -120,70 +124,88 @@ arg_loop_done:
 
   # Convert the remaining elements returned by foldup into a TclList
   # XXX This code lifted from Tcl::&list - eventually factor this out.
-  proc_body .= ".local int cnt,jj\n  cnt = "
+  proc_body .= "  .local int cnt,jj\n"
+  proc_body .= "  cnt = "
   $I0 = ii
   $S0 = $I0
-  proc_body .= $S0
-  proc_body .= "\n  jj = 0\n  "
-  #proc_body .= "$I0 = argc - 1\n  "
-  proc_body .= "if cnt == argc goto NO_SLURPY_ARGS\n  "
-  
-  proc_body .= ".local pmc arg_list\n  arg_list = new .TclList\n  "
-  proc_body .= "\n\nSLURPY_LOOP:\n  "
-  proc_body .= "if cnt >= argc goto DONE\n  "
-  proc_body .= "$P0 = args[cnt]\n  "
-  proc_body .= "arg_list[jj] = $P0\n  "
-  proc_body .= "inc cnt\n  "
-  proc_body .= "inc jj\n  "
-  proc_body .= "goto SLURPY_LOOP\n\n"
-  proc_body .= "NO_SLURPY_ARGS:\n  arg_list= new .TclString\n  arg_list=\"\"\n\n"
-  proc_body .= "DONE:\n  "
-  proc_body .= "store_lex -1, \"$args\", arg_list\n  "
-  
+  proc_body .=   $S0
+  proc_body .=   "\n"
+  proc_body .= "  jj = 0\n"
+  proc_body .= "  if cnt == argc goto NO_SLURPY_ARGS\n"
+  proc_body .= "  .local pmc arg_list\n"
+  proc_body .= "  arg_list = new .TclList\n"
+  proc_body .= "\n"
+  proc_body .= "SLURPY_LOOP:\n"
+  proc_body .= "  if cnt >= argc goto DONE\n"
+  proc_body .= "  $P0 = args[cnt]\n"
+  proc_body .= "  arg_list[jj] = $P0\n"
+  proc_body .= "  inc cnt\n"
+  proc_body .= "  inc jj\n"
+  proc_body .= "  goto SLURPY_LOOP\n"
+  proc_body .= "\n"
+  proc_body .= "NO_SLURPY_ARGS:\n"
+  proc_body .= "  arg_list= new .TclString\n"
+  proc_body .= "  arg_list=\"\"\n"
+  proc_body .= "\n"
+  proc_body .= "DONE:\n"
+  proc_body .= "  store_lex -1, \"$args\", arg_list\n"
+
 
 body:
-  proc_body .= ".local pmc proc_body\n  $P0 = find_global \"_Tcl\", \"proc_parsed\"\n  proc_body=$P0[\""
-  proc_body .= esc_name
-  proc_body .= "\"]\n  "
+  proc_body .= "  .local pmc proc_body\n"
+  proc_body .= "  $P0 = find_global \"_Tcl\", \"proc_parsed\"\n"
+  proc_body .= "  proc_body=$P0[\""
+  proc_body .=   esc_name
+  proc_body .=   "\"]\n"
 
 done_args:
-  proc_body .= "  goto ARGS_OK\n\nBAD_ARGS:\n  $P1=new String\n  "
-  proc_body .= "$P1=\"wrong # args: should be \\\""
-  proc_body .= name
-  proc_body .= " "
-  proc_body .= args
-  proc_body .= "\\\"\"\n  .return(1,$P1)\n\nARGS_OK:\n  "
+  proc_body .= "  goto ARGS_OK\n"
+  proc_body .= "\n"
+  proc_body .= "BAD_ARGS:\n"
+  proc_body .= "  .throw(\"wrong # args: should be \\\""
+  proc_body .=   name
+  proc_body .=   " "  # XXX optional if no args?
+  proc_body .=   args
+  proc_body .=   "\\\"\")\n"
+  proc_body .= "\n"
+  proc_body .= "ARGS_OK:\n"
 
   # XXX Is the pop_pad necessary, or would it be  handled as a side
   #  effect of the .return?
- 
-  # a TCL_RETURN (2) from a sub body should be transformed into a TCL_OK (0)
-  # to stop propagation outward.  XXX Should use the real constants here
 
-  proc_body .= "($I0,$P0) = proc_body.\"interpret\"()\n  if $I0 != 2 goto done\n  $I0 = 0\n  done:\n  pop_pad\n  dec call_level\n  .return($I0,$P0)\n.end\n"
-
-  #print "PROC_BODY=\n"
-  #print proc_body
-  #print "\n--\n"
+  proc_body .= "  push_eh is_return\n"
+  proc_body .= "    $P0 = proc_body.\"interpret\"()\n"
+  proc_body .= "  clear_eh\n"
+  proc_body .= "was_ok:\n"
+  proc_body .= "  dec call_level\n"
+  proc_body .= "  pop_pad\n"
+  proc_body .= "  .return($P0)\n"
+  proc_body .= "not_return_nor_ok:\n"
+  proc_body .= "  dec call_level\n"
+  proc_body .= "  pop_pad\n"
+  proc_body .= "  .throw(P5)\n"
+  proc_body .= "is_return:\n"
+  proc_body .= "  .get_return_code(P5,$I0)\n"
+  proc_body .= "  if $I0 != TCL_RETURN goto not_return_nor_ok\n"
+  proc_body .= "  $P0 = P5[VALUE_SLOT]\n"
+  proc_body .= "  dec call_level\n"
+  proc_body .= "  pop_pad\n"
+  proc_body .= "  .return ($P0)\n"
+  proc_body .= ".end\n"
 
   .local pmc pir_compiler
   pir_compiler = compreg "PIR"
-  $P0 = compile pir_compiler, proc_body 
+  $P0 = pir_compiler(proc_body)
+
 
   # XXX because of the current implementation of the PIR compiler, we must save a reference
   # to our newly compiled function or run the risk of having it garbage collected
   $P1 = find_global "_Tcl", "proc_exec"
   $P1[name] = $P0
-  
-  retval = new String
-  retval = ""
-  goto done
- 
-error:
-  return_type = TCL_ERROR
-  retval = new String
-  retval = "wrong # args: should be \"proc name args body\"\n"
 
-done:
-  .return(return_type,retval)
+  .return ("")
+
+error:
+  .throw ("wrong # args: should be \"proc name args body\"\n")
+
 .end

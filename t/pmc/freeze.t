@@ -375,7 +375,7 @@ output_is(<<'CODE', <<'OUTPUT', "freeze/thaw a Sub");
     typeof S10, P0
     print S10
     print "\n"
-    invokecc
+    invokecc P0
     print "back\n"
     end
 .pcc_sub _foo:
@@ -763,12 +763,12 @@ OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "freeze/thaw a ResizableBooleanArray");
 .sub test @MAIN
-    .local pmc original_arr, thawed_arr 
+    .local pmc original_arr, thawed_arr
     .local string frozen_arr
-    original_arr = new ResizableBooleanArray 
+    original_arr = new ResizableBooleanArray
     set original_arr, 666
     original_arr[555] = 777
-    
+
     # Dump some data before freezing
     print "Before freezing:\n"
     typeof S10, original_arr	# type

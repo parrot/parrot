@@ -26,7 +26,7 @@ TBD
     .local int i
     .local pmc base
     .local pmc lines
-    
+
     find_type i, "Stream::Lines"
     if i > 1 goto END
 
@@ -35,7 +35,7 @@ TBD
     getclass base, "Stream::Base"
     subclass lines, base, "Stream::Lines"
 
-    addattribute lines, "buffer"    
+    addattribute lines, "buffer"
 END:
 .end
 
@@ -43,7 +43,7 @@ END:
 
 .sub __init method
     .local pmc temp
-    
+
     classoffset $I0, self, "Stream::Lines"
     temp = new .PerlString
     setattribute self, $I0, temp
@@ -79,7 +79,7 @@ NOT_CONNECTED:
     .local string buffer
     .local string ret
     .local int i
-    
+
     buffer = self."buffer"()
     i = length buffer
     if i > 0 goto BUFFER_OK
@@ -91,11 +91,11 @@ BUFFER_FILL:
 #    self."close"()
 #    branch BUFFER_END
 BUFFER_OK:
-    
+
     index i, buffer, "\n"
-    
+
     if i == -1 goto BUFFER_FILL
-    
+
     substr ret, buffer, 0, i
     inc i
     substr buffer, buffer, i
@@ -132,7 +132,7 @@ BUFFER_END:
 .sub setBuffer method
     .param string buffer
     .local pmc temp
-    
+
     new temp, .PerlString
     temp = buffer
     classoffset $I0, self, "Stream::Lines"
@@ -161,7 +161,7 @@ BUFFER_END:
     code = 0
 
     isnull str, END
-    
+
     # concat to the buffer
     concat buffer, str
     temp = buffer
@@ -173,9 +173,9 @@ END:
     self = self."source"()
     self."close"()
     null buffer
-    null temp
+    null code
 NO_CLOSE:
-    .return(temp, buffer, code)
+    .return(buffer, code)
 .end
 
 =back

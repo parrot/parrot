@@ -159,6 +159,8 @@ WRITE:
 
     source( str )
 END:
+    .return()
+    goto WRITE	# XXX else self get's overwritten by source
 .end
 
 =item source."rawRead"() (B<internal>)
@@ -169,26 +171,16 @@ END:
 
 .sub rawRead method
     .local string str
-    .local pmc cont
     .local pmc writer
+    .local pmc cont
 
     cont = self."source"()
     isnull cont, END_OF_STREAM
 
     classoffset $I0, self, "Stream::Writer"
     getattribute writer, self, $I0
-
-    newsub cont, .Continuation, _CONT
-    self."setSource"( cont )
-
-    .pcc_begin
-    .pcc_call writer
-_CONT:
-    .result str
-    .pcc_end
-
+    str = self."_call_writer"(writer)
     .return(str)
-    
 END_OF_STREAM:
     null writer
     classoffset $I0, self, "Stream::Writer"
@@ -197,6 +189,18 @@ END_OF_STREAM:
 
     .return(str)
 .end
+
+.sub _call_writer method
+    .param pmc writer
+    .local pmc cont
+    .local string str
+
+    cont = interpinfo .INTERPINFO_CURRENT_CONT
+    self."setSource"( cont )
+    str = writer()
+    .return(str)
+.end
+
 
 =back
 

@@ -28,6 +28,8 @@ Create or destroy a Parrot interpreter.c
 Interp interpre;
 #endif
 
+#define CTX_LEAK_DEBUG 0
+
 #define ATEXIT_DESTROY
 
 /*
@@ -75,6 +77,370 @@ static void setup_default_compreg(Parrot_Interp interpreter)
 }
 
 /*
+ * Context and register frame layout
+ *
+ *    +----------+--------------------------+
+ *    | context  | registers                +
+ *    +----------+--------------------------+
+ *               ^
+ *               |
+ *               ctx.bp pointer
+ *
+ * Registers are addressed as usual via the register base pointer ctx.bp.
+ * Context variables are to the "left" of the pointer and accessible with
+ * the ctx union member ctx.rctx e.g. ctx.rctx[-1].current_sub
+ *
+ * The macro CONTEXT() hides these details
+ *
+ */
+
+#define CHUNKED_CTX_MEM 0
+
+/*
+ * Context and register frame allocation
+ *
+ * There are two allocation strategies: chunked memory and malloced
+ * with a free list.
+ *
+ * CHUNKED_CTX_MEM = 1
+ *
+ * C<ctx_mem.data> is a pointer to an allocated chunk of memory.
+ * The pointer C<ctx_mem.free> holds the next usable
+ * location. With (full) continuations the C<ctx_mem.free> pointer can't be
+ * moved below the C<ctx_mem.threshold>, which is the highest context pointer
+ * of all avtive continuations.
+ *
+ * TODO GC has to lower this threshold when collecting continuations.
+ *
+ * CHUNKED_CTX_MEM = 0
+ *
+ * Context/register memory is malloced. C<ctx_mem.free> is used as a free
+ * list of reusable items.
+ */
+
+#define CTX_ALLOC_SIZE 0x20000
+
+/*
+
+=item C<static void new_context_mem(Interp *, context_mem *ctx_mem)>
+
+Allocate and initialize context memory chunk.
+
+=item C<static void destroy_context(Interp *)>
+
+Free allocated context memory
+
+=item C<static void create_initial_context(Interp *)>
+
+Create initial interpreter context.
+
+=cut
+
+*/
+
+#if CHUNKED_CTX_MEM
+static void
+new_context_mem(Interp *interpreter, context_mem *ctx_mem)
+{
+    ctx_mem->data = mem_sys_allocate(CTX_ALLOC_SIZE);
+    ctx_mem->free = ctx_mem->data;
+    ctx_mem->threshold = NULL;
+    ctx_mem->prev = NULL;
+}
+
+static void
+destroy_context(Interp *interpreter)
+{
+    context_mem *ctx_mem, *prev;
+
+    mem_sys_free(interpreter->ctx_mem.data);
+    for (ctx_mem = interpreter->ctx_mem.prev; ctx_mem; ) {
+        prev = ctx_mem->prev;
+        mem_sys_free(ctx_mem->data);
+        mem_sys_free(ctx_mem);
+        ctx_mem = prev;
+    }
+}
+
+static void
+create_initial_context(Interp *interpreter)
+{
+    size_t to_alloc = sizeof(struct parrot_regs_t) + ALIGNED_CTX_SIZE;
+
+    new_context_mem(interpreter, &interpreter->ctx_mem);
+    LVALUE_CAST(char *, interpreter->ctx.bp) =
+        interpreter->ctx_mem.free + ALIGNED_CTX_SIZE;
+    interpreter->ctx_mem.free += to_alloc;
+    memset(CONTEXT(interpreter->ctx), 0, sizeof(struct Parrot_Context));
+    CONTEXT(interpreter->ctx)->prev = NULL;
+}
+
+#else
+
+static void
+destroy_context(Interp *interpreter)
+{
+}
+
+static void
+create_initial_context(Interp *interpreter)
+{
+    size_t to_alloc = sizeof(struct parrot_regs_t) + ALIGNED_CTX_SIZE;
+    char *p;
+
+    p = mem_sys_allocate(to_alloc);
+    LVALUE_CAST(char *, interpreter->ctx.bp) = p + ALIGNED_CTX_SIZE;
+#if CTX_LEAK_DEBUG
+    fprintf(stderr, "alloc %p\n", interpreter->ctx.bp);
+#endif
+    interpreter->ctx_mem.free = NULL;
+    memset(CONTEXT(interpreter->ctx), 0, sizeof(struct Parrot_Context));
+    CONTEXT(interpreter->ctx)->prev = NULL;
+}
+
+#endif
+
+/*
+
+=item C<void parrot_gc_context(Interp *)>
+
+Cleanup dead context memory. Called by the gargabe collector.
+
+=item C<void Parrot_alloc_context(Interp *)>
+
+Allocate a new context and set the context pointer.
+
+=item C<void Parrot_set_context_threshold(Interp *, parrot_context_t *ctxp)>
+
+Mark the context as possible threshold.
+
+=item C<void Parrot_free_context(Interp *, parrot_context_t *ctxp, int re_use)>
+
+Free the context. If C<re_use> is true, this function is called by a
+return continuation invoke, else from the destructur of a continuation.
+
+=cut
+
+*/
+
+void
+parrot_gc_context(Interp *interpreter)
+{
+#if CHUNKED_CTX_MEM
+    parrot_context_t ctx;
+
+    if (!interpreter->ctx_mem.threshold)
+        return;
+    LVALUE_CAST(char *, ctx.bp) = interpreter->ctx_mem.threshold -
+        sizeof(struct parrot_regs_t);
+    /* TODO */
+#endif
+}
+
+static void
+init_context(Interp *interpreter, parrot_context_t *oldp)
+{
+    struct parrot_regs_t *bp;
+    parrot_context_t old = *oldp;
+    int i;
+
+    memcpy(CONTEXT(interpreter->ctx),
+           CONTEXT(old), sizeof(struct Parrot_Context));
+    CONTEXT(interpreter->ctx)->prev = old.rctx;
+    CONTEXT(interpreter->ctx)->ref_count = 0;
+    CONTEXT(interpreter->ctx)->current_results = NULL;
+    CONTEXT(interpreter->ctx)->current_args = NULL;
+
+    /* NULL out registers
+     *
+     * if the architecture has 0x := NULL and 0.0 we could memset too
+     *
+     */
+    bp = interpreter->ctx.bp;
+    for (i = 0; i < NUM_REGISTERS; i++) {
+        BP_REG_PMC(bp, i) = PMCNULL;
+        BP_REG_STR(bp, i) = NULL;
+#ifndef NDEBUG
+        /* depending on -D40 we set int, num to garbage or zero
+         */
+        if (Interp_debug_TEST(interpreter, PARROT_REG_DEBUG_FLAG)) {
+            /* TODO better use rand values */
+            BP_REG_INT(bp, i) = -999;
+            BP_REG_NUM(bp, i) = -99.9;
+        }
+        else {
+            BP_REG_INT(bp, i) = 0;
+            BP_REG_NUM(bp, i) = 0.0;
+        }
+#endif
+    }
+}
+
+#if CHUNKED_CTX_MEM
+void
+Parrot_alloc_context(Interp *interpreter)
+{
+
+    parrot_context_t ctx;
+    size_t used;
+
+    /* for now still use 32 regs fixed chunks */
+    size_t to_alloc = sizeof(struct parrot_regs_t) + ALIGNED_CTX_SIZE;
+
+    used = interpreter->ctx_mem.free - interpreter->ctx_mem.data;
+    if (used + to_alloc >= CTX_ALLOC_SIZE ) {
+        /* trigger a DOD run to reuse ctx hel by dead continuations */
+        if (interpreter->ctx_mem.threshold) {
+            Parrot_do_dod_run(interpreter, DOD_trace_stack_FLAG);
+            used = interpreter->ctx_mem.free - interpreter->ctx_mem.data;
+        }
+        if (used + to_alloc >= CTX_ALLOC_SIZE ) {
+            context_mem *ctx_mem = mem_sys_allocate(sizeof(context_mem));
+            memcpy(ctx_mem, &interpreter->ctx_mem, sizeof(context_mem));
+            ctx_mem->prev = NULL;
+            new_context_mem(interpreter, &interpreter->ctx_mem);
+            interpreter->ctx_mem.prev = ctx_mem;
+        }
+    }
+    ctx = interpreter->ctx;
+    LVALUE_CAST(char *, interpreter->ctx.bp) =
+        interpreter->ctx_mem.free + ALIGNED_CTX_SIZE;
+    interpreter->ctx_mem.free += to_alloc;
+    init_context(interpreter, ctx);
+}
+
+void
+Parrot_set_context_threshold(Interp * interpreter, parrot_context_t *ctxp)
+{
+    char *used_ctx_mem;
+    parrot_context_t ctx = *ctxp;
+
+    used_ctx_mem = (char *)ctx.bp + sizeof(struct parrot_regs_t);
+    if ((UINTVAL)used_ctx_mem > (UINTVAL)interpreter->ctx_mem.free)
+        interpreter->ctx_mem.free = used_ctx_mem;
+}
+
+void
+Parrot_free_context(Interp *interpreter, parrot_context_t *ctxp, int re_use)
+{
+
+    struct Parrot_Context *prev;
+    size_t to_alloc = sizeof(struct parrot_regs_t) + ALIGNED_CTX_SIZE;
+    parrot_context_t ctx = *ctxp;
+    char *used_ctx_mem;
+
+    prev = CONTEXT(ctx)->prev;
+    if (!prev) {
+        /* returning from main */
+        return;
+    }
+    CONTEXT(ctx)->prev = NULL;
+    used_ctx_mem = (char *)ctx.bp + sizeof(struct parrot_regs_t);
+
+    /* if we are at the top end of memory
+     * (e.g. return continuation was invoked)
+     * then lower free
+     */
+    if (used_ctx_mem == interpreter->ctx_mem.free &&
+            interpreter->ctx_mem.free > interpreter->ctx_mem.threshold) {
+        interpreter->ctx_mem.free -= to_alloc;
+        if (interpreter->ctx_mem.free == interpreter->ctx_mem.data) {
+            /* reached lower end of context chunk */
+            if (interpreter->ctx_mem.prev) {
+                context_mem *ctx_mem = interpreter->ctx_mem.prev;
+#if 0
+                /* TODO
+                 * can't do that yet
+                 * runops_fromc still fetches results after the
+                 * return continuation is invoked
+                 * XXX leak the register memory for now
+                 */
+                mem_sys_free(interpreter->ctx_mem.data);
+#endif
+                memcpy(&interpreter->ctx_mem, ctx_mem, sizeof(context_mem));
+                mem_sys_free(ctx_mem);
+            }
+        }
+    }
+    if (!re_use) {
+        /*
+         * real continuation was GCed
+         * mark this ctx area dead
+         */
+        if (interpreter->ctx_mem.threshold == used_ctx_mem) {
+            /* if threshold is at the end of used memory, lower threshold */
+            interpreter->ctx_mem.threshold -= to_alloc;
+        }
+        else {
+            /* mark it dead by setting a uniq signature into the
+             * prev pointer location
+             */
+            *(void**)&CONTEXT(ctx)->prev = (void*) 0xdeaddead;
+        }
+    }
+}
+
+#else
+
+
+void
+Parrot_alloc_context(Interp *interpreter)
+{
+
+    parrot_context_t ctx;
+    struct Parrot_Context *p;
+
+    p = (struct Parrot_Context *)interpreter->ctx_mem.free;
+    if (p) {
+        LVALUE_CAST(struct Parrot_Context *, interpreter->ctx_mem.free) =
+            p[-1].prev;
+    }
+    else {
+        p = mem_sys_allocate(sizeof(struct parrot_regs_t) + ALIGNED_CTX_SIZE);
+        LVALUE_CAST(char *, p) += ALIGNED_CTX_SIZE;
+    }
+    p[-1].prev = NULL;
+    ctx = interpreter->ctx;
+    interpreter->ctx.rctx = p;
+#if CTX_LEAK_DEBUG
+    fprintf(stderr, "alloc %p\n", p);
+#endif
+    init_context(interpreter, &ctx);
+}
+
+void
+Parrot_free_context(Interp *interpreter, parrot_context_t *ctxp, int re_use)
+{
+    struct Parrot_Context *free_list;
+
+    /*
+     * The context structure has a reference count, initially 0
+     * it' incrementented when a continuation is created either directly
+     * or a continuation is cloned or a retcontinuation is converted
+     * to a full continuation in invalidate_retc
+     * this *should* be ok, but obviously leaks memory
+     * (turn CTX_LEAK_DEBUG on)
+     *
+     */
+    if (re_use || --CONTEXT(*ctxp)->ref_count == 0) {
+        free_list = (struct Parrot_Context *) interpreter->ctx_mem.free;
+        LVALUE_CAST(struct Parrot_Context *, interpreter->ctx_mem.free) =
+            ctxp->rctx;
+#if CTX_LEAK_DEBUG
+        fprintf(stderr, "free  %p\n", ctxp->rctx);
+#endif
+        CONTEXT(*ctxp)->prev = free_list;
+    }
+}
+
+void
+Parrot_set_context_threshold(Interp * interpreter, parrot_context_t *ctxp)
+{
+    /* nothing to do */
+}
+
+#endif
+/*
 
 =item C<Parrot_Interp
 make_interpreter(Parrot_Interp parent, Interp_flags flags)>
@@ -120,6 +486,7 @@ make_interpreter(Parrot_Interp parent, Interp_flags flags)
         MUTEX_INIT(interpreter_array_mutex);
         MUTEX_INIT(class_count_mutex);
     }
+    create_initial_context(interpreter);
     interpreter->resume_flag = RESUME_INITIAL;
     interpreter->recursion_limit = 1000;
 
@@ -176,27 +543,29 @@ make_interpreter(Parrot_Interp parent, Interp_flags flags)
     /* allocate stack chunk cache */
     stack_system_init(interpreter);
     /* Set up the initial register chunks */
-    setup_register_stacks(interpreter, &interpreter->ctx);
+    setup_register_stacks(interpreter);
 
     Parrot_clear_s(interpreter);
     Parrot_clear_p(interpreter);
+    Parrot_clear_i(interpreter);
+    Parrot_clear_n(interpreter);
 
     /* Stack for lexical pads */
-    interpreter->ctx.pad_stack = new_stack(interpreter, "Pad");
+    CONTEXT(interpreter->ctx)->pad_stack = new_stack(interpreter, "Pad");
 
     /* Need a user stack */
-    interpreter->ctx.user_stack = new_stack(interpreter, "User");
+    CONTEXT(interpreter->ctx)->user_stack = new_stack(interpreter, "User");
 
     /* And a control stack */
-    interpreter->ctx.control_stack = new_stack(interpreter, "Control");
+    CONTEXT(interpreter->ctx)->control_stack = new_stack(interpreter, "Control");
 
     /* A regex stack would be nice too. */
-    interpreter->ctx.intstack = intstack_new(interpreter);
+    CONTEXT(interpreter->ctx)->intstack = intstack_new(interpreter);
 
     /* clear context introspection vars */
-    SET_NULL_P(interpreter->ctx.current_sub, PMC*);
-    SET_NULL_P(interpreter->ctx.current_cont, PMC*);
-    SET_NULL_P(interpreter->ctx.current_object, PMC*);
+    SET_NULL_P(CONTEXT(interpreter->ctx)->current_sub, PMC*);
+    SET_NULL_P(CONTEXT(interpreter->ctx)->current_cont, PMC*);
+    SET_NULL_P(CONTEXT(interpreter->ctx)->current_object, PMC*);
 
     /* Load the core op func and info tables */
     interpreter->op_lib = PARROT_CORE_OPLIB_INIT(1);
@@ -210,16 +579,11 @@ make_interpreter(Parrot_Interp parent, Interp_flags flags)
     /* Set up defaults for line/package/file */
     interpreter->current_file =
         string_make(interpreter, "(unknown file)", 14, NULL, 0);
-    interpreter->ctx.current_package =
+    CONTEXT(interpreter->ctx)->current_package =
         string_make(interpreter, "(unknown package)", 18, NULL, 0);
 
     SET_NULL_P(interpreter->code, struct PackFile *);
     SET_NULL_P(interpreter->profile, ProfData *);
-
-    /* next two are pointers to the real thing in the current code seg */
-    SET_NULL_P(interpreter->prederef.code, void **);
-    SET_NULL_P(interpreter->prederef.branches, Prederef_btanch*);
-    SET_NULL(interpreter->jit_info);
 
     /* null out the root set registry */
     SET_NULL_P(interpreter->DOD_registry, PMC *);
@@ -390,6 +754,7 @@ Parrot_really_destroy(int exit_code, void *vinterp)
             Parrot_destroy_vtable(interpreter, Parrot_base_vtables[i]);
     mmd_destroy(interpreter);
 
+
     if (interpreter->profile) {
         mem_sys_free(interpreter->profile->data);
         interpreter->profile->data = NULL;
@@ -400,11 +765,13 @@ Parrot_really_destroy(int exit_code, void *vinterp)
     /* deinit op_lib */
     (void) PARROT_CORE_OPLIB_INIT(0);
 
-    stack_destroy(interpreter->ctx.pad_stack);
-    stack_destroy(interpreter->ctx.user_stack);
-    stack_destroy(interpreter->ctx.control_stack);
+    stack_destroy(CONTEXT(interpreter->ctx)->pad_stack);
+    stack_destroy(CONTEXT(interpreter->ctx)->user_stack);
+    stack_destroy(CONTEXT(interpreter->ctx)->control_stack);
     /* intstack */
-    intstack_free(interpreter, interpreter->ctx.intstack);
+    intstack_free(interpreter, CONTEXT(interpreter->ctx)->intstack);
+
+    destroy_context(interpreter);
 
     /* predefined exceptions */
     mem_sys_free(interpreter->exception_list);

@@ -240,15 +240,15 @@ interpinfo_p(Interp *interpreter, INTVAL what)
     PMC *cont;
     switch (what) {
         case CURRENT_SUB:
-            return interpreter->ctx.current_sub;
+            return CONTEXT(interpreter->ctx)->current_sub;
         case CURRENT_CONT:
-            cont = interpreter->ctx.current_cont;
+            cont = CONTEXT(interpreter->ctx)->current_cont;
             if (!PMC_IS_NULL(cont) && cont->vtable->base_type ==
                     enum_class_RetContinuation)
                 return VTABLE_clone(interpreter, cont);
             return cont;
         case CURRENT_OBJECT:
-            return interpreter->ctx.current_object;
+            return CONTEXT(interpreter->ctx)->current_object;
         case NAMESPACE_ROOT: /* XXX */
             return interpreter->globals->stash_hash;
         case CURRENT_LEXPAD:
@@ -265,7 +265,7 @@ interpinfo_s(Interp *interpreter, INTVAL what)
 {
     switch (what) {
         case CURRENT_METHOD:
-            return interpreter->ctx.current_method;
+            return CONTEXT(interpreter->ctx)->current_method;
         default:        /* or a warning only? */
             internal_exception(UNIMPLEMENTED,
                     "illegal argument in interpinfo");

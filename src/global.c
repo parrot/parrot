@@ -200,7 +200,7 @@ Parrot_get_name(Interp* interpreter, STRING *name)
     pad = scratchpad_get_current(interpreter);
     g = scratchpad_find(interpreter, pad, name);
     if (!g) {
-        current_sub = interpreter->ctx.current_sub;
+        current_sub = CONTEXT(interpreter->ctx)->current_sub;
         if (current_sub &&
                 (name_space = PMC_sub(current_sub)->name_space))
 
@@ -211,12 +211,12 @@ Parrot_get_name(Interp* interpreter, STRING *name)
     if (!g)
         g = Parrot_find_builtin(interpreter, name);
     if (g) {
-        if (g->vtable->base_type == enum_class_MultiSub && REG_STR(1)) {
+        if (g->vtable->base_type == enum_class_MultiSub &&
+                interpreter->current_args) {
             /*
-             * signature is currently passed in S1
-             * see also imcc/pcc.c
+             * inside a function call, we have an args signature
              */
-            g = Parrot_MMD_search_default_func(interpreter, name, REG_STR(1));
+            g = Parrot_MMD_search_default_func(interpreter, name);
             if (g)
                 return g;
         }

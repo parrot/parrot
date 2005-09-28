@@ -49,11 +49,10 @@ Initialize the attributes for an instance of the class
 
 .sub interpret method
   .local pmc retval
-  .local int return_type
   # assigning a $Nx will change this to a TclFloat
+
   retval      = new TclInt
-  return_type = TCL_OK
-  
+
   .local pmc funcs, expr_interpret, __number
   funcs = find_global "_Tcl", "functions"
   expr_interpret = find_global "_Tcl", "__expression_interpret"
@@ -61,8 +60,8 @@ Initialize the attributes for an instance of the class
   
   .local pmc arg, name
   arg  = getattribute self, "TclFunc\x00argument"
-  (return_type, retval) = expr_interpret(arg)
-  if return_type == TCL_ERROR goto done
+  retval = expr_interpret(arg)
+
   arg  = __number(retval)
   name = getattribute self, "TclFunc\x00name"
   
@@ -149,8 +148,9 @@ func_tanh:
   $N0 = arg
   $N1 = tanh $N0
   retval = $N1
-  # goto done
+  #goto done
 
 done:
-  .return(return_type, retval)
+  .return(retval)
+
 .end

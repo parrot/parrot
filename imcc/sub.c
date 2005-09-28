@@ -101,24 +101,6 @@ expand_sub_call(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
 
 
 /*
- * Peephole optimizer for subroutine Unit depending on its calling convention.
- * Currently the same optimizer works for both.
- */
-void
-sub_optimize(Parrot_Interp interp, IMC_Unit * unit)
-{
-    /* IMC_FASTSUB */
-    if (unit->type == IMC_FASTSUB) {
-        pcc_sub_optimize(interp, unit);
-    }
-    /* IMC_PCCSUB */
-    else {
-        pcc_sub_optimize(interp, unit);
-    }
-}
-
-
-/*
  * Local variables:
  * c-indentation-style: bsd
  * c-basic-offset: 4

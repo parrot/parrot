@@ -18,9 +18,9 @@ hard.
 =back 
 
 It is, of course, quite likely that said feature already exists with
-a nice interface, and
-was just not found by the partcl developers - If you find something
-along these lines, let them know.
+a nice interface, and was just not found by the partcl developers - 
+If you find something along these lines, let them know on the internals
+list.
 
 =head1 WORKAROUNDS
 
@@ -66,29 +66,6 @@ be nice to have invoke() automatically figure this out and generate an exception
 that Tcl can use. (This also starts to drag in "how to do Tcl exceptions cleanly from
 parrot")
 
-=item [error], [catch], [break], continue...
-
-Tcl kind of conflates normal returns and exceptional returns, and uses the same
-mechanism for [break]ing and [continue]'ing  out of loops. 
-
-Right now, this is being handled by returning *two* values from each publicly exposed
-function. (And from several internal ones, as well.) The first is the code, that is, 
-an integer, which is a faked up enum of:
-
- TCL_OK, TCL_ERROR, TCL_BREAK, TCL_CONTINUE, TCL_RETURN
-
-Then, the actual I<interesting> value is returned as as a PMC. How do we tie in the
-two happy return cases, the two cases that interact with loops, and the error case
-into parrot's normal return/exception handler in a way that works for tcl and will
-allow interoperability
-
-Note: The reason we're not using parrot exceptions is that we're unable
-at the moment to redefine them ourselves - I don't see any easy way to get the
-nice stacktraces that tcl gives you using the parrot exception handling
-mechanism. So we could potentially use exceptions for TCL_ERROR in the long
-term. But then [catch] will need to be re-written to cope with exceptions
-or not (as opposed to now, where all codes are equal).
-
 =item stack depth
 
 Cheating and keeping a global around right now, so we can figure out if we 
@@ -104,6 +81,13 @@ and, if any other languages support this feature, this would give us a chance
 to interoperate.
 
 =back
+
+=item list splicing
+
+There are several cases where we convert TclLists or ResizablePMCArrays to
+Arrays so that we can use the splice opcode. Need to have better splice
+support in parrot array classes, as well as our own. 
+L<lib/commands/linsert.pir>
 
 =cut
 

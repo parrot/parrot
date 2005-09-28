@@ -4,13 +4,18 @@
 .namespace [ "Tcl" ]
 
 .sub "&while"
-  .param pmc cond_p
-  .param pmc body_p
+  .param pmc argv :slurpy
+  .local int argc
+  argc = argv
 
-  if argcP != 2 goto bad_args
+  if argc != 2 goto bad_args
+
+  .local pmc    cond_p
+  cond_p = argv[0]
+  .local string body_p
+  body_p = argv[1]
 
   .local pmc retval, parsed_code
-  .local int return_type
 
   .local pmc parse
   .local pmc expression_p
@@ -26,36 +31,25 @@
 
 while_loop:
   $S0 = cond_p
-  (return_type,retval) = expression_p($S0)
-  if return_type == TCL_ERROR goto done_done
-  (return_type,retval) = expression_i(retval)
-  if return_type == TCL_ERROR goto done_done
+  retval = expression_p($S0)
+  retval = expression_i(retval)
   unless retval goto done
-  (return_type,retval) = parsed_code."interpret"()
-  if return_type == TCL_BREAK goto done
-  if return_type == TCL_RETURN goto done
+  push_eh handle_continue
+    retval = parsed_code."interpret"()
+  clear_eh
 
   goto while_loop
 
+handle_continue:
+  .local int return_type
+  .get_return_code(P5,return_type)
+  if return_type == TCL_BREAK goto done
+  if return_type == TCL_CONTINUE goto while_loop
+
 done:
-  if return_type == TCL_RETURN goto done_cleaned
-  if return_type == TCL_ERROR  goto done_cleaned
-  retval = ""
-  return_type = TCL_OK
-  goto done_done
-
-done_cleaned:
-  retval = ""
-
-done_done:
-  # while always returns "", regardless of the code it may have executed
-  # XXX - (unless there's an error)
-
-  .return(return_type,retval)
+  .return("")
 
 bad_args:
-  $P1 = new String
-  $P1 = "wrong # args: should be \"while test command\""
-  .return (TCL_ERROR, $P1)
+  .throw ("wrong # args: should be \"while test command\"")
 
 .end

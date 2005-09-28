@@ -32,14 +32,12 @@ Initialize the attributes for an instance of the class
 .sub interpret method
   .local pmc retval
   retval = new TclInt
-  .local int return_type
-  return_type = TCL_OK
   
   .local pmc name, operand
   name    = getattribute self, "TclUnaryOp\x00name"
   operand = getattribute self, "TclUnaryOp\x00operand"
-  (return_type, retval) = operand."interpret"()
-  if return_type == TCL_ERROR goto done
+  retval = operand."interpret"()
+
   operand = retval
   
   if name == "-" goto minus
@@ -61,5 +59,6 @@ logical_not:
   goto done
 
 done:
-  .return(return_type, retval)
+  .return(retval)
+
 .end

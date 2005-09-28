@@ -208,16 +208,9 @@ my @funcnames = qw(
 	key_next
 	key_append
 	key_mark
-	new_register_frame
-	save_context
-	swap_context
-	restore_context
 	mark_context
-	copy_regs
 	mark_reg_stack
 	invalidate_retc_context
-	add_to_retc_cache
-	mark_retc_cache
 	Parrot_full_sub_name
 	Parrot_Context_info
 	Parrot_Context_infostr

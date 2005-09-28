@@ -25,15 +25,15 @@ pir_output_is(<<'CODE', <<'OUT', "find_cclass, ascii");
 .sub main @MAIN
     $S0 = ascii:"test_func(1)"
     test( .CCLASS_WORD, $S0 )
-    
+
     $S0 = ascii:"ab\nC_X34.\0 \t!"
     test( .CCLASS_NUMERIC, $S0 )
     test( .CCLASS_LOWERCASE, $S0 )
     test( .CCLASS_PUNCTUATION, $S0 )
 .end
 .sub test
-    .param string str
     .param int flags
+    .param string str
     $I0 = 0
     $I2 = length str
 loop:
@@ -57,15 +57,15 @@ pir_output_is(<<'CODE', <<'OUT', "find_not_cclass, ascii");
 .sub main @MAIN
     $S0 = ascii:"test_func(1)"
     test( .CCLASS_WORD, $S0 )
-    
+
     $S0 = ascii:"ab\nC_X34.\0 \t!"
     test( .CCLASS_NUMERIC, $S0 )
     test( .CCLASS_LOWERCASE, $S0 )
     test( .CCLASS_PUNCTUATION, $S0 )
 .end
 .sub test
-    .param string str
     .param int flags
+    .param string str
     $I0 = 0
     $I2 = length str
 loop:
@@ -89,15 +89,15 @@ pir_output_is(<<'CODE', <<'OUT', "find_cclass, iso-8859-1");
 .sub main @MAIN
     $S0 = iso-8859-1:"test_func(1)"
     test( .CCLASS_WORD, $S0 )
-    
+
     $S0 = iso-8859-1:"ab\nC_X34.\0 \t!"
     test( .CCLASS_NUMERIC, $S0 )
     test( .CCLASS_LOWERCASE, $S0 )
     test( .CCLASS_PUNCTUATION, $S0 )
 .end
 .sub test
-    .param string str
     .param int flags
+    .param string str
     $I0 = 0
     $I2 = length str
 loop:
@@ -121,15 +121,15 @@ pir_output_is(<<'CODE', <<'OUT', "find_not_cclass, iso-8859-1");
 .sub main @MAIN
     $S0 = iso-8859-1:"test_func(1)"
     test( .CCLASS_WORD, $S0 )
-    
+
     $S0 = iso-8859-1:"ab\nC_X34.\0 \t!"
     test( .CCLASS_NUMERIC, $S0 )
     test( .CCLASS_LOWERCASE, $S0 )
     test( .CCLASS_PUNCTUATION, $S0 )
 .end
 .sub test
-    .param string str
     .param int flags
+    .param string str
     $I0 = 0
     $I2 = length str
 loop:
@@ -170,7 +170,7 @@ pir_output_is(<<'CODE', <<'OUT', "is_cclass, ascii");
     test2( str, .CCLASS_ALPHANUMERIC)
     test2( str, .CCLASS_NEWLINE)
     test2( str, .CCLASS_WORD)
-    
+
     $I0 = .CCLASS_NEWLINE|.CCLASS_WHITESPACE
     test2( str, $I0)
     $I0 = .CCLASS_WHITESPACE|.CCLASS_LOWERCASE
@@ -233,7 +233,7 @@ pir_output_is(<<'CODE', <<'OUT', "is_cclass, iso-8859-1");
     test2( str, .CCLASS_ALPHANUMERIC)
     test2( str, .CCLASS_NEWLINE)
     test2( str, .CCLASS_WORD)
-    
+
     $I0 = .CCLASS_NEWLINE|.CCLASS_WHITESPACE
     test2( str, $I0)
     $I0 = .CCLASS_WHITESPACE|.CCLASS_LOWERCASE

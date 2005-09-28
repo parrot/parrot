@@ -10,35 +10,20 @@ END:
 .namespace ["Data::Dumper"]
 
 .sub dumper method
-    .param string nameA
-    .param pmc dumpA
-    .param string indentA
-    .local string name
-    .local pmc dump
-    .local string indent
+    .param pmc dump
+    .param string name           :optional
+    .param int has_name          :opt_flag
+    .param string indent         :optional
+    .param int has_indent        :opt_flag
     .local pmc style
 
-    name = nameA
-    dump = dumpA
-    indent = indentA
-
-    # check the number of INT args
-    if I1 != 0 goto ERROR
-    # check the number of PMC args
-    if I3 != 1 goto ERROR
-    # check the number of STR args
-    if I2 > 2 goto ERROR
-    if I2 < 0 goto ERROR
-
-    if I2 == 2 goto GO
-    # I2 <= 1; no indent specified
+    if has_indent goto no_def_indent
     set indent, "    "
-    if I2 == 1 goto GO
-    # I2 == 0; no indent and no name
+no_def_indent:
     # use a default name
+    if has_name goto no_def_name
     set name, "VAR1"
-
-GO:
+no_def_name:
     # XXX: support different output styles
     find_type $I0, "Data::Dumper::Default"
     if $I0 < 1 goto ERROR2
@@ -58,8 +43,8 @@ ERROR2:
 ERROR:
     print "Syntax:\n"
     print "Data::Dumper::dumper( pmc )\n"
-    print "Data::Dumper::dumper( name, pmc )\n"
-    print "Data::Dumper::dumper( name, pmc, indent )\n"
+    print "Data::Dumper::dumper( pmc, name )\n"
+    print "Data::Dumper::dumper( pmc, name, indent )\n"
     .return ( 0 )
 .end
 

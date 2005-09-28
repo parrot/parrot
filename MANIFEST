@@ -5,6 +5,7 @@ ABI_CHANGES                                       []
 CREDITS                                           []
 ChangeLog                                         []
 Configure.pl                                      []
+DEPRECATED                                        []
 DEVELOPING                                        []
 LICENSES/Artistic                                 [main]doc
 LICENSES/gpl.txt                                  [main]doc
@@ -743,6 +744,7 @@ include/parrot/global.h                           [devel]include
 include/parrot/hash.h                             [devel]include
 include/parrot/headers.h                          [devel]include
 include/parrot/hll.h                              [devel]include
+include/parrot/inter_call.h                       [devel]include
 include/parrot/interp_guts.h                      [devel]include
 include/parrot/interpreter.h                      [devel]include
 include/parrot/intlist.h                          [devel]include
@@ -1728,6 +1730,7 @@ src/hash.c                                        []
 src/headers.c                                     []
 src/hll.c                                         []
 src/interpreter.c                                 []
+src/inter_call.c                                  []
 src/inter_cb.c                                    []
 src/inter_create.c                                []
 src/inter_misc.c                                  []
@@ -1782,7 +1785,7 @@ src/utils.c                                       []
 src/vtables.c                                     []
 src/warnings.c                                    []
 t/benchmarks.t                                    []
-t/doc/pod.t                                       [] 
+t/doc/pod.t                                       []
 t/dynclass/foo.t                                  []
 t/dynclass/gdbmhash.t                             []
 t/dynclass/pybuiltin.t                            []
@@ -1912,6 +1915,7 @@ t/pmc/threads.t                                   []
 t/pmc/timer.t                                     []
 t/pmc/tqueue.t                                    []
 t/pmc/undef.t                                     []
+t/library/data_escape.t                           []
 t/library/dumper.t                                []
 t/library/getopt_long.t                           []
 t/library/md5.t                                   []
@@ -1969,4 +1973,7 @@ types/bignum.h                                    []
 types/bignum_atest.pl                             []
 types/bignum_test.pl                              []
 util/ncidef2pasm.pl                               []
+util/smokeserv-README                             []
+util/smokeserv-client.pl                          []
+util/smokeserv-server.pl                          []
 vtable.tbl                                        [devel]

@@ -328,7 +328,7 @@ sub read_ops
             }
 
             $type       = defined($1) ? 'inline' : 'function';
-            $short_name = lc $2;
+            $short_name = $2;
             $args       = trim(lc $3);
             $flags      = $4 ? trim(lc $4) : "";
             @args       = split(/\s*,\s*/, $args);

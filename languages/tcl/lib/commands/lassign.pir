@@ -1,9 +1,9 @@
 .namespace [ "Tcl" ]
 
 .sub "&lassign"
-  .local pmc argv
+  .param pmc argv :slurpy
+
   .local int argc
-  argv = foldup
   argc = argv
   if argc < 2 goto bad_args
 
@@ -13,9 +13,7 @@
 
   .local pmc __list
   __list = find_global "_Tcl", "__list"
-  ($I0, retval) = __list(list)
-  if $I0 == TCL_ERROR goto bad_list
-  list = retval
+  list = __list(list)
 
   .local string varname
   .local pmc set, value
@@ -39,12 +37,8 @@ null_loop:
   branch null_loop
 
 var_end:
-  .return(TCL_OK, list)
+  .return(list)
 
-bad_list:
-  .return(TCL_ERROR, retval)
 bad_args:
-  retval = new String
-  retval = "wrong # args: should be \"lassign list varName ?varName ...?\""
-  .return(TCL_ERROR, retval)
+  .throw ("wrong # args: should be \"lassign list varName ?varName ...?\"")
 .end

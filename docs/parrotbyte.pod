@@ -270,8 +270,19 @@ The pieces that can be found in the byte code segment are as follows:
   |   Number Argument (Constant Table Index)  |
   +----------+----------+----------+----------+
 
-The number and types for each argument can be determined by consulting
-Parrot::Opcode.
+  +----------+----------+----------+----------+
+  |    PMC Argument (Constant Table Index)    |
+  +----------+----------+----------+----------+
+
+The number of arguments and the type of each argument can usually be
+determined by consulting Parrot::Opcode, or programatically by obtaining
+the op_info_t structure for the opcode in question.
+
+There are currently 4 opcodes that can take a variable number of arguments:
+set_args, get_params, set_returns and get_results. These ops always have one
+required argument, which is a PMC constant. Calling the elements VTABLE
+function on this PMC will give the number of extra variable arguments that
+follow.
 
 
 =head2 SOURCE CODE SEGMENT
@@ -293,7 +304,9 @@ Gregor N. Purdy C<gregor@focusresearch.com>
 
 Format 1 description by Leopold Toetsch C<lt@toetsch.at>
 
+Variable argument opcodes update by Jonathan Worthington C<jonathan@jwcs.net>
+
 =head1 VERSION
 
-2003.11.22
+2005.09.19
 

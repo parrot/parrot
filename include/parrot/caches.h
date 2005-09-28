@@ -34,8 +34,6 @@ typedef struct _Caches {
     UINTVAL mc_size;            /* sizeof table */
     Meth_cache_entry ***idx;    /* bufstart idx */
     /* PMC **hash */            /* for non-constant keys */
-    struct Stack_Chunk * frame_cache; /* register frame cache */
-    PMC* retc_cache;            /* return continuations recycling */
 } Caches;
 
 void init_object_cache(Parrot_Interp interpreter);

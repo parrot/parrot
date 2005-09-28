@@ -27,6 +27,7 @@ output_is(<<'CODE', <<'OUTPUT', "delegate set_integer_native");
     end
 .namespace ["delegate"]
 .pcc_sub __set_integer_native:
+    get_params "(0,0)", P2, I5
     # need a private store to keep state - we dont have that yet
     # for now check param passing
     print I5
@@ -45,7 +46,9 @@ output_is(<<'CODE', <<'OUTPUT', "delegate get_integer");
     end
 .namespace ["delegate"]
 .pcc_sub __get_integer:
+    get_params "(0)", P2
     set I5, 42
+    set_returns "(0)", I5
     returncc
 CODE
 42
@@ -57,6 +60,7 @@ output_is(<<'CODE', <<'OUTPUT', "delegate set_string_native");
     end
 .namespace ["delegate"]
 .pcc_sub __set_string_native:
+    get_params "(0,0)", P2, S5
     print S5
     print "\n"
     returncc
@@ -72,7 +76,9 @@ output_is(<<'CODE', <<'OUTPUT', "delegate get_string");
     end
 .namespace ["delegate"]
 .pcc_sub __get_string:
+    get_params "(0)", P2
     set S5, "fortytwo"
+    set_returns "(0)", S5
     returncc
 CODE
 fortytwo
@@ -84,6 +90,7 @@ output_is(<<'CODE', <<'OUTPUT', "delegate set_number_native");
     end
 .namespace ["delegate"]
 .pcc_sub __set_number_native:
+    get_params "(0,0)", P2,N5
     print N5
     print "\n"
     returncc
@@ -99,7 +106,9 @@ output_is(<<'CODE', <<'OUTPUT', "delegate get_number");
     end
 .namespace ["delegate"]
 .pcc_sub __get_number:
+    get_params "(0)", P2
     set N5, 47.11
+    set_returns "(0)", N5
     returncc
 CODE
 47.110000
@@ -113,6 +122,7 @@ output_is(<<'CODE', <<'OUTPUT', "delegate assign_pmc");
     end
 .namespace ["delegate"]
 .pcc_sub __assign_pmc:
+    get_params "(0,0)", P2, P5
     print P5
     print "\n"
     # just return
@@ -133,10 +143,10 @@ pir_output_is(<<'CODE', <<'OUTPUT', "delegate add_p_p_i");
     end
 .end
 .namespace ["delegate"]
-.sub __set_integer_native
-    # cant keep state yet
+.sub __set_integer_native method
+    .param int i
     # just return
-    print I5
+    print i
     print "\n"
     returncc
 .end
@@ -144,8 +154,9 @@ pir_output_is(<<'CODE', <<'OUTPUT', "delegate add_p_p_i");
     .param pmc l
     .param int r
     .param pmc d
-    print I5
+    print r
     print "\n"
+    d = new .Integer
     d =  3
     .return(d)
 .end
@@ -170,10 +181,11 @@ pir_output_is(<<'CODE', <<'OUTPUT', "delegate add_p_p_p");
     end
 .end
 .namespace ["delegate"]
-.sub __set_integer_native
+.sub __set_integer_native method
+    .param int i
     # cant keep state yet
     # just print arg and return
-    print I5
+    print i
     print "\n"
 .end
 .sub __add @MULTI(delegate, pmc)
@@ -190,7 +202,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "delegate add_p_p_p");
     d = 3
     .return (d)
 .end
-.sub __get_string
+.sub __get_string method
     .return("one")
 .end
 CODE

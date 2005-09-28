@@ -60,7 +60,8 @@ typedef enum {
     PARROT_ARG_SLURPY_ARRAY     = PARROT_ARG_FLATTEN,  /* i.e. foldup  */
     PARROT_ARG_MAYBE_FLATTEN    = 0x10, /* flatten, if slurping and the
                                            argument is array */
-    PARROT_ARG_OPTIONAL         = 0x20
+    PARROT_ARG_OPTIONAL         = 0x20,
+    PARROT_ARG_OPT_FLAG         = 0x40  /* pev optional was set */
     /* more to come soon */
 
 } Call_bits_enum_t;

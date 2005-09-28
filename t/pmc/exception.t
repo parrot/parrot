@@ -16,7 +16,7 @@ Tests C<Exception> and C<Exception_Handler> PMCs.
 
 =cut
 
-use Parrot::Test tests => 30;
+use Parrot::Test tests => 25;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "push_eh - clear_eh");
@@ -47,10 +47,9 @@ main
 caught it
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "set_eh - throw - message");
+output_is(<<'CODE', <<'OUTPUT', "push_eh - throw - message");
     print "main\n"
-    newsub P20, .Exception_Handler, _handler
-    set_eh P20
+    push_eh _handler
 
     new P30, .Exception
     set P30["_message"], "something happend"
@@ -69,10 +68,9 @@ caught it
 something happend
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "set_eh - throw - message, check P5");
+output_is(<<'CODE', <<'OUTPUT', "push_eh - throw - message, check P5");
     print "main\n"
-    newsub P20, .Exception_Handler, _handler
-    set_eh P20
+    push_eh _handler
 
     new P30, .Exception
     set P30["_message"], "something happend"
@@ -86,10 +84,8 @@ _handler:
     set S0, P5["_message"]	# P5 is the exception object
     print S0
     print "\n"
-    save P0		# preserve reg
     set P0, P5["_P5"]	# original P5
     print P0
-    restore P0
     end
 CODE
 main
@@ -98,14 +94,13 @@ something happend
 a string
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "set_eh - throw - lexical");
+output_is(<<'CODE', <<'OUTPUT', "push_eh - throw - lexical");
     print "main\n"
     new_pad 0
     new P0, .Integer
     set P0, 42
     store_lex -1, "$a", P0
-    newsub P20, .Exception_Handler, _handler
-    set_eh P20
+    push_eh _handler
 
     new P30, .Exception
     throw P30
@@ -121,67 +116,6 @@ CODE
 main
 caught it
 42
-OUTPUT
-
-output_is(<<'CODE', <<'OUTPUT', "set_eh - throw - return");
-    print "main\n"
-    newsub P20, .Exception_Handler, _handler
-    set_eh P20
-
-    new P30, .Exception
-    set P30["_message"], "something happend"
-    throw P30
-    print "back again\n"
-    end
-_handler:
-    print "caught it\n"
-    set S0, P5["_message"]	# P5 is the exception object
-    print S0
-    print "\n"
-    set P2, P5["_invoke_cc"]	# the return continuation
-    invoke P2
-CODE
-main
-caught it
-something happend
-back again
-OUTPUT
-
-output_is(<<'CODE', <<'OUTPUT', "set_eh - throw - return, change lexical");
-    print "main\n"
-    new_pad 0
-    new P0, .Integer
-    set P0, 42
-    store_lex -1, "$a", P0
-    newsub P20, .Exception_Handler, _handler
-    set_eh P20
-
-    new P30, .Exception
-    set P30["_message"], "something happend"
-    throw P30
-    print "back again\n"
-    find_lex P0, "$a"
-    print P0
-    print "\n"
-    end
-_handler:
-    print "caught it\n"
-    set S0, P5["_message"]	# P5 is the exception object
-    print S0
-    print "\n"
-    find_lex P0, "$a"
-    print P0
-    print "\n"
-    inc P0
-    set P2, P5["_invoke_cc"]	# the return continuation
-    invoke P2
-CODE
-main
-caught it
-something happend
-42
-back again
-43
 OUTPUT
 
 output_like(<<'CODE', <<'OUTPUT', "throw - no handler");
@@ -219,10 +153,8 @@ OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "2 exception handlers");
     print "main\n"
-    newsub P20, .Exception_Handler, _handler1
-    set_eh P20
-    newsub P21, .Exception_Handler, _handler2
-    set_eh P21
+    push_eh _handler1
+    push_eh _handler2
 
     new P30, .Exception
     set P30["_message"], "something happend"
@@ -249,10 +181,8 @@ OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "2 exception handlers, throw next");
     print "main\n"
-    newsub P20, .Exception_Handler, _handler1
-    set_eh P20
-    newsub P21, .Exception_Handler, _handler2
-    set_eh P21
+    push_eh _handler1
+    push_eh _handler2
 
     new P30, .Exception
     set P30["_message"], "something happend"
@@ -278,44 +208,6 @@ caught it in 2
 something happend
 caught it in 1
 something happend
-OUTPUT
-
-output_is(<<'CODE', <<'OUTPUT', "2 exception handlers, throw next - return");
-    print "main\n"
-    newsub P20, .Exception_Handler, _handler1
-    set_eh P20
-    newsub P21, .Exception_Handler, _handler2
-    set_eh P21
-
-    new P30, .Exception
-    set P30["_message"], "something happend"
-    throw P30
-    print "back in main\n"
-    end
-_handler1:
-    print "caught it in 1\n"
-    set S0, P5["_message"]
-    print S0
-    print "\n"
-    set P2, P5["_invoke_cc"]	# the return continuation
-    invoke P2
-_handler2:
-    print "caught it in 2\n"
-    set S0, P5["_message"]
-    print S0
-    print "\n"
-    throw P5
-    print "back in 2\n"
-    # XXX we cant return from here, the _return_cc in P5 is common
-    # to both exception handlers
-    end
-CODE
-main
-caught it in 2
-something happend
-caught it in 1
-something happend
-back in 2
 OUTPUT
 
 output_is(<<'CODE', <<OUT, "die_hard");
@@ -367,9 +259,10 @@ OUT
 
 output_like(<<'CODE', <<OUT, "find_lex");
     new_pad 0
-    newsub P0, .Exception_Handler, _handler
-    set_eh P0
+    push_eh _handler
     find_lex P1, "no_such_thing"
+    clear_eh
+ok:
     print "resumed\n"
     end
 _handler:
@@ -377,78 +270,13 @@ _handler:
     set S0, P5["_message"]
     print S0
     print "\n"
-    set P1, P5["_invoke_cc"]
-    invoke P1
+    branch ok
 CODE
 /^caught it
 Lexical 'no_such_thing' not found
 resumed
 /
 OUT
-
-
-output_is(<<'CODE', <<'OUTPUT', "clear_eh, set_eh again");
-# bug reported by Jos Visser
-	new_pad 0
-
-	newsub P10, .Exception_Handler, _handler
-
-	set I12, 1
-	set_eh P10
-	find_lex P13,"a"
-	clear_eh
-	new P13, .Float
-	store_lex -1,"a",P13
-	set P13, I12
-	find_lex P14,"a"
-	print P14
-
-	set I12, 2
-	set_eh P10
-	print "mark1\n"
-	find_lex P13,"b"
-	print "mark2\n"
-	end
-
-_handler:
-        print "Hi from handler\n"
-        set P2, P5["_invoke_cc"]
-        invoke P2
-
-CODE
-Hi from handler
-1mark1
-Hi from handler
-mark2
-OUTPUT
-
-output_like(<<'CODE', <<'OUTPUT', "check that coroutines handler isnt run");
-    print "main\n"
-    newsub P0, .Coroutine, _sub
-    invokecc
-    print "back in main\n"
-    find_lex P3, -1, "nix"
-    end
-
-_sub:
-    print "in coro\n"
-    newsub P20, .Exception_Handler, _handler
-    set_eh P20
-    invoke P1
-
-_handler:
-    print "caught it\n"
-    set S0, P5["_message"]
-    print S0
-    print "\n"
-    set P2, P5["_invoke_cc"]	# the return continuation
-    invoke P2
-CODE
-/main
-in coro
-back in main
-/
-OUTPUT
 
 output_is(<<'CODE', '', "exit exception");
     noop
@@ -465,7 +293,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "set recursion limit, method call ");
     .local pmc n
     new_pad 0
     $P0 = getinterp
-    $P0."recursion_limit"(100)
+    $P0."recursion_limit"(50)
     newclass $P0, "b"
     $I0 = find_type "b"
     $P0 = new $I0
@@ -484,8 +312,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "set recursion limit, method call ");
     store_lex -1, "n", n
     n1 = new Integer
     n1 = n + 1
-    newsub $P0, .Exception_Handler, catch
-    set_eh $P0
+    push_eh catch
     n = self."b11"(n1)
     store_lex -1, "n", n
     clear_eh
@@ -495,7 +322,7 @@ catch:
 .end
 CODE
 ok 1
-99
+49
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "push_eh - throw");
@@ -560,6 +387,7 @@ output_is(<<'CODE', <<'OUTPUT', "pushaction");
     print "ok 3\n"
     end
 .pcc_sub action:
+    get_params "(0)", I5
     print "in action I5 = "
     print I5
     print "\n"
@@ -584,6 +412,7 @@ handler:
     print "ok 3\n"
     end
 .pcc_sub action:
+    get_params "(0)", I5
     print "in action I5 = "
     print I5
     print "\n"
@@ -660,7 +489,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "pushaction, sub exit - capture CC, ret");
     .local pmc cc
     cc = interpinfo .INTERPINFO_CURRENT_CONT
     print "foo\n"
-    invoke cc
+    invokecc cc
 .end
 
 .sub action

@@ -21,7 +21,6 @@ enum INSTYPE {    /*instruction type can be   */
 typedef struct _Instruction {
     char * op;		   /* opstring w/o params */
     char * fmt;            /* printf style format string for params   */
-    SymReg * r[IMCC_MAX_REGS];  /*   uses {r0-rx}->reg     */
     unsigned int flags;    /* how the instruction affects each of the values */
     unsigned int type;	   /* 16 bit register branches, + ITxxx */
     int keys;		   /* bitmask of keys used in this instruction */
@@ -32,6 +31,9 @@ typedef struct _Instruction {
     int opnum;		   /* parrot op number */
     int opsize;		   /* parrot op size   */
     int line;		   /* source code line number */
+    int n_r;              /* count of regs in **r */
+    SymReg * r[1];         /* instruction is allocated variabled sized
+                              to hold more SymRegs */
 } Instruction;
 
 
@@ -75,9 +77,9 @@ struct _IMC_Unit;
  * please use INS
  */
 #ifdef _PARSER
-Instruction * _mk_instruction(const char *,const char *, SymReg **, int);
+Instruction * _mk_instruction(const char *,const char *, int n, SymReg **, int);
 #else
-#define _mk_instruction(a,b,c,d) dont_use(a,b)
+#define _mk_instruction(a,b,n,c,d) dont_use(a,b)
 #endif
 Instruction * INS(Interp *, struct _IMC_Unit *, char * name,
 	const char *fmt, SymReg **regs, int nargs, int keyv, int emit);

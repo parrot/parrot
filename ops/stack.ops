@@ -374,7 +374,7 @@ Gets the type of entry $2 of the user stack and puts it in $1.
 op entrytype(out INT, in INT) :base_core {
   Stack_Entry_t *entry;
 
-  entry = stack_entry(interpreter, interpreter->ctx.user_stack, $2);
+  entry = stack_entry(interpreter, CONTEXT(interpreter->ctx)->user_stack, $2);
   if (!entry) {
     internal_exception(99, "Stack Depth wrong");
   }
@@ -391,7 +391,7 @@ Puts the depth of the user stack in $1.
 =cut
 
 inline op depth(out INT) :base_core {
-  $1 = stack_height(interpreter, interpreter->ctx.user_stack);
+  $1 = stack_height(interpreter, CONTEXT(interpreter->ctx)->user_stack);
   goto NEXT();
 }
 
@@ -414,7 +414,7 @@ is the bottom-most)
 
 op lookback(out INT, in INT) :base_core {
   Stack_Entry_t *entry =
-  	stack_entry(interpreter, interpreter->ctx.user_stack, $2);
+  	stack_entry(interpreter, CONTEXT(interpreter->ctx)->user_stack, $2);
   if (!entry)
       internal_exception(99, "Stack depth wrong");
   if (entry->entry_type != STACK_ENTRY_INT) {
@@ -427,7 +427,7 @@ op lookback(out INT, in INT) :base_core {
 
 op lookback(out STR, in INT) :base_core {
   Stack_Entry_t *entry =
-  	stack_entry(interpreter, interpreter->ctx.user_stack, $2);
+  	stack_entry(interpreter, CONTEXT(interpreter->ctx)->user_stack, $2);
   if (!entry)
       internal_exception(99, "Stack depth wrong");
   if (entry->entry_type != STACK_ENTRY_STRING) {
@@ -440,7 +440,7 @@ op lookback(out STR, in INT) :base_core {
 
 op lookback(out NUM, in INT) :base_core {
   Stack_Entry_t *entry =
-  	stack_entry(interpreter, interpreter->ctx.user_stack, $2);
+  	stack_entry(interpreter, CONTEXT(interpreter->ctx)->user_stack, $2);
   if (!entry)
       internal_exception(99, "Stack depth wrong");
   if (entry->entry_type != STACK_ENTRY_FLOAT) {
@@ -453,7 +453,7 @@ op lookback(out NUM, in INT) :base_core {
 
 op lookback(out PMC, in INT) :base_core {
   Stack_Entry_t *entry =
-  	stack_entry(interpreter, interpreter->ctx.user_stack, $2);
+  	stack_entry(interpreter, CONTEXT(interpreter->ctx)->user_stack, $2);
   if (!entry)
       internal_exception(99, "Stack depth wrong");
   if (entry->entry_type != STACK_ENTRY_PMC) {
@@ -480,22 +480,22 @@ Save register or constant $1 onto the user stack.
 
 inline op save(in INT) :base_core {
   INTVAL i = $1;
-  stack_push(interpreter, &interpreter->ctx.user_stack, &i, STACK_ENTRY_INT, STACK_CLEANUP_NULL);
+  stack_push(interpreter, &CONTEXT(interpreter->ctx)->user_stack, &i, STACK_ENTRY_INT, STACK_CLEANUP_NULL);
   goto NEXT();
 }
 
 inline op save(in NUM) :base_core {
-  stack_push(interpreter, &interpreter->ctx.user_stack, &($1), STACK_ENTRY_FLOAT, STACK_CLEANUP_NULL);
+  stack_push(interpreter, &CONTEXT(interpreter->ctx)->user_stack, &($1), STACK_ENTRY_FLOAT, STACK_CLEANUP_NULL);
   goto NEXT();
 }
 
 inline op save(in PMC) :base_core {
-  stack_push(interpreter, &interpreter->ctx.user_stack, $1, STACK_ENTRY_PMC, STACK_CLEANUP_NULL);
+  stack_push(interpreter, &CONTEXT(interpreter->ctx)->user_stack, $1, STACK_ENTRY_PMC, STACK_CLEANUP_NULL);
   goto NEXT();
 }
 
 inline op save(in STR) :base_core {
-  stack_push(interpreter, &interpreter->ctx.user_stack, $1, STACK_ENTRY_STRING, STACK_CLEANUP_NULL);
+  stack_push(interpreter, &CONTEXT(interpreter->ctx)->user_stack, $1, STACK_ENTRY_STRING, STACK_CLEANUP_NULL);
   goto NEXT();
 }
 
@@ -508,7 +508,7 @@ Save a clone of register or constant $1 onto the user stack.
 =cut
 
 inline op savec(in STR) :base_core {
-  stack_push(interpreter, &interpreter->ctx.user_stack, string_copy(interpreter, $1), STACK_ENTRY_STRING, STACK_CLEANUP_NULL);
+  stack_push(interpreter, &CONTEXT(interpreter->ctx)->user_stack, string_copy(interpreter, $1), STACK_ENTRY_STRING, STACK_CLEANUP_NULL);
   goto NEXT();
 }
 
@@ -527,25 +527,25 @@ Restore register $1 from the user stack.
 =cut
 
 inline op restore(out INT) :base_core {
-  (void)stack_pop(interpreter, &interpreter->ctx.user_stack, &($1),
+  (void)stack_pop(interpreter, &CONTEXT(interpreter->ctx)->user_stack, &($1),
                   STACK_ENTRY_INT);
   goto NEXT();
 }
 
 inline op restore(out NUM) :base_core {
-  (void)stack_pop(interpreter, &interpreter->ctx.user_stack, &($1),
+  (void)stack_pop(interpreter, &CONTEXT(interpreter->ctx)->user_stack, &($1),
                   STACK_ENTRY_FLOAT);
   goto NEXT();
 }
 
 inline op restore(out PMC) :base_core {
-  (void)stack_pop(interpreter, &interpreter->ctx.user_stack, &($1),
+  (void)stack_pop(interpreter, &CONTEXT(interpreter->ctx)->user_stack, &($1),
                   STACK_ENTRY_PMC);
   goto NEXT();
 }
 
 inline op restore(out STR) :base_core {
-  (void)stack_pop(interpreter, &interpreter->ctx.user_stack, &($1),
+  (void)stack_pop(interpreter, &CONTEXT(interpreter->ctx)->user_stack, &($1),
                   STACK_ENTRY_STRING);
   goto NEXT();
 }
@@ -565,7 +565,7 @@ the second entry, the second becomes the third etc., while the former
 =cut
 
 inline op rotate_up(in INT) :base_core {
-  rotate_entries(interpreter, &interpreter->ctx.user_stack, $1);
+  rotate_entries(interpreter, &CONTEXT(interpreter->ctx)->user_stack, $1);
   goto NEXT();
 }
 
@@ -578,7 +578,7 @@ Save register or constant $1 onto the high-speed int stack.
 =cut
 
 inline op intsave(in INT) :base_core {
-  intstack_push(interpreter, interpreter->ctx.intstack, $1);
+  intstack_push(interpreter, CONTEXT(interpreter->ctx)->intstack, $1);
   goto NEXT();
 }
 
@@ -591,7 +591,7 @@ Restore register $1 from the high-speed int stack.
 =cut
 
 inline op intrestore(out INT) :base_core {
-  $1=intstack_pop(interpreter, interpreter->ctx.intstack);
+  $1=intstack_pop(interpreter, CONTEXT(interpreter->ctx)->intstack);
   goto NEXT();
 }
 
@@ -604,7 +604,7 @@ Puts the depth of the high-speed int stack in $1.
 =cut
 
 inline op intdepth(out INT) :base_core {
-  $1=intstack_depth(interpreter, interpreter->ctx.intstack);
+  $1=intstack_depth(interpreter, CONTEXT(interpreter->ctx)->intstack);
   goto NEXT();
 }
 

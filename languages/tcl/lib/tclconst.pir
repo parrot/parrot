@@ -264,5 +264,5 @@ Get the value of the const.
 =cut
 
 .sub interpret method
-    .return(TCL_OK, self)
+    .return(self)
 .end

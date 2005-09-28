@@ -147,7 +147,7 @@ _main:
     set I17, 0
 loop:
     sweep 1
-    invokecc
+    invokecc P0
     inc I17
     lt I17, I16, loop
     print "ok\n"
@@ -170,39 +170,38 @@ CODE
 ok
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "vanishing return continuation in method calls");
-    newclass P1, "Foo"
+pir_output_is(<<'CODE', <<OUTPUT, "vanishing return continuation in method calls");
+.sub main @MAIN
+    .local pmc o, cl
+    cl = newclass "Foo"
 
-    find_type I1, "Foo"
-    new P3, I1
+    find_type $I1, "Foo"
+    new o, $I1
     print "ok\n"
     end
+.end
 
 .namespace ["Foo"]
-.pcc_sub __init:
+.sub __init method
     print "init\n"
     sweep 1
     new P6, .String
     set P6, "hi"
-.include "interpinfo.pasm"
-    interpinfo P2, .INTERPINFO_CURRENT_OBJECT
-    callmethodcc "do_inc"
+    self."do_inc"()
     sweep 1
-    returncc
+.end
 
-.pcc_sub do_inc:
+.sub do_inc method
     sweep 1
-.include "interpinfo.pasm"
-    interpinfo P2, .INTERPINFO_CURRENT_OBJECT
-    inc P2
+    inc self
     sweep 1
     print "back from _inc\n"
-    returncc
+.end
 
-.pcc_sub __increment:
+.sub __increment method
     print "inc\n"
     sweep 1
-    returncc
+.end
 CODE
 init
 inc
@@ -224,8 +223,7 @@ output_is(<<'CODE', <<OUTPUT, "failing if regsave is not marked");
 
 .namespace ["Source"]
 .pcc_sub __get_string:	# buffer
-.include "interpinfo.pasm"
-    interpinfo P2, .INTERPINFO_CURRENT_OBJECT
+    get_params "(0)", P2
     getprop P12, "buf", P2
     sweep 1
     typeof I12, P12
@@ -237,26 +235,16 @@ output_is(<<'CODE', <<OUTPUT, "failing if regsave is not marked");
     setprop P12, "buf", P14
     setprop P2, "buffer", P12
 buffer_ok:
-    set I0, 1
-    null I1
-    set I2, 1
-    null I3
-    null I4
-    set S5, P12
+    set_returns "(0)", P12
     returncc
 
 .namespace ["Source::Buffer"]
 .pcc_sub __get_string:
+    get_params "(0)", P2
     sweep 1
-    interpinfo P2, .INTERPINFO_CURRENT_OBJECT
     getprop P12, "buf", P2
     set S16, P12
-    set S5, S16
-    set I0, 1
-    null I1
-    set I2, 1
-    null I3
-    null I4
+    set_returns "(0)", S16
     returncc
 CODE
 hello
@@ -266,9 +254,10 @@ OUTPUT
 # this is a stripped down version of imcc/t/syn/pcc_16
 # s. also classes/retcontinuation.pmc
 output_is(<<'CODE', <<OUTPUT, "coro context and invalid return continuations");
+.include "interpinfo.pasm"
     newsub P0, .Coroutine, co1
 l:
-    invokecc
+    invokecc P0
     inc I20
     lt I20, 3, l
     print "done\n"
@@ -278,7 +267,7 @@ co1:
 col:
     print "coro\n"
     sweep 1
-    invoke P0
+    yield
     branch col
 CODE
 coro

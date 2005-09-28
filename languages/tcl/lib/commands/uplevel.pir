@@ -7,8 +7,7 @@
 .namespace [ "Tcl" ]
 
 .sub "&uplevel"
-  .local pmc argv
-  argv = foldup  
+  .param pmc argv :slurpy
  
   .local string expr
   .local int argc
@@ -52,12 +51,12 @@ loop_done:
   store_global "_Tcl", "call_level", call_level
 
   $P1 = parse(expr,0,0)
-  ($I0,$P0) = $P1."interpret"()
+  # can't quite tailcall this at the moment due to the hackish call_level
+  $P0 = $P1."interpret"()
 
   #restore the old level
   store_global "_Tcl", "call_level", old_call_level
 
 done:
-  # XXX can't quite tailcall this at the moment due to the hackish call_level
-  .return($I0,$P0) 
+  .return($P0) 
 .end

@@ -2,9 +2,19 @@
 
 use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 5;
+use Parrot::Test tests => 6;
 use Test::More;
 use vars qw($TODO);
+
+language_output_is("tcl",<<'TCL',<<OUT,"missing unreferenced global");
+  proc a {} {
+    global q
+    puts "ok"
+ }
+ a
+TCL
+ok
+OUT
 
 language_output_is("tcl",<<'TCL',<<OUT,"missing global");
   proc a {} {

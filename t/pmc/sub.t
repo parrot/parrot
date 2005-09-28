@@ -17,7 +17,7 @@ C<Continuation> PMCs.
 
 =cut
 
-use Parrot::Test tests => 51;
+use Parrot::Test tests => 50;
 use Test::More;
 use Parrot::Config;
 
@@ -30,7 +30,7 @@ END {
 output_is(<<'CODE', <<'OUTPUT', "PASM subs - newsub");
     print "main\n"
     newsub .Sub, .RetContinuation, _func, _ret
-    invoke
+    invoke P0, P1
 _ret:
     print "back\n"
     end
@@ -46,7 +46,7 @@ OUTPUT
 output_is(<<'CODE', <<'OUTPUT', "PASM subs - newsub 2");
     print "main\n"
     newsub P0, .Sub, _func
-    invokecc
+    invokecc P0
     print "back\n"
     end
 _func:
@@ -63,61 +63,14 @@ output_is(<<'CODE', <<'OUTPUT', "PASM subs - invokecc");
     set_addr P0, func
 
     set I5, 3
-    set I0, 1
-    set I1, 1
-    null I2
-    null I3
-    null I4
-    save I5
-
-    invokecc
-
-    restore I5
-    print I5
-    print "\n"
-    end
-
-func:
-    print I5
-    print "\n"
-
-    eq I5, 0, endfunc
-    dec I5
-
-.include "interpinfo.pasm"
-    interpinfo P0, .INTERPINFO_CURRENT_SUB
-    invokecc   # recursive invoke
-
-endfunc:
-    returncc
-CODE
-3
-2
-1
-0
-3
-OUTPUT
-
-output_is(<<'CODE', <<'OUTPUT', "PASM subs - invokecc_p");
-    new P0, .Sub
-    set_addr P0, func
-
-    set I5, 3
-    set I0, 1
-    set I1, 1
-    null I2
-    null I3
-    null I4
-    save I5
-
+    set_args "(0)", I5
     invokecc P0
-
-    restore I5
     print I5
     print "\n"
     end
 
 func:
+    get_params "(0)", I5
     print I5
     print "\n"
 
@@ -126,6 +79,7 @@ func:
 
 .include "interpinfo.pasm"
     interpinfo P0, .INTERPINFO_CURRENT_SUB
+    set_args "(0)", I5
     invokecc P0  # recursive invoke
 
 endfunc:
@@ -154,7 +108,7 @@ endcont:
     store_global "foo", P4
     print "going to cont\n"
     clone P0, P1
-    invoke
+    invokecc P0
 done:
     print "done\n"
     end
@@ -207,44 +161,27 @@ main:
     new P5, .Integer
     set P5, 5
 
-    set I0, 0	# non-proto
-    set I3, 1	# 1 arg
-    invokecc
-    set P0, P5	# the closure
+    set_args "(0)", P5
+    get_results "(0)", P0
+    invokecc P0
 
     new P5, .Integer
     set P5, 3
-
-    set I0, 0	# non-proto
-    set I3, 1	# 1 arg
-    pushbottomp	# preserve P regs
-    invokecc
-    save P5	# result in P5
-    popbottomp
-    restore P2
-
+    set_args "(0)", P5
+    get_results "(0)", P2
+    invokecc P0
     print P2
     print "\n"
 
-    set I0, 0	# non-proto
-    set I3, 1	# 1 arg
-    pushbottomp	# preserve P regs
-    invokecc
-    save P5	# result in P5
-    popbottomp
-    restore P2
-
+    set_args "(0)", P5
+    get_results "(0)", P2
+    invokecc P0
     print P2
     print "\n"
 
-    set I0, 0	# non-proto
-    set I3, 1	# 1 arg
-    pushbottomp	# preserve P regs
-    invokecc
-    save P5	# result in P5
-    popbottomp
-    restore P2
-
+    set_args "(0)", P5
+    get_results "(0)", P2
+    invokecc P0
     print P2
     print "\n"
 
@@ -253,23 +190,23 @@ main:
 # foo takes a number n (P5) and returns a sub (in P5) that takes
 # a number i (P5) and returns n incremented by i.
 foo:
+    get_params "(0)", P5
     new_pad 0
     store_lex 0, "n", P5
     new P5, .Closure	# P5 has now the lexical "n" in the pad
     set_addr P5, f
-    set I0, 0	# non-proto
-    set I3, 1	# 1 retval
+    set_returns "(0)", P5
     returncc		# ret
 
 # expects arg in P5, returns incremented result in P5
 f:
+    get_params "(0)", P5
     find_lex P2, "n"	# invoke-ing the Sub pushes the lexical pad
     			# of the closure on the pad stack
     add P2, P5		# n += shift, the lexical is incremented
     new P5, .Integer
-    set P5, P2
-    set I0, 0	# non-proto
-    set I3, 1	# 1 retval
+    assign P5, P2
+    set_returns "(0)", P5
     returncc		# ret
 
 CODE
@@ -282,7 +219,7 @@ output_is(<<'CODE', <<'OUTPUT', "PASM subs - tail invoke");
     new P0, .Sub
     set_addr P0, func1
 
-    invokecc
+    invokecc P0
     print "done\n"
     end
 
@@ -309,7 +246,7 @@ OUTPUT
 output_is(<<'CODE', <<'OUTPUT', "PASM subs - tail invoke with newsub");
     newsub P0, .Sub, func1
 
-    invokecc
+    invokecc P0
     print "done\n"
     end
 
@@ -334,18 +271,16 @@ OUTPUT
 output_is(<<'CODE', <<'OUTPUT', "sub calling a sub");
     print "main\n"
     newsub .Sub, .RetContinuation, _func1, ret1
-    invoke
+    invoke P0, P1
 ret1:
     print "back\n"
     end
 
 _func1:
     print "func1\n"
-    pushbottomp
     newsub .Sub, .RetContinuation, _func2, ret2
-    invoke
+    invoke P0, P1
 ret2:
-    popbottomp
     print "func1\n"
     returncc
 
@@ -366,7 +301,7 @@ output_like(<<'CODE', <<'OUTPUT', "interp - warnings");
     set I0, P0
     printerr "main:"
     newsub .Sub, .RetContinuation, _func, _ret
-    invoke
+    invoke P0, P1
 _ret:
     printerr ":back"
     new P0, .PerlUndef
@@ -389,7 +324,7 @@ output_like(<<'CODE', <<'OUTPUT', "interp - warnings 2");
     new P10, .PerlUndef
     set I0, P10
     printerr ":main"
-    invoke
+    invoke P0, P1
 ret:
     printerr ":back:"
     new P10, .PerlUndef
@@ -415,9 +350,7 @@ output_like(<<'CODE', <<'OUTPUT', "interp - warnings 2 - updatecc");
     new P10, .PerlUndef
     set I0, P10
     printerr ":main"
-    # update the state of the return continuation
-    updatecc
-    invoke
+    invokecc P0
 ret:
     printerr ":back:"
     new P10, .PerlUndef
@@ -443,7 +376,7 @@ output_is(<<'CODE', <<'OUTPUT', "pcc sub");
     print "not "
 ok:
     print "ok 1\n"
-    invokecc
+    invokecc P0
     print "back\n"
     end
 .pcc_sub _the_sub:
@@ -462,7 +395,7 @@ output_is(<<'CODE', <<'OUTPUT', "pcc sub, tail call");
     print "not "
 ok:
     print "ok 1\n"
-    invokecc
+    invokecc P0
     print "back\n"
     end
 
@@ -492,7 +425,7 @@ output_is(<<'CODE', <<'OUTPUT', "pcc sub perl::syn::tax");
     print "not "
 ok:
     print "ok 1\n"
-    invokecc
+    invokecc P0
     print "back\n"
     end
 .pcc_sub _the::sub::some::where:
@@ -523,7 +456,7 @@ output_is(<<'CODE', <<'OUTPUT', "load_bytecode call sub");
     print "not "
 ok1:
     print "found sub\n"
-    invoke
+    invokecc P0
     print "never\n"
     end
 CODE
@@ -552,7 +485,7 @@ output_is(<<'CODE', <<'OUTPUT', "load_bytecode call sub, ret");
     print "not "
 ok1:
     print "found sub\n"
-    invokecc
+    invokecc P0
     print "back\n"
     end
 CODE
@@ -586,7 +519,7 @@ output_is(<<'CODE', <<'OUTPUT', "load_bytecode call different subs, ret");
 ok1:
     print "found sub1\n"
     set P10, P0
-    invokecc
+    invokecc P0
     print "back\n"
     find_global P0, "_sub2"
     defined I0, P0
@@ -594,10 +527,10 @@ ok1:
     print "not "
 ok2:
     print "found sub2\n"
-    invokecc
+    invokecc P0
     print "back\n"
     set P0, P10
-    invokecc
+    invokecc P0
     print "back\n"
     end
 CODE
@@ -627,7 +560,7 @@ output_is(<<'CODE', <<'OUTPUT', "load_bytecode PBC call different subs, ret");
 ok1:
     print "found sub1\n"
     set P10, P0
-    invokecc
+    invokecc P0
     print "back\n"
     find_global P0, "_sub2"
     defined I0, P0
@@ -635,10 +568,10 @@ ok1:
     print "not "
 ok2:
     print "found sub2\n"
-    invokecc
+    invokecc P0
     print "back\n"
     set P0, P10
-    invokecc
+    invokecc P0
     print "back\n"
     end
 CODE
@@ -708,40 +641,6 @@ f2:
 CODE
 ok 1
 ok 2
-OUTPUT
-
-output_is(<<'CODE', <<'OUTPUT', "continuation close over register stacks");
-    set S20, "ok\n"
-    savetop
-    newsub P0, .Continuation, next
-    restoretop
-    concat S20, "not ", S20
-    invoke
-    print "bad\n"
-next:
-    restoretop
-    print S20
-    end
-CODE
-ok
-OUTPUT
-
-output_is(<<'CODE', <<'OUTPUT', "DOD marks continuation's register stacks");
-    set S20, "ok\n"
-    savetop
-    newsub P0, .Continuation, next
-    restoretop
-    null S20
-    sweep 1
-    collect
-    invoke
-    print "bad\n"
-next:
-    restoretop
-    print S20
-    end
-CODE
-ok
 OUTPUT
 
 output_is(<<'CODE', <<'OUT', "MAIN pragma, syntax only");
@@ -825,7 +724,7 @@ output_is(<<'CODE', <<'OUTPUT', "load_bytecode autorun first");
     load_bytecode "temp.pasm"
     print "loaded\n"
     find_global P0, "_sub2"
-    invokecc
+    invokecc P0
     print "back\n"
     end
 CODE
@@ -844,7 +743,7 @@ output_is(<<'CODE', <<'OUTPUT', "load_bytecode autorun first in pbc");
     load_bytecode "temp.pbc"
     print "loaded\n"
     find_global P0, "_sub2"
-    invokecc
+    invokecc P0
     print "back\n"
     end
 CODE
@@ -872,7 +771,7 @@ output_is(<<'CODE', <<'OUTPUT', "load_bytecode autorun second");
     load_bytecode "temp.pasm"
     print "loaded\n"
     find_global P0, "_sub1"
-    invokecc
+    invokecc P0
     print "back\n"
     end
 CODE
@@ -891,7 +790,7 @@ output_is(<<'CODE', <<'OUTPUT', "load_bytecode autorun second in pbc");
     load_bytecode "temp.pbc"
     print "loaded\n"
     find_global P0, "_sub1"
-    invokecc
+    invokecc P0
     print "back\n"
     end
 CODE
@@ -919,7 +818,7 @@ output_is(<<'CODE', <<'OUTPUT', "load_bytecode autorun both");
     load_bytecode "temp.pasm"
     print "loaded\n"
     find_global P0, "_sub1"
-    invokecc
+    invokecc P0
     print "back\n"
     end
 CODE
@@ -939,7 +838,7 @@ output_is(<<'CODE', <<'OUTPUT', "load_bytecode autorun both in pbc");
     load_bytecode "temp.pbc"
     print "loaded\n"
     find_global P0, "_sub1"
-    invokecc
+    invokecc P0
     print "back\n"
     end
 CODE
@@ -986,9 +885,9 @@ output_is(<<'CODE', <<'OUTPUT', '@MAIN pragma call subs');
 .pcc_sub @MAIN _main:
     print "main\n"
     find_global P0, "_first"
-    invokecc
+    invokecc P0
     find_global P0, "_second"
-    invokecc
+    invokecc P0
     end
 CODE
 main
@@ -1130,7 +1029,7 @@ output_is(<<'CODE', <<'OUTPUT', "sub names");
     print P20
     print "\n"
     find_global P0, "the_sub"
-    invokecc
+    invokecc P0
     interpinfo P20, .INTERPINFO_CURRENT_SUB
     print P20
     print "\n"
@@ -1157,7 +1056,7 @@ output_is(<<'CODE', <<'OUTPUT', "sub names w MAIN");
     print P20
     print "\n"
     find_global P0, "the_sub"
-    invokecc
+    invokecc P0
     interpinfo P20, .INTERPINFO_CURRENT_SUB
     print P20
     print "\n"
@@ -1378,4 +1277,44 @@ l12
 l21
 l22
 main 3
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "immediate code as const");
+.sub make_pi @IMMEDIATE, @ANON
+    $N0 = atan 1.0, 1.0
+    $N0 *= 4
+    $P0 = new .Float
+    $P0 = $N0
+    .return ($P0)
+.end
+
+.sub main @MAIN
+    .const .Sub pi = "make_pi"
+    print pi
+    print "\n"
+.end
+CODE
+3.14159
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "immediate code as const - obj");
+.sub make_obj @IMMEDIATE, @ANON
+    .local pmc cl, o
+    cl = newclass "Foo"
+    addattribute cl, 'x'
+    o = new 'Foo'
+    $P0 = new String
+    $P0 = "ok 1\n"
+    setattribute o, 'x', $P0
+    .return (o)
+.end
+
+.sub main @MAIN
+    .const .Sub o = "make_obj"
+    $P0 = getattribute o, 'x'
+    print $P0
+.end
+
+CODE
+ok 1
 OUTPUT

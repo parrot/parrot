@@ -24,7 +24,7 @@ TDB
     .local int i
     .local pmc base
     .local pmc io
-    
+
     find_type i, "Stream::ParrotIO"
     if i > 1 goto END
 
@@ -32,7 +32,7 @@ TDB
 
     getclass base, "Stream::Base"
     subclass io, base, "Stream::ParrotIO"
-    
+
     addattribute io, "blocksize"
 END:
 .end
@@ -53,7 +53,7 @@ Uses the open op to create a ParrotIO which is used as the source.
     .param string name
     .param string mode
     .local pmc pio
-    
+
     open pio, name, mode
     assign self, pio
 .end
@@ -65,13 +65,15 @@ Sets or returns the current block size.
 =cut
 
 .sub blockSize method
-    .param int bs
+    .param int bs :optional
+    .param int has_bs :opt_flag
+
     .local pmc temp
     .local int ret
-    
+
     classoffset $I0, self, "Stream::ParrotIO"
-    if argcI == 0 goto GET
-    
+    unless has_bs goto GET
+
     temp = new .PerlInt
     temp = bs
     setattribute self, $I0, temp
@@ -94,7 +96,7 @@ RET:
     .local string str
     .local pmc pio
     .local int bs
-    
+
     bs = self."blockSize"()
     pio = self."source"()
     read str, pio, bs

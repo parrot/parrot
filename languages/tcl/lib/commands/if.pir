@@ -4,8 +4,7 @@
 .namespace [ "Tcl" ]
 
 .sub "&if"
-  .local pmc argv 
-  argv = foldup
+  .param pmc argv :slurpy
 
   .local int argc 
   argc = argv
@@ -19,7 +18,6 @@
   .local string condition
   .local string body
   .local string else
-  .local int return_type
   .local int handling_else
   handling_else = 0
   .local int counter
@@ -75,10 +73,8 @@ get_final:
   if counter != argc goto more_than_else
 
 begin_parsing:
-  (return_type,retval) = expression_p(condition)
-  if return_type == TCL_ERROR goto done_error
-  (return_type,retval) = expression_i(retval)
-  if return_type == TCL_ERROR goto done_error
+  retval = expression_p(condition)
+  retval = expression_i(retval)
 
   unless retval goto do_elseifs
   code = body 
@@ -92,10 +88,8 @@ elseif_loop:
   if $I2 == $I1 goto do_else
   $P1 = elseifs[$I2]
   condition = $P1[0]
-  (return_type,retval) = expression_p(condition)
-  if return_type == TCL_ERROR goto done_error
-  (return_type,retval) = expression_i(retval)
-  if return_type == TCL_ERROR goto done_error
+  retval = expression_p(condition)
+  retval = expression_i(retval)
   if retval goto done_elseifs
   inc $I2
   goto elseif_loop  
@@ -111,34 +105,24 @@ done:
   $P1 = parse(code)
   register $P1
 
-  .return $P1."interpret"() #tailcall
-
-done_error:
-  .return(return_type,retval)
+  .return $P1."interpret"()
 
 no_args:
-  retval = new TclString
-  retval = "wrong # args: no expression after \"if\" argument"
-  .return(TCL_ERROR,retval)
+  .throw("wrong # args: no expression after \"if\" argument")
 
 missing_script:
-  retval = new TclString
-  retval = "wrong # args: no script following \"" 
+  $S0 = "wrong # args: no script following \"" 
   $I0 = counter
   dec $I0
-  $S0 = argv[$I0]
-  retval .= $S0
-  retval .= "\" argument"
-  .return(TCL_ERROR,retval)
+  $S1  = argv[$I0]
+  $S0 .= $S1
+  $S0 .=  "\" argument"
+  .throw ($S0)
 
 more_than_else:
-  retval = new TclString
-  retval = "wrong # args: extra words after \"else\" clause in \"if\" command"
-  .return(TCL_ERROR,retval)
+  .throw ("wrong # args: extra words after \"else\" clause in \"if\" command")
 
 missing_elseif:
-  retval = new TclString
-  retval = "wrong # args: no expression after \"elseif\" argument"
-  .return(TCL_ERROR,retval)
+  .throw ("wrong # args: no expression after \"elseif\" argument")
 
 .end

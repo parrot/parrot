@@ -7,8 +7,7 @@ read a line from a channel
 .namespace [ "Tcl" ]
 
 .sub "&gets"
-  .local pmc argv 
-  argv = foldup
+  .param pmc argv :slurpy
 
   $S1 = shift argv
 
@@ -20,7 +19,5 @@ read a line from a channel
   .local string line
   line = readline io
 
-  $P1 = new TclString
-  $P1 = line
-  .return (TCL_OK,$P1)
+  .return (line)
 .end

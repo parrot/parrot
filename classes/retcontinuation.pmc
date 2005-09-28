@@ -10,8 +10,8 @@ classes/retcontinuation.pmc - Return Continuation
 
 C<RetContinuation> extends C<Continuation>.
 
-A return continuation is like a Continuation, only its context isn't marked,
-because that's just some previous state of the interpreter.
+A return continuation is a one shot Continuation, it gets recycled
+immediately after invocation.
 
 =head2 Methods
 
@@ -22,6 +22,7 @@ because that's just some previous state of the interpreter.
 */
 
 #include "parrot/parrot.h"
+#include "parrot/oplib/ops.h"
 #include "parrot/method_util.h"
 
 
@@ -38,11 +39,23 @@ Initializes the continuation.
 */
 
     void init () {
-        PMC_cont_ASSIGN(SELF, new_continuation(INTERP));
+        PMC_cont_ASSIGN(SELF, new_ret_continuation(INTERP));
         PMC_pmc_val(SELF) = NULL;
         PObj_custom_mark_destroy_SETALL(SELF);
     }
 
+    /*
+     * XXX when reusing SUPER.destroy() RetContinuations
+     *     have to set ref_count initially to 1
+     */
+
+    void destroy () {
+        struct Parrot_cont * cc = PMC_cont(SELF);
+        if (cc) {
+            mem_sys_free(cc);
+            PMC_cont(SELF) = NULL;
+        }
+    }
 /*
 
 =item C<PMC* clone>
@@ -57,11 +70,8 @@ the GC gets at them.
 
 */
     PMC* clone() {
-        PMC *ret = SUPER();
-        ret->vtable = Parrot_base_vtables[enum_class_Continuation];
-        SELF->vtable = Parrot_base_vtables[enum_class_Continuation];
-        invalidate_retc_context(INTERP, &PMC_cont(ret)->ctx);
-        return ret;
+        invalidate_retc_context(INTERP, SELF);
+        return SUPER();
     }
 /*
 
@@ -75,13 +85,15 @@ the frame pointer in the stack frame cache.
 */
 
     void* invoke (void* next) {
-        Stack_Chunk_t *stack_p;
         Stack_Chunk_t *ctr_stack, *stack_now;
+        struct Parrot_cont * cc = PMC_cont(SELF);
+        struct parrot_regs_t *caller_regs;
+        parrot_context_t ctx;
         /*
          * unwind control stack
          */
-        stack_now = INTERP->ctx.control_stack;
-        ctr_stack = PMC_cont(SELF)->ctx.control_stack;
+        stack_now = CONTEXT(INTERP->ctx)->control_stack;
+        ctr_stack = CONTEXT(cc->to_ctx)->control_stack;
         while (stack_now != ctr_stack) {
             if (!stack_now || !ctr_stack)
                 internal_exception(1, "Control stack damaged");
@@ -94,10 +106,45 @@ the frame pointer in the stack frame cache.
                             NULL, NO_STACK_ENTRY_TYPE);
         }
 
-        stack_p = INTERP->ctx.reg_stack;
-        next = SUPER(next);
-        add_to_fp_cache(INTERP, stack_p);
-        add_to_retc_cache(INTERP, SELF);
+        /* debug print before context is switched */
+        if (Interp_trace_TEST(INTERP, PARROT_TRACE_SUB_CALL_FLAG)) {
+            PMC *to_sub = CONTEXT(cc->to_ctx)->current_sub;
+            PMC *from_sub = CONTEXT(cc->from_ctx)->current_sub;
+
+            PIO_eprintf(INTERP, "# Back in sub '%Ss' from '%Ss\n",
+                    Parrot_full_sub_name(INTERP, to_sub),
+                    Parrot_full_sub_name(INTERP, from_sub));
+        }
+        caller_regs = INTERP->ctx.bp;
+        INTERP->ctx = cc->to_ctx;
+        next = cc->address;
+        if (next) {
+            if (CONTEXT(INTERP->ctx)->current_results) {
+                /*
+                 * the register pointer is already switched back
+                 * to the caller, therefore the registers of the
+                 * sub we are returning from aren't marked, if
+                 * inside argument passing a DOD run is triggered
+                 * therefore we have to block DOD
+                 */
+                Parrot_block_DOD(INTERP);
+                parrot_pass_args(INTERP, cc->seg,
+                        caller_regs,
+                        PARROT_OP_get_results_pc);
+                Parrot_unblock_DOD(INTERP);
+            }
+            INTERP->current_returns = NULL;
+        }
+        Parrot_free_context(INTERP, &cc->from_ctx, 1);
+        cc->from_ctx.bp = NULL;
+        INTERP->current_args = NULL;
+        /* no address and no segment */
+        if (!cc->seg) {
+            return NULL;
+        }
+        if (INTERP->code != cc->seg) {
+            Parrot_switch_to_cs(INTERP, cc->seg, 1);
+        }
         return next;
     }
 

@@ -16,9 +16,9 @@ Tests builtin opcode-like methods.
 
 =cut
 
-use Parrot::Test tests => 3;
+use Parrot::Test tests => 4;
 
-pir_output_is(<<'CODE', <<'OUT', "six ways to call a method");
+pir_output_is(<<'CODE', <<'OUT', "three ways to call a method");
 .sub main @MAIN
     .local pmc x, y, cl, m
     x = new Float
@@ -38,6 +38,44 @@ pir_output_is(<<'CODE', <<'OUT', "six ways to call a method");
     y = x."cos"()
     print y
     print "\n"
+.end
+CODE
+opcode        0.540302
+function      0.540302
+method        0.540302
+OUT
+
+pir_output_is(<<'CODE', <<'OUT', "say");
+.sub main @MAIN
+    .local pmc io
+    $I0 = say "ok 1"
+    io = getstdout
+    $I0 = say io, "ok 2"
+    say "ok 3"
+    say io, "ok 4"
+    "say"(io, "ok 5")
+.end
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
+ok 5
+OUT
+
+SKIP: {
+    skip("bound methods - n/y", 2);
+pir_output_is(<<'CODE', <<'OUT', "bound methods");
+.sub main @MAIN
+    .local pmc x, y, cl, m
+    x = new Float
+    x = 1.0
+    # bound object nethod
+    m = getattribute x, "cos"	# m = x.cos
+    print "bound obj met "
+    y = m()
+    print y
+    print "\n"
     # same as class method
     cl = getclass "Float"
     print "class method  "
@@ -50,20 +88,11 @@ pir_output_is(<<'CODE', <<'OUT', "six ways to call a method");
     y = m(x)
     print y
     print "\n"
-    # bound object nethod
-    m = getattribute x, "cos"	# m = x.cos
-    print "bound obj met "
-    y = m()
-    print y
-    print "\n"
 .end
 CODE
-opcode        0.540302
-function      0.540302
-method        0.540302
+bound obj met 0.540302
 class method  0.540302
 bound class m 0.540302
-bound obj met 0.540302
 OUT
 
 pir_output_is(<<'CODE', <<'OUT', "ParrotIO.puts");
@@ -86,20 +115,4 @@ ok 4
 ok 5
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "say");
-.sub main @MAIN
-    .local pmc io
-    $I0 = say "ok 1"
-    io = getstdout
-    $I0 = say io, "ok 2"
-    say "ok 3"
-    say io, "ok 4"
-.end
-CODE
-ok 1
-ok 2
-ok 3
-ok 4
-OUT
-
-
+}

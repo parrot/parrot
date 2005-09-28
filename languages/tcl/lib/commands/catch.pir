@@ -4,61 +4,49 @@
 .namespace [ "Tcl" ]
 
 .sub "&catch"
-  .local pmc argv
-  argv = foldup
+  .param pmc argv :slurpy
  
   .local int argc 
   argc = argv
 
-  .local int return_type
-  .local pmc retval
-  .local string varname,sigil_varname
-  .local string code
-  .local pmc parse
-  return_type = TCL_OK
-  parse = find_global "_Tcl", "parse"
+  .local int retval
+  .local pmc code_retval,parse
+  .local string varname,sigil_varname,code
 
-  .local int call_level
-  $P0 = find_global "_Tcl", "call_level"
-  call_level = $P0
+  parse = find_global "_Tcl", "parse"
 
   if argc == 0 goto badargs
   if argc  > 2 goto badargs
+
   code = argv[0]
   $P1 = parse(code)
-  register $P1
-  # ignoring $P0 here.
-  ($I0,$P0) = $P1."interpret"()
-  retval = new Integer
-  retval = $I0
+  push_eh non_ok
+    code_retval = $P1."interpret"()
+    retval = TCL_OK  # no exception => TCL_OK
+  clear_eh
 
+  goto got_retval
+
+non_ok:
+  code_retval = P5[0]
+  .get_return_code(P5,retval)
+
+got_retval:
+  #argc = argv # lost over function invoke?
   if argc==1 goto done
-  # XXX This should probably use the "set" command for better
-  # error handling on bad var names.
 
-  #.local pmc set_sub
-  #.local int set_return_type
-  #.local pmc set_retval
-  #set_sub = find_global "Tcl", "_set"
-  #(set_return_type,set_retval) = set_sub(varname,$P0)
-  #if set_return_type != TCL_OK goto done
-  #return_type = TCL_OK
- 
   varname = argv[1]
-  sigil_varname = "$" . varname
 
-if call_level goto save_lex
-  store_global "Tcl", sigil_varname, $P0
-  goto done
-save_lex:
-  store_lex call_level, sigil_varname, $P0
-  goto done
+  # Store the caught value in a 
 
-badargs:
-  return_type = TCL_ERROR
-  retval = new String
-  retval = "wrong # args: should be \"catch script ?resultVarName? ?optionVarName?\""
+  .local pmc __set
+  __set = find_global "_Tcl", "__set"
+  __set(varname,code_retval)
 
 done:
-  .return(return_type,retval)
+  .return(retval)
+
+badargs:
+  .throw ("wrong # args: should be \"catch script ?resultVarName? ?optionVarName?\"")
+
 .end

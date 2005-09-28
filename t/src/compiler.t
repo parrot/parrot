@@ -52,8 +52,8 @@ run(Parrot_Interp interpreter, int argc, char *argv[])
     /*
      * compile source
      */
-    src = string_from_cstring(interpreter, c_src, 0);
-    prog = VTABLE_invoke(interpreter, comp, src);
+    prog = imcc_compile_pir(interpreter, c_src);
+
     if (PMC_IS_NULL(prog) || !VTABLE_defined(interpreter, prog)) {
 	PIO_eprintf(interpreter, "Pir compiler returned no prog");
 	exit(1);
@@ -64,6 +64,7 @@ run(Parrot_Interp interpreter, int argc, char *argv[])
     smain  = const_string(interpreter, "main");
     entry = Parrot_find_global(interpreter, NULL, smain);
     /* location of the entry */
+    interpreter->current_cont  = new_ret_continuation_pmc(interpreter, NULL);
     dest = VTABLE_invoke(interpreter, entry, NULL);
     /* where to start */
     interpreter->resume_offset = dest - interpreter->code->base.data;
@@ -90,9 +91,8 @@ int main(int margc, char* margv[]) {
     imcc_init(interpreter);
     /* dummy pf and segment to get things started */
     pf = PackFile_new(interpreter, 0);
-    seg = PackFile_Segment_new_seg(interpreter,
-	    &pf->directory, PF_BYTEC_SEG, "test_code", 1);
-    pf->cur_cs = (struct PackFile_ByteCode *)seg;
+    Parrot_loadbc(interpreter, pf);
+    pf->cur_cs = PF_create_default_segs(interpreter, "test_code", 1);
     Parrot_loadbc(interpreter, pf);
 
     /* Parrot_set_flag(interpreter, PARROT_TRACE_FLAG); */

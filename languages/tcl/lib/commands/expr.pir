@@ -7,16 +7,13 @@
 .namespace [ "Tcl" ]
 
 .sub "&expr"
-  .local pmc argv 
-  argv = foldup
+  .param pmc argv :slurpy
  
   .local string expr
   .local int argc
   .local int looper
 
   .local pmc retval
-  .local int return_type
-  return_type = TCL_OK
   .local pmc expression_p
   .local pmc expression_i
   expression_p = find_global "_Tcl", "__expression_parse"
@@ -38,14 +35,9 @@ loop:
   goto loop
 
 loop_done:
-  (return_type,retval) = expression_p(expr)
-  if return_type==TCL_ERROR goto done
-  (return_type,retval) = expression_i(retval) 
-done:
-  .return(return_type,retval)
+  retval = expression_p(expr)
+  .return expression_i(retval) 
 
 no_args:
-  retval = new String
-  retval = "wrong # args: should be \"expr arg ?arg ...?\""
-  .return(TCL_ERROR,retval)
+  .throw("wrong # args: should be \"expr arg ?arg ...?\"")
 .end

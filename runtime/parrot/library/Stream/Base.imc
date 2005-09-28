@@ -44,7 +44,7 @@ END:
 
     # call our own close
     close = find_global "Stream::Base", "close"
-    close()
+    close(self)
 .end
 
 =item assign stream, source
@@ -140,10 +140,6 @@ Returns the currently set source.
 .sub source method
     .local pmc ret
 
-    if argcP != 0 goto ERROR
-    if argcI != 0 goto ERROR
-    if argcS != 0 goto ERROR
-    if argcN != 0 goto ERROR
     classoffset $I0, self, "Stream::Base"
     add $I0, aSource
     getattribute ret, self, $I0
@@ -354,12 +350,13 @@ Returns or sets the byte buffer.
 =cut
 
 .sub byte_buffer method
-    .param pmc buf
+    .param pmc buf :optional
+    .param int has_buf :opt_flag
 
     classoffset $I0, self, "Stream::Base"
     add $I0, aBuffer
 
-    if argcP != 0 goto SET
+    if has_buf goto SET
 
     getattribute $P0, self, $I0
 

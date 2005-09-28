@@ -22,7 +22,7 @@ use Test::More;
 output_like(<<'CODE', <<'OUTPUT', "callmethod - unknown method");
     newclass P2, "Foo"
     set S0, "nada"
-    callmethod
+    callmethodcc P2, S0
     print "nope\n"
     end
 CODE
@@ -32,7 +32,7 @@ OUTPUT
 output_like(<<'CODE', <<'OUTPUT', "callmethod (STR) - unknown method");
     newclass P2, "Foo"
     set S1, "nada"
-    callmethod S1
+    callmethod P2, S1, P1
     print "nope\n"
     end
 CODE
@@ -42,7 +42,7 @@ OUTPUT
 output_like(<<'CODE', <<'OUTPUT', "callmethodcc - unknown method");
     newclass P2, "Foo"
     set S0, "nada"
-    callmethodcc
+    callmethodcc P2, S0
     print "nope\n"
     end
 CODE
@@ -52,7 +52,7 @@ OUTPUT
 output_like(<<'CODE', <<'OUTPUT', "callmethodcc (STR) - unknown method");
     newclass P2, "Foo"
     set S1, "nada"
-    callmethodcc S1
+    callmethodcc P2, S1
     print "nope\n"
     end
 CODE
@@ -64,7 +64,7 @@ output_is(<<'CODE', <<'OUTPUT', "callmethod 1");
     set S0, "meth"
 
     print "main\n"
-    callmethodcc
+    callmethodcc P2, S0
     print "back\n"
     end
 
@@ -129,6 +129,7 @@ output_is(<<'CODE', <<'OUTPUT', "constructor");
     end
 .namespace ["Foo"]
 .pcc_sub __init:
+    get_params "(0)", P2
     print "ok 1\n"
     returncc
 CODE
@@ -193,24 +194,19 @@ output_is(<<'CODE', <<'OUTPUT', "constructor - init attr");
     end
 .namespace ["Foo"]
 .pcc_sub __init:
+    get_params "(0)", P2
     print "ok 1\n"
     new P10, .Integer
     set P10, 42
-.include "interpinfo.pasm"
-    interpinfo P2, .INTERPINFO_CURRENT_OBJECT
     classoffset I0, P2, "Foo"
     setattribute P2, I0, P10
+    set_returns "()"
     returncc
 .pcc_sub __get_string:
-    interpinfo P2, .INTERPINFO_CURRENT_OBJECT
+    get_params "(0)", P2
     classoffset I0, P2, "Foo"
     getattribute P10, P2, I0
-    set S5, P10
-    set I0, 0
-    set I1, 0
-    set I2, 1
-    set I3, 0
-    set I4, 0
+    set_returns "(0)", P10
     returncc
 CODE
 ok 1
@@ -227,15 +223,14 @@ output_is(<<'CODE', <<'OUTPUT', "constructor - parents");
     find_type I1, "Bar"
     new P3, I1
     find_global P0, "_sub"
-    invokecc
+    invokecc P0
     print "done\n"
     end
 
     .namespace ["Foo"]
 .pcc_sub __init:
+    get_params "(0)", P2
     print "foo_init\n"
-.include "interpinfo.pasm"
-    interpinfo P2, .INTERPINFO_CURRENT_OBJECT
     classname S0, P2
     print S0
     print "\n"
@@ -243,16 +238,19 @@ output_is(<<'CODE', <<'OUTPUT', "constructor - parents");
 
     .namespace ["Bar"]
 .pcc_sub __init:
+    get_params "(0)", P2
     print "bar_init\n"
     returncc
 
     .namespace ["Baz"]
 .pcc_sub __init:
+    get_params "(0)", P2
     print "baz_init\n"
     returncc
 
     .namespace [""]	# main again
 .pcc_sub _sub:
+    get_params "(0)", P2
     print "in sub\n"
     returncc
 
@@ -461,8 +459,7 @@ eh:
     print "in __init\n"
 
     # raise an exception
-    set S0, "qux"
-    callmethodcc
+    callmethodcc self, "qux"
 
     print "never\n"
     returncc
@@ -481,13 +478,11 @@ output_is(<<'CODE', <<'OUTPUT', "fetchmethod");
     set S0, "meth"
     fetchmethod P0, P2, S0
     print "main\n"
-    # P2, S0 are as in callmethod
-    invokecc
+    callmethodcc P2, P0
     print "back\n"
     # check class
     fetchmethod P0, P3, S0
-    set P2, P3
-    invokecc
+    callmethodcc P3, P0
     print "back\n"
     end
 
@@ -603,26 +598,32 @@ _check_isa:
 
 .namespace ["A"]
 .pcc_sub __init:
+    get_params "(0)", P2
     print "A init\n"
     returncc
 .namespace ["B"]
 .pcc_sub __init:
+    get_params "(0)", P2
     print "B init\n"
     returncc
 .namespace ["C"]
 .pcc_sub __init:
+    get_params "(0)", P2
     print "C init\n"
     returncc
 .namespace ["D"]
 .pcc_sub __init:
+    get_params "(0)", P2
     print "D init\n"
     returncc
 .namespace ["E"]
 .pcc_sub __init:
+    get_params "(0)", P2
     print "E init\n"
     returncc
 .namespace ["F"]
 .pcc_sub __init:
+    get_params "(0)", P2
     print "F init\n"
     returncc
 CODE
@@ -665,15 +666,14 @@ output_is(<<'CODE', <<'OUTPUT', "constructor - parents BUILD");
     find_type I1, "Bar"
     new P3, I1
     find_global P0, "_sub"
-    invokecc
+    invokecc P0
     print "done\n"
     end
 
     .namespace ["Foo"]
 .pcc_sub _new:
+    get_params "(0)", P2
     print "foo_init\n"
-.include "interpinfo.pasm"
-    interpinfo P2, .INTERPINFO_CURRENT_OBJECT
     classname S0, P2
     print S0
     print "\n"
@@ -681,11 +681,13 @@ output_is(<<'CODE', <<'OUTPUT', "constructor - parents BUILD");
 
     .namespace ["Bar"]
 .pcc_sub _new:
+    get_params "(0)", P2
     print "bar_init\n"
     returncc
 
     .namespace ["Baz"]
 .pcc_sub _new:
+    get_params "(0)", P2
     print "baz_init\n"
     returncc
 
@@ -776,7 +778,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "Bug in method calling with nonconst keys");
 
 .namespace ["Foo"]
 
-.sub __get_integer_keyed
+.sub __get_integer_keyed method
     .param pmc key
     print "Key = "
     print key
@@ -806,7 +808,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "Bug in method calling with nonconst keys - 
 
 .namespace ["Foo"]
 
-.sub __get_integer_keyed
+.sub __get_integer_keyed method
     .param pmc key
     $S0 = "bar"
     print "Key = "
@@ -835,11 +837,11 @@ pir_output_is(<<'CODE', <<'OUTPUT', "method cache invalidation");
     store_global "Bar", "__get_string", $P0
     print o
 .end
-.sub ok2
+.sub ok2 method
     .return("ok 2\n")
 .end
 .namespace [ "Foo" ]
-.sub __get_string
+.sub __get_string method
     .return("ok 1\n")
 .end
 CODE
@@ -852,7 +854,7 @@ output_is(<<'CODE', <<'OUTPUT', "callmethod - method name");
     set S0, "meth"
 
     print "main\n"
-    callmethodcc
+    callmethodcc P2, S0
     print "back\n"
     end
 
@@ -871,6 +873,8 @@ meth
 back
 OUTPUT
 
+SKIP: {
+    skip("no bound NCI method", 1);
 pir_output_is(<<'CODE', <<'OUTPUT', "bound NCI method");
 .sub main @MAIN
     .local pmc s, l, f
@@ -887,6 +891,7 @@ CODE
 Bound_NCI
 abc
 OUTPUT
+}
 
 pir_output_is(<<'CODE', <<'OUTPUT', "tailcallmeth");
 .sub main @MAIN
@@ -909,9 +914,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "tailcallmeth");
     n = getattribute self, "Foo\0n"
     dec n
     unless n goto done
-    # XXX this is ugly
-    P2 = self
-    tailcallmethod "go"
+    tailcallmethod self, "go"
 done:
 .end
 CODE

@@ -50,7 +50,6 @@ SymbolTable global_sym_tab;
  * No nested classes for now.
  */
 static Class * current_class;
-static Instruction * current_call;
 static SymReg *cur_obj, *cur_call;
 int cur_pmc_type;      /* used in mk_ident */
 IMC_Unit * cur_unit;
@@ -59,10 +58,11 @@ SymReg *cur_namespace; /* ugly hack for mk_address */
 /*
  * these are used for constructing one INS
  */
-static SymReg *keys[IMCC_MAX_REGS];
+static SymReg *keys[IMCC_MAX_FIX_REGS]; /* TODO key overflow check */
 static int nkeys, in_slice;
 static int keyvec;
-static SymReg *regs[IMCC_MAX_REGS];
+#define IMCC_MAX_STATIC_REGS 100
+static SymReg *regs[IMCC_MAX_STATIC_REGS];
 static int nargs;
 static int cnr;
 
@@ -84,7 +84,7 @@ MK_I(Interp *interpreter, IMC_Unit * unit, const char * fmt, int n, ...)
     char *p;
     const char *q;
     va_list ap;
-    SymReg *r[IMCC_MAX_REGS];
+    SymReg *r[IMCC_MAX_FIX_REGS];
     int i;
 
     for (p = opname, q = fmt; *q && *q != ' '; )
@@ -99,12 +99,10 @@ MK_I(Interp *interpreter, IMC_Unit * unit, const char * fmt, int n, ...)
 #endif
     va_start(ap, n);
     i = 0;
-    while (i < n) {
-	r[i++] = va_arg(ap, SymReg *);
+    for (i = 0; i < n; ++i) {
+	r[i] = va_arg(ap, SymReg *);
     }
     va_end(ap);
-    while (i < IMCC_MAX_REGS)
-	r[i++] = NULL;
     return INS(interpreter, unit, opname, fmt, r, n, keyvec, 1);
 }
 
@@ -114,7 +112,7 @@ mk_pmc_const(Parrot_Interp interp, IMC_Unit *unit,
 {
     int type_enum = atoi(type);
     SymReg *rhs;
-    SymReg *r[IMCC_MAX_REGS];
+    SymReg *r[2];
     char *name;
     int len;
 
@@ -172,21 +170,14 @@ static void clear_state(void)
 {
     nargs = 0;
     keyvec = 0;
-    memset(regs, 0, sizeof(regs));
 }
 
 Instruction * INS_LABEL(IMC_Unit * unit, SymReg * r0, int emit)
 {
 
-    SymReg *r[IMCC_MAX_REGS];
     Instruction *ins;
-    int i;
 
-    r[0] = r0;
-    i = 1;
-    while (i < IMCC_MAX_REGS)
-	r[i++] = NULL;
-    ins = _mk_instruction("","%s:", r, 0);
+    ins = _mk_instruction("","%s:", 1, &r0, 0);
     ins->type = ITLABEL;
     r0->first_ins = ins;
     if (emit)
@@ -201,10 +192,14 @@ static Instruction * iLABEL(IMC_Unit * unit, SymReg * r0) {
     return i;
 }
 
-static Instruction * iSUBROUTINE(IMC_Unit * unit, SymReg * r0) {
+static Instruction * iSUBROUTINE(Interp *interp, IMC_Unit * unit, SymReg * r) {
     Instruction *i;
-    i =  iLABEL(unit, r0);
+    i =  iLABEL(unit, r);
+    r->type = VT_PCC_SUB;
+    r->pcc_sub = calloc(1, sizeof(struct pcc_sub_t));
+    cur_call = r;
     i->line = line - 1;
+    add_namespace(interp, unit);
     return i;
 }
 
@@ -260,7 +255,8 @@ IMCC_create_itcall_label(Interp* interpreter)
 
     sprintf(name, "%cpcc_sub_call_%d", IMCC_INTERNAL_CHAR, cnr++);
     r = mk_pcc_sub(interpreter, str_dup(name), 0);
-    current_call = i = iLABEL(cur_unit, r);
+    i = iLABEL(cur_unit, r);
+    cur_call = r;
     i->type = ITCALL | ITPCCSUB;
     return i;
 }
@@ -281,17 +277,17 @@ mk_sub_address_fromc(Interp *interp, char * name)
 void
 IMCC_itcall_sub(Interp* interp, SymReg* sub)
 {
-    current_call->r[0]->pcc_sub->sub = sub;
+    cur_call->pcc_sub->sub = sub;
     if (cur_obj) {
         if (cur_obj->set != 'P')
             IMCC_fataly(interp, E_SyntaxError, "object isn't a PMC");
-        current_call->r[0]->pcc_sub->object = cur_obj;
+        cur_call->pcc_sub->object = cur_obj;
         cur_obj = NULL;
     }
-    if (current_call->r[0]->pcc_sub->sub->pmc_type == enum_class_NCI)
-        current_call->r[0]->pcc_sub->flags |= isNCI;
+    if (cur_call->pcc_sub->sub->pmc_type == enum_class_NCI)
+        cur_call->pcc_sub->flags |= isNCI;
     if (cur_unit->type == IMC_PCCSUB)
-        cur_unit->instructions->r[1]->pcc_sub->calls_a_sub |= 1;
+        cur_unit->instructions->r[0]->pcc_sub->calls_a_sub |= 1;
 }
 
 static void
@@ -300,11 +296,11 @@ begin_return_or_yield(Interp *interp, int yield)
     Instruction *i, *ins;
     char name[128];
     ins = cur_unit->instructions;
-    if(!ins || !ins->r[1] || ins->r[1]->type != VT_PCC_SUB)
+    if(!ins || !ins->r[0] || ins->r[0]->type != VT_PCC_SUB)
         IMCC_fataly(interp, E_SyntaxError,
               "yield or return directive outside pcc subroutine\n");
     if(yield)
-       ins->r[1]->pcc_sub->calls_a_sub = 1 | ITPCCYIELD;
+       ins->r[0]->pcc_sub->calls_a_sub = 1 | ITPCCYIELD;
     sprintf(name, yield ? "%cpcc_sub_yield_%d" : "%cpcc_sub_ret_%d", IMCC_INTERNAL_CHAR, cnr++);
     interp->imc_info->sr_return = mk_pcc_sub(interp, str_dup(name), 0);
     i = iLABEL(cur_unit, interp->imc_info->sr_return);
@@ -334,7 +330,7 @@ begin_return_or_yield(Interp *interp, int yield)
 
 %token <t> PRAGMA FASTCALL N_OPERATORS HLL
 %token <t> CALL GOTO ARG IF UNLESS END SAVEALL RESTOREALL
-%token <t> ADV_FLAT ADV_SLURPY ADV_OPTIONAL
+%token <t> ADV_FLAT ADV_SLURPY ADV_OPTIONAL ADV_OPT_FLAG
 %token <t> NEW NEWSUB NEWCLOSURE NEWCOR NEWCONT
 %token <t> NAMESPACE ENDNAMESPACE CLASS ENDCLASS FIELD DOT_METHOD
 %token <t> SUB SYM LOCAL CONST
@@ -367,7 +363,7 @@ begin_return_or_yield(Interp *interp, int yield)
 %type <sr> pcc_returns pcc_return pcc_call arg the_sub multi_type
 %type <t> argtype_list argtype paramtype_list paramtype
 %type <t> pcc_return_many
-%type <t> pcc_sub_proto proto sub_proto multi multi_types
+%type <t> proto sub_proto sub_proto_list multi multi_types opt_comma
 %type <i> instruction assignment if_statement labeled_inst opt_label op_assign
 %type <i> func_assign
 %type <i> opt_invocant
@@ -487,12 +483,11 @@ pasm_inst:         { clear_state(); }
      PARROT_OP pasm_args
                    { $$ = INS(interp, cur_unit, $2,0,regs,nargs,keyvec,1);
                      free($2); }
-   | PCC_SUB pcc_sub_proto LABEL
+   | PCC_SUB sub_proto LABEL
                    {
-                     $$ = iSUBROUTINE(cur_unit, mk_sub_label(interp, $3));
-                     $$->r[1] = mk_pcc_sub(interp, str_dup($$->r[0]->name), 0);
-                     add_namespace(interp, cur_unit);
-                     $$->r[1]->pcc_sub->pragma = $2;
+                     $$ = iSUBROUTINE(interp, cur_unit,
+                                mk_sub_label(interp, $3));
+                     cur_call->pcc_sub->pragma = $2;
                    }
    | /* none */    { $$ = 0;}
    ;
@@ -604,9 +599,7 @@ sub:
         }
      sub_label_op_c
         {
-          Instruction *i = iSUBROUTINE(cur_unit, $3);
-          i->r[1] = cur_call = mk_pcc_sub(interp, str_dup(i->r[0]->name), 0);
-          add_namespace(interp, cur_unit);
+          iSUBROUTINE(interp, cur_unit, $3);
         }
      sub_proto '\n' { cur_call->pcc_sub->pragma = $5; }
      sub_params
@@ -621,16 +614,15 @@ sub_params:
 
 sub_param:
      PARAM                             { is_def=1; }
-     type IDENTIFIER          { $$ = mk_ident(interp, $4, $3); is_def=0; }
+     type IDENTIFIER  paramtype_list   { $$ = mk_ident(interp, $4, $3);
+                                         is_def=0; $$->type |= $5; }
    ;
 
-sub_proto:
+opt_comma:
      /* empty */              { $$ = 0;  }
-   | sub_proto COMMA proto    { $$ = $1 | $3; }
-   | sub_proto COMMA multi    { $$ = $1 | $3; }
-   | proto                    { $$ = $1; }
-   | multi                    { $$ = $1; }
+   | COMMA
    ;
+
 
 multi: MULTI '(' multi_types ')'  { $$ = 0; }
    ;
@@ -667,9 +659,7 @@ pcc_sub:
      PCC_SUB       { cur_unit = imc_open_unit(interp, IMC_PCCSUB); }
      IDENTIFIER
          {
-            Instruction *i = iSUBROUTINE(cur_unit, mk_sub_label(interp, $3));
-            i->r[1] = cur_call = mk_pcc_sub(interp, str_dup(i->r[0]->name), 0);
-            add_namespace(interp, cur_unit);
+            iSUBROUTINE(interp, cur_unit, mk_sub_label(interp, $3));
 
          }
      sub_proto '\n' { cur_call->pcc_sub->pragma = $5; }
@@ -690,13 +680,14 @@ pcc_sub_call:
              * sub SymReg.
              * This is used below to append args & results
              */
-            current_call = i = iLABEL(cur_unit, r);
+            i = iLABEL(cur_unit, r);
+            cur_call = r;
             i->type = ITPCCSUB;
             /*
              * if we are inside a pcc_sub mark the sub as doing a
-             * sub call; the sub is in r[1] of the first ins
+             * sub call; the sub is in r[0] of the first ins
              */
-            r1 = cur_unit->instructions->r[1];
+            r1 = cur_unit->instructions->r[0];
             if (r1 && r1->pcc_sub)
                 r1->pcc_sub->calls_a_sub |= 1;
          }
@@ -705,24 +696,28 @@ pcc_sub_call:
      pcc_call
      opt_label
      pcc_results
-     PCC_END       { $$ = 0; current_call = NULL; }
+     PCC_END       { $$ = 0; cur_call = NULL; }
    ;
 
 opt_label:
-     /* empty */   { $$ = NULL;  current_call->r[0]->pcc_sub->label = 0; }
-   | label '\n'    { $$ = NULL;  current_call->r[0]->pcc_sub->label = 1; }
+     /* empty */   { $$ = NULL;  cur_call->pcc_sub->label = 0; }
+   | label '\n'    { $$ = NULL;  cur_call->pcc_sub->label = 1; }
    ;
 
 opt_invocant:
      /* empty */   { $$ = NULL; }
    | INVOCANT var '\n'
-                   { $$ = NULL;  current_call->r[0]->pcc_sub->object = $2; }
+                   { $$ = NULL;  cur_call->pcc_sub->object = $2; }
    ;
 
-pcc_sub_proto:
+sub_proto:
      /* empty */                { $$ = 0; }
-   | proto                      { $$ = $1; }
-   | pcc_sub_proto COMMA proto  { $$ = $1 | $3; }
+   | sub_proto_list
+   ;
+
+sub_proto_list:
+     proto                           { $$ = $1; }
+   | sub_proto_list opt_comma proto  { $$ = $1 | $3; }
    ;
 
 proto:
@@ -732,39 +727,40 @@ proto:
    | POSTCOMP       {  $$ = P_POSTCOMP; }
    | ANON           {  $$ = P_ANON; }
    | METHOD         {  $$ = P_METHOD; }
+   | multi
    ;
 
 pcc_call:
      PCC_CALL var COMMA var '\n'
          {
-            add_pcc_sub(current_call->r[0], $2);
-            add_pcc_cc(current_call->r[0], $4);
+            add_pcc_sub(cur_call, $2);
+            add_pcc_cc(cur_call, $4);
          }
    | PCC_CALL var '\n'
-         {  add_pcc_sub(current_call->r[0], $2); }
+         {  add_pcc_sub(cur_call, $2); }
    | NCI_CALL var '\n'
          {
-            add_pcc_sub(current_call->r[0], $2);
-            current_call->r[0]->pcc_sub->flags |= isNCI;
+            add_pcc_sub(cur_call, $2);
+            cur_call->pcc_sub->flags |= isNCI;
          }
    | METH_CALL target '\n'
-         {  add_pcc_sub(current_call->r[0], $2); }
+         {  add_pcc_sub(cur_call, $2); }
    | METH_CALL STRINGC '\n'
-         {  add_pcc_sub(current_call->r[0], mk_const(interp, $2,'S')); }
+         {  add_pcc_sub(cur_call, mk_const(interp, $2,'S')); }
    | METH_CALL target COMMA var '\n'
-         {  add_pcc_sub(current_call->r[0], $2);
-            add_pcc_cc(current_call->r[0], $4);
+         {  add_pcc_sub(cur_call, $2);
+            add_pcc_cc(cur_call, $4);
          }
    | METH_CALL STRINGC COMMA var '\n'
-         {  add_pcc_sub(current_call->r[0], mk_const(interp, $2,'S'));
-            add_pcc_cc(current_call->r[0], $4);
+         {  add_pcc_sub(cur_call, mk_const(interp, $2,'S'));
+            add_pcc_cc(cur_call, $4);
          }
    ;
 
 
 pcc_args:
      /* empty */                       {  $$ = 0; }
-   | pcc_args pcc_arg '\n'             {  add_pcc_arg(current_call->r[0], $2); }
+   | pcc_args pcc_arg '\n'             {  add_pcc_arg(cur_call, $2); }
    ;
 
 pcc_arg:
@@ -774,7 +770,7 @@ pcc_arg:
 
 pcc_results:
      /* empty */                       {  $$ = 0; }
-   | pcc_results pcc_result '\n'       {  if($2) add_pcc_result(current_call->r[0], $2); }
+   | pcc_results pcc_result '\n'       {  if($2) add_pcc_result(cur_call, $2); }
    ;
 
 pcc_result:
@@ -791,6 +787,7 @@ paramtype_list:
 paramtype:
      ADV_SLURPY                        {  $$ = VT_FLAT;   }
    | ADV_OPTIONAL                      {  $$ = VT_OPTIONAL; }
+   | ADV_OPT_FLAG                      {  $$ = VT_OPT_FLAG; }
    ;
 
 
@@ -944,8 +941,8 @@ labeled_inst:
    | ARG arg                          { $$ = MK_I(interp, cur_unit, "save", 1, $2); }
    | RETURN var                       { $$ = MK_I(interp, cur_unit, "save", 1, $2); }
    | RETURN  sub_call   { $$ = NULL;
-                           current_call->r[0]->pcc_sub->flags |= isTAIL_CALL;
-                           current_call = NULL;
+                           cur_call->pcc_sub->flags |= isTAIL_CALL;
+                           cur_call = NULL;
                         }
    | CALL label_op                    { $$ = MK_I(interp, cur_unit, "bsr",  1, $2); }
    | GOTO label_op                    { $$ = MK_I(interp, cur_unit, "branch",1, $2); }
@@ -955,7 +952,7 @@ labeled_inst:
    | PARROT_OP vars
                    { $$ = INS(interp, cur_unit, $1, 0, regs, nargs, keyvec, 1);
                                           free($1); }
-   | sub_call      {  $$ = 0; current_call = NULL; }
+   | sub_call      {  $$ = 0; cur_call = NULL; }
    | pcc_sub_call  {  $$ = 0; }
    | pcc_ret
    | /* none */                        { $$ = 0;}
@@ -1064,7 +1061,7 @@ assignment:
    | target '=' sub_call
          {
             add_pcc_result($3->r[0], $1);
-            current_call = NULL;
+            cur_call = NULL;
             $$ = 0;
          }
    |
@@ -1074,7 +1071,7 @@ assignment:
      '(' targetlist  ')' '=' the_sub '(' arglist ')'
          {
            IMCC_itcall_sub(interp, $6);
-           current_call = NULL;
+           cur_call = NULL;
          }
    | op_assign
    | func_assign
@@ -1145,8 +1142,8 @@ sub_call:
 
 arglist:
      /* empty */             {  $$ = 0; }
-   | arglist COMMA arg       {  $$ = 0; add_pcc_arg(current_call->r[0], $3); }
-   | arg                     {  $$ = 0; add_pcc_arg(current_call->r[0], $1); }
+   | arglist COMMA arg       {  $$ = 0; add_pcc_arg(cur_call, $3); }
+   | arg                     {  $$ = 0; add_pcc_arg(cur_call, $1); }
    ;
 
 arg:
@@ -1163,8 +1160,8 @@ argtype:
    ;
 
 targetlist:
-     targetlist COMMA target { $$ = 0; add_pcc_result(current_call->r[0], $3); }
-   | target                  { $$ = 0; add_pcc_result(current_call->r[0], $1); }
+     targetlist COMMA target { $$ = 0; add_pcc_result(cur_call, $3); }
+   | target                  { $$ = 0; add_pcc_result(cur_call, $1); }
    ;
 
 if_statement:

@@ -43,10 +43,11 @@ typedef enum {
     PARROT_NO_DEBUG                 = 0x00,
     PARROT_MEM_STAT_DEBUG_FLAG      = 0x01,  /* memory usage summary */
     PARROT_BACKTRACE_DEBUG_FLAG     = 0x02,  /* print bt in exception */
-    PARROT_JIT_DEBUG_FLAG           = 0x04,
+    PARROT_JIT_DEBUG_FLAG           = 0x04,  /* create jit stabs file */
     PARROT_START_DEBUG_FLAG         = 0x08,
     PARROT_THREAD_DEBUG_FLAG        = 0x10,
-    PARROT_EVAL_DEBUG_FLAG          = 0x20,
+    PARROT_EVAL_DEBUG_FLAG          = 0x20,  /* create EVAL_n file */
+    PARROT_REG_DEBUG_FLAG           = 0x40,  /* fill I,N with garbage */
     PARROT_ALL_DEBUG_FLAGS          = 0xffff
 } Parrot_debug_flags;
 /* &end_gen */
@@ -91,9 +92,9 @@ typedef Parrot_Run_core_t Run_Cores;
 #define Interp_debug_CLEAR(interp, flag) ((interp)->debug_flags &= ~(flag))
 #define Interp_debug_TEST(interp, flag)  ((interp)->debug_flags & (flag))
 
-#define Interp_trace_SET(interp, flag)   ((interp)->ctx.trace_flags |= (flag))
-#define Interp_trace_CLEAR(interp, flag) ((interp)->ctx.trace_flags &= ~(flag))
-#define Interp_trace_TEST(interp, flag)  ((interp)->ctx.trace_flags & (flag))
+#define Interp_trace_SET(interp, flag)   (CONTEXT((interp)->ctx)->trace_flags |= (flag))
+#define Interp_trace_CLEAR(interp, flag) (CONTEXT((interp)->ctx)->trace_flags &= ~(flag))
+#define Interp_trace_TEST(interp, flag)  (CONTEXT((interp)->ctx)->trace_flags & (flag))
 
 #define Interp_core_SET(interp, core)   ((interp)->run_core = (core))
 #define Interp_core_TEST(interp, core)  ((interp)->run_core == (core))
@@ -179,14 +180,13 @@ struct parrot_regs_t {
 #endif /* SLIDING_BP */
 };
 
-typedef struct Parrot_Context {
-    struct parrot_regs_t *bp;           /* indirect reg base pointer */
+struct Parrot_Context {
+    struct Parrot_Context *prev;
+    INTVAL ref_count;                   /* how often refered to */
     struct Stack_Chunk *int_reg_stack;  /* register frame stacks */
     struct Stack_Chunk *num_reg_stack;
     struct Stack_Chunk *string_reg_stack;
     struct Stack_Chunk *pmc_reg_stack;
-
-    struct Stack_Chunk *reg_stack;      /* all in one register stack */
 
     struct Stack_Chunk *pad_stack;      /* Base of the lex pad stack */
     struct Stack_Chunk *user_stack;     /* Base of the scratch stack */
@@ -213,9 +213,12 @@ typedef struct Parrot_Context {
     opcode_t *current_pc;       /* program counter of Sub invocation */
     String *current_package;    /* The package we're currently in */
     INTVAL current_HLL;         /* see also src/hll.c */
-    opcode_t *current_params;   /* ptr into code with get_params opcode */
+    opcode_t *current_args;      /* ptr into code with set_args opcode */
     opcode_t *current_results;   /* ptr into code with get_results opcode */
-} parrot_context_t;
+};
+
+#define ALIGNED_CTX_SIZE ( ((sizeof(struct Parrot_Context) + NUMVAL_SIZE - 1) \
+        / NUMVAL_SIZE) * NUMVAL_SIZE )
 
 struct _Thread_data;    /* in thread.h */
 struct _Caches;         /* caches .h */
@@ -233,13 +236,25 @@ typedef struct _Prederef {
 } Prederef;
 
 
+typedef union All_Context {
+    struct parrot_regs_t *bp;           /* register base pointer */
+    struct Parrot_Context *rctx;        /* context is at rctx[-1] */
+} parrot_context_t;
 
+#define CONTEXT(ctx) ((ctx).rctx -1)
+
+typedef struct _context_mem {
+    char *data;                     /* ctx + register store */
+    char *free;                     /* free to allocate */
+    char *threshold;                /* continuation threshold */
+    struct _context_mem *prev;      /* previous allocated area */
+} context_mem;
 /*
  * The actual interpreter structure
  */
 struct parrot_interp_t {
-    struct Parrot_Context ctx;          /* All the registers and stacks that
-                                           matter when context switching */
+    parrot_context_t ctx;
+    context_mem ctx_mem;                /* ctx memory managment */
 
     struct Stash *globals;              /* Pointer to the global variable
                                          * area */
@@ -313,7 +328,14 @@ struct parrot_interp_t {
     UINTVAL recursion_limit;    /* Sub call resursion limit */
     UINTVAL gc_generation;      /* GC generation number */
     opcode_t *current_args;      /* ptr into code with set_args opcode */
+    opcode_t *current_params;   /* ptr into code with get_params opcode */
     opcode_t *current_returns;   /* ptr into code with get_returns opcode */
+    /* during a call sequencer the caller fills these objects
+     * inside the invoke these get moved to the context structure
+     */
+    PMC *current_cont;          /* the return continuation PMC */
+    PMC *current_object;        /* current object if a method call */
+    STRING *current_method;     /* name of method */
 };
 
 /* typedef struct parrot_interp_t Interp;    done in parrot.h so that
@@ -364,10 +386,10 @@ typedef enum {
 #  define INTERP_REG_STR(i, x) i->ctx.bp->string_reg.registers[x]
 #  define INTERP_REG_PMC(i, x) i->ctx.bp->pmc_reg.registers[x]
 
-#  define BP_REG_INT(bp, x) bp->int_reg.registers[x]
-#  define BP_REG_NUM(bp, x) bp->num_reg.registers[x]
-#  define BP_REG_STR(bp, x) bp->string_reg.registers[x]
-#  define BP_REG_PMC(bp, x) bp->pmc_reg.registers[x]
+#  define BP_REG_INT(bp, x) (bp)->int_reg.registers[x]
+#  define BP_REG_NUM(bp, x) (bp)->num_reg.registers[x]
+#  define BP_REG_STR(bp, x) (bp)->string_reg.registers[x]
+#  define BP_REG_PMC(bp, x) (bp)->pmc_reg.registers[x]
 
 #endif /* SLIDING_BP */
 
@@ -435,6 +457,11 @@ __declspec(dllimport) extern PMC * PMCNULL;  /* Holds single Null PMC         */
 Interp *make_interpreter(Interp * parent, Interp_flags);
 void Parrot_init(Interp *);
 void Parrot_destroy(Interp *);
+
+void Parrot_alloc_context(Interp *);
+void Parrot_free_context(Interp *, parrot_context_t *, int re_use);
+void Parrot_set_context_threshold(Interp *, parrot_context_t *);
+void parrot_gc_context(Interp *);
 
 INTVAL interpinfo(Interp *interpreter, INTVAL what);
 PMC*   interpinfo_p(Interp *interpreter, INTVAL what);

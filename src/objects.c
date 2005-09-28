@@ -558,8 +558,8 @@ do_initcall(Interp* interpreter, PMC* class, PMC *object, PMC *init)
             Parrot_run_meth_fromc_args(interpreter, meth,
                     object, meth_str, "vP", init);
         else
-            Parrot_run_meth_fromc(interpreter, meth,
-                    object, meth_str);
+            Parrot_run_meth_fromc_args(interpreter, meth,
+                    object, meth_str, "v");
     }
     /*
      * 2. if class has a BUILD property call it for all classes
@@ -612,8 +612,8 @@ do_initcall(Interp* interpreter, PMC* class, PMC *object, PMC *init)
                 Parrot_run_meth_fromc_args(interpreter, meth,
                         object, meth_str, "vP", init);
             else
-                Parrot_run_meth_fromc(interpreter, meth,
-                        object, meth_str);
+                Parrot_run_meth_fromc_args(interpreter, meth,
+                        object, meth_str, "v");
         }
         else if (meth_str != NULL &&
                 string_length(interpreter, meth_str) != 0 && !default_meth) {
@@ -933,14 +933,6 @@ static PMC* find_method_direct(Interp*, PMC *, STRING*);
 void
 mark_object_cache(Interp* interpreter)
 {
-    /* mark register frame cache */
-    Stack_Chunk_t *chunk = interpreter->caches->frame_cache;
-
-    while (chunk) {
-        pobject_lives(interpreter, (PObj*)chunk);
-        chunk = PObj_bufstart(chunk);
-    }
-    mark_retc_cache(interpreter);
 }
 
 void
@@ -950,8 +942,6 @@ init_object_cache(Interp* interpreter)
 
     mc = interpreter->caches = mem_sys_allocate_zeroed(sizeof(*mc));
     SET_NULL(mc->idx);
-    SET_NULL(mc->frame_cache);
-    SET_NULL(mc->retc_cache);
 }
 
 #define TBL_SIZE_MASK 0x1ff   /* x bits 2..10 */
@@ -1163,7 +1153,7 @@ next instance of this method.
 void
 Parrot_note_method_offset(Interp* interpreter, UINTVAL offset, PMC *method)
 {
-    interpreter->ctx.current_class_offset = offset;
+    CONTEXT(interpreter->ctx)->current_class_offset = offset;
 }
 
 /*
@@ -1212,7 +1202,21 @@ Parrot_add_attribute(Interp* interpreter, PMC* class, STRING* attr)
         internal_exception(1, "Attribute '%s' already exists", c_error);
         string_cstring_free(c_error);
     }
+#if 0
+    if (VTABLE_exists_keyed_str(interpreter, attr_hash, attr)) {
+        /* make old short name invisible */
+        static int anon_count;
+        STRING *mangled;
+        INTVAL old_idx = VTABLE_get_integer_keyed_str(interpreter,
+                attr_hash, attr);
+        VTABLE_delete_keyed_str(interpreter, attr_hash, attr);
 
+        mangled = Parrot_sprintf_c(interpreter, "%Ss%c%canon_%d",
+                attr, 0, 0, ++anon_count);
+        VTABLE_set_integer_keyed_str(interpreter, attr_hash,
+                mangled, old_idx);
+    }
+#endif
     /*
      * TODO check if someone is trying to add attributes to a parent class
      * while there are already child class attrs

@@ -14,6 +14,11 @@ tests by then. =-)
 
 =over 4
 
+=item pbc_merge
+
+Take advantage of the new C<pbc_merge> to combine the various .pbc files
+into a singleton.
+
 =item Makefile deps
 
 Should be more explicit about the PMC dependencies in the makefile. *something*
@@ -29,13 +34,6 @@ is causing things to get rebuilt unecessarily each time "make tclsh" is run.
 
 tcl is not using Keys when getting from aggregates. It probably should,
 at least for language interoperability.
-
-=item interactive tclsh
-
- o catch any real_exceptions thrown.
- o respect tcl_prompt1, tcl_prompt2
- o deal with incomplete input (needs better error handling)
- o add back in support for dispatch to shell.
 
 =item implement default globals, etc.
 
@@ -61,7 +59,7 @@ Perhaps via [namespace import]? Can fake it right now with [inline]
 
 =over 4
 
-=item [expr] mdiep is currently working on this.
+=item [expr]
 
 the expr AST could use a rework. Be nice if it just passed around something
 invokable.

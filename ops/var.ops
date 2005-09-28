@@ -47,7 +47,7 @@ op new_pad(in INT) {
     PMC * pad;
     PMC * parent = scratchpad_get_current(interpreter);
     pad = scratchpad_new(interpreter, parent, $1);
-    stack_push(interpreter, &interpreter->ctx.pad_stack, pad,
+    stack_push(interpreter, &CONTEXT(interpreter->ctx)->pad_stack, pad,
                STACK_ENTRY_PMC, STACK_CLEANUP_NULL);
     goto NEXT();
 }
@@ -67,7 +67,7 @@ Push the scratchpad in $1 onto the lexical scope stack.
 =cut
 
 op push_pad(in PMC) {
-    stack_push(interpreter, &interpreter->ctx.pad_stack, $1,
+    stack_push(interpreter, &CONTEXT(interpreter->ctx)->pad_stack, $1,
                STACK_ENTRY_PMC, STACK_CLEANUP_NULL);
     goto NEXT();
 }
@@ -86,13 +86,13 @@ it in $1
 =cut
 
 op pop_pad() {
-    stack_pop(interpreter, &interpreter->ctx.pad_stack,
+    stack_pop(interpreter, &CONTEXT(interpreter->ctx)->pad_stack,
               NULL, STACK_ENTRY_PMC);
     goto NEXT();
 }
 
 op pop_pad(out PMC) {
-    stack_pop(interpreter, &interpreter->ctx.pad_stack,
+    stack_pop(interpreter, &CONTEXT(interpreter->ctx)->pad_stack,
               &$1, STACK_ENTRY_PMC);
     goto NEXT();
 }

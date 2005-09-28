@@ -4,16 +4,14 @@
 .namespace [ "Tcl" ]
 
 .sub "&source"
-  .local pmc argv 
-  argv = foldup
-
+  .param pmc argv :slurpy
+  
   .local int argc 
   argc = argv
-
   if argc != 1 goto fail
 
   .local string chunk, filename, contents
-  .local int code,type
+  .local int type
   .local pmc retval, handle, parse
 
   parse = find_global "_Tcl", "parse"
@@ -40,22 +38,15 @@ loop:
 
 gotfile:
   $P1 = parse(contents)
-  register $P1
-  (code,retval) = $P1."interpret"()
-  goto done
- 
+  .return $P1."interpret"()
+
 badfile:
-  code = TCL_ERROR
-  retval = new String
-  retval = "couldn't read file \""
-  retval = retval . filename
-  retval = retval . "\": no such file or directory"
-  goto done
+  $S0 = "couldn't read file \""
+  $S0 = $S0 . filename
+  $S0 = $S0 . "\": no such file or directory"
+  .throw($S0)
 
 fail:
-  code = TCL_ERROR
-  retval = new String
-  retval =  "bad call to source\n"
-done:
-  .return(code,retval)
+  .throw("wrong # args: should be \"source fileName\"")
+
 .end

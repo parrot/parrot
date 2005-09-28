@@ -1,6 +1,6 @@
 =head1 ParTcl
 
-A from scratch implementation of Tcl on Parrot, called partcl.
+A from scratch implementation of Tcl on Parrot.
 
 To build the tcl interpreter, first build parrot.  From the top level
 parrot directory:
@@ -23,19 +23,19 @@ in this directory.
 =head2 Examples
 
 To run an example, change to the C<examples>, and type C<make>
-for instructions.
+for instructions. Running examples from here automatically handles
+cd'ing to the proper directory to run.
 
 =head2 Test Suite
 
 To run the test suite, type C<make test>. Note - if I<any> tests fail, try
 setting the environment variable C<TEST_PROG_ARGS> to C<-G> and retry.
 
-If the tests now pass, there's a GC bug that needs to be reported to
-the perl6-internals list.
+If any tests fail (with C<-G> or not), please email the perl6-internals list.
 
 =head2 Documentation
 
-Various documentation (in various states of decay at the moment):
+See:
 
  docs/*
  TODO

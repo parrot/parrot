@@ -2181,7 +2181,7 @@ void
 PDB_print_stack_int(Interp *interpreter, const char *command)
 {
     unsigned long depth = 0, i = 0;
-    Stack_Chunk_t *chunk = interpreter->ctx.int_reg_stack;
+    Stack_Chunk_t *chunk = CONTEXT(interpreter->ctx)->int_reg_stack;
 
     valid_chunk(interpreter, command, chunk, depth, i);
 
@@ -2206,7 +2206,7 @@ void
 PDB_print_stack_num(Interp *interpreter, const char *command)
 {
     unsigned long depth = 0, i = 0;
-    Stack_Chunk_t *chunk = interpreter->ctx.num_reg_stack;
+    Stack_Chunk_t *chunk = CONTEXT(interpreter->ctx)->num_reg_stack;
 
     valid_chunk(interpreter, command, chunk, depth, i);
 
@@ -2231,7 +2231,7 @@ void
 PDB_print_stack_string(Interp *interpreter, const char *command)
 {
     unsigned long depth = 0, i = 0;
-    Stack_Chunk_t *chunk = interpreter->ctx.string_reg_stack;
+    Stack_Chunk_t *chunk = CONTEXT(interpreter->ctx)->string_reg_stack;
 
     valid_chunk(interpreter, command, chunk, depth, i);
 
@@ -2256,7 +2256,7 @@ void
 PDB_print_stack_pmc(Interp *interpreter, const char *command)
 {
     unsigned long depth = 0, i = 0;
-    Stack_Chunk_t *chunk = interpreter->ctx.pmc_reg_stack;
+    Stack_Chunk_t *chunk = CONTEXT(interpreter->ctx)->pmc_reg_stack;
 
     valid_chunk(interpreter, command, chunk, depth, i);
 
@@ -2311,7 +2311,7 @@ void
 PDB_print_user_stack(Interp *interpreter, const char *command)
 {
     long depth = 0;
-    Stack_Chunk_t *chunk = interpreter->ctx.user_stack;
+    Stack_Chunk_t *chunk = CONTEXT(interpreter->ctx)->user_stack;
     Stack_Entry_t *entry;
 
     if (*command) {
@@ -2954,6 +2954,7 @@ PDB_backtrace(Interp *interpreter)
     PMC *sub;
     PMC *old = PMCNULL;
     int rec_level = 0;
+    parrot_context_t ctx;
 
     /* information about the current sub */
     sub = interpinfo_p(interpreter, CURRENT_SUB);
@@ -2964,17 +2965,23 @@ PDB_backtrace(Interp *interpreter)
     }
 
     /* backtrace: follow the continuation chain */
-    sub = interpinfo_p(interpreter, CURRENT_CONT);
-    while (!PMC_IS_NULL(sub) &&
-	    sub->vtable->base_type == enum_class_Continuation &&
-	    NULL != (str = Parrot_Context_infostr(interpreter,
-		    &PMC_cont(sub)->ctx)) ) {
+    ctx = interpreter->ctx;
+    while (1) {
+        sub = CONTEXT(ctx)->current_cont;
+        if (!sub)
+            break;
+        str = Parrot_Context_infostr(interpreter,
+		    &PMC_cont(sub)->to_ctx);
+        if (!str)
+            break;
 
 	/* recursion detection */
 	if (!PMC_IS_NULL(old) && PMC_cont(old) &&
-	    PMC_cont(old)->ctx.current_pc == PMC_cont(sub)->ctx.current_pc &&
-	    PMC_cont(old)->ctx.current_sub == PMC_cont(sub)->ctx.current_sub) {
-	    ++rec_level;
+	    CONTEXT(PMC_cont(old)->to_ctx)->current_pc ==
+            CONTEXT(PMC_cont(sub)->to_ctx)->current_pc &&
+	    CONTEXT(PMC_cont(old)->to_ctx)->current_sub ==
+            CONTEXT(PMC_cont(sub)->to_ctx)->current_sub) {
+            ++rec_level;
 	} else if (rec_level != 0) {
 	    PIO_eprintf(interpreter, "... call repeated %d times\n", rec_level);
 	    rec_level = 0;
@@ -2985,8 +2992,10 @@ PDB_backtrace(Interp *interpreter)
 	    PIO_eprintf(interpreter, "%Ss", str);
 
 	/* get the next Continuation */
+        ctx = PMC_cont(sub)->to_ctx;
 	old = sub;
-	sub = PMC_cont(sub)->ctx.current_cont;
+        if (!ctx.rctx || !CONTEXT(ctx)->prev)
+            break;
     }
     if (rec_level != 0) {
         PIO_eprintf(interpreter, "... call repeated %d times\n", rec_level);

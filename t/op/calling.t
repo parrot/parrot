@@ -16,134 +16,8 @@ Tests Parrot calling conventions.
 
 =cut
 
-use Parrot::Test tests => 26;
+use Parrot::Test tests => 37;
 use Test::More;
-
-# Test calling convention operations
-output_is(<<'CODE', <<OUTPUT, "foldup");
-    new P19, .String
-    new P18, .String
-    new P17, .String
-    new P16, .String
-    new P21, .String
-    new P20, .String
-    new P22, .String
-    new P24, .String
-    new P28, .String
-    new P29, .String
-    new P30, .String
-    new P27, .String
-    new P26, .String
-    new P25, .String
-    new P23, .String
-    set P20,"Foobar!"
-    set P23,"Baxman!"
-    newsub P0, .Sub, _foo
-    set P5,P19
-    set P6,P18
-    set P7,P17
-    set P8,P16
-    set P9,P21
-    set P10,P20
-    set P11,P22
-    set P12,P24
-    set P13,P28
-    set P14,P29
-    set P15,P30
-    new P3, .SArray
-    set P3, 4
-    push P3,P27
-    push P3,P26
-    push P3,P25
-    push P3,P23
-    set I0,1
-    set I1,0
-    set I2,0
-    set I3,11
-    set I4,0
-    invokecc
-    end
-_foo:
-    foldup P17
-    set P16,P17[5]
-    print P16
-    print "\n"
-    set P16,P17[14]
-    print P16
-    print "\n"
-    set I0,1
-    set I1,0
-    set I2,0
-    set I3,0
-    set I4,0
-    returncc
-
-CODE
-Foobar!
-Baxman!
-OUTPUT
-
-output_is(<<'CODE', <<OUTPUT, "foldup_p_i w. skip");
-    new P19, .String
-    new P18, .String
-    new P17, .String
-    new P16, .String
-    new P21, .String
-    new P20, .String
-    new P22, .String
-    new P24, .String
-    new P28, .String
-    new P29, .String
-    new P30, .String
-    new P27, .String
-    new P26, .String
-    new P25, .String
-    new P23, .String
-    set P20,"Foobar!"
-    set P23,"Baxman!"
-    newsub P0, .Sub, _foo
-    set P5,P19
-    set P6,P18
-    set P7,P17
-    set P8,P16
-    set P9,P21
-    set P10,P20
-    set P11,P22
-    set P12,P24
-    set P13,P28
-    set P14,P29
-    set P15,P30
-    new P3, .SArray
-    set P3,15
-    push P3,P27
-    push P3,P26
-    push P3,P25
-    push P3,P23
-    set I0,1
-    set I1,4
-    set I2,0
-    set I3,11
-    invokecc
-    end
-_foo:
-    foldup P17, 2
-    set P16,P17[3]
-    print P16
-    print "\n"
-    set P16,P17[12]
-    print P16
-    print "\n"
-    set I0,1
-    set I1,0
-    set I2,0
-    set I3,0
-    set I4,0
-    returncc
-
-CODE
-Foobar!
-Baxman!
-OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "set_args - parsing");
     noop
@@ -572,6 +446,8 @@ ok 6
 back
 OUTPUT
 
+SKIP: {
+  skip("arg count check disabled", 2);
 pir_output_like(<<'CODE', <<'OUTPUT', "argc mismatch, too few");
 .sub main @MAIN
     $P0 = new String
@@ -603,6 +479,7 @@ pir_output_like(<<'CODE', <<'OUTPUT', "argc mismatch, too many");
 CODE
 /too many arguments passed/
 OUTPUT
+}
 
 pir_output_is(<<'CODE', <<'OUTPUT', "argc mismatch, optional");
 .sub main @MAIN
@@ -817,3 +694,350 @@ ok:
 CODE
 ok
 OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "optional, argcX");
+.sub main @MAIN
+    $P0 = new String
+    $P0 = "hello\n"
+    find_name $P1, "foo"
+    set_args "(0,0)", $P0, 10
+    invokecc $P1
+.end
+.sub foo
+    .local int opt_argc
+    get_params "(0,0,0x20,0x20,0x20,0x20,0x40)", $P0, $I0, $P1, $S1, $I1, $N1, opt_argc
+    print $P0
+    if_null $P1, ok
+    print "not "
+ok:
+    print "ok\n"
+    print opt_argc
+    print "\n"
+.end
+CODE
+hello
+ok
+0
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "pir uses no ops");
+.sub main @MAIN
+    $I0 = 77
+    foo(42, $I0)
+    print "back\n"
+.end
+
+.emit
+.pcc_sub foo:
+    get_params "(0, 0)", I16, I17
+    print I16
+    print "\n"
+    print I17
+    print "\n"
+    returncc
+.eom
+CODE
+42
+77
+back
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "pir call evaled code");
+.sub main @MAIN
+    .local string s
+    s  = ".sub foo\n"
+    s .= ".param int i\n"
+    s .= ".param int j\n"
+    s .= "print_item i\n"
+    s .= "print_item j\n"
+    s .= "print_newline\n"
+    s .= ".return(99)\n"
+    s .= ".end\n"
+    .local pmc comp
+    comp = compreg "PIR"
+    $P0 = comp(s)
+    $I0 = 77
+    $I0 = foo(42, $I0)
+    print $I0
+    print "\n"
+.end
+
+CODE
+42 77
+99
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "tailcall 4 - pir calls");
+.sub main @MAIN
+    .const .Sub f = "foo"
+    print "main\n"
+    $S0 = f()
+    print $S0
+.end
+.sub foo
+    .const .Sub b = "bar"
+    print "foo\n"
+    .return b("from_foo\n")
+.end
+.sub bar
+    .param string s
+    print "bar\n"
+    print s
+    .return ("bar_ret\n")
+.end
+CODE
+main
+foo
+bar
+from_foo
+bar_ret
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "type conversion - native");
+.sub main @MAIN
+    foo(42, "42", 42.20)
+.end
+.sub foo
+    get_params "(0,0,0)", $I0, $I1, $I2
+    print_item $I0
+    print_item $I1
+    print_item $I2
+    print_newline
+    # yeah fetch args again
+    get_params "(0,0,0)", $N0, $N1, $N2
+    print_item $N0
+    print_item $N1
+    print_item $N2
+    print_newline
+    get_params "(0,0,0)", $S0, $S1, $S2
+    print_item $S0
+    print_item $S1
+    print_item $S2
+    print_newline
+.end
+CODE
+42 42 42
+42.0 42.0 42.2
+42 42 42.2
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "type conversion - PIR const");
+.const int MYCONST = -2
+.sub main @MAIN
+    $P0 = new PerlString
+    "foo"(MYCONST)
+.end
+.sub "foo"
+    .param string str1 :optional
+    print str1
+    print "\n"
+.end
+CODE
+-2
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "optional args, :opt_flag");
+.sub main @MAIN
+    $P0 = new String
+    $P0 = "hello\n"
+    foo($P0)
+    foo()
+.end
+.sub foo
+    .param pmc p1  :optional
+    .param int i1  :opt_flag
+
+    if_null p1, skip
+    print p1
+skip:
+    print i1
+    print "\n"
+.end
+CODE
+hello
+1
+0
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "optional multiple :opt_flag");
+.sub main @MAIN
+    $P0 = new String
+    $P0 = "ok 1\n"
+    foo($P0, "ok 2\n", "ok 3\n")
+.end
+.sub foo
+    .param pmc p1  :optional
+    .param int i1  :opt_flag
+    .param pmc p2  :optional
+    .param int i2  :opt_flag
+    .param pmc p3  :optional
+    .param int i3  :opt_flag
+    .param pmc p4  :optional
+    .param int i4  :opt_flag
+
+    print p1
+    print p2
+    print p3
+    if_null p4, ok
+    print "not "
+ok:
+    print "ok 4\n"
+    print_item i1
+    print_item i2
+    print_item i3
+    print_item i4
+    print_newline
+.end
+
+
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
+1 1 1 0
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "optional returns, void ret");
+.sub main @MAIN
+    .local pmc f
+    $I0 = 99
+    f = global "foo"
+    .pcc_begin
+    .pcc_call f
+    .result   $P0 :optional
+    .result   $I0 :opt_flag
+    .pcc_end
+    unless $I0,  ex
+    print "not "
+ex:
+    print "ok 1\n"
+.end
+.sub foo
+.end
+CODE
+ok 1
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "tailcall 5 - arg/param conflict");
+.sub main @MAIN
+    .local pmc a, b
+    a = new Integer
+    a = 1
+    b = new Integer
+    b = 2
+    .local pmc c, d
+    (c, d) = foo(a, b)
+    eq_addr a, c, ok1
+    print "not "
+ok1:
+    print "ok 1\n"
+    eq_addr b, d, ok2
+    print "not "
+ok2:
+    print "ok 2\n"
+.end
+
+.sub foo
+    .param pmc a
+    .param pmc b
+    $P0 = new Integer
+    $P0 = 3
+    .return bar($P0, a, b)
+.end
+
+.sub bar
+    .param pmc x
+    .param pmc a
+    .param pmc b
+    .return (a, b)
+.end
+CODE
+ok 1
+ok 2
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "OO argument passig");
+.sub main @MAIN
+    .local pmc cl, o, f
+    cl = newclass "Foo"
+    o = new "Foo"
+    o."bar"("ok 1\n")
+    f = find_global "Foo", "bar"
+    f(o, "ok 2\n")
+    o."baz"("ok 3\n")
+    f = find_global "Foo", "baz"
+    f(o, "ok 4\n")
+.end
+.namespace ["Foo"]
+.sub bar method
+    .param string s
+    print self
+    print " "
+    print s
+.end
+.sub baz
+    .param pmc self
+    .param string s
+    print self
+    print " "
+    print s
+.end
+.sub __get_string method
+    $S0 = typeof self
+    .return ($S0)
+.end
+CODE
+Foo ok 1
+Foo ok 2
+Foo ok 3
+Foo ok 4
+OUTPUT
+
+# see also tcl in leo-ctx5 by Coke; Date 28.08.2005
+pir_output_is(<<'CODE', <<'OUTPUT', "bug - :slurpy promotes to :flatten");
+.sub main @MAIN
+    $P0 = new String
+    $P0 = "ok 1\n"
+    $P1 = new String
+    $P1 = "ok 2\n"
+    $P0 = foo($P0, $P1)
+    print $P0
+.end
+.sub foo
+    .param pmc p :slurpy
+    .return bar(p)
+.end
+.sub bar
+    .param pmc p
+    .local pmc q
+    q = p[0]
+    print q
+    q = p[1]
+    .return (q)
+.end
+CODE
+ok 1
+ok 2
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "taicall to NCI");
+.sub main @MAIN
+    .local pmc s
+    s = new .String
+    s = "OK 1\n"
+    $S0 = s."lower"()
+    print $S0
+    s = "OK 2\n"
+    $S1 = foo(s)
+    print $S1
+.end
+.sub foo
+    .param pmc s
+    .return s."lower"()
+.end
+CODE
+ok 1
+ok 2
+OUTPUT
+

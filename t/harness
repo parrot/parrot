@@ -70,6 +70,10 @@ Some test scripts run more quickly when this is set.
 
 Invoke parrot with '--gc-debug'.
 
+=item C<--html>
+
+Emit a C<smoke.html> file instead of displaying results.
+
 =back
 
 =cut
@@ -80,6 +84,8 @@ use lib qw(lib imcc);
 use Getopt::Std;
 use Test::Harness qw(runtests);
 
+use Parrot::Config qw/%PConfig/;
+
 # handle the long options
 
 $ENV{RUNNING_MAKE_TEST} = grep { $_ eq '--running-make-test' } @ARGV;
@@ -87,6 +93,9 @@ $ENV{RUNNING_MAKE_TEST} = grep { $_ eq '--running-make-test' } @ARGV;
 
 my $gc_debug = grep { $_ eq '--gc-debug' } @ARGV;
 @ARGV = grep { $_ ne '--gc-debug' } @ARGV;
+
+my $html = grep { $_ eq '--html' } @ARGV;
+@ARGV = grep { $_ ne '--html' } @ARGV;
 
 # Suck the short options into the TEST_PROG_ARGS evar:
 my %opts;
@@ -108,6 +117,7 @@ perl t/harness [options] [testfiles]
     -O[012]    ... optimize
     --running-make-test
     --gc-debug
+    --html
 EOF
     exit;
 }
@@ -124,7 +134,51 @@ my @default_tests = ( ( map { glob( "t/$_/*.t" ) } qw(op pmc native_pbc) ),
                       glob( "t/library/*.t" ),
                     );
 my @tests = @ARGV ? map { glob( $_ ) } @ARGV : @default_tests;
-runtests(@tests);
+
+unless ($html) {
+    runtests(@tests);
+} else {
+    my @smoke_config_vars = qw(
+	  osname
+      archname
+      build_dir
+      cpuarch
+      revision
+	  VERSION
+	  optimize
+	  DEVEL
+    );
+
+    eval {
+        require Test::TAP::HTMLMatrix;
+        require Test::TAP::Model::Visual;
+    };
+
+    die "You must have Test::TAP::HTMLMatrix installed.\n\n$@" if $@;
+
+	my $start = time;
+    my $model = Test::TAP::Model::Visual->new_with_tests(@tests);
+	my $end = time;
+
+	my $duration = $end - $start;
+
+    my $v = Test::TAP::HTMLMatrix->new(
+        $model,
+        join("\n",
+			"duration: $duration",
+            "branch: unknown",
+            "harness_args: " . (($args) ? $args : "N/A"),
+            map { "$_: $PConfig{$_}" } sort @smoke_config_vars),
+    );
+
+    $v->has_inline_css(1); # no separate css file
+
+    open HTML, ">", "smoke.html";
+    print HTML $v->html;
+    close HTML;
+
+    print "smoke.html has been generated.\n";
+}
 
 =head1 HISTORY
 

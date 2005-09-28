@@ -3,14 +3,13 @@
 
 .namespace [ "Tcl" ]
 
-.include "iterator.pasm"
 .sub "&parray"
-  .local pmc argv
-  argv = foldup
+  .param pmc argv :slurpy
+.include "iterator.pasm"
 
-  .local int argc 
+  .local int argc
   argc = argv
-  
+
   .local pmc retval
   retval = new String
   retval = ""
@@ -47,7 +46,7 @@ catch_var:
   if argc == 1 goto match_all
   match_str = argv[1]
 match_all:
-  
+
   # for storing the matching results, so we can sort it
   .local pmc filtered
   filtered = new ResizablePMCArray
@@ -105,21 +104,20 @@ print_loop:
   print " = "
   print $P1
   print "\n"
-  
+
   inc c
   branch print_loop
 print_end:
 
 done:
-  .return(TCL_OK,retval)
+  .return(retval)
 
 bad_args:
-  retval = "wrong # args: should be \"parray arrayName ?pattern?\""
-  .return(TCL_ERROR, retval)
+  .throw ("wrong # args: should be \"parray arrayName ?pattern?\"")
 
 not_array:
-  retval = "\""
-  retval .= name 
-  retval .= "\" isn't an array"
-  .return(TCL_ERROR, retval)
+  $S0 = "\""
+  $S0 .= name
+  $S0 .= "\" isn't an array"
+  .throw ($S0)
 .end

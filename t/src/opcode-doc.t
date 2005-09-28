@@ -31,9 +31,10 @@ sub slurp {
 sub analyse {
     my ($filename, $ops) = @_;
     my %file;
-    
+
     foreach my $op ( keys %$ops ) {
         my $args = $ops->{$op};
+        next if $op =~ /^DELETED/;
         foreach my $arg ( keys %$args ) {
             my $e = $args->{$arg};
             my $val = $e->{status};
@@ -53,7 +54,7 @@ sub check_op_doc {
     my @file = slurp( $filename );
     my %op;
     my $lineno = 0;
-    
+
     foreach my $line (@file) {
         ++$lineno;
         if (my ($item) = $line =~ /^=item\s+(.+\(.*)/) {

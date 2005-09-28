@@ -14,11 +14,11 @@ t/examples/japh.t - Test some JAPHs
 
 =head1 DESCRIPTION
 
-Test the JAPHs in 'examples/japh'. 
+Test the JAPHs in 'examples/japh'.
 For now there are only JAPHs in PASM.
 
 Some JAPH are not really suitable for inclusion in automated tests.
- 
+
 =head1 TODO
 
 Get the TODO JAPHs working or decide that they are not suitable for testing.
@@ -34,24 +34,24 @@ use Parrot::Test tests => 15;
 use Test::More;
 
 # be pessimistic initially
-my %todo = map { $_ => 'various reasons' } ( 1 .. 15 ); 
+my %todo = map { $_ => 'various reasons' } ( 1 .. 15 );
 
 # known reasons for failure
 $todo{8}  = 'works only on little endian';
 $todo{13} = 'unreliable, but often succeeds';
 
 # working tests
-undef $todo{$_} foreach ( 3, 10, 12 );
+undef $todo{$_} foreach ( 3, 12 );
 
 # run all tests and tell about todoness
 foreach ( 1 .. 15 ) {
     my $pasm_fn   = "examples/japh/japh$_.pasm";
-    my $pasm_code = Parrot::Test::slurp_file($pasm_fn); 
+    my $pasm_code = Parrot::Test::slurp_file($pasm_fn);
 
     if ( defined $todo{$_} ) {
        pasm_output_is($pasm_code, "Just another Parrot Hacker\n", $pasm_fn,
-                      todo => $todo{$_}); 
+                      todo => $todo{$_});
     } else {
-       pasm_output_is($pasm_code, "Just another Parrot Hacker\n", $pasm_fn); 
+       pasm_output_is($pasm_code, "Just another Parrot Hacker\n", $pasm_fn);
     }
 }

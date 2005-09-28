@@ -58,8 +58,8 @@ $rules = <<'EOH';
 .sub "_load_grammar"
   .local pmc p6rule_compile
   p6rule_compile = find_global "PGE", "p6rule"
-  
-  .local string grammar 
+
+  .local string grammar
   grammar = "_Tcl_Rules" #xxx should probably not hardcode this.
 EOH
 
@@ -70,7 +70,7 @@ while ($rule =~ m/rule\s+(\w+)\s*{\s*(.*?)\s*};?/g) {
   my $rule_name = $1;
   my $rule_def = $2;
   $rule_def =~ s:\s+: :g;    # remove extra whitespace
-  $rule_def =~ s:\\:\\\\:g;   
+  $rule_def =~ s:\\:\\\\:g;
   $rule_def =~ s:":\\":g;
 
   $rules .= <<EORULE

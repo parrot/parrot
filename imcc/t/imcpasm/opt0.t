@@ -44,8 +44,7 @@ CODE
   sub N0, N\1, N1
   set N\1, I0
   div N0, N\1, N1
-  null I0
-  null I3
+  set_returns
   returncc/
 OUT
 
@@ -87,7 +86,6 @@ CODE
 # see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
 _test:
   noop
-  null I0
-  null I3
+  set_returns
   returncc
 OUT

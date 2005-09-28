@@ -351,7 +351,7 @@ op get_results(inconst PMC) {
     PMC *signature = $1;
     INTVAL argc;
 
-    interpreter->ctx.current_results = this;
+    CONTEXT(interpreter->ctx)->current_results = this;
     argc = VTABLE_elements(interpreter, signature);
     goto ADDRESS(this + 2 + argc);
 }
@@ -359,23 +359,18 @@ op get_results(inconst PMC) {
 op get_params(inconst PMC) {
     opcode_t *this = CUR_OPCODE;
     PMC *signature = $1;
-    INTVAL argc;
-    struct Parrot_sub * sub = PMC_sub(interpreter->ctx.current_sub);
+    struct Parrot_sub * sub = PMC_sub(CONTEXT(interpreter->ctx)->current_sub);
+    struct parrot_regs_t *caller_regs;
+    PMC *cont_pmc;
+    opcode_t *pc;
 
-    interpreter->ctx.current_params = this;
-    if (sub->address != this) {
-	struct parrot_regs_t *caller_regs;
-	PMC *cont_pmc = interpreter->ctx.current_cont;
-	opcode_t *pc;
+    interpreter->current_params = this;
+    cont_pmc = CONTEXT(interpreter->ctx)->current_cont;
 
-	caller_regs = PMC_cont(cont_pmc)->ctx.bp;
-	pc = parrot_pass_args(interpreter, sub, caller_regs,
-		PARROT_OP_get_params_pc);
-	goto ADDRESS(pc);
-    }
-
-    argc = VTABLE_elements(interpreter, signature);
-    goto ADDRESS(this + 2 + argc);
+    caller_regs = PMC_cont(cont_pmc)->to_ctx.bp;
+    pc = parrot_pass_args(interpreter, sub->seg, caller_regs,
+	    PARROT_OP_get_params_pc);
+    goto ADDRESS(pc);
 }
 
 op set_returns(inconst PMC) {

@@ -163,7 +163,7 @@ Parrot_get_ctx_HLL_type(Interp *interpreter, INTVAL core_type)
     INTVAL hll_id, n;
 
     hll_info = interpreter->HLL_info;
-    hll_id = interpreter->ctx.current_HLL;
+    hll_id = CONTEXT(interpreter->ctx)->current_HLL;
     if (hll_id <= 0)
         return core_type;
     n = VTABLE_elements(interpreter, hll_info);

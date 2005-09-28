@@ -9,10 +9,11 @@ version 0.10
 =head1 SYNOPSIS
 
 	...
-
 	# dump the P0 register
-	_dumper( "P0", P0 )
+	_dumper( P0 )
 
+	# dump the P0 register, with "name"
+	_dumper( P0, "name" )
 	...
 
 	END
@@ -31,7 +32,7 @@ version 0.10
     print "\tload_bytecode \"library/Data/Dumper.imc\"\n"
     print "\t...\n"
     print "\tnew dumper, \"Data::Dumper\"\n"
-    print "\tdumper.\"dumper\"( \"foo\", foo )\n\n"
+    print "\tdumper.\"dumper\"( foo, \"foo\" )\n\n"
     end
 .end
 
@@ -43,19 +44,19 @@ This library provides the following functions:
 
 =over 4
 
-=item _dumper( name, pmc[, indent] )
+=item _dumper( pmc, ?name, ?indent] )
 
 This is the public (non object) interface to the dumper library.
 
 =over 4
 
-=item name
-
-Optional. The name of the PMC.
-
 =item pmc
 
 Required. The PMC to dump.
+
+=item name
+
+Optional. The name of the PMC.
 
 =item indent
 
@@ -72,21 +73,21 @@ B<Note: #2> Hash keys are now sorted using C<_sort()> (library/sort.imc)
 =cut
 
 .sub _dumper
-    .param string name
     .param pmc p
-    .param string ident
-    $I2 = argcS
-    _global_dumper()
-    find_global $P2, "Data::Dumper", "global"
-    if $I2 == 2 goto w_ident
-    if $I2 == 0 goto wo_name
-    $P2."dumper"(name, p)
+    .param string name    :optional
+    .param int has_name   :opt_flag
+    .param string ident   :optional
+    .param int has_ident  :opt_flag
+    $P2 = _global_dumper()
+    if has_ident goto w_ident
+    unless has_name goto wo_name        # XXX argument order, opt 1st
+    $P2."dumper"(p, name)
     goto ex
 wo_name:
     $P2."dumper"(p)
     goto ex
 w_ident:
-    $P2."dumper"(name, p, ident)
+    $P2."dumper"(p, name, ident)
 ex:
 .end
 
@@ -119,9 +120,7 @@ This function returns nothing.
 .sub _register_dumper
     .param int id
     .param pmc s
-    # XXX argument passing
-    _global_dumper()
-    find_global $P2, "Data::Dumper", "global"
+    $P2 = _global_dumper()
     $P2."registerDumper"(id, s)
 .end
 

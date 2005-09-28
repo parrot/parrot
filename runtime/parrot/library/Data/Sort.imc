@@ -53,30 +53,19 @@ This function returns nothing.
 
 .sub simple
     .param pmc array
-    .param int start
+    .param int start         :optional
+    .param int has_start     :opt_flag
     .local int i
     .local int size
     .local pmc tmp
     .local int minpos
     .local pmc minval
     .local int v
-    
+
     # check number of INT args
-    if I1 == 0 goto NOINT
-    if I1 == 1 goto OK
-ERROR:
-    print "_sort Syntax:\n"
-    print "_sort( array )\n"
-    print "_sort( array, startoffset )\n"
-    branch END
-NOINT:
+    if has_start == 1 goto OK
     set start, 0
 OK:
-    # check number of STR args
-    if I2 != 0 goto ERROR
-    # check number of PMC args
-    if I3 != 1 goto ERROR
-        
     size = array
     # already sorted
     if size <= 1 goto END
@@ -87,7 +76,7 @@ REDO:
 LOOP:
     tmp = array[i]
     if minpos == -1 goto DO
-    
+
     cmp_str v, tmp, minval
     if v > 0 goto SKIP
 DO:

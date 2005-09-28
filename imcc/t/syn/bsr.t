@@ -242,14 +242,14 @@ pir_output_is(<<'CODE', <<'OUT', "tail recursive bsr, parrot cc");
 # the same state after, so instead of calling again the sub, just
 # a branch to the entry is done
 .sub _fact
-   if I6 <= 1 goto fin
-   I5 = I5 * I6
-   dec I6
-   branch _fact
+   .param int f
+   .param int n
+   if n <= 1 goto fin
+   f = f * n
+   dec n
+   .return _fact(f, n)
 fin:
-   I0 = 1
-   I1 = 1
-   returncc
+   .return(f)
 .end
 
 CODE
@@ -264,9 +264,9 @@ pir_output_is(<<'CODE', <<'OUT', "coroutine");
     co = new Coroutine
     co = addr _routine
     print "Hello"
-    invoke co
+    invokecc co
     print "perl6"
-    invoke co
+    invokecc co
     print "\n"
     end
 .end

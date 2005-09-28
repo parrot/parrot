@@ -74,7 +74,7 @@ Invokes the closure.
 
     void* invoke (void* next) {
         struct Parrot_sub * sub = PMC_sub(SELF);
-        INTERP->ctx.pad_stack = sub->pad_stack;
+        CONTEXT(INTERP->ctx)->pad_stack = sub->pad_stack;
         return SUPER(next);
     }
 

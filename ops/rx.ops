@@ -195,7 +195,7 @@ Pushes the current index onto the stack contained in the info structure.
 =cut
 
 op rx_pushindex(in int) {
-	intstack_push(interpreter, interpreter->ctx.intstack, $1);
+	intstack_push(interpreter, CONTEXT(interpreter->ctx)->intstack, $1);
 
 	goto NEXT();
 }
@@ -203,14 +203,14 @@ op rx_pushindex(in int) {
 =item B<rx_initstack>()
 
 op rx_initstack() {
-	interpreter->ctx.intstack = intstack_new(interpreter);
+	CONTEXT(interpreter->ctx)->intstack = intstack_new(interpreter);
 	goto NEXT();
 }
 
 =item B<rx_clearstack>()
 
 op rx_clearstack () {
-	intstack_free(interpreter, interpreter->ctx.intstack);
+	intstack_free(interpreter, CONTEXT(interpreter->ctx)->intstack);
 	goto NEXT();
 }
 
@@ -225,7 +225,7 @@ and another's begins.
 =cut
 
 op rx_pushmark() {
- 	intstack_push(interpreter, interpreter->ctx.intstack, RX_MARK);
+ 	intstack_push(interpreter, CONTEXT(interpreter->ctx)->intstack, RX_MARK);
 
 	goto NEXT();
 }
@@ -242,7 +242,7 @@ branches to the second parameter.
 op rx_popindex(out int, labelconst int) {
 	INTVAL i;
 
-	i=intstack_pop(interpreter, interpreter->ctx.intstack);
+	i=intstack_pop(interpreter, CONTEXT(interpreter->ctx)->intstack);
 
 	if(i==RX_MARK) {
 		goto OFFSET($2);

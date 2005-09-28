@@ -4,9 +4,7 @@
 .namespace [ "Tcl" ]
 
 .sub "&list"
-
-  .local pmc argv 
-  argv = foldup
+  .param pmc argv :slurpy
 
   # convert the Array returned by foldup into a TclList.
   #   Is there a more efficient way to do this?
@@ -28,5 +26,5 @@ LOOP:
   goto LOOP
 DONE: 
 
-  .return(TCL_OK,retval)
+  .return(retval)
 .end

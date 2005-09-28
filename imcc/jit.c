@@ -120,7 +120,7 @@ allocate_jit(Interp *interpreter, IMC_Unit * unit)
     const char *types = "IPSN";
     Instruction * ins, *tmp, *prev, *last;
     SymReg * r;
-    SymReg * regs[IMCC_MAX_REGS];
+    SymReg * regs[3];
     static SymReg  *cpu[4][MAX_MAPPED];
     static SymReg  *par[4][MAX_MAPPED];
     int reads[4][MAX_MAPPED], writes[4][MAX_MAPPED], nr, nw;
@@ -248,7 +248,8 @@ allocate_jit(Interp *interpreter, IMC_Unit * unit)
                         }
                     }
                     /* changed mapped regs to parrot regs */
-                    for (j = 0; (r = ins->r[j]) && j < IMCC_MAX_REGS; j++) {
+                    for (j = 0; j < ins->n_r; j++) {
+                        r = ins->r[j];
                         typ = strchr(types, r->set) - types;
                         if ((r->type & VTREGISTER) && r->color < 0)
                             ins->r[j] = par[typ][-1 - r->color];

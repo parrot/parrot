@@ -3,7 +3,7 @@
 # $Id$
 
 use strict;
-use Parrot::Test tests => 46;
+use Parrot::Test tests => 45;
 
 ##############################
 # Parrot Calling Conventions
@@ -357,10 +357,8 @@ pir_output_is(<<'CODE', <<'OUT', "coroutine iterator");
   .pcc_end
     print $I2
     print "\n"
-    savetop
-    invoke
+    invokecc $P0
     goto ret_addr
-    restoretop
  after_loop:
   print "done in main\n"
   end
@@ -381,7 +379,7 @@ pir_output_is(<<'CODE', <<'OUT', "coroutine iterator");
     goto loop
  done:
   print "done in coroutine\n"
-  invoke when_done
+  invokecc when_done
   end
 .end
 CODE
@@ -777,6 +775,8 @@ pir_output_is($code, <<'OUT', "overflow integers");
 all params ok
 OUT
 
+SKIP: {
+    skip("need variable register frame", 2);
 $code = repeat($template, 40,
                LOCALS => '.local int a<index>',
                INITS => 'a<index> = <index>',
@@ -784,17 +784,6 @@ $code = repeat($template, 40,
                PARAMS => '.param int a<index>',
                TESTS => 'ne a<index>, <index>, fail');
 pir_output_is($code, <<'OUT', "overflowed spilled integers");
-all params ok
-OUT
-
-$code = repeat($template, 18,
-               LOCALS => ".local Integer a<index>\n\ta<index> = new Integer",
-               INITS => 'a<index> = <index>',
-               ARGS => '.arg a<index>',
-               PARAMS => '.param Integer a<index>',
-               TESTS => "set I0, a<index>\nne I0, <index>, fail");
-
-pir_output_is($code, <<'OUT', "overflow pmcs");
 all params ok
 OUT
 
@@ -806,6 +795,18 @@ $code = repeat($template, 40,
                TESTS => "set I0, a<index>\nne I0, <index>, fail");
 
 pir_output_is($code, <<'OUT', "overflow pmcs 40");
+all params ok
+OUT
+
+}
+$code = repeat($template, 18,
+               LOCALS => ".local Integer a<index>\n\ta<index> = new Integer",
+               INITS => 'a<index> = <index>',
+               ARGS => '.arg a<index>',
+               PARAMS => '.param Integer a<index>',
+               TESTS => "set I0, a<index>\nne I0, <index>, fail");
+
+pir_output_is($code, <<'OUT', "overflow pmcs");
 all params ok
 OUT
 
@@ -951,9 +952,6 @@ pir_output_is(<<'CODE', <<'OUT', ".arg :flat non-prototyped 4");
     .param pmc f
     .param pmc g
     .param pmc h
-    print "Got "
-    print I3
-    print " params\n"
     print a
     print b
     print c
@@ -965,7 +963,6 @@ pir_output_is(<<'CODE', <<'OUT', ".arg :flat non-prototyped 4");
     end
 .end
 CODE
-Got 8 params
 first
 ok 1
 ok 2
@@ -1018,13 +1015,6 @@ pir_output_is(<<'CODE', <<'OUT', ".arg :flat prototyped 1");
     .param pmc f
     .param pmc g
     .param pmc h
-    .local int count
-    print "Got "
-    count = I1 + I2
-    count = count + I3
-    count = count + I4
-    print count
-    print " params\n"
     print a
     print b
     print c
@@ -1036,7 +1026,6 @@ pir_output_is(<<'CODE', <<'OUT', ".arg :flat prototyped 1");
     end
 .end
 CODE
-Got 8 params
 first
 ok 1
 ok 2
@@ -1103,9 +1092,6 @@ pir_output_is(<<'CODE', <<'OUT', ".arg :flat - overflow");
     .param pmc m
     .param pmc n
     .param pmc o
-    print "Got "
-    print I3
-    print " params\n"
     print a
     print b
     print c
@@ -1124,7 +1110,6 @@ pir_output_is(<<'CODE', <<'OUT', ".arg :flat - overflow");
     end
 .end
 CODE
-Got 11 params
 first
 ok 1
 ok 2
@@ -1309,59 +1294,6 @@ CODE
 P3 is NULL
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "P3 isnt NULL - 12 args");
-.sub test @MAIN
-    null P3
-    # call with 12 parameters
-    _foo($P1, $P2, $P3, $P4, $P5, $P6, $P7, $P8, $P9, $P10, $P11, $P12)
-    end
-.end
-
-.sub _foo
-    isnull P3, p3_is_null
-    print "P3 is not NULL\n"
-    $I0 = P3
-    print $I0
-    print "\n"
-    print I3
-    print "\n"
-    goto return
-p3_is_null:
-    print "P3 is NULL\n"
-return:
-.end
-CODE
-P3 is not NULL
-1
-11
-OUT
-
-pir_output_is(<<'CODE', <<'OUT', "P3 isnt NULL - 13 args");
-.sub test @MAIN
-    null P3
-    # call with 13 parameters
-    _foo($P1, $P2, $P3, $P4, $P5, $P6, $P7, $P8, $P9, $P10, $P11, $P12, $P13)
-    end
-.end
-
-.sub _foo
-    isnull P3, p3_is_null
-    print "P3 is not NULL\n"
-    $I0 = P3
-    print $I0
-    print "\n"
-    print I3
-    print "\n"
-    goto return
-p3_is_null:
-    print "P3 is NULL\n"
-return:
-.end
-CODE
-P3 is not NULL
-2
-11
-OUT
 
 pir_output_is(<<'CODE', "mongueur\nmonger\n", "multiple declaration in a .sym/.local directive");
 .sub main
@@ -1409,10 +1341,8 @@ pir_output_is(<<'CODE', <<'OUT', "oneliner yield");
   .pcc_end
     print $I2
     print "\n"
-    savetop
-    invoke
+    invokecc $P0
     goto ret_addr
-    restoretop
  after_loop:
   print "done in main\n"
   end
@@ -1431,7 +1361,7 @@ pir_output_is(<<'CODE', <<'OUT', "oneliner yield");
     goto loop
  done:
   print "done in coroutine\n"
-  invoke when_done
+  invokecc when_done
   end
 .end
 CODE
@@ -1559,5 +1489,20 @@ pir_output_like(<<'CODE', <<'OUT', "multiple \@ANON subs with same name");
 .end
 CODE
 /.*'anon'.*not found/
+OUT
+
+pir_output_is(<<'CODE', <<'OUT', "multi - colon syntax");
+# just parser test - these flags are meaningless
+.sub foo :multi() :main
+    print "ok 1\n"
+.end
+.sub f1 :multi(int) :load :postcomp
+.end
+.sub f2 :multi(int, float)
+.end
+.sub f3 :multi(Integer, Any, _)
+.end
+CODE
+ok 1
 OUT
 

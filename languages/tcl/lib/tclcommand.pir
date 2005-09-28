@@ -35,13 +35,11 @@ Execute the command.
 
 .sub interpret method
   .local pmc retval
-  .local int return_type
-  return_type = TCL_OK
-  
+ 
   .local string name
   $P0 = getattribute self, "TclCommand\x00name"
-  (return_type, retval) = $P0.interpret()
-  if return_type != TCL_OK goto done
+  retval = $P0."interpret"()
+
   name = retval
   
   .local pmc args
@@ -66,18 +64,14 @@ loop:
   if i == elems goto loop_done
   
   word   = self[i]
-  (return_type, retval) = word.interpret()
-  if return_type != TCL_OK goto done
+  retval = word."interpret"()
   
   push args, retval
   inc i
   goto loop
   
 loop_done:
-  (return_type, retval) = cmd(args :flat)
-
-done: 
-  .return(return_type, retval)
+  .return cmd(args :flat)
 
 no_command:
   $P1 = find_global "Tcl", "$tcl_interactive"
@@ -91,10 +85,8 @@ no_command:
   goto execute
 
 no_command_non_interactive:
-  return_type = TCL_ERROR
   $S0 = "invalid command name \""
   $S0 .= name
   $S0 .= "\""
-  retval = $S0
-  goto done
+  .throw($S0)
 .end

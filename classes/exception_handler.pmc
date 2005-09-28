@@ -36,7 +36,7 @@ Initializes the exception handler.
 */
 
     void init() {
-        PMC_cont_ASSIGN(SELF, new_continuation(INTERP));
+        PMC_cont_ASSIGN(SELF, new_continuation(INTERP, NULL));
         PMC_pmc_val(SELF) = NULL;
         /*
          * an exception handler has no separate context, its
@@ -48,6 +48,24 @@ Initializes the exception handler.
         PObj_active_destroy_SET(SELF);
     }
 
+    /*
+     * can't reuse Continuation's destroy yet -
+     * XXX fix ref_count handling for exception_handlers first
+     *
+     * An Exception_Handler is kind of a limited Continuation
+     * (can only call 'up the stack') Therefore we probably don't
+     * have to convert all RetContinuations to real Continuations
+     */
+
+    void destroy () {
+        struct Parrot_cont * cc = PMC_cont(SELF);
+        if (cc) {
+            if (cc->ctx_copy)
+                mem_sys_free(cc->ctx_copy);
+            mem_sys_free(cc);
+            PMC_cont(SELF) = NULL;
+        }
+    }
 }
 
 /*

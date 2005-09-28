@@ -73,7 +73,9 @@ should have a corresponding file in C<lib/commands/>
 =item pod
 
 Every PIR .sub that's defined should probably have some POD to go along
-with it to document the arguments and return values.
+with it to document the arguments and return values. Only exceptions to
+this should be subs which correspond directly to Tcl builtins -- those
+are already documented elsewhere.
 
 =item big picture docs.
 
@@ -95,12 +97,10 @@ as arguments. For those commands that take a fixed number of parameters,
 we declare them with C<.param>. For those that take a variable number,
 we use the C<foldup> opcode.
 
-Note that there are two return values for each command, an int and a PMC.
-The integer contains the Tcl return value for that command (OK, BREAK,
-RETURN, etc.). The PMC is usually a string at this point, but could be
-any valid PMC. Note - right now, if there's an error condition, create
-a new string-like PMC and put the error condition in it. Eventually this
-will be some kind of structure.
+If the return value would be TCL_OK, then simply C<.return> the value
+from the sub. For any other return type, use one of the macros in 
+C<lib/returncodes.pir>: C<.throw>, etc. the value can be any simple
+register or a PMC, the calling conventions will autobox as necessary.
 
 Before adding new functionality, add a test (or a test in an existing) file 
 in C<t/> - tests for C<puts>, for example,

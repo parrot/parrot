@@ -47,6 +47,7 @@ pmclass TclInt extends TclObject extends Integer dynpmc group tcl_group {
     METHOD PMC* interpret() {
         return SELF;
     }
+    
 }
 
 

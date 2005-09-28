@@ -25,7 +25,8 @@ enum VARTYPE {		/* variable type can be */
     VT_START_ZERO  = PF_VT_START_ZERO  ,   /* .. y 0..start */
     VT_END_INF     = PF_VT_END_INF     ,   /* x..  start..inf */
     VT_SLICE_BITS  = PF_VT_SLICE_BITS,
-    VT_ENCODED  = 1 << 16       /* unicode string constant */
+    VT_ENCODED  = 1 << 16,       /* unicode string constant */
+    VT_OPT_FLAG  = 1 << 17	/* var :opt_flag */
 };
 
 /* this VARTYPE needs register allocation and such */
@@ -152,10 +153,12 @@ typedef enum {
 
 struct pcc_sub_t {
     SymReg ** args;
+    int *arg_flags;	/* :slurpy, :optional, ... */
     int nargs;
     SymReg *sub;
     SymReg *cc;
     SymReg ** ret;
+    int *ret_flags;	/* :slurpy, :optional, ... */
     int nret;
     SymReg ** multi;
     int nmulti;

@@ -391,11 +391,15 @@ my $temp = 'temp';;
 open S, ">$temp.pasm" or die "Can't write $temp.pasm";
 print S <<'EOF';
   .pcc_sub _sub1:
+  get_params "()"
   printerr "in sub1\n"
+  set_returns "()"
   returncc
   .pcc_sub _sub2:
+  get_params "(0)", P5
   printerr P5
   printerr "in sub2\n"
+  set_returns "()"
   returncc
 EOF
 close S;
@@ -465,6 +469,7 @@ OUTPUT
 open S, ">$temp.pasm" or die "Can't write $temp.pasm";
 print S <<'EOF';
   .pcc_sub _sub1:
+  get_params "()"
   printerr "in sub1\n"
   new_pad 0
   find_lex P2, "no_such_var"

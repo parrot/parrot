@@ -83,13 +83,15 @@ min/max/greedy/etc.  values and C<exp1> and C<exp2> objects if provided.
 =cut
 
 .sub "new"
-    .param string expclass     #:optional           # class from find_type
-    .param pmc exp1            #:optional           # left expression
-    .param pmc exp2            #:optional           # right expression
-    #.param int argc            :opt_count
+    .param string expclass     :optional           # class from find_type
+    .param int has_class       :opt_flag
+    .param pmc exp1            :optional           # left expression
+    .param int has_exp1        :opt_flag
+    .param pmc exp2            :optional           # right expression
+    .param int has_exp2        :opt_flag
     .local pmc me                                  # new expression object
 
-    if argcS > 0 goto buildme
+    if has_class goto buildme
     expclass = "PGE::Exp"
   buildme:
     $I0 = find_type expclass
@@ -99,9 +101,9 @@ min/max/greedy/etc.  values and C<exp1> and C<exp2> objects if provided.
     me["isgreedy"] = 1
     me["iscut"] = 0
 
-    if argcP < 1 goto end
+    unless has_exp1 goto end
     me["exp1"] = exp1
-    if argcP < 2 goto end
+    unless has_exp2 goto end
     me["exp2"] = exp2
   end:
     .return (me)
@@ -181,14 +183,15 @@ hint, then we have have no firstchars either.
 =cut
 
 .sub "firstchars" method
-    .param pmc exp1            #:optional
-    .param pmc exp2            #:optional
-    #.param int argc            :opt_count
+    .param pmc exp1            :optional
+    .param int has_exp1        :opt_flag
+    .param pmc exp2            :optional
+    .param int has_exp2        :opt_flag
 
-    if argcP < 1 goto exp_1
+    unless has_exp1 goto exp_1
     $S0 = exp1["firstchars"]
     unless $S0 > "" goto exp_1
-    if argcP < 2 goto end
+    unless has_exp2 goto exp_1
     $S1 = exp2["firstchars"]
     unless $S1 > "" goto exp_1
     concat $S0, $S1
@@ -211,16 +214,17 @@ won't be a problem, but is the use of the start parameter thread-safe?
 =cut
 
 .sub "serno" method
-    .param string prefix       #:optional
-    .param int start           #:optional
-    #.param int argc            :opt_count
+    .param string prefix       :optional
+    .param int has_prefix      :opt_flag
+    .param int start           :optional
+    .param int has_start       :opt_flag
 
-    if argcS > 0 goto serno_1
+    if has_prefix goto serno_1
     prefix = "R"
   serno_1:
     $P0 = find_global "PGE::Exp", "$_serno"
     inc $P0
-    if argcI < 1 goto serno_2
+    unless has_start goto serno_2
     $P0 = start
   serno_2:
     $I0 = $P0
@@ -236,13 +240,11 @@ Adds to the current code string, replacing %s by str1/str2.
 
 =cut
 
-.sub "emit" method
+.sub "emit"
     .param pmc code                                # append to code
     .param string fmt                              # string to output
-    .param string str1         #:optional           # first %s substitution
-    .param string str2         #:optional           # second %s substitution
-    .param string str3         #:optional           # third %s substitution
-    .param int int1                                # first %d substitution
+    .param string str1         :optional           # first %s substitution
+    .param string str2         :optional           # second %s substitution
 
     concat fmt, "\n"
     $I0 = index fmt, "%s"
@@ -251,15 +253,7 @@ Adds to the current code string, replacing %s by str1/str2.
     $I0 = index fmt, "%s"
     if $I0 < 0 goto emit_1
     substr fmt, $I0, 2, str2
-    $I0 = index fmt, "%s"
-    if $I0 < 0 goto emit_1
-    substr fmt, $I0, 2, str3
   emit_1:
-    $I0 = index fmt, "%d"
-    if $I0 < 0 goto emit_2
-    $S0 = int1
-    substr fmt, $I0, 2, $S0
-  emit_2:
     concat code, fmt
     .return ()
 .end
@@ -272,10 +266,10 @@ says not to intercept cutting operations.
 
 =cut
 
-.sub "emitsub-newcc" method
+.sub "emitsub" method
     .param pmc code                                # append to code
     .param string next                             # sub label
-    .param pmc save         #:slurpy                # registers to save
+    .param pmc save         :slurpy                # registers to save
     .local int nocut                               # flag for "NOCUT"
     .local pmc emit                                # emit subroutine
     .local int savec                               # number of save items
@@ -311,61 +305,6 @@ says not to intercept cutting operations.
     .return ()
 .end
 
-.sub "emitsub" method    # old calling conventions
-    .param pmc code                                # append to code
-    .param string next                             # sub label
-    .param string save2                            # string 1
-    .param string save3                            # string 2
-    .param string save4                            # string 3
-    .param string save5                            # string 4
-    .local int nocut                               # flag for "NOCUT"
-    .local pmc emit                                # emit subroutine
-    .local int argc
-
-    argc = argcS
-
-    emit = find_global "PGE::Exp", "emit"
-    nocut = 0
-    if argc < 2 goto emitsub_0
-    if save2 == "NOCUT" goto set_nocut
-    emit(code, "    save %s", save2)
-    if argc < 3 goto emitsub_0
-    if save3 == "NOCUT" goto set_nocut
-    emit(code, "    save %s", save3)
-    if argc < 4 goto emitsub_0
-    if save4 == "NOCUT" goto set_nocut
-    emit(code, "    save %s", save4)
-    if argc < 5 goto emitsub_0
-    if save5 == "NOCUT" goto set_nocut
-    emit(code, "    save %s", save5)
-    goto emitsub_0
-  set_nocut:
-    nocut = 1
-  emitsub_0:
-    emit(code, "    bsr %s", next)
-    if argc < 5 goto res4
-    if save5 == "NOCUT" goto res4
-    emit(code, "    restore %s", save5)
-  res4:
-    if argc < 4 goto res3
-    if save4 == "NOCUT" goto res3
-    emit(code, "    restore %s", save4)
-  res3:
-    if argc < 3 goto res2
-    if save3 == "NOCUT" goto res2
-    emit(code, "    restore %s", save3)
-  res2:
-    if argc < 2 goto generate_cut
-    if save2 == "NOCUT" goto generate_cut
-    emit(code, "    restore %s", save2)
-  generate_cut:
-    if nocut goto end
-    emit(code, "    if cutting != 0 goto fail")
-  end:
-    .return ()
-.end
-
-
 =item C<genliteral(PMC code, STR label, STR next)>
 
 Generate code to match literal strings, quantified as necessary.
@@ -397,18 +336,18 @@ register.
     emit(code, "    rep = 0")
     unless isgreedy goto lazy
     emit(code, "  %s_lit1:", label)
-    emit(code, "    if rep >= %d goto %s_lit2", max, label)
+    emit(code, "    if rep >= %s goto %s_lit2", max, label)
     emit(code, "    $S0 = substr target, pos, litlen")
     emit(code, "    if $S0 != lit goto %s_lit2", label)
     emit(code, "    inc rep")
     emit(code, "    pos += litlen")
     emit(code, "    goto %s_lit1", label)
     emit(code, "  %s_lit2:", label)
-    emit(code, "    if rep < %d goto fail", min)
+    emit(code, "    if rep < %s goto fail", min)
     unless iscut goto greedy_1
     emit(code, "    goto %s", next)
   greedy_1:
-    emit(code, "    if rep == %d goto %s", min, next)
+    emit(code, "    if rep == %s goto %s", min, next)
     self.emitsub(code, next, "pos", "rep", "litlen")
     emit(code, "    dec rep")
     emit(code, "    pos -= litlen")
@@ -417,12 +356,12 @@ register.
 
   lazy:
     emit(code, "  %s_lit1:", label)
-    emit(code, "    if rep < %d goto %s_lit2", min, label)
+    emit(code, "    if rep < %s goto %s_lit2", min, label)
     unless iscut goto lazy_1
     emit(code, "    goto %s", next)
     goto lazy_2
   lazy_1:
-    emit(code, "    if rep >= %d goto %s", max, next)
+    emit(code, "    if rep >= %s goto %s", max, next)
     self.emitsub(code, next, "pos", "rep", "lit", "litlen")
   lazy_2:
     emit(code, "  %s_lit2:", label)
@@ -456,26 +395,17 @@ register.
 
     emit = find_global "PGE::Exp", "emit"
     emit(code, ".sub _pge_rule")
-    emit(code, "    .param pmc pmc1")
-    emit(code, "    .param string str1")                
-    emit(code, "    .param int pos")
-    emit(code, "    .local pmc mob")
+    emit(code, "    .param pmc mob")
+    emit(code, "    .param pmc pos :optional")
+    emit(code, "    .param int has_pos :opt_flag")
     emit(code, "    .local pmc yield")
-    emit(code, "    if argcP < 1 goto new_match")
-    emit(code, "    $I0 = isa pmc1, \"PGE::Match\"")
-    emit(code, "    unless $I0 goto new_match")
-    emit(code, "    mob = pmc1")
-    emit(code, "    goto init_pos")
+    emit(code, "    $I0 = isa mob, \"PGE::Match\"")
+    emit(code, "    if $I0 goto init_pos")
     emit(code, "  new_match:")
+    emit(code, "    $P0 = new String")
+    emit(code, "    assign $P0, mob")
     emit(code, "    $I0 = find_type \"PGE::Rule\"")
     emit(code, "    mob = new $I0")
-    emit(code, "    $P0 = new String")
-    emit(code, "    if argcP > 0 goto from_pmc")
-    emit(code, "    assign $P0, str1")
-    emit(code, "    goto init_match")
-    emit(code, "  from_pmc:")
-    emit(code, "    assign $P0, pmc1")
-    emit(code, "  init_match:")
     emit(code, "    setattribute mob, \"PGE::Match\\x0$:target\", $P0")
     emit(code, "    $P0 = new PerlInt")
     emit(code, "    setattribute mob, \"PGE::Match\\x0$:from\", $P0")
@@ -483,7 +413,7 @@ register.
     emit(code, "    $P0 = -1")
     emit(code, "    setattribute mob, \"PGE::Match\\x0$:pos\", $P0")
     emit(code, "  init_pos:")
-    emit(code, "    if argcI > 0 goto start_match")
+    emit(code, "    if has_pos goto start_match")
     emit(code, "    $P0 = getattribute mob, \"PGE::Match\\x0$:pos\"")
     emit(code, "    pos = $P0")
     emit(code, "  start_match:")
@@ -532,8 +462,8 @@ register.
   gen_1:
     emit(code, "    from = pos")
     self.emitsub(code, label, "pos", "from", "lastpos", "NOCUT")
-    #emit(code, "    if cutting == %d goto fail_forever", PGE_CUT_RULE)
-    emit(code, "    if cutting == %d goto fail_forever", -2)  # XXX
+    #emit(code, "    if cutting == %s goto fail_forever", PGE_CUT_RULE)
+    emit(code, "    if cutting == %s goto fail_forever", -2)  # XXX
     emit(code, "  try_again:")
     emit(code, "    inc pos")
     emit(code, "    goto try_match")
@@ -617,11 +547,11 @@ register.
     $I0 = isa cname, "Integer"
     unless $I0 goto named
     subp = cname
-    emit(code, "\n  %s:  # backref $%d %s", label, subp, $S0)
+    emit(code, "\n  %s:  # backref $%s %s", label, subp, $S0)
     emit(code, "    lit = ''")
     emit(code, "    $P0 = getattribute mob, \"PGE::Match\\x0@:capt\"")
     emit(code, "    isnull $P0, %s_1", label)
-    emit(code, "    $P1 = $P0[%d]", subp)
+    emit(code, "    $P1 = $P0[%s]", subp)
     emit(code, "    lit = $P1[-1]")
     emit(code, "  %s_1:", label)
     .return self.genliteral(code, label, next)
@@ -655,35 +585,35 @@ register.
     emit(code, "    maxrep = length target")
     emit(code, "    maxrep -= pos")
     unless min > 0 goto dot_1
-    emit(code, "    if maxrep < %d goto fail", min)
+    emit(code, "    if maxrep < %s goto fail", min)
   dot_1:
     unless min == max goto dot_2
-    emit(code, "    pos += %d", min)
+    emit(code, "    pos += %s", min)
     emit(code, "    goto %s", next)
     .return ()
   dot_2:
     if max == PGE_INF goto greedy
-    emit(code, "    if maxrep <= %d goto %s_1", max, label)
-    emit(code, "    maxrep = %d", max)
+    emit(code, "    if maxrep <= %s goto %s_1", max, label)
+    emit(code, "    maxrep = %s", max)
     emit(code, "  %s_1:", label)
   greedy:
     unless isgreedy goto lazy
     emit(code, "    rep = maxrep")
     emit(code, "    pos += rep")
     emit(code, "  %s_2:", label)
-    emit(code, "    if rep < %d goto fail", min)
+    emit(code, "    if rep < %s goto fail", min)
     unless iscut goto greedy_1
     emit(code, "    goto %s", next)
     .return ()
   greedy_1:
-    emit(code, "    if rep == %d goto %s", min, next)
+    emit(code, "    if rep == %s goto %s", min, next)
     self.emitsub(code, next, "pos", "rep")
     emit(code, "    dec rep")
     emit(code, "    dec pos")
     emit(code, "    goto %s_2", label)
     .return ()
   lazy:
-    emit(code, "    rep = %d", min)
+    emit(code, "    rep = %s", min)
     emit(code, "    pos += rep", min)
     emit(code, "  %s_3:", label)
     emit(code, "    if rep > maxrep goto fail")
@@ -720,18 +650,18 @@ register.
     unless isgreedy goto lazy
     emit(code, "  %s_1:", label)
     emit(code, "    if pos >= lastpos goto %s_f", label)
-    emit(code, "    if rep >= %d goto %s_f", max, label)
+    emit(code, "    if rep >= %s goto %s_f", max, label)
     emit(code, test, label)
     emit(code, "    inc pos")
     emit(code, "    inc rep")
     emit(code, "    goto %s_1", label)
     emit(code, "  %s_f:", label)
-    emit(code, "    if rep < %d goto fail", min)
+    emit(code, "    if rep < %s goto fail", min)
     unless iscut goto greedy_1
     emit(code, "    goto %s", next)
     .return ()
   greedy_1:
-    emit(code, "    if rep == %d goto %s", min, next)
+    emit(code, "    if rep == %s goto %s", min, next)
     self.emitsub(code, next, "pos", "rep")
     emit(code, "    dec pos")
     emit(code, "    dec rep")
@@ -739,12 +669,12 @@ register.
     .return ()
   lazy:
     emit(code, "  %s_0:", label)
-    emit(code, "    if rep < %d goto %s_1", min, label)
+    emit(code, "    if rep < %s goto %s_1", min, label)
     unless iscut goto lazy_1
     emit(code, "    goto %s", next)
     goto lazy_2
   lazy_1:
-    emit(code, "    if rep >= %d goto %s", max, next)
+    emit(code, "    if rep >= %s goto %s", max, next)
     emit(code, "    if pos >= lastpos goto fail")
     self.emitsub(code, next, "pos", "rep")
   lazy_2:
@@ -783,7 +713,7 @@ register.
     unless isgreedy goto lazy
     emit(code, "  %s_1:", label)
     emit(code, "    if pos >= lastpos goto %s_2", label)
-    emit(code, "    if rep >= %d goto %s_2", max, label)
+    emit(code, "    if rep >= %s goto %s_2", max, label)
     emit(code, "    $S0 = substr target, pos, 1")
     emit(code, "    $I0 = index \"%s\", $S0", charclass)
     emit(code, "    %s $I0 == -1 goto %s_2", charmatch, label)
@@ -791,12 +721,12 @@ register.
     emit(code, "    inc rep")
     emit(code, "    goto %s_1", label)
     emit(code, "  %s_2:", label)
-    emit(code, "    if rep < %d goto fail", min)
+    emit(code, "    if rep < %s goto fail", min)
     unless iscut goto greedy_1
     emit(code, "    goto %s", next)
     .return ()
   greedy_1:
-    emit(code, "    if rep == %d goto %s", min, next)
+    emit(code, "    if rep == %s goto %s", min, next)
     self.emitsub(code, next, "pos", "rep")
     emit(code, "    dec pos")
     emit(code, "    dec rep")
@@ -804,12 +734,12 @@ register.
     .return ()
   lazy:
     emit(code, "  %s_0:", label)
-    emit(code, "    if rep < %d goto %s_1", min, label)
+    emit(code, "    if rep < %s goto %s_1", min, label)
     unless iscut goto lazy_1
     emit(code, "    goto %s", next)
     goto lazy_2
   lazy_1:
-    emit(code, "    if rep >= %d goto %s", max, next)
+    emit(code, "    if rep >= %s goto %s", max, next)
     emit(code, "    if pos > lastpos goto fail")
     self.emitsub(code, next, "pos", "rep")
   lazy_2:
@@ -850,14 +780,14 @@ register.
     emit(code, "    rep = 0")
     emit(code, "    if pos >= lastpos goto %s", next)
     emit(code, "    if pos < 1 goto %s_1", label)
-    emit(code, "    $I0 = is_cclass %d, target, pos", .CCLASS_WORD)
+    emit(code, "    $I0 = is_cclass %s, target, pos", .CCLASS_WORD)
     emit(code, "    unless $I0 goto %s_1", label)
     emit(code, "    $I0 = pos - 1")
-    emit(code, "    $I1 = is_cclass %d, target, $I0", .CCLASS_WORD)
+    emit(code, "    $I1 = is_cclass %s, target, $I0", .CCLASS_WORD)
     emit(code, "    if $I1 goto fail")
     emit(code, "  %s_1:", label)
     emit(code, "    rep = pos")
-    emit(code, "    pos = find_not_cclass %d, target, pos, lastpos", .CCLASS_WHITESPACE)
+    emit(code, "    pos = find_not_cclass %s, target, pos, lastpos", .CCLASS_WHITESPACE)
     $I0 = self["iscut"]
     unless $I0 goto backtrack
     emit(code, "    goto %s", next)
@@ -1021,7 +951,7 @@ register.
     .local pmc emit
     .local pmc exp1, exp2
     emit = find_global "PGE::Exp", "emit"
-    emit(code, "\n  %s:  # alt", label)
+    emit(code, "\n  %s:", label)
     ($S0, $I0) = self.serno()
     ($S1, $I1) = self.serno()
     self.emitsub(code, $S0, "pos")
@@ -1137,7 +1067,7 @@ register.
   init:
     emit(code, "\n  %s:", label)
     emit(code, "    $I0 = gpad[-1]")
-    emit(code, "    if $I0 == %d goto %s_1", myserno, label)
+    emit(code, "    if $I0 == %s goto %s_1", myserno, label)
     emit(code, "    $P0 = cpad[-1]")
     emit(code, "    push cpad, $P0")
     unless iscapture goto init_1
@@ -1153,7 +1083,7 @@ register.
     emit(code, "    if $I0 goto %s_i3", label)
     emit(code, "    capt = new PerlArray")
     emit(code, "    $P0 = new Integer")
-    emit(code, "    $P0 = %d", isarray)
+    emit(code, "    $P0 = %s", isarray)
     emit(code, "    setprop capt, \"isarray\", $P0")
     emit(code, "    cobcapt[%s] = capt", captname)
     emit(code, "    iscreator = 1")
@@ -1162,7 +1092,7 @@ register.
   init_1:
     emit(code, "    push gpad, capt")
     emit(code, "    push gpad, 0")
-    emit(code, "    push gpad, %d", myserno)
+    emit(code, "    push gpad, %s", myserno)
     emit(code, "    save iscreator")
     emit(code, "    save cobcapt")
     emit(code, "    bsr %s_1", label)
@@ -1177,7 +1107,7 @@ register.
     emit(code, "    delete cobcapt[%s]", captname)
     emit(code, "  %s_i4:", label)
   init_2:
-    emit(code, "    unless cutting == %d goto fail", myserno)
+    emit(code, "    unless cutting == %s goto fail", myserno)
     emit(code, "    cutting = 0")
     emit(code, "    goto fail")
     emit(code, "  %s_1:", label)
@@ -1192,14 +1122,14 @@ register.
   greedy:
     emit(code, "  %s_2:", label)
     unless isgreedy goto lazy
-    emit(code, "    if rep >= %d goto %s_g1", max, label)
+    emit(code, "    if rep >= %s goto %s_g1", max, label)
     emit(code, "    inc rep")
     emit(code, "    gpad[-2] = rep")
     self.emitsub(code, sublabel, "pos", "rep")
   greedy_1:
     emit(code, "    dec rep")
     emit(code, "  %s_g1:", label)
-    emit(code, "    if rep < %d goto fail", min)
+    emit(code, "    if rep < %s goto fail", min)
     emit(code, "    $I0 = pop gpad")
     emit(code, "    $I0 = pop gpad")
     emit(code, "    $P0 = pop gpad")
@@ -1208,14 +1138,14 @@ register.
     emit(code, "    push cpad, $P0")
     emit(code, "    push gpad, capt")
     emit(code, "    push gpad, rep")
-    emit(code, "    push gpad, %d", myserno)
+    emit(code, "    push gpad, %s", myserno)
     unless iscut goto greedy_2
-    emit(code, "    cutting = %d", myserno)
+    emit(code, "    cutting = %s", myserno)
   greedy_2:
     emit(code, "    goto fail")
     goto subpat
   lazy:
-    emit(code, "    if rep < %d goto %s_l1", min, label)
+    emit(code, "    if rep < %s goto %s_l1", min, label)
     emit(code, "    $I0 = pop gpad")
     emit(code, "    $I0 = pop gpad")
     emit(code, "    $P0 = pop gpad")
@@ -1224,13 +1154,13 @@ register.
     emit(code, "    push cpad, $P0")
     emit(code, "    push gpad, capt")
     emit(code, "    push gpad, rep")
-    emit(code, "    push gpad, %d", myserno)
+    emit(code, "    push gpad, %s", myserno)
     unless iscut goto lazy_1
-    emit(code, "    cutting = %d", myserno)
+    emit(code, "    cutting = %s", myserno)
     emit(code, "    goto fail")
   lazy_1:
     emit(code, "  %s_l1:", label)
-    emit(code, "    if rep >= %d goto fail", max)
+    emit(code, "    if rep >= %s goto fail", max)
     emit(code, "    inc rep")
     emit(code, "    gpad[-2] = rep")
     self.emitsub(code, sublabel, "rep")
@@ -1279,7 +1209,7 @@ register.
     goto subrule_invoke
   subrule_simple_name:
     emit(code, "    $P2 = mob.\"newat\"(mob, pos)")
-    emit(code, "    errorsoff %d", .PARROT_ERRORS_GLOBALS_FLAG)
+    emit(code, "    errorsoff %s", .PARROT_ERRORS_GLOBALS_FLAG)
 #    emit(code, "    $P1 = find_lex \"%s\"", rname)
 #    emit(code, "    $I0 = defined $P1")
 #    emit(code, "    if $I0 goto %s_s1", label)

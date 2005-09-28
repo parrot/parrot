@@ -340,7 +340,7 @@ static Instruction *
 insert_new(Interp* interpreter, SymReg *var, const char *pmy_type)
 {
     Instruction *ins;
-    SymReg *regs[IMCC_MAX_REGS], *r;
+    SymReg *regs[2], *r;
     int type = pmc_type(interpreter, const_string(interpreter, pmy_type));
     char ireg[8];
 
@@ -360,7 +360,7 @@ static SymReg *
 insert_find_global(Interp* interpreter, nodeType *var)
 {
     Instruction *ins;
-    SymReg *regs[IMCC_MAX_REGS], *r;
+    SymReg *regs[2], *r;
     char name[128];
 
     ins = cur_unit->last_ins;
@@ -392,7 +392,7 @@ default_pmc_type(nodeType *p)
 static SymReg*
 node_to_pmc(Interp* interpreter, nodeType *p)
 {
-    SymReg *regs[IMCC_MAX_REGS];
+    SymReg *regs[2];
     const char *pmc;
     SymReg *temp;
     Instruction *ins;
@@ -411,7 +411,7 @@ node_to_pmc(Interp* interpreter, nodeType *p)
 static SymReg*
 insert_find_lex(Interp* interpreter, nodeType *var)
 {
-    SymReg *regs[IMCC_MAX_REGS];
+    SymReg *regs[3];
     Instruction *ins;
     char buf[128];
 
@@ -488,7 +488,7 @@ static SymReg*
 exp_Assign(Interp* interpreter, nodeType *p)
 {
     Instruction *ins = NULL;    /* gcc uninit warning */
-    SymReg *regs[IMCC_MAX_REGS], *lr = NULL, *rr = NULL;
+    SymReg *regs[3], *lr = NULL, *rr = NULL;
     nodeType *var = CHILD(p);
     nodeType *rhs = var->next;
     int need_assign = 0, need_store = 0;
@@ -554,7 +554,7 @@ exp_Binary(Interp* interpreter, nodeType *p)
 {
     nodeType *op, *left, *right;
     Instruction *ins;
-    SymReg *regs[IMCC_MAX_REGS];
+    SymReg *regs[3];
     SymReg *lr, *rr, *dest;
 
     op = CHILD(p);
@@ -603,7 +603,7 @@ exp_Unary(Interp* interpreter, nodeType *p)
 {
     nodeType *op, *arg;
     Instruction *ins;
-    SymReg *regs[IMCC_MAX_REGS];
+    SymReg *regs[2];
     SymReg *rr, *dest;
 
     op = CHILD(p);
@@ -646,7 +646,7 @@ exp_Compare(Interp* interpreter, nodeType *p)
 {
     nodeType *op, *left, *right, *last;
     Instruction *ins;
-    SymReg *regs[IMCC_MAX_REGS], *lr, *rr;
+    SymReg *regs[3], *lr, *rr;
 
     left = CHILD(p);
     op = left->next;
@@ -698,7 +698,7 @@ exp_Function(Interp* interpreter, nodeType *p)
     SymReg *sub;
     Instruction *ins;
     IMC_Unit *last_unit = cur_unit;
-    SymReg *regs[IMCC_MAX_REGS];
+    SymReg *regs[3];
 
     cur_unit = p->unit;
 
@@ -744,7 +744,7 @@ exp_If(Interp* interpreter, nodeType *p)
     nodeType *tests, *else_, *test, *stmts;
     SymReg *else_label, *endif_label, *true_;
     Instruction *ins;
-    SymReg *regs[IMCC_MAX_REGS];
+    SymReg *regs[3];
 
     tests = CHILD(p);
     else_ = tests->next;
@@ -807,7 +807,7 @@ exp_Py_Call(Interp* interpreter, nodeType *p)
     nodeType *name, *args;
     Instruction *ins;
 /* TODO
- * SymReg *regs[IMCC_MAX_REGS];
+ * SymReg *regs[3];
  */
 
     name = CHILD(p);
@@ -827,7 +827,7 @@ static SymReg*
 exp_Py_Local(Interp* interpreter, nodeType *var)
 {
     Instruction *ins;
-    SymReg *regs[IMCC_MAX_REGS], *temp;
+    SymReg *regs[3], *temp;
     char buf[128];
 
     if (var->u.r->type == VTADDRESS)
@@ -857,18 +857,20 @@ exp_PCC_Sub(Interp* interpreter, nodeType *p)
 {
 /*
  * TODO
+ * nodeType *sub_name ...
  * nodeType *doc;
  */
     SymReg *sub;
     Instruction *ins;
-    SymReg *regs[IMCC_MAX_REGS];
+    SymReg *regs[2];
 
     if (!cur_unit)
         IMCC_fatal(interpreter, 1, "exp_PCC_Sub: no cur_unit");
-    sub = mk_sub_address(interpreter, str_dup("pcc_sub"));
+    sub = mk_sub_label(interpreter, str_dup("pcc_sub"));
     ins = INS_LABEL(cur_unit, sub, 1);
 
-    ins->r[1] = mk_pcc_sub(interpreter, str_dup(ins->r[0]->name), 0);
+    ins->r[0]->type = VT_PCC_SUB;
+    ins->r[0]->pcc_sub = calloc(1, sizeof(struct pcc_sub_t));
     add_namespace(interpreter, cur_unit);
     regs[0] = get_const(interpreter, "0", 'I');
     insINS(interpreter, cur_unit, ins, "new_pad", regs, 1);
@@ -895,11 +897,11 @@ exp_Py_Module(Interp* interpreter, nodeType *p)
  */
     SymReg *sub;
     Instruction *ins;
-    SymReg *regs[IMCC_MAX_REGS];
+    SymReg *regs[2];
 
     if (!cur_unit)
         IMCC_fatal(interpreter, 1, "exp_Py_Module: no cur_unit");
-    sub = mk_sub_address(interpreter, str_dup("__main__"));
+    sub = mk_sub_label(interpreter, str_dup("__main__"));
     ins = INS_LABEL(cur_unit, sub, 1);
 
     ins->r[1] = mk_pcc_sub(interpreter, str_dup(ins->r[0]->name), 0);
@@ -922,7 +924,7 @@ static SymReg*
 exp_Py_Print(Interp* interpreter, nodeType *p)
 {
     Instruction *ins ;
-    SymReg *regs[IMCC_MAX_REGS], *d;
+    SymReg *regs[1], *d;
     nodeType * child = CHILD(p);
     if (!child)
         IMCC_fatal(interpreter, 1, "exp_Py_Print: nothing to print");
@@ -943,8 +945,7 @@ static SymReg*
 exp_Py_Print_nl(Interp* interpreter, nodeType *p)
 {
     Instruction *ins = cur_unit->last_ins;
-    SymReg *regs[IMCC_MAX_REGS];
-    insINS(interpreter, cur_unit, ins, "print_newline", regs, 0);
+    insINS(interpreter, cur_unit, ins, "print_newline", NULL, 0);
     return NULL;
 }
 

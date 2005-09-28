@@ -10,9 +10,9 @@ pir_output_is(<<'CODE', <<'OUTPUT', "test tcl compiler, verify double call works
      load_bytecode "languages/tcl/lib/tcllib.pbc"
      .local pmc tcl_compiler,compiled_sub
      tcl_compiler = compreg "TCL"
-     compiled_sub = compile tcl_compiler, "puts {ok 1}"
+     compiled_sub = tcl_compiler("puts {ok 1}")
      compiled_sub()
-     compiled_sub = compile tcl_compiler, "puts {ok 2}"
+     compiled_sub = tcl_compiler("puts {ok 2}")
      compiled_sub()
   .end 
 CODE
@@ -28,7 +28,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "test tcl compiler global variable interop")
      $P1 = "ok 1" 
      store_global "Tcl", "$a", $P1
      tcl_compiler = compreg "TCL"
-     compiled_sub = compile tcl_compiler, "puts $a"
+     compiled_sub = tcl_compiler("puts $a")
      compiled_sub()
   .end 
 CODE
@@ -44,7 +44,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "pass arguments to a tcl proc from PIR");
   load_bytecode "languages/tcl/lib/tcllib.pbc"
 
   $P0 = compreg "TCL"
-  $P1 = compile $P0, "proc _tmp {a} {puts $a}"
+  $P1 = $P0("proc _tmp {a} {puts $a}")
   $P1()
 
   $P2 = find_global "Tcl", "&_tmp"
@@ -62,7 +62,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "invoke argless tcl proc from PIR");
   load_bytecode "languages/tcl/lib/tcllib.pbc"
   $S1 = 'proc hey {} { puts 11 }; hey; '
   $P1 = compreg 'TCL'
-  $P0 = compile $P1, $S1
+  $P0 = $P1($S1)
   $P0()
 .end
 CODE

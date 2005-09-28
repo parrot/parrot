@@ -158,7 +158,7 @@ output_is(<<'CODE', <<'OUTPUT', "clone and invoke interp");
     clone P3, P2
     print "ok 1\n"
     set_addr P3, _foo
-    invoke P3
+    invokecc P3
     print P0
     print I0
     print S0
@@ -188,7 +188,7 @@ output_is(<<'CODE', <<'OUTPUT', "clone and invoke interp - sweep");
     clone P3, P2
     print "ok 1\n"
     set_addr P3, _foo
-    invoke P3
+    invokecc P3
     print P0
     print I0
     print S0
@@ -223,7 +223,7 @@ output_is(<<'CODE', <<'OUTPUT', "clone and invoke interp - ret via invoke");
     clone P3, P2
     print "ok 1\n"
     set_addr P3, _foo
-    invoke P3
+    invokecc P3
 cont:
     print P0
     print I0

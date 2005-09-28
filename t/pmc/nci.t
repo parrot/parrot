@@ -23,7 +23,7 @@ Most tests are skipped when the F<libnci_test.so> shared library is not found.
 
 =cut
 
-use Parrot::Test    tests => 56;
+use Parrot::Test    tests => 59;
 use Parrot::Config;
 
 SKIP: {
@@ -357,29 +357,20 @@ output_is(<<'CODE', <<'OUTPUT', "nci_dd - PASM");
   print "loaded\n"
   dlfunc P0, P1, "nci_dd", "dd"
   print "dlfunced\n"
-  set I0, 1	# prototype used - unchecked
-  set N5, 4.0
-  invoke
+  set_args "(0)", 4.0
+  get_results "(0)", N5
+  invokecc P0
   ne N5, 8.0, nok_1
   print "ok 1\n"
-  ne I0, 1, nok_2	# test return value convention
-  ne I1, 0, nok_2
-  ne I2, 0, nok_2
-  ne I3, 0, nok_2
-  ne I4, 1, nok_2
-  print "ok 2\n"
   end
 nok_1: print "nok 1\n"
   print N5
   print "\n"
   end
-nok_2: print "nok 2\n"
-  end
 CODE
 loaded
 dlfunced
 ok 1
-ok 2
 OUTPUT
 
 
@@ -438,30 +429,22 @@ output_is(<<'CODE', <<'OUTPUT', "nci_fff");
   print "loaded\n"
   dlfunc P0, P1, "nci_fff", "fff"
   print "dlfunced\n"
-  set I0, 1	# prototype used - unchecked
   set N5, 12.0
   set N6, 3.0
-  invoke
+  set_args "(0,0)", N5, N6
+  get_results "(0)", N5
+  invokecc P0
   ne N5, 4.0, nok_1
   print "ok 1\n"
-  ne I0, 1, nok_2	# test return value convention
-  ne I1, 0, nok_2
-  ne I2, 0, nok_2
-  ne I3, 0, nok_2
-  ne I4, 1, nok_2
-  print "ok 2\n"
   end
 nok_1: print "nok 1\n"
   print N5
   print "\n"
   end
-nok_2: print "nok 2\n"
-  end
 CODE
 loaded
 dlfunced
 ok 1
-ok 2
 OUTPUT
 
 
@@ -470,30 +453,22 @@ output_is(<<'CODE', <<'OUTPUT', "nci_isc");
   print "loaded\n"
   dlfunc P0, P1, "nci_isc", "isc"
   print "dlfunced\n"
-  set I0, 1	# prototype used - unchecked
   set I5, 2
   set I6, 3
-  invoke
+  set_args "(0,0)", I5, I6
+  get_results "(0)", I5
+  invokecc P0
   ne I5, 6, nok_1
   print "ok 1\n"
-  ne I0, 1, nok_2	# test return value convention
-  ne I1, 1, nok_2
-  ne I2, 0, nok_2
-  ne I3, 0, nok_2
-  ne I4, 0, nok_2
-  print "ok 2\n"
   end
 nok_1: print "nok 1\n"
   print I5
   print "\n"
   end
-nok_2: print "nok 2\n"
-  end
 CODE
 loaded
 dlfunced
 ok 1
-ok 2
 OUTPUT
 
 
@@ -502,30 +477,22 @@ output_is(<<'CODE', <<'OUTPUT', "nci_ssc");
   print "loaded\n"
   dlfunc P0, P1, "nci_ssc", "ssc"
   print "dlfunced\n"
-  set I0, 1	# prototype used - unchecked
   set I5, 2
   set I6, 3
-  invoke
+  set_args "(0,0)", I5, I6
+  get_results "(0)", I5
+  invokecc P0
   ne I5, 6, nok_1
   print "ok 1\n"
-  ne I0, 1, nok_2	# test return value convention
-  ne I1, 1, nok_2
-  ne I2, 0, nok_2
-  ne I3, 0, nok_2
-  ne I4, 0, nok_2
-  print "ok 2\n"
   end
 nok_1: print "nok 1\n"
   print I5
   print "\n"
   end
-nok_2: print "nok 2\n"
-  end
 CODE
 loaded
 dlfunced
 ok 1
-ok 2
 OUTPUT
 
 
@@ -534,40 +501,22 @@ output_is(<<'CODE', <<'OUTPUT', "nci_csc");
   print "loaded\n"
   dlfunc P0, P1, "nci_csc", "csc"
   print "dlfunced\n"
-  set I0, 1	# prototype used - unchecked
   set I5, 6
   set I6, 7
-  invoke
+  set_args "(0,0)", I5, I6
+  get_results "(0)", I5
+  invokecc P0
   ne I5, 42, nok_1
   print "ok 1\n"
-  ne I0, 1, nok_2	# test return value convention
-  ne I1, 1, nok_2
-  ne I2, 0, nok_2
-  ne I3, 0, nok_2
-  ne I4, 0, nok_2
-  print "ok 2\n"
   end
 nok_1: print "nok 1\n"
   print I5
-  print "\n"
-  end
-nok_2: print "nok 2\n"
-  print I0
-  print "\n"
-  print I1
-  print "\n"
-  print I2
-  print "\n"
-  print I3
-  print "\n"
-  print I4
   print "\n"
   end
 CODE
 loaded
 dlfunced
 ok 1
-ok 2
 OUTPUT
 
 
@@ -576,15 +525,11 @@ output_is(<<'CODE', <<'OUTPUT', "nci_it");
   printerr "loaded\n"
   dlfunc P0, P1, "nci_it", "it"
   printerr "dlfunced\n"
-  set I0, 1	# prototype used - unchecked
   set S5, "ko\n"
-  invoke
+  set_args "(0)", S5
+  get_results "(0)", I5
+  invokecc P0
   ne I5, 2, nok_1
-  ne I0, 1, nok_2	# test return value convention
-  ne I1, 1, nok_2
-  ne I2, 0, nok_2
-  ne I3, 0, nok_2
-  ne I4, 0, nok_2
   printerr "ok 2\n"
   end
 nok_1: printerr "nok 1\n"
@@ -606,16 +551,11 @@ output_is(<<'CODE', <<'OUTPUT', "nci_tt");
   print "loaded\n"
   dlfunc P0, P1, "nci_tt", "tt"
   print "dlfunced\n"
-  set I0, 1	# prototype used - unchecked
   set S5, "ko\n"
-  invoke
+  set_args "(0)", S5
+  get_results "(0)", S5
+  invokecc P0
   print S5
-  ne I0, 1, nok_2	# test return value convention
-  ne I1, 0, nok_2
-  ne I2, 1, nok_2
-  ne I3, 0, nok_2
-  ne I4, 0, nok_2
-  print "ok 2\n"
   end
 nok_1: print "nok 1\n"
   print I5
@@ -627,7 +567,6 @@ CODE
 loaded
 dlfunced
 ok worked
-ok 2
 OUTPUT
 
 
@@ -638,19 +577,14 @@ output_is(<<'CODE', <<'OUTPUT', "nci_dd - stress test");
   print "dlfunced\n"
 loop:
   dlfunc P0, P1, "nci_dd", "dd"
-  set I0, 1	# prototype used - unchecked
-  set N5, 4.0
-  invoke
+  set N5, 77.0
+  set_args "(0)", 4.0
+  get_results "(0)", N5
+  invokecc P0
   ne N5, 8.0, nok_1
   dec I10
   gt I10, 0, loop
   print "ok 1\n"
-  ne I0, 1, nok_2	# test return value convention
-  ne I1, 0, nok_2
-  ne I2, 0, nok_2
-  ne I3, 0, nok_2
-  ne I4, 1, nok_2
-  print "ok 2\n"
   end
 nok_1: print "nok 1\n"
   print N5
@@ -662,7 +596,6 @@ CODE
 loaded
 dlfunced
 ok 1
-ok 2
 OUTPUT
 
 
@@ -673,49 +606,37 @@ output_is(<<'CODE', <<'OUTPUT', "nci_dd - clone");
   print "dlfunced\n"
   clone P2, P0
   print "ok 1\n"
-  set I0, 1	# prototype used - unchecked
-  set N5, 4.0
-  invoke
+  set_args "(0)", 4.0
+  get_results "(0)", N5
+  invokecc P0
   ne N5, 8.0, nok_1
   print "ok 2\n"
-  set I0, 1
-  set I1, 0
-  set N5, 4.0
-  set P0, P2
-  invoke
+  set_args "(0)", 4.0
+  get_results "(0)", N5
+  invokecc P2
   ne N5, 8.0, nok_1
-  print "ok 3\n"
-  ne I0, 1, nok_2	# test return value convention
-  ne I1, 0, nok_2
-  ne I2, 0, nok_2
-  ne I3, 0, nok_2
-  ne I4, 1, nok_2
-  print "ok 4\n"
   end
 nok_1: print "nok 1\n"
   print N5
   print "\n"
-  end
-nok_2: print "nok 2\n"
   end
 CODE
 loaded
 dlfunced
 ok 1
 ok 2
-ok 3
-ok 4
 OUTPUT
 
 
 output_is(<<'CODE', <<'OUTPUT', "nci_iiii");
   loadlib P1, "libnci_test"
   dlfunc P0, P1, "nci_iiii", "iiii"
-  set I0, 1	# prototype used - unchecked
   set I5, 10
   set I6, 20
   set I7, 30
-  invoke
+  set_args "(0,0,0)", I5,I6,I7
+  get_results "(0)", I5
+  invokecc P0
   print I5
   print "\n"
   end
@@ -731,7 +652,9 @@ output_is(<<'CODE', <<'OUTPUT', "nci_i4i");
   new P5, .Integer
   set P5, -6
   set I5, -7
-  invoke
+  set_args "(0,0)", P5,I5
+  get_results "(0)", I5
+  invokecc P0
   print I5
   print "\n"
   end
@@ -749,10 +672,9 @@ output_is(<<'CODE', <<'OUTPUT', "nci_ii3");
   new P5, .Integer
   set P5, -7
 
-  set I0, 1
-  set I1, 1
-  set I3, 1
-  invoke
+  set_args "(0,0)", I5,P5
+  get_results "(0)", I5
+  invokecc P0
 
   print I5
   print "\n"
@@ -768,7 +690,9 @@ output_is(<<'CODE', <<'OUTPUT', "nci_tb");
   loadlib P1, "libnci_test"
   dlfunc P0, P1, "nci_tb", "tb"
   set S5, "ko\n"
-  invoke
+  set_args "(0)", S5
+  get_results "(0)", S5
+  invokecc P0
   print S5
   end
 CODE
@@ -779,7 +703,9 @@ output_is(<<'CODE', <<'OUTPUT', "nci_tB");
   loadlib P1, "libnci_test"
   dlfunc P0, P1, "nci_tB", "tB"
   set S5, "ko\n"
-  invoke
+  set_args "(0)", S5
+  get_results "(0)", S5
+  invokecc P0
   print S5
   end
 CODE
@@ -792,7 +718,9 @@ output_is(<<'CODE', <<'OUTPUT', "nci_pi - struct with ints");
   dlfunc P0, P1, "nci_pi", "pi"
   # this test function returns a struct { int[2]; char }
   set I5, 0
-  invoke
+  set_args "(0)", I5
+  get_results "(0)", P5
+  invokecc P0
   new P2, .ResizablePMCArray
 .include "datatypes.pasm"
   push P2, .DATATYPE_INT
@@ -823,8 +751,9 @@ output_is(<<'CODE', <<'OUTPUT', "nci_pi - struct with floats");
   loadlib P1, "libnci_test"
   dlfunc P0, P1, "nci_pi", "pi"
   # this test function returns a struct { float[2]; double }
-  set I5, 1
-  invoke
+  set_args "(0)", 1
+  get_results "(0)", P5
+  invokecc P0
   new P2, .ResizablePMCArray
 .include "datatypes.pasm"
   push P2, .DATATYPE_FLOAT
@@ -855,8 +784,9 @@ output_like(<<'CODE', <<'OUTPUT', "nci_pi - align");
   loadlib P1, "libnci_test"
   dlfunc P0, P1, "nci_pi", "pi"
   # this test function returns a struct { char; int }
-  set I5, 2
-  invoke
+  set_args "(0)", 2
+  get_results "(0)", P5
+  invokecc P0
   new P2, .ResizablePMCArray
 .include "datatypes.pasm"
   push P2, .DATATYPE_CHAR
@@ -889,8 +819,9 @@ output_is(<<'CODE', <<'OUTPUT', "nci_pi - char*");
   loadlib P1, "libnci_test"
   dlfunc P0, P1, "nci_pi", "pi"
   # this test function returns a struct { char*; int }
-  set I5, 3
-  invoke
+  set_args "(0)", 3
+  get_results "(0)", P5
+  invokecc P0
   new P2, .ResizablePMCArray
 .include "datatypes.pasm"
   push P2, .DATATYPE_CSTR
@@ -917,8 +848,9 @@ output_is(<<'CODE', <<'OUTPUT', "nci_pi - nested struct *");
   loadlib P1, "libnci_test"
   dlfunc P0, P1, "nci_pi", "pi"
   # this test function returns a struct { char; x->{int, double} }
-  set I5, 4
-  invoke
+  set_args "(0)", 4
+  get_results "(0)", P5
+  invokecc P0
 .include "datatypes.pasm"
   # the contained structure
   new P3, .ResizablePMCArray
@@ -971,8 +903,9 @@ OUTPUT
 output_is(<<'CODE', <<'OUTPUT', "nci_pi - nested struct * w named access");
   loadlib P1, "libnci_test"
   dlfunc P0, P1, "nci_pi", "pi"
-  set I5, 8  # test fun number
-  invoke
+  set_args "(0)", 8
+  get_results "(0)", P5
+  invokecc P0
 .include "datatypes.pasm"
   # the contained structure pointer
   new  P6, .OrderedHash
@@ -1042,8 +975,9 @@ output_is(<<'CODE', <<'OUTPUT', "nci_pi - func_ptr* with signature");
   loadlib P1, "libnci_test"
   dlfunc P0, P1, "nci_pi", "pi"
   # this test function returns a struct { int (*f)(char *) }
-  set I5, 5
-  invoke
+  set_args "(0)", 5
+  get_results "(0)", P5
+  invokecc P0
   new P2, .ResizablePMCArray
 .include "datatypes.pasm"
   push P2, .DATATYPE_FUNC_PTR
@@ -1057,8 +991,9 @@ output_is(<<'CODE', <<'OUTPUT', "nci_pi - func_ptr* with signature");
   assign P5, P2
   # now we get a callable NCI PMC
   set P0, P5[0]
-  set S5, "hello call_back"
-  invoke
+  set_args "(0)", "hello call_back"
+  get_results "(0)", I5
+  invokecc P0
   print I5
   print "\n"
   end
@@ -1072,8 +1007,9 @@ output_is(<<'CODE', <<'OUTPUT', "nci_pi - nested struct aligned");
   loadlib P1, "libnci_test"
   dlfunc P0, P1, "nci_pi", "pi"
   # this test function returns a struct { int; {int; int} int }
-  set I5, 6
-  invoke
+  set_args "(0)", 6
+  get_results "(0)", P5
+  invokecc P0
 .include "datatypes.pasm"
   # the nested structure
   new P3, .ResizablePMCArray
@@ -1127,8 +1063,9 @@ output_is(<<'CODE', <<'OUTPUT', "nci_pi - nested struct unaligned");
   loadlib P1, "libnci_test"
   dlfunc P0, P1, "nci_pi", "pi"
   # this test function returns a struct { char; {char; int} char }
-  set I5, 7
-  invoke
+  set_args "(0)", 7
+  get_results "(0)", P5
+  invokecc P0
 .include "datatypes.pasm"
   # the nested structure
   new P3, .ResizablePMCArray
@@ -1182,8 +1119,9 @@ output_is(<<'CODE', <<'OUTPUT', "nci_pi - nested, unaligned, named");
   loadlib P1, "libnci_test"
   dlfunc P0, P1, "nci_pi", "pi"
   # this test function returns a struct { char; {char; int} char }
-  set I5, 7
-  invoke
+  set_args "(0)", 7
+  get_results "(0)", P5
+  invokecc P0
 .include "datatypes.pasm"
   # the nested structure
   new P3, .OrderedHash
@@ -1308,7 +1246,9 @@ output_is(<<'CODE', <<'OUTPUT', "nci_ip");
   set P5[2], 17
   set P5[3], "hello from Parrot\x0"
   set I5, 1
-  invoke
+  set_args "(0)", P5
+  get_results "(0)", I5
+  invokecc P0
   print I5
   print "\n"
   end
@@ -1323,9 +1263,11 @@ output_is(<<'CODE', <<'OUTPUT', "nci_vP");
   dlfunc P0, P1, "nci_vP", "vP"
   new P5, .String
   set P5, "ok\n"
-  invoke
+  set_args "(0)", P5
+  invokecc P0
   null P5
-  invoke
+  set_args "(0)", P5
+  invokecc P0
   end
 CODE
 ok
@@ -1352,9 +1294,9 @@ output_is(<<'CODE', <<'OUTPUT', "nci_cb_C1 - PASM");
   dlfunc P0, P1, "nci_cb_C1", "vpP"
   print "ok 2\n"
   # P5 is the cb
-  # P6 is user_data
-  set P6, P7
-  invoke
+  # P7 is user_data
+  set_args "(0,0)", P5, P7
+  invokecc P0
   # call_back will be called at any time
   # so spin a bit
   set I20, 0
@@ -1373,6 +1315,7 @@ err:
   end
 
 _call_back:
+  get_params "(0,0)", P5, S5
   print "in callback\n"
   print "user data: "
   print P5
@@ -1446,12 +1389,14 @@ ERROR:
 .end
 
 .sub _call_back
+.param pmc u
+.param string s
   print "in callback\n"
   print "user data: "
-  print P5
+  print u
   print "\n"
   print "external data: "
-  print S5
+  print s
   print "\n"
   find_global P12, "cb_done"
   inc P12
@@ -1484,9 +1429,9 @@ output_is(<<'CODE', <<'OUTPUT', "nci_cb_C2 - PASM");
   dlfunc P0, P1, "nci_cb_C2", "vpP"
   print "ok 2\n"
   # P5 is the cb
-  # P6 is user_data
-  set P6, P7
-  invoke
+  # P7 is user_data
+  set_args "(0,0)", P5, P7
+  invokecc P0
   # call_back will be called at any time
   # so spin a bit
   set I20, 0
@@ -1505,6 +1450,7 @@ err:
   end
 
 _call_back:
+  get_params "(0,0)", P5, I5
   print "in callback\n"
   print "user data: "
   print P5
@@ -1582,6 +1528,7 @@ ERROR:
 .end
 
 .sub _call_back
+  get_params "(0,0)", P5, P6
   print "in callback\n"
   print "user data: "
   print P5
@@ -1631,9 +1578,9 @@ output_is(<<'CODE', <<'OUTPUT', "nci_cb_D1 - PASM");
   dlfunc P0, P1, "nci_cb_D1", "vpP"
   print "ok 2\n"
   # P5 is the cb
-  # P6 is user_data
-  set P6, P7
-  invoke
+  # P7 is user_data
+  set_args "(0,0)", P5, P7
+  invokecc P0
   # call_back will be called at any time
   # so spin a bit
   set I20, 0
@@ -1652,6 +1599,7 @@ err:
   end
 
 _call_back:
+  get_params "(0,0)", P5, S5
   print "in callback\n"
   print "user data: "
   print P5
@@ -1689,9 +1637,9 @@ output_is(<<'CODE', <<'OUTPUT', "nci_cb_D2 - PASM");
   dlfunc P0, P1, "nci_cb_D2", "vpP"
   print "ok 2\n"
   # P5 is the cb
-  # P6 is user_data
-  set P6, P7
-  invoke
+  # P7 is user_data
+  set_args "(0,0)", P5, P7
+  invokecc P0
   # call_back will be called at any time
   # so spin a bit
   set I20, 0
@@ -1710,6 +1658,7 @@ err:
   end
 
 _call_back:
+  get_params "(0,0)", P5, I5
   print "in callback\n"
   print "user data: "
   print P5
@@ -1783,12 +1732,14 @@ ERROR:
 .end
 
 .sub _call_back
+.param pmc u
+.param int i
   print "in callback\n"
   print "user data: "
-  print P5
+  print u
   print "\n"
   print "external data: "
-  print I5
+  print i
   print "\n"
   find_global P12, "cb_done"
   inc P12
@@ -1860,20 +1811,22 @@ ERROR:
 .end
 
 .sub _call_back
+.param pmc u
+.param pmc s
   print "in callback\n"
   print "user data: "
-  print P5
+  print u
   print "\n"
 
-  # P6 is a UnManagedStruct PMC containing a pointer to an integer
+  # s is a UnManagedStruct PMC containing a pointer to an integer
   new P2, .ResizablePMCArray
   push P2, .DATATYPE_INT
   push P2, 0
   push P2, 0
-  assign P6, P2
+  assign s, P2
 
   # print referenced integer in libnci_test.so
-  I17 = P6[0]
+  I17 = s[0]
   print "external data: "
   print I17
   print "\n"
@@ -1950,19 +1903,21 @@ pir_output_is(<<'CODE', <<'OUTPUT', "nci_cb_D4 - synchronous callbacks");
 .end
 
 .sub _call_back
-  # P6 is a UnManagedStruct PMC containing a pointer to an integer
+.param pmc u
+.param pmc s
+  # s is a UnManagedStruct PMC containing a pointer to an integer
   new P2, .ResizablePMCArray
   push P2, .DATATYPE_INT
   push P2, 0
   push P2, 0
-  assign P6, P2
+  assign s, P2
 
   print "external data: "
-  I17 = P6[0]
+  I17 = s[0]
   print I17
   print "\n"
   I17 = I17 * 10
-  P6[0] = I17
+  s[0] = I17
 
   returncc
 .end
@@ -2037,15 +1992,10 @@ output_is(<<'CODE', <<'OUTPUT', 'nci_pip - array of structs');
   set P5[0;3;'w'], 420
   set P5[0;3;'h'], 430
 
-
-  set I5, 4
-  set I0, 1
-  set I1, 1
-  set I3, 4
-
   loadlib P1, "libnci_test"
+  set_args "(0,0)", 4, P5
   dlfunc P0, P1, "nci_pip", "pip"
-  invoke
+  invokecc P0
   end
 
 CODE
@@ -2077,16 +2027,11 @@ output_is(<<'CODE', <<'OUTPUT', 'nci_i33 - out parameters and return values');
   new P3, .Integer
   set P3, 2
 
-  set P5, P2
-  set P6, P3
-
-  set I0, 1
-  set I2, 0
-  set I3, 2
-  set I4, 0
   loadlib P1, "libnci_test"
+  set_args "(0,0)", P2, P3
+  get_results "(0)", I5
   dlfunc P0, P1, "nci_i33", "i33"
-  invoke
+  invokecc P0
 
   print "Double: "
   print P2
@@ -2137,18 +2082,10 @@ output_is(<<'CODE', <<'OUTPUT', 'nci_vpii - nested structs');
   print I1
   print "\n"
 
-  set I5, 1
-  set I6, 2
-
-  set I0, 1
-  set I1, 2
-  set I2, 0
-  set I3, 1
-  set I4, 0
-
+  set_args "(0,0,0)", P5, 1, 2
   loadlib P1, "libnci_test"
   dlfunc P0, P1, "nci_vpii", "vpii"
-  invoke
+  invokecc P0
 
   set I0, P5[ 'x' ]
   set P6, P5[ 'nested' ]
@@ -2175,19 +2112,12 @@ OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', 'nci_piiii - nested array in a struct');
 .include "datatypes.pasm"
-  set I0, 1
-  set I1, 4
-  set I2, 0
-  set I3, 0
-  set I4, 0
-  set I5, 100
-  set I6, 200
-  set I7, 400
-  set I8, 800
 
   loadlib P1, "libnci_test"
   dlfunc P0, P1, "nci_piiii", "piiii"
-  invoke
+  set_args "(0,0,0,0)", 100,200,400,800
+  get_results "(0)", P5
+  invokecc P0
 
   new  P6, .OrderedHash
   set  P6[ 'count' ], .DATATYPE_INT
@@ -2461,4 +2391,60 @@ CODE
 0
 1
 0
+OUTPUT
+
+pir_output_is(<< 'CODE', << 'OUTPUT', "conversion d <-> P");
+.sub test @MAIN
+    .local string library_name
+    library_name = 'libnci_test'
+    .local pmc libnci_test
+    libnci_test = loadlib  library_name
+    .local pmc twice
+    twice = dlfunc libnci_test, "nci_dd", "dd"
+    .local pmc f, g
+    f = new Integer
+    f = 21
+    g = twice( f )
+    print g
+    print "\n"
+.end
+CODE
+42
+OUTPUT
+
+pir_output_is(<< 'CODE', << 'OUTPUT', "conversion S <-> P");
+.sub test @MAIN
+    .local string library_name
+    library_name = 'libnci_test'
+    .local pmc libnci_test
+    libnci_test = loadlib  library_name
+    .local pmc reverse
+    reverse = dlfunc libnci_test, "nci_tt", "tt"
+    .local pmc s, t
+    s = new String
+    s = "ko"
+    t = reverse( s )
+    print t
+.end
+CODE
+ok worked
+OUTPUT
+
+pir_output_is(<< 'CODE', << 'OUTPUT', "conversion I <-> P");
+.sub test @MAIN
+    .local string library_name
+    library_name = 'libnci_test'
+    .local pmc libnci_test
+    libnci_test = loadlib  library_name
+    .local pmc mult
+    mult = dlfunc libnci_test, "nci_i4i", "i4i"
+    .local pmc i, j
+    i = new Integer
+    i = 2
+    j = mult( 21, i )       # call signature is PI
+    print j
+    print "\n"
+.end
+CODE
+42
 OUTPUT

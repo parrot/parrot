@@ -20,6 +20,7 @@ This file implements the Parrot embedding interface.
 
 #include "parrot/parrot.h"
 #include "parrot/embed.h"
+#include "parrot/oplib/ops.h"
 
 /*
 
@@ -49,6 +50,7 @@ Parrot_new(Parrot_Interp parent)
 
 extern void Parrot_initialize_core_pmcs(Interp *interp);
 
+static void set_current_sub(Interp *interpreter);
 /*
 
 =item C<void Parrot_init(Interp *interpreter)>
@@ -142,7 +144,7 @@ void
 Parrot_set_trace(Interp *interpreter, UINTVAL flag)
 {
 
-    interpreter->ctx.trace_flags |= flag;
+    CONTEXT(interpreter->ctx)->trace_flags |= flag;
     Interp_core_SET(interpreter, PARROT_SLOW_CORE);
 }
 
@@ -175,7 +177,7 @@ Parrot_clear_debug(Interp *interpreter, UINTVAL flag)
 void
 Parrot_clear_trace(Interp *interpreter, UINTVAL flag)
 {
-    interpreter->ctx.trace_flags &= ~flag;
+    CONTEXT(interpreter->ctx)->trace_flags &= ~flag;
 }
 
 /*
@@ -210,7 +212,7 @@ Parrot_test_debug(Interp *interpreter, UINTVAL flag)
 UINTVAL
 Parrot_test_trace(Interp *interpreter, UINTVAL flag)
 {
-    return interpreter->ctx.trace_flags & flag;
+    return CONTEXT(interpreter->ctx)->trace_flags & flag;
 }
 
 /*
@@ -461,18 +463,21 @@ static void
 setup_argv(Interp *interpreter, int argc, char ** argv)
 {
     INTVAL i;
-    PMC *userargv;
+    PMC *userargv, *sig_arr, *class, *cont;
+    STRING *signature;
+    static opcode_t opcodes[3];
+    int const_nr;
 
     if (Interp_debug_TEST(interpreter, PARROT_START_DEBUG_FLAG)) {
         PIO_eprintf(interpreter,
-                "*** Parrot VM: Setting up ARGV array in P5.  Current argc: %d ***\n",
+                "*** Parrot VM: Setting up ARGV array."
+                " Current argc: %d ***\n",
                 argc);
     }
 
     /* XXX @ARGS should propably be a ResizableStringArray */
-    userargv = pmc_new_noinit(interpreter, enum_class_SArray);
+    REG_PMC(5) = userargv = pmc_new_noinit(interpreter, enum_class_SArray);
     /* immediately anchor pmc to root set */
-    REG_PMC(5) = userargv;
     VTABLE_set_pmc_keyed_int(interpreter, interpreter->iglobals,
             (INTVAL)IGLOBALS_ARGV_LIST, userargv);
     VTABLE_init(interpreter, userargv);
@@ -481,7 +486,7 @@ setup_argv(Interp *interpreter, int argc, char ** argv)
     for (i = 0; i < argc; i++) {
         /* Run through argv, adding everything to @ARGS. */
         STRING *arg = string_make(interpreter, argv[i], strlen(argv[i]),
-                                  NULL, PObj_external_FLAG);
+                NULL, PObj_external_FLAG);
 
         if (Interp_debug_TEST(interpreter, PARROT_START_DEBUG_FLAG)) {
             PIO_eprintf(interpreter, "\t%vd: %s\n", i, argv[i]);
@@ -494,12 +499,32 @@ setup_argv(Interp *interpreter, int argc, char ** argv)
      * will terminate the main run loop
      * XXX for now still place in P1 until return opcodes are everywhere
      */
-    REG_PMC(1) =
-        interpreter->ctx.current_cont =
+    CONTEXT(interpreter->ctx)->current_cont = cont =
         new_ret_continuation_pmc(interpreter, NULL);
     /* clear segment to denote the end of chain */
-    PMC_cont(interpreter->ctx.current_cont)->seg = NULL;
-    REG_INT(3) = 1; /* pdd03 - one PMC arg, if code really inspects that */
+    PMC_cont(cont)->seg = NULL;
+    /* the continuation keeps the initial context alive */
+    PMC_cont(cont)->from_ctx = interpreter->ctx;
+    PMC_cont(cont)->to_ctx = interpreter->ctx;
+    /*
+     * set current subroutine
+     */
+    set_current_sub(interpreter);
+
+    /*
+     * create signature and flags array
+     */
+    signature = const_string(interpreter, "(2)");
+    class = Parrot_base_vtables[enum_class_FixedIntegerArray]->class;
+    sig_arr = VTABLE_new_from_string(interpreter, class, signature,
+            PObj_constant_FLAG);
+    const_nr = PDB_extend_const_table(interpreter);
+    interpreter->code->const_table->constants[const_nr]->type = PFC_PMC;
+    interpreter->code->const_table->constants[const_nr]->u.key = sig_arr;
+    opcodes[0] = PARROT_OP_set_args_pc;
+    opcodes[1] = const_nr;
+    opcodes[2] = 5;     /* REG_PMC(5) */
+    CONTEXT(interpreter->ctx)->current_args = opcodes;
 }
 
 /*
@@ -736,8 +761,8 @@ set_current_sub(Interp *interpreter)
                 code_start = (opcode_t*) sub->seg->base.data;
                 offs = sub->address - code_start;
                 if (offs == interpreter->resume_offset) {
-                    interpreter->ctx.current_sub = sub_pmc;
-                    interpreter->ctx.current_HLL = sub->HLL_id;
+                    CONTEXT(interpreter->ctx)->current_sub = sub_pmc;
+                    CONTEXT(interpreter->ctx)->current_HLL = sub->HLL_id;
                     return;
                 }
                 break;
@@ -747,7 +772,7 @@ set_current_sub(Interp *interpreter)
      * if we didn't find anything put an Undef PMC into current_sub
      */
     sub_pmc = pmc_new(interpreter, enum_class_Undef);
-    interpreter->ctx.current_sub = sub_pmc;
+    CONTEXT(interpreter->ctx)->current_sub = sub_pmc;
 }
 
 /*
@@ -830,11 +855,6 @@ Parrot_runcode(Interp *interpreter, int argc, char *argv[])
      */
     Parrot_on_exit(print_debug,   interpreter);
     Parrot_on_exit(print_profile, interpreter);
-
-    /*
-     * set current subroutine
-     */
-    set_current_sub(interpreter);
 
     /* Let's kick the tires and light the fires--call interpreter.c:runops. */
     runops(interpreter,  interpreter->resume_offset);

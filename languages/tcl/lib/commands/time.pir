@@ -4,16 +4,10 @@
 .namespace [ "Tcl" ]
 
 .sub "&time"
-  .local pmc argv 
-  argv = foldup
+  .param pmc argv :slurpy
  
   .local int argc 
   argc = argv
-
-  .local pmc retval
-  retval = new String
-  .local int return_type
-  return_type = TCL_OK
 
   .local pmc parse
   parse = find_global "_Tcl", "parse"
@@ -26,9 +20,7 @@
   if argc == 1 goto run
   if argc == 2 goto twoargs
 
-  return_type = TCL_ERROR
-  retval =  "wrong # args: should be \"time command ?count?\""
-  .return (TCL_ERROR,retval)
+  .throw ("wrong # args: should be \"time command ?count?\"")
 
 twoargs:
   # verify this is a number?
@@ -38,14 +30,11 @@ run:
   script = argv[0]
  
   $P1 = parse(script)
-  register $P1
-
   time $N1 
   $I1 = count
 loop:
   if $I1 == 0 goto done
-  ($I0,$P0) = $P1."interpret"()
-  if $I0 != TCL_OK goto done
+  $P0 = $P1."interpret"()
   dec $I1
   goto loop
 
@@ -56,9 +45,8 @@ done:
   $N3 = $N3 * 1000000
   $N3 = $N3 / count
   $I2 = $N3
-  retval = $I2
-  retval = retval . " microseconds per iteration"
+  $S0 = $I2
+  $S0 = $S0 . " microseconds per iteration"
 
-real_done:
-  .return(return_type,retval)
+  .return($S0)
 .end

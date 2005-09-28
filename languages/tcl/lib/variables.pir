@@ -14,10 +14,8 @@ other than the default, and multiple interpreters.
 
 .sub __read
   .param string name
-  
+
   .local pmc variable
-  .local int return_type
-  return_type = TCL_OK
 
   # is this an array?
   # ends with )
@@ -46,30 +44,21 @@ array:
   $I0 = does variable, "hash"
   unless $I0 goto cant_read_not_array
 
-  #$P1 = new String
-  #$P1 = key
-  #$I0 = exists $I0variable, $P1
-  #unless $I0 goto bad_index
-
   variable = variable[key]
   if_null variable, bad_index 
-  .return(TCL_OK, variable)
+  .return(variable)
 
 bad_index:
   $S0 = "can't read \""
   $S0 .= name
   $S0 .= "\": no such element in array"
-  variable = new String
-  variable = $S0
-  .return (TCL_ERROR, variable)
+  .throw($S0)
 
 cant_read_not_array:
   $S0 =  "can't read \""
   $S0 .= name
   $S0 .= "\": variable isn't array"
-  variable = new String
-  variable = $S0
-  .return (TCL_ERROR, variable)
+  .throw($S0)
 
 scalar:
   variable = __find_var(name)
@@ -77,23 +66,19 @@ scalar:
   
   $I0 = does variable, "hash"
   if $I0 goto cant_read_array
-  .return(TCL_OK,variable)
+  .return(variable)
 
 cant_read_array:
   $S0 = "can't read \""
   $S0 .= name
   $S0 .= "\": variable is array"
-  variable = new String
-  variable = $S0
-  .return (TCL_ERROR, variable)
+  .throw($S0)
 
 no_such_variable:
   $S0 = "can't read \""
   $S0 .= name
   $S0 .= "\": no such variable"
-  variable = new String
-  variable = $S0
-  .return (TCL_ERROR, variable)
+  .throw($S0)
 .end
 
 =head2 _Tcl::__set
@@ -112,8 +97,6 @@ other than the default, and multiple interpreters.
   .param pmc value
 
   .local pmc variable
-  .local int return_type
-  return_type = TCL_OK
 
   # is this an array?
   # ends with )
@@ -148,27 +131,25 @@ find_array:
 set_array:
   array[key] = value
   variable = clone value
-  .return(TCL_OK,variable)
+  .return(variable)
 
 create_array:
   array = new TclArray
   array[key] = value
   __store_var(var, array)
   variable = clone value
-  .return(TCL_OK,variable)
+  .return(variable)
 
 cant_set_not_array:
   $S0 =  "can't set \""
   $S0 .= name
   $S0 .= "\": variable isn't array"
-  variable = new String
-  variable = $S0
-  .return(TCL_ERROR,variable)
+  .throw($S0)
 
 scalar:
   __store_var(name, value)
   variable = clone value
-  .return(return_type, variable)
+  .return(variable)
 
 .end
 
@@ -182,33 +163,36 @@ Gets the actual variable from memory and returns it.
 
 .sub __find_var
   .param string name
+
   name = "$" . name
   
   .local pmc value
-  null value
- 
-  push_eh done
-  $S0 = substr name, 1, 2
-  if $S0 == "::"     goto coloned
+
+  push_eh notfound
+    $S0 = substr name, 1, 2
+    if $S0 == "::"     goto coloned
   
-  .local int call_level
-  $P1 = find_global "_Tcl", "call_level"
-  call_level = $P1
-  if call_level == 0 goto global_var
+    .local int call_level
+    $P1 = find_global "_Tcl", "call_level"
+    call_level = $P1
+    if call_level == 0 goto global_var
 lexical_var:
-  value = find_lex call_level, name
-  goto found
+    value = find_lex call_level, name
+    goto clear_found
 
 coloned:
-  substr name, 1, 2, ""
+    substr name, 1, 2, ""
 global_var:
-  value = find_global "Tcl", name
-  # goto found
+    value = find_global "Tcl", name
+    # goto clear_found
 
+clear_found:
+    clear_eh
 found:
-  clear_eh
+  .return(value)
 
-done:
+notfound:
+  null value
   .return(value)
 .end
 

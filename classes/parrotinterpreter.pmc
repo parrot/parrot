@@ -173,6 +173,7 @@ clone_regs(Parrot_Interp d, Parrot_Interp s, PMC *dest)
         clone_regs_thread(d, s, dest);
     else
         clone_regs_interp(d, s, dest);
+    CONTEXT(d->ctx)->current_object = dest;
 }
 
 /*
@@ -202,7 +203,7 @@ clone_interpreter(PMC* dest, PMC* self)
     /*
      * copy over packfile - done currently in the runinterp opcode
      * for multi-threading we have to generate separate
-     * profile, prederef, and JIT data
+     * profile data
      */
 #if 0
     pt_clone_code(d, s);
@@ -242,7 +243,7 @@ create_interp(PMC *self, Parrot_Interp parent)
 }
 
 static int
-recursion_limit(Parrot_Interp interpreter, int l)
+recursion_limit(Parrot_Interp interpreter, PMC *self, int l)
 {
     int ret = interpreter->recursion_limit;
     interpreter->recursion_limit = l;
@@ -298,7 +299,7 @@ Class initialization.
              * misc functions
              */
             enter_nci_method(INTERP, typ,
-                    F2DPTR(recursion_limit), "recursion_limit", "iJi");
+                    F2DPTR(recursion_limit), "recursion_limit", "iJOi");
         }
 
     }
@@ -453,7 +454,7 @@ Introspection interface. C<key> can be:
         int level = 0;
         PMC* nextkey;
         STRING *item, *s;
-        struct Parrot_Context *ctx;
+        parrot_context_t ctx;
         PMC *cont;
 
         item =  key_string(interpreter, key);
@@ -463,23 +464,23 @@ Introspection interface. C<key> can be:
         nextkey = key_next(INTERP, key);
         if (nextkey)
             level = key_integer(interpreter, nextkey);
-        ctx = &interpreter->ctx;
+        ctx = interpreter->ctx;
         for (; level; --level) {
-            cont = ctx->current_cont;
+            cont = CONTEXT(ctx)->current_cont;
             if (PMC_IS_NULL(cont) || !PMC_cont(cont)->seg)
                 real_exception(interpreter, NULL, E_ValueError,
                         "No such caller depth");
-            ctx = &PMC_cont(cont)->ctx;
+            ctx = PMC_cont(cont)->to_ctx;
         }
         s = CONST_STRING(interpreter, "sub");
         if (string_equal(interpreter, item, s) == 0)
-            return ctx->current_sub;
+            return CONTEXT(ctx)->current_sub;
         s = CONST_STRING(interpreter, "pad");
         if (string_equal(interpreter, item, s) == 0)
-            return stack_peek(interpreter, ctx->pad_stack, NULL);
+            return stack_peek(interpreter, CONTEXT(ctx)->pad_stack, NULL);
         s = CONST_STRING(interpreter, "continuation");
         if (string_equal(interpreter, item, s) == 0)
-            return VTABLE_clone(interpreter, ctx->current_cont);
+            return VTABLE_clone(interpreter, CONTEXT(ctx)->current_cont);
         return PMCNULL;
     }
 /*

@@ -11,7 +11,7 @@ pir_2_pasm_like(<<'CODE', <<'OUT', "non-constant dest bsr, invoke");
     $P26 = new Sub
     $I15 = addr _sub1
     $P26 = $I15
-    invoke $P26
+    invokecc $P26
     ret
 _sub1:
     ret
@@ -23,7 +23,7 @@ _main:
  new P(\d+), \d+ # \.Sub
  set_addr I(\d+), _sub1
  set P\1, I\2
- invoke P\1
+ invokecc P\1
  ret
 _sub1:
  ret/
@@ -34,7 +34,7 @@ pir_2_pasm_like(<<'CODE', <<'OUT', "nonlocal bsr");
     $P26 = new Sub
     $I15 = addr _f
     $P26 = $I15
-    invoke $P26
+    invokecc $P26
     ret
 .end
 .sub _f
@@ -47,7 +47,7 @@ _main:
  new P(\d+), \d+ # \.Sub
  set_addr I(\d+), _f
  set P\1, I\2
- invoke P\1
+ invokecc P\1
  ret
 _f:
  ret/

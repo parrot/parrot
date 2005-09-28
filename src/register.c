@@ -44,25 +44,19 @@ Sets up the register stacks.
 */
 
 void
-setup_register_stacks(Parrot_Interp interpreter, struct Parrot_Context *ctx)
+setup_register_stacks(Parrot_Interp interpreter)
 {
-    ctx->int_reg_stack = register_new_stack(interpreter,
+    CONTEXT(interpreter->ctx)->int_reg_stack = register_new_stack(interpreter,
             "IntReg_", sizeof(struct IRegFrame));
 
-    ctx->string_reg_stack = register_new_stack(interpreter,
+    CONTEXT(interpreter->ctx)->string_reg_stack = register_new_stack(interpreter,
             "StringReg_", sizeof(struct SRegFrame));
 
-    ctx->num_reg_stack = register_new_stack(interpreter,
+    CONTEXT(interpreter->ctx)->num_reg_stack = register_new_stack(interpreter,
             "NumReg_", sizeof(struct NRegFrame));
 
-    ctx->pmc_reg_stack = register_new_stack(interpreter,
+    CONTEXT(interpreter->ctx)->pmc_reg_stack = register_new_stack(interpreter,
             "PMCReg_", sizeof(struct PRegFrame));
-
-    ctx->reg_stack = register_new_stack(interpreter,
-            "Register_", sizeof(struct parrot_regs_t));
-
-    ctx->bp = (struct parrot_regs_t *)STACK_DATAP(ctx->reg_stack);
-
 }
 
 

@@ -95,7 +95,7 @@ METHOD void sort(PMC *cmp_func) {
     n = (UINTVAL) PMC_int_val(SELF);
     if (n <= 1)
         return;
-    if (REG_INT(3) == 0)
+    if (PMC_IS_NULL(cmp_func))
         cmp_func = NULL;
     quicksort(interpreter, PMC_data(SELF), n, cmp_func);
 }

@@ -164,8 +164,6 @@ imc_reg_alloc(Interp *interpreter, IMC_Unit * unit)
 
     graph_coloring_reg_alloc(interpreter, unit);
 
-    if (IMCC_INFO(interpreter)->optimizer_level & OPT_SUB)
-        sub_optimize(interpreter, unit);
     if (IMCC_INFO(interpreter)->debug & DEBUG_IMC)
         dump_instructions(interpreter, unit);
     if (IMCC_INFO(interpreter)->verbose  ||
@@ -328,9 +326,14 @@ sort_reglist(IMC_Unit *unit)
  *
  * Registers 28-30 are reserved for short range temps, which
  * get allocated immediately
+ *
+ * TODO remove ALLOCATE_HACK
+ * The code doesn't check collisions against pre-allocated PASM in
+ * e.g. set_args. And due to upcoming variable sized register frames
+ * it's unneeded anyway.
  */
 
-#define ALLOCATE_HACK
+/* #define ALLOCATE_HACK */
 
 #ifdef ALLOCATE_HACK
 
@@ -625,7 +628,7 @@ compute_spilling_costs (Parrot_Interp interpreter, IMC_Unit * unit)
             if (!l->first_ins)
                 continue;
             for (ins = l->first_ins ; ins; ins = ins->next) {
-                for (k = 0; k < IMCC_MAX_REGS && ins->r[k]; k++)
+                for (k = 0; k < ins->n_r; k++)
                     if (ins->r[k] == r) {
                         used = 1;
                         break;
@@ -1138,7 +1141,7 @@ spill(Interp *interpreter, IMC_Unit * unit, int spilled)
     int needs_fetch, needs_store;
     SymReg * old_sym, *p31, *new_sym;
     char * buf;
-    SymReg *regs[IMCC_MAX_REGS];
+    SymReg *regs[3];
     SymReg **reglist = unit->reglist;
 
     buf = mem_sys_allocate(256 * sizeof(char));
@@ -1205,8 +1208,7 @@ spill(Interp *interpreter, IMC_Unit * unit, int spilled)
             dl++;
 	}
         /* change all occurance of old_sym to new */
-        for (i = 0; old_sym != new_sym && ins->r[i] &&
-                i < IMCC_MAX_REGS; i++)
+        for (i = 0; old_sym != new_sym && i < ins->n_r; i++)
             if (ins->r[i] == old_sym)
                 ins->r[i] = new_sym;
 	if (needs_store) {

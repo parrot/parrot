@@ -376,14 +376,13 @@ This is a test
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', 'puts method');
-       set S5, "ok 2\n"
        getstdout P2
        can I0, P2, "puts"
        if I0, ok1
        print "not "
 ok1:   print "ok 1\n"
-       find_method P0, P2, "puts"
-       invoke
+       set_args "(0,0)", P2, "ok 2\n"
+       callmethodcc P2, "puts"
        end
 CODE
 ok 1
@@ -412,11 +411,12 @@ OUTPUT
 output_is(<<'CODE', <<'OUTPUT', 'callmethod puts');
        getstderr P2	# the object
        set S0, "puts"	# method
-       set P5, P2	# first param
        set S5, "ok 1\n"	# 2nd param
-       callmethod
+       set_args "(0,0)", P2, S5
+       callmethodcc P2, S0
        set S5, "ok 2\n"
-       callmethod
+       set_args "(0,0)", P2, S5
+       callmethodcc P2, S0
        end
 CODE
 ok 1

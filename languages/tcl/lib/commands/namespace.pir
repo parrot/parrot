@@ -12,10 +12,12 @@ real top level namespace.
 .namespace [ "Tcl" ]
 
 .sub "&namespace"
-  .local pmc argv, retval
-  argv = foldup
+   .param pmc argv :slurpy
 
-  unless I3 goto no_args
+  .local pmc retval
+
+  $I3 = argv
+  unless $I3 goto no_args
 
   .local string subcommand_name
   subcommand_name = shift argv
@@ -24,8 +26,8 @@ real top level namespace.
 
   push_eh catch
     subcommand_proc = find_global "_Tcl\0builtins\0namespace", subcommand_name
-resume:
   clear_eh
+resume:
   if_null subcommand_proc, bad_args
   .return subcommand_proc(argv)
 
@@ -33,17 +35,13 @@ catch:
   goto resume
 
 bad_args:
-  retval = new String
-
-  retval = "bad option \""
-  retval .= subcommand_name
-  retval .= "\": must be children, code, current, delete, eval, exists, export, forget, import, inscope, origin, parent, qualifiers, tail, or which"
-  .return(TCL_ERROR,retval)
+  $S0 = "bad option \""
+  $S0 .= subcommand_name
+  $S0 .= "\": must be children, code, current, delete, eval, exists, export, forget, import, inscope, origin, parent, qualifiers, tail, or which"
+  .throw ($S0)
 
 no_args:
-  retval = new String
-  retval = "wrong # args: should be \"namespace subcommand ?arg ...?\""
-  .return (TCL_ERROR, retval)
+  .throw ("wrong # args: should be \"namespace subcommand ?arg ...?\"")
 
 .end
 
@@ -57,50 +55,38 @@ no_args:
   argc = argv
   if argc goto bad_args
 
-  $P1 = new TclString
-  $P1 = "::"
-  .return(TCL_OK,$P1)
+  .return("::")
 
 bad_args:
-  $P1 = new TclString
-  $P1 = "wrong # args: should be \"namespace current\"" 
-  .return(TCL_ERROR, $P1)
+  .throw ("wrong # args: should be \"namespace current\"")
 
 .end
 
 .sub "delete"
   .param pmc argv
-  
+
   .local int argc
   argc = argv
   if argc !=0  goto not_done
- 
+
   # No arg delete does nothing.
-  $P1 = new String
-  $P1 = ""
-  .return(TCL_OK,$P1)
+  .return("")
 
 not_done:
-  $P1 = new String
-  $P1 = "XXX: eek"
-  .return (TCL_ERROR,$P1)
+  .throw ("XXX")
 .end
 
-.sub "exists" # XXX 
+.sub "exists" # XXX
   .param pmc argv
 
   .local int argc
   argc = argv
   if argc != 1 goto bad_args
   # canonicalize namespace.
-  $P1 = new TclInt
-  $P1 = 0
-  .return(TCL_OK,$P1)
+  .return(0)
 
 bad_args:
-  $P1 = new TclString
-  $P1 = "wrong # args: should be \"namespace exists name\"" 
-  .return(TCL_ERROR, $P1)
+  .throw("wrong # args: should be \"namespace exists name\"" )
 .end
 
 .sub "qualifiers"
@@ -125,18 +111,14 @@ bad_args:
   $P2 = $P0."__get_pmc_keyed"($P1)
   
   $S1 = $P2
-  $P3 = new String
-  $P3 = $S1
-  .return (TCL_OK,$P3)
+  .return ($S1)
 
 WHOLE:
   $P0 = argv[0]
-  .return(TCL_OK,$P0)
+  .return($P0)
 
   bad_args:
-  $P1 = new String
-  $P1 = "wrong # args: should be \"namespace qualifiers string\""
-  .return (TCL_ERROR,$P1)
+  .throw ("wrong # args: should be \"namespace qualifiers string\"")
 
 .end
 
@@ -162,17 +144,13 @@ WHOLE:
   $P2 = $P0."__get_pmc_keyed"($P1)
   
   $S1 = $P2
-  $P3 = new String
-  $P3 = $S1
-  .return (TCL_OK,$P3)
+  .return ($S1)
 
 WHOLE:
   $P0 = argv[0]
-  .return(TCL_OK,$P0)
+  .return($P0)
 
   bad_args:
-  $P1 = new String
-  $P1 = "wrong # args: should be \"namespace tail string\""
-  .return (TCL_ERROR,$P1)
+  .throw ("wrong # args: should be \"namespace tail string\"")
 
 .end

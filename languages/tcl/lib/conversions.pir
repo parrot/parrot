@@ -11,17 +11,14 @@ use __stringToList.
 .sub __list
   .param pmc value
 
-  .local int return_type
-  return_type = TCL_OK
-
-  $S0 = typeof value
-  if $S0 == "TclList" goto done
+  $I0 = typeof value
+  if $I0 == .TclList goto done
 
   $S0 = value
-  (return_type, value) = __stringToList($S0)
-  
+  .return __stringToList($S0)
+
 done:
-  .return(return_type, value)
+  .return(value)
 .end
 
 =head2 _Tcl::__number
@@ -32,22 +29,21 @@ Given a PMC, get a number from it.
 
 .sub __number
   .param pmc value
-  
+
   $I0 = typeof value
   if $I0 == .TclInt goto done
   if $I0 == .TclFloat goto done
   
   $S0 = value
   $I0 = length $S0
+
   (value, $I1) = get_number($S0, 0)
   if $I0 != $I1 goto NaN
   goto done
 
 done:
-  .return(TCL_OK, value)
+  .return(value)
 
 NaN:
-  $P0 = new Exception
-  $P0["_message"] = "Not a number!"
-  throw $P0
+  .throw("Not a number!")
 .end

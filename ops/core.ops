@@ -205,7 +205,7 @@ stack for later returning.
 =cut
 
 inline op bsr (label INT) :base_core,check_event {
-  stack_push(interpreter, &interpreter->ctx.control_stack, expr NEXT(),  STACK_ENTRY_DESTINATION, STACK_CLEANUP_NULL);
+  stack_push(interpreter, &CONTEXT(interpreter->ctx)->control_stack, expr NEXT(),  STACK_ENTRY_DESTINATION, STACK_CLEANUP_NULL);
   goto OFFSET($1);
 }
 
@@ -231,7 +231,7 @@ location onto the call stack for later returning.
 
 inline op jsr(label INT) :base_core,check_event {
   opcode_t * loc;
-  stack_push(interpreter, &interpreter->ctx.control_stack, expr NEXT(),  STACK_ENTRY_DESTINATION, STACK_CLEANUP_NULL);
+  stack_push(interpreter, &CONTEXT(interpreter->ctx)->control_stack, expr NEXT(),  STACK_ENTRY_DESTINATION, STACK_CLEANUP_NULL);
   loc = INTVAL2PTR(opcode_t *, $1);
   goto ADDRESS(loc);
 }
@@ -379,34 +379,24 @@ continuations.
 
 ########################################
 
-=item B<invoke>()
-
-Call the subroutine in P0, with Parrot calling convention as
-described in PDD03.
-
-=item B<invoke>(in PMC)
-
-Call the subroutine in $1 with no defined calling convention or invoke
-a continuation for returning from a subroutine.
-
-=item B<invokecc>()
-
-Call the subroutine in P0 and generate a new return continuation in P1.
-
 =item B<invokecc>(in PMC)
 
-Call the subroutine in $1 and generate a new return continuation in P1.
+Call the subroutine in $1 and generate a new return continuation, if needed.
+E.g. a NCI subroutine, which executes code in some C library will not
+create a continuation, neither the not-first call to a coroutine.
+
+=item B<invoke>(in PMC, in PMC)
+
+Call the subroutine in $1 and use continuation $2.
+
+=item B<yield>()
+
+Yield results from a coroutine.
 
 =item B<tailcall>(in PMC)
 
 Call the subroutine in $1 and use the current continuation as the subs
 continuation.
-
-=item B<updatecc>()
-
-Update the state of the return continuation in P1. This is necessary,
-when any context stuff was changed between creating the return continuation
-and invoke'ing it.
 
 =item B<returncc>()
 
@@ -414,41 +404,33 @@ Return from the sub or method via the current continuation.
 
 =cut
 
-inline op invoke() {
-  opcode_t *dest;
-  PMC * p = REG_PMC(0);
-
-  dest = (opcode_t *)p->vtable->invoke(interpreter, p, expr NEXT());
-
-  goto ADDRESS(dest);
-}
-
-inline op invoke(in PMC) {
-  opcode_t *dest;
-  PMC * p = $1;
-
-  dest = (opcode_t *)p->vtable->invoke(interpreter, p, expr NEXT());
-
-  goto ADDRESS(dest);
-}
-
-inline op invokecc() {
-  opcode_t *dest;
-  PMC * p = REG_PMC(0);
-  dest = expr NEXT();
-  REG_PMC(2) = NULL;
-  REG_PMC(1) = new_ret_continuation_pmc(interpreter, dest);
-  dest = (opcode_t *)p->vtable->invoke(interpreter, p, dest);
-
-  goto ADDRESS(dest);
+inline op DELETED_invoke() {
+  goto NEXT();
 }
 
 inline op invokecc(in PMC) {
   opcode_t *dest;
   PMC * p = $1;
   dest = expr NEXT();
-  REG_PMC(2) = NULL;
-  REG_PMC(1) = new_ret_continuation_pmc(interpreter, dest);
+  interpreter->current_object = NULL;
+  interpreter->current_cont = NEED_CONTINUATION;
+  dest = (opcode_t *)p->vtable->invoke(interpreter, p, dest);
+  goto ADDRESS(dest);
+}
+
+inline op invoke(in PMC, in PMC) {
+  opcode_t *dest;
+  PMC * p = $1;
+
+  interpreter->current_object = NULL;
+  interpreter->current_cont = $2;
+  dest = (opcode_t *)p->vtable->invoke(interpreter, p, expr NEXT());
+  goto ADDRESS(dest);
+}
+
+inline op yield() {
+  opcode_t *dest = expr NEXT();
+  PMC * p = CONTEXT(interpreter->ctx)->current_sub;
   dest = (opcode_t *)p->vtable->invoke(interpreter, p, dest);
   goto ADDRESS(dest);
 }
@@ -457,23 +439,19 @@ inline op tailcall(in PMC) {
   opcode_t *dest;
   PMC * p = $1;
   dest = expr NEXT();
-  REG_PMC(1) = interpreter->ctx.current_cont;
-  PObj_get_FLAGS(REG_PMC(1)) |= SUB_FLAG_TAILCALL;
+  interpreter->current_cont = CONTEXT(interpreter->ctx)->current_cont;
+  PObj_get_FLAGS(interpreter->current_cont) |= SUB_FLAG_TAILCALL;
   dest = (opcode_t *)p->vtable->invoke(interpreter, p, dest);
   goto ADDRESS(dest);
 }
 
-inline op updatecc() {
-  struct Parrot_cont *cc =  PMC_cont(REG_PMC(1));
-  /* update context */
-  cc->ctx.warns = interpreter->ctx.warns;
-  cc->ctx.errors = interpreter->ctx.errors;
+inline op DELETED_updatecc() {
   goto NEXT();
 }
 
 inline op returncc() {
   opcode_t *dest;
-  PMC * p = interpreter->ctx.current_cont;
+  PMC * p = CONTEXT(interpreter->ctx)->current_cont;
 
   dest = (opcode_t *)p->vtable->invoke(interpreter, p, expr NEXT());
   goto ADDRESS(dest);
@@ -938,7 +916,7 @@ Set the name of the package for which we're currently executing code.
 =cut
 
 inline op setpackage(in STR) {
-  interpreter->ctx.current_package = $1;
+  CONTEXT(interpreter->ctx)->current_package = $1;
   goto NEXT();
 }
 
@@ -949,7 +927,7 @@ Get the name of the current package.
 =cut
 
 inline op getpackage(out STR) {
-  $1 = interpreter->ctx.current_package;
+  $1 = CONTEXT(interpreter->ctx)->current_package;
   goto NEXT();
 }
 
@@ -1126,11 +1104,7 @@ unmanagedstruct PMC and stick the address into its data pointer.
 
 =item B<compile>(out PMC, in PMC, in STR)
 
-Compile source code $3 with compiler $2 into PMC $1. The compile opcode
-is just a fancy function call without the overhead of setting
-branch flags. Thus the compiler PMC $2 can be a plain function returning
-a subroutine or a NCI PMC that wraps a compiler implemented in C. The
-result has to be some invocable PMC.
+Don't use compile - just invoke the compiler.
 
 =item B<compreg>(out PMC, in STR)
 
@@ -1195,12 +1169,7 @@ op dlvar (out PMC, in PMC, in STR) {
 }
 
 inline op compile(out PMC, in PMC, in STR) {
-  PMC *compiler = $2;
-  if (VTABLE_isa(interpreter, compiler, const_string(interpreter, "Sub"))) {
-    $1 = Parrot_runops_fromc_args(interpreter, compiler, "PS", $3);
-  }
-  else
-    $1 = VTABLE_invoke(interpreter, compiler, $3);
+  internal_exception(1, "don't use compile - just invoke the compiler");
   goto NEXT();
 }
 

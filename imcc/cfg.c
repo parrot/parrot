@@ -13,13 +13,8 @@
 #include <string.h>
 #include "imc.h"
 #include "optimizer.h"
-#include "parrot/oplib/ops.h"
 
-/* #define ALIAS */
-/* Currently unused -- see propagate_alias below */
 
-static void add_instruct_reads(Interp *, Instruction *ins, SymReg *r0);
-static void add_instruct_writes(Interp *, Instruction *ins, SymReg *r0);
 static void propagate_need(Basic_block *bb, SymReg* r, int i);
 static void bb_findadd_edge(Parrot_Interp, IMC_Unit *, Basic_block*, SymReg*);
 static void mark_loop(Parrot_Interp, IMC_Unit *, Edge*);
@@ -49,7 +44,7 @@ check_invoke_type(Interp *interp, IMC_Unit * unit, Instruction *ins)
      * inside another pcc_sub
      * 2) invoke = loop to begin
      */
-    if (unit->instructions->r[1] && unit->instructions->r[1]->pcc_sub)
+    if (unit->instructions->r[0] && unit->instructions->r[0]->pcc_sub)
         return INVOKE_SUB_LOOP;
     /* 3) invoke P1 returns */
     if (ins->opsize == 2)
@@ -82,9 +77,9 @@ find_basic_blocks (Parrot_Interp interpreter, IMC_Unit * unit, int first)
 
     /* XXX FIXME: Now the way to check for a sub is unit->type */
     ins = unit->instructions;
-    if (first && ins->type == ITLABEL && ins->r[1]) {
+    if (first && ins->type == ITLABEL && ins->r[0]->type == VT_PCC_SUB) {
         IMCC_debug(interpreter, DEBUG_CFG, "pcc_sub %s nparams %d\n",
-                ins->r[0]->name, ins->r[1]->pcc_sub->nargs);
+                ins->r[0]->name, ins->r[0]->pcc_sub->nargs);
         expand_sub(interpreter, unit, ins);
     }
     ins->index = i = 0;
@@ -100,24 +95,6 @@ find_basic_blocks (Parrot_Interp interpreter, IMC_Unit * unit, int first)
 
         bb->end = ins;
         ins->bbindex = unit->n_basic_blocks - 1;
-        /* invoke and newsub have implicit args (P0, P1) so mark it as doing so
-         * XXX Needs to be done in the parser or instruction creation API
-         */
-        if ( !strcmp(ins->op, "invoke") || !strcmp(ins->op, "invokecc")) {
-            if (ins->opsize == 1) {
-                SymReg * p0 = get_pasm_reg(interpreter, "P0");
-                add_instruct_reads(interpreter, ins, p0);
-                check_invoke_type(interpreter, unit, ins);
-                p0->use_count++;
-            }
-            ins->type |= IF_r0_branch | ITBRANCH;
-        }
-        else if ( !strcmp(ins->op, "newsub") && ins->opsize == 5) {
-            SymReg * p0 = get_pasm_reg(interpreter, "P0");
-            SymReg * p1 = get_pasm_reg(interpreter, "P1");
-            add_instruct_writes(interpreter, ins, p0);
-            add_instruct_writes(interpreter, ins, p1);
-        }
 
         if (ins->opnum == -1 && (ins->type & ITPCCSUB)) {
             if (first) {
@@ -502,91 +479,6 @@ edge_count(IMC_Unit * unit)
     return i;
 }
 
-static void
-add_instruct_reads(Interp *interp, Instruction *ins, SymReg *r0)
-{
-    int i;
-    for (i = 0; i < IMCC_MAX_REGS && ins->r[i]; i++)
-        if (r0 == ins->r[i])
-            return;
-    if (i == IMCC_MAX_REGS) {
-        IMCC_fatal(interp, 1,
-                "add_instruct_reads: out of registers with %s\n", r0->name);
-    }
-    /* append reg */
-    ins->r[i] = r0;
-    /* this gets read */
-    ins->flags |= (1<<i);
-}
-
-static void
-add_instruct_writes(Interp *interp, Instruction *ins, SymReg *r0)
-{
-    int i;
-    for (i = 0; i < IMCC_MAX_REGS && ins->r[i]; i++)
-        if (r0 == ins->r[i])
-            return;
-    if (i == IMCC_MAX_REGS) {
-        IMCC_fatal(interp, 1,
-        "add_instruct_writes: out of registers with %s\n", r0->name);
-    }
-    /* append reg */
-    ins->r[i] = r0;
-    ins->flags |= (1<< (16+i));
-}
-
-#ifdef ALIAS
-/*
- * set P1, P0
- *
- * means, the PMC P1 points to whatever, P0 pointed to
- *
- * set P1, 4 sets P0 value
- * as long as P1 is used (not overwritten, by new or clone)
- *
- * XXX currently turned off, this extends life ranges too much
- */
-
-static void
-propagate_alias(Parrot_Interp interpreter)
-{
-    Instruction *ins, *curr;
-    SymReg *r0, *r1;
-    int any = 0;
-
-    for (ins = instructions ; ins ; ins = ins->next) {
-	if (ins->type & ITALIAS) {
-	    /* make r1 live in each instruction
-	     * where r0 lives, until r0 is written
-	     */
-	    curr = ins;
-	    r0 = ins->r[0];
-	    r1 = ins->r[1];
-	    if (r1->type & VTREGISTER) {
-		for (ins = ins->next ; ins; ins = ins->next)
-		    if (instruction_writes(ins, r0))
-			break;
-		    else if (instruction_reads(ins, r0) &&
-			   !instruction_reads(ins, r1)) {
-			add_instruct_reads(interpreter, ins, r1);
-                        any = 1;
-                    }
-                    else if (instruction_reads(ins, r1) &&
-			   !instruction_reads(ins, r0)) {
-			add_instruct_reads(interpreter, ins, r0);
-                        any = 1;
-		    }
-		ins = curr;
-	    }
-	}
-    }
-    if (any && (IMCC_INFO(interpreter)->debug & DEBUG_CFG)) {
-	IMCC_debug(interpreter, DEBUG_CFG, "\nAfter propagate_alias\n");
-	dump_instructions(interpreter, unit);
-    }
-}
-#endif
-
 void
 life_analysis(Parrot_Interp interpreter, IMC_Unit * unit)
 {
@@ -594,9 +486,6 @@ life_analysis(Parrot_Interp interpreter, IMC_Unit * unit)
     SymReg** reglist = unit->reglist;
 
     IMCC_info(interpreter, 2, "life_analysis\n");
-#ifdef ALIAS
-    propagate_alias(interpreter);
-#endif
     for (i = 0; i < unit->n_symbols; i++)
         analyse_life_symbol(interpreter, unit, reglist[i]);
 }
@@ -639,7 +528,7 @@ analyse_life_symbol(Parrot_Interp interpreter, IMC_Unit * unit, SymReg* r)
                 prev = ins->prev;
                 if (prev->type & (ITPCCSUB|ITPCCYIELD))
                     r->usage |= U_NON_VOLATILE;
-                else if (prev->opnum == PARROT_OP_invokecc ||
+                else if (prev->opnum == PARROT_OP_invoke_p_p ||
                          prev->opnum == PARROT_OP_invokecc_p)
                     r->usage |= U_NON_VOLATILE;
                 else if (ins->type & ITADDR)

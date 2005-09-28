@@ -1,18 +1,17 @@
 .namespace [ "Tcl" ]
 
 .sub "&switch"
-  .local pmc argv
+  .param pmc argv :slurpy
   .local int argc
-  argv = foldup
   argc = argv
-  
+
   .local pmc retval
   .local string mode
   mode = "-exact"
 
   if argc < 2 goto bad_args
 flag_loop:
-  unless argv goto bad_args
+  unless argc goto bad_args
   $S0 = shift argv
   $S1 = substr $S0, 0, 1
   if $S0 == "--" goto get_subj
@@ -48,12 +47,9 @@ skip_subj:
 body_from_list:
   .local pmc __list
   __list = find_global "_Tcl", "__list"
-  
-  $P0 = shift argv
-  ($I0, retval) = __list($P0)
-  if $I0 == TCL_ERROR goto bad_list
-  body = retval
 
+  $P0 = shift argv
+  body = __list($P0)
   branch got_body
 
 body_from_argv:
@@ -99,32 +95,20 @@ regex_loop:
 body_end:
   if pattern == "default" goto body_match
 
-  retval = new String
-  retval = ""
-  .return (TCL_OK, retval)
+  .return ("")
 
 body_match:
   .local pmc parse
   parse = find_global "_Tcl", "parse"
   $P0 = parse(code)
-
-  # I don't know why we do this
-  register $P0
-
   .return $P0."interpret"()
 
 bad_args:
-  retval = new String
-  retval = "wrong # args: should be \"switch ?switches? string pattern body ... ?default body?\""
-  .return (TCL_ERROR, retval)
-
-bad_list:
-  .return (TCL_ERROR, retval)
+  .throw("wrong # args: should be \"switch ?switches? string pattern body ... ?default body?\"")
 
 bad_flag:
-  retval = new String
-  retval = "bad option \""
-  retval .= $S0
-  retval .= "\": must be -exact, -glob, -regexp, -matchvar, -indexvar, or --"
-  .return (TCL_ERROR, retval)
+  $S1 = "bad option \""
+  $S1 .= $S0
+  $S1 .= "\": must be -exact, -glob, -regexp, -matchvar, -indexvar, or --"
+  .throw ($S1)
 .end

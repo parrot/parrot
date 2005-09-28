@@ -213,7 +213,7 @@ Directives used for Parrot Calling Conventions.
 
 =back
 
-=head2 Deprecated directives for subroutine parameters and return
+=head2 Directives for subroutine parameters and return
 
 =over 4
 
@@ -221,16 +221,17 @@ Directives used for Parrot Calling Conventions.
 
 At the top of a subroutine, declare a local variable, in the mannter
 of B<.local>, into which parameter(s) of the current subroutine should
-be stored.  Available flags, not yet implemented in the old calling
-convention: C<:slurpy> and C<:optional>.  [XXX Chip - finish this
+be stored. Available flags are:
+C<:slurpy>, C<:optional>, and C<:opt_count>.  [XXX Chip - finish this
 update]
 
 =item .param <reg> [:<flag> ...]
 
 At the top of a subroutine, specify where parameter(s) of the current
-subroutine should be stored.  Available flags, not yet implemented in
-the old calling convention: C<:slurpy> and C<:optional>.  [XXX Chip -
-finish this update]
+subroutine should be stored.  Available flags are:
+C<:slurpy>, C<:optional>, and C<:opt_count>.  [XXX Chip - finish this
+update]
+
 
 =item .return <var> [:<flag> ...]
 
@@ -240,7 +241,7 @@ flags: C<:flat>.  [XXX Chip - finish this update]
 
 =back
 
-=head2 Deprecated directives for making a PCC call
+=head2 Directives for making a PCC call
 
 =over 4
 
@@ -252,9 +253,9 @@ passed.  Available flags: C<:flat>.  [XXX Chip - finish this update]
 =item .result <var> [:<flag> ...]
 
 Between B<.pcc_call> and B<.pcc_end>, specify where one or more return
-value(s) should be stored.  Available flags, not yet implemented in
-the old calling convention: C<:slurpy> and C<:optional>.  [XXX Chip -
-finish this update]
+value(s) should be stored.  Available flags are:
+C<:slurpy>, C<:optional>, and C<:opt_count>.  [XXX Chip - finish this
+update]
 
 =back
 

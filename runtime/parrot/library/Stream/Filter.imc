@@ -46,12 +46,13 @@ Sets or returns the filter sub.
 =cut
 
 .sub filter method
-    .param pmc _filter
+    .param pmc _filter :optional
+    .param int has_filter :opt_flag
     .local pmc ret
 
-    ret = _filter
     classoffset $I0, self, "Stream::Filter"
-    if argcP == 0 goto GET    
+    unless has_filter goto GET
+    ret = _filter
     setattribute self, $I0, _filter
     branch END
 GET:

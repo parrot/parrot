@@ -21,7 +21,6 @@
 #include "parrot/interp_guts.h"
 #include "parrot/dynext.h"
 #include "parrot/embed.h"
-#include "parrot/oplib/ops.h"
 #include "pbc.h"
 #include "parser.h"
 
@@ -50,7 +49,7 @@ iNEW(Interp *interpreter, IMC_Unit * unit, SymReg * r0,
         char * type, SymReg *init, int emit)
 {
     char fmt[256];
-    SymReg *regs[IMCC_MAX_REGS];
+    SymReg *regs[3];
     SymReg *pmc;
     int i, nargs;
     int pmc_num = pmc_type(interpreter,
@@ -76,8 +75,6 @@ iNEW(Interp *interpreter, IMC_Unit * unit, SymReg * r0,
     else
         nargs = 2;
     i = nargs;
-    while (i < IMCC_MAX_REGS)
-	regs[i++] = NULL;
     return INS(interpreter, unit, "new", fmt, regs, nargs,0, emit);
 }
 
@@ -102,7 +99,7 @@ iNEWSUB(Interp *interpreter, IMC_Unit * unit, SymReg * r0,
         int type, SymReg *subinit, SymReg *retinit, int emit)
 {
     char fmt[256];
-    SymReg *regs[IMCC_MAX_REGS];
+    SymReg *regs[4];
     SymReg *subpmc, *retpmc;
     int i, nargs;
     int pmc_num;
@@ -165,8 +162,6 @@ iNEWSUB(Interp *interpreter, IMC_Unit * unit, SymReg * r0,
     }
 
     i = nargs;
-    while (i < IMCC_MAX_REGS)
-	regs[i++] = NULL;
     return INS(interpreter, unit, "newsub", NULL, regs, nargs, 0, emit);
 }
 
@@ -301,6 +296,7 @@ maybe_builtin(Interp *interpreter, IMC_Unit *unit, char *name,
         sub = ins->r[0];
         IMCC_itcall_sub(interpreter, meth);
         sub->pcc_sub->object = ns_sym;
+
         first_arg = 1;
     }
     else {    /* method y = x."cos"() */
@@ -437,7 +433,7 @@ static Instruction *
 var_arg_ins(Interp *interpreter, IMC_Unit * unit, char *name,
         SymReg **r, int n, int emit)
 {
-    int i, op;
+    int op;
     Instruction *ins;
     int dirs;
     char fullname[64];
@@ -448,20 +444,8 @@ var_arg_ins(Interp *interpreter, IMC_Unit * unit, char *name,
     op_fullname(fullname, name, r, 1, 0);
     op = interpreter->op_lib->op_code(fullname, 1);
     assert(op >= 0);
-    for (i = 1; i < n; i++) {
-        switch (op) {
-            case PARROT_OP_set_returns_pc:
-            case PARROT_OP_set_args_pc:
-                dirs |= 1 << i ;        /* IN */
-                break;
-            case PARROT_OP_get_params_pc:
-            case PARROT_OP_get_results_pc:
-                dirs |= 1 << (16 + i);  /* OUT */
-                break;
-        }
-    }
 
-    ins = _mk_instruction(name, "", r, dirs);
+    ins = _mk_instruction(name, "", n, r, dirs);
     ins->opnum = op;
     ins->opsize = n + 1;
 
@@ -607,13 +591,12 @@ INS(Interp *interpreter, IMC_Unit * unit, char *name,
     format[len] = '\0';
     if (fmt && *fmt)
         strcpy(format, fmt);
-    memset(r + n, 0, sizeof(*r) * (IMCC_MAX_REGS - n));
 #if 1
     IMCC_debug(interpreter, DEBUG_PARSER,"%s %s\t%s\n", name, format, fullname);
 #endif
     /* make the instruction */
 
-    ins = _mk_instruction(name, format, r, dirs);
+    ins = _mk_instruction(name, format, n, r, dirs);
     ins->keys |= keyvec;
     /* fill in oplib's info */
     ins->opnum = op;
@@ -645,7 +628,7 @@ INS(Interp *interpreter, IMC_Unit * unit, char *name,
     else if (!memcmp(name, "invoke", 6) ||
             !memcmp(name, "callmethod", 10)) {
         if (cur_unit->type & IMC_PCCSUB)
-            cur_unit->instructions->r[1]->pcc_sub->calls_a_sub |= 1;
+            cur_unit->instructions->r[0]->pcc_sub->calls_a_sub |= 1;
     }
     /* set up branch flags */
     /*
@@ -900,7 +883,7 @@ change_op(Interp *interpreter, IMC_Unit *unit, SymReg **r, int num, int emit)
          * or
          *   op  Nx, ..., $N0
          */
-        SymReg *rr[IMCC_MAX_REGS];
+        SymReg *rr[2];
 
         rr[0] = mk_temp_reg(interpreter, 'N');
         rr[1] = r[num];
@@ -1038,8 +1021,8 @@ multi_keyed(Interp *interpreter, IMC_Unit * unit, char *name,
     int i, keyf, kv, n;
     char buf[16];
     static int p = 0;
-    SymReg *preg[IMCC_MAX_REGS];    /* px,py,pz */
-    SymReg *nreg[IMCC_MAX_REGS];
+    SymReg *preg[3];    /* px,py,pz */
+    SymReg *nreg[3];
     Instruction *ins = 0;
 
     /* count keys in keyvec */

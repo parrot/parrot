@@ -3,9 +3,6 @@
 .sub __stringToList
   .param string str
 
-  .local int return_type
-  return_type = TCL_OK
-  
   .local pmc retval
   retval = new TclList
 
@@ -132,11 +129,8 @@ found_close_bracket:
   goto eat_space
 
 unmatched_open_brace:
-  return_type = TCL_ERROR
-  retval = new String
-  retval = "unmatched open brace in list"
-  # goto done
+  .throw("unmatched open brace in list")
 
 done:
-  .return(return_type, retval)
+  .return(retval)
 .end

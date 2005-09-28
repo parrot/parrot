@@ -139,7 +139,7 @@ use vars qw($VERSION);
 
 require 5.005;
 
-$VERSION = sprintf "%d.%d", q$Revision$ =~ /(\d+)/g; # jhi@iki.fi;
+$VERSION = sprintf "%d.%d", q$Revision: 6964 $ =~ /(\d+)/g; # jhi@iki.fi;
 
 my $ME = basename($0);
 my $RCS_DATE = q$Date$;

@@ -7,8 +7,7 @@
 .namespace [ "Tcl" ]
 
 .sub "&eval"
-  .local pmc argv
-  argv = foldup  
+  .param pmc argv :slurpy
  
   .local string expr
   .local int argc
@@ -35,13 +34,9 @@ loop:
 
 loop_done:
   $P1 = parse(expr)
-  register $P1
-
-  .return $P1."interpret"() 
+  .return $P1."interpret"()
 
 no_args:
-  $P1 = new String
-  $P1 = "wrong # args: should be \"eval arg ?arg ...?\""
-  .return(TCL_ERROR, $P1)
+  .throw("wrong # args: should be \"eval arg ?arg ...?\"")
 
 .end

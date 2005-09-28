@@ -36,7 +36,7 @@ walk the logic tree and replace it with a direct lookup or something.
 
 =head2 PGE::Class
 
-This is an abstract base class for the atomic classes defined later in 
+This is an abstract base class for the atomic classes defined later in
 the file.  It provides the following methods to all other classes
 defined here:
 
@@ -54,7 +54,7 @@ proxy to the get_integer_keyed vtable slot.
     .param string key
     # Hmm, we should be able to just say self[$S0], but we can't
     # for some reason
-    $P0 = new Key 
+    $P0 = new Key
     $P0 = key
     $I0 = self[$P0]
     .return($I0)
@@ -70,10 +70,10 @@ where to start looking.
 
 .sub find_forward method
     .param string source
-    .param int offset
+    .param int offset           :optional
+    .param int has_offset       :opt_flag
 
-    # XXX is it zeroed automatically?
-    if argcI > 0 goto dontzero
+    if has_offset goto dontzero
     offset = 0
 dontzero:
 
@@ -84,7 +84,7 @@ dontzero:
     i = offset
 again:
     unless i < len goto fail
-    
+
     substr $S0, source, i, 1
     $I0 = self.matches($S0)
     unless $I0 goto continue
@@ -100,8 +100,10 @@ fail:
 .sub find_forward_inverted method
     .param string source
     .param int offset
+    .param int offset           :optional
+    .param int has_offset       :opt_flag
 
-    if argcI > 0 goto dontzero
+    if has_offset goto dontzero
     offset = 0
 dontzero:
 
@@ -111,7 +113,7 @@ dontzero:
 
     assign parent, self
     $I1 = parent.find_forward(source, offset)
-    
+
     .return($I1)
 .end
 
@@ -139,7 +141,7 @@ This class represents a discrete set of characters, such as [aeiou] (or
     matches = class.matches("x")
 
 Ranges ("a-m") are not supported.  That means the three characters "a", "-",
-and "m".  
+and "m".
 
 =cut
 
@@ -169,7 +171,7 @@ and "m".
     $S0 = $P0
     $S1 = key
     index $I0, $S0, $S1
-    
+
     if $I0 < 1 goto fail
     .return(1)
 fail:

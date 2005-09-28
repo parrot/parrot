@@ -143,12 +143,12 @@ bxors_s_s_s                     112
 bxors_s_s_sc                    113
 bxors_s_sc                      114
 bxors_s_sc_s                    115
-callmethod                      116
-callmethod_s                    117
-callmethod_sc                   118
-callmethodcc                    119
-callmethodcc_s                  120
-callmethodcc_sc                 121
+callmethod_p_s_p                116
+callmethod_p_sc_p               117
+callmethod_p_p_p                118
+callmethodcc_p_s                119
+callmethodcc_p_sc               120
+callmethodcc_p_p                121
 can_i_p_s                       122
 can_i_p_sc                      123
 ceil_i_n                        124
@@ -469,9 +469,9 @@ interpinfo_p_ic                 438
 intrestore_i                    439
 intsave_i                       440
 intsave_ic                      441
-invoke                          442
-invoke_p                        443
-invokecc                        444
+DELETED_invoke                          442
+invoke_p_p                      443
+yield                           444
 invokecc_p                      445
 isa_i_p_s                       446
 isa_i_p_sc                      447
@@ -1199,8 +1199,8 @@ sysinfo_i_ic                   1168
 sysinfo_s_i                    1169
 sysinfo_s_ic                   1170
 tailcall_p                     1171
-tailcallmethod_s               1172
-tailcallmethod_sc              1173
+tailcallmethod_p_s             1172
+tailcallmethod_p_sc            1173
 tan_n_n                        1174
 tan_n_nc                       1175
 tanh_n_n                       1176
@@ -1241,7 +1241,7 @@ unshift_p_sc                   1210
 upcase_s                       1211
 upcase_s_s                     1212
 upcase_s_sc                    1213
-updatecc                       1214
+DELETED_updatecc                       1214
 valid_type_i_i                 1215
 valid_type_i_ic                1216
 warningsoff_i                  1217
@@ -1349,3 +1349,4 @@ new_p_i_s                      1318
 new_p_ic_s                     1319
 new_p_i_sc                     1320
 new_p_ic_sc                    1321
+tailcallmethod_p_p             1322

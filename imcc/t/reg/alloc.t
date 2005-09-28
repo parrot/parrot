@@ -26,7 +26,7 @@ ex:
 .end
 .sub alligator
     get_params "(0)", $P0
-    invoke $P0
+    invokecc $P0
 .end
 CODE
 Hi

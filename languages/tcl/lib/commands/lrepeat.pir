@@ -4,16 +4,13 @@
 .namespace [ "Tcl" ]
 
 .sub "&lrepeat"
-
-  .local pmc argv 
-  argv = foldup
+  .param pmc argv :slurpy
 
   # XXX Need error handling
 
   .local int repeater # I hardly know 'er.
   repeater = argv[0] 
    
-
   # convert the Array ireturned by foldup into a TclList.
 
   .local int argc
@@ -40,5 +37,5 @@ INNER_DONE:
   goto OUTER_LOOP
 OUTER_DONE:
 
-  .return(0,retval)
+  .return(retval)
 .end

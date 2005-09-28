@@ -179,11 +179,11 @@ void
 add_pcc_arg(SymReg *r, SymReg * arg)
 {
     int n = r->pcc_sub->nargs;
-#if IMC_TRACE_HIGH
-    PIO_eprintf(NULL, "add_pcc_arg(%s)\n", arg->name);
-#endif
     r->pcc_sub->args = realloc(r->pcc_sub->args, (n + 1) * sizeof(SymReg *));
     r->pcc_sub->args[n] = arg;
+    r->pcc_sub->arg_flags = realloc(r->pcc_sub->arg_flags, (n + 1) * sizeof(int));
+    r->pcc_sub->arg_flags[n] = arg->type;
+    arg->type &= ~(VT_FLAT|VT_OPTIONAL|VT_OPT_FLAG );
     r->pcc_sub->nargs++;
 }
 
@@ -199,6 +199,12 @@ add_pcc_result(SymReg *r, SymReg * arg)
     int n = r->pcc_sub->nret;
     r->pcc_sub->ret = realloc(r->pcc_sub->ret, (n + 1) * sizeof(SymReg *));
     r->pcc_sub->ret[n] = arg;
+    /* we can't keep the flags in the SymReg as the SymReg
+     * maybe used with different flags for different calls
+     */
+    r->pcc_sub->ret_flags = realloc(r->pcc_sub->ret_flags, (n + 1) * sizeof(int));
+    r->pcc_sub->ret_flags[n] = arg->type;
+    arg->type &= ~(VT_FLAT|VT_OPTIONAL|VT_OPT_FLAG );
     r->pcc_sub->nret++;
 }
 
@@ -290,7 +296,7 @@ mk_ident(Interp *interp, char * name, int t)
 static SymReg*
 mk_pmc_const_2(Parrot_Interp interp, IMC_Unit *unit, SymReg *left, SymReg *rhs)
 {
-    SymReg *r[IMCC_MAX_REGS];
+    SymReg *r[2];
     char *name;
     int len;
 
@@ -483,7 +489,7 @@ SymReg *
 mk_sub_address(Interp *interp, char * name)
 {
     SymReg * s = _mk_address(interp, IMCC_INFO(interp)->ghash,
-            name, U_add_once);
+            name, U_add_all);
     s->usage |= U_FIXUP;
     return s;
 }

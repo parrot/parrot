@@ -41,11 +41,12 @@ if ($^O eq "cygwin" ) {
 	exit;
     }
 }
-if ($platforms{$^O}) {
+if (0 && $platforms{$^O}) {
    plan tests => 11;
 }
 else {
-   plan skip_all => "No threading yet or test not enabled for '$^O'";
+   # plan skip_all => "No threading yet or test not enabled for '$^O'";
+   plan skip_all => "Needs COPY for argument passing";
 }
 
 
@@ -73,9 +74,8 @@ output_is(<<'CODE', <<'OUTPUT', "thread type 1");
     # set regs P2 = thread-interp, P5 = sub
     find_global P5, "_foo"
     new P2, .ParrotThread
-    find_method P0, P2, "thread1"
     set I3, 1
-    invoke	# start the thread
+    callmethod "thread1"
 
     sleep 1
     print "main "
@@ -84,8 +84,7 @@ output_is(<<'CODE', <<'OUTPUT', "thread type 1");
     # get tid of thread
     set I5, P2
     # wait for it
-    find_method P0, P2, "join"
-    invoke
+    callmethod "join"
     end
 
 .pcc_sub _foo:
@@ -117,8 +116,7 @@ output_is(<<'CODE', <<'OUTPUT', "thread type 2");
     print "ok 2\n"
     new P2, .ParrotThread
     set I3, 2   # 2 args
-    find_method P0, P2, "thread2"
-    invoke	# start the thread
+    callmethod "thread2"
 
     sleep 1	# now the thread should run
     print P6
@@ -127,8 +125,7 @@ output_is(<<'CODE', <<'OUTPUT', "thread type 2");
     # get tid of thread
     set I5, P2
     # wait for it
-    find_method P0, P2, "join"
-    invoke
+    callmethod "join"
     end
 
 .pcc_sub _foo:
@@ -139,14 +136,12 @@ output_is(<<'CODE', <<'OUTPUT', "thread type 2");
     print P6
     print I5
     print S5
+    getinterp P2
     typeof S0, P2
     print S0
     print " tid "
     set I0, P2
     print I0
-    print "\n"
-    typeof S0, P0
-    print S0
     print "\n"
     set I3, 0
     returncc	# ret and be done with thread
@@ -156,7 +151,6 @@ ok 1
 ok 2
 hello from 1 thread
 ParrotThread tid 1
-Sub
 from 10 interp
 OUTPUT
 
@@ -168,15 +162,13 @@ output_is(<<'CODE', <<'OUTPUT', "thread - kill");
     print "start "
     print I10
     print "\n"
-    find_method P0, P2, "thread3"
     set I3, 1
-    invoke	# start the thread
+    callmethod "thread3"
     sleep 1
 
     set I5, I10
     getinterp P2
-    find_method P0, P2, "kill"
-    invoke
+    callmethod "kill"
 
     print "done\n"
     end
@@ -209,26 +201,13 @@ pir_output_is(<<'CODE', <<'OUTPUT', "join, get retval");
     .sym pmc to
     to = new Integer
     to = MAX
-    .sym pmc Thread_new
-    find_method Thread_new, kid, "thread3"
-    .pcc_begin
-    .arg Adder
-    .arg from
-    .arg to
-    .invocant kid
-    .nci_call Thread_new
-    .pcc_end
+    kid."thread3"(Adder, from, to)
 
-    .sym int tid
+    .local int tid
     tid = kid
-    .sym pmc Thread_join
-    find_method Thread_join, kid, "join"
-    .pcc_begin
-    .arg tid
-    .nci_call Thread_join
-    .sym pmc result
-    .result result
-    .pcc_end
+    .local pmc me, result
+    me = getinterp
+    result = me."join"(tid)
     print result
     print "\n"
     # sum = n * (n + 1)/2
@@ -268,15 +247,13 @@ SKIP: {
 output_like(<<'CODE', <<'OUTPUT', "detach");
     find_global P5, "_foo"
     new P2, .ParrotThread
-    find_method P0, P2, "thread3"
     new P6, .TQueue	# need a flag that thread is done
     set I3, 2
-    invoke	# start the thread
+    callmethod "thread3"
 
     set I5, P2
     getinterp P2
-    find_method P0, P2, "detach"
-    invoke
+    callmethod "detach"
 wait:
     defined I0, P6
     unless I0, wait
@@ -297,19 +274,17 @@ OUTPUT
 output_is(<<'CODE', <<'OUTPUT', "share a PMC");
     find_global P5, "_foo"
     new P2, .ParrotThread
-    find_method P0, P2, "thread3"
     new P20, .Integer
     new P6, .SharedRef, P20
     set P6, 20
     set I3, 2   # P5..P6
-    invoke	# start the thread
+    callmethod "thread3"
     # now sleep a bit, so that the thread runs
     sleep 0.1
 
     set I5, P2
     getinterp P2
-    find_method P0, P2, "join"
-    invoke
+    callmethod "join"
     print "done\n"
     print P6
     print "\n"
@@ -343,14 +318,12 @@ output_is(<<'CODE', <<'OUT', "multi-threaded");
     set P6, P10
 
     new P2, .ParrotThread
-    find_method P0, P2, "thread3"
     find_global P5, "_foo"
     set I3, 2
-    invoke	# start the thread
+    callmethod "thread3"
     set I5, P2
     getinterp P2
-    find_method P0, P2, "join"
-    invoke	# join the thread
+    callmethod "join"
     print "done main\n"
     end
 
@@ -394,14 +367,12 @@ output_is(<<'CODE', <<'OUT', "multi-threaded strings via SharedRef");
     set P6, P10
 
     new P2, .ParrotThread
-    find_method P0, P2, "thread3"
     find_global P5, "_foo"
     set I3, 2
-    invoke	# start the thread
+    callmethod "thread3"
     set I5, P2
     getinterp P2
-    find_method P0, P2, "join"
-    invoke	# join the thread
+    callmethod "join"
     print "done main\n"
     end
 
@@ -473,12 +444,10 @@ output_is(<<'CODE', <<'OUT', "multi-threaded strings");
 
     find_global P5, "_foo"
     new P2, .ParrotThread
-    find_method P0, P2, "thread3"
-    invoke	# start the thread
+    callmethod "thread3"
     set I5, P2
     getinterp P2
-    find_method P0, P2, "join"
-    invoke	# join the thread
+    callmethod "join"
     print "done main\n"
     end
 

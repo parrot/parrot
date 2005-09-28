@@ -150,9 +150,6 @@ TCL
 3
 OUT
 
-TODO: {
-  local $TODO = "&& doesn't evaluate in the right order";
-
 language_output_is("tcl",<<TCL,<<OUT,"&&, both sides");
  proc true {} {puts T; return 1}
  proc false {} {puts F; return 0}
@@ -172,10 +169,6 @@ F
 T
 1
 OUT
-}
-
-TODO: {
-  local $TODO = "&&,||  doesn't short circuit yet.";
 
 language_output_is("tcl",<<TCL,<<OUT,"&&, short circuited");
  proc true {} {puts T; return 1}
@@ -194,10 +187,6 @@ TCL
 T
 1
 OUT
-}
-
-
-
 
 language_output_is("tcl",<<TCL,<<OUT,"abs");
  puts [expr abs(1-2)]

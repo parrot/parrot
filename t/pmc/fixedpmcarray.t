@@ -295,29 +295,21 @@ OUTPUT
 pir_output_like(<<'CODE',
 
 .sub main @MAIN
-     .local pmc compares
+     .local pmc compares, cmp_fun
      # XXX doesnt work wit prederef of JIT
      bounds 1
      compares = new .Integer
      compares = 0
      global "compares" = compares
+    cmp_fun = global "cmp_fun"
      sort_ar()
-     sort_ar(1)
+     sort_ar(cmp_fun)
 .end
 .sub sort_ar
-    .local pmc cmp_fun
+    .param pmc cmp_fun :optional
     .local pmc compares
     compares = global "compares"
     compares = 0
-    if argcI goto s1
-       .local pmc none
-       null none
-       cmp_fun = none
-       goto sort_it
-s1:
-    cmp_fun = global "cmp_fun"
-sort_it:
-
     .local pmc ar
     new ar, .FixedPMCArray
     ar = 5
