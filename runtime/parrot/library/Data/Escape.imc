@@ -76,8 +76,6 @@ LOOP:
     if index >= str_len goto END
 
     tmp = str[index]
-    is_alphanum = is_cclass mask, tmp, 0
-    if is_alphanum, DONE
 
     ord test_char_ord, tmp
 
@@ -119,6 +117,8 @@ escape_quote_char:
     branch DONE
 
 default:
+    is_alphanum = is_cclass mask, tmp, 0
+    if is_alphanum goto DONE
     ## otherwise encode the value as an octal number
     $P0 = new .ResizableIntegerArray
     push $P0, test_char_ord
