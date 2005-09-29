@@ -530,7 +530,7 @@ as PIR.
   $P1[1] = $I0
 
   # Use n_operators pragma to force generation of new pmcs 
-  sprintf pir_code, ".pragma n_operators 1\n.sub blah @ANON\n%s.return ($P%s)\n.end\n", $P1
+  pir_code = sprintf ".pragma n_operators 1\n.sub blah @ANON\n%s.return ($P%s)\n.end\n", $P1
 
   #print pir_code # for debugging the compiler
 

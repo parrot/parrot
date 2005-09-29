@@ -14,7 +14,7 @@
   # pull off the format string.
   shift format, argv
 
-  sprintf $S0, format, argv 
+  $S0 = sprintf format, argv 
 
   .return($S0)
 .end
