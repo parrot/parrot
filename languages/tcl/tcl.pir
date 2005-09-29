@@ -67,7 +67,6 @@ loop_error:
 loop_error_real:
   .get_stacktrace(P5,$S0)
   print $S0
-  print "\n"
   #goto input_loop_continue
 
 input_loop_continue:

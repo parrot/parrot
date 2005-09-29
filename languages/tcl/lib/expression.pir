@@ -41,7 +41,10 @@ operand:
   goto operator
 
 no_operand:
-  .throw ("XXX: no operand!")
+  $S0 = "syntax error in expression \""
+  $S0 .= expr
+  $S0 .= "\": premature end of expression"
+  .throw ($S0)
 
 operator:
   (chunk, pos) = get_operator(expr, pos)
