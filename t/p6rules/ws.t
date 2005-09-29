@@ -2,6 +2,7 @@ use strict;
 use warnings;
 use Parrot::Test tests => 21;
 use Parrot::Test::PGE;
+use Test::More;
 
 
 # without :w
