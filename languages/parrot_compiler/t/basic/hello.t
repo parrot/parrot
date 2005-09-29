@@ -3,6 +3,8 @@
 
 use strict;
 use lib 'parrot_compiler/lib';
+use FindBin;
+use lib "$FindBin::Bin/../../lib", "$FindBin::Bin/../../../../lib";
 
 use Parrot::Test tests => 2+3 + 3 + 3;
 use Test::More;
@@ -10,13 +12,18 @@ use Test::More;
 # Execute 'Hello World' in PASM, PIR and PAST
 
 my %code = ( PASM => << 'END_PASM', PIR => << 'END_PIR', PAST => << 'END_PAST' );
+
     print "Hello, this is PASM.\n"
     end
 END_PASM
+
+
 .sub test @MAIN
     print "Hello, this is PIR.\n"
 .end
 END_PIR
+
+
 Parrot_AST(
   version(Const('0.1'))
  _options(

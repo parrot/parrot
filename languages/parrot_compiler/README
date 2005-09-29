@@ -2,5 +2,9 @@
 # $Id$
 
 'languages/parrot_compiler' is not really a language implementation.
-It servers as an example on how the builtin PASM, PIR and PAST compilers
+
+It just provides examples on how the builtin PASM, PIR and PAST compilers
 can be used in PIR, PASM and PAST scripts.
+
+See also t/pmc/eval.t, t/src/compilers.t, examples/compilers and
+languages/m4/src/eval.c.
