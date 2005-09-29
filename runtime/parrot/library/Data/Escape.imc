@@ -67,7 +67,7 @@ This function returns the quoted string.
     .local int mask
 
     .include 'cclass.pasm'
-    mask = .CCLASS_ALPHANUMERIC
+    mask = .CCLASS_PRINTING
 
     index = 0
     str_len = length str

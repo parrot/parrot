@@ -507,6 +507,15 @@ setup_argv(Interp *interpreter, int argc, char ** argv)
     PMC_cont(cont)->from_ctx = interpreter->ctx;
     PMC_cont(cont)->to_ctx = interpreter->ctx;
     /*
+     * TODO replace interpreter startup with runops_args_fromc
+     * This needs the following changes:
+     * - inter_create: place a dummy Sub with offset 0 in initial context->current_sub
+     * - during packfile loading, if a sub is labeled SUB_FLAG_PF_MAIN, replace it
+     * - remove  set_current_sub
+     * - run the sub with argv, instead of runops_args
+     */
+
+    /*
      * set current subroutine
      */
     set_current_sub(interpreter);
