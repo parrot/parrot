@@ -29,7 +29,7 @@ This library provides the following function:
 
 =over 4
 
-=item str = String( str, char )
+=item str = String( str, [char] )
 
 A simple string escaping function.
 
@@ -54,20 +54,20 @@ This function returns the quoted string.
 
 .sub String
     .param string str
-	.param string quote_char
+    .param string quote_char   :optional
+    .param int has_quote       :opt_flag
 
-	.local string return
+    .local string return
     .local int index
     .local int str_len
     .local int test_char_ord
     .local int quote_char_ord
-	.local int is_alphanum
+    .local int is_alphanum
     .local string tmp
-	.local int mask
+    .local int mask
 
-	.include 'cclass.pasm'
-
-	mask = .CCLASS_ALPHANUMERIC
+    .include 'cclass.pasm'
+    mask = .CCLASS_ALPHANUMERIC
 
     index = 0
     str_len = length str
@@ -76,49 +76,50 @@ LOOP:
     if index >= str_len goto END
 
     tmp = str[index]
-	is_alphanum = is_cclass mask, tmp, 0
-	if is_alphanum, DONE
+    is_alphanum = is_cclass mask, tmp, 0
+    if is_alphanum, DONE
 
     ord test_char_ord, tmp
 
-	## allow spaces as is
-	if 32 == test_char_ord goto DONE
+    ## allow spaces as is
+    if 32 == test_char_ord goto DONE
 
 t_backslash:
-	## escape backslash to double backslash
-	if 92 != test_char_ord goto t_newline
-	tmp = '\\'
-	branch DONE
-	
+    ## escape backslash to double backslash
+    if 92 != test_char_ord goto t_newline
+    tmp = '\\'
+    branch DONE
+
 t_newline:
-	## escape newline to \n
-	if 10 != test_char_ord goto t_tab
-	tmp = '\n'
-	branch DONE
+    ## escape newline to \n
+    if 10 != test_char_ord goto t_tab
+    tmp = '\n'
+    branch DONE
 
 t_tab:
-	## escape tab to \t
-	if 9 != test_char_ord goto t_quote
-	tmp = '\t'
-	branch DONE
+    ## escape tab to \t
+    if 9 != test_char_ord goto t_quote
+    tmp = '\t'
+    branch DONE
 
 t_quote:
-	## escape quote character
+    ## escape quote character
+    unless has_quote goto escape_qu
     ord quote_char_ord, quote_char
-	
-	if quote_char_ord == test_char_ord goto escape_quote_char
-	if 34 == test_char_ord goto DONE
-	if 39 == test_char_ord goto DONE
-	branch default
+
+    if quote_char_ord == test_char_ord goto escape_quote_char
+escape_qu:
+    if 34 == test_char_ord goto DONE
+    if 39 == test_char_ord goto DONE
+    branch default
 
 escape_quote_char:
-	tmp = '\'
-	concat tmp, quote_char
-	branch DONE
+    tmp = '\'
+    concat tmp, quote_char
+    branch DONE
 
 default:
     ## otherwise encode the value as an octal number
-	.local pmc char
     $P0 = new .ResizableIntegerArray
     push $P0, test_char_ord
     tmp = sprintf "\\%03o", $P0
