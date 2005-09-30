@@ -35,8 +35,6 @@ To prepare a release:
 	    perl Configure.pl ...
 	    make -s all world fulltest
 
-	j.  [ leo: check that .skip-diffit is empty ]
-
     3.  svn commit.
 
     4.  make release VERSION=<version>
@@ -52,11 +50,10 @@ To prepare a release:
     7.  tag the release as: RELEASE_a_b_c
            where a.b.c is the version number
 
-,--[ handwaving --leo ]----------------------------------
-| 	export SVNPARROT=https://svn.perl.org/parrot
-| 	svn copy $SVNPARROT/trunk $SVNPARROT/tags/RELEASE_a_b_c \
-            -m"tagged release a.b.c"
-`--------------------------------------------------------
+  	$ export SVNPARROT=https://svn.perl.org/parrot
+  	$ svn copy -m"tagged release a.b.c \
+            "$SVNPARROT/trunk $SVNPARROT/tags/RELEASE_a_b_c
+
         See also below [1]
 
     8.  upload to CPAN.
