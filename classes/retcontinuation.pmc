@@ -53,7 +53,7 @@ Initializes the continuation.
         struct Parrot_cont * cc = PMC_cont(SELF);
         if (cc) {
             mem_sys_free(cc);
-            PMC_cont(SELF) = NULL;
+            PMC_cont_ASSIGN(SELF, NULL);
         }
     }
 /*

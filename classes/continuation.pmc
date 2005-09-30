@@ -106,7 +106,7 @@ Destroys the continuation.
             if (cc->ctx_copy)
                 mem_sys_free(cc->ctx_copy);
             mem_sys_free(cc);
-            PMC_cont(SELF) = NULL;
+            PMC_cont_ASSIGN(SELF, NULL);
         }
     }
 /*
