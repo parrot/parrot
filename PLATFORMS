@@ -7,7 +7,7 @@ Platform                B8    Runloops      Feature Comp Test Inst YYYYMMDD
 ---------------------------------------------------------------------------
 aix-pwr-xlc6            B    -    Y    -     Y   -   Y    Y
 aix-pwr64-xlc6          B8   -    -    -     Y   -   Y    Y/20
-darwin_7.9.0 (10.3)     B    Y    Y    -     Y   Y   Y    Y     Y  20050804
+darwin_7.9.0 (10.3)     B    Y    Y    -     Y   Y   Y    Y     Y  20051001
 darwin_8.2.0-gcc4.0.0   B                            Y    Y        20050804
 freebsd5.2-i386              Y    Y/4  Y     Y   -   Y*6  Y
 freebsd6.0b-amd64        8   Y    -    -     Y   Y   Y    Y/12     20050804
@@ -20,7 +20,7 @@ linux-ppc-gcc3.2.3      B    Y    Y/9  Y     Y   Y   Y    Y
 linux-sparc-gcc3.3.3    B    Y    -    -     Y   Y   Y    Y
 linux-sparc64-gcc3.3.3  B8   Y    -    -     -   -   Y    -
 linux-x86-gcc2.95.2          Y    Y    Y     Y   Y   Y    Y     Y  20050804
-linux-x86-gcc3.3.3           Y    Y    Y     Y   Y   Y    Y     Y  20050804
+linux-x86-gcc3.3.3           Y    Y    Y     Y   Y   Y    Y     Y  20051001
 linux-x86-gcc3.3.3 *3        Y    Y    Y     Y   Y   Y    Y*3
 linux-x86-icc8               Y    Y    Y     Y   Y   Y    Y
 linux-x86_64-gcc3.3.3    8   Y    -    -     Y   Y   Y    Y
