@@ -141,6 +141,7 @@ unless ($html) {
     my @smoke_config_vars = qw(
 	  osname
       archname
+      cc
       build_dir
       cpuarch
       revision

@@ -118,6 +118,7 @@ sub add_smoke {
   $html =~ /branch: ([\w\-]+)/     and $smoke{branch}       = $1;
   $html =~ /cpuarch: ([\w\d]+)/    and $smoke{cpuarch}      = $1;
   $html =~ /osname: ([\w\d]+)/     and $smoke{osname}       = $1;
+  $html =~ /cc: ([\w\d]+)/         and $smoke{cc}           = $1;
   $html =~ /DEVEL: -?(\w+)/        and $smoke{DEVEL}        = $1;
   $html =~ /harness_args: (.+)$/m  and $smoke{harness_args} = $1;
   $html =~ /build_dir: (.+)$/m     and $smoke{build_dir}    = $1;
@@ -152,7 +153,7 @@ sub add_smoke {
 sub clean_obsolete_smokes {
   my $category = sub {
     return join "-",
-      (map { $_[0]->{$_} } qw<branch cpuarch osname runcore>),
+      (map { $_[0]->{$_} } qw<branch cpuarch osname cc runcore>),
       $_[0]->{DEVEL} eq "devel" ? "dev" : "release",
   };
 
@@ -186,11 +187,12 @@ sub process_list {
   print $CGI->header;
 
   my $category = sub {
-    return sprintf "%s / %s runcore on %s-%s",
+    return sprintf "%s / %s runcore on %s-%s-%s",
       $_[0]->{DEVEL} eq "devel" ? "repository snapshot" : "release",
 	  runcore2human($_[0]->{runcore}),
 	  $_[0]->{cpuarch},
       $_[0]->{osname},
+      $_[0]->{cc},
   };
 
   my @smokes  = map { unpack_smoke($_) } glob "parrot-smoke-*.html";
@@ -235,7 +237,7 @@ sub pack_smoke {
 
   my $summary = join("-", map { $smoke{summary}{$_} } qw<total ok failed todo skipped unexpect>);
   my $args = unpack("H*", $smoke{harness_args});
-  my $str = "parrot-smoke-<VERSION>-<DEVEL>-r<revision>-<branch>--<cpuarch>-<osname>-<runcore>--<timestamp>-<duration>--$summary--$args--<id>.html";
+  my $str = "parrot-smoke-<VERSION>-<DEVEL>-r<revision>-<branch>--<cpuarch>-<osname>-<cc>-<runcore>--<timestamp>-<duration>--$summary--$args--<id>.html";
 
   $str =~ s/<(.+?)>/$smoke{$1}/g;
 
@@ -245,7 +247,7 @@ sub pack_smoke {
 sub unpack_smoke {
   my $name = shift;
 
-  /^parrot-smoke-([\d\.]+)-(\w+)-r(\d+)-([\w\-]+)--([\w\d]+)-([\w\d]+)-(\w+)--(\d+)-(\d+)--(\d+)-(\d+)-(\d+)-(\d+)-(\d+)-(\d+)--([a-f0-9]+)--([a-f0-9]+).html$/
+  /^parrot-smoke-([\d\.]+)-(\w+)-r(\d+)-([\w\-]+)--([\w\d]+)-([\w\d]+)-([\w\d]+)-(\w+)--(\d+)-(\d+)--(\d+)-(\d+)-(\d+)-(\d+)-(\d+)-(\d+)--([a-f0-9]+)--([a-f0-9]+).html$/
     and return {
 	  VERSION       => $1,
 	  DEVEL         => $2,
@@ -253,7 +255,8 @@ sub unpack_smoke {
 	  branch		=> $4,
 	  cpuarch       => $5,
       osname        => $6,
-      runcore       => $7,
+      cc            => $7,
+      runcore       => $8,
       timestamp     => [
         $8,
         do { 
