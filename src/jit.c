@@ -1330,6 +1330,13 @@ build_asm(Interp *interpreter, opcode_t *pc,
      * register allocation information inside.
      * See imcc/jit.c for more
      */
+#if 0
+    /* XXX
+     * JIT segs are currentlu not build
+     * the find_segments also segfaults on PPC eval_2
+     * maybe something not initialized correctly
+     * - diabled --leo
+     */
     name = mem_sys_allocate(strlen(interpreter->code->base.name) + 5);
     sprintf(name, "%s_JIT", interpreter->code->base.name);
     jit_seg = PackFile_find_segment(interpreter,
@@ -1339,6 +1346,7 @@ build_asm(Interp *interpreter, opcode_t *pc,
         jit_info->optimizer =
             optimize_imcc_jit(interpreter, pc, code_start, code_end, jit_seg);
     else
+#endif
         jit_info->optimizer =
             optimize_jit(interpreter, pc, code_start, code_end);
 
