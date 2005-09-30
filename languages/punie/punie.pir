@@ -41,7 +41,7 @@ single digit, in the form of:
     $I0 = match.__get_bool()
     unless $I0 goto match_fail           # if match fails stop
 #    print "parse succeeded\n"
-    match.dump()
+#    match.dump()
 
     # "Traverse" the parse tree (currently a hack)
     $P1 =  match['PunieGrammar::expr']
