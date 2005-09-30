@@ -41,7 +41,7 @@ single digit, in the form of:
     $I0 = match.__get_bool()
     unless $I0 goto match_fail           # if match fails stop
 #    print "parse succeeded\n"
-#    match.dump()
+    match.dump()
 
     # "Traverse" the parse tree (currently a hack)
     $P1 =  match['PunieGrammar::expr']
@@ -60,9 +60,9 @@ single digit, in the form of:
     .local pmc past_compiler
     .local pmc past_compiled
     past_compiler = compreg "PAST"
-    past_compiled = compile past_compiler, past_source
+    past_compiled = past_compiler( past_source )
 
-    invoke past_compiled
+    past_compiled()
 
   match_fail:
     print "parse failed"
