@@ -66,6 +66,10 @@ D: Bugfixes, m4, Getopt_Long.pir, Parrot bc, Configure bugfixes
 N: Bob Diertens
 D: patch regarding macro argument expansion
 
+N: Bob Rogers
+D: Updates to pmc2c.pl
+E: rogers-perl6@rgrjr.dyndns.org
+
 N: Brent Royal-Gordon
 D: Configure, Parrot_sprintf, embedding, early regex engine.
 D: Early contributions under the name Brent Dax.
@@ -193,7 +197,7 @@ D: parrotbug, befunge interpreter, ook compiler.
 E: jquelin@cpan.org
 S: Lyon, France
 
-N: Jerry Gay a.k.a particle
+N: Jerry Gay a.k.a. particle
 E: Jerry.Gay@gmail.com
 D: remove Win32 compile warnings; pcre update; cleanup of internal exceptions
 D: add tests; doc cleanup; pick low hanging fruit
@@ -208,7 +212,7 @@ D: Lexical pads, CPS.
 N: Jonathan Stowe
 
 N: Jonathan Worthington
-D: Win32 dynclasses support, Win32 fixes and various other patches
+D: Win32 dynclasses support, Win32 fixes, PBC utilities, and various patches
 E: jonathan@jwcs.net
 W: http://www.jwcs.net/~jonathan/
 
@@ -223,7 +227,7 @@ D: updated version of parrotbench.pl
 
 N: Joshua Hoblitt
 E: jhoblitt@cpan.org
-D: bug wrangling, doc & makefile cleanups
+D: bug wrangling, doc & makefile cleanups, and Pod tests
 
 N: Josh Wilmes
 
@@ -270,6 +274,7 @@ N: Mattia Barbon
 D: Win32 fixes, dynamic PMC creation and loading
 
 N: Matt Kennedy
+D: Some Env PMC method implementations and tests
 
 N: Melvin Smith
 D: Parrot core, various ops, IO, subs, continuations, COW stacks
@@ -298,6 +303,10 @@ N: Neil Conway
 
 N: Nicholas Clark
 D: Building and platform compat and more.
+
+N: Nick Glencross
+D: Bugfixes to trace and more.
+E: nickg@glencros.demon.co.uk
 
 N: Nick Kostirya
 D: Win32, FreeBSD build fixes

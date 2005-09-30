@@ -1,5 +1,14 @@
 # $Id$
 
+New in 0.3.0
+
+- New calling conventions implemented: see PDD03 for details
+- Merge multiple Parrot bytecode (PBC) files into a singe PBC file
+- 'make smoke' target going beta
+- bc now supports if statements, comparison ops, prefix inc/dec
+- ParTcl adds [lassign], [switch] (partially); [expr] converted to a compiler
+- Many exciting doc updates, tests, and bugfixes, too numerous to mention
+
 New in 0.2.3
 
 - Dynamic classes now compile on Windows (including ParTcl)
