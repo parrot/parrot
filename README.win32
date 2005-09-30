@@ -82,6 +82,9 @@ L<http://gnuwin32.sourceforge.net/>
 B<GMP> - GNU multiple precision arithmetic library 
 L<http://developer.berlios.de/projects/win32gmp/>
 
+B<pcre> - Perl-Compatible Regular Expression library 
+L<http://gnuwin32.sourceforge.net/>
+
 =item Optional utilities
 
 The availability of these utilities is checked by Configure.pl.
@@ -134,7 +137,8 @@ L<http://prdownloads.sf.net/mingw/MinGW-4.1.1.exe>
 
 The HomePage is on L<http://www.mingw.org/>.
 
-With the ActiveState Perl distribution, tell Configure.pl to use gcc :
+With the ActiveState Perl distribution or PXPerl distribution,
+tell Configure.pl to use gcc :
 
     perl Configure.pl --cc=gcc --icushared="C:\usr\lib\icu\lib\icudt.lib C:\usr\lib\icu\lib\icuuc.lib" --icuheaders="C:\usr\lib\icu\include" --icudatadir="C:\usr\local\icu\data"
 or
@@ -172,10 +176,6 @@ directories.
 =head1 BUGS AND CAVEATS
 
 =over
-
-=item Dynclasses
-
-Dynclasses are currently broken due to linkage.
 
 =item Features
 

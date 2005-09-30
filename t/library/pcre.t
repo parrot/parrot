@@ -22,8 +22,8 @@ use strict;
 use Parrot::Test tests => 1;
 
 # if we keep pcre, we need a config test
-my $has_pcre = Parrot::Test::run_command("pcre-config --version",
-    STDERR => '/dev/null') == 0;
+my $cmd = ($^O =~ /MSWin32/) ? "pcregrep --version" : "pcre-config --version";
+my $has_pcre = Parrot::Test::run_command($cmd, STDERR => '/dev/null') == 0;
 
 SKIP: {
     skip("no pcre-config", Test::Builder->new()->expected_tests())
