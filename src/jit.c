@@ -1342,11 +1342,13 @@ build_asm(Interp *interpreter, opcode_t *pc,
     jit_seg = PackFile_find_segment(interpreter,
             interpreter->code->base.dir, name, 0);
     mem_sys_free(name);
+#else
+    jit_seg = NULL;
+#endif
     if (jit_seg)
         jit_info->optimizer =
             optimize_imcc_jit(interpreter, pc, code_start, code_end, jit_seg);
     else
-#endif
         jit_info->optimizer =
             optimize_jit(interpreter, pc, code_start, code_end);
 
