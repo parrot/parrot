@@ -1,4 +1,4 @@
-This is Parrot, version 0.2.3
+This is Parrot, version 0.3.0
 -----------------------------
 
 Parrot is Copyright (C) 2001-2005 The Perl Foundation. All Rights Reserved.
@@ -65,7 +65,7 @@ For systems like HPUX that don't have inet_pton please run
 
 If you want to install Parrot into a non-standard location use
 
-    perl Configure.pl --prefix=/Users/foo/parrot-0.2.3
+    perl Configure.pl --prefix=/Users/foo/parrot-0.3.0
 
 Running Configure.pl will generate a config.h header, a Parrot::Config
 module, platform files and some Makefiles.
@@ -127,6 +127,11 @@ CHANGES
 
 For documentation on the user-visible changes between this version and
 previous versions, please see NEWS.
+
+KNOWN ISSUES
+------------
+
+Some PASM examples are currently broken.
 
 MAILING LISTS
 -------------
