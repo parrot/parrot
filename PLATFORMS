@@ -22,7 +22,7 @@ linux-sparc64-gcc3.3.3  B8   Y    -    -     -   -   Y    -
 linux-x86-gcc2.95.2          Y    Y    Y     Y   Y   Y    Y     Y  20050804
 linux-x86-gcc3.3.3           Y    Y    Y     Y   Y   Y    Y     Y  20051001
 linux-x86-gcc3.3.3 *3        Y    Y    Y     Y   Y   Y    Y*3
-linux-x86-gcc3.3.5.2005013   Y    Y    -     -   Y   Y    Y        20050930
+linux-x86-gcc3.3.5.2005013   Y    Y    Y/2474-   Y   Y    Y        20050930
 linux-x86-icc8               Y    Y    Y     Y   Y   Y    Y
 linux-x86_64-gcc3.3.3    8   Y    -    -     Y   Y   Y    Y
 linux-x86_64-gcc3.4.2    8   Y    -    -     Y   Y   Y    Y        200505
