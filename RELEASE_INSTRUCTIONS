@@ -61,6 +61,9 @@ To prepare a release:
     9.  Compose and send out the announcements--perl6-internals,
         -language, -announce, perl5-porters, use Perl, PerlMonks,
         comp.lang.perl.misc, etc.
+
+    9a. Submit the use Perl announcement story to Slashdot, Newsforge, etc.
+
 	Don't forget to set a Reply-To: or Followup-To: header.
 
     10. You're done!  Help yourself to a beer, cola or other
