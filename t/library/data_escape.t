@@ -265,29 +265,25 @@ ok
 OUT
 }
 
-SKIP: {
-#skip 'can\'t escape unicode yet' => 1;
+my @codes = qw/ 0666 0777 0888 0999 6666 7777 8888 9999/;
 
-	my @codes = qw/ 0666 0777 0888 0999 6666 7777 8888 9999/;
-
-	my $unicode_test = $PRE . << 'CODE' . $POST;
-		.local string str
-		str = unicode:"\u%s"
-		str = escape_string( str, '"' )
-		print str
-		goto END
+my $unicode_test = $PRE . << 'CODE' . $POST;
+	.local string str
+	str = unicode:"\u%s"
+	str = escape_string( str, '"' )
+	print str
+	goto END
 CODE
 
-	foreach my $codepoint (@codes) {
-		pir_output_is(
-			(sprintf $unicode_test, $codepoint),
-			(sprintf "\\u%s", $codepoint),
-			"escape_string: unicode: $codepoint"
-		);
-	}
+foreach my $codepoint (@codes) {
+	pir_output_is(
+		(sprintf $unicode_test, $codepoint),
+		(sprintf "\\x{%i}\n", $codepoint),
+		"escape_string: unicode: $codepoint"
+	);
 }
 
 ## don't forget to change the number of tests!
-BEGIN { plan tests => 15; }
+BEGIN { plan tests => 22; }
 
 # vim: ft=imc :
