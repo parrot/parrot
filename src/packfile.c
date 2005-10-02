@@ -325,6 +325,7 @@ do_1_sub_pragma(Parrot_Interp interpreter, PMC* sub_pmc, int action)
                          - code) / sizeof(opcode_t*);
                     interpreter->resume_offset = start_offs;
                     PObj_get_FLAGS(sub_pmc) &= ~SUB_FLAG_PF_MAIN;
+                    CONTEXT(interpreter->ctx)->current_sub = sub_pmc;
                 }
                 else {
                     /* XXX which warn_class */

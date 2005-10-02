@@ -471,6 +471,10 @@ Introspection interface. C<key> can be:
                 real_exception(interpreter, NULL, E_ValueError,
                         "No such caller depth");
             ctx = PMC_cont(cont)->to_ctx;
+            if (!CONTEXT(ctx)->current_sub)
+                real_exception(interpreter, NULL, E_ValueError,
+                        "No such caller depth");
+
         }
         s = CONST_STRING(interpreter, "sub");
         if (string_equal(interpreter, item, s) == 0)

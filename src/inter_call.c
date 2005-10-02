@@ -788,6 +788,12 @@ parrot_pass_args_fromc(Interp *interpreter, const char *sig,
     struct call_state st;
 
     if (dest[0] != PARROT_OP_get_params_pc) {
+        /*
+         * main is now started with runops_args_fromc too
+         * PASM subs usually don't have get_params
+         * XXX we could check, if we are running main
+         */
+        return dest;
         real_exception(interpreter, NULL, E_ValueError,
                 "no get_params in sub");
     }

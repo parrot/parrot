@@ -50,7 +50,6 @@ Parrot_new(Parrot_Interp parent)
 
 extern void Parrot_initialize_core_pmcs(Interp *interp);
 
-static void set_current_sub(Interp *interpreter);
 /*
 
 =item C<void Parrot_init(Interp *interpreter)>
@@ -450,16 +449,16 @@ Parrot_loadbc(Interp *interpreter, struct PackFile *pf)
 
 /*
 
-=item C<static void
+=item C<static PMC*
 setup_argv(Interp *interpreter, int argc, char ** argv)>
 
-Sets up the C<ARGS> array in P5.
+Creates and returns C<ARGS> array PMC.
 
 =cut
 
 */
 
-static void
+static PMC*
 setup_argv(Interp *interpreter, int argc, char ** argv)
 {
     INTVAL i;
@@ -494,46 +493,7 @@ setup_argv(Interp *interpreter, int argc, char ** argv)
 
         VTABLE_push_string(interpreter, userargv, arg);
     }
-    /*
-     * place empty return continuation in context, so that returncc
-     * will terminate the main run loop
-     * XXX for now still place in P1 until return opcodes are everywhere
-     */
-    CONTEXT(interpreter->ctx)->current_cont = cont =
-        new_ret_continuation_pmc(interpreter, NULL);
-    /* clear segment to denote the end of chain */
-    PMC_cont(cont)->seg = NULL;
-    /* the continuation keeps the initial context alive */
-    PMC_cont(cont)->from_ctx = interpreter->ctx;
-    PMC_cont(cont)->to_ctx = interpreter->ctx;
-    /*
-     * TODO replace interpreter startup with runops_args_fromc
-     * This needs the following changes:
-     * - inter_create: place a dummy Sub with offset 0 in initial context->current_sub
-     * - during packfile loading, if a sub is labeled SUB_FLAG_PF_MAIN, replace it
-     * - remove  set_current_sub
-     * - run the sub with argv, instead of runops_args
-     */
-
-    /*
-     * set current subroutine
-     */
-    set_current_sub(interpreter);
-
-    /*
-     * create signature and flags array
-     */
-    signature = const_string(interpreter, "(2)");
-    class = Parrot_base_vtables[enum_class_FixedIntegerArray]->class;
-    sig_arr = VTABLE_new_from_string(interpreter, class, signature,
-            PObj_constant_FLAG);
-    const_nr = PDB_extend_const_table(interpreter);
-    interpreter->code->const_table->constants[const_nr]->type = PFC_PMC;
-    interpreter->code->const_table->constants[const_nr]->u.key = sig_arr;
-    opcodes[0] = PARROT_OP_set_args_pc;
-    opcodes[1] = const_nr;
-    opcodes[2] = 5;     /* REG_PMC(5) */
-    CONTEXT(interpreter->ctx)->current_args = opcodes;
+    return userargv;
 }
 
 /*
@@ -739,7 +699,7 @@ print_debug(int status, void *p)
     }
 }
 
-static void
+static PMC*
 set_current_sub(Interp *interpreter)
 {
     opcode_t i, ci;
@@ -772,16 +732,18 @@ set_current_sub(Interp *interpreter)
                 if (offs == interpreter->resume_offset) {
                     CONTEXT(interpreter->ctx)->current_sub = sub_pmc;
                     CONTEXT(interpreter->ctx)->current_HLL = sub->HLL_id;
-                    return;
+                    return sub_pmc;
                 }
                 break;
         }
     }
     /*
-     * if we didn't find anything put an Undef PMC into current_sub
+     * if we didn't find anything put a dummy PMC into current_sub
      */
-    sub_pmc = pmc_new(interpreter, enum_class_Undef);
+    sub_pmc = pmc_new(interpreter, enum_class_Sub);
+    PMC_sub(sub_pmc)->address = interpreter->code->base.data;
     CONTEXT(interpreter->ctx)->current_sub = sub_pmc;
+    return sub_pmc;
 }
 
 /*
@@ -798,6 +760,8 @@ Sets up C<ARGV> and runs the ops.
 void
 Parrot_runcode(Interp *interpreter, int argc, char *argv[])
 {
+    PMC *userargv, *main_sub;
+
     if (!interpreter->lo_var_ptr) {
         int top;
         if (Interp_debug_TEST(interpreter, PARROT_START_DEBUG_FLAG)) {
@@ -846,7 +810,7 @@ Parrot_runcode(Interp *interpreter, int argc, char *argv[])
     }
 
     /* Set up @ARGS (or whatever this language calls it) in P5. */
-    setup_argv(interpreter, argc, argv);
+    userargv = setup_argv(interpreter, argc, argv);
 
 #if EXEC_CAPABLE
 
@@ -866,7 +830,15 @@ Parrot_runcode(Interp *interpreter, int argc, char *argv[])
     Parrot_on_exit(print_profile, interpreter);
 
     /* Let's kick the tires and light the fires--call interpreter.c:runops. */
-    runops(interpreter,  interpreter->resume_offset);
+    main_sub = CONTEXT(interpreter->ctx)->current_sub;
+    /*
+     * if no sub was marked being :main, we create a dummy sub with offset 0
+     */
+    if (!main_sub) {
+        main_sub = set_current_sub(interpreter);
+    }
+    CONTEXT(interpreter->ctx)->current_sub = NULL;
+    Parrot_runops_fromc_args(interpreter, main_sub, "vP", userargv);
 }
 
 

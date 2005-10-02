@@ -88,6 +88,7 @@ ok 2
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "access argv");
+    get_params "(0)", P5
     .include "iglobals.pasm"
     getinterp P1
     set P2, P1[.IGLOBALS_ARGV_LIST]

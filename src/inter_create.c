@@ -488,6 +488,8 @@ make_interpreter(Parrot_Interp parent, Interp_flags flags)
     }
     create_initial_context(interpreter);
     interpreter->resume_flag = RESUME_INITIAL;
+    /* main is called as a Sub too - this will get depth 0 then */
+    CONTEXT(interpreter->ctx)->recursion_depth = -1;
     interpreter->recursion_limit = 1000;
 
     /* Must initialize flags here so the GC_DEBUG stuff is available before
