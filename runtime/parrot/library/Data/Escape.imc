@@ -130,7 +130,7 @@ esc_oct:
 esc_unicode:
     $P0 = new .ResizableIntegerArray
     push $P0, test_char_ord
-    tmp = sprintf "\\x{%d}", $P0
+    tmp = sprintf "\\x{%x}", $P0
     # fall though to DONE
 DONE:
     concat return, tmp
