@@ -117,14 +117,21 @@ escape_quote_char:
     branch DONE
 
 default:
+    if test_char_ord >= 256 goto esc_unicode
+    if test_char_ord >= 128 goto esc_oct
     is_alphanum = is_cclass mask, tmp, 0
     if is_alphanum goto DONE
+esc_oct:
     ## otherwise encode the value as an octal number
     $P0 = new .ResizableIntegerArray
     push $P0, test_char_ord
     tmp = sprintf "\\%03o", $P0
     branch DONE
-
+esc_unicode:
+    $P0 = new .ResizableIntegerArray
+    push $P0, test_char_ord
+    tmp = sprintf "\\x{%d}", $P0
+    # fall though to DONE
 DONE:
     concat return, tmp
     inc index
