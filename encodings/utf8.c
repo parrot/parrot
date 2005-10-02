@@ -411,8 +411,20 @@ static STRING *
 get_codepoints(Interp *interpreter, STRING *src,
 	UINTVAL offset, UINTVAL count)
 {
-    STRING *return_string = NULL;
-    UNIMPL;
+    String_iter iter;
+    UINTVAL start;
+    STRING *return_string = Parrot_make_COW_reference(interpreter,
+	    src);
+    return_string->encoding = src->encoding;
+    return_string->charset = src->charset;
+    iter_init(interpreter, src, &iter);
+    iter.set_position(interpreter, &iter, offset);
+    start = iter.bytepos;
+    return_string->strstart = (char *)return_string->strstart + start ;
+    iter.set_position(interpreter, &iter, offset + count);
+    return_string->bufused = iter.bytepos - start;
+    return_string->strlen = count;
+    return_string->hashval = 0;
     return return_string;
 }
 

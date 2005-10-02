@@ -266,7 +266,7 @@ OUT
 }
 
 SKIP: {
-	skip 'can\'t escape unicode yet' => 1;
+#skip 'can\'t escape unicode yet' => 1;
 
 	my @codes = qw/ 0666 0777 0888 0999 6666 7777 8888 9999/;
 
