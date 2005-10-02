@@ -268,7 +268,7 @@ OUT
 SKIP: {
 	skip 'can\'t escape unicode yet' => 1;
 
-	my @codes = qw/ 666 777 888 999 6666 7777 8888 9999/;
+	my @codes = qw/ 0666 0777 0888 0999 6666 7777 8888 9999/;
 
 	my $unicode_test = $PRE . << 'CODE' . $POST;
 		.local string str
