@@ -55,6 +55,16 @@ die, die(in INT), die_hard(int INT, in INT)
   really nice. Therefore die_hard with be renamed to die, the 2 argument
   form of die survives.
 
+String character class opcodes is_* find_* and API interfaces
+
+  The opcodes C<is_digit>, C<find_digit> et al and the according APIs are
+  covered by the more universal C<is_cclass>, C<find_cclass>, and
+  C<find_not_cclass> opcodes.
+
+C<pack> opcodes
+
+  I've no clue what these are doing - for sure not a perl-ish pack.
+
 Deprecated PIR directives and shortcuts.
 
 
