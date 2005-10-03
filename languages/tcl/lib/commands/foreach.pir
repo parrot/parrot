@@ -77,7 +77,6 @@ arg_done:
   iterator = 0
 loop_outer:
   if iterator >= max_size goto done
-  new_pad 0
   
   .local int counter,end_counter
   counter = -1
@@ -122,7 +121,6 @@ loop_inner_done_good:
 loop_inner_done:
   if got_one == 1 goto loop_outer_continue
   # there was nothing in this set of iterators. 
-  pop_pad  #XXX NEEDED?
   goto loop_outer_done 
  
   # Loop until all elements are consumed. If any of the lists that were
@@ -132,10 +130,9 @@ loop_inner_done:
   # Handle [break] and [continue]
 loop_outer_continue:
   push_eh handle_continue
-    retval = parsed."interpret"()
+    retval = parsed()
   clear_eh
 
-  pop_pad  #XXX NEEDED?
 do_next:
   inc iterator
   goto loop_outer

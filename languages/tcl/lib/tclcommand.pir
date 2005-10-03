@@ -40,7 +40,6 @@ Initialize the attributes for an instance of the class
 
 Execute the command.
 
-=cut
 
 .sub interpret method
   .local pmc retval
@@ -100,16 +99,21 @@ no_command_non_interactive:
   .throw($S0)
 .end
 
+=cut
+
 .sub compile method
    .param int register_num
+ 
+   #.local int eh_num
+   #eh_num = register_num
 
-   $P22 = getattribute self, "TclCommand\x00name"
-
+   #inc register_num
+ 
    .local pmc compile
    compile = find_global "_Tcl", "compile"
 
    .local string pir_code
-   pir_code = ""
+   pir_code = ".include \"languages/tcl/lib/returncodes.pir\"\n"
 
    .local string retval
    # Generate partial code for each of our arguments
@@ -127,15 +131,19 @@ arg_loop:
    register_num = result_reg + 1
    pir_code .= retval 
    inc ii 
+   goto arg_loop
 arg_loop_done:
    # Generate code that will invoke our name'd command.
-   pir_code .= ".local pmc command,name\n"
+   pir_code .= ".local pmc command\n"
+
    # XXX Need to trap a missing command
    # Need to actually compile our name, as it might not be constant.
 
    .local pmc name
    name = getattribute self, "TclCommand\x00name"
-   (register_num,retval) = compile(name,register_num)
+   .local int name_register
+   (name_register,retval) = compile(name,register_num)
+   register_num = name_register
 
    pir_code .= retval
    $S1 = "$P"
@@ -158,13 +166,19 @@ arg_loop_done:
    pir_code .= " = \"&\" . "
    pir_code .= $S2
    pir_code .= "\n"
-  
-   pir_code .= "\ncommand = find_global \"Tcl\", "
-   pir_code .= $S2
-   pir_code .= "\n$P"
 
+   pir_code .= "push_eh bad_command"
+   $S0 = register_num
+   pir_code .= $S0
+   pir_code .= "\n"
+   pir_code .= "command = find_global \"Tcl\", "
+   pir_code .= $S2
+   pir_code .= "\nclear_eh\nif_null command, bad_command"
+   pir_code .= $S0
+   pir_code .= "\n$P"
    pir_code .= $S0
    pir_code .= " = command("
+
    ii = 0
 elem_loop:
    if ii == num_args goto elem_loop_done   
@@ -176,8 +190,31 @@ elem_loop:
    pir_code .= ","
    goto elem_loop 
 elem_loop_done:
-   pir_code .= ")\n"
+   pir_code .= ")\ngoto resume"
+   $S0 = register_num
+   pir_code .= $S0
+   pir_code .="\n" 
+   pir_code .= "bad_command"
+   pir_code .= $S0
+   pir_code .= ":\n$S"
+   pir_code .= $S0
+   pir_code .= "=$P"
+   $S1 = name_register
+   pir_code .= $S1
+   pir_code .= "\n$S"
+   pir_code .= $S0
+   pir_code .= "=concat \"invalid command name \\\"\" ,"
+   pir_code .= "$S"
+   pir_code .= $S0
+   pir_code .= "\n$S"
+   pir_code .= $S0
+   pir_code .= ".=\"\\\"\"\n.throw($S"
+   pir_code .= $S0
+   pir_code .= ")\n"  
 
+   pir_code .= "resume"
+   pir_code .= $S0
+   pir_code .= ":\n"
    # return the code and the new register_num 
   .return (register_num,pir_code)
 .end

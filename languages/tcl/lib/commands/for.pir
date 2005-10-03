@@ -31,17 +31,17 @@
   body_parsed  = parse(body_code)
 
   # first, execute start.
-  start_parsed."interpret"()
+  start_parsed()
 
 for_loop:
   # then execute body
   push_eh check_continue
-    body_parsed."interpret"()
+    body_parsed()
   clear_eh
 
 continue:
   # then execute next
-  next_parsed."interpret"()
+  next_parsed()
   # then check condition
   test_compiled = expression_p(test_code)
   retval = test_compiled()

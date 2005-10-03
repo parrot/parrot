@@ -104,7 +104,7 @@ done:
   $P1 = parse(code)
   register $P1
 
-  .return $P1."interpret"()
+  .return $P1()
 
 no_args:
   .throw("wrong # args: no expression after \"if\" argument")

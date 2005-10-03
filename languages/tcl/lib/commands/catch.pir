@@ -21,7 +21,7 @@
   code = argv[0]
   $P1 = parse(code)
   push_eh non_ok
-    code_retval = $P1."interpret"()
+    code_retval = $P1()
     retval = TCL_OK  # no exception => TCL_OK
   clear_eh
 

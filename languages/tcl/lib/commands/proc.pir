@@ -68,9 +68,9 @@ got_args:
   proc_body  = ".namespace [\"Tcl\"]\n.sub \"&"
   proc_body .= name
   proc_body .= "\"\n"
-  proc_body .= ".param pmc args :slurpy\n  new_pad 1\n  "
+  proc_body .= ".param pmc args :slurpy\n"
   proc_body .= "  .include \"languages/tcl/lib/returncodes.pir\"\n  " 
-  proc_body .= ".local pmc call_level\n  call_level = find_global \"_Tcl\", \"call_level\"\n  inc call_level\n  "
+  proc_body .= ".local pmc call_level\n  call_level = find_global \"_Tcl\", \"call_level\"\n  inc call_level\n  new_pad -1\n"
   .local int arg_count
   arg_count = args_p
   .local int ii,is_slurpy
@@ -170,33 +170,28 @@ done_args:
   proc_body .= "\n"
   proc_body .= "ARGS_OK:\n"
 
-  # XXX Is the pop_pad necessary, or would it be  handled as a side
-  #  effect of the .return?
-
   proc_body .= "  push_eh is_return\n"
-  proc_body .= "    $P0 = proc_body.\"interpret\"()\n"
+  proc_body .= "    $P0 = proc_body()\n"
   proc_body .= "  clear_eh\n"
   proc_body .= "was_ok:\n"
   proc_body .= "  dec call_level\n"
-  proc_body .= "  pop_pad\n"
   proc_body .= "  .return($P0)\n"
   proc_body .= "not_return_nor_ok:\n"
   proc_body .= "  dec call_level\n"
-  proc_body .= "  pop_pad\n"
   proc_body .= "  .throw(P5)\n"
   proc_body .= "is_return:\n"
   proc_body .= "  .get_return_code(P5,$I0)\n"
   proc_body .= "  if $I0 != TCL_RETURN goto not_return_nor_ok\n"
   proc_body .= "  $P0 = P5[VALUE_SLOT]\n"
   proc_body .= "  dec call_level\n"
-  proc_body .= "  pop_pad\n"
   proc_body .= "  .return ($P0)\n"
   proc_body .= ".end\n"
+ 
+  #print proc_body
 
   .local pmc pir_compiler
   pir_compiler = compreg "PIR"
   $P0 = pir_compiler(proc_body)
-
 
   # XXX because of the current implementation of the PIR compiler, we must save a reference
   # to our newly compiled function or run the risk of having it garbage collected

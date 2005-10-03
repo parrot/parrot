@@ -29,7 +29,7 @@ while_loop:
   retval = compiled_condition()
   unless retval goto done
   push_eh handle_continue
-    retval = parsed_code."interpret"()
+    retval = parsed_code()
   clear_eh
 
   goto while_loop

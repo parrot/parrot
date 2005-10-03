@@ -261,11 +261,12 @@ done:
 
 Get the value of the const.
 
-=cut
 
 .sub interpret method
     .return(self)
 .end
+
+=cut
 
 =head2 compile
 
@@ -275,15 +276,13 @@ Generate PIR code which can be used to generate our value
 
 .sub compile method
    .param int argnum
-   
-   .local string code
-
+  
    .local pmc value
    $I0 = classoffset self, "TclConst"
    value = getattribute self, $I0
 
    .local pmc compiler
    compiler = find_global "_Tcl", "compile"
- 
+
    .return compiler(value,argnum)
 .end

@@ -34,7 +34,7 @@ run:
   $I1 = count
 loop:
   if $I1 == 0 goto done
-  $P0 = $P1."interpret"()
+  $P0 = $P1()
   dec $I1
   goto loop
 

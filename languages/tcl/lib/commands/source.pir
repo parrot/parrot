@@ -38,7 +38,7 @@ loop:
 
 gotfile:
   $P1 = parse(contents)
-  .return $P1."interpret"()
+  .return $P1()
 
 badfile:
   $S0 = "couldn't read file \""

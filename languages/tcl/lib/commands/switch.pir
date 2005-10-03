@@ -101,7 +101,7 @@ body_match:
   .local pmc parse
   parse = find_global "_Tcl", "parse"
   $P0 = parse(code)
-  .return $P0."interpret"()
+  .return $P0()
 
 bad_args:
   .throw("wrong # args: should be \"switch ?switches? string pattern body ... ?default body?\"")

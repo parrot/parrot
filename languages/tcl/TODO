@@ -10,6 +10,37 @@ http://cvs.sourceforge.net/viewcvs.py/tcl/tcl/library/tcltest/tcltest.tcl?view=m
 This will require a lot of work. On the plus side, we'll be passing a lot more
 tests by then. =-)
 
+Also on the table right now is converting to a compiler. This is mostly done,
+with a few caveats and TODOs.
+
+=over 4
+
+=item 0
+
+Remove all the (now) dead "interpret" code.
+
+=item 1
+
+Generate compiler-variants for several builtins, esp. the flow control
+commands like C<while>. Easy ones like C<incr> should be done as well.
+Modify the compiler for tclcommand to generate the inline version if
+it's available. (C<proc> and C<expr> should also be straightforward, as they
+already compile anyway.)
+
+=item 2
+
+When an inline compiled version exists, use it, but IFF a global counter
+indicates no procs have been redifined.  Update proc and rename to increment
+this counter whenever they are called.
+
+=item 3
+
+provide a command line to tcl.pbc (C<-o>?) that collects the PIR and dumps it,
+instead of compiling and executing it. Perhaps the option could be smart enough
+to see if it was being sent to a PBC or a PIR output.
+
+=back
+
 =head2 Generic tasks
 
 =over 4
@@ -61,8 +92,12 @@ Perhaps via [namespace import]? Can fake it right now with [inline]
 
 =item [expr]
 
+clean up the generated expr subs so that they use a unique id. (in add
+to being anon)
+
 Add "is_const" global which checks to see if something is, in fact,
-constant. (which will allow us to then constant fold)
+constant. (which will allow us to then constant fold. Leo assures us
+that constant folding isn't necessary at the language level, but.)
 
 TBD: ternary op
 

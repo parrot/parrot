@@ -249,7 +249,7 @@ providing a compreg-compatible method.
   pir_code .= tcl_code
   pir_code .= "\"\n.local pmc parse\n"
   pir_code .= "parse = find_global \"_Tcl\", \"parse\"\n"
-  pir_code .= "$P1 = parse(code)\n.return $P1.\"interpret\"()\n.end\n"
+  pir_code .= "$P1 = parse(code)\n.return $P1()\n.end\n"
 
   $P1 = pir_compiler(pir_code)
   .return ($P1)

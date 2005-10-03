@@ -19,7 +19,6 @@ Define the attributes required for the class.
 
 Get the value of the variable.
 
-=cut
 
 .sub interpret method
     .local pmc read
@@ -28,10 +27,13 @@ Get the value of the variable.
     .return read($S0)
 .end
 
+=cut
+
 .sub compile method
     .param int register_num
 
     .local string pir_code
+    pir_code = ""
     .local pmc args
  
     args = new .Array
@@ -39,10 +41,18 @@ Get the value of the variable.
     args[0] = register_num
     $S0 = self
     args[1] = $S0
-    args[2] = register_num
-    args[3] = register_num
 
-    pir_code = sprintf ".local pmc read\nread=find_global \"_Tcl\", \"__read\"\n.local pmc number\nnumber=find_global \"_Tcl\", \"__number\"\n$P%i = read(\"%s\")\n$P%i = number($P%i)\n", args
-  
+    $S1 = sprintf ".local pmc read\nread=find_global \"_Tcl\", \"__read\"\n$P%i = read(\"%s\")\n", args
+    pir_code .= $S1 
+ 
     .return (register_num,pir_code)
 .end
+
+.sub __clone method
+  .local pmc obj
+  $I0 = typeof self
+  obj = new $I0
+  obj = self
+  .return(obj)
+.end
+

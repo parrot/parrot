@@ -48,6 +48,20 @@
   $P1[5] = register_num
   op_code = sprintf .FORMAT, $P1
   pir_code = l_code . r_code
+  pir_code .= ".local pmc number\n"
+  pir_code .= "number = find_global \"_Tcl\", \"__number\"\n"
+  $S99 = "$P%i = number($P%i)\n"
+  $P1 = 2
+  $P1[0] = l_reg
+  $P1[1] = l_reg
+  $S98 = sprintf $S99, $P1
+  pir_code .= $S98 
+  $P1 = 2
+  $P1[0] = r_reg
+  $P1[1] = r_reg
+  $S98 = sprintf $S99, $P1
+  pir_code .= $S98 
+
   pir_code .= op_code
   goto done
 .endm 
@@ -111,6 +125,7 @@ Initialize the attributes for an instance of the class
   .param int register_num
 
   .local string pir_code
+  pir_code=""
 
   .local pmc retval
   retval = new TclInt

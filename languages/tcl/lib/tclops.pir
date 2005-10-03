@@ -29,6 +29,8 @@ Initialize the attributes for an instance of the class
   setattribute self, "TclUnaryOp\x00operand", $P0
 .end
 
+=for cut
+
 .sub interpret method
   .local pmc retval
   retval = new TclInt
@@ -63,10 +65,13 @@ done:
 
 .end
 
+=cut
+
 .sub compile method
   .param int register_num
 
   .local string pir_code
+  pir_code = ""
 
   .local pmc retval
   retval = new TclInt
@@ -115,3 +120,12 @@ done:
   .return(register_num, pir_code)
 
 .end
+
+.sub __clone method
+  .local pmc obj
+  $I0 = typeof self
+  obj = new $I0
+  obj = self
+  .return(obj)
+.end
+

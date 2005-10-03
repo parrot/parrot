@@ -48,7 +48,7 @@ input_loop:
   unless STDIN goto done
   push_eh loop_error
     $P1 = parse(input_line)
-    retval = $P1."interpret"()
+    retval = $P1()
   clear_eh
   # print out the result of the evaluation.
   if_null retval, input_loop_continue
@@ -124,7 +124,7 @@ got_prompt:
   push_eh no_prompt
     $P0 = find_global "Tcl", varname
     $P1 = parse($P0)
-    $P1."interpret"()
+    $P1()
   clear_eh
 
   STDOUT."flush"()

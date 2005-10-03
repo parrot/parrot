@@ -52,7 +52,7 @@ loop_done:
 
   $P1 = parse(expr,0,0)
   # can't quite tailcall this at the moment due to the hackish call_level
-  $P0 = $P1."interpret"()
+  $P0 = $P1()
 
   #restore the old level
   store_global "_Tcl", "call_level", old_call_level

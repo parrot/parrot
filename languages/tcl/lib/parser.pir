@@ -90,7 +90,24 @@ done_comment:
   goto next_command
  
 done:
-  .return(commands)
+  .local pmc pir_compiler
+  .local int result_reg
+  .local string pir_code
+
+  (result_reg,pir_code) = "compile"(commands,0)
+
+  $P1 = new .Array
+  $P1 = 2
+  $P1[0] = pir_code
+  $P1[1] = result_reg
+
+  sprintf pir_code, ".pragma n_operators 1\n.sub blah @ANON\n%s.return ($P%s)\n.end\n", $P1
+
+  #print pir_code
+
+  pir_compiler = compreg "PIR"
+  
+  .return pir_compiler(pir_code)
 .end
 
 =item C<int pos = skip_comment(string tcl_code, int pos)>
@@ -631,14 +648,19 @@ and generate the code for it.
 
   if $I0 goto can_compile
 
-  .local string thing_type,quote_char
+  .local string thing_type,lquote,rquote
   thing_type = typeof thing
-  quote_char = "" 
+  lquote = ""
+  rquote = ""
   if thing_type == "TclString" goto stringish
   if thing_type == "String" goto    stringish
   goto set_args
 stringish:
-  quote_char = "\"" 
+  $P1 = find_global "Data::Escape", "String"
+  thing = $P1(thing,"\"")
+
+  lquote = "\""  # might eventually put unicode: here.
+  rquote = "\"" 
 set_args:
 
   .local pmc printf_args
@@ -647,9 +669,9 @@ set_args:
   printf_args[0] = register_num
   printf_args[1] = thing_type
   printf_args[2] = register_num
-  printf_args[3] = quote_char
+  printf_args[3] = lquote
   printf_args[4] = thing
-  printf_args[5] = quote_char
+  printf_args[5] = rquote
  
   pir_code = sprintf "$P%i = new .%s\n$P%i=%s%s%s\n", printf_args
 
@@ -662,4 +684,5 @@ can_compile:
 =back
 
 =cut
+
 
