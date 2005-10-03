@@ -231,12 +231,10 @@ OUT
 }
 
 
-SKIP: {
-	skip 'currently causes bus error' => 1;
-pir_output_is($PRE . <<'CODE' . $POST, <<'OUT', "escape_string: freeze a simple pmc" );
+pir_output_is($PRE . <<'CODE', <<'OUT', "escape_string: freeze a simple pmc" );
   .local pmc original_pmc
   original_pmc = new String
-  original_pmc = "ok"
+  original_pmc = "ok\n"
 
   .local string frozen_pmc
   frozen_pmc = freeze original_pmc
@@ -245,25 +243,21 @@ pir_output_is($PRE . <<'CODE' . $POST, <<'OUT', "escape_string: freeze a simple 
   escaped_frozen_pmc = escape_string( frozen_pmc, '"' )
 
   .local string pir_code
-  pir_code = ".sub test @ANON\n$P1 = thaw \"%s\"\nprint $P1\n.end\n"
+  pir_code = ".sub test @ANON\n$P1 = thaw binary:\""
 
-  .local pmc printf_args
-  printf_args = new Array
-  printf_args = 1
-  printf_args[0] = escaped_frozen_pmc
-
-  pir_code = sprintf pir_code, printf_args
+  pir_code .= escaped_frozen_pmc
+  pir_code .= "\"\nprint $P1\n.end\n"
 
   .local pmc pir_compiler
   pir_compiler = compreg "PIR"
 
   .local pmc compiled_sub
-  compiled_sub = pir_compiler($S3)
+  compiled_sub = pir_compiler(pir_code)
   compiled_sub()
+.end
 CODE
 ok
 OUT
-}
 
 my @codes = qw/ 0666 0777 0888 0999 6666 7777 8888 9999/;
 
