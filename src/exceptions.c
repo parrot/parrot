@@ -247,6 +247,16 @@ find_exception_handler(Interp * interpreter, PMC *exception)
         (void)stack_pop(interpreter, &CONTEXT(interpreter->ctx)->control_stack,
                         NULL, e->entry_type);
         if (e->entry_type == STACK_ENTRY_PMC) {
+            /*
+             * During interpreter creation there is an initial context
+             * and the context of :main, created by runops_fromc_args
+             * Therefore, it seems, we have the main context twice
+             * and an exception handler in main can catch the same
+             * exception twich e.g. after rethrow
+             *
+             * work around - invalidate entry_type
+             */
+            e->entry_type = NO_STACK_ENTRY_TYPE;
             handler = UVal_pmc(e->entry);
             if (handler && handler->vtable->base_type ==
                     enum_class_Exception_Handler) {
