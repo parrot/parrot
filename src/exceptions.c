@@ -254,7 +254,9 @@ find_exception_handler(Interp * interpreter, PMC *exception)
              * and an exception handler in main can catch the same
              * exception twich e.g. after rethrow
              *
-             * work around - invalidate entry_type
+             * The same problem can arise after a tailcall.
+             *
+             * So invalidate entry_type.
              */
             e->entry_type = NO_STACK_ENTRY_TYPE;
             handler = UVal_pmc(e->entry);
