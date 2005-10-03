@@ -214,7 +214,8 @@ V: 0.3.0
 N: Tcl ("partcl")
 A: Will Coleda
 A: Matt Diephouse
-S: passes about 10% of *tcl*'s test suite (modulo clock)
+S: Some tests failing after switch to compiler.
+S: passes about 10% of *tcl*'s test suite (modulo clock).
 M: Yes
 V: 0.3.0
 
