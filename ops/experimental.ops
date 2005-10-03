@@ -276,7 +276,7 @@ inline op is_cclass(out INT, in INT, in STR, in INT) {
 Set $1 to the offset of the first codepoint matching
 the character class(es) given by $2 in string $3, starting
 at offset $4 for up to $5 codepoints.  If no matching
-character is found, set $1 to -1.
+character is found, set $1 to (offset + count).
 
 =cut
 
@@ -290,7 +290,7 @@ inline op find_cclass(out INT, in INT, in STR, in INT, in INT) {
 Set $1 to the offset of the first codepoint not matching
 the character class(es) given by $2 in string $3, starting
 at offset $4 for up to $5 codepoints.  If the substring
-consists entirely of matching characters, set $1 to -1.
+consists entirely of matching characters, set $1 to (offset + count).
 
 =cut
 
