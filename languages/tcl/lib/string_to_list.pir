@@ -6,6 +6,8 @@
   .local pmc retval
   retval = new TclList
 
+  .include "cclass.pasm"
+
   .local int pos, len
   # we're going to increment before we use it, so set it to 0-1
   pos = -1
@@ -13,7 +15,7 @@
 
 eat_space:
   inc pos
-  $I0 = is_whitespace str, pos
+  $I0 = is_cclass .CCLASS_WHITESPACE, str, pos
   if $I0 == 1 goto eat_space
 
 loop:
@@ -30,7 +32,7 @@ not_list:
   
   $I1 = ord str, $I0
   if $I1 == 92 goto not_list_backslash
-  $I1 = is_whitespace str, $I0
+  $I1 = is_cclass .CCLASS_WHITESPACE, str, $I0
   if $I1 == 1 goto extract
   
   inc $I0

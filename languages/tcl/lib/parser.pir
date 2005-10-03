@@ -27,7 +27,9 @@ commands, one at a time (skipping over comments).
   
   .local int len
   len = length tcl_code
-  
+ 
+  .include "cclass.pasm"
+ 
   # perform the backslash-newline substitution
   $I0 = -1
 loop:
@@ -42,7 +44,7 @@ loop:
 space:
   inc $I2
   if $I0 >= len goto get_commands
-  $I1 = is_whitespace tcl_code, $I2
+  $I1 = is_cclass .CCLASS_WHITESPACE, tcl_code, $I2
   if $I1 == 0 goto not_space
   goto space
 not_space:
@@ -200,7 +202,9 @@ contains only one.
   .param pmc    chars
   .param int    pos
   dec pos
-  
+ 
+  .include "cclass.pasm"
+ 
   .local int len
   len = length tcl_code
   
@@ -213,7 +217,7 @@ eat_space:
   $I0 = ord tcl_code, pos
   $I0 = exists chars[$I0]
   if $I0 == 1 goto done
-  $I0 = is_whitespace tcl_code, pos
+  $I0 = is_cclass .CCLASS_WHITESPACE, tcl_code, pos
   if $I0 == 1 goto eat_space
   
   if pos >= len goto done
@@ -239,7 +243,7 @@ default:
 loop:
   inc pos
   if pos >= len goto have_word
-  $I0 = is_whitespace tcl_code, pos
+  $I0 = is_cclass .CCLASS_WHITESPACE, tcl_code, pos
   if $I0 == 1 goto have_word
   
   $I0 = ord tcl_code, pos
@@ -388,7 +392,7 @@ missing_quote:
 check_chars:
   $I0 = pos + 1
   if $I0 == len goto done
-  $I1 = is_whitespace tcl_code, $I0
+  $I1 = is_cclass .CCLASS_WHITESPACE, tcl_code, $I0
   if $I1 == 1 goto done
   $I1 = ord tcl_code, $I0
   $I1 = exists chars[$I1]
@@ -455,7 +459,7 @@ missing_close_brace:
 check_chars:
   $I0 = pos + 1
   if $I0 == len goto done
-  $I1 = is_whitespace tcl_code, $I0
+  $I1 = is_cclass .CCLASS_WHITESPACE, tcl_code, $I0
   if $I1 == 1 goto done
   $I1 = ord tcl_code, $I0
   $I1 = exists chars[$I1]
@@ -555,7 +559,7 @@ name:
 char:
   inc pos
   if pos >= len goto check_length
-  $I0 = is_wordchar tcl_code, pos
+  $I0 = is_cclass .CCLASS_WORD, tcl_code, pos
   if $I0 goto char
   $I0 = ord tcl_code, pos
   if $I0 == 58 goto colon # :

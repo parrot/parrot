@@ -55,7 +55,7 @@ TCL
 can't set "x(0)": variable isn't array
 OUT
 
-# Tcl currently throughs an error for this code
+# Tcl currently throws an error for this code
 # but a bug has been filed for it at http://tcl.sf.net (#1227172)
 language_output_is('tcl', <<'TCL', <<'OUT', 'append unset variable');
  append x

@@ -17,6 +17,8 @@
   .local string current_arg, trimmed_string
   .local int start_pos,end_pos,str_length,current_char
 
+   .include "cclass.pasm"
+
   .local int first_time
   first_time = 1
 arg_loop:
@@ -36,7 +38,7 @@ loop_init:
 
 left_loop:
   if start_pos == end_pos goto right_done
-  $I0 = is_whitespace current_arg, start_pos
+  $I0 = is_cclass .CCLASS_WHITESPACE, current_arg, start_pos
   if $I0 == 0 goto left_done
   inc start_pos
   goto left_loop
@@ -45,7 +47,7 @@ left_done:
   dec end_pos
 
 right_loop:
-  $I0 = is_whitespace current_arg, end_pos
+  $I0 = is_cclass .CCLASS_WHITESPACE, current_arg, end_pos
   if $I0 == 0 goto right_done
   dec end_pos
   goto right_loop

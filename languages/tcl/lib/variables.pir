@@ -37,7 +37,7 @@ array:
   len -= 2
   inc char
   key = substr name, char, len
-  
+ 
   variable = __find_var(var)
   if_null variable, no_such_variable
   

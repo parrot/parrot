@@ -184,15 +184,17 @@ converter_done:
   start = pos
   len   = length expr
 
+  .include 'cclass.pasm'
+
   dec pos
 eat_space:
   inc pos
   if pos >= len goto fail
 
-  $I0 = is_whitespace expr, pos
+  $I0 = is_cclass .CCLASS_WHITESPACE, expr, pos
   if $I0 == 1 goto eat_space
 
-  $I0 = is_digit expr, pos
+  $I0 = is_cclass .CCLASS_NUMERIC, expr, pos
   if $I0 == 1 goto number
 
   $I0 = ord expr, pos
@@ -206,7 +208,7 @@ eat_space:
   if $I0 == 47 goto unary       # ~
   if $I0 == 33 goto unary       # !
 
-  $I0 = is_wordchar expr, pos
+  $I0 = is_cclass .CCLASS_WORD, expr, pos
   if $I0 == 1 goto function
 
 fail:
@@ -249,13 +251,15 @@ unary:
   # Global list of operator precedence
   precedences = find_global "_Tcl", "precedence"
 
+  .include "cclass.pasm"
+
   .local int len
   len = length expr
   dec pos
 eat_space:
   inc pos
   if pos >= len goto done
-  $I0 = is_whitespace expr, pos
+  $I0 = is_cclass .CCLASS_WHITESPACE, expr, pos
   if $I0 == 1 goto eat_space
 
   .local int op_len
