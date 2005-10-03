@@ -42,8 +42,8 @@ CODE
 /_test:
   set N(\d+), I0
   sub N0, N\1, N1
-  set N\1, I0
-  div N0, N\1, N1
+  set N(\d+), I0
+  div N0, N\2, N1
   set_returns
   returncc/
 OUT

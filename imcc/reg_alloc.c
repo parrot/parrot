@@ -891,38 +891,12 @@ allocate_wanted_regs(IMC_Unit * unit)
 static int
 ig_find_color(Interp* interpreter, IMC_Unit *unit, int x, char *avail)
 {
-    int c, t;
-    SymReg *r;
-    static const char types[] = "ISPN";
-
-    static const char assignable[4][5] = {
-       /* 0  1  2  3  4  */
-        { 0, 0, 0, 0, 0, },     /* I */
-        { 0, 0, 1, 1, 1, },     /* S */
-        { 0, 0, 0, 1, 1, },     /* P */
-        { 1, 1, 1, 1, 1, },     /* N */
-    };
-
+    int c;
 
     UNUSED(interpreter);
-    r = unit->reglist[x];
-    t = strchr(types, r->set) - types;
-
-    /* please note: c is starting at 1 for R0 */
-    if (!(r->usage & U_NON_VOLATILE)) {
-        /* 1) 5-15 volatile range
-         * XXX allocate down to work around continuation bug
-         * */
-        for (c = 16; c >= 6; c--)
-            if (avail[c])
-                return c;
-        /* some lower regs are usable too 0...4 */
-        for (c = 1; c <= 5; c++)
-            if (avail[c] && assignable[t][c - 1])
-                return c;
-    }
-    /* 2) try upper non-volatiles, 16...NUM_REGISTERS-1 */
-    for (c = 17; c <= NUM_REGISTERS; c++)
+    UNUSED(unit);
+    UNUSED(x);
+    for (c = 1; c <= NUM_REGISTERS; c++)
         if (avail[c])
             return c;
     return 0;
