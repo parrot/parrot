@@ -216,7 +216,7 @@ A: Will Coleda
 A: Matt Diephouse
 S: passes about 10% of *tcl*'s test suite (modulo clock)
 M: Yes
-V: Current
+V: 0.3.0
 
 N: unlamba
 A: Leopold Tötsch
