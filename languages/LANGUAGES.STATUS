@@ -1,3 +1,5 @@
+# $Id$
+
 If you submit a language compiler please write a one-liner that roughly
 indicates the state of your language. Where can the source be found?
 Does it have samples and do they work?
@@ -34,7 +36,7 @@ A: Bernhard Schmalhofer
 D: Based on ANTLR and Python
 S: very simple arithmetic expressions are working
 M: Yes
-V: 0.2.3
+V: 0.3.0
 
 N: befunge
 A: Jerome Quelin
@@ -108,7 +110,7 @@ S: Functioning for handcrafted test cases.
 S: Far from complete.
 S: Revision 0.0.11
 M: Yes
-V: 0.1.2
+V: 0.3.0
 
 N: miniperl
 
@@ -207,7 +209,7 @@ S: Functioning, as far as implemented. Lists and functions are working
 S: but many functions are missing implementation.
 S: Two test failures on Mac OS X and Linux
 M: Yes
-V: 0.0.11
+V: 0.3.0
 
 N: Tcl ("partcl")
 A: Will Coleda

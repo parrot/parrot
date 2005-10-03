@@ -78,9 +78,7 @@ This is executed when you call F<getopt_demo.imc>.
   NO_HELP_FLAG:
 
   # Say Hi
-  print "Hi, I am '"
-  print program_name
-  print "'.\n"
+  print "Hi, I am 'getopt_demo.imc'.\n"
   print "\n"
 
   # handle the bool option
