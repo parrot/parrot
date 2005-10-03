@@ -30,8 +30,6 @@ Call a sub with no return values.
   print " "
   print s
   print "\n"
-  .pcc_begin_return   # This syntax is going away soon
-  .pcc_end_return
 .end
 
 =head2 SEE ALSO

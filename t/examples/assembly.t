@@ -28,16 +28,11 @@ F<t/examples/japh.t>
 =cut
 
 use strict;
-use Parrot::Test tests => 2;
+use Parrot::Test tests => 1;
 use Test::More;
 
 # Set up expected output for examples
 my %expected = (
-    'sub.pasm'        =>  << 'END_EXPECTED',
-Hello from subroutine
-Hello from main
-END_EXPECTED
-
     'getopt_demo.imc'        =>  << 'END_EXPECTED',
 Hi, I am 'getopt_demo.imc'.
 

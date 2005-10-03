@@ -473,7 +473,6 @@ examples/assembly/queens_r.imc                    [main]doc
 examples/assembly/slurp.pasm                      [main]doc
 examples/assembly/small.xml                       [main]doc
 examples/assembly/stack.pasm                      [main]doc
-examples/assembly/sub.pasm                        [main]doc
 examples/assembly/substr.pasm                     [main]doc
 examples/assembly/sudoku.pir                      [main]doc
 examples/assembly/thr-primes.imc                  [main]doc
@@ -630,6 +629,7 @@ examples/sdl/tetris/boarddata.imc                 [main]doc
 examples/sdl/tetris/board.imc                     [main]doc
 examples/sdl/tetris/eventhandler.imc              [main]doc
 examples/sdl/tetris/tetris.imc                    [main]doc
+examples/subs/pasm_sub1.pasm                      [main]doc
 examples/subs/sub1.imc                            [main]doc
 examples/subs/sub2.imc                            [main]doc
 examples/subs/sub3.imc                            [main]doc

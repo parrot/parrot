@@ -3,15 +3,15 @@
 
 =head1 NAME
 
-examples/assembly/sub.pasm - Subroutines
+examples/subs/pasm_sub1.pasm - Parrot calling conventions
 
 =head1 SYNOPSIS
 
-    % ./parrot examples/assembly/sub.pasm
+    % ./parrot examples/subs/pasm_sub1.pasm
 
 =head1 DESCRIPTION
 
-Sample subroutines in Parrot.
+Sample subroutines in Parrot assembler.
 
 Shows you how to create a C<.Sub> and C<invokecc> it.
 

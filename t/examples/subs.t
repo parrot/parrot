@@ -24,11 +24,16 @@ F<t/examples/assembly.t>
 =cut
 
 use strict;
-use Parrot::Test tests => 3;
+use Parrot::Test tests => 4;
 use Test::More;
 
 # Set up expected output for examples
 my %expected = (
+    'pasm_sub1.pasm'        =>  << 'END_EXPECTED',
+Hello from subroutine
+Hello from main
+END_EXPECTED
+
     'sub1.imc'        =>  << 'END_EXPECTED',
 7 8 nine
 return: 10

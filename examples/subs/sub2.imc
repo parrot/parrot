@@ -28,11 +28,7 @@ Call a sub with multiple return values.
 .end
 
 .sub _foo
-  .pcc_begin_return
-  .return 10
-  .return 11
-  .return 12
-  .pcc_end_return
+  .return( 10, 11, 12 )
 .end
 
 =head2 SEE ALSO

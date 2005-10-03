@@ -39,9 +39,8 @@ Simple sub calls with 1 return value.
   print " "
   print s
   print "\n"
-  .pcc_begin_return    # This notation is going away soon
-  .return 10
-  .pcc_end_return
+
+  .return( 10 )
 .end
 
 =head2 SEE ALSO
