@@ -65,19 +65,30 @@ C<pack> opcodes
 
   I've no clue what these are doing - for sure not a perl-ish pack.
 
+rx_ opcodes, src/rx.c, and the intstack
+
+  The old rx_ (regex) opcodes are unused by PGE (and will not be used).
+  The opcodes are lacking state, rx code using these ops is not reentrant
+  due to the global intstack.
+  rx.c has yet another (ascii-only) character class handling, it leaks
+  memory and is just broken.
+
+
 Deprecated PIR directives and shortcuts.
 
-
-Stack calling convention PIR directives
+*Stack calling convention* PIR directives
 
 .param, .result, .arg, .return
+
+  Please note that this has nothing to do with the 'normal' usage of these
+  directives.
 
   All have a different functionality, if stack calling conventions are used.
   This leads to unneeded complexity in the parser and to nasty workarounds
   (.param works only directly after a .sub statement, .return var is always
   'save' and so on.
 
-  use save or restore instead
+  use the 'save' or 'restore' opcodes instead
 
 call xxx
 
