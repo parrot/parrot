@@ -731,8 +731,6 @@ CODE
 42.42
 OUTPUT
 
-SKIP: {
-	skip("MMD as method disabled", 5);
 pir_output_is(<<'CODE', <<'OUTPUT', "__add as method");
 .sub main @MAIN
     .local pmc d, l, r
@@ -780,6 +778,8 @@ CODE
 42.42
 OUTPUT
 
+SKIP: {
+	skip("bound method disabled", 1);
 pir_output_is(<<'CODE', <<'OUTPUT', "bound __add method");
 .sub main @MAIN
     .local pmc d, l, r, m
@@ -804,6 +804,7 @@ CODE
 42.42
 42
 OUTPUT
+}
 
 pir_output_is(<<'CODE', <<'OUTPUT', "Integer subclasses");
 .sub main @MAIN
@@ -838,7 +839,6 @@ CODE
 42
 42
 OUTPUT
-}
 
 pir_output_is(<<'CODE', <<'OUTPUT', "Integer subclasses, n_add");
 .sub main @MAIN

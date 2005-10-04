@@ -354,8 +354,8 @@ MMD_Integer: {
              *   e.g. MMD_Integer_EXACT
              */
 
-            INTVAL a = PMC_int_val(SELF);
-            INTVAL b = PMC_int_val(value);
+            INTVAL a = DYNSELF.get_integer();
+            INTVAL b = VTABLE_get_integer(INTERP, value);
             INTVAL c = a + b;
             if ((c^a) >= 0 || (c^b) >= 0) {
                 if (!dest)

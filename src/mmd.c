@@ -2072,7 +2072,7 @@ mmd_create_builtin_multi_meth_2(Interp *interpreter,
     /*
      * create NCI method in left class
      */
-    strcpy(signature, "vJP.P");
+    strcpy(signature, "PJP.P");
     signature[3] = val_sig;
     if (func_nr >= MMD_EQ && func_nr <= MMD_STRCMP) {
         signature[0] = 'I';

@@ -289,8 +289,14 @@ get_nci_S(Interp *interpreter, struct call_state *st, int n)
 static PMC*
 get_nci_P(Interp *interpreter, struct call_state *st, int n)
 {
-    assert(n < st->src.n);
-    Parrot_fetch_arg_nci(interpreter, st);
+    /*
+     * exessive args are passed as NULL
+     * used by e.g. MMD infix like __add
+     */
+    if (n < st->src.n)
+	Parrot_fetch_arg_nci(interpreter, st);
+    else
+	UVal_pmc(st->val) = NULL;
 
     return UVal_pmc(st->val);
 }
