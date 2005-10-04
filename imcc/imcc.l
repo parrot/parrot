@@ -66,6 +66,8 @@ static int expand_macro (YYSTYPE *valp, void *interp, const char *name);
 static void include_file (Interp* interp, char *file_name);
 static int in_pod;
 static int prev_state;
+static char *heredoc_end;
+static char *heredoc_content;
 
 #define YY_DECL int yylex(YYSTYPE *valp, Interp *interp)
 
@@ -112,6 +114,7 @@ SP              [ ]
 %x cmt3
 %x cmt4
 %x cmt5
+%x heredoc
 
 %%
         /* for emacs "*/
@@ -431,11 +434,57 @@ SP              [ ]
         return(STRINGC); /* XXX delete quotes, -> emit, pbc */
     }
 
+<*>"<<"{STRINGCONSTANT} {
+        /* Save the string we want to mark the end of the heredoc. */
+        heredoc_end = str_dup(yytext + 3);
+		heredoc_end[strlen(heredoc_end) - 1] = 0;
+
+		/* Start slurping up the heredoc. */
+		heredoc_content = mem_sys_allocate(2);
+		strcpy(heredoc_content, "\"");
+		prev_state = YYSTATE; 
+		BEGIN(heredoc);
+    }
+
+<heredoc>{EOL} {
+		/* Newline in the heredoc. Realloc and cat on, unless this is the
+		   newline after the <<"blah". */
+		if (heredoc_content[1] != 0)
+		{
+			heredoc_content = mem_sys_realloc(heredoc_content, 
+				                              strlen(heredoc_content) +
+					                          strlen(yytext) + 2);
+			strcpy(heredoc_content + strlen(heredoc_content), yytext);
+		}
+}
+
+<heredoc>.* {
+		/* Are we at the end of the heredoc? */
+		if (strcmp(heredoc_end, yytext) == 0)
+		{
+			/* End of the heredoc. */
+			strcpy(heredoc_content + strlen(heredoc_content), "\"");
+			mem_sys_free(heredoc_end);
+			BEGIN(prev_state);
+			valp->s = heredoc_content;
+			return(STRINGC); /* XXX delete quotes, -> emit, pbc */
+		}
+		else
+		{
+			/* Part of the heredoc. Realloc and cat the line on. */
+			heredoc_content = mem_sys_realloc(heredoc_content, 
+			                                  strlen(heredoc_content) +
+			                                  strlen(yytext) + 2);
+			strcpy(heredoc_content + strlen(heredoc_content), yytext);
+		}
+	}
+
 <*>{UNICODE} {
 	valp->s = str_dup(yytext);    /* charset:"..." */
         /* this is actually not unicode but a string with a charset */
         return(USTRINGC);
     }
+
 <*>{CHARCONSTANT} {
         valp->s = str_dup(yytext); /* XXX delete quotes, -> emit, pbc */
         return(STRINGC);
