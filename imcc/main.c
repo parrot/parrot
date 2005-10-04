@@ -409,7 +409,6 @@ do_pre_process(Parrot_Interp interp)
             case NEW:           printf("new ");break;
             case ADDR:          printf("addr ");break;
             case GLOBAL:        printf("global ");break;
-            case CALL:          printf("call ");break;
             case SHIFT_LEFT:    printf(" << ");break;
             case SHIFT_RIGHT:   printf(" >> ");break;
             case SHIFT_RIGHT_U: printf(" >>> ");break;

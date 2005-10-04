@@ -260,7 +260,6 @@ SP              [ ]
 "object"        return(OBJECTV);
 "pmc"           return(PMCV);
 "string"        return(STRINGV);
-"call"          return(CALL);
 "<<"            return(SHIFT_LEFT);
 ">>"            return(SHIFT_RIGHT);
 ">>>"           return(SHIFT_RIGHT_U);
