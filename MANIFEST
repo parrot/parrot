@@ -438,6 +438,7 @@ encodings/fixed_8.c                               []
 encodings/fixed_8.h                               []
 encodings/utf8.c                                  []
 encodings/utf8.h                                  []
+examples/README                                   [main]doc
 examples/assembly/99beer.pasm                     [main]doc
 examples/assembly/Makefile                        [main]doc
 examples/assembly/acorn.l                         [main]doc
@@ -446,7 +447,6 @@ examples/assembly/cat.pasm                        [main]doc
 examples/assembly/coroutine.pasm                  [main]doc
 examples/assembly/euclid.pasm                     [main]doc
 examples/assembly/fact.pasm                       [main]doc
-examples/assembly/getopt_demo.imc                 [main]doc
 examples/assembly/hanoi.pasm                      [main]doc
 examples/assembly/hello.pasm                      [main]doc
 examples/assembly/hello-dwim.imc                  [main]doc
@@ -590,6 +590,7 @@ examples/japh/japh6.pasm                          [main]doc
 examples/japh/japh7.pasm                          [main]doc
 examples/japh/japh8.pasm                          [main]doc
 examples/japh/japh9.pasm                          [main]doc
+examples/library/getopt_demo.imc                  [main]doc
 examples/mops/README                              [main]doc
 examples/mops/mops.c                              [main]doc
 examples/mops/mops.cs                             [main]doc
@@ -1797,6 +1798,7 @@ t/dynclass/pyfunc.t                               []
 t/dynclass/pyint.t                                []
 t/examples/assembly.t                             []
 t/examples/japh.t                                 []
+t/examples/library.t                              []
 t/examples/subs.t                                 []
 t/harness                                         []
 t/native_pbc/header.t                             []

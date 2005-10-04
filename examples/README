@@ -1,0 +1,29 @@
+# $Id$
+
+The directory 'examples' provides examples on the proper, and sometimes clever, use
+of code for Parrot.
+
+assembly  - Miscellaneous stuff in PASM and PIR
+            This should be split in the dirs 'pir' and 'pasm'
+
+benchmark - Contains benchmark. Run them with 'make testbench'
+     
+c         - Examples in C
+
+compilers - Examples for parrot complilers
+
+io        - Examples how PIR and PASM programs talk with the world
+
+japh      - Say 'Just another Parrot hacker' in various ways
+
+library   - Examples on how to use PIR libraries
+
+mops      - Million ops per second
+
+pni       - Native call interface
+
+sdl       - SDL
+
+streams   - Examples for the streams library
+
+subs      - Parrot calling conventions

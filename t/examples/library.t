@@ -4,13 +4,13 @@
 
 =head1 NAME
 
-t/examples/assembly.t - Test examples in F<examples/assembly>
+t/examples/library.t - Test examples in F<examples/library>
 
 =head1 SYNOPSIS
 
-	% perl -Ilib t/examples/assembly.t
+	% perl -Ilib t/examples/library.t
 
-        % perl t/harness t/examples/assembly.t
+        % perl t/harness t/examples/library.t
 
 =head1 DESCRIPTION
 
@@ -33,14 +33,13 @@ use Test::More;
 
 # Set up expected output for examples
 my %expected = (
-    'fact.pasm'        =>  << 'END_EXPECTED',
-fact of 0 is: 1
-fact of 1 is: 1
-fact of 2 is: 2
-fact of 3 is: 6
-fact of 4 is: 24
-fact of 5 is: 120
-fact of 6 is: 720
+    'getopt_demo.imc'        =>  << 'END_EXPECTED',
+Hi, I am 'getopt_demo.imc'.
+
+You haven't passed the option '--bool'. This is fine with me.
+You haven't passed the option '--string'. This is fine with me.
+You haven't passed the option '--integer'. This is fine with me.
+All args have been parsed.
 END_EXPECTED
                           );
 
@@ -51,7 +50,7 @@ my %test_func = ( pasm => \&pasm_output_is,
 
 while ( my ( $example, $expected ) = each %expected )
 {
-    my $code_fn   = "examples/assembly/$example";
+    my $code_fn   = "examples/library/$example";
     my $code = Parrot::Test::slurp_file($code_fn);
 
     my ( $extension ) = $example =~ m{ [.]                  # introducing extension
