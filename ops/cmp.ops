@@ -144,18 +144,9 @@ op eq_addr(in PMC, in PMC, labelconst INT) :base_core {
   goto NEXT();
 }
 
-########################################
-
-=item B<isnull>(in PMC, labelconst INT)
-
-Branch to $2 if $1 is a NULL PMC.
-
 =cut
 
-op isnull(in PMC, labelconst INT) :base_core {
-  if (PMC_IS_NULL($1)) {
-    goto OFFSET($2);
-  }
+op DELETED_isnull(in PMC, labelconst INT) :base_core {
   goto NEXT();
 }
 

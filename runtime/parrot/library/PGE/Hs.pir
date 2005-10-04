@@ -132,7 +132,7 @@ whole thing may be taken out or refactored away at any moment.
 
   subpats:
     capt = getattribute self, PGE_SUB_POS
-    isnull capt, subrules
+    if_null capt, subrules
     spi = 0
     spc = elements capt
     goto subpats_body
@@ -154,7 +154,7 @@ whole thing may be taken out or refactored away at any moment.
   subrules:
     out .= "] ["
     capt = getattribute self, PGE_SUB_NAMED
-    isnull capt, end
+    if_null capt, end
     iter = new Iterator, capt
     iter = 0
     goto subrules_body

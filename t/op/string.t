@@ -2662,12 +2662,12 @@ ok 3
 ok 4
 OUTPUT
 
-output_is( <<'CODE', <<OUTPUT, "isnull_sc_ic");
+output_is( <<'CODE', <<OUTPUT, "if_null_s_ic");
 	set S0, "foo"
-	isnull S0, ERROR
+	if_null S0, ERROR
 	print "ok 1\n"
 	null S0
-	isnull S0, OK
+	if_null S0, OK
 ERROR:	print "error\n"
 	end
 OK:	print "ok 2\n"

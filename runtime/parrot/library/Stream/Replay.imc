@@ -134,10 +134,10 @@ ASSIGN:
     
     null ret
     source = self."source"()
-    isnull source, END
+    if_null source, END
     classoffset $I0, self, "Stream::Replay"
     getattribute buffer, self, $I0
-    isnull buffer, END
+    if_null buffer, END
     inc $I0
     getattribute pos, self, $I0
 
@@ -162,7 +162,7 @@ END:
     assign ret, self
     
     $P0 = self."byte_buffer"()
-    isnull $P0, END
+    if_null $P0, END
     $P0 = clone $P0
     ret."byte_buffer"( $P0 )
 END:

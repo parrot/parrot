@@ -153,7 +153,7 @@ WRITE:
     setattribute self, $I0, $P0
 
     source = self."source"()
-    isnull source, END
+    if_null source, END
     typeof $I0, source
     if $I0 == .PerlUndef goto END
 
@@ -175,7 +175,7 @@ END:
     .local pmc cont
 
     cont = self."source"()
-    isnull cont, END_OF_STREAM
+    if_null cont, END_OF_STREAM
 
     classoffset $I0, self, "Stream::Writer"
     getattribute writer, self, $I0

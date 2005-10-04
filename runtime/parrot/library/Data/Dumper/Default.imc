@@ -82,7 +82,7 @@ A Data::Dumper::Default object has the following methods:
     .local int ret
 
     ret = 1
-    isnull dump, END
+    if_null dump, END
     prophash prop, dump
     unless prop goto END
 

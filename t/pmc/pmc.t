@@ -381,13 +381,13 @@ ok 1
 ok 2
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "isnull");
+output_is(<<'CODE', <<'OUTPUT', "if_null");
       null P0
-      isnull P0, OK1
+      if_null P0, OK1
       print "not "
 OK1:  print "ok 1\n"
       new P0, .PerlInt
-      isnull P0, BAD2
+      if_null P0, BAD2
       branch OK2
 BAD2: print "not "
 OK2:  print "ok 2\n"

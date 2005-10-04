@@ -1283,7 +1283,7 @@ pir_output_is(<<'CODE', <<'OUT', "P3 is NULL - 11 args");
 .end
 
 .sub _foo
-    isnull P3, p3_is_null
+    if_null P3, p3_is_null
     print "P3 is not NULL\n"
     goto return
 p3_is_null:

@@ -63,7 +63,7 @@ it left off.
     .local pmc yield
 
     yield = getattribute self, "PGE::Match\x0&:yield"
-    isnull yield, next_1
+    if_null yield, next_1
     goto next_2
   next_1:
     $P0 = getattribute self, "PGE::Match\x0$:pos"
@@ -255,7 +255,7 @@ Produces a data dump of the match object and all of its subcaptures.
     print $I0
     print "\n"
     capt = getattribute self, "PGE::Match\x0@:capt"
-    isnull capt, subrules
+    if_null capt, subrules
     spi = 0
     spc = elements capt
   subpats_1:
@@ -274,7 +274,7 @@ Produces a data dump of the match object and all of its subcaptures.
 
   subrules:
     capt = getattribute self, "PGE::Match\x0%:capt"
-    isnull capt, end
+    if_null capt, end
     iter = new Iterator, capt
     iter = 0
   subrules_1:

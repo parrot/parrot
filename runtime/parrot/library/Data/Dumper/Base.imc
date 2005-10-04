@@ -221,7 +221,7 @@ NOT_IN_CACHE:
     # is _dump null?
     # lookup the type id otherwise
     set func, "pmcNull"
-    isnull _dump, DUMP
+    if_null _dump, DUMP
 
     # does a helper method exists?
     typeof temp, _dump

@@ -167,7 +167,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "mmdvtfind");
     comp = global "Float_cmp_Integer"
     mmdvtregister .MMD_NUMCMP, .Float, .Integer, comp
     $P0 = mmdvtfind .MMD_NUMCMP, .Float, .Integer
-    isnull $P0, nok
+    if_null $P0, nok
     print "ok 1\n"
     ne_addr $P0, comp, nok
     print "ok 2\n"
@@ -200,7 +200,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "mmdvtfind - invoke it");
     comp = global "Float_cmp_Integer"
     mmdvtregister .MMD_NUMCMP, .Float, .Integer, comp
     $P0 = mmdvtfind .MMD_NUMCMP, .Float, .Integer
-    isnull $P0, nok
+    if_null $P0, nok
     print "ok 1\n"
     ne_addr $P0, comp, nok
     print "ok 2\n"

@@ -173,7 +173,7 @@ NEXT:
 
     $P0 = shift iter
     ret = $P0( name )
-    isnull ret, NEXT
+    if_null ret, NEXT
 END:
     .pcc_begin_return
     .return ret

@@ -76,9 +76,9 @@ END:
     filter = self."filter"()
 REDO:
     str = source."read"()
-    isnull str, END
+    if_null str, END
     str = filter( str )
-    isnull str, REDO
+    if_null str, REDO
 END:
     .return(str)
 .end

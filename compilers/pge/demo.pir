@@ -45,7 +45,7 @@
     if $S0 == "trace" goto toggle_trace
     if $S0 == "use" goto use_grammar
 
-    isnull rulesub, match_nopattern
+    if_null rulesub, match_nopattern
     match = rulesub(x)
   match_result:
     unless match goto match_fail
@@ -74,7 +74,7 @@
     goto read_loop
 
   save_rule:
-    isnull rulesub, match_nopattern
+    if_null rulesub, match_nopattern
     x = substr x, 5
     store_global x, rulesub
     print "Saved as "
@@ -84,12 +84,12 @@
     
   
   print_pir:
-    isnull rulesub, match_nopattern
+    if_null rulesub, match_nopattern
     print pir
     goto read_loop
 
   print_exp:
-    isnull rulesub, match_nopattern
+    if_null rulesub, match_nopattern
     exp."dump"(0)
     goto read_loop
 

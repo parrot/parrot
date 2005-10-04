@@ -59,7 +59,7 @@ END:
     # XXX: check if the buffer is empty if the source stream is not connected
     classoffset $I0, self, "Stream::Base"
     getattribute $P0, self, $I0
-    isnull $P0, NOT_CONNECTED
+    if_null $P0, NOT_CONNECTED
     typeof $I0, $P0
     if $I0 == .PerlUndef goto NOT_CONNECTED
     $I0 = $P0."connected"()
@@ -160,7 +160,7 @@ BUFFER_END:
     buffer = temp
     code = 0
 
-    isnull str, END
+    if_null str, END
 
     # concat to the buffer
     concat buffer, str

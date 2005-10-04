@@ -9,12 +9,6 @@ newsub(in INT, in INT, labelconst INT, labelconst INT)
 
   use 3 arg newsub, find_global, set_p_pc, or just foo() syntax
 
-isnull(in PMC, labelconst INT)
-
-  Despite it's name this is a branching opcode. The name is misleading.
-
-  use if_null or unless_null instead.
-
 Register stack opcodes
 
 pop{i,s,p,n}, popbottom{i,s,p,n}, poptop{i,s,p,n},

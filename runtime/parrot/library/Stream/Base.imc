@@ -103,7 +103,7 @@ LOOP:
     i = self."connected"()
     unless i goto END
     str = self."read"()
-    isnull str, END
+    if_null str, END
     print "read:["
     str = escape( str )
     print str
@@ -125,7 +125,7 @@ LOOP:
     i = self."connected"()
     unless i goto END
     str = self."read"()
-    isnull str, END
+    if_null str, END
     print to, str
     branch LOOP
 END:
@@ -190,7 +190,7 @@ Returns the read string, or a null string if the stream end has been reached.
     classoffset $I0, self, "Stream::Base"
     add $I0, aBuffer
     getattribute $P0, self, $I0
-    isnull $P0, NO_BUFFER
+    if_null $P0, NO_BUFFER
     ret = $P0
     null $P0
     setattribute self, $I0, $P0
@@ -200,7 +200,7 @@ NO_BUFFER:
     classoffset $I0, self, "Stream::Base"
     add $I0, aIncludes
     getattribute includes, self, $I0
-    isnull includes, SELF
+    if_null includes, SELF
 
     $I0 = includes
     if $I0 > 0 goto INCLUDE
@@ -208,8 +208,8 @@ NO_BUFFER:
 SELF:
     ret = self."rawRead"()
 
-    isnull includes, DONE
-    isnull ret, INCLUDE_CHECK
+    if_null includes, DONE
+    if_null ret, INCLUDE_CHECK
 
 DONE:
     .return(ret)
@@ -225,7 +225,7 @@ INCLUDE:
 
     ret = stream."read"()
 
-    isnull ret, INCLUDE_DEL
+    if_null ret, INCLUDE_DEL
     branch DONE
 
 INCLUDE_DEL:
@@ -302,7 +302,7 @@ Reads the specified number of bytes from the stream.
     getattribute buffer, self, $I0
 
     # no buffer set?
-    isnull buffer, CREATE
+    if_null buffer, CREATE
 
     # unset buffer
     null $P0
@@ -319,7 +319,7 @@ LOOP:
     $I0 = length ret
     if $I0 >= requested goto DONE
     $S0 = self."read"()
-    isnull $S0, DONE
+    if_null $S0, DONE
     concat ret, $S0
     branch LOOP
 DONE:
@@ -360,7 +360,7 @@ Returns or sets the byte buffer.
 
     getattribute $P0, self, $I0
 
-    isnull $P0, END
+    if_null $P0, END
     branch END
 SET:
     setattribute self, $I0, buf

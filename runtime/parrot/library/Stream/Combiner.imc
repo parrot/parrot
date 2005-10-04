@@ -178,7 +178,7 @@ READ_LOOP:
     str = source."read"()
 
     # end of stream?
-    isnull str, END_OF_STREAM
+    if_null str, END_OF_STREAM
 
     # push onto array
     push args, str

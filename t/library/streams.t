@@ -75,7 +75,7 @@ pir_output_is(<<'CODE', <<'OUT', "Stream::Sub");
     stream."dump"()
     # read again to see if read returns null
     $S0 = stream."read"()
-    isnull $S0, OK
+    if_null $S0, OK
     print "error: read returned '"
     print $S0
     print "' instead of (null)\n"
