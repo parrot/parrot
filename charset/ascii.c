@@ -264,7 +264,7 @@ ascii_compare(Interp *interpreter, STRING *lhs, STRING *rhs)
             rhs->encoding == Parrot_fixed_8_encoding_ptr) {
         int ret_val = memcmp(lhs->strstart, rhs->strstart, min_len);
         if (ret_val)
-            return ret_val;
+            return ret_val < 0 ? -1 : 1;
     }
     else {
         UINTVAL cl, cr;
