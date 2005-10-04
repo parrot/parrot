@@ -15,7 +15,6 @@ C<Parrot::Vtable> provides a collection of functions for manipulating
 PMC vtables. It is used by F<build_tools/jit2h.pl>, F<build_tools/pmc2c.pl>,
 F<build_tools/vtable_h.pl>, F<classes/genclass.pl>, and F<classes/null.pl>.
 
-
 =head2 Functions
 
 The following functions are exported:
@@ -26,13 +25,14 @@ The following functions are exported:
 
 package Parrot::Vtable;
 
-use FileHandle;
-
-use Exporter;
 use strict;
 
-@Parrot::Vtable::ISA = qw(Exporter);
-@Parrot::Vtable::EXPORT = qw(parse_vtable vtbl_defs vtbl_struct vtbl_macros);
+use Exporter;
+use FileHandle;
+
+@Parrot::Vtable::ISA    = qw(Exporter);
+@Parrot::Vtable::EXPORT =
+    qw( parse_vtable vtbl_defs vtbl_struct vtbl_macros vtbl_embed );
 
 sub make_re {
     my $re = shift;
@@ -53,10 +53,10 @@ my $method_re = make_re('^\s*('.$type_re.')\s+('.$ident_re.')\s*\(('.$arglist_re
 
 Returns a reference to an array containing
 
-  [ return_type method_name parameters section ]
+  [ return_type method_name parameters section MMD_type ]
 
-for each vtable method defined in C<$file>. If C<$file> is unspecified
-it defaults to F<vtable.tbl>.
+for each vtable method defined in C<$file>. If C<$file> is unspecified it
+defaults to F<vtable.tbl>.  If it is not an MMD method, C<MMD_type> is -1.
 
 =cut
 
@@ -64,7 +64,7 @@ sub parse_vtable {
 
     my $file = defined $_[0] ? shift() : 'vtable.tbl';
     my $vtable = [];
-    my $fh = new FileHandle ($file, O_RDONLY) or
+    my $fh = FileHandle->new($file, O_RDONLY) or
         die "Can't open $file for reading: $!\n";
     my $section = 'MAIN';
 
@@ -74,15 +74,15 @@ sub parse_vtable {
 
         next if /^\s*#/ or /^\s*$/;
 
-	if (/^\[(\w+)\]/) {
-	    $section = $1;
-	}
+    if (/^\[(\w+)\]/) {
+        $section = $1;
+    }
         elsif (m/^\s*
-	        ($type_re)\s+
-	        ($ident_re)\s*
-		\(($arglist_re)\)
-		(?:\s+(MMD_\w+))?\s*$/x) {
-	    my $mmd = defined $4 ? $4 : -1;
+            ($type_re)\s+
+            ($ident_re)\s*
+        \(($arglist_re)\)
+        (?:\s+(MMD_\w+))?\s*$/x) {
+        my $mmd = defined $4 ? $4 : -1;
             push @{$vtable}, [ $1, $2, $3, $section, $mmd ];
         } else {
             die "Syntax error at $file line ".$fh->input_line_number()."\n";
@@ -105,7 +105,7 @@ sub vtbl_defs {
     my $entry;
 
     for $entry (@{$vtable}) {
-	next if ($entry->[4] =~ /MMD_/);
+    next if ($entry->[4] =~ /MMD_/);
         my $args = join(", ", 'Interp* interpreter', 'PMC* pmc', split(/\s*,\s*/, $entry->[2]));
         $defs .= "typedef $entry->[0] (*$entry->[1]_method_t)($args);\n";
     }
@@ -140,8 +140,8 @@ struct _vtable {
     INTVAL base_type;        /* 'type' value for MMD */
     STRING* whoami;          /* Name of class this vtable is for */
     UINTVAL flags;           /* Flags. Duh */
-    STRING* does_str;	     /* space separated list of interfaces */
-    STRING* isa_str;	     /* space separated list of classes */
+    STRING* does_str;        /* space-separated list of interfaces */
+    STRING* isa_str;         /* space-separated list of classes */
     PMC *class;              /* for PMCs: a PMC of that type
                                 for objects: the class PMC */
     PMC *mro;                /* array PMC of [class, parents ... ] */
@@ -149,7 +149,7 @@ struct _vtable {
 
 EOF
     for $entry (@{$vtable}) {
-	next if ($entry->[4] =~ /MMD_/);
+    next if ($entry->[4] =~ /MMD_/);
         $struct .= "    $entry->[1]_method_t $entry->[1];\n";
     }
 
@@ -177,11 +177,11 @@ sub vtbl_macros {
 
 EOM
     for my $entry (@{$vtable}) {
-	next if ($entry->[4] =~ /MMD_/);
-	my @args = split /,\s*/, $entry->[2];
-	unshift @args, "i interp", "p pmc";
-	my $args = join ', ', map { (split / /, $args[$_])[1] } (0..$#args);
-	$macros .= <<"EOM";
+    next if ($entry->[4] =~ /MMD_/);
+    my @args = split /,\s*/, $entry->[2];
+    unshift @args, "i interp", "p pmc";
+    my $args = join ', ', map { (split / /, $args[$_])[1] } (0..$#args);
+    $macros .= <<"EOM";
 #define VTABLE_$entry->[1]($args) \\
     (pmc)->vtable->$entry->[1]($args)
 EOM
@@ -195,8 +195,8 @@ EOM
 /* &gen_from_def(vtable_methods.pasm) */
 EOM
     for my $entry (@{$vtable}) {
-	my $uc_meth = uc $entry->[1];
-	$macros .= <<"EOM";
+    my $uc_meth = uc $entry->[1];
+    $macros .= <<"EOM";
 #define PARROT_VTABLE_${uc_meth}_METHNAME \"__$entry->[1]\"
 EOM
 
@@ -217,16 +217,16 @@ static const char * const Parrot_vtable_slot_names[] = {
     "",     /* 'type' value for MMD */
     "",     /* Name of class this vtable is for */
     "",     /* Flags. Duh */
-    "",	    /* space separated list of interfaces */
-    "",	    /* space separated list of classes */
+    "",     /* space-separated list of interfaces */
+    "",     /* space-separated list of classes */
     "",     /* class */
-    "",	    /* mro */
+    "",     /* mro */
 
     /* Vtable Functions */
 EOM
     for my $entry (@{$vtable}) {
-	next if ($entry->[4] =~ /MMD_/);
-	$macros .= <<"EOM";
+    next if ($entry->[4] =~ /MMD_/);
+    $macros .= <<"EOM";
         \"__$entry->[1]\",
 EOM
     }
@@ -245,11 +245,11 @@ EOM
 typedef enum {
 EOM
     for my $entry (@{$vtable}) {
-	next unless ($entry->[4] =~ /MMD_/);
-	next if ($entry->[4] =~ /_INT$/);
-	next if ($entry->[4] =~ /_STR$/);
-	next if ($entry->[4] =~ /_FLOAT$/);
-	$macros .= <<"EOM";
+    next unless ($entry->[4] =~ /MMD_/);
+    next if ($entry->[4] =~ /_INT$/);
+    next if ($entry->[4] =~ /_STR$/);
+    next if ($entry->[4] =~ /_FLOAT$/);
+    $macros .= <<"EOM";
         $entry->[4],
 EOM
     }
@@ -264,11 +264,11 @@ static const char * const Parrot_mmd_func_names[] = {
 EOM
 
     for my $entry (@{$vtable}) {
-	next unless ($entry->[4] =~ /MMD_/);
-	next if ($entry->[4] =~ /_INT$/);
-	next if ($entry->[4] =~ /_STR$/);
-	next if ($entry->[4] =~ /_FLOAT$/);
-	$macros .= <<"EOM";
+    next unless ($entry->[4] =~ /MMD_/);
+    next if ($entry->[4] =~ /_INT$/);
+    next if ($entry->[4] =~ /_STR$/);
+    next if ($entry->[4] =~ /_FLOAT$/);
+    $macros .= <<"EOM";
         \"__$entry->[1]\",
 EOM
     }
@@ -280,6 +280,84 @@ EOM
 EOM
 
     $macros;
+}
+
+=item C<vtbl_embed($vtable)>
+
+Returns the C function definitions to call the vtable methods on a PMC for the
+elements in the referenced vtable array.
+
+=cut
+
+sub vtbl_embed
+{
+    my $vtable = shift;
+
+    for my $entry (@$vtable)
+    {
+        my ($return_type, $name, $params, $section, $mmd) = @$entry;
+        next unless $mmd eq '-1';
+
+        my @params    = parse_params( $params );
+        my @sig       = ( 'Parrot_INTERP interp', 'Parrot_PMC pmc' );
+        my @args      = ( 'interp', 'pmc' );
+
+        while (my ($type, $name) = splice( @params, 0, 2 ))
+        {
+            push @sig, find_type( $type ) . ' ' . $name;
+            push @args, $name;
+        }
+
+        my $signature = join( ', ', @sig  );
+        my $arguments = join( ', ', @args );
+
+        my $ret_type  = find_type( $return_type );
+
+        printf 
+"%s Parrot_PMC_%s( %s )
+{
+    %s retval;
+    PARROT_CALLIN_START( interp );
+    retval = VTABLE_%s( %s );
+    PARROT_CALLIN_END( interp );
+    return retval;
+}\n\n", $ret_type, $name, $signature, $ret_type, $name, $arguments;
+
+    }
+}
+
+sub find_type
+{
+    my $type    = shift;
+
+    my %typemap =
+    (
+        'STRING*'  => 'Parrot_STRING',
+        'void*'    => 'void*',
+        'INTVAL'   => 'Parrot_Int',
+        'PMC*'     => 'Parrot_PMC',
+        'FLOATVAL' => 'Parrot_Float',
+        'void'     => 'void',
+        'UINTVAL'  => 'Parrot_Int',
+    );
+
+    die "Unknown type $type\n" unless exists $typemap{ $type };
+
+    return $typemap{ $type };
+}
+
+sub parse_params
+{
+    my $params = shift;
+
+    my @params;
+
+    while ($params =~ m/(\w+\*?) (\w+)/g)
+    {
+        push @params, $1, $2;
+    }
+
+    return @params;
 }
 
 =back
@@ -301,4 +379,3 @@ EOM
 =back
 
 1;
-
