@@ -272,7 +272,7 @@ insert_tail_call(Parrot_Interp interp, IMC_Unit * unit,
 void
 expand_pcc_sub_call(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
 {
-    SymReg *arg, *sub, *reg, *regs[2];
+    SymReg *arg, *sub, *reg, *regs[3];
     int  n;
     int tail_call;
     int meth_call = 0;
