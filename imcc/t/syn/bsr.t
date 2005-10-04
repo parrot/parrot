@@ -31,13 +31,13 @@ pir_output_is(<<'CODE', <<'OUT', "stack calling conventions");
    x = 10
    .const int y = 20
 
-   .arg y	# save args in reversed order
-   .arg x
-   call _foo	#(r, s) = _foo(x,y)
+   save y	# save args in reversed order
+   save x
+   bsr _foo	#(r, s) = _foo(x,y)
    .local int r
    .local int s
-   .result r	# restore results in order
-   .result s
+   restore r	# restore results in order
+   restore s
 
    print "r = "
    print r
@@ -50,8 +50,9 @@ pir_output_is(<<'CODE', <<'OUT', "stack calling conventions");
 
 .sub _foo		# sub foo(int a, int b)
    saveall
-   .param int a
-   .param int b
+   .local int a, b
+   restore  a
+   restore  b
    print "a = "
    print a
    print "\n"
@@ -62,8 +63,8 @@ pir_output_is(<<'CODE', <<'OUT', "stack calling conventions");
    .local int mi
    pl = a + b
    mi = a - b
-   .return mi		# from right to left
-   .return pl		# return (pl, mi)
+   save mi		# from right to left
+   save pl		# return (pl, mi)
    restoreall
    ret
 .end
@@ -81,10 +82,10 @@ pir_output_is(<<'CODE', <<'OUT', "fact with stack calling conventions");
 .sub test @MAIN
     .local int counter
     counter = 5
-    .arg counter
-    call _fact
+    save counter
+    bsr _fact
     .local int product
-    .result product
+    restore product
     print product
     print "\n"
     end
@@ -92,14 +93,15 @@ pir_output_is(<<'CODE', <<'OUT', "fact with stack calling conventions");
 
 .sub _fact
     saveall
-    .param int N
+    .local int N
+    restore  N
     .local int prod
     prod = 1
 L1:
     prod = prod * N
     dec N
     if N > 0 goto L1
-    .return prod
+    save prod
     restoreall
     ret
 .end
@@ -341,7 +343,7 @@ test:
         ret
 L1:
         $I2 = 2
-        call test
+        bsr test
         print $I2               # printed 1, not 2
 	print "\n"
         end

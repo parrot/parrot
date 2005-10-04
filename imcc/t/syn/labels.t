@@ -68,7 +68,7 @@ OUT
 pir_output_is(<<'CODE', <<'OUT', "local labels 2");
 .sub _realmain
          bsr FOO
-         call _function
+         bsr _function
          end
 
 FOO:    print "in main\n"

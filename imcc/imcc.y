@@ -329,7 +329,7 @@ begin_return_or_yield(Interp *interp, int yield)
 %nonassoc <t> PARAM
 
 %token <t> PRAGMA FASTCALL N_OPERATORS HLL
-%token <t> CALL GOTO ARG IF UNLESS END SAVEALL RESTOREALL
+%token <t> CALL GOTO ARG IF UNLESS
 %token <t> ADV_FLAT ADV_SLURPY ADV_OPTIONAL ADV_OPT_FLAG
 %token <t> NEW NEWSUB NEWCLOSURE NEWCOR NEWCONT
 %token <t> NAMESPACE ENDNAMESPACE CLASS ENDCLASS FIELD DOT_METHOD
@@ -933,19 +933,11 @@ labeled_inst:
    | pmc_const
    | GLOBAL_CONST { is_def=1; } type IDENTIFIER '=' const
                     { mk_const_ident(interp, $4, $3, $6, 1);is_def=0; }
-   | PARAM { is_def=1; } type IDENTIFIER
-                    { $$ = MK_I(interp, cur_unit, "restore",
-                                1, mk_ident(interp, $4, $3));is_def=0; }
-   | PARAM reg                        { $$ = MK_I(interp, cur_unit, "restore", 1, $2); }
-   | RESULT var                       { $$ = MK_I(interp, cur_unit, "restore", 1, $2); }
-   | ARG arg                          { $$ = MK_I(interp, cur_unit, "save", 1, $2); }
-   | RETURN var                       { $$ = MK_I(interp, cur_unit, "save", 1, $2); }
    | RETURN  sub_call   { $$ = NULL;
                            cur_call->pcc_sub->flags |= isTAIL_CALL;
                            cur_call = NULL;
                         }
-   | CALL label_op                    { $$ = MK_I(interp, cur_unit, "bsr",  1, $2); }
-   | GOTO label_op                    { $$ = MK_I(interp, cur_unit, "branch",1, $2); }
+   | GOTO label_op { $$ = MK_I(interp, cur_unit, "branch",1, $2); }
    | NEWSUB                           { expect_pasm = 1; }
      pasm_args
                    { $$ = INS(interp, cur_unit, "newsub",0,regs,nargs,keyvec,1); }

@@ -9,7 +9,7 @@ pir_output_is(<<'CODE', <<'OUT', "globalconst 1");
 
 .sub __main
 	.globalconst int N = 5
-	call _main
+	bsr _main
 	end
 .end
 
@@ -20,7 +20,7 @@ pir_output_is(<<'CODE', <<'OUT', "globalconst 1");
 .end
 
 .sub _main
-	call _sub1
+	bsr _sub1
 	ret
 .end
 CODE
@@ -30,7 +30,7 @@ OUT
 pir_output_is(<<'CODE', <<'OUT', "globalconst 2");
 .sub test @MAIN
 	.globalconst int N = 5
-	call _main
+	bsr _main
 	end
 .end
 
@@ -43,7 +43,7 @@ pir_output_is(<<'CODE', <<'OUT', "globalconst 2");
 .end
 
 .sub _main
-	call _sub1
+	bsr _sub1
 	ret
 .end
 CODE
