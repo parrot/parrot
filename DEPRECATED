@@ -95,5 +95,15 @@ call xxx
   This is one char longer then it's translation 'bsr' - it's just not needed.
 
 
+FUTURE changes
 
+Not yet deprecated, but it's recommended to use the new syxtax.
+
+Subroutine attributes will use the colon syntax:
+
+  .sub foo method, @MULTI(x,y)    => .sub foo :method :multi(x,y)
+  .sub foo @ANON, @LOAD           => .sub foo :anon :load
+
+The new syntax uses no comma separators and all sub attributes are lower
+case and prefixed by a colon.
 
