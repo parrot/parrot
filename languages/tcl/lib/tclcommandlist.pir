@@ -4,14 +4,14 @@
 
 .include "languages/tcl/lib/returncodes.pir"
 
-.sub __class_init @LOAD
+.sub __class_init :load
   $P0 = getclass "TclList"
   $P0 = subclass $P0, "TclCommandList"
 .end
 
 =for cut
 
-.sub interpret method
+.sub interpret :method
   .local pmc retval
   .local int i, elems
   elems = self
@@ -30,7 +30,7 @@ done:
 
 =cut
 
-.sub compile method
+.sub compile :method
   .param int register_num
 
   .local string pir_code,temp_code
@@ -57,7 +57,7 @@ done:
 
 .end
 
-.sub __clone method
+.sub __clone :method
   .local pmc obj
   $I0 = typeof self
   obj = new $I0

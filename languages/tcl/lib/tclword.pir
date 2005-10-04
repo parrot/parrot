@@ -18,7 +18,7 @@ Define the attributes required for the class.
 
 =cut
 
-.sub __class_init @LOAD
+.sub __class_init :load
   $P0 = getclass "TclList"
   $P1 = subclass $P0, "TclWord"
 .end
@@ -29,7 +29,7 @@ Return a PMC that contains the value of our word, concatenating
 the string values of the elements.
 
 
-.sub interpret method
+.sub interpret :method
   .local pmc retval
   
   .local int i, len
@@ -58,7 +58,7 @@ loop_done:
 
 =cut
 
-.sub compile method
+.sub compile :method
   .param int register_num
 
   .local int i, len
@@ -119,7 +119,7 @@ concat_loop_done:
 
 .end
 
-.sub __clone method
+.sub __clone :method
   .local pmc obj
   $I0 = typeof self
   obj = new $I0

@@ -99,7 +99,7 @@ done:
   $P1[0] = pir_code
   $P1[1] = result_reg
 
-  sprintf pir_code, ".pragma n_operators 1\n.sub blah @ANON\n%s.return ($P%s)\n.end\n", $P1
+  sprintf pir_code, ".pragma n_operators 1\n.sub blah :anon\n%s.return ($P%s)\n.end\n", $P1
 
   #print pir_code
 

@@ -78,7 +78,7 @@ providing a compreg-compatible method.
 
 .namespace [ "_Tcl" ]
 
-.sub __prepare_lib @LOAD,@ANON
+.sub __prepare_lib :load :anon
 
   # Load any dependant libraries.
   load_bytecode "languages/tcl/lib/tclcommand.pbc"
@@ -245,7 +245,7 @@ providing a compreg-compatible method.
   pir_code = ".namespace [ \"_Tcl\" ]\n.sub _compiled_sub"
   $S0 = compiled_num
   pir_code .= $S0
-  pir_code .= " @ANON\n.local string code\ncode = \""
+  pir_code .= " :anon\n.local string code\ncode = \""
   tcl_code = escaper(tcl_code,"\"")
   pir_code .= tcl_code
   pir_code .= "\"\n.local pmc parse\n"

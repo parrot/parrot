@@ -10,7 +10,7 @@ Define the attributes required for the class.
 
 =cut
 
-.sub __class_init @LOAD
+.sub __class_init :load
   $P0 = getclass "TclList"
   $P1 = subclass $P0, "TclCommand"
   addattribute $P1, "name"
@@ -22,12 +22,12 @@ Initialize the attributes for an instance of the class
 
 =cut
 
-.sub __init method
+.sub __init :method
   #$P0 = new TclString
   #setattribute self, "TclCommand\x00name", $P0
 .end
 
-.sub __clone method
+.sub __clone :method
   .local pmc obj
   $I0 = typeof self
   obj = new $I0
@@ -41,7 +41,7 @@ Initialize the attributes for an instance of the class
 Execute the command.
 
 
-.sub interpret method
+.sub interpret :method
   .local pmc retval
  
   .local string name
@@ -101,7 +101,7 @@ no_command_non_interactive:
 
 =cut
 
-.sub compile method
+.sub compile :method
    .param int register_num
  
    #.local int eh_num

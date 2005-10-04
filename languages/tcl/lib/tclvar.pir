@@ -10,7 +10,7 @@ Define the attributes required for the class.
 
 =cut
 
-.sub __class_init @LOAD
+.sub __class_init :load
   $P0 = getclass "TclConst"
   $P1 = subclass $P0, "TclVar"
 .end
@@ -20,7 +20,7 @@ Define the attributes required for the class.
 Get the value of the variable.
 
 
-.sub interpret method
+.sub interpret :method
     .local pmc read
     read = find_global "_Tcl", "__read"
     $S0 = self
@@ -29,7 +29,7 @@ Get the value of the variable.
 
 =cut
 
-.sub compile method
+.sub compile :method
     .param int register_num
 
     .local string pir_code
@@ -48,7 +48,7 @@ Get the value of the variable.
     .return (register_num,pir_code)
 .end
 
-.sub __clone method
+.sub __clone :method
   .local pmc obj
   $I0 = typeof self
   obj = new $I0

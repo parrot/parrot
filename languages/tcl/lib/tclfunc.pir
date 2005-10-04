@@ -28,7 +28,7 @@ Define the attributes required for the class.
 
 =cut
 
-.sub __class_init @LOAD
+.sub __class_init :load
   $P0 = newclass "TclFunc"
   addattribute $P0, "argument"
   addattribute $P0, "name"
@@ -40,14 +40,14 @@ Initialize the attributes for an instance of the class
 
 =cut
 
-.sub __init method
+.sub __init :method
   $P0 = new TclString
   setattribute self, "TclFunc\x00name", $P0
   $P0 = new TclString
   setattribute self, "TclFunc\x00argument", $P0
 .end
 
-.sub compile method
+.sub compile :method
   .param int register_num
 
   .local pmc retval
@@ -176,7 +176,7 @@ done_all:
 
 .end
 
-.sub __clone method
+.sub __clone :method
   .local pmc obj
   $I0 = typeof self
   obj = new $I0

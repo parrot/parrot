@@ -91,7 +91,7 @@ Define the attributes required for the class.
 
 =cut
 
-.sub __class_init @LOAD
+.sub __class_init :load
   $P0 = newclass "TclBinaryOp"
   addattribute $P0, "type"
   addattribute $P0, "l_operand"
@@ -104,7 +104,7 @@ Initialize the attributes for an instance of the class
 
 =cut
 
-.sub __init method
+.sub __init :method
   $P0 = new TclInt
   setattribute self, "TclBinaryOp\x00type", $P0
   $P0 = new TclInt
@@ -113,7 +113,7 @@ Initialize the attributes for an instance of the class
   setattribute self, "TclBinaryOp\x00r_operand", $P0
 .end
 
-.sub __clone method
+.sub __clone :method
   .local pmc obj
   $I0 = typeof self
   obj = new $I0
@@ -121,7 +121,7 @@ Initialize the attributes for an instance of the class
   .return(obj)
 .end
 
-.sub compile method
+.sub compile :method
   .param int register_num
 
   .local string pir_code

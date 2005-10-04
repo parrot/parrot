@@ -8,7 +8,7 @@
 
 .include "languages/tcl/lib/returncodes.pir"
 
-.sub _main @MAIN
+.sub _main :main
   .param pmc argv
 
   load_bytecode "languages/tcl/lib/tcllib.pbc"

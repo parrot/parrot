@@ -6,7 +6,7 @@ use Test::More;
 use vars qw($TODO);
 
 pir_output_is(<<'CODE', <<'OUTPUT', "test tcl compiler, verify double call works");
-  .sub main @MAIN
+  .sub main :main
      load_bytecode "languages/tcl/lib/tcllib.pbc"
      .local pmc tcl_compiler,compiled_sub
      tcl_compiler = compreg "TCL"
@@ -21,7 +21,7 @@ ok 2
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "test tcl compiler global variable interop");
-  .sub main @MAIN
+  .sub main :main
      load_bytecode "languages/tcl/lib/tcllib.pbc"
      .local pmc tcl_compiler,compiled_sub
      $P1 = new String
@@ -39,7 +39,7 @@ TODO: {
   local $TODO = "stack too deep?";
 
 pir_output_is(<<'CODE', <<'OUTPUT', "pass arguments to a tcl proc from PIR");
-.sub main @MAIN
+.sub main :main
 
   load_bytecode "languages/tcl/lib/tcllib.pbc"
 
@@ -58,7 +58,7 @@ hello
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "invoke argless tcl proc from PIR");
-.sub _main @MAIN
+.sub _main :main
   load_bytecode "languages/tcl/lib/tcllib.pbc"
   $S1 = 'proc hey {} { puts 11 }; hey; '
   $P1 = compreg 'TCL'

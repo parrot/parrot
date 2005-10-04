@@ -10,7 +10,7 @@ Define the attributes required for the class.
 
 =cut
 
-.sub __class_init @LOAD
+.sub __class_init :load
   $P0 = getclass "String"
   $P1 = subclass $P0, "TclConst"
   
@@ -53,7 +53,7 @@ Define the attributes required for the class.
 
 .end
 
-.sub __clone method
+.sub __clone :method
   .local pmc obj
   $I0 = typeof self
   obj = new $I0
@@ -61,7 +61,7 @@ Define the attributes required for the class.
   .return(obj)
 .end
 
-.sub __set_string_native method
+.sub __set_string_native :method
   .param string value
 
   .local int value_length
@@ -262,7 +262,7 @@ done:
 Get the value of the const.
 
 
-.sub interpret method
+.sub interpret :method
     .return(self)
 .end
 
@@ -274,7 +274,7 @@ Generate PIR code which can be used to generate our value
 
 =cut
 
-.sub compile method
+.sub compile :method
    .param int argnum
   
    .local pmc value
