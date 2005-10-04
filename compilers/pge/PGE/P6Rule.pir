@@ -899,7 +899,7 @@ needed).
     $S0 = code
     rule = $P0($S0)
     unless has_name goto p6rule_3
-    $I0 = findclass grammar
+    $I0 = find_type grammar
     if $I0 goto p6rule_2
     $P0 = getclass "PGE::Rule"
     $P1 = subclass $P0, grammar
