@@ -17,8 +17,6 @@
   .local string current_arg, trimmed_string
   .local int start_pos,end_pos,str_length,current_char
 
-   .include "cclass.pasm"
-
   .local int first_time
   first_time = 1
 arg_loop:

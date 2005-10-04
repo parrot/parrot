@@ -184,8 +184,6 @@ converter_done:
   start = pos
   len   = length expr
 
-  .include 'cclass.pasm'
-
   dec pos
 eat_space:
   inc pos
@@ -250,8 +248,6 @@ unary:
   ops = find_global "_Tcl", "operators"
   # Global list of operator precedence
   precedences = find_global "_Tcl", "precedence"
-
-  .include "cclass.pasm"
 
   .local int len
   len = length expr

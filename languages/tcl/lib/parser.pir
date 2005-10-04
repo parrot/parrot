@@ -28,8 +28,6 @@ commands, one at a time (skipping over comments).
   .local int len
   len = length tcl_code
  
-  .include "cclass.pasm"
- 
   # perform the backslash-newline substitution
   $I0 = -1
 loop:
@@ -219,8 +217,6 @@ contains only one.
   .param pmc    chars
   .param int    pos
   dec pos
- 
-  .include "cclass.pasm"
  
   .local int len
   len = length tcl_code

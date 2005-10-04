@@ -6,8 +6,6 @@
   .local pmc retval
   retval = new TclList
 
-  .include "cclass.pasm"
-
   .local int pos, len
   # we're going to increment before we use it, so set it to 0-1
   pos = -1

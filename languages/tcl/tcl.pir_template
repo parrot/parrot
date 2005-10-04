@@ -9,6 +9,7 @@ providing a compreg-compatible method.
 =cut
 
 .include "languages/tcl/lib/returncodes.pir"
+.include "cclass.pasm"
 
 # don't pollute the global namespaces with our utility functions.
 
@@ -90,7 +91,7 @@ providing a compreg-compatible method.
   load_bytecode "library/Data/Escape.pbc"
   load_bytecode "library/PGE.pbc"
   load_bytecode "library/PGE/Glob.pbc"
- 
+
   #_load_grammar()
  
   .local pmc operators
