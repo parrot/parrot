@@ -3,7 +3,7 @@
 # $Id$
 
 use strict;
-use Parrot::Test tests => 9;
+use Parrot::Test tests => 11;
 
 pir_output_is(<<'CODE', <<'OUT', "globalconst 1");
 
@@ -180,5 +180,42 @@ CODE
 2.000000
 ok
 ok 2
+OUT
+
+pir_output_is(<<'CODE', <<'OUT', "PIR Here Documents");
+.sub __main
+    $S0 = <<"quotage"
+I want an elephant
+Oh, I want an elephat!
+Oh, woo, elephants, yeah :-O
+quotage
+    print $S0
+    end
+.end
+CODE
+I want an elephant
+Oh, I want an elephat!
+Oh, woo, elephants, yeah :-O
+OUT
+
+pir_output_is(<<'CODE', <<'OUT', "PIR Here Documents");
+.sub __main
+    $S0 = ""
+    $I0 = 0
+LOOP:
+    $S0 = concat <<"end"
+ending
+end
+    inc $I0
+    if $I0 < 5 goto LOOP
+    print $S0
+    end
+.end
+CODE
+ending
+ending
+ending
+ending
+ending
 OUT
 
