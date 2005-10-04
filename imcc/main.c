@@ -397,7 +397,6 @@ do_pre_process(Parrot_Interp interp)
             case MACRO:         yylex(&val, interp);
                                 break; /* swallow nl */
 
-            case END:           printf("end");break;
             case GOTO:          printf("goto ");break;
             case IF:            printf("if ");break;
             case UNLESS:        printf("unless ");break;
@@ -411,8 +410,6 @@ do_pre_process(Parrot_Interp interp)
             case ADDR:          printf("addr ");break;
             case GLOBAL:        printf("global ");break;
             case CALL:          printf("call ");break;
-            case SAVEALL:       printf("saveall");break;
-            case RESTOREALL:    printf("restoreall");break;
             case SHIFT_LEFT:    printf(" << ");break;
             case SHIFT_RIGHT:   printf(" >> ");break;
             case SHIFT_RIGHT_U: printf(" >>> ");break;
