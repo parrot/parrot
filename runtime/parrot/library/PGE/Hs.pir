@@ -57,7 +57,7 @@ whole thing may be taken out or refactored away at any moment.
     load_bytecode "library/Data/Escape.imc"
 .end
 
-.sub "add_rule" method
+.sub "add_rule"
     .param string name
     .param string pattern
     .local pmc p6rule_compile, rulesub
@@ -70,7 +70,7 @@ whole thing may be taken out or refactored away at any moment.
     .return (name)
 .end
 
-.sub "match" method
+.sub "match"
     .param string x
     .param string pattern
     .local string out, tmps
