@@ -1,13 +1,5 @@
 Deprecated opcodes (branches/leo-ctx5 first)
 
-findclass(out INT, in STR)    DONE
-
-  returns a boolean bit if the class exists. The opocde name is misleading
-  doesn't conform to other find_ ops and the functionality is covered by
-  C<find_type>.
-
-  use find_type > 0 instead
-
 newsub(in INT, in INT, labelconst INT, labelconst INT)
 
   Creates a sub in P0 and a continuation in P1. It was a premature
@@ -72,27 +64,6 @@ rx_ opcodes, src/rx.c, and the intstack
   due to the global intstack.
   rx.c has yet another (ascii-only) character class handling, it leaks
   memory and is just broken.
-
-
-Deprecated PIR directives and shortcuts.
-
-*Stack calling convention* PIR directives    DONE
-
-.param, .result, .arg, .return    DONE
-
-  Please note that this has nothing to do with the 'normal' usage of these
-  directives.
-
-  All have a different functionality, if stack calling conventions are used.
-  This leads to unneeded complexity in the parser and to nasty workarounds
-  (.param works only directly after a .sub statement, .return var is always
-  'save' and so on.
-
-  use the 'save' or 'restore' opcodes instead
-
-call xxx    DONE
-
-  This is one char longer then it's translation 'bsr' - it's just not needed.
 
 
 FUTURE changes
