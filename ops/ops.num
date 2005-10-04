@@ -385,8 +385,8 @@ find_method_p_p_s               354
 find_method_p_p_sc              355
 find_type_i_s                   356
 find_type_i_sc                  357
-findclass_i_s                   358
-findclass_i_sc                  359
+DELETED_findclass_i_s                   358
+DELETED_findclass_i_sc                  359
 floor_i_n                       360
 floor_i_nc                      361
 floor_n                         362

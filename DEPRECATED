@@ -1,6 +1,6 @@
 Deprecated opcodes (branches/leo-ctx5 first)
 
-findclass(out INT, in STR)
+findclass(out INT, in STR)    DONE
 
   returns a boolean bit if the class exists. The opocde name is misleading
   doesn't conform to other find_ ops and the functionality is covered by
@@ -76,9 +76,9 @@ rx_ opcodes, src/rx.c, and the intstack
 
 Deprecated PIR directives and shortcuts.
 
-*Stack calling convention* PIR directives
+*Stack calling convention* PIR directives    DONE
 
-.param, .result, .arg, .return
+.param, .result, .arg, .return    DONE
 
   Please note that this has nothing to do with the 'normal' usage of these
   directives.
@@ -90,7 +90,7 @@ Deprecated PIR directives and shortcuts.
 
   use the 'save' or 'restore' opcodes instead
 
-call xxx
+call xxx    DONE
 
   This is one char longer then it's translation 'bsr' - it's just not needed.
 

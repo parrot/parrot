@@ -19,14 +19,16 @@ Tests the object/class subsystem.
 use Parrot::Test tests => 62;
 use Test::More;
 
-output_is(<<'CODE', <<'OUTPUT', "findclass (base class)");
+output_is(<<'CODE', <<'OUTPUT', "find_type (base class)");
     newclass P1, "Foo"
 
-    findclass I0, "Foo"
+    find_type I0, "Foo"
+    isgt I0, I0, 0
     print I0
     print "\n"
 
-    findclass I0, "Bar"
+    find_type I0, "Bar"
+    isgt I0, I0, 0
     print I0
     print "\n"
     end
@@ -35,19 +37,22 @@ CODE
 0
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "findclass (subclass)");
+output_is(<<'CODE', <<'OUTPUT', "find_type (subclass)");
     newclass P1, "Foo"
     subclass P2, P1, "Bar"
 
-    findclass I0, "Foo"
+    find_type I0, "Foo"
+    isgt I0, I0, 0
     print I0
     print "\n"
 
-    findclass I0, "Bar"
+    find_type I0, "Bar"
+    isgt I0, I0, 0
     print I0
     print "\n"
 
-    findclass I0, "Qux"
+    find_type I0, "Qux"
+    isgt I0, I0, 0
     print I0
     print "\n"
     end

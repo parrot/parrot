@@ -268,15 +268,9 @@ op subclass(out PMC, in STR) :object_classes {
   goto NEXT();
 }
 
-=item B<findclass>(out INT, in STR)
-
-Returns 1 if the class exists, 0 if it does not.
-
 =cut
 
-inline op findclass(out INT, in STR) :object_base {
-  PMC *class = Parrot_class_lookup(interpreter, $2);
-  $1 = !PMC_IS_NULL(class);
+inline op DELETED_findclass(out INT, in STR) :object_base {
   goto NEXT();
 }
 
