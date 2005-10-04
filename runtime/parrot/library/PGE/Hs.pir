@@ -7,7 +7,8 @@ PGE::Hs - Match and display PGE rules as Haskell expressions
 (You need to run C<make PGE-Hs.pbc> in F<compilers/pge> first.)
 
     .sub _main
-        load_bytecode "PGE-Hs.pbc"
+        load_bytecode "PGE.pbc"
+        load_bytecode "PGE/Hs.pir"
         $P0 = find_global "PGE::Hs", "match"
         $S0 = $P0("Hello", "(...)*$")
         print $S0   # PGE_Match 2 5 [PGE_Array [PGE_Match 2 5 [] []]] []
@@ -37,7 +38,7 @@ the one in the Parrot tree instead.
 
 Granted, it is possible to pass in Pugs's own library path into an
 environment variable (maybe C<PARROT_LIBS>?), but as this was not in
-the 0.2.0 release, I (autrijus) decided to take the easy route. :-)
+the 0.3.0 release, I (autrijus) decided to take the easy route. :-)
 
 =head1 CAVEATS
 
@@ -54,7 +55,7 @@ whole thing may be taken out or refactored away at any moment.
 
 .sub "__onload" @LOAD
     .local pmc load
-    load_bytecode "library/Data/Escape.imc"
+    load_bytecode "Data/Escape.imc"
 .end
 
 .sub "add_rule"
@@ -107,7 +108,7 @@ whole thing may be taken out or refactored away at any moment.
 
 .namespace [ "PGE::Match" ]
 
-.sub "dump_hs" method
+.sub "dump_hs" :method
     .local string out
     .local int spi, spc
     .local int ari, arc
