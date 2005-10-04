@@ -24,6 +24,7 @@ lib${slash}builtins${slash}break.pir \
 lib${slash}commands${slash}break.pir \
 lib${slash}commands${slash}catch.pir \
 lib${slash}commands${slash}concat.pir \
+lib${slash}builtins${slash}continue.pir \
 lib${slash}commands${slash}continue.pir \
 lib${slash}commands${slash}error.pir \
 lib${slash}commands${slash}eval.pir \
@@ -35,6 +36,7 @@ lib${slash}commands${slash}format.pir \
 lib${slash}commands${slash}gets.pir \
 lib${slash}commands${slash}global.pir \
 lib${slash}commands${slash}if.pir \
+lib${slash}builtins${slash}incr.pir \
 lib${slash}commands${slash}incr.pir \
 lib${slash}commands${slash}info.pir \
 lib${slash}commands${slash}inline.pir \

@@ -37,9 +37,20 @@ Given a PMC, get a number from it.
   $S0 = value
   $I0 = length $S0
 
+  .local int multiplier
+  multiplier = 1
+
+  $S1 = substr $S0, 0, 1
+  # If the first character is -, assume a negative number.
+  unless $S1 == "-" goto get_value
+  multiplier = -1
+  $I0 = length $S0
+  dec $I0
+  $S0 = substr $S0, 1, $I0
+get_value:
   (value, $I1) = get_number($S0, 0)
   if $I0 != $I1 goto NaN
-  goto done
+  value *= multiplier
 
 done:
   .return(value)

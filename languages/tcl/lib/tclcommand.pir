@@ -109,6 +109,9 @@ no_command_non_interactive:
 
    .local string label_num
    label_num = register_num
+   .local int inline_result_num
+   .local int inline_available
+   inline_available=0
 
    .local pmc compile
    compile = find_global "_Tcl", "compile"
@@ -151,16 +154,23 @@ arg_loop_done:
      $S0 = name
      $P1 = find_global "_Tcl::builtins", $S0
    clear_eh
-
-   (register_num,retval) = $P1(register_num,self)
+ 
+   (inline_result_num,retval) = $P1(register_num,self)
+   
+   register_num = inline_result_num + 1
    # XXX Need check here for global epoch.
    pir_code .= "inlined_command"
    pir_code .= label_num
    pir_code .= ":\n"
    pir_code .= retval
+   pir_code .= "$P%i=$P" # placeholder for final result PMC.
+   $S0 = inline_result_num
+   pir_code .= $S0
+   pir_code .= "\n"
    pir_code .= "goto done_command"
    pir_code .= label_num
    pir_code .= "\n"
+   inline_available = 1
 dynamic:
    pir_code .= "dynamic_command"
    pir_code .= label_num
@@ -168,9 +178,6 @@ dynamic:
    .local int name_register
    (name_register,retval) = compile(name,register_num)
    register_num = name_register
-
-   
-
 
    pir_code .= retval
    $S1 = "$P"
@@ -246,6 +253,17 @@ elem_loop_done:
    pir_code .= "done_command"
    pir_code .= label_num
    pir_code .= ":\n"
+
+   unless inline_available goto done
+
+   .local pmc printf_args
+   printf_args = new .Array
+   printf_args = 1
+   printf_args[0] = register_num
+
+   pir_code = sprintf pir_code, printf_args
+
+done:
 
   .return (register_num,pir_code)
 .end
