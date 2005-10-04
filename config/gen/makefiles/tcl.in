@@ -20,6 +20,7 @@ DEPS = $(PARROT) \
 lib${slash}commands${slash}after.pir \
 lib${slash}commands${slash}append.pir \
 lib${slash}commands${slash}array.pir \
+lib${slash}builtins${slash}break.pir \
 lib${slash}commands${slash}break.pir \
 lib${slash}commands${slash}catch.pir \
 lib${slash}commands${slash}concat.pir \

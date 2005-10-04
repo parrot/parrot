@@ -21,15 +21,21 @@ opendir(CMDDIR,$command_dir);
 my @cmd_files = readdir(CMDDIR);
 closedir(CMDDIR);
 
+my $builtins_dir = "lib/builtins";
+opendir(CMDDIR,$builtins_dir);
+my @blt_files = readdir(CMDDIR);
+closedir(CMDDIR);
+
 my $macro_dir = "lib/macros";
 opendir(CMDDIR,$macro_dir);
 my @macro_files = readdir(CMDDIR);
 closedir(CMDDIR);
 
-my @cmd_includes = map {"$command_dir/$_"} grep {m/\.pir$/} @cmd_files;
-my @macro_includes = map {"$macro_dir/$_"} grep {m/\.pir$/} @macro_files;
+my @cmd_includes = map {"$command_dir/$_"} grep {m/\.pir$/}  @cmd_files;
+my @blt_includes = map {"$builtins_dir/$_"} grep {m/\.pir$/} @blt_files;
+my @macro_includes = map {"$macro_dir/$_"} grep {m/\.pir$/}  @macro_files;
 
-my @commands = grep {s/\.pir$//} @cmd_files;
+my @commands = grep {s/\.pir$//} @cmd_files, @blt_files;
 
 my $lib_dir = "lib";
 opendir(LIBDIR,$lib_dir) or die;
@@ -37,7 +43,7 @@ my @libs = map {"$lib_dir/$_"} grep {m/\.pir$/} grep {! m/^tcl(lib|command|comma
 closedir(LIBDIR);
 
 my $includes;
-foreach my $file (@macro_includes, @cmd_includes, @libs) {
+foreach my $file (@macro_includes, @cmd_includes, @blt_includes, @libs) {
   $includes .= "  .include \"languages/tcl/$file\"\n";
 }
 

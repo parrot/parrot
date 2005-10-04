@@ -27,6 +27,7 @@ Initialize the attributes for an instance of the class
   #setattribute self, "TclCommand\x00name", $P0
 .end
 
+
 .sub __clone :method
   .local pmc obj
   $I0 = typeof self
@@ -104,11 +105,11 @@ no_command_non_interactive:
 .sub compile :method
    .param int register_num
  
-   #.local int eh_num
-   #eh_num = register_num
+   inc register_num
 
-   #inc register_num
- 
+   .local string label_num
+   label_num = register_num
+
    .local pmc compile
    compile = find_global "_Tcl", "compile"
 
@@ -141,9 +142,35 @@ arg_loop_done:
 
    .local pmc name
    name = getattribute self, "TclCommand\x00name"
+
+   $I0 = typeof name
+   $I1 = find_type "TclConst"
+   if $I0 != $I1 goto dynamic
+
+   push_eh dynamic
+     $S0 = name
+     $P1 = find_global "_Tcl::builtins", $S0
+   clear_eh
+
+   (register_num,retval) = $P1(register_num,self)
+   # XXX Need check here for global epoch.
+   pir_code .= "inlined_command"
+   pir_code .= label_num
+   pir_code .= ":\n"
+   pir_code .= retval
+   pir_code .= "goto done_command"
+   pir_code .= label_num
+   pir_code .= "\n"
+dynamic:
+   pir_code .= "dynamic_command"
+   pir_code .= label_num
+   pir_code .= ":\n"
    .local int name_register
    (name_register,retval) = compile(name,register_num)
    register_num = name_register
+
+   
+
 
    pir_code .= retval
    $S1 = "$P"
@@ -216,5 +243,9 @@ elem_loop_done:
    pir_code .= $S0
    pir_code .= ":\n"
    # return the code and the new register_num 
+   pir_code .= "done_command"
+   pir_code .= label_num
+   pir_code .= ":\n"
+
   .return (register_num,pir_code)
 .end

@@ -27,6 +27,11 @@ Modify the compiler for tclcommand to generate the inline version if
 it's available. (C<proc> and C<expr> should also be straightforward, as they
 already compile anyway.)
 
+Note: compiled builtins always take two args: the register_num to begin
+using for the inlined code, and a single container pmc that contains the
+pre-parsed arguments. They return just like the compile methods in lib/tcl*.pir,
+that is, the register_num the result is in, and the inlinable code.
+
 =item 2
 
 When an inline compiled version exists, use it, but IFF a global counter
