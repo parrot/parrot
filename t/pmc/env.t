@@ -89,6 +89,10 @@ ok 1
 ok 2
 OUT
 
+SKIP:
+{
+	skip 'iterator not available on win32' => 1
+		if 'MSWin32' eq $^O;
 output_is(<<'CODE', <<OUT, "iterate");
     new P0, .Env
     set P0["PARROT_1"], "hello"
@@ -114,7 +118,7 @@ isok:
 CODE
 ok
 OUT
-
+}
 
 SKIP: {
     # This will not work on our unsetenv implementation
