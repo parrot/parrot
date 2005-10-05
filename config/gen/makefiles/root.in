@@ -391,8 +391,6 @@ INTERP_O_FILES = \
     $(SRC_DIR)/core_pmcs$(O) \
 #CONDITIONED_LINE(platform_asm):    $(SRC_DIR)/platform_asm$(O) \
     $(SRC_DIR)/platform$(O) ${TEMP_jit_o} \
-    $(SRC_DIR)/rx$(O) \
-    $(SRC_DIR)/rxstacks$(O) \
     $(SRC_DIR)/intlist$(O) \
     $(SRC_DIR)/list$(O) \
     $(SRC_DIR)/library$(O) \
@@ -1000,10 +998,6 @@ $(SRC_DIR)/parrot$(O) : $(GENERAL_H_FILES)
 $(SRC_DIR)/register$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/generic_register.c
 
 $(SRC_DIR)/runops_cores$(O) : $(GENERAL_H_FILES)
-
-$(SRC_DIR)/rx$(O) : $(GENERAL_H_FILES)
-
-$(SRC_DIR)/rxstacks$(O) : $(GENERAL_H_FILES)
 
 $(SRC_DIR)/stacks$(O) : $(GENERAL_H_FILES)
 

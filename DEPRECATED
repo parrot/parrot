@@ -21,15 +21,6 @@ savetop, restoretop,
   use saveall/restoreall (whole register frame) or
   user stack opcodes save/restore instead.
 
-Integer stack opcodes
-
-intsave/intrestore/intdepth
-
-  The integer stack was an invention for rx_ opcodes, but as it's a
-  global stack, regexen using these opcodes aren't reentrant.
-
-  use a ResizableIntegerPMC instead and standard keyed access
-
 String character class opcodes is_* find_* and API interfaces
 
   The opcodes C<is_digit>, C<find_digit> et al and the according APIs are
@@ -39,14 +30,6 @@ String character class opcodes is_* find_* and API interfaces
 C<pack> opcodes
 
   I've no clue what these are doing - for sure not a perl-ish pack.
-
-rx_ opcodes, src/rx.c, and the intstack
-
-  The old rx_ (regex) opcodes are unused by PGE (and will not be used).
-  The opcodes are lacking state, rx code using these ops is not reentrant
-  due to the global intstack.
-  rx.c has yet another (ascii-only) character class handling, it leaks
-  memory and is just broken.
 
 
 FUTURE changes

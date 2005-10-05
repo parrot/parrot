@@ -326,7 +326,6 @@ docs/dev/longopt.dev                              [main]doc
 docs/dev/optimizer.pod                            [main]doc
 docs/dev/nanoparrot.c                             [main]doc
 docs/dev/pmc_freeze.pod                           [devel]doc
-docs/dev/rx.dev                                   [main]doc
 docs/embed.pod                                    [main]doc
 docs/extend.pod                                   [main]doc
 docs/faq.pod                                      [main]doc
@@ -775,8 +774,6 @@ include/parrot/regfuncs.h                         [devel]include
 include/parrot/register.h                         [devel]include
 include/parrot/resources.h                        [devel]include
 include/parrot/runops_cores.h                     [devel]include
-include/parrot/rx.h                               [devel]include
-include/parrot/rxstacks.h                         [devel]include
 include/parrot/settings.h                         [devel]include
 include/parrot/slice.h                            [devel]include
 include/parrot/smallobject.h                      [devel]include
@@ -1692,7 +1689,6 @@ ops/ops.num                                       [devel]
 ops/pic.ops                                       []
 ops/pmc.ops                                       []
 ops/python.ops                                    []
-ops/rx.ops                                        []
 ops/set.ops                                       []
 ops/stack.ops                                     []
 ops/string.ops                                    []
@@ -1773,8 +1769,6 @@ src/register.c                                    []
 src/res_lea.c                                     []
 src/resources.c                                   []
 src/runops_cores.c                                []
-src/rx.c                                          []
-src/rxstacks.c                                    []
 src/smallobject.c                                 []
 src/spf_render.c                                  []
 src/spf_vtable.c                                  []
@@ -1842,7 +1836,6 @@ t/op/literal.t                                    []
 t/op/macro.t                                      []
 t/op/number.t                                     []
 t/op/random.t                                     []
-t/op/rx.t                                         []
 t/op/spawnw.t                                     []
 t/op/stacks.t                                     []
 t/op/string.t                                     []

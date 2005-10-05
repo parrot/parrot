@@ -106,8 +106,6 @@ typedef Parrot_Run_core_t Run_Cores;
 #include "parrot/op.h"
 #include "parrot/oplib.h"
 
-#include "parrot/rxstacks.h"
-
 #include "parrot/debug.h"
 #include "parrot/mmd.h"
 
@@ -191,7 +189,6 @@ struct Parrot_Context {
     struct Stack_Chunk *pad_stack;      /* Base of the lex pad stack */
     struct Stack_Chunk *user_stack;     /* Base of the scratch stack */
     struct Stack_Chunk *control_stack;  /* Base of the flow control stack */
-    IntStack intstack;                  /* Base of the regex stack */
     UINTVAL warns;             /* Keeps track of what warnings
                                  * have been activated */
     UINTVAL errors;            /* fatals that can be turned off */

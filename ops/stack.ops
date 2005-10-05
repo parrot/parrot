@@ -569,42 +569,16 @@ inline op rotate_up(in INT) :base_core {
   goto NEXT();
 }
 
-########################################
-
-=item B<intsave>(in INT)
-
-Save register or constant $1 onto the high-speed int stack.
-
-=cut
-
-inline op intsave(in INT) :base_core {
-  intstack_push(interpreter, CONTEXT(interpreter->ctx)->intstack, $1);
+inline op DELETED_intsave(in INT) :base_core {
   goto NEXT();
 }
 
-########################################
 
-=item B<intrestore>(out INT)
-
-Restore register $1 from the high-speed int stack.
-
-=cut
-
-inline op intrestore(out INT) :base_core {
-  $1=intstack_pop(interpreter, CONTEXT(interpreter->ctx)->intstack);
+inline op DELETED_intrestore(out INT) :base_core {
   goto NEXT();
 }
 
-########################################
-
-=item B<intdepth>(out INT)
-
-Puts the depth of the high-speed int stack in $1.
-
-=cut
-
-inline op intdepth(out INT) :base_core {
-  $1=intstack_depth(interpreter, CONTEXT(interpreter->ctx)->intstack);
+inline op DELETED_intdepth(out INT) :base_core {
   goto NEXT();
 }
 

@@ -39,9 +39,10 @@ my %todo = map { $_ => 'various reasons' } ( 1 .. 15 );
 # known reasons for failure
 $todo{8}  = 'works only on little endian';
 $todo{13} = 'unreliable, but often succeeds';
+# all others: opcode renumbered
 
 # working tests
-undef $todo{$_} foreach ( 3, 12 );
+undef $todo{$_} foreach ( 12 );
 
 # run all tests and tell about todoness
 foreach ( 1 .. 15 ) {

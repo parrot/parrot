@@ -561,9 +561,6 @@ make_interpreter(Parrot_Interp parent, Interp_flags flags)
     /* And a control stack */
     CONTEXT(interpreter->ctx)->control_stack = new_stack(interpreter, "Control");
 
-    /* A regex stack would be nice too. */
-    CONTEXT(interpreter->ctx)->intstack = intstack_new(interpreter);
-
     /* clear context introspection vars */
     SET_NULL_P(CONTEXT(interpreter->ctx)->current_sub, PMC*);
     SET_NULL_P(CONTEXT(interpreter->ctx)->current_cont, PMC*);
@@ -770,8 +767,6 @@ Parrot_really_destroy(int exit_code, void *vinterp)
     stack_destroy(CONTEXT(interpreter->ctx)->pad_stack);
     stack_destroy(CONTEXT(interpreter->ctx)->user_stack);
     stack_destroy(CONTEXT(interpreter->ctx)->control_stack);
-    /* intstack */
-    intstack_free(interpreter, CONTEXT(interpreter->ctx)->intstack);
 
     destroy_context(interpreter);
 
