@@ -39,7 +39,7 @@ my @commands = grep {s/\.pir$//} @cmd_files, @blt_files;
 
 my $lib_dir = "lib";
 opendir(LIBDIR,$lib_dir) or die;
-my @libs = map {"$lib_dir/$_"} grep {m/\.pir$/} grep {! m/^tcl(lib|command|commandlist|const|func|ops|var|word).pir$/} readdir(LIBDIR);
+my @libs = map {"$lib_dir/$_"} grep {m/\.pir$/} grep {! m/^tcl(lib|command|commandlist|const|func|ops|binaryops|var|word).pir$/} readdir(LIBDIR);
 closedir(LIBDIR);
 
 my $includes;

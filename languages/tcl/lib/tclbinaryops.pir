@@ -181,17 +181,59 @@ op_shl:
 op_shr:
   .binary_op("$P%i = shr $P%i, $P%i\n")
 op_lt:
-  .binary_op2 ("$I%i = islt $P%i, $P%i\n$P%i = new .TclInt\n$P%i= $I%i\n")
+
+  $S0 = <<"END_PIR"
+$I%i=islt $P%i,$P%i
+$P%i=new .TclInt
+$P%i= $I%i
+END_PIR
+
+  .binary_op2 ($S0)
 op_gt:
-  .binary_op2 ("$I%i = isgt $P%i, $P%i\n$P%i = new .TclInt\n$P%i= $I%i\n")
+
+  $S0 = <<"END_PIR"
+$I%i=isgt $P%i,$P%i
+$P%i=new .TclInt
+$P%i= $I%i
+END_PIR
+
+  .binary_op2 ($S0)
 op_lte:
-  .binary_op2 ("$I%i = isle $P%i, $P%i\n$P%i = new .TclInt\n$P%i= $I%i\n")
+
+  $S0 = <<"END_PIR"
+$I%i=isle $P%i,$P%i
+$P%i=new .TclInt
+$P%i= $I%i
+END_PIR
+
+  .binary_op2 ($S0)
 op_gte:
-  .binary_op2 ("$I%i = isge $P%i, $P%i\n$P%i = new .TclInt\n$P%i= $I%i\n")
+
+  $S0 = <<"END_PIR"
+$I%i=isge $P%i,$P%i
+$P%i=new .TclInt
+$P%i= $I%i
+END_PIR
+
+  .binary_op2 ($S0)
 op_equal:
-  .binary_op2 ("$I%i = iseq $P%i, $P%i\n$P%i = new .TclInt\n$P%i= $I%i\n")
+
+  $S0 = <<"END_PIR"
+$I%i=iseq $P%i,$P%i
+$P%i=new .TclInt
+$P%i= $I%i
+END_PIR
+
+  .binary_op2 ($S0)
 op_unequal:
-  .binary_op2 ("$I%i = isne $P%i, $P%i\n$P%i = new .TclInt\n$P%i= $I%i\n")
+
+  $S0 = <<"END_PIR"
+$I%i=isne $P%i,$P%i
+$P%i=new .TclInt
+$P%i= $I%i
+END_PIR
+
+  .binary_op2 ($S0)
 op_bitand:
   .binary_op("$P%i = band $P%i, $P%i\n")
 op_bitxor:
@@ -199,9 +241,27 @@ op_bitxor:
 op_bitor:
   .binary_op("$P%i = bor $P%i, $P%i\n")
 op_ne:
-  .binary_op3("$S%i=$P%i\n$S%i=$P%i\n$I%i = isne $S%i, $S%i\n$P%i = new .TclInt\n$P%i = $I%i\n")
+
+   $S0 = <<"END_PIR"
+$S%i=$P%i
+$S%i=$P%i
+$I%i=isne $S%i,$S%i
+$P%i=new .TclInt
+$P%i=$I%i
+END_PIR
+
+  .binary_op3($S0)
 op_eq:
-  .binary_op3("$S%i=$P%i\n$S%i=$P%i\n$I%i = iseq $S%i, $S%i\n$P%i = new .TclInt\n$P%i = $I%i\n")
+
+   $S0 = <<"END_PIR"
+$S%i=$P%i
+$S%i=$P%i
+$I%i=iseq $S%i,$S%i
+$P%i=new .TclInt
+$P%i=$I%i
+END_PIR
+
+  .binary_op3($S0)
 op_and:
   inc register_num 
   .local int jump_label 
@@ -226,21 +286,23 @@ op_and:
   printf_args[12] = register_num
   printf_args[13] = jump_label
 
-  pir_code .= "%s"
-  pir_code .= "unless $P%i goto false%i\n"
-  pir_code .= "%s"
-  pir_code .= "unless $P%i goto false%i\n"
-  pir_code .= "true%i:\n"
-  pir_code .= "$P%i = new .TclInt\n"
-  pir_code .= "$P%i = 1\n"
-  pir_code .= "goto done%i\n"
-  pir_code .= "false%i:\n"
-  pir_code .= "$P%i = new .TclInt\n"
-  pir_code .= "$P%i = 0\n"
-  pir_code .= "done%i:\n"
+   $S0 = <<"END_PIR"
+%s
+unless $P%i goto false%i
+%s
+unless $P%i goto false%i
+true%i:
+$P%i=new .TclInt
+$P%i=1
+goto done%i
+false%i:
+$P%i=new .TclInt
+$P%i=0
+done%i:
+END_PIR
 
-  pir_code = sprintf pir_code, printf_args
-
+  $S1 = sprintf $S0, printf_args 
+  pir_code .= $S1
 
   goto done
 op_or:
@@ -267,20 +329,23 @@ op_or:
   printf_args[12] = register_num
   printf_args[13] = jump_label
 
-  pir_code .= "%s"
-  pir_code .= "if $P%i goto true%i\n"
-  pir_code .= "%s"
-  pir_code .= "if $P%i goto true%i\n"
-  pir_code .= "false%i:\n"
-  pir_code .= "$P%i = new .TclInt\n"
-  pir_code .= "$P%i = 0\n"
-  pir_code .= "goto done%i\n"
-  pir_code .= "true%i:\n"
-  pir_code .= "$P%i = new .TclInt\n"
-  pir_code .= "$P%i = 1\n"
-  pir_code .= "done%i:\n"
+  $S0 =<<"END_PIR"
+%s
+if $P%i goto true%i
+%s
+if $P%i goto true%i
+false%i:
+$P%i=new .TclInt
+$P%i=0\
+goto done%i
+true%i:
+$P%i=new .TclInt
+$P%i=1
+done%i:
+END_PIR
 
-  pir_code = sprintf pir_code, printf_args
+  $S1 = sprintf $S0, printf_args
+  pir_code .= $S1
 
 done:
 

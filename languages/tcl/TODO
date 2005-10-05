@@ -17,15 +17,16 @@ with a few caveats and TODOs.
 
 =item 0
 
-Remove all the (now) dead "interpret" code.
+Add the "unknown command" logic from the (commented out) tclcommand's interpret
+to the compiled version, and then remove the interpret :method.
 
 =item 1
 
 Generate compiler-variants for several builtins, esp. the flow control
-commands like C<while>. Easy ones like C<incr> should be done as well.
+commands like C<while>. 
 Modify the compiler for tclcommand to generate the inline version if
 it's available. (C<proc> and C<expr> should also be straightforward, as they
-already compile anyway.)
+already compile anyway.)  [Completed: incr, break, continue]
 
 Note: compiled builtins always take two args: the register_num to begin
 using for the inlined code, and a single container pmc that contains the

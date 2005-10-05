@@ -15,20 +15,6 @@ Define the attributes required for the class.
   $P1 = subclass $P0, "TclVar"
 .end
 
-=head2 interpret
-
-Get the value of the variable.
-
-
-.sub interpret :method
-    .local pmc read
-    read = find_global "_Tcl", "__read"
-    $S0 = self
-    .return read($S0)
-.end
-
-=cut
-
 .sub compile :method
     .param int register_num
 

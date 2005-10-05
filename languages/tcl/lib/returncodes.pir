@@ -12,11 +12,11 @@ A convenience: we need these return codes in many different bytecode files.
 
  # values for accessing exception information
  .const int VALUE_SLOT = 0 # _message
- .const int CODE_SLOT = 9 # tcl return code.
+ .const int CODE_SLOT  = 9 # tcl return code.
 
 =head1 exception handling macros
 
-Exceptions creation can be fairly verbose. These macros provide an API
+Exception creation can be fairly verbose. These macros provide an API
 of sorts to the exceptions.
 
 =cut

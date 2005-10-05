@@ -29,44 +29,6 @@ Initialize the attributes for an instance of the class
   setattribute self, "TclUnaryOp\x00operand", $P0
 .end
 
-=for cut
-
-.sub interpret :method
-  .local pmc retval
-  retval = new TclInt
-  
-  .local pmc name, operand
-  name    = getattribute self, "TclUnaryOp\x00name"
-  operand = getattribute self, "TclUnaryOp\x00operand"
-  retval = operand."interpret"()
-
-  operand = retval
-  
-  if name == "-" goto minus
-  if name == "+" goto plus
-  if name == "~" goto bitwise_not
-  if name == "!" goto logical_not
-  
-minus:
-  retval = neg operand
-  goto done
-plus:
-  retval = operand
-  goto done
-bitwise_not:
-  retval = bnot operand
-  goto done
-logical_not:
-  retval = not operand
-  goto done
-
-done:
-  .return(retval)
-
-.end
-
-=cut
-
 .sub compile :method
   .param int register_num
 

@@ -100,6 +100,9 @@ got_increment:
   .return (register_num,pir_code)
 
 error:
-  pir_code = ".throw (\"wrong # args: should be \\\"incr varName ?increment?\\\"\")\n"
+  pir_code =<<"END_PIR"
+.throw (\"wrong # args: should be \\\"incr varName ?increment?\\\"\")
+END_PIR
+
   .return (register_num,pir_code)
 .end

@@ -23,41 +23,6 @@ Define the attributes required for the class.
   $P1 = subclass $P0, "TclWord"
 .end
 
-=head2 interpret
-
-Return a PMC that contains the value of our word, concatenating
-the string values of the elements.
-
-
-.sub interpret :method
-  .local pmc retval
-  
-  .local int i, len
-  i   = 0
-  len = self
-  
-  .local string word
-  word = ""
-
-loop:
-  if i == len goto loop_done
-  
-  $P0 = self[i]
-  retval = $P0."interpret"()
-  
-  $S0 = retval
-  word .= $S0
-  
-  inc i
-  goto loop
-
-loop_done:
-  .return(word)
-
-.end
-
-=cut
-
 .sub compile :method
   .param int register_num
 

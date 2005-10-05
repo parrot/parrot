@@ -257,17 +257,6 @@ done:
   $P0 = value
 .end
 
-=head2 interpret
-
-Get the value of the const.
-
-
-.sub interpret :method
-    .return(self)
-.end
-
-=cut
-
 =head2 compile
 
 Generate PIR code which can be used to generate our value

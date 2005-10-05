@@ -81,6 +81,7 @@ providing a compreg-compatible method.
 .sub __prepare_lib :load :anon
 
   # Load any dependant libraries.
+  load_bytecode "languages/tcl/lib/tclbinaryops.pbc"
   load_bytecode "languages/tcl/lib/tclcommand.pbc"
   load_bytecode "languages/tcl/lib/tclcommandlist.pbc"
   load_bytecode "languages/tcl/lib/tclconst.pbc"

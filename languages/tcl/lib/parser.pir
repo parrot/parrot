@@ -655,7 +655,7 @@ stringish:
   $P1 = find_global "Data::Escape", "String"
   thing = $P1(thing,"\"")
 
-  lquote = "\""  # might eventually put unicode: here.
+  lquote = "\""  # XXX might eventually put unicode: here.
   rquote = "\"" 
 set_args:
 

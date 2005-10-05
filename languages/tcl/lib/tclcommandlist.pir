@@ -9,27 +9,6 @@
   $P0 = subclass $P0, "TclCommandList"
 .end
 
-=for cut
-
-.sub interpret :method
-  .local pmc retval
-  .local int i, elems
-  elems = self
-  i     = 0
-
-loop:
-  if i == elems goto done
-  $P0 = self[i]
-  retval = $P0."interpret"()
-  inc i
-  goto loop
-done:
-  .return (retval) 
-
-.end
-
-=cut
-
 .sub compile :method
   .param int register_num
 

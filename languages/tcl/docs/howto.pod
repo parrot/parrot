@@ -12,34 +12,24 @@ should merge with the TODO to avoid redundancy.
 
 =over 4
 
-=item interperter -> compiler
+=item compiler bits
 
-Right now, partcl is an interpreter. The parser generates an AST of sorts,
-which the interpreter then walks through the ast, finds the command to execute,
-(e.g., C<Tcl::puts>), gets the values for each of the args (Evaluation is
-deferred until just before the function is called.)
+Partcl is now a compiler. Given a section of tcl code, it generates PIR
+instead of an AST, then compiles and invokes the sub.
 
-To switch to a compiler, we need to basically use the same interpreter loop,
-but generate it specifically for the series of commands being invoked. Once
-we have the PIR, we can then C<compile> it, and return that anonymous PIR
-sub. Then, instead of calling "interpret", we can just invoke that sub.
+When writing a new builtin, preferentially put it in
+C<< lib/builtins/<builtin>.pir >> , and write a wrapper in
+C<< lib/commands/<builtin>.pir >> which calls the inlined version.
 
-Some optimizations we can do:
-
-TclWord (which we call to get the PMC for
-the various arguments), has an "is_const" method - If we look up the
-value and it's constant, we can hardcode it right into the PIR. Same goes
-for the commands.
-
-A non-tcl option we can provide is a command line option to just dump the
-generated PIR/bytecode. (e.g. tclsh -o foo.pir or tclsh -o foo.pbc)
-
-One algorithm to cache the builtins - keep a global counter (in some places,
-called epoch) - every time [rename] is called, epoch is bumped up and we have
-to re-fetch the method. But, if it hasn't changed, we're allowed to cheat.
-And if we can cheat on something like C<puts foo>, we can translate that
-*in place* to a simple C<print "foo\n"> and not have to go through all
-the overhead.
+Inlined builtins must take a register num to begin with, along with a single
+PMC with the various args. (As opposed to the interpreted-style, which takes
+a vararg list.). They must return the register in which the result of the
+command is stored, along with the generated PIR. The results of calling
+the inlined code will be used by C<lib/tclcommand.pir>. The inlined code
+is further wrapped in a protective conditional which will (eventually) skip
+the inlined version if it can no longer be trusted, and will fall back to
+the interpreted version as necessary. (And throw an exception if the command
+is not found at runtime.)
 
 =item speed
 

@@ -163,11 +163,12 @@ done:
   printf_args[6] = register_num
   printf_args[7] = register_num
 
-  pir_code .= "$N%i=$P%i\n"
-  pir_code .= "$N%i=%s $N%i\n"
-  pir_code .= "$P%i = new .TclFloat\n"
-  pir_code .= "$P%i=$N%i\n"
-
+  pir_code .= <<"END_PIR"
+$N%i=$P%i
+$N%i=%s $N%i
+$P%i=new .TclFloat
+$P%i=$N%i
+END_PIR
 
 done_all:
 
