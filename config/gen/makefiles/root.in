@@ -1227,8 +1227,12 @@ test_prep : all
 # Users have to look at only one report.
 # Normal core
 test : test_prep
-	$(PERL) t/harness $(EXTRA_TEST_ARGS) $(PARROT_ARGS) $(RUNCORE_TEST_FILES) \
-		$(RUN_TEST_FILES) $(SRC_TEST_FILES) $(PERL_TEST_FILES) $(TOOLS_TEST_FILES)
+	$(PERL) t/harness $(EXTRA_TEST_ARGS) $(PARROT_ARGS) \
+    $(RUNCORE_TEST_FILES) \
+    $(RUN_TEST_FILES) \
+    $(SRC_TEST_FILES)  \
+    $(PERL_TEST_FILES)  \
+    $(TOOLS_TEST_FILES)
 
 # Test various run cores and other stuff
 # 'testC', 'testg' and 'testj' are tested only

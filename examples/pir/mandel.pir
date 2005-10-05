@@ -7,7 +7,7 @@ examples/assembly/mandel.imc - Print the Mandelbrot set
 
 =head1 SYNOPSIS
 
-    % ./parrot examples/assembly/mandel.imc
+    % ./parrot examples/pir/mandel.pir
 
 =head1 DESCRIPTION
 
@@ -93,6 +93,4 @@ PRINT:  $I1 = k % 16
         print "\n"
         dec y
         if y > 0 goto YREDO
-
-END:   
 .end

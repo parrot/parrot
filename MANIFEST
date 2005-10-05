@@ -445,7 +445,6 @@ examples/assembly/bsr.pasm                        [main]doc
 examples/assembly/cat.pasm                        [main]doc
 examples/assembly/coroutine.pasm                  [main]doc
 examples/assembly/euclid.pasm                     [main]doc
-examples/assembly/fact.pasm                       [main]doc
 examples/assembly/hanoi.pasm                      [main]doc
 examples/assembly/hello.pasm                      [main]doc
 examples/assembly/hello-dwim.imc                  [main]doc
@@ -457,7 +456,6 @@ examples/assembly/lexical2.pasm                   [main]doc
 examples/assembly/lexical3.pasm                   [main]doc
 examples/assembly/life.pasm                       [main]doc
 examples/assembly/local_label.pasm                [main]doc
-examples/assembly/mandel.imc                      [main]doc
 examples/assembly/mandel.pasm                     [main]doc
 examples/assembly/md5sum.imc                      [main]doc
 examples/assembly/mops.pasm                       [main]doc
@@ -600,6 +598,8 @@ examples/mops/mops.ps                             [main]doc
 examples/mops/mops.py                             [main]doc
 examples/mops/mops.rb                             [main]doc
 examples/mops/mops.scheme                         [main]doc
+examples/pasm/fact.pasm                           [main]doc
+examples/pir/mandel.pir                           [main]doc
 examples/pni/PQt.C                                [main]doc
 examples/pni/QtHelloWorld.pasm                    [main]doc
 examples/pni/sdl_blue_rectangle.imc               [main]doc
@@ -1792,9 +1792,10 @@ t/dynclass/pyclass.t                              []
 t/dynclass/pycomplex.t                            []
 t/dynclass/pyfunc.t                               []
 t/dynclass/pyint.t                                []
-t/examples/assembly.t                             []
 t/examples/japh.t                                 []
 t/examples/library.t                              []
+t/examples/pasm.t                                 []
+t/examples/pir.t                                  []
 t/examples/subs.t                                 []
 t/harness                                         []
 t/native_pbc/header.t                             []

@@ -4,13 +4,13 @@
 
 =head1 NAME
 
-t/examples/assembly.t - Test examples in F<examples/assembly>
+t/examples/pasm.t - Test examples in F<examples/pasm>
 
 =head1 SYNOPSIS
 
-	% perl -Ilib t/examples/assembly.t
+	% perl -Ilib t/examples/pasm.t
 
-        % perl t/harness t/examples/assembly.t
+        % perl t/harness t/examples/pasm.t
 
 =head1 DESCRIPTION
 
@@ -51,7 +51,7 @@ my %test_func = ( pasm => \&pasm_output_is,
 
 while ( my ( $example, $expected ) = each %expected )
 {
-    my $code_fn   = "examples/assembly/$example";
+    my $code_fn   = "examples/pasm/$example";
     my $code = Parrot::Test::slurp_file($code_fn);
 
     my ( $extension ) = $example =~ m{ [.]                  # introducing extension
