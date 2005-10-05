@@ -13,7 +13,7 @@ How to submit bug reports, patches and new files to Parrot.
 
 If you encounter an error while working with Parrot, and don't understand what
 is causing it, then submit a bug report using the F<parrotbug> utility. The
-simplest way to use it is to run 
+simplest way to use it is to run
 
     % ./parrotbug
 

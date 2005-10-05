@@ -98,13 +98,13 @@ PARROT_PREDEREF_CORE, PARROT_JIT_CORE.
 =item C<PARROT_PREDEREF_CORE>
 
 This flag turns on predereferencing.  Parrot will transform many offsets in the
-opcode stream to absolute pointers.  
+opcode stream to absolute pointers.
 
 =item C<PARROT_JIT_CORE>
 
 This flag turns on just-in-time compilation.  Parrot will convert the bytecode
 file into native machine code and run it, usually resulting in substantial
-speedup. 
+speedup.
 
 =back
 

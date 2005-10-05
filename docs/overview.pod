@@ -54,13 +54,13 @@ designated by the first C<INTVAL> by the value in the second C<INTVAL>.
 Naturally, operations which act on C<FLOATVAL> registers will use C<FLOATVAL>s
 for constants; however, since the first argument is almost always a register
 B<number> rather than actual data, even operations on string and PMC registers
-will take an C<INTVAL> as the first argument. 
+will take an C<INTVAL> as the first argument.
 
 As in Perl, Parrot ops will return the pointer to the next operation in the
 bytecode stream. Although ops will have a predetermined number and size of
 arguments, it's cheaper to have the individual ops skip over their arguments
 returning the next operation, rather than looking up in a table the number of
-bytes to skip over for a given opcode. 
+bytes to skip over for a given opcode.
 
 There will be global and private opcode tables; that is to say, an area of the
 bytecode can define a set of custom operations that it will use.  These areas
@@ -136,7 +136,7 @@ You can find out more about vtables in F<docs/vtables.pod>.
 Parrot provides a programmer-friendly view of strings. The Parrot string
 handling subsection handles all the work of memory allocation, expansion, and
 so on behind the scenes. It also deals with some of the encoding headaches that
-can plague Unicode-aware languages. 
+can plague Unicode-aware languages.
 
 This is done primarily by a similar vtable system to that used by PMCs; each
 encoding will specify functions such as the maximum number of bytes to allocate

@@ -9,7 +9,7 @@ docs/parrot.pod - Parrot
 
 Parrot is a common bytecode format and interpreter for dynamic languages; it is
 designed to run Perl 6 code efficiently, but is also intended to be
-language-agnostic. 
+language-agnostic.
 
 =head2 Documentation
 
@@ -61,7 +61,7 @@ inter-routine calling conventions.
 
 This subdirectory contains documentation files that are created from the
 corresponding opcode files at build time. These files describe what each opcode
-does and specify what arguments they take. 
+does and specify what arguments they take.
 
 =item F<pmc/>
 
@@ -99,7 +99,7 @@ The Parrot bytecode format.
 
 =item F<packfile-perl.pod>, F<packfile-c.pod>
 
-The APIs for accessing packed bytecode files (packfiles) from Perl and C. 
+The APIs for accessing packed bytecode files (packfiles) from Perl and C.
 
 =item F<strings.pod>
 
@@ -130,7 +130,7 @@ ones. The Parrot team is committed to supporting the following combinations as
 
 Parrot is developed and maintained by the members of the
 C<perl6-internals@perl.org> mailing list. The list is archived at:
-L<http://nntp.perl.org/group/perl.perl6.internals> 
+L<http://nntp.perl.org/group/perl.perl6.internals>
 
 =over 4
 

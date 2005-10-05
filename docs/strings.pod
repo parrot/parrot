@@ -53,7 +53,7 @@ brand new Parrot string. This string will have its own private copy of the
 buffer, so you don't need to keep it.
 
 Additionally there several convenience functions, that are wrapping
-string_make_direct.  See F<src/string.c> for details.  
+string_make_direct.  See F<src/string.c> for details.
 
 =over 3
 

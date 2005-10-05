@@ -22,7 +22,7 @@ everything local to that execution path, not just the stack. It is a snapshot
 in time (minus global variables). While it is similar to C's C<setjmp> (taking
 the continuation)/C<longjmp> (invoking the continuation), C<longjmp>'ing only
 works "down" the stack; jumping "up" the stack (ie, back to a frame that has
-returned) is bad. Continuations can work either way. 
+returned) is bad. Continuations can work either way.
 
 We can do two important things with continuations:
 
@@ -115,7 +115,7 @@ marked COW. If either string A or string B are changed, the system notes it and
 only at that point does it make a copy of the string and change it.
 
 If the program never actually changes the string - something that's fairly
-common - the program need never make a copy, saving both memory and time. 
+common - the program need never make a copy, saving both memory and time.
 
 =for author
 Nicholas Clark <nick@ccl4.org>, as clarified by Leo
@@ -149,7 +149,7 @@ reclaimed by the related L<"destruction"> operation, as and when necessary.
 
 Garbage Collection is the process of sweeping through all the active objects,
 variables, and structures, marking the memory they're using as in use, and all
-other memory is freed up for later reuse. 
+other memory is freed up for later reuse.
 
 Garbage Collection and Dead Object Detection are separate in Parrot, since we
 generally chew through memory segments faster than we chew through objects.
@@ -188,7 +188,7 @@ See also L<"PIR">.
 =head2 JAPH
 
 In the Parrot context a JAPH is a small script that prints the string "Just
-another Parrot Hacker\". 
+another Parrot Hacker\".
 
 =head2 Packfile
 

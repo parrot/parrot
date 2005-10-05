@@ -36,7 +36,7 @@ So, for example:
         {   0,   0, 0,                    { NULL } }
     };
 
-This is a structure that specifies three options.  
+This is a structure that specifies three options.
 
 Some various ways you could give these options on the command line follow:
 

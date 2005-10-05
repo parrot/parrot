@@ -42,7 +42,7 @@ You can retrieve the size of the array using
 
 This will put the size of the array in register C<P0> into C<I0>. In the same
 way, assigning an integer directly to the array sets the size of the  array.
-For instance: 
+For instance:
 
   new P0, .Array
   set P0, 2
@@ -56,7 +56,7 @@ before storing anything in it.
 
 =head2 Accessing elements
 
-Elements are accessed using indexes, as in any programming language. 
+Elements are accessed using indexes, as in any programming language.
 
 The following code initializes an array in C<P0> with size two, and sets the
 first position to the integer C<-8> and second position to the floating point
@@ -79,9 +79,9 @@ You can also assign directly from registers; for instance:
   set P0[0], I0
   set P0[1], N0
 
-leaves P0 in the same state as in the previous code snippet. 
+leaves P0 in the same state as in the previous code snippet.
 
-To retrieve elements, we use the same syntax: 
+To retrieve elements, we use the same syntax:
 
   set N1, P0[1]
   set I1, P0[0]

@@ -162,7 +162,7 @@ the GNU GPL, which means you can combine Parrot with GPL'ed code.
 Code accepted into the core interpreter must fall under the same terms as
 parrot. Library code (for example the ICU library we're using for Unicode) we
 link into the interpreter can be covered by other licenses so long as their
-terms don't prohibit this. 
+terms don't prohibit this.
 
 =item *
 Platform compatibility.
@@ -284,7 +284,7 @@ included the Perl language, the implementation of that language, the community
 of open source developers who volunteer to implement and maintain the language,
 and the larger community of programmers who use Perl.
 
-A variety of reasons were given for embarking on this project: 
+A variety of reasons were given for embarking on this project:
 
 =over 4
 
@@ -315,7 +315,7 @@ I<false> on success, and C<localtime> should return the year, not the year -
 =item *
 
 It would be nice to write the Perl to Bytecode compiler in Perl, instead of C.
-That would make it much easier for Perl hackers to hack on Perl. 
+That would make it much easier for Perl hackers to hack on Perl.
 
 =back
 
@@ -415,7 +415,7 @@ even short-lived objects that will exist only briefly before dying. The cost of
 a reference counting scheme is directly linked to the number of times code
 references, or unreferences, objects. A tracing system of one sort or another
 (and there are many) has an average-case cost that's based on the number of
-live objects. 
+live objects.
 
 There are a number of hidden costs in a reference-counting scheme. Since the
 code to manipulate the reference counts I<must> be scattered throughout the

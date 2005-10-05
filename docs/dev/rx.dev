@@ -202,7 +202,7 @@ are added to the bitmap.  To check if a character were in the bitmap, you would
 need to scan each entry in the string one by one.  This is slow (linear time),
 and it still wastes space.  It turns out that this is actually how characters >
 255 are handled.  This is a good method for that, but for characters < 256 we
-can make use of some optimization.  
+can make use of some optimization.
 
 =item B<Array/Bitfields>
 

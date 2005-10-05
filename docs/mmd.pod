@@ -21,7 +21,7 @@ operators such as addition or subtraction.
 
 The MMD system is straightforward, and currently must be explicitly invoked,
 for example by a vtable function. (We may reserve the right to use MMD in all
-circumstances, but currently do not) 
+circumstances, but currently do not)
 
 =head2 API
 

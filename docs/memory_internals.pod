@@ -152,7 +152,7 @@ manipulating the DOD-relevant object flags.
 The three object flags consulted during DOD are packed into one 4-bit nibble
 per object (one bit is currently unused).  Since C<arena-E<gt>dod_flags[]> is
 an array of native-sized UINTVALs ("words"), the number of nibbles per array
-entry varies depending on the platform. 
+entry varies depending on the platform.
 
 To reference a particular flag in a test, set, or clear operation, we require
 both the word containing the object's flags and a bitmask to isolate the flag.
