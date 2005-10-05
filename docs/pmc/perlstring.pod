@@ -22,13 +22,13 @@ And it works in the other direction too:
 
     set S0, P0
 
-and now the string is on C<S0> register. You can set an integer or
-numeric value as if it was a string:
+and now the string is on C<S0> register. You can set an integer or numeric
+value as if it was a string:
 
     set P0, 3.1415926
 
-and if the content of the PMC string is numeric, you can go in the
-other way too:
+and if the content of the PMC string is numeric, you can go in the other way
+too:
 
     set N0, P0
 
@@ -37,8 +37,8 @@ This means that:
     set P0, "foo"
     set N0, P0
 
-will put '0' in C<N0>. In fact, this is very useful: you can convert
-a numeric value to string using:
+will put '0' in C<N0>. In fact, this is very useful: you can convert a numeric
+value to string using:
 
     set P0, 3.1415926
     set S0, P0
@@ -56,8 +56,8 @@ Concatenating strings is done using the C<concat> operator:
 
     concat P2, P0, P1
 
-Then, P2 will hold "FredFlintstone" string. To speed-up things, you
-can use string registers instead:
+Then, P2 will hold "FredFlintstone" string. To speed-up things, you can use
+string registers instead:
 
     new P0, .PerlString
     new P1, .PerlString
@@ -68,15 +68,14 @@ can use string registers instead:
     concat P1, P0, S0
 
 Note that concatenation creates a new string; this means that after 
-concatenating the string, you can change the original values without 
-changing the concatenation result.
+concatenating the string, you can change the original values without  changing
+the concatenation result.
 
 =head2 Repeating strings
 
-Repeating strings can be done using the C<repeat> operator. It repeats
-its second argument the number of times passed as third
-argument. The result is stored on the string PMC passed as first
-argument:
+Repeating strings can be done using the C<repeat> operator. It repeats its
+second argument the number of times passed as third argument. The result is
+stored on the string PMC passed as first argument:
 
     new P0, .PerlString
     set P0, "x"
@@ -87,8 +86,8 @@ argument:
 
 In this example C<P2> will become C<xxxxxxxxxxxx>.
 
-As you can set and get integers and numbers from a Perl String PMC,
-this is also valid:
+As you can set and get integers and numbers from a Perl String PMC, this is
+also valid:
 
     new P0, .PerlString
     set P0, "x"
@@ -99,9 +98,9 @@ this is also valid:
 
 =head2 Trueness
 
-Perl String PMC trueness values are like Perl scalar trueness. If it
-is empty (not initialized), contains an empty value or a 0, then it is
-evaluated as false. On other cases, it is true.
+Perl String PMC trueness values are like Perl scalar trueness. If it is empty
+(not initialized), contains an empty value or a 0, then it is evaluated as
+false. On other cases, it is true.
 
     new P0, .PerlString
     set P0, "foo"

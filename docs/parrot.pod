@@ -99,8 +99,7 @@ The Parrot bytecode format.
 
 =item F<packfile-perl.pod>, F<packfile-c.pod>
 
-The APIs for accessing packed bytecode files (packfiles) from Perl
-and C. 
+The APIs for accessing packed bytecode files (packfiles) from Perl and C. 
 
 =item F<strings.pod>
 
@@ -167,3 +166,4 @@ See:
 =back
 
 for more information.
+

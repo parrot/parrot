@@ -21,8 +21,8 @@ Debugging support can be explicitly enabled with:
     shell> perl Configure.pl --debugging
     shell> make
 
-For testing it might be a good idea to make test runs without debug support.
-So debugging can also be turned off with:
+For testing it might be a good idea to make test runs without debug support. So
+debugging can also be turned off with:
 
   shell> perl Configure.pl --debugging=0
   shell> make
@@ -162,8 +162,7 @@ or
 
 =item Version 1.1
 
-Updates to remove references to C<imcc> by
-C<Bernhard.Schmalhofer@biomax.de>
+Updates to remove references to C<imcc> by C<Bernhard.Schmalhofer@biomax.de>
 
 =item Version 1.0
 

@@ -28,8 +28,8 @@ example:
 
 =item freeze
 
-Called from user code to serialize the state of a PMC into some (possibly
-        binary) representation held in a STRING.
+Called from user code to serialize the state of a PMC into some (possibly      
+  binary) representation held in a STRING.
 
 =item freeze_at_destruct
 
@@ -60,8 +60,8 @@ destroyed in an appropriate order. This is also called on interpreter shutdown.
 
 Mark all objects as being live by calling B<pobject_lives> called from DOD.
 While the functionality is the same, it will not be implemented on top of this
-general scheme for performance reasons. This leads to some code duplication,
-        but DOD is run permanently and deserves all the speed it can get.
+general scheme for performance reasons. This leads to some code duplication,   
+     but DOD is run permanently and deserves all the speed it can get.
 
 =back
 
@@ -92,9 +92,9 @@ the B<todo_list>.
 =item next_for_GC
 
 All PMCs that can contain other PMCs have the B<next_for_GC> pointer in the
-PMC's extended data area. The B<todo_list> gets built by appending (or
-        prepending) the current PMC to a B<mark_ptr>, which then points to the
-current PMC, forming a linked list of items.
+PMC's extended data area. The B<todo_list> gets built by appending (or        
+prepending) the current PMC to a B<mark_ptr>, which then points to the current
+PMC, forming a linked list of items.
 
 This pointer is also used during DOD's B<mark()> functionality, so that DOD has
 to be turned off during operations using this scheme.
@@ -125,8 +125,8 @@ for later processing, but doesn't do any action on these immediately.
 =head2 The visit() vtable
 
 The general scheme above shows that this method is called for all items on the
-B<todo_list>. B<visit> has to call B<visit_pmc_now> for all contained PMCs,
-    which then get visited until all is done.
+B<todo_list>. B<visit> has to call B<visit_pmc_now> for all contained PMCs,    
+which then get visited until all is done.
 
 =head2 The visit_pmc_now() callback
 
@@ -150,8 +150,8 @@ to be remembered.
 
 Using a B<Hash> is one method to avoid duplicates. The B<seen> hash holds keys
 being the address of the PMC and values being a PMC B<id>, which is unique for
-this PMC. While this is straight forward, it consumes 16 bytes per PMC (plus
-        overhead, 32-bit system assumed). Hash lookups also take a considerable
+this PMC. While this is straight forward, it consumes 16 bytes per PMC (plus   
+     overhead, 32-bit system assumed). Hash lookups also take a considerable
 amount of time.
 
 =item B<next_for_GC>
@@ -274,8 +274,8 @@ A PerlInt(666) with a property hash ("answer"=>42) thus looks like:
 
   0xdfc 33 666 0xdff 2 0xdf4 32 1 answer 0xdf8 33 42
 
-B<0xdff> is the escape mark for the PMC B<0xdfc> followed by the
-constant B<EXTRA_IS_PROP_HASH>.
+B<0xdff> is the escape mark for the PMC B<0xdfc> followed by the constant
+B<EXTRA_IS_PROP_HASH>.
 
 [ To be continued ]
 

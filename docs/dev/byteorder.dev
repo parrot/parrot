@@ -8,11 +8,11 @@ docs/dev/byteorder.dev - Byteorder Conversion Functions
 =head1 Overview
 
 The byteorder code will check the endianness of an C<INTVAL> or an C<opcode_t>
-value and swap from little to big, or big to little when appropriate.
-Functions also exist to convert a 4, 8, 12, or 16 byte character buffer to big
-or little endian.  The functions will be placed in the PackFile vtable and will
-be called when necessary. The Parrot interpreter should be smart enough to
-avoid calling these functions when converting from and to the same byteorder.
+value and swap from little to big, or big to little when appropriate. Functions
+also exist to convert a 4, 8, 12, or 16 byte character buffer to big or little
+endian.  The functions will be placed in the PackFile vtable and will be called
+when necessary. The Parrot interpreter should be smart enough to avoid calling
+these functions when converting from and to the same byteorder.
 
 =head1 Data Structures and Algorithms
 

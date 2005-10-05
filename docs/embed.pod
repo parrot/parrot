@@ -108,8 +108,7 @@ speedup.
 
 =back
 
-B<Interpreter flags setting> is done by a call of
-C<Parrot_set_flag()> like>:
+B<Interpreter flags setting> is done by a call of C<Parrot_set_flag()> like>:
 
 
     Parrot_set_flag(interp, PARROT_TRACE_FLAG, NULL);

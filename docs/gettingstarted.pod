@@ -93,9 +93,9 @@ running the following command in the Parrot distribution's root directory:
 
 To view the HTML documentation start with the page F<docs/html/index.html>.
 
-There are a few categories of documentation, each with different intents.
-It'll probably help to be aware of them before you go digging in. I highly
-suggest you check out F</docs/pdds/pdd07_codingstd.pod> for guidelines on how
+There are a few categories of documentation, each with different intents. It'll
+probably help to be aware of them before you go digging in. I highly suggest
+you check out F</docs/pdds/pdd07_codingstd.pod> for guidelines on how
 documentation is supposed to be laid out. For now, here's the executive
 summary:
 
@@ -187,8 +187,8 @@ L<http://lists.perl.org/showlist.cgi?name=perl6-announce>
 =back
 
 In addition, there is a mailing list which logs all commits to the Parrot SVN 
-repository. If you're interested in Parrot development, you might find it 
-very helpful to subscribe and keep up on changes that people are making.
+repository. If you're interested in Parrot development, you might find it  very
+helpful to subscribe and keep up on changes that people are making.
 
 =over 4
 
@@ -210,7 +210,8 @@ L<http://www.nntp.perl.org/group/perl.cvs.parrot>
 
 =item * Searching
 
-After clicking the below links, just add your search terms to the Google search box.
+After clicking the below links, just add your search terms to the Google search
+box.
 
 L<http://www.google.com/search?sourceid=navclient&q=site:archive%2Edevelooper%2Ecom+cvs+parrot>
 

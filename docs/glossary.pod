@@ -7,8 +7,8 @@ docs/glossary.pod - Parrot Glossary
 
 =head1 SUMMARY
 
-Short descriptions of words you might need to know that show up in
-Parrot development.
+Short descriptions of words you might need to know that show up in Parrot
+development.
 
 =head1 GLOSSARY
 
@@ -123,8 +123,8 @@ Nicholas Clark <nick@ccl4.org>, as clarified by Leo
 =head2 destruction
 
 Destruction is low level memory clean up, such as calling C<free> on
-C<malloc>ed memory.  This happens after L<"finalization">, and if resources
-are adequate, may only happen as a side effect of program exit.
+C<malloc>ed memory.  This happens after L<"finalization">, and if resources are
+adequate, may only happen as a side effect of program exit.
 
 =head2 DOD
 
@@ -187,8 +187,8 @@ See also L<"PIR">.
 
 =head2 JAPH
 
-In the Parrot context a JAPH is a small script that prints the string
-"Just another Parrot Hacker\". 
+In the Parrot context a JAPH is a small script that prints the string "Just
+another Parrot Hacker\". 
 
 =head2 Packfile
 
@@ -205,8 +205,8 @@ See also L<"Packfile">.
 
 =head2 PDD
 
-Acronym for Parrot Design Document. These documents describe the
-features that the Parrot interpreter should implement.
+Acronym for Parrot Design Document. These documents describe the features that
+the Parrot interpreter should implement.
 
 See also L<"pdd00_pdd">.
 
@@ -226,9 +226,9 @@ fundamental types, such as Perl's scalar values.
 
 =head2 POD
 
-POD is an acronym for Plain Old Documentation. This is for now the
-prefered form for all kinds of documentation in Parrot.
-See "perldoc perlpod" for details.
+POD is an acronym for Plain Old Documentation. This is for now the prefered
+form for all kinds of documentation in Parrot. See "perldoc perlpod" for
+details.
 
 =head2 Predereferencing
 

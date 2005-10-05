@@ -7,9 +7,9 @@ Array base class
 
 =head1 ABSTRACT
 
-This pod file documents the Array base class usage. For implementation
-details you should look inside the class file, found at
-C<classes/array.pmc> in the parrot source code.
+This pod file documents the Array base class usage. For implementation details
+you should look inside the class file, found at C<classes/array.pmc> in the
+parrot source code.
 
 =head1 SYNOPSIS
 
@@ -40,9 +40,9 @@ You can retrieve the size of the array using
 
   set I0, P0
 
-This will put the size of the array in register C<P0> into C<I0>. In the
-same way, assigning an integer directly to the array sets the size of the 
-array. For instance: 
+This will put the size of the array in register C<P0> into C<I0>. In the same
+way, assigning an integer directly to the array sets the size of the  array.
+For instance: 
 
   new P0, .Array
   set P0, 2
@@ -58,9 +58,9 @@ before storing anything in it.
 
 Elements are accessed using indexes, as in any programming language. 
 
-The following code initializes an array in C<P0> with size two, and
-sets the first position to the integer C<-8> and second position to
-the floating point number C<3.1415>.
+The following code initializes an array in C<P0> with size two, and sets the
+first position to the integer C<-8> and second position to the floating point
+number C<3.1415>.
 
   new P0, .Array
   set P0, 2
@@ -88,28 +88,27 @@ To retrieve elements, we use the same syntax:
 
 Those two lines retrieve the values from the array back into registers.
 
-The value stored at a given position is not fixed; it can be
-changed simply by assigning a new value:
+The value stored at a given position is not fixed; it can be changed simply by
+assigning a new value:
 
   set P0[1], "A string"
 
-Accessing an out-of-bounds array element raises an exception; if you want
-an Array that will automatically resize, then use a C<PerlArray>.
+Accessing an out-of-bounds array element raises an exception; if you want an
+Array that will automatically resize, then use a C<PerlArray>.
 
 You can test if there is a defined element at an array position by using
 
   defined I0, P0[1]
 
-for the position you want to test. On the other hand, if you only want to
-test whether a given element exists (rather than whether it is defined), 
-then use the C<exists> op instead:
+for the position you want to test. On the other hand, if you only want to test
+whether a given element exists (rather than whether it is defined),  then use
+the C<exists> op instead:
 
   exists I0, P0[0]
 
 =head2 TODO
 
-Explain a little more which exception will be raised in case you
-access a out-of-bounds index on the array (as soon we have
-exceptions).
+Explain a little more which exception will be raised in case you access a
+out-of-bounds index on the array (as soon we have exceptions).
 
 =cut

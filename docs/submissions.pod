@@ -25,8 +25,8 @@ about submitting a patch.
 =head1 How To Submit A Patch
 
 Try to keep your patches specific to a single change, and ensure that your
-change does not break any tests. If there is no test for the fixed bug, 
-please try to provide one.
+change does not break any tests. If there is no test for the fixed bug,  please
+try to provide one.
 
 =over
 
@@ -189,8 +189,8 @@ Attach the patch for MANIFEST and your new file(s).
 
 Double-check that you've actually done this, because it's easy to forget.
 
-B<DO NOT> paste the content of the new file or files into the body of
-the message.
+B<DO NOT> paste the content of the new file or files into the body of the
+message.
 
 =item 8
 
@@ -204,9 +204,9 @@ RT creates a ticket for the submission, and you will receive an automatic reply
 with details of the ticket identifier. This identifier should be used in all
 further correspondence concerning the submission.
 
-Everyone on the list sees the submission, and can comment on it. A
-developer with SVN commit authority will commit it to SVN once it is
-clear that it is the right thing to do.
+Everyone on the list sees the submission, and can comment on it. A developer
+with SVN commit authority will commit it to SVN once it is clear that it is the
+right thing to do.
 
 Even those developers with SVN commit authority stick to this scheme for all
 but the most trivial of their own patches, to allow time for peer review of
@@ -224,19 +224,20 @@ L<http://www.parrotcode.org/openpatches.html>
 
 =head1 Patches for the Parrot website
 
-The sources for L<http://www.parrotcode.org> are managed in a subversion repository.
-The repository can be fetched from https://svn.perl.org/perl.org/docs/live/parrotcode/.
-A read only copy can be retrieved with 'guest/guest'.
+The sources for L<http://www.parrotcode.org> are managed in a subversion
+repository. The repository can be fetched from
+https://svn.perl.org/perl.org/docs/live/parrotcode/. A read only copy can be
+retrieved with 'guest/guest'.
 
 You will notice that some of the content is generated directly from the Parrot
 repository. So the usual rules for Parrot patches apply for this content.
 
-For changes specific for parrotcode.org please send patches to   
-B<webmaster> I<at> B<perl> I<dot> B<org>.
+For changes specific for parrotcode.org please send patches to    B<webmaster>
+I<at> B<perl> I<dot> B<org>.
 
 =head1 HISTORY
 
-Adapted by Michael Scott from a tutorial submitted by Aldo Calpini, with
-some additional remarks from Bruce Gray.
+Adapted by Michael Scott from a tutorial submitted by Aldo Calpini, with some
+additional remarks from Bruce Gray.
 
 =cut

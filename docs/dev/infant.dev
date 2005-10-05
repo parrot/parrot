@@ -286,8 +286,8 @@ L<http://groups.google.com/groups?th=f7e270609ef93161>
 
 L<http://groups.google.com/groups?th=ad045a1baeba0c9a>
 
-This is a good thread for illustrating the pain that infant mortality
-causes -- in the context of Parrot, I mean.
+This is a good thread for illustrating the pain that infant mortality causes --
+in the context of Parrot, I mean.
 
 =item Numbers!
 
@@ -299,8 +299,8 @@ Gives some benchmark numbers for different approaches.
 
 L<http://groups.google.com/groups?th=808f38c656a49806>
 
-Early discussion that has some stuff I didn't go over here. Mostly
-involves generational schemes.
+Early discussion that has some stuff I didn't go over here. Mostly involves
+generational schemes.
 
 =item Problems with stack-walking
 
@@ -312,5 +312,6 @@ This thread also includes Juergen Boemmels Variant 3 of Solution 3
 
 =head1 CHANGES
 
-2002-Dec-30: Initial Version by Steve Fink
-2003-Aug-04: Some extra variants added by Juergen Boemmels
+2002-Dec-30: Initial Version by Steve Fink 2003-Aug-04: Some extra variants
+added by Juergen Boemmels
+

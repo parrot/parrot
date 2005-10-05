@@ -279,10 +279,10 @@ L<http://svn.perl.org/perl6/pugs/trunk/docs/01Overview.html>
 Good question.
 
 At The Perl Conference 4.0, in the summer of 2000, Larry Wall
-L<announced|"LINKS"> that it was time to recreate Perl from the ground up.
-This included the Perl language, the implementation of that language, the
-community of open source developers who volunteer to implement and maintain the
-language, and the larger community of programmers who use Perl.
+L<announced|"LINKS"> that it was time to recreate Perl from the ground up. This
+included the Perl language, the implementation of that language, the community
+of open source developers who volunteer to implement and maintain the language,
+and the larger community of programmers who use Perl.
 
 A variety of reasons were given for embarking on this project: 
 
@@ -543,7 +543,8 @@ L<http://www.perl.com/pub/a/2000/10/23/soto2000.html>
 
 be there: L<http://www.csse.monash.edu.au/~damian/papers/#Superpositions>
 
-Really.: L<http://developer.apple.com/techpubs/mac/PPCSoftware/PPCSoftware-13.html>
+Really.:
+L<http://developer.apple.com/techpubs/mac/PPCSoftware/PPCSoftware-13.html>
 
 =cut
 

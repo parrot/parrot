@@ -103,8 +103,8 @@ various optimizations, including B<-Op>.
 
 =item --output-pbc
 
-Act like an assembler, but always output bytecode, even if the output file
-does not end in B<.pbc>
+Act like an assembler, but always output bytecode, even if the output file does
+not end in B<.pbc>
 
 =item -r, --run-pbc
 
@@ -181,8 +181,8 @@ Prederefernce opcode function arguments on the fly.
 
 =item -t, --trace
 
-Run with the slow core and print trace information to B<stderr>.
-See 'parrot --help-debug' for aviable flag bits.
+Run with the slow core and print trace information to B<stderr>. See 'parrot
+--help-debug' for aviable flag bits.
 
 =back
 
@@ -196,7 +196,8 @@ Turn on warnings. See 'parrot --help-debug' for aviable flag bits.
 
 =item -D, --parrot-debug
 
-Turn on interpreter debug flag. See 'parrot --help-debug' for aviable flag bits.
+Turn on interpreter debug flag. See 'parrot --help-debug' for aviable flag
+bits.
 
 =item --gc-debug
 

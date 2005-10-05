@@ -4,8 +4,8 @@ Iterator - Parrot Iterator Class
 
 =head1 DESCRIPTION
 
-Iterators are used in combination with other classes (mainly
-aggregates) to visit all entries in that aggregate.
+Iterators are used in combination with other classes (mainly aggregates) to
+visit all entries in that aggregate.
 
 =head1 SYNOPSIS
 
@@ -61,3 +61,4 @@ F<classes/iterator.pmc>, F<t/pmc/iter.t>
 =head1 AUTHOR
 
 Leopold Toetsch <lt@toetsch.at>
+

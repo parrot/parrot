@@ -42,8 +42,8 @@ To get the element use it in the opposite way:
 
 Notice that a hash is polymorphic on the value it holds.
 
-When using a key that does not exist in the hash, the value returned
-depends on the register used to retrieve the element.
+When using a key that does not exist in the hash, the value returned depends on
+the register used to retrieve the element.
 
   set I0, P1["qwerty"]  # I0 = 0
   set N0, P1["qwerty"]  # N0 = 0.000
@@ -55,13 +55,12 @@ C<exists> command:
 
   exists I0, P0["a"]
 
-This example will set the value one in register C<I0> if the key
-exists, the value zero if it does not exist.
+This example will set the value one in register C<I0> if the key exists, the
+value zero if it does not exist.
 
-Notice that this tests if there is anything. In fact, the C<exists>
-command will return true if the element in that position is a
-PerlUndef PMC. To check if that element is defined, use the C<defined>
-command:
+Notice that this tests if there is anything. In fact, the C<exists> command
+will return true if the element in that position is a PerlUndef PMC. To check
+if that element is defined, use the C<defined> command:
 
   defined I0, P0["a"]
 
@@ -75,8 +74,8 @@ I need to read that proposal :-)
 
 =head2 Removing Elements
 
-You can remove (or delete) an element from the hash using the
-C<delete> command:
+You can remove (or delete) an element from the hash using the C<delete>
+command:
 
   delete P0["a"]
 
@@ -95,9 +94,9 @@ To get the number of keys (size of the hash) use
 
     set I0, P0
 
-where C<P0> is the Perl Hash PMC and C<I0> the register where to store
-the hash size. You can use an Perl Hash PMC on an C<if> or C<unless>
-command, where it will be checked for the number of elements.
+where C<P0> is the Perl Hash PMC and C<I0> the register where to store the hash
+size. You can use an Perl Hash PMC on an C<if> or C<unless> command, where it
+will be checked for the number of elements.
 
 =head2 Cloning
 
@@ -109,8 +108,8 @@ As other PMCs, you can clone Perl hashes. If you try something like
 
     clone P1, P0
 
-C<P1> is a copy of C<P0>, where you can do whatever you want without
-changing the other hash.
+C<P1> is a copy of C<P0>, where you can do whatever you want without changing
+the other hash.
 
 TODO: deep or shallow copy? Apparently, deep... wait untill there are news!
 

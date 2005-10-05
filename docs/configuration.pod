@@ -193,8 +193,8 @@ Sets the given keys to the given values.
 
 =item C<< Configure::Data->add(delim, key, value, [key, value, ...]) >>
 
-Sets the given keys to the given values or appends values delimited by
-I<delim> to existing keys.
+Sets the given keys to the given values or appends values delimited by I<delim>
+to existing keys.
 
 =item C<< Configure::Data->keys() >>
 

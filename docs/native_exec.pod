@@ -34,8 +34,8 @@ This generates the "myprog" executable, which runs equivalently to
 
     ./parrot -j myprog.pbc
 
-minus the time required to JIT-compile the bytecode.
-    
+minus the time required to JIT-compile the bytecode.     
+
 The "testexec" Makefile target demonstrates this method for a "Hello world"
 program.
 
@@ -73,3 +73,4 @@ may be done by hand, e.g.
     gcc -o myprog myprog.o src/exec_start.o blib/lib/libparrot.a
 
 Additional libraries may need to be included as appropriate for the platform.
+

@@ -20,16 +20,16 @@ Parrot.
 =head2 How can I implement a compiler to use as a compiler object from within
 Parrot? (For example, with the C<compile> op.)
 
-Define a sub that takes as input a string, and returns something invokable.
-The easiest way to create something invokable at the moment is to use the
-builtin C<PIR> or C<PASM> compilers.
+Define a sub that takes as input a string, and returns something invokable. The
+easiest way to create something invokable at the moment is to use the builtin
+C<PIR> or C<PASM> compilers.
 
 See C<languages/tcl/tcl.pir_template>'s C<.sub _tcl_compile> as an example.
 
 =head2 How do I embed source locations in my code for debugging?
 
-You can do this using either the C<setfile> and C<setline> opcodes or
-with C-like C<#line> comments:
+You can do this using either the C<setfile> and C<setline> opcodes or with
+C-like C<#line> comments:
 
   #line 27 "my_source.file"
 
@@ -80,9 +80,9 @@ The sub C<bar> will return to the caller of C<foo>.
 
 =head2 How do I generate a sub call with a variable-length parameter list in PIR?
 
-Use unprototyped calls and functions and pass as many arguments as you have.
-If you have a variable amounts of arguments in an array, you can pass all items
-of that array with the C<.flatten_arg> directive.
+Use unprototyped calls and functions and pass as many arguments as you have. If
+you have a variable amounts of arguments in an array, you can pass all items of
+that array with the C<.flatten_arg> directive.
 
   ar = new PerlArray
   push ar, "arg 1\n"
@@ -208,10 +208,10 @@ C<return>ing from a subroutine, for instance), as the continuation will
 automatically put the lexical pad stack back the way it was when the
 continuation was created.
 
-When you need to figure out how to access a certain variable, simply
-look at the topmost block and work your way down the tree until you
-finds a block that declares lexical variables. Then take the lexical
-depth of the block in which you found it and emit some code like so:
+When you need to figure out how to access a certain variable, simply look at
+the topmost block and work your way down the tree until you finds a block that
+declares lexical variables. Then take the lexical depth of the block in which
+you found it and emit some code like so:
 
     find_lex $P0, 2, "foo"
 
@@ -262,8 +262,8 @@ Use C<find_name>:
     $P0 = find_name "$x"
     find_name $P0, "foo"    # same thing
 
-This will find the name C<foo> in lexical, global or builtin namespace,
-in that order, and store it in C<$P0>.
+This will find the name C<foo> in lexical, global or builtin namespace, in that
+order, and store it in C<$P0>.
 
 =head2 How do I fetch a variable from the current lexical pad?
 

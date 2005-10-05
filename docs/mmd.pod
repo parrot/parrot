@@ -29,8 +29,7 @@ For the purposes of the API, each MMD-able function is assigned a unique number
 which is used to find the correct function table. This is the C<func_num>
 parameter in the following functions. While Parrot isn't restricted to a
 predefined set of functions, it I<does> set things up so that all the binary
-vtable functions have a MMD table preinstalled for them, with default
-behavior.
+vtable functions have a MMD table preinstalled for them, with default behavior.
 
 =over 4
 
@@ -79,10 +78,9 @@ PMC" vtable functions do.
 
 =item STRING *mmd_dispatch_string(interp, left, right, func_num)
 
-Dispatch to a multimethod that returns a string. C<left> and C<right>
-are PMC pointers, while C<func_num> is the MMD table that should be
-used to do the dispatching. The function is responsible for creating
-the returned string.
+Dispatch to a multimethod that returns a string. C<left> and C<right> are PMC
+pointers, while C<func_num> is the MMD table that should be used to do the
+dispatching. The function is responsible for creating the returned string.
 
 =item INTVAL mmd_dispatch_intval(interp, left, right, func_num)
 
@@ -236,3 +234,4 @@ sides.
 
 The string bitwise ops (and, or, xor) take the string values of both sides and
 do bitwise operations on the resulting bitstring.
+

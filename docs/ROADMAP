@@ -359,8 +359,7 @@ L<ops/debug.ops>
 
 =item *
 
-parrot doesn't catch the exception thrown by the op C<cmod>.
-L<ops/math.ops>
+parrot doesn't catch the exception thrown by the op C<cmod>. L<ops/math.ops>
 
 =item *
 
@@ -431,8 +430,8 @@ isn't handled correctly on JIT/i386.
 
 =item *
 
-C<Parrot_destroy> currently leaks most of the memory that it is supposed to free.
-L<embed.pod>
+C<Parrot_destroy> currently leaks most of the memory that it is supposed to
+free. L<embed.pod>
 
 =back
 

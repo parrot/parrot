@@ -302,3 +302,4 @@ classes/YOURCLASS.pmc, add the C<extends SUPERCLASS> phrase. For example:
 See the POD documentation in F<build_tools/pmc2c.pl> for a list of useful
 keywords that you may use in the .pmc file. (Run C<perldoc -F pmc2c.pl> to view
 the POD.)
+

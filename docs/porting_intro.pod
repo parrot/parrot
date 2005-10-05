@@ -24,8 +24,8 @@ runcores make use of this feature as an optimization.
 =head2 How to help
 
 If cgoto is not supported in Parrot by default on your platform, try to compile
-config/auto/cgoto/test_c.in with your C compiler and determine why it fails.
-If the compiler does not support the computed goto concept at all, this feature
+config/auto/cgoto/test_c.in with your C compiler and determine why it fails. If
+the compiler does not support the computed goto concept at all, this feature
 cannot be made to work (don't worry, there are other runcores).  However, if
 the compiler supports it but the test is inadequate, please submit a bug report
 describing how the implementation of this feature differs from what Parrot
@@ -130,8 +130,8 @@ Parrot.
 
 To assist with enhancing threading support, compare the threading primitives
 required by Parrot in F<thread.h> to those provided by your platform's
-threading model(s) and implement Parrot threads in terms of native threads.
-See F<thr_pthread.h> for an example of this.
+threading model(s) and implement Parrot threads in terms of native threads. See
+F<thr_pthread.h> for an example of this.
 
 =head2 References
 
@@ -154,9 +154,9 @@ See F<thr_pthread.h> for an example of this.
 =head2 What it is
 
 Parrot must be able to receive asynchronous imperative and advisory messages
-from the operating system and other local processes in a safe manner.
-Typically this is done by registering message-specific callback functions, to
-which the operating system transfers control when signals are generated.
+from the operating system and other local processes in a safe manner. Typically
+this is done by registering message-specific callback functions, to which the
+operating system transfers control when signals are generated.
 
 =head2 How to help
 

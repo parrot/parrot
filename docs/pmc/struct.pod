@@ -7,16 +7,16 @@ Structures - Accessing C Structs from Parrot
 
 =head1 DESCRIPTION
 
-Parrot provides two PMC classes to deal with C structures. These
-are UnManagedStruct and ManagedStruct. The former has no allocated
-memory and is typically used to access structures returned by NCI calls,
-while the latter can be used to define a structure and pass it over
-to a C function - pointers to structures in both cases of course.
+Parrot provides two PMC classes to deal with C structures. These are
+UnManagedStruct and ManagedStruct. The former has no allocated memory and is
+typically used to access structures returned by NCI calls, while the latter can
+be used to define a structure and pass it over to a C function - pointers to
+structures in both cases of course.
 
 =head1 Structure definition
 
-The Struct PMCs take an array of triples per structure element, either
-as initializer or with the B<assign> opcode to define the struct elements.
+The Struct PMCs take an array of triples per structure element, either as
+initializer or with the B<assign> opcode to define the struct elements.
 
 =over 4
 
@@ -26,8 +26,8 @@ The datatype is defined by constants declared in F<datatypes.pasm>.
 
 =item Array Size
 
-The second initializer item, if set to a value greater then 1, defines
-the struct element to consist of an array of the given data type.
+The second initializer item, if set to a value greater then 1, defines the
+struct element to consist of an array of the given data type.
 
 =item Byte Offset
 
@@ -41,8 +41,7 @@ Parrot only knows the size of each item.
 
 =head2 Alignment
 
-Parrot tries to do The Right Thing that is currently align items at
-their size.
+Parrot tries to do The Right Thing that is currently align items at their size.
 
   struct {
     char c;
@@ -81,9 +80,9 @@ can be declared with this initializer:
 
 =head2 Named Structure Elements
 
-The initializer can be an OrderedHash PMC too. When all elements are
-defined in the correct order this can be used to define and access
-struct elements by name and by index:
+The initializer can be an OrderedHash PMC too. When all elements are defined in
+the correct order this can be used to define and access struct elements by name
+and by index:
 
   new P2, .OrderedHash
   .include "datatypes.pasm"
@@ -95,9 +94,9 @@ struct elements by name and by index:
 
 =head1 Size of a Structure
 
-For ManagedStruct (a new structure passed over to a C function) the
-storage for data items has to be allocated. This is done
-automatically, when the initializer is attached to the Struct PMC.
+For ManagedStruct (a new structure passed over to a C function) the storage for
+data items has to be allocated. This is done automatically, when the
+initializer is attached to the Struct PMC.
 
 The size can be obtained by:
 
@@ -107,9 +106,9 @@ The size can be obtained by:
 
 =head1 Accessing Structure Items
 
-Setting or getting items is done by keyed access to the Struct PMC. The
-first key is the structure item, an optional second key can access the
-n-th array element.
+Setting or getting items is done by keyed access to the Struct PMC. The first
+key is the structure item, an optional second key can access the n-th array
+element.
 
 =head2 Example
 
@@ -132,9 +131,8 @@ n-th array element.
 
 =head2 Strings
 
-When passing a STRING to a structure that needs a 0-terminated
-C-string (char *s), then you have to provide the terminating NUL char
-in the string.
+When passing a STRING to a structure that needs a 0-terminated C-string (char
+*s), then you have to provide the terminating NUL char in the string.
 
   struct {
     ...
@@ -151,8 +149,8 @@ Passing constant strings like above is safe though.
 
 =head2 Callback Functions in the C Library
 
-Given a C function that returns a structure containing a callback
-function like in this example:
+Given a C function that returns a structure containing a callback function like
+in this example:
 
   static struct {
       int (*f)(char *);
@@ -181,9 +179,9 @@ The PASM would look like:
 
 =head2 Nested Structures or Pointers to Nested Structures
 
-Each contained structure needs its own UnManagedStruct initializer.
-The UnManagedStruct of the contained structures has to be attached to
-the structure type PMC as the property B<"_struct">.
+Each contained structure needs its own UnManagedStruct initializer. The
+UnManagedStruct of the contained structures has to be attached to the structure
+type PMC as the property B<"_struct">.
 
 If a C function returns a pointer to this structure:
 
@@ -265,9 +263,9 @@ a pointer to the structure is passed with the B<p> signature char:
 
 =head1 BUGS
 
-Not all datatypes are implemented. Alignment is barely tested on
-different machines. Arrays of structures aren't handled yet. Passing
-nested structures to C isn't finished.
+Not all datatypes are implemented. Alignment is barely tested on different
+machines. Arrays of structures aren't handled yet. Passing nested structures to
+C isn't finished.
 
 =head1 FILES
 
@@ -275,9 +273,9 @@ F<classes/unmanagedstruct.pmc>, F<classes/managedstruct.pmc>
 
 =head1 SEE ALSO
 
-F<docs/pdds/pdd03_calling_conventions.pod>
-F<t/pmc/nci.t>, F<src/nci_test.c>
+F<docs/pdds/pdd03_calling_conventions.pod> F<t/pmc/nci.t>, F<src/nci_test.c>
 
 =head1 AUTHOR
 
 Leopold Toetsch <lt@toetsch.at>
+

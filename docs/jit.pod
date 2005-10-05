@@ -99,8 +99,8 @@ program counter values.
 
 The bytecode is considered an array of B<opcode_t> sized elements, with
 parallel entries in B<op_map>.  B<op_map> is initially populated with the
-offsets into the native code corresponding to the opcodes in the bytecode.
-Once code generation is complete and fixups have been applied, the native code
+offsets into the native code corresponding to the opcodes in the bytecode. Once
+code generation is complete and fixups have been applied, the native code
 offsets are converted to absolute addresses.  This trades the low up-front cost
 of converting all offsets once, for the unknown cost of repeatedly converting
 these offsets while executing native code.
@@ -370,8 +370,8 @@ the PASM name of the op.
 
 =item I<<args>>
 
-B<args> specify the arguments of the function in the PASM sequence
-B<dest>, B<source> ... The B<args> consist of one letter per argument:
+B<args> specify the arguments of the function in the PASM sequence B<dest>,
+B<source> ... The B<args> consist of one letter per argument:
 
 =over 4
 

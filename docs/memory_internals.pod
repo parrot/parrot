@@ -43,8 +43,8 @@ bytecode are managed here.
 
 =head1 Arenas
 
-C<struct Arenas> holds pointers to different subkinds of managed memory.
-A simplification looks similar to this:
+C<struct Arenas> holds pointers to different subkinds of managed memory. A
+simplification looks similar to this:
 
     struct Arenas {
         struct Memory_Pool *memory_pool;
@@ -52,8 +52,8 @@ A simplification looks similar to this:
         struct Small_Object_Pool * header_pool;
     }
 
-C<Memory_pool> and C<header_pool> are variable and fixed sized pool
-pointers respectively.
+C<Memory_pool> and C<header_pool> are variable and fixed sized pool pointers
+respectively.
 
 =head1 Memory_Pool
 
@@ -62,8 +62,8 @@ C<Memory_Blocks> - but see below.
 
 =head1 Small_Object_Pool
 
-This pool manages C<Small_Object_Arena>s, linked together, which provide
-the space for the fixed sized objects.
+This pool manages C<Small_Object_Arena>s, linked together, which provide the
+space for the fixed sized objects.
 
 =head1 Fixed sized items
 
@@ -131,11 +131,11 @@ simply masking out the lower bits of the pointer to the object:
 
     arena = object & ARENA_MASK;
 
-The macro C<GET_ARENA> does exactly this, including the necessary type casts
-to remove warnings. The dod_flags are accessed by getting the element number
-in the arena (this is possible because the C<object_size> is fixed and stored
-in the C<struct Small_Object_Arena>), creating the appropriate bitmask by
-shifting and accessing the right element of C<dod_flags[]>.
+The macro C<GET_ARENA> does exactly this, including the necessary type casts to
+remove warnings. The dod_flags are accessed by getting the element number in
+the arena (this is possible because the C<object_size> is fixed and stored in
+the C<struct Small_Object_Arena>), creating the appropriate bitmask by shifting
+and accessing the right element of C<dod_flags[]>.
 
     n = (object - arena->start_objects) / arena->object_size;
     arena->dod_flags[n >> ARENA_FLAG_SHIFT] 
@@ -258,11 +258,11 @@ The F<Configure.pl> option C<--gc> allows one to use either method.
 =head2 Buffer_Tail and COW
 
 Both implementations have the same problem to solve: C<STRING>s that get
-copied, or parts of strings as the result of a substr() call, do not
-allocate new space in the memory pool to hold this string or part of
-string. They just use a C<new_string_header()> and set up a pointer
-(C<strstart>) pointing somewhere into the original string and remember the
-used length there in C<bufused>.
+copied, or parts of strings as the result of a substr() call, do not allocate
+new space in the memory pool to hold this string or part of string. They just
+use a C<new_string_header()> and set up a pointer (C<strstart>) pointing
+somewhere into the original string and remember the used length there in
+C<bufused>.
 
 This is all OK, as long as the original and the lazy copy of the string are not
 modified. So that's well-known and called COW (copy on write).
@@ -308,9 +308,9 @@ When freeing the buffer, the string is only freed if the refcount reaches zero.
                  Buffer          Memory Block
 
 Now consider, that the I<Interpreter> shall be a C<PMC> living in C<Buffer X>
-of the underlying interpreter and is currently running
-F<perldoc docs/memory_internals.pod>, and then redo this figure, with all the
-blanks filled in ;-)
+of the underlying interpreter and is currently running F<perldoc
+docs/memory_internals.pod>, and then redo this figure, with all the blanks
+filled in ;-)
 
 =head1 FILES
 
@@ -333,3 +333,4 @@ Leopold Tötsch C<lt@toetsch.at>
 =head1 VERSION
 
 0.1.0 Mar 2004
+
