@@ -209,9 +209,9 @@ caught it in 1
 something happend
 OUTPUT
 
-output_is(<<'CODE', <<OUT, "die_hard");
+output_is(<<'CODE', <<OUT, "die");
     push_eh _handler
-    die_hard 3, 100
+    die 3, 100
     print "not reached\n"
     end
 _handler:
@@ -221,9 +221,9 @@ CODE
 caught it
 OUT
 
-output_is(<<'CODE', <<OUT, "die_hard, error, severity");
+output_is(<<'CODE', <<OUT, "die, error, severity");
     push_eh _handler
-    die_hard 3, 100
+    die 3, 100
     print "not reached\n"
     end
 _handler:
@@ -243,8 +243,8 @@ error 100
 severity 3
 OUT
 
-output_like(<<'CODE', <<OUT, "die_hard - no handler");
-    die_hard 3, 100
+output_like(<<'CODE', <<OUT, "die - no handler");
+    die 3, 100
     print "not reached\n"
     end
 _handler:

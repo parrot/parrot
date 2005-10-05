@@ -566,9 +566,10 @@ Throw the exception in $1.
 
 Only valid inside an exception handler. Rethrow the exception $1.
 
-=item B<die_hard>(in INT, in INT)
+=item B<die>(in INT, in INT)
 
-Die with severity $1 and error $2.
+Die with severity $1 and error $2. If severity is .EXCEPT_DOOMED,
+call _exit($2). The latter isn't catchable.
 
 =item B<exit>(in INT)
 
@@ -615,7 +616,7 @@ inline op rethrow(in PMC) {
   goto ADDRESS(dest);
 }
 
-inline op die_hard(in INT, in INT) {
+inline op die(in INT, in INT) {
   if ($1 == EXCEPT_doomed)
     _exit($2);
   do_exception(interpreter, $1, $2);

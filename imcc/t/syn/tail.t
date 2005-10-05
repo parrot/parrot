@@ -52,7 +52,7 @@ pir_output_is(<<'CODE', <<'OUT', "tail call optimization, final position");
     if $I33 goto doit
 bad_func:
     printerr "_funcall:  Bad function.\n"
-    die
+    exit 0
 doit:
     set_args "(0x8)", argv
     tailcall function
@@ -134,7 +134,7 @@ doit:
 	.pcc_tail_return
 bad_func:
 	printerr "_funcall:  Bad function.\n"
-	die
+	exit 0
 .end
 
 ## Return quotient and remainder as two integers.
@@ -214,7 +214,7 @@ pir_output_is(<<'CODE', <<'OUT', "tail call optimization, implicit final return"
 	if $I33 goto doit
 bad_func:
 	printerr "_funcall:  Bad function.\n"
-	die
+	exit 0
 doit:
 	function(argv :flatten)
 .end
@@ -295,7 +295,7 @@ doit:
 	.pcc_end_return
 bad_func:
 	printerr "_funcall:  Bad function.\n"
-	die
+	exit 0
 .end
 
 ## Return the sum and the two arguments as three integers.

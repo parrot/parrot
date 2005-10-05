@@ -30,12 +30,6 @@ intsave/intrestore/intdepth
 
   use a ResizableIntegerPMC instead and standard keyed access
 
-die, die(in INT), die_hard(int INT, in INT)
-
-  die is a special case of die_hard, but the name of the latter isn't
-  really nice. Therefore die_hard with be renamed to die, the 2 argument
-  form of die survives.
-
 String character class opcodes is_* find_* and API interfaces
 
   The opcodes C<is_digit>, C<find_digit> et al and the according APIs are

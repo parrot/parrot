@@ -271,10 +271,10 @@ delprop_p_s                     240
 delprop_p_sc                    241
 depth_i                         242
 deref_p_p                       243
-die_hard_i_i                    244
-die_hard_i_ic                   245
-die_hard_ic_i                   246
-die_hard_ic_ic                  247
+die_i_i                         244
+die_i_ic                        245
+die_ic_i                        246
+die_ic_ic                       247
 div_i_i                         248
 div_i_i_i                       249
 div_i_i_ic                      250

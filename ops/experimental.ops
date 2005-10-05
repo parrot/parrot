@@ -133,28 +133,6 @@ inline op gcd(out INT, out INT, out INT, in INT, in INT) :advanced_math {
 
 =cut
 
-########################################
-
-=item B<die>()
-
-=item B<die>(in INT)
-
-Die. Hard. Calls _exit, and won't do any process cleanup
-
-TODO encode in existing die_hard opcode.
-
-=cut
-
-op die() :base_debug {
-  _exit(0);
-  goto NEXT();
-}
-
-op die(in INT) :base_debug {
-  _exit($1);
-  goto NEXT();
-}
-
 =item B<new>(out PMC, in INT, in KEY)
 
 XXX
