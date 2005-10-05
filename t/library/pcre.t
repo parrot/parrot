@@ -40,7 +40,7 @@ pir_output_is( <<'CODE', <<'OUT', 'soup to nuts' );
 
 
     find_global func, 'PCRE', 'init'
-    isnull func, NOK1
+    if_null func, NOK1
     branch OK1
 NOK1:
     print 'not '
@@ -48,7 +48,7 @@ OK1:
     print "ok 1\n"
 
     lib= func()
-    isnull lib, NOK2
+    if_null lib, NOK2
     branch OK2
 NOK2:
     print 'not '
