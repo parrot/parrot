@@ -651,10 +651,10 @@ sub dump_pmc {
         my $existing = find_file($include, $file);
         if ($existing && -e $existing && dump_is_newer($existing)) {
             if ($file =~ /default\.dump$/) {
-                $file = $existing;   # XXX: overwriting default.dump every time
+                next; # don't overwite default.dump
             }                                
             else {
-                next;                # don't overwrite anything else
+                $file = $existing; # XXX: overwrite anything else
             }
         }
 
