@@ -34,6 +34,7 @@ sub runstep {
 	"\nWhat flags instruct your compiler to compile code suitable for use in a shared library?",
 	$cc_shared) if $ask;
     Configure::Data->set(cc_shared =>  $cc_shared);
-    $Configure::Step::result = $cc_shared;
+    $Configure::Step::result =
+        ( $cc_shared =~ m/^ ?$/ ) ? 'done' : $cc_shared;
 }
 1;
