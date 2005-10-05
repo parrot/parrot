@@ -649,8 +649,9 @@ sub dump_pmc {
         $file =~ s/\.\w+$/\.dump/;
 
         # XXX write default.dump only once
-        my $existing = find_file($include, $file);
-        next if $existing && -e $existing && dump_is_newer($existing);
+        # Comented per bug #36493
+        # my $existing = find_file($include, $file);
+        # next if $existing && -e $existing && dump_is_newer($existing);
 
         my $class = $all{$name};
         gen_parent_list($include, $name, \%all);
