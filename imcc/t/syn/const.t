@@ -3,23 +3,22 @@
 # $Id$
 
 use strict;
-use Parrot::Test tests => 11;
+use Parrot::Test;
 
 pir_output_is(<<'CODE', <<'OUT', "globalconst 1");
 
-.sub __main
+.sub 'main' :main
 	.globalconst int N = 5
 	bsr _main
-	end
 .end
 
-.sub _sub1
+.sub '_sub1'
 	print N
 	print "\n"
 	ret
 .end
 
-.sub _main
+.sub '_main'
 	bsr _sub1
 	ret
 .end
@@ -28,13 +27,12 @@ CODE
 OUT
 
 pir_output_is(<<'CODE', <<'OUT', "globalconst 2");
-.sub test @MAIN
+.sub 'test' :main
 	.globalconst int N = 5
 	bsr _main
-	end
 .end
 
-.sub _sub1
+.sub '_sub1'
 	.local int x
 	x = 10 + N
 	print x
@@ -42,7 +40,7 @@ pir_output_is(<<'CODE', <<'OUT', "globalconst 2");
 	ret
 .end
 
-.sub _main
+.sub '_main'
 	bsr _sub1
 	ret
 .end
@@ -52,16 +50,16 @@ OUT
 
 pir_output_is(<<'CODE', <<'OUT', "globalconst 3");
 
-.sub call_sub1
-    sub1()
+.sub 'call_sub1'
+    'sub1'()
 .end
 
-.sub test @MAIN
+.sub 'test' :main
     .globalconst int N = 5
-    call_sub1()
+    'call_sub1'()
 .end
 
-.sub sub1
+.sub 'sub1'
     print N
     print "\n"
 .end
@@ -72,7 +70,7 @@ OUT
 
 
 pir_output_is(<<'CODE', <<'OUT', "array/hash consts");
-.sub _MAIN
+.sub 'main' :main
    .local Array ar
    .local pmc ha
    .local string key1
@@ -95,7 +93,6 @@ pir_output_is(<<'CODE', <<'OUT', "array/hash consts");
    print $I2
    print $I3
    print "\n"
-   end
 .end
 CODE
 12
@@ -103,21 +100,21 @@ OUT
 
 
 pir_output_is(<<'CODE', <<'OUT', "escaped");
-.sub _MAIN
+.sub 'main' :main
    $S0 = "\""
    print $S0
    print "\\"
    $S0 = "\"\\\"\n"
    print $S0
-  end
 .end
 CODE
 "\"\"
 OUT
+# fix editor highlighting "
 
 
 pir_output_is(<<'CODE', <<'OUT', "PMC const 1 - Sub");
-.sub main @MAIN
+.sub 'main' :main
     .const .Sub $P0 = "foo"
     print "ok 1\n"
     $P0()
@@ -134,7 +131,7 @@ OUT
 
 
 pir_output_is(<<'CODE', <<'OUT', "PMC const 2 - Sub ident");
-.sub main @MAIN
+.sub 'main' :main
     .const .Sub func = "foo"
     print "ok 1\n"
     func()
@@ -148,6 +145,7 @@ ok 1
 ok 2
 ok 3
 OUT
+
 
 output_is(<<'CODE', <<'OUT', "const I/N mismatch");
     set I0, 2.0
@@ -163,8 +161,9 @@ CODE
 ok
 OUT
 
+
 pir_output_is(<<'CODE', <<'OUT', "const I/N mismatch 2");
-.sub main
+.sub 'main' :main
     .const int i = 2.0
     print i
     print "\n"
@@ -173,7 +172,6 @@ pir_output_is(<<'CODE', <<'OUT', "const I/N mismatch 2");
     print "\nok\n"
     .const string s = ascii:"ok 2\n"
     print s
-    end
 .end
 CODE
 2
@@ -182,15 +180,16 @@ ok
 ok 2
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "PIR Here Documents");
-.sub __main
+
+pir_output_is(<<'CODE', <<'OUT', 'PIR heredocs: accepts double quoted terminator');
+.sub 'main' :main
     $S0 = <<"quotage"
 I want an elephant
 Oh, I want an elephat!
 Oh, woo, elephants, yeah :-O
 quotage
+
     print $S0
-    end
 .end
 CODE
 I want an elephant
@@ -198,8 +197,9 @@ Oh, I want an elephat!
 Oh, woo, elephants, yeah :-O
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "PIR Here Documents");
-.sub __main
+
+pir_output_is(<<'CODE', <<'OUT', 'PIR heredocs: accepts inline with concat');
+.sub 'main' :main
     $S0 = ""
     $I0 = 0
 LOOP:
@@ -209,7 +209,6 @@ end
     inc $I0
     if $I0 < 5 goto LOOP
     print $S0
-    end
 .end
 CODE
 ending
@@ -219,3 +218,163 @@ ending
 ending
 OUT
 
+
+pir_output_is(<<'CODE', <<'OUT', "PIR heredoc: accepts terminator with any word chars");
+.sub 'main' :main
+    $S0 = <<"AnY_w0Rd_ch4rS"
+so much depends
+upon
+
+a red wheel
+barrow
+
+glazed with rain
+water
+
+beside the white
+chickens
+AnY_w0Rd_ch4rS
+
+    print $S0
+.end
+CODE
+so much depends
+upon
+
+a red wheel
+barrow
+
+glazed with rain
+water
+
+beside the white
+chickens
+OUT
+
+
+pir_output_like(<<'CODE', <<'OUT', 'PIR heredoc: rejects single quoted terminator');
+.sub 'main' :main
+    $S0 = <<'Jabberwocky'
+`Twas brillig, and the slithy toves
+  Did gyre and gimble in the wabe;
+All mimsy were the borogoves,
+  And the mome raths outgrabe.
+Jabberwocky
+    print $S0
+.end
+CODE
+/^error:imcc:parse error, unexpected SHIFT_LEFT.*/
+OUT
+
+
+pir_output_like(<<'CODE', <<'OUT', 'PIR heredoc: rejects unquoted terminator');
+.sub 'main' :main
+    $S0 = <<Jabberwocky
+"Beware the Jabberwock, my son!
+  The jaws that bite, the claws that catch!
+Beware the Jubjub bird, and shun
+  The frumious Bandersnatch!"
+Jabberwocky
+    print $S0
+.end
+CODE
+/^error:imcc:parse error, unexpected SHIFT_LEFT.*/
+OUT
+
+
+pir_output_like(<<'CODE', <<'OUT', "PIR heredoc: rejects inline heredoc");
+.sub 'main' :main
+    $S0 .= <<Jabberwocky
+He took his vorpal sword in hand:
+  Long time the manxome foe he sought --
+So rested he by the Tumtum tree,
+  And stood awhile in thought.
+Jabberwocky
+
+    print $S0
+.end
+CODE
+/^error:imcc:parse error, unexpected SHIFT_LEFT.*/
+OUT
+
+
+pir_output_like(<<'CODE', <<'OUT', "PIR heredoc: rejects null terminator");
+.sub 'main' :main
+    $S0 = <<
+And, as in uffish thought he stood,
+  The Jabberwock, with eyes of flame,
+Came whiffling through the tulgey wood,
+  And burbled as it came!
+
+    print $S0
+.end
+CODE
+/^error:imcc:parse error, unexpected SHIFT_LEFT.*/
+OUT
+
+
+pir_output_like(<<'CODE', <<'OUT', "PIR heredoc: rejects terminator with spaces");
+.sub 'main' :main
+    $S0 = << "terminator with spaces"
+One, two! One, two! And through and through
+  The vorpal blade went snicker-snack!
+He left it dead, and with its head
+  He went galumphing back.
+terminator with spaces
+
+    print $S0
+.end
+CODE
+/^error:imcc:parse error, unexpected SHIFT_LEFT.*/
+OUT
+
+
+pir_output_like(<<'CODE', <<'OUT', "PIR heredoc: rejects terminator with non-word chars", todo => 'specification unclear');
+.sub 'main' :main
+    $S0 = <<"#non$word-chars."
+"And, has thou slain the Jabberwock?
+  Come to my arms, my beamish boy!
+O frabjous day! Callooh! Callay!'
+  He chortled in his joy.
+#non$word-chars.
+
+    print $S0
+.end
+CODE
+/^error:imcc:parse error, unexpected SHIFT_LEFT.*/
+OUT
+
+
+pir_output_like(<<'CODE', <<'OUT', "PIR heredoc: rejects terminator with unprintable chars", todo => 'specification unclear');
+.sub 'main' :main
+    $S0 = <<"\0"
+`Twas brillig, and the slithy toves
+  Did gyre and gimble in the wabe;
+All mimsy were the borogoves,
+  And the mome raths outgrabe.
+\0
+    print $S0
+.end
+CODE
+/^error:imcc:parse error, unexpected SHIFT_LEFT.*/
+OUT
+
+
+pir_output_like(<<'CODE', <<'OUT', "PIR heredoc: rejects interpolated terminator", todo => 'specification unclear');
+.sub 'main' :main
+    $S1 = 'Jabberwocky'
+    $S0 = <<$S1
+`Twas brillig, and the slithy toves
+  Did gyre and gimble in the wabe;
+All mimsy were the borogoves,
+  And the mome raths outgrabe.
+Jabberwocky
+    print $S0
+.end
+CODE
+/^error:imcc:parse error, unexpected SHIFT_LEFT.*/
+OUT
+
+
+## remember to change the number of tests!
+BEGIN { plan tests => 20; }
