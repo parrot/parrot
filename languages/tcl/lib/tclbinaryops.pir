@@ -336,7 +336,7 @@ if $P%i goto true%i
 if $P%i goto true%i
 false%i:
 $P%i=new .TclInt
-$P%i=0\
+$P%i=0
 goto done%i
 true%i:
 $P%i=new .TclInt
