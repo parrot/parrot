@@ -1,3 +1,5 @@
+# XXX Convert to a call to the inline version.
+
 =head2 [incr]
 
  incr foo
