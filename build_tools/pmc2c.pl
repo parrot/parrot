@@ -646,12 +646,17 @@ sub dump_pmc {
 
     foreach my $name (keys %all) {
         my $file = $all{$name}->{file};
-        $file =~ s/\.\w+$/\.dump/;
+        $file =~ s/\.\w+$/.dump/;
 
-        # XXX write default.dump only once
-        # Comented per bug #36493
-        # my $existing = find_file($include, $file);
-        # next if $existing && -e $existing && dump_is_newer($existing);
+        my $existing = find_file($include, $file);
+        if ($existing && -e $existing && dump_is_newer($existing)) {
+            if ($file =~ /default\.dump$/) {
+                $file = $existing;   # XXX: overwriting default.dump every time
+            }                                
+            else {
+                next;                # don't overwrite anything else
+            }
+        }
 
         my $class = $all{$name};
         gen_parent_list($include, $name, \%all);
@@ -661,7 +666,7 @@ sub dump_pmc {
         $Dumper->Indent(1);
 
         print "Writing $file\n" if $opt{verbose};
-        open my $fh, ">", $file or die "Can't write '$file'";
+        open my $fh, ">", $file or die "Can't write '$file': $!";
         print $fh $Dumper->Dump;
         close $fh;
     }
