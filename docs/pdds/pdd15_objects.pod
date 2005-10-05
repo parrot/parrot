@@ -7,20 +7,19 @@ docs/pdds/pdd15_objects.pod - Object and Class semantics for Parrot
 
 =head1 ABSTRACT
 
-This PDD describes the semantics of Parrot's object and class
-systems. The PDD is divided into two parts, the semantics expressed
-to user programs through PMCs, and the default back-end class scheme.
+This PDD describes the semantics of Parrot's object and class systems. The PDD
+is divided into two parts, the semantics expressed to user programs through
+PMCs, and the default back-end class scheme.
 
-Note that the class system is I<not> the single mandated class
-scheme, merely the one designed to express the semantics needed for
-Perl 6, ruby, and python. Alternate class systems are certainly
-possible, and direct compatibility with the system as described here
-isn't strictly necessary.
+Note that the class system is I<not> the single mandated class scheme, merely
+the one designed to express the semantics needed for Perl 6, ruby, and python.
+Alternate class systems are certainly possible, and direct compatibility with
+the system as described here isn't strictly necessary.
 
 =head1 DESCRIPTION
 
-This is a reasonably straightforward object system. It assumes that
-objects have:
+This is a reasonably straightforward object system. It assumes that objects
+have:
 
 =over 4
 
@@ -56,9 +55,9 @@ Fetch the class for an object
 
 =item *
 
-Subclass an existing object (note that objects may not necessarily be
-able to have their classes changed arbitrarily, but making a subclass
-and moving the object to it is allowable)
+Subclass an existing object (note that objects may not necessarily be able to
+have their classes changed arbitrarily, but making a subclass and moving the
+object to it is allowable)
 
 =item *
 
@@ -70,9 +69,9 @@ Set an attribute by name or offset
 
 =back
 
-Additionally we assume that I<all> objects can have properties on
-them, as all PMCs can have properties. The property get/set method may
-be overridden on a per-class basis as any other vtable method may be.
+Additionally we assume that I<all> objects can have properties on them, as all
+PMCs can have properties. The property get/set method may be overridden on a
+per-class basis as any other vtable method may be.
 
 For classes, we assume that:
 
@@ -88,8 +87,7 @@ Classes have one or more immediate parent classes
 
 =item *
 
-Classes have a catalog of attribute names and offsets for all
-attributes.
+Classes have a catalog of attribute names and offsets for all attributes.
 
 =item *
 
@@ -131,52 +129,47 @@ Remove interfaces
 
 =back
 
-This list is likely not definitive, but it's enough to start
-with. It also doesn't address the semantics of method calls, which
-need to be dealt with, possibly separately. With that in mind, the
-object system supports these features with a combination of PMC
-classes (not to be confused with object classes) and opcodes.
+This list is likely not definitive, but it's enough to start with. It also
+doesn't address the semantics of method calls, which need to be dealt with,
+possibly separately. With that in mind, the object system supports these
+features with a combination of PMC classes (not to be confused with object
+classes) and opcodes.
 
 =head1 IMPLEMENTATION
 
-There are four pieces to the object implementation. There are the PMCs
-for the classes and objects, the opcodes the engine uses to do objecty
-things, the specific vtable methods used to perform those objecty
-things, and the supporting code provided by the interpreter engine to
-do the heavy lifting.
+There are four pieces to the object implementation. There are the PMCs for the
+classes and objects, the opcodes the engine uses to do objecty things, the
+specific vtable methods used to perform those objecty things, and the
+supporting code provided by the interpreter engine to do the heavy lifting.
 
-Please note that Parrot, in general, does I<not> restrict operations
-on objects and classes. If a language has restrictions on what can be
-done with them, the language is responsible for making sure that
-disallowed things do not happen. For example, Parrot permits multiple
-inheritance, and will not stop code that adds a new parent to an
-existing class. If a language doesn't allow for multiple inheritance
-it must not emit code which would add multiple parents to a
-class. (Parrot may, at some point, allow imposition of runtime
-restrictions on a class, but currently it doesn't)
+Please note that Parrot, in general, does I<not> restrict operations on objects
+and classes. If a language has restrictions on what can be done with them, the
+language is responsible for making sure that disallowed things do not happen.
+For example, Parrot permits multiple inheritance, and will not stop code that
+adds a new parent to an existing class. If a language doesn't allow for
+multiple inheritance it must not emit code which would add multiple parents to
+a class. (Parrot may, at some point, allow imposition of runtime restrictions
+on a class, but currently it doesn't)
 
 =head2 PMCs
 
-There are two PMC classes, C<ParrotClass> and
-C<ParrotObject>. ParrotObject PMCs are the actual objects, and
-hold all the per-object instance data. ParrotClass PMCs hold all the
-class-specific information. Instantiating a new OO class creates a new
-ParrotClass PMC, and enters the new OO class into Parrot's PMC class
-table, at which point it is indistinguishable from any other PMC
-class. (This doesn't mean that non-ParrotClass things can be
-subclassed or treated as an OO class. Neither is that forbidden. Just
-unimplemented)
+There are two PMC classes, C<ParrotClass> and C<ParrotObject>. ParrotObject
+PMCs are the actual objects, and hold all the per-object instance data.
+ParrotClass PMCs hold all the class-specific information. Instantiating a new
+OO class creates a new ParrotClass PMC, and enters the new OO class into
+Parrot's PMC class table, at which point it is indistinguishable from any other
+PMC class. (This doesn't mean that non-ParrotClass things can be subclassed or
+treated as an OO class. Neither is that forbidden. Just unimplemented)
 
-It's important to note that I<all> 'standard' classes are
-ParrotClass PMC instances, and I<all> 'standard' objects are
-ParrotObject PMCs. We do I<not> create a brand new PMC class for each
-OO class, and they all share the ParrotClass or ParrotObject vtable,
-respectively. This distinction is mostly an artifact of the
-implementation, and may change in the future.
+It's important to note that I<all> 'standard' classes are ParrotClass PMC
+instances, and I<all> 'standard' objects are ParrotObject PMCs. We do I<not>
+create a brand new PMC class for each OO class, and they all share the
+ParrotClass or ParrotObject vtable, respectively. This distinction is mostly an
+artifact of the implementation, and may change in the future.
 
-While the internals of the class and object PMCs should be considered
-black boxes, here's some documentation as to what they are for
-implementation purposes.
+While the internals of the class and object PMCs should be considered black
+boxes, here's some documentation as to what they are for implementation
+purposes.
 
 The ParrotClass PMC holds a 6 element array, which is:
 
@@ -196,34 +189,33 @@ An array of all parent PMCs, in search order
 
 =item 3
 
-The class attribute section hash. Keys are the class name in
-language-defined format (so perl would be foo::bar, while java would
-be some.damn.long.thing.with.dots), values are the integer offset from
-the start of the attribute array where that class' attributes start.
+The class attribute section hash. Keys are the class name in language-defined
+format (so perl would be foo::bar, while java would be
+some.damn.long.thing.with.dots), values are the integer offset from the start
+of the attribute array where that class' attributes start.
 
 =item 4
 
-The class attribute name hash. Keys are the fully qualified attribute
-names and the values are the offset from the beginning of the
-attribute array of the particular attribute.
+The class attribute name hash. Keys are the fully qualified attribute names and
+the values are the offset from the beginning of the attribute array of the
+particular attribute.
 
 =item 5
 
-The class attribute array. This is an array of unqualified attribute
-names.
+The class attribute array. This is an array of unqualified attribute names.
 
 =back
 
-Note that the attribute catalog holds I<all> the attributes for an
-object. This includes the attributes in the object's class as well as
-I<all> the attributes defined in all the parent classes. (Multiple
-inheritance makes this necessary -- the offsets of a class' attributes
-will change from child class to child class)
+Note that the attribute catalog holds I<all> the attributes for an object. This
+includes the attributes in the object's class as well as I<all> the attributes
+defined in all the parent classes. (Multiple inheritance makes this necessary
+-- the offsets of a class' attributes will change from child class to child
+class)
 
 ParrotClass PMCs also have the "I am a class" flag set on them.
 
-The ParrotObject PMC is an array of meta-information and
-attributes. The elements of this array are:
+The ParrotObject PMC is an array of meta-information and attributes. The
+elements of this array are:
 
 =over 4
 
@@ -241,16 +233,14 @@ The attributes for the object
 
 =back
 
-Note that ParrotObject PMCs also have the "I am an object" flag set on
-them.
+Note that ParrotObject PMCs also have the "I am an object" flag set on them.
 
 =head2 Opcodes
 
-The following ops are provided to deal with objects. Please note that
-method calls are governed by parrot's calling conventions, and as such
-objects, method PMCs, return continuations, and parameters must be in
-the right places, though some ops will put parameters where they need
-to go.
+The following ops are provided to deal with objects. Please note that method
+calls are governed by parrot's calling conventions, and as such objects, method
+PMCs, return continuations, and parameters must be in the right places, though
+some ops will put parameters where they need to go.
 
 =over 4
 
@@ -260,19 +250,19 @@ Returns the offset of the first attribute for class Sz in object Py.
 
 =item getattribute Px, Py, Iz
 
-Returns attribute Iz of object Py and puts it in Px. Note that the
-attribute number is an absolute offset.
+Returns attribute Iz of object Py and puts it in Px. Note that the attribute
+number is an absolute offset.
 
 =item getattribute Px, Py, Sz
 
-Get the attribute with the fully qualified name Sz from object Py and
-put it in Px.
+Get the attribute with the fully qualified name Sz from object Py and put it in
+Px.
 
 =item setattribute Px, Iy, Pz
 
-Set the attribute Iy of object Px to Pz. Note that this op stores the
-B<actual> PMC rather than a copy, and so if the PMC's value is subsequently
-changed, the value of the attribute will also change.
+Set the attribute Iy of object Px to Pz. Note that this op stores the B<actual>
+PMC rather than a copy, and so if the PMC's value is subsequently changed, the
+value of the attribute will also change.
 
 =item setattribute Px, Sy, Pz
 
@@ -280,35 +270,35 @@ Set the attribute of object Px with the fully qualified name Sy to Pz
 
 =item fetchmethod Px, Py, Sz
 
-Find the PMC for method Sz of object Py, and put it in Px. Note that how
-the method PMC returned behaves if it goes out of scope or if the
-class hierarchy changes or the method definitions change is entirely
-up to the class that provides the PMC.
+Find the PMC for method Sz of object Py, and put it in Px. Note that how the
+method PMC returned behaves if it goes out of scope or if the class hierarchy
+changes or the method definitions change is entirely up to the class that
+provides the PMC.
 
 =item callmethod
 
 =item callmethod Sz
 
 Call a method. If the method name is provided, we find the PMC for the named
-method and put it in the sub/method slot. If no name is provided we
-assume that all the calling conventions have already been set up and
-the method PMC is already in the proper place.
+method and put it in the sub/method slot. If no name is provided we assume that
+all the calling conventions have already been set up and the method PMC is
+already in the proper place.
 
 =item callmethodcc
 
 =item callmethodcc Sx
 
-Make a method call, automatically generating a return continuation. If
-a method name is passed in we look up the method PMC for the object
-and put it in the method slot. If a method name isn't provided then we
-assume that things are already properly set up.
+Make a method call, automatically generating a return continuation. If a method
+name is passed in we look up the method PMC for the object and put it in the
+method slot. If a method name isn't provided then we assume that things are
+already properly set up.
 
 =item tailcallmethod (Unimplemented)
 
 =item tailcallmethod Sx (Unimplemented)
 
-Make a tailcall to method Sx. If no method name is given, we assume
-everything is already set up properly.
+Make a tailcall to method Sx. If no method name is given, we assume everything
+is already set up properly.
 
 =item newclass Px, Sy
 
@@ -320,26 +310,24 @@ Create a new class, named Sz, which has Py as its immediate parent.
 
 =item addparent Px, Py
 
-Add class Py to the end of the list of immediate parents of class
-Px. Adds any attributes of Py (and its parent classes) that aren't
-already in Px.
+Add class Py to the end of the list of immediate parents of class Px. Adds any
+attributes of Py (and its parent classes) that aren't already in Px.
 
 =item removeparent Px, Py (Unimplemented)
 
-Remove class Py from the parent list of Px. All parent classes of Py
-which aren't parent classes of what remains of Px's parent list are
-removed, as are their attributes.
+Remove class Py from the parent list of Px. All parent classes of Py which
+aren't parent classes of what remains of Px's parent list are removed, as are
+their attributes.
 
 =item addattribute Px, Sy
 
-Add attribute Sy to class Px. This will add the attribute slot to all
-objects of class Px and children of class Px, with a default value of
-C<Null>.
+Add attribute Sy to class Px. This will add the attribute slot to all objects
+of class Px and children of class Px, with a default value of C<Null>.
 
 =item removeattribute Px, Sy (Unimplemented)
 
-Remove the attribute Sy from class Px, all objects of class Px, and
-all objects of a child of class Px.
+Remove the attribute Sy from class Px, all objects of class Px, and all objects
+of a child of class Px.
 
 =item instantiate Px, Py, Sz (Unimplemented)
 
@@ -349,27 +337,25 @@ Instantiate a brand new class, based on the metadata in Py, named Sz.
 
 =head2 Vtables
 
-To make this work all PMCs must have the following vtable
-entries. They may, for non-objects, throw an exception.
+To make this work all PMCs must have the following vtable entries. They may,
+for non-objects, throw an exception.
 
-The catalog metadata for objects is considered to be attributes on the
-class, so to get the offset for a class for an object, you fetch the
-object's class then look up the offset attribute from it. (The class
-attributes are detailed later) This is safe in general, since the only
-code reasonably querying a class' attribute list is the class code
-itself, and if a class doesn't know whether it's a ParrotClass-style
-class or not you've got bigger problems.
+The catalog metadata for objects is considered to be attributes on the class,
+so to get the offset for a class for an object, you fetch the object's class
+then look up the offset attribute from it. (The class attributes are detailed
+later) This is safe in general, since the only code reasonably querying a
+class' attribute list is the class code itself, and if a class doesn't know
+whether it's a ParrotClass-style class or not you've got bigger problems.
 
 =over 4
 
 =item find_method(string *)
 
-Returns the PMC for the named method. If no method of this name
-exists, nor can be constructed, returns a Null PMC.
+Returns the PMC for the named method. If no method of this name exists, nor can
+be constructed, returns a Null PMC.
 
-Note that for languages which support default fallback methods, such
-as Perl 5's AUTOLOAD, this would be the place to return it if a normal
-lookup fails.
+Note that for languages which support default fallback methods, such as Perl
+5's AUTOLOAD, this would be the place to return it if a normal lookup fails.
 
 =item isa(class *)
 
@@ -378,13 +364,13 @@ inheritance hierarchy of the object.
 
 =item can(string *)
 
-Returns true or false if the object can perform the requested
-method. (Including with an AUTOLOAD)
+Returns true or false if the object can perform the requested method.
+(Including with an AUTOLOAD)
 
 =item does(class *)
 
-Returns true or false to note whether the object in question
-implements the interface passed in.
+Returns true or false to note whether the object in question implements the
+interface passed in.
 
 =item get_attr(INTVAL)
 
@@ -409,24 +395,23 @@ Returns the class PMC for the object.
 =back
 
 Currently Parrot only supports mutating a class' metainformation for
-ParrotClass classes. This is a restriction which will be lifted at
-some point soon.
+ParrotClass classes. This is a restriction which will be lifted at some point
+soon.
 
 
 =head1 What The Bytecode Sees
 
 The bytecode is isolated from most of the internal details of the
-implementation. This allows both for flexibility in the implementation
-and forward compatibility, generally good things. It also allows for
-multiple concurrent interoperable object systems. The major thrust is
-for transparent use of objects, though most class activity (including
-creation of subclasses and modifications of existing classes) should
-be transparent as well.
+implementation. This allows both for flexibility in the implementation and
+forward compatibility, generally good things. It also allows for multiple
+concurrent interoperable object systems. The major thrust is for transparent
+use of objects, though most class activity (including creation of subclasses
+and modifications of existing classes) should be transparent as well.
 
 =head1 EXAMPLES
 
-The following examples all assume we're working with basic
-ParrotObject objects and ParrotClass classes.
+The following examples all assume we're working with basic ParrotObject objects
+and ParrotClass classes.
 
 =head2 Creating a new class
 
@@ -436,8 +421,7 @@ To create a new class C<Foo> which has no parent classes:
 
 =head2 Creating a new class with multiple parents
 
-To create a class C<Foo> with the parents C<A> and C<B>, the code
-would be:
+To create a class C<Foo> with the parents C<A> and C<B>, the code would be:
 
    getclass $P0, "A"
    getclass $P1, "B"
@@ -480,8 +464,8 @@ Or, if a return continuation needs constructing:
 
 =head2 Accessing attributes from within a class
 
-Assuming we've an object that has class C<Foo> in it somewhere and
-want to get the second attribute C<b> out of it:
+Assuming we've an object that has class C<Foo> in it somewhere and want to get
+the second attribute C<b> out of it:
 
   .local int BaseOffset
   .local int BOffset
@@ -495,10 +479,9 @@ Or with named access, if it isn't time critical:
 
 =head1 Explanations
 
-To get a new class, you can do a C<newclass>, which creates a new
-class with no parents besides parrot's default super-ish parent
-class. (Which doesn't appear in the class list anywhere, though
-arguably it ought to)
+To get a new class, you can do a C<newclass>, which creates a new class with no
+parents besides parrot's default super-ish parent class. (Which doesn't appear
+in the class list anywhere, though arguably it ought to)
 
 To get a new child class, you have two potential options:
 
@@ -510,46 +493,41 @@ To get a new child class, you have two potential options:
 
 =back
 
-Both ways work. It is, however, more efficient to use the first
-method, and just subclass the immediate parent class of your new
-class.
+Both ways work. It is, however, more efficient to use the first method, and
+just subclass the immediate parent class of your new class.
 
-When adding in extra parents in a multiple-inheritance scenario,
-subclass the first class in the immediate parent list then use the
-C<addparent> op to add in the rest of the immediate parents.
+When adding in extra parents in a multiple-inheritance scenario, subclass the
+first class in the immediate parent list then use the C<addparent> op to add in
+the rest of the immediate parents.
 
-Do be aware that, right now, you should I<not> add attributes or
-parents to a class that's been subclassed or has had objects
-instantiated. This will leave the internal structures of the classes
-and objects in an inconsistent state and things won't work at all the
-way you want them to. At the moment parrot won't warn if you do this,
-but it will soon. The restriction on parent list changes and attribute
-addition will be lifted in future releases, though doing so will be an
-expensive operation.
+Do be aware that, right now, you should I<not> add attributes or parents to a
+class that's been subclassed or has had objects instantiated. This will leave
+the internal structures of the classes and objects in an inconsistent state and
+things won't work at all the way you want them to. At the moment parrot won't
+warn if you do this, but it will soon. The restriction on parent list changes
+and attribute addition will be lifted in future releases, though doing so will
+be an expensive operation.
 
 =head1 VTABLE OVERLOADING
 
-Classes may override the vtable methods, allowing objects of a class
-to behave like a primitive PMC. Each vtable slot has a
-corresponding named method that parrot looks for in your class
-hierarchy when an object is used in a primitive context.
+Classes may override the vtable methods, allowing objects of a class to behave
+like a primitive PMC. Each vtable slot has a corresponding named method that
+parrot looks for in your class hierarchy when an object is used in a primitive
+context.
 
-To use these properly at a low-level requires a good working knowledge
-of the way Parrot works--generally for higher-level languages the
-language compiler or runtime will provide easier-to-use
-wrappers. These methods are all prototyped, and take a single fixed
-argument list, and return at most a single value.
+To use these properly at a low-level requires a good working knowledge of the
+way Parrot works--generally for higher-level languages the language compiler or
+runtime will provide easier-to-use wrappers. These methods are all prototyped,
+and take a single fixed argument list, and return at most a single value.
 
-While vtable methods I<may> take a continuation, those continuations
-may I<not> escape the vtable method's execution. This is due to the
-way that vtable methods are called by the interpreter--once a vtable
-method is exited any continuation taken within it is no longer valid
-and may not be used.
+While vtable methods I<may> take a continuation, those continuations may I<not>
+escape the vtable method's execution. This is due to the way that vtable
+methods are called by the interpreter--once a vtable method is exited any
+continuation taken within it is no longer valid and may not be used.
 
-Note that any class method that wishes to use parrot's multi-method
-dispatch system may do so. This is, in fact, encouraged, though it is
-not required. In the absence of explicit multimethod dispatch, a
-left-side wins scheme is used.
+Note that any class method that wishes to use parrot's multi-method dispatch
+system may do so. This is, in fact, encouraged, though it is not required. In
+the absence of explicit multimethod dispatch, a left-side wins scheme is used.
 
 The following list details the raw method names:
 
@@ -567,17 +545,17 @@ Called when the object is first created.
 
 =item __mark
 
-Called when the DOD is tracing live PMCs. If this method is called
-then the code must mark all strings and PMCs that it contains as
-live, otherwise they may be collected.
+Called when the DOD is tracing live PMCs. If this method is called then the
+code must mark all strings and PMCs that it contains as live, otherwise they
+may be collected.
 
-This method is only called if the PMC is flagged as having a special
-mark routine, and is not necessary for normal objects.
+This method is only called if the PMC is flagged as having a special mark
+routine, and is not necessary for normal objects.
 
 =item __destroy
 
-Called when the object is destroyed. This method is only called if
-the PMC is marked as having an active finalizer.
+Called when the object is destroyed. This method is only called if the PMC is
+marked as having an active finalizer.
 
 =item __getprop
 
@@ -924,8 +902,8 @@ aggregate.
 
 =head1 TRANSLATION AND GLOSSARY
 
-Since every object system on the planet shares a common set of terms
-but uses them completely differently, this section defines
+Since every object system on the planet shares a common set of terms but uses
+them completely differently, this section defines
 
 =head2 Glossary
 
@@ -933,86 +911,76 @@ but uses them completely differently, this section defines
 
 =item Property
 
-A name and value pair attached to a PMC. Properties may be attached to
-the PMC in its role as a container or the PMC in its role as a value.
+A name and value pair attached to a PMC. Properties may be attached to the PMC
+in its role as a container or the PMC in its role as a value.
 
-Properties are global to the PMC. That is there can only be one
-property named "FOO" attached to a PMC, and it is globally visible to
-all inspectors of the PMCs properties. They are I<not> restricted by
-class.
+Properties are global to the PMC. That is there can only be one property named
+"FOO" attached to a PMC, and it is globally visible to all inspectors of the
+PMCs properties. They are I<not> restricted by class.
 
-Properties are generally assigned at runtime, and a particular
-property may or may not exist on a PMC at any particular
-time. Properties are not restricted to objects as such, and any PMC
-may have a property attached to it.
+Properties are generally assigned at runtime, and a particular property may or
+may not exist on a PMC at any particular time. Properties are not restricted to
+objects as such, and any PMC may have a property attached to it.
 
 =item Attribute
 
-An attribute is a slot in an object that contains a value, generally a
-PMC. (Containing non-PMCs leads to interesting garbage collection
-issues at the moment) Attributes are referenced either
-by slot number or by class name/attribute name pairs. (At least
-conceptually)
+An attribute is a slot in an object that contains a value, generally a PMC.
+(Containing non-PMCs leads to interesting garbage collection issues at the
+moment) Attributes are referenced either by slot number or by class
+name/attribute name pairs. (At least conceptually)
 
-Attributes are set on a class-wide basis, and all the objects of a
-class will have the same set of attributes. Generally attributes
-aren't added or removed from classes at runtime, as this would require
-resizing and moving the elements of the attribute arrays of existing
-objects, and potentially recompiling code with fixed attribute offsets
-embedded in it. Most OO languages don't allow attribute changes to
-existing classes, though parrot's base attribute system does allow
-this.
+Attributes are set on a class-wide basis, and all the objects of a class will
+have the same set of attributes. Generally attributes aren't added or removed
+from classes at runtime, as this would require resizing and moving the elements
+of the attribute arrays of existing objects, and potentially recompiling code
+with fixed attribute offsets embedded in it. Most OO languages don't allow
+attribute changes to existing classes, though parrot's base attribute system
+does allow this.
 
-The fully qualified name of an attribute is the classname, a null, and
-the attribute name. Parrot synthesizes the fully-qualified name where
-it needs to.
+The fully qualified name of an attribute is the classname, a null, and the
+attribute name. Parrot synthesizes the fully-qualified name where it needs to.
 
 =item Method
 
-In its strictest sense, a method is a chunk of code that you call with
-an object in the object slot of the calling conventions.
+In its strictest sense, a method is a chunk of code that you call with an
+object in the object slot of the calling conventions.
 
-More generally, a method is some piece of code that you invoke by name
-through an object. You call the object's "Invoke a method" vtable
-entry, passing in the method name (Assuming we don't just get it from
-the sub name register, per calling conventions). The object is then
-responsible for doing something with the method being
-requested. Presumably it calls the method, though this isn't strictly
-required.
+More generally, a method is some piece of code that you invoke by name through
+an object. You call the object's "Invoke a method" vtable entry, passing in the
+method name (Assuming we don't just get it from the sub name register, per
+calling conventions). The object is then responsible for doing something with
+the method being requested. Presumably it calls the method, though this isn't
+strictly required.
 
 =item Delegate
 
-An object that is transparently (to the user) embedded in another
-object. Delegate objects are used in those cases where we can't
-inherit from a class because the class is from a different object
-universe.
+An object that is transparently (to the user) embedded in another object.
+Delegate objects are used in those cases where we can't inherit from a class
+because the class is from a different object universe.
 
-As an example, assume you have a class A, which inherits from class
-B. The classes are incompatible, so Parrot can't automatically meld B
-into A, as it might if they were. When instantiating an object of
-class A, Parrot will automatically instantiate an object of class B
-and embed it in the object of class A. The object of class B is class
-A's delegate--when a method call comes in that A can't handle, that
-method call is delegated to B.
+As an example, assume you have a class A, which inherits from class B. The
+classes are incompatible, so Parrot can't automatically meld B into A, as it
+might if they were. When instantiating an object of class A, Parrot will
+automatically instantiate an object of class B and embed it in the object of
+class A. The object of class B is class A's delegate--when a method call comes
+in that A can't handle, that method call is delegated to B.
 
 =item Parent class
 
-Also called the super-class. The parent class is, in an inheritance
-situation, the class being derived from. If A derives from B, B is the
-parent class of A.
+Also called the super-class. The parent class is, in an inheritance situation,
+the class being derived from. If A derives from B, B is the parent class of A.
 
 =item Child class
 
-Also called the sub-class. The child class is, in an inheritance
-situation, the class doing the deriving. If A derives from B, A is the
-child class.
+Also called the sub-class. The child class is, in an inheritance situation, the
+class doing the deriving. If A derives from B, A is the child class.
 
 =back
 
 =head2 Translation
 
-The following list a set of languages, then within each language what
-the parrot term translates to.
+The following list a set of languages, then within each language what the
+parrot term translates to.
 
 =over 4
 
@@ -1114,8 +1082,8 @@ A complete overhaul from the original spec.
 
 =item Version 1.1
 
-Removed attributes from the object interface and put them in the
-class interface section, where they belong.
+Removed attributes from the object interface and put them in the class
+interface section, where they belong.
 
 =item Version 1.0
 

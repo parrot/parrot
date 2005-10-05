@@ -7,14 +7,14 @@ docs/pdds/pdd05_opfunc.pod - Opcode Function specs
 
 =head1 ABSTRACT
 
-This PDD specifies how the opcode functions should behave and how they
-are called by the Parrot interpreter.
+This PDD specifies how the opcode functions should behave and how they are
+called by the Parrot interpreter.
 
 =head1 DESCRIPTION
 
-The opcode functions are the workhorse of the Parrot engine. They
-control program flow and do most of the work in a program. (The rest
-being done by the variable vtable functions)
+The opcode functions are the workhorse of the Parrot engine. They control
+program flow and do most of the work in a program. (The rest being done by the
+variable vtable functions)
 
 Opcode functions have very few limitations or restrictions on them. In
 particular, opcode functions:
@@ -33,40 +33,35 @@ opcode signature indicates otherwise
 =back
 
 Each opcode has two separate functions. The first function takes two
-parameters, the current interpreter pointer and current interpreter
-PC, and returns the address of the next opcode to execute. The second
-function takes zero or more parameters as addresses, register numbers,
-integers, or floating point numbers and optionally returns either the
-address of the next opcode or the register number holding the address
-of the next opcode. These are referred to as the I<wrapping function>
-and the I<inner function>, respectively.
+parameters, the current interpreter pointer and current interpreter PC, and
+returns the address of the next opcode to execute. The second function takes
+zero or more parameters as addresses, register numbers, integers, or floating
+point numbers and optionally returns either the address of the next opcode or
+the register number holding the address of the next opcode. These are referred
+to as the I<wrapping function> and the I<inner function>, respectively.
 
-The I<wrapping function> is required, as this is the code that the
-interpreter will call. Normally this is automatically generated.
+The I<wrapping function> is required, as this is the code that the interpreter
+will call. Normally this is automatically generated.
 
-The I<inner function> is the code that gets directly executed when
-parrot gets TIL-ified. If there is no I<inner function> for some reason,
-then your opcode will likely run slower (as the interpreter would need
-to set up the registers and other stuff that would normally get
-stripped away for speed)
+The I<inner function> is the code that gets directly executed when parrot gets
+TIL-ified. If there is no I<inner function> for some reason, then your opcode
+will likely run slower (as the interpreter would need to set up the registers
+and other stuff that would normally get stripped away for speed)
 
 =head2 The wrapping function
 
-This is the function that the interpreter actually executes. It has
-all the intimate knowledge of its parameters embedded in it, and is
-responsible for figuring out what register data it needs and from
-where.
+This is the function that the interpreter actually executes. It has all the
+intimate knowledge of its parameters embedded in it, and is responsible for
+figuring out what register data it needs and from where.
 
-This function is generally created automatically by
-C<opcode_process.pl>, so the programmer doesn't have to create it. If,
-for some reason, you do need or want to write it (for example if you
-have no inner function) that's fine.
+This function is generally created automatically by C<opcode_process.pl>, so
+the programmer doesn't have to create it. If, for some reason, you do need or
+want to write it (for example if you have no inner function) that's fine.
 
 =head2 The inner function
 
-The inner function is the code that actually does the work. This is
-generally a chunk of C code, though the interpreter will be able to
-call perl code soon.
+The inner function is the code that actually does the work. This is generally a
+chunk of C code, though the interpreter will be able to call perl code soon.
 
 =head1 IMPLEMENTATION
 
@@ -81,8 +76,8 @@ The C<RETURN> type may be one of:
 =item void
 
 Indicates the function returns nothing. The I<wrapping function> will
-automagically figure out what address to return based on the size of
-the current opcode.
+automagically figure out what address to return based on the size of the
+current opcode.
 
 =item void *
 
@@ -90,8 +85,8 @@ Indicates the function returns the address of the next opcode to execute.
 
 =item I
 
-Indicates the function returns the number of the C<PMC> register that
-holds address of the next opcode to be execute.
+Indicates the function returns the number of the C<PMC> register that holds
+address of the next opcode to be execute.
 
 =back
 
@@ -149,8 +144,8 @@ Indicates the item is a PMC register number.
 
 =back
 
-The function starts with the first open brace, which should generally
-be on the first non-empty line.
+The function starts with the first open brace, which should generally be on the
+first non-empty line.
 
 For example:
 
@@ -159,8 +154,7 @@ For example:
        INTREG(out) = INTREG(in1) + INTREG(in2);
      }
 
-is a simple opcode function that corresponds to the C<addI>
-opcode.
+is a simple opcode function that corresponds to the C<addI> opcode.
 
 =head1 TODO
 

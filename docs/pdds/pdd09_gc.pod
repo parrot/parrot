@@ -7,45 +7,41 @@ docs/pdds/pdd09_gc.pod - Garbage Collection Subsystems
 
 =head1 ABSTRACT
 
-This PDD describes how DOD/GC systems work, and what's required of PMC
-classes.
+This PDD describes how DOD/GC systems work, and what's required of PMC classes.
 
 =head1 DESCRIPTION
 
-Doing DOD takes a bit of work--we need to make sure that everything is
-findable from the root set, and that we don't go messing up data
-shared between interpreters.
+Doing DOD takes a bit of work--we need to make sure that everything is findable
+from the root set, and that we don't go messing up data shared between
+interpreters.
 
 =head1 GC TERMS
 
 =head2 GC Schemes
 
-There are basically three general schemes to achieve garbage
-collection.
+There are basically three general schemes to achieve garbage collection.
 
 =over 4
 
 =item Reference counting
 
-All objects have a count, how often they are refered to by other
-objects. If that count reaches zero, the object's space can be
-reclaimed. This scheme can't cope with reference loops, i.e, a loop
-of dead objects, all referencing one another but not reachable from
-elsewhere, never gets collected.
+All objects have a count, how often they are refered to by other objects. If
+that count reaches zero, the object's space can be reclaimed. This scheme can't
+cope with reference loops, i.e, a loop of dead objects, all referencing one
+another but not reachable from elsewhere, never gets collected.
 
 =item Mark and Sweep
 
-Starting from the root set (Parrot registers, stacks, internal
-structures) all reachable objects (and objects reachable from these)
-are marked being alive.
+Starting from the root set (Parrot registers, stacks, internal structures) all
+reachable objects (and objects reachable from these) are marked being alive.
 
-Ojbects not reached are considered being dead and get collected by a
-sweep through the objects arenas.
+Ojbects not reached are considered being dead and get collected by a sweep
+through the objects arenas.
 
 =item Copying collection
 
-Live objects are copied into a new memory region. The old memory space
-can then be reclaimed.
+Live objects are copied into a new memory region. The old memory space can then
+be reclaimed.
 
 =back
 
@@ -55,14 +51,13 @@ can then be reclaimed.
 
 =item stop-the-world
 
-During a GC cycle the processing of user code is stopped. Normal
-operation continues only after the whole GC cycle is performed. This
-can lead to arbitrary long pauses during program execution.
+During a GC cycle the processing of user code is stopped. Normal operation
+continues only after the whole GC cycle is performed. This can lead to
+arbitrary long pauses during program execution.
 
 =item incremental
 
-GC is done in small increments intermittent with normal program
-operation.
+GC is done in small increments intermittent with normal program operation.
 
 =item real-time
 
@@ -89,50 +84,48 @@ generation this can considerably speed up GC.
 
 =head2 Fix-sized Headers
 
-All managed objects (PMCs, Strings, Buffers) inside Parrot are subject
-to garbage collection. As these objects aren't allowed to move after
-creation, garbage collection is done by a non-copying scheme. Further:
-as we have to cope with pointers to objects on the C stack and in CPU
-registers, the garbage collection scheme is a conservative one.
+All managed objects (PMCs, Strings, Buffers) inside Parrot are subject to
+garbage collection. As these objects aren't allowed to move after creation,
+garbage collection is done by a non-copying scheme. Further: as we have to cope
+with pointers to objects on the C stack and in CPU registers, the garbage
+collection scheme is a conservative one.
 
 DOD/GC is normally triggered by allocation of new objects, which happens
-usually from some stack nesting below the run-loop. There is a small
-chance that an integer on the C stack is misinterpreted as a pointer
-to an object. This object would kept alive in such a case.
+usually from some stack nesting below the run-loop. There is a small chance
+that an integer on the C stack is misinterpreted as a pointer to an object.
+This object would kept alive in such a case.
 
 The live-ness information gained by dead object detection (DOD) is also the
 base for collecting variable sized-data that may hang off buffers.
 
 =head2 Variable-sized Buffer Memory
 
-Variable-sized memory like string memory gets collected, when the
-associated header isn't found to be alive during DOD. While a copying
-collection could basically[1] be done at any time, its inefficient to
-copy buffers of objects that are non yet detected being dead. This
-implies that before a collection in the memory pools is run, a DOD run
-for fixed-sized headers is triggered.
+Variable-sized memory like string memory gets collected, when the associated
+header isn't found to be alive during DOD. While a copying collection could
+basically[1] be done at any time, its inefficient to copy buffers of objects
+that are non yet detected being dead. This implies that before a collection in
+the memory pools is run, a DOD run for fixed-sized headers is triggered.
 
-[1] Dead objects stay dead, there is no possibility of a reusal of
-dead objects.
+[1] Dead objects stay dead, there is no possibility of a reusal of dead
+objects.
 
 =head1 IMPLEMENTATION OF FIXED-SIZED HEADER GC
 
 =head2 General Notes
 
-GC subsystems are rather independent. The goal for Parrot is just to
-provide new object headers in the fasted possible way. How that is
-achieved can be considered as an implementation detail.
+GC subsystems are rather independent. The goal for Parrot is just to provide
+new object headers in the fasted possible way. How that is achieved can be
+considered as an implementation detail.
 
-While GC subsystems are independent they may share some code to reduce
-Parrot memory footprint. E.g. stop-the-world mark and sweep and
-incremental mark and sweep use the same arena structures and share
-arena creation and DOD routines.
+While GC subsystems are independent they may share some code to reduce Parrot
+memory footprint. E.g. stop-the-world mark and sweep and incremental mark and
+sweep use the same arena structures and share arena creation and DOD routines.
 
 =head2 Initialization
 
-Currently only one GC system is active (selected at configure or
-compile time). But future versions might support switching GC systems
-during runtime to accommodate for different work loads.
+Currently only one GC system is active (selected at configure or compile time).
+But future versions might support switching GC systems during runtime to
+accommodate for different work loads.
 
 =over 4
 
@@ -140,10 +133,9 @@ during runtime to accommodate for different work loads.
 
 Initialize GC system named C<XXX>.
 
-Called from F<src/memory.c:mem_setup_allocator()> after creating
-C<arena_base>. The initialization code is responsible for the creation
-of the header pools and has to fill the following function pointer
-slots in C<arena_base>:
+Called from F<src/memory.c:mem_setup_allocator()> after creating C<arena_base>.
+The initialization code is responsible for the creation of the header pools and
+has to fill the following function pointer slots in C<arena_base>:
 
 =back
 
@@ -161,29 +153,28 @@ Flags is one of:
 
 =item DOD_trace_normal | DOD_trace_stack_FLAG
 
-Run a normal GC cycle. This is normally called by resource shortage in
-the buffer memory pools before a collection is run. The bit named
-C<DOD_trace_stack_FLAG> indicates that the C-stack (and other system
-areas like the processor registers) have to be traced too.
+Run a normal GC cycle. This is normally called by resource shortage in the
+buffer memory pools before a collection is run. The bit named
+C<DOD_trace_stack_FLAG> indicates that the C-stack (and other system areas like
+the processor registers) have to be traced too.
 
-The implementation might or might not actually run a full GC cycle. If
-e.g an incremental GC system just has finished the mark phase, it
-would do nothing. OTOH if no objects are currently marked live, the
-implementation should run the mark phase, so that copying of dead
-objects is avoided.
+The implementation might or might not actually run a full GC cycle. If e.g an
+incremental GC system just has finished the mark phase, it would do nothing.
+OTOH if no objects are currently marked live, the implementation should run the
+mark phase, so that copying of dead objects is avoided.
 
 =item DOD_lazy_FLAG
 
-Do a timely destruction run. The goal is to either detect all objects
-that need timely destruction or to do a full collection. In the former
-case the collection can be interrupted or postponed. This is called
-from the Parrot run-loop. No system areas have to be traced.
+Do a timely destruction run. The goal is to either detect all objects that need
+timely destruction or to do a full collection. In the former case the
+collection can be interrupted or postponed. This is called from the Parrot
+run-loop. No system areas have to be traced.
 
 =item DOD_finish_FLAG
 
-Called during interpreter destruction. The GC subsystem must clear the
-live state of all objects and perform a sweep in the PMC header pool,
-so that destructors and finalizers get called.
+Called during interpreter destruction. The GC subsystem must clear the live
+state of all objects and perform a sweep in the PMC header pool, so that
+destructors and finalizers get called.
 
 =item DOD_no_trace_volatile_roots
 
@@ -193,13 +184,11 @@ Trace root set except volatile roots. That is skip e.g. registers.
 
 =item C<void (*de_init_gc_system) (Interp*)>
 
-Called during interpreter destruction. Free used resources and memory
-pools.
+Called during interpreter destruction. Free used resources and memory pools.
 
 =item C<void (*mark_object) (Interp*, Pobj*)>
 
-Mark the object being live. This function gets invoked by the
-following macro:
+Mark the object being live. This function gets invoked by the following macro:
 
 =item C<Parrot_pobj_lives(Interp*, PObj *)>
 
@@ -207,24 +196,23 @@ which might do nothing if the object is already marked live.
 
 =item C<void (*init_pool) (Interp*, struct Small_Object_Pool *)>
 
-A function to initialize the given pool. This function should set
-the following object allocation functions for the given pool.
+A function to initialize the given pool. This function should set the following
+object allocation functions for the given pool.
 
 =back
 
 =head2 Object allocation
 
-Each header pool provides one function pointer to get a new object
-from that pool.
+Each header pool provides one function pointer to get a new object from that
+pool.
 
 =over 4
 
 =item C<PObj * (*get_free_object) (Interp*, struct Small_Object_Pool*)>
 
-It should return one free object from the given pool. Object flags are
-returned clear, except flags that are used by the garbage collector
-itself. If the pool is a buffer header pool, all other object memory
-is zeroed.
+It should return one free object from the given pool. Object flags are returned
+clear, except flags that are used by the garbage collector itself. If the pool
+is a buffer header pool, all other object memory is zeroed.
 
 =back
 
@@ -236,30 +224,30 @@ The GC subsystem has to provide these (possibly empty) macros:
 
 =item C<DOD_WRITE_BARRIER(Interp*, PMC *agg, PMC *old, PMC *new)>
 
-This macro is invoked when in aggregate C<agg> the element C<old> is
-getting overritten by C<new>. Both C<old> and C<new> may be NULL.
+This macro is invoked when in aggregate C<agg> the element C<old> is getting
+overritten by C<new>. Both C<old> and C<new> may be NULL.
 
 =item C<DOD_WRITE_BARRIER_KEY(Interp*, PMC *agg, PMC *old, PObj *old_key, PMC *new, PObj *new_key)>
 
-Like above. Invoked when a hash key is inserted, possibly replacing
-and old key.
+Like above. Invoked when a hash key is inserted, possibly replacing and old
+key.
 
 =back
 
 =head2 The Arena_base structure
 
-The C<arena_base> holds the mentioned function pointers, pointers to
-the header pools, some statistic counters, and a pointer C<void *gc_private>
-reserved for the GC subsystem.
+The C<arena_base> holds the mentioned function pointers, pointers to the header
+pools, some statistic counters, and a pointer C<void *gc_private> reserved for
+the GC subsystem.
 
-The GC subsystem is responsible for updating the appropriate statistic
-fields of the structure.
+The GC subsystem is responsible for updating the appropriate statistic fields
+of the structure.
 
 =head2 Blocking GC
 
-Being able to block GC and DOD is important--you'd hate to have the
-newly allocated Buffers or PMCs you've got yanked out from underneath
-you. That'd be no fun. Use the following routines to control GC:
+Being able to block GC and DOD is important--you'd hate to have the newly
+allocated Buffers or PMCs you've got yanked out from underneath you. That'd be
+no fun. Use the following routines to control GC:
 
 =over 4
 
@@ -281,53 +269,51 @@ Unblock GC for the passed interpreter. (But not DOD)
 
 =back
 
-Note that the blocking is recursive--if you call Parrot_block_DOD()
-three times in succession, you need to call Parrot_unblock_DOD() three
-times to re-enable DOD.
+Note that the blocking is recursive--if you call Parrot_block_DOD() three times
+in succession, you need to call Parrot_unblock_DOD() three times to re-enable
+DOD.
 
 =head2 Important flags
 
-For PMCs and Buffers to be collected properly, you B<must> get the
-flags set on them properly. Otherwise Bad Things Will Happen.
+For PMCs and Buffers to be collected properly, you B<must> get the flags set on
+them properly. Otherwise Bad Things Will Happen.
 
-Note: don't manipulate these flags directly. Always use the macros
-defined in F<include/parrot/pobj.h>.
+Note: don't manipulate these flags directly. Always use the macros defined in
+F<include/parrot/pobj.h>.
 
 =over 4
 
 =item PObj_active_destroy_FLAG
 
-The PMC has some sort of active destructor, and will have that
-destructor called when the PMC is destroyed.
+The PMC has some sort of active destructor, and will have that destructor
+called when the PMC is destroyed.
 
 =item PObj_custom_mark_FLAG
 
-The C<mark> vtable slot will be called during DOD. The mark function
-must call C<Parrot_pobj_lives> for all non-NULL objects that PMC
-refers too.
+The C<mark> vtable slot will be called during DOD. The mark function must call
+C<Parrot_pobj_lives> for all non-NULL objects that PMC refers too.
 
 Please note that C<Parrot_pobj_lives> may be a macro.
 
 =item PObj_data_is_PMC_array_FLAG
 
-Set if the data pointer points to an array of objects. The length of
-the array is C<PMC_int_val(SELF)>.
+Set if the data pointer points to an array of objects. The length of the array
+is C<PMC_int_val(SELF)>.
 
 =item PObj_external_FLAG
 
-Set if the buffer points to memory that came from outside Parrot's
-memory system.
+Set if the buffer points to memory that came from outside Parrot's memory
+system.
 
 =item PObj_sysmem_FLAG
 
-Set if the memory came from the system malloc. When the buffer is
-considered dead, the memory will be freed back to the system.
+Set if the memory came from the system malloc. When the buffer is considered
+dead, the memory will be freed back to the system.
 
 =item PObj_COW_FLAG
 
-The buffer's memory is copy on write. Any changes to the buffer must
-first have the buffer's memory copied. The COW flag should then be
-removed.
+The buffer's memory is copy on write. Any changes to the buffer must first have
+the buffer's memory copied. The COW flag should then be removed.
 
 =back
 

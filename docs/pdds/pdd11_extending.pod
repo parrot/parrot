@@ -7,71 +7,67 @@ docs/pdds/pdd11_extending.pod - The Parrot Extension System
 
 =head1 ABSTRACT
 
-The extension API for Parrot is a simple, somewhat abstract,
-interface to Parrot for code written in C or other compiled
-languages. It provides about the same level of access to Parrot 
-that bytecode programs have.
+The extension API for Parrot is a simple, somewhat abstract, interface to
+Parrot for code written in C or other compiled languages. It provides about the
+same level of access to Parrot  that bytecode programs have.
 
 =head1 DESCRIPTION
 
-The API presents to C programs roughly the same interface presented to
-bytecode programs--that is, a C extension can see everything that a
-bytecode program can see, including Parrot's base architecture,
-registers, stacks, and whatnot. This view isn't required, however, and
-often extension code won't need or want to know what Parrot's internal
-structures look like. For this reason the functions in the extension
-API are divided into two broad groups, one that has no particular
-knowledge of the internals and one that does.
+The API presents to C programs roughly the same interface presented to bytecode
+programs--that is, a C extension can see everything that a bytecode program can
+see, including Parrot's base architecture, registers, stacks, and whatnot. This
+view isn't required, however, and often extension code won't need or want to
+know what Parrot's internal structures look like. For this reason the functions
+in the extension API are divided into two broad groups, one that has no
+particular knowledge of the internals and one that does.
 
-The stability of the two API groups is guaranteed separately. Group 1,
-the internals unaware group, should be good basically forever. Group
-2, the internals aware group, is only guaranteed for the lifetime of
-the current architecture. (It's likely that both groups will last
-equally long; however, the Group 1 interface could reasonably be
-emulated on a different engine, while the Group 2 interface is more
-closely tied to Parrot).
+The stability of the two API groups is guaranteed separately. Group 1, the
+internals unaware group, should be good basically forever. Group 2, the
+internals aware group, is only guaranteed for the lifetime of the current
+architecture. (It's likely that both groups will last equally long; however,
+the Group 1 interface could reasonably be emulated on a different engine, while
+the Group 2 interface is more closely tied to Parrot).
 
-B<Note:> The extension API has not yet been completely specified. New
-functions may be added, and those described below may change or be
-removed. You have been warned...
+B<Note:> The extension API has not yet been completely specified. New functions
+may be added, and those described below may change or be removed. You have been
+warned...
 
 =head1 API - Group 1: Internals-unaware functions
 
-These functions are the ones that are largely unaware of the structure
-and architecture of Parrot. They deal mainly in data as abstract
-entities, and Parrot itself as a black box that, at best, can make
-subroutine or method calls. This is sufficient for many extensions
-which act as black box processing units and in turn treat Parrot
-itself as a black box.
+These functions are the ones that are largely unaware of the structure and
+architecture of Parrot. They deal mainly in data as abstract entities, and
+Parrot itself as a black box that, at best, can make subroutine or method
+calls. This is sufficient for many extensions which act as black box processing
+units and in turn treat Parrot itself as a black box.
 
 =head2 PMC access functions
 
-The following functions are for storing and retrieving data inside PMCs.
-Note that use of the _keyed functions with non-aggregate PMCs will
-generally just result in Parrot throwing an exception.
+The following functions are for storing and retrieving data inside PMCs. Note
+that use of the _keyed functions with non-aggregate PMCs will generally just
+result in Parrot throwing an exception.
 
 =over 4
 
 =item C<Parrot_PMC_get_string(interp, pmc)>
 
-Returns a Parrot_STRING that represents the string value of the PMC. 
+Returns a Parrot_STRING that represents the string value of the PMC.
 
 =item C<Parrot_PMC_get_string_intkey(interp, pmc, Parrot_Int key)>
 
 Keyed version of C<Parrot_PMC_get_string>. Returns a Parrot_STRING 
-representing the string value of whatever is stored at the element of the 
-PMC indexed by C<key>. 
+representing the string value of whatever is stored at the element of the  PMC
+indexed by C<key>.
 
 =item C<Parrot_PMC_get_pointer(interp, pmc)>
 
-Returns a pointer to some item of data. The details of what the pointer
-points to depend on the particular PMC. This function is useful for
-dealing with PMCs that hold pointers to arbitrary data.
+Returns a pointer to some item of data. The details of what the pointer points
+to depend on the particular PMC. This function is useful for dealing with PMCs
+that hold pointers to arbitrary data.
 
 =item C<Parrot_PMC_get_pointer_intkey(interp, pmc, Parrot_Int key)>
 
-A keyed version of C<Parrot_PMC_get_pointer>. Returns the pointer value
-of whatever is stored at the element of the PMC indexed by C<key>.
+A keyed version of C<Parrot_PMC_get_pointer>. Returns the pointer value of
+whatever is stored at the element of the PMC indexed by C<key>.
 
 =item C<Parrot_PMC_get_intval(interp, pmc)>
 
@@ -79,8 +75,8 @@ Returns the integer value of the PMC.
 
 =item C<Parrot_PMC_get_intval_intkey(interp, pmc, Parrot_Int key)>
 
-A keyed version of C<Parrot_PMC_get_intval>. Returns the integer value
-of whatever is stored at the element of the PMC indexed by C<key>.
+A keyed version of C<Parrot_PMC_get_intval>. Returns the integer value of
+whatever is stored at the element of the PMC indexed by C<key>.
 
 =item C<Parrot_PMC_get_numval(interp, pmc)>
 
@@ -88,47 +84,46 @@ Returns the numeric value of the PMC.
 
 =item C<Parrot_PMC_get_numval_intkey(interp, pmc, Parrot_Int key)>
 
-A keyed version of C<Parrot_PMC_get_numval>. Returns the numeric value
-of whatever is stored at the element of the PMC indexed by C<key>.
+A keyed version of C<Parrot_PMC_get_numval>. Returns the numeric value of
+whatever is stored at the element of the PMC indexed by C<key>.
 
 =item C<Parrot_PMC_get_cstring(interp, pmc)>
 
-Returns a C-string (char *) that represents the string value of the
-PMC. The memory the char * points to is a copy of the original value,
-and changing it will not change the original in any way. 
+Returns a C-string (char *) that represents the string value of the PMC. The
+memory the char * points to is a copy of the original value, and changing it
+will not change the original in any way.
 
-This memory will I<not> be reclaimed by garbage collection, nor may it
-be returned to the system with C<free>. It must be returned with
+This memory will I<not> be reclaimed by garbage collection, nor may it be
+returned to the system with C<free>. It must be returned with
 C<Parrot_free_cstring>.
 
 =item C<Parrot_PMC_get_cstring_intkey(interp, pmc, Parrot_Int key)>
 
-A keyed version of C<Parrot_PMC_get_cstring>. Returns a C-string
-representing the string value of whatever is stored at the element of 
-the PMC indexed by C<key>.
+A keyed version of C<Parrot_PMC_get_cstring>. Returns a C-string representing
+the string value of whatever is stored at the element of  the PMC indexed by
+C<key>.
 
 =item C<Parrot_PMC_get_cstringn(interp, pmc, &len)>
 
-Returns a C-string (char *) that represents the string value of the
-PMC. The memory the char * points to is a copy of the original value,
-and changing it will not change the original in any way. The C<len>
-parameter is the address of an integer that will get the length of the
-string as Parrot knows it.
+Returns a C-string (char *) that represents the string value of the PMC. The
+memory the char * points to is a copy of the original value, and changing it
+will not change the original in any way. The C<len> parameter is the address of
+an integer that will get the length of the string as Parrot knows it.
 
-This memory will I<not> be reclaimed by garbage collection, nor may it
-be returned to the system with C<free>. It must be returned with
+This memory will I<not> be reclaimed by garbage collection, nor may it be
+returned to the system with C<free>. It must be returned with
 C<Parrot_free_cstring>.
 
 =item C<Parrot_PMC_get_cstringn_intkey(interp, pmc, &len, Parrot_Int key)>
 
-A keyed version of C<Parrot_PMC_get_cstringn>. Returns a C-string
-representing the string value of whatever is stored at the element of 
-the PMC indexed by C<key>. Stores the length of the string in C<len>.
+A keyed version of C<Parrot_PMC_get_cstringn>. Returns a C-string representing
+the string value of whatever is stored at the element of  the PMC indexed by
+C<key>. Stores the length of the string in C<len>.
 
 =item C<Parrot_PMC_get_pmc_intkey(interp, pmc, Parrot_Int key)>
 
-Returns the PMC stored at the element of the passed-in PMC that is 
-indexed by C<key>.
+Returns the PMC stored at the element of the passed-in PMC that is  indexed by
+C<key>.
 
 =item C<Parrot_PMC_set_string(interp, pmc, Parrot_STRING value)>
 
@@ -175,8 +170,8 @@ at element <key> of the passed-in PMC.
 
 =item C<Parrot_PMC_set_cstring(interp, pmc, const char *value)>
 
-Convert the passed-in null-terminated C string to a Parrot_STRING and
-assign it to the passed-in PMC.
+Convert the passed-in null-terminated C string to a Parrot_STRING and assign it
+to the passed-in PMC.
 
 =item C<Parrot_PMC_set_cstring_intkey(interp, 
 pmc, const char *value, Parrot_Int key)>
@@ -198,8 +193,8 @@ Parrot_STRING should be assumed to contain garbage.
 pmc, const char *value, Parrot_int length, Parrot_Int key)>
 
 Keyed version of C<Parrot_PMC_set_cstringn>. Converts the first C<length>
-characters of C<value> to a Parrot_STRING and assigns the resulting string
-to the PMC stored at element <key> of the passed-in PMC.
+characters of C<value> to a Parrot_STRING and assigns the resulting string to
+the PMC stored at element <key> of the passed-in PMC.
 
 =back
 
@@ -217,8 +212,8 @@ particular PMC class name can be found using C<Parrot_PMC_typenum>.
 
 =item C<Parrot_PMC_typenum(interp, const char* class)>
 
-Returns the internal integer identifier corresponding to a PMC with
-class name C<class>. 
+Returns the internal integer identifier corresponding to a PMC with class name
+C<class>.
 
 =item C<Parrot_PMC_null()>
 
@@ -229,11 +224,11 @@ char *buffer, int length, Parrot_Encoding encoding,
 Parrot_CharType charset, Parrot_Language language, Parrot_Int flags)>
 
 Create a new Parrot string from a passed-in buffer. If the C<encoding>,
-C<charset>, or C<language> are unspecified (i.e. if you pass in 0), then 
-the defaults are used. Otherwise, the functions C<Parrot_find_encoding>,
-C< Parrot_find_chartype> and C<Parrot_find_language> (all described below)
-can be used to find the appropriate values for a particular choice of 
-encoding, chartype or language.
+C<charset>, or C<language> are unspecified (i.e. if you pass in 0), then  the
+defaults are used. Otherwise, the functions C<Parrot_find_encoding>, C<
+Parrot_find_chartype> and C<Parrot_find_language> (all described below) can be
+used to find the appropriate values for a particular choice of  encoding,
+chartype or language.
 
 Flag values are currently undocumented.
 
@@ -241,7 +236,7 @@ Note that a copy of the buffer is made.
 
 =item C<Parrot_find_encoding(interp, char *encoding_name)>
 
-Find the magic token for an encoding, by name. 
+Find the magic token for an encoding, by name.
 
 =item C<Parrot_find_chartype(interp, char *chartype)>
 
@@ -253,23 +248,22 @@ Find the magic token for a language, by language name.
 
 =item C<Parrot_free_cstring(char* string)>
 
-Deallocates a C string that the interpreter has handed to you.
-This function must be used to free strings produced by 
-C<Parrot_PMC_get_cstring> and C<Parrot_PMC_get_cstringn>, as these
-will not be reclaimed by the garbage collector. It should not be used
-to deallocate strings that do not come from Parrot.
+Deallocates a C string that the interpreter has handed to you. This function
+must be used to free strings produced by  C<Parrot_PMC_get_cstring> and
+C<Parrot_PMC_get_cstringn>, as these will not be reclaimed by the garbage
+collector. It should not be used to deallocate strings that do not come from
+Parrot.
 
 =item C<Parrot_register_pmc(interp, pmc)>
 
-Add a reference to the PMC to the interpreter's DOD registry. This
-prevents PMCs known only to extensions from getting destroyed during 
-DOD runs.
+Add a reference to the PMC to the interpreter's DOD registry. This prevents
+PMCs known only to extensions from getting destroyed during  DOD runs.
 
 =item C<Parrot_unregister_pmc(interp, pmc)>
 
-Remove a reference to the PMC from the interpreter's DOD registry. 
-If the reference count reaches zero, the PMC will be destroyed during the 
-next DOD run.
+Remove a reference to the PMC from the interpreter's DOD registry.  If the
+reference count reaches zero, the PMC will be destroyed during the  next DOD
+run.
 
 =back
 
@@ -281,49 +275,49 @@ Functions to call Parrot subroutines and methods
 
 =item C<Parrot_call(interp, Parrot_PMC sub, Parrot_Int argcount, ...)>
 
-Calls a Parrot subroutine, with C<argcount> PMC parameters. This function
-sets up Parrot's registers in line with the Parrot calling conventions;
-see L<pdd03_calling_conventions.pod> for more details.
+Calls a Parrot subroutine, with C<argcount> PMC parameters. This function sets
+up Parrot's registers in line with the Parrot calling conventions; see
+L<pdd03_calling_conventions.pod> for more details.
 
 =item C<Parrot_call_method(interp, 
 Parrot_PMC sub, Parrot_STRING method, Parrot_Int argcount, ...)>
 
-Calls a Parrot method named C<method> with C<argcount> PMC parameters.
-NB. This is not yet implemented and may change.
+Calls a Parrot method named C<method> with C<argcount> PMC parameters. NB. This
+is not yet implemented and may change.
 
 =back
 
 =head1 API - Group 2: Internals aware
 
-The internals-aware functions are for those extensions that need to
-query or alter the state of Parrot's internals in some way. 
+The internals-aware functions are for those extensions that need to query or
+alter the state of Parrot's internals in some way.
 
 Register access functions
 
-The following functions allow the values stored in Parrot's registers
-to be accessed. An attempt to access a non-existent register (e.g.
-string register -123) will cause the function to throw an exception
-(well, it will once we actually implement some bounds-checking...). 
-The value stored in an uninitialized register is undefined; it may well
-be zero (or NULL), but do not rely on this being the case.
+The following functions allow the values stored in Parrot's registers to be
+accessed. An attempt to access a non-existent register (e.g. string register
+-123) will cause the function to throw an exception (well, it will once we
+actually implement some bounds-checking...).  The value stored in an
+uninitialized register is undefined; it may well be zero (or NULL), but do not
+rely on this being the case.
 
 =over 4
 
 =item C<Parrot_get_intreg(interp, Parrot_Int regnum)>
 
-Return the value of an integer register. 
+Return the value of an integer register.
 
 =item C<Parrot_get_numreg(interp, Parrot_Int regnum)>
 
-Return the value of a numeric register. 
+Return the value of a numeric register.
 
 =item C<Parrot_get_strreg(interp, Parrot_Int regnum)>
 
-Return the value of a string register. 
+Return the value of a string register.
 
 =item C<Parrot_get_pmcreg(interp, Parrot_Int regnum)>
 
-Return the value of a PMC register. 
+Return the value of a PMC register.
 
 =back
 

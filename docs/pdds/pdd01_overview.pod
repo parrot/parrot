@@ -7,7 +7,7 @@ docs/pdds/pdd01_overview.pod - A high-level overview of the Parrot system
 
 =head1 ABSTRACT
 
-This PDD provides a high-level overview of the Parrot system. 
+This PDD provides a high-level overview of the Parrot system.
 
 =head1 DESCRIPTION
 
@@ -29,71 +29,67 @@ The Parrot system generally looks like this:
 
 =item Parser
 
-The parser takes source code of some sort and creates a syntax tree of
-that source.
+The parser takes source code of some sort and creates a syntax tree of that
+source.
 
-Different high level languages will generally have their own parser
-modules, implemented in whatever language is most convenient. For instance,
-we currently intend to write the parser for Perl 6 in Perl 6, to allow
-for easy extension. Generally there will be one parser per language, though
-there's no reason that there can't be multiple independent parsers.
+Different high level languages will generally have their own parser modules,
+implemented in whatever language is most convenient. For instance, we currently
+intend to write the parser for Perl 6 in Perl 6, to allow for easy extension.
+Generally there will be one parser per language, though there's no reason that
+there can't be multiple independent parsers.
 
 =item Bytecode compiler
 
-The bytecode compiler module takes a syntax tree from the parser and
-emits an unoptimized stream of bytecode. This code is suitable for
-passing straight to the interpreter, though it is probably not going
-to be very fast.
+The bytecode compiler module takes a syntax tree from the parser and emits an
+unoptimized stream of bytecode. This code is suitable for passing straight to
+the interpreter, though it is probably not going to be very fast.
 
 =item Optimizer
 
-The optimizer module takes the bytecode stream from the compiler and
-optionally the syntax tree the bytecode was generated from, and
-optimizes the bytecode.
+The optimizer module takes the bytecode stream from the compiler and optionally
+the syntax tree the bytecode was generated from, and optimizes the bytecode.
 
 =item Interpreter
 
-The interpreter module takes the bytecode stream from either the
-optimizer or the bytecode compiler and executes it. There must always
-be at least one interpreter module available for any program that can
-handle all of Perl, since it's required for use statements and BEGIN
-blocks.
+The interpreter module takes the bytecode stream from either the optimizer or
+the bytecode compiler and executes it. There must always be at least one
+interpreter module available for any program that can handle all of Perl, since
+it's required for use statements and BEGIN blocks.
 
-While there must be at least one interpreter, there may be multiple
-interpreter modules linked into an executable. This would be the case,
-for example, for programs that produced Java bytecode, where one of
-the interpreter modules would take the bytecode stream and spit out
-Java bytecode instead of interpreting it.
+While there must be at least one interpreter, there may be multiple interpreter
+modules linked into an executable. This would be the case, for example, for
+programs that produced Java bytecode, where one of the interpreter modules
+would take the bytecode stream and spit out Java bytecode instead of
+interpreting it.
 
 =back
 
 =head2 Independent subsystems
 
-Parrot also has a number of subsystems that are independent of any
-single module.
+Parrot also has a number of subsystems that are independent of any single
+module.
 
 =over 4
 
 =item ParrotIO subsystem
 
-The ParrotIO subsystem provides source- and platform-independent
-asynchronous I/O to Parrot. The intent is to make Parrot (and any
-languages that run on it) independent of C's stdio system. (And good 
-riddance--it sucks) How this maps to the OS's underlying I/O code is not 
-generally Parrot's concern, and a platform isn't obligated to provide 
-asynchronous I/O.
+The ParrotIO subsystem provides source- and platform-independent asynchronous
+I/O to Parrot. The intent is to make Parrot (and any languages that run on it)
+independent of C's stdio system. (And good  riddance--it sucks) How this maps
+to the OS's underlying I/O code is not  generally Parrot's concern, and a
+platform isn't obligated to provide  asynchronous I/O.
 
-Additionally, the ParrotIO subsystem allows a program to push filters
-onto an input stream if necessary, to manipulate the data before it is
-presented to a program. 
+Additionally, the ParrotIO subsystem allows a program to push filters onto an
+input stream if necessary, to manipulate the data before it is presented to a
+program.
 
 =item Regex engine
 
-By providing a regular expression engine as a separate subsystem of
-Parrot, we intend to make it easily available to any language running
-on Parrot (cf. the Perl 5 regex engine, which is intimately linked to
-the perl core). The job of the regex engine is to turn regexes into objects, 
-and apply those regex objects to strings. 
+By providing a regular expression engine as a separate subsystem of Parrot, we
+intend to make it easily available to any language running on Parrot (cf. the
+Perl 5 regex engine, which is intimately linked to the perl core). The job of
+the regex engine is to turn regexes into objects,  and apply those regex
+objects to strings.
 
 =back
 
@@ -103,89 +99,83 @@ and apply those regex objects to strings.
 
 =item Embedding
 
-The embedding API is the set of calls exported to the embedding
-application. This is a small, simple set of calls, requiring minimum
-effort to use. 
+The embedding API is the set of calls exported to the embedding application.
+This is a small, simple set of calls, requiring minimum effort to use.
 
 The goal is to provide an interface that a competent programmer who is
 uninterested in Parrot internals can use to provide access to a Parrot
 interpreter within another application with very little programming or
-intellectual effort. Generally it should take less than thirty minutes
-for a simple interface, though more complete integration will take
-longer.
+intellectual effort. Generally it should take less than thirty minutes for a
+simple interface, though more complete integration will take longer.
 
-Backwards binary compatibility at this level is guaranteed across the
-life of Parrot.
+Backwards binary compatibility at this level is guaranteed across the life of
+Parrot.
 
 =item Extensions
 
-The extension API is the set of calls exported to Parrot
-extensions. They provide access to most of the things an extension
-needs to do, while hiding the implementation details. (So that, for
-example, we can change the way scalars are stored without having to
-rewrite, or even recompile, an extension).
+The extension API is the set of calls exported to Parrot extensions. They
+provide access to most of the things an extension needs to do, while hiding the
+implementation details. (So that, for example, we can change the way scalars
+are stored without having to rewrite, or even recompile, an extension).
 
-Binary compatibility is a serious goal, though it may be broken if
-absolutely necessary.
+Binary compatibility is a serious goal, though it may be broken if absolutely
+necessary.
 
 =item Guts
 
-The guts-level APIs are the routines used within a component. These
-aren't guaranteed to be stable, and shouldn't be used outside a
-component. (For example, an extension to the interpreter shouldn't
-call any of the parser's internal routines).
+The guts-level APIs are the routines used within a component. These aren't
+guaranteed to be stable, and shouldn't be used outside a component. (For
+example, an extension to the interpreter shouldn't call any of the parser's
+internal routines).
 
-No binary compatibility is guaranteed, and routines here may be
-changed without notice.
+No binary compatibility is guaranteed, and routines here may be changed without
+notice.
 
 =back
 
 =head1 VARIATIONS ON A THEME
 
-One of the explicit goals of the Parrot project is to generate Java 
-bytecode and .NET code, as well as to run on small devices such as the Palm. 
-The modular nature of the Parrot system makes this reasonably straightforward.
+One of the explicit goals of the Parrot project is to generate Java  bytecode
+and .NET code, as well as to run on small devices such as the Palm.  The
+modular nature of the Parrot system makes this reasonably straightforward.
 
 =over 4
 
 =item Parrot for small platforms
 
-For small platforms, any parser, compiler, and optimizer modules are
-replaced with a small bytecode loader module which reads in Parrot
-bytecode and passes it to the interpreter for execution. Note that 
-the lack of a parser will limit the available functionality in some 
-languages: for instance, in Perl, string eval, do, use, and require 
-will not be available (although loading of precompiled modules via do, 
-use, or require may be supported).
+For small platforms, any parser, compiler, and optimizer modules are replaced
+with a small bytecode loader module which reads in Parrot bytecode and passes
+it to the interpreter for execution. Note that  the lack of a parser will limit
+the available functionality in some  languages: for instance, in Perl, string
+eval, do, use, and require  will not be available (although loading of
+precompiled modules via do,  use, or require may be supported).
 
 =item Bytecode compilation
 
-One straightforward use of the Parrot system is to precompile a 
-program into bytecode and save it for later use. Essentially, we
-would compile a program as normal, but then simply freeze the 
-bytecode to disk for later loading.
+One straightforward use of the Parrot system is to precompile a  program into
+bytecode and save it for later use. Essentially, we would compile a program as
+normal, but then simply freeze the  bytecode to disk for later loading.
 
 =item Perl in, Java (or whatever) out
 
-The previous section implicitly assumes that we will be emitting 
-Parrot bytecode. However, there are other possibilities: we could
-translate the bytecode to Java bytecode or .NET code, or even to a
-native executable. In principle, Parrot could also act as a front end to 
-other modular compilers such as gcc or HP's GEM compiler system.
+The previous section implicitly assumes that we will be emitting  Parrot
+bytecode. However, there are other possibilities: we could translate the
+bytecode to Java bytecode or .NET code, or even to a native executable. In
+principle, Parrot could also act as a front end to  other modular compilers
+such as gcc or HP's GEM compiler system.
 
 =item Standalone pieces
 
-Each piece of Parrot can, with enough support hidden away (in the form
-of an interpreter for the parsing module, for example), stand on its
-own. This means it's feasible to make the parser, bytecode compiler,
-optimizer and interpreter separate executables.
+Each piece of Parrot can, with enough support hidden away (in the form of an
+interpreter for the parsing module, for example), stand on its own. This means
+it's feasible to make the parser, bytecode compiler, optimizer and interpreter
+separate executables.
 
-This allows us to develop pieces independently--the first version of
-the Perl 6 parser, for example, can be written mainly in perl 5 using an
-embedded interpreter. It also means we can have a standalone optimizer
-which can spend a lot of time groveling over bytecode, far more than
-you might want to devote to optimizing one-liners or code that'll run
-only once or twice.
+This allows us to develop pieces independently--the first version of the Perl 6
+parser, for example, can be written mainly in perl 5 using an embedded
+interpreter. It also means we can have a standalone optimizer which can spend a
+lot of time groveling over bytecode, far more than you might want to devote to
+optimizing one-liners or code that'll run only once or twice.
 
 =back
 
@@ -222,8 +212,8 @@ only once or twice.
 
 =item 1.1
 
-Changed perl to Parrot where appropriate. Rewrote some sections to 
-reflect the language agnostic nature of the project.
+Changed perl to Parrot where appropriate. Rewrote some sections to  reflect the
+language agnostic nature of the project.
 
 =item 1.0
 

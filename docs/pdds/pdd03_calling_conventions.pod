@@ -11,28 +11,26 @@ This PDD describes Parrot's inter-routine calling conventions.
 
 =head1 AND NOW FOR SOMETHING COMPLETELY DIFFERENT
 
-This document's current contents are a complete change of direction
-from the original direction of Parrot design.  Brand new and/or
-improved!  Share and enjoy!
+This document's current contents are a complete change of direction from the
+original direction of Parrot design.  Brand new and/or improved!  Share and
+enjoy!
 
 =head1 DESCRIPTION
 
-This document describes how to pass arguments from registers to
-subroutines, and how subroutines can extract their parameters into
-registers for use.
+This document describes how to pass arguments from registers to subroutines,
+and how subroutines can extract their parameters into registers for use.
 
-Since Parrot's calling conventions are continuation-based, there is
-arguably very little difference between a call and a return. Because
-of this, the conversion rules are the same regardless of whether code
-is invoking a subroutine or a return continuation.
+Since Parrot's calling conventions are continuation-based, there is arguably
+very little difference between a call and a return. Because of this, the
+conversion rules are the same regardless of whether code is invoking a
+subroutine or a return continuation.
 
 =head2 Common Features of Argument/Return Opcodes
 
-XXX FIXME: PIR should have pretty syntactical sugar around this, but
-it doesn't.  Document here what it should look like.
+XXX FIXME: PIR should have pretty syntactical sugar around this, but it
+doesn't.  Document here what it should look like.
 
-There are four opcodes involved in parameter and return value
-propagation:
+There are four opcodes involved in parameter and return value propagation:
 
 =over 4
 
@@ -59,16 +57,16 @@ The common syntax of these opcodes is:
     <set_opcode> "(flags0, flags1, ..., flagsN)", VAL0, VAL1, ... VALN
     <get_opcode> "(flags0, flags1, ..., flagsN)", REG0, REG1, ... REGN
 
-The flags string is a literal quoted string denoting a list of zero or
-more comma-separated integers.  The list as a whole may be surrounded
-by parentheses.  Integers may be specified either in decimal, or if
-prefixed with "0b"/"0x", in binary/hexadecimal.  There must be exactly one
-integer for each value or register given.
+The flags string is a literal quoted string denoting a list of zero or more
+comma-separated integers.  The list as a whole may be surrounded by
+parentheses.  Integers may be specified either in decimal, or if prefixed with
+"0b"/"0x", in binary/hexadecimal.  There must be exactly one integer for each
+value or register given.
 
 =head3 Flag Words; Common Flag Word Bits
 
-Each integer in the flag string controls the processing of the
-corresponding value or register.
+Each integer in the flag string controls the processing of the corresponding
+value or register.
 
 These bits of each flag word have common meanings for all argument/
 return-value opcodes:
@@ -79,25 +77,24 @@ return-value opcodes:
                0b10 = P
                0b11 = N
 
-You can just set these bits (as well as the I<CONSTANT> bit below) to
-zero as the assembler calculates the correct setting depending on the
-given arguments.
+You can just set these bits (as well as the I<CONSTANT> bit below) to zero as
+the assembler calculates the correct setting depending on the given arguments.
 
 =head2 Passing Arguments, Returning Values
 
-Just before calling a subroutine with C<invokecc> or calling a method
-with <call_methodcc>, use the C<set_args> opcode to tell Parrot where
-the subroutine's or method's arguments will come from and how they
-should be expanded by the target.
+Just before calling a subroutine with C<invokecc> or calling a method with
+<call_methodcc>, use the C<set_args> opcode to tell Parrot where the
+subroutine's or method's arguments will come from and how they should be
+expanded by the target.
 
-Similarly, just before returning from such a subroutine or method, use
-the C<set_returns> opcode to tell Parrot where the return values will
-come from and how to expand them for the caller's use.
+Similarly, just before returning from such a subroutine or method, use the
+C<set_returns> opcode to tell Parrot where the return values will come from and
+how to expand them for the caller's use.
 
 =head3 Flag Word Bits For 'Setting'
 
-These bits of each flag word have these meanings specific to
-C<set_args> and C<set_returns>:
+These bits of each flag word have these meanings specific to C<set_args> and
+C<set_returns>:
 
     0b00100  CONSTANT
                the value is a literal constant, not a register
@@ -147,23 +144,23 @@ C<set_args> and C<set_returns>:
 
 =head2 Accepting Parameters, Accepting Return Values
 
-As the I<first opcode> in a subroutine that will be called with
-C<invokecc> or a method that will be called with <call_methodcc>, use
-the C<get_params> opcode to tell Parrot where the subroutine's or
-method's arguments should be stored and how they should be expanded.
+As the I<first opcode> in a subroutine that will be called with C<invokecc> or
+a method that will be called with <call_methodcc>, use the C<get_params> opcode
+to tell Parrot where the subroutine's or method's arguments should be stored
+and how they should be expanded.
 
-Similarly, just I<before> (yes, I<before>) calling such a subroutine
-or method, use the C<get_results> opcode to tell Parrot where the
-return values should be stored and how to expand them for your use.
+Similarly, just I<before> (yes, I<before>) calling such a subroutine or method,
+use the C<get_results> opcode to tell Parrot where the return values should be
+stored and how to expand them for your use.
 
-NOTE: It should be obvious, but in case it's not: You must name only
-registers as targets of these opcodes, not constants.  (You can't
-store anything into a constant.  That would make it a variable.)
+NOTE: It should be obvious, but in case it's not: You must name only registers
+as targets of these opcodes, not constants.  (You can't store anything into a
+constant.  That would make it a variable.)
 
 =head3 Flag Word Bits For 'Getting'
 
-These bits of each flag word have these meanings specific to
-C<get_params> and C<get_results>:
+These bits of each flag word have these meanings specific to C<get_params> and
+C<get_results>:
 
     0b1000  FLATTEN
                If this bit is set on a PMC register, then the PMC
@@ -180,24 +177,22 @@ C<get_params> and C<get_results>:
 
 =head3 Overflow
 
-If too many values are provided to fit into the given target
-registers, Parrot will throw an exception.  Note that if the final
-target is a P register with the FLATTEN flag bit, then this exception
-can never occur.
+If too many values are provided to fit into the given target registers, Parrot
+will throw an exception.  Note that if the final target is a P register with
+the FLATTEN flag bit, then this exception can never occur.
 
-XXX - FIXME - which exception?  We really could use an exception
-subsystem.  Oh, wait, that's my job.  Never mind.  --Chip
+XXX - FIXME - which exception?  We really could use an exception subsystem. 
+Oh, wait, that's my job.  Never mind.  --Chip
 
 =head3 Underflow
 
-If too few values are provided so that some target registers are left
-unset, this too results in an exception.
+If too few values are provided so that some target registers are left unset,
+this too results in an exception.
 
 =head3 Type Conversions
 
-Unlike the C<set_*> opcodes, the C<get_*> opcodes must perform
-conversion from one register type to another.  Here are the conversion
-rules:
+Unlike the C<set_*> opcodes, the C<get_*> opcodes must perform conversion from
+one register type to another.  Here are the conversion rules:
 
 =over 4
 
@@ -208,24 +203,23 @@ C<assign> (standard conversion).
 
 =item *
 
-When the target and source are both P registers, storage will behave
-like a C<set> (pass by reference).
+When the target and source are both P registers, storage will behave like a
+C<set> (pass by reference).
 
 =item *
 
-When the target is a P register and the source is an integer, the P
-will be set to a new .Integer which has been C<assign>ed the given
-integer.
+When the target is a P register and the source is an integer, the P will be set
+to a new .Integer which has been C<assign>ed the given integer.
 
 =item *
 
-When the target is a P register and the source is a number, the P will
-be set to a new .Float which has been C<assign>ed the given number.
+When the target is a P register and the source is a number, the P will be set
+to a new .Float which has been C<assign>ed the given number.
 
 =item *
 
-When the target is a P register and the source is a string, the P will
-be set to a new .String which has been C<assign>ed the given string.
+When the target is a P register and the source is a string, the P will be set
+to a new .String which has been C<assign>ed the given string.
 
 =back
 
@@ -257,9 +251,8 @@ Specific exceptions to throw for specific errors.
 
 =back
 
-Also, PIR should have pretty syntactical sugar around the get and set
-opcodes, but it doesn't.  This document should specify what that looks
-like, too.
+Also, PIR should have pretty syntactical sugar around the get and set opcodes,
+but it doesn't.  This document should specify what that looks like, too.
 
 =head1 REFERENCES
 
@@ -316,9 +309,9 @@ None. First version
 
 =item Version 2.0
 
-Meet the new boss, definitely not the same as the old boss.
-All the register-window fixed-register-number ideas are gone.
-In their place are specialized conversion opcodes.
+Meet the new boss, definitely not the same as the old boss. All the
+register-window fixed-register-number ideas are gone. In their place are
+specialized conversion opcodes.
 
 =item Version 1.4
 
@@ -336,9 +329,9 @@ Dropped the number of registers passed in and out of subs.
 
 =item Version 1.1
 
-We now call with a frame, rather than pushing on the stack, and we
-return frames, rather than returning a stack. We also pass in context
-information for the return.
+We now call with a frame, rather than pushing on the stack, and we return
+frames, rather than returning a stack. We also pass in context information for
+the return.
 
 =item Version 1.0
 

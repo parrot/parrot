@@ -7,71 +7,68 @@ docs/pdds/pdd02_vtables.pod - Common vtable format for all variables
 
 =head1 ABSTRACT
 
-This PDD presents the vtable entries, and their order, that all
-variables MUST provide.
+This PDD presents the vtable entries, and their order, that all variables MUST
+provide.
 
 =head1 DESCRIPTION
 
-All parrot variables hide their guts behind a magic parrot structure
-generally referred to as a PMC, or Parrot Magic Cookie. Nothing outside
-the core of parrot (in fact, nothing outside the data type's vtable
-routines) should infer anything about a PMC (hence the Magic part).
+All parrot variables hide their guts behind a magic parrot structure generally
+referred to as a PMC, or Parrot Magic Cookie. Nothing outside the core of
+parrot (in fact, nothing outside the data type's vtable routines) should infer
+anything about a PMC (hence the Magic part).
 
 The first parameter to any vtable routine should be the current interpreter.
 The second parameter should be the PMC itself.
 
-vtables are neat because they decouple the interface and
-implementation of various object functions. This does mean, though,
-that you need to either know what functions are available and what
-they do, or have some method of finding out. It's faster if you know
-which vtable entry does what, so that's the method parrot's using.
+vtables are neat because they decouple the interface and implementation of
+various object functions. This does mean, though, that you need to either know
+what functions are available and what they do, or have some method of finding
+out. It's faster if you know which vtable entry does what, so that's the method
+parrot's using.
 
-The actual vtable structure contains pointers to functions that
-implement the methods for that particular vtable.  All pointers
-must point to valid functions with appropriate prototypes.
+The actual vtable structure contains pointers to functions that implement the
+methods for that particular vtable.  All pointers must point to valid functions
+with appropriate prototypes.
 
 =head1 IMPLEMENTATION
 
 =head2 vtable functions
 
-This is a list of each of the vtable methods, their prototypes, and
-a description of the method.
+This is a list of each of the vtable methods, their prototypes, and a
+description of the method.
 
-The following functions are singleton functions. (There are no keyed
-versions of these)
+The following functions are singleton functions. (There are no keyed versions
+of these)
 
 =over 4
 
 =item void init(INTERP, PMC* self)
 
-The init vtable method takes an unused PMC as a parameter and turns
-it into a PMC appropriate for the class owning the vtable. Called as a
-class method.  There is also a form that accepts a PMC initializer as
-a third argument.
+The init vtable method takes an unused PMC as a parameter and turns it into a
+PMC appropriate for the class owning the vtable. Called as a class method. 
+There is also a form that accepts a PMC initializer as a third argument.
 
 =item void init_pmc(INTERP, PMC* self, PMC* initializer)
 
 This form of the init method takes a single initializer parameter. The
-initializer is an array that contains keys and values. The meaning of
-the keys and their corresponding values is left up to the PMC.
+initializer is an array that contains keys and values. The meaning of the keys
+and their corresponding values is left up to the PMC.
 
-Keys are either strings or integers. If strings, the PMC is
-responsible for figuring out what the string represents. If integers,
-it means the meaning has been pre-figured based on meta-information
-from the class.
+Keys are either strings or integers. If strings, the PMC is responsible for
+figuring out what the string represents. If integers, it means the meaning has
+been pre-figured based on meta-information from the class.
 
-For example, if a class has the known properties "Size", "Dimension"
-and "Color", they may be assigned the values 100, 101, and 102. If the
-creator of the PMC knows enough about the class to make the
-translation to numbers it may; otherwise, the raw strings may be used.
-So, for the declaration:
+For example, if a class has the known properties "Size", "Dimension" and
+"Color", they may be assigned the values 100, 101, and 102. If the creator of
+the PMC knows enough about the class to make the translation to numbers it may;
+otherwise, the raw strings may be used. So, for the declaration:
 
    my @foo Size(12), Dimension(3), Color("Green");
 
 the init array may be [100, 12, 101, 3, 102, "Green"] or ["Size", 12,
-"Dimension", 3, "Color", "Green"]. Note that, in all cases, the array
-is an array of PMCs. (So you get either an int PMC or a string PMC in
-the list of keys).
+"Dimension", 3, "Color", "Green"]. Note that, in all cases, the array is an
+array of PMCs. (So you get either an int PMC or a string PMC in the list of
+keys).
 
 =item void init_pmc_props(INTERP, PMC* self, PMC* initializer, PMC* properties)
 
@@ -79,58 +76,57 @@ XXX: what does this do?
 
 =item void morph(INTERP, PMC* self, INTVAL type)
 
-Turn the PMC into a PMC of type C<type>. If the morphing can't be
-done in any reasonable way -- for instance if an integer is asked to turn
-into an Array -- then the PMC is first destroyed, then recreated as an
-empty PMC of the new type.
+Turn the PMC into a PMC of type C<type>. If the morphing can't be done in any
+reasonable way -- for instance if an integer is asked to turn into an Array --
+then the PMC is first destroyed, then recreated as an empty PMC of the new
+type.
 
-This method is primarily used when the interpreter has need of
-coercing a PMC to a particular type, and isn't meant as a general
-purpose casting tool. Compilers should only emit valid transformations.
+This method is primarily used when the interpreter has need of coercing a PMC
+to a particular type, and isn't meant as a general purpose casting tool.
+Compilers should only emit valid transformations.
 
 =item void mark(INTERP, PMC* self)
 
-Called by the DOD when it is sweeping through the PMCs and has detected
-that this PMC is both alive and has a custom mark routine (as indicated
-by the custom mark PMC flag).
+Called by the DOD when it is sweeping through the PMCs and has detected that
+this PMC is both alive and has a custom mark routine (as indicated by the
+custom mark PMC flag).
 
-If a PMC has this flag set, then it is responsible for marking all buffers
-and PMCs under its control as alive. If it does not, those PMCs or buffers
-may be collected later. This method does I<not> have to call the
-C<mark> method on any PMCs it marks--the DOD system takes care of
-that. (So no need to recurse into aggregate PMCs or anything of the sort).
+If a PMC has this flag set, then it is responsible for marking all buffers and
+PMCs under its control as alive. If it does not, those PMCs or buffers may be
+collected later. This method does I<not> have to call the C<mark> method on any
+PMCs it marks--the DOD system takes care of that. (So no need to recurse into
+aggregate PMCs or anything of the sort).
 
-This method may allocate no memory from Parrot, nor may it alter
-Parrot's internal structures. It should have no side-effects from the
-C level either.
+This method may allocate no memory from Parrot, nor may it alter Parrot's
+internal structures. It should have no side-effects from the C level either.
 
 This routine may B<not> throw an exception.
 
 =item void destroy(INTERP, PMC* self)
 
-This method is called by the DOD when it determines that a PMC is
-dead and that the PMC has marked itself as having a destroy method.
+This method is called by the DOD when it determines that a PMC is dead and that
+the PMC has marked itself as having a destroy method.
 
-When this method finishes, the PMC will be marked as dead. As such you
-should make sure that you do I<not> leave any references to it in any
-parrot structure by the end of the method.
+When this method finishes, the PMC will be marked as dead. As such you should
+make sure that you do I<not> leave any references to it in any parrot structure
+by the end of the method.
 
 This method may I<not> throw an exception. It will be ignored if it does.
 
 =item PMC* getprop(INTERP, PMC* self, STRING* key)
 
-Return the value from the property hash of B<self> keyed by B<key>.
-The key should not be NULL.
+Return the value from the property hash of B<self> keyed by B<key>. The key
+should not be NULL.
 
 =item void setprop(INTERP, PMC* self, STRING* key, PMC* value)
 
-Set the value in the property hash of B<self> that is keyed by B<key> to
-the value of B<value>. The key should not be NULL.
+Set the value in the property hash of B<self> that is keyed by B<key> to the
+value of B<value>. The key should not be NULL.
 
 =item void delprop(INTERP, PMC* self, STRING* key)
 
-Delete the value from the property hash of B<self> keyed by B<key>.
-The key should not be NULL.
+Delete the value from the property hash of B<self> keyed by B<key>. The key
+should not be NULL.
 
 =item PMC* getprops(INTERP, PMC* self)
 
@@ -138,31 +134,30 @@ Return the entire property hash for B<self>.
 
 =back
 
-The following functions have a plain form, a _keyed form, and
-a _keyed_int form. The keyed forms take a PMC* or INTVAL for I<each> PMC
-parameter.  The PMC* parameter for each PMC is NULL if there is no
-key for that PMC; this means that that argument is unkeyed.
+The following functions have a plain form, a _keyed form, and a _keyed_int
+form. The keyed forms take a PMC* or INTVAL for I<each> PMC parameter.  The
+PMC* parameter for each PMC is NULL if there is no key for that PMC; this means
+that that argument is unkeyed.
 
 In some cases, the caller I<must> provide a non-NULL key.  Those cases are
 explicitly stated below.  In the other cases, you may have to implement the
 keyed vtable methods and check for a NULL B<self> key even if you are
-implementing a non-aggregate type.  If the B<self> key is non-NULL and the
-PMC class is a non-aggregate type, the _keyed_* methods should throw an
-exception.
+implementing a non-aggregate type.  If the B<self> key is non-NULL and the PMC
+class is a non-aggregate type, the _keyed_* methods should throw an exception.
 
-If you do not implement the _keyed_int methods, the default will convert
-the INTVAL into a key PMC* and call the corresponding _keyed method.
+If you do not implement the _keyed_int methods, the default will convert the
+INTVAL into a key PMC* and call the corresponding _keyed method.
 
-The keyed methods should I<NOT> assume that the key pointer will be
-valid after the method exits.  The pointer may be to a
-stack variable in the calling function.
+The keyed methods should I<NOT> assume that the key pointer will be valid after
+the method exits.  The pointer may be to a stack variable in the calling
+function.
 
 =over 4
 
 =item INTVAL type(INTERP, PMC* self)
 
-Return the type of the PMC. Type is a unique tag associated with the
-PMC when the PMC's class is loaded. Negative numbers are considered
+Return the type of the PMC. Type is a unique tag associated with the PMC when
+the PMC's class is loaded. Negative numbers are considered
 interpreter-specific, non-public types.
 
 =item INTVAL type_keyed(INTERP, PMC* self, PMC* key)
@@ -171,15 +166,15 @@ interpreter-specific, non-public types.
 
 =item INTVAL type_keyed_str(INTERP, PMC* self, STRING* key)
 
-Return the type of the PMC indexed by B<key>.  The B<key> parameter
-is guaranteed not to be NULL for this method.
+Return the type of the PMC indexed by B<key>.  The B<key> parameter is
+guaranteed not to be NULL for this method.
 
 =item UINTVAL subtype(INTERP, PMC* self, INTVAL type)
 
-Return the subtype of a PMC. (Note that this may be unimplemented,
-and may go away). This is intended to return information about the
-PMC--what type of number or string it is, whether it's a scalar, hash,
-array, or list, and suchlike things.
+Return the subtype of a PMC. (Note that this may be unimplemented, and may go
+away). This is intended to return information about the PMC--what type of
+number or string it is, whether it's a scalar, hash, array, or list, and
+suchlike things.
 
 =item STRING* name(INTERP, PMC* self)
 
@@ -191,10 +186,9 @@ Return a clone of yourself.
 
 =item PMC* find_method(INTERP, PMC* self, STRING* method_name)
 
-Return a subroutine PMC for the passed method name. This subroutine
-PMC may be cached, so the method I<must> return an equivalent sub PMC
-each time, or be capable of dealing with the returned sub PMCs being
-reused.
+Return a subroutine PMC for the passed method name. This subroutine PMC may be
+cached, so the method I<must> return an equivalent sub PMC each time, or be
+capable of dealing with the returned sub PMCs being reused.
 
 =item INTVAL get_integer(INTERP, PMC* self)
 
@@ -206,8 +200,8 @@ Return the native integer value of the PMC.
 
 =item INTVAL get_integer_keyed_str(INTERP, PMC* self, STRING* key)
 
-Return the native integer value of the PMC indexed by B<key>.
-The B<key> parameter is guaranteed not to be NULL for this method.
+Return the native integer value of the PMC indexed by B<key>. The B<key>
+parameter is guaranteed not to be NULL for this method.
 
 =item FLOATVAL get_number(INTERP, PMC* self)
 
@@ -219,8 +213,8 @@ Return the native floating-point value of the PMC.
 
 =item FLOATVAL get_number_keyed_str(INTERP, PMC* self, STRING* key)
 
-Return the native floating-point value of the PMC indexed by B<key>.
-The B<key> parameter is guaranteed not to be NULL for this method.
+Return the native floating-point value of the PMC indexed by B<key>. The B<key>
+parameter is guaranteed not to be NULL for this method.
 
 =item PMC* get_bignum(INTERP, PMC* self)
 
@@ -228,8 +222,8 @@ Return the value of the PMC as a new bignum PMC.
 
 =item STRING* get_string(INTERP, PMC* self)
 
-Return the native string value of the PMC. This may be in the
-encoding of the PMC's choice.
+Return the native string value of the PMC. This may be in the encoding of the
+PMC's choice.
 
 =item STRING* get_string_keyed(INTERP, PMC* self, PMC* key)
 
@@ -237,22 +231,22 @@ encoding of the PMC's choice.
 
 =item STRING* get_string_keyed_str(INTERP, PMC* self, STRING* key)
 
-Return the string value of the PMC indexed by B<key>.
-The B<key> parameter is guaranteed not to be NULL for this method.
+Return the string value of the PMC indexed by B<key>. The B<key> parameter is
+guaranteed not to be NULL for this method.
 
 =item INTVAL get_bool(INTERP, PMC* self)
 
-Return the constant TRUE if the PMC is true, or FALSE if the PMC is
-false. The definition of truth for a given PMC will depend on the type
-of the PMC: for a scalar, it may be as simple as 0 or "" being false,
-and any other value being true.
+Return the constant TRUE if the PMC is true, or FALSE if the PMC is false. The
+definition of truth for a given PMC will depend on the type of the PMC: for a
+scalar, it may be as simple as 0 or "" being false, and any other value being
+true.
 
 =item PMC* get_pmc(INTERP, PMC* self)
 
-Return the PMC for this PMC. While this may seem nonsensical, it's
-useful in several circumstances. If the thing being accessed may
-return something odd, for example a reference, it may return a
-value different from the PMC that get_pmc is being called on.
+Return the PMC for this PMC. While this may seem nonsensical, it's useful in
+several circumstances. If the thing being accessed may return something odd,
+for example a reference, it may return a value different from the PMC that
+get_pmc is being called on.
 
 =item PMC* get_pmc_keyed(INTERP, PMC* self, PMC* key)
 
@@ -260,8 +254,8 @@ value different from the PMC that get_pmc is being called on.
 
 =item PMC* get_pmc_keyed_str(INTERP, PMC* self, STRING* key)
 
-Return the PMC indexed by B<key>.
-The B<key> parameter is guaranteed not to be NULL for this method.
+Return the PMC indexed by B<key>. The B<key> parameter is guaranteed not to be
+NULL for this method.
 
 =item void* get_pointer(INTERP, PMC* self)
 
@@ -271,8 +265,8 @@ The B<key> parameter is guaranteed not to be NULL for this method.
 
 =item void* get_pointer_keyed_str(INTERP, PMC* self, STRING* key)
 
-Return a pointer to some data. The details of the data (type, location
-etc.) depend on the PMC.
+Return a pointer to some data. The details of the data (type, location etc.)
+depend on the PMC.
 
 =item void set_integer_native(INTERP, PMC* self, INTVAL value)
 
@@ -280,9 +274,9 @@ Sets the PMC to the integer value passed.
 
 =item void set_integer_same(INTERP, PMC* self, PMC* value)
 
-Sets the PMC to the integer value of the PMC in B<value>.
-In this case, B<value> is guaranteed to be of the same type
-as B<self> so optimizations may be made.
+Sets the PMC to the integer value of the PMC in B<value>. In this case,
+B<value> is guaranteed to be of the same type as B<self> so optimizations may
+be made.
 
 =item void set_integer_keyed(INTERP, PMC* self, PMC* key, INTVAL value)
 
@@ -290,8 +284,8 @@ as B<self> so optimizations may be made.
 
 =item void set_integer_keyed_str(INTERP, PMC* self, STRING* key, INTVAL value)
 
-Sets the PMC indexed by B<key> to the integer value passed in B<value>.
-The B<key> parameter is guaranteed not to be NULL for this method.
+Sets the PMC indexed by B<key> to the integer value passed in B<value>. The
+B<key> parameter is guaranteed not to be NULL for this method.
 
 =item void set_number_native(INTERP, PMC* self, FLOATVAL value)
 
@@ -299,9 +293,9 @@ Sets the PMC to the floating-point value passed.
 
 =item void set_number_same(INTERP, PMC* self, PMC* value)
 
-Sets the PMC to the floating-point value of the PMC in B<value>.
-In this case, B<value> is guaranteed to be of the same type
-as B<self> so optimizations may be made.
+Sets the PMC to the floating-point value of the PMC in B<value>. In this case,
+B<value> is guaranteed to be of the same type as B<self> so optimizations may
+be made.
 
 =item void set_number_keyed(INTERP, PMC* self, PMC* key, FLOATVAL value)
 
@@ -326,9 +320,8 @@ Sets the PMC to the copied string value.
 
 =item void set_string_same(INTERP, PMC* self, PMC* value)
 
-Sets the PMC to the string value of B<value>.
-In this case, B<value> is guaranteed to be of the same type
-as B<self> so optimizations may be made.
+Sets the PMC to the string value of B<value>. In this case, B<value> is
+guaranteed to be of the same type as B<self> so optimizations may be made.
 
 =item void set_string_keyed(INTERP, PMC* self, PMC* key, STRING* value)
 
@@ -336,8 +329,8 @@ as B<self> so optimizations may be made.
 
 =item void set_string_keyed_str(INTERP, PMC* self, STRING* key, STRING* value)
 
-Sets the PMC indexed by B<key> to the string value passed in B<value>.
-The B<key> parameter is guaranteed not to be NULL for this method.
+Sets the PMC indexed by B<key> to the string value passed in B<value>. The
+B<key> parameter is guaranteed not to be NULL for this method.
 
 =item void set_bool(INTERP, PMC* self, INTVAL value)
 
@@ -359,8 +352,7 @@ copying the value.
 
 =item void set_pmc_keyed_str(INTERP, PMC* self, STRING* key, PMC* value)
 
-Sets the value of the PMC keyed by B<key> to the value of the PMC
-in B<value>.
+Sets the value of the PMC keyed by B<key> to the value of the PMC in B<value>.
 
 =item void set_pointer(INTERP, PMC* self, void* value)
 
@@ -382,18 +374,16 @@ Return the integer value of the last item on the list, removing that item.
 
 =item FLOATVAL pop_float(INTERP, PMC* self)
 
-Return the floating-point value of the last item on the list,
-removing that item.
+Return the floating-point value of the last item on the list, removing that
+item.
 
 =item STRING* pop_string(INTERP, PMC* self)
 
-Return the string value of the last item on the list,
-removing that item.
+Return the string value of the last item on the list, removing that item.
 
 =item PMC* pop_pmc(INTERP, PMC* self)
 
-Return the PMC value of the last item on the list,
-removing that item.
+Return the PMC value of the last item on the list, removing that item.
 
 =item void push_integer(INTERP, PMC* self, INTVAL value)
 
@@ -417,18 +407,16 @@ Return the integer value of the first item on the list, removing that item.
 
 =item FLOATVAL shift_float(INTERP, PMC* self)
 
-Return the floating-point value of the first item on the list,
-removing that item.
+Return the floating-point value of the first item on the list, removing that
+item.
 
 =item STRING* shift_string(INTERP, PMC* self)
 
-Return the string value of the first item on the list,
-removing that item.
+Return the string value of the first item on the list, removing that item.
 
 =item PMC* shift_pmc(INTERP, PMC* self)
 
-Return the PMC value of the first item on the list,
-removing that item.
+Return the PMC value of the first item on the list, removing that item.
 
 =item void unshift_integer(INTERP, PMC* self, INTVAL value)
 
@@ -444,8 +432,8 @@ Add the passed in string to the beginning of the list.
 
 =item void splice(INTERP, PMC* self, PMC* value, INTVAL offset, INTVAL count)
 
-Replace the B<count> PMCs at offset B<offset> from the beginning of
-B<self> with the PMCs in the aggregate B<value>.
+Replace the B<count> PMCs at offset B<offset> from the beginning of B<self>
+with the PMCs in the aggregate B<value>.
 
 =item void add(INTERP, PMC* self, PMC* value, PMC* dest)
 
@@ -453,9 +441,8 @@ B<self> with the PMCs in the aggregate B<value>.
 
 =item void add_float(INTERP, PMC* self, FLOATVAL value, PMC* dest)
 
-Add B<self> to B<value> and store the result in B<dest>.  Note that
-B<dest> may be equal to B<self>; in that case optimizations I<may> be
-made.
+Add B<self> to B<value> and store the result in B<dest>.  Note that B<dest> may
+be equal to B<self>; in that case optimizations I<may> be made.
 
 =item PMC* subtract(INTERP, PMC* self, PMC* value, PMC* dest)
 
@@ -463,9 +450,9 @@ made.
 
 =item PMC* subtract_float(INTERP, PMC* self, FLOATVAL value, PMC* dest)
 
-If B<dest> is NULL create a result PMC of an appropriate type.
-Subtract B<value> from B<self> and store the result in B<dest>.  Note that
-B<dest> may be equal to B<self>; in that case optimizations I<may> be made.
+If B<dest> is NULL create a result PMC of an appropriate type. Subtract
+B<value> from B<self> and store the result in B<dest>.  Note that B<dest> may
+be equal to B<self>; in that case optimizations I<may> be made.
 
 =item void i_subtract(INTERP, PMC* self, PMC* value)
 
@@ -482,8 +469,7 @@ Inplace operation B<self -= value>.
 =item void multiply_float(INTERP, PMC* self, FLOATVAL value, PMC* dest)
 
 Multiply B<value> by B<self> and store the result in B<dest>.  Note that
-B<dest> may be equal to B<self>; in that case optimizations I<may> be
-made.
+B<dest> may be equal to B<self>; in that case optimizations I<may> be made.
 
 =item void divide(INTERP, PMC* self, PMC* value, PMC* dest)
 
@@ -491,9 +477,8 @@ made.
 
 =item void divide_float(INTERP, PMC* self, FLOATVAL value, PMC* dest)
 
-Divide B<self> by B<value> and store the result in B<dest>.  Note that
-B<dest> may be equal to B<self>; in that case optimizations I<may> be
-made.
+Divide B<self> by B<value> and store the result in B<dest>.  Note that B<dest>
+may be equal to B<self>; in that case optimizations I<may> be made.
 
 =item void modulus(INTERP, PMC* self, PMC* value, PMC* dest)
 
@@ -502,8 +487,7 @@ made.
 =item void modulus_float(INTERP, PMC* self, FLOATVAL value, PMC* dest)
 
 Divide B<self> by B<value> and store the remainder in B<dest>.  Note that
-B<dest> may be equal to B<self>; in that case optimizations I<may> be
-made.
+B<dest> may be equal to B<self>; in that case optimizations I<may> be made.
 
 =item void cmodulus(INTERP, PMC* self, PMC* value, PMC* dest)
 
@@ -514,138 +498,133 @@ made.
 Divide B<self> by B<value> and store the remainder in B<dest>.  Note that
 B<dest> may be equal to B<self>; in that case optimizations I<may> be made.
 
-B<Note>: C<modulus> uses the Knuth's "corrected mod" algorithm, as
-implemented in F<src/utils.c>, while C<cmodulus> uses the C-style fmod
-function.
+B<Note>: C<modulus> uses the Knuth's "corrected mod" algorithm, as implemented
+in F<src/utils.c>, while C<cmodulus> uses the C-style fmod function.
 
 =item void neg(INTERP, PMC* self, PMC* dest)
 
-Negate the sign of B<self> and store the result in B<dest>.  Note that
-B<self> and B<dest> may refer to the same PMC, in which case
-optimizations I<may> be made.
+Negate the sign of B<self> and store the result in B<dest>.  Note that B<self>
+and B<dest> may refer to the same PMC, in which case optimizations I<may> be
+made.
 
 =item void bitwise_or(INTERP, PMC* self, PMC* value, PMC* dest)
 
 =item void bitwise_or_int(INTERP, PMC* self, INTVAL value, PMC* dest)
 
-Calculate the bitwise-OR of B<self> and B<value> and store the result
-in B<dest>.   Note that B<dest> may be equal to B<self>; in that case
+Calculate the bitwise-OR of B<self> and B<value> and store the result in
+B<dest>.   Note that B<dest> may be equal to B<self>; in that case
 optimizations I<may> be made.
 
 =item void bitwise_and(INTERP, PMC* self, PMC* value, PMC* dest)
 
 =item void bitwise_and_int(INTERP, PMC* self, INTVAL value, PMC* dest)
 
-Calculate the bitwise-AND of B<self> and B<value> and store the result
-in B<dest>.   Note that B<dest> may be equal to B<self>; in that case
+Calculate the bitwise-AND of B<self> and B<value> and store the result in
+B<dest>.   Note that B<dest> may be equal to B<self>; in that case
 optimizations I<may> be made.
 
 =item void bitwise_xor(INTERP, PMC* self, PMC* value, PMC* dest)
 
 =item void bitwise_xor_int(INTERP, PMC* self, INTVAL value, PMC* dest)
 
-Calculate the bitwise-XOR of B<self> and B<value> and store the result
-in B<dest>.   Note that B<dest> may be equal to B<self>; in that case
+Calculate the bitwise-XOR of B<self> and B<value> and store the result in
+B<dest>.   Note that B<dest> may be equal to B<self>; in that case
 optimizations I<may> be made.
 
 =item void bitwise_ors(INTERP, PMC* self, PMC* value, PMC* dest)
 
 =item void bitwise_ors_str(INTERP, PMC* self, STRING* value, PMC* dest)
 
-Calculate the bitwise-OR of the strings in B<self> and B<value> and store
-the result in B<dest>. Note that B<dest> may be equal to B<self>; in that
-case optimizations I<may> be made.
+Calculate the bitwise-OR of the strings in B<self> and B<value> and store the
+result in B<dest>. Note that B<dest> may be equal to B<self>; in that case
+optimizations I<may> be made.
 
 =item void bitwise_ands(INTERP, PMC* self, PMC* value, PMC* dest)
 
 =item void bitwise_ands_str(INTERP, PMC* self, STRING* value, PMC* dest)
 
-Calculate the bitwise-AND of the strings in B<self> and B<value> and store
-the result in B<dest>. Note that B<dest> may be equal to B<self>; in that
-case optimizations I<may> be made.
+Calculate the bitwise-AND of the strings in B<self> and B<value> and store the
+result in B<dest>. Note that B<dest> may be equal to B<self>; in that case
+optimizations I<may> be made.
 
 =item void bitwise_xors(INTERP, PMC* self, PMC* value, PMC* dest)
 
 =item void bitwise_xors_str(INTERP, PMC* self, STRING* value, PMC* dest)
 
-Calculate the bitwise-XOR of the strings in B<self> and B<value> and store
-the result in B<dest>. Note that B<dest> may be equal to B<self>; in that
-case optimizations I<may> be made.
+Calculate the bitwise-XOR of the strings in B<self> and B<value> and store the
+result in B<dest>. Note that B<dest> may be equal to B<self>; in that case
+optimizations I<may> be made.
 
 =item void bitwise_not(INTERP, PMC* self, PMC* dest)
 
-Apply a bitwise negation to B<self> and store the result in B<dest>.
-Note that B<self> and B<dest> may refer to the same PMC; in that case
-optimizations I<may> be made.
+Apply a bitwise negation to B<self> and store the result in B<dest>. Note that
+B<self> and B<dest> may refer to the same PMC; in that case optimizations
+I<may> be made.
 
 =item void bitwise_shl(INTERP, PMC* self, PMC* value, PMC* dest)
 
 =item void bitwise_shl_int(INTERP, PMC* self, INTVAL value, PMC* dest)
 
-Apply a leftward shift of B<value> bits to the number stored in B<self>,
-and place the resulting value in B<dest>. Note that B<self> and B<dest> may
-refer to the same PMC; in that case optimizations I<may> be made.
+Apply a leftward shift of B<value> bits to the number stored in B<self>, and
+place the resulting value in B<dest>. Note that B<self> and B<dest> may refer
+to the same PMC; in that case optimizations I<may> be made.
 
 =item void bitwise_shr(INTERP, PMC* self, PMC* value, PMC* dest)
 
 =item void bitwise_shr_int(INTERP, PMC* self, INTVAL value, PMC* dest)
 
-Applies a rightward shift of B<value> bits to the number stored in B<self>,
-and places the resulting value in B<dest>. Note that B<self> and B<dest> may
-refer to the same PMC; in that case optimizations I<may> be made.
+Applies a rightward shift of B<value> bits to the number stored in B<self>, and
+places the resulting value in B<dest>. Note that B<self> and B<dest> may refer
+to the same PMC; in that case optimizations I<may> be made.
 
 =item void concatenate(INTERP, PMC* self, PMC* value, PMC* dest)
 
 =item void concatenate_str(INTERP, PMC* self, STRING* value, PMC* dest)
 
-Concatenate the strings in B<self> and B<value> and store the result
-in B<dest>.
-Note that B<self> and B<dest> may refer to the same PMC; in that case
+Concatenate the strings in B<self> and B<value> and store the result in
+B<dest>. Note that B<self> and B<dest> may refer to the same PMC; in that case
 optimizations I<may> be made.
 
 =item INTVAL is_equal(INTERP, PMC* self, PMC* value)
 
-Return TRUE if the two PMCs are generically equivalent, or
-FALSE if they aren't.
+Return TRUE if the two PMCs are generically equivalent, or FALSE if they
+aren't.
 
 =item INTVAL is_same(INTERP, PMC* self, PMC* value)
 
-Return TRUE if the PMCs are the same, and FALSE if
-they're not. In this case, "the same" means identical at a low
-level. For plain equality, use the is_equal method.
+Return TRUE if the PMCs are the same, and FALSE if they're not. In this case,
+"the same" means identical at a low level. For plain equality, use the is_equal
+method.
 
 =item INTVAL cmp(INTERP, PMC* self, PMC* value)
 
-Compare the two PMCs as PMCs (whatever that means for the class).
-Return -1 if B<self> is smaller, 0 if the two are equal, and 1
-if B<value> is smaller.
+Compare the two PMCs as PMCs (whatever that means for the class). Return -1 if
+B<self> is smaller, 0 if the two are equal, and 1 if B<value> is smaller.
 
 =item INTVAL cmp_num(INTERP, PMC* self, PMC* value)
 
-Compare the two PMCs numerically.
-Return -1 if B<self> is smaller, 0 if the two are equal, and 1
-if B<value> is smaller.
+Compare the two PMCs numerically. Return -1 if B<self> is smaller, 0 if the two
+are equal, and 1 if B<value> is smaller.
 
 =item INTVAL cmp_string(INTERP, PMC* self, PMC* value)
 
-Compare the two PMCs as strings.
-Return -1 if B<self> is smaller, 0 if the two are equal, and 1
-if B<value> is smaller.
+Compare the two PMCs as strings. Return -1 if B<self> is smaller, 0 if the two
+are equal, and 1 if B<value> is smaller.
 
 =item void logical_or(INTERP, PMC* self, PMC* value, PMC* dest)
 
-Do a short-circuiting logical-OR of B<self> and B<value>, storing
-the winner in B<dest>.
+Do a short-circuiting logical-OR of B<self> and B<value>, storing the winner in
+B<dest>.
 
 =item void logical_and(INTERP, PMC* self, PMC* value, PMC* dest)
 
-Do a short-circuiting logical-AND of B<self> and B<value>, storing
-the winner in dest.
+Do a short-circuiting logical-AND of B<self> and B<value>, storing the winner
+in dest.
 
 =item void logical_xor(INTERP, PMC* self, PMC* value, PMC* dest)
 
-If exactly one of B<self> or B<value> is true, store it in B<dest>.  Else
-set B<dest> to be false.
+If exactly one of B<self> or B<value> is true, store it in B<dest>.  Else set
+B<dest> to be false.
 
 =item void logical_not(INTERP, PMC* self, PMC* dest)
 
@@ -655,8 +634,8 @@ Do a logical-NOT on B<self> and stores the result in B<dest>.
 
 =item void repeat_int(INTERP, PMC* self, INTVAL value, PMC* dest)
 
-Repeat the string value of B<self> B<value> times and store the
-resultant string in B<dest>.
+Repeat the string value of B<self> B<value> times and store the resultant
+string in B<dest>.
 
 =item void increment(INTERP, PMC* self)
 
@@ -668,8 +647,7 @@ Auto-decrement the PMC.
 
 =item void abs(INTERP, PMC* self, PMC* dest)
 
-Set C<dest> to the absolute value of C<SELF>. Note: C<dest> may be
-C<SELF>.
+Set C<dest> to the absolute value of C<SELF>. Note: C<dest> may be C<SELF>.
 
 =item INTVAL exists_keyed(INTERP, PMC* self, PMC* key)
 
@@ -686,8 +664,8 @@ The key is guaranteed to be non-NULL.
 
 =item INTVAL defined(INTERP, PMC* self)
 
-Check to see if the PMC is defined. Return TRUE if it is; otherwise,
-return FALSE.
+Check to see if the PMC is defined. Return TRUE if it is; otherwise, return
+FALSE.
 
 =item INTVAL defined_keyed(INTERP, PMC* self, PMC* key)
 
@@ -695,8 +673,8 @@ return FALSE.
 
 =item INTVAL defined_keyed_str(INTERP, PMC* self, STRING* key)
 
-Return TRUE if the value of B<self> keyed by B<key> is defined;
-otherwise, return FALSE.
+Return TRUE if the value of B<self> keyed by B<key> is defined; otherwise,
+return FALSE.
 
 The key is guaranteed to be non-NULL.
 
@@ -722,10 +700,9 @@ The key is guaranteed to be non-NULL.
 
 =item PMC* get_iter(INTERP, PMC* self)
 
-Return a new iterator for this aggregate. The iterator should be
-initialized so that iterations starts at the first element of the
-aggregate. If the aggregate is empty, set PMC_int_val() of the
-iterator key to -1.
+Return a new iterator for this aggregate. The iterator should be initialized so
+that iterations starts at the first element of the aggregate. If the aggregate
+is empty, set PMC_int_val() of the iterator key to -1.
 
 =item PMC* slice(INTERP, PMC* self, PMC* key)
 
@@ -733,8 +710,8 @@ Return a new iterator for this aggregate and the given Slice key.
 
 =item void substr(INTERP, PMC* self, INTVAL offset, INTVAL length, PMC* dest)
 
-Place the value of the substring of B<self> at offset B<offset> and with
-length B<length> into B<dest>.
+Place the value of the substring of B<self> at offset B<offset> and with length
+B<length> into B<dest>.
 
 =item STRING* substr_str(INTERP, PMC* self, INTVAL offset, INTVAL length)
 
@@ -744,19 +721,18 @@ Return the substring of B<self> at offset B<offset> and with length B<length>.
 
 Invoke the subroutine/method in the given PMC.
 
-It should set up the environment for the sub, and should return the
-location at which operation flow should continue after the subroutine
-returns. (Note that this will generally be the address of the next
-instruction).
+It should set up the environment for the sub, and should return the location at
+which operation flow should continue after the subroutine returns. (Note that
+this will generally be the address of the next instruction).
 
-It is B<NOT> responsible for preserving any of the current context;
-the caller should have preserved anything that they want preserved
-before calling this method.
+It is B<NOT> responsible for preserving any of the current context; the caller
+should have preserved anything that they want preserved before calling this
+method.
 
 See F<pdd03_calling_conventions.pod> for more details.
 
-B<next*> is passed in from the run loop and is the program counter of the
-next instruction.
+B<next*> is passed in from the run loop and is the program counter of the next
+instruction.
 
 =item INTVAL can(INTERP, PMC* self, STRING* method)
 
@@ -861,8 +837,8 @@ Added a number of missing method definitions. Many other minor cleanups.
 
 =item 1.2
 
-Many cleanups and clarifications.  Much detail added.  Many missing
-methods added.
+Many cleanups and clarifications.  Much detail added.  Many missing methods
+added.
 
 =item 1.1
 

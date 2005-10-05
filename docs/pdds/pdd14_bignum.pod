@@ -7,29 +7,28 @@ docs/pdds/pdd14_bignum.pod - Big Numbers
 
 =head1 ABSTRACT
 
-This document describes the big number library, the functionality it
-provides and some internal details of interest to people making use of
-the library.  Some of the areas in which the big number library meet
-with the rest of Parrot are also discussed.
+This document describes the big number library, the functionality it provides
+and some internal details of interest to people making use of the library. 
+Some of the areas in which the big number library meet with the rest of Parrot
+are also discussed.
 
 =head1 DESCRIPTION
 
-The big number library provides Parrot with both a collection of
-(nearly) infinite precision numeric types and an implementation of an
-extended decimal arithmetic (EDA).
+The big number library provides Parrot with both a collection of (nearly)
+infinite precision numeric types and an implementation of an extended decimal
+arithmetic (EDA).
 
 =head2 Why decimal arithmetic?
 
-There are benefits in using the big number library to provide both
-values of effectively unlimited precision and a defined arithmetic,
-complete with rounding and exceptional conditions, for values which
-are otherwise easily represented using standard low-level types.  Both
-require the same range of operations but differ in the environment
-under which those operations occur.  The effort required to produce a
-library which implements a decimal arithmetic is not much greater than
-that needed to provide a base-2 big number library.  It is true that
-some trade-off in both space and speed is made but given the nature of
-dynamic languages, this should not present too great a burden.
+There are benefits in using the big number library to provide both values of
+effectively unlimited precision and a defined arithmetic, complete with
+rounding and exceptional conditions, for values which are otherwise easily
+represented using standard low-level types.  Both require the same range of
+operations but differ in the environment under which those operations occur. 
+The effort required to produce a library which implements a decimal arithmetic
+is not much greater than that needed to provide a base-2 big number library. 
+It is true that some trade-off in both space and speed is made but given the
+nature of dynamic languages, this should not present too great a burden.
 
 =head2 Numeric types provided
 
@@ -47,15 +46,14 @@ Numbers with decimal fractional parts, again with no limit on size.
 
 =item Big floats with fixed fractional parts
 
-Numbers with a fixed maximum number of digits in their fractional
-part, again with no limit on size.
+Numbers with a fixed maximum number of digits in their fractional part, again
+with no limit on size.
 
 =back
 
-The library implements these different forms of number using the same
-internal representation, and differentiates between them only when
-performing rounding operations.  A number has the following abstract
-form:
+The library implements these different forms of number using the same internal
+representation, and differentiates between them only when performing rounding
+operations.  A number has the following abstract form:
 
  [ sign, string of digits, exponent ]
 
@@ -64,82 +62,78 @@ negative.  The number has the value
 
  sign, string of digits * 10 ** exponent
 
-A big integer must always have a non-negative exponent, a big float
-may have any exponent and a float with a fixed fractional part will
-have an exponent greater than a given (negative) number.  These limits
-are not attached to a numeric value, but instead are enforced by
-giving any operation involving the numbers a I<context>.
+A big integer must always have a non-negative exponent, a big float may have
+any exponent and a float with a fixed fractional part will have an exponent
+greater than a given (negative) number.  These limits are not attached to a
+numeric value, but instead are enforced by giving any operation involving the
+numbers a I<context>.
 
-In general, Parrot functions will not need to care about what the
-bignum objects are or do, they should merely be used as arguments to
-big number functions, the objects will be managed by Parrot's garbage
-collection in a similar manner to strings.
+In general, Parrot functions will not need to care about what the bignum
+objects are or do, they should merely be used as arguments to big number
+functions, the objects will be managed by Parrot's garbage collection in a
+similar manner to strings.
 
 =head2 Special Values
 
-Additionally the library provides special values, which represent the
-result of otherwise undefined operations (division by zero, for
-instance).  +Infinity, -Infinity and both quiet and signalling Not a
-Number (NaN) are available.  In general, the result of an operation
-with at least one argument which is NaN will be NaN, if the argument
-is a signalling NaN, an exception will also be raised.  See the EDA
-for full details.
+Additionally the library provides special values, which represent the result of
+otherwise undefined operations (division by zero, for instance).  +Infinity,
+-Infinity and both quiet and signalling Not a Number (NaN) are available.  In
+general, the result of an operation with at least one argument which is NaN
+will be NaN, if the argument is a signalling NaN, an exception will also be
+raised.  See the EDA for full details.
 
 =head2 Context
 
-All operations occur within a defined context.  This tells the
-operations how they should be treating their arguments, what sort of
-rounding to perform and what to do if information is lost through
-rounding.
+All operations occur within a defined context.  This tells the operations how
+they should be treating their arguments, what sort of rounding to perform and
+what to do if information is lost through rounding.
 
-The context provides the environment in which an operation occurs,
-in particular the following options are available:
+The context provides the environment in which an operation occurs, in
+particular the following options are available:
 
 =over 4
 
 =item precision
 
-A positive I<precision> indicates that big floats are to be used,
-these cannot have more than I<precision> digits in their coefficient
-before or after any operation.  Arguments to operations with more than
-I<precision> digits will be truncated and rounded appropriately and
-results of operations will not have more than I<precision> digits in
-their coefficients, with any extra digits accumulated during the
-calculation of the operation being truncated and rounded as required.
+A positive I<precision> indicates that big floats are to be used, these cannot
+have more than I<precision> digits in their coefficient before or after any
+operation.  Arguments to operations with more than I<precision> digits will be
+truncated and rounded appropriately and results of operations will not have
+more than I<precision> digits in their coefficients, with any extra digits
+accumulated during the calculation of the operation being truncated and rounded
+as required.
 
-A I<precision> of zero indicates that integer operations are to be
-performed.  Arguments to operations are rounded so that they have no
-fractional part, and the result of all operations will be rounded to
-be integers.
+A I<precision> of zero indicates that integer operations are to be performed. 
+Arguments to operations are rounded so that they have no fractional part, and
+the result of all operations will be rounded to be integers.
 
-A negative value of I<precision> indicates that a fixed number of
-fractional digits are to be provided, with arguments and results being
-truncated after those digits.
+A negative value of I<precision> indicates that a fixed number of fractional
+digits are to be provided, with arguments and results being truncated after
+those digits.
 
-With non-positive values of I<precision> the total number of digits in
-the coefficient is limited only by available memory.
+With non-positive values of I<precision> the total number of digits in the
+coefficient is limited only by available memory.
 
 =item rounding
 
-The rounding part of the context defines the rounding algorithm which
-is to be applied when truncating digits from a number's coefficient.
-The available rounding forms are outlined below.
+The rounding part of the context defines the rounding algorithm which is to be
+applied when truncating digits from a number's coefficient. The available
+rounding forms are outlined below.
 
 =item traps and flags
 
-The I<traps> part of the context defines how exceptions are raised by
-the library.  Seven distinct classes of error can occur, if the
-corresponding trap is set (enabled) then an exception is raised by the
-library (and dispatched to Parrot) otherwise execution continues with
-the exception class being recorded in flags.  For more details see the
-extended decimal arithmetic standard.
+The I<traps> part of the context defines how exceptions are raised by the
+library.  Seven distinct classes of error can occur, if the corresponding trap
+is set (enabled) then an exception is raised by the library (and dispatched to
+Parrot) otherwise execution continues with the exception class being recorded
+in flags.  For more details see the extended decimal arithmetic standard.
 
 =back
 
-It is therefore the current I<context> which determines which numeric
-type is being considered during a particular operation, this makes it
-easy to upgrade from one numeric form to another, and also allows for
-considerable code-reuse within the library.
+It is therefore the current I<context> which determines which numeric type is
+being considered during a particular operation, this makes it easy to upgrade
+from one numeric form to another, and also allows for considerable code-reuse
+within the library.
 
 =head2 Exception Classes
 
@@ -149,8 +143,8 @@ The following exception classes are defined:
 
 =item Lost Digits
 
-Non-zero digits have been removed from an argument to a function
-during rounding before the operation.
+Non-zero digits have been removed from an argument to a function during
+rounding before the operation.
 
 =item Division By Zero
 
@@ -158,14 +152,14 @@ Division by zero was attempted.
 
 =item Inexact
 
-Because arguments were rounded, or because the result of an operation
-has lost significant digits, the result is inexact.
+Because arguments were rounded, or because the result of an operation has lost
+significant digits, the result is inexact.
 
 =item Invalid Operation
 
-An invalid operation was attempted, for instance a sNaN was provided
-as an argument to a function.  This also covers recoverable errors
-like 0/0, which signals Invalid Operation and can return NaN.
+An invalid operation was attempted, for instance a sNaN was provided as an
+argument to a function.  This also covers recoverable errors like 0/0, which
+signals Invalid Operation and can return NaN.
 
 =item Overflow
 
@@ -183,25 +177,25 @@ The exponent of a number has underflowed.
 
 =head2 Rounding
 
-The rounding part of the context defines the rounding algorithm to be
-used, the following are provided (examples assume a precision of 5):
+The rounding part of the context defines the rounding algorithm to be used, the
+following are provided (examples assume a precision of 5):
 
 =over 4
 
 =item Round down
 
-Any unwanted digits are simply truncated from the coefficient.  This
-rounds towards zero.
+Any unwanted digits are simply truncated from the coefficient.  This rounds
+towards zero.
 
  [0, 1234567, 10] => [0, 12345, 12]
 
 =item Round half up
 
-The first lost digit is examined, if this is in the range 0-4, the
-coefficient is truncated directly, if in the range 5-9, one is added
-to the final digit of the coefficient.  If this leads to a coefficient
-with more than I<precision> digits, the number is rounded again,
-removing the trailing zero.  This is essentially rounding to nearest.
+The first lost digit is examined, if this is in the range 0-4, the coefficient
+is truncated directly, if in the range 5-9, one is added to the final digit of
+the coefficient.  If this leads to a coefficient with more than I<precision>
+digits, the number is rounded again, removing the trailing zero.  This is
+essentially rounding to nearest.
 
  [0, 1234567, 10] => [0, 12346, 12]
  [0, 1234549, 10] => [0, 12345, 12]
@@ -209,25 +203,24 @@ removing the trailing zero.  This is essentially rounding to nearest.
 
 =item Round half even
 
-The first lost digit is examined, if it lies in the range 0-4, the
-coefficient is truncated directly, if in the range 6-9, the
-coefficient is rounded up.  If the first lost digit is equal to 5, and
-the remaining lost digits in the coefficient are non-zero, the number
-is also rounded up.  If the lost digits are equal to exactly half, the
-number is rounded up if the least significant retained digit is odd,
-and rounded down if it is even.
+The first lost digit is examined, if it lies in the range 0-4, the coefficient
+is truncated directly, if in the range 6-9, the coefficient is rounded up.  If
+the first lost digit is equal to 5, and the remaining lost digits in the
+coefficient are non-zero, the number is also rounded up.  If the lost digits
+are equal to exactly half, the number is rounded up if the least significant
+retained digit is odd, and rounded down if it is even.
 
 =item Round Floor
 
-If the digits to be discarded are non zero, and the number is negative,
-the coefficient is rounded up, otherwise it remains the same.
+If the digits to be discarded are non zero, and the number is negative, the
+coefficient is rounded up, otherwise it remains the same.
 
 This is rounding towards -Infinity.
 
 =item Round Ceiling
 
-If the digits to be discarded are non zero, and the number is positive,
-the coefficient is rounded up, otherwise it remains the same.
+If the digits to be discarded are non zero, and the number is positive, the
+coefficient is rounded up, otherwise it remains the same.
 
 This is rounding towards +Infinity.
 
@@ -235,14 +228,13 @@ This is rounding towards +Infinity.
 
 =head2 Operations
 
-The following operations are provided by the library, they function
-exactly as those described in the Standard Decimal Arithmetic (SDA)
-(see references below) with some extension to cope with integer and
-fixed fractional part numbers.  Only the deviations are outlined here.
+The following operations are provided by the library, they function exactly as
+those described in the Standard Decimal Arithmetic (SDA) (see references below)
+with some extension to cope with integer and fixed fractional part numbers. 
+Only the deviations are outlined here.
 
-In all cases, the sequence of rounding and promotion to zero outlined
-by the SDA are followed, even where the context implies integer
-operations.
+In all cases, the sequence of rounding and promotion to zero outlined by the
+SDA are followed, even where the context implies integer operations.
 
 =over 4
 
@@ -252,23 +244,21 @@ operations.
 
 =item Division
 
-Under integer conditions, division is halted once the first fractional
-digit is calculated, with the result then being rounded to an integer
-and returned.  Under fixed-fraction conditions, one more digit than
-needed is calculated, with the coefficient then being rounded and
-returned.
+Under integer conditions, division is halted once the first fractional digit is
+calculated, with the result then being rounded to an integer and returned. 
+Under fixed-fraction conditions, one more digit than needed is calculated, with
+the coefficient then being rounded and returned.
 
-If a floating point value is required, or if inexact division by a
-very small number is attempted, it may be wise to follow big float
-arithmetic to limit the number of digits returned.  It is safe to
-chose a precision at least as big the largest number of digits
-of either argument to the division function.
+If a floating point value is required, or if inexact division by a very small
+number is attempted, it may be wise to follow big float arithmetic to limit the
+number of digits returned.  It is safe to chose a precision at least as big the
+largest number of digits of either argument to the division function.
 
 =item Integer division, Remainder
 
-For both integer and fixed-fraction numbers, the result returned by
-the remainder function will be an integer or fixed-fraction number.
-The result of integer division will be an integer.
+For both integer and fixed-fraction numbers, the result returned by the
+remainder function will be an integer or fixed-fraction number. The result of
+integer division will be an integer.
 
 =item Rounding
 
@@ -276,9 +266,9 @@ The result of integer division will be an integer.
 
 =item Comparison
 
-Comparison returns a big number which is equal to 1, 0 or -1 if the
-first argument is larger, equal to or smaller than the second.  An
-alternative form which returns an INTVAL is also provided.
+Comparison returns a big number which is equal to 1, 0 or -1 if the first
+argument is larger, equal to or smaller than the second.  An alternative form
+which returns an INTVAL is also provided.
 
 =item Rescale
 
@@ -290,27 +280,25 @@ alternative form which returns an INTVAL is also provided.
 
 =head2 Conversion to and from strings
 
-A one to one conversion between the abstract representation above and
-a string is provided by the library, and acts as defined by the
-standard decimal arithmetic.  Other conversation operations may also
-be implemented, and these may not provide one to one mapping.
+A one to one conversion between the abstract representation above and a string
+is provided by the library, and acts as defined by the standard decimal
+arithmetic.  Other conversation operations may also be implemented, and these
+may not provide one to one mapping.
 
-A pedantic error checking conversion is available within the library,
-but only works with native strings.  Versions which work with Parrot
-strings will also be provided, although in a separate file to the rest
-of the library (they will share a common private header file).
+A pedantic error checking conversion is available within the library, but only
+works with native strings.  Versions which work with Parrot strings will also
+be provided, although in a separate file to the rest of the library (they will
+share a common private header file).
 
 =head1 IMPLEMENTATION
 
-Functions are provided which implement the arithmetic, conversion,
-creation and destruction of big numbers by dealing with otherwise
-opaque big number objects.
+Functions are provided which implement the arithmetic, conversion, creation and
+destruction of big numbers by dealing with otherwise opaque big number objects.
 
 =head2 Big number representation
 
-A big number is represented by the following structure, this is
-capable of being allocated, tracked and destroyed by the Parrot
-garbage collection system.
+A big number is represented by the following structure, this is capable of
+being allocated, tracked and destroyed by the Parrot garbage collection system.
 
  typedef struct {
     BN_NIB* buffer; /* string of nibbles */
@@ -321,16 +309,14 @@ garbage collection system.
     INTVAL expn;    /* exponent of number */
  } parrot_bignum_t;
 
-Within the library, individual decimal digits can be accessed using
-macros, outside the library, access must be made via exported
-functions.  BN_NIB is likely to be a UINTVAL, but this is not
-essential.
+Within the library, individual decimal digits can be accessed using macros,
+outside the library, access must be made via exported functions.  BN_NIB is
+likely to be a UINTVAL, but this is not essential.
 
-Special values are represented by setting I<digits> to zero and
-setting appropriate private I<flags>, using internal macros.  Infinity
-has one flag field, NaN another flag field and sNaN a third.  In
-general the flags should not be examined directly, even within the
-module.
+Special values are represented by setting I<digits> to zero and setting
+appropriate private I<flags>, using internal macros.  Infinity has one flag
+field, NaN another flag field and sNaN a third.  In general the flags should
+not be examined directly, even within the module.
 
 =head2 Context
 
@@ -342,46 +328,41 @@ module.
     unsigned char traps;       /* throw errors or not? */
  } parrot_bignum_context;
 
-I<BN_ROUNDING> is an enumeration of the possible rounding types as
-described above.  I<traps> is a bitmask of exception traps, 0 implies
-that a trap is disabled and 1 implies it is enabled.  I<flags> is a
-bitmask which records exceptional conditions and has the same fields
-at I<flags>.
+I<BN_ROUNDING> is an enumeration of the possible rounding types as described
+above.  I<traps> is a bitmask of exception traps, 0 implies that a trap is
+disabled and 1 implies it is enabled.  I<flags> is a bitmask which records
+exceptional conditions and has the same fields at I<flags>.
 
-It is expected that language level types implement big floats using a
-global floating point context which is tagged onto an interpreter
-structure (and can thus be modified by called the right opcodes).
-That big integers and fixed-fraction number are provided by creating a
-context with an appropriate precision whenever a call into the library
-is made.
+It is expected that language level types implement big floats using a global
+floating point context which is tagged onto an interpreter structure (and can
+thus be modified by called the right opcodes). That big integers and
+fixed-fraction number are provided by creating a context with an appropriate
+precision whenever a call into the library is made.
 
 =head2 Exceptional Conditions
 
-When an exceptional condition is raised by the module, control is
-passed to C<BN_nonfatal()>, this examines the error which has occurred
-and the current context to determine which class of error has occurred.
-If the corresponding trap handler is not enabled, the context's flags
-are updated and control is returned to the bignumber library,
-otherwise the exception becomes fatal.  How this mechanism interacts
-with Parrot's own is yet to be decided.
+When an exceptional condition is raised by the module, control is passed to
+C<BN_nonfatal()>, this examines the error which has occurred and the current
+context to determine which class of error has occurred. If the corresponding
+trap handler is not enabled, the context's flags are updated and control is
+returned to the bignumber library, otherwise the exception becomes fatal.  How
+this mechanism interacts with Parrot's own is yet to be decided.
 
-The possible exceptions are detailed in the extended decimal
-arithmetic.
+The possible exceptions are detailed in the extended decimal arithmetic.
 
 =head1 Tests
 
-The Standard Decimal Arithmetic provides a collection of tests for
-both its base and extended behaviour.  Initially it is hoped that this
-library can pass all base tests, with extended tests to be included at
-a later date as it is extended to cope with values such as +Inf.
+The Standard Decimal Arithmetic provides a collection of tests for both its
+base and extended behaviour.  Initially it is hoped that this library can pass
+all base tests, with extended tests to be included at a later date as it is
+extended to cope with values such as +Inf.
 
 =head1 TODO
 
-Fill in the remaining functions from the EDA, verify that the test
-suite still passes, integrate the library into the rest of Parrot,
-provide PMC types and suitable opcodes.  Conversion to and from Parrot
-strings, conversion to and from floating point types, sprintf output
-of bignumbers.
+Fill in the remaining functions from the EDA, verify that the test suite still
+passes, integrate the library into the rest of Parrot, provide PMC types and
+suitable opcodes.  Conversion to and from Parrot strings, conversion to and
+from floating point types, sprintf output of bignumbers.
 
 =head1 ATTACHMENTS
 
@@ -413,10 +394,10 @@ Perl's Math::Big* modules.
 
 =item version 1.1
 
-The first version is more a description of the state of the art than a
-plan for the future.  The author believes this is akin to learning how
-to crawl before trying to run.  Leaving the ground is considered Right
-Out with attempts being left as an exercise for the interested reader.
+The first version is more a description of the state of the art than a plan for
+the future.  The author believes this is akin to learning how to crawl before
+trying to run.  Leaving the ground is considered Right Out with attempts being
+left as an exercise for the interested reader.
 
 =back
 
@@ -430,7 +411,7 @@ None. First version
 
 =item Version 1.1
 
-Special values added, exception handling updated to suit EDA,
-more rounding types added, TODO added.  PDD number bagged.
+Special values added, exception handling updated to suit EDA, more rounding
+types added, TODO added.  PDD number bagged.
 
 =back

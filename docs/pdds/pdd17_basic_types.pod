@@ -11,9 +11,9 @@ This PDD documents the base Parrot PMC types and their behaviours.
 
 =head1 DESCRIPTION
 
-Parrot has a number of basic PMC types that all programs can guarantee
-will be available to them. (With the possible exception of parrot
-programs executing on an embedded device or other restricted environment)
+Parrot has a number of basic PMC types that all programs can guarantee will be
+available to them. (With the possible exception of parrot programs executing on
+an embedded device or other restricted environment)
 
 =head2 Scalar types
 
@@ -21,62 +21,57 @@ programs executing on an embedded device or other restricted environment)
 
 =item Undef
 
-This is the generic no-value type. It has a numeric value of zero, a
-string value of empty string, and a boolean value of false. It will,
-on assignment, turn itself into a PMC of the source type, or if
-assigned a basic type will turn itself into one of the wrapper PMC
-types (detailed below) for the basic types.
+This is the generic no-value type. It has a numeric value of zero, a string
+value of empty string, and a boolean value of false. It will, on assignment,
+turn itself into a PMC of the source type, or if assigned a basic type will
+turn itself into one of the wrapper PMC types (detailed below) for the basic
+types.
 
 =item Integer
 
-The PMC wrapper for Parrot's low-level integer type. Always an
-integer, with other types auto-converted to an integer when stored
-into this PMC. The range and behaviour of the Integer PMC is
-identical to the platform low-level integer.
+The PMC wrapper for Parrot's low-level integer type. Always an integer, with
+other types auto-converted to an integer when stored into this PMC. The range
+and behaviour of the Integer PMC is identical to the platform low-level
+integer.
 
 The boolean value for an Integer is false if zero, otherwise true.
 
-Floating point, string, and bignum values assigned to an Integer PMC
-round to the nearest integer. Floats, or strings which resolve to
-numbers, cap at the platform maximum or minimum integer value.
+Floating point, string, and bignum values assigned to an Integer PMC round to
+the nearest integer. Floats, or strings which resolve to numbers, cap at the
+platform maximum or minimum integer value.
 
-Integer PMCs take on a value of 1 if a boolean true is assigned, and
-a value of 0 if a boolean false is assigned.
+Integer PMCs take on a value of 1 if a boolean true is assigned, and a value of
+0 if a boolean false is assigned.
 
-If an out-of-range value is assigned to an Integer PMC, the PMC will
-throw an exception if exact math is enabled.
+If an out-of-range value is assigned to an Integer PMC, the PMC will throw an
+exception if exact math is enabled.
 
 =item Float
 
-The PMC wrapper for Parrot's low-level floating point type. Always a
-float, with other types autoconverted to a float when stored into this
-PMC.
+The PMC wrapper for Parrot's low-level floating point type. Always a float,
+with other types autoconverted to a float when stored into this PMC.
 
-The boolean value for a Float is false if exactly zero, otherwise
-true.
+The boolean value for a Float is false if exactly zero, otherwise true.
 
-When converted to an integer, floats round to the closest integer,
-capping at the platform maximum or minimum integer value.
+When converted to an integer, floats round to the closest integer, capping at
+the platform maximum or minimum integer value.
 
-When converting to a string, floats use the platform default snprintf
-format.
+When converting to a string, floats use the platform default snprintf format.
 
 =item String
 
-The PMC wrapper for Parrot's low-level string type. Always a simple
-string, with other types autoconverted to a string when stored into
-this PMC.
+The PMC wrapper for Parrot's low-level string type. Always a simple string,
+with other types autoconverted to a string when stored into this PMC.
 
-The boolean value for a String is false if empty or the string '0' (a
-one character string holding a zero) otherwise true. This PMC
-autoconverts to an integer or float when its integer or float value is
-fetched.
+The boolean value for a String is false if empty or the string '0' (a one
+character string holding a zero) otherwise true. This PMC autoconverts to an
+integer or float when its integer or float value is fetched.
 
 =item Boolean
 
-The PMC wrapper for Parrot's low-level true/false value. Returns 0 for
-false, 1 for true when fetched as an integer or float, empty string
-for false and '1' for true when fetched as a string.
+The PMC wrapper for Parrot's low-level true/false value. Returns 0 for false, 1
+for true when fetched as an integer or float, empty string for false and '1'
+for true when fetched as a string.
 
 =item BigNum
 
@@ -84,8 +79,8 @@ The PMC wrapper for Parrot's low-level BigNum type.
 
 =item ParrotClass
 
-The PMC for Parrot's class. (Note that this may go away if we
-ultimately make all classes just objects)
+The PMC for Parrot's class. (Note that this may go away if we ultimately make
+all classes just objects)
 
 =item ParrotObject
 
@@ -93,19 +88,19 @@ The PMC for Parrot's base object type.
 
 =item Reference
 
-The PMC that represents a reference to another PMC. Delegates all
-functions to the referred-to PMC.
+The PMC that represents a reference to another PMC. Delegates all functions to
+the referred-to PMC.
 
 =back
 
 =head2 Array types
 
-Note that for the following types you can set the size of the array by
-using the VTABLE_set_integer_native() method. Assigning an integer to
-the array as a whole sets the array to that size.
+Note that for the following types you can set the size of the array by using
+the VTABLE_set_integer_native() method. Assigning an integer to the array as a
+whole sets the array to that size.
 
-Note that size-changing operations, such as push, pop, shift, unshift,
-and splice, on fixed arrays will result in an exception.
+Note that size-changing operations, such as push, pop, shift, unshift, and
+splice, on fixed arrays will result in an exception.
 
 =over 4
 
@@ -157,16 +152,16 @@ A dynamically sized array which holds only String values.
 
 =item Hash
 
-A container with key-value semantics. The values are PMCs. 
+A container with key-value semantics. The values are PMCs.
 
 =item Env
 
 Env is a singleton PMC class, that is there is only one Env PMC in any
 interpreter. This PMC gives access to the process' environment
-variables--reading from it returns the value of the named process
-environment variable, while writing to it sets the value of a process
-environment variable. For example, to retrieve the current value of
-TERM (the terminal type on most Unix systems):
+variables--reading from it returns the value of the named process environment
+variable, while writing to it sets the value of a process environment variable.
+For example, to retrieve the current value of TERM (the terminal type on most
+Unix systems):
 
    new P1, .Env
    set S1, P1['TERM']
@@ -177,8 +172,8 @@ Note that an embedding system may override this behaviour.
 
 =head2 Binary Math operations
 
-The following is a list of what should happen with the basic types
-when used in a binary math operation:
+The following is a list of what should happen with the basic types when used in
+a binary math operation:
 
 =over 4
 

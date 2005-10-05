@@ -7,78 +7,71 @@ docs/pdds/pdd16_native_call.pod - NCI conventions and definitions
 
 =head1 ABSTRACT
 
-This PDD describes the native call interface, and the function
-signatures used to describe those functions.
+This PDD describes the native call interface, and the function signatures used
+to describe those functions.
 
 =head1 DESCRIPTION
 
-The NCI is designed to allow Parrot to interface to I<most> of the
-functions in a C library without having to write any C code for that
-interface. It isn't designed to be a universal C-less
-interface--there will always be libraries that have some bizarre
-parameter list that requires that some C be written. It should,
-however, handle all the simple cases.
+The NCI is designed to allow Parrot to interface to I<most> of the functions in
+a C library without having to write any C code for that interface. It isn't
+designed to be a universal C-less interface--there will always be libraries
+that have some bizarre parameter list that requires that some C be written. It
+should, however, handle all the simple cases.
 
-Using the NCI, parrot automatically wraps the C functions and presents
-them as prototyped subroutines that follow normal parrot calling
-conventions, and can be called like any other parrot subroutine.
+Using the NCI, parrot automatically wraps the C functions and presents them as
+prototyped subroutines that follow normal parrot calling conventions, and can
+be called like any other parrot subroutine.
 
-The NCI uses the platform native dynamic by-name function loading
-mechanism (dlopen/dlsym on unix and LoadLibrary/GetProcAddress on
-Win32, for example) to get the function pointer, then dynamically
-generates the wrapper based on the signature of that function.
+The NCI uses the platform native dynamic by-name function loading mechanism
+(dlopen/dlsym on unix and LoadLibrary/GetProcAddress on Win32, for example) to
+get the function pointer, then dynamically generates the wrapper based on the
+signature of that function.
 
-As there is no good platform-independent way to determine function
-signatures (C header files are not always available (certainly not
-for libraries not designed for access from C) and not always
-reasonably parseable anyway, and there is no generic way to query a
-function for its signature) the signature must be passed in when the
-linkage between the C function and parrot is made.
+As there is no good platform-independent way to determine function signatures
+(C header files are not always available (certainly not for libraries not
+designed for access from C) and not always reasonably parseable anyway, and
+there is no generic way to query a function for its signature) the signature
+must be passed in when the linkage between the C function and parrot is made.
 
 =head2 Function signatures
 
-The following list are the valid letters in the function signatures
-for Parrot's NCI. Note that only letters and numbers are valid, and
-each letter represents a single parameter passed into the NCI. Note
-that the letters are case-sensitive, and must be within the base
-7-bit ASCII character set.
+The following list are the valid letters in the function signatures for
+Parrot's NCI. Note that only letters and numbers are valid, and each letter
+represents a single parameter passed into the NCI. Note that the letters are
+case-sensitive, and must be within the base 7-bit ASCII character set.
 
-At some point punctuation may be used as modifiers on the function
-parameters, in which case each parameter may be represented by
-multiple letters.
+At some point punctuation may be used as modifiers on the function parameters,
+in which case each parameter may be represented by multiple letters.
 
-In I<no> case should the signature letters be separated by
-whitespace. This restriction may be lifted in the future, but for now
-remains as an avenue for adding additional functionality.
+In I<no> case should the signature letters be separated by whitespace. This
+restriction may be lifted in the future, but for now remains as an avenue for
+adding additional functionality.
 
 =over 4
 
 =item v
 
-Void. As a return type indicates that there I<is> no return type. As
-a parameter indicates that there are no parameters. Can't be mixed
-with other parameter types.
+Void. As a return type indicates that there I<is> no return type. As a
+parameter indicates that there are no parameters. Can't be mixed with other
+parameter types.
 
 =item c
 
-Char. This is an integer type, taken from (or put into) an I register.
-NOTE: it might be signed or unsigned because that is how an unadorned
-C 'char' works.
+Char. This is an integer type, taken from (or put into) an I register. NOTE: it
+might be signed or unsigned because that is how an unadorned C 'char' works.
 
 =item s
 
-short. An integer type, taken from or put into an I register.
-It is always signed, not unsigned.
+short. An integer type, taken from or put into an I register. It is always
+signed, not unsigned.
 
 =item i
 
-int. An integer type.
-It is always signed, not unsigned.
+int. An integer type. It is always signed, not unsigned.
 
 =item l
 
-long. An integer type. You know the drill.
-It is always signed, not unsigned.
+long. An integer type. You know the drill. It is always signed, not unsigned.
 
 =item f
 
@@ -94,35 +87,35 @@ A PMC register.
 
 =item p
 
-PMC thingie. A generic pointer, taken from or stuck into a PMC's
-data pointer. If this is a return type, parrot will create a new
-UnManagedStruct PMC type, which is just a generic "pointer to some
-damn thing or other" PMC type which Parrot does I<no> management of.
+PMC thingie. A generic pointer, taken from or stuck into a PMC's data pointer.
+If this is a return type, parrot will create a new UnManagedStruct PMC type,
+which is just a generic "pointer to some damn thing or other" PMC type which
+Parrot does I<no> management of.
 
 =item 2
 
-A pointer to a short, taken from an P register of an int-like PMC.
-On return from NCI, the PMC_int_val will hold the new value.
+A pointer to a short, taken from an P register of an int-like PMC. On return
+from NCI, the PMC_int_val will hold the new value.
 
 =item 3
 
-A pointer to an int, taken from an P register of an int-like PMC.
-On return from NCI, the PMC_int_val will hold the new value.
+A pointer to an int, taken from an P register of an int-like PMC. On return
+from NCI, the PMC_int_val will hold the new value.
 
 =item 4
 
-A pointer to a long, taken from an P register of an int-like PMC.
-On return from NCI, the PMC_int_val will hold the new value.
+A pointer to a long, taken from an P register of an int-like PMC. On return
+from NCI, the PMC_int_val will hold the new value.
 
 =item t
 
-string pointer. Taken from, or stuck into, a string
-register. (Converted to a null-terminated C string before passing in)
+string pointer. Taken from, or stuck into, a string register. (Converted to a
+null-terminated C string before passing in)
 
 =item U
 
-This parameter is used for passing user data to a callback creation.
-More explanation in the L<callbacks> section.
+This parameter is used for passing user data to a callback creation. More
+explanation in the L<callbacks> section.
 
 =back
 
@@ -130,56 +123,55 @@ Note that not all types are valid as return types.
 
 =head2 Examples
 
-Most of the function parameters are reasonably self-evident. Some,
-however, merit additional explanation. The
+Most of the function parameters are reasonably self-evident. Some, however,
+merit additional explanation. The
 
 =head2 Callbacks
 
-Some libraries, particularly ones implementing more complex
-functionality such as databases or GUIs, want callbacks, that is ways
-to call a function under the control of the library rather than under
-control of the interpreter. These functions must be C functions, and
-generally are passed parameters to indicate what should be done.
+Some libraries, particularly ones implementing more complex functionality such
+as databases or GUIs, want callbacks, that is ways to call a function under the
+control of the library rather than under control of the interpreter. These
+functions must be C functions, and generally are passed parameters to indicate
+what should be done.
 
-Unfortunately there's no good way to generically describe all
-possible callback parameter sets, so in some cases hand-written C
-will be necessary. However, many callback functions share a common
-signature, and parrot provides some ready-made functions for this
-purpose that should serve for most of the callback uses.
+Unfortunately there's no good way to generically describe all possible callback
+parameter sets, so in some cases hand-written C will be necessary. However,
+many callback functions share a common signature, and parrot provides some
+ready-made functions for this purpose that should serve for most of the
+callback uses.
 
-There are two callback functions, Parrot_callback_C and
-Parrot_callback_D, which differ if the passed in C<user_data> is
-second or first respectively:
+There are two callback functions, Parrot_callback_C and Parrot_callback_D,
+which differ if the passed in C<user_data> is second or first respectively:
 
    void (function *)(void *library_data, void *user_data);
 
    void (function *)(void *user_data, void *library_data);
 
-The information C<library_data> is normally coming from C code and
-can be any C type that Parrot supports as NCI value.
+The information C<library_data> is normally coming from C code and can be any C
+type that Parrot supports as NCI value.
 
-The position of the C<user_data> is specified with the C<U> function
-signature, when creating the callback PMC:
+The position of the C<user_data> is specified with the C<U> function signature,
+when creating the callback PMC:
 
   cb_PMC = new_callback cb_Sub, user_data, "tU"
 
-Given a Parrot function C<cb_Sub>, and a C<user_data> PMC, this creates
-a callback PMC C<cb_PMC>, which expects the user data as the second argument.
-The information returned by the callback (C<library_data>) is a C string.
+Given a Parrot function C<cb_Sub>, and a C<user_data> PMC, this creates a
+callback PMC C<cb_PMC>, which expects the user data as the second argument. The
+information returned by the callback (C<library_data>) is a C string.
 
-Since parrot needs more than just a pointer to a generic function to
-figure out what to do, it stuffs all the extra information into the
-C<user_data> pointer, which contains a custom PMC holding all the
-information that Parrot needs. This also implies that the C function
-that installs the callback, must not make any assumptions on the C<user_data>
-argument. This argument must be handled transparently by the C code.
+Since parrot needs more than just a pointer to a generic function to figure out
+what to do, it stuffs all the extra information into the C<user_data> pointer,
+which contains a custom PMC holding all the information that Parrot needs. This
+also implies that the C function that installs the callback, must not make any
+assumptions on the C<user_data> argument. This argument must be handled
+transparently by the C code.
 
-The callback function takes care of wrapping the external data
-pointer into an UnManagedStruct PMC, the same as if it were a p
-return type of a normal NCI function.
+The callback function takes care of wrapping the external data pointer into an
+UnManagedStruct PMC, the same as if it were a p return type of a normal NCI
+function.
 
-The signature of the I<parrot> subroutine which is called by the
-callback should be:
+The signature of the I<parrot> subroutine which is called by the callback
+should be:
 
    void parrotsub(PMC user_data, <type> external_data)
 
@@ -202,8 +194,8 @@ Register the callback
 
 =back
 
-When the callback function is invoked by the external library, the
-function itself should look like:
+When the callback function is invoked by the external library, the function
+itself should look like:
 
   .sub _my_callback prototyped
     .param pmc my_data
@@ -211,9 +203,9 @@ function itself should look like:
     # Do something with the passed in data
   .end
 
-Parrot itself handles all the nasty bits involved in collecting up
-the interpreter pointer, creating the wrapping PMCs, stuffing data
-various places, and generally dealing with the bookkeeping.
+Parrot itself handles all the nasty bits involved in collecting up the
+interpreter pointer, creating the wrapping PMCs, stuffing data various places,
+and generally dealing with the bookkeeping.
 
 =head1 REFERENCES
 

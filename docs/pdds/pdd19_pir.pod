@@ -4,13 +4,13 @@ docs/pdds/pdd19_pir.pod - Parrot Intermediate Representation
 
 =head1 ABSTRACT
 
-This PDD describes PIR, a stable, middle-level language for both compiler
-and human to target on.
+This PDD describes PIR, a stable, middle-level language for both compiler and
+human to target on.
 
 =head1 DESCRIPTION
 
-XXX - Currently under-specified.  We need to move the actively supported
-parts of F<docs/imcc/syntax.pod> here.
+XXX - Currently under-specified.  We need to move the actively supported parts
+of F<docs/imcc/syntax.pod> here.
 
 =head1 VERSION
 

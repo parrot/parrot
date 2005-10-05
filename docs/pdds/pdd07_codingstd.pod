@@ -3,34 +3,33 @@
 
 =head1 NAME
 
-docs/pdds/pdd07_codingstd.pod - Conventions and Guidelines for Parrot Source Code
+docs/pdds/pdd07_codingstd.pod - Conventions and Guidelines for Parrot Source
+Code
 
 =head1 ABSTRACT
 
-This document describes the various rules, guidelines and advice for
-those wishing to contribute to the source code of Parrot, in such areas
-as code structure, naming conventions, comments etc.
+This document describes the various rules, guidelines and advice for those
+wishing to contribute to the source code of Parrot, in such areas as code
+structure, naming conventions, comments etc.
 
 =head1 DESCRIPTION
 
-One of the criticisms of Perl 5 is that its source code is
-impenetrable to newcomers, due to such things as inconsistent or
-obscure variable naming conventions, lack of comments in the source
-code, and so on.  We don't intend to make the same mistake when writing
-Parrot. Hence this document.
+One of the criticisms of Perl 5 is that its source code is impenetrable to
+newcomers, due to such things as inconsistent or obscure variable naming
+conventions, lack of comments in the source code, and so on.  We don't intend
+to make the same mistake when writing Parrot. Hence this document.
 
-We define three classes of conventions. Those that say I<must> are
-mandatory, and code will not be accepted (apart from in exceptional
-circumstances) unless it follows these rules. Those that say I<should>
-are strong guidelines that should normally be followed unless there
-is a sensible reason to do otherwise.  Finally, those that say I<may>,
-are tentative suggestions to be used at your discretion.
+We define three classes of conventions. Those that say I<must> are mandatory,
+and code will not be accepted (apart from in exceptional circumstances) unless
+it follows these rules. Those that say I<should> are strong guidelines that
+should normally be followed unless there is a sensible reason to do otherwise. 
+Finally, those that say I<may>, are tentative suggestions to be used at your
+discretion.
 
-Note this particular PDD makes some recommendations that are
-specific to the C programming language. This does not preclude Parrot 
-(or Perl 6) being implemented in other languages, but in this case, 
-additional PDDs may need to be authored for the extra language-specific 
-features.
+Note this particular PDD makes some recommendations that are specific to the C
+programming language. This does not preclude Parrot  (or Perl 6) being
+implemented in other languages, but in this case,  additional PDDs may need to
+be authored for the extra language-specific  features.
 
 =head1 IMPLEMENTATION
 
@@ -42,15 +41,15 @@ The following I<must> apply:
 
 =item *
 
-4 column indents for code and 2 column indents for nested CPP #directives.
-All indentation must consist of spaces, no tabs (for ease of patching).
+4 column indents for code and 2 column indents for nested CPP #directives. All
+indentation must consist of spaces, no tabs (for ease of patching).
 
-There are two exceptions to the CPP indenting- neither PARROT_IN_CORE nor
-the outermost _GUARD #ifdefs cause the level of indenting to increase.
+There are two exceptions to the CPP indenting- neither PARROT_IN_CORE nor the
+outermost _GUARD #ifdefs cause the level of indenting to increase.
 
 To ensure that tabs aren't inadvertently used for indentation, the following
-boilerplate code must appear at the bottom of each source file. (This
-rule may be rescinded if I'm ever threatened with a lynching....)
+boilerplate code must appear at the bottom of each source file. (This rule may
+be rescinded if I'm ever threatened with a lynching....)
 
    /*
     * Local variables:
@@ -73,13 +72,13 @@ ANSI C function prototypes
 
 =item *
 
-"K&R" style for indenting control constructs: ie the closing C<}> should
-line up with the opening C<if> etc.
+"K&R" style for indenting control constructs: ie the closing C<}> should line
+up with the opening C<if> etc.
 
 =item *
 
-When a conditional spans multiple lines, the opening C<{> must line up
-with the C<if> or C<while>, or be at the end-of-line otherwise.
+When a conditional spans multiple lines, the opening C<{> must line up with the
+C<if> or C<while>, or be at the end-of-line otherwise.
 
 =item *
 
@@ -91,30 +90,29 @@ No C++ style comments (C<//>): some C compilers may choke on them
 
 =item *
 
-Mark places that need to be revisited with XXX (and preferably your
-initials too), and revisit often!
+Mark places that need to be revisited with XXX (and preferably your initials
+too), and revisit often!
 
 =item *
 
-In function definitions, the name starts in column 0, with the
-return type on the previous line.
+In function definitions, the name starts in column 0, with the return type on
+the previous line.
 
 =item *
 
-However, in function declarations (in header files) the return type is kept
-on the same line.
+However, in function declarations (in header files) the return type is kept on
+the same line.
 
 =item *
 
-Variable names should be included for all function parameters in the
-function declarations.  These names should match the parameters in the
-function definition.
+Variable names should be included for all function parameters in the function
+declarations.  These names should match the parameters in the function
+definition.
 
 =item *
 
-Single space after keywords that are followed by C<()>, eg
-C<return (x+y)*2>, but no space between function name and following C<()>,
-eg C<z = foo(x+y)*2>
+Single space after keywords that are followed by C<()>, eg C<return (x+y)*2>,
+but no space between function name and following C<()>, eg C<z = foo(x+y)*2>
 
 =back
 
@@ -136,8 +134,8 @@ C<if (!foo) ...> rather than C<if (foo == FALSE) ...> etc.
 
 =item *
 
-Avoid assignments in conditionals, but if they're unavoidable, use
-Extra paren, e.g. C<if (a && (b = c)) ...>
+Avoid assignments in conditionals, but if they're unavoidable, use Extra paren,
+e.g. C<if (a && (b = c)) ...>
 
 =item *
 
@@ -145,22 +143,22 @@ Avoid double negatives, eg C<#ifndef NO_FEATURE_FOO>
 
 =item *
 
-Binary operators should have a space on either side; parentheses should
-not have space immediately after the opening paren nor immediately before
-the closing paren, commas should have space after but not before, eg
+Binary operators should have a space on either side; parentheses should not
+have space immediately after the opening paren nor immediately before the
+closing paren, commas should have space after but not before, eg
 
         x = (a + b) * f(c, d / e)
 
 =item *
 
-Long lines should be split before an operator so that it is immediately
-obvious when scanning the LHS of the code that this has happened, and two
-extra levels of indent should be used.
+Long lines should be split before an operator so that it is immediately obvious
+when scanning the LHS of the code that this has happened, and two extra levels
+of indent should be used.
 
 =item *
 
-and/or split on matching parens, with the content on separate line(s) and
-with one extra indent:
+and/or split on matching parens, with the content on separate line(s) and with
+one extra indent:
 
     do_arbitrary_function(
         list_of_parameters_with_long_names, or_complex_subexpression(
@@ -170,8 +168,8 @@ with one extra indent:
 
 =back
 
-To enforce the spacing, indenting, and bracing guidelines mentioned
-above, the following arguments to GNU Indent should be used:
+To enforce the spacing, indenting, and bracing guidelines mentioned above, the
+following arguments to GNU Indent should be used:
 
    -kr -nce -sc -cp0 -l79 -lc79 -psl -nut -cdw -ncs -lps
 
@@ -325,8 +323,8 @@ Leave a procedure declaration's return type alone (.h files)
 
 =back
 
-Please note that it is also necessary to include all typedef types
-with the "-T" option to ensure that everything is formatted properly.
+Please note that it is also necessary to include all typedef types with the
+"-T" option to ensure that everything is formatted properly.
 
 A script (F<tools/dev/run_indent.pl>) is provided which runs F<indent> 
 properly automatically.
@@ -338,83 +336,77 @@ properly automatically.
 =item Subsystems and APIs
 
 The Parrot core will be split into a number of subsystems, each with an
-associated API. For the purposes of naming files, data structures, etc,
-each subsystem will be assigned a short nickname, eg I<pmc>, I<gc>, I<io>.
-All code within the core will belong to a subsystem; miscellaneous code
-with no obvious home will be placed in the special subsystem called
-I<misc>.
+associated API. For the purposes of naming files, data structures, etc, each
+subsystem will be assigned a short nickname, eg I<pmc>, I<gc>, I<io>. All code
+within the core will belong to a subsystem; miscellaneous code with no obvious
+home will be placed in the special subsystem called I<misc>.
 
 =item Filenames
 
-Filenames must be assumed to be case-insensitive, in the sense that
-that you may not have two different files called F<Foo> and F<foo>. Normal
-source-code filenames should be all lower-case; filenames with
-upper-case letters in them are reserved for notice-me-first files such
-as F<README>, and for files which need some sort of pre-processing applied
-to them or which do the preprocessing - eg a script F<foo.SH> might
-read F<foo.TEMPLATE> and output F<foo.c>.
+Filenames must be assumed to be case-insensitive, in the sense that that you
+may not have two different files called F<Foo> and F<foo>. Normal source-code
+filenames should be all lower-case; filenames with upper-case letters in them
+are reserved for notice-me-first files such as F<README>, and for files which
+need some sort of pre-processing applied to them or which do the preprocessing
+- eg a script F<foo.SH> might read F<foo.TEMPLATE> and output F<foo.c>.
 
 The characters making up filenames must be chosen from the ASCII set
 A-Z,a-z,0-9 plus .-_
 
-An underscore should be used to separate words rather than a hyphen
-(-).  A file should not normally have more than a single '.' in it, and
-this should be used to denote a suffix of some description. The
-filename must still be unique if the main part is truncated to 8
-characters and any suffix truncated to 3 characters. Ideally, filenames
-should restricted to 8.3 in the first place, but this is not
-essential.
+An underscore should be used to separate words rather than a hyphen (-).  A
+file should not normally have more than a single '.' in it, and this should be
+used to denote a suffix of some description. The filename must still be unique
+if the main part is truncated to 8 characters and any suffix truncated to 3
+characters. Ideally, filenames should restricted to 8.3 in the first place, but
+this is not essential.
 
-Each subsystem I<foo> should supply the following files. This arrangement
-is based on the assumption that each subsystem will - as far as is
-practical - present an opaque interface to all other subsystems within the
-core, as well as to extensions and embeddings.
+Each subsystem I<foo> should supply the following files. This arrangement is
+based on the assumption that each subsystem will - as far as is practical -
+present an opaque interface to all other subsystems within the core, as well as
+to extensions and embeddings.
 
 =over 4
 
 =item foo.h
 
-This contains all the declarations needed for external users of that
-API (and nothing more), ie it defines the API. It is permissible for
-the API to include different or extra functionality when used by other
-parts of the core, compared with its use in extensions and embeddings.
-In this case, the extra stuff within the file is enabled by testing for
-the macro C<PERL_IN_CORE>.
+This contains all the declarations needed for external users of that API (and
+nothing more), ie it defines the API. It is permissible for the API to include
+different or extra functionality when used by other parts of the core, compared
+with its use in extensions and embeddings. In this case, the extra stuff within
+the file is enabled by testing for the macro C<PERL_IN_CORE>.
 
 =item foo_private.h
 
-This contains declarations used internally by that subsystem, and which
-must only be included within source files associated the subsystem.
-This file defines the macro C<PERL_IN_FOO> so that code knows when it is
-being used within that subsystem. The file will also contain all the
-'convenience' macros used to define shorter working names for functions
-without the perl prefix (see below).
+This contains declarations used internally by that subsystem, and which must
+only be included within source files associated the subsystem. This file
+defines the macro C<PERL_IN_FOO> so that code knows when it is being used
+within that subsystem. The file will also contain all the 'convenience' macros
+used to define shorter working names for functions without the perl prefix (see
+below).
 
 =item foo_globals.h
 
-This file contains the declaration of a single structure containing the
-private global variables used by the subsystem (see the section on
-globals below for more details).
+This file contains the declaration of a single structure containing the private
+global variables used by the subsystem (see the section on globals below for
+more details).
 
 =item foo.sym
 
-This file (format and contents TBD) contains information about global
-symbols associated with the subsystem, and may be used by scripts to
-auto-generate such stuff as the include files mentioned above, linker
-map tables, documentation etc, based upon portability and extensibility
-requirements.
+This file (format and contents TBD) contains information about global symbols
+associated with the subsystem, and may be used by scripts to auto-generate such
+stuff as the include files mentioned above, linker map tables, documentation
+etc, based upon portability and extensibility requirements.
 
 =item foo_bar.[ch] etc
 
-All other source files associated with the subsystem will have the prefix
-foo_
+All other source files associated with the subsystem will have the prefix foo_
 
 =back
 
 =item Header Files
 
 All .h files should include the following "guards" to prevent
-multiple-inclusion: 
+multiple-inclusion:
 
     /* file header comments */
 
@@ -434,9 +426,9 @@ local ones) should all follow these general guidelines.
 
 =item *
 
-Multiple words or components should be separated with underscores rather
-than using tricks such as capitalization, eg C<new_foo_bar> rather than
-C<NewFooBar> or (gasp) C<newfoobar>.
+Multiple words or components should be separated with underscores rather than
+using tricks such as capitalization, eg C<new_foo_bar> rather than C<NewFooBar>
+or (gasp) C<newfoobar>.
 
 =item *
 
@@ -446,23 +438,22 @@ abbreviations wherever possible.
 
 =item *
 
-All entities should be prefixed with the name of the subsystem they appear
-in, eg C<pmc_foo()>, C<struct io_bar>. They should be further prefixed
-with the word 'perl' if they have external visibility or linkage,
-namely, non-static functions, plus macros and typedefs etc which appear
-in public header files. (Global variables are handled specially; see below.)
-For example:
+All entities should be prefixed with the name of the subsystem they appear in,
+eg C<pmc_foo()>, C<struct io_bar>. They should be further prefixed with the
+word 'perl' if they have external visibility or linkage, namely, non-static
+functions, plus macros and typedefs etc which appear in public header files.
+(Global variables are handled specially; see below.) For example:
 
     perlpmc_foo()
     struct perlio_bar
     typedef struct perlio_bar Perlio_bar
     #define PERLPMC_readonly_TEST ...
 
-In the specific case of the use of global variables and functions
-within a subsystem, convenience macros will be defined (in
-foo_private.h) that allow use of the shortened name in the case of
-functions (ie C<pmc_foo()> instead of C<perlpmc_foo()>), and hide the
-real representation in the case of global variables.
+In the specific case of the use of global variables and functions within a
+subsystem, convenience macros will be defined (in foo_private.h) that allow use
+of the shortened name in the case of functions (ie C<pmc_foo()> instead of
+C<perlpmc_foo()>), and hide the real representation in the case of global
+variables.
 
 
 =item *
@@ -471,34 +462,33 @@ Variables and structure names should be all lower-case, eg C<pmc_foo>.
 
 =item *
 
-Structure elements should be all lower-case, and the first component of
-the name should incorporate the structure's name or an abbreviation of it.
+Structure elements should be all lower-case, and the first component of the
+name should incorporate the structure's name or an abbreviation of it.
 
 =item *
 
-Typedef names should be lower-case except for the first letter, eg
-C<Foo_bar>. The exception to this is when the first component is a
-short abbreviation, in which case the whole first component may be made
-uppercase for readability purposes, eg C<IO_foo> rather than
-C<Io_foo>.  Structures should generally be typedefed.
+Typedef names should be lower-case except for the first letter, eg C<Foo_bar>.
+The exception to this is when the first component is a short abbreviation, in
+which case the whole first component may be made uppercase for readability
+purposes, eg C<IO_foo> rather than C<Io_foo>.  Structures should generally be
+typedefed.
 
 =item *
 
-Macros should have their first component uppercase, and the majority
-of the remaining components should be likewise. Where there is a family
-of macros, the variable part can be indicated in lowercase, eg
-C<PMC_foo_FLAG>, C<PMC_bar_FLAG>, ....
+Macros should have their first component uppercase, and the majority of the
+remaining components should be likewise. Where there is a family of macros, the
+variable part can be indicated in lowercase, eg C<PMC_foo_FLAG>,
+C<PMC_bar_FLAG>, ....
 
 =item *
 
 A macro which defines a flag bit should be suffixed with C<_FLAG>, eg
-C<PMC_readonly_FLAG> (although you probably want to use an C<enum>
-instead.)
+C<PMC_readonly_FLAG> (although you probably want to use an C<enum> instead.)
 
 =item *
 
-A macro which tests a flag bit should be suffixed with C<_TEST>, eg
-C<if (PMC_readonly_TEST(foo)) ...>
+A macro which tests a flag bit should be suffixed with C<_TEST>, eg C<if
+(PMC_readonly_TEST(foo)) ...>
 
 =item *
 
@@ -512,41 +502,38 @@ C<PMC_readonly_CLEAR(foo);>
 
 =item *
 
-A macro defining a mask of flag bits should be suffixed with C<_MASK>,
-eg C<foo &= ~PMC_STATUS_MASK> (but see notes on extensibility below).
+A macro defining a mask of flag bits should be suffixed with C<_MASK>, eg C<foo
+&= ~PMC_STATUS_MASK> (but see notes on extensibility below).
 
 =item *
 
 Macros can be defined to cover common flag combinations, in which case they
-should have C<_SETALL>, C<CLEARALL>, C<_TESTALL> or <_TESTANY> suffixes
-as appropriate, to indicate aggregate bits, eg
-C<PMC_valid_CLEARALL(foo)>
+should have C<_SETALL>, C<CLEARALL>, C<_TESTALL> or <_TESTANY> suffixes as
+appropriate, to indicate aggregate bits, eg C<PMC_valid_CLEARALL(foo)>
 
 =item *
 
-A macro defining an auto-configuration value should be prefixed with
-C<HAS_>, eg C<HAS_BROKEN_FLOCK>, C<HAS_EBCDIC>.
+A macro defining an auto-configuration value should be prefixed with C<HAS_>,
+eg C<HAS_BROKEN_FLOCK>, C<HAS_EBCDIC>.
 
 =item *
 
-A macro indicating the compilation 'location' should be prefixed with
-C<IN_>, eg C<PERL_IN_CORE>, C<PERL_IN_PMC>, C<PERL_IN_X2P>. Individual
-include file visitations should be marked with C<PERL_IN_FOO_H> for
-file foo.h
+A macro indicating the compilation 'location' should be prefixed with C<IN_>,
+eg C<PERL_IN_CORE>, C<PERL_IN_PMC>, C<PERL_IN_X2P>. Individual include file
+visitations should be marked with C<PERL_IN_FOO_H> for file foo.h
 
 =item *
 
-A macro indicating major compilation switches should be prefixed with
-C<USE_>, eg C<PERL_USE_STDIO>, C<USE_MULTIPLICITY>.
+A macro indicating major compilation switches should be prefixed with C<USE_>,
+eg C<PERL_USE_STDIO>, C<USE_MULTIPLICITY>.
 
 =item *
 
-A macro that may declare stuff and thus needs to be at the start of a
-block should be prefixed with C<DECL_>, eg C<DECL_SAVE_STACK>. Note
-that macros which implicitly declare and then use variables are strongly
-discouraged, unless it is essential for portability or extensibility.
-The following are in decreasing preference style-wise, but increasing
-preference extensibility-wise.
+A macro that may declare stuff and thus needs to be at the start of a block
+should be prefixed with C<DECL_>, eg C<DECL_SAVE_STACK>. Note that macros which
+implicitly declare and then use variables are strongly discouraged, unless it
+is essential for portability or extensibility. The following are in decreasing
+preference style-wise, but increasing preference extensibility-wise.
 
     { Stack sp = GETSTACK;  x = POPSTACK(sp) ... /* sp is an auto variable */
     { DECL_STACK(sp);  x = POPSTACK(sp); ... /* sp may or may not be auto */
@@ -557,27 +544,26 @@ preference extensibility-wise.
 
 =item Global Variables
 
-Global variables must never be accessed directly outside the subsystem
-in which they are used. Some other method, such as accessor functions,
-must be provided by that subsystem's API. (For efficiency the 'accessor
-functions' may occasionally actually be macros, but then the rule still
-applies in spirit at least).
+Global variables must never be accessed directly outside the subsystem in which
+they are used. Some other method, such as accessor functions, must be provided
+by that subsystem's API. (For efficiency the 'accessor functions' may
+occasionally actually be macros, but then the rule still applies in spirit at
+least).
 
-All global variables needed for the internal use of a particular
-subsystem should all be declared within a single struct called
-foo_globals for subsystem foo. This structure's declaration is placed
-in the file foo_globals.h. Then somewhere a single compound structure
-will be declared which has as members the individual structures from
-each subsystem. Instances of this structure are then defined as a
-one-off global variable, or as per-thread instances, or whatever is
-required.
+All global variables needed for the internal use of a particular subsystem
+should all be declared within a single struct called foo_globals for subsystem
+foo. This structure's declaration is placed in the file foo_globals.h. Then
+somewhere a single compound structure will be declared which has as members the
+individual structures from each subsystem. Instances of this structure are then
+defined as a one-off global variable, or as per-thread instances, or whatever
+is required.
 
 [Actually, three separate structures may be required, for global,
 per-interpreter and per-thread variables.]
 
-Within an individual subsystem, macros are defined for each global
-variable of the form C<GLOBAL_foo> (the name being deliberately clunky).
-So we might for example have the following macros:
+Within an individual subsystem, macros are defined for each global variable of
+the form C<GLOBAL_foo> (the name being deliberately clunky). So we might for
+example have the following macros:
 
 	/* perl_core.h or similar */
 
@@ -598,29 +584,27 @@ So we might for example have the following macros:
 
 =head2 Code comments
 
-The importance of good code documentation cannot be stressed enough.
-To make your code understandable by others (and indeed by yourself when
-you come to make changes a year later :-), the following conventions
-apply to all source files.
+The importance of good code documentation cannot be stressed enough. To make
+your code understandable by others (and indeed by yourself when you come to
+make changes a year later :-), the following conventions apply to all source
+files.
 
 =over 4
 
 =item Developer files
 
-Each source file (eg a F<foo.c> F<foo.h> pair), should contain inline
-POD documentation containing information on the
-implementation decisions associated with the source file. (Note that
-this is in contrast to PDDs, which describe design decisions). In addition,
-more discussive documentation can be placed in F<*.dev> files in the
-F<docs/dev> directory. This is
-the place for mini-essays on how to avoid overflows in unsigned
-arithmetic, or on the pros and cons of differing hash algorithms, and
-why the current one was chosen, and how it works. 
+Each source file (eg a F<foo.c> F<foo.h> pair), should contain inline POD
+documentation containing information on the implementation decisions associated
+with the source file. (Note that this is in contrast to PDDs, which describe
+design decisions). In addition, more discussive documentation can be placed in
+F<*.dev> files in the F<docs/dev> directory. This is the place for mini-essays
+on how to avoid overflows in unsigned arithmetic, or on the pros and cons of
+differing hash algorithms, and why the current one was chosen, and how it
+works.
 
-In principle, someone coming to a particular source file for the first
-time should be able to read the inline documentation file and gain an immediate
-overview of what the source file is for, the algorithms it implements,
-etc.
+In principle, someone coming to a particular source file for the first time
+should be able to read the inline documentation file and gain an immediate
+overview of what the source file is for, the algorithms it implements, etc.
 
 The POD documentation should follow the standard POD layout:
 
@@ -644,46 +628,42 @@ When appropriate, some simple examples of usage.
 
 =item DESCRIPTION
 
-A description of the contents of the file, how the implementation works,
-data structures and algorithms, and anything that may be of interest to
-your successors, eg benchmarks of differing hash algorithms, essays on
-how to do integer arithmetic.
+A description of the contents of the file, how the implementation works, data
+structures and algorithms, and anything that may be of interest to your
+successors, eg benchmarks of differing hash algorithms, essays on how to do
+integer arithmetic.
 
 =item HISTORY
 
-Record major changes to the file, eg "we moved from a linked list to a
-hash table implementation for storing Foos, as it was found to be much
-faster".
+Record major changes to the file, eg "we moved from a linked list to a hash
+table implementation for storing Foos, as it was found to be much faster".
 
 =item SEE ALSO
 
-Links to pages and books that may contain useful info relevant to the
-stuff going on in the code - eg the book you stole the hash function
-from.
+Links to pages and books that may contain useful info relevant to the stuff
+going on in the code - eg the book you stole the hash function from.
 
 =back
 
 =item Per-section comments
 
-If there is a collection of functions, structures or whatever which are
-grouped together and have a common theme or purpose, there should be a
-general comment at the start of the section briefly explaining their
-overall purpose. (Detailed essays should be left to the developer
-file). If there is really only one section, then the top-of-file
-comment already satisfies this requirement.
+If there is a collection of functions, structures or whatever which are grouped
+together and have a common theme or purpose, there should be a general comment
+at the start of the section briefly explaining their overall purpose. (Detailed
+essays should be left to the developer file). If there is really only one
+section, then the top-of-file comment already satisfies this requirement.
 
 =item Per-entity comments
 
-Every non-local named entity, be it a function, variable, structure,
-macro or whatever, must have an accompanying comment explaining it's
-purpose.  This comment must be in the special format described below,
-in order to allow automatic extraction by tools - for example, to
-generate per API man pages, B<perldoc -f> style utilities and so on.
+Every non-local named entity, be it a function, variable, structure, macro or
+whatever, must have an accompanying comment explaining it's purpose.  This
+comment must be in the special format described below, in order to allow
+automatic extraction by tools - for example, to generate per API man pages,
+B<perldoc -f> style utilities and so on.
 
-Often the comment need only be a single line explaining its purpose,
-but sometimes more explanation may be needed. For example, "return an
-Integer Foo to its allocation pool" may be enough to demystify the
-function C<del_I_foo()>
+Often the comment need only be a single line explaining its purpose, but
+sometimes more explanation may be needed. For example, "return an Integer Foo
+to its allocation pool" may be enough to demystify the function C<del_I_foo()>
 
 Each comment should be of the form
 
@@ -703,10 +683,9 @@ This inline POD documentation is parsed to HTML by running:
 
 =item Optimizations
 
-Whenever code has deliberately been written in an odd way for
-performance reasons, you should point this out - if nothing else, to
-avoid some poor schmuck trying subsequently to replace it with something
-'cleaner'.
+Whenever code has deliberately been written in an odd way for performance
+reasons, you should point this out - if nothing else, to avoid some poor
+schmuck trying subsequently to replace it with something 'cleaner'.
 
     /* The loop is partially unrolled here as it makes it a lot faster.
      * See the .dev file for the full details
@@ -714,11 +693,10 @@ avoid some poor schmuck trying subsequently to replace it with something
 
 =item General comments
 
-While there is no need to go mad commenting every line of code, it is
-immensely helpful to provide a "running commentary" every 10 or so
-lines say; if nothing else, this makes it easy to quickly locate a
-specific chunk of code. Such comments are particularly useful at the top
-of each major branch, eg
+While there is no need to go mad commenting every line of code, it is immensely
+helpful to provide a "running commentary" every 10 or so lines say; if nothing
+else, this makes it easy to quickly locate a specific chunk of code. Such
+comments are particularly useful at the top of each major branch, eg
 
     if (FOO_bar_BAZ(**p+*q) <= (r-s[FOZ & FAZ_MASK]) || FLOP_2(z99)) {
 	/* we're in foo mode: clean up lexicals */
@@ -737,45 +715,43 @@ of each major branch, eg
 
 =head2 Extensibility
 
-If Perl 5 is anything to go by, the lifetime of Perl 6 will be at least
-seven years. During this period, the source code will undergo many
-major changes never envisaged by its original authors - cf threads,
-unicode in perl 5. To this end, your code should balance out the
-assumptions that make things possible, fast or small, with the
-assumptions that make it difficult to change things in future. This is
-especially important for parts of the code which are exposed through
-APIs - the requirements of src or binary compatibility for such things as
-extensions can make it very hard to change things later on.
+If Perl 5 is anything to go by, the lifetime of Perl 6 will be at least seven
+years. During this period, the source code will undergo many major changes
+never envisaged by its original authors - cf threads, unicode in perl 5. To
+this end, your code should balance out the assumptions that make things
+possible, fast or small, with the assumptions that make it difficult to change
+things in future. This is especially important for parts of the code which are
+exposed through APIs - the requirements of src or binary compatibility for such
+things as extensions can make it very hard to change things later on.
 
-For example, if you define suitable macros to set/test flags in a
-struct, then you can later add a second word of flags to the struct
-without breaking source compatibility. (Although you might still break
-binary compatibility if you're not careful.) Of the following two
-methods of setting a common combination of flags, the second doesn't
-assume that all the flags are contained within a single field:
+For example, if you define suitable macros to set/test flags in a struct, then
+you can later add a second word of flags to the struct without breaking source
+compatibility. (Although you might still break binary compatibility if you're
+not careful.) Of the following two methods of setting a common combination of
+flags, the second doesn't assume that all the flags are contained within a
+single field:
 
     foo->flags |= (FOO_int_FLAG | FOO_num_FLAG | FOO_str_FLAG);
     FOO_valid_value_SETALL(foo);
 
-Similarly, avoid using a char* (or {char*,length}) if it is feasible to
-later use a PMC* at the same point: cf UTF-8 hash keys in Perl 5.
+Similarly, avoid using a char* (or {char*,length}) if it is feasible to later
+use a PMC* at the same point: cf UTF-8 hash keys in Perl 5.
 
-Of course, private code hidden behind an API can play more fast and
-loose than code which gets exposed.
+Of course, private code hidden behind an API can play more fast and loose than
+code which gets exposed.
 
 
 =head2 Portability
 
-Related to extensibility is portability. Perl runs on many, many
-platforms, and will no doubt be ported to ever more bizarre and obscure
-ones over time.  You should never assume an operating system, processor
-architecture, endian-ness, word size, or whatever. In particular, don't
-fall into any of the following common traps:
+Related to extensibility is portability. Perl runs on many, many platforms, and
+will no doubt be ported to ever more bizarre and obscure ones over time.  You
+should never assume an operating system, processor architecture, endian-ness,
+word size, or whatever. In particular, don't fall into any of the following
+common traps:
 
-Internal data types and their utility functions (especially for strings)
-should be used over a bare char * whenever possible. Ideally there should
-be no char * in the source anywhere, and no use of C's standard string
-library.
+Internal data types and their utility functions (especially for strings) should
+be used over a bare char * whenever possible. Ideally there should be no char *
+in the source anywhere, and no use of C's standard string library.
 
 Don't assume GNU C, and don't use any GNU extensions unless protected by
 #ifdefs for non-GNU-C builds.
@@ -786,41 +762,37 @@ TBC ... Any contributions welcome !!!
 
 =head2 Performance
 
-We want Perl to be fast. Very fast. But we also want it to be portable
-and extensible. Based on the 90/10 principle, (or 80/20, or 95/5,
-depending on who you speak to), most performance is gained or lost in a
-few small but critical areas of code. Concentrate your optimization
-efforts there.
+We want Perl to be fast. Very fast. But we also want it to be portable and
+extensible. Based on the 90/10 principle, (or 80/20, or 95/5, depending on who
+you speak to), most performance is gained or lost in a few small but critical
+areas of code. Concentrate your optimization efforts there.
 
 Note that the most overwhelmingly important factor in performance is in
-choosing the correct algorithms and data structures in the first place.
-Any subsequent tweaking of code is secondary to this. Also, any
-tweaking that is done should as far as possible be platform
-independent, or at least likely to cause speed-ups in a wide variety of
-environments, and do no harm elsewhere. Only in exceptional
-circumstances should assembly ever even be considered, and then only if
-generic fallback code is made available that can still be used by all
-other non-optimized platforms.
+choosing the correct algorithms and data structures in the first place. Any
+subsequent tweaking of code is secondary to this. Also, any tweaking that is
+done should as far as possible be platform independent, or at least likely to
+cause speed-ups in a wide variety of environments, and do no harm elsewhere.
+Only in exceptional circumstances should assembly ever even be considered, and
+then only if generic fallback code is made available that can still be used by
+all other non-optimized platforms.
 
-Probably the dominant factor (circa 2001) that effects processor
-performance is the cache. Processor clock rates have increased far in
-excess of main memory access rates, and the only way for the
-processor to proceed without stalling is for most of the data items it
-needs to be found to hand in the cache. It is reckoned that even a 2%
-cache miss rate can cause a slowdown in the region of 50%. It is for
-this reason that algorithms and data structures must be designed to be
-'cache-friendly'.
+Probably the dominant factor (circa 2001) that effects processor performance is
+the cache. Processor clock rates have increased far in excess of main memory
+access rates, and the only way for the processor to proceed without stalling is
+for most of the data items it needs to be found to hand in the cache. It is
+reckoned that even a 2% cache miss rate can cause a slowdown in the region of
+50%. It is for this reason that algorithms and data structures must be designed
+to be 'cache-friendly'.
 
-A typical cache may have a block size of anywhere between 4 and 256
-bytes.  When a program attempts to read a word from memory and the word
-is already in the cache, then processing continues unaffected.
-Otherwise, the processor is typically stalled while a whole contiguous
-chunk of main memory is read in and stored in a cache block. Thus,
-after incurring the initial time penalty, you then get all the memory
-adjacent to the initially read data item for free.  Algorithms that make
-use of this fact can experience quite dramatic speedups.  For example,
-the following pathological code ran four times faster on my machine by
-simply swapping C<i> and C<j>.
+A typical cache may have a block size of anywhere between 4 and 256 bytes. 
+When a program attempts to read a word from memory and the word is already in
+the cache, then processing continues unaffected. Otherwise, the processor is
+typically stalled while a whole contiguous chunk of main memory is read in and
+stored in a cache block. Thus, after incurring the initial time penalty, you
+then get all the memory adjacent to the initially read data item for free. 
+Algorithms that make use of this fact can experience quite dramatic speedups. 
+For example, the following pathological code ran four times faster on my
+machine by simply swapping C<i> and C<j>.
 
     int a[1000][1000];
 
@@ -833,34 +805,32 @@ simply swapping C<i> and C<j>.
         }
     }
 
-This all boils down to: keep things near to each other that get
-accessed at around the same time. (This is why the important
-optimizations occur in data structure and algorithm design rather than
-in the detail of the code.) This rule applies both to the layout of
-different objects relative to each other, and to the relative
-positioning of individual fields within a single structure.
+This all boils down to: keep things near to each other that get accessed at
+around the same time. (This is why the important optimizations occur in data
+structure and algorithm design rather than in the detail of the code.) This
+rule applies both to the layout of different objects relative to each other,
+and to the relative positioning of individual fields within a single structure.
 
-If you do put an optimization in, time it on as many architectures as
-you can, and be suspicious of it if it slows down on any of them! Perhaps
-it will be slow on other architectures too (current and future).
-Perhaps it wasn't so clever after all? If the optimization is platform
-specific, you should probably put it in a platform-specific function in
-a platform-specific file, rather than cluttering the main source with
-zillions of #ifdefs.
+If you do put an optimization in, time it on as many architectures as you can,
+and be suspicious of it if it slows down on any of them! Perhaps it will be
+slow on other architectures too (current and future). Perhaps it wasn't so
+clever after all? If the optimization is platform specific, you should probably
+put it in a platform-specific function in a platform-specific file, rather than
+cluttering the main source with zillions of #ifdefs.
 
 And remember to document it.
 
-Loosely speaking, Perl tends to optimism for speed rather than space,
-so you may want to code for speed first, then tweak to reclaim some
-space while not affecting performance.
+Loosely speaking, Perl tends to optimism for speed rather than space, so you
+may want to code for speed first, then tweak to reclaim some space while not
+affecting performance.
 
 =head1 REFERENCES
 
 
-The section on coding style is based on Perl5's F<Porting/patching.pod>
-by Daniel Grisinger. The section on naming conventions grew from some
-suggestions by Paolo Molaro <lupus@lettere.unipd.it>. Other snippets
-came from various P5Pers. The rest of it is probably my fault.
+The section on coding style is based on Perl5's F<Porting/patching.pod> by
+Daniel Grisinger. The section on naming conventions grew from some suggestions
+by Paolo Molaro <lupus@lettere.unipd.it>. Other snippets came from various
+P5Pers. The rest of it is probably my fault.
 
 =head1 VERSION
 
