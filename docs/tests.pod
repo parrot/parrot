@@ -57,6 +57,7 @@ friends.
 =head2 C source tests
 
 C source tests are usually located in F<t/src/*.t>.  A simple test looks like:  
+
     c_output_is(<<'CODE', <<'OUTPUT', "name for test");
     #include <stdio.h>
     #include "parrot/parrot.h"
