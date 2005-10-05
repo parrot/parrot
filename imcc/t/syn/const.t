@@ -329,10 +329,10 @@ CODE
 OUT
 
 
-pir_output_like(<<'CODE', <<'OUT', "PIR heredoc: rejects terminator with non-word chars", todo => 'specification unclear');
+pir_output_is(<<'CODE', <<'OUT', "PIR heredoc: accepts terminator with non-word chars");
 .sub 'main' :main
     $S0 = <<"#non$word-chars."
-"And, has thou slain the Jabberwock?
+'And, has thou slain the Jabberwock?
   Come to my arms, my beamish boy!
 O frabjous day! Callooh! Callay!'
   He chortled in his joy.
@@ -341,40 +341,72 @@ O frabjous day! Callooh! Callay!'
     print $S0
 .end
 CODE
-/^error:imcc:parse error, unexpected SHIFT_LEFT.*/
+'And, has thou slain the Jabberwock?
+  Come to my arms, my beamish boy!
+O frabjous day! Callooh! Callay!'
+  He chortled in his joy.
 OUT
 
 
-pir_output_like(<<'CODE', <<'OUT', "PIR heredoc: rejects terminator with unprintable chars", todo => 'specification unclear');
+pir_output_is(<<'CODE', <<'OUT', "PIR heredoc: accepts terminator with unprintable chars");
 .sub 'main' :main
-    $S0 = <<"\0"
+    $S0 = <<"\0\1\2\3"
 `Twas brillig, and the slithy toves
   Did gyre and gimble in the wabe;
 All mimsy were the borogoves,
   And the mome raths outgrabe.
-\0
+\0\1\2\3
     print $S0
 .end
 CODE
-/^error:imcc:parse error, unexpected SHIFT_LEFT.*/
+`Twas brillig, and the slithy toves
+  Did gyre and gimble in the wabe;
+All mimsy were the borogoves,
+  And the mome raths outgrabe.
 OUT
 
 
-pir_output_like(<<'CODE', <<'OUT', "PIR heredoc: rejects interpolated terminator", todo => 'specification unclear');
+pir_output_like(<<'CODE', <<'OUT', "PIR heredoc: rejects interpolated terminator");
 .sub 'main' :main
-    $S1 = 'Jabberwocky'
+    $S1 = 'e_e_cummings'
     $S0 = <<$S1
-`Twas brillig, and the slithy toves
-  Did gyre and gimble in the wabe;
-All mimsy were the borogoves,
-  And the mome raths outgrabe.
-Jabberwocky
+l(a
+
+le
+af
+
+fa
+ll
+s)
+
+one
+l
+iness
+e_e_cummings
     print $S0
 .end
 CODE
 /^error:imcc:parse error, unexpected SHIFT_LEFT.*/
+OUT
+
+
+pir_output_is(<<'CODE', <<'OUT', "PIR heredoc: rejects variable interpolation");
+.sub 'main' :main
+    $S0 = 'parrot'
+    print <<"*<:-O"
+Happy Birthday to you,
+Happy Birthday to you.
+Happy Birthday dear $S0,
+Happy Birthday to you!
+*<:-O
+.end
+CODE
+Happy Birthday to you,
+Happy Birthday to you.
+Happy Birthday dear $S0,
+Happy Birthday to you!
 OUT
 
 
 ## remember to change the number of tests!
-BEGIN { plan tests => 20; }
+BEGIN { plan tests => 21; }
