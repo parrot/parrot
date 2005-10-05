@@ -186,23 +186,20 @@ output_is(<<'CODE', <<'OUTPUT', "read on invalid fh should throw exception");
 ok1:
 	print "ok 1\n"
 
-        newsub P20, .Exception_Handler, _readline_handler
-        set_eh P20
+        push_eh _readline_handler
         readline S0, P0 # Currently segfaults
         print "not "
 _readline_handler:
         print "ok 2\n"
 	branch fin
 
-        newsub P20, .Exception_Handler, _read_handler
-        set_eh P20
+        push_eh _read_handler
         read S0, P0, 1
         print "not "
 _read_handler:
         print "ok 3\n"
 
-        newsub P20, .Exception_Handler, _print_handler
-        set_eh P20
+        push_eh _print_handler
         print P0, "kill me now\n"
         print "not "
 _print_handler:

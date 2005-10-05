@@ -129,8 +129,7 @@ CODE
 OUTPUT
 
 output_like(<<'CODE', <<'OUTPUT', "throw - no handler, no message");
-    newsub P20, .Exception_Handler, _handler
-    set_eh P20
+    push_eh _handler
     new P0, .Exception
     clear_eh
     throw P0
@@ -211,8 +210,7 @@ something happend
 OUTPUT
 
 output_is(<<'CODE', <<OUT, "die_hard");
-    newsub P0, .Exception_Handler, _handler
-    set_eh P0
+    push_eh _handler
     die_hard 3, 100
     print "not reached\n"
     end
@@ -224,8 +222,7 @@ caught it
 OUT
 
 output_is(<<'CODE', <<OUT, "die_hard, error, severity");
-    newsub P0, .Exception_Handler, _handler
-    set_eh P0
+    push_eh _handler
     die_hard 3, 100
     print "not reached\n"
     end

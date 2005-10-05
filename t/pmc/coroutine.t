@@ -316,8 +316,7 @@ output_is(<<'CODE', <<'OUTPUT', "Coroutine - exception in main");
 .include "interpinfo.pasm"
 _main:
     newsub P0, .Coroutine, _coro
-    newsub P16, .Exception_Handler, _catchm
-    set_eh P16
+    push_eh _catchm
     new P16, .Integer
     set P16, 2
     store_global "i", P16
@@ -331,8 +330,7 @@ lp:
     print "done\n"
     end
 _coro:
-    newsub P16, .Exception_Handler, _catchc
-    set_eh P16
+    push_eh _catchc
 corolp:
     find_global P17, "i"
     dec P17
@@ -353,8 +351,7 @@ output_is(<<'CODE', <<'OUTPUT', "Coroutine - exception in coro");
 .include "interpinfo.pasm"
 _main:
     newsub P0, .Coroutine, _coro
-    newsub P16, .Exception_Handler, _catchm
-    set_eh P16
+    push_eh _catchm
     new P16, .Integer
     set P16, 2
     store_global "i", P16
@@ -367,8 +364,7 @@ lp:
     print "done\n"
     end
 _coro:
-    newsub P16, .Exception_Handler, _catchc
-    set_eh P16
+    push_eh _catchc
 corolp:
     find_global P17, "i"
     dec P17
@@ -390,8 +386,7 @@ output_is(<<'CODE', <<'OUTPUT', "Coroutine - exception in coro no handler");
 .include "interpinfo.pasm"
 _main:
     newsub P0, .Coroutine, _coro
-    newsub P16, .Exception_Handler, _catchm
-    set_eh P16
+    push_eh _catchm
     new P16, .Integer
     set P16, 2
     store_global "i", P16
@@ -425,8 +420,7 @@ output_is(<<'CODE', <<'OUTPUT', "Coroutine - exception in coro rethrow");
 .include "interpinfo.pasm"
 _main:
     newsub P0, .Coroutine, _coro
-    newsub P16, .Exception_Handler, _catchm
-    set_eh P16
+    push_eh _catchm
     new P16, .Integer
     set P16, 2
     store_global "i", P16
@@ -439,8 +433,7 @@ lp:
     print "done\n"
     end
 _coro:
-    newsub P16, .Exception_Handler, _catchc
-    set_eh P16
+    push_eh _catchc
 corolp:
     find_global P17, "i"
     dec P17

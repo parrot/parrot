@@ -30,11 +30,6 @@ intsave/intrestore/intdepth
 
   use a ResizableIntegerPMC instead and standard keyed access
 
-set_eh
-
-  already dprecated
-  use push_eh
-
 die, die(in INT), die_hard(int INT, in INT)
 
   die is a special case of die_hard, but the name of the latter isn't

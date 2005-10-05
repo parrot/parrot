@@ -159,8 +159,7 @@ output_is(<<'CODE', <<'OUTPUT', "specified constructor method does not exist");
     set P0, "bar"
     setprop P1, "BUILD", P0
 
-    newsub P20, .Exception_Handler, _handler
-    set_eh P20
+    push_eh _handler
 
     find_type I1, "Foo"
     new P3, I1
@@ -442,8 +441,7 @@ SKIP: {
   skip("currently broken", 1);
 output_is(<<'CODE', <<'OUTPUT', "exceptions and different runloops");
 _main:
-    newsub P0, .Exception_Handler, eh
-    set_eh P0
+    push_eh eh
 
     newclass P0, "Foo"
 

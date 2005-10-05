@@ -1125,8 +1125,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "caller introspection");
     print "Bar foo\n"
     $P1 = getinterp
     $I0 = 0
-    newsub $P2, .Exception_Handler, tb_end
-    set_eh $P2
+    push_eh tb_end
 tb_loop:
     $P0 = $P1["sub"; $I0]
     print "caller "

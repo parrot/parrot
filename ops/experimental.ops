@@ -135,21 +135,6 @@ inline op gcd(out INT, out INT, out INT, in INT, in INT) :advanced_math {
 
 ########################################
 
-=item B<set_eh>(in PMC)
-
-Install $1 as an exception handler.
-
-=cut
-
-inline op set_eh(in PMC) {
-  /* use push_eh */
-  push_exception(interpreter, $1);
-  goto NEXT();
-}
-
-
-########################################
-
 =item B<die>()
 
 =item B<die>(in INT)

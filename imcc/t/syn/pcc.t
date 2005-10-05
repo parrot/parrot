@@ -641,8 +641,7 @@ ret0:
 
     ## HERE IS where we want the try block to start ####
     .local Sub handler
-    newsub handler, .Exception_Handler, catch0
-    set_eh handler
+    push_eh catch0
 
     # now call the generator, until that throws 'StopIteration'
     # protect against endless loops

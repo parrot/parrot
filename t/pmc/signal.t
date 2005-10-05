@@ -120,8 +120,7 @@ SKIP: {
 send_SIGHUP;
 
 output_is(<<'CODE', <<'OUTPUT', "SIGHUP event - sleep, catch");
-    newsub P20, .Exception_Handler, _handler
-    set_eh P20
+    push_eh _handler
     print "start\n"
     sleep 2
     print "never\n"

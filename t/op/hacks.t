@@ -33,8 +33,7 @@ SKIP: {
   skip("no universal SIGFPE handling", 2);
 
 output_is(<<'CODE', <<OUT, "catch a SIGFPE");
-    newsub P0, .Exception_Handler, _handler
-    set_eh P0
+    push_eh _handler
     div I10, 0
     print "not reached\n"
     end
@@ -57,8 +56,7 @@ severity 0
 OUT
 
 output_is(<<'CODE', <<OUT, "catch a SIGFPE 2");
-    newsub P0, .Exception_Handler, _handler
-    set_eh P0
+    push_eh _handler
     div I10, 0
     print "not reached\n"
     end
