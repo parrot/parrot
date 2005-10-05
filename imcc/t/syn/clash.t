@@ -14,6 +14,7 @@ nok1:
 	unless $I0 goto ok1
 	print "nok 1\n"
 ok1:
+	null I0
 	if I0, nok2
 	print "ok 2\n"
 nok2:
@@ -37,6 +38,7 @@ nok1:
 	unless $I0 == $I1 goto ok1
 	print "nok 1\n"
 ok1:
+	null I0
 	if I0, nok2
 	print "ok 2\n"
 nok2:
@@ -150,6 +152,7 @@ OUT
 
 pir_output_is(<<'CODE', <<'OUT', "parrot op as label");
 .sub test @MAIN
+	null I0
 	goto set
 set:
 	if I0, err
