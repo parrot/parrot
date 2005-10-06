@@ -15,7 +15,7 @@
 
 badargs:
   pir_code =<<"END_PIR"
-.throw(\"wrong # args: should be \\\"continue\\\"\")
+.throw('wrong # args: should be "continue"')
 END_PIR
 
   .return(register_num,pir_code)
