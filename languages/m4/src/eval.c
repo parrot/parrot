@@ -833,13 +833,13 @@ unescape(char *string)
 PMC *
 compile_m4_arithmetic_expression( Parrot_Interp interp, const char *program )
 {
-    eval_t value;  /* will be returned to caller */
-
+    eval_t value;                        /* will be returned to caller */
     struct PackFile_ByteCode *new_cs;    /* generated PBC goes there */
     struct PackFile_ByteCode *old_cs;    /* Continue there, when new_cs is finished */
     opcode_t* program_counter;
     PMC *sub;
     parrot_sub_t sub_data;
+    char name[64];
 
     /*
      * The real work is done here
@@ -864,7 +864,7 @@ compile_m4_arithmetic_expression( Parrot_Interp interp, const char *program )
     sprintf(name, "EVAL_" INTVAL_FMT, ++interp->code->base.pf->eval_nr);
     new_cs = PF_create_default_segs(interp, name, 0);
     old_cs = Parrot_switch_to_cs(interp, new_cs, 0);
-    interp->imc_info->cur_namespace = NULL;
+    /* TODO gcc complains interp->imc_info->cur_namespace = NULL: */
 
     /*
      * need a packfile segment

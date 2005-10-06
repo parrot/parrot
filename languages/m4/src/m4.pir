@@ -366,19 +366,20 @@ TODO: Pass a flag for EXIT_FAILURE and EXIT_SUCCESS
 
   print "Usage: ../../parrot "
   print program_name
-  print " [OPTION]... FILE\n"
-  print "\n"
-  print "Currently only long options are available.\n"
-  print "\n"
-  print "Operation modes:\n"
-  print "      --help                   display this help and exit\n"
-  print "      --version                output version information and exit\n"
-  print "      --prefix-builtins        force a `m4_' prefix to all builtins\n"
-  print "\n"
-  print "Frozen state files:\n"
-  print "      --freeze-state=FILE      produce a frozen state on FILE at end\n"
-  print "      --reload-state=FILE      reload a frozen state from FILE at start\n"
-  print "\n"
+  print " [OPTION]... FILE\n\n"
+  print <<"END_USAGE"
+Currently only long options are available.
+
+Operation modes:
+      --help                   display this help and exit
+      --version                output version information and exit
+      --prefix-builtins        force a `m4_' prefix to all builtins
+
+Frozen state files:
+      --freeze-state=FILE      produce a frozen state on FILE at end
+      --reload-state=FILE      reload a frozen state from FILE at start
+
+END_USAGE
 
 .end
 

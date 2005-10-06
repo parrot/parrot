@@ -144,27 +144,27 @@ For now we just worry about the flags 'F', 'T' and 'V'.
     # Look for two numbers seperated by a ','
     # We expect at least one digit
     pos = 0
-    rx_is_d content, pos, UNEXPECTED
+    # rc_ is deprecated rx_is_d content, pos, UNEXPECTED
   PERHAPS_ANOTHER_DIGIT_1:
-    rx_is_d content, pos, EXPECT_A_COMMA_1
+    # rc_ is deprecated rx_is_d content, pos, EXPECT_A_COMMA_1
     goto PERHAPS_ANOTHER_DIGIT_1
   EXPECT_A_COMMA_1:
     substr token, content, 0, pos, '' 
     name_len = token
     pos = 0
-    rx_literal content, pos, ',', UNEXPECTED
+    # rx_ is deprecated rx_literal content, pos, ',', UNEXPECTED
     substr content, 0, pos, '' 
     pos = 0
     # We expect at least another digit 
-    rx_is_d content, pos, UNEXPECTED
+    # rc_ is deprecated rx_is_d content, pos, UNEXPECTED
   PERHAPS_ANOTHER_DIGIT_2:
-    rx_is_d content, pos, EXPECT_A_NEWLINE_1
+    # rc_ is deprecated rx_is_d content, pos, EXPECT_A_NEWLINE_1
     goto PERHAPS_ANOTHER_DIGIT_2
   EXPECT_A_NEWLINE_1:
     substr token, content, 0, pos, '' 
     substitution_len = token
     pos = 0
-    rx_literal content, pos, "\n", UNEXPECTED
+    # rx_ is deprecated rx_literal content, pos, "\n", UNEXPECTED
     substr content, 0, pos, '' 
     pos = 0
     # We know the length, so we can extract the strings
@@ -180,7 +180,7 @@ For now we just worry about the flags 'F', 'T' and 'V'.
       printerr "' from frozen file not found in builtin table!\n" 
     BUILTIN_HAS_BEEN_HANDLED:
     pos = 0
-    rx_literal content, pos, "\n", UNEXPECTED
+    # rx_ is deprecated rx_literal content, pos, "\n", UNEXPECTED
     substr content, 0, pos, '' 
     pos = 0
     goto CHECK_PARSING_FINISHED
@@ -190,27 +190,27 @@ For now we just worry about the flags 'F', 'T' and 'V'.
     # Look for two numbers seperated by a ','
     # We expect at least one digit
     pos = 0
-    rx_is_d content, pos, UNEXPECTED
+    # rc_ is deprecated rx_is_d content, pos, UNEXPECTED
   PERHAPS_ANOTHER_DIGIT_3:
-    rx_is_d content, pos, EXPECT_A_COMMA_2
+    # rc_ is deprecated rx_is_d content, pos, EXPECT_A_COMMA_2
     goto PERHAPS_ANOTHER_DIGIT_3
   EXPECT_A_COMMA_2:
     substr token, content, 0, pos, '' 
     name_len = token
     pos = 0
-    rx_literal content, pos, ',', UNEXPECTED
+    # rx_ is deprecated rx_literal content, pos, ',', UNEXPECTED
     substr content, 0, pos, '' 
     pos = 0
     # We expect at least another digit 
-    rx_is_d content, pos, UNEXPECTED
+    # rc_ is deprecated rx_is_d content, pos, UNEXPECTED
   PERHAPS_ANOTHER_DIGIT_4:
-    rx_is_d content, pos, EXPECT_A_NEWLINE_2
+    # rc_ is deprecated rx_is_d content, pos, EXPECT_A_NEWLINE_2
     goto PERHAPS_ANOTHER_DIGIT_4
   EXPECT_A_NEWLINE_2:
     substr token, content, 0, pos, '' 
     substitution_len = token
     pos = 0
-    rx_literal content, pos, "\n", UNEXPECTED
+    # rx_ is deprecated rx_literal content, pos, "\n", UNEXPECTED
     substr content, 0, pos, '' 
     pos = 0
     substr name, content, 0, name_len, '' 
@@ -218,7 +218,7 @@ For now we just worry about the flags 'F', 'T' and 'V'.
     # We know the length, so we can extract the strings
     define_user_macro( state, name, text )
     pos = 0
-    rx_literal content, pos, "\n", UNEXPECTED
+    # rx_ is deprecated rx_literal content, pos, "\n", UNEXPECTED
     substr content, 0, pos, '' 
     pos = 0
     goto CHECK_PARSING_FINISHED
