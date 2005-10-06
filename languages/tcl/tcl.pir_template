@@ -90,7 +90,8 @@ providing a compreg-compatible method.
   load_bytecode "languages/tcl/lib/tclvar.pbc"
   load_bytecode "languages/tcl/lib/tclword.pbc"
   load_bytecode "library/Data/Escape.pbc"
-  load_bytecode "library/PGE.pbc"
+  load_bytecode "Getopt/Long.pir"  
+  #load_bytecode "library/PGE.pbc" # XXX Can't load this if Getopt/Long loaded.
   load_bytecode "library/PGE/Glob.pbc"
 
   #_load_grammar()

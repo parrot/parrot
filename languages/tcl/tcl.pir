@@ -83,10 +83,60 @@ input_loop_continue2:
 
 open_file: 
   tcl_interactive = 0
-  filename = argv[1]
+ 
+
+  # XXX should use getopts or something similar.
+
+  .local pmc get_options
+  get_options = find_global "Getopt::Long", "get_options"
+  
+  .local pmc opt_spec
+  opt_spec = new .Array
+  opt_spec = 2
+  opt_spec[0] = "dump"
+  opt_spec[1] = "e=s"
+
+  .local pmc opt, argv_clone
+  $P1 = shift argv # drop program name.
+  argv_clone = clone argv
+  opt = get_options(argv_clone, opt_spec)
+
+  .local int dump_only, execute
+  dump_only = defined opt["dump"]
+
+  execute = defined opt["e"]
+  if execute goto oneliner
+
+  unless dump_only goto source_file
+
+  print "SHOULD BE DUMPING\n"
+
+source_file:
+  filename = shift argv
+
   push_eh file_error
     source(filename)
   clear_eh
+  goto done
+
+oneliner:
+  .local string tcl_code
+  tcl_code = opt["e"]
+  if dump_only goto oneliner_dump
+  $P1 = find_global "_Tcl", "compile"
+  $P2 = find_global "_Tcl", "pir_compiler"
+  ($I0, $S1) = $P1(0,tcl_code)
+  $P3 = $P2($I0,$S1)
+  push_eh file_error
+    $P3()
+  clear_eh
+  goto done
+
+oneliner_dump:
+  $P1 = find_global "_Tcl", "compile"
+  $P2 = find_global "_Tcl", "pir_compiler"
+  ($I0, $S1) = $P1(0,tcl_code)
+  print $S1
 
 done:
   end
