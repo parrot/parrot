@@ -408,5 +408,20 @@ Happy Birthday to you!
 OUT
 
 
+pir_output_is(<<'CODE', <<'OUT', "PIR heredoc: allow empty lines");
+.sub 'main' :main
+    $S0 = 'parrot'
+    print <<"END_HERE"
+
+The line above is empty.
+END_HERE
+.end
+CODE
+
+The line above is empty.
+OUT
+
+
+
 ## remember to change the number of tests!
-BEGIN { plan tests => 21; }
+BEGIN { plan tests => 22; }
