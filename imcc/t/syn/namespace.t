@@ -115,7 +115,7 @@ OUT
 
 
 
-pir_output_is(<<'CODE', <<'OUT', "rejects unicode namespaces");
+pir_output_is(<<'CODE', <<'OUT', "accepts unicode namespaces", todo => 'not yet implemented');
 .namespace [ "François" ]
 
 .sub '__init'
@@ -129,7 +129,7 @@ pir_output_is(<<'CODE', <<'OUT', "rejects unicode namespaces");
 	$P0()
 .end
 CODE
-Malformed string
+unicode namespaces are fun
 OUT
 
 
