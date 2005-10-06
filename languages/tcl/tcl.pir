@@ -26,6 +26,10 @@
   tcl_interactive = new TclInt
   store_global "Tcl", "$tcl_interactive", tcl_interactive
 
+  .local pmc compiler,pir_compiler
+  compiler = find_global "_Tcl", "compile"
+  pir_compiler = find_global "_Tcl", "pir_compiler"
+
   argc = argv
   if argc > 1 goto open_file
 
@@ -37,10 +41,6 @@
   .local pmc STDIN
   STDIN = getstdin
 
-  .local pmc compiler,pir_compiler
-  compiler = find_global "_Tcl", "compile"
-  pir_compiler = find_global "_Tcl", "pir_compiler"
-  compiler = find_global "_Tcl", "compile"
   input_line = ""
 
   __prompt(1)
@@ -84,9 +84,6 @@ input_loop_continue2:
 open_file: 
   tcl_interactive = 0
  
-
-  # XXX should use getopts or something similar.
-
   .local pmc get_options
   get_options = find_global "Getopt::Long", "get_options"
   
@@ -106,18 +103,41 @@ open_file:
 
   execute = defined opt["e"]
   if execute goto oneliner
+ 
+  .local pmc handle
+  .local string chunk,contents
+file:
+  filename = shift argv_clone
+  $S1="<"
+  handle = open filename, $S1
+  $I0 = typeof handle
+  if $I0 == .Undef goto badfile
+  contents = ""
 
-  unless dump_only goto source_file
+loop:
+  read chunk, handle, 1024
+  if chunk == "" goto gotfile
+  contents = contents . chunk
+  goto loop
 
-  print "SHOULD BE DUMPING\n"
+gotfile:
+  ($I0,$S1) = compiler(0,contents)
+  unless dump_only goto run_file  
+  print $S1
+  goto done
 
-source_file:
-  filename = shift argv
-
+run_file:
+  $P2       = pir_compiler($I0,$S1)
   push_eh file_error
-    source(filename)
+    $P2()
   clear_eh
   goto done
+
+badfile:
+  $S0 = "couldn't read file \""
+  $S0 = $S0 . filename
+  $S0 = $S0 . "\": no such file or directory"
+  .throw($S0)
 
 oneliner:
   .local string tcl_code
