@@ -26,7 +26,7 @@ Generate compiler-variants for several builtins, esp. the flow control
 commands like C<while>. 
 Modify the compiler for tclcommand to generate the inline version if
 it's available. (C<proc> and C<expr> should also be straightforward, as they
-already compile anyway.)  [Completed: incr, break, continue]
+already compile anyway.)  [Completed: incr, break, continue, for]
 
 Note: compiled builtins always take two args: the register_num to begin
 using for the inlined code, and a single container pmc that contains the
@@ -38,12 +38,6 @@ that is, the register_num the result is in, and the inlinable code.
 When an inline compiled version exists, use it, but IFF a global counter
 indicates no procs have been redifined.  Update proc and rename to increment
 this counter whenever they are called.
-
-=item 3
-
-provide a command line to tcl.pbc (C<-o>?) that collects the PIR and dumps it,
-instead of compiling and executing it. Perhaps the option could be smart enough
-to see if it was being sent to a PBC or a PIR output.
 
 =back
 

@@ -2,11 +2,23 @@
 
 .const int MAX_PRECEDENCE =  11
 
-=head1 _Tcl::__expression_parse
+=head1 NAME
 
-Given a string, return an invokable PMC that will generate the appropriate
-value described by this Tcl expression. An intermediate AST is generated,
-and the functions ends with a tailcall to the compiler.
+Tcl Expressions
+
+=head1 DESCRIPTION
+
+This is the parser that deals with all [expr] related code. (Include those used
+implicitly by commands like [while].
+
+=head FUNCTIONS
+
+=item C<(int register_num, string pir_code) = __expression_compile(int register_num, string expr)>
+
+Argument register_num is the first register number that is available for use by the
+generated PIR.
+
+Return register_num is the register number that contains the result of this code.
 
 =cut
 
@@ -21,6 +33,13 @@ and the functions ends with a tailcall to the compiler.
   compiler = find_global "_Tcl", "compile_dispatch"
   .return compiler(ast,register_num)
 .end
+
+=item C<(pmc ast) = __expression_ast(string expr)>
+
+Given a string representing a tcl [expr], return a PMC that represents the abstract
+syntax tree associated with this expression.
+
+=cut
 
 .sub __expression_ast
   .param string expr
@@ -61,7 +80,7 @@ operator:
 
 chunks_done:
 
-=for comment
+=for documentation
 
 Convert the chunks into a stack. For each level of precendence, 
 scan the chunk list for operators that match our level. As we find one, 

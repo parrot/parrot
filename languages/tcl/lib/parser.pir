@@ -16,9 +16,12 @@ at <http://www.tcl.tk/man/tcl8.4/TclCmd/Tcl.htm>.
 
 =item C<(int register_num, string pir_code) = compile(int register_num, string tcl_code)>
 
-Parses the Tcl code and returns an array of TclCommand objects.
-First, it performs the \<newline> substitution. Then it fetches
-commands, one at a time (skipping over comments).
+Parses the Tcl code and returns generated PIR code.
+
+Argument register_num is the first register number that is available for use by the
+generated PIR.
+
+Return register_num is the register number that contains the result of this code.
 
 =cut
 
@@ -91,6 +94,17 @@ done_comment:
 done:
   .return "compile_dispatch"(commands,register_num)
 .end
+
+=item C<(pmc invokable) = pir_compiler(string PIR, int register_num)>
+
+A thin wrapper for the <compreg>'d PIR compiler. 
+Given PIR code, wrap it in anonymous subroutine, compile to bytecode, and return the
+compiled, anonymous sub.
+
+Argument register_num is the first register number that is available for use by the
+generated PIR.
+
+=cut
 
 .sub pir_compiler
   .param int result_reg
@@ -642,10 +656,15 @@ done:
 .end
 
 
-=item C<(int reg_num, str code) = compile(pmc thing, int reg_num)>
+=item C<(int register_num, str code) = compile_dispatch(pmc thing, int register_num)>
 
-Given an object, call its compile method, or assume it's constant
-and generate the code for it.
+Given an object, call its compile method, or, if it's constant, generate
+code on its behalf. Returns PIR code.
+
+Argument register_num is the first register number that is available for use by the
+generated PIR.
+
+Return register_num is the register number that contains the result of this code.
 
 =cut
 
