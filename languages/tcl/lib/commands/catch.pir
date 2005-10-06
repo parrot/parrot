@@ -10,18 +10,21 @@
   argc = argv
 
   .local int retval
-  .local pmc code_retval,parse
+  .local pmc code_retval,compiler,pir_compiler
   .local string varname,sigil_varname,code
 
-  parse = find_global "_Tcl", "parse"
+  compiler = find_global "_Tcl", "compile"
+  pir_compiler = find_global "_Tcl", "pir_compiler"
 
   if argc == 0 goto badargs
   if argc  > 2 goto badargs
 
   code = argv[0]
-  $P1 = parse(code)
+  ($I0,$P1) = compiler(0,code)
+  $P2 = pir_compiler($I0,$P1)
+  
   push_eh non_ok
-    code_retval = $P1()
+    code_retval = $P2()
     retval = TCL_OK  # no exception => TCL_OK
   clear_eh
 

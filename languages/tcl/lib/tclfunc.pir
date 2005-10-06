@@ -55,7 +55,7 @@ Initialize the attributes for an instance of the class
   .local pmc funcs,  __number, compile
   funcs = find_global "_Tcl", "functions"
   __number = find_global "_Tcl", "__number"
-  compile = find_global  "_Tcl", "compile" 
+  compile = find_global  "_Tcl", "compile_dispatch" 
 
   # eventually, we'll need to deal with more than one arg.
 

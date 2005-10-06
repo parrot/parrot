@@ -14,22 +14,25 @@
   condition = argv[0]
   body      = argv[1]
 
-  .local pmc retval, parsed_code
+  .local pmc retval, compiled_code
 
-  .local pmc parse
-  .local pmc expression_p, compiled_condition
+  .local pmc compiler
+  .local pmc expression_compiler, pir_compiler, compiled_condition
 
-  parse = find_global "_Tcl", "parse"
-  expression_p = find_global "_Tcl", "__expression_parse"
+  compiler = find_global "_Tcl", "compile"
+  expression_compiler = find_global "_Tcl", "__expression_compile"
+  pir_compiler = find_global "_Tcl", "pir_compiler"
 
-  parsed_code = parse(body)
-  compiled_condition = expression_p(condition)
+  ($I0,$P1) = compiler(0,body)
+  compiled_code = pir_compiler($I0,$P1)
+  ($I0,$P1) = expression_compiler(0,condition)
+  compiled_condition = pir_compiler($I0,$P1)
 
 while_loop:
   retval = compiled_condition()
   unless retval goto done
   push_eh handle_continue
-    retval = parsed_code()
+    retval = compiled_code()
   clear_eh
 
   goto while_loop

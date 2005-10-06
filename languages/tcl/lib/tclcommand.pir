@@ -114,7 +114,7 @@ no_command_non_interactive:
    inline_available=0
 
    .local pmc compile
-   compile = find_global "_Tcl", "compile"
+   compile = find_global "_Tcl", "compile_dispatch"
 
    .local string pir_code
    pir_code = ".include \"languages/tcl/lib/returncodes.pir\"\n"

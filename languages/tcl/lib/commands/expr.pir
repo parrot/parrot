@@ -14,9 +14,9 @@
   .local int looper
 
   .local pmc retval
-  .local pmc expression_p
-  .local pmc expression_i
-  expression_p = find_global "_Tcl", "__expression_parse"
+  .local pmc expression_compiler,pir_compiler
+  expression_compiler = find_global "_Tcl", "__expression_compile"
+  pir_compiler = find_global "_Tcl", "pir_compiler"
 
   expr = ""
   looper = 0
@@ -34,8 +34,9 @@ loop:
   goto loop
 
 loop_done:
-  $P1 = expression_p(expr)
-  .return $P1()
+  ($I0,$P1) = expression_compiler(0,expr)
+  $P2 = pir_compiler($I0,$P1)
+  .return $P2()
 
 no_args:
   .throw("wrong # args: should be \"expr arg ?arg ...?\"")

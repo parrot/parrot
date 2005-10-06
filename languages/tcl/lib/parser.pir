@@ -14,7 +14,7 @@ at <http://www.tcl.tk/man/tcl8.4/TclCmd/Tcl.htm>.
 
 =over 4
 
-=item C<pmc commands = parse(string tcl_code)>
+=item C<(int register_num, string pir_code) = compile(int register_num, string tcl_code)>
 
 Parses the Tcl code and returns an array of TclCommand objects.
 First, it performs the \<newline> substitution. Then it fetches
@@ -22,7 +22,8 @@ commands, one at a time (skipping over comments).
 
 =cut
 
-.sub parse
+.sub compile
+  .param int register_num
   .param string tcl_code
   
   .local int len
@@ -88,21 +89,35 @@ done_comment:
   goto next_command
  
 done:
-  .local pmc pir_compiler
-  .local int result_reg
-  .local string pir_code
+  .return "compile_dispatch"(commands,register_num)
+.end
 
-  (result_reg,pir_code) = "compile"(commands,0)
+.sub pir_compiler
+  .param int result_reg
+  .param string pir_code
+
+  .local pmc compiled_num
+  compiled_num = find_global "_Tcl", "compiled_num"
+  inc compiled_num
 
   $P1 = new .Array
-  $P1 = 2
-  $P1[0] = pir_code
-  $P1[1] = result_reg
+  $P1 = 3
+  $P1[0] = compiled_num
+  $P1[1] = pir_code
+  $P1[2] = result_reg
 
-  sprintf pir_code, ".pragma n_operators 1\n.sub blah :anon\n%s.return ($P%s)\n.end\n", $P1
+  $S0 = <<"END_PIR"
+.pragma n_operators 1
+.sub compiled_tcl_sub%i :anon
+%s
+.return ($P%s)
+.end
+END_PIR
 
+  sprintf pir_code, $S0, $P1
   #print pir_code
 
+  .local pmc pir_compiler
   pir_compiler = compreg "PIR"
   
   .return pir_compiler(pir_code)
@@ -634,7 +649,7 @@ and generate the code for it.
 
 =cut
 
-.sub compile
+.sub compile_dispatch
   .param pmc thing
   .param int register_num
 

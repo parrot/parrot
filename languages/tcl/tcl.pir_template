@@ -231,30 +231,16 @@ providing a compreg-compatible method.
 .sub _tcl_compile
   .param string tcl_code
 
-  .local pmc pir_compiler
-  .local string pir_code
-
-  .local pmc escaper
-  escaper = find_global "Data::Escape", "String"
-
-  pir_compiler = compreg "PIR"
-
   .local pmc compiled_num
   compiled_num = find_global "_Tcl", "compiled_num"
   inc compiled_num
 
-  pir_code = ".namespace [ \"_Tcl\" ]\n.sub _compiled_sub"
-  $S0 = compiled_num
-  pir_code .= $S0
-  pir_code .= " :anon\n.local string code\ncode = \""
-  tcl_code = escaper(tcl_code,"\"")
-  pir_code .= tcl_code
-  pir_code .= "\"\n.local pmc parse\n"
-  pir_code .= "parse = find_global \"_Tcl\", \"parse\"\n"
-  pir_code .= "$P1 = parse(code)\n.return $P1()\n.end\n"
+  .local pmc compiler,pir_compiler
+  compiler = find_global "_Tcl", "compile"
+  pir_compiler = find_global "_Tcl", "pir_compiler"
 
-  $P1 = pir_compiler(pir_code)
-  .return ($P1)
+  ($I0,$S0) = compiler(0,tcl_code)
+  .return pir_compiler($I0,$S0)
 .end
 
 ${RULES}

@@ -37,8 +37,10 @@
   .local pmc STDIN
   STDIN = getstdin
 
-  .local pmc parse
-  parse = find_global "_Tcl", "parse"
+  .local pmc compiler,pir_compiler
+  compiler = find_global "_Tcl", "compile"
+  pir_compiler = find_global "_Tcl", "pir_compiler"
+  compiler = find_global "_Tcl", "compile"
   input_line = ""
 
   __prompt(1)
@@ -47,8 +49,9 @@ input_loop:
   input_line .= $S0
   unless STDIN goto done
   push_eh loop_error
-    $P1 = parse(input_line)
-    retval = $P1()
+    ($I0,$P1) = compiler(0,input_line)
+    $P2 = pir_compiler($I0,$P1)
+    retval = $P2()
   clear_eh
   # print out the result of the evaluation.
   if_null retval, input_loop_continue
@@ -118,13 +121,15 @@ got_prompt:
   $S0 = level
   varname .= $S0
 
-  .local pmc parse
-  parse = find_global "_Tcl", "parse"
+  .local pmc compiler,pir_compiler
+  compiler = find_global "_Tcl", "compile"
+  pir_compiler = find_global "_Tcl", "pir_compiler"
 
   push_eh no_prompt
     $P0 = find_global "Tcl", varname
-    $P1 = parse($P0)
-    $P1()
+    ($I0,$P1) = compiler(0,$P0)
+    $P2 = pir_compiler($I0,$P1)
+    $P2()
   clear_eh
 
   STDOUT."flush"()

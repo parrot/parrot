@@ -14,7 +14,7 @@
   if argc >  2 goto error
 
   .local pmc compiler
-  compiler = find_global "_Tcl", "compile"
+  compiler = find_global "_Tcl", "compile_dispatch"
 
   .local int value_num,increment_num
   .local pmc value,increment
@@ -25,12 +25,14 @@
   (value_num,temp_code) = compiler(value,register_num)
   pir_code .= temp_code
   register_num = value_num + 1
+
   pir_code .= <<"END_PIR"
 .local pmc read, set, number
 read = find_global '_Tcl', '__read'
 number = find_global '_Tcl', '__number'
 set = find_global '_Tcl', '__set'
 END_PIR
+
   pir_code .= "$P"
   $S0 = register_num
   pir_code .= $S0
@@ -66,12 +68,14 @@ got_increment:
   (value_num,temp_code) = compiler(value,register_num)
   pir_code .= temp_code
   register_num = value_num + 1
+
   pir_code .= <<"END_PIR"
 .local pmc read, set, number
 read = find_global '_Tcl', '__read'
 number = find_global '_Tcl', '__number'
 set = find_global '_Tcl', '__set'
 END_PIR
+
   pir_code .= "$P"
   $S0 = register_num
   pir_code .= $S0
@@ -109,7 +113,7 @@ END_PIR
 
 error:
   pir_code =<<"END_PIR"
-.throw ('wrong # args: should be "incr varName ?increment?"')
+.throw ('wrong # args: should be \"incr varName ?increment?\"')
 END_PIR
 
   .return (register_num,pir_code)

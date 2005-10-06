@@ -16,8 +16,9 @@
  
   .local int looper
  
-  .local pmc parse 
-  parse = find_global "_Tcl", "parse"
+  .local pmc compiler,pir_compiler
+  compiler = find_global "_Tcl", "compile"
+  pir_compiler = find_global "_Tcl", "pir_compiler"
 
   expr = ""
   looper = 0
@@ -33,8 +34,9 @@ loop:
   goto loop
 
 loop_done:
-  $P1 = parse(expr)
-  .return $P1()
+  ($I0,$P1) = compiler(0,expr)
+  $P2 = pir_compiler($I0,$P1) 
+  .return $P2()
 
 no_args:
   .throw("wrong # args: should be \"eval arg ?arg ...?\"")

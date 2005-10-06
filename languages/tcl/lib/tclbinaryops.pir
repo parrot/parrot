@@ -136,7 +136,7 @@ Initialize the attributes for an instance of the class
   r_operand = getattribute self, "TclBinaryOp\x00r_operand"
 
 
-  compile = find_global "_Tcl", "compile"
+  compile = find_global "_Tcl", "compile_dispatch"
 
   .local string l_code,r_code,op_code
   .local int l_reg,r_reg

@@ -13,8 +13,9 @@
   .local int argc
   .local int looper
  
-  .local pmc parse
-  parse = find_global "_Tcl", "__parse"
+  .local pmc compiler,pir_compiler
+  compiler = find_global "_Tcl", "compile"
+  pir_compiler = find_global "_Tcl", "pir_compiler"
 
   # save the old call level
   .local pmc old_call_level
@@ -51,6 +52,10 @@ loop_done:
   store_global "_Tcl", "call_level", call_level
 
   $P1 = parse(expr,0,0)
+
+  ($I0,$P0) = compiler(0,expr)
+  $P1 = pir_compiler($I0,$P0)
+
   # can't quite tailcall this at the moment due to the hackish call_level
   $P0 = $P1()
 

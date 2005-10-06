@@ -9,8 +9,9 @@
   .local int argc 
   argc = argv
 
-  .local pmc parse
-  parse = find_global "_Tcl", "parse"
+  .local pmc compiler,pir_compiler
+  compiler = find_global "_Tcl", "compile"
+  pir_compiler = find_global "_Tcl", "pir_compiler"
 
   .local string script
   .local int count
@@ -29,7 +30,8 @@ twoargs:
 run:
   script = argv[0]
  
-  $P1 = parse(script)
+  ($I0,$P0) = compiler(0,script)
+  $P1 = pir_compiler($I0,$P0)
   time $N1 
   $I1 = count
 loop:

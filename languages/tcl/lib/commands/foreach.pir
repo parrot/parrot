@@ -4,7 +4,7 @@
   .param pmc argv :slurpy
   # Requires multiple of 3 args.
 
-  .local pmc parse,retval
+  .local pmc compiler,pir_compiler,retval
 
   .local int call_level
   $P0 = find_global "_Tcl", "call_level"
@@ -19,7 +19,8 @@
   .local pmc __list
   __list = find_global "_Tcl", "__list"
 
-  parse = find_global "_Tcl", "parse"
+  compiler = find_global "_Tcl", "compile"
+  pir_compiler = find_global "_Tcl", "pir_compiler"
 
   .local int argc
   argc = argv
@@ -69,7 +70,8 @@ got_list:
   goto arg_loop
 arg_done: 
   .local pmc parsed
-  parsed = parse(body)
+  ($I0,$P0) = compiler(0,body)
+  parsed = pir_compiler($I0,$P0)  
   register parsed
 
   .local pmc iterator

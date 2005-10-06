@@ -12,9 +12,10 @@
 
   .local string chunk, filename, contents
   .local int type
-  .local pmc retval, handle, parse
+  .local pmc retval, handle, compiler, pir_compiler
 
-  parse = find_global "_Tcl", "parse"
+  compiler = find_global "_Tcl", "compile"
+  pir_compiler = find_global "_Tcl", "pir_compiler"
 
   $P1 = argv[0] 
   typeof type, $P1
@@ -37,8 +38,9 @@ loop:
   goto loop
 
 gotfile:
-  $P1 = parse(contents)
-  .return $P1()
+  ($I0,$P1) = compiler(0,contents)
+  $P2       = pir_compiler($I0,$P1)
+  .return $P2()
 
 badfile:
   $S0 = "couldn't read file \""

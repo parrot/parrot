@@ -41,7 +41,7 @@ Initialize the attributes for an instance of the class
   .local pmc name, operand, compile
   name    = getattribute self, "TclUnaryOp\x00name"
   operand = getattribute self, "TclUnaryOp\x00operand"
-  compile = find_global "_Tcl", "compile"
+  compile = find_global "_Tcl", "compile_dispatch"
 
   .local string opcode
  

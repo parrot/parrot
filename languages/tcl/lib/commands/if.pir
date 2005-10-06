@@ -22,10 +22,10 @@
   handling_else = 0
   .local int counter
 
-  .local pmc parse
-  .local pmc expression_p
-  parse = find_global "_Tcl", "parse"
-  expression_p = find_global "_Tcl", "__expression_parse"
+  .local pmc compiler,pir_compiler,expr_compiler
+  compiler = find_global "_Tcl", "compile"
+  pir_compiler = find_global "_Tcl", "pir_compiler"
+  expr_compiler = find_global "_Tcl", "__expression_compile"
  
   .local string temp_str
   temp_str ="" 
@@ -72,8 +72,9 @@ get_final:
   if counter != argc goto more_than_else
 
 begin_parsing:
-  $P1 = expression_p(condition)
-  retval = $P1()
+  ($I0,$S1) = expr_compiler(0,condition)
+  $P2 = pir_compiler($I0,$S1)
+  retval = $P2()
 
   unless retval goto do_elseifs
   code = body 
@@ -87,8 +88,9 @@ elseif_loop:
   if $I2 == $I1 goto do_else
   $P1 = elseifs[$I2]
   condition = $P1[0]
-  $P2 = expression_p(condition)
-  retval = $P2()
+  ($I0,$S2) = expr_compiler(0,condition)
+  $P3 = pir_compiler($I0,$S2)
+  retval = $P3()
   if retval goto done_elseifs
   inc $I2
   goto elseif_loop  
@@ -101,10 +103,10 @@ do_else:
   code = else
 
 done:
-  $P1 = parse(code)
-  register $P1
+  ($I0,$P1) = compiler(0,code)
+  $P2 = pir_compiler($I0,$P1)
 
-  .return $P1()
+  .return $P2()
 
 no_args:
   .throw("wrong # args: no expression after \"if\" argument")

@@ -98,10 +98,12 @@ body_end:
   .return ("")
 
 body_match:
-  .local pmc parse
-  parse = find_global "_Tcl", "parse"
-  $P0 = parse(code)
-  .return $P0()
+  .local pmc compiler,pir_compiler
+  compiler = find_global "_Tcl", "compile"
+  pir_compiler = find_global "_Tcl", "pir_compiler"
+  ($I0,$P0) = compiler(0,code)
+  $P1 = pir_compiler($I0,$P0)
+  .return $P1()
 
 bad_args:
   .throw("wrong # args: should be \"switch ?switches? string pattern body ... ?default body?\"")

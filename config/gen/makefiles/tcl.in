@@ -30,6 +30,7 @@ lib${slash}commands${slash}error.pir \
 lib${slash}commands${slash}eval.pir \
 lib${slash}commands${slash}exit.pir \
 lib${slash}commands${slash}expr.pir \
+lib${slash}builtins${slash}for.pir \
 lib${slash}commands${slash}for.pir \
 lib${slash}commands${slash}foreach.pir \
 lib${slash}commands${slash}format.pir \
@@ -66,6 +67,7 @@ lib${slash}commands${slash}unknown.pir \
 lib${slash}commands${slash}unset.pir \
 lib${slash}commands${slash}uplevel.pir \
 lib${slash}commands${slash}upvar.pir \
+lib${slash}builtins${slash}while.pir \
 lib${slash}commands${slash}while.pir \
 lib${slash}conversions.pir \
 lib${slash}expression.pir \

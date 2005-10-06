@@ -23,8 +23,9 @@ Create a PIR sub on the fly for this user defined proc.
 
   .local pmc retval
 
-  .local pmc parse
-  parse = find_global "_Tcl", "parse"
+  .local pmc compiler,pir_compiler
+  compiler = find_global "_Tcl", "compile"
+  pir_compiler = find_global "_Tcl", "pir_compiler"
 
   .local pmc __list
   __list = find_global "_Tcl", "__list"
@@ -38,7 +39,8 @@ got_args:
   # Save the parsed body.
   .local pmc parsed_body
   $S0 = body_p
-  parsed_body = parse($S0)
+  ($I0,$P0) = compiler(0,$S0)
+  parsed_body = pir_compiler($I0,$P0)
   register parsed_body
 
   # XXX these need to go away - for now, we'll just escape
