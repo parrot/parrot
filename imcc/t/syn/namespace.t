@@ -115,23 +115,5 @@ OUT
 
 
 
-pir_output_is(<<'CODE', <<'OUT', "accepts unicode namespaces", todo => 'not yet implemented');
-.namespace [ "François" ]
-
-.sub '__init'
-	print 'unicode namespaces are fun'
-.end
-
-.namespace [ "" ]
-
-.sub 'main' :main
-	$P0 = find_global 'François', '__init'
-	$P0()
-.end
-CODE
-unicode namespaces are fun
-OUT
-
-
 ## remember to change the number of tests!
-BEGIN { plan tests => 4; }
+BEGIN { plan tests => 3; }

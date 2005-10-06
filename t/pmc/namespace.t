@@ -16,17 +16,17 @@ Tests the namespace manipulation.
 
 =cut
 
-use Parrot::Test tests => 15;
+use Parrot::Test;
 use Test::More;
 
 pir_output_is(<<'CODE', <<'OUTPUT', "find_global bar");
-.sub main @MAIN
+.sub 'main' :main
     $P0 = find_global "bar"
     print "ok\n"
     $P0()
 .end
 
-.sub bar
+.sub 'bar'
     print "bar\n"
 .end
 CODE
@@ -35,14 +35,14 @@ bar
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "find_global Foo::bar");
-.sub main @MAIN
+.sub 'main' :main
     $P0 = find_global "Foo", "bar"
     print "ok\n"
     $P0()
 .end
 
 .namespace ["Foo"]
-.sub bar
+.sub 'bar'
     print "bar\n"
 .end
 CODE
@@ -51,7 +51,7 @@ bar
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "get_name_space Foo::bar");
-.sub main @MAIN
+.sub 'main' :main
     $P0 = find_global "Foo", "bar"
     print "ok\n"
     $P1 = $P0."get_name_space"()
@@ -60,7 +60,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "get_name_space Foo::bar");
 .end
 
 .namespace ["Foo"]
-.sub bar
+.sub 'bar'
 .end
 CODE
 ok
@@ -68,7 +68,7 @@ Foo
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "find_global Foo::bar ns");
-.sub main @MAIN
+.sub 'main' :main
     $P0 = find_global "\0Foo"
     $P1 = find_global $P0, "bar"
     print "ok\n"
@@ -76,7 +76,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "find_global Foo::bar ns");
 .end
 
 .namespace ["Foo"]
-.sub bar
+.sub 'bar'
     print "bar\n"
 .end
 CODE
@@ -85,7 +85,7 @@ bar
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "find_global Foo::bar hash");
-.sub main @MAIN
+.sub 'main' :main
     $P0 = find_global "\0Foo"
     $P1 = $P0["bar"]
     print "ok\n"
@@ -93,7 +93,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "find_global Foo::bar hash");
 .end
 
 .namespace ["Foo"]
-.sub bar
+.sub 'bar'
     print "bar\n"
 .end
 CODE
@@ -102,7 +102,7 @@ bar
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "find_global Foo::bar root");
-.sub main @MAIN
+.sub 'main' :main
     .include "interpinfo.pasm"
     $P0 = interpinfo .INTERPINFO_NAMESPACE_ROOT
     $P1 = $P0["\0Foo"]
@@ -112,7 +112,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "find_global Foo::bar root");
 .end
 
 .namespace ["Foo"]
-.sub bar
+.sub 'bar'
     print "bar\n"
 .end
 CODE
@@ -121,7 +121,7 @@ bar
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "find_global Foo::Bar::baz");
-.sub main @MAIN
+.sub 'main' :main
     $P0 = find_global "\0Foo"
     $P1 = find_global $P0, "\0Bar"
     $P2 = find_global $P1, "baz"
@@ -130,7 +130,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "find_global Foo::Bar::baz");
 .end
 
 .namespace ["Foo" ; "Bar"]
-.sub baz
+.sub 'baz'
     print "baz\n"
 .end
 CODE
@@ -139,7 +139,7 @@ baz
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "find_global Foo::Bar::baz hash");
-.sub main @MAIN
+.sub 'main' :main
     $P0 = find_global "\0Foo"
     $P1 = $P0["\0Bar"]
     $P2 = $P1["baz"]
@@ -148,7 +148,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "find_global Foo::Bar::baz hash");
 .end
 
 .namespace ["Foo"; "Bar"]
-.sub baz
+.sub 'baz'
     print "baz\n"
 .end
 CODE
@@ -157,7 +157,7 @@ baz
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "find_global Foo::Bar::baz hash 2");
-.sub main @MAIN
+.sub 'main' :main
     $P0 = find_global "\0Foo"
     $P1 = $P0["\0Bar" ; "baz"]
     print "ok\n"
@@ -165,7 +165,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "find_global Foo::Bar::baz hash 2");
 .end
 
 .namespace ["Foo"; "Bar"]
-.sub baz
+.sub 'baz'
     print "baz\n"
 .end
 CODE
@@ -174,7 +174,7 @@ baz
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "find_global Foo::Bar::baz hash 3");
-.sub main @MAIN
+.sub 'main' :main
     .include "interpinfo.pasm"
     $P0 = interpinfo .INTERPINFO_NAMESPACE_ROOT
     $P1 = $P0["\0Foo";"\0Bar" ; "baz"]
@@ -183,7 +183,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "find_global Foo::Bar::baz hash 3");
 .end
 
 .namespace ["Foo"; "Bar"]
-.sub baz
+.sub 'baz'
     print "baz\n"
 .end
 CODE
@@ -192,7 +192,7 @@ baz
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "find_global Foo::Bar::baz alias");
-.sub main @MAIN
+.sub 'main' :main
     $P0 = find_global "\0Foo"
     $P1 = $P0["\0Bar"]
     store_global "\0TopBar", $P1
@@ -202,7 +202,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "find_global Foo::Bar::baz alias");
 .end
 
 .namespace ["Foo"; "Bar"]
-.sub baz
+.sub 'baz'
     print "baz\n"
 .end
 CODE
@@ -211,8 +211,7 @@ baz
 OUTPUT
 
 pir_output_like(<<'CODE', <<'OUTPUT', "func() namespace resolution");
-
-.sub main @MAIN
+.sub 'main' :main
     print "calling foo\n"
     foo()
     print "calling Foo::foo\n"
@@ -222,32 +221,32 @@ pir_output_like(<<'CODE', <<'OUTPUT', "func() namespace resolution");
     baz()
 .end
 
-.sub foo
+.sub 'foo'
     print "  foo\n"
     bar()
 .end
 
-.sub bar
+.sub 'bar'
     print "  bar\n"
 .end
 
-.sub fie
+.sub 'fie'
     print "  fie\n"
 .end
 
 .namespace ["Foo"]
 
-.sub foo
+.sub 'foo'
     print "  Foo::foo\n"
     bar()
     fie()
 .end
 
-.sub bar
+.sub 'bar'
     print "  Foo::bar\n"
 .end
 
-.sub baz
+.sub 'baz'
     print "  Foo::baz\n"
 .end
 CODE
@@ -263,14 +262,14 @@ calling baz
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "get namespace in Foo::bar");
-.sub main @MAIN
+.sub 'main' :main
     $P0 = find_global "Foo", "bar"
     print "ok\n"
     $P0()
 .end
 
 .namespace ["Foo"]
-.sub bar
+.sub 'bar'
     print "bar\n"
     .include "interpinfo.pasm"
     $P0 = interpinfo .INTERPINFO_CURRENT_SUB
@@ -285,7 +284,7 @@ Foo
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "get namespace in Foo::Bar::baz");
-.sub main @MAIN
+.sub 'main' :main
     $P0 = find_global "\0Foo"
     $P1 = find_global $P0, "\0Bar"
     $P2 = find_global $P1, "baz"
@@ -294,7 +293,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "get namespace in Foo::Bar::baz");
 .end
 
 .namespace ["Foo" ; "Bar"]
-.sub baz
+.sub 'baz'
     print "baz\n"
     .include "interpinfo.pasm"
     .include "pmctypes.pasm"
@@ -325,7 +324,7 @@ SKIP: {
 	skip("disabled class method", 1);
 pir_output_is(<<'CODE', <<'OUTPUT', "segv in get_name");
 .namespace ['pugs';'main']
-.sub main @MAIN
+.sub 'main' :main
     $P0 = find_name "&say"
     $P0()
 .end
@@ -337,3 +336,43 @@ ok
 OUTPUT
 
 }
+
+
+pir_output_is(<<'CODE', <<'OUT', "unicode: default ns encoding is ascii");
+.namespace [ "François" ]
+
+.sub '__init'
+	print 'unicode namespaces are fun'
+.end
+
+.namespace [ "" ]
+
+.sub 'main' :main
+	$P0 = find_global 'François', '__init'
+	$P0()
+.end
+CODE
+Malformed string
+OUT
+
+
+pir_output_is(<<'CODE', <<'OUT', "unicode: accepts namespaces with encoding", todo => 'as yet unimplemented');
+.namespace [ unicode:"François" ]
+
+.sub '__init'
+	print 'unicode namespaces are fun'
+.end
+
+.namespace [ "" ]
+
+.sub 'main' :main
+	$P0 = find_global unicode:'François', '__init'
+	$P0()
+.end
+CODE
+unicode namespaces are fun
+OUT
+
+
+# remember to modify the number of tests!
+BEGIN { plan tests => 17; }
