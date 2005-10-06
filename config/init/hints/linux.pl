@@ -24,12 +24,17 @@ else {
     $linkflags .= ' -Wl,-E';  # --export-dynamic, s. info gcc, ld
 }
 
+if ( $cflags !~ /-D_XOPEN_SOURCE=/ ) {
+    # Request visibility of all POSIX symbols
+    $cflags .= ' -D_XOPEN_SOURCE=600';
+}
+
 Configure::Data->set(
-    ccflags => $cflags,
-    libs => $libs,
+    ccflags        => $cflags,
+    libs           => $libs,
     ld_share_flags => $ld_share_flags,
     ld_load_flags  => $ld_share_flags,
-    i_lib_pthread  => 1,		# XXX fake a header entry
+    i_lib_pthread  => 1,               # XXX fake a header entry
     linkflags      => $linkflags,
     link           => $link,
 );
