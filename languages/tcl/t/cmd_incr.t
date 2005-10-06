@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 5;
+use Parrot::Test tests => 6;
 use Test::More;
 
 language_output_is("tcl",<<'TCL',<<OUT,"simple");
@@ -43,4 +43,12 @@ language_output_is("tcl",<<'TCL',<<OUT,"negative base");
  puts $a
 TCL
 -1
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"error");
+ set a 1
+ incr a 3 2
+ puts $a
+TCL
+wrong # args: should be "incr varName ?increment?"
 OUT
