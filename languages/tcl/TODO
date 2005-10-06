@@ -39,6 +39,11 @@ When an inline compiled version exists, use it, but IFF a global counter
 indicates no procs have been redifined.  Update proc and rename to increment
 this counter whenever they are called.
 
+=item 3
+
+Add compiled TclComment objects, which do nothing other than generate PIR comments with
+the same text.
+
 =back
 
 =head2 Generic tasks
