@@ -80,7 +80,7 @@ IS:
     .local pmc temp
     .local string name
     
-    isnull where, END
+    if_null where, END
     
     # call __replace if the PMC supports it
     can $I0, where, "__replace"

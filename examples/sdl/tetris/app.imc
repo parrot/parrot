@@ -176,7 +176,7 @@ This method returns nothing.
 
     # shutdown the SDL system
     $P0 = self."SDL"()
-    isnull $P0, END
+    if_null $P0, END
     $P0."quit"()
 END:
 .end
@@ -318,7 +318,7 @@ Returns the color palette.
     classoffset $I0, self, "Tetris::App"
     add $I0, tPalette
     getattribute palette, self, $I0
-    isnull palette, CREATE
+    if_null palette, CREATE
     branch RET
 
 NULL:
@@ -454,7 +454,7 @@ Returns the block object, or NULL if the board was not found.
     .local pmc temp
 
     temp = self."board"( boardID )
-    isnull temp, BLOCKISNULL
+    if_null temp, BLOCKISNULL
     temp = temp."currentBlock"()
 
 BLOCKISNULL:
@@ -497,7 +497,7 @@ Returns 1 if the rotation was possible, 0 otherwise.
 
     # lookup the block
     block = self."currentBlock"( boardID )
-    isnull block, END
+    if_null block, END
 
     # rotate the block
     ret = block."rotate"( dir )
@@ -557,7 +557,7 @@ Returns 1 if the movement was possible, 0 otherwise.
     self."disableTimer"()
 
     block = self."currentBlock"( boardID )
-    isnull block, END
+    if_null block, END
     success = block."move"( xval, yval )
 
     unless success goto END
@@ -615,7 +615,7 @@ This method returns the new falling block.
 SKIP_ID:
 
     temp = self."board"( boardID )
-    isnull temp, APP_NEXTBLOCK_END
+    if_null temp, APP_NEXTBLOCK_END
     temp = temp."nextBlock"(id )
 
 APP_NEXTBLOCK_END:
@@ -648,7 +648,7 @@ This method returns 1 if the board was found, 0 otherwise.
 
     ret = 0
     board = self."board"( boardID )
-    isnull board, APP_FALL_END
+    if_null board, APP_FALL_END
     board."fall"()
     ret = 1
 
@@ -682,7 +682,7 @@ This method returns 1 if the block is falling down fast, 0 otherwise.
 
     ret = 0
     board = self."board"( boardID )
-    isnull board, APP_FALLING_END
+    if_null board, APP_FALLING_END
     ret = board."falling"()
 
 APP_FALLING_END:
@@ -715,7 +715,7 @@ to fall down one unit.
 
     ret = 0
     board = self."board"( boardID )
-    isnull board, APP_INTERVAL_END
+    if_null board, APP_INTERVAL_END
     ret = board."fallInterval"()
 
 APP_INTERVAL_END:
@@ -747,7 +747,7 @@ Returns the time when the block falls down the next time.
     .local num ret
 
     board = self."board"( boardID )
-    isnull board, APP_NEXTFALL_END
+    if_null board, APP_NEXTFALL_END
     ret = board."nextFallTime"()
 
 APP_NEXTFALL_END:
@@ -783,7 +783,7 @@ This method returns nothing.
     .local pmc board
 
     board = self."board"( boardID )
-    isnull board, APP_SETFALL_END
+    if_null board, APP_SETFALL_END
     board."setNextFallTime"( val )
 
 APP_SETFALL_END:
@@ -979,7 +979,7 @@ the boards array.
     add $I0, tBoards
     getattribute boards, self, $I0
     count = 0
-    isnull boards, END
+    if_null boards, END
     count = boards
 
 END:
@@ -1086,7 +1086,7 @@ This method returns nothing.
     add $I0, tPlayers
     getattribute temp, self, $I0
     players = 1
-    isnull temp, SET
+    if_null temp, SET
     players = temp
     branch END_SET
 

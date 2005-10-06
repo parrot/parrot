@@ -65,15 +65,15 @@ DONE:
 
 LEXICAL_SYMBOL:
   symbol = _LOOKUP_LEXICAL(symname)
-  isnull retv, GLOBAL_SYMBOL
+  if_null retv, GLOBAL_SYMBOL
   goto DONE
 
 GLOBAL_SYMBOL:
   symbol = _LOOKUP_GLOBAL("COMMON-LISP", "*PACKAGE*")
-  isnull symbol, PACKAGE_NOT_FOUND
+  if_null symbol, PACKAGE_NOT_FOUND
 
   package = symbol._get_value()
-  isnull package, PACKAGE_NOT_FOUND
+  if_null package, PACKAGE_NOT_FOUND
 
   pkgname = package._get_name_as_string()
 
@@ -264,7 +264,7 @@ CALL_FUNCTION:
    retv = 1
 
    getattribute special, symbol, "LispSymbol\0special"
-   isnull special, NOT_SPECIAL
+   if_null special, NOT_SPECIAL
 
   .NULL(special, NOT_SPECIAL)
 

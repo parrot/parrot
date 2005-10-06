@@ -135,7 +135,7 @@ STEP_9b:
 
 STEP_10:
   retv = _VALIDATE_TOKEN(token)
-  isnull retv, READER_ERROR
+  if_null retv, READER_ERROR
 
   goto DONE
 

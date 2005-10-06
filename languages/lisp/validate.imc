@@ -30,21 +30,21 @@ QUALIFIED_SYMBOL:
   if flag != 1 goto SYMBOL
 
   retv = _LOOKUP_GLOBAL(pkgname, symname)
-  isnull retv, SYMBOL_NOT_FOUND
+  if_null retv, SYMBOL_NOT_FOUND
   goto DONE
 
 SYMBOL:
   symbol = _LOOKUP_GLOBAL("COMMON-LISP", "*PACKAGE*")
-  isnull symbol, PACKAGE_NOT_FOUND
+  if_null symbol, PACKAGE_NOT_FOUND
 
   package = symbol._get_value()		# Get the current package
-  isnull package, PACKAGE_NOT_FOUND
+  if_null package, PACKAGE_NOT_FOUND
 
   pkgname = package._get_name_as_string()
   symname = token
 
   retv = _LOOKUP_GLOBAL(pkgname, symname)
-  isnull retv, SYMBOL_NOT_FOUND		# If not found, intern a new symbol
+  if_null retv, SYMBOL_NOT_FOUND		# If not found, intern a new symbol
 
   goto DONE
 

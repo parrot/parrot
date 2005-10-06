@@ -143,7 +143,7 @@ FUNCTION:
 
 SYMBOL:
    func = car._get_function()			# Get the function from symbol
-   isnull func, INVALID_FUNCTION_NAME		# Throw an error if undefined
+   if_null func, INVALID_FUNCTION_NAME		# Throw an error if undefined
 
    _FUNCTION_CALL(func,cdr)
    goto DONE
@@ -210,7 +210,7 @@ DONE:
   .ASSERT_TYPE(symbol, "symbol")
 
    val = symbol._get_value()
-   isnull val, UNBOUND
+   if_null val, UNBOUND
 
   .TRUE(retv)
    goto DONE
@@ -738,7 +738,7 @@ CLEANUP_LOOP:
    goto CLEANUP_LOOP
 
 CLEANUP_DONE:
-   isnull error, DONE				# Rethrow an exception if we
+   if_null error, DONE				# Rethrow an exception if we
    rethrow error				# need to
    goto DONE
 
@@ -912,7 +912,7 @@ LOOP:
 
    name = symbol._get_name_as_string()		# Get the symbols name
    lexical = _LOOKUP_LEXICAL(name)		# Look for it in lexical env
-   isnull lexical, SET_SYMBOL_VALUE
+   if_null lexical, SET_SYMBOL_VALUE
 
    symbol = lexical				# Lexical variable was found
 

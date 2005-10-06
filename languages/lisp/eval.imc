@@ -95,7 +95,7 @@ MACRO_FORM:
   .local pmc macroarg
 
    macrosym = _LOOKUP_SYMBOL("*MACROEXPAND-HOOK*")
-   isnull macrosym, MACRO_NOT_INITIALIZED
+   if_null macrosym, MACRO_NOT_INITIALIZED
 
    macroexp = macrosym._get_value()		# Get the expander function
   .ASSERT_TYPE_AND_BRANCH(macroexp, "function", MACRO_NOT_INITIALIZED)
@@ -127,7 +127,7 @@ DYNAMIC_SYMBOL:
 
 LEXICAL_SYMBOL:
   retv = _LOOKUP_LEXICAL(symname)		# Check for a lexical shadow
-  isnull retv, CHECK_VALUE			# If not found, assume global
+  if_null retv, CHECK_VALUE			# If not found, assume global
   symbol = retv					# Use the lexical value
   goto CHECK_VALUE
 

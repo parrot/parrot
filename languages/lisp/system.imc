@@ -440,7 +440,7 @@ DONE:
    concat attr, objt, attr
 
    getattribute retv, symbol, attr
-   isnull retv, NO_VALUE
+   if_null retv, NO_VALUE
    goto DONE
 
 NO_VALUE:

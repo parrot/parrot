@@ -218,7 +218,7 @@ items in the blockdata array.
     classoffset $I0, self, "Tetris::BlockData"
     getattribute $P0, self, $I0
     $I0 = 0
-    isnull $P0, END
+    if_null $P0, END
     $I0 = $P0
     $N0 = $I0
     sqrt $N0, $I0
@@ -244,7 +244,7 @@ END:
 
     classoffset $I0, self, "Tetris::BlockData"
     getattribute $P0, self, $I0
-    isnull $P0, ERR
+    if_null $P0, ERR
     $I0 = $P0
     if index >= $I0 goto ERR
     $I0 = $P0[index]
@@ -272,7 +272,7 @@ ERR:
 
     classoffset $I0, self, "Tetris::BlockData"
     getattribute $P0, self, $I0
-    isnull $P0, ERR
+    if_null $P0, ERR
     $I0 = $P0
     if index >= $I0 goto ERR
     $P0[index] = val
