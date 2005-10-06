@@ -66,13 +66,25 @@ got_args:
   .local string esc_name
   esc_name = escaper(name)
 
-  .local string proc_body
-  proc_body  = ".namespace [\"Tcl\"]\n.sub \"&"
-  proc_body .= name
-  proc_body .= "\"\n"
-  proc_body .= ".param pmc args :slurpy\n"
-  proc_body .= "  .include \"languages/tcl/lib/returncodes.pir\"\n  " 
-  proc_body .= ".local pmc call_level\n  call_level = find_global \"_Tcl\", \"call_level\"\n  inc call_level\n  new_pad -1\n"
+  .local string proc_body, temp_code
+
+  temp_code = <<"END_PIR"
+.namespace ['Tcl']
+.sub '&%s'
+.param pmc args :slurpy
+.include 'languages/tcl/lib/returncodes.pir'
+.local pmc call_level
+call_level=find_global '_Tcl', 'call_level'
+inc call_level
+new_pad -1
+END_PIR
+
+  $P1 = new .Array
+  $P1 = 1
+  $P1[0] = name
+
+  proc_body = sprintf temp_code, $P1
+
   .local int arg_count
   arg_count = args_p
   .local int ii,is_slurpy
@@ -109,15 +121,21 @@ slurpy_arg_count:
 
 arg_loop:
   if ii == last_arg goto arg_loop_done
-  $S1 = ii
-  proc_body .= "$P1 = args["
-  proc_body .= $S1
-  proc_body .= "]\n  "
-  proc_body .= "store_lex -1,\"$"
-  # XXX This should be Escape'd
-  $S1 = args_p[ii]
-  proc_body .= $S1
-  proc_body .= "\", $P1\n  "
+
+  temp_code= <<"END_PIR"
+$P1 = args[%i]
+store_lex -1, '$%s', $P1
+END_PIR
+
+  $P1 = new .Array
+  $P1 = 2
+  $P1[0] = ii
+  $S0 = args_p[ii]  #Escape this?
+  $P1[1] = $S0
+
+  temp_code = sprintf temp_code, $P1
+  proc_body.= temp_code
+
   ii = ii + 1
   goto arg_loop
 
@@ -126,32 +144,32 @@ arg_loop_done:
 
   # Convert the remaining elements returned by foldup into a TclList
   # XXX This code lifted from Tcl::&list - eventually factor this out.
-  proc_body .= "  .local int cnt,jj\n"
-  proc_body .= "  cnt = "
-  $I0 = ii
-  $S0 = $I0
-  proc_body .=   $S0
-  proc_body .=   "\n"
-  proc_body .= "  jj = 0\n"
-  proc_body .= "  if cnt == argc goto NO_SLURPY_ARGS\n"
-  proc_body .= "  .local pmc arg_list\n"
-  proc_body .= "  arg_list = new .TclList\n"
-  proc_body .= "\n"
-  proc_body .= "SLURPY_LOOP:\n"
-  proc_body .= "  if cnt >= argc goto DONE\n"
-  proc_body .= "  $P0 = args[cnt]\n"
-  proc_body .= "  arg_list[jj] = $P0\n"
-  proc_body .= "  inc cnt\n"
-  proc_body .= "  inc jj\n"
-  proc_body .= "  goto SLURPY_LOOP\n"
-  proc_body .= "\n"
-  proc_body .= "NO_SLURPY_ARGS:\n"
-  proc_body .= "  arg_list= new .TclString\n"
-  proc_body .= "  arg_list=\"\"\n"
-  proc_body .= "\n"
-  proc_body .= "DONE:\n"
-  proc_body .= "  store_lex -1, \"$args\", arg_list\n"
+  temp_code = <<"END_PIR"
+  .local int cnt,jj
+  cnt = %i
+  jj = 0
+  if cnt == argc goto NO_SLURPY_ARGS
+  .local pmc arg_list
+  arg_list = new .TclList
+SLURPY_LOOP:
+  if cnt >= argc goto DONE
+  $P0 = args[cnt]
+  arg_list[jj] = $P0
+  inc cnt
+  inc jj
+  goto SLURPY_LOOP
+NO_SLURPY_ARGS:
+  arg_list=new .TclString
+  arg_list=''
+DONE:
+  store_lex -1, '$args', arg_list
+END_PIR
 
+   $P1 = new .Array
+   $P1 = 1
+   $P1[0] = ii
+   temp_code = sprintf temp_code, $P1
+   proc_body .= temp_code
 
 body:
   proc_body .= "  .local pmc proc_body\n"
@@ -161,35 +179,36 @@ body:
   proc_body .=   "\"]\n"
 
 done_args:
-  proc_body .= "  goto ARGS_OK\n"
-  proc_body .= "\n"
-  proc_body .= "BAD_ARGS:\n"
-  proc_body .= "  .throw(\"wrong # args: should be \\\""
-  proc_body .=   name
-  proc_body .=   " "  # XXX optional if no args?
-  proc_body .=   args
-  proc_body .=   "\\\"\")\n"
-  proc_body .= "\n"
-  proc_body .= "ARGS_OK:\n"
-
-  proc_body .= "  push_eh is_return\n"
-  proc_body .= "    $P0 = proc_body()\n"
-  proc_body .= "  clear_eh\n"
-  proc_body .= "was_ok:\n"
-  proc_body .= "  dec call_level\n"
-  proc_body .= "  .return($P0)\n"
-  proc_body .= "not_return_nor_ok:\n"
-  proc_body .= "  dec call_level\n"
-  proc_body .= "  .throw(P5)\n"
-  proc_body .= "is_return:\n"
-  proc_body .= "  .get_return_code(P5,$I0)\n"
-  proc_body .= "  if $I0 != TCL_RETURN goto not_return_nor_ok\n"
-  proc_body .= "  $P0 = P5[VALUE_SLOT]\n"
-  proc_body .= "  dec call_level\n"
-  proc_body .= "  .return ($P0)\n"
-  proc_body .= ".end\n"
- 
-  #print proc_body
+  temp_code = <<"END_PIR"
+  goto ARGS_OK
+BAD_ARGS:
+  .throw('wrong # args: should be \"%s %s\"')
+ARGS_OK:
+  push_eh is_return
+    $P0 = proc_body()
+  clear_eh
+was_ok:
+  dec call_level
+  .return($P0)
+not_return_nor_ok:
+  dec call_level
+  .throw(P5)
+is_return:
+  .get_return_code(P5,$I0)
+  if $I0 != TCL_RETURN goto not_return_nor_ok
+  $P0 = P5[VALUE_SLOT]
+  dec call_level
+  .return ($P0)
+.end
+END_PIR
+   
+  $P1 = new .Array
+  $P1 = 2
+  $P1[0] = name
+  $P1[1] = args
+  
+  temp_code = sprintf temp_code, $P1
+  proc_body .= temp_code
 
   .local pmc pir_compiler
   pir_compiler = compreg "PIR"
