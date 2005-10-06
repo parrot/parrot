@@ -6,6 +6,10 @@ my $ccflags = Configure::Data->get('ccflags');
 if ( $ccflags !~ /-pthread/ ) {
     $ccflags .= ' -pthread';
 }
+if ( $ccflags !~ /-D_XOPEN_SOURCE=/ ) {
+    # Request all POSIX visible (not automatic for cxx, as it is for cc)
+    $ccflags .= ' -D_XOPEN_SOURCE=500';
+}
 Configure::Data->set(
     ccflags => $ccflags,
 );

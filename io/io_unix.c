@@ -825,14 +825,14 @@ static ParrotIO *
 PIO_unix_accept(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
 {
     int newsock;
-    int newsize;
+    socklen_t newsize;
     ParrotIO *newio;
 
     UNUSED(layer);
     newio = PIO_new(interpreter, PIO_F_SOCKET, 0, PIO_F_READ|PIO_F_WRITE);
 
     if ((newsock = accept(io->fd, (struct sockaddr *)&newio->remote,
-                                  (socklen_t *)&newsize)) == -1)
+                          &newsize)) == -1)
     {
         fprintf(stderr, "accept: errno=%d", errno);
         /* Didn't get far enough, free the io */
