@@ -3,7 +3,7 @@
 # $Id$
 
 use strict;
-use Parrot::Test tests => 3;
+use Parrot::Test;
 
 ##############################
 pir_output_is(<<'CODE', <<'OUT', "namespace 1");
@@ -113,3 +113,25 @@ CODE
 20
 OUT
 
+
+
+pir_output_is(<<'CODE', <<'OUT', "rejects unicode namespaces");
+.namespace [ "François" ]
+
+.sub '__init'
+	print 'unicode namespaces are fun'
+.end
+
+.namespace [ "" ]
+
+.sub 'main' :main
+	$P0 = find_global 'François', '__init'
+	$P0()
+.end
+CODE
+Malformed string
+OUT
+
+
+## remember to change the number of tests!
+BEGIN { plan tests => 4; }
