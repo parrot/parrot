@@ -389,16 +389,18 @@ Parrot_alloc_context(Interp *interpreter)
 
     parrot_context_t ctx;
     struct Parrot_Context *p;
+    void *ptr;
 
-    p = (struct Parrot_Context *)interpreter->ctx_mem.free;
-    if (p) {
-        LVALUE_CAST(struct Parrot_Context *, interpreter->ctx_mem.free) =
-            p[-1].prev;
+    ptr = interpreter->ctx_mem.free;
+    if (ptr) {
+        interpreter->ctx_mem.free = *(void **) ptr;
     }
     else {
-        p = mem_sys_allocate(sizeof(struct parrot_regs_t) + ALIGNED_CTX_SIZE);
-        LVALUE_CAST(char *, p) += ALIGNED_CTX_SIZE;
+        ptr = mem_sys_allocate(sizeof(struct parrot_regs_t) +
+                ALIGNED_CTX_SIZE);
+        *(void **) ptr = NULL;
     }
+    p = (void *) ((char *)ptr + ALIGNED_CTX_SIZE);
     p[-1].prev = NULL;
     ctx = interpreter->ctx;
     interpreter->ctx.rctx = p;
@@ -412,6 +414,7 @@ void
 Parrot_free_context(Interp *interpreter, parrot_context_t *ctxp, int re_use)
 {
     struct Parrot_Context *free_list;
+    void *ptr;
 
     /*
      * The context structure has a reference count, initially 0
@@ -423,13 +426,13 @@ Parrot_free_context(Interp *interpreter, parrot_context_t *ctxp, int re_use)
      *
      */
     if (re_use || --CONTEXT(*ctxp)->ref_count == 0) {
-        free_list = (struct Parrot_Context *) interpreter->ctx_mem.free;
-        LVALUE_CAST(struct Parrot_Context *, interpreter->ctx_mem.free) =
-            ctxp->rctx;
+        ptr = ctxp->bp;
+        ptr = (char *)ptr - ALIGNED_CTX_SIZE;
+        *(void **)ptr = interpreter->ctx_mem.free;
+        interpreter->ctx_mem.free = ptr;
 #if CTX_LEAK_DEBUG
         fprintf(stderr, "free  %p\n", ctxp->rctx);
 #endif
-        CONTEXT(*ctxp)->prev = free_list;
     }
 }
 
