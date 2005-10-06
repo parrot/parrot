@@ -176,12 +176,11 @@
 .endm
 
 .macro findWord(wrd)
-  newsub $P1, .Exception_Handler, .$NotFound
-  set_eh $P1
+  push_eh .$NotFound
   find_lex .TOS, .wrd
+  clear_eh
   goto .$End
 .local $NotFound:
-  clear_eh
     $P0 = new .Exception
     $P0["_message"] = "UnknownWord"
     throw $P0
