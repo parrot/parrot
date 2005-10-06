@@ -26,7 +26,7 @@ Generate compiler-variants for several builtins, esp. the flow control
 commands like C<while>. 
 Modify the compiler for tclcommand to generate the inline version if
 it's available. (C<proc> and C<expr> should also be straightforward, as they
-already compile anyway.)  [Completed: incr, break, continue, for]
+already compile anyway.)  [Completed: incr, break, continue, for, while]
 
 Note: compiled builtins always take two args: the register_num to begin
 using for the inlined code, and a single container pmc that contains the

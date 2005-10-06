@@ -1,3 +1,5 @@
+# XXX convert to a call to the inline'd version
+
 ###
 # [while]
 
