@@ -38,7 +38,7 @@ build_tools/list_unjitted.pl                      []
 build_tools/ops2c.pl                              [devel]
 build_tools/ops2pm.pl                             [devel]
 build_tools/parrot_config_c.pl                    []
-build_tools/parrotdef.pl
+build_tools/parrotdef.pl                          []
 build_tools/pbc2c.pl                              [devel]
 build_tools/pmc2c.pl                              []
 build_tools/revision_c.pl                         [devel]

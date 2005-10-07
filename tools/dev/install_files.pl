@@ -159,6 +159,7 @@ while(<>) {
     }
 
     # Parse out metadata
+    die "Malformed line in MANIFEST: $_" if not defined $meta;
     my $generated = $meta =~ s/^\*//;
     my ($package) = $meta =~ /^\[(.*?)\]/;
     $meta =~ s/^\[(.*?)\]//;
