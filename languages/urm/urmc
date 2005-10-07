@@ -45,13 +45,14 @@ GetOptions( "silent"     => \$silent,
 
 my $version = '0.4';
 my @pasm =
-    ("## Compiled by urmc $version",
-     '## 2003 (c) by Marcus Thiesen',
-     '## <marcus@cpan.org>',
-     '',
-     '_MAIN:',
-     "\tshift S1, P5        # we don't need the scriptname",
-     );
+    ( qq{## Compiled by urmc $version},
+      q{## 2003 (c) by Marcus Thiesen},
+      q{## <marcus@cpan.org>},
+      q{},
+      q{_MAIN:},
+      qq{\tget_params "(0)", P5    # Get command line},
+      qq{\tshift S1, P5           # we don't need the scriptname},
+    );
 
 my $lp = qr/\s*(\d+)\s*\:/; #line prefix (1:)
 my (%lines, %jtarget);      # tcount lines and jump targets
