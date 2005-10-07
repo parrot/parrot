@@ -106,6 +106,43 @@ whole thing may be taken out or refactored away at any moment.
     .return (out)
 .end
 
+.sub unescape
+    .param string str
+    .local string ret, tmp
+    .local int i, j
+
+    ret = ""
+    j = length str
+    if j == 0 goto END
+    i = 0
+
+LOOP:
+    tmp = str[i]
+    inc i
+    if i >= j goto FIN
+
+    eq tmp, "\\", ESC
+    concat ret, tmp
+    goto LOOP
+
+ESC:
+    tmp = str[i]
+    inc i
+    eq tmp, "n", LF
+    concat ret, tmp
+    goto UNESC
+LF:
+    concat ret, "\n"
+UNESC:
+    if i >= j goto END
+    goto LOOP
+
+FIN:
+    concat ret, tmp
+END:
+    .return(ret)
+.end
+
 .namespace [ "PGE::Match" ]
 
 .sub "dump_hs" :method
