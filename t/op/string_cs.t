@@ -94,12 +94,13 @@ OUTPUT
 
 output_is( <<'CODE', <<OUTPUT, "is_whitespace");
     set S0, iso-8859-1:"a\t\n \xa0" # is 0xa0 a whitespace in iso-8859-1??
-    is_whitespace I0, S0, 0
-    is_whitespace I1, S0, 1
-    is_whitespace I2, S0, 2
-    is_whitespace I3, S0, 3
+    .include "cclass.pasm"
+    is_cclass I0, .CCLASS_WHITESPACE, S0, 0
+    is_cclass I1, .CCLASS_WHITESPACE, S0, 1
+    is_cclass I2, .CCLASS_WHITESPACE, S0, 2
+    is_cclass I3, .CCLASS_WHITESPACE, S0, 3
     set I4, 4
-    is_whitespace I4, S0, I4
+    is_cclass I4, .CCLASS_WHITESPACE, S0, I4
     print I0
     print I1
     print I2
@@ -107,11 +108,11 @@ output_is( <<'CODE', <<OUTPUT, "is_whitespace");
     print I4
     print "\n"
     set S0, ascii:"a\t\n "
-    is_whitespace I0, S0, 0
-    is_whitespace I1, S0, 1
-    is_whitespace I2, S0, 2
-    is_whitespace I3, S0, 3
-    is_whitespace I4, S0, 4 # access past string boundary: not a whitespace
+    is_cclass I0, .CCLASS_WHITESPACE, S0, 0
+    is_cclass I1, .CCLASS_WHITESPACE, S0, 1
+    is_cclass I2, .CCLASS_WHITESPACE, S0, 2
+    is_cclass I3, .CCLASS_WHITESPACE, S0, 3
+    is_cclass I4, .CCLASS_WHITESPACE, S0, 4 # access past string boundary: not a whitespace
     print I0
     print I1
     print I2
@@ -125,11 +126,12 @@ CODE
 OUTPUT
 
 output_is( <<'CODE', <<OUTPUT, "is_wordchar");
+    .include "cclass.pasm"
     set S0, "az019-,._"
     length I1, S0
     set I2, 0
 lp:
-    is_wordchar I0, S0, I2
+    is_cclass I0, .CCLASS_WORD, S0, I2
     print I0
     inc I2
     lt I2, I1, lp
@@ -140,11 +142,12 @@ CODE
 OUTPUT
 
 output_is( <<'CODE', <<OUTPUT, "is_digit");
+    .include "cclass.pasm"
     set S0, "az019-,._"
     length I1, S0
     set I2, 0
 lp:
-    is_digit I0, S0, I2
+    is_cclass I0, .CCLASS_NUMERIC, S0, I2
     print I0
     inc I2
     lt I2, I1, lp
@@ -155,11 +158,12 @@ CODE
 OUTPUT
 
 output_is( <<'CODE', <<OUTPUT, "is_punctuation");
+    .include "cclass.pasm"
     set S0, "az019-,._"
     length I1, S0
     set I2, 0
 lp:
-    is_punctuation I0, S0, I2
+    is_cclass I0, .CCLASS_PUNCTUATION, S0, I2
     print I0
     inc I2
     lt I2, I1, lp
@@ -170,10 +174,11 @@ CODE
 OUTPUT
 
 output_is( <<'CODE', <<OUTPUT, "is_newline");
+    .include "cclass.pasm"
     set S0, "a\n"
-    is_newline I0, S0, 0
+    is_cclass I0, .CCLASS_NEWLINE, S0, 0
     print I0
-    is_newline I0, S0, 1
+    is_cclass I0, .CCLASS_NEWLINE, S0, 1
     print I0
     print "\n"
     end
@@ -182,55 +187,64 @@ CODE
 OUTPUT
 
 output_is( <<'CODE', <<OUTPUT, "find_wordchar");
+    .include "cclass.pasm"
     set S0, "_ ab 09"
     set I0, 0
+    length I1, S0
 lp:
-    find_wordchar I0, S0, I0
+    find_cclass I0, .CCLASS_WORD, S0, I0, I1
     print I0
     print " "
-    eq I0, -1, done
+    eq I0, I1, done
     inc I0
     branch lp
 done:
     print "ok\n"
     end
 CODE
-0 2 3 5 6 -1 ok
+0 2 3 5 6 7 ok
 OUTPUT
 
 output_is( <<'CODE', <<OUTPUT, "find_digit");
+    .include "cclass.pasm"
     set S0, "_ ab 09"
     set I0, 0
+    length I1, S0
 lp:
-    find_digit I0, S0, I0
+    find_cclass I0, .CCLASS_NUMERIC, S0, I0, I1
     print I0
     print " "
-    eq I0, -1, done
+    eq I0, I1, done
     inc I0
     branch lp
 done:
     print "ok\n"
     end
 CODE
-5 6 -1 ok
-OUTPUT
-output_is( <<'CODE', <<OUTPUT, "find_punctuation");
-    set S0, "_ .b ,9"
-    set I0, 0
-lp:
-    find_punctuation I0, S0, I0
-    print I0
-    print " "
-    eq I0, -1, done
-    inc I0
-    branch lp
-done:
-    print "ok\n"
-    end
-CODE
-0 2 5 -1 ok
+5 6 7 ok
 OUTPUT
 
+output_is( <<'CODE', <<OUTPUT, "find_punctuation");
+    .include "cclass.pasm"
+    set S0, "_ .b ,9"
+    set I0, 0
+    length I1, S0
+lp:
+    find_cclass I0, .CCLASS_PUNCTUATION, S0, I0, I1
+    print I0
+    print " "
+    eq I0, I1, done
+    inc I0
+    branch lp
+done:
+    print "ok\n"
+    end
+CODE
+0 2 5 7 ok
+OUTPUT
+
+SKIP: {
+  skip('TODO wordboundary', 1);
 output_is( <<'CODE', <<OUTPUT, "find_word_boundary");
     set S0, "_ab 09z"
     set I0, 0
@@ -247,6 +261,7 @@ done:
 CODE
 0 2 3 6 -1 ok
 OUTPUT
+}
 
 output_is( <<'CODE', <<OUTPUT, "trans_charset_s_s_i");
     set S0, "abc"

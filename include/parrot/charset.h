@@ -122,22 +122,6 @@ struct _charset {
     charset_is_cclass_t is_cclass;
     charset_find_cclass_t find_cclass;
     charset_find_not_cclass_t find_not_cclass;
-    charset_is_wordchar_t is_wordchar;
-    charset_find_wordchar_t find_wordchar;
-    charset_find_not_wordchar_t find_not_wordchar;
-    charset_is_whitespace_t is_whitespace;
-    charset_find_whitespace_t find_whitespace;
-    charset_find_not_whitespace_t find_not_whitespace;
-    charset_is_digit_t is_digit;
-    charset_find_digit_t find_digit;
-    charset_find_not_digit_t find_not_digit;
-    charset_is_punctuation_t is_punctuation;
-    charset_find_punctuation_t find_punctuation;
-    charset_find_not_punctuation_t find_not_punctuation;
-    charset_is_newline_t is_newline;
-    charset_find_newline_t find_newline;
-    charset_find_not_newline_t find_not_newline;
-    charset_find_word_boundary_t find_word_boundary;
     charset_string_from_codepoint_t string_from_codepoint;
     charset_compute_hash_t compute_hash;
     ENCODING *preferred_encoding;
@@ -163,22 +147,6 @@ struct _charset {
 #define CHARSET_IS_CCLASS(interp, flags, source, offset) ((CHARSET *)source->charset)->is_cclass(interpreter, flags, source, offset)
 #define CHARSET_FIND_CCLASS(interp, flags, source, offset, count) ((CHARSET *)source->charset)->find_cclass(interpreter, flags, source, offset, count)
 #define CHARSET_FIND_NOT_CCLASS(interp, flags, source, offset, count) ((CHARSET *)source->charset)->find_not_cclass(interpreter, flags, source, offset, count)
-#define CHARSET_IS_WORDCHAR(interp, source, offset) ((CHARSET *)source->charset)->is_wordchar(interpreter, source, offset)
-#define CHARSET_FIND_WORDCHAR(interp, source, offset) ((CHARSET *)source->charset)->find_wordchar(interpreter, source, offset)
-#define CHARSET_FIND_NOT_WORDCHAR(interp, source, offset) ((CHARSET *)source->charset)->find_not_wordchar(interpreter, source, offset)
-#define CHARSET_IS_WHITESPACE(interp, source, offset) ((CHARSET *)source->charset)->is_whitespace(interpreter, source, offset)
-#define CHARSET_FIND_WHITESPACE(interp, source, offset) ((CHARSET *)source->charset)->find_whitespace(interpreter, source, offset)
-#define CHARSET_FIND_NOT_WHITESPACE(interp, source, offset) ((CHARSET *)source->charset)->find_not_whitespace(interpreter, source, offset)
-#define CHARSET_IS_DIGIT(interp, source, offset) ((CHARSET *)source->charset)->is_digit(interpreter, source, offset)
-#define CHARSET_FIND_DIGIT(interp, source, offset) ((CHARSET *)source->charset)->find_digit(interpreter, source, offset)
-#define CHARSET_FIND_NOT_DIGIT(interp, source, offset) ((CHARSET *)source->charset)->find_not_digit(interpreter, source, offset)
-#define CHARSET_IS_PUNCTUATION(interp, source, offset) ((CHARSET *)source->charset)->is_punctuation(interpreter, source, offset)
-#define CHARSET_FIND_PUNCTUATION(interp, source, offset) ((CHARSET *)source->charset)->find_punctuation(interpreter, source, offset)
-#define CHARSET_FIND_NOT_PUNCTUATION(interp, source, offset) ((CHARSET *)source->charset)->find_not_punctuation(interpreter, source, offset)
-#define CHARSET_IS_NEWLINE(interp, source, offset) ((CHARSET *)source->charset)->is_newline(interpreter, source, offset)
-#define CHARSET_FIND_NEWLINE(interp, source, offset) ((CHARSET *)source->charset)->find_newline(interpreter, source, offset)
-#define CHARSET_FIND_NOT_NEWLINE(interp, source, offset) ((CHARSET *)source->charset)->find_not_newline(interpreter, source, offset)
-#define CHARSET_FIND_WORD_BOUNDARY(interp, source, offset) ((CHARSET *)source->charset)->find_word_boundary(interpreter, source, offset)
 #define CHARSET_COMPUTE_HASH(interp, source, seed) ((CHARSET *)source->charset)->compute_hash(interpreter, source, seed)
 #define CHARSET_GET_PREFERRED_ENCODING(interp, source) ((CHARSET *)source->charset)->preferred_encoding
 

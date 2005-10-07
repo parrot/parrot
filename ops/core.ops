@@ -404,10 +404,6 @@ Return from the sub or method via the current continuation.
 
 =cut
 
-inline op DELETED_invoke() {
-  goto NEXT();
-}
-
 inline op invokecc(in PMC) {
   opcode_t *dest;
   PMC * p = $1;
@@ -445,10 +441,6 @@ inline op tailcall(in PMC) {
   goto ADDRESS(dest);
 }
 
-inline op DELETED_updatecc() {
-  goto NEXT();
-}
-
 inline op returncc() {
   opcode_t *dest;
   PMC * p = CONTEXT(interpreter->ctx)->current_cont;
@@ -456,6 +448,94 @@ inline op returncc() {
   dest = (opcode_t *)p->vtable->invoke(interpreter, p, expr NEXT());
   goto ADDRESS(dest);
 }
+
+=back
+
+=head2 Function argument opcode
+
+Implementations of function argument and params handling
+
+=over 4
+
+=item B<set_args>(inconst PMC /* , ... */)
+
+Define arguments for the next function call.
+
+=item B<get_results>(inconst PMC /* , ... */)
+
+Define return values for the next function call.
+
+=item B<get_params>(inconst PMC /* , ... */)
+
+Define function parameters for this subroutine.
+
+=item B<set_returns>(inconst PMC /* , ... */)
+
+Define return results for the subroutine return statement.
+
+For all of these opcodes the passed in PMC constant is the string
+representation of a fixed integer array with one flag word per argument.
+The flags are documented currently in F<include/parrrot/enum.h> only.
+
+After this argument a variable amount of arguments must follow according
+to the elements of the signature array.
+
+=cut
+
+
+op set_args(inconst PMC) {
+    opcode_t *this = CUR_OPCODE;
+    PMC *signature = $1;
+    INTVAL argc;
+
+    /* for now just point to the opcode */
+    interpreter->current_args = this;
+    argc = VTABLE_elements(interpreter, signature);
+    goto ADDRESS(this + 2 + argc);
+}
+
+op get_results(inconst PMC) {
+    opcode_t *this = CUR_OPCODE;
+    PMC *signature = $1;
+    INTVAL argc;
+
+    CONTEXT(interpreter->ctx)->current_results = this;
+    argc = VTABLE_elements(interpreter, signature);
+    goto ADDRESS(this + 2 + argc);
+}
+
+op get_params(inconst PMC) {
+    opcode_t *this = CUR_OPCODE;
+    PMC *signature = $1;
+    struct Parrot_sub * sub = PMC_sub(CONTEXT(interpreter->ctx)->current_sub);
+    struct parrot_regs_t *caller_regs;
+    PMC *cont_pmc;
+    opcode_t *pc;
+
+    interpreter->current_params = this;
+    cont_pmc = CONTEXT(interpreter->ctx)->current_cont;
+
+    caller_regs = PMC_cont(cont_pmc)->to_ctx.bp;
+    pc = parrot_pass_args(interpreter, sub->seg, caller_regs,
+	    PARROT_OP_get_params_pc);
+    goto ADDRESS(pc);
+}
+
+op set_returns(inconst PMC) {
+    opcode_t *this = CUR_OPCODE;
+    PMC *signature = $1;
+    INTVAL argc;
+
+    interpreter->current_returns = this;
+    argc = VTABLE_elements(interpreter, signature);
+    goto ADDRESS(this + 2 + argc);
+}
+
+=back
+
+=head2 Address manipulation
+
+=over 4
 
 ########################################
 

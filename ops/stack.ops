@@ -569,19 +569,6 @@ inline op rotate_up(in INT) :base_core {
   goto NEXT();
 }
 
-inline op DELETED_intsave(in INT) :base_core {
-  goto NEXT();
-}
-
-
-inline op DELETED_intrestore(out INT) :base_core {
-  goto NEXT();
-}
-
-inline op DELETED_intdepth(out INT) :base_core {
-  goto NEXT();
-}
-
 =back
 
 =cut

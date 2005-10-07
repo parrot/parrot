@@ -18,7 +18,7 @@ do not.
 
 The variants with a prepended B<n_> like <n_not> generate a new target PMC.
 If possible, they use the appropriate language type, specified with C<.HLL>.
- 
+
 =cut
 
 ###############################################################################
@@ -145,10 +145,6 @@ op eq_addr(in PMC, in PMC, labelconst INT) :base_core {
 }
 
 =cut
-
-op DELETED_isnull(in PMC, labelconst INT) :base_core {
-  goto NEXT();
-}
 
 ########################################
 
@@ -823,6 +819,14 @@ inline op isfalse(out INT, in PMC) {
     goto NEXT();
 }
 
+=item B<isgt>(out INT, in INT, in INT)
+
+=item B<isgt>(out INT, in NUM, in NUM)
+
+=item B<isgt>(out INT, in STR, in STR)
+
+These 3 opcodes are valid, but create as their reverse.
+
 =item B<isgt>(out INT, in PMC, in PMC)
 
 Sets $1 to 1 if $2 is greater than $3.
@@ -833,6 +837,14 @@ inline op isgt(out INT, in PMC, in PMC) {
   $1 = (mmd_dispatch_i_pp(interpreter, $2, $3, MMD_CMP) > 0);
   goto NEXT();
 }
+
+=item B<isge>(out INT, in INT, in INT)
+
+=item B<isge>(out INT, in NUM, in NUM)
+
+=item B<isge>(out INT, in STR, in STR)
+
+These 3 opcodes are valid, but create as their reverse.
 
 =item B<isge>(out INT, in PMC, in PMC)
 
@@ -976,6 +988,58 @@ inline op isne(out INT, in PMC, in PMC) {
     $1 = 0;
   else
     $1 = !mmd_dispatch_i_pp(interpreter, $2, $3, MMD_EQ);
+  goto NEXT();
+}
+
+########################################
+
+=item B<if_null>(in PMC, labelconst INT)
+
+Branch to $2 if $1 is a NULL PMC.
+
+=item B<if_null>(invar STR, labelconst INT)
+
+Branch to $2 if $1 is a NULL STRING.
+
+=cut
+
+op if_null(in PMC, labelconst INT) {
+  if (PMC_IS_NULL($1)) {
+    goto OFFSET($2);
+  }
+  goto NEXT();
+}
+
+op if_null(invar STR, labelconst INT) {
+  if (!$1) {
+    goto OFFSET($2);
+  }
+  goto NEXT();
+}
+
+########################################
+
+=item B<unless_null>(in PMC, labelconst INT)
+
+Branch to $2 if $1 is I<not> a NULL PMC.
+
+=item B<unless_null>(invar STR, labelconst INT)
+
+Branch to $2 if $1 is I<not> a NULL STRING.
+
+=cut
+
+op unless_null(in PMC, labelconst INT) {
+  if (!PMC_IS_NULL($1)) {
+    goto OFFSET($2);
+  }
+  goto NEXT();
+}
+
+op unless_null(invar STR, labelconst INT) {
+  if ($1) {
+    goto OFFSET($2);
+  }
   goto NEXT();
 }
 

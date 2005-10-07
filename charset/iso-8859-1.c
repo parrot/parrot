@@ -266,109 +266,6 @@ validate(Interp *interpreter, STRING *src)
 }
 
 static INTVAL
-is_wordchar(Interp *interpreter, STRING *source_string, UINTVAL offset)
-{
-    UINTVAL codepoint;
-    codepoint = ENCODING_GET_CODEPOINT(interpreter, source_string, offset);
-    return (Parrot_iso_8859_1_typetable[codepoint] & WORDCHAR) == WORDCHAR;
-}
-
-static INTVAL
-find_wordchar(Interp *interpreter, STRING *source_string, UINTVAL offset)
-{
-    return ascii_find_thing(interpreter, source_string, offset, WORDCHAR,
-            Parrot_iso_8859_1_typetable);
-}
-
-static INTVAL
-find_not_wordchar(Interp *interpreter, STRING *source_string, UINTVAL offset)
-{
-    return ascii_find_not_thing(interpreter, source_string, offset, WORDCHAR,
-            Parrot_iso_8859_1_typetable);
-}
-
-static INTVAL
-is_whitespace(Interp *interpreter, STRING *source_string, UINTVAL offset)
-{
-    UINTVAL codepoint;
-    codepoint = ENCODING_GET_CODEPOINT(interpreter, source_string, offset);
-    return (Parrot_iso_8859_1_typetable[codepoint] & WHITESPACE) == WHITESPACE;
-}
-
-static INTVAL
-find_whitespace(Interp *interpreter, STRING *source_string, UINTVAL offset)
-{
-    return ascii_find_thing(interpreter, source_string, offset, WHITESPACE,
-            Parrot_iso_8859_1_typetable);
-}
-
-static INTVAL
-find_not_whitespace(Interp *interpreter, STRING *source_string,
-        UINTVAL offset)
-{
-    return ascii_find_not_thing(interpreter, source_string, offset,
-            WHITESPACE, Parrot_iso_8859_1_typetable);
-}
-
-static INTVAL
-is_digit(Interp *interpreter, STRING *source_string, UINTVAL offset)
-{
-    UINTVAL codepoint;
-    codepoint = ENCODING_GET_CODEPOINT(interpreter, source_string, offset);
-    return (Parrot_iso_8859_1_typetable[codepoint] & DIGIT) == DIGIT;
-}
-
-static INTVAL
-find_digit(Interp *interpreter, STRING *source_string, UINTVAL offset)
-{
-    return ascii_find_thing(interpreter, source_string, offset, DIGIT,
-            Parrot_iso_8859_1_typetable);
-}
-
-static INTVAL
-find_not_digit(Interp *interpreter, STRING *source_string, UINTVAL offset)
-{
-    return ascii_find_not_thing(interpreter, source_string, offset, DIGIT,
-            Parrot_iso_8859_1_typetable);
-}
-
-static INTVAL
-is_punctuation(Interp *interpreter, STRING *source_string, UINTVAL offset)
-{
-    UINTVAL codepoint;
-    codepoint = ENCODING_GET_CODEPOINT(interpreter, source_string, offset);
-    return (Parrot_iso_8859_1_typetable[codepoint] & PUNCTUATION) == PUNCTUATION;
-}
-
-static INTVAL
-find_punctuation(Interp *interpreter, STRING *source_string, UINTVAL offset)
-{
-    return ascii_find_thing(interpreter, source_string, offset, PUNCTUATION,
-            Parrot_iso_8859_1_typetable);
-}
-
-static INTVAL
-find_not_punctuation(Interp *interpreter, STRING *source_string,
-        UINTVAL offset)
-{
-    return ascii_find_not_thing(interpreter, source_string, offset,
-            PUNCTUATION, Parrot_iso_8859_1_typetable);
-}
-
-static INTVAL
-find_not_newline(Interp *interpreter, STRING *source_string, UINTVAL offset)
-{
-    return offset;
-}
-
-static INTVAL
-find_word_boundary(Interp *interpreter, STRING *source_string, UINTVAL offset)
-{
-     return ascii_find_word_boundary(interpreter, source_string,
-            offset, Parrot_iso_8859_1_typetable);
-}
-
-static INTVAL
 is_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags, STRING *source_string, UINTVAL offset)
 {
     UINTVAL codepoint;
@@ -457,22 +354,6 @@ Parrot_charset_iso_8859_1_init(Interp *interpreter)
 	is_cclass,
 	find_cclass,
 	find_not_cclass,
-        is_wordchar,
-        find_wordchar,
-        find_not_wordchar,
-        is_whitespace,
-        find_whitespace,
-        find_not_whitespace,
-        is_digit,
-        find_digit,
-        find_not_digit,
-        is_punctuation,
-        find_punctuation,
-        find_not_punctuation,
-        ascii_is_newline,
-        ascii_find_newline,
-        ascii_find_not_newline,
-        find_word_boundary,
         string_from_codepoint,
         ascii_compute_hash,
         NULL

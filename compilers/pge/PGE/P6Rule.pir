@@ -102,16 +102,17 @@ scan until the next token is found in C<pattern>.
     .local int pos                         # current position
     .local int plen                        # pattern length
 
+    .include "cclass.pasm"
     plen = lex["plen"]
     pos = lex["pos"]
     pos += skip
     lex["ws"] = 0
     unless pos < plen goto end
-    $I0 = is_whitespace pattern, pos
+    $I0 = is_cclass .CCLASS_WHITESPACE, pattern, pos
     lex["ws"] = $I0
   skipws:
     unless pos < plen goto end
-    $I0 = is_whitespace pattern, pos
+    $I0 = is_cclass .CCLASS_WHITESPACE, pattern, pos
     unless $I0 goto skipcomments
     inc pos
     goto skipws
@@ -121,7 +122,7 @@ scan until the next token is found in C<pattern>.
   skipnl:
     inc pos
     unless pos < plen goto end
-    $I0 = is_newline $S0, pos
+    $I0 = is_cclass .CCLASS_NEWLINE, pattern, pos
     if $I0 goto skipws
     goto skipnl
   end:
@@ -356,7 +357,7 @@ Parses subrules.
     pos = lex["pos"]
     $I0 = pos
   subrule_1:
-    $I1 = is_wordchar pattern, pos
+    $I1 = is_cclass .CCLASS_WORD, pattern, pos
     unless $I1 goto subrule_1b
   subrule_1_inc:
     inc pos
@@ -417,7 +418,7 @@ Parse an alias or backreference.
     plen = lex["plen"]                             # now let's scan for digits
   num_0:
     if $I0 >= plen goto num_1
-    $I1 = is_digit pattern, $I0
+    $I1 = is_cclass .CCLASS_NUMERIC, pattern, $I0
     unless $I1 goto num_1
     inc $I0
     goto num_0
@@ -674,7 +675,7 @@ will be coming soon.
     pos = "p6rule_parse_skip"(pattern, lex, 1)
     $I0 = pos
   quant_range_1:
-    $I1 = is_digit pattern, $I0
+    $I1 = is_cclass .CCLASS_NUMERIC, pattern, $I0
     unless $I1 goto quant_range_2
     inc $I0
     goto quant_range_1
@@ -697,7 +698,7 @@ will be coming soon.
     pos = "p6rule_parse_skip"(pattern, lex, 2)
     $I0 = pos
   quant_range_4:
-    $I1 = is_digit pattern, $I0
+    $I1 = is_cclass .CCLASS_NUMERIC, pattern, $I0
     unless $I1 goto quant_range_5
     inc $I0
     goto quant_range_4

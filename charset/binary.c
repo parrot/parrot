@@ -136,103 +136,6 @@ validate(Interp *interpreter, STRING *source_string)
     return 1;
 }
 
-/* No word chars in binary data */
-static INTVAL
-is_wordchar(Interp *interpreter, STRING *source_string, UINTVAL offset)
-{
-    return 0;
-}
-
-static INTVAL
-find_wordchar(Interp *interpreter, STRING *source_string, UINTVAL offset)
-{
-    return -1;
-}
-
-static INTVAL
-find_not_wordchar(Interp *interpreter, STRING *source_string, UINTVAL offset)
-{
-    return -1;
-}
-
-static INTVAL
-is_whitespace(Interp *interpreter, STRING *source_string, UINTVAL offset)
-{
-    return 0;
-}
-
-static INTVAL
-find_whitespace(Interp *interpreter, STRING *source_string, UINTVAL offset)
-{
-    return -1;
-}
-
-static INTVAL
-find_not_whitespace(Interp *interpreter, STRING *source_string, UINTVAL offset) {
-    return -1;
-}
-
-static INTVAL
-is_digit(Interp *interpreter, STRING *source_string, UINTVAL offset)
-{
-    return 0;
-}
-
-static INTVAL
-find_digit(Interp *interpreter, STRING *source_string, UINTVAL offset)
-{
-    return -1;
-}
-
-static INTVAL
-find_not_digit(Interp *interpreter, STRING *source_string, UINTVAL offset)
-{
-    return -1;
-}
-
-static INTVAL
-is_punctuation(Interp *interpreter, STRING *source_string, UINTVAL offset)
-{
-    return 0;
-}
-
-static INTVAL
-find_punctuation(Interp *interpreter, STRING *source_string, UINTVAL offset)
-{
-    return -1;
-}
-
-static INTVAL
-find_not_punctuation(Interp *interpreter, STRING *source_string,
-        UINTVAL offset)
-{
-    return -1;
-}
-
-static INTVAL
-is_newline(Interp *interpreter, STRING *source_string, UINTVAL offset)
-{
-    return 0;
-}
-
-static INTVAL
-find_newline(Interp *interpreter, STRING *source_string, UINTVAL offset)
-{
-    return -1;
-}
-
-static INTVAL
-find_not_newline(Interp *interpreter, STRING *source_string, UINTVAL offset)
-{
-    return -1;
-}
-
-static INTVAL
-find_word_boundary(Interp *interpreter, STRING *source_string, UINTVAL offset)
-{
-    return -1;
-}
-
 static INTVAL
 is_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags, STRING *source_string, UINTVAL offset)
 {
@@ -242,13 +145,13 @@ is_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags, STRING *source_string,
 static INTVAL
 find_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags, STRING *source_string, UINTVAL offset, UINTVAL count)
 {
-    return -1;
+    return offset + count;
 }
 
 static INTVAL
 find_not_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags, STRING *source_string, UINTVAL offset, UINTVAL count)
 {
-    return -1;
+    return offset + count;
 }
 
 static STRING *
@@ -289,22 +192,6 @@ Parrot_charset_binary_init(Interp *interpreter)
         is_cclass,
         find_cclass,
         find_not_cclass,
-        is_wordchar,
-        find_wordchar,
-        find_not_wordchar,
-        is_whitespace,
-        find_whitespace,
-        find_not_whitespace,
-        is_digit,
-        find_digit,
-        find_not_digit,
-        is_punctuation,
-        find_punctuation,
-        find_not_punctuation,
-        is_newline,
-        find_newline,
-        find_not_newline,
-        find_word_boundary,
         string_from_codepoint,
         ascii_compute_hash,
         NULL

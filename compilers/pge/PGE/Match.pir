@@ -177,7 +177,8 @@ depending on the rule.
     .param pmc key
     .local pmc capt
     $S0 = key
-    $I0 = is_digit $S0, 0
+    .include "cclass.pasm"
+    $I0 = is_cclass .CCLASS_NUMERIC, $S0, 0
     unless $I0 goto keyed_1
     capt = getattribute self, "PGE::Match\x0@:capt"
     goto keyed_2

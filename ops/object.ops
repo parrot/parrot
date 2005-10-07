@@ -270,10 +270,6 @@ op subclass(out PMC, in STR) :object_classes {
 
 =cut
 
-inline op DELETED_findclass(out INT, in STR) :object_base {
-  goto NEXT();
-}
-
 =item B<getclass>(out PMC, in STR)
 
 Find the PMC for a class, by name. Note that this is a one-level hash, so for

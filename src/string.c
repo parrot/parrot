@@ -2608,99 +2608,25 @@ Parrot_string_cstring(Interp *interpreter, const STRING *str)
     return str->strstart;
 }
 
-INTVAL
-Parrot_string_is_whitespace(Interp *interpreter, STRING *s, INTVAL offset)
-{
-    if (!s)
-        return 0;
-    return CHARSET_IS_WHITESPACE(interpreter, s, offset);
-}
 
-INTVAL
-Parrot_string_is_digit(Interp *interpreter, STRING *s, INTVAL offset)
-{
-    if (!s)
-        return 0;
-    return CHARSET_IS_DIGIT(interpreter, s, offset);
-}
+/*
 
-INTVAL
-Parrot_string_is_wordchar(Interp *interpreter, STRING *s, INTVAL offset)
-{
-    if (!s)
-        return 0;
-    return CHARSET_IS_WORDCHAR(interpreter, s, offset);
-}
+=item C<
+Parrot_string_is_cclass(Interp *, PARROT_CCLASS_FLAGS flags, STRING *s, UINTVAL offset)>
 
-INTVAL
-Parrot_string_is_punctuation(Interp *interpreter, STRING *s, INTVAL offset)
-{
-    if (!s)
-        return 0;
-    return CHARSET_IS_PUNCTUATION(interpreter, s, offset);
-}
+Return 1 if the codepoint of string C<s> at given offset is in the given
+character class C<flags>. See also F<include/parrot/cclass.h> for possible
+character classes. Returns 0 otherwise, or if the string is empty or NULL.
 
-INTVAL
-Parrot_string_is_newline(Interp *interpreter, STRING *s, INTVAL offset)
-{
-    if (!s)
-        return 0;
-    return CHARSET_IS_NEWLINE(interpreter, s, offset);
-}
+=cut
 
-INTVAL
-Parrot_string_find_whitespace(Interp *interpreter, STRING *s, INTVAL offset)
-{
-    if (!s)
-        return -1;
-    return CHARSET_FIND_WHITESPACE(interpreter, s, offset);
-}
-
-INTVAL
-Parrot_string_find_digit(Interp *interpreter, STRING *s, INTVAL offset)
-{
-    if (!s)
-        return -1;
-    return CHARSET_FIND_DIGIT(interpreter, s, offset);
-}
-
-INTVAL
-Parrot_string_find_wordchar(Interp *interpreter, STRING *s, INTVAL offset)
-{
-    if (!s)
-        return -1;
-    return CHARSET_FIND_WORDCHAR(interpreter, s, offset);
-}
-
-INTVAL
-Parrot_string_find_punctuation(Interp *interpreter, STRING *s, INTVAL offset)
-{
-    if (!s)
-        return -1;
-    return CHARSET_FIND_PUNCTUATION(interpreter, s, offset);
-}
-
-INTVAL
-Parrot_string_find_newline(Interp *interpreter, STRING *s, INTVAL offset)
-{
-    if (!s)
-        return -1;
-    return CHARSET_FIND_NEWLINE(interpreter, s, offset);
-}
-
-INTVAL
-Parrot_string_find_word_boundary(Interp *interpreter, STRING *s, INTVAL offset)
-{
-    if (!s)
-        return -1;
-    return CHARSET_FIND_WORD_BOUNDARY(interpreter, s, offset);
-}
+*/
 
 INTVAL
 Parrot_string_is_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags, STRING *s, UINTVAL offset)
 {
-    if (!s)
-        return -1;
+    if (!string_length(interpreter, s))
+        return 0;
     return CHARSET_IS_CCLASS(interpreter, flags, s, offset);
 }
 

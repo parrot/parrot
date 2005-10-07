@@ -60,14 +60,38 @@ functionality and correctness at the moment.
     $P0 = subclass expclass, "PGE::Exp::Group"
     hash = new Hash
     store_global "PGE::Exp::CCShortcut", "%slashcode", hash
-    hash['\d'] = "$I0=is_digit target, pos \n unless $I0 goto %s_f"
-    hash['\n'] = "$I0=is_newline target, pos \n unless $I0 goto %s_f"
-    hash['\s'] = "$I0=is_whitespace target, pos \n unless $I0 goto %s_f"
-    hash['\w'] = "$I0=is_wordchar target, pos \n unless $I0 goto %s_f"
-    hash['\D'] = "$I0=is_digit target, pos \n if $I0 goto %s_f"
-    hash['\N'] = "$I0=is_newline target, pos \n if $I0 goto %s_f"
-    hash['\S'] = "$I0=is_whitespace target, pos \n if $I0 goto %s_f"
-    hash['\W'] = "$I0=is_wordchar target, pos \n if $I0 goto %s_f"
+    hash['\d'] = <<"EOT"
+    $I0 = is_cclass .CCLASS_NUMERIC, target, pos
+    unless $I0 goto %s_f
+EOT
+    hash['\n'] = <<"EOT"
+    $I0 = is_cclass .CCLASS_NEWLINE, target, pos
+    unless $I0 goto %s_f
+EOT
+    hash['\s'] = <<"EOT"
+    $I0 = is_cclass .CCLASS_WHITESPACE, target, pos
+    unless $I0 goto %s_f
+EOT
+    hash['\w'] = <<"EOT"
+    $I0 = is_cclass .CCLASS_WORD, target, pos
+    unless $I0 goto %s_f
+EOT
+    hash['\D'] = <<"EOT"
+    $I0 = is_cclass .CCLASS_NUMERIC, target, pos
+    if $I0 goto %s_f
+EOT
+    hash['\N'] = <<"EOT"
+    $I0 = is_cclass .CCLASS_NEWLINE, target, pos
+    if $I0 goto %s_f
+EOT
+    hash['\S'] = <<"EOT"
+    $I0 = is_cclass .CCLASS_WHITESPACE, target, pos
+    if $I0 goto %s_f
+EOT
+    hash['\W'] = <<"EOT"
+    $I0 = is_cclass .CCLASS_WORD, target, pos
+    if $I0 goto %s_f
+EOT
     $P0 = new Integer
     store_global "PGE::Exp", "$_serno", $P0
     .return ()
@@ -437,6 +461,7 @@ register.
     emit(code, "    .local pmc capt")
     emit(code, "    .local pmc from")
     emit(code, "    .local int iscreator")
+    emit(code, ".include \"cclass.pasm\"")
     emit(code, "    gpad = new PerlArray")
     emit(code, "    cpad = new PerlArray")
     emit(code, "    push gpad, -1")
@@ -830,24 +855,24 @@ register.
     emit(code, "    if pos == 0 goto %s", next)
     unless token == '^^' goto end
     emit(code, "    $I0 = pos - 1")
-    emit(code, "    $I1 = is_newline target, $I0")
+    emit(code, "    $I1 = is_cclass .CCLASS_NEWLINE, target, $I0")
     emit(code, "    if $I1 goto %s", next)
     goto end
   eos:
     emit(code, "    if pos == lastpos goto %s", next)
     unless token == '$$' goto end
-    emit(code, "    $I0 = is_newline target, pos")
+    emit(code, "    $I0 = is_cclass .CCLASS_NEWLINE, target, pos")
     emit(code, "    if $I0 goto %s", next)
     goto end
   word:
     emit(code, "    $I0 = 0")
     emit(code, "    unless pos > 0 goto %s_1", label)
     emit(code, "    $I2 = pos - 1")
-    emit(code, "    $I0 = is_wordchar target, $I2")
+    emit(code, "    $I0 = is_cclass .CCLASS_WORD, target, $I2")
     emit(code, "  %s_1:", label)
     emit(code, "    $I1 = 0")
     emit(code, "    unless pos < lastpos goto %s_2", label)
-    emit(code, "    $I1 = is_wordchar target, pos")
+    emit(code, "    $I1 = is_cclass .CCLASS_WORD, target, pos")
     emit(code, "  %s_2:", label)
     unless token == "\\b" goto word_1
     emit(code, "    if $I0 != $I1 goto %s", next)
