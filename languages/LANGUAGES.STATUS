@@ -20,9 +20,11 @@ N: BASIC/compiler
 A: Clint Pierce
 A: Will Coleda (work with parrot 0.1.0+)
 D: BASIC Compiler
-S: Cautiously Optimistic - wumpus & screen examples seem to work again.
+S: Broken. Using PIR, but deprecated "invoke" and manually managing
+S:  old-sylte calling conventions: needs to be updated to work with new 
+S:  calling conventions
 M: Yes
-V: 0.0.11
+V: N/A
 
 N: BASIC/interpreter
 A: Clint Pierce

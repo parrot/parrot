@@ -180,8 +180,7 @@ ANSI_BG:find_global $P0, "ANSI_bgcolors"
 	find_global $P0, "scankey"
 	set I0, $P0["value"]
 	eq I0, 1, END
-        #call _set_nonblock
-	call _set_noecho_cbreak
+	_set_noecho_cbreak()
 END:    set $P0["value"], 1
 	store_global "scankey", $P0
 .end
@@ -189,8 +188,7 @@ END:    set $P0["value"], 1
 	find_global $P0, "scankey"
 	set I0, $P0["value"]
 	eq I0, 0, END
-	#call _unset_nonblock
-	call _set_echo_nocbreak
+	_set_echo_nocbreak()
 END:    set $P0["value"], 0
 	store_global "scankey", $P0
 .end

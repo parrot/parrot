@@ -7,7 +7,7 @@
 	.param int numchar
 	.param int fd
 	ne fd, 0, NORESET
-	call _line_read
+	_line_read()
 NORESET:find_global $P0, "FDS"
 	$P1=$P0[fd]
 	set $S0, ""
