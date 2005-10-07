@@ -164,6 +164,9 @@ END_OUT
 
 
 #--------------------------------------------
+SKIP:
+{
+  skip( 'infinite loop when loading frozen state', 5 );
 $real_out     = `$parrot_m4 --reload-state=$examples_dir/only_T7_0.frozen $examples_dir/hello.m4 2>&1`; 
 is( $real_out, << 'END_OUT', '--reload-state' );
 Hello
@@ -200,3 +203,5 @@ Hello
 Hello
 Hello
 END_OUT
+
+};

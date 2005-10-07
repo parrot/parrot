@@ -366,8 +366,9 @@ TODO: Pass a flag for EXIT_FAILURE and EXIT_SUCCESS
 
   print "Usage: ../../parrot "
   print program_name
-  print " [OPTION]... FILE\n\n"
+  print " [OPTION]... FILE\n"
   print <<"END_USAGE"
+
 Currently only long options are available.
 
 Operation modes:
