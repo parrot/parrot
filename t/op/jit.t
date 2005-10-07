@@ -1163,6 +1163,8 @@ OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "volatile clobbered by function call");
   null I3
+  null I6
+  null I5
   add I4, I5, I6
   add I4, I5, I6
   add I4, I5, I6
