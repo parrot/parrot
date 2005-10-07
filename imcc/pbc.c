@@ -563,12 +563,18 @@ IMCC_string_from_reg(Interp *interpreter, SymReg *r)
 
     if (r->type & VT_ENCODED) {
         char *p;
+        /*
+         * the lexer parses:   foo:"string"
+         * get first part as charset, rest as string
+         */
         p = strchr(r->name, '"');
-        assert(p);
+        assert(p && p[-1] == ':');
         p[-1] = 0;
         charset = r->name;
         buf = p + 1;        /* past delim */
         s = string_unescape_cstring(interpreter, buf, '"', charset);
+        /* restore colon, as we may reuse this string */
+        p[-1] = ':';
     }
     else if (*buf == '"') {
         buf++;
@@ -934,6 +940,8 @@ add_1_const(Interp *interpreter, SymReg *r)
             r->color = IMCC_int_from_reg(interpreter, r);
             break;
         case 'S':
+            if (r->type & VT_CONSTP)
+                r = r->reg;
             r->color = add_const_str(interpreter, r);
             break;
         case 'N':

@@ -26,7 +26,7 @@ else {
 
 if ( $cflags !~ /-D_XOPEN_SOURCE=/ ) {
     # Request visibility of all POSIX symbols
-    $cflags .= ' -D_XOPEN_SOURCE=600';
+    ## $cflags .= ' -D_XOPEN_SOURCE=600';
 }
 
 Configure::Data->set(

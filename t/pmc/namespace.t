@@ -338,40 +338,40 @@ OUTPUT
 }
 
 
-pir_output_is(<<'CODE', <<'OUT', "unicode: default ns encoding is ascii");
-.namespace [ "François" ]
+pir_output_is(<<'CODE', <<'OUT', "latin1 namespace, global");
+.namespace [ iso-8859-1:"François" ]
 
 .sub '__init'
-	print 'unicode namespaces are fun'
+	print "latin1 namespaces are fun\n"
 .end
 
 .namespace [ "" ]
 
 .sub 'main' :main
-	$P0 = find_global 'François', '__init'
+	$P0 = find_global iso-8859-1:"François", '__init'
 	$P0()
 .end
 CODE
-Malformed string
+latin1 namespaces are fun
 OUT
 
-
-pir_output_is(<<'CODE', <<'OUT', "unicode: accepts namespaces with encoding", todo => 'as yet unimplemented');
-.namespace [ unicode:"François" ]
+pir_output_is(<<'CODE', <<'OUT', "unicode namespace, global");
+.namespace [ unicode:"Fran\xe7ois" ]
 
 .sub '__init'
-	print 'unicode namespaces are fun'
+	print "unicode namespaces are fun\n"
 .end
 
 .namespace [ "" ]
 
 .sub 'main' :main
-	$P0 = find_global unicode:'François', '__init'
+	$P0 = find_global unicode:"Fran\xe7ois", '__init'
 	$P0()
 .end
 CODE
 unicode namespaces are fun
 OUT
+
 
 
 # remember to modify the number of tests!
