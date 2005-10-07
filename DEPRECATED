@@ -21,12 +21,6 @@ savetop, restoretop,
   use saveall/restoreall (whole register frame) or
   user stack opcodes save/restore instead.
 
-String character class opcodes is_* find_* and API interfaces
-
-  The opcodes C<is_digit>, C<find_digit> et al and the according APIs are
-  covered by the more universal C<is_cclass>, C<find_cclass>, and
-  C<find_not_cclass> opcodes.
-
 C<pack> opcodes
 
   I've no clue what these are doing - for sure not a perl-ish pack.
@@ -34,7 +28,8 @@ C<pack> opcodes
 
 FUTURE changes
 
-Not yet deprecated, but it's recommended to use the new syxtax.
+Not yet deprecated, but it's recommended to use the new syxtax and
+gradually change the old.
 
 Subroutine attributes will use the colon syntax:
 
@@ -43,4 +38,8 @@ Subroutine attributes will use the colon syntax:
 
 The new syntax uses no comma separators and all sub attributes are lower
 case and prefixed by a colon.
+
+Class name IDs will require a dot in front
+
+  $P0 = new Integer               => $P0 = new .Integer
 
