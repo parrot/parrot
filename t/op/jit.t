@@ -942,6 +942,7 @@ ok 4
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "last is JIT branch");
+    null I0
     print "ok 1\n"
     branch l2
 l1:
@@ -957,6 +958,7 @@ ok 3
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "last is JIT branch");
+    null I0
     print "ok 1\n"
     branch l2
 l1:

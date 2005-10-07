@@ -39,6 +39,7 @@ OUT
 pir_output_is(<<'CODE', <<'OUT', "local labels");
 # this code is illegal for assemble.pl
 .sub __main
+	null $I0
 	bsr _sub1
 	bsr _sub2
 	end
