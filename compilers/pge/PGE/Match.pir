@@ -70,9 +70,7 @@ it left off.
     $P0 = -1
     goto end
   next_2:
-    .pcc_begin
-    .pcc_call yield
-    .pcc_end
+    .yield()
   end:
     .return ()
 .end

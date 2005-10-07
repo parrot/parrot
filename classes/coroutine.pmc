@@ -149,7 +149,7 @@ Swaps the "context".
             ctx.rctx = CONTEXT(ctx)->prev;
             INTERP->ctx = ctx;
             /* yield values */
-            if (INTERP->current_returns)
+            if (INTERP->current_returns && CONTEXT(ctx)->current_results)
                 parrot_pass_args(INTERP, wanted_seg,
                         co->ctx.bp,
                         PARROT_OP_get_results_pc);
