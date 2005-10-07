@@ -35,6 +35,8 @@ sub analyse {
     foreach my $op ( keys %$ops ) {
         my $args = $ops->{$op};
         next if $op =~ /^DELETED/;
+        next if $op =~ /^isgt/;	# doced but rewritten
+        next if $op =~ /^isge/;
         foreach my $arg ( keys %$args ) {
             my $e = $args->{$arg};
             my $val = $e->{status};
