@@ -1,7 +1,7 @@
 #! perl -w
 
 use strict;
-use constant VERSION => 2.2;
+use constant VERSION => 2.3;
 
 use constant PREV => 2;
 use constant CURR => 1;

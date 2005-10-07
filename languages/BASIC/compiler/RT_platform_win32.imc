@@ -1,3 +1,7 @@
+=for fixing
+
+I can't test this on windows, and it's currently broken. Please fix it.
+
 .const int SIZEOF_CONSOLE_SCREEN_BUFFER_INFO = 22
 .const int SIZEOF_DWORD = 4
 .sub _win32_setup			# void win32_setup(void)
@@ -249,3 +253,5 @@ NO_EVENTS:
 END_EVENTS:
 END:	.return(S0)
 .end
+
+=cut

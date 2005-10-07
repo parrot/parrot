@@ -17,6 +17,7 @@
 #
 .sub _BUILTIN_DISPLAY  #_WORK	 	# string display_work(string|float thingy[, string|float thingy2])
 	.param int argc
+	.param pmc printme
 
 	.local string buf
 	.local int intver
@@ -26,60 +27,69 @@
         # XXX Used to use entrytype.  our naive fix here will eventually
 	#   fail, because of the two variable type arguments.
 
-	find_global $P0, "PRINTCOL"
-	set PRINTCOL, $P0["value"]
+	$P0 = find_global "PRINTCOL"
+	PRINTCOL = $P0["value"]
 
-	set buf, ""
-NEXT:	eq argc, 0, END_DISPLAY
+	buf = ""
+NEXT:	
+	if argc==0 goto END_DISPLAY
 	dec argc
-	eq I2, 1, DISPSTRING
-	ne I4, 1, DISPERR
+	$I0 = typeof printme
+	if $I0 == .String goto DISPSTRING
+	if $I0 != .Float  goto DISPERR
 	
 	# Now, do floats
-	set intver, N5
-	set $N0, intver
-	eq $N0, N5, DISPINT	# Nope, it's an integer.
-	s = _NORMALIZE_FLOAT(N5)
-	lt N5, 0.0, NEGFLO
-	concat buf, " "
-NEGFLO:	concat buf, s
-	concat buf, " "
-	branch NEXT
+	intver = printme
+	$N0 = intver
+	$N1 = printme
+	if $N0 == $N1 goto DISPINT	# Nope, it's an integer.
+	s = _NORMALIZE_FLOAT(printme)
+	if printme < 0 goto NEGFLO
+        buf .= " "
+NEGFLO:	
+	buf .= s
+	buf .= " "
+	goto NEXT
 
 	# Integers display -1234_
 	#              or  _1234
-DISPINT:set $S0, intver
-	lt intver, 0, NEGINT
-	concat buf, " "
-NEGINT: concat buf, $S0
-	concat buf, " "
-	branch NEXT
+DISPINT:
+	$S0 = intver
+	if intver <0 goto NEGINT
+	buf .= " "
+NEGINT: 	
+	buf .= $S0
+	buf .= " "
+	goto NEXT
 
 DISPSTRING:
-	length $I0, S5
-	eq S5, "\t", DISPTAB
-	concat buf, S5
-	eq S5, "\n", DISPNL
-	add PRINTCOL, PRINTCOL, $I0
-	branch NEXT
+	s = printme
+	$I0 = length s
+	if s == "\t" goto DISPTAB
+	buf .= s
+	if s == "\n" goto DISPNL
+	PRINTCOL += $I0
+	goto NEXT
 DISPTAB:
-	set $I0, PRINTCOL
-        mod $I0, $I0, 8
-        sub $I0, 7, $I0
-        set $I1, 0
-        eq $I1, $I0, NEXT
-	concat buf, " "
+	$I0 = PRINTCOL
+	$I0 %= 8
+	$I0 = 7 - $I0
+        $I1 = 0
+	if $I1 == $I0 goto NEXT
+	buf .= " "
 	inc PRINTCOL
-        inc I1
-        branch DISPTAB
-DISPNL:	set PRINTCOL, 0
-	branch NEXT
+        inc $I1
+        goto DISPTAB
+DISPNL:	
+	PRINTCOL = 0
+	goto NEXT
 END_DISPLAY:
-	set $P0["value"], PRINTCOL
+	$P0["value"] = PRINTCOL
 	store_global "PRINTCOL", $P0
 	print buf
 	.return(buf)
-DISPERR:print "Unknown type on stack to print\n"
+DISPERR:
+	print "Unknown type on stack to print\n"
 	end
 .end
 

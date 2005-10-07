@@ -5,102 +5,112 @@
 .const int PMC = 4
 .sub _ARRAY_LOOKUP_N	# float ARRAY_LOOKUP_N(string array, int keycount[, string|float])
 	.param string array
+        .param int keycount
+	.param pmc things :slurpy
+
 	.local string key
 	.local pmc BASICARR
 	find_global BASICARR, "BASICARR"
-	key = _ARRAY_BUILDKEY()
-	set $P0, BASICARR[array]
-	ne key, "", ARR_NORMAL
+	key = _ARRAY_BUILDKEY(keycount,things)
+	$P0 = BASICARR[array]
+	if key != "" goto ARR_NORMAL
 	.return($P0)		# Return the whole array.
 ARR_NORMAL:
-	$P1=$P0["hash"]		# forked arrays, awaiting keys()
-	set $N0, $P1[key]
+	$P1 = $P0["hash"]		# forked arrays, awaiting keys()
+	$N0 = $P1[key]
 	.return($N0)
 .end
+
 .sub _ARRAY_LOOKUP_S	# string ARRAY_LOOKUP_S(string array, int keycount[, string|float])
 	.param string array
+	.param int keycount
+	.param pmc things :slurpy
+
 	.local string key
 	.local pmc BASICARR
 	find_global BASICARR, "BASICARR"
-	key = _ARRAY_BUILDKEY()
-	set $P0, BASICARR[array]
-	ne key, "", ARR_NORMAL
+	key = _ARRAY_BUILDKEY(keycount, things)
+	$P0 = BASICARR[array]
+	if key != "" goto ARR_NORMAL
 	.return($P0)
 ARR_NORMAL:
-	$P1=$P0["hash"]		# forked arrays, awaiting keys()
-	set $S0, $P1[key]
+	$P1 = $P0["hash"]		# forked arrays, awaiting keys()
+	$S0 = $P1[key]
 	.return($S0)
 ARR_END:
         noop
 .end
+
 			# void ARRAY_ASSIGN_N(string array, PerlArray rhs, int keycount[, string|float keys])
 			# void ARRAY_ASSIGN_N(string array, string rhs, int keycount[, string|float keys])
 .sub _ARRAY_ASSIGN	# void ARRAY_ASSIGN_N(string array, float rhs, int keycount[, string|float keys])
 	.param string array
-
-        # XXX used to use entrytype. now using calling conventions.
-	#   problem in that the last arg to this function seems to also
-	#   have variable types, so our check is currently a little naive.
+        .param pmc rhs
+	.param int keycount
+        .param pmc things     :slurpy
 
 	# Assign a number
-	ne I4, 1, ASSIGN_STRING
+	.local int rhs_type
+	rhs_type = typeof rhs
+	if rhs_type == .String goto ASSIGN_STRING
 	.local string key
 	.local pmc BASICARR
-	find_global BASICARR, "BASICARR"
+	BASICARR = find_global "BASICARR"
 
-	key = _ARRAY_BUILDKEY()   # Will absorb rest of arguments.
-	set $P1, BASICARR[array]
-	set $P0, $P1["hash"]
-	set $P0[key], N5
+	key = _ARRAY_BUILDKEY(keycount,things)
+	$P1 = BASICARR[array]
+	$P0 =  $P1["hash"]
+	$P0[key] = rhs
 	store_global "BASICARR", BASICARR
-	branch END_ASSIGN
+	goto END_ASSIGN
 
 	# Assign a string
 ASSIGN_STRING:
-	ne I2, 1, ASSIGN_UNK
+	if rhs_type != .String goto ASSIGN_UNK
 
 	.local string key
 	.local pmc BASICARR
 	find_global BASICARR, "BASICARR"
 
-	key = _ARRAY_BUILDKEY()  # Will absorb rest of arguments.
-	set $P1, BASICARR[array]
-	set $P0, $P1["hash"]
-	set $P0[key], S5
+	key = _ARRAY_BUILDKEY(keycount, things)
+	$P1 =  BASICARR[array]
+	$P0 = $P1["hash"]
+	$P0[key] = rhs
 	store_global "BASICARR", BASICARR
-	branch END_ASSIGN
+	goto END_ASSIGN
 
 	# Assign a... well, we dunno WTF this is.
 ASSIGN_UNK:
-	ne I3, 1, ASSIGN_ERR
+	#ne I3, 1, ASSIGN_ERR (handled by calling conventions now)
 	.local string key
 	.local pmc BASICARR
 	find_global BASICARR, "BASICARR"
-	key = _ARRAY_BUILDKEY()
-	set $P1, BASICARR[array]
-	set $P0, $P1["hash"]
+	key = _ARRAY_BUILDKEY(keycount,things)
+	$P1 = BASICARR[array]
+	$P0 = $P1["hash"]
+	$S0 = rhs[TYPE]
 
-	set $S0, P5[TYPE]
-	ne $S0, "STRING", NOTSTRING
-	set $S1, P5[VALUE]
-	set $P0[key], $S1
-	branch END_UNK
+	if $S0 != "STRING" goto NOTSTRING
+	$S1 = rhs[VALUE]
+	$P0[key]= $S1
+	goto END_UNK
 
 NOTSTRING:
-	ne $S0, "INT", NOTINT
-	set $I0, P5[VALUE]
-	set $N0, $I0
-	set $P0[key], $N0
-	branch END_UNK
+	if $S0 != "INT" goto NOTINT
+	$I0 = rhs[VALUE]
+	$N0 = $I0
+	$P0[key] = $N0
+	goto END_UNK
 
-NOTINT:	ne $S0, "FLOAT", ASSIGN_ERR
-	set $N0, P5[VALUE]
-	set $P0[key], $N0
-	branch END_UNK
+NOTINT:	
+	if $S0 != "FLOAT" goto ASSIGN_ERR
+	$N0 = rhs[VALUE]
+	$P0[key] = $N0
+	#goto END_UNK
 
 END_UNK:
 	store_global "BASICARR", BASICARR
-	branch END_ASSIGN
+	goto END_ASSIGN
 
 ASSIGN_ERR:
 	print "Assignment error"
@@ -110,20 +120,23 @@ ASSIGN_ERR:
 END_ASSIGN:
 	# Temporary, needed only until PerlHash->keys() gets implemented
 	find_global BASICARR, "BASICARR"
-	set $P1, BASICARR[array]
-	set $P0, $P1["index"]
+	$P1 = BASICARR[array]
+	$P0 = $P1["index"]
 	.local int i
-	set i, 0
-E_A:	set $S0, $P0[i]
-	eq $S0, "", E_A2
-	eq $S0, key, E_A2
+	i = 0
+E_A:	
+	$S0 = $P0[i]
+	if $S0=="" goto E_A2
+	if $S0==key goto E_A2
 	inc i
-	branch E_A
-E_A2:	$P0[i]=key
+	goto E_A
+E_A2:	
+	$P0[i]=key
 	$P1["index"]=$P0
 	BASICARR[array]=$P1
 	store_global "BASICARR", BASICARR
-REALEND:noop
+REALEND:
+	noop
 .end
 # This gets a *lot* easier when PerlHash->keys() gets implemented
 .sub _ARRAY_KEYS	# void ARRAY_KEYS(string source, string target)
@@ -172,30 +185,41 @@ ENDLOOP:noop
 #	store_global "BASICARR", BASICARR
 #.end
 # These are probably defined somewhere, I can't find them.
+
 .const int FLOAT = 2
 .const int STRING = 3
+
 .sub _ARRAY_BUILDKEY   # string ARRAY_BUILDKEY(int keycount[, string|float...])
 	.param int keycount
+	.param pmc things
+
 	.local string key
-	set key, ""
-KEYLOOP:le keycount, 0, KEYDONE
-	concat key, "|"
-	eq I4, 1, ADDFLOAT
-	eq I2, 1, ADDSTRING
+	key = ""
+
+	.local pmc thing
+	.local int key_type
+KEYLOOP:
+	if keycount ==0 goto KEYDONE
+	thing = shift things
+	key_type = typeof thing
+	
+	key .= "|"
+	if key_type == .Float goto ADDFLOAT
+	if key_type == .String goto ADDSTRING
+
 	print "Wrong type on stack, key creation\n"
 	end
 ADDFLOAT:
-	restore $N0
-	set $I1, $N0
-	set $S0, $I1
-	concat key, $S0
+	$I1 = thing
+	$S0 = $I1
+	key .= $S0
 	dec keycount
-	branch KEYLOOP
+	goto KEYLOOP
 ADDSTRING:
-	restore $S0
-	concat key, $S0
+	$S0 = thing
+	key .= $S0
 	dec keycount
-	branch KEYLOOP
-
-KEYDONE:.return(key)
+	goto KEYLOOP
+KEYDONE:
+	.return(key)
 .end

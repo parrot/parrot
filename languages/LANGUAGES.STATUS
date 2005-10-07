@@ -18,19 +18,17 @@ W: http://xamber.org/
 
 N: BASIC/compiler
 A: Clint Pierce
-A: Will Coleda (work with parrot 0.1.0+)
+A: Will Coleda (work with parrot 0.3.0+)
 D: BASIC Compiler
-S: Broken. Using PIR, but deprecated "invoke" and manually managing
-S:  old-sylte calling conventions: needs to be updated to work with new 
-S:  calling conventions
+S: some of the samples work again.
 M: Yes
-V: N/A
+V: 0.3.0
 
 N: BASIC/interpreter
 A: Clint Pierce
 D: BASIC Interpreter written in pure Parrot
 S: Broken - probably due to changes in PIR syntax.
-M: Yes
+M: No?
 V: 0.0.11
 
 N: bc

@@ -1,53 +1,68 @@
 .const int BLACK =  0
-.const int RED	=  1
+.const int RED	 =  1
 .const int GREEN  = 2
 .const int YELLOW = 3
 .const int BLUE   = 4
 .const int MAGENTA= 5
 .const int CYAN   = 6
 .const int WHITE  = 7
+
+.const int TCGETA  = 0x5405
+.const int TCSETAF = 0x5408
+
+.const int ICANON = 2
+.const int IECHO  = 8
+
+.const int F_GETFL = 3
+.const int F_SETFL = 4
+
+.const int STDIN = 0
+
 .sub _ansi_setup
-	$P0=new PerlArray
-	set $P0[0], BLACK
-	set $P0[1], BLUE
-	set $P0[2], GREEN
-	set $P0[3], CYAN
-	set $P0[4], RED
-	set $P0[5], MAGENTA
-	set $P0[6], YELLOW
-	set $P0[7], WHITE
+	$P0=new .PerlArray
+	$P0[0]= BLACK
+	$P0[1]= BLUE
+	$P0[2]= GREEN
+	$P0[3]= CYAN
+	$P0[4]= RED
+	$P0[5]= MAGENTA
+	$P0[6]= YELLOW
+	$P0[7]= WHITE
 	store_global "ANSI_fgcolors", $P0
 
-	$P0=new PerlArray
-	set $P0[0], BLACK
-	set $P0[1], BLUE
-	set $P0[2], GREEN
-	set $P0[3], CYAN
-	set $P0[4], RED
-	set $P0[5], MAGENTA
-	set $P0[6], YELLOW
-	set $P0[7], WHITE
-	set $P0[8], BLACK
-	set $P0[9], BLUE
-	set $P0[10], GREEN
-	set $P0[11], CYAN
-	set $P0[12], RED
-	set $P0[13], MAGENTA
-	set $P0[14], YELLOW
-	set $P0[15], 8
+	$P0=new .PerlArray
+	$P0[0]= BLACK
+	$P0[1]= BLUE
+	$P0[2]= GREEN
+	$P0[3]= CYAN
+	$P0[4]= RED
+	$P0[5]= MAGENTA
+	$P0[6]= YELLOW
+	$P0[7]= WHITE
+	$P0[8]= BLACK
+	$P0[9]= BLUE
+	$P0[10]= GREEN
+	$P0[11]= CYAN
+	$P0[12]= RED
+	$P0[13]= MAGENTA
+	$P0[14]= YELLOW
+	$P0[15]= 8
 	store_global "ANSI_bgcolors", $P0
 
-	$P0=new PerlHash
+	$P0=new .PerlHash
 	$P0["value"]=0
 	store_global "scankey", $P0
 .end
+
 .sub _ansi_screen_clear
 	print "\e[2J"
 	print "\e[H"
 .end
+
 .sub _ansi_shutdown
 	_TERMIO_normal()
 .end
+
 .sub _ANSI_SCREEN_LOCATE	# void ansi_screen_locate (int x, int y)
 	.param int x
 	.param int y
@@ -57,6 +72,7 @@
 	print y
 	print "H"
 .end
+
 ## These don't work exactly right.  ANSI would require that I send
 ## \e[6n and read the input stream for a \e[row;colR reply from the 
 ## terminal.  I *really* can't do that until IO is fixed, because STDIN
@@ -94,102 +110,110 @@
 	lt fore, 8, ANSI_FG
 	sub fore, fore, 8
 	print "1;"	# Turn on high intensity
-ANSI_FG: set $I3, $P0[fore]
+ANSI_FG: 
+	$I3 = $P0[fore]
 	print "3"
 	print $I3
 	print ";"
 	
 	# Background
-ANSI_BG:find_global $P0, "ANSI_bgcolors"
-	set $I3, $P0[back]
+ANSI_BG:
+	$P0 = find_global "ANSI_bgcolors"
+	$I3 = $P0[back]
 	print "4"
 	print $I3
 	print "m"
 .end
+
 .sub _set_noecho_cbreak
-	loadlib P1, ""
-	dlfunc P0, P1, "ioctl", "iiip"
-	set I0, 1
-	P9 = new ManagedStruct	# Saved
-	P10 = new ManagedStruct   # New
-	set P9, 20	# sizeof termio 4/byte aligned
-	set P10, 20
-	set I5, 0
-	set I6, 0x5405  # TCGETA
-	set P5, P9
-	invoke		# ioctl(0, TCGETA, &savetty);
-	set I5, 0
-	set I6, 0x5405
-	set P5, P10
-	invoke		# ioctl(0, TCGETA, &settty);
-	I0 = _get_little_endian(P10,6,2)
-	set I1, 2	# ICANON
-	bnot I1, I1 	# ~ICANON
-	band I0, I0, I1 # settty.c_lflag &= ~ICANON;
-	set I1, 8	# IECHO
-	bnot I1, I1 	# ~ICANON
-	band I0, I0, I1	# settty.c_lflag &= ~ECHO;
-	_set_little_endian(P10,6,2,I10)
-	set I5, 0
-	set I6, 0x5408
-	set P5, P10
-	invoke		# ioctl(0, TCSETAF, &settty);
-	store_global "ioctl_mode", P9
+
+	$P1 = loadlib ""
+        .local pmc ioctl
+	ioctl = dlfunc $P1, "ioctl", "iiip"
+
+	$P9 = new .ManagedStruct    # Saved
+	$P9 = 20
+
+	$P10 = new .ManagedStruct   # New
+	$P10 = 20
+
+        ioctl(0, TCGETA, $P9)
+
+        ioctl(0, TCGETA, $P10)
+
+	$I0 = _get_little_endian($P10,6,2)
+
+	$I1 = ICANON
+	$I1 = bnot $I1
+	$I0 = band $I0, $I1 # settty.c_lflag &= ~ICANON;
+
+	$I1 = IECHO
+	$I1 = bnot $I1
+	$I0 = band $I0, $I1	# settty.c_lflag &= ~ECHO;
+
+	_set_little_endian($P10,6,2,$I0)
+
+	ioctl(0, TCSETAF, $P10)
+
+	store_global "ioctl_mode", $P9
 .end
+
 .sub _set_echo_nocbreak
-	loadlib P1, ""
-	dlfunc P0, P1, "ioctl", "iiip"
-	find_global P9, "ioctl_mode"
-	set I5, 0
-	set I6, 0x5408
-	set P5, P9
-	invoke		# ioctl(0, TCSETAF, &savetty)
+	$P1 = loadlib ""
+	.local pmc ioctl
+	ioctl = dlfunc $P1, "ioctl", "iiip"
+	$P9 = find_global "ioctl_mode"
+
+	ioctl(0, TCSETAF, $P9)
 .end
 
 .sub _set_nonblock	# void _set_nonblock
-	set I11, 0
-	loadlib P1, ""
-	dlfunc P0, P1, "fcntl", "iiii"
-	set I0, 1
-	set I5, 0	# Stdin
-	set I6, 3	# F_GETFL
-	invoke		# mode=fcntl(0, F_GETFL, unused)
+	I11= 0
+	$P1 = loadlib ""
+	.local pmc fcntl
+	fcntl = dlfunc $P1, "fcntl", "iiii"
 
-	set I11, I5	# Old values
-	dlfunc P0, P1, "fcntl", "iiil"
-	bor I7, I5, 2048  # O_NONBLOCK 04000
-	set I5, 0	# Stdin
-	set I6, 4	# F_SETFL
-	invoke		# nmode=fcntl(0, F_SETFL, mode | O_NONBLOCK)
+	.local int old_value
+	old_value = fcntl(STDIN, F_GETFL)
 
-	$P0=new PerlHash
-	set $P0["value"], I11
+	fcntl = dlfunc $P1, "fcntl", "iiil"
+
+	$I7 = bor I5, 2048  # O_NONBLOCK 04000
+	#invoke		# nmode=fcntl(0, F_SETFL, mode | O_NONBLOCK)
+	fcntl(STDIN, F_SETFL, $I7)
+
+	$P0=new .PerlHash
+	$P0["value"]= old_value
 	store_global "fcntl_mode", $P0
 .end
+
 .sub _unset_nonblock	# void _unset_nonblock
-	find_global P0, "fcntl_mode"
-	set I11, P0["value"]
-	loadlib P1, ""
-	dlfunc P0, P1, "fcntl", "iiil"
-	set I7, I11
-	set I5, 0
-	set I6, 4
-	invoke		# nmode=fcntl(0, F_SETFL, mode)
+	$P0 = find_global "fcntl_mode"
+	$I11= $P0["value"]
+	$P1 = loadlib ""
+	.local pmc fcntl
+	fcntl = dlfunc $P1, "fcntl", "iiil"
+
+	fcntl(0, F_SETFL, $I11)
 .end
+
 .sub _TERMIO_scankey
 	find_global $P0, "scankey"
-	set I0, $P0["value"]
+	I0= $P0["value"]
 	eq I0, 1, END
 	_set_noecho_cbreak()
-END:    set $P0["value"], 1
+END:    
+	$P0["value"]= 1
 	store_global "scankey", $P0
 .end
+
 .sub _TERMIO_normal
 	find_global $P0, "scankey"
-	set I0, $P0["value"]
+	I0= $P0["value"]
 	eq I0, 0, END
 	_set_echo_nocbreak()
-END:    set $P0["value"], 0
+END:    
+	$P0["value"]= 0
 	store_global "scankey", $P0
 .end
 
