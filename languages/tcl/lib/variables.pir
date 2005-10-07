@@ -134,7 +134,7 @@ set_array:
   .return(variable)
 
 create_array:
-  array = new TclArray
+  array = new .TclArray
   array[key] = value
   __store_var(var, array)
   variable = clone value

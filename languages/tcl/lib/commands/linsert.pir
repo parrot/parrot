@@ -42,7 +42,7 @@ convert_the_list:
   cnt = 0
   $I1 = the_list
   .local pmc argv_list
-  argv_list = new Array
+  argv_list = new .Array
   argv_list = $I1
 LOOP_the_list:
   if cnt >= $I1 goto DONE_the_list
@@ -57,7 +57,7 @@ convert_the_args:
   cnt = 0
   $I1 = argv
   .local pmc argv_copy
-  argv_copy = new Array
+  argv_copy = new .Array
   argv_copy = $I1
 LOOP_the_args:
   if cnt >= $I1 goto DONE_the_args
@@ -70,7 +70,7 @@ DONE_the_args:
   argv_list = splice argv_copy, the_index, 0
 
   .local pmc retval
-  retval = new TclList
+  retval = new .TclList
 
   .local int cnt
   cnt = 0

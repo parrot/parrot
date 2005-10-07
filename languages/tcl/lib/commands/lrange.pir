@@ -44,7 +44,7 @@
   cnt_in = first
 
   .local pmc retval
-  retval = new TclList
+  retval = new .TclList
   .local int last_pos
   last_pos = last
 LOOP:

@@ -23,7 +23,7 @@ Initialize the attributes for an instance of the class
 =cut
 
 .sub __init :method
-  #$P0 = new TclString
+  #$P0 = new .TclString
   #setattribute self, "TclCommand\x00name", $P0
 .end
 
@@ -52,7 +52,7 @@ Execute the command.
   name = retval
   
   .local pmc args
-  args = new TclList
+  args = new .TclList
   .local int elems, i
   elems = self
   i     = 0

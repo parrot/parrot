@@ -14,7 +14,7 @@
   argc = argv
  
   .local pmc retval
-  retval = new TclList
+  retval = new .TclList
  
   .local int cnt
   cnt = 0

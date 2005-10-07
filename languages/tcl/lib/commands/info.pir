@@ -103,7 +103,7 @@ bad_args:
   .local pmc math_funcs,iterator,retval
 
   math_funcs = find_global "_Tcl", "functions"
-  iterator = new Iterator, math_funcs
+  iterator = new .Iterator, math_funcs
   iterator = 0
   retval = new .TclList
 
@@ -116,7 +116,7 @@ pattern_loop:
   $S0 = shift iterator
   match = rule($S0)
   unless match goto pattern_next
-  $P0 = new TclString
+  $P0 = new .TclString
   $P0 = $S0
   push retval, $P0
 pattern_next:
@@ -125,7 +125,7 @@ pattern_next:
 
 loop:
   $S0 = shift iterator
-  $P0 = new TclString
+  $P0 = new .TclString
   $P0 = $S0
   push retval, $P0
   if iterator goto loop

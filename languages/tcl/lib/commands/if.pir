@@ -12,7 +12,7 @@
   unless argc goto no_args
 
   .local pmc elseifs
-  elseifs = new TclList
+  elseifs = new .TclList
   .local pmc retval,condition
   .local string code
   .local string condition
@@ -45,7 +45,7 @@ get_elseifs:
   if counter >= argc goto get_final
   temp_str = argv[counter]
   if temp_str != "elseif" goto get_else
-  $P1 = new TclList
+  $P1 = new .TclList
   inc counter
   if counter >= argc goto missing_elseif
   $P2 = argv[counter]

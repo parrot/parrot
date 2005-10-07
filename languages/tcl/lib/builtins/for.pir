@@ -48,7 +48,7 @@ $P%i=new .TclString
 $P%i=\"\"
 END_PIR
 
-   $P1 = new Array
+   $P1 = new .Array
    $P1 = 4
    $P1[0] = cond_num
    $P1[1] = loop_label

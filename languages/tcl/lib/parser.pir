@@ -68,7 +68,7 @@ get_commands:
   pos = 0
   # characters that end commands
   .local pmc chars
-  chars = new Hash
+  chars = new .Hash
   chars[10] = 1 # \n
   chars[59] = 1 # ;
   
@@ -154,7 +154,7 @@ or the position after the comment.
   .param int    pos
 
   .local pmc chars
-  chars = new Hash
+  chars = new .Hash
   chars[10] = 1 # \n
   
   .local pmc word   
@@ -265,7 +265,7 @@ eat_space:
   if pos >= len goto done
   
   .local pmc dispatch
-  dispatch = new Hash
+  dispatch = new .Hash
   dispatch[ 34] = "get_quote"       # "
   dispatch[123] = "get_brace"       # {
   
@@ -513,7 +513,7 @@ done:
   $I0 = pos - start
   
   $S0 = substr tcl_code, start, $I0
-  $P0 = new String
+  $P0 = new .String
   $P0 = $S0
   $P0.replace("\\","\\\\")
   $S0 = $P0
@@ -542,7 +542,7 @@ Parses a subcommand and returns a TclCommand or TclCommandList object.
 
   .local pmc command
   .local pmc chars
-  chars = new Hash
+  chars = new .Hash
   chars[93] = 1 # ]
   chars[59] = 1 # ;
  

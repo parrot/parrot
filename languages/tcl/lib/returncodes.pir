@@ -38,7 +38,7 @@ of sorts to the exceptions.
 # Simple TCL_ERROR has occurred
 .macro throw (mess)
   .sym pmc e
-  e = new Exception
+  e = new .Exception
   e[CODE_SLOT] = TCL_ERROR
   e[VALUE_SLOT] = .mess
   throw e
@@ -47,7 +47,7 @@ of sorts to the exceptions.
 # Specify TCL returncode and message.
 .macro throw_with_code (code,mess)
   .sym pmc e
-  e = new Exception
+  e = new .Exception
   e[CODE_SLOT] = .code
   e[VALUE_SLOT] = .mess
   throw e
@@ -55,7 +55,7 @@ of sorts to the exceptions.
 
 .macro tcl_break ()
   .sym pmc e
-  e = new Exception
+  e = new .Exception
   e[CODE_SLOT] = TCL_BREAK
   e[VALUE_SLOT] = ""
   throw e
@@ -63,7 +63,7 @@ of sorts to the exceptions.
 
 .macro tcl_continue ()
   .sym pmc e
-  e = new Exception
+  e = new .Exception
   e[CODE_SLOT] = TCL_CONTINUE
   e[VALUE_SLOT] = ""
   throw e
@@ -71,7 +71,7 @@ of sorts to the exceptions.
 
 .macro tcl_return (value)
   .sym pmc e
-  e = new Exception
+  e = new .Exception
   e[CODE_SLOT] = TCL_RETURN
   e[VALUE_SLOT] = .value
   throw e

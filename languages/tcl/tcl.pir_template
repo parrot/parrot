@@ -103,7 +103,7 @@ providing a compreg-compatible method.
   # XXX Should track how many args are needed for each of these.
 
   # Keep track of math functions
-  math_funcs = new TclArray
+  math_funcs = new .TclArray
 
   math_funcs["abs"]   = FUNCTION_ABS
   math_funcs["acos"]  = FUNCTION_ACOS
@@ -120,8 +120,8 @@ providing a compreg-compatible method.
   math_funcs["tan"]   = FUNCTION_TAN
   math_funcs["tanh"]  = FUNCTION_TANH
 
-  operators = new TclArray
-  precedence = new TclArray
+  operators = new .TclArray
+  precedence = new .TclArray
 
   # XXX This precedence check should be shoved into [expr]. There's no need
   # to make it this generic. 
@@ -174,32 +174,32 @@ providing a compreg-compatible method.
   # Eventually, we'll need to register MMD for the various Tcl PMCs
   # (Presuming we don't do this from the .pmc definitions.)
 
-  $P1 = new TclArray
+  $P1 = new .TclArray
   store_global "_Tcl", "proc_body", $P1
 
-  $P1 = new TclArray
+  $P1 = new .TclArray
   store_global "_Tcl", "proc_parsed", $P1
 
-  $P1 = new TclArray
+  $P1 = new .TclArray
   store_global "_Tcl", "proc_args", $P1
 
   # We need to store these ourselves, because creating dynamic
   # .subroutines in PIR runs the risk of garbage collection if we're
   # not careful. 
   # XXX - these should be removed when the procedure is then deleted.
-  $P1 = new TclArray
+  $P1 = new .TclArray
   store_global "_Tcl", "proc_exec", $P1
 
   # Global variable initialization
-  $P0 = new String
+  $P0 = new .String
   $P0 = "0.1"
   store_global "Tcl", "$tcl_patchLevel", $P0
-  $P0 = new String
+  $P0 = new .String
   $P0 = "0.1"
   store_global "Tcl", "$tcl_version", $P0
  
   # Setup the default channelIds
-  $P1 = new TclArray
+  $P1 = new .TclArray
   $P2 = getstdin
   $P1["stdin"] = $P2
   $P2 = getstdout
@@ -209,12 +209,12 @@ providing a compreg-compatible method.
   store_global "_Tcl", "channels", $P1
   
   # Setup the id # for channels..
-  $P1 = new Integer
+  $P1 = new .Integer
   $P1 = 1
   store_global "_Tcl", "next_channel_id", $P1
 
   # Setup the calling level (for upvar, uplevel, interpreter)
-  $P1 = new Integer
+  $P1 = new .Integer
   $P1 = 0
   store_global "_Tcl", "call_level", $P1
 
@@ -223,7 +223,7 @@ providing a compreg-compatible method.
   compreg "TCL", $P1
   
   # Setup a global to keep a unique id for compiled subs.
-  $P1 = new Integer
+  $P1 = new .Integer
   $P1 = 0
   store_global "_Tcl", "compiled_num", $P1
 

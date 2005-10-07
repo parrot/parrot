@@ -28,7 +28,7 @@ var_loop:
   if argv goto var_loop
 
 list_empty:
-  value = new String
+  value = new .String
   value = ""
 null_loop:
   unless argv goto var_end

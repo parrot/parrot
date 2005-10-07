@@ -14,7 +14,7 @@ Define the attributes required for the class.
   $P0 = getclass "String"
   $P1 = subclass $P0, "TclConst"
   
-  $P0 = new Hash
+  $P0 = new .Hash
   $P0[ 97] = "\a"
   $P0[ 98] = "\x8" # \b
   $P0[102] = "\f"
@@ -25,7 +25,7 @@ Define the attributes required for the class.
   
   store_global "_Tcl", "backslashes", $P0
 
-  $P0 = new Hash
+  $P0 = new .Hash
   $P0[ 48] =  0 # "0"
   $P0[ 49] =  1
   $P0[ 50] =  2

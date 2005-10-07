@@ -217,10 +217,10 @@ no_args:
   .local pmc rule
   (rule, $P0, $P1) = globber(match_str)
 
-  iter = new Iterator, the_array
+  iter = new .Iterator, the_array
   iter = .ITERATE_FROM_START
 
-  retval = new String
+  retval = new .String
 
 
   .local int count
@@ -289,7 +289,7 @@ no_args:
   .local pmc rule
   (rule, $P0, $P1) = globber(match_str)
 
-  iter = new Iterator, the_array
+  iter = new .Iterator, the_array
   iter = .ITERATE_FROM_START
 
 push_loop:
@@ -377,10 +377,10 @@ not_array:
   .local pmc rule
   (rule, $P0, $P1) = globber(pattern)
 
-  iter = new Iterator, the_array
+  iter = new .Iterator, the_array
   iter = .ITERATE_FROM_START
 
-  retval = new String
+  retval = new .String
 
   .local int count
   count = 0
@@ -410,10 +410,10 @@ check_end:
   .local pmc iter, retval
   .local string name
 
-  iter = new Iterator, the_array
+  iter = new .Iterator, the_array
   iter = .ITERATE_FROM_START
 
-  retval = new String
+  retval = new .String
   retval = ""
 
 check_loop:

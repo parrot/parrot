@@ -17,7 +17,7 @@
   increment = 1
   
   .local pmc argc
-  argc = new Integer # XXX NEEDED? persist across function calls...
+  argc = new .Integer # XXX NEEDED? persist across function calls...
   argc = argv
 
   .local pmc original_pmc

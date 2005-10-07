@@ -28,7 +28,7 @@
   goto loop
 
 new_variable:
-  value = new TclList
+  value = new .TclList
   # goto loop
 
 loop:

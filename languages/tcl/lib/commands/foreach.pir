@@ -28,14 +28,14 @@
   # Compartmentalize our arguments
   .local pmc varnames, arglists
   .local string body
-  varnames = new TclList
-  arglists  = new TclList
+  varnames = new .TclList
+  arglists  = new .TclList
   varnames = argc
   arglists = argc
   .local pmc arg_num,arg_max,index_num
-  arg_num = new Integer
-  arg_max = new Integer
-  index_num = new Integer
+  arg_num = new .Integer
+  arg_max = new .Integer
+  index_num = new .Integer
   arg_num = 0 
   index_num = 0
 
@@ -44,7 +44,7 @@
   body = argv[arg_max]
   dec arg_max
   .local pmc max_size
-  max_size = new Integer
+  max_size = new .Integer
   max_size = 0
 arg_loop:
   if arg_num >= arg_max goto arg_done
@@ -75,7 +75,7 @@ arg_done:
   register parsed
 
   .local pmc iterator
-  iterator = new Integer
+  iterator = new .Integer
   iterator = 0
 loop_outer:
   if iterator >= max_size goto done
@@ -84,7 +84,7 @@ loop_outer:
   counter = -1
   end_counter = index_num
   .local pmc got_one
-  got_one = new Integer
+  got_one = new .Integer
   got_one = 0
 loop_inner:
   inc counter
@@ -110,7 +110,7 @@ store_done:
   got_one = 1
   goto loop_inner
 empty_var:
-  $P0 = new TclString
+  $P0 = new .TclString
   $P0 = ""
   if call_level goto store_lex2
     store_global "Tcl", sigil_varname, $P0

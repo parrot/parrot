@@ -77,7 +77,7 @@ check_quotes:
   goto append_elem
 
 escape:
-  $P0 = new String
+  $P0 = new .String
   $P0 = $S0
   
   $P0."replace"("\\", "\\\\")

@@ -105,7 +105,7 @@ bad_args:
   unless $P0 goto WHOLE
 
   # XXX pre leo-ctx5 this requires a PMC arg, but we can switch later
-  $P1 = new String
+  $P1 = new .String
   $P1 = "0"  
 
   $P2 = $P0."__get_pmc_keyed"($P1)
@@ -138,7 +138,7 @@ WHOLE:
   unless $P0 goto WHOLE
 
   # XXX pre leo-ctx5 this requires a PMC arg, but we can switch later
-  $P1 = new String
+  $P1 = new .String
   $P1 = "0"  
 
   $P2 = $P0."__get_pmc_keyed"($P1)

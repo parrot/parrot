@@ -4,7 +4,7 @@
   .param string str
 
   .local pmc retval
-  retval = new TclList
+  retval = new .TclList
 
   .local int pos, len
   # we're going to increment before we use it, so set it to 0-1
@@ -59,7 +59,7 @@ loop_done:
   # grab the rest of the string
   $I1 = len - pos
   $S0 = substr str, pos, $I1
-  $P0 = new String
+  $P0 = new .String
   $P0 = $S0
   push retval, $P0
   goto done
@@ -81,7 +81,7 @@ found_quote:
   $I0 = $I1 - pos
   $S0 = substr str, pos, $I0
   
-  $P0 = new String
+  $P0 = new .String
   $P0 = $S0
   push retval, $P0
   

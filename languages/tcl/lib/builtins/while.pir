@@ -49,7 +49,7 @@ $P%i=new .TclString
 $P%i=\"\"
 END_PIR
 
-   $P1 = new Array
+   $P1 = new .Array
    $P1 = 4
    $P1[0] = loop_label
    $P1[1] = done_label

@@ -105,11 +105,11 @@ Initialize the attributes for an instance of the class
 =cut
 
 .sub __init :method
-  $P0 = new TclInt
+  $P0 = new .TclInt
   setattribute self, "TclBinaryOp\x00type", $P0
-  $P0 = new TclInt
+  $P0 = new .TclInt
   setattribute self, "TclBinaryOp\x00l_operand", $P0
-  $P0 = new TclInt
+  $P0 = new .TclInt
   setattribute self, "TclBinaryOp\x00r_operand", $P0
 .end
 
@@ -128,7 +128,7 @@ Initialize the attributes for an instance of the class
   pir_code=""
 
   .local pmc retval
-  retval = new TclInt
+  retval = new .TclInt
   
   .local pmc op,l_operand, r_operand, compile
   op  = getattribute self, "TclBinaryOp\x00type"

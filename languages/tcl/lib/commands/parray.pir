@@ -11,7 +11,7 @@
   argc = argv
 
   .local pmc retval
-  retval = new String
+  retval = new .String
   retval = ""
 
   if argc == 0 goto bad_args
@@ -49,7 +49,7 @@ match_all:
 
   # for storing the matching results, so we can sort it
   .local pmc filtered
-  filtered = new ResizablePMCArray
+  filtered = new .ResizablePMCArray
 
   # for aligning the equal signs together
   .local int maxsize
@@ -61,7 +61,7 @@ match_all:
 
 
   .local pmc iter
-  iter = new Iterator, array
+  iter = new .Iterator, array
   iter = .ITERATE_FROM_START
 
 add_loop:

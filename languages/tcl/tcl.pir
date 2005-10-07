@@ -23,7 +23,7 @@
   source = find_global "Tcl", "&source"
 
   .local pmc tcl_interactive
-  tcl_interactive = new TclInt
+  tcl_interactive = new .TclInt
   store_global "Tcl", "$tcl_interactive", tcl_interactive
 
   .local pmc compiler,pir_compiler

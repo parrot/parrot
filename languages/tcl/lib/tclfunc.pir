@@ -41,9 +41,9 @@ Initialize the attributes for an instance of the class
 =cut
 
 .sub __init :method
-  $P0 = new TclString
+  $P0 = new .TclString
   setattribute self, "TclFunc\x00name", $P0
-  $P0 = new TclString
+  $P0 = new .TclString
   setattribute self, "TclFunc\x00argument", $P0
 .end
 

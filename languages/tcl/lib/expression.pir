@@ -47,11 +47,11 @@ syntax tree associated with this expression.
   .local pmc retval
 
   .local pmc undef
-  undef = new Undef
+  undef = new .Undef
 
   .local pmc chunk, chunks, program_stack
-  chunks = new TclList
-  program_stack = new TclList
+  chunks = new .TclList
+  program_stack = new .TclList
 
   .local int pos
   pos = 0
@@ -60,7 +60,7 @@ operand:
   (retval, pos) = get_operand(expr, pos)
   if_null retval, no_operand
 
-  chunk = new TclList
+  chunk = new .TclList
   chunk[0] = OPERAND
   chunk[1] = retval
   push chunks, chunk
@@ -314,7 +314,7 @@ op_done:
   $I5 = precedences[test_op]
   $I6 = ops[test_op]
 
-  chunk = new TclList
+  chunk = new .TclList
   chunk[0] = OP
   chunk[1] = $I6 # op lookup
   chunk[2] = $I5 # precedence
@@ -401,7 +401,7 @@ integer_done:
 
   $S0 = substr expr, start, pos
   $I0 = $S0
-  value = new TclInt
+  value = new .TclInt
   value = $I0
   goto done
 
@@ -419,7 +419,7 @@ float_done:
   $S0 = substr expr, start, pos
   # XXX Can't we just assign this string directly to the the TclFloat - WJC
   $N0 = $S0
-  value = new TclFloat
+  value = new .TclFloat
   value = $N0
   # goto done
 
@@ -474,7 +474,7 @@ loop_done:
 
   $I0 = find_type "TclFunc"
   func = new $I0
-  $P0 = new String
+  $P0 = new .String
   $P0 = $S0
   setattribute func, "TclFunc\x00name", $P0
 
@@ -518,7 +518,7 @@ unknown_func:
   .local pmc name, operand
 
   $S0 = substr expr, pos, 1
-  name = new String
+  name = new .String
   name = $S0
 
   inc pos
