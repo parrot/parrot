@@ -24,9 +24,11 @@ else {
     $linkflags .= ' -Wl,-E';  # --export-dynamic, s. info gcc, ld
 }
 
-if ( $cflags !~ /-D_XOPEN_SOURCE=/ ) {
+if ( $cflags !~ /-D_GNU_SOURCE/ ) {
     # Request visibility of all POSIX symbols
-    ## $cflags .= ' -D_XOPEN_SOURCE=600';
+    # _XOPEN_SOURCE=600 doesn't work with glibc 2.1.3
+    # _XOPEN_SOURCE=500 gives 2 undefined warns (setenv, unsetenv) on 2.1.3
+    $cflags .= ' -D_GNU_SOURCE';
 }
 
 Configure::Data->set(
