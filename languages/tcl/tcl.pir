@@ -121,12 +121,14 @@ loop:
   goto loop
 
 gotfile:
-  ($I0,$S1) = compiler(0,contents)
   unless dump_only goto run_file  
+  ($I0,$S0) = compiler(0,contents)
+  $S1 = pir_compiler($I0,$S0,1)
   print $S1
   goto done
 
 run_file:
+  ($I0,$S1) = compiler(0,contents)
   $P2       = pir_compiler($I0,$S1)
   push_eh file_error
     $P2()
@@ -154,9 +156,10 @@ oneliner:
 
 oneliner_dump:
   $P1 = find_global "_Tcl", "compile"
-  $P2 = find_global "_Tcl", "pir_compiler"
-  ($I0, $S1) = $P1(0,tcl_code)
-  print $S1
+  $P2 = find_global "_Tcl", "pir_compiler" 
+  ($I0, $S1) = $P1(0,tcl_code,1)
+  $S2 = $P2($I0,$S1,1)
+  print $S2
 
 done:
   end

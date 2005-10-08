@@ -96,19 +96,24 @@ done:
 .end
 
 =item C<(pmc invokable) = pir_compiler(string PIR, int register_num)>
+=item C<(string code)   = pir_compiler(string PIR, int register_num, 1)>
 
 A thin wrapper for the <compreg>'d PIR compiler. 
-Given PIR code, wrap it in anonymous subroutine, compile to bytecode, and return the
-compiled, anonymous sub.
+Given inline PIR code, wrap it in anonymous subroutine and return the
+fully qualified PIR.
 
-Argument register_num is the first register number that is available for use by the
-generated PIR.
+If the third argument is present, don't compile the wrapper sub, just
+return the wrapped code.
+
+Argument register_num is the first register number that is available for
+use by the generated PIR.
 
 =cut
 
 .sub pir_compiler
   .param int result_reg
   .param string pir_code
+  .param int code_only :optional
 
   .local pmc compiled_num
   compiled_num = find_global "_Tcl", "compiled_num"
@@ -121,16 +126,21 @@ generated PIR.
   $P1[2] = result_reg
 
   $S0 = <<"END_PIR"
+.HLL 'tcl', 'tcl_group'
 .pragma n_operators 1
 .sub compiled_tcl_sub%i :anon
+load_bytecode 'languages/tcl/lib/tcllib.pbc'
 %s
-.return ($P%s)
+.return ($P%i)
 .end
 END_PIR
 
-  sprintf pir_code, $S0, $P1
-  #print pir_code
+  pir_code = sprintf $S0, $P1
 
+  unless code_only goto compile_it
+  .return (pir_code)
+
+compile_it:
   .local pmc pir_compiler
   pir_compiler = compreg "PIR"
   

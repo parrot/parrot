@@ -10,9 +10,6 @@ http://cvs.sourceforge.net/viewcvs.py/tcl/tcl/library/tcltest/tcltest.tcl?view=m
 This will require a lot of work. On the plus side, we'll be passing a lot more
 tests by then. =-)
 
-Also on the table right now is converting to a compiler. This is mostly done,
-with a few caveats and TODOs.
-
 =over 4
 
 =item 0
@@ -22,8 +19,9 @@ to the compiled version, and then remove the interpret :method.
 
 =item 1
 
-Generate compiler-variants for several builtins, esp. the flow control
-commands like C<while>. 
+Generate compiler-variants for several builtins, esp. those used by
+examples/bench.tcl
+
 Modify the compiler for tclcommand to generate the inline version if
 it's available. (C<proc> and C<expr> should also be straightforward, as they
 already compile anyway.)  [Completed: incr, break, continue, for, while]
@@ -41,8 +39,8 @@ this counter whenever they are called.
 
 =item 3
 
-Add compiled TclComment objects, which do nothing other than generate PIR comments with
-the same text.
+Add compiled TclComment objects, which do nothing other than generate
+PIR comments with the same text.
 
 =back
 
