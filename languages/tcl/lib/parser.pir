@@ -119,23 +119,41 @@ use by the generated PIR.
   compiled_num = find_global "_Tcl", "compiled_num"
   inc compiled_num
 
+  .local string stub_code
+  # If someone wants to generate standalone code only, include
+  # The library bits that they'll need.
+
+  stub_code = <<"END_PIR"
+.HLL 'tcl', 'tcl_group'
+.pragma n_operators 1
+.sub compiled_tcl_sub%i :anon
+load_bytecode 'languages/tcl/lib/tcllib.pbc'
+%s.return ($P%i)
+.end
+END_PIR
+
+  if code_only goto set_args
+
+  # Otherwise, leave out items that will will cause reloading
+  # conflicts with the parser itself.
+  stub_code = <<"END_PIR"
+.pragma n_operators 1
+.sub compiled_tcl_sub%i :anon
+%s.return ($P%i)
+.end
+END_PIR
+
+set_args:
   $P1 = new .Array
   $P1 = 3
   $P1[0] = compiled_num
   $P1[1] = pir_code
   $P1[2] = result_reg
 
-  $S0 = <<"END_PIR"
-.HLL 'tcl', 'tcl_group'
-.pragma n_operators 1
-.sub compiled_tcl_sub%i :anon
-load_bytecode 'languages/tcl/lib/tcllib.pbc'
-%s
-.return ($P%i)
-.end
-END_PIR
+  # The pir_code element above should always end in a \n, so we don't
+  # need to add one explicitly before the .return
 
-  pir_code = sprintf $S0, $P1
+  pir_code = sprintf stub_code, $P1
 
   unless code_only goto compile_it
   .return (pir_code)
