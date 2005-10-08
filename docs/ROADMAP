@@ -374,20 +374,12 @@ Memory leak - PIO subsystem leaks file handles (ParrotIO structures)
 
 =item *
 
-Memory leak - regexen leak bitmaps
-
-=item *
-
 Memory leak - string_to_cstring returns a malloced string, which isn't freed
 everywhere
 
 =item *
 
 Memory Leaks - imcc is currently leaking Unit structures and possibly more
-
-=item *
-
-Regular Expressions - are non reentrant due to interpreter global intstack
 
 =item *
 
