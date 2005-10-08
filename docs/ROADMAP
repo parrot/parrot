@@ -88,7 +88,7 @@ The intention was to comb through the various sources of things to be done and
 collate them in some fashion. At the time of that writing, none of the tasks
 documented in those directories were documented in a central area.  Something a
 little nicer than grep -r 'XXX', but that would certainly do for a start.
-Chromatic's recent email is another step on this path. --Coke
+See also L<docs/BROKEN> --Coke
 
 =back
 
@@ -145,19 +145,6 @@ implementation.  :-,
 
 =item *
 
-Calling conventions are definitely changing for the better, but not in a way
-that need change much of substance for language implementors.  Chip/Leo mind
-meld is in progress; stay tuned.
-
-BTW: Don't panic!  Life is getting better for you, the Parrot user.  It had
-already become obvious recently to us that Parrot needed a nice opcode-based
-interface for automated collection and extraction of call parameters and return
-values.  That's what you were going to write to anyway.  How it works,
-precisely, shouldn't matter much.  (You I<were> writing to PIR instead of PASM,
-right?)
-
-=item *
-
 Design the standard library to replace all those opcodes that should never have
 been opcodes in the first place, e.g. the IO and transcendental math features.
 
@@ -187,7 +174,7 @@ can be mutable even when the index hash isn't.
 
 =item *
 
-Finish event and IO specification
+Finish event and IO specification. 
 
 =item *
 
@@ -204,7 +191,7 @@ Specify what we need to serialize continuations
 
 =item *
 
-Final namespace spec
+Final namespace spec.
 
 =item *
 
@@ -360,14 +347,6 @@ L<ops/debug.ops>
 =item *
 
 parrot doesn't catch the exception thrown by the op C<cmod>. L<ops/math.ops>
-
-=item *
-
-C<rx_compile> op is documented but unimplemented. L<ops/rx.ops>
-
-=item *
-
-There is no way to do a case-insensitive match. L<ops/rx.ops>
 
 =back
 
