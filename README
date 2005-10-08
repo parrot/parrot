@@ -107,10 +107,9 @@ somewhere into your path. Finally no dynamic extensions from
 runtime/parrot/dynext are installed, albeit dynamic extensions are searched
 for in the installed directory structure.
 
-Look at docs/parrot.pod and docs/intro.pod for where to go from here.
-If you have any problems, see the section "Reporting Problems" in
-docs/intro.pod. These documents are in POD format. You can view these files
-with:
+Look at docs/parrot.pod and docs/intro.pod for where to go from here.  If you
+have any problems, see the section "Reporting Problems" in docs/intro.pod.
+These documents are in POD format. You can view these files with:
 
     perldoc -F docs/intro.pod
 
@@ -131,7 +130,8 @@ previous versions, please see NEWS.
 KNOWN ISSUES
 ------------
 
-Some PASM examples are currently broken.
+Some PASM examples are currently broken.  The docs/BROKEN file lists other
+major subsystems and regressions that block progress.
 
 MAILING LISTS
 -------------

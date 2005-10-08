@@ -1,0 +1,181 @@
+=head1 NAME
+
+What's Broken in Parrot Right Now
+
+=head1 PURPOSE
+
+This is a list of items we think are broken in Parrot at the current revision.
+It's not a list of bugs -- it's a list of missing and broken features that
+prevent developers from working on their parts of the system.
+
+Committers, please add to the list as you find things and remove from the list
+as you resolve things.
+
+=head2 Missing Features
+
+Ways to emulate these would be nice too.
+
+=over 4
+
+=item * Lexical Classes
+
+=item * Anonymous Classes
+
+=item * Submethods
+
+=back
+
+=head2 Broken Features
+
+=over 4
+
+=item * Existing Code Marked As Broken
+
+Lots of comments in the code read C<XXX>, C<???>, or C<FIXME>.  Fix them.
+
+=item * Lexical Pads
+
+Autrijus Tang has details.
+
+=item * Nested *Struct PMCs Share State
+
+chromatic has a test case almost ready to show this.
+
+=item * C<setattribute> Sometimes Misses
+
+https://rt.perl.org/rt3//Ticket/Display.html?id=36411
+
+=back
+
+=head2 Unfinished Opcodes
+
+=over 4
+
+=item * split
+
+https://rt.perl.org/rt3//Ticket/Display.html?id=32544
+
+Will Coleda suggested C<s/regexp/perl 6 rule/> and using PGE.  Patrick Michaud
+suggests making C<split> work only on constant strings and using PGE for
+everything else.
+
+=back
+
+=head2 Missing Vtables
+
+=over 4
+
+=item * ResizablePMCArray
+
+https://rt.perl.org/rt3//Ticket/Display.html?id=31867  
+
+=item * ResizableIntegerArray
+
+https://rt.perl.org/rt3//Ticket/Display.html?id=32374  
+
+=item * splice
+
+https://rt.perl.org/rt3//Ticket/Display.html?id=34394
+
+=back
+
+=head2 Missing PDDs
+
+=over
+
+=item * Embedding (PDD 10)
+
+https://rt.perl.org/rt3//Ticket/Display.html?id=33918
+
+=item * Assembly (PDD 12)
+
+https://rt.perl.org/rt3//Ticket/Display.html?id=33919
+
+=item * Bytecode (PDD 13)
+
+https://rt.perl.org/rt3//Ticket/Display.html?id=33920
+
+=back
+
+=head2 Language-Specific Items
+
+=over 4
+
+=item * Make Perl a F</language>
+
+=over 4
+
+=item * Don't have Perl deps in static classes
+
+https://rt.perl.org/rt3//Ticket/Display.html?id=32642
+
+=item * Make Perl PMCs dynamic
+
+https://rt.perl.org/rt3//Ticket/Display.html?id=32646
+
+=back
+
+=item * Let languages be self contained
+
+https://rt.perl.org/rt3//Ticket/Display.html?id=31633
+
+Right now many languages are in the  F<MANIFEST>, using the global config, etc.
+As far as Perl goes, this  could let us move Perl PMCs into
+F<languages/perl[6]>).
+
+=back
+
+=head2 Obsolete Features
+
+=over 4
+
+=item * Everything in F<DEPRECATED>
+
+=item * F<ops/rx.ops>
+
+Superseded by PGE.
+
+=back
+
+=head2 Miscellaneous
+
+=over 4
+
+=item * Generate accurate file/line number information in stack traces.  
+
+=item * Get name of C<parrot> executable
+
+https://rt.perl.org/rt3//Ticket/Display.html?id=33923 
+
+=item * Namespaces
+
+Matt Diephouse has prepared an email on this.  
+
+=item * Give invokable PMCs a canonical way to store their associated HLL
+source and argument information.
+
+Will Coleda is thinking about this.
+
+=item * Add rules engines for perl5-ish RE's in PGE.
+
+Will Coleda specifically wants
+http://www.tcl.tk/man/tcl8.5/TclCmd/re_syntax.htm, but having a P5-ish one to
+subclass would be just dandy.  Patrick Michaud thinks this is doable.
+
+=item * Allow Runtime Compiler Registration
+
+Leo suggests an eventual startup sequence of:
+
+=over 4
+
+=item * start main in F<src/parrot.c>
+
+=item * determine source file type to compile/run
+
+=item * handle execution over to xxx-compiler or to pbc-run.
+
+=back
+
+Currently F<src/parrot.c> does nothing and startup occurs in F<imcc/main.c>.
+
+=back
