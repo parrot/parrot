@@ -231,6 +231,8 @@ by chapters in the GNU m4 documentation.
 
 =over
 
+=item Needs to be fixed, as the rx_* ops are gone
+
 =item more tests
 
 =back

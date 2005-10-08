@@ -77,7 +77,7 @@ the text are just copied to the output.
         blind_no_args = symbol['blind_no_args'] 
         unless blind_no_args goto EXPAND_MACRO
           .local string input_string    
-          input_string = state['input_stack';0;'string']
+          input_string = state['stack';'input';0;'string']
           .local int first_char, open_parenthesis
           first_char = ord input_string
           open_parenthesis = ord '('
@@ -138,9 +138,9 @@ NESTING_LIMIT_NOT_REACHED_YET:
   .local string text
   ( text ) = call_macro( state, symbol, arguments )
   .local string input_string    
-  input_string = state['input_stack';0;'string']
+  input_string = state['stack';'input';0;'string']
   input_string = text . input_string 
-  state['input_stack';0;'string'] = input_string
+  state['stack';'input';0;'string'] = input_string
 
   expansion_level = state['expansion_level']
   dec expansion_level
@@ -207,7 +207,7 @@ Collect all the arguments to a call of a macro.
   # Thus we need to remenber the start and the length of these two captures
   .local int cnt_stack
   .local string input_string    
-  input_string = state['input_stack';0;'string']
+  input_string = state['stack';'input';0;'string']
 
   # We need a '(' at beginning of string
   .local int index_opening
@@ -250,5 +250,5 @@ NO_MORE_ARGS:
   substr input_string, 0, index_closing, ''
   
 NOT_A_ARGUMENT_LIST:
-  state['input_stack';0;'string'] = input_string
+  state['stack';'input';0;'string'] = input_string
 .end

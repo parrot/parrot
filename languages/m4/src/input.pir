@@ -6,7 +6,7 @@ input.pir - Setting up input and reading input
 
 =head1 DESCRIPTION
 
-Copyright:  2004 Bernhard Schmalhofer. All Rights Reserved.
+Copyright:  2004-2005 Bernhard Schmalhofer. All Rights Reserved.
 CVS Info:   $Id$
 History:    Ported from GNU m4 1.4
 References: http://www.gnu.org/software/m4/m4.html
@@ -15,17 +15,33 @@ References: http://www.gnu.org/software/m4/m4.html
 
 =head2 void input_init( Hash state )
 
-Initialise some stacks and some regexes
+Initialise some stacks and put them into the Hash state['stack']: 
 
-'token_stack'
-'input_stack'   contains files, strings and macro definitions
-'wrapup_stack'
-'word_rulesub'    recognizes TOKEN_WORD.
-'string_rulesub'  recognizes TOKEN_STRING
-'simple_rulesub'  recognizes TOKEN_SIMPLE
-'comment_rulesub' recognizes comments, returned as TOKEN_SIMPLE
+=over 4
 
-TODO: recognize nested quoted strings
+=item state['stack';'token']   not used yet
+
+=item state['stack';'input']   contains files, strings and macro definitions
+
+=item state['stack';'wrapup']  not used yet
+
+=back
+
+Initialize some PGE rulesubs and put them into the Hash state['rulesub']: 
+
+=over 4
+
+=item state['rulesub';'word']    recognizes TOKEN_WORD.
+
+=item state['rulesub';'string']  recognizes TOKEN_STRING
+
+=item state['rulesub';'simple']  recognizes TOKEN_SIMPLE
+
+=item state['rulesub';'simple']  recognizes comments, returned as TOKEN_SIMPLE
+
+=back
+
+TOOO: recognize nested quoted strings
 
 =cut
 
@@ -35,27 +51,35 @@ TODO: recognize nested quoted strings
   .param pmc state         
 
   # setup of stacks
+  .local pmc stack_in_state
+  stack_in_state = new Hash
+  state['stack'] = stack_in_state
   .local pmc empty_array
   empty_array = new ResizablePMCArray
-  state['token_stack'] = empty_array
+  stack_in_state['token'] = empty_array
   empty_array = new ResizablePMCArray
-  state['input_stack'] = empty_array
+  stack_in_state['input'] = empty_array
   empty_array = new ResizablePMCArray
-  state['wrapup_stack'] = empty_array
+  stack_in_state['wrapup'] = empty_array
 
   # setup of some rules
   # these rules should be kept in sync with t/regex/002_tokens.t
+  # TODO: Use named or positional captures
+  # TODO: rulesub for frozen state 
   .local pmc p6rule
   find_global p6rule, "PGE", "p6rule"
+  .local pmc rulesub_in_state
+  rulesub_in_state = new Hash
+  state['rulesub'] = rulesub_in_state
   .local pmc rulesub
-  rulesub = p6rule( "^<[_a..zA..Z]><[_a..zA..Z0..9]>*" )
-  state['word_rulesub'] = rulesub
+  rulesub = p6rule( "^<[_a..zA..Z]><[_a..zA..Z0..9>]>*" )
+  rulesub_in_state['word'] = rulesub
   rulesub = p6rule( "^`<-[`]>*'" )
-  state['string_rulesub'] = rulesub
+  rulesub_in_state['string'] = rulesub
   rulesub = p6rule( "^<-[`#_a..zA..Z]>" )
-  state['simple_rulesub'] = rulesub
+  rulesub_in_state['simple'] = rulesub
   rulesub = p6rule( "^\#\N*\n" )
-  state['comment_rulesub'] = rulesub
+  rulesub_in_state['comment'] = rulesub
 
 .end
 
@@ -86,10 +110,10 @@ TODO: open these files and complain when they don't or pass filehandles
   input_string = read in, 50000
   close in
 
-  # state['input_stack'] has been created in input_init 
+  # state['stack';'input'] has been created in input_init 
   # TODO: seperate input blocks for every file
   .local pmc input_stack
-  input_stack = state['input_stack']
+  input_stack = state['stack';'input']
   .local pmc input_block
   .local int stack_size
   stack_size = input_stack
@@ -113,7 +137,7 @@ TODO: open these files and complain when they don't or pass filehandles
 =head2 string next_token( Hash state )
 
 Parse and return a single token from the input stream.  A token can
-either be TOKEN_EOF, if the input_stack is empty; it can be TOKEN_STRING
+either be TOKEN_EOF, if the state['stack';'input'] is empty; it can be TOKEN_STRING
 for a quoted string; TOKEN_WORD for something that is a potential macro
 name; and TOKEN_SIMPLE for any single character that is not a part of
 any of the previous types.					
@@ -128,7 +152,7 @@ Uses regular expressions for finding tokens.
   .param pmc state 
 
   .local pmc input_stack    
-  input_stack = state['input_stack']
+  input_stack = state['stack';'input']
   .local pmc input_block    
   input_block = shift input_stack
   .local string input_string    
@@ -144,26 +168,26 @@ Uses regular expressions for finding tokens.
     
   # look for 'TOKEN_SIMPLE'
   # read a whole bunch of non-macro and non-word charcters
-  rulesub = state['simple_rulesub']
+  rulesub = state['rulesub';'simple']
   token_type = 'TOKEN_SIMPLE'
   match = rulesub( input_string ) 
   if match goto MATCH
 
   # look for comments and return it as 'TOKEN_SIMPLE'
-  rulesub = state['comment_rulesub']
+  rulesub = state['rulesub';'comment']
   token_type = 'TOKEN_SIMPLE'
   match = rulesub( input_string ) 
   if match goto MATCH
 
   # look for 'TOKEN_STRING'
-  rulesub = state['string_rulesub']
+  rulesub = state['rulesub';'string']
   token_type = 'TOKEN_STRING'
   match = rulesub( input_string ) 
   if match goto MATCH
 
   # look for 'TOKEN_WORD'
   # this will be checked for macro substitution
-  rulesub = state['word_rulesub']
+  rulesub = state['rulesub';'word']
   token_type = 'TOKEN_WORD'
   match = rulesub( input_string ) 
   if match goto MATCH

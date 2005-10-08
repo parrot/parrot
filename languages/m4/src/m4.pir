@@ -134,7 +134,7 @@ Looks at the command line arguments and acts accordingly.
   # Was '--version' passed ?
   is_defined = defined opt["version"]
   unless is_defined goto NO_VERSION_FLAG
-    print "Parrot m4 0.0.13\n"
+    print "Parrot m4 0.0.14\n"
     end
 NO_VERSION_FLAG: 
 
@@ -255,7 +255,7 @@ NO_UNIMPLEMENTED_OPTION:
   .local pmc m4_eval_compiler_lib
   m4_eval_compiler_lib = loadlib "m4_eval_compiler"
 
-  # init of input structures, creates state['input_stack']
+  # init of input structures, creates state['stack';'input']
   input_init( state )
 
   # TODO: init of output structures

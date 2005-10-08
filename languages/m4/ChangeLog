@@ -1,6 +1,12 @@
 # $Id$
 
 2005-06-29     Bernhard Schmalhofer
+        * Make it partly work with Parrot 0.3.0
+        * Skip testing of loading frozen states
+        * Fix t/regex/004_pge.t
+	* Call it Parrot m4 0.0.14
+
+2005-06-29     Bernhard Schmalhofer
         * Switch from PCRE to PGE
 	* Call it Parrot m4 0.0.13
 

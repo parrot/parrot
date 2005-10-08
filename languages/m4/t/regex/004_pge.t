@@ -33,6 +33,7 @@ use Parrot::Test tests => 1;
     match = word_rulesub(target)               # execute rule on target string
 
 match_loop:
+    if_null match, match_fail          # if match fails stop
     unless match goto match_fail          # if match fails stop
     print "match succeeded\n"
 
@@ -43,19 +44,14 @@ match_loop:
 
 match_fail:
     print "match failed\n"   
-    .return()
 .end
 END_PIR
 match succeeded
 : <Hello @ 0> 0
 match succeeded
-: <Hell @ 0> 0
+: <Hello @ 0> 0
 match succeeded
-: <Hel @ 0> 0
-match succeeded
-: <He @ 0> 0
-match succeeded
-: <H @ 0> 0
+: <Hello @ 0> 0
 match failed
 OUTPUT
 }
