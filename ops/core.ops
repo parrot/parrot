@@ -581,11 +581,6 @@ inline op get_addr(out INT, in PMC) {
 
 Generate a new subroutine object in $1 of class $2 and label $3.
 
-=item B<newsub>(in INT, in INT, labelconst INT, labelconst INT)
-
-Generate a new subroutine object in P0 of class $1 subroutine label $3 and
-a return continuation in P1 of class $2 and return address $4.
-
 =cut
 
 inline op newsub(out PMC, in INT, labelconst INT) {
@@ -599,23 +594,7 @@ inline op newsub(out PMC, in INT, labelconst INT) {
   goto NEXT();
 }
 
-inline op newsub(in INT, in INT, labelconst INT, labelconst INT) {
-  if ($1 <= 0 || $1 >= enum_class_max) {
-    internal_exception(1, "Illegal PMC enum (%d) in newsub", (int)$1);
-    abort(); /* Deserve to lose */
-  }
-  if ($2 <= 0 || $2 >= enum_class_max) {
-    internal_exception(1, "Illegal PMC enum (%d) in newsub", (int)$2);
-    abort(); /* Deserve to lose */
-  }
-  REG_PMC(0) = pmc_new_noinit(interpreter, $1);
-  VTABLE_init(interpreter, REG_PMC(0));
-  VTABLE_set_pointer(interpreter, REG_PMC(0),
-      (CUR_OPCODE + $3));
-  REG_PMC(1) = pmc_new_noinit(interpreter, $2);
-  VTABLE_init(interpreter, REG_PMC(1));
-  VTABLE_set_pointer(interpreter, REG_PMC(1),
-      (CUR_OPCODE + $4));
+op DELETED_newsub(in INT, in INT, labelconst INT, labelconst INT) {
   goto NEXT();
 }
 

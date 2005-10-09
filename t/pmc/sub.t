@@ -17,7 +17,7 @@ C<Continuation> PMCs.
 
 =cut
 
-use Parrot::Test tests => 49;
+use Parrot::Test tests => 44;
 use Test::More;
 use Parrot::Config;
 
@@ -26,22 +26,6 @@ my $temp = "temp.pasm";
 END {
     unlink($temp, 'temp.pbc');
 };
-
-output_is(<<'CODE', <<'OUTPUT', "PASM subs - newsub");
-    print "main\n"
-    newsub .Sub, .RetContinuation, _func, _ret
-    invoke P0, P1
-_ret:
-    print "back\n"
-    end
-_func:
-    print "func\n"
-    returncc
-CODE
-main
-func
-back
-OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "PASM subs - newsub 2");
     print "main\n"
@@ -266,107 +250,6 @@ CODE
 in func1
 in func2
 done
-OUTPUT
-
-output_is(<<'CODE', <<'OUTPUT', "sub calling a sub");
-    print "main\n"
-    newsub .Sub, .RetContinuation, _func1, ret1
-    invoke P0, P1
-ret1:
-    print "back\n"
-    end
-
-_func1:
-    print "func1\n"
-    newsub .Sub, .RetContinuation, _func2, ret2
-    invoke P0, P1
-ret2:
-    print "func1\n"
-    returncc
-
-_func2:
-    print "func2\n"
-    returncc
-
-CODE
-main
-func1
-func2
-func1
-back
-OUTPUT
-
-output_like(<<'CODE', <<'OUTPUT', "interp - warnings");
-    new P0, .PerlUndef
-    set I0, P0
-    printerr "main:"
-    newsub .Sub, .RetContinuation, _func, _ret
-    invoke P0, P1
-_ret:
-    printerr ":back"
-    new P0, .PerlUndef
-    set I0, P0
-    end
-_func:
-    warningson 1
-    new P0, .PerlUndef
-    set I0, P0
-    returncc
-CODE
-/^main:Use of uninitialized value in integer context
-current instr\.: '\(null\)' pc (\d+|-1) \(.*?:(\d+|-1)\)
-:back$/s
-OUTPUT
-
-output_like(<<'CODE', <<'OUTPUT', "interp - warnings 2");
-    warningson 1
-    newsub .Sub, .RetContinuation, _func, ret
-    new P10, .PerlUndef
-    set I0, P10
-    printerr ":main"
-    invoke P0, P1
-ret:
-    printerr ":back:"
-    new P10, .PerlUndef
-    set I0, P10
-    printerr ":end"
-    end
-_func:
-    warningsoff 1
-    new P0, .PerlUndef
-    set I0, P0
-    returncc
-CODE
-/^Use of uninitialized value in integer context
-current instr\.: '\(null\)' pc (\d+|-1) .*?
-:main:back:Use of un.*$/sm
-OUTPUT
-
-output_like(<<'CODE', <<'OUTPUT', "interp - warnings 2 - updatecc");
-    # the RetContinuation in P1 is created with warnings off
-    newsub .Sub, .RetContinuation, _func, ret
-    # turn warnings on in main
-    warningson 1
-    new P10, .PerlUndef
-    set I0, P10
-    printerr ":main"
-    invokecc P0
-ret:
-    printerr ":back:"
-    new P10, .PerlUndef
-    set I0, P10
-    printerr ":end"
-    end
-_func:
-    # turn off warnings in the sub
-    warningsoff 1
-    new P0, .PerlUndef
-    set I0, P0
-    returncc
-CODE
-/^Use of uninitialized value in integer context
-current instr\.: '\(null\)' pc (\d+|-1) .*?
-:main:back:Use of un.*$/sm
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "pcc sub");

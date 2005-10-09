@@ -1,13 +1,12 @@
-Deprecated opcodes (branches/leo-ctx5 first)
+Deprecated opcodes
 
-newsub(in INT, in INT, labelconst INT, labelconst INT)
+newsub Pdest, IType, ILabel
 
-  Creates a sub in P0 and a continuation in P1. It was a premature
-  attempt to be able to create a return continuation outside a loop.
-  This isn't needed anymore due to continuation recycling and the opcode
-  also has implicit register usage (P0, P1).
+C<newsub> creates a subroutine object just from a label. The
+Sub object is lacking necessary meta information like name, length,
+MMD-info, and more.
 
-  use 3 arg newsub, find_global, set_p_pc, or just foo() syntax
+Use: find_name, find_global, or Sub constants instead.
 
 Register stack opcodes
 
