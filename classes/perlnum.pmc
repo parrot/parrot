@@ -22,7 +22,7 @@ These are the vtable functions for the PerlNum base class
 
 void Parrot_perlscalar_morph(Interp* , PMC* pmc, INTVAL type);
 
-pmclass PerlNum extends Float {
+pmclass PerlNum extends Float does float does scalar {
 
 /*
 

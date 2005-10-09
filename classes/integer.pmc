@@ -71,7 +71,7 @@ overflow_p(Interp *interpreter, PMC *self, PMC *val, PMC *dest, int mmd)
     }
 }
 
-pmclass Integer extends scalar {
+pmclass Integer extends scalar does integer does scalar {
 
 /*
 

@@ -23,7 +23,7 @@ C<PerlInt> extends C<Integer> to provide a Perl integer.
 void Parrot_perlscalar_morph(Interp* , PMC* pmc, INTVAL type);
 
 /* TODO extends PerlAny or perlscalar or whatever */
-pmclass PerlInt extends Integer {
+pmclass PerlInt extends Integer does integer does scalar {
 
 
 /*

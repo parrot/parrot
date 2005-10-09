@@ -4,7 +4,7 @@ Data::Dumper::Base - style baseclass
 
 =head1 VERSION
 
-version 0.11
+version 0.20
 
 =head1 SYNOPSIS
 
@@ -29,7 +29,7 @@ A Data::Dumper::Base object has the following methods:
 .const int attrIndention = 2
 .const int attrCache = 3
 
-.sub __library_data_dumper_base_onload @LOAD
+.sub __library_data_dumper_base_onload :load
     find_type $I0, "Data::Dumper::Base"
     if $I0 > 1 goto END
     newclass $P0, "Data::Dumper::Base"
@@ -47,7 +47,7 @@ END:
 
 =cut
 
-.sub prepare method
+.sub prepare :method
     .param pmc dumper
     .param string indent
     .local string stemp
@@ -57,20 +57,20 @@ END:
     add $I0, attrDumper
     setattribute self, $I0, dumper
 
-    new temp, .PerlInt
+    new temp, .Integer
     set temp, 0
     classoffset $I0, self, "Data::Dumper::Base"
     add $I0, attrLevel
     setattribute self, $I0, temp
 
-    new temp, .PerlString
+    new temp, .String
     clone stemp, indent
     set temp, stemp
     classoffset $I0, self, "Data::Dumper::Base"
     add $I0, attrIndention
     setattribute self, $I0, temp
 
-    new temp, .PerlArray
+    new temp, .ResizablePMCArray
     classoffset $I0, self, "Data::Dumper::Base"
     add $I0, attrCache
     setattribute self, $I0, temp
@@ -82,7 +82,7 @@ END:
 
 =cut
 
-.sub cache method
+.sub cache :method
     .param string defname
     .param pmc find
     .local pmc _cache
@@ -120,7 +120,7 @@ NOTFOUND:
 
 =cut
 
-.sub createIndent method
+.sub createIndent :method
     .param int level
     .local pmc temp
     .local string indent
@@ -139,7 +139,7 @@ NOTFOUND:
 
 =cut
 
-.sub indent method
+.sub indent :method
     .local pmc temp
     .local string _indent
     .local int level
@@ -158,7 +158,7 @@ NOTFOUND:
 
 =cut
 
-.sub newIndent method
+.sub newIndent :method
     .local pmc temp
     .local string indent1
     .local string indent2
@@ -181,7 +181,7 @@ NOTFOUND:
 
 =cut
 
-.sub deleteIndent method
+.sub deleteIndent :method
     .local pmc temp
     .local string indent
     .local int level
@@ -201,7 +201,7 @@ NOTFOUND:
 
 =cut
 
-.sub dump method
+.sub dump :method
     .param string paramName
     .param pmc _dump
     .local int type
@@ -223,12 +223,38 @@ NOT_IN_CACHE:
     set func, "pmcNull"
     if_null _dump, DUMP
 
-    # does a helper method exists?
+    # does a specific helper method exist?
+    # (in general, it will not, let it override the general ones below)
     typeof temp, _dump
     set func, "pmc"
     concat func, temp
     can ret, self, func
     if ret goto DUMP
+
+    #is _dump undef?
+    func = "genericUndef"
+    $I0 = defined _dump
+    unless $I0 goto DUMP
+
+    # does a generic helper method exist?
+    func = "genericHash" 
+    $I0 = does _dump, "hash"
+    if $I0 goto DUMP
+
+    func = "genericArray" 
+    $I0 = does _dump, "array"
+    if $I0 goto DUMP
+
+    func = "genericString"
+    $I0 = does _dump, "string"
+    if $I0 goto DUMP
+
+    func = "genericNumber"
+    $I0 = does _dump, "integer"
+    if $I0 goto DUMP
+    $I0 = does _dump, "float"
+    if $I0 goto DUMP
+
     # no, dump as a unknown PMC
     set func, "pmcDefault"
 DUMP:

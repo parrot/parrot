@@ -4,7 +4,7 @@ Data::Dumper::Default - The default output module of Data::Dumper.
 
 =head1 VERSION
 
-version 0.10
+version 0.20
 
 =head1 SYNOPSIS
 
@@ -16,7 +16,7 @@ This module provides the default output style of C<Data::Dumper>.
 
 =cut
 
-.sub __library_data_dumper_default_onload @LOAD
+.sub __library_data_dumper_default_onload :load
     find_type $I0, "Data::Dumper::Default"
     if $I0 > 1 goto END
     load_bytecode "library/Data/Dumper/Base.imc"
@@ -40,7 +40,7 @@ A Data::Dumper::Default object has the following methods:
 
 =cut
 
-.sub dumpWithName method
+.sub dumpWithName :method
     .param string shortname
     .param string name
     .param pmc dump
@@ -59,7 +59,7 @@ A Data::Dumper::Default object has the following methods:
 
 =cut
 
-.sub dumpCached method
+.sub dumpCached :method
     .param string name
     .param pmc dump
 
@@ -74,7 +74,7 @@ A Data::Dumper::Default object has the following methods:
 
 =cut
 
-.sub dumpProperties method
+.sub dumpProperties :method
     .param string paramName
     .param pmc dump
     .local string name
@@ -95,13 +95,13 @@ END:
     .return ( ret )
 .end
 
-=item style.dumpHash( name, hash )
+=item style.genericHash( name, hash )
 
 Dumps a 'generic' Hash.
 
 =cut
 
-.sub dumpHash method
+.sub genericHash :method
     .param string name
     .param pmc hash
     .local string indent
@@ -114,9 +114,12 @@ Dumps a 'generic' Hash.
 
     (subindent, indent) = self."newIndent"()
 
-    print "{"
+    $S0 = typeof hash
+    print $S0
+   
+    print " {"
 
-    new keys, .PerlArray
+    new keys, .ResizablePMCArray
     new iter, .Iterator, hash
     set iter, 0
 
@@ -139,7 +142,7 @@ dump_loop:
 
     shift key, keys
 
-    new val, .PerlArray
+    new val, .ResizablePMCArray
     push val, name
     push val, key
     sprintf name2, "%s[\"%s\"]", val
@@ -168,7 +171,7 @@ Escape any characters in a string so we can re-use it as a literal.
 
 =cut
 
-.sub dumpStringEscaped method
+.sub dumpStringEscaped :method
     .param pmc var
     .param string char
     .local string str
@@ -186,7 +189,7 @@ Escape any characters in a string so we can re-use it as a literal.
 
 =cut
 
-.sub pmcDefault method
+.sub pmcDefault :method
     .param string name
     .param pmc dump
     .local string type
@@ -206,145 +209,13 @@ END:
     .return ( 1 )
 .end
 
-=item style."pmcPMCArray"( name, array )
-
-Dumps a PMC Array.
-
-=cut
-
-.sub pmcPMCArray method
-    .param string name
-    .param pmc array
-    self."pmcPerlArray"( name, array )
-.end
-
-=item style."pmcResizablePMCArray"( name, array )
-
-Dumps a resizable (PMC) Array.
-
-=cut
-
-.sub pmcResizablePMCArray method
-    .param string name
-    .param pmc array
-    self."pmcPerlArray"( name, array )
-.end
-
-=item style."pmcResizableStringArray"( name, array )
-
-Dumps a resizable (string) Array.
-
-=cut
-
-.sub pmcResizableStringArray method
-    .param string name
-    .param pmc array
-    self."pmcPerlArray"( name, array )
-.end
-
-=item style."pmcResizableIntegerArray"( name, array )
-
-Dumps a resizable (Integer) Array.
-
-=cut
-
-.sub pmcResizableIntegerArray method
-    .param string name
-    .param pmc array
-    self."pmcPerlArray"( name, array )
-.end
-
-=item style."pmcResizableFloatArray"( name, array )
-
-Dumps a resizable (Float) Array.
-
-=cut
-
-.sub pmcResizableFloatArray method
-    .param string name
-    .param pmc array
-    self."pmcPerlArray"( name, array )
-.end
-
-=item style."pmcFixedPMCArray"( name, array )
-
-Dumps a fixed (PMC) Array.
-
-=cut
-
-.sub pmcFixedPMCArray method
-    .param string name
-    .param pmc array
-    self."pmcPerlArray"( name, array )
-.end
-
-=item style."pmcFixedStringArray"( name, array )
-
-Dumps a fixed (string) Array.
-
-=cut
-
-.sub pmcFixedStringArray method
-    .param string name
-    .param pmc array
-    self."pmcPerlArray"( name, array )
-.end
-
-=item style."pmcFixedIntegerArray"( name, array )
-
-Dumps a fixed (Integer) Array.
-
-=cut
-
-.sub pmcFixedIntegerArray method
-    .param string name
-    .param pmc array
-    self."pmcPerlArray"( name, array )
-.end
-
-=item style."pmcFixedFloatArray"( name, array )
-
-Dumps a fixed (Float) Array.
-
-=cut
-
-.sub pmcFixedFloatArray method
-    .param string name
-    .param pmc array
-    self."pmcPerlArray"( name, array )
-.end
-
-=item style."pmcPMCArray"( name, array )
-
-Dumps a (PMC) Array.
-
-=cut
-
-.sub pmcPMCArray method
-    .param string name
-    .param pmc array
-    self."pmcPerlArray"( name, array )
-.end
-
-=item style."pmcStringArray"( name, array )
-
-Dumps a (string) Array.
-
-=cut
-
-.sub pmcStringArray method
-    .param string name
-    .param pmc array
-    self."pmcPerlArray"( name, array )
-.end
-
 =item style."pmcIntList"( name, array )
 
 Dumps an IntList PMC.
 
 =cut
 
-.sub pmcIntList method
+.sub pmcIntList :method
     .param string name
     .param pmc array
     .local string indent
@@ -374,7 +245,7 @@ iter_loop:
 
     print subindent
 
-    new val, .PerlArray
+    new val, .ResizablePMCArray
     push val, name
     push val, pos
     sprintf name2, "%s[%d]", val
@@ -403,15 +274,16 @@ iter_end:
     .return ( 1 )
 .end
 
-=item style."pmcPerlArray"( name, array )
+=item style."genericArray"( name, array )
 
-Dumps a (Perl) Array.
+Dumps any pmc that implements an Array interface.
 
 =cut
 
-.sub pmcPerlArray method
+.sub genericArray :method
     .param string name
     .param pmc array
+
     .local string indent
     .local string subindent
     .local int size
@@ -429,8 +301,8 @@ Dumps a (Perl) Array.
     print $I0
     print ") ["
 
-    set size, array
-    set pos, 0
+    size = array
+    pos = 0
 
     unless size, iter_end
 
@@ -439,7 +311,7 @@ iter_loop:
 
     print subindent
 
-    new val, .PerlArray
+    val = new .ResizablePMCArray
     push val, name
     push val, pos
     sprintf name2, "%s[%d]", val
@@ -469,54 +341,13 @@ iter_end:
     .return ( 1 )
 .end
 
-=item style."pmcPerlHash"( name, hash )
+=item style."genericString"( name, str )
 
-Dumps a PerlHash PMC.
-
-=cut
-
-.sub pmcPerlHash method
-    .param string name
-    .param pmc hash
-    .local string indent
-
-    $S0 = typeof hash
-  
-    print $S0
-    print " "
-
-    self."dumpHash"( name, hash )
-
-    .return ( 1 )
-.end
-
-
-=item style."pmcHash"( name, hash )
-
-Dumps a Hash PMC.
+Dumps any string-like PMC.
 
 =cut
 
-.sub pmcHash method
-    .param string name
-    .param pmc hash
-    .local string indent
-
-    print "Hash "
-
-    self."dumpHash"( name, hash )
-
-    .return ( 1 )
-.end
-
-
-=item style."pmcString"( name, str )
-
-Dumps a String PMC.
-
-=cut
-
-.sub pmcString method
+.sub genericString :method
     .param string name
     .param pmc str
 
@@ -527,32 +358,13 @@ Dumps a String PMC.
     .return ( 1 )
 .end
 
+=item style."genericNumber"
 
-=item style."pmcPerlString"( name, str )
-
-Dumps a PerlString PMC.
-
-=cut
-
-.sub pmcPerlString method
-    .param string name
-    .param pmc str
-
-    print "\""
-    self."dumpStringEscaped"( str, "\"" )
-    print "\""
-
-    .return ( 1 )
-.end
-
-
-=item style."pmcPerlInt"( name, val )
-
-Dumps a PerlInt PMC.
+Dumps a generic numeric PMC.
 
 =cut
 
-.sub pmcPerlInt method
+.sub genericNumber :method
     .param string name
     .param pmc val
 
@@ -561,41 +373,14 @@ Dumps a PerlInt PMC.
     .return ( 1 )
 .end
 
-=item style."pmcPerlNum"( name, val )
+=item style."genericUndef"( name, val )
 
-Dumps a PerlNum PMC.
-
-=cut
-
-.sub pmcPerlNum method
-    .param string name
-    .param pmc val
-
-    print val
-
-    .return ( 1 )
-.end
-
-=item style."pmcPerlUndef"( name, val )
-
-Dumps a PerlUndef PMC.
+Dumps any undef PMC.
 
 =cut
 
-.sub pmcPerlUndef method
+.sub genericUndef :method
     print "undef"
-
-    .return ( 1 )
-.end
-
-=item style."pmcSub"( name, val )
-
-Dumps a Sub pmc
-
-=cut
-
-.sub pmcSub method
-    print "sub { ... }"
 
     .return ( 1 )
 .end
@@ -606,86 +391,8 @@ Dumps a Null PMC.
 
 =cut
 
-.sub pmcNull method
+.sub pmcNull :method
     print "null"
-
-    .return ( 1 )
-.end
-
-=item style."pmcOrderedHash"( name, val )
-
-Dumps a OrderedHash PMC.
-
-=cut
-
-.sub pmcOrderedHash method
-    print "OrderedHash { ... }"
-
-    .return ( 1 )
-.end
-
-=item style."pmcManagedStruct"( name, val )
-
-Dumps a ManagedStruct PMC.
-
-=cut
-
-.sub pmcManagedStruct method
-    print "ManagedStruct { ... }"
-
-    .return ( 1 )
-.end
-
-=item style."pmcUnManagedStruct"( name, val )
-
-Dumps a UnManagedStruct PMC.
-
-=cut
-
-.sub pmcUnManagedStruct method
-    print "UnManagedStruct { ... }"
-
-    .return ( 1 )
-.end
-
-=item style."pmcArray"( name, array )
-
-Dumps an Array.
-
-=cut
-
-.sub pmcArray method
-    .param string name
-    .param pmc array
-    self."pmcPerlArray"( name, array )
-.end
-
-=item style."pmcInteger"( name, val )
-
-Dumps an Integer PMC.
-
-=cut
-
-.sub pmcInteger method
-    .param string name
-    .param pmc val
-
-    print val
-
-    .return ( 1 )
-.end
-
-=item style."pmcFloat"( name, val )
-
-Dumps a Float PMC.
-
-=cut
-
-.sub pmcFloat method
-    .param string name
-    .param pmc val
-
-    print val
 
     .return ( 1 )
 .end

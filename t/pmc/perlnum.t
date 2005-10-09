@@ -1089,12 +1089,16 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "check whether interface is done");
     does bool1, pmc1, "scalar"
     print bool1
     print "\n"
+    does bool1, pmc1, "float"
+    print bool1
+    print "\n"
     does bool1, pmc1, "no_interface"
     print bool1
     print "\n"
     end
 .end
 CODE
+1
 1
 0
 OUTPUT

@@ -22,7 +22,7 @@ wrapper for the functions in /src/string.c
 
 #include "parrot/parrot.h"
 
-pmclass String extends scalar {
+pmclass String extends scalar does string does scalar {
 
 /*
 

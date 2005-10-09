@@ -20,7 +20,7 @@ C<Float> extends C<scalar> to provide floating-point number operations.
 
 #include "parrot/parrot.h"
 
-pmclass Float extends scalar {
+pmclass Float extends scalar does float does scalar {
 
 /*
 

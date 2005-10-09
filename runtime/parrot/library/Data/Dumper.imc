@@ -1,4 +1,4 @@
-.sub __library_data_dumper_onload @LOAD
+.sub __library_data_dumper_onload :load
     find_type $I0, "Data::Dumper"
     if $I0 > 1 goto END
     load_bytecode "library/Data/Dumper/Default.imc"
@@ -9,7 +9,7 @@ END:
 
 .namespace ["Data::Dumper"]
 
-.sub dumper method
+.sub dumper :method
     .param pmc dump
     .param string name           :optional
     .param int has_name          :opt_flag

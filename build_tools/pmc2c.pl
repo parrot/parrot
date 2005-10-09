@@ -157,6 +157,9 @@ The default is "scalar". Other currently used interfaces are:
     hash     : container PMC with string-keyed elements
     library  : PMC that corresponds to a dynamic library
     ref      : PMC that references another PMC
+    string   : PMC that behaves similarly to the base string type
+    integer  : PMC that behaves similarly to the base int type
+    float    : PMC that behaves similarly to the base number type
     scalar   : (only used by the sample dynclasses/foo.pmc)
 
 This is not a canonical list, but merely a snapshot of what's in use.
