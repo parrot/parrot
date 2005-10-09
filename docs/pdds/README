@@ -1,0 +1,21 @@
+PDD SPRING CLEANING IN PROGRESS
+
+The PDDs have gotten stale and dusty, and I think a family of cockatiels
+has built a nest back behind pdd03.  So it's time for PDD spring cleaning!
+(Yes, I know it's October, but cockatiels are from Australia.)
+
+The first step is emptying out the room by moving all the current PDDs to
+the "clip" directory.  That directory is for PDDs that have not yet been
+put under the knife for review and modification or deletion.  As each
+section of a clip PDD is discarded, renamed, edited, and/or retained, it
+will be clipped out (thus the name) and inserted into a PDD in this
+directory.  In the end, the clip directory will evaporate.
+
+I'll be posting requests for help specific to the work of the moment
+to p6i.  In the meantime, if you want to document how the current
+Parrot works (i.e. fix pdd bugs), while I wouldn't embark on a rewrite
+of any documents, it would be OK to add notes to the clip PDDs.  Think
+of them as Wiki pages, but without the HTML.  (If you don't have a
+commit bit, and you start submitting doc patches, somehow I think we'll
+be able to find a commit bit for you.  :-))
+
