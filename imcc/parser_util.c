@@ -87,8 +87,6 @@ iNEW(Interp *interpreter, IMC_Unit * unit, SymReg * r0,
  *  Example:
  *   P0 = newsub _func            ::=   newsub, P0, .Sub, _func
  *   P0 = newclosure _clos        ::=   newsub, P0, .Closure, _clos
- *   P0 = newsub _func, _ret      ::=   newsub, .Sub, .RetContinuation, _func, _ret
- *   P0 = newclosure _clos, _ret  ::=   newsub, .Closure, .RetContinuation, _clos, _ret
  *
  * XXX: Currently the 3 arg version of newsub ignores the Px target on the assign.
  *      Fix the PASM opcode.
@@ -96,22 +94,22 @@ iNEW(Interp *interpreter, IMC_Unit * unit, SymReg * r0,
 
 Instruction *
 iNEWSUB(Interp *interpreter, IMC_Unit * unit, SymReg * r0,
-        int type, SymReg *subinit, SymReg *retinit, int emit)
+        int type, SymReg *subinit, int emit)
 {
     char fmt[256];
     SymReg *regs[4];
-    SymReg *subpmc, *retpmc;
-    int i, nargs;
+    SymReg *subpmc;
+    int nargs;
     int pmc_num;
     const char * classnm = NULL;
     switch(type) {
-       case NEWSUB: classnm = "Sub"; break;
-       case NEWCLOSURE: classnm = "Closure"; break;
-       case NEWCOR: classnm = "Coroutine"; break;
-       case NEWCONT: classnm = "Continuation"; break;
-       default:
-        IMCC_fataly(interpreter, E_SyntaxError,
-             "iNEWSUB: unimplemented classtype '%d'\n", type);
+        case NEWSUB: classnm = "Sub"; break;
+        case NEWCLOSURE: classnm = "Closure"; break;
+        case NEWCOR: classnm = "Coroutine"; break;
+        case NEWCONT: classnm = "Continuation"; break;
+        default:
+              IMCC_fataly(interpreter, E_SyntaxError,
+                      "iNEWSUB: unimplemented classtype '%d'\n", type);
     }
 
     pmc_num = pmc_type(interpreter,
@@ -122,46 +120,19 @@ iNEWSUB(Interp *interpreter, IMC_Unit * unit, SymReg * r0,
 
     if (pmc_num <= 0)
         IMCC_fataly(interpreter, E_SyntaxError,
-            "Unknown PMC type '%s'\n", classnm);
+                "Unknown PMC type '%s'\n", classnm);
     sprintf(fmt, "%%s, %d\t # .%s", pmc_num, classnm);
 
-    /* 1st form:   px = newsub _foo */
-    if (!retinit) {
-        r0->usage = U_NEW;
-        regs[0] = r0;
-        regs[1] = subpmc;
-        if (subinit) {
-            regs[2] = subinit;
-            nargs = 3;
-        }
-        else
-            nargs = 2;
-    }
-    /* 2nd form:   px = newsub _foo, _retcont
-     *
-     * XXX: Currently px is ignored, this op sets P0/P1 implicitly
-     */
-    else {
-        if (!subinit) { /* sanity check */
-            IMCC_fataly(interpreter, E_SyntaxError,
-                "iNEWSUB: NULL $0 for newsub\n");
-        }
-
-        /* The return continuation */
-        pmc_num = pmc_type(interpreter,
-                string_from_cstring(interpreter, "RetContinuation", 0));
-
-        sprintf(fmt, "%d", pmc_num);
-        retpmc = mk_const(interpreter, str_dup(fmt), 'I');
-
-        regs[0] = subpmc;
-        regs[1] = retpmc;
+    r0->usage = U_NEW;
+    regs[0] = r0;
+    regs[1] = subpmc;
+    if (subinit) {
         regs[2] = subinit;
-        regs[3] = retinit;
-        nargs = 4;
+        nargs = 3;
     }
+    else
+        nargs = 2;
 
-    i = nargs;
     return INS(interpreter, unit, "newsub", NULL, regs, nargs, 0, emit);
 }
 

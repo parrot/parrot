@@ -88,7 +88,7 @@ Instruction * INS_LABEL(struct _IMC_Unit *, SymReg * r0, int emit);
 Instruction * iNEW(Interp *, struct _IMC_Unit *, SymReg * r0, char * type,
 	SymReg *init, int emit);
 Instruction * iNEWSUB(Interp *, struct _IMC_Unit *, SymReg * r0, int type,
-	SymReg *init, SymReg *retcont, int emit);
+	SymReg *init, int emit);
 Instruction * emitb(struct _IMC_Unit *, Instruction *);
 
 int instruction_reads(Instruction *, SymReg *);

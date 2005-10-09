@@ -1026,14 +1026,7 @@ assignment:
                         { $$ = MK_I(interp, cur_unit, "new", 3, $1, $4, $6); }
    | target '=' newsub IDENTIFIER
                         { $$ = iNEWSUB(interp, cur_unit, $1, $3,
-                                  mk_sub_address(interp, $4), NULL, 1); }
-   | target '=' newsub IDENTIFIER COMMA IDENTIFIER
-                        { /* XXX: Fix 4arg version of newsub PASM op
-                              * to use $1 instead of implicit P0
-                              */
-                              $$ = iNEWSUB(interp, cur_unit, NULL, $3,
-                                           mk_sub_address(interp, $4),
-                                           mk_sub_address(interp, $6), 1); }
+                                  mk_sub_address(interp, $4), 1); }
    | target '=' ADDR IDENTIFIER
                         { $$ = MK_I(interp, cur_unit, "set_addr",
                             2, $1, mk_label_address(interp, $4)); }

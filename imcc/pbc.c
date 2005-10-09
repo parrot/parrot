@@ -1186,19 +1186,6 @@ e_pbc_emit(Interp *interpreter, void *param, IMC_Unit * unit, Instruction * ins)
                         "label not found for '%s'\n",
                         addr->name);
             }
-            if (ins->opsize == 5 && !strcmp(ins->op, "newsub")) {
-                /* this only fixes local branches,
-                 * TODO globals
-                 */
-                addr = ins->r[2];
-                label = _get_sym(globals.cs->subs->labels, addr->name);
-                /* maybe global */
-                if (label) {
-                    addr->color = label->color - npc;
-                    IMCC_debug(interpreter, DEBUG_PBC_FIXUP, "branch label %d jump %d %s %d\n",
-                            npc, label->color, addr->name,addr->color);
-                }
-            }
         }
         /* add debug line info */
         if (debug_seg) {
