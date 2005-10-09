@@ -90,7 +90,7 @@ open_file:
   .local pmc opt_spec
   opt_spec = new .Array
   opt_spec = 2
-  opt_spec[0] = "dump"
+  opt_spec[0] = "pir"
   opt_spec[1] = "e=s"
 
   .local pmc opt, argv_clone
@@ -99,7 +99,7 @@ open_file:
   opt = get_options(argv_clone, opt_spec)
 
   .local int dump_only, execute
-  dump_only = defined opt["dump"]
+  dump_only = defined opt["pir"]
 
   execute = defined opt["e"]
   if execute goto oneliner

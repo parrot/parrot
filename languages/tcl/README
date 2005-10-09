@@ -20,6 +20,27 @@ To run ParTcl interactively, simply type:
 
 in this directory.
 
+=head2 Command line options
+
+partcl supports two command line options (that are not standard Tcl):
+
+=over 4
+
+=item -e
+
+Analagous to perl's C<-e> switch, this option will let you specify tcl
+in the command, which will then be executed. e.g:
+
+ ../../parrot tcl.pbc -e="puts {Hello World}"
+
+=item --pir
+
+Given this option, partcl will compile the tcl code to PIR, and output
+the PIR on STDOUT. This PIR can then be compiled to parrot bytecode, or
+run directly through parrot. Works with C<-e>.
+
+=back
+
 =head2 Examples
 
 To run an example, change to the C<examples>, and type C<make>
@@ -35,9 +56,6 @@ If any tests fail (with C<-G> or not), please email the perl6-internals list.
 
 =head2 Documentation
 
-See:
-
- docs/*
- TODO
+See C<docs/> and C<TODO>
 
 =cut
