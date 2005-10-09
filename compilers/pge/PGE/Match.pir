@@ -16,7 +16,7 @@ This file implements match objects returned by the Parrot Grammar Engine.
     addattribute base, "$:target"                  # target
     addattribute base, "$:from"                    # start of match
     addattribute base, "$:pos"                     # current match position
-    addattribute base, "&:yield"                   # match's yield
+    addattribute base, "&:corou"                   # match's corou
     addattribute base, "@:capt"                    # subpattern captures
     addattribute base, "%:capt"                    # subpattern captures
     .return ()
@@ -60,17 +60,17 @@ it left off.
 =cut
 
 .sub "next" method
-    .local pmc yield
+    .local pmc corou
 
-    yield = getattribute self, "PGE::Match\x0&:yield"
-    if_null yield, next_1
+    corou = getattribute self, "PGE::Match\x0&:corou"
+    if_null corou, next_1
     goto next_2
   next_1:
     $P0 = getattribute self, "PGE::Match\x0$:pos"
     $P0 = -1
     goto end
   next_2:
-    .yield()
+    corou()
   end:
     .return ()
 .end
