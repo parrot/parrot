@@ -15,7 +15,7 @@ Tests the freeze/thaw archiving subsystem.
 
 =cut
 
-use Parrot::Test tests => 26;
+use Parrot::Test tests => 27;
 use Test::More;
 
 END { unlink "temp.fpmc"; };
@@ -823,5 +823,70 @@ ResizableBooleanArray
 0
 1
 0
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "freeze/thaw a ResizablePMCArray");
+.sub test @MAIN
+    .local pmc original_arr, thawed_arr
+    .local string frozen_arr
+    original_arr = new .ResizablePMCArray
+    original_arr[0] = 1
+    original_arr[1] = 2.72
+    original_arr[2] = "three.14"
+
+    # Dump some data before freezing
+    print "Before freezing:\n"
+    typeof S10, original_arr	# type
+    print S10
+    print "\n"
+    set I12, original_arr	# elements
+    print I12
+    print "\n"
+    I12 = original_arr[0]
+    print I12
+    print "\n"
+    N12 = original_arr[1]
+    print N12
+    print "\n"
+    S12 = original_arr[2]
+    print S12
+    print "\n"
+
+    frozen_arr = freeze original_arr
+    thawed_arr = thaw frozen_arr
+
+    # Dump the same data after freeze/thaw
+    print "\nAfter freeze/thaw:\n"
+    typeof S10, thawed_arr	# type
+    print S10
+    print "\n"
+    set I12, thawed_arr	# elements
+    print I12
+    print "\n"
+    I12 = thawed_arr[0]
+    print I12
+    print "\n"
+    N12 = thawed_arr[1]
+    print N12
+    print "\n"
+    S12 = thawed_arr[2]
+    print S12
+    print "\n"
+
+.end
+CODE
+Before freezing:
+ResizablePMCArray
+3
+1
+2.720000
+three.14
+
+After freeze/thaw:
+ResizablePMCArray
+3
+1
+2.720000
+three.14
 OUTPUT
 
