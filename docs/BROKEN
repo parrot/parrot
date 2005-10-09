@@ -131,10 +131,6 @@ F<languages/perl[6]>).
 
 =item * Everything in F<DEPRECATED>
 
-=item * F<ops/rx.ops>
-
-Superseded by PGE.
-
 =back
 
 =head2 Miscellaneous
