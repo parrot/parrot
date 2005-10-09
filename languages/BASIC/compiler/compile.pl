@@ -52,18 +52,21 @@ foreach my $seg ("_main", "_basicmain", keys %code) {
 
 	print CODE ".sub $seg\n";
 	if (exists $code{$seg}->{declarations}) {
-		print CODE "\t.local PerlHash _GLOBALS\n";
-		print CODE "\t.local string JUMPLABEL\n";
-		print CODE "\tset JUMPLABEL, \"\"\n";
+		print CODE <<'END_PIR';
+
+	.local pmc _GLOBALS
+	.local string JUMPLABEL
+	JUMPLABEL=''
+END_PIR
 		foreach my $var (sort keys %{$code{$seg}->{declarations}}) {
 			if ($var=~/_string$/) {
 				print CODE "\t.local string $var\n";
-				push @init, qq{\t\tset $var, ""\n};
-				push @debdecl, "\t\tset \$P1[\"$var\"], $var\n";
+				push @init, qq{\t\t$var=""\n};
+				push @debdecl, "\t\t\$P1[\"$var\"]=$var\n";
 			} else {
 				print CODE "\t.local float $var\n";
-				push @init, qq{\t\tset $var, 0.0\n};
-				push @debdecl, "\t\tset \$S0, $var\n\t\tset \$P1[\"$var\"], \$S0\n";
+				push @init, qq{\t\t$var=0.0\n};
+				push @debdecl, "\t\t\$S0=$var\n\t\t\$P1[\"$var\"]= \$S0\n";
 			}
 
 		}
@@ -155,16 +158,16 @@ foreach my $seg ("_main", "_basicmain", keys %code) {
 		saveall
 		.param int debline
 		find_global \$P0, "DEBUGGER"
-		set \$I0, \$P0["step"]
+		\$I0= \$P0["step"]
 		ne \$I0, 0, DEBUGGER_STOP
-		set \$P1, \$P0["break"]
-		set \$I0, \$P1
+		\$P1= \$P0["break"]
+		\$I0= \$P1
 		eq \$I0, 0, DEBUGGER_DONE  # No breakpoints
-		set \$S0, debline
+		\$S0= debline
 		exists \$I0, \$P1[\$S0]
 		eq \$I0, 0, DEBUGGER_DONE	 # This breakpoint doesn't exist
 	DEBUGGER_STOP:
-		\$P1=new PerlHash
+		\$P1=new .PerlHash
 @debdecl		.arg \$P1
 		.arg debline
 		_DEBUGGER_STOP_FOR_REAL()
@@ -177,21 +180,21 @@ if ($debug) {
 	print CODE<<FOO;
 .sub _DEBUG_INIT
 	saveall
-	\$P0=new PerlArray
+	\$P0=new .PerlArray
 	find_global \$P1, "DEBUGGER"
 FOO
 	foreach(0..@main::basic-1) {
 		my $line=$main::basic[$_];
 		$line=~s/"/'/g;
-		print CODE "\tset \$P0[",$_+1,"], \"$line\"\n";
+		print CODE "\t\$P0[",$_+1,"]= \"$line\"\n";
 	}
 	print CODE<<FOO;
-	set \$P1["code"], \$P0
-	set \$P1["step"], 1   # Turn on stepping mode
-	\$P0=new PerlHash
-	set \$P1["break"], \$P0  # Breakpoints
-	\$P0=new PerlArray
-	set \$P1["watch"], \$P0  # Watch
+	\$P1["code"]= \$P0
+	\$P1["step"]= 1   # Turn on stepping mode
+	\$P0=new .PerlHash
+	\$P1["break"]= \$P0  # Breakpoints
+	\$P0=new .PerlArray
+	\$P1["watch"]= \$P0  # Watch
 	store_global "DEBUGGER", \$P1
 .end
 FOO

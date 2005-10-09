@@ -397,7 +397,7 @@ sub fixup {
 			push(@expr, [ "STARTARG", "STARTARG" ] );
 		}
 	}
-	return(@expr);
+	return (@expr);
 }
 sub get_expression {
 	my(%opts)=@_;
@@ -476,7 +476,7 @@ sub pushargs {
 	my @args=();
 
 	while($$work[-1]->[0] ne "STARTARG") {
-		my $item=pop @$work;
+		my $item= pop @$work;
 		my $a1=pushthing($code, $optype, @$item);
 		push @args, [ $a1, @$item ];
 	}
@@ -516,7 +516,7 @@ sub generate_code {   # Will return a result register, or something.
 		my($ac, @args, $extern, $pir_args);
 		if (isarray($sym) and $lhs) {
 			($ac,@args)=pushargs(\@code, \$optype, \@work);
-			$pir_args = join(",", map {$_->[0]} @args);
+			$pir_args = join(",", map {$_->[0]} (reverse @args));
 			$pir_args = ",$pir_args" if $pir_args;
 			$extern=$sym;
 			$optype=optype_of($extern);
@@ -525,10 +525,11 @@ sub generate_code {   # Will return a result register, or something.
 			return("~Array", "$optype", @code);
 		} elsif (hasargs($sym)) {
 			($ac,@args)=pushargs(\@code, \$optype, \@work);
-			$pir_args = join(",", map {$_->[0]} @args);
+			$pir_args = join(",", map {$_->[0]} (reverse @args));
 			$pir_args = ",$pir_args" if $pir_args;
 			$extern=$sym;
 			$optype=optype_of($extern);
+			my ($calling_code,@return_params);
 			if (isarray($sym)) {
 NEST_ARRAY_ASSIGN:
 				if ($ac == 0) {
@@ -542,7 +543,8 @@ NEST_ARRAY_ASSIGN:
 				push @work, [ "result of $extern()", "RESULT",  "\$$optype$retcount"];
 			} else {
 				$extern=~s/\$/_string/g; $extern=~tr/a-z/A-Z/;
-				push @code, qq{\$$optype$retcount = _USERFUNC_${extern}_run($ac$pir_args)};
+
+				$calling_code = "(%s) = _USERFUNC_${extern}_run($ac$pir_args)";
 				push @work, [ "result of $extern()", "RESULT",  "\$$optype$retcount"];
 				$retcount++;
 				# External functions return their arguments, 
@@ -551,15 +553,20 @@ NEST_ARRAY_ASSIGN:
 				foreach my $arg (@args) {
 					next if $arg->[0] =~ /^\$P\d+$/;
 					if ($arg->[2] eq "BARE") {
-						push @code, "\t.result $arg->[0]";
+						push @return_params, $arg->[0]
 					} else {
-						push @code, "\t.result \$"
-						. optype_of($arg->[0], $arg) 
-						. "$retcount\t# Dummy, thrown away";
-						$retcount++;
+						push @return_params, "\$" .
+						  optype_of($arg->[0], $arg) .
+						  $retcount++;
 					}
 				}
+				if (@return_params) {
+					push @code, sprintf ($calling_code, join(",",@return_params));
+				} else {
+					push @code, sprintf ($calling_code, '');
+				}
 			}
+					
 			$retcount++;
 		} else {
 			my($op1,$op2)=(pop @work, pop @work);

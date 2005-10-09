@@ -16,7 +16,7 @@ I can't test this on windows, and it's currently broken. Please fix it.
 	set I5, -10
 	invoke
 	store_global "Win32Inputhandle", P5
-	$P0= new PerlHash
+	$P0= new .PerlHash
 	store_global "Win32console", $P0
 	_WIN32_CONSOLE_INFO()
 .end
@@ -26,7 +26,7 @@ I can't test this on windows, and it's currently broken. Please fix it.
 	find_global P1, "kernel32"
 	dlfunc P0, P1, "GetConsoleScreenBufferInfo", "ipp"
 	find_global P5, "Win32handle"
-	P6=new ManagedStruct
+	P6=new .ManagedStruct
 	set P6, SIZEOF_CONSOLE_SCREEN_BUFFER_INFO
 	set I0, 1
 	invoke
@@ -79,7 +79,7 @@ I can't test this on windows, and it's currently broken. Please fix it.
 	dlfunc P0, P2, "FillConsoleOutputCharacterA", "ipcilp"
 	set I0, 1
 	find_global P5, "Win32handle"
-	P6=new ManagedStruct
+	P6=new .ManagedStruct
 	set P6, SIZEOF_DWORD
 	set I5, 32			# Char (space)
 	set I1, P1["xbuf"]
@@ -92,7 +92,7 @@ I can't test this on windows, and it's currently broken. Please fix it.
 	dlfunc P0, P2, "FillConsoleOutputAttribute", "ipiilp"
 	set I0, 1
 	find_global P5, "Win32handle"
-	P6= new ManagedStruct
+	P6= new .ManagedStruct
 	set P6, SIZEOF_DWORD
 	set I5, P1["attr"]		# Attrib
 	set I1, P1["xbuf"]
@@ -202,8 +202,8 @@ INKEY:
 	dlfunc P9, P1,  "PeekConsoleInputA",  "ippip"
         dlfunc P10, P1, "ReadConsoleInputA", "ippip"
 	find_global P5, "Win32Inputhandle"
-	P6=new ManagedStruct
-	P7=new ManagedStruct
+	P6=new .ManagedStruct
+	P7=new .ManagedStruct
 	set P6, INPUT_BUFFER
 	set P7, SIZEOF_DWORD
 

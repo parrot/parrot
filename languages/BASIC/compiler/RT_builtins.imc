@@ -179,6 +179,9 @@ ENDINT:	.return(res)
 	.param int argc
 	.param string target
 	.param float start
+        .param float extent :optional
+	.param int has_extent :opt_flag
+
 	.local string res
 	.local string a
 	.local int strlen
@@ -188,7 +191,7 @@ ENDINT:	.return(res)
 	set pos, start
 	dec pos
 
-	eq argc, 3, MID3ARG
+	if has_extent goto MID3ARG
 
 MIDLOOP:ge pos, strlen, MIDDONE
 	substr a, target, pos, 1
@@ -270,25 +273,34 @@ RND_BAIL:
 	time $N0
 	.return($N0)
 .end
-.sub _BUILTIN_INSTR	# float instr([float start,] string full, string substr);
+
+# float instr(float start, string full, string substring);
+.sub _BUILTIN_INSTR @MULTI(int, float, string, string)
 	.param int argc
-	.local int start
-	set start, 1
-	eq argc, 2, NOSTART
-	.local float startf
-	set start, startf
-NOSTART:
-	dec start		# BASIC starts at 1.
-	.local string full
-	.local string substr
-	length $I0, substr
-	eq $I0, 0, ENDINSTR
-	index $I0, full, substr, start
-	set $N0, $I0
-	
-ENDINSTR:inc $N0
-	.return($N0)
+	.param float start
+	.param string full
+	.param string substring
+
+	.local int start_i
+	start_i = start
+	dec start_i   # BASIC starts at 1, parrot at 0.
+	$I0 = length substring
+	if $I0 == 0 goto ENDINSTR
+	$I0 = index full, substring, start_i
+ENDINSTR:
+	inc $I0
+	.return($I0)
 .end
+
+# float instr(string full, string substring);
+.sub _BUILTIN_INSTR @MULTI(int, string, string)
+	.param int argc
+	.param string full
+	.param string substring
+
+	.return _BUILTIN_INSTR(argc,1.0,full,substring)
+.end
+
 .sub _BUILTIN_UCASE_STRING	# string ucase$(string targ)
 	.param int argc
         .param string targ

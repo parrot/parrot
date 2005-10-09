@@ -74,11 +74,11 @@ CLOSE_OK:
 #        #       I0   Error?
 .sub _READLINE		# string readline(int fd)
 	.param int fd
-	find_global $P0, "FDS"
-	$P1=$P0[fd]
-	set $S0, ""
-	readline $S0, $P1
+	$P0 = find_global "FDS"
+	$P1 = $P0[fd]
+	$S0 = readline $P1
 	.return($S0)
+
 .end
 #	# ###########################
 #	# SPLITLINE	Splits a line into parts
