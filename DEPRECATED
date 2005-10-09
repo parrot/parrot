@@ -21,11 +21,6 @@ savetop, restoretop,
   use saveall/restoreall (whole register frame) or
   user stack opcodes save/restore instead.
 
-C<pack> opcodes
-
-  I've no clue what these are doing - for sure not a perl-ish pack.
-
-
 FUTURE changes
 
 Not yet deprecated, but it's recommended to use the new syxtax and

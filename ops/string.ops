@@ -280,90 +280,22 @@ inline op index(out INT, in STR, in STR, in INT) :base_core {
 
 ########################################
 
-=item B<pack>(inout STR, in INT, in INT)
-
-=item B<pack>(inout STR, in INT, in NUM)
-
-=item B<pack>(inout STR, in INT, in STR)
-
-=item B<pack>(inout STR, in INT, in INT, in INT)
-
-#=item B<pack>(inout STR, in INT, in NUM, in INT) (B<unimplemented>)
-
-#=item B<pack>(inout STR, in INT, in STR, in INT) (B<unimplemented>)
-
-Concat $2 bytes from $3 at the end of $1 or replace them at $4 if provided.
-
-BE AFRAID, THIS IS A QUICK HACK, USE IT AT YOUR OWN RISK.
-
 =cut
 
-inline op pack(inout STR, in INT, in INT) :base_core {
-    char *c = (char *)&$3;
-    STRING *s;
-
-    s = string_make(interpreter, c, (UINTVAL)$2, "binary", 0);
-    $1 = string_concat(interpreter, $1, s, 1);
-
+op DELETED_pack(inout STR, in INT, in INT) :base_core {
     goto NEXT();
 }
 
-inline op pack(inout STR, in INT, in NUM) :base_core {
-    char *c = (char *)&$3;
-    STRING *s;
-
-    s = string_make(interpreter, c, (UINTVAL)$2, "binary", 0);
-    $1 = string_concat(interpreter, $1, s, 1);
-
+op DELETED_pack(inout STR, in INT, in NUM) :base_core {
     goto NEXT();
 }
 
-inline op pack(inout STR, in INT, in STR) :base_core {
-    STRING *t,*s = $3;
-    UINTVAL len = (UINTVAL)$2;
-
-    if (s->strlen < len) { /* XXXX: what is this supposed to do? */
-    	STRING *temp;
-		temp = string_repeat(interpreter,
-							string_from_cstring(interpreter, " ", 1),
-							(UINTVAL)(len - s->strlen),
-							NULL);
-     /*   $1 = string_concat(interpreter, $1, s, 1); */
-        t = string_concat(interpreter, s, temp, 1);
-    } else {
-		t = string_substr(interpreter, s, 0, len, NULL, 0);
-    }
-
-    $1 = string_concat(interpreter, $1, t, 1);
-
+op DELETED_pack(inout STR, in INT, in STR) :base_core {
     goto NEXT();
 }
 
 
-inline op pack(inout STR, in INT, in INT, in INT) :base_core {
-    char *c = (char *)&$3, *n;
-    STRING *s;
-    INTVAL ln;
-    char *t;
-    int i;
-
-    s = string_make(interpreter, c, (UINTVAL)$2, "binary", 0);
-    ln = string_length(interpreter, $1);
-    if (ln < $4 + $2)
-    {
-       PObj_buflen($1) = $1->strlen;
-       string_grow(interpreter, $1, $4 + $2 - ln);
-       $1->bufused = $1->strlen = PObj_buflen($1);
-    }
-
-    /* XXX this is EVIL, use string_replace */
-    n = $1->strstart;
-    t = string_to_cstring(interpreter, s);
-    for (i = $4; i < $4 + $2; i++)
-        n[i] = t[i - $4];
-    string_cstring_free(t);
-
-
+op DELETED_pack(inout STR, in INT, in INT, in INT) :base_core {
     goto NEXT();
 }
 
