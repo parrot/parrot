@@ -13,8 +13,8 @@ examples/assembly/mandel.imc - Print the Mandelbrot set
 
 This prints an ASCII-art representation of the Mandelbrot set.
 
-Translated from C code by Glenn Rhoads into Parrot assembler by Leon
-Brocard <acme@astray.com>.
+Translated from C code by Glenn Rhoads into Parrot assembler
+by Leon Brocard <acme@astray.com>.
 Translated from PASM to PIR by Bernhard Schmalhofer.
 
 The C code is:
@@ -34,7 +34,7 @@ The C code is:
 
 =cut
 
-.sub main @MAIN
+.sub 'main' :main
 
         .local string b
         .local int    x, y, k

@@ -11,7 +11,7 @@ See languages/m4/Makefile on how to generate the needed shared lib.
 
 =cut
 
-.sub example @MAIN
+.sub 'example' :main
 
     print "Trying to load shared library 'm4_eval_compiler'.\n"
     print "Let the init function of the library register the compiler.\n"
