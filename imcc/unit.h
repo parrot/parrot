@@ -47,6 +47,8 @@ typedef struct _IMC_Unit {
     SymReg *namespace;
     int pasm_file;
     INTVAL HLL_id;
+    int n_vars_used[4];	/* INSP in PIR */
+    int n_regs_used[4];	/* INSP in PBC */
 } IMC_Unit;
 
 

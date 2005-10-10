@@ -110,14 +110,15 @@ imc_reg_alloc(Interp *interpreter, IMC_Unit * unit)
 
     if (!unit)
         return;
+    if (!unit->instructions)
+        return;
+    imc_stat_init(unit);
     if (!(IMCC_INFO(interpreter)->optimizer_level &
                 (OPT_PRE|OPT_CFG|OPT_PASM)) && unit->pasm_file)
-        return;
+        goto done;
 
     imcc_init_tables(interpreter);
     IMCC_INFO(interpreter)->allocated = 0;
-    if (!unit->instructions)
-        return;
 
 #if IMC_TRACE
     fprintf(stderr, "reg_alloc.c: imc_reg_alloc\n");
@@ -131,13 +132,12 @@ imc_reg_alloc(Interp *interpreter, IMC_Unit * unit)
     IMCC_debug(interpreter, DEBUG_IMC, "\n------------------------\n");
     IMCC_debug(interpreter, DEBUG_IMC, "processing sub %s\n", function);
     IMCC_debug(interpreter, DEBUG_IMC, "------------------------\n\n");
-    if (IMCC_INFO(interpreter)->verbose ||
-            (IMCC_INFO(interpreter)->debug & DEBUG_IMC))
-        imc_stat_init(unit);
 
-    if (IMCC_INFO(interpreter)->optimizer_level == OPT_PRE && unit->pasm_file) {
-        while (pre_optimize(interpreter, unit));
-        return;
+    if (IMCC_INFO(interpreter)->optimizer_level == OPT_PRE &&
+            unit->pasm_file) {
+        while (pre_optimize(interpreter, unit))
+            ;
+        goto done;
     }
 
     nodeStack = imcstack_new();
@@ -160,16 +160,22 @@ imc_reg_alloc(Interp *interpreter, IMC_Unit * unit)
 
         build_reglist(interpreter, unit, 1);
         life_analysis(interpreter, unit);
-    } while (!IMCC_INFO(interpreter)->dont_optimize && optimize(interpreter, unit));
+    } while (!IMCC_INFO(interpreter)->dont_optimize &&
+            optimize(interpreter, unit));
 
     graph_coloring_reg_alloc(interpreter, unit);
 
     if (IMCC_INFO(interpreter)->debug & DEBUG_IMC)
         dump_instructions(interpreter, unit);
-    if (IMCC_INFO(interpreter)->verbose  ||
-            (IMCC_INFO(interpreter)->debug & DEBUG_IMC))
-        print_stat(interpreter, unit);
     imcstack_free(nodeStack);
+done:
+    if (IMCC_INFO(interpreter)->verbose  ||
+            (IMCC_INFO(interpreter)->debug & DEBUG_IMC)) {
+        print_stat(interpreter, unit);
+    }
+    else {
+        make_stat(unit, NULL, unit->n_regs_used);
+    }
 }
 
 void
@@ -254,45 +260,66 @@ make_stat(IMC_Unit * unit, int *sets, int *cols)
     	for (; r; r = r->next)
             for (j = 0; j < 4; j++)
                 if (r->set == type[j] && (r->type & VTREGISTER)) {
-                    sets[j]++;
+                    if (sets)
+                        sets[j]++;
                     if (cols)
                         if (r->color > cols[j])
                             cols[j] = r->color;
                 }
     }
+    if (cols) {
+        for (j = 0; j < 4; j++)
+            ++cols[j];
+    }
 }
-static int imcsets[4];
+
 /* registes usage of .imc */
-static void imc_stat_init(IMC_Unit * unit) {
-    imcsets[0] = imcsets[1] = imcsets[2] = imcsets[3] = 0;
-    make_stat(unit, imcsets, 0);
+static void
+imc_stat_init(IMC_Unit * unit)
+{
+    int j;
+
+    make_stat(unit, unit->n_vars_used, NULL);
+    for (j = 0; j < 4; j++)
+        unit->n_regs_used[j] = -1;
+    /*
+     * TODO move statistic into unit
+     */
     memset(&ostat, 0, sizeof(ostat));
 }
 
 /* and final */
-static void print_stat(Parrot_Interp interpreter, IMC_Unit * unit)
+static void
+print_stat(Parrot_Interp interpreter, IMC_Unit * unit)
 {
     int sets[4] = {0,0,0,0};
-    int cols[4] = {-1,-1,-1,-1};
+
     char *function = unit->instructions->r[0]->name;
 
-    make_stat(unit, sets, cols);
-    IMCC_info(interpreter, 1, "sub %s:\n\tregisters in .imc:\t I%d, N%d, S%d, P%d\n",
-            function, imcsets[0], imcsets[1], imcsets[2], imcsets[3]);
-    IMCC_info(interpreter, 1, "\t%d labels, %d lines deleted, %d if_branch, %d branch_branch\n",
+    make_stat(unit, sets, unit->n_regs_used);
+    IMCC_info(interpreter, 1,
+            "sub %s:\n\tregisters in .imc:\t I%d, N%d, S%d, P%d\n",
+            function,
+            unit->n_vars_used[0], unit->n_vars_used[1],
+            unit->n_vars_used[2], unit->n_vars_used[3]);
+    IMCC_info(interpreter, 1,
+            "\t%d labels, %d lines deleted, "
+            "%d if_branch, %d branch_branch\n",
             ostat.deleted_labels, ostat.deleted_ins, ostat.if_branch,
             ostat.branch_branch);
     IMCC_info(interpreter, 1, "\t%d used once deleted\n",
             ostat.used_once);
-    IMCC_info(interpreter, 1, "\t%d invariants_moved\n", ostat.invariants_moved);
+    IMCC_info(interpreter, 1, "\t%d invariants_moved\n",
+            ostat.invariants_moved);
     IMCC_info(interpreter, 1, "\tregisters needed:\t I%d, N%d, S%d, P%d\n",
             sets[0], sets[1], sets[2], sets[3]);
-    IMCC_info(interpreter, 1, "\tregisters in .pasm:\t I%d, N%d, S%d, P%d - %d spilled\n",
-            cols[0]+1, cols[1]+1, cols[2]+1, cols[3]+1,
+    IMCC_info(interpreter, 1,
+            "\tregisters in .pasm:\t I%d, N%d, S%d, P%d - %d spilled\n",
+            unit->n_regs_used[0], unit->n_regs_used[1],
+            unit->n_regs_used[2], unit->n_regs_used[3],
             unit->n_spilled);
     IMCC_info(interpreter, 1, "\t%d basic_blocks, %d edges\n",
             unit->n_basic_blocks, edge_count(unit));
-
 }
 
 /* sort list by line  nr */
