@@ -519,6 +519,8 @@ CODE
 0
 OUTPUT
 
+TODO: {
+  local $TODO  = "coroutines re-entered from another sub";
 pir_output_is(<<'CODE', <<'OUTPUT', "re-entering coro from another sub");
 
 .sub main @MAIN
@@ -563,5 +565,5 @@ yield #3
 yield #4
 yield #5
 OUTPUT
-
+};
 
