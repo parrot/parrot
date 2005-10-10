@@ -16,7 +16,7 @@ Tests the C<Coroutine> PMC.
 
 =cut
 
-use Parrot::Test tests => 12;
+use Parrot::Test tests => 13;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "Coroutine 1");
@@ -518,4 +518,50 @@ CODE
 1
 0
 OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "re-entering coro from another sub");
+
+.sub main @MAIN
+    .local pmc corou
+    .local int z
+    newsub corou, .Coroutine, _coroufn
+    corou("from main")
+    z = 0
+  loop:
+    unless z < 4 goto end
+    met(corou)                     # <-- replace with "corou()" and it works
+    inc z
+    goto loop
+  end:
+.end
+
+.sub met
+    .param pmc corou
+    corou()
+.end
+
+.sub _coroufn
+    .param string x
+    .local int j
+    print "coroutine: first call "
+    print x
+    print "\n"
+    j = 0
+  coroufn_1:
+    inc j
+    print "yield #"
+    print j
+    print "\n"
+    .yield()
+    goto coroufn_1
+.end
+CODE
+coroutine: first call from main
+yield #1
+yield #2
+yield #3
+yield #4
+yield #5
+OUTPUT
+
 
