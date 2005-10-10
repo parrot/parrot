@@ -1,6 +1,8 @@
-Deprecated opcodes
+=head1 Deprecated opcodes
 
-newsub Pdest, IType, ILabel
+=over 4
+
+=item newsub Pdest, IType, ILabel
 
 C<newsub> creates a subroutine object just from a label. The
 Sub object is lacking necessary meta information like name, length,
@@ -8,22 +10,28 @@ MMD-info, and more.
 
 Use: find_name, find_global, or Sub constants instead.
 
-Register stack opcodes
+=item Register stack opcodes
 
 pop{i,s,p,n}, popbottom{i,s,p,n}, poptop{i,s,p,n},
 push{i,s,p,n}, pushbottom{i,s,p,n}, pushtop{i,s,p,n},
 savetop, restoretop,
 
-  With the upcoming variable-sized register frame handling these opcodes
-  will stop working and are useless anyway.
+With the upcoming variable-sized register frame handling these opcodes
+will stop working and are useless anyway.
 
-  use saveall/restoreall (whole register frame) or
-  user stack opcodes save/restore instead.
+use saveall/restoreall (whole register frame) or
+user stack opcodes save/restore instead.
 
-FUTURE changes
+=back
+
+=head1 FUTURE changes
 
 Not yet deprecated, but it's recommended to use the new syxtax and
 gradually change the old.
+
+=over
+
+=item Chip's colon
 
 Subroutine attributes will use the colon syntax:
 
@@ -33,7 +41,28 @@ Subroutine attributes will use the colon syntax:
 The new syntax uses no comma separators and all sub attributes are lower
 case and prefixed by a colon.
 
-Class name IDs will require a dot in front
+=item Class name IDs
+
+... will require a dot in front
 
   $P0 = new Integer               => $P0 = new .Integer
 
+=item Assignment syntax with opcodes [#36283]
+
+When the first argument of an opcode is C<OUT>, then the assignment syntax
+will be allowed, as it is today.
+
+In any other case (i.e. C<INOUT>, C<IN>), this will become
+a syntax error. For example:
+
+	$S0 = print
+	$P0 = substr 1, 2, "x"
+
+Will have to be:
+
+	print $S0
+	substr $P0, 1, 2, "x"	
+
+
+
+=back
