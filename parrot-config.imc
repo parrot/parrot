@@ -1,4 +1,6 @@
-=head1 TITLE
+# $Id$
+
+=head1 NAME
 
 config.imc - Print a Parrot configuration item
 
@@ -8,9 +10,13 @@ version 0.01
 
 =head1 SYNOPSIS
 
-  ./parrot parrot-config VERSION
-  ./parrot parrot-config ccflags
-  ./parrot parrot-config --dump
+  ./parrot parrot-config.imc VERSION
+  ./parrot parrot-config.imc ccflags
+  ./parrot parrot-config.imc --dump
+
+=head1 DESCRIPTION
+
+Print out configuration items.
 
 =head1 AUTHOR
 
@@ -18,11 +24,11 @@ Leopold Toetsch E<lt>lt@toetsch.atE<gt>.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2004, the Perl Foundation.
+Copyright (c) 2004-2005, the Perl Foundation.
 
 =cut
 
-.sub _main
+.sub _main @MAIN
     .param pmc argv
     .local int argc
     argc = argv
