@@ -48,6 +48,8 @@ Load needed libraries
 
 .sub "__onload" @LOAD
 
+  # load_bytecode "PGE.pbc"        # Loaded by Getopt/Long.pbc
+  #load_bytecode "Getopt/Long.pbc"  # This also loads PGE
 
 .end
 
@@ -58,11 +60,10 @@ Looks at the command line arguments and acts accordingly.
 
 =cut
 
-.sub m4 @MAIN 
+.sub 'm4' @MAIN 
   .param pmc argv
 
-  # TODO: put this into __onload
-  # load_bytecode "PGE.pbc"        # Loaded by Getopt/Long.pbc
+  # TODO: put this into '__onload'
   load_bytecode "Getopt/Long.pbc"  # This also loads PGE
 
   .local pmc get_options
