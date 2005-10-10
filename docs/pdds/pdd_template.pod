@@ -1,0 +1,37 @@
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+docs/pdds/pdd_template.pod - PDD Template
+
+=head1 ABSTRACT
+
+Summary of the contents of the PDD.
+
+=head1 VERSION
+
+$Revision$
+
+=head1 DESCRIPTION
+
+Description of the subject.
+
+=head1 IMPLEMENTATION
+
+Implementation details.
+
+=head1 ATTACHMENTS
+
+Any associated documents.
+
+=head1 FOOTNOTES
+
+List of footnotes to the text.
+
+=head1 REFERENCES
+
+List of references.
+
+=back
+
