@@ -435,6 +435,7 @@ SP              [ ]
     }
 
 <*>"<<"{STRINGCONSTANT}{EOL} {
+        ++line;
         /* Save the string we want to mark the end of the heredoc and snip
            off newline and quote. */
         heredoc_end = str_dup(yytext + 3);
@@ -446,13 +447,14 @@ SP              [ ]
         /* Start slurping up the heredoc. */
         heredoc_content = mem_sys_allocate(2);
         strcpy(heredoc_content, "\"");
-        prev_state = YYSTATE; 
+        prev_state = YYSTATE;
         BEGIN(heredoc);
     }
 
 <heredoc>{EOL} {
         /* Newline in the heredoc. Realloc and cat on. */
-        heredoc_content = mem_sys_realloc(heredoc_content, 
+        ++line;
+        heredoc_content = mem_sys_realloc(heredoc_content,
                                           strlen(heredoc_content) +
                                           strlen(yytext) + 2);
         strcpy(heredoc_content + strlen(heredoc_content), yytext);
@@ -472,7 +474,7 @@ SP              [ ]
         else
         {
             /* Part of the heredoc. Realloc and cat the line on. */
-            heredoc_content = mem_sys_realloc(heredoc_content, 
+            heredoc_content = mem_sys_realloc(heredoc_content,
                                               strlen(heredoc_content) +
                                               strlen(yytext) + 2);
             strcpy(heredoc_content + strlen(heredoc_content), yytext);

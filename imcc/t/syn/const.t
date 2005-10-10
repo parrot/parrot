@@ -421,7 +421,23 @@ CODE
 The line above is empty.
 OUT
 
+pir_output_like(<<'CODE', <<'OUT', "PIR heredoc: line numbers");
+.sub main :main
+    .local string s
+    .local pmc nil
+    bounds 1   # force line nums
+    s = <<"EOT"
+line 1
+line 2
+line 3
+line 4
+EOT
+    print nil  # force err
+.end
+CODE
+/^Null PMC.*:11\)$/s
+OUT
 
 
 ## remember to change the number of tests!
-BEGIN { plan tests => 22; }
+BEGIN { plan tests => 23; }
