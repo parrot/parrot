@@ -60,9 +60,9 @@ typedef struct Parrot_sub {
     PMC      *name_space;       /* where this Sub is in */
     STRING   *name;             /* name of the sub */
     PMC      *multi_signature;  /* list of types for MMD */
+    INTVAL   n_regs_used[4];	/* INSP in PBC */
 
     PMC      *lexicals;         /* OrderedHash of Lexicals */
-    PMC      *enclosing_sub;    /* enclosing subroutine, to find lexicals */
 
     /* - end common */
 
@@ -84,9 +84,9 @@ typedef struct Parrot_coro {
     PMC      *name_space;       /* where this Sub is in */
     STRING   *name;             /* name of the sub */
     PMC      *multi_signature;  /* list of types for MMD */
+    INTVAL   n_regs_used[4];	/* INSP in PBC */
 
     PMC      *lexicals;         /* OrderedHash of Lexicals */
-    PMC      *enclosing_sub;    /* enclosing subroutine, to find lexicals */
 
     /* - end common */
 
