@@ -31,7 +31,8 @@ Ways to emulate these would be nice too.
 
 =item * Existing Code Marked As Broken
 
-Lots of comments in the code read C<XXX>, C<???>, or C<FIXME>.  Fix them.
+Lots of comments in the code read C<XXX>, C<???>, C<FIXME>, or 
+C<UNIMPL>.  Fix them.
 
 =item * Lexical Pads
 
