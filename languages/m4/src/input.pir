@@ -72,13 +72,13 @@ TOOO: recognize nested quoted strings
   rulesub_in_state = new Hash
   state['rulesub'] = rulesub_in_state
   .local pmc rulesub
-  rulesub = p6rule( "^<[_a..zA..Z]><[_a..zA..Z0..9>]>*" )
+  rulesub = p6rule( "^(<[_a..zA..Z]><[_a..zA..Z0..9>]>*)" )
   rulesub_in_state['word'] = rulesub
-  rulesub = p6rule( "^`<-[`]>*'" )
+  rulesub = p6rule( "^(`<-[`]>*')" )
   rulesub_in_state['string'] = rulesub
-  rulesub = p6rule( "^<-[`#_a..zA..Z]>" )
+  rulesub = p6rule( "^(<-[`#_a..zA..Z]>)" )
   rulesub_in_state['simple'] = rulesub
-  rulesub = p6rule( "^\#\N*\n" )
+  rulesub = p6rule( "^(\#\N*\n)" )
   rulesub_in_state['comment'] = rulesub
 
 .end
@@ -200,20 +200,26 @@ Uses regular expressions for finding tokens.
   MATCH:
   # TODO: is there a method for extraction the matched string?
   .local int token_from, token_to
-  token_from = match.from()
-  token_to = match.to()
-  token_data = substr input_string, token_from, token_to, ''
+  .local pmc captures
+  ( captures ) = match."get_array"()
+  token_from = match.'from'()
+  token_to = match.'to'()
+  token_data = captures[0;0]   
+  #token_data = substr input_string, token_from, token_to, ''      # TODO nibble at input without replacing input_string
+  substr input_string, token_from, token_to, ''      # TODO nibble at input without replacing input_string
+
   goto SKIP_DEBUG_1
-  print "\ntoken_type: "
-  print token_type
-  print "\ntoken_from: "
-  print token_from
-  print "\ntoken_to: "
-  print token_to
-  print "\ntoken_data: "
-  print token_data
-  print "\n"
+    print "\ntoken_type: "
+    print token_type
+    print "\ntoken_from: "
+    print token_from
+    print "\ntoken_to: "
+    print token_to
+    print "\ntoken_data: "
+    print token_data
+    print "\n"
   SKIP_DEBUG_1:
+
   ne token_type, 'TOKEN_STRING', NO_STRING_MATCH
     substr token_data, 0, 1, ''
     substr token_data, -1, 1, ''
