@@ -519,8 +519,6 @@ CODE
 0
 OUTPUT
 
-TODO: {
-  local $TODO  = "coroutines re-entered from another sub";
 pir_output_is(<<'CODE', <<'OUTPUT', "re-entering coro from another sub");
 
 .sub main @MAIN
@@ -531,7 +529,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "re-entering coro from another sub");
     z = 0
   loop:
     unless z < 4 goto end
-    met(corou)                     # <-- replace with "corou()" and it works
+    met(corou)
     inc z
     goto loop
   end:
@@ -565,5 +563,5 @@ yield #3
 yield #4
 yield #5
 OUTPUT
-};
+
 

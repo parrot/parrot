@@ -96,11 +96,12 @@ Swaps the "context".
         struct PackFile_ByteCode *wanted_seg;
         opcode_t * dest = co->address;
         parrot_context_t ctx;
+        PMC *ccont;
 
         ctx = INTERP->ctx;
 
         if (!co->ctx.bp) {
-            PMC *pad, *ccont;
+            PMC *pad;
 
             ccont = INTERP->current_cont;
             if (ccont == NEED_CONTINUATION) {
@@ -141,13 +142,19 @@ Swaps the "context".
             PObj_get_FLAGS(SELF) |= SUB_FLAG_CORO_FF;
             wanted_seg = co->seg;
             /* remember segment of caller */
+            co->caller_seg = INTERP->code;
+            /* and the recent call context */
+            ccont = CONTEXT(co->ctx)->current_cont;
+            PMC_cont(ccont)->to_ctx = INTERP->ctx;
+            /* set context to coro context */
             INTERP->ctx = co->ctx;
         }
         else {
             PObj_get_FLAGS(SELF) &= ~SUB_FLAG_CORO_FF;
+            /* switch back to last remembered code seg and context */
             wanted_seg = co->caller_seg;
-            ctx.rctx = CONTEXT(ctx)->prev;
-            INTERP->ctx = ctx;
+            ccont = CONTEXT(co->ctx)->current_cont;
+            INTERP->ctx = ctx = PMC_cont(ccont)->to_ctx;
             /* yield values */
             if (INTERP->current_returns && CONTEXT(ctx)->current_results)
                 parrot_pass_args(INTERP, wanted_seg,
