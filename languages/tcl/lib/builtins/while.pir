@@ -8,11 +8,12 @@
   argc = argv
   if argc != 2 goto badargs
 
-  .local string pir_code,loop_label,done_label,temp_code
+  .local string pir_code,loop_label,done_label,ex_label,temp_code
   .local int cond_num
   $S0 = register_num
   loop_label = "loop" . $S0
   done_label = "done" . $S0
+  ex_label = "excep" . $S0
 
   .local pmc cond,body,compiler,expr_compiler
 
@@ -38,23 +39,54 @@
 
   pir_code .= temp_code
 
+  pir_code .= "push_eh "
+  pir_code .= ex_label
+  pir_code .= "\n"
+
   (register_num,temp_code) = compiler(register_num, body)
   pir_code .= temp_code
   inc register_num
+
+  pir_code .= "clear_eh\n"
+  pir_code .= "goto "
+  pir_code .= loop_label
+  pir_code .= "\n"
   
+  $S0 = register_num
+  $S0 = "$I" . $S0
+  pir_code .= ex_label
+  pir_code .= ":\n"
+
+  pir_code .= ".get_return_code(P5, "
+  pir_code .= $S0
+  pir_code .= ")\n"
+
+  pir_code .= "if "
+  pir_code .= $S0
+  pir_code .= " == TCL_CONTINUE goto "
+  pir_code .= loop_label
+  pir_code .= "\n"
+
+  pir_code .= "if "
+  pir_code .= $S0
+  pir_code .= " == TCL_BREAK goto "
+  pir_code .= done_label
+  pir_code .= "\n"
+
+  pir_code .= ".rethrow()\n"
+				    
+
   $S0=<<"END_PIR"
-goto %s
 %s:
 $P%i=new .TclString
 $P%i=\"\"
 END_PIR
 
    $P1 = new .Array
-   $P1 = 4
-   $P1[0] = loop_label
-   $P1[1] = done_label
+   $P1 = 3
+   $P1[0] = done_label
+   $P1[1] = register_num
    $P1[2] = register_num
-   $P1[3] = register_num
 
    temp_code = sprintf $S0, $P1
    pir_code .= temp_code
