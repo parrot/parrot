@@ -56,7 +56,7 @@ check_continue:
   .get_return_code(P5,return_type)
   if return_type == TCL_CONTINUE goto continue
   if return_type == TCL_BREAK goto done
-  .rethrow(P5)
+  .rethrow()
 
 bad_args:
   .throw("wrong # args: should be \"for start test next command\"")

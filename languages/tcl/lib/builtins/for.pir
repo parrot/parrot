@@ -9,9 +9,13 @@
   if argc != 4 goto badargs
 
   .local string pir_code,loop_label,temp_code
+  .local string ex_label, step_label, done_label
   .local int cond_num
   $S0 = register_num
   loop_label = "loop" . $S0
+  ex_label = "excep" . $S0
+  step_label = "step" . $S0
+  done_label = "done" . $S0
 
   .local pmc start,cond,step,body,compiler,expr_compiler
 
@@ -31,9 +35,21 @@
   pir_code .= loop_label
   pir_code .= ":\n"
   pir_code .= "#BODY LOOP\n"
+
+  pir_code .= "push_eh "
+  pir_code .= ex_label
+  pir_code .= "\n"
+
   pir_code .= temp_code
+
+  pir_code .= "clear_eh\n"
+
   inc register_num
   (register_num,temp_code) = compiler(register_num, step)
+
+  pir_code .= step_label
+  pir_code .= ":\n"
+  
   pir_code .= "#STEP LOOP\n"
   pir_code .= temp_code
   inc register_num
@@ -48,15 +64,46 @@ $P%i=new .TclString
 $P%i=\"\"
 END_PIR
 
-   $P1 = new .Array
-   $P1 = 4
-   $P1[0] = cond_num
-   $P1[1] = loop_label
-   $P1[2] = register_num
-   $P1[3] = register_num
+  $P1 = new .Array
+  $P1 = 4
+  $P1[0] = cond_num
+  $P1[1] = loop_label
+  $P1[2] = register_num
+  $P1[3] = register_num
 
-   temp_code = sprintf $S0, $P1
-   pir_code .= temp_code
+  temp_code = sprintf $S0, $P1
+  pir_code .= temp_code
+
+  pir_code .= "goto "
+  pir_code .= done_label
+  pir_code .= "\n"
+
+  inc register_num
+  $S0 = register_num
+  $S0 = "$I" . $S0
+  pir_code .= ex_label
+  pir_code .= ":\n"
+
+  pir_code .= ".get_return_code(P5, "
+  pir_code .= $S0 
+  pir_code .= ")\n"
+  
+  pir_code .= "if "
+  pir_code .= $S0
+  pir_code .= " == TCL_CONTINUE goto "
+  pir_code .= step_label
+  pir_code .= "\n"
+
+  pir_code .= "if "
+  pir_code .= $S0
+  pir_code .= " == TCL_BREAK goto "
+  pir_code .= done_label
+  pir_code .= "\n"
+
+  pir_code .= ".rethrow()\n"
+
+  pir_code .= done_label
+  pir_code .= ":\n"
 
   .return(register_num,pir_code)
 
