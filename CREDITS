@@ -285,6 +285,10 @@ S: Atlanta, GA
 
 N: Michael G. Schwern
 
+N: Michael Cartmell
+E: Michael.Cartmell@thomson.com
+D: README.win32 spelling patch
+
 N: Michael Scott
 D: Getting Started Guide for Parrot, many doc fixes
 D: Mac OS X build fixes

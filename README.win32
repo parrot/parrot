@@ -72,9 +72,9 @@ really wants it and the binary packages don't contain it.  It doesn't
 need to contain anything though, as the data is pulled in from
 F<lib/icudt.lib>, which contains the standard data in binary form.
 
-=item Optional librairies
+=item Optional libraries
 
-The availability of these librairies is checked by Configure.pl.
+The availability of these libraries is checked by Configure.pl.
 
 B<gdbm> - GNU database manager 
 L<http://gnuwin32.sourceforge.net/>
