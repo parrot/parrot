@@ -497,7 +497,7 @@ register.
     emit(code, "    from = pos")
     self.emitsub(code, label, "NOCUT")
     emit(code, "  fail_forever:")
-    emit(code, "    .yield(-2)")
+    emit(code, "    .yield()")
     emit(code, "    goto fail_forever")
 
     exp1 = self["exp1"]
@@ -518,7 +518,7 @@ register.
     emit(code, "\n  %s:", label)
     emit(code, "    $P0 = getattribute mob, \"PGE::Match\\x0$:pos\"")
     emit(code, "    $P0 = pos")
-    emit(code, "    .yield(pos)")
+    emit(code, "    .yield()")
     emit(code, "    $P0 = -1")
     emit(code, "  fail:")
     emit(code, "    ret")
