@@ -16,7 +16,7 @@ Tests PMC object methods.
 
 =cut
 
-use Parrot::Test tests => 32;
+use Parrot::Test tests => 34;
 use Test::More;
 
 output_like(<<'CODE', <<'OUTPUT', "callmethod - unknown method");
@@ -1038,4 +1038,70 @@ pir_output_is(<<'CODE', <<'OUTPUT', "delegate keyed_int");
 CODE
 ikey
 skey
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "delegate keyed_int PMC derived");
+.sub main :main
+    .local pmc cl, o
+    cl = subclass "ResizablePMCArray", "MyClass"
+    o = new "MyClass"
+    $I0 = 5
+    o[$I0] = 42
+    $I1 = o[$I0]
+    print $I1
+    print "\n"
+.end
+
+.namespace ["MyClass"]
+
+.sub __get_integer_keyed_int :method
+    .param int key
+    print "ikey\n"
+    .local pmc ar
+    ar = getattribute self, "__value"
+    $I0 = ar[key]
+    .return ($I0)
+.end
+
+.sub __set_integer_keyed :method
+    .param pmc key
+    .param int val
+    print "pkey\n"
+    .local pmc ar
+    ar = getattribute self, "__value"
+    ar[key] = val
+.end
+
+CODE
+pkey
+ikey
+42
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "delegate keyed_int PMC derived - inherit");
+.sub main :main
+    .local pmc cl, o
+    cl = subclass "ResizablePMCArray", "MyClass"
+    o = new "MyClass"
+    $I0 = 5
+    o[$I0] = 42
+    $I1 = o[$I0]
+    print $I1
+    print "\n"
+.end
+
+.namespace ["MyClass"]
+
+.sub __get_integer_keyed_int :method
+    .param int key
+    print "ikey\n"
+    .local pmc ar
+    ar = getattribute self, "__value"
+    $I0 = ar[key]
+    .return ($I0)
+.end
+
+CODE
+ikey
+42
 OUTPUT
