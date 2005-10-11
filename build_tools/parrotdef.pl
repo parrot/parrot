@@ -107,17 +107,6 @@ my @funcnames = qw(
 	Parrot_string_is_cclass
 	Parrot_string_find_cclass
 	Parrot_string_find_not_cclass
-	Parrot_string_is_whitespace
-	Parrot_string_is_digit
-	Parrot_string_is_wordchar
-	Parrot_string_is_punctuation
-	Parrot_string_is_newline
-	Parrot_string_find_whitespace
-	Parrot_string_find_digit
-	Parrot_string_find_wordchar
-	Parrot_string_find_punctuation
-	Parrot_string_find_newline
-	Parrot_string_find_word_boundary
 	Parrot_binary_charset_ptr
 	list_pmc_new
 	list_pmc_new_init
