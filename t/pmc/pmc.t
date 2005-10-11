@@ -445,7 +445,7 @@ Integer
 OUTPUT
 
 output_is(<<'CODE', <<'OUT', ".const - Sub constant");
-.pcc_sub @MAIN main:
+.pcc_sub :main main:
     print "ok 1\n"
     .const .Sub P0 = "foo"
     invokecc P0
@@ -481,7 +481,7 @@ Integer
 OUT
 
 pir_output_is(<<'CODE', <<'OUT', "pmc constant 1");
-.sub main @MAIN
+.sub main :main
     .const Integer i = "42"
     print i
     print "\n"
@@ -491,7 +491,7 @@ CODE
 OUT
 
 pir_output_is(<<'CODE', <<'OUT', "pmc constant 2");
-.sub main @MAIN
+.sub main :main
     .const .Integer i = "42"
     print i
     print "\n"

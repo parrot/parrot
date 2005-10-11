@@ -37,7 +37,7 @@ ok 2
 OUT
 
 pir_output_is(<<'CODE', <<'OUT', 'methods');
-.sub main @MAIN
+.sub main :main
     .local pmc p, kv
     new p, .Pair
     new $P1, .Integer
@@ -64,7 +64,7 @@ OUT
 SKIP: {
 	skip("instantiate disabled", 1);
 pir_output_is(<<'CODE', <<'OUT', 'instantiate, assign');
-.sub main @MAIN
+.sub main :main
     .local pmc cl, p, kv, k, v
     k = new .String
     k = "key"

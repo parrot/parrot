@@ -21,7 +21,7 @@ use Parrot::Config;
 use Cwd qw(cwd);
 
 pir_output_is(<<'CODE', <<'OUT', "get config hash");
-.sub main @MAIN
+.sub main :main
     .include "iglobals.pasm"
     .local pmc config_hash, interp
     interp = getinterp
@@ -35,7 +35,7 @@ Hash
 OUT
 
 pir_output_is(<<'CODE', cwd, "prefix");
-.sub main @MAIN
+.sub main :main
     .include "iglobals.pasm"
     .local pmc config_hash, interp
     interp = getinterp
@@ -46,7 +46,7 @@ pir_output_is(<<'CODE', cwd, "prefix");
 CODE
 
 pir_output_is(<<'CODE', <<'OUT', "load src/pbc from library path");
-.sub main @MAIN
+.sub main :main
     load_bytecode "config.imc"
     print "ok 1\n"
     load_bytecode "config.pbc"

@@ -1245,7 +1245,7 @@ OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "PMC as classes - subclass");
 
-.sub main @MAIN
+.sub main :main
   .local pmc MyInt
   getclass $P0, "Integer"
   print "ok 1\n"
@@ -1269,7 +1269,7 @@ OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "PMC as classes - instantiate");
 
-.sub main @MAIN
+.sub main :main
   .local pmc MyInt
   getclass $P0, "Integer"
   print "ok 1\n"
@@ -1289,7 +1289,7 @@ OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "PMC as classes - methods");
 
-.sub main @MAIN
+.sub main :main
   .local pmc MyInt
   getclass $P0, "Integer"
   print "ok 1\n"
@@ -1342,7 +1342,7 @@ OUTPUT
 pir_output_is(<<'CODE', <<'OUTPUT', "PMC as classes - mmd methods");
 
 
-.sub main @MAIN
+.sub main :main
   .local pmc MyInt
   getclass $P0, "Integer"
   subclass MyInt, $P0, "MyInt"
@@ -1384,7 +1384,7 @@ OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "PMC as classes - overridden mmd methods");
 
-.sub main @MAIN
+.sub main :main
   .local pmc MyInt
   getclass $P0, "Integer"
   subclass MyInt, $P0, "MyInt"
@@ -1408,7 +1408,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "PMC as classes - overridden mmd methods");
 .end
 
 .namespace ["MyInt"]
-.sub __add @MULTI(MyInt, MyInt)
+.sub __add :multi(MyInt, MyInt)
    .param pmc self
    .param pmc right
    .param pmc dest
@@ -1429,7 +1429,7 @@ OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "PMC as classes - derived 1");
 
-.sub main @MAIN
+.sub main :main
   .local pmc MyInt
   .local pmc MyInt2
   getclass $P0, "Integer"
@@ -1493,7 +1493,7 @@ OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "PMC as classes - derived 2");
 
-.sub main @MAIN
+.sub main :main
   .local pmc MyInt
   .local pmc MyInt2
   getclass $P0, "Integer"
@@ -1571,7 +1571,7 @@ TODO: {
   local $TODO = "methods can't be overridden in derived class only";
 pir_output_is(<<'CODE', <<'OUTPUT', "PMC as classes - derived 3");
 
-.sub main @MAIN
+.sub main :main
   .local pmc MyInt
   .local pmc MyInt2
   getclass $P0, "Integer"
@@ -1636,7 +1636,7 @@ OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "subclassing ParrotClass");
 
-.sub main @MAIN
+.sub main :main
     .local pmc cl
     .local pmc parent
     parent = getclass "ParrotClass"
@@ -1683,7 +1683,7 @@ OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "instantiate - PIR");
 
-.sub main @MAIN
+.sub main :main
     .local pmc cl
     cl = subclass "Integer", "Foo"
     .local pmc i
@@ -1714,7 +1714,7 @@ OUTPUT
 { local $TODO = "new Px, Ix: argcP is wrong in __init method";
 pir_output_is(<<'CODE', <<'OUTPUT', "__init argcP");
 
-.sub main @MAIN
+.sub main :main
     $P0 = newclass "Foo"
     $I0 = find_type "Foo"
 
@@ -1782,7 +1782,7 @@ OUTPUT
 }
 
 pir_output_is(<<'CODE', <<'OUTPUT', "namespace vs name");
-.sub main @MAIN
+.sub main :main
     .local pmc o, cl, f
     newclass cl, "Foo"
     $I0 = find_type "Foo"
@@ -1832,7 +1832,7 @@ ok
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "subclassed Integer bug");
-.sub _main @MAIN
+.sub _main :main
    .local pmc class
    .local pmc a
    .local pmc b

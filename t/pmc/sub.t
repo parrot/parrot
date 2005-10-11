@@ -527,7 +527,7 @@ ok 2
 OUTPUT
 
 output_is(<<'CODE', <<'OUT', "MAIN pragma, syntax only");
-.pcc_sub @MAIN _main:
+.pcc_sub :main _main:
     print "ok\n"
     end
 CODE
@@ -536,13 +536,13 @@ OUT
 
 open S, ">$temp" or die "Can't write $temp";
 print S <<'EOF';
-  .pcc_sub @LOAD _sub1:
+  .pcc_sub :load _sub1:
   print "in sub1\n"
   returncc
 EOF
 close S;
 
-output_is(<<'CODE', <<'OUTPUT', 'load_bytecode @LOAD');
+output_is(<<'CODE', <<'OUTPUT', 'load_bytecode :load');
 .pcc_sub _main:
     print "main\n"
     load_bytecode "temp.pasm"
@@ -558,13 +558,13 @@ open S, ">$temp" or die "Can't write $temp";
 print S <<'EOF';
   .pcc_sub _error:
   print "error\n"
-  .pcc_sub @LOAD _sub1:
+  .pcc_sub :load _sub1:
   print "in sub1\n"
   returncc
 EOF
 close S;
 
-output_is(<<'CODE', <<'OUTPUT', 'load_bytecode @LOAD second sub');
+output_is(<<'CODE', <<'OUTPUT', 'load_bytecode :load second sub');
 .pcc_sub _main:
     print "main\n"
     load_bytecode "temp.pasm"
@@ -578,7 +578,7 @@ OUTPUT
 
 system(".$PConfig{slash}parrot$PConfig{exe} -o temp.pbc $temp");
 
-output_is(<<'CODE', <<'OUTPUT', 'load_bytecode @LOAD in pbc');
+output_is(<<'CODE', <<'OUTPUT', 'load_bytecode :load in pbc');
 .pcc_sub _main:
     print "main\n"
     load_bytecode "temp.pbc"
@@ -592,7 +592,7 @@ OUTPUT
 
 open S, ">$temp" or die "Can't write $temp";
 print S <<'EOF';
-  .pcc_sub @LOAD _sub1:
+  .pcc_sub :load _sub1:
   print "in sub1\n"
   returncc
   .pcc_sub _sub2:
@@ -642,7 +642,7 @@ print S <<'EOF';
   .pcc_sub _sub1:
   print "in sub1\n"
   returncc
-  .pcc_sub @LOAD _sub2:
+  .pcc_sub :load _sub2:
   print "in sub2\n"
   returncc
 EOF
@@ -686,10 +686,10 @@ OUTPUT
 
 open S, ">$temp" or die "Can't write $temp";
 print S <<'EOF';
-  .pcc_sub @LOAD _sub1:
+  .pcc_sub :load _sub1:
   print "in sub1\n"
   returncc
-  .pcc_sub @LOAD _sub2:
+  .pcc_sub :load _sub2:
   print "in sub2\n"
   returncc
 EOF
@@ -733,39 +733,39 @@ in sub1
 back
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', '@MAIN pragma');
+output_is(<<'CODE', <<'OUTPUT', ':main pragma');
 .pcc_sub _first:
     print "first\n"
     returncc
-.pcc_sub @MAIN _main:
+.pcc_sub :main _main:
     print "main\n"
     end
 CODE
 main
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', 'two @MAIN pragmas');
+output_is(<<'CODE', <<'OUTPUT', 'two :main pragmas');
 .pcc_sub _first:
     print "first\n"
     returncc
-.pcc_sub @MAIN _main:
+.pcc_sub :main _main:
     print "main\n"
     end
-.pcc_sub @MAIN _second:
+.pcc_sub :main _second:
     print "second\n"
     returncc
 CODE
 main
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', '@MAIN pragma call subs');
+output_is(<<'CODE', <<'OUTPUT', ':main pragma call subs');
 .pcc_sub _first:
     print "first\n"
     returncc
 .pcc_sub _second:
     print "second\n"
     returncc
-.pcc_sub @MAIN _main:
+.pcc_sub :main _main:
     print "main\n"
     find_global P0, "_first"
     invokecc P0
@@ -783,14 +783,14 @@ $temp = "temp.imc";
 open S, ">$temp" or die "Can't write $temp";
 print S <<'EOF';
 .emit
-  .pcc_sub @LOAD _sub1:
+  .pcc_sub :load _sub1:
   print "in sub1\n"
   returncc
 .eom
 EOF
 close S;
 
-output_is(<<'CODE', <<'OUTPUT', 'load_bytecode @LOAD first sub - imc');
+output_is(<<'CODE', <<'OUTPUT', 'load_bytecode :load first sub - imc');
 .pcc_sub _main:
     print "main\n"
     load_bytecode "temp.imc"
@@ -811,14 +811,14 @@ print S <<'EOF';
 .emit
 # LOAD or other pragmas are only evaluated on the first
 # instruction of a compilation unit
-  .pcc_sub @LOAD _sub1:
+  .pcc_sub :load _sub1:
   print "in sub1\n"
   returncc
 .eom
 EOF
 close S;
 
-output_is(<<'CODE', <<'OUTPUT', 'load_bytecode @LOAD second sub - imc');
+output_is(<<'CODE', <<'OUTPUT', 'load_bytecode :load second sub - imc');
 .pcc_sub _main:
     print "main\n"
     load_bytecode "temp.imc"
@@ -842,7 +842,7 @@ print S <<'EOF';
 EOF
 close S;
 
-output_is(<<'CODE', <<'OUTPUT', 'load_bytecode no @LOAD - imc');
+output_is(<<'CODE', <<'OUTPUT', 'load_bytecode no :load - imc');
 .pcc_sub _main:
     print "main\n"
     load_bytecode "temp.imc"
@@ -855,7 +855,7 @@ OUTPUT
 
 
 pir_output_like(<<'CODE', <<'OUTPUT', "warn on in main");
-.sub _main @MAIN
+.sub _main :main
 .include "warnings.pasm"
     warningson .PARROT_WARNINGS_UNDEF_FLAG
     _f1()
@@ -869,7 +869,7 @@ CODE
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "warn on in sub");
-.sub _main @MAIN
+.sub _main :main
 .include "warnings.pasm"
     _f1()
     $P0 = new PerlUndef
@@ -884,7 +884,7 @@ ok
 OUTPUT
 
 pir_output_like(<<'CODE', <<'OUTPUT', "warn on in sub, turn off in f2");
-.sub _main @MAIN
+.sub _main :main
 .include "warnings.pasm"
     _f1()
     $P0 = new PerlUndef
@@ -933,7 +933,7 @@ output_is(<<'CODE', <<'OUTPUT', "sub names w MAIN");
 .pcc_sub dummy:
     print "never\n"
     noop
-.pcc_sub @MAIN main:
+.pcc_sub :main main:
     .include "interpinfo.pasm"
     interpinfo P20, .INTERPINFO_CURRENT_SUB
     print P20
@@ -957,7 +957,7 @@ main
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "sub names w newsub");
-.sub main @MAIN
+.sub main :main
     .include "interpinfo.pasm"
     $P0 = interpinfo .INTERPINFO_CURRENT_SUB
     print $P0
@@ -980,7 +980,7 @@ mainfoobarfoo
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "caller introspection");
-.sub main @MAIN
+.sub main :main
 .include "interpinfo.pasm"
     # this test will fail when run with -Oc
     # as the call chain is cut down with tail calls
@@ -1041,10 +1041,10 @@ OUTPUT
     # its not captured by the test system
 
     my $code = << 'CODE';
-.sub optc @IMMEDIATE, @POSTCOMP
+.sub optc :immediate, :postcomp
     print "initial\n"
 .end
-.sub _main @MAIN
+.sub _main :main
     print "main\n"
 .end
 CODE
@@ -1052,12 +1052,12 @@ CODE
 initial
 main
 OUTPUT
-    my $descr = '@IMMEDIATE, @POSTCOMP';
+    my $descr = ':immediate, :postcomp';
     if ( exists $ENV{TEST_PROG_ARGS} and $ENV{TEST_PROG_ARGS} =~ m/-r / )
     {
         TODO:
         {
-            local $TODO = "output from POSTCOMP is lost";
+            local $TODO = "output from :postcomp is lost";
             output_is( $code, $output, $descr);
         };
     } else {
@@ -1065,8 +1065,8 @@ OUTPUT
     }
 }
 
-pir_output_like(<<'CODE', <<'OUTPUT', '@ANON');
-.sub main @MAIN
+pir_output_like(<<'CODE', <<'OUTPUT', ':anon');
+.sub main :main
     "foo"()
     print "ok\n"
     $P0 = global "new"
@@ -1076,7 +1076,7 @@ pir_output_like(<<'CODE', <<'OUTPUT', '@ANON');
     $P0 = global "foo"
 .end
 
-.sub "foo" @ANON
+.sub "foo" :anon
     print "foo\n"
     "new"()
 .end
@@ -1094,11 +1094,11 @@ OUTPUT
 
 open S, ">test_l1.imc" or die "Can't write test_l1.imc";
 print S <<'EOF';
-.sub l11 @LOAD
+.sub l11 :load
     print "l11\n"
 .end
 
-.sub l12 @LOAD
+.sub l12 :load
     print "l12\n"
 .end
 EOF
@@ -1106,11 +1106,11 @@ close S;
 
 open S, ">test_l2.imc" or die "Can't write test_l2.imc";
 print S <<'EOF';
-.sub l21 @LOAD
+.sub l21 :load
     print "l21\n"
 .end
 
-.sub l22 @LOAD
+.sub l22 :load
     print "l22\n"
 .end
 EOF
@@ -1121,8 +1121,8 @@ system(".$PConfig{slash}parrot$PConfig{exe} -o test_l2.pbc test_l2.imc");
 
 END { unlink(qw/ test_l1.imc test_l2.imc test_l1.pbc test_l2.pbc /); };
 
-pir_output_is(<<'CODE', <<'OUTPUT', 'multiple @LOAD');
-.sub main @MAIN
+pir_output_is(<<'CODE', <<'OUTPUT', 'multiple :load');
+.sub main :main
     print "main 1\n"
     load_bytecode "test_l1.imc"
     load_bytecode "test_l2.imc"
@@ -1146,7 +1146,7 @@ main 3
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "immediate code as const");
-.sub make_pi @IMMEDIATE, @ANON
+.sub make_pi :immediate, :anon
     $N0 = atan 1.0, 1.0
     $N0 *= 4
     $P0 = new .Float
@@ -1154,7 +1154,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "immediate code as const");
     .return ($P0)
 .end
 
-.sub main @MAIN
+.sub main :main
     .const .Sub pi = "make_pi"
     print pi
     print "\n"
@@ -1164,7 +1164,7 @@ CODE
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "immediate code as const - obj");
-.sub make_obj @IMMEDIATE, @ANON
+.sub make_obj :immediate, :anon
     .local pmc cl, o
     cl = newclass "Foo"
     addattribute cl, 'x'
@@ -1175,7 +1175,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "immediate code as const - obj");
     .return (o)
 .end
 
-.sub main @MAIN
+.sub main :main
     .const .Sub o = "make_obj"
     $P0 = getattribute o, 'x'
     print $P0

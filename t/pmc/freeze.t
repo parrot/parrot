@@ -762,7 +762,7 @@ ok
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "freeze/thaw a ResizableBooleanArray");
-.sub test @MAIN
+.sub test :main
     .local pmc original_arr, thawed_arr
     .local string frozen_arr
     original_arr = new ResizableBooleanArray
@@ -826,7 +826,7 @@ ResizableBooleanArray
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "freeze/thaw a ResizablePMCArray");
-.sub test @MAIN
+.sub test :main
     .local pmc original_arr, thawed_arr
     .local string frozen_arr
     original_arr = new .ResizablePMCArray

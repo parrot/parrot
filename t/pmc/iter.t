@@ -1158,7 +1158,7 @@ OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "slice, get strings from array");
 
-.sub main @MAIN
+.sub main :main
     .include "iterator.pasm"
     .local pmc ar
     ar = new PerlArray
@@ -1326,7 +1326,7 @@ OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "iter.next method");
 
-.sub main @MAIN
+.sub main :main
    new $P0, .PerlString
    set $P0, "abcdef"
    iter $P1, $P0

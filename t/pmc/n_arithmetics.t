@@ -24,7 +24,7 @@ use Test::More;
 ### Operations on a single INTVAL
 ###
 pir_output_is(<<'CODE', <<OUTPUT, "take the negative of an Integer");
-.sub _main @MAIN
+.sub _main :main
 	P0 = new Integer
 	## negate zero.
 	set P0, 0
@@ -54,7 +54,7 @@ CODE
 OUTPUT
 
 pir_output_is(<<'CODE', <<OUTPUT, "take the absolute value of an Integer");
-.sub _main @MAIN
+.sub _main :main
 	P0 = new Integer
 	## find absolute zero (so to speak).
 	set P0, 0
@@ -87,7 +87,7 @@ OUTPUT
 ### first arg is Integer, second arg is Integer
 ###
 pir_output_is(<<'CODE', <<OUTPUT, "add Integer to Integer");
-.sub _main @MAIN
+.sub _main :main
 	P0 = new Integer
 	set P0, 4000
 	P1 = new Integer
@@ -121,7 +121,7 @@ CODE
 OUTPUT
 
 pir_output_is(<<'CODE', <<OUTPUT, "subtract Integer from Integer");
-.sub _main @MAIN
+.sub _main :main
 	P0 = new Integer
 	set P0, 4000
 	P1 = new Integer
@@ -155,7 +155,7 @@ CODE
 OUTPUT
 
 pir_output_is(<<'CODE', <<OUTPUT, "multiply Integer with Integer");
-.sub _main @MAIN
+.sub _main :main
 	P0 = new Integer
 	set P0, 4000
 	P1 = new Integer
@@ -184,7 +184,7 @@ CODE
 OUTPUT
 
 pir_output_is(<<'CODE', <<OUTPUT, "divide Integer by Integer");
-.sub _main @MAIN
+.sub _main :main
 	P0 = new Integer
 	set P0, 4000
 	P1 = new Integer
@@ -216,7 +216,7 @@ OUTPUT
 ### Operations on a single NUMVAL
 ###
 pir_output_is(<<'CODE', <<OUTPUT, "negate a Float");
-.sub _main @MAIN
+.sub _main :main
 	P0 = new Float
 	set P0, 0
 	P1 = n_neg P0
@@ -243,7 +243,7 @@ CODE
 OUTPUT
 
 pir_output_is(<<'CODE', <<OUTPUT, "take the absolute value of a Float");
-.sub _main @MAIN
+.sub _main :main
 	P0 = new Integer
 	set P0, 0
 	P1 = n_abs P0
@@ -273,7 +273,7 @@ OUTPUT
 ### FLOATVAL and INTVAL tests
 ###
 pir_output_is(<<'CODE', <<OUTPUT, "add Integer to Float");
-.sub _main @MAIN
+.sub _main :main
 	P10 = new Integer
 	set P10, 4000
 	P0 = new Float
@@ -304,7 +304,7 @@ CODE
 OUTPUT
 
 pir_output_is(<<'CODE', <<OUTPUT, "subtract Integer from Float");
-.sub _main @MAIN
+.sub _main :main
 	P10 = new Integer
 	set P10, 4000
 	P0 = new Float
@@ -335,7 +335,7 @@ CODE
 OUTPUT
 
 pir_output_is(<<'CODE', <<OUTPUT, "multiply Float with Integer");
-.sub _main @MAIN
+.sub _main :main
 	P10 = new Integer
 	set P10, 4000
 	P0 = new Float
@@ -366,7 +366,7 @@ CODE
 OUTPUT
 
 pir_output_is(<<'CODE', <<OUTPUT, "divide Float by Integer");
-.sub _main @MAIN
+.sub _main :main
 	P10 = new Integer
 	set P10, 4000
 	P0 = new Float
@@ -405,7 +405,7 @@ OUTPUT
 ### FLOATVAL and FLOATVAL tests
 ###
 pir_output_is(<<'CODE', <<OUTPUT, "add Float to Float");
-.sub _main @MAIN
+.sub _main :main
 	P0 = new Float
 	set P0, 4000.246
 	P1 = new Float
@@ -432,7 +432,7 @@ OUTPUT
 ## This tests n_infix_ic_p_p_nc for n_add, n_sub, n_mul, and n_div.  Note that
 ## there is no n_infix_ic_p_nc_p op; the PMC argument always comes first.
 pir_output_is(<<'CODE', <<OUTPUT, "add/sub/mul/div of Float with constants");
-.sub _main @MAIN
+.sub _main :main
 	P0 = new Float
 	set P0, 4000.246
 	P1 = new Float
@@ -458,7 +458,7 @@ CODE
 OUTPUT
 
 pir_output_is(<<'CODE', <<OUTPUT, "subtract Float from Float");
-.sub _main @MAIN
+.sub _main :main
 	P0 = new Float
 	set P0, 4000.246
 	P1 = new Float
@@ -483,7 +483,7 @@ CODE
 OUTPUT
 
 pir_output_is(<<'CODE', <<OUTPUT, "multiply Float with Float");
-.sub _main @MAIN
+.sub _main :main
 	P0 = new Float
 	set P0, 400.0246
 	P1 = new Float
@@ -508,7 +508,7 @@ CODE
 OUTPUT
 
 pir_output_is(<<'CODE', <<OUTPUT, "divide Float by Float");
-.sub _main @MAIN
+.sub _main :main
 	P0 = new Float
 	set P0, 4000.246
 	P1 = new Float
@@ -533,7 +533,7 @@ CODE
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "verify new PMC");
-.sub main @MAIN
+.sub main :main
     P0 = new Integer
     P1 = P0
     P0 = n_add P0, 1
@@ -553,7 +553,7 @@ OUTPUT
 pir_output_is(<<'CODE', <<'OUTPUT', ".pragma n_operators");
 .pragma n_operators 1
 
-.sub main @MAIN
+.sub main :main
     P0 = new Integer
     P1 = P0
     P0 = P0 + 1

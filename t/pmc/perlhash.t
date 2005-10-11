@@ -1067,7 +1067,7 @@ OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "Setting with compound keys");
 
-.sub test @MAIN
+.sub test :main
     .local pmc outer_hash
     outer_hash = new PerlHash
     .local pmc inner_hash
@@ -1224,7 +1224,7 @@ OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "check whether interface is done");
 
-.sub test @MAIN
+.sub test :main
     .local pmc pmc1
     pmc1 = new PerlHash
     .local int bool1
@@ -1247,7 +1247,7 @@ OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "iter");
 
-.sub test @MAIN
+.sub test :main
     new P0, .PerlHash
     set P0['a'], 'x'
     iter P1, P0

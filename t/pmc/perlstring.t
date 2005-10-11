@@ -1987,7 +1987,7 @@ OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "lower method");
 
-.sub _main @MAIN
+.sub _main :main
     .local pmc pmc1
     pmc1 = new String
     pmc1 = "ABCdef\n"

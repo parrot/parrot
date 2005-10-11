@@ -388,7 +388,7 @@ OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', 'puts method - PIR');
 
-.sub main @MAIN
+.sub main :main
        .local string s
        s = "ok 2\n"
        .local pmc io

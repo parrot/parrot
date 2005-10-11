@@ -337,7 +337,7 @@ again:
 ret:
 .end
 
-.sub _main @MAIN
+.sub _main :main
 	new	P30, .Hash
 	print "round 1\n"
 	I29 = 1
@@ -1315,7 +1315,7 @@ OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "iter");
 
-.sub __main__ @MAIN
+.sub __main__ :main
     new P0, .Hash
     set P0['a'], 'x'
     iter P1, P0
@@ -1341,7 +1341,7 @@ OUTPUT
 pir_output_is(<< 'CODE', << 'OUTPUT', "broken delete, thx to azuroth on irc");
 .include "iterator.pasm"
 
-.sub main @MAIN
+.sub main :main
   .local pmc thash
 
   # just put in some dummy data...

@@ -456,7 +456,7 @@ OUTPUT
 
 pir_output_is(<<'CODE', 'Coroutine', "Coro new - type");
 
-.sub main @MAIN
+.sub main :main
     .local pmc c
     c = global "coro"
     typeof S0, c
@@ -475,7 +475,7 @@ CODE
 
 pir_output_is(<<'CODE', '01234', "Coro new - yield");
 
-.sub main @MAIN
+.sub main :main
     .local pmc c
     c = global "coro"
 loop:
@@ -521,7 +521,7 @@ OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "re-entering coro from another sub");
 
-.sub main @MAIN
+.sub main :main
     .local pmc corou
     .local int z
     newsub corou, .Coroutine, _coroufn

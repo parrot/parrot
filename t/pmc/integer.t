@@ -311,7 +311,7 @@ ok 4
 OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "n_<oper>");
-.sub main @MAIN
+.sub main :main
     $P0 = new Integer
     $P1 = new Integer
     set $P0, 6

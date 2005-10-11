@@ -124,7 +124,7 @@ OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "PIR compiler sub");
 
-.sub test @MAIN
+.sub test :main
     .local NCI compiler
     find_global compiler, "xcompile"
     compreg "XPASM", compiler
@@ -161,7 +161,7 @@ OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "bug #31467");
 
-  .sub main @MAIN
+  .sub main :main
      $P1 = new Hash
      newsub $P0, .Sub, _builtin
      $P1['builtin'] = $P0
@@ -194,7 +194,7 @@ OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "compile PAST in PIR");
 
-.sub main @MAIN
+.sub main :main
     .local pmc past_compiler
     past_compiler = compreg "PAST"
     .local string past_source
@@ -234,7 +234,7 @@ OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "compile PAST in PASM in PIR");
 
-.sub test @MAIN
+.sub test :main
 
     # PIR
     .local pmc pasm_compiler
@@ -278,7 +278,7 @@ PIR: after
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "PIR compiler sub PASM");
-.sub main @MAIN
+.sub main :main
   register_compiler()
 
   .local pmc compiler, invokable
@@ -317,7 +317,7 @@ ok 1
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "PIR compiler sub PIR");
-.sub main @MAIN
+.sub main :main
   register_compiler()
 
   .local pmc compiler, invokable
@@ -352,7 +352,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "PIR compiler sub PIR");
   code = ".sub anonymous"
   $S0 = counter
   code .= $S0
-  code .= " @ANON\n"
+  code .= " :anon\n"
   code .= "print \""
   code .= printme
   code .= "\\n\"\n"
@@ -367,7 +367,7 @@ ok 1
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "eval.get_string");
-.sub main @MAIN
+.sub main :main
 
   .local pmc f1, f2
   .local pmc io
@@ -392,7 +392,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "eval.get_string");
   pir_compiler = compreg "PIR"
   code = ".sub "
   code .= name
-  code .= " @LOAD\n"
+  code .= " :load\n"
   code .= "print \""
   code .= printme
   code .= "\\n\"\n"
@@ -411,7 +411,7 @@ END {
 };
 
 pir_output_is(<<'CODE', <<'OUTPUT', "eval.freeze");
-.sub main @MAIN
+.sub main :main
   .local pmc f, e
   .local pmc io
   f = compi("foo_1", "hello from foo_1")
@@ -444,7 +444,7 @@ written
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "eval.thaw");
-.sub main @MAIN
+.sub main :main
     .local pmc io, e
     .local string file
     .local int size

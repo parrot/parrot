@@ -593,7 +593,7 @@ end_yield:
     goto forever
 .end
 
-.sub main @MAIN
+.sub main :main
     .local int i
     .local pmc d
 loop:

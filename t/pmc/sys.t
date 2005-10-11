@@ -25,10 +25,10 @@ END {
 
 pir_output_is(<<'CODE', <<OUT, "spawnw, _config");
 
-.sub _test @MAIN
+.sub _test :main
      .local pmc O
      open O, "temp.imc", ">"
-     print O, ".sub _main @MAIN\n"
+     print O, ".sub _main :main\n"
      print O, "\tprint \"Hello, World!\\n\"\n"
      print O, ".end\n"
      close O

@@ -294,7 +294,7 @@ OUTPUT
 
 pir_output_like(<<'CODE',
 
-.sub main @MAIN
+.sub main :main
      .local pmc compares, cmp_fun
      # XXX doesnt work wit prederef of JIT
      bounds 1
@@ -381,7 +381,7 @@ OUTPUT
 
 pir_output_like(<<'CODE', <<'OUTPUT', "Getting unitialized elements");
 
-.sub main @MAIN
+.sub main :main
     .local pmc arr1
     arr1 = new FixedPMCArray
     arr1 = 2005
@@ -397,7 +397,7 @@ OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "Multi keys");
 
-.sub test @MAIN
+.sub test :main
     .local pmc    matrix, row
     .local pmc    elem_in_pmc
     .local pmc    elem_out_pmc

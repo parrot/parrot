@@ -19,7 +19,7 @@ Tests builtin opcode-like methods.
 use Parrot::Test tests => 4;
 
 pir_output_is(<<'CODE', <<'OUT', "three ways to call a method");
-.sub main @MAIN
+.sub main :main
     .local pmc x, y, cl, m
     x = new Float
     x = 1.0
@@ -46,7 +46,7 @@ method        0.540302
 OUT
 
 pir_output_is(<<'CODE', <<'OUT', "say");
-.sub main @MAIN
+.sub main :main
     .local pmc io
     $I0 = say "ok 1"
     io = getstdout
@@ -66,7 +66,7 @@ OUT
 SKIP: {
     skip("bound methods - n/y", 2);
 pir_output_is(<<'CODE', <<'OUT', "bound methods");
-.sub main @MAIN
+.sub main :main
     .local pmc x, y, cl, m
     x = new Float
     x = 1.0
@@ -96,7 +96,7 @@ bound class m 0.540302
 OUT
 
 pir_output_is(<<'CODE', <<'OUT', "ParrotIO.puts");
-.sub main @MAIN
+.sub main :main
     .local pmc o, m, cl
     o = getstdout
     $I0 = o."puts"("ok 1\n")

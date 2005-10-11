@@ -150,7 +150,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "delegate add_p_p_i");
     print "\n"
     returncc
 .end
-.sub __add @MULTI(pmc, int)
+.sub __add :multi(pmc, int)
     .param pmc l
     .param int r
     .param pmc d
@@ -188,7 +188,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "delegate add_p_p_p");
     print i
     print "\n"
 .end
-.sub __add @MULTI(delegate, pmc)
+.sub __add :multi(delegate, pmc)
     .param pmc l
     .param pmc r
     .param pmc d

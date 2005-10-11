@@ -286,7 +286,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "set recursion limit, method call ");
 
 # see also t/op/gc_14.imc
 
-.sub main @MAIN
+.sub main :main
     .local pmc n
     new_pad 0
     $P0 = getinterp

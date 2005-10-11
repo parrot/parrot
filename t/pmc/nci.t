@@ -36,7 +36,7 @@ pir_output_is( << 'CODE', << "OUTPUT", "nci_c - return a char in an INTEGER regi
 
 .include "datatypes.pasm"
 
-.sub test @MAIN
+.sub test :main
 
   # load library
   .local pmc libnci_test
@@ -62,7 +62,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "nci_d and nci_dlvar_double" );
 
 .include "datatypes.pasm"
 
-.sub test @MAIN
+.sub test :main
 
     # load libnci_test.so
     .local string library_name
@@ -124,7 +124,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "nci_f and nci_dlvar_float" );
 
 .include "datatypes.pasm"
 
-.sub test @MAIN
+.sub test :main
 
     # load libnci_test.so
     .local string library_name
@@ -186,7 +186,7 @@ pir_output_is( << 'CODE', << "OUTPUT", "nci_l - return a long in an INTEGER regi
 
 .include "datatypes.pasm"
 
-.sub test @MAIN
+.sub test :main
 
   # load library
   .local pmc libnci_test
@@ -211,7 +211,7 @@ pir_output_is( << 'CODE', << "OUTPUT", "nci_p - return a pointer to int");
 
 .include "datatypes.pasm"
 
-.sub test @MAIN
+.sub test :main
 
     # load library
     .local pmc libnci_test
@@ -246,7 +246,7 @@ pir_output_is( << 'CODE', << "OUTPUT", "nci_t - return a C-string");
 
 .include "datatypes.pasm"
 
-.sub test @MAIN
+.sub test :main
 
     # load library
     .local pmc libnci_test
@@ -270,7 +270,7 @@ pir_output_is( << 'CODE', << "OUTPUT", "nci_s - return a short in an INTEGER reg
 
 .include "datatypes.pasm"
 
-.sub test @MAIN
+.sub test :main
 
   # load library
   .local pmc libnci_test
@@ -296,7 +296,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "nci_v and nci_dlvar_int" );
 
 .include "datatypes.pasm"
 
-.sub test @MAIN
+.sub test :main
 
     # load libnci_test.so
     .local string library_name
@@ -376,7 +376,7 @@ OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', "nci_dd - PIR" );
 
-.sub test @MAIN
+.sub test :main
     .local string library_name
     library_name = 'libnci_test'
     .local pmc libnci_test
@@ -400,7 +400,7 @@ OUTPUT
 
 pir_output_is( << 'CODE', << "OUTPUT", "get_string()" );
 
-.sub test @MAIN
+.sub test :main
     .local string library_name
     library_name = 'libnci_test'
     .local pmc libnci_test
@@ -1175,7 +1175,7 @@ pir_output_is( << 'CODE', << "OUTPUT", "nci_pi - int");
 
 .include "datatypes.pasm"
 
-.sub test @MAIN
+.sub test :main
 
   # load library
   .local pmc libnci_test
@@ -1339,7 +1339,7 @@ OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "nci_cb_C1 - PIR");
 
-.sub test @MAIN
+.sub test :main
 
     # this flag will be set by the callback function
     .local pmc cb_done
@@ -1478,7 +1478,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "nci_cb_C3 - PIR");
 
 .include "datatypes.pasm"
 
-.sub test @MAIN
+.sub test :main
 
     # this flag will be set by the callback function
     .local pmc cb_done
@@ -1682,7 +1682,7 @@ OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "nci_cb_D2 - PIR");
 
-.sub test @MAIN
+.sub test :main
 
     # this flag will be set by the callback function
     .local pmc cb_done
@@ -1761,7 +1761,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "nci_cb_D3 - PIR");
 
 .include "datatypes.pasm"
 
-.sub test @MAIN
+.sub test :main
 
     # this flag will be set by the callback function
     .local pmc cb_done
@@ -1851,7 +1851,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "nci_cb_D4 - synchronous callbacks");
 
 .include "datatypes.pasm"
 
-.sub test @MAIN
+.sub test :main
 
     # turn off JIT or special core - no events yet
     bounds 1
@@ -2176,7 +2176,7 @@ pir_output_is( << 'CODE', << "OUTPUT", "nci_pii - writing back to libnci_test.so
 
 .include "datatypes.pasm"
 
-.sub test @MAIN
+.sub test :main
 
   # load library
   .local pmc libnci_test
@@ -2230,7 +2230,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "nci_vv and nci_dlvar_int" );
 
 .include "datatypes.pasm"
 
-.sub test @MAIN
+.sub test :main
 
     # load libnci_test.so
     .local string library_name
@@ -2291,7 +2291,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "dlvar - unknown symbol" );
 
 .include "datatypes.pasm"
 
-.sub test @MAIN
+.sub test :main
 
     # load libnci_test.so
     .local string library_name
@@ -2322,7 +2322,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "dlfunc - unknown symbol" );
 
 .include "datatypes.pasm"
 
-.sub test @MAIN
+.sub test :main
 
     # load libnci_test.so
     .local string library_name
@@ -2372,7 +2372,7 @@ OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "opcode 'does'");
 
-.sub test @MAIN
+.sub test :main
     .local pmc pmc1
     pmc1 = new ParrotLibrary
     .local int bool1
@@ -2394,7 +2394,7 @@ CODE
 OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "conversion d <-> P");
-.sub test @MAIN
+.sub test :main
     .local string library_name
     library_name = 'libnci_test'
     .local pmc libnci_test
@@ -2413,7 +2413,7 @@ CODE
 OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "conversion S <-> P");
-.sub test @MAIN
+.sub test :main
     .local string library_name
     library_name = 'libnci_test'
     .local pmc libnci_test
@@ -2431,7 +2431,7 @@ ok worked
 OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "conversion I <-> P");
-.sub test @MAIN
+.sub test :main
     .local string library_name
     library_name = 'libnci_test'
     .local pmc libnci_test

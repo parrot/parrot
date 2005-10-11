@@ -1107,7 +1107,7 @@ TODO: {
     no warnings 'once';
     local $TODO = "pending PerlInt's numeric tower morphinc semantics";
 pir_output_is(<<'CODE', <<'OUT', "perlint should morph to num on cos()ing");
-.sub main @MAIN
+.sub main :main
     .local pmc x, y
     # integer morphing for perlint
     print "perlint morph"

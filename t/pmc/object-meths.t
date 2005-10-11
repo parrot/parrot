@@ -725,7 +725,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "same method name in two namespaces");
 .end
 
 .namespace [""]
-.sub _main @MAIN
+.sub _main :main
     print "ok\n"
 .end
 CODE
@@ -824,7 +824,7 @@ bar
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "method cache invalidation");
-.sub main @MAIN
+.sub main :main
     .local pmc o, cl
     newclass cl, "Foo"
     subclass cl, cl, "Bar"
@@ -874,7 +874,7 @@ OUTPUT
 SKIP: {
     skip("no bound NCI method", 1);
 pir_output_is(<<'CODE', <<'OUTPUT', "bound NCI method");
-.sub main @MAIN
+.sub main :main
     .local pmc s, l, f
     s = new String
     s = "ABC\n"
@@ -892,7 +892,7 @@ OUTPUT
 }
 
 pir_output_is(<<'CODE', <<'OUTPUT', "tailcallmeth");
-.sub main @MAIN
+.sub main :main
     .local pmc cl, o, n
     cl = newclass "Foo"
     addattribute cl, "n"
@@ -927,7 +927,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "print mro 1");
 #    \   /
 #     \ /
 #      F
-.sub main @MAIN
+.sub main :main
     .local pmc A, B, C, D, E, F, m, p, it
     newclass A, "A"
     newclass B, "B"
@@ -958,7 +958,7 @@ OUTPUT
 
 
 pir_output_is(<<'CODE', <<'OUTPUT', "kind of a super");
-.sub main @MAIN
+.sub main :main
     .local pmc cl, o
     cl = subclass "String", "MyString"
     o = new "MyString"
@@ -980,7 +980,7 @@ foofoo
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "super 1");
-.sub main @MAIN
+.sub main :main
     .local pmc o, cl
     cl = newclass 'Parent'
     cl = subclass cl, 'Child'

@@ -341,7 +341,7 @@ OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "check whether interface is done");
 
-.sub test @MAIN
+.sub test :main
     .local pmc pmc1
     pmc1 = new ResizablePMCArray
     .local int bool1
@@ -364,7 +364,7 @@ OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "inherited sort method");
 
-.sub test @MAIN
+.sub test :main
     .local pmc ar
     ar = new ResizablePMCArray
 
@@ -397,7 +397,7 @@ OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "push pmc");
 
-.sub test @MAIN
+.sub test :main
     .local pmc pmc_arr, pmc_9999, pmc_10000
     pmc_arr = new ResizablePMCArray
     pmc_9999  = new Float
@@ -423,7 +423,7 @@ OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "push integer");
 
-.sub test @MAIN
+.sub test :main
     .local pmc pmc_arr, pmc_9999
     .local int int_10000
     pmc_arr = new ResizablePMCArray
@@ -449,7 +449,7 @@ OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "push string");
 
-.sub test @MAIN
+.sub test :main
     .local pmc pmc_arr, pmc_9999
     .local string string_10000
     pmc_arr = new ResizablePMCArray
@@ -475,7 +475,7 @@ OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "shift integer");
 
-.sub test @MAIN
+.sub test :main
     .local pmc pmc_arr, elem
     pmc_arr = new ResizablePMCArray
     push pmc_arr, 4
@@ -588,7 +588,7 @@ OUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "push and pop");
 
-.sub test @MAIN
+.sub test :main
     .local float f, f_elem
     .local int i, i_elem, elements
     .local pmc p, p_elem, pmc_arr
@@ -682,7 +682,7 @@ OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "unshift and shift");
 
-.sub test @MAIN
+.sub test :main
     .local float f, f_elem
     .local int i, i_elem, elements
     .local pmc p, p_elem, pmc_arr
@@ -776,7 +776,7 @@ OUTPUT
 # An Integer Matrix, as used by befunge as a playing field 
 pir_output_is(<< 'CODE', << 'OUTPUT', "multi key access");
 
-.sub test @MAIN
+.sub test :main
     .local pmc matrix, row_in, row_out
     matrix = new ResizablePMCArray
     row_in = new ResizableIntegerArray

@@ -740,7 +740,7 @@ ok 3
 OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "sub");
-.sub main @MAIN
+.sub main :main
     .local pmc d, f, c
     d = new Undef
     f = new Float
@@ -768,7 +768,7 @@ Complex
 OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "i_sub");
-.sub main @MAIN
+.sub main :main
     .local pmc f, c
     f = new Float
     f = 2.2

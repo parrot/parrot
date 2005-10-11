@@ -2015,7 +2015,7 @@ OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "check whether interface is done");
 
-.sub test @MAIN
+.sub test :main
     .local pmc pmc1
     pmc1 = new PerlInt
     .local int bool1
@@ -2038,7 +2038,7 @@ OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "Fix for a minor problem");
 
-.sub test @MAIN
+.sub test :main
     $P1 = new PerlInt
     $P1 = 5
     $P2 = new PerlNum

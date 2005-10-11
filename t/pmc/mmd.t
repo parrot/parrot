@@ -364,7 +364,7 @@ OUTPUT
 
 pir_output_is(<<'CODE', <<'OUT', "first dynamic MMD call");
 
-.sub main @MAIN
+.sub main :main
     .local pmc F, B, f, b, m, s
     newclass F, "Foo"
     f = new "Foo"
@@ -383,13 +383,13 @@ pir_output_is(<<'CODE', <<'OUT', "first dynamic MMD call");
     foo(b, f)
 .end
 
-.sub foo method, @MULTI(Foo, Bar)
+.sub foo method, :multi(Foo, Bar)
     .param pmc x
     .param pmc y
     print "  Foo::foo\n"
 .end
 
-.sub foo method, @MULTI(Bar, Foo)
+.sub foo method, :multi(Bar, Foo)
     .param pmc x
     .param pmc y
     print "  Bar::foo\n"
@@ -403,19 +403,19 @@ OUT
 
 pir_output_is(<<'CODE', <<'OUT', "MMD on argument count");
 .namespace ["main"]
-.sub main @MAIN
+.sub main :main
     p("ok 1\n")
     p("-twice", "ok 2\n")
 .end
 
 .namespace [""]
 
-.sub p @MULTI(string)
+.sub p :multi(string)
     .param string s
     print s
 .end
 
-.sub p @MULTI(string, string)
+.sub p :multi(string, string)
     .param string opt
     .param string s
     if opt != '-twice' goto no_twice
@@ -433,19 +433,19 @@ OUT
 
 pir_output_is(<<'CODE', <<'OUT', "MMD on mative types");
 .namespace ["main"]
-.sub main @MAIN
+.sub main :main
     p("ok 1\n")
     p(42)
 .end
 
 .namespace [""]
 
-.sub p @MULTI(string)
+.sub p :multi(string)
     .param string s
     print s
 .end
 
-.sub p @MULTI(int)
+.sub p :multi(int)
     .param int i
     print i
     print "\n"
@@ -457,7 +457,7 @@ OUT
 
 pir_output_is(<<'CODE', <<'OUT', "MMD on PMC types");
 .namespace ["main"]
-.sub main @MAIN
+.sub main :main
     $P0 = new String
     $P0 = "ok 1\n"
     $P1 = new PerlString
@@ -476,13 +476,13 @@ pir_output_is(<<'CODE', <<'OUT', "MMD on PMC types");
 
 .namespace [""]
 
-.sub p @MULTI(String)
+.sub p :multi(String)
     .param pmc p
     print "String "
     print p
 .end
 
-.sub p @MULTI(PerlString)
+.sub p :multi(PerlString)
     .param pmc p
     print "PerlSt "
     print p
@@ -496,7 +496,7 @@ OUT
 
 pir_output_like(<<'CODE', <<'OUT', "MMD on PMC types, invalid");
 .namespace ["main"]
-.sub main @MAIN
+.sub main :main
     $P0 = new String
     $P0 = "ok 1\n"
     $P1 = new PerlString
@@ -517,13 +517,13 @@ pir_output_like(<<'CODE', <<'OUT', "MMD on PMC types, invalid");
 
 .namespace [""]
 
-.sub p @MULTI(String)
+.sub p :multi(String)
     .param pmc p
     print "String "
     print p
 .end
 
-.sub p @MULTI(PerlString)
+.sub p :multi(PerlString)
     .param pmc p
     print "PerlSt "
     print p
@@ -538,7 +538,7 @@ OUT
 
 pir_output_is(<<'CODE', <<'OUT', "MMD on PMC types 3");
 .namespace ["main"]
-.sub main @MAIN
+.sub main :main
     $P0 = new String
     $P0 = "ok 1\n"
     $P1 = new PerlString
@@ -560,19 +560,19 @@ pir_output_is(<<'CODE', <<'OUT', "MMD on PMC types 3");
 
 .namespace [""]
 
-.sub p @MULTI(String)
+.sub p :multi(String)
     .param pmc p
     print "String "
     print p
 .end
 
-.sub p @MULTI(PerlString)
+.sub p :multi(PerlString)
     .param pmc p
     print "PerlSt "
     print p
 .end
 
-.sub p @MULTI(Integer)
+.sub p :multi(Integer)
     .param pmc p
     print "Intege "
     print p
@@ -588,7 +588,7 @@ Intege 42
 OUT
 
 pir_output_is(<<'CODE', <<'OUT', "MMD on PMC types, global namespace");
-.sub main @MAIN
+.sub main :main
     $P0 = new String
     $P0 = "ok 1\n"
     $P1 = new PerlString
@@ -605,13 +605,13 @@ pir_output_is(<<'CODE', <<'OUT', "MMD on PMC types, global namespace");
     p($P1)
 .end
 
-.sub p @MULTI(String)
+.sub p :multi(String)
     .param pmc p
     print "String "
     print p
 .end
 
-.sub p @MULTI(PerlString)
+.sub p :multi(PerlString)
     .param pmc p
     print "PerlSt "
     print p
@@ -627,7 +627,7 @@ pir_output_is(<<'CODE', <<'OUT', "MMD on PMC types, package namespace");
 
 .namespace ["Some"]
 
-.sub main @MAIN
+.sub main :main
     $P0 = new String
     $P0 = "ok 1\n"
     $P1 = new PerlString
@@ -644,13 +644,13 @@ pir_output_is(<<'CODE', <<'OUT', "MMD on PMC types, package namespace");
     p($P1)
 .end
 
-.sub p @MULTI(String)
+.sub p :multi(String)
     .param pmc p
     print "String "
     print p
 .end
 
-.sub p @MULTI(PerlString)
+.sub p :multi(PerlString)
     .param pmc p
     print "PerlSt "
     print p
@@ -664,7 +664,7 @@ OUT
 
 pir_output_is(<<'CODE', <<'OUT', "MMD on PMC types - Any");
 
-.sub main @MAIN
+.sub main :main
     $P0 = new String
     $P0 = "ok 1\n"
     $P1 = new PerlString
@@ -681,26 +681,26 @@ pir_output_is(<<'CODE', <<'OUT', "MMD on PMC types - Any");
 
 .namespace [""]
 
-.sub p @MULTI(String)
+.sub p :multi(String)
     .param pmc p
     print "String "
     print p
 .end
 
-.sub p @MULTI(PerlString)
+.sub p :multi(PerlString)
     .param pmc p
     print "PerlSt "
     print p
 .end
 
-.sub p @MULTI(_)
+.sub p :multi(_)
     .param pmc p
     print "Any    "
     print p
     print "\n"
 .end
 
-.sub q @MULTI(pmc)
+.sub q :multi(pmc)
     .param pmc p
     print "Any    "
     print p
@@ -715,7 +715,7 @@ Any    43
 OUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "__add as function - Int, Float");
-.sub main @MAIN
+.sub main :main
     .local pmc d, l, r
     d = new Integer
     l = new Integer
@@ -732,7 +732,7 @@ CODE
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "__add as method");
-.sub main @MAIN
+.sub main :main
     .local pmc d, l, r
     l = new Integer
     r = new Integer
@@ -748,7 +748,7 @@ CODE
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "__add as method - inherited");
-.sub main @MAIN
+.sub main :main
     .local pmc d, l, r
     l = new PerlInt
     r = new PerlInt
@@ -763,7 +763,7 @@ CODE
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "__add as method - Int, Float");
-.sub main @MAIN
+.sub main :main
     .local pmc d, l, r
     l = new Integer
     r = new Float
@@ -781,7 +781,7 @@ OUTPUT
 SKIP: {
 	skip("bound method disabled", 1);
 pir_output_is(<<'CODE', <<'OUTPUT', "bound __add method");
-.sub main @MAIN
+.sub main :main
     .local pmc d, l, r, m
     d = new Integer
     l = new Integer
@@ -807,7 +807,7 @@ OUTPUT
 }
 
 pir_output_is(<<'CODE', <<'OUTPUT', "Integer subclasses");
-.sub main @MAIN
+.sub main :main
     .local pmc d, l, r, cl
     cl = subclass "Integer", "AInt"
     d = new "AInt"
@@ -841,7 +841,7 @@ CODE
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "Integer subclasses, n_add");
-.sub main @MAIN
+.sub main :main
     $P0 = subclass "Integer", "AInt"
     $P0 = new "AInt"
     $P1 = new Integer
@@ -853,7 +853,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "Integer subclasses, n_add");
     print "\n"
 .end
 .namespace ["AInt"]
-.sub __add @MULTI(AInt, Integer)
+.sub __add :multi(AInt, Integer)
     .param pmc l
     .param pmc r
     print l
@@ -873,7 +873,7 @@ OUTPUT
 
 open P, ">$temp" or die "can't write $temp";
 print P <<'EOF';
-.sub __add @MULTI(Integer, Integer)
+.sub __add :multi(Integer, Integer)
     .param pmc l
     .param pmc r
     print l
@@ -907,21 +907,21 @@ SKIP: {
 pir_output_is(<<'CODE', <<'OUTPUT', "mmd bug reported by Jeff");
 .namespace ['Foo']
 
-.sub bar method, @MULTI(Foo, string)
+.sub bar method, :multi(Foo, string)
     print "string\n"
 .end
 
-.sub bar method, @MULTI(Foo, pmc)
+.sub bar method, :multi(Foo, pmc)
     print "PMC\n"
 .end
 
-.sub bar method, @MULTI(Foo)
+.sub bar method, :multi(Foo)
     print "nothing\n"
 .end
 
 .namespace ['']
 
-.sub main @MAIN
+.sub main :main
     newclass $P0, 'Foo'
 
     $I0 = find_type 'Foo'
@@ -943,7 +943,7 @@ OUTPUT
 }
 
 pir_output_is(<<'CODE', <<'OUTPUT', "use a core func for an object");
-.sub main @MAIN
+.sub main :main
     .local pmc d, l, r, cl
     cl = newclass "AInt"
     addattribute cl, ".i"
@@ -998,17 +998,17 @@ CODE
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "multisub vs find_name");
-.sub main @MAIN
+.sub main :main
     $P0 = find_name "foo"
     $S0 = classname $P0
     print $S0
     print "\n"
 .end
-.sub foo method, @MULTI(string)
+.sub foo method, :multi(string)
     .param pmc x
     print "  foo\n"
 .end
-.sub foo method, @MULTI(pmc)
+.sub foo method, :multi(pmc)
     .param pmc x
     print "  foo\n"
 .end
