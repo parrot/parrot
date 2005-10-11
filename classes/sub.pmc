@@ -84,10 +84,10 @@ Initializes the subroutine.
      * - private1 ... Fixup is done
      * - private2 ... tailcall invoked this Sub
      * - private3 ... pythonic coroutine generator flag
-     * - private4 ... @MAIN
-     * - private5 ... @LOAD
-     * - private6 ... @IMMEDIATE
-     * - private7 ... @POSTCOMP
+     * - private4 ... :main (nee @MAIN)
+     * - private5 ... :load (nee @LOAD)
+     * - private6 ... :immediate (nee @IMMEDIATE)
+     * - private7 ... :postcomp (nee @POSTCOMP)
      *
      * see also the enum in include/parrot/sub.h
      *
@@ -465,7 +465,7 @@ Archives the subroutine.
          * - start offset in byte-code segment
          * - end   offset in byte-code segment
          * - segment TODO ???
-         * - flags  (i.e. @LOAD pragma and such)
+         * - flags  (i.e. :load pragma and such)
          * - name of the sub's label
          * - name_space
          * - HLL_id

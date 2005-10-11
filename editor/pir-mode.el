@@ -218,7 +218,7 @@ newline or semicolon after an end keyword."
 (defvar pir-dollar-register-regexp "\\$[INPS][0-9]+")
 
 (defvar pir-directives
-  '("method" "non_prototyped" "prototyped" "@LOAD" "@MAIN"))
+  '("method" "non_prototyped" "prototyped" ":load" "@MAIN"))
 
 (defvar pir-dotted-directives
   '(".sub" ".pcc_sub" ".end" ".emit" ".eom" ".const" ".namespace"

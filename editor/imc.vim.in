@@ -36,7 +36,7 @@ syn match imcDirective      /\.\(param\|result\|arg\|return\|invocant\)/
 syn match imcDirective      /\.\(include|pcc_begin|pcc_end\)/
 syn match imcDirective      /\.\(pcc_begin_return|pcc_end_return\)/
 syn match imcDirective      /\.\(pcc_begin_yield|pcc_end_yield\)/
-syn keyword imcDirective    non_prototyped prototyped @LOAD @MAIN
+syn keyword imcDirective    non_prototyped prototyped :load @MAIN
 
 " imcWord before imcRegister
 " FIXME :: in identifiers and labels
