@@ -7,7 +7,7 @@ use Parrot::Test tests => 13;
 
 pir_output_is(<<'CODE', <<'OUT', "bsr 1");
 # this tests register allocation/preserving of local bsr calls
-.sub test @MAIN
+.sub test :main
    $I0 = 2
    $I1 = 3
    bsr L
@@ -26,7 +26,7 @@ OUT
 
 ##############################
 pir_output_is(<<'CODE', <<'OUT', "stack calling conventions");
-.sub test @MAIN
+.sub test :main
    .local int x
    x = 10
    .const int y = 20
@@ -79,7 +79,7 @@ OUT
 ##############################
 #
 pir_output_is(<<'CODE', <<'OUT', "fact with stack calling conventions");
-.sub test @MAIN
+.sub test :main
     .local int counter
     counter = 5
     save counter
@@ -114,7 +114,7 @@ OUT
 # this is considered a non local bsr
 #
 pir_output_is(<<'CODE', <<'OUT', "recursive bsr with saveall");
-.sub test @MAIN
+.sub test :main
    $I0 = 5	# count
    $I1 = 1	# product
    save $I0
@@ -148,7 +148,7 @@ OUT
 ##############################
 # tail recursion - caller saves
 pir_output_is(<<'CODE', <<'OUT', "tail recursive bsr");
-.sub test @MAIN
+.sub test :main
    $I0 = 5	# count
    $I1 = 1	# product
    saveall
@@ -179,7 +179,7 @@ OUT
 ##############################
 # tail recursion - caller saves
 pir_output_is(<<'CODE', <<'OUT', "tail recursive bsr 2");
-.sub test @MAIN
+.sub test :main
    $I0 = 5	# count
    $I1 = 1	# product
    saveall
@@ -206,7 +206,7 @@ OUT
 ##############################
 # tail recursion - caller saves
 pir_output_is(<<'CODE', <<'OUT', "tail recursive bsr - opt");
-.sub test @MAIN
+.sub test :main
    $I0 = 5	# count
    $I1 = 1	# product
    saveall
@@ -233,7 +233,7 @@ OUT
 ##############################
 # tail recursion - caller saves - parrot calling convention
 pir_output_is(<<'CODE', <<'OUT', "tail recursive bsr, parrot cc");
-.sub test @MAIN
+.sub test :main
    $I0 = _fact(1, 5)
    print $I0
    print "\n"
@@ -261,7 +261,7 @@ OUT
 ##############################
 # coroutine
 pir_output_is(<<'CODE', <<'OUT', "coroutine");
-.sub test @MAIN
+.sub test :main
     .local Coroutine co
     co = new Coroutine
     co = addr _routine
@@ -285,7 +285,7 @@ Hello perl6.
 OUT
 
 pir_output_is(<<'CODE', <<'OUT', "newsub");
-    .sub test @MAIN
+    .sub test :main
         newsub P0, .Sub, _foo	# PASM syntax only for now
         invokecc P0
         end
@@ -309,7 +309,7 @@ $head1 BLA
  fasel
 
 $cut
-.sub test \@MAIN
+.sub test \:main
 	print "ok 1\\n"
 	end
 .end
@@ -323,7 +323,7 @@ $head1 FOO
  fasel
 
 $cut
-.sub test \@MAIN
+.sub test \:main
 	print "ok 1\\n"
 	end
 .end
@@ -336,7 +336,7 @@ ok 1
 OUT
 
 pir_output_is(<<'CODE', <<'OUT', "bug #25948");
-.sub main @MAIN
+.sub main :main
         goto L1
 test:
         $I1 = 1

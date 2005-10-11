@@ -30,7 +30,7 @@ ENDF
 close FOO;
 
 pir_output_is(<<'CODE', <<'OUT', "include pasm");
-.sub test @MAIN
+.sub test :main
     print "before\n"
     .include "temp.pasm"
     print .BAR
@@ -52,7 +52,7 @@ ENDF
 close FOO;
 
 pir_output_is(<<'CODE', <<'OUT', "include pir");
-.sub test @MAIN
+.sub test :main
     print "before\n"
     .include "temp.imc"
     print BAR
@@ -74,7 +74,7 @@ ENDF
 close FOO;
 
 pir_output_is(<<'CODE', <<'OUT', "include .inc");
-.sub test @MAIN
+.sub test :main
     print "before\n"
     .include "temp.inc"
     print BAR
@@ -111,7 +111,7 @@ EOF
 close F;
 
 pir_output_is(<<'CODE', <<'OUT', "subroutine in external file");
-.sub test @MAIN
+.sub test :main
    .local int x
    x = 10
    .const int y = 20
@@ -341,7 +341,7 @@ OUT
 # Including a non-existent file should produce an error
 .include "non_existent.imc"
 # An error should have been raised
-.sub test @MAIN
+.sub test :main
   # dummy, because a main function is expected
   end
 .end
@@ -365,7 +365,7 @@ END_PIR
     my $ENOENT = $! + 0;
     open FOO, ">temp.imc" or die "Can't write temp.imc\n";
     print FOO << "END_PIR";
-.sub test \@MAIN
+.sub test \:main
   # run a OS command, and get the errmessge for the exit code
   .local string enoent_err_msg
   err enoent_err_msg, $ENOENT

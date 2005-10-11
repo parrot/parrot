@@ -1066,7 +1066,7 @@ OUT
 }
 
 pir_2_pasm_like(<<'CODE', <<'OUT', "segv - last ins changed");
-.sub main @MAIN
+.sub main :main
     func()
 .end
 .sub func
@@ -1081,7 +1081,7 @@ CODE
 OUT
 
 pir_2_pasm_like(<<'CODE', <<'OUT', "segv - last ins deleted");
-.sub main @MAIN
+.sub main :main
     func()
 .end
 .sub func

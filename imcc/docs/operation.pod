@@ -111,7 +111,7 @@ an appropriate message.
 
 Consider these two code snippets (block numbers are attached):
 
-  .sub main @MAIN
+  .sub main :main
  0      $I0 = 0		# initialized
  0      if $I0 goto l1
  1      $I1 = 1		# init in block 1

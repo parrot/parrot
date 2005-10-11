@@ -6,8 +6,8 @@ use strict;
 use Parrot::Test tests => 11;
 
 
-pir_2_pasm_like(<<'CODE', <<'OUT', 'end in @MAIN');
-.sub _main @MAIN
+pir_2_pasm_like(<<'CODE', <<'OUT', 'end in :main');
+.sub _main :main
      noop
 .end
 CODE

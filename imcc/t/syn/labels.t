@@ -7,7 +7,7 @@ use Parrot::Test tests => 7;
 
 ##############################
 pir_output_is(<<'CODE', <<'OUT', "goto 1");
-.sub test @MAIN
+.sub test :main
 	goto foo
 	end
 foo:
@@ -21,7 +21,7 @@ OUT
 
 ##############################
 pir_output_is(<<'CODE', <<'OUT', "goto 2");
-.sub test @MAIN
+.sub test :main
 	goto foo
 bar:	print "ok 2\n"
 	end

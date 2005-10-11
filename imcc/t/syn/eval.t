@@ -10,7 +10,7 @@ SKIP: {
 
 ##############################
 pir_output_is(<<'CODE', <<'OUT', "eval pasm");
-.sub test @MAIN
+.sub test :main
 	$S0 = 'set S1, "in eval\n"'
 	concat $S0, "\n"
 	concat $S0, "print S1\nend\n"
@@ -26,7 +26,7 @@ back
 OUT
 
 pir_output_is(<<'CODE', <<'OUT', "eval pir");
-.sub test @MAIN
+.sub test :main
 	$S1 = ".sub _foo\n"
 	concat $S1, '$S1 = "42\n"'
 	concat $S1, "\nprint $S1\nend\n"
@@ -53,7 +53,7 @@ pir_output_is(<<'CODE', <<'OUT', "intersegment branch");
 # 7
 #####
 
-.sub test @MAIN
+.sub test :main
     I1 = 5
     $S0 = ".sub _e\nif I1 == 6 goto LAB\nend\n.end\n"
     compreg P2, "PIR"
@@ -70,7 +70,7 @@ CODE
 OUT
 
 pir_output_is(<<'CODE', <<'OUT', "intersegment branch 2");
-.sub test @MAIN
+.sub test :main
     I1 = 4
     $S0 = ".sub _e\nif I1 <= 6 goto LAB\nend\n.end\n"
     compreg P2, "PIR"
@@ -87,7 +87,7 @@ CODE
 OUT
 
 pir_output_is(<<'CODE', <<'OUT', "intersegment branch 3");
-.sub test @MAIN
+.sub test :main
     I1 = 4
     compreg P2, "PIR"
     $S0 = ".sub _e\nif I1 <= 5 goto LAB\nend\n.end\n"
@@ -108,7 +108,7 @@ CODE
 OUT
 
 pir_output_is(<<'CODE', <<'OUT', "intersegment branch 4");
-.sub test @MAIN
+.sub test :main
     I1 = 4
     compreg P2, "PIR"
     $S0 = ".sub _e\nif I1 <= 5 goto LAB\nend\n.end\n"
@@ -130,7 +130,7 @@ CODE
 OUT
 
 pir_output_is(<<'CODE', <<'OUT', "eval - same constants");
-.sub test @MAIN
+.sub test :main
         print "hello"
 	print "\n"
 	$S0 = 'print "hello"'

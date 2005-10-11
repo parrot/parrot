@@ -7,7 +7,7 @@ use Parrot::Test tests => 21;
 
 ##############################
 pir_output_is(<<'CODE', <<'OUT', "+=");
-.sub test @MAIN
+.sub test :main
     $I0 = 10
     $I0 += 20
     print $I0
@@ -20,7 +20,7 @@ OUT
 
 ##############################
 pir_output_is(<<'CODE', <<'OUT', "-=");
-.sub test @MAIN
+.sub test :main
     $I0 = 10
     $I0 -= 20
     print $I0
@@ -32,7 +32,7 @@ CODE
 OUT
 
 pir_output_is(<<'CODE', <<'OUT', "*=");
-.sub test @MAIN
+.sub test :main
     $I0 = 10
     $I0 *= 20
     print $I0
@@ -44,7 +44,7 @@ CODE
 OUT
 
 pir_output_is(<<'CODE', <<'OUT', "/=");
-.sub test @MAIN
+.sub test :main
     $I0 = 20
     $I0 /= 2
     print $I0
@@ -56,7 +56,7 @@ CODE
 OUT
 
 pir_output_is(<<'CODE', <<'OUT', "%=");
-.sub test @MAIN
+.sub test :main
     $I0 = 20
     $I0 %= 7
     print $I0
@@ -68,7 +68,7 @@ CODE
 OUT
 
 pir_output_is(<<'CODE', <<'OUT', ".=");
-.sub test @MAIN
+.sub test :main
     $S0 = "ab"
     $S0 .= "cd"
     print $S0
@@ -79,7 +79,7 @@ CODE
 abcd
 OUT
 pir_output_is(<<'CODE', <<'OUT', "&=");
-.sub test @MAIN
+.sub test :main
     $I0 =  0b1011
     $I0 &= 0b1000
     print $I0
@@ -91,7 +91,7 @@ CODE
 OUT
 
 pir_output_is(<<'CODE', <<'OUT', "|=");
-.sub test @MAIN
+.sub test :main
     $I0 =  0b1011
     $I0 |= 0b1000
     print $I0
@@ -103,7 +103,7 @@ CODE
 OUT
 
 pir_output_is(<<'CODE', <<'OUT', "~=");
-.sub test @MAIN
+.sub test :main
     $I0 =  0b1011
     $I0 ~= 0b1000
     print $I0
@@ -115,7 +115,7 @@ CODE
 OUT
 
 pir_output_is(<<'CODE', <<'OUT', ">>=");
-.sub test @MAIN
+.sub test :main
     $I0 =  0b1011
     $I0 >>= 1
     print $I0
@@ -127,7 +127,7 @@ CODE
 OUT
 
 pir_output_is(<<'CODE', <<'OUT', ">>>=");
-.sub test @MAIN
+.sub test :main
     $I0 =  0b1011
     $I0 >>>= 1
     print $I0
@@ -139,7 +139,7 @@ CODE
 OUT
 
 pir_output_is(<<'CODE', <<'OUT', "<<=");
-.sub test @MAIN
+.sub test :main
     $I0 =  0b1011
     $I0 <<= 1
     print $I0
@@ -151,7 +151,7 @@ CODE
 OUT
 
 pir_output_is(<<'CODE', <<'OUT', "x = defined");
-.sub test @MAIN
+.sub test :main
     .local pmc a
     a = new PerlArray
     push a, 10
@@ -169,7 +169,7 @@ CODE
 OUT
 
 pir_output_is(<<'CODE', <<'OUT', "x = clone");
-.sub test @MAIN
+.sub test :main
     .local pmc a
     a = new Integer
     a = 10
@@ -184,7 +184,7 @@ CODE
 OUT
 
 pir_output_is(<<'CODE', <<'OUT', "x = length");
-.sub test @MAIN
+.sub test :main
     .local string s
     s = "abc"
     $I0 = length s
@@ -197,7 +197,7 @@ CODE
 OUT
 
 pir_output_is(<<'CODE', <<'OUT', "x = sin");
-.sub test @MAIN
+.sub test :main
     $N0 = sin 0
     print $N0
     print "\n"
@@ -208,7 +208,7 @@ CODE
 OUT
 
 pir_output_is(<<'CODE', <<'OUT', "x = can");
-.sub test @MAIN
+.sub test :main
     $P0 = new ParrotIO
     $I0 = can $P0, "puts"
     print $I0
@@ -220,7 +220,7 @@ CODE
 OUT
 
 pir_output_is(<<'CODE', <<'OUT', "x = isa");
-.sub test @MAIN
+.sub test :main
     $P0 = new Integer
     $I0 = isa $P0, "scalar"
     print $I0
@@ -232,7 +232,7 @@ CODE
 OUT
 
 pir_output_is(<<'CODE', <<'OUT', "x = add");
-.sub test @MAIN
+.sub test :main
     $I0 = 10
     $I1 = add $I0, 10
     print $I1
@@ -244,7 +244,7 @@ CODE
 OUT
 
 pir_output_is(<<'CODE', <<'OUT', "x = invoke");
-.sub test @MAIN
+.sub test :main
     $P0 = find_global "_s"
     $P0 = invokecc
     $S0 = "done\n"

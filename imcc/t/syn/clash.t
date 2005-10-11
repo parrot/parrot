@@ -6,7 +6,7 @@ use strict;
 use Parrot::Test tests => 15;
 
 pir_output_is(<<'CODE', <<'OUT', "if/unless");
-.sub test @MAIN
+.sub test :main
 	$I0 = 0
 	if $I0 goto nok1
 	print "ok 1\n"
@@ -29,7 +29,7 @@ ok 2
 OUT
 
 pir_output_is(<<'CODE', <<'OUT', "if/unless");
-.sub test @MAIN
+.sub test :main
 	$I0 = 0
 	$I1 = 1
 	if $I0 == $I1 goto nok1
@@ -58,7 +58,7 @@ OUT
 
 
 pir_output_is(<<'CODE', <<'OUT', "new");
-.sub test @MAIN
+.sub test :main
 	$P1 = new String
 	$P1 = "ok 1\n"
 	new P1, .String
@@ -74,7 +74,7 @@ OUT
 
 
 pir_output_is(<<'CODE', <<'OUT', "clone");
-.sub test @MAIN
+.sub test :main
 	$P1 = new String
 	$P1 = "ok 1\n"
 	$P0 = clone $P1
@@ -92,7 +92,7 @@ OUT
 
 
 pir_output_is(<<'CODE', <<'OUT', "defined");
-.sub test @MAIN
+.sub test :main
 	$P1 = new Hash
 	$I0 = defined $P1
 	new P1, .Hash
@@ -110,7 +110,7 @@ OUT
 
 
 pir_output_is(<<'CODE', <<'OUT', "defined keyed");
-.sub test @MAIN
+.sub test :main
 	$P1 = new Hash
 	$P1["a"] = "ok 1\n"
 	$I0 = defined $P1["a"]
@@ -134,7 +134,7 @@ OUT
 
 
 pir_output_is(<<'CODE', <<'OUT', "parrot op as identifier");
-.sub test @MAIN
+.sub test :main
 	.local int set
 	set = 5
 	print set
@@ -151,7 +151,7 @@ OUT
 
 
 pir_output_is(<<'CODE', <<'OUT', "parrot op as label");
-.sub test @MAIN
+.sub test :main
 	null I0
 	goto set
 set:
@@ -172,7 +172,7 @@ ok
 OUT
 
 pir_output_like(<<'CODE', <<'OUTPUT', "new with a native type");
-.sub test @MAIN
+.sub test :main
         $P1 = new INTVAL
 	print "never\n"
 	end
@@ -182,7 +182,7 @@ CODE
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "setline w comment");
-.sub test @MAIN
+.sub test :main
     setline 1	# comment
     print "ok\n"
     end
@@ -192,7 +192,7 @@ ok
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "setfile w comment");
-.sub test @MAIN
+.sub test :main
     setfile "foo"	# comment
     print "ok\n"
     end
@@ -202,7 +202,7 @@ ok
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "eq_num => eq");
-.sub test @MAIN
+.sub test :main
     .local int i
     .local int j
     i = 1
@@ -218,7 +218,7 @@ ok 1
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "eq_num => eq mixed => eq_n_n");
-.sub test @MAIN
+.sub test :main
     .local int i
     .local float j
     i = 1
@@ -234,7 +234,7 @@ ok 1
 OUTPUT
 
 pir_output_like(<<'CODE', <<'OUT', "undefined ident");
-.sub test @MAIN
+.sub test :main
     print no_such
 .end
 CODE
@@ -242,7 +242,7 @@ CODE
 OUT
 
 pir_output_is(<<'CODE', <<'OUT', "label ident");
-.sub test @MAIN
+.sub test :main
     branch no_such
     end
 no_such:

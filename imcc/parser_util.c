@@ -705,7 +705,7 @@ imcc_compile(Parrot_Interp interp, const char *s, int pasm_file)
     /*
      * create sub PMC
      *
-     * TODO if a sub was denoted @MAIN return that instead
+     * TODO if a sub was denoted :main return that instead
      */
     sub = pmc_new(interp, enum_class_Eval);
     sub_data = PMC_sub(sub);

@@ -11,7 +11,7 @@ pir_output_is(<<'CODE', <<'OUT', "allocate 1");
 # Test the ability of the register allocator to
 # generate spills.
 #
-.sub test @MAIN
+.sub test :main
 	$I0 = 0
 	$I1 = 1
 	$I2 = 2
@@ -85,7 +85,7 @@ pir_output_is(<<'CODE', <<'OUT', "spill 1");
 # Test the ability of the register allocator to
 # generate spills.
 #
-.sub test @MAIN
+.sub test :main
 	$I0 = 0
 	$I1 = 1
 	$I2 = 2
@@ -243,7 +243,7 @@ pir_output_is(<<'CODE', <<'OUT', "pcc arg overflow 1");
 # combination with PCC calling convention and overflow arguments.
 # Slightly redundant with tests in t/syn/pcc.t but please leave.
 #
-.sub test @MAIN
+.sub test :main
   _foo(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40)
   end
 .end
@@ -334,7 +334,7 @@ pir_output_is(<<'CODE', <<'OUT', "spill 4");
 #
 # Another spill test
 #
-.sub test @MAIN
+.sub test :main
 	$I0 = 0
 	$I1 = 1
 	$I2 = 2
@@ -434,7 +434,7 @@ pir_output_is(<<'CODE', <<'OUT', "bug #32996");
 
 .namespace ["Foo"]
 
-.sub __biginit @MAIN
+.sub __biginit :main
 	newclass $P0, "Foo"
 	$I1 = find_type "Foo"
 	$P1 = new $I1

@@ -8,7 +8,7 @@ use Parrot::Test tests => 23;
 # macro tests
 
 pir_output_is( <<'CODE', <<OUTPUT, "macro, zero parameters" );
-.sub test @MAIN
+.sub test :main
 .macro answer()
 	print	42
 	print	"\n"
@@ -21,7 +21,7 @@ CODE
 OUTPUT
 
 pir_output_is( <<'CODE', <<OUTPUT, "macro, one unused parameter, literal term" );
-.sub test @MAIN
+.sub test :main
 .macro answer(A)
 	print	42
 .endm
@@ -34,7 +34,7 @@ CODE
 OUTPUT
 
 pir_output_is( <<'CODE', <<OUTPUT, "macro, one unused parameter, register term" );
-.sub test @MAIN
+.sub test :main
 .macro answer(A)
 	print	42
 .endm
@@ -48,7 +48,7 @@ CODE
 OUTPUT
 
 pir_output_is( <<'CODE', <<OUTPUT, "macro, one used parameter, literal" );
-.sub test @MAIN
+.sub test :main
 .macro answer(A)
 	print	.A
 .endm
@@ -61,7 +61,7 @@ CODE
 OUTPUT
 
 pir_output_is( <<'CODE', <<OUTPUT, "macro, one used parameter, register" );
-.sub test @MAIN
+.sub test :main
 .macro answer(A)
 	print	.A
 .endm
@@ -75,7 +75,7 @@ CODE
 OUTPUT
 
 pir_output_is( <<'CODE', <<OUTPUT, "macro, one used parameter, called twice" );
-.sub test @MAIN
+.sub test :main
 .macro answer(A)
 	print	.A
 	print	"\n"
@@ -92,7 +92,7 @@ CODE
 OUTPUT
 
 pir_output_is( <<'CODE', <<OUTPUT, "macro, one used parameter, label" );
-.sub test @MAIN
+.sub test :main
 .macro answer(A)
 	ne	I0,42,.$done
 	print	.A
@@ -108,7 +108,7 @@ CODE
 OUTPUT
 
 pir_output_is( <<'CODE', <<OUTPUT, "macro, one used parameter run twice, label" );
-.sub test @MAIN
+.sub test :main
 .macro answer(A)
 	ne	I0,42,.$done
 	print	.A
@@ -126,7 +126,7 @@ CODE
 OUTPUT
 
 pir_output_is(<<'CODE', '32', "constant defined and used");
-.sub test @MAIN
+.sub test :main
 .const int FOO = 32
   print FOO
   end
@@ -134,7 +134,7 @@ pir_output_is(<<'CODE', '32', "constant defined and used");
 CODE
 
 pir_output_is(<<'CODE', 'foo', "constant defined and used");
-.sub test @MAIN
+.sub test :main
 .const string FOO = "foo"
   print FOO
   end
@@ -142,7 +142,7 @@ pir_output_is(<<'CODE', 'foo', "constant defined and used");
 CODE
 
 pir_output_is( <<'CODE', <<OUTPUT, ".newid" );
-.sub test @MAIN
+.sub test :main
 .macro newid(ID, CLASS)
     .sym .CLASS .ID
     .ID = new .CLASS
@@ -158,7 +158,7 @@ CODE
 OUTPUT
 
 pir_output_is( <<'CODE', <<OUTPUT, ".newlex" );
-.sub test @MAIN
+.sub test :main
 .macro newlex(ID, CLASS)
     .sym .CLASS .ID
     .ID = new .CLASS
@@ -175,7 +175,7 @@ CODE
 OUTPUT
 
 pir_output_like( <<'CODE', <<OUTPUT, "too few params" );
-.sub test @MAIN
+.sub test :main
 .macro M(A, B)
     print .A
     print .B
@@ -188,7 +188,7 @@ CODE
 OUTPUT
 
 pir_output_like( <<'CODE', <<OUTPUT, "too many params" );
-.sub test @MAIN
+.sub test :main
 .macro M(A, B)
     print .A
     print .B
@@ -201,7 +201,7 @@ CODE
 OUTPUT
 
 pir_output_is( <<'CODE', <<OUTPUT, "ok param count" );
-.sub test @MAIN
+.sub test :main
 .macro M(A, B)
     print .A
     print .B
@@ -214,7 +214,7 @@ fine
 OUTPUT
 
 pir_output_like( <<'CODE', <<OUTPUT, "macro name is no ident" );
-.sub test @MAIN
+.sub test :main
 .macro 42(A, B)
     print .A
     print .B
@@ -227,7 +227,7 @@ CODE
 OUTPUT
 
 pir_output_like( <<'CODE', <<OUTPUT, "unterminated macro" );
-.sub test @MAIN
+.sub test :main
 .macro M(
 
 
@@ -236,7 +236,7 @@ CODE
 OUTPUT
 
 pir_output_like( <<'CODE', <<OUTPUT, "unterminated macro 2" );
-.sub test @MAIN
+.sub test :main
 .macro M(A, B)
   print .A
 .endm
@@ -247,7 +247,7 @@ CODE
 OUTPUT
 
 pir_output_like( <<'CODE', <<OUTPUT, "ill param def" );
-.sub test @MAIN
+.sub test :main
 .macro M(A, B
   print .A
 .endm
@@ -258,7 +258,7 @@ CODE
 OUTPUT
 
 pir_output_like( <<'CODE', <<OUTPUT, "no params" );
-.sub test @MAIN
+.sub test :main
 .macro M(A, B)
     print .A
     print .B
@@ -272,7 +272,7 @@ OUTPUT
 
 
 pir_output_like( <<'CODE', <<OUTPUT, "unknown macro" );
-.sub test @MAIN
+.sub test :main
 .macro M(A, B)
     print .A
     print .B
@@ -285,7 +285,7 @@ CODE
 OUTPUT
 
 pir_output_like( <<'CODE', <<OUTPUT, "unexpected IDENTIFIER" );
-.sub test @MAIN
+.sub test :main
 .macro M()
     this gives a parse error
 .endm
@@ -297,7 +297,7 @@ CODE
 OUTPUT
 
 pir_output_like( <<'CODE', <<OUTPUT, "unknown macro" );
-.sub test @MAIN
+.sub test :main
 .macro M(A)
     .arg .A
 .endm

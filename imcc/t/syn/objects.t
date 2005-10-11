@@ -11,7 +11,7 @@ use Parrot::Test tests => 11;
 
 pir_output_is(<<'CODE', <<'OUT', "meth call syntax");
 
-.sub test @MAIN
+.sub test :main
     .local pmc class
     .local pmc obj
     newclass class, "Foo"
@@ -34,7 +34,7 @@ done
 OUT
 
 pir_output_is(<<'CODE', <<'OUT', "meth call syntax m.o(arg)");
-.sub test @MAIN
+.sub test :main
     .local pmc class
     .local pmc obj
     newclass class, "Foo"
@@ -60,7 +60,7 @@ done
 OUT
 
 pir_output_is(<<'CODE', <<'OUT', "meth call ret = o.m(arg)");
-.sub test @MAIN
+.sub test :main
     .local pmc class
     .local pmc obj
     newclass class, "Foo"
@@ -89,7 +89,7 @@ done
 OUT
 
 pir_output_is(<<'CODE', <<'OUT', "meth call syntax, string");
-.sub test @MAIN
+.sub test :main
     .local pmc class
     .local pmc obj
     .local string meth
@@ -119,7 +119,7 @@ done
 OUT
 
 pir_output_is(<<'CODE', <<'OUT', "initializer");
-.sub test @MAIN
+.sub test :main
     newclass P1, "Foo"
     subclass P2, P1, "Bar"
     subclass P3, P2, "Baz"
@@ -160,7 +160,7 @@ OUT
 
 pir_output_is(<<'CODE', <<'OUT', "meth call syntax - method, self");
 
-.sub test @MAIN
+.sub test :main
     .local pmc class
     .local pmc obj
     newclass class, "Foo"
@@ -188,7 +188,7 @@ OUT
 
 pir_output_is(<<'CODE', <<'OUT', "explicit meth call syntax");
 
-.sub test @MAIN
+.sub test :main
     .local pmc class
     .local pmc obj
     newclass class, "Foo"
@@ -213,7 +213,7 @@ OUT
 
 pir_output_is(<<'CODE', <<'OUT', "explicit meth call syntax, meth var");
 
-.sub test @MAIN
+.sub test :main
     .local pmc class
     .local pmc obj
     .local string meth
@@ -240,7 +240,7 @@ done
 OUT
 pir_output_is(<<'CODE', <<'OUT', "explicit meth call syntax, args");
 
-.sub test @MAIN
+.sub test :main
     .local pmc class
     .local pmc obj
     newclass class, "Foo"
@@ -278,7 +278,7 @@ OUT
 
 pir_output_is(<<'CODE', <<'OUT', "explicit meth call syntax");
 
-.sub test @MAIN
+.sub test :main
     .local pmc class
     .local pmc obj
     newclass class, "Foo"
@@ -303,7 +303,7 @@ OUT
 
 pir_output_is(<<'CODE', <<'OUT', "meth call syntax - reserved word");
 
-.sub test @MAIN
+.sub test :main
     .local pmc class
     .local pmc obj
     newclass class, "Foo"

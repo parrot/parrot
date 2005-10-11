@@ -11,7 +11,7 @@ use Parrot::Test tests => 6;
 $ENV{TEST_PROG_ARGS} = '-Oc';
 
 pir_output_is(<<'CODE', <<'OUT', "tail call optimization, final position");
-.sub _main @MAIN
+.sub _main :main
     $P1 = new Integer
     $P1 = 20
     $P2 = new Integer
@@ -95,7 +95,7 @@ SKIP: {
     skip("missing HLL :slurp syntax", 3);
 pir_output_is(<<'CODE', <<'OUT', "tail call optimization, intermediate position");
 
-.sub _main @MAIN
+.sub _main :main
 	$P1 = new Integer
 	$P1 = 20
 	$P2 = new Integer
@@ -177,7 +177,7 @@ OUT
 
 pir_output_is(<<'CODE', <<'OUT', "tail call optimization, implicit final return");
 
-.sub _main @MAIN
+.sub _main :main
 
 	$P1 = new Integer
 	$P1 = 20
@@ -259,7 +259,7 @@ OUT
 
 pir_output_is(<<'CODE', <<'OUT', ":flatten in .return");
 
-.sub _main @MAIN
+.sub _main :main
 
 	$P1 = new Integer
 	$P1 = 20
@@ -318,7 +318,7 @@ OUT
 }
 
 pir_output_is(<<'CODE', <<'OUT', "new tail call syntax");
-.sub main @MAIN
+.sub main :main
     $S0 = foo()
     print $S0
 .end
@@ -336,7 +336,7 @@ ok
 OUT
 
 pir_output_is(<<'CODE', <<'OUT', "new tail method call syntax");
-.sub main @MAIN
+.sub main :main
     .local pmc cl, o, n
     cl = newclass "Foo"
     addattribute cl, "n"

@@ -9,7 +9,7 @@ pir_output_is(<<'CODE', <<'OUT', "alligator");
 # if the side-effect of newsub/continuation isn't
 # detected this program prints "Hi\nalligator\n"
 
-.sub main @MAIN
+.sub main :main
     $P0 = new .String
     $P0 = "Hi\n"
     $I0 = 2

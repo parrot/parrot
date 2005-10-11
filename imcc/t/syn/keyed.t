@@ -10,7 +10,7 @@ SKIP: {
   skip("experimental", 1);
 
 pir_output_is(<<'CODE', <<'OUTPUT', "add_keyed");
-.sub test @MAIN
+.sub test :main
     new P0, .Array
     new P1, .Array
     new P2, .Array

@@ -7,7 +7,7 @@ use Parrot::Test tests => 1;
 
 ##############################
 pir_output_is(<<'CODE', <<'OUT', "global const");
-.sub test @MAIN
+.sub test :main
 	.globalconst string ok = "ok\n"
 	print ok
 	bsr _sub

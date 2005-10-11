@@ -105,23 +105,23 @@ following meaning:
 
 =over 4
 
-=item * @MAIN
+=item * :main
 
 Define "main" entry point to start execution. If multiple subroutines
-are marked as B<@MAIN>, the B<last> marked subroutine is entered.
+are marked as B<:main>, the B<last> marked subroutine is entered.
 
-=item * @LOAD
+=item * :load
 
 Run this subroutine during the B<load_library> opcode.
-B<@LOAD> is ignored, if another subroutine in that file is marked with
-B<@MAIN>.
+B<:load> is ignored, if another subroutine in that file is marked with
+B<:main>.
 
-=item * @ANON
+=item * :anon
 
 Do not install this subroutine in the namespace. Allows the subroutine
 name to be reused.
 
-=item * @MULTI(Type1, Type2...)
+=item * :multi(Type1, Type2...)
 
 Engage in multiple dispatch with the listed types.
 
