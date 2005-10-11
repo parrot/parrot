@@ -36,7 +36,9 @@ should be included for reference.
 
 =cut
 
-use Parrot::Test tests => 1;
+use Parrot::Test;
+# tests => 1;
+ plan  skip_all => 'Ongoing PBC format changes';
 
 # execute the file t/native_pbc/integer_1.pbc
 #

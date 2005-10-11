@@ -37,7 +37,9 @@ $ mv n.pbc t/native_pbc/number_$(N).pbc
 
 =cut
 
-use Parrot::Test tests => 1;
+# use Parrot::Test tests => 1;
+use Parrot::Test;
+ plan  skip_all => 'Ongoing PBC format changes';
 
 my $output = << 'END_OUTPUT';
 1.000000

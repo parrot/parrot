@@ -646,7 +646,7 @@ static int
 add_const_pmc_sub(Interp *interpreter, SymReg *r,
         int offs, int end)
 {
-    int k;
+    int i, k;
     INTVAL type;
     PMC *name_space;
     PMC *sub_pmc;
@@ -711,6 +711,8 @@ add_const_pmc_sub(Interp *interpreter, SymReg *r,
     sub->address = (opcode_t*)(long)offs;
     sub->end = (opcode_t*)(long)end;
     sub->HLL_id = unit->HLL_id;
+    for (i = 0; i < 4; ++i)
+        sub->n_regs_used[i] = unit->n_regs_used[i];
     /*
      * check if it's declared multi
      */

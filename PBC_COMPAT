@@ -24,6 +24,7 @@
 
 # please insert tab separated entries at the top of the list
 
+2005.10.11	leo	added reg usage to Subs in PBC
 2005.10.07	leo	deleted lot of opcodes
 2005.10.05	leo	deleted rx_ opcodes
 2005.10.01	leo	0.3.0 release

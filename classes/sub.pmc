@@ -458,6 +458,7 @@ Archives the subroutine.
         IMAGE_IO *io = info->image_io;
         struct Parrot_sub * sub = PMC_sub(SELF);
         size_t start_offs, end_offs;
+        int i;
 
         SUPER(info);
         /*
@@ -470,6 +471,7 @@ Archives the subroutine.
          * - name_space
          * - HLL_id
          * - multi_signature
+         * - n_regs_used[i]
          */
 
         /*
@@ -491,6 +493,8 @@ Archives the subroutine.
                 PObj_get_FLAGS(pmc) & SUB_FLAG_PF_MASK);
         io->vtable->push_string(INTERP, io, sub->name);
         io->vtable->push_integer(INTERP, io, sub->HLL_id);
+        for (i = 0; i < 4; ++i)
+            io->vtable->push_integer(INTERP, io, sub->n_regs_used[i]);
     }
 
 /*
@@ -511,6 +515,7 @@ Unarchives the subroutine.
             struct Parrot_sub * sub = PMC_sub(SELF);
             size_t start_offs, end_offs;
             INTVAL flags;
+            int i;
             /*
              * we get relative offsets
              */
@@ -523,6 +528,8 @@ Unarchives the subroutine.
             PObj_get_FLAGS(SELF) |= flags & SUB_FLAG_PF_MASK;
             sub->name = io->vtable->shift_string(INTERP, io);
             sub->HLL_id  = io->vtable->shift_integer(INTERP, io);
+            for (i = 0; i < 4; ++i)
+                sub->n_regs_used[i] = io->vtable->shift_integer(INTERP, io);
         }
     }
 
