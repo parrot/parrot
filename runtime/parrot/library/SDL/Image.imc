@@ -39,7 +39,7 @@ An SDL::Image object has the following methods:
 
 .namespace [ 'SDL::Image' ]
 
-.sub _initialize @LOAD
+.sub _initialize :load
 	.local pmc surface_type
 	.local pmc image_class
 	

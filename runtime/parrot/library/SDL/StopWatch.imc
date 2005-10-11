@@ -33,7 +33,7 @@ An SDL::StopWatch object has the following methods:
 .include "iterator.pasm"
 .namespace ['SDL::StopWatch']
 
-.sub __onload @LOAD
+.sub __onload :load
     $I0 = find_type 'SDL::StopWatch'
     if $I0 > 1 goto END
 
@@ -264,7 +264,7 @@ It is drawn onto the screen consigned to the constructor.
 
 .namespace ["SDL::StopWatch::Timer"]
 
-.sub __onload @LOAD
+.sub __onload :load
     # XXX: an old array will be overwritten when loading this file again
     $P0 = new PerlArray
     store_global "SDL::StopWatch::Timer", "array", $P0

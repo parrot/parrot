@@ -53,7 +53,7 @@ whole thing may be taken out or refactored away at any moment.
 .const string PGE_SUB_POS = "@:capt"
 .const string PGE_SUB_NAMED = "%:capt"
 
-.sub "__onload" @LOAD
+.sub "__onload" :load
     .local pmc load
     load_bytecode "Data/Escape.imc"
 .end

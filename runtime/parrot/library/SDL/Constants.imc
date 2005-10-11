@@ -23,7 +23,7 @@ This library declares the following constants:
 
 .namespace [ 'SDL::Constants' ]
 
-.sub _initialize @LOAD
+.sub _initialize :load
 
 	# load the constants
 	_load_key_names()

@@ -47,7 +47,7 @@ This class defines the following methods:
 
 .namespace [ 'Test::Builder' ]
 
-.sub _initialize @LOAD
+.sub _initialize :load
 	load_bytecode 'library/Test/Builder/Test.pir'
 	load_bytecode 'library/Test/Builder/Output.pir'
 	load_bytecode 'library/Test/Builder/TestPlan.pir'

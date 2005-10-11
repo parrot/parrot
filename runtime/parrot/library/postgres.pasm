@@ -1,4 +1,4 @@
-.pcc_sub __postgres_init @LOAD
+.pcc_sub __postgres_init :load
 
 loadlib $P1, 'libpq'
 dlfunc $P2, $P1, 'PQconnectStart', 'pt'

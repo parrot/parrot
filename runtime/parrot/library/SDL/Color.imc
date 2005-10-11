@@ -50,7 +50,7 @@ SDL::Color objects have the following methods:
 
 .namespace [ 'SDL::Color' ]
 
-.sub _initialize , @LOAD
+.sub _initialize , :load
 
 	.local pmc color_class
 

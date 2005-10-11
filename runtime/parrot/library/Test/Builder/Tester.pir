@@ -65,7 +65,7 @@ This module defines the following public functions:
 
 .namespace [ 'Test::Builder::Tester::Output' ]
 
-.sub _initialize @LOAD
+.sub _initialize :load
 	.local pmc tbto_class
 	newclass tbto_class, 'Test::Builder::Tester::Output'
 	addattribute tbto_class, 'output'
@@ -162,7 +162,7 @@ This module defines the following public functions:
 
 .namespace [ 'Test::Builder::Tester' ]
 
-.sub _initialize @LOAD
+.sub _initialize :load
 	load_bytecode 'library/Test/Builder.pir'
 
 	.local pmc test

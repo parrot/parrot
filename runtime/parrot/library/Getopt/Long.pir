@@ -49,7 +49,7 @@ The subroutine get_options() is exported into the namespace 'Getopt::Long'.
 
 .include "library/dumper.imc"
 
-.sub "__onload" @LOAD
+.sub "__onload" :load
 
   # Load dependant libraries
   load_bytecode "PGE.pbc"

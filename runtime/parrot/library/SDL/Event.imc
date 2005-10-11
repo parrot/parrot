@@ -41,7 +41,7 @@ The SDL::Event object has the following methods:
 
 .namespace [ 'SDL::Event' ]
 
-.sub _initialize @LOAD
+.sub _initialize :load
 	.local pmc   event_class
 
 	newclass     event_class, 'SDL::Event'

@@ -107,7 +107,7 @@ REPLACE_PROPS:
 END:
 .end
 
-.sub __onload @LOAD
+.sub __onload :load
     $P0 = find_global "Data::Replace", "PerlArray"
     store_global "Data::Replace", "PMCArray", $P0
     store_global "Data::Replace", "StringArray", $P0

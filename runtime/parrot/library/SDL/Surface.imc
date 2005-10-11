@@ -40,7 +40,7 @@ All SDL::Surface objects have the following methods:
 
 .namespace [ 'SDL::Surface' ]
 
-.sub _initialize @LOAD
+.sub _initialize :load
 	.local pmc   surface_class
 
 	$I0 = find_type 'SDL::Surface'

@@ -22,7 +22,7 @@ TBD
 
 .include "library/Data/Escape.imc"
 
-.sub onload @LOAD, @ANON
+.sub onload :load, :anon
     .local int i
     .local pmc base
     .local pmc lines

@@ -48,7 +48,7 @@ The subsystem initalizers include:
 
 .namespace [ 'SDL' ]
 
-.sub _sdl_init @LOAD
+.sub _sdl_init :load
 	_init_video()
 
 	.local pmc layouts

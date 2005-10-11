@@ -18,7 +18,7 @@ walk the logic tree and replace it with a direct lookup or something.
 
 =cut
 
-.sub __onload @LOAD
+.sub __onload :load
     .local pmc base
     newclass base, "PGE::Class"
 

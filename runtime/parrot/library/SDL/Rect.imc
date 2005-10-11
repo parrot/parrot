@@ -44,7 +44,7 @@ An SDL::Rect object has the following methods:
 
 .namespace [ 'SDL::Rect' ]
 
-.sub _initialize @LOAD
+.sub _initialize :load
 
 	$I0 = find_type 'SDL::Rect'
 	if $I0 > 1 goto END

@@ -21,7 +21,7 @@ This class defines the following methods:
 
 .namespace [ 'Test::Builder::Output' ]
 
-.sub _initialize @LOAD
+.sub _initialize :load
 	.local pmc   tbo_class
 	newclass     tbo_class, 'Test::Builder::Output'
 	addattribute tbo_class, 'output'

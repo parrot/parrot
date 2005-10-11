@@ -32,7 +32,7 @@ version 0.1
 .include "interpinfo.pasm"
 .namespace ["Stream::Writer"]
 
-.sub __onload @LOAD
+.sub __onload :load
     find_type $I0, "Stream::Writer"
     if $I0 > 1 goto END
 

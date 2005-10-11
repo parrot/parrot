@@ -16,7 +16,7 @@ This class provides the following methods:
 
 .namespace [ 'Test::Builder::Test' ]
 
-.sub _initialize @LOAD
+.sub _initialize :load
 	.local pmc tbtb_class
 
 	newclass     tbtb_class, 'Test::Builder::Test::Base'

@@ -64,7 +64,7 @@ SDL::EventHandler provides the following methods:
 
 .namespace [ 'SDL::EventHandler' ]
 
-.sub _initialize @LOAD
+.sub _initialize :load
 
 	.local pmc   handler_class
 

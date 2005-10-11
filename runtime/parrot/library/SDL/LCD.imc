@@ -36,7 +36,7 @@ An SDL::LCD object has the following methods:
 
 .namespace ["SDL::LCD"]
 
-.sub __onload @LOAD
+.sub __onload :load
     $I0 = find_type 'SDL::LCD'
     if $I0 > 1 goto END
     

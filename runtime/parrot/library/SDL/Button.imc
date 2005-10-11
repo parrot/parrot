@@ -42,7 +42,7 @@ An SDL::Button object has the following methods:
 
 .namespace ['SDL::Button']
 
-.sub __onload @LOAD
+.sub __onload :load
 
     $I0 = find_type 'SDL::Button'
     if $I0 > 1 goto END

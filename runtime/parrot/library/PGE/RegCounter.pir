@@ -27,7 +27,7 @@ PGE::RegCounter - A register naming manager
 
 =cut
 
-.sub __onload @ANON, @LOAD
+.sub __onload :anon, :load
     newclass $P0, "PGE::RegCounter"
     addattribute $P0, ".counter"
     addattribute $P0, ".map"

@@ -49,7 +49,7 @@ consumption which should be resolved soon.
 ###########################################################################
 # Export function entries to globals
 
-.sub onload @LOAD
+.sub onload :load
 
     .local pmc f
     f = find_global "Digest", "_md5sum"
