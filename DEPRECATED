@@ -9,6 +9,7 @@ Sub object is lacking necessary meta information like name, length,
 MMD-info, and more.
 
 Use: find_name, find_global, or Sub constants instead.
+See F<docs/compiler_faq.pod> for detailed examples.
 
 =item Register stack opcodes
 
@@ -61,7 +62,7 @@ a syntax error. For example:
 Will have to be:
 
 	print $S0
-	substr $P0, 1, 2, "x"	
+	substr $P0, 1, 2, "x"
 
 
 

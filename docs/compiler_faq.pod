@@ -20,21 +20,21 @@ Parrot.
 =head2 How can I implement a compiler to use as a compiler object from within
 Parrot? (For example, with the C<compile> op.)
 
-Define a sub that takes as input a string, and returns something invokable. The
-easiest way to create something invokable at the moment is to use the builtin
-C<PIR> or C<PASM> compilers.
+Define a sub that takes as input a string, and returns something
+invokable. The easiest way to create something invokable at the moment
+is to use the builtin C<PIR> or C<PASM> compilers.
 
 See C<languages/tcl/tcl.pir_template>'s C<.sub _tcl_compile> as an example.
 
 =head2 How do I embed source locations in my code for debugging?
 
-You can do this using either the C<setfile> and C<setline> opcodes or with
-C-like C<#line> comments:
+You can do this using either the C<setfile> and C<setline> opcodes or
+with C-like C<#line> comments:
 
   #line 27 "my_source.file"
 
-Simply set the source file name or line number whenever it changes. But note
-that currently (Parrot 0.2.x) both are ignored in the lexer.
+Simply set the source file name or line number whenever it changes.
+But note that currently (Parrot 0.3.0) both are ignored in the lexer.
 
 =head1 Subroutines
 
@@ -44,8 +44,9 @@ If you have a fixed-length parameter list, IMCC makes this blindingly easy:
 
    $P0( $P1, $P2, $P3 )
 
-where $P0 is the function object, and $P1, $P2, and $P3 are its parameters. You
-can also use a function's label in place of the object:
+where $P0 is the function object, and $P1, $P2, and $P3 are its
+parameters. You can also use a function's label in place of the
+object:
 
    somefunctionlabel( $P1, $P2, $P3 )
 
@@ -53,9 +54,13 @@ You can also get return value(s):
 
   ($P1,$P2) = $P0( $P1, $P2, $P3 )
 
+If the function name might collide with a Parrot opcode, quote it:
+
+   i = "new"(42)
+
 =head2 How do I generate a method call in PIR?
 
-Similar to function calls, just append C<.> and the method:
+Similar to function calls, just append C<.> to the object and the method:
 
   ret_val = some_obj."some_meth"(arg)
 
@@ -64,6 +69,59 @@ The method name may also be a string variable representing a method name:
   .local string m
   m = "bold"
   curses_obj.m()
+
+=head2 How do I locate or create a subroutine object
+
+There are several ways to achieve this, depending on the location of
+the subroutine.
+
+If the sub is in the same compilation unit use a Sub constant:
+
+  .const .Sub foo = "foo"
+
+If the PIR compiler finds a "foo" function during compiling a file,
+then the syntax:
+
+  foo()
+
+gets translated to above constant declaration.
+
+A more dynamic way is:
+
+  .local pmc foo
+  foo = find_name "foo"
+
+This searches for a subroutine "foo" in the current lexical pad, in
+the current namespace, in the global, and in the builtin namespace in
+that order. This opcode is generated, if I<foo()> is used, but the
+compiler can't figure out, where the function is.
+
+If the subroutine is in a different namespace, use the C<find_global>
+opcode:
+
+  foo = find_global "Foo", "foo"
+
+This searches the sub "foo" in the "Foo" namespace.
+
+=head2 How do I create a Closure or Coroutine
+
+Both carry dynamic state, therefore you use one of the above ways to
+locate the sub object, then you just clone it to get a distinct copy
+of it:
+
+  .local pmc coro
+  coro = find_name "my_coro"
+  coro = clone coro
+
+Any subroutine that contains a C<.yield> directive is automatically
+created as a Coroutine PMC:
+
+  .sub my_coro             # automagically a Coroutine PMC
+     ...
+     .yield (result)
+     ...
+  .end
+
 
 =head2 How do I generate a tail call in PIR?
 
@@ -80,51 +138,56 @@ The sub C<bar> will return to the caller of C<foo>.
 
 =head2 How do I generate a sub call with a variable-length parameter list in PIR?
 
-Use unprototyped calls and functions and pass as many arguments as you have. If
-you have a variable amounts of arguments in an array, you can pass all items of
-that array with the C<.flatten_arg> directive.
+If you have a variable amounts of arguments in an array, you can
+pass all items of that array with the C<:flat> directive.
 
-  ar = new PerlArray
+  ar = new .ResitablePMCArray
   push ar, "arg 1\n"
   push ar, "arg 2\n"
-  .pcc_begin non_prototyped
-  .flatten_arg ar
-  .pcc_call sub
+  ...
+  foo(ar :flat)
   ...
 
 =head2 How to I retrieve the contents of a variable-length parameter list being passed to me?
 
-You can check the passed PMC parameter count in the subroutine with the argcP
-variable (an alias to I3). Remember, the first eleven PMC parameters are passed
-in P5 through P15, with overflow parameters an array-like PMC in P3.
+Use a slurpy array:
 
-A simpler way is to use the C<foldup> opcode, which creates an array of all
-passed PMC arguments.
-
-  .sub _mysub non_prototyped
-    .local pmc argv
+  .sub mysub
+    .param pmc argv      :slurpy
     .local int argc
-    argv = foldup
     argc = argv
     ...
 
-If you have a few fixed parameters too, you can use a variant of C<foldup> to
-capture variable arguments from that position on.
+If you have a few fixed parameters too, you can use a slurpy array
+to get the rest of the arguments
 
-  .sub _mysub non_prototyped
+  .sub mysub
     .param pmc arg0
     .param pmc arg1
-    .local pmc varargs
+    .param pmc varargs   :slurpy
     .local int num_varargs
-    varargs = foldup, 2
     num_varargs = varargs
     ...
 
+=head2 How do I pass optional arguments
+
+Use the C<:optional> and C<:opt_flag> pragmas:
+
+  .sub foo
+     .param pmc arg1       :optional
+     .param int has_arg1   :opt_flag
+     .param pmc arg2       :optional
+     .param int has_arg2   :opt_flag
+
+     if has_arg1 goto got_arg1
+     ...
+
 =head2 How do I create nested subroutines?
 
-PIR doesn't support nested subroutines. You have to emit subroutines one by
-one. If lexicals of the outer subroutine are visible inside the nested sub, you
-have to include the outer pad depth in C<new_pad> opcodes.
+PIR doesn't support nested subroutines. You have to emit subroutines
+one by one. If lexicals of the outer subroutine are visible inside the
+nested sub, you have to include the outer pad depth in C<new_pad>
+opcodes.
 
 =head1 Variables
 
@@ -143,8 +206,8 @@ or the C<find_global> op:
 You can retrieve the namespace hash and use the C<delete> opcode.  Nested
 namespace names have a NULL char prepended to their name.
 
-  .sub main @MAIN
-    $P0 = new Integer
+  .sub main :main
+    $P0 = new .Integer
     store_global "foo", $P0
     store_global "Bar", "baz", $P0
     # ...
@@ -246,7 +309,7 @@ You can C<peek_pad> the current pad and use C<delete>.
 
   .sub main @MAIN
     new_pad 0
-    $P0 = new Integer
+    $P0 = new .Integer
     store_lex -1, "foo", $P0
     .local pmc pad
     pad = peek_pad
@@ -313,7 +376,7 @@ keyword appended to the function declaration:
   .namespace [ "Animal" ]
 
   .sub __init method
-    $P0 = new Integer
+    $P0 = new .Integer
     setattribute self, "legs", $P0
     ...
   .end
@@ -344,19 +407,19 @@ or
 
 =head2 When should I use properties vs. attributes?
 
-Properties aren't inherited. If you have some additional data that don't fit
-into the classes hierarchy, you could use properties.
+Properties aren't inherited. If you have some additional data that
+don't fit into the classes hierarchy, you could use properties.
 
 =head2 How do I create a class that is a subclass of another class?
 
-You first have to get the class PMC of the class you want to subclass.  Either
-you use the PMC returned by the C<newclass> op if you created the class, or use
-the C<getclass> op:
+You first have to get the class PMC of the class you want to subclass.
+Either you use the PMC returned by the C<newclass> op if you created
+the class, or use the C<getclass> op:
 
     getclass $P0, "Animal"
 
-Then you can use the C<subclass> op to create a new class that is a subclass of
-this class:
+Then you can use the C<subclass> op to create a new class that is a
+subclass of this class:
 
     subclass $P1, $P0, "Dog"
 
@@ -364,14 +427,15 @@ This stores the newly created class PMC in $P1.
 
 =head2 How do I create a class that has more than one parent class?
 
-First, create a class without a parent class using C<newclass> (or with only
-one subclass, see previous question). Then add the other parent classes to it.
-Please refer to the next question for an example.
+First, create a class without a parent class using C<newclass> (or
+with only one subclass, see previous question). Then add the other
+parent classes to it.  Please refer to the next question for an
+example.
 
 =head2 How do I add another parent class to my class?
 
-If you have a class PMC (created with C<newclass> or by C<subclass>), you can
-add more parent classes to it with the C<addparent> op:
+If you have a class PMC (created with C<newclass> or by C<subclass>),
+you can add more parent classes to it with the C<addparent> op:
 
     getclass $P1, "Dog"
     subclass $P2, $P1, "SmallDog"
@@ -390,11 +454,11 @@ Just define a method named C<__init> in the namespace if the class.
     .sub __init method
       # ...
 
-Or you can specify the constructor method by setting the BUILD property of the
-class PMC:
+Or you can specify the constructor method by setting the BUILD
+property of the class PMC:
 
     newclass $P0, "Dog"         # create a class named Dog
-    new $P1, .PerlString        # create a string
+    new $P1, .String            # create a string
     set $P1, "initialise"       # set it to the name of the constructor method
     setprop $P0, "BUILD", $P1   # set the BUILD property
 
@@ -416,9 +480,9 @@ During the C<new> opcode the constructor is called.
 
 =head2 How can I pass arguments to an constructor?
 
-You can pass only a single argument to a constructor.  By convention, a hash
-PMC is passed to the constructor that contains the arguments as key/value
-pairs:
+You can pass only a single argument to a constructor.  By convention,
+a hash PMC is passed to the constructor that contains the arguments as
+key/value pairs:
 
     new $P0, .Hash
     set $P0["greeting"], "hello"
@@ -438,14 +502,14 @@ pairs:
 
 Create an Exception object and throw it!
 
-    $P0 = new Exception
+    $P0 = new .Exception
     throw $P0
 
 Not too hard, is it?
 
 =head2 How do I throw an exception with an error message in PIR?
 
-    $P0 = new Exception
+    $P0 = new .Exception
     $P0["_message"] = "something happened"
     throw $P0
 
@@ -454,7 +518,7 @@ Not too hard, is it?
 Use C<push_eh> to push an exception handler onto the stack.
 
     push_eh handler
-    $P0 = new Exception         # or any other code ...
+    $P0 = new .Exception         # or any other code ...
     throw $P0                   # ... that might throw
     clear_eh
     exit 0
@@ -468,7 +532,7 @@ Use C<push_eh> to push an exception handler onto the stack.
 P5 is the register used for the Exception object.
 
     push_eh handler
-    $P0 = new Exception
+    $P0 = new .Exception
     $P0["_message"] = "something happened"
     throw $P0
     clear_eh
@@ -497,15 +561,8 @@ Create a new C<Env> PMC and access it like a hash.
     .local pmc interp, cfg
     interp = getinterp
     cfg = interp[.IGLOBALS_CONFIG_HASH]
-    $S0 = cfg['VERSION']     "0.2.2"
+    $S0 = cfg['VERSION']     "0.3.0"
 
 See F<config_lib.pasm> for all the keys in the config hash - or iterate over
 the config hash.
 
-=head1 VERSION
-
-=over 4
-
-=item Revision 0.5 - 2005.08.03
-
-=back

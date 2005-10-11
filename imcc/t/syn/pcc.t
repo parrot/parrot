@@ -3,22 +3,23 @@
 # $Id$
 
 use strict;
-use Parrot::Test tests => 45;
+use Parrot::Test tests => 23;
 
 ##############################
 # Parrot Calling Conventions
 
-pir_output_is(<<'CODE', <<'OUT', "basic syntax - invokecc, constants");
-.sub test @MAIN
-    .local Sub sub
-    newsub sub, .Sub, _sub
+pir_output_is(<<'CODE', <<'OUT', "low-level syntax");
+.sub test :main
+    .const .Sub sub = "_sub"
     .const int y = 20
     .pcc_begin
     .arg 10
     .arg y
     .pcc_call sub
-    ret:
+    .local string z
+    .result z
     .pcc_end
+    print z
     end
 .end
 .pcc_sub _sub
@@ -28,99 +29,99 @@ pir_output_is(<<'CODE', <<'OUT', "basic syntax - invokecc, constants");
     print "\n"
     print b
     print "\n"
-    end
+    .return ("ok\n")
 .end
 CODE
 10
 20
+ok
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "constants, bug 24667");
-.sub _main
-    .local Sub sub
-    newsub sub, .Sub, _sub
-    .pcc_begin
-    .arg 5
-    .arg 6
-    .arg 7
-    .pcc_call sub
-    .pcc_end
+pir_output_is(<<'CODE', <<'OUT', "func() syntax");
+.sub test :main
+    .const int y = 20
+    .local string z
+    z = _sub(10, y)
+    print z
+    end
+.end
+.pcc_sub _sub
+    .param int a
+    .param int b
+    print a
+    print "\n"
+    print b
+    print "\n"
+    .return ("ok\n")
+.end
+CODE
+10
+20
+ok
+OUT
+
+
+pir_output_is(<<'CODE', <<'OUT', "quoted sub names");
+.sub main :main
+    "foo"()
+    print "ok\n"
+.end
+
+.sub "foo"
+    print "foo\n"
+    "new"()
+.end
+
+.sub "new"
+    print "new\n"
+.end
+CODE
+foo
+new
+ok
+OUT
+
+pir_output_is(<<'CODE', <<'OUT', "_func() syntax with var - global");
+.sub test :main
+    .local pmc the_sub
+    the_sub = global "_sub"
+    the_sub(10, 20)
     end
 .end
 .sub _sub
     .param int a
     .param int b
-    .param int c
     print a
     print "\n"
     print b
     print "\n"
-    print c
-    print "\n"
-    end
-.end
-CODE
-5
-6
-7
-OUT
-
-pir_output_is(<<'CODE', <<'OUT', "basic syntax - order of return values");
-.sub test @MAIN
-    .local Sub sub
-    newsub sub, .Sub, _sub
-    .pcc_begin
-    .pcc_call sub
-    ret:
-    .local int A
-    .local int B
-    .local int C
-    .result A
-    .result B
-    .result C
-    .pcc_end
-    print A
-    print "\n"
-    print B
-    print "\n"
-    print C
-    print "\n"
-    end
-.end
-.pcc_sub _sub
-    .pcc_begin_return
-    .return 10
-    .return 20
-    .return 30
-    .pcc_end_return
     end
 .end
 CODE
 10
 20
-30
 OUT
 
-##############################
-# tail recursion - caller saves - parrot calling convention
+pir_output_is(<<'CODE', "42\n", "multiple returns");
+.sub test :main
+.local int a, b
+  (a, b) = _sub()
+  print a
+  print b
+  print "\n"
+.end
+
+.sub _sub
+.return ( 4,  2 )
+.end
+CODE
+
 pir_output_is(<<'CODE', <<'OUT', "tail recursive sub");
-.sub test @MAIN
-    .local int count
+.sub test :main
+    .local int count, product, result
     count = 5
-    .local int product
     product = 1
-    .local Sub sub
-    .local RetContinuation cc
-    newsub sub, .Sub, _fact
-    newsub cc, .RetContinuation, ret
-   .pcc_begin
-   .arg product
-   .arg count
-   .pcc_call sub, cc
- ret:
-   .local int result
-    .result result
-    .pcc_end
+    result = _fact(product, count)
     print result
     print "\n"
     end
@@ -129,195 +130,16 @@ pir_output_is(<<'CODE', <<'OUT', "tail recursive sub");
 .pcc_sub _fact
    .param int product
    .param int count
-   if count <= 1 goto fin
+   if count > 1 goto recur
+   .return (product)
+recur:
    product = product * count
    dec count
-   product = _fact(product, count)
-fin:
-   .pcc_begin_return
-    .return product
-   .pcc_end_return
+   .return _fact(product, count)
 .end
 
 CODE
 120
-OUT
-
-pir_output_is(<<'CODE', <<'OUT', "proto call, proto sub, invokecc, P param");
-.sub test @MAIN
-    .local Sub sub
-    newsub sub, .Sub, _sub
-    $P0 = new Undef
-    $P0 = "ok 1\n"
-    $P1 = new Undef
-    $P1 = "ok 2\n"
-    .pcc_begin
-    .arg $P0
-    .arg $P1
-    .pcc_call sub
-    ret:
-    .pcc_end
-    print "back\n"
-    end
-.end
-.pcc_sub _sub
-    .param Undef a
-    .param Undef b
-    print a
-    print b
-   .pcc_begin_return
-   .pcc_end_return
-.end
-CODE
-ok 1
-ok 2
-back
-OUT
-pir_output_is(<<'CODE', <<'OUT', "proto call, un proto sub, invokecc, P param");
-.sub test @MAIN
-    .local Sub sub
-    newsub sub, .Sub, _sub
-    $P0 = new Undef
-    $P0 = "ok 1\n"
-    $P1 = new Undef
-    $P1 = "ok 2\n"
-    .pcc_begin
-    .arg $P0
-    .arg $P1
-    .pcc_call sub
-    ret:
-    .pcc_end
-    print "back\n"
-    end
-.end
-.pcc_sub _sub
-    .param Undef a
-    .param Undef b
-    print a
-    print b
-   .pcc_begin_return
-   .pcc_end_return
-.end
-CODE
-ok 1
-ok 2
-back
-OUT
-
-pir_output_is(<<'CODE', <<'OUT', "proto call, proto sub, invokecc, S param");
-.sub test @MAIN
-    .local Sub sub
-    newsub sub, .Sub, _sub
-    $S0 = "ok 1\n"
-    $S1 = "ok 2\n"
-    .pcc_begin
-    .arg $S0
-    .arg $S1
-    .pcc_call sub
-    ret:
-    .pcc_end
-    print "back\n"
-    end
-.end
-.pcc_sub _sub
-    .param string a
-    .param string b
-    print a
-    print b
-   .pcc_begin_return
-   .pcc_end_return
-.end
-CODE
-ok 1
-ok 2
-back
-OUT
-
-pir_output_is(<<'CODE', <<'OUT', "proto call, nonproto sub, invokecc, S param");
-.sub test @MAIN
-    .local Sub sub
-    newsub sub, .Sub, _sub
-    $S0 = "ok 1\n"
-    $S1 = "ok 2\n"
-    .pcc_begin
-    .arg $S0
-    .arg $S1
-    .pcc_call sub
-    ret:
-    .pcc_end
-    print "back\n"
-    end
-.end
-.pcc_sub _sub
-    .param string a
-    .param string b
-    print a
-    print b
-   .pcc_begin_return
-   .pcc_end_return
-.end
-CODE
-ok 1
-ok 2
-back
-OUT
-
-pir_output_is(<<'CODE', <<'OUT', "proto call, unproto sub, invokecc, S param");
-.sub test @MAIN
-    .local Sub sub
-    newsub sub, .Sub, _sub
-    $S0 = "ok 1\n"
-    $S1 = "ok 2\n"
-    .pcc_begin
-    .arg $S0
-    .arg $S1
-    .pcc_call sub
-    ret:
-    .pcc_end
-    print "back\n"
-    end
-.end
-.pcc_sub _sub
-    .param string a
-    .param string b
-    print a
-    print b
-   .pcc_begin_return
-   .pcc_end_return
-.end
-CODE
-ok 1
-ok 2
-back
-OUT
-
-pir_output_is(<<'CODE', <<'OUT', "non_proto call, unproto sub, invokecc, S param");
-.sub test @MAIN
-    .local Sub sub
-    newsub sub, .Sub, _sub
-    $S0 = "ok 1\n"
-    $S1 = "ok 2\n"
-    .pcc_begin
-    .arg $S0
-    .arg $S1
-    .pcc_call sub
-    ret:
-    .pcc_end
-    print "back\n"
-    end
-.end
-.pcc_sub _sub
-    .param string a
-    .param string b
-    print a
-    print b
-   .pcc_begin_return
-   .pcc_end_return
-.end
-CODE
-ok 1
-ok 2
-back
 OUT
 
 
@@ -343,44 +165,33 @@ OUT
 #	}
 
 pir_output_is(<<'CODE', <<'OUT', "coroutine iterator");
-.sub test @MAIN
+.sub test :main
   .local int i
   i=5
-  newsub $P0, .Coroutine, _addtwo
   newsub $P1, .Continuation, after_loop
-  .pcc_begin
-  .arg $P1
-  .arg i
-  .pcc_call $P0
- ret_addr:
-  .result $I2
-  .pcc_end
+loop:
+  $I2 = _addtwo($P1, i)
     print $I2
     print "\n"
-    invokecc $P0
-    goto ret_addr
+    goto loop
  after_loop:
   print "done in main\n"
-  end
 .end
 
-.pcc_sub _addtwo
-  .param Continuation when_done
+.sub _addtwo
+  .param pmc when_done
   .param int a
   .local int i
   i = 0
  loop:
     if i >= 10 goto done
     $I5 = a+i
-    .pcc_begin_yield
-    .return $I5
-    .pcc_end_yield
+    .yield($I5)
     i = i + 1
     goto loop
  done:
   print "done in coroutine\n"
   invokecc when_done
-  end
 .end
 CODE
 5
@@ -397,331 +208,52 @@ done in coroutine
 done in main
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "sub calling another sub, SRegs");
-.sub test @MAIN
-    .local Sub sub
-    newsub sub, .Sub, _sub
-    $S0 = "ok 1\n"
-    $S1 = "ok 2\n"
-    .pcc_begin
-    .arg $S0
-    .arg $S1
-    .pcc_call sub
-    ret:
-    .pcc_end
-    print "back\n"
-    end
-.end
-.pcc_sub _sub
-    .param string a
-    .param string b
-    print a
-    print b
-    .local Sub sub
-    newsub sub, .Sub, _sub2
-    $S0 = "ok 3\n"
-    $S1 = "ok 4\n"
-    .pcc_begin
-    .arg $S0
-    .arg $S1
-    .pcc_call sub
-    ret:
-    .pcc_end
-    print a
-    print b
-   .pcc_begin_return
-   .pcc_end_return
-.end
-.pcc_sub _sub2
-    .param string a
-    .param string b
-    print a
-    print b
-   .pcc_begin_return
-   .pcc_end_return
-.end
-CODE
-ok 1
-ok 2
-ok 3
-ok 4
-ok 1
-ok 2
-back
-OUT
-
-pir_output_is(<<'CODE', <<'OUT', "sub calling another sub, PRegs");
-.sub test @MAIN
-    .local Sub sub
-    newsub sub, .Sub, _sub
-    $P0 = new Undef
-    $P1 = new Undef
-    $P0 = "ok 1\n"
-    $P1 = "ok 2\n"
-    .pcc_begin
-    .arg $P0
-    .arg $P1
-    .pcc_call sub
-    ret:
-    .pcc_end
-    print "back\n"
-    end
-.end
-.pcc_sub _sub
-    .param Undef a
-    .param Undef b
-    print a
-    print b
-    .local Sub sub
-    newsub sub, .Sub, _sub2
-    $P0 = new Undef
-    $P1 = new Undef
-    $P0 = "ok 3\n"
-    $P1 = "ok 4\n"
-    .pcc_begin
-    .arg $P0
-    .arg $P1
-    .pcc_call sub
-    ret:
-    .pcc_end
-    print a
-    print b
-   .pcc_begin_return
-   .pcc_end_return
-.end
-.pcc_sub _sub2
-    .param Undef a
-    .param Undef b
-    print a
-    print b
-   .pcc_begin_return
-   .pcc_end_return
-.end
-CODE
-ok 1
-ok 2
-ok 3
-ok 4
-ok 1
-ok 2
-back
-OUT
-
-pir_output_is(<<'CODE', <<'OUT', "in, out different P param, 2 subs");
-.sub test @MAIN
-    .local Sub sub
-    .local Undef x
-    x = new Undef
-    x = 42
-    newsub sub, .Sub, _sub
-    .pcc_begin
-    .arg x
-    .pcc_call sub
-    ret:
-    .local Undef y
-    .result y
-    .pcc_end
-    .local Undef z
-    z = y
-    .pcc_begin
-    .arg y
-    .pcc_call sub
-    ret2:
-    .result y
-    .pcc_end
-    print x
-    print "\n"
-    print y
-    print "\n"
-    print z
-    print "\n"
-    end
-.end
-.pcc_sub _sub
-    .param Undef a
-    .local Undef res
-    res = new Undef
-    res = a + 1
-    .pcc_begin_return
-    .return res
-    .pcc_end_return
-.end
-CODE
-42
-44
-43
-OUT
-
-pir_output_is(<<'CODE', <<'OUT', "sub calling another");
-# sub g() { return 42; }
-# sub f() { return g(); }
-# print f(), "\n"
-# mostly generated from pirate.py
-
-.sub __main__
-    new_pad 0
-    newsub $P0, .Sub, _sub0       # (genFunction:378)
-    store_lex -1, 'g', $P0        # (genFunction:380)
-    newsub $P1, .Sub, _sub1       # (genFunction:378)
-    store_lex -1, 'f', $P1        # (genFunction:380)
-    find_lex $P5, 'f'             # (callingExpression:325)
-    newsub $P6, .RetContinuation, ret1 # (callingExpression:331)
-    .pcc_begin                    # (callingExpression:332)
-    .pcc_call $P5, $P6            # (callingExpression:335)
-ret1:
-    .result $P4                   # (callingExpression:338)
-    .pcc_end                      # (callingExpression:339)
-    print $P4                     # (visitPrint:394)
-    print "\n"                    # (visitPrintnl:403)
-    end                           # (compile:574)
-.end
-
-# g from line 1
-.pcc_sub _sub0
-    .local pmc res0               # (visitReturn:528)
-    res0 = new Integer            # (expressConstant:153)
-    res0 = 42                     # (expressConstant:154)
-    .pcc_begin_return             # (visitReturn:530)
-    .return res0                  # (visitReturn:531)
-    .pcc_end_return               # (visitReturn:532)
-.end
-
-
-# f from line 3
-.pcc_sub _sub1
-    .local pmc res1               # (visitReturn:528)
-    find_lex $P2, 'g'             # (callingExpression:325)
-    newsub $P3, .RetContinuation, ret0 # (callingExpression:331)
-    .pcc_begin                    # (callingExpression:332)
-    .pcc_call $P2, $P3            # (callingExpression:335)
-ret0:
-    .result res1                  # (callingExpression:338)
-    .pcc_end                      # (callingExpression:339)
-    .pcc_begin_return             # (visitReturn:530)
-    .return res1                  # (visitReturn:531)
-    .pcc_end_return               # (visitReturn:532)
-.end
-CODE
-42
-OUT
-
-
-pir_output_is(<<'CODE', <<'OUT', "coroutine generator throwing exception");
-## this is mainly from Michal Wallace
-## generator_try_bug.imc
-
-## this exposes a bug in parrot exception handling
-## a function returns a function and that function
-## throws an error. The error is not caught.
-
-# count returns a generator, which counts down to zero and then
-# throws an exception, which is caught in main
-
-.sub __main__
-    new_pad 0
-
-    # count() returns a generator
-    .local Sub count
-    newsub count, .Sub, _count
-
-    # here's where we'll store it
-    .local pmc generator
-
-    # call count and get the generator
-    .local Integer start
-    start = new Integer
-    start = 3
-    .pcc_begin
-    .arg start
-    .pcc_call count
-ret0:
-    .result generator
-    .pcc_end
-
-
-    ## HERE IS where we want the try block to start ####
-    .local Sub handler
-    push_eh catch0
-
-    # now call the generator, until that throws 'StopIteration'
-    # protect against endless loops
-    set I20, 10
+pir_output_is(<<'CODE', <<'OUT', "coroutine iterator - throw stop");
+.sub test :main
+  .local int i
+  i=5
+  push_eh after_loop
 loop:
-    dec I20
-    unless I20, err
-    .pcc_begin
-    .arg $P0
-    .pcc_call generator
-ret1:
-    .result $P0
-    .pcc_end
-    print $P0
+  $I2 = _addtwo(i)
+    print $I2
     print "\n"
     goto loop
-
-    # end the "try" block (we never get here)
-    clear_eh
-    goto endtry0
-catch0:
-    print "caught it!\n"
-endtry0:
-    end
-err:
-    print "didn't stop\n"
-    end
+ after_loop:
+  print "done in main\n"
 .end
 
-# here is count(), which returns the generator
-.pcc_sub _count
-   .param Integer start
-   .local pmc gen_fun
-   .local pmc gen_obj
-   store_lex -1, "start", start
-   newsub gen_fun, .Coroutine, _count_g
-   .pcc_begin_return
-   .return gen_fun
-   .pcc_end_return
+.sub _addtwo
+  .param int a
+  .local int i
+  i = 0
+ loop:
+    if i >= 10 goto done
+    $I5 = a+i
+    .yield($I5)
+    i = i + 1
+    goto loop
+ done:
+  print "done in coroutine\n"
+  new $P0, .Exception
+  throw $P0
 .end
-
-# here is the generator itself
-# all it does is throw StopIteration
-.pcc_sub _count_g
-    .local Integer c
-count_loop:
-    find_lex c, -1, "start"
-    lt c, 0, stop
-    .pcc_begin_yield
-    .return c
-    .pcc_end_yield
-    c = c - 1
-    # this branch was to _coung_g, which isn't quite right
-    # code shouldn't branch to the entry label, where some
-    # function prologue does exist
-    # OTOH there might be some more bugs with coruoutines
-    goto count_loop
-
-stop:
-    .local pmc ex0
-    .local pmc msg0
-    ex0 = new Exception
-    msg0 = new String
-    msg0 = 'StopIteration'
-    ex0['_message'] = msg0
-    throw ex0
-.end
-
-## end of test case ###############################
-
 CODE
-3
-2
-1
-0
-caught it!
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+done in coroutine
+done in main
 OUT
 
     my $template = <<'TEMPLATE';
-.sub test @MAIN
+.sub test :main
     =LOCALS=
     =INITS=
     .local Sub sub
@@ -810,139 +342,34 @@ all params ok
 OUT
 
 
-pir_output_is(<<'CODE', <<'OUT', ".arg :flat 1");
-.pcc_sub _main
-    .local Sub sub
-    newsub sub, .Sub, _sub
-    .local pmc ar
-    ar = new PerlArray
-    push ar, "ok 1\n"
-    push ar, "ok 2\n"
-    .pcc_begin
-    .arg ar :flat
-    .pcc_call sub
-    ret:
-    .pcc_end
-    end
-.end
-.pcc_sub _sub
-    .param pmc a
-    .param pmc b
-    print a
-    print b
-    end
-.end
-CODE
-ok 1
-ok 2
-OUT
-
-pir_output_is(<<'CODE', <<'OUT', ".arg :flat non-prototyped 2");
-.pcc_sub _main
-    .local Sub sub
-    newsub sub, .Sub, _sub
-    .local pmc ar
-    .local pmc x
-    x = new String
+pir_output_is(<<'CODE', <<'OUT', ".arg :flat");
+.sub _main
+    .local pmc x, y, z, ar, ar2, s
+    x = new .String
     x = "first\n"
-    ar = new PerlArray
-    push ar, "ok 1\n"
-    push ar, "ok 2\n"
-    .pcc_begin
-    .arg x
-    .arg ar :flat
-    .pcc_call sub
-    ret:
-    .pcc_end
-    end
-.end
-.pcc_sub _sub
-    .param pmc a
-    .param pmc b
-    print a
-    print b
-    end
-.end
-CODE
-first
-ok 1
-OUT
-
-pir_output_is(<<'CODE', <<'OUT', ".arg :flat non-prototyped 3");
-.pcc_sub _main
-    .local Sub sub
-    newsub sub, .Sub, _sub
-    .local pmc ar
-    .local pmc x
-    x = new String
-    x = "first\n"
-    .local pmc y
-    y = new String
-    y = "last\n"
-    ar = new PerlArray
-    push ar, "ok 1\n"
-    push ar, "ok 2\n"
-    .pcc_begin
-    .arg x
-    .arg ar :flat
-    .arg y
-    .pcc_call sub
-    ret:
-    .pcc_end
-    end
-.end
-.pcc_sub _sub
-    .param pmc a
-    .param pmc b
-    .param pmc c
-    .param pmc d
-    print a
-    print b
-    print c
-    print d
-    end
-.end
-CODE
-first
-ok 1
-ok 2
-last
-OUT
-
-pir_output_is(<<'CODE', <<'OUT', ".arg :flat non-prototyped 4");
-.pcc_sub _main
-    .local Sub sub
-    newsub sub, .Sub, _sub
-    .local pmc x
-    x = new String
-    x = "first\n"
-    .local pmc y
-    y = new String
+    y = new .String
     y = "middle\n"
-    .local pmc z
-    z = new String
+    z = new .String
     z = "last\n"
-    .local pmc ar
-    ar = new PerlArray
+    ar = new .ResizablePMCArray
     push ar, "ok 1\n"
     push ar, "ok 2\n"
-    .local pmc ar2
-    ar2 = new PerlArray
+    ar2 = new .ResizablePMCArray
     push ar2, "ok 3\n"
     push ar2, "ok 4\n"
     push ar2, "ok 5\n"
+    .const .Sub s = "_sub"
     .pcc_begin
     .arg x
     .arg ar :flat
     .arg y
     .arg ar2 :flat
     .arg z
-    .pcc_call sub
-    ret:
+    .pcc_call s
     .pcc_end
     end
 .end
-.pcc_sub _sub
+.sub _sub
     .param pmc a
     .param pmc b
     .param pmc c
@@ -959,7 +386,6 @@ pir_output_is(<<'CODE', <<'OUT', ".arg :flat non-prototyped 4");
     print f
     print g
     print h
-    end
 .end
 CODE
 first
@@ -972,40 +398,27 @@ ok 5
 last
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', ".arg :flat prototyped 1");
-.pcc_sub _main
-    .local Sub sub
-    newsub sub, .Sub, _sub
-    .local pmc x
-    x = new String
+pir_output_is(<<'CODE', <<'OUT', "foo (arg :flat)");
+.sub _main
+    .local pmc x, y, z, ar, ar2
+    x = new .String
     x = "first\n"
-    .local pmc y
-    y = new String
+    y = new .String
     y = "middle\n"
-    .local pmc z
-    z = new String
+    z = new .String
     z = "last\n"
-    .local pmc ar
-    ar = new PerlArray
+    ar = new .ResizablePMCArray
     push ar, "ok 1\n"
     push ar, "ok 2\n"
-    .local pmc ar2
-    ar2 = new PerlArray
+    ar2 = new .ResizablePMCArray
     push ar2, "ok 3\n"
     push ar2, "ok 4\n"
     push ar2, "ok 5\n"
-    .pcc_begin
-    .arg x
-    .arg ar :flat
-    .arg y
-    .arg ar2 :flat
-    .arg z
-    .pcc_call sub
-    ret:
-    .pcc_end
+    _sub(x, ar :flat, y, ar2 :flat, z)
     end
 .end
-.pcc_sub _sub
+
+.sub _sub
     .param pmc a
     .param pmc b
     .param pmc c
@@ -1022,8 +435,8 @@ pir_output_is(<<'CODE', <<'OUT', ".arg :flat prototyped 1");
     print f
     print g
     print h
-    end
 .end
+
 CODE
 first
 ok 1
@@ -1033,174 +446,18 @@ ok 3
 ok 4
 ok 5
 last
-OUT
-
-pir_output_is(<<'CODE', <<'OUT', ".arg :flat - overflow");
-.pcc_sub _main
-    .local Sub sub
-    newsub sub, .Sub, _sub
-    .local pmc x
-    x = new String
-    x = "first\n"
-    .local pmc y
-    y = new String
-    y = "middle\n"
-    .local pmc z
-    z = new String
-    z = "last\n"
-    .local pmc ar
-    ar = new PerlArray
-    push ar, "ok 1\n"
-    push ar, "ok 2\n"
-    .local pmc ar2
-    ar2 = new PerlArray
-    push ar2, "ok 3\n"
-    push ar2, "ok 4\n"
-    push ar2, "ok 5\n"
-    push ar2, "ok 6\n"
-    push ar2, "ok 7\n"
-    push ar2, "ok 8\n"
-    push ar2, "ok 9\n"
-    push ar2, "ok 10\n"
-    push ar2, "ok 11\n"
-    push ar2, "ok 12\n"
-    .pcc_begin
-    .arg x
-    .arg ar :flat
-    .arg y
-    .arg ar2 :flat
-    .arg z
-    .pcc_call sub
-    ret:
-    .pcc_end
-    end
-.end
-.pcc_sub _sub
-    .param pmc a
-    .param pmc b
-    .param pmc c
-    .param pmc d
-    .param pmc e
-    .param pmc f
-    .param pmc g
-    .param pmc h
-    .param pmc i
-    .param pmc j
-    .param pmc k
-    .param pmc l
-    .param pmc m
-    .param pmc n
-    .param pmc o
-    print a
-    print b
-    print c
-    print d
-    print e
-    print f
-    print g
-    print h
-    print i
-    print j
-    print k
-    print l
-    print m
-    print n
-    print o
-    end
-.end
-CODE
-first
-ok 1
-ok 2
-middle
-ok 3
-ok 4
-ok 5
-ok 6
-ok 7
-ok 8
-ok 9
-ok 10
-ok 11
-ok 12
-last
-OUT
-
-pir_output_is(<<'CODE', <<'OUT', ".arg :flat multiple instances");
-.pcc_sub _main
-    .local Sub sub
-    newsub sub, .Sub, _sub
-    .local pmc ar
-    ar = new PerlArray
-    push ar, "ok 1\n"
-    push ar, "ok 2\n"
-    .pcc_begin
-    .arg ar :flat
-    .pcc_call sub
-    ret:
-    .pcc_end
-    .pcc_begin
-    .arg ar :flat
-    .pcc_call sub
-    ret2:
-    .pcc_end
-    end
-.end
-.pcc_sub _sub
-    .param pmc a
-    .param pmc b
-    print a
-    print b
-    .pcc_begin_return
-    .pcc_end_return
-    end
-.end
-CODE
-ok 1
-ok 2
-ok 1
-ok 2
-OUT
-
-pir_output_is(<<'CODE', <<'OUT', "(regression) comment handling in pcc_params");
-.sub __main
-	.local Sub main_sub
-	newsub main_sub, .Sub, _main
-	.pcc_begin
-        .arg P5
-	.pcc_call main_sub
-ret:
-	.pcc_end
-        print "ok\n"
-	end
-.end
-
-.pcc_sub _main
-#Positional parameters:
-	.param Array command_line
-        .pcc_begin_return
-        .pcc_end_return
-.end
-CODE
-ok
 OUT
 
 SKIP: {
   skip("cant do NCI on $^O", 1) unless ($^O =~ /linux/ || $^O =~ /darwin/);
 pir_output_is(<<'CODE', <<'OUT', "nci");
-.sub test @MAIN
-    .sym pmc FABS
-    .sym pmc NULL
+.sub test :main
+    .local pmc FABS, NULL
     null NULL
     dlfunc FABS, NULL, "fabs", "dd"
-    .sym float d
-    .sym float r
+    .local float d, r
     d = -42
-    .pcc_begin
-    .arg d
-    .nci_call FABS
-    .result r
-    .pcc_end
+    r = FABS(d)
     print d
     print "\n"
     print r
@@ -1213,8 +470,8 @@ CODE
 OUT
 }
 
-pir_output_is(<<'CODE', <<'OUT', "MAIN pragma, syntax only");
-.sub _main @MAIN
+pir_output_is(<<'CODE', <<'OUT', ":main pragma, syntax only");
+.sub _main :main
     print "ok\n"
     end
 .end
@@ -1226,7 +483,7 @@ OUT
   # "-o code.pbc -r -r" command line params.
   # Strangely, the same output is written
 pir_output_like(<<'CODE', <<'OUT', "more pragmas, syntax only");
-.sub _main @MAIN, @LOAD, @POSTCOMP
+.sub _main :main :load :postcomp
     print "ok\n"
     end
 .end
@@ -1234,268 +491,11 @@ CODE
 /(ok\n){1,2}/
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "_func() syntax");
-.sub test @MAIN
-    _sub(10, 20)
-    end
-.end
-.pcc_sub _sub
-    .param int a
-    .param int b
-    print a
-    print "\n"
-    print b
-    print "\n"
-    end
-.end
-CODE
-10
-20
-OUT
-pir_output_is(<<'CODE', <<'OUT', "_func() syntax with var");
-.sub test @MAIN
-    .local pmc the_sub
-    the_sub = global "_sub"
-    the_sub(10, 20)
-    end
-.end
-.pcc_sub _sub
-    .param int a
-    .param int b
-    print a
-    print "\n"
-    print b
-    print "\n"
-    end
-.end
-CODE
-10
-20
-OUT
-
-pir_output_is(<<'CODE', <<'OUT', "P3 is NULL - 11 args");
-.sub test @MAIN
-    P3 = new .Array
-    # call with 11 parameters
-    _foo($P1, $P2, $P3, $P4, $P5, $P6, $P7, $P8, $P9, $P10, $P11)
-    end
-.end
-
-.sub _foo
-    if_null P3, p3_is_null
-    print "P3 is not NULL\n"
-    goto return
-p3_is_null:
-    print "P3 is NULL\n"
-return:
-.end
-CODE
-P3 is NULL
-OUT
-
-
-pir_output_is(<<'CODE', "mongueur\nmonger\n", "multiple declaration in a .sym/.local directive");
-.sub main
-.sym string s, t
-  s = "mongueur\n"
-  t = "monger\n"
-  print s
-  print t
-  end
-.end
-CODE
-
-pir_output_is(<<'CODE', "42\n", "oneliner return");
-.sub test @MAIN
-.sym int a, b
-  (a, b) = _sub()
-  print a
-  print b
-  print "\n"
-  _sub1()
-  end
-.end
-
-.sub _sub
-.return ( 4,  2 )
-.end
-
-.sub _sub1
-.return ( )
-.end
-CODE
-
-pir_output_is(<<'CODE', <<'OUT', "oneliner yield");
-.sub test @MAIN
-  .local int i
-  i=5
-  newsub $P0, .Coroutine, _addtwo
-  newsub $P1, .Continuation, after_loop
-  .pcc_begin
-  .arg $P1
-  .arg i
-  .pcc_call $P0
- ret_addr:
-  .result $I2
-  .pcc_end
-    print $I2
-    print "\n"
-    invokecc $P0
-    goto ret_addr
- after_loop:
-  print "done in main\n"
-  end
-.end
-
-.pcc_sub _addtwo
-  .param Continuation when_done
-  .param int a
-  .local int i
-  i = 0
- loop:
-    if i >= 10 goto done
-    $I5 = a+i
-    .yield ( $I5 )
-    i = i + 1
-    goto loop
- done:
-  print "done in coroutine\n"
-  invokecc when_done
-  end
-.end
-CODE
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-done in coroutine
-done in main
-OUT
-
-pir_output_is(<<'CODE', <<'OUT', "quoted sub names");
-.sub main @MAIN
-    "foo"()
-    print "ok\n"
-.end
-
-.sub "foo"
-    print "foo\n"
-    "new"()
-.end
-
-.sub "new"
-    print "new\n"
-.end
-CODE
-foo
-new
-ok
-OUT
-
 pir_output_is(<<'CODE', <<'OUT', "multi 1");
-.sub foo @MULTI()
+.sub foo :multi()
     print "ok 1\n"
 .end
-.sub f1 @MULTI(int)
-.end
-.sub f2 @MULTI(int, float)
-.end
-.sub f3 @MULTI(Integer, Any, _)
-.end
-CODE
-ok 1
-OUT
-
-
-pir_output_is(<<'CODE', <<'OUT', "\@MAIN defined twice");
-.sub foo @MAIN
-	set S0, 'not ok'
-	print S0
-	print "\r\n"
-	end
-.end
-
-.sub bar @MAIN
-	set S0, 'ok'
-	print S0
-	print "\r\n"
-	end
-.end
-CODE
-ok
-OUT
-
-pir_output_is(<<'CODE', <<'OUT', "\@ANON subpragma, syntax only");
-.sub anon @ANON
-    print "ok\n"
-.end
-CODE
-ok
-OUT
-
-pir_output_like(<<'CODE', <<'OUT', "\@ANON doesn't install symbol 1");
-.sub main @MAIN
-    .local pmc result
-    result= find_global 'anon'
-    result()
-    print "\n"
-.end
-
-.sub anon @ANON
-    print "not ok\n"
-.end
-CODE
-/.*'anon'.*not found/
-OUT
-
-pir_output_is(<<'CODE', <<'OUT', "\@ANON doesn't install symbol 2");
-.sub main @MAIN
-    .local pmc result
-    result= find_global 'anon'
-    result()
-.end
-
-.sub anon
-    print "ok\n"
-.end
-
-.sub anon @ANON
-    print "not ok\n"
-.end
-CODE
-ok
-OUT
-
-pir_output_like(<<'CODE', <<'OUT', "multiple \@ANON subs with same name");
-.sub main @MAIN
-    .local pmc result
-    result= find_global 'anon'
-    result()
-.end
-
-.sub anon @ANON
-    print "nok 1\n"
-.end
-
-.sub anon @ANON
-    print "nok 2\n"
-.end
-CODE
-/.*'anon'.*not found/
-OUT
-
-pir_output_is(<<'CODE', <<'OUT', "multi - colon syntax");
-# just parser test - these flags are meaningless
-.sub foo :multi() :main
-    print "ok 1\n"
-.end
-.sub f1 :multi(int) :load :postcomp
+.sub f1 :multi(int)
 .end
 .sub f2 :multi(int, float)
 .end
@@ -1505,3 +505,80 @@ CODE
 ok 1
 OUT
 
+
+pir_output_is(<<'CODE', <<'OUT', "\:main defined twice");
+.sub foo :main
+	set S0, 'not ok'
+	print S0
+	print "\r\n"
+	end
+.end
+
+.sub bar :main
+	set S0, 'ok'
+	print S0
+	print "\r\n"
+	end
+.end
+CODE
+ok
+OUT
+
+pir_output_is(<<'CODE', <<'OUT', "\:anon subpragma, syntax only");
+.sub anon :anon
+    print "ok\n"
+.end
+CODE
+ok
+OUT
+
+pir_output_like(<<'CODE', <<'OUT', "\:anon doesn't install symbol 1");
+.sub main :main
+    .local pmc result
+    result= find_global 'anon'
+    result()
+    print "\n"
+.end
+
+.sub anon :anon
+    print "not ok\n"
+.end
+CODE
+/.*'anon'.*not found/
+OUT
+
+pir_output_is(<<'CODE', <<'OUT', "\:anon doesn't install symbol 2");
+.sub main :main
+    .local pmc result
+    result= find_global 'anon'
+    result()
+.end
+
+.sub anon
+    print "ok\n"
+.end
+
+.sub anon :anon
+    print "not ok\n"
+.end
+CODE
+ok
+OUT
+
+pir_output_like(<<'CODE', <<'OUT', "multiple \:anon subs with same name");
+.sub main :main
+    .local pmc result
+    result= find_global 'anon'
+    result()
+.end
+
+.sub anon :anon
+    print "nok 1\n"
+.end
+
+.sub anon :anon
+    print "nok 2\n"
+.end
+CODE
+/.*'anon'.*not found/
+OUT
