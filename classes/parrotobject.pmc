@@ -45,6 +45,22 @@ F<src/objects.c>, at least for right now.
 
 #include "parrot/parrot.h"
 
+/* XXX duplicated from delegate.pmc */
+static PMC *
+find_meth(Interp* interpreter, PMC *pmc, STRING *meth) {
+    PMC *class = pmc;
+
+    if (Interp_trace_TEST(interpreter, PARROT_TRACE_SUB_CALL_FLAG)) {
+        char *name = string_to_cstring(interpreter, meth);
+        PIO_eprintf(interpreter, "# Calling meth '%s'\n#", name);
+        string_cstring_free(name);
+        print_pbc_location(interpreter);
+    }
+    if (PObj_is_object_TEST(pmc)) {
+        class = GET_CLASS((Buffer *)PMC_data(pmc), pmc);
+    }
+    return Parrot_find_method_with_cache(interpreter, class, meth);
+}
 pmclass ParrotObject extends ParrotClass need_ext {
 
 /*
@@ -153,6 +169,120 @@ Return the class of this object.
 
     PMC* get_class() {
         return GET_CLASS(PMC_data(SELF), SELF);
+    }
+
+/*
+
+=item C<INTVAL get_integer_keyed_int(INTVAL key)>
+
+=item C<FLOATVAL get_number_keyed_int(INTVAL key)>
+
+=item C<STRING *get_string_keyed_int(INTVAL key)>
+
+=item C<PMC *get_pmc_keyed_int(INTVAL key)>
+
+=item C<void set_integer_keyed_int (INTVAL key, INTVAL value)>
+
+=item C<void set_number_keyed_int (INTVAL key, FLOATVAL value)>
+
+=item C<void set_string_keyed_int (INTVAL key, STRING* value)>
+
+=item C<void set_pmc_keyed_int (INTVAL key, PMC* value)>
+
+These methods have default implmentations in F<classes/default.pmc>
+which redirct to PMC keys. Test if a specialized method exists, else
+use fallback.
+
+=cut
+
+*/
+
+    INTVAL get_integer_keyed_int (INTVAL key) {
+        STRING *meth = CONST_STRING(interpreter, "__get_integer_keyed_int");
+        PMC *sub = find_meth(interpreter, pmc, meth);
+        if (sub) {
+            return Parrot_run_meth_fromc_args_reti(interpreter, sub,
+                                              pmc, meth, "II", key);
+        }
+        else
+            return SUPER(key);
+    }
+
+    FLOATVAL get_number_keyed_int (INTVAL key) {
+        STRING *meth = CONST_STRING(interpreter, "__get_number_keyed_int");
+        PMC *sub = find_meth(interpreter, pmc, meth);
+        if (sub) {
+            return Parrot_run_meth_fromc_args_retf(interpreter, sub,
+                                              pmc, meth, "NI", key);
+        }
+        else
+            return SUPER(key);
+    }
+
+    STRING* get_string_keyed_int (INTVAL key) {
+        STRING *meth = CONST_STRING(interpreter, "__get_string_keyed_int");
+        PMC *sub = find_meth(interpreter, pmc, meth);
+        if (sub) {
+            return Parrot_run_meth_fromc_args(interpreter, sub,
+                                              pmc, meth, "SI", key);
+        }
+        else
+            return SUPER(key);
+    }
+
+    PMC* get_pmc_keyed_int (INTVAL key) {
+        STRING *meth = CONST_STRING(interpreter, "__get_pmc_keyed_int");
+        PMC *sub = find_meth(interpreter, pmc, meth);
+        if (sub) {
+            return Parrot_run_meth_fromc_args(interpreter, sub,
+                                              pmc, meth, "PI", key);
+        }
+        else
+            return SUPER(key);
+    }
+
+    void set_integer_keyed_int (INTVAL key, INTVAL value) {
+        STRING *meth = CONST_STRING(interpreter, "__set_integer_keyed_int");
+        PMC *sub = find_meth(interpreter, pmc, meth);
+        if (sub) {
+            (void) Parrot_run_meth_fromc_args(interpreter, sub,
+                                              pmc, meth, "vII", key, value);
+        }
+        else
+            SUPER(key, value);
+    }
+
+    void set_number_keyed_int (INTVAL key, FLOATVAL value) {
+        STRING *meth = CONST_STRING(interpreter, "__set_number_keyed_int");
+        PMC *sub = find_meth(interpreter, pmc, meth);
+        if (sub) {
+            (void) Parrot_run_meth_fromc_args(interpreter, sub,
+                                              pmc, meth, "vIN", key, value);
+        }
+        else
+            SUPER(key, value);
+    }
+
+    void set_string_keyed_int (INTVAL key, STRING* value) {
+        STRING *meth = CONST_STRING(interpreter, "__set_string_keyed_int");
+        PMC *sub = find_meth(interpreter, pmc, meth);
+        if (sub) {
+            (void) Parrot_run_meth_fromc_args(interpreter, sub,
+                                              pmc, meth, "vIS", key, value);
+        }
+        else
+            SUPER(key, value);
+    }
+
+    void set_pmc_keyed_int (INTVAL key, PMC* value) {
+        STRING *meth = CONST_STRING(interpreter, "__set_pmc_keyed_int");
+        PMC *sub = find_meth(interpreter, pmc, meth);
+        if (sub) {
+            (void) Parrot_run_meth_fromc_args(interpreter, sub,
+                                              pmc, meth, "vIP", key, value);
+        }
+        else
+            SUPER(key, value);
     }
 
 /*

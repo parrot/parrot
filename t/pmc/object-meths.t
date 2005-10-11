@@ -16,7 +16,7 @@ Tests PMC object methods.
 
 =cut
 
-use Parrot::Test tests => 31;
+use Parrot::Test tests => 32;
 use Test::More;
 
 output_like(<<'CODE', <<'OUTPUT', "callmethod - unknown method");
@@ -1010,3 +1010,32 @@ Parent foo
 Parent bar
 OUTPUT
 
+pir_output_is(<<'CODE', <<'OUTPUT', "delegate keyed_int");
+.sub main :main
+    .local pmc cl, o
+    cl = newclass "MyClass"
+    o = new "MyClass"
+    $I0 = 5
+    $S0 = "foo"
+    o[$I0] = 42
+    o[$S0] = 42
+.end
+
+.namespace ["MyClass"]
+
+.sub __set_integer_keyed_int :method
+    .param int key
+    .param int val
+    print "ikey\n"
+.end
+
+.sub __set_integer_keyed :method
+    .param string key
+    .param int val
+    print "skey\n"
+.end
+
+CODE
+ikey
+skey
+OUTPUT
