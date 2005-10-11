@@ -17,7 +17,7 @@ C<Continuation> PMCs.
 
 =cut
 
-use Parrot::Test tests => 44;
+use Parrot::Test tests => 46;
 use Test::More;
 use Parrot::Config;
 
@@ -1183,4 +1183,53 @@ pir_output_is(<<'CODE', <<'OUTPUT', "immediate code as const - obj");
 
 CODE
 ok 1
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "__get_regs_used 1");
+.sub main :main
+    .local pmc m
+    .include "interpinfo.pasm"
+    m = interpinfo .INTERPINFO_CURRENT_SUB
+    $I0 = m."__get_regs_used"('N')
+    print $I0
+    $I0 = m."__get_regs_used"('I')
+    print $I0
+    $I0 = m."__get_regs_used"('S')
+    print $I0
+    $I0 = m."__get_regs_used"('P')
+    print $I0
+    print "\n"
+.end
+
+CODE
+0101
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "__get_regs_used 2");
+.sub main :main
+    foo()
+.end
+.sub foo
+    .local pmc m
+    .include "interpinfo.pasm"
+    m = interpinfo .INTERPINFO_CURRENT_SUB
+    set N0, 1.0
+    set N7, 1.0
+    add N7, N7, N0
+    set I9, 1
+    add I10, I9, I9
+    $I0 = m."__get_regs_used"('N')
+    print $I0
+    $I0 = m."__get_regs_used"('I')
+    print $I0
+    $I0 = m."__get_regs_used"('S')
+    print $I0
+    $I0 = m."__get_regs_used"('P')
+    print $I0
+    print "\n"
+.end
+
+
+CODE
+81101
 OUTPUT

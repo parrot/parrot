@@ -575,6 +575,10 @@ Called after the subroutine as been unarchived.
 Return the name_space PMC or Undef. The name_space PMC is either a
 String PMC or a Key PMC for a nested name_space.
 
+=item C<METHOD INTVAL __get_regs_used(char *kind)>
+
+Return amount of used registers for register kinds "I", "S", "P", "N".
+
 =cut
 
 */
@@ -585,6 +589,26 @@ String PMC or a Key PMC for a nested name_space.
         return PMC_IS_NULL(sub->name_space) ?
             pmc_new(INTERP, enum_class_Undef) : sub->name_space;
     }
+
+    METHOD INTVAL __get_regs_used(char *kind) {
+        struct Parrot_sub * sub = PMC_sub(SELF);
+        /* TODO switch to canonical NiSP order 
+         * see also imcc/reg_alloc.c
+         */
+        const char *types = "INSP";
+        char *p;
+
+        assert(sub->n_regs_used);
+        if (!*kind || kind[1])
+            real_exception(INTERP, NULL, E_ValueError,
+                "illegal register kind '%s'", kind);
+        p = strchr(types, *kind);
+        if (!p)
+            real_exception(INTERP, NULL, E_ValueError,
+                "illegal register kind '%s'", kind);
+        return sub->n_regs_used[p - types];
+    }
+
 
 }
 
