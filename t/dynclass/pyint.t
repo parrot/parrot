@@ -21,7 +21,7 @@ use Parrot::Config;
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "abs");
 
-.sub main @MAIN
+.sub main :main
     loadlib P1, "python_group"
     find_type $I0, "PyInt"
     new $P1, $I0
@@ -42,7 +42,7 @@ OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "add");
 
-.sub main @MAIN
+.sub main :main
     loadlib P1, "python_group"
     find_type $I0, "PyInt"
     new $P0, $I0
@@ -68,7 +68,7 @@ OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "and");
 
-.sub main @MAIN
+.sub main :main
     loadlib P1, "python_group"
     find_type $I0, "PyInt"
     new $P0, $I0
@@ -97,7 +97,7 @@ OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "cmp");
 
-.sub main @MAIN
+.sub main :main
     loadlib P1, "python_group"
     find_type $I0, "PyInt"
     new $P0, $I0
@@ -125,7 +125,7 @@ OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "div");
 
-.sub main @MAIN
+.sub main :main
     loadlib P1, "python_group"
     find_type $I0, "PyInt"
     new $P0, $I0
@@ -154,7 +154,7 @@ OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "float");
 
-.sub main @MAIN
+.sub main :main
     loadlib P1, "python_group"
     find_type $I0, "PyInt"
     new $P0, $I0
@@ -171,7 +171,7 @@ OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "floordiv");
 
-.sub main @MAIN
+.sub main :main
     loadlib P1, "python_group"
     find_type $I0, "PyInt"
     new $P0, $I0
@@ -200,7 +200,7 @@ OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "hex");
 
-.sub main @MAIN
+.sub main :main
     loadlib P1, "python_group"
     find_type $I0, "PyInt"
     new $P0, $I0
@@ -216,7 +216,7 @@ OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "int");
 
-.sub main @MAIN
+.sub main :main
     loadlib P1, "python_group"
     find_type $I0, "PyInt"
     new $P0, $I0
@@ -233,7 +233,7 @@ OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "invert");
 
-.sub main @MAIN
+.sub main :main
     loadlib P1, "python_group"
     find_type $I0, "PyInt"
     new $P1, $I0
@@ -254,7 +254,7 @@ OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "is");
 
-.sub main @MAIN
+.sub main :main
     loadlib P1, "python_group"
     new $P0, "PyInt"
     new $P1, "PyInt"
@@ -274,7 +274,7 @@ OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "lshift");
 
-.sub main @MAIN
+.sub main :main
     loadlib P1, "python_group"
     find_type $I0, "PyInt"
     new $P0, $I0
@@ -303,7 +303,7 @@ OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "mod");
 
-.sub main @MAIN
+.sub main :main
     loadlib P1, "python_group"
     find_type $I0, "PyInt"
     new $P0, $I0
@@ -332,7 +332,7 @@ OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "mul");
 
-.sub main @MAIN
+.sub main :main
     loadlib P1, "python_group"
     find_type $I0, "PyInt"
     new $P0, $I0
@@ -361,7 +361,7 @@ OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "neg");
 
-.sub main @MAIN
+.sub main :main
     loadlib P1, "python_group"
     find_type $I0, "PyInt"
     new $P1, $I0
@@ -382,7 +382,7 @@ OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "nonzero");
 
-.sub main @MAIN
+.sub main :main
     loadlib P1, "python_group"
     find_type $I0, "PyInt"
     new $P1, $I0
@@ -400,7 +400,7 @@ OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "oct");
 
-.sub main @MAIN
+.sub main :main
     loadlib P1, "python_group"
     find_type $I0, "PyInt"
     new $P0, $I0
@@ -416,7 +416,7 @@ OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "or");
 
-.sub main @MAIN
+.sub main :main
     loadlib P1, "python_group"
     find_type $I0, "PyInt"
     new $P0, $I0
@@ -445,7 +445,7 @@ OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "pos");
 
-.sub main @MAIN
+.sub main :main
     loadlib P1, "python_group"
     find_type $I0, "PyInt"
     new $P1, $I0
@@ -463,7 +463,7 @@ OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "pow");
 
-.sub main @MAIN
+.sub main :main
     loadlib P1, "python_group"
     find_type $I0, "PyInt"
     new $P0, $I0
@@ -497,7 +497,7 @@ OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "repr");
 
-.sub main @MAIN
+.sub main :main
     loadlib P1, "python_group"
     find_type $I0, "PyInt"
     new $P0, $I0
@@ -519,7 +519,7 @@ OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "rshift");
 
-.sub main @MAIN
+.sub main :main
     loadlib P1, "python_group"
     find_type $I0, "PyInt"
     new $P0, $I0
@@ -548,7 +548,7 @@ OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "sub");
 
-.sub main @MAIN
+.sub main :main
     loadlib P1, "python_group"
     find_type $I0, "PyInt"
     new $P0, $I0
@@ -574,7 +574,7 @@ OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "truediv");
 
-.sub main @MAIN
+.sub main :main
     loadlib P1, "python_group"
     find_type $I0, "PyInt"
     new $P0, $I0
@@ -594,7 +594,7 @@ OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "xor");
 
-.sub main @MAIN
+.sub main :main
     loadlib P1, "python_group"
     find_type $I0, "PyInt"
     new $P0, $I0
@@ -623,7 +623,7 @@ SKIP:
   skip("No bigint support", 1) unless $PConfig{gmp};
 
 pir_output_like(<< 'CODE', << 'OUTPUT', "sub - propagate to PyLong");
-.sub main @MAIN
+.sub main :main
     .include "sysinfo.pasm"
     .local pmc d, l, r
     .local int b, i

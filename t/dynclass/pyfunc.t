@@ -20,7 +20,7 @@ use Parrot::Test tests => 4;
 
 my $base = << 'CODE';
 
-.sub __main__ @MAIN
+.sub __main__ :main
     new_pad 0
     loadlib P1, "python_group"
 

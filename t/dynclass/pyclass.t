@@ -20,7 +20,7 @@ use Parrot::Test tests => 6;
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "attribute");
 
-.sub main @MAIN
+.sub main :main
     loadlib $P0, "python_group"
 
     getclass $P1, 'PyType'
@@ -61,7 +61,7 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "method");
     end
 .end
 
-.sub _m @ANON
+.sub _m :anon
     find_type $I0, "PyInt"
     new $P0, $I0
     $P0 = 1
@@ -73,7 +73,7 @@ OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "classname");
 
-.sub main @MAIN
+.sub main :main
     loadlib $P0, "python_group"
 
     getclass $P1, 'PyType'
@@ -97,7 +97,7 @@ OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "delprop");
 
-.sub main @MAIN
+.sub main :main
     loadlib $P0, "python_group"
 
     getclass $P1, 'PyType'
@@ -137,7 +137,7 @@ OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "nested subclasses");
 
-.sub main @MAIN
+.sub main :main
     loadlib $P0, "python_group"
 
     getclass $P1, 'PyType'
@@ -179,7 +179,7 @@ OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "overriding builtins");
 
-.sub __main__ @MAIN
+.sub __main__ :main
     new_pad 0
     loadlib P1, 'python_group'
     find_global P0, 'PyBuiltin', '__load__'
@@ -206,7 +206,7 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "overriding builtins");
     .return ()
 .end
 
-.sub ___repr__ @ANON, method
+.sub ___repr__ :anon, method
     find_type $I0, 'PyObject'
     new $P0, $I0
     find_type $I1, 'PyString'

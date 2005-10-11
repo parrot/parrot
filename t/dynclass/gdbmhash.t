@@ -30,7 +30,7 @@ else {
 
 # PIR fragment for setting up a GDBM Hash
 my $new_hash_1 = << 'CODE';
-.sub test @MAIN
+.sub test :main
     .local pmc gdbmhash_lib
     gdbmhash_lib = loadlib "gdbmhash" 
     .local int gdbmhash_type

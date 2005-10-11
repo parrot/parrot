@@ -21,7 +21,7 @@ use Parrot::Config;
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "get_integer");
 
-.sub main @MAIN
+.sub main :main
     loadlib P1, "foo"
     find_type $I0, "Foo"
     new $P1, $I0
@@ -35,7 +35,7 @@ CODE
 OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "loadlib with relative pathname, no ext");
-.sub main @MAIN
+.sub main :main
     ## load a relative pathname without the extension.  loadlib will convert the
     ## '/' characters to '\\' on windows.
     $S0 = "runtime/parrot/dynext/foo"
@@ -53,7 +53,7 @@ CODE
 OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "loadlib with absolute pathname, no ext");
-.sub main @MAIN
+.sub main :main
     ## get cwd in $S0.
     .include "iglobals.pasm"
     $P11 = getinterp
@@ -78,7 +78,7 @@ CODE
 OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "loadlib with relative pathname & ext");
-.sub main @MAIN
+.sub main :main
     ## get load_ext in $S0.
     .include "iglobals.pasm"
     $P11 = getinterp
@@ -101,7 +101,7 @@ CODE
 OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "loadlib with absolute pathname & ext");
-.sub main @MAIN
+.sub main :main
     ## get cwd in $S0, load_ext in $S1.
     .include "iglobals.pasm"
     $P11 = getinterp
@@ -130,7 +130,7 @@ OUTPUT
 SKIP: { skip("No BigInt Lib configured", 1) if !$PConfig{gmp};
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "inherited add");
-.sub _main @MAIN
+.sub _main :main
     .local pmc d, l, r
     $P0 = loadlib "foo"
     print "ok\n"
@@ -155,7 +155,7 @@ OUTPUT
 }
 
 pir_output_is(<<'CODE', <<'OUTPUT', "Foo subclass isa Integer");
-.sub main @MAIN
+.sub main :main
     .local pmc F, f, d, r
     loadlib F, "foo"
     f = new "Foo"
@@ -175,7 +175,7 @@ pir_output_is(<< 'CODE', << 'OUTPUT', ".HLL 1");
 # load our Foo test (pseudo) language
 # it defines one PMC type "Foo"
 .HLL "Fool", "foo"
-.sub main @MAIN
+.sub main :main
     new $P1, "Foo"      # load by name
     $I1 = $P1
     print $I1
@@ -187,7 +187,7 @@ OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', ".HLL 2");
 .HLL "Fool", "foo"
-.sub main @MAIN
+.sub main :main
     new $P1, .Foo       # load by index
     $I1 = $P1
     print $I1

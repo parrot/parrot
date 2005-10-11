@@ -20,7 +20,7 @@ use Parrot::Test tests => 6;
 use Parrot::Config;
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "autoload");
-.sub main @MAIN
+.sub main :main
     new_pad 0
 
     new $P0, "PyInt"
@@ -36,7 +36,7 @@ OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "delegating");
 
-.sub main @MAIN
+.sub main :main
     new_pad 0
     loadlib $P0, "python_group"
     find_global P0, "PyBuiltin", "__load__"
@@ -97,7 +97,7 @@ OUTPUT
 SKIP: { skip("No BigInt Lib configured", 1) if !$PConfig{gmp};
 pir_output_is(<< 'CODE', << 'OUTPUT', "bigint");
 
-.sub main @MAIN
+.sub main :main
     new_pad 0
     loadlib $P0, "python_group"
     find_global P0, "PyBuiltin", "__load__"
@@ -120,7 +120,7 @@ OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "range");
 
-.sub main @MAIN
+.sub main :main
     new_pad 0
     loadlib $P0, "python_group"
     find_global P0, "PyBuiltin", "__load__"
@@ -175,7 +175,7 @@ OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "boolean");
 
-.sub main @MAIN
+.sub main :main
     new_pad 0
     loadlib $P0, "python_group"
     find_global P0, "PyBuiltin", "__load__"
@@ -195,7 +195,7 @@ OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "boolean");
 
-.sub main @MAIN
+.sub main :main
     new_pad 0
     loadlib $P0, "python_group"
 

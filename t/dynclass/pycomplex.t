@@ -21,7 +21,7 @@ use Parrot::Test tests => 4;
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "eq");
 
-.sub main @MAIN
+.sub main :main
     loadlib P1, "python_group"
     new $P1, "PyComplex"
     new $P2, "PyComplex"
@@ -38,7 +38,7 @@ CODE
 OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "sub");
-.sub main @MAIN
+.sub main :main
     .local pmc d, i, c
     d = new "PyObject"
     i = new "PyInt"
@@ -67,7 +67,7 @@ OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "abs - test registered type");
 .HLL "Python", "python_group"
-.sub main @MAIN
+.sub main :main
     .local pmc d, c
     c = new .PyComplex
     c = "3+4j"
@@ -86,7 +86,7 @@ OUTPUT
 pir_output_is(<< 'CODE', << 'OUTPUT', "n_abs - test registered type");
 .pragma n_operators 1
 .HLL "Python", "python_group"
-.sub main @MAIN
+.sub main :main
     .local pmc d, c
     c = new .PyComplex
     c = "3+4j"
