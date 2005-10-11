@@ -31,7 +31,7 @@ static opcode_t*
 run(Parrot_Interp interpreter, int argc, char *argv[])
 {
     const char *c_src =
-	".sub main @MAIN\n"
+	".sub main :main\n"
 	"    print \"ok\\n\"\n"
 	".end\n";
 

@@ -58,7 +58,7 @@ OUT
 #
 pir_output_is(<<'CODE', <<'OUT', "Stream::Sub");
 
-.sub _main @MAIN
+.sub _main :main
     .local pmc stream
     .local pmc temp
 
@@ -106,7 +106,7 @@ OUT
 #
 pir_output_is(<<'CODE', <<'OUT', "Stream::read_bytes");
 
-.sub _main @MAIN
+.sub _main :main
     .local pmc stream
     .local pmc temp
 
@@ -966,7 +966,7 @@ OUT
 #
 pir_output_is(<<'CODE', <<'OUT', "Stream::ParrotIO");
 
-.sub _main @MAIN
+.sub _main :main
     .local pmc stream
     .local pmc temp
 
@@ -1282,7 +1282,7 @@ SKIP:
     skip("broken method invocation", 1);
 pir_output_is(<<'CODE', <<'OUT', "Stream::Replay");
 
-.sub _main @MAIN
+.sub _main :main
     .local pmc stream
 
     load_bytecode "library/Stream/Writer.imc"
@@ -1449,7 +1449,7 @@ SKIP:
     skip("broken method invocation", 1);
 pir_output_is(<<'CODE', <<'OUT', "Stream::Write");
 
-.sub _main @MAIN
+.sub _main :main
     .local pmc stream
     .local pmc temp
 

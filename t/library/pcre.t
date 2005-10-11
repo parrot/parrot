@@ -33,7 +33,7 @@ SKIP: {
 pir_output_is( <<'CODE', <<'OUT', 'soup to nuts' );
 
 
-.sub main @MAIN
+.sub main :main
     load_bytecode "library/pcre.imc"
     .local pmc func
     .local pmc lib

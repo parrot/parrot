@@ -24,7 +24,7 @@ use Parrot::Test tests => 27;
 pir_output_is(<<'CODE', <<'OUT', "dumping array of sorted numbers");
 
 .include "library/dumper.imc"
-.sub test @MAIN
+.sub test :main
     .local pmc array
 
     new array, .PerlArray
@@ -60,7 +60,7 @@ OUT
 
 pir_output_is(<<'CODE', <<'OUT', "dumping unsorted numbers");
 .include "library/dumper.imc"
-.sub test @MAIN
+.sub test :main
     .local pmc array
 
     new array, .PerlArray
@@ -96,7 +96,7 @@ OUT
 pir_output_is(<<'CODE', <<'OUT', "dumping sorted strings");
 
 .include "library/dumper.imc"
-.sub test @MAIN
+.sub test :main
     .local pmc array
 
     new array, .PerlArray
@@ -127,7 +127,7 @@ OUT
 # no. 4
 pir_output_is(<<'CODE', <<'OUT', "sorting unsorted strings");
 
-.sub test @MAIN
+.sub test :main
     .local pmc array
 
     new array, .PerlArray
@@ -159,7 +159,7 @@ OUT
 # no. 5
 pir_output_is(<<'CODE', <<'OUT', "dumping different types");
 
-.sub test @MAIN
+.sub test :main
     .local pmc array
 
     new array, .PerlArray
@@ -215,7 +215,7 @@ OUT
 # no. 6
 pir_output_is(<<'CODE', <<'OUT', "dumping complex data");
 
-.sub test @MAIN
+.sub test :main
     .local pmc hash1
     .local pmc hash2
     .local pmc hash3
@@ -318,7 +318,7 @@ OUT
 # no.7
 pir_output_is(<<'CODE', <<'OUT', "properties");
 
-.sub test @MAIN
+.sub test :main
     .local pmc str
     .local pmc array
 
@@ -351,7 +351,7 @@ OUT
 # no. 8
 pir_output_is(<<'CODE', <<'OUT', "indent string");
 
-.sub test @MAIN
+.sub test :main
     .local pmc hash1
     .local pmc hash2
     .local pmc array1
@@ -419,7 +419,7 @@ OUT
 # no. 9
 pir_output_is(<<'CODE', <<'OUT', "back-referencing properties");
 
-.sub test @MAIN
+.sub test :main
     .local pmc hash
 
     new hash, .PerlHash
@@ -440,7 +440,7 @@ OUT
 # no. 10
 pir_output_is(<<'CODE', <<'OUT', "self-referential properties (1)");
 
-.sub test @MAIN
+.sub test :main
     .local pmc hash
     .local pmc prop
 
@@ -463,7 +463,7 @@ OUT
 # no. 11
 pir_output_is(<<'CODE', <<'OUT', "self-referential properties (2)");
 
-.sub test @MAIN
+.sub test :main
     .local pmc array
     .local pmc hash1
     .local pmc hash2
@@ -506,7 +506,7 @@ OUT
 # no. 12
 pir_output_is(<<'CODE', <<'OUT', "dumping objects");
 
-.sub test @MAIN
+.sub test :main
     .local pmc temp
     .local pmc array
 
@@ -568,7 +568,7 @@ OUT
 # no. 13
 pir_output_is(<<'CODE', <<'OUT', "dumping 'null'");
 
-.sub test @MAIN
+.sub test :main
     .local pmc array
     .local pmc temp
 
@@ -606,7 +606,7 @@ OUT
 pir_output_is( << 'CODE', << 'OUT', "dumping strings");
 
 .include "library/dumper.imc"
-.sub _test @MAIN
+.sub _test :main
     .local pmc array
     array = new PerlArray
 
@@ -637,7 +637,7 @@ OUT
 # no. 15
 pir_output_is(<<'CODE', <<'OUT', "dumping complex data in Hash");
 
-.sub test @MAIN
+.sub test :main
     .local pmc hash1
     .local pmc hash2
     .local pmc hash3
@@ -739,7 +739,7 @@ OUT
 # no. 16
 pir_output_is(<<'CODE', <<'OUTPUT', "dumping Integer PMC");
 
-.sub test @MAIN
+.sub test :main
     .local pmc int1
 
     new int1, .Integer
@@ -754,7 +754,7 @@ OUTPUT
 # no. 17
 pir_output_is(<<'CODE', <<'OUTPUT', "dumping Float PMC");
 
-.sub test @MAIN
+.sub test :main
     .local pmc float1
 
     new float1, .Float
@@ -768,7 +768,7 @@ OUTPUT
 
 # no. 18
 pir_output_is(<<'CODE', <<'OUTPUT', "dumping ResizablePMCArray PMC");
-.sub test @MAIN
+.sub test :main
     .local pmc array
 
     new array, .ResizablePMCArray
@@ -786,7 +786,7 @@ OUTPUT
 
 # no. 19
 pir_output_is(<<'CODE', <<'OUTPUT', "dumping ResizableStringArray PMC");
-.sub test @MAIN
+.sub test :main
     .local pmc array
 
     new array, .ResizableStringArray
@@ -804,7 +804,7 @@ OUTPUT
 
 # no. 20
 pir_output_is(<<'CODE', <<'OUTPUT', "dumping ResizableIntegerArray PMC");
-.sub test @MAIN
+.sub test :main
     .local pmc array
 
     new array, .ResizableIntegerArray
@@ -822,7 +822,7 @@ OUTPUT
 
 # no. 21
 pir_output_is(<<'CODE', <<'OUTPUT', "dumping ResizableFloatArray PMC");
-.sub test @MAIN
+.sub test :main
     .local pmc array
 
     new array, .ResizableFloatArray
@@ -840,7 +840,7 @@ OUTPUT
 
 # no. 22
 pir_output_is(<<'CODE', <<'OUTPUT', "dumping FixedPMCArray PMC");
-.sub test @MAIN
+.sub test :main
     .local pmc array
 
     new array, .FixedPMCArray
@@ -859,7 +859,7 @@ OUTPUT
 
 # no. 23
 pir_output_is(<<'CODE', <<'OUTPUT', "dumping FixedStringArray PMC");
-.sub test @MAIN
+.sub test :main
     .local pmc array
 
     new array, .FixedStringArray
@@ -878,7 +878,7 @@ OUTPUT
 
 # no. 24
 pir_output_is(<<'CODE', <<'OUTPUT', "dumping FixedIntegerArray PMC");
-.sub test @MAIN
+.sub test :main
     .local pmc array
 
     new array, .FixedIntegerArray
@@ -897,7 +897,7 @@ OUTPUT
 
 # no. 25
 pir_output_is(<<'CODE', <<'OUTPUT', "dumping FixedFloatArray PMC");
-.sub test @MAIN
+.sub test :main
     .local pmc array
 
     new array, .FixedFloatArray
@@ -916,7 +916,7 @@ OUTPUT
 
 # no. 26
 pir_output_is(<<'CODE', <<'OUTPUT', "dumping StringArray PMC");
-.sub test @MAIN
+.sub test :main
     .local pmc array
 
     new array, .StringArray
@@ -934,7 +934,7 @@ OUTPUT
 
 # no. 27
 pir_output_is(<<'CODE', <<'OUTPUT', "custom dumper");
-.sub main @MAIN
+.sub main :main
     .local pmc o, cl
     cl = subclass 'ResizablePMCArray', 'bar'
     .local int id
