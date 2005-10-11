@@ -69,19 +69,19 @@ E.g. get a reference to a (possibly) external subroutine:
 Exactly one subroutine in the first executed source or byte code file may be
 flagged as the "main" subroutine, where executions starts.
 
-  .pcc_sub @MAIN _main:
+  .pcc_sub :main _main:
 
-In the absence of a B<@MAIN> entry Parrot starts execution at the first
+In the absence of a B<:main> entry Parrot starts execution at the first
 statement.
 
 =head2 Automatically loaded initializer code
 
-If a subroutine is marked as B<@LOAD> this subroutine is run, before the
+If a subroutine is marked as B<:load> this subroutine is run, before the
 B<load_bytecode> opcode returns.
 
 e.g.
 
-  .pcc_sub @MAIN _main:
+  .pcc_sub :main _main:
      print "in main\n"
      load_bytecode "library_code.pasm"
      ...
@@ -89,12 +89,12 @@ e.g.
 # library_code.pasm
 
      ...
-  .pcc_sub @LOAD _my_lib_init:
+  .pcc_sub :load _my_lib_init:
      ...
      invoke P1
 
-B<@LOAD> is ignored, if another subroutine in that file is marked with
-B<@MAIN>.
+B<:load> is ignored, if another subroutine in that file is marked with
+B<:main>.
 
 =head2 Invocation i.e. calling the sub
 

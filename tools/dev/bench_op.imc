@@ -68,7 +68,7 @@ Print program version.
 
 .const string VERSION = "0.1.0"
 
-.sub main @MAIN
+.sub main :main
     .param pmc argv
 
     load_bytecode "Getopt/Long.pbc"

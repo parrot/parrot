@@ -200,7 +200,7 @@ make_code_pointers(struct PackFile_Segment *seg)
 sub_pragma(Parrot_Interp interpreter,
         int action, PMC *sub_pmc)>
 
-Handle @LOAD, @MAIN ... pragmas for B<sub_pmc>
+Handle :load, :main ... pragmas for B<sub_pmc>
 
 =cut
 
@@ -236,7 +236,7 @@ sub_pragma(Parrot_Interp interpreter, int action, PMC *sub_pmc)
 
 =item C<static PMC* run_sub(Parrot_Interp interpreter, PMC* sub_pmc)>
 
-Run the B<sub_pmc> due its B<@LOAD>, B<@IMMEDIATE>, ... pragma
+Run the B<sub_pmc> due its B<:load>, B<:immediate>, ... pragma
 
 =cut
 

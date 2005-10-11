@@ -307,7 +307,7 @@ same way:
 
 You can C<peek_pad> the current pad and use C<delete>.
 
-  .sub main @MAIN
+  .sub main :main
     new_pad 0
     $P0 = new .Integer
     store_lex -1, "foo", $P0

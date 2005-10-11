@@ -386,9 +386,9 @@ sub.
 
 The call to C<_fact> in main works in just the same was as the recursive call
 to C<_fact> within the sub C<_fact> itself. The only remaining bit of new
-syntax is the C<@MAIN>, written after C<.sub _main>. By default, PIR assumes
+syntax is the C<:main>, written after C<.sub _main>. By default, PIR assumes
 that execution begins with the first sub in the file. This behavior can be
-changed by making the sub to start in with C<@MAIN>.
+changed by marking the sub to start in with C<:main>.
 
 =head2 Compiling to PBC
 

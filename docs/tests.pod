@@ -47,7 +47,7 @@ friends.
     pir_output_is(<<'CODE',<<'OUT','nothing useful');
         .include 'library/config.imc'
 
-        .sub main @MAIN
+        .sub main :main
             print "hi\n"
         .end
     CODE
