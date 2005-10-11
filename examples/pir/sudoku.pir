@@ -1,3 +1,5 @@
+# $Id$
+
 =pod
 
 =head1 TITLE
@@ -213,7 +215,7 @@ nok:
 err:
     printerr "inconsistent start\n"
     self."end_display"()
-    die 1
+    die 3, 100
 .end
 
 # read game from file
@@ -253,7 +255,7 @@ err:
     printerr "read '"
     printerr file_name
     printerr "' failed\n"
-    die 1
+    die 3, 100
 .end
 
 # get commandline options
@@ -337,7 +339,7 @@ sel_name:
 	printerr "no such builtin: '"
 	printerr name
 	printerr "'\n"
-	die 1
+	die 3, 100
 ok:
     $S0 = b[name]
     .return ($S0)
@@ -482,11 +484,11 @@ err:
     $S0 = raw[i]
     printerr $S0
     printerr "\n"
-    die 1
+    die 3, 100
 
 len_err:
     printerr "length != 81\n"
-    die
+    die 3, 100
 .end
 
 #
@@ -684,7 +686,7 @@ not_deb:
     .return()
 intern_err:
     printerr "diff between ar and try\n"
-    die
+    die 3, 100
 .end
 
 # print invalid for given row and number(s)
@@ -1228,7 +1230,7 @@ lpx:
     printerr " x="
     printerr x
     printerr "\n"
-    die 1
+    die 3, 100
 ok:
     inc x
     if x < 9 goto lpx

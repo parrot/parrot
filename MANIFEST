@@ -473,7 +473,6 @@ examples/assembly/slurp.pasm                      [main]doc
 examples/assembly/small.xml                       [main]doc
 examples/assembly/stack.pasm                      [main]doc
 examples/assembly/substr.pasm                     [main]doc
-examples/assembly/sudoku.pir                      [main]doc
 examples/assembly/thr-primes.imc                  [main]doc
 examples/assembly/trace.pasm                      [main]doc
 examples/assembly/uniq.pasm                       [main]doc
@@ -602,6 +601,7 @@ examples/mops/mops.rb                             [main]doc
 examples/mops/mops.scheme                         [main]doc
 examples/pasm/fact.pasm                           [main]doc
 examples/pir/mandel.pir                           [main]doc
+examples/pir/sudoku.pir                           [main]doc
 examples/pni/PQt.C                                [main]doc
 examples/pni/QtHelloWorld.pasm                    [main]doc
 examples/pni/sdl_blue_rectangle.imc               [main]doc

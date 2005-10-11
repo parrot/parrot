@@ -27,7 +27,7 @@ F<t/examples/pasm.t>
 =cut
 
 use strict;
-use Parrot::Test tests => 1;
+use Parrot::Test tests => 2;
 use Test::More;
 
 # Set up expected output for examples
@@ -64,6 +64,37 @@ my %expected = (
 ........::::::::::::::::::::::::::::::::::,,,,,,,:::::::::::::::::::.......
 ...........::::::::::::::::::::::::::::::::::::::::::::::::::::::..........
 END_EXPECTED
+
+    'sudoku.pir'        =>  << 'END_EXPECTED',
++---------+---------+---------+
+| 1  .  . | .  .  . | .  .  . |
+| .  .  2 | 7  4  . | .  .  . |
+| .  .  . | 5  .  . | .  .  4 |
++---------+---------+---------+
+| .  3  . | .  .  . | .  .  . |
+| 7  5  . | .  .  . | .  .  . |
+| .  .  . | .  .  9 | 6  .  . |
++---------+---------+---------+
+| .  4  . | .  .  6 | .  .  . |
+| .  .  . | .  .  . | .  7  1 |
+| .  .  . | .  .  1 | .  3  . |
++---------+---------+---------+
+init ok
++---------+---------+---------+
+| 1  8  4 | 9  6  3 | 7  2  5 |
+| 5  6  2 | 7  4  8 | 3  1  9 |
+| 3  9  7 | 5  1  2 | 8  6  4 |
++---------+---------+---------+
+| 2  3  9 | 6  5  7 | 1  4  8 |
+| 7  5  6 | 1  8  4 | 2  9  3 |
+| 4  1  8 | 2  3  9 | 6  5  7 |
++---------+---------+---------+
+| 9  4  1 | 3  7  6 | 5  8  2 |
+| 6  2  3 | 8  9  5 | 4  7  1 |
+| 8  7  5 | 4  2  1 | 9  3  6 |
++---------+---------+---------+
+solved
+END_EXPECTED
                           );
 
 # Do the testing
@@ -71,8 +102,7 @@ my %test_func = ( pasm => \&pasm_output_is,
                   pir  => \&pir_output_is,
                   imc  => \&pir_output_is );
 
-while ( my ( $example, $expected ) = each %expected )
-{
+while ( my ( $example, $expected ) = each %expected ) {
     my $code_fn   = "examples/pir/$example";
     my $code = Parrot::Test::slurp_file($code_fn);
 
