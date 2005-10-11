@@ -27,8 +27,11 @@ F<t/examples/pasm.t>
 =cut
 
 use strict;
-use Parrot::Test tests => 2;
+use Parrot::Test tests => 3;
 use Test::More;
+use Parrot::Config;
+
+my $PARROT = ".$PConfig{slash}$PConfig{test_prog}";
 
 # Set up expected output for examples
 my %expected = (
@@ -116,4 +119,12 @@ while ( my ( $example, $expected ) = each %expected ) {
     else {
       ok( defined $extension, "no extension recognized for $code_fn" );
     }
+}
+
+
+# For testing md5sum.pir we need to pass a filename
+{
+  my $md5sum_fn = "examples$PConfig{slash}pir$PConfig{slash}md5sum.pir";
+  my $sum = `$PARROT $md5sum_fn $md5sum_fn`;
+  is( $sum, "3c97cb808c62b1b1a6ad9477d6edb850\t$md5sum_fn\n", $md5sum_fn );
 }

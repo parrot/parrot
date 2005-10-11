@@ -459,7 +459,6 @@ examples/assembly/lexical3.pasm                   [main]doc
 examples/assembly/life.pasm                       [main]doc
 examples/assembly/local_label.pasm                [main]doc
 examples/assembly/mandel.pasm                     [main]doc
-examples/assembly/md5sum.imc                      [main]doc
 examples/assembly/mops.pasm                       [main]doc
 examples/assembly/mops_p.pasm                     [main]doc
 examples/assembly/nanoforth.pasm                  [main]doc
@@ -601,6 +600,7 @@ examples/mops/mops.rb                             [main]doc
 examples/mops/mops.scheme                         [main]doc
 examples/pasm/fact.pasm                           [main]doc
 examples/pir/mandel.pir                           [main]doc
+examples/pir/md5sum.pir                           [main]doc
 examples/pir/sudoku.pir                           [main]doc
 examples/pni/PQt.C                                [main]doc
 examples/pni/QtHelloWorld.pasm                    [main]doc

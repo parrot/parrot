@@ -19,12 +19,14 @@ would be expected.
 
 =cut
 
+use strict;
+
 use Parrot::Test;
 use Test::More;
 use Parrot::Config;
 
-$PARROT = ".$PConfig{slash}$PConfig{test_prog}";
-$PBCMERGE = ".$PConfig{slash}pbc_merge$PConfig{exe}";
+my $PARROT = ".$PConfig{slash}$PConfig{test_prog}";
+my $PBCMERGE = ".$PConfig{slash}pbc_merge$PConfig{exe}";
 
 # Only test if we have the PBC merge tool built.
 if (-e $PBCMERGE) {

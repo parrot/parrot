@@ -230,7 +230,7 @@ foreach ( sort keys %outputs ) {
 
         if ( ref $outputs{ $_ } eq q(Regexp) ) {
             if ( /\.pasm$/ ) {
-                output_like( $bench, $outputs{ $_ }, $_ );
+                pasm_output_like( $bench, $outputs{ $_ }, $_ );
             }
             elsif ( /\.imc$/ ) {
                 pir_output_like( $bench, $outputs{ $_ }, $_ );
@@ -241,7 +241,7 @@ foreach ( sort keys %outputs ) {
         }
         else {
             if ( /\.pasm$/ ) {
-                output_is( $bench, $outputs{ $_ }, $_ );
+                pasm_output_is( $bench, $outputs{ $_ }, $_ );
             }
             elsif ( /\.imc$/ ) {
                 pir_output_is( $bench, $outputs{ $_ }, $_ );

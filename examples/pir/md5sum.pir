@@ -5,11 +5,11 @@
 
 =head1 NAME
 
-examples/assembly/md5sum.imc - calculate MD5 checksums
+examples/pir/md5sum.imc - calculate MD5 checksums
 
 =head1 SYNOPSIS
 
-    % ./parrot examples/assembly/md5sum.imc filename [filename ...]
+    % ./parrot examples/pir/md5sum.imc filename [filename ...]
 
 =head1 DESCRIPTION
 
@@ -87,6 +87,5 @@ iter_cont:
 
 iter_done:
 
-     end
 .end
 
