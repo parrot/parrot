@@ -24,7 +24,7 @@ And a lot of comments in the source - sorry.
 =cut
 
 
-.sub _main @MAIN
+.sub _main :main
     .param pmc argv
     .local int argc
     .local pmc in

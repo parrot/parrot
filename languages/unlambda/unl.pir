@@ -18,7 +18,7 @@ L<http://www.madore.org/~david/programs/unlambda/>
 
 =cut
 
-.sub _main @MAIN
+.sub _main :main
     .param pmc argv
     .local int argc
     .local pmc in, cchar
