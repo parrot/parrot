@@ -171,7 +171,7 @@ ok
 OUTPUT
 
 pir_output_is(<<'CODE', <<OUTPUT, "vanishing return continuation in method calls");
-.sub main @MAIN
+.sub main :main
     .local pmc o, cl
     cl = newclass "Foo"
 
@@ -444,7 +444,7 @@ pir_output_is(<<'CODE', <<OUTPUT, "Recursion and exceptions");
 
 # this did segfault with GC_DEBUG
 
-.sub main @MAIN
+.sub main :main
     .local pmc n
     new_pad 0
     $P0 = getinterp
@@ -723,7 +723,7 @@ ok
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "verify deleg_pmc object marking");
-.sub main @MAIN
+.sub main :main
     .local pmc cl, s, t
     cl = subclass "String", "X"
     addattribute cl, "o3"
@@ -766,7 +766,7 @@ ok 4
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "AddrRegistry 1");
-.sub main @MAIN
+.sub main :main
     .local pmc a, reg, nil
     reg = new .AddrRegistry
     a = new .String
@@ -811,7 +811,7 @@ ok 5
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "AddrRegistry 2");
-.sub main @MAIN
+.sub main :main
     .local pmc a, b, reg, nil
     null nil
     reg = new .AddrRegistry
@@ -835,7 +835,7 @@ CODE
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "AddrRegistry 2");
-.sub main @MAIN
+.sub main :main
     .local pmc a, b, c, reg, nil, it
     null nil
     reg = new .AddrRegistry

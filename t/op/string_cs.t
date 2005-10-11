@@ -463,7 +463,7 @@ iso-8859-1
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "bug #34661 literal" );
-.sub main @MAIN
+.sub main :main
     $S0 = unicode:"\"]\nif I3 == "
     print "ok 1\n"
 .end
@@ -472,7 +472,7 @@ ok 1
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "todo #34660 hash" );
-.sub main @MAIN
+.sub main :main
     $P0 = new Integer
     $P0 = 42
     store_global "Foo", unicode:"Bar", $P0

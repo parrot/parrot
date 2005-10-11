@@ -445,7 +445,7 @@ CODE
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "current pad depth");
-.sub main @MAIN
+.sub main :main
     new_pad 0
     new_pad -1
     $P0 = peek_pad

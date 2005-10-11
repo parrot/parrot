@@ -1464,7 +1464,7 @@ OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT',"index with different charsets");
 
-.sub test @MAIN
+.sub test :main
 
     print "default - default:\n"
     set S0, "Parrot"

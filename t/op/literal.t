@@ -44,7 +44,7 @@ CODE
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "integer literals in PIR");
-.sub test @MAIN
+.sub test :main
         print 0x2A
         print "\n"
         print 0X2A

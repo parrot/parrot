@@ -338,7 +338,7 @@ CODE
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "mod - negative, zero rest (#36003)");
-.sub test @MAIN
+.sub test :main
 
    $I1 = mod 3, 3
    print "3 mod 3 = "

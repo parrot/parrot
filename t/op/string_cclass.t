@@ -22,7 +22,7 @@ use Parrot::Test tests => 6;
 
 pir_output_is(<<'CODE', <<'OUT', "find_cclass, ascii");
 .include "cclass.pasm"
-.sub main @MAIN
+.sub main :main
     $S0 = ascii:"test_func(1)"
     test( .CCLASS_WORD, $S0 )
 
@@ -54,7 +54,7 @@ OUT
 
 pir_output_is(<<'CODE', <<'OUT', "find_not_cclass, ascii");
 .include "cclass.pasm"
-.sub main @MAIN
+.sub main :main
     $S0 = ascii:"test_func(1)"
     test( .CCLASS_WORD, $S0 )
 
@@ -86,7 +86,7 @@ OUT
 
 pir_output_is(<<'CODE', <<'OUT', "find_cclass, iso-8859-1");
 .include "cclass.pasm"
-.sub main @MAIN
+.sub main :main
     $S0 = iso-8859-1:"test_func(1)"
     test( .CCLASS_WORD, $S0 )
 
@@ -118,7 +118,7 @@ OUT
 
 pir_output_is(<<'CODE', <<'OUT', "find_not_cclass, iso-8859-1");
 .include "cclass.pasm"
-.sub main @MAIN
+.sub main :main
     $S0 = iso-8859-1:"test_func(1)"
     test( .CCLASS_WORD, $S0 )
 
@@ -150,7 +150,7 @@ OUT
 
 pir_output_is(<<'CODE', <<'OUT', "is_cclass, ascii");
 .include "cclass.pasm"
-.sub main @MAIN
+.sub main :main
     $S1 = ascii:"ab\nC_X34.\0 \t!"
     test1( $S1 )
 .end
@@ -213,7 +213,7 @@ OUT
 
 pir_output_is(<<'CODE', <<'OUT', "is_cclass, iso-8859-1");
 .include "cclass.pasm"
-.sub main @MAIN
+.sub main :main
     $S1 = iso-8859-1:"ab\nC_X34.\0 \t!"
     test1( $S1 )
 .end

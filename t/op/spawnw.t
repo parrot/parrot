@@ -134,7 +134,7 @@ return code: 3
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "grow argv buffer");
-.sub test @MAIN
+.sub test :main
         .local pmc args
 
         $S0 = "exit length(qq{"

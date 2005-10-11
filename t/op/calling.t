@@ -252,7 +252,7 @@ back
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "use it in PIR");
-.sub main @MAIN
+.sub main :main
     $P0 = new String
     $P0 = "hello\n"
     find_name $P1, "foo"
@@ -324,7 +324,7 @@ back
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "use it in PIR");
-.sub main @MAIN
+.sub main :main
     $P0 = new String
     $P0 = "hello\n"
     find_name $P1, "foo"
@@ -341,7 +341,7 @@ hello
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "type conversion - autobox");
-.sub main @MAIN
+.sub main :main
     $P0 = new String
     $P0 = "hello"
     find_name $P1, "foo"
@@ -364,7 +364,7 @@ hello 42 bar
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "type conversion - fetch");
-.sub main @MAIN
+.sub main :main
     $P0 = new .String
     $P0 = "hello"
     $P1 = new .Integer
@@ -449,7 +449,7 @@ OUTPUT
 SKIP: {
   skip("arg count check disabled", 2);
 pir_output_like(<<'CODE', <<'OUTPUT', "argc mismatch, too few");
-.sub main @MAIN
+.sub main :main
     $P0 = new String
     $P0 = "hello\n"
     find_name $P1, "foo"
@@ -465,7 +465,7 @@ CODE
 OUTPUT
 
 pir_output_like(<<'CODE', <<'OUTPUT', "argc mismatch, too many");
-.sub main @MAIN
+.sub main :main
     $P0 = new String
     $P0 = "hello\n"
     find_name $P1, "foo"
@@ -482,7 +482,7 @@ OUTPUT
 }
 
 pir_output_is(<<'CODE', <<'OUTPUT', "argc mismatch, optional");
-.sub main @MAIN
+.sub main :main
     $P0 = new String
     $P0 = "hello\n"
     find_name $P1, "foo"
@@ -533,7 +533,7 @@ back
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "tailcall 1");
-.sub main @MAIN
+.sub main :main
     .const .Sub f = "foo"
     print "main\n"
     get_results "(0)", $S0
@@ -559,7 +559,7 @@ bar_ret
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "tailcall 2 - pass arg");
-.sub main @MAIN
+.sub main :main
     .const .Sub f = "foo"
     print "main\n"
     get_results "(0)", $S0
@@ -589,7 +589,7 @@ bar_ret
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "tailcall 3 - pass arg");
-.sub main @MAIN
+.sub main :main
     .const .Sub f = "foo"
     print "main\n"
     get_results "(0)", $S0
@@ -658,7 +658,7 @@ back
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "empty args");
-.sub main @MAIN
+.sub main :main
     $P0 = new String
     $P0 = "hello\n"
     find_name $P1, "foo"
@@ -677,7 +677,7 @@ ok
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "optional args");
-.sub main @MAIN
+.sub main :main
     $P0 = new String
     $P0 = "hello\n"
     find_name $P1, "foo"
@@ -696,7 +696,7 @@ ok
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "optional, argcX");
-.sub main @MAIN
+.sub main :main
     $P0 = new String
     $P0 = "hello\n"
     find_name $P1, "foo"
@@ -721,7 +721,7 @@ ok
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "pir uses no ops");
-.sub main @MAIN
+.sub main :main
     $I0 = 77
     foo(42, $I0)
     print "back\n"
@@ -743,7 +743,7 @@ back
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "pir call evaled code");
-.sub main @MAIN
+.sub main :main
     .local string s
     s  = ".sub foo\n"
     s .= ".param int i\n"
@@ -768,7 +768,7 @@ CODE
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "tailcall 4 - pir calls");
-.sub main @MAIN
+.sub main :main
     .const .Sub f = "foo"
     print "main\n"
     $S0 = f()
@@ -794,7 +794,7 @@ bar_ret
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "type conversion - native");
-.sub main @MAIN
+.sub main :main
     foo(42, "42", 42.20)
 .end
 .sub foo
@@ -823,7 +823,7 @@ OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "type conversion - PIR const");
 .const int MYCONST = -2
-.sub main @MAIN
+.sub main :main
     $P0 = new PerlString
     "foo"(MYCONST)
 .end
@@ -837,7 +837,7 @@ CODE
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "optional args, :opt_flag");
-.sub main @MAIN
+.sub main :main
     $P0 = new String
     $P0 = "hello\n"
     foo($P0)
@@ -860,7 +860,7 @@ hello
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "optional multiple :opt_flag");
-.sub main @MAIN
+.sub main :main
     $P0 = new String
     $P0 = "ok 1\n"
     foo($P0, "ok 2\n", "ok 3\n")
@@ -899,7 +899,7 @@ ok 4
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "optional returns, void ret");
-.sub main @MAIN
+.sub main :main
     .local pmc f
     $I0 = 99
     f = global "foo"
@@ -920,7 +920,7 @@ ok 1
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "tailcall 5 - arg/param conflict");
-.sub main @MAIN
+.sub main :main
     .local pmc a, b
     a = new Integer
     a = 1
@@ -958,7 +958,7 @@ ok 2
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "OO argument passig");
-.sub main @MAIN
+.sub main :main
     .local pmc cl, o, f
     cl = newclass "Foo"
     o = new "Foo"
@@ -996,7 +996,7 @@ OUTPUT
 
 # see also tcl in leo-ctx5 by Coke; Date 28.08.2005
 pir_output_is(<<'CODE', <<'OUTPUT', "bug - :slurpy promotes to :flatten");
-.sub main @MAIN
+.sub main :main
     $P0 = new String
     $P0 = "ok 1\n"
     $P1 = new String
@@ -1022,7 +1022,7 @@ ok 2
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "taicall to NCI");
-.sub main @MAIN
+.sub main :main
     .local pmc s
     s = new .String
     s = "OK 1\n"
