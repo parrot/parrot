@@ -25,7 +25,7 @@ The main function.
 
 =cut
 
-.sub _main @MAIN
+.sub _main :main
     load_bytecode "library/SDL/App.imc"
     load_bytecode "library/SDL/Event.imc"
     load_bytecode "library/SDL/EventHandler.imc"

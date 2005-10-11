@@ -44,7 +44,7 @@ Markus Amsler - <markus.amsler@oribi.org>
 
 =cut
 
-.sub main @MAIN
+.sub main :main
     .local pmc sock, work, fp
     .local pmc fp               # read requested files from disk
     .local string address

@@ -1082,7 +1082,7 @@ This method is called automatically when this module is loaded.
 
 =cut
 
-.sub __onload @LOAD
+.sub __onload :load
     $I0 = find_type "Mines::Field"
     if $I0 > 1 goto END
 

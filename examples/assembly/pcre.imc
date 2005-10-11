@@ -25,7 +25,7 @@ E<lt>jerry dot gay at gmail dot com<gt>
 .include 'library/pcre.imc'
 
 
-.sub main @MAIN
+.sub main :main
 	.param pmc argv
 
 	.local int argc

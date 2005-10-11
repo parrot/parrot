@@ -40,7 +40,7 @@ it parent classes nor is it subclassed.
 .const int tPalette           = 7
 .const int tBoards            = 8
 
-.sub __onload @LOAD
+.sub __onload :load
     find_type $I0, "Tetris::App"
     if $I0 > 1 goto END
 

@@ -17,7 +17,7 @@ royalty-free font file.  Maybe soon.
 
 =cut
 
-.sub _main @MAIN
+.sub _main :main
 
 	# first load the necessary libraries
 	load_bytecode "library/SDL/App.imc"

@@ -6,7 +6,7 @@ blocks.imc - tetris block classes
 
 .namespace ["Tetris::Blocks"]
 
-.sub __onload @LOAD
+.sub __onload :load
     find_type $I0, "Tetris::Block::1"
     if $I0 > 1 goto END
 

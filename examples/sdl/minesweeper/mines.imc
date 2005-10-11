@@ -19,7 +19,7 @@ The main function.
 
 =cut
 
-.sub _main @MAIN
+.sub _main :main
     .param pmc args
     .local pmc field
     .local pmc screen

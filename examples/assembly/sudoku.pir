@@ -139,7 +139,7 @@ Same as parrot.
 
 .const string VERSION="0.2.3"
 
-.sub _main @MAIN
+.sub _main :main
     .param pmc argv
     .local int argc
     .local string raw_given

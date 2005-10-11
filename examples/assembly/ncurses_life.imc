@@ -56,7 +56,7 @@ Run faster.
 
 =cut
 
-.sub _MAIN @MAIN
+.sub _MAIN :main
 	.param pmc argv
 	# the command line
         load_bytecode "library/ncurses.pasm"

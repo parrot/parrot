@@ -15,7 +15,7 @@ Inspired by computer language shootout.
 
 =cut
 
-.sub main @MAIN
+.sub main :main
     .param pmc argv
 
     load_bytecode "Getopt/Long.pbc"

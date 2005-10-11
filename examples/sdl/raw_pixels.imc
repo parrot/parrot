@@ -13,7 +13,7 @@ To run this file, run the following command from the Parrot directory:
 
 .include 'datatypes.pasm'
 
-.sub _main @MAIN
+.sub _main :main
 	# first load the necessary libraries
 	load_bytecode "library/SDL/App.imc"
 	load_bytecode "library/SDL/Rect.imc"

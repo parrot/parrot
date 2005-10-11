@@ -1,4 +1,4 @@
-.sub _main @MAIN
+.sub _main :main
     .local pmc stream
     
     load_bytecode "library/Stream/Writer.imc"

@@ -27,7 +27,7 @@ is not subclassed further.
 .const int Fall      = 3
 .const int Board     = 4
 
-.sub __onload @LOAD
+.sub __onload :load
     find_type $I0, "Tetris::Block"
     if $I0 > 1 goto END
     load_bytecode "examples/sdl/tetris/blockdata.imc"

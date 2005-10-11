@@ -1,6 +1,6 @@
 # $Id$
 
-.sub bench @MAIN
+.sub bench :main
 .include "pmctypes.pasm"
 .include "mmd.pasm"
    .local pmc my_mul

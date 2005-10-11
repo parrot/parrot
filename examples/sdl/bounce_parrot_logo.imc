@@ -15,7 +15,7 @@ Use the Escape key or close the window when you've had enough.
 
 =cut
 
-.sub _main @MAIN
+.sub _main :main
 	load_bytecode "library/SDL/App.imc"
 	load_bytecode "library/SDL/Color.imc"
 	load_bytecode "library/SDL/Rect.imc"

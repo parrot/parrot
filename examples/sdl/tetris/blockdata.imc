@@ -14,7 +14,7 @@ blockdata.imc - a tetris block data class
 
 .namespace ["Tetris::BlockData"]
 
-.sub __onload @LOAD
+.sub __onload :load
     find_type $I0, "Tetris::BlockData"
     if $I0 > 1 goto END
     newclass $P0, "Tetris::BlockData"

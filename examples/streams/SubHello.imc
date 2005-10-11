@@ -12,7 +12,7 @@ Creates a C<Stream::Sub> and dumps it.
 
 =cut
 
-.sub _main @MAIN
+.sub _main :main
     .local pmc stream
     .local pmc temp
 

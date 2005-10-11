@@ -11,7 +11,7 @@ This example shows the usage of C<Stream::read_bytes>.
 
 =cut
 
-.sub _main @MAIN
+.sub _main :main
     .local pmc stream
     .local pmc temp
 

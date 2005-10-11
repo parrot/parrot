@@ -20,7 +20,7 @@ board.imc - a tetris board class.
 
 .namespace ["Tetris::Board"]
 
-.sub __onload @LOAD
+.sub __onload :load
     find_type $I0, "Tetris::Board"
     if $I0 > 1 goto END
     load_bytecode "examples/sdl/tetris/boarddata.imc"

@@ -6,7 +6,7 @@ eventhandler.imc - a tetris event handler class
 
 .namespace ["Tetris::EventHandler"]
 
-.sub __onload @LOAD
+.sub __onload :load
     find_type $I0, "Tetris::EventHandler"
     if $I0 > 1 goto END
     load_bytecode "library/SDL/EventHandler.imc"

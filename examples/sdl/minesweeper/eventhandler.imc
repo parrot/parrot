@@ -20,7 +20,7 @@ This is a simple SDL event handler class.
 
 .namespace ["Mines::EventHandler"]
 
-.sub __onload @LOAD
+.sub __onload :load
 
     $I0 = find_type "Mines::EventHandler"
     if $I0 > 1 goto END

@@ -24,7 +24,7 @@ about ten-fold).
 
 # Main Harness to demonstrate MD5.imc
 
-.sub _main @MAIN
+.sub _main :main
     .param pmc args
 
     .local int size

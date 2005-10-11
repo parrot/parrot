@@ -16,7 +16,7 @@ PMC to the stream with the C<assign> op.
 
 =cut
 
-.sub _main @MAIN
+.sub _main :main
     .local pmc stream
     .local pmc temp
 

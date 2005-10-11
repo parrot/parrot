@@ -1,4 +1,4 @@
-.sub main @MAIN
+.sub main :main
     .param pmc argv
     .local int argc
     argc = argv

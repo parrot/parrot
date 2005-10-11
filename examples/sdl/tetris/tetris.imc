@@ -27,7 +27,7 @@ Array with commandline parameters.
 
 =cut
 
-.sub _main @MAIN
+.sub _main :main
     .param pmc argv
     .local pmc app
 
