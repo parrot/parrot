@@ -126,5 +126,5 @@ while ( my ( $example, $expected ) = each %expected ) {
 {
   my $md5sum_fn = "examples$PConfig{slash}pir$PConfig{slash}md5sum.pir";
   my $sum = `$PARROT $md5sum_fn $md5sum_fn`;
-  is( $sum, "3c97cb808c62b1b1a6ad9477d6edb850\t$md5sum_fn\n", $md5sum_fn );
+  is( $sum, "0141db367bd8265f37926c16ccf5113a\t$md5sum_fn\n", $md5sum_fn );
 }
