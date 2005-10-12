@@ -41,6 +41,9 @@ print T <<'EOF';
 MAIN:
 	new P20, .PerlHash     # PerlHash   # Numerics
 	new P21, .PerlHash     # Alphabetics.
+	new P22, .PerlHash     # ??
+	new P23, .PerlHash     # ??
+	new P24, .PerlArray    # Line numbers
 	time I24  	       # Seed the random number generator
 
 	save 0  # Initialize the runtime stack!
