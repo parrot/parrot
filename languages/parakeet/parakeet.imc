@@ -404,10 +404,10 @@
 
   .addCore("open", _OPEN, "unimplemented.")
   .addCore("close", _CLOSE, "unimplemented.")
-  .addCore("peek", _PEEK, "unimplimented.")
-  .addCore("stat", _STAT, "unimplimented.")
-  .addCore("seek", _SEEK, "unimplimented.")
-  .addCore("tell", _TELL, "unimplimented.")
+  .addCore("peek", _PEEK, "unimplemented.")
+  .addCore("stat", _STAT, "unimplemented.")
+  .addCore("seek", _SEEK, "unimplemented.")
+  .addCore("tell", _TELL, "unimplemented.")
 
   # stackies
 

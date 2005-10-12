@@ -3,13 +3,13 @@
 
 =head1 NAME
 
-examples/assembly/getopt_demo.imc - demonstrating library/Getopt/Long.pir
+examples/library/getopt_demo.imc - demonstrating library/Getopt/Long.pir
 
 =head1 SYNOPSIS
 
-    % ./parrot examples/assembly/getopt_demo.imc --help
-    % ./parrot examples/assembly/getopt_demo.imc --version
-    % ./parrot examples/assembly/getopt_demo.imc --string=asdf --bool --integer=42 some thing
+    % ./parrot examples/library/getopt_demo.imc --help
+    % ./parrot examples/library/getopt_demo.imc --version
+    % ./parrot examples/library/getopt_demo.imc --string=asdf --bool --integer=42 some thing
 
 =head1 DESCRIPTION
 

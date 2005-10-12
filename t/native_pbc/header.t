@@ -1,6 +1,6 @@
 #! perl -w
 # Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
-# $Id: number.t 7803 2005-04-11 13:37:27Z leo $
+# $Id$
 
 =head1 NAME
 
@@ -26,7 +26,7 @@ use Test::More;
 use Parrot::Config;
 
 SKIP: {
-    skip "new header format not yet implimented", 8;
+    skip "new header format not yet implemented", 8;
     # idea stolen from t/pmc/sub.t
     my $tmppasm = File::Temp->new(UNLINK => 1, SUFFIX => '.pasm');
     print $tmppasm <<END;

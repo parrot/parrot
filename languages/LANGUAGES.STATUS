@@ -135,7 +135,7 @@ D: Parakeet also has a lot of features not found in standard Forth, like local
 D: variables, nested words and classes and (as a result) nested
 D: compile-time and run-time lexical word, class and variable scopes.
 S: Under development;
-S: Not in Parrot CVS
+S: Broken in respect to recent (and upcoming) DEPRECATED items
 W: http://www.daca.net:8080/Parakeet-0.1.tgz
 V: 0.0.11
 

@@ -712,7 +712,7 @@ ft_init(Parrot_Interp interpreter, visit_info *info)
     else {
         if (string_length(interpreter, s) < PACKFILE_HEADER_BYTES) {
             real_exception(interpreter, NULL, E_IOError,
-                    "bad string too thaw");
+                    "bad string to thaw");
         }
         mem_sys_memcopy(pf->header, s->strstart, PACKFILE_HEADER_BYTES);
         PackFile_assign_transforms(pf);
