@@ -49,7 +49,7 @@ More? - FIXME
 PDDS B<should not> discuss the implementation details or trade-offs,
 unless they absolutely have to.  Such implementation documentation
 should go in the relevant F<*.dev> file.  On the other hand, PDDs
-B<should design trade-offs, i.e. the paths not chosen.
+B<should> document design trade-offs, i.e. the paths not chosen.
 
 These guidelines may seem fuzzy.  The line between "design" and
 "implementation" is a murky one.  Still, please try to adhere to this
