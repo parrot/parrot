@@ -8,9 +8,9 @@ t/examples/pir.t - Test examples in F<examples/pir>
 
 =head1 SYNOPSIS
 
-	% perl -Ilib t/examples/pir.t
+    % perl -Ilib t/examples/pir.t
 
-        % perl t/harness t/examples/pir.t
+    % perl t/harness t/examples/pir.t
 
 =head1 DESCRIPTION
 
@@ -19,15 +19,20 @@ Test the examples in F<examples/pir>.
 =head1 TODO
 
 Check on remaining examples.
+Perhaps use Parrot::Test::run_command().
 
 =head1 SEE ALSO
 
 F<t/examples/pasm.t>
 
+=head1 AUTHOR
+
+Bernhard Schmalhofer - <Bernhard.Schmalhofer@gmx.de>
+
 =cut
 
 use strict;
-use Parrot::Test tests => 3;
+use Parrot::Test tests => 4;
 use Test::More;
 use Parrot::Config;
 
@@ -121,10 +126,20 @@ while ( my ( $example, $expected ) = each %expected ) {
     }
 }
 
-
 # For testing md5sum.pir we need to pass a filename
 {
   my $md5sum_fn = "examples$PConfig{slash}pir$PConfig{slash}md5sum.pir";
   my $sum = `$PARROT $md5sum_fn $md5sum_fn`;
   is( $sum, "0141db367bd8265f37926c16ccf5113a\t$md5sum_fn\n", $md5sum_fn );
+}
+
+# Testing pcre.imc with a simple pattern
+{
+  my $pcre_fn = "examples$PConfig{slash}pir$PConfig{slash}pcre.pir";
+  my $test_out = `$PARROT $pcre_fn asdf as`;
+  is( $test_out, << 'END_EXPECTED', $pcre_fn );
+asdf =~ /as/
+1 match(es):
+as
+END_EXPECTED
 }
