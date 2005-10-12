@@ -1,7 +1,4 @@
-# Parrot md5sum; Nick Glencross <nickg@glencros.demon.co.uk>
-#                Improvements from Leo
-#
-# Harness for the Digest/MD5.pir library
+# $Id$
 
 =head1 NAME
 
@@ -9,20 +6,22 @@ examples/pir/md5sum.imc - calculate MD5 checksums
 
 =head1 SYNOPSIS
 
-    % ./parrot examples/pir/md5sum.imc filename [filename ...]
+    % ./parrot examples/pir/md5sum.pir filename [filename ...]
 
 =head1 DESCRIPTION
 
-Behave very much like md5sum(1).
+The main purpose of this script is testing the Digest/MD5.pir library.
+It should behave very much like md5sum(1).
 
 Running parrot with -j will give a significant performance boost (often
 about ten-fold).
 
+=head1 AUTHOR
+
+Nick Glencross     - <nickg@glencros.demon.co.uk>
+Leopold Toetsch    - <lt@toetsch.at>
+
 =cut
-
-###########################################################################
-
-# Main Harness to demonstrate MD5.imc
 
 .sub _main :main
     .param pmc args
@@ -50,7 +49,7 @@ next_iter:
     file = args[$I1]
     .include "stat.pasm"
     # Get size of file
-    stat size, file, .STAT_FILESIZE
+    size = stat file, .STAT_FILESIZE
     .local pmc pio, cl
     cl = getclass "ParrotIO"
     # slurp the file into memory
@@ -88,4 +87,3 @@ iter_cont:
 iter_done:
 
 .end
-
