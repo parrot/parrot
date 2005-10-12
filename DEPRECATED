@@ -25,6 +25,17 @@ user stack opcodes save/restore instead.
 
 =back
 
+=head1 Deprecated methods
+
+=over 4
+
+=item Sub.get_name_space()
+
+The Sub PMC method get_name_space is being replaced with get_namespace to
+reflect the internal change from name_space to the one-word namespace.
+
+=back
+
 =head1 FUTURE changes
 
 Not yet deprecated, but it's recommended to use the new syxtax and

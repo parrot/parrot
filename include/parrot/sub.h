@@ -57,7 +57,7 @@ typedef struct Parrot_sub {
     opcode_t *end;              /* end of bytecode */
 
     INTVAL   HLL_id;            /* see src/hll.c XXX or per segment? */
-    PMC      *name_space;       /* where this Sub is in */
+    PMC      *namespace;       /* where this Sub is in */
     STRING   *name;             /* name of the sub */
     PMC      *multi_signature;  /* list of types for MMD */
     INTVAL   n_regs_used[4];	/* INSP in PBC */
@@ -81,7 +81,7 @@ typedef struct Parrot_coro {
     opcode_t *end;              /* end of bytecode */
 
     INTVAL   HLL_id;            /* see src/hll.c XXX or per segment? */
-    PMC      *name_space;       /* where this Sub is in */
+    PMC      *namespace;       /* where this Sub is in */
     STRING   *name;             /* name of the sub */
     PMC      *multi_signature;  /* list of types for MMD */
     INTVAL   n_regs_used[4];	/* INSP in PBC */

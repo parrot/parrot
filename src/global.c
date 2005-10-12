@@ -195,16 +195,16 @@ the interpreter's errors setting.
 PMC *
 Parrot_get_name(Interp* interpreter, STRING *name)
 {
-    PMC *g, *pad, *current_sub, *name_space;
+    PMC *g, *pad, *current_sub, *namespace;
 
     pad = scratchpad_get_current(interpreter);
     g = scratchpad_find(interpreter, pad, name);
     if (!g) {
         current_sub = CONTEXT(interpreter->ctx)->current_sub;
         if (current_sub &&
-                (name_space = PMC_sub(current_sub)->name_space))
+                (namespace = PMC_sub(current_sub)->namespace))
 
-            g = Parrot_find_global_p(interpreter, name_space, name);
+            g = Parrot_find_global_p(interpreter, namespace, name);
     }
     if (!g)
         g = Parrot_find_global(interpreter, NULL, name);
@@ -298,7 +298,7 @@ Parrot_store_global(Interp *interpreter, STRING *class,
 
 static void
 store_sub_in_namespace(Parrot_Interp interpreter, PMC* sub_pmc,
-        PMC *name_space, STRING *sub_name)
+        PMC *namespace, STRING *sub_name)
 {
     PMC *globals = interpreter->globals->stash_hash;
     INTVAL type, class_type;
@@ -306,12 +306,12 @@ store_sub_in_namespace(Parrot_Interp interpreter, PMC* sub_pmc,
 #if DEBUG_GLOBAL
     fprintf(stderr, "PMC_CONST: store_global: name '%s' ns %s\n",
             (char*)sub_name->strstart,
-            name_space ? (char*)PMC_str_val(name_space)->strstart : "(none)");
+            namespace ? (char*)PMC_str_val(namespace)->strstart : "(none)");
 #endif
     /*
      * namespace is either s String or a Key PMC or NULL
      */
-    if (PMC_IS_NULL(name_space)) {
+    if (PMC_IS_NULL(namespace)) {
 global_ns:
         Parrot_store_global(interpreter, NULL, sub_name, sub_pmc);
     }
@@ -319,10 +319,10 @@ global_ns:
         STRING *names;
         PMC * stash = NULL, *part;
 
-        type = name_space->vtable->base_type;
+        type = namespace->vtable->base_type;
         switch (type) {
             case enum_class_String:
-                names = PMC_str_val(name_space);
+                names = PMC_str_val(namespace);
                 if (!string_length(interpreter, names))
                     goto global_ns;
                 /*
@@ -345,7 +345,7 @@ global_ns:
                     Parrot_store_global(interpreter, names, sub_name, sub_pmc);
                 break;
             case enum_class_Key:
-                part = name_space;
+                part = namespace;
                 /*
                  * a nested key can't be handled by add_method
                  */
@@ -398,29 +398,29 @@ Parrot_store_sub_in_namespace(Parrot_Interp interpreter, PMC* sub_pmc)
 {
     STRING* sub_name;
     PMC *multi_sig;
-    PMC *name_space;
+    PMC *namespace;
     INTVAL func_nr;
     char *c_meth;
 
     sub_name = PMC_sub(sub_pmc)->name;
-    name_space = PMC_sub(sub_pmc)->name_space;
+    namespace = PMC_sub(sub_pmc)->namespace;
     multi_sig = PMC_sub(sub_pmc)->multi_signature;
     if (PMC_IS_NULL(multi_sig)) {
-        store_sub_in_namespace(interpreter, sub_pmc, name_space, sub_name);
+        store_sub_in_namespace(interpreter, sub_pmc, namespace, sub_name);
     }
     else {
         STRING *long_name;
         PMC *multi_sub;
 
-        multi_sub = Parrot_find_global_p(interpreter, name_space, sub_name);
+        multi_sub = Parrot_find_global_p(interpreter, namespace, sub_name);
         if (!multi_sub) {
             multi_sub = pmc_new(interpreter, enum_class_MultiSub);
             store_sub_in_namespace(interpreter, multi_sub,
-                    name_space, sub_name);
+                    namespace, sub_name);
         }
         VTABLE_push_pmc(interpreter, multi_sub, sub_pmc);
         long_name = Parrot_multi_long_name(interpreter, sub_pmc);
-        store_sub_in_namespace(interpreter, sub_pmc, name_space, long_name);
+        store_sub_in_namespace(interpreter, sub_pmc, namespace, long_name);
 
         c_meth = string_to_cstring(interpreter, sub_name);
         if ( (func_nr = Parrot_MMD_method_idx(interpreter, c_meth))  >= 0) {

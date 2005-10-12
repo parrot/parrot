@@ -50,11 +50,11 @@ ok
 bar
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "get_name_space Foo::bar");
+pir_output_is(<<'CODE', <<'OUTPUT', "get_namespace Foo::bar");
 .sub 'main' :main
     $P0 = find_global "Foo", "bar"
     print "ok\n"
-    $P1 = $P0."get_name_space"()
+    $P1 = $P0."get_namespace"()
     print $P1
     print "\n"
 .end
@@ -273,7 +273,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "get namespace in Foo::bar");
     print "bar\n"
     .include "interpinfo.pasm"
     $P0 = interpinfo .INTERPINFO_CURRENT_SUB
-    $P1 = $P0."get_name_space"()
+    $P1 = $P0."get_namespace"()
     print $P1
     print "\n"
 .end
@@ -298,7 +298,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "get namespace in Foo::Bar::baz");
     .include "interpinfo.pasm"
     .include "pmctypes.pasm"
     $P0 = interpinfo .INTERPINFO_CURRENT_SUB
-    $P1 = $P0."get_name_space"()
+    $P1 = $P0."get_namespace"()
     typeof $I0, $P1
     if $I0 == .Key goto is_key
     print $P1

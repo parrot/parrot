@@ -284,11 +284,11 @@ Parrot_full_sub_name(Interp* interpreter, PMC* sub)
     if (!sub || !VTABLE_defined(interpreter, sub))
         return NULL;
     s = PMC_sub(sub);
-    if (PMC_IS_NULL(s->name_space)) {
+    if (PMC_IS_NULL(s->namespace)) {
         return s->name;
     } else {
         if (s->name) {
-	    STRING* ns = VTABLE_get_string(interpreter, s->name_space);
+	    STRING* ns = VTABLE_get_string(interpreter, s->namespace);
 
     	    ns = string_concat(interpreter, ns,
 		string_from_cstring(interpreter, " :: ", 4), 0);
@@ -345,11 +345,11 @@ Parrot_Context_info(Interp *interpreter, parrot_context_t *ctxp,
     info->subname = sub->name;
 
     /* set the namespace name and fullname of the sub */
-    if (PMC_IS_NULL(sub->name_space)) {
+    if (PMC_IS_NULL(sub->namespace)) {
 	info->nsname = string_from_cstring(interpreter, "", 0);
 	info->fullname = info->subname;
     } else {
-	info->nsname = VTABLE_get_string(interpreter, sub->name_space);
+	info->nsname = VTABLE_get_string(interpreter, sub->namespace);
 	info->fullname = string_concat(interpreter, info->nsname,
 		string_from_cstring(interpreter, " :: ", 4), 0);
 	info->fullname = string_concat(interpreter, info->fullname,

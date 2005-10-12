@@ -119,15 +119,15 @@ PackFile_Constant_dump(Interp *interpreter,
                             "\tstart_offs => %d,\n"
                             "\tend_offs => %d,\n"
                             "\tname => '%Ss',\n"
-                            "\tname_space => '%Ss'\n",
+                            "\tnamespace => '%Ss'\n",
                             pmc->vtable->whoami,
                             sub->address - code_start,
                             sub->end - code_start,
                             sub->name,
-                            sub->name_space ?
-                                (sub->name_space->vtable->base_type ==
+                            sub->namespace ?
+                                (sub->namespace->vtable->base_type ==
                                     enum_class_String ?
-                                PMC_str_val(sub->name_space) : a_key) :
+                                PMC_str_val(sub->namespace) : a_key) :
                                 null
                             );
                     break;

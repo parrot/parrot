@@ -648,7 +648,7 @@ add_const_pmc_sub(Interp *interpreter, SymReg *r,
 {
     int i, k;
     INTVAL type;
-    PMC *name_space;
+    PMC *namespace;
     PMC *sub_pmc;
     struct Parrot_sub *sub;
     struct PackFile_Constant *pfc;
@@ -693,21 +693,21 @@ add_const_pmc_sub(Interp *interpreter, SymReg *r,
     sub = PMC_sub(sub_pmc);
     sub->name = string_from_cstring(interpreter, real_name, 0);
 
-    name_space = NULL;
+    namespace = NULL;
     if (ns_const >= 0 && ns_const < ct->const_count) {
         switch (ct->constants[ns_const]->type) {
             case PFC_KEY:
-                name_space = ct->constants[ns_const]->u.key;
+                namespace = ct->constants[ns_const]->u.key;
                 break;
             case PFC_STRING:
-                name_space = constant_pmc_new(interpreter,
+                namespace = constant_pmc_new(interpreter,
                         enum_class_String);
-                PMC_str_val(name_space) =
+                PMC_str_val(namespace) =
                     ct->constants[ns_const]->u.string;
                 break;
         }
     }
-    sub->name_space = name_space;
+    sub->namespace = namespace;
     sub->address = (opcode_t*)(long)offs;
     sub->end = (opcode_t*)(long)end;
     sub->HLL_id = unit->HLL_id;

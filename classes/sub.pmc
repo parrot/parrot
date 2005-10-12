@@ -63,7 +63,7 @@ print_sub_name(Interp* interpreter, PMC* sub)
 }
 
 /*
- * A sub now contains more data like name_space, which makes it
+ * A sub now contains more data like namespace, which makes it
  * effectively a container. Therefore need_ext has to be set
  */
 pmclass Sub need_ext {
@@ -396,8 +396,8 @@ Marks the continuation as live.
             return;
         if (sub->name)
             pobject_lives(INTERP, (PObj *) sub->name);
-        if (!PMC_IS_NULL(sub->name_space))
-            pobject_lives(INTERP, (PObj *) sub->name_space);
+        if (!PMC_IS_NULL(sub->namespace))
+            pobject_lives(INTERP, (PObj *) sub->namespace);
         if (!PMC_IS_NULL(sub->multi_signature))
             pobject_lives(INTERP, (PObj *) sub->multi_signature);
     }
@@ -447,8 +447,8 @@ Archives the subroutine.
     void visit(visit_info *info) {
         struct Parrot_sub * sub = PMC_sub(SELF);
 
-        info->thaw_ptr = &sub->name_space;
-        (info->visit_pmc_now)(INTERP, sub->name_space, info);
+        info->thaw_ptr = &sub->namespace;
+        (info->visit_pmc_now)(INTERP, sub->namespace, info);
         info->thaw_ptr = &sub->multi_signature;
         (info->visit_pmc_now)(INTERP, sub->multi_signature, info);
         SUPER(info);
@@ -468,7 +468,7 @@ Archives the subroutine.
          * - segment TODO ???
          * - flags  (i.e. :load pragma and such)
          * - name of the sub's label
-         * - name_space
+         * - namespace
          * - HLL_id
          * - multi_signature
          * - n_regs_used[i]
@@ -572,8 +572,10 @@ Called after the subroutine as been unarchived.
 
 =item C<METHOD PMC* get_name_space()>
 
-Return the name_space PMC or Undef. The name_space PMC is either a
-String PMC or a Key PMC for a nested name_space.
+=item C<METHOD PMC* get_namespace()>
+
+Return the namespace PMC or Undef. The namespace PMC is either a
+String PMC or a Key PMC for a nested namespace.
 
 =item C<METHOD INTVAL __get_regs_used(char *kind)>
 
@@ -586,8 +588,15 @@ Return amount of used registers for register kinds "I", "S", "P", "N".
     METHOD PMC* get_name_space() {
         struct Parrot_sub * sub = PMC_sub(SELF);
 
-        return PMC_IS_NULL(sub->name_space) ?
-            pmc_new(INTERP, enum_class_Undef) : sub->name_space;
+        return PMC_IS_NULL(sub->namespace) ?
+            pmc_new(INTERP, enum_class_Undef) : sub->namespace;
+    }
+
+    METHOD PMC* get_namespace() {
+        struct Parrot_sub * sub = PMC_sub(SELF);
+
+        return PMC_IS_NULL(sub->namespace) ?
+            pmc_new(INTERP, enum_class_Undef) : sub->namespace;
     }
 
     METHOD INTVAL __get_regs_used(char *kind) {

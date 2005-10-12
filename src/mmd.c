@@ -1962,18 +1962,18 @@ the MMD search should stop.
 static int
 mmd_search_package(Interp *interpreter, STRING *meth, PMC *arg_tuple, PMC *cl)
 {
-    /* STRING *name_space = CONTEXT(interpreter->ctx)->current_package; */
+    /* STRING *namespace = CONTEXT(interpreter->ctx)->current_package; */
     PMC *pmc;
     PMC *current_sub;
-    PMC *name_space;
+    PMC *namespace;
 
     current_sub = CONTEXT(interpreter->ctx)->current_sub;
     if (!current_sub || !VTABLE_defined(interpreter, current_sub))
         return 0;
-    name_space = PMC_sub(current_sub)->name_space;
-    if (!name_space)
+    namespace = PMC_sub(current_sub)->namespace;
+    if (!namespace)
         return 0;
-    pmc = Parrot_find_global_p(interpreter, name_space, meth);
+    pmc = Parrot_find_global_p(interpreter, namespace, meth);
     if (pmc) {
         if (mmd_maybe_candidate(interpreter, pmc, arg_tuple, cl))
             return 1;
