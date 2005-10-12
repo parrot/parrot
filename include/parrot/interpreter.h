@@ -163,19 +163,10 @@ struct _imc_info_t;
  * of a continuation by restoring the interpreter context.
  */
 struct parrot_regs_t {
-#ifdef SLIDING_BP
-    struct {
-        INTVAL  int_reg;
-        FLOATVAL num_reg;
-        STRING * string_reg;
-        PMC * pmc_reg;
-    } registers[32];
-#else
     struct IReg int_reg;
     struct NReg num_reg;
     struct SReg string_reg;
     struct PReg pmc_reg;
-#endif /* SLIDING_BP */
 };
 
 struct Parrot_Context {
@@ -364,20 +355,6 @@ typedef enum {
  * Macros to make accessing registers more convenient/readable.
  */
 
-#ifdef SLIDING_BP
-
-#  define INTERP_REG_INT(i, x) i->ctx.bp->registers[x].int_reg
-#  define INTERP_REG_NUM(i, x) i->ctx.bp->registers[x].num_reg
-#  define INTERP_REG_STR(i, x) i->ctx.bp->registers[x].string_reg
-#  define INTERP_REG_PMC(i, x) i->ctx.bp->registers[x].pmc_reg
-
-#  define BP_REG_INT(bp, x) bp->registers[x].int_reg
-#  define BP_REG_NUM(bp, x) bp->registers[x].num_reg
-#  define BP_REG_STR(bp, x) bp->registers[x].string_reg
-#  define BP_REG_PMC(bp, x) bp->registers[x].pmc_reg
-
-#else
-
 #  define INTERP_REG_INT(i, x) i->ctx.bp->int_reg.registers[x]
 #  define INTERP_REG_NUM(i, x) i->ctx.bp->num_reg.registers[x]
 #  define INTERP_REG_STR(i, x) i->ctx.bp->string_reg.registers[x]
@@ -387,8 +364,6 @@ typedef enum {
 #  define BP_REG_NUM(bp, x) (bp)->num_reg.registers[x]
 #  define BP_REG_STR(bp, x) (bp)->string_reg.registers[x]
 #  define BP_REG_PMC(bp, x) (bp)->pmc_reg.registers[x]
-
-#endif /* SLIDING_BP */
 
 #define REG_BASE struct parrot_regs_t
 
@@ -408,17 +383,10 @@ typedef enum {
  */
 
 
-#ifdef SLIDING_BP
-#  define REG_OFFS_INT(x) offsetof(REG_BASE, registers[x].int_reg)
-#  define REG_OFFS_NUM(x) offsetof(REG_BASE, registers[x].num_reg)
-#  define REG_OFFS_STR(x) offsetof(REG_BASE, registers[x].string_reg)
-#  define REG_OFFS_PMC(x) offsetof(REG_BASE, registers[x].pmc_reg)
-#else
 #  define REG_OFFS_INT(x) offsetof(REG_BASE, int_reg.registers[x])
 #  define REG_OFFS_NUM(x) offsetof(REG_BASE, num_reg.registers[x])
 #  define REG_OFFS_STR(x) offsetof(REG_BASE, string_reg.registers[x])
 #  define REG_OFFS_PMC(x) offsetof(REG_BASE, pmc_reg.registers[x])
-#endif /* SLIDING_BP */
 
 #define PCONST(i) PF_CONST(interpreter->code, (i))
 #define PNCONST   PF_NCONST(interpreter->code)

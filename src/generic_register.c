@@ -87,11 +87,7 @@ REG_CLEAR(Interp *interpreter)
 {
     int i;
     for (i = 0; i < NUM_REGISTERS; i++) {
-#ifdef SLIDING_BP
-        interpreter->ctx.bp->registers[i].REG_TYPE = REG_NULL;
-#else
         interpreter->ctx.bp->REG_TYPE.registers[i] = REG_NULL;
-#endif
     }
 }
 
