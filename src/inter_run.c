@@ -143,7 +143,7 @@ runops_args(Parrot_Interp interpreter, PMC *sub, PMC *obj,
 {
     opcode_t offset, *dest;
     struct parrot_regs_t *bp;
-    parrot_context_t old_ctx;
+    parrot_context_t *old_ctx;
     int i;
     /*
      * FIXME argument count limited - check strlen of sig
@@ -151,7 +151,7 @@ runops_args(Parrot_Interp interpreter, PMC *sub, PMC *obj,
     char new_sig[10];
     const char *sig_p;
 
-    old_ctx = interpreter->ctx;
+    old_ctx = CONTEXT(interpreter->ctx);
     interpreter->current_cont  = new_ret_continuation_pmc(interpreter, NULL);
     interpreter->current_object = obj;
     dest = VTABLE_invoke(interpreter, sub, NULL);
@@ -173,7 +173,7 @@ runops_args(Parrot_Interp interpreter, PMC *sub, PMC *obj,
     }
     if (*sig_p) {
         dest = parrot_pass_args_fromc(interpreter, sig_p, dest,
-                &old_ctx, ap);
+                old_ctx, ap);
     }
 
     bp = interpreter->ctx.bp;

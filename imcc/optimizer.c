@@ -85,7 +85,7 @@ int
 pre_optimize(Interp *interpreter, IMC_Unit * unit)
 {
     int changed = 0;
-    
+
     if (IMCC_INFO(interpreter)->optimizer_level & OPT_PRE) {
         IMCC_info(interpreter, 2, "pre_optimize\n");
         /* TODO integrate all in one pass */
@@ -673,7 +673,7 @@ IMCC_subst_constants(Interp *interpreter, IMC_Unit * unit, char *name,
     char b[128], fmt[64], op[20];
     const char *debug_fmt;
     int found, branched;
-    parrot_context_t ctx;
+    parrot_context_t *ctx;
 
 
     /* construct a FLOATVAL_FMT with needed precision */
@@ -756,7 +756,7 @@ IMCC_subst_constants(Interp *interpreter, IMC_Unit * unit, char *name,
         return NULL;
     }
     /* preserve registers */
-    ctx = interpreter->ctx;
+    ctx = CONTEXT(interpreter->ctx);
     Parrot_alloc_context(interpreter);
 
     IMCC_debug(interpreter, DEBUG_OPT1, debug_fmt, name);
@@ -807,8 +807,10 @@ IMCC_subst_constants(Interp *interpreter, IMC_Unit * unit, char *name,
     /*
      * restore and recycle register frame
      */
-    Parrot_free_context(interpreter, &interpreter->ctx, 1);
-    interpreter->ctx = ctx;
+    Parrot_free_context(interpreter, CONTEXT(interpreter->ctx), 1);
+    CONTEXT(interpreter->ctx) = ctx;
+    interpreter->ctx.bp = ctx->bp;
+    interpreter->ctx.bp_ps = ctx->bp_ps;
     return tmp;
 }
 

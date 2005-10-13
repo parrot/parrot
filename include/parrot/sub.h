@@ -90,7 +90,7 @@ typedef struct Parrot_coro {
 
     /* - end common */
 
-    parrot_context_t ctx;          /* coroutine context */
+    struct Parrot_Context  *ctx;          /* coroutine context */
     struct PackFile_ByteCode *caller_seg;  /* bytecode segment */
 } * parrot_coro_t;
 
@@ -101,10 +101,10 @@ typedef struct Parrot_cont {
     /* continuation destination */
     struct PackFile_ByteCode *seg;   /* bytecode segment */
     opcode_t *address;               /* start of bytecode, addr to continue */
-    parrot_context_t to_ctx;         /* pointer to dest context */
-    struct Parrot_Context *ctx_copy; /* full continuation only */
+    struct Parrot_Context *to_ctx;   /* pointer to dest context */
     /* a Continuation keeps the from_ctx alive */
-    parrot_context_t from_ctx;       /* the sub, this cont is returning from */
+    struct Parrot_Context *from_ctx;  /* sub, this cont is returning from */
+    struct Parrot_Context *ctx_copy; /* full continuation only */
 } * parrot_cont_t;
 
 #define PMC_cont(pmc)		  ((parrot_cont_t)PMC_struct_val(pmc))

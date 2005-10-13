@@ -34,7 +34,8 @@ Prints the bytecode location of the warning or error to C<PIO_STDERR>.
 void
 print_pbc_location(Parrot_Interp inter)
 {
-    PIO_eprintf(inter, "%Ss", Parrot_Context_infostr(inter, &inter->ctx));
+    PIO_eprintf(inter, "%Ss",
+            Parrot_Context_infostr(inter, CONTEXT(inter->ctx)));
 }
 
 /*

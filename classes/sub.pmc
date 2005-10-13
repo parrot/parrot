@@ -340,7 +340,7 @@ create_ctx:
                     PARROT_OP_get_params_pc);
         }
 
-        PMC_cont(ccont)->from_ctx = INTERP->ctx;
+        PMC_cont(ccont)->from_ctx = CONTEXT(INTERP->ctx);
         if (!PMC_IS_NULL(INTERP->current_object)) {
             context->current_object = INTERP->current_object;
             INTERP->current_object = NULL;
@@ -601,7 +601,7 @@ Return amount of used registers for register kinds "I", "S", "P", "N".
 
     METHOD INTVAL __get_regs_used(char *kind) {
         struct Parrot_sub * sub = PMC_sub(SELF);
-        /* TODO switch to canonical NiSP order 
+        /* TODO switch to canonical NiSP order
          * see also imcc/reg_alloc.c
          */
         const char *types = "INSP";

@@ -33,24 +33,23 @@ Marks the context C<*ctx>.
 */
 
 void
-mark_context(Interp* interpreter, parrot_context_t* ctxp)
+mark_context(Interp* interpreter, parrot_context_t* ctx)
 {
     PObj *obj;
-    parrot_context_t ctx = *ctxp;
     int i, n;
     struct parrot_regs_t *regs;
 
-    mark_stack(interpreter, CONTEXT(ctx)->pad_stack);
-    mark_stack(interpreter, CONTEXT(ctx)->user_stack);
-    mark_stack(interpreter, CONTEXT(ctx)->control_stack);
-    mark_register_stack(interpreter, CONTEXT(ctx)->int_reg_stack);
-    mark_register_stack(interpreter, CONTEXT(ctx)->num_reg_stack);
-    mark_string_register_stack(interpreter, CONTEXT(ctx)->string_reg_stack);
-    mark_pmc_register_stack(interpreter, CONTEXT(ctx)->pmc_reg_stack);
-    obj = (PObj*)CONTEXT(ctx)->current_sub;
+    mark_stack(interpreter, ctx->pad_stack);
+    mark_stack(interpreter, ctx->user_stack);
+    mark_stack(interpreter, ctx->control_stack);
+    mark_register_stack(interpreter, ctx->int_reg_stack);
+    mark_register_stack(interpreter, ctx->num_reg_stack);
+    mark_string_register_stack(interpreter, ctx->string_reg_stack);
+    mark_pmc_register_stack(interpreter, ctx->pmc_reg_stack);
+    obj = (PObj*)ctx->current_sub;
     if (obj)
         pobject_lives(interpreter, obj);
-    obj = (PObj*)CONTEXT(ctx)->current_object;
+    obj = (PObj*)ctx->current_object;
     if (obj)
         pobject_lives(interpreter, obj);
     /* the current continuation in the interpreter has
@@ -61,16 +60,16 @@ mark_context(Interp* interpreter, parrot_context_t* ctxp)
     obj = (PObj*)interpreter->current_cont;
     if (obj && obj != NEED_CONTINUATION)
         pobject_lives(interpreter, obj);
-    obj = (PObj*)CONTEXT(ctx)->current_cont;
+    obj = (PObj*)ctx->current_cont;
     if (obj && !PObj_live_TEST(obj))
         pobject_lives(interpreter, obj);
-    obj = (PObj*)CONTEXT(ctx)->current_method;
+    obj = (PObj*)ctx->current_method;
     if (obj)
         pobject_lives(interpreter, obj);
-    obj = (PObj*)CONTEXT(ctx)->current_package;
+    obj = (PObj*)ctx->current_package;
     if (obj)
         pobject_lives(interpreter, obj);
-    regs = ctx.bp;
+    regs = ctx->bp;
     for (i = 0; i < NUM_REGISTERS; ++i) {
         obj = (PObj*) BP_REG_PMC(regs, i);
         if (obj)
@@ -145,11 +144,11 @@ struct Parrot_cont *
 new_continuation(Interp *interp, struct Parrot_cont *to)
 {
     struct Parrot_cont *cc = mem_sys_allocate(sizeof(struct Parrot_cont));
-    parrot_context_t to_ctx = to ? to->to_ctx : interp->ctx;
+    struct Parrot_Context *to_ctx = to ? to->to_ctx : CONTEXT(interp->ctx);
 
     cc->to_ctx = to_ctx;
-    cc->from_ctx = interp->ctx;
-    CONTEXT(cc->from_ctx)->ref_count++;
+    cc->from_ctx = CONTEXT(interp->ctx);
+    CONTEXT(interp->ctx)->ref_count++;
     if (to) {
         cc->seg = to->seg;
         cc->address = to->address;
@@ -159,7 +158,7 @@ new_continuation(Interp *interp, struct Parrot_cont *to)
         cc->address = NULL;
     }
     cc->ctx_copy = mem_sys_allocate(sizeof(struct Parrot_Context));
-    memcpy(cc->ctx_copy, CONTEXT(to_ctx), sizeof(struct Parrot_Context));
+    memcpy(cc->ctx_copy, to_ctx, sizeof(struct Parrot_Context));
     return cc;
 }
 
@@ -168,7 +167,7 @@ new_continuation(Interp *interp, struct Parrot_cont *to)
 =item C<struct Parrot_cont *
 new_ret_continuation(Interp *interp)>
 
-Returns a new C<Parrot_cont> with its own copy of the current context.
+Returns a new C<Parrot_cont> pointing to the current context.
 
 =cut
 
@@ -178,9 +177,8 @@ struct Parrot_cont *
 new_ret_continuation(Interp *interp)
 {
     struct Parrot_cont *cc = mem_sys_allocate(sizeof(struct Parrot_cont));
-    cc->to_ctx = interp->ctx;
-    cc->from_ctx.bp = NULL;      /* ret continuations should be created later
-                                   in the subroutine if needed */
+    cc->to_ctx = CONTEXT(interp->ctx);
+    cc->from_ctx = NULL;    /* filled in during a call */
     cc->seg = interp->code;
     cc->ctx_copy = NULL;
     cc->address = NULL;
@@ -207,7 +205,7 @@ new_coroutine(Interp *interp)
         mem_sys_allocate_zeroed(sizeof(struct Parrot_coro));
 
     co->seg = interp->code;
-    co->ctx.bp = NULL;
+    co->ctx = NULL;
     return co;
 }
 
@@ -245,9 +243,9 @@ Make true Continuation from all RetContinuations up the call chain.
 void
 invalidate_retc_context(Interp *interpreter, PMC *cont)
 {
-    parrot_context_t ctx = PMC_cont(cont)->from_ctx;
+    struct Parrot_Context *ctx = PMC_cont(cont)->from_ctx;
 
-    Parrot_set_context_threshold(interpreter, &ctx);
+    Parrot_set_context_threshold(interpreter, ctx);
     while (1) {
         /*
          * We  stop if we encounter a true continuation, because
@@ -257,8 +255,8 @@ invalidate_retc_context(Interp *interpreter, PMC *cont)
         if (cont->vtable != Parrot_base_vtables[enum_class_RetContinuation])
             break;
         cont->vtable = Parrot_base_vtables[enum_class_Continuation];
-        CONTEXT(ctx)->ref_count++;
-        cont = CONTEXT(ctx)->current_cont;
+        ctx->ref_count++;
+        cont = ctx->current_cont;
         ctx = PMC_cont(cont)->from_ctx;
     }
 
@@ -302,11 +300,10 @@ Parrot_full_sub_name(Interp* interpreter, PMC* sub)
 }
 
 int
-Parrot_Context_info(Interp *interpreter, parrot_context_t *ctxp,
+Parrot_Context_info(Interp *interpreter, parrot_context_t *ctx,
 	struct Parrot_Context_info *info)
 {
     struct Parrot_sub *sub;
-    parrot_context_t ctx = *ctxp;
 
     /* set file/line/pc defaults */
     info->file = "(unknown file)";
@@ -317,7 +314,7 @@ Parrot_Context_info(Interp *interpreter, parrot_context_t *ctxp,
     info->fullname = NULL;
 
     /* is the current sub of the specified context valid? */
-    if (PMC_IS_NULL(CONTEXT(ctx)->current_sub)) {
+    if (PMC_IS_NULL(ctx->current_sub)) {
 	info->subname = string_from_cstring(interpreter, "???", 3);
 	info->nsname = info->subname;
 	info->fullname = string_from_cstring(interpreter, "??? :: ???", 10);
@@ -326,21 +323,21 @@ Parrot_Context_info(Interp *interpreter, parrot_context_t *ctxp,
     }
 
     /* make sure there is a sub (not always the case, e.g in pasm code) */
-    if (CONTEXT(ctx)->current_sub->vtable->base_type == enum_class_Undef ||
-	    PMC_sub(CONTEXT(ctx)->current_sub)->address == 0) {
+    if (ctx->current_sub->vtable->base_type == enum_class_Undef ||
+	    PMC_sub(ctx->current_sub)->address == 0) {
 	/* XXX: is this correct? (try with load_bytecode) */
 	/* use the current interpreter's bytecode as start address */
-	if (CONTEXT(ctx)->current_pc != NULL)
-	    info->pc = CONTEXT(ctx)->current_pc - interpreter->code->base.data;
+	if (ctx->current_pc != NULL)
+	    info->pc = ctx->current_pc - interpreter->code->base.data;
 	return 1;
     }
 
     /* fetch struct Parrot_sub of the current sub in the given context */
-    if (!VTABLE_isa(interpreter, CONTEXT(ctx)->current_sub,
+    if (!VTABLE_isa(interpreter, ctx->current_sub,
                 const_string(interpreter, "Sub")))
         return 1;
 
-    sub = PMC_sub(CONTEXT(ctx)->current_sub);
+    sub = PMC_sub(ctx->current_sub);
     /* set the sub name */
     info->subname = sub->name;
 
@@ -357,14 +354,14 @@ Parrot_Context_info(Interp *interpreter, parrot_context_t *ctxp,
     }
 
     /* return here if there is no current pc */
-    if (CONTEXT(ctx)->current_pc == NULL)
+    if (ctx->current_pc == NULL)
 	return 1;
 
     /* calculate the current pc */
-    info->pc = CONTEXT(ctx)->current_pc - sub->seg->base.data;
+    info->pc = ctx->current_pc - sub->seg->base.data;
 
     /* determine the current source file/line */
-    if (CONTEXT(interpreter->ctx)->current_pc) {
+    if (ctx->current_pc) {
 	size_t offs = info->pc;
 	size_t i, n;
 	/* XXX: interpreter->code->cur_cs is not correct, is it? */
@@ -394,7 +391,7 @@ STRING*
 Parrot_Context_infostr(Interp *interpreter, parrot_context_t *ctx)
 {
     struct Parrot_Context_info info;
-    const char* msg = (&interpreter->ctx == ctx) ?
+    const char* msg = (CONTEXT(interpreter->ctx) == ctx) ?
 	"current instr.:":
 	"called from Sub";
 

@@ -59,7 +59,7 @@ Parrot_init_ret_nci(Interp *interpreter, struct call_state *st,
         const char *sig)
 {
     PMC *current_cont;
-    parrot_context_t ctx;
+    struct Parrot_Context *ctx;
     struct PackFile_ByteCode *seg;
     /*
      * if this NCI call was a taicall, return results to caller's get_results
@@ -72,14 +72,14 @@ Parrot_init_ret_nci(Interp *interpreter, struct call_state *st,
         seg = PMC_cont(current_cont)->seg;
     }
     else {
-        ctx = interpreter->ctx;
+        ctx = CONTEXT(interpreter->ctx);
         seg = interpreter->code;
     }
     /* TODO simplify all */
     Parrot_init_arg_sig(interpreter, interpreter->code, interpreter->ctx.bp,
             sig, NULL, &st->src);
-    Parrot_init_arg_op(interpreter, seg, ctx.bp,
-            CONTEXT(ctx)->current_results, &st->dest);
+    Parrot_init_arg_op(interpreter, seg, ctx->bp,
+            ctx->current_results, &st->dest);
     next_arg(interpreter, &st->src);
     next_arg(interpreter, &st->dest);
     return 1;
@@ -497,14 +497,20 @@ clone_key_arg(Interp *interpreter, struct call_state *st)
         }
 
         if (any_registers) {
-            parrot_context_t new_ctx = interpreter->ctx;
+            parrot_context_t new_ctx;
+
+            new_ctx.bp = interpreter->ctx.bp;
+            new_ctx.bp_ps = interpreter->ctx.bp_ps;
             /* need old = src context
              * clone sets key values according to refered
              * register items
+             *
+             * XXX
              */
             interpreter->ctx.bp = st->src.regs;
             p_arg = VTABLE_clone(interpreter, p_arg);
-            interpreter->ctx = new_ctx;
+            interpreter->ctx.bp = new_ctx.bp;
+            interpreter->ctx.bp_ps = new_ctx.bp_ps;
             UVal_pmc(st->val) = p_arg;
         }
     }
@@ -693,7 +699,6 @@ parrot_pass_args(Interp *interpreter, struct PackFile_ByteCode *dst_seg,
         struct parrot_regs_t *caller_regs, int what)
 {
     const char *action;
-    parrot_context_t old_ctx;
     struct call_state st;
     int todo;
     opcode_t *src_pc, *dst_pc;

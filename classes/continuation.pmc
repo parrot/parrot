@@ -85,7 +85,7 @@ Marks the continuation as live.
 
     void mark () {
         struct Parrot_cont * cc = PMC_cont(SELF);
-        mark_context(INTERP, &cc->to_ctx);
+        mark_context(INTERP, cc->to_ctx);
     }
 
 /*
@@ -101,8 +101,8 @@ Destroys the continuation.
     void destroy () {
         struct Parrot_cont * cc = PMC_cont(SELF);
         if (cc) {
-            if (cc->from_ctx.bp)
-                Parrot_free_context(interpreter, &cc->from_ctx, 0);
+            if (cc->from_ctx)
+                Parrot_free_context(interpreter, cc->from_ctx, 0);
             if (cc->ctx_copy)
                 mem_sys_free(cc->ctx_copy);
             mem_sys_free(cc);
@@ -209,11 +209,12 @@ destination to continue execution.
     void* invoke (void* next) {
         struct Parrot_cont * cc = PMC_cont(SELF);
         struct parrot_regs_t *caller_regs;
+        parrot_context_t *ctx;
         opcode_t *pc;
 
         /* debug print before context is switched */
         if (Interp_trace_TEST(INTERP, PARROT_TRACE_SUB_CALL_FLAG)) {
-            PMC *sub = CONTEXT(cc->to_ctx)->current_sub;
+            PMC *sub = cc->to_ctx->current_sub;
 
             PIO_eprintf(INTERP, "# Back in sub '%Ss'\n",
                     Parrot_full_sub_name(INTERP, sub));
@@ -222,19 +223,19 @@ destination to continue execution.
         /*
          * set context
          */
-        INTERP->ctx = cc->to_ctx;
+        CONTEXT(INTERP->ctx) = ctx = cc->to_ctx;
+        INTERP->ctx.bp = ctx->bp;
+        INTERP->ctx.bp_ps = ctx->bp_ps;
         if (cc->ctx_copy) {
             /* copy only these parts that are different
              * XXX what else?
              */
-            CONTEXT(INTERP->ctx)->current_results =
-                cc->ctx_copy->current_results;
-            CONTEXT(INTERP->ctx)->current_args =
-                cc->ctx_copy->current_args;
+            ctx->current_results = cc->ctx_copy->current_results;
+            ctx->current_args = cc->ctx_copy->current_args;
         }
         pc = cc->address;
         if (pc) {
-            if (CONTEXT(INTERP->ctx)->current_results) {
+            if (ctx->current_results) {
                 /*
                  * the register pointer is already switched back
                  * to the caller, therefore the registers of the
@@ -272,7 +273,7 @@ Experimental: return caller info as a STRING.
 */
 
     STRING* get_string() {
-	return Parrot_Context_infostr(INTERP, &PMC_cont(SELF)->to_ctx);
+	return Parrot_Context_infostr(INTERP, PMC_cont(SELF)->to_ctx);
     }
 
 /*
@@ -287,7 +288,7 @@ Experimental: return caller PMC or Undef if none.
 
     METHOD PMC* caller() {
         struct Parrot_cont * cc = PMC_cont(SELF);
-        PMC *caller = CONTEXT(cc->to_ctx)->current_sub;
+        PMC *caller = cc->to_ctx->current_sub;
         if (!caller || !PMC_sub(caller)->address) {
             caller = pmc_new(INTERP, enum_class_Undef);
         }
@@ -306,7 +307,7 @@ Experimental: return continuation PMC of this Continuation or Undef if none.
 
     METHOD PMC* continuation() {
         struct Parrot_cont * cc = PMC_cont(SELF);
-        PMC *cont = CONTEXT(cc->to_ctx)->current_cont;
+        PMC *cont = cc->to_ctx->current_cont;
         if (cont)
             return cont;
         return pmc_new(INTERP, enum_class_Undef);

@@ -169,9 +169,16 @@ struct parrot_regs_t {
     struct PReg pmc_reg;
 };
 
-struct Parrot_Context {
+typedef union {
+    PMC         **regs_p;
+    STRING      **regs_s;
+} Regs_ps;
+
+typedef struct Parrot_Context {
     struct Parrot_Context *prev;
     INTVAL ref_count;                   /* how often refered to */
+    struct parrot_regs_t  *bp;          /* register base pointer */
+    Regs_ps               *bp_ps;       /* yet unused */
     struct Stack_Chunk *int_reg_stack;  /* register frame stacks */
     struct Stack_Chunk *num_reg_stack;
     struct Stack_Chunk *string_reg_stack;
@@ -203,7 +210,7 @@ struct Parrot_Context {
     INTVAL current_HLL;         /* see also src/hll.c */
     opcode_t *current_args;      /* ptr into code with set_args opcode */
     opcode_t *current_results;   /* ptr into code with get_results opcode */
-};
+} parrot_context_t;
 
 #define ALIGNED_CTX_SIZE ( ((sizeof(struct Parrot_Context) + NUMVAL_SIZE - 1) \
         / NUMVAL_SIZE) * NUMVAL_SIZE )
@@ -224,12 +231,13 @@ typedef struct _Prederef {
 } Prederef;
 
 
-typedef union All_Context {
-    struct parrot_regs_t *bp;           /* register base pointer */
-    struct Parrot_Context *rctx;        /* context is at rctx[-1] */
-} parrot_context_t;
+struct All_Context {
+    struct parrot_regs_t  *bp;          /* register base pointer */
+    Regs_ps               *bp_ps;       /* yet unused */
+    struct Parrot_Context *state;       /* ontext  */
+};
 
-#define CONTEXT(ctx) ((ctx).rctx -1)
+#define CONTEXT(ctx) ((ctx).state)
 
 typedef struct _context_mem {
     char *data;                     /* ctx + register store */
@@ -241,7 +249,7 @@ typedef struct _context_mem {
  * The actual interpreter structure
  */
 struct parrot_interp_t {
-    parrot_context_t ctx;
+    struct All_Context ctx;
     context_mem ctx_mem;                /* ctx memory managment */
 
     struct Stash *globals;              /* Pointer to the global variable

@@ -515,7 +515,7 @@ op get_params(inconst PMC) {
     interpreter->current_params = this;
     cont_pmc = CONTEXT(interpreter->ctx)->current_cont;
 
-    caller_regs = PMC_cont(cont_pmc)->to_ctx.bp;
+    caller_regs = PMC_cont(cont_pmc)->to_ctx->bp;
     pc = parrot_pass_args(interpreter, sub->seg, caller_regs,
 	    PARROT_OP_get_params_pc);
     goto ADDRESS(pc);

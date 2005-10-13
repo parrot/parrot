@@ -454,7 +454,7 @@ Introspection interface. C<key> can be:
         int level = 0;
         PMC* nextkey;
         STRING *item, *s;
-        parrot_context_t ctx;
+        parrot_context_t *ctx;
         PMC *cont;
 
         item =  key_string(interpreter, key);
@@ -464,27 +464,27 @@ Introspection interface. C<key> can be:
         nextkey = key_next(INTERP, key);
         if (nextkey)
             level = key_integer(interpreter, nextkey);
-        ctx = interpreter->ctx;
+        ctx = CONTEXT(interpreter->ctx);
         for (; level; --level) {
-            cont = CONTEXT(ctx)->current_cont;
+            cont = ctx->current_cont;
             if (PMC_IS_NULL(cont) || !PMC_cont(cont)->seg)
                 real_exception(interpreter, NULL, E_ValueError,
                         "No such caller depth");
             ctx = PMC_cont(cont)->to_ctx;
-            if (!CONTEXT(ctx)->current_sub)
+            if (!ctx->current_sub)
                 real_exception(interpreter, NULL, E_ValueError,
                         "No such caller depth");
 
         }
         s = CONST_STRING(interpreter, "sub");
         if (string_equal(interpreter, item, s) == 0)
-            return CONTEXT(ctx)->current_sub;
+            return ctx->current_sub;
         s = CONST_STRING(interpreter, "pad");
         if (string_equal(interpreter, item, s) == 0)
-            return stack_peek(interpreter, CONTEXT(ctx)->pad_stack, NULL);
+            return stack_peek(interpreter, ctx->pad_stack, NULL);
         s = CONST_STRING(interpreter, "continuation");
         if (string_equal(interpreter, item, s) == 0)
-            return VTABLE_clone(interpreter, CONTEXT(ctx)->current_cont);
+            return VTABLE_clone(interpreter, ctx->current_cont);
         return PMCNULL;
     }
 /*

@@ -93,47 +93,50 @@ Swaps the "context".
 
     void* invoke (void* next) {
         struct Parrot_coro * co = PMC_coro(SELF);
+        struct parrot_regs_t *caller_regs;
         struct PackFile_ByteCode *wanted_seg;
         opcode_t * dest = co->address;
-        parrot_context_t ctx;
+        parrot_context_t *ctx;
         PMC *ccont;
 
-        ctx = INTERP->ctx;
-
-        if (!co->ctx.bp) {
+        if (!co->ctx) {
             PMC *pad;
 
             ccont = INTERP->current_cont;
             if (ccont == NEED_CONTINUATION) {
                 ccont = new_ret_continuation_pmc(interpreter, next);
             }
+            caller_regs = INTERP->ctx.bp;
             /*
              * first time set current sub, cont, object
              */
             Parrot_alloc_context(INTERP);
-            co->ctx = INTERP->ctx;
-            wanted_seg = co->seg;
-            co->caller_seg = INTERP->code;
+            co->ctx = ctx = CONTEXT(INTERP->ctx);
+            PMC_cont(ccont)->from_ctx = ctx;
+            /*
+             * XXX are our coroutines closures?
+             */
             pad = scratchpad_get_current(INTERP);
             if (pad) {
-                stack_push(INTERP, &CONTEXT(co->ctx)->pad_stack, pad,
+                stack_push(INTERP, &ctx->pad_stack, pad,
                         STACK_ENTRY_PMC, STACK_CLEANUP_NULL);
             }
-            CONTEXT(co->ctx)->current_sub = SELF;
-            CONTEXT(co->ctx)->current_cont = ccont;
-            PMC_cont(ccont)->from_ctx = INTERP->ctx;
-            CONTEXT(co->ctx)->current_object = NULL;
+            ctx->current_sub = SELF;
+            ctx->current_cont = ccont;
+            ctx->current_args = INTERP->current_args;
+            ctx->current_object = NULL;
             INTERP->current_object = NULL;
             INTERP->current_cont = NULL;
+            INTERP->current_args = NULL;
 
             PObj_get_FLAGS(SELF) |= SUB_FLAG_CORO_FF;
-            CONTEXT(INTERP->ctx)->current_args = INTERP->current_args;
-            INTERP->current_args = NULL;
+            wanted_seg = co->seg;
+            co->caller_seg = INTERP->code;
             /* copy args from interpreter */
             if (*dest == PARROT_OP_get_params_pc) {
                 INTERP->current_params = dest;
                 dest = parrot_pass_args(INTERP, wanted_seg,
-                        ctx.bp,
+                        caller_regs,
                         PARROT_OP_get_params_pc);
             }
         }
@@ -144,21 +147,25 @@ Swaps the "context".
             /* remember segment of caller */
             co->caller_seg = INTERP->code;
             /* and the recent call context */
-            ccont = CONTEXT(co->ctx)->current_cont;
-            PMC_cont(ccont)->to_ctx = INTERP->ctx;
+            ccont = co->ctx->current_cont;
+            PMC_cont(ccont)->to_ctx = CONTEXT(INTERP->ctx);
             /* set context to coro context */
-            INTERP->ctx = co->ctx;
+            CONTEXT(INTERP->ctx) = ctx = co->ctx;
+            INTERP->ctx.bp = ctx->bp;
+            INTERP->ctx.bp_ps = ctx->bp_ps;
         }
         else {
             PObj_get_FLAGS(SELF) &= ~SUB_FLAG_CORO_FF;
             /* switch back to last remembered code seg and context */
             wanted_seg = co->caller_seg;
-            ccont = CONTEXT(co->ctx)->current_cont;
-            INTERP->ctx = ctx = PMC_cont(ccont)->to_ctx;
+            ccont = co->ctx->current_cont;
+            CONTEXT(INTERP->ctx) = ctx = PMC_cont(ccont)->to_ctx;
+            INTERP->ctx.bp = ctx->bp;
+            INTERP->ctx.bp_ps = ctx->bp_ps;
             /* yield values */
-            if (INTERP->current_returns && CONTEXT(ctx)->current_results)
+            if (INTERP->current_returns && ctx->current_results)
                 parrot_pass_args(INTERP, wanted_seg,
-                        co->ctx.bp,
+                        co->ctx->bp,
                         PARROT_OP_get_results_pc);
         }
 
@@ -187,8 +194,8 @@ Marks the coroutine as live.
         mark_stack(INTERP, c->co_control_base);
         mark_stack(INTERP, c->co_pad_stack);
 #endif
-        if (c && c->ctx.bp)
-            mark_context(INTERP, &c->ctx);
+        if (c && c->ctx)
+            mark_context(INTERP, c->ctx);
     }
 }
 

@@ -357,7 +357,7 @@ Parrot_dod_trace_root(Interp *interpreter, int trace_stack)
         pobject_lives(interpreter, (PObj *)interpreter->DOD_registry);
 
     /* Walk all stacks */
-    mark_context(interpreter, &interpreter->ctx);
+    mark_context(interpreter, CONTEXT(interpreter->ctx));
 
     /* Walk the iodata */
     Parrot_IOData_mark(interpreter, interpreter->piodata);

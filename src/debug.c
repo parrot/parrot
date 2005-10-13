@@ -2954,33 +2954,33 @@ PDB_backtrace(Interp *interpreter)
     PMC *sub;
     PMC *old = PMCNULL;
     int rec_level = 0;
-    parrot_context_t ctx;
+    parrot_context_t *ctx;
 
     /* information about the current sub */
     sub = interpinfo_p(interpreter, CURRENT_SUB);
+    ctx = CONTEXT(interpreter->ctx);
     if (!PMC_IS_NULL(sub)) {
-	str = Parrot_Context_infostr(interpreter, &interpreter->ctx);
+	str = Parrot_Context_infostr(interpreter, ctx);
 	if (str)
 	    PIO_eprintf(interpreter, "%Ss", str);
     }
 
     /* backtrace: follow the continuation chain */
-    ctx = interpreter->ctx;
     while (1) {
-        sub = CONTEXT(ctx)->current_cont;
+        sub = ctx->current_cont;
         if (!sub)
             break;
         str = Parrot_Context_infostr(interpreter,
-		    &PMC_cont(sub)->to_ctx);
+		    PMC_cont(sub)->to_ctx);
         if (!str)
             break;
 
 	/* recursion detection */
 	if (!PMC_IS_NULL(old) && PMC_cont(old) &&
-	    CONTEXT(PMC_cont(old)->to_ctx)->current_pc ==
-            CONTEXT(PMC_cont(sub)->to_ctx)->current_pc &&
-	    CONTEXT(PMC_cont(old)->to_ctx)->current_sub ==
-            CONTEXT(PMC_cont(sub)->to_ctx)->current_sub) {
+	    PMC_cont(old)->to_ctx->current_pc ==
+            PMC_cont(sub)->to_ctx->current_pc &&
+	    PMC_cont(old)->to_ctx->current_sub ==
+            PMC_cont(sub)->to_ctx->current_sub) {
             ++rec_level;
 	} else if (rec_level != 0) {
 	    PIO_eprintf(interpreter, "... call repeated %d times\n", rec_level);
@@ -2994,7 +2994,7 @@ PDB_backtrace(Interp *interpreter)
 	/* get the next Continuation */
         ctx = PMC_cont(sub)->to_ctx;
 	old = sub;
-        if (!ctx.rctx || !CONTEXT(ctx)->prev)
+        if (!ctx || !ctx->prev)
             break;
     }
     if (rec_level != 0) {
