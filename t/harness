@@ -139,37 +139,36 @@ unless ($html) {
     runtests(@tests);
 } else {
     my @smoke_config_vars = qw(
-	  osname
+      osname
       archname
       cc
       build_dir
       cpuarch
       revision
-	  VERSION
-	  optimize
-	  DEVEL
+      VERSION
+      optimize
+      DEVEL
     );
 
     eval {
         require Test::TAP::HTMLMatrix;
         require Test::TAP::Model::Visual;
     };
-
     die "You must have Test::TAP::HTMLMatrix installed.\n\n$@" if $@;
 
-	my $start = time;
+    my $start = time;
     my $model = Test::TAP::Model::Visual->new_with_tests(@tests);
-	my $end = time;
+    my $end = time;
 
-	my $duration = $end - $start;
+    my $duration = $end - $start;
 
     my $v = Test::TAP::HTMLMatrix->new(
         $model,
         join("\n",
-			"duration: $duration",
-            "branch: unknown",
-            "harness_args: " . (($args) ? $args : "N/A"),
-            map { "$_: $PConfig{$_}" } sort @smoke_config_vars),
+             "duration: $duration",
+             "branch: unknown",
+             "harness_args: " . (($args) ? $args : "N/A"),
+             map { "$_: $PConfig{$_}" } sort @smoke_config_vars),
     );
 
     $v->has_inline_css(1); # no separate css file

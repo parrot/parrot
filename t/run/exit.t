@@ -9,7 +9,7 @@ t/run/exit.t - test parrot exit codes
 
 =head1 SYNOPSIS
 
-	% perl -Ilib t/run/exit.t
+    % perl -Ilib t/run/exit.t
 
 =head1 DESCRIPTION
 
@@ -18,16 +18,15 @@ with combinations of STDERR and STDOUT open and closed.
 
 =cut
 
+use strict;
 use Parrot::Test tests => 8;
 use Test::More;
 use Parrot::Config;
 
-$PARROT = ".$PConfig{slash}$PConfig{test_prog}";
+my $PARROT = ".$PConfig{slash}$PConfig{test_prog}";
 
 # windows wants '>nul', most everything else wants '>/dev/null'
-my $redir = $^O =~ /^(MSWin\d+)$/ 
-	? q{>nul 2>&1} 
-	: q{>/dev/null 2>&1};
+my $redir = $^O =~ /^(MSWin\d+)$/ ? q{>nul 2>&1} : q{>/dev/null 2>&1};
 
 # copy file descriptors
 open OLDOUT, ">&STDOUT";
@@ -35,11 +34,11 @@ open OLDERR, ">&STDERR";
 
 sub exits
 {
-	my $pre = shift;
-	$pre ||= '';
+    my $pre = shift;
+    $pre ||= '';
 
-	is( system(qq|$PARROT --version $redir|) >> 8, 0, "$pre: normal exit" );
-	isnt( system(qq|$PARROT --foo $redir|) >> 8, 0, "$pre: abnormal exit" );
+    is( system(qq|$PARROT --version $redir|) >> 8, 0, "$pre: normal exit" );
+    isnt( system(qq|$PARROT --foo $redir|) >> 8, 0, "$pre: abnormal exit" );
 }
 
 # all open

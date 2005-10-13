@@ -1214,7 +1214,6 @@ PERL_TEST_FILES = \
 RUNCORE_TEST_FILES = \
     t/op/*.t \
     t/pmc/*.t \
-    t/run/*.t \
     t/native_pbc/*.t \
     $(IMCC_DIR)/t/*/*.t \
     t/library/*.t \

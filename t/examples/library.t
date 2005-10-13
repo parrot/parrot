@@ -68,9 +68,9 @@ while ( my ( $example, $expected ) = each %expected )
 # For testing md5sum.pir we need to pass a filename
 {
     my $md5sum_fn = "examples$PConfig{slash}library$PConfig{slash}md5sum.pir";
-    my $sample_fn = "examples$PConfig{slash}README";
+    my $sample_fn = "t$PConfig{slash}library$PConfig{slash}perlhist.txt";
     my $sum = `$PARROT $md5sum_fn $sample_fn`;
-    is( $sum, "cba989d2bebdce8f56f69c3f0d54ae15\t$sample_fn\n", $md5sum_fn );
+    is( $sum, "fb171bd1a17bf6cd08d73105ad738a35\t$sample_fn\n", $md5sum_fn );
 }
 
 

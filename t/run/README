@@ -1,0 +1,4 @@
+# Copyright: 2005 The Perl Foundation.  All Rights Reserved.
+# $Id: README 7635 2005-03-14 19:49:59Z bernhard $
+
+This directory contains tests for the stuff documented in docs/running.pod. 
