@@ -16,7 +16,7 @@ Tests Parrot's string registers and operations.
 
 =cut
 
-use Parrot::Test tests => 156;
+use Parrot::Test tests => 157;
 use Test::More;
 
 output_is( <<'CODE', <<OUTPUT, "set_s_s|sc" );
@@ -2555,7 +2555,7 @@ sub compare_strings {
   return $rt;
 }
 
-output_is( <<'CODE', <<OUTPUT, "split");
+output_is( <<'CODE', <<'OUTPUT', "split on empty string");
 _main:
     split P1, "", ""
     set I1, P1
@@ -2577,7 +2577,31 @@ CODE
 ab
 OUTPUT
 
-output_is( <<'CODE', <<OUTPUT, "join");
+output_is( <<'CODE', <<'OUTPUT', "split on non-empty string");
+_main:
+    split P0, "a", "afooabara"
+    set I0, P0
+    print I0
+    print "\n"
+    set I1, 0
+loop:
+    set S0, P0[I1]
+    print S0
+    print "\n"
+    inc I1
+    sub I2, I1, I0
+    if I2, loop
+    end
+CODE
+5
+
+foo
+b
+r
+
+OUTPUT
+
+output_is( <<'CODE', <<'OUTPUT', "join");
 _main:
     new P0, .PerlArray
     join S0, "--", P0

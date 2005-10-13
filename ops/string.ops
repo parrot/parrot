@@ -479,8 +479,10 @@ with string $2.
 
 =item B<split>(out PMC, in STR, in STR)
 
-Create a new Array PMC $1 by splitting the string $3 with
-regexp $2. Currently implemented only for the empty string $2.
+Create a new Array PMC $1 by splitting the string $3 into pieces
+delimited by the string $2. If $2 does not appear in $3, then return $3
+as the sole element of the Array PMC. Will return empty strings for
+delimiters at the beginning and end of $3
 
 =cut
 
@@ -507,21 +509,42 @@ op join(out STR, in STR, in PMC) :base_core {
 }
 
 op split(out PMC, in STR, in STR) :base_core {
-    PMC *res = $1 = pmc_new(interpreter, enum_class_Array);
-    STRING *r = $2;
-    STRING *s = $3;
-    int slen = string_length(interpreter, s);
-    int i;
+    PMC *res = $1 = pmc_new(interpreter, enum_class_ResizableStringArray);
+    STRING *delim = $2;
+    STRING *str = $3;
+    int dlen = string_length(interpreter, delim);
+    int slen = string_length(interpreter, str);
+    int ps,pe;
 
     if (!slen)
 	goto NEXT();
-    if (string_length(interpreter, r))
-	internal_exception(1, "Unimplemented split by regex");
-    VTABLE_set_integer_native(interpreter, res, slen);
-    for (i = 0; i < slen; ++i) {
-	STRING *p = string_substr(interpreter, s, i, 1, NULL, 0);
-	/* TODO first set empty string, then replace */
-	VTABLE_set_string_keyed_int(interpreter, res, i, p);
+
+    if (dlen == 0) {
+        int i;
+        VTABLE_set_integer_native(interpreter, res, slen);
+        for (i = 0; i < slen; ++i) {
+           STRING *p = string_substr(interpreter, str, i, 1, NULL, 0);
+           VTABLE_set_string_keyed_int(interpreter, res, i, p);
+        }
+	goto NEXT();
+    }
+
+    ps = 0;
+    pe = string_str_index(interpreter,str,delim,0);
+    if (pe < 0) {
+	VTABLE_push_string(interpreter,res,str);
+	goto NEXT();
+    }
+    while (ps <= slen) { 
+        int pl = pe - ps;
+	STRING *tstr = string_substr(interpreter, str, ps, pl, NULL, 0);
+	VTABLE_push_string(interpreter,res,tstr);
+	ps = pe + string_length(interpreter,delim);
+	if (ps > slen) 
+	    break;
+        pe = string_str_index(interpreter,str,delim,ps);
+	if (pe < 0)
+	    pe = slen;
     }
     goto NEXT();
 }
