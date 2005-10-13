@@ -190,6 +190,14 @@ See also L<"PIR">.
 In the Parrot context a JAPH is a small script that prints the string "Just
 another Parrot Hacker\".
 
+=head2 Native Call Interface
+
+This let's Parrot talk to native "C" libraries, without a C-compiler.
+
+=head2 NCI
+
+Acronym for Native Call Interface.
+
 =head2 Packfile
 
 Another name for a PBC file, due to the names used for data structures in one
