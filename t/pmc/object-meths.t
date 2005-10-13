@@ -1019,6 +1019,12 @@ pir_output_is(<<'CODE', <<'OUTPUT', "delegate keyed_int");
     $S0 = "foo"
     o[$I0] = 42
     o[$S0] = 42
+    delete o[$I0]
+    delete o[$S0]
+    $I1 = defined o[$I0]
+    $I1 = defined o[$S0]
+    $I1 = exists o[$I0]
+    $I1 = exists o[$S0]
 .end
 
 .namespace ["MyClass"]
@@ -1035,9 +1041,49 @@ pir_output_is(<<'CODE', <<'OUTPUT', "delegate keyed_int");
     print "skey\n"
 .end
 
+.sub __delete_keyed_int :method
+    .param int key
+    print "del_ikey\n"
+.end
+
+.sub __delete_keyed :method
+    .param string key
+    print "del_skey\n"
+.end
+
+.sub __defined_keyed_int :method
+    .param int key
+    print "def_ikey\n"
+    .return (0)
+.end
+
+.sub __defined_keyed :method
+    .param string key
+    print "def_skey\n"
+    .return (0)
+.end
+
+.sub __exists_keyed_int :method
+    .param int key
+    print "exists_ikey\n"
+    .return (0)
+.end
+
+.sub __exists_keyed :method
+    .param string key
+    print "exists_skey\n"
+    .return (0)
+.end
+
 CODE
 ikey
 skey
+del_ikey
+del_skey
+def_ikey
+def_skey
+exists_ikey
+exists_skey
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "delegate keyed_int PMC derived");

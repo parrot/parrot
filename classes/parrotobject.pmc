@@ -189,8 +189,14 @@ Return the class of this object.
 
 =item C<void set_pmc_keyed_int (INTVAL key, PMC* value)>
 
-These methods have default implmentations in F<classes/default.pmc>
-which redirct to PMC keys. Test if a specialized method exists, else
+=item C<void delete_keyed_int(INTVAL key)>
+
+=item C<INTVAL defined_keyed_int(INTVAL key)>
+
+=item C<INTVAL exists_keyed_int(INTVAL key)>
+
+These methods have default implementations in F<classes/default.pmc>
+which redirect to PMC keys. Test if a specialized method exists, else
 use fallback.
 
 =cut
@@ -283,6 +289,39 @@ use fallback.
         }
         else
             SUPER(key, value);
+    }
+
+    void delete_keyed_int (INTVAL key) {
+        STRING *meth = CONST_STRING(interpreter, "__delete_keyed_int");
+        PMC *sub = find_meth(interpreter, pmc, meth);
+        if (sub) {
+            (void) Parrot_run_meth_fromc_args(interpreter, sub,
+                                              pmc, meth, "vI", key);
+        }
+        else
+            SUPER(key);
+    }
+
+    INTVAL defined_keyed_int (INTVAL key) {
+        STRING *meth = CONST_STRING(interpreter, "__defined_keyed_int");
+        PMC *sub = find_meth(interpreter, pmc, meth);
+        if (sub) {
+            (void) Parrot_run_meth_fromc_args_reti(interpreter, sub,
+                                              pmc, meth, "II", key);
+        }
+        else
+            SUPER(key);
+    }
+
+    INTVAL exists_keyed_int (INTVAL key) {
+        STRING *meth = CONST_STRING(interpreter, "__exists_keyed_int");
+        PMC *sub = find_meth(interpreter, pmc, meth);
+        if (sub) {
+            (void) Parrot_run_meth_fromc_args_reti(interpreter, sub,
+                                              pmc, meth, "II", key);
+        }
+        else
+            SUPER(key);
     }
 
 /*
