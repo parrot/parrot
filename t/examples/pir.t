@@ -32,7 +32,7 @@ Bernhard Schmalhofer - <Bernhard.Schmalhofer@gmx.de>
 =cut
 
 use strict;
-use Parrot::Test tests => 4;
+use Parrot::Test tests => 2;
 use Test::More;
 use Parrot::Config;
 
@@ -124,22 +124,4 @@ while ( my ( $example, $expected ) = each %expected ) {
     else {
       ok( defined $extension, "no extension recognized for $code_fn" );
     }
-}
-
-# For testing md5sum.pir we need to pass a filename
-{
-  my $md5sum_fn = "examples$PConfig{slash}pir$PConfig{slash}md5sum.pir";
-  my $sum = `$PARROT $md5sum_fn $md5sum_fn`;
-  is( $sum, "0141db367bd8265f37926c16ccf5113a\t$md5sum_fn\n", $md5sum_fn );
-}
-
-# Testing pcre.imc with a simple pattern
-{
-  my $pcre_fn = "examples$PConfig{slash}pir$PConfig{slash}pcre.pir";
-  my $test_out = `$PARROT $pcre_fn asdf as`;
-  is( $test_out, << 'END_EXPECTED', $pcre_fn );
-asdf =~ /as/
-1 match(es):
-as
-END_EXPECTED
 }

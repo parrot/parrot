@@ -2,11 +2,11 @@
 
 =head1 NAME
 
-examples/pir/md5sum.imc - calculate MD5 checksums
+examples/library/md5sum.imc - calculate MD5 checksums
 
 =head1 SYNOPSIS
 
-    % ./parrot examples/pir/md5sum.pir filename [filename ...]
+    % ./parrot examples/library/md5sum.pir filename [filename ...]
 
 =head1 DESCRIPTION
 

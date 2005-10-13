@@ -14,12 +14,8 @@ t/examples/library.t - Test examples in F<examples/library>
 
 =head1 DESCRIPTION
 
-Test the examples in F<examples/assambly>.
-For now only a fex examples are included here.
+Test the examples in F<examples/library>.
 
-=head1 TODO
-
-Check on remaining examples.
 
 =head1 SEE ALSO
 
@@ -28,8 +24,11 @@ F<t/examples/japh.t>
 =cut
 
 use strict;
-use Parrot::Test tests => 1;
+use Parrot::Test tests => 3;
 use Test::More;
+use Parrot::Config;
+
+my $PARROT = ".$PConfig{slash}$PConfig{test_prog}";
 
 # Set up expected output for examples
 my %expected = (
@@ -50,8 +49,8 @@ my %test_func = ( pasm => \&pasm_output_is,
 
 while ( my ( $example, $expected ) = each %expected )
 {
-    my $code_fn   = "examples/library/$example";
-    my $code = Parrot::Test::slurp_file($code_fn);
+    my $code_fn = "examples/library/$example";
+    my $code    = Parrot::Test::slurp_file($code_fn);
 
     my ( $extension ) = $example =~ m{ [.]                  # introducing extension
                                        ( pasm | pir | imc ) # match and capture the extension
@@ -61,6 +60,31 @@ while ( my ( $example, $expected ) = each %expected )
       $test_func{$extension}->($code, $expected, $code_fn);
     }
     else {
-      ok( defined $extension, "no extension recognized for $code_fn" );
+      fail( "no extension recognized for $code_fn" );
     }
 }
+
+
+# For testing md5sum.pir we need to pass a filename
+{
+    my $md5sum_fn = "examples$PConfig{slash}library$PConfig{slash}md5sum.pir";
+    my $sample_fn = "examples$PConfig{slash}README";
+    my $sum = `$PARROT $md5sum_fn $sample_fn`;
+    is( $sum, "cba989d2bebdce8f56f69c3f0d54ae15\t$sample_fn\n", $md5sum_fn );
+}
+
+
+# Testing pcre.imc with a simple pattern, if we have PCRE
+my $cmd = ($^O =~ /MSWin32/) ? "pcregrep --version" : "pcre-config --version";
+my $has_pcre = Parrot::Test::run_command($cmd, STDERR => '/dev/null') == 0;
+SKIP:
+{
+    skip( "no pcre-config", 1 ) unless $has_pcre;
+    my $pcre_fn = "examples$PConfig{slash}library$PConfig{slash}pcre.pir";
+    my $test_out = `$PARROT $pcre_fn asdf as`;
+    is( $test_out, << 'END_EXPECTED', $pcre_fn );
+asdf =~ /as/
+1 match(es):
+as
+END_EXPECTED
+};

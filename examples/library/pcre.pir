@@ -3,11 +3,11 @@
 
 =head1 NAME
 
-examples/pir/pcre.imc - Perl compatible regular expressions
+examples/library/pcre.imc - Perl compatible regular expressions
 
 =head1 SYNOPSIS
 
-    % ./parrot examples/pir/pcre.pir string pattern
+    % ./parrot examples/library/pcre.pir string pattern
 
 =head1 DESCRIPTION
 
