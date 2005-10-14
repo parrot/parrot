@@ -18,9 +18,6 @@ a number of built-in rules.
     .local pmc p6rule
     base = getclass "PGE::Match"
     $P0 = subclass base, "PGE::Rule"
-    p6rule = find_global "PGE", "p6rule"
-    p6rule("[_ | <?alpha>] \w*", "PGE::Rule", "ident")
-    p6rule("<ident> [ \: \: <ident> ]*", "PGE::Rule", "name")
     .return ()
 .end
 
@@ -34,6 +31,8 @@ Match a null string (always returns true on first match).
 
 .sub null
     .param pmc mob
+    $P0 = find_global "PGE::Match", "newfrom"
+    mob = $P0(mob)
     $P0 = getattribute mob, "PGE::Match\x0$:from"
     $P1 = getattribute mob, "PGE::Match\x0$:pos"
     assign $P1, $P0
@@ -48,8 +47,8 @@ Force a backtrack.  (Taken from A05.)
 
 .sub fail
     .param pmc mob
-    $P0 = getattribute mob, "PGE::Match\x0$:pos"
-    $P0 = -1
+    $P0 = find_global "PGE::Match", "newfrom"
+    mob = $P0(mob)
     .return (mob)
 .end
 
@@ -63,6 +62,8 @@ Match a single uppercase character.
     .param pmc mob
     .local string target
     .local int pos
+    $P0 = find_global "PGE::Match", "newfrom"
+    mob = $P0(mob)
     $P0 = getattribute mob, "PGE::Match\x0$:from"
     pos = $P0
     $P1 = getattribute mob, "PGE::Match\x0$:target"
@@ -86,6 +87,8 @@ Match a single lowercase character.
     .param pmc mob
     .local string target
     .local int pos
+    $P0 = find_global "PGE::Match", "newfrom"
+    mob = $P0(mob)
     $P0 = getattribute mob, "PGE::Match\x0$:from"
     pos = $P0
     $P1 = getattribute mob, "PGE::Match\x0$:target"
@@ -109,15 +112,17 @@ Match a single alphabetic character.
     .param pmc mob
     .local string target
     .local int pos
+    $P0 = find_global "PGE::Match", "newfrom"
+    mob = $P0(mob, 0)
     $P0 = getattribute mob, "PGE::Match\x0$:from"
     pos = $P0
-    $P1 = getattribute mob, "PGE::Match\x0$:target"
-    target = $P1
+    $P0 = getattribute mob, "PGE::Match\x0$:target"
+    target = $P0
     $I0 = is_cclass .CCLASS_ALPHABETIC, target, pos
     unless $I0 goto end
     inc pos
-    $P1 = getattribute mob, "PGE::Match\x0$:pos"
-    $P1 = pos
+    $P0 = getattribute mob, "PGE::Match\x0$:pos"
+    $P0 = pos
   end:
     .return (mob)
 .end
@@ -132,6 +137,8 @@ Match a single digit.
     .param pmc mob
     .local string target
     .local int pos
+    $P0 = find_global "PGE::Match", "newfrom"
+    mob = $P0(mob)
     $P0 = getattribute mob, "PGE::Match\x0$:from"
     pos = $P0
     $P1 = getattribute mob, "PGE::Match\x0$:target"
@@ -155,6 +162,8 @@ Match a single alphanumeric character.
     .param pmc mob
     .local string target
     .local int pos
+    $P0 = find_global "PGE::Match", "newfrom"
+    mob = $P0(mob)
     $P0 = getattribute mob, "PGE::Match\x0$:from"
     pos = $P0
     $P1 = getattribute mob, "PGE::Match\x0$:target"
@@ -178,6 +187,8 @@ Match a single whitespace character.
     .param pmc mob
     .local string target
     .local int pos
+    $P0 = find_global "PGE::Match", "newfrom"
+    mob = $P0(mob)
     $P0 = getattribute mob, "PGE::Match\x0$:from"
     pos = $P0
     $P1 = getattribute mob, "PGE::Match\x0$:target"
@@ -201,6 +212,8 @@ Match a single printable character.
     .param pmc mob
     .local string target
     .local int pos
+    $P0 = find_global "PGE::Match", "newfrom"
+    mob = $P0(mob)
     $P0 = getattribute mob, "PGE::Match\x0$:from"
     pos = $P0
     $P1 = getattribute mob, "PGE::Match\x0$:target"
@@ -224,6 +237,8 @@ Match a single "graphical" character.
     .param pmc mob
     .local string target
     .local int pos
+    $P0 = find_global "PGE::Match", "newfrom"
+    mob = $P0(mob)
     $P0 = getattribute mob, "PGE::Match\x0$:from"
     pos = $P0
     $P1 = getattribute mob, "PGE::Match\x0$:target"
@@ -247,6 +262,8 @@ Match a single "blank" character.
     .param pmc mob
     .local string target
     .local int pos
+    $P0 = find_global "PGE::Match", "newfrom"
+    mob = $P0(mob)
     $P0 = getattribute mob, "PGE::Match\x0$:from"
     pos = $P0
     $P1 = getattribute mob, "PGE::Match\x0$:target"
@@ -270,6 +287,8 @@ Match a single "control" character.
     .param pmc mob
     .local string target
     .local int pos
+    $P0 = find_global "PGE::Match", "newfrom"
+    mob = $P0(mob)
     $P0 = getattribute mob, "PGE::Match\x0$:from"
     pos = $P0
     $P1 = getattribute mob, "PGE::Match\x0$:target"
@@ -293,6 +312,8 @@ Match a single punctuation character.
     .param pmc mob
     .local string target
     .local int pos
+    $P0 = find_global "PGE::Match", "newfrom"
+    mob = $P0(mob)
     $P0 = getattribute mob, "PGE::Match\x0$:from"
     pos = $P0
     $P1 = getattribute mob, "PGE::Match\x0$:target"
@@ -316,6 +337,8 @@ Match a single alphanumeric character.
     .param pmc mob
     .local string target
     .local int pos
+    $P0 = find_global "PGE::Match", "newfrom"
+    mob = $P0(mob)
     $P0 = getattribute mob, "PGE::Match\x0$:from"
     pos = $P0
     $P1 = getattribute mob, "PGE::Match\x0$:target"
@@ -339,6 +362,8 @@ Match a single space character.  (Taken from E05.)
     .param pmc mob
     .local string target
     .local int pos
+    $P0 = find_global "PGE::Match", "newfrom"
+    mob = $P0(mob)
     $P0 = getattribute mob, "PGE::Match\x0$:from"
     pos = $P0
     $P1 = getattribute mob, "PGE::Match\x0$:target"
@@ -362,6 +387,8 @@ Match a single left angle bracket.  (Taken from E05.)
     .param pmc mob
     .local string target
     .local int pos
+    $P0 = find_global "PGE::Match", "newfrom"
+    mob = $P0(mob)
     $P0 = getattribute mob, "PGE::Match\x0$:from"
     pos = $P0
     $P1 = getattribute mob, "PGE::Match\x0$:target"
@@ -385,6 +412,8 @@ Match a single right angle bracket. (Taken from E05.)
     .param pmc mob
     .local string target
     .local int pos
+    $P0 = find_global "PGE::Match", "newfrom"
+    mob = $P0(mob)
     $P0 = getattribute mob, "PGE::Match\x0$:from"
     pos = $P0
     $P1 = getattribute mob, "PGE::Match\x0$:target"
@@ -408,6 +437,8 @@ Match a single dot ('.').  (Taken from E05.)
     .param pmc mob
     .local string target
     .local int pos
+    $P0 = find_global "PGE::Match", "newfrom"
+    mob = $P0(mob)
     $P0 = getattribute mob, "PGE::Match\x0$:from"
     pos = $P0
     $P1 = getattribute mob, "PGE::Match\x0$:target"

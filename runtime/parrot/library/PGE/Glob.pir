@@ -276,7 +276,7 @@ Parse alternations of the form {a,b,c} where a,b, and c are the alternatives.
     exp.serno(0)
 
     code = new String
-    exp.gen(code, "R", "fail")
+    exp.gen(code, "_pge_rule", "fail")
 
     compreg $P0, "PIR"
     $S0 = code

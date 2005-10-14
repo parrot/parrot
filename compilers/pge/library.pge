@@ -1,0 +1,8 @@
+grammar PGE::Rule;
+
+rule ident { [ _ | <?alpha> ] \w* }
+
+# comments
+
+rule name { <ident> [ \:\: <ident> ]* }
+

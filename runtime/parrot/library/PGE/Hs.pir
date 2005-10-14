@@ -216,13 +216,9 @@ END:
     goto subrules_loop
 
   dumper:
-    ari = 0
-    arc = elements elm
-    is_array = getprop "isarray", elm
-    if is_array goto dumper_array
-    unless ari < arc goto dumper_fail
-    subelm = elm[-1]
-    tmps = subelm."dump_hs"()
+    $I0 = isa elm, "Array"
+    if $I0 goto dumper_array
+    tmps = elm."dump_hs"()
     out .= tmps
     ret
   dumper_fail:
@@ -232,6 +228,8 @@ END:
     out .= "]"
     ret
   dumper_array:
+    ari = 0
+    arc = elements elm
     out .= "PGE_Array ["
     unless ari < arc goto dumper_done
     goto dumper_array_body

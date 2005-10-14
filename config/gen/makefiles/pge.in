@@ -16,7 +16,8 @@ all: $(PARROT_LIBRARY)${slash}PGE.pbc
 $(PARROT_LIBRARY)${slash}PGE.pbc: PGE.pbc
 	$(CP) PGE.pbc $(PARROT_LIBRARY)
 
-PGE.pbc: PGE.pir PGE/Exp.pir PGE/Match.pir PGE/Rule.pir PGE/P6Rule.pir PGE/TokenHash.pir
+PGE.pbc: PGE.pir PGE/Exp.pir PGE/Match.pir PGE/Rule.pir PGE/P6Rule.pir PGE/TokenHash.pir mklib.pir library.pge
+	$(PARROT) mklib.pir >PGE/Library.pir
 	$(PARROT) -o PGE.pbc --output-pbc PGE.pir 
 
 # This is a listing of all targets, that are meant to be called by users
@@ -46,7 +47,7 @@ testclean:
 	$(RM_RF) ../../t/p6rules/*.pir ../../t/p6rules/*.pasm
 
 clean: testclean
-	$(RM_RF) PGE.pbc
+	$(RM_RF) PGE.pbc PGE/Library.pir
 
 realclean: clean
 	$(RM_RF) Makefile

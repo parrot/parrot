@@ -35,3 +35,4 @@ defined.
 .include "compilers/pge/PGE/Match.pir"
 .include "compilers/pge/PGE/Rule.pir"
 .include "compilers/pge/PGE/P6Rule.pir"
+.include "compilers/pge/PGE/Library.pir"

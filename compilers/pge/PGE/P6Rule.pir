@@ -875,6 +875,11 @@ needed).
     .local pmc code
     .local pmc rule
 
+    if has_name goto p6rule_1
+    name = "_pge_rule"
+    if has_gram goto p6rule_1
+    grammar = "PGE::Rule"
+  p6rule_1:
     lex = new Hash
     lex["pos"] = 0
     lex["subp"] = 0
@@ -894,19 +899,20 @@ needed).
     exp.serno(0)
 
     code = new String
-    exp.gen(code, "R", "fail")
+    code = ".namespace [ \""
+    code .= grammar
+    code .= "\" ]\n\n"
+    exp.gen(code, name, "fail")
     $P0 = compreg "PIR"
     compreg $P0, "PIR"
     $S0 = code
     rule = $P0($S0)
-    unless has_name goto p6rule_3
+    if has_name == 0 goto p6rule_2
     $I0 = find_type grammar
     if $I0 > 0 goto p6rule_2
     $P0 = getclass "PGE::Rule"
     $P1 = subclass $P0, grammar
   p6rule_2:
-    store_global grammar, name, rule
-  p6rule_3:
     .return (rule, code, exp)
 .end
 

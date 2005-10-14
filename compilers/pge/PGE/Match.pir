@@ -22,31 +22,56 @@ This file implements match objects returned by the Parrot Grammar Engine.
     .return ()
 .end
 
-=head2 Methods
+=head2 Functions
 
-=item C<newat(PMC mob, INT pos)>
+=item C<newfrom(PMC mob [, int from [, string grammar]])>
 
-Create a new match object in the same class as the invocant, from
-the match state given by C<mob>, and initialized to start from
-C<pos>.
+Creates a new Match object, based on C<mob>.  If C<grammar> is
+specified then the newly created object is an instance of that class,
+otherwise if C<isa mob, "PGE::Match"> then the new object is the
+same class as C<mob>, otherwise the new object is a "PGE::Match"
+object.  The optional C<from> parameter says how to initialize
+the C<$:from> attribute of the new object if it can't start from
+the current position of C<mob>.
 
 =cut
 
-.sub "newat" method
+.sub "newfrom"
     .param pmc mob
-    .param int pos
+    .param int from            :optional           # from for new object
+    .param int has_from        :opt_flag
+    .param string grammar      :optional           # grammar to use
+    .param int has_grammar     :opt_flag
     .local pmc me
-    $S0 = classname self
-    $I0 = find_type $S0
+
+    $I0 = isa mob, "PGE::Match"
+    if $I0 goto newfrom_mob
+    $P1 = new String
+    assign $P1, mob
+    $P2 = new PerlInt
+    $P2 = -1
+    if has_grammar goto new_me
+    grammar = "PGE::Rule"
+    goto new_me
+  newfrom_mob:
+    if has_grammar goto newfrom_2
+    grammar = classname mob
+  newfrom_2:
+    $P1 = getattribute mob, "PGE::Match\x0$:target"
+    $P2 = getattribute mob, "PGE::Match\x0$:pos"
+    $P2 = clone $P2
+  new_me:
+    $I0 = find_type grammar
     me = new $I0
-    $P0 = getattribute mob, "PGE::Match\x0$:target"
-    setattribute me, "PGE::Match\x0$:target", $P0
-    $P0 = new PerlInt
-    $P0 = pos
-    setattribute me, "PGE::Match\x0$:from", $P0
-    $P0 = new PerlInt
-    $P0 = -1
-    setattribute me, "PGE::Match\x0$:pos", $P0
+    setattribute me, "PGE::Match\x0$:target", $P1
+    setattribute me, "PGE::Match\x0$:from", $P2
+    $P3 = new PerlInt
+    $P3 = -1
+    setattribute me, "PGE::Match\x0$:pos", $P3
+    if has_from == 0 goto end
+    if $P2 >= 0 goto end
+    $P2 = from
+  end:
     .return (me)
 .end
 
@@ -85,8 +110,7 @@ this object matched.
 .sub "from" method
     .local pmc from
     from = getattribute self, "PGE::Match\x0$:from"
-    $I0 = from
-    .return ($I0)
+    .return (from)
 .end
 
 =item C<to()>
@@ -98,8 +122,7 @@ Returns the offset at the end of this match.
 .sub "to" method
     .local pmc to
     to = getattribute self, "PGE::Match\x0$:pos"
-    $I0 = to
-    .return ($I0)
+    .return (to)
 .end
 
 =item C<__get_bool()>
@@ -163,33 +186,98 @@ Returns the portion of the target string matched by this object.
 
 =item C<__get_pmc_keyed(PMC key)>
 
-Returns the subpattern or subrule capture associated with C<key>.
-If the first character of C<key> is a digit then return the
-subpattern, otherwise return the subrule.  Note that this will
-return either a single Match object or an array of match objects
-depending on the rule.
+Returns the subrule capture associated with C<key>.  This
+returns either a single Match object or an array of match
+objects depending on the rule.
 
 =cut
 
 .sub "__get_pmc_keyed" method
     .param pmc key
-    .local pmc capt
-    $S0 = key
-    .include "cclass.pasm"
-    $I0 = is_cclass .CCLASS_NUMERIC, $S0, 0
-    unless $I0 goto keyed_1
-    capt = getattribute self, "PGE::Match\x0@:capt"
-    goto keyed_2
-  keyed_1:
-    capt = getattribute self, "PGE::Match\x0%:capt"
-  keyed_2:
-    $P0 = capt[key]
-    $P1 = getprop "isarray", $P0
-    if $P1 goto end
-    $P0 = $P0[-1]
-  end:
+    $P0 = getattribute self, "PGE::Match\x0%:capt"
+    if_null $P0, get_1
+    $P0 = $P0[key]
+  get_1:
     .return ($P0)
 .end
+
+=item C<__get_pmc_keyed_int(int key)>
+
+Returns the subpattern capture associated with C<key>.  This
+returns either a single Match object or an array of match
+objects depending on the rule.
+
+=cut
+
+.sub "__get_pmc_keyed_int" method
+    .param int key
+    $P0 = getattribute self, "PGE::Match\x0@:capt"
+    if_null $P0, get_1
+    $P0 = $P0[key]
+  get_1:
+    .return ($P0)
+.end
+
+.sub "__set_pmc_keyed" method
+    .param pmc key
+    .param pmc val
+    .local pmc capt
+    capt = getattribute self, "PGE::Match\x0%:capt"
+    unless_null capt, set_1
+    capt = new PerlHash
+    setattribute self, "PGE::Match\x0%:capt", capt
+  set_1:
+    capt[key] = val
+.end
+
+.sub "__set_pmc_keyed_int" method
+    .param int key
+    .param pmc val
+    .local pmc capt
+    capt = getattribute self, "PGE::Match\x0@:capt"
+    unless_null capt, set_1
+    capt = new PerlArray
+    setattribute self, "PGE::Match\x0@:capt", capt
+  set_1:
+    capt[key] = val
+.end
+
+.sub "__delete_keyed" :method
+    .param pmc key
+    .local pmc capt
+    capt = getattribute self, "PGE::Match\x0%:capt"
+    delete capt[key]
+.end
+
+.sub "__delete_keyed_int" :method
+    .param int key
+    .local pmc capt
+    capt = getattribute self, "PGE::Match\x0@:capt"
+    delete capt[key]
+.end
+
+.sub "__defined_keyed" :method
+    .param pmc key
+    .local pmc capt
+    $I0 = 0
+    capt = getattribute self, "PGE::Match\x0%:capt"
+    if_null capt, end
+    $I0 = defined capt[key]
+  end:
+    .return ($I0)
+.end
+
+.sub "__defined_keyed_int" :method
+    .param int key
+    .local pmc capt
+    $I0 = 0
+    capt = getattribute self, "PGE::Match\x0@:capt"
+    if_null capt, end
+    $I0 = defined capt[key]
+  end:
+    .return ($I0)
+.end
+
 
 =item C<get_hash()>
 
@@ -289,17 +377,15 @@ Produces a data dump of the match object and all of its subcaptures.
     goto subrules_1
 
   dumper:
+    $I0 = isa $P0, "Array"
+    if $I0 goto dumper_0
+    $P0."dump"(prefix1, b1, b2)
+    ret
+  dumper_0:
     $I0 = 0
     $I1 = elements $P0
-    unless $I0 < $I1 goto dumper_1
-    $P1 = getprop "isarray", $P0
-    if $P1 goto dumper_2
-    $P1 = $P0[-1]
-    $P1."dump"(prefix1, b1, b2)
   dumper_1:
-    ret
-  dumper_2:
-    unless $I0 < $I1 goto dumper_1
+    if $I0 >= $I1 goto dumper_2
     $P1 = $P0[$I0]
     prefix2 = concat prefix1, b1
     $S0 = $I0
@@ -307,7 +393,10 @@ Produces a data dump of the match object and all of its subcaptures.
     concat prefix2, b2
     $P1."dump"(prefix2, b1, b2)
     inc $I0
-    goto dumper_2
+    goto dumper_1
+  dumper_2:
+    ret
+
   end:
     .return ()
 .end
