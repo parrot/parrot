@@ -20,24 +20,25 @@ scan_paths(const char *filename, const char *libpath)
     static char buf[PATH_MAX];
     struct stat st;
     char *path_list;
+    char *path_list_start;
     const char *path;
 
     if(!libpath)
-	return NULL;
+        return NULL;
 
-    path_list = strdup(libpath);
+    path_list_start = path_list = strdup(libpath);
 
     path = strsep(&path_list, ":");
 
     while(path) {
-	snprintf(buf, PATH_MAX, "%s/%s", path, filename);
-	if(stat(buf, &st) == 0) {
-	    free(path_list);
-	    return buf;
-	}
-	path = strsep(&path_list, ":");
+        snprintf(buf, PATH_MAX, "%s/%s", path, filename);
+        if(stat(buf, &st) == 0) {
+            free(path_list_start);
+            return buf;
+        }
+        path = strsep(&path_list, ":");
     }
-    free(path_list);
+    free(path_list_start);
     return NULL;
 }
 
