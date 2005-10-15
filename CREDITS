@@ -310,7 +310,7 @@ D: Building and platform compat and more.
 
 N: Nick Glencross
 D: Bugfixes to trace and more.
-D: fixes file perms in config/gen/makefiles/dynclasses_pl on hpux & cygwin
+D: fixes file perms for hpux & cygwin in config/gen/makefiles/dynclasses_pl
 E: nickg@glencros.demon.co.uk
 
 N: Nick Kostirya
