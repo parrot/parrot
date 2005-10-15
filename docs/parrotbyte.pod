@@ -1,4 +1,4 @@
-# Copyright: 2001-2004 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 =head1 NAME
@@ -172,13 +172,50 @@ or Coroutine PMC.
 
 =head2 Debug Segment
 
-  +----------+----------+----------+----------+
-  | filename ...                              |
-  | ...        0x00       padding             |
-  +----------+----------+----------+----------+
+The opcode stream will contain one line number per bytecode instruction. No 
+information as to what file that line is from will be stored in this stream.
 
-The debug segment has one additional field with the source file name.  The
-opcode stream holds one line number per bytecode instruction.
+The header will start with a count of the number of source file to bytecode
+position mappings that are in the header.
+
+0 (relative)
++----------+----------+----------+----------+
+|   number of source => bytecode mappings   |
++----------+----------+----------+----------+
+
+A source to bytecode position mapping simply states that the bytecode that 
+starts from the specified offset up until the offset in the next mapping, or 
+if there is none up until the end of the bytecode, has it's source in 
+location X.
+
+A mapping always starts with the offset in the bytecode, followed by the 
+type of the mapping.
+
+0 (relative)
++----------+----------+----------+----------+
+|              bytecode offset              |
++----------+----------+----------+----------+
+
+4
++----------+----------+----------+----------+
+|                mapping type               |
++----------+----------+----------+----------+
+
+There are 3 mapping types.
+
+Type B<0> means there is no source available for the bytecode starting at the 
+given offset. No further data is stored with this type of mapping; the next 
+mapping continues immediately after it.
+
+Type B<1> means the source is available in a file. A NULL terminated string 
+containing the filename follows, with padding.
+
+Type B<2> means the source is available in a source segment. Another integer 
+follows, which will specify which source file in the source segment to use.
+
+Note that the ordering of the offsets into the bytecode must be sequential; 
+a mapping for offset 100 cannot follow a mapping for offset 200, for 
+example.
 
 =head2 CONSTANT TABLE SEGMENT
 
@@ -290,9 +327,6 @@ follow.
 Currently there are no utilities that use this segment, even though it is
 mentioned in some of the early Parrot documents.
 
-Eventually there will be a more complete and useful PackFile specification, but
-this simple format works well enough for now (c. Parrot 0.0.5).
-
 =head1 SEE ALSO
 
 F<packfile.c>, F<packfile.h>, F<packout.c>, F<packdump.c>, F<pf/*.c>, and the
@@ -306,7 +340,9 @@ Format 1 description by Leopold Toetsch C<lt@toetsch.at>
 
 Variable argument opcodes update by Jonathan Worthington C<jonathan@jwcs.net>
 
+New debug segment format by Jonathan Worthington C<jonathan@jwcs.net>
+
 =head1 VERSION
 
-2005.09.19
+2005.10.04
 

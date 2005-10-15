@@ -180,9 +180,25 @@ struct PackFile_ByteCode {
     struct PackFile_FixupTable *fixups;
 };
 
+enum PF_DEBUGMAPPINGTYPE {
+    PF_DEBUGMAPPINGTYPE_NONE = 0,
+    PF_DEBUGMAPPINGTYPE_FILENAME,
+    PF_DEBUGMAPPINGTYPE_SOURCESEG
+};
+
+struct PackFile_DebugMapping {
+    opcode_t offset;
+    opcode_t mapping_type;
+    union {
+        char *filename;
+        opcode_t source_seg; /* XXX Source segments currently unimplemented. */
+    } u;
+};
+
 struct PackFile_Debug {
-    struct PackFile_Segment     base;
-    char                      * filename;
+    struct PackFile_Segment base;
+    opcode_t num_mappings;
+    struct PackFile_DebugMapping ** mappings; /* Last element always NULL. */
     struct PackFile_ByteCode  * code;   /* where this segment belongs to */
 };
 
@@ -323,6 +339,9 @@ void Parrot_pop_cs(Interp *);
 /* Debug stuff */
 struct PackFile_Debug * Parrot_new_debug_seg(Interp *,
         struct PackFile_ByteCode *cs, const char *filename, size_t size);
+char * Parrot_debug_pc_to_filename(Interp *interpreter,
+        struct PackFile_Debug *debug, opcode_t pc);
+
 /*
 ** PackFile_ConstTable Functions:
 */

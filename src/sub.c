@@ -370,7 +370,7 @@ Parrot_Context_info(Interp *interpreter, parrot_context_t *ctx,
 
 	/*assert(pc == sub->seg->base.data);*/
 	/* set source file */
-	info->file = debug->filename;
+	info->file = Parrot_debug_pc_to_filename(interpreter, debug, info->pc);
 	for (i = n = 0; n < interpreter->code->base.size; i++) {
 	    op_info_t *op_info = &interpreter->op_info_table[*pc];
             if (i >= debug->base.size)
