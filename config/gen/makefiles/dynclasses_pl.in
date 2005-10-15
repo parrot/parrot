@@ -153,6 +153,13 @@ elsif ($mode eq 'copy') {
 
     foreach (@ungrouped_pmcs, keys %$group_files) {
         copy("$_$LOAD_EXT", $dest) or die "Copy $_$LOAD_EXT failed ($?)\n";
+
+        # Execute permissions on libraries is especially important on
+        # some platforms
+        if ($^O eq 'hpux' or $^O eq 'cygwin') {
+            chmod 0755, "$dest${slash}$_$LOAD_EXT";
+        }
+
     }
 }
 else {
