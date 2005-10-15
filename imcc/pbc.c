@@ -1146,8 +1146,10 @@ e_pbc_emit(Interp *interpreter, void *param, IMC_Unit * unit, Instruction * ins)
             const char *sourcefile = IMCC_INFO(interpreter)->state->file;
             /* FIXME length and multiple subs */
             debug_seg = Parrot_new_debug_seg(interpreter,
-                    interpreter->code, sourcefile,
+                    interpreter->code,
                     (size_t) ins_line + ins_size + 1);
+            Parrot_debug_add_mapping(interpreter, debug_seg, 0,
+                     PF_DEBUGMAPPINGTYPE_FILENAME, sourcefile, 0);
         }
         else
             debug_seg = NULL;

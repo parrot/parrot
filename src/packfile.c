@@ -1923,11 +1923,7 @@ pf_debug_destroy (Interp* interpreter, struct PackFile_Segment *self)
 
     /* Free each mapping. */
     for (i = 0; i < debug->num_mappings; i++)
-    {
-        if (debug->mappings[i]->mapping_type = PF_DEBUGMAPPINGTYPE_FILENAME)
-            mem_sys_free(debug->mappings[i]->u.filename);
         mem_sys_free(debug->mappings[i]);
-    }
     
     /* Free mappings pointer array. */
     mem_sys_free(debug->mappings);
@@ -1998,8 +1994,6 @@ pf_debug_packed_size (Interp* interpreter, struct PackFile_Segment *self)
             case PF_DEBUGMAPPINGTYPE_NONE:
                 break;
             case PF_DEBUGMAPPINGTYPE_FILENAME:
-                size += PF_size_cstring(debug->mappings[i]->u.filename);
-                break;
             case PF_DEBUGMAPPINGTYPE_SOURCESEG:
                 size += 1;
                 break;
@@ -2043,8 +2037,7 @@ pf_debug_pack (Interp* interpreter, struct PackFile_Segment *self,
             case PF_DEBUGMAPPINGTYPE_NONE:
                 break;
             case PF_DEBUGMAPPINGTYPE_FILENAME:
-                strcpy ((char*)cursor, debug->mappings[i]->u.filename);
-                cursor += PF_size_cstring(debug->mappings[i]->u.filename);
+                *cursor++ = debug->mappings[i]->u.filename;
                 break;
             case PF_DEBUGMAPPINGTYPE_SOURCESEG:
                 *cursor++ = debug->mappings[i]->u.source_seg;
@@ -2103,7 +2096,7 @@ pf_debug_unpack (Interp *interpreter,
             case PF_DEBUGMAPPINGTYPE_NONE:
                 break;
             case PF_DEBUGMAPPINGTYPE_FILENAME:
-                debug->mappings[i]->u.filename = PF_fetch_cstring(self->pf, &cursor);
+                debug->mappings[i]->u.filename = PF_fetch_opcode(self->pf, &cursor);
                 break;
             case PF_DEBUGMAPPINGTYPE_SOURCESEG:
                 debug->mappings[i]->u.source_seg = PF_fetch_opcode(self->pf, &cursor);
@@ -2129,11 +2122,24 @@ pf_debug_unpack (Interp *interpreter,
     return cursor;
 }
 
+
+/*
+
+=item C<static void
+pf_debug_dump (Interp *interpreter, struct PackFile_Segment *self)>
+
+Dumps a debug segment to a human readable form.
+
+=cut
+
+*/
+
 static void
 pf_debug_dump (Parrot_Interp interpreter, struct PackFile_Segment *self)
 {
-    size_t i;
+    opcode_t i;
     struct PackFile_Debug *debug = (struct PackFile_Debug *) self;
+    char *filename;
 
     default_dump_header(interpreter, self);
 
@@ -2150,8 +2156,10 @@ pf_debug_dump (Parrot_Interp interpreter, struct PackFile_Segment *self)
                 break;
             case PF_DEBUGMAPPINGTYPE_FILENAME:
                 PIO_printf(interpreter, "        MAPPINGTYPE => FILENAME,\n");
-                PIO_printf(interpreter, "        FILENAME => %s\n",
-                           debug->mappings[i]->u.filename);
+                filename = string_to_cstring(interpreter, PF_CONST(debug->code,
+                           debug->mappings[i]->u.filename)->u.string);
+                PIO_printf(interpreter, "        FILENAME => %s\n", filename);
+                free(filename);
                 break;
             case PF_DEBUGMAPPINGTYPE_SOURCESEG:
                 PIO_printf(interpreter, "        MAPPINGTYPE => SOURCESEG,\n");
@@ -2182,7 +2190,7 @@ pf_debug_dump (Parrot_Interp interpreter, struct PackFile_Segment *self)
 
 =item C<struct PackFile_Debug *
 Parrot_new_debug_seg(Interp *interpreter,
-        struct PackFile_ByteCode *cs, const char *filename, size_t size)>
+        struct PackFile_ByteCode *cs, size_t size)>
 
 Create and append (or resize) a new debug seg for a code segment.
 
@@ -2192,7 +2200,7 @@ Create and append (or resize) a new debug seg for a code segment.
 
 struct PackFile_Debug *
 Parrot_new_debug_seg(Interp *interpreter,
-        struct PackFile_ByteCode *cs, const char *filename, size_t size)
+        struct PackFile_ByteCode *cs, size_t size)
 {
     struct PackFile_Debug *debug;
     char *name;
@@ -2207,7 +2215,7 @@ Parrot_new_debug_seg(Interp *interpreter,
         len = strlen(cs->base.name) + 4;
         name = mem_sys_allocate(len);
         sprintf(name, "%s_DB", cs->base.name);
-        if (interpreter->code->base.dir) {
+        if (interpreter->code && interpreter->code->base.dir) {
             debug = (struct PackFile_Debug *)
                 PackFile_Segment_new_seg(interpreter,
                 interpreter->code->base.dir, PF_DEBUG_SEG, name, 1);
@@ -2216,24 +2224,16 @@ Parrot_new_debug_seg(Interp *interpreter,
             /* used by eval - don't register the segment */
             debug = (struct PackFile_Debug *)
                 PackFile_Segment_new_seg(interpreter,
-                &interpreter->initial_pf->directory, PF_DEBUG_SEG, name, 0);
+                cs->base.dir, PF_DEBUG_SEG, name, 0);
         }
         mem_sys_free(name);
 
         debug->base.data = mem_sys_allocate(size * sizeof(opcode_t));
+        debug->num_mappings = 0;
+        debug->mappings = mem_sys_allocate(1);
+
         debug->code = cs;
         cs->debugs = debug;
-        
-        /* XXX While we transition to allowing multiple file names, we'll keep
-           this working by creating a single mapping for the filename passed. */
-        debug->num_mappings = 1;
-        debug->mappings = mem_sys_realloc(debug->mappings, sizeof(Parrot_Pointer) * 2);
-        debug->mappings[0] = mem_sys_allocate(sizeof(struct PackFile_DebugMapping));
-        debug->mappings[0]->offset = 0;
-        debug->mappings[0]->mapping_type = PF_DEBUGMAPPINGTYPE_FILENAME;
-        debug->mappings[0]->u.filename = mem_sys_allocate(strlen(filename) + 1);
-        strcpy(debug->mappings[0]->u.filename, filename);
-        debug->mappings[1] = NULL;
     }
     debug->base.size = size;
     return debug;
@@ -2241,6 +2241,86 @@ Parrot_new_debug_seg(Interp *interpreter,
 
 /*
 
+=item c<void
+Parrot_debug_add_mapping(Interp *interpreter,
+                         struct PackFile_Debug *debug,
+                         opcode_t offset, int mapping_type,
+                         char *filename, int source_seg)>
+
+Add a bytecode offset to filename/source segment mapping. mapping_type may be
+one of PF_DEBUGMAPPINGTYPE_NONE (in which case the last two parameters are
+ignored), PF_DEBUGMAPPINGTYPE_FILENAME (in which case filename must be given)
+or PF_DEBUGMAPPINGTYPE_SOURCESEG (in which case source_seg should contains the
+number of the source segment in question).
+
+=cut
+
+*/
+void
+Parrot_debug_add_mapping(Interp *interpreter,
+                         struct PackFile_Debug *debug,
+                         opcode_t offset, int mapping_type,
+                         char *filename, int source_seg)
+{
+    struct PackFile_DebugMapping *mapping;
+    struct PackFile_ConstTable *ct = debug->code->const_table;
+    struct PackFile_Constant *fnconst;
+    int insert_pos = 0;
+
+    /* Allocate space for the extra entry. */
+    debug->mappings = mem_sys_realloc(debug->mappings, 
+        sizeof(Parrot_Pointer) * (debug->num_mappings + 1));
+
+    /* Can it just go on the end? */
+    if (debug->num_mappings == 0 || 
+        offset >= debug->mappings[debug->num_mappings - 1]->offset)
+    {
+        insert_pos = debug->num_mappings;
+    }
+    else
+    {
+        /* Find the right place and shift stuff that's after it. */
+        int i;
+        for (i = 0; i < debug->num_mappings; i++)
+        {
+            if (debug->mappings[i]->offset > offset)
+            {
+                insert_pos = i;
+                memmove(debug->mappings + i + 1, debug->mappings + i,
+                    debug->num_mappings - i);
+                break;
+            }
+        }
+    }
+    
+    /* Set up new entry and insert it. */
+    mapping = mem_sys_allocate(sizeof(struct PackFile_DebugMapping));
+    mapping->offset = offset;
+    mapping->mapping_type = mapping_type;
+    switch (mapping_type)
+    {
+        case PF_DEBUGMAPPINGTYPE_NONE:
+            break;
+        case PF_DEBUGMAPPINGTYPE_FILENAME:
+            /* Need to put filename in constants table. */
+            ct->const_count = ct->const_count + 1;
+            ct->constants = mem_sys_realloc(ct->constants,
+                ct->const_count * sizeof(Parrot_Pointer));
+            fnconst = PackFile_Constant_new(interpreter);
+            fnconst->type = PFC_STRING;
+            fnconst->u.string = string_from_cstring(interpreter, filename, 0);
+            ct->constants[ct->const_count - 1] = fnconst;
+            mapping->u.filename = ct->const_count - 1;
+            break;
+        case PF_DEBUGMAPPINGTYPE_SOURCESEG:
+            mapping->u.source_seg = source_seg;
+            break;
+    }
+    debug->mappings[insert_pos] = mapping;
+    debug->num_mappings = debug->num_mappings + 1;
+}
+
+/*
 =item C<char *
 Parrot_debug_pc_to_filename(Interp *interpreter,
         struct PackFile_Debug *debug, opcode_t pc)>
@@ -2272,7 +2352,8 @@ Parrot_debug_pc_to_filename(Interp *interpreter,
                 case PF_DEBUGMAPPINGTYPE_NONE:
                     return "(unknown file)";
                 case PF_DEBUGMAPPINGTYPE_FILENAME:
-                    return debug->mappings[i]->u.filename;
+                    return string_to_cstring(interpreter, PF_CONST(debug->code,
+                           debug->mappings[i]->u.filename)->u.string);
                 case PF_DEBUGMAPPINGTYPE_SOURCESEG:
                     return "(unknown file)";
             }

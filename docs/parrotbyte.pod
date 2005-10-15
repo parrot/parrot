@@ -207,8 +207,8 @@ Type B<0> means there is no source available for the bytecode starting at the
 given offset. No further data is stored with this type of mapping; the next 
 mapping continues immediately after it.
 
-Type B<1> means the source is available in a file. A NULL terminated string 
-containing the filename follows, with padding.
+Type B<1> means the source is available in a file. An index into the constants
+table follows, which will point to a string containing the filename.
 
 Type B<2> means the source is available in a source segment. Another integer 
 follows, which will specify which source file in the source segment to use.

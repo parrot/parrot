@@ -190,7 +190,7 @@ struct PackFile_DebugMapping {
     opcode_t offset;
     opcode_t mapping_type;
     union {
-        char *filename;
+        opcode_t filename;
         opcode_t source_seg; /* XXX Source segments currently unimplemented. */
     } u;
 };
@@ -198,7 +198,7 @@ struct PackFile_DebugMapping {
 struct PackFile_Debug {
     struct PackFile_Segment base;
     opcode_t num_mappings;
-    struct PackFile_DebugMapping ** mappings; /* Last element always NULL. */
+    struct PackFile_DebugMapping ** mappings;
     struct PackFile_ByteCode  * code;   /* where this segment belongs to */
 };
 
@@ -336,11 +336,17 @@ struct PackFile_ByteCode * Parrot_switch_to_cs(Interp *,
 void Parrot_switch_to_cs_by_nr(Interp *, opcode_t seg);
 void Parrot_pop_cs(Interp *);
 
-/* Debug stuff */
+/*
+** PackFile_Debug Functions:
+*/
 struct PackFile_Debug * Parrot_new_debug_seg(Interp *,
-        struct PackFile_ByteCode *cs, const char *filename, size_t size);
+        struct PackFile_ByteCode *cs, size_t size);
 char * Parrot_debug_pc_to_filename(Interp *interpreter,
         struct PackFile_Debug *debug, opcode_t pc);
+void Parrot_debug_add_mapping(Interp *interpreter,
+                         struct PackFile_Debug *debug,
+                         opcode_t offset, int mapping_type,
+                         const char *filename, int source_seg);
 
 /*
 ** PackFile_ConstTable Functions:

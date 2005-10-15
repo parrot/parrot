@@ -228,6 +228,7 @@ pbc_merge_bytecode(Interp *interpreter, struct pbc_merge_input **inputs,
     /* Stash produced bytecode. */
     bc_seg->base.data = bc;
     bc_seg->base.size = cursor;
+    bc_seg->base.name = "MERGED";
     return bc_seg;
 }
 
@@ -446,6 +447,83 @@ pbc_merge_fixups(Interp *interpreter, struct pbc_merge_input **inputs,
 /*
 
 =item C<static void
+pbc_merge_debugs(Interp *interpreter, struct pbc_merge_input **inputs,
+                 int num_inputs, struct PackFile *pf, 
+                 struct PackFile_ByteCode *bc)>
+
+This function merges the debug segments from the input PBC files.
+
+=cut
+
+*/
+static void
+pbc_merge_debugs(Interp *interpreter, struct pbc_merge_input **inputs,
+                 int num_inputs, struct PackFile *pf, 
+                 struct PackFile_ByteCode *bc)
+{
+    struct PackFile_Debug *debug_seg;
+    opcode_t *lines = mem_sys_allocate(1);
+    struct PackFile_DebugMapping **mappings =
+        mem_sys_allocate(sizeof(Parrot_Pointer));
+    opcode_t num_mappings = 0;
+    opcode_t num_lines = 0;
+    int i, j;
+
+    /* We need to merge both the mappings and the list of line numbers.
+       The line numbers can just be concatenated. The mappings must have
+       their offsets fixed up. */
+    for (i = 0; i < num_inputs; i++)
+    {
+        struct PackFile_Debug *in_seg = inputs[i]->pf->cur_cs->debugs;
+
+        /* Concatenate line numbers. */
+        lines = mem_sys_realloc(lines, 
+                (num_lines + in_seg->base.size) * sizeof(opcode_t));
+        if (lines == NULL)
+        {
+            PIO_eprintf(interpreter, "PBC Merge: Cannot reallocate memory\n");
+            Parrot_exit(1);
+        }
+        memcpy(lines + num_lines, in_seg->base.data, 
+            in_seg->base.size * sizeof(opcode_t));
+        
+        /* Concatenate mappings. */
+        mappings = mem_sys_realloc(mappings,
+                   (num_mappings + in_seg->num_mappings) * 
+                   sizeof(Parrot_Pointer));
+        for (j = 0; j < in_seg->num_mappings; j++)
+        {
+            struct PackFile_DebugMapping *mapping = mem_sys_allocate(
+                sizeof(struct PackFile_DebugMapping));
+            memcpy(mapping, in_seg->mappings[j], 
+                sizeof(struct PackFile_DebugMapping));
+            mapping->offset += num_lines;
+            if (mapping->mapping_type = PF_DEBUGMAPPINGTYPE_FILENAME)
+                mapping->u.filename += inputs[i]->const_start;
+            mappings[num_mappings + j] = mapping;
+        }
+
+        /* Update counts. */
+        num_lines += in_seg->base.size;
+        num_mappings += in_seg->num_mappings;
+    }
+    
+    /* Create merged debug segment. Replace created data and mappings
+       with merged ones we have created. */
+    debug_seg = Parrot_new_debug_seg(interpreter, bc, num_lines);
+    PackFile_add_segment(interpreter, &pf->directory, 
+                         (struct PackFile_Segment*)debug_seg);
+    free(debug_seg->base.data);
+    debug_seg->base.data = lines;
+    free(debug_seg->mappings);
+    debug_seg->mappings = mappings;
+    debug_seg->num_mappings = num_mappings;
+}
+
+
+/*
+
+=item C<static void
 pbc_merge_ctpointers(Interp *interpreter, struct pbc_merge_input **inputs,
                      int num_inputs, struct PackFile *pf, 
                      struct PackFile_ByteCode *bc,
@@ -545,6 +623,7 @@ pbc_merge_begin(Interp *interpreter, struct pbc_merge_input **inputs,
     bc = pbc_merge_bytecode(interpreter, inputs, num_inputs, merged);
     ct = pbc_merge_constants(interpreter, inputs, num_inputs, merged, bc);
     pbc_merge_fixups(interpreter, inputs, num_inputs, merged, bc);
+    pbc_merge_debugs(interpreter, inputs, num_inputs, merged, bc);
 
     /* Walk bytecode and fix ops that reference the constants table. */
     pbc_merge_ctpointers(interpreter, inputs, num_inputs, merged, bc, ct);
