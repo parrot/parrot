@@ -2245,7 +2245,7 @@ Parrot_new_debug_seg(Interp *interpreter,
 Parrot_debug_add_mapping(Interp *interpreter,
                          struct PackFile_Debug *debug,
                          opcode_t offset, int mapping_type,
-                         char *filename, int source_seg)>
+                         const char *filename, int source_seg)>
 
 Add a bytecode offset to filename/source segment mapping. mapping_type may be
 one of PF_DEBUGMAPPINGTYPE_NONE (in which case the last two parameters are
@@ -2260,7 +2260,7 @@ void
 Parrot_debug_add_mapping(Interp *interpreter,
                          struct PackFile_Debug *debug,
                          opcode_t offset, int mapping_type,
-                         char *filename, int source_seg)
+                         const char *filename, int source_seg)
 {
     struct PackFile_DebugMapping *mapping;
     struct PackFile_ConstTable *ct = debug->code->const_table;
