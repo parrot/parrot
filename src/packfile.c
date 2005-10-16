@@ -2224,7 +2224,9 @@ Parrot_new_debug_seg(Interp *interpreter,
             /* used by eval - don't register the segment */
             debug = (struct PackFile_Debug *)
                 PackFile_Segment_new_seg(interpreter,
-                cs->base.dir, PF_DEBUG_SEG, name, 0);
+                cs->base.dir ?  cs->base.dir :
+                    &interpreter->initial_pf->directory,
+                PF_DEBUG_SEG, name, 0);
         }
         mem_sys_free(name);
 
