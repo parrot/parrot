@@ -614,7 +614,7 @@ sub save_report {
 
 # Send message to final recipient.
 sub send_report {
-    print "==> Sending message to recipiend...\n";
+    print "==> Sending message to recipient...\n";
 
     # On linux certain mail implementations won't accept the subject
     # as "~s subject" and thus the Subject header will be corrupted
