@@ -5,11 +5,11 @@
 
 =head1 NAME
 
-examples/assembly/euclid.pasm - Euclid's algorithm
+examples/pir/euclid.pir - Euclid's algorithm
 
 =head1 SYNOPSIS
 
-    % ./parrot examples/assembly/euclid.pasm
+    % ./parrot examples/pir/euclid.pir
 
 =head1 DESCRIPTION
 
@@ -31,14 +31,16 @@ Page 2:
 
 =cut
 
-main:   set    I1, 96
-        set    I2, 64
+.sub 'example' :main
+        I1 = 96
+        I2 = 64
         print  "Algorithm E (Euclid's algorithm)\n"
-e1:     mod    I4, I1, I2
-e2:     eq     I4, 0, done
-e3:     set    I1, I2
-        set    I2, I4
+e1:     I4 = mod I1, I2
+e2:     unless I4 goto done
+e3:     I1 = I2
+        I2 = I4
         branch e1
-done:   print  I2
-        print  "\n"
-        end
+done:   print "The greatest common denominator of 96 and 64 is "
+        print  I2
+        print  ".\n"
+.end

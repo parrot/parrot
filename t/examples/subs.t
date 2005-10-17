@@ -19,16 +19,35 @@ Test the examples in F<examples/subs>.
 =head1 SEE ALSO
 
 F<t/examples/japh.t>
-F<t/examples/assembly.t>
+F<t/examples/pasm.t>
 
 =cut
 
 use strict;
-use Parrot::Test tests => 4;
+use Parrot::Test tests => 6;
 use Test::More;
 
 # Set up expected output for examples
 my %expected = (
+    'bsr_ret.pasm'        =>  << 'END_EXPECTED',
+Main
+TestSub
+NestSub
+TestSub: Ret from NestSub
+Main: Return from TestSub
+END_EXPECTED
+
+    'coroutine.pasm'        =>  << 'END_EXPECTED',
+Calling 1st co-routine
+Entry
+Resumed
+Done
+Calling 2nd co-routine
+Entry
+Resumed
+Done
+END_EXPECTED
+
     'pasm_sub1.pasm'        =>  << 'END_EXPECTED',
 Hello from subroutine
 Hello from main
@@ -53,8 +72,7 @@ my %test_func = ( pasm => \&pasm_output_is,
                   pir  => \&pir_output_is,
                   imc  => \&pir_output_is );
 
-while ( my ( $example, $expected ) = each %expected )
-{
+while ( my ( $example, $expected ) = each %expected ) {
     my $code_fn   = "examples/subs/$example";
     my $code = Parrot::Test::slurp_file($code_fn);
 

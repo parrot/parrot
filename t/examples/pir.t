@@ -32,7 +32,7 @@ Bernhard Schmalhofer - <Bernhard.Schmalhofer@gmx.de>
 =cut
 
 use strict;
-use Parrot::Test tests => 2;
+use Parrot::Test tests => 3;
 use Test::More;
 use Parrot::Config;
 
@@ -40,6 +40,11 @@ my $PARROT = ".$PConfig{slash}$PConfig{test_prog}";
 
 # Set up expected output for examples
 my %expected = (
+    'euclid.pir'        =>  << 'END_EXPECTED',
+Algorithm E (Euclid's algorithm)
+The greatest common denominator of 96 and 64 is 32.
+END_EXPECTED
+
     'mandel.pir'        =>  << 'END_EXPECTED',
 ................::::::::::::::::::::::::::::::::::::::::::::...............
 ...........::::::::::::::::::::::::::::::::::::::::::::::::::::::..........

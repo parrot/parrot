@@ -15,30 +15,31 @@ This shows you how to create two coroutines and C<invoke> them.
 
 =cut
 
-set_addr I0, MYCOROUTINE
-new P0, .Coroutine
-set P0, I0
-save P0
-new P0, .Coroutine
-set P0, I0
+# create a coro and save it on the user stack
+newsub P0, .Coroutine, MYCOROUTINE
+
+# create a second coro
+newsub P1, .Coroutine, MYCOROUTINE
+
 # Calling convention says P0 will contain the sub so..
 print "Calling 1st co-routine\n"
-invoke
-invoke
-invoke
-restore P0
+invokecc P0
+invokecc P0
+invokecc P0
+
 print "Calling 2nd co-routine\n"
-invoke
-invoke
-invoke
+invokecc P1
+invokecc P1
+invokecc P1
+
 end
 
 # A coroutine
 MYCOROUTINE:
-print "Entry\n"
-invoke
-print "Resumed\n"
-invoke
-print "Done\n"
-invoke
+    print "Entry\n"
+    yield
+    print "Resumed\n"
+    yield
+    print "Done\n"
+    yield
 
