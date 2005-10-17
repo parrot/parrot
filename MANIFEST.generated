@@ -2,6 +2,7 @@ installable_parrot                                [main]bin
 pdump                                             [main]bin
 pdb                                               [main]bin
 pbc_info                                          [main]bin
+pbc_merge                                         [main]bin
 disassemble                                       [main]bin
 blib/lib/libparrot.a                              [devel]lib
 runtime/parrot/library/Data/Dumper/Base.pbc       [main]
