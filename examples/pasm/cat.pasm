@@ -3,11 +3,11 @@
 
 =head1 NAME
 
-examples/assembly/cat.pasm - cat-like utility
+examples/pasm/cat.pasm - cat-like utility
 
 =head1 SYNOPSIS
 
-    % ./parrot examples/assembly/cat.pasm
+    % ./parrot examples/pasm/cat.pasm
 
 =head1 DESCRIPTION
 

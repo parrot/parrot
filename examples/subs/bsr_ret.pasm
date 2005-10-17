@@ -1,13 +1,13 @@
-# Copyright (C) 2001-2003 The Perl Foundation.  All rights reserved.
+# Copyright (C) 2001-2005 The Perl Foundation.  All rights reserved.
 # $Id$
 
 =head1 NAME
 
-examples/assembly/bsr.pasm - Branch to location
+examples/subs/bsr_ret.pasm - Branch to location
 
 =head1 SYNOPSIS
 
-    % ./parrot examples/assembly/bsr.pasm
+    % ./parrot examples/subs/bsr_ret.pasm
 
 =head1 DESCRIPTION
 

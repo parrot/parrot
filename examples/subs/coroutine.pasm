@@ -1,13 +1,13 @@
-# Copyright (C) 2001-2003 The Perl Foundation.  All rights reserved.
+# Copyright (C) 2001-2005 The Perl Foundation.  All rights reserved.
 # $Id$
 
 =head1 NAME
 
-examples/assembly/coroutine.pasm - Sample co-routines in Parrot
+examples/pasm/coroutine.pasm - Sample co-routines in Parrot
 
 =head1 SYNOPSIS
 
-    % ./parrot examples/assembly/coroutine.pasm
+    % ./parrot examples/pasm/coroutine.pasm
 
 =head1 DESCRIPTION
 

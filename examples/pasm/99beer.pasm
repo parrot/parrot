@@ -3,11 +3,11 @@
 
 =head1 NAME
 
-examples/assembly/99beer.pasm - Mmmm, beer good
+examples/pasm/99beer.pasm - Mmmm, beer good
 
 =head1 SYNOPSIS
 
-    % ./parrot examples/assembly/99beer.pasm
+    % ./parrot examples/pasm/99beer.pasm
 
 =head1 DESCRIPTION
 
@@ -65,6 +65,3 @@ ONE_BOTTLE: # it's been fun
         print S7
         print S8
         end
-
-
-
