@@ -11,18 +11,6 @@ MMD-info, and more.
 Use: find_name, find_global, or Sub constants instead.
 See F<docs/compiler_faq.pod> for detailed examples.
 
-=item Register stack opcodes
-
-pop{i,s,p,n}, popbottom{i,s,p,n}, poptop{i,s,p,n},
-push{i,s,p,n}, pushbottom{i,s,p,n}, pushtop{i,s,p,n},
-savetop, restoretop,
-
-With the upcoming variable-sized register frame handling these opcodes
-will stop working and are useless anyway.
-
-use saveall/restoreall (whole register frame) or
-user stack opcodes save/restore instead.
-
 =back
 
 =head1 Deprecated methods

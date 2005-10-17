@@ -30,8 +30,9 @@ Get the TODO JAPHs working or decide that they are not suitable for testing.
 =cut
 
 use strict;
-use Parrot::Test tests => 15;
+# use Parrot::Test tests => 15;
 use Test::More;
+ plan  skip_all => 'Ongoing PBC format changes';
 
 # be pessimistic initially
 my %todo = map { $_ => 'various reasons' } ( 1 .. 15 );

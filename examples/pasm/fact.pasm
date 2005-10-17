@@ -17,7 +17,7 @@ Compute the factorial recursively for 0! to 6! and print the results.
 
 =over 4
 
-=item 20020316 bdwheele@indiana.edu 
+=item 20020316 bdwheele@indiana.edu
 
 Changed local labels to global for new assembler. Use C<pushi> instead
 of the now missing C<clonei>.
@@ -45,7 +45,7 @@ done:
 
 # I0 is the number to compute
 fact:
-	pushi
+        saveall
 	lt	I0,2,is_one
 	set	I1,I0
 	dec	I0
@@ -57,6 +57,6 @@ is_one:
 	set	I0,1
 	save	I0
 fact_done:
-	popi
+	restoreall
 	restore	I0
 	ret
