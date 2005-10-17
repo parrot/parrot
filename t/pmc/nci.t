@@ -291,6 +291,10 @@ libnci_test was successfully loaded
 333
 OUTPUT
 
+SKIP:
+{
+
+skip ("nci_dlvar_int hangs on HP-UX", 1) if $^O eq 'hpux'; 
 
 pir_output_is( << 'CODE', << 'OUTPUT', "nci_v and nci_dlvar_int" );
 
@@ -351,6 +355,7 @@ libnci_test was successfully loaded
 -4444000
 -44440000
 OUTPUT
+}
 
 output_is(<<'CODE', <<'OUTPUT', "nci_dd - PASM");
   loadlib P1, "libnci_test"
@@ -2226,6 +2231,11 @@ libnci_test was successfully loaded
 OUTPUT
 
 
+SKIP:
+{
+
+skip ("nci_dlvar_int hangs on HP-UX", 1) if $^O eq 'hpux'; 
+
 pir_output_is( << 'CODE', << 'OUTPUT', "nci_vv and nci_dlvar_int" );
 
 .include "datatypes.pasm"
@@ -2285,6 +2295,7 @@ libnci_test was successfully loaded
 -119988
 -359964
 OUTPUT
+}
 
 
 pir_output_is( << 'CODE', << 'OUTPUT', "dlvar - unknown symbol" );
