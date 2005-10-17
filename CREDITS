@@ -1,4 +1,4 @@
-# $Id$
+﻿# $Id$
 
 	Following in the steps of other open source projects that
 	eventually take over the world, here is the partial list
@@ -133,7 +133,7 @@ D: Use unix98 ps option in signal.t
 N: Felix Gallo
 D: delegate.pmc patch
 
-N: Fran�ois PERRAD
+N: François PERRAD
 D: build fixes for MinGW
 
 N: Garrett Rooney
