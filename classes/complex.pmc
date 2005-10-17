@@ -85,6 +85,7 @@ complex_parse_string(Interp* interpreter,
         first_num_length = 0;
         second_num_offset = first_num_offset;
         second_num_minus = first_num_minus;
+        first_num_minus = 0;
         /* this is useful if there is no number for
             the imaginary part, like in "-i" */
         i = 1;
