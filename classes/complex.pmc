@@ -366,12 +366,8 @@ Returns true if the complex number is non-zero.
 
     STRING* get_string () {
         STRING *s;
-        if (IM(SELF) >= 0)
             s = Parrot_sprintf_c(INTERP,
-                    "%vg+%vgi", RE(SELF), IM(SELF));
-        else
-            s = Parrot_sprintf_c(INTERP,
-                    "%vg-%vgi", RE(SELF), -IM(SELF));
+                    "%vg%+vgi", RE(SELF), IM(SELF));
         return s;
     }
 

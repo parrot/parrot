@@ -35,12 +35,20 @@ Returns the number as a Parrot string.
 */
 
     STRING* get_string () {
+#if 0
         double d = (double) PMC_num_val(SELF);
         const char *sign = "-";
 	if (!signbit(PMC_num_val(SELF)))
             sign = "";
         d = fabs(d);
         return Parrot_sprintf_c(INTERP, "%s" FLOATVAL_FMT, sign, d);
+#else
+	/* XXX signbit isn't portable and as we are calling Parrot_sprintf_c
+	 * anyway, we can use the builtin number formatting too
+	 * this might still be a problem with -0.0
+	 */
+        return Parrot_sprintf_c(INTERP, "%Pf", SELF);
+#endif
     }
 
 
