@@ -253,10 +253,9 @@ GEN_LIBRARY = \
     $(LIBRARY_DIR)/ncurses.pbc \
     $(LIBRARY_DIR)/parrotlib.pbc \
     $(LIBRARY_DIR)/pcre.pbc \
-    $(LIBRARY_DIR)/PGE/Class.pbc \
     $(LIBRARY_DIR)/PGE/Dumper.pbc \
     $(LIBRARY_DIR)/PGE/Glob.pbc \
-    $(LIBRARY_DIR)/PGE/RegCounter.pbc \
+    $(LIBRARY_DIR)/PGE/Text.pbc \
     $(LIBRARY_DIR)/Stream/Base.pbc \
     $(LIBRARY_DIR)/Stream/Combiner.pbc \
     $(LIBRARY_DIR)/Stream/Coroutine.pbc \

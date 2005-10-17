@@ -16,6 +16,7 @@
     load_bytecode "PGE.pbc"
     load_bytecode "PGE/Dumper.pir"
     load_bytecode "PGE/Glob.pir"
+    load_bytecode "PGE/Text.pir"
     find_global p6rule_compile, "PGE", "p6rule"
     find_global glob_compile, "PGE", "glob"
     istrace = 0
