@@ -37,26 +37,12 @@ Restore all the registers from the register stack.
 =cut
 
 inline op saveall() :base_core {
-  Parrot_push_i(interpreter, &REG_INT(0));
-  Parrot_push_i(interpreter, &REG_INT(16));
-  Parrot_push_s(interpreter, &REG_STR(0));
-  Parrot_push_s(interpreter, &REG_STR(16));
-  Parrot_push_n(interpreter, &REG_NUM(0));
-  Parrot_push_n(interpreter, &REG_NUM(16));
-  Parrot_push_p(interpreter, &REG_PMC(0));
-  Parrot_push_p(interpreter, &REG_PMC(16));
+  Parrot_push_regs(interpreter);
   goto NEXT();
 }
 
 inline op restoreall() :base_core {
-  Parrot_pop_i(interpreter, &REG_INT(16));
-  Parrot_pop_i(interpreter, &REG_INT(0));
-  Parrot_pop_s(interpreter, &REG_STR(16));
-  Parrot_pop_s(interpreter, &REG_STR(0));
-  Parrot_pop_n(interpreter, &REG_NUM(16));
-  Parrot_pop_n(interpreter, &REG_NUM(0));
-  Parrot_pop_p(interpreter, &REG_PMC(16));
-  Parrot_pop_p(interpreter, &REG_PMC(0));
+  Parrot_pop_regs(interpreter);
   goto NEXT();
 }
 

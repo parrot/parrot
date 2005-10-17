@@ -20,32 +20,16 @@ struct IReg {
     INTVAL registers[NUM_REGISTERS];
 };
 
-struct IRegFrame {
-    INTVAL registers[NUM_REGISTERS/2];
-};
-
 struct NReg {
     FLOATVAL registers[NUM_REGISTERS];
-};
-
-struct NRegFrame {
-    FLOATVAL registers[NUM_REGISTERS/2];
 };
 
 struct SReg {
     STRING *registers[NUM_REGISTERS];
 };
 
-struct SRegFrame {
-    STRING *registers[NUM_REGISTERS/2];
-};
-
 struct PReg {
     PMC *registers[NUM_REGISTERS];
-};
-
-struct PRegFrame {
-    PMC *registers[NUM_REGISTERS/2];
 };
 
 struct Stack_Chunk;
@@ -53,10 +37,6 @@ struct Stack_Chunk;
 void setup_register_stacks(Interp*);
 void mark_register_stack(Interp* interpreter,
                              struct Stack_Chunk* stack);
-void mark_pmc_register_stack(Interp* interpreter,
-                             struct Stack_Chunk* stack);
-void mark_string_register_stack(Interp* interpreter,
-                                struct Stack_Chunk* stack);
 
 #endif /* PARROT_REGISTER_H_GUARD */
 

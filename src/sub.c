@@ -42,10 +42,7 @@ mark_context(Interp* interpreter, parrot_context_t* ctx)
     mark_stack(interpreter, ctx->pad_stack);
     mark_stack(interpreter, ctx->user_stack);
     mark_stack(interpreter, ctx->control_stack);
-    mark_register_stack(interpreter, ctx->int_reg_stack);
-    mark_register_stack(interpreter, ctx->num_reg_stack);
-    mark_string_register_stack(interpreter, ctx->string_reg_stack);
-    mark_pmc_register_stack(interpreter, ctx->pmc_reg_stack);
+    mark_register_stack(interpreter, ctx->reg_stack);
     obj = (PObj*)ctx->current_sub;
     if (obj)
         pobject_lives(interpreter, obj);

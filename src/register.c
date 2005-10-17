@@ -39,6 +39,14 @@ setup_register_stacks(Parrot_Interp, struct Parrot_Context *)>
 
 Sets up the register stacks.
 
+=item C<void Parrot_push_regs(Interp *)>
+
+Save all registers onto the register stack.
+
+=item C<void Parrot_pop_regs(Interp *)>
+
+Restore all registers from register stack.
+
 =cut
 
 */
@@ -46,31 +54,69 @@ Sets up the register stacks.
 void
 setup_register_stacks(Parrot_Interp interpreter)
 {
-    CONTEXT(interpreter->ctx)->int_reg_stack = register_new_stack(interpreter,
-            "IntReg_", sizeof(struct IRegFrame));
+    CONTEXT(interpreter->ctx)->reg_stack =
+        register_new_stack(interpreter,
+            "Regs_", sizeof(struct parrot_regs_t));
 
-    CONTEXT(interpreter->ctx)->string_reg_stack = register_new_stack(interpreter,
-            "StringReg_", sizeof(struct SRegFrame));
-
-    CONTEXT(interpreter->ctx)->num_reg_stack = register_new_stack(interpreter,
-            "NumReg_", sizeof(struct NRegFrame));
-
-    CONTEXT(interpreter->ctx)->pmc_reg_stack = register_new_stack(interpreter,
-            "PMCReg_", sizeof(struct PRegFrame));
 }
 
+void
+Parrot_push_regs(Interp *interpreter)
+{
+    struct parrot_regs_t *bp = stack_prepare_push(interpreter,
+            &CONTEXT(interpreter->ctx)->reg_stack);
+    memcpy(bp, interpreter->ctx.bp, sizeof(struct parrot_regs_t));
+}
+
+void
+Parrot_pop_regs(Interp* interpreter)
+{
+    /*
+     * TODO just move the base pointer - no copying needed
+     */
+    struct parrot_regs_t *bp = stack_prepare_pop(interpreter,
+            &CONTEXT(interpreter->ctx)->reg_stack);
+    memcpy(interpreter->ctx.bp, bp, sizeof(struct parrot_regs_t));
+}
+
+void
+Parrot_clear_i(Interp *interpreter)
+{
+    int i;
+    for (i = 0; i < NUM_REGISTERS; ++i)
+        REG_INT(i) = 0;
+}
+
+void
+Parrot_clear_s(Interp *interpreter)
+{
+    int i;
+    for (i = 0; i < NUM_REGISTERS; ++i)
+        REG_STR(i) = NULL;
+}
+
+void
+Parrot_clear_p(Interp *interpreter)
+{
+    int i;
+    for (i = 0; i < NUM_REGISTERS; ++i)
+        REG_PMC(i) = PMCNULL;
+}
+
+void
+Parrot_clear_n(Interp *interpreter)
+{
+    int i;
+    for (i = 0; i < NUM_REGISTERS; ++i)
+        REG_NUM(i) = 0.0;
+}
 
 /*
 
 =item C<void
 mark_register_stack(Parrot_Interp interpreter, Stack_Chunk_t* stack)>
 
-Marks the INT or NUM register stack as live.
-
-=item C<void
-mark_pmc_register_stack(Parrot_Interp interpreter, Stack_Chunk_t* stack)>
-
-Marks the PMC register stack as live.
+Marks the register stack and it's registers as live.
 
 =cut
 
@@ -79,86 +125,22 @@ Marks the PMC register stack as live.
 void
 mark_register_stack(Parrot_Interp interpreter, Stack_Chunk_t* chunk)
 {
+    struct parrot_regs_t *regs;
+    int i;
+    PObj *obj;
+
     for (; ; chunk = chunk->prev) {
         pobject_lives(interpreter, (PObj*)chunk);
         if (chunk == chunk->prev)
             break;
-    }
-}
-
-void
-mark_pmc_register_stack(Parrot_Interp interpreter, Stack_Chunk_t* chunk)
-{
-    UINTVAL j;
-    for ( ; ; chunk = chunk->prev) {
-        struct PRegFrame *pf = (struct PRegFrame *)STACK_DATAP(chunk);
-
-        pobject_lives(interpreter, (PObj*)chunk);
-        if (chunk == chunk->prev)
-            break;
-        /* TODO for variable sized chunks use buflen */
-        for (j = 0; j < NUM_REGISTERS/2; j++) {
-            PObj* reg = (PObj*) pf->registers[j];
-            if (reg)
-                pobject_lives(interpreter, reg);
-        }
-    }
-}
-
-/*
-
-=item C<void
-mark_reg_stack(Inter*, Stack_Chunk_t* chunk)>
-
-Marks one chunk of the register frame stack. Previous chunks are marked
-by marking the continuation of this frame.
-
- */
-void
-mark_reg_stack(Parrot_Interp interpreter, Stack_Chunk_t* chunk)
-{
-    UINTVAL j;
-    PObj *obj;
-
-    struct parrot_regs_t *regs = (struct parrot_regs_t *)STACK_DATAP(chunk);
-
-    pobject_lives(interpreter, (PObj*)chunk);
-
-    for (j = 0; j < NUM_REGISTERS; j++) {
-        obj = (PObj*) BP_REG_PMC(regs, j);
-        if (obj)
-            pobject_lives(interpreter, obj);
-        obj = (PObj*) BP_REG_STR(regs, j);
-        if (obj)
-            pobject_lives(interpreter, obj);
-    }
-}
-
-/*
-
-=item C<void
-mark_string_register_stack(Parrot_Interp interpreter, Stack_Chunk_t* stack)>
-
-Mark the contents of the string register stack as live.
-
-=cut
-
-*/
-
-void
-mark_string_register_stack(Parrot_Interp interpreter, Stack_Chunk_t* chunk)
-{
-    UINTVAL j;
-    for ( ; ; chunk = chunk->prev) {
-        struct SRegFrame *sf = (struct SRegFrame *)STACK_DATAP(chunk);
-
-        pobject_lives(interpreter, (PObj*)chunk);
-        if (chunk == chunk->prev)
-            break;
-        for (j = 0; j < NUM_REGISTERS/2; j++) {
-            PObj* reg = (PObj*) sf->registers[j];
-            if (reg)
-                pobject_lives(interpreter, reg);
+        regs = (struct parrot_regs_t *)STACK_DATAP(chunk);
+        for (i = 0; i < NUM_REGISTERS; ++i) {
+            obj = (PObj *)BP_REG_PMC(regs, i);
+            if (obj)
+                pobject_lives(interpreter, obj);
+            obj = (PObj *)BP_REG_STR(regs, i);
+            if (obj)
+                pobject_lives(interpreter, obj);
         }
     }
 }
@@ -201,42 +183,6 @@ Parrot_pop_off_stack(void *thing, INTVAL type)
     UNUSED(thing);
     UNUSED(type);
 }
-
-#define REG_PUSH Parrot_push_i
-#define REG_POP Parrot_pop_i
-#define REG_CLEAR Parrot_clear_i
-#define REG_STACK int_reg_stack
-#define REG_TYPE int_reg
-#define REG_FRAME IRegFrame
-#define REG_NULL 0
-#include "generic_register.c"
-
-#define REG_PUSH Parrot_push_s
-#define REG_POP Parrot_pop_s
-#define REG_CLEAR Parrot_clear_s
-#define REG_STACK string_reg_stack
-#define REG_TYPE string_reg
-#define REG_FRAME SRegFrame
-#define REG_NULL NULL
-#include "generic_register.c"
-
-#define REG_PUSH Parrot_push_n
-#define REG_POP Parrot_pop_n
-#define REG_CLEAR Parrot_clear_n
-#define REG_STACK num_reg_stack
-#define REG_TYPE num_reg
-#define REG_FRAME NRegFrame
-#define REG_NULL 0.0
-#include "generic_register.c"
-
-#define REG_PUSH Parrot_push_p
-#define REG_POP Parrot_pop_p
-#define REG_CLEAR Parrot_clear_p
-#define REG_STACK pmc_reg_stack
-#define REG_TYPE pmc_reg
-#define REG_FRAME PRegFrame
-#define REG_NULL PMCNULL
-#include "generic_register.c"
 
 
 /*

@@ -130,7 +130,6 @@ PMC * new_ret_continuation_pmc(Interp *, opcode_t * address);
 
 void mark_context(Interp *, parrot_context_t *);
 
-void mark_reg_stack(Interp *, Stack_Chunk_t *);
 void invalidate_retc_context(Interp *interpreter, PMC *cont);
 
 STRING* Parrot_full_sub_name(Interp* interpreter, PMC* sub);

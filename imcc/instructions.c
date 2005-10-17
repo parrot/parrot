@@ -95,12 +95,10 @@ imcc_init_tables(Interp * interpreter)
 {
     size_t i;
     const char *reads[] = {
-        "saveall",
-        "pushi", "pushn", "pushp", "pushs"
+        "saveall"
     };
     const char *writes[] = {
         "restoreall",
-        "popi", "popn", "popp", "pops",
         "cleari", "clearn", "clearp", "clears",
     };
     /* init opnums */

@@ -546,11 +546,6 @@ make_interpreter(Parrot_Interp parent, Interp_flags flags)
     /* Set up the initial register chunks */
     setup_register_stacks(interpreter);
 
-    Parrot_clear_s(interpreter);
-    Parrot_clear_p(interpreter);
-    Parrot_clear_i(interpreter);
-    Parrot_clear_n(interpreter);
-
     /* Stack for lexical pads */
     CONTEXT(interpreter->ctx)->pad_stack = new_stack(interpreter, "Pad");
 

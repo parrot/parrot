@@ -1000,7 +1000,7 @@ $(SRC_DIR)/packout$(O) : $(GENERAL_H_FILES)
 
 $(SRC_DIR)/parrot$(O) : $(GENERAL_H_FILES)
 
-$(SRC_DIR)/register$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/generic_register.c
+$(SRC_DIR)/register$(O) : $(GENERAL_H_FILES)
 
 $(SRC_DIR)/runops_cores$(O) : $(GENERAL_H_FILES)
 
