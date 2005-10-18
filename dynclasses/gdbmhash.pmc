@@ -74,7 +74,12 @@ pmclass GDBMHash does hash dynpmc lib gdbm {
 
 =item C<void class_init()>
 
-Class initialization. Allocates the memory for the hash.
+Class initialization. GDBMHash is a dynamic PMC, meaning that a dynamically
+loadable module is created. On Unix-like systems this is a shared library.
+When it is available, the shared library has linked in the library 'gdbm'.
+
+On WIN32 the relevant library seems to be called 'gdbm3'.
+So we do a bit of cheating here, and load it during class initialization.  
 
 =cut
 
@@ -82,15 +87,11 @@ Class initialization. Allocates the memory for the hash.
 
     void class_init() {
         if (pass) {
-            /* XXX: Name of the lib should be configurable */
 #ifdef WIN32
-            STRING *slib = string_from_cstring(INTERP, "gdbm3", 0);
-#else
-            STRING *slib = string_from_cstring(INTERP, "libgdbm", 0);
-#endif
-
             /* XXX: What if libgdbm.so cannot be loaded */
-            Parrot_load_lib(INTERP, slib, NULL);
+            /* Parrot_load_lib(INTERP, slib, NULL); */
+            STRING *slib = string_from_cstring(INTERP, "gdbm3", 0);
+#endif
         }
     }
 
