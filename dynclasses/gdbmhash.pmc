@@ -81,15 +81,17 @@ Class initialization. Allocates the memory for the hash.
 */
 
     void class_init() {
-        /* XXX: Name of the lib should be configurable */
+        if (pass) {
+            /* XXX: Name of the lib should be configurable */
 #ifdef WIN32
-        STRING *slib = string_from_cstring(INTERP, "gdbm3", 0);
+            STRING *slib = string_from_cstring(INTERP, "gdbm3", 0);
 #else
-        STRING *slib = string_from_cstring(INTERP, "libgdbm", 0);
+            STRING *slib = string_from_cstring(INTERP, "libgdbm", 0);
 #endif
 
-        /* XXX: What if libgdbm.so cannot be loaded */
-        Parrot_load_lib(INTERP, slib, NULL);
+            /* XXX: What if libgdbm.so cannot be loaded */
+            Parrot_load_lib(INTERP, slib, NULL);
+        }
     }
 
     void init () {
@@ -108,7 +110,7 @@ Class initialization. Allocates the memory for the hash.
 
 =item C<VOID set_string_native(STRING* value)>
 
-Open a or create a new dbm file. 
+Open a or create a new dbm file.
 
 =cut
 
@@ -147,7 +149,7 @@ XXX: This can be optimized by keeping track of number of elements
                 nextkey = gdbm_nextkey( dbf, key );
                 free( key.dptr );
             }
-            
+
             return cnt;
         }
     }
@@ -230,7 +232,7 @@ Returns the string value for the element at C<*key>.
 
         val = string_from_cstring(INTERP, val_gdbm.dptr, val_gdbm.dsize);
         free( val_gdbm.dptr );
-        
+
         return val;
     }
 
@@ -329,7 +331,7 @@ Returns whether a key C<*key> exists in the hash.
 
         key_gdbm.dsize = keystr->strlen;
         key_gdbm.dptr  = keystr->strstart;
-        
+
         return gdbm_exists(dbf, key_gdbm);
     }
 
@@ -354,7 +356,7 @@ Deletes the element associated with C<*key>.
 
         key_gdbm.dsize = keystr->strlen;
         key_gdbm.dptr  = keystr->strstart;
-        
+
         if ( gdbm_exists(dbf, key_gdbm) ) {
            gdbm_delete(dbf, key_gdbm);
         }
