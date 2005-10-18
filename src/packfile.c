@@ -329,7 +329,7 @@ do_1_sub_pragma(Parrot_Interp interpreter, PMC* sub_pmc, int action)
                 }
                 else {
                     /* XXX which warn_class */
-                    Parrot_warn(interpreter, 0xff, "@MAIN sub not allowed\n");
+                    Parrot_warn(interpreter, PARROT_WARNINGS_ALL_FLAG, "@MAIN sub not allowed\n");
                 }
             }
     }

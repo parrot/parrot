@@ -137,8 +137,8 @@ get_path(Interp *interpreter, STRING *lib, void **handle, char **lib_name)
 {
     STRING *path;
     char *full_name, *file_name, *file_w_ext = NULL;
-    char *tmp_lib_name, *path_end, *ext_start;
-    const char *err;
+    char *tmp_lib_name, *path_end, *ext_start = NULL;
+    const char *err = NULL;    /* buffer returned from Parrot_dlerror */
 
     /* Find the pure library name, without path or extension.  */
     file_name = string_to_cstring(interpreter, lib);
@@ -174,15 +174,17 @@ get_path(Interp *interpreter, STRING *lib, void **handle, char **lib_name)
                 return path;
             }
             err = Parrot_dlerror();
-            fprintf(stderr, "Couldn't load '%s': %s\n",
+            Parrot_warn(interpreter, PARROT_WARNINGS_DYNEXT_FLAG, "Couldn't load '%s': %s\n",
                     full_name, err ? err : "unknown reason");
             string_cstring_free(file_name);
             string_cstring_free(full_name);
             string_cstring_free(file_w_ext);
             return NULL;
         }
+
         /*
-         * then file.extension w/o prefix
+         * File with extension and prefix was not found, 
+         * so try file.extension w/o prefix
          */
         *handle = Parrot_dlopen(file_w_ext);
         if (*handle) {
@@ -208,7 +210,7 @@ get_path(Interp *interpreter, STRING *lib, void **handle, char **lib_name)
                     return path;
                 }
                 err = Parrot_dlerror();
-                fprintf(stderr, "Couldn't load '%s': %s\n",
+                Parrot_warn(interpreter, PARROT_WARNINGS_DYNEXT_FLAG, "Couldn't load '%s': %s\n",
                         full_name, err ? err : "unknown reason");
                 string_cstring_free(file_name);
                 string_cstring_free(file_w_ext);
@@ -228,13 +230,13 @@ get_path(Interp *interpreter, STRING *lib, void **handle, char **lib_name)
         }
     }
     /*
-     * finally, try the given file name as is.  we still use
+     * finally, try the given file name as is. We still use
      * Parrot_locate_runtime_file so that (a) relative pathnames are searched in
      * the standard locations, and (b) the angle of the slashes are adjusted as
      * required for non-Unix systems.
      */
     full_name = Parrot_locate_runtime_file(interpreter, file_name,
-                                           PARROT_RUNTIME_FT_DYNEXT);
+            PARROT_RUNTIME_FT_DYNEXT);
     if (full_name) {
         *handle = Parrot_dlopen(full_name);
         if (*handle) {
@@ -259,7 +261,7 @@ get_path(Interp *interpreter, STRING *lib, void **handle, char **lib_name)
     }
 #endif
     err = Parrot_dlerror();
-    fprintf(stderr, "Couldn't load '%s': %s\n",
+    Parrot_warn(interpreter, PARROT_WARNINGS_DYNEXT_FLAG, "Couldn't load '%s': %s\n",
             file_name, err ? err : "unknown reason");
     string_cstring_free(file_name);
     return NULL;
@@ -310,8 +312,9 @@ Parrot_init_lib(Interp *interpreter,
          */
         lib_pmc = pmc_new(interpreter, enum_class_ParrotLibrary);
     }
+
     /*
-     *  call init, if it exists
+     *  Call init, if it exists
      */
     if (init_func)
         (init_func)(interpreter, lib_pmc);
