@@ -28,11 +28,12 @@ F<t/examples/japh.t>
 =cut
 
 use strict;
-use Parrot::Test tests => 1;
+use Parrot::Test tests => 2;
 use Test::More;
 
 # Set up expected output for examples
 my %expected = (
+
     'fact.pasm'        =>  << 'END_EXPECTED',
 fact of 0 is: 1
 fact of 1 is: 1
@@ -41,6 +42,10 @@ fact of 3 is: 6
 fact of 4 is: 24
 fact of 5 is: 120
 fact of 6 is: 720
+END_EXPECTED
+
+    'hello.pasm'        =>  << 'END_EXPECTED',
+Hello World
 END_EXPECTED
                           );
 

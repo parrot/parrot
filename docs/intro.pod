@@ -229,7 +229,7 @@ C<.local> is a type. This can be C<int> (for I registers), C<float> (for N
 registers), C<string> (for S registers), C<pmc> (for P registers) or the name
 of a PMC type.
 
-=head2 PIR vs PASM
+=head2 PIR vs. PASM
 
 PIR can be turned into PASM by running:
 

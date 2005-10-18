@@ -842,22 +842,22 @@ examples-clean:
     examples/assembly/mops.pbc \
     examples/mops/mops$(O) \
     examples/mops/mops$(EXE) \
-    examples/assembly/hello.pbc \
-    examples/assembly/hello$(O) \
-    examples/assembly/hello$(EXE)
+    examples/pasm/hello.pbc \
+    examples/pasm/hello$(O) \
+    examples/pasm/hello$(EXE)
 
 # hello
-hello:	test_prep examples/assembly/hello$(EXE)
-	$(CUR_DIR)/examples/assembly/hello$(EXE)
+hello:	test_prep examples/pasm/hello$(EXE)
+	$(CUR_DIR)/examples/pasm/hello$(EXE)
 
-examples/assembly/hello.pbc: examples/assembly/hello.pasm
-	$(PARROT) -o examples/assembly/hello.pbc examples/assembly/hello.pasm
+examples/pasm/hello.pbc: examples/pasm/hello.pasm
+	$(PARROT) -o examples/pasm/hello.pbc examples/pasm/hello.pasm
 
-examples/assembly/hello$(O): examples/assembly/hello.pbc
-	$(PARROT) -o examples/assembly/hello$(O) examples/assembly/hello.pbc
+examples/pasm/hello$(O): examples/pasm/hello.pbc
+	$(PARROT) -o examples/pasm/hello$(O) examples/pasm/hello.pbc
 
-examples/assembly/hello$(EXE):	examples/assembly/hello$(O)
-	$(MAKE) EXEC=examples/assembly/hello exec
+examples/pasm/hello$(EXE):	examples/pasm/hello$(O)
+	$(MAKE) EXEC=examples/pasm/hello exec
 
 
 
