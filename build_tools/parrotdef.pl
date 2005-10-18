@@ -198,7 +198,6 @@ my @funcnames = qw(
 	key_append
 	key_mark
 	mark_context
-	mark_reg_stack
 	invalidate_retc_context
 	Parrot_full_sub_name
 	Parrot_Context_info
