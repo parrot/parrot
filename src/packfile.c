@@ -1924,7 +1924,7 @@ pf_debug_destroy (Interp* interpreter, struct PackFile_Segment *self)
     /* Free each mapping. */
     for (i = 0; i < debug->num_mappings; i++)
         mem_sys_free(debug->mappings[i]);
-    
+
     /* Free mappings pointer array. */
     mem_sys_free(debug->mappings);
     debug->mappings = NULL;
@@ -1978,7 +1978,7 @@ pf_debug_packed_size (Interp* interpreter, struct PackFile_Segment *self)
     struct PackFile_Debug *debug = (struct PackFile_Debug *) self;
     int size = 0;
     int i;
-    
+
     /* Size of mappings count. */
     size += 1;
 
@@ -2020,10 +2020,10 @@ pf_debug_pack (Interp* interpreter, struct PackFile_Segment *self,
 {
     struct PackFile_Debug *debug = (struct PackFile_Debug *) self;
     int i;
-    
+
     /* Store number of mappings. */
     *cursor++ = debug->num_mappings;
-    
+
     /* Now store each mapping. */
     for (i = 0; i < debug->num_mappings; i++)
     {
@@ -2044,7 +2044,7 @@ pf_debug_pack (Interp* interpreter, struct PackFile_Segment *self,
                 break;
         }
     }
-    
+
     return cursor;
 }
 
@@ -2079,7 +2079,7 @@ pf_debug_unpack (Interp *interpreter,
     debug->num_mappings = PF_fetch_opcode(self->pf, &cursor);
 
     /* Allocate space for mappings vector. */
-    debug->mappings = mem_sys_allocate(sizeof(Parrot_Pointer) * 
+    debug->mappings = mem_sys_allocate(sizeof(Parrot_Pointer) *
                                        (debug->num_mappings + 1));
 
     /* Read in each mapping. */
@@ -2147,7 +2147,7 @@ pf_debug_dump (Parrot_Interp interpreter, struct PackFile_Segment *self)
     for (i = 0; i < debug->num_mappings; i++)
     {
         PIO_printf(interpreter, "    #%d\n    [\n", i);
-        PIO_printf(interpreter, "        OFFSET => %d,\n", 
+        PIO_printf(interpreter, "        OFFSET => %d,\n",
                    debug->mappings[i]->offset);
         switch (debug->mappings[i]->mapping_type)
         {
@@ -2170,7 +2170,7 @@ pf_debug_dump (Parrot_Interp interpreter, struct PackFile_Segment *self)
         PIO_printf(interpreter, "    ],\n");
     }
     PIO_printf(interpreter, "]\n");
-    
+
     i = self->data ? 0: self->file_offset + 4;
     if (i % 8)
         PIO_printf(interpreter, "\n %04x:  ", (int) i);
@@ -2270,11 +2270,11 @@ Parrot_debug_add_mapping(Interp *interpreter,
     int insert_pos = 0;
 
     /* Allocate space for the extra entry. */
-    debug->mappings = mem_sys_realloc(debug->mappings, 
+    debug->mappings = mem_sys_realloc(debug->mappings,
         sizeof(Parrot_Pointer) * (debug->num_mappings + 1));
 
     /* Can it just go on the end? */
-    if (debug->num_mappings == 0 || 
+    if (debug->num_mappings == 0 ||
         offset >= debug->mappings[debug->num_mappings - 1]->offset)
     {
         insert_pos = debug->num_mappings;
@@ -2294,7 +2294,7 @@ Parrot_debug_add_mapping(Interp *interpreter,
             }
         }
     }
-    
+
     /* Set up new entry and insert it. */
     mapping = mem_sys_allocate(sizeof(struct PackFile_DebugMapping));
     mapping->offset = offset;
@@ -2310,7 +2310,7 @@ Parrot_debug_add_mapping(Interp *interpreter,
                 ct->const_count * sizeof(Parrot_Pointer));
             fnconst = PackFile_Constant_new(interpreter);
             fnconst->type = PFC_STRING;
-            fnconst->u.string = string_from_cstring(interpreter, filename, 0);
+            fnconst->u.string = const_string(interpreter, filename);
             ct->constants[ct->const_count - 1] = fnconst;
             mapping->u.filename = ct->const_count - 1;
             break;
