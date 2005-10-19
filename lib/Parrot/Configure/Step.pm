@@ -26,7 +26,10 @@ package Parrot::Configure::Step;
 use strict;
 use Exporter;
 use Carp;
+use File::Basename qw( basename );
 use File::Copy ();
+use File::Spec;
+
 use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 
 @ISA = qw(Exporter);
@@ -34,11 +37,13 @@ use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 @EXPORT = ();
 
 @EXPORT_OK = qw(prompt genfile copy_if_diff move_if_diff integrate
-                cc_gen cc_build cc_run cc_clean cc_run_capture capture_output);
+                cc_gen cc_build cc_run cc_clean cc_run_capture capture_output
+                check_progs);
 
 %EXPORT_TAGS = (
         inter => [qw(prompt integrate)],
-        auto  => [qw(cc_gen cc_build cc_run cc_clean cc_run_capture)],
+        auto  => [qw(cc_gen cc_build cc_run cc_clean cc_run_capture
+                  capture_output check_progs)],
         gen   => [qw(genfile copy_if_diff move_if_diff)]
                );
 
@@ -461,6 +466,46 @@ sub capture_output {
 
     return ($output, $out_err, $retval) if wantarray;
     return $output;
+}
+
+=item C<check_progs([$programs])>
+
+Where C<$programs> may be either a scalar with the name of a single program or
+an array ref of programs to search the current C<PATH> for.  The first matching
+program name is returned or C<undef> on failure.  Note: this function only
+returns the name of the program and not its complete path.
+
+This function is similar to C<autoconf>'s C<AC_CHECK_PROGS> macro.
+
+=cut
+
+sub check_progs {
+    my $progs = shift;
+
+    $progs = [$progs] unless ref $progs eq 'ARRAY';
+    my $verbose = Configure::Data->get('verbose');
+
+    print "checking for program: ", join(" or ", @$progs), "\n" if $verbose;
+    foreach my $prog (@$progs) {
+        # try relative path first in case it's not in the path
+        return $prog if -x $prog;
+
+        my $util = basename($prog);
+        # use the first word in the string to ignore any options
+        ($util) = $util =~ /(\w+)/;
+        foreach my $dir (File::Spec->path) {
+            my $path = File::Spec->catfile($dir, $util);
+
+            if ($verbose) {
+                print "trying: $path\n";
+                print "$path is executable\n" if -x $path;
+            }
+
+            return $prog if -x $path;
+        }
+    }
+
+    return;
 }
 
 =back

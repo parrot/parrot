@@ -228,6 +228,7 @@ D: updated version of parrotbench.pl
 N: Joshua Hoblitt
 E: jhoblitt@cpan.org
 D: bug wrangling, doc & makefile cleanups, and Pod tests
+D: mucking around with Configure
 
 N: Josh Wilmes
 
