@@ -163,10 +163,10 @@ struct _imc_info_t;
  * of a continuation by restoring the interpreter context.
  */
 struct parrot_regs_t {
-    struct IReg int_reg;
     struct NReg num_reg;
-    struct SReg string_reg;
+    struct IReg int_reg;
     struct PReg pmc_reg;
+    struct SReg string_reg;
 };
 
 typedef union {

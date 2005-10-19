@@ -419,13 +419,15 @@ enum { JIT_PPC_CALL, JIT_PPC_BRANCH, JIT_PPC_UBRANCH };
 
 /* Load a CPU register from a Parrot register. */
 
+/* TODO use offsets directly - see also jit/i386 and src/jit.c JIT_USE_OFFS */
+
 #  define jit_emit_mov_rm_i(pc, reg, addr) \
     jit_emit_lwz(pc, reg, (((char *)addr) - \
-      ((char *)&REG_INT(0))), r13)
+      ((char *)interpreter->ctx.bp)), r13)
 
 #  define jit_emit_mov_rm_n(pc, reg, addr) \
     jit_emit_lfd(pc, reg, (((char *)addr) - \
-      ((char *)&REG_INT(0))), r13)
+      ((char *)interpreter->ctx.bp)), r13)
 
 /* compare operation.
  *
@@ -561,11 +563,11 @@ jit_emit_bx(Parrot_jit_info_t *jit_info, char type, opcode_t disp)
 
 #  define jit_emit_mov_mr_i(pc, addr, reg) \
     jit_emit_stw(pc, reg, (((char *)addr) - \
-      ((char *)&REG_INT(0))), r13)
+      ((char *)interpreter->ctx.bp)), r13)
 
 #  define jit_emit_mov_mr_n(pc, addr, reg) \
     jit_emit_stfd(pc, reg, (((char *)addr) - \
-      ((char *)&REG_INT(0))), r13)
+      ((char *)interpreter->ctx.bp)), r13)
 
 
 /*
