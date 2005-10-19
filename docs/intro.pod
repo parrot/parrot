@@ -397,7 +397,6 @@ the extension F<.pbc>.
 
   parrot -o factorial.pbc factorial.pir
 
-
 =head1 Where next?
 
 =head2 Documentation
@@ -422,6 +421,7 @@ at L<http://www.nntp.perl.org/group/perl.perl6.internals>.
 =head2 IRC
 
 The Parrot IRC channel is hosted on irc.perl.org and is named C<#parrot>.
+Alternative IRC servers are at irc.pobox.com and irc.rhizomatic.net.
 
 =cut
 
