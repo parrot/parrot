@@ -445,7 +445,6 @@ encodings/utf8.h                                  []
 examples/README                                   [main]doc
 examples/assembly/Makefile                        [main]doc
 examples/assembly/acorn.l                         [main]doc
-examples/assembly/hanoi.pasm                      [main]doc
 examples/assembly/hello-dwim.imc                  [main]doc
 examples/assembly/io1.pasm                        [main]doc
 examples/assembly/io2.pasm                        [main]doc
@@ -601,6 +600,7 @@ examples/pasm/cat.pasm                            [main]doc
 examples/pasm/fact.pasm                           [main]doc
 examples/pasm/hello.pasm                          [main]doc
 examples/pir/euclid.pir                           [main]doc
+examples/pir/hanoi.pir                            [main]doc
 examples/pir/mandel.pir                           [main]doc
 examples/pir/sudoku.pir                           [main]doc
 examples/pni/PQt.C                                [main]doc

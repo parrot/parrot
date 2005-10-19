@@ -32,7 +32,7 @@ Bernhard Schmalhofer - <Bernhard.Schmalhofer@gmx.de>
 =cut
 
 use strict;
-use Parrot::Test tests => 3;
+use Parrot::Test tests => 4;
 use Test::More;
 use Parrot::Config;
 
@@ -43,6 +43,39 @@ my %expected = (
     'euclid.pir'        =>  << 'END_EXPECTED',
 Algorithm E (Euclid's algorithm)
 The greatest common denominator of 96 and 64 is 32.
+END_EXPECTED
+
+    'hanoi.pir'        =>  << 'END_EXPECTED',
+Using default size 3 for tower.
+
+       |        |       
+ ====  |        |       
+====== |        |   ==  
+
+       |        |       
+       |        |       
+====== |  ====  |   ==  
+
+       |        |       
+       |   ==   |       
+====== |  ====  |       
+
+       |        |       
+       |   ==   |       
+       |  ====  | ======
+
+       |        |       
+       |        |       
+  ==   |  ====  | ======
+
+       |        |       
+       |        |  ==== 
+  ==   |        | ======
+
+       |        |   ==  
+       |        |  ==== 
+       |        | ======
+
 END_EXPECTED
 
     'mandel.pir'        =>  << 'END_EXPECTED',
