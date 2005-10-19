@@ -1350,6 +1350,9 @@ static unsigned char *lastpc;
 #  define emitm_fprem(pc) { *(pc)++ = 0xd9; *(pc)++ = 0xF8; }
 #  define emitm_fprem1(pc) { *(pc)++ = 0xd9; *(pc)++ = 0xF5; }
 
+#  define emitm_fldcw(pc, mem) \
+    emitm_fl_2(pc, emit_b00, 1, emit_b101, 0, 0, 0, mem)
+
 #  if defined(NEG_MINUS_ZERO)
 #    define jit_emit_neg_r_n(pc, r) { \
        if (r) { \
@@ -2738,6 +2741,8 @@ Parrot_jit_dofixup(Parrot_jit_info_t *jit_info,
     jit_info->arena.fixups = NULL;
 }
 
+static int control_word = 0x27f;
+
 #  ifndef JIT_CGP
 void
 Parrot_jit_begin(Parrot_jit_info_t *jit_info,
@@ -2750,6 +2755,7 @@ Parrot_jit_begin(Parrot_jit_info_t *jit_info,
 
     /* Maintain the stack frame pointer for the sake of gdb */
     jit_emit_stack_frame_enter(jit_info->native_ptr);
+    emitm_fldcw(jit_info->native_ptr, &control_word);
     /* stack:
      *  12   pc
      *   8   interpreter
@@ -2865,6 +2871,7 @@ Parrot_jit_begin(Parrot_jit_info_t *jit_info,
                  Interp * interpreter)
 {
     jit_emit_stack_frame_enter(jit_info->native_ptr);
+    emitm_fldcw(jit_info->native_ptr, &control_word);
     emitm_pushl_r(jit_info->native_ptr, emit_EBX);
     /* get the pc from stack:  mov 12(%ebp), %ebx */
     emitm_movl_m_r(jit_info->native_ptr, emit_EBX, emit_EBP, emit_None, 1, 12);
@@ -3382,6 +3389,16 @@ preg:
 #if JIT_EMIT == 0
 #  define REQUIRES_CONSTANT_POOL 0
 /* #  define INT_REGISTERS_TO_MAP 4 definition at top */
+/*
+ * examples/pir/mandel.pir and t/op/jitn_14 show rounding problems
+ * due to keeping intermediate results in FP registers
+ * When intermediates are written back to parrot regs, rounding to
+ * 64 bit is performed, which changes results slightly
+ *
+ * One method is to just turn off mapped floats. The other one is
+ * setting a different control word (with precision control = double)
+ * see emitm_fldcw above
+ */
 #  define FLOAT_REGISTERS_TO_MAP 4
 
 #  ifndef JIT_IMCC

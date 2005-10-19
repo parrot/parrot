@@ -18,7 +18,7 @@ registers.
 
 =cut
 
-use Parrot::Test tests => 13;
+use Parrot::Test tests => 14;
 
 output_is(<<'CODE', <<'OUTPUT', "sub_n_n_n 1,2,3 mapped");
 set N0,0
@@ -315,3 +315,15 @@ CODE
 123
 OUT
 
+output_is(<<'CODE', <<'OUTPUT', "rounding due to mapped");
+    set N0, 15
+    mul N0, N0, 0.1
+    sub N0, 1.5
+    unless N0, z
+    print "not "
+z:
+    print "zero\n"
+    end
+CODE
+zero
+OUTPUT
