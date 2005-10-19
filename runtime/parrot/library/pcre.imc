@@ -52,6 +52,7 @@ and is additionally stored as global 'PCRE', 'lib'.
     osname = config['osname']
 
     if 'MSWin32' == osname goto LIB_WIN32
+    if 'cygwin'  == osname goto LIB_CYGWIN
 
 LIB_DEFAULT:
     loadlib libpcre, 'libpcre'
@@ -59,6 +60,10 @@ LIB_DEFAULT:
 
 LIB_WIN32:
     loadlib libpcre, 'pcre'
+    branch LIB_LOADED
+
+LIB_CYGWIN:
+    loadlib libpcre, 'cygpcre-0'
 
 LIB_LOADED:
     store_global 'PCRE', 'lib', libpcre
