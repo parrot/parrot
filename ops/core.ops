@@ -508,15 +508,15 @@ op get_params(inconst PMC) {
     opcode_t *this = CUR_OPCODE;
     PMC *signature = $1;
     struct Parrot_sub * sub = PMC_sub(CONTEXT(interpreter->ctx)->current_sub);
-    struct parrot_regs_t *caller_regs;
+    parrot_context_t *caller_ctx;
     PMC *cont_pmc;
     opcode_t *pc;
 
     interpreter->current_params = this;
     cont_pmc = CONTEXT(interpreter->ctx)->current_cont;
 
-    caller_regs = PMC_cont(cont_pmc)->to_ctx->bp;
-    pc = parrot_pass_args(interpreter, sub->seg, caller_regs,
+    caller_ctx = PMC_cont(cont_pmc)->to_ctx;
+    pc = parrot_pass_args(interpreter, sub->seg, caller_ctx,
 	    PARROT_OP_get_params_pc);
     goto ADDRESS(pc);
 }

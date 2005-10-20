@@ -99,7 +99,7 @@ runops(Interp *interpreter, size_t offs)
 
 /*
 
-=item C<struct parrot_regs_t *
+=item C<parrot_context_t *
 Parrot_runops_fromc(Parrot_Interp interpreter, PMC *sub)>
 
 Runs the Parrot ops, called from C code. The function arguments are
@@ -110,12 +110,12 @@ is an invocable C<Sub> PMC.
 
 */
 
-struct parrot_regs_t *
+parrot_context_t *
 Parrot_runops_fromc(Parrot_Interp interpreter, PMC *sub)
 {
     PMC *ret_c;
     opcode_t offset, *dest;
-    struct parrot_regs_t *bp;
+    parrot_context_t *ctx;
 
     /* we need one return continuation with a NULL offset */
     interpreter->current_cont = ret_c =
@@ -130,19 +130,19 @@ Parrot_runops_fromc(Parrot_Interp interpreter, PMC *sub)
     dest = VTABLE_invoke(interpreter, sub, (void*) 1);
     if (!dest)
         internal_exception(1, "Subroutine returned a NULL address");
-    bp = interpreter->ctx.bp;
+    ctx = CONTEXT(interpreter->ctx);
     offset = dest - interpreter->code->base.data;
     runops(interpreter, offset);
-    return bp;
+    return ctx;
 }
 
 
-static struct parrot_regs_t *
+static parrot_context_t *
 runops_args(Parrot_Interp interpreter, PMC *sub, PMC *obj,
         STRING *meth, const char* sig, va_list ap)
 {
     opcode_t offset, *dest;
-    struct parrot_regs_t *bp;
+    parrot_context_t *ctx;
     parrot_context_t *old_ctx;
     int i;
     /*
@@ -176,10 +176,10 @@ runops_args(Parrot_Interp interpreter, PMC *sub, PMC *obj,
                 old_ctx, ap);
     }
 
-    bp = interpreter->ctx.bp;
+    ctx = CONTEXT(interpreter->ctx);
     offset = dest - interpreter->code->base.data;
     runops(interpreter, offset);
-    return bp;
+    return ctx;
 }
 
 
@@ -250,7 +250,7 @@ void *
 Parrot_run_meth_fromc(Parrot_Interp interpreter,
         PMC *sub, PMC *obj, STRING *meth)
 {
-    struct parrot_regs_t *bp;
+    parrot_context_t *ctx;
     opcode_t offset, *dest;
 
     interpreter->current_cont = new_ret_continuation_pmc(interpreter, NULL);
@@ -258,10 +258,10 @@ Parrot_run_meth_fromc(Parrot_Interp interpreter,
     dest = VTABLE_invoke(interpreter, sub, (void*)1);
     if (!dest)
         internal_exception(1, "Subroutine returned a NULL address");
-    bp = interpreter->ctx.bp;
+    ctx = CONTEXT(interpreter->ctx);
     offset = dest - interpreter->code->base.data;
     runops(interpreter, offset);
-    return set_retval(interpreter, 0, PMC_sub(sub)->seg, bp);
+    return set_retval(interpreter, 0, PMC_sub(sub)->seg, ctx);
 }
 
 void *
@@ -269,12 +269,12 @@ Parrot_runops_fromc_args(Parrot_Interp interpreter, PMC *sub,
         const char *sig, ...)
 {
     va_list args;
-    struct parrot_regs_t *bp;
+    parrot_context_t *ctx;
 
     va_start(args, sig);
-    bp = runops_args(interpreter, sub, PMCNULL, NULL, sig, args);
+    ctx = runops_args(interpreter, sub, PMCNULL, NULL, sig, args);
     va_end(args);
-    return set_retval(interpreter, *sig, PMC_sub(sub)->seg, bp);
+    return set_retval(interpreter, *sig, PMC_sub(sub)->seg, ctx);
 }
 
 
@@ -283,12 +283,12 @@ Parrot_runops_fromc_args_reti(Parrot_Interp interpreter, PMC *sub,
         const char *sig, ...)
 {
     va_list args;
-    struct parrot_regs_t *bp;
+    parrot_context_t *ctx;
 
     va_start(args, sig);
-    bp = runops_args(interpreter, sub, PMCNULL, NULL, sig, args);
+    ctx = runops_args(interpreter, sub, PMCNULL, NULL, sig, args);
     va_end(args);
-    return set_retval_i(interpreter, *sig, PMC_sub(sub)->seg, bp);
+    return set_retval_i(interpreter, *sig, PMC_sub(sub)->seg, ctx);
 }
 
 FLOATVAL
@@ -296,12 +296,12 @@ Parrot_runops_fromc_args_retf(Parrot_Interp interpreter, PMC *sub,
         const char *sig, ...)
 {
     va_list args;
-    struct parrot_regs_t *bp;
+    parrot_context_t *ctx;
 
     va_start(args, sig);
-    bp = runops_args(interpreter, sub, PMCNULL, NULL, sig, args);
+    ctx = runops_args(interpreter, sub, PMCNULL, NULL, sig, args);
     va_end(args);
-    return set_retval_f(interpreter, *sig, PMC_sub(sub)->seg, bp);
+    return set_retval_f(interpreter, *sig, PMC_sub(sub)->seg, ctx);
 }
 
 void*
@@ -309,12 +309,12 @@ Parrot_run_meth_fromc_args(Parrot_Interp interpreter,
         PMC *sub, PMC *obj, STRING *meth, const char *sig, ...)
 {
     va_list args;
-    struct parrot_regs_t *bp;
+    parrot_context_t *ctx;
 
     va_start(args, sig);
-    bp = runops_args(interpreter, sub, obj, meth, sig, args);
+    ctx = runops_args(interpreter, sub, obj, meth, sig, args);
     va_end(args);
-    return set_retval(interpreter, *sig, PMC_sub(sub)->seg, bp);
+    return set_retval(interpreter, *sig, PMC_sub(sub)->seg, ctx);
 }
 
 INTVAL
@@ -322,12 +322,12 @@ Parrot_run_meth_fromc_args_reti(Parrot_Interp interpreter,
         PMC *sub, PMC *obj, STRING *meth, const char *sig, ...)
 {
     va_list args;
-    struct parrot_regs_t *bp;
+    parrot_context_t *ctx;
 
     va_start(args, sig);
-    bp = runops_args(interpreter, sub, obj, meth, sig, args);
+    ctx = runops_args(interpreter, sub, obj, meth, sig, args);
     va_end(args);
-    return set_retval_i(interpreter, *sig, PMC_sub(sub)->seg, bp);
+    return set_retval_i(interpreter, *sig, PMC_sub(sub)->seg, ctx);
 }
 
 FLOATVAL
@@ -335,72 +335,72 @@ Parrot_run_meth_fromc_args_retf(Parrot_Interp interpreter,
         PMC *sub, PMC *obj, STRING *meth, const char *sig, ...)
 {
     va_list args;
-    struct parrot_regs_t *bp;
+    parrot_context_t *ctx;
 
     va_start(args, sig);
-    bp = runops_args(interpreter, sub, obj, meth, sig, args);
+    ctx = runops_args(interpreter, sub, obj, meth, sig, args);
     va_end(args);
-    return set_retval_f(interpreter, *sig, PMC_sub(sub)->seg, bp);
+    return set_retval_f(interpreter, *sig, PMC_sub(sub)->seg, ctx);
 }
 
 void *
 Parrot_runops_fromc_arglist(Parrot_Interp interpreter, PMC *sub,
         const char *sig, va_list args)
 {
-    struct parrot_regs_t *bp;
+    parrot_context_t *ctx;
 
-    bp = runops_args(interpreter, sub, PMCNULL, NULL, sig, args);
-    return set_retval(interpreter, *sig, PMC_sub(sub)->seg, bp);
+    ctx = runops_args(interpreter, sub, PMCNULL, NULL, sig, args);
+    return set_retval(interpreter, *sig, PMC_sub(sub)->seg, ctx);
 }
 
 INTVAL
 Parrot_runops_fromc_arglist_reti(Parrot_Interp interpreter, PMC *sub,
         const char *sig, va_list args)
 {
-    struct parrot_regs_t *bp;
+    parrot_context_t *ctx;
 
-    bp = runops_args(interpreter, sub, PMCNULL, NULL, sig, args);
-    return set_retval_i(interpreter, *sig, PMC_sub(sub)->seg, bp);
+    ctx = runops_args(interpreter, sub, PMCNULL, NULL, sig, args);
+    return set_retval_i(interpreter, *sig, PMC_sub(sub)->seg, ctx);
 }
 
 FLOATVAL
 Parrot_runops_fromc_arglist_retf(Parrot_Interp interpreter, PMC *sub,
         const char *sig, va_list args)
 {
-    struct parrot_regs_t *bp;
+    parrot_context_t *ctx;
 
-    bp = runops_args(interpreter, sub, PMCNULL, NULL, sig, args);
-    return set_retval_f(interpreter, *sig, PMC_sub(sub)->seg, bp);
+    ctx = runops_args(interpreter, sub, PMCNULL, NULL, sig, args);
+    return set_retval_f(interpreter, *sig, PMC_sub(sub)->seg, ctx);
 }
 
 void*
 Parrot_run_meth_fromc_arglist(Parrot_Interp interpreter,
         PMC *sub, PMC *obj, STRING *meth, const char *sig, va_list args)
 {
-    struct parrot_regs_t *bp;
+    parrot_context_t *ctx;
 
-    bp = runops_args(interpreter, sub, obj, meth, sig, args);
-    return set_retval(interpreter, *sig, PMC_sub(sub)->seg, bp);
+    ctx = runops_args(interpreter, sub, obj, meth, sig, args);
+    return set_retval(interpreter, *sig, PMC_sub(sub)->seg, ctx);
 }
 
 INTVAL
 Parrot_run_meth_fromc_arglist_reti(Parrot_Interp interpreter,
         PMC *sub, PMC *obj, STRING *meth, const char *sig, va_list args)
 {
-    struct parrot_regs_t *bp;
+    parrot_context_t *ctx;
 
-    bp = runops_args(interpreter, sub, obj, meth, sig, args);
-    return set_retval_i(interpreter, *sig, PMC_sub(sub)->seg, bp);
+    ctx = runops_args(interpreter, sub, obj, meth, sig, args);
+    return set_retval_i(interpreter, *sig, PMC_sub(sub)->seg, ctx);
 }
 
 FLOATVAL
 Parrot_run_meth_fromc_arglist_retf(Parrot_Interp interpreter,
         PMC *sub, PMC *obj, STRING *meth, const char *sig, va_list args)
 {
-    struct parrot_regs_t *bp;
+    parrot_context_t *ctx;
 
-    bp = runops_args(interpreter, sub, obj, meth, sig, args);
-    return set_retval_f(interpreter, *sig, PMC_sub(sub)->seg, bp);
+    ctx = runops_args(interpreter, sub, obj, meth, sig, args);
+    return set_retval_f(interpreter, *sig, PMC_sub(sub)->seg, ctx);
 }
 
 /*

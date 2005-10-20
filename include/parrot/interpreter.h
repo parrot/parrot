@@ -439,7 +439,7 @@ STRING*interpinfo_s(Interp *interpreter, INTVAL what);
 
 void runops(Interp *, size_t offset);
 void runops_int(Interp *, size_t offset);
-struct parrot_regs_t* Parrot_runops_fromc(Interp *, PMC *sub);
+parrot_context_t* Parrot_runops_fromc(Interp *, PMC *sub);
 void* Parrot_runops_fromc_args(Interp *, PMC *sub, const char *sig, ...);
 INTVAL Parrot_runops_fromc_args_reti(Interp *, PMC *, const char *, ...);
 FLOATVAL Parrot_runops_fromc_args_retf(Interp *, PMC *, const char *, ...);

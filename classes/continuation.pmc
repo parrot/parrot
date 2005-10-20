@@ -208,7 +208,7 @@ destination to continue execution.
 
     void* invoke (void* next) {
         struct Parrot_cont * cc = PMC_cont(SELF);
-        struct parrot_regs_t *caller_regs;
+        parrot_context_t *caller_ctx;
         parrot_context_t *ctx;
         opcode_t *pc;
 
@@ -219,7 +219,7 @@ destination to continue execution.
             PIO_eprintf(INTERP, "# Back in sub '%Ss'\n",
                     Parrot_full_sub_name(INTERP, sub));
         }
-        caller_regs = INTERP->ctx.bp;
+        caller_ctx = CONTEXT(INTERP->ctx);
         /*
          * set context
          */
@@ -245,7 +245,7 @@ destination to continue execution.
                  */
                 Parrot_block_DOD(INTERP);
                 parrot_pass_args(INTERP, cc->seg,
-                        caller_regs,
+                        caller_ctx,
                         PARROT_OP_get_results_pc);
                 Parrot_unblock_DOD(INTERP);
             }

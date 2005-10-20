@@ -87,7 +87,7 @@ the frame pointer in the stack frame cache.
     void* invoke (void* next) {
         Stack_Chunk_t *ctr_stack, *stack_now;
         struct Parrot_cont * cc = PMC_cont(SELF);
-        struct parrot_regs_t *caller_regs;
+        parrot_context_t *caller_ctx;
         /*
          * unwind control stack
          */
@@ -114,7 +114,7 @@ the frame pointer in the stack frame cache.
                     Parrot_full_sub_name(INTERP, to_sub),
                     Parrot_full_sub_name(INTERP, from_sub));
         }
-        caller_regs = INTERP->ctx.bp;
+        caller_ctx = CONTEXT(INTERP->ctx);
         CONTEXT(INTERP->ctx) = cc->to_ctx;
         INTERP->ctx.bp = CONTEXT(INTERP->ctx)->bp;
         INTERP->ctx.bp_ps = CONTEXT(INTERP->ctx)->bp_ps;
@@ -130,7 +130,7 @@ the frame pointer in the stack frame cache.
                  */
                 Parrot_block_DOD(INTERP);
                 parrot_pass_args(INTERP, cc->seg,
-                        caller_regs,
+                        caller_ctx,
                         PARROT_OP_get_results_pc);
                 Parrot_unblock_DOD(INTERP);
             }

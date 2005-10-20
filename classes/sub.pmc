@@ -236,7 +236,7 @@ Invokes the subroutine.
 
     void* invoke (void* next) {
         struct Parrot_sub * sub = PMC_sub(SELF);
-        struct parrot_regs_t *caller_regs;
+        parrot_context_t *caller_ctx;
         struct Parrot_Context *context;
         PMC *ccont;
         opcode_t *pc;
@@ -281,7 +281,7 @@ Invokes the subroutine.
          *
          */
         pc = sub->address;
-        caller_regs = INTERP->ctx.bp;
+        caller_ctx = CONTEXT(INTERP->ctx);
         ccont = INTERP->current_cont;
         INTERP->current_cont = NULL;
         if (ccont == NEED_CONTINUATION) {
@@ -336,7 +336,7 @@ create_ctx:
              * get_params, so that we can skip this opcode, we
              * start executing in the sub after this opcode
              */
-            pc = parrot_pass_args(INTERP, sub->seg, caller_regs,
+            pc = parrot_pass_args(INTERP, sub->seg, caller_ctx,
                     PARROT_OP_get_params_pc);
         }
 

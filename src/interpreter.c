@@ -370,11 +370,11 @@ init_prederef(Interp *interpreter, int which)
                 sig = interpreter->code->const_table->constants[pc[1]]->u.key;
                 n += VTABLE_elements(interpreter, sig);
             }
-            pc += n;
-            i += n;
             /* count ops that need a PIC */
             if (parrot_PIC_op_is_cached(interpreter, *pc))
                 n_pics++;
+            pc += n;
+            i += n;
         }
 
         interpreter->code->prederef.code = temp;

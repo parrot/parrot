@@ -93,7 +93,7 @@ Swaps the "context".
 
     void* invoke (void* next) {
         struct Parrot_coro * co = PMC_coro(SELF);
-        struct parrot_regs_t *caller_regs;
+        parrot_context_t *caller_ctx;
         struct PackFile_ByteCode *wanted_seg;
         opcode_t * dest = co->address;
         parrot_context_t *ctx;
@@ -106,7 +106,7 @@ Swaps the "context".
             if (ccont == NEED_CONTINUATION) {
                 ccont = new_ret_continuation_pmc(interpreter, next);
             }
-            caller_regs = INTERP->ctx.bp;
+            caller_ctx = CONTEXT(INTERP->ctx);
             /*
              * first time set current sub, cont, object
              */
@@ -136,7 +136,7 @@ Swaps the "context".
             if (*dest == PARROT_OP_get_params_pc) {
                 INTERP->current_params = dest;
                 dest = parrot_pass_args(INTERP, wanted_seg,
-                        caller_regs,
+                        caller_ctx,
                         PARROT_OP_get_params_pc);
             }
         }
@@ -165,7 +165,7 @@ Swaps the "context".
             /* yield values */
             if (INTERP->current_returns && ctx->current_results)
                 parrot_pass_args(INTERP, wanted_seg,
-                        co->ctx->bp,
+                        co->ctx,
                         PARROT_OP_get_results_pc);
         }
 
