@@ -37,7 +37,6 @@ mark_context(Interp* interpreter, parrot_context_t* ctx)
 {
     PObj *obj;
     int i, n;
-    struct parrot_regs_t *regs;
 
     mark_stack(interpreter, ctx->pad_stack);
     mark_stack(interpreter, ctx->user_stack);
@@ -66,12 +65,11 @@ mark_context(Interp* interpreter, parrot_context_t* ctx)
     obj = (PObj*)ctx->current_package;
     if (obj)
         pobject_lives(interpreter, obj);
-    regs = ctx->bp;
     for (i = 0; i < NUM_REGISTERS; ++i) {
-        obj = (PObj*) BP_REG_PMC(regs, i);
+        obj = (PObj*) CTX_REG_PMC(ctx, i);
         if (obj)
             pobject_lives(interpreter, obj);
-        obj = (PObj*) BP_REG_STR(regs, i);
+        obj = (PObj*) CTX_REG_STR(ctx, i);
         if (obj)
             pobject_lives(interpreter, obj);
     }

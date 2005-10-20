@@ -164,13 +164,21 @@ static void
 create_initial_context(Interp *interpreter)
 {
     size_t to_alloc = sizeof(struct parrot_regs_t) + ALIGNED_CTX_SIZE;
+    void *p;
+    parrot_context_t *ctx;
 
     new_context_mem(interpreter, &interpreter->ctx_mem);
-    LVALUE_CAST(char *, interpreter->ctx.bp) =
-        interpreter->ctx_mem.free + ALIGNED_CTX_SIZE;
+    p = interpreter->ctx_mem.free;
+    CONTEXT(interpreter->ctx) = ctx = p;
+    p = interpreter->ctx_mem.free + ALIGNED_CTX_SIZE;
+    interpreter->ctx.bp = p;
+    interpreter->ctx.bp_ps.regs_s = (STRING**) ((char*)p +
+        offsetof(struct parrot_regs_t, string_reg.registers[0]));
     interpreter->ctx_mem.free += to_alloc;
-    memset(CONTEXT(interpreter->ctx), 0, sizeof(struct Parrot_Context));
-    CONTEXT(interpreter->ctx)->prev = NULL;
+    memset(ctx, 0, sizeof(struct Parrot_Context));
+    ctx->bp = interpreter->ctx.bp;
+    ctx->bp_ps = interpreter->ctx.bp_ps;
+    ctx->prev = NULL;
 }
 
 #else
@@ -185,16 +193,21 @@ create_initial_context(Interp *interpreter)
 {
     size_t to_alloc = sizeof(struct parrot_regs_t) + ALIGNED_CTX_SIZE;
     void *p;
+    parrot_context_t *ctx;
 
-    p = mem_sys_allocate_zeroed(to_alloc);
+    ctx = p = mem_sys_allocate_zeroed(to_alloc);
 #if CTX_LEAK_DEBUG
     fprintf(stderr, "alloc %p\n", p);
 #endif
-    CONTEXT(interpreter->ctx) = p;
+    CONTEXT(interpreter->ctx) = ctx;
     p = (void *) ((char *)p + ALIGNED_CTX_SIZE);
-    interpreter->ctx.bp = CONTEXT(interpreter->ctx)->bp = p;
+    interpreter->ctx.bp = p;
+    interpreter->ctx.bp_ps.regs_s = (STRING**) ((char*)p +
+        offsetof(struct parrot_regs_t, string_reg.registers[0]));
     interpreter->ctx_mem.free = NULL;
-    CONTEXT(interpreter->ctx)->prev = NULL;
+    ctx->bp = interpreter->ctx.bp;
+    ctx->bp_ps = interpreter->ctx.bp_ps;
+    ctx->prev = NULL;
 }
 
 #endif
@@ -237,10 +250,10 @@ parrot_gc_context(Interp *interpreter)
 }
 
 static void
-init_context(Interp *interpreter, struct Parrot_Context *old_state)
+init_context(Interp *interpreter, parrot_context_t *old_state)
 {
-    struct parrot_regs_t *bp;
     int i;
+    parrot_context_t *ctx;
 
     memcpy(CONTEXT(interpreter->ctx),
            old_state, sizeof(struct Parrot_Context));
@@ -254,21 +267,23 @@ init_context(Interp *interpreter, struct Parrot_Context *old_state)
      * if the architecture has 0x := NULL and 0.0 we could memset too
      *
      */
-    CONTEXT(interpreter->ctx)->bp = bp = interpreter->ctx.bp;
+    ctx = CONTEXT(interpreter->ctx);
+    ctx->bp = interpreter->ctx.bp;
+    ctx->bp_ps = interpreter->ctx.bp_ps;
     for (i = 0; i < NUM_REGISTERS; i++) {
-        BP_REG_PMC(bp, i) = PMCNULL;
-        BP_REG_STR(bp, i) = NULL;
+        CTX_REG_PMC(ctx, i) = PMCNULL;
+        CTX_REG_STR(ctx, i) = NULL;
 #ifndef NDEBUG
         /* depending on -D40 we set int, num to garbage or zero
          */
         if (Interp_debug_TEST(interpreter, PARROT_REG_DEBUG_FLAG)) {
             /* TODO better use rand values */
-            BP_REG_INT(bp, i) = -999;
-            BP_REG_NUM(bp, i) = -99.9;
+            CTX_REG_INT(ctx, i) = -999;
+            CTX_REG_NUM(ctx, i) = -99.9;
         }
         else {
-            BP_REG_INT(bp, i) = 0;
-            BP_REG_NUM(bp, i) = 0.0;
+            CTX_REG_INT(ctx, i) = 0;
+            CTX_REG_NUM(ctx, i) = 0.0;
         }
 #endif
     }
@@ -403,7 +418,11 @@ Parrot_alloc_context(Interp *interpreter)
 #if CTX_LEAK_DEBUG
     fprintf(stderr, "alloc %p\n", p);
 #endif
+    /* XXX .bp this still points to start */
     interpreter->ctx.bp = p;
+    /* this points to S0 - currently fixed regs still */
+    interpreter->ctx.bp_ps.regs_s = (STRING**) ((char*)p +
+        offsetof(struct parrot_regs_t, string_reg.registers[0]));
     init_context(interpreter, old);
 }
 

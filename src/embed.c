@@ -475,7 +475,7 @@ setup_argv(Interp *interpreter, int argc, char ** argv)
     }
 
     /* XXX @ARGS should propably be a ResizableStringArray */
-    REG_PMC(5) = userargv = pmc_new_noinit(interpreter, enum_class_SArray);
+    userargv = pmc_new_noinit(interpreter, enum_class_SArray);
     /* immediately anchor pmc to root set */
     VTABLE_set_pmc_keyed_int(interpreter, interpreter->iglobals,
             (INTVAL)IGLOBALS_ARGV_LIST, userargv);

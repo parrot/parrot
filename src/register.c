@@ -128,17 +128,21 @@ mark_register_stack(Parrot_Interp interpreter, Stack_Chunk_t* chunk)
     struct parrot_regs_t *regs;
     int i;
     PObj *obj;
+    struct Interp_Context ctx;
 
     for (; ; chunk = chunk->prev) {
         pobject_lives(interpreter, (PObj*)chunk);
         if (chunk == chunk->prev)
             break;
         regs = (struct parrot_regs_t *)STACK_DATAP(chunk);
+        /* XXX intermediate hack */
+        ctx.bp = regs;
+        ctx.bp_ps.regs_p = regs->pmc_reg.registers;
         for (i = 0; i < NUM_REGISTERS; ++i) {
-            obj = (PObj *)BP_REG_PMC(regs, i);
+            obj = (PObj *)CTX_REG_PMC(&ctx, i);
             if (obj)
                 pobject_lives(interpreter, obj);
-            obj = (PObj *)BP_REG_STR(regs, i);
+            obj = (PObj *)CTX_REG_STR(&ctx, i);
             if (obj)
                 pobject_lives(interpreter, obj);
         }

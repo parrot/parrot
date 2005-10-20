@@ -175,10 +175,12 @@ typedef union {
 } Regs_ps;
 
 typedef struct Parrot_Context {
+    /* common header with Interp_Context */
     struct Parrot_Context *prev;
-    INTVAL ref_count;                   /* how often refered to */
     struct parrot_regs_t  *bp;          /* register base pointer */
-    Regs_ps               *bp_ps;       /* yet unused */
+    Regs_ps                bp_ps;       /* pointers to PMC & STR */
+    /* end common header */
+    INTVAL ref_count;                   /* how often refered to */
     struct Stack_Chunk *reg_stack;      /* register stack */
 
     struct Stack_Chunk *pad_stack;      /* Base of the lex pad stack */
@@ -228,10 +230,12 @@ typedef struct _Prederef {
 } Prederef;
 
 
-struct All_Context {
+struct Interp_Context {
+    /* common header */
+    struct Parrot_Context *state;       /* context  */
     struct parrot_regs_t  *bp;          /* register base pointer */
-    Regs_ps               *bp_ps;       /* yet unused */
-    struct Parrot_Context *state;       /* ontext  */
+    Regs_ps                bp_ps;       /* pointers to PMC & STR */
+    /* end common header */
 };
 
 #define CONTEXT(ctx) ((ctx).state)
@@ -246,7 +250,7 @@ typedef struct _context_mem {
  * The actual interpreter structure
  */
 struct parrot_interp_t {
-    struct All_Context ctx;
+    struct Interp_Context ctx;
     context_mem ctx_mem;                /* ctx memory managment */
 
     struct Stash *globals;              /* Pointer to the global variable
@@ -360,15 +364,15 @@ typedef enum {
  * Macros to make accessing registers more convenient/readable.
  */
 
-#  define INTERP_REG_INT(i, x) i->ctx.bp->int_reg.registers[x]
 #  define INTERP_REG_NUM(i, x) i->ctx.bp->num_reg.registers[x]
-#  define INTERP_REG_STR(i, x) i->ctx.bp->string_reg.registers[x]
-#  define INTERP_REG_PMC(i, x) i->ctx.bp->pmc_reg.registers[x]
+#  define INTERP_REG_INT(i, x) i->ctx.bp->int_reg.registers[x]
+#  define INTERP_REG_PMC(i, x) i->ctx.bp_ps.regs_p[-32+x]
+#  define INTERP_REG_STR(i, x) i->ctx.bp_ps.regs_s[x]
 
-#  define BP_REG_INT(bp, x) (bp)->int_reg.registers[x]
-#  define BP_REG_NUM(bp, x) (bp)->num_reg.registers[x]
-#  define BP_REG_STR(bp, x) (bp)->string_reg.registers[x]
-#  define BP_REG_PMC(bp, x) (bp)->pmc_reg.registers[x]
+#  define CTX_REG_NUM(ctx, x) (ctx)->bp->num_reg.registers[x]
+#  define CTX_REG_INT(ctx, x) (ctx)->bp->int_reg.registers[x]
+#  define CTX_REG_PMC(ctx, x) (ctx)->bp_ps.regs_p[-32+x]
+#  define CTX_REG_STR(ctx, x) (ctx)->bp_ps.regs_s[x]
 
 #define REG_BASE struct parrot_regs_t
 

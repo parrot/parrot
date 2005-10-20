@@ -166,7 +166,7 @@ fetch_arg_int_op(Interp *interpreter, struct call_state *st)
 
     idx = *st->src.u.op.pc;
     if (!(st->src.sig & PARROT_ARG_CONSTANT)) {
-        idx = BP_REG_INT(st->src.ctx->bp, idx);
+        idx = CTX_REG_INT(st->src.ctx, idx);
     }
     UVal_int(st->val) = idx;
     st->src.mode |= CALL_STATE_NEXT_ARG;
@@ -184,7 +184,7 @@ fetch_arg_str_op(Interp *interpreter, struct call_state *st)
         s_arg = st->src.constants[idx]->u.string;
     }
     else {
-        s_arg = BP_REG_STR(st->src.ctx->bp, idx);
+        s_arg = CTX_REG_STR(st->src.ctx, idx);
     }
     UVal_str(st->val) = s_arg;
     st->src.mode |= CALL_STATE_NEXT_ARG;
@@ -202,7 +202,7 @@ fetch_arg_num_op(Interp *interpreter, struct call_state *st)
         f_arg = st->src.constants[idx]->u.number;
     }
     else {
-        f_arg = BP_REG_NUM(st->src.ctx->bp, idx);
+        f_arg = CTX_REG_NUM(st->src.ctx, idx);
     }
     UVal_num(st->val) = f_arg;
     st->src.mode |= CALL_STATE_NEXT_ARG;
@@ -221,7 +221,7 @@ fetch_arg_pmc_op(Interp *interpreter, struct call_state *st)
         p_arg = st->src.constants[idx]->u.key;
     }
     else {
-        p_arg = BP_REG_PMC(st->src.ctx->bp, idx);
+        p_arg = CTX_REG_PMC(st->src.ctx, idx);
     }
     if (st->src.sig & PARROT_ARG_FLATTEN) {
         _array = CONST_STRING(interpreter, "array");
@@ -533,7 +533,7 @@ again:
         if (st->opt_so_far > 1)
             real_exception(interpreter, NULL, E_ValueError,
                     ":opt_flag preceeded by more then one :optional");
-        BP_REG_INT(st->dest.ctx->bp, *st->dest.u.op.pc) = st->opt_so_far;
+        CTX_REG_INT(st->dest.ctx, *st->dest.u.op.pc) = st->opt_so_far;
         st->opt_so_far = 0;
         if (!next_arg(interpreter, &st->dest))
             return 0;
@@ -577,7 +577,7 @@ Parrot_store_arg(Interp *interpreter, struct call_state *st)
         st->dest.slurp = pmc_new(interpreter,
                 Parrot_get_ctx_HLL_type(interpreter,
                     enum_class_ResizablePMCArray));
-        BP_REG_PMC(st->dest.ctx->bp, *st->dest.u.op.pc) = st->dest.slurp;
+        CTX_REG_PMC(st->dest.ctx, *st->dest.u.op.pc) = st->dest.slurp;
         st->dest.mode |= CALL_STATE_FLATTEN;
         return Parrot_store_arg(interpreter, st);
     }
@@ -589,16 +589,16 @@ Parrot_store_arg(Interp *interpreter, struct call_state *st)
     assert(st->dest.mode & CALL_STATE_OP);
     switch (st->dest.sig & PARROT_ARG_TYPE_MASK) {
         case PARROT_ARG_INTVAL:
-            BP_REG_INT(st->dest.ctx->bp, *st->dest.u.op.pc) = UVal_int(st->val);
+            CTX_REG_INT(st->dest.ctx, *st->dest.u.op.pc) = UVal_int(st->val);
             break;
         case PARROT_ARG_FLOATVAL:
-            BP_REG_NUM(st->dest.ctx->bp, *st->dest.u.op.pc) = UVal_num(st->val);
+            CTX_REG_NUM(st->dest.ctx, *st->dest.u.op.pc) = UVal_num(st->val);
             break;
         case PARROT_ARG_STRING:
-            BP_REG_STR(st->dest.ctx->bp, *st->dest.u.op.pc) = UVal_str(st->val);
+            CTX_REG_STR(st->dest.ctx, *st->dest.u.op.pc) = UVal_str(st->val);
             break;
         case PARROT_ARG_PMC:
-            BP_REG_PMC(st->dest.ctx->bp, *st->dest.u.op.pc) =  UVal_pmc(st->val);
+            CTX_REG_PMC(st->dest.ctx, *st->dest.u.op.pc) =  UVal_pmc(st->val);
             break;
     }
     st->dest.mode |= CALL_STATE_NEXT_ARG;
