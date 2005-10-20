@@ -313,6 +313,7 @@ N: Nick Glencross
 D: Bugfixes to trace and more.
 D: fixes file perms for hpux & cygwin in config/gen/makefiles/dynclasses_pl
 D: A patch to skip tests that hang on hp-ux in t/pmc/nci.t
+D: The example circle.pir
 E: nickg@glencros.demon.co.uk
 
 N: Nick Kostirya
