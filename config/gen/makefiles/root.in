@@ -671,38 +671,38 @@ parrot.def : build_tools\parrotdef.pl
 	perl build_tools/parrotdef.pl
 
 $(PARROT) : $(IMCC_DIR)/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
-		lib/Parrot/OpLib/core.pm $(SRC_DIR)/parrot_config$(O) \
-		$(MINIPARROT) ${parrot_exe_def}
+    lib/Parrot/OpLib/core.pm $(SRC_DIR)/parrot_config$(O) \
+    $(MINIPARROT) ${parrot_exe_def}
 	$(LINK) ${ld_out}$(PARROT) $(LINKFLAGS) $(LINK_DYNAMIC) ${ld_parrot_exe_def} \
-	  $(IMCC_DIR)/main$(O) $(ALL_PARROT_LIBS) $(SRC_DIR)/parrot_config$(O)
+    $(IMCC_DIR)/main$(O) $(ALL_PARROT_LIBS) $(SRC_DIR)/parrot_config$(O)
 #
 # TODO build the real miniparrot
 #
 $(MINIPARROT) : $(IMCC_DIR)/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
-		lib/Parrot/OpLib/core.pm $(SRC_DIR)/null_config$(O)
+    lib/Parrot/OpLib/core.pm $(SRC_DIR)/null_config$(O)
 	$(LINK) ${ld_out}$(MINIPARROT) $(LINKFLAGS) $(IMCC_DIR)/main$(O) \
-	    $(ALL_PARROT_LIBS) $(SRC_DIR)/null_config$(O)
+    $(ALL_PARROT_LIBS) $(SRC_DIR)/null_config$(O)
 
 $(INSTALLABLEPARROT) : $(IMCC_DIR)/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
-		lib/Parrot/OpLib/core.pm $(SRC_DIR)/install_config$(O) \
-		$(PARROT)
+    lib/Parrot/OpLib/core.pm $(SRC_DIR)/install_config$(O) \
+    $(PARROT)
 	$(LINK) ${ld_out}$(INSTALLABLEPARROT) $(LINKFLAGS) \
-		$(IMCC_DIR)/main$(O) \
-		$(ALL_PARROT_LIBS) $(SRC_DIR)/install_config$(O)
+    $(IMCC_DIR)/main$(O) \
+    $(ALL_PARROT_LIBS) $(SRC_DIR)/install_config$(O)
 
 $(SRC_DIR)/parrot_config.c :  runtime/parrot/include/config.fpmc \
-			$(BUILD_TOOLS_DIR)/parrot_config_c.pl
+    $(BUILD_TOOLS_DIR)/parrot_config_c.pl
 	$(PERL) $(BUILD_TOOLS_DIR)/parrot_config_c.pl > \
-		$(SRC_DIR)/parrot_config.c
+    $(SRC_DIR)/parrot_config.c
 
 $(SRC_DIR)/install_config.c :  install_config.fpmc \
-			$(BUILD_TOOLS_DIR)/parrot_config_c.pl
+    $(BUILD_TOOLS_DIR)/parrot_config_c.pl
 	$(PERL) $(BUILD_TOOLS_DIR)/parrot_config_c.pl --install > \
-		$(SRC_DIR)/install_config.c
+    $(SRC_DIR)/install_config.c
 
 $(SRC_DIR)/null_config.c : myconfig $(BUILD_TOOLS_DIR)/parrot_config_c.pl
 	$(PERL) $(BUILD_TOOLS_DIR)/parrot_config_c.pl --mini > \
-		$(SRC_DIR)/null_config.c
+    $(SRC_DIR)/null_config.c
 
 install_config.fpmc : myconfig config_lib.pasm $(PARROT)
 	@echo Invoking Parrot to generate install_config.fpmc
@@ -774,9 +774,9 @@ $(SRC_DIR)/disassemble$(O) : $(GENERAL_H_FILES)
 
 $(DIS) : $(SRC_DIR)/disassemble$(O) $(LIBPARROT)
 	$(LINK) ${ld_out}$(DIS) \
-	$(SRC_DIR)/disassemble$(O) \
-	$(SRC_DIR)/null_config$(O) \
-	$(LINKFLAGS) $(ALL_PARROT_LIBS)
+    $(SRC_DIR)/disassemble$(O) \
+    $(SRC_DIR)/null_config$(O) \
+    $(LINKFLAGS) $(ALL_PARROT_LIBS)
 
 #
 # Parrot Dump
@@ -784,17 +784,17 @@ $(DIS) : $(SRC_DIR)/disassemble$(O) $(LIBPARROT)
 
 $(PDUMP) : $(SRC_DIR)/pdump$(O) $(SRC_DIR)/packdump$(O) $(LIBPARROT)
 	$(LINK) ${ld_out}$(PDUMP) \
-	$(SRC_DIR)/pdump$(O) \
-	$(SRC_DIR)/null_config$(O) \
-	$(SRC_DIR)/packdump$(O) $(LINKFLAGS) $(ALL_PARROT_LIBS)
+    $(SRC_DIR)/pdump$(O) \
+    $(SRC_DIR)/null_config$(O) \
+    $(SRC_DIR)/packdump$(O) $(LINKFLAGS) $(ALL_PARROT_LIBS)
 
 
 # pbc_info
 $(PINFO) : $(SRC_DIR)/pbc_info$(O) $(LIBPARROT)
 	$(LINK) ${ld_out}$(PINFO) \
-	$(SRC_DIR)/pbc_info$(O) \
-	$(SRC_DIR)/null_config$(O) \
-	$(LINKFLAGS) $(ALL_PARROT_LIBS)
+    $(SRC_DIR)/pbc_info$(O) \
+    $(SRC_DIR)/null_config$(O) \
+    $(LINKFLAGS) $(ALL_PARROT_LIBS)
 
 #
 # Parrot Bytecode File Merger
@@ -803,9 +803,9 @@ $(PINFO) : $(SRC_DIR)/pbc_info$(O) $(LIBPARROT)
 # pbc_info
 $(PBCMERGE) : $(SRC_DIR)/pbc_merge$(O) $(LIBPARROT)
 	$(LINK) ${ld_out}$(PBCMERGE) \
-	$(SRC_DIR)/pbc_merge$(O) \
-	$(SRC_DIR)/null_config$(O) \
-	$(LINKFLAGS) $(ALL_PARROT_LIBS)
+    $(SRC_DIR)/pbc_merge$(O) \
+    $(SRC_DIR)/null_config$(O) \
+    $(LINKFLAGS) $(ALL_PARROT_LIBS)
 
 
 
@@ -847,7 +847,7 @@ examples-clean:
     examples/pasm/hello$(EXE)
 
 # hello
-hello:	test_prep examples/pasm/hello$(EXE)
+hello: test_prep examples/pasm/hello$(EXE)
 	$(CUR_DIR)/examples/pasm/hello$(EXE)
 
 examples/pasm/hello.pbc: examples/pasm/hello.pasm
@@ -856,7 +856,7 @@ examples/pasm/hello.pbc: examples/pasm/hello.pasm
 examples/pasm/hello$(O): examples/pasm/hello.pbc
 	$(PARROT) -o examples/pasm/hello$(O) examples/pasm/hello.pbc
 
-examples/pasm/hello$(EXE):	examples/pasm/hello$(O)
+examples/pasm/hello$(EXE): examples/pasm/hello$(O)
 	$(MAKE) EXEC=examples/pasm/hello exec
 
 
@@ -1366,9 +1366,9 @@ prog-clean :
     $(PDB) $(SRC_DIR)/pdb$(O) \
     $(PBCMERGE) $(SRC_DIR)/pbc_merge$(O) \
     $(DIS) $(SRC_DIR)/disassemble$(O) \
-	$(SRC_DIR)/null_config$(O) \
-	$(SRC_DIR)/parrot_config$(O) \
-	$(SRC_DIR)/install_config$(O) \
+    $(SRC_DIR)/null_config$(O) \
+    $(SRC_DIR)/parrot_config$(O) \
+    $(SRC_DIR)/install_config$(O) \
     $(LIBNCI_TEST_SO) \
     $(LIBPARROT)
 	$(PERL) build_tools/c2str.pl --init
@@ -1385,9 +1385,9 @@ dynext-clean :
 # win32 program data base - contains debugging info
 	$(RM_F) *.pdb $(DYNEXT_DIR)/*.pdb
 # win32 incremental link status files
-	$(RM_F)	*.ilk $(DYNEXT_DIR)/*.ilk
+	$(RM_F) *.ilk $(DYNEXT_DIR)/*.ilk
 # win32 exported functions and data items
-	$(RM_F)	$(DYNEXT_DIR)/*.exp
+	$(RM_F) $(DYNEXT_DIR)/*.exp
 # win32 export definition files
 	$(RM_F) *.def
 
@@ -1490,13 +1490,13 @@ lint2 : $(PARROT)
 
 install : $(INSTALLABLEPARROT)
 	$(PERL) tools/dev/install_files.pl \
-	    --buildprefix=$(BUILDPREFIX) \
-	    --prefix=$(PREFIX) \
-	    --exec-prefix=$(EXEC_PREFIX) \
-	    --bindir=$(BIN_DIR) \
-	    --libdir=$(LIB_DIR) \
-	    --includedir=$(INCLUDE_DIR) \
-	    MANIFEST MANIFEST.generated
+    --buildprefix=$(BUILDPREFIX) \
+    --prefix=$(PREFIX) \
+    --exec-prefix=$(EXEC_PREFIX) \
+    --bindir=$(BIN_DIR) \
+    --libdir=$(LIB_DIR) \
+    --includedir=$(INCLUDE_DIR) \
+    MANIFEST MANIFEST.generated
 
 ###############################################################################
 #
@@ -1555,12 +1555,12 @@ exec_so : $(SRC_DIR)/exec_start$(O) blib/lib/libparrot$(SHARE_EXT)
 # for use by t/pmc/nci.t
 $(LIBNCI_TEST_SO): $(SRC_DIR)/nci_test$(O)
 	$(LD) $(LD_LOAD_FLAGS) ${ncilib_link_extra} $(LDFLAGS) \
-	    ${ld_out}$@ $(SRC_DIR)/nci_test$(O) $(C_LIBS)
+    ${ld_out}$@ $(SRC_DIR)/nci_test$(O) $(C_LIBS)
 
 # vim ctags
 # this needs exuberant-ctags
 
-tags:	tags.dummy
+tags: tags.dummy
 	$(RM_F) tags
 	ctags -R --links=no $(CUR_DIR)
 	$(PERL) editor/addtags ops/*.ops

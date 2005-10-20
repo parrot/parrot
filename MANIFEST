@@ -446,8 +446,6 @@ examples/README                                   [main]doc
 examples/assembly/Makefile                        [main]doc
 examples/assembly/acorn.l                         [main]doc
 examples/assembly/hello-dwim.imc                  [main]doc
-examples/assembly/io1.pasm                        [main]doc
-examples/assembly/io2.pasm                        [main]doc
 examples/assembly/jump.pasm                       [main]doc
 examples/assembly/lexical.pasm                    [main]doc
 examples/assembly/lexical2.pasm                   [main]doc
@@ -602,6 +600,7 @@ examples/pasm/hello.pasm                          [main]doc
 examples/pir/circle.pir                           [main]doc
 examples/pir/euclid.pir                           [main]doc
 examples/pir/hanoi.pir                            [main]doc
+examples/pir/io.pir                               [main]doc
 examples/pir/mandel.pir                           [main]doc
 examples/pir/sudoku.pir                           [main]doc
 examples/pni/PQt.C                                [main]doc
@@ -1789,6 +1788,7 @@ src/tsq.c                                         []
 src/utils.c                                       []
 src/vtables.c                                     []
 src/warnings.c                                    []
+t/README                                          []
 t/benchmarks.t                                    []
 t/doc/pod.t                                       []
 t/dynclass/foo.t                                  []
@@ -1864,6 +1864,7 @@ t/p6rules/ws.t                                    []
 t/perl/Parrot_Distribution.t                      [devel]
 t/perl/Parrot_Docs.t                              [devel]
 t/perl/Parrot_IO.t                                [devel]
+t/perl/manifest.t                                 []
 t/pmc/array.t                                     []
 t/pmc/bigint.t                                    []
 t/pmc/boolean.t                                   []
@@ -1952,7 +1953,6 @@ t/src/hash.t                                      []
 t/src/intlist.t                                   []
 t/src/io.t                                        []
 t/src/list.t                                      []
-t/src/manifest.t                                  []
 t/src/opcode-doc.t                                []
 t/src/sprintf.t                                   []
 t/src/string.t                                    []

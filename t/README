@@ -1,0 +1,5 @@
+# Copyright: 2005 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+The directory contains part of the Parrot test suite. 
+For details see the documentation in 'docs/tests.pod'.
