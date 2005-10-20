@@ -1142,13 +1142,14 @@ e_pbc_emit(Interp *interpreter, void *param, IMC_Unit * unit, Instruction * ins)
         pc = (opcode_t*) interpreter->code->base.data + oldsize;
         npc = 0;
         /* add debug if necessary */
-        if (!IMCC_INFO(interpreter)->optimizer_level) {
+        if (!IMCC_INFO(interpreter)->optimizer_level || 
+            IMCC_INFO(interpreter)->optimizer_level == OPT_PASM) {
             const char *sourcefile = IMCC_INFO(interpreter)->state->file;
             /* FIXME length and multiple subs */
             debug_seg = Parrot_new_debug_seg(interpreter,
                     interpreter->code,
                     (size_t) ins_line + ins_size + 1);
-            Parrot_debug_add_mapping(interpreter, debug_seg, 0,
+            Parrot_debug_add_mapping(interpreter, debug_seg, ins_line,
                      PF_DEBUGMAPPINGTYPE_FILENAME, sourcefile, 0);
         }
         else
