@@ -4,11 +4,13 @@
 
 =head1 NAME
 
-t/src/manifest.t - MANIFEST File
+t/perl/manifest.t - sanity check the MANIFEST file
 
 =head1 SYNOPSIS
 
-	% perl t/src/manifest.t
+	% perl t/harness t/perl/manifest.t
+
+	% perl -I lib t/perl/manifest.t
 
 =head1 DESCRIPTION
 
