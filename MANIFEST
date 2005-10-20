@@ -599,6 +599,7 @@ examples/pasm/99beer.pasm                         [main]doc
 examples/pasm/cat.pasm                            [main]doc
 examples/pasm/fact.pasm                           [main]doc
 examples/pasm/hello.pasm                          [main]doc
+examples/pir/circle.pir                           [main]doc
 examples/pir/euclid.pir                           [main]doc
 examples/pir/hanoi.pir                            [main]doc
 examples/pir/mandel.pir                           [main]doc
