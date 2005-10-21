@@ -1144,7 +1144,7 @@ e_pbc_emit(Interp *interpreter, void *param, IMC_Unit * unit, Instruction * ins)
         /* add debug if necessary */
         if (!IMCC_INFO(interpreter)->optimizer_level || 
             IMCC_INFO(interpreter)->optimizer_level == OPT_PASM) {
-            const char *sourcefile = IMCC_INFO(interpreter)->state->file;
+            const char *sourcefile = unit->file;
             /* FIXME length and multiple subs */
             debug_seg = Parrot_new_debug_seg(interpreter,
                     interpreter->code,

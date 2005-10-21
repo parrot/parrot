@@ -2138,6 +2138,7 @@ static void
 pf_debug_dump (Parrot_Interp interpreter, struct PackFile_Segment *self)
 {
     opcode_t i;
+    size_t j;
     struct PackFile_Debug *debug = (struct PackFile_Debug *) self;
     char *filename;
 
@@ -2171,17 +2172,17 @@ pf_debug_dump (Parrot_Interp interpreter, struct PackFile_Segment *self)
     }
     PIO_printf(interpreter, "]\n");
 
-    i = self->data ? 0: self->file_offset + 4;
-    if (i % 8)
-        PIO_printf(interpreter, "\n %04x:  ", (int) i);
+    j = self->data ? 0: self->file_offset + 4;
+    if (j % 8)
+        PIO_printf(interpreter, "\n %04x:  ", (int) j);
 
-    for ( ; i < (self->data ? self->size :
-            self->file_offset + self->op_count); i++) {
-        if (i % 8 == 0) {
-            PIO_printf(interpreter, "\n %04x:  ", (int) i);
+    for ( ; j < (self->data ? self->size :
+            self->file_offset + self->op_count); j++) {
+        if (j % 8 == 0) {
+            PIO_printf(interpreter, "\n %04x:  ", (int) j);
         }
         PIO_printf(interpreter, "%08lx ", (unsigned long)
-                self->data ? self->data[i] : self->pf->src[i]);
+                self->data ? self->data[j] : self->pf->src[j]);
     }
     PIO_printf(interpreter, "\n]\n");
 }
@@ -2352,12 +2353,12 @@ Parrot_debug_pc_to_filename(Interp *interpreter,
             switch (debug->mappings[i]->mapping_type)
             {
                 case PF_DEBUGMAPPINGTYPE_NONE:
-                    return "(unknown file)";
+                    return (char*) "(unknown file)";
                 case PF_DEBUGMAPPINGTYPE_FILENAME:
                     return string_to_cstring(interpreter, PF_CONST(debug->code,
                            debug->mappings[i]->u.filename)->u.string);
                 case PF_DEBUGMAPPINGTYPE_SOURCESEG:
-                    return "(unknown file)";
+                    return (char*) "(unknown file)";
             }
         }
     }
