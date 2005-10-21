@@ -259,6 +259,23 @@ done:
   .param int pretty
   .param int indent
 
+  .local pmc keys
+  keys = new .ResizablePMCArray
+  .local pmc iter 
+  iter = new .Iterator, thing
+  iter = 0
+  .local string key
+
+iter_loop:
+  unless iter, done_iter
+  shift key, iter
+  push keys, key
+  goto iter_loop
+
+done_iter:
+  $P0 = find_global 'Data::Sort', 'simple' 
+  $P0( keys ) 
+
   .local string result,separator
 
   result = '{'
@@ -279,14 +296,10 @@ pre_loop:
   len = thing
   unless pretty goto loop
   result .= "\n"
-  .local pmc iter 
-  iter = new .Iterator, thing
-  iter = 0
-  .local string key
 
 loop:
   if pos >= len goto done_loop
-  key = shift iter
+  key = keys[pos]
   $S0 = _json_string(key,pretty,indent)
   result .= $S0
   result .= separator
@@ -321,7 +334,8 @@ done:
   .return (result)
 .end
 
-.include  "library/Data/Escape.imc"
+.include  'library/Data/Escape.imc'
+.include  'library/Data/Sort.imc'
 
 =head1 TODO
 
@@ -330,8 +344,6 @@ done:
 =item Hashed subentries are not entirely pretty yet.
 
 =item Pending a more comprehensive test suite from Roger Browne
-
-=item String Escaping
 
 =item implement _jsan_to_pmc
 
