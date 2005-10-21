@@ -19,12 +19,6 @@ Tests JSON->Parrot and Parrot->JSON conversions.
 use strict;
 
 use Parrot::Test tests => 2;
-use Test::More;
-
-use vars qw($SKIP);
-
-SKIP: {
-    local $SKIP = "Not implemented yet.";
 
 # no. 1
 pir_output_is(<<'CODE', <<'OUT', 'Create JSON of an empty string');
@@ -74,4 +68,3 @@ CODE
   9
 ]
 OUT
-}
