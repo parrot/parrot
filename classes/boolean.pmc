@@ -24,7 +24,7 @@ it doesn't morph to other types. Only its value is changed.
 #include "parrot/parrot.h"
 #include "parrot/perltypes.h"
 
-pmclass Boolean extends Integer {
+pmclass Boolean extends Integer does boolean does scalar {
 
 /*
 
