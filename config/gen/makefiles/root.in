@@ -250,6 +250,7 @@ GEN_LIBRARY = \
     $(LIBRARY_DIR)/Digest/MD5.pbc \
     $(LIBRARY_DIR)/dumper.pbc \
     $(LIBRARY_DIR)/Getopt/Long.pbc \
+    $(LIBRARY_DIR)/JSON.pbc \
     $(LIBRARY_DIR)/ncurses.pbc \
     $(LIBRARY_DIR)/parrotlib.pbc \
     $(LIBRARY_DIR)/pcre.pbc \

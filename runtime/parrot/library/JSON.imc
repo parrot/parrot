@@ -1,0 +1,332 @@
+=head1 TITLE
+
+JSON.imc - PIR implementation of JSON data interchange format.
+
+=head1 SYNOPSIS
+
+ ...
+
+ # generate a JSON representation of a PMC.
+ $S0 = _json( $P0 )
+
+ # generate a PMC from a JSON representation:
+ $P1 = _json_to_pmc( "[1,2,3]" ) 
+ #$P1 is now a array-like container PMC with three Integer elements.
+
+ .end
+ .include 'library/JSON.imc'
+
+=head1 DESCRIPTION
+
+PIR implementation of JSON
+
+=cut
+
+=head1 FUNCTIONS
+
+This library provides the following functions:
+
+=over 4
+
+=item (string) = _json(pmc, ?pretty] )
+
+Convert a PMC to a JSON-serialized string
+
+=over 4
+
+=item pmc
+
+Required. The PMC to dump.
+
+=item pretty
+
+Optional. Boolean: If true, then the generated string will be very
+readable for humans. Defaults to false, which will generate the
+most compact string possible.
+
+=back
+
+=cut
+
+.const string _json_prefix = '  '
+
+.sub _json
+    .param pmc thing
+    .param int pretty     :optional
+    .param int has_pretty :opt_flag
+
+    .local string result
+
+    if has_pretty goto done_init
+    pretty = 0
+
+done_init:
+    result = _json_any(thing,pretty,0)
+    unless pretty goto plain
+    result .= "\n"
+plain:
+    .return (result)
+.end
+
+.sub _json_any
+    .param pmc thing
+    .param int pretty
+    .param int indent
+
+done_init:
+    if_null thing, json_null
+
+    $I0 = does thing, "array"
+    if $I0 goto json_array
+
+    $I0 = does thing, "hash"
+    if $I0 goto json_hash
+
+    $I0 = does thing, "string"
+    if $I0 goto json_string
+
+    $I0 = does thing, "boolean"
+    if $I0 goto json_boolean
+
+    $I0 = does thing, "integer"
+    if $I0 goto json_integer
+
+    $I0 = does thing, "float"
+    if $I0 goto json_float
+
+    # Default to a null. We could in the future make this more
+    # clever, or conditional.
+json_null:
+    .return _json_null(thing,pretty,indent)
+json_string:
+    .return _json_string(thing,pretty,indent)
+json_array:
+    .return _json_array(thing,pretty,indent)
+json_hash:
+    .return _json_hash(thing,pretty,indent)
+json_boolean:
+    .return _json_boolean(thing,pretty,indent)
+json_integer:
+    .return _json_number(thing,pretty,indent)
+json_float:
+    .return _json_number(thing,pretty,indent)
+
+.end
+
+.sub '_json_null'
+  .param pmc thing  # ignored, but needed for the ``API''
+  .param int pretty
+  .param int indent
+
+  unless pretty goto plain
+  unless indent goto plain
+
+  .local string result
+  result = repeat _json_prefix, indent
+  result .= 'null'
+  .return (result)
+
+plain:
+  .return ('null')
+.end
+
+.sub '_json_string'
+  .param pmc thing
+  .param int pretty
+  .param int indent
+
+  .local string result
+
+  $S0 = thing
+  result = '"' . $S0
+  result = result . '"'
+
+  unless pretty goto plain
+  unless indent goto plain
+
+  $S0 = repeat _json_prefix, indent
+  result = $S0 . result
+
+plain:
+  .return (result)
+.end
+
+.sub '_json_boolean'
+  .param pmc thing
+  .param int pretty
+  .param int indent
+
+  .local string result
+
+  result = 'true'
+  if thing goto got_value
+  result = 'false'
+
+got_value:
+
+  unless pretty goto plain
+  unless indent goto plain
+
+  $S0 = repeat _json_prefix, indent
+  result = $S0 . result
+
+plain:
+  .return (result)
+.end
+
+.sub '_json_number'
+  .param pmc thing
+  .param int pretty
+  .param int indent
+
+  .local string result
+
+  result = thing
+
+  unless pretty goto plain
+  unless indent goto plain
+
+  $S0 = repeat _json_prefix, indent
+  result = $S0 . result
+
+plain:
+  .return (result)
+.end
+
+.sub '_json_array'
+  .param pmc thing
+  .param int pretty
+  .param int indent
+
+  .local string result
+
+  result = '['
+
+  unless pretty goto pre_loop
+  unless indent goto pre_loop
+ 
+  $S0 = repeat _json_prefix, indent
+  result = $S0 . result
+  result .= "\n"
+
+pre_loop:
+  inc indent
+  .local int pos,len
+  pos = 0
+  len = thing
+  unless pretty goto loop
+  result .= "\n"
+
+loop:
+  if pos >= len goto done_loop
+  $P1 = thing[pos]
+  $S0 = _json_any($P1,pretty,indent)
+  result .= $S0
+  inc pos
+  if pos == len goto loop
+  result .= ","
+  unless pretty goto loop
+  result .= "\n"
+  goto loop
+
+done_loop:
+  dec indent
+
+  .local string optional_newline,optional_indent
+  optional_newline = ''
+  optional_indent = ''
+
+  unless pretty goto done
+  optional_newline = "\n"
+
+  unless indent goto done
+  optional_indent = repeat _json_prefix, indent
+
+done:
+  result .= optional_newline
+  result .= optional_indent
+  result .= ']'
+
+  .return (result)
+.end
+
+.sub '_json_hash'
+  .param pmc thing
+  .param int pretty
+  .param int indent
+
+  .local string result,separator
+
+  result = '{'
+  separator = ':'
+
+  unless pretty goto pre_loop
+  separator = ' : '
+  unless indent goto pre_loop
+ 
+  $S0 = repeat _json_prefix, indent
+  result = $S0 . result
+  result .= "\n"
+
+pre_loop:
+  inc indent
+  .local int pos,len
+  pos = 0
+  len = thing
+  unless pretty goto loop
+  result .= "\n"
+  .local pmc iter 
+  iter = new .Iterator, thing
+  iter = 0
+  .local string key
+
+loop:
+  if pos >= len goto done_loop
+  key = shift iter
+  $S0 = _json_string(key,pretty,indent)
+  result .= $S0
+  result .= separator
+  $P1 = thing[key]
+  $S0 = _json_any($P1,pretty,indent)
+  result .= $S0
+  inc pos
+  if pos == len goto loop
+  result .= ","
+  unless pretty goto loop
+  result .= "\n"
+  goto loop
+
+done_loop:
+  dec indent
+
+  .local string optional_newline,optional_indent
+  optional_newline = ''
+  optional_indent = ''
+
+  unless pretty goto done
+  optional_newline = "\n"
+
+  unless indent goto done
+  optional_indent = repeat _json_prefix, indent
+
+done:
+  result .= optional_newline
+  result .= optional_indent
+  result .= '}'
+
+  .return (result)
+.end
+
+=head1 TODO
+
+=over 4
+
+=item Hashed subentries are not entirely pretty yet.
+
+=item Pending a more comprehensive test suite from Roger Browne
+
+=item String Escaping
+
+=item implement _jsan_to_pmc
+
+=cut
