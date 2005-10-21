@@ -109,21 +109,6 @@ END
     $debug='y'  if $args{debugging};
     $debug = prompt("Do you want a debugging build of Parrot?", $debug) if $args{ask};
 
-    if ($args{'maintainer'}) {
-	$lex = integrate(Configure::Data->get('lex'), $args{lex});
-	$lex  = &$first_working($lex,  'flex', 'lex');
-	$yacc = integrate(Configure::Data->get('yacc'), $args{yacc});
-	$yacc = &$first_working($yacc, 'bison -v -y', 'yacc', 'byacc');
-    }
-    else {
-	$lex = $yacc = $null;
-    }
-    $lex = prompt("Do you have a lexical analyzer generator, like flex or lex?",$lex) if $args{ask};
-    Configure::Data->set(lex =>  $lex);
-
-    $yacc = prompt("Do you have a parser generator, like bison or yacc?",$yacc) if $args{ask};
-    Configure::Data->set(yacc =>  $yacc);
-
   if(!$debug || $debug =~ /n/i) {
     Configure::Data->set(
       cc_debug => '',

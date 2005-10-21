@@ -31,6 +31,8 @@ use vars qw(@steps);
     init/hints.pl
     init/headers.pl
     inter/progs.pl
+    inter/lex.pl
+    inter/yacc.pl
     auto/gcc.pl
     init/optimize.pl
     inter/shlibs.pl
