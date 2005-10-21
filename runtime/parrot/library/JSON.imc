@@ -138,6 +138,10 @@ plain:
   .local string result
 
   $S0 = thing
+  .local pmc escaper
+  escaper = find_global "Data::Escape", "String"
+  $S0 = escaper($S0,'"')
+
   result = '"' . $S0
   result = result . '"'
 
@@ -316,6 +320,8 @@ done:
 
   .return (result)
 .end
+
+.include  "library/Data/Escape.imc"
 
 =head1 TODO
 
