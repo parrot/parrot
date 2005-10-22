@@ -135,6 +135,7 @@ D: delegate.pmc patch
 
 N: François PERRAD
 D: build fixes for MinGW
+D: a patch to remove slash_exec from config
 
 N: Garrett Rooney
 D: Fix typo in PARROT_BIGENDIAN case

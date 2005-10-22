@@ -140,10 +140,7 @@ sub runstep {
 
     cp            => '$(PERL) -MExtUtils::Command -e cp',
     lns           => $Config{lns},        # soft link
-    # On all platform slash == slash_exec, except with MinGW
-    # slash_exec is needed by pathname of executable in test or makefile
     slash         => '/',
-    slash_exec    => '/',
 
     VERSION       => $main::parrot_version,
     MAJOR         => $main::parrot_version[0],

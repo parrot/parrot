@@ -8,7 +8,7 @@ use Parrot::Config;
 use Test::More tests => 25; 
 
 my $real_out;
-my $parrot_m4    = "cd .. && .$PConfig{slash_exec}parrot$PConfig{exe} languages/m4/m4.pbc";
+my $parrot_m4    = "cd .. && .$PConfig{slash}parrot$PConfig{exe} languages/m4/m4.pbc";
 my $examples_dir = 'languages/m4/examples'; 
 
 

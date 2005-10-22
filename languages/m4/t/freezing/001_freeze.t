@@ -8,7 +8,7 @@ use Parrot::Config;
 #use Test::More tests => 1; 
 use Test::More skip_all => 'infinite loop lurking'; 
 
-my $parrot_m4 = "cd .. && .$PConfig{slash_exec}parrot$PConfig{exe} languages/m4/m4.pbc"; 
+my $parrot_m4 = "cd .. && .$PConfig{slash}parrot$PConfig{exe} languages/m4/m4.pbc"; 
 my $cat  = "$PConfig{perl} -MExtUtils::Command -e cat";
 my $rm_f = "$PConfig{perl} -MExtUtils::Command -e rm_f";
 
