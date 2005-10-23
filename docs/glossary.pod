@@ -273,6 +273,13 @@ the Computed Goto Prederef cores to great effect.
 
 L<http://www.perl.com/pub/a/2003/02/p6pdigest/20030216.html>
 
+=head2 run core
+
+aka run loop, aka runcore. The way Parrot executes Parrot Byte Code. 
+See L<running.pod> on how to tell parrot which run core should be used. 
+
+=for TODO
+  Add a list of available run cores, or provide pointer to documentation.
 
 =head2 Vtable
 
