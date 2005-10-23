@@ -303,6 +303,7 @@ config/init/hints/openbsd.pl                      []
 config/init/hints/os2.pl                          []
 config/init/hints/solaris.pl                      []
 config/init/hints/vms.pl                          []
+config/inter/lex.pl                               []
 config/init/manifest.pl                           []
 config/init/miniparrot.pl                         []
 config/init/optimize.pl                           []
@@ -314,6 +315,7 @@ config/inter/pmc.pl                               []
 config/inter/shlibs.pl                            []
 config/inter/progs.pl                             []
 config/inter/types.pl                             []
+config/inter/yacc.pl                              []
 docs/BROKEN                                       [devel]doc
 docs/ROADMAP                                      [devel]doc
 docs/compiler_faq.pod                             [devel]doc
