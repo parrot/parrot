@@ -20,11 +20,12 @@ Test the examples in F<examples/subs>.
 
 F<t/examples/japh.t>
 F<t/examples/pasm.t>
+F<t/examples/pir.t>
 
 =cut
 
 use strict;
-use Parrot::Test tests => 6;
+use Parrot::Test tests => 7;
 use Test::More;
 
 # Set up expected output for examples
@@ -46,6 +47,19 @@ Calling 2nd co-routine
 Entry
 Resumed
 Done
+END_EXPECTED
+
+    'jsr_ret.pasm'        =>  << 'END_EXPECTED',
+Example of the jump op.
+
+Jumping to subroutine SUB_1.
+Entered subroutine SUB_1.
+Returning from subroutine SUB_1.
+Returned from subroutine SUB_1.
+Jumping to subroutine SUB_2.
+Entered subroutine SUB_2.
+Returning from subroutine SUB_2.
+Returned from subroutine SUB_2.
 END_EXPECTED
 
     'pasm_sub1.pasm'        =>  << 'END_EXPECTED',

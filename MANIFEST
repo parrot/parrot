@@ -443,10 +443,8 @@ encodings/fixed_8.h                               []
 encodings/utf8.c                                  []
 encodings/utf8.h                                  []
 examples/README                                   [main]doc
-examples/assembly/Makefile                        [main]doc
 examples/assembly/acorn.l                         [main]doc
 examples/assembly/hello-dwim.imc                  [main]doc
-examples/assembly/jump.pasm                       [main]doc
 examples/assembly/lexical.pasm                    [main]doc
 examples/assembly/lexical2.pasm                   [main]doc
 examples/assembly/lexical3.pasm                   [main]doc
@@ -634,6 +632,7 @@ examples/sdl/tetris/eventhandler.imc              [main]doc
 examples/sdl/tetris/tetris.imc                    [main]doc
 examples/subs/bsr_ret.pasm                        [main]doc
 examples/subs/coroutine.pasm                      [main]doc
+examples/subs/jsr_ret.pasm                        [main]doc
 examples/subs/pasm_sub1.pasm                      [main]doc
 examples/subs/sub1.imc                            [main]doc
 examples/subs/sub2.imc                            [main]doc
