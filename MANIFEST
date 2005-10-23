@@ -445,9 +445,6 @@ encodings/utf8.h                                  []
 examples/README                                   [main]doc
 examples/assembly/acorn.l                         [main]doc
 examples/assembly/hello-dwim.imc                  [main]doc
-examples/assembly/lexical.pasm                    [main]doc
-examples/assembly/lexical2.pasm                   [main]doc
-examples/assembly/lexical3.pasm                   [main]doc
 examples/assembly/life.pasm                       [main]doc
 examples/assembly/local_label.pasm                [main]doc
 examples/assembly/mandel.pasm                     [main]doc
@@ -595,6 +592,7 @@ examples/pasm/99beer.pasm                         [main]doc
 examples/pasm/cat.pasm                            [main]doc
 examples/pasm/fact.pasm                           [main]doc
 examples/pasm/hello.pasm                          [main]doc
+examples/pasm/lexical.pasm                        [main]doc
 examples/pir/circle.pir                           [main]doc
 examples/pir/euclid.pir                           [main]doc
 examples/pir/hanoi.pir                            [main]doc

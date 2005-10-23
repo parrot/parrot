@@ -28,7 +28,7 @@ F<t/examples/japh.t>
 =cut
 
 use strict;
-use Parrot::Test tests => 2;
+use Parrot::Test tests => 3;
 use Test::More;
 
 # Set up expected output for examples
@@ -47,6 +47,35 @@ END_EXPECTED
     'hello.pasm'        =>  << 'END_EXPECTED',
 Hello World
 END_EXPECTED
+
+    'lexical.pasm'      =>  << 'END_EXPECTED',
+Storing 'a' in top lexical pad
+The lexical 'a' has in the current scope the value 1.
+
+Storing 'c' in bottom lexical pad
+The lexical 'a' has in the current scope the value 1.
+The lexical 'b' has in the current scope the value 3.
+
+Overwriting 'c' in bottom lexical pad
+The lexical 'a' has in the current scope the value 2.
+The lexical 'b' has in the current scope the value 3.
+
+Adding another stack level at bottom
+The lexical 'a' has in the current scope the value 2.
+The lexical 'b' has in the current scope the value 3.
+
+Override lexicals
+The lexical 'a' has in the current scope the value 5.
+The lexical 'b' has in the current scope the value 4.
+The lexical 'a' has in scope 1 the value 5.
+The lexical 'b' has in scope 1 the value 4.
+The lexical 'a' has in scope 0 the value 2.
+The lexical 'b' has in scope 0 the value 3.
+
+Getting rid of bottom stack
+The lexical 'a' has in the current scope the value 2.
+The lexical 'b' has in the current scope the value 3.
+END_EXPECTED
                           );
 
 # Do the testing
@@ -54,8 +83,7 @@ my %test_func = ( pasm => \&pasm_output_is,
                   pir  => \&pir_output_is,
                   imc  => \&pir_output_is );
 
-while ( my ( $example, $expected ) = each %expected )
-{
+while ( my ( $example, $expected ) = each %expected ) {
     my $code_fn   = "examples/pasm/$example";
     my $code = Parrot::Test::slurp_file($code_fn);
 
