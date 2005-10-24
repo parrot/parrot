@@ -95,15 +95,8 @@ do_panic(Interp *interpreter, const char *message,
     fprintf(stderr, "C file %s, line %d\n",
                file ? file : "(not available)", line);
 
-    if (interpreter) {
-        fprintf(stderr, "Parrot file %s, line %d\n",
-                   "(unknown)",
-                   (int)interpreter->current_line);
-    }
-    else {
-        fprintf(stderr, "Parrot file (not available), ");
-        fprintf(stderr, "line (not available)\n");
-    }
+    fprintf(stderr, "Parrot file (not available), ");
+    fprintf(stderr, "line (not available)\n");
 
     fprintf(stderr, "\n\
 We highly suggest you notify the Parrot team if you have not been working on\n\

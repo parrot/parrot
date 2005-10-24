@@ -932,7 +932,7 @@ Set the line number for which we're currently executing code.
 =cut
 
 inline op setline(in INT) {
-  interpreter->current_line = $1;
+  /* TODO: not implemented yet */
   goto NEXT();
 }
 
@@ -943,7 +943,7 @@ Get the current line number.
 =cut
 
 inline op getline(out INT) {
-  $1 = interpreter->current_line;
+  /* TODO: not implemented yet */
   goto NEXT();
 }
 

@@ -299,9 +299,6 @@ struct parrot_interp_t {
 
     struct _imc_info_t *imc_info;             /* imcc data */
 
-    size_t current_line;                      /* Which line we're executing in the
-                                               * source */
-    
     const char* output_file;                  /* The file into which output is written */
 
     PDB_t *pdb;                               /* Debug system */
