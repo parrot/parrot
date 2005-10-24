@@ -259,7 +259,7 @@ void
 parrot_PIC_prederef(Interp *interpreter, opcode_t op, void **pc_pred, int core)
 {
     op_func_t *prederef_op_func = interpreter->op_lib->op_func_table;
-    char * _reg_base = (char*)interpreter->ctx.bp;
+    char * _reg_base = (char*)interpreter->ctx.bp.regs_i;
     opcode_t *cur_opcode = (opcode_t*)pc_pred;
 
     switch (op) {

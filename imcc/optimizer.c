@@ -674,6 +674,7 @@ IMCC_subst_constants(Interp *interpreter, IMC_Unit * unit, char *name,
     const char *debug_fmt;
     int found, branched;
     parrot_context_t *ctx;
+    INTVAL regs_used[4] = {3,3,3,3};
 
 
     /* construct a FLOATVAL_FMT with needed precision */
@@ -757,7 +758,7 @@ IMCC_subst_constants(Interp *interpreter, IMC_Unit * unit, char *name,
     }
     /* preserve registers */
     ctx = CONTEXT(interpreter->ctx);
-    Parrot_alloc_context(interpreter);
+    Parrot_alloc_context(interpreter, regs_used);
 
     IMCC_debug(interpreter, DEBUG_OPT1, debug_fmt, name);
     /* we construct a parrot instruction

@@ -65,10 +65,12 @@ mark_context(Interp* interpreter, parrot_context_t* ctx)
     obj = (PObj*)ctx->current_package;
     if (obj)
         pobject_lives(interpreter, obj);
-    for (i = 0; i < NUM_REGISTERS; ++i) {
+    for (i = 0; i < ctx->n_regs_used[REGNO_PMC]; ++i) {
         obj = (PObj*) CTX_REG_PMC(ctx, i);
         if (obj)
             pobject_lives(interpreter, obj);
+    }
+    for (i = 0; i < ctx->n_regs_used[REGNO_STR]; ++i) {
         obj = (PObj*) CTX_REG_STR(ctx, i);
         if (obj)
             pobject_lives(interpreter, obj);

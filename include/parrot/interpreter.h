@@ -157,12 +157,9 @@ typedef struct _RunProfile {
 struct _imc_info_t;
 
 /*
- * Parrot registers are now accessed through interpreter->ctx.bp
- * This structure is dynamically allocated in subroutine calls
- * and restored on subroutine returns on more precisely on invokation
- * of a continuation by restoring the interpreter context.
+ * doomed helper structure
  */
-struct parrot_regs_t {
+struct _parrot_regs_t {
     struct NReg num_reg;
     struct IReg int_reg;
     struct PReg pmc_reg;
@@ -174,12 +171,18 @@ typedef union {
     STRING      **regs_s;
 } Regs_ps;
 
+typedef union {
+    FLOATVAL     *regs_n;
+    INTVAL       *regs_i;
+} Regs_ni;
+
 typedef struct Parrot_Context {
     /* common header with Interp_Context */
     struct Parrot_Context *prev;
-    struct parrot_regs_t  *bp;          /* register base pointer */
+    Regs_ni                bp;          /* pointers to FLOATVAL & INTVAL */
     Regs_ps                bp_ps;       /* pointers to PMC & STR */
     /* end common header */
+    INTVAL n_regs_used[4];	        /* INSP in PBC */
     INTVAL ref_count;                   /* how often refered to */
     struct Stack_Chunk *reg_stack;      /* register stack */
 
@@ -230,10 +233,15 @@ typedef struct _Prederef {
 } Prederef;
 
 
+/*
+ * This is an 'inlined' copy of the first 3 Context items for
+ * faster access of registers mainly
+ * During a context switch a 3 pointers are set
+ */
 struct Interp_Context {
     /* common header */
     struct Parrot_Context *state;       /* context  */
-    struct parrot_regs_t  *bp;          /* register base pointer */
+    Regs_ni                bp;          /* pointers to FLOATVAL & INTVAL */
     Regs_ps                bp_ps;       /* pointers to PMC & STR */
     /* end common header */
 };
@@ -383,17 +391,40 @@ typedef enum {
  * Macros to make accessing registers more convenient/readable.
  */
 
-#  define INTERP_REG_NUM(i, x) i->ctx.bp->num_reg.registers[x]
-#  define INTERP_REG_INT(i, x) i->ctx.bp->int_reg.registers[x]
-#  define INTERP_REG_PMC(i, x) i->ctx.bp_ps.regs_p[-32+x]
+#  define INTERP_REG_NUM(i, x) i->ctx.bp.regs_n[-1L-(x)]
+#  define INTERP_REG_INT(i, x) i->ctx.bp.regs_i[x]
+#  define INTERP_REG_PMC(i, x) i->ctx.bp_ps.regs_p[-1L-(x)]
 #  define INTERP_REG_STR(i, x) i->ctx.bp_ps.regs_s[x]
 
-#  define CTX_REG_NUM(ctx, x) (ctx)->bp->num_reg.registers[x]
-#  define CTX_REG_INT(ctx, x) (ctx)->bp->int_reg.registers[x]
-#  define CTX_REG_PMC(ctx, x) (ctx)->bp_ps.regs_p[-32+x]
+#  define CTX_REG_NUM(ctx, x) (ctx)->bp.regs_n[-1L-(x)]
+#  define CTX_REG_INT(ctx, x) (ctx)->bp.regs_i[x]
+#  define CTX_REG_PMC(ctx, x) (ctx)->bp_ps.regs_p[-1L-(x)]
 #  define CTX_REG_STR(ctx, x) (ctx)->bp_ps.regs_s[x]
+/*
+ * and a set of macros to access a register by offset, used
+ * in JIT emit prederef code
+ * The offsets are relative to interpreter->ctx.bp.
+ *
+ * Reg order in imcc/reg_alloc.c is "INSP"   TODO make defines
+ */
 
-#define REG_BASE struct parrot_regs_t
+#define REGNO_INT 0
+#define REGNO_NUM 1
+#define REGNO_STR 2
+#define REGNO_PMC 3
+
+#  define __CTX interpreter->ctx.state
+#  define _SIZEOF_INTS    (sizeof(INTVAL) * __CTX->n_regs_used[REGNO_INT])
+#  define _SIZEOF_NUMS    (sizeof(FLOATVAL) * __CTX->n_regs_used[REGNO_NUM])
+#  define _SIZEOF_PMCS    (sizeof(PMC*) * __CTX->n_regs_used[REGNO_PMC])
+#  define _SIZEOF_STRS    (sizeof(STRING*) * __CTX->n_regs_used[REGNO_STR])
+
+#  define REG_OFFS_NUM(x) (sizeof(FLOATVAL) * (-1L - (x)))
+#  define REG_OFFS_INT(x) (sizeof(INTVAL) * (x))
+#  define REG_OFFS_PMC(x) (_SIZEOF_INTS + sizeof(PMC*) * \
+        (__CTX->n_regs_used[REGNO_PMC] - 1L - x))
+#  define REG_OFFS_STR(x) (sizeof(STRING*) * (x) + _SIZEOF_INTS + _SIZEOF_PMCS )
+
 
 /*
  * same with the default name interpreter
@@ -402,19 +433,6 @@ typedef enum {
 #define REG_NUM(x) INTERP_REG_NUM(interpreter, x)
 #define REG_STR(x) INTERP_REG_STR(interpreter, x)
 #define REG_PMC(x) INTERP_REG_PMC(interpreter, x)
-
-/*
- * and a set of macros to access a register by offset, mostly used
- * in JIT emit code
- * The offsets are relative to REG_BASE, which is REG_INT(0),
- * i.e. that what interpreter->ctx.bp is pointing to.
- */
-
-
-#  define REG_OFFS_INT(x) offsetof(REG_BASE, int_reg.registers[x])
-#  define REG_OFFS_NUM(x) offsetof(REG_BASE, num_reg.registers[x])
-#  define REG_OFFS_STR(x) offsetof(REG_BASE, string_reg.registers[x])
-#  define REG_OFFS_PMC(x) offsetof(REG_BASE, pmc_reg.registers[x])
 
 #define PCONST(i) PF_CONST(interpreter->code, (i))
 #define PNCONST   PF_NCONST(interpreter->code)
@@ -451,7 +469,7 @@ Interp *make_interpreter(Interp * parent, Interp_flags);
 void Parrot_init(Interp *);
 void Parrot_destroy(Interp *);
 
-void Parrot_alloc_context(Interp *);
+void Parrot_alloc_context(Interp *, INTVAL *n_regs_used);
 void Parrot_free_context(Interp *, parrot_context_t *, int re_use);
 void Parrot_set_context_threshold(Interp *, parrot_context_t *);
 void parrot_gc_context(Interp *);

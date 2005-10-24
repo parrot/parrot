@@ -364,7 +364,7 @@ if ($suffix =~ /cgp/) {
 	asm ("jmp *4(%ebp)");	/* jump to ret addr, used by JIT */
 # endif
 #endif
-    _reg_base = (char*)interpreter->ctx.bp;
+    _reg_base = (char*)interpreter->ctx.bp.regs_i;
     goto *((void *)*cur_opcode);
 
 END_C

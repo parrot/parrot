@@ -107,7 +107,7 @@ sub goto_address
     {
         return "if ((opcode_t *) $addr == 0)
 	  return 0;
-   _reg_base = (char*)interpreter->ctx.bp;
+   _reg_base = (char*)interpreter->ctx.bp.regs_i;
    goto *((void*)*(cur_opcode = (opcode_t *)
 	opcode_to_prederef(interpreter, $addr)))";
   }
@@ -144,7 +144,7 @@ sub goto_pop
 sub run_core_func_start
 {
     return <<END_C;
-#if defined(__GNUC__) && defined(I386) && __GNUC__ < 4 
+#if defined(__GNUC__) && defined(I386) && __GNUC__ < 4
     register opcode_t *cur_opcode asm ("esi") = cur_op;
     register char *   _reg_base   asm ("edi");
 #else

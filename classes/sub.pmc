@@ -308,7 +308,7 @@ create_ctx:
              * plain subroutine call
              * create new context, place it in interpreter
              */
-            Parrot_alloc_context(INTERP);
+            Parrot_alloc_context(INTERP, sub->n_regs_used);
             context = CONTEXT(INTERP->ctx);
             /* check recursion/call depth */
             if (++context->recursion_depth >

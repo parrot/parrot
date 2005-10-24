@@ -191,23 +191,31 @@ destroy_context(Interp *interpreter)
 static void
 create_initial_context(Interp *interpreter)
 {
-    size_t to_alloc = sizeof(struct parrot_regs_t) + ALIGNED_CTX_SIZE;
-    void *p;
+    size_t to_alloc = ALIGNED_CTX_SIZE;
     parrot_context_t *ctx;
+    void *p, *ptr;
+    int i;
 
-    ctx = p = mem_sys_allocate_zeroed(to_alloc);
+    ctx = ptr = mem_sys_allocate_zeroed(to_alloc);
 #if CTX_LEAK_DEBUG
-    fprintf(stderr, "alloc %p\n", p);
+    fprintf(stderr, "alloc %p\n", ctx);
 #endif
     CONTEXT(interpreter->ctx) = ctx;
-    p = (void *) ((char *)p + ALIGNED_CTX_SIZE);
-    interpreter->ctx.bp = p;
-    interpreter->ctx.bp_ps.regs_s = (STRING**) ((char*)p +
-        offsetof(struct parrot_regs_t, string_reg.registers[0]));
+    for (i = 0; i < 4; ++i)
+        ctx->n_regs_used[i] = NUM_REGISTERS;
+    /* regs start past the context */
+    p = (void *) ((char *)ptr + ALIGNED_CTX_SIZE);
+    /* ctx.bp points to I0, which has Nx at left */
+    interpreter->ctx.bp.regs_i = (INTVAL*)((char*)p + _SIZEOF_NUMS);
+    /* this points to S0 */
+    interpreter->ctx.bp_ps.regs_s = (STRING**)((char*)p + _SIZEOF_NUMS +
+        _SIZEOF_INTS + _SIZEOF_PMCS);
     interpreter->ctx_mem.free = NULL;
-    ctx->bp = interpreter->ctx.bp;
-    ctx->bp_ps = interpreter->ctx.bp_ps;
+    ctx->bp.regs_i = interpreter->ctx.bp.regs_i;
+    ctx->bp_ps.regs_s = interpreter->ctx.bp_ps.regs_s;
     ctx->prev = NULL;
+    for (i = 0; i < 4; ++i)
+        ctx->n_regs_used[i] = 0;
 }
 
 #endif
@@ -218,7 +226,7 @@ create_initial_context(Interp *interpreter)
 
 Cleanup dead context memory. Called by the gargabe collector.
 
-=item C<void Parrot_alloc_context(Interp *)>
+=item C<void Parrot_alloc_context(Interp *, INTVAL *n_regs_used)>
 
 Allocate a new context and set the context pointer.
 
@@ -250,48 +258,54 @@ parrot_gc_context(Interp *interpreter)
 }
 
 static void
-init_context(Interp *interpreter, parrot_context_t *old_state)
+init_context(Interp *interpreter, parrot_context_t *ctx)
 {
     int i;
-    parrot_context_t *ctx;
 
-    memcpy(CONTEXT(interpreter->ctx),
-           old_state, sizeof(struct Parrot_Context));
-    CONTEXT(interpreter->ctx)->prev = old_state;
-    CONTEXT(interpreter->ctx)->ref_count = 0;
-    CONTEXT(interpreter->ctx)->current_results = NULL;
-    CONTEXT(interpreter->ctx)->current_args = NULL;
+    ctx->ref_count = 0;
+    ctx->current_results = NULL;
+    ctx->current_args = NULL;
 
     /* NULL out registers
      *
      * if the architecture has 0x := NULL and 0.0 we could memset too
-     *
      */
-    ctx = CONTEXT(interpreter->ctx);
     ctx->bp = interpreter->ctx.bp;
     ctx->bp_ps = interpreter->ctx.bp_ps;
-    for (i = 0; i < NUM_REGISTERS; i++) {
+    for (i = 0; i < ctx->n_regs_used[REGNO_PMC]; i++) {
         CTX_REG_PMC(ctx, i) = PMCNULL;
+    }
+    for (i = 0; i < ctx->n_regs_used[REGNO_STR]; i++) {
         CTX_REG_STR(ctx, i) = NULL;
+    }
 #ifndef NDEBUG
+    for (i = 0; i < ctx->n_regs_used[REGNO_INT]; i++) {
         /* depending on -D40 we set int, num to garbage or zero
          */
         if (Interp_debug_TEST(interpreter, PARROT_REG_DEBUG_FLAG)) {
             /* TODO better use rand values */
             CTX_REG_INT(ctx, i) = -999;
-            CTX_REG_NUM(ctx, i) = -99.9;
         }
         else {
             CTX_REG_INT(ctx, i) = 0;
+        }
+    }
+    for (i = 0; i < ctx->n_regs_used[REGNO_NUM]; i++) {
+        /* depending on -D40 we set int, num to garbage or zero
+         */
+        if (Interp_debug_TEST(interpreter, PARROT_REG_DEBUG_FLAG)) {
+            CTX_REG_NUM(ctx, i) = -99.9;
+        }
+        else {
             CTX_REG_NUM(ctx, i) = 0.0;
         }
-#endif
     }
+#endif
 }
 
 #if CHUNKED_CTX_MEM
 void
-Parrot_alloc_context(Interp *interpreter)
+Parrot_alloc_context(Interp *interpreter, INTVAL *n_regs_used)
 {
 
     parrot_context_t ctx;
@@ -397,33 +411,39 @@ Parrot_free_context(Interp *interpreter, parrot_context_t *ctxp, int re_use)
 
 
 void
-Parrot_alloc_context(Interp *interpreter)
+Parrot_alloc_context(Interp *interpreter, INTVAL *n_regs_used)
 {
-
-    struct Parrot_Context *old;
+    struct Parrot_Context *old, *ctx;
     void *ptr, *p;
+    int i;
 
     ptr = interpreter->ctx_mem.free;
     if (ptr) {
         interpreter->ctx_mem.free = *(void **) ptr;
     }
     else {
-        ptr = mem_sys_allocate(sizeof(struct parrot_regs_t) +
+        ptr = mem_sys_allocate(sizeof(struct _parrot_regs_t) +
                 ALIGNED_CTX_SIZE);
         *(void **) ptr = NULL;
     }
-    p = (void *) ((char *)ptr + ALIGNED_CTX_SIZE);
-    old = CONTEXT(interpreter->ctx);
-    CONTEXT(interpreter->ctx) = ptr;
 #if CTX_LEAK_DEBUG
-    fprintf(stderr, "alloc %p\n", p);
+    fprintf(stderr, "alloc %p\n", ptr);
 #endif
-    /* XXX .bp this still points to start */
-    interpreter->ctx.bp = p;
-    /* this points to S0 - currently fixed regs still */
-    interpreter->ctx.bp_ps.regs_s = (STRING**) ((char*)p +
-        offsetof(struct parrot_regs_t, string_reg.registers[0]));
-    init_context(interpreter, old);
+    old = CONTEXT(interpreter->ctx);
+    CONTEXT(interpreter->ctx) = ctx = ptr;
+    memcpy(ctx, old, sizeof(struct Parrot_Context));
+    ctx->prev = old;
+    for (i = 0; i < 4; ++i)
+        ctx->n_regs_used[i] = NUM_REGISTERS;
+    /* regs start past the context */
+    p = (void *) ((char *)ptr + ALIGNED_CTX_SIZE);
+    /* ctx.bp points to I0, which has Nx at left */
+    interpreter->ctx.bp.regs_i = (INTVAL*)((char*)p + _SIZEOF_NUMS);
+    /* this points to S0 */
+    interpreter->ctx.bp_ps.regs_s = (STRING**)((char*)p + _SIZEOF_NUMS +
+        _SIZEOF_INTS + _SIZEOF_PMCS);
+
+    init_context(interpreter, ctx);
 }
 
 void

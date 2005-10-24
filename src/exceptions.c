@@ -232,7 +232,6 @@ find_exception_handler(Interp * interpreter, PMC *exception)
              */
             PMC *sub = UVal_pmc(e->entry);
             e->cleanup = STACK_CLEANUP_NULL;
-            Parrot_alloc_context(interpreter);
             Parrot_runops_fromc_args(interpreter, sub, "vI", 1);
         }
         (void)stack_pop(interpreter, &CONTEXT(interpreter->ctx)->control_stack,

@@ -110,7 +110,7 @@ Swaps the "context".
             /*
              * first time set current sub, cont, object
              */
-            Parrot_alloc_context(INTERP);
+            Parrot_alloc_context(INTERP, co->n_regs_used);
             co->ctx = ctx = CONTEXT(INTERP->ctx);
             PMC_cont(ccont)->from_ctx = ctx;
             /*
