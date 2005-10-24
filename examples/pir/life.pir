@@ -1,23 +1,48 @@
-# Copyright (C) 2001-2003 The Perl Foundation.  All rights reserved.
+# Copyright (C) 2001-2005 The Perl Foundation.  All rights reserved.
 # $Id$
 
 =head1 NAME
 
-examples/assembly/life.pasm - Conway's Life
+examples/pir/life.pir - Conway's Life
 
 =head1 SYNOPSIS
 
-    % ./parrot examples/assembly/life.pasm
+    % ./parrot examples/pir/life.pir
 
 =head1 DESCRIPTION
 
 Runs Conway's Life cellular automata
 (L<http://ddi.cs.uni-potsdam.de/HyFISCH/Produzieren/lis_projekt/proj_gamelife/ConwayScientificAmerican.htm>).
 
+=head1 TODO
+
+Convert this into proper PIR.
+
+=head1 SEE ALSO
+
+F<examples/assembly/ncurses_life.imc>.
+
 =cut
 
+.sub 'life' :main
+        .param pmc argv
+        .local int max_generations
+
 	# First the generation count
+        I15 = argv
+        if I15 < 2 goto USE_DEFAULT_MAX_GENERATIONS
+        S5 = argv[1]
+        I2 = S5
+        print "Running "
+        print I2
+        print " generations.\n"
+        goto MAX_GENERATIONS_IS_NOW_KNOWN
+USE_DEFAULT_MAX_GENERATIONS:
+        print "Running 5000 generations by default.\n"
 	set I2, 5000
+MAX_GENERATIONS_IS_NOW_KNOWN:
+        print "\n"
+
 	# Note the time
 	time N5
 	# If true, we don't print
@@ -118,7 +143,10 @@ getout:	time N6
 # I2 is the count for that cell
 # I3 is the offset to the neighbor
 generate:
-	pushi
+	save I0
+	save I1
+	save I2
+	save I3
 	length I0, S15
 	set S1, ""
 	set I1, 0
@@ -213,36 +241,31 @@ iter_done:
 	lt I1, I0, genloop
 done:
 	set S15, S1
-	popi
+	restore I3
+	restore I2
+	restore I1
+	restore I0
 	ret
 
 # S15 has the incoming string, S0 is scratch
 dump:
 	if I12, dumpend
 	print "\f"
-	save I0
-	save I1
 	print "\n\n\n\n\n\n\n\n\n\n\n"
 	print "------------- generation "
 	print I0
 	print " -------------\n"
-	set I0, 0
-	set I1, 14
+	set I10, 0
+	set I11, 14
 printloop:
-	substr_r S0, S15, I0, 15
+	substr_r S0, S15, I10, 15
 	print S0
 	print "\n"
-	add I0, I0, 15
-	dec I1
-	ge I1, 0, printloop
-	restore I1
-	restore I0
+	add I10, I10, 15
+	dec I11
+	ge I11, 0, printloop
 	sleep 1
 dumpend:
 	ret
 
-=head1 SEE ALSO
-
-F<examples/assembly/ncurses_life.imc>.
-
-=cut
+.end
