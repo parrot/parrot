@@ -4,8 +4,6 @@ JSON.imc - PIR implementation of JSON data interchange format.
 
 =head1 SYNOPSIS
 
- ...
-
  # generate a JSON representation of a PMC.
  $S0 = _json( $P0 )
 
@@ -28,9 +26,10 @@ This library provides the following functions:
 
 =over 4
 
-=item (string) = _json(pmc, ?pretty] )
+=item (string) = _json(pmc, ?pretty )
 
-Convert a PMC to a JSON-serialized string
+Convert a PMC to a JSON-serialized string. Note: If you pass in a cyclic
+structure, JSON will eventually throw a maximum recursion depth exception.
 
 =over 4
 
@@ -337,14 +336,37 @@ done:
 .include  'library/Data/Escape.imc'
 .include  'library/Data/Sort.imc'
 
+=item (pmc) = _json_to_pmc(string)
+
+Given a JSON string, return a PMC that represents that data. 
+
+=over 4
+
+=item string
+
+Required. A JSON data string.
+
+=back
+
+=back
+
 =head1 TODO
 
 =over 4
 
-=item Hashed subentries are not entirely pretty yet.
+=item 1
 
-=item Pending a more comprehensive test suite from Roger Browne
+Hashed subentries are not entirely pretty yet.
 
-=item implement _jsan_to_pmc
+=item 2
+
+implement _jsan_to_pmc
+
+=item 3
+
+Thunk a better way to deal with the maximum recursion depth exception (Or make it official)
+
+=back
 
 =cut
+
