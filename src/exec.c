@@ -113,8 +113,8 @@ Parrot_exec(Interp *interpreter, opcode_t *pc,
     obj->text.size += (4 - obj->text.size % 4);
     obj->data.size += (4 - obj->data.size % 4);
     offset_fixup(obj);
-    output = REG_STR(0) ?
-        (const char *)REG_STR(0) : "exec_output.o";
+    output = interpreter->output_file ?
+        interpreter->output_file : "exec_output.o";
     Parrot_exec_save(obj, output);
 }
 

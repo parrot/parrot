@@ -291,7 +291,7 @@ Parrot_readbc(Interp *interpreter, const char *filename)
                         filename, errno);
             return NULL;
         }
-        fs = interpreter->current_file = string_make(interpreter, fullname,
+        fs = string_make(interpreter, fullname,
                 strlen(fullname), NULL, 0);
         if (!Parrot_stat_info_intval(interpreter, fs, STAT_EXISTS)) {
             PIO_eprintf(interpreter, "Parrot VM: Can't stat %s, code %i.\n",
@@ -494,26 +494,6 @@ setup_argv(Interp *interpreter, int argc, char ** argv)
         VTABLE_push_string(interpreter, userargv, arg);
     }
     return userargv;
-}
-
-/*
-
-=item C<void
-Parrot_setup_opt(Interp *interpreter, int n, char *argv)>
-
-XXX This allows a command line option to be visible from inside the
-Parrot core. This is done using the pointers in the interpreter
-structure, and the subsystems using this arguments must clear them
-before running.
-
-=cut
-
-*/
-
-void
-Parrot_setup_opt(Interp *interpreter, int n, char *argv)
-{
-    REG_STR(n) = (STRING *)argv;
 }
 
 /*

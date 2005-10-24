@@ -1,3 +1,5 @@
+/* $Id$ */
+
 #if !defined(PARROT_IMCC_IMC_H_GUARD)
 #define PARROT_IMCC_IMC_H_GUARD
 
@@ -195,7 +197,6 @@ typedef struct _imc_info_t {
     int IMCC_DEBUG;
     int gc_off;
     int write_pbc;
-    char* output;
     SymReg* sr_return;
     AsmState asm_state;
     int optimizer_level;

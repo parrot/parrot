@@ -101,7 +101,7 @@ pbc_merge_loadpbc(Interp *interpreter, char *fullname)
 
     /* Check the file exists. */
     STRING *fs;
-    fs = interpreter->current_file = string_make(interpreter, fullname,
+    fs = string_make(interpreter, fullname,
             strlen(fullname), NULL, 0);
     if (!Parrot_stat_info_intval(interpreter, fs, STAT_EXISTS)) {
         PIO_eprintf(interpreter, "PBC Merge: Can't stat %s, code %i.\n",

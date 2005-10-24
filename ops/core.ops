@@ -954,7 +954,7 @@ Set the name of the file for which we're currently executing code.
 =cut
 
 inline op setfile(in STR) {
-  interpreter->current_file = $1;
+  /* TODO: not implemented yet */
   goto NEXT();
 }
 
@@ -965,7 +965,7 @@ Get the name of the current file.
 =cut
 
 inline op getfile(out STR) {
-  $1 = interpreter->current_file;
+  /* TODO: not implemented yet */
   goto NEXT();
 }
 

@@ -292,14 +292,14 @@ parseflags(Parrot_Interp interp, int *argc, char **argv[])
                 break;
             case 'o':
                 run_pbc = 0;
-                IMCC_INFO(interp)->output = str_dup(opt.opt_arg);
+                interp->output_file = str_dup(opt.opt_arg);
                 break;
 
             case OPT_PBC_OUTPUT:
                 run_pbc = 0;
                 write_pbc = 1;
-                if (!IMCC_INFO(interp)->output)
-                    IMCC_INFO(interp)->output = str_dup("-");
+                if (!interp->output_file)
+                    interp->output_file = str_dup("-");
                 break;
 
             case 'O':
@@ -453,7 +453,7 @@ main(int argc, char * argv[])
     struct PackFile *pf;
     int obj_file, ast_file = 0;
     char *sourcefile;
-    char *output;
+    char *output_file;
 
     Interp *interp = Parrot_new(NULL);
 
@@ -466,7 +466,7 @@ main(int argc, char * argv[])
     IMCC_ast_init(interp);
 
     sourcefile = parseflags(interp, &argc, &argv);
-    output = IMCC_INFO(interp)->output;
+    output_file = interp->output_file;
 
     /* Default optimization level is zero; see optimizer.c, imc.h */
     if (!*optimizer_opt) {
@@ -512,9 +512,9 @@ main(int argc, char * argv[])
 
     /* Do we need to produce an output file? If so, what type? */
     obj_file = 0;
-    if (IMCC_INFO(interp)->output) {
+    if (interp->output_file) {
         char *ext;
-        ext = strrchr(IMCC_INFO(interp)->output, '.');
+        ext = strrchr(interp->output_file, '.');
         if (ext && strcmp (ext, ".pbc") == 0) {
             write_pbc = 1;
         }
@@ -524,13 +524,12 @@ main(int argc, char * argv[])
             write_pbc = 0;
             run_pbc = 1;
             obj_file = 1;
-            Parrot_setup_opt(interp, 0, output);
             Parrot_set_run_core(interp, PARROT_EXEC_CORE);
 #else
             IMCC_fatal(interp, 1, "main: can't produce object file");
 #endif
         }
-        if (!strcmp(sourcefile, output) && strcmp(sourcefile, "-"))
+        if (!strcmp(sourcefile, output_file) && strcmp(sourcefile, "-"))
             IMCC_fatal(interp, 1,
                 "main: outputfile is sourcefile\n");
     }
@@ -562,7 +561,7 @@ main(int argc, char * argv[])
         IMCC_push_parser_state(interp);
         IMCC_INFO(interp)->state->file = sourcefile;
 
-        emit_open(interp, per_pbc, per_pbc ? NULL : (void*)output);
+        emit_open(interp, per_pbc, per_pbc ? NULL : (void*)output_file);
 
         IMCC_info(interp, 1, "Starting parse...\n");
 
@@ -588,24 +587,24 @@ main(int argc, char * argv[])
         size_t size;
         opcode_t *packed;
         FILE *fp;
-        IMCC_info(interp, 1, "Writing %s\n", output);
+        IMCC_info(interp, 1, "Writing %s\n", output_file);
 
         size = PackFile_pack_size(interp, interp->code->base.pf) *
             sizeof(opcode_t);
         IMCC_info(interp, 1, "packed code %d bytes\n", size);
         packed = (opcode_t*) mem_sys_allocate(size);
         PackFile_pack(interp, interp->code->base.pf, packed);
-        if (strcmp (output, "-") == 0)
+        if (strcmp (output_file, "-") == 0)
             fp = stdout;
-        else if ((fp = fopen(output, "wb")) == 0)
+        else if ((fp = fopen(output_file, "wb")) == 0)
             IMCC_fatal(interp, E_IOError,
-                "Couldn't open %s\n", output);
+                "Couldn't open %s\n", output_file);
 
         if ((1 != fwrite(packed, size, 1, fp)) )
             IMCC_fatal(interp, E_IOError,
-                "Couldn't write %s\n", output);
+                "Couldn't write %s\n", output_file);
         fclose(fp);
-        IMCC_info(interp, 1, "%s written.\n", output);
+        IMCC_info(interp, 1, "%s written.\n", output_file);
         free(packed);
         /* TODO */
         if (run_pbc != 2)
@@ -613,9 +612,9 @@ main(int argc, char * argv[])
     }
 
     /* If necessary, load the file written above */
-    if (run_pbc == 2 && write_pbc && strcmp(output, "-")) {
-        IMCC_info(interp, 1, "Loading %s\n", output);
-        pf = Parrot_readbc(interp, output);
+    if (run_pbc == 2 && write_pbc && strcmp(output_file, "-")) {
+        IMCC_info(interp, 1, "Loading %s\n", output_file);
+        pf = Parrot_readbc(interp, output_file);
         if (!pf)
             IMCC_fatal(interp, 1,
             "Packfile loading failed\n");
@@ -635,7 +634,7 @@ main(int argc, char * argv[])
             Parrot_unblock_GC(interp);
         }
         if (obj_file)
-            IMCC_info(interp, 1, "Writing %s\n", output);
+            IMCC_info(interp, 1, "Writing %s\n", output_file);
         else
             IMCC_info(interp, 1, "Running...\n");
         if (!load_pbc)
@@ -646,8 +645,8 @@ main(int argc, char * argv[])
 
     /* Clean-up after ourselves */
     Parrot_destroy(interp);
-    if (output)
-        free(output);
+    if (output_file)
+        free(output_file);
     mem_sys_free(IMCC_INFO(interp));
     Parrot_exit(0);
 

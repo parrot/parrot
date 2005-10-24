@@ -97,9 +97,7 @@ do_panic(Interp *interpreter, const char *message,
 
     if (interpreter) {
         fprintf(stderr, "Parrot file %s, line %d\n",
-                   interpreter->current_file &&
-                   interpreter->current_file->strstart ?
-                   (char *)interpreter->current_file->strstart : "(null)",
+                   "(unknown)",
                    (int)interpreter->current_line);
     }
     else {

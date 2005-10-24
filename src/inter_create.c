@@ -589,8 +589,6 @@ make_interpreter(Parrot_Interp parent, Interp_flags flags)
     SET_NULL_P(interpreter->save_func_table, op_func_t *);
 
     /* Set up defaults for line/package/file */
-    interpreter->current_file =
-        string_make(interpreter, "(unknown file)", 14, NULL, 0);
     CONTEXT(interpreter->ctx)->current_package =
         string_make(interpreter, "(unknown package)", 18, NULL, 0);
 

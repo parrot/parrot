@@ -30,10 +30,10 @@ typedef enum {
     PARROT_THR_COPY_INTERP  = 0x2000, /* thread start copies interp state */
     PARROT_THR_THREAD_POOL  = 0x4000, /* type3 threads */
 
-    PARROT_THR_TYPE_1 = PARROT_IS_THREAD,
-    PARROT_THR_TYPE_2 = PARROT_IS_THREAD | PARROT_THR_COPY_INTERP,
-    PARROT_THR_TYPE_3 = PARROT_IS_THREAD | PARROT_THR_COPY_INTERP |
-                        PARROT_THR_THREAD_POOL
+    PARROT_THR_TYPE_1       = PARROT_IS_THREAD,
+    PARROT_THR_TYPE_2       = PARROT_IS_THREAD | PARROT_THR_COPY_INTERP,
+    PARROT_THR_TYPE_3       = PARROT_IS_THREAD | PARROT_THR_COPY_INTERP |
+                              PARROT_THR_THREAD_POOL
 
 } Parrot_Interp_flag;
 /* &end_gen */
@@ -251,88 +251,110 @@ typedef struct _context_mem {
  */
 struct parrot_interp_t {
     struct Interp_Context ctx;
-    context_mem ctx_mem;                /* ctx memory managment */
+    context_mem ctx_mem;                      /* ctx memory managment */
 
-    struct Stash *globals;              /* Pointer to the global variable
-                                         * area */
-    struct Arenas *arena_base;          /* Pointer to this interpreter's
-                                         * arena */
-    PMC *class_hash;                    /* Hash of classes */
-    struct _ParrotIOData *piodata;              /* interpreter's IO system */
+    struct Stash *globals;                    /* Pointer to the global variable
+                                               * area */
+    
+    struct Arenas *arena_base;                /* Pointer to this interpreter's
+                                               * arena */
+    
+    PMC *class_hash;                          /* Hash of classes */
+    
+    struct _ParrotIOData *piodata;            /* interpreter's IO system */
 
-    op_lib_t  *op_lib;                  /* Opcode library */
-    size_t     op_count;                /* The number of ops */
-    op_info_t *op_info_table; /* Opcode info table (name, nargs, arg types) */
+    op_lib_t  *op_lib;                        /* Opcode library */
+    size_t     op_count;                      /* The number of ops */
+    op_info_t *op_info_table;                 /* Opcode info table (name, nargs, arg types) */
 
-    op_func_t *op_func_table;   /* opcode dispatch table (functios, labels,
-                                   or nothing (e.g. switched core), which
-                                   the interpreter is currently running */
-    op_func_t *evc_func_table;  /* opcode dispatch for event checking */
-    op_func_t *save_func_table; /* for restoring op_func_table */
+    op_func_t *op_func_table;                 /* opcode dispatch table (functios, labels,
+                                               * or nothing (e.g. switched core), which
+                                               * the interpreter is currently running */
+    op_func_t *evc_func_table;                /* opcode dispatch for event checking */
+    op_func_t *save_func_table;               /* for restoring op_func_table */
 
-    int         n_libs;                  /* count of libs below */
-    op_lib_t  **all_op_libs;             /* all loaded opcode libraries */
+    int         n_libs;                       /* count of libs below */
+    op_lib_t  **all_op_libs;                  /* all loaded opcode libraries */
 
 /* XXX kwoo:  Is this for future, or is it safe to remove? */
 #if 0
     str_func_t *string_funcs;
 #endif
 
-    Interp_flags flags;         /* Various interpreter flags that */
-    UINTVAL debug_flags;        /* debug settings */
-    Run_Cores run_core;         /* type of core to run the ops */
+    Interp_flags flags;                       /* Various interpreter flags that */
+
+    UINTVAL debug_flags;                      /* debug settings */
+
+    Run_Cores run_core;                       /* type of core to run the ops */
 
     /* TODO profile per code segment or global */
-    RunProfile *profile;        /* The structure and array where we keep the
-                                 * profile counters */
+    RunProfile *profile;                      /* The structure and array where we keep the
+                                               * profile counters */
+
     INTVAL resume_flag;
     size_t resume_offset;
 
-    struct PackFile_ByteCode  *code;      /* The code we are executing */
-    struct PackFile *initial_pf;   /* first created PF */
+    struct PackFile_ByteCode *code;           /* The code we are executing */
+    struct PackFile *initial_pf;              /* first created PF  */
 
-    struct _imc_info_t *imc_info;   /* imcc data */
-    size_t current_line;        /* Which line we're executing in the
-                                 * source */
-    String *current_file;       /* The file we're currently in */
+    struct _imc_info_t *imc_info;             /* imcc data */
 
+    size_t current_line;                      /* Which line we're executing in the
+                                               * source */
+    
+    const char* output_file;                  /* The file into which output is written */
 
-    PDB_t *pdb;                 /* Debug system */
-    void *lo_var_ptr;           /* Pointer to memory on runops system stack */
+    PDB_t *pdb;                               /* Debug system */
+
+    void *lo_var_ptr;                         /* Pointer to memory on runops system stack */
+
     Interp * parent_interpreter;
 
     /* per interpreter global vars */
-    INTVAL world_inited;        /* Parrot_init is done */
-    PMC *iglobals;              /* SArray of PMCs, containing: */
-/* 0:   PMC *Parrot_base_classname_hash; hash containing name->base_type */
-/* 1:   PMC *Parrot_compreg_hash;    hash containing assembler/compilers */
-/* 2:   PMC *Argv;                   list of argv */
-/* 3:   PMC *NCI func hash           hash of NCI funcs */
-/* 4:   PMC *ParrotInterpreter       that's me */
-/* 5:   PMC *Dyn_libs           Array of dynamically loaded ParrotLibrary  */
-    PMC* DOD_registry;          /* registered PMCs added to the root set */
-    PMC* HLL_info;              /* storage for HLL names and types */
-    MMD_table *binop_mmd_funcs; /* Table of MMD functions */
-    UINTVAL n_binop_mmd_funcs;   /* function count */
-    struct _Caches * caches;            /* s. caches.h */
-    STRING **const_cstring_table;       /* CONST_STRING(x) items */
-    struct QUEUE* task_queue;           /* per interpreter queue */
-    int sleeping;                       /* used during sleep in events */
-    struct parrot_exception_t *exceptions; /* internal exception stack */
+    INTVAL world_inited;                      /* Parrot_init is done */
+
+    PMC *iglobals;                            /* SArray of PMCs, containing: */
+    /* 0:   PMC *Parrot_base_classname_hash; hash containing name->base_type */
+    /* 1:   PMC *Parrot_compreg_hash;    hash containing assembler/compilers */
+    /* 2:   PMC *Argv;                   list of argv */
+    /* 3:   PMC *NCI func hash           hash of NCI funcs */
+    /* 4:   PMC *ParrotInterpreter       that's me */
+    /* 5:   PMC *Dyn_libs           Array of dynamically loaded ParrotLibrary  */
+
+    PMC* DOD_registry;                        /* registered PMCs added to the root set */
+
+    PMC* HLL_info;                            /* storage for HLL names and types */
+
+    MMD_table *binop_mmd_funcs;               /* Table of MMD functions */
+    UINTVAL n_binop_mmd_funcs;                /* function count */
+
+    struct _Caches * caches;                  /* s. caches.h */
+
+    STRING **const_cstring_table;             /* CONST_STRING(x) items */
+
+    struct QUEUE* task_queue;                 /* per interpreter queue */
+
+    int sleeping;                             /* used during sleep in events */
+
+    struct parrot_exception_t *exceptions;    /* internal exception stack */
     struct parrot_exception_t *exc_free_list; /* and free list */
-    PMC ** exception_list;              /* precreated exception objects */
-    struct _Thread_data *thread_data;   /* thread specific items */
-    UINTVAL recursion_limit;    /* Sub call resursion limit */
-    UINTVAL gc_generation;      /* GC generation number */
-    opcode_t *current_args;      /* ptr into code with set_args opcode */
-    opcode_t *current_params;   /* ptr into code with get_params opcode */
-    opcode_t *current_returns;   /* ptr into code with get_returns opcode */
+    PMC ** exception_list;                    /* precreated exception objects */
+
+    struct _Thread_data *thread_data;         /* thread specific items */
+
+    UINTVAL recursion_limit;                  /* Sub call resursion limit */
+
+    UINTVAL gc_generation;                    /* GC generation number */
+
+    opcode_t *current_args;                   /* ptr into code with set_args opcode */
+    opcode_t *current_params;                 /* ptr into code with get_params opcode */
+    opcode_t *current_returns;                /* ptr into code with get_returns opcode */
     /* during a call sequencer the caller fills these objects
      * inside the invoke these get moved to the context structure
      */
-    PMC *current_cont;          /* the return continuation PMC */
-    PMC *current_object;        /* current object if a method call */
-    STRING *current_method;     /* name of method */
+    PMC *current_cont;                        /* the return continuation PMC */
+    PMC *current_object;                      /* current object if a method call */
+    STRING *current_method;                   /* name of method */
 };
 
 /* typedef struct parrot_interp_t Interp;    done in parrot.h so that

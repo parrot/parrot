@@ -248,7 +248,7 @@ static void
 Parrot_jit_debug_stabs(Interp *interpreter)
 {
     Parrot_jit_info_t *jit_info = interpreter->jit_info;
-    STRING *file = interpreter->current_file;
+    STRING *file = NULL;
     STRING *pasmfile, *stabsfile, *ofile, *cmd;
     FILE *stabs;
     size_t i;
