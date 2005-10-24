@@ -18,7 +18,7 @@ Tests JSON->Parrot and Parrot->JSON conversions.
 
 use strict;
 
-use Parrot::Test tests => 18;
+use Parrot::Test tests => 22;
 use Test::More;
 
 # no. 1
@@ -548,3 +548,82 @@ null
 null
 null
 OUT
+
+SKIP: {
+skip('_json_to_pmc: Not implemented',4);
+
+# no. 19
+pir_output_is(<<'CODE', <<'OUT', 'Decode JSON empty string');
+
+.sub test :main
+    $P0 = _json_to_pmc( '""' )
+    $S0 = typeof $P0
+    print $S0
+    print "\n"
+
+    $S0 = $P0
+    print $S0
+    print "\n"
+
+.end
+.include 'library/JSON.imc'
+CODE
+String
+
+OUT
+
+# no. 20
+pir_output_is(<<'CODE', <<'OUT', 'Decode JSON null');
+
+.sub test :main
+    $P0 = _json_to_pmc( 'null' )
+    if_null $P0, ok
+
+    print "not "
+ok:
+    print "ok\n"
+.end
+.include 'library/JSON.imc'
+CODE
+ok
+OUT
+
+# no. 21
+pir_output_is(<<'CODE', <<'OUT', 'Decode JSON true');
+
+.sub test :main
+    $P0 = _json_to_pmc( 'true' )
+    $S0 = typeof $P0
+    print $S0
+    print "\n"
+
+    $S0 = $P0
+    print $S0
+    print "\n"
+.end
+.include 'library/JSON.imc'
+CODE
+.Boolean
+1
+OUT
+
+# no. 22
+pir_output_is(<<'CODE', <<'OUT', 'Decode JSON false');
+
+.sub test :main
+    $P0 = _json_to_pmc( 'false' )
+    $S0 = typeof $P0
+    print $S0
+    print "\n"
+
+    $S0 = $P0
+    print $S0
+    print "\n"
+.end
+.include 'library/JSON.imc'
+CODE
+.Boolean
+0
+OUT
+
+}
