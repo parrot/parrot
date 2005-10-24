@@ -204,20 +204,23 @@ plain:
   .local string result
 
   result = '['
+  .local int len
+  len = thing
 
   unless pretty goto pre_loop
   unless indent goto pre_loop
  
   $S0 = repeat _json_prefix, indent
   result = $S0 . result
+  if len goto pre_loop
   result .= "\n"
 
 pre_loop:
   inc indent
-  .local int pos,len
+  .local int pos
   pos = 0
-  len = thing
   unless pretty goto loop
+  if len == 0 goto done_loop
   result .= "\n"
 
 loop:
@@ -240,8 +243,10 @@ done_loop:
   optional_indent = ''
 
   unless pretty goto done
+  if len == 0 goto indent1
   optional_newline = "\n"
 
+indent1:
   unless indent goto done
   optional_indent = repeat _json_prefix, indent
 
@@ -251,12 +256,16 @@ done:
   result .= ']'
 
   .return (result)
+
 .end
 
 .sub '_json_hash'
   .param pmc thing
   .param int pretty
   .param int indent
+
+  .local int not_empty
+  not_empty = thing
 
   .local pmc keys
   keys = new .ResizablePMCArray
@@ -286,27 +295,49 @@ done_iter:
  
   $S0 = repeat _json_prefix, indent
   result = $S0 . result
+  if not_empty goto pre_loop
   result .= "\n"
 
 pre_loop:
   inc indent
-  .local int pos,len
+  .local int pos
   pos = 0
-  len = thing
   unless pretty goto loop
+  unless not_empty goto done_loop
   result .= "\n"
 
 loop:
-  if pos >= len goto done_loop
+  if pos >= not_empty goto done_loop
   key = keys[pos]
   $S0 = _json_string(key,pretty,indent)
   result .= $S0
   result .= separator
   $P1 = thing[key]
   $S0 = _json_any($P1,pretty,indent)
+
+  # remove any leading whitespace on the value's string.
+  unless pretty goto space_loop_skip
+ 
+  .local int space_pos,space_len
+  space_pos = 0
+  space_len = length $S0
+ 
+space_loop:
+  if space_pos >= space_len goto space_loop_done
+  $I0 = ord $S0, space_pos
+  if $I0 != 32 goto space_loop_done 
+
+  inc space_pos
+  goto space_loop
+
+space_loop_done:
+  $S0 = substr $S0, space_pos
+
+space_loop_skip:
+
   result .= $S0
   inc pos
-  if pos == len goto loop
+  if pos == not_empty goto loop
   result .= ","
   unless pretty goto loop
   result .= "\n"
@@ -320,8 +351,10 @@ done_loop:
   optional_indent = ''
 
   unless pretty goto done
+  unless not_empty goto indent1
   optional_newline = "\n"
 
+indent1:
   unless indent goto done
   optional_indent = repeat _json_prefix, indent
 
@@ -338,7 +371,7 @@ done:
 
 =item (pmc) = _json_to_pmc(string)
 
-Given a JSON string, return a PMC that represents that data. 
+Given a JSON string, return a PMC that represents that data. The
 
 =over 4
 
@@ -348,6 +381,9 @@ Required. A JSON data string.
 
 =back
 
+The following PMCs are used when unmarshalling a JSON string:
+ResizablePMCArray, Hash, String, Integer, Float, Boolean, Null.
+
 =back
 
 =head1 TODO
@@ -356,13 +392,10 @@ Required. A JSON data string.
 
 =item 1
 
-Hashed subentries are not entirely pretty yet.
+implement _jsan_to_pmc - Jerry Gay was rolling some PGE to do the
+heavy lifting here.
 
 =item 2
-
-implement _jsan_to_pmc
-
-=item 3
 
 Thunk a better way to deal with the maximum recursion depth exception (Or make it official)
 

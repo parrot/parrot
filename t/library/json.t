@@ -286,9 +286,6 @@ CODE
 ]
 OUT
 
-TODO: {
-  local $TODO = 'Formatting not properly implemented yet';
-
 # no. 11
 pir_output_is(<<'CODE', <<'OUT', 'Create JSON of hash');
 
@@ -298,7 +295,7 @@ pir_output_is(<<'CODE', <<'OUT', 'Create JSON of hash');
     new hash, .Hash
     hash["alpha"] = 29
     hash["beta"] = "B"
-    hash["gamma"] = 3.0
+    hash["gamma"] = 3.1
     hash["delta"] = "DELTA"
 
     $S0 = _json( hash, 1 )
@@ -307,14 +304,12 @@ pir_output_is(<<'CODE', <<'OUT', 'Create JSON of hash');
 .include 'library/JSON.imc'
 CODE
 {
-  "alpha": 29,
-  "beta": "B",
-  "delta": "DELTA",
-  "gamma": 3.0
+  "alpha" : 29,
+  "beta" : "B",
+  "delta" : "DELTA",
+  "gamma" : 3.1
 }
 OUT
-
-}
 
 # no. 12
 pir_output_is(<<'CODE', <<'OUT', 'Create non-pretty JSON of hash');
@@ -325,7 +320,7 @@ pir_output_is(<<'CODE', <<'OUT', 'Create non-pretty JSON of hash');
     new hash, .Hash
     hash["alpha"] = 29
     hash["beta"] = "B"
-    hash["gamma"] = 3.0
+    hash["gamma"] = 3.1
     hash["delta"] = "DELTA"
 
     $S0 = _json( hash, 0 )
@@ -334,11 +329,8 @@ pir_output_is(<<'CODE', <<'OUT', 'Create non-pretty JSON of hash');
 .end
 .include 'library/JSON.imc'
 CODE
-{"alpha":29,"beta":"B","delta":"DELTA","gamma":3}
+{"alpha":29,"beta":"B","delta":"DELTA","gamma":3.1}
 OUT
-
-TODO: {
-  local $TODO = 'Formatting not properly implemented yet';
 
 # no. 13
 pir_output_is(<<'CODE', <<'OUT', 'Create JSON of nested structure including PerlArray and empties');
@@ -374,25 +366,22 @@ pir_output_is(<<'CODE', <<'OUT', 'Create JSON of nested structure including Perl
 .include 'library/JSON.imc'
 CODE
 {
-  "population": 1234567890,
-  "some_country":
+  "population" : 1234567890,
+  "some_country" : [
     [
-      [
-        {
-          "Perl": "Highway",
-          "Python": "Grove",
-          "Ruby": "Lane"
-        },
-        {
-        }
-      ],
-      [
-      ]
+      {
+        "Perl" : "Highway",
+        "Python" : "Grove",
+        "Ruby" : "Lane"
+      },
+      {
+      }
+    ],
+    [
     ]
+  ]
 }
 OUT
-
-}
 
 # no. 14
 pir_output_is(<<'CODE', <<'OUT', 'Create non-pretty JSON of nested structure');
