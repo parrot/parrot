@@ -29,9 +29,10 @@ dispatches these to one or all interpreters.
 /*
  * not yet - need to sort out platform code and fix exceptions first
  * TODO get some config for POSIX compliant
+ * TODO create API for extenders like ponie - events disabled for now
  */
 #if defined(linux) || defined(darwin)
-#  define INSTALL_EVENT_HANDLER 1
+#  define INSTALL_EVENT_HANDLER 0
 #else
 #  define INSTALL_EVENT_HANDLER 0
 #endif

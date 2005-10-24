@@ -33,7 +33,8 @@ my %platforms = map {$_=>1} qw/
 /;
 
 if ($platforms{$^O}) {
-    plan tests => 3;
+    #plan tests => 3;
+    plan skip_all => 'Signals currently diabled';
 }
 else {
     plan skip_all => 'No events yet';
