@@ -422,7 +422,7 @@ typedef enum {
 #  define REG_OFFS_NUM(x) (sizeof(FLOATVAL) * (-1L - (x)))
 #  define REG_OFFS_INT(x) (sizeof(INTVAL) * (x))
 #  define REG_OFFS_PMC(x) (_SIZEOF_INTS + sizeof(PMC*) * \
-        (__CTX->n_regs_used[REGNO_PMC] - 1L - x))
+        (__CTX->n_regs_used[REGNO_PMC] - 1L - (x)))
 #  define REG_OFFS_STR(x) (sizeof(STRING*) * (x) + _SIZEOF_INTS + _SIZEOF_PMCS )
 
 
