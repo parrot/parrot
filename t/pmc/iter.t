@@ -17,7 +17,7 @@ Tests the C<Iterator> PMC.
 
 =cut
 
-use Parrot::Test tests => 41;
+use Parrot::Test tests => 42;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "new iter");
@@ -1341,4 +1341,53 @@ CODE
 abcdef
 OUTPUT
 
+TODO: {
+  local $TODO = "adding keys during iteration";
+
+pir_output_is(<< 'CODE', << 'OUTPUT', "adding keys during iteration");
+.sub main :main
+    .local pmc h, it, ar
+    .local string k
+    .local int i,v
+
+    h = new .Hash
+    i = 0
+lp1:
+    $I0 = i + 65
+    k = chr $I0
+    h[k] = i
+    inc i
+    if i < 10 goto lp1
+  
+    it = iter h
+    ar = new ResizablePMCArray
+    i = 20
+lp2:
+    unless it goto ex
+    k = shift it
+    v = h[k]
+    push ar, v
+    if i == 29 goto no_add
+    $I0 = i + 65
+    k = chr $I0
+    h[k] = i
+    inc i
+no_add:
+    goto lp2
+ex:
+    ar."sort"()
+    i = elements ar
+lp3:
+    dec i
+    v = ar[i]
+    print v
+    print "_"
+    if i goto lp3
+    print "\n"
+.end
+# or some such output
+CODE
+29_28_27_26_25_24_23_22_21_20_9_8_7_6_5_4_3_2_1_0_
+OUTPUT
+}    
 
