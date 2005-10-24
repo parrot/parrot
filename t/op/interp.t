@@ -17,7 +17,7 @@ C<interpinfo> opcode.
 
 =cut
 
-use Parrot::Test tests => 11;
+use Parrot::Test tests => 7;
 
 output_is(<<'CODE', <<'OUTPUT', "runinterp - new style");
 	new P0, .ParrotInterpreter
@@ -118,131 +118,6 @@ output_is(<<'CODE', <<'OUTPUT', "check_events");
 CODE
 before
 after
-OUTPUT
-
-output_is(<<'CODE', <<'OUTPUT', "clone and runinterp");
-    set I0, 1
-    set S0, " interp\n"
-    new P0, .String
-    set P0, "from "
-
-    getinterp P2
-    clone P3, P2
-    print "ok 1\n"
-    runinterp P3, _foo
-    print P0
-    print I0
-    print S0
-    end
-
-_foo:
-    set I0, 2
-    set S0, " clone\n"
-    set P0, "hello from "
-    print P0
-    print I0
-    print S0
-    end
-CODE
-ok 1
-hello from 2 clone
-from 1 interp
-OUTPUT
-
-output_is(<<'CODE', <<'OUTPUT', "clone and invoke interp");
-    set I0, 1
-    set S0, " interp\n"
-    new P0, .String
-    set P0, "from "
-
-    getinterp P2
-    clone P3, P2
-    print "ok 1\n"
-    set_addr P3, _foo
-    invokecc P3
-    print P0
-    print I0
-    print S0
-    end
-
-_foo:
-    set I0, 2
-    set S0, " clone\n"
-    set P0, "hello from "
-    print P0
-    print I0
-    print S0
-    end
-CODE
-ok 1
-hello from 2 clone
-from 1 interp
-OUTPUT
-
-output_is(<<'CODE', <<'OUTPUT', "clone and invoke interp - sweep");
-    set I0, 1
-    set S0, " interp\n"
-    new P0, .String
-    set P0, "from "
-
-    getinterp P2
-    clone P3, P2
-    print "ok 1\n"
-    set_addr P3, _foo
-    invokecc P3
-    print P0
-    print I0
-    print S0
-    end
-
-_foo:
-    set I0, 2
-    set S0, " clone\n"
-    set P0, "hello from "
-    print P0
-    print I0
-    print S0
-    sweep 1
-    print P0
-    print I0
-    print S0
-    end
-CODE
-ok 1
-hello from 2 clone
-hello from 2 clone
-from 1 interp
-OUTPUT
-
-output_is(<<'CODE', <<'OUTPUT', "clone and invoke interp - ret via invoke");
-    set I0, 1
-    set S0, " interp\n"
-    new P0, .String
-    set P0, "from "
-
-    getinterp P2
-    clone P3, P2
-    print "ok 1\n"
-    set_addr P3, _foo
-    invokecc P3
-cont:
-    print P0
-    print I0
-    print S0
-    end
-
-_foo:
-    set I0, 2
-    set S0, " clone\n"
-    set P0, "hello from "
-    print P0
-    print I0
-    print S0
-    returncc
-CODE
-ok 1
-hello from 2 clone
-from 1 interp
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "interpinfo lexpad");
