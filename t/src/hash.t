@@ -417,53 +417,46 @@ CODE
 42
 OUTPUT
 
-SKIP: {
-  skip("changed this useless dump format", 1);
-c_output_like($main . <<'CODE', <<'OUTPUT', "dump_hash");
+c_output_is($main . <<'CODE', <<'OUTPUT', "hash iteration");
 
 static opcode_t*
 the_test(Interp *interpreter,
 	opcode_t *cur_op, opcode_t *start)
 {
-    Hash *hash;
-    STRING *key;
-    HashEntry value;
+    PMC *hash, *iter;
+    STRING *k;
+    INTVAL b, v;
 
     UNUSED(cur_op);
     UNUSED(start);
 
-    new_hash(interpreter, &hash);
+    hash = pmc_new(interpreter, enum_class_Hash);
 
-    if ( hash == NULL ) {
-	PIO_eprintf(interpreter, "hash creation failed\n");
-	exit_value = 1;
-	return NULL;
+    k    = const_string(interpreter, "a");
+    VTABLE_set_integer_keyed_str(interpreter, hash, k, 10);
+
+    k    = const_string(interpreter, "b");
+    VTABLE_set_integer_keyed_str(interpreter, hash, k, 20);
+
+    k    = const_string(interpreter, "c");
+    VTABLE_set_integer_keyed_str(interpreter, hash, k, 30);
+
+    iter = VTABLE_get_iter(interpreter, hash);
+
+    for (;;) {
+	b = VTABLE_get_bool(interpreter, iter);
+	if (!b)
+	    break;
+	k = VTABLE_shift_string(interpreter, iter);
+	v = VTABLE_get_integer_keyed_str(interpreter, hash, k);
+	/* a few keys are in add order */
+	PIO_eprintf(interpreter, "%vd", v);
     }
-
-    key = string_from_cstring(interpreter, "fortytwo", 0);
-    value.type = enum_hash_int;
-    UVal_int(value.val) = 42;
-    hash_put(interpreter, hash, key, &value);
-
-    key = string_from_cstring(interpreter, "twocents", 0);
-    value.type = enum_hash_num;
-    UVal_num(value.val) = 0.02;
-    hash_put(interpreter, hash, key, &value);
-
-    key = string_from_cstring(interpreter, "blurb", 0);
-    value.type = enum_hash_string;
-    UVal_str(value.val) = key;
-    hash_put(interpreter, hash, key, &value);
-
-    dump_hash(interpreter, hash);
-
+    PIO_eprintf(interpreter, "\nok\n");
     return NULL;
 }
 
 CODE
-/Hashtable\[3\/16\]
-  Bucket \d+: \([0-9a-f]*\)
-  Bucket \d+: \([0-9a-f]*\) -> \([0-9a-f]*\)
-  Bucket \d+: \(0\) -> \(0\) -> \(0\) -> \(0\) -> \(0\) -> \(0\) -> \(0\) -> \(0\) -> \(0\)/
+102030
+ok
 OUTPUT
-}
