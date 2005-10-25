@@ -19,7 +19,7 @@ Tests the Hash functions.
 
 =cut
 
-use Parrot::Test tests => 10;
+use Parrot::Test tests => 11;
 
 my $main = <<'CODE';
 #include <parrot/parrot.h>
@@ -417,7 +417,7 @@ CODE
 42
 OUTPUT
 
-c_output_is($main . <<'CODE', <<'OUTPUT', "hash iteration");
+my $code_setup = <<'CODE';
 
 static opcode_t*
 the_test(Interp *interpreter,
@@ -432,14 +432,9 @@ the_test(Interp *interpreter,
 
     hash = pmc_new(interpreter, enum_class_Hash);
 
-    k    = const_string(interpreter, "a");
-    VTABLE_set_integer_keyed_str(interpreter, hash, k, 10);
+CODE
 
-    k    = const_string(interpreter, "b");
-    VTABLE_set_integer_keyed_str(interpreter, hash, k, 20);
-
-    k    = const_string(interpreter, "c");
-    VTABLE_set_integer_keyed_str(interpreter, hash, k, 30);
+my $code_loop_top = <<'CODE';
 
     iter = VTABLE_get_iter(interpreter, hash);
 
@@ -450,13 +445,39 @@ the_test(Interp *interpreter,
 	k = VTABLE_shift_string(interpreter, iter);
 	v = VTABLE_get_integer_keyed_str(interpreter, hash, k);
 	/* a few keys are in add order */
-	PIO_eprintf(interpreter, "%vd", v);
+
+CODE
+
+my $code_loop_end = <<'CODE';
+
     }
     PIO_eprintf(interpreter, "\nok\n");
     return NULL;
 }
 
 CODE
+
+c_output_is($main . $code_setup . <<'CODE1' . $code_loop_top . <<'CODE2' . $code_loop_end, <<'OUTPUT', "hash iteration");
+
+    k    = const_string(interpreter, "a");
+    VTABLE_set_integer_keyed_str(interpreter, hash, k, 10);
+
+    k    = const_string(interpreter, "b");
+    VTABLE_set_integer_keyed_str(interpreter, hash, k, 20);
+
+    k    = const_string(interpreter, "c");
+    VTABLE_set_integer_keyed_str(interpreter, hash, k, 30);
+
+CODE1
+	PIO_eprintf(interpreter, "%vd", v);
+CODE2
 102030
+ok
+OUTPUT
+
+c_output_is($main . $code_setup . $code_loop_top . <<'CODE2' . $code_loop_end, <<'OUTPUT', "hash iteration on empty hash");
+	PIO_eprintf(interpreter, "%p,%vd", k, v);
+CODE2
+
 ok
 OUTPUT
