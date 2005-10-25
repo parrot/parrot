@@ -2343,7 +2343,7 @@ Unescapes the specified C string. These sequences are covered:
   \x{h..h}    1..8 hex digits
   \uhhhh      4 hex digits
   \Uhhhhhhhh  8 hex digits
-  \a, \b, \t, \n, \v, \f, \r, \e, \?
+  \a, \b, \t, \n, \v, \f, \r, \e
 
 =cut
 

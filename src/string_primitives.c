@@ -169,9 +169,9 @@ string_unescape_one(Interp *interpreter, UINTVAL *offset,
     UINTVAL len = string_length(interpreter, string);
     /* Well, not right now */
     codepoint = CHARSET_GET_BYTE(interpreter, string, *offset);
+    ++*offset;
     switch (codepoint) {
         case 'x':
-            ++*offset;
             codepoint = CHARSET_GET_BYTE(interpreter, string, *offset);
             if (codepoint >= '0' && codepoint <= '9') {
                 workchar = codepoint - '0';
@@ -226,7 +226,6 @@ string_unescape_one(Interp *interpreter, UINTVAL *offset,
             ++*offset;
             return workchar;
         case 'c':
-            ++*offset;
             codepoint = CHARSET_GET_BYTE(interpreter, string, *offset);
             if (codepoint >= 'A' && codepoint <= 'Z') {
                 workchar = codepoint - 'A' + 1;
@@ -236,7 +235,6 @@ string_unescape_one(Interp *interpreter, UINTVAL *offset,
             ++*offset;
             return workchar;
         case 'u':
-            ++*offset;
             workchar = 0;
             for (charcount = 0; charcount < 4; charcount++) {
                 if (*offset < len) {
@@ -260,7 +258,6 @@ string_unescape_one(Interp *interpreter, UINTVAL *offset,
             }
             return workchar;
         case 'U':
-            ++*offset;
             workchar = 0;
             for (charcount = 0; charcount < 8; charcount++) {
                 if (*offset < len) {
@@ -283,8 +280,6 @@ string_unescape_one(Interp *interpreter, UINTVAL *offset,
                 ++*offset;
             }
             return workchar;
-        case 'b':
-            internal_exception(UNIMPLEMENTED, "Illegal escape sequence in ");
         case '0':
         case '1':
         case '2':
@@ -294,7 +289,6 @@ string_unescape_one(Interp *interpreter, UINTVAL *offset,
         case '6':
         case '7':
             workchar = codepoint - '0';
-            ++*offset;
             if (*offset < len) {
                 workchar *= 8;
                 codepoint = CHARSET_GET_BYTE(interpreter, string, *offset);
@@ -321,35 +315,28 @@ string_unescape_one(Interp *interpreter, UINTVAL *offset,
             ++*offset;
             return workchar;
         case 'a':
-            ++*offset;
             return 7; /* bell */
+        case 'b':
+            return 8; /* bs */
         case 't':
-            ++*offset;
             return 9;
         case 'n':
-            ++*offset;
             return 10;
         case 'v':
-            ++*offset;
             return 11;
         case 'f':
-            ++*offset;
             return 12;
         case 'r':
-            ++*offset;
             return 13;
         case 'e':
-            ++*offset;
             return 27;
         case 92:
-            ++*offset;
             return 92;
         case '"':
-            ++*offset;
             return '"';
     }
 
-    return 0;
+    return codepoint;  /* any not special return the char */ 
 }
 
 /*

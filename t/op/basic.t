@@ -18,7 +18,7 @@ Tests basic string and branching operations.
 
 use strict;
 
-use Parrot::Test tests => 22;
+use Parrot::Test tests => 23;
 
 # It would be very embarrassing if these didnt work...
 output_is(<<'CODE', '', "noop, end");
@@ -58,6 +58,11 @@ CODE
 
 output_is(<<'CODE', q(Parrot flies), "print string with embedded hex escape");
        print "Parrot\x20flies"
+       end
+CODE
+
+output_is(<<'CODE', q(Parrot flies), "escaped non-special");
+       print "Parrot fl\ies"
        end
 CODE
 
