@@ -38,12 +38,18 @@ Restore all the registers from the register stack.
 
 inline op saveall() :base_core {
   Parrot_push_regs(interpreter);
-  goto NEXT();
+  /* these 2 opcodes change the register base pointer
+   * restart NEXT() reloads cached base pointers, and works with
+   * arbitrary branch opcodes too. While it's a bit of overkill,
+   * we don't have an opcode annotation to reload just the base pointers
+   * TODO OPTIMIZE later
+   */
+  restart NEXT();
 }
 
 inline op restoreall() :base_core {
   Parrot_pop_regs(interpreter);
-  goto NEXT();
+  restart NEXT();
 }
 
 =back
