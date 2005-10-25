@@ -14,7 +14,6 @@
 #define PARROT_REGISTER_H_GUARD
 
 #include "parrot/string.h"
-#include "parrot/enums.h"
 
 struct IReg {
     INTVAL registers[NUM_REGISTERS];
@@ -33,6 +32,14 @@ struct PReg {
 };
 
 struct Stack_Chunk;
+
+void Parrot_push_regs(Interp *);
+void Parrot_pop_regs(Interp *);
+
+void Parrot_clear_i(Interp *);
+void Parrot_clear_s(Interp *);
+void Parrot_clear_p(Interp *);
+void Parrot_clear_n(Interp *);
 
 void setup_register_stacks(Interp*);
 void mark_register_stack(Interp* interpreter,

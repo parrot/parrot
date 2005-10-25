@@ -258,7 +258,6 @@ typedef void (*funcptr_t)(void);
 #include "parrot/vtable.h"
 #include "parrot/stacks.h"
 #include "parrot/register.h"
-#include "parrot/regfuncs.h"
 #include "parrot/exceptions.h"
 #include "parrot/warnings.h"
 #include "parrot/memory.h"

@@ -21,10 +21,6 @@ to the previous values and the allocated register memory is discarded.
 
 =head2 Functions
 
-Note that the API header for this file is F<include/parrot/regfuncs.h>
-not F<include/parrot/register.h> - that contains the various registers
-and register frame stacks.
-
 =over 4
 
 =cut
@@ -55,7 +51,7 @@ Restore all registers from register stack.
 typedef struct {
     Regs_ni  old_bp_ni;   /* restoreall just resets ptrs */
     Regs_ps  old_bp_ps;
-    Regs_ps  bp_ps;       /* pushed regs need DOD marking */ 
+    Regs_ps  bp_ps;       /* pushed regs need DOD marking */
     INTVAL   n_regs_pmc;
     INTVAL   n_regs_str;
 } save_regs_t;
@@ -90,9 +86,9 @@ Parrot_push_regs(Interp *interpreter)
     size_nisp = size_nis + _SIZEOF_PMCS;
     ptr = mem_sys_allocate(size_nisp);
     memcpy(ptr, (char*)ctx->bp.regs_i - _SIZEOF_NUMS, size_nisp);
-    save_r->bp_ps.regs_s = (void*) ((char*) ptr + size_nis); 
-    interpreter->ctx.bp.regs_i = ctx->bp.regs_i = 
-        (void*) ((char*) ptr + _SIZEOF_NUMS); 
+    save_r->bp_ps.regs_s = (void*) ((char*) ptr + size_nis);
+    interpreter->ctx.bp.regs_i = ctx->bp.regs_i =
+        (void*) ((char*) ptr + _SIZEOF_NUMS);
     interpreter->ctx.bp_ps = ctx->bp_ps = save_r->bp_ps;
     chunk = *chunk_p;
     PObj_bufstart(chunk) = ptr;
@@ -197,50 +193,11 @@ Parrot_clear_n(Interp *interpreter)
 
 /*
 
-=item C<void
-Parrot_push_on_stack(void *thing, INTVAL size, INTVAL type)>
-
-Unimplemented at present.
-
-=cut
-
-*/
-
-void
-Parrot_push_on_stack(void *thing, INTVAL size, INTVAL type)
-{
-    UNUSED(thing);
-    UNUSED(size);
-    UNUSED(type);
-}
-
-/*
-
-=item C<void
-Parrot_pop_off_stack(void *thing, INTVAL type)>
-
-Unimplemented at present.
-
-=cut
-
-*/
-
-void
-Parrot_pop_off_stack(void *thing, INTVAL type)
-{
-    UNUSED(thing);
-    UNUSED(type);
-}
-
-
-/*
-
 =back
 
 =head1 SEE ALSO
 
-F<include/parrot/register.h>, F<include/parrot/regfuncs.h>, and
-F<src/stack_common.c>
+F<include/parrot/register.h> and F<src/stack_common.c>
 
 =cut
 
