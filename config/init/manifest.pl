@@ -23,7 +23,7 @@ $description="Checking MANIFEST...";
 @args=qw(nomanicheck);
 
 sub runstep {
-  return if $_[0];
+  $Configure::Step::result = 'skipped' and return if $_[0];
 
   my(@missing)=manicheck();
 
