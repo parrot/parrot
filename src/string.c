@@ -2395,8 +2395,6 @@ string_unescape_cstring(Interp * interpreter,
             r = (Parrot_UInt4)((unsigned char*)result->strstart)[offs];
             /* There cannot be any NULs within this string.  */
             assert(r != '\0');
-            /* It's also a logic bug if we encounter the delimiter.  */
-            assert(r != (Parrot_UInt4)delimiter);
             if (r == '\\') {
                 ++offs;
                 r = string_unescape_one(interpreter, &offs, result);

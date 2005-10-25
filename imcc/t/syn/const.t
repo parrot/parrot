@@ -439,9 +439,6 @@ CODE
 /^Null PMC.*:11\)$/s
 OUT
 
-TODO: {
-  local $TODO = "double quoted strings aren't working correctly in heredocs";
-
 pir_output_is(<<'CODE', <<'OUT', "PIR heredoc: double quoted strings");
 .sub main :main
   $S0 = <<"HEREDOC"
@@ -453,8 +450,6 @@ HEREDOC
 CODE
 print "hello"
 OUT
-
-}
 
 ## remember to change the number of tests!
 BEGIN { plan tests => 24; }
