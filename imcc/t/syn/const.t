@@ -498,5 +498,33 @@ CODE
 OUT
 
 
+pir_output_is(<<'CODE', <<'OUT', "PIR heredoc: escaped characters, escaped quotes, starting quotes");
+.sub test :main
+	.local string test
+
+	test = <<"TEST"
+{ \{ \\{
+w \w \\w
+" \" \\"
+{ \{ \\{
+w \w \\w
+" \" \\"
+{ \{ \\{
+w \w \\w
+TEST
+	print test
+.end
+CODE
+{ { \{
+w w \w
+" " \"
+{ { \{
+w w \w
+" " \"
+{ { \{
+w w \w
+OUT
+
+
 ## remember to change the number of tests!
-BEGIN { plan tests => 28; }
+BEGIN { plan tests => 29; }
