@@ -590,10 +590,9 @@ Returns the PMC value for the element at C<*key>.
         PMC *key =  pmc_new(INTERP, enum_class_Key);
         PMC_struct_val(iter) = key;
         PObj_get_FLAGS(key) |= KEY_hash_iterator_FLAGS;
-        PMC_int_val(key) = 0;
         PMC_data(key) = (void *)INITBucketIndex;
-        if (!hash_size(INTERP, PMC_struct_val(SELF)))
-            PMC_int_val(key) = -1;
+        /* -1 for an empty hash, 0 for a non-empty hash.  */
+        PMC_int_val(key) = hash_size(INTERP, PMC_struct_val(SELF)) ? 0 : -1;
         return iter;
     }
 
