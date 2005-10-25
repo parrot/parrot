@@ -454,8 +454,6 @@ print "hello"
 OUT
 
 
-TODO: {
-    local $TODO = 'lines starting with a double quote are broken';
 pir_output_is(<<'CODE', <<'OUT', "PIR heredoc: double quotes - two in a row");
 .sub main :main
     print <<"QUOTES"
@@ -476,7 +474,6 @@ QUOTES
 CODE
 "anything"
 OUT
-}
 
 
 pir_output_is(<<'CODE', <<'OUT', "PIR heredoc: double quotes - two in a row prefaced by anything");

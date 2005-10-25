@@ -132,6 +132,41 @@ SP              [ ]
             return 0;
         }
 
+<heredoc>{EOL} {
+        /* heredocs have highest priority
+         * arrange them befor all wildcard state matches
+         */
+
+        /* Newline in the heredoc. Realloc and cat on. */
+        ++line;
+        heredoc_content = mem_sys_realloc(heredoc_content,
+                                          strlen(heredoc_content) +
+                                          strlen(yytext) + 2);
+        strcpy(heredoc_content + strlen(heredoc_content), yytext);
+    }
+
+<heredoc>.* {
+        /* Are we at the end of the heredoc? */
+        if (strcmp(heredoc_end, yytext) == 0)
+        {
+            /* End of the heredoc. */
+            strcpy(heredoc_content + strlen(heredoc_content), "\"");
+            mem_sys_free(heredoc_end);
+            BEGIN(prev_state);
+            valp->s = heredoc_content;
+            return(STRINGC); /* XXX delete quotes, -> emit, pbc */
+        }
+        else
+        {
+            /* Part of the heredoc. Realloc and cat the line on. */
+            heredoc_content = mem_sys_realloc(heredoc_content,
+                                              strlen(heredoc_content) +
+                                              strlen(yytext) + 2);
+            strcpy(heredoc_content + strlen(heredoc_content), yytext);
+        }
+    }
+
+
 <*>^"#line"{SP}{DIGITS}{SP}["] { prev_state = YYSTATE; BEGIN(cmt2);
                        valp->t = atoi(yytext+6);
                        return LINECOMMENT;
@@ -327,7 +362,7 @@ SP              [ ]
     return MACRO;
     }
 
-<*>".include" {
+<emit,INITIAL>".include" {
         int c;
 
     c = yylex(valp, interp);
@@ -449,36 +484,6 @@ SP              [ ]
         strcpy(heredoc_content, "\"");
         prev_state = YYSTATE;
         BEGIN(heredoc);
-    }
-
-<heredoc>{EOL} {
-        /* Newline in the heredoc. Realloc and cat on. */
-        ++line;
-        heredoc_content = mem_sys_realloc(heredoc_content,
-                                          strlen(heredoc_content) +
-                                          strlen(yytext) + 2);
-        strcpy(heredoc_content + strlen(heredoc_content), yytext);
-    }
-
-<heredoc>.* {
-        /* Are we at the end of the heredoc? */
-        if (strcmp(heredoc_end, yytext) == 0)
-        {
-            /* End of the heredoc. */
-            strcpy(heredoc_content + strlen(heredoc_content), "\"");
-            mem_sys_free(heredoc_end);
-            BEGIN(prev_state);
-            valp->s = heredoc_content;
-            return(STRINGC); /* XXX delete quotes, -> emit, pbc */
-        }
-        else
-        {
-            /* Part of the heredoc. Realloc and cat the line on. */
-            heredoc_content = mem_sys_realloc(heredoc_content,
-                                              strlen(heredoc_content) +
-                                              strlen(yytext) + 2);
-            strcpy(heredoc_content + strlen(heredoc_content), yytext);
-        }
     }
 
 <*>{UNICODE} {
