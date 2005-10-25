@@ -36,7 +36,7 @@ void
 mark_context(Interp* interpreter, parrot_context_t* ctx)
 {
     PObj *obj;
-    int i, n;
+    int i;
 
     mark_stack(interpreter, ctx->pad_stack);
     mark_stack(interpreter, ctx->user_stack);

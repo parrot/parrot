@@ -462,10 +462,7 @@ static PMC*
 setup_argv(Interp *interpreter, int argc, char ** argv)
 {
     INTVAL i;
-    PMC *userargv, *sig_arr, *class, *cont;
-    STRING *signature;
-    static opcode_t opcodes[3];
-    int const_nr;
+    PMC *userargv;
 
     if (Interp_debug_TEST(interpreter, PARROT_START_DEBUG_FLAG)) {
         PIO_eprintf(interpreter,

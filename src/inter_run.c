@@ -144,7 +144,6 @@ runops_args(Parrot_Interp interpreter, PMC *sub, PMC *obj,
     opcode_t offset, *dest;
     parrot_context_t *ctx;
     parrot_context_t *old_ctx;
-    int i;
     /*
      * FIXME argument count limited - check strlen of sig
      */

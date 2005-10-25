@@ -744,7 +744,6 @@ Initializes the C<*info> lists.
 static void
 todo_list_init(Parrot_Interp interpreter, visit_info *info)
 {
-    Hash *hash;
     info->visit_pmc_now = visit_todo_list;
     info->visit_pmc_later = add_pmc_todo_list;
     /* we must use PMCs here, so that they get marked properly */

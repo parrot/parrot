@@ -449,7 +449,6 @@ Parrot_alloc_context(Interp *interpreter, INTVAL *n_regs_used)
 void
 Parrot_free_context(Interp *interpreter, parrot_context_t *ctxp, int re_use)
 {
-    struct Parrot_Context *free_list;
     void *ptr;
 
     /*

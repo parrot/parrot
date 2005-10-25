@@ -275,9 +275,7 @@ hash_thaw(Interp *interpreter, Hash *hash, visit_info* info)
 static void
 hash_freeze(Interp *interpreter, Hash *hash, visit_info* info)
 {
-    size_t i, n;
-    STRING *s_key;
-    INTVAL i_key;
+    size_t i;
     IMAGE_IO *io = info->image_io;
     HashBucket *b;
 

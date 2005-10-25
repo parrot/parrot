@@ -63,7 +63,6 @@ Parrot_exec(Interp *interpreter, opcode_t *pc,
 #ifdef JIT_CGP
     int i, j *k;
 #endif
-    char *nptr;
     const char *output;
     long bhs;
     Parrot_exec_objfile_t *obj;

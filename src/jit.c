@@ -1297,7 +1297,10 @@ build_asm(Interp *interpreter, opcode_t *pc,
     opcode_t cur_opcode_byte, *cur_op;
     Parrot_jit_optimizer_section_ptr cur_section;
     struct PackFile_Segment *jit_seg;
-    char *name;
+    /* XXX
+     * no longer referenced due to disabled code below
+    char *name; 
+    */
     char *map;
     Parrot_jit_fn_info_t *op_func;
 #if EXEC_CAPABLE
