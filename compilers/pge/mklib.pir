@@ -33,7 +33,7 @@ file.
     load = find_global "PGE::Rule", "__onload"
     load()
     p6rule = find_global "PGE", "p6rule"
-    $S0 = ":w ( (grammar) ([\w|\:]+) ; | (rule) (\w+) \{(<-[}]>+)\} | (\#)\N* )*"
+    $S0 = ':w ( (grammar) ([\w|\:]+) ; | (rule) (\w+) \{(<-[}]>+)\} | (\#)\N* )*'
     (gparse, code) = p6rule($S0)
     grammar = "PGE::Rule"
 
