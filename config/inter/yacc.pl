@@ -31,7 +31,7 @@ sub runstep {
     Configure::Data->set(bison_version => undef);
 
     unless ($args{maintainer}) {
-        Configure::Data->set( $util => $^O eq 'Win32' ? 'REM' : 'echo' );
+        Configure::Data->set( $util => 'echo' );
         $Configure::Step::result = 'skipped';
         return undef;
     }

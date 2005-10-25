@@ -35,7 +35,7 @@ sub runstep {
   # Try each alternative, until one works.
   # If none work, then set to null command.
   # XXX need config support for a null command.
-  my $null = $^O eq 'Win32' ? 'REM' : 'echo';
+  my $null = 'echo';
   my $first_working = sub {
     foreach (@_) {
       `$_ -h 2>&1`;
