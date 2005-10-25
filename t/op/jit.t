@@ -100,6 +100,7 @@ CODE
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "add_i_i_i 1 mapped");
+cleari
 set I0,0
 set I1,1
 set I2,2
@@ -160,6 +161,7 @@ CODE
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "add_i_i_i 0 mapped");
+cleari
 set I0,0
 set I1,1
 set I2,2
@@ -254,6 +256,7 @@ CODE
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "sub_i_i_i 1 mapped");
+cleari
 set I0,0
 set I1,1
 set I2,2
@@ -314,6 +317,7 @@ CODE
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "sub_i_i_i 0 mapped");
+cleari
 set I0,0
 set I1,1
 set I2,2
@@ -408,6 +412,7 @@ CODE
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "mul_i_i_i 1 mapped");
+cleari
 set I0,0
 set I1,1
 set I2,2
@@ -468,6 +473,7 @@ CODE
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "mul_i_i_i 0 mapped");
+cleari
 set I0,0
 set I1,1
 set I2,2
@@ -545,6 +551,7 @@ CODE
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "mul_i_i 0 mapped");
+cleari
 set I0,0
 set I1,1
 set I2,2
@@ -638,6 +645,7 @@ CODE
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "div_i_i_i 1 mapped");
+cleari
 set I0,0
 set I1,1
 set I2,2
@@ -698,6 +706,7 @@ CODE
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "div_i_i_i 0 mapped");
+cleari
 set I0,0
 set I1,1
 set I2,2
