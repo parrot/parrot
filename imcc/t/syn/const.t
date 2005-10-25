@@ -9,19 +9,19 @@ use vars qw($TODO);
 pir_output_is(<<'CODE', <<'OUT', "globalconst 1");
 
 .sub 'main' :main
-	.globalconst int N = 5
-	bsr _main
+    .globalconst int N = 5
+    bsr _main
 .end
 
 .sub '_sub1'
-	print N
-	print "\n"
-	ret
+    print N
+    print "\n"
+    ret
 .end
 
 .sub '_main'
-	bsr _sub1
-	ret
+    bsr _sub1
+    ret
 .end
 CODE
 5
@@ -29,21 +29,21 @@ OUT
 
 pir_output_is(<<'CODE', <<'OUT', "globalconst 2");
 .sub 'test' :main
-	.globalconst int N = 5
-	bsr _main
+    .globalconst int N = 5
+    bsr _main
 .end
 
 .sub '_sub1'
-	.local int x
-	x = 10 + N
-	print x
-	print "\n"
-	ret
+    .local int x
+    x = 10 + N
+    print x
+    print "\n"
+    ret
 .end
 
 .sub '_main'
-	bsr _sub1
-	ret
+    bsr _sub1
+    ret
 .end
 CODE
 15
@@ -422,6 +422,7 @@ CODE
 The line above is empty.
 OUT
 
+
 pir_output_like(<<'CODE', <<'OUT', "PIR heredoc: line numbers");
 .sub main :main
     .local string s
@@ -439,6 +440,7 @@ CODE
 /^Null PMC.*:11\)$/s
 OUT
 
+
 pir_output_is(<<'CODE', <<'OUT', "PIR heredoc: double quoted strings");
 .sub main :main
   $S0 = <<"HEREDOC"
@@ -451,5 +453,53 @@ CODE
 print "hello"
 OUT
 
+
+TODO: {
+    local $TODO = 'lines starting with a double quote are broken';
+pir_output_is(<<'CODE', <<'OUT', "PIR heredoc: double quotes - two in a row");
+.sub main :main
+    print <<"QUOTES"
+""
+QUOTES
+.end
+CODE
+""
+OUT
+
+
+pir_output_is(<<'CODE', <<'OUT', "PIR heredoc: double quotes - with anything between");
+.sub main :main
+    print <<"QUOTES"
+"anything"
+QUOTES
+.end
+CODE
+"anything"
+OUT
+}
+
+
+pir_output_is(<<'CODE', <<'OUT', "PIR heredoc: double quotes - two in a row prefaced by anything");
+.sub main :main
+    print <<"QUOTES"
+anything""
+QUOTES
+.end
+CODE
+anything""
+OUT
+
+
+pir_output_is(<<'CODE', <<'OUT', "PIR heredoc: double quotes - escaped with anything between");
+.sub main :main
+    print <<"QUOTES"
+\"anything\"
+QUOTES
+.end
+CODE
+"anything"
+OUT
+
+
 ## remember to change the number of tests!
-BEGIN { plan tests => 24; }
+BEGIN { plan tests => 28; }
