@@ -30,21 +30,19 @@ in order to enable the conversion of data in the B<JSON> format to a B<PMC>.
 
 	json_grammar = <<"JSON_GRAMMAR"
 grammar JSON;
-rule object { \{ <members>? \} }
-rule members { <string> \: <value> [ \, <string> \: <value> ]* }
-rule array { \[ <elements>? \] }
-rule elements { <value> [ \, <value> ]* }
+rule object { \\{ <members>? \\} }
+rule members { <string> \\: <value> [ \\, <string> \\: <value> ]* }
+rule array { \\[ <elements>? \\] }
+rule elements { <value> [ \\, <value> ]* }
 rule value { <string> | <number> | <object> | <array> | true | false | null }
-rule string { \" <char>* \" }
-rule char { \w | \" | \\ | \/ | \010 | \\u \x{4} }
+rule string { \\" <char>* \\" }
+rule char { \\w | \\" | \\ | \\/ | \\010 | \\014 | <cntrl> | \\u <xdigit>**{4} }
 rule number { <int> <frac>? <exp>? } 
-rule int { \-? \d+ }
-rule frac { \. \d+ }
-rule exp { <e> \d+ }
-rule e { e | e\+ | e\- | E | E\+ | E\- }
+rule int { \\-? \d+ }
+rule frac { \\. \d+ }
+rule exp { <e> \\d+ }
+rule e :i { e <[\\-+]>? }
 JSON_GRAMMAR
-# this rule isn't working properly -----v------v----v----v
-#rule char { \w | \" | \\ | \/ | \010 | \014 | \n | \r | \t | \\u \x{4} }
 
 	rules = p6rule_compile( json_grammar )
 	store_global 'rules', rules
