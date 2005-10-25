@@ -4,6 +4,7 @@
 
 use strict;
 use Parrot::Test;
+use vars qw($TODO);
 
 pir_output_is(<<'CODE', <<'OUT', "globalconst 1");
 
@@ -438,6 +439,22 @@ CODE
 /^Null PMC.*:11\)$/s
 OUT
 
+TODO: {
+  local $TODO = "double quoted strings aren't working correctly in heredocs";
+
+pir_output_is(<<'CODE', <<'OUT', "PIR heredoc: double quoted strings");
+.sub main :main
+  $S0 = <<"HEREDOC"
+print "hello"
+HEREDOC
+  print $S0
+  end
+.end
+CODE
+print "hello"
+OUT
+
+}
 
 ## remember to change the number of tests!
-BEGIN { plan tests => 23; }
+BEGIN { plan tests => 24; }
