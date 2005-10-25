@@ -447,7 +447,6 @@ encodings/utf8.h                                  []
 examples/README                                   [main]doc
 examples/assembly/acorn.l                         [main]doc
 examples/assembly/hello-dwim.imc                  [main]doc
-examples/assembly/local_label.pasm                [main]doc
 examples/assembly/mandel.pasm                     [main]doc
 examples/assembly/mops.pasm                       [main]doc
 examples/assembly/mops_p.pasm                     [main]doc
@@ -599,6 +598,7 @@ examples/pir/euclid.pir                           [main]doc
 examples/pir/hanoi.pir                            [main]doc
 examples/pir/io.pir                               [main]doc
 examples/pir/life.pir                             [main]doc
+examples/pir/local_label.pir                      [main]doc
 examples/pir/mandel.pir                           [main]doc
 examples/pir/sudoku.pir                           [main]doc
 examples/pni/PQt.C                                [main]doc
