@@ -518,8 +518,8 @@ INS(Interp *interpreter, IMC_Unit * unit, char *name,
     }
     if (op < 0) {
         IMCC_fataly(interpreter, E_SyntaxError,
-            "op not found '%s' (%s<%d>)\n",
-                fullname, name, n);
+            "The opcode '%s' (%s<%d>) was not found. Check the type and number of the arguments",
+            fullname, name, n);
     }
     op_info = &interpreter->op_info_table[op];
 
