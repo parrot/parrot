@@ -448,7 +448,6 @@ encodings/utf8.h                                  []
 examples/README                                   [main]doc
 examples/assembly/acorn.l                         [main]doc
 examples/assembly/hello-dwim.imc                  [main]doc
-examples/assembly/mandel.pasm                     [main]doc
 examples/assembly/mops.pasm                       [main]doc
 examples/assembly/mops_p.pasm                     [main]doc
 examples/assembly/nanoforth.pasm                  [main]doc
