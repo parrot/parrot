@@ -11,13 +11,15 @@ method to add operator tokens into the table:
 
     .local pmc optable, digit
     $I0 = find_type "PGE::OPTable"
+    optable = new $I0 
+
     digit = find_global "PGE::Rule", "digit"
-    optable."addtok"(" infix:+", "PGE::Match")
-    optable."addtok"(" infix:-", "PGE::Match", "infix:+")
-    optable."addtok"(" infix:*", "PGE::Match", ">infix:+")
-    optable."addtok"(" infix:/", "PGE::Match", "infix:*")
-    optable."addtok"(" term:", digit, ">infix:*")
-    optable."addtok"(" circumfix:( )", "PGE::Match", "term:")
+    optable."addtok"("infix:+")
+    optable."addtok"("infix:-", "infix:+")
+    optable."addtok"("infix:*", ">infix:+")
+    optable."addtok"("infix:/", "infix:*")
+    optable."addtok"("term:", ">infix:*", digit)
+    optable."addtok"("circumfix:( )", "term:")
 
 The C<parse> method can then be used to obtain a Match object
 representing the parse of a string:
@@ -39,13 +41,15 @@ subroutine that calls the parser:
 
 .namespace [ "PGE::OPTable" ]
 
-.const int PGE_OPTABLE_CLOSE = 0
+.const int PGE_OPTABLE_EMPTY = 0
 .const int PGE_OPTABLE_TERM = 1
 .const int PGE_OPTABLE_POSTFIX = 2
-.const int PGE_OPTABLE_PREFIX = 3
-.const int PGE_OPTABLE_INFIX = 4
-.const int PGE_OPTABLE_CIRCUMFIX = 5
-.const int PGE_OPTABLE_POSTCIRCUMFIX = 6
+.const int PGE_OPTABLE_CLOSE = 3
+.const int PGE_OPTABLE_PREFIX = 4
+.const int PGE_OPTABLE_INFIX = 5
+.const int PGE_OPTABLE_TERNARY = 6
+.const int PGE_OPTABLE_POSTCIRCUMFIX = 7
+.const int PGE_OPTABLE_CIRCUMFIX = 8
 
 .include "cclass.pasm"
 
@@ -53,7 +57,7 @@ subroutine that calls the parser:
 
 =item C<__onload()>
 
-Creates the PGE::OPTable and PGE::Op classes.
+Creates the PGE::OPTable class.
 
 =cut
 
@@ -65,8 +69,6 @@ Creates the PGE::OPTable and PGE::Op classes.
     addattribute base, "%:opertable"
     addattribute base, "%:wstermtable"
     addattribute base, "%:wsopertable"
-    $P0 = getclass "PGE::Match"
-    $P0 = subclass $P0, "PGE::Op"
 .end
 
 =item C<__init()>
@@ -91,7 +93,7 @@ Initializes a PGE::OPTable object.
 
 =head2 Methods
 
-=item C<addtok(STR name, PMC match, STR rel, STR opts)>
+=item C<addtok(STR name [, STR rel [, PMC match [, STR opts]]])>
 
 Adds a new token to the operator precedence table.  Operators are
 named as strings representing the syntactic category of the operator
@@ -99,31 +101,34 @@ and the operator token(s).  Available syntactic categories include
 "infix:", "prefix:", "postfix:", "term:", "circumfix:", and
 "postcircumfix:".  
 
+The C<rel> argument specifies the precedence of the new operator
+relative to an existing operator, with a leading "<" or ">" indicating
+looser or tighter precedence.
+
 The C<match> argument is either a string identifying the class of 
 Match object to create for this operator, or a (rule) subroutine 
 to be called that will parse the complete token and return an 
-appropriate match object.  
+appropriate match object.  The default for C<match> is "PGE::Match".
 
-The C<rel> argument specifies the precedence of this operator 
-relative to another operator, with a leading ">" or "<" used to indicate
-tighter or looser precedence.  Finally, the C<opts> parameter
-can be used to indicate the associativity of the operator ("left" or 
-"right").
+Finally, the C<opts> parameter can be used to indicate
+the associativity of the operator ("left" or "right") and whether
+the token disallows leading whitespace ("nows").
 
 =cut
 
 .sub "addtok" :method
     .param string name
-    .param pmc match
     .param string rel          :optional
     .param int has_rel         :opt_flag
+    .param pmc match           :optional
+    .param int has_match       :opt_flag
     .param string opts         :optional
     .param int has_opts        :opt_flag
     .local string equiv, syncat
     .local pmc toktable, termtable, wstermtable, opertable, wsopertable
     .local pmc tok
     .local string tok1, tok2
-    .local int isws
+    .local int nows
 
     toktable = getattribute self, "PGE::OPTable\x0%:toktable"
     termtable = getattribute self, "PGE::OPTable\x0%:termtable"
@@ -131,32 +136,35 @@ can be used to indicate the associativity of the operator ("left" or
     wstermtable = getattribute self, "PGE::OPTable\x0%:wstermtable"
     wsopertable = getattribute self, "PGE::OPTable\x0%:wsopertable"
 
-    if has_opts goto addtok_1
+    if has_opts goto set_equiv
     opts = "left"
-  addtok_1:
+    if has_match goto set_equiv
+    match = new String
+    match = "PGE::Match"
+
+  set_equiv:
     equiv = "="
-    if has_rel == 0 goto addtok_2
+    if has_rel == 0 goto set_nows
     $S0 = substr rel, 0, 1
     $I0 = index "=<>", $S0
-    if $I0 == -1 goto addtok_3
+    if $I0 == -1 goto set_equiv_1
     $S1 = substr rel, 1
     $P0 = toktable[$S1]
     equiv = $P0['equiv']
     equiv = clone equiv
     substr equiv, -1, 0, $S0
-    goto addtok_2
-  addtok_3:
+    goto set_nows
+  set_equiv_1:
     $P0 = toktable[rel]
     equiv = $P0['equiv']
 
-  addtok_2:
-    isws = 0
-    $S0 = substr name, 0, 1
-    if $S0 != " " goto addtok_4
-    isws = 1
-    name = substr name, 1
+  set_nows:
+    nows = 0
+    $I0 = index opts, "nows"
+    if $I0 < 0 goto addtok_1
+    nows = 1
 
-  addtok_4:
+  addtok_1:
     tok = new Hash
     tok["name"] = name
     tok["opts"] = opts
@@ -168,7 +176,7 @@ can be used to indicate the associativity of the operator ("left" or
     syncat = substr name, 0, $I0
     tok1 = substr name, $I0
     $I0 = index tok1, " "
-    if $I0 < 0 goto addtok_5
+    if $I0 < 0 goto addtok_2
     $I1 = $I0 + 1
     tok2 = substr tok1, $I1
     tok1 = substr tok1, 0, $I0
@@ -177,7 +185,7 @@ can be used to indicate the associativity of the operator ("left" or
     $P0["syncat"] = PGE_OPTABLE_CLOSE
     opertable[tok2] = $P0
     wsopertable[tok2] = $P0
-  addtok_5:
+  addtok_2:
     tok["tok1"] = tok1
     toktable[name] = tok
     if syncat == "infix:" goto infix
@@ -185,6 +193,7 @@ can be used to indicate the associativity of the operator ("left" or
     if syncat == "circumfix:" goto circumfix
     if syncat == "prefix:" goto prefix
     if syncat == "postcircumfix:" goto postcircumfix
+    if syncat == "ternary:" goto ternary
   term:
     tok["syncat"] = PGE_OPTABLE_TERM
     goto expect_term
@@ -205,14 +214,18 @@ can be used to indicate the associativity of the operator ("left" or
     tok["syncat"] = PGE_OPTABLE_POSTCIRCUMFIX
     tok["arity"] = 2
     goto expect_op
+  ternary:
+    tok["syncat"] = PGE_OPTABLE_TERNARY
+    tok["arity"] = 3
+    goto expect_op
   expect_term:
     termtable[tok1] = tok 
-    if isws == 0 goto end
+    if nows goto end
     wstermtable[tok1] = tok 
     goto end
   expect_op:
     opertable[tok1] = tok 
-    if isws == 0 goto end
+    if nows goto end
     wsopertable[tok1] = tok
   end:
 .end
@@ -232,6 +245,7 @@ representing the result of the parse.
     .local pmc termtable, opertable, wstermtable, wsopertable
     .local pmc oper
     .local pmc tok, match, top
+    .local int tokcat, topcat
     .local pmc termstack, operstack, tokstack
     .local int arity
     .local pmc args
@@ -266,8 +280,8 @@ representing the result of the parse.
     bsr tok_match
     unless oper goto term_error
     $P0 = tok["syncat"]
-    if $P0 == PGE_OPTABLE_PREFIX goto oper_shift
-    if $P0 == PGE_OPTABLE_CIRCUMFIX goto oper_shift
+    if $P0 == PGE_OPTABLE_PREFIX goto oper_shift               # (S1)
+    if $P0 == PGE_OPTABLE_CIRCUMFIX goto oper_shift            # (S2, P2)
     push termstack, oper
     pos = oper.to()
     
@@ -278,37 +292,52 @@ representing the result of the parse.
     $P0 = opertable
   expect_oper_1:
     key = $P0."lkey"(target, wspos)
-    if key == "" goto end
+    $I0 = exists $P0[key]
+    if $I0 == 0 goto end
     tok = $P0[key]
     bsr tok_match
     unless oper goto end
+    tokcat = tok["syncat"]
   expect_oper_2:
+    topcat = PGE_OPTABLE_EMPTY
     $I0 = elements tokstack
-    if $I0 < 1 goto oper_shift
+    if $I0 > 0 goto expect_oper_3
+    if tokcat == PGE_OPTABLE_CLOSE goto end                    # (E3)
+    goto oper_shift                                            # (S3)
+  expect_oper_3:
     top = tokstack[-1]
-    $P0 = top["syncat"]
-    if $P0 <= PGE_OPTABLE_POSTFIX goto oper_reduce
-    if $P0 >= PGE_OPTABLE_CIRCUMFIX goto oper_shift
-    $P0 = tok["syncat"]
-    if $P0 == PGE_OPTABLE_CLOSE goto oper_reduce
-    $P0 = tok["equiv"]
+    topcat = top["syncat"]
+    if topcat == PGE_OPTABLE_POSTFIX goto oper_reduce          # (R4)
+    if tokcat == PGE_OPTABLE_CLOSE goto oper_close             # (R5, C5)
+    if topcat >= PGE_OPTABLE_POSTCIRCUMFIX goto oper_shift     # (S6)
+    $P0 = tok["equiv"]                                         
     $P1 = top["equiv"]
-    if $P1 < $P0 goto oper_shift
-    if $P1 > $P0 goto oper_reduce
+    if $P0 > $P1 goto oper_shift                               # (P)
+    if topcat != PGE_OPTABLE_TERNARY goto expect_oper_4        
+    if tokcat != PGE_OPTABLE_TERNARY goto ternary_error        # (P/E)
+    goto oper_shift                                            # (S7)
+  expect_oper_4:
+    if $P1 < $P0 goto oper_reduce                              # (P)
     $S0 = top["opts"]
-    $I0 = index $S0, "right"
-    if $I0 >= 0 goto oper_shift
+    $I0 = index $S0, "right"                                   
+    if $I0 >= 0 goto oper_shift                                # (P/A)
   oper_reduce:
     bsr reduce
     goto expect_oper_2
+  oper_close:
+    if topcat < PGE_OPTABLE_TERNARY goto oper_reduce           # (R5)
+    $P1 = top["tok2"]
+    $S0 = $P1
+    if key != $S0 goto end                                     # (C5)
   oper_shift:
     push tokstack, tok
     push operstack, oper
     pos = oper.to()
-    $P0 = tok["syncat"]
-    if $P0 >= PGE_OPTABLE_PREFIX goto expect_term
+    tokcat = tok["syncat"]
+    if tokcat >= PGE_OPTABLE_PREFIX goto expect_term
+    if tokcat == PGE_OPTABLE_POSTFIX goto expect_oper
+    if topcat == PGE_OPTABLE_TERNARY goto expect_term
     goto expect_oper
-  oper_close:
 
   reduce:
     $P0 = pop tokstack
@@ -323,9 +352,9 @@ representing the result of the parse.
     $P0["args"] = args
   reduce_args:
     if arity < 1 goto reduce_end
+    dec arity
     $P1 = pop termstack
     unshift args, $P1
-    dec arity
     goto reduce_args
   reduce_end:
     push termstack, $P0
@@ -347,7 +376,7 @@ representing the result of the parse.
   tok_match_end:
     $P0 = tok["name"]
     $P0 = clone $P0
-    oper["name"] = $P0
+    oper["type"] = $P0
     ret
 
   end:
@@ -371,6 +400,71 @@ representing the result of the parse.
     throw $P0
     mobpos = -1
     .return (mob)
+
+  ternary_error:
+    $P0 = new Exception
+    $S0 = "Missing ternary close at offset "
+    $S1 = wspos
+    $S0 .= $S1
+    $S0 .= "\n"
+    $P0["_message"] = $S0
+    throw $P0
+    mobpos = -1
+    .return (mob)
 .end
 
+=head1 Miscellaneous Notes
 
+Here's the shift-reduce table used by the C<parse> method.
+The digits in the table map each state to the corresponding
+statement in the C<parse> method above.
+
+    tokstack                           Current token
+    --------    ---------------------------------------------------------
+                postfix  close  prefix  infix  ternary  postcirc  circfix
+    empty         S3      E3      S1     S3      S3        S3       S2
+    postfix       R4      R4      X      R4      R4        R4       X
+    close         P       R5      S1     P       P         P        P2 (*)
+    prefix        P       R5      S1     P       P         P        S2
+    infix         P       R5      S1     P/A     P         P        S2
+    ternary       P/E     C5      S1     P/E     S7        P/E      S2
+    postcirc      S6      C5      S1     S6      S6        S6       S2
+    circfix       S6      C5      S1     S6      S6        S6       S2
+
+      Expect    oper    mixed    term   term    term      term     term
+
+   Legend:
+      S# = shift  -- push operator onto token stack
+      R# = reduce -- pop operator from token stack, and fill it with
+          the appropriate number of arguments (arity) from the term stack.
+          Then put the operator token onto the term stack.  Reducing a
+          close token requires popping two operators from the token
+          stack.  Reducing a lone ternary operator is a parse error 
+          (its close token must be present).
+      P = precedence -- compare the relative precedence of the top
+          token in the token stack with the current token.
+          If current is tighter than top, shift.
+          If current is looser than top, reduce.
+      P/A = precedence with associativity -- for tokens with equal
+          precedence, use the associativity of the top token in the
+          token stack, shift if it's right associative, reduce otherwise.
+      P/E = higher precedence only -- shift if the current token has
+          higher precedence than the top token on the stack, otherwise
+          it's a parse error.
+      C = close -- If the current token is an appropriate closing
+          token for the top operator on the token stack, then shift.
+          Otherwise, it's an unbalanced closing token.
+      X = unreachable combination
+      E = either the end of the parse, or a parse error (probably
+          to be determined by the caller)
+
+   (*) - XXX: The current implementation assumes that circumfix
+   operators are always tighter than any close, and so performs a shift.
+      
+=head1 AUTHOR
+
+Patrick Michaud (pmichaud@pobox.com) is the author and maintainer.
+Patches and suggestions should be sent to the Perl 6 compiler list
+(perl6-compiler@perl.org).
+
+=cut

@@ -14,6 +14,7 @@
     .local string gname
 
     load_bytecode "PGE.pbc"
+    load_bytecode "dumper.imc"
     load_bytecode "PGE/Dumper.pir"
     load_bytecode "PGE/Glob.pir"
     load_bytecode "PGE/Text.pir"
@@ -51,7 +52,8 @@
   match_result:
     unless match goto match_fail
     print "match succeeded\n"
-    match."dump"("$/")
+    $P0 = find_global "_dumper"
+    $P0(match, "$/")
     goto read_loop
   match_fail:
     print "match failed\n"
