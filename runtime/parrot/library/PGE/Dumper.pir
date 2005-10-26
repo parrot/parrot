@@ -21,27 +21,63 @@ This method enables Data::Dumper to work on Match objects.
     .param pmc dumper
     .param string label
     .local string indent, subindent
+    .local pmc iter, key, val
+    .local pmc hash, array
+    .local int hascapts
     
-    (indent, subindent) = dumper."newIndent"()
+    (subindent, indent) = dumper."newIndent"()
     print "=> "
     $S0 = self
     dumper."genericString"("", $S0)
     print " @ "
     $I0 = self.from()
     print $I0
-    $P0 = self."get_array"()
-    if_null $P0, dump_1
+    hascapts = 0
+    hash = self."get_hash"()
+    if_null hash, dump_array
+    iter = new Iterator, hash
+    iter = 0
+  dump_hash_1:
+    unless iter goto dump_array
+    if hascapts goto dump_hash_2
+    print " {"
+    hascapts = 1
+  dump_hash_2:
     print "\n"
-    print indent
-    dumper."dump"(label, $P0)
-  dump_1:
-    $P0 = self."get_hash"()
-    if_null $P0, dump_end
+    print subindent
+    key = shift iter
+    val = hash[key]
+    print "<"
+    print key
+    print "> => "
+    dumper."dump"(label, val)
+    goto dump_hash_1
+  dump_array:
+    array = self."get_array"()
+    if_null array, dump_end
+    $I1 = elements array
+    $I0 = 0
+  dump_array_1:
+    if $I0 >= $I1 goto dump_end
+    if hascapts goto dump_array_2
+    print " {"
+    hascapts = 1
+  dump_array_2:
     print "\n"
-    print indent
-    dumper."dump"(label, $P0)
-    goto dump_end
+    print subindent
+    val = array[$I0]
+    print "["
+    print $I0
+    print "] => "
+    dumper."dump"(label, val)
+    inc $I0
+    goto dump_array_1
   dump_end:
+    unless hascapts goto end
+    print "\n"
+    print indent
+    print "}"
+  end:
     dumper."deleteIndent"()
 .end
 
@@ -151,48 +187,6 @@ An alternate dump output for a Match object and all of its subcaptures.
     .return ()
 .end
 
-.namespace [ "PGE::Op" ]
-
-=head2 C<PGE::Op> methods
-
-=item C<__dump(PMC dumper, STR label)>
-
-For C<PGE::Op> objects (often produced by the shift/reduce 
-parser in C<PGE::OPTable>), it's perhaps useful to have an 
-alternate Data::Dumper format that makes the operator 
-precedence more obvious.
-
-=cut
-
-.sub "__dump" :method
-    .param pmc dumper
-    .param string label
-    .local string indent, subindent
-
-    (indent, subindent) = dumper."newIndent"()
-    $P0 = self["name"]
-    print "=> "
-    print $P0
-    print " => "
-    $S0 = self
-    dumper."genericString"("", $S0)
-    $I0 = defined self["args"]
-    if $I0 == 0 goto end
-    $P0 = self["args"]
-    $I1 = elements $P0
-    $I0 = 0
-  dump_args:
-    if $I0 >= $I1 goto end
-    print "\n"
-    print indent
-    $P1 = $P0[$I0]
-    dumper."dump"(label, $P1)
-    inc $I0
-    goto dump_args
-  end:
-    dumper."deleteIndent"()
-.end
-    
 =head2 C<PGE::Exp> methods
 
 These methods print out a PGE expression tree.  They may be
