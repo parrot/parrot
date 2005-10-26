@@ -1,15 +1,22 @@
 # $Id$
 
+=head1 NAME
+
+ook.pasm - An implementation of ook in PASM
+
+=cut
+
 # First, read the file.
+        get_params "(0)", P5
         set S20, P5[1]      # Name of the Ook source.
-	open P20, S20, "<"  # P20 = file descriptor
-	set S21, ""         # S21 = accumulator
+        open P20, S20, "<"  # P20 = file descriptor
+        set S21, ""         # S21 = accumulator
 READ:
-	read S22, P20, 256
-	length I20, S22
-	le I20, 0, EOF
-	concat S21, S22
-	branch READ
+        read S22, P20, 256
+        length I20, S22
+        le I20, 0, EOF
+        concat S21, S22
+        branch READ
 EOF:
         close P20
 
@@ -102,12 +109,15 @@ LOOP_LINEFEED:
         # Fallthru.
 LOOP_END:
         le I21, I20, LOOP
-        concat S24, "\tend\n"
-        #print S24
-        #end
-        compreg P22, "PASM"
-	compile P0, P22, S24
-	invokecc
+        concat S24, "\tset_returns \"()\"\n"
+        concat S24, "\treturncc\n"
+
+# Execute the generated code in S24
+        compreg P1, "PASM"
+        set_args "(0)", S24
+        get_results "(0)", P0
+        invokecc P1
+        invokecc P0
         end
 
 # Given the content of P21, create a label of integers concateneted in S26.
@@ -125,5 +135,3 @@ LABEL_LOOP:
 LABEL_END:
         lt I26, I25, LABEL_LOOP
         ret
-
-

@@ -120,7 +120,7 @@ A: Jerome Quelin
 D: Functioning compiler targeting pasm.
 S: Samples working, README explain how to build/use.
 M: Yes
-V: 0.0.11
+V: 0.3.0
 
 N: OpenComal
 D: Compiler emiting parrot being added to interpreter

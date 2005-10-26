@@ -2,6 +2,9 @@
 
 Revision history for a Ook! compiler written in Parrot and targeting Parrot.
 
+0.2.1 Mi Okt 26 22:59:41 CEST 2005
+        - Make it work on Parrot 0.3.0
+
 0.2.0 Tue Apr  5 20:35:49 CEST 2005
         - fixed register usage to leave bottom half of register (0->15)
           for parrot internal use.
