@@ -93,7 +93,7 @@ Initializes a PGE::OPTable object.
 
 =head2 Methods
 
-=item C<addtok(STR name [, STR rel [, PMC match [, STR opts]]])>
+=item C<addtok(STR name [, STR rel [, STR opts [, PMC match ]]])>
 
 Adds a new token to the operator precedence table.  Operators are
 named as strings representing the syntactic category of the operator
@@ -105,14 +105,15 @@ The C<rel> argument specifies the precedence of the new operator
 relative to an existing operator, with a leading "<" or ">" indicating
 looser or tighter precedence.
 
-The C<match> argument is either a string identifying the class of 
-Match object to create for this operator, or a (rule) subroutine 
-to be called that will parse the complete token and return an 
-appropriate match object.  The default for C<match> is "PGE::Match".
+The C<opts> parameter can be used to indicate the associativity 
+of the operator ("left" or "right") and whether the token 
+disallows leading whitespace ("nows").
 
-Finally, the C<opts> parameter can be used to indicate
-the associativity of the operator ("left" or "right") and whether
-the token disallows leading whitespace ("nows").
+Finally, the C<match> argument is either a string identifying 
+the class of Match object to create for this operator, or a 
+(rule) subroutine to be called that will parse the complete 
+token and return an appropriate Match object.  The default 
+value for C<match> is "PGE::Match".
 
 =cut
 
@@ -120,10 +121,10 @@ the token disallows leading whitespace ("nows").
     .param string name
     .param string rel          :optional
     .param int has_rel         :opt_flag
-    .param pmc match           :optional
-    .param int has_match       :opt_flag
     .param string opts         :optional
     .param int has_opts        :opt_flag
+    .param pmc match           :optional
+    .param int has_match       :opt_flag
     .local string equiv, syncat
     .local pmc toktable, termtable, wstermtable, opertable, wsopertable
     .local pmc tok
@@ -136,11 +137,11 @@ the token disallows leading whitespace ("nows").
     wstermtable = getattribute self, "PGE::OPTable\x0%:wstermtable"
     wsopertable = getattribute self, "PGE::OPTable\x0%:wsopertable"
 
-    if has_opts goto set_equiv
-    opts = "left"
     if has_match goto set_equiv
     match = new String
     match = "PGE::Match"
+    if has_opts goto set_equiv
+    opts = "left"
 
   set_equiv:
     equiv = "="
@@ -348,13 +349,11 @@ representing the result of the parse.
   reduce_1:
     arity = $P0["arity"]
     $P0 = pop operstack
-    args = new PerlArray
-    $P0["args"] = args
   reduce_args:
     if arity < 1 goto reduce_end
     dec arity
     $P1 = pop termstack
-    unshift args, $P1
+    $P0[arity] = $P1
     goto reduce_args
   reduce_end:
     push termstack, $P0
