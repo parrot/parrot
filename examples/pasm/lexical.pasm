@@ -3,11 +3,11 @@
 
 =head1 NAME
 
-examples/assembly/lexical.pasm - Lexical scope
+examples/pasm/lexical.pasm - Lexical scope
 
 =head1 SYNOPSIS
 
-    % ./parrot examples/assembly/lexical.pasm
+    % ./parrot examples/pasm/lexical.pasm
 
 =head1 DESCRIPTION
 
