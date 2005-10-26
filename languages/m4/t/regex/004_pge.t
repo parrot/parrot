@@ -13,15 +13,16 @@ pir_output_is( << 'END_PIR', << 'END_OUT', "check whether PGE is there" );
 
 .sub 'test' :main
     load_bytecode "PGE.pbc"
+    load_bytecode "PGE/Dumper.pbc"
 
-    .local pmc p6rule
-    p6rule = find_global "PGE", "p6rule"            # get the compiler
+    .local pmc p6rule_compile
+    p6rule_compile = find_global "PGE", "p6rule"            # get the compiler
 
     .local string pattern       
     pattern = "^(<[_a..zA..Z]><[_a..zA..Z0..9]>*)"  # capture the complete id
 
     .local pmc word_rulesub                     
-    word_rulesub = p6rule(pattern)                  # compile the pattern to a rulesub
+    word_rulesub = p6rule_compile(pattern)                  # compile the pattern to a rulesub
 
     .local string target
     target = "Hello World"                          # target string
@@ -43,10 +44,10 @@ match_success:
     .local pmc captures
     ( captures ) = match."get_array"()
 
-    .local pmc captures_0_0
-    captures_0_0 = captures[0;0]                    # TODO will the blow up when the match failed?
+    .local pmc captures_0
+    captures_0 = captures[0]                    # TODO will the blow up when the match failed?
     print "The first capture is: "
-    print captures_0_0 
+    print captures_0 
     print "\n"
 
     goto end_main

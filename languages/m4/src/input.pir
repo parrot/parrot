@@ -78,7 +78,7 @@ TOOO: recognize nested quoted strings
   rulesub_in_state['string'] = rulesub
   rulesub = p6rule( "^(<-[`#_a..zA..Z]>)" )
   rulesub_in_state['simple'] = rulesub
-  rulesub = p6rule( "^(\#\N*\n)" )
+  rulesub = p6rule( '^(\#\N*\n)' )
   rulesub_in_state['comment'] = rulesub
 
 .end
@@ -204,7 +204,7 @@ Uses regular expressions for finding tokens.
   ( captures ) = match."get_array"()
   token_from = match.'from'()
   token_to = match.'to'()
-  token_data = captures[0;0]   
+  token_data = captures[0]   
   #token_data = substr input_string, token_from, token_to, ''      # TODO nibble at input without replacing input_string
   substr input_string, token_from, token_to, ''      # TODO nibble at input without replacing input_string
 
