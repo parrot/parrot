@@ -147,6 +147,7 @@ sub _generate_pir_for {
         .sub _PGE_Test
             .local pmc p6rule_compile
             load_bytecode "PGE.pbc"
+            load_bytecode "PGE/Dumper.pir"
             load_bytecode "PGE/Text.pir"
             find_global p6rule_compile, "PGE", "p6rule"
 

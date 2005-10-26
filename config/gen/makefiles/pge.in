@@ -16,7 +16,7 @@ all: $(PARROT_LIBRARY)${slash}PGE.pbc
 $(PARROT_LIBRARY)${slash}PGE.pbc: PGE.pbc
 	$(CP) PGE.pbc $(PARROT_LIBRARY)
 
-PGE.pbc: PGE.pir PGE/Exp.pir PGE/Match.pir PGE/Rule.pir PGE/P6Rule.pir PGE/TokenHash.pir mklib.pir library.pge
+PGE.pbc: PGE.pir PGE/Exp.pir PGE/Match.pir PGE/Rule.pir PGE/P6Rule.pir PGE/TokenHash.pir PGE/OPTable.pir mklib.pir library.pge
 	$(PARROT) mklib.pir >PGE/Library.pir
 	$(PARROT) -o PGE.pbc --output-pbc PGE.pir 
 

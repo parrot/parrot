@@ -28,6 +28,8 @@ defined.
     load()
     load = find_global "PGE::Rule", "__onload"
     load()
+    load = find_global "PGE::OPTable", "__onload"
+    load()
 .end
 
 .include "compilers/pge/PGE/TokenHash.pir"
@@ -36,3 +38,4 @@ defined.
 .include "compilers/pge/PGE/Rule.pir"
 .include "compilers/pge/PGE/P6Rule.pir"
 .include "compilers/pge/PGE/Library.pir"
+.include "compilers/pge/PGE/OPTable.pir"
