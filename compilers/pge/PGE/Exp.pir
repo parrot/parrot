@@ -834,19 +834,28 @@ register.
     token = self["token"]
     if token == "\\b" goto word
     if token == "\\B" goto word
-    if token == '$$' goto eos
+    if token == '$$' goto eol
     if token == '$' goto eos
+  bos:
     emit(code, "    if pos == 0 goto %s", next)
     unless token == '^^' goto end
+  bol:
+    emit(code, "    if pos == lastpos goto fail")
     emit(code, "    $I0 = pos - 1")
     emit(code, "    $I1 = is_cclass .CCLASS_NEWLINE, target, $I0")
     emit(code, "    if $I1 goto %s", next)
     goto end
+  eol:
+    emit(code, "    $I1 = is_cclass .CCLASS_NEWLINE, target, pos")
+    emit(code, "    if $I1 goto %s", next)
+    emit(code, "    if pos != lastpos goto fail")
+    emit(code, "    if pos < 1 goto %s", next)
+    emit(code, "    $I0 = pos - 1")
+    emit(code, "    $I1 = is_cclass .CCLASS_NEWLINE, target, $I0")
+    emit(code, "    if $I1 == 0 goto %s", next)
+    goto end
   eos:
     emit(code, "    if pos == lastpos goto %s", next)
-    unless token == '$$' goto end
-    emit(code, "    $I0 = is_cclass .CCLASS_NEWLINE, target, pos")
-    emit(code, "    if $I0 goto %s", next)
     goto end
   word:
     emit(code, "    $I0 = 0")
