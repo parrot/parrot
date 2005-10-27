@@ -1,0 +1,28 @@
+This is a short README until I have time to write a longer
+one.
+
+Files in this directory:
+
+   all.pir - program that demonstrates a variety of parses using PGE.
+     Includes:  
+       simple.pir - parser for simple mathematical expressions (<Simple::expr>)
+       p6parse.pir - Perl 6 expression parser (<Perl6::expr>)
+
+
+Start by running "all.pir".  To parse simple mathematical expressions
+(e.g., "r = sqrt(a*b + 5)"), enter
+
+    rule <Simple::expr>
+
+and then enter mathematical expressions after that.
+
+To parse Perl 6 expressions, enter
+
+    rule <Perl6::expr>
+
+and then type in p6 expressions to see the resulting parse.  
+
+Note that this is all a work in progress, so some features might
+not be working yet.
+
+Pm

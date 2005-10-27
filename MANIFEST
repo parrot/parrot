@@ -592,6 +592,11 @@ examples/pasm/cat.pasm                            [main]doc
 examples/pasm/fact.pasm                           [main]doc
 examples/pasm/hello.pasm                          [main]doc
 examples/pasm/lexical.pasm                        [main]doc
+examples/pge/README                               [main]doc
+examples/pge/all.pir                              [main]doc
+examples/pge/p6parse.pir                          [main]doc
+examples/pge/perl6.pir                            [main]doc
+examples/pge/simple.pir                           [main]doc
 examples/pir/circle.pir                           [main]doc
 examples/pir/euclid.pir                           [main]doc
 examples/pir/hanoi.pir                            [main]doc
