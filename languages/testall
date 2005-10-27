@@ -146,7 +146,6 @@ unless ($html) {
              "languages: $languages",
              "duration: $duration",
              "branch: unknown",
-             "Parrot languages: yes",
              "harness_args: languages",
              map { "$_: $PConfig{$_}" } sort @smoke_config_vars),
     );
