@@ -16,7 +16,7 @@ Tests Parrot calling conventions.
 
 =cut
 
-use Parrot::Test tests => 37;
+use Parrot::Test tests => 38;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "set_args - parsing");
@@ -1021,7 +1021,7 @@ ok 1
 ok 2
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "taicall to NCI");
+pir_output_is(<<'CODE', <<'OUTPUT', "tailcall to NCI");
 .sub main :main
     .local pmc s
     s = new .String
@@ -1041,3 +1041,42 @@ ok 1
 ok 2
 OUTPUT
 
+
+# bug - repeated calls to eval'd sub crashes (pmichaud, 2005.10.27)
+pir_output_is(<<'CODE', <<'OUTPUT', "repeated calls to eval'd sub");
+.sub main :main
+    .local string s
+    .local pmc outer
+    s =  ".namespace [ \"XYZ\" ]\n"
+    s .= ".sub outer\n"
+    s .= "    .param int n\n"
+    s .= "    $I0 = n % 1000\n"
+    s .= "    if $I0 goto end\n"
+    s .= "    print n\n"
+    s .= "    print \"\\n\"\n"
+    s .= "  end:\n"
+    s .= ".end\n"
+    $P0 = compreg "PIR"
+    $P0(s)
+    outer = find_global "XYZ", "outer"
+    $I1 = 0
+  loop:
+    inc $I1
+    if $I1 > 10000 goto end
+    outer($I1)
+    goto loop
+  end:
+.end
+CODE
+1000
+2000
+3000
+4000
+5000
+6000
+7000
+8000
+9000
+10000
+OUTPUT
+  
