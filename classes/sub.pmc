@@ -384,7 +384,7 @@ Creates and returns a clone of the subroutine.
 
 =item C<void mark()>
 
-Marks the continuation as live.
+Marks the sub as live.
 
 =cut
 
@@ -400,6 +400,8 @@ Marks the continuation as live.
             pobject_lives(INTERP, (PObj *) sub->namespace);
         if (!PMC_IS_NULL(sub->multi_signature))
             pobject_lives(INTERP, (PObj *) sub->multi_signature);
+        if (!PMC_IS_NULL(sub->eval_pmc))
+            pobject_lives(INTERP, (PObj *) sub->eval_pmc);
     }
 /*
 

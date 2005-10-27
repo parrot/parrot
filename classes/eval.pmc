@@ -51,6 +51,34 @@ clear_fixups(Interp* interpreter, PMC* self)
     }
 }
 
+static void
+mark_subs(Interp* interpreter, PMC* self)
+{
+    opcode_t i, ci;
+    struct PackFile_ByteCode *seg;
+    struct PackFile_FixupTable *ft;
+    struct PackFile_ConstTable *ct;
+    PMC *sub;
+
+    seg = PMC_sub(self)->seg;
+    if (!seg)
+        return;
+    ft = seg->fixups;
+    if (!ft)
+        return;
+    ct = seg->const_table;
+    if (!ct)
+        return;
+    for (i = 0; i < ft->fixup_count; i++) {
+        switch (ft->fixups[i]->type) {
+            case enum_fixup_sub:
+                ci = ft->fixups[i]->offset;
+                sub = ct->constants[ci]->u.key;
+                pobject_lives(interpreter, (PObj*)sub);
+        }
+    }
+}
+
 pmclass Eval extends Closure need_ext {
 
     void init() {
@@ -101,6 +129,10 @@ pmclass Eval extends Closure need_ext {
         PackFile_Segment_destroy(INTERP, seg);
         sub_data->seg = NULL;
         PMC_sub_ASSIGN(SELF, NULL);
+    }
+
+    void mark() {
+        mark_subs(INTERP, SELF);
     }
 
 /*
@@ -204,7 +236,7 @@ Final code fixup after thawing.
         if (!PackFile_unpack(INTERP, pf, packed->strstart, packed->strlen))
             real_exception(INTERP, NULL, E_IOError,
                     "couldn't unpack packfile");
-        fixup_subs(INTERP, pf->cur_cs, PBC_PBC);
+        fixup_subs(INTERP, pf->cur_cs, PBC_PBC, SELF);
         for (i = 0; i < pf->directory.num_segments; ++i) {
             seg = pf->directory.segments[i];
             if (seg->type == PF_BYTEC_SEG) {

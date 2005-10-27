@@ -608,7 +608,7 @@ main(int argc, char * argv[])
         free(packed);
         /* TODO */
         if (run_pbc != 2)
-            PackFile_fixup_subs(interp, PBC_POSTCOMP);
+            PackFile_fixup_subs(interp, PBC_POSTCOMP, NULL);
     }
 
     /* If necessary, load the file written above */
@@ -638,7 +638,7 @@ main(int argc, char * argv[])
         else
             IMCC_info(interp, 1, "Running...\n");
         if (!load_pbc)
-            PackFile_fixup_subs(interp, PBC_MAIN);
+            PackFile_fixup_subs(interp, PBC_MAIN, NULL);
         Parrot_runcode(interp, argc, argv);
         /* XXX no return value :-( */
     }

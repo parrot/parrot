@@ -257,8 +257,8 @@ typedef enum {
     PBC_POSTCOMP  = 16
 } pbc_action_enum_t;
 
-void PackFile_fixup_subs(Interp *interpreter, pbc_action_enum_t);
-void fixup_subs(Interp *interpreter, struct PackFile_ByteCode *self, int action);
+void PackFile_fixup_subs(Interp *, pbc_action_enum_t, PMC *eval_pmc);
+void fixup_subs(Interp *, struct PackFile_ByteCode *, int, PMC *eval_pmc);
 /*
  * directory functions
  */

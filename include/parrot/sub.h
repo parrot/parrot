@@ -63,6 +63,7 @@ typedef struct Parrot_sub {
     INTVAL   n_regs_used[4];	/* INSP in PBC */
 
     PMC      *lexicals;         /* OrderedHash of Lexicals */
+    PMC      *eval_pmc;         /* eval container / NULL */
 
     /* - end common */
 
@@ -87,6 +88,7 @@ typedef struct Parrot_coro {
     INTVAL   n_regs_used[4];	/* INSP in PBC */
 
     PMC      *lexicals;         /* OrderedHash of Lexicals */
+    PMC      *eval_pmc;         /* eval container / NULL */
 
     /* - end common */
 

@@ -431,17 +431,19 @@ mark_const_subs(Parrot_Interp interpreter)
 
 =item C<static void
 fixup_subs(Interp *interpreter, struct PackFile_Bytecode *self,
-   int action)>
+   int action, PMC *eval_pmc)>
 
 Fixes up the constant subroutine objects. B<action> is one of
-B<PBC_PBC>, B<PBC_LOADED>, or B<PBC_MAIN>.
+B<PBC_PBC>, B<PBC_LOADED>, or B<PBC_MAIN>. Also store the C<eval_pmc>
+in the sub structure, so that the eval PMC is kept alive be living subs.
 
 =cut
 
 */
 
 void
-fixup_subs(Interp *interpreter, struct PackFile_ByteCode *self, int action)
+fixup_subs(Interp *interpreter, struct PackFile_ByteCode *self, 
+        int action, PMC *eval_pmc)
 {
     opcode_t i, ci;
     struct PackFile_FixupTable *ft;
@@ -471,6 +473,7 @@ fixup_subs(Interp *interpreter, struct PackFile_ByteCode *self, int action)
                     case enum_class_Sub:
                     case enum_class_Closure:
                     case enum_class_Coroutine:
+                        PMC_sub(sub_pmc)->eval_pmc = eval_pmc;
                         VTABLE_thawfinish(interpreter, sub_pmc, NULL);
                         if (PObj_get_FLAGS(sub_pmc) & SUB_FLAG_PF_MASK) {
                             /*
@@ -3398,7 +3401,7 @@ Parrot_load_bytecode(Interp *interpreter, const char *filename)
         cs = IMCC_compile_file(interpreter, filename);
 #endif
         if (cs) {
-            fixup_subs(interpreter, cs, PBC_LOADED);
+            fixup_subs(interpreter, cs, PBC_LOADED, NULL);
         }
         else
             internal_exception(1, "compiler returned NULL ByteCode");
@@ -3417,9 +3420,9 @@ I<What does this do?>
 */
 
 void
-PackFile_fixup_subs(Interp *interpreter, pbc_action_enum_t what)
+PackFile_fixup_subs(Interp *interpreter, pbc_action_enum_t what, PMC *eval)
 {
-    fixup_subs(interpreter, interpreter->code, what);
+    fixup_subs(interpreter, interpreter->code, what, eval);
 }
 
 /*

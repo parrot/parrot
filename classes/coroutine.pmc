@@ -205,13 +205,9 @@ Marks the coroutine as live.
 
     void mark () {
         struct Parrot_coro *c = PMC_coro(SELF);
-#if 0
-        mark_stack(INTERP, c->co_control_stack);
-        mark_stack(INTERP, c->co_control_base);
-        mark_stack(INTERP, c->co_pad_stack);
-#endif
         if (c && c->ctx)
             mark_context(INTERP, c->ctx);
+        SUPER();
     }
 }
 

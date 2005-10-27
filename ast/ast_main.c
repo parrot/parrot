@@ -76,7 +76,8 @@ ast_compile_past(Parrot_Interp interp, const char *src_string)
     imc_compile_all_units_for_ast(interp);
     imc_compile_all_units(interp);
 
-    PackFile_fixup_subs(interp, PBC_MAIN);
+    sub = pmc_new(interp, enum_class_Eval);
+    PackFile_fixup_subs(interp, PBC_MAIN, sub);
     if (old_cs) {
         /* restore old byte_code, */
         (void)Parrot_switch_to_cs(interp, old_cs, 0);
@@ -84,7 +85,6 @@ ast_compile_past(Parrot_Interp interp, const char *src_string)
     /*
      * create sub PMC
      */
-    sub = pmc_new(interp, enum_class_Eval);
     sub_data = PMC_sub(sub);
     sub_data->seg = new_cs;
     sub_data->address = new_cs->base.data;

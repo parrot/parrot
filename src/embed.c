@@ -410,7 +410,7 @@ again:
     /*
      * fixup constant subroutine objects
      */
-    fixup_subs(interpreter, pf->cur_cs, PBC_PBC);
+    fixup_subs(interpreter, pf->cur_cs, PBC_PBC, NULL);
     /*
      * JITting and/or prederefing the sub/the bytecode is done
      * in switch_to_cs before actual usage of the segment

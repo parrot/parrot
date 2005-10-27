@@ -1028,7 +1028,7 @@ e_pbc_end_sub(Interp *interpreter, void *param, IMC_Unit * unit)
     if (pragma & P_IMMEDIATE) {
         IMCC_debug(interpreter, DEBUG_PBC, "immediate sub '%s'",
                 ins->r[0]->name);
-        PackFile_fixup_subs(interpreter, PBC_IMMEDIATE);
+        PackFile_fixup_subs(interpreter, PBC_IMMEDIATE, NULL);
     }
     return 0;
 }
