@@ -22,22 +22,23 @@ in this directory.
 
 =head2 Command line options
 
-partcl supports two command line options (that are not standard Tcl):
+partcl supports two command line options (that are B<not> standard Tcl):
 
 =over 4
 
 =item -e
 
 Analagous to perl's C<-e> switch, this option will let you specify tcl
-in the command, which will then be executed. e.g:
+code in the command line, which will then be executed. e.g:
 
- ../../parrot tcl.pbc -e="puts {Hello World}"
+ $ ../../parrot tcl.pbc -e="puts {Hello World}"
+ Hello World
 
 =item --pir
 
 Given this option, partcl will compile the tcl code to PIR, and output
 the PIR on STDOUT. This PIR can then be compiled to parrot bytecode, or
-run directly through parrot. Works with C<-e>.
+run directly through parrot. (Works with C<-e>.)
 
 =back
 
