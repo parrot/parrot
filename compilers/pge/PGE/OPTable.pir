@@ -279,10 +279,20 @@ representing the result of the parse.
     key = $P0."lkey"(target, wspos)
     tok = $P0[key]
     bsr tok_match
-    unless oper goto term_error
-    $P0 = tok["syncat"]
-    if $P0 == PGE_OPTABLE_PREFIX goto oper_shift               # (S1)
-    if $P0 == PGE_OPTABLE_CIRCUMFIX goto oper_shift            # (S2, P2)
+    if oper goto expect_term_2
+    $I0 = elements tokstack
+    if $I0 < 1 goto term_error
+    top = tokstack[-1]
+    $S0 = top["opts"]
+    $I0 = index $S0, "nullterm"
+    if $I0 < 0 goto term_error
+    oper = newfrom(mob, wspos, "PGE::Match")
+    push termstack, oper
+    goto expect_oper
+  expect_term_2:
+    tokcat = tok["syncat"]
+    if tokcat == PGE_OPTABLE_PREFIX goto oper_shift            # (S1)
+    if tokcat == PGE_OPTABLE_CIRCUMFIX goto oper_shift         # (S2, P2)
     push termstack, oper
     pos = oper.to()
     
@@ -334,7 +344,6 @@ representing the result of the parse.
     push tokstack, tok
     push operstack, oper
     pos = oper.to()
-    tokcat = tok["syncat"]
     if tokcat >= PGE_OPTABLE_PREFIX goto expect_term
     if tokcat == PGE_OPTABLE_POSTFIX goto expect_oper
     if topcat == PGE_OPTABLE_TERNARY goto expect_term

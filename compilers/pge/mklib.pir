@@ -32,43 +32,14 @@ file.
     load()
     load = find_global "PGE::Rule", "__onload"
     load()
-    p6rule = find_global "PGE", "p6rule"
-    $S0 = ':w ( (grammar) ([\w|\:]+) ; | (rule) (\w+) \{(<-[}]>+)\} | (\#)\N* )*'
-    (gparse, code) = p6rule($S0)
-    grammar = "PGE::Rule"
+    load_bytecode "PGE/Util.pir"
 
     $P0 = open "library.pge", "<"
     $S0 = read $P0, 65535
     close $P0
-    $P0 = gparse($S0)
-    $P1 = $P0[0]
-    $I0 = elements $P1
-    $I1 = 0
-  loop_1:
-    if $I1 >= $I0 goto end
-    stmt = $P1[$I1]
-    inc $I1
-    $P0 = stmt[0]
-    keyword = $P0
-    if keyword == "#" goto loop_1
-    if keyword == "grammar" goto grammar_stmt
-    $P0 = stmt[1]
-    name = $P0
-    $P0 = stmt[2]
-    code = $P0
-    print "\n\n# "
-    print grammar
-    print "::"
-    print name
-    print "\n"
-    ($P0, code) = p6rule(code, grammar, name)
+    $P1 = find_global "PGE", "compile_rules"
+    code = $P1($S0)
     print code
-    goto loop_1
-  grammar_stmt:
-    $P0 = stmt[1]
-    grammar = $P0
-    goto loop_1
-  end:
 .end
 
 .include "compilers/pge/PGE/TokenHash.pir"
