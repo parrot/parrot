@@ -6,7 +6,7 @@ use Parrot::Test;
 use Parrot::Test::PGE;
 
 
-## tests based on http://dev.perl.org/perl6/doc/design/syn/S05.html,
+## tests based on http://dev.perl.org/perl6/doc/design/syn/S05.html, ver. 7
 ##   in the 'Modifiers' section
 
 
