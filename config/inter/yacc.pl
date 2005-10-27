@@ -75,7 +75,7 @@ sub runstep {
     # if '--version' returns a string assume that this is bison.
     # if this is bison pretending to be yacc '--version' doesn't work
     if ($stdout =~ /Bison .*? (\d+) \. (\d+) (\w)? /x) {
-        Configure::Data->set(bison_version => [$1, $2, $3]);
+        Configure::Data->set(bison_version => $3 ? "$1.$2$3" : "$1.$2");
     }
 
     Configure::Data->set($util => $prog);

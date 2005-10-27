@@ -75,7 +75,7 @@ sub runstep {
     # if '--version' returns a string assume that this is flex.
     # flex calls it self by $0 so it will claim to be lex if invoked as `lex`
     if ($stdout =~ /f?lex .*? (\d+) \. (\d+) \. (\d+)/x) {
-        Configure::Data->set(flex_version => [$1, $2, $3]);
+        Configure::Data->set(flex_version => "$1.$2.$3");
     }
 
     Configure::Data->set($util => $prog);
