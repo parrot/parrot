@@ -126,8 +126,18 @@ includes the full blown IDE, and Microsoft Visual C++ Toolkit 2003
 (but unsupported) package, containing only the basic compiler and
 linker stuff.
 
-Only Microsoft Visual Studio is currently known to work.  XXX Add
-Microsoft Visual C++ Toolkit instructions here XXX
+If you use the Toolkit, be sure to follow the directions for setting up
+your build environment that come with the perl distributions. (README.win32
+in the latest perl distribution.) You may have to substitute "Microsoft 
+Platform SDK" wherever "Microsoft SDK" is listed, depending on the your 
+install. You can ignore the entries regarding "win32/config.vc", but be sure
+to create the "link.bat" batch file. Copy the missing files mentioned,
+run the Toolkit Command Prompt, set the appropriate env vars, and you
+should be fine. (For env vars, you can update them under My Computer->
+properties so they are available whenever you open a shell.)
+
+Note: It is possible to use ActiveState Perl with the Toolkit: you don't
+have to compile your own perl.
 
 =item MinGW32 with GCC
 
