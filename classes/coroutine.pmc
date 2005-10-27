@@ -71,6 +71,10 @@ pmclass Coroutine extends Sub need_ext {
 
 Initializes the co-routine.
 
+=item C<PMC* clone()>
+
+Clone the couroutine.
+
 =cut
 
 */
@@ -79,6 +83,18 @@ Initializes the co-routine.
         PMC_coro_ASSIGN(SELF, new_coroutine(INTERP));
         PMC_pmc_val(SELF) = NULL;
         PObj_custom_mark_destroy_SETALL(SELF);
+    }
+
+    PMC* clone () {
+        struct Parrot_coro * sub;
+        PMC* ret = pmc_new_noinit(INTERP, SELF->vtable->base_type);
+        PObj_custom_mark_destroy_SETALL(ret);
+        sub = mem_sys_allocate(sizeof(struct Parrot_coro));
+        memcpy(sub, PMC_sub(SELF), sizeof(struct Parrot_coro));
+        sub->name = string_copy(INTERP, sub->name);
+        PMC_coro_ASSIGN(ret, sub);
+        PMC_pmc_val(ret) = NULL;
+        return ret;
     }
 
 /*
