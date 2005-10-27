@@ -18,16 +18,21 @@ use vars qw($description @args);
 use Parrot::Configure::Step;
 use ExtUtils::Manifest qw(manicheck);
 
-$description="Checking MANIFEST...";
+$description = "Checking MANIFEST...";
 
-@args=qw(nomanicheck);
+@args = qw(nomanicheck);
 
 sub runstep {
-  $Configure::Step::result = 'skipped' and return if $_[0];
+  my ( $nomanicheck ) = @_;
 
-  my(@missing)=manicheck();
+  if ( $nomanicheck ) {
+    $Configure::Step::result = 'skipped';
+    return; 
+  }
 
-  if(@missing) {
+  my @missing = ExtUtils::Manifest::manicheck();
+
+  if (@missing) {
      print <<"END";
 
 Ack, some files were missing!  I can't continue running
