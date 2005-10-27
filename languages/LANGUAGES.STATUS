@@ -68,7 +68,7 @@ D: An early attempt to support grammars in Bachus-Naur-Format
 
 N: forth
 A: Dan Sugalski
-M: yes
+M: no
 V: 0.0.13
 
 N: IMCC
