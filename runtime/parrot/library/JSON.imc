@@ -371,7 +371,7 @@ done:
 
 =item (pmc) = _json_to_pmc(string)
 
-Given a JSON string, return a PMC that represents that data. The
+Given a JSON string, return a PMC that represents that data.
 
 =over 4
 
