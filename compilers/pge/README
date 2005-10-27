@@ -34,7 +34,7 @@ C<parrot demo.pir>.  The demo understands the following commands:
     rule pattern      - compile a Perl 6 rule from "pattern"
     save name         - save the current rule as "name"
     text              - a text string to match against previously entered rule
-    pir               - display the PIR cod generated for current rule
+    pir               - display the PIR code generated for current rule
     exp               - display the expression tree for the current rule
     trace             - toggle pattern execution tracing
     next              - repeat last match on target string
