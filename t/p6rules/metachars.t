@@ -39,7 +39,6 @@ p6rule_is  ("abc\n", 'abc \n $', 'end of string ($)');
 p6rule_isnt("abc\n", 'abc $', 'end of string ($)');
 
 
-
 ## (\n and \N -- matches platform independent newline (or everything but)
 p6rule_is  ("abc\ndef", 'c \n d', 'logical newline (\n)');
 p6rule_is  ("abc\012def", 'c \n d', 'logical newline (\n)');
@@ -85,11 +84,11 @@ p6rule_is  ("abc#def", '^ abc \# def $', 'comments (#)');
 
 ## ^^ and $$ -- line beginnings and endings
 p6rule_is  ("abc\ndef", '^^ abc \n ^^ def', 'line beginnings and endings (^^)');
-p6rule_is  ("abc\ndef\n", '^^ abc \n ^^ def \n ^^', 'line beginnings and endings (^^)');
+p6rule_isnt("abc\ndef\n", '^^ abc \n ^^ def \n ^^', 'line beginnings and endings (^^)');
 p6rule_is  ("\n", '^^ \n', 'line beginnings and endings (^^)');
 p6rule_isnt("\n", '\n ^^', 'line beginnings and endings (^^)');
 p6rule_is  ("abc\ndef", 'abc $$ \n def $$', 'line beginnings and endings ($$)');
-p6rule_is  ("abc\ndef\n", 'abc $$ \n def $$ \n $$', 'line beginnings and endings ($$)');
+p6rule_isnt("abc\ndef\n", 'abc $$ \n def $$ \n $$', 'line beginnings and endings ($$)');
 p6rule_is  ("\n", '$$ \n', 'line beginnings and endings ($$)');
 p6rule_isnt("\n", '\n $$', 'line beginnings and endings ($$)');
 
