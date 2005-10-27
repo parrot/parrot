@@ -666,6 +666,10 @@ imcc_compile(Parrot_Interp interp, const char *s, int pasm_file)
         void * __ptr;
     } __ptr_u;
 
+    /*
+     * we create not yet anchored PMCs - e.g. Subs: turn off DOD
+     */
+    Parrot_block_DOD(interp);
     if (IMCC_INFO(interp)->last_unit) {
         /* got a reentrant compile */
         imc_info = mem_sys_allocate_zeroed(sizeof(imc_info_t));
@@ -723,6 +727,7 @@ imcc_compile(Parrot_Interp interp, const char *s, int pasm_file)
     }
     else
         imc_cleanup(interp);
+    Parrot_unblock_DOD(interp);
     return sub;
 }
 
