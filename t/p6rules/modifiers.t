@@ -11,7 +11,8 @@ use Parrot::Test::PGE;
 
 
 ## :i
-p6rule_is  ('abcdef', ':i bcd', 'ignorecase (:i)', todo => 'not yet implemented');
+## TODO lexical scoping of :i
+p6rule_is  ('abcdef', ':i bcd', 'ignorecase (:i)');
 p6rule_is  ('aBcdef', ':i bcd', 'ignorecase (:i)', todo => 'not yet implemented');
 p6rule_is  ('abCdef', ':i bcd', 'ignorecase (:i)', todo => 'not yet implemented');
 p6rule_is  ('abcDef', ':i bcd', 'ignorecase (:i)', todo => 'not yet implemented');
@@ -19,21 +20,26 @@ p6rule_isnt('abc-ef', ':i bcd', 'ignorecase (:i)');
 p6rule_is  ('abcdef', ':ignorecase bcd', 'ignorecase (:ignorecase)', todo => 'not yet implemented');
 p6rule_is  ('aBCDef', ':ignorecase bcd', 'ignorecase (:ignorecase)', todo => 'not yet implemented');
 p6rule_isnt('abc-ef', ':ignorecase bcd', 'ignorecase (:ignorecase)');
-## TODO lexical scoping of :i
+
 
 ## :w
-p6rule_is  ('abcdef', ':w bcd', 'words (:w)');
+## TODO lexical scoping of :w
 p6rule_is  ('a bcdef', ':w bcd', 'words (:w)');
-p6rule_is  ('abcd ef', ':w bcd', 'words (:w)');
 p6rule_is  ('a bcd ef', ':w bcd', 'words (:w)');
+p6rule_isnt('abcdef', ':w bcd', 'words (:w)');
+p6rule_isnt('abcd ef', ':w bcd', 'words (:w)');
 p6rule_isnt('ab cdef', ':w bcd', 'words (:w)');
 p6rule_is  ('a b c d ef', ':w b c d', 'words (:w)');
-p6rule_is  ('ab c d ef', ':w b c d', 'words (:w)');
 p6rule_is  ('a b c def', ':w b c d', 'words (:w)');
+p6rule_isnt('ab c d ef', ':w b c d', 'words (:w)');
 p6rule_isnt('a bcdef', ':w b c d', 'words (:w)');
-p6rule_isnt('abcd ef', ':w b c d', 'words (:w)');
 p6rule_isnt('abcdef', ':w b c d', 'words (:w)');
-## TODO lexical scoping of :w
+p6rule_is  ('a bcdef', ':words bcd', 'words (:words)', todo => 'not yet implemented');
+p6rule_is  ('a bcd ef', ':words bcd', 'words (:words)', todo => 'not yet implemented');
+p6rule_isnt('abcdef', ':words bcd', 'words (:words)');
+p6rule_is  ('a b c d ef', ':words b c d', 'words (:words)', todo => 'not yet implemented');
+p6rule_is  ('a b c def', ':words b c d', 'words (:words)', todo => 'not yet implemented');
+p6rule_isnt('ab c d ef', ':words b c d', 'words (:words)');
 
 
 ## :once
@@ -45,4 +51,4 @@ p6rule_isnt('abcdef', ':w b c d', 'words (:w)');
 
 
 ## remember to change the number of tests :-)
-BEGIN { plan tests => 19; }
+BEGIN { plan tests => 24; }
