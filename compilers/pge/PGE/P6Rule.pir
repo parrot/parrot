@@ -908,6 +908,7 @@ needed).
     $S0 = code
     rule = $P0($S0)
     if has_name == 0 goto p6rule_2
+    store_global grammar, name, rule
     $I0 = find_type grammar
     if $I0 > 0 goto p6rule_2
     $P0 = getclass "PGE::Rule"
