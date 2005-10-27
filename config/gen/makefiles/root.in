@@ -632,6 +632,7 @@ help :
 	@echo "  compilers:         Proxy for default target of compilers/pge"
 	@echo "  languages:         Proxy for default target of languages/Makefile"
 	@echo "  languages-test:    Proxy for target 'test' of languages/Makefile"
+	@echo "  languages-smoke:   Proxy for target 'test' of languages/Makefile"
 	@echo "  languages-clean:   Proxy for target 'clean' of languages/Makefile"
 	@echo ""
 	@echo "fetch from source repository:"
@@ -1174,6 +1175,9 @@ languages.dummy :
 
 languages-test :
 	$(MAKE_C) languages test
+
+languages-smoke :
+	$(MAKE_C) languages smoke
 
 languages-clean :
 	$(MAKE_C) languages clean

@@ -44,6 +44,12 @@ help:
 	@echo ""
 	@echo "  help:         Print this help message."
 	@echo ""
+	@echo "  smoke:        Run the test suite and send smoke.html to "
+	@echo "                http://smoke.parrotcode.org/"
+	@echo ""
+	@echo "  smoke-clean:  clean up smoke.html"
+	@echo ""
+	@echo ""
 	@echo "Following languages are available:"
 	@echo "  $(LANGUAGES)"
 	@echo "A particular language <lang> can be built, tested and cleand up"
@@ -54,7 +60,14 @@ help:
 	@echo ""
 
 test:   all
-	$(PERL) -I ../lib testall
+	$(PERL) testall
+
+smoke:  all
+	$(PERL) testall --html
+	$(PERL) ../util/smokeserv-client.pl languages_smoke.html
+
+smoke-clean :
+	$(RM_F) languages_smoke.html
 
 clean: \
     BASIC.clean \
@@ -75,7 +88,8 @@ clean: \
     regex.clean \
     scheme.clean \
     tcl.clean \
-    urm.clean
+    urm.clean \
+    smoke-clean
 
 
 #
@@ -96,9 +110,9 @@ Zcode : Zcode.dummy
 Zcode.dummy:
 # Do nothing. make Zcode requires an Inform compiler
 Zcode.test:
-	$(MAKE_C) Zcode test
+	- $(MAKE_C) Zcode test
 Zcode.clean:
-	$(MAKE_C) Zcode clean
+	- $(MAKE_C) Zcode clean
 
 bc : bc.dummy
 bc.dummy:

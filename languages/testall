@@ -4,9 +4,13 @@
 
 use strict;
 
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+
 use Data::Dumper;
 use File::Spec;
-use Test::Harness;
+use Test::Harness();
+use Parrot::Config qw/%PConfig/;
 
 =head1 languages harness
 
@@ -34,6 +38,10 @@ e.g., C<cd languages/tcl && t/joe_test.t>
 
 =back
 
+=head1 TODO
+
+There is too much overlap with ../t/harness.
+
 =head1 AUTHOR
 
   Will "Coke" Coleda
@@ -49,6 +57,12 @@ a Makefile with a "test" target, and any prereqs required by that test
 have already been built.
 
 =cut
+
+
+# Step 0: handle command line args
+
+my $html = grep { $_ eq '--html' } @ARGV;
+@ARGV = grep { $_ ne '--html' } @ARGV;
 
 # Step 1: find harness files for testable languages
 
@@ -88,15 +102,61 @@ my @harnesses =
 
 # Step 2: Get a listing of files from these harnesses.
 
-my @testfiles;
+my @tests;
 foreach my $harness (@harnesses) {
-    my $perl = "$^X -I" . File::Spec->join(File::Spec->updir,"lib");
+    my $perl = "$^X -I" . File::Spec->join(File::Spec->updir(), 'lib');
     open(FILES, "$perl $harness --files |");  
-    push @testfiles, <FILES>;
+    push @tests, <FILES>;
     close(FILES);
 }
-chomp(@testfiles);
+chomp(@tests);
 
 # Step 3: test.
 
-runtests(@testfiles);
+unless ($html) {
+    Test::Harness::runtests(@tests);
+} else {
+    my @smoke_config_vars = qw(
+      osname
+      archname
+      cc
+      build_dir
+      cpuarch
+      revision
+      VERSION
+      optimize
+      DEVEL
+    );
+
+    eval {
+        require Test::TAP::HTMLMatrix;
+        require Test::TAP::Model::Visual;
+    };
+    die "You must have Test::TAP::HTMLMatrix installed.\n\n$@" if $@;
+
+    my $start = time;
+    my $model = Test::TAP::Model::Visual->new_with_tests(@tests);
+    my $end = time;
+
+    my $duration = $end - $start;
+    my $languages = join( q{ }, @unified_testable_languages );
+    my $v = Test::TAP::HTMLMatrix->new(
+        $model,
+        join("\n",
+             "languages: $languages",
+             "duration: $duration",
+             "branch: unknown",
+             "Parrot languages: yes",
+             "harness_args: languages",
+             map { "$_: $PConfig{$_}" } sort @smoke_config_vars),
+    );
+
+    $v->has_inline_css(1); # no separate css file
+
+    open HTML, ">", "languages_smoke.html";
+    print HTML $v->html();
+    close HTML;
+
+    print "smoke.html has been generated.\n";
+}
+

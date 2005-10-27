@@ -82,7 +82,7 @@ use strict;
 use lib qw(lib imcc);
 
 use Getopt::Std;
-use Test::Harness qw(runtests);
+use Test::Harness();
 
 use Parrot::Config qw/%PConfig/;
 
@@ -136,7 +136,7 @@ my @default_tests = ( ( map { glob( "t/$_/*.t" ) } qw(op pmc native_pbc) ),
 my @tests = @ARGV ? map { glob( $_ ) } @ARGV : @default_tests;
 
 unless ($html) {
-    runtests(@tests);
+    Test::Harness::runtests(@tests);
 } else {
     my @smoke_config_vars = qw(
       osname
@@ -156,9 +156,9 @@ unless ($html) {
     };
     die "You must have Test::TAP::HTMLMatrix installed.\n\n$@" if $@;
 
-    my $start = time;
+    my $start = time();
     my $model = Test::TAP::Model::Visual->new_with_tests(@tests);
-    my $end = time;
+    my $end = time();
 
     my $duration = $end - $start;
 
