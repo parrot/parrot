@@ -1,0 +1,4 @@
+usr/examples/*		usr/share/doc/parrot-doc/examples/
+usr/imcc/examples/*	usr/share/doc/parrot-doc/examples/imcc/
+usr/docs/*			usr/share/doc/parrot-doc/docs/
+usr/imcc/docs/*		usr/share/doc/parrot-doc/docs/imcc/

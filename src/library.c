@@ -173,17 +173,22 @@ Parrot_locate_runtime_file(Interp *interpreter, const char *file_name,
         "runtime/parrot/include/",
         "runtime/parrot/",
         "./",
+        "lib/parrot/runtime/include/",
+        "lib/parrot/runtime/",
         NULL
     };
     const char *library_paths[] = {
         "runtime/parrot/library/",
         "runtime/parrot/",
         "./",
+        "lib/parrot/runtime/library/",
+        "lib/parrot/runtime/",
         NULL
     };
     const char *dynext_paths[] = {
         "runtime/parrot/dynext/",
         "",
+        "lib/parrot/runtime/dynext/",
         NULL
     };
     const char **paths;
