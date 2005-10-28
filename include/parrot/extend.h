@@ -55,6 +55,8 @@ typedef const void * Parrot_VTABLE;
 
 #endif
 
+#include "parrot/extend_vtable.h" /* the auto-generated prototypes    */
+
 Parrot_VTABLE Parrot_get_vtable(Parrot_INTERP, Parrot_Int);
 Parrot_PMC Parrot_PMC_get_pmc_intkey(Parrot_INTERP, Parrot_PMC, Parrot_Int);
 Parrot_STRING Parrot_PMC_get_string(Parrot_INTERP, Parrot_PMC);

@@ -224,7 +224,8 @@ GEN_HEADERS = \
     $(INC_DIR)/vtable.h \
     $(INC_DIR)/oplib/core_ops.h \
     $(INC_DIR)/oplib/ops.h \
-    $(INC_DIR)/oplib/core_ops_switch.h
+    $(INC_DIR)/oplib/core_ops_switch.h \
+    $(INC_DIR)/extend_vtable.h
 
 GEN_SOURCES = \
     $(SRC_DIR)/core_ops.c \
@@ -235,7 +236,8 @@ GEN_SOURCES = \
     $(SRC_DIR)/parrot_config.c \
     $(SRC_DIR)/null_config.c \
     $(SRC_DIR)/install_config.c \
-    $(SRC_DIR)/exec_cpu.c
+    $(SRC_DIR)/exec_cpu.c \
+    $(SRC_DIR)/extend_vtable.c
 
 GEN_MODULES = \
     lib/Parrot/OpLib/core.pm
@@ -426,6 +428,7 @@ INTERP_O_FILES = \
     $(SRC_DIR)/mmd$(O) \
     $(SRC_DIR)/builtin$(O) \
     $(SRC_DIR)/extend$(O) \
+    $(SRC_DIR)/extend_vtable$(O) \
     $(SRC_DIR)/revision$(O) \
     $(PF_DIR)/pf_items$(O) \
     $(OPS_DIR)/core_ops$(O) \
@@ -896,6 +899,9 @@ $(SRC_DIR)/jit_cpu$(O) : $(GENERAL_H_FILES) ${TEMP_jit_h} $(INC_DIR)/jit_emit.h
 $(SRC_DIR)/exec$(O) : $(GENERAL_H_FILES) ${TEMP_exec_h} ${TEMP_jit_h} $(INC_DIR)/jit_emit.h
 
 $(SRC_DIR)/exec_cpu$(O) : $(GENERAL_H_FILES) ${TEMP_exec_h} ${TEMP_jit_h} $(INC_DIR)/jit_emit.h
+
+$(INC_DIR)/extend_vtable.h $(SRC_DIR)/extend_vtable.c $(SRC_DIR)/vtable.h : vtable.tbl $(BUILD_TOOLS_DIR)/vtable_extend.pl lib/Parrot/Vtable.pm
+	$(PERL) $(BUILD_TOOLS_DIR)/vtable_extend.pl
 
 $(SRC_DIR)/exec_start$(O) : $(GENERAL_H_FILES) ${TEMP_exec_h}
 

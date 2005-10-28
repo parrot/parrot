@@ -293,6 +293,9 @@ sub vtbl_embed
 {
     my $vtable = shift;
 
+    my $funcs  = '';
+    my $protos = '';
+
     for my $entry (@$vtable)
     {
         my ($return_type, $name, $params, $section, $mmd) = @$entry;
@@ -304,26 +307,49 @@ sub vtbl_embed
 
         while (my ($type, $name) = splice( @params, 0, 2 ))
         {
-            push @sig, find_type( $type ) . ' ' . $name;
-            push @args, $name;
+           eval
+           {
+               push @sig, find_type( $type ) . ' ' . $name;
+               push @args, $name;
+            };
         }
+
+        next if $@;
 
         my $signature = join( ', ', @sig  );
         my $arguments = join( ', ', @args );
 
         my $ret_type  = find_type( $return_type );
 
-        printf 
-"%s Parrot_PMC_%s( %s )
+        $protos .= sprintf "extern %s Parrot_PMC_%s( %s );\n",
+            $ret_type, $name, $signature;
+
+        $funcs .= sprintf 
+"/*
+
+=item C<%s
+%s(%s)>
+
+=cut
+
+*/
+
+%s Parrot_PMC_%s( %s )
 {
-    %s retval;
-    PARROT_CALLIN_START( interp );
-    retval = VTABLE_%s( %s );
+", ($ret_type, $name, $signature) x 2;
+
+        $funcs .= "    $ret_type retval;\n" unless $ret_type eq 'void';
+	$funcs .= "    PARROT_CALLIN_START( interp );\n    ";
+        $funcs .= "retval = " unless $ret_type eq 'void';
+        $funcs .= "VTABLE_$name( $arguments );
     PARROT_CALLIN_END( interp );
-    return retval;
-}\n\n", $ret_type, $name, $signature, $ret_type, $name, $arguments;
+    return";
+        $funcs .= " retval" unless $ret_type eq 'void';
+        $funcs .= ";\n}\n\n";
 
     }
+
+    return ($funcs, $protos);
 }
 
 sub find_type
@@ -339,6 +365,7 @@ sub find_type
         'FLOATVAL' => 'Parrot_Float',
         'void'     => 'void',
         'UINTVAL'  => 'Parrot_Int',
+        'size_t'   => 'size_t',
     );
 
     die "Unknown type $type\n" unless exists $typemap{ $type };
