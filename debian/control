@@ -2,7 +2,7 @@ Source: parrot
 Section: interpreters
 Priority: optional
 Maintainer: Florian Ragwitz <rafl@debianforum.de>
-Build-Depends: debhelper (>= 4.0.0), perl
+Build-Depends: debhelper (>= 4.0.0), perl, perl-doc, libgmp3-dev, libgdbm-dev, python, bc, m4, libicu34-dev
 Standards-Version: 3.6.2
 
 Package: parrot
@@ -29,7 +29,7 @@ Description: virtual machine to execute bytecode for interpreted languages
 
 Package: parrot-doc
 Architecture: all
-Depends: 
+Suggests: perl-doc
 Description: virtual machine to execute bytecode for interpreted languages
  Parrot is a virtual machine designed to execute bytecode for interpreted
  languages efficiently. Parrot will be the target for the Perl 6 compiler.
