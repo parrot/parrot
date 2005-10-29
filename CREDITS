@@ -323,6 +323,9 @@ D: Win32, FreeBSD build fixes
 N: Nigelsandever
 D: Win32 patches
 
+N: OOLLEY kj
+D: Miscellaneous cleanup and PDD07-conformance
+
 N: Patrick R. Michaud
 D: Parrot Grammar Engine
 E: pmichaud@pobox.com
@@ -397,6 +400,9 @@ E: steven@accognoscere.org
 W: http://www.accognoscere.org
 S: Winterthur, Switzerland
 
+N: Stig Brantaset
+D: Patch to repair 'make clean'
+
 N: Thilo Planz
 D: ParTcl tests and inspiration
 
@@ -420,8 +426,5 @@ D: Win32, IO fixes
 N: Will Coleda
 E: will@coleda.com
 D: Tcl language (partcl) and misc fixes
-
-N: OOLLEY kj
-D: Miscellaneous cleanup and PDD07-conformance
 
 N: Zach Lipton

@@ -4,6 +4,7 @@
 ${make_set_make}
 PERL      = ${perl}
 MAKE_C    = ${make_c}
+RM_F      = ${rm_f}
 
 # add new languages here
 # remove obsolete languages here
