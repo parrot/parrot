@@ -434,3 +434,9 @@ E: will@coleda.com
 D: Tcl language (partcl) and misc fixes
 
 N: Zach Lipton
+
+N: Florian Ragwitz
+E: rafl@debianforum.de
+W: http://www.tu-chemnitz.de/~rafl/
+D: Debian packaging
+S: Chemnitz, Germany
