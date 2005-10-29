@@ -3,7 +3,7 @@
 # $Id$
 
 use strict;
-use Parrot::Test tests => 1;
+use Parrot::Test tests => 2;
 
 pir_output_is(<<'CODE', <<'OUT', "alligator");
 # if the side-effect of newsub/continuation isn't
@@ -31,4 +31,32 @@ ex:
 CODE
 Hi
 Hi
+OUT
+
+pir_output_is(<<'CODE', <<'OUT', "alligator 2 - r9629");
+.sub xyz
+    .local pmc args
+    args = new .ResizablePMCArray
+    push args, "abc"
+    push args, "def"
+    push args, "POPME"
+
+    $S0 = args[-1]
+    if $S0 != "POPME" goto start
+    $P0 = pop args
+  start:
+    $I1 = elements args
+    $I0 = 0
+  loop:
+    if $I0 >= $I1 goto end
+    $S0 = args[$I0]
+    print $S0
+    print "\n"
+    inc $I0
+    goto loop
+  end:
+.end
+CODE
+abc
+def
 OUT

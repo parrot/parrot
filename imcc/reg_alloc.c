@@ -738,10 +738,13 @@ interferes(Interp *interpreter, IMC_Unit * unit, SymReg * r0, SymReg * r1)
         if (l1->first_ins->index > l0->last_ins->index)
             continue;
 
-#if 1
+#if 0
         /* If they only overlap one instruction and one is used RHS only
          * and the other LHS, then that's ok
          * same if both are LHS
+         *
+         * XXX While the idea is ok, the following tests are wrong
+         * see imcc/t/reg/alloc_2
          */
         if (l0->first_ins->index == l1->last_ins->index &&
                 instruction_writes(l0->first_ins, r0) &&
