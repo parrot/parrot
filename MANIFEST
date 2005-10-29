@@ -318,15 +318,6 @@ config/inter/shlibs.pl                            []
 config/inter/progs.pl                             []
 config/inter/types.pl                             []
 config/inter/yacc.pl                              []
-debian/changelog                                  []
-debian/compat                                     []
-debian/control                                    []
-debian/copyright                                  []
-debian/parrot-dev.install                         []
-debian/parrot-doc.install                         []
-debian/parrot.docs                                []
-debian/parrot.install                             []
-debian/rules                                      []
 docs/BROKEN                                       [devel]doc
 docs/ROADMAP                                      [devel]doc
 docs/compiler_faq.pod                             [devel]doc
