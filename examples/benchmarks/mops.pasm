@@ -1,13 +1,13 @@
-# Copyright (C) 2001-2003 The Perl Foundation.  All rights reserved.
+# Copyright (C) 2001-2005 The Perl Foundation.  All rights reserved.
 # $Id$
 
 =head1 NAME
 
-examples/assembly/mops_p.pasm - Calculate a benchmark
+examples/benchmarks/mops.pasm - Calculate a benchmark
 
 =head1 SYNOPSIS
 
-    % ./parrot examples/assembly/mops_p.pasm
+    % ./parrot examples/benchmarks/mops.pasm
 
 =head1 DESCRIPTION
 
@@ -65,7 +65,16 @@ DONE:   time   N5
 
 =head1 SEE ALSO
 
-F<examples/assembly/mops.pasm>, F<examples/assembly/pmcmops.pasm>.
+F<examples/assembly/pmcmops.pasm>,
+F<examples/mops/mops.c>,
+F<examples/mops/mops.cs>,
+F<examples/mops/mops.il>,
+F<examples/mops/mops.p6>,
+F<examples/mops/mops.pl>,
+F<examples/mops/mops.ps>,
+F<examples/mops/mops.py>,
+F<examples/mops/mops.rb>,
+F<examples/mops/mops.scheme>.
 
 =cut
 

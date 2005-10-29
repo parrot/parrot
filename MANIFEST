@@ -450,7 +450,6 @@ examples/README                                   [main]doc
 examples/assembly/acorn.l                         [main]doc
 examples/assembly/hello-dwim.imc                  [main]doc
 examples/assembly/mops.pasm                       [main]doc
-examples/assembly/mops_p.pasm                     [main]doc
 examples/assembly/nanoforth.pasm                  [main]doc
 examples/assembly/nanoforth2.pasm                 [main]doc
 examples/assembly/ncurses_life.imc                [main]doc

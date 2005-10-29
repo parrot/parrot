@@ -61,7 +61,11 @@ N: Benjamin Goldberg
 D: Numerous improvements and proposals.
 
 N: Bernhard Schmalhofer
-D: Bugfixes, m4, Getopt_Long.pir, Parrot bc, Configure bugfixes
+D: Bugfixes
+D: Parrot m4
+D: Getopt/Long.pir
+D: Parrot bc
+D: Cleanup of examples/assembly 
 
 N: Bob Diertens
 D: patch regarding macro argument expansion
