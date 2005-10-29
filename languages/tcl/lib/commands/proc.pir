@@ -40,8 +40,8 @@ got_args:
   .local pmc parsed_body
   $S0 = body_p
   ($I0,$P0) = compiler(0,$S0)
-  parsed_body = pir_compiler($I0,$P0)
-  register parsed_body
+  $P0 = pir_compiler($I0,$P0)
+  parsed_body = $P0[0]
 
   # XXX these need to go away - for now, we'll just escape
   # the code portion and put it, escaped, into the proc
