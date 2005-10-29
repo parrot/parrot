@@ -16,7 +16,7 @@ Tests Parrot calling conventions.
 
 =cut
 
-use Parrot::Test tests => 38;
+use Parrot::Test tests => 39;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "set_args - parsing");
@@ -1079,4 +1079,35 @@ CODE
 9000
 10000
 OUTPUT
-  
+ 
+# bug - register conflict with :slurpy param (pmichaud, 2005.10.29)
+pir_output_is(<<'CODE', <<'OUTPUT', ":slurpy register conflict");
+.sub main :main
+    xyz("abc", "def")
+    xyz("ghi", "jkl", "POPME")
+.end
+
+.sub xyz
+    .param pmc args            :slurpy
+
+    $S0 = args[-1]
+    if $S0 != "POPME" goto start
+    $P0 = pop args
+  start:
+    $I1 = elements args
+    $I0 = 0
+  loop:
+    if $I0 >= $I1 goto end
+    $S0 = args[$I0]
+    print $S0
+    print "\n"
+    inc $I0
+    goto loop
+  end:
+.end
+CODE
+abc
+def
+ghi
+jkl
+OUTPUT
