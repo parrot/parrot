@@ -51,6 +51,37 @@ clear_fixups(Interp* interpreter, PMC* self)
     }
 }
 
+static PMC*
+get_sub(Interp* interpreter, PMC* self, int idx)
+{
+    opcode_t i, n, ci;
+    struct PackFile_ByteCode *seg;
+    struct PackFile_FixupTable *ft;
+    struct PackFile_ConstTable *ct;
+    PMC *sub;
+
+    seg = PMC_sub(self)->seg;
+    if (!seg)
+        return PMCNULL;
+    ft = seg->fixups;
+    if (!ft)
+        return PMCNULL;
+    ct = seg->const_table;
+    if (!ct)
+        return PMCNULL;
+    for (i = n = 0; i < ft->fixup_count; i++) {
+        switch (ft->fixups[i]->type) {
+            case enum_fixup_sub:
+                if (n++ != idx)
+                    continue;
+                ci = ft->fixups[i]->offset;
+                sub = ct->constants[ci]->u.key;
+                return sub;
+        }
+    }
+    return PMCNULL;
+}
+
 static void
 mark_subs(Interp* interpreter, PMC* self)
 {
@@ -194,6 +225,20 @@ for writing to disc and later loading via C<load_bytecode>.
         pf->directory.num_segments = 0;
         PackFile_destroy(INTERP, pf);
         return res;
+    }
+
+/*
+
+=item C<PMC *get_pmc_keyed_int(INTVAL key)>
+
+Returns the Sub PMC of the element at index C<key> or PMCNULL. 
+
+=cut
+
+*/
+
+    PMC* get_pmc_keyed_int (INTVAL key) {
+        return get_sub(INTERP, SELF, key);
     }
 
 /*

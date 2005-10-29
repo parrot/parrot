@@ -17,7 +17,7 @@ Tests on-the-fly PASM, PIR and PAST compilation and invocation.
 
 =cut
 
-use Parrot::Test tests => 14;
+use Parrot::Test tests => 15;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "eval_sc");
@@ -462,4 +462,30 @@ pir_output_is(<<'CODE', <<'OUTPUT', "eval.thaw");
 CODE
 hello from foo_1
 hello from foo_1
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "get_pmc_keyed_int");
+.sub main :main
+    .local string code
+    .local pmc e, s, compi
+    code = <<"EOC"
+    .sub foo
+	noop
+    .end
+    .sub bar
+	noop
+    .end
+EOC
+    compi = compreg "PIR"
+    e  = compi(code)
+    s = e[0]
+    print s
+    print "\n"
+    s = e[1]
+    print s
+    print "\n"
+.end
+CODE
+foo
+bar
 OUTPUT
