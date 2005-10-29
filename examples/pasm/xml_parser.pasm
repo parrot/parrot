@@ -1,17 +1,13 @@
-# Copyright (C) 2001-2003 The Perl Foundation.  All rights reserved.
+# Copyright (C) 2001-2005 The Perl Foundation.  All rights reserved.
 # $Id$
 
 =head1 NAME
 
-examples/assembly/xml_parser.pasm - Simple XML Parser
+examples/pasm/xml_parser.pasm - Simple XML Parser
 
 =head1 SYNOPSIS
 
-    % ./parrot examples/assembly/xml_parser.pasm examples/assembly/small.xml
-
-Note that this example currently seems to be broken:
-
-    Couldn't open small.xml
+    % ./parrot examples/pasm/xml_parser.pasm examples/pasm/small.xml
 
 =head1 DESCRIPTION
 
@@ -373,7 +369,7 @@ MAIN:
 	# SMALL FILES ONLY.  SMALL.  SMALL.  SMALL.  Parrots I/O
 	# GC does not play nice with read().
 	set S10, ""
-	open P0, "small.xml", "<"
+	open P0, "examples/pasm/small.xml", "<"
 	if P0, READ
 	print "Couldn't open small.xml\n"
 	exit 1
@@ -460,7 +456,7 @@ BAIL:
 
 =head1 SEE ALSO
 
-F<examples/assembly/small.xml>.
+F<examples/pasm/small.xml>.
 
 =head1 HISTORY
 

@@ -103,6 +103,8 @@ D: Fix for parrot linking issue on Solaris 8
 
 N: Clinton A. Pierce
 D: Many PIR tests and fixes
+D: A small XML parser in PASM
+D: Interpreter and compiler for BASIC
 
 N: Cory Spencer
 D: Peek opcode and PIO implementation

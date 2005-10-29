@@ -14,12 +14,11 @@ t/examples/pasm.t - Test examples in F<examples/pasm>
 
 =head1 DESCRIPTION
 
-Test the examples in F<examples/assambly>.
-For now only a fex examples are included here.
+Test the examples in F<examples/pasm>.
 
 =head1 TODO
 
-Check on remaining examples.
+Check on remaining examples in 'examples/assembly'.
 
 =head1 SEE ALSO
 
@@ -28,7 +27,7 @@ F<t/examples/japh.t>
 =cut
 
 use strict;
-use Parrot::Test tests => 3;
+use Parrot::Test tests => 4;
 use Test::More;
 
 # Set up expected output for examples
@@ -76,6 +75,20 @@ Getting rid of bottom stack
 The lexical 'a' has in the current scope the value 2.
 The lexical 'b' has in the current scope the value 3.
 END_EXPECTED
+
+    'xml_parser.pasm'        =>  << 'END_EXPECTED',
+Start xml version=1.0
+Start top
+Start inner foo=bar narf=poit
+Start junk
+Data Hello
+Close junk
+Start empty
+Close empty
+Close inner
+Close top
+END_EXPECTED
+
                           );
 
 # Do the testing
