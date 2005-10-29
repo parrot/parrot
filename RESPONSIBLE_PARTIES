@@ -1,16 +1,17 @@
 # $Id$
 
-This is a partial list of the folks with CVS commit access and the
+This is a partial list of the folks with SVN commit access and the
 areas they're directly responsible for. This does not list all the
-people with CVS commit access, just those who have an area they've
+people with SVN commit access, just those who have an area they've
 taken responsibility for.
 See also languages/LANGUAGES.STATUS for language authors/maintainers.
 
-Design				Chip Salzenberg
-Release pumpking		Leopold "leo" Toetsch
-JIT				Daniel Grunblatt, Leopold Toetsch
-Configure			Brent Royal-Gordon
+Design                          Chip Salzenberg
+Release pumpking                Leopold "leo" Toetsch
+JIT                             Daniel Grunblatt, Leopold Toetsch
+Configure                       Brent Royal-Gordon
 Garbage Collector               ** volunteers?? **
-I/O				Juergen Boemmels
+I/O                             Juergen Boemmels
 IMCC & PIR                      Leopold Toetsch
 Misc core stuff                 Leopold Toetsch
+Debian packaging                Florian Ragwitz
