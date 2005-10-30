@@ -16,6 +16,7 @@
 
 DEVEL           = ${DEVEL}
 VERSION         = ${VERSION}$(DEVEL)
+SOVERSION       = ${VERSION}
 
 # Override at least PREFIX with the install location if you're going
 # to be using this outside of your build area.
@@ -736,7 +737,7 @@ check_source : $(GENERAL_H_FILES)
 #
 ###############################################################################
 
-shared : $(GEN_HEADERS) blib/lib/libparrot$(SHARE_EXT) $(LIBPARROT)
+shared : $(GEN_HEADERS) blib/lib/libparrot$(SHARE_EXT).$(SOVERSION) $(LIBPARROT)
 static : $(GEN_HEADERS) $(LIBPARROT)
 
 # XXX changes don't always propagate into libparrot
@@ -750,9 +751,9 @@ $(LIBPARROT) : $(O_FILES)
 	$(AR_CR) ${ar_out}$@ ${ar_extra} $(O_FILES)
 	$(RANLIB) $@
 
-blib/lib/libparrot$(SHARE_EXT) : $(O_FILES)
+blib/lib/libparrot$(SHARE_EXT).$(SOVERSION) : $(O_FILES)
 	$(MKDIR) blib blib/lib
-	$(LD) $(LD_SHARE_FLAGS) $(LDFLAGS) ${ld_out}blib/lib/libparrot$(SHARE_EXT) $(O_FILES) $(C_LIBS) $(LIBICUCORE) $(LIBICUDATA)
+	$(LD) -Wl,-soname=libparrot$(SHARE_EXT).$(SOVERSION) $(LD_SHARE_FLAGS) $(LDFLAGS) ${ld_out}blib/lib/libparrot$(SHARE_EXT).$(SOVERSION) $(O_FILES) $(C_LIBS) $(LIBICUCORE) $(LIBICUDATA)
 
 $(PARROT_SO) : $(IMCC_DIR)/main$(O) blib/lib/libparrot$(SHARE_EXT) lib/Parrot/OpLib/core.pm
 	$(LINK) $(LINKFLAGS) ${ld_out}$(PARROT) $(IMCC_DIR)/main$(O) \
