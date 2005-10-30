@@ -38,6 +38,10 @@ my $header = '# $' . 'Id' . '$' . "\n" . << 'END_HEADER';   # confuse SVN
 # 
 # Ignore the SVN directories
 \B\.svn\b
+
+# debian/ should not go into release tarballs
+^debian$
+^debian/
 END_HEADER
 my $now = localtime();
 $header =~ s/NOW/$now/;
