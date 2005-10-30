@@ -604,8 +604,8 @@ pir_output_is(<<'CODE', <<'OUTPUT', "tailcall 3 - pass arg");
     tailcall b
 .end
 .sub bar
-    print "bar\n"
     get_params "(0)", $S0
+    print "bar\n"
     print $S0
     set_returns "(0)", "bar_ret\n"
     returncc
