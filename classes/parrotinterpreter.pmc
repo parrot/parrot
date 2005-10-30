@@ -44,6 +44,7 @@ destination interpreter.
 static void
 clone_regs_interp(Parrot_Interp d, Parrot_Interp s, PMC *dest)
 {
+#if 0
     int i;
     mem_sys_memcopy(&INTERP_REG_INT(d, 0),
         &INTERP_REG_INT(s, 0), sizeof(struct IReg));
@@ -72,6 +73,7 @@ clone_regs_interp(Parrot_Interp d, Parrot_Interp s, PMC *dest)
             }
         }
     }
+#endif
 }
 
 /*

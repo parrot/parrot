@@ -16,7 +16,7 @@ Tests Parrot calling conventions.
 
 =cut
 
-use Parrot::Test tests => 39;
+use Parrot::Test tests => 42;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "set_args - parsing");
@@ -1079,35 +1079,119 @@ CODE
 9000
 10000
 OUTPUT
- 
-# bug - register conflict with :slurpy param (pmichaud, 2005.10.29)
-pir_output_is(<<'CODE', <<'OUTPUT', ":slurpy register conflict");
+
+pir_output_is(<<'CODE', <<'OUTPUT', "tailcall - overlapping Ix");
 .sub main :main
-    xyz("abc", "def")
-    xyz("ghi", "jkl", "POPME")
-.end
-
-.sub xyz
-    .param pmc args            :slurpy
-
-    $S0 = args[-1]
-    if $S0 != "POPME" goto start
-    $P0 = pop args
-  start:
-    $I1 = elements args
-    $I0 = 0
-  loop:
-    if $I0 >= $I1 goto end
-    $S0 = args[$I0]
-    print $S0
+    ($I0, $I1) = foo()
+    print $I0
+    print $I1
     print "\n"
-    inc $I0
-    goto loop
-  end:
+.end
+.sub foo
+    .const .Sub b = "bar"
+    I0 = 10
+    I1 = 20
+    set_args "(0,0)", I1, I0
+    tailcall b
+.end
+.sub bar
+    get_params "(0,0)", I0, I1
+    .return (I0, I1)
 .end
 CODE
-abc
-def
-ghi
-jkl
+2010
 OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "tailcall - optional not set");
+.sub main :main
+    foo()
+    print "ok\n"
+.end
+.sub foo
+    .const .Sub b = "bar"
+    .return b(10, 20)
+.end
+.sub bar
+    .param int a
+    .param int b
+    .param int c :optional
+    .param int has_c :opt_flag
+    print_item a
+    print_item b
+    unless has_c goto no_c
+    print_item c
+    goto got_c
+no_c:
+    print_item 'no'
+got_c:
+    print_newline
+.end
+CODE
+10 20 no
+ok
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "tailcall - optional set");
+.sub main :main
+    foo()
+    print "ok\n"
+.end
+.sub foo
+    .const .Sub b = "bar"
+    .return b(10, 20, 30)
+.end
+.sub bar
+    .param int a
+    .param int b
+    .param int c :optional
+    .param int has_c :opt_flag
+    print_item a
+    print_item b
+    unless has_c goto no_c
+    print_item c
+    goto got_c
+no_c:
+    print_item 'no'
+got_c:
+    print_newline
+.end
+CODE
+10 20 30
+ok
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "clone_key_arg");
+.sub main :main
+    foo()
+    print "ok\n"
+.end
+
+.sub foo
+    .local pmc cl, o
+    cl = newclass "MyClass"
+    o = new "MyClass"
+    $S0 = "key"
+    $I0 = 3
+    o[$S0;$I0] = 42
+.end
+
+.namespace ["MyClass"]
+
+# key arguments in register have to be expanded into their
+# values because in the called sub frame the original refered
+# registers just don't exist              #' for vim
+
+.sub __set_integer_keyed :method
+    .param pmc key
+    .param int val
+    print_item key        # print first key
+    key = shift key       # get next key
+    print_item key
+    print_item val
+    print_newline
+.end
+CODE
+key 3 42
+ok
+OUTPUT
+

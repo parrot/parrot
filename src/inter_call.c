@@ -315,6 +315,9 @@ next_arg(Interp *interpreter, struct call_state_1 *st)
                     st->sig = PARROT_ARG_PMC; break;
             }
             break;
+        case CALL_STATE_TC:
+            st->sig = st->u.tc_args[st->i].type;
+            break;
     }
     return 1;
 }
@@ -345,6 +348,14 @@ fetch_arg(Interp *interpreter, struct call_state *st)
                     return fetch_arg_num_sig(interpreter, st);
                 case PARROT_ARG_PMC:
                     return fetch_arg_pmc_sig(interpreter, st);
+            }
+            break;
+        case CALL_STATE_TC:
+            {
+                HashEntry *e =  st->src.u.tc_args + st->src.i;
+                st->val = e->val;
+                st->src.sig = e->type;
+                st->src.mode |= CALL_STATE_NEXT_ARG;
             }
             break;
     }
@@ -481,7 +492,11 @@ convert_arg_from_pmc(Interp *interpreter, struct call_state *st)
     }
     return 0;
 }
-
+/*
+ * replace any src register by their values (done inside clone)
+ * need a test for tailcalls too, but I think there is no syntax
+ * to pass a key to a tailcalled function or method
+ */
 static void
 clone_key_arg(Interp *interpreter, struct call_state *st)
 {
@@ -641,59 +656,87 @@ the latter handles return values and yields.
 Check register usage of arguments and params for a conflict that would
 prevent proper argument passing. E.g.
 
-  args     P30   P14    P15
-  params   P14   P30    P15
+  args     P0   P1   P2
+  params   P1   P0   P2
 
 As in a tailcall we are working in the same register store, passing
-the first argument (P30 -> P14) would overwrite the next source (P14)
+the first argument (P0 -> P1) would overwrite the next source (P1)
 and the second param would get a wrong value.
 
-TODO instead of disabling tailcalls in such a case, we could create an
-intermediate storage for conflicting registers and use this information
-in the subsequent argument passing.
+The same problem arises if registers overlap due to variable-sized
+register chunks:
+
+  args     N1   N0    # sub with N-regs only
+  params   I2   I0    # sub with I-regs only
+
+We create an intermediate storage for conflicting registers and use
+this information in the subsequent argument passing.
 
 =cut
 
 */
 
-int
-parrot_check_tail_call(Interp* interpreter,
-        struct PackFile_ByteCode *dst_seg, opcode_t *pc)
+opcode_t *
+parrot_pass_args_tail_call(Interp* interpreter,
+        struct Parrot_sub *dest_sub, opcode_t *pc)
 {
     struct call_state st;
-    int todo, i;
+    int todo, i, n;
 
     if (*pc != PARROT_OP_get_params_pc)
-        return 1;
-    todo = Parrot_init_arg_op(interpreter, dst_seg,
-            CONTEXT(interpreter->ctx), pc, &st.dest);
-    if (!todo)
-        return 1;
+        return pc;
     todo = Parrot_init_arg_op(interpreter, interpreter->code,
             CONTEXT(interpreter->ctx),
             interpreter->current_args, &st.src);
     if (!todo)
-        return 1;
-    for (;;) {
-        if (!next_arg(interpreter, &st.src))
-            return 1;
-        if (!next_arg(interpreter, &st.dest))
-            return 1;
-        pc = st.src.u.op.pc;
-        i  = st.src.i;
-        for (;;) {
-            if (!next_arg(interpreter, &st.src))
-                break;
-            if ( (st.src.sig & PARROT_ARG_TYPE_MASK) ==
-                    (st.dest.sig & PARROT_ARG_TYPE_MASK) &&
-                    *st.src.u.op.pc  == *st.dest.u.op.pc) {
-                return 0;
-            }
-        }
-        st.src.u.op.pc = pc;
-        st.src.i = i;
+        return pc;
+    todo = Parrot_init_arg_op(interpreter, dest_sub->seg,
+            CONTEXT(interpreter->ctx),
+            pc, &st.dest);
+    if (!todo)
+        return pc;
+    /* allocate helper storage
+     * due to flatten, we need max(src, dest)
+     */
+    n = st.src.n;
+    if (st.dest.n > n)
+        n = st.dest.n;
+    st.dest.u.tc_args = mem_sys_allocate(n * sizeof(HashEntry));
+    /* fetch args */
+
+    st.dest.mode = CALL_STATE_TC;
+    for (i = 0;  ; ++i) {
+        if (!Parrot_fetch_arg(interpreter, &st))
+            break;
+        assert(i < n);
+        st.dest.u.tc_args[i].val = st.val;
+        st.dest.u.tc_args[i].type = st.src.sig;
     }
-    return 1;
+    /* now set new register structure, realloc if needed */
+    Parrot_realloc_context(interpreter, dest_sub->n_regs_used);
+    /* ctx might have moved */
+    st.dest.ctx = CONTEXT(interpreter->ctx);
+    /* and store args */
+
+    st.src.i = 0;
+    st.src.n = i;
+    st.opt_so_far = 0;
+    st.src.mode = CALL_STATE_TC;
+    st.src.u.tc_args = st.dest.u.tc_args;
+    /* reinit dest */
+    Parrot_init_arg_op(interpreter, dest_sub->seg,
+            CONTEXT(interpreter->ctx),
+            pc, &st.dest);
+    for (;;) {
+        Parrot_fetch_arg(interpreter, &st);
+        Parrot_convert_arg(interpreter, &st);
+        if (!Parrot_store_arg(interpreter, &st))
+            break;
+    }
+    /* free helper */
+    mem_sys_free(st.src.u.tc_args);
+    /* done. return position past get_params opcode */
+    return pc + st.dest.n + 2;
 }
 
 opcode_t *

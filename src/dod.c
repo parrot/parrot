@@ -271,6 +271,7 @@ Parrot_dod_trace_root(Interp *interpreter, int trace_stack)
 {
 
     struct Arenas *arena_base = interpreter->arena_base;
+    parrot_context_t *ctx;
 
     /*
      * note: adding locals here did cause increased DOD runs
@@ -294,7 +295,8 @@ Parrot_dod_trace_root(Interp *interpreter, int trace_stack)
     pobject_lives(interpreter, (PObj *)interpreter->iglobals);
     /* Now, go run through the PMC registers and mark them as live */
     /* First mark the current set. */
-    for (i = 0; i < NUM_REGISTERS; i++) {
+    ctx = CONTEXT(interpreter->ctx);
+    for (i = 0; i < ctx->n_regs_used[REGNO_PMC]; i++) {
         if (REG_PMC(i)) {
             pobject_lives(interpreter, (PObj *)REG_PMC(i));
         }
@@ -302,12 +304,12 @@ Parrot_dod_trace_root(Interp *interpreter, int trace_stack)
     /*
      * mark current context stuff
      */
-    if (CONTEXT(interpreter->ctx)->current_sub)
-        pobject_lives(interpreter, (PObj*)CONTEXT(interpreter->ctx)->current_sub);
-    if (CONTEXT(interpreter->ctx)->current_cont)
-        pobject_lives(interpreter, (PObj*)CONTEXT(interpreter->ctx)->current_cont);
-    if (CONTEXT(interpreter->ctx)->current_object)
-        pobject_lives(interpreter, (PObj*)CONTEXT(interpreter->ctx)->current_object);
+    if (ctx->current_sub)
+        pobject_lives(interpreter, (PObj*)ctx->current_sub);
+    if (ctx->current_cont)
+        pobject_lives(interpreter, (PObj*)ctx->current_cont);
+    if (ctx->current_object)
+        pobject_lives(interpreter, (PObj*)ctx->current_object);
 
     /*
      * mark vtable->data
@@ -357,7 +359,7 @@ Parrot_dod_trace_root(Interp *interpreter, int trace_stack)
         pobject_lives(interpreter, (PObj *)interpreter->DOD_registry);
 
     /* Walk all stacks */
-    mark_context(interpreter, CONTEXT(interpreter->ctx));
+    mark_context(interpreter, ctx);
 
     /* Walk the iodata */
     Parrot_IOData_mark(interpreter, interpreter->piodata);
@@ -507,7 +509,7 @@ trace_active_buffers(Interp *interpreter)
     /* First mark the current set. We assume that all pointers in S registers
      * are pointing to valid buffers. This is not a good assumption, but it'll
      * do for now. */
-    for (i = 0; i < NUM_REGISTERS; i++) {
+    for (i = 0; i < CONTEXT(interpreter->ctx)->n_regs_used[REGNO_STR]; i++) {
         Buffer *reg = (Buffer *)REG_STR(i);
 
         if (reg)

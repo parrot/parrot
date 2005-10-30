@@ -240,6 +240,7 @@ Invokes the subroutine.
         struct Parrot_Context *context;
         PMC *ccont;
         opcode_t *pc;
+        int args_passed;
 
         if (Interp_trace_TEST(INTERP, PARROT_TRACE_SUB_CALL_FLAG)) {
             print_sub_name(INTERP, SELF);
@@ -284,6 +285,7 @@ Invokes the subroutine.
         caller_ctx = CONTEXT(INTERP->ctx);
         ccont = INTERP->current_cont;
         INTERP->current_cont = NULL;
+        args_passed = 0;
         if (ccont == NEED_CONTINUATION) {
             ccont = new_ret_continuation_pmc(interpreter, next);
             goto create_ctx;
@@ -294,13 +296,18 @@ Invokes the subroutine.
          * if we do a taicall, we have to check that registers
          * don't overlap
          */
-        if ((PObj_get_FLAGS(ccont) & SUB_FLAG_TAILCALL)
-            && parrot_check_tail_call(INTERP, sub->seg, pc)) {
+        if (PObj_get_FLAGS(ccont) & SUB_FLAG_TAILCALL) {
+            opcode_t *new_pc;
+            new_pc = parrot_pass_args_tail_call(INTERP, sub, pc);
             /* clear tail call flag - it has to be set again
              * by the tailcall opcode
              */
             PObj_get_FLAGS(ccont) &= ~SUB_FLAG_TAILCALL;
-            context = CONTEXT(INTERP->ctx);
+            if (new_pc) {
+                pc = new_pc;
+                args_passed = 1;
+                context = CONTEXT(INTERP->ctx);
+            }
         }
         else {
 create_ctx:
@@ -330,7 +337,7 @@ create_ctx:
          * new frame, e.g. called from runops_fromc
          * else if the sub starts with get_params, pass arguments now
          */
-        if (next && *pc == PARROT_OP_get_params_pc) {
+        if (next && *pc == PARROT_OP_get_params_pc && !args_passed) {
             INTERP->current_params = pc;
             /* argument passing code returns the address beyond
              * get_params, so that we can skip this opcode, we

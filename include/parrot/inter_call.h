@@ -17,7 +17,8 @@
 enum call_state_mode {
     CALL_STATE_SIG        =  0x001,     /* runops, nci */
     CALL_STATE_OP         =  0x002,     /* get_, set_ ops */
-    CALL_STATE_MASK       =  0x003,
+    CALL_STATE_TC         =  0x004,     /* taicall, fetch from tc_args */
+    CALL_STATE_MASK       =  0x007,
 
     CALL_STATE_FLATTEN    =  0x010,
 
@@ -35,6 +36,7 @@ struct call_state_1 {
             opcode_t *pc;
             PMC *signature;
         } op;
+        HashEntry *tc_args;     /* tailcall arg store - a typed union */
     } u;
     struct PackFile_Constant **constants;
     parrot_context_t *ctx;
@@ -69,7 +71,8 @@ int Parrot_fetch_arg_nci(Interp *, struct call_state *st);
 int Parrot_convert_arg(Interp *, struct call_state *st);
 int Parrot_store_arg(Interp *, struct call_state *st);
 
-int parrot_check_tail_call(Interp*, struct PackFile_ByteCode *, opcode_t *);
+opcode_t * parrot_pass_args_tail_call(Interp*, struct Parrot_sub *,
+        opcode_t *);
 
 opcode_t * parrot_pass_args(Interp *, struct PackFile_ByteCode *seg,
         parrot_context_t *ctx, int what);

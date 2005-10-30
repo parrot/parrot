@@ -156,16 +156,6 @@ typedef struct _RunProfile {
  */
 struct _imc_info_t;
 
-/*
- * doomed helper structure
- */
-struct _parrot_regs_t {
-    struct NReg num_reg;
-    struct IReg int_reg;
-    struct PReg pmc_reg;
-    struct SReg string_reg;
-};
-
 typedef union {
     PMC         **regs_p;
     STRING      **regs_s;
@@ -183,6 +173,7 @@ typedef struct Parrot_Context {
     Regs_ps                bp_ps;       /* pointers to PMC & STR */
     /* end common header */
     INTVAL n_regs_used[4];	        /* INSP in PBC */
+    size_t regs_mem_size;               /* memory occupied by registers */
     INTVAL ref_count;                   /* how often refered to */
     struct Stack_Chunk *reg_stack;      /* register stack */
 
@@ -248,11 +239,19 @@ struct Interp_Context {
 
 #define CONTEXT(ctx) ((ctx).state)
 
+#define CHUNKED_CTX_MEM 0           /* see src/register.c */
+
 typedef struct _context_mem {
+#if CHUNKED_CTX_MEM
     char *data;                     /* ctx + register store */
     char *free;                     /* free to allocate */
     char *threshold;                /* continuation threshold */
     struct _context_mem *prev;      /* previous allocated area */
+#else
+    void **free_list;               /* per size free slots */
+    int n_free_slots;               /* amount of allocated */
+#endif
+
 } context_mem;
 /*
  * The actual interpreter structure
@@ -263,12 +262,12 @@ struct parrot_interp_t {
 
     struct Stash *globals;                    /* Pointer to the global variable
                                                * area */
-    
+
     struct Arenas *arena_base;                /* Pointer to this interpreter's
                                                * arena */
-    
+
     PMC *class_hash;                          /* Hash of classes */
-    
+
     struct _ParrotIOData *piodata;            /* interpreter's IO system */
 
     op_lib_t  *op_lib;                        /* Opcode library */
@@ -387,53 +386,6 @@ typedef enum {
 } iglobals_enum;
 /* &end_gen */
 
-/*
- * Macros to make accessing registers more convenient/readable.
- */
-
-#  define INTERP_REG_NUM(i, x) i->ctx.bp.regs_n[-1L-(x)]
-#  define INTERP_REG_INT(i, x) i->ctx.bp.regs_i[x]
-#  define INTERP_REG_PMC(i, x) i->ctx.bp_ps.regs_p[-1L-(x)]
-#  define INTERP_REG_STR(i, x) i->ctx.bp_ps.regs_s[x]
-
-#  define CTX_REG_NUM(ctx, x) (ctx)->bp.regs_n[-1L-(x)]
-#  define CTX_REG_INT(ctx, x) (ctx)->bp.regs_i[x]
-#  define CTX_REG_PMC(ctx, x) (ctx)->bp_ps.regs_p[-1L-(x)]
-#  define CTX_REG_STR(ctx, x) (ctx)->bp_ps.regs_s[x]
-/*
- * and a set of macros to access a register by offset, used
- * in JIT emit prederef code
- * The offsets are relative to interpreter->ctx.bp.
- *
- * Reg order in imcc/reg_alloc.c is "INSP"   TODO make defines
- */
-
-#define REGNO_INT 0
-#define REGNO_NUM 1
-#define REGNO_STR 2
-#define REGNO_PMC 3
-
-#  define __CTX interpreter->ctx.state
-#  define _SIZEOF_INTS    (sizeof(INTVAL) * __CTX->n_regs_used[REGNO_INT])
-#  define _SIZEOF_NUMS    (sizeof(FLOATVAL) * __CTX->n_regs_used[REGNO_NUM])
-#  define _SIZEOF_PMCS    (sizeof(PMC*) * __CTX->n_regs_used[REGNO_PMC])
-#  define _SIZEOF_STRS    (sizeof(STRING*) * __CTX->n_regs_used[REGNO_STR])
-
-#  define REG_OFFS_NUM(x) (sizeof(FLOATVAL) * (-1L - (x)))
-#  define REG_OFFS_INT(x) (sizeof(INTVAL) * (x))
-#  define REG_OFFS_PMC(x) (_SIZEOF_INTS + sizeof(PMC*) * \
-        (__CTX->n_regs_used[REGNO_PMC] - 1L - (x)))
-#  define REG_OFFS_STR(x) (sizeof(STRING*) * (x) + _SIZEOF_INTS + _SIZEOF_PMCS )
-
-
-/*
- * same with the default name interpreter
- */
-#define REG_INT(x) INTERP_REG_INT(interpreter, x)
-#define REG_NUM(x) INTERP_REG_NUM(interpreter, x)
-#define REG_STR(x) INTERP_REG_STR(interpreter, x)
-#define REG_PMC(x) INTERP_REG_PMC(interpreter, x)
-
 #define PCONST(i) PF_CONST(interpreter->code, (i))
 #define PNCONST   PF_NCONST(interpreter->code)
 
@@ -468,11 +420,6 @@ __declspec(dllimport) extern PMC * PMCNULL;  /* Holds single Null PMC         */
 Interp *make_interpreter(Interp * parent, Interp_flags);
 void Parrot_init(Interp *);
 void Parrot_destroy(Interp *);
-
-void Parrot_alloc_context(Interp *, INTVAL *n_regs_used);
-void Parrot_free_context(Interp *, parrot_context_t *, int re_use);
-void Parrot_set_context_threshold(Interp *, parrot_context_t *);
-void parrot_gc_context(Interp *);
 
 INTVAL interpinfo(Interp *interpreter, INTVAL what);
 PMC*   interpinfo_p(Interp *interpreter, INTVAL what);

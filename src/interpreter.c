@@ -73,8 +73,12 @@ prederef_args(void **pc_prederef, Interp *interpreter,
 {
     struct PackFile_ConstTable * const_table
         = interpreter->code->const_table;
-    int i;
+    int i, regs_n, regs_i, regs_p, regs_s;
 
+    regs_n = CONTEXT(interpreter->ctx)->n_regs_used[REGNO_NUM];
+    regs_i = CONTEXT(interpreter->ctx)->n_regs_used[REGNO_INT];
+    regs_p = CONTEXT(interpreter->ctx)->n_regs_used[REGNO_PMC];
+    regs_s = CONTEXT(interpreter->ctx)->n_regs_used[REGNO_STR];
     for (i = 1; i < opinfo->arg_count; i++) {
         opcode_t arg = pc[i];
 
@@ -82,26 +86,26 @@ prederef_args(void **pc_prederef, Interp *interpreter,
 
         case PARROT_ARG_KI:
         case PARROT_ARG_I:
-            if (arg < 0 || arg >= NUM_REGISTERS)
+            if (arg < 0 || arg >= regs_i)
                 internal_exception(INTERP_ERROR, "Illegal register number");
             pc_prederef[i] = (void *)REG_OFFS_INT(arg);
             break;
 
         case PARROT_ARG_N:
-            if (arg < 0 || arg >= NUM_REGISTERS)
+            if (arg < 0 || arg >= regs_n)
                 internal_exception(INTERP_ERROR, "Illegal register number");
             pc_prederef[i] = (void *)REG_OFFS_NUM(arg);
             break;
 
         case PARROT_ARG_K:
         case PARROT_ARG_P:
-            if (arg < 0 || arg >= NUM_REGISTERS)
+            if (arg < 0 || arg >= regs_p)
                 internal_exception(INTERP_ERROR, "Illegal register number");
             pc_prederef[i] = (void *)REG_OFFS_PMC(arg);
             break;
 
         case PARROT_ARG_S:
-            if (arg < 0 || arg >= NUM_REGISTERS)
+            if (arg < 0 || arg >= regs_s)
                 internal_exception(INTERP_ERROR, "Illegal register number");
             pc_prederef[i] = (void *)REG_OFFS_STR(arg);
             break;

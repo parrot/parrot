@@ -1142,7 +1142,7 @@ e_pbc_emit(Interp *interpreter, void *param, IMC_Unit * unit, Instruction * ins)
         pc = (opcode_t*) interpreter->code->base.data + oldsize;
         npc = 0;
         /* add debug if necessary */
-        if (!IMCC_INFO(interpreter)->optimizer_level || 
+        if (!IMCC_INFO(interpreter)->optimizer_level ||
             IMCC_INFO(interpreter)->optimizer_level == OPT_PASM) {
             const char *sourcefile = unit->file;
             /* FIXME length and multiple subs */
@@ -1160,6 +1160,14 @@ e_pbc_emit(Interp *interpreter, void *param, IMC_Unit * unit, Instruction * ins)
             PIO_eprintf(NULL, "pbc.c: e_pbc_emit (pcc_sub=%s)\n", ins->r[0]->name);
 #endif
             add_const_pmc_sub(interpreter, ins->r[0], oldsize,
+                    oldsize+code_size);
+        }
+        else {
+            /* need a dummy to hold register usage */
+            SymReg *r = mk_sub_label(interpreter, str_dup("(null)"));
+            r->type = VT_PCC_SUB;
+            r->pcc_sub = calloc(1, sizeof(struct pcc_sub_t));
+            add_const_pmc_sub(interpreter, r, oldsize,
                     oldsize+code_size);
         }
     }

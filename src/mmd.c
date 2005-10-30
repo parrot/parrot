@@ -1759,7 +1759,7 @@ Sort the candidate list C<cl> by Manhattan Distance
 static void
 mmd_sort_candidates(Interp *interpreter, PMC *arg_tuple, PMC *cl)
 {
-    INTVAL i, n, d, i3;
+    INTVAL i, n, d;
     PMC *nci, *pmc, *sort;
     INTVAL *helper;
     PMC **data;
@@ -1788,10 +1788,7 @@ mmd_sort_candidates(Interp *interpreter, PMC *arg_tuple, PMC *cl)
     /*
      * sort it
      */
-    i3 = REG_INT(3);
-    REG_INT(3) = 1;
     Parrot_FixedPMCArray_sort(interpreter, sort, nci);
-    REG_INT(3) = i3;
     /*
      * now helper has a sorted list of indices in the upper 16 bits
      * fill helper with sorted candidates

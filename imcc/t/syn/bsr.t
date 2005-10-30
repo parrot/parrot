@@ -46,9 +46,8 @@ pir_output_is(<<'CODE', <<'OUT', "stack calling conventions");
    print s
    print "\n"
    end
-.end
 
-.sub _foo		# sub foo(int a, int b)
+_foo:		# sub foo(int a, int b)
    saveall
    .local int a, b
    restore  a
@@ -89,9 +88,8 @@ pir_output_is(<<'CODE', <<'OUT', "fact with stack calling conventions");
     print product
     print "\n"
     end
-.end
 
-.sub _fact
+_fact:
     saveall
     .local int N
     restore  N
@@ -147,7 +145,7 @@ OUT
 
 ##############################
 # tail recursion - caller saves
-pir_output_is(<<'CODE', <<'OUT', "tail recursive bsr");
+pir_output_is(<<'CODE', <<'OUT', "another recursive bsr");
 .sub test :main
    $I0 = 5	# count
    $I1 = 1	# product
