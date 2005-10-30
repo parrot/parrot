@@ -348,7 +348,11 @@ set_register_usage(Interp *interpreter,
                 typ = -1;
                 break;
         }
-        if (typ >= 0) {
+        /*
+         * JIT structures are NUM_REGISTERS big
+         * we can currently allocate only that much
+         */
+        if (typ >= 0 && idx < NUM_REGISTERS) {
             /* remember the register typ (+1) for this op argument
              * for register allocation */
             map[cur_op + argn - code_start] = typ + 1;
@@ -376,8 +380,10 @@ set_register_usage(Interp *interpreter,
                     else if (flags & KEY_string_FLAG)
                         typ = 2;
 
-                    if (!ru[typ].reg_count[n]++)
-                        ru[typ].reg_dir[n] |= PARROT_ARGDIR_IN;
+                    if (n < NUM_REGISTERS) {
+                        if (!ru[typ].reg_count[n]++)
+                            ru[typ].reg_dir[n] |= PARROT_ARGDIR_IN;
+                    }
                 }
                 key = key_next(interpreter, key);
             }
@@ -1299,7 +1305,7 @@ build_asm(Interp *interpreter, opcode_t *pc,
     struct PackFile_Segment *jit_seg;
     /* XXX
      * no longer referenced due to disabled code below
-    char *name; 
+    char *name;
     */
     char *map;
     Parrot_jit_fn_info_t *op_func;
@@ -1335,10 +1341,10 @@ build_asm(Interp *interpreter, opcode_t *pc,
      */
 #if 0
     /* XXX
-     * JIT segs are currentlu not build
+     * JIT segs are currently not build
      * the find_segments also segfaults on PPC eval_2
      * maybe something not initialized correctly
-     * - diabled --leo
+     * - disabled --leo
      */
     name = mem_sys_allocate(strlen(interpreter->code->base.name) + 5);
     sprintf(name, "%s_JIT", interpreter->code->base.name);
@@ -1413,6 +1419,17 @@ build_asm(Interp *interpreter, opcode_t *pc,
     while (jit_info->optimizer->cur_section) {
         /* the code emitting functions need cur_op and cur_section
          * so these vars are in jit_info too
+         */
+
+        /*
+         * TODO
+         *
+         * Register offsets depend on n_regs_used, which is per
+         * subroutine. JIT code is currently generated for a whole
+         * PBC. We can either:
+         * 1) create JIT per subroutine or
+         * 2) track the sub we are currently in, set register usage
+         *    in the interpreter context and restore it at end
          */
 
         /* The first opcode for this section */
