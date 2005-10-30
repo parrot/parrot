@@ -64,25 +64,6 @@ can.
 /*
 
 =item C<Parrot_STRING
-Parrot_PMC_get_string(Parrot_INTERP interp, Parrot_PMC pmc)>
-
-Return an opaque string that represents the string contained in the PMC.
-
-=cut
-
-*/
-
-Parrot_STRING Parrot_PMC_get_string(Parrot_INTERP interp, Parrot_PMC pmc) {
-    Parrot_STRING retval;
-    PARROT_CALLIN_START(interp);
-    retval = VTABLE_get_string(interp, pmc);
-    PARROT_CALLIN_END(interp);
-    return retval;
-}
-
-/*
-
-=item C<Parrot_STRING
 Parrot_PMC_get_string_intkey(Parrot_INTERP interp, Parrot_PMC pmc, Parrot_Int key)>
 
 Return the integer keyed string value of the passed-in PMC
@@ -99,25 +80,6 @@ Parrot_STRING Parrot_PMC_get_string_intkey(Parrot_INTERP interp, Parrot_PMC pmc,
     return retval;
 }
 
-
-/*
-
-=item C<void *Parrot_PMC_get_pointer(Parrot_INTERP interp, Parrot_PMC pmc)>
-
-Returns a pointer. Used for PMCs that hold pointers to arbitrary data
-PMC.
-
-=cut
-
-*/
-
-void *Parrot_PMC_get_pointer(Parrot_INTERP interp, Parrot_PMC pmc) {
-    void *retval;
-    PARROT_CALLIN_START(interp);
-    retval = VTABLE_get_pointer(interp, pmc);
-    PARROT_CALLIN_END(interp);
-    return retval;
-}
 
 /*
 
@@ -424,23 +386,6 @@ void Parrot_PMC_set_pmc_pmckey(Parrot_INTERP interp, Parrot_PMC pmc,
 /*
 
 =item C<void
-Parrot_PMC_set_pointer(Parrot_INTERP interp, Parrot_PMC pmc, void *value)>
-
-Assign the passed-in pointer to the passed-in PMC.
-
-=cut
-
-*/
-
-void Parrot_PMC_set_pointer(Parrot_INTERP interp, Parrot_PMC pmc, void *value) {
-    PARROT_CALLIN_START(interp);
-    VTABLE_set_pointer(interp, pmc, value);
-    PARROT_CALLIN_END(interp);
-}
-
-/*
-
-=item C<void
 Parrot_PMC_set_pointer_intkey(Parrot_INTERP interp, Parrot_PMC pmc,
                               Parrot_Int key, void *value)>
 
@@ -618,44 +563,6 @@ void Parrot_PMC_push_numval(Parrot_INTERP interp, Parrot_PMC pmc,
                             Parrot_Float value) {
     PARROT_CALLIN_START(interp);
     VTABLE_push_float(interp, pmc, value);
-    PARROT_CALLIN_END(interp);
-}
-
-/*
-
-=item C<void
-Parrot_PMC_push_string(Parrot_INTERP interp, Parrot_PMC pmc,
-                            Parrot_Int value)>
-
-Push the passed-in Parrot string onto the passed in PMC
-
-=cut
-
-*/
-
-void Parrot_PMC_push_string(Parrot_INTERP interp, Parrot_PMC pmc,
-                            Parrot_STRING value) {
-    PARROT_CALLIN_START(interp);
-    VTABLE_push_string(interp, pmc, value);
-    PARROT_CALLIN_END(interp);
-}
-
-/*
-
-=item C<void
-Parrot_PMC_push_pmc(Parrot_INTERP interp, Parrot_PMC pmc,
-                    Parrot_PMC value)>
-
-Push the passed-in PMC onto the passed in PMC
-
-=cut
-
-*/
-
-void Parrot_PMC_push_pmc(Parrot_INTERP interp, Parrot_PMC pmc,
-                         Parrot_PMC value) {
-    PARROT_CALLIN_START(interp);
-    VTABLE_push_pmc(interp, pmc, value);
     PARROT_CALLIN_END(interp);
 }
 
