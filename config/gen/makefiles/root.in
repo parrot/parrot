@@ -1382,7 +1382,7 @@ prog-clean :
     $(SRC_DIR)/null_config$(O) \
     $(SRC_DIR)/parrot_config$(O) \
     $(SRC_DIR)/install_config$(O) \
-	$(SRC_DIR)/install_config.fpmc \
+	install_config.fpmc \
     $(LIBNCI_TEST_SO) \
     $(LIBPARROT)
 	$(PERL) build_tools/c2str.pl --init
