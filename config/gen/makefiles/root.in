@@ -807,10 +807,10 @@ $(PINFO) : $(SRC_DIR)/pbc_info$(O) $(LIBPARROT)
 #
 
 # pbc_info
-$(PBCMERGE) : $(SRC_DIR)/pbc_merge$(O) $(LIBPARROT)
-	$(LINK) ${ld_out}$(PBCMERGE) \
+$(PBCMERGE) : $(SRC_DIR)/pbc_merge$(O) $(LIBPARROT) $(SRC_DIR)/parrot_config$(O)
+    $(LINK) ${ld_out}$(PBCMERGE) \
     $(SRC_DIR)/pbc_merge$(O) \
-    $(SRC_DIR)/null_config$(O) \
+    $(SRC_DIR)/parrot_config$(O) \
     $(LINKFLAGS) $(ALL_PARROT_LIBS)
 
 
