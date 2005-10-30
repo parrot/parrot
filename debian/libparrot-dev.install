@@ -1,3 +1,3 @@
 usr/include/*
 usr/parrot-config.imc usr/bin
-usr/lib/blib/lib/libparrot.a usr/lib
+#usr/lib/blib/lib/libparrot.a usr/lib

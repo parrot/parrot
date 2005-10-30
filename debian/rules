@@ -1,6 +1,8 @@
 #!/usr/bin/make -f
 
 CFLAGS = -Wall -g
+VERSION = 0.3.0
+SOVERSION = 0.3.0
 
 ifneq (,$(findstring noopt,$(DEB_BUILD_OPTIONS)))
 	CFLAGS += -O0
@@ -18,7 +20,7 @@ build: build-stamp
 
 build-stamp: configure-stamp 
 	dh_testdir
-	$(MAKE)
+	$(MAKE) all shared
 	pod2man --section=1 --release="Debian Project" --center="Debian GNU/Linux manual" docs/running.pod debian/parrot.1
 	pod2man --section=1 --release="Debian Project" --center="Debian GNU/Linux manual" parrot-config.imc debian/parrot-config.imc.1
 	touch build-stamp
@@ -34,10 +36,10 @@ install: build
 	dh_testdir
 	dh_testroot
 	dh_clean -k 
-	dh_installdirs
+	dh_installdirs -plibparrot$(SOVERSION)-dev usr/share/lintian/overrides
 	$(MAKE) install PREFIX=$(CURDIR)/debian/tmp/usr
 	dh_install --sourcedir=$(CURDIR)/debian/tmp --list-missing
-	install -m 644 debian/parrot-dev.lintian-overrides $(CURDIR)/debian/parrot-dev/usr/share/lintian/overrides/parrot-dev
+	install -m 644 debian/libparrot-dev.lintian-overrides $(CURDIR)/debian/libparrot$(SOVERSION)-dev/usr/share/lintian/overrides/parrot-dev
 
 # Build architecture-independent files here.
 binary-indep: build install
