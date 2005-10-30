@@ -43,7 +43,7 @@ print << "EOF";
 
 #include "parrot/parrot.h"
 
-static const char parrot_config[] = {
+static const unsigned char parrot_config[] = {
 EOF
 
 if ($mini_parrot) {
