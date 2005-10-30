@@ -17,7 +17,7 @@ Description: virtual machine to execute bytecode for interpreted languages
  stages of completion for a wide range of other languages.
 
 Package: parrot-dev
-Architecture: all
+Architecture: any
 Depends: parrot (= ${Source-Version})
 Description: virtual machine to execute bytecode for interpreted languages
  Parrot is a virtual machine designed to execute bytecode for interpreted
