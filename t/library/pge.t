@@ -290,7 +290,7 @@ pir_output_is(<<'CODE', <<'OUT', "This made Parrot m4 fail");
   rulesub_b( input_string ) 
 
   print "ok1\n"
-  end
+  # end
 
   rulesub_a( input_string ) 
   print "ok2\n"
