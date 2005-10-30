@@ -29,7 +29,7 @@ clean:
 	dh_testdir
 	dh_testroot
 	rm -f build-stamp configure-stamp debian/parrot.1 debian/parrot-config.imc.1
-	-$(MAKE) clean
+	-$(MAKE) realclean
 	dh_clean 
 
 install: build
@@ -39,13 +39,14 @@ install: build
 	dh_installdirs -plibparrot$(SOVERSION)-dev usr/share/lintian/overrides
 	$(MAKE) install PREFIX=$(CURDIR)/debian/tmp/usr
 	dh_install --sourcedir=$(CURDIR)/debian/tmp --list-missing
-	install -m 644 debian/libparrot-dev.lintian-overrides $(CURDIR)/debian/libparrot$(SOVERSION)-dev/usr/share/lintian/overrides/parrot-dev
+	perl -p -e 's/%SOVERSION%/$(SOVERSION)/g' debian/libparrot-dev.lintian-overrides > $(CURDIR)/debian/libparrot$(SOVERSION)-dev/usr/share/lintian/overrides/libparrot$(SOVERSION)-dev
 
 # Build architecture-independent files here.
 binary-indep: build install
 	dh_testdir -i 
 	dh_testroot -i
 	dh_installchangelogs -i ChangeLog
+	dh_installman -plibparrot$(SOVERSION)-dev debian/parrot-config.imc.1
 	dh_installdocs -i
 	dh_compress -i
 	dh_fixperms -i
@@ -60,13 +61,13 @@ binary-arch: build install
 	dh_testroot -a
 	dh_installchangelogs -a ChangeLog
 	dh_installman -pparrot debian/parrot.1
-	dh_installman -pparrot-dev debian/parrot-config.imc.1
 	dh_installdocs -a
 	dh_strip -a
 	dh_compress -a
 	dh_fixperms -a
 	dh_installdeb -a
 	dh_shlibdeps -a
+	dh_makeshlibs -a
 	dh_gencontrol -a
 	dh_md5sums -a
 	dh_builddeb -a
