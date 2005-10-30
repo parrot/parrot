@@ -16,7 +16,7 @@ Tests Parrot calling conventions.
 
 =cut
 
-use Parrot::Test tests => 42;
+use Parrot::Test tests => 44;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "set_args - parsing");
@@ -1193,5 +1193,48 @@ pir_output_is(<<'CODE', <<'OUTPUT', "clone_key_arg");
 CODE
 key 3 42
 ok
+OUTPUT
+
+# result_info op
+
+pir_output_is(<<'CODE', <<'OUTPUT', "result_info op");
+.sub main :main
+    test()
+    $I0 = test()
+    ($I1, $I2, $I3) = test()
+.end
+
+.sub test
+    $P0 = result_info
+    $I0 = elements $P0
+    print $I0
+    print "\n"
+.end
+CODE
+0
+1
+3
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "result_info op with eval");
+.sub main :main
+    $S0 = <<"TESTSUB"
+.sub test
+    $P0 = result_info
+    $I0 = elements $P0
+    print $I0
+    print "\\n"
+.end
+TESTSUB
+    $P0 = compreg "PIR"
+    $P1 = $P0($S0)
+    test()
+    $I0 = test()
+    ($I1, $I2, $I3) = test()
+.end
+CODE
+0
+1
+3
 OUTPUT
 
