@@ -257,6 +257,7 @@ GEN_LIBRARY = \
     $(LIBRARY_DIR)/ncurses.pbc \
     $(LIBRARY_DIR)/parrotlib.pbc \
     $(LIBRARY_DIR)/pcre.pbc \
+	$(LIBDARY_DIR)/PGE.pbc \
     $(LIBRARY_DIR)/PGE/Dumper.pbc \
     $(LIBRARY_DIR)/PGE/Glob.pbc \
     $(LIBRARY_DIR)/PGE/Text.pbc \
@@ -1381,6 +1382,7 @@ prog-clean :
     $(SRC_DIR)/null_config$(O) \
     $(SRC_DIR)/parrot_config$(O) \
     $(SRC_DIR)/install_config$(O) \
+	$(SRC_DIR)/install_config.fpmc \
     $(LIBNCI_TEST_SO) \
     $(LIBPARROT)
 	$(PERL) build_tools/c2str.pl --init
