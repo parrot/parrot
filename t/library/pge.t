@@ -1,5 +1,5 @@
 #! perl -w
-# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 =head1 NAME
@@ -14,7 +14,7 @@ t/library/pge.t - Grammar Engine tests
 
 use strict;
 
-use Parrot::Test tests => 3;
+use Parrot::Test tests => 4;
 
 # 1
 pir_output_is(<<'CODE', <<'OUT', "Glob, wildcards");
@@ -269,6 +269,37 @@ ok8
 ok9
 ok10
 ok11
+OUT
+
+# 4
+pir_output_is(<<'CODE', <<'OUT', "This made Parrot m4 fail");
+
+.sub 'test' :main
+  load_bytecode "PGE.pbc"
+
+  .local pmc p6rule
+  find_global p6rule, "PGE", "p6rule"
+
+  .local pmc rulesub_a, rulesub_b
+  rulesub_a  = p6rule( "a" )
+  rulesub_b  = p6rule( "^(<[b]>)" )
+
+  .local string input_string    
+  input_string    = "_____________________________________________________________________"
+
+  rulesub_b( input_string ) 
+
+  print "ok1\n"
+  end
+
+  rulesub_a( input_string ) 
+  print "ok2\n"
+
+.end
+
+CODE
+ok1
+ok2
 OUT
 
 # vim: ft=imc :
