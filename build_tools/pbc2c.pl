@@ -357,7 +357,7 @@ Gregor N. Purdy E<lt>gregor@focusresearch.comE<gt>
 
 Copyright (C) 2001 Gregor N. Purdy. All rights reserved.
 
-Copyright (C) 2001-2002 The Parrot Team. All rights reserved.
+Copyright (C) 2001-2002 The Perl Foundation. All rights reserved.
 This program is free software. It is subject to the same license
 as the Parrot interpreter.
 

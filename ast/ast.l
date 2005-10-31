@@ -4,7 +4,7 @@
  *
  * Ast lexer
  *
- * Copyright (C) 2004 by leo
+ * Copyright (C) 2004-2005 The Perl Foundation.  All Rights Reserved.
  *
  * The tokenizer.
  */
