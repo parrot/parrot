@@ -51,11 +51,11 @@ SKIP:
 {
     # check that MANIFEST.SKIP is in sync with svn:ignore
     # An new MANIFEST.SKIP can be generated with tools/dev/gen_manifest_skip.pl
-    skip 'Not a working copy', 3 unless $Parrot::Revision::svn_entries;
+    skip 'Not a working copy', 3 unless ($Parrot::Revision::svn_entries || `svk ls .`);
 
     my $dist = Parrot::Distribution->new();
     my @from_svn = grep { $_ && $_ !~ m/^#/ } @{ $dist->gen_manifest_skip() };
-    unshift @from_svn, '\B\.svn\b';   # added in gen_manifest_skip.pl
+    unshift @from_svn, '\B\.svn\b', '^debian$', '^debian/';   # added in gen_manifest_skip.pl
     open( MANIFEST_SKIP, '<', $manifest_skip ) or die "Can't open $manifest_skip: $!";
     my @from_manifest_skip = grep { $_ ne "\n" && $_ !~ m/^#/ } ( <MANIFEST_SKIP> );
     close( MANIFEST_SKIP );
@@ -65,12 +65,8 @@ SKIP:
 
     local $" = "\n\t";
 
-    SKIP:
-    {
-      skip( q{'debian/' is on purpose not in svn:ignore}, 1 );
-      ok(!@$svn_miss, 'all files in MANIFEST.SKIP are also in svn:ignore')
+    ok(!@$svn_miss, 'all files in MANIFEST.SKIP are also in svn:ignore')
           or diag("File in MANIFEST.SKIP but not ignored by SVN:\n\t@$svn_miss");
-    };
     ok(!@$manifest_skip_miss, 'all svn:ignore files are in MANIFEST.SKIP')
         or diag("Files ignored by SVN but not in MANIFEST.SKIP:\n\t@$manifest_skip_miss");
 
