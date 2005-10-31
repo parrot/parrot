@@ -139,6 +139,12 @@ D: Use unix98 ps option in signal.t
 N: Felix Gallo
 D: delegate.pmc patch
 
+N: Florian Ragwitz
+E: rafl@debianforum.de
+W: http://www.tu-chemnitz.de/~rafl/
+D: Debian packaging
+S: Chemnitz, Germany
+
 N: François PERRAD
 D: build fixes for MinGW
 D: a patch to remove slash_exec from config
@@ -438,9 +444,3 @@ E: will@coleda.com
 D: Tcl language (partcl) and misc fixes
 
 N: Zach Lipton
-
-N: Florian Ragwitz
-E: rafl@debianforum.de
-W: http://www.tu-chemnitz.de/~rafl/
-D: Debian packaging
-S: Chemnitz, Germany
