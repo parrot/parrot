@@ -343,7 +343,7 @@ Parrot_jit_debug_stabs(Interp *interpreter)
     line = 1;
     lc = 0;
     debug = interpreter->code->debugs;
-    for (i = 0; i < jit_info->arena.map_size; i++) {
+    for (i = 0; i < interpreter->code->base.size; i++) {
         if (jit_info->arena.op_map[i].ptr) {
             op_info_t* op = &interpreter->op_info_table[
                 interpreter->code->base.data[i]];
