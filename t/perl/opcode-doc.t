@@ -4,15 +4,15 @@
 
 =head1 NAME
 
-t/src/opcode-doc.t - check opcode documentation
+t/perl/opcode-doc.t - check opcode documentation
 
 =head1 SYNOPSIS
 
-        % perl t/src/opcode-doc.t
+        % perl t/perl/opcode-doc.t
 
 =head1 DESCRIPTION
 
-Checks whether all opcodes are documentated.
+Checks whether all opcodes are documented.
 
 =cut
 
@@ -22,6 +22,7 @@ my @docerr;
 
 sub slurp {
     my ($filename) = @_;
+
     open FILE, "< $filename" or die "can't open '$filename' for reading";
     my @file = <FILE>;
     close FILE;
@@ -30,6 +31,7 @@ sub slurp {
 
 sub analyse {
     my ($filename, $ops) = @_;
+
     my %file;
 
     foreach my $op ( keys %$ops ) {
@@ -47,12 +49,13 @@ sub analyse {
     }
 
     foreach my $line ( sort {$a<=>$b} keys %file ) {
-            push @docerr, "$filename:$line: $file{$line}\n";
+        push @docerr, "$filename:$line: $file{$line}\n";
     }
 }
 
 sub check_op_doc {
     my ($filename) = @_;
+
     my @file = slurp( $filename );
     my %op;
     my $lineno = 0;

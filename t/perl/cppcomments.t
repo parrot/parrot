@@ -1,5 +1,5 @@
 #! perl -w
-# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 =head1 NAME
@@ -12,14 +12,14 @@ t/src/cppcomments.t - checks for C++ style comments
 
 =head1 DESCRIPTION
 
-Checks that no source file in the distribution uses C++ style comments
+Checks that no source file in the distribution uses C++ style comments.
 
 =cut
 
 use strict;
 use Test::More tests => 1;
 
-my @files = qw(
+my @globs = qw(
     ast/*.c
     ast/*.h
     classes/*.pmc
@@ -43,7 +43,7 @@ my @files = qw(
 
 my @comments;
 
-foreach my $glob ( @files ) {
+foreach my $glob ( @globs ) {
     foreach my $file ( glob $glob ) {
 	my $i = 0;
 	
