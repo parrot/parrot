@@ -1,0 +1,5 @@
+# Copyright: 2003-2005 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+This directory contains test code written in Perl5.
+See also the documentation in ../../docs/tests.pod.
