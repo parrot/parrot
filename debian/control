@@ -18,6 +18,7 @@ Description: virtual machine to execute bytecode for interpreted languages
 
 Package: libparrot0.3.0
 Architecture: any
+Section: libs
 Depends: ${shlibs:Depends}
 Description: virtual machine to execute bytecode for interpreted languages
  Parrot is a virtual machine designed to execute bytecode for interpreted
@@ -29,6 +30,7 @@ Description: virtual machine to execute bytecode for interpreted languages
  
 Package: libparrot0.3.0-dev
 Architecture: all
+Section: libdevel
 Depends: libparrot0.3.0 (= ${Source-Version})
 Provides: libparrot-dev
 Conflicts: libparrot-dev
