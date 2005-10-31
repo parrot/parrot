@@ -47,7 +47,7 @@ testclean:
 	$(RM_RF) ../../t/p6rules/*.pir ../../t/p6rules/*.pasm
 
 clean: testclean
-	$(RM_RF) PGE.pbc PGE/Library.pir
+	$(RM_RF) PGE.pbc $(PARROT_LIBRARY)${slash}PGE.pbc PGE/Library.pir
 
 realclean: clean
 	$(RM_RF) Makefile
