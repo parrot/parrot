@@ -741,7 +741,9 @@ check_source : $(GENERAL_H_FILES)
 #
 ###############################################################################
 
-shared : $(GEN_HEADERS) blib/lib/libparrot$(SHARE_EXT).$(SOVERSION) $(LIBPARROT)
+shared : $(GEN_HEADERS) blib/lib/libparrot$(SHARE_EXT).$(SOVERSION) $(LIBPARROT) $(INSTALLABLEPARROT)
+	$(LINK) ${ld_out}$(INSTALLABLEPARROT) $(LINKFLAGS) $(IMCC_DIR)/main$(O) $(ICU_SHARED) $(C_LIBS) -Lblib/lib -lparrot $(SRC_DIR)/install_config$(O)
+
 static : $(GEN_HEADERS) $(LIBPARROT)
 
 # XXX changes don't always propagate into libparrot
@@ -758,6 +760,7 @@ $(LIBPARROT) : $(O_FILES)
 blib/lib/libparrot$(SHARE_EXT).$(SOVERSION) : $(O_FILES)
 	$(MKDIR) blib blib/lib
 	$(LD) -Wl,-soname=libparrot$(SHARE_EXT).$(SOVERSION) $(LD_SHARE_FLAGS) $(LDFLAGS) ${ld_out}blib/lib/libparrot$(SHARE_EXT).$(SOVERSION) $(O_FILES) $(C_LIBS) $(LIBICUCORE) $(LIBICUDATA)
+	cp blib/lib/libparrot$(SHARE_EXT).$(SOVERSION) blib/lib/libparrot$(SHARE_EXT)
 
 $(PARROT_SO) : $(IMCC_DIR)/main$(O) blib/lib/libparrot$(SHARE_EXT) lib/Parrot/OpLib/core.pm
 	$(LINK) $(LINKFLAGS) ${ld_out}$(PARROT) $(IMCC_DIR)/main$(O) \
