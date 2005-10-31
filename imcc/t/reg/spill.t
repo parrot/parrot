@@ -235,8 +235,6 @@ CODE
 6165697377
 OUT
 
-SKIP: {
-    skip("need variable register frame", 1);
 pir_output_is(<<'CODE', <<'OUT', "pcc arg overflow 1");
 #
 # Test the ability of the register allocator in
@@ -328,7 +326,6 @@ CODE
 35
 40
 OUT
-}
 
 pir_output_is(<<'CODE', <<'OUT', "spill 4");
 #
@@ -636,25 +633,20 @@ sub repeat {
 }
     my $template2 = <<'TEMPLATE';
 .sub _main
-    new P3, .Integer
-    new P4, .Integer
     =LOCALS=
     =INITS=
     _sub(=ARGS=)
     =TESTS2=
-    P5 = P3
-    P5 = P4
     end
 fail:
     print "failed\n"
     end
 .end
-.pcc_sub _sub
+.sub _sub
     =PARAMS=
     =TESTS=
     print "all params ok\n"
-    .pcc_begin_return
-    .pcc_end_return
+    .return()
 fail:
     print "failed\n"
     end
@@ -685,8 +677,6 @@ pir_output_is($code, <<'OUT', "overflow pmcs 22 spill");
 all params ok
 OUT
 
-SKIP: {
-    skip("need variable register frame", 2);
 $code = repeat($template2, 40,
                LOCALS => ".local Integer a<index>\n\ta<index> = new Integer",
                INITS => 'a<index> = <index>',
@@ -710,4 +700,3 @@ $code = repeat($template2, 60,
 pir_output_is($code, <<'OUT', "overflow pmcs 60 spill");
 all params ok
 OUT
-}

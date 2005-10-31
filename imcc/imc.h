@@ -54,12 +54,6 @@
 #include "unit.h"
 #include "debug.h"
 
-
-/* Ok, this won't scale to architectures like i386, but thats not
- * the goal right now.
- */
-#define MAX_COLOR NUM_REGISTERS
-
 /*
  * imc.c
  */
