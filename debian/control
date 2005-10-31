@@ -1,7 +1,7 @@
 Source: parrot
 Section: interpreters
 Priority: optional
-Maintainer: Florian Ragwitz <rafl@debianforum.de>
+Maintainer: Florian Ragwitz <rafl@debian.org>
 Build-Depends: debhelper (>= 4.0.0), perl, perl-doc, libgmp3-dev, libgdbm-dev, python, bc, m4, libicu34-dev
 Standards-Version: 3.6.2
 
