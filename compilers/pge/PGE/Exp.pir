@@ -355,6 +355,8 @@ register.
     emit(code, "    cutting = 0")
     self.emitsub(code, exp0label, "NOCUT")
     emit(code, "  fail_forever:")
+    emit(code, "    null $P0")
+    emit(code, "    setattribute mob, \"PGE::Match\\x0&:corou\", $P0")
     emit(code, "    mpos = -2")
     emit(code, "    .yield (mob)")
     emit(code, "    goto fail_forever")
@@ -873,10 +875,11 @@ register.
     .local pmc emit
     .local string subname, subargs
     .local string cname, captsave, captback
-    .local int iscapture
+    .local int iscapture, iscut
     emit = find_global "PGE::Exp", "emit"
     subname = self["subname"]
     iscapture = self["iscapture"]
+    iscut = self["iscut"]
     cname = self["cname"]
     emit(code, "\n  %s:  # subrule %s    ##", label, subname)
     subargs = ""
@@ -924,8 +927,14 @@ register.
   subrule_3:
     emit(code, "    unless $P0 goto fail")
     emit(code, captsave, cname)
+    if iscut == 0 goto subrule_4
+    emit(code, "    goto %s", next)
+    goto end
+  subrule_4:
     emit(code, "  %s_sr3:", label)
     emit(code, "    pos = $P0.to()")
+    emit(code, "    $P1 = getattribute $P0, \"PGE::Match\\x0&:corou\"")
+    emit(code, "    if_null $P1, %s", next)
     self.emitsub(code, next, "$P0", "NOCUT")
     emit(code, "    $P0.next()")
     emit(code, "    if $P0 goto %s_sr3", label)

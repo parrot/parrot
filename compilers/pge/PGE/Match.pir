@@ -134,9 +134,9 @@ Returns 1 if this object successfully matched the target string,
 =cut
 
 .sub "__get_bool" method
-    $P0 = getattribute self, "PGE::Match\x0$:from"
     $P1 = getattribute self, "PGE::Match\x0$:pos"
-    isge $I1, $P1, $P0    
+    $I0 = $P1
+    $I1 = isge $I0, 0
     .return ($I1)
 .end
 

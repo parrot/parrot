@@ -405,16 +405,20 @@ Match whitespace between tokens.
     $P0 = corou
     $P0 = clone $P0
     setattribute mob, "PGE::Match\x0&:corou", $P0
-    $P0(mob, mpos)
+    $P0(mob, mfrom, mpos)
   end:
     .return (mob)
 .end
 .sub "ws_corou" :anon
     .param pmc mob
+    .param pmc mfrom
     .param pmc mpos
   loop:
     .yield (mob)
     dec mpos
+    if mpos > mfrom goto loop
+    null $P0
+    setattribute mob, "PGE::Match\x0&:corou", $P0
     goto loop
 .end
 
