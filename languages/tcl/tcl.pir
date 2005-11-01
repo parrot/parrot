@@ -122,7 +122,7 @@ loop:
 
 gotfile:
   unless dump_only goto run_file  
-  push_eh compile_error
+  push_eh file_error 
     ($I0,$S0) = compiler(0,contents)
   clear_eh
   $S1 = pir_compiler($I0,$S0,1)
@@ -130,7 +130,7 @@ gotfile:
   goto done
 
 run_file:
-  push_eh compile_error
+  push_eh file_error
     ($I0,$S1) = compiler(0,contents)
   clear_eh
   $P2       = pir_compiler($I0,$S1)
@@ -167,12 +167,6 @@ oneliner_dump:
 
 done:
   end
-
-compile_error:
-  $S0 = P5["_message"]
-  print $S0
-  print_newline
-  exit 1
 
 file_error:
   .include "except_severity.pasm"
