@@ -7,23 +7,7 @@ Parrot - running
 
 =head1 VERSION
 
-=over 4
-
-=item 0.0.1 initial
-
-=item 0.0.9.10 changed run options
-
-=item 0.0.9.12 changed debug options
-
-=item 0.0.10.0 imcc is parrot
-
-=item 0.0.10.1 add -E switch
-
-=item 0.0.11 added runtime options
-
-=item 0.0.12 changed .imc to .pir
-
-=back
+$Revision $
 
 =head1 OVERVIEW
 
@@ -282,4 +266,4 @@ F<main.c>
 
 Leopold Toetsch C<lt@toetsch.at>
 
-
+=cut

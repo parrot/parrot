@@ -9,6 +9,10 @@ docs/debug.pod - Debugging Parrot
 
 This document describes how to debug various parts of Parrot.
 
+=head1 VERSION
+
+$Revision $
+
 =head1 THE PARROT BINARY
 
 =head2 Using a debugger
@@ -147,7 +151,7 @@ stop next. If you know of a better technique, please let the mailing list know
 =head1 PIR CODE GENERATION
 
 The C<parrot> binary has a bunch of debugging flags for spewing out information
-about various aspects of its processing. See F<imcc/docs/running.pod> for a
+about various aspects of its processing. See L<running.pod> for a
 list of flags. Or have a look at the information provided by:
 
   shell> parrot --help
@@ -155,17 +159,5 @@ list of flags. Or have a look at the information provided by:
 or
 
   shell> parrot --help-debug
-
-=head1 HISTORY
-
-=over 4
-
-=item Version 1.1
-
-Updates to remove references to C<imcc> by C<Bernhard.Schmalhofer@biomax.de>
-
-=item Version 1.0
-
-First version by Steve Fink C<steve@fink.com>
 
 =back
