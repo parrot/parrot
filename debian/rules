@@ -48,6 +48,7 @@ binary-indep: build install
 	dh_installchangelogs -i ChangeLog
 	dh_installman -plibparrot$(SOVERSION)-dev debian/parrot-config.imc.1
 	dh_installdocs -i
+	dh_link -plibparrot$(SOVERSION)-dev usr/lib/libparrot.so.$(SOVERSION) usr/lib/libparrot.so
 	dh_compress -i
 	dh_fixperms -i
 	dh_installdeb -i
