@@ -1264,6 +1264,45 @@ Parrot_destroy_jit(void *ptr)
 }
 
 /*
+ * see TODO below
+ * - locate Sub according to pc
+ * - set register usage in context
+ */  
+static void
+set_reg_usage(Interp *interpreter, opcode_t *pc)
+{
+    struct PackFile_ByteCode *seg;
+    struct PackFile_FixupTable *ft;
+    struct PackFile_ConstTable *ct;
+    PMC *sub_pmc;
+    parrot_sub_t sub;
+    int i, j, ci;
+
+    seg = interpreter->code;
+    ft = seg->fixups;
+    if (!ft)
+        return;
+    ct = seg->const_table;
+    if (!ct)
+        return;
+    for (i = 0; i < ft->fixup_count; i++) {
+        switch (ft->fixups[i]->type) {
+            case enum_fixup_sub:
+                ci = ft->fixups[i]->offset;
+                sub_pmc = ct->constants[ci]->u.key;
+                sub = PMC_sub(sub_pmc);
+                if (pc >= sub->address && pc < sub->end) {
+                    for (j = 0; j < 4; ++j)
+                        CONTEXT(interpreter->ctx)->n_regs_used[j] = 
+                            sub->n_regs_used[j];
+                    return;
+                }
+
+        }
+    }
+}
+
+/*
 
 =item C<jit_f
 build_asm(Interp *interpreter, opcode_t *pc,
@@ -1303,6 +1342,7 @@ build_asm(Interp *interpreter, opcode_t *pc,
     opcode_t cur_opcode_byte, *cur_op;
     Parrot_jit_optimizer_section_ptr cur_section;
     struct PackFile_Segment *jit_seg;
+    INTVAL   n_regs_used[4];	/* INSP in PBC */
     /* XXX
      * no longer referenced due to disabled code below
     char *name;
@@ -1390,6 +1430,11 @@ build_asm(Interp *interpreter, opcode_t *pc,
 
     jit_info->op_i = 0;
     jit_info->arena.fixups = NULL;
+    /*
+     * remember register usage
+     */
+    for (i = 0; i < 4; ++i)
+        n_regs_used[i] = CONTEXT(interpreter->ctx)->n_regs_used[i];
 
     /*
      * from C's ABI all the emitted code here is one (probably big)
@@ -1430,10 +1475,14 @@ build_asm(Interp *interpreter, opcode_t *pc,
          * 1) create JIT per subroutine or
          * 2) track the sub we are currently in, set register usage
          *    in the interpreter context and restore it at end
+         *
+         * for now we use 2) - longterm plan is 1)   
          */
 
         /* The first opcode for this section */
         cur_op = jit_info->cur_op = cur_section->begin;
+
+        set_reg_usage(interpreter, cur_op);
 
         /* Load mapped registers for this section, if JIT */
         if (!jit_seg && cur_section->isjit) {
@@ -1552,6 +1601,11 @@ build_asm(Interp *interpreter, opcode_t *pc,
             cur_section->next;
     }
 
+    /*
+     * restore register usage
+     */
+    for (i = 0; i < 4; ++i)
+        CONTEXT(interpreter->ctx)->n_regs_used[i] = n_regs_used[i];
     /* Do fixups before converting offsets */
     Parrot_jit_dofixup(jit_info, interpreter);
 
