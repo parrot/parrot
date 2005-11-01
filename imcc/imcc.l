@@ -289,9 +289,6 @@ SP              [ ]
 "num"           return(FLOATV);
 "float"         return(FLOATV);
 "new"           return(NEW);
-"newclosure"    return(NEWCLOSURE);
-"newcont"       return(NEWCONT);
-"newcor"        return(NEWCOR);
 "newsub"        return(NEWSUB);
 "addr"          return(ADDR);
 "global"        return(GLOBALOP);

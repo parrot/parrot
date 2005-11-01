@@ -250,6 +250,22 @@ inline op result_info(out PMC) {
     goto NEXT();
 }
 
+inline op newclosure(out PMC, in PMC) {
+  PMC *clos;
+  struct Parrot_sub *newsub;
+  PMC * pad = scratchpad_get_current(interpreter);
+  clos = VTABLE_clone(interpreter, $2);
+  clos->vtable = Parrot_base_vtables[enum_class_Closure];
+  newsub = PMC_sub(clos);
+  newsub->pad_stack = new_stack(interpreter, "Pad");
+  if (pad) {
+    /* put the correct pad in place */
+    stack_push(interpreter, &newsub->pad_stack, pad,
+	STACK_ENTRY_PMC, STACK_CLEANUP_NULL);
+  }
+  $1 = clos; 
+  goto NEXT();
+}
 ###############################################################################
 
 =back

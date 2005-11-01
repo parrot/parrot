@@ -279,8 +279,6 @@ done
 OUTPUT
 
 pir_output_is(<<'CODE', <<OUTPUT, "Fun with nondeterministic searches");
-
-
 # code by Piers Cawley
 =pod
 
@@ -321,20 +319,16 @@ pir_output_is(<<'CODE', <<OUTPUT, "Fun with nondeterministic searches");
      .local pmc arr2
      .local pmc x
      .local pmc y
-     .local pmc choose
-     .local pmc fail
      new_pad 0
      $P0 = new PerlArray
      store_lex 0, "*paths*", $P0
      $P0 = new String
      $P0 = "@"
-     store_lex 0, "failsym", $P0
-     store_lex 0, "choose", $P0
      store_lex 0, "fail", $P0
-     newsub choose, .Closure, _choose
-     store_lex "choose", choose
-     newsub fail, .Closure, _fail
-     store_lex "fail", fail
+     .const .Sub choose = "_choose"
+     .const .Sub fail = "_fail"
+     $P0 = newclosure fail
+     store_lex "fail", $P0
      arr1 = new PerlArray
      store_lex 0, "arr1", arr1
      arr1[0] = 1
@@ -346,7 +340,8 @@ pir_output_is(<<'CODE', <<OUTPUT, "Fun with nondeterministic searches");
      arr2[1] = 5
      arr2[2] = 9
 
-     x = choose(arr1)
+     $P0 = newclosure choose
+     x = $P0(arr1)
      store_lex 0, "x", x
      #print "Chosen "
      #print x
@@ -357,9 +352,9 @@ pir_output_is(<<'CODE', <<OUTPUT, "Fun with nondeterministic searches");
      # arr2 and x,y have to be lexicals as due to continuations
      # all variables needs refetching after a subroutine call
 
-     newsub choose, .Closure, _choose
+     $P0 = newclosure choose
      arr2 = find_lex "arr2"
-     y = choose(arr2)
+     y = $P0(arr2)
      store_lex 0, "y", y
      #print "Chosen "
      #print y
@@ -394,12 +389,11 @@ the_end:
      .include "interpinfo.pasm"
      $P1 = interpinfo .INTERPINFO_CURRENT_CONT
      store_lex 1, "cc", $P1
-     newsub our_try, .Closure, _try
+     .const .Sub tr = "_try"
+     newclosure our_try, tr
      store_lex 1, "try", our_try
      $P2 = our_try(choices)
-     .pcc_begin_return
-     .return $P2
-     .pcc_end_return
+     .return($P2)
 .end
 
 .sub _try
@@ -413,16 +407,16 @@ the_end:
      store_lex "fail", $P1
      $P1()
 have_choices:
-     newsub $P2, .Closure, new_fail
+     .const .Sub f = "new_fail"
+     newclosure $P2, f
      store_lex "fail", $P2
      $P3 = find_lex "choices"
      shift $P4, $P3
 
-     .pcc_begin_return
-     .return $P4
-     .pcc_end_return
+     .return($P4)
+.end
 
-new_fail:
+.sub new_fail
      .local pmc our_try
      .local pmc our_cc
      #print "In new_fail\n"
@@ -435,8 +429,6 @@ new_fail:
 
 .sub _fail
      print "Program failed\n"
-     .pcc_begin_return
-     .pcc_end_return
 .end
 CODE
 3 * 5 == 15!
