@@ -174,13 +174,17 @@ register.
     .param string label
     .param string next
     .local pmc emit
-    .local int min, max, islazy, iscut
+    .local int min, max, islazy, iscut, ignorecase
     (min, max, islazy, iscut, $S0) = self."quant"()
+    ignorecase = self["ignorecase"]
     emit = find_global "PGE::Exp", "emit"
     emit(code, "    litlen = length lit")
     unless min == 1 goto quant
     unless max == 1 goto quant
     emit(code, "    $S0 = substr target, pos, litlen")
+    if ignorecase == 0 goto init_1
+    emit(code, "    downcase $S0")
+  init_1:
     emit(code, "    if $S0 != lit goto fail")
     emit(code, "    pos += litlen")
     emit(code, "    goto %s", next)
@@ -376,8 +380,12 @@ register.
     .param string next
     .local pmc emit
     ($I0, $I1, $I2, $I3, $S0) = self."quant"()
+    $I0 = self["ignorecase"]
     emit = find_global "PGE::Exp", "emit"
     $S1 = self["value"]
+    if $I0 == 0 goto init_1
+    downcase $S1
+  init_1:
     $P0 = find_global "Data::Escape", "String"
     $S1 = $P0($S1, '"')
     emit(code, "\n  %s: # literal %s    ##", label, $S0)

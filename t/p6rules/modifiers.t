@@ -13,12 +13,12 @@ use Parrot::Test::PGE;
 ## :i
 ## TODO lexical scoping of :i
 p6rule_is  ('abcdef', ':i bcd', 'ignorecase (:i)');
-p6rule_is  ('aBcdef', ':i bcd', 'ignorecase (:i)', todo => 'not yet implemented');
-p6rule_is  ('abCdef', ':i bcd', 'ignorecase (:i)', todo => 'not yet implemented');
-p6rule_is  ('abcDef', ':i bcd', 'ignorecase (:i)', todo => 'not yet implemented');
+p6rule_is  ('aBcdef', ':i bcd', 'ignorecase (:i)');
+p6rule_is  ('abCdef', ':i bcd', 'ignorecase (:i)');
+p6rule_is  ('abcDef', ':i bcd', 'ignorecase (:i)');
 p6rule_isnt('abc-ef', ':i bcd', 'ignorecase (:i)');
-p6rule_is  ('abcdef', ':ignorecase bcd', 'ignorecase (:ignorecase)', todo => 'not yet implemented');
-p6rule_is  ('aBCDef', ':ignorecase bcd', 'ignorecase (:ignorecase)', todo => 'not yet implemented');
+p6rule_is  ('abcdef', ':ignorecase bcd', 'ignorecase (:ignorecase)');
+p6rule_is  ('aBCDef', ':ignorecase bcd', 'ignorecase (:ignorecase)');
 p6rule_isnt('abc-ef', ':ignorecase bcd', 'ignorecase (:ignorecase)');
 
 
@@ -34,11 +34,11 @@ p6rule_is  ('a b c def', ':w b c d', 'words (:w)');
 p6rule_isnt('ab c d ef', ':w b c d', 'words (:w)');
 p6rule_isnt('a bcdef', ':w b c d', 'words (:w)');
 p6rule_isnt('abcdef', ':w b c d', 'words (:w)');
-p6rule_is  ('a bcdef', ':words bcd', 'words (:words)', todo => 'not yet implemented');
-p6rule_is  ('a bcd ef', ':words bcd', 'words (:words)', todo => 'not yet implemented');
+p6rule_is  ('a bcdef', ':words bcd', 'words (:words)');
+p6rule_is  ('a bcd ef', ':words bcd', 'words (:words)');
 p6rule_isnt('abcdef', ':words bcd', 'words (:words)');
-p6rule_is  ('a b c d ef', ':words b c d', 'words (:words)', todo => 'not yet implemented');
-p6rule_is  ('a b c def', ':words b c d', 'words (:words)', todo => 'not yet implemented');
+p6rule_is  ('a b c d ef', ':words b c d', 'words (:words)');
+p6rule_is  ('a b c def', ':words b c d', 'words (:words)');
 p6rule_isnt('ab c d ef', ':words b c d', 'words (:words)');
 
 
