@@ -485,6 +485,8 @@ pasm_inst:         { clear_state(); }
                      free($2); }
    | PCC_SUB sub_proto LABEL
                    {
+                    imc_close_unit(interp, cur_unit);
+                    cur_unit = imc_open_unit(interp, IMC_PASM);
                      $$ = iSUBROUTINE(interp, cur_unit,
                                 mk_sub_label(interp, $3));
                      cur_call->pcc_sub->pragma = $2;

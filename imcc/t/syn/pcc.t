@@ -3,7 +3,7 @@
 # $Id$
 
 use strict;
-use Parrot::Test tests => 23;
+use Parrot::Test tests => 19;
 
 ##############################
 # Parrot Calling Conventions
@@ -168,7 +168,8 @@ pir_output_is(<<'CODE', <<'OUT', "coroutine iterator");
 .sub test :main
   .local int i
   i=5
-  newsub $P1, .Continuation, after_loop
+  new $P1, .Continuation
+  set_addr $P1, after_loop
 loop:
   $I2 = _addtwo($P1, i)
     print $I2
@@ -250,95 +251,6 @@ CODE
 14
 done in coroutine
 done in main
-OUT
-
-    my $template = <<'TEMPLATE';
-.sub test :main
-    =LOCALS=
-    =INITS=
-    .local Sub sub
-    newsub sub, .Sub, _sub
-    .pcc_begin
-    =ARGS=
-    .pcc_call sub
-ret:
-    .pcc_end
-    end
-.end
-.pcc_sub _sub
-    =PARAMS=
-    =TESTS=
-    print "all params ok\n"
-    .pcc_begin_return
-    .pcc_end_return
-fail:
-    print "failed\n"
-    end
-.end
-TEMPLATE
-
-sub repeat {
-    my ($template, $n, %substs) = @_;
-    my $code;
-    foreach (split(/\n/, $template)) {
-        if (/^(.*)=(\w+)=(.*)/) {
-            my ($pre, $key, $post) = ($1, $2, $3);
-            for my $i (0..$n-1) {
-                (my $new = $substs{$key}) =~ s/\<index\>/$i/g;
-                $code .= "$pre$new$post\n";
-            }
-        } else {
-            $code .= "$_\n";
-        }
-    }
-
-    return $code;
-}
-
-my $code = repeat($template, 18,
-                  LOCALS => '.local int a<index>',
-                  INITS => 'a<index> = <index>',
-                  ARGS => '.arg a<index>',
-                  PARAMS => '.param int a<index>',
-                  TESTS => 'ne a<index>, <index>, fail');
-
-pir_output_is($code, <<'OUT', "overflow integers");
-all params ok
-OUT
-
-SKIP: {
-    skip("need variable register frame", 2);
-$code = repeat($template, 40,
-               LOCALS => '.local int a<index>',
-               INITS => 'a<index> = <index>',
-               ARGS => '.arg a<index>',
-               PARAMS => '.param int a<index>',
-               TESTS => 'ne a<index>, <index>, fail');
-pir_output_is($code, <<'OUT', "overflowed spilled integers");
-all params ok
-OUT
-
-$code = repeat($template, 40,
-               LOCALS => ".local Integer a<index>\n\ta<index> = new Integer",
-               INITS => 'a<index> = <index>',
-               ARGS => '.arg a<index>',
-               PARAMS => '.param Integer a<index>',
-               TESTS => "set I0, a<index>\nne I0, <index>, fail");
-
-pir_output_is($code, <<'OUT', "overflow pmcs 40");
-all params ok
-OUT
-
-}
-$code = repeat($template, 18,
-               LOCALS => ".local Integer a<index>\n\ta<index> = new Integer",
-               INITS => 'a<index> = <index>',
-               ARGS => '.arg a<index>',
-               PARAMS => '.param Integer a<index>',
-               TESTS => "set I0, a<index>\nne I0, <index>, fail");
-
-pir_output_is($code, <<'OUT', "overflow pmcs");
-all params ok
 OUT
 
 

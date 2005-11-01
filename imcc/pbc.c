@@ -727,8 +727,9 @@ add_const_pmc_sub(Interp *interpreter, SymReg *r,
     pfc->type = PFC_PMC;
     pfc->u.key = sub_pmc;
     IMCC_debug(interpreter, DEBUG_PBC_CONST,
-            "add_const_pmc_sub '%s' -> '%s' flags %d color %d\n",
-            r->name, real_name, r->pcc_sub->pragma, k);
+            "add_const_pmc_sub '%s' -> '%s' flags %d color %d (%s)\n",
+            r->name, real_name, r->pcc_sub->pragma, k,
+            (char*) sub_pmc->vtable->whoami->strstart);
     /*
      * create entry in our fixup (=symbol) table
      * the offset is the index in the constant table of this Sub

@@ -6,7 +6,7 @@ use strict;
 use Parrot::Test tests => 2;
 
 pir_output_is(<<'CODE', <<'OUT', "alligator");
-# if the side-effect of newsub/continuation isn't
+# if the side-effect of set_addr/continuation isn't
 # detected this program prints "Hi\nalligator\n"
 
 .sub main :main
@@ -17,7 +17,7 @@ lab:
     print $P0
     dec $I0
     unless $I0 goto ex
-    newsub $P1, .Continuation, lab
+    new $P1, .Continuation
     set_addr $P1, lab
     $P2 = find_name "alligator"
     set_args "(0)", $P1

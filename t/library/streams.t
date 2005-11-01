@@ -60,15 +60,14 @@ pir_output_is(<<'CODE', <<'OUT', "Stream::Sub");
 
 .sub _main :main
     .local pmc stream
-    .local pmc temp
 
     load_bytecode "library/Stream/Sub.imc"
 
     find_type I0, "Stream::Sub"
     new stream, I0
 
-    # set the stream's source sub
-    newsub temp, .Sub, _hello
+    # set the stream's source sub   #'
+    .const .Sub temp = "_hello"
     assign stream, temp
 
     # dump the stream
@@ -108,16 +107,15 @@ pir_output_is(<<'CODE', <<'OUT', "Stream::read_bytes");
 
 .sub _main :main
     .local pmc stream
-    .local pmc temp
 
     load_bytecode "library/Stream/Sub.imc"
     load_bytecode "library/Stream/Replay.imc"
 
     find_type $I0, "Stream::Sub"
     new $P0, $I0
-    # set the stream's source sub
-    newsub $P1, .Sub, _hello
-    assign $P0, $P1
+    # set the stream's source sub      #'
+    .const .Sub temp = "_hello"
+    assign $P0, temp
 
     find_type $I0, "Stream::Replay"
     stream = new $I0
@@ -188,7 +186,6 @@ pir_output_is(<<'CODE', <<'OUT', "Stream::Combiner");
     .local pmc counter
     .local pmc text
     .local pmc combined
-    .local pmc temp
 
     load_bytecode "library/Stream/Base.imc"
     load_bytecode "library/Stream/Combiner.imc"
@@ -197,15 +194,15 @@ pir_output_is(<<'CODE', <<'OUT', "Stream::Combiner");
     # create the counter stream
     find_type I0, "Stream::Sub"
     new counter, I0
-    newsub temp, .Sub, _counter
-    assign counter, temp
+    .const .Sub ct = "_counter"
+    assign counter, ct
 
     # create the text stream
     find_type I0, "Stream::Sub"
     new text, I0
     # set its source
-    newsub temp, .Sub, _text
-    assign text, temp
+    .const .Sub src = "_text"
+    assign text, src
 
     # create a combiner stream
     find_type I0, "Stream::Combiner"
@@ -215,8 +212,8 @@ pir_output_is(<<'CODE', <<'OUT', "Stream::Combiner");
     assign combined, text
 
     # specify our own combiner sub
-    newsub temp, .Sub, _combiner
-    combined."combiner"( temp )
+    .const .Sub cb = "_combiner"
+    combined."combiner"( cb )
 
     # dump the combined stream
     combined."dump"()
@@ -278,7 +275,6 @@ pir_output_is(<<'CODE', <<'OUT', "Stream::Coroutine");
 
 .sub _main
     .local pmc stream
-    .local pmc temp
 
     load_bytecode "library/Stream/Base.imc"
     load_bytecode "library/Stream/Coroutine.imc"
@@ -287,8 +283,8 @@ pir_output_is(<<'CODE', <<'OUT', "Stream::Coroutine");
     find_type I0, "Stream::Coroutine"
     new stream, I0
 
-    # set the stream's source coroutine
-    newsub temp, .Coroutine, _coro
+    # set the stream's source coroutine #'
+    .const .Sub temp = "_coro"
     assign stream, temp
     #stream."source"( temp )
 
@@ -349,7 +345,6 @@ pir_output_is(<<'CODE', <<'OUT', "Stream::ParrotIO");
     .local pmc lines
     .local pmc counter
     .local pmc combiner
-    .local pmc temp
     .local string name
 
     name = "t/library/perlhist.txt"
@@ -360,24 +355,24 @@ pir_output_is(<<'CODE', <<'OUT', "Stream::ParrotIO");
     load_bytecode "library/Stream/Combiner.imc"
 
     # create a file stream
-    find_type I0, "Stream::ParrotIO"
-    new file, I0
+    find_type $I0, "Stream::ParrotIO"
+    new file, $I0
     file."open"( name, "<" )
 
     # process it one line per read
-    find_type I0, "Stream::Lines"
-    new lines, I0
+    find_type $I0, "Stream::Lines"
+    new lines, $I0
     assign lines, file
 
     # endless counter
-    find_type I0, "Stream::Sub"
-    new counter, I0
-    newsub temp, .Sub, _counter
+    find_type $I0, "Stream::Sub"
+    new counter, $I0
+    .const .Sub temp = "_counter"
     assign counter, temp
 
-    # combine the counter and the file's lines
-    find_type I0, "Stream::Combiner"
-    new combiner, I0
+    # combine the counter and the file's lines   #'
+    find_type $I0, "Stream::Combiner"
+    new combiner, $I0
     assign combiner, counter
     assign combiner, lines
 
@@ -718,7 +713,6 @@ pir_output_is(<<'CODE', <<'OUT', "Stream::Filter");
 .sub _main
     .local pmc stream
     .local pmc filter
-    .local pmc temp
 
     load_bytecode "library/Stream/Sub.imc"
     load_bytecode "library/Stream/Filter.imc"
@@ -727,7 +721,7 @@ pir_output_is(<<'CODE', <<'OUT', "Stream::Filter");
     find_type I0, "Stream::Sub"
     new stream, I0
     # assign its source
-    newsub temp, .Sub, _counter
+    .const .Sub temp = "_counter"
     assign stream, temp
 
     # create the filter stream
@@ -736,8 +730,8 @@ pir_output_is(<<'CODE', <<'OUT', "Stream::Filter");
     # assign its source
     assign filter, stream
     # set the filter sub
-    newsub temp, .Sub, _filter
-    filter."filter"( temp )
+    .const .Sub ft = "_filter"
+    filter."filter"( ft )
 
     # dump the stream
     filter."dump"()
@@ -806,15 +800,13 @@ pir_output_is(<<'CODE', <<'OUT', "Stream::include");
 
 .sub _main
     .local pmc stream
-    .local pmc temp
 
     load_bytecode "library/Stream/Sub.imc"
 
     find_type I0, "Stream::Sub"
     new stream, I0
 
-    # set the stream's source sub
-    newsub temp, .Sub, _counter
+    .const .Sub temp = "_counter"
     assign stream, temp
 
     # dump the stream
@@ -841,12 +833,11 @@ LOOP:
     # include another stream after '4'
     if i != 4 goto SKIP
     .local pmc temp
-    .local pmc func
 
     find_type I0, "Stream::Sub"
     new temp, I0
 
-    newsub func, .Sub, _included
+    .const .Sub func = "_included"
     assign temp, func
 
     # include it
@@ -859,14 +850,13 @@ SKIP:
 
 .sub _included method
     .local pmc temp
-    .local pmc func
 
     self."write"( "hello" )
 
     # create another stream
     find_type I0, "Stream::Sub"
     new temp, I0
-    newsub func, .Sub, _counter2
+    .const .Sub func = "_counter2"
     assign temp, func
 
     # include it
@@ -919,7 +909,6 @@ pir_output_is(<<'CODE', <<'OUT', "Stream::Lines");
 .sub _main
     .local pmc stream
     .local pmc lines
-    .local pmc temp
 
     load_bytecode "library/Stream/Sub.imc"
     load_bytecode "library/Stream/Lines.imc"
@@ -928,7 +917,7 @@ pir_output_is(<<'CODE', <<'OUT', "Stream::Lines");
     find_type I0, "Stream::Sub"
     new stream, I0
     # set the source
-    newsub temp, .Sub, _text
+    .const .Sub temp = "_text"
     assign stream, temp
 
     # create a lines stream
@@ -1381,7 +1370,7 @@ OUT
 }
 
 #
-# 19
+# 19 #'
 #
 pir_output_is(<<'CODE', <<'OUT', "Stream::Sub");
 
@@ -1395,8 +1384,7 @@ pir_output_is(<<'CODE', <<'OUT', "Stream::Sub");
     find_type I0, "Stream::Sub"
     new stream, I0
 
-    # set the stream's source sub
-    newsub temp, .Sub, _counter
+    .const .Sub temp = "_counter"
     assign stream, temp
 
     # dump the stream
@@ -1451,7 +1439,6 @@ pir_output_is(<<'CODE', <<'OUT', "Stream::Write");
 
 .sub _main :main
     .local pmc stream
-    .local pmc temp
 
     load_bytecode "library/Stream/Writer.imc"
 
@@ -1459,7 +1446,7 @@ pir_output_is(<<'CODE', <<'OUT', "Stream::Write");
     new stream, I0
 
     # set the stream's source sub
-    newsub temp, .Sub, _reader
+    .const .Sub temp = "_reader"
     assign stream, temp
 
     print "main start\n"

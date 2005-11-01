@@ -596,6 +596,9 @@ INS(Interp *interpreter, IMC_Unit * unit, char *name,
         }
     }
 #endif
+    else if (!strcmp(name, "yield")) {
+        cur_unit->instructions->r[0]->pcc_sub->calls_a_sub |= 1 |ITPCCYIELD;
+    }
     else if (!memcmp(name, "invoke", 6) ||
             !memcmp(name, "callmethod", 10)) {
         if (cur_unit->type & IMC_PCCSUB)

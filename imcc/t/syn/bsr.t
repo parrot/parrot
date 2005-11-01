@@ -3,7 +3,7 @@
 # $Id$
 
 use strict;
-use Parrot::Test tests => 13;
+use Parrot::Test tests => 12;
 
 pir_output_is(<<'CODE', <<'OUT', "bsr 1");
 # this tests register allocation/preserving of local bsr calls
@@ -282,20 +282,6 @@ CODE
 Hello perl6.
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "newsub");
-    .sub test :main
-        newsub P0, .Sub, _foo	# PASM syntax only for now
-        invokecc P0
-        end
-    .end
-
-    .sub _foo
-        print "foo\n"
-	returncc
-    .end
-CODE
-foo
-OUT
 
 # This is a workaround to suppress errors from POD::Checker.
 my $head1 = '=head1';
@@ -307,7 +293,7 @@ $head1 BLA
  fasel
 
 $cut
-.sub test \:main
+.sub test :main
 	print "ok 1\\n"
 	end
 .end
@@ -321,7 +307,7 @@ $head1 FOO
  fasel
 
 $cut
-.sub test \:main
+.sub test :main
 	print "ok 1\\n"
 	end
 .end

@@ -16,13 +16,13 @@ Tests the C<Coroutine> PMC.
 
 =cut
 
-use Parrot::Test tests => 13;
+use Parrot::Test tests => 12;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "Coroutine 1");
 .include "interpinfo.pasm"
-_main:
-    newsub P0, .Coroutine, _coro
+.pcc_sub _main:
+    .const .Sub P0 = "_coro"
     new P10, .Integer
     set P10, 2
     store_global "i", P10
@@ -34,7 +34,7 @@ lp:
     if P10, lp
     print "done\n"
     end
-_coro:
+.pcc_sub _coro:
     find_global P11, "i"
     dec P11
     yield
@@ -45,88 +45,16 @@ back 0
 done
 OUTPUT
 
-SKIP: {
-    skip("should this really work with distinct registers", 1);
-output_is(<<'CODE', <<'OUTPUT', "Coroutines");
-    null I0
-    null I3
-    new P0, .Coroutine
-    set_addr P0, co2
-co1:
-    set I10, 4
-    print "start 1\n"
-co1_loop:
-    invokecc P0
-    print "back  1\n"
-    dec I10
-    ne I10, 0, co1_loop
-    print "done\n"
-    end
-
-co2:
-    null I0
-    null I3
-    print "start 2\n"
-    new P5, .Coroutine
-    set_addr P5, co3
-    set P6, P0
-co2_loop:
-    invokecc P0
-    print "back  2\n"
-    set I3, I3
-    invokecc P5
-    print "back  2b\n"
-    set P0, P6
-    branch co2_loop
-
-co3:
-    null I0
-    null I3
-    print "start 3\n"
-    new P7, .Coroutine
-    set_addr P7, co2_loop
-    set P8, P0
-co3_loop:
-    invokecc P0
-    print "back  3\n"
-    set I3, I3
-    set P0, P7
-    invokecc P7
-    print "back  3b\n"
-    set P0, P8
-    branch co3_loop
-
-CODE
-start 1
-start 2
-back  1
-back  2
-start 3
-back  2b
-back  1
-back  2
-back  3
-back  3b
-back  2b
-back  1
-back  2
-back  3
-back  2
-back  2b
-back  1
-done
-OUTPUT
-}
-
 output_is(<<'CODE', <<'OUTPUT', "Coroutines and lexicals 1");
 .include "interpinfo.pasm"
+.pcc_sub main:
     new_pad 0
 
     new P20, .String
     set P20, "main\n"
     store_lex -1, "a", P20
 
-    newsub P0, .Coroutine, co1
+    .const .Sub P0 = "co1"
     invokecc P0
     find_lex P21, "a"
     print P21
@@ -135,7 +63,7 @@ output_is(<<'CODE', <<'OUTPUT', "Coroutines and lexicals 1");
     print "done\n"
     end
 
-co1:
+.pcc_sub co1:
     new_pad 1
     new P22, .String
     set P22, "coro\n"
@@ -153,6 +81,7 @@ OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "Coroutines and lexicals 2");
 .include "interpinfo.pasm"
+.pcc_sub main:
     new_pad 0
     new_pad 1
 
@@ -164,12 +93,8 @@ output_is(<<'CODE', <<'OUTPUT', "Coroutines and lexicals 2");
     store_lex -1, "a", P20
     store_lex -2, "b", P21
 
-
-    new P5, .Coroutine
-    set_addr P5, co1
-
-    new P6, .Coroutine
-    set_addr P6, co2
+    .const .Sub P5 = "co1"
+    .const .Sub P6 = "co2"
 
     null I0
     set I3, 2
@@ -199,7 +124,7 @@ output_is(<<'CODE', <<'OUTPUT', "Coroutines and lexicals 2");
     print "done\n"
     end
 
-co1:
+.pcc_sub co1:
     get_params "(0,0)", P5, P6
     new_pad 2
 
@@ -237,7 +162,7 @@ co1:
     # return again
     yield
 
-co2:
+.pcc_sub co2:
     new_pad 1
 
     # return
@@ -259,16 +184,16 @@ OUTPUT
 pir_output_is(<<'CODE', <<'OUTPUT', "Coroutines - M. Wallace yield example");
 
 .sub __main__
-    .local Coroutine itr
     .local object return
     .local object counter
-    newsub itr, .Coroutine, _iterator
+    .const .Sub itr = "_iterator"
 
     .local object zero
     zero = new Integer
     zero = 0
 
-    newsub return, .Continuation, return_here
+    new return, .Continuation
+    set_addr return, return_here
     loop:
         .pcc_begin
             .pcc_call itr, return
@@ -315,7 +240,7 @@ OUTPUT
 output_is(<<'CODE', <<'OUTPUT', "Coroutine - exception in main");
 .include "interpinfo.pasm"
 _main:
-    newsub P0, .Coroutine, _coro
+    .const .Sub P0 = "_coro"
     push_eh _catchm
     new P16, .Integer
     set P16, 2
@@ -329,7 +254,11 @@ lp:
     if P16, lp
     print "done\n"
     end
-_coro:
+_catchm:
+    print "catch main\n"
+    end
+
+.pcc_sub _coro:
     push_eh _catchc
 corolp:
     find_global P17, "i"
@@ -338,9 +267,6 @@ corolp:
     branch corolp
 _catchc:
     print "catch coro\n"
-    end
-_catchm:
-    print "catch main\n"
     end
 CODE
 back 1
@@ -350,7 +276,7 @@ OUTPUT
 output_is(<<'CODE', <<'OUTPUT', "Coroutine - exception in coro");
 .include "interpinfo.pasm"
 _main:
-    newsub P0, .Coroutine, _coro
+    .const .Sub P0 = "_coro"
     push_eh _catchm
     new P16, .Integer
     set P16, 2
@@ -363,7 +289,11 @@ lp:
     if P16, lp
     print "done\n"
     end
-_coro:
+_catchm:
+    print "catch main\n"
+    end
+
+.pcc_sub _coro:
     push_eh _catchc
 corolp:
     find_global P17, "i"
@@ -374,9 +304,6 @@ corolp:
 _catchc:
     print "catch coro\n"
     end
-_catchm:
-    print "catch main\n"
-    end
 CODE
 back 1
 catch coro
@@ -385,7 +312,7 @@ OUTPUT
 output_is(<<'CODE', <<'OUTPUT', "Coroutine - exception in coro no handler");
 .include "interpinfo.pasm"
 _main:
-    newsub P0, .Coroutine, _coro
+    .const .Sub P0 = "_coro"
     push_eh _catchm
     new P16, .Integer
     set P16, 2
@@ -398,7 +325,10 @@ lp:
     if P16, lp
     print "done\n"
     end
-_coro:
+_catchm:
+    print "catch main\n"
+    end
+.pcc_sub _coro:
 corolp:
     find_global P17, "i"
     dec P17
@@ -408,9 +338,6 @@ corolp:
 _catchc:
     print "catch coro\n"
     end
-_catchm:
-    print "catch main\n"
-    end
 CODE
 back 1
 catch main
@@ -419,7 +346,7 @@ OUTPUT
 output_is(<<'CODE', <<'OUTPUT', "Coroutine - exception in coro rethrow");
 .include "interpinfo.pasm"
 _main:
-    newsub P0, .Coroutine, _coro
+    .const .Sub P0 = "_coro"
     push_eh _catchm
     new P16, .Integer
     set P16, 2
@@ -432,7 +359,11 @@ lp:
     if P16, lp
     print "done\n"
     end
-_coro:
+_catchm:
+    print "catch main\n"
+    end
+
+.pcc_sub _coro:
     push_eh _catchc
 corolp:
     find_global P17, "i"
@@ -443,9 +374,6 @@ corolp:
 _catchc:
     print "catch coro\n"
     rethrow P5
-    end
-_catchm:
-    print "catch main\n"
     end
 CODE
 back 1

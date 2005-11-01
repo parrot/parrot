@@ -16,10 +16,12 @@ This shows you how to create two coroutines and C<invoke> them.
 =cut
 
 # create a coro and save it on the user stack
-newsub P0, .Coroutine, MYCOROUTINE
+.const .Sub P0 =  "MYCOROUTINE"
+# a coroutine carries state - clone it
+clone P0, P0
 
 # create a second coro
-newsub P1, .Coroutine, MYCOROUTINE
+clone P1, P0
 
 # Calling convention says P0 will contain the sub so..
 print "Calling 1st co-routine\n"
@@ -35,7 +37,7 @@ invokecc P1
 end
 
 # A coroutine
-MYCOROUTINE:
+.pcc_sub MYCOROUTINE:
     print "Entry\n"
     yield
     print "Resumed\n"

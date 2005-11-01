@@ -1,4 +1,4 @@
-/* A Bison parser, made by GNU Bison 1.875.  */
+/* A Bison parser, made from ast/ast.y, by GNU bison 1.75.  */
 
 /* Skeleton parser for Yacc-like parsing with Bison,
    Copyright (C) 1984, 1989, 1990, 2000, 2001, 2002 Free Software Foundation, Inc.
@@ -22,6 +22,9 @@
    Bison output file, you may use that output file without restriction.
    This special exception was added by the Free Software Foundation
    in version 1.24 of Bison.  */
+
+#ifndef BISON_AST_ASTPARSER_H
+# define BISON_AST_ASTPARSER_H
 
 /* Tokens.  */
 #ifndef YYTOKENTYPE
@@ -53,35 +56,32 @@
 
 
 
-#if ! defined (YYSTYPE) && ! defined (YYSTYPE_IS_DECLARED)
+#ifndef YYSTYPE
 #line 41 "ast/ast.y"
-typedef union YYSTYPE {
+typedef union {
     int t;
     char *s;
     struct nodeType_t *n;
-} YYSTYPE;
-/* Line 1248 of yacc.c.  */
-#line 64 "ast/astparser.h"
-# define yystype YYSTYPE /* obsolescent; will be withdrawn */
-# define YYSTYPE_IS_DECLARED 1
-# define YYSTYPE_IS_TRIVIAL 1
+} yystype;
+/* Line 1281 of /usr/share/bison/yacc.c.  */
+#line 68 "ast/astparser.h"
+# define YYSTYPE yystype
 #endif
 
 
 
-#if ! defined (YYLTYPE) && ! defined (YYLTYPE_IS_DECLARED)
-typedef struct YYLTYPE
+#ifndef YYLTYPE
+typedef struct yyltype
 {
   int first_line;
   int first_column;
   int last_line;
   int last_column;
-} YYLTYPE;
-# define yyltype YYLTYPE /* obsolescent; will be withdrawn */
-# define YYLTYPE_IS_DECLARED 1
-# define YYLTYPE_IS_TRIVIAL 1
+} yyltype;
+# define YYLTYPE yyltype
 #endif
 
 
 
+#endif /* not BISON_AST_ASTPARSER_H */
 

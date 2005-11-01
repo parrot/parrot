@@ -142,7 +142,7 @@ OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "vanishing slingleton PMC");
 _main:
-    newsub P0, .Sub, _rand
+    .const .Sub P0 = "_rand"
     set I16, 100
     set I17, 0
 loop:
@@ -153,7 +153,7 @@ loop:
     print "ok\n"
     end
 
-_rand:
+.pcc_sub _rand:
     new P16, .Random
     set I5, P16[10]
     gt I5, 10, err
@@ -255,14 +255,16 @@ OUTPUT
 # s. also classes/retcontinuation.pmc
 output_is(<<'CODE', <<OUTPUT, "coro context and invalid return continuations");
 .include "interpinfo.pasm"
-    newsub P0, .Coroutine, co1
+.pcc_sub main:
+    .const .Sub P0 = "co1"
+    set I20, 0
 l:
     invokecc P0
     inc I20
     lt I20, 3, l
     print "done\n"
     end
-co1:
+.pcc_sub co1:
     set P17, P1
 col:
     print "coro\n"

@@ -3,16 +3,13 @@
 # $Id$
 
 use strict;
-use Parrot::Test tests => 6;
+use Parrot::Test tests => 1;
 
 # these tests are run with -Oc by TestCompiler and show
 # generated PASM code for call optimization
 
 
 ##############################
-# invokecc
-SKIP: {
-    skip("PCC changes", 6);
 
 pir_2_pasm_like(<<'CODE', <<'OUT', "in P param");
 .sub _main
@@ -30,291 +27,17 @@ CODE
 /_main:
   new (P\d+), \d+ # \.Undef
   set \1, 42
-  set_p_pc (P\d+), foo
 @pcc_sub_call_\d:
-  set P5, \1
-  set I0, 1
-  null I1
-  null I2
-  set I3, 1
-  null I4
-  set P0, \2
-  invokecc
+  set_args
+  set_p_pc (P\d+), foo
+  get_results
+  invokecc \2
   noop
   end
 foo:
-  set (P\d+), P5
-  print \3
-  null I0
-  null I3
+  get_params
+  print P0
+  set_returns
   returncc/
 OUT
 
-pir_2_pasm_like(<<'CODE', <<'OUT', "in, out P param");
-.sub _main
-    .local Sub sub
-    .local Undef x
-    x = new Undef
-    x = 42
-    newsub sub, .Sub, _sub
-    .pcc_begin
-    .arg x
-    .pcc_call sub
-    ret:
-    .result x
-    .pcc_end
-    print x
-    end
-.end
-.pcc_sub _sub
-    .param Undef a
-    a = a + 1
-    .pcc_begin_return
-    .return a
-    .pcc_end_return
-.end
-CODE
-/_main:
-  set P16, P1
-  new P5, \d+ # \.Undef
-  set P5, 42
-  newsub P0, \d+, _sub
-@pcc_sub_call_\d:
-  set I0, 1
-  null I1
-  set I2, 1
-  set I3, -2
-  invokecc
-ret:
-  print P5
-  end
-_sub:
-  add P5, P5, 1
-@pcc_sub_ret_\d+:
-  set I0, 1
-  null I1
-  null I2
-  set I3, 1
-  null I4
-  returncc/
-OUT
-
-pir_2_pasm_like(<<'CODE', <<'OUT', "in, out P param, P var");
-.sub _main
-    .local Sub sub
-    .local Undef x
-    x = new Undef
-    x = 42
-    .local Undef y
-    y = new Undef
-    y = 10
-    newsub sub, .Sub, _sub
-    .pcc_begin
-    .arg x
-    .pcc_call sub
-    ret:
-    .result x
-    .pcc_end
-    print x
-    print y
-    end
-.end
-.pcc_sub _sub
-    .param Undef a
-    a = a + 1
-    .pcc_begin_return
-    .return a
-    .pcc_end_return
-.end
-CODE
-/_main:
-  set P16, P1
-  new P5, \d+ # \.Undef
-  set P5, 42
-  new P16, \d+ # \.Undef
-  set P16, 10
-  newsub P0, \d+, _sub
-@pcc_sub_call_\d+:
-  set I0, 1
-  null I1
-  set I2, 1
-  set I3, -2
-  invokecc
-ret:
-  print P5
-  print P16
-  end
-_sub:
-  add P5, P5, 1
-@pcc_sub_ret_\d+:
-  set I0, 1
-  null I1
-  null I2
-  set I3, 1
-  null I4
-  returncc/
-OUT
-
-pir_2_pasm_like(<<'CODE', <<'OUT', "in, out different P param");
-.sub _main
-    .local Sub sub
-    .local Undef x
-    x = new Undef
-    x = 42
-    newsub sub, .Sub, _sub
-    .pcc_begin
-    .arg x
-    .pcc_call sub
-    ret:
-    .local Undef y
-    .result y
-    .pcc_end
-    print y
-    end
-.end
-.pcc_sub _sub
-    .param Undef a
-    a = a + 1
-    .pcc_begin_return
-    .return a
-    .pcc_end_return
-.end
-CODE
-/_main:
-  set P16, P1
-  new P5, \d+ # \.Undef
-  set P5, 42
-  newsub P0, \d+, _sub
-@pcc_sub_call_\d:
-  set I0, 1
-  null I1
-  set I2, 1
-  set I3, -2
-  invokecc
-ret:
-  print P5
-  end
-_sub:
-  add P5, P5, 1
-@pcc_sub_ret_\d+:
-  set I0, 1
-  null I1
-  null I2
-  set I3, 1
-  null I4
-  returncc/
-OUT
-
-pir_2_pasm_like(<<'CODE', <<'OUT', "in, out different P param, interfer");
-.sub _main
-    .local Sub sub
-    .local Undef x
-    x = new Undef
-    x = 42
-    newsub sub, .Sub, _sub
-    .pcc_begin
-    .arg x
-    .pcc_call sub
-    ret:
-    .local Undef y
-    .result y
-    .pcc_end
-    print x
-    print y
-    end
-.end
-.pcc_sub _sub
-    .param Undef a
-    a = a + 1
-    .pcc_begin_return
-    .return a
-    .pcc_end_return
-.end
-CODE
-/_main:
-  set P16, P1
-  new P16, \d+ # \.Undef
-  set P16, 42
-  newsub P0, \d+, _sub
-@pcc_sub_call_\d:
-  set P5, P16
-  set I0, 1
-  null I1
-  set I2, 1
-  set I3, -2
-  invokecc
-ret:
-  print P16
-  print P5
-  end
-_sub:
-  add P5, P5, 1
-@pcc_sub_ret_\d+:
-  set I0, 1
-  null I1
-  null I2
-  set I3, 1
-  null I4
-  returncc/
-OUT
-
-pir_2_pasm_like(<<'CODE', <<'OUT', "tail call");
-.sub _main
-    .local Sub sub
-    newsub sub, .Sub, _sub1
-    .pcc_begin
-    .pcc_call sub
-    ret:
-    .pcc_end
-    end
-.end
-.pcc_sub _sub1
-    .local Sub sub
-    newsub sub, .Sub, _sub2
-    .pcc_begin
-    .arg P16
-    .pcc_call sub
-    ret:
-    .result P16
-    .pcc_end
-    .pcc_begin_return
-    .return P16
-    .pcc_end_return
-.end
-.pcc_sub _sub2
-    .pcc_begin_return
-    .pcc_end_return
-.end
-CODE
-/_main:
-        set P16, P1
-        newsub P0, \d+, _sub1
-@pcc_sub_call_\d+:
-        set I0, 1
-        null I1
-        null I2
-        null I3
-        invokecc
-ret:
-        end
-_sub1:
-        set P17, P1
-        newsub P17, \d+, _sub2
-@pcc_sub_call_\d+:
-        set P5, P16
-        set I16, P17
-        jump I16
-ret:
-@pcc_sub_ret_\d+:
-_sub2:
-@pcc_sub_ret_\d+:
-        set I0, 1
-        null I1
-        null I2
-        null I3
-        null I4
-        returncc
-/
-OUT
-
-}
