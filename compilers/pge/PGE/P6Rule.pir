@@ -299,6 +299,7 @@
     charlist = ""
     mob["charmatch"] = "if"
     pos = mfrom
+    isrange = 0
     $S0 = substr target, pos, 3
     pos += 2
     if $S0 != "<-[" goto scan
