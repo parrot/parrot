@@ -39,7 +39,6 @@
     optable.addtok("circumfix:[ ]", "term:", "nows", "PGE::Exp::Group")
     optable.addtok("circumfix:( )", "term:", "nows", "PGE::Exp::Group")
 
-
     $P0 = find_global "PGE::P6Rule", "parse_subrule"
     optable.addtok("term:<", "term:", "nows", $P0)
     optable.addtok("term:<?", "term:", "nows", $P0)
@@ -63,8 +62,9 @@
 
     $P0 = find_global "PGE::P6Rule", "parse_modifier"
     optable.addtok("prefix::", "<infix:|", "nows", $P0)
-.end
 
+    optable.addtok("close:>", "<prefix::", "nows")
+.end
 
 
 .sub "parse_ws_lit"
@@ -257,7 +257,19 @@
     $I1 = pos - $I0
     subname = substr target, $I0, $I1
     $S0 = substr target, pos, 1
-    if $S0 != '>' goto end
+    if $S0 != " " goto subrule_end
+    inc pos
+    mpos = pos
+    $P0 = find_global "PGE::Rule", "p6rule"
+    $P1 = $P0(mob)
+    unless $P1 goto end
+    $S0 = $P1
+    mob["arg"] = $S0
+    pos = $P1.to()
+    mpos = -1
+    $S0 = substr target, pos, 1
+  subrule_end:
+    if $S0 != ">" goto end
     inc pos
     mpos = pos
     mob["subname"] = subname

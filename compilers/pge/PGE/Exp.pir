@@ -871,7 +871,7 @@ register.
     .param string label
     .param string next
     .local pmc emit
-    .local string subname
+    .local string subname, subargs
     .local string cname, captsave, captback
     .local int iscapture
     emit = find_global "PGE::Exp", "emit"
@@ -879,6 +879,16 @@ register.
     iscapture = self["iscapture"]
     cname = self["cname"]
     emit(code, "\n  %s:  # subrule %s    ##", label, subname)
+    subargs = ""
+    $I0 = exists self["arg"]
+    if $I0 == 0 goto nosubargs
+    $P0 = find_global "Data::Escape", "String"
+    $S0 = self["arg"]
+    $S0 = $P0($S0, '"')
+    subargs = ', "'
+    subargs .= $S0
+    subargs .= '"'
+  nosubargs:
     captsave = ""
     captback = ""
     if iscapture == 0 goto subrule
@@ -898,7 +908,7 @@ register.
     emit(code, "    ($P1,$P9,$P9,$P0) = newfrom(captscope, pos, \"%s\")", $S0)
     emit(code, "    $P0 = pos")
     emit(code, "    $P0 = find_global \"%s\", \"%s\"", $S0, $S1)
-    emit(code, "    $P0 = $P0($P1)")
+    emit(code, "    $P0 = $P0($P1%s)", subargs)
     goto subrule_3
   subrule_simple_name:
     emit(code, "    $P0 = getattribute captscope, \"PGE::Match\\x0$:pos\"")
@@ -910,7 +920,7 @@ register.
     emit(code, "  %s_s1:", label)
     emit(code, "    $P0 = find_global \"%s\"", subname)
     emit(code, "  %s_s2:", label)
-    emit(code, "    $P0 = $P0(captscope)")
+    emit(code, "    $P0 = $P0(captscope%s)", subargs)
   subrule_3:
     emit(code, "    unless $P0 goto fail")
     emit(code, captsave, cname)

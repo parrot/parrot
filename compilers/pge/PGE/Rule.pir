@@ -19,6 +19,8 @@ a number of built-in rules.
     .local pmc p6rule
     base = getclass "PGE::Match"
     $P0 = subclass base, "PGE::Rule"
+    $P0 = new Hash
+    store_global "PGE::Rule", "%:cache", $P0
     .return ()
 .end
 
@@ -417,6 +419,39 @@ Match whitespace between tokens.
 .end
 
 
+=item C<before(PMC mob, STR pattern)>
+
+Perform lookahead -- i.e., check if we're at a position where
+C<pattern> matches.  Always returns a zero-width Match object.
+
+=cut
+
+.sub "before"
+    .param pmc mob
+    .param string pattern      :optional
+    .param int has_pattern     :opt_flag
+    .local pmc cache, rule
+
+    cache = find_global "PGE::Rule", "%:cache"
+    $I0 = exists cache[pattern]
+    if $I0 == 0 goto new_pattern
+    rule = cache[pattern]
+    goto match
+  new_pattern:
+    $P0 = find_global "PGE", "p6rule"
+    rule = $P0(pattern)
+    cache[pattern] = rule
+  match:
+    mob = rule(mob)
+    unless mob goto end
+    $P0 = getattribute mob, "PGE::Match\x0$:from"
+    $P1 = getattribute mob, "PGE::Match\x0$:pos"
+    assign $P1, $P0
+  end:
+    .return (mob)
+.end
+
+    
 =head1 AUTHOR
 
 Patrick Michaud (pmichaud@pobox.com) is the author and maintainer.

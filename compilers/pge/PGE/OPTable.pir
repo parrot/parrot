@@ -196,6 +196,7 @@ value for C<match> is "PGE::Match".
     if syncat == "prefix:" goto prefix
     if syncat == "postcircumfix:" goto postcircumfix
     if syncat == "ternary:" goto ternary
+    if syncat == "close:" goto close
   term:
     tok["syncat"] = PGE_OPTABLE_TERM
     goto expect_term
@@ -219,6 +220,10 @@ value for C<match> is "PGE::Match".
   ternary:
     tok["syncat"] = PGE_OPTABLE_TERNARY
     tok["arity"] = 3
+    goto expect_op
+  close:
+    tok["syncat"] = PGE_OPTABLE_CLOSE
+    tok["arity"] = 0
     goto expect_op
   expect_term:
     termtable[tok1] = tok 
