@@ -436,6 +436,10 @@ C<pattern> matches.  Always returns a zero-width Match object.
     .param int has_pattern     :opt_flag
     .local pmc cache, rule
 
+    if has_pattern goto lookahead
+    mob = fail(mob)
+    .return (mob)
+  lookahead:
     cache = find_global "PGE::Rule", "%:cache"
     $I0 = exists cache[pattern]
     if $I0 == 0 goto new_pattern
@@ -451,6 +455,8 @@ C<pattern> matches.  Always returns a zero-width Match object.
     $P0 = getattribute mob, "PGE::Match\x0$:from"
     $P1 = getattribute mob, "PGE::Match\x0$:pos"
     assign $P1, $P0
+    null $P0
+    setattribute mob, "PGE::Match\\x0&:corou", $P0
   end:
     .return (mob)
 .end
