@@ -12,13 +12,13 @@ This file implements match objects returned by the Parrot Grammar Engine.
 
 .sub "__onload"
     .local pmc base
-    newclass base, "PGE::Match"
+    $P0 = getclass "PerlHash"
+    base = subclass $P0, "PGE::Match"
     addattribute base, "$:target"                  # target
     addattribute base, "$:from"                    # start of match
     addattribute base, "$:pos"                     # current match position
     addattribute base, "&:corou"                   # match's corou
     addattribute base, "@:capt"                    # subpattern captures
-    addattribute base, "%:capt"                    # subpattern captures
     .return ()
 .end
 
@@ -38,18 +38,19 @@ the current position of C<mob>.
 
 .sub "newfrom"
     .param pmc mob
-    .param int from            :optional           # from for new object
-    .param int has_from        :opt_flag
+    .param int fromd           :optional           # default from for new
+    .param int has_fromd       :opt_flag
     .param string grammar      :optional           # grammar to use
     .param int has_grammar     :opt_flag
-    .local pmc me
+    .local pmc me, target, from, pos
 
+  newfrom_1:
     $I0 = isa mob, "PGE::Match"
     if $I0 goto newfrom_mob
-    $P1 = new String
-    assign $P1, mob
-    $P2 = new PerlInt
-    $P2 = -1
+    target = new String
+    assign target, mob
+    from = new PerlInt
+    from = -1
     if has_grammar goto new_me
     grammar = "PGE::Rule"
     goto new_me
@@ -57,22 +58,22 @@ the current position of C<mob>.
     if has_grammar goto newfrom_2
     grammar = classname mob
   newfrom_2:
-    $P1 = getattribute mob, "PGE::Match\x0$:target"
-    $P2 = getattribute mob, "PGE::Match\x0$:pos"
-    $P2 = clone $P2
+    target = getattribute mob, "PGE::Match\x0$:target"
+    from = getattribute mob, "PGE::Match\x0$:pos"
+    from = clone from
   new_me:
     $I0 = find_type grammar
     me = new $I0
-    setattribute me, "PGE::Match\x0$:target", $P1
-    setattribute me, "PGE::Match\x0$:from", $P2
-    $P3 = new PerlInt
-    $P3 = -1
-    setattribute me, "PGE::Match\x0$:pos", $P3
-    if has_from == 0 goto end
-    if $P2 >= 0 goto end
-    $P2 = from
+    setattribute me, "PGE::Match\x0$:target", target
+    setattribute me, "PGE::Match\x0$:from", from
+    pos = new PerlInt
+    pos = -1
+    setattribute me, "PGE::Match\x0$:pos", pos
+    if has_fromd == 0 goto end
+    if from >= 0 goto end
+    from = fromd
   end:
-    .return (me)
+    .return (me, target, from, pos)
 .end
 
 =head2 Methods
@@ -133,9 +134,9 @@ Returns 1 if this object successfully matched the target string,
 =cut
 
 .sub "__get_bool" method
-    $P0 = getattribute self, "PGE::Match\x0$:pos"
-    $I0 = $P0
-    isge $I1, $I0, 0
+    $P0 = getattribute self, "PGE::Match\x0$:from"
+    $P1 = getattribute self, "PGE::Match\x0$:pos"
+    isge $I1, $P1, $P0    
     .return ($I1)
 .end
 
@@ -184,23 +185,6 @@ Returns the portion of the target string matched by this object.
     .return ("")
 .end
 
-=item C<__get_pmc_keyed(PMC key)>
-
-Returns the subrule capture associated with C<key>.  This
-returns either a single Match object or an array of match
-objects depending on the rule.
-
-=cut
-
-.sub "__get_pmc_keyed" method
-    .param pmc key
-    $P0 = getattribute self, "PGE::Match\x0%:capt"
-    if_null $P0, get_1
-    $P0 = $P0[key]
-  get_1:
-    .return ($P0)
-.end
-
 =item C<__get_pmc_keyed_int(int key)>
 
 Returns the subpattern capture associated with C<key>.  This
@@ -218,18 +202,6 @@ objects depending on the rule.
     .return ($P0)
 .end
 
-.sub "__set_pmc_keyed" method
-    .param pmc key
-    .param pmc val
-    .local pmc capt
-    capt = getattribute self, "PGE::Match\x0%:capt"
-    unless_null capt, set_1
-    capt = new PerlHash
-    setattribute self, "PGE::Match\x0%:capt", capt
-  set_1:
-    capt[key] = val
-.end
-
 .sub "__set_pmc_keyed_int" method
     .param int key
     .param pmc val
@@ -242,29 +214,11 @@ objects depending on the rule.
     capt[key] = val
 .end
 
-.sub "__delete_keyed" :method
-    .param pmc key
-    .local pmc capt
-    capt = getattribute self, "PGE::Match\x0%:capt"
-    delete capt[key]
-.end
-
 .sub "__delete_keyed_int" :method
     .param int key
     .local pmc capt
     capt = getattribute self, "PGE::Match\x0@:capt"
     delete capt[key]
-.end
-
-.sub "__defined_keyed" :method
-    .param pmc key
-    .local pmc capt
-    $I0 = 0
-    capt = getattribute self, "PGE::Match\x0%:capt"
-    if_null capt, end
-    $I0 = defined capt[key]
-  end:
-    .return ($I0)
 .end
 
 .sub "__defined_keyed_int" :method
@@ -286,9 +240,7 @@ Returns the hash component of the match object.
 =cut
 
 .sub "get_hash" method
-    .param pmc hash
-    hash = getattribute self, "PGE::Match\x0%:capt"
-    .return (hash)
+    .return (self)
 .end
 
 =item C<get_array()>

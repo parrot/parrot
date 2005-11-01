@@ -91,7 +91,8 @@
 
   print_exp:
     if_null rulesub, match_nopattern
-    exp."dump"(0)
+    $P0 = find_global "_dumper"
+    $P0(exp, "exp")
     goto read_loop
 
   toggle_trace:

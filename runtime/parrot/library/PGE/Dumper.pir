@@ -21,10 +21,11 @@ This method enables Data::Dumper to work on Match objects.
     .param pmc dumper
     .param string label
     .local string indent, subindent
-    .local pmc iter, key, val
+    .local pmc iter, val
+    .local string key
     .local pmc hash, array
     .local int hascapts
-    
+  
     (subindent, indent) = dumper."newIndent"()
     print "=> "
     $S0 = self
@@ -138,7 +139,7 @@ An alternate dump output for a Match object and all of its subcaptures.
     goto subpats_1
 
   subrules:
-    capt = getattribute self, "PGE::Match\x0%:capt"
+    capt = self.get_hash()
     if_null capt, end
     iter = new Iterator, capt
     iter = 0

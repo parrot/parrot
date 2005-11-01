@@ -1,927 +1,753 @@
-=head1 TITLE
-
-PGE::P6Rule - Parse and compile Perl 6 rules
-
-=head1 DESCRIPTION
-
-This file implements the Perl 6 rules compiler -- it parses strings
-using Perl 6 rules syntax into a rule expression tree (see L<PGE::Exp>),
-generates the PIR code from the expression tree, and compiles the
-PIR code into a subroutine object.
-
-The parser here is implemented as a hybrid top-down parser, with a
-token lookup table for individual pattern terms.  This parser is
-likely temporary; one of our goals once more of Perl 6 is implemented
-will be to use Perl 6 to write and compile a better (faster) rules parser.
-
-=head2 Functions
-
-=cut
+.include "cclass.pasm"
 
 .namespace [ "PGE::P6Rule" ]
 
-.const int PGE_INF = 2147483647                # XXX: arbitrary limit
-
 .sub "__onload"
-    .local pmc p6meta
-    .local pmc u
+    .local pmc optable
+    $P0 = getclass "PGE::Exp::Subrule"
+    $P1 = subclass $P0, "PGE::Exp::WS"
+    $P0 = getclass "PGE::Exp"
+    $P1 = subclass $P0, "PGE::Exp::Alias"
 
-    u = new Undef
-    $I0 = find_type "PGE::TokenHash"
-    p6meta = new $I0
-    store_global "PGE::P6Rule", "%_p6meta", p6meta
-    p6meta['*'] = u
-    p6meta['+'] = u
-    p6meta['?'] = u
-    p6meta[':'] = u
-    p6meta['|'] = u
-    $P0 = find_global "PGE::P6Rule", "p6rule_parse_literal"
-    p6meta['']  = $P0
-    $P0 = find_global "PGE::P6Rule", "p6rule_parse_dot"
-    p6meta['.'] = $P0
-    $P0 = find_global "PGE::P6Rule", "p6rule_parse_anchor"
-    p6meta['^'] = $P0
-    p6meta['^^'] = $P0
-    p6meta['$'] = $P0
-    p6meta['$$'] = $P0
-    p6meta["\\B"] = $P0
-    p6meta["\\b"] = $P0
-    $P0 = find_global "PGE::P6Rule", "p6rule_parse_cut"
-    p6meta['::'] = $P0
-    p6meta[':::'] = $P0
-    $P0 = find_global "PGE::P6Rule", "p6rule_parse_group"
-    p6meta['['] = $P0
-    p6meta[']'] = u
-    p6meta['('] = $P0
-    p6meta[')'] = u
-    $P0 = find_global "PGE::P6Rule", "p6rule_parse_alias"
-    p6meta['$<'] = $P0
-    p6meta['@<'] = $P0
-    p6meta['%<'] = $P0
-    p6meta['$0'] = $P0
-    p6meta['$1'] = $P0
-    p6meta['$2'] = $P0
-    p6meta['$3'] = $P0
-    p6meta['$4'] = $P0
-    p6meta['$5'] = $P0
-    p6meta['$6'] = $P0
-    p6meta['$7'] = $P0
-    p6meta['$8'] = $P0
-    p6meta['$9'] = $P0
-    $P0 = find_global "PGE::P6Rule", "p6rule_parse_subrule"
-    p6meta['<'] = $P0
-    p6meta['<?'] = $P0
-    p6meta['>'] = u
-    $P0 = find_global "PGE::P6Rule", "p6rule_parse_ccshortcut"
-    p6meta['\d'] = $P0
-    p6meta['\D'] = $P0
-    p6meta['\w'] = $P0
-    p6meta['\W'] = $P0
-    p6meta['\s'] = $P0
-    p6meta['\S'] = $P0
-    p6meta['\n'] = $P0
-    p6meta['\N'] = $P0
-    $P0 = find_global "PGE::P6Rule", "p6rule_parse_charclass"
-    p6meta['<['] = $P0
-    p6meta['<-['] = $P0
-    p6meta['<+['] = $P0
-    .return ()
+    $I0 = find_type "PGE::OPTable"
+    optable = new $I0
+    store_global "PGE::P6Rule", "$optable", optable
+
+    $P0 = find_global "PGE::P6Rule", "parse_ws_lit"
+    optable.addtok("term:", "", "nows", $P0)
+    optable.addtok("term:::", "term:", "nows", "PGE::Exp::Cut")
+    optable.addtok("term::::", "term:", "nows", "PGE::Exp::Cut")
+    optable.addtok("term:\\b", "term:", "nows", "PGE::Exp::Anchor")
+    optable.addtok("term:\\B", "term:", "nows", "PGE::Exp::Anchor")
+    optable.addtok("term:^", "term:", "nows", "PGE::Exp::Anchor")
+    optable.addtok("term:^^", "term:", "nows", "PGE::Exp::Anchor")
+    optable.addtok("term:$$", "term:", "nows", "PGE::Exp::Anchor")
+
+    $P0 = find_global "PGE::P6Rule", "parse_dollar"
+    optable.addtok("term:$", "term:", "nows", $P0)
+
+    optable.addtok("term:.", "term:", "nows", "PGE::Exp::CCShortcut")
+    optable.addtok("term:\\d", "term:", "nows", "PGE::Exp::CCShortcut")
+    optable.addtok("term:\\D", "term:", "nows", "PGE::Exp::CCShortcut")
+    optable.addtok("term:\\s", "term:", "nows", "PGE::Exp::CCShortcut")
+    optable.addtok("term:\\S", "term:", "nows", "PGE::Exp::CCShortcut")
+    optable.addtok("term:\\w", "term:", "nows", "PGE::Exp::CCShortcut")
+    optable.addtok("term:\\W", "term:", "nows", "PGE::Exp::CCShortcut")
+    optable.addtok("term:\\n", "term:", "nows", "PGE::Exp::CCShortcut")
+    optable.addtok("term:\\N", "term:", "nows", "PGE::Exp::CCShortcut")
+
+    optable.addtok("circumfix:[ ]", "term:", "nows", "PGE::Exp::Group")
+    optable.addtok("circumfix:( )", "term:", "nows", "PGE::Exp::Group")
+
+
+    $P0 = find_global "PGE::P6Rule", "parse_subrule"
+    optable.addtok("term:<", "term:", "nows", $P0)
+    optable.addtok("term:<?", "term:", "nows", $P0)
+
+    $P0 = find_global "PGE::P6Rule", "parse_enumclass"
+    optable.addtok("term:<[", "term:", "nows", $P0)
+    optable.addtok("term:<-[", "term:", "nows", $P0)
+
+    $P0 = find_global "PGE::P6Rule", "parse_quant"
+    optable.addtok("postfix:*", "<term:", "left", $P0)
+    optable.addtok("postfix:+", "postfix:*", "left", $P0)
+    optable.addtok("postfix:?", "postfix:*", "left", $P0)
+    optable.addtok("postfix::", "postfix:*", "left", "PGE::Exp::Cut")
+    $P0 = find_global "PGE::Rule", "fail"
+    optable.addtok("postfix:::", "postfix:*", "left", $P0)
+
+    optable.addtok("infix:", "<postfix:*", "right,nows", "PGE::Exp::Concat")
+    optable.addtok("infix:|", "<infix:", "left,nows", "PGE::Exp::Alt")
+
+    optable.addtok("infix::=", ">postfix:*", "right", "PGE::Exp::Alias")
+
+    $P0 = find_global "PGE::P6Rule", "parse_modifier"
+    optable.addtok("prefix::", "<infix:|", "nows", $P0)
 .end
 
-=item C<p6rule_parse_skip(STR pattern, PMC lex, INT skip)>
 
-Advance the lexical context over the next C<skip> characters and
-scan until the next token is found in C<pattern>.
 
-=cut
+.sub "parse_ws_lit"
+    .param pmc mob
+    .local pmc newfrom
+    .local string target
+    .local int pos, lastpos
+    .local int litstart, litlen
+    newfrom = find_global "PGE::Match", "newfrom"
+    $P0 = getattribute mob, "PGE::Match\x0$:target"
+    target = $P0
+    $P0 = getattribute mob, "PGE::Match\x0$:pos"
+    pos = $P0
+    lastpos = length target
 
-.sub "p6rule_parse_skip"
-    .param string pattern                  # pattern being analyzed
-    .param pmc lex                         # current lexical state
-    .param int skip                        # characters to skip
-    .local int pos                         # current position
-    .local int plen                        # pattern length
+    $I0 = is_cclass .CCLASS_WHITESPACE, target, pos
+    if $I0 goto term_ws
+    $S0 = substr target, pos, 1
+    if $S0 == '#' goto term_ws
 
-    .include "cclass.pasm"
-    plen = lex["plen"]
-    pos = lex["pos"]
-    pos += skip
-    lex["ws"] = 0
-    unless pos < plen goto end
-    $I0 = is_cclass .CCLASS_WHITESPACE, pattern, pos
-    lex["ws"] = $I0
-  skipws:
-    unless pos < plen goto end
-    $I0 = is_cclass .CCLASS_WHITESPACE, pattern, pos
-    unless $I0 goto skipcomments
+  term_literal:
+    mob = newfrom(mob, 0, "PGE::Exp::Literal")
+    litstart = pos
+    litlen = 0
+    $S0 = substr target, pos, 1
     inc pos
-    goto skipws
-  skipcomments:
-    substr $S0, pattern, pos, 1
-    if $S0 != '#' goto end
-  skipnl:
+    if $S0 != "\\" goto term_literal_loop
+    inc litstart
     inc pos
-    unless pos < plen goto end
-    $I0 = is_cclass .CCLASS_NEWLINE, pattern, pos
-    if $I0 goto skipws
-    goto skipnl
+  term_literal_loop:
+    if pos >= lastpos goto term_literal_end
+    $I0 = is_cclass .CCLASS_WHITESPACE, target, pos
+    if $I0 goto term_literal_end
+    $S0 = substr target, pos, 1
+    $I0 = index "<>[](){}:*?+\\|&#^$.", $S0
+    if $I0 >= 0 goto term_literal_end
+    inc pos
+    inc litlen
+    goto term_literal_loop
+  term_literal_end:
+    if litlen < 2 goto term_literal_one
+    dec pos
+  term_literal_one:
+    $I0 = pos - litstart
+    $S0 = substr target, litstart, $I0
+    mob["value"] = $S0
+    goto end
+
+  term_ws:
+    mob = newfrom(mob, 0, "PGE::Exp::WS")
+  term_ws_1:
+    pos = find_not_cclass .CCLASS_WHITESPACE, target, pos, lastpos
+    $S0 = substr target, pos, 1
+    if $S0 != "#" goto end
+    $I0 = index target, "\n", pos
+    pos = $I0 + 1
+    if pos > 0 goto term_ws_1
+    pos = lastpos
   end:
-    lex["pos"] = pos
-    .return (pos)
+    $P0 = getattribute mob, "PGE::Match\x0$:pos"
+    $P0 = pos
+    .return (mob)
 .end
 
-=item C<p6rule_parse_string(STR pattern, PMC lex, STR stopat)>
 
-Grab a sequence of characters, processing backslash escapes,
-until one of the characters in C<stopat> is found.  Advances
-the C<lex["pos"]> pointer as it goes.
+.sub "parse_modifier"
+    .param pmc mob
+    .local int pos, lastpos
+    .local string target
+    .local pmc mfrom, mpos
+    $P0 = find_global "PGE::Match", "newfrom"
+    (mob, target, mfrom, mpos) = $P0(mob, 0, "PGE::Exp::Modifier")
+    pos = mfrom
+    lastpos = length target
+    $I0 = pos
+    inc pos
+    pos = find_not_cclass .CCLASS_WORD, target, pos, lastpos
+    $I1 = pos - $I0
+    $S0 = substr target, $I0, $I1
+    mob["mname"] = $S0
+    mob["value"] = 1
+    $S0 = substr target, pos, 1
+    if $S0 != "(" goto end
+    $I0 = pos + 1
+    pos = index target, ")", pos
+    $I1 = pos - $I0
+    $S0 = substr target, $I0, $I1
+    mob["value"] = $S0
+    inc pos
+  end:
+    mpos = pos
+    .return (mob)
+.end
 
-=cut
 
-.sub p6rule_parse_string
-    .param string pattern
-    .param pmc lex
-    .param string stopat
+.sub "parse_quant"
+    .param pmc mob
+    .local string target
+    .local int min, max, islazy
+    .local int pos, lastpos
+    .local pmc mfrom, mpos
+    $P0 = find_global "PGE::Match", "newfrom"
+    (mob, target, mfrom, mpos) = $P0(mob, 0, "PGE::Exp::Quant")
+    pos = mfrom
+    lastpos = length target
+    min = 1
+    max = 1
+    islazy = 0
+    $S0 = substr target, pos, 2
+    if $S0 == "**" goto quant_closure
+    $S0 = substr target, pos, 1
+    if $S0 == "+" goto quant_max
+    min = 0
+  quant_max:
+    if $S0 == "?" goto quant_lazy
+    max = PGE_INF
+    goto quant_lazy
+  quant_lazy:
+    inc pos
+    $I0 = find_not_cclass .CCLASS_WHITESPACE, target, pos, lastpos
+    $S0 = substr target, $I0, 1
+    if $S0 != "?" goto end
+    islazy = 1
+    pos = $I0 + 1
+  quant_closure:
+    pos += 2
+    pos = find_not_cclass .CCLASS_WHITESPACE, target, pos, lastpos
+    $S0 = substr target, pos, 1
+    if $S0 != "{" goto err_closure
+    inc pos
+    $I1 = find_not_cclass .CCLASS_NUMERIC, target, pos, lastpos
+    if $I1 <= pos goto err_closure
+    $S0 = substr target, pos
+    min = $S0
+    max = $S0
+    pos = $I1
+    $S0 = substr target, pos, 2
+    if $S0 != '..' goto quant_closure_end
+    pos += 2
+    max = PGE_INF
+    $S0 = substr target, pos, 1
+    if $S0 == '.' goto quant_closure_end
+    $I1 = find_not_cclass .CCLASS_NUMERIC, target, pos, lastpos
+    if $I1 <= pos goto err_closure
+    $S0 = substr target, pos
+    max = $S0
+    pos = $I1
+  quant_closure_end:
+    $S0 = substr target, pos, 1
+    if $S0 != "}" goto err_closure
+    inc pos
+  end:
+    mob["min"] = min
+    mob["max"] = max
+    mob["islazy"] = islazy
+    mpos = pos
+    .return (mob)
+  err_closure:
+    parse_error(mob, pos, "Error in closure quantifier")
+.end
+
+.sub "parse_subrule"
+    .param pmc mob
+    .local string target
+    .local pmc mfrom, mpos
+    .local int pos, lastpos
+    .local int iscapture
+    .local string subname
+    $P0 = find_global "PGE::Match", "newfrom"
+    (mob, target, mfrom, mpos) = $P0(mob, 0, "PGE::Exp::Subrule")
+    pos = mfrom 
+    lastpos = length target
+    $S0 = substr target, pos, 2
+    if $S0 == "<?" goto nocapture
+    iscapture = 1
+    inc pos
+    goto subrule_name
+  nocapture:
+    iscapture = 0
+    pos += 2
+  subrule_name:
+    $I0 = pos
+  subrule_name_1:
+    pos = find_not_cclass .CCLASS_WORD, target, pos, lastpos
+    $S0 = substr target, pos, 2
+    if $S0 != "::" goto subrule_name_2
+    pos += 2
+    goto subrule_name_1
+  subrule_name_2:
+    $I1 = pos - $I0
+    subname = substr target, $I0, $I1
+    $S0 = substr target, pos, 1
+    if $S0 != '>' goto end
+    inc pos
+    mpos = pos
+    mob["subname"] = subname
+    mob["iscapture"] = iscapture
+    if iscapture == 0 goto end
+    $P1 = find_global "Data::Escape", "String"
+    $S0 = $P1(subname, '"')
+    $S0 = concat '"', $S0
+    $S0 = concat $S0, '"'
+    mob["cname"] = $S0
+  end:
+    .return (mob)
+.end 
+
+
+.sub "parse_enumclass"
+    .param pmc mob
+    .local string target
+    .local pmc mfrom, mpos
+    .local int pos, lastpos
+    .local int isrange
+    .local string charlist
+    $P0 = find_global "PGE::Match", "newfrom"
+    (mob, target, mfrom, mpos) = $P0(mob, 0, "PGE::Exp::EnumCharList")
+    lastpos = length target
+    charlist = ""
+    mob["charmatch"] = "if"
+    pos = mfrom
+    $S0 = substr target, pos, 3
+    pos += 2
+    if $S0 != "<-[" goto scan
+    mob["charmatch"] = "unless"
+    inc pos
+  scan:
+    if pos >= lastpos goto err_close
+    $S0 = substr target, pos, 1
+    if $S0 == "]" goto endclass
+    if $S0 == "-" goto err_hyphen
+    if $S0 == "." goto dotrange
+    if $S0 != "\\" goto addchar
+  backslash:
+    inc pos
+    $S0 = substr target, pos, 1
+    $I0 = index "nrtfae0", $S0
+    if $I0 == -1 goto addchar
+    $S0 = substr "\n\r\t\f\a\e\0", $I0, 1
+  addchar:
+    inc pos
+    if isrange goto addrange
+    charlist .= $S0
+    goto scan
+  addrange:
+    isrange = 0
+    $I2 = ord charlist, -1
+    $I0 = ord $S0
+  addrange_1:
+    inc $I2
+    if $I2 > $I0 goto scan
+    $S1 = chr $I2
+    charlist .= $S1
+    goto addrange_1
+  dotrange:
+    if isrange goto addrange
+    $S1 = substr target, pos, 2
+    if $S1 != ".." goto addchar
+    pos += 2
+    isrange = 1
+    goto scan
+  endclass:
+    $S0 = substr target, pos, 2
+    if $S0 != "]>" goto err_bracket
+    pos += 2
+    mpos = pos
+    mob["charlist"] = charlist
+    goto end
+  err_bracket:
+    parse_error(mob, pos, "Unescaped ']' in charlist")
+    goto end
+  err_hyphen:
+    parse_error(mob, pos, "Unescaped '-' in charlist (use '..' or '\-')")
+    goto end
+  err_close:
+    parse_error(mob, pos, "No closing ']>' for charlist")
+  end:
+    .return (mob)
+.end
+
+.sub "parse_dollar"
+    .param pmc mob
+    .local string target
+    .local int pos, lastpos
+    .local pmc newfrom, mfrom, mpos
+    .local string cname
+    newfrom = find_global "PGE::Match", "newfrom"
+    $P0 = getattribute mob, "PGE::Match\x0$:target"
+    target = $P0
+    $P0 = getattribute mob, "PGE::Match\x0$:pos"
+    pos = $P0
+    lastpos = length target
+    inc pos
+    $S0 = substr target, pos, 1
+    if $S0 == '<' goto name
+    $I0 = find_not_cclass .CCLASS_NUMERIC, target, pos, lastpos
+    if $I0 > pos goto numeric
+  eos_anchor:
+    (mob, $P0, mfrom, mpos) = newfrom(mob, 0, "PGE::Exp::Anchor")
+    mob["value"] = "$"
+    goto end
+  numeric:
+    (mob, $P0, mfrom, mpos) = newfrom(mob, 0, "PGE::Exp::Scalar")
+    $I1 = $I0 - pos
+    cname = substr target, pos, $I1
+    mob["cname"] = cname
+    pos = $I0
+    goto end
+  name:
+    inc pos
+    (mob, $P0, mfrom, mpos) = newfrom(mob, 0, "PGE::Exp::Scalar")
+    $I0 = index target, ">", pos
+    if $I0 < pos goto err_close
+  name_1:
+    $I1 = $I0 - pos
+    cname = substr target, pos, $I1
+    $P1 = find_global "Data::Escape", "String"
+    cname = $P1(cname, '"')
+    cname = concat '"', cname
+    cname = concat cname, '"'
+    mob["cname"] = cname
+    pos = $I0 + 1
+    goto end
+  err_close:
+    parse_error(mob, pos, "Missing close '>' in scalar")
+  end:
+    mpos = pos
+    .return (mob)
+.end
+    
+.sub "parse_error"
+    .param pmc mob
     .param int pos
-    .param int plen
-    .param string val
-    pos = lex["pos"]
-    plen = lex["plen"]
-    val = ""
-  string_1:
-    unless pos < plen goto end
-    $S0 = substr pattern, pos, 1
-    unless $S0 == "\\" goto string_2
-    inc pos
-    unless pos < plen goto end
-    $S0 = substr pattern, pos, 1
-    goto string_3
-  string_2:
-    $I0 = index stopat, $S0
-    if $I0 >= 0 goto end
-  string_3:
-    concat val, $S0
-    inc pos
-    goto string_1
-  end:
-    lex["pos"] = pos
-    .return (val)
-.end
-
-=item C<p6rule_parse_error(STR pattern, PMC lex, STR message)>
-
-Generates error messages during parsing.  Gracefully recovering
-from errors in rule expressions still needs a fair amount of work
-(but that's probably true for nearly any compiler).
-
-=cut
-
-.sub "p6rule_parse_error"
-    .param string pattern
-    .param pmc lex
     .param string message
-
+    $P0 = getattribute mob, "PGE::Match\x0$:pos"
+    $P0 = pos
     $P0 = new Exception
-    $S0 = "PGE Parse error: "
+    $S0 = "p6rule parse error: "
     $S0 .= message
-    $S0 .= " at offset "
-    $I0 = lex["pos"]
-    $S1 = $I0
-    $S0 .= $S1
-    $S0 .= " (found <<"
-    $S1 = substr pattern, $I0, 1
-    $S0 .= $S1
-    $S0 .= ">>)\n"
     $P0["_message"] = $S0
     throw $P0
     .return ()
 .end
 
-=item C<p6rule_parse_literal(STR pattern, PMC lex)>
+.namespace [ "PGE::Rule" ]
 
-Parse a literal string out of C<pattern> and return a PGE::Exp::Literal
-object.  If a quantifier appears after a literal string, it applies
-only to the last character (and we handle that below in C<p6rule_parse_quant>.
-
-=cut
-
-.sub "p6rule_parse_literal"
-    .param string pattern                  # pattern being analyzed
-    .param pmc lex                         # current position (Integer)
-    .local pmc p6meta                      # meta characters (Hash)
-    .local string c                        # current character
-    .local string lit                      # captured literal
-    .local int pos                         # current position
-    .local pmc exp
-
-    p6meta = find_global "PGE::P6Rule", "%_p6meta"
-    lit = ''
-
-  literal:
-    $I0 = lex["ws"]
-    if $I0 goto literal_end
-    pos = lex["pos"]
-    c = substr pattern, pos, 1             # get current character
-    if c == "\\" goto isslashmeta          # possibly a \ escape
-    $I0 = exists p6meta[c]                 # see if we have a meta char
-    if $I0 goto literal_end                # stop literal if we do
-    concat lit, c                          # add char to literal
-    "p6rule_parse_skip"(pattern, lex, 1)   # move to next position
-    goto literal                           # get next lit char
-  isslashmeta:
-    c = substr pattern, pos, 2             # get full \ escape
-    $I0 = exists p6meta[c]                 # see if this is a meta
-    if $I0 goto literal_end                # yes, so stop literal
-    c = substr c, 1                        # use actual char here
-    concat lit, c                          # add escaped char to literal
-    "p6rule_parse_skip"(pattern, lex, 2)   # skip them
-    goto literal                           # go for next
-  literal_end:
-    $P0 = find_global "PGE::Exp", "new"
-    exp = $P0("PGE::Exp::Literal")
-    exp["literal"] = lit
-    .return (exp)
+.sub "p6rule"
+    .param pmc mob
+    .local pmc optable
+    optable = find_global "PGE::P6Rule", "$optable"
+    $P0 = optable."parse"(mob)
+    .return ($P0)
 .end
-
-=item C<p6rule_parse_dot(STR pattern, PMC lex)>
-
-Parse a dot (.) token and return a C<PGE::Exp::Dot> object for it.
-
-=cut
-
-.sub "p6rule_parse_dot"
-    .param string pattern
-    .param pmc lex
-    .param string token
-    .local pmc exp
-    p6rule_parse_skip(pattern, lex, 1)
-    $P0 = find_global "PGE::Exp", "new"
-    exp = $P0("PGE::Exp::Dot")
-    .return (exp)
-.end
-
-=item C<p6rule_parse_anchor(STR pattern, PMC lex)>
-
-Parse one of the ^, ^^, $, or $$ anchors and return a
-C<PGE::Exp::Anchor> object for it.  Note that $ will be
-a little tricky here, because it can also be used to represent
-backreferences or variables.
-
-=cut
-
-.sub "p6rule_parse_anchor"
-    .param string pattern
-    .param pmc lex
-    .param string token
-    .local pmc exp
-
-    $I0 = length token
-    p6rule_parse_skip(pattern, lex, $I0)
-    $P0 = find_global "PGE::Exp", "new"
-    exp = $P0("PGE::Exp::Anchor")
-    exp["token"] = token
-  end:
-    .return (exp)
-.end
-
-=item C<p6rule_parse_group(STR pattern, PMC lex)>
-
-Parse a capturing or non-capturing group.  '[' is used to indicate
-non-capturing groups, and '(' indicates capturing subpatterns.
-Furthermore, '('-captures introduce a new lexical scope for
-subcaptures.
-
-=cut
-
-.sub "p6rule_parse_group"
-    .param string pattern
-    .param pmc lex
-    .param string token
-    .local pmc exp
-    .local int pos
-    .local string ket
-    .local int subp
-    .local pmc cname
-    .local int isaliased
-
-    p6rule_parse_skip(pattern, lex, 1)             # skip '(' or ']'
-    $P0 = find_global "PGE::Exp", "new"            # create group exp object
-    exp = $P0("PGE::Exp::Group")
-    isaliased = exists lex["cname"]
-    unless isaliased goto group_1                  # are we aliased?
-    cname = lex["cname"]                           # yes, use that capture name
-    exp["cname"] = cname
-    delete lex["cname"]                            # and then remove it
-  group_1:
-    subp = lex["subp"]                             # current subpattern count
-    unless token == '(' goto group_2
-    exp["cscope"] = 1                              # '(' == scoped capture
-    lex["subp"] = 0                                # restart subpattern #'s
-    if isaliased goto group_2                      # if not aliased
-    exp["cname"] = subp                            # use subpattern number
-    inc subp                                       # and increase
-  group_2:
-    $P1 = "p6rule_parse_exp"(pattern, lex)         # parse subexpression
-    exp["exp1"] = $P1                              # store in group exp
-    pos = lex['pos']                               # update pattern pos
-    $S0 = substr pattern, pos, 1                   # get closing char
-    unless token == '(' goto group_3               # if scoped capture '('
-    lex["subp"] = subp                             # set next subpattern #
-    if $S0 == ')' goto group_4                     # check for closing char
-    p6rule_parse_error(pattern, lex, "group missing ')'")
-    goto end
-  group_3:                                         # unscoped capture
-    if $S0 == ']' goto group_4
-    p6rule_parse_error(pattern, lex, "group missing ']'")
-    goto end
-  group_4:
-    p6rule_parse_skip(pattern, lex, 1)             # skip closing token
-  end:
-    .return (exp)
-.end
-
-=item C<p6rule_parse_subrule(STR pattern, PMC lex)>
-
-Parses subrules.
-
-=cut
-
-.sub p6rule_parse_subrule
-    .param string pattern
-    .param pmc lex
-    .param string token
-    .local int pos
-    .local pmc exp
-    $I0 = length token
-    p6rule_parse_skip(pattern, lex, $I0)
-    pos = lex["pos"]
-    $I0 = pos
-  subrule_1:
-    $I1 = is_cclass .CCLASS_WORD, pattern, pos
-    unless $I1 goto subrule_1b
-  subrule_1_inc:
-    inc pos
-    goto subrule_1
-  subrule_1b:
-    $S0 = substr pattern, pos, 1
-    if $S0 == '.' goto subrule_1_inc
-    if $S0 == ':' goto subrule_1_inc
-  subrule_2:
-    $I1 = pos - $I0
-    if $I1 > 0 goto subrule_3
-    p6rule_parse_error(pattern, lex, "invalid subrule name")
-  subrule_3:
-    $P0 = find_global "PGE::Exp", "new"
-    $P1 = $P0("PGE::Exp")
-    exp = $P0("PGE::Exp::Group", $P1)
-    $S0 = substr pattern, $I0, $I1
-    exp["rname"] = $S0
-    if token == '<?' goto subrule_4
-    exp["cname"] = $S0
-    $I0 = exists lex["cname"]
-    unless $I0 goto subrule_4
-    $P0 = lex["cname"]
-    exp["cname"] = $P0
-  subrule_4:
-    $S0 = substr pattern, pos, 1
-    if $S0 == '>' goto subrule_5
-    p6rule_parse_error(pattern, lex, "missing closing '>'")
-    goto subrule_6
-  subrule_5:
-    inc pos
-    lex["pos"] = pos
-    p6rule_parse_skip(pattern, lex, 0)
-  subrule_6:
-    .return (exp)
-.end
-
-=item C<p6rule_parse_alias(STR pattern, PMC lex, STR token)>
-
-Parse an alias or backreference.
-
-=cut
-
-.sub p6rule_parse_alias
-    .param string pattern
-    .param pmc lex
-    .param string token
-    .local int pos, plen
-    .local int subp
-    .local pmc exp
-
-    pos = lex["pos"]                               # get current position
-    inc pos                                        # skip past '$'
-    if token == '$<' goto name                     # $< == named capture
-    if token == '@<' goto name                     # @< == named capture
-    if token == '%<' goto name                     # %< == named capture
-    $I0 = pos                                      # aha, numeric capture
-    plen = lex["plen"]                             # now let's scan for digits
-  num_0:
-    if $I0 >= plen goto num_1
-    $I1 = is_cclass .CCLASS_NUMERIC, pattern, $I0
-    unless $I1 goto num_1
-    inc $I0
-    goto num_0
-  num_1:                                           # we have digits
-    lex["pos"] = $I0                               # save new scan position
-    $I0 -= pos                                     # get length of digit seq.
-    $S0 = substr pattern, pos, $I0                 # extract digit seq.
-    subp = $S0                                     # convert to integer
-    lex["cname"] = subp                            # this capture
-    inc subp                                       # store next subpattern #
-    lex["subp"] = subp                             #
-    p6rule_parse_skip(pattern, lex, 0)             # skip ws
-    goto alias
-  name:
-    inc pos                                        # skip over '<'
-    lex["pos"] = pos                               # set position
-    $S0 = p6rule_parse_string(pattern, lex, '>')   # now get named alias
-    lex["cname"] = $S0                             # capture to this alias
-    p6rule_parse_skip(pattern, lex, 1)             # skip closing '>'  (XXX)
-  alias:
-    pos = lex["pos"]                               # get current pos
-    $S0 = substr pattern, pos, 2                   # check for ':='
-    unless $S0 == ':=' goto backref
-    p6rule_parse_skip(pattern, lex, 2)             # skip ':='
-    exp = p6rule_parse_term(pattern, lex)          # parse a term to capture
-    goto end
-  backref:
-    $P0 = find_global "PGE::Exp", "new"            # create a backreference
-    exp = $P0("PGE::Exp::Scalar")
-    $P0 = lex["cname"]
-    exp["cname"] = $P0
-  end:
-    delete lex["cname"]                            # destroy any capture name
-    .return (exp)
-.end
-
-
-=item C<p6rule_parse_ccshortcut(STR pattern, PMC lex)>
-
-Parses a character class of some sort, including the \n, \N, \s, \S,
-and related matches.
-
-=cut
-
-.sub p6rule_parse_ccshortcut
-    .param string pattern
-    .param pmc lex
-    .param string token
-    .local pmc exp
-    $P0 = find_global "PGE::Exp", "new"
-    exp = $P0("PGE::Exp::CCShortcut")
-    exp["token"] = token
-    $I0 = length token
-    p6rule_parse_skip(pattern, lex, $I0)
-    .return (exp)
-.end
-
-=item C<p6rule_parse_charclass(STR pattern, PMC lex, STR token)>
-
-Parse a character class in a rule expression.
-
-Note: The interface for PGE::Exp::CharClass may change in the
-near future, so don't rely on this code too strongly just yet.
-(pmichaud, 2005-05-11)
-
-=cut
-
-.sub p6rule_parse_charclass
-    .param string pattern
-    .param pmc lex
-    .param string token
-    .local int pos, plen
-    .local string charclass
-    .local int range
-    .local pmc exp
-    pos = lex["pos"]
-    plen = lex["plen"]
-    $I0 = length token
-    pos += $I0
-    charclass = ""
-    range = 0
-  scan:
-    if pos >= plen goto no_close_err
-    $S0 = substr pattern, pos, 1
-    if $S0 == "]" goto end_class
-    if $S0 == "-" goto unescaped_hyphen
-    if $S0 == "." goto start_range
-    unless $S0 == "\\" goto add_char
-  backslash:
-    inc pos
-    $S0 = substr pattern, pos, 1
-    $I0 = index "nrtfae0", $S0
-    if $I0 == -1 goto add_char
-    $S0 = substr "\n\r\t\f\a\e\0", $I0, 1
-  add_char:
-    inc pos
-    if range goto add_range
-    concat charclass, $S0
-    goto scan
-  add_range:
-    range = 0
-    $I2 = ord charclass, -1
-    $I0 = ord $S0
-  add_range_1:
-    inc $I2
-    if $I2 > $I0 goto scan
-    $S1 = chr $I2
-    concat charclass, $S1
-    goto add_range_1
-  start_range:
-    if range goto add_range
-    $S1 = substr pattern, pos, 2
-    unless $S1 == ".." goto add_char
-    pos += 2
-    range = 1
-    goto scan
-  end_class:
-    $S0 = substr pattern, pos, 2
-    unless $S0 == "]>" goto unescaped_bracket
-    pos += 2
-    lex["pos"] = pos
-    p6rule_parse_skip(pattern, lex, 0)
-    $P0 = find_global "PGE::Exp", "new"
-    exp = $P0("PGE::Exp::CharClass")
-    exp["charclass"] = charclass
-    $S0 = substr token, 1, 1
-    if $S0 == "-" goto charclass_negate
-    exp["charmatch"] = "if"
-    goto end
-  charclass_negate:
-    exp["charmatch"] = "unless"
-    goto end
-  unescaped_hyphen:
-    p6rule_parse_error(pattern, lex, "Unescaped '-' in charclass (use '..' or '\\-')")
-    goto end
-  no_close_err:
-    p6rule_parse_error(pattern, lex, "No closing ']>' for character class")
-    goto end
-  unescaped_bracket:
-    p6rule_parse_error(pattern, lex, "Unescaped ']' in character class")
-    goto end
-  end:
-    .return (exp)
-.end
-
-=item C<p6rule_parse_cut(STR pattern, PMC lex)>
-
-Parse one of the cut terms (::, :::) in a rule expression.
-The single-colon cut (cut previous expression) is actually
-handled as a special quantifier.
-
-=cut
-
-.sub p6rule_parse_cut
-    .param string pattern
-    .param pmc lex
-    .param string token
-    .local pmc exp
-    $P0 = find_global "PGE::Exp", "new"
-    exp = $P0("PGE::Exp::Cut")
-    exp["token"] = token
-    $I0 = length token
-    p6rule_parse_skip(pattern, lex, $I0)
-    .return (exp)
-.end
-
-=item C<p6rule_parse_term(STR pattern, PMC lex)>
-
-Parse a single term in a rule expression, such as a literal,
-anchor, assertion, backslash sequence, etc.  We use a TokenHash
-here as a lookup table to find the longest sequence of matching
-characters.
-
-=cut
-
-.sub "p6rule_parse_term"
-    .param string pattern                          # pattern
-    .param pmc lex                                 # current lexical state
-    .local pmc p6meta                              # hash of meta chars
-    .local int pos                                 # current position
-    .local string c                                # current character
-    .local pmc exp                                 # returned expression
-
-    p6rule_parse_skip(pattern, lex, 0)             # skip to next token
-    pos = lex["pos"]
-
-    p6meta = find_global "PGE::P6Rule", "%_p6meta"
-    c = p6meta."lkey"(pattern, pos)
-    $P0 = p6meta[c]
-    (exp) = $P0(pattern, lex, c)
-    .return (exp)
-.end
-
-=item C<p6rule_parse_quant(STR pattern, PMC lex)>
-
-Parse a quantified term expressions, as well as the C<:> backtracking
-control.  Currently does not handle **{m..n} quantifiers, but that
-will be coming soon.
-
-=cut
-
-.sub "p6rule_parse_quant"
-    .param string pattern
-    .param pmc lex
-    .local pmc exp
-    .local pmc qexp
-    .local string c
-    .local int offset
-    .local int pos
-
-    (exp) = "p6rule_parse_term"(pattern, lex)
-    set qexp, exp
-    pos = lex["pos"]
-    c = substr pattern, pos, 1
-    $I0 = index "*+?:", c
-    if $I0 < 0 goto end
-    $I0 = isa exp, "PGE::Exp::Literal"             # break multichar literals
-    unless $I0 goto quant                          # not a literal
-    $S0 = exp["literal"]
-    $I0 = length $S0
-    unless $I0 > 1 goto quant                      # not multichar
-    $S1 = substr $S0, -1, 1                        # split off last char
-    chopn $S0, 1                                   # else split off last char
-    exp["literal"] = $S0                           # save shorter literal
-    $P1 = find_global "PGE::Exp", "new"
-    qexp = $P1("PGE::Exp::Literal")                # create quantified literal
-    qexp["literal"] = $S1
-    exp = $P1("PGE::Exp::Concat", exp, qexp)       # and concat
-  quant:                                           # qexp is the atom to quant
-  quant_quest:
-    if c != "?" goto quant_plus
-    pos = "p6rule_parse_skip"(pattern, lex, 1)
-    qexp["min"] = 0
-    goto quant_greedy
-  quant_plus:
-    if c != "+" goto quant_star
-    pos = "p6rule_parse_skip"(pattern, lex, 1)
-    qexp["max"] = PGE_INF
-    qexp["isarray"] = 1
-    goto quant_greedy
-  quant_star:
-    if c != "*" goto quant_greedy
-    pos = "p6rule_parse_skip"(pattern, lex, 1)
-    c = substr pattern, pos, 1
-    if c == '*' goto quant_range
-    qexp["min"] = 0
-    qexp["max"] = PGE_INF
-    qexp["isarray"] = 1
-    goto quant_greedy
-  quant_range:
-    pos = "p6rule_parse_skip"(pattern, lex, 1)
-    c = substr pattern, pos, 1
-    unless c == '{' goto quant_range_error
-    pos = "p6rule_parse_skip"(pattern, lex, 1)
-    $I0 = pos
-  quant_range_1:
-    $I1 = is_cclass .CCLASS_NUMERIC, pattern, $I0
-    unless $I1 goto quant_range_2
-    inc $I0
-    goto quant_range_1
-  quant_range_2:
-    $I0 -= pos
-    $S0 = substr pattern, pos, $I0
-    qexp["min"] = $S0
-    qexp["max"] = $S0
-    pos = "p6rule_parse_skip"(pattern, lex, $I0)
-    $S0 = substr pattern, pos, 1
-    if $S0 == '}' goto quant_range_close
-    $S0 = substr pattern, pos, 3
-    unless $S0 == "..." goto quant_range_3
-    qexp["max"] = PGE_INF
-    pos = "p6rule_parse_skip"(pattern, lex, 3)
-    goto quant_range_close
-  quant_range_3:
-    $S0 = substr pattern, pos, 2
-    unless $S0 == ".." goto quant_range_error
-    pos = "p6rule_parse_skip"(pattern, lex, 2)
-    $I0 = pos
-  quant_range_4:
-    $I1 = is_cclass .CCLASS_NUMERIC, pattern, $I0
-    unless $I1 goto quant_range_5
-    inc $I0
-    goto quant_range_4
-  quant_range_5:
-    $I0 -= pos
-    unless $I0 > 0 goto quant_range_error
-    $S0 = substr pattern, pos, $I0
-    qexp["max"] = $S0
-    pos = "p6rule_parse_skip"(pattern, lex, $I0)
-  quant_range_close:
-    $S0 = substr pattern, pos, 1
-    unless $S0 == '}' goto quant_range_error
-    pos = "p6rule_parse_skip"(pattern, lex, 1)
-    goto quant_greedy
-  quant_range_error:
-    p6rule_parse_error(pattern, lex, "error in range quantifier")
-  quant_greedy:
-    c = substr pattern, pos, 1
-    if c != '?' goto quant_cut
-    pos = "p6rule_parse_skip"(pattern, lex, 1)
-    qexp["isgreedy"] = 0
-  quant_cut:
-    c = substr pattern, pos, 1
-    if c != ':' goto end
-    inc pos
-    c = substr pattern, pos, 1
-    if c == ':' goto end
-    pos = "p6rule_parse_skip"(pattern, lex, 1)
-    qexp["iscut"] = 1
-  end:
-    .return (exp)
-.end
-
-=item C<p6rule_parse_concat(STR pattern, PMC lex)>
-
-Parse a concatenated sequence of rule expressions, terminated
-by a closing group character, an alternation, or a conjunction.
-We also generate <?ws> rules as needed here.
-XXX: We need to add an option here to allow other characters to
-terminate the expression.
-
-=cut
-
-.sub "p6rule_parse_concat"
-    .param string pattern
-    .param pmc lex
-    .local pmc exp
-    .local pmc p6meta
-    .local int words
-
-    $P0 = find_global "PGE::Exp", "new"
-    words = lex["words"]
-    unless words goto concat_1
-    $I0 = lex["ws"]
-    unless $I0 goto concat_1
-    (exp) = $P0("PGE::Exp::WS")
-    lex["ws"] = 0
-    goto concat_2
-  concat_1:
-    (exp) = "p6rule_parse_quant"(pattern, lex)
-    unless words goto concat_2
-    $I0 = lex["ws"]
-    if $I0 goto concat_3
-  concat_2:
-    $I0 = lex["pos"]
-    $S0 = substr pattern, $I0, 1
-    if $S0 == '' goto end
-    $I0 = index "])|&", $S0
-    if $I0 >= 0 goto end
-  concat_3:
-    ($P1) = "p6rule_parse_concat"(pattern, lex)
-    (exp) = $P0("PGE::Exp::Concat", exp, $P1)
-  end:
-    .return (exp)
-.end
-
-=item C<p6rule_parse_alt(STR pattern, PMC lex)>
-
-Parse an alternating sequence of rule expressions, and
-generate a PGE::Exp::Alt object for it.  We also have
-to adjust the subpattern counts here.
-
-=cut
-
-.sub "p6rule_parse_alt"
-    .param string pattern
-    .param pmc lex
-    .local pmc exp
-    .local int subp
-    .local int subp1
-
-    subp = lex["subp"]
-    (exp) = "p6rule_parse_concat"(pattern, lex)
-    $I0 = lex["pos"]
-    $S0 = substr pattern, $I0, 1
-    if $S0 != '|' goto end
-  alt:
-    subp1 = lex["subp"]
-    lex["subp"] = subp
-    "p6rule_parse_skip"(pattern, lex, 1)
-    ($P0) = "p6rule_parse_alt"(pattern, lex)
-    $P1 = find_global "PGE::Exp", "new"
-    (exp) = $P1("PGE::Exp::Alt", exp, $P0)
-    $I0 = lex["subp"]
-    unless subp1 > $I0 goto end
-    lex["subp"] = subp1
-  end:
-    .return (exp)
-.end
-
-=item C<p6rule_parse_exp(STR pattern, PMC lex)>
-
-Parse a complete rule expression and return its expression object.
-Note that this function may be called recursively from
-C<p6rule_parse_group> above.
-
-=cut
-
-.sub "p6rule_parse_exp"
-    .param string pattern
-    .param pmc lex
-    .local int words, ignorecase
-    .local int pos
-    .local pmc exp
-
-    words = lex["words"]
-    ignorecase = lex["ignorecase"]
-    $I0 = lex["ws"]
-    if $I0 goto exp_1
-  exp_0:
-    pos = lex["pos"]
-    $S0 = substr pattern, pos, 2
-    if $S0 == ':i' goto exp_i
-    if $S0 == ':w' goto exp_w
-    goto exp_1
-  exp_i:
-    lex["ignorecase"] = 1
-    p6rule_parse_skip(pattern, lex, 2)
-    goto exp_0
-  exp_w:
-    lex["words"] = 1
-    p6rule_parse_skip(pattern, lex, 2)
-    goto exp_0
-  exp_1:
-    (exp) = "p6rule_parse_alt"(pattern, lex)
-    lex["words"] = words
-    lex["ignorecase"] = ignorecase
-    .return (exp)
-.end
-
-=item C<(rule, code, expr) = p6rule(STR pattern [, STR gmr, STR name])>
-
-Compile C<pattern> containing a Perl 6 rule expression into
-a subroutine that can match that expression, returned as C<rule>.
-The C<p6rule> subroutine also returns the PIR code and expression
-tree used to generate the rule (generally for debugging purposes).
-
-This function optionally takes a grammar and rule name, and automatically
-installs the compiled rule into the grammar (creating the grammar if
-needed).
-
-=cut
 
 .namespace [ "PGE" ]
 
 .sub "p6rule"
-    .param string pattern                          # pattern to compile
-    .param string grammar      :optional           # grammar to store in
-    .param int    has_gram     :opt_flag
-    .param string name         :optional           # name of rule
-    .param int    has_name     :opt_flag
-    .local pmc lex
+    .param string pattern
+    .param string grammar      :optional
+    .param int has_gram        :opt_flag
+    .param string name         :optional
+    .param int has_name        :opt_flag
+    .param int pironly         :optional
+    .param int has_pironly     :opt_flag
     .local pmc exp
+    .local pmc newfrom
     .local pmc code
-    .local pmc rule
+    .local pmc sub
+    .local pmc pad
 
     if has_name goto p6rule_1
     name = "_pge_rule"
     if has_gram goto p6rule_1
     grammar = "PGE::Rule"
   p6rule_1:
-    lex = new Hash
-    lex["pos"] = 0
-    lex["subp"] = 0
-    $I0 = length pattern
-    lex["plen"] = $I0
-    $P0 = find_global "PGE::P6Rule", "p6rule_parse_skip"
-    $P0(pattern, lex, 0)
-    $P0 = find_global "PGE::P6Rule", "p6rule_parse_exp"
-    (exp) = $P0(pattern, lex)
+    newfrom = find_global "PGE::Match", "newfrom"
+    (exp, $P99, $P99, $P0) = newfrom(pattern, 0, "PGE::Exp")
+    $P0 = 0
 
-    $P1 = find_global "PGE::Exp", "new"
-    $P2 = $P1("PGE::Exp::End")
-    exp = $P1("PGE::Exp::Concat", exp, $P2)
-    exp = $P1("PGE::Exp::Start", exp)
+    $P0 = find_global "PGE::Rule", "p6rule"
+    exp = $P0(exp)
+    pad = new Hash
+    $P0 = new Hash
+    pad["reps"] = $P0
+    pad["cutnum"] = PGE_CUT_GROUP
+    pad["subpats"] = 0
+    $P0 = exp["expr"]
+    $P0 = $P0.p6analyze(pad)
+    exp["expr"] = $P0
 
-    exp.analyze()
-    exp.serno(0)
+    $P0 = new String
+    $P0 = "\n.namespace [ \""
+    $P0 .= grammar
+    $P0 .= "\" ]\n\n"
+    code = exp."as_pir"(name)
+    code = concat $P0, code
 
-    code = new String
-    code = ".namespace [ \""
-    code .= grammar
-    code .= "\" ]\n\n"
-    exp.gen(code, name, "fail")
+    if has_pironly goto end
     $P0 = compreg "PIR"
-    compreg $P0, "PIR"
-    $S0 = code
-    rule = $P0($S0)
-    if has_name == 0 goto p6rule_2
-    store_global grammar, name, rule
+    sub = $P0(code)
+    if has_name == 0 goto end
     $I0 = find_type grammar
-    if $I0 > 0 goto p6rule_2
+    if $I0 > 0 goto end
     $P0 = getclass "PGE::Rule"
-    $P1 = subclass $P0, grammar
-  p6rule_2:
-    .return (rule, code, exp)
+    $P1 = subclass $P0, grammar 
+  end:
+    .return (sub, code, exp)
 .end
 
-=head1 AUTHOR
+.namespace [ "PGE::Exp" ]
 
-Patrick Michaud (pmichaud@pobox.com) is the author and maintainer.
-Patches and suggestions should be sent to the Perl 6 compiler list
-(perl6-compiler@perl.org).
+.sub "p6analyze" :method
+    .param pmc pad
+    $I0 = defined self["value"]
+    if $I0 goto end
+    $S0 = self
+    self["value"] = $S0
+  end:
+    .return (self)
+.end
 
-=cut
+.namespace [ "PGE::Exp::Literal" ]
 
+.sub "p6analyze" :method
+    .param pmc pad
+    $I0 = pad[":i"]
+    self["ignorecase"] = $I0
+    .return (self)
+.end
+
+.namespace [ "PGE::Exp::Cut" ]
+
+.sub "p6analyze" :method
+    .param pmc pad
+    .local string token
+    token = self
+    if token == ":" goto cutatom
+    $I0 = PGE_CUT_RULE
+    if token == ":::" goto cut_1
+    $I0 = pad["cutnum"]
+  cut_1:
+    self["cutnum"] = $I0
+    .return (self)
+  cutatom:
+    $P0 = self[0]
+    $P0 = $P0.reduce(pad)
+    $P0["iscut"] = 1
+    $P0["isquant"] = 1
+    .return ($P0)
+.end
+
+.namespace [ "PGE::Exp::Concat" ]
+
+.sub "p6analyze" :method
+    .param pmc pad
+    .local pmc exp0, exp1
+    exp0 = self[0]
+    exp0 = exp0.p6analyze(pad)
+    exp1 = self[1]
+    exp1 = exp1.p6analyze(pad)
+    unless_null exp0, exp1null
+    .return (exp1)
+  exp1null:
+    self[0] = exp0
+    unless_null exp1, end
+    .return (exp0)
+  end:
+    self[1] = exp1
+    .return (self)
+.end
+
+.namespace [ "PGE::Exp::Alt" ]
+
+.sub "p6analyze" :method
+    .param pmc pad
+    .local pmc reps, savereps
+    .local pmc exp0, exp1
+
+    reps = pad["reps"]
+    savereps = new Hash
+    $P0 = new Iterator, reps
+  reps_1:
+    unless $P0 goto reps_2
+    $P1 = shift $P0
+    $P2 = reps[$P1]
+    savereps[$P1] = $P2
+    goto reps_1
+  reps_2:
+    $I0 = pad["subpats"]
+    exp0 = self[0]
+    exp0 = exp0.p6analyze(pad)
+    self[0] = exp0
+
+    $I1 = pad["subpats"]
+    pad["subpats"] = $I0
+    pad["reps"] = savereps
+    exp1 = self[1]
+    exp1 = exp1.p6analyze(pad)
+    self[1] = exp1
+    $I0 = pad["subpats"]
+    if $I0 >= $I1 goto end
+    pad["subpats"] = $I1
+  end:
+    .return (self)
+.end
+    
+.namespace [ "PGE::Exp::Quant" ]
+
+.sub "p6analyze" :method
+    .param pmc pad
+    .local pmc exp
+    .local int padarray
+    padarray = pad["isarray"]
+    pad["isarray"] = 1
+    exp = self[0]
+    exp = exp.p6analyze(pad)
+    self[0] = exp
+    pad["isarray"] = padarray
+    .return (self)
+.end
+    
+.namespace [ "PGE::Exp::Group" ] 
+
+.sub "p6analyze" :method
+    .param pmc pad
+    .local pmc reps, exp
+    .local string cname
+    .local int cutnum, padarray, isarray, subpats
+
+    cutnum = pad["cutnum"]
+    ($S0, $I0) = self.serno()
+    pad["cutnum"] = $I0
+    self["cutnum"] = $I0
+
+    if self != "(" goto init
+    self["iscapture"] = 1
+    self["isscope"] = 1
+
+  init:
+    $I0 = self["iscapture"]
+    if $I0 == 0 goto unscoped
+
+  capture:
+    $I0 = exists self["cname"]
+    if $I0 goto setsubpats
+    $I0 = pad["subpats"]
+    self["cname"] = $I0
+    
+  setsubpats:
+    cname = self["cname"]
+    $S0 = substr cname, 0, 1
+    if $S0 == '"' goto setreps
+    $I0 = cname
+    inc $I0
+    pad["subpats"] = $I0
+
+  setreps:
+    isarray = 0
+    reps = pad["reps"]
+    $I0 = exists reps[cname]
+    if $I0 == 0 goto setreps_1
+    $P0 = reps[cname]
+    $P0["isarray"] = 1
+    isarray = 1
+  setreps_1:
+    reps[cname] = self
+
+    padarray = pad["isarray"]
+    isarray |= padarray
+    self["isarray"] = isarray
+    $I0 = self["isscope"]
+    if $I0 == 0 goto unscoped
+
+  scoped:
+    subpats = pad["subpats"]
+    pad["subpats"] = 0
+    pad["isarray"] = 0
+    $P0 = new Hash
+    pad["reps"] = $P0
+    exp = self[0]
+    exp = exp.p6analyze(pad)
+    self[0] = exp
+    pad["reps"] = reps
+    pad["subpats"] = subpats
+    pad["isarray"] = padarray
+    pad["cutnum"] = cutnum
+    goto end
+  unscoped:
+    exp = self[0]
+    exp = exp.p6analyze(pad)
+    self[0] = exp
+    pad["cutnum"] = cutnum
+  end:
+    .return (self)
+.end
+
+.namespace [ "PGE::Exp::Subrule" ]
+
+.sub "p6analyze" :method
+    .param pmc pad
+    .local int isarray, iscapture
+    .local string cname
+    .local pmc reps
+
+    iscapture = self["iscapture"]
+    if iscapture == 0 goto end
+    cname = self["cname"]
+    isarray = pad["isarray"]
+    reps = pad["reps"]
+    $I0 = exists reps[cname]
+    if $I0 == 0 goto reps_1
+    $P0 = reps[cname]
+    $P0["isarray"] = 1
+    isarray = 1
+  reps_1:
+    reps[cname] = self
+    self["isarray"] = isarray
+  
+  next_cname:
+    $S0 = substr cname, 0, 1
+    if $S0 == '"' goto end
+    $I0 = cname
+    inc $I0
+    pad["subpats"] = $I0
+
+  end:
+    .return (self)
+.end
+
+.namespace [ "PGE::Exp::WS" ]
+
+.sub "p6analyze" :method
+    .param pmc pad
+    $I0 = pad[":w"]
+    if $I0 goto ws
+    null $P0
+    .return ($P0)
+  ws:
+    self["subname"] = "ws"
+    self["iscapture"] = 0
+    .return (self)
+.end
+
+.namespace [ "PGE::Exp::Modifier" ]
+
+.sub "p6analyze" :method
+    .param pmc pad
+    .local string mname
+    .local pmc value
+    .local pmc exp
+    mname = self["mname"]
+    value = self["value"]
+    if mname == ":words" goto words
+    if mname == ":ignorecase" goto ignorecase
+    goto setpad
+  words:
+    mname = ":w"
+    goto setpad
+  ignorecase:
+    mname = ":i"
+  setpad:
+    $P0 = pad[mname]
+    pad[mname] = value
+    exp = self[0]
+    exp = exp.p6analyze(pad)
+    self[0] = exp
+    pad[mname] = $P0
+    .return (exp)
+.end
+
+
+.namespace [ "PGE::Exp::Alias" ]
+
+.sub "p6analyze" :method
+    .param pmc pad
+    .local string cname
+    .local pmc exp0, exp1
+
+    exp0 = self[0]
+    cname = exp0["cname"]
+    exp1 = self[1]
+    exp1["cname"] = cname
+    exp1["iscapture"] = 1
+    exp1 = exp1.p6analyze(pad)
+    .return (exp1)
+.end

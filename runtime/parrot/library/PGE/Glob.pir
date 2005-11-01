@@ -15,6 +15,39 @@ A parser for shell-stype glob notation.
 .const string STOPCHARS = ",*?{}[]"	# XXX: should be part of context
 .const int GLOB_INF = 2147483647	# XXX: arbitrary limit
 
+=item C<new(STR class [, PMC exp1 [, PMC exp2]])>
+
+Creates and returns  a new C<Exp> object of C<class>, initializing
+min/max/greedy/etc.  values and C<exp1> and C<exp2> objects if provided.
+
+=cut
+
+.sub "new"
+    .param pmc pattern
+    .param string expclass     :optional           # class from find_type
+    .param int has_class       :opt_flag
+    .param pmc exp1            :optional           # left expression
+    .param int has_exp1        :opt_flag
+    .param pmc exp2            :optional           # right expression
+    .param int has_exp2        :opt_flag
+    .local pmc me                                  # new expression object
+
+    if has_class goto buildme
+    expclass = "PGE::Exp"
+  buildme:
+    $P0 = find_global "PGE::Match", "newfrom"
+    (me, $P0, $P1, $P2) = $P0(pattern, 0, expclass)
+    assign $P2, $P1
+
+    unless has_exp1 goto end
+    me[0] = exp1
+    unless has_exp2 goto end
+    me[1] = exp2
+  end:
+    .return (me)
+.end
+
+
 =item C<glob_error(STR pattern, PMC lex, STR message)>
 
 output an error message
@@ -91,8 +124,7 @@ Parse alternations of the form {a,b,c} where a,b, and c are the alternatives.
     inc $I0
     lex['pos'] = $I0
     exp2 = "glob_parse_literallist"(pattern,lex)
-    $P0 = find_global "PGE::Exp", "new"
-    exp =  $P0("PGE::Exp::Alt", exp1, exp2)
+    exp =  "new"(pattern, "PGE::Exp::Alt", exp1, exp2)
     .return (exp)
 
   lit_end:
@@ -126,9 +158,8 @@ Parse alternations of the form {a,b,c} where a,b, and c are the alternatives.
     goto next_char
   lit_end:
     lex['pos'] = $I0
-    $P0 = find_global "PGE::Exp", "new"
-    exp = $P0("PGE::Exp::Literal")
-    exp['literal'] = lit
+    exp = "new"(pattern, "PGE::Exp::Literal")
+    exp["value"] = lit
     .return (exp)
 .end
 
@@ -141,8 +172,7 @@ Parse alternations of the form {a,b,c} where a,b, and c are the alternatives.
     pos = lex["pos"]
     plen = lex["plen"]
     charclass = ""
-    $P0 = find_global "PGE::Exp", "new"
-    exp = $P0("PGE::Exp::CharClass")
+    exp = "new"(pattern, "PGE::Exp::EnumCharList")
     $S0 = substr pattern, pos, 1
     if $S0 == "!" goto negate
     if $S0 == "^" goto negate
@@ -182,7 +212,7 @@ Parse alternations of the form {a,b,c} where a,b, and c are the alternatives.
   end_class:
     inc pos
     lex["pos"] = pos
-    exp["charclass"] = charclass
+    exp["charlist"] = charclass
   end:
     .return (exp)
 .end  
@@ -206,18 +236,19 @@ Parse alternations of the form {a,b,c} where a,b, and c are the alternatives.
   dot:
     inc $I0
     lex['pos'] = $I0
-    $P0 = find_global "PGE::Exp", "new"
-    exp = $P0("PGE::Exp::Dot")
+    exp = "new"(pattern, "PGE::Exp::CCShortcut")
+    exp["value"] = "."
     goto next
 
   star:
     inc $I0
     lex['pos'] = $I0
-    $P0 = find_global "PGE::Exp", "new"
-    exp = $P0("PGE::Exp::Dot")
-    exp['min'] = 0
-    exp['max'] = GLOB_INF
-    exp['isgreedy'] = 1
+    exp = "new"(pattern, "PGE::Exp::CCShortcut")
+    exp["value"] = "."
+    exp["min"] = 0
+    exp["max"] = GLOB_INF
+    exp["islazy"] = 0
+    exp["isquant"] = 1
     goto next
 
   cc:
@@ -234,8 +265,7 @@ Parse alternations of the form {a,b,c} where a,b, and c are the alternatives.
     $I0 = lex['pos']
     unless $I0 < $I1 goto expr_end
     $P2 = "glob_parse_expr"(pattern,lex)
-    $P0 = find_global "PGE::Exp", "new"
-    exp = $P0("PGE::Exp::Concat", exp, $P2)
+    exp = "new"(pattern, "PGE::Exp::Concat", exp, $P2)
 
   expr_end:
     .return (exp)
@@ -258,31 +288,26 @@ Parse alternations of the form {a,b,c} where a,b, and c are the alternatives.
     $P0 = find_global "PGE::Glob", "glob_parse_expr"
     exp = $P0(pattern,lex)
 
-    $P1 = find_global "PGE::Exp", "new"
+    $P1 = find_global "PGE::Glob", "new"
 
-    aexp = $P1("PGE::Exp::Anchor")
-    aexp['token'] = '^'
-    exp = $P1("PGE::Exp::Concat", aexp, exp)
+    aexp = $P1(pattern, "PGE::Exp::Anchor")
+    aexp["value"] = "^"
+    exp = $P1(pattern, "PGE::Exp::Concat", aexp, exp)
 
-    aexp = $P1("PGE::Exp::Anchor")
-    aexp['token'] = '$'
-    exp = $P1("PGE::Exp::Concat", exp, aexp)
+    aexp = $P1(pattern, "PGE::Exp::Anchor")
+    aexp["value"] = "$"
+    exp = $P1(pattern, "PGE::Exp::Concat", exp, aexp)
 
-    $P2 = $P1("PGE::Exp::End")
-    exp = $P1("PGE::Exp::Concat", exp, $P2)
-    exp = $P1("PGE::Exp::Start", exp)
+    $P2 = $P1(pattern, "PGE::Exp")
+    $P2["expr"] = exp
 
-    exp.analyze()
-    exp.serno(0)
-
-    code = new String
-    exp.gen(code, "_pge_rule", "fail")
+    code = $P2."as_pir"("_pge_rule")
 
     compreg $P0, "PIR"
     $S0 = code
 
     glob = $P0($S0)
-    .return (glob, code, exp)
+    .return (glob, code, $P2)
 .end
 
 =head1 AUTHOR

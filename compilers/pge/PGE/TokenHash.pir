@@ -61,7 +61,14 @@ PGE::TokenHash - hash implementation to speed up Token lookups
     .return ($I0)
 .end
 
-.sub "lkey" method
+.sub "__get_integer" :method
+    .local pmc vhash
+    vhash = getattribute self, "PGE::TokenHash\x0.vhash"
+    $I0 = vhash
+    .return ($I0)
+.end
+
+.sub "lkey" :method
     .param string key
     .param int pos
     .local string c

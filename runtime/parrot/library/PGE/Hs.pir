@@ -190,14 +190,11 @@ END:
 
   subrules:
     out .= "] ["
-    capt = getattribute self, PGE_SUB_NAMED
+    capt = self."get_hash"()
     if_null capt, end
     iter = new Iterator, capt
     iter = 0
-    goto subrules_body
-  subrules_loop:
     unless iter goto end
-    out .= ", "
   subrules_body:
     key = shift iter
     cond = defined capt[key]
@@ -209,6 +206,8 @@ END:
     out .= '", '
     bsr dumper
     out .= ")"
+    unless iter goto end
+    out .= ", "
     goto subrules_loop
   subrules_fail:
     out .= PGE_FAIL

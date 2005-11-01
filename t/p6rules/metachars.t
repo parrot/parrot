@@ -15,13 +15,11 @@ p6rule_is  ('a', '.', 'dot (.)');
 p6rule_is  ("\n", '.', 'dot (.)');
 p6rule_isnt('', '.', 'dot (.)');
 
-
 ## \s and \S -- whitespace
 p6rule_isnt('abcdef', 'a\s+f', 'whitespace (\s)');
 p6rule_is  ("ab  cdef", 'ab\s+cdef', 'whitespace (\s)');
 p6rule_is  ('abcdef', 'a\S+f', 'not whitespace (\S)');
 p6rule_isnt("ab cdef", 'a\S+f', 'not whitespace (\S)');
-
 
 ## ^ and $ -- always matches start and end of string
 p6rule_is  ("abcdef", '^ abc', 'start and end of string (^)');

@@ -1,231 +1,38 @@
-=head1 Title
-
-PGE::Exp - PGE rule expression trees and code generator
-
-=head1 DESCRIPTION
-
-This file implements the expression objects used to build rule
-expressions.  The classes currently include
-
-    PGE::Exp       - base class
-    PGE::Start     - start of rule
-    PGE::End       - (successful) end of rule
-    PGE::Literal   - match a literal string
-    PGE::Scalar    - match a scalar
-    PGE::Dot       - match any character
-    PGE::CCShortcut - character class shortcuts (\d, \D, \w, etc.)
-    PGE::CharClass - character classes (<[abcde]>, <-[abcde]>)
-    PGE::WS        - <?ws> rule
-    PGE::Anchor    - matching of ^, ^^, $, $$, \b, \B anchors
-    PGE::Cut       - :: and :::
-    PGE::Concat    - concatenation of expressions
-    PGE::Alt       - alternations
-    PGE::Group     - groups and captures
-
-Each class has a C<gen> method that is used to generate PIR
-code for that portion of the expression.  The code does not yet
-have a lot of optimizations in it -- we're still focusing on
-functionality and correctness at the moment.
-
-=cut
-
-.include "cclass.pasm"
-.include "errors.pasm"
-.include "interpinfo.pasm"
-
-.const int PGE_INF = 2147483647                    # XXX: arbitrary limit
-.const int PGE_CUT_GROUP = -1                      # cut current alt/group
-.const int PGE_CUT_RULE = -2                       # cut current rule
-
 .namespace [ "PGE::Exp" ]
 
-.sub __onload
-    .local pmc hashclass
-    .local pmc expclass
-    .local pmc hash
-    hashclass = getclass "Hash"
-    expclass = subclass hashclass, "PGE::Exp"
-    $P0 = subclass expclass, "PGE::Exp::Start"
-    $P0 = subclass expclass, "PGE::Exp::End"
-    $P0 = subclass expclass, "PGE::Exp::Literal"
-    $P0 = subclass expclass, "PGE::Exp::Scalar"
-    $P0 = subclass expclass, "PGE::Exp::Dot"
-    $P0 = subclass expclass, "PGE::Exp::CCShortcut"
-    $P0 = subclass expclass, "PGE::Exp::CharClass"
-    $P0 = subclass expclass, "PGE::Exp::WS"
-    $P0 = subclass expclass, "PGE::Exp::Anchor"
-    $P0 = subclass expclass, "PGE::Exp::Cut"
-    $P0 = subclass expclass, "PGE::Exp::Concat"
-    $P0 = subclass expclass, "PGE::Exp::Alt"
-    $P0 = subclass expclass, "PGE::Exp::Group"
-    hash = new Hash
-    store_global "PGE::Exp::CCShortcut", "%slashcode", hash
-    hash['\d'] = <<"EOT"
-    $I0 = is_cclass .CCLASS_NUMERIC, target, pos
-    unless $I0 goto %s_f
-EOT
-    hash['\n'] = <<"EOT"
-    $I0 = is_cclass .CCLASS_NEWLINE, target, pos
-    unless $I0 goto %s_f
-EOT
-    hash['\s'] = <<"EOT"
-    $I0 = is_cclass .CCLASS_WHITESPACE, target, pos
-    unless $I0 goto %s_f
-EOT
-    hash['\w'] = <<"EOT"
-    $I0 = is_cclass .CCLASS_WORD, target, pos
-    unless $I0 goto %s_f
-EOT
-    hash['\D'] = <<"EOT"
-    $I0 = is_cclass .CCLASS_NUMERIC, target, pos
-    if $I0 goto %s_f
-EOT
-    hash['\N'] = <<"EOT"
-    $I0 = is_cclass .CCLASS_NEWLINE, target, pos
-    if $I0 goto %s_f
-EOT
-    hash['\S'] = <<"EOT"
-    $I0 = is_cclass .CCLASS_WHITESPACE, target, pos
-    if $I0 goto %s_f
-EOT
-    hash['\W'] = <<"EOT"
-    $I0 = is_cclass .CCLASS_WORD, target, pos
-    if $I0 goto %s_f
-EOT
+.include "interpinfo.pasm"
+.include "cclass.pasm"
+.const int PGE_INF = 2147483647
+.const int PGE_CUT_GROUP = -1
+.const int PGE_CUT_RULE = -2
+
+.sub "__onload"
+    .local pmc optable
+    .local pmc term
+
+    $P0 = getclass "PGE::Match"
+    $P0 = subclass $P0, "PGE::Exp"
+    $P1 = subclass $P0, "PGE::Exp::Literal"
+    $P1 = subclass $P0, "PGE::Exp::Scalar"
+    $P1 = subclass $P0, "PGE::Exp::CCShortcut"
+    $P1 = subclass $P0, "PGE::Exp::EnumCharList"
+    $P1 = subclass $P0, "PGE::Exp::Anchor"
+    $P1 = subclass $P0, "PGE::Exp::Concat"
+    $P1 = subclass $P0, "PGE::Exp::Conj"
+    $P1 = subclass $P0, "PGE::Exp::Alt"
+    $P1 = subclass $P0, "PGE::Exp::Group"
+    $P1 = subclass $P0, "PGE::Exp::Subrule"
+    $P1 = subclass $P0, "PGE::Exp::Cut"
+    $P1 = subclass $P0, "PGE::Exp::Quant"
+    $P1 = subclass $P0, "PGE::Exp::Modifier"
     $P0 = new Integer
     store_global "PGE::Exp", "$_serno", $P0
-    .return ()
-.end
-
-=head2 Functions
-
-=item C<new(STR class [, PMC exp1 [, PMC exp2]])>
-
-Creates and returns  a new C<Exp> object of C<class>, initializing
-min/max/greedy/etc.  values and C<exp1> and C<exp2> objects if provided.
-
-=cut
-
-.sub "new"
-    .param string expclass     :optional           # class from find_type
-    .param int has_class       :opt_flag
-    .param pmc exp1            :optional           # left expression
-    .param int has_exp1        :opt_flag
-    .param pmc exp2            :optional           # right expression
-    .param int has_exp2        :opt_flag
-    .local pmc me                                  # new expression object
-
-    if has_class goto buildme
-    expclass = "PGE::Exp"
-  buildme:
-    $I0 = find_type expclass
-    me = new $I0
-    me["min"] = 1
-    me["max"] = 1
-    me["isgreedy"] = 1
-    me["iscut"] = 0
-
-    unless has_exp1 goto end
-    me["exp1"] = exp1
-    unless has_exp2 goto end
-    me["exp2"] = exp2
-  end:
-    .return (me)
-.end
-
-=item C<(min, max, isgreedy, iscut) = _getattributes()>
-
-A method for quickly retrieving the min, max, and greediness
-attributes of an expression object.
-
-=cut
-
-.sub "_getattributes" method
-    .local int min, max, isgreedy, iscut
-    min = self["min"]
-    max = self["max"]
-    isgreedy = self["isgreedy"]
-    iscut = self["iscut"]
-    .return (min, max, isgreedy, iscut)
-.end
-
-=item C<quant()>
-
-Returns a string representing the quantifier values of the
-current expression object.
-
-=cut
-
-.sub "quant" method
-    .local string min, max
-    $S0 = "{"
-    min = self["min"]
-    concat $S0, min
-    concat $S0, ".."
-    max = self["max"]
-    concat $S0, max
-    concat $S0, "}"
-    $I0 = self["isgreedy"]
-    if $I0 goto cut
-    concat $S0, "?"
-  cut:
-    $I0 = self["iscut"]
-    unless $I0 goto end
-    concat $S0, ":"
-  end:
-    .return ($S0)
-.end
-
-=item C<analyze(PMC next, PMC pad)>
-
-The analyze method is used to walk an expression tree and perform
-a variety of optimizations and pre-processing in preparation for
-generating the rule code.  The C<next> parameter identifies the
-expression that will come after this one.  The C<pad> parameter
-is a work pad hash that is carried from one object to the next.
-Typical entries in the pad include:
-    isarray: does this (group) object cause its subelements to repeat?
-    reps: a hash of lexically repeated capture names
-
-=cut
-
-.sub "analyze" method
-    .param pmc next
-    .param pmc pad
-    self["firstchars"] = ""
-    .return ()
 .end
 
 
-=item C<firstchars([PMC exp1 [, PMC exp2]])>
+#### Code Generation ####
 
-The firstchars method sets the "firstchars" optimization hint
-based on the concatenation of the firstchars of any expressions
-provided.  If either of the expressions has an empty firstchars
-hint, then we have have no firstchars either.
-
-=cut
-
-.sub "firstchars" method
-    .param pmc exp1            :optional
-    .param int has_exp1        :opt_flag
-    .param pmc exp2            :optional
-    .param int has_exp2        :opt_flag
-
-    unless has_exp1 goto exp_1
-    $S0 = exp1["firstchars"]
-    unless $S0 > "" goto exp_1
-    unless has_exp2 goto exp_1
-    $S1 = exp2["firstchars"]
-    unless $S1 > "" goto exp_1
-    concat $S0, $S1
-    goto end
-  exp_1:
-    $S0 = ""
-  end:
-    self["firstchars"] = $S0
-    .return ()
-.end
+.namespace [ "PGE::Exp" ]
 
 =item C<(STR, INT) = serno([STR prefix [, INT start]])>
 
@@ -237,7 +44,7 @@ won't be a problem, but is the use of the start parameter thread-safe?
 
 =cut
 
-.sub "serno" method
+.sub "serno" :method
     .param string prefix       :optional
     .param int has_prefix      :opt_flag
     .param int start           :optional
@@ -257,76 +64,98 @@ won't be a problem, but is the use of the start parameter thread-safe?
     .return (prefix, $I0)
 .end
 
-
-=item C<emit(PMC code, STR fmt [, STR str1 [, STR str2]])>
-
-Adds to the current code string, replacing %s by str1/str2.
-
-=cut
-
 .sub "emit"
-    .param pmc code                                # append to code
+    .param pmc code                                # string to append to
     .param string fmt                              # string to output
-    .param string str1         :optional           # first %s substitution
-    .param string str2         :optional           # second %s substitution
+    .param pmc args            :slurpy             # slurpy args
 
-    concat fmt, "\n"
-    $I0 = index fmt, "%s"
-    if $I0 < 0 goto emit_1
-    substr fmt, $I0, 2, str1
-    $I0 = index fmt, "%s"
-    if $I0 < 0 goto emit_1
-    substr fmt, $I0, 2, str2
+    $I0 = length fmt
+    if $I0 < 2 goto emit_1
+    $S0 = substr fmt, -2, 2
+    if $S0 != "##" goto emit_1
+    $S0 = code
+    $S0 = clone $S0
+    $S0 .= fmt
+    $P0 = split "\n", $S0
+    $I0 = $P0
+    $S1 = $I0
+    fmt .= " "
+    fmt .= $S1
   emit_1:
-    concat code, fmt
-    .return ()
+    fmt .= "\n"
+  emit_2:
+    $I0 = index fmt, "%s"
+    if $I0 < 0 goto end
+    $S0 = shift args
+    substr fmt, $I0, 2, $S0
+    goto emit_2
+  end:
+    code .= fmt
 .end
 
-=item C<emitsub(PMC code, STR next, [STR save [, ...]])
-
-Generate a subroutine call to C<next>, preserving and restoring
-any save parameters in the process.  The special parameter "NOCUT"
-says not to intercept cutting operations.
-
-=cut
-
-.sub "emitsub" method
+.sub "emitsub" :method
     .param pmc code                                # append to code
-    .param string next                             # sub label
-    .param pmc save         :slurpy                # registers to save
-    .local int nocut                               # flag for "NOCUT"
-    .local pmc emit                                # emit subroutine
-    .local int savec                               # number of save items
+    .param string next                             # where to bsr
+    .param pmc save            :slurpy             # things to save
+    .local pmc emit
+    .local int nocut 
+    .local int savec
 
     emit = find_global "PGE::Exp", "emit"
     nocut = 0
+    $S0 = save[-1]
+    if $S0 != "NOCUT" goto saveregs
+    nocut = 1
+    $S0 = pop save
+  saveregs:
     savec = elements save
     $I0 = 0
-  saveregs_0:
-    if $I0 >= savec goto emitsub_0
+  saveregs_1:
+    if $I0 >= savec goto emitsub_1
     $S0 = save[$I0]
-    inc $I0
-    if $S0 == "NOCUT" goto set_nocut
     emit(code, "    save %s", $S0)
-    goto saveregs_0
-  set_nocut:
-    nocut = 1
-    goto saveregs_0
-  emitsub_0:
+    inc $I0
+    goto saveregs_1
+  emitsub_1:
     emit(code, "    bsr %s", next)
     $I0 = savec - 1
-  restoreregs_0:
-    if $I0 < 0 goto generate_cut
+  restoreregs_1:
+    if $I0 < 0 goto gencut
     $S0 = save[$I0]
-    dec $I0
-    if $S0 == "NOCUT" goto restoreregs_0
     emit(code, "    restore %s", $S0)
-    goto restoreregs_0
-  generate_cut:
+    dec $I0
+    goto restoreregs_1
+  gencut:
     if nocut goto end
     emit(code, "    if cutting != 0 goto fail")
   end:
-    .return ()
+.end
+
+.sub "quant" :method
+    .local int min, max, islazy, iscut
+    .local string qstr
+    min = 1
+    max = 1
+    islazy = 0
+    iscut = 0
+    $I0 = exists self["min"]
+    if $I0 == 0 goto quant_1
+    min = self["min"]
+    max = self["max"]
+    islazy = self["islazy"]
+    iscut = self["iscut"]
+  quant_1:
+    qstr = "{"
+    $S0 = min
+    concat qstr, $S0
+    concat qstr, ".."
+    $S0 = max
+    concat qstr, $S0
+    concat qstr, "}"
+    if islazy == 0 goto end
+    concat qstr, "?"
+  end:
+    .return (min, max, islazy, iscut, qstr)
 .end
 
 =item C<genliteral(PMC code, STR label, STR next)>
@@ -340,27 +169,30 @@ register.
 
 =cut
 
-.sub "genliteral" method
+.sub "genliteral" :method
     .param pmc code
     .param string label
     .param string next
     .local pmc emit
-    .local int min, max, isgreedy, iscut
-    (min, max, isgreedy, iscut) = self."_getattributes"()
+    .local int min, max, islazy, iscut
+    (min, max, islazy, iscut, $S0) = self."quant"()
     emit = find_global "PGE::Exp", "emit"
     emit(code, "    litlen = length lit")
-    unless min == 1 goto greedy
-    unless max == 1 goto greedy
+    unless min == 1 goto quant
+    unless max == 1 goto quant
     emit(code, "    $S0 = substr target, pos, litlen")
     emit(code, "    if $S0 != lit goto fail")
     emit(code, "    pos += litlen")
     emit(code, "    goto %s", next)
-    .return ()
-  greedy:
+    .return()
+  quant:
     emit(code, "    rep = 0")
-    unless isgreedy goto lazy
+    if islazy goto lazy
+  greedy:
     emit(code, "  %s_lit1:", label)
+    if max == PGE_INF goto greedy_1
     emit(code, "    if rep >= %s goto %s_lit2", max, label)
+  greedy_1:
     emit(code, "    $S0 = substr target, pos, litlen")
     emit(code, "    if $S0 != lit goto %s_lit2", label)
     emit(code, "    inc rep")
@@ -368,26 +200,30 @@ register.
     emit(code, "    goto %s_lit1", label)
     emit(code, "  %s_lit2:", label)
     emit(code, "    if rep < %s goto fail", min)
-    unless iscut goto greedy_1
-    emit(code, "    goto %s", next)
-  greedy_1:
+    if iscut goto greedy_cut
     emit(code, "    if rep == %s goto %s", min, next)
     self.emitsub(code, next, "pos", "rep", "litlen")
     emit(code, "    dec rep")
     emit(code, "    pos -= litlen")
     emit(code, "    goto %s_lit2", label)
     .return ()
-
+  greedy_cut:
+    emit(code, "    goto %s", next)
+    .return ()
   lazy:
     emit(code, "  %s_lit1:", label)
+    if min < 1 goto lazy_1
     emit(code, "    if rep < %s goto %s_lit2", min, label)
-    unless iscut goto lazy_1
-    emit(code, "    goto %s", next)
-    goto lazy_2
   lazy_1:
-    emit(code, "    if rep >= %s goto %s", max, next)
-    self.emitsub(code, next, "pos", "rep", "lit", "litlen")
+    if iscut == 0 goto lazy_2
+    emit(code, "    goto %s", next)
+    goto lazy_4
   lazy_2:
+    if max == PGE_INF goto lazy_3
+    emit(code, "    if rep >= %s goto %s", max, next)
+  lazy_3:
+    self.emitsub(code, next, "pos", "rep", "lit", "litlen")
+  lazy_4:
     emit(code, "  %s_lit2:", label)
     emit(code, "    $S0 = substr target, pos, litlen")
     emit(code, "    if $S0 != lit goto fail")
@@ -397,149 +233,158 @@ register.
     .return ()
 .end
 
-.namespace [ "PGE::Exp::Start" ]
-
-.sub analyze method
-    .param pmc next
-    .param pmc pad
-    pad = new Hash                                 # create a new workpad
-    pad["cutnum"] = PGE_CUT_GROUP                  # cut the current group
-    $P0 = self["exp1"]
-    $P0.analyze(self, pad)                         # analyze our subexp
-    self.firstchars($P0)                           # set firstchars
-    .return ()
+.sub "gencapture" :method
+    .param pmc code
+    .param string label
+    .local string cname, captsave, captback
+    .local int iscapture, isarray
+    .local pmc emit
+    emit = find_global "PGE::Exp", "emit"
+    iscapture = self["iscapture"]
+    isarray = self["isarray"]
+    cname = self["cname"]
+    captsave = ""
+    captback = ""
+    if iscapture == 0 goto end
+    captsave = "    captscope[%s] = $P0"
+    captback = "    delete captscope[%s]"
+    if isarray == 0 goto end
+    captsave = "    $P1 = captscope[%s]\n    push $P1, $P0"
+    captback = "    $P1 = captscope[%s]\n    $P1 = pop $P1"
+    $I0 = self["isgen"]
+    if $I0 goto end
+    emit(code, "    $I0 = defined captscope[%s]", cname)
+    emit(code, "    if $I0 goto %s_c1", label)
+    emit(code, "    $P0 = new PerlArray")
+    emit(code, "    captscope[%s] = $P0", cname)
+    emit(code, "    save captscope")
+    emit(code, "    bsr %s_c1", label)
+    emit(code, "    restore captscope")
+    emit(code, "    delete captscope[%s]", cname)
+    emit(code, "    goto fail")
+    emit(code, "  %s_c1:", label)
+    self["isgen"] = 1
+  end:
+    .return (captsave, captback)
+.end
+ 
+.sub "reduce" :method
+    .local pmc args
+    args = getattribute self, "PGE::Match\x0@:capt"
+    if_null args, end
+    $I0 = elements args
+  loop:
+    dec $I0
+    if $I0 < 0 goto end
+    $P0 = args[$I0]
+    $P0 = $P0.reduce()
+    args[$I0] = $P0
+    goto loop
+  end:
+    .return (self)
 .end
 
-.sub "gen" method
+.sub "gen" :method
     .param pmc code
     .param string label
     .param string next
     .local pmc emit
-    .local pmc exp1
-    .local string firstchars
-    .local string exp1label
+    emit = find_global "PGE::Exp", "emit"
+    $S0 = classname self
+    emit(code, "\n  %s:  # %s", label, $S0)
+    .return ()
+.end
 
-    exp1label = "R"
+.sub "as_pir" :method
+    .param string label
+    .local pmc code
+    .local pmc emit
+    .local pmc exp0
+    .local string exp0label
+
+    code = new String
+    exp0 = self["expr"]
+    exp0 = exp0.reduce()
+    self["expr"] = exp0
+
+    exp0label = "R"
     emit = find_global "PGE::Exp", "emit"
     emit(code, ".sub %s", label)
     emit(code, "    .param pmc mob")
-    emit(code, "    .local pmc corou")
-    emit(code, "    $P0 = find_global \"PGE::Match\", \"newfrom\"")
+    emit(code, "    .const .Sub corou = \"%s_corou\"", label)
+    emit(code, "    $P0 = corou")
+    emit(code, "    $P0 = clone $P0")
     emit(code, "    mob = $P0(mob)")
-    emit(code, "    newsub corou, .Coroutine, _%s_coroutine", label)
-    emit(code, "    setattribute mob, \"PGE::Match\\x0&:corou\", corou")
-    emit(code, "    corou(mob)")
     emit(code, "    .return (mob)")
     emit(code, ".end")
-    emit(code, "")
-    emit(code, ".sub _%s_coroutine", label)
+    emit(code, "\n.sub %s_corou :anon", label)
     emit(code, "    .param pmc mob")
-    emit(code, "    .local int pos")
+    emit(code, "    .local pmc newfrom")
     emit(code, "    .local string target")
-    emit(code, "    .local int lastpos")
+    emit(code, "    .local pmc mfrom, mpos")
+    emit(code, "    .local int pos, lastpos, rep, maxrep")
     emit(code, "    .local int cutting")
-    emit(code, "    .local int rep, maxrep")
-    emit(code, "    .local int litlen")
     emit(code, "    .local string lit")
+    emit(code, "    .local int litlen")
     emit(code, "    .local pmc gpad, rcache")
     emit(code, "    .local pmc captscope")
-    emit(code, "    .local pmc from")
-    emit(code, ".include \"cclass.pasm\"")
+    emit(code, "    newfrom = find_global \"PGE::Match\", \"newfrom\"")
+    emit(code, "    (mob, target, mfrom, mpos) = newfrom(mob, -1)")
+    emit(code, "    $P0 = interpinfo %s", .INTERPINFO_CURRENT_SUB)
+    emit(code, "    setattribute mob, \"PGE::Match\\x0&:corou\", $P0")
+    emit(code, "    lastpos = length target")
     emit(code, "    gpad = new PerlArray")
     emit(code, "    rcache = new PerlHash")
     emit(code, "    captscope = mob")
-    emit(code, "    from = getattribute mob, \"PGE::Match\\x0$:from\"")
-    emit(code, "    $P0 = getattribute mob, \"PGE::Match\\x0$:target\"")
-    emit(code, "    target = $P0")
-    emit(code, "    pos = from")
-    emit(code, "    lastpos = length target")
+    emit(code, "    pos = mfrom")
     emit(code, "    if pos >= 0 goto try_at_pos")
     emit(code, "    pos = 0")
     emit(code, "  try_match:")
     emit(code, "    cutting = 0")
     emit(code, "    if pos > lastpos goto fail_forever")
-    $I0 = exists self["firstchars"]
-    unless $I0 goto gen_1
-    firstchars = self["firstchars"]
-    unless firstchars > "" goto gen_1
-    $P0 = find_global "Data::Escape", "String"
-    firstchars = $P0(firstchars, '"')
-    emit(code, "    $S0 = substr target, pos, 1")
-    emit(code, "    $I0 = index \"%s\", $S0", firstchars)
-    emit(code, "    if $I0 < 0 goto try_again")
-  gen_1:
-    emit(code, "    from = pos")
-    self.emitsub(code, exp1label, "pos", "from", "lastpos", "NOCUT")
+    emit(code, "    mfrom = pos")
+    self.emitsub(code, exp0label, "pos", "NOCUT")
     emit(code, "    if cutting == %s goto fail_forever", PGE_CUT_RULE)
-    emit(code, "  try_again:")
     emit(code, "    inc pos")
     emit(code, "    goto try_match")
     emit(code, "  try_at_pos:")
     emit(code, "    cutting = 0")
-    emit(code, "    from = pos")
-    self.emitsub(code, exp1label, "NOCUT")
+    self.emitsub(code, exp0label, "NOCUT")
     emit(code, "  fail_forever:")
-    emit(code, "    $P0 = getattribute mob, \"PGE::Match\\x0$:pos\"")
-    emit(code, "    $P0 = -2")
-    emit(code, "    .yield()")
+    emit(code, "    mpos = -2")
+    emit(code, "    .yield (mob)")
     emit(code, "    goto fail_forever")
-
-    exp1 = self["exp1"]
-    exp1.gen(code, exp1label, next)
-
-    emit(code, ".end")
-    .return ()
-.end
-
-.namespace [ "PGE::Exp::End" ]
-
-.sub "gen" method
-    .param pmc code
-    .param string label
-    .param string next
-    .local pmc emit
-    emit = find_global "PGE::Exp", "emit"
-    emit(code, "\n  %s:", label)
-    emit(code, "    $P0 = getattribute mob, \"PGE::Match\\x0$:pos\"")
-    emit(code, "    $P0 = pos")
-    emit(code, "    .yield()")
-    emit(code, "    $P0 = -1")
+    emit(code, "  succeed:")
+    emit(code, "    mpos = pos")
+    emit(code, "    .yield (mob)")
+    emit(code, "    mpos = -1")
     emit(code, "  fail:")
     emit(code, "    ret")
-    .return ()
+
+    exp0.gen(code, exp0label, "succeed")
+
+    emit(code, "\n.end")
+    .return (code)
 .end
+
 
 .namespace [ "PGE::Exp::Literal" ]
 
-.sub "analyze" method
-    .param pmc next
-    .param pmc pad
-    $S0 = self["literal"]                          # set up firstchars
-    $S0 = substr $S0, 0, 1
-    self["firstchars"] = $S0
-    $I0 = self["min"]                              # if we allow zero reps
-    unless $I0 < 1 goto end                        # then add firstchars
-    self.firstchars(self, next)                    # of the following exp
-  end:
-    .return ()
-.end
-
-.sub "gen" method
+.sub "gen" :method
     .param pmc code
     .param string label
     .param string next
     .local pmc emit
+    ($I0, $I1, $I2, $I3, $S0) = self."quant"()
     emit = find_global "PGE::Exp", "emit"
-    $S0 = self."quant"()
-    $S1 = self["literal"]
+    $S1 = self["value"]
     $P0 = find_global "Data::Escape", "String"
     $S1 = $P0($S1, '"')
-    emit(code, "\n  %s:  # literal %s", label, $S0)
+    emit(code, "\n  %s: # literal %s    ##", label, $S0)
     emit(code, "    lit = \"%s\"", $S1)
     self.genliteral(code, label, next)
     .return ()
-.end
-
+.end    
 
 .namespace [ "PGE::Exp::Scalar" ]
 
@@ -548,73 +393,78 @@ register.
     .param string label
     .param string next
     .local pmc emit
-    .local pmc cname
-    .local int subp
+    .local string cname
+    ($I0, $I1, $I2, $I3, $S0) = self."quant"()
     emit = find_global "PGE::Exp", "emit"
-    $S0 = self."quant"()
     cname = self["cname"]
-    $I0 = isa cname, "Integer"
-    unless $I0 goto named
-    subp = cname
-    emit(code, "\n  %s:  # backref $%s %s", label, subp, $S0)
-    emit(code, "    lit = ''")
-    emit(code, "    $P0 = getattribute mob, \"PGE::Match\\x0@:capt\"")
-    emit(code, "    if_null $P0, %s_1", label)
-    emit(code, "    $P1 = $P0[%s]", subp)
-    emit(code, "    lit = $P1[-1]")
-    emit(code, "  %s_1:", label)
-    .return self.genliteral(code, label, next)
-  named:
-    $P0 = find_global "Data::Escape", "String"
-    $S1 = cname
-    $S1 = $P0($S1)
-    emit(code, "\n  %s:  # backref $<%s> %s", label, $S1, $S0)
-    emit(code, "    lit = ''")
-    emit(code, "    $P0 = getattribute mob, \"PGE::Match\\x0%:capt\"")
-    emit(code, "    if_null $P0, %s_1", label)
-    emit(code, "    $P1 = $P0[\"%s\"]", $S1)
-    emit(code, "    lit = $P1[-1]")
-    emit(code, "  %s_1:", label)
-    .return self.genliteral(code, label, next)
+    emit(code, "\n  %s: # scalar %s %s    ##", label, cname, $S0)
+    emit(code, "    $P0 = mob[%s]", cname)
+    emit(code, "    $I0 = isa $P0, \"Array\"")
+    emit(code, "    if $I0 == 0 goto %s_0", label)
+    emit(code, "    $P0 = $P0[-1]")
+    emit(code, "  %s_0:", label)
+    emit(code, "    lit = $P0")
+    self.genliteral(code, label, next)
+    .return ()
 .end
+    
 
+.namespace [ "PGE::Exp::CCShortcut" ]
 
-.namespace [ "PGE::Exp::Dot" ]
-
-.sub "gen" method
+.sub "gen" :method
     .param pmc code
     .param string label
     .param string next
+    .local string token
+    .local int min, max, islazy, iscut
     .local pmc emit
-    .local int min, max, isgreedy, iscut
-    (min, max, isgreedy, iscut) = self."_getattributes"()
+    .local string find
+    token = self["value"]
+    (min, max, islazy, iscut, $S0) = self."quant"()
     emit = find_global "PGE::Exp", "emit"
-    $S0 = self."quant"()
-    emit(code, "\n  %s: # dot %s", label, $S0)
-    emit(code, "    maxrep = length target")
-    emit(code, "    maxrep -= pos")
-    unless min > 0 goto dot_1
-    emit(code, "    if maxrep < %s goto fail", min)
-  dot_1:
-    unless min == max goto dot_2
+    emit(code, "\n %s:  # %s %s", label, token, $S0)
+    if token == "." goto dot
+    find = "    $I0 = find_not_cclass %s, target, pos, lastpos"
+    if token == "\\s" goto space
+    if token == "\\d" goto digit
+    if token == "\\w" goto word
+    if token == "\\n" goto newline
+    find = "    $I0 = find_cclass %s, target, pos, lastpos"
+    if token == "\\S" goto space
+    if token == "\\D" goto digit
+    if token == "\\W" goto word
+    if token == "\\N" goto newline
+  dot:
+    emit(code, "    $I0 = lastpos")
+    goto char
+  space:
+    emit(code, find, .CCLASS_WHITESPACE)
+    goto char
+  digit:
+    emit(code, find, .CCLASS_NUMERIC)
+    goto char
+  word:
+    emit(code, find, .CCLASS_WORD)
+    goto char
+  newline:
+    emit(code, find, .CCLASS_NEWLINE)
+    goto char
+  char:
+    emit(code, "    rep = $I0 - pos")
+    emit(code, "    if rep < %s goto fail", min)
+    if min != max goto char_2
     emit(code, "    pos += %s", min)
     emit(code, "    goto %s", next)
-    .return ()
-  dot_2:
-    if max == PGE_INF goto greedy
-    emit(code, "    if maxrep <= %s goto %s_1", max, label)
-    emit(code, "    maxrep = %s", max)
+    .return()
+  char_2:
+    emit(code, "    if rep <= %s goto %s_1", max, label)
+    emit(code, "    rep = %s", max)
     emit(code, "  %s_1:", label)
+    if islazy goto lazy
   greedy:
-    unless isgreedy goto lazy
-    emit(code, "    rep = maxrep")
     emit(code, "    pos += rep")
+    if iscut goto cut
     emit(code, "  %s_2:", label)
-    emit(code, "    if rep < %s goto fail", min)
-    unless iscut goto greedy_1
-    emit(code, "    goto %s", next)
-    .return ()
-  greedy_1:
     emit(code, "    if rep == %s goto %s", min, next)
     self.emitsub(code, next, "pos", "rep")
     emit(code, "    dec rep")
@@ -622,119 +472,51 @@ register.
     emit(code, "    goto %s_2", label)
     .return ()
   lazy:
-    emit(code, "    rep = %s", min)
-    emit(code, "    pos += rep", min)
+    emit(code, "    pos += %s", min)
+    if iscut goto cut
+    emit(code, "    rep -= %s", min)
     emit(code, "  %s_3:", label)
-    emit(code, "    if rep > maxrep goto fail")
-    unless iscut goto lazy_1
-    emit(code, "    goto %s", next)
-    .return ()
-  lazy_1:
-    emit(code, "    if rep == maxrep goto %s", next)
-    self.emitsub(code, next, "pos", "rep", "maxrep")
-    emit(code, "    inc rep")
+    emit(code, "    if rep == 0 goto %s", next)
+    self.emitsub(code, next, "pos", "rep")
+    emit(code, "    dec rep")
     emit(code, "    inc pos")
     emit(code, "    goto %s_3", label)
     .return ()
-.end
-
-.namespace [ "PGE::Exp::CCShortcut" ]
-
-.sub gen method
-    .param pmc code
-    .param string label
-    .param string next
-    .local string token
-    .local int min, max, isgreedy, iscut
-    .local pmc emit
-    .local pmc hash
-    .local string test
-    (min, max, isgreedy, iscut) = self."_getattributes"()
-    hash = find_global "PGE::Exp::CCShortcut", "%slashcode"
-    token = self["token"]
-    test = hash[token]
-    emit = find_global "PGE::Exp", "emit"
-    emit(code, "\n  %s:", label)
-    emit(code, "    rep = 0")
-    unless isgreedy goto lazy
-    emit(code, "  %s_1:", label)
-    emit(code, "    if pos >= lastpos goto %s_f", label)
-    emit(code, "    if rep >= %s goto %s_f", max, label)
-    emit(code, test, label)
-    emit(code, "    inc pos")
-    emit(code, "    inc rep")
-    emit(code, "    goto %s_1", label)
-    emit(code, "  %s_f:", label)
-    emit(code, "    if rep < %s goto fail", min)
-    unless iscut goto greedy_1
+  cut:
     emit(code, "    goto %s", next)
-    .return ()
-  greedy_1:
-    emit(code, "    if rep == %s goto %s", min, next)
-    self.emitsub(code, next, "pos", "rep")
-    emit(code, "    dec pos")
-    emit(code, "    dec rep")
-    emit(code, "    goto %s_f", label)
-    .return ()
-  lazy:
-    emit(code, "  %s_0:", label)
-    emit(code, "    if rep < %s goto %s_1", min, label)
-    unless iscut goto lazy_1
-    emit(code, "    goto %s", next)
-    goto lazy_2
-  lazy_1:
-    emit(code, "    if rep >= %s goto %s", max, next)
-    emit(code, "    if pos >= lastpos goto fail")
-    self.emitsub(code, next, "pos", "rep")
-  lazy_2:
-    emit(code, "  %s_1:", label)
-    emit(code, test, label)
-    emit(code, "    inc rep")
-    emit(code, "    inc pos")
-    emit(code, "    goto %s_0", label)
-    emit(code, "  %s_f:", label)
-    emit(code, "    goto fail")
     .return ()
 .end
 
-.namespace [ "PGE::Exp::CharClass" ]
+.namespace [ "PGE::Exp::EnumCharList" ]
 
-# Note:  The implementation interface for CharClass may change
-# in the near future, so don't rely on this too heavily just yet.
-# (pmichaud, 2005-05-11)
-
-.sub gen method
+.sub "gen" :method
     .param pmc code
     .param string label
     .param string next
-    .local string token
-    .local int min, max, isgreedy, iscut
+    .local string charlist, charmatch
+    .local int min, max, islazy, iscut
     .local pmc emit
-    .local string charclass, charmatch
-    (min, max, isgreedy, iscut) = self."_getattributes"()
+    (min, max, islazy, iscut, $S0) = self."quant"()
     emit = find_global "PGE::Exp", "emit"
     $P0 = find_global "Data::Escape", "String"
-    charclass = self["charclass"]
-    charclass = $P0(charclass, '"')
+    charlist = self["charlist"]
+    charlist = $P0(charlist, '"')
     charmatch = self["charmatch"]
-    emit(code, "\n  %s:", label)
+    emit(code, "\n  %s:  # enumchars %s %s    ##", label, charlist, $S0)
     emit(code, "    rep = 0")
-    unless isgreedy goto lazy
+    if islazy goto lazy
     emit(code, "  %s_1:", label)
     emit(code, "    if pos >= lastpos goto %s_2", label)
     emit(code, "    if rep >= %s goto %s_2", max, label)
     emit(code, "    $S0 = substr target, pos, 1")
-    emit(code, "    $I0 = index \"%s\", $S0", charclass)
+    emit(code, "    $I0 = index \"%s\", $S0", charlist)
     emit(code, "    %s $I0 == -1 goto %s_2", charmatch, label)
-    emit(code, "    inc pos")
+    emit(code, "    inc pos") 
     emit(code, "    inc rep")
     emit(code, "    goto %s_1", label)
     emit(code, "  %s_2:", label)
     emit(code, "    if rep < %s goto fail", min)
-    unless iscut goto greedy_1
-    emit(code, "    goto %s", next)
-    .return ()
-  greedy_1:
+    if iscut goto cut
     emit(code, "    if rep == %s goto %s", min, next)
     self.emitsub(code, next, "pos", "rep")
     emit(code, "    dec pos")
@@ -754,104 +536,110 @@ register.
   lazy_2:
     emit(code, "  %s_1:", label)
     emit(code, "    $S0 = substr target, pos, 1")
-    emit(code, "    $I0 = index \"%s\", $S0", charclass)
+    emit(code, "    $I0 = index \"%s\", $S0", charlist)
     emit(code, "    %s $I0 == -1 goto fail", charmatch)
     emit(code, "    inc rep")
     emit(code, "    inc pos")
     emit(code, "    goto %s_0", label)
     .return ()
-.end
-
-.namespace [ "PGE::Exp::WS" ]
-
-.sub "analyze" method
-    .param pmc next
-    .param pmc pad
-    .local string nextfc
-    self["firstchars"] = ""
-    nextfc = next["firstchars"]
-    unless nextfc > "" goto end
-    $I1 = length nextfc
-    $I0 = find_cclass .CCLASS_WHITESPACE, nextfc, 0, $I1
-    unless $I0 == $I1 goto end
-    self["iscut"] = 1
-  end:
+  cut:
+    emit(code, "    goto %s", next)
     .return ()
 .end
+ 
 
-.sub "gen" method
+.namespace [ "PGE::Exp::Concat" ]
+
+.sub "reduce" :method
+    .local pmc exp0, exp1, exp10
+
+    exp0 = self[0]
+    exp0 = exp0.reduce()
+    self[0] = exp0
+    exp1 = self[1]
+    exp1 = exp1.reduce()
+    self[1] = exp1
+
+  concat_lit:
+    $I0 = exp0["isquant"]
+    if $I0 goto concat_lit_end
+    $I0 = isa exp0, "PGE::Exp::Literal"
+    if $I0 == 0 goto concat_lit_end
+    $I0 = exp1["isquant"]
+    if $I0 goto concat_lit_end
+    $I0 = isa exp1, "PGE::Exp::Literal"
+    if $I0 == 0 goto concat_lit_concat
+    $S0 = exp0["value"]
+    $S1 = exp1["value"]
+    concat $S0, $S1
+    exp0["value"] = $S0
+    .return (exp0)
+  concat_lit_concat:
+    $I0 = isa exp1, "PGE::Exp::Concat"
+    if $I0 == 0 goto concat_lit_end
+    exp10 = exp1[0]
+    $I0 = exp10["isquant"]
+    if $I0 goto concat_lit_end
+    $I0 = isa exp10, "PGE::Exp::Literal"
+    if $I0 == 0 goto concat_lit_end
+    $S0 = exp0["value"]
+    $S1 = exp10["value"]
+    concat $S0, $S1
+    exp0["value"] = $S0
+    $P0 = exp1[1]
+    self[1] = $P0
+  concat_lit_end:
+    .return (self)
+.end
+
+.sub "gen" :method
     .param pmc code
     .param string label
     .param string next
     .local pmc emit
+    .local pmc exp0, exp1
     emit = find_global "PGE::Exp", "emit"
-    emit(code, "\n  %s: # <?ws>", label)
-    emit(code, "    rep = 0")
-    emit(code, "    if pos >= lastpos goto %s", next)
-    emit(code, "    if pos < 1 goto %s_1", label)
-    emit(code, "    $I0 = is_cclass %s, target, pos", .CCLASS_WORD)
-    emit(code, "    unless $I0 goto %s_1", label)
-    emit(code, "    $I0 = pos - 1")
-    emit(code, "    $I1 = is_cclass %s, target, $I0", .CCLASS_WORD)
-    emit(code, "    if $I1 goto fail")
-    emit(code, "  %s_1:", label)
-    emit(code, "    rep = pos")
-    emit(code, "    pos = find_not_cclass %s, target, pos, lastpos", .CCLASS_WHITESPACE)
-    $I0 = self["iscut"]
-    unless $I0 goto backtrack
-    emit(code, "    goto %s", next)
-    goto end
-  backtrack:
-    emit(code, "    rep = pos - rep")
-    emit(code, "  %s_2:", label)
-    emit(code, "    if rep == 0 goto %s", next)
-    self.emitsub(code, next, "pos", "rep")
-    emit(code, "    dec rep")
-    emit(code, "    dec pos")
-    emit(code, "    goto %s_2", label)
-  end:
+    emit(code, "\n  %s:    ##", label)
+    ($S0, $I0) = self.serno()
+    ($S1, $I1) = self.serno()
+    exp0 = self[0]
+    exp0.gen(code, $S0, $S1)
+    exp1 = self[1]
+    exp1.gen(code, $S1, next)
     .return ()
 .end
-
 
 .namespace [ "PGE::Exp::Anchor" ]
 
-.sub "analyze" method
-    .param pmc next
-    .param pmc pad
-    self.firstchars(next)
-    .return ()
-.end
-
-.sub "gen" method
+.sub "gen" :method
     .param pmc code
-    .param string label
-    .param string next
+    .param pmc label
+    .param pmc next
     .local pmc emit
-    .local string token
+    .local pmc token
+    token = self["value"]
     emit = find_global "PGE::Exp", "emit"
-    emit(code, "\n  %s:", label)
-    token = self["token"]
+    emit(code, "\n  %s: # anchor %s    ##", label, token)
+    if token == "$$" goto eol
+    if token == "$" goto eos
     if token == "\\b" goto word
     if token == "\\B" goto word
-    if token == '$$' goto eol
-    if token == '$' goto eos
   bos:
     emit(code, "    if pos == 0 goto %s", next)
-    unless token == '^^' goto end
+    if token != "^^" goto end
   bol:
     emit(code, "    if pos == lastpos goto fail")
     emit(code, "    $I0 = pos - 1")
-    emit(code, "    $I1 = is_cclass .CCLASS_NEWLINE, target, $I0")
+    emit(code, "    $I1 = is_cclass %s, target, $I0", .CCLASS_NEWLINE)
     emit(code, "    if $I1 goto %s", next)
     goto end
   eol:
-    emit(code, "    $I1 = is_cclass .CCLASS_NEWLINE, target, pos")
+    emit(code, "    $I1 = is_cclass %s, target, pos", .CCLASS_NEWLINE)
     emit(code, "    if $I1 goto %s", next)
     emit(code, "    if pos != lastpos goto fail")
     emit(code, "    if pos < 1 goto %s", next)
     emit(code, "    $I0 = pos - 1")
-    emit(code, "    $I1 = is_cclass .CCLASS_NEWLINE, target, $I0")
+    emit(code, "    $I1 = is_cclass %s, target, $I0", .CCLASS_NEWLINE)
     emit(code, "    if $I1 == 0 goto %s", next)
     goto end
   eos:
@@ -859,15 +647,15 @@ register.
     goto end
   word:
     emit(code, "    $I0 = 0")
-    emit(code, "    unless pos > 0 goto %s_1", label)
+    emit(code, "    if pos == 0 goto %s_1", label)
     emit(code, "    $I2 = pos - 1")
-    emit(code, "    $I0 = is_cclass .CCLASS_WORD, target, $I2")
+    emit(code, "    $I0 = is_cclass %s, target, $I2", .CCLASS_WORD)
     emit(code, "  %s_1:", label)
     emit(code, "    $I1 = 0")
-    emit(code, "    unless pos < lastpos goto %s_2", label)
-    emit(code, "    $I1 = is_cclass .CCLASS_WORD, target, pos")
+    emit(code, "    if pos >= lastpos goto %s_2", label)
+    emit(code, "    $I1 = is_cclass %s, target, pos", .CCLASS_WORD)
     emit(code, "  %s_2:", label)
-    unless token == "\\b" goto word_1
+    if token == "\\B" goto word_1
     emit(code, "    if $I0 != $I1 goto %s", next)
     goto end
   word_1:
@@ -878,177 +666,196 @@ register.
 .end
 
 
-.namespace [ "PGE::Exp::Concat" ]
-
-.sub "analyze" method
-    .param pmc next
-    .param pmc pad
-    .local pmc exp1, exp2
-    exp2 = self["exp2"]
-    exp2.analyze(next, pad)
-    exp1 = self["exp1"]
-    exp1.analyze(exp2, pad)
-    self.firstchars(exp1)
-    .return ()
-.end
-
-.sub "gen" method
-    .param pmc code
-    .param string label
-    .param string next
-    .local pmc emit
-    .local pmc exp1, exp2
-    emit = find_global "PGE::Exp", "emit"
-    emit(code, "\n  %s:", label)
-    ($S0, $I0) = self.serno()
-    ($S1, $I1) = self.serno()
-    exp1 = self["exp1"]
-    exp1.gen(code, $S0, $S1)
-    exp2 = self["exp2"]
-    exp2.gen(code, $S1, next)
-    .return ()
-.end
-
-.namespace [ "PGE::Exp::Cut" ]
-
-.sub "analyze" method
-    .param pmc next
-    .param pmc pad
-    .local string token
-    token = self["token"]
-    $I0 = PGE_CUT_RULE
-    if token == ":::" goto cut_1
-    $I0 = pad["cutnum"]
-  cut_1:
-    self["cutnum"] = $I0
-    self.firstchars(next)
-    .return ()
-.end
-
-.sub "gen" method
-    .param pmc code
-    .param string label
-    .param string next
-    .local pmc emit
-    .local int cutnum
-    emit = find_global "PGE::Exp", "emit"
-    cutnum = self["cutnum"]
-    emit(code, "\n  %s:", label)
-    self.emitsub(code, next, "NOCUT")
-    emit(code, "    cutting = %s", cutnum)
-    emit(code, "    goto fail")
-    .return ()
-.end
-
 .namespace [ "PGE::Exp::Alt" ]
 
-.sub "analyze" method
-    .param pmc next
-    .param pmc pad
-    .local pmc exp1, exp2
-    .local pmc creps
-
-    $I0 = exists pad["creps"]                      # create creps hash array
-    if $I0 goto creps_1                            # if not exists
-    $P0 = new Hash
-    pad["creps"] = $P0
-  creps_1:
-    creps = pad["creps"]
-    creps = clone creps
-    exp1 = self["exp1"]
-    exp2 = self["exp2"]
-    exp2.analyze(next, pad)
-    pad["creps"] = creps
-    exp1.analyze(next, pad)
-    self.firstchars(exp1, exp2)
-    .return ()
-.end
-
 .sub "gen" method
     .param pmc code
     .param string label
     .param string next
     .local pmc emit
-    .local pmc exp1, exp2
+    .local pmc exp0, exp1
     emit = find_global "PGE::Exp", "emit"
-    emit(code, "\n  %s:", label)
     ($S0, $I0) = self.serno()
     ($S1, $I1) = self.serno()
+    emit(code, "\n  %s:  # alt %s, %s    ##", label, $S0, $S1)
     self.emitsub(code, $S0, "pos")
     emit(code, "    goto %s", $S1)
-    exp1 = self["exp1"]
-    exp1.gen(code, $S0, next)
-    exp2 = self["exp2"]
-    exp2.gen(code, $S1, next)
+    exp0 = self[0]
+    exp0.gen(code, $S0, next)
+    exp1 = self[1]
+    exp1.gen(code, $S1, next)
     .return ()
+.end
+
+
+.namespace [ "PGE::Exp::Quant" ]
+
+.sub "reduce" :method
+    .local pmc exp
+
+    exp = self[0]
+    exp = exp.reduce()
+    $I0 = exp["isquant"]
+    if $I0 == 1 goto noreduce
+    exp["isquant"] = 1
+    $P0 = self["min"]
+    exp["min"] = $P0
+    $P0 = self["max"]
+    exp["max"] = $P0
+    $P0 = self["islazy"]
+    exp["islazy"] = $P0
+    .return (exp)
+  noreduce:
+    .return (self)
+.end
+
+.sub "gen" :method
+    .param pmc code
+    .param string label
+    .param string next
+    .local pmc emit
+    .local int min, max, islazy, iscut
+    .local int cutnum
+    .local string explabel, replabel
+    .local pmc exp
+
+    emit = find_global "PGE::Exp", "emit"
+    (min, max, islazy, iscut, $S0) = self."quant"()
+    ($S0, cutnum) = self."quant"()
+    exp = self[0]
+    (explabel, $I0) = self."serno"()
+    replabel = concat label, "_rep"
+
+    emit(code, "  %s:  # quant %s    ##", label, $S0)
+    $I0 = exp["iscapture"]
+    if $I0 == 0 goto quant_1
+    exp."gencapture"(code, label)
+  quant_1:
+    emit(code, "    push gpad, 0")
+    emit(code, "    bsr %s", replabel)  
+    emit(code, "    $I0 = pop gpad")
+    emit(code, "    if cutting != %s goto fail", cutnum)
+    emit(code, "    cutting = 0")
+    emit(code, "    goto fail")
+    emit(code, "  %s:", replabel)
+    emit(code, "    rep = gpad[-1]")
+    if islazy goto lazy
+  greedy:
+    if max == PGE_INF goto greedy_1
+    emit(code, "    if rep >= %s goto %s_g1", max, label)
+  greedy_1:
+    emit(code, "    inc rep")
+    emit(code, "    gpad[-1] = rep")
+    self.emitsub(code, explabel, "rep", "pos")
+    emit(code, "    dec rep")
+    emit(code, "  %s_g1:", label)
+    if min < 1 goto greedy_2
+    emit(code, "    if rep < %s goto fail", min)
+  greedy_2:
+    emit(code, "    $I0 = pop gpad")
+    self.emitsub(code, next, "rep", "NOCUT")
+    emit(code, "    push gpad, rep")
+    if iscut == 0 goto greedy_3
+    emit(code, "    cutting = %s", cutnum)
+  greedy_3:
+    emit(code, "    goto fail")
+    goto end
+  lazy:
+    if min < 1 goto lazy_1
+    emit(code, "    if rep < %s goto %s_l1", min, label)
+  lazy_1:
+    emit(code, "    $I0 = pop gpad")
+    self.emitsub(code, next, "rep", "pos", "NOCUT")
+    emit(code, "    push gpad, rep")
+    emit(code, "  %s_l1:", label)
+    emit(code, "    if rep >= %s goto fail", max)
+    emit(code, "    inc rep")
+    emit(code, "    gpad[-1] = rep")
+    emit(code, "    goto %s", explabel)
+  end:
+    exp.gen(code, explabel, replabel)
 .end
 
 
 .namespace [ "PGE::Exp::Group" ]
 
-.sub "analyze" method
-    .param pmc next
-    .param pmc pad
-    .local pmc exp1
-    .local int isarray, psave
-    .local pmc creps
-    .local string cname
+.sub "reduce" :method
+    .local pmc exp
+    self["isquant"] = 1
+    exp = self[0]
+    exp = exp.reduce()
+    self[0] = exp
+    .return (self)
+.end
 
-    self["firstchars"] = ""                        # no firstchars default
-    ($S0, $I0) = self.serno()                      # get a unique group number
-    pad["cutnum"] = $I0
-    self["cutnum"] = $I0
+.sub "gen" :method
+    .param pmc code
+    .param string label
+    .param string next
+    .local pmc emit
+    .local int iscapture, isarray, isscope
+    .local string cname, captsave, captback
+    .local string explabel, expnext
+    .local int cutnum, iscut
+    .local pmc exp
 
-    $I0 = exists pad["creps"]                      # create creps hash array
-    if $I0 goto creps_1                            # if not exists
-    $P0 = new Hash
-    pad["creps"] = $P0
-  creps_1:
-    creps = pad["creps"]                           # load creps hash
-    $I0 = exists self["cname"]
-    unless $I0 goto isarray_0                      # skip if no capture
-    $P0 = self["cname"]
-    cname = $P0
-    $I0 = isa $P0, "Integer"                       # Integer = subpattern cap
-    if $I0 goto creps_2
-    cname = concat "%", cname
-  creps_2:
-    $I0 = exists creps[cname]                      # have seen capture name?
-    unless $I0 goto creps_3                        #
-    $P0 = creps[cname]                             # yes, so prev is now
-    $P0["isarray"] = 1                             # an array capture
-    self["isarray"] = 1                            # and so is self
-  creps_3:
-    creps[cname] = self                            # mark us for future ref
+    emit = find_global "PGE::Exp", "emit"
+    iscapture = self["iscapture"]
+    isscope = self["isscope"]
+    cname = self["cname"]
+    iscut = self["iscut"]
+    cutnum = self["cutnum"]
+    exp = self[0]
+    (explabel, $I0) = self.serno()
+    expnext = next
 
-  isarray_0:
-    psave = pad["isarray"]                         # get current isarray status
-    isarray = self["isarray"]                      # combine with group's
-    isarray |= psave                               #
-    self["isarray"] = isarray                      # and pass to nested
-    pad["isarray"] = isarray
-    $I0 = self["cscope"]                           # new scope resets
-    unless $I0 goto isarray_1                      # array status
-    pad["isarray"] = 0
-    isarray = 0                                    # each capt obj is single
-    delete pad["creps"]                            # new lexical name scope
-  isarray_1:
-    $I0 = defined self["exp1"]
-    unless $I0 goto end
-    exp1 = self["exp1"]
-    exp1.analyze(next, pad)
-    pad["isarray"] = psave
-
-  fc:
-    $I0 = self["min"]                              # set up firstchars
-    if $I0 > 0 goto fc_2
-    self.firstchars(exp1, next)
+    emit(code, "\n  %s:  # group %s    ##", label, cname)
+    if iscapture goto capture
+    self.emitsub(code, explabel, "NOCUT")
+    emit(code, "    if cutting != %s goto fail", cutnum)
+    emit(code, "    cutting = 0")
+    emit(code, "    goto fail")
     goto end
-  fc_2:
-    self.firstchars(exp1)
+  capture:
+    expnext = concat label, "_subp"
+    (captsave, captback) = self."gencapture"(code, label)
+    emit(code, "    ($P0, $P9, $P1) = newfrom(captscope, pos)")
+    emit(code, "    $P1 = pos")
+    emit(code, "    push gpad, captscope")
+    emit(code, "    push gpad, $P0")
+    emit(code, captsave, cname)
+    if isscope == 0 goto capture_1
+    emit(code, "    captscope = $P0")
+  capture_1:
+    self.emitsub(code, explabel, "NOCUT")
+    emit(code, "    $P0 = pop gpad")
+    emit(code, "    captscope = pop gpad")
+    emit(code, captback, cname)
+    if iscut == 0 goto capture_2
+    emit(code, "    if cutting != %d goto fail", cutnum)
+    emit(code, "    cutting = 0")
+  capture_2:
+    emit(code, "    goto fail")
+    emit(code, "  %s:", expnext)
+    emit(code, "    save captscope")
+    emit(code, "    $P0 = pop gpad")
+    emit(code, "    captscope = pop gpad")
+    emit(code, "    $P1 = getattribute $P0, \"PGE::Match\\x0$:pos\"")
+    emit(code, "    $P1 = pos")
+    self.emitsub(code, next, "$P0", "captscope", "NOCUT")
+    emit(code, "    push gpad, captscope")
+    emit(code, "    push gpad, $P0")
+    emit(code, "    restore captscope")
+    emit(code, "    goto fail")
   end:
-    pad["creps"] = creps
-    .return ()
+    exp.gen(code, explabel, expnext)
+.end 
+
+.namespace [ "PGE::Exp::Subrule" ]
+
+.sub "reduce" :method
+    self["isquant"] = 1
+    .return (self)
 .end
 
 .sub "gen" method
@@ -1056,180 +863,73 @@ register.
     .param string label
     .param string next
     .local pmc emit
-    .local pmc exp1
-    .local int min, max, isgreedy, iscut, iscapture, isarray, issubrule, cscope
-    .local int cutnum
-    .local string rname, captname, captsave, captback
-    .local string exp1label, exp1next
-    .local string replabel
+    .local string subname
+    .local string cname, captsave, captback
+    .local int iscapture
     emit = find_global "PGE::Exp", "emit"
-    (min, max, isgreedy, iscut) = self."_getattributes"()
-    (exp1label, $I0) = self.serno()
-    cutnum = self["cutnum"]
-    iscapture = defined self["cname"]
-    isarray = self["isarray"]
-    rname = self["rname"]
-    cscope = self["cscope"]
-    issubrule = exists self["rname"]
-    $P0 = self["cname"]
-    captname = $P0
-    $I0 = isa $P0, "Integer"
-    if $I0 goto captarray
-    $P1 = find_global "Data::Escape", "String"
-    captname = $P1(captname, '"')
-    captname = concat '"', captname
-    captname = concat captname, '"'
-
-  captarray:
+    subname = self["subname"]
+    iscapture = self["iscapture"]
+    cname = self["cname"]
+    emit(code, "\n  %s:  # subrule %s    ##", label, subname)
     captsave = ""
     captback = ""
-    emit(code, "\n  %s:", label)
     if iscapture == 0 goto subrule
-    captsave = "    $P1[%s] = $P0"
-    captback = "    delete $P1[%s]"
-    if isarray == 0 goto subrule
-    captsave = "    $P1 = $P1[%s]\n    push $P1, $P0"
-    captback = "    $P1 = pop $P1"
-    emit(code, "    $I0 = defined captscope[%s]", captname)
-    emit(code, "    if $I0 goto %s_c1", label)
-    emit(code, "    $P0 = new PerlArray")
-    emit(code, "    captscope[%s] = $P0", captname)
-    emit(code, "    save captscope")
-    emit(code, "    bsr %s_c1", label)
-    emit(code, "    restore captscope")
-    emit(code, "    delete captscope[%s]", captname)
-    emit(code, "    goto fail")
-    emit(code, "  %s_c1:", label)
-   
+    (captsave, captback) = self."gencapture"(code, label)
   subrule:
-    if issubrule == 0 goto init
     $I0 = 0
   subrule_1:
-    $I1 = index rname, "::", $I0
+    $I1 = index subname, "::", $I0
     if $I1 == -1 goto subrule_2
     $I0 = $I1 + 2
     goto subrule_1
   subrule_2:
     if $I0 == 0 goto subrule_simple_name
-    $S1 = substr rname, $I0                         # get rule name
+    $S1 = substr subname, $I0
     $I0 -= 2
-    $S0 = substr rname, 0, $I0                      # get grammar name
+    $S0 = substr subname, 0, $I0
+    emit(code, "    ($P1,$P9,$P9,$P0) = newfrom(captscope, pos, \"%s\")", $S0)
+    emit(code, "    $P0 = pos")
     emit(code, "    $P0 = find_global \"%s\", \"%s\"", $S0, $S1)
-    emit(code, "    rcache[\"%s\"] = $P0", rname)
-    emit(code, "    $P1 = find_global \"PGE::Match\", \"newfrom\"")
-    emit(code, "    $P1 = $P1(mob, pos, \"%s\")", $S0)
-    goto init
+    emit(code, "    $P0 = $P0($P1)")
+    goto subrule_3
   subrule_simple_name:
-    emit(code, "    $I0 = can mob, \"%s\"", rname)
-    emit(code, "    if $I0 goto %s_s1", label)
-    emit(code, "    $P0 = find_global \"%s\"", rname)
+    emit(code, "    $P0 = getattribute captscope, \"PGE::Match\\x0$:pos\"")
+    emit(code, "    $P0 = pos")
+    emit(code, "    $I0 = can mob, \"%s\"", subname)
+    emit(code, "    if $I0 == 0 goto %s_s1", label)
+    emit(code, "    $P0 = find_method mob, \"%s\"", subname)
     emit(code, "    goto %s_s2", label)
     emit(code, "  %s_s1:", label)
-    emit(code, "    $P0 = find_method mob, \"%s\"", rname)
+    emit(code, "    $P0 = find_global \"%s\"", subname)
     emit(code, "  %s_s2:", label)
-    emit(code, "    rcache[\"%s\"] = $P0", rname)
-    emit(code, "    $P1 = mob")
-    
-  init:
-    emit(code, "    push gpad, captscope")
-    emit(code, "    push gpad, $P1")
-    emit(code, "    push gpad, 0")
-    replabel = concat label, "_rep"
-    emit(code, "    bsr %s", replabel)
-    emit(code, "    $I0 = pop gpad")
-    emit(code, "    $P0 = pop gpad")
-    emit(code, "    $P0 = pop gpad")
-    emit(code, "    if cutting != %s goto fail", cutnum)
-    emit(code, "    cutting = 0")
-    emit(code, "    goto fail")
-
-  rep:
-    emit(code, "  %s:", replabel)
-    emit(code, "    rep = gpad[-1]")
-    if isgreedy == 0 goto lazy
-    emit(code, "    if rep >= %s goto %s_g1", max, label)
-    emit(code, "    inc rep")
-    emit(code, "    gpad[-1] = rep")
-    emit(code, "    captscope = gpad[-3]")
-    $S0 = concat label, "_exp1"
-    self.emitsub(code, $S0, "rep", "pos")
-    emit(code, "    dec rep")
-    emit(code, "  %s_g1:", label)
-    emit(code, "    if rep < %s goto fail", min)
-    goto trynext
-  lazy:
-    emit(code, "    if rep < %s goto %s_l1", min, label)
-    $S0 = concat label, "_next"
-    self.emitsub(code, $S0, "rep", "pos")
-    emit(code, "  %s_l1:", label)
-    emit(code, "    if rep >= %s goto fail", max)
-    emit(code, "    inc rep")
-    emit(code, "    gpad[-1] = rep")
-    emit(code, "    captscope = gpad[-3]")
-    emit(code, "    goto %s_exp1", label)
-
-  trynext:
-    emit(code, "  %s_next:", label) 
-    emit(code, "    $I0 = pop gpad")
-    emit(code, "    $P0 = pop gpad")
-    emit(code, "    captscope = pop gpad")
-    self.emitsub(code, next, "rep", "$P0", "captscope", "NOCUT")
-    emit(code, "    push gpad, captscope")
-    emit(code, "    push gpad, $P0")
-    emit(code, "    push gpad, rep")
-    if iscut == 0 goto trynext_1
-    emit(code, "    cutting = %s", cutnum)
-  trynext_1:
-    emit(code, "    goto fail")
-
-  tryexp1:
-    emit(code, "  %s_exp1:", label)
-    if issubrule goto trysubr
-    if iscapture goto trysubp
-    exp1next = replabel
-    goto trysubp_2
-  trysubp:  
-    exp1next = concat label, "_subp"
-    emit(code, "    $P1 = captscope")
-    emit(code, "    $P0 = find_global \"PGE::Match\", \"newfrom\"")
-    emit(code, "    $P0 = $P0($P1, pos)")
-    emit(code, "    gpad[-2] = $P0")
-    emit(code, "    save captscope")
-    if cscope == 0 goto trysubp_1
-    emit(code, "    captscope = $P0")
-  trysubp_1:
-    emit(code, captsave, captname)
-    self.emitsub(code, exp1label, "$P1", "NOCUT")
-    emit(code, captback, captname)
-    emit(code, "    restore captscope")
-    emit(code, "    goto fail")
-    emit(code, "  %s:", exp1next)
-    emit(code, "    $P0 = gpad[-2]")
-    emit(code, "    $P0 = getattribute $P0, \"PGE::Match\\x0$:pos\"")
-    emit(code, "    $P0 = pos")
-    emit(code, "    goto %s", replabel)
-  trysubp_2:
-    exp1 = self["exp1"]
-    exp1.gen(code, exp1label, exp1next)
-    goto end
-
-  trysubr:
-    emit(code, "    $P1 = gpad[-2]")
-    emit(code, "    $P0 = getattribute $P1, \"PGE::Match\\x0$:pos\"")
-    emit(code, "    $P0 = pos")
-    emit(code, "    $P0 = rcache[\"%s\"]", rname)
-    emit(code, "    $P0 = $P0($P1)")
+    emit(code, "    $P0 = $P0(captscope)")
+  subrule_3:
     emit(code, "    unless $P0 goto fail")
-    emit(code, "    $P1 = captscope")
-    emit(code, captsave, captname)
+    emit(code, captsave, cname)
     emit(code, "  %s_sr3:", label)
     emit(code, "    pos = $P0.to()")
-    self.emitsub(code, replabel, "$P0", "$P1", "NOCUT")
+    self.emitsub(code, next, "$P0", "NOCUT")
     emit(code, "    $P0.next()")
     emit(code, "    if $P0 goto %s_sr3", label)
-    emit(code, captback, captname)
+    emit(code, captback, cname)
     emit(code, "    goto fail")
-
   end:
+    .return ()
 .end
-  
+
+.namespace [ "PGE::Exp::Cut" ]
+
+.sub "gen" :method
+    .param pmc code
+    .param string label
+    .param string next
+    .local pmc emit
+    .local int cutnum
+    emit = find_global "PGE::Exp", "emit"
+    cutnum = self["cutnum"]
+    emit(code, "\n  %s:  # cut %s    ##", label, cutnum)
+    self.emitsub(code, next, "NOCUT")
+    emit(code, "    cutting = %s", cutnum)
+    emit(code, "    goto fail")
+    .return ()
+.end

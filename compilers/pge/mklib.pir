@@ -24,9 +24,11 @@ file.
     load_bytecode "Data/Escape.pbc"
     load = find_global "PGE::TokenHash", "__onload"
     load()
-    load = find_global "PGE::Exp", "__onload"
-    load()
     load = find_global "PGE::Match", "__onload"
+    load()
+    load = find_global "PGE::OPTable", "__onload"
+    load()
+    load = find_global "PGE::Exp", "__onload"
     load()
     load = find_global "PGE::P6Rule", "__onload"
     load()
@@ -43,7 +45,8 @@ file.
 .end
 
 .include "compilers/pge/PGE/TokenHash.pir"
-.include "compilers/pge/PGE/Exp.pir"
 .include "compilers/pge/PGE/Match.pir"
-.include "compilers/pge/PGE/Rule.pir"
+.include "compilers/pge/PGE/OPTable.pir"
+.include "compilers/pge/PGE/Exp.pir"
 .include "compilers/pge/PGE/P6Rule.pir"
+.include "compilers/pge/PGE/Rule.pir"
