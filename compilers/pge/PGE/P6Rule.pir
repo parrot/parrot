@@ -189,6 +189,7 @@
     if $S0 != "?" goto end
     islazy = 1
     pos = $I0 + 1
+    goto end
   quant_closure:
     pos += 2
     pos = find_not_cclass .CCLASS_WHITESPACE, target, pos, lastpos
