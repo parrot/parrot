@@ -240,9 +240,12 @@
     lastpos = length target
     $S0 = substr target, pos, 2
     if $S0 == "<?" goto nocapture
+    if $S0 == "<!" goto negated
     iscapture = 1
     inc pos
     goto subrule_name
+  negated:
+    mob["isnegated"] = 1
   nocapture:
     iscapture = 0
     pos += 2

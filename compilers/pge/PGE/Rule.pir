@@ -50,8 +50,7 @@ Force a backtrack.  (Taken from A05.)
 .sub fail
     .param pmc mob
     $P0 = find_global "PGE::Match", "newfrom"
-    mob = $P0(mob)
-    .return (mob)
+    .return $P0(mob)
 .end
 
 =item C<upper()>
@@ -456,7 +455,7 @@ C<pattern> matches.  Always returns a zero-width Match object.
     $P1 = getattribute mob, "PGE::Match\x0$:pos"
     assign $P1, $P0
     null $P0
-    setattribute mob, "PGE::Match\\x0&:corou", $P0
+    setattribute mob, "PGE::Match\x0&:corou", $P0
   end:
     .return (mob)
 .end

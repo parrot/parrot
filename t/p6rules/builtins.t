@@ -1,4 +1,4 @@
-use Parrot::Test tests => 44;
+use Parrot::Test tests => 45;
 use Parrot::Test::PGE;
 
 $str = 
@@ -107,4 +107,9 @@ p6rule_like("abacad", '<before .d> a.',
 p6rule_isnt("abacad", '<before c> ....', 'lookahead <before>');
 
 p6rule_isnt("abcd", '<before> .', 'null <before>');
+
+p6rule_like  ("aabaaa", '<!before ..b> aa', 
+    qr/mob: <aa @ 3>/,
+    'negated lookahead');
+
 

@@ -875,11 +875,12 @@ register.
     .local pmc emit
     .local string subname, subargs
     .local string cname, captsave, captback
-    .local int iscapture, iscut
+    .local int iscapture, iscut, isnegated
     emit = find_global "PGE::Exp", "emit"
     subname = self["subname"]
     iscapture = self["iscapture"]
     iscut = self["iscut"]
+    isnegated = self["isnegated"]
     cname = self["cname"]
     emit(code, "\n  %s:  # subrule %s    ##", label, subname)
     subargs = ""
@@ -925,12 +926,21 @@ register.
     emit(code, "  %s_s2:", label)
     emit(code, "    $P0 = $P0(captscope%s)", subargs)
   subrule_3:
-    emit(code, "    unless $P0 goto fail")
-    emit(code, captsave, cname)
-    if iscut == 0 goto subrule_4
+    if isnegated == 0 goto subrule_4
+    emit(code, "    if $P0 goto fail")
+    emit(code, "    $P1 = getattribute $P0, \"PGE::Match\\x0$:from\"")
+    emit(code, "    $P1 = pos")
+    emit(code, "    $P1 = getattribute $P0, \"PGE::Match\\x0$:pos\"")
+    emit(code, "    $P1 = pos")
     emit(code, "    goto %s", next)
     goto end
   subrule_4:
+    emit(code, "    unless $P0 goto fail")
+    emit(code, captsave, cname)
+    if iscut == 0 goto subrule_5
+    emit(code, "    goto %s", next)
+    goto end
+  subrule_5:
     emit(code, "  %s_sr3:", label)
     emit(code, "    pos = $P0.to()")
     emit(code, "    $P1 = getattribute $P0, \"PGE::Match\\x0&:corou\"")
