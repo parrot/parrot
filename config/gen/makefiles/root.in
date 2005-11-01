@@ -742,7 +742,7 @@ check_source : $(GENERAL_H_FILES)
 ###############################################################################
 
 shared : $(GEN_HEADERS) blib/lib/libparrot$(SHARE_EXT).$(SOVERSION) $(LIBPARROT) $(INSTALLABLEPARROT)
-	$(LINK) ${ld_out}$(INSTALLABLEPARROT) $(LINKFLAGS) $(IMCC_DIR)/main$(O) $(ICU_SHARED) $(C_LIBS) -Lblib/lib -lparrot $(SRC_DIR)/install_config$(O)
+	$(LINK) ${ld_out}$(INSTALLABLEPARROT) $(LINKFLAGS) $(IMCC_DIR)/main$(O) -Lblib/lib -lparrot $(ICU_SHARED) $(C_LIBS)
 
 static : $(GEN_HEADERS) $(LIBPARROT)
 
@@ -757,9 +757,9 @@ $(LIBPARROT) : $(O_FILES)
 	$(AR_CR) ${ar_out}$@ ${ar_extra} $(O_FILES)
 	$(RANLIB) $@
 
-blib/lib/libparrot$(SHARE_EXT).$(SOVERSION) : $(O_FILES)
+blib/lib/libparrot$(SHARE_EXT).$(SOVERSION) : $(O_FILES) $(SRC_DIR)/install_config$(O)
 	$(MKDIR) blib blib/lib
-	$(LD) -Wl,-soname=libparrot$(SHARE_EXT).$(SOVERSION) $(LD_SHARE_FLAGS) $(LDFLAGS) ${ld_out}blib/lib/libparrot$(SHARE_EXT).$(SOVERSION) $(O_FILES) $(C_LIBS) $(LIBICUCORE) $(LIBICUDATA)
+	$(LD) -Wl,-soname=libparrot$(SHARE_EXT).$(SOVERSION) $(LD_SHARE_FLAGS) $(LDFLAGS) ${ld_out}blib/lib/libparrot$(SHARE_EXT).$(SOVERSION) $(O_FILES) $(SRC_DIR)/install_config$(O) $(C_LIBS) $(LIBICUCORE) $(LIBICUDATA)
 	cp blib/lib/libparrot$(SHARE_EXT).$(SOVERSION) blib/lib/libparrot$(SHARE_EXT)
 
 $(PARROT_SO) : $(IMCC_DIR)/main$(O) blib/lib/libparrot$(SHARE_EXT) lib/Parrot/OpLib/core.pm
