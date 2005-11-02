@@ -331,7 +331,7 @@ begin_return_or_yield(Interp *interp, int yield)
 %token <t> PRAGMA FASTCALL N_OPERATORS HLL
 %token <t> GOTO ARG IF UNLESS
 %token <t> ADV_FLAT ADV_SLURPY ADV_OPTIONAL ADV_OPT_FLAG
-%token <t> NEW NEWSUB NEWCLOSURE NEWCOR NEWCONT
+%token <t> NEW
 %token <t> NAMESPACE ENDNAMESPACE CLASS ENDCLASS FIELD DOT_METHOD
 %token <t> SUB SYM LOCAL CONST
 %token <t> INC DEC GLOBAL_CONST
@@ -351,7 +351,7 @@ begin_return_or_yield(Interp *interp, int yield)
 %token <s> IREG NREG SREG PREG IDENTIFIER REG MACRO ENDM
 %token <s> STRINGC INTC FLOATC USTRINGC
 %token <s> PARROT_OP
-%type <t> type newsub ptr pragma_1 hll_def
+%type <t> type ptr pragma_1 hll_def
 %type <i> program class class_body member_decls member_decl field_decl
 %type <i> method_decl class_namespace
 %type <i> global constdef sub emit pcc_sub  pcc_ret
@@ -940,9 +940,6 @@ labeled_inst:
                            cur_call = NULL;
                         }
    | GOTO label_op { $$ = MK_I(interp, cur_unit, "branch",1, $2); }
-   | NEWSUB                           { expect_pasm = 1; }
-     pasm_args
-                   { $$ = INS(interp, cur_unit, "newsub",0,regs,nargs,keyvec,1); }
    | PARROT_OP vars
                    { $$ = INS(interp, cur_unit, $1, 0, regs, nargs, keyvec, 1);
                                           free($1); }
@@ -950,13 +947,6 @@ labeled_inst:
    | pcc_sub_call  {  $$ = 0; }
    | pcc_ret
    | /* none */                        { $$ = 0;}
-   ;
-
-newsub:
-     NEWSUB { $$ = NEWSUB; }
-   | NEWCLOSURE { $$ = NEWCLOSURE; }
-   | NEWCOR { $$ = NEWCOR; }
-   | NEWCONT { $$ = NEWCONT; }
    ;
 
 type:
@@ -1026,9 +1016,6 @@ assignment:
                         { $$ = MK_I(interp, cur_unit, "new", 3, $1, $4, $6); }
    | target '=' NEW var '[' keylist ']'
                         { $$ = MK_I(interp, cur_unit, "new", 3, $1, $4, $6); }
-   | target '=' newsub IDENTIFIER
-                        { $$ = iNEWSUB(interp, cur_unit, $1, $3,
-                                  mk_sub_address(interp, $4), 1); }
    | target '=' ADDR IDENTIFIER
                         { $$ = MK_I(interp, cur_unit, "set_addr",
                             2, $1, mk_label_address(interp, $4)); }

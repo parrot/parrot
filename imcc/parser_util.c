@@ -79,65 +79,6 @@ iNEW(Interp *interpreter, IMC_Unit * unit, SymReg * r0,
 }
 
 /*
- * Variation of iNEW() specific for subs/closures/etc. and the newsub opcode
- * Allows IMCC to take advantage of the newsub opcode which is much more
- * efficient than new/set_addr combination. This makes PIR orthogonal
- * between new and newsub.
- *
- *  Example:
- *   P0 = newsub _func            ::=   newsub, P0, .Sub, _func
- *   P0 = newclosure _clos        ::=   newsub, P0, .Closure, _clos
- *
- * XXX: Currently the 3 arg version of newsub ignores the Px target on the assign.
- *      Fix the PASM opcode.
- */
-
-Instruction *
-iNEWSUB(Interp *interpreter, IMC_Unit * unit, SymReg * r0,
-        int type, SymReg *subinit, int emit)
-{
-    char fmt[256];
-    SymReg *regs[4];
-    SymReg *subpmc;
-    int nargs;
-    int pmc_num;
-    const char * classnm = NULL;
-    switch(type) {
-        case NEWSUB: classnm = "Sub"; break;
-        case NEWCLOSURE: classnm = "Closure"; break;
-        case NEWCOR: classnm = "Coroutine"; break;
-        case NEWCONT: classnm = "Continuation"; break;
-        default:
-              IMCC_fataly(interpreter, E_SyntaxError,
-                      "iNEWSUB: unimplemented classtype '%d'\n", type);
-    }
-
-    pmc_num = pmc_type(interpreter,
-            string_from_cstring(interpreter, classnm, 0));
-
-    sprintf(fmt, "%d", pmc_num);
-    subpmc = mk_const(interpreter, str_dup(fmt), 'I');
-
-    if (pmc_num <= 0)
-        IMCC_fataly(interpreter, E_SyntaxError,
-                "Unknown PMC type '%s'\n", classnm);
-    sprintf(fmt, "%%s, %d\t # .%s", pmc_num, classnm);
-
-    r0->usage = U_NEW;
-    regs[0] = r0;
-    regs[1] = subpmc;
-    if (subinit) {
-        regs[2] = subinit;
-        nargs = 3;
-    }
-    else
-        nargs = 2;
-
-    return INS(interpreter, unit, "newsub", NULL, regs, nargs, 0, emit);
-}
-
-
-/*
  * Lookup the full opcode given the short name
  *   set I0, 5  -> set_i_ic
  *   set I0, I1 -> set_i_i

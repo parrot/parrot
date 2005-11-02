@@ -258,7 +258,7 @@ store_bsr(Interp *interpreter, SymReg * r, int pc, int offset)
     if (r->set == 'p')
         bsr->set = 'p';
     bsr->color = pc;
-    bsr->score = offset;        /* bsr = 1, set_addr I,x = 2, newsub = 3 */
+    bsr->score = offset;        /* bsr = 1, set_addr I,x = 2  */
     /* This is hackish but it's better to have it here than in the
      * fixup code until we decide if we need the _globallabel semantic.
      */
@@ -333,8 +333,6 @@ store_labels(Interp *interpreter, IMC_Unit * unit, int *src_lines, int oldsize)
             }
             else if (!strcmp(ins->op, "set_addr"))
                 store_bsr(interpreter, ins->r[1], pc, 2);
-            else if (!strcmp(ins->op, "newsub"))
-                store_bsr(interpreter, ins->r[2], pc, 3);
         }
         else if (ins->opsize == 3 && ins->r[1]->set == 'p') {
             /*
@@ -390,7 +388,7 @@ store_labels(Interp *interpreter, IMC_Unit * unit, int *src_lines, int oldsize)
         if (label)
             continue;
         if (strcmp(ins->op, "bsr") && strcmp(ins->op, "set_addr") &&
-                strcmp(ins->op, "branch_cs") && strcmp(ins->op, "newsub")) {
+                strcmp(ins->op, "branch_cs")) {
             char buf[64];
             SymReg *r[1];
             char *glabel;
@@ -1193,8 +1191,7 @@ e_pbc_emit(Interp *interpreter, void *param, IMC_Unit * unit, Instruction * ins)
                 IMCC_debug(interpreter, DEBUG_PBC_FIXUP, "branch label %d jump %d %s %d\n",
                         npc, label->color, addr->name,addr->color);
             }
-            else if (strcmp(ins->op, "bsr") && strcmp(ins->op, "set_addr") &&
-                    strcmp(ins->op, "newsub")) {
+            else if (strcmp(ins->op, "bsr") && strcmp(ins->op, "set_addr")) {
                 /* TODO make intersegment branch */
                 IMCC_fatal(interpreter, 1, "e_pbc_emit: "
                         "label not found for '%s'\n",
