@@ -24,7 +24,6 @@ stream for it. Then it combines the stream with a stream providing line numbers.
     .local pmc lines
     .local pmc counter
     .local pmc combiner
-    .local pmc temp
     .local string name
 
     # get the name of the file to open
@@ -52,7 +51,7 @@ NO_NAME:
     # endless counter
     find_type $I0, "Stream::Sub"
     new counter, $I0
-    newsub temp, .Sub, _counter
+    .const .Sub temp = "_counter"
     assign counter, temp
 
     # combine the counter and the file's lines

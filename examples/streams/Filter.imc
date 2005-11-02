@@ -20,7 +20,6 @@ Creates a counter stream that generates numbers from 0 to 9.
 .sub _main
     .local pmc stream
     .local pmc filter
-    .local pmc temp
 
     load_bytecode "library/Stream/Sub.imc"
     load_bytecode "library/Stream/Filter.imc"
@@ -29,7 +28,7 @@ Creates a counter stream that generates numbers from 0 to 9.
     find_type $I0, "Stream::Sub"
     new stream, $I0
     # assign its source
-    newsub temp, .Sub, _counter
+    .const .Sub temp = "_counter"
     assign stream, temp
 
     # create the filter stream
@@ -38,7 +37,7 @@ Creates a counter stream that generates numbers from 0 to 9.
     # assign its source
     assign filter, stream
     # set the filter sub
-    newsub temp, .Sub, _filter
+    .const .Sub temp = "_filter"
     filter."filter"( temp )
     
     # dump the stream

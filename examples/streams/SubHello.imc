@@ -14,7 +14,6 @@ Creates a C<Stream::Sub> and dumps it.
 
 .sub _main :main
     .local pmc stream
-    .local pmc temp
 
     load_bytecode "library/Stream/Sub.imc"
 
@@ -22,7 +21,7 @@ Creates a C<Stream::Sub> and dumps it.
     new stream, $I0
 
     # set the stream's source sub
-    newsub temp, .Sub, _hello
+    .const .Sub temp = "_hello"
     assign stream, temp
 
     # dump the stream

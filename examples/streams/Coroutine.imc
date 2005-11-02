@@ -32,7 +32,8 @@ Creates a coroutine stream and dumps it.
     new stream, $I0
 
     # set the stream's source coroutine
-    newsub temp, .Coroutine, _coro
+    # A .Sub is a coroutine when there is a yield?
+    .const .Sub temp = "_coro"
     assign stream, temp
     #stream."source"( temp )
     

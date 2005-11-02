@@ -14,7 +14,6 @@ Creates a counter stream and dumps it.
 
 .sub _main
     .local pmc stream
-    .local pmc temp
 
     load_bytecode "library/Stream/Sub.imc"
     
@@ -22,13 +21,12 @@ Creates a counter stream and dumps it.
     new stream, $I0
 
     # set the stream's source sub
-    newsub temp, .Sub, _counter
+    .const .Sub temp = "_counter"
     assign stream, temp
     
     # dump the stream
     stream."dump"()
     
-    end
 .end
 
 =item _counter
@@ -56,12 +54,11 @@ LOOP:
     # include another stream after '4'
     if i != 4 goto SKIP
     .local pmc temp
-    .local pmc func
     
     find_type $I0, "Stream::Sub"
     new temp, $I0
 
-    newsub func, .Sub, _included
+    .const .Sub func = "_included"
     assign temp, func
     
     # include it
@@ -90,7 +87,7 @@ writes "world".
     # create another stream
     find_type $I0, "Stream::Sub"
     new temp, $I0
-    newsub func, .Sub, _counter2
+    .const .Sub func = "_counter2"
     assign temp, func
     
     # include it

@@ -18,7 +18,6 @@ PMC to the stream with the C<assign> op.
 
 .sub _main :main
     .local pmc stream
-    .local pmc temp
 
     load_bytecode "library/Stream/ParrotIO.imc"
 

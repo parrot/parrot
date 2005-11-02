@@ -15,7 +15,6 @@ Creates a stream and pipes it through a Stream::Lines stream.
 .sub _main
     .local pmc stream
     .local pmc lines
-    .local pmc temp
 
     load_bytecode "library/Stream/Sub.imc"
     load_bytecode "library/Stream/Lines.imc"
@@ -24,7 +23,7 @@ Creates a stream and pipes it through a Stream::Lines stream.
     find_type $I0, "Stream::Sub"
     new stream, $I0
     # set the source
-    newsub temp, .Sub, _text
+    .const .Sub temp = "_text"
     assign stream, temp
 
     # create a lines stream

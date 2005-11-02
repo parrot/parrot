@@ -28,7 +28,6 @@ Creates the 3 Stream objects and dumps the combined stream.
     .local pmc counter
     .local pmc text
     .local pmc combined
-    .local pmc temp
 
     load_bytecode "library/Stream/Base.imc"
     load_bytecode "library/Stream/Combiner.imc"
@@ -37,14 +36,14 @@ Creates the 3 Stream objects and dumps the combined stream.
     # create the counter stream
     find_type $I0, "Stream::Sub"
     new counter, $I0
-    newsub temp, .Sub, _counter
+    .const .Sub temp = "_counter"
     assign counter, temp
     
     # create the text stream
     find_type $I0, "Stream::Sub"
     new text, $I0
     # set its source
-    newsub temp, .Sub, _text
+    .const .Sub temp = "_text"
     assign text, temp
 
     # create a combiner stream
@@ -55,7 +54,7 @@ Creates the 3 Stream objects and dumps the combined stream.
     assign combined, text
     
     # specify our own combiner sub
-    newsub temp, .Sub, _combiner
+    .const .Sub temp = "_combiner"
     combined."combiner"( temp )
     
     # dump the combined stream

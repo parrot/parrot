@@ -14,7 +14,6 @@ Creates a C<Stream::Writer> and writes to it.
 
 .sub _main :main
     .local pmc stream
-    .local pmc temp
 
     load_bytecode "library/Stream/Writer.imc"
 
@@ -22,7 +21,7 @@ Creates a C<Stream::Writer> and writes to it.
     new stream, $I0
 
     # set the stream's source sub
-    newsub temp, .Sub, _reader
+    .const .Sub temp = "_reader"
     assign stream, temp
 
     print "main start\n"
