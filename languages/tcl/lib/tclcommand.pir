@@ -87,7 +87,7 @@ no_command_non_interactive:
 
 .sub compile :method
    .param int register_num
- 
+
    inc register_num
 
    .local string label_num
@@ -95,12 +95,12 @@ no_command_non_interactive:
    .local int inline_result_num
    .local int inline_available
    inline_available=0
-
    .local pmc compile
    compile = find_global "_Tcl", "compile_dispatch"
 
-   .local string pir_code
+   .local string pir_code,pir_code2
    pir_code = ".include \"languages/tcl/lib/returncodes.pir\"\n"
+   pir_code2 = ''
 
    .local string retval
    # Generate partial code for each of our arguments
@@ -137,7 +137,7 @@ arg_loop_done:
      $S0 = name
      $P1 = find_global "_Tcl::builtins", $S0
    clear_eh
- 
+
    (inline_result_num,retval) = $P1(register_num,self)
    
    register_num = inline_result_num + 1
@@ -146,23 +146,24 @@ arg_loop_done:
    pir_code .= label_num
    pir_code .= ":\n"
    pir_code .= retval
-   pir_code .= "$P%i=$P" # placeholder for final result PMC.
+ 
    $S0 = inline_result_num
-   pir_code .= $S0
-   pir_code .= "\n"
-   pir_code .= "goto done_command"
-   pir_code .= label_num
-   pir_code .= "\n"
+   pir_code2 .= $S0
+   pir_code2 .= "\n"
+   pir_code2 .= "goto done_command"
+   pir_code2 .= label_num
+   pir_code2 .= "\n"
    inline_available = 1
 dynamic:
-   pir_code .= "dynamic_command"
-   pir_code .= label_num
-   pir_code .= ":\n"
+   $P99 = P5 # XXX Curse you, variable register frames!
+   pir_code2 .= "dynamic_command"
+   pir_code2 .= label_num
+   pir_code2 .= ":\n"
    .local int name_register
    (name_register,retval) = compile(name,register_num)
    register_num = name_register
 
-   pir_code .= retval
+   pir_code2 .= retval
    $S1 = "$P"
    $S0 = register_num
    $S1 .= $S0
@@ -173,69 +174,69 @@ dynamic:
    $S2 .= $S0
 
    # Get a string version of the name
-   pir_code .= $S2
-   pir_code .= "="
-   pir_code .= $S1
-   pir_code .= "\n"
+   pir_code2 .= $S2
+   pir_code2 .= "="
+   pir_code2 .= $S1
+   pir_code2 .= "\n"
    
    # Prepend a "&"
-   pir_code .= $S2
-   pir_code .= " = \"&\" . "
-   pir_code .= $S2
-   pir_code .= "\n"
+   pir_code2 .= $S2
+   pir_code2 .= " = \"&\" . "
+   pir_code2 .= $S2
+   pir_code2 .= "\n"
 
-   pir_code .= "push_eh bad_command"
+   pir_code2 .= "push_eh bad_command"
    $S0 = register_num
-   pir_code .= $S0
-   pir_code .= "\n"
-   pir_code .= "command = find_global \"Tcl\", "
-   pir_code .= $S2
-   pir_code .= "\nclear_eh\nif_null command, bad_command"
-   pir_code .= $S0
-   pir_code .= "\n$P"
-   pir_code .= $S0
-   pir_code .= " = command("
+   pir_code2 .= $S0
+   pir_code2 .= "\n"
+   pir_code2 .= "command = find_global \"Tcl\", "
+   pir_code2 .= $S2
+   pir_code2 .= "\nclear_eh\nif_null command, bad_command"
+   pir_code2 .= $S0
+   pir_code2 .= "\n$P"
+   pir_code2 .= $S0
+   pir_code2 .= " = command("
 
    ii = 0
 elem_loop:
    if ii == num_args goto elem_loop_done   
    $S0 = compiled_args[ii]
-   pir_code .= "$P"
-   pir_code .= $S0
+   pir_code2 .= "$P"
+   pir_code2 .= $S0
    inc ii 
    if ii == num_args goto elem_loop_done
-   pir_code .= ","
+   pir_code2 .= ","
    goto elem_loop 
 elem_loop_done:
-   pir_code .= ")\ngoto resume"
+   pir_code2 .= ")\ngoto resume"
    $S0 = register_num
-   pir_code .= $S0
-   pir_code .="\n" 
-   pir_code .= "bad_command"
-   pir_code .= $S0
-   pir_code .= ":\n$S"
-   pir_code .= $S0
-   pir_code .= "=$P"
+   pir_code2 .= $S0
+   pir_code2 .="\n" 
+   pir_code2 .= "bad_command"
+   pir_code2 .= $S0
+   pir_code2 .= ":\n$S"
+   pir_code2 .= $S0
+   pir_code2 .= "=$P"
    $S1 = name_register
-   pir_code .= $S1
-   pir_code .= "\n$S"
-   pir_code .= $S0
-   pir_code .= "=concat \"invalid command name \\\"\" ,"
-   pir_code .= "$S"
-   pir_code .= $S0
-   pir_code .= "\n$S"
-   pir_code .= $S0
-   pir_code .= ".=\"\\\"\"\n.throw($S"
-   pir_code .= $S0
-   pir_code .= ")\n"  
+   pir_code2 .= $S1
+   pir_code2 .= "\n$S"
+   pir_code2 .= $S0
+   pir_code2 .= "=concat \"invalid command name \\\"\" ,"
+   pir_code2 .= "$S"
+   pir_code2 .= $S0
+   pir_code2 .= "\n$S"
+   pir_code2 .= $S0
+   pir_code2 .= ".=\"\\\"\"\n.throw($S"
+   pir_code2 .= $S0
+   pir_code2 .= ")\n"  
 
-   pir_code .= "resume"
-   pir_code .= $S0
-   pir_code .= ":\n"
+   pir_code2 .= "resume"
+   pir_code2 .= $S0
+   pir_code2 .= ":\n"
    # return the code and the new register_num 
-   pir_code .= "done_command"
-   pir_code .= label_num
-   pir_code .= ":\n"
+   pir_code2 .= "done_command"
+   pir_code2 .= label_num
+   pir_code2 .= ":\n"
 
    unless inline_available goto done
 
@@ -244,9 +245,11 @@ elem_loop_done:
    printf_args = 1
    printf_args[0] = register_num
 
-   pir_code = sprintf pir_code, printf_args
+   $S1 = sprintf '$P%i=$P', printf_args
+   pir_code .= $S1
 
 done:
 
+  pir_code .= pir_code2
   .return (register_num,pir_code)
 .end
