@@ -1,20 +1,14 @@
-    .param pmc argv		# main is a pcc_sub, so we can use .param
+    .param pmc argv		# main is a sub, so we can use .param
     .sym string me
     me = argv[0]		# the filename of the calling prog
     .include "iterator.pasm"	# we need iterator constants
-    .sym Sub read
-    newsub read, .Sub, _read	# call _read(filename)
-    .pcc_begin
-    .arg me
-    .pcc_call read
-    ret:
-    .pcc_end
+    _read(me)
     end
 .end
 
 # utility to check if the program is already DWIMmed
 # returns (dwim, pos)
-.pcc_sub _check
+.sub _check
     .param PerlString pline
     .sym int dwim
     .sym int state
@@ -51,7 +45,7 @@ iter_end:
 .end
 
 # DWIM the source
-.pcc_sub _dwim1
+.sub _dwim1
     .param string me
     .param PerlArray ar
     #concat me, "x" 		# test output is in source.imcx
@@ -63,20 +57,12 @@ iter_end:
     iter = .ITERATE_FROM_START
     .sym int dwim
     .sym int pos
-    .sym Sub check
     .sym PerlString pline
-    newsub check, .Sub, _check
 iter_rep:
     unless iter goto iter_end
     shift pline, iter
     # print line
-    .pcc_begin
-    .arg pline
-    .pcc_call check
-    ret:
-    .result dwim
-    .result pos
-    .pcc_end
+    (dwim, pos) = _check(pline)
     if dwim goto do_dwim
     print file, pline		# print .lines directly
     goto iter_rep
@@ -138,7 +124,7 @@ err_write:
 .end
 
 # deDWIM a source file - lines in ar
-.pcc_sub _dwim2
+.sub _dwim2
     .param string me
     .param PerlArray ar
     .sym string r
@@ -206,15 +192,15 @@ iter_end:
     .local pmc code
     .local pmc interp
     compreg comp, "PIR"		# get a PIR compiler
-    compile code, comp, r	# compile source
+    code = comp(r)	# compile source
     getinterp interp		# setup argv for eval
     .include "iglobals.pasm"
-    set P5, interp[.IGLOBALS_ARGV_LIST]
-    invoke code			# run it and be done
+    set $P5, interp[.IGLOBALS_ARGV_LIST]
+    code($P5)			# run it and be done
     end
 .end
 
-.pcc_sub _read			# read in source code of script
+.sub _read			# read in source code of script
     .param string me
     .sym ParrotIO file
     open file, me, "<"
@@ -233,43 +219,21 @@ slurp:
     .sym Iterator iter
     iter = new Iterator, ar
     iter = .ITERATE_FROM_START
-    .sym int dwim
-    .sym Sub check
-    newsub check, .Sub, _check
+    .sym int dwim, pos
 iter_rep:			# run over array
     unless iter goto iter_end
     shift pline, iter
+    (dwim, pos) = _check(pline)
     # print line
-    .pcc_begin
-    .arg pline
-    .pcc_call check
-    ret:
-    .result dwim		# and check if source is DWIMmed
-    .pcc_end
     if dwim goto iter_end
     goto iter_rep
 iter_end:
     unless dwim goto ok
     if dwim == 2 goto dwim2	# then do either action
-    .sym Sub dwim1
-    newsub dwim1, .Sub, _dwim1
-    .pcc_begin
-    .arg me
-    .arg ar
-    .pcc_call dwim1
-    ret1:
-    .pcc_end
+    _dwim1(me, ar)
     goto ok
 dwim2:
-    .sym Sub dwim2
-    newsub dwim2, .Sub, _dwim2
-    .pcc_begin
-    .arg me
-    .arg ar
-    .pcc_call dwim2
-    ret2:
-    .pcc_end
-
+    _dwim2(me, ar)
     goto ok
 
 err_open:
@@ -285,7 +249,7 @@ Parrot::DWIM - Parrot's confusing opcodes made easy.
 
 =head1 SYNOPSIS
 
-    .pcc_sub _main
+    .sub _main
 	.include "DWIM.imc"
 	print "The answer is\n"
 	add $I0, 20, 23
@@ -304,7 +268,7 @@ your source file with the new DWIM comment: B<# DWIM> and runs normally.
 The code continues to work exactly as it did before, but
 now it looks like this:
 
-    .pcc_sub _main
+    .sub _main
 	.include "DWIM.imc"
        # DWIM  "The answer is\n"
        # DWIM  $I0, 20, 23

@@ -210,29 +210,20 @@ no_v3:
     prog = prog . preops
     prog = prog . "\nloop:\n"
     prog = prog . ops
-    prog = prog . "\ninc i\nlt i, N, loop\ninvoke P1\n.end\n"
+    prog = prog . "\ninc i\nlt i, N, loop\n.end\n"
     if verbose < 2 goto no_v2
 	print prog
 no_v2:
-    compile compiled, compiler, prog
+    compiled = compiler(prog)
     .local float now
     time now
     .local pmc entry
-    .local pmc retc
     find_global entry, entry_label
-    newsub retc, .RetContinuation, retl
-
-    .pcc_begin
-    .arg n
-    .pcc_call entry, retc
-    retl:
-    .pcc_end
+    entry(n)
     .local float later
     time later
     later = later - now
-    .pcc_begin_return
-    .return later
-    .pcc_end_return
+    .return(later)
 .end
 
 =head1 BUGS

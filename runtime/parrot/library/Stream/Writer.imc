@@ -13,7 +13,7 @@ version 0.1
     new stream, $I0
 
     # set the source sub
-    newsub temp, .Sub, _reader
+    .const .Sub temp = "_reader"
     stream."source"( temp )
 
     stream."write"( "hello, world" )
@@ -87,10 +87,9 @@ END:
 
 .sub __set_pmc method
     .param pmc source
-    .local pmc stub
     .local pmc status
 
-    newsub stub, .Sub, _reader_stub
+    .const .Sub stub = "_reader_stub"
     setprop stub, "CALL", source
     self."setSource"( stub )
 

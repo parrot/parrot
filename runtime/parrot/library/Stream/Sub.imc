@@ -13,7 +13,7 @@ version 0.1
     new stream, $I0
 
     # set the source sub
-    newsub temp, .Sub, _test
+    .const .Sub temp = "_test"
     stream."source"( temp )
 
     ...

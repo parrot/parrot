@@ -55,9 +55,8 @@ END:
 .namespace ["Stream::Combiner"]
 
 .sub __init method
-    .local pmc temp
 
-    newsub temp, .Sub, _default_combiner
+    .const .Sub temp = "_default_combiner"
     self."combiner"( temp )
 
     temp = new .ResizablePMCArray

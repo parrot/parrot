@@ -110,7 +110,7 @@ a Sub pmc, that gets called in order to dump the content of the given PMC
 
 For example:
 
-	newsub sub, .Sub, _dump_PerlArray
+	sub = find_name "_dump_PerlArray"
 	_register_dumper( .PerlArray, sub )
 
 This function returns nothing.
