@@ -30,9 +30,9 @@ efficient native machine language.
 Moreover, many programs in high-level languages consist of nested function
 and method calls, sometimes with lexical variables to hold intermediate
 results.  Under non-JIT settings, a stack-based VM will be popping and then
-pushing the same thing many times, a register-based VM will simply allocate the
-right amount of registers to hold intermediate values, which significantly
-reduces the total amount of operations.
+pushing the same operands many times, while a register-based VM will simply
+allocate the right amount of registers and operate on them, which can
+significantly reduce the amount of operations and CPU time.
 
 To be more specific about the software CPU, it will contain a large number of
 registers. The current design provides for four groups of N registers; each
