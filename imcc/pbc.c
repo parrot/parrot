@@ -712,6 +712,12 @@ add_const_pmc_sub(Interp *interpreter, SymReg *r,
     for (i = 0; i < 4; ++i)
         sub->n_regs_used[i] = unit->n_regs_used[i];
     /*
+     * XXX work around implict P5 usage in exception handling code
+     *     need at least 6 PMC regs
+     */
+    if (unit->has_push_eh && sub->n_regs_used[REGNO_PMC] < 6)
+        sub->n_regs_used[REGNO_PMC] = 6;
+    /*
      * check if it's declared multi
      */
     if (r->pcc_sub->nmulti)

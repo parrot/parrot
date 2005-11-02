@@ -16,7 +16,7 @@ Tests C<Exception> and C<Exception_Handler> PMCs.
 
 =cut
 
-use Parrot::Test tests => 25;
+use Parrot::Test tests => 26;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "push_eh - clear_eh");
@@ -496,4 +496,23 @@ CODE
 main
 foo
 back
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "register corruption - implicit P5");
+.sub main :main
+    null P0
+    null P1
+    null P2
+    null P3
+    I0 = 1
+    I1 = 2
+    push_eh coke
+    $P0 = global 'no coke'
+coke:
+    print_item I0
+    print_item I1
+    print_newline
+.end
+CODE
+1 2
 OUTPUT
