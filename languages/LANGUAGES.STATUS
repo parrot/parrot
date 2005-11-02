@@ -41,6 +41,7 @@ V: 0.3.0
 N: befunge
 A: Jerome Quelin
 D: Functioning -93 interpreter (input routines may be funky).
+S: Broken with recent deprecation of push[simp]/pop[simp]
 S: Samples working, README explain how to build/use.
 S: (waiting for Parrot objects for a befunge-98 version).
 M: Yes
