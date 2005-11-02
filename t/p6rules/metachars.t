@@ -107,8 +107,8 @@ p6rule_is  ("Pabc", '\Pabc', 'retired metachars (\P)');
 
 ## \L...\E, \U...\E, \Q...\E -- deprecated
 p6rule_is  ("LabcE", '\Labc\E', 'retired metachars (\L...\E)');
-p6rule_isnt("abc", '\UABC\E', 'retired metachars (\L...\E)');
-p6rule_is  ("UabcE", '\Labc\E', 'retired metachars (\U...\E)');
+p6rule_isnt("abc", '\LABC\E', 'retired metachars (\L...\E)');
+p6rule_is  ("UabcE", '\Uabc\E', 'retired metachars (\U...\E)');
 p6rule_isnt("ABC", '\Uabc\E', 'retired metachars (\U...\E)');
 p6rule_is  ("QabcE", '\Qabc\E', 'retired metachars (\Q...\E)');
 p6rule_isnt("abc d", '\Qabc d?\E', 'retired metachars (\Q...\E)');
@@ -122,18 +122,53 @@ p6rule_isnt("abc d", '\Qabc d?\E', 'retired metachars (\Q...\E)');
 ## TODO add tests here
 
 
-## \s -- match unicode whitespace
+## setup for unicode whitespace tests
 ## see http://www.unicode.org/Public/UNIDATA/PropList.txt for White_Space list
-p6rule_is  ("\x0009\x000a\x000b\x000c\x000d\x0020\x0085\x00a0", '\s+', 'unicode whitespace (\s)', todo => 'not yet implemented');
-SKIP: {
-	skip 'unicode support unavailable' => 2
-		unless defined $PConfig{HAS_ICU};
-p6rule_is  ("\x1680\x180e\x2000\x2001\x2002\x2003\x2004\x2005", '\s+', 'unicode whitespace (\s)', todo => 'not yet implemented');
-p6rule_is  ("\\x2006\x2007\x2008\x2009\x200ax2028\x2029\x202f\x205f\x3000", '\s+', 'unicode whitespace (\s)', todo => 'not yet implemented');
-}
+my $ws= {
+	horizontal_ascii => [qw/ \x0009 \x0020 \x00a0 /],
+	horizontal_unicode => [qw/
+		\x1680 \x180e \x2000 \x2001 \x2002 \x2003 \x2004 \x2005
+		\x2006 \x2007 \x2008 \x2009 \x200a \x202f \x205f \x3000
+	/],
+	vertical_ascii => [qw/ \x000a \x000b \x000c \x000d \x0085 /],
+	vertical_unicode => [qw/ \x2028 \x2029 /],
+};
 
+push @{ $ws->{horizontal} } =>
+	@{ $ws->{horizontal_ascii} }, @{ $ws->{horizontal_unicode} };
+
+push @{ $ws->{vertical} } =>
+	@{ $ws->{vertical_ascii} }, @{ $ws->{vertical_unicode} };
+
+push @{ $ws->{whitespace_ascii} } =>
+	@{ $ws->{horizontal_ascii} }, @{ $ws->{vertical_ascii} };
+
+push @{ $ws->{whitespace_unicode} } =>
+	@{ $ws->{horizontal_unicode} }, @{ $ws->{vertical_unicode} };
+
+push @{ $ws->{whitespace} } =>
+	@{ $ws->{whitespace_ascii} }, @{ $ws->{whitespace_unicode} };
+
+
+## \s -- match unicode whitespace
 ## \h and \H -- horizontal whitespace, including unicode
 ## \v and \V -- vertical whitespace, including unicode
+p6rule_is  (join('', @{$ws->{whitespace_ascii}}), '^ \s+ $', 'ascii whitespace (\s)', todo => 'not yet implemented');
+p6rule_is  (join('', @{$ws->{horizontal_ascii}}), '^ \h+ $', 'ascii horizontal whitespace (\h)', todo => 'not yet implemented');
+p6rule_is  (join('', @{$ws->{vertical_ascii}}), '^ \v+ $', 'ascii vertical whitespace (\v)', todo => 'not yet implemented');
+p6rule_isnt(join('', @{$ws->{vertical_ascii}}), '^ \h+ $', 'ascii horizontal whitespace (\h)');
+p6rule_isnt(join('', @{$ws->{horizontal_ascii}}), '^ \v+ $', 'ascii vertical whitespace (\v)');
+SKIP: {
+	skip 'unicode support unavailable' => 5
+		unless $PConfig{has_icu};
+p6rule_is  (join('', @{$ws->{whitespace_unicode}}), '^ \s+ $', 'unicode whitespace (\s)', todo => 'not yet implemented');
+p6rule_is  (join('', @{$ws->{horizontal_unicode}}), '^ \h+ $', 'unicode horizontal whitespace (\h)', todo => 'not yet implemented');
+p6rule_is  (join('', @{$ws->{vertical_unicode}}), '^ \v+ $', 'unicode vertical whitespace (\v)', todo => 'not yet implemented');
+p6rule_isnt(join('', @{$ws->{vertical_unicode}}), '^ \h+ $', 'unicode horizontal whitespace (\h)', todo => 'not yet implemented');
+p6rule_isnt(join('', @{$ws->{horizontal_unicode}}), '^ \v+ $', 'unicode vertical whitespace (\v)', todo => 'not yet implemented');
+}
+
+
 ## \t and \T -- tabs
 ## \r and \R -- returns
 ## \f and \F -- formfeed
@@ -142,4 +177,4 @@ p6rule_is  ("\\x2006\x2007\x2008\x2009\x200ax2028\x2029\x202f\x205f\x3000", '\s+
 
 
 ## remember to change the number of tests :-)
-BEGIN { plan tests => 67; }
+BEGIN { plan tests => 74; }
