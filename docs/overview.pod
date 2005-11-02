@@ -25,10 +25,14 @@ similar to Java's than the medium-level ops of Perl and Python and the like.
 
 The reasoning for this decision is primarily that by resembling the underlying
 hardware to some extent, it's possible to compile down Parrot bytecode to
-efficient native machine language. It also allows us to make use of the
-literature available on optimizing compilation for hardware CPUs, rather than
-the relatively slight volume of information on optimizing for macro-op based
-stack machines.
+efficient native machine language.
+
+Moreover, many programs in high-level languages consist of nested function
+and method calls, sometimes with lexical variables to hold intermediate
+results.  Under non-JIT settings, a stack-based VM will be popping and then
+pushing the same thing many times, a register-based VM will simply allocate the
+right amount of registers to hold intermediate values, which significantly
+reduces the total amount of operations.
 
 To be more specific about the software CPU, it will contain a large number of
 registers. The current design provides for four groups of N registers; each
