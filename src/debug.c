@@ -380,10 +380,6 @@ PDB_run_command(Interp *interpreter, const char *command)
         case c_print:
             /* PDB_print(interpreter, command);  XXX */
             break;
-        case c_s:
-        case c_stack:
-            /* PDB_print_stack(interpreter, command); XXX */
-            break;
         case c_n:
         case c_next:
             PDB_next(interpreter, command);
@@ -2099,176 +2095,6 @@ PDB_extend_const_table(Interp *interpreter)
     return k;
 }
 
-#if 0
-
-/* XXX TODO */
-
-/*
-
-=item C<void
-PDB_print_stack(Interp *interpreter, const char *command)>
-
-Print entries in the stack.
-
-=cut
-
-*/
-
-void
-PDB_print_stack(Interp *interpreter, const char *command)
-{
-    unsigned long c = 0;
-
-    /* Print from the user stack? */
-    if (!*command || isdigit((int) *command))
-        PDB_print_user_stack(interpreter, command);
-    else {
-        parse_command(command, &c);
-
-        switch (c) {
-            case c_i:
-            case c_int:
-                na(command);
-                PDB_print_stack_int(interpreter, command);
-                break;
-            case c_n:
-            case c_num:
-                na(command);
-                PDB_print_stack_num(interpreter, command);
-                break;
-            case c_s:
-            case c_str:
-                na(command);
-                PDB_print_stack_string(interpreter, command);
-                break;
-            case c_p:
-            case c_pmc:
-                na(command);
-                PDB_print_stack_pmc(interpreter, command);
-                break;
-            default:
-                PIO_eprintf(interpreter,
-                            "Unknown argument \"%s\" to 'stack'\n", command);
-                break;
-        }
-    }
-}
-
-/*
-
-=item C<void
-PDB_print_stack_int(Interp *interpreter, const char *command)>
-
-Print the integer register stack.
-
-=cut
-
-*/
-
-#define valid_chunk(interp, com, chunk, d, i) do { \
-    d = atol(com); \
-    PIO_eprintf(interp, "%s_ stack depth %li\n", chunk->name, d); \
-    i = stack_height(interp, chunk); \
-    if (d > i) { \
-        PIO_eprintf(interp, "There are only %li frames\n", i); \
-        return; \
-    } \
-    while (d--) \
-        chunk = chunk->prev; \
-} while (0)
-
-void
-PDB_print_stack_int(Interp *interpreter, const char *command)
-{
-    unsigned long depth = 0, i = 0;
-    Stack_Chunk_t *chunk = CONTEXT(interpreter->ctx)->int_reg_stack;
-
-    valid_chunk(interpreter, command, chunk, depth, i);
-
-    na(command);
-    PDB_print_int_frame(interpreter,
-                (struct IRegFrame*)STACK_DATAP(chunk),
-                atoi(command));
-}
-
-/*
-
-=item C<void
-PDB_print_stack_num(Interp *interpreter, const char *command)>
-
-Print the float register stack.
-
-=cut
-
-*/
-
-void
-PDB_print_stack_num(Interp *interpreter, const char *command)
-{
-    unsigned long depth = 0, i = 0;
-    Stack_Chunk_t *chunk = CONTEXT(interpreter->ctx)->num_reg_stack;
-
-    valid_chunk(interpreter, command, chunk, depth, i);
-
-    na(command);
-    PDB_print_num_frame(interpreter,
-                (struct NRegFrame*)STACK_DATAP(chunk),
-                atoi(command));
-}
-
-/*
-
-=item C<void
-PDB_print_stack_string(Interp *interpreter, const char *command)>
-
-Print the string register stack.
-
-=cut
-
-*/
-
-void
-PDB_print_stack_string(Interp *interpreter, const char *command)
-{
-    unsigned long depth = 0, i = 0;
-    Stack_Chunk_t *chunk = CONTEXT(interpreter->ctx)->string_reg_stack;
-
-    valid_chunk(interpreter, command, chunk, depth, i);
-
-    na(command);
-    PDB_print_string_frame(interpreter,
-                (struct SRegFrame*)STACK_DATAP(chunk),
-                atoi(command));
-}
-
-/*
-
-=item C<void
-PDB_print_stack_pmc(Interp *interpreter, const char *command)>
-
-Print the pmc register stack.
-
-=cut
-
-*/
-
-void
-PDB_print_stack_pmc(Interp *interpreter, const char *command)
-{
-    unsigned long depth = 0, i = 0;
-    Stack_Chunk_t *chunk = CONTEXT(interpreter->ctx)->pmc_reg_stack;
-
-    valid_chunk(interpreter, command, chunk, depth, i);
-
-    na(command);
-    PDB_print_pmc_frame(interpreter,
-                (struct PRegFrame*)STACK_DATAP(chunk),
-                atoi(command), NULL);
-}
-
-#undef valid_chunk
-
-#endif
 
 /*
 
@@ -2892,9 +2718,6 @@ This is the same as the information you get when running Parrot with\n\
 the -t option.\n");
             break;
         case c_print:
-            PIO_eprintf(interpreter,"No documentation yet");
-            break;
-        case c_stack:
             PIO_eprintf(interpreter,"No documentation yet");
             break;
         case c_info:

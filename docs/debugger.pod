@@ -346,43 +346,6 @@ Example:
    8 =
    # ... and so on
 
-
-=item stack (s)
-
-Examine the stack. The syntax is:
-
-  stack TYPE [NUM]
-  stack NUM
-
-The first form prints entries from the register stacks (eg.  results from
-C<push_i>, C<push_n>, C<push_s> and C<push_p>).  For the meaning of C<TYPE> see
-the C<print (p)> command.  The C<NUM> argument is the frame number (defaults to
-0).  The whole frame (0..31) is printed out.
-
-The second form prints a single entry (C<NUM>) from the generic stack (eg.
-results from C<save>), prepending the type of the entry on output.
-
-Example:
-
-  # prints the value on top of the generic stack
-  (pdb) s 0
-  Integer =             42
-
-  # prints the first integer register stack frame
-  (pdb) s i
-  Integer stack, frame 0, depth 0
-  Integer Registers:
-   0 =              0
-   1 =              0
-   2 =              0
-   3 =              0
-   4 =              0
-   5 =              0
-   6 =              0
-   7 =              0
-   8 =              0
-   # ... and so on
-
 =item info
 
 Print interpreter information.
