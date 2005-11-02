@@ -457,7 +457,6 @@ examples/assembly/pmcmops.pasm                    [main]doc
 examples/assembly/queens.pasm                     [main]doc
 examples/assembly/queens_r.imc                    [main]doc
 examples/assembly/stack.pasm                      [main]doc
-examples/assembly/substr.pasm                     [main]doc
 examples/assembly/thr-primes.imc                  [main]doc
 examples/assembly/trace.pasm                      [main]doc
 examples/assembly/uniq.pasm                       [main]doc
@@ -605,6 +604,7 @@ examples/pir/life.pir                             [main]doc
 examples/pir/local_label.pir                      [main]doc
 examples/pir/mandel.pir                           [main]doc
 examples/pir/readline.pir                         [main]doc
+examples/pir/substr.pir                           [main]doc
 examples/pir/sudoku.pir                           [main]doc
 examples/pni/PQt.C                                [main]doc
 examples/pni/QtHelloWorld.pasm                    [main]doc
