@@ -250,12 +250,6 @@ UNIMPLEMENTED_OPTION:
     end
 NO_UNIMPLEMENTED_OPTION:
 
-  # load shared lib
-  # There is a init-function in the shared lib,
-  # which registers the new compiler
-  .local pmc m4_eval_compiler_lib
-  m4_eval_compiler_lib = loadlib "m4_eval_compiler"
-
   # init of input structures, creates state['stack';'input']
   input_init( state )
 
