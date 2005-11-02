@@ -289,7 +289,6 @@ SP              [ ]
 "num"           return(FLOATV);
 "float"         return(FLOATV);
 "new"           return(NEW);
-"newsub"        return(NEWSUB);
 "addr"          return(ADDR);
 "global"        return(GLOBALOP);
 "object"        return(OBJECTV);

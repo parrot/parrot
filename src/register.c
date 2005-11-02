@@ -376,32 +376,8 @@ Parrot_alloc_context(Interp *interpreter, INTVAL *n_regs_used)
 {
     struct Parrot_Context *old, *ctx;
     void *ptr, *p;
-    int i, n, any, slot;
+    int i, n, slot;
     size_t to_alloc, reg_alloc, size_n, size_nip;
-
-    /*
-     * XXX Subs constructed via newsub don't have regs_used
-     */
-    any = 0;
-    if (n_regs_used[REGNO_PMC])
-        any = 1;
-    else
-        if (n_regs_used[REGNO_INT])
-            any = 1;
-        else
-            if (n_regs_used[REGNO_NUM])
-                any = 1;
-            else
-                if (n_regs_used[REGNO_STR])
-                    any = 1;
-
-    if (!any) {
-        n_regs_used[REGNO_NUM] =
-            n_regs_used[REGNO_INT] =
-            n_regs_used[REGNO_PMC] =
-            n_regs_used[REGNO_STR] = 32;
-    }
-    /* XXX end of workaround */
 
     size_n = sizeof(FLOATVAL) * n_regs_used[REGNO_NUM];
     size_nip = size_n +

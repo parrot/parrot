@@ -21,11 +21,11 @@ Examples for parameter passing.
 
 =cut
 
-    # Create a subroutine
-    newsub P0, .Sub, _sub
+    # Fetch a subroutine objec
+    .const .Sub P0 = "_sub"
 
-    # Call the sub in argument, create and invoke return continuation 
-    invokecc P0 
+    # Call the sub in argument, create return continuation
+    invokecc P0
 
     # got here, because the sub invoked the return continuation
     print "Hello from main\n"
@@ -33,7 +33,7 @@ Examples for parameter passing.
     end
 
 # A subroutine
-_sub:
+.pcc_sub _sub:
     print "Hello from subroutine\n"
 
     # Call the return continuation

@@ -577,20 +577,9 @@ inline op get_addr(out INT, in PMC) {
   goto NEXT();
 }
 
-=item B<newsub>(out PMC, in INT, labelconst INT)
-
-Generate a new subroutine object in $1 of class $2 and label $3.
-
 =cut
 
-inline op newsub(out PMC, in INT, labelconst INT) {
-  if ($2 <= 0 || $2 >= enum_class_max) {
-    internal_exception(1, "Illegal PMC enum (%d) in newsub", (int)$2);
-    abort(); /* Deserve to lose */
-  }
-  $1 = pmc_new_noinit(interpreter, $2);
-  $1->vtable->init(interpreter, $1);
-  VTABLE_set_pointer(interpreter, $1, (CUR_OPCODE + $3));
+op DELETED_newsub(out PMC, in INT, labelconst INT) {
   goto NEXT();
 }
 

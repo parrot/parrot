@@ -138,8 +138,7 @@ find_basic_blocks (Parrot_Interp interpreter, IMC_Unit * unit, int first)
              *
              * ignore set_addr - no new basic block
              */
-            if (!strcmp(ins->op, "bsr") || !strcmp(ins->op, "set_addr") ||
-                    !strcmp(ins->op, "newsub")) {
+            if (!strcmp(ins->op, "bsr") || !strcmp(ins->op, "set_addr")) {
                 char *name = ins->r[0]->name;
                 SymReg *r = get_sym(name);
                 if (*ins->op == 'b') {  /* bsr */
@@ -163,7 +162,7 @@ find_basic_blocks (Parrot_Interp interpreter, IMC_Unit * unit, int first)
                     }
                 }
                 else {
-                    /* don't treat set_addr/newsub as jump source */
+                    /* don't treat set_addr as jump source */
                     found = 0;
                 }
             }
@@ -182,25 +181,12 @@ find_basic_blocks (Parrot_Interp interpreter, IMC_Unit * unit, int first)
 }
 
 static void
-bb_check_newsub(Parrot_Interp interpreter, IMC_Unit * unit,
+bb_check_set_addr(Parrot_Interp interpreter, IMC_Unit * unit,
         Basic_block *bb, SymReg *label)
 {
     Instruction *ins;
     for (ins = unit->instructions; ins; ins = ins->next) {
-            if (ins->opnum == PARROT_OP_newsub_p_ic_ic &&
-                    !strcmp(label->name, ins->r[2]->name)) {
-                IMCC_debug(interpreter, DEBUG_CFG, "newsub %s\n",
-                        ins->r[2]->name);
-                /*
-                 * connect this block with first and last block
-                 */
-                bb_add_edge(unit, unit->bb_list[0], bb);
-                bb_add_edge(unit, unit->bb_list[unit->n_basic_blocks - 1], bb);
-                /* and mark the instruction as being kind of a branch */
-                bb->start->type |= ITADDR;
-                break;
-            }
-            else if (ins->opnum == PARROT_OP_set_addr_p_ic &&
+             if (ins->opnum == PARROT_OP_set_addr_p_ic &&
                     !strcmp(label->name, ins->r[1]->name)) {
                 IMCC_debug(interpreter, DEBUG_CFG, "set_addr %s\n",
                         ins->r[1]->name);
@@ -234,9 +220,9 @@ build_cfg(Parrot_Interp interpreter, IMC_Unit * unit)
         /* if the block can fall-through */
         if (i > 0 && ! (last->end->type & IF_goto) )
             bb_add_edge(unit, last, bb);
-        /* check first ins, if label try to find a newsub op */
+        /* check first ins, if label try to find a set_addr op */
         if (bb->start->type & ITLABEL) {
-            bb_check_newsub(interpreter, unit, bb, bb->start->r[0]);
+            bb_check_set_addr(interpreter, unit, bb, bb->start->r[0]);
         }
         /* look if last instruction is a branch */
         addr = get_branch_reg(bb->end);
@@ -830,7 +816,7 @@ compute_dominators (Parrot_Interp interpreter, IMC_Unit * unit)
 #endif
 }
 
-/* Algorithm to find dominance frontiers described in paper 
+/* Algorithm to find dominance frontiers described in paper
  * "A Simple, Fast Dominance Algorithm", Cooper et al. (2001)
  */
 void
@@ -871,7 +857,7 @@ compute_dominance_frontiers (Parrot_Interp interpreter, IMC_Unit * unit)
             }
         }
     }
-        
+
     if (IMCC_INFO(interpreter)->debug & DEBUG_CFG)
         dump_dominance_frontiers(unit);
 }
