@@ -96,13 +96,20 @@ p6rule_isnt("\n", '\n $$', 'line beginnings and endings ($$)');
 
 
 ## &
-## TODO add tests here
+p6rule_is  ("c", '[a..d] & [b..e]', 'conjunction (&)', todo => 'not yet implemented');
+p6rule_isnt("c", '[a..d] & [d..e]', 'conjunction (&)');
+p6rule_isnt("c", '[a..b] & [b..e]', 'conjunction (&)');
+p6rule_is  ("bcd", '[a..d]+ & [b..e]+', 'conjunction (&)', todo => 'not yet implemented');
+p6rule_is  ("bcd", '^ [a..d]+ & [b..e]+ $', 'conjunction (&)', todo => 'not yet implemented');
+p6rule_isnt("bcd", '[a..c]+ & [b..e]+', 'conjunction (&)');
+p6rule_isnt("bcd", '[a..d]+ & [c..e]+', 'conjunction (&)');
 
 
 ## \p and \P -- deprecated
 p6rule_is  ("pabc", '\pabc', 'retired metachars (\p)');
+p6rule_isnt("a", '\p{InConsonant}', 'retired metachars (\p)');
 p6rule_is  ("Pabc", '\Pabc', 'retired metachars (\P)');
-## TODO add \p and \P tests here
+p6rule_isnt("a", '\P{InConsonant}', 'retired metachars (\P)');
 
 
 ## \L...\E, \U...\E, \Q...\E -- deprecated
@@ -115,11 +122,11 @@ p6rule_isnt("abc d", '\Qabc d?\E', 'retired metachars (\Q...\E)');
 
 
 ## \G -- deprecated
-## TODO add tests here
+p6rule_is  ("Gabc", '\Gabc', 'retired metachars (\G)');
 
 
 ## \1 -- backreferences deprecated
-## TODO add tests here
+p6rule_is  ("1abc", '\1abc', 'retired metachars (\1)');
 
 
 ## setup for unicode whitespace tests
@@ -255,4 +262,4 @@ p6rule_is  ('abcdef', 'a \X0021+ f', 'not hex (\X)', todo => 'not yet implemente
 
 
 ## remember to change the number of tests :-)
-BEGIN { plan tests => 144; }
+BEGIN { plan tests => 155; }
