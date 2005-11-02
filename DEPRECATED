@@ -2,14 +2,7 @@
 
 =over 4
 
-=item newsub Pdest, IType, ILabel
-
-C<newsub> creates a subroutine object just from a label. The
-Sub object is lacking necessary meta information like name, length,
-MMD-info, and more.
-
-Use: find_name, find_global, or Sub constants instead.
-See F<docs/compiler_faq.pod> for detailed examples.
+All are gone. Please read the history of this file for more.
 
 =back
 
