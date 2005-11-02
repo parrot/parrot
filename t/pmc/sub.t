@@ -17,7 +17,7 @@ C<Continuation> PMCs.
 
 =cut
 
-use Parrot::Test tests => 46;
+use Parrot::Test tests => 42;
 use Test::More;
 use Parrot::Config;
 
@@ -27,24 +27,8 @@ END {
     unlink($temp, 'temp.pbc');
 };
 
-output_is(<<'CODE', <<'OUTPUT', "PASM subs - newsub 2");
-    print "main\n"
-    newsub P0, .Sub, _func
-    invokecc P0
-    print "back\n"
-    end
-_func:
-    print "func\n"
-    returncc
-CODE
-main
-func
-back
-OUTPUT
-
 output_is(<<'CODE', <<'OUTPUT', "PASM subs - invokecc");
-    new P0, .Sub
-    set_addr P0, func
+    .const .Sub P0 = "func"
 
     set I5, 3
     set_args "(0)", I5
@@ -53,7 +37,7 @@ output_is(<<'CODE', <<'OUTPUT', "PASM subs - invokecc");
     print "\n"
     end
 
-func:
+.pcc_sub func:
     get_params "(0)", I5
     print I5
     print "\n"
@@ -139,8 +123,7 @@ output_is(<<'CODE', <<'OUTPUT', "PASM sub as closure");
     # print &$f(3), "\n";
 main:
 
-    new P0, .Sub
-    set_addr P0, foo
+    .const .Sub P0 = "foo"
 
     new P5, .Integer
     set P5, 5
@@ -173,17 +156,17 @@ main:
 
 # foo takes a number n (P5) and returns a sub (in P5) that takes
 # a number i (P5) and returns n incremented by i.
-foo:
+.pcc_sub foo:
     get_params "(0)", P5
     new_pad 0
     store_lex 0, "n", P5
-    new P5, .Closure	# P5 has now the lexical "n" in the pad
-    set_addr P5, f
+    .const .Sub P5 = "f"
+    newclosure P5, P5	# P5 has now the lexical "n" in the pad
     set_returns "(0)", P5
     returncc		# ret
 
 # expects arg in P5, returns incremented result in P5
-f:
+.pcc_sub f:
     get_params "(0)", P5
     find_lex P2, "n"	# invoke-ing the Sub pushes the lexical pad
     			# of the closure on the pad stack
@@ -199,58 +182,6 @@ CODE
 14
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "PASM subs - tail invoke");
-    new P0, .Sub
-    set_addr P0, func1
-
-    invokecc P0
-    print "done\n"
-    end
-
-func1:
-    print "in func1\n"
-
-    new P0, .Sub
-    set_addr P0, func2
-
-    tailcall P0
-    print "this should not be called\n"
-    end
-
-func2:
-    print "in func2\n"
-    returncc
-
-CODE
-in func1
-in func2
-done
-OUTPUT
-
-output_is(<<'CODE', <<'OUTPUT', "PASM subs - tail invoke with newsub");
-    newsub P0, .Sub, func1
-
-    invokecc P0
-    print "done\n"
-    end
-
-func1:
-    print "in func1\n"
-
-    newsub P0, .Sub, func2
-
-    tailcall P0
-    print "this should not be called\n"
-
-func2:
-    print "in func2\n"
-    returncc
-
-CODE
-in func1
-in func2
-done
-OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "pcc sub");
     find_global P0, "_the_sub"
@@ -956,28 +887,6 @@ the_sub
 main
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "sub names w newsub");
-.sub main :main
-    .include "interpinfo.pasm"
-    $P0 = interpinfo .INTERPINFO_CURRENT_SUB
-    print $P0
-    foo()
-    print "\n"
-.end
-.sub foo
-    $P0 = interpinfo .INTERPINFO_CURRENT_SUB
-    print $P0
-   bar()
-    $P0 = interpinfo .INTERPINFO_CURRENT_SUB
-    print $P0
-.end
-.sub bar
-    $P0 = interpinfo .INTERPINFO_CURRENT_SUB
-    print $P0
-.end
-CODE
-mainfoobarfoo
-OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "caller introspection");
 .sub main :main

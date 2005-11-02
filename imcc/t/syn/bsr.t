@@ -260,13 +260,10 @@ OUT
 # coroutine
 pir_output_is(<<'CODE', <<'OUT', "coroutine");
 .sub test :main
-    .local Coroutine co
-    co = new Coroutine
-    co = addr _routine
     print "Hello"
-    invokecc co
+    _routine()
     print "perl6"
-    invokecc co
+    _routine()
     print "\n"
     end
 .end

@@ -163,7 +163,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "bug #31467");
 
   .sub main :main
      $P1 = new Hash
-     newsub $P0, .Sub, _builtin
+     $P0 = find_name "_builtin"
      $P1['builtin'] = $P0
 
      $P2 = compreg "PIR"

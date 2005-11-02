@@ -434,7 +434,7 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "check whether interface is done");
     .local pmc pmc1
     pmc1 = new Coroutine
     .local int bool1
-    does bool1, pmc1, "scalar"
+    does bool1, pmc1, "scalar"      # XXX WTF
     print bool1
     print "\n"
     does bool1, pmc1, "no_interface"
@@ -450,9 +450,8 @@ OUTPUT
 pir_output_is(<<'CODE', <<'OUTPUT', "re-entering coro from another sub");
 
 .sub main :main
-    .local pmc corou
     .local int z
-    newsub corou, .Coroutine, _coroufn
+    .const .Sub corou = "_coroufn"
     corou("from main")
     z = 0
   loop:
