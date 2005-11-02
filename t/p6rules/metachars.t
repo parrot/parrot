@@ -238,7 +238,21 @@ p6rule_is  ('abcdef', 'a \E+ f', 'not escape (\E)', todo => 'not yet implemented
 
 
 ## \x and \X -- hex characters
+p6rule_is  ("abc!def", 'c \x0021 d', 'hex (\x)', todo => 'not yet implemented');
+p6rule_is  ("abc\x0021def", 'c \x0021 d', 'hex (\x)', todo => 'not yet implemented');
+p6rule_is  ("abc\033def", 'c \x0021 d', 'hex (\x)', todo => 'not yet implemented');
+p6rule_is  ("abc!!def", 'c \x0021+ d', 'hex (\x)', todo => 'not yet implemented');
+p6rule_isnt('abcdef', 'a \x0021+ f', 'hex (\x)');
+p6rule_isnt('abc!def', 'b \x0021 c', 'hex (\x)');
+p6rule_is  ("a", '\X0021', 'not hex (\X)', todo => 'not yet implemented');
+p6rule_is  ("abc", 'a \X0021 c', 'not hex (\X)', todo => 'not yet implemented');
+p6rule_isnt("", '\X0021', 'not hex (\X)');
+p6rule_isnt("abc!def", 'c \X0021 d', 'not hex (\X)');
+p6rule_isnt('abc\o33def', 'c \X0021 d', 'not hex (\X)');
+p6rule_isnt('abc\x0021def', 'c \X0021 d', 'not hex (\X)');
+p6rule_isnt("abc!!def", 'c \X0021+ d', 'not hex (\X)');
+p6rule_is  ('abcdef', 'a \X0021+ f', 'not hex (\X)', todo => 'not yet implemented');
 
 
 ## remember to change the number of tests :-)
-BEGIN { plan tests => 130; }
+BEGIN { plan tests => 144; }
