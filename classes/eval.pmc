@@ -119,6 +119,20 @@ pmclass Eval extends Closure need_ext {
         PObj_custom_mark_destroy_SETALL(SELF);
         sub_data->seg = NULL;
     }
+/*
+
+=item C<void *invoke(void *next)>
+
+Invokes the first subroutine in the eval code.
+
+=cut
+
+*/
+
+    void* invoke(void *next) {
+        PMC *sub = SELF.get_pmc_keyed_int(0);
+        return VTABLE_invoke(INTERP, sub, next);
+    }
 
     void destroy() {
         /*
@@ -210,12 +224,12 @@ for writing to disc and later loading via C<load_bytecode>.
          *   of the code, which isn't really the same
          * Therefore align code at 16, which should give the desired
          * effect
-         */    
+         */
         aligned_size = size + 15;
         res = string_make_empty(INTERP, enum_stringrep_one, aligned_size);
         res->strlen = res->bufused = size;
         if ((size_t)res->strstart & 0xf) {
-            LVALUE_CAST(char*,res->strstart) += 
+            LVALUE_CAST(char*,res->strstart) +=
                 16 - ((size_t)res->strstart & 0xf);
         }
         PackFile_pack(INTERP, pf, res->strstart);
@@ -231,7 +245,7 @@ for writing to disc and later loading via C<load_bytecode>.
 
 =item C<PMC *get_pmc_keyed_int(INTVAL key)>
 
-Returns the Sub PMC of the element at index C<key> or PMCNULL. 
+Returns the Sub PMC of the element at index C<key> or PMCNULL.
 
 =cut
 
