@@ -85,8 +85,7 @@ static eval_error          exp_term( eval_token, eval_t * );
 static eval_error          unary_term( eval_token, eval_t * );
 static eval_error          simple_term( eval_token, eval_t * );
 boolean_for_m4             evaluate (const char *, eval_t *);
-PMC *                      compile_m4_arithmetic_expression(Parrot_Interp, const char *);
-void                       Parrot_lib_m4_eval_compiler_init(Parrot_Interp , PMC* );
+int                        m4_evaluate(void *);
 
 /*--------------------.
 | Lexical functions.  |
@@ -792,14 +791,6 @@ $ make -C examples/compilers/
  * we use init to register the compiler
  */
 
-void
-Parrot_lib_m4_eval_compiler_init(Parrot_Interp interp, PMC* lib)
-{
-    STRING *m4_eval_compiler = const_string(interp, "m4_eval_compiler");
-    Parrot_compreg(interp, m4_eval_compiler, compile_m4_arithmetic_expression);
-}
-
-
 static int
 unescape(char *string)
 {
@@ -825,102 +816,18 @@ unescape(char *string)
 
 
 /*
- * This one is actually generating PBC.
- * First the aritmetic expression is evaluated.
- * Then we generaten a sub, that does nothing but return the result of the evaluation.
- * I suppose that is cheating in a confuse way.
+ * This one is called from PIR using NCI with the signature 'it'.
  */
-PMC *
-compile_m4_arithmetic_expression( Parrot_Interp interp, const char *program )
+int 
+m4_evaluate( void *program )
 {
     eval_t value;                        /* will be returned to caller */
-    struct PackFile_ByteCode *new_cs;    /* generated PBC goes there */
-    struct PackFile_ByteCode *old_cs;    /* Continue there, when new_cs is finished */
-    opcode_t* program_counter;
-    PMC *sub;
-    parrot_sub_t sub_data;
-    char name[64];
 
     /*
      * The real work is done here
      */
-    evaluate( program, &value );
+    evaluate( (const char *)program, &value );
 
-    /* This is from ast/ast_main.c
-     * What does this do?
-     */
-    /*
-    if (interp->imc_info->last_unit) {
-        imc_info = mem_sys_allocate_zeroed(sizeof(imc_info_t));
-        imc_info->ghash = interp->imc_info->ghash;
-        imc_info->prev = interp->imc_info;
-        interp->imc_info = imc_info;
-    }
-    */
-
-    /* m4_eval_compiler always compiles to interp->code->cur_cs
-     * make new, switch and save old cs
-     */
-    sprintf(name, "EVAL_" INTVAL_FMT, ++interp->code->base.pf->eval_nr);
-    new_cs = PF_create_default_segs(interp, name, 0);
-    old_cs = Parrot_switch_to_cs(interp, new_cs, 0);
-    /* TODO gcc complains interp->imc_info->cur_namespace = NULL: */
-
-    /*
-     * need a packfile segment
-     */
-    /*
-     * alloc byte code mem
-     */
-    new_cs->base.data = mem_sys_allocate(CODE_SIZE * sizeof(opcode_t));
-    new_cs->base.size = CODE_SIZE;
-
-    /*
-     * Generate some bytecode
-     * This is actually simulating the now obsolete calling conventions.
-     * TODO: Let the PIR-compiler generate the PBC
-     */
-    program_counter = new_cs->base.data;
-    /* set the single integer return value */
-    *program_counter++ = interp->op_lib->op_code("set_i_ic", 1);
-    *program_counter++ = 5;
-    *program_counter++ = value;
-    /* promise to fill in the counters */
-    *program_counter++ = interp->op_lib->op_code("set_i_ic", 1);
-    *program_counter++ = 0;
-    *program_counter++ = 1;
-    /* one integer return value */
-    *program_counter++ = interp->op_lib->op_code("set_i_ic", 1);
-    *program_counter++ = 1;
-    *program_counter++ = 1;
-    /* no string return values */
-    *program_counter++ = interp->op_lib->op_code("set_i_ic", 1);
-    *program_counter++ = 2;
-    *program_counter++ = 0;
-    /* no PMC return values */
-    *program_counter++ = interp->op_lib->op_code("set_i_ic", 1);
-    *program_counter++ = 3;
-    *program_counter++ = 0;
-    /* no numeric return values */
-    *program_counter++ = interp->op_lib->op_code("set_i_ic", 1);
-    *program_counter++ = 4;
-    *program_counter++ = 0;
-    /* invoke the return continuation */
-    *program_counter++ = interp->op_lib->op_code("returncc", 1);
-
-    if (old_cs) {
-        /* restore old byte_code, */
-        (void)Parrot_switch_to_cs(interp, old_cs, 0);
-    }
-    /*
-     * create sub PMC
-     */
-    sub = pmc_new(interp, enum_class_Eval);
-    sub_data = PMC_sub(sub);
-    sub_data->seg = new_cs;
-    sub_data->address = new_cs->base.data;
-    sub_data->end = new_cs->base.data + new_cs->base.size;
-    sub_data->name = string_from_cstring(interp, "m4 eval", 0);
-
-    return sub;
+    return value;
 }
+

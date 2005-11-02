@@ -252,7 +252,6 @@ my @funcnames = qw(
 	Parrot_make_COW_reference
 	Parrot_switch_to_cs
 	PackFile_Segment_new_seg
-	PF_create_default_segs
 );
 push @funcnames, "PMCNULL	DATA";
 push @funcnames, "Parrot_base_vtables	DATA";

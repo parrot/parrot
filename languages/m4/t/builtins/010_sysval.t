@@ -7,14 +7,14 @@ use lib "$FindBin::Bin/../../lib", "$FindBin::Bin/../../../../lib";
 use Parrot::Config;
 use Parrot::Test tests => 1 + 1;
 
-my $true  = "$PConfig{perl} -e exit(0)";
-my $false = "$PConfig{perl} -e exit(1)";
+my $true  = qq{$PConfig{perl} -e "exit(0)"};
+my $false = qq{$PConfig{perl} -e "exit(1)"};
 
 SKIP:
 {
   skip( "difference between running a process in a fork, or with system()", 1 );
-  language_output_is( 'm4', <<'CODE', <<'OUT', 'output of "false"' );
-syscmd(`$false`)
+  language_output_is( 'm4', <<"CODE", <<'OUT', 'output of "false"' );
+syscmd(`$false')
 sysval()
 CODE
 
@@ -23,8 +23,8 @@ OUT
 }
 
 {
-  language_output_is( 'm4', <<'CODE', <<'OUT', 'output of "true"' );
-syscmd(`$true`)
+  language_output_is( 'm4', <<"CODE", <<'OUT', 'output of "true"' );
+syscmd(`$true')
 sysval()
 CODE
 

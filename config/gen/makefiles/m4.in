@@ -23,7 +23,7 @@ LD_SHARE_FLAGS = ${ld_share_flags} # e.g. -shared
 #INVERSE_CONDITIONED_LINE(parrot_exe_def):LIBPARROT      =
 
 # some constants
-M4_EVAL_COMPILER_SO = ..${slash}..${slash}runtime${slash}parrot${slash}dynext${slash}m4_eval_compiler${share_ext}
+M4_EVALUATE_SO = ..${slash}..${slash}runtime${slash}parrot${slash}dynext${slash}m4_evaluate${share_ext}
 #CONDITIONED_LINE(has_gnu_m4):USE_GNU_M4 = --use-gnu-m4
 #INVERSE_CONDITIONED_LINE(has_gnu_m4):USE_GNU_M4 = 
 
@@ -51,12 +51,12 @@ help:
 test: build
 	cd .. && $(PERL) -I../lib m4/t/harness $(USE_GNU_M4)
 
-build: $(M4_EVAL_COMPILER_SO) m4.pbc 
+build: $(M4_EVALUATE_SO) m4.pbc 
 
 m4.pbc: src/m4.pir
 	$(PARROT) -o m4.pbc src/m4.pir 
 
-$(M4_EVAL_COMPILER_SO): src/eval.c
+$(M4_EVALUATE_SO): src/eval.c
 	$(CC) $(CFLAGS) $(CC_SHARED) $(DEBUG) $(WARN) -c src/eval.c
 	$(LD) $(LD_SHARE_FLAGS) $(LDFLAGS) ${ld_out}$@ eval$(O) $(LIBPARROT)
 
@@ -79,7 +79,7 @@ t/*/*.parrot_out \
 t/*/*.gnu_out \
 t/*/*.imc \
 t/*/*.pir \
-$(M4_EVAL_COMPILER_SO) 
+$(M4_EVALUATE_SO) 
 
 realclean: clean
 	$(RM_RF) Makefile

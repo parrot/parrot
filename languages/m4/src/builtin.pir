@@ -7,7 +7,7 @@ builtin.pir - builtin and user defined macros
 =head2 DESCRIPTION
 
 Copyright:  2004 Bernhard Schmalhofer.  All Rights Reserved.
-CVS Info:   $Id$
+SVN Info:   $Id$
 History:    Ported from GNU m4 1.4
 References: http://www.gnu.org/software/m4/m4.html
 
@@ -576,17 +576,17 @@ Integer arithmetics.
   .param pmc state
   .param pmc arguments
 
-  # get compiler
-  .local pmc m4_eval_compiler
-  m4_eval_compiler = compreg "m4_eval_compiler"
+  # load shared library
+  .local pmc m4_evaluate_lib
+  m4_evaluate_lib = loadlib "m4_evaluate"
 
   # compile code and run it
   .local string expression
   expression = arguments[0]
-  .local pmc compiled_code
-  compiled_code = compile m4_eval_compiler, expression
   .local int evaluated_expression
-  ( evaluated_expression ) = compiled_code()
+  .local pmc m4_evaluate
+  m4_evaluate = dlfunc m4_evaluate_lib, "m4_evaluate", "it"
+  ( evaluated_expression ) = m4_evaluate( expression )
   .local string ret
   ret = evaluated_expression
 
