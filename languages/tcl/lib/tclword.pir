@@ -1,12 +1,10 @@
-=head1 TclWord
-
-=cut
+.include "languages/tcl/lib/returncodes.pir"
 
 .namespace [ "TclWord" ]
 
 .HLL "Tcl", "tcl_group"
 
-.include "languages/tcl/lib/returncodes.pir"
+.cloneable()
 
 =head1 Methods
 
@@ -83,12 +81,3 @@ concat_loop_done:
   .return(register_num,pir_code)
 
 .end
-
-.sub __clone :method
-  .local pmc obj
-  $I0 = typeof self
-  obj = new $I0
-  obj = self
-  .return(obj)
-.end
-

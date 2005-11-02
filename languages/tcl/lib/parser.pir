@@ -113,7 +113,13 @@ use by the generated PIR.
 .sub pir_compiler
   .param int result_reg
   .param string pir_code
-  .param int code_only :optional
+  .param int code_only     :optional
+  .param int has_code_only :opt_flag
+
+  if has_code_only goto done_init
+  code_only = 0
+
+done_init:
 
   .local pmc compiled_num
   compiled_num = find_global "_Tcl", "compiled_num"

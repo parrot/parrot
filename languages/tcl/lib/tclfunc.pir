@@ -1,8 +1,10 @@
+.include "languages/tcl/lib/returncodes.pir"
+
 .namespace [ "TclFunc" ]
 
 .HLL "Tcl", "tcl_group"
 
-.include "languages/tcl/lib/returncodes.pir"
+.cloneable()
 
 # functions
  .const int FUNCTION_ABS    = 53
@@ -176,12 +178,3 @@ done_all:
   .return(register_num,pir_code)
 
 .end
-
-.sub __clone :method
-  .local pmc obj
-  $I0 = typeof self
-  obj = new $I0
-  obj = self
-  .return(obj)
-.end
-

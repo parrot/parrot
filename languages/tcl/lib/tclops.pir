@@ -1,8 +1,10 @@
+.include "languages/tcl/lib/returncodes.pir"
+
 .namespace [ "TclUnaryOp" ]
 
 .HLL "Tcl", "tcl_group"
 
-.include "languages/tcl/lib/returncodes.pir"
+.cloneable()
  
 =head2 __class_init
 
@@ -82,12 +84,3 @@ done:
   .return(register_num, pir_code)
 
 .end
-
-.sub __clone :method
-  .local pmc obj
-  $I0 = typeof self
-  obj = new $I0
-  obj = self
-  .return(obj)
-.end
-

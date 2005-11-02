@@ -76,3 +76,16 @@ of sorts to the exceptions.
   e[VALUE_SLOT] = .value
   throw e
 .endm
+
+# Utility methods: the implementation of these never change:
+# define them once and just include them.
+
+.macro cloneable ()
+.sub __clone :method
+  .sym pmc obj
+  $I0 = typeof self
+  obj = new $I0
+  obj = self
+  .return(obj)
+.end
+.endm

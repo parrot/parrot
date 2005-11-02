@@ -1,8 +1,10 @@
+.include "languages/tcl/lib/returncodes.pir"
+
 .namespace [ "TclVar" ]
 
 .HLL "Tcl", "tcl_group"
 
-.include "languages/tcl/lib/returncodes.pir"
+.cloneable()
 
 =head2 __class_init
 
@@ -33,12 +35,3 @@ Define the attributes required for the class.
  
     .return (register_num,pir_code)
 .end
-
-.sub __clone :method
-  .local pmc obj
-  $I0 = typeof self
-  obj = new $I0
-  obj = self
-  .return(obj)
-.end
-

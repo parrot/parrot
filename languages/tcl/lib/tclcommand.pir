@@ -1,8 +1,10 @@
+.include "languages/tcl/lib/returncodes.pir"
+
 .namespace [ "TclCommand" ]
 
 .HLL "Tcl", "tcl_group"
 
-.include "languages/tcl/lib/returncodes.pir"
+.cloneable()
 
 =head2 __class_init
 
@@ -16,25 +18,6 @@ Define the attributes required for the class.
   addattribute $P1, "name"
 .end
 
-=head2 __init
-
-Initialize the attributes for an instance of the class
-
-=cut
-
-.sub __init :method
-  #$P0 = new .TclString
-  #setattribute self, "TclCommand\x00name", $P0
-.end
-
-
-.sub __clone :method
-  .local pmc obj
-  $I0 = typeof self
-  obj = new $I0
-  obj = self
-  .return(obj)
-.end
 
 
 =head2 interpret

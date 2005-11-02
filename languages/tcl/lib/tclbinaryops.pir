@@ -1,8 +1,10 @@
+.include "languages/tcl/lib/returncodes.pir"
+
 .namespace [ "TclBinaryOp" ]
 
 .HLL "Tcl", "tcl_group"
 
-.include "languages/tcl/lib/returncodes.pir"
+.cloneable()
 
   .const int OPERATOR_AND    = 26
   .const int OPERATOR_OR     = 27
@@ -111,14 +113,6 @@ Initialize the attributes for an instance of the class
   setattribute self, "TclBinaryOp\x00l_operand", $P0
   $P0 = new .TclInt
   setattribute self, "TclBinaryOp\x00r_operand", $P0
-.end
-
-.sub __clone :method
-  .local pmc obj
-  $I0 = typeof self
-  obj = new $I0
-  obj = self
-  .return(obj)
 .end
 
 .sub compile :method
