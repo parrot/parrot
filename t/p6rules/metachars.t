@@ -164,17 +164,81 @@ SKIP: {
 p6rule_is  (join('', @{$ws->{whitespace_unicode}}), '^ \s+ $', 'unicode whitespace (\s)', todo => 'not yet implemented');
 p6rule_is  (join('', @{$ws->{horizontal_unicode}}), '^ \h+ $', 'unicode horizontal whitespace (\h)', todo => 'not yet implemented');
 p6rule_is  (join('', @{$ws->{vertical_unicode}}), '^ \v+ $', 'unicode vertical whitespace (\v)', todo => 'not yet implemented');
-p6rule_isnt(join('', @{$ws->{vertical_unicode}}), '^ \h+ $', 'unicode horizontal whitespace (\h)', todo => 'not yet implemented');
-p6rule_isnt(join('', @{$ws->{horizontal_unicode}}), '^ \v+ $', 'unicode vertical whitespace (\v)', todo => 'not yet implemented');
+p6rule_isnt(join('', @{$ws->{vertical_unicode}}), '^ \h+ $', 'unicode horizontal whitespace (\h)');
+p6rule_isnt(join('', @{$ws->{horizontal_unicode}}), '^ \v+ $', 'unicode vertical whitespace (\v)');
 }
 
 
 ## \t and \T -- tabs
+p6rule_is  ("abc\tdef", 'c \t d', 'horizontal tab (\t)', todo => 'not yet implemented');
+p6rule_is  ("abc\011def", 'c \t d', 'horizontal tab (\t)', todo => 'not yet implemented');
+p6rule_is  ("abc\x0009def", 'c \t d', 'horizontal tab (\t)', todo => 'not yet implemented');
+p6rule_is  ("abc\t\tdef", 'c \t+ d', 'horizontal tab (\t)', todo => 'not yet implemented');
+p6rule_isnt('abcdef', 'a \t+ f', 'horizontal tab (\t)');
+p6rule_isnt('abc\tdef', 'b \t c', 'horizontal tab (\t)');
+p6rule_is  ("a", '\T', 'not horizontal tab (\T)', todo => 'not yet implemented');
+p6rule_is  ("abc", 'a \T c', 'not horizontal tab (\T)', todo => 'not yet implemented');
+p6rule_isnt("", '\T', 'not horizontal tab (\T)');
+p6rule_isnt("abc\tdef", 'c \T d', 'not horizontal tab (\T)');
+p6rule_isnt('abc\o11def', 'c \T d', 'not horizontal tab (\T)');
+p6rule_isnt('abc\x0009def', 'c \T d', 'not horizontal tab (\T)');
+p6rule_isnt("abc\t\tdef", 'c \T+ d', 'not horizontal tab (\T)');
+p6rule_is  ('abcdef', 'a \T+ f', 'not horizontal tab (\T)', todo => 'not yet implemented');
+
+
 ## \r and \R -- returns
+p6rule_is  ("abc\rdef", 'c \r d', 'return (\r)', todo => 'not yet implemented');
+p6rule_is  ("abc\015def", 'c \r d', 'return (\r)', todo => 'not yet implemented');
+p6rule_is  ("abc\x000ddef", 'c \r d', 'return (\r)', todo => 'not yet implemented');
+p6rule_is  ("abc\r\rdef", 'c \r+ d', 'return (\r)', todo => 'not yet implemented');
+p6rule_isnt('abcdef', 'a \r+ f', 'return (\r)');
+p6rule_isnt('abc\rdef', 'b \r c', 'return (\r)');
+p6rule_is  ("a", '\R', 'not return (\R)', todo => 'not yet implemented');
+p6rule_is  ("abc", 'a \R c', 'not return (\R)', todo => 'not yet implemented');
+p6rule_isnt("", '\R', 'not return (\R)');
+p6rule_isnt("abc\rdef", 'c \R d', 'not return (\R)');
+p6rule_isnt('abc\o15def', 'c \R d', 'not return (\R)');
+p6rule_isnt('abc\x000ddef', 'c \R d', 'not return (\R)');
+p6rule_isnt("abc\r\rdef", 'c \R+ d', 'not return (\R)');
+p6rule_is  ('abcdef', 'a \R+ f', 'not return (\R)', todo => 'not yet implemented');
+
+
 ## \f and \F -- formfeed
-## \E -- anything but escape
+p6rule_is  ("abc\fdef", 'c \f d', 'formfeed (\f)', todo => 'not yet implemented');
+p6rule_is  ("abc\014def", 'c \f d', 'formfeed (\f)', todo => 'not yet implemented');
+p6rule_is  ("abc\x000cdef", 'c \f d', 'formfeed (\f)', todo => 'not yet implemented');
+p6rule_is  ("abc\f\fdef", 'c \f+ d', 'formfeed (\f)', todo => 'not yet implemented');
+p6rule_isnt('abcdef', 'a \f+ f', 'formfeed (\f)');
+p6rule_isnt('abc\fdef', 'b \f c', 'formfeed (\f)');
+p6rule_is  ("a", '\F', 'not formfeed (\F)', todo => 'not yet implemented');
+p6rule_is  ("abc", 'a \F c', 'not formfeed (\F)', todo => 'not yet implemented');
+p6rule_isnt("", '\F', 'not formfeed (\F)');
+p6rule_isnt("abc\fdef", 'c \F d', 'not formfeed (\F)');
+p6rule_isnt('abc\o14def', 'c \F d', 'not formfeed (\F)');
+p6rule_isnt('abc\x000cdef', 'c \F d', 'not formfeed (\F)');
+p6rule_isnt("abc\f\fdef", 'c \F+ d', 'not formfeed (\F)');
+p6rule_is  ('abcdef', 'a \F+ f', 'not formfeed (\F)', todo => 'not yet implemented');
+
+
+## \e and \E -- escape
+p6rule_is  ("abc\edef", 'c \e d', 'escape (\e)', todo => 'not yet implemented');
+p6rule_is  ("abc\033def", 'c \e d', 'escape (\e)', todo => 'not yet implemented');
+p6rule_is  ("abc\x001bdef", 'c \e d', 'escape (\e)', todo => 'not yet implemented');
+p6rule_is  ("abc\e\edef", 'c \e+ d', 'escape (\e)', todo => 'not yet implemented');
+p6rule_isnt('abcdef', 'a \e+ f', 'escape (\e)');
+p6rule_isnt('abc\edef', 'b \e c', 'escape (\e)');
+p6rule_is  ("a", '\E', 'not escape (\E)', todo => 'not yet implemented');
+p6rule_is  ("abc", 'a \E c', 'not escape (\E)', todo => 'not yet implemented');
+p6rule_isnt("", '\E', 'not escape (\E)');
+p6rule_isnt("abc\edef", 'c \E d', 'not escape (\E)');
+p6rule_isnt('abc\o33def', 'c \E d', 'not escape (\E)');
+p6rule_isnt('abc\x001bdef', 'c \E d', 'not escape (\E)');
+p6rule_isnt("abc\e\edef", 'c \E+ d', 'not escape (\E)');
+p6rule_is  ('abcdef', 'a \E+ f', 'not escape (\E)', todo => 'not yet implemented');
+
+
 ## \x and \X -- hex characters
 
 
 ## remember to change the number of tests :-)
-BEGIN { plan tests => 74; }
+BEGIN { plan tests => 130; }
