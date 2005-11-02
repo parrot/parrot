@@ -135,7 +135,8 @@ Step 7: Step into the JITed code
   gdb> s
 
 At this point, you can step through the instructions, or print out the various
-Parrot registers. C<gdb> will know about I0-I31, N0-N31, S0-S31, and P0-P31.
+Parrot registers. FIXME: C<gdb> will know about I0-I31, N0-N31, S0-S31, and P0-P31.
+
 
 WARNING: Stepping too far
 

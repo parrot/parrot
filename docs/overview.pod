@@ -31,7 +31,7 @@ the relatively slight volume of information on optimizing for macro-op based
 stack machines.
 
 To be more specific about the software CPU, it will contain a large number of
-registers. The current design provides for four groups of 32 registers; each
+registers. The current design provides for four groups of N registers; each
 group will hold a different data type: integers, floating-point numbers,
 strings, and PMCs. (Parrot Magic Cookies, detailed below.)
 
