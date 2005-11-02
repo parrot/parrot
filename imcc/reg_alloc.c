@@ -19,12 +19,6 @@
 #include "imc.h"
 #include "optimizer.h"
 
-/* recalculate CFG and register life for all syms, with this
- * set to 1, the old and slow routines are used
- * with 0, this info is recalced on the fly during spilling
- */
-#define DOIT_AGAIN_SAM 0
-
 void graph_coloring_reg_alloc(Interp *interpreter, IMC_Unit * unit);
 static void make_stat(IMC_Unit *, int *sets, int *cols);
 static void imc_stat_init(IMC_Unit *);
@@ -38,7 +32,6 @@ static int interferes(Interp *, IMC_Unit *, SymReg * r0, SymReg * r1);
 static void map_colors(IMC_Unit *, int x, unsigned int * graph, char colors[], int typ);
 static void compute_spilling_costs (Parrot_Interp, IMC_Unit *);
 static void order_spilling (IMC_Unit *);
-static void spill (Interp *, IMC_Unit * unit, int);
 static int try_allocate(Parrot_Interp, IMC_Unit *);
 static void restore_interference_graph(Interp *, IMC_Unit *);
 #if 0
@@ -191,45 +184,15 @@ free_reglist(IMC_Unit * unit)
 void
 graph_coloring_reg_alloc(Interp *interpreter, IMC_Unit * unit)
 {
-    int to_spill, todo, loop_counter;
 
-    todo = 1;
-    loop_counter = 0;
-#if !DOIT_AGAIN_SAM
     build_interference_graph(interpreter, unit);
-#endif
-    while (todo) {
-        loop_counter++;
-#if DOIT_AGAIN_SAM
-        build_interference_graph(interpreter, unit);
-#endif
-        if (IMCC_INFO(interpreter)->optimizer_level & OPT_SUB)
-            allocate_wanted_regs(unit);
-        compute_spilling_costs(interpreter, unit);
-        order_spilling(unit);          /* put the remaining items on stack */
+    if (IMCC_INFO(interpreter)->optimizer_level & OPT_SUB)
+        allocate_wanted_regs(unit);
+    compute_spilling_costs(interpreter, unit);
+    order_spilling(unit);          /* put the remaining items on stack */
 
-        to_spill = try_allocate(interpreter, unit);
-        IMCC_INFO(interpreter)->allocated = 1;
-
-        if ( to_spill >= 0 ) {
-            IMCC_INFO(interpreter)->allocated = 0;
-            spill(interpreter, unit, to_spill);
-            /*
-             * build the new cfg/reglist on the fly in spill() and
-             * do life analysis there for only the involved regs
-             */
-#if DOIT_AGAIN_SAM
-            find_basic_blocks(interpreter, unit, 0);
-            build_cfg(interpreter, unit);
-            build_reglist(interpreter, unit, 1);
-            life_analysis(interpreter);
-#endif
-        }
-        else {
-            /* the process is finished */
-            todo = 0;
-        }
-    }
+    try_allocate(interpreter, unit);
+    IMCC_INFO(interpreter)->allocated = 1;
 }
 
 /* some statistics about register usage
@@ -857,248 +820,6 @@ map_colors(IMC_Unit* unit, int x, unsigned int *graph, char avail[], int typ)
     	    avail[r->color+1] = 0;
     	}
     }
-}
-
-#if ! DOIT_AGAIN_SAM
-/* update bb and life_info after spilling
- * this saves 4 costly routines
- * NOTE {lhs_,}use_count are not set again. This is safe as long as
- *      no further optimization pass follows
- */
-static void
-update_life(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins,
-        SymReg *r, int needs_fetch, int needs_store, int add)
-{
-    Life_range *l;
-    int i;
-    Instruction *ins2;
-    Basic_block **bb_list = unit->bb_list;
-
-#if IMC_TRACE
-    fprintf(stderr, "reg_alloc.c: update_life(%s)\n", r->name);
-#endif
-
-    for (i = 0, ins2 = unit->instructions; ins2; ins2 = ins2->next) {
-        ins2->index = i++;
-    }
-    /* add this sym to reglist, if not there */
-    if (add) {
-        unit->reglist = realloc(unit->reglist, (unit->n_symbols + 1) *
-                sizeof(SymReg *));
-        unit->reglist[unit->n_symbols++] = r;
-    }
-
-    r->first_ins = r->last_ins = ins;
-    if (needs_fetch) {
-        /* prev instructions is a fetch then and the first usage of this reg */
-        r->first_ins = ins->prev;
-        /* if this ins was the first of a BB, then the fetch is the
-         * first ins then
-         */
-        if (ins == bb_list[ins->bbindex]->start)
-            bb_list[ins->bbindex]->start = ins->prev;
-    }
-    if (needs_store) {
-        /* next ins is a store then, and ends life of this reg */
-        r->last_ins = ins->next;
-        if (ins == bb_list[ins->bbindex]->end)
-            bb_list[ins->bbindex]->end = ins->next;
-    }
-    /* now set life_info */
-    free_life_info(unit, r);
-    r->life_info = calloc(unit->n_basic_blocks,
-            sizeof(Life_range*));
-    for (i=0; i < unit->n_basic_blocks; i++)
-        make_life_range(r, i);
-    l = r->life_info[ins->bbindex];
-    l->first_ins = r->first_ins;
-    l->last_ins = r->last_ins;
-    if (IMCC_INFO(interpreter)->debug & DEBUG_IMC) {
-        dump_instructions(interpreter, unit);
-        dump_symreg(unit);
-    }
-}
-/*
- * update the interference_graph too and don't call
- *      build_interference_graph again
- */
-
-static void
-update_interference(Parrot_Interp interpreter, IMC_Unit * unit,
-        SymReg *old, SymReg *new)
-{
-    int x, y, n_symbols;
-    SymReg ** reglist = unit->reglist;
-    unsigned int *interference_graph = unit->interference_graph;
-
-    n_symbols = unit->n_symbols;
-    if (old != new) {
-        /* n_symbols is already increased */
-        unsigned int *new_graph = ig_allocate(n_symbols);
-        /* old symbols count of previous graph */
-        int o = n_symbols - 1;
-        for (x = 0; x < o; x++) {
-            for (y = x + 1; y < o; y++) {
-                if (ig_test(x, y, o, interference_graph)) {
-                    ig_set(x, y, n_symbols, new_graph);
-                    ig_set(y, x, n_symbols, new_graph);
-                }
-            }
-        }
-        free(interference_graph);
-        unit->interference_graph = interference_graph = new_graph;
-    }
-    for (x = 0; x < n_symbols; x++) {
-        for (y = x + 1; y < n_symbols; y++) {
-            if (reglist[x] == old || reglist[x] == new ||
-                    reglist[y] == old || reglist[y] == new) {
-                if (interferes(interpreter, unit, reglist[x], reglist[y])) {
-                    ig_set(x, y, n_symbols, interference_graph);
-                    ig_set(y, x, n_symbols, interference_graph);
-                }
-                else {
-                    ig_clear(x, y, n_symbols, interference_graph);
-                    ig_clear(y, x, n_symbols, interference_graph);
-                }
-            }
-        }
-    }
-    if (IMCC_INFO(interpreter)->debug & DEBUG_IMC) {
-        fprintf(stderr, "old_sym %s\n", old->name);
-        fprintf(stderr, "new_sym %s\n", new->name);
-        dump_interference_graph(unit);
-    }
-}
-#endif
-
-/* Rewrites the unit instructions, inserting spill code in every ocurrence
- * of the symbol.
- */
-
-static void
-spill(Interp *interpreter, IMC_Unit * unit, int spilled)
-{
-    Instruction * tmp, *ins;
-    int i, n, dl;
-    int needs_fetch, needs_store;
-    SymReg * old_sym, *p31, *new_sym;
-    char * buf;
-    SymReg *regs[3];
-    SymReg **reglist = unit->reglist;
-
-    buf = mem_sys_allocate(256 * sizeof(char));
-
-    IMCC_debug(interpreter, DEBUG_IMC, "#Spilling [%s]:\n", reglist[spilled]->name);
-
-    new_sym = old_sym = reglist[spilled];
-    if (old_sym->usage & U_SPILL)
-        IMCC_fatal(interpreter, 1,
-                "spill: double spill - program too complex\n");
-    new_sym->usage |= U_SPILL;
-
-    unit->n_spilled++;
-    n = 0;
-    dl = 0;     /* line corr */
-    tmp = NULL;
-
-
-    /* first instruction should be ".sub" -- make sure we allocate P31
-     * _after_ subroutine entry.  And after the "saveall", or any
-     * other assortment of pushes. */
-
-    if (!unit->p31) {
-        Instruction *spill_ins;
-
-        p31 = unit->p31 = mk_pasm_reg(interpreter, str_dup("P31"));
-        ins = unit->instructions;
-        while (ins
-                && (strncmp(ins->fmt, "push", 4) == 0
-                    || strcmp(ins->fmt, "saveall") == 0)) {
-            ins = ins->next;
-        }
-        spill_ins = iNEW(interpreter, unit, p31, str_dup("PerlArray"), NULL, 0);
-        insert_ins(unit, ins, spill_ins);
-    }
-    else
-        p31 = unit->p31;
-
-    for (ins = unit->instructions; ins; ins = ins->next) {
-	needs_store = 0;
-	needs_fetch = 0;
-
-	if (instruction_reads (ins, old_sym) && !(ins->flags & ITSPILL))
-	    needs_fetch = 1;
-
-	if (instruction_writes (ins, old_sym) && !(ins->flags & ITSPILL))
-	    needs_store = 1;
-        if (dl)
-            ins->index += dl;
-
-	if (needs_fetch) {
-	    regs[0] = new_sym;
-            regs[1] = p31;
-            sprintf(buf, "%d", unit->n_spilled);
-            regs[2] = mk_const(interpreter, str_dup(buf), 'I');
-	    sprintf(buf, "%%s, %%s[%%s]   #FETCH %s", old_sym->name);
-	    tmp = INS(interpreter, unit, "set", buf, regs, 3, 4, 0);
-	    tmp->bbindex = ins->bbindex;
-            tmp->flags |= ITSPILL;
-            tmp->index = ins->index;
-            ins->index++;
-            /* insert tmp before actual ins */
-            insert_ins(unit, ins->prev, tmp);
-            dl++;
-	}
-        /* change all occurance of old_sym to new */
-        for (i = 0; old_sym != new_sym && i < ins->n_r; i++)
-            if (ins->r[i] == old_sym)
-                ins->r[i] = new_sym;
-	if (needs_store) {
-            regs[0] = p31;
-            sprintf(buf, "%d", unit->n_spilled);
-            regs[1] = mk_const(interpreter, str_dup(buf), 'I');
-	    regs[2] = new_sym;
-	    sprintf(buf, "%%s[%%s], %%s   #SPILL %s", old_sym->name);
-	    tmp = INS(interpreter, unit, "set", buf, regs, 3, 2, 0);
-	    tmp->bbindex = ins->bbindex;
-            tmp->flags |= ITSPILL;
-            /* insert tmp after ins */
-            insert_ins(unit, ins, tmp);
-            tmp->index = ins->index + 1;
-            dl++;
-	}
-        if (needs_fetch || needs_store) {
-#if ! DOIT_AGAIN_SAM
-            /* update life info of prev sym */
-            update_life(interpreter, unit, ins, new_sym, needs_fetch, needs_store,
-                    old_sym != new_sym);
-            /* and interference of both */
-            update_interference(interpreter, unit, old_sym, new_sym);
-#endif
-            /* if all symbols are in one basic_block, we need a new
-             * symbol, so that the life_ranges are minimal
-             * It would be nice to detect when changing the symbol
-             * is necessary.
-             */
-            sprintf(buf, "%s_%d", old_sym->name, n++);
-            new_sym = mk_symreg(interpreter, str_dup(buf), old_sym->set);
-            new_sym->usage |= U_SPILL;
-            if (needs_store)    /* advance past store */
-                ins = tmp;
-        }
-    }
-
-    free(buf);
-
-#if DOIT_AGAIN_SAM
-    /* update index */
-    for (i = 0, ins = unit; ins; ins = ins->next) {
-	ins->index = i++;
-    }
-#endif
-    if (IMCC_INFO(interpreter)->debug & DEBUG_IMC)
-        dump_instructions(interpreter, unit);
-
 }
 
 /*

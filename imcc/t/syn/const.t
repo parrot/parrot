@@ -10,18 +10,16 @@ pir_output_is(<<'CODE', <<'OUT', "globalconst 1");
 
 .sub 'main' :main
     .globalconst int N = 5
-    bsr _main
+    _main()
 .end
 
 .sub '_sub1'
     print N
     print "\n"
-    ret
 .end
 
 .sub '_main'
-    bsr _sub1
-    ret
+    _sub1()
 .end
 CODE
 5
@@ -30,7 +28,7 @@ OUT
 pir_output_is(<<'CODE', <<'OUT', "globalconst 2");
 .sub 'test' :main
     .globalconst int N = 5
-    bsr _main
+    _main()
 .end
 
 .sub '_sub1'
@@ -38,12 +36,10 @@ pir_output_is(<<'CODE', <<'OUT', "globalconst 2");
     x = 10 + N
     print x
     print "\n"
-    ret
 .end
 
 .sub '_main'
-    bsr _sub1
-    ret
+     _sub1()
 .end
 CODE
 15
