@@ -1288,7 +1288,7 @@ output_is(<<'CODE', <<'OUTPUT', "nci_cb_C1 - PASM");
   new P10, .Integer
   store_global "cb_done", P10
   # first attempt - create cb manually (this step will be hidden later)
-  newsub P6, .Sub, _call_back
+  .const .Sub P6 = "_call_back"
   # prepare user data
   new P7, .Integer
   set P7, 42
@@ -1319,7 +1319,7 @@ err:
   print "cb didnt run\n"
   end
 
-_call_back:
+.pcc_sub _call_back:
   get_params "(0,0)", P5, S5
   print "in callback\n"
   print "user data: "
@@ -1359,8 +1359,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "nci_cb_C1 - PIR");
 
     # A Sub that can be given to the library
     # this callback function will eventually by called by the library
-    .local pmc cb
-    cb = newsub _call_back
+    .const .Sub cb = "_call_back"
     .local pmc cb_wrapped
     cb_wrapped = new_callback cb, user_data, "tU"	# Z in pdd16
     print "created a callback sub\n"
@@ -1423,7 +1422,7 @@ output_is(<<'CODE', <<'OUTPUT', "nci_cb_C2 - PASM");
   new P10, .Integer
   store_global "cb_done", P10
   # first attempt - create cb manually (this step will be hidden later)
-  newsub P6, .Sub, _call_back
+  .const .Sub P6 = "_call_back"
   # prepare user data
   new P7, .Integer
   set P7, 42
@@ -1454,7 +1453,7 @@ err:
   print "cb didnt run\n"
   end
 
-_call_back:
+.pcc_sub _call_back:
   get_params "(0,0)", P5, I5
   print "in callback\n"
   print "user data: "
@@ -1498,8 +1497,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "nci_cb_C3 - PIR");
 
     # A Sub that can be given to the library
     # this callback function will eventually by called by the library
-    .local pmc cb
-    cb = newsub _call_back
+    .const .Sub cb = "_call_back"
     .local pmc cb_wrapped
     cb_wrapped = new_callback cb, user_data, "pU"	# Z in pdd16
     print "created a callback sub\n"
@@ -1572,7 +1570,7 @@ output_is(<<'CODE', <<'OUTPUT', "nci_cb_D1 - PASM");
   new P10, .Integer
   store_global "cb_done", P10
   # first attempt - create cb manually (this step will be hidden later)
-  newsub P6, .Sub, _call_back
+  .const .Sub P6 = "_call_back"
   # prepare user data
   new P7, .Integer
   set P7, 42
@@ -1603,7 +1601,7 @@ err:
   print "cb didnt run\n"
   end
 
-_call_back:
+.pcc_sub _call_back:
   get_params "(0,0)", P5, S5
   print "in callback\n"
   print "user data: "
@@ -1631,7 +1629,7 @@ output_is(<<'CODE', <<'OUTPUT', "nci_cb_D2 - PASM");
   new P10, .Integer
   store_global "cb_done", P10
   # first attempt - create cb manually (this step will be hidden later)
-  newsub P6, .Sub, _call_back
+  .const .Sub P6 = "_call_back"
   # prepare user data
   new P7, .Integer
   set P7, 42
@@ -1662,7 +1660,7 @@ err:
   print "cb didnt run\n"
   end
 
-_call_back:
+.pcc_sub _call_back:
   get_params "(0,0)", P5, I5
   print "in callback\n"
   print "user data: "
@@ -1702,8 +1700,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "nci_cb_D2 - PIR");
 
     # A Sub that can be given to the library
     # this callback function will eventually by called by the library
-    .local pmc cb
-    cb = newsub _call_back
+    .const .Sub cb = "_call_back"
     .local pmc cb_wrapped
     cb_wrapped = new_callback cb, user_data, "Ui"	# Z in pdd16
     print "created a callback sub\n"
@@ -1781,8 +1778,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "nci_cb_D3 - PIR");
 
     # A Sub that can be given to the library
     # this callback function will eventually by called by the library
-    .local pmc cb
-    cb = newsub _call_back
+    .const .Sub cb = "_call_back"
     .local pmc cb_wrapped
     cb_wrapped = new_callback cb, user_data, "Up"	# Z in pdd16
     print "created a callback sub\n"
@@ -1882,8 +1878,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "nci_cb_D4 - synchronous callbacks");
 
     # A Sub that can be given to the library
     # this callback function will eventually by called by the library
-    .local pmc cb
-    cb = newsub _call_back
+    .const .Sub cb = "_call_back"
     .local pmc cb_wrapped
     cb_wrapped = new_callback cb, user_data, "Up"	# Z in pdd16
     print "created a callback sub\n"
