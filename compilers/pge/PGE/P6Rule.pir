@@ -47,6 +47,9 @@
     optable.addtok("term:<[", "term:", "nows", $P0)
     optable.addtok("term:<-[", "term:", "nows", $P0)
 
+    $P0 = find_global "PGE::P6Rule", "parse_closure"
+    optable.addtok("term:{{", "term:", "nows", $P0)
+
     $P0 = find_global "PGE::P6Rule", "parse_quant"
     optable.addtok("postfix:*", "<term:", "left", $P0)
     optable.addtok("postfix:+", "postfix:*", "left", $P0)
@@ -159,6 +162,38 @@
     .return (mob)
 .end
 
+
+.sub "parse_closure"
+    .param pmc mob
+    .local pmc newfrom
+    .local string target
+    .local pmc mfrom, mpos
+    .local int pos, len
+    $P0 = find_global "PGE::Match", "newfrom"
+    (mob, target, mfrom, mpos) = $P0(mob, 0, "PGE::Exp::Closure")
+    pos = mfrom
+    len = 0
+  init:
+    $S0 = substr target, pos, 1
+    if $S0 != "{" goto body
+    inc len
+    inc pos
+    goto init
+  body:
+    $S0 = repeat "}", len
+    $I0 = index target, $S0, pos
+    if $I0 < pos goto err_noclose
+    $I1 = $I0 - pos
+    $S1 = substr target, pos, $I1
+    mob["value"] = $S1
+    pos = $I0 + len
+    mpos = pos
+    .return (mob)
+ err_noclose:
+    parse_error(mob, pos, "Missing closing braces for closure")
+    .return (mob)
+.end
+    
 
 .sub "parse_quant"
     .param pmc mob
@@ -444,8 +479,6 @@
     .param int has_gram        :opt_flag
     .param string name         :optional
     .param int has_name        :opt_flag
-    .param int pironly         :optional
-    .param int has_pironly     :opt_flag
     .local pmc exp
     .local pmc newfrom
     .local pmc code
@@ -468,6 +501,7 @@
     pad["reps"] = $P0
     pad["cutnum"] = PGE_CUT_GROUP
     pad["subpats"] = 0
+    pad[":lang"] = "PIR"
     $P0 = exp["expr"]
     $P0 = $P0.p6analyze(pad)
     exp["expr"] = $P0
@@ -479,7 +513,6 @@
     code = exp."as_pir"(name)
     code = concat $P0, code
 
-    if has_pironly goto end
     $P0 = compreg "PIR"
     sub = $P0(code)
     if has_name == 0 goto end
@@ -767,4 +800,21 @@
     exp1["iscapture"] = 1
     exp1 = exp1.p6analyze(pad)
     .return (exp1)
+.end
+
+.namespace [ "PGE::Exp::Closure" ]
+
+.sub "p6analyze" :method
+    .param pmc pad
+    $S0 = pad[":lang"]
+    self["lang"] = $S0
+    if $S0 != "PIR" goto end
+    $S1 = self["value"]
+    $I0 = index $S1, ".sub"
+    if $I0 >= 0 goto end
+    $S1 = concat ".sub anon :anon\n.param pmc match\n", $S1
+    $S1 .= "\n.end\n"
+    self["value"] = $S1
+  end:
+    .return (self)
 .end

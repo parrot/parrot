@@ -25,6 +25,7 @@
     $P1 = subclass $P0, "PGE::Exp::Cut"
     $P1 = subclass $P0, "PGE::Exp::Quant"
     $P1 = subclass $P0, "PGE::Exp::Modifier"
+    $P1 = subclass $P0, "PGE::Exp::Closure"
     $P0 = new Integer
     store_global "PGE::Exp", "$_serno", $P0
 .end
@@ -970,3 +971,41 @@ register.
     emit(code, "    goto fail")
     .return ()
 .end
+
+.namespace [ "PGE::Exp::Closure" ]
+
+.sub "reduce" :method
+    self["isquant"] = 1
+    .return (self)
+.end
+
+.sub "gen" :method
+    .param pmc code
+    .param string label
+    .param string next
+    .local pmc emit
+    .local string value, lang
+    emit = find_global "PGE::Exp", "emit"
+    value = self["value"]
+    lang = self["lang"]
+    $P0 = find_global "Data::Escape", "String"
+    value = $P0(value, '"')
+    lang = $P0(lang, '"')
+    emit(code, "\n  %s:  # closure    ##", label)
+    emit(code, "    $S0 = \"%s:\"", lang)
+    emit(code, "    $S1 = \"%s\"", value)
+    emit(code, "    $S0 .= $S1")
+    emit(code, "    $P0 = find_global \"PGE::Rule\", \"%:cache\"")
+    emit(code, "    $I0 = exists $P0[$S0]")
+    emit(code, "    if $I0 goto %s_1", label)
+    emit(code, "    $P1 = compreg \"%s\"", lang)
+    emit(code, "    $P1 = $P1($S1)")
+    emit(code, "    $P0[$S0] = $P1")
+    emit(code, "  %s_1:", label)
+    emit(code, "    $P1 = $P0[$S0]")
+    emit(code, "    mpos = pos")
+    emit(code, "    $P1(mob)")
+    emit(code, "    goto %s", next)
+    .return ()
+.end
+
