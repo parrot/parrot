@@ -250,6 +250,12 @@ inline op result_info(out PMC) {
     goto NEXT();
 }
 
+=item B<newclosure>(out PMC, in PMC)
+
+Create a closure of the given subroutine PMC by cloning the sub's state.
+
+=cut
+
 inline op newclosure(out PMC, in PMC) {
   PMC *clos;
   struct Parrot_sub *newsub;
