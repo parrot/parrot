@@ -1,4 +1,4 @@
-/* dynext.h
+/* cclass.h
 *
 * $Id: cclass.h jrieks $
 *
