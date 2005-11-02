@@ -7,7 +7,7 @@ YAML/Parser/Syck.imc - Interface to libsyck
 
 =head1 SYNOPSIS
 
-This won't work yet with a standard libsyck, as libsyck needs to be 
+This won't work yet with a standard libsyck, as libsyck needs to be
 aware of Parrot.
 
 =head1 DESCRIPTION
@@ -28,7 +28,7 @@ Parses a YAML string and returns a data structure.
 
 .include "datatypes.pasm"
 
-.sub load 
+.sub load
     .param string yaml_string
 
     # prepare user data
@@ -36,7 +36,7 @@ Parses a YAML string and returns a data structure.
     user_data = new String
 
     .local string library_name
-    library_name = 'libsyck' 
+    library_name = 'libsyck'
     .local pmc libsyck
     libsyck = loadlib library_name
     unless libsyck goto NOT_LOADED
@@ -53,8 +53,7 @@ Parses a YAML string and returns a data structure.
 
     # A Sub that can be given to the library
     # this callback function will eventually by called by the library
-    .local pmc yaml_handler
-    yaml_handler = newsub _yaml_handler
+    .const .Sub yaml_handler = "_yaml_handler"
     .local pmc yaml_handler_wrapped
     yaml_handler_wrapped = new_callback yaml_handler, user_data, "Up"	# Z in pdd16
 
@@ -101,7 +100,7 @@ NOT_LOADED:
 
 .sub _yaml_handler
     .param pmc user_data
-    .param pmc external_data 
+    .param pmc external_data
 
     # struct _syck_node {
     #     /* Symbol table ID */
@@ -139,23 +138,23 @@ NOT_LOADED:
 
 
     # external_data is an UnManagedStruct PMC containing node info
-    .local pmc external_data_decl, data_str_decl, data_str 
+    .local pmc external_data_decl, data_str_decl, data_str
     external_data_decl = new ResizablePMCArray
     data_str_decl      = new ResizablePMCArray
 
-    # id 
+    # id
     push external_data_decl, .DATATYPE_INT
     push external_data_decl, 0
     push external_data_decl, 0
-    # kind 
+    # kind
     push external_data_decl, .DATATYPE_INT
     push external_data_decl, 0
     push external_data_decl, 0
-    # type_id 
+    # type_id
     push external_data_decl, .DATATYPE_CSTR
     push external_data_decl, 0
     push external_data_decl, 0
-    # anchor 
+    # anchor
     push external_data_decl, .DATATYPE_CSTR
     push external_data_decl, 0
     push external_data_decl, 0
@@ -164,7 +163,7 @@ NOT_LOADED:
     push data_str_decl, .DATATYPE_INT
     push data_str_decl, 0
     push data_str_decl, 0
-    # ptr 
+    # ptr
     push data_str_decl, .DATATYPE_CSTR
     push data_str_decl, 0
     push data_str_decl, 0
