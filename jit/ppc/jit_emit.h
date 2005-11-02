@@ -60,6 +60,8 @@ typedef enum {
     r31
 } ppc_iregister_t;
 
+#  define Parrot_jit_emit_get_base_reg_no(pc) r13
+
 typedef enum {
     f0,
     FSR1 = f0,
@@ -419,15 +421,11 @@ enum { JIT_PPC_CALL, JIT_PPC_BRANCH, JIT_PPC_UBRANCH };
 
 /* Load a CPU register from a Parrot register. */
 
-/* TODO use offsets directly - see also jit/i386 and src/jit.c JIT_USE_OFFS */
+#  define jit_emit_mov_rm_i(pc, reg, offs) \
+    jit_emit_lwz(pc, reg, offs, r13)
 
-#  define jit_emit_mov_rm_i(pc, reg, addr) \
-    jit_emit_lwz(pc, reg, (((char *)addr) - \
-      ((char *)interpreter->ctx.bp.regs_i)), r13)
-
-#  define jit_emit_mov_rm_n(pc, reg, addr) \
-    jit_emit_lfd(pc, reg, (((char *)addr) - \
-      ((char *)interpreter->ctx.bp.regs_i)), r13)
+#  define jit_emit_mov_rm_n(pc, reg, offs) \
+    jit_emit_lfd(pc, reg, offs, r13)
 
 /* compare operation.
  *
@@ -561,14 +559,11 @@ jit_emit_bx(Parrot_jit_info_t *jit_info, char type, opcode_t disp)
 
 /* Store a CPU register back to a Parrot register. */
 
-#  define jit_emit_mov_mr_i(pc, addr, reg) \
-    jit_emit_stw(pc, reg, (((char *)addr) - \
-      ((char *)interpreter->ctx.bp.regs_i)), r13)
+#  define jit_emit_mov_mr_i(pc, offs, reg) \
+    jit_emit_stw(pc, reg, offs, r13)
 
-#  define jit_emit_mov_mr_n(pc, addr, reg) \
-    jit_emit_stfd(pc, reg, (((char *)addr) - \
-      ((char *)interpreter->ctx.bp.regs_i)), r13)
-
+#  define jit_emit_mov_mr_n(pc, offs, reg) \
+    jit_emit_stfd(pc, reg,  offs, r13)
 
 /*
  * Load a 32-bit immediate value.
@@ -804,10 +799,10 @@ Parrot_jit_dofixup(Parrot_jit_info_t *jit_info,
 
 /* move reg to mem (i.e. intreg) */
 void
-Parrot_jit_emit_mov_mr(Interp * interpreter, char *mem, int reg)
+Parrot_jit_emit_mov_mr_offs(Interp * interpreter, int base, size_t offs, int reg)
 {
     jit_emit_mov_mr_i(
-        ((Parrot_jit_info_t *)(interpreter->code->jit_info))->native_ptr, mem, reg);
+        ((Parrot_jit_info_t *)(interpreter->code->jit_info))->native_ptr, offs, reg);
     /*
      * if we save registers, the last instruction isn't the ins that
      * sets condition codes, so the speed hack in Parrot_ifunless_i_ic
@@ -818,27 +813,27 @@ Parrot_jit_emit_mov_mr(Interp * interpreter, char *mem, int reg)
 
 /* move mem (i.e. intreg) to reg */
 void
-Parrot_jit_emit_mov_rm(Interp * interpreter, int reg, char *mem)
+Parrot_jit_emit_mov_rm_offs(Interp * interpreter, int reg, int base, size_t offs)
 {
     jit_emit_mov_rm_i(
-        ((Parrot_jit_info_t *)(interpreter->code->jit_info))->native_ptr, reg, mem);
+        ((Parrot_jit_info_t *)(interpreter->code->jit_info))->native_ptr, reg, offs);
 }
 
 /* move reg to mem (i.e. numreg) */
 void
-Parrot_jit_emit_mov_mr_n(Interp * interpreter, char *mem,int reg)
+Parrot_jit_emit_mov_mr_n_offs(Interp * interpreter, int base, size_t offs, int reg)
 {
     jit_emit_mov_mr_n(
-        ((Parrot_jit_info_t *)(interpreter->code->jit_info))->native_ptr, mem, reg);
+        ((Parrot_jit_info_t *)(interpreter->code->jit_info))->native_ptr, offs, reg);
     ((Parrot_jit_info_t *)(interpreter->code->jit_info))->prev_op = 0;
 }
 
 /* move mem (i.e. numreg) to reg */
 void
-Parrot_jit_emit_mov_rm_n(Interp * interpreter, int reg,char *mem)
+Parrot_jit_emit_mov_rm_n_offs(Interp * interpreter, int reg, int base, size_t offs)
 {
     jit_emit_mov_rm_n(
-        ((Parrot_jit_info_t *)(interpreter->code->jit_info))->native_ptr, reg, mem);
+        ((Parrot_jit_info_t *)(interpreter->code->jit_info))->native_ptr, reg, offs);
 }
 
 #endif /* JIT_EMIT == 2 */
