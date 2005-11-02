@@ -155,7 +155,6 @@ arg_loop_done:
    pir_code2 .= "\n"
    inline_available = 1
 dynamic:
-   $P99 = P5 # XXX Curse you, variable register frames!
    pir_code2 .= "dynamic_command"
    pir_code2 .= label_num
    pir_code2 .= ":\n"

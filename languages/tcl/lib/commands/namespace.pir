@@ -98,24 +98,18 @@ bad_args:
 
   .local pmc p6r,match
   p6r = find_global "PGE", "p6rule"
-  match = p6r("(.*)\:\:+<-[:]>*$$")
+  match = p6r("(.*)\\:\\:+<-[:]>*$$")
 
   $S0 = argv[0]
   $P0 = match($S0)
   unless $P0 goto WHOLE
-
-  # XXX pre leo-ctx5 this requires a PMC arg, but we can switch later
-  $P1 = new .String
-  $P1 = "0"  
-
-  $P2 = $P0."__get_pmc_keyed"($P1)
-  
-  $S1 = $P2
+  $P1 = $P0[0]
+  $S1 = $P1
   .return ($S1)
 
 WHOLE:
-  $P0 = argv[0]
-  .return($P0)
+  $S0 = argv[0]
+  .return($S0)
 
   bad_args:
   .throw ("wrong # args: should be \"namespace qualifiers string\"")
@@ -137,11 +131,7 @@ WHOLE:
   $P0 = match($S0)
   unless $P0 goto WHOLE
 
-  # XXX pre leo-ctx5 this requires a PMC arg, but we can switch later
-  $P1 = new .String
-  $P1 = "0"  
-
-  $P2 = $P0."__get_pmc_keyed"($P1)
+  $P2 = $P0[0]
   
   $S1 = $P2
   .return ($S1)
