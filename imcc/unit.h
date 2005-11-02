@@ -33,8 +33,6 @@ typedef struct _IMC_Unit {
     Edge * edge_list;
 
     /* register allocation */
-    int n_spilled;
-    SymReg * p31;
     unsigned int* interference_graph;
     SymReg** reglist;
     int n_symbols;

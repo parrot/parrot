@@ -57,13 +57,6 @@ static void ig_set(int i, int j, int N, unsigned int* graph)
     *word |= (1 << bit_ofs);
 }
 
-static void ig_clear(int i, int j, int N, unsigned int* graph)
-{
-    int bit_ofs;
-    unsigned int* word = ig_get_word(i, j, N, graph, &bit_ofs);
-    *word &= ~(1 << bit_ofs);
-}
-
 int ig_test(int i, int j, int N, unsigned int* graph);
 int ig_test(int i, int j, int N, unsigned int* graph)
 {
@@ -124,7 +117,6 @@ imc_reg_alloc(Interp *interpreter, IMC_Unit * unit)
     }
 
     nodeStack = imcstack_new();
-    unit->n_spilled = 0;
 
     /* build CFG and life info, and optimize iteratively */
     do {
@@ -263,10 +255,9 @@ print_stat(Parrot_Interp interpreter, IMC_Unit * unit)
     IMCC_info(interpreter, 1, "\tregisters needed:\t I%d, N%d, S%d, P%d\n",
             sets[0], sets[1], sets[2], sets[3]);
     IMCC_info(interpreter, 1,
-            "\tregisters in .pasm:\t I%d, N%d, S%d, P%d - %d spilled\n",
+            "\tregisters in .pasm:\t I%d, N%d, S%d, P%d - %d\n",
             unit->n_regs_used[0], unit->n_regs_used[1],
-            unit->n_regs_used[2], unit->n_regs_used[3],
-            unit->n_spilled);
+            unit->n_regs_used[2], unit->n_regs_used[3]);
     IMCC_info(interpreter, 1, "\t%d basic_blocks, %d edges\n",
             unit->n_basic_blocks, edge_count(unit));
 }
