@@ -498,7 +498,7 @@ pbc_merge_debugs(Interp *interpreter, struct pbc_merge_input **inputs,
             memcpy(mapping, in_seg->mappings[j], 
                 sizeof(struct PackFile_DebugMapping));
             mapping->offset += num_lines;
-            if (mapping->mapping_type = PF_DEBUGMAPPINGTYPE_FILENAME)
+            if (mapping->mapping_type == PF_DEBUGMAPPINGTYPE_FILENAME)
                 mapping->u.filename += inputs[i]->const_start;
             mappings[num_mappings + j] = mapping;
         }
