@@ -683,34 +683,38 @@ read_params (YYSTYPE *valp, void *interp, struct params_t *params,
     c = yylex_skip(&val, interp, " \n");
 
     while(c != ')') {
-    if (c <= 0)
+        if (YYSTATE == heredoc2)
             IMCC_fataly(interp, E_SyntaxError,
-           "End of file reached while reading arguments in '%s'",
-                   macro_name);
-    else if (c == ',') {
+                    "Heredoc in macro '%s' not allowed",
+                    macro_name);
+        if (c <= 0)
+            IMCC_fataly(interp, E_SyntaxError,
+                    "End of file reached while reading arguments in '%s'",
+                    macro_name);
+        else if (c == ',') {
             if (params->num_param == MAX_PARAM)
                 IMCC_fataly(interp, E_SyntaxError,
-                       "More then %d params in '%s'",
-                       MAX_PARAM, macro_name);
-        params->name[params->num_param++] = current;
-        current = str_dup("");
-        len = 0;
-        c = yylex_skip(&val, interp, " \n");
-    }
-    else if (need_id && (*current || c != IDENTIFIER) && c != ' ') {
-            IMCC_fataly(interp, E_SyntaxError,
-           "Parameter definition in '%s' must be IDENTIFIER",
-                   macro_name);
-    }
-    else {
-        if (!need_id || c != ' ') {
-        len += strlen(val.s);
-        current = realloc(current, len + 1);
-        strcat(current,val.s);
+                        "More then %d params in '%s'",
+                        MAX_PARAM, macro_name);
+            params->name[params->num_param++] = current;
+            current = str_dup("");
+            len = 0;
+            c = yylex_skip(&val, interp, " \n");
         }
-        free(val.s);
-        c = yylex(&val,interp);
-    }
+        else if (need_id && (*current || c != IDENTIFIER) && c != ' ') {
+            IMCC_fataly(interp, E_SyntaxError,
+                    "Parameter definition in '%s' must be IDENTIFIER",
+                    macro_name);
+        }
+        else {
+            if (!need_id || c != ' ') {
+                len += strlen(val.s);
+                current = realloc(current, len + 1);
+                strcat(current,val.s);
+            }
+            free(val.s);
+            c = yylex(&val,interp);
+        }
     }
     params->name[params->num_param++] = current;
 
