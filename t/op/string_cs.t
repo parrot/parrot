@@ -121,7 +121,7 @@ output_is( <<'CODE', <<OUTPUT, "is_whitespace");
     print "\n"
     end
 CODE
-01110
+01111
 01110
 OUTPUT
 
