@@ -95,7 +95,7 @@ characters outside thar range, specify an encoding in the way below.
 
 Heredocs work like single or double quoted strings. All lines up to
 the terminating delimiter is slurped into the string. The delimiter
-has to be on it's own line with no trailing whitespace.
+has to be on its own line with no trailing whitespace.
 
   $S0 = <<'EOT'
   ...
