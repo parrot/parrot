@@ -17,6 +17,7 @@ This file implements the charset functions for unicode data
 #include "parrot/parrot.h"
 #include "unicode.h"
 #include "ascii.h"
+#include "tables.h"
 
 #ifdef EXCEPTION
 #  undef EXCEPTION
@@ -201,6 +202,7 @@ validate(Interp *interpreter, STRING *src)
     return 1;
 }
 
+#if PARROT_HAS_ICU
 static int
 is_foo(Interp *interpreter, UINTVAL codepoint, int bit)
 {
@@ -246,6 +248,7 @@ is_foo(Interp *interpreter, UINTVAL codepoint, int bit)
     }
     return 0;
 }
+#endif
 
 static INTVAL
 is_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags, STRING *source_string, UINTVAL offset)
