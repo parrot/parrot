@@ -243,6 +243,9 @@ is_foo(Interp *interpreter, UINTVAL codepoint, int bit)
         case enum_cclass_alphanumeric:
             return u_isalnum(codepoint);
             break;
+        case enum_cclass_word:
+            return u_isalnum(codepoint) || codepoint == '_';
+            break;
         default:
             UNIMPL;
     }
