@@ -257,7 +257,9 @@ static INTVAL
 is_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags, STRING *source_string, UINTVAL offset)
 {
     UINTVAL codepoint;
+#if PARROT_HAS_ICU
     int bit, mask;
+#endif
 
     if (offset >= source_string->strlen)
         return 0;
@@ -286,7 +288,9 @@ find_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags, STRING *source_strin
     UINTVAL pos = offset;
     UINTVAL end = offset + count;
     UINTVAL codepoint;
+#if PARROT_HAS_ICU
     int bit, mask;
+#endif
 
     assert(source_string != 0);
     end = source_string->strlen < end ? source_string->strlen : end;
@@ -319,7 +323,9 @@ find_not_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags, STRING *source_s
     UINTVAL pos = offset;
     UINTVAL end = offset + count;
     UINTVAL codepoint;
+#if PARROT_HAS_ICU
     int bit, mask;
+#endif
 
     assert(source_string != 0);
     end = source_string->strlen < end ? source_string->strlen : end;
