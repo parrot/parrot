@@ -18,7 +18,7 @@ Tests find_cclass find_not_cclass, is_cclass.
 
 use strict;
 
-use Parrot::Test tests => 7;
+use Parrot::Test tests => 9;
 
 pir_output_is(<<'CODE', <<'OUT', "find_cclass, ascii");
 .include "cclass.pasm"
@@ -308,7 +308,7 @@ sub string {
 }
 
 my $all_ws = string('whitespace');
-pir_output_is(<<"CODE", <<'OUT', "unicode whitespace");
+pir_output_is(<<"CODE", <<'OUT', "unicode is_cclass whitespace");
 .sub main :main
 .include "cclass.pasm"
    .local int result, char, len, i
@@ -327,3 +327,36 @@ CODE
 11111111111111111111111111
 OUT
 
+pir_output_is(<<"CODE", <<'OUT', "unicode find_ccclass whitespace");
+.sub main :main
+.include "cclass.pasm"
+   .local int result, char, len, i
+   .local string s
+   s = $all_ws
+   s = unicode:"abc" . s
+   len = length s
+   result = find_cclass .CCLASS_WHITESPACE, s, 0, len
+   print result
+   print "\\n"
+.end
+CODE
+3
+OUT
+
+pir_output_is(<<"CODE", <<'OUT', "unicode find_not_ccclass whitespace");
+.sub main :main
+.include "cclass.pasm"
+   .local int result, char, len, i
+   .local string s
+   s = $all_ws
+   s .= unicode:"abc"
+   len = length s
+   result = find_not_cclass .CCLASS_WHITESPACE, s, 0, len
+   print len
+   print ' '
+   print result
+   print "\\n"
+.end
+CODE
+29 26
+OUT

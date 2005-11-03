@@ -201,65 +201,71 @@ validate(Interp *interpreter, STRING *src)
     return 1;
 }
 
+static int
+is_foo(Interp *interpreter, UINTVAL codepoint, int bit)
+{
+    switch (bit) {
+        case enum_cclass_uppercase:
+            return u_isupper(codepoint);
+            break;
+        case enum_cclass_lowercase:
+            return u_islower(codepoint);
+            break;
+        case enum_cclass_alphabetic:
+            return u_isalpha(codepoint);
+            break;
+        case enum_cclass_numeric:
+            return u_isdigit(codepoint);
+            /* XXX which one
+               return u_charDigitValue(codepoint);
+               */
+            break;
+        case enum_cclass_hexadecimal:
+            return u_isxdigit(codepoint);
+            break;
+        case enum_cclass_whitespace:
+            return u_isspace(codepoint);
+            break;
+        case enum_cclass_printing:
+            return u_isprint(codepoint);
+            break;
+        case enum_cclass_graphical:
+            return u_isgraph(codepoint);
+            break;
+        case enum_cclass_blank:
+            return u_isblank(codepoint);
+            break;
+        case enum_cclass_control:
+            return u_iscntrl(codepoint);
+            break;
+        case enum_cclass_alphanumeric:
+            return u_isalnum(codepoint);
+            break;
+        default:
+            UNIMPL;
+    }
+    return 0;
+}
+
 static INTVAL
 is_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags, STRING *source_string, UINTVAL offset)
 {
     UINTVAL codepoint;
-    int result, bit, mask;
+    int bit, mask;
 
     if (offset >= source_string->strlen)
         return 0;
     codepoint = ENCODING_GET_CODEPOINT(interpreter, source_string, offset);
 #if PARROT_HAS_ICU
-    for (result = 0, mask = enum_cclass_uppercase;
+    for (mask = enum_cclass_uppercase;
             mask <= enum_cclass_word ; mask <<= 1) {
         bit = mask & flags;
-        switch (bit) {
-            case 0: continue;
-            case enum_cclass_uppercase:
-                    result |= u_isupper(codepoint);
-                    break;
-            case enum_cclass_lowercase:
-                    result |= u_islower(codepoint);
-                    break;
-            case enum_cclass_alphabetic:
-                    result |= u_isalpha(codepoint);
-                    break;
-            case enum_cclass_numeric:
-                    result |= u_isdigit(codepoint);
-                    /* XXX which one
-                       result |= u_charDigitValue(codepoint);
-                       */
-                    break;
-            case enum_cclass_hexadecimal:
-                    result |= u_isxdigit(codepoint);
-                    break;
-            case enum_cclass_whitespace:
-                    result |= u_isspace(codepoint);
-                    break;
-            case enum_cclass_printing:
-                    result |= u_isprint(codepoint);
-                    break;
-            case enum_cclass_graphical:
-                    result |= u_isgraph(codepoint);
-                    break;
-            case enum_cclass_blank:
-                    result |= u_isblank(codepoint);
-                    break;
-            case enum_cclass_control:
-                    result |= u_iscntrl(codepoint);
-                    break;
-            case enum_cclass_alphanumeric:
-                    result |= u_isalnum(codepoint);
-                    break;
-            default:
-                    UNIMPL;
-        }
-        /* more bits? */
-        if (~ (flags ^ ~mask) == 0)
-            break;
+        if (!bit)
+            continue;
+        if (is_foo(interpreter, codepoint, bit))
+            return 1;
     }
-    return result;
+    return 0;
 #else
     if (codepoint >= 128)
         real_exception(interpreter, NULL, E_LibraryNotLoadedError,
@@ -271,15 +277,67 @@ is_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags, STRING *source_string,
 static INTVAL
 find_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags, STRING *source_string, UINTVAL offset, UINTVAL count)
 {
-    UNIMPL;
-    return -1;
+    UINTVAL pos = offset;
+    UINTVAL end = offset + count;
+    UINTVAL codepoint;
+    int bit, mask;
+
+    assert(source_string != 0);
+    end = source_string->strlen < end ? source_string->strlen : end;
+    for (; pos < end; ++pos) {
+        codepoint = ENCODING_GET_CODEPOINT(interpreter, source_string, pos);
+#if PARROT_HAS_ICU
+        for (mask = enum_cclass_uppercase;
+                mask <= enum_cclass_word ; mask <<= 1) {
+            bit = mask & flags;
+            if (!bit)
+                continue;
+            if (is_foo(interpreter, codepoint, bit))
+                return pos;
+        }
+#else
+        if (codepoint >= 128)
+            real_exception(interpreter, NULL, E_LibraryNotLoadedError,
+                    "no ICU lib loaded");
+        if ((Parrot_ascii_typetable[codepoint] & flags) != 0) {
+            return pos;
+        }
+#endif
+    }
+    return end;
 }
 
 static INTVAL
 find_not_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags, STRING *source_string, UINTVAL offset, UINTVAL count)
 {
-    UNIMPL;
-    return -1;
+    UINTVAL pos = offset;
+    UINTVAL end = offset + count;
+    UINTVAL codepoint;
+    int bit, mask;
+
+    assert(source_string != 0);
+    end = source_string->strlen < end ? source_string->strlen : end;
+    for (; pos < end; ++pos) {
+	codepoint = ENCODING_GET_CODEPOINT(interpreter, source_string, pos);
+#if PARROT_HAS_ICU
+        for (mask = enum_cclass_uppercase;
+                mask <= enum_cclass_word ; mask <<= 1) {
+            bit = mask & flags;
+            if (!bit)
+                continue;
+            if (!is_foo(interpreter, codepoint, bit))
+                return pos;
+        }
+#else
+        if (codepoint >= 128)
+            real_exception(interpreter, NULL, E_LibraryNotLoadedError,
+                    "no ICU lib loaded");
+        if ((Parrot_ascii_typetable[codepoint] & flags) != 0) {
+            return pos;
+        }
+#endif
+    }
+    return end;
 }
 
 static STRING *
