@@ -49,6 +49,7 @@ struct macro_frame_t {
     struct params_t expansion;
     int label;
     int is_macro;
+    char *heredoc_rest;
 };
 
 struct macro_frame_t *frames = NULL;
@@ -95,12 +96,13 @@ FLOATNUM        {SIGN}?(({DIGITS}{DOT}{DIGIT}*|{DOT}{DIGITS})([eE]{SIGN}?{DIGITS
 LETTERDIGIT     [a-zA-Z0-9_]
 LABELLETTERDIGIT     ([a-zA-Z0-9_@]|"::")
 ID              {LETTER}{LABELLETTERDIGIT}*
-STRINGCONSTANT  \"(\\.|[^"\\\n])*\"
+DQ_STRING       \"(\\.|[^"\\\n])*\"
 ENCCHAR         {LETTER}|{DIGIT}|"-"
 ENCCHARS        {ENCCHAR}*
 ENC             {LETTER}{ENCCHARS}":"
-UNICODE         {ENC}{ENC}?{STRINGCONSTANT}
-CHARCONSTANT    \'[^'\n]*\'
+UNICODE         {ENC}{ENC}?{DQ_STRING}
+STRINGCONSTANT  {SQ_STRING}|{DQ_STRING}
+SQ_STRING       \'[^'\n]*\'
 RANKSPEC        \[[,]*\]
 EOL        \r?\n
 WS              [\t\f\r\x1a ]
@@ -114,7 +116,9 @@ SP              [ ]
 %x cmt3
 %x cmt4
 %x cmt5
-%x heredoc
+%x heredoc1
+%x heredoc2
+
 
 %%
         /* for emacs "*/
@@ -132,7 +136,12 @@ SP              [ ]
             return 0;
         }
 
-<heredoc>{EOL} {
+<heredoc1>.*{EOL} {
+            frames->heredoc_rest = str_dup(yytext);
+            BEGIN(heredoc2);
+        }
+
+<heredoc2>{EOL} {
         /* heredocs have highest priority
          * arrange them befor all wildcard state matches
          */
@@ -145,15 +154,19 @@ SP              [ ]
         strcpy(heredoc_content + strlen(heredoc_content), yytext);
     }
 
-<heredoc>.* {
+<heredoc2>.* {
         /* Are we at the end of the heredoc? */
         if (strcmp(heredoc_end, yytext) == 0)
         {
             /* End of the heredoc. */
-            strcpy(heredoc_content + strlen(heredoc_content), "\"");
+            int len = strlen(heredoc_content);
+            heredoc_content[len] = heredoc_content[0];  /* delim */
+            heredoc_content[len+1] = 0;
             mem_sys_free(heredoc_end);
-            BEGIN(prev_state);
+            frames->buffer = YY_CURRENT_BUFFER;
             valp->s = heredoc_content;
+            BEGIN(prev_state);
+            yy_scan_string(frames->heredoc_rest);
             return(STRINGC); /* XXX delete quotes, -> emit, pbc */
         }
         else
@@ -465,21 +478,26 @@ SP              [ ]
         return(STRINGC); /* XXX delete quotes, -> emit, pbc */
     }
 
-<*>"<<"{STRINGCONSTANT}{EOL} {
-        ++line;
+<*>"<<"{STRINGCONSTANT} {
+        struct macro_frame_t *frame;
         /* Save the string we want to mark the end of the heredoc and snip
            off newline and quote. */
+        if (frames->heredoc_rest)
+            IMCC_fataly(interp, E_SyntaxError,
+            "nested heredoc not supported");
         heredoc_end = str_dup(yytext + 3);
-        while (heredoc_end[strlen(heredoc_end) - 1] == '"' ||
-               heredoc_end[strlen(heredoc_end) - 1] == '\n' ||
-               heredoc_end[strlen(heredoc_end) - 1] == '\r')
-            heredoc_end[strlen(heredoc_end) - 1] = 0;
-
+        heredoc_end[strlen(heredoc_end) - 1] = 0;
+        if (!strlen(heredoc_end))
+            IMCC_fataly(interp, E_SyntaxError, "empty heredoc delimiter");
+        frame = new_frame(interp);
+        frame->s.next = (struct parser_state_t*) frames;
+        frames = frame;
+        prev_state = YYSTATE;
         /* Start slurping up the heredoc. */
         heredoc_content = mem_sys_allocate(2);
-        strcpy(heredoc_content, "\"");
-        prev_state = YYSTATE;
-        BEGIN(heredoc);
+        heredoc_content[0] = yytext[2];        /* preserve delim */
+        heredoc_content[1] = 0;                /* eos */
+        BEGIN(heredoc1);
     }
 
 <*>{UNICODE} {
@@ -488,10 +506,6 @@ SP              [ ]
         return(USTRINGC);
     }
 
-<*>{CHARCONSTANT} {
-        valp->s = str_dup(yytext); /* XXX delete quotes, -> emit, pbc */
-        return(STRINGC);
-    }
 
 <emit,INITIAL>\$I[0-9]+          DUP_AND_RET(valp, IREG);
 <emit,INITIAL>\$N[0-9]+          DUP_AND_RET(valp, NREG);
@@ -625,10 +639,13 @@ destroy_frame (struct macro_frame_t *frame)
     buffer = frame->buffer;
 
     for (i = 0; i < frame->expansion.num_param; i++) {
-    free(frame->expansion.name[i]);
+        free(frame->expansion.name[i]);
     }
 
-    line = frame->s.line;
+    if (frame->heredoc_rest)
+        mem_sys_free(frame->heredoc_rest);
+    else
+        line = frame->s.line;
     /* FIXME if frame->s.file was allocated free it */
 
     mem_sys_free(frame);

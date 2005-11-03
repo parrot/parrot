@@ -1085,41 +1085,11 @@ op needs_destroy(in PMC) {
 
 =cut
 
-###############################################################################
-
-=head2 Function Utility ops
-
-Opcodes for handling function parameters, validating parameters, type
-and prototype checking, and generic whatnots.
-
-=over 4
-
-=cut
-
-########################################
-
-=item B<foldup>(out PMC)
-
-Take all the PMCs passed in as parameters and stick them into an Array
-PMC in $1. Note: foldup I<only> works for PMC arguments.
-
-=item B<foldup>(out PMC, in INT)
-
-Take all the PMCs passed in as parameters, starting at offset $2 and
-stick them into an Array PMC in $1.
-Note: foldup I<only> works for PMC arguments.
-
-=back
-
-=cut
-
-op foldup(out PMC) {
-   $1 = foldup(interpreter, 0);
+op DELETED_foldup(out PMC) {
    goto NEXT();
 }
 
-op foldup(out PMC, in INT) {
-   $1 = foldup(interpreter, $2);
+op DELETED_foldup(out PMC, in INT) {
    goto NEXT();
 }
 

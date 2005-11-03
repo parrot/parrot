@@ -249,7 +249,7 @@ chickens
 OUT
 
 
-pir_output_like(<<'CODE', <<'OUT', 'PIR heredoc: rejects single quoted terminator');
+pir_output_is(<<'CODE', <<'OUT', 'PIR heredoc: single quoted terminator');
 .sub 'main' :main
     $S0 = <<'Jabberwocky'
 `Twas brillig, and the slithy toves
@@ -260,9 +260,22 @@ Jabberwocky
     print $S0
 .end
 CODE
-/^error:imcc:parse error, unexpected SHIFT_LEFT.*/
+`Twas brillig, and the slithy toves
+  Did gyre and gimble in the wabe;
+All mimsy were the borogoves,
+  And the mome raths outgrabe.
 OUT
 
+pir_output_is(<<'CODE', <<'OUT', 'PIR heredoc: single quoted - backslash');
+.sub 'main' :main
+    $S0 = <<'SQ'
+abc\tdef
+SQ
+    print $S0
+.end
+CODE
+abc\tdef
+OUT
 
 pir_output_like(<<'CODE', <<'OUT', 'PIR heredoc: rejects unquoted terminator');
 .sub 'main' :main
@@ -521,6 +534,49 @@ w w \w
 w w \w
 OUT
 
+pir_output_is(<<'CODE', <<'OUT', "heredoc not eol 1");
+.sub main :main
+    .local string code
+    code = ''
+    emit(code, <<"HERE", 10)
+line 1
+line %d
+line 2
+HERE
+.end
+.sub emit
+    .param string code
+    .param string more
+    .param pmc args  :slurpy
+    $S0 = sprintf more, args
+    code .= $S0
+    print code
+.end
+CODE
+line 1
+line 10
+line 2
+OUT
+
+pir_output_like(<<'CODE', <<'OUT', "heredoc not eol 2 - nested");
+.sub main :main
+    cat(<<"H1", <<"H2")
+line 1
+line 2
+H1
+line 3
+line 4
+H2
+.end
+.sub cat
+    .param string p1
+    .param string p2
+    p1 .= p2
+    print p1
+.end
+CODE
+/nested heredoc not supported/
+OUT
 
 ## remember to change the number of tests!
-BEGIN { plan tests => 29; }
+BEGIN { plan tests => 32; }

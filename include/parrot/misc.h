@@ -28,7 +28,6 @@
 
 INTVAL   intval_mod(INTVAL i2, INTVAL i3);
 FLOATVAL floatval_mod(FLOATVAL n2, FLOATVAL n3);
-PMC*     foldup(Parrot_Interp, INTVAL start);
 
 FLOATVAL Parrot_float_rand(INTVAL how_random);
 INTVAL Parrot_uint_rand(INTVAL how_random);

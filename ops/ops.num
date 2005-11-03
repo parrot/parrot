@@ -390,9 +390,9 @@ floor_i_nc                      359
 floor_n                         360
 floor_n_n                       361
 floor_n_nc                      362
-foldup_p                        363
-foldup_p_i                      364
-foldup_p_ic                     365
+DELETED_foldup_p                        363
+DELETED_foldup_p_i                      364
+DELETED_foldup_p_ic                     365
 freeze_s_p                      366
 gc_debug_i                      367
 gc_debug_ic                     368

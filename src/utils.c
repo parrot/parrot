@@ -112,66 +112,6 @@ floatval_mod(FLOATVAL n2, FLOATVAL n3)
 #endif
 }
 
-/*
-
-=item C<PMC*
-foldup(Parrot_Interp interpreter, INTVAL skip)>
-
-Take all the PMCs in register P3, starting at offset C<skip> and return
-them in an C<Array> PMC.
-
-=cut
-
-*/
-
-PMC*
-foldup(Parrot_Interp interpreter, INTVAL skip)
-{
-    INTVAL max_used_reg = REG_INT(3) + 5;
-    INTVAL reg;
-    INTVAL elems_in_array = 0;
-    INTVAL current_offset = 0;
-    INTVAL total_size;
-    INTVAL start = 5;
-    PMC *destination_pmc = NULL;
-    PMC *overflow = REG_PMC(3);
-
-    destination_pmc = pmc_new_noinit(interpreter, enum_class_Array);
-    VTABLE_init(interpreter, destination_pmc);
-
-    /* see how many are in the overflow, if any */
-    if (max_used_reg == 16 && !PMC_IS_NULL(overflow) &&
-            VTABLE_type(interpreter, overflow) != enum_class_Null) {
-        elems_in_array = VTABLE_get_integer(interpreter, overflow);
-    }
-    total_size = REG_INT(3) + elems_in_array - skip;
-
-    VTABLE_set_integer_native(interpreter, destination_pmc, total_size);
-
-    /* Skip past what we're skipping */
-    start += skip;
-
-    /* First move over the PMCs in registers */
-    for (reg = start; reg < max_used_reg; reg++) {
-        VTABLE_set_pmc_keyed_int(interpreter, destination_pmc,
-                current_offset, REG_PMC(reg));
-        current_offset++;
-    }
-    if (elems_in_array) {
-        INTVAL cur_elem;
-        start = 0;
-        if (skip > 11) {
-            start = skip - 11;
-        }
-        for (cur_elem = start; cur_elem < elems_in_array; cur_elem++) {
-            VTABLE_set_pmc_keyed_int(interpreter, destination_pmc,
-                    current_offset,
-                    VTABLE_get_pmc_keyed_int(interpreter, overflow, cur_elem));
-            current_offset++;
-        }
-    }
-    return destination_pmc;
-}
 
 /*
 
