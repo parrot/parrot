@@ -176,10 +176,10 @@ Parse alternations of the form {a,b,c} where a,b, and c are the alternatives.
     $S0 = substr pattern, pos, 1
     if $S0 == "!" goto negate
     if $S0 == "^" goto negate
-    exp["charmatch"] = "if"
+    exp["isnegated"] = 0
     goto first_bracket
   negate:
-    exp["charmatch"] = "unless"
+    exp["isnegated"] = 1
     inc pos
   first_bracket:
     $S0 = substr pattern, pos, 1
@@ -212,7 +212,7 @@ Parse alternations of the form {a,b,c} where a,b, and c are the alternatives.
   end_class:
     inc pos
     lex["pos"] = pos
-    exp["charlist"] = charclass
+    exp["value"] = charclass
   end:
     .return (exp)
 .end  
