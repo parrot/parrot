@@ -106,11 +106,12 @@
     $I1 = is_cclass .CCLASS_UPPERCASE, target, pos 
     inc pos
     $S0 = downcase initchar
+    if $S0 == 'x' goto term_backslash_x            # \x.. \X..
     $P0 = find_global "PGE::P6Rule", "%escape"
-    $I0 = exists $P0[$S0]                          # \e\f\h\r\t\v etc...
+    $I0 = exists $P0[$S0]                          # \e\f\r\t\v\h
     if $I0 == 0 goto term_literal
     initchar = $P0[$S0]
-    if $I1 goto term_charlist                      # negated escapes
+    if $I1 goto term_charlist                      # negated \E\F\R\T\V\H
     $I0 = length initchar
     if $I0 < 2 goto term_literal
   term_charlist:
@@ -118,6 +119,29 @@
     mob["value"] = initchar
     mob["isnegated"] = $I1
     goto end
+
+  term_backslash_x:
+    $S0 = substr target, pos, 1
+    $I2 = index "[{(<", $S0
+    if $I2 < 0 goto term_bx1
+    $S2 = substr "]})>", $I0
+    inc pos
+  term_bx1:
+    $I0 = pos
+    pos = find_not_cclass .CCLASS_HEXADECIMAL, target, pos, lastpos
+    if pos == $I0 goto err_nodigits
+    $I3 = pos - $I0
+    $S0 = substr target, $I0, $I3
+    $S0 = concat "0x", $S0
+    $I0 = $S0
+    initchar = chr $I0
+    if $I2 < 0 goto term_bx2
+    $S0 = substr target, pos, 1
+    if $S0 != $S2 goto err_close
+    inc pos
+  term_bx2:
+    if $I1 goto term_charlist                      # X[...]
+    # goto term_literal                            # x[...]
 
   term_literal:                                    # first char is in initchar
     mob = newfrom(mob, 0, "PGE::Exp::Literal")
@@ -157,8 +181,14 @@
     $P0 = getattribute mob, "PGE::Match\x0$:pos"
     $P0 = pos
     .return (mob)
-.end
 
+  err_nodigits:
+    parse_error(mob, pos, "No digits found in \\x...")
+    goto end
+  err_close:
+    parse_error(mob, pos, "Missing close bracket for \\x...")
+    goto end
+.end
 
 .sub "parse_modifier"
     .param pmc mob
