@@ -124,7 +124,7 @@ package Parrot::Test::PGE;
 
 sub _parrot_stringify {
     $_ = $_[0];
-    s/\\/\\\\/g;
+    s/\\(?!u)/\\\\/g;
     s/\n/\\n/g;
     s/\r/\\r/g;
     s/\"/\\"/g;
@@ -157,7 +157,7 @@ sub _generate_pir_for {
             .local pmc match
             .local pmc code
             .local pmc exp
-            target = "$target"
+            target = unicode:"$target"
             pattern = "$pattern"
             (rulesub, code, exp) = p6rule_compile(pattern)
             match = rulesub(target)

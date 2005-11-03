@@ -18,7 +18,7 @@ Tests find_cclass find_not_cclass, is_cclass.
 
 use strict;
 
-use Parrot::Test tests => 9;
+use Parrot::Test tests => 10;
 use Parrot::Config;
 
 pir_output_is(<<'CODE', <<'OUT', "find_cclass, ascii");
@@ -366,3 +366,26 @@ CODE
 29 26
 OUT
 }
+
+# The following should pass even if ICU is unavailable  (pmichaud, 2005-11-3)
+pir_output_is(<<"CODE", <<'OUT', "unicode 0-127 find_*_cclass whitespace");
+.sub main :main
+.include "cclass.pasm"
+   .local int result, char, len, i
+   .local string s
+   s = unicode:"abc   def"
+   len = length s
+   result = find_cclass .CCLASS_WHITESPACE, s, 0, len
+   print len
+   print ' '
+   print result
+   result = find_not_cclass .CCLASS_WHITESPACE, s, 3, len
+   print ' '
+   print result
+   print "\\n"
+.end
+CODE
+9 3 6
+OUT
+
+
