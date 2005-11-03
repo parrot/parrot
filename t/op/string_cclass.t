@@ -19,6 +19,7 @@ Tests find_cclass find_not_cclass, is_cclass.
 use strict;
 
 use Parrot::Test tests => 9;
+use Parrot::Config;
 
 pir_output_is(<<'CODE', <<'OUT', "find_cclass, ascii");
 .include "cclass.pasm"
@@ -308,6 +309,10 @@ sub string {
 }
 
 my $all_ws = string('whitespace');
+
+SKIP: {
+	skip 'unicode support unavailable' => 3
+		unless $PConfig{has_icu};
 pir_output_is(<<"CODE", <<'OUT', "unicode is_cclass whitespace");
 .sub main :main
 .include "cclass.pasm"
@@ -360,3 +365,4 @@ pir_output_is(<<"CODE", <<'OUT', "unicode find_not_ccclass whitespace");
 CODE
 29 26
 OUT
+}
