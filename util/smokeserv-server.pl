@@ -35,18 +35,30 @@ $SIG{PIPE} = "IGNORE";
 
 my $t = do { local $/; <DATA> };
 
+my $CGI = new CGI;
+
 #sub handle_request {
 	#my ($self, $CGI) = @_;
 
-	#HSS if ($CGI->url(-path => 1) =~ /html$/) {
-		#HSS $self->serve_static($CGI, BASEDIR);
-	#HSS } else {
+	if ($CGI->url(-path => 1) =~ /html$/) {
+	    print $CGI->header;
+	    my $file = $CGI->url(-absolute => 1, -path => 1);
+	    my $basehttpdir = BASEHTTPDIR;
+	    $file =~ s!^$basehttpdir!!;
+	    die "Invalid File"
+		if $file =~ m!/|\.\.!;
+	    if (-e BASEDIR . "/" . $file) {
+		open my $f, "<", BASEDIR . "/" . $file or die $!;
+		print do { local $/; <$f> };
+	    }
+
+	} else {
 		if($CGI->param("upload")) {
 		  eval { process_upload($CGI) };
 		} else {
 		  eval { process_list($CGI) };
 		}
-	#HSS } 
+	} 
 #HSS }
 #HSS __PACKAGE__->new->run(host => "192.168.2.249");
 
@@ -54,7 +66,7 @@ exit;
 
 sub process_upload {
   my $CGI = shift;
-  print "HTTP/1.0 200 OK\n";
+  #print "HTTP/1.0 200 OK\n";
   print $CGI->header;
 
   limit_rate();
@@ -153,7 +165,7 @@ sub add_smoke {
 sub clean_obsolete_smokes {
   my $category = sub {
     return join "-",
-      (map { $_[0]->{$_} } qw<branch cpuarch osname cc runcore>),
+      (map { $_[0]->{$_} } qw<branch cpuarch osname cc runcore harness_args>),
       $_[0]->{DEVEL} eq "devel" ? "dev" : "release",
   };
 
@@ -183,7 +195,7 @@ sub process_list {
   my $CGI = shift;
   my $tmpl = HTML::Template->new(scalarref => \$t, die_on_bad_params => 0);
 
-  print "HTTP/1.0 200 OK\n";
+  #print "HTTP/1.0 200 OK\n";
   print $CGI->header;
 
   my $category = sub {
