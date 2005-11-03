@@ -264,22 +264,23 @@ is_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags, STRING *source_string,
     if (offset >= source_string->strlen)
         return 0;
     codepoint = ENCODING_GET_CODEPOINT(interpreter, source_string, offset);
+    if (codepoint >= 256) {
 #if PARROT_HAS_ICU
-    for (mask = enum_cclass_uppercase;
-            mask <= enum_cclass_word ; mask <<= 1) {
-        bit = mask & flags;
-        if (!bit)
-            continue;
-        if (is_foo(interpreter, codepoint, bit))
-            return 1;
-    }
-    return 0;
+        for (mask = enum_cclass_uppercase;
+                mask <= enum_cclass_word ; mask <<= 1) {
+            bit = mask & flags;
+            if (!bit)
+                continue;
+            if (is_foo(interpreter, codepoint, bit))
+                return 1;
+        }
+        return 0;
 #else
-    if (codepoint >= 256)
         real_exception(interpreter, NULL, E_LibraryNotLoadedError,
                 "no ICU lib loaded");
-    return (Parrot_iso_8859_1_typetable[codepoint] & flags) ? 1 : 0;
 #endif
+    }
+    return (Parrot_iso_8859_1_typetable[codepoint] & flags) ? 1 : 0;
 }
 
 static INTVAL
@@ -296,23 +297,26 @@ find_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags, STRING *source_strin
     end = source_string->strlen < end ? source_string->strlen : end;
     for (; pos < end; ++pos) {
         codepoint = ENCODING_GET_CODEPOINT(interpreter, source_string, pos);
+        if (codepoint >= 256) {
 #if PARROT_HAS_ICU
-        for (mask = enum_cclass_uppercase;
-                mask <= enum_cclass_word ; mask <<= 1) {
-            bit = mask & flags;
-            if (!bit)
-                continue;
-            if (is_foo(interpreter, codepoint, bit))
-                return pos;
-        }
+            for (mask = enum_cclass_uppercase;
+                    mask <= enum_cclass_word ; mask <<= 1) {
+                bit = mask & flags;
+                if (!bit)
+                    continue;
+                if (is_foo(interpreter, codepoint, bit))
+                    return pos;
+            }
 #else
-        if (codepoint >= 256)
             real_exception(interpreter, NULL, E_LibraryNotLoadedError,
                     "no ICU lib loaded");
-        if ((Parrot_iso_8859_1_typetable[codepoint] & flags) != 0) {
-            return pos;
-        }
 #endif
+        }
+        else {
+            if (Parrot_iso_8859_1_typetable[codepoint] & flags) {
+                return pos;
+            }
+        }
     }
     return end;
 }
@@ -330,24 +334,27 @@ find_not_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags, STRING *source_s
     assert(source_string != 0);
     end = source_string->strlen < end ? source_string->strlen : end;
     for (; pos < end; ++pos) {
-	codepoint = ENCODING_GET_CODEPOINT(interpreter, source_string, pos);
+        codepoint = ENCODING_GET_CODEPOINT(interpreter, source_string, pos);
+        if (codepoint >= 256) {
 #if PARROT_HAS_ICU
-        for (mask = enum_cclass_uppercase;
-                mask <= enum_cclass_word ; mask <<= 1) {
-            bit = mask & flags;
-            if (!bit)
-                continue;
-            if (!is_foo(interpreter, codepoint, bit))
-                return pos;
-        }
+            for (mask = enum_cclass_uppercase;
+                    mask <= enum_cclass_word ; mask <<= 1) {
+                bit = mask & flags;
+                if (!bit)
+                    continue;
+                if (!is_foo(interpreter, codepoint, bit))
+                    return pos;
+            }
 #else
-        if (codepoint >= 256)
             real_exception(interpreter, NULL, E_LibraryNotLoadedError,
                     "no ICU lib loaded");
-        if ((Parrot_iso_8859_1_typetable[codepoint] & flags) != 0) {
-            return pos;
-        }
 #endif
+        } 
+        else {
+            if (!(Parrot_iso_8859_1_typetable[codepoint] & flags)) {
+                return pos;
+            }
+        }
     }
     return end;
 }

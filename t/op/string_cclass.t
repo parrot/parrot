@@ -324,6 +324,14 @@ pir_output_is(<<"CODE", <<'OUT', "unicode is_cclass whitespace");
 loop:
    result = is_cclass .CCLASS_WHITESPACE, s, i
    print result
+   if result goto ok
+   \$S0 = s[i]
+   \$I0 = ord \$S0
+   \$P0 = new .ResizablePMCArray
+   push \$P0, \$I0
+   \$S0 = sprintf "\\nchar %#x not reported as ws\\n", \$P0
+   print \$S0
+ok:
    inc i
    if i < len goto loop
    print "\\n"
