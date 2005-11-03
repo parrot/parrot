@@ -51,7 +51,7 @@ sub classify {
     $ret |= 0x0004 if $chr =~ /^[[:alpha:]]$/;  # CCLASS_ALPHABETIC
     $ret |= 0x0008 if $chr =~ /^[[:digit:]]$/;  # CCLASS_NUMERIC        
     $ret |= 0x0010 if $chr =~ /^[[:xdigit:]]$/; # CCLASS_HEXADECIMAL    
-    $ret |= 0x0020 if $chr =~ /^[[:space:]]$/;  # CCLASS_WHITESPACE     
+    $ret |= 0x0020 if $chr =~ /^[[:space:]\x85\xa0]$/;  # CCLASS_WHITESPACE     
     $ret |= 0x0040 if $chr =~ /^[[:print:]]$/;  # CCLASS_PRINTING       
     $ret |= 0x0080 if $chr =~ /^[[:graph:]]$/;  # CCLASS_GRAPHICAL      
     $ret |= 0x0100 if $chr =~ /^[[:blank:]]$/;  # CCLASS_BLANK  

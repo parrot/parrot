@@ -132,40 +132,45 @@ p6rule_is  ("1abc", '\1abc', 'retired metachars (\1)');
 ## setup for unicode whitespace tests
 ## see http://www.unicode.org/Public/UNIDATA/PropList.txt for White_Space list
 my $ws= {
-	horizontal_ascii => [qw/ \u0009 \u0020 /],
+	horizontal_iso_8859_1 => [qw/ \u0009 \u0020 \u00a0 /],
 	horizontal_unicode => [qw/
-           \u00a0 \u1680 \u180e \u2000 \u2001 \u2002 \u2003 
+           \u1680 \u180e \u2000 \u2001 \u2002 \u2003 
            \u2004 \u2005 \u2006 \u2007 \u2008 \u2009 
            \u200a \u202f \u205f \u3000
 	/],
-	vertical_ascii => [qw/ \u000a \u000b \u000c \u000d /],
-	vertical_unicode => [qw/ \u0085 \u2028 \u2029 /] 
+	vertical_iso_8859_1 => [qw/ \u000a \u000b \u000c \u000d \u0085 /],
+	vertical_unicode => [qw/ \u2028 \u2029 /] 
 };
 
 push @{ $ws->{horizontal} } =>
-	@{ $ws->{horizontal_ascii} }, @{ $ws->{horizontal_unicode} };
+	@{ $ws->{horizontal_iso_8859_1} }, @{ $ws->{horizontal_unicode} };
 
 push @{ $ws->{vertical} } =>
-	@{ $ws->{vertical_ascii} }, @{ $ws->{vertical_unicode} };
+	@{ $ws->{vertical_iso_8859_1} }, @{ $ws->{vertical_unicode} };
 
-push @{ $ws->{whitespace_ascii} } =>
-	@{ $ws->{horizontal_ascii} }, @{ $ws->{vertical_ascii} };
+push @{ $ws->{whitespace_iso_8859_1} } =>
+	@{ $ws->{horizontal_iso_8859_1} }, @{ $ws->{vertical_iso_8859_1} };
 
 push @{ $ws->{whitespace_unicode} } =>
 	@{ $ws->{horizontal_unicode} }, @{ $ws->{vertical_unicode} };
 
 push @{ $ws->{whitespace} } =>
-	@{ $ws->{whitespace_ascii} }, @{ $ws->{whitespace_unicode} };
+	@{ $ws->{whitespace_iso_8859_1} }, @{ $ws->{whitespace_unicode} };
 
 
 ## \s -- match unicode whitespace
 ## \h and \H -- horizontal whitespace, including unicode
 ## \v and \V -- vertical whitespace, including unicode
-p6rule_is  (join('', @{$ws->{whitespace_ascii}}), '^ \s+ $', 'ascii whitespace (\s)');
-p6rule_is  (join('', @{$ws->{horizontal_ascii}}), '^ \h+ $', 'ascii horizontal whitespace (\h)');
-p6rule_is  (join('', @{$ws->{vertical_ascii}}), '^ \v+ $', 'ascii vertical whitespace (\v)');
-p6rule_isnt(join('', @{$ws->{vertical_ascii}}), '^ \h+ $', 'ascii horizontal whitespace (\h)');
-p6rule_isnt(join('', @{$ws->{horizontal_ascii}}), '^ \v+ $', 'ascii vertical whitespace (\v)');
+p6rule_is  (join('', @{$ws->{whitespace_iso_8859_1}}), '^ \s+ $', 
+    '0-255 whitespace (\s)');
+p6rule_is  (join('', @{$ws->{horizontal_iso_8859_1}}), '^ \h+ $', 
+    '0-255 horizontal whitespace (\h)');
+p6rule_is  (join('', @{$ws->{vertical_iso_8859_1}}), '^ \v+ $', 
+    '0-255 vertical whitespace (\v)');
+p6rule_isnt(join('', @{$ws->{vertical_iso_8859_1}}), '^ \h+ $', 
+    '0-255 horizontal whitespace (\h)');
+p6rule_isnt(join('', @{$ws->{horizontal_iso_8859_1}}), '^ \v+ $', 
+    '0-255 vertical whitespace (\v)');
 SKIP: {
 	skip 'unicode support unavailable' => 5
 		unless $PConfig{has_icu};
