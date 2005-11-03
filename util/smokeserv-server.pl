@@ -418,10 +418,10 @@ __DATA__
 </pre>
     
   <p>
-    should suffice. If a language distributed with parrot supports smoking, you
-    can cd to that language directory and issue the same commands.
+    should suffice. To test the languages that are shipped with parrot, change
+    to the languages directory and issue the same command.
   </p>
-  
+
   <p>
     Note that old smoke reports are automatically deleted, so you may not want
     to link directly to a smoke.
