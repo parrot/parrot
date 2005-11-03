@@ -270,10 +270,10 @@ is_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags, STRING *source_string,
     }
     return 0;
 #else
-    if (codepoint >= 128)
+    if (codepoint >= 256)
         real_exception(interpreter, NULL, E_LibraryNotLoadedError,
                 "no ICU lib loaded");
-    return (Parrot_ascii_typetable[codepoint] & flags) ? 1 : 0;
+    return (Parrot_iso_8859_1_typetable[codepoint] & flags) ? 1 : 0;
 #endif
 }
 
@@ -299,10 +299,10 @@ find_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags, STRING *source_strin
                 return pos;
         }
 #else
-        if (codepoint >= 128)
+        if (codepoint >= 256)
             real_exception(interpreter, NULL, E_LibraryNotLoadedError,
                     "no ICU lib loaded");
-        if ((Parrot_ascii_typetable[codepoint] & flags) != 0) {
+        if ((Parrot_iso_8859_1_typetable[codepoint] & flags) != 0) {
             return pos;
         }
 #endif
@@ -332,10 +332,10 @@ find_not_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags, STRING *source_s
                 return pos;
         }
 #else
-        if (codepoint >= 128)
+        if (codepoint >= 256)
             real_exception(interpreter, NULL, E_LibraryNotLoadedError,
                     "no ICU lib loaded");
-        if ((Parrot_ascii_typetable[codepoint] & flags) != 0) {
+        if ((Parrot_iso_8859_1_typetable[codepoint] & flags) != 0) {
             return pos;
         }
 #endif
