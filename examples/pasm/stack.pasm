@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2003 The Perl Foundation.  All rights reserved.
+# Copyright (C) 2001-2005 The Perl Foundation.  All rights reserved.
 # $Id$
 
 =head1 NAME
@@ -190,5 +190,5 @@ Shows you how to C<set>, C<save>, C<restore> and C<print>.
 	print I1
 	restore I1
 	print I1
-    end
-
+	print "\n"
+ 	end

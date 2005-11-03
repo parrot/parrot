@@ -27,7 +27,7 @@ F<t/examples/japh.t>
 =cut
 
 use strict;
-use Parrot::Test tests => 4;
+use Parrot::Test tests => 5;
 use Test::More;
 
 # Set up expected output for examples
@@ -74,6 +74,10 @@ The lexical 'b' has in scope 0 the value 3.
 Getting rid of bottom stack
 The lexical 'a' has in the current scope the value 2.
 The lexical 'b' has in the current scope the value 3.
+END_EXPECTED
+
+    'stack.pasm'        =>  << 'END_EXPECTED',
+87654321098765432100123456789012345678998765432109876543210
 END_EXPECTED
 
     'xml_parser.pasm'        =>  << 'END_EXPECTED',

@@ -456,7 +456,6 @@ examples/assembly/ncurses_life.imc                [main]doc
 examples/assembly/pmcmops.pasm                    [main]doc
 examples/assembly/queens.pasm                     [main]doc
 examples/assembly/queens_r.imc                    [main]doc
-examples/assembly/stack.pasm                      [main]doc
 examples/assembly/thr-primes.imc                  [main]doc
 examples/assembly/trace.pasm                      [main]doc
 examples/assembly/uniq.pasm                       [main]doc
@@ -590,6 +589,7 @@ examples/pasm/fact.pasm                           [main]doc
 examples/pasm/hello.pasm                          [main]doc
 examples/pasm/lexical.pasm                        [main]doc
 examples/pasm/small.xml                           [main]doc
+examples/pasm/stack.pasm                          [main]doc
 examples/pasm/xml_parser.pasm                     [main]doc
 examples/pge/README                               [main]doc
 examples/pge/all.pir                              [main]doc
@@ -608,6 +608,7 @@ examples/pir/substr.pir                           [main]doc
 examples/pir/sudoku.pir                           [main]doc
 examples/pni/PQt.C                                [main]doc
 examples/pni/QtHelloWorld.pasm                    [main]doc
+examples/pni/ls.pir                               [main]doc
 examples/pni/sdl_blue_rectangle.imc               [main]doc
 examples/pni/win32api.imc                         [main]doc
 examples/sdl/anim_image.imc                       [devel]
