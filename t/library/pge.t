@@ -14,7 +14,7 @@ t/library/pge.t - Grammar Engine tests
 
 use strict;
 
-use Parrot::Test tests => 19;
+use Parrot::Test tests => 23;
 use Parrot::Test::PGE;
 
 # 1-6
@@ -38,7 +38,12 @@ pgeglob_isnt('9','[^0-9]','glob enumerated characters');
 pgeglob_isnt('4a','[^0-9]','glob enumerated characters');
 pgeglob_isnt('aa','[^0-9]','glob enumerated characters');
 
-# 18
+pgeglob_is  ('', '*', 'glob empty string');
+pgeglob_isnt('', '?', 'glob empty string');
+pgeglob_isnt('', '[0]', 'glob empty string');
+pgeglob_isnt('', '[^0]', 'glob empty string');
+
+# 22 
 pir_output_is(<<'CODE', <<'OUT', "Glob, alternate");
 
 .sub _main
@@ -132,7 +137,7 @@ ok10
 ok11
 OUT
 
-# 19
+# 23 
 pir_output_is(<<'CODE', <<'OUT', "This made Parrot m4 fail");
 
 .sub 'test' :main
