@@ -80,11 +80,32 @@ A local B<identifier> or a B<reg> or a constant (when allowed).
 
 =over 4
 
+=item 'char constant'
+
+Are delimited by B<'>. They are taken to be C<ascii> encoded. No escape
+sequences are processed.
+
 =item "string constants"
 
 Are delimited by B<">. A B<"> inside a string must be escaped by
 B<\">.  Only 7-bit ASCII is accepted in string constants; to use
 characters outside thar range, specify an encoding in the way below.
+
+=item <<"heredoc",  <<'heredoc'
+
+Heredocs work like single or double quoted strings. All lines up to
+the terminating delimiter is slurped into the string. The delimiter
+has to be on it's own line with no trailing whitespace.
+
+  $S0 = <<'EOT'
+  ...
+ EOT
+
+  function(<<"END_OF_HERE", arg)
+  ...
+ END_OF_HERE
+
+Only one heredoc can be active per statement line.
 
 =item charset:"string constant"
 
@@ -116,11 +137,6 @@ Like above with an extra encoding attached to the string. For eample:
 
 The encoding and charset gets attaced to the string, no further processing
 is done, specifically escape sequences are not honored.
-
-=item 'char constant'
-
-Are delimited by B<'>. They are taken to be C<ascii> encoded. No escape
-sequences are processed.
 
 =item numeric constants
 
