@@ -16,7 +16,7 @@ Description: virtual machine to execute bytecode for interpreted languages
  There is already a partial Perl 6 compiler as well as compilers in various
  stages of completion for a wide range of other languages.
 
-Package: libparrot0.3.0
+Package: libparrot%SOVERSION%
 Architecture: any
 Section: libs
 Depends: ${shlibs:Depends}
@@ -28,10 +28,10 @@ Description: virtual machine to execute bytecode for interpreted languages
  .
  This package contains the parrot shared library.
  
-Package: libparrot0.3.0-dev
+Package: libparrot%SOVERSION%-dev
 Architecture: all
 Section: libdevel
-Depends: libparrot0.3.0 (= ${Source-Version})
+Depends: libparrot%SOVERSION% (= ${Source-Version})
 Provides: libparrot-dev
 Conflicts: libparrot-dev
 Description: virtual machine to execute bytecode for interpreted languages

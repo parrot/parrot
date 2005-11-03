@@ -2,7 +2,7 @@
 
 CFLAGS = -Wall -g
 VERSION = 0.3.0
-SOVERSION = 0.3.0
+SOVERSION = 0.3.1
 
 ifneq (,$(findstring noopt,$(DEB_BUILD_OPTIONS)))
 	CFLAGS += -O0
@@ -10,7 +10,10 @@ else
 	CFLAGS += -O2
 endif
 
-configure: configure-stamp
+debian/control:
+	perl -p -e 's/%SOVERSION%/$(SOVERSION)/g' debian/control.in > debian/control
+
+configure: debian/control configure-stamp
 configure-stamp:
 	dh_testdir
 	perl Configure.pl --prefix=/usr
