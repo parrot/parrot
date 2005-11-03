@@ -46,6 +46,7 @@
     $P0 = find_global "PGE::P6Rule", "parse_enumclass"
     optable.addtok("term:<[", "term:", "nows", $P0)
     optable.addtok("term:<-[", "term:", "nows", $P0)
+    optable.addtok("term:<+[", "term:", "nows", $P0)
 
     $P0 = find_global "PGE::P6Rule", "parse_closure"
     optable.addtok("term:{{", "term:", "nows", $P0)

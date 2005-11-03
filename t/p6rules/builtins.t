@@ -1,10 +1,18 @@
-use Parrot::Test tests => 45;
+# $Id$
+
+use strict;
+use warnings;
+use Parrot::Test;
 use Parrot::Test::PGE;
 
-$str = 
+
+## tests based on http://dev.perl.org/perl6/doc/design/syn/S05.html, ver. 7
+##   in the 'Extensible metasyntax (<...>)' and 'Nothing is illegal' sections
+
+
+my $str = 
   "\t\n\r !\"#\$%&'()*+,-./:;<=>?@[\\]^`_{|}0123456789ABCDEFGHIJabcdefghij";
 
-p6rule_is  ($str,  'abc <null> def', '<null>');
 p6rule_isnt($str,  'abc <fail> def', '<fail>');
 
 p6rule_like($str,  '<upper>',
@@ -113,3 +121,31 @@ p6rule_like  ("aabaaa", '<!before ..b> aa',
     'negated lookahead');
 
 
+## leading + -- enumerated char class
+p6rule_is  ('az', '<[a..z]>+', 'metasyntax with leading + (<+...>)');
+p6rule_is  ('az', '<+[a..z]>+', 'metasyntax with leading + (<+...>)');
+p6rule_is  ('az', '<+<alpha>>+', 'metasyntax with leading + (<+...>)',
+    todo => 'not yet implemented');
+
+
+## null pattern is illegal
+p6rule_like($str, '', '/Missing term at offset.*/',
+    'null pattern ()');
+
+
+## <null> -- null pattern
+p6rule_is  ('',  '<null>', 'null pattern (<null>)');
+p6rule_like($str,  '^ <null>',
+    qr/mob<null>: < @ 0>/, 'null pattern (<null>)');
+p6rule_like($str,  '<null> $',
+    qr/mob<null>: < @ 65>/, 'null pattern (<null>)');
+p6rule_is  ($str,  'abc <null> def', 'null pattern (<null>)');
+p6rule_like($str, "abc <null> def",
+    qr/mob<null>: < @ 58>/, 'null pattern (<null>)');
+p6rule_is  ($str, 'x | y | <null>', 'null pattern (<null>)',
+    todo => 'specification unclear');
+p6rule_is  ($str, 'x | y | <?null>', 'null pattern (<null>)');
+
+
+## remember to change the number of tests :-)
+BEGIN { plan tests => 55; }

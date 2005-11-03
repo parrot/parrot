@@ -1,7 +1,12 @@
-use Parrot::Test tests => 26;
+# $Id$
+
+use strict;
+use warnings;
+use Parrot::Test;
 use Parrot::Test::PGE;
 
-$str = q{abc
+
+my $str = q{abc
 def
 -==
 ghi};
@@ -38,5 +43,5 @@ p6rule_is  ($str, 'a\B',   '\w\w nonword boundary');
 p6rule_is  ($str, '-\B',   '\W\W nonword boundary');
 
 
-
-# dont forget to change the number of tests :-)
+# remember to change the number of tests :-)
+BEGIN { plan tests => 26; }

@@ -10,7 +10,40 @@ use Parrot::Test::PGE;
 ##   in the 'Modifiers' section
 
 
-## :i
+## setup template for pir tests
+my $pre = <<PRE;
+.sub 'main' :main
+    load_bytecode "PGE.pbc"
+    load_bytecode "dumper.imc"
+    load_bytecode "PGE/Dumper.pir"
+    load_bytecode "PGE/Glob.pir"
+    load_bytecode "PGE/Text.pir"
+    load_bytecode "PGE/Util.pir"
+    .local string target
+    .local string pattern
+    .local string modifier
+    .local pmc p6rule_compile
+    .local pmc rulesub
+    .local pmc pir
+    .local pmc exp
+    .local pmc match
+    find_global p6rule_compile, 'PGE', 'p6rule'
+    null match
+    null rulesub
+PRE
+my $post = <<'POST';
+    goto OK
+NOK:
+    print "not "
+OK:
+    print "ok"
+END:
+	print "\n"
+.end
+POST
+
+
+## :i and :ignorecase -- ignore case
 ## TODO lexical scoping of :i
 p6rule_is  ('abcdef', ':i bcd', 'ignorecase (:i)');
 p6rule_is  ('aBcdef', ':i bcd', 'ignorecase (:i)');
@@ -22,7 +55,7 @@ p6rule_is  ('aBCDef', ':ignorecase bcd', 'ignorecase (:ignorecase)');
 p6rule_isnt('abc-ef', ':ignorecase bcd', 'ignorecase (:ignorecase)');
 
 
-## :w
+## :w and :words -- magically ignore whitespace
 ## TODO lexical scoping of :w
 p6rule_is  ('a bcdef', ':w bcd', 'words (:w)');
 p6rule_is  ('a bcd ef', ':w bcd', 'words (:w)');
@@ -42,13 +75,32 @@ p6rule_is  ('a b c def', ':words b c d', 'words (:words)');
 p6rule_isnt('ab c d ef', ':words b c d', 'words (:words)');
 
 
-## :once
+## :once -- match only once
+pir_output_is($pre . <<'CODE' . $post, <<"OUT", 'match only once (:once)', todo => 'syntax not specified');
+    target = "abc"
+    pattern = "abc"
+    modifier = ":once"
+#    (rulesub, pir, exp) = p6rule_compile(pattern)
+#    match = rulesub(target)
+#    unless match goto NOK
+    goto NOK
+CODE
+ok
+OUT
 
 
-## TODO :c, :p, :g, :bytes, :codes, :graphs, :langs, :perl5,
-##   integer modifiers, Nth occurance, :ov, :ex, :rw, :keepall
+## TODO :c, :p, :g, :bytes, :codes, :graphs, :langs
+
+
+## :perl5 -- use perl5 regexp syntax
+p6rule_is  ('a bcd$ef', ':perl5 \A.*? bcd\Q$\E..\z', 'perl5 syntax (:perl5)', todo => 'not yet implemented');
+## TODO lexical scoping of :perl5
+## TODO add more tests
+
+
+## TODO integer modifiers, Nth occurance, :ov, :ex, :rw, :keepall
 ##   user-defined modifiers
 
 
 ## remember to change the number of tests :-)
-BEGIN { plan tests => 24; }
+BEGIN { plan tests => 26; }
