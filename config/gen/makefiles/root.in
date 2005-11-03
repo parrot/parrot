@@ -1595,7 +1595,12 @@ tags.dummy:
 ###############################################################################
 
 smoke : all
-	$(PERL) t/harness --html
+	$(PERL) t/harness --html $(EXTRA_TEST_ARGS) $(PARROT_ARGS) \
+    $(RUNCORE_TEST_FILES) \
+    $(RUN_TEST_FILES) \
+    $(SRC_TEST_FILES)  \
+    $(PERL_TEST_FILES)  \
+    $(TOOLS_TEST_FILES)
 	$(PERL) util/smokeserv-client.pl smoke.html
 
 smoke-clean :
