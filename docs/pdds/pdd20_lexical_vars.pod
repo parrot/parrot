@@ -34,7 +34,7 @@ lexically scoped variables.
 
     .sub corge
         print "hi"
-    .end                    # no .lex and no :lex, thus: no PadInfo, no Pad
+    .end                    # no .lex and no :lex, thus: no LexInfo, no LexPad
 
 
     # Lexical behavior varies by HLL.  For example,
@@ -64,36 +64,46 @@ call frame.
 
 =head1 CONCEPTUAL MODEL
 
-=head2 Pad PMC
+=head2 LexPad PMC
 
-Lexicals are stored in PMCs called "Pads".  The Pad interface is a
-slight extension of the Hash interface.  Lexical variables are
+Lexicals are stored in PMCs called "LexPads".  The LexPad interface is
+a slight extension of the Hash interface.  Lexical variables are
 conceptually key/value pairs, with string keys and PMC values.
 
-Pad objects are accessible to user code when necessary.  But normal
-lexical variable usage does not require a Pad reference.  Instead,
-specialize opcodes implement the common use cases.  Pads contain
-references to their associated PadInfos.
+Each call frame may contain a LexPad, through which the names and
+values of that call's lexical variables can be accessed.
+
+Call frames are not PMCs (yet?) and are therefore not visible to user
+code (yet?).  Therefore, users can access the LexPad for a given call
+frame through any Continuation object that was created for the given
+frame.
+
+However, normal lexical variable usage does not use the LexPad
+directly.  Instead, specialize opcodes implement the common use cases.
+LexPads contain references to their associated LexInfos.
 
 (Specialized opcodes are particular a Good Idea because most lexical
-usage involves searching more than one Pad, so a single Pad reference
-is not as useful as it might seem.  And, of coures, opcodes can cheat
-... er, can be written in optimized C.  :-))
+usage involves searching more than one LexPad, so a single LexPad
+reference is not as useful as it might seem.  And, of coures, opcodes
+can cheat ... er, can be written in optimized C.  :-))
 
-Pad keys are unique.  Therefore, in each subroutine, there can be only
-one lexical variable with a given name.
+LexPad keys are unique.  Therefore, in each subroutine, there can be
+only one lexical variable with a given name.
 
-=head2 PadInfo PMC
+TODO: Describe how lexical naming system interacts with non-ASCII
+      character sets.
+
+=head2 LexInfo PMC
 
 At compile time, each newly created Subroutine structure (or
 Subroutine derivative, e.g.  Closure) is populated with a PMC of
-HLL-mapped type PadInfo.  (Note that this type may actually be Null in
-some HLLs, e.g. Tcl.)  PadInfo PMCs are the interface through which
+HLL-mapped type LexInfo.  (Note that this type may actually be Null in
+some HLLs, e.g. Tcl.)  LexInfo PMCs are the interface through which
 the PIR compiler communicates compile-time information about lexical
 variables.
 
-A PadInfo represents what is known about lexicals at compile time
-(e.g. variable names, perhaps variable types, etc.), while a Pad
+A LexInfo represents what is known about lexicals at compile time
+(e.g. variable names, perhaps variable types, etc.), while a LexPad
 represents what becomes known at run time (values).
 
 =head2 Lookup strategy
@@ -111,10 +121,7 @@ loops through these steps:
      (NOTE: The first time through, $sub is the current subroutine
             and $frame is the currently live frame.)
 
-  2. Look for $var in $frame.pad.
-
-     FIXME - is "$frame.pad.fetch($var)" too confusing a way to
-             write this?
+  2. Look for $var in $frame.lexicals using standard Hash methods.
 
   3. If the given pad contains $var, fetch/store it and
      REPORT SUCCESS.
@@ -122,20 +129,20 @@ loops through these steps:
   4. Set $sub to $sub.outer.  (That is, the textually enclosing
      subroutine.)  But if $sub has no outer sub, REPORT FAILURE.
 
-=head2 Pad and PadInfo are optional; the ":lex" attribute
+=head2 LexPad and LexInfo are optional; the ":lex" attribute
 
 Parrot does not assume that every subroutine needs lexical variables.
-Therefore, Parrot defaults to I<not> creating PadInfo or Pad PMCs for
-a given subroutine.  It only creates them when it first encounters a
-".lex" directive in the subroutine.  If no such directive is found,
-Parrot does not create a PadInfo for it at compile time, nor a Pad for
-it at run time.
+Therefore, Parrot defaults to I<not> creating LexInfo or LexPad PMCs
+for a given subroutine.  It only creates them when it first encounters
+a ".lex" directive in the subroutine.  If no such directive is found,
+Parrot does not create a LexInfo for it at compile time, nor a LexPad
+for it at run time.
 
 However, an absence of ".lex" directives is normal for some languages
 (e.g. Tcl) which lack compile-time knowledge of lexicals.  For these
 languages, the additional Subroutine attribute ":lex" should be
-specified.  It tells Parrot to create PadInfo and Pads even though no
-lexicals are declared.
+specified.  It tells Parrot to create LexInfo and LexPads even though
+no lexicals are declared.
 
 =head2 Closures
 
@@ -144,19 +151,19 @@ FIXME: Describe the current closure mechanism
 =head2 HLL Type Mapping
 
 The implementation of lexical variables in the PIR compiler depends on
-two new PMCs: Pad and PadInfo.  However, the default Parrot Pad and
-PadInfo PMCs will not meet the needs of all languages.  They should
-suit Perl 6, for example, but not Tcl.
+two new PMCs: LexPad and LexInfo.  However, the default Parrot LexPad
+and LexInfo PMCs will not meet the needs of all languages.  They
+should suit Perl 6, for example, but not Tcl.
 
-Therefore, it is expected that HLLs will map the Pad and PadInfo types
-to something more appropriate (e.g. TclPad and TclPadInfo).  That
-mapping will automatically occur when the appropriate ".HLL" directive
-is in force.  
+Therefore, it is expected that HLLs will map the LexPad and LexInfo
+types to something more appropriate (e.g. TclLexPad and TclLexInfo).
+That mapping will automatically occur when the appropriate ".HLL"
+directive is in force.
 
-Using Tcl as an extreme example: TclPad will likely be a thin veneer
-on PMCHash.  TclPadInfo will likely map to Null.  Tcl provides no
-reliable compile-time information about lexicals; without any
-compile-time information to store, there's no need for TclPadInfo to
+Using Tcl as an extreme example: TclLexPad will likely be a thin
+veneer on PMCHash.  TclLexInfo will likely map to Null.  Tcl provides
+no reliable compile-time information about lexicals; without any
+compile-time information to store, there's no need for TclLexInfo to
 do anything interesting.
 
 =head2 Nested Subroutines Have Outies; the ":outer" attribute
@@ -190,41 +197,29 @@ Damian.  But I repeat myself.)  This information is given through a
 
     .sub a :outer(foo)
 
-=head1 PAD AND PADINFO REQUIRED INTERFACES
+=head1 LEXPAD AND LEXINFO REQUIRED INTERFACES
 
-=head2 PadInfo
+=head2 LexInfo
 
-Below are the standard PadInfo methods that all HLL PadInfo PMCs may
-support.  Each PadInfo PMC should only define the methods that it can
+Below are the standard LexInfo methods that all HLL LexInfo PMCs may
+support.  Each LexInfo PMC should only define the methods that it can
 usefully implement, so the compiler can use method lookup failure to
 generate useful diagnostics (e.g. "register aliasing not supported by
 Tcl lexicals").
 
-Each language's PadInfo will implement methods that are helpful to
-that language's Pad.  In the extreme case, PadInfo can be Null -- but
-if it is, the given HLL should not generate any ".lex*" directives.
+Each language's LexInfo will implement methods that are helpful to
+that language's LexPad.  In the extreme case, LexInfo can be Null --
+but if it is, the given HLL should not generate any ".lex*" directives.
 
 =over 4
 
-=item void init(PMC *sub, Context *ctx)
+=item void init_pmc(PMC *sub)
 
 Called exactly once.
-
- FIXME: Is it kosher to pass a Context pointer?  Probably not.
-        Possible fix: replace it with a documentation guarantee that
-        the new current Context will already exist at init() time;
-        then init() can grab it from the Interp.
-
- TODO: Can init() take parameters like this?  If not, rename.
 
 =item PMC *sub()
 
 Return the associated Subroutine.
-
-=item void declare_lex(STRING *name)
-
-Declare a lexical variable.  The PIR compiler calls this method in
-response to a C<.lex STRING> directive.
 
 =item void declare_lex_preg(STRING *name, INTVAL preg)
 
@@ -247,38 +242,38 @@ And, also, these two opcodes also have identical effect:
 
 =back
 
-=head2 Pad
+=head2 LexPad
 
-Pads start by implementing the Hash interface: variable names are
+LexPads start by implementing the Hash interface: variable names are
 string keys, and variable values are PMCs.
 
-In addition, Pads must implement the following methods:
+In addition, LexPads must implement the following methods:
 
 =over 4
 
-=item init(PMC *padinfo)
+=item init_pmc(PMC *lexinfo)
 
-Called exactly once.
+Called exactly once.  Note that Parrot guarantees that this method
+will be called after the new Context object is made current.  It is
+recommended that any LexPad that aliases registers take a pointer to
+the current Context at init_pmc() time.
 
-TODO: Can init() take parameters like this?  If not, rename.
+=item PMC *lexinfo()
 
-=item PMC *padinfo()
-
-Return the associated PadInfo.
+Return the associated LexInfo.
 
 =back
 
-=head1 DEFAULT PARROT PAD AND PADINFO
+=head1 DEFAULT PARROT LEXPAD AND LEXINFO
 
-The default PadInfo supports lexicals only as aliases for PMC
-registers.  It therefore implements declare_lex_preg(), but not
-declare_lex().  (Internally, it could be a Hash of some kind, where
-keys are String variable names and values are integer register
-numbers.)
+The default LexInfo supports lexicals only as aliases for PMC
+registers.  It therefore implements declare_lex_preg().  (Internally,
+it could be a Hash of some kind, where keys are String variable names
+and values are integer register numbers.)
 
-The default Pad (like all Pads) implements the Hash interface.  When
-asked to look up a variable, it finds the corresponding register
-number by querying its associated PadInfo.  It then gets or sets the
+The default LexPad (like all LexPads) implements the Hash interface.
+When asked to look up a variable, it finds the corresponding register
+number by querying its associated LexInfo.  It then gets or sets the
 given numbered register in its associated Parrot Context structure.
 
 =head1 ATTACHMENTS
