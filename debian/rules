@@ -28,11 +28,17 @@ build-stamp: configure-stamp
 clean:
 	dh_testdir
 	dh_testroot
-	rm -f build-stamp configure-stamp debian/parrot.1 debian/parrot-config.imc.1
+	rm -f build-stamp configure-stamp debian/parrot.1 debian/parrot-config.imc.1 debian/libparrot$(SOVERSION).install debian/libparrot$(SOVERSION)-dev.install
 	-$(MAKE) realclean
 	dh_clean 
 
-install: build
+debian/libparrot$(SOVERSION).install: debian/libparrot.install
+	cp $< $@
+
+debian/libparrot$(SOVERSION)-dev.install: debian/libparrot-dev.install
+	cp $< $@
+
+install: build debian/libparrot$(SOVERSION).install debian/libparrot$(SOVERSION)-dev.install
 	dh_testdir
 	dh_testroot
 	dh_clean -k 
