@@ -22,6 +22,12 @@ This file implements the charset functions for unicode data
 #  undef EXCEPTION
 #endif
 
+#if PARROT_HAS_ICU
+#include <unicode/ucnv.h>
+#include <unicode/utypes.h>
+#include <unicode/uchar.h>
+#include <unicode/ustring.h>
+#endif
 #define EXCEPTION(err, str) \
     real_exception(interpreter, NULL, err, str)
 
@@ -198,8 +204,68 @@ validate(Interp *interpreter, STRING *src)
 static INTVAL
 is_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags, STRING *source_string, UINTVAL offset)
 {
-    UNIMPL;
-    return 0;
+    UINTVAL codepoint;
+    int result, bit, mask;
+
+    if (offset >= source_string->strlen)
+        return 0;
+    codepoint = ENCODING_GET_CODEPOINT(interpreter, source_string, offset);
+#if PARROT_HAS_ICU
+    for (result = 0, mask = enum_cclass_uppercase;
+            mask <= enum_cclass_word ; mask <<= 1) {
+        bit = mask & flags;
+        switch (bit) {
+            case 0: continue;
+            case enum_cclass_uppercase:
+                    result |= u_isupper(codepoint);
+                    break;
+            case enum_cclass_lowercase:
+                    result |= u_islower(codepoint);
+                    break;
+            case enum_cclass_alphabetic:
+                    result |= u_isalpha(codepoint);
+                    break;
+            case enum_cclass_numeric:
+                    result |= u_isdigit(codepoint);
+                    /* XXX which one
+                       result |= u_charDigitValue(codepoint);
+                       */
+                    break;
+            case enum_cclass_hexadecimal:
+                    result |= u_isxdigit(codepoint);
+                    break;
+            case enum_cclass_whitespace:
+                    result |= u_isspace(codepoint);
+                    break;
+            case enum_cclass_printing:
+                    result |= u_isprint(codepoint);
+                    break;
+            case enum_cclass_graphical:
+                    result |= u_isgraph(codepoint);
+                    break;
+            case enum_cclass_blank:
+                    result |= u_isblank(codepoint);
+                    break;
+            case enum_cclass_control:
+                    result |= u_iscntrl(codepoint);
+                    break;
+            case enum_cclass_alphanumeric:
+                    result |= u_isalnum(codepoint);
+                    break;
+            default:
+                    UNIMPL;
+        }
+        /* more bits? */
+        if (~ (flags ^ ~mask) == 0)
+            break;
+    }
+    return result;
+#else
+    if (codepoint >= 128)
+        real_exception(interpreter, NULL, E_LibraryNotLoadedError,
+                "no ICU lib loaded");
+    return (Parrot_ascii_typetable[codepoint] & flags) ? 1 : 0;
+#endif
 }
 
 static INTVAL

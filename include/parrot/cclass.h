@@ -10,8 +10,8 @@
 
 /* &gen_from_enum(cclass.pasm) subst(s/enum_cclass_(\w+)/uc("CCLASS_$1")/e) */
 typedef enum {				/* ASCII characters matching this class: */
-enum_cclass_any = 0x0000,		/* all */
-enum_cclass_none = 0xffff,		/* none */
+enum_cclass_any = 0xffff,		/* all */
+enum_cclass_none = 0x0000,		/* none */
 enum_cclass_uppercase = 0x0001,		/* A-Z */
 enum_cclass_lowercase = 0x0002,		/* a-z */
 enum_cclass_alphabetic = 0x0004,	/* a-z, A-Z */
