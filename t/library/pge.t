@@ -14,76 +14,18 @@ t/library/pge.t - Grammar Engine tests
 
 use strict;
 
-use Parrot::Test tests => 4;
+use Parrot::Test tests => 9;
+use Parrot::Test::PGE;
 
-# 1
-pir_output_is(<<'CODE', <<'OUT', "Glob, wildcards");
+# 1-6
+pgeglob_is  ('bznza', 'b?n*a', "glob wildcards");
+pgeglob_is  ('bana', 'b?n*a', "glob wildcards");
+pgeglob_isnt('bnana', 'b?n*a', "glob wildcards");
+pgeglob_is  ('bnan', '?n?*', "glob wildcards");
+pgeglob_is  ('ana', '?n?*', "glob wildcards");
+pgeglob_isnt('an', '?n?*', "glob wildcards");
 
-.sub _main
-  load_bytecode "library/PGE.pbc"
-  load_bytecode "library/PGE/Glob.pir"
-
-  .local pmc rule
-  $P0 = find_global "PGE", "glob"
-  (rule, $P1, $P2) = $P0("b?n*a")
-
-  $P1 = rule("banana")
-  if $P1 goto ok1
-  print "not "
-ok1:
-  print "ok1\n"
-
-  $P1 = rule("bznza")
-  if $P1 goto ok2
-  print "not "
-ok2:
-  print "ok2\n"
-
-  $P1 = rule("bana")
-  if $P1 goto ok3
-  print "not "
-ok3:
-  print "ok3\n"
-
-  $P1 = rule("bnana")
-  unless $P1 goto ok4
-  print "not "
-ok4:
-  print "ok4\n"
-
-
-  (rule, $P1, $P2) = $P0("?n?*")
-
-  $P1 = rule("bnan")
-  if $P1 goto ok5
-  print "not "
-ok5:
-  print "ok5\n"
-
-  $P1 = rule("ana")
-  if $P1 goto ok6
-  print "not "
-ok6:
-  print "ok6\n"
-
-  $P1 = rule("an")
-  unless $P1 goto ok7
-  print "not "
-ok7:
-  print "ok7\n"
-
-.end
-CODE
-ok1
-ok2
-ok3
-ok4
-ok5
-ok6
-ok7
-OUT
-
-# 2
+# 7
 pir_output_is(<<'CODE', <<'OUT', "Glob, character classes");
 
 .sub _main
@@ -177,7 +119,7 @@ ok10
 ok11
 OUT
 
-# 3
+# 8
 pir_output_is(<<'CODE', <<'OUT', "Glob, alternate");
 
 .sub _main
@@ -271,7 +213,7 @@ ok10
 ok11
 OUT
 
-# 4
+# 9
 pir_output_is(<<'CODE', <<'OUT', "This made Parrot m4 fail");
 
 .sub 'test' :main

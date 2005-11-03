@@ -120,6 +120,62 @@ sub p6rule_like {
             @todo);
 }
 
+=item C<pgeglob_is($target, $pattern, $description)>
+
+Runs the target string against the Perl 6 pattern, passing the test
+if they match.  Note that patterns should be specified as strings
+and without leading/trailing pattern delimiters.
+
+(Hint: if you try using qr// for the $pattern then you're misreading
+what this does.)
+
+=cut
+
+sub pgeglob_is {
+    my ($target, $pattern, $description, @todo) = @_;
+
+        Parrot::Test::pir_output_is(
+            Parrot::Test::PGE::_generate_glob_for($target, $pattern),
+            'matched',
+            $description,
+            @todo);
+}
+
+=item C<pgeglob_isnt($target, $pattern, $description)>
+
+Runs the target string against the Perl 6 pattern, passing the test if
+they do not match. The same pattern argument syntax above applies here.
+
+=cut
+
+sub pgeglob_isnt {
+    my ($target, $pattern, $description, @todo) = @_;
+
+        Parrot::Test::pir_output_is(
+            Parrot::Test::PGE::_generate_glob_for($target, $pattern),
+            'failed',
+            $description,
+            @todo);
+}
+
+=item C<pgeglob_like($target, $pattern, $expected, $description)>
+
+Runs the target string against the Perl 6 pattern, passing the test
+if the output produced by the test code matches the C<$expected>
+parameter.  Note that C<$expected> is a I<Perl 5> pattern.
+
+=cut
+
+sub pgeglob_like {
+    my ($target, $pattern, $expected, $description, @todo) = @_;
+    Parrot::Test::pir_output_like(
+            Parrot::Test::PGE::_generate_glob_for($target, $pattern, 1),
+            $expected,
+            $description,
+            @todo);
+}
+
+
 package Parrot::Test::PGE;
 
 sub _parrot_stringify {
@@ -223,6 +279,38 @@ sub _generate_subrule_pir {
     return $pirCode;
 }
 
+sub _generate_glob_for {
+    my($target, $pattern, $captures) = @_;
+    $target = _parrot_stringify($target);
+    $pattern = _parrot_stringify($pattern);
+    return qq(
+        .sub _PGE_Test
+            .local pmc glob_compile
+            load_bytecode "PGE.pbc"
+            load_bytecode "PGE/Glob.pir"
+            load_bytecode "PGE/Dumper.pir"
+            load_bytecode "PGE/Text.pir"
+            find_global glob_compile, "PGE", "glob"
+
+            .local string target
+            .local string pattern
+            .local pmc rulesub
+            .local pmc match
+            .local pmc code
+            .local pmc exp
+            target = unicode:"$target"
+            pattern = "$pattern"
+            (rulesub, code, exp) = glob_compile(pattern)
+            match = rulesub(target)
+            unless match goto match_fail
+          match_success:
+            print "matched"
+            goto match_end
+          match_fail:
+            print "failed"
+          match_end:
+        .end\n);
+}
 =back
 
 =head1 AUTHOR
