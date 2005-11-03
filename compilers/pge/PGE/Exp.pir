@@ -170,72 +170,76 @@ register.
 
 =cut
 
-.sub "genliteral" :method
+.sub "genfixedstr" :method
     .param pmc code
     .param string label
     .param string next
+    .param string testcode
+    .param string fixstr
+    .param string fixlen
     .local pmc emit
     .local int min, max, islazy, iscut, ignorecase
+    .local string testlabel
     (min, max, islazy, iscut, $S0) = self."quant"()
     ignorecase = self["ignorecase"]
     emit = find_global "PGE::Exp", "emit"
-    emit(code, "    litlen = length lit")
-    unless min == 1 goto quant
-    unless max == 1 goto quant
-    emit(code, "    $S0 = substr target, pos, litlen")
-    if ignorecase == 0 goto init_1
-    emit(code, "    downcase $S0")
-  init_1:
-    emit(code, "    if $S0 != lit goto fail")
-    emit(code, "    pos += litlen")
+    testlabel = "fail"
+    if min != max goto quant
+    iscut = 1
+    if max != 1 goto quant
+    bsr test
     emit(code, "    goto %s", next)
-    .return()
+    .return ()
   quant:
     emit(code, "    rep = 0")
     if islazy goto lazy
   greedy:
-    emit(code, "  %s_lit1:", label)
+    testlabel = concat label, "_g2"
+    emit(code, "  %s_g1:", label)
     if max == PGE_INF goto greedy_1
-    emit(code, "    if rep >= %s goto %s_lit2", max, label)
+    emit(code, "    if rep >= %s goto %s", max, testlabel)
   greedy_1:
-    emit(code, "    $S0 = substr target, pos, litlen")
-    emit(code, "    if $S0 != lit goto %s_lit2", label)
+    bsr test
     emit(code, "    inc rep")
-    emit(code, "    pos += litlen")
-    emit(code, "    goto %s_lit1", label)
-    emit(code, "  %s_lit2:", label)
+    emit(code, "    goto %s_g1", label)
+    emit(code, "  %s:", testlabel)
     emit(code, "    if rep < %s goto fail", min)
-    if iscut goto greedy_cut
+    if iscut goto cut
     emit(code, "    if rep == %s goto %s", min, next)
-    self.emitsub(code, next, "pos", "rep", "litlen")
+    self.emitsub(code, next, "pos", "rep", "$I1")
     emit(code, "    dec rep")
-    emit(code, "    pos -= litlen")
-    emit(code, "    goto %s_lit2", label)
-    .return ()
-  greedy_cut:
-    emit(code, "    goto %s", next)
+    emit(code, "    pos -= %s", fixlen)
+    emit(code, "    goto %s", testlabel)
     .return ()
   lazy:
-    emit(code, "  %s_lit1:", label)
-    if min < 1 goto lazy_1
-    emit(code, "    if rep < %s goto %s_lit2", min, label)
+    if min > 1 goto lazy_1
+    emit(code, "    goto %s_l2", label)
   lazy_1:
-    if iscut == 0 goto lazy_2
-    emit(code, "    goto %s", next)
-    goto lazy_4
-  lazy_2:
-    if max == PGE_INF goto lazy_3
+    emit(code, "  %s_l1:", label)
+    bsr test
+    emit(code, "    if rep < %s goto %s_lit1", min, label)
+    emit(code, "  %s_l2:", label)
+    if iscut goto cut
+    if max == PGE_INF goto lazy_2
     emit(code, "    if rep >= %s goto %s", max, next)
-  lazy_3:
-    self.emitsub(code, next, "pos", "rep", "lit", "litlen")
+  lazy_2:
+    self.emitsub(code, next, "pos", "rep", "$I1", "$S1")
   lazy_4:
-    emit(code, "  %s_lit2:", label)
-    emit(code, "    $S0 = substr target, pos, litlen")
-    emit(code, "    if $S0 != lit goto fail")
-    emit(code, "    inc rep")
-    emit(code, "    pos += litlen")
-    emit(code, "    goto %s_lit1", label)
+    emit(code, "    goto %s_l1", label)
     .return ()
+  cut:
+    emit(code, "    goto %s", next)
+    .return ()
+
+  test:
+    emit(code, "    if pos >= lastpos goto %s", testlabel)
+    emit(code, "    $S0 = substr target, pos, %s", fixlen)
+    if ignorecase == 0 goto test_1
+    emit(code, "    downcase $S0")
+  test_1:
+    emit(code, testcode, fixstr, testlabel)
+    emit(code, "    pos += %s", fixlen)
+    ret
 .end
 
 .sub "gencapture" :method
@@ -383,19 +387,50 @@ register.
     .param string next
     .local pmc emit
     ($I0, $I1, $I2, $I3, $S0) = self."quant"()
-    $I0 = self["ignorecase"]
     emit = find_global "PGE::Exp", "emit"
     $S1 = self["value"]
-    if $I0 == 0 goto init_1
+    $I0 = self["ignorecase"]
+    if $I0 == 0 goto lit_1
     downcase $S1
-  init_1:
+  lit_1:
+    $I1 = length $S1
     $P0 = find_global "Data::Escape", "String"
     $S1 = $P0($S1, '"')
     emit(code, "\n  %s: # literal %s    ##", label, $S0)
-    emit(code, "    lit = \"%s\"", $S1)
-    self.genliteral(code, label, next)
+    $S0 = "    if $S0 != unicode:\"%s\" goto %s"
+    self.genfixedstr(code, label, next, $S0, $S1, $I1)
     .return ()
 .end    
+
+.namespace [ "PGE::Exp::EnumCharList" ]
+
+.sub "gen" :method
+    .param pmc code
+    .param string label
+    .param string next
+    .local pmc emit
+    ($I0, $I1, $I2, $I3, $S0) = self."quant"()
+    emit = find_global "PGE::Exp", "emit"
+    $S1 = self["value"]
+    $I0 = self["ignorecase"]
+    if $I0 == 0 goto charlist_1
+    downcase $S1
+  charlist_1:
+    emit(code, "\n  %s: # charclass %s    ##", label, $S0)
+    $I1 = length $S1
+    $P0 = find_global "Data::Escape", "String"
+    $S1 = $P0($S1, '"')
+    $I0 = self["isnegated"]
+    if $I0 goto charlist_2
+    $S0 = "    $I0 = index unicode:\"%s\", $S0\n    if $I0 < 0 goto %s"
+    self.genfixedstr(code, label, next, $S0, $S1, 1)
+    .return ()
+  charlist_2:
+    $S0 = "    $I0 = index unicode:\"%s\", $S0\n    if $I0 >= 0 goto %s"
+    self.genfixedstr(code, label, next, $S0, $S1, 1)
+    .return ()
+.end    
+
 
 .namespace [ "PGE::Exp::Scalar" ]
 
@@ -414,8 +449,10 @@ register.
     emit(code, "    if $I0 == 0 goto %s_0", label)
     emit(code, "    $P0 = $P0[-1]")
     emit(code, "  %s_0:", label)
-    emit(code, "    lit = $P0")
-    self.genliteral(code, label, next)
+    emit(code, "    $S1 = $P0")
+    emit(code, "    $I1 = length $S1")
+    $S0 = "    if $S0 != %s goto %s"
+    self."genfixedstr"(code, label, next, $S0, "$S1", "$I1")
     .return ()
 .end
     
@@ -498,66 +535,6 @@ register.
     .return ()
 .end
 
-.namespace [ "PGE::Exp::EnumCharList" ]
-
-.sub "gen" :method
-    .param pmc code
-    .param string label
-    .param string next
-    .local string charlist, charmatch
-    .local int min, max, islazy, iscut
-    .local pmc emit
-    (min, max, islazy, iscut, $S0) = self."quant"()
-    emit = find_global "PGE::Exp", "emit"
-    $P0 = find_global "Data::Escape", "String"
-    charlist = self["charlist"]
-    charlist = $P0(charlist, '"')
-    charmatch = self["charmatch"]
-    emit(code, "\n  %s:  # enumchars %s %s    ##", label, charlist, $S0)
-    emit(code, "    rep = 0")
-    if islazy goto lazy
-    emit(code, "  %s_1:", label)
-    emit(code, "    if pos >= lastpos goto %s_2", label)
-    emit(code, "    if rep >= %s goto %s_2", max, label)
-    emit(code, "    $S0 = substr target, pos, 1")
-    emit(code, "    $I0 = index \"%s\", $S0", charlist)
-    emit(code, "    %s $I0 == -1 goto %s_2", charmatch, label)
-    emit(code, "    inc pos") 
-    emit(code, "    inc rep")
-    emit(code, "    goto %s_1", label)
-    emit(code, "  %s_2:", label)
-    emit(code, "    if rep < %s goto fail", min)
-    if iscut goto cut
-    emit(code, "    if rep == %s goto %s", min, next)
-    self.emitsub(code, next, "pos", "rep")
-    emit(code, "    dec pos")
-    emit(code, "    dec rep")
-    emit(code, "    goto %s_2", label)
-    .return ()
-  lazy:
-    emit(code, "  %s_0:", label)
-    emit(code, "    if rep < %s goto %s_1", min, label)
-    unless iscut goto lazy_1
-    emit(code, "    goto %s", next)
-    goto lazy_2
-  lazy_1:
-    emit(code, "    if rep >= %s goto %s", max, next)
-    emit(code, "    if pos > lastpos goto fail")
-    self.emitsub(code, next, "pos", "rep")
-  lazy_2:
-    emit(code, "  %s_1:", label)
-    emit(code, "    $S0 = substr target, pos, 1")
-    emit(code, "    $I0 = index \"%s\", $S0", charlist)
-    emit(code, "    %s $I0 == -1 goto fail", charmatch)
-    emit(code, "    inc rep")
-    emit(code, "    inc pos")
-    emit(code, "    goto %s_0", label)
-    .return ()
-  cut:
-    emit(code, "    goto %s", next)
-    .return ()
-.end
- 
 
 .namespace [ "PGE::Exp::Concat" ]
 

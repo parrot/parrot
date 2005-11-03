@@ -67,6 +67,16 @@
     optable.addtok("prefix::", "<infix:|", "nows", $P0)
 
     optable.addtok("close:>", "<prefix::", "nows")
+
+    $P0 = new Hash
+    store_global "PGE::P6Rule", "%escape", $P0
+    $P0["e"] = "\e"
+    $P0["f"] = "\f"
+    $P0["r"] = "\r"
+    $P0["t"] = "\t"
+    $P0["v"] = unicode:"\x0a\x0b\x0c\x0d\x85\u2028\u2029"
+    $P0["h"] = unicode:"\x09\x20\xa0\u1680\u180e\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u202f\u205f\u3000"
+    # See http://www.unicode.org/Public/UNIDATA/PropList.txt for above
 .end
 
 
@@ -76,6 +86,7 @@
     .local string target
     .local int pos, lastpos
     .local int litstart, litlen
+    .local string initchar
     newfrom = find_global "PGE::Match", "newfrom"
     $P0 = getattribute mob, "PGE::Match\x0$:target"
     target = $P0
@@ -85,18 +96,33 @@
 
     $I0 = is_cclass .CCLASS_WHITESPACE, target, pos
     if $I0 goto term_ws
-    $S0 = substr target, pos, 1
-    if $S0 == '#' goto term_ws
+    initchar = substr target, pos, 1
+    inc pos
+    if initchar == "#" goto term_ws
+    if initchar != "\\" goto term_literal
 
-  term_literal:
+  term_backslash:
+    initchar = substr target, pos, 1
+    $I1 = is_cclass .CCLASS_UPPERCASE, target, pos 
+    inc pos
+    $S0 = downcase initchar
+    $P0 = find_global "PGE::P6Rule", "%escape"
+    $I0 = exists $P0[$S0]                          # \e\f\h\r\t\v etc...
+    if $I0 == 0 goto term_literal
+    initchar = $P0[$S0]
+    if $I1 goto term_charlist                      # negated escapes
+    $I0 = length initchar
+    if $I0 < 2 goto term_literal
+  term_charlist:
+    mob = newfrom(mob, 0, "PGE::Exp::EnumCharList")
+    mob["value"] = initchar
+    mob["isnegated"] = $I1
+    goto end
+
+  term_literal:                                    # first char is in initchar
     mob = newfrom(mob, 0, "PGE::Exp::Literal")
     litstart = pos
     litlen = 0
-    $S0 = substr target, pos, 1
-    inc pos
-    if $S0 != "\\" goto term_literal_loop
-    inc litstart
-    inc pos
   term_literal_loop:
     if pos >= lastpos goto term_literal_end
     $I0 = is_cclass .CCLASS_WHITESPACE, target, pos
@@ -108,11 +134,12 @@
     inc litlen
     goto term_literal_loop
   term_literal_end:
-    if litlen < 2 goto term_literal_one
+    if litlen < 1 goto term_literal_one
     dec pos
   term_literal_one:
     $I0 = pos - litstart
     $S0 = substr target, litstart, $I0
+    $S0 = concat initchar, $S0
     mob["value"] = $S0
     goto end
 
@@ -335,13 +362,13 @@
     (mob, target, mfrom, mpos) = $P0(mob, 0, "PGE::Exp::EnumCharList")
     lastpos = length target
     charlist = ""
-    mob["charmatch"] = "if"
+    mob["isnegated"] = 0
     pos = mfrom
     isrange = 0
     $S0 = substr target, pos, 3
     pos += 2
     if $S0 != "<-[" goto scan
-    mob["charmatch"] = "unless"
+    mob["isnegated"] = 1
     inc pos
   scan:
     if pos >= lastpos goto err_close
@@ -383,7 +410,7 @@
     if $S0 != "]>" goto err_bracket
     pos += 2
     mpos = pos
-    mob["charlist"] = charlist
+    mob["value"] = charlist
     goto end
   err_bracket:
     parse_error(mob, pos, "Unescaped ']' in charlist")
