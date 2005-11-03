@@ -16,7 +16,7 @@ Tests Parrot calling conventions.
 
 =cut
 
-use Parrot::Test tests => 44;
+use Parrot::Test tests => 47;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "set_args - parsing");
@@ -1238,3 +1238,52 @@ CODE
 3
 OUTPUT
 
+pir_output_is(<<'CODE', <<'OUTPUT', ":slurpy result");
+.sub main :main
+   ($P0 :slurpy) = foo()
+   $S0 = $P0[0]
+   print $S0
+   $S0 = $P0[1]
+   print $S0
+.end
+.sub foo
+   .return("ok 1\n", "ok 2\n")
+.end
+CODE
+ok 1
+ok 2
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', ":optional result");
+.sub main :main
+   ($S0 :optional, $I1 :opt_flag) = foo()
+   unless $I1 goto no_ret
+   print "ok 1\n"
+   print $S0
+   end
+no_ret:
+   print "not ok 1\n"
+.end
+.sub foo
+   .return("ok 2\n")
+.end
+CODE
+ok 1
+ok 2
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', ":optional result");
+.sub main :main
+   ($S0 :optional, $I1 :opt_flag) = foo()
+   if $I1 goto has_ret
+   print "ok 1\n"
+   end
+has_ret:
+   print "not ok 1\n"
+.end
+.sub foo
+   .return()
+.end
+CODE
+ok 1
+OUTPUT

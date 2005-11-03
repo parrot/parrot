@@ -244,8 +244,6 @@ _floor returned 2 values, 6 and 2.
 _fib_step returned 3 values, 23, 20, and 3.
 OUT
 
-SKIP: {
-   skip("missing :slurpy in .return", 1);
 pir_output_is(<<'CODE', <<'OUT', ":flatten in .return");
 
 .sub _main :main
@@ -298,7 +296,6 @@ CODE
 [got 3 results]
 _fib_step returned 3 values, 23, 20, and 3.
 OUT
-}
 
 pir_output_is(<<'CODE', <<'OUT', "new tail call syntax");
 .sub main :main

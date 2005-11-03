@@ -367,7 +367,7 @@ begin_return_or_yield(Interp *interp, int yield)
 %type <i> instruction assignment if_statement labeled_inst opt_label op_assign
 %type <i> func_assign
 %type <i> opt_invocant
-%type <sr> target reg const var string
+%type <sr> target reg const var string result
 %type <sr> key keylist _keylist
 %type <sr> vars _vars var_or_i _var_or_i label_op sub_label_op sub_label_op_c
 %type <i> pasmcode pasmline pasm_inst
@@ -845,8 +845,8 @@ pcc_return_many:
 
 var_returns:
     /* empty */ { $$ = 0; }
-  | var                     {  add_pcc_return(IMCC_INFO(interp)->sr_return, $1);    }
-  | var_returns COMMA var   {  add_pcc_return(IMCC_INFO(interp)->sr_return, $3);    }
+  | arg                     {  add_pcc_return(IMCC_INFO(interp)->sr_return, $1);    }
+  | var_returns COMMA arg   {  add_pcc_return(IMCC_INFO(interp)->sr_return, $3);    }
   ;
 
 
@@ -1032,7 +1032,7 @@ assignment:
    | NEW target COMMA var '[' keylist ']'
                         { $$ = MK_I(interp, cur_unit, "new", 3, $2, $4, $6); }
      /* Subroutine call the short way */
-   | target '=' sub_call
+   | target  '=' sub_call
          {
             add_pcc_result($3->r[0], $1);
             cur_call = NULL;
@@ -1133,9 +1133,12 @@ argtype:
      ADV_FLAT                {  $$ = VT_FLAT; }
    ;
 
+result: target paramtype_list  { $$ = $1; $$->type |= $2; }
+   ;
+
 targetlist:
-     targetlist COMMA target { $$ = 0; add_pcc_result(cur_call, $3); }
-   | target                  { $$ = 0; add_pcc_result(cur_call, $1); }
+     targetlist COMMA result { $$ = 0; add_pcc_result(cur_call, $3); }
+   | result                  { $$ = 0; add_pcc_result(cur_call, $1); }
    ;
 
 if_statement:
