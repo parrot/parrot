@@ -241,11 +241,11 @@ output_is(<<'CODE', <<OUTPUT, "turn a native number into it's negative");
 	print "\n"
 	end
 CODE
-0.000000
+-0.000000
 0.000000
 -123.456789
 123.456789
-0.000000
+-0.000000
 0.000000
 -123.456789
 123.456789

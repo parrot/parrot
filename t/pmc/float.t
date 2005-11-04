@@ -16,7 +16,7 @@ Tests the Float PMC.
 
 =cut
 
-use Parrot::Test tests => 44;
+use Parrot::Test tests => 45;
 
 my $fp_equality_macro = <<'ENDOFMACRO';
 .macro fp_eq (	J, K, L )
@@ -716,6 +716,16 @@ EQ2:	print "ok 2\\n"
 CODE
 ok 1
 ok 2
+OUTPUT
+
+output_like(<< 'CODE', << 'OUTPUT', "neg 0");
+	new P0, .Float
+	set P0, 0.0
+	neg P0
+        print P0
+	end
+CODE
+/^-0/
 OUTPUT
 
 output_is(<< 'CODE', << 'OUTPUT', "Equality");

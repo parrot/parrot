@@ -620,12 +620,12 @@ Create $1 as the negative of $2.
 =cut
 
 inline op neg(inout INT) :base_core {
-  $1 = 0 - $1;
+  $1 = - $1;
   goto NEXT();
 }
 
 inline op neg(inout NUM) :base_core {
-  $1 = 0.0 - $1;
+  $1 = - $1;
   goto NEXT();
 }
 
@@ -635,12 +635,12 @@ inline op neg(in PMC) :base_core {
 }
 
 inline op neg(out INT, in INT) :base_core {
-  $1 = 0 - $2;
+  $1 = - $2;
   goto NEXT();
 }
 
 inline op neg(out NUM, in NUM) :base_core {
-  $1 = 0.0 - $2;
+  $1 = - $2;
   goto NEXT();
 }
 
