@@ -60,7 +60,8 @@
     optable.addtok("postfix:::", "postfix:*", "left", $P0)
 
     optable.addtok("infix:", "<postfix:*", "right,nows", "PGE::Exp::Concat")
-    optable.addtok("infix:|", "<infix:", "left,nows", "PGE::Exp::Alt")
+    optable.addtok("infix:&", "<infix:", "left,nows", "PGE::Exp::Conj")
+    optable.addtok("infix:|", "<infix:&", "left,nows", "PGE::Exp::Alt")
 
     optable.addtok("infix::=", ">postfix:*", "right", "PGE::Exp::Alias")
 
@@ -678,6 +679,20 @@
   end:
     .return (self)
 .end
+
+.namespace [ "PGE::Exp::Conj" ]
+
+.sub "p6analyze" :method
+    .param pmc pad
+    $P0 = self[0]
+    $P0 = $P0.p6analyze(pad)
+    self[0] = $P0
+    $P1 = self[1]
+    $P1 = $P1.p6analyze(pad)
+    self[1] = $P1
+    .return (self)
+.end
+    
     
 .namespace [ "PGE::Exp::Quant" ]
 

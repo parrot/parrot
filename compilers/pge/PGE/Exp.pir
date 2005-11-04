@@ -20,8 +20,8 @@
     $P1 = subclass $P0, "PGE::Exp::EnumCharList"
     $P1 = subclass $P0, "PGE::Exp::Anchor"
     $P1 = subclass $P0, "PGE::Exp::Concat"
-    $P1 = subclass $P0, "PGE::Exp::Conj"
     $P1 = subclass $P0, "PGE::Exp::Alt"
+    $P1 = subclass $P0, "PGE::Exp::Conj"
     $P1 = subclass $P0, "PGE::Exp::Group"
     $P1 = subclass $P0, "PGE::Exp::Subrule"
     $P1 = subclass $P0, "PGE::Exp::Cut"
@@ -677,6 +677,48 @@ register.
     exp0.gen(code, $S0, next)
     exp1 = self[1]
     exp1.gen(code, $S1, next)
+    .return ()
+.end
+
+
+.namespace [ "PGE::Exp::Conj" ]
+
+.sub "gen" :method
+    .param pmc code
+    .param string label
+    .param string next
+    .local pmc emit
+    .local pmc exp0, exp1
+    .local string exp0label, exp1label, chk0label, chk1label
+    emit = find_global "PGE::Exp", "emit"
+    (exp0label, $I0) = self.serno()
+    (exp1label, $I1) = self.serno()
+    chk0label = concat label, "_0"
+    chk1label = concat label, "_1"
+    emit(code, "\n  %s:  # conj %s, %s    ##", label, exp0label, exp1label)
+    emit(code, "    push gpad, pos")
+    emit(code, "    push gpad, pos")
+    self.emitsub(code, exp0label, "NOCUT")
+    emit(code, "    $I0 = pop gpad")
+    emit(code, "    $I0 = pop gpad")
+    emit(code, "    goto fail")
+    emit(code, "  %s:", chk0label)
+    emit(code, "    gpad[-1] = pos")
+    emit(code, "    pos = gpad[-2]")
+    emit(code, "    goto %s", exp1label)
+    emit(code, "  %s:", chk1label)
+    emit(code, "    $I0 = gpad[-1]")
+    emit(code, "    if $I0 != pos goto fail")
+    emit(code, "    $I0 = pop gpad")
+    emit(code, "    $I1 = pop gpad")
+    self.emitsub(code, next, "$I0", "$I1", "NOCUT")
+    emit(code, "    push gpad, $I1")
+    emit(code, "    push gpad, $I0")
+    emit(code, "    goto fail")
+    exp0 = self[0]
+    exp0.gen(code, exp0label, chk0label)
+    exp1 = self[1]
+    exp1.gen(code, exp1label, chk1label)
     .return ()
 .end
 

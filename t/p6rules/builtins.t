@@ -124,7 +124,7 @@ p6rule_like  ("aabaaa", '<!before ..b> aa',
 ## leading + -- enumerated char class
 p6rule_is  ('az', '<[a..z]>+', 'metasyntax with leading + (<+...>)');
 p6rule_is  ('az', '<+[a..z]>+', 'metasyntax with leading + (<+...>)');
-p6rule_is  ('az', '<+<alpha>>+', 'metasyntax with leading + (<+...>)',
+p6rule_is  ('az', '<+alpha>+', 'metasyntax with leading + (<+...>)',
     todo => 'not yet implemented');
 
 

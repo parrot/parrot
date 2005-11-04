@@ -191,6 +191,7 @@ sub _generate_pir_for {
     my($target, $pattern, $captures) = @_;
     $target = _parrot_stringify($target);
     $pattern = _parrot_stringify($pattern);
+    my $unicode = ($target =~ /\\u/) ? "unicode:" : "";
     if ($captures) { 
         $captures = qq(
             print "\\n"
@@ -213,7 +214,7 @@ sub _generate_pir_for {
             .local pmc match
             .local pmc code
             .local pmc exp
-            target = unicode:"$target"
+            target = $unicode"$target"
             pattern = "$pattern"
             (rulesub, code, exp) = p6rule_compile(pattern)
             match = rulesub(target)

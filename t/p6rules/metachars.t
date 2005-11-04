@@ -96,13 +96,13 @@ p6rule_isnt("\n", '\n $$', 'line beginnings and endings ($$)');
 
 
 ## &
-p6rule_is  ("c", '[a..d] & [b..e]', 'conjunction (&)', todo => 'not yet implemented');
-p6rule_isnt("c", '[a..d] & [d..e]', 'conjunction (&)');
-p6rule_isnt("c", '[a..b] & [b..e]', 'conjunction (&)');
-p6rule_is  ("bcd", '[a..d]+ & [b..e]+', 'conjunction (&)', todo => 'not yet implemented');
-p6rule_is  ("bcd", '^ [a..d]+ & [b..e]+ $', 'conjunction (&)', todo => 'not yet implemented');
-p6rule_isnt("bcd", '[a..c]+ & [b..e]+', 'conjunction (&)');
-p6rule_isnt("bcd", '[a..d]+ & [c..e]+', 'conjunction (&)');
+p6rule_is  ("c", '<[a..d]> & <[b..e]>', 'conjunction (&)');
+p6rule_isnt("c", '<[a..d]> & <[d..e]>', 'conjunction (&)');
+p6rule_isnt("c", '<[a..b]> & <[b..e]>', 'conjunction (&)');
+p6rule_is  ("bcd", '<[a..d]>+ & <[b..e]>+', 'conjunction (&)');
+p6rule_is  ("bcd", '^ <[a..d]>+ & <[b..e]>+ $', 'conjunction (&)');
+p6rule_is  ("bcd", '<[a..c]>+ & <[b..e]>+', 'conjunction (&)');
+p6rule_is  ("bcd", '<[a..d]>+ & <[c..e]>+', 'conjunction (&)');
 
 
 ## \p and \P -- deprecated
