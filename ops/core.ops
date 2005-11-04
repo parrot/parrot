@@ -535,9 +535,7 @@ op set_returns(inconst PMC) {
 
 =head2 Address manipulation
 
-=over 4
-
-########################################
+=over 4 ########################################
 
 =item B<set_addr>(out INT, labelconst INT)
 
@@ -576,8 +574,6 @@ inline op get_addr(out INT, in PMC) {
   $1 = (INTVAL)$2->vtable->get_pointer(interpreter, $2);
   goto NEXT();
 }
-
-=cut
 
 op DELETED_newsub(out PMC, in INT, labelconst INT) {
   goto NEXT();
