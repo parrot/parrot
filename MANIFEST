@@ -457,7 +457,6 @@ examples/assembly/pmcmops.pasm                    [main]doc
 examples/assembly/queens.pasm                     [main]doc
 examples/assembly/queens_r.imc                    [main]doc
 examples/assembly/thr-primes.imc                  [main]doc
-examples/assembly/trace.pasm                      [main]doc
 examples/assembly/uniq.pasm                       [main]doc
 examples/benchmarks/addit.imc                     [main]doc
 examples/benchmarks/addit.pasm                    [main]doc
@@ -590,6 +589,7 @@ examples/pasm/hello.pasm                          [main]doc
 examples/pasm/lexical.pasm                        [main]doc
 examples/pasm/small.xml                           [main]doc
 examples/pasm/stack.pasm                          [main]doc
+examples/pasm/trace.pasm                          [main]doc
 examples/pasm/xml_parser.pasm                     [main]doc
 examples/pge/README                               [main]doc
 examples/pge/all.pir                              [main]doc

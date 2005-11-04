@@ -22,12 +22,12 @@ Check on remaining examples in 'examples/assembly'.
 
 =head1 SEE ALSO
 
-F<t/examples/japh.t>
+F<t/examples/pir.t>
 
 =cut
 
 use strict;
-use Parrot::Test tests => 5;
+use Parrot::Test tests => 6;
 use Test::More;
 
 # Set up expected output for examples
@@ -78,6 +78,14 @@ END_EXPECTED
 
     'stack.pasm'        =>  << 'END_EXPECTED',
 87654321098765432100123456789012345678998765432109876543210
+END_EXPECTED
+
+    'trace.pasm'        =>  << 'END_EXPECTED',
+Howdy!
+     4 print "There!\n"
+There!
+     6 trace 0
+Partner!
 END_EXPECTED
 
     'xml_parser.pasm'        =>  << 'END_EXPECTED',
