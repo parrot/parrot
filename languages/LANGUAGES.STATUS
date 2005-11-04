@@ -35,6 +35,7 @@ N: bc
 A: Bernhard Schmalhofer
 D: Based on ANTLR and Python
 S: very simple arithmetic expressions are working
+S: Some test failures
 M: Yes
 V: 0.3.0
 
@@ -44,11 +45,13 @@ D: Functioning -93 interpreter (input routines may be funky).
 S: Broken with recent deprecation of push[simp]/pop[simp]
 S: Samples working, README explain how to build/use.
 S: (waiting for Parrot objects for a befunge-98 version).
+S: Broken with recent deprecations
 M: Yes
 V: 0.0.11
 
 N: bf
 A: Leon Brocard
+S: src/packfile.c:2314: failed assertion `ct->constants!=NULL'
 
 N: Cola
 A: Melvin Smith
@@ -62,6 +65,7 @@ N: Common Lisp
 A: Cory Spencer
 D: Aspires to implement a significant subset of the Common Lisp language.
 M: Yes
+S: broken due to recent deprecations
 V: 0.1.2
 
 N: conversion
@@ -72,21 +76,13 @@ A: Dan Sugalski
 M: no
 V: 0.0.13
 
-N: IMCC
-A: Melvin Smith
-A: Angel Faus
-A: Leopold Toetsch
-D: The PIR and PASM compiler for Parrot
-S: Functioning, all samples working
-M: Yes (integral to Parrot)
-V: 0.0.13
-
 N: Jako
 A: Gregor Purdy
 D: C/Perl like language, first compiler for Parrot
 S: Functioning, although not all examples work. Calling conventions and NCI
 S: have changed since the Jako subroutine and NCI code
 S: generation was written, causing some breakage.
+S: broken due to recent deprecations
 M: Yes
 V: 0.0.11
 
@@ -171,9 +167,9 @@ W: http://pugscode.org/
 N: Punie
 A: Allison Randal
 D: An implementation of Perl1, implemented in PIR with PGE
-S: 'print 1' is working
+S: Most tests pass, but 'print 1;' fails.
 M: Yes
-V: 0.2.2
+V: 0.3.0
 
 N: Python
 A: Michal J Wallace
@@ -199,7 +195,7 @@ D: Smalltalk for C++, C#, and Java programmers. It features an object
 D: system modeled on the Smalltalk object system and a language syntax
 D: designed to be easy to learn for developers of C-like languages.
 S: Working
-S: Not in parrot CVS
+S: Not in parrot SVN
 W: http://homepage.mac.com/matt.kennedy/Span
 M: Yes
 V: 0.0.11
@@ -209,7 +205,7 @@ A: Jeffrey Goff
 A: Juergen Boemmels
 S: Functioning, as far as implemented. Lists and functions are working
 S: but many functions are missing implementation.
-S: Two test failures on Mac OS X and Linux
+S: 70% pass ratio due to recent deprecations
 M: Yes
 V: 0.3.0
 
@@ -225,8 +221,7 @@ N: unlamba
 A: Leopold Tötsch
 D: unlambda is a pure functional programming language with mostly eager
 D: evaluation following the SKI calculus (+ a few extensions)
-S: Errors on HEAD branch, which will go away after complete merge of
-S: Leo's branch,
+S: Bus error (OS X only?)
 W: http://www.madore.org/~david/programs/unlambda/
 V: 0.2.2
 
@@ -250,6 +245,7 @@ N: Zcode
 A: Amir Karger (taken over from Leo)
 D: Infocom's Z-machine
 S: 25 out of 66 Z3 opcodes all or mostly done. A long way from Zork.
+S: broken with recent deprecations.
 M: Yes
 V: 0.2.3
 
