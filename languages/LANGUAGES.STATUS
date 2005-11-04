@@ -167,7 +167,8 @@ W: http://pugscode.org/
 N: Punie
 A: Allison Randal
 D: An implementation of Perl1, implemented in PIR with PGE
-S: Most tests pass, but 'print 1;' fails.
+S: All tests fail.
+S: Only 'print 1;' is expected to work, the other tests are marked as TODO.
 M: Yes
 V: 0.3.0
 
