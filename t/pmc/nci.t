@@ -1322,7 +1322,7 @@ pasm_output_is(<<'CODE', <<'OUTPUT', "nci_cb_C1 - PASM");
   # prepare user data
   new P7, .Integer
   set P7, 42
-  new_callback P5, P6, P7, "tU"	# Z in pdd16
+  new_callback P5, P6, P7, "vtU" # Z in pdd16
   print "ok 1\n"
   # now call the external sub, that takes a call_back and user_data
   loadlib P1, "libnci_test"
@@ -1391,7 +1391,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "nci_cb_C1 - PIR");
     # this callback function will eventually by called by the library
     .const .Sub cb = "_call_back"
     .local pmc cb_wrapped
-    cb_wrapped = new_callback cb, user_data, "tU"	# Z in pdd16
+    cb_wrapped = new_callback cb, user_data, "vtU"	# Z in pdd16
     print "created a callback sub\n"
 
     # now call the external sub, that takes a callback and user data
@@ -1456,7 +1456,7 @@ pasm_output_is(<<'CODE', <<'OUTPUT', "nci_cb_C2 - PASM");
   # prepare user data
   new P7, .Integer
   set P7, 42
-  new_callback P5, P6, P7, "iU"	# Z in pdd16
+  new_callback P5, P6, P7, "viU"	# Z in pdd16
   print "ok 1\n"
   # now call the external sub, that takes a call_back and user_data
   loadlib P1, "libnci_test"
@@ -1529,7 +1529,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "nci_cb_C3 - PIR");
     # this callback function will eventually by called by the library
     .const .Sub cb = "_call_back"
     .local pmc cb_wrapped
-    cb_wrapped = new_callback cb, user_data, "pU"	# Z in pdd16
+    cb_wrapped = new_callback cb, user_data, "vpU"	# Z in pdd16
     print "created a callback sub\n"
 
     # now call the external sub, that takes a callback and user data
@@ -1604,7 +1604,7 @@ pasm_output_is(<<'CODE', <<'OUTPUT', "nci_cb_D1 - PASM");
   # prepare user data
   new P7, .Integer
   set P7, 42
-  new_callback P5, P6, P7, "Ut"	# Z in pdd16
+  new_callback P5, P6, P7, "vUt"	# Z in pdd16
   print "ok 1\n"
   # now call the external sub, that takes a call_back and user_data
   loadlib P1, "libnci_test"
@@ -1663,7 +1663,7 @@ pasm_output_is(<<'CODE', <<'OUTPUT', "nci_cb_D2 - PASM");
   # prepare user data
   new P7, .Integer
   set P7, 42
-  new_callback P5, P6, P7, "Ui"	# Z in pdd16
+  new_callback P5, P6, P7, "vUi"	# Z in pdd16
   print "ok 1\n"
   # now call the external sub, that takes a call_back and user_data
   loadlib P1, "libnci_test"
@@ -1732,7 +1732,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "nci_cb_D2 - PIR");
     # this callback function will eventually by called by the library
     .const .Sub cb = "_call_back"
     .local pmc cb_wrapped
-    cb_wrapped = new_callback cb, user_data, "Ui"	# Z in pdd16
+    cb_wrapped = new_callback cb, user_data, "vUi"	# Z in pdd16
     print "created a callback sub\n"
 
     # now call the external sub, that takes a callback and user data
@@ -1810,7 +1810,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "nci_cb_D3 - PIR");
     # this callback function will eventually by called by the library
     .const .Sub cb = "_call_back"
     .local pmc cb_wrapped
-    cb_wrapped = new_callback cb, user_data, "Up"	# Z in pdd16
+    cb_wrapped = new_callback cb, user_data, "vUp"	# Z in pdd16
     print "created a callback sub\n"
 
     # now call the external sub, that takes a callback and user data
@@ -1910,7 +1910,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "nci_cb_D4 - synchronous callbacks");
     # this callback function will eventually by called by the library
     .const .Sub cb = "_call_back"
     .local pmc cb_wrapped
-    cb_wrapped = new_callback cb, user_data, "Up"	# Z in pdd16
+    cb_wrapped = new_callback cb, user_data, "vUp"	# Z in pdd16
     print "created a callback sub\n"
 
     # now call the external sub, that takes a callback and user data

@@ -61,6 +61,14 @@ Parrot_make_cb(Parrot_Interp interpreter, PMC* sub, PMC* user_data,
     VTABLE_setprop(interpreter, user_data, sc, sub);
     /* only ASCII signatures are supported */
     sig_str = cb_signature->strstart;
+
+    if (strlen (sig_str) != 3) {
+        internal_exception(1, "unhandled signature '%s' in make_cb",
+              cb_signature->strstart);
+    }
+    
+    ++sig_str;     /* Skip callback return type */
+
     if (*sig_str == 'U') {
         type = 'D';
     }
@@ -70,8 +78,8 @@ Parrot_make_cb(Parrot_Interp interpreter, PMC* sub, PMC* user_data,
             type = 'C';
         }
         else {
-            internal_exception(1, "unhandled signature '%Ss' in make_cb",
-                    cb_signature);
+            internal_exception(1, "unhandled signature '%s' in make_cb",
+                    cb_signature->strstart);
         }
     }
 
@@ -264,6 +272,7 @@ Parrot_run_callback(Parrot_Interp interpreter, PMC* user_data, void* external_da
 
     sig_str = VTABLE_get_string(interpreter, signature);
     p = sig_str->strstart;
+    ++p;     /* Skip return type */
 
     pasm_sig[0] = 'v';  /* no return value supported yet */
     pasm_sig[1] = 'P';
