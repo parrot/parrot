@@ -39,6 +39,8 @@
     optable.addtok("circumfix:[ ]", "term:", "nows", "PGE::Exp::Group")
     optable.addtok("circumfix:( )", "term:", "nows", "PGE::Exp::Group")
 
+    optable.addtok("<commit>", "term:", "nows", "PGE::Exp::Commit")
+
     $P0 = find_global "PGE::P6Rule", "parse_subrule"
     optable.addtok("term:<", "term:", "nows", $P0)
     optable.addtok("term:<?", "term:", "nows", $P0)

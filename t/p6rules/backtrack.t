@@ -36,9 +36,15 @@ p6rule_is  ('xyabghij', '[ab::cd | gh::ij]', 'group cut in group');
 p6rule_isnt('xyabghij', '[ab:::cd | gh:::ij]', 'rule cut in group');
 
 
-## <commit> -- cut over entire rule
-p6rule_isnt('whence', '[ when <commit> ever ] | whence', 'full backtrack failure', todo => 'not yet implemented');
+## <commit> -- cut over entire match
+p6rule_isnt('whence', '[ when <commit> ever ] | whence', 'full backtrack failure');
 
-
+p6rule_isnt('whence', 
+    [
+        [ subrule => 'when <commit> ever' ],
+        [ _MASTER => '<subrule> | whence' ],
+    ],
+    "<commit> in nested subrule");
+  
 # remember to change the number of tests :-)
-BEGIN { plan tests => 16; }
+BEGIN { plan tests => 17; }

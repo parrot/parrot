@@ -28,6 +28,7 @@
     $P1 = subclass $P0, "PGE::Exp::Quant"
     $P1 = subclass $P0, "PGE::Exp::Modifier"
     $P1 = subclass $P0, "PGE::Exp::Closure"
+    $P1 = subclass $P0, "PGE::Exp::Commit"
     $P0 = new Integer
     store_global "PGE::Exp", "$_serno", $P0
 .end
@@ -1043,3 +1044,17 @@ register.
     .return ()
 .end
 
+.namespace [ "PGE::Exp::Commit" ]
+
+.sub "gen" :method
+    .param pmc code
+    .param string label
+    .param string next
+    .local pmc emit
+    emit = find_global "PGE::Exp", "emit"
+    emit(code, "  %s:  # commit    ##", label)
+    emit(code, "    bsr %s", next)
+    emit(code, "    cutting = %s", PGE_CUT_MATCH)
+    emit(code, "    goto fail")
+    .return ()
+.end
