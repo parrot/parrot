@@ -292,14 +292,14 @@ parseflags(Parrot_Interp interp, int *argc, char **argv[])
                 break;
             case 'o':
                 run_pbc = 0;
-                interp->output_file = str_dup(opt.opt_arg);
+                interp->output_file = opt.opt_arg;
                 break;
 
             case OPT_PBC_OUTPUT:
                 run_pbc = 0;
                 write_pbc = 1;
                 if (!interp->output_file)
-                    interp->output_file = str_dup("-");
+                    interp->output_file = "-";
                 break;
 
             case 'O':
@@ -453,7 +453,7 @@ main(int argc, char * argv[])
     struct PackFile *pf;
     int obj_file, ast_file = 0;
     char *sourcefile;
-    char *output_file;
+    const char *output_file;
 
     Interp *interp = Parrot_new(NULL);
 
@@ -645,8 +645,6 @@ main(int argc, char * argv[])
 
     /* Clean-up after ourselves */
     Parrot_destroy(interp);
-    if (output_file)
-        free(output_file);
     mem_sys_free(IMCC_INFO(interp));
     Parrot_exit(0);
 

@@ -144,11 +144,6 @@ imc_close_unit(Parrot_Interp interp, IMC_Unit * unit)
     cur_unit = NULL;
 }
 
-/*
- * XXX FIXME: Memory leakage. Can't call free_reglist or clear_tables()
- * yet due to interaction between units. One unit may hold a reference
- * to another (subs). Garbage collection would solve this.
- */
 static void
 imc_free_unit(Parrot_Interp interp, IMC_Unit * unit)
 {
@@ -158,9 +153,7 @@ imc_free_unit(Parrot_Interp interp, IMC_Unit * unit)
     fprintf(stderr, "imc_free_unit()\n");
 #endif
 
-    /* XXX See above
     free_reglist(unit);
-    */
 
     clear_basic_blocks(unit);       /* and cfg ... */
     if (!imc->n_comp_units)

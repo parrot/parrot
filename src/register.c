@@ -138,6 +138,17 @@ create_initial_context(Interp *interpreter)
 void
 destroy_context(Interp *interpreter)
 {
+    int slot;
+    void *ptr, *next;
+
+    for (slot = 0; slot < interpreter->ctx_mem.n_free_slots; ++slot) {
+        ptr = interpreter->ctx_mem.free_list[slot];
+        while (ptr) {
+            next = *(void **) ptr;
+            mem_sys_free(ptr);
+            ptr = next;
+        }
+    }
     mem_sys_free(interpreter->ctx_mem.free_list);
 }
 

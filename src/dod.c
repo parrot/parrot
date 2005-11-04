@@ -519,8 +519,6 @@ trace_active_buffers(Interp *interpreter)
     /* The interpreter might have a few strings of its own,
      * but currently there are none.
      * When the interpreter gets strings again, then mark them as alive */
-    /* if (interpreter->output_file)
-        pobject_lives(interpreter, (PObj *)interpreter->output_file) */;
 }
 
 #ifdef GC_IS_MALLOC
