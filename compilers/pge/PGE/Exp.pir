@@ -5,6 +5,8 @@
 .const int PGE_INF = 2147483647
 .const int PGE_CUT_GROUP = -1
 .const int PGE_CUT_RULE = -2
+.const int PGE_CUT_MATCH = -3
+.const int PGE_CUT_CUT = -4
 
 .sub "__onload"
     .local pmc optable
@@ -258,7 +260,7 @@ register.
     captsave = "    captscope[%s] = $P0"
     captback = "    delete captscope[%s]"
     if isarray == 0 goto end
-    captsave = "    $P1 = captscope[%s]\n    push $P1, $P0"
+    captsave = "    $P2 = captscope[%s]\n    push $P2, $P0"
     captback = "    $P1 = captscope[%s]\n    $P1 = pop $P1"
     $I0 = self["isgen"]
     if $I0 goto end
@@ -353,16 +355,19 @@ register.
     emit(code, "    if pos > lastpos goto fail_forever")
     emit(code, "    mfrom = pos")
     self.emitsub(code, exp0label, "pos", "NOCUT")
-    emit(code, "    if cutting == %s goto fail_forever", PGE_CUT_RULE)
+    emit(code, "    if cutting <= %s goto fail_cut", PGE_CUT_RULE)
     emit(code, "    inc pos")
     emit(code, "    goto try_match")
     emit(code, "  try_at_pos:")
     emit(code, "    cutting = 0")
     self.emitsub(code, exp0label, "NOCUT")
+    emit(code, "    if cutting <= %s goto fail_cut", PGE_CUT_RULE)
     emit(code, "  fail_forever:")
+    emit(code, "    cutting = %s", PGE_CUT_RULE)
+    emit(code, "  fail_cut:")
+    emit(code, "    mpos = cutting")
     emit(code, "    null $P0")
     emit(code, "    setattribute mob, \"PGE::Match\\x0&:corou\", $P0")
-    emit(code, "    mpos = -2")
     emit(code, "    .yield (mob)")
     emit(code, "    goto fail_forever")
     emit(code, "  succeed:")
@@ -904,29 +909,39 @@ register.
     emit(code, "  %s_s2:", label)
     emit(code, "    $P0 = $P0(captscope%s)", subargs)
   subrule_3:
-    if isnegated == 0 goto subrule_4
-    emit(code, "    if $P0 goto fail")
-    emit(code, "    $P1 = getattribute $P0, \"PGE::Match\\x0$:from\"")
-    emit(code, "    $P1 = pos")
     emit(code, "    $P1 = getattribute $P0, \"PGE::Match\\x0$:pos\"")
+    emit(code, "    if $P1 <= %s goto %s_commit", PGE_CUT_MATCH, label)
+    if isnegated == 0 goto subrule_4
+    emit(code, "    if $P1 >= 0 goto fail")
+    emit(code, "    $P1 = pos")
+    emit(code, "    $P1 = getattribute $P0, \"PGE::Match\\x0$:from\"")
     emit(code, "    $P1 = pos")
     emit(code, "    goto %s", next)
     goto end
   subrule_4:
-    emit(code, "    unless $P0 goto fail")
+    emit(code, "    if $P1 < 0 goto fail")
+    if iscapture == 0 goto subrule_5
     emit(code, captsave, cname)
-    if iscut == 0 goto subrule_5
-    emit(code, "    goto %s", next)
-    goto end
+    emit(code, "    bsr %s_s3", label)
+    emit(code, captback, cname)
+    emit(code, "    goto fail")
   subrule_5:
-    emit(code, "  %s_sr3:", label)
-    emit(code, "    pos = $P0.to()")
+    emit(code, "  %s_s3:", label)
+    emit(code, "    pos = $P1")
+    if iscut == 0 goto subrule_6
+    emit(code, "    goto %s", next)
+    goto subrule_commit
+  subrule_6:
     emit(code, "    $P1 = getattribute $P0, \"PGE::Match\\x0&:corou\"")
     emit(code, "    if_null $P1, %s", next)
     self.emitsub(code, next, "$P0", "NOCUT")
     emit(code, "    $P0.next()")
-    emit(code, "    if $P0 goto %s_sr3", label)
-    emit(code, captback, cname)
+    emit(code, "    $P1 = getattribute $P0, \"PGE::Match\\x0$:pos\"")
+    emit(code, "    if $P1 >= 0 goto %s_s3", label)
+    emit(code, "    if $P1 > %s goto fail", PGE_CUT_MATCH)
+  subrule_commit:
+    emit(code, "  %s_commit:", label)
+    emit(code, "    cutting = $P1")
     emit(code, "    goto fail")
   end:
     .return ()
