@@ -249,6 +249,8 @@ sub pack_smoke {
 
   my $summary = join("-", map { $smoke{summary}{$_} } qw<total ok failed todo skipped unexpect>);
   my $args = unpack("H*", $smoke{harness_args});
+
+  #                           1       2          3        4         5        6         7      8           9        10          ...
   my $str = "parrot-smoke-<VERSION>-<DEVEL>-r<revision>-<branch>--<cpuarch>-<osname>-<cc>-<runcore>--<timestamp>-<duration>--$summary--$args--<id>.html";
 
   $str =~ s/<(.+?)>/$smoke{$1}/g;
@@ -259,7 +261,25 @@ sub pack_smoke {
 sub unpack_smoke {
   my $name = shift;
 
-  /^parrot-smoke-([\d\.]+)-(\w+)-r(\d+)-([\w\-]+)--([\w\d]+)-([\w\d]+)-([\w\d]+)-(\w+)--(\d+)-(\d+)--(\d+)-(\d+)-(\d+)-(\d+)-(\d+)-(\d+)--([a-f0-9]+)--([a-f0-9]+).html$/
+  /^parrot-smoke-([\d\.]+)	#  1 VERSION
+                -(\w+)		#  2 DEVEL
+                -r(\d+)		#  3 revision
+                -([\w\-]+)	#  4 branch
+               --([\w\d]+)	#  5 cpuarch
+                -([\w\d]+)	#  6 osname
+                -([\w\d]+)	#  7 cc
+                -(\w+)		#  8 runcore
+               --(\d+)		#  9 timestamp
+                -(\d+)		# 10 duration
+               --(\d+)		# 11	total
+                -(\d+)		# 12	ok
+                -(\d+)		# 13	failed
+                -(\d+)		# 14	todo
+                -(\d+)		# 15	skipped
+                -(\d+)		# 16	unexpected
+               --([a-f0-9]+)	# 17    harness_args
+               --([a-f0-9]+)	# 18	id
+   .html$/x
     and return {
 	  VERSION       => $1,
 	  DEVEL         => $2,
@@ -270,27 +290,27 @@ sub unpack_smoke {
       cc            => $7,
       runcore       => $8,
       timestamp     => [
-        $8,
+        $9,
         do { 
-          my $str = localtime($8)->strftime("%d %b %Y %H:%M %a");
+          my $str = localtime($9)->strftime("%d %b %Y %H:%M %a");
           $str =~ s/ /&nbsp;/g;
           # hack, to make the timestamps not break so the smoke reports look
           # good even on 640x480
           $str;
         },
       ],
-      duration      => sprintf("%.02f", Time::Seconds->new($9)->minutes) . "&nbsp;min",
+      duration      => sprintf("%.02f", Time::Seconds->new($10)->minutes) . "&nbsp;min",
       summary       => [{
-        total       => $10,
-        ok          => $11,
-        failed      => $12,
-        todo        => $13,
-        skipped     => $14,
-        unexpect    => $15,
+        total       => $11,
+        ok          => $12,
+        failed      => $13,
+        todo        => $14,
+        skipped     => $15,
+        unexpect    => $16,
       }],
-      percentage    => sprintf("%.02f", $11 / ($10||1) * 100),
-	  harness_args  => pack("H*", $16),
-      id            => $17,
+      percentage    => sprintf("%.02f", $12 / ($11||1) * 100),
+	  harness_args  => pack("H*", $17),
+      id            => $18,
       filename      => $name,
       link          => BASEHTTPDIR . $name, 
     };
