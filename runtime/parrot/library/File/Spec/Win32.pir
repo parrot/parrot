@@ -232,10 +232,6 @@ do_match_1:
 	substr path, $I0, $I1, $S0
 no_match_1:
 
-print "-1 "
-print path
-print "\n"
-
 match_2:
 	## $path =~ s|/|\\|g;
 	rulesub= p6rule( "/" )
@@ -249,10 +245,6 @@ do_match_2:
 	substr path, $I0, $I1, $S0
 	goto do_match_2
 no_match_2:
-
-print "-2 "
-print path
-print "\n"
 
 match_3:
 	## $path =~ s|([^\\])\\+|$1\\|g;
@@ -270,10 +262,6 @@ do_match_3:
 	goto do_match_3
 no_match_3:
 
-print "-3 "
-print path
-print "\n"
-
 match_4:
 	## $path =~ s|(\\\.)+\\|\\|g;
 	## xx\.\.\xx -> xx\xx
@@ -288,10 +276,6 @@ do_match_4:
 	substr path, $I0, $I1, $S0
 	goto do_match_4
 no_match_4:
-
-print "-4 "
-print path
-print "\n"
 
 match_5:
     ## $path =~ s|^(\.\\)+||s unless $path eq ".\\";
@@ -312,10 +296,6 @@ do_match_5:
 	substr path, $I0, $I1, $S0
 no_match_5:
 
-print "-5 "
-print path
-print "\n"
-
 match_6:
     ## $path =~ s|\\\Z(?!\n)||
 	##     unless $path =~ m{^([A-Z]:)?\\\Z(?!\n)}s;
@@ -335,10 +315,6 @@ match_6:
 	substr path, $I0, $I1, $S0
 no_match_6:
 
-print "-6 "
-print path
-print "\n"
-
 match_7:
     ## $path =~ s|\\\.\.\.\\|\\\.\.\\\.\.\\|g;
 	## \...\ is 2 levels up
@@ -353,10 +329,6 @@ do_match_7:
 	substr path, $I0, $I1, $S0
 	goto do_match_7
 no_match_7:
-
-print "-7 "
-print path
-print "\n"
 
 match_8:
     ## $path =~ s|^\.\.\.\\|\.\.\\\.\.\\|g;
@@ -373,10 +345,6 @@ do_match_8:
 	goto do_match_8
 no_match_8:
 
-print "-8 "
-print path
-print "\n"
-
 match_9:
     ## return $path if $path =~ m|^\.\.|;
 	## skip relative paths
@@ -385,10 +353,6 @@ match_9:
 do_match_9:
 	if match, return
 no_match_9:
-
-print "-9 "
-print path
-print "\n"
 
 match_10:
     ## return $path unless $path =~ /\.\./;
@@ -399,10 +363,6 @@ do_match_10:
 	unless match, return
 no_match_10:
 
-print "10 "
-print path
-print "\n"
-
 match_11:
     ## return $path if $path =~ /\.\.\.\./;
 	## too many .'s to cleanup
@@ -411,10 +371,6 @@ match_11:
 do_match_11:
 	if match, return
 no_match_11:
-
-print "11 "
-print path
-print "\n"
 
 match_12:
     ## $path =~ s{^\\\.\.$}{\\};
@@ -430,10 +386,6 @@ do_match_12:
 	substr path, $I0, $I1, $S0
 no_match_12:
 
-print "12 "
-print path
-print "\n"
-
 match_13:
     ## 1 while $path =~ s{^\\\.\.}{};
 	## \..\xx -> \xx
@@ -448,10 +400,6 @@ do_match_13:
 	substr path, $I0, $I1, $S0
 	goto match_13
 no_match_13:
-
-print "13 "
-print path
-print "\n"
 
 #    my ($vol,$s_dirs,$file) = $self->splitpath($path);
 	.local string vol, s_dirs, file
