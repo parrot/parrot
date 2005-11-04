@@ -33,7 +33,8 @@ V: 0.0.11
 
 N: bc
 A: Bernhard Schmalhofer
-D: Based on ANTLR and Python
+D: Based on ANTLR and Python.
+D: ANTLR is needed only for maintainance, for generation of Python runtime files. 
 S: very simple arithmetic expressions are working
 S: Some test failures
 M: Yes

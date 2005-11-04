@@ -13,7 +13,7 @@ Very basic checks.
 
 use strict;
 use FindBin;
-use lib "$FindBin::Bin/../../lib", "$FindBin::Bin/../../../../lib";
+use lib "$FindBin::Bin/../lib", "$FindBin::Bin/../../../lib";
 
 use Parrot::Test tests => 72;
 use Test::More;
