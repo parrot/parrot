@@ -144,25 +144,9 @@ destroy_context(Interp *interpreter)
 void
 create_initial_context(Interp *interpreter)
 {
-    size_t to_alloc = ALIGNED_CTX_SIZE;
-    parrot_context_t *ctx;
-    void *p, *ptr;
     int i;
+    INTVAL num_regs[] ={32,32,32,32};
 
-    ctx = ptr = mem_sys_allocate_zeroed(to_alloc);
-#if CTX_LEAK_DEBUG
-    fprintf(stderr, "alloc %p\n", ctx);
-#endif
-    CONTEXT(interpreter->ctx) = ctx;
-    for (i = 0; i < 4; ++i)
-        ctx->n_regs_used[i] = NUM_REGISTERS;
-    /* regs start past the context */
-    p = (void *) ((char *)ptr + ALIGNED_CTX_SIZE);
-    /* ctx.bp points to I0, which has Nx at left */
-    interpreter->ctx.bp.regs_i = (INTVAL*)((char*)p + _SIZEOF_NUMS);
-    /* this points to S0 */
-    interpreter->ctx.bp_ps.regs_s = (STRING**)((char*)p + _SIZEOF_NUMS +
-        _SIZEOF_INTS + _SIZEOF_PMCS);
     /*
      * create some initial free_list slots
      */
@@ -172,11 +156,11 @@ create_initial_context(Interp *interpreter)
         mem_sys_allocate(INITIAL_FREE_SLOTS * sizeof(void *));
     for (i = 0; i < INITIAL_FREE_SLOTS; ++i)
         interpreter->ctx_mem.free_list[i] = NULL;
-    ctx->bp.regs_i = interpreter->ctx.bp.regs_i;
-    ctx->bp_ps.regs_s = interpreter->ctx.bp_ps.regs_s;
-    ctx->prev = NULL;
-    for (i = 0; i < 4; ++i)
-        ctx->n_regs_used[i] = 0;
+    /*
+     * For now create context with 32 regs each. Some src tests (and maybe other
+     * extenders) are assuming the presence of these registers
+     */
+    Parrot_alloc_context(interpreter, num_regs);
 }
 
 #endif
@@ -410,7 +394,10 @@ Parrot_alloc_context(Interp *interpreter, INTVAL *n_regs_used)
 #endif
     old = CONTEXT(interpreter->ctx);
     CONTEXT(interpreter->ctx) = ctx = ptr;
-    memcpy(ctx, old, sizeof(struct Parrot_Context));
+    if (old)
+        memcpy(ctx, old, sizeof(struct Parrot_Context));
+    else
+        memset(ctx, 0, sizeof(struct Parrot_Context));
     ctx->prev = old;
     ctx->regs_mem_size = reg_alloc;
     for (i = 0; i < 4; ++i)

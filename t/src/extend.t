@@ -535,7 +535,7 @@ caught
 back
 OUTPUT
 
-unlink "$temp.pasm", "$temp.pbc";
+unlink "$temp.pasm", "$temp.pbc" unless $ENV{POSTMORTEM};
 
 
 1;
