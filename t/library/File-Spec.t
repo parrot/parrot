@@ -33,9 +33,6 @@ END:
 POST
 
 
-plan skip_all => 'win32 implementation only'
-	unless $^O =~ m/MSWin32/;
-
 ## 1
 pir_output_is(<<'CODE'.$POST, <<'OUT', "load_bytecode");
 .sub 'main' :main
@@ -116,4 +113,11 @@ OUT
 
 
 # remember to update the number of tests! :-)
-BEGIN { plan tests => 21; }
+BEGIN {
+	if( $^O eq 'MSWin32' ) {
+		plan tests => 21;
+	} else {
+		plan skip_all => 'win32 implementation only' unless $^O =~ m/MSWin32/;
+	}
+}
+
