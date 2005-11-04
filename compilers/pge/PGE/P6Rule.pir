@@ -356,6 +356,8 @@
   subrule_name_2:
     $I1 = pos - $I0
     subname = substr target, $I0, $I1
+    $S0 = substr target, pos, 2
+    if $S0 == ": " goto subrule_text
     $S0 = substr target, pos, 1
     if $S0 != " " goto subrule_end
     inc pos
@@ -367,6 +369,16 @@
     mob["arg"] = $S0
     pos = $P1.to()
     mpos = -1
+    $S0 = substr target, pos, 1
+    goto subrule_end
+  subrule_text:
+    pos += 2
+    $I0 = index target, ">", pos
+    if $I0 < 0 goto end
+    $I0 -= pos
+    $S0 = substr target, pos, $I0
+    mob["arg"] = $S0
+    pos += $I0
     $S0 = substr target, pos, 1
   subrule_end:
     if $S0 != ">" goto end

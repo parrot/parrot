@@ -1,4 +1,4 @@
-use Parrot::Test tests => 5;
+use Parrot::Test tests => 12;
 use Parrot::Test::PGE;
 
 ## First, test direct calls to PGE::Text::bracketed
@@ -62,10 +62,23 @@ OUT
 
 ## Now, test calls as subrules
 ##
-$PTB = "^<PGE::Text::bracketed>\$";
+$PTB = "^<PGE::Text::bracketed>\$"; 
 p6rule_is  ("{ nested { and } okay, () and <> pairs okay }", $PTB);
-p6rule_is  ("{ nested { and } okay, escaped \\}'s okay }", $PTB);
+p6rule_is  ("{ nested { and } okay, () <>, escaped \\}'s okay }", $PTB);
 p6rule_isnt("{ unmatched nested { not okay }", $PTB);
 p6rule_isnt("{ unmatched nested ( not okay }", $PTB);
+
+## parameterized with {}
+$PTB = "^<PGE::Text::bracketed: {}>";
+p6rule_is  ("{ nested { } okay, unbalanced (, <, escaped \\} okay}", $PTB);
+p6rule_isnt("{ unmatched nested { not okay }", $PTB);
+p6rule_isnt("{ unmatched nested { not okay, nor ( and < }", $PTB);
+
+## parameterized with {}[]" (nested and quoted)
+$PTB = '^<PGE::Text::bracketed: {}[]"`>';
+p6rule_isnt('{ unbalanced nested [ with } and ] not okay', $PTB);
+p6rule_is  ('{ balanced nested [ with ] and ( is } okay', $PTB);
+p6rule_is  ('{ a quoted "}" unbalanced right bracket} okay', $PTB);
+p6rule_is  ('{ quoted "}" unbalanced quotes (`}}}"""}}}}`)} okay', $PTB);
 
 # Don't forget to change the number of tests!

@@ -142,8 +142,7 @@ p6rule_like($str,  '<null> $',
 p6rule_is  ($str,  'abc <null> def', 'null pattern (<null>)');
 p6rule_like($str, "abc <null> def",
     qr/mob<null>: < @ 58>/, 'null pattern (<null>)');
-p6rule_is  ($str, 'x | y | <null>', 'null pattern (<null>)',
-    todo => 'specification unclear');
+p6rule_is  ($str, 'x | y | <null>', 'null pattern (<null>)');
 p6rule_is  ($str, 'x | y | <?null>', 'null pattern (<null>)');
 
 
