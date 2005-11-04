@@ -34,7 +34,6 @@
     optable.addtok("term:\\w", "term:", "nows", "PGE::Exp::CCShortcut")
     optable.addtok("term:\\W", "term:", "nows", "PGE::Exp::CCShortcut")
     optable.addtok("term:\\n", "term:", "nows", "PGE::Exp::CCShortcut")
-    optable.addtok("term:\\N", "term:", "nows", "PGE::Exp::CCShortcut")
 
     optable.addtok("circumfix:[ ]", "term:", "nows", "PGE::Exp::Group")
     optable.addtok("circumfix:( )", "term:", "nows", "PGE::Exp::Group")
@@ -80,6 +79,7 @@
     $P0["t"] = "\t"
     $P0["v"] = unicode:"\x0a\x0b\x0c\x0d\x85\u2028\u2029"
     $P0["h"] = unicode:"\x09\x20\xa0\u1680\u180e\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u202f\u205f\u3000"
+    $P0["n"] = unicode:"\x0a\x0d\x0c\x85\u2028\u2029"
     # See http://www.unicode.org/Public/UNIDATA/PropList.txt for above
 .end
 

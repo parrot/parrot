@@ -465,6 +465,13 @@ register.
 
 .namespace [ "PGE::Exp::CCShortcut" ]
 
+.sub "reduce" :method
+    $S0 = self["value"]
+    if $S0 != "\\n" goto end
+    self["isquant"] = 1
+  end:
+.end
+    
 .sub "gen" :method
     .param pmc code
     .param string label
@@ -477,17 +484,16 @@ register.
     (min, max, islazy, iscut, $S0) = self."quant"()
     emit = find_global "PGE::Exp", "emit"
     emit(code, "\n %s:  # %s %s", label, token, $S0)
+    if token == "\\n" goto newline
     if token == "." goto dot
     find = "    $I0 = find_not_cclass %s, target, pos, lastpos"
     if token == "\\s" goto space
     if token == "\\d" goto digit
     if token == "\\w" goto word
-    if token == "\\n" goto newline
     find = "    $I0 = find_cclass %s, target, pos, lastpos"
     if token == "\\S" goto space
     if token == "\\D" goto digit
     if token == "\\W" goto word
-    if token == "\\N" goto newline
   dot:
     emit(code, "    $I0 = lastpos")
     goto char
@@ -499,9 +505,6 @@ register.
     goto char
   word:
     emit(code, find, .CCLASS_WORD)
-    goto char
-  newline:
-    emit(code, find, .CCLASS_NEWLINE)
     goto char
   char:
     emit(code, "    rep = $I0 - pos")
@@ -537,6 +540,15 @@ register.
     emit(code, "    goto %s_3", label)
     .return ()
   cut:
+    emit(code, "    goto %s", next)
+    .return ()
+  newline:                                         # single newline
+    emit(code, "    $I0 = is_cclass %s, target, pos", .CCLASS_NEWLINE)
+    emit(code, "    if $I0 == 0 goto fail")
+    emit(code, "    $S0 = substr target, pos, 2")
+    emit(code, "    inc pos")
+    emit(code, "    if $S0 != \"\\r\\n\" goto %s", next)
+    emit(code, "    inc pos")
     emit(code, "    goto %s", next)
     .return ()
 .end

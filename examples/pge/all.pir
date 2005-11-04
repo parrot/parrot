@@ -13,6 +13,7 @@
     load_bytecode "PGE/Dumper.pir"
     load_bytecode "PGE/Util.pir"
 
+    print "loaded p6rule\n"
     "loadexpr"("Simple", "expr")
     "loadexpr"("Perl6", "expr")
 

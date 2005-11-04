@@ -58,7 +58,7 @@ sub classify {
     $ret |= 0x0200 if $chr =~ /^[[:cntrl:]]$/;  # CCLASS_CONTROL        
     $ret |= 0x0400 if $chr =~ /^[[:punct:]]$/;  # CCLASS_PUNCTUATION    
     $ret |= 0x0800 if $chr =~ /^[[:alnum:]]$/;  # CCLASS_ALPHANUMERIC   
-    $ret |= 0x1000 if $chr =~ /^[\n\r]$/;       # CCLASS_NEWLINE
+    $ret |= 0x1000 if $chr =~ /^[\n\r\f\x85]$/; # CCLASS_NEWLINE
     $ret |= 0x2000 if $chr =~ /^[[:alnum:]_]$/; # CCLASS_WORD
 
     return $ret;

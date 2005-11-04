@@ -47,8 +47,8 @@ p6rule_is  ("abc\012def", 'c \n d', 'logical newline (\n)');
 p6rule_is  ("abc\015def", 'c \n d', 'logical newline (\n)');
 p6rule_is  ("abc\n\ndef", 'c \n+ d', 'logical newline (\n)');
 p6rule_isnt('abcdef', 'a\n+f', 'logical newline (\n)');
-p6rule_is  ("abc\012\015def", 'c \n d', 'logical newline (\n)', todo => 'specification unclear');
-p6rule_is  ("abc\015\012def", 'c \n d', 'logical newline (\n)', todo => 'specification unclear');
+p6rule_isnt("abc\012\015def", 'c \n d', 'logical newline (\n)');
+p6rule_is  ("abc\015\012def", 'c \n d', 'logical newline (\n)');
 p6rule_isnt("abc\ndef", 'b \n c', 'logical newline (\n)');
 p6rule_is  ("a", '\N', 'not logical newline (\N)');
 p6rule_is  ("abc", 'a \N c', 'not logical newline (\N)');
@@ -58,8 +58,8 @@ p6rule_isnt("abc\012def", 'c \N d', 'not logical newline (\N)');
 p6rule_isnt("abc\015def", 'c \N d', 'not logical newline (\N)');
 p6rule_isnt("abc\n\ndef", 'c \N+ d', 'not logical newline (\N)');
 p6rule_is  ('abcdef', 'a\N+f', 'not logical newline (\N)');
-p6rule_is  ("abc\012\015def", 'c \N d', 'not logical newline (\N)', todo => 'specification unclear');
-p6rule_is  ("abc\015\012def", 'c \N d', 'not logical newline (\N)', todo => 'specification unclear');
+p6rule_isnt("abc\012\015def", 'c \N d', 'not logical newline (\N)');
+p6rule_isnt("abc\015\012def", 'c \N d', 'not logical newline (\N)');
 p6rule_is  ("abc\ndef", 'b \N \n', 'not logical newline (\N)');
 
 
