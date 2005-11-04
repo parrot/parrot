@@ -49,8 +49,8 @@
 
 extern UINTVAL ld(UINTVAL);
 
-/* #define NEG_MINUS_ZERO */
-#define NEG_ZERO_SUB
+#define NEG_MINUS_ZERO
+/* #define NEG_ZERO_SUB */
 
 /* Register codes */
 #define emit_None 0
