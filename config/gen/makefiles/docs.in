@@ -9,9 +9,10 @@ PERL = ${perl}
 RM_F = ${rm_f}
 # Make directory; do not die if dir exists.
 MKDIR = $(PERL) -e ${PQ}-d or mkdir $$_,0777 or die foreach @ARGV${PQ}
+NEW_PERLDOC = ${new_perldoc}
 
 # long list of .pod files
-POD = ${pod}
+POD = $(patsubst %.ops,ops/%.pod,$(wildcard ../ops/*.ops))
 
 #
 # Targets
@@ -48,3 +49,10 @@ html:
 
 html-clean:
 	$(PERL) -I../lib -MParrot::Distribution -e "Parrot::Distribution->new->delete_html_docs"
+
+ops${slash}%.pod: ..${slash}ops${slash}%.ops
+ifeq ($(NEW_PERLDOC), 1)
+	perldoc -ud $@ $<
+else
+	perldoc -u $< < $@
+endif

@@ -127,38 +127,11 @@ sub makefiles {
   if ( Configure::Data->get('has_perldoc') ) {
     # set up docs/Makefile, partly based on the .ops in the root dir
   
-    opendir OPS, "ops" or die "opendir ops: $!";
-    my @ops = sort grep { !/^\./ && /\.ops$/ } readdir OPS;
-    closedir OPS;
-  
-    my $pod = join " ", map { my $t = $_; $t =~ s/\.ops$/.pod/; "ops/$t" } @ops;
-  
-    Configure::Data->set(pod => $pod);
-  
     genfile('config/gen/makefiles/docs.in',      'docs/Makefile',
             commentType       => '#',
             replace_slashes   => 1,
             conditioned_lines => 1);
   
-    Configure::Data->set(pod => undef);
-  
-    open MAKEFILE, ">> docs/Makefile" or die "open >> docs/Makefile: $!";
-  
-    my $slash = Configure::Data->get('slash');
-    my $new_perldoc = Configure::Data->get('new_perldoc');
-
-    foreach my $ops (@ops) {
-        my $pod = $ops;
-        $pod =~ s/\.ops$/.pod/;
-	print MAKEFILE "ops$slash$pod: ..${slash}ops${slash}$ops\n";
-	if ($new_perldoc == 1) {
-	    print MAKEFILE "\tperldoc -ud ops${slash}$pod ..${slash}ops${slash}$ops\n\n";
-	} else {
-	    print MAKEFILE "\tperldoc -u ..${slash}ops${slash}$ops > ops${slash}$pod\n\n";
-	}
-    }
-  
-    close MAKEFILE;
   } else {
     print "\nNo Perldoc, not generating a docs makefile.\n";
   }
