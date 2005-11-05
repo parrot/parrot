@@ -1,6 +1,11 @@
+#!perl
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
 use strict;
 use warnings;
-use Parrot::Test tests => 6;
+use Test::More;
+use Parrot::Test;
 use Parrot::Test::PGE;
 
 
@@ -52,4 +57,6 @@ p6rule_is("ab",
 
 p6rule_isnt("   ab", '^ <ws>: \ ab', "cut on subrules");
 
-# Don't forget to change the number of tests :-)
+
+# remember to change the number of tests :-)
+BEGIN { plan tests => 6; }

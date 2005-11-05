@@ -1,7 +1,10 @@
+#!perl
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 use strict;
 use warnings;
+use Test::More;
 use Parrot::Test;
 use Parrot::Test::PGE;
 use Parrot::Config;

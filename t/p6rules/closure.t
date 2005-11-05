@@ -1,6 +1,13 @@
+#!perl
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
 
-use Parrot::Test tests => 3;
+use strict;
+use warnings;
+use Test::More;
+use Parrot::Test;
 use Parrot::Test::PGE;
+
 
 p6rule_like("abcd",  "<alpha>**{3} {{ print match }}",
     qr/abcmatched/, "PIR closure");
@@ -17,4 +24,7 @@ p6rule_like("123 any",
         returncc
      }}}}",
      qr/foo/, "multi-line PASM closure");
-           
+
+
+# remember to change the number of tests :-)
+BEGIN { plan tests => 3; }

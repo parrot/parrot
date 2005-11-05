@@ -1,6 +1,11 @@
+#!perl
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
 use strict;
 use warnings;
-use Parrot::Test tests => 53;
+use Test::More;
+use Parrot::Test;
 use Parrot::Test::PGE;
 
 
@@ -69,4 +74,6 @@ p6rule_is  ('------', '<-[\-+]>?', 'negated optional escaped hyphen in range');
 p6rule_is  ('---x--', '<-[+\-]>?', 'negated optional escaped hyphen in range');
 p6rule_is  ('------', '<-[+\-]>?', 'negated optional escaped hyphen in range');
 
-# dont forget to change the number of tests :-)
+
+# remember to change the number of tests :-)
+BEGIN { plan tests => 53; }

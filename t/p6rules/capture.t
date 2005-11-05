@@ -1,6 +1,11 @@
+#!perl
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
 use strict;
 use warnings;
-use Parrot::Test tests => 38;
+use Test::More;
+use Parrot::Test;
 use Parrot::Test::PGE;
 
 
@@ -80,4 +85,5 @@ p6rule_like('123x', '(.)*x',
             qr/mob: <123x @ 0>/, 'repeated dot capture');
 
 
-# Don't forget to change the number of test :-)
+# remember to change the number of test :-)
+BEGIN { plan tests => 38; }

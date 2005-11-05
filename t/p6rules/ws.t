@@ -1,8 +1,12 @@
+#!perl
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
 use strict;
 use warnings;
-use Parrot::Test tests => 21;
-use Parrot::Test::PGE;
 use Test::More;
+use Parrot::Test;
+use Parrot::Test::PGE;
 
 
 # without :w
@@ -40,4 +44,6 @@ p6rule_like('dog := spot', ':w::(\w+) \:= (\S+)', qr/mob 1: <spot @ 7>/,
 
 # XXX: When available, add tests for full form :words modifier
 
-# Don't forget to change the number of tests :-)
+
+# remember to change the number of tests :-)
+BEGIN { plan tests => 21; }
