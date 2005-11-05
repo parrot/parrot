@@ -402,26 +402,26 @@ back
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "equality of closures");
-      new P0, .Closure
-      set_addr P0, f1
+      .const .Sub P3 = "f1"
+      newclosure P0, P3
       clone P1, P0
       eq P0, P1, OK1
       print "not "
 OK1:  print "ok 1\n"
 
-      new P2, .Closure
-      set_addr P2, f2
+      .const .Sub P4 = "f2"
+      newclosure P2, P4
       eq P0, P2, BAD2
       branch OK2
 BAD2: print "not "
 OK2:  print "ok 2\n"
       end
 
-f1:
+.pcc_sub f1:
       print "Test\n"
       end
 
-f2:
+.pcc_sub f2:
       new P1, .PerlUndef
       end
 CODE
@@ -430,26 +430,25 @@ ok 2
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "equality of subs");
-      new P0, .Sub
-      set_addr P0, f1
+      .const .Sub P0 = "f1"
       clone P1, P0
       eq P0, P1, OK1
       print "not "
 OK1:  print "ok 1\n"
 
-      new P2, .Sub
-      set_addr P2, f2
+      .const .Sub P2 = "f2"
+      clone P1, P0
       eq P0, P2, BAD2
       branch OK2
 BAD2: print "not "
 OK2:  print "ok 2\n"
       end
 
-f1:
+.pcc_sub f1:
       print "Test\n"
       end
 
-f2:
+.pcc_sub f2:
       new P1, .PerlUndef
       end
 CODE

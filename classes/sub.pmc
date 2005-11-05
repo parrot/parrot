@@ -159,16 +159,17 @@ Sets the name of the subroutine.
 
 =item C<void set_pointer(void *value)>
 
-Sets the pointer to the actual subroutine.
+Sets the pointer to the actual subroutine. 
+
+*** Don't use that - use .Sub constants instead ***
 
 =cut
 
 */
 
     void set_pointer (void* value) {
-        struct Parrot_sub * sub = PMC_sub(SELF);
-        PObj_get_FLAGS(SELF) |= SUB_FLAG_FIXUP_DONE;
-        sub->address = value;
+        internal_exception(1, "Don't set the address of a sub\n"
+                "use .Sub constants instead");
     }
 
 /*
