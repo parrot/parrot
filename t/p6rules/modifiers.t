@@ -76,17 +76,9 @@ p6rule_isnt('ab c d ef', ':words b c d', 'words (:words)');
 
 
 ## :once -- match only once
-pir_output_is($pre . <<'CODE' . $post, <<"OUT", 'match only once (:once)', todo => 'syntax not specified');
-    target = "abc"
-    pattern = "abc"
-    modifier = ":once"
-#    (rulesub, pir, exp) = p6rule_compile(pattern)
-#    match = rulesub(target)
-#    unless match goto NOK
-    goto NOK
-CODE
-ok
-OUT
+# N.B.: the :once modifier doesn't really belong to PGE or
+# p6rule matching, but instead is something the caller keeps
+# track of.  (pmichaud, 2005-11-05)
 
 
 ## TODO :c, :p, :g, :bytes, :codes, :graphs, :langs
@@ -103,4 +95,4 @@ p6rule_is  ('a bcd$ef', ':perl5 \A.*? bcd\Q$\E..\z', 'perl5 syntax (:perl5)', to
 
 
 ## remember to change the number of tests :-)
-BEGIN { plan tests => 26; }
+BEGIN { plan tests => 25; }
