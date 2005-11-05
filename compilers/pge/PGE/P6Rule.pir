@@ -91,6 +91,7 @@
     .local int pos, lastpos
     .local int litstart, litlen
     .local string initchar
+    .local int base, isnegated
     newfrom = find_global "PGE::Match", "newfrom"
     $P0 = getattribute mob, "PGE::Match\x0$:target"
     target = $P0
@@ -107,7 +108,9 @@
 
   term_backslash:
     initchar = substr target, pos, 1
-    $I1 = is_cclass .CCLASS_UPPERCASE, target, pos 
+    $I0 = index "01234567", initchar
+    if $I0 >= 0 goto term_backslash_o
+    isnegated = is_cclass .CCLASS_UPPERCASE, target, pos 
     inc pos
     $S0 = downcase initchar
     if $S0 == 'x' goto term_backslash_x            # \x.. \X..
@@ -115,37 +118,46 @@
     $I0 = exists $P0[$S0]                          # \e\f\r\t\v\h
     if $I0 == 0 goto term_literal
     initchar = $P0[$S0]
-    if $I1 goto term_charlist                      # negated \E\F\R\T\V\H
+    if isnegated goto term_charlist                # negated \E\F\R\T\V\H
     $I0 = length initchar
     if $I0 < 2 goto term_literal
   term_charlist:
     mob = newfrom(mob, 0, "PGE::Exp::EnumCharList")
     mob["value"] = initchar
-    mob["isnegated"] = $I1
+    mob["isnegated"] = isnegated
     goto end
 
+  term_backslash_o:
+    base = 8
+    goto term_bx0
   term_backslash_x:
+    base = 16
+  term_bx0:
+    $I0 = 0
     $S0 = substr target, pos, 1
     $I2 = index "[{(<", $S0
     if $I2 < 0 goto term_bx1
     $S2 = substr "]})>", $I0
     inc pos
   term_bx1:
-    $I0 = pos
-    pos = find_not_cclass .CCLASS_HEXADECIMAL, target, pos, lastpos
-    if pos == $I0 goto err_nodigits
-    $I3 = pos - $I0
-    $S0 = substr target, $I0, $I3
-    $S0 = concat "0x", $S0
-    $I0 = $S0
+    $S0 = substr target, pos, 1
+    downcase $S0
+    $I1 = index "0123456789abcdef", $S0
+    if $I1 < 0 goto term_bx2
+    if $I1 >= base goto term_bx2
+    $I0 *= base
+    $I0 += $I1
+    inc pos
+    goto term_bx1
+  term_bx2:
     initchar = chr $I0
-    if $I2 < 0 goto term_bx2
+    if $I2 < 0 goto term_bx3
     $S0 = substr target, pos, 1
     if $S0 != $S2 goto err_close
     inc pos
-  term_bx2:
-    if $I1 goto term_charlist                      # X[...]
-    # goto term_literal                            # x[...]
+  term_bx3:
+    if isnegated goto term_charlist                # \X[...], \000
+    # goto term_literal                            # \x[...], \000
 
   term_literal:                                    # first char is in initchar
     mob = newfrom(mob, 0, "PGE::Exp::Literal")
