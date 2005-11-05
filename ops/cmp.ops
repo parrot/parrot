@@ -144,8 +144,6 @@ op eq_addr(in PMC, in PMC, labelconst INT) :base_core {
   goto NEXT();
 }
 
-=cut
-
 ########################################
 
 =item B<ne>(in INT, in INT, labelconst INT)

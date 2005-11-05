@@ -268,8 +268,6 @@ op subclass(out PMC, in STR) :object_classes {
   goto NEXT();
 }
 
-=cut
-
 =item B<getclass>(out PMC, in STR)
 
 Find the PMC for a class, by name. Note that this is a one-level hash, so for

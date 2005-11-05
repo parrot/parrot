@@ -535,7 +535,13 @@ op set_returns(inconst PMC) {
 
 =head2 Address manipulation
 
-=over 4 ########################################
+=for clarity
+
+########################################
+
+=cut
+
+=over 4
 
 =item B<set_addr>(out INT, labelconst INT)
 

@@ -280,8 +280,6 @@ inline op index(out INT, in STR, in STR, in INT) :base_core {
 
 ########################################
 
-=cut
-
 op DELETED_pack(inout STR, in INT, in INT) :base_core {
     goto NEXT();
 }
@@ -548,8 +546,6 @@ op split(out PMC, in STR, in STR) :base_core {
     }
     goto NEXT();
 }
-
-=cut
 
 op DELETED_isnull(in STR, labelconst INT) :base_core {
   goto NEXT();
