@@ -368,6 +368,7 @@ docs/pdds/clip/pdd18_security.pod                 [main]doc
 docs/pdds/clip/pdd19_pir.pod                      [main]doc
 docs/pdds/pdd00_pdd.pod                           [main]doc
 docs/pdds/pdd_template.pod                        [main]doc
+docs/pdds/pdd20_lexical_vars.pod                  [main]doc
 docs/pdds/README                                  [main]doc
 docs/pmc.pod                                      [main]doc
 docs/pmc/array.pod                                [main]doc
