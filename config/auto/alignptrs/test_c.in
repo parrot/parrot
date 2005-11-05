@@ -10,7 +10,7 @@
 #include <signal.h>
 /* Try to catch bus errors */
 #ifdef SIGBUS
-void bletch(s) int s; { exit(1); }
+void bletch(int s) { exit(1); }
 #endif
 
 int main(int argc, char **argv) {
