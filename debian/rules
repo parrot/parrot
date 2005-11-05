@@ -10,8 +10,8 @@ else
 	CFLAGS += -O2
 endif
 
-debian/control:
-	perl -p -e 's/%SOVERSION%/$(SOVERSION)/g' debian/control.in > debian/control
+debian/control: debian/control.in VERSION
+	perl -p -e 's/%SOVERSION%/$(SOVERSION)/g' $< > $@
 
 configure: debian/control configure-stamp
 configure-stamp:
