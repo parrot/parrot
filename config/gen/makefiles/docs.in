@@ -49,6 +49,3 @@ html:
 html-clean:
 	$(PERL) -I../lib -MParrot::Distribution -e "Parrot::Distribution->new->delete_html_docs"
 
-ops${slash}%.pod: ..${slash}ops${slash}%.ops
-#CONDITIONED_LINE(new_perldoc):	perldoc -ud $@ $<
-#INVERSE_CONDITIONED_LINE(new_perldoc):	perldoc -u $< > $@
