@@ -13,10 +13,10 @@ Very basic checks.
 
 use strict;
 use FindBin;
-use lib "$FindBin::Bin/../../lib", "$FindBin::Bin/../../../../lib";
+use lib "$FindBin::Bin/../lib", "$FindBin::Bin/../../../lib";
 
-use Test::More;
 use Parrot::Test tests => 8;
+use Test::More;
 
 language_output_is( 'bc', << 'END_CODE', << 'END_EXPECTED', "block without newlines" );
 1; { 2 }
