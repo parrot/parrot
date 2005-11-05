@@ -21,6 +21,7 @@ The Haskell-side data structure is defined thus:
     data MatchPGE
         = PGE_Match Int Int [MatchPGE] [(String, MatchPGE)]
         | PGE_Array [MatchPGE]
+        | PGE_String String
         | PGE_Fail
         deriving (Show, Eq, Ord, Read)
 
@@ -151,7 +152,7 @@ END:
     .local int ari, arc
     .local int tmpi, cond
     .local string tmps, key
-    .local pmc capt, iter, subelm, elm, escape, is_array
+    .local pmc capt, iter, subelm, elm, escape
 
     out = ""
     escape = find_global "Data::Escape", "String"
@@ -208,17 +209,26 @@ END:
     out .= ")"
     unless iter goto end
     out .= ", "
-    goto subrules_loop
+    goto subrules_body
   subrules_fail:
     out .= PGE_FAIL
     key = shift iter
-    goto subrules_loop
+    unless iter goto end
+    goto subrules_body
 
   dumper:
     $I0 = isa elm, "Array"
     if $I0 goto dumper_array
+    $I0 = can elm, "dump_hs"
+    unless $I0 goto dumper_string
     tmps = elm."dump_hs"()
     out .= tmps
+    ret
+  dumper_string:
+    tmps = escape(elm)
+    out .= 'PGE_String "'
+    out .= tmps
+    out .= '"'
     ret
   dumper_fail:
     out .= PGE_FAIL
