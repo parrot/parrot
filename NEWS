@@ -10,7 +10,7 @@ New in 0.3.1
 - uniccode character classification (is_upper ...)
 - support for heredoc syntax in assembler
 - improved examples, basic JSON support
-- debgian packakging support
+- debian packaging support
 - the usual improvements, bug fixes, and cleanup
 - test count exceeds 3000
 
