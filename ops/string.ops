@@ -280,25 +280,6 @@ inline op index(out INT, in STR, in STR, in INT) :base_core {
 
 ########################################
 
-op DELETED_pack(inout STR, in INT, in INT) :base_core {
-    goto NEXT();
-}
-
-op DELETED_pack(inout STR, in INT, in NUM) :base_core {
-    goto NEXT();
-}
-
-op DELETED_pack(inout STR, in INT, in STR) :base_core {
-    goto NEXT();
-}
-
-
-op DELETED_pack(inout STR, in INT, in INT, in INT) :base_core {
-    goto NEXT();
-}
-
-########################################
-
 =item B<sprintf>(out STR, in STR, in PMC)
 
 =item B<sprintf>(out PMC, in PMC, in PMC)
@@ -533,22 +514,18 @@ op split(out PMC, in STR, in STR) :base_core {
 	VTABLE_push_string(interpreter,res,str);
 	goto NEXT();
     }
-    while (ps <= slen) { 
+    while (ps <= slen) {
         int pl = pe - ps;
 	STRING *tstr = string_substr(interpreter, str, ps, pl, NULL, 0);
 	VTABLE_push_string(interpreter,res,tstr);
 	ps = pe + string_length(interpreter,delim);
-	if (ps > slen) 
+	if (ps > slen)
 	    break;
         pe = string_str_index(interpreter,str,delim,ps);
 	if (pe < 0)
 	    pe = slen;
     }
     goto NEXT();
-}
-
-op DELETED_isnull(in STR, labelconst INT) :base_core {
-  goto NEXT();
 }
 
 =item B<charset>(out INT, in STR)

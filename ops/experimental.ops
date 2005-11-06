@@ -224,32 +224,6 @@ inline op exec(in STR) {
 
 ########################################
 
-=item B<result_info>(out PMC)
-
-Returns the results PMC of the callee. The number of elements of this
-PMC is equal to the number of return values that are expected.
-
-=cut
-
-inline op result_info(out PMC) {
-    /* Get context of callee from return continuation. */
-    PMC *cc = CONTEXT(interpreter->ctx)->current_cont;
-    PMC *i = NULL;
-    if (cc && PMC_cont(cc)->to_ctx)
-    {
-        /* Find results PMC index and get PMC. */
-        opcode_t results_pmc = PMC_cont(cc)->to_ctx->current_results[1];
-        i = PF_CONST(PMC_cont(cc)->seg, results_pmc)->u.key;
-    }
-    
-    /* If no elements, hand back empty array; otherwise PMC. */
-    if (PMC_IS_NULL(i))
-        $1 = pmc_new(interpreter, enum_class_FixedIntegerArray); 
-    else
-        $1 = i;
-    goto NEXT();
-}
-
 =item B<newclosure>(out PMC, in PMC)
 
 Create a closure of the given subroutine PMC by cloning the sub's state.
@@ -269,7 +243,7 @@ inline op newclosure(out PMC, in PMC) {
     stack_push(interpreter, &newsub->pad_stack, pad,
 	STACK_ENTRY_PMC, STACK_CLEANUP_NULL);
   }
-  $1 = clos; 
+  $1 = clos;
   goto NEXT();
 }
 ###############################################################################

@@ -1,5 +1,19 @@
 # $Id$
 
+New in 0.3.1
+
+- Variable sized register frames are finished. Each subroutine gets
+  the amount of registers that it actually needs. No more spilling.
+- Vastly improved PGE (Parrot Grammar Engine) including shift-reduce,
+  precedence-based expression parser and support for matching of
+  bracketed text delimited by e.g. ()[]{}'"
+- uniccode character classification (is_upper ...)
+- support for heredoc syntax in assembler
+- improved examples, basic JSON support
+- debgian packakging support
+- the usual improvements, bug fixes, and cleanup
+- test count exceeds 3000
+
 New in 0.3.0
 
 - New calling conventions implemented: see PDD03 for details

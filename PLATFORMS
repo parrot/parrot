@@ -1,13 +1,14 @@
 # $Id$
 
-Parrot was reported to compile and run tests successfully on these platforms:
+Parrot was reported to compile and run tests successfully on the following
+platforms. See also http://smoke.parrotcode.org/smoke/ for recent results.
 
 Platform                B8    Runloops      Feature Comp Test Inst YYYYMMDD
                            CGoto JIT EXEC   Thr Sig
 ---------------------------------------------------------------------------
 aix-pwr-xlc6            B    -    Y    -     Y   -   Y    Y
 aix-pwr64-xlc6          B8   -    -    -     Y   -   Y    Y/20
-darwin_7.9.0 (10.3)     B    Y    Y    -     Y   Y   Y    Y     Y  20051001
+darwin_7.9.0 (10.3)     B    Y    Y    -     Y   Y   Y    Y     Y  20051106
 darwin_8.2.0-gcc4.0.0   B                            Y    Y        20050804
 freebsd5.2-i386              Y    Y/4  Y     Y   -   Y*6  Y
 freebsd6.0b-amd64        8   Y    -    -     Y   Y   Y    Y/12     20050804
@@ -19,7 +20,7 @@ linux-ppc-gcc2.95.3     B    Y    Y    Y     Y   Y   Y    Y
 linux-ppc-gcc3.2.3      B    Y    Y/9  Y     Y   Y   Y    Y
 linux-sparc-gcc3.3.3    B    Y    -    -     Y   Y   Y    Y
 linux-sparc64-gcc3.3.3  B8   Y    -    -     -   -   Y    -
-linux-x86-gcc2.95.2          Y    Y    Y     Y   Y   Y    Y     Y  20051001
+linux-x86-gcc2.95.2          Y    Y    Y     Y   Y   Y    Y     Y  20051106
 linux-x86-gcc3.2.3           Y    Y    Y     Y   Y   Y    Y        20050930
 linux-x86-gcc3.3.3           Y    Y    Y     Y   Y   Y    Y     Y  20051001
 linux-x86-gcc3.3.3 *3        Y    Y    Y     Y   Y   Y    Y*3
@@ -27,7 +28,7 @@ linux-x86-gcc3.3.5.2005013   Y    Y    Y     Y   Y   Y    Y        20050930
 linux-x86-icc8               Y    Y    Y     Y   Y   Y    Y
 linux-x86_64-gcc3.3.3    8   Y    -    -     Y   Y   Y    Y
 linux-x86_64-gcc3.4.2    8   Y    -    -     Y   Y   Y    Y        200505
-linux-x86_64-gcc3.4.3    8   Y    -    -     Y   Y   Y    Y        20050930
+linux-x86_64-gcc3.4.3    8   Y    -    -     Y   Y   Y    Y        20051106
 netbsd                                 Y             Y    Y*1
 openbsd                      Y    Y/5  Y     Y   -   Y    Y
 openbsd_beta_3.5-vax                                 Y*4  Y/26

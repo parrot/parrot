@@ -25,9 +25,9 @@ document, among others.
 For a high level overview of parrot milestones, please see:
 L<http://www.perlfoundation.org/gc/grants/2005-p6-proposal.html>
 
-=head1 CURRENT RELEASE (0.3.0)
+=head1 CURRENT RELEASE (0.3.1)
 
-Parrot 0.3.0 was released on Oct. 1st, 2005. For a list of new and fixed
+Parrot 0.3.1 was released on Nov. 6st, 2005. For a list of new and fixed
 feature see L<NEWS>.
 
 =head1 OVERVIEW
@@ -174,7 +174,7 @@ can be mutable even when the index hash isn't.
 
 =item *
 
-Finish event and IO specification. 
+Finish event and IO specification.
 
 =item *
 

@@ -531,6 +531,32 @@ op set_returns(inconst PMC) {
     goto ADDRESS(this + 2 + argc);
 }
 
+=item B<result_info>(out PMC)
+
+Returns the results PMC of the caller. The number of elements of this
+PMC is equal to the number of return values that are expected.
+
+=cut
+
+inline op result_info(out PMC) {
+    /* Get context of callee from return continuation. */
+    PMC *cc = CONTEXT(interpreter->ctx)->current_cont;
+    PMC *i = NULL;
+    if (cc && PMC_cont(cc)->to_ctx)
+    {
+        /* Find results PMC index and get PMC. */
+        opcode_t results_pmc = PMC_cont(cc)->to_ctx->current_results[1];
+        i = PF_CONST(PMC_cont(cc)->seg, results_pmc)->u.key;
+    }
+
+    /* If no elements, hand back empty array; otherwise PMC. */
+    if (PMC_IS_NULL(i))
+        $1 = pmc_new(interpreter, enum_class_FixedIntegerArray);
+    else
+        $1 = i;
+    goto NEXT();
+}
+
 =back
 
 =head2 Address manipulation
@@ -578,14 +604,6 @@ inline op set_addr(in PMC, labelvar INT) {
 
 inline op get_addr(out INT, in PMC) {
   $1 = (INTVAL)$2->vtable->get_pointer(interpreter, $2);
-  goto NEXT();
-}
-
-op DELETED_newsub(out PMC, in INT, labelconst INT) {
-  goto NEXT();
-}
-
-op DELETED_newsub(in INT, in INT, labelconst INT, labelconst INT) {
   goto NEXT();
 }
 
@@ -1084,16 +1102,6 @@ op needs_destroy(in PMC) {
 }
 
 =back
-
-=cut
-
-op DELETED_foldup(out PMC) {
-   goto NEXT();
-}
-
-op DELETED_foldup(out PMC, in INT) {
-   goto NEXT();
-}
 
 ###############################################################################
 
