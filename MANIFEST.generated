@@ -5,7 +5,7 @@ pbc_info                                          [main]bin
 pbc_merge                                         [main]bin
 disassemble                                       [main]bin
 blib/lib/libparrot.a                              [main]lib
-blib/lib/libparrot.so.0.3.0                       [main]lib
+blib/lib/libparrot.so.0.3.1                       [main]lib
 runtime/parrot/library/Data/Dumper/Base.pbc       [main]
 runtime/parrot/library/Data/Dumper/Default.pbc    [main]
 runtime/parrot/library/Data/Dumper.pbc            [main]
