@@ -12,7 +12,7 @@ To prepare a release:
 
         a.  Increment the version number in:
 	    VERSION, parrot.spec, and docs/intro.pod,
-	    adjust IMCC_VERSION in imcc/main.c,
+	    adjust IMCC_VERSION in imcc/main.c, MANIFEST.generated
 
         b.  Change the information in DEVELOPING to reflect
             this release's version number and date.
