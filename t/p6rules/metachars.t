@@ -129,7 +129,7 @@ p6rule_is  ("Gabc", '\Gabc', 'retired metachars (\G)');
 
 
 ## \1 -- backreferences deprecated
-p6rule_is  ("1abc", '\1abc', 'retired metachars (\1)');
+p6rule_is  ("1abc", '\1abc', 'retired metachars (\1)', todo => 'implement me');
 
 
 ## setup for unicode whitespace tests

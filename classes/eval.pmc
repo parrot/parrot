@@ -304,7 +304,12 @@ Final code fixup after thawing.
             }
         }
         pf->directory.num_segments = 0;
-        PackFile_destroy(INTERP, pf);
+        /*
+         * XXX this isn't ok - it seems that the packfile
+         *     gets attached to interpreter->code and is
+         *     destroyed again during interpreter destruction
+         */
+        /* PackFile_destroy(INTERP, pf); */
     }
 
     void thawfinish(visit_info *info) {
