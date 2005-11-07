@@ -49,10 +49,10 @@ foreach my $func ( keys %language_test_map ) {
         my $pir_f          = Parrot::Test::per_test( '.pir', $count );
         my $bc_out_f       = Parrot::Test::per_test( $ENV{PARROT_BC_TEST_PROG} ? '.posix_out' : '.parrot_out', $count );
         my $test_prog_args = $ENV{TEST_PROG_ARGS} || '';
-        my $test_prog      = $ENV{PARROT_BC_TEST_PROG} ?
-                               "$ENV{PARROT_BC_TEST_PROG}  ${test_prog_args} languages/${lang_f}" :
-                               "python languages/bc/bc.py languages/${lang_f} && $self->{parrot} languages/${pir_f}";
-        # die Dumper( $test_prog );
+        my @test_prog      = $ENV{PARROT_BC_TEST_PROG} ?
+                 ( "$ENV{PARROT_BC_TEST_PROG}  ${test_prog_args} languages/${lang_f}" ):
+                 ( "python languages/bc/bc.py languages/${lang_f}", 
+                   "$self->{parrot} languages/${pir_f}" );
 
         # This does nor create byte code, but bc code
         my $parrotdir       = dirname( $self->{parrot} );
@@ -60,7 +60,7 @@ foreach my $func ( keys %language_test_map ) {
 
         # STDERR is written into same output file
         my $exit_code = Parrot::Test::run_command( 
-            $test_prog, 
+            \@test_prog, 
             CD => $self->{relpath}, 
             STDOUT => $bc_out_f, STDERR => $bc_out_f 
         );
@@ -74,6 +74,7 @@ foreach my $func ( keys %language_test_map ) {
                                                   );
         unless ( $pass ) {
             my $diag = '';
+            my $test_prog = join ' && ', @test_prog;
             $diag .= "'$test_prog' failed with exit code $exit_code." if $exit_code;
             $self->{builder}->diag( $diag ) if $diag;
         }
