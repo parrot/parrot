@@ -49,6 +49,7 @@ typedef struct _IMC_Unit {
     INTVAL HLL_id;
     int n_vars_used[4];	/* INSP in PIR */
     int n_regs_used[4];	/* INSP in PBC */
+    int first_avail[4];	/* INSP */
     int has_push_eh;
 } IMC_Unit;
 

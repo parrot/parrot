@@ -34,6 +34,8 @@ static void compute_spilling_costs (Parrot_Interp, IMC_Unit *);
 static void order_spilling (IMC_Unit *);
 static int try_allocate(Parrot_Interp, IMC_Unit *);
 static void restore_interference_graph(Interp *, IMC_Unit *);
+static void allocate_lexicals (Parrot_Interp, IMC_Unit *);
+static void allocate_non_volatile (Parrot_Interp, IMC_Unit *);
 #if 0
 static int neighbours(int node);
 #endif
@@ -115,6 +117,10 @@ imc_reg_alloc(Interp *interpreter, IMC_Unit * unit)
             ;
         goto done;
     }
+    /*
+     * all lexicals get a unique register
+     */
+    allocate_lexicals(interpreter, unit);
 
     nodeStack = imcstack_new();
 
@@ -135,6 +141,7 @@ imc_reg_alloc(Interp *interpreter, IMC_Unit * unit)
 
         build_reglist(interpreter, unit, 1);
         life_analysis(interpreter, unit);
+        allocate_non_volatile(interpreter, unit);
     } while (!IMCC_INFO(interpreter)->dont_optimize &&
             optimize(interpreter, unit));
 
@@ -226,8 +233,10 @@ imc_stat_init(IMC_Unit * unit)
     int j;
 
     make_stat(unit, unit->n_vars_used, NULL);
-    for (j = 0; j < 4; j++)
+    for (j = 0; j < 4; j++) {
         unit->n_regs_used[j] = -1;
+        unit->first_avail[j] = 0;
+    }
     /*
      * TODO move statistic into unit
      */
@@ -796,11 +805,13 @@ try_allocate(Parrot_Interp interpreter, IMC_Unit * unit)
 static void
 map_colors(IMC_Unit* unit, int x, unsigned int *graph, char avail[], int typ)
 {
-    int y = 0, n_symbols;
+    int y = 0, n_symbols, n;
     SymReg * r;
 
-    n_symbols = unit->n_symbols;
-    memset(avail, 1, n_symbols + 1);
+    n = n_symbols = unit->n_symbols;
+    if (unit->max_color > n)
+        n = unit->max_color;
+    memset(avail, 1, n + 1);
     for (y = 0; y < n_symbols; y++) {
         if (! ig_test(x, y, n_symbols, graph))
             continue;
@@ -811,6 +822,28 @@ map_colors(IMC_Unit* unit, int x, unsigned int *graph, char avail[], int typ)
     	    avail[r->color+1] = 0;
     	}
     }
+}
+
+static void
+allocate_uniq(Parrot_Interp interpreter, IMC_Unit *unit, int usage)
+{
+    UNUSED(interpreter);
+    UNUSED(unit);
+    UNUSED(usage);
+}
+
+static void
+allocate_lexicals(Parrot_Interp interpreter, IMC_Unit *unit)
+{
+    IMCC_debug(interpreter, DEBUG_IMC, "allocate lexicals");
+    allocate_uniq(interpreter, unit, U_LEXICAL);
+}
+
+static void
+allocate_non_volatile(Parrot_Interp interpreter, IMC_Unit *unit)
+{
+    IMCC_debug(interpreter, DEBUG_IMC, "allocate non_volatile");
+    allocate_uniq(interpreter, unit, U_NON_VOLATILE);
 }
 
 /*
