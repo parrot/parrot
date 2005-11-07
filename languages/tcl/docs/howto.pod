@@ -8,14 +8,19 @@ patches, but am happy to take complete files as well.
 Most of this is mentioned in the TODO - in fact, this document probably
 should merge with the TODO to avoid redundancy.
 
+Since partcl is bundled with the parrot source, svn access is handled via
+the same mechanism as for parrot itself.
+
 =head1 BIG STUFF
 
 =over 4
 
 =item compiler bits
 
-Partcl is now a compiler. Given a section of tcl code, it generates PIR
-instead of an AST, then compiles and invokes the sub.
+partcl is a compiler. Given a section of tcl code, it translates that code
+into an AST (in the form of a Tcl* object from lib/*). Once a section of code
+has been translated, the object's C<compile> method is invoked, which then
+generates PIR which can be compiled by parrot.
 
 When writing a new builtin, preferentially put it in
 C<< lib/builtins/<builtin>.pir >> , and write a wrapper in
@@ -33,26 +38,35 @@ is not found at runtime.)
 
 =item speed
 
-We're currently quite slow, compared to tclsh. Switching over to a compiler
-instead of an interpreter might help here, though I'm having a hard time
-envisioning a compiler that doesn't have to do all the things we already do
-as an interpreter. 
-
-We could rewrite parse/interpret/compile in C, either as an NCI or behind
-a PMC object - this would I<possibly> give us an improvement in speed also.
+We're currently slow, compared to tclsh. It's not worth worrying about
+this in terms of specific numbers until we can run C<tcltest> natively. That
+said, any patches that improve speed without harming maintainability will of
+course be applied.
 
 =item features
 
-We're currently missing some things that require support from parrot
-before we can continue, like [info nameofexecutable]. In general, though,
-a lot of what we need to do is possible with parrot.
+We're currently missing some things that require support from parrot. See
+L<hacks.pod> for a list. In general, though, a lot of what we need to do is
+possible with parrot.
 
-If you're looking for something to todo, check one of: TODO tests in 
-C<t/>; RT
+If you're looking for something to todo, check one of:
+
+=over 4
+
+=item TODO tests
+
+in C<t/>;
+
+=item RT tickets
+
 https://rt.perl.org/rt3/NoAuth/parrot/List.html?Field=Lang&Value=tcl
-or by their absence: every actual builtin at 
-http://www.tcl.tk/man/tcl8.5/TclCmd/contents.htm
-should have a corresponding file in C<lib/commands/>
+
+=item Missing builtins
+
+Every builtin at L<http://www.tcl.tk/man/tcl8.5/TclCmd/contents.htm>
+should have a corresponding file in C<lib/builtins/>
+
+=back
 
 =back
 
@@ -93,9 +107,8 @@ C<lib/returncodes.pir>: C<.throw>, etc. the value can be any simple
 register or a PMC, the calling conventions will autobox as necessary.
 
 Before adding new functionality, add a test (or a test in an existing) file 
-in C<t/> - tests for C<puts>, for example,
-go in C<t/cmd_puts.t> - we use the C<Test::Harness> framework, via 
-C<Parrot::Test>. 
+in C<t/> - tests for C<puts>, for example, go in C<t/cmd_puts.t> - 
+we use the C<Test::Harness> framework, via C<Parrot::Test>. 
 
 Our final goal will be to pass (most of) the tcl test suite: run 
 C<make tcl-test> to checkout the latest version of of the tcl test suite
@@ -107,8 +120,6 @@ Partcl's checked in test suite should just
 be checking partcl-specific functionaliity.
 
 =back
-
-
 
 =cut
 

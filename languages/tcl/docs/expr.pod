@@ -1,6 +1,9 @@
+
+
 =head1 OVERVIEW
 
-This documents how expressions are handled internally.
+This documents how expressions are handled internally. It is outdated and
+should be removed.
 
 =head1 Split the string into an array of chunks
 

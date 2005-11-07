@@ -6,8 +6,8 @@ Prodding by Matt Diephouse to generate documentation for two things:
 
 =item 1
 
-Things that partcl has done that might be considered hacks - 
-things that will likely impair our ability in the distant future to 
+Things that partcl has done that might be considered hacks -
+things that will likely impair our ability in the distant future to
 cleanly do language interoperability.
 
 =item 2
@@ -15,10 +15,10 @@ cleanly do language interoperability.
 Things that partcl hasn't done yet at all because parrot makes them
 hard.
 
-=back 
+=back
 
 It is, of course, quite likely that said feature already exists with
-a nice interface, and was just not found by the partcl developers - 
+a nice interface, and was just not found by the partcl developers -
 If you find something along these lines, let them know on the internals
 list.
 
@@ -34,7 +34,7 @@ and their code. For example:
  % proc sum {{a 2} {b 3}} {
  return [expr $a + $b]
  }
- % sum 
+ % sum
  5
  % info args sum
  a b
@@ -48,9 +48,9 @@ and their code. For example:
  2
  %
 
-Right now, partcl is using globals to store the argument list and the the body information.
-It would seem that we'd want to have a builtin mechanism for querying the subs directly
-rather than storing this information separately.
+Right now, partcl is using globals to store the argument list and the the
+body information. It would seem that we'd want to have a builtin mechanism
+for querying the subs directly rather than storing this information separately.
 
 =item user defined subs; parameter handling.
 
@@ -60,20 +60,20 @@ our example:
  % sum a b c
  wrong # args: should be "sum ?a? ?b?"
 
-Right now, this is handled I<inside> the function definition - it is defined to take
-an arbitary number of args, and then is checked for correctness internally. It would
-be nice to have invoke() automatically figure this out and generate an exception
-that Tcl can use. (This also starts to drag in "how to do Tcl exceptions cleanly from
-parrot")
+Right now, this is handled I<inside> the function definition - it is defined
+to take an arbitary number of args, and then is checked for correctness
+internally. It would be nice to have invoke() automatically figure this out
+and generate an exception that Tcl can use. (This also starts to drag in
+"how to do Tcl exceptions cleanly from parrot")
 
 =item stack depth
 
-Cheating and keeping a global around right now, so we can figure out if we 
+Cheating and keeping a global around right now, so we can figure out if we
 should be using a global or a lexical (and if so, how far down or up).
 
 =item [trace]'ing
 
-There are two ways we can go about the tracing - either we can keep the 
+There are two ways we can go about the tracing - either we can keep the
 information about the traces in a global, and check that global every time
 the appropriate action is taken; or, we can tie that information into the
 actual commands and variables. I think the latter would be somewhat cleaner,
@@ -84,15 +84,15 @@ to interoperate.
 
 There are several cases where we convert TclLists or ResizablePMCArrays to
 Arrays so that we can use the splice opcode. Need to have better splice
-support in parrot array classes, as well as our own. 
-L<lib/commands/linsert.pir>
+support in parrot array classes, as well as our own. See
+C<lib/commands/linsert.pir>.
 
 =item marshalling/unmarshalling
 
 When compiling, there is currently no easy way to embed a PMC that exists
-at runtime into the compiled code. Because of this, we have to interrogate 
+at runtime into the compiled code. Because of this, we have to interrogate
 the PMC at compile time for its type, and then handroll the appropriate PIR
-to intialize it's value. We should be able to freeze the PMC during compilation,
+to intialize its value. We should be able to freeze the PMC during compilation,
 And then have in the generated code C<$P1 = thaw "...">.
 
 =back
