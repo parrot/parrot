@@ -135,6 +135,24 @@ won't be a problem, but is the use of the start parameter thread-safe?
   end:
 .end
 
+.sub "escape" :method
+    .param string str
+    $P0 = find_global "Data::Escape", "String"
+    str = $P0(str, '"')
+    str = concat '"', str
+    str = concat str, '"'
+    $I0 = index str, "\\x"
+    if $I0 > 0 goto unicode
+    $I0 = index str, "\\2"
+    if $I0 > 0 goto unicode
+    $I0 = index str, "\\3"
+    if $I0 > 0 goto unicode
+    .return (str)
+  unicode:
+    str = concat "unicode:", str
+    .return (str)
+.end
+
 .sub "quant" :method
     .local int min, max, islazy, iscut
     .local string qstr
@@ -400,10 +418,9 @@ register.
     downcase $S1
   lit_1:
     $I1 = length $S1
-    $P0 = find_global "Data::Escape", "String"
-    $S1 = $P0($S1, '"')
+    $S1 = self."escape"($S1)
     emit(code, "\n  %s: # literal %s    ##", label, $S0)
-    $S0 = "    if $S0 != unicode:\"%s\" goto %s"
+    $S0 = "    if $S0 != %s goto %s"
     self.genfixedstr(code, label, next, $S0, $S1, $I1)
     .return ()
 .end    
@@ -424,15 +441,14 @@ register.
   charlist_1:
     emit(code, "\n  %s: # charclass %s    ##", label, $S0)
     $I1 = length $S1
-    $P0 = find_global "Data::Escape", "String"
-    $S1 = $P0($S1, '"')
+    $S1 = self."escape"($S1)
     $I0 = self["isnegated"]
     if $I0 goto charlist_2
-    $S0 = "    $I0 = index unicode:\"%s\", $S0\n    if $I0 < 0 goto %s"
+    $S0 = "    $I0 = index %s, $S0\n    if $I0 < 0 goto %s"
     self.genfixedstr(code, label, next, $S0, $S1, 1)
     .return ()
   charlist_2:
-    $S0 = "    $I0 = index unicode:\"%s\", $S0\n    if $I0 >= 0 goto %s"
+    $S0 = "    $I0 = index %s, $S0\n    if $I0 >= 0 goto %s"
     self.genfixedstr(code, label, next, $S0, $S1, 1)
     .return ()
 .end    
@@ -924,12 +940,9 @@ register.
     subargs = ""
     $I0 = exists self["arg"]
     if $I0 == 0 goto nosubargs
-    $P0 = find_global "Data::Escape", "String"
     $S0 = self["arg"]
-    $S0 = $P0($S0, '"')
-    subargs = ', "'
-    subargs .= $S0
-    subargs .= '"'
+    $S0 = self."escape"($S0)
+    subargs = concat ", ", $S0
   nosubargs:
     captsave = ""
     captback = ""
@@ -1035,17 +1048,16 @@ register.
     emit = find_global "PGE::Exp", "emit"
     value = self["value"]
     lang = self["lang"]
-    $P0 = find_global "Data::Escape", "String"
-    value = $P0(value, '"')
-    lang = $P0(lang, '"')
+    value = self."escape"(value)
+    lang = self."escape"(lang)
     emit(code, "\n  %s:  # closure    ##", label)
-    emit(code, "    $S0 = \"%s:\"", lang)
-    emit(code, "    $S1 = \"%s\"", value)
+    emit(code, "    $S0 = concat %s, \":\"", lang)
+    emit(code, "    $S1 = %s", value)
     emit(code, "    $S0 .= $S1")
     emit(code, "    $P0 = find_global \"PGE::Rule\", \"%:cache\"")
     emit(code, "    $I0 = exists $P0[$S0]")
     emit(code, "    if $I0 goto %s_1", label)
-    emit(code, "    $P1 = compreg \"%s\"", lang)
+    emit(code, "    $P1 = compreg %s", lang)
     emit(code, "    $P1 = $P1($S1)")
     emit(code, "    $P0[$S0] = $P1")
     emit(code, "  %s_1:", label)
