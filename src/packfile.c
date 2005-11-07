@@ -2314,7 +2314,7 @@ Parrot_debug_add_mapping(Interp *interpreter,
                 ct->const_count * sizeof(Parrot_Pointer));
             fnconst = PackFile_Constant_new(interpreter);
             fnconst->type = PFC_STRING;
-            fnconst->u.string = const_string(interpreter, filename);
+            fnconst->u.string = string_from_cstring(interpreter, filename, 0);
             ct->constants[ct->const_count - 1] = fnconst;
             mapping->u.filename = ct->const_count - 1;
             break;
@@ -2327,7 +2327,7 @@ Parrot_debug_add_mapping(Interp *interpreter,
 }
 
 /*
-=item C<char *
+=item C<STRING*
 Parrot_debug_pc_to_filename(Interp *interpreter,
         struct PackFile_Debug *debug, opcode_t pc)>
 
@@ -2338,7 +2338,7 @@ that position.
 
 */
 
-char *
+STRING *
 Parrot_debug_pc_to_filename(Interp *interpreter,
         struct PackFile_Debug *debug, opcode_t pc)
 {
@@ -2356,18 +2356,20 @@ Parrot_debug_pc_to_filename(Interp *interpreter,
             switch (debug->mappings[i]->mapping_type)
             {
                 case PF_DEBUGMAPPINGTYPE_NONE:
-                    return (char*) "(unknown file)";
+                    return string_from_const_cstring(interpreter, 
+                        "(unknown file)", 0);
                 case PF_DEBUGMAPPINGTYPE_FILENAME:
-                    return string_to_cstring(interpreter, PF_CONST(debug->code,
-                           debug->mappings[i]->u.filename)->u.string);
+                    return PF_CONST(debug->code,
+                        debug->mappings[i]->u.filename)->u.string;
                 case PF_DEBUGMAPPINGTYPE_SOURCESEG:
-                    return (char*) "(unknown file)";
+                    return string_from_const_cstring(interpreter, 
+                        "(unknown file)", 0);
             }
         }
     }
 
     /* Otherwise, no mappings = no filename. */
-    return "(unknown file)";
+    return string_from_const_cstring(interpreter, "(unknown file)", 0);
 }
 
 /*
@@ -3340,7 +3342,7 @@ PackFile_append_pbc(Interp *interpreter, const char *filename)
 /*
 
 =item C<void
-Parrot_load_bytecode(Interp *interpreter, STRING *filename)>
+Parrot_load_bytecode(Interp *interpreter, const char *filename)>
 
 Load and append a bytecode, IMC or PASM file into interpreter.
 

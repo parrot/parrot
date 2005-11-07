@@ -363,7 +363,7 @@ Parrot_Context_info(Interp *interpreter, parrot_context_t *ctx,
 	size_t i, n;
 	/* XXX: interpreter->code->cur_cs is not correct, is it? */
 	opcode_t *pc = interpreter->code->base.data;
-	struct PackFile_Debug *debug = interpreter->code->debugs;
+	struct PackFile_Debug *debug = sub->seg->debugs;
 
 	/*assert(pc == sub->seg->base.data);*/
 	for (i = n = 0; n < interpreter->code->base.size; i++) {
@@ -373,7 +373,8 @@ Parrot_Context_info(Interp *interpreter, parrot_context_t *ctx,
         if (n >= offs) {
             /* set source line and file */
             info->line = debug->base.data[i];
-            info->file = Parrot_debug_pc_to_filename(interpreter, debug, i);
+            info->file = string_to_cstring(interpreter,
+                Parrot_debug_pc_to_filename(interpreter, debug, i));
             break;
         }
         n += op_info->arg_count;

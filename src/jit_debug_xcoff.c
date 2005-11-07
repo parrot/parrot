@@ -257,8 +257,9 @@ Parrot_jit_debug_stabs(Interp *interpreter)
 
     if (interpreter->code->debugs) {
         char *ext;
-        char *src = Parrot_debug_pc_to_filename(interpreter,
-                interpreter->code->debugs, 0);
+        char *src = string_to_cstring(interpreter,
+            Parrot_debug_pc_to_filename(interpreter, 
+            interpreter->code->debugs, 0));
         pasmfile = string_make(interpreter, src, strlen(src), NULL,
                 PObj_external_FLAG);
         file = string_copy(interpreter, pasmfile);

@@ -307,8 +307,7 @@ pbc_merge_constants(Interp *interpreter, struct pbc_merge_input **inputs,
             }
             
             /* Copy. */
-            copy->type = cur_entry->type;
-            copy->u = cur_entry->u;
+            memcpy(copy, cur_entry, sizeof(struct PackFile_Constant));
 
             /* If it's a sub PMC, need to deal with offsets. */
             if (copy->type == PFC_PMC)
