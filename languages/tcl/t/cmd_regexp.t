@@ -11,6 +11,8 @@ TCL
 wrong # args: should be "regexp ?switches? exp string ?matchVar? ?subMatchVar subMatchVar ...?"
 OUT
 
+# http://www.tcl.tk/man/tcl8.5/TclCmd/re_syntax.htm
+
 TODO: {
   local $TODO="not implemented yet.";
   regexp_is  ("asdf","asdf","literal, t");
