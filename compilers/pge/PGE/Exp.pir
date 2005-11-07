@@ -297,20 +297,32 @@ register.
   end:
     .return (captsave, captback)
 .end
- 
-.sub "reduce" :method
-    .local pmc args
-    args = getattribute self, "PGE::Match\x0@:capt"
-    if_null args, end
-    $I0 = elements args
+
+.sub "firstchars" :method
+    .param pmc explist         :slurpy
+    $S1 = ""
   loop:
-    dec $I0
-    if $I0 < 0 goto end
-    $P0 = args[$I0]
-    $P0 = $P0.reduce()
-    args[$I0] = $P0
+    unless explist goto end
+    $P0 = shift explist
+    $I0 = exists $P0["firstchars"]
+    if $I0 == 0 goto nofirstchars
+    $S0 = $P0["firstchars"]
+    if $S0 == "" goto nofirstchars
+    $S1 .= $S0
     goto loop
   end:
+    self["firstchars"] = $S1
+    .return ()
+  nofirstchars:
+    self["firstchars"] = ""
+    .return ()
+.end
+ 
+.sub "reduce" :method
+    .param pmc next
+    $P0 = new Exception
+    $P0["_message"] = "Attempt to reduce PGE::Exp abstract class"
+    throw $P0
     .return (self)
 .end
 
@@ -334,7 +346,7 @@ register.
 
     code = new String
     exp0 = self["expr"]
-    exp0 = exp0.reduce()
+    exp0 = exp0.reduce(self)
     self["expr"] = exp0
 
     exp0label = "R"
@@ -372,9 +384,17 @@ register.
     emit(code, "  try_match:")
     emit(code, "    cutting = 0")
     emit(code, "    if pos > lastpos goto fail_forever")
+    $S1 = exp0["firstchars"]
+    if $S1 == "" goto nofc
+    $S1 = self."escape"($S1)
+    emit(code, "    $S0 = substr target, pos, 1")
+    emit(code, "    $I0 = index %s, $S0", $S1)
+    emit(code, "    if $I0 < 0 goto try_match_1")
+  nofc:
     emit(code, "    mfrom = pos")
     self.emitsub(code, exp0label, "pos", "NOCUT")
     emit(code, "    if cutting <= %s goto fail_cut", PGE_CUT_RULE)
+    emit(code, "  try_match_1:")
     emit(code, "    inc pos")
     emit(code, "    goto try_match")
     emit(code, "  try_at_pos:")
@@ -405,6 +425,20 @@ register.
 
 .namespace [ "PGE::Exp::Literal" ]
 
+.sub "reduce" :method
+    .param pmc next
+    $S0 = self["value"]
+    $S0 = substr $S0, 0, 1
+    $I0 = self["ignorecase"]
+    if $I0 == 0 goto end
+    $S1 = downcase $S0
+    $S0 = upcase $S0
+    $S0 .= $S1
+  end:
+    self["firstchars"] = $S0
+    .return (self)
+.end
+
 .sub "gen" :method
     .param pmc code
     .param string label
@@ -426,6 +460,17 @@ register.
 .end    
 
 .namespace [ "PGE::Exp::EnumCharList" ]
+
+.sub "reduce" :method
+    .param pmc next
+    $S0 = ""
+    $I0 = self["isnegated"]
+    if $I0 goto end
+    $S0 = self["charlist"]
+  end:
+    self["firstchars"] = $S0
+    .return (self)
+.end
 
 .sub "gen" :method
     .param pmc code
@@ -456,6 +501,12 @@ register.
 
 .namespace [ "PGE::Exp::Scalar" ]
 
+.sub "reduce" :method
+    .param pmc next
+    self["firstchars"] = ""
+    .return (self)
+.end
+    
 .sub "gen" method
     .param pmc code
     .param string label
@@ -486,6 +537,7 @@ register.
     if $S0 != "\\n" goto end
     self["isquant"] = 1
   end:
+    self["firstchars"] = ""
 .end
     
 .sub "gen" :method
@@ -573,14 +625,15 @@ register.
 .namespace [ "PGE::Exp::Concat" ]
 
 .sub "reduce" :method
+    .param pmc next
     .local pmc exp0, exp1, exp10
 
-    exp0 = self[0]
-    exp0 = exp0.reduce()
-    self[0] = exp0
     exp1 = self[1]
-    exp1 = exp1.reduce()
+    exp1 = exp1.reduce(next)
     self[1] = exp1
+    exp0 = self[0]
+    exp0 = exp0.reduce(exp1)
+    self[0] = exp0
 
   concat_lit:
     $I0 = exp0["isquant"]
@@ -611,6 +664,14 @@ register.
     $P0 = exp1[1]
     self[1] = $P0
   concat_lit_end:
+    $I0 = exp0["isquant"]
+    if $I0 == 0 goto exp0_min1
+    $I0 = exp0["min"]
+    if $I0 > 0 goto exp0_min1
+    self.firstchars(exp0, exp1)
+    .return (self)
+  exp0_min1:
+    self.firstchars(exp0)
     .return (self)
 .end
 
@@ -632,6 +693,12 @@ register.
 .end
 
 .namespace [ "PGE::Exp::Anchor" ]
+
+.sub "reduce" :method
+    .param pmc next
+    self.firstchars(next)
+    .return (self)
+.end
 
 .sub "gen" :method
     .param pmc code
@@ -690,7 +757,20 @@ register.
 
 .namespace [ "PGE::Exp::Alt" ]
 
-.sub "gen" method
+.sub "reduce" :method
+    .param pmc next
+    .local pmc exp0, exp1
+    exp0 = self[0]
+    exp0 = exp0.reduce(next)
+    self[0] = exp0
+    exp1 = self[1]
+    exp1 = exp1.reduce(next)
+    self[1] = exp1
+    self.firstchars(exp0, exp1)
+    .return (self)
+.end
+
+.sub "gen" :method
     .param pmc code
     .param string label
     .param string next
@@ -711,6 +791,19 @@ register.
 
 
 .namespace [ "PGE::Exp::Conj" ]
+
+.sub "reduce" :method
+    .param pmc next
+    .local pmc exp0, exp1
+    exp0 = self[0]
+    exp0 = exp0.reduce(next)
+    self[0] = exp0
+    exp1 = self[1]
+    exp1 = exp1.reduce(next)
+    self[1] = exp1
+    self.firstchars(exp0, exp1)
+    .return (self)
+.end
 
 .sub "gen" :method
     .param pmc code
@@ -755,21 +848,31 @@ register.
 .namespace [ "PGE::Exp::Quant" ]
 
 .sub "reduce" :method
+    .param pmc next
     .local pmc exp
 
     exp = self[0]
-    exp = exp.reduce()
+    exp = exp.reduce(next)
     $I0 = exp["isquant"]
     if $I0 == 1 goto noreduce
     exp["isquant"] = 1
-    $P0 = self["min"]
-    exp["min"] = $P0
-    $P0 = self["max"]
-    exp["max"] = $P0
     $P0 = self["islazy"]
     exp["islazy"] = $P0
+    $P0 = self["max"]
+    exp["max"] = $P0
+    $P0 = self["min"]
+    exp["min"] = $P0
+    if $P0 > 0 goto quant1
+    exp.firstchars(exp, next)
+  quant1:
     .return (exp)
   noreduce:
+    $P0 = self["min"]
+    if $P0 > 0 goto quant2
+    self.firstchars(exp, next)
+    .return (self)
+  quant2:
+    self.firstchars(exp)
     .return (self)
 .end
 
@@ -844,11 +947,13 @@ register.
 .namespace [ "PGE::Exp::Group" ]
 
 .sub "reduce" :method
+    .param pmc next
     .local pmc exp
     self["isquant"] = 1
     exp = self[0]
-    exp = exp.reduce()
+    exp = exp.reduce(next)
     self[0] = exp
+    self.firstchars(exp)
     .return (self)
 .end
 
@@ -919,6 +1024,7 @@ register.
 
 .sub "reduce" :method
     self["isquant"] = 1
+    self["firstchars"] = ""
     .return (self)
 .end
 
@@ -1017,6 +1123,12 @@ register.
 
 .namespace [ "PGE::Exp::Cut" ]
 
+.sub "reduce" :method
+    .param pmc next
+    self.firstchars(next)
+    .return (self)
+.end
+
 .sub "gen" :method
     .param pmc code
     .param string label
@@ -1036,6 +1148,7 @@ register.
 
 .sub "reduce" :method
     self["isquant"] = 1
+    self["firstchars"] = ""
     .return (self)
 .end
 
@@ -1069,6 +1182,12 @@ register.
 .end
 
 .namespace [ "PGE::Exp::Commit" ]
+
+.sub "reduce" :method
+    .param pmc next
+    self["firstchars"] = ""
+    .return (self)
+.end
 
 .sub "gen" :method
     .param pmc code
