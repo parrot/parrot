@@ -209,19 +209,27 @@
 .sub "parse_modifier"
     .param pmc mob
     .local int pos, lastpos
-    .local string target
+    .local string target, value
     .local pmc mfrom, mpos
     $P0 = find_global "PGE::Match", "newfrom"
     (mob, target, mfrom, mpos) = $P0(mob, 0, "PGE::Exp::Modifier")
     pos = mfrom
     lastpos = length target
-    $I0 = pos
+    value = "1"
     inc pos
+    $I0 = pos
+    pos = find_not_cclass .CCLASS_NUMERIC, target, pos, lastpos
+    if pos == $I0 goto name
+    $I1 = pos - $I0
+    value = substr target, $I0, $I1
+    $I0 = pos
+  name:
     pos = find_not_cclass .CCLASS_WORD, target, pos, lastpos
     $I1 = pos - $I0
     $S0 = substr target, $I0, $I1
+    $S0 = concat ":", $S0
     mob["mname"] = $S0
-    mob["value"] = 1
+    mob["value"] = value
     $S0 = substr target, pos, 1
     if $S0 != "(" goto end
     $I0 = pos + 1
