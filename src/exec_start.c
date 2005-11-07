@@ -128,7 +128,7 @@ main(int argc, char **argv) {
         printf( "Can't unpack.\n" );
         return 1;
     }
-	fixup_subs(interpreter, pf->cur_cs, PBC_PBC);
+    fixup_subs(interpreter, pf->cur_cs, PBC_PBC, NULL);
     Parrot_loadbc(interpreter, pf);
     setup_argv(interpreter, argc, argv);
 
