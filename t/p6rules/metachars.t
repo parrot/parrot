@@ -270,5 +270,22 @@ p6rule_isnt("abc!!def", 'c \X0021+ d', 'not hex (\X)');
 p6rule_is  ("abcdef", 'a \X0021+ f', 'not hex (\X)');
 
 
+## \o and \O -- octal characters
+## NOTE: these metacharacters are not specified in S05, ver. 7,
+## but have been implemented in PGE
+p6rule_is  ("abc!def", 'c \o041 d', 'octal (\o)');
+p6rule_is  ("abc\041def", 'c \o41 d', 'octal (\o)');
+p6rule_is  ("abc!!def", 'c \o41+ d', 'octal (\o)');
+p6rule_isnt('abcdef', 'a \o41+ f', 'octal (\o)');
+p6rule_isnt('abc!def', 'b \o41 c', 'octal (\o)');
+p6rule_is  ("a", '\O41', 'not octal (\O)');
+p6rule_is  ("abc", 'a \O41 c', 'not octal (\O)');
+p6rule_isnt("", '\O41', 'not octal (\O)');
+p6rule_isnt("abc!def", 'c \O41 d', 'not octal (\O)');
+p6rule_isnt("abc\041def", 'c \O41 d', 'not octal (\O)');
+p6rule_isnt("abc!!def", 'c \O41+ d', 'not octal (\O)');
+p6rule_is  ("abcdef", 'a \O41+ f', 'not octal (\O)');
+
+
 ## remember to change the number of tests :-)
-BEGIN { plan tests => 155; }
+BEGIN { plan tests => 167; }

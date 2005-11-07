@@ -63,8 +63,8 @@ p6rule_isnt('aBxDef', ':i(1) bcd', 'ignorecase, repetition (:i(1))');
 p6rule_is  ('abcdef', ':0i bcd', 'ignorecase, repetition (:0i)');
 p6rule_isnt('abCdef', ':0i bcd', 'ignorecase, repetition (:0i)');
 p6rule_is  ('abcdef', ':1i bcd', 'ignorecase, repetition (:1i)');
-p6rule_is  ('abCdef', ':1i bcd', 'ignorecase, repetition (:1i)', todo => 'not yet implemented');
-p6rule_is  ('aBCDef', ':1i bcd', 'ignorecase, repetition (:1i)', todo => 'not yet implemented');
+p6rule_is  ('abCdef', ':1i bcd', 'ignorecase, repetition (:1i)');
+p6rule_is  ('aBCDef', ':1i bcd', 'ignorecase, repetition (:1i)');
 p6rule_isnt('aBxDef', ':1i bcd', 'ignorecase, repetition (:1i)');
 p6rule_is  ('abcdef', 'ab [:i cd ] ef', 'ignorecase, lexical (:i)');
 p6rule_is  ('abCdef', 'ab [:i cd ] ef', 'ignorecase, lexical (:i)');
@@ -75,13 +75,13 @@ p6rule_isnt('abCDEf', 'ab [:i cd ] ef', 'ignorecase, lexical (:i)');
 p6rule_is  ('abCDef', ':i ab [:i cd ] ef', 'ignorecase, lexical (:i)');
 p6rule_is  ('AbCDeF', ':i ab [:i cd ] ef', 'ignorecase, lexical (:i)');
 p6rule_is  ('AbcdeF', ':i ab [:i cd ] ef', 'ignorecase, lexical (:i)');
-p6rule_is  ('AbCdEf', ':i a [:i(0) b [:i(1) c [:0i d [:1i e [:i(0) f ] ] ] ] ]', 'ignorecase, lexical (:i)', todo => 'not yet implemented');
-p6rule_is  ('AabbCcddEeff', ':i aa [:i(0) bb [:i(1) cc [:0i dd [:1i ee [:i(0) ff ] ] ] ] ]', 'ignorecase, lexical (:i)', todo => 'not yet implemented');
+p6rule_is  ('AbCdEf', ':i a [:i(0) b [:i(1) c [:0i d [:1i e [:i(0) f ] ] ] ] ]', 'ignorecase, lexical (:i)');
+p6rule_is  ('AabbCcddEeff', ':i aa [:i(0) bb [:i(1) cc [:0i dd [:1i ee [:i(0) ff ] ] ] ] ]', 'ignorecase, lexical (:i)');
 p6rule_isnt('AbCdEF', ':i a [:i(0) b [:i(1) c [:0i d [:1i e [:i(0) f ] ] ] ] ]', 'ignorecase, lexical (:i)');
 p6rule_isnt('AabbCcddEeFf', ':i aa [:i(0) bb [:i(1) cc [:0i dd [:1i ee [:i(0) ff ] ] ] ] ]', 'ignorecase, lexical (:i)');
 p6rule_is  ('AbcdeF', ':i ab [:i(0) cd ] ef', 'ignorecase, lexical repetition (:i)');
 p6rule_is  ('AbcdeF', ':i ab [:0i cd ] ef', 'ignorecase, lexical repetition (:i)');
-p6rule_is  ('abCDef', ':0i ab [:1i cd ] ef', 'ignorecase, lexical repetition (:i)', todo => 'not yet implemented');
+p6rule_is  ('abCDef', ':0i ab [:1i cd ] ef', 'ignorecase, lexical repetition (:i)');
 p6rule_isnt('AbCDeF', ':0i ab [:1i cd ] ef', 'ignorecase, lexical repetition (:i)');
 p6rule_isnt('AbcdeF', ':0i ab [:1i cd ] ef', 'ignorecase, lexical repetition (:i)');
 p6rule_is  ('abcdef', ':0i ab [:i(0) cd ] ef', 'ignorecase, lexical repetition (:i)');
@@ -90,12 +90,12 @@ p6rule_is  ('AbCdeF', ':i(1) ab [:1i cd ] ef', 'ignorecase, lexical repetition (
 p6rule_is  ('AbcdeF', ':i(1) ab [:i(0) cd ] ef', 'ignorecase, lexical repetition (:i)');
 p6rule_isnt('AbcDeF', ':i(1) ab [:i(0) cd ] ef', 'ignorecase, lexical repetition (:i)');
 p6rule_is  ('ABCDEF', ':i(2) ab [:i(999) cd ] ef', 'ignorecase, lexical repetition (:i)');
-p6rule_is  ('ABCDEF', ':1i ab [:i(1) cd ] ef', 'ignorecase, lexical repetition (:i)', todo => 'not yet implemented');
+p6rule_is  ('ABCDEF', ':1i ab [:i(1) cd ] ef', 'ignorecase, lexical repetition (:i)');
 p6rule_isnt('abcDeF', ':0i ab [:1i cd ] ef', 'ignorecase, lexical repetition (:i)');
-p6rule_is  ('ABCDEF', ':2i ab [:999i cd ] ef', 'ignorecase, lexical repetition (:i)', todo => 'not yet implemented');
+p6rule_is  ('ABCDEF', ':2i ab [:999i cd ] ef', 'ignorecase, lexical repetition (:i)');
 p6rule_is  ('abCDef', 'ab [:ignorecase cd ] ef', 'ignorecase, lexical (:ignorecase)');
 p6rule_isnt('aBCDef', 'ab [:ignorecase cd ] ef', 'ignorecase, lexical (:ignorecase)');
-p6rule_is  ('ABCDEF', ':1ignorecase ab [:ignorecase(1) cd ] ef', 'ignorecase, lexical repetition (:ignorecase)', todo => 'not yet implemented');
+p6rule_is  ('ABCDEF', ':1ignorecase ab [:ignorecase(1) cd ] ef', 'ignorecase, lexical repetition (:ignorecase)');
 
 
 ## :w and :words -- magically ignore whitespace
@@ -123,7 +123,7 @@ p6rule_isnt('a b c def', ':w(0) b c [:w(0) d e f ]', 'words, lexical repetition 
 
 
 ## :once -- match only once
-# N.B.: the :once modifier doesn't really belong to PGE or
+# N.B.: the :once modifier does not really belong to PGE or
 # p6rule matching, but instead is something the caller keeps
 # track of.  (pmichaud, 2005-11-05)
 
@@ -137,12 +137,22 @@ p6rule_is  ('a bcd$ef', ':perl5 \A.*? bcd\Q$\E..\z', 'perl5 syntax (:perl5)', to
 ## TODO add more tests
 
 
-## integer modifiers
+## :x -- repetition
+p6rule_is  ('123456', ':x(6) \d', 'repetition (:x)');
+p6rule_is  ('123456', ':x(3) \d', 'repetition (:x)');
+p6rule_is  ('123456', ':x(0) \d', 'repetition (:x)');
+## TODO more tests here
 
 
-## TODO Nth occurance, :ov, :ex, :rw, :keepall
+## :nth -- nth occurance
+p6rule_is  ('a1a2a3', ':nth(3) a \d', 'nth occurance (:nth)');
+p6rule_isnt('a1a2a3', ':nth(4) a \d', 'nth occurance (:nth)', todo => 'not yet implemented');
+## TODO more tests here
+
+
+## TODO :ov, :ex, :rw, :keepall
 ##   user-defined modifiers
 
 
 ## remember to change the number of tests :-)
-BEGIN { plan tests => 70; }
+BEGIN { plan tests => 75; }
