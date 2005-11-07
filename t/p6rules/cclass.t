@@ -74,6 +74,13 @@ p6rule_is  ('------', '<-[\-+]>?', 'negated optional escaped hyphen in range');
 p6rule_is  ('---x--', '<-[+\-]>?', 'negated optional escaped hyphen in range');
 p6rule_is  ('------', '<-[+\-]>?', 'negated optional escaped hyphen in range');
 
+# 'greater than' and 'less than' need no escapes
+p6rule_is(  '><', '^><[<]>', 'lt character class');
+p6rule_is(  '><', '^<[>]><', 'gt character class');
+p6rule_is(  '><', '^<[><]>**{2}', 'gt, lt character class');
+p6rule_is(  '><', '^<[<>]>**{2}', 'lt, gt  character class');
+p6rule_isnt('><', '^<-[><]>', 'not gt, lt character class');
+p6rule_isnt('><', '^<-[<>]>', 'not lt, gt  character class');
 
 # remember to change the number of tests :-)
-BEGIN { plan tests => 53; }
+BEGIN { plan tests => 59; }
