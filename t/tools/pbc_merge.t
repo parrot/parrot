@@ -29,8 +29,8 @@ my $PARROT = ".$PConfig{slash}$PConfig{test_prog}";
 my $PBCMERGE = ".$PConfig{slash}pbc_merge$PConfig{exe}";
 
 # Only test if we have the PBC merge tool built.
-if (0 && -e $PBCMERGE) {          # disabled (failing) --leo
-   plan tests => 2;
+if (-e $PBCMERGE) {
+   plan tests => 3;
 } else {
    plan skip_all => "PBC Merge tool not built or test disabled";
 }
@@ -97,4 +97,27 @@ pir_to_pbc "pbc_merge_t2_2", <<'PIR';
 PIR
 pbc_merge("pbc_merge_t2", "pbc_merge_t2_1", "pbc_merge_t2_2");
 is(run_pbc("pbc_merge_t2"), "Rammstein have rocked for over 10.398571 years!");
+
+# Third test - sub calls back and forth between blocks.
+pir_to_pbc "pbc_merge_t3_1", <<'PIR';
+.sub main :main
+    .local string s
+    s = test1()
+.end
+
+.sub test2
+    .local string s
+    s = "Stirb nicht vor mir"
+    .return(s)
+.end
+PIR
+pir_to_pbc "pbc_merge_t3_2", <<'PIR';
+.sub test1
+    .local string s
+    s = test2()
+    .return(s)
+.end
+PIR
+pbc_merge("pbc_merge_t3", "pbc_merge_t3_1", "pbc_merge_t3_2");
+is(run_pbc("pbc_merge_t3"), "Stirb nicht vor mir");
 
