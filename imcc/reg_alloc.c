@@ -196,9 +196,13 @@ make_stat(IMC_Unit * unit, int *sets, int *cols)
     /* register usage summary */
     char type[] = "INSP";
     int i, j;
-    for (i = 0; i < HASH_SIZE; i++) {
-        SymReg * r = unit->hash[i];
-    	for (; r; r = r->next)
+    SymHash *hsh = &unit->hash;
+    SymReg * r;
+
+    for (i = 0; i < hsh->size; i++) {
+        for (r = hsh->data[i]; r; r = r->next) {
+            if (r->color > unit->max_color)
+                unit->max_color = r->color;
             for (j = 0; j < 4; j++)
                 if (r->set == type[j] && (r->type & VTREGISTER)) {
                     if (sets)
@@ -207,6 +211,7 @@ make_stat(IMC_Unit * unit, int *sets, int *cols)
                         if (r->color > cols[j])
                             cols[j] = r->color;
                 }
+        }
     }
     if (cols) {
         for (j = 0; j < 4; j++)
@@ -307,30 +312,22 @@ static void
 build_reglist(Parrot_Interp interpreter, IMC_Unit * unit, int first)
 {
     int i, count, unused, n_symbols;
+    SymHash *hsh = &unit->hash;
+    SymReg * r;
 
     UNUSED(first);
     IMCC_info(interpreter, 2, "build_reglist\n");
     /* count symbols */
     if (unit->reglist)
         free_reglist(unit);
-    for (i = count = 0; i < HASH_SIZE; i++) {
-        SymReg * r = unit->hash[i];
-        for (; r; r = r->next) {
-            if (r->type & VTREGISTER)
-                count++;
-        }
-    }
+    count = unit->hash.entries;
     if (count == 0)
         return;
-    if (count >= HASH_SIZE)
-        IMCC_warning(interpreter, "build_reglist: probably too small HASH_SIZE"
-                " (%d symbols)\n", count);
     unit->reglist = mem_sys_allocate(count * sizeof(SymReg*));
 
-    for (i = count = 0; i < HASH_SIZE; i++) {
-        SymReg * r = unit->hash[i];
-        /* Add each symbol to reglist  */
-        for (; r; r = r->next) {
+    for (i = count = 0; i < hsh->size; i++) {
+        for (r = hsh->data[i]; r; r = r->next) {
+            /* Add each symbol to reglist  */
             if (r->type & VTREGISTER) {
                 unit->reglist[count++] = r;
             }
@@ -739,14 +736,17 @@ try_allocate(Parrot_Interp interpreter, IMC_Unit * unit)
     int x = 0;
     int color;
     char *avail;
-    int t;
+    int t, n;
     unsigned int *graph = unit->interference_graph;
     SymReg ** reglist = unit->reglist;
 
     /*
      * unit->n_symbols should be an upper limit of needed colors
      */
-    avail = mem_sys_allocate(unit->n_symbols + 1);
+    n = unit->n_symbols;
+    if (unit->max_color > n)
+        n = unit->max_color;
+    avail = mem_sys_allocate(n + 1);
 
     while ((imcstack_depth(nodeStack) > 0) ) {
         x=imcstack_pop(nodeStack);

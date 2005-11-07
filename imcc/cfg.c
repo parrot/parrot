@@ -61,14 +61,15 @@ find_basic_blocks (Parrot_Interp interpreter, IMC_Unit * unit, int first)
 {
     Basic_block *bb;
     Instruction *ins;
+    SymHash *hsh = &unit->hash;
+    SymReg * r;
     int nu = 0;
     int i;
 
     IMCC_info(interpreter, 2, "find_basic_blocks\n");
     init_basic_blocks(unit);
-    for (i = 0; i < HASH_SIZE; i++) {
-        SymReg * r;
-        for (r = unit->hash[i]; r; r = r->next) {
+    for (i = 0; i < hsh->size; i++) {
+        for (r = hsh->data[i]; r; r = r->next) {
             if (r && (r->type & VTADDRESS)) {
                 r->last_ins = NULL;
             }
@@ -140,7 +141,7 @@ find_basic_blocks (Parrot_Interp interpreter, IMC_Unit * unit, int first)
              */
             if (!strcmp(ins->op, "bsr") || !strcmp(ins->op, "set_addr")) {
                 char *name = ins->r[0]->name;
-                SymReg *r = get_sym(name);
+                r = get_sym(name);
                 if (*ins->op == 'b') {  /* bsr */
                     Instruction * lab;
                     found = r != NULL && r->first_ins;

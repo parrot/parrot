@@ -42,8 +42,8 @@ struct subs {
     size_t size;                        /* code size in ops */
     int ins_line;                       /* line# for debug */
     int n_basic_blocks;                 /* block count */
-    SymReg * labels[HASH_SIZE];         /* label names */
-    SymReg * bsrs[HASH_SIZE];           /* bsr, set_addr locations */
+    SymHash labels;         /* label names */
+    SymHash  bsrs;           /* bsr, set_addr locations */
     IMC_Unit * unit;
     int pmc_const;                       /* index in const table */
     struct subs *prev;
@@ -58,7 +58,7 @@ struct cs_t {
     struct subs *first;                 /* first sub of code segment */
     struct cs_t *prev;                  /* previous code segment */
     struct cs_t *next;                  /* next code segment */
-    SymReg * key_consts[HASH_SIZE];     /* cached key constants for this seg */
+    SymHash key_consts;                 /* cached key constants for this seg */
     int pic_idx;                        /* next index of PIC */
 };
 
@@ -88,8 +88,8 @@ imcc_globals_destroy(int ex, void *param)
         s = cs->subs;
         while (s) {
             prev_s = s->prev;
-            clear_sym_hash(s->labels);
-            clear_sym_hash(s->bsrs);
+            clear_sym_hash(&s->labels);
+            clear_sym_hash(&s->bsrs);
             mem_sys_free(s);
             s = prev_s;
         }
@@ -117,9 +117,10 @@ e_pbc_open(Interp * interpreter, void *param)
     cs->prev = globals.cs;
     /* free previous cached key constants if any */
     if (globals.cs) {
-        SymReg **h = globals.cs->key_consts;
+        SymHash *h = &globals.cs->key_consts;
         clear_sym_hash(h);
     }
+    create_symhash(&cs->key_consts);
     cs->next = NULL;
     cs->subs = NULL;
     cs->first = NULL;
@@ -206,6 +207,8 @@ make_new_sub(Interp *interpreter, IMC_Unit * unit)
     if (!globals.cs->first)
         globals.cs->first = s;
     globals.cs->subs = s;
+    create_symhash(&s->labels);
+    create_symhash(&s->bsrs);
 #ifdef HAS_JIT
     if ((IMCC_INFO(interpreter)->optimizer_level & OPT_J)) {
         allocate_jit(interpreter, unit);
@@ -245,8 +248,8 @@ static void
 store_label(Interp *interpreter, SymReg * r, int pc)
 {
     SymReg * label;
-    label = _mk_address(interpreter, globals.cs->subs->labels, str_dup(r->name),
-            U_add_uniq_label);
+    label = _mk_address(interpreter, &globals.cs->subs->labels,
+            str_dup(r->name), U_add_uniq_label);
     label->color = pc;
 }
 
@@ -254,7 +257,8 @@ static void
 store_bsr(Interp *interpreter, SymReg * r, int pc, int offset)
 {
     SymReg * bsr;
-    bsr = _mk_address(interpreter, globals.cs->subs->bsrs, str_dup(r->name), U_add_all);
+    bsr = _mk_address(interpreter, &globals.cs->subs->bsrs,
+            str_dup(r->name), U_add_all);
     if (r->set == 'p')
         bsr->set = 'p';
     bsr->color = pc;
@@ -270,7 +274,7 @@ static void
 store_key_const(char * str, int idx)
 {
     SymReg * c;
-    c  = _mk_const(globals.cs->key_consts, str_dup(str), 0);
+    c  = _mk_const(&globals.cs->key_consts, str_dup(str), 0);
     c->color = idx;
 }
 
@@ -383,7 +387,7 @@ store_labels(Interp *interpreter, IMC_Unit * unit, int *src_lines, int oldsize)
         if (addr->type & VTREGISTER)
             continue;
         /* branch found */
-        label = _get_sym(globals.cs->subs->labels, addr->name);
+        label = _get_sym(&globals.cs->subs->labels, addr->name);
         /* maybe global */
         if (label)
             continue;
@@ -442,7 +446,7 @@ find_global_label(char *name, struct subs *sym, int *pc, struct subs **s1)
                     || (sym->unit->namespace && !s->unit->namespace)
                     || (!sym->unit->namespace && s->unit->namespace)))
             continue;
-        if ( (r = _get_sym(s->labels, name)) ) {
+        if ( (r = _get_sym(&s->labels, name)) ) {
             *pc += r->color;    /* here pc was stored */
             *s1 = s;
             return r;
@@ -461,10 +465,12 @@ fixup_bsrs(Interp *interpreter)
     struct subs *s, *s1;
     int jumppc = 0;
     int pmc_const;
+    SymHash *hsh;
 
     for (s = globals.cs->first; s; s = s->next) {
-        for (i = 0; i < HASH_SIZE; i++) {
-            for (bsr = s->bsrs[i]; bsr; bsr = bsr->next ) {
+        hsh = &s->bsrs;
+        for (i = 0; i < hsh->size; i++) {
+            for (bsr = hsh->data[i]; bsr; bsr = bsr->next ) {
 #if IMC_TRACE_HIGH
                 fprintf(stderr, "fixup_bsr %s\n", bsr->name);
 #endif
@@ -752,7 +758,7 @@ add_const_key(Interp *interpreter, opcode_t key[],
     struct PackFile_Constant *pfc;
     opcode_t *rc;
 
-    if ( (r = _get_sym(globals.cs->key_consts, s_key)) != 0)
+    if ( (r = _get_sym(&globals.cs->key_consts, s_key)) != 0)
         return r->color;
     pfc = malloc(sizeof(struct PackFile_Constant));
     rc = PackFile_Constant_unpack_key(interpreter,
@@ -981,19 +987,25 @@ constant_folding(Interp *interpreter, IMC_Unit * unit)
 {
     SymReg * r;
     int i;
+    SymHash *hsh;
 
     /* go through all consts of current sub */
-    for (i = 0; i < HASH_SIZE; i++) {
+    hsh = &IMCC_INFO(interpreter)->ghash;
+    for (i = 0; i < hsh->size; i++) {
         /* normally constants are in ghash ... */
-        for (r = IMCC_INFO(interpreter)->ghash[i]; r; r = r->next) {
+        for (r = hsh->data[i]; r; r = r->next) {
             if (r->type & (VTCONST|VT_CONSTP)) {
                 add_1_const(interpreter, r);
             }
         }
-        /* ... but keychains 'K' are in local hash, they may contain
-         * variables and constants
-         */
-        for (r = unit->hash[i]; r; r = r->next) {
+    }
+    /* ... but keychains 'K' are in local hash, they may contain
+     * variables and constants
+     */
+    hsh = &unit->hash;
+    for (i = 0; i < hsh->size; i++) {
+        /* normally constants are in ghash ... */
+        for (r = hsh->data[i]; r; r = r->next) {
             if (r->type & VTCONST) {
                 add_1_const(interpreter, r);
             }
@@ -1190,7 +1202,7 @@ e_pbc_emit(Interp *interpreter, void *param, IMC_Unit * unit, Instruction * ins)
         PIO_eprintf(NULL, "emit_pbc: op [%d %s]\n", ins->opnum, ins->op);
 #endif
         if ((addr = get_branch_reg(ins)) != 0 && !(addr->type & VTREGISTER)) {
-            SymReg *label = _get_sym(globals.cs->subs->labels, addr->name);
+            SymReg *label = _get_sym(&globals.cs->subs->labels, addr->name);
             /* maybe global */
             if (label) {
                 addr->color = label->color - npc;

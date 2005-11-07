@@ -197,7 +197,7 @@ typedef struct _imc_info_t {
     int dont_optimize;
     int has_compile;
     int allocated;
-    SymReg ** ghash;
+    SymHash ghash;
     SymReg  *  cur_namespace;
     struct nodeType_t *top_node;
 

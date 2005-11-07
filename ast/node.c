@@ -1067,7 +1067,7 @@ create_Func(int nr, nodeType *self, nodeType *child)
     self = create_1(nr, self, child);
     r = child->u.r;
     last = cur_unit->prev;      /* XXX  ->caller */
-    r = _get_sym(last->hash, r->name);
+    r = _get_sym(&last->hash, r->name);
     if (r) {
         /* mark the name being a subroutine name
          * s. Py_Local

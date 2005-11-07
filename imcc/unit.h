@@ -20,7 +20,7 @@ typedef struct _IMC_Unit {
     IMC_Unit_Type type;
     Instruction * instructions;
     Instruction * last_ins;
-    SymReg ** hash;
+    SymHash hash;
     Symbol * sym;
     int bb_list_size;
     int n_basic_blocks;
@@ -36,6 +36,7 @@ typedef struct _IMC_Unit {
     unsigned int* interference_graph;
     SymReg** reglist;
     int n_symbols;
+    int max_color;
     struct _IMC_Unit * prev;
     struct _IMC_Unit * next;
 

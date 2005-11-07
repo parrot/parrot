@@ -158,17 +158,20 @@ void
 dump_labels(IMC_Unit * unit)
 {
     int i;
+    SymHash *hsh = &unit->hash;
+    SymReg * r;
 
     fprintf(stderr, "Labels\n");
     fprintf(stderr, "name\tpos\tlast ref\n"
             "-----------------------\n");
-    for(i = 0; i < HASH_SIZE; i++) {
-        SymReg * r = unit->hash[i];
+    for (i = 0; i < hsh->size; i++) {
+        for (r = hsh->data[i]; r; r = r->next) {
         if (r && (r->type & VTADDRESS))
             fprintf(stderr, "%s\t%d\t%d\n",
                     r->name,
                     r->first_ins ? r->first_ins->index : -1,
                     r->last_ins ? r->last_ins->index : -1);
+        }
     }
     fprintf(stderr, "\n");
 }

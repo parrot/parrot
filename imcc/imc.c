@@ -82,8 +82,8 @@ void
 imc_cleanup(Interp *interp)
 {
      clear_globals(interp);
-     mem_sys_free(IMCC_INFO(interp)->ghash);
-     IMCC_INFO(interp)->ghash = NULL;
+     mem_sys_free(IMCC_INFO(interp)->ghash.data);
+     IMCC_INFO(interp)->ghash.data = NULL;
 }
 
 
@@ -94,7 +94,7 @@ static IMC_Unit *
 imc_new_unit(IMC_Unit_Type t)
 {
    IMC_Unit * unit = calloc(1, sizeof(IMC_Unit));
-   unit->hash = mem_sys_allocate_zeroed(HASH_SIZE * sizeof(SymReg*));
+   create_symhash(&unit->hash);
    unit->type = t;
    return unit;
 }
@@ -114,8 +114,8 @@ imc_open_unit(Parrot_Interp interp, IMC_Unit_Type t)
     imc_info = IMCC_INFO(interp);
     if (!imc_info->imc_units)
        imc_info->imc_units = unit;
-    if (!imc_info->ghash)
-       imc_info->ghash = mem_sys_allocate_zeroed(HASH_SIZE * sizeof(SymReg*));
+    if (!imc_info->ghash.data)
+       create_symhash(&imc_info->ghash);
     unit->prev = imc_info->last_unit;
     if (imc_info->last_unit)
        imc_info->last_unit->next = unit;
@@ -161,7 +161,7 @@ imc_free_unit(Parrot_Interp interp, IMC_Unit * unit)
     imc->n_comp_units--;
 
     clear_locals(unit);
-    free(unit->hash);
+    free(unit->hash.data);
 
     free(unit);
 }

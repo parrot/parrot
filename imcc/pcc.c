@@ -48,7 +48,7 @@ get_pasm_reg(Interp* interp, char *name)
 {
     SymReg *r;
 
-    if ((r = _get_sym(cur_unit->hash, name)))
+    if ((r = _get_sym(&cur_unit->hash, name)))
         return r;
     return mk_pasm_reg(interp, str_dup(name));
 }
@@ -61,7 +61,7 @@ get_const(Interp *interp, const char *name, int type)
 {
     SymReg *r;
 
-    if ((r = _get_sym(IMCC_INFO(interp)->ghash, name)) && r->set == type)
+    if ((r = _get_sym(&IMCC_INFO(interp)->ghash, name)) && r->set == type)
         return r;
     return mk_const(interp, str_dup(name), type);
 }
