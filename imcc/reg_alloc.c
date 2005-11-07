@@ -824,25 +824,95 @@ map_colors(IMC_Unit* unit, int x, unsigned int *graph, char avail[], int typ)
     }
 }
 
+/*
+ * find first available register of the given reg_set
+ */
+
+static int
+first_avail(IMC_Unit *unit, int reg_set)
+{
+    int i, n, first;
+    SymReg * r;
+    SymHash *hsh;
+    Set *allocated;
+
+    n = unit->n_symbols;
+    if (unit->max_color > n)
+        n = unit->max_color;
+    allocated = set_make(n);
+    hsh = &unit->hash;
+    for (i = 0; i < hsh->size; i++) {
+        for (r = hsh->data[i]; r; r = r->next) {
+            if (r->set != reg_set)
+                continue;
+            if (r->type & VTREGISTER) {
+                if (r->color >= 0)
+                    set_add(allocated, r->color);
+            }
+        }
+    }
+    first = set_first_zero(allocated);
+    set_free(allocated);
+    return first;
+}
+
+
+/*
+ * allocate lexicals or non-volatile in ascending order
+ */
+
 static void
 allocate_uniq(Parrot_Interp interpreter, IMC_Unit *unit, int usage)
 {
-    UNUSED(interpreter);
-    UNUSED(unit);
-    UNUSED(usage);
+    char type[] = "INSP";
+    int i, j, reg_set, first_reg;
+    SymReg * r;
+    SymHash *hsh;
+
+    hsh = &unit->hash;
+    for (j = 0; j < 4; j++) {
+        reg_set = type[j];
+        first_reg = first_avail(unit, reg_set);
+        for (i = 0; i < hsh->size; i++) {
+            for (r = hsh->data[i]; r; r = r->next) {
+                if (r->set != reg_set)
+                    continue;
+                if ((r->type & VTREGISTER) &&
+                        r->color == -1 &&
+                        (r->usage & usage)) {
+                    r->color = first_reg++;
+                    IMCC_debug(interpreter, DEBUG_IMC,
+                            "allocate %s sym %c '%s'  color %d\n",
+                            usage & U_LEXICAL ? "Lexical" : "Non-vol",
+                            reg_set, r->name, r->color);
+                }
+            }
+        }
+        unit->first_avail[j] = first_reg;
+    }
+    /*
+     * TODO for the graph-coloring alligator:
+     *      start at first_avail - don't create interference for
+     *      any register below already allocated
+     *      needs rebuilding of reglist
+     *
+     * TODO create allocation_threshold
+     *      if there are less registers than threshold
+     *      just allocate all and be done with it
+     */
 }
 
 static void
 allocate_lexicals(Parrot_Interp interpreter, IMC_Unit *unit)
 {
-    IMCC_debug(interpreter, DEBUG_IMC, "allocate lexicals");
+    IMCC_debug(interpreter, DEBUG_IMC, "allocate lexicals\n");
     allocate_uniq(interpreter, unit, U_LEXICAL);
 }
 
 static void
 allocate_non_volatile(Parrot_Interp interpreter, IMC_Unit *unit)
 {
-    IMCC_debug(interpreter, DEBUG_IMC, "allocate non_volatile");
+    IMCC_debug(interpreter, DEBUG_IMC, "allocate non_volatile\n");
     allocate_uniq(interpreter, unit, U_NON_VOLATILE);
 }
 

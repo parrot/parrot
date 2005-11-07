@@ -83,6 +83,16 @@ set_add(Set *s, int element)
 }
 
 int
+set_first_zero(Set *s)
+{
+    int i;
+    for (i = 0; i < s->length; ++i)
+        if (!set_contains(s, i))
+            return i;
+    return s->length;
+}
+
+int
 set_contains(Set *s, int element)
 {
 #ifdef __LCC__

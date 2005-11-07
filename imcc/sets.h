@@ -18,6 +18,7 @@ int set_contains(Set*, int);
 Set* set_union(Set*, Set*);
 Set* set_intersec(Set*, Set*);
 void set_intersec_inplace(Set*, Set*);
+int set_first_zero(Set *s);
 
 #endif /* PARROT_IMCC_SETS_H_GUARD */
 
