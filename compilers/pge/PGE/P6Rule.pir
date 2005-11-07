@@ -107,13 +107,14 @@
     if initchar != "\\" goto term_literal
 
   term_backslash:
+    $I0 = is_cclass .CCLASS_NUMERIC, target, pos
+    if $I0 goto err_backslash_digit
     initchar = substr target, pos, 1
-    $I0 = index "01234567", initchar
-    if $I0 >= 0 goto term_backslash_o
     isnegated = is_cclass .CCLASS_UPPERCASE, target, pos 
     inc pos
     $S0 = downcase initchar
     if $S0 == 'x' goto term_backslash_x            # \x.. \X..
+    if $S0 == 'o' goto term_backslash_o            # \o.. \O..
     $P0 = find_global "PGE::P6Rule", "%escape"
     $I0 = exists $P0[$S0]                          # \e\f\r\t\v\h
     if $I0 == 0 goto term_literal
@@ -198,6 +199,9 @@
     $P0 = pos
     .return (mob)
 
+  err_backslash_digit:
+    parse_error(mob, pos, "\\1 and \\012 illegal, use $1, \\o012, or \\x0a")
+    goto end
   err_nodigits:
     parse_error(mob, pos, "No digits found in \\x...")
     goto end
