@@ -14,7 +14,7 @@ t/library/pge.t - Grammar Engine tests
 
 use strict;
 
-use Parrot::Test tests => 23;
+use Parrot::Test tests => 24;
 use Parrot::Test::PGE;
 
 # 1-6
@@ -167,5 +167,67 @@ CODE
 ok1
 ok2
 OUT
+
+# 24 
+pir_output_is(<<'CODE', <<'OUT', "parse FASTA");
+
+# Grok fasta files, which usually contain DNA, RNA or protein sequences.
+# http://en.wikipedia.org/wiki/FASTA_format
+
+# TODO: Compose rules out of subrules
+
+.include "library/dumper.imc"
+
+.sub "example" :main
+    load_bytecode 'PGE.pbc'
+    load_bytecode 'PGE/Util.pir'
+
+    .local string fasta_grammar
+    fasta_grammar = <<'END_FASTA_GRAMMAR'
+grammar Bio::Fasta;
+
+rule file        { <entry>+ }
+rule start_entry { \> }
+rule entry       { <start_entry> <id> \s+ <desc> } 
+rule id          { (\S+) }
+rule desc        { (\N*) }
+rule sequence    { (<-[>]>*) }
+
+END_FASTA_GRAMMAR
+
+    .local string fasta
+    fasta = <<'END_FASTA'
+>gi|5524211|gb|AAD44166.1| cytochrome b [Elephas maximus maximus]
+LCLYTHIGRNIYYGSYLYSETWNTGIMLLLITMATAFMGYVLPWGQMSFWGATVITNLFSAIPYIGTNLV
+EWIWGGFSVDKATLNRFFAFHFILPFTMVALAGVHLTFLHETGSNNPLGLTSDSDKIPFHPYYTIKDFLG
+LLILILLLLLLALLSPDMLGDPDNHMPADPLNTPLHIKPEWYFLFAYAILRSVPNKLGGVLALFLSIVIL
+GLMPFLHTSKHRSMMLRPLSQALFWTLTMDLLTLTWIGSQPVEYPYTIIGQMASILYFSIILAFLPIAGX
+IENY
+END_FASTA
+
+    .local pmc compile_rules
+    compile_rules = find_global "PGE", "compile_rules"
+    .local pmc code
+    ( code ) = compile_rules(fasta_grammar)
+    # print code
+
+    .local pmc fasta_rule
+    fasta_rule = find_global "Bio::Fasta", "start_entry"
+    .local pmc match
+    ( match ) = fasta_rule( fasta )
+    
+    # TODO: Extract named or positional captures
+    print match
+    print "\n"
+
+.end
+
+CODE
+>
+OUT
+
+
+
+
 
 # vim: ft=imc :
