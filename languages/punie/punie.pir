@@ -23,7 +23,7 @@ single digit, in the form of:
 
 =cut
 
-.sub _main @MAIN
+.sub _main :main
     .param pmc argv
 
     load_bytecode "languages/punie/PunieGrammar.pir"
@@ -41,6 +41,7 @@ single digit, in the form of:
     $I0 = match.__get_bool()
     unless $I0 goto match_fail           # if match fails stop
 #    print "parse succeeded\n"
+#    load_bytecode "PGE/Dumper.pbc"
 #    match.dump()
 
     # "Traverse" the parse tree (currently a hack)
