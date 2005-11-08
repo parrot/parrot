@@ -3,11 +3,11 @@
 
 =head1 NAME
 
-examples/assembly/uniq.pasm - Remove duplicate lines from a sorted file
+examples/pir/uniq.pir - Remove duplicate lines from a sorted file
 
 =head1 SYNOPSIS
 
-    % ./parrot uniq.pasm -o uniq.pbc
+    % ./parrot uniq.pir -o uniq.pbc
     % ./parrot uniq.pbc data.txt
     % ./parrot uniq.pbc -c data.txt
 
@@ -35,10 +35,19 @@ Don't output lines that are repeated in the input
 
 =back
 
+=head1 HISTORY
+
+By Leon Brocard <acme@astray.com>.
+
+Converted to PIR by Bernhard Schmalhofer.
+
 =cut
 
-  set I0, P5
-  shift S0, P5
+.sub "uniq" :main
+  .param pmc argv
+
+  set I0, argv
+  shift S0, argv
   ne I0, 1, SOURCE
   print "usage: parrot "
   print S0
@@ -47,21 +56,21 @@ Don't output lines that are repeated in the input
 
 SOURCE:
   # do some simple option parsing
-  shift S0, P5
+  shift S0, argv
 
   ne S0, "-c", NOTC
   set I10, 1 # count mode
-  shift S0, P5
+  shift S0, argv
 
 NOTC:
   ne S0, "-d", NOTD
   set I11, 1 # duplicate mode
-  shift S0, P5
+  shift S0, argv
 
 NOTD:
   ne S0, "-u", GO
   set I12, 1 # unique mode
-  shift S0, P5
+  shift S0, argv
 
 GO:
   # S2 is the previous line
@@ -133,10 +142,5 @@ LOOP:
   if S1, SOURCE_LOOP
   close P1
 
-  end
+.end
 
-=head1 HISTORY
-
-By Leon Brocard <acme@astray.com>
-
-=cut

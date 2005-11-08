@@ -458,7 +458,6 @@ examples/assembly/pmcmops.pasm                    [main]doc
 examples/assembly/queens.pasm                     [main]doc
 examples/assembly/queens_r.imc                    [main]doc
 examples/assembly/thr-primes.imc                  [main]doc
-examples/assembly/uniq.pasm                       [main]doc
 examples/benchmarks/addit.imc                     [main]doc
 examples/benchmarks/addit.pasm                    [main]doc
 examples/benchmarks/addit.pl                      [main]doc
@@ -608,6 +607,7 @@ examples/pir/mandel.pir                           [main]doc
 examples/pir/readline.pir                         [main]doc
 examples/pir/substr.pir                           [main]doc
 examples/pir/sudoku.pir                           [main]doc
+examples/pir/uniq.pir                             [main]doc
 examples/pni/PQt.C                                [main]doc
 examples/pni/QtHelloWorld.pasm                    [main]doc
 examples/pni/ls.pir                               [main]doc
