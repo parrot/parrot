@@ -329,7 +329,7 @@ begin_return_or_yield(Interp *interp, int yield)
 %nonassoc <t> PARAM
 
 %token <t> PRAGMA FASTCALL N_OPERATORS HLL
-%token <t> GOTO ARG IF UNLESS
+%token <t> GOTO ARG IF UNLESS PNULL
 %token <t> ADV_FLAT ADV_SLURPY ADV_OPTIONAL ADV_OPT_FLAG
 %token <t> NEW
 %token <t> NAMESPACE ENDNAMESPACE CLASS ENDCLASS FIELD DOT_METHOD
@@ -382,7 +382,6 @@ begin_return_or_yield(Interp *interp, int yield)
 
 %nonassoc CONCAT DOT
 %nonassoc  <t> POINTY
-
 
 %pure_parser
 
@@ -491,6 +490,8 @@ pasm_inst:         { clear_state(); }
                                 mk_sub_label(interp, $3));
                      cur_call->pcc_sub->pragma = $2;
                    }
+   | PNULL var
+                   {  $$ =MK_I(interp, cur_unit, "null", 1, $2); }
    | /* none */    { $$ = 0;}
    ;
 
@@ -943,6 +944,8 @@ labeled_inst:
    | PARROT_OP vars
                    { $$ = INS(interp, cur_unit, $1, 0, regs, nargs, keyvec, 1);
                                           free($1); }
+   | PNULL var
+                   {  $$ =MK_I(interp, cur_unit, "null", 1, $2); }
    | sub_call      {  $$ = 0; cur_call = NULL; }
    | pcc_sub_call  {  $$ = 0; }
    | pcc_ret
@@ -1146,6 +1149,10 @@ if_statement:
                    {  $$ =MK_I(interp, cur_unit, $3, 3, $2, $4, $6); }
    | UNLESS var relop var GOTO label_op
                    {  $$ =MK_I(interp, cur_unit, inv_op($3), 3, $2,$4, $6); }
+   | IF PNULL var GOTO label_op
+                   {  $$ = MK_I(interp, cur_unit, "if_null", 2, $3, $5); }
+   | UNLESS PNULL var GOTO label_op
+                   {  $$ = MK_I(interp, cur_unit, "unless_null", 2, $3, $5); }
    | IF var GOTO label_op
                    {  $$ = MK_I(interp, cur_unit, "if", 2, $2, $4); }
    | UNLESS var GOTO label_op

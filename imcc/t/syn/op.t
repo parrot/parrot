@@ -3,7 +3,7 @@
 # $Id$
 
 use strict;
-use Parrot::Test tests => 21;
+use Parrot::Test tests => 24;
 
 ##############################
 pir_output_is(<<'CODE', <<'OUT', "+=");
@@ -268,3 +268,41 @@ pir_output_is(<<'CODE', '', "empty sub");
 .emit
 .eom
 CODE
+
+pir_output_is(<<'CODE', <<'OUT', "if null X goto Y");
+.sub main :main
+    null $P0
+    if null $P0 goto BLAH
+    print "NOT A "
+BLAH:
+   print "PASS\n"
+.end
+CODE
+PASS
+OUT
+
+pir_output_is(<<'CODE', <<'OUT', "unless null X goto Y");
+.sub main :main
+    null $P0
+    unless null $P0 goto BLAH
+    print "PASS\n"
+    end
+BLAH:
+   print "FAIL"
+.end
+CODE
+PASS
+OUT
+
+pir_output_is(<<'CODE', <<'OUT', "if null X goto Y");
+.sub main :main
+    $S0 = "hello"
+    if null $S0 goto BLAH
+    print "PASS\n"
+    end
+BLAH:
+   print "FAIL"
+.end
+CODE
+PASS
+OUT

@@ -298,6 +298,7 @@ SP              [ ]
 "goto"          return(GOTO);
 "if"            return(IF);
 "unless"        return(UNLESS);
+"null"          return(PNULL);
 "int"           return(INTV);
 "num"           return(FLOATV);
 "float"         return(FLOATV);
