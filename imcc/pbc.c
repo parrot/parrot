@@ -21,9 +21,6 @@
  * So when reading color here it's either a constant table idx
  * or a parrot register number, depending on data type.
  *
- * More weird, in global fixup reg->score is used for the opcode offset
- * into the instruction.
- *
  * TODO memory clean up
  *
  * And finally: there might be some issues on 64bit systems with
@@ -262,7 +259,7 @@ store_bsr(Interp *interpreter, SymReg * r, int pc, int offset)
     if (r->set == 'p')
         bsr->set = 'p';
     bsr->color = pc;
-    bsr->score = offset;        /* bsr = 1, set_addr I,x = 2  */
+    bsr->offset = offset;        /* bsr = 1, set_addr I,x = 2  */
     /* This is hackish but it's better to have it here than in the
      * fixup code until we decide if we need the _globallabel semantic.
      */
@@ -534,7 +531,7 @@ fixup_bsrs(Interp *interpreter)
                                 "couldn't find sub 2 '%s'\n",
                                 bsr->name);
                     }
-                    interpreter->code->base.data[addr+bsr->score] =
+                    interpreter->code->base.data[addr+bsr->offset] =
                         pmc_const;
                     IMCC_debug(interpreter, DEBUG_PBC_FIXUP, "fixup const PMC"
                             " sub '%s' const nr: %d\n", bsr->name,
@@ -551,7 +548,7 @@ fixup_bsrs(Interp *interpreter)
                 /* patch the bsr __ instruction */
                 IMCC_debug(interpreter, DEBUG_PBC_FIXUP, "fixup %s pc %d fix %d\n",
                         bsr->name, addr, pc - addr);
-                interpreter->code->base.data[addr+bsr->score] = pc - addr;
+                interpreter->code->base.data[addr+bsr->offset] = pc - addr;
             }
         }
         jumppc += s->size;

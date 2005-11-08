@@ -187,7 +187,7 @@ dump_symreg(IMC_Unit * unit)
     fprintf(stderr,
             "\nSymbols:"
             "\n----------------------------------------------\n");
-    fprintf(stderr, "name\tfirst\tlast\t1.blk\t-blk\tset col     \tscore\t"
+    fprintf(stderr, "name\tfirst\tlast\t1.blk\t-blk\tset col     \t"
             "used\tlhs_use\tregp\tus flgs\n"
             "----------------------------------------------\n");
     for(i = 0; i < unit->n_symbols; i++) {
@@ -196,13 +196,13 @@ dump_symreg(IMC_Unit * unit)
             continue;
         if(!r->first_ins)
             continue;
-        fprintf(stderr, "%s %c\t%d\t%d\t%d\t%d\t%c   %2d %2d\t%d\t%d\t%d\t%s\t%x\n",
+        fprintf(stderr, "%s %c\t%d\t%d\t%d\t%d\t%c   %2d %2d\t%d\t%d\t%s\t%x\n",
                 r->name,
                 r->usage & U_NON_VOLATILE ? 'P' : ' ',
 		    r->first_ins->index, r->last_ins->index,
 		    r->first_ins->bbindex, r->last_ins->bbindex,
 		    r->set,
-                (int)r->color, r->want_regno, r->score,
+                (int)r->color, r->want_regno,
                 r->use_count, r->lhs_use_count,
                 r->reg ? r->reg->name : "",
                 r->usage
@@ -282,20 +282,18 @@ dump_interference_graph(IMC_Unit * unit)
             "\n-------------------------------\n");
     for (x = 0; x < n_symbols; x++) {
 
-	if (!reglist[x]->first_ins) continue;
+        if (!reglist[x]->first_ins) continue;
 
-	fprintf(stderr, "%s\t -> ", reglist[x]->name);
-	cnt = 0;
+        fprintf(stderr, "%s\t -> ", reglist[x]->name);
+        cnt = 0;
 
         for (y = 0; y < n_symbols; y++) {
 
             if (! ig_test(x, y, n_symbols, interference_graph))
                 continue;
             r = unit->reglist[y];
-	     if ( r && !r->simplified) {
-	        fprintf(stderr, "%s ", r->name);
-		cnt++;
-	     }
+            fprintf(stderr, "%s ", r->name);
+            cnt++;
         }
         fprintf(stderr, "(%d)\n", cnt);
     }

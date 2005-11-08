@@ -137,6 +137,8 @@ imc_reg_alloc(Interp *interpreter, IMC_Unit * unit)
     } while (!IMCC_INFO(interpreter)->dont_optimize &&
             optimize(interpreter, unit));
 
+    if (IMCC_INFO(interpreter)->debug & DEBUG_IMC)
+        dump_symreg(unit);
     rebuild_reglist(interpreter, unit);
     graph_coloring_reg_alloc(interpreter, unit);
 
@@ -661,10 +663,8 @@ try_allocate(Parrot_Interp interpreter, IMC_Unit * unit)
                     r->color = color;
 
                     IMCC_debug(interpreter, DEBUG_IMC,
-                            "#[%s] gets color [%d]"
-                            "(score %d)\n",
-                            r->name, color,
-                            r->score);
+                            "#[%s] gets color [%d]\n",
+                            r->name, color);
                     break;
                 }
 

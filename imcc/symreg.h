@@ -62,10 +62,9 @@ typedef struct _SymReg {
     int want_regno;	     /* wanted register number */
     INTVAL color;            /* Color: parrot register number
     				and parrot const table index of VTCONST */
-    int score;               /* How costly it is to spill this symbol */
+    int offset;              /* used for label fixup */
     int use_count;	     /* How often this symbol is used */
     int lhs_use_count;	     /* How often this symbol is written to */
-    int simplified;          /* Has it been simplified during the process? */
     Life_range **life_info;  /* Each block has its Life_range status */
     struct _SymReg * next;   /* used in the symbols hash */
     struct _Instruction * first_ins;	/* first and last instruction */
