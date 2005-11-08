@@ -1023,8 +1023,11 @@ register.
 .namespace [ "PGE::Exp::Subrule" ]
 
 .sub "reduce" :method
+    .param pmc next
     self["isquant"] = 1
     self["firstchars"] = ""
+    $S0 = next["firstchars"]
+    self["nextchars"] = $S0
     .return (self)
 .end
 
@@ -1033,7 +1036,7 @@ register.
     .param string label
     .param string next
     .local pmc emit
-    .local string subname, subargs
+    .local string subname, subargs, nextchars
     .local string cname, captsave, captback
     .local int iscapture, iscut, isnegated
     emit = find_global "PGE::Exp", "emit"
@@ -1042,6 +1045,7 @@ register.
     iscut = self["iscut"]
     isnegated = self["isnegated"]
     cname = self["cname"]
+    nextchars = self["nextchars"]
     emit(code, "\n  %s:  # subrule %s    ##", label, subname)
     subargs = ""
     $I0 = exists self["arg"]
@@ -1069,7 +1073,6 @@ register.
     emit(code, "    ($P1,$P9,$P9,$P0) = newfrom(captscope, pos, \"%s\")", $S0)
     emit(code, "    $P0 = pos")
     emit(code, "    $P0 = find_global \"%s\", \"%s\"", $S0, $S1)
-    emit(code, "    $P0 = $P0($P1%s)", subargs)
     goto subrule_3
   subrule_simple_name:
     emit(code, "    $P0 = getattribute captscope, \"PGE::Match\\x0$:pos\"")
@@ -1081,8 +1084,15 @@ register.
     emit(code, "  %s_s1:", label)
     emit(code, "    $P0 = find_global \"%s\"", subname)
     emit(code, "  %s_s2:", label)
-    emit(code, "    $P0 = $P0(captscope%s)", subargs)
+    emit(code, "    $P1 = captscope", subargs)
   subrule_3:
+    if nextchars == "" goto subrule_3a
+    nextchars = self.escape(nextchars)
+    emit(code, "    $P2 = new String")
+    emit(code, "    $P2 = %s", nextchars)
+    emit(code, "    setprop $P0, \"nextchars\", $P2")
+  subrule_3a:
+    emit(code, "    $P0 = $P0($P1%s)", subargs)
     emit(code, "    $P1 = getattribute $P0, \"PGE::Match\\x0$:pos\"")
     emit(code, "    if $P1 <= %s goto %s_commit", PGE_CUT_MATCH, label)
     if isnegated == 0 goto subrule_4

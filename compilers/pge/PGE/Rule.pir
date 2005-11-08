@@ -32,7 +32,7 @@ Match a null string (always returns true on first match).
 
 =cut
 
-.sub null
+.sub "null"
     .param pmc mob
     .local pmc target, mfrom, mpos
     $P0 = find_global "PGE::Match", "newfrom"
@@ -47,7 +47,7 @@ Force a backtrack.  (Taken from A05.)
 
 =cut
 
-.sub fail
+.sub "fail"
     .param pmc mob
     $P0 = find_global "PGE::Match", "newfrom"
     .return $P0(mob)
@@ -384,21 +384,39 @@ Match whitespace between tokens.
     .local string target
     .local pmc mfrom, mpos
     .local int rep, pos, lastpos
+    .local string nextchars
     .const .Sub corou = "ws_corou"
+    nextchars = ""
+    $P0 = interpinfo .INTERPINFO_CURRENT_SUB
+    $P1 = getprop "nextchars", $P0
+    if_null $P1, ws_1
+    delprop $P0, "nextchars"
+    nextchars = $P1
+  ws_1:
     $P0 = find_global "PGE::Match", "newfrom"
     (mob, target, mfrom, mpos) = $P0(mob)
     lastpos = length target
     pos = mfrom
     if pos >= lastpos goto end
-    if pos < 1 goto ws_succ
+    if pos < 1 goto ws_scan
     $I0 = is_cclass .CCLASS_WORD, target, pos
-    if $I0 == 0 goto ws_succ
+    if $I0 == 0 goto ws_scan
     $I1 = pos - 1
     $I0 = is_cclass .CCLASS_WORD, target, $I1
-    if $I0 == 0 goto ws_succ
-    .return (mob)
-  ws_succ:
+    if $I0 == 0 goto ws_scan
+    goto end
+  ws_scan:
     $I0 = find_not_cclass .CCLASS_WHITESPACE, target, pos, lastpos
+    if nextchars == "" goto found
+  ws_scan2:
+    if $I0 < pos goto end
+    $S0 = substr target, $I0, 1
+    $I1 = index nextchars, $S0
+    if $I1 >= 0 goto found
+    $I1 = length nextchars
+    $I2 = find_cclass .CCLASS_WHITESPACE, nextchars, 0, $I1
+    if $I2 == $I1 goto end
+  found:
     mpos = $I0
     if $I0 == pos goto end
     $P0 = corou
@@ -425,7 +443,8 @@ Match whitespace between tokens.
 =item C<before(PMC mob, STR pattern)>
 
 Perform lookahead -- i.e., check if we're at a position where
-C<pattern> matches.  Always returns a zero-width Match object.
+C<pattern> matches.  Returns a zero-width Match object on
+success.
 
 =cut
 
