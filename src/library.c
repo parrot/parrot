@@ -192,7 +192,7 @@ Parrot_locate_runtime_file(Interp *interpreter, const char *file_name,
         NULL
     };
     const char **paths;
-    int length;
+    size_t length;
 
     union {
         const void * __c_ptr;
@@ -242,7 +242,7 @@ Parrot_locate_runtime_file(Interp *interpreter, const char *file_name,
     /* Otherwise look at possible library paths. */
     length = 0;
     for (ptr = paths; *ptr; ++ptr) {
-        int len = strlen(*ptr);
+        size_t len = strlen(*ptr);
         length = (len > length) ? len : length;
     }
     length += strlen(prefix) + strlen(file_name) + 2;
@@ -288,6 +288,7 @@ Parrot_locate_runtime_file(Interp *interpreter, const char *file_name,
         }
         strcat(full_name, *ptr);
         strcat(full_name, file_name);
+        assert(strlen(full_name) < length);
 #ifdef WIN32
         {
             char *p;
