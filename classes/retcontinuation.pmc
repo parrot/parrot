@@ -138,6 +138,11 @@ the frame pointer in the stack frame cache.
         }
         Parrot_free_context(INTERP, cc->from_ctx, 1);
         cc->from_ctx = NULL;
+        /*
+         * the to_ctx is marked in Continuation.mark
+         * NULLify it or turn off the custom_mark bit
+         */
+        cc->to_ctx = NULL;
         INTERP->current_args = NULL;
         /* no address and no segment */
         if (!cc->seg) {

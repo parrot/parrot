@@ -85,7 +85,8 @@ Marks the continuation as live.
 
     void mark () {
         struct Parrot_cont * cc = PMC_cont(SELF);
-        mark_context(INTERP, cc->to_ctx);
+        if (cc->to_ctx)
+            mark_context(INTERP, cc->to_ctx);
     }
 
 /*
