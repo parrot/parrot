@@ -1,0 +1,14 @@
+# $Id$
+
+The directory contains the sources for the "Parrot Abstract Syntax Tree" - compiler
+of Parrot.
+
+See examples/past and t/pmc/eval.t for examples.
+Particularly you should be able to do:
+
+  ./parrot examples/past/hello.past
+
+Active Maintainer:
+
+Leopold Toetsch <lt@toetsch.at>
+
