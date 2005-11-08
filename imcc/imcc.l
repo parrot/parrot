@@ -611,6 +611,7 @@ new_frame (Interp* interp)
     tmp = mem_sys_allocate_zeroed(sizeof(struct macro_frame_t));
     tmp->label = ++label;
     tmp->s.line = line;
+    tmp->s.handle = NULL;
     if (frames) {
         tmp->s.pasm_file = frames->s.pasm_file;
         tmp->s.file = frames->s.file;
@@ -922,7 +923,9 @@ include_file (Interp* interp, char *file_name)
     }
     else
         IMCC_fataly(interp, E_IOError, strerror(errno));
+
     frame->s.file = file_name;
+    frame->s.handle = file;
 
     ext = strrchr(file_name, '.');
     if (ext) {
@@ -970,6 +973,7 @@ pop_parser_state(Interp* interp)
     struct macro_frame_t *tmp;
     tmp = frames;
     if (tmp) {
+        if (tmp->s.handle) fclose (tmp->s.handle);
         frames = (struct macro_frame_t*) frames->s.next;
         destroy_frame(tmp);
     }

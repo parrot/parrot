@@ -165,6 +165,7 @@ struct parser_state_t {
     struct parser_state_t *next;
     Interp *interpreter;
     const char *file;
+    FILE *handle;
     int line;
     int pasm_file;      /* pasm_file mode of this frame */
     int pragmas;        /* n_operators ... */
