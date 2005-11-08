@@ -198,6 +198,10 @@ This let's Parrot talk to native "C" libraries, without a C-compiler.
 
 Acronym for Native Call Interface.
 
+=head2 PAST
+
+Acronym for Parrot Abstract Syntax Tree.
+
 =head2 Packfile
 
 Another name for a PBC file, due to the names used for data structures in one

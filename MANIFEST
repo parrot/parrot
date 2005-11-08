@@ -21,6 +21,7 @@ RELEASE_INSTRUCTIONS                              []
 RESPONSIBLE_PARTIES                               [main]doc
 TODO                                              [main]doc
 VERSION                                           [main]doc
+ast/README                                        []
 ast/ast.h                                         []
 ast/ast.l                                         []
 ast/ast.y                                         []
@@ -28,7 +29,6 @@ ast/ast_main.c                                    []
 ast/astlexer.c                                    []
 ast/astparser.c                                   []
 ast/astparser.h                                   []
-ast/hello.past                                    []
 ast/node.c                                        []
 build_tools/build_nativecall.pl                   []
 build_tools/c2str.pl                              []
@@ -592,6 +592,7 @@ examples/pasm/small.xml                           [main]doc
 examples/pasm/stack.pasm                          [main]doc
 examples/pasm/trace.pasm                          [main]doc
 examples/pasm/xml_parser.pasm                     [main]doc
+examples/past/hello.past                          []
 examples/pge/README                               [main]doc
 examples/pge/all.pir                              [main]doc
 examples/pge/p6parse.pir                          [main]doc
@@ -1815,6 +1816,7 @@ t/dynclass/pyint.t                                []
 t/examples/japh.t                                 []
 t/examples/library.t                              []
 t/examples/pasm.t                                 []
+t/examples/past.t                                 []
 t/examples/pir.t                                  []
 t/examples/subs.t                                 []
 t/harness                                         []

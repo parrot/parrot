@@ -55,6 +55,21 @@ the  output matches the expected result.
 Runs the Parrot Assembler code and passes the test
 if a string comparison of the output with the unexpected result is false.
 
+=item C<past_output_is($code, $expected, $description)>
+
+Runs the PAST code and passes the test if a string comparison of output
+with the expected result is true.
+
+=item C<past_output_like($code, $expected, $description)>
+
+Runs the PAST code and passes the test if output matches the expected
+result.
+
+=item C<past_output_isnt($code, $unexpected, $description)>
+
+Runs the PAST code and passes the test if a string comparison of the output
+with the unexpected result is false.
+
 =item C<pir_output_is($code, $expected, $description)>
 
 Runs the PIR code and passes the test if a string comparison of output
@@ -160,6 +175,7 @@ require Test::More;
 
 @EXPORT = qw( output_is          output_like          output_isnt
               pasm_output_is     pasm_output_like     pasm_output_isnt
+              past_output_is     past_output_like     past_output_isnt
               pir_output_is      pir_output_like      pir_output_isnt
               pir_2_pasm_is      pir_2_pasm_like      pir_2_pasm_isnt
               pbc_output_is      pbc_output_like      pbc_output_isnt
@@ -309,6 +325,9 @@ sub _generate_functions {
         pasm_output_is     => 'is_eq',
         pasm_output_isnt   => 'isnt_eq',
         pasm_output_like   => 'like',
+        past_output_is     => 'is_eq',
+        past_output_isnt   => 'isnt_eq',
+        past_output_like   => 'like',
         pir_output_is      => 'is_eq',
         pir_output_isnt    => 'isnt_eq',
         pir_output_like    => 'like',
@@ -342,16 +361,19 @@ sub _generate_functions {
             # Name of the file with test code.
             # This depends on which kind of code we are testing.
             my $code_f;
-            if ( $func =~ /^pir_output/ ) {
+            if ( $func =~ m/^pir_output/ ) {
                 $code_f = per_test('.pir', $test_no);
             }
             elsif ( $func =~ m/^output_/ || $func =~ m/^pasm_output_/ ) {
                 $code_f = per_test('.pasm', $test_no);
             }
-            elsif ( $func =~ /^pir_2_pasm_/) {
+            elsif ( $func =~ m/^past_/) {
+                $code_f = per_test('.past', $test_no);
+            }
+            elsif ( $func =~ m/^pir_2_pasm_/) {
                 $code_f = per_test('.pir', $test_no);
             }
-            elsif ( $func =~ /^pbc_output_/ ) {
+            elsif ( $func =~ m/^pbc_output_/ ) {
                 $code_f = per_test('.pbc', $test_no);
             }
             else {
