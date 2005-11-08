@@ -24,16 +24,16 @@ static void make_stat(IMC_Unit *, int *sets, int *cols);
 static void imc_stat_init(IMC_Unit *);
 static void print_stat(Parrot_Interp, IMC_Unit *);
 static void allocate_wanted_regs(IMC_Unit *);
-static void build_reglist(Parrot_Interp, IMC_Unit * unit, int first);
+static void build_reglist(Parrot_Interp, IMC_Unit * unit);
+static void rebuild_reglist(Parrot_Interp, IMC_Unit * unit);
 static void build_interference_graph(Parrot_Interp, IMC_Unit *);
 static void compute_du_chain(IMC_Unit * unit);
 static void compute_one_du_chain(SymReg * r, IMC_Unit * unit);
 static int interferes(Interp *, IMC_Unit *, SymReg * r0, SymReg * r1);
-static void map_colors(IMC_Unit *, int x, unsigned int * graph, char colors[], int typ);
+static void map_colors(IMC_Unit *, int x, unsigned int * graph, char colors[], int typ, int);
 static void compute_spilling_costs (Parrot_Interp, IMC_Unit *);
 static void order_spilling (IMC_Unit *);
 static int try_allocate(Parrot_Interp, IMC_Unit *);
-static void restore_interference_graph(Interp *, IMC_Unit *);
 static void allocate_lexicals (Parrot_Interp, IMC_Unit *);
 static void allocate_non_volatile (Parrot_Interp, IMC_Unit *);
 #if 0
@@ -139,12 +139,13 @@ imc_reg_alloc(Interp *interpreter, IMC_Unit * unit)
         compute_dominance_frontiers(interpreter, unit);
         find_loops(interpreter, unit);
 
-        build_reglist(interpreter, unit, 1);
+        build_reglist(interpreter, unit);
         life_analysis(interpreter, unit);
         allocate_non_volatile(interpreter, unit);
     } while (!IMCC_INFO(interpreter)->dont_optimize &&
             optimize(interpreter, unit));
 
+    rebuild_reglist(interpreter, unit);
     graph_coloring_reg_alloc(interpreter, unit);
 
     if (IMCC_INFO(interpreter)->debug & DEBUG_IMC)
@@ -314,13 +315,12 @@ sort_reglist(IMC_Unit *unit)
  */
 
 static void
-build_reglist(Parrot_Interp interpreter, IMC_Unit * unit, int first)
+build_reglist(Parrot_Interp interpreter, IMC_Unit * unit)
 {
     int i, count, unused, n_symbols;
     SymHash *hsh = &unit->hash;
     SymReg * r;
 
-    UNUSED(first);
     IMCC_info(interpreter, 2, "build_reglist\n");
     /* count symbols */
     if (unit->reglist)
@@ -340,7 +340,7 @@ build_reglist(Parrot_Interp interpreter, IMC_Unit * unit, int first)
     }
     unit->n_symbols = n_symbols = count;
     compute_du_chain(unit);
-    /* we might have unused symbols here, from spilling */
+    /* we might have unused symbols here, from optimizations */
     for (i = count = unused = 0; i < n_symbols; i++) {
         if (!unit->reglist[i]->first_ins)
             unused++;
@@ -352,6 +352,40 @@ build_reglist(Parrot_Interp interpreter, IMC_Unit * unit, int first)
     n_symbols -= unused;
     unit->n_symbols = n_symbols;
     sort_reglist(unit);
+}
+
+/*
+ * Exclude all already allocated registers (< first_avail)
+ * from reglist. This reduced the size of the interference graph
+ * significantly
+ */
+static void
+rebuild_reglist(Parrot_Interp interpreter, IMC_Unit * unit)
+{
+    int i, count, unused, reg_set;
+    SymReg * r;
+    char types[] = "INSP", *p;
+
+    UNUSED(interpreter);
+    for (i = count = unused = 0; i < unit->n_symbols; i++) {
+        r = unit->reglist[i];
+        if (r->color == -1)
+            goto use_it;
+        p = strchr(types, r->set);
+        if (!p)
+            goto use_it;
+        reg_set = p - types;
+        if (r->color < unit->first_avail[reg_set]) {
+            unused++;
+            continue;
+        }
+use_it:
+        if (i == count)
+            count++;
+        else
+            unit->reglist[count++] = unit->reglist[i];
+    }
+    unit->n_symbols -= unused;
 }
 
 /* Creates the interference graph between the variables.
@@ -651,19 +685,6 @@ order_spilling (IMC_Unit * unit)
 }
 
 
-static void
-restore_interference_graph(Interp *interpreter, IMC_Unit * unit)
-{
-    int i;
-    for (i=0; i < unit->n_symbols; i++) {
-        if ((unit->reglist[i]->type & VTPASM) &&
-                !(IMCC_INFO(interpreter)->optimizer_level & OPT_PASM))
-            continue;
-	unit->reglist[i]->color = -1;
-	unit->reglist[i]->simplified = 0;
-    }
-}
-
 /*
  * try to allocate as much as possible
  */
@@ -704,10 +725,10 @@ ig_find_color(Interp* interpreter, IMC_Unit *unit, int x, char *avail)
 
     UNUSED(interpreter);
     UNUSED(x);
-    for (c = 1; c <= unit->n_symbols; c++)
+    for (c = 0; c < unit->n_symbols; c++)
         if (avail[c])
             return c;
-    return 0;
+    return -1;
 }
 /*
  * Color the graph, assigning registers to each symbol:
@@ -734,24 +755,29 @@ try_allocate(Parrot_Interp interpreter, IMC_Unit * unit)
     n = unit->n_symbols;
     if (unit->max_color > n)
         n = unit->max_color;
-    avail = mem_sys_allocate(n + 1);
+    avail = mem_sys_allocate(n);
 
     while ((imcstack_depth(nodeStack) > 0) ) {
         x=imcstack_pop(nodeStack);
 
         for (t = 0; t < 4; t++) {
             int typ = "INSP"[t];
+            int already_allocated = unit->first_avail[t];
+            /*
+             * TODO don't even consider these regs
+             */
             if (reglist[x]->set == typ && reglist[x]->color == -1) {
-                memset(avail, 1, n + 1);
-                map_colors(unit, x, graph, avail, typ);
+                memset(avail, 1, n);
+                map_colors(unit, x, graph, avail, typ, already_allocated );
                 color = ig_find_color(interpreter, unit, x, avail);
-                if (color) {
-                    reglist[x]->color = color - 1;
+                if (color >= 0) {
+                    color += already_allocated;
+                    reglist[x]->color = color;
 
                     IMCC_debug(interpreter, DEBUG_IMC,
                             "#[%s] gets color [%d]"
                             "(score %d)\n",
-                            reglist[x]->name, color - 1,
+                            reglist[x]->name, color,
                             reglist[x]->score);
                     break;
                 }
@@ -773,7 +799,8 @@ try_allocate(Parrot_Interp interpreter, IMC_Unit * unit)
  * map_colors: calculates what colors can be assigned to the x-th symbol.
  */
 static void
-map_colors(IMC_Unit* unit, int x, unsigned int *graph, char avail[], int typ)
+map_colors(IMC_Unit* unit, int x, unsigned int *graph, char avail[],
+        int typ, int already_allocated)
 {
     int y = 0, n_symbols;
     SymReg * r;
@@ -786,7 +813,8 @@ map_colors(IMC_Unit* unit, int x, unsigned int *graph, char avail[], int typ)
         if (   r
     	    && r->color != -1
 	    && r->set == typ) {
-    	    avail[r->color+1] = 0;
+            assert(r->color - already_allocated >= 0);
+    	    avail[r->color - already_allocated] = 0;
     	}
     }
 }
@@ -858,11 +886,6 @@ allocate_uniq(Parrot_Interp interpreter, IMC_Unit *unit, int usage)
         unit->first_avail[j] = first_reg;
     }
     /*
-     * TODO for the graph-coloring alligator:
-     *      start at first_avail - don't create interference for
-     *      any register below already allocated
-     *      needs rebuilding of reglist
-     *
      * TODO create allocation_threshold
      *      if there are less registers than threshold
      *      just allocate all and be done with it
