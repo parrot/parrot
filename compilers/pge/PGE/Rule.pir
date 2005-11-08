@@ -407,22 +407,25 @@ Match whitespace between tokens.
     goto end
   ws_scan:
     $I0 = find_not_cclass .CCLASS_WHITESPACE, target, pos, lastpos
-    if nextchars == "" goto found
-  ws_scan2:
-    if $I0 < pos goto end
-    $S0 = substr target, $I0, 1
-    $I1 = index nextchars, $S0
-    if $I1 >= 0 goto found
+    if $I0 == pos goto nobacktrack
     $I1 = length nextchars
+    if $I1 == 0 goto backtrack
     $I2 = find_cclass .CCLASS_WHITESPACE, nextchars, 0, $I1
-    if $I2 == $I1 goto end
-  found:
+    if $I2 >= $I1 goto nobacktrack
+  backtrack:
     mpos = $I0
-    if $I0 == pos goto end
     $P0 = corou
     $P0 = clone $P0
     setattribute mob, "PGE::Match\x0&:corou", $P0
     $P0(mob, mfrom, mpos)
+    .return (mob)
+  nobacktrack:
+    if nextchars == "" goto found
+    $S1 = substr target, $I0, 1
+    $I1 = index nextchars, $S1
+    if $I1 < 0 goto end
+  found:
+    mpos = $I0
   end:
     .return (mob)
 .end
