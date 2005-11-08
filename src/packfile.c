@@ -442,7 +442,7 @@ in the sub structure, so that the eval PMC is kept alive be living subs.
 */
 
 void
-fixup_subs(Interp *interpreter, struct PackFile_ByteCode *self, 
+fixup_subs(Interp *interpreter, struct PackFile_ByteCode *self,
         int action, PMC *eval_pmc)
 {
     opcode_t i, ci;
@@ -2310,8 +2310,12 @@ Parrot_debug_add_mapping(Interp *interpreter,
         case PF_DEBUGMAPPINGTYPE_FILENAME:
             /* Need to put filename in constants table. */
             ct->const_count = ct->const_count + 1;
-            ct->constants = mem_sys_realloc(ct->constants,
-                ct->const_count * sizeof(Parrot_Pointer));
+            if (ct->constants)
+                ct->constants = mem_sys_realloc(ct->constants,
+                    ct->const_count * sizeof(Parrot_Pointer));
+            else
+                ct->constants = mem_sys_allocate(
+                    ct->const_count * sizeof(Parrot_Pointer));
             fnconst = PackFile_Constant_new(interpreter);
             fnconst->type = PFC_STRING;
             fnconst->u.string = string_from_cstring(interpreter, filename, 0);
@@ -2356,13 +2360,13 @@ Parrot_debug_pc_to_filename(Interp *interpreter,
             switch (debug->mappings[i]->mapping_type)
             {
                 case PF_DEBUGMAPPINGTYPE_NONE:
-                    return string_from_const_cstring(interpreter, 
+                    return string_from_const_cstring(interpreter,
                         "(unknown file)", 0);
                 case PF_DEBUGMAPPINGTYPE_FILENAME:
                     return PF_CONST(debug->code,
                         debug->mappings[i]->u.filename)->u.string;
                 case PF_DEBUGMAPPINGTYPE_SOURCESEG:
-                    return string_from_const_cstring(interpreter, 
+                    return string_from_const_cstring(interpreter,
                         "(unknown file)", 0);
             }
         }
