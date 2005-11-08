@@ -1052,6 +1052,8 @@ assignment:
          }
    | op_assign
    | func_assign
+   | target '=' PNULL
+                   {  $$ =MK_I(interp, cur_unit, "null", 1, $1); }
    ;
 
 op_assign:

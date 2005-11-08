@@ -3,7 +3,7 @@
 # $Id$
 
 use strict;
-use Parrot::Test tests => 24;
+use Parrot::Test tests => 25;
 
 ##############################
 pir_output_is(<<'CODE', <<'OUT', "+=");
@@ -298,6 +298,19 @@ pir_output_is(<<'CODE', <<'OUT', "if null X goto Y");
 .sub main :main
     $S0 = "hello"
     if null $S0 goto BLAH
+    print "PASS\n"
+    end
+BLAH:
+   print "FAIL"
+.end
+CODE
+PASS
+OUT
+
+pir_output_is(<<'CODE', <<'OUT', 'unless null X goto Y, $P0 = null');
+.sub main :main
+    $P0 = null
+    unless null $P0 goto BLAH
     print "PASS\n"
     end
 BLAH:
