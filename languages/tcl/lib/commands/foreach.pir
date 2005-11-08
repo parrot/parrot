@@ -92,6 +92,10 @@ loop_inner:
 
   .local string varname,sigil_varname
   .local pmc value
+
+  $I0 = varnames
+  if counter >= $I0 goto loop_inner_done_good
+
   varname = varnames[counter]
   sigil_varname = "$" . varname
   $P0 = arglists[counter]
@@ -106,7 +110,6 @@ loop_inner:
 store_lex:
     store_lex -1, sigil_varname, value
 store_done:
-
   got_one = 1
   goto loop_inner
 empty_var:
