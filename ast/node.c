@@ -904,9 +904,9 @@ exp_Py_Module(Interp* interpreter, nodeType *p)
     sub = mk_sub_label(interpreter, str_dup("__main__"));
     ins = INS_LABEL(cur_unit, sub, 1);
 
-    ins->r[1] = mk_pcc_sub(interpreter, str_dup(ins->r[0]->name), 0);
+    ins->r[0] = mk_pcc_sub(interpreter, str_dup(ins->r[0]->name), 0);
     add_namespace(interpreter, cur_unit);
-    ins->r[1]->pcc_sub->pragma = P_MAIN;
+    ins->r[0]->pcc_sub->pragma = P_MAIN;
     regs[0] = get_const(interpreter, "0", 'I');
     insINS(interpreter, cur_unit, ins, "new_pad", regs, 1);
     /*
