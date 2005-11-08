@@ -103,6 +103,7 @@ pir_to_pbc "pbc_merge_t3_1", <<'PIR';
 .sub main :main
     .local string s
     s = test1()
+    print s
 .end
 
 .sub test2

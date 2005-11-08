@@ -108,7 +108,7 @@ pbc_merge_loadpbc(Interp *interpreter, char *fullname)
                 fullname, errno);
         Parrot_exit(1);
     }
-    
+
     /* Get program size. */
     program_size = Parrot_stat_info_intval(interpreter, fs, STAT_FILESIZE);
 
@@ -193,7 +193,7 @@ pbc_merge_bytecode(Interp *interpreter, struct pbc_merge_input **inputs,
         PIO_eprintf(interpreter, "PBC Merge: Error creating bytecode segment.");
         Parrot_exit(1);
     }
-    
+
     /* Loop over input files. */
     for (i = 0; i < num_inputs; i++)
     {
@@ -201,14 +201,14 @@ pbc_merge_bytecode(Interp *interpreter, struct pbc_merge_input **inputs,
         struct PackFile_ByteCode *in_seg = inputs[i]->pf->cur_cs;
         if (in_seg == NULL)
         {
-            PIO_eprintf(interpreter, 
+            PIO_eprintf(interpreter,
                 "PBC Merge: Cannot locate bytecode segment in %s",
                 inputs[i]->filename);
             Parrot_exit(1);
         }
 
         /* Re-allocate the current buffer. */
-        bc = mem_sys_realloc(bc, 
+        bc = mem_sys_realloc(bc,
             (cursor + in_seg->base.size) * sizeof(opcode_t));
         if (bc == NULL)
         {
@@ -217,10 +217,10 @@ pbc_merge_bytecode(Interp *interpreter, struct pbc_merge_input **inputs,
         }
 
         /* Copy data and store cursor. */
-        memcpy(bc + cursor, in_seg->base.data, 
+        memcpy(bc + cursor, in_seg->base.data,
             in_seg->base.size * sizeof(opcode_t));
         inputs[i]->code_start = cursor;
-        
+
         /* Update cursor. */
         cursor += in_seg->base.size;
     }
@@ -277,14 +277,14 @@ pbc_merge_constants(Interp *interpreter, struct pbc_merge_input **inputs,
                 inputs[i]->filename);
             Parrot_exit(1);
         }
-        
+
         /* Store cursor as position where constant table starts. */
         inputs[i]->const_start = cursor;
 
         /* Allocate space for the constant list, provided we have some. */
         if (in_seg->const_count > 0)
         {
-            constants = mem_sys_realloc(constants, 
+            constants = mem_sys_realloc(constants,
                 (cursor + in_seg->const_count) * sizeof(Parrot_Pointer));
             if (constants == NULL)
             {
@@ -305,7 +305,7 @@ pbc_merge_constants(Interp *interpreter, struct pbc_merge_input **inputs,
                 PIO_eprintf(interpreter, "PBC Merge: Out of memory");
                 Parrot_exit(1);
             }
-            
+
             /* Copy. */
             memcpy(copy, cur_entry, sizeof(struct PackFile_Constant));
 
@@ -323,7 +323,7 @@ pbc_merge_constants(Interp *interpreter, struct pbc_merge_input **inputs,
                         break;
                 }
             }
-            
+
             /* Slot it into the list. */
             constants[cursor] = copy;
             cursor++;
@@ -386,7 +386,7 @@ pbc_merge_fixups(Interp *interpreter, struct pbc_merge_input **inputs,
         /* Allocate space for these fixups, provided we have some. */
         if (in_seg->fixup_count > 0)
         {
-            fixups = mem_sys_realloc(fixups, 
+            fixups = mem_sys_realloc(fixups,
                 (cursor + in_seg->fixup_count) * sizeof(Parrot_Pointer));
             if (fixups == NULL)
             {
@@ -409,7 +409,7 @@ pbc_merge_fixups(Interp *interpreter, struct pbc_merge_input **inputs,
                 PIO_eprintf(interpreter, "PBC Merge: Out of memory");
                 Parrot_exit(1);
             }
-            
+
             /* Copy type and name. */
             copy->type = cur_entry->type;
             strcpy(name_copy, cur_entry->name);
@@ -428,9 +428,9 @@ pbc_merge_fixups(Interp *interpreter, struct pbc_merge_input **inputs,
                     PIO_eprintf(interpreter, "PBC Merge: Unknown fixup type");
                     Parrot_exit(1);
             }
-            
+
             copy->seg = bc;
-            
+
             /* Slot it into the list. */
             fixups[cursor] = copy;
             cursor++;
@@ -447,7 +447,7 @@ pbc_merge_fixups(Interp *interpreter, struct pbc_merge_input **inputs,
 
 =item C<static void
 pbc_merge_debugs(Interp *interpreter, struct pbc_merge_input **inputs,
-                 int num_inputs, struct PackFile *pf, 
+                 int num_inputs, struct PackFile *pf,
                  struct PackFile_ByteCode *bc)>
 
 This function merges the debug segments from the input PBC files.
@@ -457,7 +457,7 @@ This function merges the debug segments from the input PBC files.
 */
 static void
 pbc_merge_debugs(Interp *interpreter, struct pbc_merge_input **inputs,
-                 int num_inputs, struct PackFile *pf, 
+                 int num_inputs, struct PackFile *pf,
                  struct PackFile_ByteCode *bc)
 {
     struct PackFile_Debug *debug_seg;
@@ -476,25 +476,25 @@ pbc_merge_debugs(Interp *interpreter, struct pbc_merge_input **inputs,
         struct PackFile_Debug *in_seg = inputs[i]->pf->cur_cs->debugs;
 
         /* Concatenate line numbers. */
-        lines = mem_sys_realloc(lines, 
+        lines = mem_sys_realloc(lines,
                 (num_lines + in_seg->base.size) * sizeof(opcode_t));
         if (lines == NULL)
         {
             PIO_eprintf(interpreter, "PBC Merge: Cannot reallocate memory\n");
             Parrot_exit(1);
         }
-        memcpy(lines + num_lines, in_seg->base.data, 
+        memcpy(lines + num_lines, in_seg->base.data,
             in_seg->base.size * sizeof(opcode_t));
-        
+
         /* Concatenate mappings. */
         mappings = mem_sys_realloc(mappings,
-                   (num_mappings + in_seg->num_mappings) * 
+                   (num_mappings + in_seg->num_mappings) *
                    sizeof(Parrot_Pointer));
         for (j = 0; j < in_seg->num_mappings; j++)
         {
             struct PackFile_DebugMapping *mapping = mem_sys_allocate(
                 sizeof(struct PackFile_DebugMapping));
-            memcpy(mapping, in_seg->mappings[j], 
+            memcpy(mapping, in_seg->mappings[j],
                 sizeof(struct PackFile_DebugMapping));
             mapping->offset += num_lines;
             if (mapping->mapping_type == PF_DEBUGMAPPINGTYPE_FILENAME)
@@ -506,11 +506,11 @@ pbc_merge_debugs(Interp *interpreter, struct pbc_merge_input **inputs,
         num_lines += in_seg->base.size;
         num_mappings += in_seg->num_mappings;
     }
-    
+
     /* Create merged debug segment. Replace created data and mappings
        with merged ones we have created. */
     debug_seg = Parrot_new_debug_seg(interpreter, bc, num_lines);
-    PackFile_add_segment(interpreter, &pf->directory, 
+    PackFile_add_segment(interpreter, &pf->directory,
                          (struct PackFile_Segment*)debug_seg);
     free(debug_seg->base.data);
     debug_seg->base.data = lines;
@@ -524,7 +524,7 @@ pbc_merge_debugs(Interp *interpreter, struct pbc_merge_input **inputs,
 
 =item C<static void
 pbc_merge_ctpointers(Interp *interpreter, struct pbc_merge_input **inputs,
-                     int num_inputs, struct PackFile *pf, 
+                     int num_inputs, struct PackFile *pf,
                      struct PackFile_ByteCode *bc,
                      struct PackFile_ConstTable *ct)>
 
@@ -536,7 +536,7 @@ bytecode.
 */
 static void
 pbc_merge_ctpointers(Interp *interpreter, struct pbc_merge_input **inputs,
-                     int num_inputs, struct PackFile *pf, 
+                     int num_inputs, struct PackFile *pf,
                      struct PackFile_ByteCode *bc,
                      struct PackFile_ConstTable *ct)
 {
@@ -559,7 +559,7 @@ pbc_merge_ctpointers(Interp *interpreter, struct pbc_merge_input **inputs,
 		op_num = ops[cur_op];
         op = &interpreter->op_info_table[op_num];
         cur_op++;
-        
+
         /* Loop over the arguments. */
         for (cur_arg = 1; cur_arg < op->arg_count; cur_arg++)
         {
@@ -626,7 +626,7 @@ pbc_merge_begin(Interp *interpreter, struct pbc_merge_input **inputs,
 
     /* Walk bytecode and fix ops that reference the constants table. */
     pbc_merge_ctpointers(interpreter, inputs, num_inputs, merged, bc, ct);
-    
+
     /* Return merged result. */
     return merged;
 }
@@ -651,7 +651,7 @@ pbc_merge_write(Interp *interpreter, struct PackFile *pf, char *filename)
 
     /* Get size of packfile we'll write. */
     size = PackFile_pack_size(interpreter, pf) * sizeof(opcode_t);
-    
+
     /* Allocate memory. */
     pack = (opcode_t*) mem_sys_allocate(size);
     if (pack == NULL) {
@@ -705,6 +705,7 @@ main(int argc, char **argv)
     /* Create a Parrot interpreter. */
     interpreter = make_interpreter(NULL, PARROT_NO_FLAGS);
     Parrot_init(interpreter);
+    Parrot_block_DOD(interpreter);
 
     /* Get options, ensuring we have at least one input
        file and an output file. */
@@ -748,7 +749,7 @@ main(int argc, char **argv)
         }
 
         /* Load the packfile and unpack it. */
-        input_files[i]->pf = pbc_merge_loadpbc(interpreter, 
+        input_files[i]->pf = pbc_merge_loadpbc(interpreter,
             input_files[i]->filename);
         if (input_files[i]->pf == NULL)
         {
