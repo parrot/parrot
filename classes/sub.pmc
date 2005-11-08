@@ -32,6 +32,8 @@ clear_fixup(Interp* interpreter, PMC* self)
     struct PackFile_ConstTable *ct;
 
     seg = PMC_sub(self)->seg;
+    if (!seg)
+        return;
     ft = seg->fixups;
     if (!ft)
         return;

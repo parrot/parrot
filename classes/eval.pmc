@@ -44,7 +44,7 @@ clear_fixups(Interp* interpreter, PMC* self)
             case enum_fixup_sub:
                 ci = ft->fixups[i]->offset;
                 sub = ct->constants[ci]->u.key;
-                VTABLE_destroy(interpreter, sub);
+                PMC_sub(sub)->seg = NULL;
                 ct->constants[ci]->u.key = NULL;
                 ft->fixups[i]->type = 0;
         }
