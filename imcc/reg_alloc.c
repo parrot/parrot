@@ -640,8 +640,8 @@ try_allocate(Parrot_Interp interpreter, IMC_Unit * unit)
      * unit->n_symbols should be an upper limit of needed colors
      */
     n = unit->n_symbols;
-    if (unit->max_color > n)
-        n = unit->max_color;
+    if (unit->max_color >= n)
+        n = unit->max_color + 1;
     avail = mem_sys_allocate(n);
 
     for (x = 0; x < unit->n_symbols; ++x) {
