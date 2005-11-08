@@ -48,7 +48,6 @@ typedef struct _Life_range {
 enum USAGE {
 	U_KEYED		= 1 << 0,	/* array, hash, keyed */
 	U_NEW		= 1 << 1,	/* PMC was inited */
-	U_SPILL		= 1 << 2,	/* reg is spilled */
 	U_GLOBAL        = 1 << 3,       /* symbol is global (fixup) */
 	U_LEXICAL       = 1 << 4,       /* symbol is lexical */
 	U_FIXUP         = 1 << 5,       /* maybe not global, force fixup */
