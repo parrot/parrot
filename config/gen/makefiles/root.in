@@ -300,7 +300,6 @@ FLUID_FILES = \
 # these are private to the IMCC subsystem
 IMCC_H_FILES = \
     $(IMCC_DIR)/imc.h \
-    $(IMCC_DIR)/stacks.h \
     $(IMCC_DIR)/cfg.h \
     $(IMCC_DIR)/class.h \
     $(IMCC_DIR)/instructions.h \
@@ -318,7 +317,6 @@ IMCC_O_FILES = \
     $(IMCC_DIR)/imcparser$(O) \
     $(IMCC_DIR)/imclexer$(O) \
     $(IMCC_DIR)/imc$(O) \
-    $(IMCC_DIR)/stacks$(O) \
     $(IMCC_DIR)/symbol$(O) \
     $(IMCC_DIR)/class$(O) \
     $(IMCC_DIR)/symreg$(O) \
