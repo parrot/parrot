@@ -1,253 +1,920 @@
-# $Id$
+# $Id $
 
-If you submit a language compiler please write a one-liner that roughly
-indicates the state of your language. Where can the source be found?
-Does it have samples and do they work?
-Is there a README and an easy way to build it? 
-The fields are: (N) Language name, (A) authors/maintainers, (D)
-description, (S) status, (M) maintained, (V) minimum Parrot version
-required, (W) website.
+=head1 Languages targeting parrot
 
-N: Amber for parrot
-A: Roger Browne
-D: Scripting language inspired by Eiffel and ruby
-S: Incomplete - but all examples and test cases are working
-M: Yes
-V: 0.2.1
-W: http://xamber.org/
+Any language that targets parrot should be listed here. In addition,
+any languages bundled with parrot that work with the unified test
+suite will have their test reseults listed under the smokes marked
+'languages' at http://smoke.parrotcode.org/smoke/.
 
-N: BASIC/compiler
-A: Clint Pierce
-A: Will Coleda (work with parrot 0.3.0+)
-D: BASIC Compiler
-S: some of the samples work again.
-M: Yes
-V: 0.3.0
+=head2 Amber for parrot
 
-N: BASIC/interpreter
-A: Clint Pierce
-D: BASIC Interpreter written in pure Parrot
-S: Broken - probably due to changes in PIR syntax.
-M: No?
-V: 0.0.11
+=over 4
 
-N: bc
-A: Bernhard Schmalhofer
-D: Based on ANTLR and Python.
-D: ANTLR is needed only for maintainance, for generation of Python runtime files. 
-S: very simple arithmetic expressions are working
-S: Some test failures
-M: Yes
-V: 0.3.0
+=item Author
 
-N: befunge
-A: Jerome Quelin
-D: Functioning -93 interpreter (input routines may be funky).
-S: Broken with recent deprecation of push[simp]/pop[simp]
-S: Samples working, README explain how to build/use.
-S: (waiting for Parrot objects for a befunge-98 version).
-S: Broken with recent deprecations
-M: Yes
-V: 0.0.11
+Roger Browne
 
-N: bf
-A: Leon Brocard
-S: src/packfile.c:2314: failed assertion `ct->constants!=NULL'
+=item Description
 
-N: Cola
-A: Melvin Smith
-D: Java like language with some hybrid Perl features like regex
-D: operators planned.
-S: Functioning, all samples working, lacks IO routines
-M: Yes
-V: 0.0.11
+Scripting language inspired by Eiffel and ruby
 
-N: Common Lisp
-A: Cory Spencer
-D: Aspires to implement a significant subset of the Common Lisp language.
-M: Yes
-S: broken due to recent deprecations
-V: 0.1.2
+=item Status
 
-N: conversion
-D: An early attempt to support grammars in Bachus-Naur-Format
+Incomplete - but all examples and test cases are working .
 
-N: forth
-A: Dan Sugalski
-M: no
-V: 0.0.13
+=item Last verified with parrot version
 
-N: Jako
-A: Gregor Purdy
-D: C/Perl like language, first compiler for Parrot
-S: Functioning, although not all examples work. Calling conventions and NCI
-S: have changed since the Jako subroutine and NCI code
-S: generation was written, causing some breakage.
-S: broken due to recent deprecations
-M: Yes
-V: 0.0.11
+0.2.1
 
-N: lazy-k
-A: Leopold Tötsch
-D: lazy-k is a pure functional programming language according to the
-D: SKI calculus.
-W: http://homepages.cwi.nl/~tromp/cl/lazy-k.html
-V: 0.2.2
+=item Location
 
-N: Lua for Pirate, formerly known as Pirate, a new name is sought
-A: Klaas-Jan Stol
-D: Making Lua work on Parrot
-S: Not in Parrot CVS, source available from the website
-W: http://members.home.nl/joeijoei/parrot/
-M: Yes
+http://xamber.org/
 
-N: Parrot m4
-A: Bernhard Schmalhofer
-D: Port of GNU m4 to PIR
-S: Functioning for handcrafted test cases.
-S: Eval compiler and loading frozen state are currently broken.
-S: Far from complete.
-S: Revision 0.0.14
-M: Yes
-V: 0.3.0
+=back
 
-N: miniperl
 
-N: Ook
-A: Jerome Quelin
-D: Functioning compiler targeting pasm.
-S: Samples working, README explain how to build/use.
-M: Yes
-V: 0.3.0
+=head2 BASIC/compiler
 
-N: OpenComal
-D: Compiler emiting parrot being added to interpreter
-S: Under development; nowhere near anything yet
-W: http://www.josvisser.nl/opencomal
-V: 0.0.11
+=over 4
 
-N: Parakeet
-A: Michel Pelletier
-D: Parakeet is a Forth that is extremely machine specific to the Parrot VM.
-D: Parakeet also has a lot of features not found in standard Forth, like local
-D: variables, nested words and classes and (as a result) nested
-D: compile-time and run-time lexical word, class and variable scopes.
-S: Under development;
-S: Broken in respect to recent (and upcoming) DEPRECATED items
-W: http://www.daca.net:8080/Parakeet-0.1.tgz
-V: 0.0.11
+=item Author
 
-N: parrot_compiler
-D: An example on how the builtin compilers can be used
+Clint Pierce, Will Coleda (work with parrot 0.3.0+)
 
-N: Perl6
-A: Sean O'Rourke
-D: Perl6 compiler written in Perl5
-S: This prototype of a Perl6 compiler was abandoned in June 2004. Current
-S: work on the compiler may be found in the development of Pugs,
-S: http://www.pugscode.org, and in the Parrot grammar engine (PGE) in
-S: the Parrot repository at compilers/pge.
-M: No
-V: 0.0.11
+=item Description
 
-N: Pint
-A: Alan Knowles
-D: An experimental implementation of PHP
-S: This project has been abandoned. Any takers?
-W: http://www.akbkhome.com/svn.php/PintCompiler
-W: http://www.akbkhome.com/blog.php/View/44/Latest_in_Vapourware_PintCompiler__dbdo.html
+BASIC Compiler
 
-N: Pugs
-A: Autrijus Tang
-D: Perl6 compiler written in Perl6 and Haskell with multiple backends
-S: Basic IO and control flow elements; mutable variables; assignment.
-M: Yes
-V: 0.2.2
-W: http://pugscode.org/
+=item Status
 
-N: Punie
-A: Allison Randal
-D: An implementation of Perl1, implemented in PIR with PGE
-S: All tests fail.
-S: Only 'print 1;' is expected to work, the other tests are marked as TODO.
-M: Yes
-V: 0.3.0
+Most of the samples work.
 
-N: Python
-A: Michal J Wallace
-S: Mostly working except for classes/exec/import. For licensing
-S: reasons, not in parrot's cvs tree.
-M: Yes
-W: http://pirate.tangentcode.com/
-V: 0.0.11
+=item Last verified with parrot version
 
-N: regex
-A: Steve Fink
-S: Working but fairly minimal
-M: Yes
+0.3.0
 
-N: Ruby
-D: See http://rubyforge.org/projects/cardinal/
-M: Last update was in August 2004
+=item Location
 
-N: Span
-A: Matt Kennedy
-D: Span can be most concisely described as
-D: Smalltalk for C++, C#, and Java programmers. It features an object
-D: system modeled on the Smalltalk object system and a language syntax
-D: designed to be easy to learn for developers of C-like languages.
-S: Working
-S: Not in parrot SVN
-W: http://homepage.mac.com/matt.kennedy/Span
-M: Yes
-V: 0.0.11
+C<languages/BASIC/compiler>
 
-N: Scheme
-A: Jeffrey Goff
-A: Juergen Boemmels
-S: Functioning, as far as implemented. Lists and functions are working
-S: but many functions are missing implementation.
-S: 70% pass ratio due to recent deprecations
-M: Yes
-V: 0.3.0
+=back
 
-N: Tcl ("partcl")
-A: Will Coleda
-A: Matt Diephouse
-S: Some tests failing after switch to compiler.
-S: passes about 10% of *tcl*'s test suite (modulo clock).
-M: Yes
-V: 0.3.0
 
-N: unlamba
-A: Leopold Tötsch
-D: unlambda is a pure functional programming language with mostly eager
-D: evaluation following the SKI calculus (+ a few extensions)
-S: Bus error (OS X only?)
-W: http://www.madore.org/~david/programs/unlambda/
-V: 0.2.2
+=head2 BASIC/interpreter
 
-N: URM
-A: Marcus Thiesen
-S: Functioning, all examples working
-S: Language standard is stable and not expected to change soon.
-M: Yes
-V: 0.3.0
+=over 4
 
-N: YAL
-A: Leopold Toetsch
-S: YAL is Yet Another Language
-S: Its mainly intended to test an AST interface and for checking, if and how
-S: code generation plays nicely together with Parrot opcodes.
-W: http://toetsch.at/yal/
-M: Yes
-V: 0.0.13
+=item Author
 
-N: Zcode
-A: Amir Karger (taken over from Leo)
-D: Infocom's Z-machine
-S: 25 out of 66 Z3 opcodes all or mostly done. A long way from Zork.
-S: broken with recent deprecations.
-M: Yes
-V: 0.2.3
+Clint Pierce
+
+=item Description
+
+BASIC Interpreter written in pure Parrot
+
+=item Status
+
+Broken - probably due to recent deprecations.
+
+=item Last verified with parrot version
+
+0.0.11
+
+=item Location
+
+C<languages/BASIC/interpreter>
+
+=back
+
+
+=head2 bc
+
+=over 4
+
+=item Author
+
+Bernhard Schmalhofer
+
+=item Description
+
+Based on ANTLR and Python. ANTLR is needed only for maintainance, for generation of Python runtime files. 
+
+=item Status
+
+Very simple arithmetic expressions are working. Some test failures
+
+=item Last verified with parrot version
+
+0.3.0
+
+=item Location
+
+C<languages/bc>
+
+=back
+
+
+=head2 befunge
+
+=over 4
+
+=item Author
+
+Jerome Quelin
+
+=item Description
+
+Functioning -93 interpreter (input routines may be funky).
+
+=item Status
+
+Broken with recent deprecation of push[simp]/pop[simp]. Samples working,
+README explain how to build/use. (waiting for Parrot objects for a
+befunge-98 version).
+
+=item Last verified with parrot version
+
+0.0.11
+
+=item Location
+
+C<languages/befunge>
+
+=back
+
+
+=head2 bf
+
+=over 4
+
+=item Author
+
+Leon Brocard
+
+=item Description
+
+bf
+
+=item Status
+
+ src/packfile.c:2314: failed assertion `ct->constants!=NULL'
+
+=item Last verified with parrot version
+
+Unknown
+
+=item Location
+
+C<languages/bf>
+
+=back
+
+
+=head2 Cola
+
+=over 4
+
+=item Author
+
+Melvin Smith
+
+=item Description
+
+Java like language with some hybrid Perl features like regex operators planned.
+
+=item Status
+
+Functioning, all samples working, lacks IO routines
+
+=item Last verified with parrot version
+
+0.0.11
+
+=item Location
+
+C<languages/cola>
+
+=back
+
+
+=head2 Common Lisp
+
+=over 4
+
+=item Author
+
+Cory Spencer
+
+=item Description
+
+Aspires to implement a significant subset of the Common Lisp language.
+
+=item Status
+
+broken due to recent deprecations
+
+=item Last verified with parrot version
+
+0.1.2
+
+=item Location
+
+C<languages/lisp>
+
+=back
+
+
+=head2 conversion
+
+=over 4
+
+=item Author
+
+Unknown
+
+=item Description
+
+An early attempt to support grammars in Bachus-Naur-Format
+
+=item Status
+
+Unknown
+
+=item Last verified with parrot version
+
+Unknown
+
+=item Location
+
+C<languages/conversion>
+
+=back
+
+
+=head2 forth
+
+=over 4
+
+=item Author
+
+Dan Sugalski
+
+=item Description
+
+forth
+
+=item Status
+
+Unknown
+
+=item Last verified with parrot version
+
+0.0.13
+
+=item Location
+
+C<languages/forth>
+
+=back
+
+
+=head2 Jako
+
+=over 4
+
+=item Author
+
+Gregor Purdy
+
+=item Description
+
+C/Perl like language, first compiler for Parrot
+
+=item Status
+
+Functioning, although not all examples work. Calling conventions and NCI
+have changed since the Jako subroutine and NCI code generation was written,
+causing some breakage.
+
+=item Last verified with parrot version
+
+0.0.11
+
+=item Location
+
+C<languages/jako>
+
+=back
+
+
+=head2 lazy-k
+
+=over 4
+
+=item Author
+
+Leopold Toetsch
+
+=item Description
+
+lazy-k is a pure functional programming language according to the SKI calculus.
+
+=item Status
+
+Unknown
+
+=item Last verified with parrot version
+
+0.2.2
+
+=item Location
+
+http://homepages.cwi.nl/~tromp/cl/lazy-k.html
+
+=back
+
+
+=head2 Lua for Pirate (formerly known as Pirate, a new name is sought)
+
+=over 4
+
+=item Author
+
+Klaas-Jan Stol
+
+=item Description
+
+Making Lua work on Parrot
+
+=item Status
+
+Unknown
+
+=item Last verified with parrot version
+
+Unknown
+
+=item Location
+
+http://members.home.nl/joeijoei/parrot/
+
+=back
+
+
+=head2 Parrot m4
+
+=over 4
+
+=item Author
+
+Bernhard Schmalhofer
+
+=item Description
+
+Port of GNU m4 to PIR
+
+=item Status
+
+Functioning for handcrafted test cases. Eval compiler and loading frozen
+state are currently broken. Far from complete. Revision 0.0.14
+
+=item Last verified with parrot version
+
+0.3.0
+
+=item Location
+
+C<languages/m4>
+
+=back
+
+
+=head2 miniperl
+
+=over 4
+
+=item Author
+
+Unknown
+
+=item Description
+
+miniperl
+
+=item Status
+
+Unknown
+
+=item Last verified with parrot version
+
+Unknown
+
+=item Location
+
+C<languages/miniperl>
+
+=back
+
+
+=head2 Ook
+
+=over 4
+
+=item Author
+
+Jerome Quelin
+
+=item Description
+
+Functioning compiler targeting pasm.
+
+=item Status
+
+Samples working, README explain how to build/use.
+
+=item Last verified with parrot version
+
+0.3.0
+
+=item Location
+
+C<languages/ook>
+
+=back
+
+
+=head2 OpenComal
+
+=over 4
+
+=item Author
+
+Unknown
+
+=item Description
+
+Compiler emiting parrot being added to interpreter
+
+=item Status
+
+Under development; nowhere near anything yet
+
+=item Last verified with parrot version
+
+0.0.11
+
+=item Location
+
+http://www.josvisser.nl/opencomal
+
+=back
+
+
+=head2 Parakeet
+
+=over 4
+
+=item Author
+
+Michel Pelletier
+
+=item Description
+
+Parakeet is a Forth that is extremely machine specific to the Parrot VM.
+Parakeet also has a lot of features not found in standard Forth, like local
+variables, nested words and classes and (as a result) nested compile-time and
+run-time lexical word, class and variable scopes.
+
+=item Status
+
+Under development; Broken in respect to recent (and upcoming) DEPRECATED items
+
+=item Last verified with parrot version
+
+0.0.11
+
+=item Location
+
+http://www.daca.net:8080/Parakeet-0.1.tgz
+
+=back
+
+
+=head2 parrot_compiler
+
+=over 4
+
+=item Author
+
+Unknown
+
+=item Description
+
+An example on how the builtin compilers can be used
+
+=item Status
+
+Unknown
+
+=item Last verified with parrot version
+
+Unknown
+
+=item Location
+
+C<languages/parrot_compiler>
+
+=back
+
+
+=head2 Perl6
+
+=over 4
+
+=item Author
+
+Sean O'Rourke
+
+=item Description
+
+Perl6 compiler written in Perl5
+
+=item Status
+
+This prototype of a Perl6 compiler was abandoned in June 2004. Current work on
+the compiler may be found in the development of Pugs, http://www.pugscode.org,
+and in the Parrot grammar engine (PGE) in the Parrot repository at compilers/pge.
+
+=item Last verified with parrot version
+
+0.0.11
+
+=item Location
+
+C<languages/perl6>
+
+=back
+
+
+=head2 Pint
+
+=over 4
+
+=item Author
+
+Alan Knowles
+
+=item Description
+
+An experimental implementation of PHP
+
+=item Status
+
+This project has been abandoned. Any takers?
+
+=item Last verified with parrot version
+
+Unknown
+
+=item Location
+
+http://www.akbkhome.com/svn.php/PintCompiler http://www.akbkhome.com/blog.php/View/44/Latest_in_Vapourware_PintCompiler__dbdo.html
+
+=back
+
+
+=head2 Pugs
+
+=over 4
+
+=item Author
+
+Autrijus Tang, et al.
+
+=item Description
+
+Perl6 compiler written in Perl6 and Haskell with multiple backends
+
+=item Status
+
+Basic IO and control flow elements; mutable variables; assignment.
+
+=item Last verified with parrot version
+
+0.2.2
+
+=item Location
+
+http://pugscode.org/
+
+=back
+
+
+=head2 Punie
+
+=over 4
+
+=item Author
+
+Allison Randal
+
+=item Description
+
+An implementation of Perl1, implemented in PIR with PGE
+
+=item Status
+
+All tests fail. Only 'print 1;' is expected to work, the other tests are 
+marked as TODO.
+
+=item Last verified with parrot version
+
+0.3.0
+
+=item Location
+
+C<languages/punie>
+
+=back
+
+
+=head2 Python
+
+=over 4
+
+=item Author
+
+Michal J Wallace
+
+=item Description
+
+python
+
+=item Status
+
+Mostly working except for classes/exec/import. For licensing reasons, not in 
+parrot's svn tree.
+
+=item Last verified with parrot version
+
+0.0.11
+
+=item Location
+
+http://pirate.tangentcode.com/
+
+=back
+
+
+=head2 regex
+
+=over 4
+
+=item Author
+
+Steve Fink
+
+=item Description
+
+regex
+
+=item Status
+
+Working but fairly minimal
+
+=item Last verified with parrot version
+
+Unknown
+
+=item Location
+
+C<languages/regex>
+
+=back
+
+
+=head2 Ruby
+
+=over 4
+
+=item Author
+
+Unknown
+
+=item Description
+
+Ruby
+
+=item Status
+
+Unknown
+
+=item Last verified with parrot version
+
+Unknown
+
+=item Location
+
+http://rubyforge.org/projects/cardinal/
+
+=back
+
+
+=head2 Span
+
+=over 4
+
+=item Author
+
+Matt Kennedy
+
+=item Description
+
+Span can be most concisely described as Smalltalk for C++, C#, and Java
+programmers. It features an object system modeled on the Smalltalk object
+system and a language syntax designed to be easy to learn for developers of
+C-like languages.
+
+=item Status
+
+Working.
+
+=item Last verified with parrot version
+
+0.0.11
+
+=item Location
+
+http://homepage.mac.com/matt.kennedy/Span
+
+=back
+
+
+=head2 Scheme
+
+=over 4
+
+=item Author
+
+Jeffrey Goff, Juergen Boemmels
+
+=item Description
+
+Scheme
+
+=item Status
+
+Functioning, as far as implemented. Lists and functions are working but many
+functions are missing implementation. 70% pass ratio due to recent deprecations.
+
+=item Last verified with parrot version
+
+0.3.0
+
+=item Location
+
+C<languages/scheme>
+
+=back
+
+
+=head2 Tcl ("partcl")
+
+=over 4
+
+=item Author
+
+Will Coleda, Matt Diephouse, et al.
+
+=item Description
+
+A from scratch implementation of a Tcl 8.5 compiler in parrot.
+
+=item Status
+
+Some tests failing due to unimplemented unicode features.
+Passes about 10% of *tcl*'s test suite (modulo clock).
+Still many builtins to implement.
+
+=item Last verified with parrot version
+
+0.3.1
+
+=item Location
+
+C<languages/tcl>
+
+=back
+
+
+=head2 unlamba
+
+=over 4
+
+=item Author
+
+Leopold Toetsch
+
+=item Description
+
+unlambda is a pure functional programming language with mostly eager evaluation following the SKI calculus (+ a few extensions)
+
+=item Status
+
+Bus error (OS X only?)
+
+=item Last verified with parrot version
+
+0.2.2
+
+=item Location
+
+http://www.madore.org/~david/programs/unlambda/
+
+=back
+
+
+=head2 URM
+
+=over 4
+
+=item Author
+
+Marcus Thiesen
+
+=item Description
+
+URM
+
+=item Status
+
+Functioning, all examples working. Language standard is stable and not
+expected to change soon.
+
+=item Last verified with parrot version
+
+0.3.1
+
+=item Location
+
+C<languages/urm>
+
+=back
+
+
+=head2 YAL
+
+=over 4
+
+=item Author
+
+Leopold Toetsch
+
+=item Description
+
+Yet Another Language
+
+=item Status
+
+It's mainly intended to test an AST interface and for checking that
+code generation plays nicely together with Parrot opcodes.
+
+=item Last verified with parrot version
+
+0.0.13
+
+=item Location
+
+http://toetsch.at/yal/
+
+=back
+
+
+=head2 Zcode
+
+=over 4
+
+=item Author
+
+Amir Karger, Leopold Toetsch
+
+=item Description
+
+Infocom's Z-machine
+
+=item Status
+
+25 out of 66 Z3 opcodes all or mostly done. A long way from Zork.
+Broken with recent deprecations.
+
+=item Last verified with parrot version
+
+0.2.3
+
+=item Location
+
+C<languges/Zcode>
+
+=back
 
