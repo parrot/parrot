@@ -279,11 +279,6 @@ sub new
             $self->c_pair_item('', 'tsq'),
         ),
         $self->new_group(
-            'Regular Expressions', 
-            '',
-            $self->c_pair_item('Regular expression support.', 'rx', 'rxstacks'),
-        ),
-        $self->new_group(
             'Exceptions',
             '',
             $self->c_pair_item('', 'exceptions'),
