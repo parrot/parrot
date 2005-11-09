@@ -1,6 +1,8 @@
 RM_F    = ${rm_f}
 PERL    = ${perl}
 PARROT  = ..${slash}..${slash}parrot${exe}
+PBC_MERGE = ..${slash}..${slash}pbc_merge${exe}
+
 LIBPATH  = lib
 BUILD   = $(PERL) ${build_dir}${slash}build_tools${slash}build_dynclasses.pl
 DESTDIR = ${build_dir}${slash}runtime${slash}parrot${slash}dynext
@@ -83,8 +85,13 @@ lib${slash}variables.pir \
 tcl.pir_template \
 tcl.pl
 
-tcl.pbc: pmcs lib${slash}tcllib.pbc lib${slash}tclbinaryops.pbc lib${slash}tclcommand.pbc lib${slash}tclcommandlist.pbc lib${slash}tclconst.pbc lib${slash}tclfunc.pbc lib${slash}tclops.pbc lib${slash}tclvar.pbc lib${slash}tclword.pbc tcl.pir
+tcl.pbc: pmcs lib/tcllib.pbc tcl.pir
 	$(PARROT) --output=tcl.pbc tcl.pir
+
+PBCS = lib${slash}tcllib_temp.pbc lib${slash}tclbinaryops.pbc lib${slash}tclcommand.pbc lib${slash}tclcommandlist.pbc lib${slash}tclconst.pbc lib${slash}tclfunc.pbc lib${slash}tclops.pbc lib${slash}tclvar.pbc lib${slash}tclword.pbc
+
+lib/tcllib.pbc: $(PBCS)
+	$(PBC_MERGE) -o lib/tcllib.pbc $(PBCS)
 
 pmcs:
 	@cd $(CLASSDIR) && $(BUILD) generate $(PMCS)
@@ -92,14 +99,11 @@ pmcs:
 	@cd $(CLASSDIR) && $(BUILD) linklibs $(PMCS)
 	@cd $(CLASSDIR) && $(BUILD) copy "--destination=$(DESTDIR)" $(PMCS)
 
-$(DEPS) : 
-
-
 lib${slash}tcllib.pir: $(DEPS)
 	$(PERL) tcl.pl > lib${slash}tcllib.pir
 
-lib${slash}tcllib.pbc: lib${slash}tcllib.pir
-	$(PARROT) --output=$(LIBPATH)${slash}tcllib.pbc $(LIBPATH)${slash}tcllib.pir
+lib${slash}tcllib_temp.pbc: lib${slash}tcllib.pir
+	$(PARROT) --output=$(LIBPATH)${slash}tcllib_temp.pbc $(LIBPATH)${slash}tcllib.pir
 
 lib${slash}tclbinaryops.pbc: lib${slash}tclbinaryops.pir
 	$(PARROT) --output=$(LIBPATH)${slash}tclbinaryops.pbc $(LIBPATH)${slash}tclbinaryops.pir
@@ -141,7 +145,7 @@ devtest:
 	cd t && $(PERL) -e 'use Test::Harness qw($$verbose runtests) ; $$Test::Harness::verbose=1;runtests(glob("*.t"))' && cd ..
 
 clean:
-	$(RM_F) lib${slash}tcllib.pir tcl.pbc lib${slash}*.pbc $(CLASSDIR)${slash}pmc_*.h $(CLASSDIR)${slash}*_group.h $(CLASSDIR)${slash}*$(LOAD_EXT) $(CLASSDIR)${slash}*.dump $(CLASSDIR)${slash}*.c $(CLASSDIR)${slash}*$(O)
+	$(RM_F) lib${slash}tcllib.pir $(PBCS) lib${slash}*.pbc $(CLASSDIR)${slash}pmc_*.h $(CLASSDIR)${slash}*_group.h $(CLASSDIR)${slash}*$(LOAD_EXT) $(CLASSDIR)${slash}*.dump $(CLASSDIR)${slash}*.c $(CLASSDIR)${slash}*$(O)
 
 distclean: clean
 	$(RM_F) Makefile

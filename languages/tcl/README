@@ -5,9 +5,9 @@ A from scratch implementation of Tcl on Parrot. (partcl)
 To build the tcl compiler, first build parrot and the parrot utilities.
 From the top level parrot directory:
 
- perl Configure.pl && make world
+ perl Configure.pl && make
 
-Then, type C<make> in this directory. This will
+Then, type C<make> in I<this> directory. This will
 generate the file C<tcl.pbc> which can then be used to run tcl programs.
 
  ../../parrot tcl.pbc foo.tcl
