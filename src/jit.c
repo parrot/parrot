@@ -67,17 +67,6 @@ void Parrot_jit_debug(Interp* interpreter);
 char **Parrot_exec_rel_addr;
 int Parrot_exec_rel_count;
 
-#define ADD_OP_VAR_PART(interpreter, pc, n) do { \
-    if (*pc == PARROT_OP_set_args_pc || \
-            *pc == PARROT_OP_get_results_pc || \
-            *pc == PARROT_OP_get_params_pc || \
-            *pc == PARROT_OP_set_returns_pc) { \
-        PMC *sig; \
-        sig = interpreter->code->const_table->constants[pc[1]]->u.key; \
-        n += VTABLE_elements(interpreter, sig); \
-    } \
-} while (0)
-
 /*
 
 =item C<static void
@@ -268,7 +257,7 @@ make_branch_list(Interp *interpreter,
             optimizer->has_unpredictable_jump = 1;
         }
         /* Move to the next opcode */
-        ADD_OP_VAR_PART(interpreter, cur_op, n);
+        ADD_OP_VAR_PART(interpreter, interpreter->code, cur_op, n);
         cur_op += n;
     }
     insert_fixup_targets(interpreter, branch, code_end - code_start);
@@ -442,7 +431,7 @@ make_sections(Interp *interpreter,
 
         /* Calculate the next pc */
         next_op = cur_op + op_info->arg_count;
-        ADD_OP_VAR_PART(interpreter, cur_op, next_op);
+        ADD_OP_VAR_PART(interpreter, interpreter->code, cur_op, next_op);
 
         /* Update op_count */
         cur_section->op_count++;
@@ -770,7 +759,7 @@ assign_registers(Interp *interpreter,
 
         /* Move to the next opcode */
         n = op_info->arg_count;
-        ADD_OP_VAR_PART(interpreter, cur_op, n);
+        ADD_OP_VAR_PART(interpreter, interpreter->code, cur_op, n);
         cur_op += n;
     }
 }
@@ -863,7 +852,7 @@ debug_sections(Interp *interpreter,
 #  endif
 
             n = op_info->arg_count;
-            ADD_OP_VAR_PART(interpreter, cur_op, n);
+            ADD_OP_VAR_PART(interpreter, interpreter->code, cur_op, n);
             cur_op += n;
         }
         PIO_eprintf(interpreter, "\tbegin:\t%#p\t(%Ou)\n",
@@ -1022,7 +1011,7 @@ optimize_imcc_jit(Interp *interpreter, opcode_t *cur_op,
                     op_info, cur_op, code_start);
             section->op_count++;
             n = op_info->arg_count;
-            ADD_OP_VAR_PART(interpreter, cur_op, n);
+            ADD_OP_VAR_PART(interpreter, interpreter->code, cur_op, n);
             cur_op += n;
         }
         assign_registers(interpreter, optimizer, section, code_start, 1);
@@ -1565,7 +1554,7 @@ build_asm(Interp *interpreter, opcode_t *pc,
 
             op_info = &interpreter->op_info_table[*cur_op];
             n = op_info->arg_count;
-            ADD_OP_VAR_PART(interpreter, cur_op, n);
+            ADD_OP_VAR_PART(interpreter, interpreter->code, cur_op, n);
             cur_op += n;
             /* update op_i and cur_op accordingly */
             jit_info->op_i += n;

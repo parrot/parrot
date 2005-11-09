@@ -266,7 +266,7 @@ PDB_get_command(Interp *interpreter)
     /* not used any more */
     if (pdb->last_command && *pdb->cur_command) {
         mem_sys_free(pdb->last_command);
-	pdb->last_command = NULL;
+    pdb->last_command = NULL;
     }
 
     /* update the last command */
@@ -1117,7 +1117,7 @@ PDB_delete_condition(Interp *interpreter,
         else {
             /* 'value' is a float or an int, so we can just free it */
             mem_sys_free(breakpoint->condition->value);
-	    breakpoint->condition->value = NULL;
+        breakpoint->condition->value = NULL;
         }
     }
     mem_sys_free(breakpoint->condition);
@@ -2783,9 +2783,9 @@ PDB_backtrace(Interp *interpreter)
     sub = interpinfo_p(interpreter, CURRENT_SUB);
     ctx = CONTEXT(interpreter->ctx);
     if (!PMC_IS_NULL(sub)) {
-	str = Parrot_Context_infostr(interpreter, ctx);
-	if (str)
-	    PIO_eprintf(interpreter, "%Ss", str);
+        str = Parrot_Context_infostr(interpreter, ctx);
+        if (str)
+            PIO_eprintf(interpreter, "%Ss", str);
     }
 
     /* backtrace: follow the continuation chain */
@@ -2794,29 +2794,29 @@ PDB_backtrace(Interp *interpreter)
         if (!sub)
             break;
         str = Parrot_Context_infostr(interpreter,
-		    PMC_cont(sub)->to_ctx);
+            PMC_cont(sub)->to_ctx);
         if (!str)
             break;
-
-	/* recursion detection */
-	if (!PMC_IS_NULL(old) && PMC_cont(old) &&
-	    PMC_cont(old)->to_ctx->current_pc ==
+        
+        /* recursion detection */
+        if (!PMC_IS_NULL(old) && PMC_cont(old) &&
+            PMC_cont(old)->to_ctx->current_pc ==
             PMC_cont(sub)->to_ctx->current_pc &&
-	    PMC_cont(old)->to_ctx->current_sub ==
+            PMC_cont(old)->to_ctx->current_sub ==
             PMC_cont(sub)->to_ctx->current_sub) {
-            ++rec_level;
-	} else if (rec_level != 0) {
-	    PIO_eprintf(interpreter, "... call repeated %d times\n", rec_level);
-	    rec_level = 0;
-	}
+                ++rec_level;
+        } else if (rec_level != 0) {
+            PIO_eprintf(interpreter, "... call repeated %d times\n", rec_level);
+            rec_level = 0;
+        }
 
-	/* print the context description */
-	if (rec_level == 0)
-	    PIO_eprintf(interpreter, "%Ss", str);
+        /* print the context description */
+        if (rec_level == 0)
+            PIO_eprintf(interpreter, "%Ss", str);
 
-	/* get the next Continuation */
+        /* get the next Continuation */
         ctx = PMC_cont(sub)->to_ctx;
-	old = sub;
+        old = sub;
         if (!ctx || !ctx->prev)
             break;
     }

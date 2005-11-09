@@ -83,6 +83,17 @@ void* set_retval(Interp*, int sig_ret,
 INTVAL set_retval_i(Interp*, int sig_ret,
         struct PackFile_ByteCode *seg, parrot_context_t *ctx);
 
+#define ADD_OP_VAR_PART(interpreter, seg, pc, n) do { \
+    if (*pc == PARROT_OP_set_args_pc || \
+            *pc == PARROT_OP_get_results_pc || \
+            *pc == PARROT_OP_get_params_pc || \
+            *pc == PARROT_OP_set_returns_pc) { \
+        PMC *sig; \
+        sig = seg->const_table->constants[pc[1]]->u.key; \
+        n += VTABLE_elements(interpreter, sig); \
+    } \
+} while (0)
+
 #endif /* PARROT_INTER_CALL_H_GUARD */
 
 /*
