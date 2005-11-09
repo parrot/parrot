@@ -74,7 +74,7 @@ Parrot_charsets_encodings_deinit(Interp *interpreter)
     mem_sys_free(all_charsets->set);
     mem_sys_free(all_charsets);
     all_charsets = NULL;
-    /* TODO free encodings */
+    parrot_deinit_encodings(interpreter);
 }
 
 CHARSET *

@@ -81,6 +81,12 @@ ENCODING *Parrot_default_encoding(Interp *);
 typedef INTVAL (*encoding_converter_t)(Interp *, ENCODING *lhs, ENCODING *rhs);
 encoding_converter_t Parrot_find_encoding_converter(Interp *, ENCODING *lhs, ENCODING *rhs);
 
+void parrot_deinit_encodings(Interp *);
+INTVAL Parrot_encoding_number(Interp *, STRING *encodingname);
+INTVAL Parrot_encoding_number_of_str(Interp *, STRING *src);
+STRING* Parrot_encoding_name(Interp *, INTVAL number_of_encoding);
+ENCODING* Parrot_get_encoding(Interp *, INTVAL number_of_encoding);
+const char * Parrot_encoding_c_name(Interp *, INTVAL number_of_encoding);
 
 #define ENCODING_MAX_BYTES_PER_CODEPOINT(i, src) \
     ((ENCODING *)src->encoding)->max_bytes_per_codepoint
