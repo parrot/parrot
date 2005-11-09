@@ -445,6 +445,8 @@ editor/filetype_parrot.vim                        [devel]
 editor/indent_imc.vim                             [devel]
 encodings/fixed_8.c                               []
 encodings/fixed_8.h                               []
+encodings/utf16.c                                  []
+encodings/utf16.h                                  []
 encodings/utf8.c                                  []
 encodings/utf8.h                                  []
 examples/README                                   [main]doc

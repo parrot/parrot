@@ -121,9 +121,31 @@ upcase(Interp *interpreter, STRING *source_string)
 }
 
 static void
-downcase(Interp *interpreter, STRING *source_string)
+downcase(Interp *interpreter, STRING *src)
 {
-    UNIMPL;
+#if PARROT_HAS_ICU
+
+    UErrorCode err;
+    int result_len;
+
+    Parrot_utf16_encoding_ptr->to_encoding(interpreter, src);
+    /*
+U_CAPI int32_t U_EXPORT2
+u_strToLower(UChar *dest, int32_t destCapacity,
+             const UChar *src, int32_t srcLength,
+             const char *locale,
+             UErrorCode *pErrorCode);
+     */
+    result_len = u_strToLower(src->strstart, PObj_buflen(src) / 2,
+            src->strstart, src->strlen,
+            NULL,       /* locale = default */
+            &err);
+    assert(!err);
+    src->bufused = result_len * 2;
+#else
+    real_exception(interpreter, NULL, E_LibraryNotLoadedError,
+            "no ICU lib loaded");
+#endif
 }
 
 static void
@@ -349,7 +371,7 @@ find_not_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags, STRING *source_s
             real_exception(interpreter, NULL, E_LibraryNotLoadedError,
                     "no ICU lib loaded");
 #endif
-        } 
+        }
         else {
             if (!(Parrot_iso_8859_1_typetable[codepoint] & flags)) {
                 return pos;

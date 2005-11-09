@@ -16,7 +16,7 @@ Tests charset support.
 
 =cut
 
-use Parrot::Test tests => 31;
+use Parrot::Test tests => 32;
 use Test::More;
 
 output_is( <<'CODE', <<OUTPUT, "basic syntax" );
@@ -503,4 +503,18 @@ pir_output_is( <<'CODE', <<'OUTPUT', "concat ascii, utf8" );
 CODE
 abcdefg
 abcdefg
+OUTPUT
+
+output_is( <<'CODE', <<"OUTPUT", "unicode downcase");
+    set S0, iso-8859-1:"TÖTSCH"
+    find_charset I0, "unicode"
+    trans_charset S1, S0, I0
+    downcase S1
+    getstdout P0          # need to convert back to utf8
+    push P0, "utf8"       # push utf8 output layer
+    print S1
+    print "\n"
+    end
+CODE
+t\xc3\xb6tsch
 OUTPUT

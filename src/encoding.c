@@ -18,6 +18,7 @@ These are parrot's generic encoding handling functions
 ENCODING *Parrot_default_encoding_ptr;
 ENCODING *Parrot_fixed_8_encoding_ptr;
 ENCODING *Parrot_utf8_encoding_ptr;
+ENCODING *Parrot_utf16_encoding_ptr;
 
 /* Yep, this needs to be a char * parameter -- it's tough to load in
    encodings and such for strings if we can't be sure we've got enough
@@ -37,6 +38,9 @@ Parrot_find_encoding(Interp *interpreter, const char *encodingname)
     }
     if (!strcmp("utf8", encodingname)) {
         return Parrot_utf8_encoding_ptr;
+    }
+    if (!strcmp("utf16", encodingname)) {
+        return Parrot_utf16_encoding_ptr;
     }
     return NULL;
 }
@@ -62,6 +66,10 @@ Parrot_register_encoding(Interp *interpreter, const char *encodingname,
     }
     if (!strcmp("utf8", encodingname)) {
         Parrot_utf8_encoding_ptr = encoding;
+        return 1;
+    }
+    if (!strcmp("utf16", encodingname)) {
+        Parrot_utf16_encoding_ptr = encoding;
         return 1;
     }
     return 0;
