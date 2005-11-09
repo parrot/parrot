@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2003 The Perl Foundation.  All rights reserved.
+# Copyright (C) 2001-2005 The Perl Foundation.  All rights reserved.
 # $Id$
 
 =head1 NAME
@@ -7,9 +7,7 @@ examples/pir/uniq.pir - Remove duplicate lines from a sorted file
 
 =head1 SYNOPSIS
 
-    % ./parrot uniq.pir -o uniq.pbc
-    % ./parrot uniq.pbc data.txt
-    % ./parrot uniq.pbc -c data.txt
+    % ./parrot examples/pir/uniq.pir -o uniq.pbc
 
 =head1 DESCRIPTION
 
@@ -46,45 +44,52 @@ Converted to PIR by Bernhard Schmalhofer.
 .sub "uniq" :main
   .param pmc argv
 
-  set I0, argv
-  shift S0, argv
-  ne I0, 1, SOURCE
+  .local string program
+  program = shift argv
+
+  .local int num_args
+  num_args = argv
+  if num_args > 0 goto SOURCE
   print "usage: parrot "
-  print S0
+  print program
   print " [-c] [-d] [-u] filename\n"
-  end
+  goto END
 
 SOURCE:
   # do some simple option parsing
-  shift S0, argv
+  .local string option
+  option = shift argv
 
-  ne S0, "-c", NOTC
-  set I10, 1 # count mode
-  shift S0, argv
+  ne option, "-c", NOTC
+  I10 = 1 # count mode
+  option = shift argv
 
 NOTC:
-  ne S0, "-d", NOTD
-  set I11, 1 # duplicate mode
-  shift S0, argv
+  ne option, "-d", NOTD
+  I11 = 1 # duplicate mode
+  option = shift argv
 
 NOTD:
-  ne S0, "-u", GO
-  set I12, 1 # unique mode
-  shift S0, argv
+  ne option, "-u", GO
+  I12 = 1 # unique mode
+  option = shift argv
 
 GO:
-  # S2 is the previous line
+  .local string file_name
+  file_name = option
 
-  set I1, 1 # count
-  # Read the file into S1
-  open P1, S0, "<"
-  unless P1, err
-  readline S2, P1
+  I1 = 1 # count
+  .local pmc in_fh
+  in_fh = open file_name, "<"
+  unless in_fh, ERR
+  .local string prev_line, curr_line
+  prev_line = readline in_fh
 
 SOURCE_LOOP:
-  readline S1, P1
+  unless in_fh, END
+  curr_line = readline in_fh
 
-  eq S1, S2, MATCH
+  if curr_line == prev_line goto MATCH
 
   # different line
 
@@ -99,7 +104,7 @@ SOURCE_LOOP:
   print S3
   print I1
   print " "
-  print S2
+  print prev_line
   branch RESET
 
 NOTC2:
@@ -107,10 +112,10 @@ NOTC2:
 
   # show duplicates mode
   eq 1, I1, RESET
-  print S2
+  print prev_line
   branch RESET
 
-err:
+ERR:
   print "Couldn't read "
   print S0
   exit 1
@@ -120,13 +125,13 @@ NOTD2:
 
   # don't show lines that are duplicated mode
   ne 1, I1, RESET
-  print S2
+  print prev_line
   branch RESET
 
 NOTU2:
 
   # default mode
-  print S2
+  print prev_line
   branch RESET
 
 RESET:
@@ -138,9 +143,10 @@ MATCH:
   # fall through
 
 LOOP:
-  set S2, S1
-  if S1, SOURCE_LOOP
-  close P1
+  set prev_line, curr_line
+  if curr_line, SOURCE_LOOP
+  close in_fh
 
+END:
 .end
 
