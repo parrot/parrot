@@ -238,6 +238,8 @@ Parrot_register_charset(Interp *interpreter, const char *charsetname,
     return 0;
 }
 
+void parrot_init_encodings_2(Interp *interpreter);
+
 void
 Parrot_charsets_encodings_init(Interp *interpreter)
 {
@@ -253,6 +255,11 @@ Parrot_charsets_encodings_init(Interp *interpreter)
     Parrot_charset_iso_8859_1_init(interpreter);
     Parrot_charset_binary_init(interpreter);
     Parrot_charset_unicode_init(interpreter);
+
+    /*
+     * now encoding strings don't have a charset yet - set default
+     */
+    parrot_init_encodings_2(interpreter);
     /*
      * now install charset converters
      */

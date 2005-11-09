@@ -2679,6 +2679,39 @@ Parrot_string_trans_charset(Interp *interpreter, STRING *src,
     return CHARSET_TO_CHARSET(interpreter, src, new_charset, dest);
 }
 
+STRING*
+Parrot_string_trans_encoding(Interp *interpreter, STRING *src,
+        INTVAL encoding_nr, STRING *dest)
+{
+    ENCODING *new_encoding;
+
+    if (!src)
+        return NULL;
+    new_encoding = Parrot_get_encoding(interpreter, encoding_nr);
+    if (!new_encoding)
+        real_exception(interpreter, NULL, INVALID_CHARTYPE,
+                "encoding #%d not found", (int) encoding_nr);
+    /*
+     * dest is an empty string header or NULL, if an inplace
+     * operation is desired
+     */
+    if (dest) {
+        if (new_encoding == src->encoding) {
+            Parrot_reuse_COW_reference(interpreter, src, dest);
+            dest->encoding = new_encoding;
+            return dest;
+        }
+        return new_encoding->copy_to_encoding(interpreter, src);
+    }
+    else {
+        if (new_encoding == src->encoding) {
+            return src;
+        }
+    }
+    new_encoding->to_encoding(interpreter, src);
+    return src;
+}
+
 /*
 
 =back

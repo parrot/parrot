@@ -120,6 +120,8 @@ INTVAL Parrot_string_find_word_boundary(Interp *, STRING *, INTVAL offset);
 
 STRING* Parrot_string_trans_charset(Interp *, STRING *src,
         INTVAL charset_nr, STRING *dest);
+STRING* Parrot_string_trans_encoding(Interp *, STRING *src,
+        INTVAL encoding_nr, STRING *dest);
 
 CHARSET* string_rep_compatible (Interp *, STRING *a, const STRING *b,
         ENCODING**);

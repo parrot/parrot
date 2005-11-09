@@ -16,7 +16,7 @@ Tests charset support.
 
 =cut
 
-use Parrot::Test tests => 32;
+use Parrot::Test tests => 33;
 use Test::More;
 
 output_is( <<'CODE', <<OUTPUT, "basic syntax" );
@@ -513,6 +513,20 @@ output_is( <<'CODE', <<"OUTPUT", "unicode downcase");
     getstdout P0          # need to convert back to utf8
     push P0, "utf8"       # push utf8 output layer
     print S1
+    print "\n"
+    end
+CODE
+t\xc3\xb6tsch
+OUTPUT
+
+output_is( <<'CODE', <<"OUTPUT", "unicode downcase - transcharset");
+    set S0, iso-8859-1:"TÖTSCH"
+    find_charset I0, "unicode"
+    trans_charset S1, S0, I0
+    downcase S1
+    find_encoding I0, "utf8"
+    trans_encoding S2, S1, I0
+    print S2
     print "\n"
     end
 CODE

@@ -1227,3 +1227,15 @@ if_null_p_ic                   1196
 if_null_s_ic                   1197
 unless_null_p_ic               1198
 unless_null_s_ic               1199
+encoding_i_s                    1200
+encoding_i_sc                   1201
+encodingname_s_i                1202
+encodingname_s_ic               1203
+find_encoding_i_s               1204
+find_encoding_i_sc              1205
+trans_encoding_s_i              1206
+trans_encoding_s_ic             1207
+trans_encoding_s_s_i            1208
+trans_encoding_s_s_ic           1209
+trans_encoding_s_sc_i           1210
+trans_encoding_s_sc_ic          1211

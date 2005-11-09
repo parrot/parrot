@@ -150,7 +150,7 @@ struct _charset {
 #define CHARSET_COMPUTE_HASH(interp, source, seed) ((CHARSET *)source->charset)->compute_hash(interpreter, source, seed)
 #define CHARSET_GET_PREFERRED_ENCODING(interp, source) ((CHARSET *)source->charset)->preferred_encoding
 
-#define CHARSET_TO_ENCODING(interp, source, offset, count) ((ENCODING *)source->encoding)->to_encoding(interp, source, offset, count)
+#define CHARSET_TO_ENCODING(interp, source) ((ENCODING *)source->encoding)->to_encoding(interp, source)
 #define CHARSET_COPY_TO_ENCODING(interp, source) ((ENCODING *)source->encoding)->copy_to_encoding(interp, source)
 #define CHARSET_GET_CODEPOINT(interp, source, offset) ((ENCODING *)source->encoding)->get_codepoint(interp, source, offset)
 #define CHARSET_SET_CODEPOINT(interp, source, offset, codepoint) ((ENCODING *)source->encoding)->set_codepoint(interp, source, offset, codepoint)

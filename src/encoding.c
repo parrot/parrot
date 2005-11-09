@@ -32,6 +32,18 @@ typedef struct {
 
 static All_encodings *all_encodings;
 
+void parrot_init_encodings_2(Interp *interpreter);
+void
+parrot_init_encodings_2(Interp *interpreter)
+{
+    int i, n;
+
+    n = all_encodings->n_encodings;
+    for (i = 0; i < n; ++i) {
+        all_encodings->enc[i].name->charset = Parrot_default_charset_ptr;
+    }
+}
+
 void
 parrot_deinit_encodings(Interp *interpreter)
 {
