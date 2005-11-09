@@ -161,7 +161,7 @@ Sets the name of the subroutine.
 
 =item C<void set_pointer(void *value)>
 
-Sets the pointer to the actual subroutine. 
+Sets the pointer to the actual subroutine.
 
 *** Don't use that - use .Sub constants instead ***
 

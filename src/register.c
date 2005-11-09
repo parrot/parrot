@@ -214,13 +214,9 @@ parrot_gc_context(Interp *interpreter)
 }
 
 static void
-init_context(Interp *interpreter, parrot_context_t *ctx)
+clear_regs(Interp *interpreter, parrot_context_t *ctx)
 {
     int i;
-
-    ctx->ref_count = 0;
-    ctx->current_results = NULL;
-    ctx->current_args = NULL;
 
     /* NULL out registers
      *
@@ -257,6 +253,16 @@ init_context(Interp *interpreter, parrot_context_t *ctx)
         }
     }
 #endif
+}
+
+static void
+init_context(Interp *interpreter, parrot_context_t *ctx)
+{
+    ctx->ref_count = 0;
+    ctx->current_results = NULL;
+    ctx->current_args = NULL;
+    ctx->malloced_mem = NULL;
+    clear_regs(interpreter, ctx);
 }
 
 #if CHUNKED_CTX_MEM
@@ -422,13 +428,13 @@ Parrot_alloc_context(Interp *interpreter, INTVAL *n_regs_used)
     init_context(interpreter, ctx);
 }
 
-void
+void *
 Parrot_realloc_context(Interp *interpreter, INTVAL *n_regs_used)
 {
     struct Parrot_Context *ctx;
     size_t to_alloc, reg_alloc, size_n, size_nip;
-    void *p;
-    int i, slot;
+    void *p, *old_mem;
+    int i;
 
     size_n = sizeof(FLOATVAL) * n_regs_used[REGNO_NUM];
     size_nip = size_n +
@@ -437,32 +443,30 @@ Parrot_realloc_context(Interp *interpreter, INTVAL *n_regs_used)
     reg_alloc = size_nip +
         sizeof(STRING*) *  n_regs_used[REGNO_STR];
 
-    slot = (reg_alloc + 7) >> 3;
-    reg_alloc = slot << 3;
     ctx = CONTEXT(interpreter->ctx);
-    /* need a bigger one? */
-    if (reg_alloc > ctx->regs_mem_size) {
-        CONTEXT(interpreter->ctx) =
-            ctx = mem_sys_realloc(ctx, reg_alloc + ALIGNED_CTX_SIZE);
-        ctx->regs_mem_size = reg_alloc;
-        /* if we realloced beyond the free_list, resize that too */
-        if (slot >= interpreter->ctx_mem.n_free_slots) {
-            int n = slot + 1;
-            interpreter->ctx_mem.free_list = mem_sys_realloc(
-                    interpreter->ctx_mem.free_list, n * sizeof(void*));
-            for (i = interpreter->ctx_mem.n_free_slots; i < n; ++i)
-                interpreter->ctx_mem.free_list[i] = NULL;
-            interpreter->ctx_mem.n_free_slots = n;
-        }
-    }
+    /* Need a distinct reg memory area, but we can't reallocate the
+     * context as a whole, because continuations might point to it.
+     * Therefore we just allocate the register memory and remember
+     * this in the malloced_mem pointer
+     *
+     * TODO investigate if we should preserve the original slot
+     *      so that we can reuse the context memory in _free
+     *
+     * If this is a recursive tailcall, we need the old memory
+     * which is freed after argument passing. See also
+     * src/inter_call.c
+     */
+    old_mem = ctx->malloced_mem;
+    ctx->malloced_mem = p = mem_sys_allocate(reg_alloc);
+    ctx->regs_mem_size = reg_alloc;
     for (i = 0; i < 4; ++i)
         ctx->n_regs_used[i] = n_regs_used[i];
-    p = (void *) ((char *)ctx + ALIGNED_CTX_SIZE);
     /* ctx.bp points to I0, which has Nx at left */
     interpreter->ctx.bp.regs_i = (INTVAL*)((char*)p + size_n);
     /* this points to S0 */
     interpreter->ctx.bp_ps.regs_s = (STRING**)((char*)p + size_nip);
-    init_context(interpreter, ctx);
+    clear_regs(interpreter, ctx);
+    return old_mem;
 }
 
 void
@@ -481,12 +485,20 @@ Parrot_free_context(Interp *interpreter, parrot_context_t *ctxp, int re_use)
      *
      */
     if (re_use || --ctxp->ref_count == 0) {
-        ptr = ctxp;
-        slot = ctxp->regs_mem_size >> 3;
+        if (ctxp->malloced_mem) {
+            /* we don't have the orig size anymore, just free all
+            */
+            mem_sys_free(ctxp->malloced_mem);
+            mem_sys_free(ctxp);
+        }
+        else {
+            ptr = ctxp;
+            slot = ctxp->regs_mem_size >> 3;
 
-        assert(slot < interpreter->ctx_mem.n_free_slots);
-        *(void **)ptr = interpreter->ctx_mem.free_list[slot];
-        interpreter->ctx_mem.free_list[slot] = ptr;
+            assert(slot < interpreter->ctx_mem.n_free_slots);
+            *(void **)ptr = interpreter->ctx_mem.free_list[slot];
+            interpreter->ctx_mem.free_list[slot] = ptr;
+        }
 #if CTX_LEAK_DEBUG
         fprintf(stderr, "free  %p\n", ctxp);
 #endif

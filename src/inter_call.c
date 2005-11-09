@@ -315,9 +315,6 @@ next_arg(Interp *interpreter, struct call_state_1 *st)
                     st->sig = PARROT_ARG_PMC; break;
             }
             break;
-        case CALL_STATE_TC:
-            st->sig = st->u.tc_args[st->i].type;
-            break;
     }
     return 1;
 }
@@ -348,14 +345,6 @@ fetch_arg(Interp *interpreter, struct call_state *st)
                     return fetch_arg_num_sig(interpreter, st);
                 case PARROT_ARG_PMC:
                     return fetch_arg_pmc_sig(interpreter, st);
-            }
-            break;
-        case CALL_STATE_TC:
-            {
-                HashEntry *e =  st->src.u.tc_args + st->src.i;
-                st->val = e->val;
-                st->src.sig = e->type;
-                st->src.mode |= CALL_STATE_NEXT_ARG;
             }
             break;
     }
@@ -682,59 +671,34 @@ parrot_pass_args_tail_call(Interp* interpreter,
 {
     struct call_state st;
     int todo, i, n;
+    struct Interp_Context src_ctx;
+    void *old_mem;
 
     if (*pc != PARROT_OP_get_params_pc)
         return pc;
-    todo = Parrot_init_arg_op(interpreter, interpreter->code,
+    Parrot_init_arg_op(interpreter, interpreter->code,
             CONTEXT(interpreter->ctx),
             interpreter->current_args, &st.src);
-    if (!todo)
-        return pc;
+    /* remember old register base ptrs */
+    memcpy(&src_ctx, &interpreter->ctx, sizeof(struct Interp_Context));
+    /*
+     * TODO optimize recursive tail calls
+     */
+    old_mem = Parrot_realloc_context(interpreter, dest_sub->n_regs_used);
     todo = Parrot_init_arg_op(interpreter, dest_sub->seg,
             CONTEXT(interpreter->ctx),
             pc, &st.dest);
-    if (!todo)
-        return pc;
-    /* allocate helper storage
-     * due to flatten, we need max(src, dest)
-     */
-    n = st.src.n;
-    if (st.dest.n > n)
-        n = st.dest.n;
-    st.dest.u.tc_args = mem_sys_allocate(n * sizeof(HashEntry));
-    /* fetch args */
-
-    st.dest.mode = CALL_STATE_TC;
-    for (i = 0;  ; ++i) {
-        if (!Parrot_fetch_arg(interpreter, &st))
-            break;
-        assert(i < n);
-        st.dest.u.tc_args[i].val = st.val;
-        st.dest.u.tc_args[i].type = st.src.sig;
-    }
-    /* now set new register structure, realloc if needed */
-    Parrot_realloc_context(interpreter, dest_sub->n_regs_used);
-    /* ctx might have moved */
-    st.dest.ctx = CONTEXT(interpreter->ctx);
-    /* and store args */
-
-    st.src.i = 0;
-    st.src.n = i;
-    st.opt_so_far = 0;
-    st.src.mode = CALL_STATE_TC;
-    st.src.u.tc_args = st.dest.u.tc_args;
-    /* reinit dest */
-    Parrot_init_arg_op(interpreter, dest_sub->seg,
-            CONTEXT(interpreter->ctx),
-            pc, &st.dest);
-    for (;;) {
+    /* reset st.src.ctx pointing to old regs */
+    st.src.ctx = (parrot_context_t *) &src_ctx;
+    st.opt_so_far = 0;  /* XXX */
+    while (todo) {
         Parrot_fetch_arg(interpreter, &st);
         Parrot_convert_arg(interpreter, &st);
-        if (!Parrot_store_arg(interpreter, &st))
-            break;
+        todo = Parrot_store_arg(interpreter, &st);
     }
-    /* free helper */
-    mem_sys_free(st.src.u.tc_args);
+    if (old_mem)
+        mem_sys_free(old_mem);
+
     /* done. return position past get_params opcode */
     return pc + st.dest.n + 2;
 }

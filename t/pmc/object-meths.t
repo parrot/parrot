@@ -912,7 +912,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "tailcallmeth");
     n = getattribute self, "Foo\0n"
     dec n
     unless n goto done
-    tailcallmethod self, "go"
+    .return self."go"()
 done:
 .end
 CODE
