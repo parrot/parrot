@@ -26,6 +26,7 @@ This module provides various Parrot-specific test functions.
 
 =head2 Functions
 
+The parameter C<$language> is the language of the code.
 The parameter C<$code> is the code that should be executed or transformed.
 The parameter C<$expected> is the expected result.
 The parameter C<$unexpected> is the unexpected result.
@@ -39,6 +40,26 @@ at the end of the argument list.  Valid reasons include C<bug>,
 C<unimplemented>, and so on.
 
 =over 4
+
+=item C<language_output_is( $language, $code, $expected, $description)> 
+
+Runs a langugage test and passes the test if a string comparison
+of the output with the expected result it true.
+
+=item C<language_output_like( $language, $code, $expected, $description)> 
+
+Runs a langugage test and passes the test
+if the  output matches the expected result.
+
+=item C<language_output_isnt( $language, $code, $expected, $description)> 
+
+Runs a langugage test and passes the test if a string comparison
+if a string comparison of the output with the unexpected result is false.
+
+=item C<pasm_output_isnt($code, $unexpected, $description)> or C<output_isnt($code, $unexpected, $description)>
+
+Runs the Parrot Assembler code and passes the test
+if a string comparison of the output with the unexpected result is false.
 
 =item C<pasm_output_is($code, $expected, $description)> or C<output_is($code, $expected, $description)>
 
@@ -130,6 +151,11 @@ expected result.
 Compiles and runs the C code, passing the test if a string comparison of
 output with the unexpected result is false.
 
+=item C<example_output_is( $example_fn, $expected )
+
+Determine the language from the extension of C<$example_fn> and
+runs language_output_is().
+
 =item C<skip($why, $how_many)>
 
 Use within a C<SKIP: { ... }> block to indicate why and how many test
@@ -173,14 +199,16 @@ require Test::Builder;
 require Test::More;
 
 
-@EXPORT = qw( output_is          output_like          output_isnt
+@EXPORT = qw( 
+              language_output_is language_output_like language_output_isnt
+              example_output_is
+              output_is          output_like          output_isnt
               pasm_output_is     pasm_output_like     pasm_output_isnt
               past_output_is     past_output_like     past_output_isnt
               pir_output_is      pir_output_like      pir_output_isnt
               pir_2_pasm_is      pir_2_pasm_like      pir_2_pasm_isnt
               pbc_output_is      pbc_output_like      pbc_output_isnt
               c_output_is        c_output_like        c_output_isnt
-              language_output_is language_output_like language_output_isnt
               plan
               skip
               slurp_file
@@ -468,39 +496,54 @@ sub _generate_functions {
         }
     }
 
+    my %builtin_language_prefix = (
+        IMC   => 'pir',
+        PASM  => 'pasm',
+        PAST  => 'past',
+        PIR   => 'pir',
+                                  );
+
     my %language_test_map = (
         language_output_is   => 'output_is',
         language_output_like => 'output_like',
         language_output_isnt => 'output_isnt',
-                             );
+                            );
 
     foreach my $func ( keys %language_test_map ) {
         no strict 'refs';
 
         *{$package.'::'.$func} = sub ($$$;$) {
-            # TODO: $language should be the name of the test Module
-            #       that would open the door for Scheme::Test
-            my $language = $_[0];
-            $language = ucfirst($language) unless ( $language eq 'm4' );
+            my ( $language, @remaining ) = @_;
 
-            # make sure TODO will work, by telling Test::Builder which package
-            # the .t file is in (one more than usual, due to the extra layer
-            # of package indirection
-            my $level = $builder->level();
-            $builder->level(2);
-
-            # get modified parrot command.
-            require "Parrot/Test/$language.pm";
-            # set the builder object, and parrot config.
-            my $obj = eval "Parrot::Test::${language}->new()";
-            $obj->{builder} = $builder;
-            $obj->{relpath} = $path_to_parrot;
-            $obj->{parrot}  = $parrot;
             my $meth = $language_test_map{$func};
-            $obj->$meth(@_[1..$#_]);
+            if ( my $prefix = $builtin_language_prefix{$language} ) { 
+                my $test_func = "${package}::${prefix}_${meth}";
+                &$test_func( @remaining );
+            }
+            else {
+                # TODO: $language should be the name of the test Module
+                #       that would open the door for Scheme::Test
+                # try it both ways
+                $language = ucfirst($language) unless ( $language eq 'm4' );
 
-            # restore prior level, just in case.
-            $builder->level($level);
+                # make sure TODO will work, by telling Test::Builder which package
+                # the .t file is in (one more than usual, due to the extra layer
+                # of package indirection
+                my $level = $builder->level();
+                $builder->level(2);
+
+                # get modified parrot command.
+                require "Parrot/Test/$language.pm";
+                # set the builder object, and parrot config.
+                my $obj = eval "Parrot::Test::${language}->new()";
+                $obj->{builder} = $builder;
+                $obj->{relpath} = $path_to_parrot;
+                $obj->{parrot}  = $parrot;
+                $obj->$meth(@remaining);
+
+                # restore prior level, just in case.
+                $builder->level($level);
+            }
         }
     }
 
@@ -604,6 +647,28 @@ sub _generate_functions {
 
             return $pass;
         }
+    }
+}
+
+sub example_output_is {
+    my ($example_fn, $expected) = @_;
+
+    my %lang_for_extension 
+        = ( pasm => 'PASM',
+            past => 'PAST',
+            pir  => 'PIR',
+            imc  => 'PIR', );
+
+    my ( $extension ) = $example_fn =~ m{ [.]                         # introducing extension
+                                          ( pasm | pir | imc | past ) # match and capture the extension
+                                          \z                          # at end of string
+                                        }ixms or Usage();
+    if ( defined $extension ) { 
+        my $code = slurp_file($example_fn);
+        language_output_is( $lang_for_extension{$extension}, $code, $expected, $example_fn );
+    }
+    else {
+      fail( defined $extension, "no extension recognized for $example_fn" );
     }
 }
 
