@@ -126,7 +126,7 @@ downcase(Interp *interpreter, STRING *src)
 #if PARROT_HAS_ICU
 
     UErrorCode err;
-    int result_len;
+    int dest_len, src_len;
 
     Parrot_utf16_encoding_ptr->to_encoding(interpreter, src);
     /*
@@ -137,13 +137,20 @@ u_strToLower(UChar *dest, int32_t destCapacity,
              UErrorCode *pErrorCode);
      */
     err = U_ZERO_ERROR;
-    result_len = u_strToLower(src->strstart, PObj_buflen(src) / sizeof(UChar),
-            src->strstart, src->strlen,
+    src_len = src->bufused / sizeof(UChar);
+    dest_len = u_strToLower(src->strstart, src_len,
+            src->strstart, src_len,
             NULL,       /* locale = default */
             &err);
-    /* TODO implement resizing */
-    assert(U_SUCCESS(err));
-    src->bufused = result_len * sizeof(UChar);
+    src->bufused = dest_len * sizeof(UChar);
+    if (!U_SUCCESS(err)) {
+        Parrot_reallocate_string(interpreter, src, src->bufused);
+        dest_len = u_strToLower(src->strstart, dest_len,
+                src->strstart, src_len,
+                NULL,       /* locale = default */
+                &err);
+        assert(U_SUCCESS(err));
+    }
 #else
     real_exception(interpreter, NULL, E_LibraryNotLoadedError,
             "no ICU lib loaded");
