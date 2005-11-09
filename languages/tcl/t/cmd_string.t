@@ -3,6 +3,7 @@
 use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
 use Parrot::Test tests => 57;
+use Parrot::Config;
 use Test::More;
 use vars qw($TODO);
 
@@ -215,11 +216,14 @@ TCL
 0
 OUT
 
+SKIP: {
+  skip("Parrot not configured with ICU",1) unless $PConfig{has_icu};
 language_output_is("tcl",<<TCL,<<OUT,"string match nocase");
   puts [string match -nocase ABC abc ]
 TCL
 1
 OUT
+}
 
 language_output_is("tcl",<<'TCL',<<OUT,"string match \[");
   puts [string match {\[} {[}]
@@ -337,6 +341,9 @@ TCL
 1
 OUT
 
+SKIP: {
+  skip("Parrot not configured with ICU",3) unless $PConfig{has_icu};
+
 language_output_is("tcl",<<'TCL',<<OUT,"string equal, diff with -nocase");
   puts [string equal -nocase APPLEs oranGES]
 TCL
@@ -354,5 +361,5 @@ language_output_is("tcl",<<'TCL',<<OUT,"string equal, -length and -nocase");
 TCL
 1
 OUT
-
+}
 
