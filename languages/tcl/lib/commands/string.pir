@@ -179,8 +179,8 @@ match_next:
   pattern = argv[0]
   the_string = argv[1]
   unless nocase goto match_continue
-  pattern = downcase pattern
-  pattern = downcase the_string
+  pattern    = downcase pattern
+  the_string = downcase the_string
 
 match_continue:
   .local pmc globber
