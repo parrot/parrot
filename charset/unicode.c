@@ -137,12 +137,13 @@ u_strToLower(UChar *dest, int32_t destCapacity,
              UErrorCode *pErrorCode);
      */
     err = U_ZERO_ERROR;
-    result_len = u_strToLower(src->strstart, PObj_buflen(src) / 2,
+    result_len = u_strToLower(src->strstart, PObj_buflen(src) / sizeof(UChar),
             src->strstart, src->strlen,
             NULL,       /* locale = default */
             &err);
-    assert(!err);
-    src->bufused = result_len * 2;
+    /* TODO implement resizing */
+    assert(U_SUCCESS(err));
+    src->bufused = result_len * sizeof(UChar);
 #else
     real_exception(interpreter, NULL, E_LibraryNotLoadedError,
             "no ICU lib loaded");

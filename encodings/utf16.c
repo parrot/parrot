@@ -49,7 +49,6 @@ to_encoding(Interp *interpreter, STRING *src)
     /*
      * TODO adapt string creation functions
      */
-    Parrot_reallocate_string(interpreter, src, 2 * src->strlen);
     src->charset  = Parrot_unicode_charset_ptr;
     src->encoding = Parrot_utf16_encoding_ptr;
     src_len = src->strlen;
@@ -66,11 +65,20 @@ to_encoding(Interp *interpreter, STRING *src)
 #if PARROT_HAS_ICU
     err = U_ZERO_ERROR;
     /* XXX these inplace operations are all shit (sorry) */
-    p = mem_sys_allocate(PObj_buflen(src));
-    u_strFromUTF8(p, PObj_buflen(src) / 2,
+    p = mem_sys_allocate(src_len * sizeof(UChar));
+    u_strFromUTF8(p, src_len,
             &dest_len, src->strstart, src->bufused, &err);
-    assert(!err);       /* TODO */
-    src->bufused = dest_len * 2;;
+    if (!U_SUCCESS(err)) {
+        /*
+         * have to resize - required len in UChars is in dest_len
+         */
+        p = mem_sys_realloc(p, dest_len * sizeof(UChar));
+        u_strFromUTF8(p, dest_len,
+                &dest_len, src->strstart, src->bufused, &err);
+        assert(U_SUCCESS(err));
+    }
+    src->bufused = dest_len * sizeof(UChar);
+    Parrot_reallocate_string(interpreter, src, src->bufused);
     memcpy(src->strstart, p, src->bufused);
     mem_sys_free(p);
 #else
@@ -87,6 +95,7 @@ copy_to_encoding(Interp *interpreter, STRING *src)
     UErrorCode err;
     int dest_len;
 #endif
+    int src_len;
 
     if (src->encoding == Parrot_utf16_encoding_ptr)
         return string_copy(interpreter, src);
@@ -95,17 +104,24 @@ copy_to_encoding(Interp *interpreter, STRING *src)
      * TODO adapt string creation functions
      */
     dest = new_string_header(interpreter, 0);
-    Parrot_allocate_string(interpreter, dest, 2 * src->strlen);
+    src_len = src->strlen;
+    Parrot_allocate_string(interpreter, dest, sizeof(UChar) * src_len);
+    dest->strlen   = src_len;
     dest->charset  = Parrot_unicode_charset_ptr;
     dest->encoding = Parrot_utf16_encoding_ptr;
-    dest->strlen   = src->strlen;
-    if (!src->strlen)
+    if (!src_len)
         return dest;
 #if PARROT_HAS_ICU
     err = U_ZERO_ERROR;
-    u_strFromUTF8(dest->strstart, dest->bufused,
+    u_strFromUTF8(dest->strstart, src_len,
             &dest_len, src->strstart, src->bufused, &err);
-    assert(!err);       /* TODO */
+    if (!U_SUCCESS(err)) {
+        Parrot_allocate_string(interpreter, dest, sizeof(UChar) * dest_len);
+        u_strFromUTF8(dest->strstart, dest_len,
+                &dest_len, src->strstart, src->bufused, &err);
+        assert(U_SUCCESS(err));
+    }
+    
 #else
     real_exception(interpreter, NULL, E_LibraryNotLoadedError,
             "no ICU lib loaded");
@@ -263,10 +279,13 @@ utf16_decode_and_advance(Interp *interpreter, String_iter *i)
 {
     UChar *s = (UChar*) i->str->strstart;
     UINTVAL c, pos;
-    pos = i->bytepos / 2;
+    pos = i->bytepos / sizeof(UChar);
+    /* TODO either make sure that we don't go past end or use SAFE
+     *      iter versions
+     */
     U16_NEXT_UNSAFE(s, pos, c);
     i->charpos++;
-    i->bytepos = pos * 2;
+    i->bytepos = pos * sizeof(UChar);
     return c;
 }
 
@@ -275,10 +294,10 @@ utf16_encode_and_advance(Interp *interpreter, String_iter *i, UINTVAL c)
 {
     UChar *s = (UChar*) i->str->strstart;
     UINTVAL pos;
-    pos = i->bytepos / 2;
+    pos = i->bytepos / sizeof(UChar);
     U16_APPEND_UNSAFE(s, pos, c);
     i->charpos++;
-    i->bytepos = pos * 2;
+    i->bytepos = pos * sizeof(UChar);
 }
 
 static void
@@ -289,7 +308,7 @@ utf16_set_position(Interp *interpreter, String_iter *i, UINTVAL n)
     pos = 0;
     U16_FWD_N_UNSAFE(s, pos, n);
     i->charpos = n;
-    i->bytepos = pos * 2;
+    i->bytepos = pos * sizeof(UChar);
 }
 
 #endif
