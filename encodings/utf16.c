@@ -108,9 +108,10 @@ copy_to_encoding(Interp *interpreter, STRING *src)
     dest->strlen   = src_len;
     dest->charset  = Parrot_unicode_charset_ptr;
     dest->encoding = Parrot_utf16_encoding_ptr;
-    Parrot_allocate_string(interpreter, dest, 0);
-    if (!src_len)
+    if (!src_len) {
+        Parrot_allocate_string(interpreter, dest, 0);
         return dest;
+    }
 #if PARROT_HAS_ICU
     Parrot_allocate_string(interpreter, dest, sizeof(UChar) * src_len);
     err = U_ZERO_ERROR;
