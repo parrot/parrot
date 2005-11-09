@@ -136,6 +136,7 @@ u_strToLower(UChar *dest, int32_t destCapacity,
              const char *locale,
              UErrorCode *pErrorCode);
      */
+    err = U_ZERO_ERROR;
     result_len = u_strToLower(src->strstart, PObj_buflen(src) / 2,
             src->strstart, src->strlen,
             NULL,       /* locale = default */
