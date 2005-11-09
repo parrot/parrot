@@ -528,7 +528,8 @@ all : \
     $(LIBNCI_TEST_SO) \
     $(GEN_LIBRARY) \
     dynclasses \
-    compilers
+    compilers \
+    $(PBCMERGE)
 
 # constant string support
 .c.str :
