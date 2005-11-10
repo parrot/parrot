@@ -123,6 +123,7 @@ copy_to_encoding(Interp *interpreter, STRING *src)
                 &dest_len, src->strstart, src->bufused, &err);
         assert(U_SUCCESS(err));
     }
+    dest->bufused = dest_len * sizeof(UChar);
     
 #else
     real_exception(interpreter, NULL, E_LibraryNotLoadedError,
@@ -135,10 +136,13 @@ copy_to_encoding(Interp *interpreter, STRING *src)
 static UINTVAL
 get_codepoint(Interp *interpreter, const STRING *src, UINTVAL offset)
 {
-    const void *start;
+    UChar *s = (UChar*) src->strstart;
+    UINTVAL c, pos;
 
-    UNIMPL;
-    return 0;
+    pos = 0;
+    U16_FWD_N_UNSAFE(s, pos, offset);
+    U16_GET_UNSAFE(s, pos, c);
+    return c;
 }
 
 static void

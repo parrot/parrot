@@ -16,7 +16,7 @@ Tests charset support.
 
 =cut
 
-use Parrot::Test tests => 33;
+use Parrot::Test tests => 34;
 use Test::More;
 
 output_is( <<'CODE', <<OUTPUT, "basic syntax" );
@@ -532,3 +532,27 @@ output_is( <<'CODE', <<"OUTPUT", "unicode downcase - transcharset");
 CODE
 t\xc3\xb6tsch
 OUTPUT
+
+output_is( <<'CODE', <<"OUTPUT", "utf16 ord, length");
+    set S0, iso-8859-1:"TÖTSCH"
+    find_charset I0, "unicode"
+    trans_charset S1, S0, I0
+    find_encoding I0, "utf16"
+    trans_encoding S1, S1, I0
+    length I1, S1
+    print I1
+    print "\n"
+    null I0
+loop:
+    ord I2, S1, I0
+    print I2
+    print '_'
+    inc I0
+    lt I0, I1, loop
+    print "\n"
+    end
+CODE
+6
+84_214_84_83_67_72_
+OUTPUT
+
