@@ -432,7 +432,7 @@ void *
 Parrot_realloc_context(Interp *interpreter, INTVAL *n_regs_used)
 {
     struct Parrot_Context *ctx;
-    size_t to_alloc, reg_alloc, size_n, size_nip;
+    size_t reg_alloc, size_n, size_nip;
     void *p, *old_mem;
     int i;
 

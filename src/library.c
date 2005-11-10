@@ -324,7 +324,7 @@ Parrot_locate_runtime_file(Interp *interpreter, const char *file_name,
                 str = string_from_cstring(interpreter, parrot_path, strlen(parrot_path));
                 if (Parrot_stat_info_intval(interpreter, str, STAT_EXISTS)) {
                     if (free_prefix)
-                        string_cstring_free(prefix);
+                        string_cstring_free(const_cast(prefix));
                     return parrot_path;
                 }
                 else

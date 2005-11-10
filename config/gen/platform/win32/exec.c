@@ -52,7 +52,7 @@ Parrot_Run_OS_Command_Argv(Parrot_Interp interpreter, PMC *cmdargs)
     DWORD status = 0;
     STARTUPINFO si;
     PROCESS_INFORMATION pi;
-    unsigned int pmclen;
+    int pmclen;
     int cmdlinelen = 1000;
     int cmdlinepos = 0;
     char *cmdline = mem_sys_allocate(cmdlinelen);

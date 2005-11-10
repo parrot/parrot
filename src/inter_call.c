@@ -670,7 +670,7 @@ parrot_pass_args_tail_call(Interp* interpreter,
         struct Parrot_sub *dest_sub, opcode_t *pc)
 {
     struct call_state st;
-    int todo, i, n;
+    int todo;
     struct Interp_Context src_ctx;
     void *old_mem;
 
