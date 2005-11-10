@@ -16,7 +16,7 @@ Tests charset support.
 
 =cut
 
-use Parrot::Test tests => 39;
+use Parrot::Test tests => 41;
 use Test::More;
 
 output_is( <<'CODE', <<OUTPUT, "basic syntax" );
@@ -634,6 +634,7 @@ output_is( <<'CODE', <<"OUTPUT", "utf16 substr");
 CODE
 \xc3\xb6t
 OUTPUT
+
 output_is( <<'CODE', <<"OUTPUT", "utf16 replace");
     set S0, iso-8859-1:"Tötsch"
     find_charset I0, "unicode"
@@ -652,4 +653,37 @@ output_is( <<'CODE', <<"OUTPUT", "utf16 replace");
 CODE
 \xc3\xb6
 Toetsch
+OUTPUT
+
+output_is( <<'CODE', <<"OUTPUT", "utf16 index, latin1 search");
+    set S0, iso-8859-1:"TÖTSCH"
+    find_charset I0, "unicode"
+    trans_charset S1, S0, I0
+    downcase S1
+    set S2, iso-8859-1:"öt"
+    index I0, S1, S2
+    print I0
+    print "\n"
+    end
+CODE
+1
+OUTPUT
+
+output_is( <<'CODE', <<"OUTPUT", "utf16 index, latin1 search");
+    set S0, iso-8859-1:"TÖTSCH"
+    find_charset I0, "unicode"
+    trans_charset S1, S0, I0
+    downcase S1
+    set S2, iso-8859-1:"öt"
+    index I0, S1, S2
+    print I0
+    print "\n"
+    concat S1, S2
+    index I0, S1, S2, 2
+    print I0
+    print "\n"
+    end
+CODE
+1
+6
 OUTPUT

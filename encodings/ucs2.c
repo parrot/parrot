@@ -203,8 +203,8 @@ bytes(Interp *interpreter, STRING *src)
 static UINTVAL
 ucs2_decode_and_advance(Interp *interpreter, String_iter *i)
 {
-    UChar *s = (UChar*) i->str->strstart;
-    UINTVAL c, pos;
+    UChar *s = (UChar*) i->str->strstart, c;
+    size_t pos;
     pos = i->bytepos / sizeof(UChar);
     /* TODO either make sure that we don't go past end or use SAFE
      *      iter versions
@@ -221,7 +221,7 @@ ucs2_encode_and_advance(Interp *interpreter, String_iter *i, UINTVAL c)
     UChar *s = (UChar*) i->str->strstart;
     UINTVAL pos;
     pos = i->bytepos / sizeof(UChar);
-    s[pos++] = c;
+    s[pos++] = (UChar)c;
     i->charpos++;
     i->bytepos = pos * sizeof(UChar);
 }
