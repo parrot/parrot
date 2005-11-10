@@ -1666,7 +1666,7 @@ static unsigned char *lastpc;
     jit_emit_fstore_mb_n(pc, emit_EBX, offs); \
 }
 
-#  define jit_emit_xchg_MR_n(pc, r, offs) { \
+#  define jit_emit_xchg_MR_n(pc, offs, r) { \
     emitm_fld((pc), r); \
     jit_emit_fload_mb_n(pc, emit_EBX, offs); \
     emitm_fstp((pc), (r+2)); \
