@@ -520,7 +520,7 @@ pointer once Buffers can define their own custom mark routines.
 The problem is: During DODs stack walking the item on the stack must be
 a PMC. When an auto C<Hash*> is seen, it doesn't get properly marked
 (only the C<Hash*> buffer is marked, not its contents). By passing the
-C<**hptr> up to the PerlHash's or Hash's init function, the newly constructed PMC is
+C<**hptr> up to the Hash's init function, the newly constructed PMC is
 on the stack I<including> this newly constructed Hash, so that it gets
 marked properly.
 

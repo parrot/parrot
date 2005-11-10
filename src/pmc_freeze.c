@@ -806,7 +806,7 @@ thaw_pmc(Parrot_Interp interpreter, visit_info *info,
 
 Freeze and thaw a PMC (id).
 
-For example, the ASCII representation of the C<PerlArray>
+For example, the ASCII representation of the C<Array>
 
 P0 = [P1=666, P2=777, P0]
 
@@ -814,8 +814,8 @@ may look like this:
 
 0xdf4 30 3 0xdf8 33 666 0xdf2 777 0xdf5
 
-where 30 is C<class_enum_PerlArray>, 33 is C<class_enum_PerlInt>, the
-type of the second C<PerlInt> is suppressed, the repeated P0 has bit 0
+where 30 is C<class_enum_Array>, 33 is C<class_enum_Integer>, the
+type of the second C<Integer> is suppressed, the repeated P0 has bit 0
 set.
 
 =cut

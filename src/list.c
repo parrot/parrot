@@ -69,7 +69,7 @@ be created.
 To avoid this - and the performance penalty - set the array size
 before setting elements.
 
-    new P0, .PerlArray
+    new P0, .Array
     set P0, 100000  # sets fixed sized, no sparse
 
 This is only meaningful, if a lot of the entries are used too.
@@ -1225,8 +1225,8 @@ C<list_new_init()> uses these initializers:
 After getting these values out of the key/value pairs, a new array with
 these values is stored in user_data, where the keys are explicit.
 
-=item C<void
-list_pmc_new_init(Interp *interpreter, PMC *container, PMC *init)>
+=item C<List *
+list_new_init(Interp *interpreter, PMC *container, PMC *init)>
 
 Create a new list containing PMC* values in PMC_data(container).
 
@@ -1241,10 +1241,7 @@ list_new_init(Interp *interpreter, INTVAL type, PMC *init)
     PMC * user_array, *multi_key;
     INTVAL i, len, size, key, val, item_size, items_per_chunk;
 
-    if (!init->vtable ||
-            ((init->vtable->base_type != enum_class_PerlArray) &&
-             (init->vtable->base_type != enum_class_SArray) &&
-             (init->vtable->base_type != enum_class_Array)))
+    if (!init->vtable)
         internal_exception(1, "Illegal initializer for init\n");
     len = VTABLE_elements(interpreter, init);
     if (len & 1)

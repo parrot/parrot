@@ -71,7 +71,7 @@ trace_pmc_dump(Interp *interpreter, PMC* pmc)
         STRING *name = trace_class_name(interpreter, pmc);
         PIO_eprintf(interpreter, "Class=%Ss:PMC(%#p)", name, pmc);
     }
-    else if (pmc->vtable->base_type == enum_class_PerlString ||
+    else if (
              pmc->vtable->base_type == enum_class_String) {
         STRING *s = VTABLE_get_string(interpreter, pmc);
         if (!s)
@@ -103,12 +103,6 @@ trace_pmc_dump(Interp *interpreter, PMC* pmc)
         STRING *s = VTABLE_get_string(interpreter, pmc);
         PIO_eprintf(interpreter, "Complex=PMC(%#p: %Ss)",
                 pmc, s);
-    }
-    else if (pmc->vtable->base_type == enum_class_PerlUndef
-            ||  pmc->vtable->base_type == enum_class_PerlInt
-            ||  pmc->vtable->base_type == enum_class_PerlNum) {
-        PIO_eprintf(interpreter, "%S=PMC(%#p Num:%Pf Int:%Pd)",
-                VTABLE_name(interpreter, pmc), pmc, pmc, pmc);
     }
     else if (pmc->vtable->base_type == enum_class_RetContinuation
             ||  pmc->vtable->base_type == enum_class_Continuation
