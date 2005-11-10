@@ -459,7 +459,6 @@ examples/assembly/nanoforth.pasm                  [main]doc
 examples/assembly/nanoforth2.pasm                 [main]doc
 examples/assembly/ncurses_life.imc                [main]doc
 examples/assembly/pmcmops.pasm                    [main]doc
-examples/assembly/queens.pasm                     [main]doc
 examples/assembly/queens_r.imc                    [main]doc
 examples/assembly/thr-primes.imc                  [main]doc
 examples/benchmarks/addit.imc                     [main]doc
@@ -591,6 +590,7 @@ examples/pasm/cat.pasm                            [main]doc
 examples/pasm/fact.pasm                           [main]doc
 examples/pasm/hello.pasm                          [main]doc
 examples/pasm/lexical.pasm                        [main]doc
+examples/pasm/queens.pasm                         [main]doc
 examples/pasm/small.xml                           [main]doc
 examples/pasm/stack.pasm                          [main]doc
 examples/pasm/trace.pasm                          [main]doc

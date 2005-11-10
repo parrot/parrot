@@ -19,6 +19,7 @@ Test the examples in F<examples/pasm>.
 =head1 TODO
 
 Check on remaining examples in 'examples/assembly'.
+Put expected output into the example files.
 
 =head1 SEE ALSO
 
@@ -27,7 +28,7 @@ F<t/examples/pir.t>
 =cut
 
 use strict;
-use Parrot::Test tests => 6;
+use Parrot::Test tests => 7;
 
 # Set up expected output for examples
 my %expected
@@ -74,6 +75,29 @@ The lexical 'b' has in scope 0 the value 3.
 Getting rid of bottom stack
 The lexical 'a' has in the current scope the value 2.
 The lexical 'b' has in the current scope the value 3.
+END_EXPECTED
+
+    'queens.pasm'        =>  << 'END_EXPECTED',
+Making new board with 8 ranks and 8 files...
+Board length is 64.
+  +---+---+---+---+---+---+---+---+
+8 |   | * | Q | * |   | * |   | * |
+  +---+---+---+---+---+---+---+---+
+7 | * |   | * |   | * | Q | * |   |
+  +---+---+---+---+---+---+---+---+
+6 |   | * |   | Q |   | * |   | * |
+  +---+---+---+---+---+---+---+---+
+5 | * | Q | * |   | * |   | * |   |
+  +---+---+---+---+---+---+---+---+
+4 |   | * |   | * |   | * |   | Q |
+  +---+---+---+---+---+---+---+---+
+3 | * |   | * |   | Q |   | * |   |
+  +---+---+---+---+---+---+---+---+
+2 |   | * |   | * |   | * | Q | * |
+  +---+---+---+---+---+---+---+---+
+1 | Q |   | * |   | * |   | * |   |
+  +---+---+---+---+---+---+---+---+
+    A   B   C   D   E   F   G   H  
 END_EXPECTED
 
     'stack.pasm'        =>  << 'END_EXPECTED',
