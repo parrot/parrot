@@ -204,7 +204,7 @@ set_byte(Interp *interpreter, const STRING *src,
 	internal_exception(0, "set_byte past the end of the buffer");
     }
     contents = src->strstart;
-    contents[offset] = byte;
+    contents[offset] = (unsigned char)byte;
 }
 
 static STRING *

@@ -58,49 +58,44 @@ get_graphemes_inplace(Interp *interpreter, STRING *source_string,
 }
 
 static STRING*
-to_charset(Interp *interpreter, STRING *src,
-        CHARSET *new_charset, STRING *dest)
+to_charset(Interp *interpreter, STRING *src, STRING *dest)
 {
     charset_converter_t conversion_func;
+    String_iter iter;
+    UINTVAL c, len, offs;
 
     if ((conversion_func = Parrot_find_charset_converter(interpreter,
-                    src->charset, new_charset))) {
+                    src->charset, Parrot_unicode_charset_ptr))) {
          return conversion_func(interpreter, src, dest);
     }
-    else {
-        return new_charset->from_charset(interpreter, src, dest);
-
-    }
-}
-
-static STRING*
-to_unicode(Interp *interpreter, STRING *source_string, STRING *dest)
-{
-    UNIMPL;
-    return NULL;
-}
-
-static STRING*
-from_charset(Interp *interpreter, STRING *src, STRING *dest)
-{
-    if (src->charset == Parrot_unicode_charset_ptr) {
-        if (!dest) {
-            /* inplace ok */
-            return src;
+    len = src->strlen;
+    if (dest) {
+        Parrot_reallocate_string(interpreter, dest, len);
+        dest->charset = Parrot_unicode_charset_ptr;
+        dest->encoding = CHARSET_GET_PREFERRED_ENCODING(interpreter, dest);
+        ENCODING_ITER_INIT(interpreter, dest, &iter);
+        for (offs = 0; offs < src->strlen; ++offs) {
+            c = ENCODING_GET_CODEPOINT(interpreter, src, offs);
+            if (iter.bytepos >= PObj_buflen(dest) - 4) {
+                UINTVAL need = (UINTVAL)( (src->strlen - offs) * 1.5 );
+                if (need < 16)
+                    need = 16;
+                Parrot_reallocate_string(interpreter, dest,
+                        PObj_buflen(dest) + need);
+            }
+            iter.set_and_advance(interpreter, &iter, c);
         }
-        Parrot_reuse_COW_reference(interpreter, src, dest);
+        dest->bufused = iter.bytepos;
+        dest->strlen  = iter.charpos;
         return dest;
     }
-    UNIMPL;
+    else {
+        internal_exception(UNIMPLEMENTED,
+                "to_charset inplace for unicode not implemented");
+    }
     return NULL;
 }
 
-static STRING *
-from_unicode(Interp *interpreter, STRING *source_string, STRING *dest)
-{
-    UNIMPL;
-    return NULL;
-}
 
 static void
 compose(Interp *interpreter, STRING *source_string)
@@ -434,9 +429,6 @@ Parrot_charset_unicode_init(Interp *interpreter)
         get_graphemes_inplace,
         set_graphemes,
         to_charset,
-        to_unicode,
-        from_charset,
-        from_unicode,
         compose,
         decompose,
         upcase,

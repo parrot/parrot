@@ -40,7 +40,7 @@ set_graphemes(Interp *interpreter, STRING *source_string,
 }
 
 static STRING *
-from_charset(Interp *interpreter, STRING *src, STRING *dest)
+to_latin1(Interp *interpreter, STRING *src, STRING *dest)
 {
     UINTVAL offs, c;
     String_iter iter;
@@ -49,27 +49,21 @@ from_charset(Interp *interpreter, STRING *src, STRING *dest)
         Parrot_reallocate_string(interpreter, dest, src->strlen);
         dest->bufused = src->strlen;
         dest->strlen  = src->strlen;
+        dest->charset = Parrot_iso_8859_1_charset_ptr;
+        dest->encoding = Parrot_fixed_8_encoding_ptr;
     }
+    else
+        internal_exception(UNIMPLEMENTED,
+                "to_charset inplace for latin1 not implemented");
     ENCODING_ITER_INIT(interpreter, src, &iter);
     for (offs = 0; offs < src->strlen; ++offs) {
         c = iter.get_and_advance(interpreter, &iter);
         if (c >= 0x100) {
             EXCEPTION(LOSSY_CONVERSION, "lossy conversion to ascii");
         }
-        if (dest)
-            ENCODING_SET_BYTE(interpreter, dest, offs, c);
+        ENCODING_SET_BYTE(interpreter, dest, offs, c);
     }
-    if (dest)
-        return dest;
-    src->charset = Parrot_ascii_charset_ptr;
-    return src;
-}
-
-static STRING *
-from_unicode(Interp *interpreter, STRING *source_string, STRING *dest)
-{
-    internal_exception(UNIMPLEMENTED, "Can't do this yet");
-    return NULL;
+    return dest;
 }
 
 static STRING *
@@ -106,19 +100,16 @@ to_unicode(Interp *interpreter, STRING *src, STRING *dest)
 }
 
 static STRING *
-to_charset(Interp *interpreter, STRING *src,
-        CHARSET *new_charset, STRING *dest)
+to_charset(Interp *interpreter, STRING *src, STRING *dest)
 {
     charset_converter_t conversion_func;
 
     if ((conversion_func = Parrot_find_charset_converter(interpreter,
-                    src->charset, new_charset))) {
+                    src->charset, Parrot_iso_8859_1_charset_ptr))) {
          return conversion_func(interpreter, src, dest);
     }
     else {
-        STRING *res = to_unicode(interpreter, src, dest);
-        return new_charset->from_charset(interpreter, res, dest);
-
+        return to_latin1(interpreter, src, dest);
     }
 }
 
@@ -336,9 +327,6 @@ Parrot_charset_iso_8859_1_init(Interp *interpreter)
         ascii_get_graphemes_inplace,
         set_graphemes,
         to_charset,
-        to_unicode,
-        from_charset,
-        from_unicode,
         compose,
         decompose,
         upcase,

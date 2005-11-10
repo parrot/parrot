@@ -34,30 +34,14 @@ set_graphemes(Interp *interpreter, STRING *source_string,
 }
 
 static STRING*
-to_charset(Interp *interpreter, STRING *src, CHARSET *new_charset, STRING *dest)
+to_charset(Interp *interpreter, STRING *src, STRING *dest)
 {
+    charset_converter_t conversion_func;
+    if ((conversion_func = Parrot_find_charset_converter(interpreter,
+                    src->charset, Parrot_binary_charset_ptr))) {
+         return conversion_func(interpreter, src, dest);
+    }
     internal_exception(UNIMPLEMENTED, "to_charset for binary not implemented");
-    return NULL;
-}
-
-static STRING*
-to_unicode(Interp *interpreter, STRING *source_string, STRING *dest)
-{
-    internal_exception(UNIMPLEMENTED, "to_unicode for binary not implemented");
-    return NULL;
-}
-
-static STRING*
-from_charset(Interp *interpreter, STRING *source_string, STRING *dest)
-{
-    internal_exception(UNIMPLEMENTED, "Can't do this yet");
-    return NULL;
-}
-
-static STRING *
-from_unicode(Interp *interpreter, STRING *source_string, STRING *dest)
-{
-    internal_exception(UNIMPLEMENTED, "Can't do this yet");
     return NULL;
 }
 
@@ -174,9 +158,6 @@ Parrot_charset_binary_init(Interp *interpreter)
         ascii_get_graphemes_inplace,
         set_graphemes,
         to_charset,
-        to_unicode,
-        from_charset,
-        from_unicode,
         compose,
         decompose,
         upcase,

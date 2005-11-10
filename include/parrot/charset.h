@@ -38,9 +38,6 @@ typedef STRING *(*charset_get_graphemes_inplace_t)(Interp *, STRING *source_stri
 typedef void (*charset_set_graphemes_t)(Interp *, STRING *source_string, UINTVAL offset, UINTVAL replace_count, STRING *insert_string);
 
 typedef STRING * (*charset_to_charset_t)(Interp *, STRING *source_string,
-        CHARSET *new_charset, STRING *dest);
-typedef STRING * (*charset_to_unicode_t)(Interp *, STRING *src, STRING *dest);
-typedef STRING * (*charset_from_charset_t)(Interp *, STRING *source_string,
         STRING *dest);
 typedef STRING * (*charset_from_unicode_t)(Interp *, STRING *source_string,
         STRING *dest);
@@ -104,9 +101,6 @@ struct _charset {
     charset_get_graphemes_inplace_t get_graphemes_inplace;
     charset_set_graphemes_t set_graphemes;
     charset_to_charset_t to_charset;
-    charset_to_unicode_t to_unicode;
-    charset_from_charset_t from_charset;
-    charset_from_unicode_t from_unicode;
     charset_compose_t compose;
     charset_decompose_t decompose;
     charset_upcase_t upcase;
@@ -130,7 +124,6 @@ struct _charset {
 #define CHARSET_GET_GRAPEMES(interp, source, offset, count) ((CHARSET *)source->charset)->get_graphemes(interpreter, source, offset, count)
 #define CHARSET_GET_GRAPHEMES_INPLACE(interp, source, dest, offset, count) ((CHARSET *)source->charset)->get_graphemes(interpreter, source, dest, offset, count)
 #define CHARSET_SET_GRAPHEMES(interp, source, offset, replace_count, insert) ((CHARSET *)source->charset)->set_graphemes(interpreter, source, offset, replace_count, insert)
-#define CHARSET_TO_CHARSET(interp, source, new_charset, dest) ((CHARSET *)source->charset)->to_charset(interpreter, source, new_charset, dest)
 #define CHARSET_TO_UNICODE(interp, source, dest) ((CHARSET *)source->charset)->to_unicode(interpreter, source, dest)
 #define CHARSET_COMPOSE(interp, source) ((CHARSET *)source->charset)->compose(interpreter, source)
 #define CHARSET_DECOMPOSE(interp, source) ((CHARSET *)source->charset)->decompose(interpreter, source)

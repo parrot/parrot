@@ -2653,6 +2653,19 @@ Parrot_string_find_not_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags, ST
     return CHARSET_FIND_NOT_CCLASS(interpreter, flags, s, offset, count);
 }
 
+/*
+
+=item C< STRING*
+Parrot_string_trans_charset(Interp *interpreter, STRING *src,
+        INTVAL charset_nr, STRING *dest)>
+
+If C<dest> == NULL convert  C<src> to the given charset inplace, else
+return a copy of C<src> with the charset in dest.
+
+=cut
+
+*/
+
 STRING*
 Parrot_string_trans_charset(Interp *interpreter, STRING *src,
         INTVAL charset_nr, STRING *dest)
@@ -2685,7 +2698,7 @@ Parrot_string_trans_charset(Interp *interpreter, STRING *src,
             return src;
         }
     }
-    return CHARSET_TO_CHARSET(interpreter, src, new_charset, dest);
+    return new_charset->to_charset(interpreter, src, dest);
 }
 
 STRING*
