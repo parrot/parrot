@@ -817,7 +817,7 @@ $(PBCMERGE) : $(SRC_DIR)/pbc_merge$(O) $(LIBPARROT) $(SRC_DIR)/parrot_config$(O)
 	$(LINK) ${ld_out}$(PBCMERGE) \
 	$(SRC_DIR)/pbc_merge$(O) \
 	$(SRC_DIR)/parrot_config$(O) \
-	$(LINKFLAGS) $(ALL_PARROT_LIBS)
+	$(LINKFLAGS) $(LINK_DYNAMIC) $(ALL_PARROT_LIBS)
 
 
 
