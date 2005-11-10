@@ -17,6 +17,7 @@ Tests charset support.
 =cut
 
 use Parrot::Test tests => 41;
+use Parrot::Config;
 use Test::More;
 
 output_is( <<'CODE', <<OUTPUT, "basic syntax" );
@@ -505,6 +506,8 @@ abcdefg
 abcdefg
 OUTPUT
 
+SKIP: {
+  skip('no ICU lib', 10) unless $PConfig{has_icu};
 output_is( <<'CODE', <<"OUTPUT", "unicode downcase");
     set S0, iso-8859-1:"TÖTSCH"
     find_charset I0, "unicode"
@@ -687,3 +690,5 @@ CODE
 1
 6
 OUTPUT
+
+}  # SKIP
