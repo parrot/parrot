@@ -4,7 +4,7 @@
 
 Any language that targets parrot should be listed here. In addition,
 any languages bundled with parrot that work with the unified test
-suite will have their test reseults listed under the smokes marked
+suite will have their test results listed under the smokes marked
 'languages' at http://smoke.parrotcode.org/smoke/.
 
 =head2 Amber for parrot
@@ -17,11 +17,11 @@ Roger Browne
 
 =item Description
 
-Scripting language inspired by Eiffel and ruby
+Scripting language inspired by Eiffel and ruby.
 
 =item Status
 
-Incomplete - but all examples and test cases are working .
+Incomplete - but all examples and test cases are working.
 
 =item Last verified with parrot version
 
@@ -372,7 +372,7 @@ Bernhard Schmalhofer
 
 =item Description
 
-Port of GNU m4 to PIR
+Port of GNU m4 to PIR.
 
 =item Status
 
@@ -381,7 +381,7 @@ state are currently broken. Far from complete. Revision 0.0.14
 
 =item Last verified with parrot version
 
-0.3.0
+0.3.1
 
 =item Location
 
@@ -507,19 +507,20 @@ http://www.daca.net:8080/Parakeet-0.1.tgz
 
 =item Author
 
-Unknown
+Bernhard Schmalhofer played with it.
 
 =item Description
 
-An example on how the builtin compilers can be used
+An example on how the builtin PASM, PIR and PAST compilers can be used
+from within PASM and PIR programs.
 
 =item Status
 
-Unknown
+Working. Part of languages smoke testing.
 
 =item Last verified with parrot version
 
-Unknown
+0.3.1
 
 =item Location
 
@@ -625,12 +626,12 @@ An implementation of Perl1, implemented in PIR with PGE
 
 =item Status
 
-All tests fail. Only 'print 1;' is expected to work, the other tests are 
-marked as TODO.
+There are some TODO thar are not working yet. 
+Only the 'print 1;' test is expected to work, and does so.
 
 =item Last verified with parrot version
 
-0.3.0
+0.3.1
 
 =item Location
 

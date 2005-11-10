@@ -95,17 +95,17 @@ TODO:
 };
 
 # PAST tests
+
+$ENV{TEST_PROG_ARGS} = 'parrot_compiler.pbc --language=PAST';
+language_output_is( 'ParrotCompiler', $code{PAST}, $out{PAST}, $ENV{TEST_PROG_ARGS} );
+
+$ENV{TEST_PROG_ARGS} = 'parrot_compiler.imc --language=PAST';
+language_output_is( 'ParrotCompiler', $code{PAST}, $out{PAST},
+                    $ENV{TEST_PROG_ARGS} );
+
 TODO:
 {
-   local $TODO = 'PAST compiler seem to be broken';
-
-  $ENV{TEST_PROG_ARGS} = 'parrot_compiler.pbc --language=PAST';
-  language_output_is( 'ParrotCompiler', $code{PAST}, $out{PAST}, $ENV{TEST_PROG_ARGS} );
-
-  $ENV{TEST_PROG_ARGS} = 'parrot_compiler.imc --language=PAST';
-  language_output_is( 'ParrotCompiler', $code{PAST}, $out{PAST},
-                      $ENV{TEST_PROG_ARGS} );
-
+  local $TODO = 'generating PASM from PIR is not supported';
   $ENV{TEST_PROG_ARGS} = 'parrot_compiler.pasm --language=PAST';
   language_output_is( 'ParrotCompiler', $code{PAST}, $out{PAST},
                       $ENV{TEST_PROG_ARGS} );
