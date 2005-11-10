@@ -359,6 +359,7 @@ sub make_arg {
     my ($argtype, $reg_num, $temp_cnt_ref, $temps_ref,
 	$extra_preamble_ref, $extra_postamble_ref) = @_;
 
+	local $_ = $argtype;
     my $temp_num = ${$temp_cnt_ref}++;
     /p/ && do {
 	push @{$temps_ref}, "PMC *t_$temp_num;";
@@ -479,6 +480,7 @@ sub print_function {
     $other_decl ||= "";
 
     $other_decl .= join("\n    ", @{$temps_ref});
+	my $call_state = 'struct call_state st;';
     my $extra_preamble  = join("\n    ", @{$extra_preamble_ref});
     my $extra_postamble = join("\n    ", @{$extra_postamble_ref});
     my $return_data     = "$return_assign $final_assign" =~ /return_data/ ?
@@ -502,7 +504,12 @@ sub print_function {
         my $call_params = join(",", @$args);
         my @tempi = grep { defined $temp[$_] } 0..$#$args;
         my $temp_decl = join("\n    ", map { "$temp[$_]->[0] arg$_;"} @tempi);
-        my $temp_in   = join("\n    ", map { "arg$_ = $temp[$_]->[1];"} @tempi);
+		## shorts need to be properly cast
+        my $temp_in   = join("\n    ", map {
+				"arg$_ = "
+				. ( 'short' eq $temp[$_]->[0] ? '(short)' : '' )
+				. "$temp[$_]->[1];"
+			} @tempi);
         my $temp_out  = join("\n    ", map { "$temp[$_]->[1] = arg$_;"} @tempi);
         print NCI << "HEADER";
 static void
@@ -510,7 +517,7 @@ pcf_${return}_$params(Interp *interpreter, PMC *self)
 {
     typedef $ret_type (*func_t)($proto);
     func_t pointer;
-    struct call_state st;
+    $call_state
     $return_data
     $temp_decl
     $other_decl
@@ -528,6 +535,8 @@ HEADER
     }
     else {
         # Things are more simple, when there are no params
+		# call state var not needed if there are no params and a void return
+		$call_state = '' if 'v' eq $return;
         print NCI << "HEADER";
 static void
 pcf_${return}(Interp *interpreter, PMC *self)
@@ -535,7 +544,7 @@ pcf_${return}(Interp *interpreter, PMC *self)
     $ret_type (*pointer)(void);
     $return_data
     $other_decl
-    struct call_state st;
+    $call_state
     $extra_preamble
 
     pointer =  ($ret_type (*)(void))D2FPTR(PMC_struct_val(self));
@@ -582,10 +591,6 @@ build_call_func(Interp *interpreter, PMC *pmc_nci,
     void       *result        = NULL;
     Hash       *known_frames  = NULL;
     PMC        *HashPointer   = NULL;
-    union {
-        const void * __c_ptr;
-        void * __ptr;
-    } __ptr_u;
 
 #if defined(CAN_BUILD_CALL_FRAMES)
 
