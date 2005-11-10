@@ -1152,17 +1152,6 @@ string_replace(Interp *interpreter, STRING *src,
 
     true_offset = (UINTVAL)offset;
     true_length = (UINTVAL)length;
-
-    /* may have different reps..... */
-    if ( !(cs = string_rep_compatible(interpreter, src, rep, &enc))) {
-        internal_exception(UNIMPLEMENTED,
-                "Cross-type string replace (%s/%s) (%s/%s) unsupported",
-                ((ENCODING *)(src->encoding))->name,
-                ((CHARSET *)(src->charset))->name,
-                ((ENCODING *)(rep->encoding))->name,
-                ((CHARSET *)(rep->charset))->name);
-    }
-
     /* abs(-offset) may not be > strlen-1 */
     if (offset < 0) {
         true_offset = (UINTVAL)(src->strlen + offset);
@@ -1180,6 +1169,23 @@ string_replace(Interp *interpreter, STRING *src,
         true_length = (UINTVAL)(src->strlen - true_offset);
     }
 
+    /* Save the substring that is replaced for the return value */
+    if (d != NULL) {
+        dest = CHARSET_GET_CODEPOINTS(interpreter, src,
+                true_offset, true_length);
+        *d = dest;
+    }
+
+    /* may have different reps..... */
+    if ( !(cs = string_rep_compatible(interpreter, src, rep, &enc))) {
+        Parrot_utf16_encoding_ptr->to_encoding(interpreter, src);
+        rep = Parrot_utf16_encoding_ptr->copy_to_encoding(interpreter, rep);
+    }
+    else {
+        src->charset = cs;
+        src->encoding = enc;
+    }
+
     /* get byte position of the part that will be replaced */
     ENCODING_ITER_INIT(interpreter, src, &iter);
     iter.set_position(interpreter, &iter, true_offset);
@@ -1192,26 +1198,7 @@ string_replace(Interp *interpreter, STRING *src,
         internal_exception(SUBSTR_OUT_OF_STRING,
                 "replace: subend somehow is less than substart");
     }
-    /* Save the substring that is replaced for the return value */
-    if (d != NULL) {
-        UINTVAL length_bytes = string_max_bytes(interpreter, src, true_length);
 
-        dest = string_make_empty(interpreter, enum_stringrep_one, length_bytes);
-        dest->charset = src->charset;
-        dest->encoding = src->encoding;
-
-        mem_sys_memcopy(dest->strstart,
-                (char *)src->strstart + start_byte,
-                end_byte - start_byte);
-
-        dest->bufused = end_byte - start_byte;
-        dest->strlen = true_length;
-
-        *d = dest;
-    }
-
-    src->charset = cs;
-    src->encoding = enc;
     /* Now do the replacement */
 
     /*
