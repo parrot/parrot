@@ -1028,10 +1028,10 @@ string_repeat(Interp *interpreter, const STRING *s,
     STRING *dest;
     UINTVAL i;
 
-    dest = string_make_empty(interpreter, enum_stringrep_one, s->strlen * num);
+    dest = string_make_direct(interpreter, NULL,
+                        s->bufused * num,
+                        s->encoding, s->charset, 0);
 
-    /* dest = string_make(interpreter, NULL, s->bufused * num, s->encoding, 0,
-                       s->type); */
     if (num == 0) {
         return dest;
     }
