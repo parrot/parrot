@@ -568,6 +568,7 @@ output_is( <<'CODE', <<"OUTPUT", "chopn utf8");
     stringinfo I0, S1, .STRINGINFO_BUFUSED
     print_item I0
     print_newline
+    end
 CODE
 TT 2 2
 OUTPUT

@@ -26,7 +26,7 @@ STRING *string_concat(Interp *, STRING *, STRING *, UINTVAL);
 STRING *string_append(Interp *, STRING *, STRING *, UINTVAL);
 STRING *string_repeat(Interp *, const STRING *, UINTVAL,
                       STRING **);
-STRING *string_chopn(Interp *, STRING *, INTVAL);
+STRING *string_chopn(Interp *, STRING *, INTVAL, int in_place);
 STRING *string_substr(Interp *, STRING *, INTVAL,
                       INTVAL, STRING **, int replace_dest);
 STRING *string_replace(Interp *, STRING *, INTVAL, INTVAL,

@@ -1269,25 +1269,33 @@ string_replace(Interp *interpreter, STRING *src,
 /*
 
 =item C<STRING *
-string_chopn(Interp *interpreter, STRING *s, INTVAL n)>
+string_chopn(Interp *interpreter, STRING *s, INTVAL n, int in_place)>
 
 Chops off the last C<n> characters of the specified Parrot string. If
 C<n> is negative, cuts the string after C<+n> characters.
+If C<in_place> is true, the string is chopped in places, else a copy
+of the string is chopped and returned.
 
 =cut
 
 */
 
 STRING *
-string_chopn(Interp *interpreter, STRING *s, INTVAL n)
+string_chopn(Interp *interpreter, STRING *s, INTVAL n, int in_place)
 {
     UINTVAL new_length, uchar_size;
     String_iter iter;
-    /*
-     * FIXME constant or external strings can't be chopped inplace
-     */
+
     if (!s)
         return NULL;
+    if (in_place) {
+        /*
+         *  constant or external strings can't be chopped inplace
+         */
+        Parrot_unmake_COW(interpreter, s);
+    }
+    else
+        s = string_copy(interpreter, s);
 
     if (n < 0) {
         new_length = -n;
