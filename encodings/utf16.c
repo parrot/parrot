@@ -44,7 +44,8 @@ to_encoding(Interp *interpreter, STRING *src)
 #endif
     int src_len;
 
-    if (src->encoding == Parrot_utf16_encoding_ptr)
+    if (src->encoding == Parrot_utf16_encoding_ptr ||
+        src->encoding == Parrot_ucs2_encoding_ptr)
         return;
     /*
      * TODO adapt string creation functions
@@ -101,7 +102,8 @@ copy_to_encoding(Interp *interpreter, STRING *src)
 #endif
     int src_len;
 
-    if (src->encoding == Parrot_utf16_encoding_ptr)
+    if (src->encoding == Parrot_utf16_encoding_ptr ||
+        src->encoding == Parrot_ucs2_encoding_ptr)
         return string_copy(interpreter, src);
 
     /*
