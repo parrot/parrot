@@ -356,7 +356,8 @@ string_deinit(Parrot_Interp interpreter)
 =item C<UINTVAL
 string_capacity(Interp *interpreter, STRING *s)>
 
-Returns the capacity of the specified Parrot string.
+Returns the capacity of the specified Parrot string in bytes, that
+is how many bytes can be appended onto strstart.
 
 =cut
 
@@ -365,10 +366,8 @@ Returns the capacity of the specified Parrot string.
 UINTVAL
 string_capacity(Interp *interpreter, STRING *s)
 {
-    saneify_string(s);
     return ((ptrcast_t)PObj_bufstart(s) + PObj_buflen(s) -
-            (ptrcast_t)s->strstart) /
-        ENCODING_MAX_BYTES_PER_CODEPOINT(interpreter, s);
+            (ptrcast_t)s->strstart);
 }
 
 /*
@@ -475,47 +474,45 @@ string_append(Interp *interpreter,
     saneify_string(a);
     saneify_string(b);
 
-    /* If the destination's constant, then just fall back to
+    /* If the destination's constant, or external then just fall back to
        string_concat */
-    if (PObj_constant_TEST(a)) {
+    if (PObj_is_cowed_TESTALL(a)) {
         return string_concat(interpreter, a, b, Uflags);
     }
 
-    a_capacity = string_capacity(interpreter, a);
-    total_length = string_length(interpreter, a) + b_len;
-
-    /* make sure A's big enough for both */
-    if (a_capacity < total_length)
-    {
-        a = string_grow(interpreter, a,
-                (total_length - a_capacity) + EXTRA_SIZE);
-    }
+    if ( (cs = string_rep_compatible(interpreter, a, b, NULL)))
+        a->charset = cs;
     else {
-        Parrot_unmake_COW(interpreter, a);
+        /* upgrade to utf16 */
+        Parrot_utf16_encoding_ptr->to_encoding(interpreter, a);
+        b = Parrot_utf16_encoding_ptr->copy_to_encoding(interpreter, b);
+        /*
+         * result could be mixed ucs2 / utf16
+         */
+        if (b->encoding == Parrot_utf16_encoding_ptr)
+            a->encoding = Parrot_utf16_encoding_ptr;
+    }
+    /*
+     * calc usable and total bytes
+     */
+    a_capacity = string_capacity(interpreter, a);
+    total_length = a->bufused + b->bufused;
+
+    /* make sure A's big enough for both  */
+    if (a_capacity < total_length) {
+        Parrot_reallocate_string(interpreter, a,
+                total_length + EXTRA_SIZE);
     }
 
     /* A is now ready to receive the contents of B */
 
-    /* if compatible rep, can memcopy */
-    if ( (cs = string_rep_compatible(interpreter, a, b, NULL))) {
-        a->charset = cs;
-        /* Tack B on the end of A */
-        mem_sys_memcopy((void *)((ptrcast_t)a->strstart + a->bufused),
-                b->strstart, b->bufused);
+    /* Tack B on the end of A */
+    mem_sys_memcopy((void *)((ptrcast_t)a->strstart + a->bufused),
+            b->strstart, b->bufused);
 
-        a->bufused += b->bufused;
-        a->strlen += b_len;
-        return a;
-    }
-    else {
-        internal_exception(UNIMPLEMENTED,
-                "Cross-type string appending (%s/%s) (%s/%s) unsupported",
-                ((ENCODING *)(a->encoding))->name,
-                ((CHARSET *)(a->charset))->name,
-                ((ENCODING *)(b->encoding))->name,
-                ((CHARSET *)(b->charset))->name);
-    }
-
+    a->bufused += b->bufused;
+    a->strlen += b_len;
+    a->hashval = 0;
     return a;
 }
 
@@ -675,36 +672,29 @@ string_make_direct(Interp *interpreter, const void *buffer,
         void * __ptr;
     } __ptr_u;
 
-    /*    PIO_eprintf(NULL, "string_make(): length = %ld, encoding name = %s, buffer = %s\n",
-          len, charset, (const char *)buffer); */
-
-    if (len && !buffer) {
-        internal_exception(BAD_BUFFER_SIZE,
-                "string_make: buffer pointer NULL, but length nonzero");
-    }
-
     s = new_string_header(interpreter, flags);
     s->encoding = encoding;
     s->charset = charset;
 
-    if (encoding == Parrot_fixed_8_encoding_ptr &&
-            charset == Parrot_ascii_charset_ptr) {
+    if (flags & PObj_external_FLAG) {
         /*
          * fast path for external (constant) strings - don't allocate
          * and copy data
          */
-        if (flags & PObj_external_FLAG) {
-            /* The following cast discards the 'const'.  That raises
-               a warning with gcc, but is ok since the caller indicated
-               it was safe by setting PObj_external_FLAG.
-               (The cast is necessary to pacify TenDRA's tcc.)
-               */
-            PObj_bufstart(s) = s->strstart = const_cast(buffer);
-            PObj_buflen(s)   = s->strlen = s->bufused = len;
-            PObj_bufstart_external_SET(s);
+        /* The following cast discards the 'const'.  That raises
+           a warning with gcc, but is ok since the caller indicated
+           it was safe by setting PObj_external_FLAG.
+           (The cast is necessary to pacify TenDRA's tcc.)
+           */
+        PObj_bufstart(s) = s->strstart = const_cast(buffer);
+        PObj_buflen(s)   = s->bufused = len;
+        PObj_bufstart_external_SET(s);
+        if (encoding == Parrot_fixed_8_encoding_ptr)
+            s->strlen = len;
+        else
+            string_compute_strlen(interpreter, s);
 
-            return s;
-        }
+        return s;
     }
 
     Parrot_allocate_string(interpreter, s, len);
@@ -712,7 +702,10 @@ string_make_direct(Interp *interpreter, const void *buffer,
     if (buffer) {
         mem_sys_memcopy(s->strstart, buffer, len);
         s->bufused = len;
-        string_compute_strlen(interpreter, s);
+        if (encoding == Parrot_fixed_8_encoding_ptr)
+            s->strlen = len;
+        else
+            string_compute_strlen(interpreter, s);
     }
     else {
         s->strlen = s->bufused = 0;
@@ -991,8 +984,9 @@ string_concat(Interp *interpreter,
     if (a != NULL && a->strlen != 0) {
         if (b != NULL && b->strlen != 0) {
             STRING *result =
-                string_make_empty(interpreter, enum_stringrep_one,
-                        a->strlen + b->strlen);
+                string_make_direct(interpreter, NULL,
+                        a->bufused + b->bufused,
+                        a->encoding, a->charset, 0);
 
             string_append(interpreter, result, a, Uflags);
             string_append(interpreter, result, b, Uflags);

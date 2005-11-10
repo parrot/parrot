@@ -16,7 +16,7 @@ Tests charset support.
 
 =cut
 
-use Parrot::Test tests => 35;
+use Parrot::Test tests => 37;
 use Test::More;
 
 output_is( <<'CODE', <<OUTPUT, "basic syntax" );
@@ -571,4 +571,50 @@ output_is( <<'CODE', <<"OUTPUT", "chopn utf8");
     end
 CODE
 TT 2 2
+OUTPUT
+
+output_is( <<'CODE', <<"OUTPUT", "utf16 append");
+    set S0, iso-8859-1:"Tötsch"
+    find_charset I0, "unicode"
+    trans_charset S1, S0, I0
+    find_encoding I0, "utf16"
+    trans_encoding S1, S1, I0
+    concat S1, " Leo"
+    length I0, S1
+    print_item I0
+    .include "stringinfo.pasm"
+    stringinfo I0, S1, .STRINGINFO_BUFUSED
+    print_item I0
+    print_newline
+    find_encoding I0, "utf8"
+    trans_encoding S2, S1, I0
+    print S2
+    print "\n"
+    end
+CODE
+10 20
+T\xc3\xb6tsch Leo
+OUTPUT
+
+output_is( <<'CODE', <<"OUTPUT", "utf16 concat");
+    set S0, iso-8859-1:"Tötsch"
+    find_charset I0, "unicode"
+    trans_charset S1, S0, I0
+    find_encoding I0, "utf16"
+    trans_encoding S1, S1, I0
+    concat S2, S1, " Leo"
+    length I0, S2
+    print_item I0
+    .include "stringinfo.pasm"
+    stringinfo I0, S2, .STRINGINFO_BUFUSED
+    print_item I0
+    print_newline
+    find_encoding I0, "utf8"
+    trans_encoding S2, S2, I0
+    print S2
+    print "\n"
+    end
+CODE
+10 20
+T\xc3\xb6tsch Leo
 OUTPUT

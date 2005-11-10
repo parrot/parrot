@@ -168,8 +168,13 @@ become_encoding(Interp *interpreter, STRING *src)
 static UINTVAL
 codepoints(Interp *interpreter, STRING *src)
 {
-    UNIMPL;
+#if PARROT_HAS_ICU
+    return src->bufused / sizeof(UChar);
+#else
+    real_exception(interpreter, NULL, E_LibraryNotLoadedError,
+            "no ICU lib loaded");
     return 0;
+#endif
 }
 
 static UINTVAL
