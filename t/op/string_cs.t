@@ -16,7 +16,7 @@ Tests charset support.
 
 =cut
 
-use Parrot::Test tests => 34;
+use Parrot::Test tests => 35;
 use Test::More;
 
 output_is( <<'CODE', <<OUTPUT, "basic syntax" );
@@ -556,3 +556,18 @@ CODE
 84_214_84_83_67_72_
 OUTPUT
 
+output_is( <<'CODE', <<"OUTPUT", "chopn utf8");
+    set S0, iso-8859-1:"TTÖÖ"
+    find_charset I0, "unicode"
+    trans_charset S1, S0, I0
+    chopn S1, 2
+    print_item S1
+    length I0, S1
+    print_item I0
+    .include "stringinfo.pasm"
+    stringinfo I0, S1, .STRINGINFO_BUFUSED
+    print_item I0
+    print_newline
+CODE
+TT 2 2
+OUTPUT

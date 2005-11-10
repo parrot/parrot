@@ -151,6 +151,9 @@ u_strToLower(UChar *dest, int32_t destCapacity,
                 &err);
         assert(U_SUCCESS(err));
     }
+    /* downgrade if possible */
+    if (dest_len == (int)src->strlen)
+        src->encoding = Parrot_ucs2_encoding_ptr;
 #else
     real_exception(interpreter, NULL, E_LibraryNotLoadedError,
             "no ICU lib loaded");

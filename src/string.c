@@ -1281,7 +1281,13 @@ C<n> is negative, cuts the string after C<+n> characters.
 STRING *
 string_chopn(Interp *interpreter, STRING *s, INTVAL n)
 {
-    UINTVAL new_length;
+    UINTVAL new_length, uchar_size;
+    String_iter iter;
+    /*
+     * FIXME constant or external strings can't be chopped inplace
+     */
+    if (!s)
+        return NULL;
 
     if (n < 0) {
         new_length = -n;
@@ -1294,10 +1300,24 @@ string_chopn(Interp *interpreter, STRING *s, INTVAL n)
         else
             new_length = 0;
     }
-
-    s->strlen = new_length;
-    s->bufused = string_max_bytes(interpreter, s, new_length);
     s->hashval = 0;
+    if (!new_length || !s->strlen) {
+        s->bufused = s->strlen = 0;
+        return s;
+    }
+    uchar_size = s->bufused / s->strlen;
+    s->strlen = new_length;
+    if (s->encoding == Parrot_fixed_8_encoding_ptr) {
+        s->bufused = new_length;
+    }
+    else if (s->encoding == Parrot_ucs2_encoding_ptr) {
+        s->bufused = new_length * uchar_size;
+    }
+    else {
+        ENCODING_ITER_INIT(interpreter, s, &iter);
+        iter.set_position(interpreter, &iter, new_length);
+        s->bufused = iter.bytepos;
+    }
 
     return s;
 }
