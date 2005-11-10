@@ -251,7 +251,6 @@ NEXT:
 
   # Now actually run it
   compreg P1, "PASM"
-  compile P0, P1, code
-  invoke
-  end
+  P0 = P1( code )
+  P0()
 .end
