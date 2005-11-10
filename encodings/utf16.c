@@ -81,6 +81,10 @@ to_encoding(Interp *interpreter, STRING *src)
     Parrot_reallocate_string(interpreter, src, src->bufused);
     memcpy(src->strstart, p, src->bufused);
     mem_sys_free(p);
+
+    /* downgrade if possible */
+    if (dest_len == (int)src->strlen)
+        src->encoding = Parrot_ucs2_encoding_ptr;
 #else
     real_exception(interpreter, NULL, E_LibraryNotLoadedError,
             "no ICU lib loaded");
@@ -124,7 +128,10 @@ copy_to_encoding(Interp *interpreter, STRING *src)
         assert(U_SUCCESS(err));
     }
     dest->bufused = dest_len * sizeof(UChar);
-    
+    /* downgrade if possible */
+    if (dest_len == (int)src->strlen)
+        src->encoding = Parrot_ucs2_encoding_ptr;
+
 #else
     real_exception(interpreter, NULL, E_LibraryNotLoadedError,
             "no ICU lib loaded");
@@ -340,7 +347,7 @@ Parrot_encoding_utf16_init(Interp *interpreter)
 
     static const ENCODING base_encoding = {
 	"utf16",
-	2, /* Max bytes per codepoint 0 .. 0x10ffff */
+	4, /* Max bytes per codepoint 0 .. 0x10ffff */
 	to_encoding,
 	copy_to_encoding,
 	get_codepoint,

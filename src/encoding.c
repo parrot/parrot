@@ -18,6 +18,7 @@ These are parrot's generic encoding handling functions
 ENCODING *Parrot_default_encoding_ptr;
 ENCODING *Parrot_fixed_8_encoding_ptr;
 ENCODING *Parrot_utf8_encoding_ptr;
+ENCODING *Parrot_ucs2_encoding_ptr;
 ENCODING *Parrot_utf16_encoding_ptr;
 
 typedef struct {
@@ -202,6 +203,10 @@ Parrot_register_encoding(Interp *interpreter, const char *encodingname,
     }
     if (!strcmp("utf16", encodingname)) {
         Parrot_utf16_encoding_ptr = encoding;
+        return register_encoding(interpreter, encodingname, encoding);
+    }
+    if (!strcmp("ucs2", encodingname)) {
+        Parrot_ucs2_encoding_ptr = encoding;
         return register_encoding(interpreter, encodingname, encoding);
     }
     return 0;

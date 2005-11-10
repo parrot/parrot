@@ -18,6 +18,7 @@ These are parrot's generic charset handling functions
 #include "../encodings/fixed_8.h"
 #include "../encodings/utf8.h"
 #include "../encodings/utf16.h"
+#include "../encodings/ucs2.h"
 
 #include "../charset/ascii.h"
 #include "../charset/binary.h"
@@ -249,6 +250,7 @@ Parrot_charsets_encodings_init(Interp *interpreter)
      */
     Parrot_encoding_fixed_8_init(interpreter);
     Parrot_encoding_utf8_init(interpreter);
+    Parrot_encoding_ucs2_init(interpreter);
     Parrot_encoding_utf16_init(interpreter);
 
     Parrot_charset_ascii_init(interpreter);

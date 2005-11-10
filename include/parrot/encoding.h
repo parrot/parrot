@@ -65,6 +65,7 @@ typedef struct _encoding ENCODING;
 extern ENCODING *Parrot_fixed_8_encoding_ptr;
 extern ENCODING *Parrot_utf8_encoding_ptr;
 extern ENCODING *Parrot_utf16_encoding_ptr;
+extern ENCODING *Parrot_ucs2_encoding_ptr;
 extern ENCODING *Parrot_default_encoding_ptr;
 #endif
 
