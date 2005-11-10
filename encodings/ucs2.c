@@ -69,16 +69,27 @@ copy_to_encoding(Interp *interpreter, STRING *src)
 static UINTVAL
 get_codepoint(Interp *interpreter, const STRING *src, UINTVAL offset)
 {
+#if PARROT_HAS_ICU
     UChar *s = (UChar*) src->strstart;
     return s[offset];
+#else
+    real_exception(interpreter, NULL, E_LibraryNotLoadedError,
+            "no ICU lib loaded");
+    return 0;
+#endif
 }
 
 static void
 set_codepoint(Interp *interpreter, STRING *src,
 	UINTVAL offset, UINTVAL codepoint)
 {
+#if PARROT_HAS_ICU
     UChar *s = (UChar*) src->strstart;
     s[offset] = codepoint;
+#else
+    real_exception(interpreter, NULL, E_LibraryNotLoadedError,
+            "no ICU lib loaded");
+#endif
 }
 
 static UINTVAL
@@ -99,18 +110,23 @@ static STRING *
 get_codepoints(Interp *interpreter, STRING *src,
 	UINTVAL offset, UINTVAL count)
 {
-    String_iter iter;
-    UINTVAL start;
-    STRING *return_string = Parrot_make_COW_reference(interpreter,
-	    src);
-    return_string->encoding = src->encoding;
-    return_string->charset = src->charset;
-    iter_init(interpreter, src, &iter);
-    iter.set_position(interpreter, &iter, offset);
-    start = iter.bytepos;
-    return_string->strstart = (char *)return_string->strstart + start ;
-    iter.set_position(interpreter, &iter, offset + count);
-    return_string->bufused = iter.bytepos - start;
+    STRING *return_string = Parrot_make_COW_reference(interpreter, src);
+#if PARROT_HAS_ICU
+    return_string->strstart = (char*)src->strstart + offset * sizeof(UChar);
+    return_string->bufused = count * sizeof(UChar);
+#else
+    {
+        String_iter iter;
+        UINTVAL start;
+
+        iter_init(interpreter, src, &iter);
+        iter.set_position(interpreter, &iter, offset);
+        start = iter.bytepos;
+        return_string->strstart = (char *)return_string->strstart + start;
+        iter.set_position(interpreter, &iter, offset + count);
+        return_string->bufused = iter.bytepos - start;
+    }
+#endif
     return_string->strlen = count;
     return_string->hashval = 0;
     return return_string;

@@ -415,8 +415,6 @@ get_codepoints(Interp *interpreter, STRING *src,
     UINTVAL start;
     STRING *return_string = Parrot_make_COW_reference(interpreter,
 	    src);
-    return_string->encoding = src->encoding;
-    return_string->charset = src->charset;
     iter_init(interpreter, src, &iter);
     iter.set_position(interpreter, &iter, offset);
     start = iter.bytepos;
@@ -449,11 +447,20 @@ get_bytes(Interp *interpreter, STRING *src,
 
 static STRING *
 get_codepoints_inplace(Interp *interpreter, STRING *src,
-	UINTVAL offset, UINTVAL count, STRING *dest_string)
+	UINTVAL offset, UINTVAL count, STRING *return_string)
 {
-
-    UNIMPL;
-    return NULL;
+    String_iter iter;
+    UINTVAL start;
+    Parrot_reuse_COW_reference(interpreter, src, return_string);
+    iter_init(interpreter, src, &iter);
+    iter.set_position(interpreter, &iter, offset);
+    start = iter.bytepos;
+    return_string->strstart = (char *)return_string->strstart + start ;
+    iter.set_position(interpreter, &iter, offset + count);
+    return_string->bufused = iter.bytepos - start;
+    return_string->strlen = count;
+    return_string->hashval = 0;
+    return return_string;
 }
 
 static STRING *

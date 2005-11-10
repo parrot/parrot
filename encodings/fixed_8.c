@@ -118,8 +118,6 @@ get_bytes_inplace(Interp *interpreter, STRING *source_string,
 	UINTVAL offset, UINTVAL count, STRING *return_string)
 {
     Parrot_reuse_COW_reference(interpreter, source_string, return_string);
-    return_string->encoding = source_string->encoding;
-    return_string->charset = source_string->charset;
 
     return_string->strstart = (char *)return_string->strstart + offset ;
     return_string->bufused = count;
