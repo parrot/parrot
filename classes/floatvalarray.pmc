@@ -105,11 +105,11 @@ Sets C<value> at index C<*key>.
 */
 
     void set_number_keyed (PMC* key, FLOATVAL value) {
-        FLOATVAL ix;
+        INTVAL ix;
 
         if (!key) return;
 
-        ix = key_number(INTERP, key);
+        ix = key_integer(INTERP, key);
         list_assign(INTERP, (List*) PMC_struct_val(SELF),
                 ix, &value, enum_type_FLOATVAL);
     }
@@ -155,9 +155,9 @@ Returns the value of the element at index C<*key>.
 */
 
     FLOATVAL get_number_keyed (PMC* key) {
-        FLOATVAL ix;
+        INTVAL ix;
         void *ret;
-        ix = key_number(INTERP, key);
+        ix = key_integer(INTERP, key);
         ret = list_get(INTERP, (List*) PMC_struct_val(SELF), ix,
                 enum_type_FLOATVAL);
         return !ret || ret == (void*)-1 ? 0.0 : *(FLOATVAL*)ret;

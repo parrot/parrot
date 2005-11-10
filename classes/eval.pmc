@@ -195,7 +195,6 @@ for writing to disc and later loading via C<load_bytecode>.
         STRING *res;
         struct PackFile *pf;
         size_t size, aligned_size;
-        opcode_t *packed;
         struct PackFile_ByteCode *seg;
 
         pf = PackFile_new(INTERP, 0);

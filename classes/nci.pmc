@@ -124,7 +124,6 @@ shifted down.
 
     void* invoke (void * next) {
         Parrot_csub_t func = (Parrot_csub_t)D2FPTR(PMC_data(SELF));
-        UINTVAL flags;
 
         INTERP->current_cont = NULL;
         if (!func)

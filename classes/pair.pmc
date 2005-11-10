@@ -238,8 +238,6 @@ Used to unarchive the Pair.
 
     void thaw(visit_info *info) {
         IMAGE_IO *io = info->image_io;
-        Hash *hash;
-        PMC *dummy;
 
         SUPER(info);
         if (info->extra_flags == EXTRA_IS_NULL) {

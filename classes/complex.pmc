@@ -970,11 +970,7 @@ MMD_Complex: {
                     IM(SELF) == IM(value)
                 );
         }
-MMD_Float: {
-/*
-        XXX: the above really should be MMD_DEFAULT, but that causes
-             t/dynclass/pycomplex.t to fail.
-*/
+MMD_DEFAULT: {
             if(IM(SELF) != 0.0)
                 return (INTVAL)0;
             return (RE(SELF) == VTABLE_get_number(INTERP, value));

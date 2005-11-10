@@ -775,7 +775,7 @@ MMD_DEFAULT: {
             if (!dest)
                 dest = pmc_new(INTERP, SELF->vtable->base_type);
             VTABLE_set_integer_native(INTERP, dest,
-                    floor(DYNSELF.get_number() / d));
+                    (INTVAL)floor(DYNSELF.get_number() / d));
             return dest;
         }
     }
@@ -787,7 +787,7 @@ MMD_DEFAULT: {
         if (!dest)
             dest = pmc_new(INTERP, SELF->vtable->base_type);
         VTABLE_set_integer_native(INTERP, dest,
-                floor(DYNSELF.get_number() / value));
+                (INTVAL)floor(DYNSELF.get_number() / value));
         return dest;
     }
 
@@ -798,7 +798,7 @@ MMD_DEFAULT: {
         if (!dest)
             dest = pmc_new(INTERP, SELF->vtable->base_type);
         VTABLE_set_integer_native(INTERP, dest,
-                floor(DYNSELF.get_number() / value));
+                (INTVAL)floor(DYNSELF.get_number() / value));
         return dest;
     }
 
@@ -813,7 +813,7 @@ MMD_DEFAULT: {
                 real_exception(INTERP, NULL, E_ZeroDivisionError,
                         "float division by zero");
             VTABLE_set_integer_native(INTERP, SELF,
-                    floor(DYNSELF.get_number() / d));
+                    (INTVAL)floor(DYNSELF.get_number() / d));
         }
     }
 
@@ -822,7 +822,7 @@ MMD_DEFAULT: {
             real_exception(INTERP, NULL, E_ZeroDivisionError,
                     "float division by zero");
         VTABLE_set_integer_native(INTERP, SELF,
-                floor(DYNSELF.get_number() / value));
+                (INTVAL)floor(DYNSELF.get_number() / value));
     }
 
     void i_floor_divide_float (FLOATVAL value) {
@@ -830,7 +830,7 @@ MMD_DEFAULT: {
             real_exception(INTERP, NULL, E_ZeroDivisionError,
                     "float division by zero");
         VTABLE_set_integer_native(INTERP, SELF,
-                floor(DYNSELF.get_number() / value));
+                (INTVAL)floor(DYNSELF.get_number() / value));
     }
 
 /*
@@ -882,7 +882,7 @@ MMD_DEFAULT: {
         if (!dest)
             dest = pmc_new(INTERP, SELF->vtable->base_type);
         VTABLE_set_integer_native(INTERP, dest,
-                fmod(DYNSELF.get_integer(), value));
+                (INTVAL)fmod(DYNSELF.get_integer(), value));
         return dest;
     }
 
@@ -925,7 +925,7 @@ MMD_DEFAULT: {
             real_exception(INTERP, NULL, E_ZeroDivisionError,
                     "int cmodulus by zero");
         VTABLE_set_integer_native(INTERP, SELF,
-                fmod(DYNSELF.get_integer(), value));
+                (INTVAL)fmod(DYNSELF.get_integer(), value));
     }
 
 /*
@@ -987,7 +987,7 @@ MMD_DEFAULT: {
         if (!dest)
             dest = pmc_new(INTERP, SELF->vtable->base_type);
         VTABLE_set_integer_native(INTERP, dest,
-                intval_mod(DYNSELF.get_integer(), value));
+                intval_mod(DYNSELF.get_integer(), (INTVAL)value));
         return dest;
     }
     void i_modulus (PMC* value) {
@@ -1018,7 +1018,7 @@ MMD_DEFAULT: {
             real_exception(INTERP, NULL, E_ZeroDivisionError,
                     "int modulus by zero");
         VTABLE_set_integer_native(INTERP, SELF,
-                intval_mod(DYNSELF.get_integer() , value));
+                intval_mod(DYNSELF.get_integer() , (INTVAL)value));
     }
 
 /*
