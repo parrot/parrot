@@ -143,6 +143,7 @@ copy_to_encoding(Interp *interpreter, STRING *src)
 static UINTVAL
 get_codepoint(Interp *interpreter, const STRING *src, UINTVAL offset)
 {
+#if PARROT_HAS_ICU
     UChar *s = (UChar*) src->strstart;
     UINTVAL c, pos;
 
@@ -150,6 +151,11 @@ get_codepoint(Interp *interpreter, const STRING *src, UINTVAL offset)
     U16_FWD_N_UNSAFE(s, pos, offset);
     U16_GET_UNSAFE(s, pos, c);
     return c;
+#else
+    real_exception(interpreter, NULL, E_LibraryNotLoadedError,
+            "no ICU lib loaded");
+    return 0;
+#endif
 }
 
 static void
