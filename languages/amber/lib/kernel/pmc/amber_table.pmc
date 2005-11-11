@@ -1,0 +1,86 @@
+/* amber_table.pmc
+ *  Copyright: same as Parrot.
+ *  Overview:
+ *     The Amber_TABLE PMC, which implementes the Amber kernel class TABLE
+ */
+
+#include "parrot/parrot.h"
+
+pmclass Amber_TABLE need_ext extends Hash extends Amber_DEFAULT does hash dynpmc group amber_kernel {
+
+    void class_init() {
+        if (pass) {
+            /* Register this PMC as Amber's HLL Hash type. */
+            INTVAL amber_id = Parrot_get_HLL_id(
+                INTERP, const_string(INTERP, "Amber")
+            );
+            if (amber_id > 0)
+                Parrot_register_HLL_type(
+                    INTERP, amber_id, enum_class_Hash, entry
+                );
+        }
+    }
+
+/* non-vtable methods follow */
+
+    METHOD PMC* boolean() {
+        PMC* result = pmc_new(
+            INTERP, Parrot_get_ctx_HLL_type(INTERP, enum_class_Boolean)
+        );
+        VTABLE_set_bool(INTERP, result, VTABLE_get_bool(INTERP, SELF));
+        return result;
+    }
+
+    METHOD PMC* classname() {
+        PMC* result = pmc_new(
+            INTERP, Parrot_get_ctx_HLL_type(INTERP, enum_class_String)
+        );
+        VTABLE_set_string_native(
+            INTERP, result, string_from_const_cstring(INTERP, "TABLE", 5)
+        );
+        return result;
+    }
+
+    METHOD PMC* count() {
+        PMC* result = pmc_new(
+            INTERP, Parrot_get_ctx_HLL_type(INTERP, enum_class_Integer)
+        );
+        VTABLE_set_integer_native(
+            INTERP, result, VTABLE_get_integer(INTERP, SELF)
+        );
+        return result;
+    }
+
+    METHOD void delete(PMC* key) {
+        VTABLE_delete_keyed(INTERP, SELF, key);
+    }
+
+    METHOD PMC* has(PMC* key) {
+        PMC* result = pmc_new(
+            INTERP, Parrot_get_ctx_HLL_type(INTERP, enum_class_Boolean)
+        );
+        VTABLE_set_bool(
+            INTERP, result, VTABLE_exists_keyed(INTERP, SELF, key)
+        );
+        return result;
+    }
+
+    METHOD PMC* item(PMC* key) {
+        return VTABLE_get_pmc_keyed(INTERP, SELF, key);
+    }
+
+    METHOD void set_item(PMC* key, PMC* value) {
+        VTABLE_set_pmc_keyed(INTERP, SELF, key, value);
+    }
+
+}
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+ */

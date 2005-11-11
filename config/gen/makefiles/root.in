@@ -158,6 +158,7 @@ GEN_MAKEFILES = \
 #CONDITIONED_LINE(has_perldoc):    docs/Makefile \
     dynclasses/Makefile \
     dynoplibs/Makefile \
+    languages/amber/Makefile \
     languages/cola/Makefile \
     languages/parrot_compiler/Makefile \
     languages/jako/Makefile \

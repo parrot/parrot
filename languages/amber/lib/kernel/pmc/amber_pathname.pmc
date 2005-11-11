@@ -1,0 +1,298 @@
+/* amber_pathname.pmc
+ *  Copyright: same as Parrot.
+ *  Overview:
+ *     The Amber_PATHNAME PMC, which implementes the Amber kernel class PATHNAME
+ */
+
+#include "parrot/parrot.h"
+#include <dirent.h>
+
+static INTVAL class_PATHNAME;
+
+pmclass Amber_PATHNAME extends Amber_STRING extends Amber_DEFAULT does string dynpmc group amber_kernel {
+
+    void class_init() {
+        if (pass) {
+            /* Record the type-id of this PMC */
+            class_PATHNAME = Parrot_PMC_typenum(INTERP, "Amber_PATHNAME");
+        }
+    }
+
+    void init() {
+        char* buffer = getcwd(NULL, 0);
+        if (!buffer)
+            real_exception(
+                INTERP, NULL, E_IOError,
+                "PATHNAME.set_to_current: couldn't read current working directory"
+            );
+        PMC_str_val(SELF) = string_from_cstring(INTERP, buffer, 0);
+        free(buffer);
+        PObj_custom_mark_SET(SELF);
+    }
+
+    void init_pmc(PMC* initializer) {
+        PMC_str_val(SELF) = VTABLE_get_string(INTERP, initializer);
+        PObj_custom_mark_SET(SELF);
+    }
+
+/* non-vtable methods follow */
+
+    METHOD PMC* array() {
+        PMC* result = pmc_new(
+            INTERP, Parrot_get_ctx_HLL_type(INTERP, enum_class_Array)
+        );
+        STRING* delimiter = string_from_const_cstring(INTERP, "/", 1);
+        /* --WINDOWS */
+        STRING* pathname = VTABLE_get_string(INTERP, SELF);
+        int pathlength = string_length(INTERP, pathname);
+        int start, end;
+        start = 0;
+        int index = 0;
+        while (start < pathlength) {
+            end = string_str_index(INTERP, pathname, delimiter, start);
+            if (end < start) /* no more delimiters */
+                end = pathlength;
+            if (end == start)  /* found a delimiter at the start */
+                start++;
+            else {
+                STRING* match = string_substr(
+                    INTERP, pathname, start, end - start, NULL, 0
+                );
+                PMC* item = pmc_new(
+                    INTERP, Parrot_get_ctx_HLL_type(INTERP, enum_class_String)
+                );
+                VTABLE_set_string_native(INTERP, item, match);
+                VTABLE_set_integer_native(INTERP, result, index + 1);
+                VTABLE_set_pmc_keyed_int(INTERP, result, index, item);
+                index++;
+                start = end + 1;
+            }
+        }
+        return result;
+    }
+
+    METHOD PMC* classname() {
+        PMC* result = pmc_new(
+            INTERP, Parrot_get_ctx_HLL_type(INTERP, enum_class_String)
+        );
+        VTABLE_set_string_native(
+            INTERP, result, string_from_const_cstring(INTERP, "PATHNAME", 8)
+        );
+        return result;
+    }
+
+    METHOD PMC* entry_names() {
+        DIR *dp;
+        struct dirent *ep;
+        PMC* result = pmc_new(
+            INTERP, Parrot_get_ctx_HLL_type(INTERP, enum_class_Array)
+        );
+        int index = 0;
+        dp = opendir(string_to_cstring(INTERP, PMC_str_val(SELF)));
+        if (dp != NULL) {
+            while ((ep = readdir(dp))) {
+                VTABLE_set_integer_native(INTERP, result, index + 1);
+                PMC* item = pmc_new(
+                    INTERP, Parrot_get_ctx_HLL_type(INTERP, enum_class_String)
+                );
+                VTABLE_set_string_native(
+                    INTERP, item, string_from_cstring(INTERP, ep->d_name, 0)
+                );
+                VTABLE_set_pmc_keyed_int(INTERP, result, index, item);
+                index++;
+            }
+            (void) closedir(dp);
+        } else {
+            real_exception(
+                INTERP, NULL, E_IOError,
+                "PATHNAME.entry_names: couldn't read directory"
+            );
+        }
+        return result;
+    }
+
+    METHOD PMC* file_names() {
+        DIR *dp;
+        struct dirent *ep;
+        PMC* result = pmc_new(
+            INTERP, Parrot_get_ctx_HLL_type(INTERP, enum_class_Array)
+        );
+        int index = 0;
+        dp = opendir(string_to_cstring(INTERP, PMC_str_val(SELF)));
+        if (dp != NULL) {
+            while ((ep = readdir(dp))) {
+                if (ep->d_type == DT_REG) {
+                    VTABLE_set_integer_native(INTERP, result, index + 1);
+                    PMC* item = pmc_new(
+                        INTERP, Parrot_get_ctx_HLL_type(INTERP, enum_class_String)
+                    );
+                    VTABLE_set_string_native(
+                        INTERP, item, string_from_cstring(INTERP, ep->d_name, 0)
+                    );
+                    VTABLE_set_pmc_keyed_int(INTERP, result, index, item);
+                    index++;
+                }
+            }
+            (void) closedir(dp);
+        } else {
+            real_exception(
+                INTERP, NULL, E_IOError,
+                "PATHNAME.file_names: couldn't read directory"
+            );
+        }
+        return result;
+    }
+
+    METHOD PMC* file_pathnames() {
+        DIR *dp;
+        struct dirent *ep;
+        PMC* result = pmc_new(
+            INTERP, Parrot_get_ctx_HLL_type(INTERP, enum_class_Array)
+        );
+        int index = 0;
+        dp = opendir(string_to_cstring(INTERP, PMC_str_val(SELF)));
+        if (dp != NULL) {
+            while ((ep = readdir(dp))) {
+                if (ep->d_type == DT_REG) {
+                    VTABLE_set_integer_native(INTERP, result, index + 1);
+                    /* PMC* item = pmc_new(
+                        INTERP, Parrot_get_ctx_HLL_type(INTERP, enum_class_String)
+                    ); */
+                    PMC* item = pmc_new(INTERP, class_PATHNAME);
+                    VTABLE_set_string_native(INTERP, item,
+                        string_concat(INTERP,
+                            VTABLE_get_string(INTERP, SELF),
+                            string_concat(INTERP,
+                                string_from_const_cstring(INTERP, "/", 1),
+                                string_from_cstring(INTERP, ep->d_name, 0),
+                                0
+                            ),
+                            0
+                        )
+                    );
+                    VTABLE_set_pmc_keyed_int(INTERP, result, index, item);
+                    index++;
+                }
+            }
+            (void) closedir(dp);
+        } else {
+            real_exception(
+                INTERP, NULL, E_IOError,
+                "PATHNAME.file_names: couldn't read directory"
+            );
+        }
+        return result;
+    }
+
+    METHOD PMC* is_readable_directory() {
+        PMC* result = pmc_new(
+            INTERP, Parrot_get_ctx_HLL_type(INTERP, enum_class_Boolean)
+        );
+        DIR* dp;
+        dp = opendir(string_to_cstring(INTERP, PMC_str_val(SELF)));
+        if (dp != NULL) {
+            VTABLE_set_integer_native(INTERP, result, 1);
+            (void) closedir(dp);
+        } else {
+            VTABLE_set_integer_native(INTERP, result, 0);
+        }
+        return result;
+    }
+/*
+    METHOD PMC* string() {
+        PMC* result = pmc_new(
+            INTERP, Parrot_get_ctx_HLL_type(INTERP, enum_class_String)
+        );
+        VTABLE_set_string_native(
+            INTERP, result, VTABLE_get_string(INTERP, SELF)
+        );
+        return result;
+    }
+*/
+    METHOD PMC* subdirectory_names() {
+        DIR *dp;
+        struct dirent *ep;
+        PMC* result = pmc_new(
+            INTERP, Parrot_get_ctx_HLL_type(INTERP, enum_class_Array)
+        );
+        int index = 0;
+        dp = opendir(string_to_cstring(INTERP, PMC_str_val(SELF)));
+        if (dp != NULL) {
+            while ((ep = readdir(dp))) {
+                if (ep->d_type == DT_DIR) {
+                    char *dirname = ep->d_name;
+                    if (strcmp(dirname, ".") && strcmp(dirname, "..")) {
+                        VTABLE_set_integer_native(INTERP, result, index + 1);
+                        PMC* item = pmc_new(
+                            INTERP, Parrot_get_ctx_HLL_type(INTERP, enum_class_String)
+                        );
+                        VTABLE_set_string_native(
+                            INTERP, item, string_from_cstring(INTERP, dirname, 0)
+                        );
+                        VTABLE_set_pmc_keyed_int(INTERP, result, index, item);
+                        index++;
+                    }
+                }
+            }
+            (void) closedir(dp);
+        } else {
+            real_exception(
+                INTERP, NULL, E_IOError,
+                "PATHNAME.subdirectory_names: couldn't read directory"
+            );
+        }
+        return result;
+    }
+
+    METHOD PMC* subdirectory_pathnames() {
+        DIR *dp;
+        struct dirent *ep;
+        PMC* result = pmc_new(
+            INTERP, Parrot_get_ctx_HLL_type(INTERP, enum_class_Array)
+        );
+        int index = 0;
+        dp = opendir(string_to_cstring(INTERP, PMC_str_val(SELF)));
+        if (dp != NULL) {
+            while ((ep = readdir(dp))) {
+                if (ep->d_type == DT_DIR) {
+                    char *dirname = ep->d_name;
+                    if (strcmp(dirname, ".") && strcmp(dirname, "..")) {
+                        VTABLE_set_integer_native(INTERP, result, index + 1);
+                        PMC* item = pmc_new(INTERP, class_PATHNAME);
+                        VTABLE_set_string_native(INTERP, item,
+                            string_concat(INTERP,
+                                VTABLE_get_string(INTERP, SELF),
+                                string_concat(INTERP,
+                                    string_from_const_cstring(INTERP, "/", 1),
+                                    string_from_cstring(INTERP, dirname, 0),
+                                    0
+                                ),
+                                0
+                            )
+                        );
+                        VTABLE_set_pmc_keyed_int(INTERP, result, index, item);
+                        index++;
+                    }
+                }
+            }
+            (void) closedir(dp);
+        } else {
+            real_exception(
+                INTERP, NULL, E_IOError,
+                "PATHNAME.subdirectory_pathnames: couldn't read directory"
+            );
+        }
+        return result;
+    }
+
+}
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+ */

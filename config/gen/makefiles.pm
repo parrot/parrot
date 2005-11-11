@@ -83,6 +83,9 @@ sub makefiles {
   genfile('config/gen/makefiles/Zcode.in'    => 'languages/Zcode/Makefile',
           commentType       => '#',
           replace_slashes   => 1);
+  genfile('config/gen/makefiles/amber.in'     => 'languages/amber/Makefile',
+          commentType       => '#',
+          replace_slashes   => 1);
   genfile('config/gen/makefiles/bf.in'        => 'languages/bf/Makefile',
           commentType       => '#',
           replace_slashes   => 1);

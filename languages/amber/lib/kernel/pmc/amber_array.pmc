@@ -1,0 +1,116 @@
+/* amber_array.pmc
+ *  Copyright: same as Parrot.
+ *  Overview:
+ *     The Amber_ARRAY PMC, which implementes the Amber kernel class ARRAY
+ */
+
+#include "parrot/parrot.h"
+
+pmclass Amber_ARRAY need_ext extends Array extends Amber_DEFAULT does array dynpmc group amber_kernel {
+
+    void class_init() {
+        if (pass) {
+            /* Register this PMC as Amber's HLL Array type. */
+            INTVAL amber_id = Parrot_get_HLL_id(
+                INTERP, const_string(INTERP, "Amber")
+            );
+            if (amber_id > 0)
+                Parrot_register_HLL_type(
+                    INTERP, amber_id, enum_class_Array, entry
+                );
+        }
+    }
+
+/* non-vtable methods follow */
+
+    METHOD void add_last(PMC* value) {
+        INTVAL size = VTABLE_get_integer(INTERP, SELF);
+        VTABLE_set_integer_native(INTERP, SELF, size + 1);
+        VTABLE_set_pmc_keyed_int(INTERP, SELF, size, value);
+    }
+
+    METHOD PMC* boolean() {
+        PMC* result = pmc_new(
+            INTERP, Parrot_get_ctx_HLL_type(INTERP, enum_class_Boolean)
+        );
+        VTABLE_set_bool(INTERP, result, VTABLE_get_integer(INTERP, SELF));
+        return result;
+    }
+
+    METHOD PMC* classname() {
+        PMC* result = pmc_new(
+            INTERP, Parrot_get_ctx_HLL_type(INTERP, enum_class_String)
+        );
+        VTABLE_set_string_native(
+            INTERP, result, string_from_const_cstring(INTERP, "ARRAY", 5)
+        );
+        return result;
+    }
+
+    METHOD PMC* count() {
+        PMC* result = pmc_new(
+            INTERP, Parrot_get_ctx_HLL_type(INTERP, enum_class_Integer)
+        );
+        VTABLE_set_integer_native(
+            INTERP, result, VTABLE_get_integer(INTERP, SELF)
+        );
+        return result;
+    }
+
+    METHOD PMC* first() {
+        /* XXX reject if count = 0 */
+        return VTABLE_get_pmc_keyed_int(INTERP, SELF, (INTVAL) 0);
+    }
+
+    METHOD PMC* has(PMC* index) {
+        PMC* result = pmc_new(
+            INTERP, Parrot_get_ctx_HLL_type(INTERP, enum_class_Boolean)
+        );
+        INTVAL adjusted_index = PMC_int_val(index);
+        if (adjusted_index) {
+            if (adjusted_index > 0) adjusted_index = adjusted_index - 1;
+            VTABLE_set_bool(INTERP, result, VTABLE_exists_keyed_int(
+                INTERP, SELF, adjusted_index
+            ));
+        }
+        return result;
+    }
+
+    METHOD PMC* item(PMC* index) {
+        /* XXX reject out-of-range values (0, or > count, or < -count) */
+        INTVAL adjusted_index = PMC_int_val(index);
+        if (adjusted_index > 0) adjusted_index = adjusted_index - 1;
+        return VTABLE_get_pmc_keyed_int(INTERP, SELF, adjusted_index);
+    }
+
+    METHOD PMC* last() {
+        /* XXX reject if count = 0 */
+        return VTABLE_get_pmc_keyed_int(
+            INTERP, SELF, VTABLE_get_integer(INTERP, SELF) - 1
+        );
+    }
+
+    METHOD void set_count(PMC* new_count) {
+        VTABLE_set_integer_native(
+            INTERP, SELF, VTABLE_get_integer(INTERP, new_count)
+        );
+    }
+
+    METHOD void set_item(PMC* index, PMC* value) {
+        /* XXX --require has(index) */
+        INTVAL adjusted_index = PMC_int_val(index);
+        if (adjusted_index > 0) adjusted_index = adjusted_index - 1;
+        VTABLE_set_pmc_keyed_int(INTERP, SELF, adjusted_index, value);
+    }
+
+}
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+ */

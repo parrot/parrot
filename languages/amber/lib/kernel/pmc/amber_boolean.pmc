@@ -1,0 +1,74 @@
+/* amber_boolean.pmc
+ *  Copyright: same as Parrot.
+ *  Overview:
+ *     The Amber_BOOLEAN PMC, which implementes the Amber kernel class BOOLEAN
+ */
+
+#include "parrot/parrot.h"
+
+static INTVAL dynclass_CHARACTER;
+
+pmclass Amber_BOOLEAN extends Boolean extends Amber_DEFAULT does boolean dynpmc group amber_kernel {
+
+    void class_init() {
+        if (pass) {
+            /* Register this PMC as Amber's HLL Boolean type. */
+            INTVAL amber_id = Parrot_get_HLL_id(
+                INTERP, const_string(INTERP, "Amber")
+            );
+            if (amber_id > 0)
+                Parrot_register_HLL_type(
+                    INTERP, amber_id, enum_class_Boolean, entry
+                );
+            /* Record the type-id of PMC Amber_CHARACTER */
+            dynclass_CHARACTER = Parrot_PMC_typenum(INTERP, "Amber_CHARACTER");
+        }
+    }
+
+    STRING* get_string () {
+        return PMC_int_val(SELF)
+                ? string_from_const_cstring(INTERP, "true", 4)
+                : string_from_const_cstring(INTERP, "false", 5);
+    }
+
+/* non-vtable methods follow */
+
+    METHOD PMC* character() {
+        PMC* result = pmc_new(INTERP, dynclass_CHARACTER);
+        VTABLE_set_integer_native(
+            INTERP, result, PMC_int_val(SELF) ? 't' : 'f'
+        );
+        return result;
+    }
+
+    METHOD PMC* classname() {
+        PMC* result = pmc_new(
+            INTERP, Parrot_get_ctx_HLL_type(INTERP, enum_class_String)
+        );
+        VTABLE_set_string_native(
+            INTERP, result, string_from_const_cstring(INTERP, "BOOLEAN", 7)
+        );
+        return result;
+    }
+
+    METHOD PMC* integer() {
+        PMC* result = pmc_new(
+            INTERP, Parrot_get_ctx_HLL_type(INTERP, enum_class_Integer)
+        );
+        VTABLE_set_integer_native(
+            INTERP, result, PMC_int_val(SELF) ? 1 : 0
+        );
+        return result;
+    }
+
+}
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+ */

@@ -1,0 +1,53 @@
+/* amber_character.pmc
+ *  Copyright: same as Parrot.
+ *  Overview:
+ *     The Amber_CHARACTER PMC, which implementes the Amber kernel class CHARACTER
+ */
+
+#include "parrot/parrot.h"
+
+pmclass Amber_CHARACTER extends Integer extends Amber_DEFAULT does string dynpmc group amber_kernel {
+
+    STRING* get_string () {
+        return string_chr(INTERP, PMC_int_val(SELF));
+    }
+
+/* non-vtable methods follow */
+
+    METHOD PMC* boolean() {
+        PMC* result = pmc_new(
+            INTERP, Parrot_get_ctx_HLL_type(INTERP, enum_class_Boolean)
+        );
+        VTABLE_set_bool(INTERP, result, PMC_int_val(SELF));
+        return result;
+    }
+
+    METHOD PMC* classname() {
+        PMC* result = pmc_new(
+            INTERP, Parrot_get_ctx_HLL_type(INTERP, enum_class_String)
+        );
+        VTABLE_set_string_native(
+            INTERP, result, string_from_const_cstring(INTERP, "CHARACTER", 9)
+        );
+        return result;
+    }
+
+    METHOD PMC* integer() {
+        PMC* result = pmc_new(
+            INTERP, Parrot_get_ctx_HLL_type(INTERP, enum_class_Integer)
+        );
+        VTABLE_set_integer_native(INTERP, result, PMC_int_val(SELF));
+        return result;
+    }
+
+}
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+ */
