@@ -42,21 +42,23 @@ set_graphemes(Interp *interpreter, STRING *source_string,
 static STRING *
 to_latin1(Interp *interpreter, STRING *src, STRING *dest)
 {
-    UINTVAL offs, c;
+    UINTVAL offs, c, src_len;
     String_iter iter;
 
-    if (dest) {
-        Parrot_reallocate_string(interpreter, dest, src->strlen);
-        dest->bufused = src->strlen;
-        dest->strlen  = src->strlen;
-        dest->charset = Parrot_iso_8859_1_charset_ptr;
-        dest->encoding = Parrot_fixed_8_encoding_ptr;
-    }
-    else
-        internal_exception(UNIMPLEMENTED,
-                "to_charset inplace for latin1 not implemented");
     ENCODING_ITER_INIT(interpreter, src, &iter);
-    for (offs = 0; offs < src->strlen; ++offs) {
+    src_len = src->strlen;
+    if (dest) {
+        Parrot_reallocate_string(interpreter, dest, src_len);
+        dest->strlen  = src_len;
+    }
+    else {
+        /* latin1 is never bigger then source */
+        dest = src;
+    }
+    dest->bufused = src_len;
+    dest->charset = Parrot_iso_8859_1_charset_ptr;
+    dest->encoding = Parrot_fixed_8_encoding_ptr;
+    for (offs = 0; offs < src_len; ++offs) {
         c = iter.get_and_advance(interpreter, &iter);
         if (c >= 0x100) {
             EXCEPTION(LOSSY_CONVERSION, "lossy conversion to ascii");
