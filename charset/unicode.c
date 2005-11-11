@@ -110,9 +110,43 @@ decompose(Interp *interpreter, STRING *source_string)
 }
 
 static void
-upcase(Interp *interpreter, STRING *source_string)
+upcase(Interp *interpreter, STRING *src)
 {
-    UNIMPL;
+#if PARROT_HAS_ICU
+
+    UErrorCode err;
+    int dest_len, src_len;
+
+    src = Parrot_utf16_encoding_ptr->to_encoding(interpreter, src, NULL);
+    /*
+U_CAPI int32_t U_EXPORT2
+u_strToUpper(UChar *dest, int32_t destCapacity,
+             const UChar *src, int32_t srcLength,
+             const char *locale,
+             UErrorCode *pErrorCode);
+     */
+    err = U_ZERO_ERROR;
+    src_len = src->bufused / sizeof(UChar);
+    dest_len = u_strToUpper(src->strstart, src_len,
+            src->strstart, src_len,
+            NULL,       /* locale = default */
+            &err);
+    src->bufused = dest_len * sizeof(UChar);
+    if (!U_SUCCESS(err)) {
+        Parrot_reallocate_string(interpreter, src, src->bufused);
+        dest_len = u_strToUpper(src->strstart, dest_len,
+                src->strstart, src_len,
+                NULL,       /* locale = default */
+                &err);
+        assert(U_SUCCESS(err));
+    }
+    /* downgrade if possible */
+    if (dest_len == (int)src->strlen)
+        src->encoding = Parrot_ucs2_encoding_ptr;
+#else
+    real_exception(interpreter, NULL, E_LibraryNotLoadedError,
+            "no ICU lib loaded");
+#endif
 }
 
 static void
@@ -156,9 +190,45 @@ u_strToLower(UChar *dest, int32_t destCapacity,
 }
 
 static void
-titlecase(Interp *interpreter, STRING *source_string)
+titlecase(Interp *interpreter, STRING *src)
 {
-    UNIMPL;
+#if PARROT_HAS_ICU
+
+    UErrorCode err;
+    int dest_len, src_len;
+
+    src = Parrot_utf16_encoding_ptr->to_encoding(interpreter, src, NULL);
+    /*
+U_CAPI int32_t U_EXPORT2
+u_strToTitle(UChar *dest, int32_t destCapacity,
+             const UChar *src, int32_t srcLength,
+             UBreakIterator *titleIter,
+             const char *locale,
+             UErrorCode *pErrorCode);
+     */
+    err = U_ZERO_ERROR;
+    src_len = src->bufused / sizeof(UChar);
+    dest_len = u_strToTitle(src->strstart, src_len,
+            src->strstart, src_len,
+            NULL,       /* default titleiter */
+            NULL,       /* locale = default */
+            &err);
+    src->bufused = dest_len * sizeof(UChar);
+    if (!U_SUCCESS(err)) {
+        Parrot_reallocate_string(interpreter, src, src->bufused);
+        dest_len = u_strToTitle(src->strstart, dest_len,
+                src->strstart, src_len,
+                NULL, NULL,
+                &err);
+        assert(U_SUCCESS(err));
+    }
+    /* downgrade if possible */
+    if (dest_len == (int)src->strlen)
+        src->encoding = Parrot_ucs2_encoding_ptr;
+#else
+    real_exception(interpreter, NULL, E_LibraryNotLoadedError,
+            "no ICU lib loaded");
+#endif
 }
 
 static void
