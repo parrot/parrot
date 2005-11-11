@@ -4,13 +4,26 @@
 
 use strict;
 use warnings;
+use lib qw( t . lib ../lib ../../lib ../../../lib );
 use Test::More;
 use Parrot::Test;
 use Parrot::Test::PGE;
 
 
-## tests based on http://dev.perl.org/perl6/doc/design/syn/S05.html, ver. 7
-##   in the 'Backtracking control' section
+=head1 NAME
+
+t/p6rules/backtrack.t - PGE backtracking tests
+
+=head1 DESCRIPTION
+
+These tests are based on L<http://dev.perl.org/perl6/doc/design/syn/S05.html>,
+ver. 7, in the B<Backtracking control> section
+
+=head1 SYNOPSIS
+
+	% prove t/p6rules/backtrack.t
+
+=cut
 
 
 ## : -- cut over preceding atom

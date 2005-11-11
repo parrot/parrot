@@ -1,18 +1,31 @@
 #!perl
-# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 use strict;
 use warnings;
+use lib qw( t . lib ../lib ../../lib ../../../lib );
 use Test::More;
 use Parrot::Test;
 use Parrot::Test::PGE;
 use Parrot::Config;
 
 
-## tests based on http://dev.perl.org/perl6/doc/design/syn/S05.html, ver. 7
-##   in the 'Changed metacharacters' , 'New metacharacters', and
-##   'Backslash Reform' sections
+=head1 NAME
+
+t/p6rules/metachars.t - PGE metacharacter syntax tests
+
+=head1 DESCRIPTION
+
+These tests are based on L<http://dev.perl.org/perl6/doc/design/syn/S05.html>,
+ver. 7, in the B<'Changed metacharacters'>, B<'New metacharacters'>, and
+B<'Backslash Reform'> sections
+
+=head1 SYNOPSIS
+
+	% prove t/p6rules/metachars.t
+
+=cut
 
 
 ## . -- matches any char, including newline
@@ -287,5 +300,40 @@ p6rule_isnt("abc!!def", 'c \O41+ d', 'not octal (\O)');
 p6rule_is  ("abcdef", 'a \O41+ f', 'not octal (\O)');
 
 
+## \b and \B -- word boundaries
+my $str = q{abc
+def
+-==
+ghi};
+
+p6rule_is  ($str, '\bdef', 'word boundary \W\w');
+p6rule_is  ($str, 'abc\b', 'word boundary \w\W');
+p6rule_is  ($str, '\babc', 'BOS word boundary');
+p6rule_is  ($str, 'ghi\b', 'EOS word boundary');
+p6rule_isnt($str, 'a\b',   '\w\w word boundary');
+p6rule_isnt($str, '-\b',   '\W\W word boundary');
+
+p6rule_isnt($str, '\Bdef', 'nonword boundary \W\w');
+p6rule_isnt($str, 'abc\B', 'nonword boundary \w\W');
+p6rule_isnt($str, '\Babc', 'BOS nonword boundary');
+p6rule_isnt($str, 'ghi\B', 'EOS nonword boundary');
+p6rule_is  ($str, 'a\B',   '\w\w nonword boundary');
+p6rule_is  ($str, '-\B',   '\W\W nonword boundary');
+
+
+## \w an \W -- word characters
+p6rule_isnt('a=[ *f', 'a\w+f', 'word character');
+p6rule_is  ("abcdef", 'a\w+f', 'word character');
+p6rule_is  ('a&%- f', 'a\W+f', 'not word character');
+p6rule_isnt("abcdef", 'a\W+f', 'not word character');
+
+
+## \d and \D -- digits
+p6rule_isnt('abcdef', 'a\d+f', 'digit');
+p6rule_is  ("ab42cdef", 'ab\d+cdef', 'digit');
+p6rule_is  ('abcdef', 'a\D+f', 'not digit');
+p6rule_isnt("ab0cdef", 'a\D+f', 'not digit');
+
+
 ## remember to change the number of tests :-)
-BEGIN { plan tests => 167; }
+BEGIN { plan tests => 187; }

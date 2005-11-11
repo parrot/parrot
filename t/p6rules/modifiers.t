@@ -1,16 +1,29 @@
 #!perl
-# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 use strict;
 use warnings;
+use lib qw( t . lib ../lib ../../lib ../../../lib );
 use Test::More;
 use Parrot::Test;
 use Parrot::Test::PGE;
 
 
-## tests based on http://dev.perl.org/perl6/doc/design/syn/S05.html, ver. 7
-##   in the 'Modifiers' section
+=head1 NAME
+
+t/p6rules/modifiers.t - PGE rule modifier tests
+
+=head1 DESCRIPTION
+
+These tests are based on L<http://dev.perl.org/perl6/doc/design/syn/S05.html>,
+ver. 7, in the B<'Modifiers'> section
+
+=head1 SYNOPSIS
+
+	% prove t/p6rules/modifiers.t
+
+=cut
 
 
 ## setup template for pir tests
@@ -99,7 +112,6 @@ p6rule_is  ('ABCDEF', ':1ignorecase ab [:ignorecase(1) cd ] ef', 'ignorecase, le
 
 
 ## :w and :words -- magically ignore whitespace
-## TODO lexical scoping of :w
 p6rule_is  ('a bcdef', ':w bcd', 'words (:w)');
 p6rule_is  ('a bcd ef', ':w bcd', 'words (:w)');
 p6rule_isnt('abcdef', ':w bcd', 'words (:w)');
@@ -120,6 +132,39 @@ p6rule_is  ('a b c def', ':w(1) b c [:w(0) d e f ]', 'words, lexical repetition 
 p6rule_is  ('a b c def', ':w(1) b c [:w(0) d e f ]', 'words, lexical repetition (:w)');
 p6rule_isnt('a b c def', ':w(0) b c [:w(1) d e f ]', 'words, lexical repetition (:w)');
 p6rule_isnt('a b c def', ':w(0) b c [:w(0) d e f ]', 'words, lexical repetition (:w)');
+
+## without :w
+p6rule_is  ("foo\t \n-\n\t bar", 'foo\s*-?\s*bar', 'basic match');
+p6rule_is  ('foo - bar', 'foo\s*-?\s*bar', 'basic match');
+p6rule_is  ('foo   bar', 'foo\s+-?\s*bar', 'basic match \s+ \s*');
+p6rule_is  ('foo  -bar', 'foo\s+-?\s*bar', 'basic match \s+ \s*');
+p6rule_is  ('foo-  bar', 'foo\s*-?\s+bar', 'basic match \s* \s+');
+p6rule_is  ('foo-bar', 'foo -? bar', 'basic match \s* \s*');
+p6rule_is  ('foobar', 'foo -? bar', 'basic match');
+p6rule_isnt('foo - bar', 'foo -? bar', 'basic non-match');
+
+## with :w
+p6rule_is  ("foo\n \t- \t\t\nbar", ':w foo -? bar', 'basic ws match');
+p6rule_is  ('foo - bar', ':w foo -? bar', 'basic ws match');
+p6rule_is  ('foo   bar', ':w foo -? bar', 'basic ws match \s+ \s*');
+p6rule_is  ('foo  -bar', ':w foo -? bar', 'basic ws match \s+ \s*');
+p6rule_is  ('foo-  bar', ':w foo -? bar', 'basic ws match \s* \s+');
+p6rule_is  ('foo-bar', ':w foo -? bar', 'basic ws match \s* \s*');
+p6rule_isnt('foobar', ':w foo -? bar', 'basic ws non-match');
+
+## with :w not separated by a space
+p6rule_isnt('foo - bar', ':w()foo -? bar', 'basic ws match');
+p6rule_is  ('foo - bar', ':w[]foo -? bar', 'basic ws match',
+    todo => 'words modifier [] separation not implemented');
+p6rule_is  ('foo - bar', ':w\bfoo -? bar',
+    'basic ws match with boundary modifier separation');
+p6rule_is  ('foo - bar', ':w::foo -? bar',
+    'basic ws match with backtrack no-op modifier separation');
+
+p6rule_like('dog := spot', ':w::(\w+) \:= (\S+)', qr/mob 0: <dog @ 0>/,
+    'words and capture together');
+p6rule_like('dog := spot', ':w::(\w+) \:= (\S+)', qr/mob 1: <spot @ 7>/,
+    'words and capture together');
 
 
 ## :once -- match only once
@@ -147,6 +192,7 @@ p6rule_is  ('123456', ':x(0) \d', 'repetition (:x)');
 ## :nth -- nth occurance
 p6rule_is  ('a1a2a3', ':nth(3) a \d', 'nth occurance (:nth)');
 p6rule_isnt('a1a2a3', ':nth(4) a \d', 'nth occurance (:nth)', todo => 'not yet implemented');
+p6rule_isnt('a1a2a3', ':nth(0) a \d', 'nth occurance (:nth)', todo => 'not yet implemented');
 ## TODO more tests here
 
 
@@ -155,4 +201,4 @@ p6rule_isnt('a1a2a3', ':nth(4) a \d', 'nth occurance (:nth)', todo => 'not yet i
 
 
 ## remember to change the number of tests :-)
-BEGIN { plan tests => 75; }
+BEGIN { plan tests => 97; }

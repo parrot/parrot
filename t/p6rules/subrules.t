@@ -1,12 +1,29 @@
 #!perl
-# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 use strict;
 use warnings;
+use lib qw( t . lib ../lib ../../lib ../../../lib );
 use Test::More;
 use Parrot::Test;
 use Parrot::Test::PGE;
+
+
+=head1 NAME
+
+t/p6rules/subrules.t - PGE subrules tests
+
+=head1 DESCRIPTION
+
+These tests are based on L<http://dev.perl.org/perl6/doc/design/syn/S05.html>,
+ver. 7, in the B<'Named regexes'> section
+
+=head1 SYNOPSIS
+
+	% prove t/p6rules/subrules.t
+
+=cut
 
 
 p6rule_is  ("   int argc ",

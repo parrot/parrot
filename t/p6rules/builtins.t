@@ -1,16 +1,30 @@
 #!perl
-# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 use strict;
 use warnings;
+use lib qw( t . lib ../lib ../../lib ../../../lib );
 use Test::More;
 use Parrot::Test;
 use Parrot::Test::PGE;
 
 
-## tests based on http://dev.perl.org/perl6/doc/design/syn/S05.html, ver. 7
-##   in the 'Extensible metasyntax (<...>)' and 'Nothing is illegal' sections
+=head1 NAME
+
+t/p6rules/builtins.t - PGE tests of builtin rules
+
+=head1 DESCRIPTION
+
+These tests are based on L<http://dev.perl.org/perl6/doc/design/syn/S05.html>,
+ver. 7, in the B<<'Extensible metasyntax (<...>)'>> and
+B<'Nothing is illegal'> sections
+
+=head1 SYNOPSIS
+
+	% prove t/p6rules/builtins.t
+
+=cut
 
 
 my $str = 

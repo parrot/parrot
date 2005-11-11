@@ -1,12 +1,28 @@
 #!perl
-# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 use strict;
 use warnings;
+use lib qw( t . lib ../lib ../../lib ../../../lib );
 use Test::More;
 use Parrot::Test;
 use Parrot::Test::PGE;
+
+
+=head1 NAME
+
+t/p6rules/text_brk.t - PGE::Text::bracketed tests
+
+=head1 DESCRIPTION
+
+These tests examine the ability of PGE to match text with brackets in it.
+
+=head1 SYNOPSIS
+
+	% prove t/p6rules/text_brk.t
+
+=cut
 
 
 ## First, test direct calls to PGE::Text::bracketed
