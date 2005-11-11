@@ -17,11 +17,14 @@ This file implements the encoding functions for fixed-width 8-bit codepoints
 #include "parrot/parrot.h"
 #include "fixed_8.h"
 
+#define UNIMPL internal_exception(UNIMPLEMENTED, "unimpl fixed_8")
+
 /* This function needs to go through and get all the code points one
    by one and turn them into a byte */
 static void
 to_encoding(Interp *interpreter, STRING *source_string)
 {
+    UNIMPL;
 }
 
 static STRING *
@@ -29,6 +32,7 @@ copy_to_encoding(Interp *interpreter, STRING *source_string)
 {
     STRING *return_string = NULL;
 
+    UNIMPL;
     return return_string;
 }
 
@@ -148,6 +152,7 @@ set_bytes(Interp *interpreter, STRING *source_string,
 static void
 become_encoding(Interp *interpreter, STRING *source_string)
 {
+    UNIMPL;
 }
 
 
