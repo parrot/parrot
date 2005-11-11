@@ -498,7 +498,7 @@ len_err:
 .namespace ["Sudoku"]
 
 # return true if we single-step
-.sub "step" method
+.sub "step" :method
     .local pmc opt
     opt = getattribute self, "opt"
     $I0 = defined opt['debug']
@@ -510,7 +510,7 @@ check_nc:
 .end
 
 # return true if debugging is on
-.sub "debug" method
+.sub "debug" :method
     .local pmc opt
     opt = getattribute self, "opt"
     $I0 = defined opt['debug']
@@ -518,7 +518,7 @@ check_nc:
 .end
 
 # create 9x9 LoL
-.sub create_1 method
+.sub create_1 :method
     .param string what
     .local pmc rcss, rcs, all
 
@@ -540,7 +540,7 @@ ly1:
 .end
 
 # create all arrays
-.sub create method
+.sub create :method
     .param pmc ar
     .local int x, y, p, c
 
@@ -613,7 +613,7 @@ lx2:
 
 # display
 # TODO disp 2nd in different color, use curses or shell escapes
-.sub display method
+.sub display :method
     .local pmc ar, rows, row, opt, disp
     .local string s, c
     .local int i, x, y, c1, c2, r
@@ -690,7 +690,7 @@ intern_err:
 .end
 
 # print invalid for given row and number(s)
-.sub deb_inv method
+.sub deb_inv :method
     .param int y
     .param string ns
 
@@ -732,7 +732,7 @@ nxt:
 #   1 ... ok
 #   2 ... finished
 
-.sub verify method
+.sub verify :method
     .local pmc rcss
     .local int r, done
     done = 2
@@ -760,7 +760,7 @@ err:
 .end
 
 # verify rows, cols, or sqrs
-.sub verify_1 method
+.sub verify_1 :method
     .param pmc rcss
 
     .local int x, y, result
@@ -817,7 +817,7 @@ err:
 .end
 
 # create invalid bits
-.sub create_inv method
+.sub create_inv :method
     .local pmc rcss, i_rcss
     rcss = getattribute self, "rows"
     i_rcss =  getattribute self, "i_rows"
@@ -833,7 +833,7 @@ err:
 # create row, cols, or sqrs of invalid numbers
 # one bit per invalid
 
-.sub create_inv_1 method
+.sub create_inv_1 :method
     .param pmc ars
     .param pmc invs
     .local int x, y, n, i, c
@@ -871,7 +871,7 @@ nxt_n:
 .end
 
 # return 1 if row/col/sqr contains num n
-.sub contains method
+.sub contains :method
     .param pmc ar
     .param int n
 
@@ -892,7 +892,7 @@ ret_1:
 #   0 ... err
 #   1 ... incomplete
 #   2 ... finito
-.sub solve method
+.sub solve :method
     .local int r
     #self."sanity_check"()
 loop:
@@ -921,7 +921,7 @@ nd:
 # -1 ... err
 # 0  ... no change
 # 1  ... changes
-.sub scan method
+.sub scan :method
     .local int any, y, x, m
     any = 0
     .local pmc rcss, i_rcss
@@ -957,7 +957,7 @@ err:
 .end
 
 # the quare y has a uniq digit at x - set it
-.sub set_uniq method
+.sub set_uniq :method
     .param int y
     .param int x
     .local pmc sqrs, sqr, e
@@ -995,7 +995,7 @@ nxt:
 # -1 ... err
 # 0  ... no change
 # 1  ... changes
-.sub scan_1 method
+.sub scan_1 :method
     .param pmc rcss
     .param pmc i_rcss
     .param string what
@@ -1055,7 +1055,7 @@ err:
 # returns
 # 0  ... no change
 # 1  ... changes
-.sub scan_blocked method
+.sub scan_blocked :method
     .param pmc sqrs
     .param pmc i_sqrs
     .param string what
@@ -1125,7 +1125,7 @@ nxt_n:
 
 # set rest of row invalid due to blocked square
 # skip the square itself
-.sub "inv_row" method
+.sub "inv_row" :method
     .param int y
     .param int b
     .param int n
@@ -1141,7 +1141,7 @@ nxt_n:
 .end
 
 # set rest of col invalid due to blocked square
-.sub "inv_col" method
+.sub "inv_col" :method
     .param int y
     .param int b
     .param int n
@@ -1157,7 +1157,7 @@ nxt_n:
 .end
 
 # set rest of row/col invalid due to blocked square
-.sub "inv_rc" method
+.sub "inv_rc" :method
     .param pmc rcs
     .param int r
     .param int sx
@@ -1199,7 +1199,7 @@ ret:
 .end
 
 # check that pmcs in rows, cols and sqrs are the same
-.sub sanity_check method
+.sub sanity_check :method
     .local pmc rows, cols
     rows = getattribute self, "rows"
     cols = getattribute self, "cols"
@@ -1209,7 +1209,7 @@ ret:
     self."sanity_check_rc"(rows, cols)
 .end
 
-.sub sanity_check_rc method
+.sub sanity_check_rc :method
     .param pmc rows
     .param pmc cols
     .param string what
@@ -1239,7 +1239,7 @@ ok:
 .end
 
 # backtrack progress
-.sub progress method
+.sub progress :method
     .param int size
     .param int y
     .param int x
@@ -1259,7 +1259,7 @@ ok:
 .end
 
 # back_track tries
-.sub back_track method
+.sub back_track :method
     .param pmc tries
 
     .local pmc tos, all, sqrs, sqr, e
@@ -1315,7 +1315,7 @@ fin:
 # return the square coors of the minimum freedom
 # used for backtacking
 # if m == 1 this is a forced uniq position
-.sub best_pos method
+.sub best_pos :method
     .local pmc sqrs, sqr
     .local int x, y, n, c, mx, my, mb
 
@@ -1343,7 +1343,7 @@ no_min:
     .return (my, mx, mb)
 .end
 
-.sub set_attrs method
+.sub set_attrs :method
     .param pmc all
     .local pmc e
 
@@ -1362,7 +1362,7 @@ no_min:
 .end
 
 # display support
-.sub new_display method
+.sub new_display :method
     .local pmc stdscr, opt, cl, p, s, it, f, gl
     opt = getattribute self, "opt"
     $I0 = defined opt["nc"]
@@ -1382,7 +1382,7 @@ out:
     .return(p)
 .end
 
-.sub end_display method
+.sub end_display :method
     .local pmc opt
     opt = getattribute self, "opt"
     $I0 = defined opt["nc"]
@@ -1393,19 +1393,19 @@ out:
 
 .namespace ["Dummy"]
 
-.sub "print" @MULTI(_, int, int, string), method
+.sub "print" :multi(_, int, int, string) :method
     .param int r
     .param int c
     .param string s
     print s
 .end
 
-.sub "print" @MULTI(_, string), method
+.sub "print" :multi(_, string) :method
     .param string s
     print s
 .end
 
-.sub "print" @MULTI(_, int), method
+.sub "print" :multi(_, int), :method
     .param int s
     print s
 .end
@@ -1418,7 +1418,7 @@ out:
 # TODO remember last position, parse newlines to increment row
 # this should better be all in a new library
 
-.sub "print" @MULTI(_, int, int, string), method
+.sub "print" :multi(_, int, int, string) :method
     .param int r
     .param int c
     .param string s
@@ -1429,7 +1429,7 @@ out:
     f(win, r, c, s)
 .end
 
-.sub "print" @MULTI(_, string), method
+.sub "print" :multi(_, string) :method
     .param string s
     .local pmc win, f
 
@@ -1438,7 +1438,7 @@ out:
     f(win, s)
 .end
 
-.sub "print" @MULTI(_, int), method
+.sub "print" :multi(_, int) :method
     .param int i
     .local string s
     .local pmc win, f
