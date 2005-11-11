@@ -55,6 +55,9 @@ sub makefiles {
   genfile('config/gen/makefiles/pge.in'       => 'compilers/pge/Makefile',
           commentType       => '#',
           replace_slashes   => 1);
+  genfile('config/gen/makefiles/tge.in'       => 'compilers/tge/Makefile',
+          commentType       => '#',
+          replace_slashes   => 1);
   genfile('config/gen/makefiles/editor.in'    => 'editor/Makefile',
           commentType       => '#',
           replace_slashes   => 1);

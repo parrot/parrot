@@ -1,0 +1,14 @@
+TGE - Tree Grammar Engine
+Copyright 2005, The Perl Foundation.
+
+TGE is a tool for transforming trees. It's most heavily used in the
+compiler tools suite, where it transforms the trees output by PGE into
+abstract syntax trees.
+
+INSTALLATION
+
+Compile TGE to bytecode and run its test suite:
+
+  $ make
+  $ make test
+

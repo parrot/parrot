@@ -118,6 +118,15 @@
 # generated from svn:ignore of 'compilers/pge/PGE/'
 ^compilers/pge/PGE/Library\.pir$
 ^compilers/pge/PGE/Library\.pir/
+# generated from svn:ignore of 'compilers/tge/'
+^compilers/tge/Makefile$
+^compilers/tge/Makefile/
+^compilers/tge/.*\.pbc$
+^compilers/tge/.*\.pbc/
+# generated from svn:ignore of 'compilers/tge/TGE/'
+# generated from svn:ignore of 'compilers/tge/t/'
+^compilers/tge/t/.*\.pir$
+^compilers/tge/t/.*\.pir/
 # generated from svn:ignore of 'config/'
 # generated from svn:ignore of 'config/auto/'
 # generated from svn:ignore of 'config/auto/aio/'
