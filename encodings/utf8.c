@@ -326,6 +326,8 @@ to_encoding(Interp *interpreter, STRING *src, STRING *dest)
         result = dest;
     }
 
+    /* init iter before possilby changing encoding */
+    ENCODING_ITER_INIT(interpreter, src, &src_iter);
     result->charset  = Parrot_unicode_charset_ptr;
     result->encoding = Parrot_utf8_encoding_ptr;
     result->strlen   = src_len;
@@ -341,15 +343,13 @@ to_encoding(Interp *interpreter, STRING *src, STRING *dest)
         Parrot_reallocate_string(interpreter, dest, src_len);
         p = dest->strstart;
     }
-    if (src->charset == Parrot_iso_8859_1_charset_ptr ||
-            src->charset == Parrot_ascii_charset_ptr) {
+    if (src->charset == Parrot_ascii_charset_ptr) {
         for (dest_len = 0; dest_len < src_len; ++dest_len) {
             p[dest_len] = ((unsigned char*)src->strstart)[dest_len];
         }
         result->bufused = dest_len;
     }
     else {
-        ENCODING_ITER_INIT(interpreter, src, &src_iter);
         dest_len = src_len;
         dest_pos = 0;
         for (offs = 0; offs < src_len; ++offs) {

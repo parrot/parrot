@@ -61,39 +61,12 @@ static STRING*
 to_charset(Interp *interpreter, STRING *src, STRING *dest)
 {
     charset_converter_t conversion_func;
-    String_iter iter;
-    UINTVAL c, len, offs;
 
     if ((conversion_func = Parrot_find_charset_converter(interpreter,
                     src->charset, Parrot_unicode_charset_ptr))) {
          return conversion_func(interpreter, src, dest);
     }
-    len = src->strlen;
-    if (dest) {
-        Parrot_reallocate_string(interpreter, dest, len);
-        dest->charset = Parrot_unicode_charset_ptr;
-        dest->encoding = CHARSET_GET_PREFERRED_ENCODING(interpreter, dest);
-        ENCODING_ITER_INIT(interpreter, dest, &iter);
-        for (offs = 0; offs < src->strlen; ++offs) {
-            c = ENCODING_GET_CODEPOINT(interpreter, src, offs);
-            if (iter.bytepos >= PObj_buflen(dest) - 4) {
-                UINTVAL need = (UINTVAL)( (src->strlen - offs) * 1.5 );
-                if (need < 16)
-                    need = 16;
-                Parrot_reallocate_string(interpreter, dest,
-                        PObj_buflen(dest) + need);
-            }
-            iter.set_and_advance(interpreter, &iter, c);
-        }
-        dest->bufused = iter.bytepos;
-        dest->strlen  = iter.charpos;
-        return dest;
-    }
-    else {
-        internal_exception(UNIMPLEMENTED,
-                "to_charset inplace for unicode not implemented");
-    }
-    return NULL;
+    return Parrot_utf8_encoding_ptr->to_encoding(interpreter, src, dest);
 }
 
 
