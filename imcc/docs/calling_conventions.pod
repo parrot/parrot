@@ -100,7 +100,7 @@ Similarly, one can yield using the .yield directive
 
 =head2 Subpragma
 
-This is a comma separated list of zero or more items with the
+This is a list of zero or more items with the
 following meaning:
 
 =over 4
@@ -114,7 +114,8 @@ are marked as B<:main>, the B<last> marked subroutine is entered.
 
 Run this subroutine during the B<load_library> opcode.
 B<:load> is ignored, if another subroutine in that file is marked with
-B<:main>.
+B<:main>. If multiple subs have the B<:load> pragma, the subs are
+run in compilation that is source code order.
 
 =item * :anon
 
@@ -125,7 +126,7 @@ name to be reused.
 
 Engage in multiple dispatch with the listed types.
 
-=item * method
+=item * :method
 
 Declare subroutine being a method.
 
