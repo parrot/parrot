@@ -123,7 +123,7 @@ downcase(Interp *interpreter, STRING *src)
     UErrorCode err;
     int dest_len, src_len;
 
-    Parrot_utf16_encoding_ptr->to_encoding(interpreter, src);
+    src = Parrot_utf16_encoding_ptr->to_encoding(interpreter, src, NULL);
     /*
 U_CAPI int32_t U_EXPORT2
 u_strToLower(UChar *dest, int32_t destCapacity,

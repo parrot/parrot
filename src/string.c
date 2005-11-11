@@ -484,8 +484,9 @@ string_append(Interp *interpreter,
         a->charset = cs;
     else {
         /* upgrade to utf16 */
-        Parrot_utf16_encoding_ptr->to_encoding(interpreter, a);
-        b = Parrot_utf16_encoding_ptr->copy_to_encoding(interpreter, b);
+        Parrot_utf16_encoding_ptr->to_encoding(interpreter, a, NULL);
+        b = Parrot_utf16_encoding_ptr->to_encoding(interpreter, b,
+                new_string_header(interpreter, 0));
         /*
          * result could be mixed ucs2 / utf16
          */
@@ -1178,8 +1179,9 @@ string_replace(Interp *interpreter, STRING *src,
 
     /* may have different reps..... */
     if ( !(cs = string_rep_compatible(interpreter, src, rep, &enc))) {
-        Parrot_utf16_encoding_ptr->to_encoding(interpreter, src);
-        rep = Parrot_utf16_encoding_ptr->copy_to_encoding(interpreter, rep);
+        Parrot_utf16_encoding_ptr->to_encoding(interpreter, src, NULL);
+        rep = Parrot_utf16_encoding_ptr->to_encoding(interpreter, rep,
+                new_string_header(interpreter, 0));
     }
     else {
         src->charset = cs;
@@ -2659,8 +2661,12 @@ Parrot_string_find_not_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags, ST
 Parrot_string_trans_charset(Interp *interpreter, STRING *src,
         INTVAL charset_nr, STRING *dest)>
 
-If C<dest> == NULL convert  C<src> to the given charset inplace, else
-return a copy of C<src> with the charset in dest.
+=item C< STRING*
+Parrot_string_trans_encoding(Interp *interpreter, STRING *src,
+        INTVAL charset_nr, STRING *dest)>
+
+If C<dest> == NULL convert  C<src> to the given charset or encoding inplace,
+else return a copy of C<src> with the charset/encoding in dest.
 
 =cut
 
@@ -2718,20 +2724,18 @@ Parrot_string_trans_encoding(Interp *interpreter, STRING *src,
      * operation is desired
      */
     if (dest) {
+        dest->encoding = new_encoding;
         if (new_encoding == src->encoding) {
             Parrot_reuse_COW_reference(interpreter, src, dest);
-            dest->encoding = new_encoding;
             return dest;
         }
-        return new_encoding->copy_to_encoding(interpreter, src);
     }
     else {
         if (new_encoding == src->encoding) {
             return src;
         }
     }
-    new_encoding->to_encoding(interpreter, src);
-    return src;
+    return new_encoding->to_encoding(interpreter, src, dest);
 }
 
 /*

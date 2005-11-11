@@ -33,37 +33,18 @@ UCS-2 encoding with the help of the ICU library.
 static void iter_init(Interp *, String *src, String_iter *iter);
 
 
-static void
-to_encoding(Interp *interpreter, STRING *src)
-{
-    if (src->encoding == Parrot_ucs2_encoding_ptr)
-        return;
-    Parrot_utf16_encoding_ptr->to_encoding(interpreter, src);
-    /*
-     * conversion to utf16 downgrads to ucs-2 if possible - check result
-     */
-    if (src->encoding == Parrot_utf16_encoding_ptr) {
-        real_exception(interpreter, NULL, E_UnicodeError,
-            "can't convert string with surrogates to ucs2");
-    }
-}
-
 static STRING *
-copy_to_encoding(Interp *interpreter, STRING *src)
+to_encoding(Interp *interpreter, STRING *src, STRING *dest)
 {
-    STRING *dest;
-
-    if (src->encoding == Parrot_ucs2_encoding_ptr)
-        return string_copy(interpreter, src);
-    dest = Parrot_utf16_encoding_ptr->copy_to_encoding(interpreter, src);
+    STRING *result = Parrot_utf16_encoding_ptr->to_encoding(interpreter, src, dest);
     /*
      * conversion to utf16 downgrads to ucs-2 if possible - check result
      */
-    if (dest->encoding == Parrot_utf16_encoding_ptr) {
+    if (result->encoding == Parrot_utf16_encoding_ptr) {
         real_exception(interpreter, NULL, E_UnicodeError,
             "can't convert string with surrogates to ucs2");
     }
-    return dest;
+    return result;
 }
 
 static UINTVAL
@@ -258,7 +239,6 @@ Parrot_encoding_ucs2_init(Interp *interpreter)
 	"ucs2",
 	2, /* Max bytes per codepoint 0 .. 0x10ffff */
 	to_encoding,
-	copy_to_encoding,
 	get_codepoint,
 	set_codepoint,
 	get_byte,

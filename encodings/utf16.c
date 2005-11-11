@@ -32,10 +32,20 @@ UTF-16 encoding with the help of the ICU library.
 
 
 static void iter_init(Interp *, String *src, String_iter *iter);
-/* This function needs to go through and get all the code points one
-   by one and turn them into a utf16 sequence */
-static void
-to_encoding(Interp *interpreter, STRING *src)
+
+/*
+
+=item C<static STRING *to_encoding(Interp *, STRING *src, STRING *dest)>
+
+Convert string C<src> to this encoding. If C<dest> is set
+fill it with the converted result, else operate inplace.
+
+=cut
+
+*/
+
+static STRING *
+to_encoding(Interp *interpreter, STRING *src, STRING *dest)
 {
 #if PARROT_HAS_ICU
     UErrorCode err;
@@ -43,18 +53,29 @@ to_encoding(Interp *interpreter, STRING *src)
     UChar *p;
 #endif
     int src_len;
+    int in_place = dest == NULL;
+    STRING *result;
 
     if (src->encoding == Parrot_utf16_encoding_ptr ||
-        src->encoding == Parrot_ucs2_encoding_ptr)
-        return;
+            src->encoding == Parrot_ucs2_encoding_ptr)
+        return in_place ? src : string_copy(interpreter, src);
     /*
      * TODO adapt string creation functions
      */
-    src->charset  = Parrot_unicode_charset_ptr;
-    src->encoding = Parrot_utf16_encoding_ptr;
     src_len = src->strlen;
-    if (!src_len)
-        return;
+    if (in_place) {
+        result = src;
+    }
+    else {
+        result = dest;
+    }
+    result->charset  = Parrot_unicode_charset_ptr;
+    result->encoding = Parrot_utf16_encoding_ptr;
+    result->strlen = src_len;
+    if (!src_len) {
+        result->encoding = Parrot_ucs2_encoding_ptr;
+        return result;
+    }
     /*
        u_strFromUTF8(UChar *dest,
        int32_t destCapacity,
@@ -62,11 +83,18 @@ to_encoding(Interp *interpreter, STRING *src)
        const char *src,
        int32_t srcLength,
        UErrorCode *pErrorCode);
-     */
+       */
 #if PARROT_HAS_ICU
-    /* need intermediate memory */
-    p = mem_sys_allocate(src_len * sizeof(UChar));
-    if (src->charset == Parrot_iso_8859_1_charset_ptr) {
+    if (in_place) {
+        /* need intermediate memory */
+        p = mem_sys_allocate(src_len * sizeof(UChar));
+    }
+    else {
+        Parrot_reallocate_string(interpreter, dest, sizeof(UChar) * src_len);
+        p = dest->strstart;
+    }
+    if (src->charset == Parrot_iso_8859_1_charset_ptr ||
+            src->charset == Parrot_ascii_charset_ptr) {
         for (dest_len = 0; dest_len < (int)src->strlen; ++dest_len) {
             p[dest_len] = (UChar)((unsigned char*)src->strstart)[dest_len];
         }
@@ -79,80 +107,32 @@ to_encoding(Interp *interpreter, STRING *src)
             /*
              * have to resize - required len in UChars is in dest_len
              */
-            p = mem_sys_realloc(p, dest_len * sizeof(UChar));
+            if (in_place)
+                p = mem_sys_realloc(p, dest_len * sizeof(UChar));
+            else {
+                Parrot_reallocate_string(interpreter, dest, sizeof(UChar) * dest_len);
+                p = dest->strstart;
+            }
             u_strFromUTF8(p, dest_len,
                     &dest_len, src->strstart, src->bufused, &err);
             assert(U_SUCCESS(err));
         }
     }
-    src->bufused = dest_len * sizeof(UChar);
-    Parrot_reallocate_string(interpreter, src, src->bufused);
-    memcpy(src->strstart, p, src->bufused);
-    mem_sys_free(p);
+    result->bufused = dest_len * sizeof(UChar);
+    if (in_place) {
+        Parrot_reallocate_string(interpreter, src, src->bufused);
+        memcpy(src->strstart, p, src->bufused);
+        mem_sys_free(p);
+    }
 
     /* downgrade if possible */
     if (dest_len == (int)src->strlen)
-        src->encoding = Parrot_ucs2_encoding_ptr;
+        result->encoding = Parrot_ucs2_encoding_ptr;
 #else
     real_exception(interpreter, NULL, E_LibraryNotLoadedError,
             "no ICU lib loaded");
 #endif
-}
-
-static STRING *
-copy_to_encoding(Interp *interpreter, STRING *src)
-{
-    STRING *dest;
-#if PARROT_HAS_ICU
-    UErrorCode err;
-    int dest_len;
-#endif
-    int src_len;
-
-    if (src->encoding == Parrot_utf16_encoding_ptr ||
-            src->encoding == Parrot_ucs2_encoding_ptr)
-        return string_copy(interpreter, src);
-
-    src_len  = src->strlen;
-    if (!src_len) {
-        return string_make_direct(interpreter, NULL, 0,
-                Parrot_utf16_encoding_ptr,
-                Parrot_unicode_charset_ptr, 0);
-
-    }
-#if PARROT_HAS_ICU
-    dest = string_make_direct(interpreter, NULL, sizeof(UChar) * src_len,
-                Parrot_utf16_encoding_ptr,
-                Parrot_unicode_charset_ptr, 0);
-    dest->strlen = src_len;
-    if (src->charset == Parrot_iso_8859_1_charset_ptr) {
-        UChar *p = (UChar*) dest->strstart;
-        for (dest_len = 0; dest_len < (int)src->strlen; ++dest_len, ++p) {
-            *p = (UChar)((unsigned char*)src->strstart)[dest_len];
-        }
-    }
-    else {
-        err = U_ZERO_ERROR;
-        u_strFromUTF8(dest->strstart, src_len,
-                &dest_len, src->strstart, src->bufused, &err);
-        if (!U_SUCCESS(err)) {
-            Parrot_allocate_string(interpreter, dest, sizeof(UChar) * dest_len);
-            u_strFromUTF8(dest->strstart, dest_len,
-                    &dest_len, src->strstart, src->bufused, &err);
-            assert(U_SUCCESS(err));
-        }
-    }
-    dest->bufused = dest_len * sizeof(UChar);
-    /* downgrade if possible */
-    if (dest_len == (int)src->strlen)
-        dest->encoding = Parrot_ucs2_encoding_ptr;
-
-#else
-    real_exception(interpreter, NULL, E_LibraryNotLoadedError,
-            "no ICU lib loaded");
-#endif
-
-    return dest;
+    return result;
 }
 
 static UINTVAL
@@ -367,7 +347,6 @@ Parrot_encoding_utf16_init(Interp *interpreter)
 	"utf16",
 	4, /* Max bytes per codepoint 0 .. 0x10ffff */
 	to_encoding,
-	copy_to_encoding,
 	get_codepoint,
 	set_codepoint,
 	get_byte,

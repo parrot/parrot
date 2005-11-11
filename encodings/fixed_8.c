@@ -19,22 +19,13 @@ This file implements the encoding functions for fixed-width 8-bit codepoints
 
 #define UNIMPL internal_exception(UNIMPLEMENTED, "unimpl fixed_8")
 
-/* This function needs to go through and get all the code points one
-   by one and turn them into a byte */
-static void
-to_encoding(Interp *interpreter, STRING *source_string)
-{
-    UNIMPL;
-}
-
 static STRING *
-copy_to_encoding(Interp *interpreter, STRING *source_string)
+to_encoding(Interp *interpreter, STRING *src, STRING *dest)
 {
-    STRING *return_string = NULL;
-
     UNIMPL;
-    return return_string;
+    return NULL;
 }
+
 
 /* codepoints are bytes, so delegate */
 static UINTVAL
@@ -214,7 +205,6 @@ Parrot_encoding_fixed_8_init(Interp *interpreter)
 	"fixed_8",
 	1, /* Max bytes per codepoint */
 	to_encoding,
-	copy_to_encoding,
 	get_codepoint,
 	set_codepoint,
 	get_byte,

@@ -13,8 +13,6 @@
 #if !defined(PARROT_ENCODING_FIXED_8_H_GUARD)
 #define PARROT_ENCODING_FIXED_8_H_GUARD
 
-static void to_encoding(Interp *interpreter, STRING *source_string);
-static STRING *copy_to_encoding(Interp *interpreter, STRING *source_string);
 static UINTVAL get_codepoint(Interp *interpreter, const STRING *source_string, UINTVAL offset);
 static void set_codepoint(Interp *interpreter, STRING *source_string, UINTVAL offset, UINTVAL codepoint);
 static UINTVAL get_byte(Interp *interpreter, const STRING *source_string, UINTVAL offset);

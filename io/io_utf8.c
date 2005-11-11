@@ -52,7 +52,8 @@ PIO_utf8_write(theINTERP, ParrotIOLayer *l, ParrotIO *io, STRING *s)
     if (s->encoding == Parrot_utf8_encoding_ptr)
         return PIO_write_down(interpreter, l->down, io, s);
 
-    dest = Parrot_utf8_encoding_ptr->copy_to_encoding(interpreter, s);
+    dest = Parrot_utf8_encoding_ptr->to_encoding(interpreter, s,
+            new_string_header(interpreter, 0));
     return PIO_write_down(interpreter, l->down, io, dest);
 }
 

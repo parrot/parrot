@@ -15,8 +15,7 @@
 
 #include "parrot/parrot.h"
 
-typedef void (*encoding_to_encoding_t)(Interp*, STRING *string);
-typedef STRING *(*encoding_copy_to_encoding_t)(Interp*, STRING *string);
+typedef STRING * (*encoding_to_encoding_t)(Interp*, STRING *src, STRING *dest);
 typedef UINTVAL (*encoding_get_codepoint_t)(Interp*, const STRING *src, UINTVAL offset);
 typedef void (*encoding_set_codepoint_t)(Interp*, STRING *src, UINTVAL offset, UINTVAL codepoint);
 typedef UINTVAL (*encoding_get_byte_t)(Interp*, const STRING *src, UINTVAL offset);
@@ -42,7 +41,6 @@ struct _encoding {
     const char *name;
     UINTVAL max_bytes_per_codepoint;
     encoding_to_encoding_t to_encoding;
-    encoding_copy_to_encoding_t copy_to_encoding;
     encoding_get_codepoint_t get_codepoint;
     encoding_set_codepoint_t  set_codepoint;
     encoding_get_byte_t  get_byte;
@@ -91,10 +89,6 @@ const char * Parrot_encoding_c_name(Interp *, INTVAL number_of_encoding);
 
 #define ENCODING_MAX_BYTES_PER_CODEPOINT(i, src) \
     ((ENCODING *)src->encoding)->max_bytes_per_codepoint
-#define ENCODING_TO_ENCODING(i, src, offset, count) \
-    ((ENCODING *)src->encoding)->to_encoding(i, src, offset, count)
-#define ENCODING_COPY_TO_ENCODING(i, src) \
-    ((ENCODING *)src->encoding)->copy_to_encoding(i, src)
 #define ENCODING_GET_CODEPOINT(i, src, offset) \
     ((ENCODING *)src->encoding)->get_codepoint(i, src, offset)
 #define ENCODING_SET_CODEPOINT(i, src, offset, codepoint) \
