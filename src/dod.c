@@ -470,6 +470,7 @@ Parrot_dod_trace_children(Interp *interpreter, size_t how_many)
             }
             else {
                 /* All that's left is the custom */
+                assert(!PObj_on_free_list_TEST(current));
                 VTABLE_mark(interpreter, current);
             }
         }

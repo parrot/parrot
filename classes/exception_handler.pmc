@@ -66,6 +66,11 @@ Initializes the exception handler.
             PMC_cont_ASSIGN(SELF, NULL);
         }
     }
+    PMC* clone  () {
+        PMC *result = SUPER();
+        PObj_custom_mark_CLEAR(result);
+        return result;
+    }
 }
 
 /*

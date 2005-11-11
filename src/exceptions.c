@@ -393,10 +393,21 @@ throw_exception(Interp * interpreter, PMC *exception, void *dest)
     if (!handler)
         return NULL;
     /* create return continuation with current context */
+#if 0
+    /*
+     * XXX Besides that resumable exceptions are a but doubtful,
+     *     this is wrong: when the subroutine is left via it's
+     *     own RetContinuation the call frame is immediately
+     *     recycled, but this RetContinuation still points to it
+     *     and, when mark() is called, nice crashes are occuring
+     *     Sell also languages/tcl/t/cmd_array*.t (_14, _22 and more).
+     *     Either create a full Continuation or don't.
+     */
     if (dest) {
         VTABLE_set_pmc_keyed_int(interpreter, exception, 4,
                 new_ret_continuation_pmc(interpreter, dest));
     }
+#endif
     /* put the handler aka continuation ctx in the interpreter */
     address = VTABLE_invoke(interpreter, handler, NULL);
     /* XXX preserve P5 register */

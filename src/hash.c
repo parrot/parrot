@@ -597,6 +597,7 @@ new_hash_x(Interp *interpreter, Hash **hptr,
         hash_comp_fn compare, hash_hash_key_fn keyhash)
 {
     Hash *hash = mem_sys_allocate(sizeof(Hash));
+    hash->container = NULL;
     *hptr = hash;
     init_hash(interpreter, hash, val_type, hkey_type,
             compare, keyhash);
