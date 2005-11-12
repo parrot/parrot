@@ -411,6 +411,7 @@ op peek(out STR, in PMC) :base_io {
 ##########################################
 
 =item B<stat>(out INT, in STR, in INT)
+
 =item B<stat>(out INT, in INT, in INT)
 
 Stat the file. Return stat element $3 for file $2 into $1. The queryable
