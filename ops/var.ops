@@ -137,12 +137,19 @@ by index can only be retrieved by this index.
 =cut
 
 op store_lex(in STR, in PMC) {
+  PMC *lex_pad = CONTEXT(interpreter->ctx)->lex_pad;
+  if (!PMC_IS_NULL(lex_pad)) {
+    /* use new code */
+    VTABLE_set_pmc_keyed_str(interpreter, lex_pad, $1, $2);
+  }
+  else {
     PMC *pad = scratchpad_get_current(interpreter);
     if (!pad)
-        real_exception(interpreter, NULL, PAD_NOT_FOUND,
-		"empty lexical pad");
+      real_exception(interpreter, NULL, PAD_NOT_FOUND,
+	  "empty lexical pad");
     scratchpad_store(interpreter, pad, $1, $2);
-    goto NEXT();
+  }
+  goto NEXT();
 }
 
 op store_lex(in INT, in STR, in PMC) {
@@ -188,16 +195,24 @@ otherwise, count up from the outermost scope.
 =cut
 
 op find_lex(out PMC, in STR) {
+  PMC *lex_pad = CONTEXT(interpreter->ctx)->lex_pad;
+  if (!PMC_IS_NULL(lex_pad)) {
+    /* use new code */
+    $1 = VTABLE_get_pmc_keyed_str(interpreter, lex_pad, $2);
+  }
+  else {
+    /* for now use old infrastructure too */
     opcode_t * next = expr NEXT();
     PMC *pad = scratchpad_get_current(interpreter);
     $1 = scratchpad_find(interpreter, pad, $2);
     if (!pad)
-        real_exception(interpreter, next, PAD_NOT_FOUND,
-		"empty lexical pad");
+      real_exception(interpreter, next, PAD_NOT_FOUND,
+	  "empty lexical pad");
     if (!$1)
-        real_exception(interpreter, next, LEX_NOT_FOUND,
-            "Lexical '%Ss' not found", $2);
-    goto NEXT();
+      real_exception(interpreter, next, LEX_NOT_FOUND,
+	  "Lexical '%Ss' not found", $2);
+  }
+  goto NEXT();
 }
 
 op find_lex(out PMC, in INT) {
