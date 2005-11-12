@@ -647,9 +647,13 @@ static PMC*
 create_lexinfo(Interp *interpreter, IMC_Unit *unit, PMC *sub)
 {
     PMC *lex_info;
-    int i;
+    int i, k;
     SymReg * r;
     SymHash *hsh;
+    struct PackFile_Constant **constants;
+    STRING *lex_name;
+
+    constants = interpreter->code->const_table->constants;
 
     hsh = &unit->hash;
     lex_info = NULL;
@@ -662,7 +666,11 @@ create_lexinfo(Interp *interpreter, IMC_Unit *unit, PMC *sub)
                                 enum_class_LexInfo));
                     VTABLE_init_pmc(interpreter, lex_info, sub);
                 }
-                /* TODO store lex */
+                assert(r->reg); /* lexical name */
+                k = r->reg->color;
+                assert(k >= 0);
+                lex_name = constants[k]->u.string;
+                assert(PObj_is_string_TEST(lex_name));
             }
         }
     }
@@ -1020,6 +1028,9 @@ constant_folding(Interp *interpreter, IMC_Unit * unit)
         for (r = hsh->data[i]; r; r = r->next) {
             if (r->type & (VTCONST|VT_CONSTP)) {
                 add_1_const(interpreter, r);
+            }
+            if (r->usage & U_LEXICAL) {
+                add_1_const(interpreter, r->reg); /* lex_name */
             }
         }
     }

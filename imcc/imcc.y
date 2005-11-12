@@ -483,6 +483,7 @@ pasm_inst:         { clear_state(); }
                    {
                        SymReg *r = mk_pasm_reg(interp, $4);
                        r->usage |= U_LEXICAL; $$ = 0;
+                       r->reg = mk_const(interp, $2, 'S');
                    }
    | /* none */    { $$ = 0;}
    ;
@@ -859,7 +860,10 @@ labeled_inst:
     is_def=0; $$=0;
 
    }
-   | LEXICAL STRINGC COMMA reg { $4->usage |= U_LEXICAL; $$ = 0; }
+   | LEXICAL STRINGC COMMA reg
+                    { $4->usage |= U_LEXICAL;
+                      $4->reg = mk_const(interp, $2, 'S');
+                   $$ = 0; }
    | CONST { is_def=1; } type IDENTIFIER '=' const
                     { mk_const_ident(interp, $4, $3, $6, 0);is_def=0; }
    | pmc_const
