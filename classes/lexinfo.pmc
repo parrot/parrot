@@ -36,10 +36,10 @@ key_hash_STRING(Interp *interpreter, void *value, size_t seed)
 /*
  * LexInfo contains a constant Hash with constant string
  * keys and integer indices - no marking and no pmc_ext
- * needed
+ * needed (except for freeze/thaw
  */
 
-pmclass LexInfo does hash {
+pmclass LexInfo need_ext does hash {
 
 /*
 
@@ -91,7 +91,7 @@ compiler calls this method in response to a ".lex STRING, PREG" directive.
 
 =item C<INTVAL elements()>
 
-Returns the number of elements in the hash.
+Returns the number of elements in the LexInfo hash.
 
 =cut
 
@@ -129,7 +129,25 @@ The implementation of the Hash PMC is called.
     }
 
     void thaw(visit_info *info) {
-        Parrot_Hash_thaw(INTERP, SELF, info);
+        IMAGE_IO *io = info->image_io;
+        Hash *hash;
+        PMC *dummy;
+
+        if (info->extra_flags == EXTRA_IS_NULL) {
+            INTVAL elems = io->vtable->shift_integer(INTERP, io);
+            INTVAL k_type = io->vtable->shift_integer(INTERP, io);
+            INTVAL v_type = io->vtable->shift_integer(INTERP, io);
+            info->extra_flags = EXTRA_IS_COUNT;
+            info->extra = (void *)elems;
+            assert(v_type == enum_hash_int);
+            /* TODO make a better interface for hash creation
+             * TODO create hash with needed types in the first place
+             */
+            SELF.init_pmc(NULL);
+        }
+        else {
+            SUPER(info);
+        }
     }
 }
 

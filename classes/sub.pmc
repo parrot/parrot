@@ -463,6 +463,8 @@ Archives the subroutine.
         (info->visit_pmc_now)(INTERP, sub->namespace, info);
         info->thaw_ptr = &sub->multi_signature;
         (info->visit_pmc_now)(INTERP, sub->multi_signature, info);
+        info->thaw_ptr = &sub->lex_info;
+        (info->visit_pmc_now)(INTERP, sub->lex_info, info);
         SUPER(info);
     }
 
@@ -484,6 +486,7 @@ Archives the subroutine.
          * - HLL_id
          * - multi_signature
          * - n_regs_used[i]
+         * - lex_info
          */
 
         /*
