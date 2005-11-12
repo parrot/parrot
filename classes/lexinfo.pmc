@@ -1,0 +1,132 @@
+/*
+Copyright: 2005 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+classes/lexinfo.pmc - LexInfo PMC
+
+=head1 DESCRIPTION
+
+These are the vtable functions for the lexinfo PMC.
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+#include <assert.h>
+#include "pmc_hash.h"
+
+static size_t
+key_hash_STRING(Interp *interpreter, void *value, size_t seed)
+{
+    STRING *s = value;
+
+    if (s->hashval) {
+        return s->hashval;
+    }
+
+    return string_hash(interpreter, s, seed);
+}
+/*
+ * LexInfo contains a constant Hash with constant string
+ * keys and integer indices - no marking and no pmc_ext
+ * needed
+ */
+
+pmclass LexInfo does hash {
+
+/*
+
+=item C<void class_init()>
+
+Manipulate vtable->flags so that constant PMCs are created.
+If your inherited LexInfo is not so constant, then don't
+do that and provie a mark() method and set custom_mark flag.
+
+=item C<init_pmc(PMC *sub)>
+
+Initialize the LexInfo PMC and remember the associate
+subroutine.
+
+=cut
+
+*/
+
+    void class_init() {
+        if (pass == 1) {
+            /* there is no pmclass const_pmc flag yet */
+            Parrot_base_vtables[entry]->flags |= VTABLE_IS_CONST_PMC_FLAG;
+        }
+
+    }
+    void init() {
+        real_exception(INTERP, NULL, INVALID_OPERATION,
+                "don't create me like this");
+    }
+
+    void init_pmc(PMC* sub) {
+        assert(PObj_constant_TEST(SELF));
+        PMC_pmc_val(SELF) = sub;
+        new_pmc_hash_x(INTERP, SELF,
+            enum_hash_int,
+            Hash_key_type_STRING,
+            (hash_comp_fn)string_equal,     /* STRING compare */
+            key_hash_STRING);    /*        hash */
+    }
+
+/*
+
+=item C<void visit(visit_info *info)>
+
+=item C<void freeze(visit_info *info)>
+
+=item C<void thaw(visit_info *info)>
+
+Freeze/thaw interface used during freeze/thaw of the Sub PMC.
+The implementation of the Hash PMC is called.
+
+=cut
+
+*/
+
+    void visit(visit_info *info) {
+        Parrot_Hash_visit(INTERP, SELF, info);
+    }
+
+    void freeze(visit_info *info) {
+        Parrot_Hash_freeze(INTERP, SELF, info);
+    }
+
+    void thaw(visit_info *info) {
+        Parrot_Hash_thaw(INTERP, SELF, info);
+    }
+}
+
+
+/*
+
+=back
+
+=head1 SEE ALSO
+
+F<docs/pdds/pdd20_lecical_vars.pod>, F<classes/lexpad.pmc>.
+
+=cut
+
+*/
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+*/

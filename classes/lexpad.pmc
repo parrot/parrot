@@ -1,0 +1,62 @@
+/*
+Copyright: 2005 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+classes/lexpad.pmc - LexPad PMC
+
+=head1 DESCRIPTION
+
+These are the vtable functions for the lexpad PMC.
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+#include <assert.h>
+
+/*
+ * LexPad contains a constant Hash with constant string
+ * keys and integer indices - no marking and no pmc_ext
+ * needed
+ */
+
+pmclass LexPad does hash {
+
+    void init() {
+        /* pitch a fit */
+    }
+
+    void init_pmc(PMC* sub) {
+    }
+
+}
+
+
+/*
+
+=back
+
+=head1 SEE ALSO
+
+F<docs/pdds/pdd20_lecical_vars.pod>, F<classes/lexinfo.pmc>.
+
+=cut
+
+*/
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+*/
