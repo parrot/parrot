@@ -16,7 +16,38 @@ Tests various lexical scratchpad operations.
 
 =cut
 
-use Parrot::Test tests => 14;
+use Parrot::Test tests => 17;
+
+output_is(<<'CODE', <<'OUTPUT', '.lex parsing - PASM');
+.pcc_sub main:
+    .lex "$a", P0
+    print "ok\n"
+    end
+CODE
+ok
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', '.lex parsing - PIR');
+.sub main
+    .lex "$a", P0
+    print "ok\n"
+    end
+.end
+CODE
+ok
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', '.lex parsing - PIR, $P');
+.sub main
+    .lex '$a', $P0
+    null $P0
+    null $P1
+    print "ok\n"
+    end
+.end
+CODE
+ok
+OUTPUT
 
 output_is(<<CODE, <<OUTPUT, "simple store and fetch");
 	new_pad 0

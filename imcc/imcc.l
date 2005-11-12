@@ -239,6 +239,7 @@ SP              [ ]
 <pod>{EOL}      { ++line; }
 
 ".sym"          return(LOCAL);
+<INITIAL,emit>".lex"          return(LEXICAL);
 ".arg"          return(ARG);
 ".sub"          return(SUB);
 ".end"          return(ESUB);
@@ -270,6 +271,7 @@ SP              [ ]
 <emit,INITIAL>":immediate"    return(IMMEDIATE);
 <emit,INITIAL>":postcomp"    return(POSTCOMP);
 <emit,INITIAL>":anon"    return(ANON);
+<emit,INITIAL>":outer"   return(OUTER);
 
 ".result"       return(RESULT);
 ".yield"        return(YIELDT);

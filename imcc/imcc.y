@@ -323,7 +323,7 @@ begin_return_or_yield(Interp *interp, int yield)
 %token <t> ADV_FLAT ADV_SLURPY ADV_OPTIONAL ADV_OPT_FLAG
 %token <t> NEW
 %token <t> NAMESPACE ENDNAMESPACE DOT_METHOD
-%token <t> SUB SYM LOCAL CONST
+%token <t> SUB SYM LOCAL LEXICAL CONST
 %token <t> INC DEC GLOBAL_CONST
 %token <t> PLUS_ASSIGN MINUS_ASSIGN MUL_ASSIGN DIV_ASSIGN CONCAT_ASSIGN
 %token <t> BAND_ASSIGN BOR_ASSIGN BXOR_ASSIGN FDIV FDIV_ASSIGN MOD_ASSIGN
@@ -334,7 +334,7 @@ begin_return_or_yield(Interp *interp, int yield)
 %token <t> COMMA ESUB DOTDOT
 %token <t> PCC_BEGIN PCC_END PCC_CALL PCC_SUB PCC_BEGIN_RETURN PCC_END_RETURN
 %token <t> PCC_BEGIN_YIELD PCC_END_YIELD NCI_CALL METH_CALL INVOCANT
-%token <t> MAIN LOAD IMMEDIATE POSTCOMP METHOD ANON
+%token <t> MAIN LOAD IMMEDIATE POSTCOMP METHOD ANON OUTER
 %token <t> MULTI
 %token <s> LABEL
 %token <t> EMIT EOM
@@ -479,6 +479,11 @@ pasm_inst:         { clear_state(); }
                    }
    | PNULL var
                    {  $$ =MK_I(interp, cur_unit, "null", 1, $2); }
+   | LEXICAL STRINGC COMMA REG
+                   {
+                       SymReg *r = mk_pasm_reg(interp, $4);
+                       r->usage |= U_LEXICAL; $$ = 0;
+                   }
    | /* none */    { $$ = 0;}
    ;
 
@@ -854,6 +859,7 @@ labeled_inst:
     is_def=0; $$=0;
 
    }
+   | LEXICAL STRINGC COMMA reg { $4->usage |= U_LEXICAL; $$ = 0; }
    | CONST { is_def=1; } type IDENTIFIER '=' const
                     { mk_const_ident(interp, $4, $3, $6, 0);is_def=0; }
    | pmc_const
