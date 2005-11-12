@@ -480,7 +480,8 @@ string_append(Interp *interpreter,
         return string_concat(interpreter, a, b, Uflags);
     }
 
-    if ( (cs = string_rep_compatible(interpreter, a, b, NULL)))
+    cs = string_rep_compatible(interpreter, a, b, NULL);
+    if (cs != NULL)
         a->charset = cs;
     else {
         /* upgrade to utf16 */
@@ -1178,7 +1179,8 @@ string_replace(Interp *interpreter, STRING *src,
     }
 
     /* may have different reps..... */
-    if ( !(cs = string_rep_compatible(interpreter, src, rep, &enc))) {
+    cs = string_rep_compatible(interpreter, src, rep, &enc);
+    if (!cs) {
         Parrot_utf16_encoding_ptr->to_encoding(interpreter, src, NULL);
         rep = Parrot_utf16_encoding_ptr->to_encoding(interpreter, rep,
                 new_string_header(interpreter, 0));
@@ -1318,8 +1320,6 @@ INTVAL
 string_compare(Interp *interpreter,
     STRING *s1, STRING *s2)
 {
-    INTVAL cmp = 0;    /* gcc -O3 warning */
-
     if (!s1 && !s2) {
         return 0;
     }
@@ -1468,7 +1468,8 @@ string_bitwise_and(Interp *interpreter, STRING *s1,
         res->strlen = 0;
         return res;
     }
-    if ( !(cs = string_rep_compatible(interpreter, s1, s2, &enc))) {
+    cs = string_rep_compatible(interpreter, s1, s2, &enc);
+    if (!cs) {
         internal_exception(UNIMPLEMENTED,
                 "Cross-type string bitwise_and (%s/%s) (%s/%s) unsupported",
                 ((ENCODING *)(s1->encoding))->name,
@@ -1584,7 +1585,8 @@ string_bitwise_or(Interp *interpreter,
     else if (!s2)
         cs = s1->charset;
     else {
-        if ( !(cs = string_rep_compatible(interpreter, s1, s2, &enc))) {
+        cs = string_rep_compatible(interpreter, s1, s2, &enc);
+        if (!cs) {
             internal_exception(UNIMPLEMENTED,
                     "Cross-type string bitwise_or (%s/%s) (%s/%s) unsupported",
                     ((ENCODING *)(s1->encoding))->name,
@@ -1661,7 +1663,8 @@ string_bitwise_xor(Interp *interpreter,
     else if (!s2)
         cs = s1->charset;
     else {
-        if ( !(cs = string_rep_compatible(interpreter, s1, s2, &enc))) {
+        cs = string_rep_compatible(interpreter, s1, s2, &enc);
+        if (!cs) {
             internal_exception(UNIMPLEMENTED,
                     "Cross-type string bitwise_xor (%s/%s) (%s/%s) unsupported",
                     ((ENCODING *)(s1->encoding))->name,
@@ -1720,7 +1723,6 @@ do { \
  \
         for ( ; length ; --length, ++dp, ++curr) \
         { \
-            Parrot_UInt1 temp = *curr; \
             *dp = 0xFF & ~ *curr; \
         } \
     } \
