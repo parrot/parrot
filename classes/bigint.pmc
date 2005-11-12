@@ -213,7 +213,7 @@ bigint_bitwise_shr_bigint_int(Interp *interpreter, PMC* self, INTVAL value, PMC 
     mpz_tdiv_q_2exp(BN(dest), BN(self), value);
 }
 
-#else
+#else /* ifdef PARROT_HAS_GMP */
 
 static void
 bigint_init(Interp *interpreter, PMC *self) {
@@ -406,7 +406,7 @@ bigint_bitwise_shr_bigint_int(Interp *interpreter, PMC* self, INTVAL value, PMC 
     real_exception(interpreter, NULL, E_LibraryNotLoadedError,
         "no bigint lib loaded");
 }
-#endif
+#endif /* ifdef PARROT_HAS_GMP */
 
 pmclass BigInt {
 
