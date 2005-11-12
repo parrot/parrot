@@ -23,7 +23,7 @@ $description="Loading platform and local hints files...";
 @args = qw( cc verbose define );
 
 sub runstep {
-  my $hints = "config/init/hints/" . lc($^O) . ".pl";
+  my $hints = "config/init/hints/" . lc($^O) . ".pm";
   my $hints_used = 0;
   print "[ " if $_[1];
   if(-e $hints) {
@@ -32,7 +32,7 @@ sub runstep {
     die $@ if $@;
     $hints_used++;
   }
-  $hints = "config/init/hints/local.pl";
+  $hints = "config/init/hints/local.pm";
   if(-e $hints) {
     print "$hints " if $_[1];
     do $hints;

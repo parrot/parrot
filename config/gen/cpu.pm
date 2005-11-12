@@ -29,7 +29,7 @@ sub runstep {
   my $cpu = Configure::Data->get('cpuarch');
   print "\t(cpu = '$cpu') " if $verbose;
   my $f;
-  if (-d "config/gen/cpu/$cpu" && -e ($f = "config/gen/cpu/$cpu/auto.pl")) {
+  if (-d "config/gen/cpu/$cpu" && -e ($f = "config/gen/cpu/$cpu/auto.pm")) {
     require $f;
     &run_cpu($verbose);
   }
