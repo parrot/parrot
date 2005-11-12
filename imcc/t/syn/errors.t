@@ -12,7 +12,7 @@ pir_output_like(<<'CODE', <<'OUT', "op not found");
     branch $P0
 .end
 CODE
-/.*The opcode 'branch' \(branch\<1\>\) was not found\. Check the type and number of the arguments.*/
+/.*The opcode 'branch_p' \(branch\<1\>\) was not found\. Check the type and number of the arguments.*/
 OUT
 
 

@@ -448,7 +448,6 @@ INS(Interp *interpreter, IMC_Unit * unit, char *name,
             else
                 return NULL;
         }
-        strcpy(fullname, name);
     }
     else
         strcpy(fullname, name);
