@@ -16,7 +16,7 @@ Tests the Parrot IO operations.
 
 =cut
 
-use Parrot::Test tests => 31;
+use Parrot::Test tests => 32;
 use Test::More;
 
 sub file_content_is {
@@ -603,3 +603,14 @@ sub_1: 012
 sub_2: 012
 sub_3: 345
 OUTPUT
+
+
+pir_output_like(<<'CODE', <<'OUT', 'read on null PMC throws exception', todo => 'not yet implemented');
+.sub main :main
+	null $P1
+	$S0 = read $P1, 1
+	end
+.end
+CODE
+/some crazy exception/
+OUT
