@@ -671,6 +671,8 @@ create_lexinfo(Interp *interpreter, IMC_Unit *unit, PMC *sub)
                 assert(k >= 0);
                 lex_name = constants[k]->u.string;
                 assert(PObj_is_string_TEST(lex_name));
+                VTABLE_set_integer_keyed_str(interpreter,
+                        lex_info, lex_name, r->color);
             }
         }
     }

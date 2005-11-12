@@ -593,6 +593,10 @@ String PMC or a Key PMC for a nested namespace.
 
 Return amount of used registers for register kinds "I", "S", "P", "N".
 
+=item C<METHOD PMC* get_lexinfo()>
+
+Return the LexInfo PMC, if any.
+
 =cut
 
 */
@@ -630,6 +634,10 @@ Return amount of used registers for register kinds "I", "S", "P", "N".
         return sub->n_regs_used[p - types];
     }
 
+    METHOD PMC* get_lexinfo() {
+        struct Parrot_sub * sub = PMC_sub(SELF);
+        return sub->lex_info ? sub->lex_info : PMCNULL;
+    }
 
 }
 
