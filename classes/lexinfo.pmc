@@ -47,7 +47,7 @@ pmclass LexInfo need_ext does hash {
 
 Manipulate vtable->flags so that constant PMCs are created.
 If your inherited LexInfo is not so constant, then don't
-do that and provie a mark() method and set custom_mark flag.
+do that and provide a mark() method and set the custom_mark flag.
 
 =item C<init_pmc(PMC *sub)>
 
@@ -84,7 +84,7 @@ subroutine.
 
 =item C<void set_integer_keyed_str(STRING *name, INTVAL preg)>
 
-aka void declare_lex_preg(STRING *name, INTVAL preg)
+aka C<void declare_lex_preg(STRING *name, INTVAL preg)>
 
 Declare a lexical variable that is an alias for a PMC register.  The PIR
 compiler calls this method in response to a ".lex STRING, PREG" directive.
