@@ -10,7 +10,7 @@ This file implements match objects returned by the Parrot Grammar Engine.
 
 .namespace [ "PGE::Match" ]
 
-.sub "__onload"
+.sub "__onload" :load
     .local pmc base
     $P0 = getclass "PerlHash"
     base = subclass $P0, "PGE::Match"

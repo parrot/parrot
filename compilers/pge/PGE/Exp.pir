@@ -8,7 +8,7 @@
 .const int PGE_CUT_MATCH = -3
 .const int PGE_CUT_CUT = -4
 
-.sub "__onload"
+.sub "__onload" :load
     .local pmc optable
     .local pmc term
 

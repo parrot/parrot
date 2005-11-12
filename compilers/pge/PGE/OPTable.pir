@@ -61,7 +61,7 @@ Creates the PGE::OPTable class.
 
 =cut
 
-.sub "__onload" 
+.sub "__onload" :load
     .local pmc base
     base = newclass "PGE::OPTable"
     addattribute base, "%:toktable"

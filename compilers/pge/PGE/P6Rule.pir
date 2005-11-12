@@ -2,7 +2,7 @@
 
 .namespace [ "PGE::P6Rule" ]
 
-.sub "__onload"
+.sub "__onload" :load
     .local pmc optable
     $P0 = getclass "PGE::Exp::Subrule"
     $P1 = subclass $P0, "PGE::Exp::WS"

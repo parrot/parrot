@@ -14,7 +14,7 @@ a number of built-in rules.
 .include "cclass.pasm"
 .include "interpinfo.pasm"
 
-.sub "__onload" 
+.sub "__onload" :load
     .local pmc base
     .local pmc p6rule
     base = getclass "PGE::Match"
