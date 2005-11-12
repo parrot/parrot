@@ -62,7 +62,8 @@ typedef struct Parrot_sub {
     PMC      *multi_signature;  /* list of types for MMD */
     INTVAL   n_regs_used[4];	/* INSP in PBC */
 
-    PMC      *lexicals;         /* OrderedHash of Lexicals */
+    PMC      *lex_info;         /* LexInfo PMC */
+    PMC      *outer_sub;        /* :outer for closures */
     PMC      *eval_pmc;         /* eval container / NULL */
 
     /* - end common */
@@ -87,7 +88,8 @@ typedef struct Parrot_coro {
     PMC      *multi_signature;  /* list of types for MMD */
     INTVAL   n_regs_used[4];	/* INSP in PBC */
 
-    PMC      *lexicals;         /* OrderedHash of Lexicals */
+    PMC      *lex_info;         /* LexInfo PMC */
+    PMC      *outer_sub;        /* :outer for closures */
     PMC      *eval_pmc;         /* eval container / NULL */
 
     /* - end common */

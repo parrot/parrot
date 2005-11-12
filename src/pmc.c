@@ -186,7 +186,10 @@ get_new_pmc_header(Interp *interpreter, INTVAL base_type,
         }
         return pmc;
     }
-    if (vtable->flags & VTABLE_IS_CONST_FLAG) {
+    if (vtable->flags & VTABLE_IS_CONST_PMC_FLAG) {
+        flags = PObj_constant_FLAG;
+    }
+    else if (vtable->flags & VTABLE_IS_CONST_FLAG) {
         /* put the normal vtable in, so that the pmc can be initialized first
          * parrot or user code has to set the _ro property then,
          * to morph the PMC to the const variant

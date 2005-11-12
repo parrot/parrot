@@ -643,6 +643,32 @@ mk_multi_sig(Interp* interpreter, SymReg *r)
     return multi_sig;
 }
 
+static PMC*
+create_lexinfo(Interp *interpreter, IMC_Unit *unit, PMC *sub)
+{
+    PMC *lex_info;
+    int i;
+    SymReg * r;
+    SymHash *hsh;
+
+    hsh = &unit->hash;
+    lex_info = NULL;
+    for (i = 0; i < hsh->size; i++) {
+        for (r = hsh->data[i]; r; r = r->next) {
+            if (r->set == 'P' && r->usage & U_LEXICAL) {
+                if (!lex_info) {
+                    lex_info = pmc_new_noinit(interpreter,
+                            Parrot_get_ctx_HLL_type(interpreter,
+                                enum_class_LexInfo));
+                    VTABLE_init_pmc(interpreter, lex_info, sub);
+                }
+                /* TODO store lex */
+            }
+        }
+    }
+    return lex_info;
+}
+
 static int
 add_const_pmc_sub(Interp *interpreter, SymReg *r,
         int offs, int end)
@@ -714,6 +740,7 @@ add_const_pmc_sub(Interp *interpreter, SymReg *r,
     sub->HLL_id = unit->HLL_id;
     for (i = 0; i < 4; ++i)
         sub->n_regs_used[i] = unit->n_regs_used[i];
+    sub->lex_info = create_lexinfo(interpreter, unit, sub_pmc);
     /*
      * XXX work around implict P5 usage in exception handling code
      *     need at least 6 PMC regs
