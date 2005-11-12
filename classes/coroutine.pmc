@@ -118,6 +118,9 @@ Swaps the "context".
         if (!co->ctx) {
             PMC *pad;
 
+            /* TODO factor out common code with Sub.invoke
+             *      and inherit it
+             */
             ccont = INTERP->current_cont;
             if (ccont == NEED_CONTINUATION) {
                 ccont = new_ret_continuation_pmc(interpreter, next);
@@ -147,6 +150,13 @@ Swaps the "context".
             INTERP->current_object = NULL;
             INTERP->current_cont = NULL;
             INTERP->current_args = NULL;
+
+            /* create pad if needed */
+            if (!PMC_IS_NULL(co->lex_info))
+                ctx->lex_pad = pmc_new_init(INTERP, 
+                        Parrot_get_ctx_HLL_type(interpreter,
+                            enum_class_LexPad),
+                        co->lex_info);
 
             PObj_get_FLAGS(SELF) |= SUB_FLAG_CORO_FF;
             wanted_seg = co->seg;

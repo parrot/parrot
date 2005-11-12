@@ -30,12 +30,78 @@ These are the vtable functions for the lexpad PMC.
 pmclass LexPad does hash {
 
     void init() {
-        /* pitch a fit */
+        real_exception(INTERP, NULL, INVALID_OPERATION,
+                "don't create me like this");
     }
 
-    void init_pmc(PMC* sub) {
+/*
+
+=item C<init_pmc(PMC *lexinfo)>
+
+Initialize the LexPad PMC and remember the associate
+lexinfo.
+
+=item C<INTVAL elements()>
+
+Returns the number of elements in the hash.
+
+=item C<PMC *get_pmc_keyed_str(STRING *name)>
+
+=item C<PMC *get_pmc_keyed(PMC *name)>
+
+Return the lexical with the given name;
+
+=item C<void set_pmc_keyed(PMC *name, PMC *value)>
+
+=item C<void set_pmc_keyed_str(STRING *name, PMC *value)>
+
+Set the lexical with the given name to value.
+
+=cut
+
+*/
+    void init_pmc(PMC* lexinfo) {
+        PMC_pmc_val(SELF) = lexinfo;
     }
 
+    INTVAL elements() {
+        PMC *info = PMC_pmc_val(SELF);
+        return hash_size(INTERP, PMC_struct_val(info));
+    }
+
+    PMC* get_pmc_keyed_str(STRING* name) {
+        PMC *info = PMC_pmc_val(SELF);
+        Hash *hash = PMC_struct_val(info);
+        HashBucket *b = hash_get_bucket(INTERP, hash, name);
+        INTVAL regno;
+        if (!b)
+            real_exception(interpreter, NULL, LEX_NOT_FOUND,
+                    "Lexical '%Ss' not found", name);
+        regno = (INTVAL) b->value;
+        return REG_PMC(regno);
+    }
+
+    PMC* get_pmc_keyed(PMC* name) {
+        STRING *s = key_string(INTERP, name);
+        return SELF.get_pmc_keyed_str(s);
+    }
+
+    void set_pmc_keyed_str(STRING* name, PMC* value) {
+        PMC *info = PMC_pmc_val(SELF);
+        Hash *hash = PMC_struct_val(info);
+        HashBucket *b = hash_get_bucket(INTERP, hash, name);
+        INTVAL regno;
+        if (!b)
+            real_exception(interpreter, NULL, LEX_NOT_FOUND,
+                    "Lexical '%Ss' not found", name);
+        regno = (INTVAL) b->value;
+        REG_PMC(regno) = value;
+    }
+
+    void set_pmc_keyed(PMC* name, PMC* value) {
+        STRING *s = key_string(INTERP, name);
+        SELF.set_pmc_keyed_str(s, value);
+    }
 }
 
 
