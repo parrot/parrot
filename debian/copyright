@@ -4,7 +4,40 @@ Fri, 28 Oct 2005 10:02:44 +0200.
 It was downloaded from http://parrotcode.org/
 
 Copyright for most of the code is holded by:
+
 Copyright (C) 2006, the Perl Foundation.
+
+Some files have a different copyright:
+
+build_tools/pbc2c.pl, examples/pir/euclid.pir, examples/subs/jsr_ret.pasm,
+lib/Parrot/Op.pm, src/packdump.c, src/packfile.c, src/packout.c:
+Copyright (C) 2001-2002 Gregor N. Purdy. All rights reserved.
+
+editor/pasm.el:
+Copyright (C) 2002 Edward Marco Baringer. All Rights Reserved
+
+imcc/class.c, imcc/class.h, imcc/imcc.y, imcc/main.c, imcc/parser_util.c,
+imcc/symbol.c, imcc/symbol.h, languages/cola/,
+languages/perl6/examples/life-ar.p6, languages/perl6/examples/life.p6:
+Copyright (C) 2002 Melvin Smith <melvin.smith@mindspring.com>
+
+languages/bc/python/lib/antlr/antlr.py:
+Copyright (C) Wolfgang Haefelinger, 2004.
+
+languages/regex/lib/Regex/Grammar.pm:
+(c) Copyright 1998-2001 Francois Desarmenien, all rights reserved.
+
+languages/ruby/Yacc/parse.y:
+Copyright (C) 1993-2001 Yukihiro Matsumoto
+
+languages/urm:
+2003 (c) by Marcus Thiesen
+
+lib/Digest/Perl/MD5.pm:
+Copyright (C) 1991-2, RSA Data Security, Inc. Created 1991. All rights reserved.
+
+lib/Pod/:
+Copyright (c) 2001-2002 Sean M. Burke.  All rights reserved.
 
 License:
 

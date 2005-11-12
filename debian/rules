@@ -31,33 +31,30 @@ build-stamp: configure-stamp
 clean:
 	dh_testdir
 	dh_testroot
-	rm -f build-stamp configure-stamp debian/parrot.1 debian/parrot-config.imc.1 debian/libparrot$(SOVERSION).install debian/libparrot$(SOVERSION)-dev.install
+	rm -f build-stamp configure-stamp debian/parrot.1 debian/parrot-config.imc.1 debian/libparrot$(SOVERSION).install
 	-$(MAKE) realclean
 	dh_clean 
 
-debian/libparrot$(SOVERSION).install: debian/libparrot.install
+debian/libparrot$(SOVERSION).install: debian/libparrot.install VERSION
 	cp $< $@
 
-debian/libparrot$(SOVERSION)-dev.install: debian/libparrot-dev.install
-	cp $< $@
-
-install: build debian/libparrot$(SOVERSION).install debian/libparrot$(SOVERSION)-dev.install
+install: build debian/libparrot$(SOVERSION).install
 	dh_testdir
 	dh_testroot
 	dh_clean -k 
-	dh_installdirs -plibparrot$(SOVERSION)-dev usr/share/lintian/overrides
+	dh_installdirs -plibparrot-dev usr/share/lintian/overrides
 	$(MAKE) install PREFIX=$(CURDIR)/debian/tmp/usr
 	dh_install --sourcedir=$(CURDIR)/debian/tmp --list-missing
-	perl -p -e 's/%SOVERSION%/$(SOVERSION)/g' debian/libparrot-dev.lintian-overrides > $(CURDIR)/debian/libparrot$(SOVERSION)-dev/usr/share/lintian/overrides/libparrot$(SOVERSION)-dev
+	cp debian/libparrot-dev.lintian-overrides $(CURDIR)/debian/libparrot-dev/usr/share/lintian/overrides/libparrot-dev
 
 # Build architecture-independent files here.
 binary-indep: build install
 	dh_testdir -i 
 	dh_testroot -i
 	dh_installchangelogs -i ChangeLog
-	dh_installman -plibparrot$(SOVERSION)-dev debian/parrot-config.imc.1
+	dh_installman -plibparrot-dev debian/parrot-config.imc.1
 	dh_installdocs -i
-	dh_link -plibparrot$(SOVERSION)-dev usr/lib/libparrot.so.$(SOVERSION) usr/lib/libparrot.so
+	dh_link -plibparrot-dev usr/lib/libparrot.so.$(SOVERSION) usr/lib/libparrot.so
 	dh_compress -i
 	dh_fixperms -i
 	dh_installdeb -i

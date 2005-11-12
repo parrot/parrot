@@ -30,7 +30,7 @@ Description: virtual machine to execute bytecode for interpreted languages
  .
  This package contains the parrot shared library.
  
-Package: libparrot%SOVERSION%-dev
+Package: libparrot-dev
 Architecture: all
 Section: libdevel
 Depends: libparrot%SOVERSION% (= ${Source-Version})
