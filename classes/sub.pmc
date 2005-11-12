@@ -598,7 +598,11 @@ Return amount of used registers for register kinds "I", "S", "P", "N".
 
 =item C<METHOD PMC* get_lexinfo()>
 
-Return the LexInfo PMC, if any.
+Return the LexInfo PMC, if any or a Null PMC.
+
+=item C<METHOD PMC* get_lexpad()>
+
+Return the LexPad PMC, if any or a Null PMC.
 
 =cut
 
@@ -640,6 +644,10 @@ Return the LexInfo PMC, if any.
     METHOD PMC* get_lexinfo() {
         struct Parrot_sub * sub = PMC_sub(SELF);
         return sub->lex_info ? sub->lex_info : PMCNULL;
+    }
+
+    METHOD PMC* get_lexpad() {
+        return CONTEXT(INTERP->ctx)->lex_pad;
     }
 
 }
