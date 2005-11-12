@@ -157,8 +157,6 @@ static void
 set_codepoint(Interp *interpreter, STRING *src,
 	UINTVAL offset, UINTVAL codepoint)
 {
-    const void *start;
-    void *p;
     UNIMPL;
 }
 
