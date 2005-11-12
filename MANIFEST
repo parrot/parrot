@@ -673,8 +673,6 @@ imcc/ChangeLog                                    [main]doc
 imcc/README                                       [main]doc
 imcc/cfg.c                                        []
 imcc/cfg.h                                        []
-imcc/class.c                                      []
-imcc/class.h                                      []
 imcc/debug.c                                      []
 imcc/debug.h                                      []
 imcc/docs/calling_conventions.pod                 [main]doc
@@ -689,7 +687,6 @@ imcc/examples/sample.imc                          [main]doc
 imcc/examples/sub.imc                             [main]doc
 imcc/examples/test_allocate.imc                   [main]doc
 imcc/examples/test_spilling.imc                   [main]doc
-imcc/fastcall.c                                   []
 imcc/imc.c                                        []
 imcc/imc.h                                        []
 imcc/imcc.l                                       []
@@ -713,9 +710,6 @@ imcc/reg_alloc.c                                  []
 imcc/reg_alloc_bc.c                               []
 imcc/sets.c                                       []
 imcc/sets.h                                       []
-imcc/sub.c                                        []
-imcc/symbol.c                                     []
-imcc/symbol.h                                     []
 imcc/symreg.c                                     []
 imcc/symreg.h                                     []
 imcc/t/imcpasm/cfg.t                              []

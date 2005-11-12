@@ -280,20 +280,15 @@ SP              [ ]
 ":optional"     return(ADV_OPTIONAL);
 ":opt_flag"     return(ADV_OPT_FLAG);
 
-".class"        return(CLASS);
-".endclass"     return(ENDCLASS);
 <emit,INITIAL>".namespace"    return(NAMESPACE);
 <emit,INITIAL>".HLL"    return(HLL);
 ".endnamespace" return(ENDNAMESPACE);
-".field"        return(FIELD);
-".method"       return(DOT_METHOD);
 ".local"        return(LOCAL);
 ".global"       return(GLOBAL);
 <emit,INITIAL>".const"        return(CONST);
 ".globalconst"  return(GLOBAL_CONST);
 ".param"        return(PARAM);
 <*>".pragma"    return(PRAGMA);
-<*>"fastcall"   return(FASTCALL);
 <*>"n_operators"   return(N_OPERATORS);
 "goto"          return(GOTO);
 "if"            return(IF);

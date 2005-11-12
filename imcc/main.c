@@ -388,8 +388,6 @@ do_pre_process(Parrot_Interp interp)
             case ESUB:          printf(".end"); break;
             case RESULT:        printf(".result "); break;
             case RETURN:        printf(".return "); break;
-            case CLASS:         printf(".class "); break;
-            case ENDCLASS:      printf(".endclass"); break;
             case NAMESPACE:     printf(".namespace "); break;
             case ENDNAMESPACE:  printf(".endnamespace"); break;
             case CONST:         printf(".const "); break;

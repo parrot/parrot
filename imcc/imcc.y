@@ -39,17 +39,10 @@
  * many are polymorphic.
  */
 
-/*
- * Symbol tables and lists
- * This won't scale to multiple namespaces, for now we just keep
- * one symbol table per compilation file.
- */
-SymbolTable global_sym_tab;
 
 /*
- * No nested classes for now.
+ * Some convenient vars
  */
-static Class * current_class;
 static SymReg *cur_obj, *cur_call;
 int cur_pmc_type;      /* used in mk_ident */
 IMC_Unit * cur_unit;
@@ -318,9 +311,6 @@ begin_return_or_yield(Interp *interp, int yield)
     char * s;
     SymReg * sr;
     Instruction *i;
-    Symbol * sym;
-    SymbolList * symlist;
-    SymbolTable * symtab;
 }
 
 /* We need precedence for a few tokens to resolve a couple of conflicts */
@@ -328,11 +318,11 @@ begin_return_or_yield(Interp *interp, int yield)
 %nonassoc '\n'
 %nonassoc <t> PARAM
 
-%token <t> PRAGMA FASTCALL N_OPERATORS HLL
+%token <t> PRAGMA N_OPERATORS HLL
 %token <t> GOTO ARG IF UNLESS PNULL
 %token <t> ADV_FLAT ADV_SLURPY ADV_OPTIONAL ADV_OPT_FLAG
 %token <t> NEW
-%token <t> NAMESPACE ENDNAMESPACE CLASS ENDCLASS FIELD DOT_METHOD
+%token <t> NAMESPACE ENDNAMESPACE DOT_METHOD
 %token <t> SUB SYM LOCAL CONST
 %token <t> INC DEC GLOBAL_CONST
 %token <t> PLUS_ASSIGN MINUS_ASSIGN MUL_ASSIGN DIV_ASSIGN CONCAT_ASSIGN
@@ -352,27 +342,26 @@ begin_return_or_yield(Interp *interp, int yield)
 %token <s> STRINGC INTC FLOATC USTRINGC
 %token <s> PARROT_OP
 %type <t> type ptr pragma_1 hll_def
-%type <i> program class class_body member_decls member_decl field_decl
-%type <i> method_decl class_namespace
+%type <i> program
+%type <i> class_namespace
 %type <i> global constdef sub emit pcc_sub  pcc_ret
 %type <i> compilation_units compilation_unit pmc_const pragma
 %type <s> classname relop
 %type <i> labels _labels label  statement sub_call
 %type <i> pcc_sub_call
 %type <sr> sub_param sub_params pcc_arg pcc_result pcc_args pcc_results
-%type <sr> pcc_returns pcc_return pcc_call arg the_sub multi_type
+%type <sr> pcc_returns pcc_return pcc_call arg arglist the_sub multi_type
 %type <t> argtype_list argtype paramtype_list paramtype
 %type <t> pcc_return_many
 %type <t> proto sub_proto sub_proto_list multi multi_types opt_comma
 %type <i> instruction assignment if_statement labeled_inst opt_label op_assign
 %type <i> func_assign
 %type <i> opt_invocant
-%type <sr> target reg const var string result
+%type <sr> target targetlist reg const var string result
 %type <sr> key keylist _keylist
 %type <sr> vars _vars var_or_i _var_or_i label_op sub_label_op sub_label_op_c
 %type <i> pasmcode pasmline pasm_inst
 %type <sr> pasm_args
-%type <symlist> targetlist arglist
 %type <i> var_returns
 %token <sr> VAR
 %type <t> begin_ret_or_yield end_ret_or_yield
@@ -404,8 +393,7 @@ compilation_units:
    ;
 
 compilation_unit:
-     class         { $$ = $1; cur_unit = 0; }
-   | class_namespace  { $$ = $1; }
+     class_namespace  { $$ = $1; }
    | constdef      { $$ = $1; }
    | global        { $$ = $1; }
    | sub           { $$ = $1; imc_close_unit(interp, cur_unit); cur_unit = 0; }
@@ -420,8 +408,7 @@ pragma: PRAGMA pragma_1 '\n'   { $$ = 0; }
    | hll_def            '\n'   { $$ = 0; }
    ;
 
-pragma_1: FASTCALL  { IMCC_INFO(interp)->state->pragmas |= PR_FASTCALL; }
-   |      N_OPERATORS INTC
+pragma_1:  N_OPERATORS INTC
                     { if ($2)
                           IMCC_INFO(interp)->state->pragmas |= PR_N_OPERATORS;
                       else
@@ -531,74 +518,10 @@ class_namespace:
                 }
    ;
 
-class:
-     CLASS IDENTIFIER
-                   {
-                      Symbol * sym = new_symbol($2);
-                      cur_unit = imc_open_unit(interp, IMC_CLASS);
-                      current_class = new_class(sym);
-                      sym->p = (void*)current_class;
-                      store_symbol(&global_sym_tab, sym); }
-     '\n' class_body ENDCLASS
-                   {
-                      /* Do nothing for now. Need to parse metadata for
-                       * PBC creation. */
-                      current_class = NULL;
-                      $$ = 0; }
-   ;
-
-class_body:
-     member_decls
-   | /* none */   { $$ = 0; }
-   ;
-
-member_decls:
-     member_decl
-   | member_decls member_decl
-   ;
-
-member_decl:
-     field_decl
-   | method_decl
-   | '\n'          { $$ = 0; }
-   ;
-
-field_decl:
-     FIELD type IDENTIFIER '\n'
-                   {
-                      Symbol * sym = new_symbol($3);
-                      if(lookup_field_symbol(current_class, $3)) {
-                        IMCC_fataly(interp, E_SyntaxError,
-                            "field '%s' previously declared in class '%s'\n",
-                            $3, current_class->sym->name);
-                      }
-                      sym->type = $2;
-                      store_field_symbol(current_class, sym);
-                      $$ = 0; }
-   ;
-
-method_decl:
-     DOT_METHOD IDENTIFIER IDENTIFIER '\n'
-        {
-           Method * meth;
-           Symbol * sym = new_symbol($2);
-           if(lookup_method_symbol(current_class, $2)) {
-                IMCC_fataly(interp, E_SyntaxError,
-                 "method '%s' previously declared in class '%s'\n",
-                    $2, current_class->sym->name);
-           }
-           meth = new_method(sym, new_symbol($3));
-           store_method_symbol(current_class, sym);
-           $$ = 0;
-        }
-   ;
-
 sub:
      SUB
         {
-           cur_unit = (IMCC_INFO(interp)->state->pragmas & PR_FASTCALL ?
-                  imc_open_unit(interp, IMC_FASTSUB)
-                : imc_open_unit(interp, IMC_PCCSUB));
+           cur_unit = imc_open_unit(interp, IMC_PCCSUB);
         }
      sub_label_op_c
         {

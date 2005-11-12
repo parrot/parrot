@@ -302,12 +302,10 @@ FLUID_FILES = \
 IMCC_H_FILES = \
     $(IMCC_DIR)/imc.h \
     $(IMCC_DIR)/cfg.h \
-    $(IMCC_DIR)/class.h \
     $(IMCC_DIR)/instructions.h \
     $(IMCC_DIR)/debug.h \
     $(IMCC_DIR)/sets.h \
     $(IMCC_DIR)/unit.h \
-    $(IMCC_DIR)/symbol.h \
     $(IMCC_DIR)/symreg.h \
     $(IMCC_DIR)/pbc.h \
     $(IMCC_DIR)/optimizer.h \
@@ -318,8 +316,6 @@ IMCC_O_FILES = \
     $(IMCC_DIR)/imcparser$(O) \
     $(IMCC_DIR)/imclexer$(O) \
     $(IMCC_DIR)/imc$(O) \
-    $(IMCC_DIR)/symbol$(O) \
-    $(IMCC_DIR)/class$(O) \
     $(IMCC_DIR)/symreg$(O) \
     $(IMCC_DIR)/instructions$(O) \
     $(IMCC_DIR)/cfg$(O) \
@@ -330,8 +326,6 @@ IMCC_O_FILES = \
     $(IMCC_DIR)/pbc$(O) \
     $(IMCC_DIR)/parser_util$(O) \
     $(IMCC_DIR)/jit$(O) \
-    $(IMCC_DIR)/sub$(O) \
-    $(IMCC_DIR)/fastcall$(O) \
     $(IMCC_DIR)/pcc$(O)
 
 AST_H_FILES = \
