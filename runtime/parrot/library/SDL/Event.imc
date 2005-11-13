@@ -89,8 +89,8 @@ this directly, unless you're working with raw SDL calls.
 =cut
 
 .sub event method
-
-	.param string name
+	.param string name :optional
+	.param int argcS   :opt_flag 
 	
         .local int offset
         classoffset offset, self, 'SDL::Event'
@@ -249,9 +249,10 @@ should, somehow.
 =cut
 
 .sub process_events method
-	.param num check_interval
 	.param pmc event_handler
 	.param pmc handler_args
+	.param num check_interval :optional
+	.param int argcN          :opt_flag
 
 	.local int polling
 

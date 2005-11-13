@@ -85,7 +85,6 @@ END:
     # rect
     inc $I0
     $I1 = find_type 'SDL::Rect'
-    argcP = 0 # XXX
     $P0 = new $I1
     setattribute self, $I0, $P0
 
@@ -205,7 +204,6 @@ END:
     clicked = getattribute self, $I0
     
     $I1 = find_type 'SDL::Rect'
-    argcP = 0 # XXX
     srect = new $I1
 
     $I1 = drect.'height'()
