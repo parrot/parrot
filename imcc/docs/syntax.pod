@@ -60,15 +60,13 @@ Example:
 =item <type>
 
 B<int>, B<float>, B<string>, B<pmc> or a valid parrot PMC type like
-B<PerlArray>.
+B<Array>.
 
 =item <reg>
 
-A PASM register I0..I31, S0..S31, N0..N31, P0..P31, or a IMCC temporary
+A PASM register In, Sn, Nn, Pn, or a IMCC temporary
 register $In, $Sn, $Nn, $Pn, where B<n> consists of digit(s) only.
-The parrot register B<P31> is reserved for spilling and should not be
-used in complex code sections, which might need spilling (see
-F<operation.pod>).
+The register P5 is explicitly used for exceptions.
 
 =item <var>
 
