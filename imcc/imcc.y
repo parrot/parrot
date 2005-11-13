@@ -866,7 +866,7 @@ labeled_inst:
     is_def=0; $$=0;
 
    }
-   | LEXICAL STRINGC COMMA reg
+   | LEXICAL STRINGC COMMA target
                     { $4->usage |= U_LEXICAL;
                       $4->reg = mk_const(interp, $2, 'S');
                    $$ = 0; }
