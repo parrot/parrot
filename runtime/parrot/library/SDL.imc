@@ -356,7 +356,7 @@ success:
 	set  layouts[ 'Event::MouseButton' ], layout
 .end
 
-.sub _set_Rect_layout method
+.sub _set_Rect_layout 
 	.param pmc layouts
 	.local pmc layout
 
@@ -377,7 +377,7 @@ success:
 	set  layouts[ 'Rect' ], layout
 .end
 
-.sub _set_Rect_Array_layout method
+.sub _set_Rect_Array_layout 
 	.param pmc layouts
 
 	.local pmc fetch_struct

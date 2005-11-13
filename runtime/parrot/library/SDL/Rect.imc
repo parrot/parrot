@@ -93,10 +93,8 @@ The name of this method may change, as per discussion on p6i.
 =cut
 
 .sub _new method
-	.param pmc args
-	.local int argc
-	
-	argc = argcP
+	.param pmc args :optional
+	.param int argc :opt_flag
 
 	.local pmc  fetch_layout
 	find_global fetch_layout, 'SDL::NCI', 'fetch_layout'

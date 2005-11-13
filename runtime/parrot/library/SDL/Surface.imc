@@ -63,9 +63,10 @@ The name of this method may change, per discussion on p6i.
 =cut
 
 .sub create method
-	.param pmc args
+	.param pmc args :optional
+	.param int has_args
 
-	if argcP != 0 goto OK
+	if has_args goto OK
 	print "no surface parameters!\n"
 	branch END
 OK:
@@ -361,7 +362,7 @@ understand.
 	.param pmc source
 	.param pmc dest
 
-	if argcP == 3 goto OK
+	goto OK
 	print "SDL::Surface::blit: Warning: wrong parameter count\n"
 OK:
 
