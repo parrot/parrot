@@ -562,6 +562,9 @@ multi: MULTI '(' multi_types ')'  { $$ = 0; }
 outer: OUTER '(' STRINGC ')'
                      { $$ = 0; cur_unit->outer =
                      mk_sub_address_fromc(interp, $3); }
+    | OUTER '(' IDENTIFIER ')'
+                     { $$ = 0; cur_unit->outer =
+                     mk_const(interp, $3, 'S'); }
    ;
 
 multi_types:
