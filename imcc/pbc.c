@@ -652,18 +652,39 @@ create_lexinfo(Interp *interpreter, IMC_Unit *unit, PMC *sub)
     SymHash *hsh;
     struct PackFile_Constant **constants;
     STRING *lex_name;
+    STRING *decl_lex;
+    PMC *decl_lex_meth, *lex_info_class;
+    INTVAL lex_info_id;
+    typedef void (*decl_func_t)(Interp *, PMC*, STRING *, INTVAL);
+    decl_func_t decl_func;
 
     constants = interpreter->code->const_table->constants;
-
+    /* TODO use CONST_STRING */
+    decl_lex = const_string(interpreter, "declare_lex_preg");
+    lex_info_id = Parrot_get_ctx_HLL_type(interpreter, enum_class_LexInfo);
+    lex_info_class = Parrot_base_vtables[lex_info_id]->class;
+    decl_lex_meth = VTABLE_find_method(interpreter,
+            lex_info_class, decl_lex);
+    if (!decl_lex_meth) {
+        real_exception(interpreter, NULL, METH_NOT_FOUND,
+                "Method '%Ss' not found", decl_lex);
+    }
+    if (decl_lex_meth->vtable->base_type != enum_class_NCI) {
+        real_exception(interpreter, NULL, METH_NOT_FOUND,
+                "Method '%Ss' is not a NCI", decl_lex);
+    }
+    /*
+     * I think letting this override in PASM/PIR would be a
+     * can of worms - how do we call this if it declares .lex
+     */
+    decl_func = (decl_func_t) PMC_struct_val(decl_lex_meth);
     hsh = &unit->hash;
     lex_info = NULL;
     for (i = 0; i < hsh->size; i++) {
         for (r = hsh->data[i]; r; r = r->next) {
             if (r->set == 'P' && r->usage & U_LEXICAL) {
                 if (!lex_info) {
-                    lex_info = pmc_new_noinit(interpreter,
-                            Parrot_get_ctx_HLL_type(interpreter,
-                                enum_class_LexInfo));
+                    lex_info = pmc_new_noinit(interpreter, lex_info_id);
                     VTABLE_init_pmc(interpreter, lex_info, sub);
                 }
                 assert(r->reg); /* lexical name */
@@ -671,7 +692,7 @@ create_lexinfo(Interp *interpreter, IMC_Unit *unit, PMC *sub)
                 assert(k >= 0);
                 lex_name = constants[k]->u.string;
                 assert(PObj_is_string_TEST(lex_name));
-                VTABLE_set_integer_keyed_str(interpreter,
+                (decl_func)(interpreter,
                         lex_info, lex_name, r->color);
             }
         }

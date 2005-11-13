@@ -57,6 +57,10 @@ Return the lexical with the given name;
 
 Set the lexical with the given name to value.
 
+=item C<METHOD PMC* get_lexinfo()>
+
+Return the LexInfo PMC, if any or a Null PMC.
+
 =cut
 
 */
@@ -102,6 +106,11 @@ Set the lexical with the given name to value.
         STRING *s = key_string(INTERP, name);
         SELF.set_pmc_keyed_str(s, value);
     }
+
+    METHOD PMC* get_lexinfo() {
+        return PMC_pmc_val(SELF);
+    }
+
 }
 
 

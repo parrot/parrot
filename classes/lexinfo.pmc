@@ -82,9 +82,7 @@ subroutine.
 
 /*
 
-=item C<void set_integer_keyed_str(STRING *name, INTVAL preg)>
-
-aka C<void declare_lex_preg(STRING *name, INTVAL preg)>
+=item C<METHOD void declare_lex_preg(STRING *name, INTVAL preg)>
 
 Declare a lexical variable that is an alias for a PMC register.  The PIR
 compiler calls this method in response to a ".lex STRING, PREG" directive.
@@ -97,7 +95,7 @@ Returns the number of elements in the LexInfo hash.
 
 */
 
-    void set_integer_keyed_str (STRING* name, INTVAL preg) {
+    METHOD void declare_lex_preg (STRING* name, INTVAL preg) {
         hash_put(INTERP, PMC_struct_val(SELF), name, (void*)preg);
     }
 
