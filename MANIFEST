@@ -465,7 +465,6 @@ encodings/utf8.h                                  []
 examples/README                                   [main]doc
 examples/assembly/acorn.l                         [main]doc
 examples/assembly/hello-dwim.imc                  [main]doc
-examples/assembly/mops.pasm                       [main]doc
 examples/assembly/nanoforth.pasm                  [main]doc
 examples/assembly/nanoforth2.pasm                 [main]doc
 examples/assembly/ncurses_life.imc                [main]doc
@@ -498,6 +497,7 @@ examples/benchmarks/gc_waves_headers.pasm         [main]doc
 examples/benchmarks/gc_waves_sizeable_data.pasm   [main]doc
 examples/benchmarks/gc_waves_sizeable_headers.pasm [main]doc
 examples/benchmarks/mops.pasm                     [main]doc
+examples/benchmarks/mops_intval.pasm              [main]doc
 examples/benchmarks/mops.pl                       [main]doc
 examples/benchmarks/oo1.pasm                      [main]doc
 examples/benchmarks/oo1.pl                        [main]doc
