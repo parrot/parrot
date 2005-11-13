@@ -16,7 +16,7 @@ Tests various lexical scratchpad operations.
 
 =cut
 
-use Parrot::Test tests => 27;
+use Parrot::Test tests => 30;
 
 output_is(<<'CODE', <<'OUTPUT', '.lex parsing - PASM');
 .pcc_sub main:
@@ -221,6 +221,102 @@ foo
 main
 OUTPUT
 
+pir_output_is(<<'CODE', <<'OUTPUT', 'closure 1');
+.sub "main"
+    .lex 'a', $P0
+    $P1 = new .String
+    $P1 = "main_a\n"
+    store_lex 'a', $P1
+    $P2 = find_lex 'a'
+    print $P2
+    foo()
+    print $P0
+    $P2 = find_lex 'a'
+    print $P2
+.end
+.sub foo  :outer('main')
+    .lex 'b', $P0
+    $P1 = new .String
+    $P1 = "foo_b\n"
+    store_lex 'b', $P1
+    bar()
+.end
+.sub bar   :outer('foo')
+    .lex 'b', $P0
+    $P1 = new .String
+    $P1 = "bar_b\n"
+    store_lex 'b', $P1
+    $P2 = find_lex 'b'
+    print $P2
+    $P2 = find_lex 'a'
+    print $P2
+.end
+CODE
+main_a
+bar_b
+main_a
+main_a
+main_a
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', 'closure 2');
+.sub "main"
+    .lex 'a', $P0
+    $P1 = new .String
+    $P1 = "main_a\n"
+    store_lex 'a', $P1
+    $P2 = find_lex 'a'
+    print $P2
+    foo()
+    print $P0
+    $P2 = find_lex 'a'
+    print $P2
+.end
+.sub foo  :outer('main')
+    .lex 'b', $P0
+    $P1 = new .String
+    $P1 = "foo_b\n"
+    store_lex 'b', $P1
+    bar()
+    $P2 = find_lex 'b'
+    print $P2
+.end
+.sub bar   :outer('foo')
+    .lex 'b', $P0
+    $P1 = new .String
+    $P1 = "bar_b\n"
+    store_lex 'b', $P1
+    $P2 = find_lex 'b'
+    print $P2
+    $P2 = find_lex 'a'
+    print $P2
+    $P2 = "ex_main_a\n"
+.end
+CODE
+main_a
+bar_b
+main_a
+foo_b
+ex_main_a
+ex_main_a
+OUTPUT
+
+pir_output_like(<<'CODE', <<'OUTPUT', 'get non existing');
+.sub "main"
+    .lex 'a', $P0
+    foo()
+.end
+.sub foo  :outer('main')
+    .lex 'b', $P0
+    bar()
+.end
+.sub bar   :outer('foo')
+    .lex 'c', $P0
+    $P2 = find_lex 'no_such'
+.end
+CODE
+/Lexical 'no_such' not found/
+OUTPUT
 
 output_is(<<CODE, <<OUTPUT, "simple store and fetch");
 	new_pad 0

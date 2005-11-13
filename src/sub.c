@@ -66,6 +66,9 @@ mark_context(Interp* interpreter, parrot_context_t* ctx)
     obj = (PObj*)ctx->current_package;
     if (obj)
         pobject_lives(interpreter, obj);
+    obj = (PObj*)ctx->lex_pad;
+    if (obj)
+        pobject_lives(interpreter, obj);
     for (i = 0; i < ctx->n_regs_used[REGNO_PMC]; ++i) {
         obj = (PObj*) CTX_REG_PMC(ctx, i);
         if (obj)
@@ -400,6 +403,53 @@ Parrot_Context_infostr(Interp *interpreter, parrot_context_t *ctx)
     return NULL;
 }
 
+/*
+
+=item C<PMC* Parrot_find_pad(Interp*, STRING *lex_name)>
+
+Locate the LexPad containing the given name. Return NULL on failure.
+
+=cut
+
+*/
+
+PMC*
+Parrot_find_pad(Interp* interpreter, STRING *lex_name)
+{
+    PMC *lex_pad;
+    parrot_context_t *ctx;
+    PMC *result, *sub, *caller, *cont;
+
+    ctx = CONTEXT(interpreter->ctx);;
+    lex_pad = ctx->lex_pad;
+    if (PMC_IS_NULL(lex_pad))
+        return NULL;
+    sub = ctx->current_sub;
+    while (1) {
+        result = VTABLE_get_pmc_keyed_str(interpreter, lex_pad, lex_name);
+        if (result)
+            return lex_pad;
+        sub = PMC_sub(sub)->outer_sub;
+        /*
+         * locate outer in call chain
+         */
+        while (1) {
+            cont = ctx->current_cont;
+            if (!cont)
+                return NULL;
+            ctx = PMC_cont(cont)->to_ctx;
+            if (!ctx)
+                return NULL;
+            caller = ctx->current_sub;
+            if (caller == sub)
+                break;
+        }
+        lex_pad = ctx->lex_pad;
+        if (PMC_IS_NULL(lex_pad))
+            return NULL;
+    }
+    return NULL;
+}
 
 /*
 

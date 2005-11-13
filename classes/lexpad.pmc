@@ -22,9 +22,11 @@ These are the vtable functions for the lexpad PMC.
 #include <assert.h>
 
 /*
- * LexPad contains a constant Hash with constant string
- * keys and integer indices - no marking and no pmc_ext
+ * LexPad provides a Hash interface for lexical fetch/store
  * needed
+ *
+ * struct_val ... parrot_context_t *ctx
+ * pmc_val    ... LexInfo
  */
 
 pmclass LexPad does hash {
@@ -41,6 +43,12 @@ pmclass LexPad does hash {
 Initialize the LexPad PMC and remember the associate
 lexinfo.
 
+=item C<void set_pointer(void *)>
+
+Initialize the LexPad PMC and remember the associate context.
+XXX - we really should have one-stage initialisation.
+XXX - we could abuse init_pmc_props
+
 =item C<INTVAL elements()>
 
 Returns the number of elements in the hash.
@@ -49,13 +57,15 @@ Returns the number of elements in the hash.
 
 =item C<PMC *get_pmc_keyed(PMC *name)>
 
-Return the lexical with the given name;
+Return the lexical with the given name, or NULL (not PMCNULL), if the
+lexical doesn't exist.
 
 =item C<void set_pmc_keyed(PMC *name, PMC *value)>
 
 =item C<void set_pmc_keyed_str(STRING *name, PMC *value)>
 
-Set the lexical with the given name to value.
+Set the lexical with the given name to value. If the lexical name
+doesn't exist, it is created.
 
 =item C<METHOD PMC* get_lexinfo()>
 
@@ -68,6 +78,10 @@ Return the LexInfo PMC, if any or a Null PMC.
         PMC_pmc_val(SELF) = lexinfo;
     }
 
+    void set_pointer(void* ctx) {
+        PMC_struct_val(SELF) = ctx;
+    }
+
     INTVAL elements() {
         PMC *info = PMC_pmc_val(SELF);
         return hash_size(INTERP, PMC_struct_val(info));
@@ -76,13 +90,13 @@ Return the LexInfo PMC, if any or a Null PMC.
     PMC* get_pmc_keyed_str(STRING* name) {
         PMC *info = PMC_pmc_val(SELF);
         Hash *hash = PMC_struct_val(info);
+        parrot_context_t *ctx = PMC_struct_val(SELF);
         HashBucket *b = hash_get_bucket(INTERP, hash, name);
         INTVAL regno;
         if (!b)
-            real_exception(interpreter, NULL, LEX_NOT_FOUND,
-                    "Lexical '%Ss' not found", name);
+            return NULL;
         regno = (INTVAL) b->value;
-        return REG_PMC(regno);
+        return CTX_REG_PMC(ctx, regno);
     }
 
     PMC* get_pmc_keyed(PMC* name) {
@@ -93,13 +107,14 @@ Return the LexInfo PMC, if any or a Null PMC.
     void set_pmc_keyed_str(STRING* name, PMC* value) {
         PMC *info = PMC_pmc_val(SELF);
         Hash *hash = PMC_struct_val(info);
+        parrot_context_t *ctx = PMC_struct_val(SELF);
         HashBucket *b = hash_get_bucket(INTERP, hash, name);
         INTVAL regno;
         if (!b)
             real_exception(interpreter, NULL, LEX_NOT_FOUND,
                     "Lexical '%Ss' not found", name);
         regno = (INTVAL) b->value;
-        REG_PMC(regno) = value;
+        CTX_REG_PMC(ctx, regno) = value;
     }
 
     void set_pmc_keyed(PMC* name, PMC* value) {

@@ -359,11 +359,13 @@ create_ctx:
         }
         context->current_HLL = sub->HLL_id;
         /* create pad if needed */
-        if (!PMC_IS_NULL(sub->lex_info))
+        if (!PMC_IS_NULL(sub->lex_info)) {
             context->lex_pad = pmc_new_init(INTERP,
                     Parrot_get_ctx_HLL_type(interpreter,
                         enum_class_LexPad),
                     sub->lex_info);
+            VTABLE_set_pointer(INTERP, context->lex_pad, context);
+        }
         /* switch code segment if needed */
         if (INTERP->code != sub->seg) {
             Parrot_switch_to_cs(INTERP, sub->seg, 1);

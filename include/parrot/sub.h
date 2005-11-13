@@ -140,6 +140,8 @@ STRING* Parrot_full_sub_name(Interp* interpreter, PMC* sub);
 int Parrot_Context_info(Interp *interpreter, parrot_context_t *, struct Parrot_Context_info *);
 STRING* Parrot_Context_infostr(Interp *interpreter, parrot_context_t *);
 
+PMC* Parrot_find_pad(Interp*, STRING *lex_name);
+
 #endif /* PARROT_SUB_H_GUARD */
 
 /*

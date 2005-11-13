@@ -152,11 +152,13 @@ Swaps the "context".
             INTERP->current_args = NULL;
 
             /* create pad if needed */
-            if (!PMC_IS_NULL(co->lex_info))
-                ctx->lex_pad = pmc_new_init(INTERP, 
+            if (!PMC_IS_NULL(co->lex_info)) {
+                ctx->lex_pad = pmc_new_init(INTERP,
                         Parrot_get_ctx_HLL_type(interpreter,
                             enum_class_LexPad),
                         co->lex_info);
+                VTABLE_set_pointer(INTERP, ctx->lex_pad, ctx);
+            }
 
             PObj_get_FLAGS(SELF) |= SUB_FLAG_CORO_FF;
             wanted_seg = co->seg;
