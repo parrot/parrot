@@ -360,7 +360,7 @@ create_ctx:
         context->current_HLL = sub->HLL_id;
         /* create pad if needed */
         if (!PMC_IS_NULL(sub->lex_info))
-            context->lex_pad = pmc_new_init(INTERP, 
+            context->lex_pad = pmc_new_init(INTERP,
                     Parrot_get_ctx_HLL_type(interpreter,
                         enum_class_LexPad),
                     sub->lex_info);
@@ -654,6 +654,11 @@ Return the LexPad PMC, if any or a Null PMC.
 
     METHOD PMC* get_lexpad() {
         return CONTEXT(INTERP->ctx)->lex_pad;
+    }
+
+    METHOD PMC* get_outer() {
+        struct Parrot_sub * sub = PMC_sub(SELF);
+        return sub->outer_sub ? sub->outer_sub : PMCNULL;
     }
 
 }

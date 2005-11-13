@@ -560,7 +560,8 @@ multi: MULTI '(' multi_types ')'  { $$ = 0; }
    ;
 
 outer: OUTER '(' STRINGC ')'
-                     { $$ = 0; cur_unit->outer = mk_const(interp, $3, 'S'); }
+                     { $$ = 0; cur_unit->outer =
+                     mk_sub_address_fromc(interp, $3); }
    ;
 
 multi_types:

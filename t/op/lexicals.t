@@ -16,7 +16,7 @@ Tests various lexical scratchpad operations.
 
 =cut
 
-use Parrot::Test tests => 25;
+use Parrot::Test tests => 27;
 
 output_is(<<'CODE', <<'OUTPUT', '.lex parsing - PASM');
 .pcc_sub main:
@@ -183,6 +183,44 @@ CODE
 ok
 LexInfo
 OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', 'get_outer');
+.sub "main"
+    foo()
+.end
+.sub foo :outer('main')
+    .include "interpinfo.pasm"
+    interpinfo $P1, .INTERPINFO_CURRENT_SUB
+    $P2 = $P1."get_outer"()
+    print $P2
+    print "\n"
+.end
+CODE
+main
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', 'get_outer 2');
+.sub "main"
+    foo()
+.end
+.sub foo  :outer('main')
+    bar()
+.end
+.sub bar   :outer('foo')
+    .include "interpinfo.pasm"
+    interpinfo $P1, .INTERPINFO_CURRENT_SUB
+    $P2 = $P1."get_outer"()
+    print $P2
+    print "\n"
+    $P3 = $P2."get_outer"()
+    print $P3
+    print "\n"
+.end
+CODE
+foo
+main
+OUTPUT
+
 
 output_is(<<CODE, <<OUTPUT, "simple store and fetch");
 	new_pad 0

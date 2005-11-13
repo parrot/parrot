@@ -700,6 +700,33 @@ create_lexinfo(Interp *interpreter, IMC_Unit *unit, PMC *sub)
     return lex_info;
 }
 
+static PMC*
+find_outer(Interp *interpreter, IMC_Unit *unit)
+{
+    struct subs *s;
+    SymReg *sub;
+    size_t len;
+
+    if (!unit->outer)
+        return NULL;
+    /*
+     * we need that the :outer sub is already compiled,
+     * because we are freezing the outer Sub PMC along with this
+     * one
+     */
+    UNUSED(interpreter);
+    len = strlen(unit->outer->name);
+    if (!len)
+        return NULL;
+    for (s = globals.cs->first; s; s = s->next) {
+        sub = s->unit->instructions->r[0];
+        if (!strcmp(sub->name, unit->outer->name)) {
+            return s->unit->sub_pmc;
+        }
+    }
+    return NULL;
+}
+
 static int
 add_const_pmc_sub(Interp *interpreter, SymReg *r,
         int offs, int end)
@@ -772,6 +799,7 @@ add_const_pmc_sub(Interp *interpreter, SymReg *r,
     for (i = 0; i < 4; ++i)
         sub->n_regs_used[i] = unit->n_regs_used[i];
     sub->lex_info = create_lexinfo(interpreter, unit, sub_pmc);
+    sub->outer_sub = find_outer(interpreter, unit);
     /*
      * XXX work around implict P5 usage in exception handling code
      *     need at least 6 PMC regs
@@ -791,6 +819,7 @@ add_const_pmc_sub(Interp *interpreter, SymReg *r,
     }
     pfc->type = PFC_PMC;
     pfc->u.key = sub_pmc;
+    unit->sub_pmc = sub_pmc;
     IMCC_debug(interpreter, DEBUG_PBC_CONST,
             "add_const_pmc_sub '%s' -> '%s' flags %d color %d (%s)\n",
             r->name, real_name, r->pcc_sub->pragma, k,
@@ -1069,6 +1098,11 @@ constant_folding(Interp *interpreter, IMC_Unit * unit)
             }
         }
     }
+    /*
+     * and finally, there may be an outer Sub
+     */
+    if (unit->outer)
+        add_1_const(interpreter, unit->outer);
 }
 
 int
