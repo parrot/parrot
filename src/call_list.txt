@@ -322,5 +322,12 @@ t       tt
 
 # Sub.__get_regs_used
 I	JOt
+
 # declare_lex_preg
 v	JOSI
+
+# Added for .NET => PIR translator dynamic PMCs.
+S      JOi
+v      JOi
+I      JO
+N      JO

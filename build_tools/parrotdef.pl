@@ -162,6 +162,7 @@ my @funcnames = qw(
 	get_mmd_dispatch_type
 	mem_sys_allocate
 	mem_sys_allocate_zeroed
+	mem__sys_realloc
 	mem_sys_free
 	Parrot_char_is_alnum
 	Parrot_char_is_alpha
