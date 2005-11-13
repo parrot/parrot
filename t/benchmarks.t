@@ -156,6 +156,10 @@ my %outputs = (
         done\n
         Elapsed\stime:\s\s\d+\.\d+\n
         M\sop\/s:\s\s\s\s\s\s\s\s\d+\.\d+\n$/x,
+    q(mops_intval.pasm)      => qr/^Iterations:\s\s\s\s100000000\n
+        Estimated\sops:\s200000000\n
+        Elapsed\stime:\s\s\d+\.\d+\n
+        M\sop\/s:\s\s\s\s\s\s\s\s\d+\.\d+\n$/x,
     q(oo1.pasm)      => qq(10\n),
     q(oo2.pasm)      => qq(10\n),
     q(oo3.pasm)      => qq(10\n),
