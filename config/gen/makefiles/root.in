@@ -843,10 +843,6 @@ $(SRC_DIR)/revision.c : $(SVN_ENTRIES) $(BUILD_TOOLS_DIR)/revision_c.pl
 
 examples-clean:
 	$(RM_F) \
-    examples/assembly/mops$(EXE) \
-    examples/assembly/mops.c \
-    examples/assembly/mops$(O) \
-    examples/assembly/mops.pbc \
     examples/mops/mops$(O) \
     examples/mops/mops$(EXE) \
     examples/pasm/hello.pbc \
@@ -1321,11 +1317,11 @@ doc_tests :
 
 # Running a benchmark
 mopsbench : test_prep
-	$(PARROT) $(PARROT_ARGS) examples/assembly/mops.pasm
+	$(PARROT) $(PARROT_ARGS) examples/benchmarks/mops_intval.pasm
 
 # Running the game of live
 lifetest : test_prep
-	$(PARROT) $(PARROT_ARGS) examples/assembly/life.pasm
+	$(PARROT) $(PARROT_ARGS) examples/pir/life.pir
 
 
 ###############################################################################

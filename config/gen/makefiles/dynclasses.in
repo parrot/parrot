@@ -5,7 +5,11 @@ DESTDIR = ${build_dir}${slash}runtime${slash}parrot${slash}dynext
 O = ${o}
 
 # add your dynamic pmcs here
+#
 # gdbmhash is only built when 'libgdbm.so' is available
+#
+# There is no config probe for libquantum yet, so add 'quantumreg' manually if desired
+#
 PMCS = \
 #CONDITIONED_LINE(has_gdbm):gdbmhash \
   match \

@@ -1,0 +1,122 @@
+/* quantumreg.pmc
+ *  CVS Info
+ *     $Id$
+ *  Overview:
+ *     These are the vtable functions for the QuantumReg PMC
+ *  Data Structure and Algorithms:
+ *  History:
+ *    2005-11-13: Get started, start with example in 
+ *                http://www.enyo.de/libquantum/api/node12.html 
+ *  Notes:
+ *     Please remove unneeded entries.
+ *  References:
+ *    http://www.enyo.de/libquantum/
+
+=head1 NAME
+
+dynclasses/quantumreg.pmc - QuantumReg PMC
+
+=head1 DESCRIPTION
+
+This is an interface to the libquantum library.
+The QuantumReg PMC looks from the outside like an fixed size array.
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+ */
+
+#include "parrot/parrot.h"
+#include <quantum.h>
+
+pmclass QuantumReg does array dynpmc lib quantum {
+
+/*
+
+=item C<void class_init()>
+
+Class initialization. QuantumReg is a dynamic PMC, meaning that a dynamically
+loadable module is created. On Unix-like systems this is a shared library.
+When it is available, the shared library has linked in the library 'libquantum'.
+
+=cut
+
+*/
+
+    void class_init() {
+        if (pass) {
+        }
+    }
+
+    void init () {
+        PMC_struct_val(SELF) = NULL;
+    }
+
+/*
+
+=item C<VOID set_integer_native(INTVAL size)>
+
+Create a new QuantumReg with specified number of registers.
+
+=cut
+
+*/
+
+    void set_integer_native (INTVAL size) {
+        /* TODO: implement */
+        return;
+    }
+
+    void* get_pointer() {
+        return PMC_struct_val(SELF);
+    }
+
+    void set_pointer(void* p) {
+        PMC_struct_val(SELF) = p;
+    }
+
+/*
+
+=item C<INTVAL get_integer()>
+
+Returns the number of qbits in the quantum register.
+
+=cut
+
+*/
+
+    INTVAL get_integer() {
+        quantum_reg *reg = (quantum_reg *)PMC_struct_val(SELF);
+        if ( ! reg ) {
+            return 0;
+        }
+        else {
+            /* TODO: implement this */
+            return 0;
+        }
+    }
+}
+/*
+
+=back
+
+=head1 SEE ALSO
+
+F<docs/pdds/pdd08_keys.pod>, L<http://gdbm.gnu.org>
+
+=cut
+
+*/
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+*/
