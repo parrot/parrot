@@ -353,7 +353,7 @@ begin_return_or_yield(Interp *interp, int yield)
 %type <sr> pcc_returns pcc_return pcc_call arg arglist the_sub multi_type
 %type <t> argtype_list argtype paramtype_list paramtype
 %type <t> pcc_return_many
-%type <t> proto sub_proto sub_proto_list multi multi_types opt_comma
+%type <t> proto sub_proto sub_proto_list multi multi_types opt_comma outer
 %type <i> instruction assignment if_statement labeled_inst opt_label op_assign
 %type <i> func_assign
 %type <i> opt_invocant
@@ -559,6 +559,10 @@ opt_comma:
 multi: MULTI '(' multi_types ')'  { $$ = 0; }
    ;
 
+outer: OUTER '(' STRINGC ')'
+                     { $$ = 0; cur_unit->outer = mk_const(interp, $3, 'S'); }
+   ;
+
 multi_types:
      /* empty */     { $$ = 0; }
    | multi_types COMMA multi_type { $$ = 0; add_pcc_multi(cur_call, $3); }
@@ -660,6 +664,7 @@ proto:
    | ANON           {  $$ = P_ANON; }
    | METHOD         {  $$ = P_METHOD; }
    | multi
+   | outer
    ;
 
 pcc_call:

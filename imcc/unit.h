@@ -48,6 +48,7 @@ typedef struct _IMC_Unit {
     int n_regs_used[4];	/* INSP in PBC */
     int first_avail[4];	/* INSP */
     int has_push_eh;
+    SymReg *outer;
 } IMC_Unit;
 
 
