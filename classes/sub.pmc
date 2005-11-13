@@ -471,6 +471,8 @@ Archives the subroutine.
         (info->visit_pmc_now)(INTERP, sub->multi_signature, info);
         info->thaw_ptr = &sub->lex_info;
         (info->visit_pmc_now)(INTERP, sub->lex_info, info);
+        info->thaw_ptr = &sub->outer_sub;
+        (info->visit_pmc_now)(INTERP, sub->outer_sub, info);
         SUPER(info);
     }
 
