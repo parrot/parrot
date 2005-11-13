@@ -36,7 +36,7 @@ sub runstep {
     }
 
     if ($test) {
-        Configure::Data->set(
+        Parrot::Configure::Data->set(
             TEMP_cg_h => '$(INC_DIR)/oplib/core_ops_cg.h $(INC_DIR)/oplib/core_ops_cgp.h',
             TEMP_cg_c => <<'EOF',
 $(OPS_DIR)/core_ops_cg$(O): $(GENERAL_H_FILES) $(OPS_DIR)/core_ops_cg.c
@@ -57,7 +57,7 @@ EOF
         $Configure::Step::result = 'yes';
     }
     else {
-        Configure::Data->set(
+        Parrot::Configure::Data->set(
             TEMP_cg_h => '',
             TEMP_cg_c => '',
             TEMP_cg_o => '',

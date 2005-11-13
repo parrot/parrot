@@ -153,7 +153,7 @@ END
 # classes/$pmc\$(O): \$(NONGEN_HEADERS) $parent_headers classes/pmc_$pmc.h
 
   # build list of libraries for link line in Makefile
-  my $slash = Configure::Data->get('slash');
+  my $slash = Parrot::Configure::Data->get('slash');
   (my $TEMP_pmc_classes_o   = $TEMP_pmc_o   ) =~ s/^| / classes${slash}/g;
   (my $TEMP_pmc_classes_str = $TEMP_pmc_str ) =~ s/^| / classes${slash}/g;
   (my $TEMP_pmc_classes_pmc = $pmc_list) =~ s/^| / classes${slash}/g;
@@ -186,7 +186,7 @@ END
       push @names, "Const$name" if $const;
   }
 
-  Configure::Data->set(
+  Parrot::Configure::Data->set(
     pmc             => $pmc_list,
     pmc_names       => join(" ", @names),
     TEMP_pmc_o           => $TEMP_pmc_o,

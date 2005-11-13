@@ -30,12 +30,12 @@ sub run_cpu {
 	}
 	else {
 	    if (cc_run() =~ /ok/) {
-		Configure::Data->set(
+		Parrot::Configure::Data->set(
 		  "i386_has_$suffix" => '1',
 		  "HAS_i386_$suffix" => '1',
 		);
 		print " (\U$suffix) " if ($verbose);
-	        Configure::Data->add(',',
+	        Parrot::Configure::Data->add(',',
 			"TEMP_generated" => $f
 		);
 	    }

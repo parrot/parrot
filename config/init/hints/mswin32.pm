@@ -5,7 +5,7 @@
 	my %args;
 	@args{@args}=@_;
 
-	my($cc, $ccflags, $libs)=Configure::Data->get(qw(cc ccflags libs));
+	my($cc, $ccflags, $libs)=Parrot::Configure::Data->get(qw(cc ccflags libs));
 
 	# Later in the Parrot::Configure::RunSteps->runsteps process,
 	# inter/progs.pl will merge the command-line overrides with the defaults.
@@ -17,7 +17,7 @@
 	my $is_mingw = grep { $cc eq $_ } ( qw(gcc gcc.exe) );
 	my $is_bcc   = grep { $cc eq $_ } ( qw(bcc32 bcc32.exe) );
 
-	Configure::Data->set(
+	Parrot::Configure::Data->set(
                 PQ    => '"',
                 make_c=> '$(PERL) -e "chdir shift @ARGV; system \'$(MAKE)\', @ARGV; exit $$? >> 8;"',
 		ncilib_link_extra => '-def:src/libnci_test.def',
@@ -34,7 +34,7 @@
 		$ccflags =~ s/-Gf/-GF/ if $cc_output =~ m/Version (\d+)/ && $1 >= 13;
 
 
-		Configure::Data->set(
+		Parrot::Configure::Data->set(
 			share_ext  => '.dll',
 			load_ext   => '.dll',
 			a          => '.lib',
@@ -57,29 +57,29 @@
 		);
 		# 'link' needs to be link.exe, not cl.exe.
 		# This makes 'link' and 'ld' the same.
-		Configure::Data->set('link', Configure::Data->get('ld'));
+		Parrot::Configure::Data->set('link', Parrot::Configure::Data->get('ld'));
 
 		# We can't use -opt: and -debug together.
-		if (Configure::Data->get('ld_debug') =~ /-debug/) {
-			my $linkflags = Configure::Data->get('linkflags');
+		if (Parrot::Configure::Data->get('ld_debug') =~ /-debug/) {
+			my $linkflags = Parrot::Configure::Data->get('linkflags');
 			$linkflags =~ s/-opt:\S+//;
-			Configure::Data->set('linkflags', $linkflags);
+			Parrot::Configure::Data->set('linkflags', $linkflags);
 		}
 		
 		# We need to build a .def file to export parrot.exe symbols.
-		Configure::Data->set(
+		Parrot::Configure::Data->set(
 			ld_parrot_exe_def	=> '-def:parrot.def',
 			parrot_exe_def	=> 'parrot.def'
 		);
 				
 		# When building dynclasses we need to flag up the need to
 		# mark shared variables with __declspec(dllimport).
-		Configure::Data->set(
+		Parrot::Configure::Data->set(
 			cc_building_dynclass_flag => '-DPARROT_BUILDING_WIN32_DLL'
 		);
 	}
 	elsif( $is_intel ) {
-		Configure::Data->set(
+		Parrot::Configure::Data->set(
 			share_ext  => '.dll',
 			load_ext   => '.dll',
 			a          => '.lib',
@@ -105,17 +105,17 @@
 		);
 		# 'link' needs to be xilink.exe, not icl.exe.
 		# This makes 'link' and 'ld' the same.
-		Configure::Data->set('link', Configure::Data->get('ld'));
+		Parrot::Configure::Data->set('link', Parrot::Configure::Data->get('ld'));
 
 		# We can't use -opt: and -debug together.
-		if (Configure::Data->get('ld_debug') =~ /-debug/) {
-			my $linkflags = Configure::Data->get('linkflags');
+		if (Parrot::Configure::Data->get('ld_debug') =~ /-debug/) {
+			my $linkflags = Parrot::Configure::Data->get('linkflags');
 			$linkflags =~ s/-opt:\S+//;
-			Configure::Data->set('linkflags', $linkflags);
+			Parrot::Configure::Data->set('linkflags', $linkflags);
 		}
 	}
 	elsif( $is_bcc ) {
-		Configure::Data->set(
+		Parrot::Configure::Data->set(
 			o => '.obj',
                         a => '.lib',
 			share_ext  => '.dll',
@@ -149,10 +149,10 @@
 		);
 	}
 	elsif( $is_mingw ) {
-		my $make=Configure::Data->get(qw(make));
+		my $make=Parrot::Configure::Data->get(qw(make));
 		if ($make =~ /nmake/i) {
 			# ActiveState Perl or PXPerl
-			Configure::Data->set(
+			Parrot::Configure::Data->set(
 				'a' => '.a',
 				'ar' => 'ar',
 				'cc' => 'gcc',
@@ -170,14 +170,14 @@
 				'o' => '.o',
 				'slash' => '\\',
 			);
-			if (Configure::Data->get(qw(optimize)) eq "1") {
-				Configure::Data->set(
+			if (Parrot::Configure::Data->get(qw(optimize)) eq "1") {
+				Parrot::Configure::Data->set(
 					optimize => '-O2'
 				);
 			}
 		} elsif ($make =~ /dmake/i) {
 			# mingw Perl
-			Configure::Data->set(
+			Parrot::Configure::Data->set(
 				'ld_load_flags' => '-shared ',
 				'ld_share_flags' => '-shared ',
 				'make' => 'mingw32-make',
@@ -188,14 +188,14 @@
 		}
 
 		# We need to build a .def file to export parrot.exe symbols.
-		Configure::Data->set(
+		Parrot::Configure::Data->set(
 			ld_parrot_exe_def	=> 'parrot.def',
 			parrot_exe_def	=> 'parrot.def',
 			link_dynamic	=> '-Wl,--out-implib,parrot.a',
 		);
 		# When building dynclasses we need to flag up the need to
 		# mark shared variables with __declspec(dllimport).
-		Configure::Data->set(
+		Parrot::Configure::Data->set(
 			cc_building_dynclass_flag => '-DPARROT_BUILDING_WIN32_DLL'
 		);
 	}

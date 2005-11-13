@@ -36,7 +36,7 @@ sub runstep {
     }
     cc_clean();
 
-    Configure::Data->set(
+    Parrot::Configure::Data->set(
 	setenv => $setenv,
 	unsetenv => $unsetenv
     );

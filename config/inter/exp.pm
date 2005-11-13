@@ -35,7 +35,7 @@ sub runstep {
     $net=1;
   }
   
-  Configure::Data->set(expnetworking => $net);
+  Parrot::Configure::Data->set(expnetworking => $net);
 }
 
 1;

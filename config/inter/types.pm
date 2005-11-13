@@ -37,7 +37,7 @@ sub runstep {
     print "\n";
   }
   
-  Configure::Data->set(
+  Parrot::Configure::Data->set(
     iv       => $intval,
     nv       => $floatval,
     opcode_t => $opcode

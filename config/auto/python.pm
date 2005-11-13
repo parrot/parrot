@@ -34,7 +34,7 @@ sub runstep {
     $revision = 0 unless defined $revision;
     my $has_python = $python ? 1 : 0;
 
-    Configure::Data->set(has_python => $has_python);
+    Parrot::Configure::Data->set(has_python => $has_python);
 
     my $has_python_2_4 = 0;
     if ( $has_python ) {
@@ -44,7 +44,7 @@ sub runstep {
     } else {
         $Configure::Step::result = 'no';
     }
-    Configure::Data->set(has_python_2_4 => $has_python_2_4);
+    Parrot::Configure::Data->set(has_python_2_4 => $has_python_2_4);
 }
 
 1;

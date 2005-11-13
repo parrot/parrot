@@ -45,7 +45,7 @@ sub runstep {
       $has_gnu_bc = 0;
     }
 
-    Configure::Data->set(has_gnu_bc => $has_gnu_bc);
+    Parrot::Configure::Data->set(has_gnu_bc => $has_gnu_bc);
     $Configure::Step::result = $has_gnu_bc ? 'yes' : 'no';
 }
 

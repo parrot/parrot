@@ -56,7 +56,7 @@ END
     }
   }
 
-  Configure::Data->set(
+  Parrot::Configure::Data->set(
     ops => $ops
   );
 }

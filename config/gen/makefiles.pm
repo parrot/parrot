@@ -36,7 +36,7 @@ sub cflags {
 
   # Why is this here?  I'd think this information belongs
   # in the CFLAGS.in file. -- A.D.  March 12, 2004
-  if (Configure::Data->get('cpuarch') =~ /sun4|sparc64/) {
+  if (Parrot::Configure::Data->get('cpuarch') =~ /sun4|sparc64/) {
       # CFLAGS entries must be left-aligned.
       print CFLAGS <<"EOF";
 src/jit_cpu.c -{-Wcast-align}        # lots of noise!
@@ -130,7 +130,7 @@ sub makefiles {
   genfile('config/gen/makefiles/bc.in',        'languages/bc/Makefile',
           commentType => '#', replace_slashes => 1);
 
-  if ( Configure::Data->get('has_perldoc') ) {
+  if ( Parrot::Configure::Data->get('has_perldoc') ) {
     # set up docs/Makefile, partly based on the .ops in the root dir
 
     opendir OPS, "ops" or die "opendir ops: $!";
@@ -139,19 +139,19 @@ sub makefiles {
 
     my $pod = join " ", map { my $t = $_; $t =~ s/\.ops$/.pod/; "ops/$t" } @ops;
     
-    Configure::Data->set(pod => $pod);
+    Parrot::Configure::Data->set(pod => $pod);
   
     genfile('config/gen/makefiles/docs.in',      'docs/Makefile',
             commentType       => '#',
             replace_slashes   => 1,
             conditioned_lines => 1);
     
-    Configure::Data->set(pod => undef);
+    Parrot::Configure::Data->set(pod => undef);
 
     open MAKEFILE, ">> docs/Makefile" or die "open >> docs/Makefile: $!";
 
-    my $slash = Configure::Data->get('slash');
-    my $new_perldoc = Configure::Data->get('new_perldoc');
+    my $slash = Parrot::Configure::Data->get('slash');
+    my $new_perldoc = Parrot::Configure::Data->get('new_perldoc');
 
     foreach my $ops (@ops) {
         my $pod = $ops;

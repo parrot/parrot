@@ -9,16 +9,14 @@ config/init/data.pl - Configuration Defaults
 
 Sets up the configuration system's default values and data structures.
 
-=head1 METHODS
-
-=over 4
-
 =cut
 
 package Configure::Step;
 
 use strict;
-use vars qw($description @args);
+use vars qw($description @args %c);
+
+use Parrot::Configure::Data;
 use Parrot::Configure::Step;
 
 $description="Setting up Configure's data structures...";
@@ -28,14 +26,14 @@ $description="Setting up Configure's data structures...";
 sub runstep {
   my ($debugging, $optimize, $profile,  $verbose, $prefix) = @_;
 
-  package Configure::Data;
   use Config;
-  use Data::Dumper;
   use FindBin; # see build_dir
 
   # We need a Glossary somewhere!
 
-  my(%c)=(
+  *c = \%Parrot::Configure::Data::c;
+
+  (%c)=(
     debugging     => $debugging ? 1 : 0,
     # A plain --optimize means use perl5's $Config{optimize}.  If an argument is
     # given, however, use that instead.  This logic really belongs in the optimize
@@ -169,8 +167,6 @@ sub runstep {
   $prefix = "/usr/local/parrot-$c{VERSION}$c{DEVEL}" unless defined $prefix;
   $c{prefix} = $prefix;
 
-  my (%triggers);
-
   # add profiling if needed
   # FIXME gcc syntax
   # we should have this in the hints files e.g. cc_profile
@@ -178,168 +174,6 @@ sub runstep {
     $c{cc_debug} .= " -pg ";
     $c{ld_debug} .= " -pg ";
   }
-
-=item Configure::Data->get($key,...)
-
-Return value or hash slice for key.
-
-=cut
-
-  *get=sub {
-    shift;
-    @c{@_};
-  };
-
-=item Configure::Data->set($key,$val, ...)
-
-Set config values
-
-=cut
-
-  *set = sub {
-      shift;
-      my $verbose = $c{verbose} && $c{verbose} == 2;
-      return unless (defined ($_[0]));
-      print "Setting Configuration Data:\n(\n" if ($verbose);
-      while (my ($key, $val) = splice @_, 0, 2) {
-	print "\t$key => ", defined($val) ? "'$val'" : 'undef', ",\n"
-	    if ($verbose);
-        $c{$key}=$val;
-	if (defined $triggers{$key}) {
-	  while (my ($trigger, $cb) = each %{$triggers{$key}}) {
-	    print "\tcalling trigger $trigger for $key\n" if $verbose;
-	    &$cb($key, $val);
-	  }
-	}
-      }
-      print ");\n" if ($verbose);
-    };
-
-=item Configure::Data->add($delim, $key,$val, ...)
-
-Append values delimited by C<$delim> to existing keys or set values.
-
-=cut
-
-  *add = sub {
-    my ($self, $delim) = (shift, shift);
-    while (my ($key, $val) = splice @_, 0, 2) {
-      my ($old) = $c{$key};
-      if (defined $old) {
-	$self->set($key, "$old$delim$val");
-      }
-      else {
-	$self->set($key, $val);
-      }
-    }
-  };
-
-=item Configure::Data->keys()
-
-Return config keys.
-
-=cut
-
-  *keys=sub {
-    return keys %c;
-  };
-
-=item Configure::Data->dump()
-
-Dump config keys.
-
-=cut
-
-  # Data::Dumper supports Sortkeys since 2.12
-  # older versions will work but obviously not sorted
-  my $dd_version;
-  if ($Data::Dumper::VERSION =~ /([\d.]+)/) {
-    $dd_version = $1;
-  } else {
-    $dd_version = $Data::Dumper::VERSION;
-  }
-  if ($dd_version >= 2.12) {
-    *dump=sub {
-      Data::Dumper->new([\%c], ['*PConfig'])->Sortkeys(1)->Dump();
-    };
-  }
-  else {
-    *dump=sub {
-      Data::Dumper->new([\%c], ['*PConfig'])->Dump();
-    };
-  }
-
-=item Configure::Data->clean()
-
-Delete keys matching /^TEMP_/ from config. These are used only temporarly
-e.g. as file lists for Makefile generation.
-
-=cut
-
-  *clean=sub {
-    delete $c{$_} for grep { /^TEMP_/ } keys %c;
-  };
-
-=item Configure::Data->settrigger($key, $trigger, $cb)
-
-Set a callback on C<$key> named C<$trigger>.  Multiple triggers can be
-set on a given key.  When the key is set via C<set> or C<add> then all
-callbacks that are defined will be called.  Triggers are passed the
-key and value that was set after it has been changed.
-
-=cut
-
-  *settrigger=sub {
-    my ($self, $var, $trigger, $cb) = @_;
-    if (defined $cb) {
-      if (defined $verbose and $verbose == 2) {
-	print "Setting trigger $trigger on configuration key $var\n";
-      }
-      $triggers{$var}{$trigger} = $cb;
-    }
-  };
-
-=item Configure::Data->gettriggers($key)
-
-Get the names of all triggers set for C<$key>.
-
-=cut
-
-  *gettriggers=sub {
-    my ($self, $key) = @_;
-    return keys %{$triggers{$key}};
-  };
-
-=item Configure::Data->gettrigger($key, $trigger)
-
-Get the callback set for C<$key> under the name C<$trigger>
-
-=cut
-
-  *gettrigger=sub {
-    my ($self, $key, $t) = @_;
-    return undef if !defined $triggers{$key} or !defined $triggers{$key}{$t};
-    $triggers{$key}{$t};
-  };
-
-=item Configure::Data->deltrigger($key, $trigger)
-
-Removes the trigger on C<$key> named by C<$trigger>
-
-=cut
-
-  *deltrigger=sub {
-    my ($self, $var, $t) = @_;
-    return if !defined $triggers{$var} or !defined $triggers{$var}{$t};
-    delete $triggers{$var}{$t};
-    if (defined $verbose and $verbose == 2) {
-      print "Removing trigger $t on configuration key $var\n";
-    }
-  };
 }
-
-=back
-
-=cut
 
 1;

@@ -47,10 +47,10 @@ use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
         gen   => [qw(genfile copy_if_diff move_if_diff)]
                );
 
-#Configure::Data->get('key')
-#Configure::Data->set('key', 'value')
-#Configure::Data->keys()
-#Configure::Data->dump()
+#Parrot::Configure::Data->get('key')
+#Parrot::Configure::Data->set('key', 'value')
+#Parrot::Configure::Data->keys()
+#Parrot::Configure::Data->dump()
 
 =item C<integrate($orig, $new)>
 
@@ -213,7 +213,7 @@ sub genfile {
       $_ = <IN>;
       s{
 	\$\{(\w+)\}
-      }{Configure::Data->get("$1")}gx;
+      }{Parrot::Configure::Data->get("$1")}gx;
       eval;
       die $@ if $@;
       last;
@@ -225,18 +225,18 @@ sub genfile {
         # Lines with "#INVERSE_CONDITIONED_LINE(var):..." are skipped if
         # the "var" condition is true.
         if ( m/^#CONDITIONED_LINE\(([^)]+)\):(.*)/s ) {
-            next unless Configure::Data->get($1);
+            next unless Parrot::Configure::Data->get($1);
             $_ = $2;
         }
         elsif ( m/^#INVERSE_CONDITIONED_LINE\(([^)]+)\):(.*)/s ) {
-            next if Configure::Data->get($1);
+            next if Parrot::Configure::Data->get($1);
             $_ = $2;
         }
     }
     s{
       \$\{(\w+)\}
     }{
-      if(defined(my $val=Configure::Data->get($1))) {
+      if(defined(my $val=Parrot::Configure::Data->get($1))) {
         #use Data::Dumper;warn Dumper("val for $1 is ",$val);
         $val;
       }
@@ -248,7 +248,7 @@ sub genfile {
     if ( $options{replace_slashes} ) {
       s{(/+)}{
         my $len = length $1;
-        my $slash = Configure::Data->get('slash');
+        my $slash = Parrot::Configure::Data->get('slash');
         '/' x ($len/2) . ($len%2 ? $slash : '');
       }eg;
       s{(\\\*)}{\\$1}g; # replace \* with \\*, so make will not eat the \
@@ -273,7 +273,7 @@ C<$err>.
 sub _run_command {
     my ($command, $out, $err) = @_;
 
-    my $verbose = Configure::Data->get('verbose');
+    my $verbose = Parrot::Configure::Data->get('verbose');
 
     if ($verbose) {
       print "$command\n";
@@ -351,7 +351,7 @@ sub cc_build {
     $link_args = '' unless defined $link_args;
 
     my ($cc, $ccflags, $ldout, $o, $link, $linkflags, $cc_exe_out, $exe, $libs)=
-    Configure::Data->get( qw(cc ccflags ld_out o link linkflags
+    Parrot::Configure::Data->get( qw(cc ccflags ld_out o link linkflags
                           cc_exe_out exe libs) );
 
     _run_command("$cc $ccflags $cc_args -I./include -c test.c",
@@ -371,8 +371,8 @@ F<test.out>.
 =cut
 
 sub cc_run {
-    my $exe=Configure::Data->get('exe');
-    my $slash=Configure::Data->get('slash');
+    my $exe=Parrot::Configure::Data->get('exe');
+    my $slash=Parrot::Configure::Data->get('slash');
 
     if (defined($_[0]) && length($_[0])) {
         local $"=' ';
@@ -399,8 +399,8 @@ F<test.out>.
 =cut
 
 sub cc_run_capture {
-    my $exe=Configure::Data->get('exe');
-    my $slash=Configure::Data->get('slash');
+    my $exe=Parrot::Configure::Data->get('exe');
+    my $slash=Parrot::Configure::Data->get('slash');
 
     if (defined($_[0]) && length($_[0])) {
         local $"=' ';
@@ -428,7 +428,7 @@ Cleans up all files in the root folder that match the glob F<test.*>.
 sub cc_clean {
     unlink map "test$_",
                qw( .c .cco .ldo .out),
-               Configure::Data->get( qw( o exe ) );
+               Parrot::Configure::Data->get( qw( o exe ) );
 }
 
 =item C<capture_output($command)>
@@ -483,7 +483,7 @@ sub check_progs {
     my $progs = shift;
 
     $progs = [$progs] unless ref $progs eq 'ARRAY';
-    my $verbose = Configure::Data->get('verbose');
+    my $verbose = Parrot::Configure::Data->get('verbose');
 
     print "checking for program: ", join(" or ", @$progs), "\n" if $verbose;
     foreach my $prog (@$progs) {

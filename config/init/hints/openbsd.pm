@@ -2,18 +2,18 @@
 # $Id$
 
 
-my $ccflags = Configure::Data->get('ccflags');
+my $ccflags = Parrot::Configure::Data->get('ccflags');
 if ( $ccflags !~ /-pthread/ ) {
     $ccflags .= ' -pthread';
 }
-Configure::Data->set(
+Parrot::Configure::Data->set(
     ccflags => $ccflags,
 );
 
-my $libs = Configure::Data->get('libs');
+my $libs = Parrot::Configure::Data->get('libs');
 if ( $libs !~ /-lpthread/ ) {
     $libs .= ' -lpthread';
 }
-Configure::Data->set(
+Parrot::Configure::Data->set(
     libs => $libs,
 );

@@ -22,7 +22,7 @@ $description="Verifying that the compiler supports function pointer casts...";
 @args=qw(verbose);
 
 sub runstep {
-  my $jitcapable=Configure::Data->get('jitcapable');
+  my $jitcapable=Parrot::Configure::Data->get('jitcapable');
 
   if ($jitcapable) {
     cc_gen('config/auto/funcptr/test_c.in');

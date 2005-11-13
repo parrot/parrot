@@ -1,16 +1,16 @@
 # Copyright: 2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
-my $libs = Configure::Data->get('libs');
-my $cflags = Configure::Data->get('ccflags');
-my $cc = Configure::Data->get('cc');
-my $linkflags = Configure::Data->get('linkflags');
+my $libs = Parrot::Configure::Data->get('libs');
+my $cflags = Parrot::Configure::Data->get('ccflags');
+my $cc = Parrot::Configure::Data->get('cc');
+my $linkflags = Parrot::Configure::Data->get('linkflags');
 my $link = 'c++'; # should find g++ in most cases
 
 if ($libs !~ /-lpthread/) {
     $libs .= ' -lpthread';
 }
-my $ld_share_flags = Configure::Data->get('ld_share_flags');
+my $ld_share_flags = Parrot::Configure::Data->get('ld_share_flags');
 if ( $ld_share_flags !~ /-fPIC/ ) {
     $ld_share_flags .= ' -fPIC';
 }
@@ -31,7 +31,7 @@ if ( $cflags !~ /-D_GNU_SOURCE/ ) {
     $cflags .= ' -D_GNU_SOURCE';
 }
 
-Configure::Data->set(
+Parrot::Configure::Data->set(
     ccflags        => $cflags,
     libs           => $libs,
     ld_share_flags => $ld_share_flags,

@@ -48,7 +48,7 @@ sub runstep {
     }
   
     if (!$without && $autodetect && $icuconfig && $icuconfig ne "none") {
-      my $slash = Configure::Data->get('slash');
+      my $slash = Parrot::Configure::Data->get('slash');
   
       # icu-config script to use
       $icuconfig = "icu-config" if $icuconfig eq "1";
@@ -92,7 +92,7 @@ sub runstep {
   }
 
   if ($without) {
-    Configure::Data->set(
+    Parrot::Configure::Data->set(
       has_icu     => 0,
       icu_shared  => '',  # used for generating dynclasses/Makefile
       icu_datadir => '',  # used for generation Makefile
@@ -142,7 +142,7 @@ Something is wrong with your ICU installation!
 HELP
 #'
   
-  Configure::Data->set(
+  Parrot::Configure::Data->set(
     has_icu     => 1,
     icu_shared  => $icushared,
     icu_headers => join( ' ', @icu_headers ),
@@ -151,12 +151,12 @@ HELP
 
   # Add -I $Icuheaders if necessary
   my $header = "unicode/ucnv.h";
-  Configure::Data->set(testheaders =>"#include <$header>\n");
-  Configure::Data->set(testheader => "$header");
+  Parrot::Configure::Data->set(testheaders =>"#include <$header>\n");
+  Parrot::Configure::Data->set(testheader => "$header");
   cc_gen('config/auto/headers/test_c.in');
 
-  Configure::Data->set(testheaders => undef);  # Clean up.
-  Configure::Data->set(testheader => undef);
+  Parrot::Configure::Data->set(testheaders => undef);  # Clean up.
+  Parrot::Configure::Data->set(testheader => undef);
   eval { cc_build(); };
   if (!$@ && cc_run() =~ /^$header OK/) {
     # Ok, we don't need anything more.
@@ -164,7 +164,7 @@ HELP
   }
   else {
     print "Adding -I $icuheaders to ccflags for icu headers.\n" if $verbose;
-    Configure::Data->add(' ',
+    Parrot::Configure::Data->add(' ',
     ccflags    => "-I $icuheaders");
   }
   cc_clean();

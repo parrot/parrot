@@ -25,10 +25,10 @@ $description = "Determining if your platform supports gdbm...";
 sub runstep {
     my ($verbose) = @_;
 
-    my $cc        = Configure::Data->get('cc');
-    my $libs      = Configure::Data->get('libs');
-    my $linkflags = Configure::Data->get('linkflags');
-    my $ccflags   = Configure::Data->get('ccflags');
+    my $cc        = Parrot::Configure::Data->get('cc');
+    my $libs      = Parrot::Configure::Data->get('libs');
+    my $linkflags = Parrot::Configure::Data->get('linkflags');
+    my $ccflags   = Parrot::Configure::Data->get('ccflags');
     
     my $archname = $Config{archname};
     my ($cpuarch, $osname) = split('-', $archname);
@@ -41,9 +41,9 @@ sub runstep {
     # where Fink lives.
     if($osname =~ /darwin/) {
         if( -f "/sw/include/gdbm.h") {
-            Configure::Data->add(' ', 'linkflags', '-L/sw/lib');
-            Configure::Data->add(' ', 'ldflags', '-L/sw/lib');
-            Configure::Data->add(' ', 'ccflags', '-I/sw/include');
+            Parrot::Configure::Data->add(' ', 'linkflags', '-L/sw/lib');
+            Parrot::Configure::Data->add(' ', 'ldflags', '-L/sw/lib');
+            Parrot::Configure::Data->add(' ', 'ccflags', '-I/sw/include');
         }
     }
 
@@ -69,11 +69,11 @@ sub runstep {
     }
     unless ($has_gdbm) {
         # The Config::Data settings might have changed for the test 
-        Configure::Data->set( libs      => $libs );
-        Configure::Data->set( ccflags   => $ccflags );
-        Configure::Data->set( linkflags => $linkflags );
+        Parrot::Configure::Data->set( libs      => $libs );
+        Parrot::Configure::Data->set( ccflags   => $ccflags );
+        Parrot::Configure::Data->set( linkflags => $linkflags );
         print " (no) " if $verbose;
         $Configure::Step::result = 'no';
     }
-    Configure::Data->set( has_gdbm => $has_gdbm ); # for gdbmhash.t and dynclasses.in
+    Parrot::Configure::Data->set( has_gdbm => $has_gdbm ); # for gdbmhash.t and dynclasses.in
 }

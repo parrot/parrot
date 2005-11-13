@@ -2,14 +2,14 @@
 # $Id$
 use Parrot::Configure::Step qw(cc_gen cc_run);
 
-my $libs = Configure::Data->get('libs');
+my $libs = Parrot::Configure::Data->get('libs');
 if ( $libs !~ /-lpthread/ ) {
     $libs .= ' -lpthread';
 }
 if ( $libs !~ /-lrt\b/ ) {
     $libs .= ' -lrt';      # Needed for sched_yield.
 }
-Configure::Data->set(
+Parrot::Configure::Data->set(
     libs => $libs,
 );
 
@@ -23,7 +23,7 @@ my $solaris_link_cb = sub {
     use Carp;
     my ($key, $cc) = @_;
     my %gnuc;
-    my $link = Configure::Data->get('link');
+    my $link = Parrot::Configure::Data->get('link');
     cc_gen("config/auto/gcc/test_c.in");
     # Can't call cc_build since we haven't set all the flags yet.
     # This should suffice for this test.
@@ -36,10 +36,10 @@ my $solaris_link_cb = sub {
     else {
 	$link =~ s/\bcc\b/CC/;
     }
-    Configure::Data->set('link', $link);
-    Configure::Data->deltrigger("cc", "solaris_link");
+    Parrot::Configure::Data->set('link', $link);
+    Parrot::Configure::Data->deltrigger("cc", "solaris_link");
 };
-Configure::Data->settrigger("cc", "solaris_link", $solaris_link_cb);
+Parrot::Configure::Data->settrigger("cc", "solaris_link", $solaris_link_cb);
 
 ################################################################
 # cc_shared:  Flags to instruct the compiler to use position-independent
@@ -50,14 +50,14 @@ Configure::Data->settrigger("cc", "solaris_link", $solaris_link_cb);
 my $solaris_cc_shared_cb = sub {
     my ($key, $gccversion) = @_;
     if ($gccversion) {
-	Configure::Data->set('cc_shared', '-fPIC');
+	Parrot::Configure::Data->set('cc_shared', '-fPIC');
     }
     else {
-	Configure::Data->set('cc_shared', '-KPIC');
+	Parrot::Configure::Data->set('cc_shared', '-KPIC');
     }
-    Configure::Data->deltrigger("gccversion", "solaris_cc_shared");
+    Parrot::Configure::Data->deltrigger("gccversion", "solaris_cc_shared");
 };
-Configure::Data->settrigger("gccversion", "solaris_cc_shared", 
+Parrot::Configure::Data->settrigger("gccversion", "solaris_cc_shared", 
 			$solaris_cc_shared_cb);
 
 ################################################################
@@ -78,10 +78,10 @@ my $solaris_ieee_cb = sub {
 	# Don't know how to do this for gcc.
     }
     else {
-	my $linkflags = Configure::Data->get('linkflags');
-	Configure::Data->add(' ', 'linkflags', '-xlibmieee')
+	my $linkflags = Parrot::Configure::Data->get('linkflags');
+	Parrot::Configure::Data->add(' ', 'linkflags', '-xlibmieee')
 		unless $linkflags =~ /-xlibmieee/;
     }
-    Configure::Data->deltrigger("gccversion", "solaris_ieee");
+    Parrot::Configure::Data->deltrigger("gccversion", "solaris_ieee");
 };
-Configure::Data->settrigger("gccversion", "solaris_ieee", $solaris_ieee_cb);
+Parrot::Configure::Data->settrigger("gccversion", "solaris_ieee", $solaris_ieee_cb);

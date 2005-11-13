@@ -59,7 +59,7 @@ sub runstep {
     $cpuarch  =~ s/armv[34]l?/arm/i;
     $cpuarch  =~ s/i[456]86/i386/i;
 
-    Configure::Data->set(
+    Parrot::Configure::Data->set(
         archname    => $archname,
         cpuarch     => $cpuarch,
         osname      => $osname
@@ -74,21 +74,21 @@ sub runstep {
     if (-e "jit/$cpuarch/core.jit") {
         $jitcapable = 1;
         if ($cpuarch =~ /sun4|sparc64/ &&
-            Configure::Data->get('intvalsize') > Configure::Data->get('ptrsize')) {
+            Parrot::Configure::Data->get('intvalsize') > Parrot::Configure::Data->get('ptrsize')) {
             $jitcapable = 0;
         }
     }
 
     if (-e "jit/$cpuarch/$jitarchname.s") {
         copy_if_diff("jit/$cpuarch/$jitarchname.s", "src/asmfun.s");
-        Configure::Data->set(asmfun_o => 'src/asmfun$(O)');
+        Parrot::Configure::Data->set(asmfun_o => 'src/asmfun$(O)');
     }
     elsif (-e "jit/$cpuarch/asm.s") {
         copy_if_diff("jit/$cpuarch/asm.s", "src/asmfun.s");
-        Configure::Data->set(asmfun_o => 'src/asmfun$(O)');
+        Parrot::Configure::Data->set(asmfun_o => 'src/asmfun$(O)');
     }
     else {
-        Configure::Data->set(asmfun_o => '');
+        Parrot::Configure::Data->set(asmfun_o => '');
     }
 
     $jitcapable = $set_jitcapable if defined $set_jitcapable;
@@ -96,7 +96,7 @@ sub runstep {
     if ($jitcapable) {
         my($jitcpuarch, $jitosname) =  split( /-/, $jitarchname);
 
-        Configure::Data->set(
+        Parrot::Configure::Data->set(
             jitarchname => $jitarchname,
             jitcpuarch  => $jitcpuarch,
             jitcpu      => uc($jitcpuarch),
@@ -122,14 +122,14 @@ sub runstep {
         }
         $execcapable = $set_execcapable if defined $set_execcapable;
         if ($execcapable) {
-            Configure::Data->set(
+            Parrot::Configure::Data->set(
                  TEMP_exec_h       => '$(INC_DIR)/jit.h $(INC_DIR)/exec.h $(INC_DIR)/exec_dep.h $(INC_DIR)/exec_save.h',
                  TEMP_exec_o       => '$(SRC_DIR)/exec$(O) $(SRC_DIR)/exec_cpu$(O) $(SRC_DIR)/exec_save$(O)',
                  execcapable  => 1
                                 );
         }
         else {
-            Configure::Data->set(
+            Parrot::Configure::Data->set(
                 TEMP_exec_h  => '',
                 TEMP_exec_o  => '',
                 execcapable  => 0
@@ -146,7 +146,7 @@ sub runstep {
             }
             else {
                 if (cc_run(0) !~ /ok/ && cc_run(1) =~ /ok/) {
-                    Configure::Data->set( has_exec_protect => 1 );
+                    Parrot::Configure::Data->set( has_exec_protect => 1 );
                     print "yes) " if $verbose;
                 }
                 else {
@@ -163,13 +163,13 @@ sub runstep {
             cc_gen('config/auto/jit/test_c.in');
             eval { cc_build(); };
             unless ($@ || cc_run() !~ /ok/) {
-                Configure::Data->set( jit_i386 => 'fcomip');
+                Parrot::Configure::Data->set( jit_i386 => 'fcomip');
             }
             cc_clean();
         }
     }
     else {
-        Configure::Data->set(
+        Parrot::Configure::Data->set(
             jitarchname => 'nojit',
             jitcpuarch  => $cpuarch,
             jitcpu      => $cpuarch,

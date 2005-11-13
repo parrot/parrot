@@ -29,15 +29,15 @@ sub runstep {
 
     $result = '';
     my $align;
-    if (defined(Configure::Data->get('ptr_alignment')))
+    if (defined(Parrot::Configure::Data->get('ptr_alignment')))
     {
-        $align = Configure::Data->get('ptr_alignment');
+        $align = Parrot::Configure::Data->get('ptr_alignment');
         $result = "configured: ";
     }
     elsif ($^O eq 'hpux' && $Config{ccflags} !~ /DD64/) {
         # HP-UX 10.20/32 hangs in this test.
         $align = 4;
-        Configure::Data->set(ptr_alignment => $align);
+        Parrot::Configure::Data->set(ptr_alignment => $align);
         $result = "for hpux: ";
     }
     else {
@@ -53,7 +53,7 @@ sub runstep {
         cc_clean();
 
         die "Can't determine alignment!\n" unless defined $align;
-        Configure::Data->set(ptr_alignment => $align);
+        Parrot::Configure::Data->set(ptr_alignment => $align);
     }
 
     $result .= " $align byte";

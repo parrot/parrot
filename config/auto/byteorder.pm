@@ -29,14 +29,14 @@ sub runstep {
   chomp $byteorder;
 
   if($byteorder =~ /^1234/) {
-    Configure::Data->set(
+    Parrot::Configure::Data->set(
       byteorder => $byteorder,
       bigendian => 0
     );
     $Configure::Step::result = 'little-endian';
   }
   elsif($byteorder =~ /^(8765|4321)/) {
-    Configure::Data->set(
+    Parrot::Configure::Data->set(
       byteorder => $byteorder,
       bigendian => 1
     );

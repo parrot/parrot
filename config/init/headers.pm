@@ -34,7 +34,7 @@ sub runstep {
     $_ = "\$(INC_DIR)/$_" for @headers;
     my $TEMP_nongen_headers = join("\\\n	", @headers);
 
-    Configure::Data->set(
+    Parrot::Configure::Data->set(
 	inc            => $inc,
 	TEMP_nongen_headers => $TEMP_nongen_headers,
     );

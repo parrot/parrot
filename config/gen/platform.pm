@@ -33,7 +33,7 @@ sub runstep {
 
   print " platform='$platform' " if $verbose;
 
-  my $generated = Configure::Data->get('TEMP_generated');
+  my $generated = Parrot::Configure::Data->get('TEMP_generated');
   $generated = '' unless defined $generated;
   print " ($generated) " if $verbose;
   print("\n") if defined $verbose && $verbose == 2;
@@ -209,7 +209,7 @@ HERE
 
   close PLATFORM_C;
 
-  if ( Configure::Data->get( 'platform_asm' ) ) {
+  if ( Parrot::Configure::Data->get( 'platform_asm' ) ) {
       my $asm_file = "config/gen/platform/$platform/asm.s";
       if ( -e $asm_file ) {
           copy_if_diff( $asm_file, "src/platform_asm.s" );

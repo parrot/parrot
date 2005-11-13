@@ -56,7 +56,7 @@ sub runstep {
 	}
     }
 
-    Configure::Data->set(
+    Parrot::Configure::Data->set(
 	inline => $test
     );
 }

@@ -24,7 +24,7 @@ sub runstep {
     my $revision = $Parrot::Revision::current;
     my $entries  = $Parrot::Revision::svn_entries;
 
-    Configure::Data->set(
+    Parrot::Configure::Data->set(
 	revision => $revision,
 	SVN_ENTRIES => $entries
     );

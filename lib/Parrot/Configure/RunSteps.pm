@@ -23,6 +23,8 @@ package Parrot::Configure::RunSteps;
 use strict;
 use vars qw(@steps);
 
+use Parrot::Configure::Data;
+
 # EDIT HERE TO ADD NEW TESTS
 @steps = qw(
     init/manifest.pm
@@ -112,7 +114,7 @@ sub runsteps {
 	    }
 	}
 	# cc_build uses this verbose setting
-	Configure::Data->set('verbose' => $args{verbose}) if $n > 2;
+    Parrot::Configure::Data->set('verbose' => $args{verbose}) if $n > 2;
 
         print "\n" if $args{verbose} && $args{verbose} == 2;
 

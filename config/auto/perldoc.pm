@@ -50,7 +50,7 @@ sub runstep {
     }
     unlink "c99da7c4.tmp";
 
-    Configure::Data->set(
+    Parrot::Configure::Data->set(
 	has_perldoc => $version != 0 ? 1 : 0,
 	new_perldoc => $version == 2 ? 1 : 0
     );

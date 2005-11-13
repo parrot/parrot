@@ -144,7 +144,7 @@ EOF
 	}
 	close(F);
     }
-    Configure::Data->set(
+    Parrot::Configure::Data->set(
 	TEMP_gen_pasm_includes => join("\t\\\n\t", @generated)
     );
 }

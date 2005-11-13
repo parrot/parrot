@@ -54,11 +54,11 @@ sub runstep {
   }
   elsif ($gc eq 'libc') {
     # tests mallinfo after allocation of 128 bytes
-    if (Configure::Data->get('i_malloc')) {
-        Configure::Data->set('malloc_header', 'malloc.h');
+    if (Parrot::Configure::Data->get('i_malloc')) {
+        Parrot::Configure::Data->set('malloc_header', 'malloc.h');
     }
     else {
-        Configure::Data->set('malloc_header', 'stdlib.h');
+        Parrot::Configure::Data->set('malloc_header', 'stdlib.h');
     }
 =for nothing
 
@@ -80,7 +80,7 @@ sub runstep {
   }
 
   if ($gc =~ /^malloc(?:-trace)?$/) {
-    Configure::Data->set(
+    Parrot::Configure::Data->set(
       TEMP_gc_c          => <<"EOF",
 \$(SRC_DIR)/$gc\$(O):	\$(GENERAL_H_FILES) \$(SRC_DIR)/$gc.c
 \$(SRC_DIR)/res_lea\$(O):	\$(GENERAL_H_FILES) \$(SRC_DIR)/res_lea.c
@@ -90,7 +90,7 @@ EOF
     );
   }
   elsif ($gc eq 'libc') {
-    Configure::Data->set(
+    Parrot::Configure::Data->set(
       TEMP_gc_c          => <<"EOF",
 \$(SRC_DIR)/res_lea\$(O):	\$(GENERAL_H_FILES) \$(SRC_DIR)/res_lea.c
 EOF
@@ -100,7 +100,7 @@ EOF
   }
   else {
       $gc = 'gc';
-    Configure::Data->set(
+    Parrot::Configure::Data->set(
       TEMP_gc_c          => <<"EOF",
 \$(SRC_DIR)/resources\$(O):	\$(GENERAL_H_FILES) \$(SRC_DIR)/resources.c
 EOF

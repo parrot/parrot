@@ -60,10 +60,10 @@ END
   }
 
   # build list of libraries for link line in Makefile
-  my $slash = Configure::Data->get('slash');
+  my $slash = Parrot::Configure::Data->get('slash');
   $TEMP_encoding_o  =~ s/^| / encodings${slash}/g;
 
-  Configure::Data->set(
+  Parrot::Configure::Data->set(
     encoding             => $encoding_list,
     TEMP_encoding_o           => $TEMP_encoding_o,
     TEMP_encoding_build       => $TEMP_encoding_build,

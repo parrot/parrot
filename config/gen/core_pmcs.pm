@@ -42,7 +42,7 @@ sub generate_h {
 enum {
 END
 
-    my @pmcs = split(/ /, Configure::Data->get('pmc_names'));
+    my @pmcs = split(/ /, Parrot::Configure::Data->get('pmc_names'));
     print OUT "    enum_class_default,\n";
     my $i = 1;
     foreach (@pmcs) {
@@ -63,7 +63,7 @@ END
 
 sub generate_c {
     my $file = "src/core_pmcs.c";
-    my @pmcs = split(/ /, Configure::Data->get('pmc_names'));
+    my @pmcs = split(/ /, Parrot::Configure::Data->get('pmc_names'));
 
     open(OUT, ">$file.tmp");
 
@@ -146,7 +146,7 @@ END
 
 sub generate_pm {
     my $file = "lib/Parrot/PMC.pm";
-    my @pmcs = split(/ /, Configure::Data->get('pmc_names'));
+    my @pmcs = split(/ /, Parrot::Configure::Data->get('pmc_names'));
 
     open(OUT, ">$file.tmp");
 

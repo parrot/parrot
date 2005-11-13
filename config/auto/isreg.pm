@@ -31,7 +31,7 @@ sub runstep {
     }
     cc_clean();
 
-    Configure::Data->set(
+    Parrot::Configure::Data->set(
 	isreg  => $test
     );
     print($test ? " (Yep) " : " (no) ") if $_[0];

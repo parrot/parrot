@@ -1,7 +1,7 @@
 # Copyright: 2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
-my($ccflags, $ldflags, $libs)=Configure::Data->get(qw(ccflags ldflags libs));
+my($ccflags, $ldflags, $libs)=Parrot::Configure::Data->get(qw(ccflags ldflags libs));
 
 my $OSVers = `uname -r`;
 chomp $OSVers;
@@ -17,7 +17,7 @@ $ccflags =~ s/-flat_namespace\s*//;
 $ldflags =~ s/-flat_namespace\s*//;
 $ldflags .= " -flat_namespace ";
 
-Configure::Data->set(
+Parrot::Configure::Data->set(
   ccflags => $ccflags,
   ldflags => $ldflags,
   ccwarn => "-Wno-shadow",

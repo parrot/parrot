@@ -44,7 +44,7 @@ sub runstep {
         $has_gnu_m4 = ( $output =~ m/^GNU [mM]4 / ) ? 1 : 0;
     }
 
-    Configure::Data->set(has_gnu_m4 => $has_gnu_m4);
+    Parrot::Configure::Data->set(has_gnu_m4 => $has_gnu_m4);
     $Configure::Step::result = $has_gnu_m4 ? 'yes' : 'no';
 }
 

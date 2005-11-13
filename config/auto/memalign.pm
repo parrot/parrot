@@ -25,28 +25,28 @@ sub runstep {
     my ($miniparrot, $verbose) = @_;
 
     if ($miniparrot) {
-        Configure::Data->set(memalign => '');
+        Parrot::Configure::Data->set(memalign => '');
 	print "(skipped) " if $verbose;
 	return;
     }
 
-    if (defined Configure::Data->get('memalign')) {
+    if (defined Parrot::Configure::Data->get('memalign')) {
 		return; # already set; leave it alone
 	}
     my $test = 0;
 
-    if (Configure::Data->get('i_malloc')) {
-	Configure::Data->set('malloc_header', 'malloc.h');
+    if (Parrot::Configure::Data->get('i_malloc')) {
+	Parrot::Configure::Data->set('malloc_header', 'malloc.h');
     }
     else {
-	Configure::Data->set('malloc_header', 'stdlib.h');
+	Parrot::Configure::Data->set('malloc_header', 'stdlib.h');
     }
 
-    if (Configure::Data->get('ptrsize') == Configure::Data->get('intsize')) {
-       Configure::Data->set('ptrcast','int');
+    if (Parrot::Configure::Data->get('ptrsize') == Parrot::Configure::Data->get('intsize')) {
+       Parrot::Configure::Data->set('ptrcast','int');
       }
     else {
-       Configure::Data->set('ptrcast','long');
+       Parrot::Configure::Data->set('ptrcast','long');
       }
 
     cc_gen('config/auto/memalign/test_c.in');
@@ -65,11 +65,11 @@ sub runstep {
     }
     cc_clean();
 
-    Configure::Data->set('malloc_header', undef);
+    Parrot::Configure::Data->set('malloc_header', undef);
 
     my $f = $test2 ? 'posix_memalign' :
             $test  ? 'memalign'       : '';
-    Configure::Data->set( memalign => $f );
+    Parrot::Configure::Data->set( memalign => $f );
     print($test ? " (Yep:$f) " : " (no) ") if $verbose;
     $Configure::Step::result = $test ? 'yes' : 'no';
 }

@@ -28,10 +28,10 @@ sub runstep {
     @args{@args}=@_;
 
     # undef means we don't have bison... default to not having bison
-    Configure::Data->set(bison_version => undef);
+    Parrot::Configure::Data->set(bison_version => undef);
 
     unless ($args{maintainer}) {
-        Configure::Data->set( $util => 'echo' );
+        Parrot::Configure::Data->set( $util => 'echo' );
         $Configure::Step::result = 'skipped';
         return undef;
     }
@@ -45,7 +45,7 @@ sub runstep {
     # never override the user.  If a non-existent program is specified then
     # the user is responsible for the consequences.
     if (defined $prog) {
-        Configure::Data->set($util => $prog);
+        Parrot::Configure::Data->set($util => $prog);
         $Configure::Step::result = 'yes';
         return undef;
     }
@@ -59,7 +59,7 @@ sub runstep {
     }
 
     if ($args{ask}) {
-        $prog = prompt($prompt, $prog ? $prog : Configure::Data->get($util));
+        $prog = prompt($prompt, $prog ? $prog : Parrot::Configure::Data->get($util));
     }
 
     my ($stdout, $stderr, $ret) = capture_output($prog, '--version');
@@ -75,10 +75,10 @@ sub runstep {
     # if '--version' returns a string assume that this is bison.
     # if this is bison pretending to be yacc '--version' doesn't work
     if ($stdout =~ /Bison .*? (\d+) \. (\d+) (\w)? /x) {
-        Configure::Data->set(bison_version => $3 ? "$1.$2$3" : "$1.$2");
+        Parrot::Configure::Data->set(bison_version => $3 ? "$1.$2$3" : "$1.$2");
     }
 
-    Configure::Data->set($util => $prog);
+    Parrot::Configure::Data->set($util => $prog);
     $Configure::Step::result = 'yes';
 }
 

@@ -28,17 +28,17 @@ sub runstep {
   cc_clean();
 
   if ($res =~ /snprintf/) {
-    Configure::Data->set(
+    Parrot::Configure::Data->set(
       HAS_SNPRINTF => 1,
     );
   }
   if ($res =~ /^C99 snprintf/) {
-    Configure::Data->set(
+    Parrot::Configure::Data->set(
       HAS_C99_SNPRINTF => 1,
     );
   }
   elsif ($res =~ /^old snprintf/) {
-    Configure::Data->set(
+    Parrot::Configure::Data->set(
       HAS_OLD_SNPRINTF => 1,
     );
   }

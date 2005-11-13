@@ -55,9 +55,9 @@ sub runstep {
 
 EOF
 
-  for (sort(Configure::Data->keys())) {
+  for (sort(Parrot::Configure::Data->keys())) {
     next unless /i_(\w+)/;
-    if(Configure::Data->get($_)) {
+    if(Parrot::Configure::Data->get($_)) {
       print HH "#define PARROT_HAS_HEADER_\U$1 1\n"
     }
     else {
@@ -89,9 +89,9 @@ EOF
  */
 
 EOF
-  for (sort(Configure::Data->keys())) {
+  for (sort(Parrot::Configure::Data->keys())) {
     next unless /HAS_(\w+)/;
-    if(Configure::Data->get($_)) {
+    if(Parrot::Configure::Data->get($_)) {
       print HH "#define PARROT_HAS_\U$1 1\n"
     }
   }
@@ -102,10 +102,10 @@ EOF
  */
 
 EOF
-  for (sort(Configure::Data->keys())) {
+  for (sort(Parrot::Configure::Data->keys())) {
     next unless /D_(\w+)/;
     my $val;
-    if ($val=Configure::Data->get($_)) {
+    if ($val=Parrot::Configure::Data->get($_)) {
       print HH "#define PARROT_\U$1 $val\n"
     }
   }

@@ -1,7 +1,7 @@
 # Copyright: 2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
-my $libs = Configure::Data->get('libs');
+my $libs = Parrot::Configure::Data->get('libs');
 
 # get rid of old pthread-stuff, if any
 $libs =~ s/(-lpthreads|-lc_r)\b\s*//g;
@@ -26,7 +26,7 @@ else {
     $libs .= ' -lc_r';
 }
 
-Configure::Data->set(
+Parrot::Configure::Data->set(
     libs => $libs,
     link => 'g++',
 );

@@ -1,7 +1,7 @@
 # Copyright: 2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
-Configure::Data->set(
+Parrot::Configure::Data->set(
   ccflags => qq{/Standard=Relaxed_ANSI/Prefix=All/Obj=.obj/NoList/NOANSI_ALIAS/include="./include"},
   perl    => "MCR $^X",
   exe     => "exe"

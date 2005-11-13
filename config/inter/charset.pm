@@ -60,10 +60,10 @@ END
   }
 
   # build list of libraries for link line in Makefile
-  my $slash = Configure::Data->get('slash');
+  my $slash = Parrot::Configure::Data->get('slash');
   $TEMP_charset_o  =~ s/^| / charset${slash}/g;
 
-  Configure::Data->set(
+  Parrot::Configure::Data->set(
     charset             => $charset_list,
     TEMP_charset_o           => $TEMP_charset_o,
     TEMP_charset_build       => $TEMP_charset_build,
