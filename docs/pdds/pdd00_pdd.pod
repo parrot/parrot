@@ -104,6 +104,10 @@ Architect.
 
 A quick blurb explaining the purpose of the PDD.
 
+=item SYNOPSIS:
+
+Code snippets showing the semantics of the PDD (if applicable).
+
 =item DESCRIPTION:
 
 A description of the general nature of the PDD and how it relates to Parrot.
