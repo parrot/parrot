@@ -34,10 +34,11 @@ subroutines.
 
 =head1 Parrot calling conventions - CPS
 
-=head2 Explicitely Calling PASM Subroutines
+=head2 Explicitly Calling PASM Subroutines
 
-  newsub $P0, .Sub, _sub_label
-  newsub $P1, .Continuation, ret_addr
+  .const .Sub $P0 = "_sub_label" 
+  $P1 = new .Continuation
+  set_addr $P1, ret_addr
   ...
   .local int x
   .local num y
@@ -135,11 +136,6 @@ Declare subroutine being a method.
 Notes:
 
 =over 4
-
-=item * B<newsub>
-
-Currently needs the B<.Class> syntax, i.e. a B<dot> in front of the
-class name.
 
 =item * B<pcc_call>
 
