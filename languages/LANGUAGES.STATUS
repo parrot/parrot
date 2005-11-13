@@ -158,11 +158,11 @@ bf
 
 =item Status
 
- src/packfile.c:2314: failed assertion `ct->constants!=NULL'
+Passes all tests.
 
 =item Last verified with parrot version
 
-Unknown
+0.3.1
 
 =item Location
 
