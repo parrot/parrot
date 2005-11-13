@@ -66,7 +66,8 @@ B<Array>.
 
 A PASM register In, Sn, Nn, Pn, or a IMCC temporary
 register $In, $Sn, $Nn, $Pn, where B<n> consists of digit(s) only.
-The register P5 is explicitly used for exceptions.
+Note: The register P5 is used to hold the exception PMC in exception
+handlers.
 
 =item <var>
 
