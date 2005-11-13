@@ -1319,10 +1319,6 @@ doc_tests :
 mopsbench : test_prep
 	$(PARROT) $(PARROT_ARGS) examples/benchmarks/mops_intval.pasm
 
-# Running the game of live
-lifetest : test_prep
-	$(PARROT) $(PARROT_ARGS) examples/pir/life.pir
-
 
 ###############################################################################
 #
