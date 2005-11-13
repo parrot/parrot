@@ -384,6 +384,7 @@ EOT
 }
 
 $args{debugging} = 1 unless ((exists $args{debugging}) && !$args{debugging});
+$args{maintainer} = 1 if defined $args{lex} or defined $args{yacc};
 
 print <<"END";
 Parrot Version $parrot_version Configure 2.0
