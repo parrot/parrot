@@ -1215,10 +1215,14 @@ string:
 %%
 
 
+/* XXX how to get an Interp* here */
 int yyerror(char * s)
 {
-    /* XXX */
-    IMCC_fataly(NULL, E_SyntaxError, s);
+    /* support bison 1.75, convert 'parse error to syntax error' */
+    if (!memcmp(s, "parse", 5))
+        IMCC_fataly(NULL, E_SyntaxError, "syntax%s", s+5);
+    else
+        IMCC_fataly(NULL, E_SyntaxError, s);
     /* fprintf(stderr, "last token = [%s]\n", yylval.s); */
     return 0;
 }

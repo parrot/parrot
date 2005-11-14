@@ -288,7 +288,7 @@ Jabberwocky
     print $S0
 .end
 CODE
-/^error:imcc:parse error, unexpected SHIFT_LEFT.*/
+/^error:imcc:syntax error, unexpected SHIFT_LEFT.*/
 OUT
 
 
@@ -304,7 +304,7 @@ Jabberwocky
     print $S0
 .end
 CODE
-/^error:imcc:parse error, unexpected SHIFT_LEFT.*/
+/^error:imcc:syntax error, unexpected SHIFT_LEFT.*/
 OUT
 
 
@@ -319,7 +319,7 @@ Came whiffling through the tulgey wood,
     print $S0
 .end
 CODE
-/^error:imcc:parse error, unexpected SHIFT_LEFT.*/
+/^error:imcc:syntax error, unexpected SHIFT_LEFT.*/
 OUT
 
 
@@ -335,7 +335,7 @@ terminator with spaces
     print $S0
 .end
 CODE
-/^error:imcc:parse error, unexpected SHIFT_LEFT.*/
+/^error:imcc:syntax error, unexpected SHIFT_LEFT.*/
 OUT
 
 
@@ -396,7 +396,7 @@ e_e_cummings
     print $S0
 .end
 CODE
-/^error:imcc:parse error, unexpected SHIFT_LEFT.*/
+/^error:imcc:syntax error, unexpected SHIFT_LEFT.*/
 OUT
 
 
