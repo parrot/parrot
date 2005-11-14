@@ -16,7 +16,7 @@ Tests various lexical scratchpad operations.
 
 =cut
 
-use Parrot::Test tests => 33;
+use Parrot::Test tests => 34;
 
 output_is(<<'CODE', <<'OUTPUT', '.lex parsing - PASM');
 .pcc_sub main:
@@ -379,6 +379,145 @@ CODE
 23
 11
 27
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', 'closure 4');
+# code by Piers Cawley
+=pod
+
+  ;;; Indicate that the computation has failed, and that the program
+  ;;; should try another path.  We rebind this variable as needed.
+  (define fail
+    (lambda () (error "Program failed")))
+
+  ;;; Choose an arbitrary value and return it, with backtracking.
+  ;;; You are not expected to understand this.
+  (define (choose . all-choices)
+    (let ((old-fail fail))
+      (call-with-current-continuation
+       (lambda (continuation)
+         (define (try choices)
+           (if (null? choices)
+               (begin
+                 (set! fail old-fail)
+                 (fail))
+               (begin
+                 (set! fail
+                      (lambda () (continuation (try (cdr choices)))))
+                 (car choices))))
+         (try all-choices)))))
+
+  ;;; Find two numbers with a product of 15.
+  (let ((x (choose 1 3 5))
+        (y (choose 1 5 9)))
+    (for-each display `("Trying " ,x " and " ,y #\newline))
+    (unless (= (* x y) 15)
+      (fail))
+    (for-each display `("Found " ,x " * " ,y " = 15" #\newline)))
+
+=cut
+
+.sub main :main
+     .local pmc fail, arr1, arr2, x, y, choose
+     .lex 'fail', fail
+     .lex 'arr1', arr1
+     .lex 'arr2', arr2
+     .lex 'x', x
+     .lex 'y', y
+     .lex 'choose', choose
+     .const .Sub choose_sub = "_choose"
+     .const .Sub fail_sub = "_fail"
+     fail = newclosure fail_sub
+     arr1 = new PerlArray
+     arr1[0] = 1
+     arr1[1] = 3
+     arr1[2] = 5
+     arr2 = new PerlArray
+     arr2[0] = 1
+     arr2[1] = 5
+     arr2[2] = 9
+
+     choose = newclosure choose_sub
+     x = choose(arr1)
+     #print "Chosen "
+     #print x
+     #print " from arr1\n"
+
+     # need to create a new closure: these closures have different state
+     choose = newclosure choose_sub
+     y = choose(arr2)
+     #print "Chosen "
+     #print y
+     #print " from arr2\n"
+     $I1 = x
+     $I2 = y
+     $I0 = $I1 * $I2
+     if $I0 == 15 goto success
+     fail()
+     print "Shouldn't get here without a failure report\n"
+     branch the_end
+success:
+     print x
+     print " * "
+     print y
+     print " == 15!\n"
+the_end:
+     end
+.end
+
+.sub _choose :outer(main)
+     .param PerlArray choices
+     .local pmc our_try, old_fail, cc, try
+     .lex 'old_fail', old_fail
+     .lex 'cc', cc
+     .lex 'try', try
+     #print "In choose\n"
+     old_fail = find_lex "fail"
+     .include "interpinfo.pasm"
+     $P1 = interpinfo .INTERPINFO_CURRENT_CONT
+     store_lex  "cc", $P1
+     .const .Sub tr_sub = "_try"
+     newclosure our_try, tr_sub
+     store_lex "try", our_try
+     $P2 = our_try(choices)
+     .return($P2)
+.end
+
+.sub _try :outer(_choose)
+     .param PerlArray choices
+     .lex 'choices', $P0
+     #print "In try\n"
+     clone $P0, choices
+     if choices goto have_choices
+     $P1 = find_lex "old_fail"
+     store_lex "fail", $P1
+     $P1()
+have_choices:
+     .const .Sub f = "new_fail"
+     newclosure $P2, f
+     store_lex "fail", $P2
+     $P3 = find_lex "choices"
+     shift $P4, $P3
+
+     .return($P4)
+.end
+
+.sub new_fail :outer(_try)
+     .local pmc our_try
+     .local pmc our_cc
+     #print "In new_fail\n"
+     our_cc = find_lex "cc"
+     our_try = find_lex "try"
+     $P2 = find_lex "choices"
+     $P3 = our_try($P2)
+     our_cc($P3)
+.end
+
+.sub _fail
+     print "Program failed\n"
+.end
+CODE
+3 * 5 == 15!
 OUTPUT
 
 pir_output_like(<<'CODE', <<'OUTPUT', 'get non existing');

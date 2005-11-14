@@ -436,7 +436,7 @@ Parrot_find_pad(Interp* interpreter, STRING *lex_name)
         lex_pad = ctx->lex_pad;
         if (PMC_IS_NULL(lex_pad))
             return NULL;
-        sub = PMC_sub(sub)->outer_sub;
+        sub = ctx->current_sub;
     }
     return NULL;
 }
