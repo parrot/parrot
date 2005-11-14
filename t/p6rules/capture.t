@@ -38,6 +38,18 @@ p6rule_like('abcd', '(a(b(c))(d))', qr/mob 0 0: <bc @ 1>/, 'nested match');
 p6rule_like('abcd', '(a(b(c))(d))', qr/mob 0 0 0: <c @ 2>/, 'nested match');
 p6rule_like('abcd', '(a(b(c))(d))', qr/mob 0 1: <d @ 3>/, 'nested match');
 
+p6rule_like('abcd', '((\w+)+)', qr/mob: <abcd @ 0>/, 'nested match');
+p6rule_like('abcd', '((\w+)+)', qr/mob 0: <abcd @ 0>/, 'nested match');
+p6rule_like('abcd', '((\w+)+)', qr/mob 0 0: <abcd @ 0>/, 'nested match', todo => 'specification not clear');
+
+{
+	my $long_string = join('', 'A'..'Z', 'a'..'z') for 1..10;
+	p6rule_like($long_string, '((\w+)+)', qr/mob: <\w+ @ 0>/, 'nested match', todo => 'failing on long strings');
+	p6rule_like($long_string, '((\w+)+)', qr/mob 0: <\w+ @ 0>/, 'nested match', todo => 'failing on long strings');
+	p6rule_like($long_string, '((\w+)+)', qr/mob 0 0: <\w+ @ 0>/, 'nested match', todo => 'failing on long strings, specification unclear');
+}
+
+
 p6rule_like('abcdefg', '(a) [ (bc) (d) | .* (ef) ] .* (g)',
             qr/mob 0: <a @ 0>/, 'alt subpattern before group');
 p6rule_like('abcdefg', '(a) [ (bc) (d) | .* (ef) ] .* (g)',
@@ -102,5 +114,5 @@ p6rule_like('123x', '(.)*x',
             qr/mob: <123x @ 0>/, 'repeated dot capture');
 
 
-# remember to change the number of test :-)
-BEGIN { plan tests => 38; }
+# remember to change the number of tests :-)
+BEGIN { plan tests => 44; }
