@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-config/init/data.pl - Configuration Defaults
+config/init/defaults.pm - Configuration Defaults
 
 =head1 DESCRIPTION
 
