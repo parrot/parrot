@@ -29,6 +29,7 @@ use Carp;
 use File::Basename qw( basename );
 use File::Copy ();
 use File::Spec;
+use File::Which;
 
 use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 
@@ -487,22 +488,16 @@ sub check_progs {
 
     print "checking for program: ", join(" or ", @$progs), "\n" if $verbose;
     foreach my $prog (@$progs) {
-        # try relative path first in case it's not in the path
-        return $prog if -x $prog;
-
-        my $util = basename($prog);
+        my $util = $prog;
         # use the first word in the string to ignore any options
         ($util) = $util =~ /(\w+)/;
-        foreach my $dir (File::Spec->path) {
-            my $path = File::Spec->catfile($dir, $util);
+        my $path = which($util);
 
-            if ($verbose) {
-                print "trying: $path\n";
-                print "$path is executable\n" if -x $path;
-            }
-
-            return $prog if -x $path;
+        if ($verbose) {
+            print "$path is executable\n" if $path;
         }
+
+        return $prog if $path;
     }
 
     return;
