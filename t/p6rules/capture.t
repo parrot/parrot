@@ -43,10 +43,10 @@ p6rule_like('abcd', '((\w+)+)', qr/mob 0: <abcd @ 0>/, 'nested match');
 p6rule_like('abcd', '((\w+)+)', qr/mob 0 0: <abcd @ 0>/, 'nested match', todo => 'specification not clear');
 
 {
-	my $long_string = join('', 'A'..'Z', 'a'..'z') for 1..10;
-	p6rule_like($long_string, '((\w+)+)', qr/mob: <\w+ @ 0>/, 'nested match', todo => 'failing on long strings');
-	p6rule_like($long_string, '((\w+)+)', qr/mob 0: <\w+ @ 0>/, 'nested match', todo => 'failing on long strings');
-	p6rule_like($long_string, '((\w+)+)', qr/mob 0 0: <\w+ @ 0>/, 'nested match', todo => 'failing on long strings, specification unclear');
+	my $long_string; $long_string .= join('', 'A'..'Z', 'a'..'z') for 1..10;
+	p6rule_like($long_string, '((\w+)+)', qr/mob: <\w+ @ 0>/, 'nested match');
+	p6rule_like($long_string, '((\w+)+)', qr/mob 0: <\w+ @ 0>/, 'nested match');
+	p6rule_like($long_string, '((\w+)+)', qr/mob 0 0: <\w+ @ 0>/, 'nested match', todo => 'specification unclear');
 }
 
 
