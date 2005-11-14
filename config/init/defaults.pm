@@ -16,6 +16,8 @@ package Configure::Step;
 use strict;
 use vars qw($description @args);
 
+use Config;
+use FindBin; # see build_dir
 use Parrot::Configure::Data;
 use Parrot::Configure::Step;
 
@@ -26,11 +28,7 @@ $description="Setting up Configure's default values...";
 sub runstep {
     my ($debugging, $optimize, $profile,  $verbose, $prefix) = @_;
 
-    use Config;
-    use FindBin; # see build_dir
-
     # We need a Glossary somewhere!
-
     Parrot::Configure::Data->set(
         debugging     => $debugging ? 1 : 0,
         # A plain --optimize means use perl5's $Config{optimize}.  If an
