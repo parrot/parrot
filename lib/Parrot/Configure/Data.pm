@@ -32,6 +32,7 @@ Return value or hash slice for key.
 
 sub get {
     my $self = shift;
+
     return @c{@_};
 }
 
@@ -44,22 +45,25 @@ Set config values
 sub set {
     my $self = shift;
 
-    my $verbose = $c{verbose} && $c{verbose} == 2;
-    return unless (defined ($_[0]));
-    print "Setting Configuration Data:\n(\n" if ($verbose);
+    my $verbose = defined $self->get('verbose') && $self->get('verbose') == 2;
+
+    print "Setting Configuration Data:\n(\n" if $verbose;
+
     while (my ($key, $val) = splice @_, 0, 2) {
         print "\t$key => ", defined($val) ? "'$val'" : 'undef', ",\n"
-	        if ($verbose);
+	        if $verbose;
         $c{$key}=$val;
+
         if (defined $self->gettrigger($key)) {
             while (my ($trigger, $cb) = each %{$self->gettriggers($key)}) {
                 print "\tcalling trigger $trigger for $key\n" if $verbose;
+
                 &$cb($key, $val);
             }
 	    }
     }
 
-    print ");\n" if ($verbose);
+    print ");\n" if $verbose;
 }
 
 =item Parrot::Configure::Data->add($delim, $key,$val, ...)
@@ -69,7 +73,7 @@ Append values delimited by C<$delim> to existing keys or set values.
 =cut
 
 sub add {
-    my ($self, $delim) = (shift, shift);
+    my ($self, $delim) = @_;
 
     while (my ($key, $val) = splice @_, 0, 2) {
         my ($old) = $c{$key};
@@ -143,10 +147,13 @@ key and value that was set after it has been changed.
 
 sub settrigger {
     my ($self, $var, $trigger, $cb) = @_;
+
+    my $verbose = defined $self->get('verbose') && $self->get('verbose') == 2;
+
     if (defined $cb) {
-        if (defined $self->get('verbose') and $self->get('verbose') == 2) {
-            print "Setting trigger $trigger on configuration key $var\n";
-        }
+        print "Setting trigger $trigger on configuration key $var\n"
+            if $verbose;
+
         $triggers{$var}{$trigger} = $cb;
     }
 }
@@ -159,6 +166,7 @@ Get the names of all triggers set for C<$key>.
 
 sub gettriggers {
     my ($self, $key) = @_;
+
     return CORE::keys %{$triggers{$key}};
 }
 
@@ -170,7 +178,8 @@ Get the callback set for C<$key> under the name C<$trigger>
 
 sub gettrigger {
     my ($self, $key, $t) = @_;
-    return undef if !defined $triggers{$key} or !defined $triggers{$key}{$t};
+
+    return unless defined $triggers{$key} and defined $triggers{$key}{$t};
     return $triggers{$key}{$t};
 }
 
@@ -182,11 +191,16 @@ Removes the trigger on C<$key> named by C<$trigger>
 
 sub deltrigger {
     my ($self, $var, $t) = @_;
-    return if !defined $triggers{$var} or !defined $triggers{$var}{$t};
+
+    my $verbose = defined $self->get('verbose') && $self->get('verbose') == 2;
+
+    return unless defined $triggers{$var} and defined $triggers{$var}{$t};
+
+    print "Removing trigger $t on configuration key $var\n"
+        if $verbose;
+
     delete $triggers{$var}{$t};
-    if (defined $self->get('verbose') and $self->get('verbose') == 2) {
-        print "Removing trigger $t on configuration key $var\n";
-    }
+
 }
 
 =back
