@@ -4,7 +4,7 @@
 #  parrot -o regex-compiler.pbc regex-compiler.imc
 #
 
-.sub main @MAIN
+.sub main :main
         .local pmc match
         .local pmc compile_regex
         .local pmc regex1

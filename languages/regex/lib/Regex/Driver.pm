@@ -123,8 +123,7 @@ sub output_header {
     .local int matched
     .local pmc stack
     stack = new PerlArray
-    regex_sub = newsub _default
-    result = regex_sub(1, input_string, 0, stack)
+    result = _default(1, input_string, 0, stack)
     matched = result["!RESULT"]
     if matched goto printResults
 
