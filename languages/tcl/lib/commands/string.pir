@@ -180,9 +180,8 @@ match_next:
   the_string = argv[1]
   unless nocase goto match_continue
   pattern    = downcase pattern
-  # XXX PGE::Glob Can't deal with non-ascii rules ATM.
-  $I0 = find_charset 'ascii'
-  trans_charset pattern, $I0
+  $I0 = find_encoding 'utf8'
+  trans_encoding pattern, $I0
   the_string = downcase the_string
 
 match_continue:
