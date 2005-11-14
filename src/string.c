@@ -2397,6 +2397,15 @@ string_unescape_cstring(Interp * interpreter,
             internal_exception(UNIMPLEMENTED,
                     "Can't make '%s' charset strings", p + 1);
         }
+        /*
+         * XXX this is just wrong
+         *     we still need to unescape the string, then verify
+         *     that it is valid in the passed in encoding
+         *     then append the bytes w/o further processing to
+         *     the string buffer
+         *
+         * that is currently just fixed_8 encodings are correct    
+         */
         result = string_make_direct(interpreter, cstring, clength,
                 encoding, charset, flags);
         string_compute_strlen(interpreter, result);

@@ -612,7 +612,29 @@ Finish thawing.
 
     void visit(visit_info *info) {
         PMC **pos;
-        /* 1. HLL_info */
+        /*
+         * the information frozen here is part of all PBCs
+         * we probably need to freeze all dynamic extensible
+         * mappings (or at least the dynamic part)
+         * e.g.
+         *    charsets   idx - name
+         *    encodings  idx - name
+         *    pmc types  idx - name
+         *    dynamic oplibs    opcode nr - opname
+         *
+         * The machine thawing this info still needs to load
+         * these extensions, but the order of loading could be
+         * relaxed.   
+         * 
+         * creating all these info as standard PMCs would vastly
+         * simplify this process   
+         *
+         * thaw would then need a merge operation:
+         *  - compare existing for sanity
+         *  - extend new     
+         */
+
+        /*  HLL_info */
         pos = &INTERP->HLL_info;
         info->thaw_ptr = pos;
         /* pass in the existing structure
