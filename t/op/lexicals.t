@@ -16,7 +16,7 @@ Tests various lexical scratchpad operations.
 
 =cut
 
-use Parrot::Test tests => 32;
+use Parrot::Test tests => 33;
 
 output_is(<<'CODE', <<'OUTPUT', '.lex parsing - PASM');
 .pcc_sub main:
@@ -322,6 +322,63 @@ main_a
 foo_b
 ex_main_a
 ex_main_a
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', 'closure 3');
+# sub foo {
+#     my ($n) = @_;
+#     sub {$n += shift}
+# }
+# my $f = foo(5);
+# print &$f(3), "\n";
+# my $g = foo(20);
+# print &$g(3), "\n";
+# print &$f(3), "\n";
+# print &$g(4), "\n";
+
+.sub foo
+    .param pmc arg
+    .local pmc n
+    .lex '$n', n
+    n = arg
+    .const .Sub anon = "anon"
+    $P0 = newclosure anon
+    .return ($P0)
+.end
+
+.sub anon :outer(foo)
+    .param pmc arg
+    $P0 = find_lex '$n'
+    # in practice we need copying the arg but as it is passed
+    # as native int, we already have a fresh pmc
+    $P0 += arg
+    .return ($P0)
+.end
+
+.sub main :main
+    .local pmc f, g
+    .lex '$f', f
+    .lex '$g', g
+    f = foo(5)
+    $P0 = f(3)
+    print $P0
+    print "\n"
+    g = foo(20)
+    $P0 = g(3)
+    print $P0
+    print "\n"
+    $P0 = f(3)
+    print $P0
+    print "\n"
+    $P0 = g(4)
+    print $P0
+    print "\n"
+.end
+CODE
+8
+23
+11
+27
 OUTPUT
 
 pir_output_like(<<'CODE', <<'OUTPUT', 'get non existing');

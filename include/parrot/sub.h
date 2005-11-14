@@ -65,6 +65,7 @@ typedef struct Parrot_sub {
     PMC      *lex_info;         /* LexInfo PMC */
     PMC      *outer_sub;        /* :outer for closures */
     PMC      *eval_pmc;         /* eval container / NULL */
+    parrot_context_t *outer_ctx;       /* new style */
 
     /* - end common */
 
@@ -91,10 +92,10 @@ typedef struct Parrot_coro {
     PMC      *lex_info;         /* LexInfo PMC */
     PMC      *outer_sub;        /* :outer for closures */
     PMC      *eval_pmc;         /* eval container / NULL */
+    struct Parrot_Context  *ctx;          /* coroutine context */
 
     /* - end common */
 
-    struct Parrot_Context  *ctx;          /* coroutine context */
     struct PackFile_ByteCode *caller_seg;  /* bytecode segment */
 } * parrot_coro_t;
 
@@ -141,6 +142,7 @@ int Parrot_Context_info(Interp *interpreter, parrot_context_t *, struct Parrot_C
 STRING* Parrot_Context_infostr(Interp *interpreter, parrot_context_t *);
 
 PMC* Parrot_find_pad(Interp*, STRING *lex_name);
+PMC* parrot_new_closure(Interp*, PMC*);
 
 #endif /* PARROT_SUB_H_GUARD */
 

@@ -365,6 +365,8 @@ create_ctx:
                         enum_class_LexPad),
                     sub->lex_info);
             VTABLE_set_pointer(INTERP, context->lex_pad, context);
+            if (!sub->outer_ctx)
+                 sub->outer_ctx = caller_ctx;
         }
         /* switch code segment if needed */
         if (INTERP->code != sub->seg) {

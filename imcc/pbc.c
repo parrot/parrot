@@ -693,9 +693,13 @@ create_lexinfo(Interp *interpreter, IMC_Unit *unit, PMC *sub)
                 lex_name = constants[k]->u.string;
                 assert(PObj_is_string_TEST(lex_name));
                 (decl_func)(interpreter,
-                        lex_info, lex_name, r->color);
+                            lex_info, lex_name, r->color);
             }
         }
+    }
+    if (!lex_info && unit->outer) {
+        lex_info = pmc_new_noinit(interpreter, lex_info_id);
+        VTABLE_init_pmc(interpreter, lex_info, sub);
     }
     return lex_info;
 }

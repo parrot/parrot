@@ -39,7 +39,8 @@ mark_context(Interp* interpreter, parrot_context_t* ctx)
     PObj *obj;
     int i;
 
-    mark_stack(interpreter, ctx->pad_stack);
+    if (ctx->pad_stack)
+        mark_stack(interpreter, ctx->pad_stack);
     mark_stack(interpreter, ctx->user_stack);
     mark_stack(interpreter, ctx->control_stack);
     mark_register_stack(interpreter, ctx->reg_stack);
@@ -418,7 +419,7 @@ Parrot_find_pad(Interp* interpreter, STRING *lex_name)
 {
     PMC *lex_pad;
     parrot_context_t *ctx;
-    PMC *result, *sub, *caller, *cont;
+    PMC *result, *sub;
 
     ctx = CONTEXT(interpreter->ctx);;
     lex_pad = ctx->lex_pad;
@@ -429,28 +430,53 @@ Parrot_find_pad(Interp* interpreter, STRING *lex_name)
         result = VTABLE_get_pmc_keyed_str(interpreter, lex_pad, lex_name);
         if (result)
             return lex_pad;
-        sub = PMC_sub(sub)->outer_sub;
-        /*
-         * locate outer in call chain
-         */
-        while (1) {
-            cont = ctx->current_cont;
-            if (!cont)
-                return NULL;
-            ctx = PMC_cont(cont)->to_ctx;
-            if (!ctx)
-                return NULL;
-            caller = ctx->current_sub;
-            if (caller == sub)
-                break;
-        }
+        ctx = PMC_sub(sub)->outer_ctx;
+        if (!ctx)
+            return NULL;
         lex_pad = ctx->lex_pad;
         if (PMC_IS_NULL(lex_pad))
             return NULL;
+        sub = PMC_sub(sub)->outer_sub;
     }
     return NULL;
 }
 
+PMC*
+parrot_new_closure(Interp *interpreter, PMC *sub_pmc)
+{
+    PMC *clos_pmc;
+    struct Parrot_sub *clos, *sub;
+    PMC *pad, *cont;
+    parrot_context_t *ctx;
+
+    clos_pmc = VTABLE_clone(interpreter, sub_pmc);
+    clos_pmc->vtable = Parrot_base_vtables[enum_class_Closure];
+    sub = PMC_sub(sub_pmc);
+    clos = PMC_sub(clos_pmc);
+    if (!PMC_IS_NULL(sub->lex_info)) {
+        /* new style closures */
+        ctx = CONTEXT(interpreter->ctx);
+        cont = ctx->current_cont;
+        /* preserve this frame by converting the continuation */
+        cont->vtable = Parrot_base_vtables[enum_class_Continuation];
+        /* remember this (the :outer) ctx in the closure */
+        clos->outer_ctx = ctx;
+        /* the closure refs now this context too */
+        ctx->ref_count++;
+    }
+    else {
+        /* old scratchpad */
+
+        pad = scratchpad_get_current(interpreter);
+        clos->pad_stack = new_stack(interpreter, "Pad");
+        if (pad) {
+            /* put the correct pad in place */
+            stack_push(interpreter, &clos->pad_stack, pad,
+                    STACK_ENTRY_PMC, STACK_CLEANUP_NULL);
+        }
+    }
+    return clos_pmc;
+}
 /*
 
 =back
