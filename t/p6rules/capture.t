@@ -40,13 +40,13 @@ p6rule_like('abcd', '(a(b(c))(d))', qr/mob 0 1: <d @ 3>/, 'nested match');
 
 p6rule_like('abcd', '((\w+)+)', qr/mob: <abcd @ 0>/, 'nested match');
 p6rule_like('abcd', '((\w+)+)', qr/mob 0: <abcd @ 0>/, 'nested match');
-p6rule_like('abcd', '((\w+)+)', qr/mob 0 0: <abcd @ 0>/, 'nested match', todo => 'specification not clear');
+p6rule_like('abcd', '((\w+)+)', qr/mob 0 0 0: <abcd @ 0>/, 'nested match');
 
 {
 	my $long_string; $long_string .= join('', 'A'..'Z', 'a'..'z') for 1..10;
 	p6rule_like($long_string, '((\w+)+)', qr/mob: <\w+ @ 0>/, 'nested match');
 	p6rule_like($long_string, '((\w+)+)', qr/mob 0: <\w+ @ 0>/, 'nested match');
-	p6rule_like($long_string, '((\w+)+)', qr/mob 0 0: <\w+ @ 0>/, 'nested match', todo => 'specification unclear');
+	p6rule_like($long_string, '((\w+)+)', qr/mob 0 0 0: <\w+ @ 0>/, 'nested match');
 }
 
 
