@@ -139,6 +139,8 @@ won't be a problem, but is the use of the start parameter thread-safe?
     .param string str
     $P0 = find_global "Data::Escape", "String"
     str = $P0(str, '"')
+    $I0 = find_charset "ascii"
+    trans_charset str, $I0
     str = concat '"', str
     str = concat str, '"'
     $I0 = index str, "\\x"
