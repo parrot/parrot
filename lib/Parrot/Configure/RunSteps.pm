@@ -28,7 +28,7 @@ use Parrot::Configure::Data;
 # EDIT HERE TO ADD NEW TESTS
 @steps = qw(
     init/manifest.pm
-    init/data.pm
+    init/defaults.pm
     init/miniparrot.pm
     init/hints.pm
     init/headers.pm
