@@ -436,6 +436,11 @@ Parrot_find_pad(Interp* interpreter, STRING *lex_name)
         lex_pad = ctx->lex_pad;
         if (PMC_IS_NULL(lex_pad))
             return NULL;
+        /*
+         * can't use outer_sub - we need the dynamic context
+         * where registers are, not a possibly different static
+         * instance of the closure
+         */
         sub = ctx->current_sub;
     }
     return NULL;

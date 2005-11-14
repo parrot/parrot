@@ -358,13 +358,19 @@ create_ctx:
             INTERP->current_method = NULL;
         }
         context->current_HLL = sub->HLL_id;
-        /* create pad if needed */
+        /* create pad if needed
+         * TODO move this up in front of argument passing
+         *      and factor out common code with coroutine pmc
+         */
         if (!PMC_IS_NULL(sub->lex_info)) {
             context->lex_pad = pmc_new_init(INTERP,
                     Parrot_get_ctx_HLL_type(interpreter,
                         enum_class_LexPad),
                     sub->lex_info);
             VTABLE_set_pointer(INTERP, context->lex_pad, context);
+            /*
+             * if this isn't a closure, outer is our calloer
+             */
             if (!sub->outer_ctx)
                  sub->outer_ctx = caller_ctx;
         }
