@@ -745,13 +745,13 @@ abcdefghi\n
 OUTPUT
 
 output_is( <<'CODE', <<'OUTPUT', "escape ctrl" );
-    set S0, "\a\b\t\n\v"
+    set S0, "\x00\x01\x1f"
     escape S1, S0
     print S1
     print "\n"
     end
 CODE
-\a\b\t\n\v
+\x00\x01\x1f
 OUTPUT
 
 output_is( <<'CODE', <<'OUTPUT', "escape latin1");

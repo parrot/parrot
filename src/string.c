@@ -2442,7 +2442,8 @@ string_escape_string_delimited(Interp * interpreter,
             result = string_append(interpreter, result, hex, 0);
             i += hex->strlen;
         }
-        else if (c >= 0x80) {
+        else if (c >= 0x7f) {
+esc_hex:
             result->bufused = result->strlen = i;
             hex = Parrot_sprintf_c(interpreter, "\\x%02x", c);
             result = string_append(interpreter, result, hex, 0);
@@ -2482,6 +2483,9 @@ string_escape_string_delimited(Interp * interpreter,
                     dp[i++] = '\\';
                     c = '"';
                     break;
+                default:
+                    if (c < 32)
+                        goto esc_hex;
             }
             dp[i++] = c;
         }
