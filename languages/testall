@@ -79,7 +79,6 @@ my $html = grep { $_ eq '--html' } @ARGV;
 # parakeet             No t/harness
 # perl6                t/harness has no --files
 # python               needs testing
-# regex                No t/harness
 # ruby                 No t/harness
 
 
@@ -93,8 +92,10 @@ my @unified_testable_languages =
        parrot_compiler
        punie
        scheme
+       regex
        tcl
        urm );
+# @unified_testable_languages = qw( regex );
 
 my @harnesses =
     grep {-f $_}

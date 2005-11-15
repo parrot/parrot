@@ -27,8 +27,9 @@ sub usage {
     print <<"END";
 Usage: $0 [-c|--compile] [--language=LANGUAGE] [--optimize=PASSES|--nooptimize] <filename>
 
-  Test files must contain a single regular expression on the first
-  line. Next there should be any number of pairs of INPUT and OUTPUT
+  Test files are Perl5 source files which must contain a __END__ section.
+  Right after the __END__ there must be a single regular expression.
+  Next there should be any number of pairs of INPUT and OUTPUT
   sections, where an INPUT: section begins with the string 'INPUT:' on
   a line by itself, followed by some data and a newline. (The newline
   is not regarded as part of the data, so add an extra one if you want
@@ -36,6 +37,7 @@ Usage: $0 [-c|--compile] [--language=LANGUAGE] [--optimize=PASSES|--nooptimize] 
 
   Example:
 
+__END__
 (a*a|(aaa))a
 INPUT:
 xxxxxxxxaaabb

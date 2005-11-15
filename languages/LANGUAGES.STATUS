@@ -682,7 +682,8 @@ regex
 
 =item Status
 
-Working but fairly minimal
+Working but fairly minimal.
+Part of languages smoke testing, a lot of tests failing.
 
 =item Last verified with parrot version
 
