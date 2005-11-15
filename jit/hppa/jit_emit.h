@@ -698,7 +698,7 @@ hppa_sync_cache (void *_start, void *_end)
     long size = (((long)_end) - ((long)_start));
     __asm__ __volatile__ ("fdc %0, %1":: "r" ((long)_start),
         "r" (size));
-    _asm__ __volatile__ ("sync");
+    __asm__ __volatile__ ("sync");
 }
 
 #  endif
