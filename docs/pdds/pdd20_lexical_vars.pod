@@ -54,57 +54,54 @@ lexically scoped variables.
 
 =head1 DESCRIPTION
 
-"Lexical scoping" (a.k.a. "static scoping") is a term with many
-explanations and examples across computer science.  (And I'm sure
-I've only seen a fraction of them.)
-
-For Parrot purposes, "lexical variables" are those stored in a hash
-(or hash-like) PMC associated with a subroutine invocation, a.k.a.
-call frame.
+For Parrot purposes, "lexical variables" are variables stored in a
+hash (or hash-like) PMC associated with a subroutine invocation,
+a.k.a. a call frame.
 
 =head1 CONCEPTUAL MODEL
 
+=head2 LexInfo PMC
+
+LexInfos contain what is known at compile time about lexical variables
+of a given subroutine: their names (for most languages), perhaps their
+types, etc.  They are the interface through which the PIR compiler
+stores and validates compile-time information about lexical variables.
+
+At compile time, each newly created Subroutine (or Subroutine
+derivative, e.g. Closure) that uses lexical variables will be
+populated with a PMC of HLL-mapped type LexInfo.  (Note that this type
+may actually be Null in some HLLs, e.g. Tcl.)
+
 =head2 LexPad PMC
 
-Lexicals are stored in PMCs called "LexPads".  The LexPad interface is
-a slight extension of the Hash interface.  Lexical variables are
-conceptually key/value pairs, with string keys and PMC values.
+LexPads hold what becomes known at run time about lexical variables of
+a given invocation of a given subroutine: their values, of course, and
+for some languages (e.g. Tcl) their names.  They are the interface
+through which the Parrot runtime stores and fetches lexical variables.
 
-Each call frame may contain a LexPad, through which the names and
-values of that call's lexical variables can be accessed.
+At run time, each call frame for a Subroutine (or Subroutine
+derivative) that uses lexical variables will be populated with a
+populated with a PMC of HLL-mapped type LexPad.  Note that call frames
+for subroutines without lexical variables will omit the LexPad.
 
-Call frames are not PMCs (yet?) and are therefore not visible to user
-code (yet?).  Therefore, users can access the LexPad for a given call
-frame through any Continuation object that was created for the given
-frame.
-
-However, normal lexical variable usage does not use the LexPad
-directly.  Instead, specialize opcodes implement the common use cases.
-LexPads contain references to their associated LexInfos.
-
-(Specialized opcodes are particular a Good Idea because most lexical
-usage involves searching more than one LexPad, so a single LexPad
-reference is not as useful as it might seem.  And, of coures, opcodes
-can cheat ... er, can be written in optimized C.  :-))
+From the interface perspective, LexPads are basically Hashes, with
+strings as keys and PMCs as values.  They extensd the basic Hash
+interface with specialized initialization (requiring a reference to an
+associated LexInfo) and the query METHOD "get_lexinfo()" (to return it).
 
 LexPad keys are unique.  Therefore, in each subroutine, there can be
 only one lexical variable with a given name.
 
+In the normal use case, LexPads are not exposed to user code (but for
+any special reason; it just worked out that way).  Instead,
+specialized opcodes implement the common use cases.  Specialized
+opcodes are particularly a Good Idea here because most lexical usage
+involves searching more than one LexPad, so a single LexPad reference
+wouldn't be as useful as one might expect.  And, of coures, opcodes
+can cheat ... er, can be written in optimized C.  :-)
+
 TODO: Describe how lexical naming system interacts with non-ASCII
       character sets.
-
-=head2 LexInfo PMC
-
-At compile time, each newly created Subroutine structure (or
-Subroutine derivative, e.g.  Closure) is populated with a PMC of
-HLL-mapped type LexInfo.  (Note that this type may actually be Null in
-some HLLs, e.g. Tcl.)  LexInfo PMCs are the interface through which
-the PIR compiler communicates compile-time information about lexical
-variables.
-
-A LexInfo represents what is known about lexicals at compile time
-(e.g. variable names, perhaps variable types, etc.), while a LexPad
-represents what becomes known at run time (values).
 
 =head2 Lookup strategy
 
@@ -121,7 +118,7 @@ loops through these steps:
      (NOTE: The first time through, $sub is the current subroutine
             and $frame is the currently live frame.)
 
-  2. Look for $var in $frame.lexicals using standard Hash methods.
+  2. Look for $var in $frame.get_lexpad using standard Hash methods.
 
   3. If the given pad contains $var, fetch/store it and
      REPORT SUCCESS.
@@ -213,15 +210,15 @@ but if it is, the given HLL should not generate any ".lex*" directives.
 
 =over 4
 
-=item void init_pmc(PMC *sub)
+=item B<void init_pmc(PMC *sub)>
 
 Called exactly once.
 
-=item PMC *sub()
+=item B<PMC *get_sub()>
 
 Return the associated Subroutine.
 
-=item void declare_lex_preg(STRING *name, INTVAL preg)
+=item B<void declare_lex_preg(STRING *name, INTVAL preg)>
 
 Declare a lexical variable that is an alias for a PMC register.  The
 PIR compiler calls this method in response to a C<.lex STRING, PREG>
@@ -251,14 +248,14 @@ In addition, LexPads must implement the following methods:
 
 =over 4
 
-=item init_pmc(PMC *lexinfo)
+=item B<void init_pmc(PMC *lexinfo)>
 
 Called exactly once.  Note that Parrot guarantees that this method
 will be called after the new Context object is made current.  It is
 recommended that any LexPad that aliases registers take a pointer to
 the current Context at init_pmc() time.
 
-=item PMC *lexinfo()
+=item B<PMC *get_lexinfo()>
 
 Return the associated LexInfo.
 
