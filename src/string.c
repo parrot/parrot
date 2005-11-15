@@ -2388,7 +2388,11 @@ string_hash(Interp * interpreter, STRING *s, size_t seed)
 =item C<STRING *
 string_escape_string(Interp * interpreter, STRING *src)>
 
-Escape all non-ascii chars to backslash sequences.
+Escape all non-ascii chars to backslash sequences. Control chars that 
+C<string_unescape_cstring> can handle are esacped as I<\x>, as well
+as a double quote character. Other control chars and codepoints < 0x100 are
+escaped as I<\xhh>, codepoints up to 0xffff, as I<\uhhhh>, and codepoints
+greater than this as I<\x{hh...hh}>.
 
 =item C<STRING *
 string_escape_string_delimited(Interp * interpreter, STRING *src, UINTVAL len)>
@@ -2432,31 +2436,35 @@ string_escape_string_delimited(Interp * interpreter,
     dp = result->strstart;
     for (i = 0; len; --len) {
         c = iter.get_and_advance(interpreter, &iter);
-        if (i >= charlen - 10) {        /* max \x{123456} */
-            /* resize */
+        if (i >= charlen - 2) {        /* max we append ourselves */
+            /* resize - still len codepoints to go */
             charlen += len * 2 + 16;
             Parrot_reallocate_string(interpreter, result, charlen);
             /* start can change */
             dp = result->strstart;
         }
         if (c >= 0x10000) {
+            /* current string length, so that append works */
             result->bufused = result->strlen = i;
             hex = Parrot_sprintf_c(interpreter, "\\x{%x}", c);
+            /* string_append grows result if necessary */
+append:
             result = string_append(interpreter, result, hex, 0);
+            /* adjust our insert idx */
             i += hex->strlen;
+            /* and usable len */
+            charlen = PObj_buflen(result);
         }
         else if (c >= 0x100) {
             result->bufused = result->strlen = i;
             hex = Parrot_sprintf_c(interpreter, "\\u%04x", c);
-            result = string_append(interpreter, result, hex, 0);
-            i += hex->strlen;
+            goto append;
         }
         else if (c >= 0x7f) {
 esc_hex:
             result->bufused = result->strlen = i;
             hex = Parrot_sprintf_c(interpreter, "\\x%02x", c);
-            result = string_append(interpreter, result, hex, 0);
-            i += hex->strlen;
+            goto append;
         }
         else  {
             switch (c) {
@@ -2483,6 +2491,10 @@ esc_hex:
                 case '\f':
                     dp[i++] = '\\';
                     c = 'f';
+                    break;
+                case '\r':
+                    dp[i++] = '\\';
+                    c = 'r';
                     break;
                 case 27:
                     dp[i++] = '\\';
