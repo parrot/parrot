@@ -92,9 +92,9 @@ my @unified_testable_languages =
        parrot_compiler
        punie
        scheme
-       regex
        tcl
        urm );
+# regex seems to be eating memory, so don't test is by default
 # @unified_testable_languages = qw( regex );
 
 my @harnesses =
