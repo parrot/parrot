@@ -496,7 +496,7 @@ Under development; Broken in respect to recent (and upcoming) DEPRECATED items
 
 =item Location
 
-http://www.daca.net:8080/Parakeet-0.1.tgz
+C<languages/parakeet>
 
 =back
 
