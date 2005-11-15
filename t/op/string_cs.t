@@ -715,7 +715,7 @@ output_is( <<'CODE', <<"OUTPUT", "unicode upcase");
     print "\n"
     end
 CODE
-T\xc3\x96TSCH
+T\x{c3}\x{96}TSCH
 OUTPUT
 
 output_is( <<'CODE', <<"OUTPUT", "unicode titlecase");
@@ -729,7 +729,7 @@ output_is( <<'CODE', <<"OUTPUT", "unicode titlecase");
     print "\n"
     end
 CODE
-T\xc3\xb6tsch Leo
+T\x{c3}\x{b6}tsch Leo
 OUTPUT
 
 }  # SKIP
@@ -751,7 +751,7 @@ output_is( <<'CODE', <<'OUTPUT', "escape ctrl" );
     print "\n"
     end
 CODE
-\x00\x01\x1f
+\x{00}\x{01}\x{1f}
 OUTPUT
 
 output_is( <<'CODE', <<'OUTPUT', "escape latin1");
@@ -761,7 +761,7 @@ output_is( <<'CODE', <<'OUTPUT', "escape latin1");
     print "\n"
     end
 CODE
-t\xf6tsch leo
+t\x{f6}tsch leo
 OUTPUT
 
 output_is( <<'CODE', <<'OUTPUT', "escape unicode" );

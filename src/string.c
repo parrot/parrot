@@ -2421,40 +2421,21 @@ string_escape_string_delimited(Interp * interpreter,
     /* more work TODO */
     ENCODING_ITER_INIT(interpreter, src, &iter);
     dp = result->strstart;
-    for (i = 0; len; --len) {
+    for (i = 0; len > 0; --len) {
         c = iter.get_and_advance(interpreter, &iter);
-        if (i >= charlen - 2) {        /* max we append ourselves */
-            /* resize - still len codepoints to go */
-            charlen += len * 2 + 16;
-            Parrot_reallocate_string(interpreter, result, charlen);
-            /* start can change */
-            dp = result->strstart;
-        }
-        if (c >= 0x10000) {
-            /* current string length, so that append works */
-            result->bufused = result->strlen = i;
-            hex = Parrot_sprintf_c(interpreter, "\\x{%x}", c);
-            /* string_append grows result if necessary */
-append:
-            result = string_append(interpreter, result, hex, 0);
-            /* adjust our insert idx */
-            i += hex->strlen;
-            /* and usable len */
-            charlen = PObj_buflen(result);
-        }
-        else if (c >= 0x100) {
-            result->bufused = result->strlen = i;
-            hex = Parrot_sprintf_c(interpreter, "\\u%04x", c);
-            goto append;
-        }
-        else if (c >= 0x7f) {
-esc_hex:
-            result->bufused = result->strlen = i;
-            hex = Parrot_sprintf_c(interpreter, "\\x%02x", c);
-            goto append;
-        }
-        else  {
+        if (c < 0x80) {
+            /* process ASCII chars */
+            if (i >= charlen - 2) {
+                /* resize - still len codepoints to go */
+                charlen += len * 2 + 16;
+                Parrot_reallocate_string(interpreter, result, charlen);
+                /* start can change */
+                dp = result->strstart;
+            }
             switch (c) {
+                case '\\':
+                    dp[i++] = '\\';
+                    break;
                 case '\a':
                     dp[i++] = '\\';
                     c = 'a';
@@ -2463,40 +2444,49 @@ esc_hex:
                     dp[i++] = '\\';
                     c = 'b';
                     break;
-                case '\t':
-                    dp[i++] = '\\';
-                    c = 't';
-                    break;
                 case '\n':
                     dp[i++] = '\\';
                     c = 'n';
-                    break;
-                case '\v':
-                    dp[i++] = '\\';
-                    c = 'v';
-                    break;
-                case '\f':
-                    dp[i++] = '\\';
-                    c = 'f';
                     break;
                 case '\r':
                     dp[i++] = '\\';
                     c = 'r';
                     break;
-                case 27:
+                case '\t':
                     dp[i++] = '\\';
-                    c = 'e';
+                    c = 't';
+                    break;
+                case '\f':
+                    dp[i++] = '\\';
+                    c = 'f';
                     break;
                 case '"':
                     dp[i++] = '\\';
                     c = '"';
                     break;
-                default:
-                    if (c < 32)
-                        goto esc_hex;
+                case 27:
+                    dp[i++] = '\\';
+                    c = 'e';
+                    break;
             }
-            dp[i++] = c;
+            if (c >= 0x20) {
+                dp[i++] = c;
+                assert(i < charlen);
+                continue;
+            }
         }
+        /* escape by appending either \uhhhh or \x{hh...} */
+        result->bufused = result->strlen = i;
+        if (c < 0x0100 || c >= 0x10000)
+            hex = Parrot_sprintf_c(interpreter, "\\x{%02x}", c);
+        else 
+            hex = Parrot_sprintf_c(interpreter, "\\u%04x", c);
+        result = string_append(interpreter, result, hex, 0);
+        /* adjust our insert idx */
+        i += hex->strlen;
+        /* and usable len */
+        charlen = PObj_buflen(result);
+        dp = result->strstart;
         assert(i < charlen);
     }
     result->bufused = result->strlen = i;
