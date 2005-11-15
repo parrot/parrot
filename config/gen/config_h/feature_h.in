@@ -60,7 +60,7 @@ END
 
     print OUT <<'END';
 
-#if defined __powerpc__ || defined __x86_64__
+#if defined __powerpc__ || defined __x86_64__ || defined __s390__
 #  define PARROT_VA_TO_VAPTR(x) (x)
 #else
 #  define PARROT_VA_TO_VAPTR(x) (&(x))
