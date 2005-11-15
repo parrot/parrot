@@ -60,12 +60,24 @@ END
 
     print OUT <<'END';
 
-#if defined __powerpc__ || defined __x86_64__ || defined __s390__
-#  define PARROT_VA_TO_VAPTR(x) (x)
-#else
-#  define PARROT_VA_TO_VAPTR(x) (&(x))
-#endif
 END
+my $va_result = ${va_ptr_type};
+    print OUT <<"END";
+/* from config/auto/va_ptr.pm: va_ptr_type => $va_result */
+END
+if (${va_ptr_type} eq 'ppc') {
+    print OUT <<'END';
+/* if defined __powerpc__ || defined __x86_64__ || defined __s390__ */
+#  define PARROT_VA_TO_VAPTR(x) (x)
+
+END
+}
+if (${va_ptr_type} eq 'x86') {
+    print OUT <<'END';
+#  define PARROT_VA_TO_VAPTR(x) (&(x))
+
+END
+}
 
     print OUT <<'END';
 
