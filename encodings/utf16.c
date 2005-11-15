@@ -69,10 +69,10 @@ to_encoding(Interp *interpreter, STRING *src, STRING *dest)
     else {
         result = dest;
     }
-    result->charset  = Parrot_unicode_charset_ptr;
-    result->encoding = Parrot_utf16_encoding_ptr;
-    result->strlen = src_len;
     if (!src_len) {
+        result->charset  = Parrot_unicode_charset_ptr;
+        result->encoding = Parrot_utf16_encoding_ptr;
+        result->strlen = src_len;
         result->encoding = Parrot_ucs2_encoding_ptr;
         return result;
     }
@@ -124,6 +124,9 @@ to_encoding(Interp *interpreter, STRING *src, STRING *dest)
         memcpy(src->strstart, p, src->bufused);
         mem_sys_free(p);
     }
+    result->charset  = Parrot_unicode_charset_ptr;
+    result->encoding = Parrot_utf16_encoding_ptr;
+    result->strlen = src_len;
 
     /* downgrade if possible */
     if (dest_len == (int)src->strlen)
