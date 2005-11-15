@@ -1485,39 +1485,41 @@ string_bitwise_and(Interp *interpreter, STRING *s1,
     STRING *s2, STRING **dest)
 {
     STRING *res = NULL;
-    size_t minlen = 0;
-    parrot_string_representation_t maxrep = enum_stringrep_one;
-    CHARSET *cs;
-    ENCODING *enc;
+    size_t minlen;
 
+    /* we could also trans_charset to iso-8859-1 */
+    if (s1 && s1->encoding != Parrot_fixed_8_encoding_ptr) {
+        real_exception(interpreter, NULL, INVALID_ENCODING,
+                "string bitwise_and (%s/%s) unsupported",
+                ((ENCODING *)(s1->encoding))->name,
+                ((ENCODING *)(s2->encoding))->name);
+    }
+    if (s2 && s2->encoding != Parrot_fixed_8_encoding_ptr) {
+        real_exception(interpreter, NULL, INVALID_ENCODING,
+                "string bitwise_and (%s/%s) unsupported",
+                ((ENCODING *)(s2->encoding))->name,
+                ((ENCODING *)(s2->encoding))->name);
+    }
     /* think about case of dest string is one of the operands */
     if (s1 && s2) {
         minlen = s1->strlen > s2->strlen ? s2->strlen : s1->strlen;
     }
+    else 
+        minlen = 0;
 
     if (dest && *dest) {
         res = *dest;
+        res->encoding = Parrot_fixed_8_encoding_ptr;
+        res->charset  = Parrot_binary_charset_ptr;
     }
-    else if (!s1 || !s2) {
-        res = string_make_empty(interpreter, enum_stringrep_one, 0);
-    }
-    else {
-        res = string_make_empty(interpreter, maxrep, minlen);
-    }
+    else
+        res = string_make_direct(interpreter, NULL, minlen,
+                Parrot_fixed_8_encoding_ptr, Parrot_binary_charset_ptr, 0);
 
     if (!s1 || !s2) {
         res->bufused = 0;
         res->strlen = 0;
         return res;
-    }
-    cs = string_rep_compatible(interpreter, s1, s2, &enc);
-    if (!cs) {
-        internal_exception(UNIMPLEMENTED,
-                "Cross-type string bitwise_and (%s/%s) (%s/%s) unsupported",
-                ((ENCODING *)(s1->encoding))->name,
-                ((CHARSET *)(s1->charset))->name,
-                ((ENCODING *)(s2->encoding))->name,
-                ((CHARSET *)(s2->charset))->name);
     }
 #if ! DISABLE_GC_DEBUG
     /* trigger GC for debug */
@@ -1526,14 +1528,11 @@ string_bitwise_and(Interp *interpreter, STRING *s1,
 #endif
 
     make_writable(interpreter, &res, minlen, enum_stringrep_one);
-    res->charset = cs;
-    res->encoding = enc;
 
     BITWISE_AND_STRINGS(Parrot_UInt1, Parrot_UInt1,
             Parrot_UInt1, s1, s2, res, minlen);
 
-    res->strlen = minlen;
-    res->bufused = string_max_bytes(interpreter, res, res->strlen);
+    res->bufused = res->strlen = minlen;
 
     if (dest)
         *dest = res;
