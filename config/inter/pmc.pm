@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-config/inter/pmc.pl - PMC Files
+config/inter/pmc.pm - PMC Files
 
 =head1 DESCRIPTION
 
@@ -118,7 +118,7 @@ END
   # calls to pmc2c.pl for classes/Makefile
   my $TEMP_pmc_build = <<"E_NOTE";
 
-# the following part of the Makefile was built by 'config/inter/pmc.pl'
+# the following part of the Makefile was built by 'config/inter/pmc.pm'
 
 E_NOTE
 
@@ -138,9 +138,9 @@ E_NOTE
       $parent_headers = "classes/pmc_perlhash.h $parent_headers"
 		if ($pmc eq 'orderedhash');
       $TEMP_pmc_build .= <<END
-classes/$pmc.c classes/pmc_$pmc.h: \\
-         vtable.dump classes/$pmc.pmc \\
-	$parent_dumps classes/$pmc.dump
+classes/$pmc.c classes/pmc_$pmc.h : classes/$pmc.dump
+
+classes/$pmc.dump : vtable.dump $parent_dumps 
 
 classes/pmc_$pmc.h: classes/$pmc.pmc
 	\$(PMC2CC) classes/$pmc.pmc
@@ -154,9 +154,9 @@ END
 
   # build list of libraries for link line in Makefile
   my $slash = Parrot::Configure::Data->get('slash');
-  (my $TEMP_pmc_classes_o   = $TEMP_pmc_o   ) =~ s/^| / classes${slash}/g;
-  (my $TEMP_pmc_classes_str = $TEMP_pmc_str ) =~ s/^| / classes${slash}/g;
-  (my $TEMP_pmc_classes_pmc = $pmc_list) =~ s/^| / classes${slash}/g;
+  (my $TEMP_pmc_classes_o    = $TEMP_pmc_o   )  =~ s/^| / classes${slash}/g;
+  (my $TEMP_pmc_classes_str  = $TEMP_pmc_str )  =~ s/^| / classes${slash}/g;
+  (my $TEMP_pmc_classes_pmc  = $pmc_list) =~ s/^| / classes${slash}/g;
 
   # Gather the actual names (with MixedCase) of all of the
   # non-abstract built-in PMCs.
@@ -187,13 +187,13 @@ END
   }
 
   Parrot::Configure::Data->set(
-    pmc             => $pmc_list,
-    pmc_names       => join(" ", @names),
-    TEMP_pmc_o           => $TEMP_pmc_o,
-    TEMP_pmc_build       => $TEMP_pmc_build,
-    TEMP_pmc_classes_o   => $TEMP_pmc_classes_o,
-    TEMP_pmc_classes_str => $TEMP_pmc_classes_str,
-    TEMP_pmc_classes_pmc => $TEMP_pmc_classes_pmc,
+    pmc                   => $pmc_list,
+    pmc_names             => join(" ", @names),
+    TEMP_pmc_o            => $TEMP_pmc_o,
+    TEMP_pmc_build        => $TEMP_pmc_build,
+    TEMP_pmc_classes_o    => $TEMP_pmc_classes_o,
+    TEMP_pmc_classes_str  => $TEMP_pmc_classes_str,
+    TEMP_pmc_classes_pmc  => $TEMP_pmc_classes_pmc,
   );
 }
 
