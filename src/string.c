@@ -2383,7 +2383,113 @@ string_hash(Interp * interpreter, STRING *s, size_t seed)
     return h;
 }
 
+/*
 
+=item C<STRING *
+string_escape_string(Interp * interpreter, STRING *src)>
+
+Escape all non-ascii chars to backslash sequences.
+
+=item C<STRING *
+string_escape_string_delimited(Interp * interpreter, STRING *src, UINTVAL len)>
+
+Like above but limit output to len chars (used for trace output of strings).
+
+=cut
+
+*/
+
+STRING *
+string_escape_string(Interp * interpreter, STRING *src)
+{
+    return string_escape_string_delimited(interpreter, src,
+            (UINTVAL) ~0);
+}
+
+STRING *
+string_escape_string_delimited(Interp * interpreter,
+        STRING *src, UINTVAL limit)
+{
+    STRING *result, *hex;
+    UINTVAL c, i, len, charlen;
+    String_iter iter;
+    unsigned char *dp;
+
+    if (!src)
+        return NULL;
+    len = src->strlen;
+    if (len > limit)
+        len = limit;
+    /* expect around 2x the chars */
+    charlen = 2 * len;
+    /* create ascii result */
+    result = string_make_direct(interpreter, NULL, charlen,
+            Parrot_fixed_8_encoding_ptr, Parrot_ascii_charset_ptr, 0);
+    /* more work TODO */
+    ENCODING_ITER_INIT(interpreter, src, &iter);
+    dp = result->strstart;
+    for (i = 0; len; --len) {
+        c = iter.get_and_advance(interpreter, &iter);
+        if (i >= charlen - 6) {        /* max seq len */
+            /* resize */
+                    charlen = i + len * 2 + 16;
+            Parrot_reallocate_string(interpreter, src, charlen);
+            assert (i < charlen - 6);
+        }
+        if (c >= 0x100) {
+            result->bufused = result->strlen = i;
+            hex = Parrot_sprintf_c(interpreter, "\\u%04x", c);
+            result = string_append(interpreter, result, hex, 0);
+            i += hex->strlen;
+        }
+        else if (c >= 0x80) {
+            result->bufused = result->strlen = i;
+            hex = Parrot_sprintf_c(interpreter, "\\x%02x", c);
+            result = string_append(interpreter, result, hex, 0);
+            i += hex->strlen;
+        }
+        else  {
+            switch (c) {
+                case '\a':
+                    dp[i++] = '\\';
+                    c = 'a';
+                    break;
+                case '\b':
+                    dp[i++] = '\\';
+                    c = 'b';
+                    break;
+                case '\t':
+                    dp[i++] = '\\';
+                    c = 't';
+                    break;
+                case '\n':
+                    dp[i++] = '\\';
+                    c = 'n';
+                    break;
+                case '\v':
+                    dp[i++] = '\\';
+                    c = 'v';
+                    break;
+                case '\f':
+                    dp[i++] = '\\';
+                    c = 'f';
+                    break;
+                case 27:
+                    dp[i++] = '\\';
+                    c = 'e';
+                    break;
+                case '"':
+                    dp[i++] = '\\';
+                    c = '"';
+                    break;
+            }
+            dp[i++] = c;
+        }
+        assert(i < charlen);
+    }
+    result->bufused = result->strlen = i;
+    return result;
+}
 /*
 
 =item C<STRING *

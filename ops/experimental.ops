@@ -234,7 +234,19 @@ inline op newclosure(out PMC, in PMC) {
   $1 = parrot_new_closure(interpreter, $2);
   goto NEXT();
 }
-###############################################################################
+#######################################################################
+
+=item B<escape>(out STR, invar STR)
+
+Escape all non-ascii chars to backslashed escape sequences. A
+string with charset I<ascii> is created as result.
+
+=cut
+
+op escape(out STR, invar STR) {
+  $1 = string_escape_string(interpreter, $2);
+  goto NEXT();
+}
 
 =back
 

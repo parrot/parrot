@@ -16,7 +16,7 @@ Tests charset support.
 
 =cut
 
-use Parrot::Test tests => 44;
+use Parrot::Test tests => 48;
 use Parrot::Config;
 use Test::More;
 
@@ -733,3 +733,43 @@ T\xc3\xb6tsch Leo
 OUTPUT
 
 }  # SKIP
+
+output_is( <<'CODE', <<'OUTPUT', "escape ascii" );
+    set S0, "abcdefghi\n"
+    escape S1, S0
+    print S1
+    print "\n"
+    end
+CODE
+abcdefghi\n
+OUTPUT
+
+output_is( <<'CODE', <<'OUTPUT', "escape ctrl" );
+    set S0, "\a\b\t\n\v"
+    escape S1, S0
+    print S1
+    print "\n"
+    end
+CODE
+\a\b\t\n\v
+OUTPUT
+
+output_is( <<'CODE', <<'OUTPUT', "escape latin1");
+    set S0, iso-8859-1:"tötsch leo"
+    escape S1, S0
+    print S1
+    print "\n"
+    end
+CODE
+t\xf6tsch leo
+OUTPUT
+
+output_is( <<'CODE', <<'OUTPUT', "escape unicode" );
+    set S0, unicode:"\u2001\u2002\u2003\u2004"
+    escape S1, S0
+    print S1
+    print "\n"
+    end
+CODE
+\u2001\u2002\u2003\u2004
+OUTPUT
