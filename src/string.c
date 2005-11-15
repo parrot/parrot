@@ -2422,6 +2422,8 @@ string_escape_string_delimited(Interp * interpreter,
         len = limit;
     /* expect around 2x the chars */
     charlen = 2 * len;
+    if (charlen < 16)
+        charlen = 16;
     /* create ascii result */
     result = string_make_direct(interpreter, NULL, charlen,
             Parrot_fixed_8_encoding_ptr, Parrot_ascii_charset_ptr, 0);
@@ -2430,13 +2432,20 @@ string_escape_string_delimited(Interp * interpreter,
     dp = result->strstart;
     for (i = 0; len; --len) {
         c = iter.get_and_advance(interpreter, &iter);
-        if (i >= charlen - 6) {        /* max seq len */
+        if (i >= charlen - 10) {        /* max \x{123456} */
             /* resize */
-                    charlen = i + len * 2 + 16;
-            Parrot_reallocate_string(interpreter, src, charlen);
-            assert (i < charlen - 6);
+            charlen += len * 2 + 16;
+            Parrot_reallocate_string(interpreter, result, charlen);
+            /* start can change */
+            dp = result->strstart;
         }
-        if (c >= 0x100) {
+        if (c >= 0x10000) {
+            result->bufused = result->strlen = i;
+            hex = Parrot_sprintf_c(interpreter, "\\x{%x}", c);
+            result = string_append(interpreter, result, hex, 0);
+            i += hex->strlen;
+        }
+        else if (c >= 0x100) {
             result->bufused = result->strlen = i;
             hex = Parrot_sprintf_c(interpreter, "\\u%04x", c);
             result = string_append(interpreter, result, hex, 0);
