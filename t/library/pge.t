@@ -1,233 +1,118 @@
-#! perl -w
+#! perl
 # Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
+use strict;
+use warnings;
+use lib qw( t . lib ../lib ../../lib );
+use Test::More;
+use Parrot::Test qw/ no_plan /;
+use Parrot::Test::PGE;
+
+
 =head1 NAME
 
-t/library/pge.t - Grammar Engine tests
+t/library/pge.t - Parrot Grammar Engine basic tests
 
 =head1 SYNOPSIS
 
-	% perl -Ilib t/library/pge.t
+	% prove -Ilib t/library/pge.t
 
 =cut
 
-use strict;
 
-use Parrot::Test tests => 24;
-use Parrot::Test::PGE;
+## definition of PGE public api
+## data format like: filename => { 'namespace' => [list of subs], ... },
+my $ns_subs = {
+	'PGE.pir' =>
+		{ 'PGE' => [qw/ /], },
+	'PGE/Exp.pir' => {
+		'PGE::Exp' => [qw/ serno as_pir /],
+	},
+	'PGE/Library.pir' =>
+		{ 'PGE::Rule' => [qw/ ident name /], },
+	'PGE/Match.pir' => {
+		'PGE::Match' => [qw/
+			next from to __get_bool __get_integer __get_number
+			__get_string __get_pmc_keyed_int __set_pmc_keyed_int
+			__delete_keyed_int __defined_keyed_int get_hash get_array
+		/],
+	},
+	'PGE/OPTable.pir' =>
+		{ 'PGE::OPTable' => [qw/ addtok parse /], },
+	'PGE/P6Rule.pir' => {
+		'PGE' => [qw/ /],
+		'PGE::Exp' => [qw/ /],
+		'PGE::P6Rule' => [qw/ /],
+		'PGE::Rule' => [qw/ p6rule /],
+	},
+	'PGE/Rule.pir' => {
+		'PGE::Rule' => [qw/
+			null fail upper lower alpha digit xdigit space
+			print graph blank cntrl punct alnum sp lt gt dot ws before
+			/],
+		},
+	'PGE/TokenHash.pir' => {
+		'PGE::TokenHash' => [qw/ /],
+	},
+};
 
-# 1-6
-pgeglob_is  ('bznza', 'b?n*a', "glob wildcards");
-pgeglob_is  ('bana', 'b?n*a', "glob wildcards");
-pgeglob_isnt('bnana', 'b?n*a', "glob wildcards");
-pgeglob_is  ('bnan', '?n?*', "glob wildcards");
-pgeglob_is  ('ana', '?n?*', "glob wildcards");
-pgeglob_isnt('an', '?n?*', "glob wildcards");
+## populate_namespaces -- populate many namespaces with a subname
+## data format like: subname => [qw/ list of namespaces /],
+## my $p6r_subs = { p6analyze => [qw/ Literal /], };
+## populate_namespaces( $ns_subs, $p6r_subs, 'PGE/P6Rule.pir', 'PGE::Exp' );
+sub populate_namespaces
+{
+	my( $outdata_ref, $indata_ref, $filekey, $nsprefix )= @_;
+	for my $key ( sort keys %$indata_ref )
+	{
+		push @{ $outdata_ref->{$filekey}{$nsprefix . '::' . $_} } => $key
+			for @{ $indata_ref->{$key} };
+	}
+}
 
-# 7
-pgeglob_is  ('orange','[go]range','glob enumerated characters');
-pgeglob_is  ('grange','[go]range','glob enumerated characters');
-pgeglob_isnt('ggrange','[go]range','glob enumerated characters');
-pgeglob_isnt('borange','[go]range','glob enumerated characters');
-pgeglob_isnt('arange','[go]range','glob enumerated characters');
-pgeglob_is  ('a','[^0-9]','glob enumerated characters');
-pgeglob_isnt('4','[^0-9]','glob enumerated characters');
-pgeglob_isnt('0','[^0-9]','glob enumerated characters');
-pgeglob_isnt('9','[^0-9]','glob enumerated characters');
-pgeglob_isnt('4a','[^0-9]','glob enumerated characters');
-pgeglob_isnt('aa','[^0-9]','glob enumerated characters');
 
-pgeglob_is  ('', '*', 'glob empty string');
-pgeglob_isnt('', '?', 'glob empty string');
-pgeglob_isnt('', '[0]', 'glob empty string');
-pgeglob_isnt('', '[^0]', 'glob empty string');
-
-# 22 
-pir_output_is(<<'CODE', <<'OUT', "Glob, alternate");
-
-.sub _main
-  load_bytecode "library/PGE.pbc"
-  load_bytecode "library/PGE/Glob.pir"
-
-  .local pmc rule
-  $P0 = find_global "PGE", "glob"
-  (rule, $P1, $P2) = $P0("{app,bet,cod}a")
-
-  $P1 = rule("appa")
-  if $P1 goto ok1
-  print "not "
-ok1:
-  print "ok1\n"
-
-  $P1 = rule("coda")
-  if $P1 goto ok2
-  print "not "
-ok2:
-  print "ok2\n"
-
-  $P1 = rule("beta")
-  if $P1 goto ok3
-  print "not "
-ok3:
-  print "ok3\n"
-
-  $P1 = rule("bet")
-  unless $P1 goto ok4
-  print "not "
-ok4:
-  print "ok4\n"
-
-  $P1 = rule("alfa")
-  unless $P1 goto ok5
-  print "not "
-ok5:
-  print "ok5\n"
-
-  (rule, $P1, $P2) = $P0("*{1,two,three}")
-
-  $P1 = rule("1")
-  if $P1 goto ok6
-  print "not "
-ok6:
-  print "ok6\n"
-
-  $P1 = rule("ptwo")
-  if $P1 goto ok7
-  print "not "
-ok7:
-  print "ok7\n"
-
-  $P1 = rule("al")
-  unless $P1 goto ok8
-  print "not "
-ok8:
-  print "ok8\n"
-
-  $P1 = rule("three")
-  if $P1 goto ok9
-  print "not "
-ok9:
-  print "ok9\n"
-
-  $P1 = rule("twop")
-  unless $P1 goto ok10
-  print "not "
-ok10:
-  print "ok10\n"
-
-  $P1 = rule("1atwo")
-  if $P1 goto ok11
-  print "not "
-ok11:
-  print "ok11\n"
-
+my $PRE= <<'PRE';
+.sub 'main' :main
+	load_bytecode 'PGE.pbc'
+PRE
+my $POST= <<'POST';
+	goto OK
+NOK:print "not "
+OK: print "ok"
+END:print "\n"
 .end
+POST
+
+
+# 1
+pir_output_is(<<'CODE'.$POST, <<OUT, 'load_bytecode PGE.pbc');
+.sub 'main' :main
+	load_bytecode 'PGE.pbc'
 CODE
-ok1
-ok2
-ok3
-ok4
-ok5
-ok6
-ok7
-ok8
-ok9
-ok10
-ok11
-OUT
-
-# 23 
-pir_output_is(<<'CODE', <<'OUT', "This made Parrot m4 fail");
-
-.sub 'test' :main
-  load_bytecode "PGE.pbc"
-
-  .local pmc p6rule
-  find_global p6rule, "PGE", "p6rule"
-
-  .local pmc rulesub_a, rulesub_b
-  rulesub_a  = p6rule( "a" )
-  rulesub_b  = p6rule( "^(<[b]>)" )
-
-  .local string input_string    
-  input_string    = "_____________________________________________________________________"
-
-  rulesub_b( input_string ) 
-
-  print "ok1\n"
-  # end
-
-  rulesub_a( input_string ) 
-  print "ok2\n"
-
-.end
-
-CODE
-ok1
-ok2
-OUT
-
-# 24 
-pir_output_is(<<'CODE', <<'OUT', "parse FASTA");
-
-# Grok fasta files, which usually contain DNA, RNA or protein sequences.
-# http://en.wikipedia.org/wiki/FASTA_format
-
-# TODO: Compose rules out of subrules
-
-.include "library/dumper.imc"
-
-.sub "example" :main
-    load_bytecode 'PGE.pbc'
-    load_bytecode 'PGE/Util.pir'
-
-    .local string fasta_grammar
-    fasta_grammar = <<'END_FASTA_GRAMMAR'
-grammar Bio::Fasta;
-
-rule file        { <entry>+ }
-rule start_entry { \> }
-rule entry       { <start_entry> <id> \s+ <desc> } 
-rule id          { (\S+) }
-rule desc        { (\N*) }
-rule sequence    { (<-[>]>*) }
-
-END_FASTA_GRAMMAR
-
-    .local string fasta
-    fasta = <<'END_FASTA'
->gi|5524211|gb|AAD44166.1| cytochrome b [Elephas maximus maximus]
-LCLYTHIGRNIYYGSYLYSETWNTGIMLLLITMATAFMGYVLPWGQMSFWGATVITNLFSAIPYIGTNLV
-EWIWGGFSVDKATLNRFFAFHFILPFTMVALAGVHLTFLHETGSNNPLGLTSDSDKIPFHPYYTIKDFLG
-LLILILLLLLLALLSPDMLGDPDNHMPADPLNTPLHIKPEWYFLFAYAILRSVPNKLGGVLALFLSIVIL
-GLMPFLHTSKHRSMMLRPLSQALFWTLTMDLLTLTWIGSQPVEYPYTIIGQMASILYFSIILAFLPIAGX
-IENY
-END_FASTA
-
-    .local pmc compile_rules
-    compile_rules = find_global "PGE", "compile_rules"
-    .local pmc code
-    ( code ) = compile_rules(fasta_grammar)
-    # print code
-
-    .local pmc fasta_rule
-    fasta_rule = find_global "Bio::Fasta", "start_entry"
-    .local pmc match
-    ( match ) = fasta_rule( fasta )
-    
-    # TODO: Extract named or positional captures
-    print match
-    print "\n"
-
-.end
-
-CODE
->
+ok
 OUT
 
 
+for my $file (sort keys %$ns_subs)
+{
+	for my $ns (sort keys %{ $ns_subs->{$file} })
+	{
+		for my $sub ( sort @{ $ns_subs->{$file}{$ns} } )
+		{
+			## find_global
+			pir_output_is(<<CODE.$POST, <<OUT, 'find_global $file: ($ns:: $sub)');
+.sub 'main' :main
+	load_bytecode 'PGE.pbc'
+	.local pmc sub
+	sub = find_global '$ns', '$sub'
+CODE
+ok
+OUT
+
+			## TODO: test pod exists for subs
+		}
+	}
+}
 
 
-
-# vim: ft=imc :
