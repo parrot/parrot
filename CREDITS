@@ -283,7 +283,7 @@ D: httpd.imc, bugfixes
 N: Matt Diephouse
 D: Turn off buffering layer in forth.pasm
 D: Various patches for pmc2c.pl
-D: Run Tcl test suite in ParTcl, and add various ParTcl bits
+D: Run Tcl test suite in partcl, and add various partcl bits
 
 N: Matt Fowles
 D: Resizable*Array classes
@@ -420,7 +420,7 @@ N: Stig Brautaset
 D: Patch to repair 'make clean'
 
 N: Thilo Planz
-D: ParTcl tests and inspiration
+D: partcl tests and inspiration
 
 N: TOGoS
 D: Some FAQ questions and answers
@@ -439,8 +439,8 @@ D: Lot of general Parrot design hints
 N: Vladimir Lipsky
 D: Win32, IO fixes
 
-N: Will Coleda
+N: Will "Coke" Coleda
 E: will@coleda.com
-D: Tcl language (partcl) and misc fixes
+D: Tcl language (partcl), website, various languages/ upkeep, misc.
 
 N: Zach Lipton
