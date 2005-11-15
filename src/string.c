@@ -406,26 +406,52 @@ string_make_empty(Interp *interpreter,
     return s;
 }
 
+/*
+
+=item C<CHARSET *string_rep_compatible (Interp *, STRING *a, const STRING *b,
+        ENCODING **e)>
+
+Find the "lowest" possible charset and encoding for the given string. E.g.
+
+  ascii <op> utf8 => utf8
+                  => ascii, B<if> C<STRING *b> has ascii chars only.
+
+Returs NULL, if no compatible string representation can be found.
+
+=cut
+
+*/
+
 CHARSET *
 string_rep_compatible (Interp *interpreter, STRING *a, const STRING *b,
         ENCODING **e)
 {
-    if (e)
-        *e = a->encoding;
+    /*
+     * a table could possibly simplify the logic
+     */
     if (a->encoding == Parrot_utf8_encoding_ptr &&
             b->charset == Parrot_ascii_charset_ptr) {
+        if (a->strlen == a->bufused) {
+            *e = Parrot_fixed_8_encoding_ptr;
+            return Parrot_ascii_charset_ptr;
+        }
+        *e = a->encoding;
         return a->charset;
     }
     if (b->encoding == Parrot_utf8_encoding_ptr &&
             a->charset == Parrot_ascii_charset_ptr) {
-        if (e)
-            *e = Parrot_utf8_encoding_ptr;
-        else
-            a->encoding = Parrot_utf8_encoding_ptr;
+        if (b->strlen == b->bufused) {
+            *e = Parrot_fixed_8_encoding_ptr;
+            return a->charset;
+        }
+        *e = Parrot_utf8_encoding_ptr;
         return b->charset;
     }
     if (a->encoding != b->encoding)
         return NULL;
+    if (a->encoding != Parrot_fixed_8_encoding_ptr)
+        return NULL;
+    *e = Parrot_fixed_8_encoding_ptr;
     if (a->charset == b->charset)
         return a->charset;
     if (b->charset == Parrot_ascii_charset_ptr)
@@ -458,6 +484,11 @@ string_append(Interp *interpreter,
     UINTVAL a_capacity, b_len;
     UINTVAL total_length;
     CHARSET *cs;
+    ENCODING *enc;
+
+    /*
+     * XXX should this be a CHARSET method?
+     */
 
     UNUSED(Uflags);
 
@@ -480,9 +511,11 @@ string_append(Interp *interpreter,
         return string_concat(interpreter, a, b, Uflags);
     }
 
-    cs = string_rep_compatible(interpreter, a, b, NULL);
-    if (cs != NULL)
+    cs = string_rep_compatible(interpreter, a, b, &enc);
+    if (cs != NULL) {
         a->charset = cs;
+        a->encoding = enc;
+    }
     else {
         /* upgrade to utf16 */
         Parrot_utf16_encoding_ptr->to_encoding(interpreter, a, NULL);
@@ -985,10 +1018,19 @@ string_concat(Interp *interpreter,
 {
     if (a != NULL && a->strlen != 0) {
         if (b != NULL && b->strlen != 0) {
-            STRING *result =
+            CHARSET *cs;
+            ENCODING *enc;
+            STRING *result;
+
+            cs = string_rep_compatible(interpreter, a, b, &enc);
+            if (!cs) {
+                cs = a->charset;
+                enc =a->encoding;
+            }
+            result =
                 string_make_direct(interpreter, NULL,
                         a->bufused + b->bufused,
-                        a->encoding, a->charset, 0);
+                        enc, cs, 0);
 
             string_append(interpreter, result, a, Uflags);
             string_append(interpreter, result, b, Uflags);
@@ -2404,7 +2446,7 @@ string_unescape_cstring(Interp * interpreter,
          *     then append the bytes w/o further processing to
          *     the string buffer
          *
-         * that is currently just fixed_8 encodings are correct    
+         * that is currently just fixed_8 encodings are correct
          */
         result = string_make_direct(interpreter, cstring, clength,
                 encoding, charset, flags);
