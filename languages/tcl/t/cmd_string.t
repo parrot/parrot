@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 57;
+use Parrot::Test tests => 58;
 use Parrot::Config;
 use Test::More;
 use vars qw($TODO);
@@ -217,13 +217,25 @@ TCL
 OUT
 
 SKIP: {
-  skip("Parrot not configured with ICU",1) unless $PConfig{has_icu};
+  skip("Parrot not configured with ICU",2) unless $PConfig{has_icu};
 language_output_is("tcl",<<TCL,<<OUT,"string match nocase");
-  puts [string match -nocase ABC abc ]
+  puts [string match -nocase ABC abc]
+TCL
+1
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"string match nocase: unicode (Greek alphas)");
+  puts [string match -nocase \u03b1 \u0391]
 TCL
 1
 OUT
 }
+
+# XXX once passing, put in the SKIP section above..
+#TODO: {
+  #local $TODO = "fails under current implementation.";
+
+#}
 
 language_output_is("tcl",<<'TCL',<<OUT,"string match \[");
   puts [string match {\[} {[}]
