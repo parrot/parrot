@@ -2439,50 +2439,46 @@ string_unescape_cstring(Interp * interpreter,
             internal_exception(UNIMPLEMENTED,
                     "Can't make '%s' charset strings", p + 1);
         }
-        /*
-         * XXX this is just wrong
-         *     we still need to unescape the string, then verify
-         *     that it is valid in the passed in encoding
-         *     then append the bytes w/o further processing to
-         *     the string buffer
-         *
-         * that is currently just fixed_8 encodings are correct
-         */
         result = string_make_direct(interpreter, cstring, clength,
                 encoding, charset, flags);
-        string_compute_strlen(interpreter, result);
+        encoding = Parrot_fixed_8_encoding_ptr;
     }
     else {
         result = string_make(interpreter, cstring, clength, enc_char, flags);
-        ENCODING_ITER_INIT(interpreter, result, &iter);
-        for (offs = d = 0; offs < clength; ++offs) {
-            r = (Parrot_UInt4)((unsigned char*)result->strstart)[offs];
-            /* There cannot be any NULs within this string.  */
-            assert(r != '\0');
-            if (r == '\\') {
-                ++offs;
-                r = string_unescape_one(interpreter, &offs, result);
-                --offs;
-            }
-            if (d == offs) {
-                /* we did it in place - no action */
-                ++d;
-                iter.bytepos++;
-                iter.charpos++;
-                continue;
-            }
-            assert(d < offs);
-            iter.set_and_advance(interpreter, &iter, r);
-            ++d;
-        }
-        result->strlen = d;
-        result->bufused = iter.bytepos;
         encoding = result->encoding;
     }
-    if (!CHARSET_VALIDATE(interpreter, result, 0)) {
-        internal_exception(INVALID_STRING_REPRESENTATION, "Malformed string");
+    encoding->iter_init(interpreter, result, &iter);
+    for (offs = d = 0; offs < clength; ++offs) {
+        r = (Parrot_UInt4)((unsigned char*)result->strstart)[offs];
+        /* There cannot be any NULs within this string.  */
+        assert(r != '\0');
+        if (r == '\\') {
+            ++offs;
+            r = string_unescape_one(interpreter, &offs, result);
+            --offs;
+        }
+        if (d == offs) {
+            /* we did it in place - no action */
+            ++d;
+            iter.bytepos++;
+            iter.charpos++;
+            continue;
+        }
+        assert(d < offs);
+        iter.set_and_advance(interpreter, &iter, r);
+        ++d;
     }
-    if (encoding == Parrot_utf8_encoding_ptr) {
+    result->strlen = d;
+    result->bufused = iter.bytepos;
+    if (encoding != result->encoding) {
+        /* this also validates the string */
+        string_compute_strlen(interpreter, result);
+    }
+    else if (!CHARSET_VALIDATE(interpreter, result, 0)) {
+        internal_exception(INVALID_STRING_REPRESENTATION,
+                "Malformed string");
+    }
+    if (result->encoding == Parrot_utf8_encoding_ptr) {
         /* Pythonic unicode flag - get rid of that, Python will
          * probably need a second string class anyway
          */

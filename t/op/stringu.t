@@ -18,7 +18,7 @@ Tests Parrot's unicode string system.
 
 #'
 
-use Parrot::Test tests => 17;
+use Parrot::Test tests => 19;
 use Test::More;
 #use vars qw($TODO);
 
@@ -188,9 +188,37 @@ output_is( <<'CODE', <<OUTPUT, "UTF8 literals" );
     length I0, S0
     print I0
     print "\n"
+    print S0
+    print "\n"
     end
 CODE
 1
+\xc2\xab
+OUTPUT
+
+output_is( <<'CODE', <<OUTPUT, "UTF8 literals" );
+    set S0, utf8:unicode:"\xc2\xab"
+    length I0, S0
+    print I0
+    print "\n"
+    print S0
+    print "\n"
+    end
+CODE
+1
+\xc2\xab
+OUTPUT
+
+output_like( <<'CODE', <<OUTPUT, "UTF8 literals - illegal" );
+    set S0, utf8:unicode:"\xf2\xab"
+    length I0, S0
+    print I0
+    print "\n"
+    print S0
+    print "\n"
+    end
+CODE
+/Malformed UTF-8 string/
 OUTPUT
 
 output_like( <<'CODE', <<OUTPUT, "UTF8 as malformed ascii" );
