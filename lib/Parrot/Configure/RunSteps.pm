@@ -48,6 +48,7 @@ use Parrot::Configure::Data;
     auto/headers.pm
     auto/sizes.pm
     auto/byteorder.pm
+    auto/va_ptr.pm
     auto/pack.pm
     auto/format.pm
     auto/isreg.pm
@@ -127,7 +128,7 @@ sub runsteps {
         }
 
         print "..." if $args{verbose} && $args{verbose} == 2;
-        print "." x (71 - length($Configure::Step::description) 
+        print "." x (71 - length($Configure::Step::description)
                         - length($Configure::Step::result));
         print "$Configure::Step::result." unless m{^inter/} && $args{ask};
 
