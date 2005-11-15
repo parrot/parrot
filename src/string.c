@@ -2423,7 +2423,7 @@ string_escape_string_delimited(Interp * interpreter,
     dp = result->strstart;
     for (i = 0; len > 0; --len) {
         c = iter.get_and_advance(interpreter, &iter);
-        if (c < 0x80) {
+        if (c < 0x7f) {
             /* process ASCII chars */
             if (i >= charlen - 2) {
                 /* resize - still len codepoints to go */
@@ -2478,7 +2478,7 @@ string_escape_string_delimited(Interp * interpreter,
         /* escape by appending either \uhhhh or \x{hh...} */
         result->bufused = result->strlen = i;
         if (c < 0x0100 || c >= 0x10000)
-            hex = Parrot_sprintf_c(interpreter, "\\x{%02x}", c);
+            hex = Parrot_sprintf_c(interpreter, "\\x{%x}", c);
         else 
             hex = Parrot_sprintf_c(interpreter, "\\u%04x", c);
         result = string_append(interpreter, result, hex, 0);

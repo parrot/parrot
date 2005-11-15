@@ -745,13 +745,13 @@ abcdefghi\n
 OUTPUT
 
 output_is( <<'CODE', <<'OUTPUT', "escape ctrl" );
-    set S0, "\x00\x01\x1f"
+    set S0, "\x00\x01\x1f\x7f"
     escape S1, S0
     print S1
     print "\n"
     end
 CODE
-\x{00}\x{01}\x{1f}
+\x{0}\x{1}\x{1f}\x{7f}
 OUTPUT
 
 output_is( <<'CODE', <<'OUTPUT', "escape latin1");
@@ -765,11 +765,11 @@ t\x{f6}tsch leo
 OUTPUT
 
 output_is( <<'CODE', <<'OUTPUT', "escape unicode" );
-    set S0, unicode:"\u2001\u2002\u2003\u2004"
+    set S0, unicode:"\u2001\u2002\u2003\u2004\x{e01ef}\u0114"
     escape S1, S0
     print S1
     print "\n"
     end
 CODE
-\u2001\u2002\u2003\u2004
+\u2001\u2002\u2003\u2004\x{e01ef}\u0114
 OUTPUT
