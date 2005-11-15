@@ -1672,44 +1672,44 @@ STRING *
 string_bitwise_xor(Interp *interpreter,
     STRING *s1, STRING *s2, STRING **dest)
 {
-    STRING *res = NULL;
+    STRING *res;
     size_t maxlen = 0;
-    parrot_string_representation_t maxrep = enum_stringrep_one;
-    CHARSET *cs;
-    ENCODING *enc = NULL;
 
-    maxlen = s1 ? s1->bufused: 0;
-    if (s2 && s2->bufused > maxlen)
-        maxlen = s2->bufused;
+    if (s1) {
+        if (s1->encoding != Parrot_fixed_8_encoding_ptr) {
+            real_exception(interpreter, NULL, INVALID_ENCODING,
+                    "string bitwise_and (%s/%s) unsupported",
+                    ((ENCODING *)(s1->encoding))->name,
+                    ((ENCODING *)(s2->encoding))->name);
+        }
+        maxlen = s1->bufused;
+    }
+    if (s2) {
+        if (s2->encoding != Parrot_fixed_8_encoding_ptr) {
+            real_exception(interpreter, NULL, INVALID_ENCODING,
+                    "string bitwise_and (%s/%s) unsupported",
+                    ((ENCODING *)(s2->encoding))->name,
+                    ((ENCODING *)(s2->encoding))->name);
+        }
+        if (s2->bufused > maxlen)
+            maxlen = s2->bufused;
+    }
 
-    if (dest && *dest)
+    if (dest && *dest) {
         res = *dest;
-    else if (!s1 && !s2)
-        res = string_make_empty(interpreter, enum_stringrep_one, 0);
-    else
-        res = string_make_empty(interpreter, maxrep, maxlen);
+        res->encoding = Parrot_fixed_8_encoding_ptr;
+        res->charset  = Parrot_binary_charset_ptr;
+    }
+    else 
+        res = string_make_direct(interpreter, NULL, maxlen,
+                Parrot_fixed_8_encoding_ptr, Parrot_binary_charset_ptr, 0);
 
-    if (!s1 && !s2) {
+    if (!maxlen) {
         res->bufused = 0;
         res->strlen = 0;
         return res;
     }
 
-    if (!s1)
-        cs = s2->charset;
-    else if (!s2)
-        cs = s1->charset;
-    else {
-        cs = string_rep_compatible(interpreter, s1, s2, &enc);
-        if (!cs) {
-            internal_exception(UNIMPLEMENTED,
-                    "Cross-type string bitwise_xor (%s/%s) (%s/%s) unsupported",
-                    ((ENCODING *)(s1->encoding))->name,
-                    ((CHARSET *)(s1->charset))->name,
-                    ((ENCODING *)(s2->encoding))->name,
-                    ((CHARSET *)(s2->charset))->name);
-        }
-    }
 #if ! DISABLE_GC_DEBUG
     /* trigger GC for debug */
     if (interpreter && GC_DEBUG(interpreter))
@@ -1717,38 +1717,16 @@ string_bitwise_xor(Interp *interpreter,
 #endif
 
     make_writable(interpreter, &res, maxlen, enum_stringrep_one);
-    res->charset = cs;  /* XXX binary for all bit ops --leo */
-    if (enc)
-        res->encoding = enc;
 
     BITWISE_OR_STRINGS(Parrot_UInt1, Parrot_UInt1, Parrot_UInt1,
             s1, s2, res, maxlen, ^);
-
-    res->strlen = maxlen;
-    res->bufused = string_max_bytes(interpreter, res, res->strlen);
+    res->bufused = res->strlen = maxlen;
 
     if (dest)
         *dest = res;
 
     return res;
 }
-
-/*
-#define BITWISE_NOT_STRING(type, s, res) \
-do { \
-    if (s && res) \
-    { \
-        const type *curr = (type *)s->strstart; \
-        size_t length = s->strlen; \
-        Parrot_UInt4 *dp = (Parrot_UInt4 *)res->strstart; \
- \
-        for ( ; length ; --length) \
-        { \
-            *dp++ = ~ *curr++; \
-        } \
-    } \
-} while(0)
-*/
 
 #define BITWISE_NOT_STRING(type, s, res) \
 do { \
@@ -1782,15 +1760,30 @@ STRING *
 string_bitwise_not(Interp *interpreter,
     STRING *s, STRING **dest)
 {
-    STRING *res = NULL;
-    size_t len = s ? s->strlen : 0;
+    STRING *res;
+    size_t len;
 
-    if (dest && *dest)
-        res = *dest;
+    if (s) {
+        if (s->encoding != Parrot_fixed_8_encoding_ptr) {
+            real_exception(interpreter, NULL, INVALID_ENCODING,
+                    "string bitwise_and (%s/%s) unsupported",
+                    ((ENCODING *)(s->encoding))->name,
+                    ((ENCODING *)(s->encoding))->name);
+        }
+        len = s->bufused;
+    }
     else
-        res = string_make_empty(interpreter, enum_stringrep_one, len);
+        len = 0;
+    if (dest && *dest) {
+        res = *dest;
+        res->encoding = Parrot_fixed_8_encoding_ptr;
+        res->charset  = Parrot_binary_charset_ptr;
+    }
+    else
+        res = string_make_direct(interpreter, NULL, len,
+                Parrot_fixed_8_encoding_ptr, Parrot_binary_charset_ptr, 0);
 
-    if (!s) {
+    if (!len) {
         res->bufused = 0;
         res->strlen = 0;
         return res;
@@ -1804,8 +1797,7 @@ string_bitwise_not(Interp *interpreter,
 
     make_writable(interpreter, &res, len, enum_stringrep_one);
 
-    res->strlen = len;
-    res->bufused = string_max_bytes(interpreter, res, len);
+    res->strlen = res->bufused = len;
 
     BITWISE_NOT_STRING(Parrot_UInt1, s, res);
     if (dest)
