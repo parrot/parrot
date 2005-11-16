@@ -519,7 +519,7 @@ MAKE_C = ${make_c}
 
 all : \
 	flags_dummy \
-	$(PARROT) \
+	parrot$(EXE) \
 	runtime/parrot/include/parrotlib.pbc \
 	runtime/parrot/include/config.fpmc \
 	docs \
@@ -812,7 +812,6 @@ $(PINFO) : $(SRC_DIR)/pbc_info$(O) $(LIBPARROT)
 # Parrot Bytecode File Merger
 #
 
-# pbc_info
 $(PBCMERGE) : $(SRC_DIR)/pbc_merge$(O) $(LIBPARROT) $(SRC_DIR)/parrot_config$(O)
 	$(LINK) ${ld_out}$(PBCMERGE) \
 	$(SRC_DIR)/pbc_merge$(O) \
