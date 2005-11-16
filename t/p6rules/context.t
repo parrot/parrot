@@ -182,6 +182,20 @@ pir_output_is($PRE.<<'CODE'.$POST,<<OUT,'as array ([2,1,0] => "cba")');
 CODE
 cba
 OUT
+pir_output_is($PRE.<<'CODE'.$POST,<<OUT,'as array ([2,1,0] => "cba")');
+	rulesub = p6rule('(a)(b)(c)')
+	match = rulesub('abc')
+	.local string res
+	res = match[2]
+	print res
+	res = match[1]
+	print res
+	res = match[0]
+	print res
+	goto END
+CODE
+cba
+OUT
 ## TODO: more 
 
 
@@ -232,4 +246,4 @@ OUT
 
 
 # remember to change the number of tests :-)
-BEGIN { plan tests => 15; }
+BEGIN { plan tests => 16; }

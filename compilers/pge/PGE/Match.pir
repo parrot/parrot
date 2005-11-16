@@ -188,6 +188,25 @@ Returns the portion of the target string matched by this object.
     .return ("")
 .end
 
+=item C<__get_string_keyed_int(int key)>
+
+Returns the portion of the target string matched by C<key>,
+in string context. If the Match object contains an array of
+matches, a space seperated list of matches is returned.
+
+=cut
+
+.sub "__get_string_keyed_int" method
+	.param int key
+    $P0 = getattribute self, "PGE::Match\x0@:capt"
+	$S0 = ''
+    if_null $P0, get_1
+    $P0 = $P0[key]
+	$S0 = $P0
+  get_1:
+    .return ($S0)
+.end
+
 =item C<__get_pmc_keyed_int(int key)>
 
 Returns the subpattern capture associated with C<key>.  This
