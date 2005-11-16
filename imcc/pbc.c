@@ -692,6 +692,9 @@ create_lexinfo(Interp *interpreter, IMC_Unit *unit, PMC *sub)
                 assert(k >= 0);
                 lex_name = constants[k]->u.string;
                 assert(PObj_is_string_TEST(lex_name));
+                IMCC_debug(interpreter, DEBUG_PBC_CONST,
+                        "add lexical '%s' to sub name '%s'\n",
+                        r->reg->name, (char*)PMC_sub(sub)->name->strstart);
                 (decl_func)(interpreter,
                             lex_info, lex_name, r->color);
             }

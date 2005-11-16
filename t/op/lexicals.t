@@ -561,14 +561,13 @@ pir_output_is(<<'CODE', <<'OUTPUT', 'closure 5');
 	print "\n"
 .end
 CODE
-bar 1
-bar 2
-bar 3
+bar: 1
+bar: 2
+bar: 3
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', 'closure 6');
-# Leo's version of closure 5, which works.
-# Why does closure 6 work while closure 5 fails?
+# Leo's version of xyzzy original by particle, p5 by chip
 
 .sub main :main
 	.local pmc f,g
