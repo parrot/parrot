@@ -7,7 +7,7 @@ Parrot - running
 
 =head1 VERSION
 
-$Revision $
+$Revision$
 
 =head1 OVERVIEW
 
