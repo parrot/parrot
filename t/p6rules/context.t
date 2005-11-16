@@ -116,14 +116,14 @@ pir_output_is($PRE.<<'CODE'.$POST,<<OUT,'numeric context (a1bc => 0)');
 CODE
 0
 OUT
-pir_output_is($PRE.<<'CODE'.$POST,<<OUT,'numeric context (1E5)', todo => 'specification unclear');
+pir_output_is($PRE.<<'CODE'.$POST,<<OUT,'numeric context (1E5)');
 	rulesub = p6rule('1E5abc')
 	match = rulesub('1E5abc')
 	$I0 = match
 	print $I0
 	goto END
 CODE
-1
+100000
 OUT
 
 
