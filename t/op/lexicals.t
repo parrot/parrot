@@ -520,6 +520,53 @@ CODE
 3 * 5 == 15!
 OUTPUT
 
+pir_output_is(<<'CODE', <<'OUTPUT', 'closure 5');
+# FIXME - we need to detect the destruction of the P registers
+# associated with the Contexts for the calls of xyzzy and plugh.
+# Otherwise, this test is just a repeat of others
+
+.sub main :main
+	.local pmc func
+	func = xyzzy()
+
+	invokecc func
+	invokecc func
+	invokecc func
+.end
+
+.sub xyzzy
+	$P1 = plugh()
+	.return ($P1)
+.end
+
+.sub plugh
+	$P1 = foo()
+	.return ($P1)
+.end
+
+.sub foo
+	.lex 'a', $P0
+	$P0 = new Integer
+	$P0 = 0
+
+	.const .Sub bar_sub = "bar"
+	$P1 = newclosure bar_sub
+	.return ($P1)
+.end
+
+.sub bar :anon :outer(foo)
+	$P0 = find_lex 'a'
+	inc $P0
+	print "bar: "
+	print $P0
+	print "\n"
+.end
+CODE
+bar 1
+bar 2
+bar 3
+OUTPUT
+
 pir_output_like(<<'CODE', <<'OUTPUT', 'get non existing');
 .sub "main"
     .lex 'a', $P0
