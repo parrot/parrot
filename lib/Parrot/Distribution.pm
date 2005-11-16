@@ -231,9 +231,15 @@ Query the svn:ignore property and generate the lines for MANIFEST.SKIP.
 
 sub gen_manifest_skip {
 
-   # manicheck.pl is propably only useful for checked out revisions
+   # manicheck.pl is probably only useful for checked out revisions
    # Checkout is done either with svn or svk
-   my $svn_cmd = $Parrot::Revision::svn_entries =~ m/\.svn/ ? 'svn' : 'svk';
+   my $svn_cmd;
+   if (defined $Parrot::Revision::svn_entries 
+            && $Parrot::Revision::svn_entries =~ m/\.svn/) {
+       $svn_cmd = 'svn';
+   } else {
+       $svn_cmd = 'svk';
+   }
 
    # Find all directories in the Parrot distribution
    my %dir_list  = map { my $dir = ( File::Spec->splitpath( $_ ) )[1];

@@ -25,13 +25,8 @@ use 5.006;
 our $svn_entries = undef;
 
 sub __get_revision {
-    foreach my $entry ( qw[.svn/entries .svk/entries] ) {
-        if (-e $entry) {
-            $svn_entries = $entry;
-            last;
-        }
-    }
-    return 0 unless defined $svn_entries;
+    return 0 unless (-e ".svn/entries");
+    $svn_entries = ".svn/entries";
 
     # code taken from pugs/util/version_h.pl rev 859
     if (-r $svn_entries) {
