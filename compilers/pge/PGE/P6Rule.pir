@@ -4,6 +4,8 @@
 
 .sub "__onload" :load
     .local pmc optable
+    $I0 = find_type "PGE::Exp::WS"
+    if $I0 goto end
     $P0 = getclass "PGE::Exp::Subrule"
     $P1 = subclass $P0, "PGE::Exp::WS"
     $P0 = getclass "PGE::Exp"
@@ -81,6 +83,7 @@
     $P0["h"] = unicode:"\x09\x20\xa0\u1680\u180e\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u202f\u205f\u3000"
     $P0["n"] = unicode:"\x0a\x0d\x0c\x85\u2028\u2029"
     # See http://www.unicode.org/Public/UNIDATA/PropList.txt for above
+  end:
 .end
 
 

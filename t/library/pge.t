@@ -94,6 +94,16 @@ ok
 OUT
 
 
+# 2
+pir_output_is(<<'CODE'.$POST, <<OUT, 'load_bytecode PGE.pbc 2x');
+.sub 'main' :main
+	load_bytecode 'PGE.pbc'
+	load_bytecode 'PGE.pbc'
+CODE
+ok
+OUT
+
+
 for my $file (sort keys %$ns_subs)
 {
 	for my $ns (sort keys %{ $ns_subs->{$file} })

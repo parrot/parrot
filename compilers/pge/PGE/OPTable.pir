@@ -63,12 +63,15 @@ Creates the PGE::OPTable class.
 
 .sub "__onload" :load
     .local pmc base
+    $I0 = find_type "PGE::OPTable"
+    if $I0 goto end
     base = newclass "PGE::OPTable"
     addattribute base, "%:toktable"
     addattribute base, "%:termtable"
     addattribute base, "%:opertable"
     addattribute base, "%:wstermtable"
     addattribute base, "%:wsopertable"
+  end:
 .end
 
 =item C<__init()>

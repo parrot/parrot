@@ -17,10 +17,13 @@ a number of built-in rules.
 .sub "__onload" :load
     .local pmc base
     .local pmc p6rule
+    $I0 = find_type "PGE::Rule"
+    if $I0 goto end
     base = getclass "PGE::Match"
     $P0 = subclass base, "PGE::Rule"
     $P0 = new Hash
     store_global "PGE::Rule", "%:cache", $P0
+  end:
     .return ()
 .end
 

@@ -12,6 +12,8 @@
     .local pmc optable
     .local pmc term
 
+    $I0 = find_type "PGE::Exp"
+    if $I0 goto end
     $P0 = getclass "PGE::Match"
     $P0 = subclass $P0, "PGE::Exp"
     $P1 = subclass $P0, "PGE::Exp::Literal"
@@ -31,6 +33,7 @@
     $P1 = subclass $P0, "PGE::Exp::Commit"
     $P0 = new Integer
     store_global "PGE::Exp", "$_serno", $P0
+  end:
 .end
 
 

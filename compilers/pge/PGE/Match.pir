@@ -12,6 +12,8 @@ This file implements match objects returned by the Parrot Grammar Engine.
 
 .sub "__onload" :load
     .local pmc base
+    $I0 = find_type "PGE::Match"
+    if $I0 goto end
     $P0 = getclass "PerlHash"
     base = subclass $P0, "PGE::Match"
     addattribute base, "$:target"                  # target
@@ -19,6 +21,7 @@ This file implements match objects returned by the Parrot Grammar Engine.
     addattribute base, "$:pos"                     # current match position
     addattribute base, "&:corou"                   # match's corou
     addattribute base, "@:capt"                    # subpattern captures
+  end:
     .return ()
 .end
 
