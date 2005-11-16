@@ -88,47 +88,52 @@ upcase(Interp *interpreter, STRING *src)
 #if PARROT_HAS_ICU
 
     UErrorCode err;
-    int dest_len, src_len;
+    int dest_len, src_len, needed;
 
     src = Parrot_utf16_encoding_ptr->to_encoding(interpreter, src, NULL);
     /*
-U_CAPI int32_t U_EXPORT2
-u_strToUpper(UChar *dest, int32_t destCapacity,
-             const UChar *src, int32_t srcLength,
-             const char *locale,
-             UErrorCode *pErrorCode);
-     */
+       U_CAPI int32_t U_EXPORT2
+       u_strToUpper(UChar *dest, int32_t destCapacity,
+       const UChar *src, int32_t srcLength,
+       const char *locale,
+       UErrorCode *pErrorCode);
+       */
     err = U_ZERO_ERROR;
     /* use all available space - see below XXX */
     /* TODO downcase, titlecase too */
     dest_len = PObj_buflen(src) / sizeof(UChar);
     src_len = src->bufused / sizeof(UChar);
+    /*
+     * XXX troubles:
+     *   t/op/string_cs_45  upcase unicode:"\u01f0"
+     *   this creates \u004a \u030c J+NON-SPACING HACEK
+     *   the string needs resizing, *if* the src buffer is
+     *   too short. *But* with icu 3.2/3.4 the src string is
+     *   overwritten with partial result, despite the icu docs sayeth:
+     *
+     *      The source string and the destination buffer
+     *      are allowed to overlap.
+     *
+     *  Workaround:  'preflighting' returns needed length
+     *  Alternative: forget about inplace operation - create new result
+     *
+     *  TODO downcase, titlecase
+     */
+    needed = u_strToUpper(NULL, 0,
+            src->strstart, src_len,
+            NULL,       /* locale = default */
+            &err);
+    if (needed > dest_len) {
+        Parrot_reallocate_string(interpreter, src, needed * sizeof(UChar));
+        dest_len = needed;
+    }
+    err = U_ZERO_ERROR;
     dest_len = u_strToUpper(src->strstart, dest_len,
             src->strstart, src_len,
             NULL,       /* locale = default */
             &err);
+    assert(U_SUCCESS(err));
     src->bufused = dest_len * sizeof(UChar);
-    if (!U_SUCCESS(err)) {
-        /*
-         * XXX troubles:
-         *   t/op/string_cs_44  upcase unicode:"\u01f0"
-         *   this creates \u004a \u030c J+NON-SPACING HACEK
-         *   the string needs resizing, *if* the src buffer is
-         *   too short. *But* (at least) with icu 3.2 the src string is
-         *   overwritten with \0 despite the icu docs sayeth:
-         *
-         *      The source string and the destination buffer
-         *      are allowed to overlap.
-         */
-        err = U_ZERO_ERROR;
-        Parrot_reallocate_string(interpreter, src, dest_len);
-        dest_len = u_strToUpper(src->strstart, dest_len,
-                src->strstart, src_len,
-                NULL,       /* locale = default */
-                &err);
-        assert(U_SUCCESS(err));
-        src->bufused = dest_len * sizeof(UChar);
-    }
     /* downgrade if possible */
     if (dest_len == (int)src->strlen)
         src->encoding = Parrot_ucs2_encoding_ptr;
