@@ -42,7 +42,7 @@ Parrot::Configure::Data->set(
 );
 
 if ((split('-', $Config{archname}))[0] eq 'ia64') {
-    Parrot::Configure::Data->set
+    Parrot::Configure::Data->set(
         platform_asm => 1
     );
 }
