@@ -16,7 +16,7 @@ Tests various lexical scratchpad operations.
 
 =cut
 
-use Parrot::Test tests => 35;
+use Parrot::Test tests => 36;
 
 output_is(<<'CODE', <<'OUTPUT', '.lex parsing - PASM');
 .pcc_sub main:
@@ -526,12 +526,11 @@ pir_output_is(<<'CODE', <<'OUTPUT', 'closure 5');
 # Otherwise, this test is just a repeat of others
 
 .sub main :main
-	.local pmc func
-	func = xyzzy()
-
-	invokecc func
-	invokecc func
-	invokecc func
+	.local pmc f
+	f = xyzzy()
+	f()
+	f()
+	f()
 .end
 
 .sub xyzzy
@@ -565,6 +564,67 @@ CODE
 bar 1
 bar 2
 bar 3
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', 'closure 6');
+# Leo's version of closure 5, which works.
+# Why does closure 6 work while closure 5 fails?
+
+.sub main :main
+	.local pmc f,g
+        f = xyzzy(42)
+        $P0 = f()
+        $P0 = f()
+        $P0 = f()
+        g = xyzzy(13013)
+        $P0 = g()
+        $P0 = f()
+.end
+
+.sub xyzzy
+        .param int i
+        .local pmc f
+        f = plugh(i)
+        .return (f)
+.end
+
+.sub plugh
+        .param int i
+        .local pmc f
+        f = foo(i)
+        .return (f)
+.end
+
+.sub foo
+        .param int i
+        .lex 'a', $P0
+        $P1 = new Integer
+        $P1 = i
+        store_lex 'a', $P1
+        print "foo: "
+        print $P0
+        print "\n"
+        .const .Sub closure = 'bar'
+        $P2 = newclosure closure
+        .return($P2)
+.end
+
+.sub bar :anon :outer(foo)
+        $P0 = find_lex 'a'
+        inc $P0
+        store_lex 'a', $P0
+        print "bar: "
+        print $P0
+        print "\n"
+.end
+CODE
+foo: 42
+bar: 43
+bar: 44
+bar: 45
+foo: 13013
+bar: 13014
+bar: 46
 OUTPUT
 
 pir_output_like(<<'CODE', <<'OUTPUT', 'get non existing');
