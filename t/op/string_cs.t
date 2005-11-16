@@ -16,7 +16,7 @@ Tests charset support.
 
 =cut
 
-use Parrot::Test tests => 48;
+use Parrot::Test tests => 49;
 use Parrot::Config;
 use Test::More;
 
@@ -716,6 +716,18 @@ output_is( <<'CODE', <<"OUTPUT", "unicode upcase");
     end
 CODE
 T\x{c3}\x{96}TSCH
+OUTPUT
+
+output_is( <<'CODE', <<"OUTPUT", "unicode upcase to combined char");
+    set S1, unicode:"hacek j \u01f0"
+    upcase S1
+    getstdout P0          # need to convert back to utf8
+    push P0, "utf8"       # push utf8 output layer
+    print S1
+    print "\n"
+    end
+CODE
+HACEK J J\xcc\x8c
 OUTPUT
 
 output_is( <<'CODE', <<"OUTPUT", "unicode titlecase");

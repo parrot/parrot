@@ -106,6 +106,7 @@ u_strToUpper(UChar *dest, int32_t destCapacity,
             &err);
     src->bufused = dest_len * sizeof(UChar);
     if (!U_SUCCESS(err)) {
+        err = U_ZERO_ERROR;
         Parrot_reallocate_string(interpreter, src, src->bufused);
         dest_len = u_strToUpper(src->strstart, dest_len,
                 src->strstart, src_len,
@@ -146,6 +147,7 @@ u_strToLower(UChar *dest, int32_t destCapacity,
             &err);
     src->bufused = dest_len * sizeof(UChar);
     if (!U_SUCCESS(err)) {
+        err = U_ZERO_ERROR;
         Parrot_reallocate_string(interpreter, src, src->bufused);
         dest_len = u_strToLower(src->strstart, dest_len,
                 src->strstart, src_len,
@@ -188,6 +190,7 @@ u_strToTitle(UChar *dest, int32_t destCapacity,
             &err);
     src->bufused = dest_len * sizeof(UChar);
     if (!U_SUCCESS(err)) {
+        err = U_ZERO_ERROR;
         Parrot_reallocate_string(interpreter, src, src->bufused);
         dest_len = u_strToTitle(src->strstart, dest_len,
                 src->strstart, src_len,
