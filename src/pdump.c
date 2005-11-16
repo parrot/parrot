@@ -4,15 +4,13 @@ $Id$
 
 =head1 NAME
 
-src/pdump.c - Dump or convert Parrot bytecode (PBC) files
+pdump - Dump or convert Parrot bytecode (PBC) files
 
 =head1 SYNOPSIS
 
-	% make pdump
+ pdump [-tdh] [--terse|--disassemble|--header-only] file.pbc
 
-	% ./pdump [-tdh] [--terse|--disassemble|--header-only] file.pbc
-
-	% ./pdump -o converted.pbc file.pbc
+ pdump -o converted.pbc file.pbc
 
 =head1 DESCRIPTION
 
@@ -41,9 +39,9 @@ efficiency on reading non native PBCs.
 
 =back
 
-=head2 Functions
+=head1 SEE ALSO
 
-=over 4
+F<src/packdump.c>.
 
 =cut
 
@@ -54,12 +52,10 @@ efficiency on reading non native PBCs.
 
 /*
 
-=item C<static void
-const_dump(Interp *interpreter, struct PackFile_Segment *segp)>
+static void
+const_dump(Interp *interpreter, struct PackFile_Segment *segp)
 
 Dump the constant table.
-
-=cut
 
 */
 
@@ -74,12 +70,10 @@ const_dump (Interp *interpreter, struct PackFile_Segment *segp)
 
 /*
 
-=item C<static void
-fixup_dump(Interp *interpreter, struct PackFile_Segment *segp)>
+static void
+fixup_dump(Interp *interpreter, struct PackFile_Segment *segp)
 
 Dump the fix-up table.
-
-=cut
 
 */
 
@@ -94,12 +88,10 @@ fixup_dump (Interp *interpreter, struct PackFile_Segment *segp)
 
 /*
 
-=item C<static void
-disas_dump(Interp *interpreter, struct PackFile_Segment *self)>
+static void
+disas_dump(Interp *interpreter, struct PackFile_Segment *self)
 
 Disassemble and dump.
-
-=cut
 
 */
 
@@ -128,12 +120,10 @@ disas_dump (Interp *interpreter, struct PackFile_Segment *self)
 
 /*
 
-=item C<static void
-PackFile_header_dump(Interp *interpreter, struct PackFile *pf)>
+static void
+PackFile_header_dump(Interp *interpreter, struct PackFile *pf)
 
 Dump the header.
-
-=cut
 
 */
 
@@ -162,11 +152,9 @@ PackFile_header_dump(Interp *interpreter, struct PackFile *pf)
 
 /*
 
-=item C<static void help(void)>
+static void help(void)
 
 Print out the user help info.
-
-=cut
 
 */
 
@@ -195,12 +183,10 @@ static struct longopt_opt_decl options[] = {
 
 /*
 
-=item C<int
-main(int argc, char **argv)>
+int
+main(int argc, char **argv)
 
 The run loop. Process the command-line arguments and dumps accordingly.
-
-=cut
 
 */
 
@@ -303,18 +289,6 @@ main(int argc, char **argv)
     Parrot_exit(0);
     return 0;
 }
-
-/*
-
-=back
-
-=head1 SEE ALSO
-
-F<src/packdump.c>.
-
-=cut
-
-*/
 
 /*
  * Local variables:

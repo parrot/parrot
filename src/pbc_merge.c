@@ -4,14 +4,12 @@ $Id: $
 
 =head1 NAME
 
-src/pbc_merge.c - Merge multiple Parrot bytecode (PBC) files into
+pbc_merge - Merge multiple Parrot bytecode (PBC) files into
                   a single PBC file.
 
 =head1 SYNOPSIS
 
-    % make pbc_merge
-
-    % ./pbc_merge -o out.pbc input1.pbc input2.pbc ...
+ pbc_merge -o out.pbc input1.pbc input2.pbc ...
 
 =head1 DESCRIPTION
 
@@ -29,10 +27,6 @@ The name of the PBC file to produce, containing the merged
 segments from the input PBC files.
 
 =back
-
-=head2 Functions
-
-=over 4
 
 =cut
 
@@ -58,11 +52,9 @@ struct pbc_merge_input
 
 /*
 
-=item C<static void help(void)>
+static void help(void)
 
 Print out the user help info.
-
-=cut
 
 */
 static void
@@ -77,14 +69,12 @@ help(void)
 
 /*
 
-=item C<static struct PackFile*
-pbc_merge_loadpbc(Interp *interpreter, char *filename)>
+static struct PackFile*
+pbc_merge_loadpbc(Interp *interpreter, char *filename)
 
 This function loads a PBC file and unpacks it. We can't
 use Parrot_readbc because that is specified to also
 fixup the segments, which we don't want.
-
-=cut
 
 */
 static struct PackFile*
@@ -166,14 +156,12 @@ pbc_merge_loadpbc(Interp *interpreter, char *fullname)
 
 /*
 
-=item C<static struct PackFile_ByteCode*
+static struct PackFile_ByteCode*
 pbc_merge_bytecode(Interp *interpreter, struct pbc_merge_input **inputs,
-                   int num_inputs, struct PackFile *pf)>
+                   int num_inputs, struct PackFile *pf)
 
 This function merges the bytecode from the input packfiles, storing the
 offsets that each bit of bytecode now exists at.
-
-=cut
 
 */
 static struct PackFile_ByteCode*
@@ -235,14 +223,12 @@ pbc_merge_bytecode(Interp *interpreter, struct pbc_merge_input **inputs,
 
 /*
 
-=item C<static struct PackFile_ConstTable*
+static struct PackFile_ConstTable*
 pbc_merge_constants(Interp *interpreter, struct pbc_merge_input **inputs,
                     int num_inputs, struct PackFile *pf,
-                    struct PackFile_ByteCode *bc)>
+                    struct PackFile_ByteCode *bc)
 
 This function merges the constants tables from the input PBC files.
-
-=cut
 
 */
 static struct PackFile_ConstTable*
@@ -341,14 +327,12 @@ pbc_merge_constants(Interp *interpreter, struct pbc_merge_input **inputs,
 
 /*
 
-=item C<static void
+static void
 pbc_merge_fixups(Interp *interpreter, struct pbc_merge_input **inputs,
                  int num_inputs, struct PackFile *pf,
-                 struct PackFile_ByteCode *bc)>
+                 struct PackFile_ByteCode *bc)
 
 This function merges the fixups tables from the input PBC files.
-
-=cut
 
 */
 static void
@@ -446,14 +430,12 @@ pbc_merge_fixups(Interp *interpreter, struct pbc_merge_input **inputs,
 
 /*
 
-=item C<static void
+static void
 pbc_merge_debugs(Interp *interpreter, struct pbc_merge_input **inputs,
                  int num_inputs, struct PackFile *pf,
-                 struct PackFile_ByteCode *bc)>
+                 struct PackFile_ByteCode *bc)
 
 This function merges the debug segments from the input PBC files.
-
-=cut
 
 */
 static void
@@ -523,16 +505,14 @@ pbc_merge_debugs(Interp *interpreter, struct pbc_merge_input **inputs,
 
 /*
 
-=item C<static void
+static void
 pbc_merge_ctpointers(Interp *interpreter, struct pbc_merge_input **inputs,
                      int num_inputs, struct PackFile *pf,
                      struct PackFile_ByteCode *bc,
-                     struct PackFile_ConstTable *ct)>
+                     struct PackFile_ConstTable *ct)
 
 This function corrects the pointers into the constants table found in the
 bytecode.
-
-=cut
 
 */
 static void
@@ -589,13 +569,11 @@ pbc_merge_ctpointers(Interp *interpreter, struct pbc_merge_input **inputs,
 
 /*
 
-=item C<static struct PackFile*
+static struct PackFile*
 pbc_merge_begin(Interp *interpreter, struct pbc_merge_input **inputs,
-                int num_inputs)>
+                int num_inputs)
 
 This is the function that drives PBC merging process.
-
-=cut
 
 */
 static struct PackFile*
@@ -630,12 +608,10 @@ pbc_merge_begin(Interp *interpreter, struct pbc_merge_input **inputs,
 
 /*
 
-=item C<static void
-pbc_merge_write(Interp *interpreter, struct PackFile *pf, char *filename)>
+static void
+pbc_merge_write(Interp *interpreter, struct PackFile *pf, char *filename)
 
 This functions writes out the merged packfile.
-
-=cut
 
 */
 static void
@@ -672,14 +648,12 @@ pbc_merge_write(Interp *interpreter, struct PackFile *pf, char *filename)
 
 /*
 
-=item C<int
-main(int argc, char **argv)>
+int
+main(int argc, char **argv)
 
 The main function that grabs console input, reads in the packfiles
 provided they exist, hands them to another function that runs the
 merge process and finally writes out the produce packfile.
-
-=cut
 
 */
 
@@ -774,12 +748,4 @@ main(int argc, char **argv)
     Parrot_exit(0);
     return 0;
 }
-
-/*
-
-=back
-
-=cut
-
-*/
 

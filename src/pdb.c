@@ -4,12 +4,11 @@ $Id$
 
 =head1 NAME
 
-src/pdb.c - The Parrot debugger
+pdb - The Parrot debugger
 
 =head1 SYNOPSIS
 
-	% make pdb
-	% ./pdb programfile
+ pdb programfile
 
 =head1 DESCRIPTION
 
@@ -98,10 +97,6 @@ Print the help.
 You can also debug Parrot code by using the C<debug_init>, C<debug_load>
 and C<debug_break> ops in F<ops/debug.ops>.
 
-=head2 Functions
-
-=over 4
-
 =cut
 
 */
@@ -115,13 +110,11 @@ void PDB_printwelcome(void);
 
 /*
 
-=item C<int
-main(int argc, char *argv[])>
+int
+main(int argc, char *argv[])
 
-Reads the PASM or PBC file from C<argv[1]>, loads it, and then calls
-C<Parrot_debug()>.
-
-=cut
+Reads the PASM or PBC file from argv[1], loads it, and then calls
+Parrot_debug().
 
 */
 
@@ -163,12 +156,10 @@ main(int argc, char *argv[])
 
 /*
 
-=item C<void
-PDB_printwelcome()>
+void
+PDB_printwelcome()
 
 Prints out the welcome string.
-
-=cut
 
 */
 

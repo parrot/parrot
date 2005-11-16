@@ -4,21 +4,16 @@ $Id$
 
 =head1 NAME
 
-src/pbc_info.c - PacFile demo
+pbc_info - PacFile demo
 
 =head1 SYNOPSIS
 
-    % make pbc_info
-    % ./pbc_info file.pbc
+ pbc_info file.pbc
 
 =head1 DESCRIPTION
 
 Sample program for dumping PackFile segment names by iterating
 over the main directory.
-
-=head2 Functions
-
-=over 4
 
 =cut
 
@@ -29,10 +24,10 @@ over the main directory.
 
 /*
 
-=item C<static INTVAL iter(Interp*, struct PackFile_Segment *seg, void *user_data)>
+static INTVAL iter(Interp*, struct PackFile_Segment *seg, void *user_data)
 
-This function is passed the callback to C<PackFile_map_segments()> to
-print out the name of each segment in the directory.
+This function is passed the callback to PackFile_map_segments() to print out
+the name of each segment in the directory.
 
 =cut
 
@@ -52,12 +47,11 @@ iter(Interp* interpreter,
 
 /*
 
-=item C<int
-main(int argc, char **argv)>
+int
+main(int argc, char **argv)
 
-Reads the PBC from C<argv[1]>, adds a few extra sections, and then
-iterates over the directory using C<PackFile_map_segments()> and
-C<iter()>.
+Reads the PBC from argv[1], adds a few extra sections, and then iterates over
+the directory using PackFile_map_segments() and iter().
 
 =cut
 
@@ -96,8 +90,6 @@ main(int argc, char **argv)
 }
 
 /*
-
-=back
 
 =head1 SEE ALSO
 

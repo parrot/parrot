@@ -4,23 +4,17 @@ $Id$
 
 =head1 NAME
 
-src/disassemble.c - Parrot disassembler
+disassemble - Parrot disassembler
 
 =head1 SYNOPSIS
 
-    % make disassemble
-
-    % ./disassemble file.pbc
+    disassemble file.pbc
 
 =head1 DESCRIPTION
 
 This uses the C<Parrot_disassemble()> function from F<src/embed.c>,
 which in turn uses the C<PDB_disassemble()> function from
 F<src/debug.c>.
-
-=head2 Functions
-
-=over 4
 
 =cut
 
@@ -36,12 +30,10 @@ static void do_dis(Parrot_Interp);
 
 /*
 
-=item C<int main(int argc, char *argv[])>
+int main(int argc, char *argv[])
 
 The run-loop. Starts up an interpreter, loads the bytecode from the
 command-line and disassembles it.
-
-=cut
 
 */
 
@@ -85,11 +77,9 @@ main(int argc, char *argv[])
 
 /*
 
-=item C<static void do_dis(Parrot_Interp interpreter)>
+static void do_dis(Parrot_Interp interpreter)
 
 Do the disassembling.
-
-=cut
 
 */
 
@@ -101,8 +91,6 @@ do_dis(Parrot_Interp interpreter)
 
 /*
 
-=back
-
 =head1 SEE ALSO
 
 F<src/embed.c> and F<src/debug.c>.
@@ -110,6 +98,9 @@ F<src/embed.c> and F<src/debug.c>.
 =head1 HISTORY
 
 Initial version by Daniel Grunblatt on 2002.5.26.
+
+Florian Ragwitz: Moved POD documentation that's not necessary to know how to
+actually run the disassembler to normal C comments (Wed, 16 Nov 2005).
 
 =cut
 
