@@ -103,7 +103,7 @@ can cheat ... er, can be written in optimized C.  :-)
 TODO: Describe how lexical naming system interacts with non-ASCII
       character sets.
 
-=head2 Lookup strategy
+=head2 Lexical Lookup Algorithm
 
 If Parrot is asked to access a lexical variable named $var, Parrot
 follows the following strategy.  Note that fetch and store use the
@@ -129,21 +129,62 @@ loops through these steps:
 =head2 LexPad and LexInfo are optional; the ":lex" attribute
 
 Parrot does not assume that every subroutine needs lexical variables.
-Therefore, Parrot defaults to I<not> creating LexInfo or LexPad PMCs
-for a given subroutine.  It only creates them when it first encounters
-a ".lex" directive in the subroutine.  If no such directive is found,
-Parrot does not create a LexInfo for it at compile time, nor a LexPad
-for it at run time.
+Therefore, Parrot defaults to I<not> creating LexInfo or LexPad PMCs.
+It only creates a Lexinfo when it first encounters a ".lex" directive
+in the subroutine.  If no such directive is found, Parrot does not
+create a LexInfo for it at compile time, and therefore cannot create
+a a LexPad for it at run time.
 
 However, an absence of ".lex" directives is normal for some languages
 (e.g. Tcl) which lack compile-time knowledge of lexicals.  For these
 languages, the additional Subroutine attribute ":lex" should be
-specified.  It tells Parrot to create LexInfo and LexPads even though
-no lexicals are declared.
+specified.  It forces Parrot to create LexInfo and LexPads.
 
 =head2 Closures
 
-FIXME: Describe the current closure mechanism
+NOTE: This section should be taken using the "as-if" rule: Parrot
+behaves as if this section were literally true.  As always, short cuts
+(development and runtime) may be taken.
+
+Closures are specialized Subroutines that carry their I<lexical
+environment> along with them.  A lexical environment, which we will
+call a "LexEnv" for brevity, is a list of LexPads to be searched when
+looking for lexical variables.  Its implementation may be as simple as
+a basic PMC array, but any ordered integer-indexed collection will do.
+
+=head3 Closure creation: Capturing the lexical environment
+
+The C<newclosure> op creates a Closure from a Subroutine and gives
+that Closure a new LexPad attribute.  The LexPad is then populated
+with pointers to the current I<enclosing> LexPads.  The definition
+of "enclosing" is not obvious, however.
+
+The algorithm used to find them is a loop of the following steps,
+starting with $sub set to the running Subroutine (which is a Closure):
+
+  1. Starting at the current call frame, walk back until an active
+     frame is found that is executing $sub.  Call it $frame.
+
+     (NOTE: The first time through, $sub is the current subroutine
+            and $frame is the currently live frame.)
+
+  2. Append $frame's LexPad to the LexEnv.
+
+  3. Set $sub to $sub.outer.  (That is, the textually enclosing
+     subroutine.)  But if $sub has no outer sub, END LOOP.
+
+NOTE: The C<newclosure> opcode should check to make sure that the
+target Subroutine has a :outer() attribute that points back to the
+currently running Subroutine.  This is a requirement for closures.
+
+=head3 Closure runtime: Using the lexical environment
+
+At runtime, the C<find_lex> opcode behaves differently in closures.
+It has no need to walk the call stack finding LexPads - they have all
+already been collected conveniently together in the LexEnv.
+Therefore, in a Closure, C<find_lex> I<ignores> the call stack, and
+instead searches (1) the current call frame's LexPad - i.e. the
+Closure's own lexicals -- and then (2) the LexPads in the LexEnv.
 
 =head2 HLL Type Mapping
 
@@ -158,10 +199,10 @@ That mapping will automatically occur when the appropriate ".HLL"
 directive is in force.
 
 Using Tcl as an extreme example: TclLexPad will likely be a thin
-veneer on PMCHash.  TclLexInfo will likely map to Null.  Tcl provides
-no reliable compile-time information about lexicals; without any
-compile-time information to store, there's no need for TclLexInfo to
-do anything interesting.
+veneer on PMCHash.  Meanwhile, TclLexInfo will likely map to Null: Tcl
+provides no reliable compile-time information about lexicals; without
+any compile-time information to store, there's no need for TclLexInfo
+to do anything interesting.
 
 =head2 Nested Subroutines Have Outies; the ":outer" attribute
 
@@ -194,7 +235,7 @@ Damian.  But I repeat myself.)  This information is given through a
 
     .sub a :outer(foo)
 
-=head1 LEXPAD AND LEXINFO REQUIRED INTERFACES
+=head1 REQUIRED INTERFACES: LEXPAD, LEXINFO, CLOSURE
 
 =head2 LexInfo
 
@@ -258,6 +299,19 @@ the current Context at init_pmc() time.
 =item B<PMC *get_lexinfo()>
 
 Return the associated LexInfo.
+
+=back
+
+=head2 Closure
+
+For debugging and introspection, the Closure PMC should support:
+
+=over 4
+
+=item B<PMC *get_lexenv()>
+
+Return the associated LexEnv, an ordered integer-index collection
+(e.g. an Array) of LexPads captured at C<newclosure> time.
 
 =back
 
