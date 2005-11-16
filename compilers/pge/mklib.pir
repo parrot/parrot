@@ -21,7 +21,6 @@ file.
     .local string rulex
     .local string grammar
     .local string code
-    load_bytecode "Data/Escape.pbc"
     load = find_global "PGE::TokenHash", "__onload"
     load()
     load = find_global "PGE::Match", "__onload"

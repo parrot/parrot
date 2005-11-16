@@ -411,8 +411,7 @@
     mob["subname"] = subname
     mob["iscapture"] = iscapture
     if iscapture == 0 goto end
-    $P1 = find_global "Data::Escape", "String"
-    $S0 = $P1(subname, '"')
+    $S0 = escape subname
     $S0 = concat '"', $S0
     $S0 = concat $S0, '"'
     mob["cname"] = $S0
@@ -530,8 +529,7 @@
   name_1:
     $I1 = $I0 - pos
     cname = substr target, pos, $I1
-    $P1 = find_global "Data::Escape", "String"
-    cname = $P1(cname, '"')
+    cname = escape cname
     cname = concat '"', cname
     cname = concat cname, '"'
     mob["cname"] = cname

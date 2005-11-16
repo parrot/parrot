@@ -12,10 +12,6 @@ unit, calling the subroutines marked with the C<:load> subpragma for each.
 
 .namespace [ "PGE" ]
 
-.sub "__onload" :load
-    load_bytecode "Data/Escape.pbc"
-.end
-
 .include "compilers/pge/PGE/TokenHash.pir"
 .include "compilers/pge/PGE/Match.pir"
 .include "compilers/pge/PGE/OPTable.pir"

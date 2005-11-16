@@ -137,21 +137,13 @@ won't be a problem, but is the use of the start parameter thread-safe?
 
 .sub "escape" :method
     .param string str
-    $P0 = find_global "Data::Escape", "String"
-    str = $P0(str, '"')
-    $I0 = find_charset "ascii"
-    trans_charset str, $I0
+    str = escape str
     str = concat '"', str
     str = concat str, '"'
     $I0 = index str, "\\x"
-    if $I0 > 0 goto unicode
-    $I0 = index str, "\\2"
-    if $I0 > 0 goto unicode
-    $I0 = index str, "\\3"
-    if $I0 > 0 goto unicode
-    .return (str)
-  unicode:
+    if $I0 < 0 goto end
     str = concat "unicode:", str
+  end:
     .return (str)
 .end
 
