@@ -580,13 +580,21 @@ help :
 	@echo "Executables:"
 	@echo "  all:               'parrot' and the documentation."
 	@echo "                     This is the default."
+	@echo ""
+	@echo "  shared:            'parrot', dynamically linked"
+	@echo "  all_shared:        'parrot', dynamically linked and the documentation"
+	@echo ""
 	@echo "  world:             'all' and 'parrot_utils'."
+	@echo "  world_shared:      'all_shared' and 'parrot_utils_shared'"
+	@echo ""
 	@echo "  parrot_utils:      $(PDUMP), $(DIS), $(PINFO), $(PDB) and $(PBCMERGE)"
 	@echo "  $(PDUMP):             Parrot Dumper"
 	@echo "  $(DIS):       Parrot Disassembler"
 	@echo "  $(PINFO):          Information about Parrot Byte Code"
 	@echo "  $(PDB):               Parrot Debugger"
 	@echo "  $(PBCMERGE):         Parrot Debugger"
+	@echo ""
+	@echo "  parrot_utils_shared: same as parrot_utils, but linked against a shared libparrot"
 	@echo ""
 	@echo "Installation:"
 	@echo "  install:           Install under '/usr/local/parrot' on Unix systems"
@@ -663,7 +671,10 @@ help :
 
 world : all parrot_utils
 
+world_shared: all_shared parrot_utils_shared
+
 parrot_utils : $(PDUMP) $(DIS) $(PINFO) $(PDB) $(PBCMERGE)
+parrot_utils_shared : $(PDUMP)_shared $(DIS)_shared $(PINFO)_shared $(PDB)_shared $(PBCMERGE)_shared
 
 flags_dummy :
 	@echo Compiling with:
@@ -743,6 +754,8 @@ check_source : $(GENERAL_H_FILES)
 shared : $(GEN_HEADERS) blib/lib/libparrot$(SHARE_EXT).$(SOVERSION) $(LIBPARROT) $(INSTALLABLEPARROT)
 	$(LINK) ${ld_out}$(INSTALLABLEPARROT) $(LINKFLAGS) $(IMCC_DIR)/main$(O) -Lblib/lib -lparrot $(ICU_SHARED) $(C_LIBS)
 
+all_shared : all shared
+
 static : $(GEN_HEADERS) $(LIBPARROT)
 
 # XXX changes don't always propagate into libparrot
@@ -778,6 +791,11 @@ $(PDB) : $(SRC_DIR)/pdb$(O) $(LIBPARROT)
 	$(SRC_DIR)/null_config$(O) \
 	$(LINKFLAGS) $(ALL_PARROT_LIBS)
 
+$(PDB)_shared : $(SRC_DIR)/pdb$(O) blib/lib/libparrot$(SHARE_EXT).$(SOVERSION)
+	$(LINK) ${ld_out}$(PDB)_shared \
+	$(SRC_DIR)/pdb$(O) \
+	$(LINKFLAGS) -Lblib/lib -lparrot $(ALL_PARROT_LIBS)
+
 #
 # Parrot Disassembler
 #
@@ -790,6 +808,11 @@ $(DIS) : $(SRC_DIR)/disassemble$(O) $(LIBPARROT)
 	$(SRC_DIR)/null_config$(O) \
 	$(LINKFLAGS) $(ALL_PARROT_LIBS)
 
+$(DIS)_shared : $(SRC_DIR)/disassemble$(O) blib/lib/libparrot$(SHARE_EXT).$(SOVERSION)
+	$(LINK) ${ld_out}$(DIS)_shared \
+	$(SRC_DIR)/disassemble$(O) \
+	$(LINKFLAGS) -Lblib/lib -lparrot $(ALL_PARROT_LIBS)
+
 #
 # Parrot Dump
 #
@@ -800,6 +823,12 @@ $(PDUMP) : $(SRC_DIR)/pdump$(O) $(SRC_DIR)/packdump$(O) $(LIBPARROT)
 	$(SRC_DIR)/null_config$(O) \
 	$(SRC_DIR)/packdump$(O) $(LINKFLAGS) $(ALL_PARROT_LIBS)
 
+$(PDUMP)_shared : $(SRC_DIR)/pdump$(O) $(SRC_DIR)/packdump$(O) blib/lib/libparrot$(SHARE_EXT).$(SOVERSION)
+	$(LINK) ${ld_out}$(PDUMP)_shared \
+	$(SRC_DIR)/pdump$(O) \
+	$(SRC_DIR)/packdump$(O) \
+	$(LINKFLAGS) -Lblib/lib -lparrot $(ALL_PARROT_LIBS)
+
 
 # pbc_info
 $(PINFO) : $(SRC_DIR)/pbc_info$(O) $(LIBPARROT)
@@ -807,6 +836,11 @@ $(PINFO) : $(SRC_DIR)/pbc_info$(O) $(LIBPARROT)
 	$(SRC_DIR)/pbc_info$(O) \
 	$(SRC_DIR)/null_config$(O) \
 	$(LINKFLAGS) $(ALL_PARROT_LIBS)
+
+$(PINFO)_shared : $(SRC_DIR)/pbc_info$(O) blib/lib/libparrot$(SHARE_EXT).$(SOVERSION)
+	$(LINK) ${ld_out}$(PINFO)_shared \
+	$(SRC_DIR)/pbc_info$(O) \
+	$(LINKFLAGS) -Lblib/lib -lparrot $(ALL_PARROT_LIBS)
 
 #
 # Parrot Bytecode File Merger
@@ -818,6 +852,10 @@ $(PBCMERGE) : $(SRC_DIR)/pbc_merge$(O) $(LIBPARROT) $(SRC_DIR)/parrot_config$(O)
 	$(SRC_DIR)/parrot_config$(O) \
 	$(LINKFLAGS) $(LINK_DYNAMIC) $(ALL_PARROT_LIBS)
 
+$(PBCMERGE)_shared : $(SRC_DIR)/pbc_merge$(O) blib/lib/libparrot$(SHARE_EXT).$(SOVERSION)
+	$(LINK) ${ld_out}$(PBCMERGE)_shared \
+	$(SRC_DIR)/pbc_merge$(O) \
+	$(LINKFLAGS) -Lblib/lib -lparrot $(ALL_PARROT_LIBS)
 
 
 ###############################################################################
@@ -1371,11 +1409,11 @@ prog-clean :
 		$(MINIPARROT) \
 		$(INSTALLABLEPARROT) \
 		$(IMCC_DIR)/main$(O) \
-		$(PDUMP) $(SRC_DIR)/pdump$(O) $(SRC_DIR)/packdump$(O) \
+		$(PDUMP) $(PDUMP)_shared $(SRC_DIR)/pdump$(O) $(SRC_DIR)/packdump$(O) \
 		$(SRC_DIR)/pbc_info$(O) $(PINFO) \
-		$(PDB) $(SRC_DIR)/pdb$(O) \
-		$(PBCMERGE) $(SRC_DIR)/pbc_merge$(O) \
-		$(DIS) $(SRC_DIR)/disassemble$(O) \
+		$(PDB) $(PDB)_shared $(SRC_DIR)/pdb$(O) \
+		$(PBCMERGE) $(PBCMERGE)_shared $(SRC_DIR)/pbc_merge$(O) \
+		$(DIS) $(DIS)_shared $(SRC_DIR)/disassemble$(O) \
 		$(SRC_DIR)/null_config$(O) \
 		$(SRC_DIR)/parrot_config$(O) \
 		$(SRC_DIR)/install_config$(O) \
