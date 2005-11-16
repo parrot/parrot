@@ -73,6 +73,21 @@ sub runstep {
 
     Parrot::Configure::Data->set($util => $prog);
     $Configure::Step::result = 'yes';
+
+    # setup make_C
+    if (Parrot::Configure::Data->get('gmake_version')) {
+        Parrot::Configure::Data->set(make_c => "$prog -C" );
+    } else {
+        # get the default value
+        my $make_c = Parrot::Configure::Data->get('make_c');
+
+        # FIXME this is an ugly hack
+        # replace the value for $(MAKE) with the actual path or we'll end up
+        # with a variable that recursively refers to itself
+        $make_c =~ s/\$\(MAKE\)/$prog/;
+        
+        Parrot::Configure::Data->set(make_c => $make_c);
+    }
 }
 
 1;

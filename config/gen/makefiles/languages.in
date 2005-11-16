@@ -3,7 +3,7 @@
 # setup of commands
 ${make_set_make}
 PERL      = ${perl}
-MAKE_C    = ${make_c}
+MAKE      = ${make_c}
 RM_F      = ${rm_f}
 
 # add new languages here
@@ -111,39 +111,39 @@ Zcode : Zcode.dummy
 Zcode.dummy:
 # Do nothing. make Zcode requires an Inform compiler
 Zcode.test:
-	- $(MAKE_C) Zcode test
+	- $(MAKE) Zcode test
 Zcode.clean:
-	- $(MAKE_C) Zcode clean
+	- $(MAKE) Zcode clean
 
 bc : bc.dummy
 bc.dummy:
-	- $(MAKE_C) bc
+	- $(MAKE) bc
 bc.test:
-	- $(MAKE_C) bc test
+	- $(MAKE) bc test
 bc.clean:
-	- $(MAKE_C) bc clean
+	- $(MAKE) bc clean
 
 befunge : befunge.dummy
 befunge.dummy:
-	- $(MAKE_C) befunge
+	- $(MAKE) befunge
 befunge.test:
-	- $(MAKE_C) befunge test
+	- $(MAKE) befunge test
 befunge.clean:
-	- $(MAKE_C) befunge clean
+	- $(MAKE) befunge clean
 
 bf : bf.dummy
 bf.dummy:
-	- $(MAKE_C) bf
+	- $(MAKE) bf
 bf.test:
-	- $(MAKE_C) bf test
+	- $(MAKE) bf test
 bf.clean:
-	- $(MAKE_C) bf clean
+	- $(MAKE) bf clean
 
 cola : cola.dummy
 cola.dummy:
-	- $(MAKE_C) cola
+	- $(MAKE) cola
 cola.test:
-	- $(MAKE_C) cola test
+	- $(MAKE) cola test
 cola.clean:
 # don't clean cola, as files in MANIFEST are removed
 
@@ -159,72 +159,72 @@ jako: jako.dummy
 jako.dummy:
 # don't make jako, as tests are executed by default
 jako.test:
-	- $(MAKE_C) jako test
+	- $(MAKE) jako test
 jako.clean:
-	- $(MAKE_C) jako clean
+	- $(MAKE) jako clean
 
 lisp: lisp.dummy
 lisp.dummy:
-	- $(MAKE_C) lisp
+	- $(MAKE) lisp
 lisp.test:
-	- $(MAKE_C) lisp test
+	- $(MAKE) lisp test
 lisp.clean:
-	- $(MAKE_C) lisp clean
+	- $(MAKE) lisp clean
 
 m4: m4.dummy
 m4.dummy:
-	- $(MAKE_C) m4
+	- $(MAKE) m4
 m4.test:
-	- $(MAKE_C) m4 test
+	- $(MAKE) m4 test
 m4.clean:
-	- $(MAKE_C) m4 clean
+	- $(MAKE) m4 clean
 
 miniperl : miniperl.dummy
 miniperl.dummy:
 # miniperl is missing t/harness
-# $(MAKE_C) miniperl
+# $(MAKE) miniperl
 miniperl.test:
-	- $(MAKE_C) miniperl test
+	- $(MAKE) miniperl test
 miniperl.clean:
-	- $(MAKE_C) miniperl clean
+	- $(MAKE) miniperl clean
 
 ook : ook.dummy
 ook.dummy:
-	- $(MAKE_C) ook
+	- $(MAKE) ook
 ook.test:
-	- $(MAKE_C) ook test
+	- $(MAKE) ook test
 ook.clean:
-	- $(MAKE_C) ook clean
+	- $(MAKE) ook clean
 
 parrot_compiler: parrot_compiler.dummy
 parrot_compiler.dummy:
-	- $(MAKE_C) parrot_compiler
+	- $(MAKE) parrot_compiler
 parrot_compiler.test:
-	- $(MAKE_C) parrot_compiler test
+	- $(MAKE) parrot_compiler test
 parrot_compiler.clean:
-	- $(MAKE_C) parrot_compiler clean
+	- $(MAKE) parrot_compiler clean
 
 perl6 : perl6.dummy
 perl6.dummy:
-	- $(MAKE_C) perl6
+	- $(MAKE) perl6
 perl6.test:
-	- $(MAKE_C) perl6 test
+	- $(MAKE) perl6 test
 perl6.clean:
-	- $(MAKE_C) perl6 clean
+	- $(MAKE) perl6 clean
 
 punie : punie.dummy
 punie.dummy:
-	- $(MAKE_C) punie
+	- $(MAKE) punie
 punie.test:
-	- $(MAKE_C) punie test
+	- $(MAKE) punie test
 punie.clean:
-	- $(MAKE_C) punie clean
+	- $(MAKE) punie clean
 
 regex: regex.dummy
 regex.dummy:
-	- $(MAKE_C) regex
+	- $(MAKE) regex
 regex.test :
-	- $(MAKE_C) regex test
+	- $(MAKE) regex test
 regex.clean :
 # No target clean for regex
 
@@ -232,22 +232,22 @@ scheme: scheme.dummy
 scheme.dummy:
 	@echo "SKIPPED: scheme: (nothing to make, but should not default to make test)"
 scheme.test :
-	- $(MAKE_C) scheme test
+	- $(MAKE) scheme test
 scheme.clean :
-	- $(MAKE_C) scheme clean
+	- $(MAKE) scheme clean
 
 tcl: tcl.dummy
 tcl.dummy:
-	- $(MAKE_C) tcl
+	- $(MAKE) tcl
 tcl.test:
-	- $(MAKE_C) tcl test
+	- $(MAKE) tcl test
 tcl.clean:
-	- $(MAKE_C) tcl clean
+	- $(MAKE) tcl clean
 
 urm: urm.dummy
 urm.dummy:
-	- $(MAKE_C) urm
+	- $(MAKE) urm
 urm.test:
-	- $(MAKE_C) urm test
+	- $(MAKE) urm test
 urm.clean:
-	- $(MAKE_C) urm clean
+	- $(MAKE) urm clean

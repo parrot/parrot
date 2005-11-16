@@ -481,7 +481,7 @@ LIBNCI_TEST_SO    = $(DYNEXT_DIR)/libnci_test$(LOAD_EXT)
 # This is set to  MAKE=$make if your $make command doesn't
 # do it for you.
 ${make_set_make}
-MAKE_C = ${make_c}
+MAKE = ${make_c}
 
 # These need to be above lines that define suffix rules to be portable
 # (certainly FreeBSD make doesn't grok the .imc.pbc rule otherwise)
@@ -1137,16 +1137,16 @@ docs.stub:
 	@echo "Perldoc is required, but not detected."
 
 docs.dummy :
-	$(MAKE_C) docs
+	$(MAKE) docs
 
 docs-clean :
-	$(MAKE_C) docs clean
+	$(MAKE) docs clean
 
 html.dummy :
-	$(MAKE_C) docs html
+	$(MAKE) docs html
 
 html-clean :
-	$(MAKE_C) docs html-clean
+	$(MAKE) docs html-clean
 
 ###############################################################################
 #
@@ -1158,13 +1158,13 @@ dynclasses : dynclasses.dummy
 
 # XXX this dependancy is too broad, and should be narrowed down
 dynclasses.dummy : parrot$(EXE)
-	$(MAKE_C) dynclasses
+	$(MAKE) dynclasses
 
 dynclasses-test :
-	$(MAKE_C) dynclasses test
+	$(MAKE) dynclasses test
 
 dynclasses-clean :
-	$(MAKE_C) dynclasses clean
+	$(MAKE) dynclasses clean
 
 ###############################################################################
 #
@@ -1175,21 +1175,21 @@ dynclasses-clean :
 compilers : compilers.dummy
 
 compilers.dummy : parrot$(EXE)
-	$(MAKE_C) compilers/pge
+	$(MAKE) compilers/pge
 
 languages : languages.dummy
 
 languages.dummy :
-	$(MAKE_C) languages
+	$(MAKE) languages
 
 languages-test :
-	$(MAKE_C) languages test
+	$(MAKE) languages test
 
 languages-smoke :
-	$(MAKE_C) languages smoke
+	$(MAKE) languages smoke
 
 languages-clean :
-	$(MAKE_C) languages clean
+	$(MAKE) languages clean
 
 ###############################################################################
 #
@@ -1198,7 +1198,7 @@ languages-clean :
 ###############################################################################
 
 compilers-clean :
-	$(MAKE_C) compilers/pge clean
+	$(MAKE) compilers/pge clean
 
 ###############################################################################
 #
@@ -1207,7 +1207,7 @@ compilers-clean :
 ###############################################################################
 
 editor-clean :
-	$(MAKE_C) editor clean
+	$(MAKE) editor clean
 
 ###############################################################################
 #
