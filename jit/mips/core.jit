@@ -18,7 +18,7 @@ Parrot_set_i_ic {
     }
     else {
         emit_imm32(NATIVECODE, at, *INT_CONST[2]);
-        emit_sw_r(NATIVECODE, at, &INT_REG[1]); 
+        emit_sw_r(NATIVECODE, at, ROFFS_INT(1)); 
     }
 }
 
@@ -27,14 +27,14 @@ Parrot_set_i_i {
         emit_mov(NATIVECODE, MAP[1], MAP[2]);
     }
     else if (MAP[1]) {
-        emit_lw_r(NATIVECODE, MAP[1], &INT_REG[2]); 
+        emit_lw_r(NATIVECODE, MAP[1], ROFFS_INT(2)); 
     } 
     else if (MAP[2]) {
-        emit_sw_r(NATIVECODE, MAP[2], &INT_REG[1]); 
+        emit_sw_r(NATIVECODE, MAP[2], ROFFS_INT(1)); 
     }
     else {
-        emit_lw_r(NATIVECODE, at, &INT_REG[2]); 
-        emit_sw_r(NATIVECODE, at, &INT_REG[1]); 
+        emit_lw_r(NATIVECODE, at, ROFFS_INT(2)); 
+        emit_sw_r(NATIVECODE, at, ROFFS_INT(1)); 
     }
 }
 
@@ -43,16 +43,16 @@ Parrot_neg_i_i {
         emit_neg(NATIVECODE, MAP[1], MAP[2]);
     }
     else if (MAP[1]) {
-        emit_lw_r(NATIVECODE, at, &INT_REG[2]); 
+        emit_lw_r(NATIVECODE, at, ROFFS_INT(2)); 
         emit_neg(NATIVECODE, MAP[1], at);
     }
     else if (MAP[2]) {
         emit_neg(NATIVECODE, at, MAP[1]);
-        emit_sw_r(NATIVECODE, at, &INT_REG[1]);
+        emit_sw_r(NATIVECODE, at, ROFFS_INT(1));
     }
     else {
-        emit_lw_r(NATIVECODE, at, &INT_REG[2]);
+        emit_lw_r(NATIVECODE, at, ROFFS_INT(2));
         emit_neg(NATIVECODE, at, at);
-        emit_sw_r(NATIVECODE, at, &INT_REG[1]);
+        emit_sw_r(NATIVECODE, at, ROFFS_INT(1));
     }
 }

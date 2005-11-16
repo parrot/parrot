@@ -111,12 +111,10 @@ enum { JIT_MIPS_CALL, JIT_MIPS_BRANCH };
 #  define BASE_REG s0
 
 #  define emit_sw_r(pc, reg, addr) \
-    emit_sw(pc, reg, (((char *)addr) - \
-      ((char *)&interpreter->ctx.int_reg.registers[0])), BASE_REG)
+    emit_sw(pc, reg, addr, BASE_REG)
 
 #  define emit_lw_r(pc, reg, addr) \
-    emit_lw(pc, reg, (((char *)addr) - \
-      ((char *)&interpreter->ctx.int_reg.registers[0])), BASE_REG)
+    emit_lw(pc, reg, addr, BASE_REG)
 
 /*  LUI
  *
@@ -414,51 +412,6 @@ Parrot_jit_dofixup(Parrot_jit_info_t *jit_info,
         }
         fixup = fixup->next;
     }
-}
-
-void
-Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
-    Interp *interpreter)
-{
-    emit_imm32(jit_info->native_ptr, a0, jit_info->cur_op);
-    emit_mov(jit_info->native_ptr, a1, s0);
-    emit_imm32(jit_info->native_ptr, t9,
-        interpreter->op_func_table[*(jit_info->cur_op)]);
-    emit_jalr(jit_info->native_ptr, t9, ra);
-    emit_nop(jit_info->native_ptr);
-}
-
-void
-Parrot_jit_cpcf_op(Parrot_jit_info_t *jit_info,
-    Interp *interpreter)
-{
-    Parrot_jit_normal_op(jit_info,interpreter);
-    emit_sub(jit_info->native_ptr, v0, v0, s2);
-    emit_add(jit_info->native_ptr, v0, v0, s1);
-    emit_lw(jit_info->native_ptr, v0, 0, v0);
-    emit_jr(jit_info->native_ptr, v0);
-}
-
-/* move reg to mem (i.e. intreg) */
-void
-Parrot_jit_emit_mov_mr(Interp * interpreter, char *mem, int reg)
-{
-    emit_sw_r(
-            ((Parrot_jit_info_t*)(interpreter->code->jit_info))->native_ptr,
-            ((Parrot_jit_info_t*)(interpreter->code->jit_info))->intval_map[i],
-            &interpreter->ctx.int_reg.registers[cur_se->int_reg_usage[i]]
-    );
-}
-
-/* move mem (i.e. intreg) to reg */
-void
-Parrot_jit_emit_mov_rm(Interp * interpreter, int reg, char *mem)
-{
-    emit_lw_r(
-            ((Parrot_jit_info_t*)(interpreter->code->jit_info))->native_ptr,
-            ((Parrot_jit_info_t*)(interpreter->code->jit_info))->intval_map[i],
-            &interpreter->ctx.int_reg.registers[cur_se->int_reg_usage[i]]
-    );
 }
 
 /* move reg to mem (i.e. numreg) */
