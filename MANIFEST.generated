@@ -1,9 +1,14 @@
 installable_parrot                                [main]bin
 pdump                                             [main]bin
+pdump_shared                                      [main]bin
 pdb                                               [main]bin
+pdb_shared                                        [main]bin
 pbc_info                                          [main]bin
+pbc_info_shared                                   [main]bin
 pbc_merge                                         [main]bin
+pbc_merge_shared                                  [main]bin
 disassemble                                       [main]bin
+disassemble_shared                                [main]bin
 blib/lib/libparrot.a                              [main]lib
 blib/lib/libparrot.so.0.3.1                       [main]lib
 runtime/parrot/library/Data/Dumper/Base.pbc       [main]
