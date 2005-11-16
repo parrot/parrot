@@ -507,7 +507,7 @@ abcdefg
 OUTPUT
 
 SKIP: {
-  skip('no ICU lib', 13) unless $PConfig{has_icu};
+  skip('no ICU lib', 14) unless $PConfig{has_icu};
 output_is( <<'CODE', <<"OUTPUT", "unicode downcase");
     set S0, iso-8859-1:"TÖTSCH"
     find_charset I0, "unicode"
