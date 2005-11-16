@@ -2,23 +2,18 @@
 
 =head1 Parrot Grammar Engine (PGE)
 
-This is the second implementation of a regular expression/rules/grammar
-engine designed to run in Parrot.  It's still a work in progress, and
-some parts of the implementation are designed simply to "bootstrap" 
-us along (i.e., some parts such as the parser and generator are 
-expected to be discarded).  The current work is also largely incomplete 
--- although it has support for groups (capturing and non-capturing), 
-quantifiers, alterations, etc., many of the standard assertions and 
-character classes are not implemented yet but will be coming soon.
+This is a regular expression/rules/grammar engine/parser designed to
+run in Parrot.  It's still a work in progress, but has a lot of
+nice features in it, including support for perl 6 rule expressions,
+globs, shift-reduce parsing, and ("coming soon") some support for
+perl 5 regular expressions.
 
-The previous version of PGE used a C-based parser and generator,
-but after the capture semantics were redesigned (Winter 2005) Pm
-decided that it would be better to just write the parser and generator
-in Parrot.  Thus, the current version.
-
-In addition we'll be looking at writing a parser and compiler for
-Perl *5* regular expressions, but the focus for the time being is
-(obviously) on Perl 6.
+A nice feature of PGE is that one can easily combine many
+different parsing styles into a single interface.  PGE uses 
+perl 6 rules for its top-down parsing, an operator precedence
+parser for bottom-up (shift/reduce) parsing, and allows control
+to pass freely between the two styles as well as to custom parsing
+subroutines.
 
 =head1 Installation
 
@@ -39,18 +34,18 @@ C<parrot demo.pir>.  The demo understands the following commands:
     trace             - toggle pattern execution tracing
     next              - repeat last match on target string
 
-=head1 Using PGE
+=head1 PGE's rule engine  (PGE::P6Rule)
 
 Once PGE is compiled and installed, you generally load it using
 the load_bytecode operation, as in
 
     load_bytecode "PGE.pbc"          
 
-This imports the C<PGE::p6rule> subroutine, which can be used to
-compile Perl 6 rules.  A sample compile sequence would be:
+This imports the PGE::P6Rule compiler, which can be used to compile
+strings of Perl 6 rules.  A sample compile sequence would be:
 
     .local pmc p6rule_compile
-    find_global p6rule_compile, "PGE", "p6rule"    # get the compiler
+    p6rule_compile = compreg "PGE::P6Rule"         # get the compiler
 
     .local string pattern       
     .local pmc rulesub                     
@@ -66,13 +61,16 @@ to get back a C<PGE::Match> object:
 
 The Match object is true if it successfully matched, and contains
 the strings and subpatterns that were matched as part of the capture.
-The C<dump> method can be used to quickly view the results of
-the match:
+Parrot's "Data::Dumper" can be used to quickly view the results
+of the match:
+
+    load_bytecode "dumper.imc"
+    load_bytecode "PGE/Dumper.pir"
 
   match_loop:
     unless match goto match_fail                   # if match fails stop
     print "match succeeded\n"
-    match."dump"()                                 # display matches
+    _dumper(match)                      
     match."next"()                                 # find the next match
     goto match_loop
 
@@ -86,26 +84,17 @@ the rule subroutine -- just use
 
 and you can print/inspect the contents of $S0 to see the generated code.
 
-=head1 Known Limitations
+See the STATUS file for a list of implemented and yet-to-be-implemented
+features.
 
-Since the Parrot rewrite, PGE knows and uses as much of Unicode strings
-as Parrot does.  
-
-Some backslashes aren't implemented yet, although the major ones
-are (\d, \s, \n, \D, \S, \N).
+=head1 Known limitations of the rule engine
 
 PGE doesn't (yet) properly handle nested repetitions of zero-length 
 patterns in groups -- that's coming soon.
 
-This is just the first-cut framework for building the 
-remainder of the engine, so many items (lookaround, 
-conjunctions, closures, and hypotheticals)
-just aren't implemented yet.  They're on their way!
-
-Also, many well-known optimizations (e.g., Boyer-Moore) aren't 
-implemented yet -- my primary goals at this point are to
-"release early, often" and to get sufficient features in place so
-that more people can be testing and building upon the engine.
+Many well-known optimizations (e.g., Boyer-Moore) aren't
+implemented yet, although a variety of optimizations are being
+added as we generate code.
 
 Lastly, error handling needs to be improved, but this will likely
 be decided as we discover how PGE integrates with the rest of
@@ -119,17 +108,24 @@ that can match strings.  So, PGE consists of a series of parsers
 (for each pattern matching language), an intermediate expression
 format, and a code generator.
 
-The generated code uses bsr/ret for its internal subroutine calls
-(also optimized for tailcalls) and then uses Parrot calling 
-conventions for all interfaces with external callers/callees.
-This should give some performance improvements.
+The parsers can be written using PIR subroutines or PGE's built-in
+operator precedence (shift/reduce) parser; the parser for Perl 6
+rule expressions is built with the operator precedence parser.
+This parser produces a parse tree (in the form of a Match object)
+for a given perl 6 rule expression. the parse tree then goes through
+semantic analysis and reduction phases before being sent
+to code generation to produce a PIR subroutine.  
+
+The generated PIR code uses bsr/ret for its internal backtracking
+(optimized for tailcalls) and uses Parrot calling conventions for 
+all interfaces with external callers/callees such as subrules.
 
 PGE also uses Parrot coroutines for the matching
 engine, so that after a successful match is found, the 
 next match within the same string can be found by simply 
-returning control to the matching coroutine (which then
+returning control to the matching coroutine, which then
 picks up from where it had previously left off until
-another match is discovered).
+another match is discovered.
 
 The code still needs a fair amount of commenting.  In general,
 if you have a question about a particular section of code,
