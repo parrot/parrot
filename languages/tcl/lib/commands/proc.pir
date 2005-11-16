@@ -62,9 +62,8 @@ got_args:
   $P1[name] = args_p
 
   .local pmc escaper
-  escaper = find_global "Data::Escape", "String"
   .local string esc_name
-  esc_name = escaper(name)
+  esc_name = escape name
 
   .local string proc_body, temp_code
 

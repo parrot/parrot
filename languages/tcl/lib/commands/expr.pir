@@ -34,8 +34,8 @@ loop:
   goto loop
 
 loop_done:
-  ($I0,$P1) = expression_compiler(0,expr)
-  $P2 = pir_compiler($I0,$P1)
+  ($I0,$S0) = expression_compiler(0,expr)
+  $P2 = pir_compiler($I0,$S0)
   .return $P2()
 
 no_args:

@@ -167,7 +167,7 @@ set_args:
 compile_it:
   .local pmc pir_compiler
   pir_compiler = compreg "PIR"
- 
+
   .return pir_compiler(pir_code)
 .end
 
@@ -718,10 +718,11 @@ Return register_num is the register number that contains the result of this code
   rquote = ""
   if thing_type == "TclString" goto stringish
   if thing_type == "String" goto    stringish
+  $S0 = thing
   goto set_args
 stringish:
-  $P1 = find_global "Data::Escape", "String"
-  thing = $P1(thing,"\"")
+  $S0 = thing
+  $S0 = escape $S0
 
   lquote = "unicode:\""
   rquote = "\"" 
@@ -734,7 +735,7 @@ set_args:
   printf_args[1] = thing_type
   printf_args[2] = register_num
   printf_args[3] = lquote
-  printf_args[4] = thing
+  printf_args[4] = $S0
   printf_args[5] = rquote
  
   pir_code = sprintf "$P%i = new .%s\n$P%i=%s%s%s\n", printf_args
