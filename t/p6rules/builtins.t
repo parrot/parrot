@@ -137,6 +137,19 @@ p6rule_like  ("aabaaa", '<!before ..b> aa',
     qr/mob: <aa @ 3>/,
     'negated lookahead');
 
+p6rule_is  ('ab', '<after a>b', 'lookbehind <after>');
+p6rule_isnt('cb', '<after a>b', 'lookbehind <after>');
+p6rule_isnt('b', '<after a>b', 'lookbehind <after>');
+p6rule_is  ('ab', '<!after c>b', 'lookbehind <!after>');
+p6rule_isnt('cb', '<!after c>b', 'lookbehind <!after>');
+p6rule_is  ('b', '<!after c>b', 'lookbehind <!after>');
+p6rule_isnt('dbcb', '<!after <[cd]>>b', 'lookbehind <!after>');
+p6rule_is  ('dbaacb', '<!after <[cd]>><[ab]>', 'lookbehind <!after>');
+p6rule_isnt('dbcb', '<!after c|d>b', 'lookbehind <!after>');
+p6rule_is  ('dbaacb', '<!after c|d><[ab]>', 'lookbehind <!after>');
+p6rule_is  ('cbaccb', '<!after cd><[ab]>', 'lookbehind <!after>');
+p6rule_is  ('a', '$ <after ^a>', 'lookbehind <after>');
+p6rule_is  ('axxbxxyc', '<after x+>y', 'lookbehind <after>');
 
 ## leading + -- enumerated char class
 p6rule_is  ('az', '<[a..z]>+', 'metasyntax with leading + (<+...>)');
@@ -164,4 +177,4 @@ p6rule_is  ($str, 'x | y | <?null>', 'null pattern (<null>)');
 
 
 ## remember to change the number of tests :-)
-BEGIN { plan tests => 55; }
+BEGIN { plan tests => 68; }

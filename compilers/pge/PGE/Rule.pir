@@ -482,6 +482,62 @@ success.
     .return (mob)
 .end
 
+=item C<after(PMC mob, STR pattern)>
+
+Perform lookbehind -- i.e., check if the string before the
+current position matches <pattern> (anchored at the end).
+Returns a zero-width Match object on success.
+
+XXX: Note that this implementation cheats in a big way.
+S05 says that C<after> is implemented by reversing the 
+syntax tree and looking for things in opposite order going
+to the left.  This implementation just grabs the (sub)string
+up to the current match position and tests that, anchoring
+the pattern to the end of the substring.  It's cheap and
+potentially very inefficient, but it "works" for now.
+
+=cut
+
+.sub "after"
+    .param pmc mob
+    .param string pattern      :optional
+    .param int has_pattern     :opt_flag
+    .local pmc cache, rule
+    .local int from
+
+    if has_pattern goto lookbehind
+    mob = fail(mob)
+    .return (mob)
+  lookbehind:
+    pattern = concat "[", pattern
+    pattern = concat pattern, "]$"
+    cache = find_global "PGE::Rule", "%:cache"
+    $I0 = exists cache[pattern]
+    if $I0 == 0 goto new_pattern
+    rule = cache[pattern]
+    goto match
+  new_pattern:
+    $P0 = find_global "PGE", "p6rule"
+    rule = $P0(pattern)
+    cache[pattern] = rule
+  match:
+    $P0 = getattribute mob, "PGE::Match\x0$:target"
+    $S0 = $P0
+    $P0 = getattribute mob, "PGE::Match\x0$:pos"
+    from = $P0
+    $S0 = substr $S0, 0, from
+    mob = rule($S0)
+    unless mob goto end
+    $P0 = getattribute mob, "PGE::Match\x0$:from"
+    $P1 = getattribute mob, "PGE::Match\x0$:pos"
+    $P0 = from
+    $P1 = from
+    null $P0
+    setattribute mob, "PGE::Match\x0&:corou", $P0
+  end:
+    .return (mob)
+.end
+
     
 =head1 AUTHOR
 
