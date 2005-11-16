@@ -17,7 +17,7 @@
     "loadexpr"("Simple", "expr")
     "loadexpr"("Perl6", "expr")
 
-    p6rule = find_global "PGE", "p6rule"
+    p6rule = compreg "PGE::P6Rule"
     cmdpat = p6rule("^(rule|next|trace|pir)\\s*(.*)$")
     dumper = find_global "_dumper"
     null istrace

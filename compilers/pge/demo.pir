@@ -18,8 +18,8 @@
     load_bytecode "PGE/Glob.pir"
     load_bytecode "PGE/Text.pir"
     load_bytecode "PGE/Util.pir"
-    find_global p6rule_compile, "PGE", "p6rule"
-    find_global glob_compile, "PGE", "glob"
+    p6rule_compile = compreg "PGE::P6Rule"
+    glob_compile = compreg "PGE::Glob"
     istrace = 0
     null rulesub
 

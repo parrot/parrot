@@ -3,7 +3,6 @@
 .sub "__onload"
     .local pmc optable
     .local pmc term
-    .local pmc p6rule
     .local string op
 
     $I0 = find_type "PGE::OPTable"

@@ -16,7 +16,6 @@ a number of built-in rules.
 
 .sub "__onload" :load
     .local pmc base
-    .local pmc p6rule
     $I0 = find_type "PGE::Rule"
     if $I0 goto end
     base = getclass "PGE::Match"
@@ -470,7 +469,7 @@ success.
     rule = cache[pattern]
     goto match
   new_pattern:
-    $P0 = find_global "PGE", "p6rule"
+    $P0 = compreg "PGE::P6Rule"
     rule = $P0(pattern)
     cache[pattern] = rule
   match:
@@ -520,7 +519,7 @@ potentially very inefficient, but it "works" for now.
     rule = cache[pattern]
     goto match
   new_pattern:
-    $P0 = find_global "PGE", "p6rule"
+    $P0 = compreg "PGE::P6Rule"
     rule = $P0(pattern)
     cache[pattern] = rule
   match:

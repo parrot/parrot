@@ -34,7 +34,7 @@ is supplied, rules are loaded into the C<PGE::Rule> namespace.
     namespace = new String
     namespace = "PGE::Rule"
     code = new String
-    p6rule = find_global "PGE", "p6rule"
+    p6rule = compreg "PGE::P6Rule"
     parser = p6rule(":w ( (grammar) (\\w+[\\:\\:\\w+]*) ;? | (rule) (\\w+) \\{(<-[}]>*)\\} ;?  | (\\#)\\N*\\n )*")
 
     match = parser(str)

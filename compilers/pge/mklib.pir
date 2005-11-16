@@ -13,9 +13,6 @@ file.
 
 .sub "main" :main
     .local pmc load
-    .local pmc p6rule
-    .local pmc gparse
-    .local pmc stmt
     .local string keyword
     .local string name
     .local string rulex

@@ -10,7 +10,7 @@
     optable = new $I0
     store_global "Simple", "$optable", optable
 
-    p6rule = find_global "PGE", "p6rule"
+    p6rule = compreg "PGE::P6Rule"
     term = p6rule("\\d+ | <ident>", "Simple", "term")
 
     optable.addtok("infix:+")
