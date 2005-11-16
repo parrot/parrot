@@ -123,11 +123,11 @@ compose(Interp *interpreter, STRING *src)
     return string_copy(interpreter, src);
 }
 
-/* A noop. can't decompose iso-8859-1 */
 static STRING*
 decompose(Interp *interpreter, STRING *src)
 {
-    return string_copy(interpreter, src);
+    internal_exception(UNIMPLEMENTED,
+            "decompose for iso-8859-1 not implemented");
 }
 
 static void
