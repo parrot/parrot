@@ -81,18 +81,9 @@ providing a compreg-compatible method.
 .sub __prepare_lib :load :anon
 
   # Load any dependant libraries.
-  #load_bytecode "languages/tcl/lib/tclbinaryops.pbc"
-  #load_bytecode "languages/tcl/lib/tclcommand.pbc"
-  #load_bytecode "languages/tcl/lib/tclcommandlist.pbc"
-  #load_bytecode "languages/tcl/lib/tclconst.pbc"
-  #load_bytecode "languages/tcl/lib/tclfunc.pbc"
-  #load_bytecode "languages/tcl/lib/tclops.pbc"
-  #load_bytecode "languages/tcl/lib/tclvar.pbc"
-  #load_bytecode "languages/tcl/lib/tclword.pbc"
-  load_bytecode "library/Data/Escape.pbc"
   load_bytecode "Getopt/Long.pir"  
-  #load_bytecode "library/PGE.pbc" # XXX Can't load this if Getopt/Long loaded.
-  load_bytecode "library/PGE/Glob.pbc"
+  #load_bytecode "PGE.pbc" # XXX Can't load this if Getopt/Long loaded.
+  load_bytecode "PGE/Glob.pbc"
 
   #_load_grammar()
  

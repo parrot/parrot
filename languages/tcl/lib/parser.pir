@@ -1,5 +1,4 @@
-.namespace [ "_Tcl" ]
-
+.namespace [ "_Tcl" ] 
 =head1 NAME
 
 Tcl Parser
@@ -722,9 +721,14 @@ Return register_num is the register number that contains the result of this code
   goto set_args
 stringish:
   $S0 = thing
+
+  .local string charset_name
+  $I0 = charset $S0
+  charset_name = charsetname $I0
+
   $S0 = escape $S0
 
-  lquote = "unicode:\""
+  lquote = charset_name . ":\""
   rquote = "\"" 
 set_args:
 
