@@ -69,7 +69,6 @@ my $html = grep { $_ eq '--html' } @ARGV;
 # These could all be tested:
 #
 # BASIC                No t/harness, two implementations
-# Zcode		       Can't run *.t from here, only from subdir
 # cola                 No t/harness, no standard test suite
 # conversion           No t/harness
 # forth                No t/harness
@@ -91,10 +90,10 @@ my @unified_testable_languages =
        ook
        parrot_compiler
        punie
+       regex
        scheme
        tcl
        urm );
-# regex seems to be eating memory, so don't test is by default
 # @unified_testable_languages = qw( regex );
 
 my @harnesses =
