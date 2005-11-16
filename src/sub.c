@@ -459,8 +459,27 @@ parrot_new_closure(Interp *interpreter, PMC *sub_pmc)
     sub = PMC_sub(sub_pmc);
     clos = PMC_sub(clos_pmc);
     if (!PMC_IS_NULL(sub->lex_info)) {
-        /* new style closures */
+        /* new style closures
+         *
+         * the given sub_pmc has to have an :outer(sub) that is
+         * this subroutine
+         */
         ctx = CONTEXT(interpreter->ctx);
+        if (PMC_IS_NULL(sub->outer_sub)) {
+            real_exception(interpreter, NULL, INVALID_OPERATION,
+                    "'%Ss' isn't an closure (no :outer)", sub->name);
+        }
+        /* if (sub->outer_sub != ctx->current_sub) - fails if outer
+         * is a closure too e.g. test 'closure 4'
+         */
+        if (0 == string_equal(interpreter,
+                    (PMC_sub(ctx->current_sub))->name,
+                    sub->name)) {
+            real_exception(interpreter, NULL, INVALID_OPERATION,
+                    "'%Ss' isn't the :outer of '%Ss')",
+                    (PMC_sub(ctx->current_sub))->name,
+                    sub->name);
+        }
         cont = ctx->current_cont;
         /* preserve this frame by converting the continuation */
         cont->vtable = Parrot_base_vtables[enum_class_Continuation];
