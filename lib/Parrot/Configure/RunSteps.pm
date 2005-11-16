@@ -33,6 +33,7 @@ use Parrot::Configure::Data;
     init/hints.pm
     init/headers.pm
     inter/progs.pm
+    inter/make.pm
     inter/lex.pm
     inter/yacc.pm
     auto/gcc.pm
