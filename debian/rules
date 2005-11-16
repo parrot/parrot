@@ -45,7 +45,12 @@ install: build debian/libparrot$(SOVERSION).install
 	dh_installdirs -plibparrot-dev usr/share/lintian/overrides
 	$(MAKE) install PREFIX=$(CURDIR)/debian/tmp/usr
 	dh_install --sourcedir=$(CURDIR)/debian/tmp --list-missing
-	cp debian/libparrot-dev.lintian-overrides $(CURDIR)/debian/libparrot-dev/usr/share/lintian/overrides/libparrot-dev
+	install -m755 $(CURDIR)/debian/tmp/usr/bin/pdump_shared $(CURDIR)/debian/parrot/usr/bin/pdump
+	install -m755 $(CURDIR)/debian/tmp/usr/bin/pdb_shared $(CURDIR)/debian/parrot/usr/bin/parrot-debugger
+	install -m755 $(CURDIR)/debian/tmp/usr/bin/pbc_info_shared $(CURDIR)/debian/parrot/usr/bin/pbc_info
+	install -m755 $(CURDIR)/debian/tmp/usr/bin/pbc_merge_shared $(CURDIR)/debian/parrot/usr/bin/pbc_merge
+	install -m755 $(CURDIR)/debian/tmp/usr/bin/disassemble_shared $(CURDIR)/debian/parrot/usr/bin/disassemble
+	install -m644 debian/libparrot-dev.lintian-overrides $(CURDIR)/debian/libparrot-dev/usr/share/lintian/overrides/libparrot-dev
 
 # Build architecture-independent files here.
 binary-indep: build install
