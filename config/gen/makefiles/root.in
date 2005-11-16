@@ -85,6 +85,7 @@ RM_RF      = ${rm_rf}
 AR_CR      = ${ar} ${ar_flags}
 RANLIB     = ${ranlib}
 PERL       = ${perl}
+CP         = $(PERL) -MExtUtils::Command -e cp
 TOUCH      = $(PERL) -MExtUtils::Command -e touch
 YACC       = ${yacc}
 LEX        = ${lex}
@@ -1116,9 +1117,9 @@ $(INC_DIR)/vtable.h : vtable.tbl $(BUILD_TOOLS_DIR)/vtable_h.pl lib/Parrot/Vtabl
 	$(PERL) $(BUILD_TOOLS_DIR)/vtable_h.pl
 
 $(INC_DIR)/jit_emit.h : jit/${jitcpuarch}/jit_emit.h
-	$(PERL) -MFile::Copy=cp -e ${PQ}cp q|jit/${jitcpuarch}/jit_emit.h|, q|$(INC_DIR)/jit_emit.h|${PQ}
+	$(CP) jit/${jitcpuarch}/jit_emit.h $(INC_DIR)/jit_emit.h
 $(INC_DIR)/exec_dep.h : jit/${jitcpuarch}/exec_dep.h
-	$(PERL) -MFile::Copy=cp -e ${PQ}cp q|jit/${jitcpuarch}/exec_dep.h|, q|$(INC_DIR)/exec_dep.h|${PQ}
+	$(CP) jit/${jitcpuarch}/exec_dep.h $(INC_DIR)/exec_dep.h
 $(SRC_DIR)/jit_cpu.c : lib/Parrot/OpLib/core.pm $(INC_DIR)/jit_emit.h \
 	jit/${jitcpuarch}/core.jit $(BUILD_TOOLS_DIR)/jit2h.pl
 	$(PERL) $(BUILD_TOOLS_DIR)/jit2h.pl ${jitcpuarch} $(SRC_DIR)/jit_cpu.c
