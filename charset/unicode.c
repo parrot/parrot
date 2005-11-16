@@ -28,6 +28,7 @@ This file implements the charset functions for unicode data
 #include <unicode/utypes.h>
 #include <unicode/uchar.h>
 #include <unicode/ustring.h>
+#include <unicode/unorm.h>
 #endif
 #define EXCEPTION(err, str) \
     real_exception(interpreter, NULL, err, str)
@@ -70,16 +71,55 @@ to_charset(Interp *interpreter, STRING *src, STRING *dest)
 }
 
 
-static void
-compose(Interp *interpreter, STRING *source_string)
+static STRING*
+compose(Interp *interpreter, STRING *src)
 {
-    UNIMPL;
+#if PARROT_HAS_ICU
+    STRING *dest;
+    int src_len, dest_len;
+    UErrorCode err;
+    /*
+       U_STABLE int32_t U_EXPORT2 
+       unorm_normalize(const UChar *source, int32_t sourceLength,
+       UNormalizationMode mode, int32_t options,
+       UChar *result, int32_t resultLength,
+       UErrorCode *status);
+       */
+    dest_len = src_len = src->strlen;
+    dest = string_make_direct(interpreter, NULL, src_len,
+            src->encoding, src->charset, 0);
+    err = U_ZERO_ERROR;
+    dest_len = unorm_normalize(src->strstart, src_len,
+            UNORM_DEFAULT,      /* default is NFC */
+            0,                  /* options 0 default - no specific icu version */
+            dest->strstart, dest_len,
+            &err);
+    dest->bufused = dest_len * sizeof(UChar);
+    if (!U_SUCCESS(err)) {
+        err = U_ZERO_ERROR;
+        Parrot_reallocate_string(interpreter, dest, dest->bufused);
+        dest_len = unorm_normalize(src->strstart, src_len,
+                UNORM_DEFAULT,      /* default is NFC */
+                0,                  /* options 0 default - no specific icu version */
+                dest->strstart, dest_len,
+                &err);
+        assert(U_SUCCESS(err));
+        dest->bufused = dest_len * sizeof(UChar);
+    }
+    dest->strlen = dest_len;
+    return dest;
+#else
+    real_exception(interpreter, NULL, E_LibraryNotLoadedError,
+            "no ICU lib loaded");
+    return NULL;
+#endif
 }
 
-static void
-decompose(Interp *interpreter, STRING *source_string)
+static STRING*
+decompose(Interp *interpreter, STRING *src)
 {
     UNIMPL;
+    return NULL;
 }
 
 static void

@@ -96,6 +96,7 @@ STRING * string_unescape_cstring(Interp *,
         const char *cstring, char delimiter, const char *enc_or_charset);
 STRING * string_escape_string(Interp *, STRING *);
 STRING * string_escape_string_delimited(Interp *, STRING *, UINTVAL len);
+STRING * string_compose(Interp *, STRING *);
 
 STRING *string_upcase(Interp *, const STRING *);
 STRING *string_downcase(Interp *, const STRING *);

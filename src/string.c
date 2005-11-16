@@ -2895,6 +2895,15 @@ Parrot_string_trans_encoding(Interp *interpreter, STRING *src,
     return new_encoding->to_encoding(interpreter, src, dest);
 }
 
+STRING *
+string_compose(Interp * interpreter, STRING *src)
+{
+    if (!src)
+        return NULL;
+    if (!src->strlen)
+        return string_make_empty(interpreter, enum_stringrep_one, 0);
+    return CHARSET_COMPOSE(interpreter, src);
+}
 /*
 
 =back

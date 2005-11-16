@@ -41,8 +41,8 @@ typedef STRING * (*charset_to_charset_t)(Interp *, STRING *source_string,
         STRING *dest);
 typedef STRING * (*charset_from_unicode_t)(Interp *, STRING *source_string,
         STRING *dest);
-typedef void (*charset_compose_t)(Interp *, STRING *source_string);
-typedef void (*charset_decompose_t)(Interp *, STRING *source_string);
+typedef STRING* (*charset_compose_t)(Interp *, STRING *source_string);
+typedef STRING* (*charset_decompose_t)(Interp *, STRING *source_string);
 typedef void (*charset_upcase_t)(Interp *, STRING *source_string);
 typedef void (*charset_downcase_t)(Interp *, STRING *source_string);
 typedef void (*charset_titlecase_t)(Interp *, STRING *source_string);

@@ -45,16 +45,20 @@ to_charset(Interp *interpreter, STRING *src, STRING *dest)
     return NULL;
 }
 
-/* A noop. can't compose binary */
-static void
+/* A err. can't compose binary */
+static STRING*
 compose(Interp *interpreter, STRING *source_string)
 {
+    EXCEPTION(INVALID_CHARTYPE, "Can't compose binary data");
+    return NULL;
 }
 
-/* A noop. can't decompose binary */
-static void
+/* A err. can't decompose binary */
+static STRING*
 decompose(Interp *interpreter, STRING *source_string)
 {
+    EXCEPTION(INVALID_CHARTYPE, "Can't decompose binary data");
+    return NULL;
 }
 
 static void

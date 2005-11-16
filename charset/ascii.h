@@ -36,27 +36,6 @@ INTVAL ascii_cs_rindex(Interp *, STRING *source_string,
 size_t ascii_compute_hash(Interp *, STRING *source_string, size_t seed);
 INTVAL mixed_cs_index(Interp *, STRING *src, STRING *search, UINTVAL offs);
 
-static void compose(Interp *, STRING *source_string);
-static void decompose(Interp *, STRING *source_string);
-static void upcase(Interp *, STRING *source_string);
-static void downcase(Interp *, STRING *source_string);
-static void titlecase(Interp *, STRING *source_string);
-static void upcase_first(Interp *, STRING *source_string);
-static void downcase_first(Interp *, STRING *source_string);
-static void titlecase_first(Interp *, STRING *source_string);
-static UINTVAL validate(Interp *, STRING *source_string);
-static INTVAL is_wordchar(Interp *, STRING *source_string, UINTVAL offset);
-static INTVAL find_wordchar(Interp *, STRING *source_string, UINTVAL offset);
-static INTVAL find_not_wordchar(Interp *, STRING *source_string, UINTVAL offset);
-static INTVAL is_whitespace(Interp *, STRING *source_string, UINTVAL offset);
-static INTVAL find_whitespace(Interp *, STRING *source_string, UINTVAL offset);
-static INTVAL find_not_whitespace(Interp *, STRING *source_string, UINTVAL offset);
-static INTVAL is_digit(Interp *, STRING *source_string, UINTVAL offset);
-static INTVAL find_digit(Interp *, STRING *source_string, UINTVAL offset);
-static INTVAL find_not_digit(Interp *, STRING *source_string, UINTVAL offset);
-static INTVAL is_punctuation(Interp *, STRING *source_string, UINTVAL offset);
-static INTVAL find_punctuation(Interp *, STRING *source_string, UINTVAL offset);
-static INTVAL find_not_punctuation(Interp *, STRING *source_string, UINTVAL offset);
 CHARSET *Parrot_charset_ascii_init(Interp *);
 
 STRING *charset_cvt_ascii_to_binary(Interp *, STRING *src, STRING *dest);

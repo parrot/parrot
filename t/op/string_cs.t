@@ -16,7 +16,7 @@ Tests charset support.
 
 =cut
 
-use Parrot::Test tests => 50;
+use Parrot::Test tests => 51;
 use Parrot::Config;
 use Test::More;
 
@@ -507,7 +507,7 @@ abcdefg
 OUTPUT
 
 SKIP: {
-  skip('no ICU lib', 14) unless $PConfig{has_icu};
+  skip('no ICU lib', 16) unless $PConfig{has_icu};
 output_is( <<'CODE', <<"OUTPUT", "unicode downcase");
     set S0, iso-8859-1:"TÖTSCH"
     find_charset I0, "unicode"
@@ -770,6 +770,30 @@ output_is( <<'CODE', <<"OUTPUT", "unicode titlecase");
     end
 CODE
 T\x{c3}\x{b6}tsch Leo
+OUTPUT
+
+output_is( <<'CODE', <<OUTPUT, "combose combined char" );
+    set S1, unicode:"___\u01f0___"
+    length I0, S1
+    upcase S1        # decompose J+hacek
+    length I1, S1    # 1 longer
+    downcase S1      # j+hacek
+    length I2, S1
+    compose S1, S1
+    length I3, S1    # back at original string
+    getstdout P0          # need to convert back to utf8
+    push P0, "utf8"       # push utf8 output layer
+    print S1
+    print "\n"
+    print_item I0
+    print_item I1
+    print_item I2
+    print_item I3
+    print_newline
+    end
+CODE
+___\x{c7}\x{b0}___
+7 8 8 7
 OUTPUT
 
 }  # SKIP

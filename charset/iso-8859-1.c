@@ -117,15 +117,17 @@ to_charset(Interp *interpreter, STRING *src, STRING *dest)
 
 
 /* A noop. can't compose iso-8859-1 */
-static void
-compose(Interp *interpreter, STRING *source_string)
+static STRING*
+compose(Interp *interpreter, STRING *src)
 {
+    return string_copy(interpreter, src);
 }
 
 /* A noop. can't decompose iso-8859-1 */
-static void
-decompose(Interp *interpreter, STRING *source_string)
+static STRING*
+decompose(Interp *interpreter, STRING *src)
 {
+    return string_copy(interpreter, src);
 }
 
 static void
