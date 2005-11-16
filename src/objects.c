@@ -454,9 +454,8 @@ parrot_class_register(Interp* interpreter, STRING *class_name,
      * register the class in the PMCs name class_hash
      */
     if ((new_type = pmc_type(interpreter, class_name)) > enum_type_undef) {
-        c_error = string_to_cstring(interpreter, class_name);
-        internal_exception(1, "Class %s already registered!\n", c_error);
-        string_cstring_free(c_error);
+        real_exception(interpreter, NULL, INVALID_OPERATION,
+                "Class %Ss already registered!\n", class_name);
     }
     new_type = pmc_register(interpreter, class_name);
     /* Build a new vtable for this class
