@@ -26,6 +26,11 @@ build-stamp: configure-stamp
 	$(MAKE) world_shared
 	pod2man --section=1 --release="Debian Project" --center="Debian GNU/Linux manual" docs/running.pod debian/parrot.1
 	pod2man --section=1 --release="Debian Project" --center="Debian GNU/Linux manual" parrot-config.imc debian/parrot-config.imc.1
+	pod2man --section=1 --release="Debian Project" --center="Debian GNU/Linux manual" src/pdump.c debian/pdump.1
+	pod2man --section=1 --release="Debian Project" --center="Debian GNU/Linux manual" src/disassemble.c debian/disassemble.1
+	pod2man --section=1 --release="Debian Project" --center="Debian GNU/Linux manual" src/pdb.c debian/parrot-debugger.1
+	pod2man --section=1 --release="Debian Project" --center="Debian GNU/Linux manual" src/pbc_info.c debian/pbc_info.1
+	pod2man --section=1 --release="Debian Project" --center="Debian GNU/Linux manual" src/pbc_merge.c debian/pbc_merge.1
 	touch build-stamp
 
 clean:
@@ -72,7 +77,7 @@ binary-arch: build install
 	dh_testdir -a
 	dh_testroot -a
 	dh_installchangelogs -a ChangeLog
-	dh_installman -pparrot debian/parrot.1
+	dh_installman -pparrot debian/parrot.1 debian/pdump.1 debian/disassemble.1 debian/parrot-debugger.1 debian/pbc_info.1 debian/pbc_merge.1
 	dh_installdocs -a
 	dh_strip -a
 	dh_compress -a
