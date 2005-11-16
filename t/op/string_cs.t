@@ -245,12 +245,12 @@ CODE
 OUTPUT
 
 SKIP: {
-  skip('TODO wordboundary', 1);
-output_is( <<'CODE', <<OUTPUT, "find_word_boundary");
+  skip('TODO wordboundary has no cclass', 1);
+output_is( <<'CODE', <<OUTPUT, "find a word_boundary");
     set S0, "_ab 09z"
     set I0, 0
 lp:
-    find_word_boundary I0, S0, I0
+    find_cclass I0, .CCLASS_???, S0, I0, I1
     print I0
     print " "
     eq I0, -1, done
@@ -260,7 +260,7 @@ done:
     print "ok\n"
     end
 CODE
-0 2 3 6 -1 ok
+0 2 3 6 7 ok
 OUTPUT
 }
 
