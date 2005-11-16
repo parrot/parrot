@@ -65,7 +65,8 @@ binary-indep: build install
 	dh_installman -plibparrot-dev debian/parrot-config.imc.1
 	dh_installdocs -i
 	dh_link -plibparrot-dev usr/lib/libparrot.so.$(SOVERSION) usr/lib/libparrot.so
-	dh_compress -i
+	dh_compress -pparrot-doc -X.pod
+	dh_compress -plibparrot-dev
 	dh_fixperms -i
 	dh_installdeb -i
 	dh_gencontrol -i
