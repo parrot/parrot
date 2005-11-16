@@ -141,7 +141,11 @@ won't be a problem, but is the use of the start parameter thread-safe?
     str = concat '"', str
     str = concat str, '"'
     $I0 = index str, "\\x"
-    if $I0 < 0 goto end
+    if $I0 >= 0 goto unicode
+    $I0 = index str, "\\u"
+    if $I0 >= 0 goto unicode
+    goto end
+  unicode:
     str = concat "unicode:", str
   end:
     .return (str)
