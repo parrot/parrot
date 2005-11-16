@@ -101,8 +101,8 @@ body_match:
   .local pmc compiler,pir_compiler
   compiler = find_global "_Tcl", "compile"
   pir_compiler = find_global "_Tcl", "pir_compiler"
-  ($I0,$P0) = compiler(0,code)
-  $P1 = pir_compiler($I0,$P0)
+  ($I0,$S0) = compiler(0,code)
+  $P1 = pir_compiler($I0,$S0)
   .return $P1()
 
 bad_args:

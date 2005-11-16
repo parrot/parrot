@@ -28,7 +28,7 @@ Return register_num is the register number that contains the result of this code
 .sub compile
   .param int register_num
   .param string tcl_code
-  
+
   .local int len
   len = length tcl_code
  
@@ -90,7 +90,7 @@ done_comment:
   
   push commands, command
   goto next_command
- 
+
 done:
   .return "compile_dispatch"(commands,register_num)
 .end
@@ -167,7 +167,7 @@ set_args:
 compile_it:
   .local pmc pir_compiler
   pir_compiler = compreg "PIR"
-  
+ 
   .return pir_compiler(pir_code)
 .end
 
@@ -738,6 +738,15 @@ set_args:
   printf_args[5] = rquote
  
   pir_code = sprintf "$P%i = new .%s\n$P%i=%s%s%s\n", printf_args
+
+  # PIR's compiler can't deal with the utf16 code is generated as a result
+  # of the string manipulation that brings us to this point. So, we need
+  # to downcast it to ASCII. Which should be lossless, given the code that
+  # we're generating. It should be possible to move this trans_charset
+  # to where the upcasting is occuring instead of doing it once here. (XXX)
+
+  $I0 = find_charset 'ascii'
+  pir_code = trans_charset $I0
 
   .return(register_num,pir_code)
 

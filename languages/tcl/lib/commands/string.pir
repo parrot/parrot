@@ -179,19 +179,19 @@ match_next:
   pattern = argv[0]
   the_string = argv[1]
   unless nocase goto match_continue
-  pattern    = downcase pattern
-  $I0 = find_encoding 'utf8'
-  trans_encoding pattern, $I0
+  pattern = downcase pattern
+
   the_string = downcase the_string
 
 match_continue:
+  pattern    = escape pattern # escape unicode for PGE globs.
+  the_string = escape the_string
+
   .local pmc globber
   globber = find_global "PGE", "glob"
 
-  .local pmc rule, pir, exp
-  (rule, pir, exp) = globber(pattern)
-
-  .local pmc match
+  .local pmc rule, match 
+  rule = globber(pattern)
   match = rule(the_string)
 
   .return match.__get_bool()

@@ -39,8 +39,8 @@ got_args:
   # Save the parsed body.
   .local pmc parsed_body
   $S0 = body_p
-  ($I0,$P0) = compiler(0,$S0)
-  $P0 = pir_compiler($I0,$P0)
+  ($I0,$S1) = compiler(0,$S0)
+  $P0 = pir_compiler($I0,$S1)
   parsed_body = $P0[0]
 
   # XXX these need to go away - for now, we'll just escape
@@ -212,6 +212,11 @@ END_PIR
 
   .local pmc pir_compiler
   pir_compiler = compreg "PIR"
+
+  # (see note on trans_charset in lib/parser.pir) XXX
+  $I0 = find_charset 'ascii'
+  proc_body = trans_charset $I0
+
   $P0 = pir_compiler(proc_body)
 
   # XXX because of the current implementation of the PIR compiler, we must save a reference

@@ -194,7 +194,6 @@ odd_args:
   argc = argv
   if argc > 1 goto bad_args
 
-
   .local string match_str
   # ?pattern? defaults to matching everything.
   match_str = "*"
@@ -215,13 +214,13 @@ no_args:
 
   globber = find_global "PGE", "glob"
   .local pmc rule
-  (rule, $P0, $P1) = globber(match_str)
+  match_str = escape match_str # escape unicode
+  rule = globber(match_str)
 
   iter = new .Iterator, the_array
   iter = .ITERATE_FROM_START
 
   retval = new .String
-
 
   .local int count
   count = 0
@@ -229,6 +228,7 @@ no_args:
 push_loop:
   unless iter goto push_end
   str = shift iter
+  str = escape str # escape unicode
 
   # check for match
   $P2 = rule(str)

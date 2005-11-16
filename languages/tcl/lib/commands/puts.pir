@@ -11,6 +11,9 @@
   if argc == 0 goto error
   if argc > 3 goto error
 
+  .local int utf8
+  utf8 = find_encoding 'utf8'
+
   if argc == 1 goto one_arg
   if argc == 2 goto two_arg
 
@@ -23,6 +26,7 @@ three_arg:
   $P1 = channels[$S2]
   if_null $P1, bad_channel
   $S3 = argv[2]
+  $S3 = trans_encoding $S3, utf8
   print $P1, $S3
   goto done
 
@@ -33,6 +37,7 @@ two_arg:
   if $S2 != "-nonewline" goto two_arg_channel
 two_arg_nonewline:
   $S3 = argv[1] 
+  $S3 = trans_encoding $S3, utf8
   print $S3
   goto done
 
@@ -42,6 +47,7 @@ two_arg_channel:
   channels = find_global "_Tcl", "channels"
   $P1 = channels[$S2]
   if_null $P1, bad_channel
+  $S3 = trans_encoding $S3, utf8
   print $P1, $S3
   print $P1, "\n"
   goto done
@@ -49,6 +55,7 @@ two_arg_channel:
 one_arg:
   $P0 = argv[0]
   $S1 = $P0
+  $S1 = trans_encoding $S1, utf8
   print $S1
   print "\n"
   goto done  
