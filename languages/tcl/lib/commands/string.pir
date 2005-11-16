@@ -184,9 +184,6 @@ match_next:
   the_string = downcase the_string
 
 match_continue:
-  pattern    = escape pattern # escape unicode for PGE globs.
-  the_string = escape the_string
-
   .local pmc globber
   globber = find_global "PGE", "glob"
 
