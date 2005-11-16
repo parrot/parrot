@@ -214,7 +214,6 @@ no_args:
 
   globber = find_global "PGE", "glob"
   .local pmc rule
-  match_str = escape match_str # escape unicode
   rule = globber(match_str)
 
   iter = new .Iterator, the_array
@@ -228,7 +227,6 @@ no_args:
 push_loop:
   unless iter goto push_end
   str = shift iter
-  str = escape str # escape unicode
 
   # check for match
   $P2 = rule(str)
