@@ -34,8 +34,6 @@ Package: libparrot-dev
 Architecture: all
 Section: libdevel
 Depends: libparrot%SOVERSION% (= ${Source-Version})
-Provides: libparrot-dev
-Conflicts: libparrot-dev
 Description: virtual machine to execute bytecode for interpreted languages
  Parrot is a virtual machine designed to execute bytecode for interpreted
  languages efficiently. Parrot will be the target for the Perl 6 compiler.

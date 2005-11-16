@@ -23,7 +23,7 @@ build: build-stamp
 
 build-stamp: configure-stamp 
 	dh_testdir
-	$(MAKE) all shared
+	$(MAKE) world_shared
 	pod2man --section=1 --release="Debian Project" --center="Debian GNU/Linux manual" docs/running.pod debian/parrot.1
 	pod2man --section=1 --release="Debian Project" --center="Debian GNU/Linux manual" parrot-config.imc debian/parrot-config.imc.1
 	touch build-stamp
