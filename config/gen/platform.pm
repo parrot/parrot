@@ -29,6 +29,11 @@ sub runstep {
   $platform="win32" if $platform =~ /^msys/;
   $platform="win32" if $platform =~ /^mingw/;
   $platform =~ s/^ms//;
+
+  if ((split('-', $Config{archname}))[0] eq 'ia64') {
+    $platform = 'ia64';
+  }
+
   $platform="generic" unless -d "config/gen/platform/$platform";
 
   print " platform='$platform' " if $verbose;

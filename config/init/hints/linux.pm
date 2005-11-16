@@ -40,3 +40,9 @@ Parrot::Configure::Data->set(
     linkflags      => $linkflags,
     link           => $link,
 );
+
+if ((split('-', $Config{archname}))[0] eq 'ia64') {
+    Parrot::Configure::Data->set
+        platform_asm => 1
+    );
+}
