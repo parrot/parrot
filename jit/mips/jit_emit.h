@@ -443,16 +443,22 @@ Parrot_jit_cpcf_op(Parrot_jit_info_t *jit_info,
 void
 Parrot_jit_emit_mov_mr(Interp * interpreter, char *mem, int reg)
 {
-    emit_sw_r(jit_info->native_ptr, jit_info->intval_map[i],
-        &interpreter->ctx.int_reg.registers[cur_se->int_reg_usage[i]]);
+    emit_sw_r(
+            ((Parrot_jit_info_t*)(interpreter->code->jit_info))->native_ptr,
+            ((Parrot_jit_info_t*)(interpreter->code->jit_info))->intval_map[i],
+            &interpreter->ctx.int_reg.registers[cur_se->int_reg_usage[i]]
+    );
 }
 
 /* move mem (i.e. intreg) to reg */
 void
 Parrot_jit_emit_mov_rm(Interp * interpreter, int reg, char *mem)
 {
-    emit_lw_r(jit_info->native_ptr, jit_info->intval_map[i],
-        &interpreter->ctx.int_reg.registers[cur_se->int_reg_usage[i]]);
+    emit_lw_r(
+            ((Parrot_jit_info_t*)(interpreter->code->jit_info))->native_ptr,
+            ((Parrot_jit_info_t*)(interpreter->code->jit_info))->intval_map[i],
+            &interpreter->ctx.int_reg.registers[cur_se->int_reg_usage[i]]
+    );
 }
 
 /* move reg to mem (i.e. numreg) */
