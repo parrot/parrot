@@ -85,7 +85,7 @@ CODE
 ok
 OUTPUT
 
-output_like(<<'CODE', <<'OUTPUT', '.lex - same PMC twice fails (PASM)', todo => 'not yet implemented');
+output_like(<<'CODE', <<'OUTPUT', '.lex - same PMC twice fails (PASM)');
 .pcc_sub main:
     .lex '$a', P0
     .lex '$b', P0
@@ -94,7 +94,7 @@ CODE
 /variable .* is already lexical for .*/
 OUTPUT
 
-pir_output_like(<<'CODE', <<'OUTPUT', '.lex - same PMC twice fails (P0)', todo => 'not yet implemented');
+pir_output_like(<<'CODE', <<'OUTPUT', '.lex - same PMC twice fails (P0)');
 .sub main
     .lex '$a', P0
     .lex '$b', P0
@@ -103,7 +103,7 @@ CODE
 /variable .* is already lexical for .*/
 OUTPUT
 
-pir_output_like(<<'CODE', <<'OUTPUT', '.lex - same PMC twice fails ($P0)', todo => 'not yet implemented');
+pir_output_like(<<'CODE', <<'OUTPUT', '.lex - same PMC twice fails ($P0)');
 .sub main
     .lex '$a', $P0
     .lex '$b', $P0
@@ -112,7 +112,7 @@ CODE
 /variable .* is already lexical for .*/
 OUTPUT
 
-pir_output_like(<<'CODE', <<'OUTPUT', '.lex - same PMC twice fails (.local pmc ab)', todo => 'not yet implemented');
+pir_output_like(<<'CODE', <<'OUTPUT', '.lex - same PMC twice fails (.local pmc ab)');
 .sub main
 	.local pmc ab
     .lex '$a', ab

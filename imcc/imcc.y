@@ -301,6 +301,17 @@ begin_return_or_yield(Interp *interp, int yield)
     interp->imc_info->asm_state = yield ? AsmInYield : AsmInReturn;
 }
 
+static void
+set_lexical(Interp *interp, SymReg *r, char *name)
+{
+    if (r->usage & U_LEXICAL) {
+        IMCC_fataly(interp, E_SyntaxError,
+            "variable '%s' is already lexical for %s",
+            r->name, r->reg->name);
+    }
+    r->usage |= U_LEXICAL;
+    r->reg = mk_const(interp, name, 'S');
+}
 
 
 %}
@@ -482,8 +493,7 @@ pasm_inst:         { clear_state(); }
    | LEXICAL STRINGC COMMA REG
                    {
                        SymReg *r = mk_pasm_reg(interp, $4);
-                       r->usage |= U_LEXICAL; $$ = 0;
-                       r->reg = mk_const(interp, $2, 'S');
+                       set_lexical(interp, r, $2); $$ = 0;
                    }
    | /* none */    { $$ = 0;}
    ;
@@ -870,9 +880,9 @@ labeled_inst:
 
    }
    | LEXICAL STRINGC COMMA target
-                    { $4->usage |= U_LEXICAL;
-                      $4->reg = mk_const(interp, $2, 'S');
-                   $$ = 0; }
+                    {
+                       set_lexical(interp, $4, $2); $$ = 0;
+                    }
    | CONST { is_def=1; } type IDENTIFIER '=' const
                     { mk_const_ident(interp, $4, $3, $6, 0);is_def=0; }
    | pmc_const
