@@ -23,9 +23,29 @@ Tests various lexical scratchpad operations, as described in PDD20.
 =cut
 
 
-output_is(<<'CODE', <<'OUTPUT', '.lex parsing - PASM');
+output_is(<<'CODE', <<'OUTPUT', '.lex parsing - PASM (\'$a\') succeeds');
 .pcc_sub main:
     .lex "$a", P0
+    print "ok\n"
+    end
+CODE
+ok
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', '.lex parsing - PASM (S0) fails', todo => 'specification unclear');
+.pcc_sub main:
+	S0 = '$a'
+    .lex S0, P0
+    print "ok\n"
+    end
+CODE
+ok
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', '.lex parsing - PASM ($S0) fails', todo => 'specification unclear');
+.pcc_sub main:
+	$S0 = '$a'
+    .lex $S0, P0
     print "ok\n"
     end
 CODE
@@ -102,8 +122,24 @@ CODE
 /variable .* is already lexical for .*/
 OUTPUT
 
+pir_output_is(<<'CODE', <<'OUTPUT', 'api parsing', todo => 'LexEnv not implemented');
+.sub main
+	.lex 'a', $P0
+	store_lex 'a', $P0
+	$P0 = find_lex 'a'
+	print "ok\n"
+.include 'interpinfo.pasm'
+	interpinfo $P1, .INTERPINFO_CURRENT_SUB
+	$P2 = $P1.'get_lexinfo'()
+	$P2 = $P1.'get_lexpad'()
+	$P2 = $P1.'get_lexenv'()
+	print "ok\n"
+.end
+CODE
+ok
+OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', '.lex parsing - get_lexinfo');
+pir_output_is(<<'CODE', <<'OUTPUT', 'get_lexinfo');
 .sub main
     .lex '$a', $P0
     .lex '$b', $P9
@@ -120,7 +156,7 @@ CODE
 LexInfo 2
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', '.lex parsing - get_lexinfo - no lexicals');
+pir_output_is(<<'CODE', <<'OUTPUT', 'get_lexinfo - no lexicals');
 .sub main
 .include "interpinfo.pasm"
     interpinfo $P1, .INTERPINFO_CURRENT_SUB
@@ -238,6 +274,25 @@ CODE
 13013
 OUTPUT
 
+output_is(<<'CODE', <<'OUTPUT', ':lex parsing - PASM', todo => 'not yet implemented');
+.pcc_sub main:
+    print "ok\n"
+    end
+.pcc_sub :lex foo:
+    returncc
+CODE
+ok
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', ':lex parsing - PIR', todo => 'not yet implemented');
+.sub main
+    print "ok\n"
+.end
+.sub foo :lex
+.end
+CODE
+ok
+OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', ':outer parsing - PASM');
 .pcc_sub main:
@@ -1237,4 +1292,4 @@ OUTPUT
 
 
 ## remember to change the number of tests :-)
-BEGIN { plan tests => 44; }
+BEGIN { plan tests => 49; }
