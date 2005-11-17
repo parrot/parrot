@@ -132,6 +132,7 @@ p6rule_is  ('a b c def', ':w(1) b c [:w(0) d e f ]', 'words, lexical repetition 
 p6rule_is  ('a b c def', ':w(1) b c [:w(0) d e f ]', 'words, lexical repetition (:w)');
 p6rule_isnt('a b c def', ':w(0) b c [:w(1) d e f ]', 'words, lexical repetition (:w)');
 p6rule_isnt('a b c def', ':w(0) b c [:w(0) d e f ]', 'words, lexical repetition (:w)');
+p6rule_is  ('ab', ':w ab ', 'words, trailing ws');
 
 ## without :w
 p6rule_is  ("foo\t \n-\n\t bar", 'foo\s*-?\s*bar', 'basic match');
@@ -201,4 +202,4 @@ p6rule_isnt('a1a2a3', ':nth(0) a \d', 'nth occurance (:nth)', todo => 'not yet i
 
 
 ## remember to change the number of tests :-)
-BEGIN { plan tests => 97; }
+BEGIN { plan tests => 98; }

@@ -399,7 +399,7 @@ Match whitespace between tokens.
     (mob, target, mfrom, mpos) = $P0(mob)
     lastpos = length target
     pos = mfrom
-    if pos >= lastpos goto end
+    if pos >= lastpos goto found
     if pos < 1 goto ws_scan
     $I0 = is_cclass .CCLASS_WORD, target, pos
     if $I0 == 0 goto ws_scan
