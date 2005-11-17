@@ -131,9 +131,9 @@ void add_pcc_multi(SymReg *r, SymReg * arg);
 void add_namespace(Parrot_Interp interpreter, struct _IMC_Unit *);
 
 typedef enum {
-	/* P_NON_PROTOTYPED = 0x00,	*/
-	/* P_PROTOTYPED     = 0x01,	*/
-	/* P_NONE           = 0x02, */
+	P_NONE           = 0x00,
+	P_NEED_LEX       = 0x01,
+	/* P_XXXX           = 0x02, */
 	P_METHOD         = 0x04,
 
 	P_ANON           = SUB_FLAG_PF_ANON,  /* 0x8 - private3 */

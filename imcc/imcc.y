@@ -345,7 +345,7 @@ set_lexical(Interp *interp, SymReg *r, char *name)
 %token <t> COMMA ESUB DOTDOT
 %token <t> PCC_BEGIN PCC_END PCC_CALL PCC_SUB PCC_BEGIN_RETURN PCC_END_RETURN
 %token <t> PCC_BEGIN_YIELD PCC_END_YIELD NCI_CALL METH_CALL INVOCANT
-%token <t> MAIN LOAD IMMEDIATE POSTCOMP METHOD ANON OUTER
+%token <t> MAIN LOAD IMMEDIATE POSTCOMP METHOD ANON OUTER NEED_LEX
 %token <t> MULTI
 %token <s> LABEL
 %token <t> EMIT EOM
@@ -677,6 +677,7 @@ proto:
    | POSTCOMP       {  $$ = P_POSTCOMP; }
    | ANON           {  $$ = P_ANON; }
    | METHOD         {  $$ = P_METHOD; }
+   | NEED_LEX       {  $$ = P_NEED_LEX; }
    | multi
    | outer
    ;

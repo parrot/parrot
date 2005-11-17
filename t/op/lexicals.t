@@ -274,7 +274,7 @@ CODE
 13013
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', ':lex parsing - PASM', todo => 'not yet implemented');
+output_is(<<'CODE', <<'OUTPUT', ':lex parsing - PASM');
 .pcc_sub main:
     print "ok\n"
     end
@@ -284,7 +284,7 @@ CODE
 ok
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', ':lex parsing - PIR', todo => 'not yet implemented');
+pir_output_is(<<'CODE', <<'OUTPUT', ':lex parsing - PIR');
 .sub main
     print "ok\n"
 .end
@@ -348,6 +348,36 @@ ok:
 CODE
 ok
 LexInfo
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', ':lex parsing - verify info and pad');
+.sub main
+    foo()
+    print "ok\n"
+.end
+.sub foo :lex
+.include "interpinfo.pasm"
+    interpinfo $P1, .INTERPINFO_CURRENT_SUB
+    .local pmc pad, info
+    pad = $P1.'get_lexpad'()
+    unless null pad goto ok
+    print "pad is NULL\n"
+    end
+ok:
+    print "ok\n"
+    typeof $S0, pad
+    print $S0
+    print "\n"
+    info = pad.'get_lexinfo'()
+    typeof $S0, info
+    print $S0
+    print "\n"
+.end
+CODE
+ok
+LexPad
+LexInfo
+ok
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', 'get_outer');
@@ -1292,4 +1322,4 @@ OUTPUT
 
 
 ## remember to change the number of tests :-)
-BEGIN { plan tests => 49; }
+BEGIN { plan tests => 50; }

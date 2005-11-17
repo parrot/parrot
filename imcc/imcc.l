@@ -272,6 +272,7 @@ SP              [ ]
 <emit,INITIAL>":postcomp"    return(POSTCOMP);
 <emit,INITIAL>":anon"    return(ANON);
 <emit,INITIAL>":outer"   return(OUTER);
+<emit,INITIAL>":lex"     return(NEED_LEX);
 
 ".result"       return(RESULT);
 ".yield"        return(YIELDT);

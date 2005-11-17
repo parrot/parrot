@@ -644,7 +644,7 @@ mk_multi_sig(Interp* interpreter, SymReg *r)
 }
 
 static PMC*
-create_lexinfo(Interp *interpreter, IMC_Unit *unit, PMC *sub)
+create_lexinfo(Interp *interpreter, IMC_Unit *unit, PMC *sub, int need_lex)
 {
     PMC *lex_info;
     int i, k;
@@ -700,7 +700,7 @@ create_lexinfo(Interp *interpreter, IMC_Unit *unit, PMC *sub)
             }
         }
     }
-    if (!lex_info && unit->outer) {
+    if (!lex_info && (unit->outer || need_lex)) {
         lex_info = pmc_new_noinit(interpreter, lex_info_id);
         VTABLE_init_pmc(interpreter, lex_info, sub);
     }
@@ -805,7 +805,8 @@ add_const_pmc_sub(Interp *interpreter, SymReg *r,
     sub->HLL_id = unit->HLL_id;
     for (i = 0; i < 4; ++i)
         sub->n_regs_used[i] = unit->n_regs_used[i];
-    sub->lex_info = create_lexinfo(interpreter, unit, sub_pmc);
+    sub->lex_info = create_lexinfo(interpreter, unit, sub_pmc,
+            r->pcc_sub->pragma & P_NEED_LEX);
     sub->outer_sub = find_outer(interpreter, unit);
     /*
      * XXX work around implict P5 usage in exception handling code

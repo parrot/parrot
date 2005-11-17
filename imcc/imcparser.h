@@ -117,29 +117,30 @@
      METHOD = 340,
      ANON = 341,
      OUTER = 342,
-     MULTI = 343,
-     LABEL = 344,
-     EMIT = 345,
-     EOM = 346,
-     IREG = 347,
-     NREG = 348,
-     SREG = 349,
-     PREG = 350,
-     IDENTIFIER = 351,
-     REG = 352,
-     MACRO = 353,
-     ENDM = 354,
-     STRINGC = 355,
-     INTC = 356,
-     FLOATC = 357,
-     USTRINGC = 358,
-     PARROT_OP = 359,
-     VAR = 360,
-     LINECOMMENT = 361,
-     FILECOMMENT = 362,
-     DOT = 363,
-     CONCAT = 364,
-     POINTY = 365
+     NEED_LEX = 343,
+     MULTI = 344,
+     LABEL = 345,
+     EMIT = 346,
+     EOM = 347,
+     IREG = 348,
+     NREG = 349,
+     SREG = 350,
+     PREG = 351,
+     IDENTIFIER = 352,
+     REG = 353,
+     MACRO = 354,
+     ENDM = 355,
+     STRINGC = 356,
+     INTC = 357,
+     FLOATC = 358,
+     USTRINGC = 359,
+     PARROT_OP = 360,
+     VAR = 361,
+     LINECOMMENT = 362,
+     FILECOMMENT = 363,
+     DOT = 364,
+     CONCAT = 365,
+     POINTY = 366
    };
 #endif
 #define LOW_PREC 258
@@ -227,29 +228,30 @@
 #define METHOD 340
 #define ANON 341
 #define OUTER 342
-#define MULTI 343
-#define LABEL 344
-#define EMIT 345
-#define EOM 346
-#define IREG 347
-#define NREG 348
-#define SREG 349
-#define PREG 350
-#define IDENTIFIER 351
-#define REG 352
-#define MACRO 353
-#define ENDM 354
-#define STRINGC 355
-#define INTC 356
-#define FLOATC 357
-#define USTRINGC 358
-#define PARROT_OP 359
-#define VAR 360
-#define LINECOMMENT 361
-#define FILECOMMENT 362
-#define DOT 363
-#define CONCAT 364
-#define POINTY 365
+#define NEED_LEX 343
+#define MULTI 344
+#define LABEL 345
+#define EMIT 346
+#define EOM 347
+#define IREG 348
+#define NREG 349
+#define SREG 350
+#define PREG 351
+#define IDENTIFIER 352
+#define REG 353
+#define MACRO 354
+#define ENDM 355
+#define STRINGC 356
+#define INTC 357
+#define FLOATC 358
+#define USTRINGC 359
+#define PARROT_OP 360
+#define VAR 361
+#define LINECOMMENT 362
+#define FILECOMMENT 363
+#define DOT 364
+#define CONCAT 365
+#define POINTY 366
 
 
 
@@ -264,7 +266,7 @@ typedef union {
     Instruction *i;
 } yystype;
 /* Line 1281 of /usr/share/bison/yacc.c.  */
-#line 268 "imcc/imcparser.h"
+#line 270 "imcc/imcparser.h"
 # define YYSTYPE yystype
 #endif
 
