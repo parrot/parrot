@@ -817,7 +817,7 @@ ok b
 ok a
 OUTPUT
 
-pir_output_like(<<'CODE', <<'OUTPUT', 'get from 2 contexts away (failure)', todo => 'find_lex "a" should fail!');
+pir_output_like(<<'CODE', <<'OUTPUT', 'get from 2 contexts away (failure)');
 .sub "main"
 	$P0 = new Integer
 	$P0 = 1

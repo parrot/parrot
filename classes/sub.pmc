@@ -369,9 +369,9 @@ create_ctx:
                     sub->lex_info);
             VTABLE_set_pointer(INTERP, context->lex_pad, context);
             /*
-             * if this isn't a closure, outer is our calloer
+             * if outer := caller set outer_ctx
              */
-            if (!sub->outer_ctx)
+            if (sub->outer_sub == caller_ctx->current_sub)
                  sub->outer_ctx = caller_ctx;
         }
         /* switch code segment if needed */
