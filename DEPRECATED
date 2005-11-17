@@ -31,7 +31,7 @@ PGE::P6Rule is now a registered compiler, and should be used like so:
  <@pmichaud> it's easy; instead of  $P0 = find_global "PGE", "p6rule"   
    one now does  $P0 = compreg "PGE::P6Rule"
 
-This syntax is also true for PGE::Glob and PGE::P5Regex
+This syntax is also true for PGE::Glob and PGE::P5Regexp
 
 =back
 
