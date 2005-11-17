@@ -439,10 +439,12 @@ char intval_map[INT_REGISTERS_TO_MAP] =
 
 #  include <asm/cachectl.h>
 
+extern int cacheflush(char* addr, int nbytes, int cache);
+
 static void
 sync_cache (void *_start, void *_end)
 {
-    cacheflush(_start, (int)((char *)_end - (char *)_start), BCACHE);
+    cacheflush((char*)_start, (int)((char *)_end - (char *)_start), BCACHE);
 }
 
 #endif
