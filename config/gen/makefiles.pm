@@ -77,9 +77,6 @@ sub makefiles {
           commentType       => '#',
           replace_slashes   => 1, 
           conditioned_lines => 1);
-  genfile('config/gen/makefiles/perl6.in'     => 'languages/perl6/Makefile',
-          commentType       => '#',
-          replace_slashes   => 1);
   genfile('config/gen/makefiles/Zcode.in'    => 'languages/Zcode/Makefile',
           commentType       => '#',
           replace_slashes   => 1);

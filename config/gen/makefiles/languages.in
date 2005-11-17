@@ -22,7 +22,6 @@ LANGUAGES = \
     miniperl \
     ook \
     parrot_compiler \
-    perl6 \
     punie \
     regex \
     scheme \
@@ -84,7 +83,6 @@ clean: \
     miniperl.clean \
     ook.clean \
     parrot_compiler.clean \
-    perl6.clean \
     punie.clean \
     regex.clean \
     scheme.clean \
@@ -203,14 +201,6 @@ parrot_compiler.test:
 	- $(MAKE) parrot_compiler test
 parrot_compiler.clean:
 	- $(MAKE) parrot_compiler clean
-
-perl6 : perl6.dummy
-perl6.dummy:
-	- $(MAKE) perl6
-perl6.test:
-	- $(MAKE) perl6 test
-perl6.clean:
-	- $(MAKE) perl6 clean
 
 punie : punie.dummy
 punie.dummy:
