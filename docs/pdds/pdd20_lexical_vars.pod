@@ -43,13 +43,13 @@ lexically scoped variables.
     .HLL "Tcl", "tcl_group"
 
     .sub grault :lex        # without ":lex", Tcl subs have no lexicals
-        P0 = fetch_lex "x"  # FAILS
+        P0 = find_lex "x"  # FAILS
 
         P0 = new Integer    # really TclInteger
         P0 = 42
         store_lex "x", P0   # creates lexical "x"
 
-        P0 = fetch_lex "x"  # SUCCEEDS
+        P0 = find_lex "x"  # SUCCEEDS
     .end
 
 =head1 DESCRIPTION
