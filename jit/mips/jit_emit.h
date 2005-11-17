@@ -14,6 +14,9 @@
 #if !defined(PARROT_MIPS_JIT_EMIT_H_GUARD)
 #define PARROT_MIPS_JIT_EMIT_H_GUARD
 
+#  define BASE_REG s0
+#  define Parrot_jit_emit_get_base_reg_no(pc) BASE_REG
+
 typedef enum {
     zero,
     at,
@@ -107,8 +110,6 @@ enum { JIT_MIPS_CALL, JIT_MIPS_BRANCH };
 
 #  define emit_sw(pc, rt, offset, rs) \
     emit_i(pc, 0x2b, rs, rt, offset)
-
-#  define BASE_REG s0
 
 #  define emit_sw_r(pc, reg, addr) \
     emit_sw(pc, reg, addr, BASE_REG)
@@ -372,6 +373,10 @@ emit_if(Parrot_jit_info_t *jit_info, char opcode, mips_register_t rs,
     emit_slt(pc, rs, rt, at); \
     emit_beqz(pc, at, imm)
 
+#endif /* JIT_EMIT */
+
+#if JIT_EMIT == 2
+
 void
 Parrot_jit_begin(Parrot_jit_info_t *jit_info,
                  Interp * interpreter)
@@ -414,21 +419,32 @@ Parrot_jit_dofixup(Parrot_jit_info_t *jit_info,
     }
 }
 
-/* move reg to mem (i.e. numreg) */
+/* move reg to mem (i.e. intreg) */
 void
-Parrot_jit_emit_mov_mr_n(Interp * interpreter, char *mem, int reg)
+Parrot_jit_emit_mov_mr_offs(Interp * interpreter, int base, size_t offs, int reg)
 {
 }
 
-/* move mem (i.e. numreg) to reg */
+/* move mem (i.e. intreg) to reg */
 void
-Parrot_jit_emit_mov_rm_n(Interp * interpreter, int reg, char *mem)
+Parrot_jit_emit_mov_rm_offs(Interp * interpreter, int reg, int base, size_t offs)
+{
+}
+
+void
+Parrot_jit_emit_mov_mr_n_offs(Interp * interpreter, int base, size_t offs, int reg)
+{
+}
+
+void
+Parrot_jit_emit_mov_rm_n_offs(Interp * interpreter, int reg, int base, size_t offs)
 {
 }
 
 
+# endif /* JIT_EMIT == 2 */
 
-#else
+#if JIT_EMIT == 0
 
 #  define REQUIRES_CONSTANT_POOL 0
 #  define INT_REGISTERS_TO_MAP 24
@@ -447,7 +463,7 @@ sync_cache (void *_start, void *_end)
     cacheflush((char*)_start, (int)((char *)_end - (char *)_start), BCACHE);
 }
 
-#endif
+# endif /* JIT_EMIT == 0 */
 #endif /* PARROT_MIPS_JIT_EMIT_H_GUARD */
 
 /*
