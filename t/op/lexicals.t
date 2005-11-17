@@ -801,6 +801,61 @@ bar: 13014
 bar: 46
 OUTPUT
 
+pir_output_is(<<'CODE', <<'OUTPUT', 'closure 7 - evaled', todo => 'implement :outer for eval');
+.sub xyzzy
+    .local pmc f,g
+    f =plugh()
+    $P0 = f()
+    $P0 = f()
+    $P0 = f()
+    g =plugh()
+    $P0 = g()
+    $P0 = f()
+.end
+
+.sub plugh
+    .param int i
+    .local pmc f
+    f = foo(i)
+    .return (f)
+.end
+
+.sub foo
+    .param int i
+    .lex 'a', $P0
+    $P1 = new Integer
+    $P1 = i
+    store_lex 'a', $P1
+    print "foo: "
+    print $P0
+    print "\n"
+    .local string code
+    code = <<'CODE'
+    .sub bar :anon :outer(foo)
+	$P0 = find_lex 'a'
+	inc $P0
+	store_lex 'a', $P0
+	print "bar: "
+	print $P0
+	print "\n"
+    .end
+CODE
+    .local pmc compiler
+    compiler = compreg "PIR"
+    $P1 = compiler(code)
+    $P2 = $P1[0]   # first sub of eval
+    .return($P2)
+.end
+CODE
+foo: 42
+bar: 43
+bar: 44
+bar: 45
+foo: 13013
+bar: 13014
+bar: 46
+OUTPUT
+
 pir_output_like(<<'CODE', <<'OUTPUT', 'get non existing');
 .sub "main" :main
     .lex 'a', $P0
@@ -1324,4 +1379,4 @@ OUTPUT
 
 
 ## remember to change the number of tests :-)
-BEGIN { plan tests => 50; }
+BEGIN { plan tests => 51; }
