@@ -128,6 +128,7 @@ decompose(Interp *interpreter, STRING *src)
 {
     internal_exception(UNIMPLEMENTED,
             "decompose for iso-8859-1 not implemented");
+    return NULL;
 }
 
 static void

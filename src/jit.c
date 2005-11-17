@@ -1039,13 +1039,8 @@ The latter is used if F<jit_emit.h> defines C<Parrot_jit_emit_get_base_reg_no>.
 
 */
 
-#if defined(Parrot_jit_emit_get_base_reg_no)
-#  define JIT_USE_OFFS 1
-#else
-#  define JIT_USE_OFFS 0
-#endif
+/* we always are using offsets */
 
-#if JIT_USE_OFFS
 
 static size_t
 reg_offs(Interp * interpreter, int typ, int i)
@@ -1058,20 +1053,6 @@ reg_offs(Interp * interpreter, int typ, int i)
     }
     return 0;
 }
-#else
-static char *
-reg_addr(Interp * interpreter, int typ, int i)
-{
-        switch (typ) {
-            case 0:
-                return (char*)&REG_INT(i);
-            case 3:
-                return (char*)&REG_NUM(i);
-            default:
-                return 0;   /* not currently */
-        }
-}
-#endif
 
 /*
 
@@ -1094,16 +1075,10 @@ Parrot_jit_load_registers(Parrot_jit_info_t *jit_info,
     Parrot_jit_optimizer_section_t *sect = jit_info->optimizer->cur_section;
     Parrot_jit_register_usage_t *ru = sect->ru;
     int i, typ;
-#if JIT_USE_OFFS
     void (*mov_f[4])(Interp *, int, int, size_t)
         = { Parrot_jit_emit_mov_rm_offs, 0, 0, Parrot_jit_emit_mov_rm_n_offs};
     size_t offs;
     int base_reg = 0;   /* -O3 warning */
-#else
-    void (*mov_f[4])(Interp *, int, char *)
-        = { Parrot_jit_emit_mov_rm, 0, 0, Parrot_jit_emit_mov_rm_n};
-    char *m;
-#endif
     int lasts[] = { PRESERVED_INT_REGS, 0,0,  PRESERVED_FLOAT_REGS };
     char * maps[] = {0, 0, 0, 0};
     int first = 1;
@@ -1119,7 +1094,6 @@ Parrot_jit_load_registers(Parrot_jit_info_t *jit_info,
                 if ((is_used && volatiles) ||
                     (!volatiles &&
                          ((ru[typ].reg_dir[us] & PARROT_ARGDIR_IN)))) {
-#if JIT_USE_OFFS
                     if (first) {
                         base_reg = Parrot_jit_emit_get_base_reg_no(
                                 jit_info->native_ptr);
@@ -1127,10 +1101,6 @@ Parrot_jit_load_registers(Parrot_jit_info_t *jit_info,
                     }
                     offs = reg_offs(interpreter, typ, us);
                     (mov_f[typ])(interpreter, maps[typ][i], base_reg, offs);
-#else
-                    m = reg_addr(interpreter, typ, us);
-                    (mov_f[typ])(interpreter, maps[typ][i], m);
-#endif
                 }
             }
         }
@@ -1164,16 +1134,10 @@ Parrot_jit_save_registers(Parrot_jit_info_t *jit_info,
     Parrot_jit_optimizer_section_t *sect = jit_info->optimizer->cur_section;
     Parrot_jit_register_usage_t *ru = sect->ru;
     int i, typ;
-#if JIT_USE_OFFS
     void (*mov_f[4])(Interp * ,int, size_t, int)
         = { Parrot_jit_emit_mov_mr_offs, 0, 0, Parrot_jit_emit_mov_mr_n_offs};
     size_t offs;
     int base_reg = 0; /* -O3 warning */
-#else
-    void (*mov_f[4])(Interp * , char *, int)
-        = { Parrot_jit_emit_mov_mr, 0, 0, Parrot_jit_emit_mov_mr_n};
-    char *m;
-#endif
     int lasts[] = { PRESERVED_INT_REGS, 0,0,  PRESERVED_FLOAT_REGS };
     char * maps[] = {0, 0, 0, 0};
     int first = 1;
@@ -1188,7 +1152,6 @@ Parrot_jit_save_registers(Parrot_jit_info_t *jit_info,
                 if ((is_used && volatiles) ||
                     (!volatiles &&
                      (ru[typ].reg_dir[us] & PARROT_ARGDIR_OUT))) {
-#if JIT_USE_OFFS
                     if (first) {
                         base_reg = Parrot_jit_emit_get_base_reg_no(
                                 jit_info->native_ptr);
@@ -1197,10 +1160,6 @@ Parrot_jit_save_registers(Parrot_jit_info_t *jit_info,
 
                     offs = reg_offs(interpreter, typ, us);
                     (mov_f[typ])(interpreter, base_reg, offs, maps[typ][i]);
-#else
-                    m = reg_addr(interpreter, typ, us);
-                    (mov_f[typ])(interpreter, m, maps[typ][i]);
-#endif
                 }
             }
     }
@@ -1256,7 +1215,7 @@ Parrot_destroy_jit(void *ptr)
  * see TODO below
  * - locate Sub according to pc
  * - set register usage in context
- */  
+ */
 static void
 set_reg_usage(Interp *interpreter, opcode_t *pc)
 {
@@ -1282,7 +1241,7 @@ set_reg_usage(Interp *interpreter, opcode_t *pc)
                 sub = PMC_sub(sub_pmc);
                 if (pc >= sub->address && pc < sub->end) {
                     for (j = 0; j < 4; ++j)
-                        CONTEXT(interpreter->ctx)->n_regs_used[j] = 
+                        CONTEXT(interpreter->ctx)->n_regs_used[j] =
                             sub->n_regs_used[j];
                     return;
                 }
@@ -1465,7 +1424,7 @@ build_asm(Interp *interpreter, opcode_t *pc,
          * 2) track the sub we are currently in, set register usage
          *    in the interpreter context and restore it at end
          *
-         * for now we use 2) - longterm plan is 1)   
+         * for now we use 2) - longterm plan is 1)
          */
 
         /* The first opcode for this section */
