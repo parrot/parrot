@@ -927,8 +927,8 @@ ppc_sync_cache (void *_start, void *_end)
     ppc_sync();
 }
 
+#endif /* JIT_IMCC */
 #endif /* JIT_EMIT == 0 */
-#endif
 #endif /* PARROT_PPC_JIT_EMIT_H_GUARD */
 
 /*
