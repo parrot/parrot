@@ -465,7 +465,7 @@ Parrot_jit_emit_mov_rm_n_offs(Interp * interpreter, int reg, int base, size_t of
 #  define INT_REGISTERS_TO_MAP 24
 
 #ifndef JIT_IMCC
-char intval_map[INT_REGISTERS_TO_MAP] =
+static char intval_map[INT_REGISTERS_TO_MAP] =
     { v0, v1, a0, a1, a2, a3, t0, t1, t2, t3, t4, t5, t6, t7, s0, s1, s2, s3,
       s4, s5, s6, s7, t8, t9 };
 
@@ -474,13 +474,11 @@ char intval_map[INT_REGISTERS_TO_MAP] =
 extern int cacheflush(char* addr, int nbytes, int cache);
 static void sync_cache (void *_start, void *_end);
 
-#ifndef __IBMC__
 static void
 sync_cache (void *_start, void *_end)
 {
     cacheflush((char*)_start, (int)((char *)_end - (char *)_start), BCACHE);
 }
-#endif /* __IBMC__ */
 
 #endif /* JIT_IMCC */
 #endif /* JIT_EMIT == 0 */
