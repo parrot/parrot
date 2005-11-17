@@ -1025,15 +1025,12 @@ optimize_imcc_jit(Interp *interpreter, opcode_t *cur_op,
 
 /*
 
-=item C<static char *
-reg_addr(Interp * interpreter, int typ, int i)>
-
 =item C<size_t
 reg_offs(Interp * interpreter, int typ, int i)>
 
 Returns the offset of register C<typ[i]>.
 
-The latter is used if F<jit_emit.h> defines C<Parrot_jit_emit_get_base_reg_no>.
+F<jit/arch/jit_emit.h> has to define C<Parrot_jit_emit_get_base_reg_no(pc)>
 
 =cut
 
