@@ -48,6 +48,7 @@ typedef enum {
     PARROT_THREAD_DEBUG_FLAG        = 0x10,
     PARROT_EVAL_DEBUG_FLAG          = 0x20,  /* create EVAL_n file */
     PARROT_REG_DEBUG_FLAG           = 0x40,  /* fill I,N with garbage */
+    PARROT_CTX_DESTROY_DEBUG_FLAG   = 0x80,  /* ctx of a sub is gone */
     PARROT_ALL_DEBUG_FLAGS          = 0xffff
 } Parrot_debug_flags;
 /* &end_gen */

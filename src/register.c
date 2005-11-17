@@ -486,6 +486,16 @@ Parrot_free_context(Interp *interpreter, parrot_context_t *ctxp, int re_use)
      *
      */
     if (re_use || --ctxp->ref_count == 0) {
+#ifndef NDEBUG
+        if (Interp_debug_TEST(interpreter, PARROT_CTX_DESTROY_DEBUG_FLAG)) {
+            /* can't probably PIO_eprintf here */
+            parrot_sub_t doomed = PMC_sub(ctxp->current_sub);
+            fprintf(stderr,
+                "'ctx of sub '%s' is really dead "
+                "now and not pining at all\n",
+                (char*)doomed->name->strstart);
+        }
+#endif
         if (ctxp->malloced_mem) {
             /* we don't have the orig size anymore, just free all
             */

@@ -57,6 +57,7 @@ help_debug(void)
     "    0010    thread debugging\n"
     "    0020    eval/compile\n"
     "    0040    fill I, N registers with garbage\n"
+    "    0080    show, when a context is destroyed\n"
     "\n"
     "--trace -t [Flags] ...\n"
     "    0001    opcodes\n"
