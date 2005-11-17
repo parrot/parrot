@@ -24,6 +24,15 @@ be removed. Please use Parrot_string_is_cclass() instead.
 The Sub PMC method get_name_space is being replaced with get_namespace to
 reflect the internal change from name_space to the one-word namespace.
 
+=item PGE
+
+PGE::P6Rule is now a registered compiler, and should be used like so:
+
+ <@pmichaud> it's easy; instead of  $P0 = find_global "PGE", "p6rule"   
+   one now does  $P0 = compreg "PGE::P6Rule"
+
+This syntax is also true for PGE::Glob and PGE::P5Regex
+
 =back
 
 =head1 FUTURE changes
