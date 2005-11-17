@@ -21,9 +21,9 @@ use Test::More;
 use Parrot::Config;
 
 # There is no config probe for libquantum yet, please enable manually
-#unless ($PConfig{has_quantum}) {
+# if ( 1 ) {
 if ($PConfig{has_quantum}) {
-    plan tests => 2;
+    plan tests => 3;
 }
 else {
     plan skip_all => "No quantum library available";
@@ -41,6 +41,19 @@ my $new_reg_1 = << 'CODE';
     reg_1 = new quantumreg_type
 CODE
 
+
+pir_output_is($new_reg_1 . << 'CODE', << 'OUTPUT', "check whether interface is done");
+    unless quantumreg_type goto NOT_FOUND
+    print "Found QuantumReq\n"
+    goto CONTINUE
+NOT_FOUND:
+    print "Didn't find QuantumReq\n"
+CONTINUE:
+.end
+
+CODE
+Found QuantumReq
+OUTPUT
 
 pir_output_is($new_reg_1 . << 'CODE', << 'OUTPUT', "typeof");
 

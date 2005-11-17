@@ -66,16 +66,33 @@ Create a new QuantumReg with specified number of registers.
 */
 
     void set_integer_native (INTVAL size) {
-        /* TODO: implement */
+        quantum_reg * reg_p = (quantum_reg *) malloc( 1 * sizeof(quantum_reg) );
+        PMC_struct_val(SELF) = (void *) reg_p;
+        *reg_p = quantum_new_qureg(0,size);
+
+        /* change 1|0> to 0.5*sqrt(2)*|0> + 0.5*sqrt(2)*|1>  for first qubit */
+        /* Measuring |0> will give a random value */
+        /* TODO: op or method for hadamard */
+        quantum_hadamard(0, reg_p);  
+
         return;
     }
 
-    void* get_pointer() {
-        return PMC_struct_val(SELF);
-    }
 
-    void set_pointer(void* p) {
-        PMC_struct_val(SELF) = p;
+/*
+
+=item C<INTVAL get_bool_keyed_int(INTVAL key)>
+
+Makes a measurement on |0> of the qubit at position key.
+
+=cut
+
+*/
+
+    INTVAL get_integer_keyed_int (INTVAL key) {
+        quantum_reg * reg_p = (quantum_reg *) PMC_struct_val(SELF);
+       
+        return quantum_bmeasure(key, reg_p);
     }
 
 /*
@@ -89,8 +106,8 @@ Returns the number of qbits in the quantum register.
 */
 
     INTVAL get_integer() {
-        quantum_reg *reg = (quantum_reg *)PMC_struct_val(SELF);
-        if ( ! reg ) {
+        quantum_reg *reg_p = (quantum_reg *)PMC_struct_val(SELF);
+        if ( ! reg_p ) {
             return 0;
         }
         else {
@@ -99,6 +116,7 @@ Returns the number of qbits in the quantum register.
         }
     }
 }
+
 /*
 
 =back
