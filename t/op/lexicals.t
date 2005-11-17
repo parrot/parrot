@@ -63,7 +63,7 @@ ok
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', '.lex parsing - PIR, $P');
-.sub main
+.sub main :main
     .lex '$a', $P0
     null $P0
     null $P1
@@ -75,7 +75,7 @@ ok
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', '.lex parsing - PIR, local var');
-.sub main
+.sub main :main
     .local pmc a
     .lex "$a", a
     print "ok\n"
@@ -95,7 +95,7 @@ CODE
 OUTPUT
 
 pir_output_like(<<'CODE', <<'OUTPUT', '.lex - same PMC twice fails (P0)');
-.sub main
+.sub main :main
     .lex '$a', P0
     .lex '$b', P0
 .end
@@ -104,7 +104,7 @@ CODE
 OUTPUT
 
 pir_output_like(<<'CODE', <<'OUTPUT', '.lex - same PMC twice fails ($P0)');
-.sub main
+.sub main :main
     .lex '$a', $P0
     .lex '$b', $P0
 .end
@@ -113,7 +113,7 @@ CODE
 OUTPUT
 
 pir_output_like(<<'CODE', <<'OUTPUT', '.lex - same PMC twice fails (.local pmc ab)');
-.sub main
+.sub main :main
 	.local pmc ab
     .lex '$a', ab
     .lex '$b', ab
@@ -122,13 +122,14 @@ CODE
 /variable .* is already lexical for .*/
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', 'api parsing', todo => 'LexEnv not implemented');
-.sub main
+pir_output_is(<<'CODE', <<'OUTPUT', 'api parsing');
+.sub main :main
 	.lex 'a', $P0
 	store_lex 'a', $P0
 	$P0 = find_lex 'a'
 	print "ok\n"
 .include 'interpinfo.pasm'
+        load_bytecode "pcore.pir"      # TODO autoload/preload
 	interpinfo $P1, .INTERPINFO_CURRENT_SUB
 	$P2 = $P1.'get_lexinfo'()
 	$P2 = $P1.'get_lexpad'()
@@ -137,10 +138,11 @@ pir_output_is(<<'CODE', <<'OUTPUT', 'api parsing', todo => 'LexEnv not implement
 .end
 CODE
 ok
+ok
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', 'get_lexinfo');
-.sub main
+.sub main :main
     .lex '$a', $P0
     .lex '$b', $P9
 .include "interpinfo.pasm"
@@ -157,7 +159,7 @@ LexInfo 2
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', 'get_lexinfo - no lexicals');
-.sub main
+.sub main :main
 .include "interpinfo.pasm"
     interpinfo $P1, .INTERPINFO_CURRENT_SUB
     $P2 = $P1.'get_lexinfo'()
@@ -172,7 +174,7 @@ ok
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', 'get_lexpad - no pad');
-.sub main
+.sub main :main
 .include "interpinfo.pasm"
     interpinfo $P1, .INTERPINFO_CURRENT_SUB
     $P2 = $P1.'get_lexpad'()
@@ -800,7 +802,7 @@ bar: 46
 OUTPUT
 
 pir_output_like(<<'CODE', <<'OUTPUT', 'get non existing');
-.sub "main"
+.sub "main" :main
     .lex 'a', $P0
     foo()
 .end
@@ -817,7 +819,7 @@ CODE
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', 'get from 2 contexts away (success)');
-.sub "main"
+.sub "main" :main
 	$P0 = new Integer
 	$P0 = 1
     .lex 'a', $P0
@@ -848,7 +850,7 @@ ok a
 OUTPUT
 
 pir_output_like(<<'CODE', <<'OUTPUT', 'get from 2 contexts away (failure)');
-.sub "main"
+.sub "main" :main
 	$P0 = new Integer
 	$P0 = 1
     .lex 'a', $P0
