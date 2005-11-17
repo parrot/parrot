@@ -419,6 +419,21 @@ Parrot_jit_dofixup(Parrot_jit_info_t *jit_info,
     }
 }
 
+void
+Parrot_jit_normal_op(Parrot_jit_info_t *jit_info, Interp * interpreter)
+{
+}
+
+void
+Parrot_jit_cpcf_op(Parrot_jit_info_t *jit_info, Interp * interpreter)
+{
+}
+
+/*void
+Parrot_jit_restart_op(Parrot_jit_info_t *jit_info, Interp * interpreter)
+{
+}*/
+
 /* move reg to mem (i.e. intreg) */
 void
 Parrot_jit_emit_mov_mr_offs(Interp * interpreter, int base, size_t offs, int reg)
@@ -449,6 +464,7 @@ Parrot_jit_emit_mov_rm_n_offs(Interp * interpreter, int reg, int base, size_t of
 #  define REQUIRES_CONSTANT_POOL 0
 #  define INT_REGISTERS_TO_MAP 24
 
+#ifndef JIT_IMCC
 char intval_map[INT_REGISTERS_TO_MAP] =
     { v0, v1, a0, a1, a2, a3, t0, t1, t2, t3, t4, t5, t6, t7, s0, s1, s2, s3,
       s4, s5, s6, s7, t8, t9 };
@@ -456,14 +472,18 @@ char intval_map[INT_REGISTERS_TO_MAP] =
 #  include <asm/cachectl.h>
 
 extern int cacheflush(char* addr, int nbytes, int cache);
+static void sync_cache (void *_start, void *_end);
 
+#ifndef __IBMC__
 static void
 sync_cache (void *_start, void *_end)
 {
     cacheflush((char*)_start, (int)((char *)_end - (char *)_start), BCACHE);
 }
+#endif /* __IBMC__ */
 
-# endif /* JIT_EMIT == 0 */
+#endif /* JIT_IMCC */
+#endif /* JIT_EMIT == 0 */
 #endif /* PARROT_MIPS_JIT_EMIT_H_GUARD */
 
 /*
