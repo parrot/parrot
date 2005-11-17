@@ -17,5 +17,6 @@ unit, calling the subroutines marked with the C<:load> subpragma for each.
 .include "compilers/pge/PGE/OPTable.pir"
 .include "compilers/pge/PGE/Exp.pir"
 .include "compilers/pge/PGE/P6Rule.pir"
+.include "compilers/pge/PGE/P5Regexp.pir"
 .include "compilers/pge/PGE/Rule.pir"
 .include "compilers/pge/PGE/Library.pir"
