@@ -13,15 +13,13 @@ OUT
 
 # http://www.tcl.tk/man/tcl8.5/TclCmd/re_syntax.htm
 
-TODO: {
-  local $TODO="not implemented yet.";
-  regexp_is  ("asdf","asdf","literal, t");
-  regexp_isnt("asdf","fdsa","literal, f");
+regexp_is  ("asdf","asdf","literal, t");
+regexp_isnt("asdf","fdsa","literal, f");
 
-  regexp_is  ("a*","bbb",   "*, true");
-  regexp_is  ("a*","bab",   "*, true");
-  regexp_is  ("a*","baab",  "*, true");
-  regexp_is  ("a*","baaab", "*, true");
+regexp_is  ("a*","bbb",   "*, true");
+regexp_is  ("a*","bab",   "*, true");
+regexp_is  ("a*","baab",  "*, true");
+regexp_is  ("a*","baaab", "*, true");
 
   # +
   
@@ -225,8 +223,6 @@ TODO: {
 
   # --
 
-}
-
 
 
 # Helper 
@@ -235,6 +231,7 @@ sub regexp_is   { regexp_check(@_,1) }
 sub regexp_isnt { regexp_check(@_,0) }
 
 sub regexp_check {
+
   my ($pattern,$string,$reason,$flag) = @_;
 
   language_output_is("tcl",<<"TCL",<<"OUT", $reason);
@@ -244,5 +241,4 @@ puts [regexp {$pattern} {$string}]
 TCL
 $flag
 OUT
-   }
-
+}

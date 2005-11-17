@@ -14,14 +14,13 @@
 
    .local pmc tclARE, rule, match
 
-   # XXX                       "tclARE"
-   tclARE = find_global "PGE", "p6rule"
+   # XXX            "tclARE"
+   tclARE = compreg "PGE::P5Regexp"
 
    rule = tclARE(exp)
    match = rule(a_string)
 
-   $I0 = match
-   .return ($I0)
+   .return match.__get_bool()
 
 badargs:
   .throw("wrong # args: should be \"regexp ?switches? exp string ?matchVar? ?subMatchVar subMatchVar ...?\"")
