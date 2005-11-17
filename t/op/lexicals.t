@@ -1,6 +1,12 @@
-#! perl -w
+#! perl
 # Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
 # $Id$
+
+use strict;
+use warnings;
+use Test::More;
+use Parrot::Test;
+
 
 =head1 NAME
 
@@ -12,11 +18,10 @@ t/op/lexicals.t - Lexical Ops
 
 =head1 DESCRIPTION
 
-Tests various lexical scratchpad operations.
+Tests various lexical scratchpad operations, as described in PDD20.
 
 =cut
 
-use Parrot::Test tests => 36;
 
 output_is(<<'CODE', <<'OUTPUT', '.lex parsing - PASM');
 .pcc_sub main:
@@ -60,6 +65,44 @@ CODE
 ok
 OUTPUT
 
+output_like(<<'CODE', <<'OUTPUT', '.lex - same PMC twice fails (PASM)', todo => 'not yet implemented');
+.pcc_sub main:
+    .lex '$a', P0
+    .lex '$b', P0
+	end
+CODE
+/variable .* is already lexical for .*/
+OUTPUT
+
+pir_output_like(<<'CODE', <<'OUTPUT', '.lex - same PMC twice fails (P0)', todo => 'not yet implemented');
+.sub main
+    .lex '$a', P0
+    .lex '$b', P0
+.end
+CODE
+/variable .* is already lexical for .*/
+OUTPUT
+
+pir_output_like(<<'CODE', <<'OUTPUT', '.lex - same PMC twice fails ($P0)', todo => 'not yet implemented');
+.sub main
+    .lex '$a', $P0
+    .lex '$b', $P0
+.end
+CODE
+/variable .* is already lexical for .*/
+OUTPUT
+
+pir_output_like(<<'CODE', <<'OUTPUT', '.lex - same PMC twice fails (.local pmc ab)', todo => 'not yet implemented');
+.sub main
+	.local pmc ab
+    .lex '$a', ab
+    .lex '$b', ab
+.end
+CODE
+/variable .* is already lexical for .*/
+OUTPUT
+
+
 pir_output_is(<<'CODE', <<'OUTPUT', '.lex parsing - get_lexinfo');
 .sub main
     .lex '$a', $P0
@@ -75,6 +118,21 @@ pir_output_is(<<'CODE', <<'OUTPUT', '.lex parsing - get_lexinfo');
 .end
 CODE
 LexInfo 2
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', '.lex parsing - get_lexinfo - no lexicals');
+.sub main
+.include "interpinfo.pasm"
+    interpinfo $P1, .INTERPINFO_CURRENT_SUB
+    $P2 = $P1.'get_lexinfo'()
+	if null $P2 goto ok
+    print "LexInfo not NULL\n"
+    end
+ok:
+	print "ok\n"
+.end
+CODE
+ok
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', 'get_lexpad - no pad');
@@ -134,6 +192,36 @@ ok:
 CODE
 ok
 13013
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', 'get_lexpad - set two vars via pad (2 lex -> 2 pmc)');
+.sub main
+.include "interpinfo.pasm"
+    .lex '$a', P0
+    .lex '$b', P2
+    interpinfo $P1, .INTERPINFO_CURRENT_SUB
+    .local pmc pad
+    pad = $P1.'get_lexpad'()
+    unless null pad goto ok
+    print "pad is NULL\n"
+    end
+ok:
+    print "ok\n"
+    P1 = new .Integer
+    P1 = 13013
+    pad['$a'] = P1
+    print P0
+    print "\n"
+	P1 = 42
+    pad['$b'] = P1
+    print P2
+    print "\n"
+    end
+.end
+CODE
+ok
+13013
+42
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', 'synopsis example');
@@ -643,6 +731,67 @@ CODE
 /Lexical 'no_such' not found/
 OUTPUT
 
+pir_output_is(<<'CODE', <<'OUTPUT', 'get from 2 contexts away (success)');
+.sub "main"
+	$P0 = new Integer
+	$P0 = 1
+    .lex 'a', $P0
+    foo()
+.end
+.sub foo  :outer('main')
+	$P0 = new Integer
+	$P0 = 'two'
+    .lex 'b', $P0
+    bar()
+.end
+.sub bar   :outer('foo')
+    .lex 'c', $P0
+    $P2 = find_lex 'b'
+	eq $P2, 'two', ok_b
+	print "not "
+ok_b:
+	print "ok b\n"
+	$P2 = find_lex 'a'
+	eq $P2, 1, ok_a
+	print "not "
+ok_a:
+	print "ok a\n"
+.end
+CODE
+ok b
+ok a
+OUTPUT
+
+pir_output_like(<<'CODE', <<'OUTPUT', 'get from 2 contexts away (failure)', todo => 'find_lex "a" should fail!');
+.sub "main"
+	$P0 = new Integer
+	$P0 = 1
+    .lex 'a', $P0
+    foo()
+.end
+.sub foo
+	$P0 = new Integer
+	$P0 = 'two'
+    .lex 'b', $P0
+    bar()
+.end
+.sub bar   :outer('foo')
+    .lex 'c', $P0
+    $P2 = find_lex 'b'
+	eq $P2, 'two', ok_b
+	print "not "
+ok_b:
+	print "ok b\n"
+	$P2 = find_lex 'a'
+	eq $P2, 1, ok_a
+	print "not "
+ok_a:
+	print "ok a\n"
+.end
+CODE
+/ok b\nLexical 'a' not found/
+OUTPUT
+
 output_is(<<CODE, <<OUTPUT, "simple store and fetch");
 	new_pad 0
 	new P0, .Integer
@@ -1087,3 +1236,5 @@ CODE
 OUTPUT
 
 
+## remember to change the number of tests :-)
+BEGIN { plan tests => 44; }
