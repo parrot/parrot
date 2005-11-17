@@ -72,6 +72,7 @@
     optable.addtok("prefix::", "<infix:|", "nows", $P0)
 
     optable.addtok("close:>", "<prefix::", "nows")
+    optable.addtok("close:}", "<prefix::", "nows")
 
     $P0 = new Hash
     store_global "PGE::P6Rule", "%escape", $P0

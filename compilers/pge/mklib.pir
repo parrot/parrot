@@ -35,7 +35,7 @@ file.
     $P0 = open "library.pge", "<"
     $S0 = read $P0, 65535
     close $P0
-    $P1 = find_global "PGE", "compile_rules"
+    $P1 = compreg "PGE::P6Grammar"
     code = $P1($S0)
     print code
 .end
