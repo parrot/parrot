@@ -856,8 +856,9 @@ bar: 13014
 bar: 46
 OUTPUT
 
-pir_output_is(<<'CODE', '54', 'closure 8');
-# p6 example bt pmichaud
+pir_output_is(<<'CODE', '54', 'closure 8', todo => 'unspeccced or b0rken');
+
+# p6 example from pmichaud
 # { my $x = 5;  { print $x; my $x = 4; print $x; } } 
 
 .sub main :main
@@ -871,7 +872,7 @@ pir_output_is(<<'CODE', '54', 'closure 8');
     # anon closure 
     $P0 = find_lex '$x' 
     print $P0
-    .lex '$a', $P1
+    .lex '$x', $P1
     $P1 = new .Integer
     $P1 = 4
     print $P1
