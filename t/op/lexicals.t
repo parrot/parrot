@@ -856,6 +856,28 @@ bar: 13014
 bar: 46
 OUTPUT
 
+pir_output_is(<<'CODE', '54', 'closure 8');
+# p6 example bt pmichaud
+# { my $x = 5;  { print $x; my $x = 4; print $x; } } 
+
+.sub main :main
+    .lex '$x', $P0
+    $P0 = new .Integer
+    $P0 = 5
+    anon_1()
+.end
+
+.sub anon_1 :anon :outer(main)
+    # anon closure 
+    $P0 = find_lex '$x' 
+    print $P0
+    .lex '$a', $P1
+    $P1 = new .Integer
+    $P1 = 4
+    print $P1
+.end
+CODE
+    
 pir_output_like(<<'CODE', <<'OUTPUT', 'get non existing');
 .sub "main" :main
     .lex 'a', $P0
@@ -1379,4 +1401,4 @@ OUTPUT
 
 
 ## remember to change the number of tests :-)
-BEGIN { plan tests => 51; }
+BEGIN { plan tests => 52; }
