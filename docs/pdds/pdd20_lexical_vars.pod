@@ -85,19 +85,19 @@ populated with a PMC of HLL-mapped type LexPad.  Note that call frames
 for subroutines without lexical variables will omit the LexPad.
 
 From the interface perspective, LexPads are basically Hashes, with
-strings as keys and PMCs as values.  They extensd the basic Hash
+strings as keys and PMCs as values.  They extend the basic Hash
 interface with specialized initialization (requiring a reference to an
 associated LexInfo) and the query METHOD "get_lexinfo()" (to return it).
 
 LexPad keys are unique.  Therefore, in each subroutine, there can be
 only one lexical variable with a given name.
 
-In the normal use case, LexPads are not exposed to user code (but for
+In the normal use case, LexPads are not exposed to user code (not for
 any special reason; it just worked out that way).  Instead,
 specialized opcodes implement the common use cases.  Specialized
 opcodes are particularly a Good Idea here because most lexical usage
 involves searching more than one LexPad, so a single LexPad reference
-wouldn't be as useful as one might expect.  And, of coures, opcodes
+wouldn't be as useful as one might expect.  And, of course, opcodes
 can cheat ... er, can be written in optimized C.  :-)
 
 TODO: Describe how lexical naming system interacts with non-ASCII
@@ -133,7 +133,7 @@ Therefore, Parrot defaults to I<not> creating LexInfo or LexPad PMCs.
 It only creates a Lexinfo when it first encounters a ".lex" directive
 in the subroutine.  If no such directive is found, Parrot does not
 create a LexInfo for it at compile time, and therefore cannot create
-a a LexPad for it at run time.
+a LexPad for it at run time.
 
 However, an absence of ".lex" directives is normal for some languages
 (e.g. Tcl) which lack compile-time knowledge of lexicals.  For these
@@ -268,12 +268,12 @@ directive.  For example, given this preamble:
     .lex "$a", $P0
     $P1 = new Integer
 
-These two opcodes have the identical effect:
+These two opcodes have an identical effect:
 
     $P0 = $P1
     store_lex "$a", $P1
 
-And, also, these two opcodes also have identical effect:
+And these two opcodes also have an identical effect:
 
     $P1 = $P0
     $P1 = find_lex "$a"
