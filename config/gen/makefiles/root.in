@@ -1581,16 +1581,16 @@ win32-inno-installer : world install
 #
 ###############################################################################
 
-miniparrot-prebuild : $(GEN_CONFIGS) $(FLUID_FILES)
-	@tools/dev/rebuild_miniparrot.pl --action=clean
-	@tools/dev/rebuild_miniparrot.pl --action=prebuild_classes $(CLASS_O_FILES)
-	@tools/dev/rebuild_miniparrot.pl --action=copy_src $(GEN_CONFIGS) $(FLUID_FILES) $(ALL_H_FILES)
-	@tools/dev/rebuild_miniparrot.pl --action=copy_src classes/*.h $(IMCC_DIR)/main.c $(INC_DIR)/debug.h
-	@tools/dev/rebuild_miniparrot.pl --action=copy_src_from_obj $(O_FILES)
-	@tools/dev/rebuild_miniparrot.pl --action=write_buildscripts --executable=parrot $(O_FILES) $(IMCC_DIR)/main$(O)
-
-miniparrot-update :
-	tools/dev/rebuild_miniparrot.pl
+#miniparrot-prebuild : $(GEN_CONFIGS) $(FLUID_FILES)
+#	@tools/dev/rebuild_miniparrot.pl --action=clean
+#	@tools/dev/rebuild_miniparrot.pl --action=prebuild_classes $(CLASS_O_FILES)
+#	@tools/dev/rebuild_miniparrot.pl --action=copy_src $(GEN_CONFIGS) $(FLUID_FILES) $(ALL_H_FILES)
+#	@tools/dev/rebuild_miniparrot.pl --action=copy_src classes/*.h $(IMCC_DIR)/main.c $(INC_DIR)/debug.h
+#	@tools/dev/rebuild_miniparrot.pl --action=copy_src_from_obj $(O_FILES)
+#	@tools/dev/rebuild_miniparrot.pl --action=write_buildscripts --executable=parrot $(O_FILES) $(IMCC_DIR)/main$(O)
+#
+#miniparrot-update :
+#	tools/dev/rebuild_miniparrot.pl
 
 ###############################################################################
 #
