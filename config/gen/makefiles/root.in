@@ -520,7 +520,7 @@ MAKE = ${make_c}
 
 all : \
 	flags_dummy \
-	parrot$(EXE) \
+	$(PARROT) \
 	runtime/parrot/include/parrotlib.pbc \
 	runtime/parrot/include/config.fpmc \
 	docs \
@@ -530,7 +530,7 @@ all : \
 	compilers \
 	$(PBCMERGE)
 
-$(GEN_LIBRARY) : parrot$(EXE)
+$(GEN_LIBRARY) : $(PARROT)
 
 # constant string support
 .c.str :
@@ -681,32 +681,32 @@ flags_dummy :
 	@echo Compiling with:
 	@$(PERL) tools/dev/cc_flags.pl $(CUR_DIR)/CFLAGS echo $(CC) $(CFLAGS) -I$(@D) ${cc_o_out} xx$(O) -c xx.c
 
-runtime/parrot/include/parrotlib.pbc: runtime/parrot/library/parrotlib.imc parrot$(EXE)
+runtime/parrot/include/parrotlib.pbc: runtime/parrot/library/parrotlib.imc $(PARROT)
 	$(PARROT) -o $@ runtime/parrot/library/parrotlib.imc
 
-runtime/parrot/include/config.fpmc : myconfig config_lib.pasm miniparrot$(EXE)
+runtime/parrot/include/config.fpmc : myconfig config_lib.pasm $(MINIPARROT)
 	@echo Invoking Parrot to generate runtime/parrot/include/config.fpmc --cross your fingers
 	$(MINIPARROT) config_lib.pasm > $@
 
 parrot.def :
 	$(PERL) build_tools/parrotdef.pl
 
-parrot$(EXE) : $(IMCC_DIR)/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
+$(PARROT) : $(IMCC_DIR)/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
 	lib/Parrot/OpLib/core.pm $(SRC_DIR)/parrot_config$(O) \
-	miniparrot$(EXE) ${parrot_exe_def}
+	$(MINIPARROT) ${parrot_exe_def}
 	$(LINK) ${ld_out}$(PARROT) $(LINKFLAGS) $(LINK_DYNAMIC) ${ld_parrot_exe_def} \
 	$(IMCC_DIR)/main$(O) $(ALL_PARROT_LIBS) $(SRC_DIR)/parrot_config$(O)
 #
 # TODO build the real miniparrot
 #
-miniparrot$(EXE) : $(IMCC_DIR)/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
+$(MINIPARROT) : $(IMCC_DIR)/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
 	lib/Parrot/OpLib/core.pm $(SRC_DIR)/null_config$(O)
 	$(LINK) ${ld_out}$(MINIPARROT) $(LINKFLAGS) $(IMCC_DIR)/main$(O) \
 	$(ALL_PARROT_LIBS) $(SRC_DIR)/null_config$(O)
 
 $(INSTALLABLEPARROT) : $(IMCC_DIR)/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
 	lib/Parrot/OpLib/core.pm $(SRC_DIR)/install_config$(O) \
-	parrot$(EXE)
+	$(PARROT)
 	$(LINK) ${ld_out}$(INSTALLABLEPARROT) $(LINKFLAGS) \
 	$(IMCC_DIR)/main$(O) \
 	$(ALL_PARROT_LIBS) $(SRC_DIR)/install_config$(O)
@@ -725,7 +725,7 @@ $(SRC_DIR)/null_config.c : myconfig $(BUILD_TOOLS_DIR)/parrot_config_c.pl
 	$(PERL) $(BUILD_TOOLS_DIR)/parrot_config_c.pl --mini > \
 	$(SRC_DIR)/null_config.c
 
-install_config.fpmc : myconfig config_lib.pasm parrot$(EXE)
+install_config.fpmc : myconfig config_lib.pasm $(PARROT)
 	@echo Invoking Parrot to generate install_config.fpmc
 	$(PARROT) config_lib.pasm --install > $@
 
@@ -1196,7 +1196,7 @@ html-clean :
 dynclasses : dynclasses.dummy
 
 # XXX this dependancy is too broad, and should be narrowed down
-dynclasses.dummy : parrot$(EXE)
+dynclasses.dummy : $(PARROT)
 	$(MAKE) dynclasses
 
 dynclasses-test :
@@ -1213,7 +1213,7 @@ dynclasses-clean :
 
 compilers : compilers.dummy
 
-compilers.dummy : parrot$(EXE)
+compilers.dummy : $(PARROT)
 	$(MAKE) compilers/pge
 
 languages : languages.dummy
