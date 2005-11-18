@@ -715,6 +715,8 @@ find_outer(Interp *interpreter, IMC_Unit *unit)
     struct subs *s;
     SymReg *sub;
     size_t len;
+    PMC *current;
+    STRING *cur_name;
 
     if (!unit->outer)
         return NULL;
@@ -732,6 +734,15 @@ find_outer(Interp *interpreter, IMC_Unit *unit)
         if (!strcmp(sub->name, unit->outer->name)) {
             return s->unit->sub_pmc;
         }
+    }
+    /*
+     * could be eval too - look, if :outer is the currentsub
+     */
+    current = CONTEXT(interpreter->ctx)->current_sub;
+    cur_name = PMC_sub(current)->name;
+    if (cur_name->strlen == len &&
+            !memcmp((char*)cur_name->strstart, unit->outer->name, len)) {
+        return current;
     }
     return NULL;
 }
@@ -831,9 +842,15 @@ add_const_pmc_sub(Interp *interpreter, SymReg *r,
     pfc->u.key = sub_pmc;
     unit->sub_pmc = sub_pmc;
     IMCC_debug(interpreter, DEBUG_PBC_CONST,
-            "add_const_pmc_sub '%s' -> '%s' flags %d color %d (%s)\n",
+            "add_const_pmc_sub '%s' -> '%s' flags %d color %d (%s) "
+            "lex_info %s :outer(%s)\n",
             r->name, real_name, r->pcc_sub->pragma, k,
-            (char*) sub_pmc->vtable->whoami->strstart);
+            (char*) sub_pmc->vtable->whoami->strstart,
+            sub->lex_info ? "yes" : "no",
+            sub->outer_sub ?
+                (char*)PMC_sub(sub->outer_sub)->name->strstart :
+                "*none*"
+            );
     /*
      * create entry in our fixup (=symbol) table
      * the offset is the index in the constant table of this Sub

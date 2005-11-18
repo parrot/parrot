@@ -742,7 +742,7 @@ bar: 3
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', 'closure 6');
-# Leo's version of xyzzy original by particle, p5 by chip
+# Leo's version of xyzzy original by particle, p5 by chip     #'
 
 .sub main :main
 	.local pmc f,g
@@ -801,16 +801,23 @@ bar: 13014
 bar: 46
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', 'closure 7 - evaled', todo => 'implement :outer for eval');
-.sub xyzzy
+pir_output_is(<<'CODE', <<'OUTPUT', 'closure 7 - evaled');
+.sub main :main
     .local pmc f,g
-    f =plugh()
+    f = xyzzy(42)
     $P0 = f()
     $P0 = f()
     $P0 = f()
-    g =plugh()
+    g = xyzzy(13013)
     $P0 = g()
     $P0 = f()
+.end
+
+.sub xyzzy
+    .param int i
+    .local pmc f
+    f = plugh(i)
+    .return (f)
 .end
 
 .sub plugh
@@ -844,7 +851,8 @@ EOC
     compiler = compreg "PIR"
     $P1 = compiler(code)
     $P2 = $P1[0]   # first sub of eval
-    .return($P2)
+    $P3 = newclosure $P2
+    .return($P3)
 .end
 CODE
 foo: 42
