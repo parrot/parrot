@@ -1,0 +1,70 @@
+This is just a laundry list of items completed and items on the
+"to do" list for PGE.  One of the best incentives for getting a
+feature off a "to do" list and onto a "done" list is to submit
+a test for the feature.  :-)
+
+Perl 6 rule features implemented
+--------------------------------
+* standard regular expression constructs
+* quantifiers (*, +, ?, *?, +?, ??, **{m..n}?)
+* cut operators (:, ::, :::, <commit>)
+* alternation  (|)
+* conjunction  (&)
+* capturing and non-capturing groups
+* modifiers :w, :words, :i, :ignorecase
+* enumerated character lists (<[abcdef]>, <-[a..f]>)
+* character classes (., \d, \w, \s, \n, \e, \f, \r, \t, \x[hhh], \o[nnn])
+* anchors (^, $, ^^, $$, \b, \b)
+* negated character classes 
+* capturing subrules (<expr>)
+* non-capturing subrules  (<?expr>)
+* negated subrules (<!expr>)
+* lookahead and lookbehind (<before> and <after>)
+* built-in rules: <null>, <fail>, <alpha>, <digit>, <alnum>, 
+    <upper>, <lower>, <xdigit>, <space>, <print>, <graph>,
+    <blank>, <cntrl>, <punct>, <sp>, <lt>, <gt>, <dot>, <ws>,
+    <p6rule>, <p5regexp>
+* backreferences ($0, $1, $<foo>)
+* scalar subrule and subpattern aliases ($<foo>:=(...), $0:=(...))
+* balanced delimited text (<PGE::Text::bracketed>)
+* embedded closures ({{ puts "hello" }})
+* :lang() modifier
+* firstchar/nextchar optimizations
+
+
+Perl 6 rule features to-do
+--------------------------
+* rule composition (<+alpha-[aeiou]>)
+* lookbehind according to S05 definition 
+* <cut> assertion
+* versions of <commit> and cuts that release backtracking state
+* :perl5 modifier
+* literal assertions (<'literal'>)
+* interpolated assertions (<"literal">)
+* array and hash aliasing (@<foo>:=(...), %<foo>:=(...))
+* \c[...] and \C[...]
+* don't generate unneeded internal data structures (e.g., gpad)
+
+
+Perl 5 regexp features implemented
+----------------------------------
+* basic regular expressions
+* quantifiers (*, +, ?, *?, +?, ??, {m,n}?)
+* alternation (|)
+* character classes ([a-z], [^aeiou])
+* character class shortcuts (\d, \n, \s, \w, .)
+* anchors (^, \b, \B)
+* capturing parens
+* non-capturing parens (?:...)
+
+
+Perl 5 regexp features to-do
+----------------------------
+* modifiers   (?imxs:...)
+* lookahead, lookbehind
+* backreferences (\1, \2, \3)
+* character class shortcuts in [...]   ([^\S\n])
+* global anchors (\A, \a, \z)
+* correct implementation of $ anchor
+* hexadecimal, octal, and other chars (\x{hhhh}, \012, \cX)
+
