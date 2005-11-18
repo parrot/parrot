@@ -148,9 +148,7 @@ not_comment:
     .local pmc cl
     new_pad -1
     store_lex -1, x, arg
-    cl = new .Closure
-    $I0 = get_addr f
-    set_addr cl,  $I0
+    cl = newclosure f
     # set the name of the closure
     .const .Sub pr = "pr"
     unless f == pr goto no_pr
@@ -184,11 +182,7 @@ done:
     new_pad -1
     store_lex -1, x, arg
     store_lex -1, y, arg2
-    cl = new .Closure
-    $I0 = get_addr f
-    set_addr cl,  $I0
-    $S0 = f
-    cl = $S0
+    cl = newclosure f
     .return (cl)
 .end
 
