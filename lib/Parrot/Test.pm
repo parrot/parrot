@@ -34,7 +34,7 @@ The parameter C<$description> should describe the test.
 
 Any optional parameters can follow.  For example, to mark a test as a TODO test (where you know the implementation does not yet work), pass:
 
-	todo => 'reason to consider this TODO'
+    todo => 'reason to consider this TODO'
 
 at the end of the argument list.  Valid reasons include C<bug>,
 C<unimplemented>, and so on.
@@ -167,9 +167,9 @@ Run the given $command in a cross-platform manner.
 
 %options include...
 
-    STDOUT	filehandle to redirect STDOUT to
-    STDERR     	filehandle to redirect STDERR to
-    CD		directory to run the command in
+    STDOUT    filehandle to redirect STDOUT to
+    STDERR    filehandle to redirect STDERR to
+    CD        directory to run the command in
 
 For example:
 
@@ -415,17 +415,17 @@ sub _generate_functions {
                 my $pbc_f = per_test('.pbc', $test_no);
                 my $cmd = qq{$parrot ${args} -o $pbc_f "$code_f"};
                 run_command($cmd, CD => $path_to_parrot,
-			    STDOUT => $out_f, STDERR => $out_f);
+                STDOUT => $out_f, STDERR => $out_f);
 
                 my $o_f = per_test('.o', $test_no);
                 $cmd = qq{$parrot ${args} -o $o_f "$pbc_f"};
                 run_command($cmd, CD => $path_to_parrot,
-			    STDOUT => $out_f, STDERR => $out_f);
+                STDOUT => $out_f, STDERR => $out_f);
 
                 my $noext_f = per_test('', $test_no);
                 $cmd = qq{make EXEC=$noext_f exec};
                 run_command($cmd, CD => $path_to_parrot,
-			    STDOUT => $out_f, STDERR => $out_f);
+                STDOUT => $out_f, STDERR => $out_f);
             }
             if ( $func =~ /^pbc_output_/ && $args =~ /-r / ) {
                 # native tests with --run-pbc don't make sense
@@ -433,7 +433,7 @@ sub _generate_functions {
             }
             elsif ( $func =~ /^pir_2_pasm_/) {
                 $out_f = per_test('.pasm', $test_no);
-	        my $opt = $code_f =~ m!opt(.)! ? "-O$1" : "-O1";
+                my $opt = $code_f =~ m!opt(.)! ? "-O$1" : "-O1";
                 $args = "$args $opt --output=$out_f";
             }
             $code_f = File::Spec->rel2abs($code_f);
@@ -474,9 +474,9 @@ sub _generate_functions {
 
                 # Normalize the expected output,
                 # Let's not worry too much about whitespace
-	        $expected =~ s/^\s*$//gm;
-	        $expected =~ s/[\t ]+/ /gm;
-	        $expected =~ s/[\t ]+$//gm;
+                $expected =~ s/^\s*$//gm;
+                $expected =~ s/[\t ]+/ /gm;
+                $expected =~ s/[\t ]+$//gm;
             }
 
             # set a TODO for Test::Builder to find
@@ -596,35 +596,34 @@ sub _generate_functions {
 
             my ($cmd, $exit_code);
             $cmd = "$PConfig{cc} $PConfig{ccflags} $PConfig{cc_debug} " .
-	           " -I./include -c " .
-                   "$PConfig{cc_o_out}$obj_f $source_f";
+                " -I./include -c " .
+                "$PConfig{cc_o_out}$obj_f $source_f";
             $exit_code = run_command($cmd,
-		    'STDOUT' => $build_f,
-		    'STDERR' => $build_f);
+                'STDOUT' => $build_f,
+                'STDERR' => $build_f);
             $builder->diag("'$cmd' failed with exit code $exit_code")
-			if $exit_code;
+                if $exit_code;
 
             if (! -e $obj_f) {
                 $builder->diag("Failed to build '$obj_f': " .
-			slurp_file($build_f));
+                    slurp_file($build_f));
                 unlink $build_f;
                 $builder->ok(0,$desc);
                 return 0;
             }
 
-	    my $cfg = "src$PConfig{slash}parrot_config$PConfig{o}";
+        my $cfg = "src$PConfig{slash}parrot_config$PConfig{o}";
             $cmd = "$PConfig{link} $PConfig{linkflags} $PConfig{ld_debug} " .
-		   "$obj_f $cfg $PConfig{ld_out}$exe_f " .
-		   "$libparrot $iculibs $PConfig{libs}";
+           "$obj_f $cfg $PConfig{ld_out}$exe_f " .
+           "$libparrot $iculibs $PConfig{libs}";
             $exit_code = run_command($cmd,
-		'STDOUT' => $build_f,
-		'STDERR' => $build_f);
+        'STDOUT' => $build_f,
+        'STDERR' => $build_f);
             $builder->diag("'$cmd' failed with exit code $exit_code")
-		if $exit_code;
+        if $exit_code;
 
             if (! -e $exe_f) {
-                $builder->diag("Failed to build '$exe_f': " .
-			slurp_file($build_f));
+                $builder->diag("Failed to build '$exe_f': " . slurp_file($build_f));
                 unlink $build_f;
                 $builder->ok(0,$desc);
 

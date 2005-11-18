@@ -206,7 +206,7 @@ sub _generate_pir_for {
             load_bytecode "PGE.pbc"
             load_bytecode "PGE/Dumper.pir"
             load_bytecode "PGE/Text.pir"
-            find_global p6rule_compile, "PGE", "p6rule"
+            p6rule_compile = compreg "PGE::P6Rule"
 
             .local string target
             .local string pattern
@@ -238,7 +238,7 @@ sub _generate_subrule_pir {
         .sub _PGE_Test
             .local pmc p6rule_compile
             load_bytecode "PGE.pbc"
-            find_global p6rule_compile, "PGE", "p6rule"
+            p6rule_compile = compreg "PGE::P6Rule"
 
             .local string target
             .local pmc rulesub
@@ -291,7 +291,7 @@ sub _generate_glob_for {
             load_bytecode "PGE/Glob.pir"
             load_bytecode "PGE/Dumper.pir"
             load_bytecode "PGE/Text.pir"
-            find_global glob_compile, "PGE", "glob"
+            glob_compile = compreg "PGE::Glob"
 
             .local string target
             .local string pattern
