@@ -25,7 +25,7 @@ These are the vtable functions for the TclList base class
 static INTVAL dynclass_TclInt;
 static STRING *space, *ob, *cb;
 
-pmclass TclList extends Array need_ext does array dynpmc group tcl_group {
+pmclass TclList extends Array need_ext does array dynpmc group tcl_group hll Tcl maps Array {
 
 /*
 

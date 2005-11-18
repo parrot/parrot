@@ -13,7 +13,7 @@
 #include "parrot/parrot.h"
 #include <assert.h>
 
-pmclass TclFloat extends TclObject extends Float dynpmc group tcl_group {
+pmclass TclFloat extends TclObject extends Float dynpmc group tcl_group hll Tcl maps Float {
 
     STRING* get_string () {
         UINTVAL buflen;

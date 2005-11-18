@@ -15,7 +15,7 @@
 
 static STRING *true, *false, *yes, *no;
 
-pmclass TclString extends TclObject extends String dynpmc group tcl_group {
+pmclass TclString extends TclObject extends String dynpmc group tcl_group hll Tcl maps String {
 
     void class_init () {
         PMC *string_anchor;

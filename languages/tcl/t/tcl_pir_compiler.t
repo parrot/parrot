@@ -1,7 +1,7 @@
 #!perl
 
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 4;
+use Parrot::Test tests => 7;
 use Test::More;
 use vars qw($TODO);
 
@@ -69,3 +69,48 @@ CODE
 11
 OUTPUT
 }
+
+pir_output_is(<<'CODE', <<'OUTPUT', "Verify HLL autoboxing: Int");
+.HLL 'Tcl', 'tcl_group'
+.sub _main :main
+  $P1 = test()
+  $S1 = typeof $P1
+  print $S1
+  print_newline
+.end
+.sub test
+  .return (1)
+.end
+CODE
+TclInt
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "Verify HLL autoboxing: String");
+.HLL 'Tcl', 'tcl_group'
+.sub _main :main
+  $P1 = test()
+  $S1 = typeof $P1
+  print $S1
+  print_newline
+.end
+.sub test
+  .return ("coke")
+.end
+CODE
+TclString
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "Verify HLL autoboxing: Float");
+.HLL 'Tcl', 'tcl_group'
+.sub _main :main
+  $P1 = test()
+  $S1 = typeof $P1
+  print $S1
+  print_newline
+.end
+.sub test
+  .return (8.14)
+.end
+CODE
+TclFloat
+OUTPUT

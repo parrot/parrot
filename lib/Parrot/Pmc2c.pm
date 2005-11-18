@@ -908,6 +908,26 @@ EOC
     } /* pass */
 EOC
 
+   # To make use of the .HLL directive, register any mapping...
+    if ($self->{flags}{hll} && $self->{flags}{maps}) {
+
+      my $hll  = (keys %{$self->{flags}{hll}})[0];
+      my $maps = (keys %{$self->{flags}{maps}})[0];
+      $cout .= <<"EOC";
+
+    if (pass) {
+        /* Register this PMC as a HLL mapping */
+        INTVAL pmc_id = Parrot_get_HLL_id(
+            interp, const_string(interp, "$hll")
+        );
+        if (pmc_id > 0)
+            Parrot_register_HLL_type(
+                interp, pmc_id, enum_class_$maps, entry
+            );
+    } /*pass*/
+EOC
+   }
+
     # declare each nci method for this class
     my $firstnci = 1;
     foreach my $method (@{ $self->{methods} }) {

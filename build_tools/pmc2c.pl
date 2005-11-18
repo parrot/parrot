@@ -181,6 +181,20 @@ valid for dynamic PMCs.
 
 The class needs an external library.
 
+=item C<hll HLL>
+
+The High level language this PMC corresponds to.
+
+=item C<maps Type>
+
+The basic parrot PMC type that this PMC correspond to for C<.HLL> usage. For example:
+
+ pmcclass TclInt hll Tcl maps Integer
+
+allows this PMC to automatically be used when autoboxing C<I> registers to PMCs.
+
+Requires the C<hll> flag.
+
 =back
 
 =item 3.
@@ -381,7 +395,7 @@ sub parse_flags {
     my ($pre, $classname) = ($1, $2);
 
     # flags that have values passed with them
-    my %has_value = map { $_ => 1 } qw(does extends group lib);
+    my %has_value = map { $_ => 1 } qw(does extends group lib hll maps);
 
     my (%flags, $parent_nr);
     # look through the pmc declaration header for flags such as noinit
