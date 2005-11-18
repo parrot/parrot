@@ -43,7 +43,7 @@ my $pre = <<PRE;
     .local pmc pir
     .local pmc exp
     .local pmc match
-    find_global p6rule_compile, 'PGE', 'p6rule'
+    p6rule_compile = compreg 'PGE::P6Rule'
     null match
     null rulesub
 PRE
