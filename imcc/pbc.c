@@ -411,6 +411,8 @@ store_labels(Interp *interpreter, IMC_Unit * unit, int *src_lines, int oldsize)
             store_label(interpreter, addr, code_size);
             /* increase code_size by 2 ops */
             code_size += 2;
+            /* one more line */
+            (*src_lines)++;
             /* add inter_segment jump */
             r[0] = mk_const(interpreter, glabel, 'S');
             r[0]->color = add_const_str(interpreter, r[0]);
