@@ -44,7 +44,7 @@ my $ns_subs = {
 		'PGE' => [qw/ /],
 		'PGE::Exp' => [qw/ /],
 		'PGE::P6Rule' => [qw/ /],
-		'PGE::Rule' => [qw/ p6rule /],
+		'PGE::Rule' => [qw/ p6rule /], ## TODO deprecated
 	},
 	'PGE/Rule.pir' => {
 		'PGE::Rule' => [qw/
@@ -104,6 +104,20 @@ ok
 OUT
 
 
+## compiler registration
+for my $compiler (qw/ PGE::P6Rule PGE::P5Regexp PGE::Glob /)
+{
+	pir_output_is(<<"CODE".$POST, <<OUT, 'compreg "$compiler"');
+.sub 'main' :main
+	load_bytecode 'PGE.pbc'
+	\$P0 = compreg '$compiler'
+CODE
+ok
+OUT
+}
+
+
+## public api tests
 for my $file (sort keys %$ns_subs)
 {
 	for my $ns (sort keys %{ $ns_subs->{$file} })

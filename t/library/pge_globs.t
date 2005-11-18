@@ -55,7 +55,7 @@ pir_output_is(<<'CODE', <<'OUT', "Glob, alternate");
   load_bytecode "library/PGE/Glob.pir"
 
   .local pmc rule
-  $P0 = find_global "PGE", "glob"
+  $P0 = compreg "PGE::Glob"
   (rule, $P1, $P2) = $P0("{app,bet,cod}a")
 
   $P1 = rule("appa")

@@ -1,6 +1,13 @@
-#! perl -w
-# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+#! perl
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id: pge.t 9188 2005-09-13 02:53:47Z azuroth $
+
+use strict;
+use warnings;
+use lib qw( t . lib ../lib ../../lib );
+use Test::More;
+use Parrot::Test;
+
 
 =head1 NAME
 
@@ -8,17 +15,13 @@ t/library/pge-hs.t - Grammar Engine Haskell Output tests
 
 =head1 SYNOPSIS
 
-	% perl -Ilib t/library/pge-hs.t
+	% prove t/library/pge-hs.t
 
 =cut
 
-use strict;
-
-use Parrot::Test tests => 1;
 
 # 1
 pir_output_is(<<'CODE', <<'OUT', "PGE::Hs match");
-
 .sub _main
     .local pmc match, add_rule
     .local string result
@@ -41,3 +44,7 @@ OK:
 CODE
 ok 1
 OUT
+
+
+## remember to change the number of tests :-)
+BEGIN { plan tests => 1; }
