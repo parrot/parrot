@@ -6,6 +6,11 @@ All are gone. Please read the history of this file for more.
 
 =back
 
+=head1 Deprecated opcodes
+
+new_pad is now deprecated. See PDD20 for information about how to
+handle lexical variables.
+
 =head1 Deprecated APIs
 
 =over 4
