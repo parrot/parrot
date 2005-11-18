@@ -35,7 +35,7 @@ require Parrot::Test;
 
 =over 4
 
-=item C<p6rule_is($target, $pattern, $description)>
+=item C<p6rule_is($target, $pattern, $description, @todo)>
 
 Runs the target string against the Perl 6 pattern, passing the test
 if they match.  Note that patterns should be specified as strings
@@ -61,24 +61,18 @@ will be matched against. The 'outer rule' if you will.
 =cut
 
 sub p6rule_is {
-    my ($target, $pattern, $description, @todo) = @_;
+    my ($target, $pattern) = (shift, shift);
 
-    if (ref $pattern) {
-        Parrot::Test::pir_output_is(
-            Parrot::Test::PGE::_generate_subrule_pir($target, $pattern),
-            'matched',
-            $description,
-            @todo);
-    } else {
-        Parrot::Test::pir_output_is(
-            Parrot::Test::PGE::_generate_pir_for($target, $pattern),
-            'matched',
-            $description,
-            @todo);
-    }
+    unshift @_ => 'matched';
+    unshift @_ => ( ref $pattern
+        ? Parrot::Test::PGE::_generate_subrule_pir($target, $pattern)
+        : Parrot::Test::PGE::_generate_pir_for($target, $pattern)
+    );
+
+    goto &Parrot::Test::pir_output_is;
 }
 
-=item C<p6rule_isnt($target, $pattern, $description)>
+=item C<p6rule_isnt($target, $pattern, $description, @todo)>
 
 Runs the target string against the Perl 6 pattern, passing the test if
 they do not match. The same pattern argument syntax above applies here.
@@ -86,24 +80,18 @@ they do not match. The same pattern argument syntax above applies here.
 =cut
 
 sub p6rule_isnt {
-    my ($target, $pattern, $description, @todo) = @_;
+    my ($target, $pattern) = (shift, shift);
 
-    if (ref $pattern) {
-        Parrot::Test::pir_output_is(
-            Parrot::Test::PGE::_generate_subrule_pir($target, $pattern),
-            'failed',
-            $description,
-            @todo);
-    } else {
-        Parrot::Test::pir_output_is(
-            Parrot::Test::PGE::_generate_pir_for($target, $pattern),
-            'failed',
-            $description,
-            @todo);
-    }
+    unshift @_ => 'failed';
+    unshift @_ => ( ref $pattern
+        ? Parrot::Test::PGE::_generate_subrule_pir($target, $pattern)
+        : Parrot::Test::PGE::_generate_pir_for($target, $pattern)
+    );
+
+    goto &Parrot::Test::pir_output_is;
 }
 
-=item C<p6rule_like($target, $pattern, $expected, $description)>
+=item C<p6rule_like($target, $pattern, $expected, $description, @todo)>
 
 Runs the target string against the Perl 6 pattern, passing the test
 if the output produced by the test code matches the C<$expected>
@@ -112,15 +100,14 @@ parameter.  Note that C<$expected> is a I<Perl 5> pattern.
 =cut
 
 sub p6rule_like {
-    my ($target, $pattern, $expected, $description, @todo) = @_;
-    Parrot::Test::pir_output_like(
-            Parrot::Test::PGE::_generate_pir_for($target, $pattern, 1),
-            $expected,
-            $description,
-            @todo);
+    my ($target, $pattern) = (shift, shift);
+
+    unshift @_ => Parrot::Test::PGE::_generate_pir_for($target, $pattern, 1);
+
+    goto &Parrot::Test::pir_output_like;
 }
 
-=item C<pgeglob_is($target, $pattern, $description)>
+=item C<pgeglob_is($target, $pattern, $description, @todo)>
 
 Runs the target string against the Perl 6 pattern, passing the test
 if they match.  Note that patterns should be specified as strings
@@ -132,16 +119,15 @@ what this does.)
 =cut
 
 sub pgeglob_is {
-    my ($target, $pattern, $description, @todo) = @_;
+    my ($target, $pattern) = (shift, shift);
 
-        Parrot::Test::pir_output_is(
-            Parrot::Test::PGE::_generate_glob_for($target, $pattern),
-            'matched',
-            $description,
-            @todo);
+    unshift @_ => 'matched';
+    unshift @_ => Parrot::Test::PGE::_generate_glob_for($target, $pattern);
+
+    goto &Parrot::Test::pir_output_is;
 }
 
-=item C<pgeglob_isnt($target, $pattern, $description)>
+=item C<pgeglob_isnt($target, $pattern, $description, @todo)>
 
 Runs the target string against the Perl 6 pattern, passing the test if
 they do not match. The same pattern argument syntax above applies here.
@@ -149,16 +135,15 @@ they do not match. The same pattern argument syntax above applies here.
 =cut
 
 sub pgeglob_isnt {
-    my ($target, $pattern, $description, @todo) = @_;
+    my ($target, $pattern) = (shift, shift);
 
-        Parrot::Test::pir_output_is(
-            Parrot::Test::PGE::_generate_glob_for($target, $pattern),
-            'failed',
-            $description,
-            @todo);
+    unshift @_ => 'failed';
+    unshift @_ => Parrot::Test::PGE::_generate_glob_for($target, $pattern);
+
+    goto &Parrot::Test::pir_output_is;
 }
 
-=item C<pgeglob_like($target, $pattern, $expected, $description)>
+=item C<pgeglob_like($target, $pattern, $expected, $description, @todo)>
 
 Runs the target string against the Perl 6 pattern, passing the test
 if the output produced by the test code matches the C<$expected>
@@ -167,12 +152,11 @@ parameter.  Note that C<$expected> is a I<Perl 5> pattern.
 =cut
 
 sub pgeglob_like {
-    my ($target, $pattern, $expected, $description, @todo) = @_;
-    Parrot::Test::pir_output_like(
-            Parrot::Test::PGE::_generate_glob_for($target, $pattern, 1),
-            $expected,
-            $description,
-            @todo);
+    my ($target, $pattern) = (shift, shift);
+
+    unshift @_ => Parrot::Test::PGE::_generate_glob_for($target, $pattern, 1);
+
+    goto &Parrot::Test::pir_output_like;
 }
 
 
