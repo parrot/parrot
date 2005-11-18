@@ -830,7 +830,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', 'closure 7 - evaled', todo => 'implement :ou
     print $P0
     print "\n"
     .local string code
-    code = <<'CODE'
+    code = <<'EOC'
     .sub bar :anon :outer(foo)
 	$P0 = find_lex 'a'
 	inc $P0
@@ -839,7 +839,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', 'closure 7 - evaled', todo => 'implement :ou
 	print $P0
 	print "\n"
     .end
-CODE
+EOC
     .local pmc compiler
     compiler = compreg "PIR"
     $P1 = compiler(code)
@@ -859,7 +859,7 @@ OUTPUT
 pir_output_is(<<'CODE', '54', 'closure 8', todo => 'unspeccced or b0rken');
 
 # p6 example from pmichaud
-# { my $x = 5;  { print $x; my $x = 4; print $x; } } 
+# { my $x = 5;  { print $x; my $x = 4; print $x; } }
 
 .sub main :main
     .lex '$x', $P0
@@ -869,8 +869,8 @@ pir_output_is(<<'CODE', '54', 'closure 8', todo => 'unspeccced or b0rken');
 .end
 
 .sub anon_1 :anon :outer(main)
-    # anon closure 
-    $P0 = find_lex '$x' 
+    # anon closure
+    $P0 = find_lex '$x'
     print $P0
     .lex '$x', $P1
     $P1 = new .Integer
@@ -878,7 +878,7 @@ pir_output_is(<<'CODE', '54', 'closure 8', todo => 'unspeccced or b0rken');
     print $P1
 .end
 CODE
-    
+
 pir_output_like(<<'CODE', <<'OUTPUT', 'get non existing');
 .sub "main" :main
     .lex 'a', $P0
