@@ -903,7 +903,7 @@ examples/pasm/hello$(O): examples/pasm/hello.pbc
 	$(PARROT) -o examples/pasm/hello$(O) examples/pasm/hello.pbc
 
 examples/pasm/hello$(EXE): examples/pasm/hello$(O)
-	$(MAKE) EXEC=examples/pasm/hello exec
+	$(MAKE) . EXEC=examples/pasm/hello exec
 
 
 
