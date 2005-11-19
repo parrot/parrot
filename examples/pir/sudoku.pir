@@ -102,6 +102,11 @@ To turn off ncurses just in case.
 
 =back
 
+=head2 Variable indices
+
+Column, rows, and sqares have zero-based indices. Squares are
+numbered from top left to bottom right.
+
 =head2 Sudoku Class attributes
 
 =over 4
@@ -1072,7 +1077,7 @@ lpy:
 lpn:
     x = 0
     b = 0
-    rbl = 7         # blocked is reset per sqare row/col
+    rbl = 7         # blocked is reset per square row/col
     cbl = 7
     nulb = 0        # empty are set
     nulc = 0
@@ -1504,5 +1509,54 @@ out:
     ## KEYPAD(STDSCR, 1)	# set keypad mode
     .return(STDSCR)
 .end
+
+=head1 TODO
+
+Consider this one:
+
+  # daily sudoku 16-nov-2005 very hard
+  .5..3.9..
+  .394.....
+  .....964.
+  .6...84..
+  5.......8
+  ..19...2.
+  .826.....
+  .....576.
+  ..5.9..8.
+
+It gets solved until here, then backtracking begins (and succeeds).
+
+  +---------+---------+---------+
+  | 4  5  6 | 8  3  . | 9  .  . |    777 77. 7..
+  | .  3  9 | 4  .  . | 8  .  . |    .77 7.. 7..
+  | .  .  8 | .  .  9 | 6  4  3 |    ..7 ..7 777
+  +---------+---------+---------+
+  | .  6  . | .  .  8 | 4  .  . |    .7. ..7 7..
+  | 5  .  . | .  .  . | .  .  8 |    7.. ... 7.7
+  | 8  .  1 | 9  .  . | .  2  6 |    7.7 7.. 777  <<<<<<<<<<
+  +---------+---------+---------+
+  | .  8  2 | 6  .  . | .  .  . |    .77 7.. 777
+  | .  .  . | 2  8  5 | 7  6  . |    777 777 777
+  | 6  .  5 | .  9  . | 2  8  . |    7.7 .7. 777
+  +---------+---------+---------+
+
+Have a look at the marked row 5. '3' and '5' can't be in col 1.
+So '3' and '5' have to be at the right side of the row.
+
+Now take a look at the '7' - invalid positions are shown above already
+(dumped with the --inv=7 option).
+
+In both squares 0 and 6 the '7' can only be in columns 0 or 1. This
+implies that a '7' has to be in col 2, row 3 or 4. Looking at
+square 5, the '7' is also in row 3 or 4. Therefore the '7' in the
+middle square (4) has to be too in row 5.
+
+Voila we have 3 numbers (3,5,7) which are somewhere on the right
+side of row 5 and we get a unique number in row 5, col 1 - the '4'.
+
+And then it's easy.
+
+=cut
 
 # vim: ft=imc sw=4:
