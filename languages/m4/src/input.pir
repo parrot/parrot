@@ -67,7 +67,7 @@ TOOO: recognize nested quoted strings
   # TODO: Use named or positional captures
   # TODO: rulesub for frozen state 
   .local pmc p6rule
-  find_global p6rule, "PGE", "p6rule"
+  p6rule = compreg "PGE::P6Rule"
   .local pmc rulesub_in_state
   rulesub_in_state = new Hash
   state['rulesub'] = rulesub_in_state

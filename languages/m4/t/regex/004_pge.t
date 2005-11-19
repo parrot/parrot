@@ -15,14 +15,14 @@ pir_output_is( << 'END_PIR', << 'END_OUT', "check whether PGE is there" );
     load_bytecode "PGE.pbc"
     load_bytecode "PGE/Dumper.pbc"
 
-    .local pmc p6rule_compile
-    p6rule_compile = find_global "PGE", "p6rule"            # get the compiler
+    .local pmc p6rule
+    p6rule = compreg "PGE::P6Rule"
 
     .local string pattern       
     pattern = "^(<[_a..zA..Z]><[_a..zA..Z0..9]>*)"  # capture the complete id
 
     .local pmc word_rulesub                     
-    word_rulesub = p6rule_compile(pattern)                  # compile the pattern to a rulesub
+    word_rulesub = p6rule(pattern)                  # compile the pattern to a rulesub
 
     .local string target
     target = "Hello World"                          # target string
