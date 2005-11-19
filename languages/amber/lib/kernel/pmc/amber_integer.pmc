@@ -6,22 +6,14 @@
 
 #include "parrot/parrot.h"
 
-static INTVAL dynclass_CHARACTER;
+static INTVAL class_CHARACTER;
 
-pmclass Amber_INTEGER extends Integer extends Amber_DEFAULT does integer dynpmc group amber_kernel {
+pmclass Amber_INTEGER extends Integer extends Amber_DEFAULT does integer dynpmc group amber_kernel hll Amber maps Integer {
 
     void class_init() {
         if (pass) {
-            /* Register this PMC as Amber's HLL Integer type. */
-            INTVAL amber_id = Parrot_get_HLL_id(
-                INTERP, const_string(INTERP, "Amber")
-            );
-            if (amber_id > 0)
-                Parrot_register_HLL_type(
-                    INTERP, amber_id, enum_class_Integer, entry
-                );
             /* Record the type-id of PMC Amber_CHARACTER */
-            dynclass_CHARACTER = Parrot_PMC_typenum(INTERP, "Amber_CHARACTER");
+            class_CHARACTER = Parrot_PMC_typenum(INTERP, "Amber_CHARACTER");
         }
     }
 
@@ -56,7 +48,7 @@ pmclass Amber_INTEGER extends Integer extends Amber_DEFAULT does integer dynpmc 
 
     METHOD PMC* character() {
         /* XXX consider Unicode */
-        PMC* result = pmc_new(INTERP, dynclass_CHARACTER);
+        PMC* result = pmc_new(INTERP, class_CHARACTER);
         VTABLE_set_integer_native(INTERP, result, PMC_int_val(SELF));
         return result;
     }

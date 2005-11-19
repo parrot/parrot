@@ -6,22 +6,14 @@
 
 #include "parrot/parrot.h"
 
-static INTVAL dynclass_CHARACTER;
+static INTVAL class_CHARACTER;
 
-pmclass Amber_STRING extends String extends Amber_DEFAULT does string dynpmc group amber_kernel {
+pmclass Amber_STRING extends String extends Amber_DEFAULT does string dynpmc group amber_kernel hll Amber maps String {
 
     void class_init() {
         if (pass) {
-            /* Register this PMC as Amber's HLL String type. */
-            INTVAL amber_id = Parrot_get_HLL_id(
-                INTERP, const_string(INTERP, "Amber")
-            );
-            if (amber_id > 0)
-                Parrot_register_HLL_type(
-                    INTERP, amber_id, enum_class_String, entry
-                );
             /* Record the type-id of PMC Amber_CHARACTER */
-            dynclass_CHARACTER = Parrot_PMC_typenum(INTERP, "Amber_CHARACTER");
+            class_CHARACTER = Parrot_PMC_typenum(INTERP, "Amber_CHARACTER");
         }
     }
 
@@ -57,7 +49,7 @@ pmclass Amber_STRING extends String extends Amber_DEFAULT does string dynpmc gro
 
     METHOD PMC* first() {
         /* XXX reject if count = 0 */
-        PMC* result = pmc_new(INTERP, dynclass_CHARACTER);
+        PMC* result = pmc_new(INTERP, class_CHARACTER);
         VTABLE_set_integer_native(INTERP, result, string_ord(
             INTERP, PMC_str_val(SELF), (INTVAL) 0
         ));
@@ -78,7 +70,7 @@ pmclass Amber_STRING extends String extends Amber_DEFAULT does string dynpmc gro
         /* XXX reject out-of-range values (0, or > count, or < -count) */
         INTVAL adjusted_index = VTABLE_get_integer(INTERP, index);
         if (adjusted_index > 0) adjusted_index = adjusted_index - 1;
-        PMC* result = pmc_new(INTERP, dynclass_CHARACTER);
+        PMC* result = pmc_new(INTERP, class_CHARACTER);
         VTABLE_set_integer_native(INTERP, result, string_ord(
             INTERP, PMC_str_val(SELF), adjusted_index
         ));
@@ -87,7 +79,7 @@ pmclass Amber_STRING extends String extends Amber_DEFAULT does string dynpmc gro
 
     METHOD PMC* last() {
         /* XXX reject if count = 0 */
-        PMC* result = pmc_new(INTERP, dynclass_CHARACTER);
+        PMC* result = pmc_new(INTERP, class_CHARACTER);
         VTABLE_set_integer_native(INTERP, result, string_ord(
             INTERP, PMC_str_val(SELF), string_compute_strlen(
                 INTERP, PMC_str_val(SELF)

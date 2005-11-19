@@ -6,20 +6,7 @@
 
 #include "parrot/parrot.h"
 
-pmclass Amber_ARRAY need_ext extends Array extends Amber_DEFAULT does array dynpmc group amber_kernel {
-
-    void class_init() {
-        if (pass) {
-            /* Register this PMC as Amber's HLL Array type. */
-            INTVAL amber_id = Parrot_get_HLL_id(
-                INTERP, const_string(INTERP, "Amber")
-            );
-            if (amber_id > 0)
-                Parrot_register_HLL_type(
-                    INTERP, amber_id, enum_class_Array, entry
-                );
-        }
-    }
+pmclass Amber_ARRAY need_ext extends Array extends Amber_DEFAULT does array dynpmc group amber_kernel hll Amber maps Array {
 
 /* non-vtable methods follow */
 
