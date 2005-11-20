@@ -460,6 +460,24 @@ is_set:
     .return (n)
 .end
 
+# count one bits (3 max - zero based)
+.sub bits1
+    .param int c
+    .local int i, n, b
+
+    i = 0
+    n = 0
+loop:
+    b = c & 1
+    c >>= 1        
+    unless b goto not_set
+    inc n
+not_set:
+    inc i
+    if i < 3 goto loop
+    .return (n)
+.end
+
 # make sure the game is valid
 .sub verify_input
     .param string raw
@@ -935,20 +953,26 @@ nd:
     $I0 = self."scan_1"(rcss, i_rcss, "rows")
     if $I0 == -1 goto err
     any |= $I0
+    $I0 = self."scan_dbl"(rcss, i_rcss, "rows")
+    any |= $I0
+
     rcss = getattribute self, "cols"
     i_rcss = getattribute self, "i_cols"
     $I0 = self."scan_1"(rcss, i_rcss, "cols")
     if $I0 == -1 goto err
     any |= $I0
+    $I0 = self."scan_dbl"(rcss, i_rcss, "cols")
+    any |= $I0
+
     rcss = getattribute self, "sqrs"
     i_rcss = getattribute self, "i_sqrs"
     $I0 = self."scan_1"(rcss, i_rcss, "sqrs")
     if $I0 == -1 goto err
     any |= $I0
     $I0 = self."step"()
-    unless $I0 goto nd
+    unless $I0 goto nd2
     self."display"()
-nd:
+nd2:
     $I0 = self."scan_blocked"(rcss, i_rcss, "sqrs")
     any |= $I0
     (y, x, m) = self."best_pos"()
@@ -1054,6 +1078,159 @@ nxt_n:
     .return (any)
 err:
     .return (-1)
+.end
+
+# check double invs of rows,cols for forced rows/cols
+# returns
+# 0  ... no change
+# 1  ... changes
+# this implements half of TODO item 1 (digit '7' ...)
+# scan_dbl finds both occurencies of the blocked '7' but needs more testing still
+
+.sub scan_dbl :method
+    .param pmc rcss
+    .param pmc i_rcss
+    .param string what
+
+    .local pmc inv, bits
+    .local int n, y, x, sx, sy, el, retval
+    retval = 0
+    n = 1
+    # for all digits
+lpn:
+    sx = 0
+    # when scanning cols, sx is horizontal
+    # need 3 cols at a time
+lpsx:
+    bits = new .FixedIntegerArray
+    bits = 3
+    x = 0
+lpx:
+    $I0 = sx * 3
+    $I0 += x
+    inv = i_rcss[$I0]
+    sy = 0
+lpsy:
+    y = 0
+lpy:
+    $I1 = sy * 3
+    $I1 += y
+    el = inv[$I1]
+    # if n is allowed, set a bit in bits
+    $I2 = 1 << n
+    $I2 &= el
+    if $I2 goto blocked
+    $I6 = bits[sy]
+    $I5 = 1 << x
+    $I6 |= $I5
+    bits[sy] = $I6
+blocked: 
+    inc y
+    if y < 3 goto lpy
+    inc sy
+    if sy < 3 goto lpsy
+    inc x
+    if x < 3 goto lpx
+    $I3 = 0
+lp_c:
+    $I4 = bits[$I3]
+    if $I4 == 0 goto no_check
+    inc $I3
+    if $I3 < 3 goto lp_c
+    #$S1 = sprintf "bits %x %x %x\n", bits
+    #print $S1
+    $I10 = self."check_dbl"(i_rcss, bits, sx, n)
+    retval |= $I10
+no_check:
+    inc sx
+    if sx < 3 goto lpsx
+nxt_n:
+    inc n
+    if n <= 9 goto lpn
+    .return (retval)
+.end
+
+# check if this is validly dbl blocking
+.sub check_dbl :method
+    .param pmc i_rcss
+    .param pmc bits
+    .param int sx
+    .param int n
+    # we must have 2 masks with the same 2 bits set and another one
+    # where the clear one is also set e.g. 3 7 3
+    .local int m0, m1, m2, b
+    #trace 1
+    m0 = bits[0]
+    m1 = bits[1]
+    m2 = bits[2]
+    if m0 != m1 goto m02
+    # m0 == m1 
+    b = bits1(m0)
+    if b != 2 goto m02
+    $I0 = bits1(m2)
+    if $I0 != 3 goto m02
+    .return self.inv_dbl(i_rcss, n, m0, sx, 2)
+m02:
+    if m0 != m2 goto m12
+    # m0 == m2 
+    b = bits1(m0)
+    if b != 2 goto m12
+    $I0 = bits1(m1)
+    if $I0 != 3 goto m12
+    .return self.inv_dbl(i_rcss, n, m0, sx, 1)
+m12:
+    if m1 != m2 goto ret
+    # m1 == m2 
+    b = bits1(m1)
+    if b != 2 goto ret
+    $I0 = bits1(m0)
+    if $I0 != 3 goto ret
+    .return self.inv_dbl(i_rcss, n, m1, sx, 0)
+ret:
+    .return (0)
+.end
+
+# invalidate results found from check_dbl
+.sub inv_dbl :method
+    .param pmc i_rcss
+    .param int n
+    .param int msk
+    .param int sx
+    .param int sy
+    .local int x, y, b
+    .local pmc inv, el
+    x = sx * 3
+    b = 0
+lpb:
+    $I0 = 1 << b
+    $I0 &= msk
+    unless $I0 goto not_set
+    $I2 = x + b
+    inv = i_rcss[$I2]
+    y = 0
+lpy:
+    $I1 = sy * 3
+    $I1 += y
+    el = inv[$I1]
+    $I3 = 1 << n
+    el |= $I3
+    inc y
+    if y < 3 goto lpy
+not_set:
+    inc b
+    if b < 3 goto lpb
+    $I0 = self."debug"()
+    unless $I0 goto nd
+	print_item "inv_dbl n="
+	print_item n
+	print_item "msk="
+	print_item msk
+	print_item sx
+	print_item sy
+	print_newline
+	self."display"()
+nd:
+    .return (1)
 .end
 
 # check for blocked rows or colums
@@ -1512,7 +1689,7 @@ out:
 
 =head1 TODO
 
-=head2 Double blocked quares
+=head2 Double blocked rows/columns
 
 Consider this one:
 
@@ -1558,6 +1735,9 @@ Voila we have 3 numbers (3,5,7) which are somewhere on the right
 side of row 5 and we get a unique number in row 5, col 1 - the '4'.
 
 And then it's easy.
+
+Actually one part (the '7') is implemented in C<scan_dbl>, which
+boils down this case to the other one below (probably).
 
 =head2 Blocking due to multiple others
 
