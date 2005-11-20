@@ -102,7 +102,7 @@ pt_clone_code(Parrot_Interp d, Parrot_Interp s)
 =item C<void
 pt_thread_prepare_for_run(Parrot_Interp d, Parrot_Interp s)>
 
-Setup code, create a C<RetContinuation> PMC.
+Setup code, and TODO ...
 
 =cut
 
@@ -111,16 +111,7 @@ Setup code, create a C<RetContinuation> PMC.
 void
 pt_thread_prepare_for_run(Parrot_Interp d, Parrot_Interp s)
 {
-    PMC *ret_c;
     pt_clone_code(d, s);
-    /*
-     * provide a return continuation, so that CPS returns
-     * are working - create it in the new interpreters mem space
-     */
-    ret_c = pmc_new(d, enum_class_RetContinuation);
-    PMC_cont(ret_c)->from_ctx = CONTEXT(d->ctx);
-    INTERP_REG_PMC(d, 1) =      /* XXX remove when done pdd03 */
-        CONTEXT(d->ctx)->current_cont = ret_c;
 }
 
 /*

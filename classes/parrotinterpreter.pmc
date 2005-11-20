@@ -31,155 +31,6 @@ These are the vtable functions for the ParrotInterpreter base class
 
 /*
 
-=item C<static void
-clone_regs_interp(Parrot_Interp d, Parrot_Interp s, PMC *dest)>
-
-Copy/clone all interpreter registers. All resources are created in the
-destination interpreter.
-
-=cut
-
-*/
-
-static void
-clone_regs_interp(Parrot_Interp d, Parrot_Interp s, PMC *dest)
-{
-#if 0
-    int i;
-    mem_sys_memcopy(&INTERP_REG_INT(d, 0),
-        &INTERP_REG_INT(s, 0), sizeof(struct IReg));
-    mem_sys_memcopy(&INTERP_REG_NUM(d, 0),
-        &INTERP_REG_NUM(s, 0), sizeof(struct NReg));
-    for (i = 0; i < NUM_REGISTERS; i++) {
-        if (INTERP_REG_STR(s, i))
-            INTERP_REG_STR(d, i) =
-            string_copy(d, INTERP_REG_STR(s, i));
-        /*
-         * clone PMCS and strings
-         */
-        if (!PMC_IS_NULL(INTERP_REG_PMC(s, i))) {
-            PMC *sp = INTERP_REG_PMC(s, i);
-            /* special case, dont clone SELF again - ugly */
-            if ((sp->vtable->base_type == enum_class_ParrotInterpreter ||
-                sp->vtable->base_type == enum_class_ParrotThread))
-                INTERP_REG_PMC(d, i) = dest;
-            else {
-                /*
-                 * XXX clone isn't quite right here, it can't
-                 * work on self-referential structures
-                 */
-                PMC* dp = VTABLE_clone(d, sp);
-                INTERP_REG_PMC(d, i) = dp;
-            }
-        }
-    }
-#endif
-}
-
-/*
-
-=item C<static int
-need_reg(Parrot_Interp s, int i, int i3)>
-
-Called from C<clone_regs_thread()>. Currently commented out.
-
-=cut
-
-*/
-
-static int
-need_reg(Parrot_Interp s, int i, int i3)
-{
-    if (i >= 0 && i <= 2)       /* Sub, RetCont, object */
-        return 1;
-    if (i == 3 && i3 >= 11 && !PMC_IS_NULL(INTERP_REG_PMC(s, i)))
-        return 1;               /* overflow if present */
-    if (i >= 5 && i < 5 + i3)   /* i3 params */
-        return 1;
-    return 0;
-}
-
-/*
-
-=item C<static void
-clone_regs_thread(Parrot_Interp d, Parrot_Interp s, PMC *dest)>
-
-Copy/clone thread start parameters. All resources are created in the
-destination interpreter.
-
-=cut
-
-*/
-
-static void
-clone_regs_thread(Parrot_Interp d, Parrot_Interp s, PMC *dest)
-{
-    int i;
-    /*
-     * I3 has the number of PMCs
-     */
-    int i3 = INTERP_REG_INT(s, 3);
-
-    for (i = 0; i < NUM_REGISTERS/2; i++) {
-        /*
-         * clone PMCS
-         * we have to know the thread function signature to
-         * clone only param registers
-         */
-#if 0
-        /* wait for imcc fixes - PMC count is still in I2
-         */
-        if (!need_reg(s, i, i3))
-            continue;
-#endif
-        if (!PMC_IS_NULL(INTERP_REG_PMC(s, i))) {
-            PMC *sp = INTERP_REG_PMC(s, i);
-            /* special case, dont clone SELF again - ugly */
-            if ((sp->vtable->base_type == enum_class_ParrotInterpreter ||
-                     sp->vtable->base_type == enum_class_ParrotThread))
-            INTERP_REG_PMC(d, i) = dest;
-            else if (PObj_is_PMC_shared_TEST(sp)) {
-                /*
-                 * if PMC is a shared PMC, don't clone it, just
-                 * pass it over
-                 */
-                INTERP_REG_PMC(d, i) = sp;
-            }
-            else {
-                /*
-                 * XXX clone isn't quite right here, it can't
-                 * work on self-referential structures
-                 */
-                PMC* dp = VTABLE_clone(d, sp);
-                INTERP_REG_PMC(d, i) = dp;
-            }
-        }
-    }
-}
-
-/*
-
-=item C<static void
-clone_regs(Parrot_Interp d, Parrot_Interp s, PMC *dest)>
-
-Clones the registers.
-
-=cut
-
-*/
-
-static void
-clone_regs(Parrot_Interp d, Parrot_Interp s, PMC *dest)
-{
-    if (dest->vtable->base_type == enum_class_ParrotThread)
-        clone_regs_thread(d, s, dest);
-    else
-        clone_regs_interp(d, s, dest);
-    CONTEXT(d->ctx)->current_object = dest;
-}
-
-/*
-
 =item C<void
 clone_interpreter(PMC* dest, PMC* self)>
 
@@ -198,10 +49,6 @@ clone_interpreter(PMC* dest, PMC* self)
 
     d = PMC_data(dest);
 
-    /*
-     * copy register files
-     */
-    clone_regs(d, s, dest);
     /*
      * copy over packfile - done currently in the runinterp opcode
      * for multi-threading we have to generate separate
@@ -407,6 +254,13 @@ Runs the interpreter's byte code.
          * setup code
          */
         pt_thread_prepare_for_run(new_interp, interpreter);
+        /*
+         * TODO pass arguments fro parent (interpreter)
+         *      to child (new_interp)
+         *      by possibly clone of share the arguments
+         *      r/o args can be passed as is
+         */
+
         /* calculate offset and run */
         runops(new_interp, (opcode_t *)PMC_struct_val(SELF) -
             (opcode_t *)interpreter->code->base.data);
@@ -624,14 +478,14 @@ Finish thawing.
          *
          * The machine thawing this info still needs to load
          * these extensions, but the order of loading could be
-         * relaxed.   
-         * 
+         * relaxed.
+         *
          * creating all these info as standard PMCs would vastly
-         * simplify this process   
+         * simplify this process
          *
          * thaw would then need a merge operation:
          *  - compare existing for sanity
-         *  - extend new     
+         *  - extend new
          */
 
         /*  HLL_info */
