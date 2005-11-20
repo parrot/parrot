@@ -74,11 +74,10 @@ my $html = grep { $_ eq '--html' } @ARGV;
 # forth                No t/harness
 # jako                 No t/harness
 # lisp                 No t/harness
-# miniperl             No t/harness
+# miniperl             not maintained
 # parakeet             No t/harness
-# perl6                t/harness has no --files
-# python               needs testing
-# ruby                 No t/harness
+# python               not maintained
+# ruby                 not maintained
 
 
 my @unified_testable_languages = 
@@ -93,8 +92,9 @@ my @unified_testable_languages =
        regex
        scheme
        tcl
+       unlambda
        urm );
-# @unified_testable_languages = qw( regex );
+# @unified_testable_languages = qw( unlambda );
 
 my @harnesses =
     grep {-f $_}
