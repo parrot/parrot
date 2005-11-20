@@ -14,7 +14,7 @@ Asks the user to select which PMC files to include.
 package Configure::Step;
 
 use strict;
-use vars qw($description @args %PMC_PARENTS);
+use vars qw($description $result @args %PMC_PARENTS);
 
 use base qw(Parrot::Configure::Step::Base);
 

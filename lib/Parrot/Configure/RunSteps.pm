@@ -101,41 +101,48 @@ sub runsteps {
     my $n = 0;
 
     for (@steps) {
+        # FIXME the steps still all live in the same namespace so the value of
+        # result has to be reset
         undef $Configure::Step::result;
+        my $result;
 
         die "No config/$_" unless -e "config/$_";
         require "config/$_";
-        print "\n", $step->description;
+
+        my $description = $step->description;
+
+        print "\n", $description;
         print '...';
-	++$n;
-	if ($args{'verbose-step'}) {
-	    if ($args{'verbose-step'} =~ /^\d+$/ &&
-		    $n == $args{'verbose-step'}) {
-		$args{verbose} = 2;
-	    }
-	    elsif ($step->description =~ /$args{'verbose-step'}/) {
-		$args{verbose} = 2;
-	    }
-	}
-	# cc_build uses this verbose setting
-    Parrot::Configure::Data->set('verbose' => $args{verbose}) if $n > 2;
+        ++$n;
+
+        if ($args{'verbose-step'}) {
+            if ($args{'verbose-step'} =~ /^\d+$/ &&
+                $n == $args{'verbose-step'}) {
+                $args{verbose} = 2;
+            }
+            elsif ($description =~ /$args{'verbose-step'}/) {
+                $args{verbose} = 2;
+            }
+        }
+
+        # cc_build uses this verbose setting
+        Parrot::Configure::Data->set('verbose' => $args{verbose}) if $n > 2;
 
         print "\n" if $args{verbose} && $args{verbose} == 2;
 
-        $Configure::Step::result ||= 'done';
-
-
         {
             local $_;
-            Configure::Step::runstep(@args{@Configure::Step::args});
+            $step->runstep(@args{@Configure::Step::args});
         }
 
-        print "..." if $args{verbose} && $args{verbose} == 2;
-        print "." x (71 - length($step->description)
-                        - length($Configure::Step::result));
-        print "$Configure::Step::result." unless m{^inter/} && $args{ask};
+        $result = $step->result || 'done';
 
-	$args{verbose} = $verbose;
+        print "..." if $args{verbose} && $args{verbose} == 2;
+        print "." x (71 - length($description)
+                        - length($result));
+        print "$result." unless m{^inter/} && $args{ask};
+
+        $args{verbose} = $verbose;
     }
 }
 

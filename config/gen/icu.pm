@@ -14,7 +14,7 @@ Configures ICU and add appropriate targets to the Makefile.
 package Configure::Step;
 
 use strict;
-use vars qw($description @args);
+use vars qw($description $result @args);
 
 use base qw(Parrot::Configure::Step::Base);
 
@@ -34,7 +34,7 @@ sub runstep {
                    && !defined($icushared)
                    && !defined($icuheaders);
 
-  $Configure::Step::result = undef;
+  $result = undef;
   unless ($without) {
     if (!$autodetect) {
       print "specified a icu config parameter,\nICU autodetection disabled.\n" if $verbose;
@@ -83,7 +83,7 @@ sub runstep {
       }
       
       if ($without) {
-        $Configure::Step::result = "failed";
+        $result = "failed";
       }
     }
   }
@@ -101,7 +101,7 @@ sub runstep {
       icu_shared  => '',  # used for generating dynclasses/Makefile
       icu_datadir => '',  # used for generation Makefile
     );
-    $Configure::Step::result = "no" unless defined $Configure::Step::result;
+    $result = "no" unless defined $Configure::Step::result;
     return;
   }
 
@@ -173,7 +173,7 @@ HELP
   }
   cc_clean();
 
-  $Configure::Step::result = "yes";
+  $result = "yes";
 
 }
 

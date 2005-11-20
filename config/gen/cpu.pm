@@ -14,7 +14,7 @@ Runs C<&run_cpu()> in F<config/gen/cpu/${cpuarch}/auto.pl> if it exists.
 package Configure::Step;
 
 use strict;
-use vars qw($description @args);
+use vars qw($description $result @args);
 
 use base qw(Parrot::Configure::Step::Base);
 

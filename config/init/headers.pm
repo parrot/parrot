@@ -14,7 +14,7 @@ Uses C<ExtUtils::Manifest> to determine which headers are nongenerated.
 package Configure::Step;
 
 use strict;
-use vars qw($description @args);
+use vars qw($description $result @args);
 
 use base qw(Parrot::Configure::Step::Base);
 

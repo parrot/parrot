@@ -14,7 +14,7 @@ Determines whether the platform supports GMP.
 package Configure::Step;
 
 use strict;
-use vars qw($description @args);
+use vars qw($description $result @args);
 
 use base qw(Parrot::Configure::Step::Base);
 
@@ -67,7 +67,7 @@ sub runstep {
 	if ($test eq "6864797660130609714981900799081393217269435300143305409394463459185543183397656052122559640661454554977296311391480858037121987999716643812574028291115057151 0\n") {
             $has_gmp = 1;
 	    print " (yes) " if $verbose;
-            $Configure::Step::result = 'yes';
+            $result = 'yes';
 
 	    Parrot::Configure::Data->set(
 		gmp     => 'define',
@@ -81,7 +81,7 @@ sub runstep {
         Parrot::Configure::Data->set('ccflags', $ccflags);
         Parrot::Configure::Data->set('linkflags', $linkflags);
         print " (no) " if $verbose;
-        $Configure::Step::result = 'no';
+        $result = 'no';
     }
 }
 

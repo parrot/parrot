@@ -14,7 +14,7 @@ Determines if the C library has a working C<S_ISREG>.
 package Configure::Step;
 
 use strict;
-use vars qw($description @args);
+use vars qw($description $result @args);
 
 use base qw(Parrot::Configure::Step::Base);
 
@@ -39,7 +39,7 @@ sub runstep {
 	isreg  => $test
     );
     print($test ? " (Yep) " : " (no) ") if $_[0];
-    $Configure::Step::result = $test ? 'yes' : 'no';
+    $result = $test ? 'yes' : 'no';
 }
 
 1;

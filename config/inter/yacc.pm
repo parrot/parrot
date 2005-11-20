@@ -15,7 +15,7 @@ package Configure::Step;
 
 use strict;
 
-use vars qw( $description @args $prompt $util );
+use vars qw( $description $result @args $prompt $util );
 
 use base qw(Parrot::Configure::Step::Base);
 
@@ -36,7 +36,7 @@ sub runstep {
 
     unless ($args{maintainer}) {
         Parrot::Configure::Data->set( $util => 'echo' );
-        $Configure::Step::result = 'skipped';
+        $result = 'skipped';
         return undef;
     }
 
@@ -50,7 +50,7 @@ sub runstep {
     # the user is responsible for the consequences.
     if (defined $prog) {
         Parrot::Configure::Data->set($util => $prog);
-        $Configure::Step::result = 'yes';
+        $result = 'yes';
         return undef;
     }
 
@@ -58,7 +58,7 @@ sub runstep {
 
     unless ($prog) {
         # fall back to default
-        $Configure::Step::result = 'no';
+        $result = 'no';
         return undef;
     }
 
@@ -72,7 +72,7 @@ sub runstep {
     # broken
     if ($ret == -1 and ! $args{ask}) {
         # fall back to default
-        $Configure::Step::result = 'no';
+        $result = 'no';
         return undef;
     }
 
@@ -83,7 +83,7 @@ sub runstep {
     }
 
     Parrot::Configure::Data->set($util => $prog);
-    $Configure::Step::result = 'yes';
+    $result = 'yes';
 }
 
 1;

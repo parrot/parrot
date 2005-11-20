@@ -14,7 +14,7 @@ Determine the minimum pointer alignment.
 package Configure::Step;
 
 use strict;
-use vars qw($description $result @args);
+use vars qw($description $result $result @args);
 
 use base qw(Parrot::Configure::Step::Base);
 

@@ -14,7 +14,7 @@ Determines whether the compiler supports computed C<goto>.
 package Configure::Step;
 
 use strict;
-use vars qw($description @args);
+use vars qw($description $result @args);
 
 use base qw(Parrot::Configure::Step::Base);
 
@@ -58,7 +58,7 @@ EOF
             cg_flag   => '-DHAVE_COMPUTED_GOTO'
         );
         print " (yes) " if $verbose;
-        $Configure::Step::result = 'yes';
+        $result = 'yes';
     }
     else {
         Parrot::Configure::Data->set(
@@ -69,7 +69,7 @@ EOF
             cg_flag   => ''
         );
         print " (no) " if $verbose;
-        $Configure::Step::result = 'no';
+        $result = 'no';
     }
 }
 

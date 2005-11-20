@@ -14,7 +14,7 @@ Uses C<ExtUtils::Manifest> to check that the distribution is complete.
 package Configure::Step;
 
 use strict;
-use vars qw($description @args);
+use vars qw($description $result @args);
 
 use base qw(Parrot::Configure::Step::Base);
 
@@ -30,7 +30,7 @@ sub runstep {
   my ( $nomanicheck ) = @_;
 
   if ( $nomanicheck ) {
-    $Configure::Step::result = 'skipped';
+    $result = 'skipped';
     return; 
   }
 

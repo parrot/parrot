@@ -14,7 +14,7 @@ Determines whether the compiler supports C<inline>.
 package Configure::Step;
 
 use strict;
-use vars qw($description @args);
+use vars qw($description $result @args);
 
 use base qw(Parrot::Configure::Step::Base);
 
@@ -51,11 +51,11 @@ sub runstep {
 	}
 	if ($test) {
 	    print " ($test) " if $verbose;
-            $Configure::Step::result = 'yes';
+            $result = 'yes';
 	}
 	else {
 	    print " no " if $verbose;
-            $Configure::Step::result = 'no';
+            $result = 'no';
 	    $test = '';
 	}
     }

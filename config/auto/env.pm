@@ -14,7 +14,7 @@ Determining if the C library has C<setenv()> and C<unsetenv()>.
 package Configure::Step;
 
 use strict;
-use vars qw($description @args);
+use vars qw($description $result @args);
 
 use base qw(Parrot::Configure::Step::Base);
 
@@ -47,19 +47,19 @@ sub runstep {
 
     if ($setenv && $unsetenv) {
 	print " (both) " if $_[0];
-        $Configure::Step::result = 'both';
+        $result = 'both';
     }
     elsif ($setenv) {
 	print " (setenv) " if $_[0];
-        $Configure::Step::result = 'setenv';
+        $result = 'setenv';
     }
     elsif ($unsetenv) {
 	print " (unsetenv) " if $_[0];
-        $Configure::Step::result = 'unsetenv';
+        $result = 'unsetenv';
     }
     else {
 	print " (no) " if $_[0];
-        $Configure::Step::result = 'no';
+        $result = 'no';
     }
 }
 

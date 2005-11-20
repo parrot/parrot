@@ -14,7 +14,7 @@ Tests which kind of PARROT_VA_TO_VAPTR to use.
 package Configure::Step;
 
 use strict;
-use vars qw($description @args);
+use vars qw($description $result @args);
 
 use base qw(Parrot::Configure::Step::Base);
 
@@ -41,7 +41,7 @@ sub runstep {
 	$va_type = 'x86';
     }
     cc_clean();
-    $Configure::Step::result = $va_type;
+    $result = $va_type;
     Parrot::Configure::Data->set(
 	va_ptr_type => $va_type,
     );

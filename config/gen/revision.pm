@@ -15,7 +15,7 @@ are no .svn directories, so this field is empty.
 package Configure::Step;
 
 use strict;
-use vars qw($description);
+use vars qw($description $result);
 
 use base qw(Parrot::Configure::Step::Base);
 
@@ -34,9 +34,9 @@ sub runstep {
     );
     
     if ($revision >= 1) {
-	$Configure::Step::result = "r$revision";
+	$result = "r$revision";
     } else {
-	$Configure::Step::result = "done";
+	$result = "done";
     }
 }
 

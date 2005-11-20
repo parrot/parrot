@@ -16,7 +16,7 @@ Parrot bc.
 package Configure::Step;
 
 use strict;
-use vars qw($description @args);
+use vars qw($description $result @args);
 
 use base qw(Parrot::Configure::Step::Base);
 
@@ -50,7 +50,7 @@ sub runstep {
     }
 
     Parrot::Configure::Data->set(has_gnu_bc => $has_gnu_bc);
-    $Configure::Step::result = $has_gnu_bc ? 'yes' : 'no';
+    $result = $has_gnu_bc ? 'yes' : 'no';
 }
 
 1;

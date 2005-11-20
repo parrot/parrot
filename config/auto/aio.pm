@@ -14,7 +14,7 @@ Determines whether the platform supports AIO.
 package Configure::Step;
 
 use strict;
-use vars qw($description @args);
+use vars qw($description $result @args);
 
 use base qw(Parrot::Configure::Step::Base);
 
@@ -41,7 +41,7 @@ sub runstep {
 		INFO=42\n
 		ok/x) {
 	    print " (yes) " if $verbose;
-            $Configure::Step::result = 'yes';
+            $result = 'yes';
 
 	    Parrot::Configure::Data->set(
 		aio => 'define',
@@ -55,6 +55,6 @@ sub runstep {
     else {
 	Parrot::Configure::Data->set('libs', $libs);
 	print " (no) " if $verbose;
-        $Configure::Step::result = 'no';
+        $result = 'no';
     }
 }

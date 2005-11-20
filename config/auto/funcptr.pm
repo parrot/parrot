@@ -14,7 +14,7 @@ Verifies that the compiler supports function pointer casts.
 package Configure::Step;
 
 use strict;
-use vars qw($description @args);
+use vars qw($description $result @args);
 
 use base qw(Parrot::Configure::Step::Base);
 
@@ -49,7 +49,7 @@ END
     }
     cc_clean();
     print " (yes) " if $_[0];
-    $Configure::Step::result = 'yes';
+    $result = 'yes';
   }
 }
 

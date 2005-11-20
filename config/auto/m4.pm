@@ -16,7 +16,7 @@ Parrot m4.
 package Configure::Step;
 
 use strict;
-use vars qw($description @args);
+use vars qw($description $result @args);
 
 use base qw(Parrot::Configure::Step::Base);
 
@@ -49,7 +49,7 @@ sub runstep {
     }
 
     Parrot::Configure::Data->set(has_gnu_m4 => $has_gnu_m4);
-    $Configure::Step::result = $has_gnu_m4 ? 'yes' : 'no';
+    $result = $has_gnu_m4 ? 'yes' : 'no';
 }
 
 1;

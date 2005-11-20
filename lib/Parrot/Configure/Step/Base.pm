@@ -23,4 +23,12 @@ sub description {
     }
 }
 
+sub result {
+    my $class = shift;
+    {
+        no strict 'refs';
+        ${$class . "::result"}
+    }
+}
+
 1;

@@ -14,7 +14,7 @@ Computes the native byteorder for Parrot's wordsize.
 package Configure::Step;
 
 use strict;
-use vars qw($description @args);
+use vars qw($description $result @args);
 
 use base qw(Parrot::Configure::Step::Base);
 
@@ -37,14 +37,14 @@ sub runstep {
       byteorder => $byteorder,
       bigendian => 0
     );
-    $Configure::Step::result = 'little-endian';
+    $result = 'little-endian';
   }
   elsif($byteorder =~ /^(8765|4321)/) {
     Parrot::Configure::Data->set(
       byteorder => $byteorder,
       bigendian => 1
     );
-    $Configure::Step::result = 'big-endian';
+    $result = 'big-endian';
   }
   else {
     die "Unsupported byte-order [$byteorder]!";

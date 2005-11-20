@@ -14,7 +14,7 @@ Determines whether perldoc exists on the system.
 package Configure::Step;
 
 use strict;
-use vars qw($description @args);
+use vars qw($description $result @args);
 
 use base qw(Parrot::Configure::Step::Base);
 
@@ -33,24 +33,24 @@ sub runstep {
         if ($a =~ m/^Unknown option:/) {
 	    $a = capture_output( 'perldoc perldoc' ) || '';
 	    $version = 1;
-	    $Configure::Step::result = 'yes, old version';
+	    $result = 'yes, old version';
 	} else {
 	    if (open FH, "< c99da7c4.tmp") {
 		local $/;
 		$a = <FH>;
 		close FH;
 	        $version = 2;
-	        $Configure::Step::result = 'yes';
+	        $result = 'yes';
 	    } else {
 		$a = undef;
 	    }
 	}
 	unless (defined $a && $a =~ m/perldoc/) {
 	    $version = 0;
-	    $Configure::Step::result = 'failed';
+	    $result = 'failed';
 	}
     } else {
-	$Configure::Step::result = 'no';
+	$result = 'no';
     }
     unlink "c99da7c4.tmp";
 

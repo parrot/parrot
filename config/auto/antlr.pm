@@ -21,7 +21,7 @@ might help.
 package Configure::Step;
 
 use strict;
-use vars qw($description @args);
+use vars qw($description $result @args);
 
 use base qw(Parrot::Configure::Step::Base);
 
@@ -46,11 +46,11 @@ sub runstep {
         unlink <config/auto/antlr/*.py>;
         capture_output( 'antlr', '-o', 'config/auto/antlr', 'config/auto/antlr/test_python.g' );
         $has_antlr_with_python = 1 if -e 'config/auto/antlr/test_python_l.py';
-        $Configure::Step::result = $has_antlr_with_python ?
+        $result = $has_antlr_with_python ?
                                        'yes, with python' :
                                        'yes, no python';
     } else {
-        $Configure::Step::result = ($output =~ m/NoClassDefFoundError/) ?
+        $result = ($output =~ m/NoClassDefFoundError/) ?
                                      'no, NoClassDefFoundError' :
                                      'no';
     }

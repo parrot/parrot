@@ -15,7 +15,7 @@ This is needed for the dynamic GDBMHash PMC.
 package Configure::Step;
 
 use strict;
-use vars qw($description @args);
+use vars qw($description $result @args);
 
 use base qw(Parrot::Configure::Step::Base);
 
@@ -68,7 +68,7 @@ sub runstep {
 	if ($test eq "gdbm is working.\n") {
             $has_gdbm = 1;
 	    print " (yes) " if $verbose;
-            $Configure::Step::result = 'yes';
+            $result = 'yes';
 	}
     }
     unless ($has_gdbm) {
@@ -77,7 +77,7 @@ sub runstep {
         Parrot::Configure::Data->set( ccflags   => $ccflags );
         Parrot::Configure::Data->set( linkflags => $linkflags );
         print " (no) " if $verbose;
-        $Configure::Step::result = 'no';
+        $result = 'no';
     }
     Parrot::Configure::Data->set( has_gdbm => $has_gdbm ); # for gdbmhash.t and dynclasses.in
 }

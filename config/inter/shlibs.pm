@@ -20,7 +20,7 @@ gccversion test.
 package Configure::Step;
 
 use strict;
-use vars qw($description @args);
+use vars qw($description $result @args);
 
 use base qw(Parrot::Configure::Step::Base);
 
@@ -38,7 +38,7 @@ sub runstep {
 	"\nWhat flags instruct your compiler to compile code suitable for use in a shared library?",
 	$cc_shared) if $ask;
     Parrot::Configure::Data->set(cc_shared =>  $cc_shared);
-    $Configure::Step::result =
+    $result =
         ( $cc_shared =~ m/^ ?$/ ) ? 'done' : $cc_shared;
 }
 1;

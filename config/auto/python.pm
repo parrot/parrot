@@ -19,7 +19,7 @@ Store version of Python.
 package Configure::Step;
 
 use strict;
-use vars qw($description @args);
+use vars qw($description $result @args);
 
 use base qw(Parrot::Configure::Step::Base);
 
@@ -44,9 +44,9 @@ sub runstep {
     if ( $has_python ) {
         $has_python_2_4 =
             ( $major eq '2' && $minor eq '4' ) ? 1 : 0;
-        $Configure::Step::result = "yes, $major.$minor.$revision";
+        $result = "yes, $major.$minor.$revision";
     } else {
-        $Configure::Step::result = 'no';
+        $result = 'no';
     }
     Parrot::Configure::Data->set(has_python_2_4 => $has_python_2_4);
 }

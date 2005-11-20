@@ -14,7 +14,7 @@ Determines if the C library supports C<memalign()>.
 package Configure::Step;
 
 use strict;
-use vars qw($description @args);
+use vars qw($description $result @args);
 
 use base qw(Parrot::Configure::Step::Base);
 
@@ -75,7 +75,7 @@ sub runstep {
             $test  ? 'memalign'       : '';
     Parrot::Configure::Data->set( memalign => $f );
     print($test ? " (Yep:$f) " : " (no) ") if $verbose;
-    $Configure::Step::result = $test ? 'yes' : 'no';
+    $result = $test ? 'yes' : 'no';
 }
 
 1;
