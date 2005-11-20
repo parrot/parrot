@@ -170,6 +170,32 @@ C<languages/bf>
 
 =back
 
+=head2 Cardinal
+
+=over 4
+
+=item Author
+
+Mark Spashett
+
+=item Description
+
+Implementation of Ruby.
+
+=item Status
+
+Not active.
+
+=item Last verified with parrot version
+
+Unknown
+
+=item Location
+
+http://rubyforge.org/projects/cardinal/
+
+=back
+
 
 =head2 Cola
 
@@ -396,7 +422,7 @@ C<languages/m4>
 
 =item Author
 
-Unknown
+Jeff Goff
 
 =item Description
 
@@ -404,7 +430,7 @@ miniperl
 
 =item Status
 
-Unknown
+Broken, last update in 2002. Should propably be removed.
 
 =item Last verified with parrot version
 
@@ -673,7 +699,7 @@ C<languages/regex>
 
 =item Author
 
-Unknown
+Jeff Goff
 
 =item Description
 
@@ -681,7 +707,7 @@ Ruby
 
 =item Status
 
-Unknown
+Broken. Last updated in 2002. Should propably be removed.
 
 =item Last verified with parrot version
 
@@ -689,7 +715,7 @@ Unknown
 
 =item Location
 
-http://rubyforge.org/projects/cardinal/
+languages/ruby
 
 =back
 

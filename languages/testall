@@ -69,15 +69,15 @@ my $html = grep { $_ eq '--html' } @ARGV;
 # These could all be tested:
 #
 # BASIC                No t/harness, two implementations
-# cola                 No t/harness, no standard test suite
+# cola                 not maintained
 # conversion           No t/harness
 # forth                No t/harness
 # jako                 No t/harness
 # lisp                 No t/harness
-# miniperl             not maintained
+# miniperl             not maintained, should be removed
 # parakeet             No t/harness
 # python               not maintained
-# ruby                 not maintained
+# ruby                 not maintained, should be removed
 
 
 my @unified_testable_languages = 
