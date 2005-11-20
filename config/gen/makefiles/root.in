@@ -1271,7 +1271,8 @@ RUNCORE_TEST_FILES = \
 	t/library/*.t \
 	t/dynclass/foo.t t/dynclass/g*.t \
 	t/examples/*.t \
-	t/p6rules/*.t
+	t/compilers/pge/*.t \
+	t/compilers/pge/p6rules/*.t
 TOOLS_TEST_FILES = \
 	t/tools/*.t
 
@@ -1466,10 +1467,14 @@ test-clean :
 		t/pmc/*.out \
 		t/pmc/*.o \
 		t/pmc/*.stabs.s \
-		t/p6rules/*.pir \
-		t/p6rules/*.pbc \
-		t/p6rules/*.pasm \
-		t/p6rules/*.out \
+		t/compilers/pge/*.pir \
+		t/compilers/pge/*.pbc \
+		t/compilers/pge/*.pasm \
+		t/compilers/pge/*.out \
+        t/compilers/pge/p6rules/*.pir \
+		t/compilers/pge/p6rules/*.pbc \
+		t/compilers/pge/p6rules/*.pasm \
+		t/compilers/pge/p6rules/*.out \
 		t/stress/*.pasm \
 		t/stress/*.pbc \
 		t/stress/*.out \
