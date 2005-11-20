@@ -27,6 +27,7 @@ $prompt         = "Do you have a lexical analyzer generator like flex or lex?";
 @args           = qw( lex ask maintainer );
 
 sub runstep {
+    my $self = shift;
     my %args;
     @args{@args}=@_;
 

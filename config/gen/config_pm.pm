@@ -28,6 +28,7 @@ $description="Recording configuration data for later retrieval";
 @args=();
 
 sub runstep {
+    my $self = shift;
   Parrot::Configure::Data->clean;
 
   genfile('config/gen/config_pm/myconfig.in',      'myconfig');

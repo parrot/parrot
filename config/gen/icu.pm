@@ -26,6 +26,7 @@ $description = "Determining whether ICU is installed";
 @args = qw(verbose icudatadir icushared icuheaders icu-config without-icu);
 
 sub runstep {
+    my $self = shift;
   my ($verbose, $icudatadir, $icushared, $icuheaders, $icuconfig, $without) = @_;
 
   my @icu_headers = qw(ucnv.h utypes.h uchar.h);

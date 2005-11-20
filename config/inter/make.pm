@@ -27,6 +27,7 @@ $prompt         = "Do you have a make utility like 'gmake' or 'make'?";
 @args           = qw( make ask );
 
 sub runstep {
+    my $self = shift;
     my %args;
     @args{@args}=@_;
 

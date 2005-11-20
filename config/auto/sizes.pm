@@ -25,6 +25,7 @@ $description = "Determining some sizes...";
 @args=qw(miniparrot);
 
 sub runstep {
+    my $self = shift;
 
     if (defined $_[0]) {
         Parrot::Configure::Data->set(

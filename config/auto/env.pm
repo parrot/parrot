@@ -24,6 +24,7 @@ $description="Determining if your C library has setenv / unsetenv...";
 @args=qw(verbose);
 
 sub runstep {
+    my $self = shift;
     my ($setenv, $unsetenv) = (0, 0);
 
     cc_gen('config/auto/env/test_setenv.in');

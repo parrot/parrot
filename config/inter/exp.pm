@@ -25,6 +25,7 @@ $description="Setting up experimental systems...";
 @args=qw(ask expnetwork);
 
 sub runstep {
+    my $self = shift;
   my $net=$_[1] || 'n';
 
   if($_[0]) {

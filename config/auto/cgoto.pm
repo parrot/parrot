@@ -24,6 +24,7 @@ $description = "Determining whether your compiler supports computed goto...";
 @args = qw(cgoto miniparrot verbose);
 
 sub runstep {
+    my $self = shift;
     my ($cgoto, $miniparrot, $verbose) = @_;
 
     return if $miniparrot;

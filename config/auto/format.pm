@@ -25,6 +25,7 @@ $description = "Figuring out what formats should be used for sprintf...";
 @args=();
 
 sub runstep {
+    my $self = shift;
   my($ivformat, $nvformat, $nvsize);
   my($iv, $nv, $floatsize, $doublesize, $ldsize)=Parrot::Configure::Data->get(
     qw(iv nv floatsize doublesize hugefloatvalsize)

@@ -27,6 +27,7 @@ $description="Enabling optimization...";
 @args=qw(verbose optimize);
 
 sub runstep {
+    my $self = shift;
   my ($verbose, $optimize) = @_;
   if (Parrot::Configure::Data->get('optimize')) {
     my($ccflags, $optimize) =

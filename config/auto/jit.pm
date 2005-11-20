@@ -26,6 +26,7 @@ $description = "Determining architecture, OS and JIT capability...";
 @args = qw(jitcapable miniparrot execcapable verbose);
 
 sub runstep {
+    my $self = shift;
     my ($set_jitcapable, $miniparrot, $set_execcapable, $verbose) = @_;
 
     return if $miniparrot;

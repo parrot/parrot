@@ -29,6 +29,7 @@ $description="Setting up Configure's default values...";
 @args=('debugging', 'optimize', 'profile', 'verbose', 'prefix');
 
 sub runstep {
+    my $self = shift;
     my ($debugging, $optimize, $profile,  $verbose, $prefix) = @_;
 
     # We need a Glossary somewhere!

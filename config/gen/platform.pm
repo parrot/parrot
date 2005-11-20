@@ -25,6 +25,7 @@ $description="Moving platform files into place...";
 @args=qw(miniparrot verbose);
 
 sub runstep {
+    my $self = shift;
   my ($miniparrot, $verbose) = @_;
   my $platform=lc $^O;
 

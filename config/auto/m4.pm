@@ -27,6 +27,7 @@ $description = "Determining whether GNU m4 is installed...";
 @args = qw(verbose);
 
 sub runstep {
+    my $self = shift;
     my $archname =  $Config{archname};
     my ($cpuarch, $osname)       =  split('-', $archname);
     if (!defined $osname) {

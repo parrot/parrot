@@ -26,6 +26,7 @@ $description = 'Determining what types Parrot should use...';
 @args=qw(ask intval opcode floatval);
 
 sub runstep {
+    my $self = shift;
   my %args;
   @args{@args}=@_;
   

@@ -25,6 +25,7 @@ $description="Determining if your C library supports memalign...";
 @args=qw(miniparrot verbose);
 
 sub runstep {
+    my $self = shift;
     my ($miniparrot, $verbose) = @_;
 
     if ($miniparrot) {

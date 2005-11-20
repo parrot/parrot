@@ -26,6 +26,7 @@ $description="Loading platform and local hints files...";
 @args = qw( cc verbose define );
 
 sub runstep {
+    my $self = shift;
   my $hints = "config/init/hints/" . lc($^O) . ".pm";
   my $hints_used = 0;
   print "[ " if $_[1];

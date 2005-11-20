@@ -89,6 +89,7 @@ sub sort_pmcs {
 }
 
 sub runstep {
+    my $self = shift;
   my @pmc=(
     sort
     map  { m{\./classes/(.*)} }

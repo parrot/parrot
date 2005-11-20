@@ -25,6 +25,7 @@ $description="Test the type of va_ptr (this test is likely to segfault)...";
 @args=qw(verbose);
 
 sub runstep {
+    my $self = shift;
     my $va_type;
     cc_gen('config/auto/va_ptr/test_c.in');
     eval { cc_build('-DVA_TYPE_X86'); };

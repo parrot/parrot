@@ -26,6 +26,7 @@ $description = "Determining your minimum pointer alignment...";
 @args = qw(miniparrot verbose);
 
 sub runstep {
+    my $self = shift;
     my ($miniparrot) = @_;
 
     return if $miniparrot;

@@ -30,6 +30,7 @@ $description = "Determining whether python is installed...";
 @args = qw(verbose);
 
 sub runstep {
+    my $self = shift;
     my ( $out, $err ) = capture_output( 'python', '-V' );
     my $output = join( '', $out || '', $err || '' );
     my ($python, $major, $minor, $revision) = 

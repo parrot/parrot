@@ -25,6 +25,7 @@ $description="Determining if your platform supports AIO...";
 @args=qw(verbose);
 
 sub runstep {
+    my $self = shift;
     my $test;
     my ($verbose) = @_;
     my $libs = Parrot::Configure::Data->get('libs');

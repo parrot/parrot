@@ -25,6 +25,7 @@ $description="Generating core pmc list...";
 @args=();
 
 sub runstep {
+    my $self = shift;
     generate_h();
     generate_c();
     generate_pm();

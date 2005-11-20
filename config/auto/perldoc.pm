@@ -25,6 +25,7 @@ $description = "Determining whether perldoc is installed...";
 @args = qw(verbose);
 
 sub runstep {
+    my $self = shift;
     my $version = 0;
     my $a = capture_output( 'perldoc -ud c99da7c4.tmp perldoc' ) || undef;
     

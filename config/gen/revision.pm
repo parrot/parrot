@@ -24,6 +24,7 @@ use Parrot::Revision;
 $description = "Determining Parrot's revision";
 
 sub runstep {
+    my $self = shift;
     my $revision = $Parrot::Revision::current;
     my $entries  = $Parrot::Revision::svn_entries;
 

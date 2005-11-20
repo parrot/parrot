@@ -30,6 +30,7 @@ $description="Tweaking settings for miniparrot...";
 @args=qw(miniparrot);
 
 sub runstep {
+    my $self = shift;
     return unless $_[0];
 
     Parrot::Configure::Data->set(

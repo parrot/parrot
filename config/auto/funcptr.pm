@@ -25,6 +25,7 @@ $description="Verifying that the compiler supports function pointer casts...";
 @args=qw(verbose);
 
 sub runstep {
+    my $self = shift;
   my $jitcapable=Parrot::Configure::Data->get('jitcapable');
 
   if ($jitcapable) {

@@ -49,6 +49,7 @@ $description="Determining what allocator to use...";
 @args=qw(gc verbose);
 
 sub runstep {
+    my $self = shift;
   my ($gc, $verbose) = @_;
 
   if (!defined($gc)) {

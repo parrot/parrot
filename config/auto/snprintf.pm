@@ -24,6 +24,7 @@ $description = "Testing snprintf ...";
 @args = qw(verbose);
 
 sub runstep {
+    my $self = shift;
   my ($verbose) = @_;
   cc_gen('config/auto/snprintf/test.in');
   cc_build();

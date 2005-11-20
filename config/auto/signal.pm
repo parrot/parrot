@@ -25,6 +25,7 @@ $description = "Determining some signal stuff...";
 @args=qw(miniparrot verbose);
 
 sub runstep {
+    my $self = shift;
     my ($miniparrot, $verbose) = @_;
     Parrot::Configure::Data->set(
 	has___sighandler_t => undef,

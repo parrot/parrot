@@ -26,6 +26,7 @@ $description = "Generating build files...";
 @args = ();
 
 sub runstep {
+    my $self = shift;
   makefiles();
   cflags();
   genfile('config/gen/makefiles/libparrot_def.in', 'libparrot.def');

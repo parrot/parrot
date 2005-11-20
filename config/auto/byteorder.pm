@@ -24,6 +24,7 @@ $description="Computing native byteorder for Parrot's wordsize...";
 @args=();
 
 sub runstep {
+    my $self = shift;
   cc_gen('config/auto/byteorder/test_c.in');
   cc_build();
   my $byteorder=cc_run() or die "Can't run the byteorder testing program: $!";

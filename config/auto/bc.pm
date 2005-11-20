@@ -27,6 +27,7 @@ $description = "Determining whether GNU bc is installed...";
 @args = qw(verbose);
 
 sub runstep {
+    my $self = shift;
     my $has_gnu_bc;
     my $osname =  $Config{osname};
 

@@ -25,6 +25,7 @@ $description = 'Determining what charset files should be compiled in...';
 @args=qw(ask charset);
 
 sub runstep {
+    my $self = shift;
   my @charset=(
     sort
     map  { m{\./charset/(.*)} }

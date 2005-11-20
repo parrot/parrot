@@ -26,6 +26,7 @@ $description="Determining nongenerated header files...";
 @args=();
 
 sub runstep {
+    my $self = shift;
     my $inc = 'include/parrot';
 
     my @headers=(

@@ -28,6 +28,7 @@ $description = 'Determining what C compiler and linker to use...';
 	lex yacc maintainer);
 
 sub runstep {
+    my $self = shift;
   my %args;
   @args{@args}=@_;
 

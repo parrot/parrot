@@ -27,6 +27,7 @@ $prompt         = "Do you have a parser generator, like bison or yacc?";
 @args =          qw( yacc ask maintainer );
 
 sub runstep {
+    my $self = shift;
     my %args;
     @args{@args}=@_;
 

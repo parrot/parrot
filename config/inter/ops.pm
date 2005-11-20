@@ -25,6 +25,7 @@ $description = 'Determining what opcode files should be compiled in...';
 @args=qw(ask ops);
 
 sub runstep {
+    my $self = shift;
   my @ops=(
     sort {
       if($a =~ /core\.ops/) { return -1 }

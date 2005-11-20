@@ -29,6 +29,7 @@ $description="Generating C headers...";
 @args=('define');
 
 sub runstep {
+    my $self = shift;
   my $define = shift;
 
   genfile('config/gen/config_h/config_h.in', 'include/parrot/config.h',

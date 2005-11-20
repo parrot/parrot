@@ -25,6 +25,7 @@ $description="Determining if your C library has a working S_ISREG...";
 @args=qw(verbose);
 
 sub runstep {
+    my $self = shift;
     my $test = 0;
 
     cc_gen('config/auto/isreg/test_c.in');

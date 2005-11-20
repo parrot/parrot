@@ -25,6 +25,7 @@ $description="Determining if your compiler supports inline...";
 @args=qw(inline verbose);
 
 sub runstep {
+    my $self = shift;
     my $test;
     my ($inline, $verbose) = @_;
 

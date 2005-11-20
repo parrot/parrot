@@ -26,6 +26,7 @@ $description="Probing for C headers...";
 @args=qw(miniparrot verbose);
 
 sub runstep {
+    my $self = shift;
     my ($miniparrot, $verbose) = @_;
 
     return if $miniparrot;

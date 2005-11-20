@@ -26,6 +26,7 @@ $description = "Checking MANIFEST...";
 @args = qw(nomanicheck);
 
 sub runstep {
+    my $self = shift;
   my ( $nomanicheck ) = @_;
 
   if ( $nomanicheck ) {

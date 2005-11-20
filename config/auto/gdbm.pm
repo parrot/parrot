@@ -26,6 +26,7 @@ $description = "Determining if your platform supports gdbm...";
 @args = qw(verbose);
 
 sub runstep {
+    my $self = shift;
     my ($verbose) = @_;
 
     my $cc        = Parrot::Configure::Data->get('cc');

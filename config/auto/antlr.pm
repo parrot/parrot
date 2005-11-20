@@ -32,6 +32,7 @@ $description = "Determining whether antlr is installed...";
 @args = qw(verbose);
 
 sub runstep {
+    my $self = shift;
     my ( $out, $err ) = capture_output( 'antlr', '-h' );
     my $output = join( '', $out || '', $err || '' );
     my ($python, $major, $minor, $revision) = 

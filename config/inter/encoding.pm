@@ -25,6 +25,7 @@ $description = 'Determining what encoding files should be compiled in...';
 @args=qw(ask encoding);
 
 sub runstep {
+    my $self = shift;
   my @encoding=(
     sort
     map  { m{\./encodings/(.*)} }

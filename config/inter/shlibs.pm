@@ -31,6 +31,7 @@ $description = 'Determining flags for building shared libraries...';
 @args = qw(ask verbose cc_shared);
 
 sub runstep {
+    my $self = shift;
   my ($ask, $verbose, $cc_shared) = @_;
     $cc_shared = integrate(Parrot::Configure::Data->get('cc_shared'), $cc_shared);
     $cc_shared=prompt(

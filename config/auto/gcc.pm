@@ -25,6 +25,7 @@ $description="Determining if your C compiler is actually gcc...";
 @args=qw(miniparrot verbose);
 
 sub runstep {
+    my $self = shift;
   my ($miniparrot) = @_;
 
   my %gnuc;

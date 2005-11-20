@@ -45,6 +45,7 @@ my $destdir = 'runtime/parrot/include';
 @args=qw(verbose);
 
 sub runstep {
+    my $self = shift;
     # need vtable.h now
     system($^X, "build_tools/vtable_h.pl");
     my @generated = ();
