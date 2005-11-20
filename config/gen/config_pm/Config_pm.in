@@ -17,8 +17,6 @@ use Exporter;
 
 use vars qw(@ISA @EXPORT %PConfig);
 
-use base qw(Parrot::Configure::Step::Base);
-
 @ISA=qw(Exporter);
 
 @EXPORT=qw(%PConfig);
