@@ -16,6 +16,9 @@ package Configure::Step;
 
 use strict;
 use vars qw($description);
+
+use base qw(Parrot::Configure::Step::Base);
+
 use Parrot::Revision;
 
 $description = "Determining Parrot's revision";

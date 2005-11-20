@@ -20,6 +20,9 @@ package Configure::Step;
 
 use strict;
 use vars qw($description @args);
+
+use base qw(Parrot::Configure::Step::Base);
+
 use Parrot::Configure::Step;
 
 $description="Tweaking settings for miniparrot...";

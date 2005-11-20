@@ -22,6 +22,9 @@ package Configure::Step;
 
 use strict;
 use vars qw($description @args);
+
+use base qw(Parrot::Configure::Step::Base);
+
 use Parrot::Configure::Step ':auto', 'capture_output';
 
 $description = "Determining whether antlr is installed...";

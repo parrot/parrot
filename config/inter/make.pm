@@ -16,6 +16,9 @@ package Configure::Step;
 use strict;
 
 use vars qw( $description @args $prompt $util );
+
+use base qw(Parrot::Configure::Step::Base);
+
 use Parrot::Configure::Step qw( :inter capture_output check_progs );
 
 $util           = 'make';

@@ -15,6 +15,9 @@ package Configure::Step;
 
 use strict;
 use vars qw($description @args %PMC_PARENTS);
+
+use base qw(Parrot::Configure::Step::Base);
+
 use Parrot::Configure::Step ':inter';
 
 $description = 'Determining what pmc files should be compiled in...';

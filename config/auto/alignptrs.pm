@@ -15,6 +15,9 @@ package Configure::Step;
 
 use strict;
 use vars qw($description $result @args);
+
+use base qw(Parrot::Configure::Step::Base);
+
 use Parrot::Configure::Step ':auto';
 use Config;
 

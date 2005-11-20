@@ -16,6 +16,9 @@ package Configure::Step;
 use strict;
 use vars qw($description @args);
 
+use base qw(Parrot::Configure::Step::Base);
+
+
 $description = "Testing snprintf ...";
 
 @args = qw(verbose);

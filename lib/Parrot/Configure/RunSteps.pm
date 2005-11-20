@@ -91,6 +91,8 @@ sub runsteps {
     shift;
     my %args=@_;
 
+    my $step = 'Configure::Step';
+
     local $SIG{__WARN__} = sub {
         warn $_[0] unless $_[0] =~ /^Subroutine runstep redefined at config/
     };
@@ -103,7 +105,7 @@ sub runsteps {
 
         die "No config/$_" unless -e "config/$_";
         require "config/$_";
-        print "\n$Configure::Step::description";
+        print "\n", $step->description;
         print '...';
 	++$n;
 	if ($args{'verbose-step'}) {
@@ -111,7 +113,7 @@ sub runsteps {
 		    $n == $args{'verbose-step'}) {
 		$args{verbose} = 2;
 	    }
-	    elsif ($Configure::Step::description =~ /$args{'verbose-step'}/) {
+	    elsif ($step->description =~ /$args{'verbose-step'}/) {
 		$args{verbose} = 2;
 	    }
 	}
@@ -129,7 +131,7 @@ sub runsteps {
         }
 
         print "..." if $args{verbose} && $args{verbose} == 2;
-        print "." x (71 - length($Configure::Step::description)
+        print "." x (71 - length($step->description)
                         - length($Configure::Step::result));
         print "$Configure::Step::result." unless m{^inter/} && $args{ask};
 
