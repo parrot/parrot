@@ -32,7 +32,7 @@ use Parrot::Config;
 # Set up expected output for examples
 my %expected
   = (
-    'getopt_demo.imc'        =>  << 'END_EXPECTED',
+    'getopt_demo.pir'        =>  << 'END_EXPECTED',
 Hi, I am 'getopt_demo.imc'.
 
 You haven't passed the option '--bool'. This is fine with me.

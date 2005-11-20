@@ -45,6 +45,38 @@ library/Getopt/Long.pir - parse long and short command line options
 This Parrot library can be used for parsing command line options.
 The subroutine get_options() is exported into the namespace 'Getopt::Long'.
 
+=head1 SUBROUTINES
+
+=head2 C<get_options> in C<Getopt::Long>
+
+This should work like the Perl5 module Getopt::Long.
+Takes an array of options and an array of specifications.
+
+A Hash PMC is returned.
+
+=head1 TODO
+
+- Remove need to clone argument vector
+- Make it work for all cases, short options, long options and bundling.
+- Recognise type of return value: string, integer, binary, array, hash.
+- Get started on error reporting.
+- Provide more options
+
+=head1 AUTHOR
+
+Bernhard Schmalhofer - C<Bernhard.Schmalhofer@gmx.de>
+
+=head1 SEE ALSO
+
+The Perl5 module L<Getopt::Long>.
+F<examples/library/getopt_demo.pir>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2003-2005 The Perl Foundation.  All rights reserved.
+This program is free software. It is subject to the same
+license as The Parrot Interpreter.
+
 =cut
 
 .include "library/dumper.imc"
@@ -58,17 +90,6 @@ The subroutine get_options() is exported into the namespace 'Getopt::Long'.
  
 .namespace [ "Getopt::Long" ]
 
-=head1 SUBROUTINES
-
-=head2 C<get_options> in C<Getopt::Long>
-
-This should work like the Perl5 module Getopt::Long.
-Takes an array of options and an array of specifications.
-
-A Hash PMC is returned.
-
-=cut
-
 .sub get_options 
   # TODO: Check whether these are really arrays  
   .param pmc argv                    # An Array containing command line args
@@ -77,6 +98,8 @@ A Hash PMC is returned.
   # setting up PGE
   # TODO: compile patterns in __onload
   .local pmc    p6rule
+   p6rule = compreg "PGE::P6Rule"
+
   find_global p6rule, "PGE", "p6rule"
   .local pmc    isnt_binary_rule, is_long_option, is_short_option, key_val_rule 
   isnt_binary_rule = p6rule( '=' )
@@ -209,28 +232,3 @@ A Hash PMC is returned.
 
   .return ( opt )
 .end
-
-=head1 TODO
-
-- Remove need to clone argument vector
-- Make it work for all cases, short options, long options and bundling.
-- Recognise type of return value: string, integer, binary, array, hash.
-- Get started on error reporting.
-- Provide more options
-
-=head1 AUTHOR
-
-Bernhard Schmalhofer - C<Bernhard.Schmalhofer@biomax.de>
-
-=head1 SEE ALSO
-
-The Perl5 module L<Getopt::Long>.
-F<examples/assembly/getopt_demo.imc>
-
-=head1 COPYRIGHT
-
-Copyright (C) 2003-2005 The Perl Foundation.  All rights reserved.
-This program is free software. It is subject to the same
-license as The Parrot Interpreter.
-
-=cut

@@ -590,7 +590,7 @@ examples/japh/japh6.pasm                          [main]doc
 examples/japh/japh7.pasm                          [main]doc
 examples/japh/japh8.pasm                          [main]doc
 examples/japh/japh9.pasm                          [main]doc
-examples/library/getopt_demo.imc                  [main]doc
+examples/library/getopt_demo.pir                  [main]doc
 examples/library/md5sum.pir                       [main]doc
 examples/library/pcre.pir                         [main]doc
 examples/mops/README                              [main]doc
