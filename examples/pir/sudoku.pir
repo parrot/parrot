@@ -1512,6 +1512,8 @@ out:
 
 =head1 TODO
 
+=head2 Double blocked quares
+
 Consider this one:
 
   # daily sudoku 16-nov-2005 very hard
@@ -1556,6 +1558,55 @@ Voila we have 3 numbers (3,5,7) which are somewhere on the right
 side of row 5 and we get a unique number in row 5, col 1 - the '4'.
 
 And then it's easy.
+
+=head2 Blocking due to multiple others
+
+Given this sudoku:
+
+  # daily sudoku 16-nov-2005 very hard
+  .5..3.9..
+  .394.....
+  .....964.
+  .6...84..
+  5.......8
+  ..19...2.
+  .826.....
+  .....576.
+  ..5.9..8.
+
+Currently sudoku.pir is starting backtracking at:
+
+  +---------+---------+---------+
+  | .  .  1 | 3  8  5 | .  .  . |
+  | 6  8  7 | .  1  . | .  9  . |
+  | 2  3  5 | 6  9  7 | .  .  1 |
+  +---------+---------+---------+
+  | 1  .  . | 9  7  3 | .  5  . |
+  | .  7  6 | 5  .  8 | 1  3  . |
+  | .  5  . | .  6  1 | .  .  . |
+  +---------+---------+---------+
+  | 7  1  . | 8  .  . | .  .  4 |
+  | .  .  . | 7  .  . | .  1  8 |
+  | .  .  . | 1  .  9 | 7  .  . |
+  +---------+---------+---------+
+
+In columns 7 the digits (9,5,3) are blocking this column in square 8
+so that the digits (2,6) have to be in column 7 too. Which implies
+that in square 2 we have a unique '7' at row 0, col 7:
+
+  +---------+---------+---------+
+  | .  .  1 | 3  8  5 | x  7  y |   (x,y) = (2|6)
+  | 6  8  7 | .  1  . | .  9  . |
+  | 2  3  5 | 6  9  7 | .  .  1 |
+  +---------+---------+---------+
+  | 1  .  . | 9  7  3 | .  5  . |
+  | .  7  6 | 5  .  8 | 1  3  . |
+  | .  5  . | .  6  1 | .  .  . |
+  +---------+---------+---------+
+  | 7  1  . | 8  .  . | a  .  4 |  (a,b,c) = (3|5|9)
+  | .  .  . | 7  .  . | b  1  8 |
+  | .  .  . | 1  .  9 | 7  .  c |
+  +---------+---------+---------+
 
 =cut
 
