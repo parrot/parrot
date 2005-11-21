@@ -40,10 +40,10 @@ help:
 	@echo ""
 
 test: all
-	$(PERL) -Ilib t/harness t/*.t
+	prove -R ../../t/compilers/tge
 
 testclean:
-	$(RM_RF) t/*.pir
+	$(RM_RF) ../../t/compilers/tge/*.pir
 
 clean: testclean
 	$(RM_RF) TGE.pbc $(PARROT_LIBRARY)${slash}TGE.pbc

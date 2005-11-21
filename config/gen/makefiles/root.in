@@ -176,6 +176,7 @@ GEN_MAKEFILES = \
 	languages/tcl/examples/Makefile \
 	editor/Makefile \
 	compilers/pge/Makefile \
+	compilers/tge/Makefile \
 	languages/punie/Makefile \
 	languages/bc/Makefile \
 	languages/Zcode/Makefile
@@ -645,7 +646,7 @@ help :
 	@echo "  dynclasses-clean:  Proxy for target 'clean' of dynclasses/Makefile"
 	@echo ""
 	@echo "Language implementations:"
-	@echo "  compilers:         Proxy for default target of compilers/pge"
+	@echo "  compilers:         Proxy for default target of pge and tge compilers"
 	@echo "  languages:         Proxy for default target of languages/Makefile"
 	@echo "  languages-test:    Proxy for target 'test' of languages/Makefile"
 	@echo "  languages-smoke:   Proxy for target 'test' of languages/Makefile"
@@ -1215,6 +1216,7 @@ compilers : compilers.dummy
 
 compilers.dummy : $(PARROT)
 	$(MAKE) compilers/pge
+	$(MAKE) compilers/tge
 
 languages : languages.dummy
 
@@ -1238,6 +1240,7 @@ languages-clean :
 
 compilers-clean :
 	$(MAKE) compilers/pge clean
+	$(MAKE) compilers/tge clean
 
 ###############################################################################
 #
@@ -1272,7 +1275,8 @@ RUNCORE_TEST_FILES = \
 	t/dynclass/foo.t t/dynclass/g*.t \
 	t/examples/*.t \
 	t/compilers/pge/*.t \
-	t/compilers/pge/p6rules/*.t
+	t/compilers/pge/p6rules/*.t \
+	t/compilers/tge/*.t
 TOOLS_TEST_FILES = \
 	t/tools/*.t
 
@@ -1475,6 +1479,7 @@ test-clean :
 		t/compilers/pge/p6rules/*.pbc \
 		t/compilers/pge/p6rules/*.pasm \
 		t/compilers/pge/p6rules/*.out \
+		t/compilers/tge/*.pir \
 		t/stress/*.pasm \
 		t/stress/*.pbc \
 		t/stress/*.out \
