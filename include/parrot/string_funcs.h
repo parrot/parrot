@@ -17,7 +17,7 @@
 
 /* Declarations of accessors */
 
-void Parrot_reuse_COW_reference(Interp *, STRING *, STRING *);
+STRING *Parrot_reuse_COW_reference(Interp *, STRING *, STRING *);
 STRING *Parrot_make_COW_reference(Interp *, STRING *);
 void Parrot_unmake_COW(Interp *, STRING *);
 INTVAL string_compute_strlen(Interp *, STRING *);

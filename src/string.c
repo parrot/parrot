@@ -138,11 +138,9 @@ Parrot_make_COW_reference(Interp *interpreter, STRING *s)
         return NULL;
     }
     if (PObj_constant_TEST(s)) {
-        PObj_constant_CLEAR(s);
-        d = new_string_header(interpreter, PObj_get_FLAGS(s));
-        PObj_is_cowed_SETALL(s);
+        d = new_string_header(interpreter, 0);
+        PObj_COW_SET(s);
         copy_string_header(interpreter, d, s);
-        PObj_constant_CLEAR(d);
     }
     else {
         d = new_string_header(interpreter, PObj_get_FLAGS(s));
@@ -159,21 +157,20 @@ Parrot_reuse_COW_reference(Interp *interpreter, STRING *s, STRING *reuse)>
 
 Creates a copy-on-write string by cloning a string header without
 allocating a new buffer. Doesn't allocate a new string header, instead
-using the one passed in
+using the one passed in and returns it.
 
 =cut
 
 */
 
-void
+STRING*
 Parrot_reuse_COW_reference(Interp *interpreter, STRING *s, STRING *d)
 {
     if (s == NULL) {
-        return;
+        return NULL;
     }
     if (PObj_constant_TEST(s)) {
-        PObj_constant_CLEAR(s);
-        PObj_is_cowed_SETALL(s);
+        PObj_COW_SET(s);
         copy_string_header(interpreter, d, s);
         PObj_constant_CLEAR(d);
     }
@@ -182,33 +179,7 @@ Parrot_reuse_COW_reference(Interp *interpreter, STRING *s, STRING *d)
         copy_string_header(interpreter, d, s);
         PObj_sysmem_CLEAR(d);
     }
-}
-
-/*
-
-=item C<static void
-Parrot_make_COW_reference_from_header(Interp *interpreter,
-        STRING *s, STRING *d)>
-
-Makes the second Parrot string a copy-on-write reference to first.
-
-=cut
-
-*/
-
-static void
-Parrot_make_COW_reference_from_header(Interp *interpreter,
-        STRING *s, STRING *d)
-{
-    if (PObj_constant_TEST(s)) {
-        PObj_is_cowed_SETALL(s);
-        copy_string_header(interpreter, d, s);
-        PObj_constant_CLEAR(d);
-    }
-    else {
-        PObj_COW_SET(s);
-        copy_string_header(interpreter, d, s);
-    }
+    return d;
 }
 
 /*
@@ -237,7 +208,7 @@ string_set(Interp *interpreter, STRING *dest, STRING *src)
             mem_sys_free((INTVAL*)PObj_bufstart(dest) - 1);
         }
 #endif
-        Parrot_make_COW_reference_from_header(interpreter, src, dest);
+        dest = Parrot_reuse_COW_reference(interpreter, src, dest);
     }
     else
         dest = Parrot_make_COW_reference(interpreter, src);
@@ -1504,7 +1475,7 @@ string_bitwise_and(Interp *interpreter, STRING *s1,
     if (s1 && s2) {
         minlen = s1->strlen > s2->strlen ? s2->strlen : s1->strlen;
     }
-    else 
+    else
         minlen = 0;
 
     if (dest && *dest) {
@@ -1626,7 +1597,7 @@ string_bitwise_or(Interp *interpreter,
         res->encoding = Parrot_fixed_8_encoding_ptr;
         res->charset  = Parrot_binary_charset_ptr;
     }
-    else 
+    else
         res = string_make_direct(interpreter, NULL, maxlen,
                 Parrot_fixed_8_encoding_ptr, Parrot_binary_charset_ptr, 0);
 
@@ -1700,7 +1671,7 @@ string_bitwise_xor(Interp *interpreter,
         res->encoding = Parrot_fixed_8_encoding_ptr;
         res->charset  = Parrot_binary_charset_ptr;
     }
-    else 
+    else
         res = string_make_direct(interpreter, NULL, maxlen,
                 Parrot_fixed_8_encoding_ptr, Parrot_binary_charset_ptr, 0);
 
@@ -2375,7 +2346,7 @@ string_hash(Interp * interpreter, STRING *s, size_t seed)
 =item C<STRING *
 string_escape_string(Interp * interpreter, STRING *src)>
 
-Escape all non-ascii chars to backslash sequences. Control chars that 
+Escape all non-ascii chars to backslash sequences. Control chars that
 C<string_unescape_cstring> can handle are esacped as I<\x>, as well
 as a double quote character. Other control chars and codepoints < 0x100 are
 escaped as I<\xhh>, codepoints up to 0xffff, as I<\uhhhh>, and codepoints
@@ -2479,7 +2450,7 @@ string_escape_string_delimited(Interp * interpreter,
         result->bufused = result->strlen = i;
         if (c < 0x0100 || c >= 0x10000)
             hex = Parrot_sprintf_c(interpreter, "\\x{%x}", c);
-        else 
+        else
             hex = Parrot_sprintf_c(interpreter, "\\u%04x", c);
         result = string_append(interpreter, result, hex, 0);
         /* adjust our insert idx */
@@ -2847,7 +2818,7 @@ Parrot_string_trans_charset(Interp *interpreter, STRING *src,
      */
     if (dest) {
         if (new_charset == src->charset) {
-            Parrot_reuse_COW_reference(interpreter, src, dest);
+            dest = Parrot_reuse_COW_reference(interpreter, src, dest);
             dest->charset = new_charset;
             /* keep encoding */
             return dest;
@@ -2883,7 +2854,7 @@ Parrot_string_trans_encoding(Interp *interpreter, STRING *src,
     if (dest) {
         dest->encoding = new_encoding;
         if (new_encoding == src->encoding) {
-            Parrot_reuse_COW_reference(interpreter, src, dest);
+            dest = Parrot_reuse_COW_reference(interpreter, src, dest);
             return dest;
         }
     }

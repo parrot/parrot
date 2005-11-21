@@ -71,9 +71,8 @@ to_encoding(Interp *interpreter, STRING *src, STRING *dest)
     }
     if (!src_len) {
         result->charset  = Parrot_unicode_charset_ptr;
-        result->encoding = Parrot_utf16_encoding_ptr;
-        result->strlen = src_len;
         result->encoding = Parrot_ucs2_encoding_ptr;
+        result->strlen = result->bufused = 0;
         return result;
     }
     /*
