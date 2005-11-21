@@ -19,7 +19,7 @@ Tests the C<DynLexPad> PMC.
 use Parrot::Test;
 use Test::More;
 use Parrot::Config;
-plan tests => 2;
+plan tests => 4;
 
 my $loadlib = <<EOC;
 .HLL "Some", ""
@@ -61,4 +61,53 @@ CODE
 ok 1
 ok 2
 13013
+OUTPUT
+
+pir_output_is($loadlib . << 'CODE', << 'OUTPUT', "check :outer");
+    foo()
+.end
+.sub foo :lex
+    $P1 = new .Integer
+    $P1 = 13013
+    store_lex 0, 'a', $P1
+    $P2 = find_lex 'a'
+    print $P2
+    print "\n"
+    bar()
+.end
+.sub bar :outer(foo)
+    baz()
+.end
+.sub baz :lex :outer(bar)
+    $P1 = find_lex 'a'
+    print $P1
+    print "\n"
+.end
+CODE
+13013
+13013
+OUTPUT
+
+pir_output_like($loadlib . << 'CODE', << 'OUTPUT', "check that dynlexpad honors hll", todo =>'fubared still');
+    foo()
+.end
+.sub foo :lex
+    $P1 = new .Integer
+    $P1 = 13013
+    store_lex 0, 'a', $P1
+    $P2 = find_lex 'a'
+    print $P2
+    print "\n"
+    bar()
+.end
+.HLL "Parrot",""
+.sub bar :outer(foo)
+    baz()
+.end
+.sub baz :lex :outer(bar) 
+    $P1 = find_lex 'a'
+    print $P1
+.end
+CODE
+/Null PMC access/
 OUTPUT
