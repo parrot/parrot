@@ -48,8 +48,8 @@ sub runstep {
         return undef;
     }
 
-    $prog = check_progs(['gmake', 'nmake', 'make']);
-
+    $prog = check_progs(['gmake', 'mingw32-make', 'nmake', 'make']);
+    
     unless ($prog) {
         # fall back to default
         $result = 'no';

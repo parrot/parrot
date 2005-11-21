@@ -164,8 +164,6 @@
 				'libs' => '-lmsvcrt -lmoldname -lkernel32 -luser32 -lgdi32 -lwinspool -lcomdlg32 -ladvapi32 -lshell32 -lole32 -loleaut32 -lnetapi32 -luuid -lws2_32 -lmpr -lwinmm -lversion -lodbc32 ',
 				'link' => 'gcc',
 				'linkflags' => '',
-				'make' => 'mingw32-make',
-				'make_set_make' => 'MAKE = mingw32-make',
 				'ncilib_link_extra' => 'src/libnci_test.def',
 				'o' => '.o',
 				'slash' => '\\',
@@ -180,7 +178,6 @@
 			Parrot::Configure::Data->set(
 				'ld_load_flags' => '-shared ',
 				'ld_share_flags' => '-shared ',
-				'make' => 'mingw32-make',
 				'ncilib_link_extra' => 'src/libnci_test.def',
 			);
 		} else {

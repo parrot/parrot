@@ -492,7 +492,7 @@ sub check_progs {
     foreach my $prog (@$progs) {
         my $util = $prog;
         # use the first word in the string to ignore any options
-        ($util) = $util =~ /(\w+)/;
+        ($util) = $util =~ /(\S+)/;
         my $path = which($util);
 
         if ($verbose) {
