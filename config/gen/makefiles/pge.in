@@ -41,11 +41,11 @@ help:
 	@echo ""
 
 test: all
-	cd ../..; $(PERL) -Ilib t/harness t/compilers/pge/*.t t/compilers/pge/p6rules/*.t
+	prove -r ../../t/compilers/pge
 
 testclean:
-	$(RM_RF) ../../t/compilers/pge/*.pir ../../t/compilers/pge/*.pasm \
-	    ../../t/compilers/pge/p6rules/*.pir ../../t/compilers/pge/p6rules/*.pasm
+	$(RM_RF) ../../t/compilers/pge/*.pir \
+	    ../../t/compilers/pge/p6rules/*.pir
 
 clean: testclean
 	$(RM_RF) PGE.pbc $(PARROT_LIBRARY)${slash}PGE.pbc PGE/Library.pir

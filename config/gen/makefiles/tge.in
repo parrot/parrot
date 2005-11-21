@@ -40,7 +40,7 @@ help:
 	@echo ""
 
 test: all
-	prove -R ../../t/compilers/tge
+	prove -r ../../t/compilers/tge
 
 testclean:
 	$(RM_RF) ../../t/compilers/tge/*.pir
