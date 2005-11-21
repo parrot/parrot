@@ -8,8 +8,8 @@ All are gone. Please read the history of this file for more.
 
 =head1 Deprecated opcodes
 
-new_pad is now deprecated. See PDD20 for information about how to
-handle lexical variables.
+All the *_pad opcodes are now deprecated. See PDD20 for information about how to
+handle lexical variables. (new_pad, peek_pad, pop_pad, push_pad)
 
 =head1 Deprecated APIs
 
