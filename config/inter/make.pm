@@ -48,7 +48,7 @@ sub runstep {
         return undef;
     }
 
-    $prog = check_progs(['gmake', 'make']);
+    $prog = check_progs(['gmake', 'nmake', 'make']);
 
     unless ($prog) {
         # fall back to default
