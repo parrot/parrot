@@ -26,7 +26,7 @@ TGE::Parser - parser for the grammar syntax of TGE
     p6rule('<TGE::Parser::type> \: <TGE::Parser::attrdef> \s*', classname, 'rule')
     p6rule('<TGE::Parser::name> <TGE::Parser::parenlist> \= <TGE::Parser::codeblock>', classname, 'attrdef')
     p6rule('\( \s* (.*?) \s* \)\s*', classname, 'parenlist')
-    p6rule('\s* { \s* (.*?) \s* }', classname, 'codeblock')
+    p6rule('\s* \{ \s* (.*?) \s* \}', classname, 'codeblock')
     p6rule('[ \:\: ]? \w+ [ \:\: \w+ ]*', classname, 'type')
     p6rule('\s*(\w+)\s*', classname, 'name')
     p6rule('\s* \# \N*? $$\s*', classname, 'skip')
