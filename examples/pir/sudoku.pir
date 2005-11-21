@@ -469,7 +469,7 @@ is_set:
     n = 0
 loop:
     b = c & 1
-    c >>= 1        
+    c >>= 1
     unless b goto not_set
     inc n
 not_set:
@@ -642,6 +642,7 @@ lx2:
     .local int i, x, y, c1, c2, r
     .local string deb_n
     deb_n = ""  # print inv for that
+    self."create_inv"()
     opt = getattribute self, "opt"
     disp = getattribute self, "disp"
     $I0 = defined opt["inv"]
@@ -695,7 +696,6 @@ sp2:
     s .= '|'
     disp."print"(r,0, s)
     unless deb_n goto not_deb
-    self."create_inv"()
     self."deb_inv"(y, deb_n)
 not_deb:
     disp."print"("\n")
@@ -844,13 +844,13 @@ err:
     .local pmc rcss, i_rcss
     rcss = getattribute self, "rows"
     i_rcss =  getattribute self, "i_rows"
-    self."create_inv_1"(rcss, i_rcss)
+    self."create_inv_1"(rcss, i_rcss, "row")
     rcss = getattribute self, "cols"
     i_rcss =  getattribute self, "i_cols"
-    self."create_inv_1"(rcss, i_rcss)
+    self."create_inv_1"(rcss, i_rcss, "col")
     rcss = getattribute self, "sqrs"
     i_rcss =  getattribute self, "i_sqrs"
-    self."create_inv_1"(rcss, i_rcss)
+    self."create_inv_1"(rcss, i_rcss, "sqr")
 .end
 
 # create row, cols, or sqrs of invalid numbers
@@ -859,6 +859,8 @@ err:
 .sub create_inv_1 :method
     .param pmc ars
     .param pmc invs
+    .param string what
+
     .local int x, y, n, i, c
     .local pmc ar, inv
 
@@ -889,8 +891,113 @@ fill:
 nxt_n:
     inc n
     if n <= 9 goto lpn
+    self."create_inv_n"(ar, inv, y, what)
     inc y
     if y < 9 goto lpy
+.end
+
+# if inv contains 2 identical entries and exactly 2 nums are
+# allowed these 2 positions are invalid for all other digits
+.sub create_inv_n :method
+    .param pmc ar
+    .param pmc inv
+    .param int y
+    .param string what
+
+    .local int x, x1, x2, n, m, msk
+    .local pmc d, e1, e2, empty_2, digs
+
+    # transpose into a digit-base array with positions as bits
+    # this should simplify the test for 2 empty squares with
+    # same digit
+    digs = new .FixedPMCArray
+    digs = 9
+    n = 0
+lpn:
+    msk = 2 << n
+    d = new .Integer
+    digs[n] = d
+    x = 0
+    # don't bother looking further if n is already set
+    $I1 = n + 1
+    $I0 = self."contains"(ar, $I1)
+    if $I0 goto nxt_n
+lpx:
+    e1 = inv[x]
+    $I0 = e1
+    $I0 &= msk
+    unless $I0 goto nxt_x
+    $I1 = 2 << x
+    d |= $I1
+nxt_x:
+    inc x
+    if x < 9 goto lpx
+nxt_n:
+    inc n
+    if n < 9 goto lpn
+
+    x1 = 0
+lpx1:
+    empty_2 = new .ResizablePMCArray
+    e1 = digs[x1]
+    n = bits0(e1)
+    if n != 2 goto nxt_x1
+    m = 1
+    x2 = x1 + 1
+lpx2:
+    e2 = digs[x2]
+    if e1 != e2 goto nxt_x2
+    inc m
+    if m > 2 goto nxt_x1
+    push empty_2, e1
+    push empty_2, x1
+    push empty_2, x2
+nxt_x2:
+    inc x2
+    if x2 < 9 goto lpx2
+    $I0 = elements empty_2
+    unless $I0 goto nxt_x1
+    if m != 2 goto nxt_x1
+    goto done
+nxt_x1:
+    inc x1
+    if x1 < 8 goto lpx1
+
+    $I0 = elements empty_2
+    unless $I0 goto ret
+done:
+    .local int d1, d2, pos_msk
+    pos_msk = empty_2[0]   # positions 1 based
+    d1 =      empty_2[1]   # 0 based
+    d2 =      empty_2[2]   # 0 based
+    x = 0
+lpx3:
+    $I0 = 2 << x
+    $I0 &= pos_msk
+    if $I0 goto nxt_x3
+       e1 = inv[x]
+       n = 0
+    lpn3:
+       if n == d1 goto nxt_n3
+       if n == d2 goto nxt_n3
+       # invalidate all but d1, d2 at the 2 positions
+       $I0 = 2 << n
+       e1 |= $I0
+    nxt_n3:
+       inc n
+       if n < 9 goto lpn3
+nxt_x3:
+    inc x
+    if x < 9 goto lpx3
+    $I0 = self."debug"()
+    unless $I0 goto ret
+
+    # reuse array for debug reports
+    unshift empty_2, y
+    unshift empty_2, what
+    $S0 = sprintf "*** found inv_2 %s %d: %#b %d %d\n", empty_2
+    print $S0
+ret:
 .end
 
 # return 1 if row/col/sqr contains num n
@@ -932,10 +1039,7 @@ done:
     $I0 = self."verify"()
     .return ($I0)
 err:
-    $I0 = self."debug"()
-    unless $I0 goto nd
     print "mismatch\n"
-nd:
     .return (0)
 .end
 
@@ -1124,7 +1228,7 @@ lpy:
     $I5 = 1 << x
     $I6 |= $I5
     bits[sy] = $I6
-blocked: 
+blocked:
     inc y
     if y < 3 goto lpy
     inc sy
@@ -1139,7 +1243,7 @@ lp_c:
     if $I3 < 3 goto lp_c
     #$S1 = sprintf "bits %x %x %x\n", bits
     #print $S1
-    $I10 = self."check_dbl"(i_rcss, bits, sx, n)
+    $I10 = self."check_dbl"(i_rcss, bits, sx, n, what)
     retval |= $I10
 no_check:
     inc sx
@@ -1156,6 +1260,7 @@ nxt_n:
     .param pmc bits
     .param int sx
     .param int n
+    .param string what
     # we must have 2 masks with the same 2 bits set and another one
     # where the clear one is also set e.g. 3 7 3
     .local int m0, m1, m2, b
@@ -1164,28 +1269,28 @@ nxt_n:
     m1 = bits[1]
     m2 = bits[2]
     if m0 != m1 goto m02
-    # m0 == m1 
+    # m0 == m1
     b = bits1(m0)
     if b != 2 goto m02
     $I0 = bits1(m2)
     if $I0 != 3 goto m02
-    .return self.inv_dbl(i_rcss, n, m0, sx, 2)
+    .return self.inv_dbl(i_rcss, n, m0, sx, 2, what)
 m02:
     if m0 != m2 goto m12
-    # m0 == m2 
+    # m0 == m2
     b = bits1(m0)
     if b != 2 goto m12
     $I0 = bits1(m1)
     if $I0 != 3 goto m12
-    .return self.inv_dbl(i_rcss, n, m0, sx, 1)
+    .return self.inv_dbl(i_rcss, n, m0, sx, 1, what)
 m12:
     if m1 != m2 goto ret
-    # m1 == m2 
+    # m1 == m2
     b = bits1(m1)
     if b != 2 goto ret
     $I0 = bits1(m0)
     if $I0 != 3 goto ret
-    .return self.inv_dbl(i_rcss, n, m1, sx, 0)
+    .return self.inv_dbl(i_rcss, n, m1, sx, 0, what)
 ret:
     .return (0)
 .end
@@ -1197,6 +1302,8 @@ ret:
     .param int msk
     .param int sx
     .param int sy
+    .param string what
+
     .local int x, y, b
     .local pmc inv, el
     x = sx * 3
@@ -1221,11 +1328,15 @@ not_set:
     if b < 3 goto lpb
     $I0 = self."debug"()
     unless $I0 goto nd
-	print_item "inv_dbl n="
+	print_item "inv_dbl"
+	print_item what
+	print_item "n"
 	print_item n
-	print_item "msk="
+	print_item "msk"
 	print_item msk
+	print_item "sx"
 	print_item sx
+	print_item "sy"
 	print_item sy
 	print_newline
 	self."display"()
@@ -1495,7 +1606,7 @@ fin:
 .end
 
 # return the square coors of the minimum freedom
-# used for backtacking
+# used for backtracking
 # if m == 1 this is a forced uniq position
 .sub best_pos :method
     .local pmc sqrs, sqr
@@ -1687,7 +1798,7 @@ out:
     .return(STDSCR)
 .end
 
-=head1 TODO
+=head1 Advanced checks
 
 =head2 Double blocked rows/columns
 
@@ -1704,7 +1815,7 @@ Consider this one:
   .....576.
   ..5.9..8.
 
-It gets solved until here, then backtracking begins (and succeeds).
+It got solved until here, then backtracking began (and succeeded).
 
   +---------+---------+---------+
   | 4  5  6 | 8  3  . | 9  .  . |    777 77. 7..
@@ -1736,8 +1847,8 @@ side of row 5 and we get a unique number in row 5, col 1 - the '4'.
 
 And then it's easy.
 
-Actually one part (the '7') is implemented in C<scan_dbl>, which
-boils down this case to the other one below (probably).
+One part (the '7') is implemented in C<scan_dbl>, which
+boils down this case to the other one below.
 
 =head2 Blocking due to multiple others
 
@@ -1754,7 +1865,7 @@ Given this sudoku:
   .....576.
   ..5.9..8.
 
-Currently sudoku.pir is starting backtracking at:
+Earlier sudoku.pir started backtracking at:
 
   +---------+---------+---------+
   | .  .  1 | 3  8  5 | .  .  . |
@@ -1787,6 +1898,9 @@ that in square 2 we have a unique '7' at row 0, col 7:
   | .  .  . | 7  .  . | b  1  8 |
   | .  .  . | 1  .  9 | 7  .  c |
   +---------+---------+---------+
+
+Now the tests in "create_inv_n" invalidate illegal positions
+due to multiple-blocking and other tests are likely to proceed.  
 
 =cut
 
