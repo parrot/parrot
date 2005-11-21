@@ -1,0 +1,99 @@
+/*
+Copyright: 2005 The Perl Foundation.  All Rights Reserved.
+$Id:$
+
+=head1 NAME
+
+dynclasses/dynlexpad.pmc - DynLexPad PMC
+
+=head1 DESCRIPTION
+
+DynLexPad provides a more dynamic lexpad that allows the addition of lexicals at runtime.
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+
+pmclass DynLexPad dynpmc does lexpad need_ext {
+
+    void init() {
+        real_exception(INTERP, NULL, INVALID_OPERATION,
+                "don't create me like this");
+    }
+
+/*
+
+=item C<init_pmc(PMC *lexinfo)>
+
+Initialize the LexPad PMC and remember the associate
+lexinfo.
+
+=item C<void set_pointer(void *)>
+
+Initialize the LexPad PMC and remember the associate context.
+XXX - we really should have one-stage initialisation.
+XXX - we could abuse init_pmc_props
+
+=item C<INTVAL elements()>
+
+Returns the number of elements in the hash.
+
+=item C<PMC *get_pmc_keyed_str(STRING *name)>
+
+=item C<PMC *get_pmc_keyed(PMC *name)>
+
+Return the lexical with the given name, or NULL (not PMCNULL), if the
+lexical doesn't exist.
+
+=item C<void set_pmc_keyed(PMC *name, PMC *value)>
+
+=item C<void set_pmc_keyed_str(STRING *name, PMC *value)>
+
+Set the lexical with the given name to value. If the lexical name
+doesn't exist, it is created.
+
+=item C<METHOD PMC* get_lexinfo()>
+
+Return the LexInfo PMC, if any or a Null PMC.
+
+=cut
+
+*/
+    void init_pmc(PMC* lexinfo) {
+        PMC_pmc_val(SELF) = lexinfo;
+    }
+
+    void set_pointer(void* ctx) {
+        PMC_struct_val(SELF) = ctx;
+    }
+
+}
+
+
+/*
+
+=back
+
+=head1 SEE ALSO
+
+F<docs/pdds/pdd20_lecical_vars.pod>, F<classes/lexpad.pmc>, F<classes/lexinfo.pmc>.
+
+=cut
+
+*/
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+*/

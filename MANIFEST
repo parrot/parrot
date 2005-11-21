@@ -404,6 +404,7 @@ docs/submissions.pod                              [main]doc
 docs/tests.pod                                    [main]doc
 docs/vtables.pod                                  [main]doc
 dynclasses/README                                 [devel]
+dynclasses/dynlexpad.pmc                          [library]
 dynclasses/ext.imc                                [devel]
 dynclasses/foo.pmc                                [devel]
 dynclasses/gdbmhash.pmc                           [devel]

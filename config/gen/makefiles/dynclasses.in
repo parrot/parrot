@@ -12,6 +12,7 @@ O = ${o}
 #
 PMCS = \
 #CONDITIONED_LINE(has_gdbm):gdbmhash \
+  dynlexpad \
   match \
   matchrange \
   subproxy \
