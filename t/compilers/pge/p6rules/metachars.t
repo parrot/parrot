@@ -111,14 +111,35 @@ p6rule_is  ("\n", '$$ \n', 'line beginnings and endings ($$)');
 p6rule_isnt("\n", '\n $$', 'line beginnings and endings ($$)');
 
 
-## &
+## | and &
+p6rule_is  ("c", '<[a..d]> | <[b..e]>', 'alternation (|)');
+p6rule_is  ("c", '<[a..d]> | <[d..e]>', 'alternation (|)');
+p6rule_is  ("c", '<[a..b]> | <[b..e]>', 'alternation (|)');
+p6rule_isnt("c", '<[a..b]> | <[d..e]>', 'alternation (|)');
+p6rule_is  ("bcd", '<[a..d]>+ | <[b..e]>+', 'alternation (|)');
+p6rule_is  ("bcd", '^ <[a..d]>+ | <[b..e]>+ $', 'alternation (|)');
+p6rule_is  ("bcd", '<[a..c]>+ | <[b..e]>+', 'alternation (|)');
+p6rule_is  ("bcd", '<[a..d]>+ | <[c..e]>+', 'alternation (|)');
+p6rule_like("bcd", 'b|', '/Missing term/', 'alternation (|) - null right arg illegal');
+p6rule_like("bcd", '|b', '/Missing term/', 'alternation (|) - null left arg illegal', todo => 'not yet implemented');
+p6rule_like("bcd", '|', '/Missing term/', 'alternation (|) - null both args illegal', todo => 'not yet implemented');
+p6rule_is  ("|", '\|', 'alternation (|) - literal must be escaped');
+p6rule_isnt("|", '|', 'alternation (|) - literal must be escaped', todo => 'not yet implemented');
 p6rule_is  ("c", '<[a..d]> & <[b..e]>', 'conjunction (&)');
 p6rule_isnt("c", '<[a..d]> & <[d..e]>', 'conjunction (&)');
 p6rule_isnt("c", '<[a..b]> & <[b..e]>', 'conjunction (&)');
+p6rule_isnt("c", '<[a..b]> & <[d..e]>', 'conjunction (&)');
 p6rule_is  ("bcd", '<[a..d]>+ & <[b..e]>+', 'conjunction (&)');
 p6rule_is  ("bcd", '^ <[a..d]>+ & <[b..e]>+ $', 'conjunction (&)');
 p6rule_is  ("bcd", '<[a..c]>+ & <[b..e]>+', 'conjunction (&)');
 p6rule_is  ("bcd", '<[a..d]>+ & <[c..e]>+', 'conjunction (&)');
+p6rule_like("bcd", 'b&', '/Missing term/', 'conjunction (&) - null right arg illegal');
+p6rule_like("bcd", '&b', '/Missing term/', 'conjunction (&) - null left arg illegal', todo => 'not yet implemented');
+p6rule_like("bcd", '&', '/Missing term/', 'conjunction (&) - null both args illegal', todo => 'not yet implemented');
+p6rule_is  ("&", '\&', 'conjunction (&) - literal must be escaped');
+p6rule_isnt("&", '&', 'conjunction (&) - literal must be escaped', todo => 'not yet implemented');
+p6rule_isnt("a&|b", 'a&|b', 'alternation and conjunction (|&) - parse error', todo => 'not yet implemented');
+p6rule_isnt("a|&b", 'a|&b', 'alternation and conjunction (&|) - parse error', todo => 'not yet implemented');
 
 
 ## \p and \P -- deprecated
@@ -336,4 +357,4 @@ p6rule_isnt("ab0cdef", 'a\D+f', 'not digit');
 
 
 ## remember to change the number of tests :-)
-BEGIN { plan tests => 187; }
+BEGIN { plan tests => 208; }
