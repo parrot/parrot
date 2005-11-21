@@ -402,12 +402,15 @@ END
 #Run the actual steps
 Parrot::Configure::RunSteps->runsteps(%args);
 
+# tell users what to do next
+my $make = Parrot::Configure::Data->get('make');
+
 print <<"END";
 
 Okay, we're done!
 
-You can now use `make' (or your platform's equivalent to `make') to build your
-Parrot. After that, you can use `make test' to run the test suite.
+You can now use `$make' to build your Parrot. After that,
+you can use `$make test' to run the test suite.
 
 Happy Hacking,
         The Parrot Team
