@@ -278,9 +278,9 @@ GEN_LIBRARY = \
 	$(LIBRARY_DIR)/Stream/Writer.pbc \
 	$(LIBRARY_DIR)/YAML/Parser/Syck.pbc
 # XXX Why don't these build?
-	#runtime/parrot/library/libpcre.pbc \
-	#runtime/parrot/library/Data/Replace.pbc \
-	#runtime/parrot/library/postgres.pbc \
+#	runtime/parrot/library/libpcre.pbc \
+#	runtime/parrot/library/Data/Replace.pbc \
+#	runtime/parrot/library/postgres.pbc \
 
 # the dependencies of jit_emit.h are done explicitely
 # including this file in GEN_HEADERS causes unnecessary recompile of all
