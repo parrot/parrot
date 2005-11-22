@@ -419,86 +419,6 @@ foo
 main
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', 'closure 1');
-.sub "main"
-    .lex 'a', $P0
-    $P1 = new .String
-    $P1 = "main_a\n"
-    store_lex 'a', $P1
-    $P2 = find_lex 'a'
-    print $P2
-    foo()
-    print $P0
-    $P2 = find_lex 'a'
-    print $P2
-.end
-.sub foo  :outer('main')
-    .lex 'b', $P0
-    $P1 = new .String
-    $P1 = "foo_b\n"
-    store_lex 'b', $P1
-    bar()
-.end
-.sub bar   :outer('foo')
-    .lex 'b', $P0
-    $P1 = new .String
-    $P1 = "bar_b\n"
-    store_lex 'b', $P1
-    $P2 = find_lex 'b'
-    print $P2
-    $P2 = find_lex 'a'
-    print $P2
-.end
-CODE
-main_a
-bar_b
-main_a
-main_a
-main_a
-OUTPUT
-
-pir_output_is(<<'CODE', <<'OUTPUT', 'closure 2');
-.sub "main"
-    .lex 'a', $P0
-    $P1 = new .String
-    $P1 = "main_a\n"
-    store_lex 'a', $P1
-    $P2 = find_lex 'a'
-    print $P2
-    foo()
-    print $P0
-    $P2 = find_lex 'a'
-    print $P2
-.end
-.sub foo  :outer('main')
-    .lex 'b', $P0
-    $P1 = new .String
-    $P1 = "foo_b\n"
-    store_lex 'b', $P1
-    bar()
-    $P2 = find_lex 'b'
-    print $P2
-.end
-.sub bar   :outer('foo')
-    .lex 'b', $P0
-    $P1 = new .String
-    $P1 = "bar_b\n"
-    store_lex 'b', $P1
-    $P2 = find_lex 'b'
-    print $P2
-    $P2 = find_lex 'a'
-    print $P2
-    $P2 = "ex_main_a\n"
-.end
-CODE
-main_a
-bar_b
-main_a
-foo_b
-ex_main_a
-ex_main_a
-OUTPUT
-
 pir_output_is(<<'CODE', <<'OUTPUT', 'closure 3');
 # sub foo {
 #     my ($n) = @_;
@@ -902,67 +822,6 @@ pir_output_like(<<'CODE', <<'OUTPUT', 'get non existing');
 .end
 CODE
 /Lexical 'no_such' not found/
-OUTPUT
-
-pir_output_is(<<'CODE', <<'OUTPUT', 'get from 2 contexts away (success)');
-.sub "main" :main
-	$P0 = new Integer
-	$P0 = 1
-    .lex 'a', $P0
-    foo()
-.end
-.sub foo  :outer('main')
-	$P0 = new Integer
-	$P0 = 'two'
-    .lex 'b', $P0
-    bar()
-.end
-.sub bar   :outer('foo')
-    .lex 'c', $P0
-    $P2 = find_lex 'b'
-	eq $P2, 'two', ok_b
-	print "not "
-ok_b:
-	print "ok b\n"
-	$P2 = find_lex 'a'
-	eq $P2, 1, ok_a
-	print "not "
-ok_a:
-	print "ok a\n"
-.end
-CODE
-ok b
-ok a
-OUTPUT
-
-pir_output_like(<<'CODE', <<'OUTPUT', 'get from 2 contexts away (failure)');
-.sub "main" :main
-	$P0 = new Integer
-	$P0 = 1
-    .lex 'a', $P0
-    foo()
-.end
-.sub foo
-	$P0 = new Integer
-	$P0 = 'two'
-    .lex 'b', $P0
-    bar()
-.end
-.sub bar   :outer('foo')
-    .lex 'c', $P0
-    $P2 = find_lex 'b'
-	eq $P2, 'two', ok_b
-	print "not "
-ok_b:
-	print "ok b\n"
-	$P2 = find_lex 'a'
-	eq $P2, 1, ok_a
-	print "not "
-ok_a:
-	print "ok a\n"
-.end
-CODE
-/ok b\nLexical 'a' not found/
 OUTPUT
 
 output_is(<<CODE, <<OUTPUT, "simple store and fetch");
@@ -1408,8 +1267,6 @@ CODE
 23
 OUTPUT
 
-SKIP: {
-   skip("currently loops - don't todo me", 1);
 pir_output_is(<<'CODE', <<'OUTPUT', "tailcalls and :outer");
 .pragma n_operators 1          # add creates new PMC result below
 .sub do_add3
@@ -1418,8 +1275,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "tailcalls and :outer");
     .lex '&add3', $P1
     .const .Sub add3 = "add3"
     $P1 = newclosure add3
-    $P2 = $P1()                # tailcall eventually - b0rked
-    .return ($P2)
+    .return $P1()                # tailcall 
 .end
 
 .sub add3 :anon :outer(do_add3) :lex
@@ -1437,10 +1293,9 @@ pir_output_is(<<'CODE', <<'OUTPUT', "tailcalls and :outer");
     print "\n"
 .end
 CODE
-24
+23
 24
 OUTPUT
-} # skip
 
 ## remember to change the number of tests :-)
-BEGIN { plan tests => 53; }
+BEGIN { plan tests => 49; }

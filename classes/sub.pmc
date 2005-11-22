@@ -301,11 +301,13 @@ Invokes the subroutine.
          */
         if (PObj_get_FLAGS(ccont) & SUB_FLAG_TAILCALL) {
             opcode_t *new_pc;
+            PObj_get_FLAGS(ccont) &= ~SUB_FLAG_TAILCALL;
+            if (sub->outer_sub)
+                goto create_ctx;
             new_pc = parrot_pass_args_tail_call(INTERP, sub, pc);
             /* clear tail call flag - it has to be set again
              * by the tailcall opcode
              */
-            PObj_get_FLAGS(ccont) &= ~SUB_FLAG_TAILCALL;
             if (new_pc) {
                 pc = new_pc;
                 args_passed = 1;
@@ -368,11 +370,6 @@ create_ctx:
                         enum_class_LexPad),
                     sub->lex_info);
             VTABLE_set_pointer(INTERP, context->lex_pad, context);
-            /*
-             * if outer := caller set outer_ctx
-             */
-            if (sub->outer_sub == caller_ctx->current_sub)
-                 sub->outer_ctx = caller_ctx;
         }
         /* switch code segment if needed */
         if (INTERP->code != sub->seg) {

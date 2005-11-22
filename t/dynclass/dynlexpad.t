@@ -86,10 +86,14 @@ pir_output_is($loadlib . << 'CODE', << 'OUTPUT', "check :outer");
     $P2 = find_lex 'a'
     print $P2
     print "\n"
-    bar()
+    .const .Sub bar_sub = "bar"
+    $P0 = newclosure bar_sub
+    $P0()
 .end
 .sub bar :outer(foo)
-    baz()
+    .const .Sub baz_sub = "baz"
+    $P0 = newclosure baz_sub
+    $P0()
 .end
 .sub baz :lex :outer(bar)
     $P1 = find_lex 'a'
