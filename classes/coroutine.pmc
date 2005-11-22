@@ -158,13 +158,6 @@ Swaps the "context".
                             enum_class_LexPad),
                         co->lex_info);
                 VTABLE_set_pointer(INTERP, ctx->lex_pad, ctx);
-                /*
-                 * if outer := caller set outer_ctx
-                   TODO 
-                if (co->outer_sub == caller_ctx->current_sub)
-                     co->outer_ctx = caller_ctx;
-
-                 */
             }
 
             PObj_get_FLAGS(SELF) |= SUB_FLAG_CORO_FF;
