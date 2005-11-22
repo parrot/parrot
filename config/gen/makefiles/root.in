@@ -1275,6 +1275,7 @@ RUNCORE_TEST_FILES = \
 	t/dynclass/foo.t t/dynclass/g*.t \
 	t/examples/*.t \
 	t/compilers/pge/*.t \
+	t/compilers/pge/p5regexp/*.t \
 	t/compilers/pge/p6rules/*.t \
 	t/compilers/tge/*.t
 TOOLS_TEST_FILES = \
@@ -1475,6 +1476,7 @@ test-clean :
 		t/compilers/pge/*.pbc \
 		t/compilers/pge/*.pasm \
 		t/compilers/pge/*.out \
+        t/compilers/pge/p5regexp/*.pir \
         t/compilers/pge/p6rules/*.pir \
 		t/compilers/pge/p6rules/*.pbc \
 		t/compilers/pge/p6rules/*.pasm \

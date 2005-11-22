@@ -45,6 +45,7 @@ test: all
 
 testclean:
 	$(RM_RF) ../../t/compilers/pge/*.pir \
+	    ../../t/compilers/pge/p5regexp/*.pir \
 	    ../../t/compilers/pge/p6rules/*.pir
 
 clean: testclean
