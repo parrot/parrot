@@ -94,6 +94,7 @@ while (<TESTS>) {
 
     chomp;
     s/\\n/\n/g;
+    s/\r//g;
     my ($pat, $subject, $result, $repl, $expect, $reason) = split(/\t/,$_,6);
     my @todo;
     my $input = join(':',$pat,$subject,$result,$repl,$expect);
@@ -108,7 +109,7 @@ while (<TESTS>) {
     $expect =~ s/\\n/\n/g;
     $expect = $repl = '-' if $skip_amp and $input =~ /\$[&\`\']/;
     $skip = ($skip_amp ? ($result =~ s/B//i) : ($result =~ s/B//));
-    $reason = 'skipping $&' if $reason eq  '' && $skip_amp;
+    $reason = 'skipping $&' if $skip_amp && $reason eq  '';
     $result =~ s/B//i unless $skip;
     my $c = $iters;
 
@@ -131,6 +132,7 @@ while (<TESTS>) {
     .local pmc exp
     target = "$subject"
     pattern = $pat
+#    target = "$subject"  pattern=$pat  expect='$expect'
     (rulesub, code, exp) = p5rx_compile(pattern)
     match = rulesub(target)
     unless match goto Match_fail
