@@ -53,7 +53,7 @@ ok2
 OUT
 
 
-# 24 
+# 2 
 pir_output_is(<<'CODE', <<'OUT', "parse FASTA");
 
 # Grok fasta files, which usually contain DNA, RNA or protein sequences.
@@ -73,7 +73,8 @@ grammar Bio::Fasta;
 
 rule file        { <entry>+ }
 rule start_entry { \> }
-rule entry       { <start_entry> <id> \s+ <desc> } 
+rule desc_line   { <start_entry> <id> } 
+rule entry       { <desc_line> \s+ <desc> } 
 rule id          { (\S+) }
 rule desc        { (\N*) }
 rule sequence    { (<-[>]>*) }
@@ -90,14 +91,14 @@ GLMPFLHTSKHRSMMLRPLSQALFWTLTMDLLTLTWIGSQPVEYPYTIIGQMASILYFSIILAFLPIAGX
 IENY
 END_FASTA
 
-    .local pmc compile_rules
-    compile_rules = find_global "PGE", "compile_rules"
+    .local pmc p6grammar
+    p6grammar = compreg "PGE::P6Grammar"
     .local pmc code
-    ( code ) = compile_rules(fasta_grammar)
+    ( code ) = p6grammar(fasta_grammar)
     # print code
 
     .local pmc fasta_rule
-    fasta_rule = find_global "Bio::Fasta", "start_entry"
+    fasta_rule = find_global "Bio::Fasta", "id"
     .local pmc match
     ( match ) = fasta_rule( fasta )
     
@@ -108,7 +109,7 @@ END_FASTA
 .end
 
 CODE
->
+>gi|5524211|gb|AAD44166.1|
 OUT
 
 
