@@ -436,7 +436,7 @@ hll_def: HLL STRINGC COMMA STRINGC
                 Parrot_register_HLL(interp, hll_name, hll_lib);
             $$ = 0;
          }
-   | HLL_MAP INTC POINTY INTC
+   | HLL_MAP INTC COMMA INTC
          {
              Parrot_register_HLL_type(interp,
                 IMCC_INFO(interp)->HLL_id, atoi($2), atoi($4));
