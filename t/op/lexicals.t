@@ -1408,6 +1408,39 @@ CODE
 23
 OUTPUT
 
+SKIP: {
+   skip("currently loops - don't todo me", 1);
+pir_output_is(<<'CODE', <<'OUTPUT', "tailcalls and :outer");
+.pragma n_operators 1          # add creates new PMC result below
+.sub do_add3
+    .param pmc arg             # looks nicer than get_params
+    .lex '$a', arg
+    .lex '&add3', $P1
+    .const .Sub add3 = "add3"
+    $P1 = newclosure add3
+    $P2 = $P1()                # tailcall eventually - b0rked
+    .return ($P2)
+.end
+
+.sub add3 :anon :outer(do_add3) :lex
+    $P0 = find_lex '$a'
+    $P1 = $P0 + 3
+    .return ($P1)
+.end
+
+.sub main :main
+    $P0 = do_add3(20)
+    print $P0
+    print "\n"
+    $P1 = do_add3(21)
+    print $P1
+    print "\n"
+.end
+CODE
+24
+24
+OUTPUT
+} # skip
 
 ## remember to change the number of tests :-)
-BEGIN { plan tests => 52; }
+BEGIN { plan tests => 53; }
