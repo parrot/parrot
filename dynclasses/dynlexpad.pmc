@@ -22,16 +22,6 @@ DynLexPad provides a more dynamic lexpad that allows the addition of lexicals at
 
 pmclass DynLexPad dynpmc does lexpad need_ext {
 
-    void class_init() {
-        if (pass) {
-            PMC *current_sub;
-            int hll;
-            current_sub = CONTEXT(INTERP->ctx)->current_sub;
-            hll = PMC_sub(current_sub)->HLL_id;
-            Parrot_register_HLL_type(INTERP, hll,
-                    enum_class_LexPad, entry);
-        }
-    }
     void init() {
         real_exception(INTERP, NULL, INVALID_OPERATION,
                 "don't create me like this");
@@ -110,7 +100,7 @@ Marks the lexpad hash as live.
     PMC* get_pmc_keyed_str (STRING* key) {
         HashBucket *b = hash_get_bucket(INTERP, (Hash*) PMC_struct_val(SELF),
                                         key);
-        if (!b) 
+        if (!b)
             return NULL;
         return b->value;
     }

@@ -284,7 +284,8 @@ SP              [ ]
 ":opt_flag"     return(ADV_OPT_FLAG);
 
 <emit,INITIAL>".namespace"    return(NAMESPACE);
-<emit,INITIAL>".HLL"    return(HLL);
+<emit,INITIAL>".HLL"          return(HLL);
+<emit,INITIAL>".HLL_map"      return(HLL_MAP);
 ".endnamespace" return(ENDNAMESPACE);
 ".local"        return(LOCAL);
 ".global"       return(GLOBAL);

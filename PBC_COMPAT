@@ -24,6 +24,7 @@
 
 # please insert tab separated entries at the top of the list
 
+2005.11.22	leo	changed PBC format (HLL_info)
 2005.11.13	leo	freeze outer_sub with Subs in PBC
 2005.11.12	leo	freeze lex_info with Subs in PBC
 2005.11.06	leo	deleted newsub, foldup, pack; 0.3.1 release

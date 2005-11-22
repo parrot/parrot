@@ -70,7 +70,7 @@ INTVAL
 Parrot_register_HLL(Interp *interpreter,
 	STRING *hll_name, STRING *hll_lib)
 {
-    PMC *hll_info, *entry, *name;
+    PMC *hll_info, *entry, *name, *type_hash;
     INTVAL idx;
 
     idx = Parrot_get_HLL_id(interpreter, hll_name);
@@ -89,14 +89,18 @@ Parrot_register_HLL(Interp *interpreter,
     VTABLE_set_string_native(interpreter, name, hll_name);
     VTABLE_set_pmc_keyed_int(interpreter, entry, 0, name);
 
+    name = constant_pmc_new_noinit(interpreter, enum_class_String);
+    if (!hll_lib)
+        hll_lib = const_string(interpreter, "");
+    hll_lib = string_as_const_string(interpreter, hll_lib);
+    VTABLE_set_string_native(interpreter, name, hll_lib);
+    VTABLE_set_pmc_keyed_int(interpreter, entry, 1, name);
     if (string_length(interpreter, hll_lib)) {
-        name = constant_pmc_new_noinit(interpreter, enum_class_String);
-        hll_lib = string_as_const_string(interpreter, hll_lib);
-        VTABLE_set_string_native(interpreter, name, hll_lib);
-        VTABLE_set_pmc_keyed_int(interpreter, entry, 1, name);
         /* load lib */
         Parrot_load_lib(interpreter, hll_lib, NULL);
     }
+    type_hash = Parrot_new_INTVAL_hash(interpreter, PObj_constant_FLAG);
+    VTABLE_set_pmc_keyed_int(interpreter, entry, 2, type_hash);
 
     /* UNLOCK */
     return idx;
@@ -127,14 +131,18 @@ Parrot_register_HLL_type(Interp *interpreter, INTVAL hll_id,
 {
     PMC *entry, *type_hash, *hll_info;
     Hash *hash;
+    INTVAL n;
 
     hll_info = interpreter->HLL_info;
-    entry = VTABLE_get_pmc_keyed_int(interpreter, hll_info, hll_id);
-    type_hash = VTABLE_get_pmc_keyed_int(interpreter, entry, 2);
-    if (PMC_IS_NULL(type_hash)) {
-        type_hash = Parrot_new_INTVAL_hash(interpreter, PObj_constant_FLAG);
-        VTABLE_set_pmc_keyed_int(interpreter, entry, 2, type_hash);
+    n = VTABLE_elements(interpreter, hll_info);
+    if (hll_id >= n) {
+        real_exception(interpreter, NULL, E_ValueError,
+                "no such HLL id (%Vd)", hll_id);
     }
+    entry = VTABLE_get_pmc_keyed_int(interpreter, hll_info, hll_id);
+    assert(!PMC_IS_NULL(entry));
+    type_hash = VTABLE_get_pmc_keyed_int(interpreter, entry, 2);
+    assert(!PMC_IS_NULL(type_hash));
     hash = PMC_struct_val(type_hash);
     hash_put(interpreter, hash, (void*)core_type, (void*)hll_type);
 }
@@ -144,40 +152,41 @@ Parrot_get_HLL_type(Interp *interpreter, INTVAL hll_id, INTVAL core_type)
 {
     PMC *entry, *type_hash, *hll_info;
     Hash *hash;
+    HashBucket *b;
+    INTVAL n;
 
+    if (hll_id < 0) {
+        real_exception(interpreter, NULL, E_ValueError,
+                "no such HLL id (%Vd)", hll_id);
+    }
+    if (hll_id == 0)
+        return core_type;
     hll_info = interpreter->HLL_info;
+    n = VTABLE_elements(interpreter, hll_info);
+    if (hll_id >= n) {
+        real_exception(interpreter, NULL, E_ValueError,
+                "no such HLL id (%Vd)", hll_id);
+    }
     entry = VTABLE_get_pmc_keyed_int(interpreter, hll_info, hll_id);
     type_hash = VTABLE_get_pmc_keyed_int(interpreter, entry, 2);
     if (PMC_IS_NULL(type_hash))
-        return 0;
+        return core_type;
     hash = PMC_struct_val(type_hash);
-    return (INTVAL)hash_get(interpreter, hash, (void*)core_type);
+    if (!hash->entries)
+        return core_type;
+    b = hash_get_bucket(interpreter, hash, (void*)core_type);
+    if (b)
+        return (INTVAL) b->value;
+    return core_type;
 }
 
 INTVAL
 Parrot_get_ctx_HLL_type(Interp *interpreter, INTVAL core_type)
 {
-    PMC *entry, *type_hash, *hll_info;
-    Hash *hash;
-    HashBucket *b;
-    INTVAL hll_id, n;
+    INTVAL hll_id;
 
-    hll_info = interpreter->HLL_info;
     hll_id = CONTEXT(interpreter->ctx)->current_HLL;
-    if (hll_id <= 0)
-        return core_type;
-    n = VTABLE_elements(interpreter, hll_info);
-    if (hll_id >= n)
-        return core_type;
-    entry = VTABLE_get_pmc_keyed_int(interpreter, hll_info, hll_id);
-    type_hash = VTABLE_get_pmc_keyed_int(interpreter, entry, 2);
-    if (PMC_IS_NULL(type_hash))
-        return core_type;
-    hash = PMC_struct_val(type_hash);
-    b = hash_get_bucket(interpreter, hash, (void*)core_type);
-    if (b)
-        return (INTVAL) b->value;
-    return core_type;
+    return Parrot_get_HLL_type(interpreter, hll_id, core_type);
 }
 /*
 

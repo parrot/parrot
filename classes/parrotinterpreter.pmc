@@ -528,7 +528,8 @@ Finish thawing.
             if (PMC_IS_NULL(lib_pmc))
                 continue;
             lib_name = VTABLE_get_string(INTERP, lib_pmc);
-            Parrot_load_lib(INTERP, lib_name, NULL);
+            if (lib_name->strlen)
+                Parrot_load_lib(INTERP, lib_name, NULL);
         }
     }
 }

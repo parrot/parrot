@@ -1272,7 +1272,9 @@ RUNCORE_TEST_FILES = \
 	t/native_pbc/*.t \
 	$(IMCC_DIR)/t/*/*.t \
 	t/library/*.t \
-	t/dynclass/foo.t t/dynclass/g*.t \
+	t/dynclass/dyn*.t \
+	t/dynclass/foo.t \
+	t/dynclass/g*.t \
 	t/examples/*.t \
 	t/compilers/pge/*.t \
 	t/compilers/pge/p5regexp/*.t \

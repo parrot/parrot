@@ -329,7 +329,7 @@ set_lexical(Interp *interp, SymReg *r, char *name)
 %nonassoc '\n'
 %nonassoc <t> PARAM
 
-%token <t> PRAGMA N_OPERATORS HLL
+%token <t> PRAGMA N_OPERATORS HLL HLL_MAP
 %token <t> GOTO ARG IF UNLESS PNULL
 %token <t> ADV_FLAT ADV_SLURPY ADV_OPTIONAL ADV_OPT_FLAG
 %token <t> NEW
@@ -435,6 +435,12 @@ hll_def: HLL STRINGC COMMA STRINGC
             IMCC_INFO(interp)->HLL_id =
                 Parrot_register_HLL(interp, hll_name, hll_lib);
             $$ = 0;
+         }
+   | HLL_MAP INTC POINTY INTC
+         {
+             Parrot_register_HLL_type(interp,
+                IMCC_INFO(interp)->HLL_id, atoi($2), atoi($4));
+             $$ = 0;
          }
    ;
 

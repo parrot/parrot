@@ -861,12 +861,13 @@ set_retval(Parrot_Interp interpreter, int sig_ret,
     if (!sig_ret || sig_ret == 'v')
         return NULL;
 
-    Parrot_init_arg_op(interpreter, seg, ctx, src_pc, &st.src);
-    buf[0] = sig_ret;
-    buf[1] = 0;
-    todo = Parrot_init_arg_sig(interpreter, interpreter->code,
-            CONTEXT(interpreter->ctx), sig, NULL, &st.dest);
-
+    todo = Parrot_init_arg_op(interpreter, seg, ctx, src_pc, &st.src);
+    if (todo) {
+        buf[0] = sig_ret;
+        buf[1] = 0;
+        todo = Parrot_init_arg_sig(interpreter, interpreter->code,
+                CONTEXT(interpreter->ctx), sig, NULL, &st.dest);
+    }
     if (todo) {
         Parrot_fetch_arg(interpreter, &st);
         Parrot_convert_arg(interpreter, &st);
