@@ -415,13 +415,12 @@ Locate the LexPad containing the given name. Return NULL on failure.
 */
 
 PMC*
-Parrot_find_pad(Interp* interpreter, STRING *lex_name)
+Parrot_find_pad(Interp* interpreter, STRING *lex_name, parrot_context_t *ctx)
 {
     PMC *lex_pad;
-    parrot_context_t *ctx, *outer;
+    parrot_context_t *outer;
     PMC *result;
 
-    ctx = CONTEXT(interpreter->ctx);
     while (1) {
         lex_pad = ctx->lex_pad;
         outer = ctx->outer_ctx;

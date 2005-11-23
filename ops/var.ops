@@ -137,11 +137,12 @@ by index can only be retrieved by this index.
 =cut
 
 op store_lex(in STR, in PMC) {
-  PMC *lex_pad = CONTEXT(interpreter->ctx)->lex_pad;
+  parrot_context_t *ctx = CONTEXT(interpreter->ctx);
+  PMC *lex_pad = ctx->lex_pad;
   if (!PMC_IS_NULL(lex_pad)) {
     STRING *lex_name = $1;
     /* use new code */
-    lex_pad = Parrot_find_pad(interpreter, lex_name);
+    lex_pad = Parrot_find_pad(interpreter, lex_name, ctx);
     if (!lex_pad) {
       real_exception(interpreter, NULL, LEX_NOT_FOUND,
 	  "Lexical '%Ss' not found", lex_name);
@@ -159,27 +160,11 @@ op store_lex(in STR, in PMC) {
 }
 
 op store_lex(in INT, in STR, in PMC) {
-  PMC *lex_pad = CONTEXT(interpreter->ctx)->lex_pad;
-  if (!PMC_IS_NULL(lex_pad)) {
-    /* use new code 
-     * XXX find_pad always uses get_pmc_keyed_str to locate a
-     *     matching pad
-     *     Therefore I 'reuse' the extended store_lex
-     *     to actually create the pad entry for the dynamic case
-     *     The pad depth is totally ignored, the entry is 
-     *     always in the current pad
-     */
-
-    STRING *lex_name = $2;
-    VTABLE_set_pmc_keyed_str(interpreter, lex_pad, lex_name, $3);
-  }
-  else {
     PMC *pad = scratchpad_get_current(interpreter);
     if (!pad)
       real_exception(interpreter, NULL, PAD_NOT_FOUND,
 	  "empty lexical pad");
     scratchpad_store_by_name(interpreter, pad, $1, $2, $3);
-  }
   goto NEXT();
 }
 
@@ -217,20 +202,18 @@ otherwise, count up from the outermost scope.
 =cut
 
 op find_lex(out PMC, in STR) {
-  PMC *lex_pad = CONTEXT(interpreter->ctx)->lex_pad;
+  parrot_context_t *ctx = CONTEXT(interpreter->ctx);
+  PMC *lex_pad = ctx->lex_pad;
   if (!PMC_IS_NULL(lex_pad)) {
     /* use new code */
     STRING *lex_name = $2;
     PMC *result;
-    result = VTABLE_get_pmc_keyed_str(interpreter, lex_pad, lex_name);
+    lex_pad = Parrot_find_pad(interpreter, lex_name, ctx);
+    if (lex_pad)
+      result = VTABLE_get_pmc_keyed_str(interpreter, lex_pad, lex_name);
     if (!result) {
-      lex_pad = Parrot_find_pad(interpreter, lex_name);
-      if (lex_pad)
-        result = VTABLE_get_pmc_keyed_str(interpreter, lex_pad, lex_name);
-      if (!result) {
-        real_exception(interpreter, NULL, LEX_NOT_FOUND,
+      real_exception(interpreter, NULL, LEX_NOT_FOUND,
 	  "Lexical '%Ss' not found", lex_name);
-      }
     }
     $1 = result;
   }
