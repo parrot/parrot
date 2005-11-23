@@ -1,6 +1,12 @@
-#! perl -w
-# Copyright: 2005 The Perl Foundation.  All Rights Reserved.
-# $Id: opcode-doc.t 6741 2004-10-01 21:16:56Z jrieks $
+#! perl
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+use strict;
+use warnings;
+use lib qw( . lib ../lib ../../lib );
+use Test::More tests => 1;
+
 
 =head1 NAME
 
@@ -8,7 +14,7 @@ t/perl/opcode-doc.t - check opcode documentation
 
 =head1 SYNOPSIS
 
-        % perl t/perl/opcode-doc.t
+	% prove t/perl/opcode-doc.t
 
 =head1 DESCRIPTION
 
@@ -16,8 +22,7 @@ Checks whether all opcodes are documented.
 
 =cut
 
-use strict;
-use Test::More tests => 1;
+
 my @docerr;
 
 sub slurp {

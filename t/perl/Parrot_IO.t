@@ -1,4 +1,13 @@
-#! perl -w
+#! perl
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+use strict;
+use warnings;
+use lib qw( . lib ../lib ../../lib );
+use Test::More 'tests' => 55;
+use File::Spec::Functions qw(:ALL);
+
 
 =head1 NAME
 
@@ -6,7 +15,7 @@ t/perl/Parrot_IO.t - Parrot::IO unit tests
 
 =head1 SYNOPSIS
 
-	% perl t/perl/Parrot_IO.t
+	% prove t/perl/Parrot_IO.t
 
 =head1 DESCRIPTION
 
@@ -23,10 +32,7 @@ to ensure nothing is broken.
 
 =cut
 
-use lib 'lib';
-use Test::More 'tests' => 55;
-use File::Spec::Functions qw(:ALL);
-    
+
 # Path is really only an abstract superclass but there's a few things we
 # can do with it.
 BEGIN { use_ok('Parrot::IO::Path') };
@@ -58,7 +64,7 @@ ok($oldp ne $p, 'delete from cache');
 
 ok($p->parent_path eq tmp_dir_path(), 'parent_path');
 
-$r = Parrot::IO::Path->new(rootdir);
+my $r = Parrot::IO::Path->new(rootdir);
 ok(!$r->parent_path, 'root has no parent_path');
 
 teardown();

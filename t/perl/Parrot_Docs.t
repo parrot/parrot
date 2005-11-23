@@ -1,4 +1,13 @@
-#! perl -w
+#! perl
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+use strict;
+use warnings;
+use lib qw( . lib ../lib ../../lib );
+use Test::More 'tests' => 25;
+use File::Spec::Functions qw(:ALL);
+
 
 =head1 NAME
 
@@ -6,7 +15,7 @@ t/perl/Parrot_Docs.t - Parrot::Docs unit tests
 
 =head1 SYNOPSIS
 
-    % perl t/perl/Parrot_Docs.t
+	% prove t/perl/Parrot_Docs.t
 
 =head1 DESCRIPTION
 
@@ -18,9 +27,6 @@ to ensure nothing is broken.
 
 =cut
 
-use lib 'lib';
-use Test::More 'tests' => 25;
-use File::Spec::Functions qw(:ALL);
 
 BEGIN { use_ok("Parrot::Docs::POD2HTML") }
 
@@ -90,7 +96,7 @@ my $g = Parrot::Docs::Group->new('Usual suspects', '',
 ok($g, 'new group');
 ok($g->name eq 'Usual suspects', 'name');
 
-$s = Parrot::Docs::Section->new('Usual Suspects', 'index.html',
+my $s = Parrot::Docs::Section->new('Usual Suspects', 'index.html',
         'here they are...',
         Parrot::Docs::Item->new('our old friend', 'foo'),
         Parrot::Docs::Group->new('Bar', 'no jeans',
@@ -106,7 +112,7 @@ $f = $tgt->file_with_name('index.html');
 
 ok($f, 'index.html');
 
-$html = $f->read;
+my $html = $f->read;
 
 ok($html =~ m|Usual Suspects|s &&
 $html =~ m|here they are|s &&
