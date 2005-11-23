@@ -137,7 +137,7 @@ Parrot_register_HLL_type(Interp *interpreter, INTVAL hll_id,
     n = VTABLE_elements(interpreter, hll_info);
     if (hll_id >= n) {
         real_exception(interpreter, NULL, E_ValueError,
-                "no such HLL id (%Vd)", hll_id);
+                "no such HLL id (%vd)", hll_id);
     }
     entry = VTABLE_get_pmc_keyed_int(interpreter, hll_info, hll_id);
     assert(!PMC_IS_NULL(entry));
@@ -157,7 +157,7 @@ Parrot_get_HLL_type(Interp *interpreter, INTVAL hll_id, INTVAL core_type)
 
     if (hll_id < 0) {
         real_exception(interpreter, NULL, E_ValueError,
-                "no such HLL id (%Vd)", hll_id);
+                "no such HLL id (%vd)", hll_id);
     }
     if (hll_id == 0)
         return core_type;
@@ -165,7 +165,7 @@ Parrot_get_HLL_type(Interp *interpreter, INTVAL hll_id, INTVAL core_type)
     n = VTABLE_elements(interpreter, hll_info);
     if (hll_id >= n) {
         real_exception(interpreter, NULL, E_ValueError,
-                "no such HLL id (%Vd)", hll_id);
+                "no such HLL id (%vd)", hll_id);
     }
     entry = VTABLE_get_pmc_keyed_int(interpreter, hll_info, hll_id);
     type_hash = VTABLE_get_pmc_keyed_int(interpreter, entry, 2);
