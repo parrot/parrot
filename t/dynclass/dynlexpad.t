@@ -63,9 +63,7 @@ pir_output_is($loadlib . << 'CODE', << 'OUTPUT', "store_lex");
 .sub foo :lex
     $P1 = new .Integer
     $P1 = 13013
-    # XXX hack ahead - use different opcode to create lex (as with pads)
-    #     the pad depth is ignored
-    store_lex 0, 'a', $P1
+    store_lex 'a', $P1
     print "ok 1\n"
     $P2 = find_lex 'a'
     print "ok 2\n"
@@ -86,7 +84,7 @@ pir_output_is($loadlib . << 'CODE', << 'OUTPUT', "check :outer");
 .sub foo :lex
     $P1 = new .Integer
     $P1 = 13013
-    store_lex 0, 'a', $P1
+    store_lex 'a', $P1
     $P2 = find_lex 'a'
     print $P2
     print "\n"
@@ -116,7 +114,7 @@ pir_output_is($loadlib . << 'CODE', << 'OUTPUT', "tcl-ish upvar");
 .sub foo :lex
     $P1 = new .Integer
     $P1 = 13013
-    store_lex 0, 'a', $P1
+    store_lex 'a', $P1
     $P2 = find_lex 'a'
     print $P2
     print "\n"
@@ -166,7 +164,7 @@ pir_output_like($loadlib . << 'CODE', << 'OUTPUT', "check that dynlexpad honors 
 .sub foo :lex
     $P1 = new .Integer
     $P1 = 13013
-    store_lex 0, 'a', $P1
+    store_lex 'a', $P1
     $P2 = find_lex 'a'
     print $P2
     print "\n"
