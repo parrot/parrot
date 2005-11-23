@@ -418,22 +418,21 @@ PMC*
 Parrot_find_pad(Interp* interpreter, STRING *lex_name)
 {
     PMC *lex_pad;
-    parrot_context_t *ctx;
+    parrot_context_t *ctx, *outer;
     PMC *result;
-    struct Parrot_sub  *sub;
 
     ctx = CONTEXT(interpreter->ctx);
-    lex_pad = ctx->lex_pad;
     while (1) {
-        if (PMC_IS_NULL(lex_pad))
-            return NULL;
-        result = VTABLE_get_pmc_keyed_str(interpreter, lex_pad, lex_name);
-        if (result)
-            return lex_pad;
-        ctx = ctx->outer_ctx;
-        if (!ctx)
-            return NULL;
         lex_pad = ctx->lex_pad;
+        outer = ctx->outer_ctx;
+        if (!outer)
+            return lex_pad;
+        if (!PMC_IS_NULL(lex_pad)) {
+            result = VTABLE_get_pmc_keyed_str(interpreter, lex_pad, lex_name);
+            if (result)
+                return lex_pad;
+        }
+        ctx = outer;
     }
     return NULL;
 }
