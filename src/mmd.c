@@ -1830,9 +1830,12 @@ mmd_search_scopes(Interp *interpreter, STRING *meth, PMC *arg_tuple)
     int stop;
 
     candidate_list = pmc_new(interpreter, enum_class_ResizablePMCArray);
+    /*
+     * XXX disabled during LexPad / ScratchPad transisition
     stop = mmd_search_lexical(interpreter, meth, arg_tuple, candidate_list);
     if (stop)
         return candidate_list;
+     */
     mmd_search_package(interpreter, meth, arg_tuple, candidate_list);
     if (stop)
         return candidate_list;
