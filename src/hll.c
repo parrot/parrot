@@ -95,12 +95,12 @@ Parrot_register_HLL(Interp *interpreter,
     hll_lib = string_as_const_string(interpreter, hll_lib);
     VTABLE_set_string_native(interpreter, name, hll_lib);
     VTABLE_set_pmc_keyed_int(interpreter, entry, 1, name);
+    type_hash = Parrot_new_INTVAL_hash(interpreter, PObj_constant_FLAG);
+    VTABLE_set_pmc_keyed_int(interpreter, entry, 2, type_hash);
     if (string_length(interpreter, hll_lib)) {
         /* load lib */
         Parrot_load_lib(interpreter, hll_lib, NULL);
     }
-    type_hash = Parrot_new_INTVAL_hash(interpreter, PObj_constant_FLAG);
-    VTABLE_set_pmc_keyed_int(interpreter, entry, 2, type_hash);
 
     /* UNLOCK */
     return idx;
