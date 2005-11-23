@@ -22,6 +22,11 @@ These tests are ripped from the Perl 5.9.2 distribution. The test harness
 has been modified to feed them to PGE's P5Regexp compiler. The tests are
 in a separate file in the same directory, named 're_tests'.
 
+This test harness honors a special environment variable called C<TEST_P5RX>.
+If set to a number, that test will be run alone and unconditionally--even
+if it's designated as SKIP or TODO by the harness. This is quite helpful
+in debugging tests that cause parrot to spiral out of control.
+
 B<NOTE:> Don't add new tests here. This file is strictly for Perl 5's tests.
 
 B<NOTE:> Only the first 130 tests are run, as the test framework is still
@@ -71,11 +76,20 @@ seek(TESTS,0,0);
 $. = 0;
 
 
+## if a test is specified in this environment variable, run it
+## as a single test, even if it's designated as SKIP or TODO by the harness
+my $run_unconditional = ( 
+	defined $ENV{TEST_P5RX} and $ENV{TEST_P5RX} =~ /\d+/
+		? $ENV{TEST_P5RX}
+		: ''
+	);
+
+
 ## cut out after this many tests
+## still not ready to run *all* tests
 my $cutoff = 800;
 
-#plan tests => $numtests;
-plan tests => $cutoff;     ## still not ready to run *all* tests
+plan tests => ( $run_unconditional ? 1 : $cutoff );
 
 
 ## todo these failing tests to prevent noise
@@ -100,6 +114,7 @@ my @skip_tests = qw/ 502 597 /;
 while (<TESTS>)
 {
 	my $test_num = $.;
+	next if $test_num < $run_unconditional;
 	last if $test_num > $cutoff;
 
 	chomp;
@@ -125,14 +140,17 @@ while (<TESTS>)
 	$result   =~ s/b//i
 		unless $skip;
 
-	push @todo, todo => 'various reasons'
-		if grep { /^$test_num$/ } @todo_tests;
+	unless( $run_unconditional )
+	{
+		push @todo, todo => 'various reasons'
+			if grep { /^$test_num$/ } @todo_tests;
+	}
 
 
 	## create the test from the template
 	my $pir_code = p5rx_template();
 
-	my $results = generate_pir_for_results( $repl );
+	my $results  = generate_pir_for_results( $repl );
 
 	$pir_code    =~ s/<<SUBJECT>>/$subject/g;
 	$pir_code    =~ s/<<PATTERN>>/$pattern/g;
@@ -144,10 +162,16 @@ while (<TESTS>)
 	## run the test, but skip it if i'm told to
 	SKIP:
 	{
-		skip 'bugs | errors | trailing modifiers' => 1
-			if $skip;
-		pir_output_is( $pir_code, $expect, $reason, @todo );
+		unless( $run_unconditional )
+		{
+			skip 'bugs | errors | trailing modifiers' => 1
+				if $skip;
+			pir_output_is( $pir_code, $expect, $reason, @todo );
+		}
 	}
+
+	$run_unconditional
+		and pir_output_is( $pir_code, $expect, $reason, @todo ), last;
 }
 
 close(TESTS);
