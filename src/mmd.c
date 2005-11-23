@@ -1836,10 +1836,10 @@ mmd_search_scopes(Interp *interpreter, STRING *meth, PMC *arg_tuple)
     if (stop)
         return candidate_list;
      */
-    mmd_search_package(interpreter, meth, arg_tuple, candidate_list);
+    stop = mmd_search_package(interpreter, meth, arg_tuple, candidate_list);
     if (stop)
         return candidate_list;
-    mmd_search_global(interpreter, meth, arg_tuple, candidate_list);
+    stop = mmd_search_global(interpreter, meth, arg_tuple, candidate_list);
     if (stop)
         return candidate_list;
     mmd_search_builtin(interpreter, meth, arg_tuple, candidate_list);
