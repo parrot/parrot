@@ -17,7 +17,7 @@ C<Continuation> PMCs.
 
 =cut
 
-use Parrot::Test tests => 42;
+use Parrot::Test tests => 43;
 use Test::More;
 use Parrot::Config;
 
@@ -887,7 +887,7 @@ main
 OUTPUT
 
 
-pir_output_is(<<'CODE', <<'OUTPUT', "caller introspection");
+pir_output_is(<<'CODE', <<'OUTPUT', "caller introspection via interp");
 .sub main :main
 .include "interpinfo.pasm"
     # this test will fail when run with -Oc
@@ -927,6 +927,61 @@ tb_loop:
     inc $I0
     goto tb_loop
 tb_end:
+.end
+CODE
+main foo
+Bar bar
+subname: Bar :: bar
+Bar foo
+caller 0 Bar :: foo
+caller 1 Bar :: bar
+caller 2 foo
+caller 3 main
+Bar foo
+caller 0 Bar :: foo
+caller 1 main
+ok
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "caller introspection via get_caller");
+.sub main :main
+.include "interpinfo.pasm"
+    # this test will fail when run with -Oc
+    # as the call chain is cut down with tail calls
+    foo()
+    $P0 = find_global "Bar", "foo"
+    $P0()
+    print "ok\n"
+.end
+.sub foo
+    print "main foo\n"
+    $P0 = find_global "Bar", "bar"
+    $P0()
+.end
+.namespace ["Bar"]
+.sub bar
+    print "Bar bar\n"
+    .local pmc sub
+    sub = interpinfo .INTERPINFO_CURRENT_SUB
+    print "subname: "
+    print sub
+    print "\n"
+    foo()
+.end
+.sub foo
+    print "Bar foo\n"
+    .local pmc sub
+    sub = interpinfo .INTERPINFO_CURRENT_SUB
+    $I0 = 0
+tb_loop:
+    print "caller "
+    print $I0
+    print " "
+    print sub
+    print "\n"
+    inc $I0
+    sub = sub."get_caller"()
+    unless null sub goto tb_loop
 .end
 CODE
 main foo

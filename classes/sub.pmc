@@ -675,6 +675,14 @@ Return the LexPad PMC, if any or a Null PMC.
         return sub->outer_sub ? sub->outer_sub : PMCNULL;
     }
 
+    METHOD PMC* get_caller() {
+        struct Parrot_sub * sub = PMC_sub(SELF);
+        PMC* cont, *sub_pmc;
+        cont = sub->ctx->current_cont;
+        sub_pmc = PMC_cont(cont)->to_ctx->current_sub;
+        return sub_pmc ? sub_pmc : PMCNULL;
+    }
+
 }
 
 /*
