@@ -68,9 +68,10 @@ pmclass Amber_STRING extends String extends Amber_DEFAULT does string dynpmc gro
 
     METHOD PMC* item(PMC* index) {
         /* XXX reject out-of-range values (0, or > count, or < -count) */
+        PMC* result;
         INTVAL adjusted_index = VTABLE_get_integer(INTERP, index);
         if (adjusted_index > 0) adjusted_index = adjusted_index - 1;
-        PMC* result = pmc_new(INTERP, class_CHARACTER);
+        result = pmc_new(INTERP, class_CHARACTER);
         VTABLE_set_integer_native(INTERP, result, string_ord(
             INTERP, PMC_str_val(SELF), adjusted_index
         ));

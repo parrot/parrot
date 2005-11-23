@@ -45,9 +45,9 @@ pmclass Amber_PATHNAME extends Amber_STRING extends Amber_DEFAULT does string dy
         /* --WINDOWS */
         STRING* pathname = VTABLE_get_string(INTERP, SELF);
         int pathlength = string_length(INTERP, pathname);
-        int start, end;
+        int start, end, index;
         start = 0;
-        int index = 0;
+        index = 0;
         while (start < pathlength) {
             end = string_str_index(INTERP, pathname, delimiter, start);
             if (end < start) /* no more delimiters */
@@ -91,8 +91,9 @@ pmclass Amber_PATHNAME extends Amber_STRING extends Amber_DEFAULT does string dy
         dp = opendir(string_to_cstring(INTERP, PMC_str_val(SELF)));
         if (dp != NULL) {
             while ((ep = readdir(dp))) {
+                PMC* item;
                 VTABLE_set_integer_native(INTERP, result, index + 1);
-                PMC* item = pmc_new(
+                item = pmc_new(
                     INTERP, Parrot_get_ctx_HLL_type(INTERP, enum_class_String)
                 );
                 VTABLE_set_string_native(
@@ -122,8 +123,9 @@ pmclass Amber_PATHNAME extends Amber_STRING extends Amber_DEFAULT does string dy
         if (dp != NULL) {
             while ((ep = readdir(dp))) {
                 if (ep->d_type == DT_REG) {
+                    PMC* item;
                     VTABLE_set_integer_native(INTERP, result, index + 1);
-                    PMC* item = pmc_new(
+                    item = pmc_new(
                         INTERP, Parrot_get_ctx_HLL_type(INTERP, enum_class_String)
                     );
                     VTABLE_set_string_native(
@@ -154,11 +156,12 @@ pmclass Amber_PATHNAME extends Amber_STRING extends Amber_DEFAULT does string dy
         if (dp != NULL) {
             while ((ep = readdir(dp))) {
                 if (ep->d_type == DT_REG) {
+                    PMC* item;
                     VTABLE_set_integer_native(INTERP, result, index + 1);
                     /* PMC* item = pmc_new(
                         INTERP, Parrot_get_ctx_HLL_type(INTERP, enum_class_String)
                     ); */
-                    PMC* item = pmc_new(INTERP, class_PATHNAME);
+                    item = pmc_new(INTERP, class_PATHNAME);
                     VTABLE_set_string_native(INTERP, item,
                         string_concat(INTERP,
                             VTABLE_get_string(INTERP, SELF),
@@ -212,18 +215,19 @@ pmclass Amber_PATHNAME extends Amber_STRING extends Amber_DEFAULT does string dy
     METHOD PMC* subdirectory_names() {
         DIR *dp;
         struct dirent *ep;
+        int index = 0;
         PMC* result = pmc_new(
             INTERP, Parrot_get_ctx_HLL_type(INTERP, enum_class_Array)
         );
-        int index = 0;
         dp = opendir(string_to_cstring(INTERP, PMC_str_val(SELF)));
         if (dp != NULL) {
             while ((ep = readdir(dp))) {
                 if (ep->d_type == DT_DIR) {
                     char *dirname = ep->d_name;
                     if (strcmp(dirname, ".") && strcmp(dirname, "..")) {
+                        PMC* item;
                         VTABLE_set_integer_native(INTERP, result, index + 1);
-                        PMC* item = pmc_new(
+                        item = pmc_new(
                             INTERP, Parrot_get_ctx_HLL_type(INTERP, enum_class_String)
                         );
                         VTABLE_set_string_native(
@@ -257,8 +261,9 @@ pmclass Amber_PATHNAME extends Amber_STRING extends Amber_DEFAULT does string dy
                 if (ep->d_type == DT_DIR) {
                     char *dirname = ep->d_name;
                     if (strcmp(dirname, ".") && strcmp(dirname, "..")) {
+                        PMC* item;
                         VTABLE_set_integer_native(INTERP, result, index + 1);
-                        PMC* item = pmc_new(INTERP, class_PATHNAME);
+                        item = pmc_new(INTERP, class_PATHNAME);
                         VTABLE_set_string_native(INTERP, item,
                             string_concat(INTERP,
                                 VTABLE_get_string(INTERP, SELF),
