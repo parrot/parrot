@@ -2,8 +2,8 @@
 # Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
-##use strict;
-##use warnings;
+use strict;
+use warnings;
 use lib qw( t . lib ../../../../lib );
 use Test::More;
 use Parrot::Test;
@@ -64,9 +64,6 @@ in this format, don't add it here: put it in op/pat.t instead.
 =cut
 
 
-# Poor man performance suite, 10000 is OK.
-my $iters = shift || 1;
-
 open(TESTS, catfile($PConfig{build_dir}, 't/compilers/pge/p5regexp/re_tests'))
     or die "Can\'t open re_tests";
 
@@ -76,10 +73,6 @@ my $numtests = $.;
 seek(TESTS,0,0);
 $. = 0;
 
-my $bang = sprintf "\\%03o", ord "!"; # \41 would not be portable.
-my $ffff  = chr(0xff) x 2;
-my $nulnul = "\0" x 2;
-##my $OP = my $qr ? 'qr' : 'm';
 
 ## cut out after this many tests
 my $cutoff = 130;
@@ -90,115 +83,103 @@ plan tests => $cutoff;
 
 TEST:
 while (<TESTS>) {
-    last if $. > $cutoff;
+	last if $. > $cutoff;
 
-    chomp;
-    s/\\n/\n/g;
-    s/\r//g;
-    my ($pat, $subject, $result, $repl, $expect, $reason) = split(/\t/,$_,6);
-    my @todo;
-    my $input = join(':',$pat,$subject,$result,$repl,$expect);
-    infty_subst(\$pat);
-    infty_subst(\$expect);
-    $pat = "'$pat'" unless $pat =~ /^[:']/;
-    $pat =~ s/(\$\{\w+\})/$1/eeg;
-    $pat =~ s/\\n/\n/g;
-    $subject =~ s/(\$\{\w+\})/$1/eeg;
-    $subject =~ s/\\n/\n/g;
-    $expect =~ s/(\$\{\w+\})/$1/eeg;
-    $expect =~ s/\\n/\n/g;
-    $expect = $repl = '-' if $skip_amp and $input =~ /\$[&\`\']/;
-    $skip = ($skip_amp ? ($result =~ s/B//i) : ($result =~ s/B//));
-    $reason = 'skipping $&' if $skip_amp && $reason eq  '';
-    $result =~ s/B//i unless $skip;
-    my $c = $iters;
+	chomp;
+	s/\\n/\n/g;
+	s/\r//g;
+	my ($pattern, $subject, $result, $repl, $expect, $reason) =
+		split /\t/ => $_, 6;
+	my @todo;
 
-    print "not ok $.", next TEST if $skip;
-    push @todo, todo => 'errors not implemented' if 'c' eq $result;
+	my $input =  join ':' => $pattern, $subject, $result, $repl, $expect;
 
-    my $template = <<P5RX;
-.sub 'PGE_Test' :main
-    .local pmc p5rx_compile
-    load_bytecode "PGE.pbc"
-    load_bytecode "PGE/Dumper.pir"
-    load_bytecode "PGE/Text.pir"
-    p5rx_compile = compreg "PGE::P5Regexp"
+	$pattern  =  qq{'$pattern'}
+		unless $pattern =~ /^[:']/;
+	$pattern  =~ s/(\$\{\w+\})/$1/eeg;
+	$pattern  =~ s/\\n/\n/g;
 
-    .local string target
-    .local string pattern
-    .local pmc rulesub
-    .local pmc match
-    .local pmc code
-    .local pmc exp
-    target = "$subject"
-    pattern = $pat
-#    target = "$subject"  pattern=$pat  expect='$expect'
-    (rulesub, code, exp) = p5rx_compile(pattern)
-    match = rulesub(target)
-    unless match goto Match_fail
-Match_success:
-    eq '\$-[0]', '$repl', Match_from
-    eq '\$+[0]', '$repl', Match_to
-    eq '\$\&', '$repl', Match_whole
-    eq '-', '$repl', Match_no_check
-Match_whole:
-    \$S0 = match
-    print \$S0
-    goto Match_end
-Match_from:
-    \$I0 = match.'from'()
-    print \$I0
-    goto Match_end
-Match_to:
-    \$I0 = match.'to'()
-    print \$I0
-    goto Match_end
-Match_no_check:
-Match_fail:
-    print "-"
-Match_end:
-.end
-P5RX
+	$subject  =~ s/(\$\{\w+\})/$1/eeg;
+	$subject  =~ s/\\n/\n/g;
 
-    pir_output_is( $template, $expect, $reason, @todo );
+	$expect   =~ s/(\$\{\w+\})/$1/eeg;
+	$expect   =~ s/\\n/\n/g;
+#	$expect   = $repl = '-'
+#		if undef and $input =~ /\$[&\`\']/;
 
-if(0){
+	my $skip  =  $result =~ s/B//;
 
-    chomp( $err = $@ );
-    if ($result eq 'c') {
-##        if ($err !~ m!^\Q$expect!) { print "not ok $. (compile) $input => `$err'\n"; next TEST }
-        last;
-    }
-    elsif ( $skip ) {
-##        print "ok $. # skipped", length($reason) ? " $reason" : '', "\n";
-        next TEST;
-    }
-    elsif ($@) {
-##        print "not ok $. $input => error `$err'\n"; next TEST;
-    }
-    elsif ($result eq 'n') {
-##        if ($match) { print "not ok $. $input => false positive\n"; next TEST }
-    }
-    else {
-        if (!$match || $got ne $expect) {
-##            print "not ok $. $input => `$got', match=$match\n";
-            next TEST;
-        }
-    }
-##    print "ok $.\n";
+	$result   =~ s/B//i
+		unless $skip;
 
-}
+	print "ok $.", next TEST if $skip;
 
+	push @todo, todo => 'errors not implemented'
+		if 'c' eq $result;
+
+	## create the test from the template
+	my $pir_code = p5rx_template();
+	$pir_code    =~ s/<<SUBJECT>>/$subject/g;
+	$pir_code    =~ s/<<PATTERN>>/$pattern/g;
+	$pir_code    =~ s/<<EXPECT>>/$expect/g;
+	$pir_code    =~ s/<<REPL>>/$repl/g;
+
+
+	## run the test
+	pir_output_is( $pir_code, $expect, $reason, @todo );
 }
 
 close(TESTS);
 
-sub infty_subst                             # Special-case substitution
-{                                           #  of $reg_infty and friends
-    my $tp = shift;
-    if( defined $reg_infty ) {
-        $$tp =~ s/,\$reg_infty_m}/,$reg_infty_m}/o;
-        $$tp =~ s/,\$reg_infty_p}/,$reg_infty_p}/o;
-        $$tp =~ s/,\$reg_infty}/,$reg_infty}/o;
-    }
+
+
+exit;
+
+
+
+sub p5rx_template
+{
+	return <<'P5RX';
+.sub 'PGE_Test' :main
+	.local pmc p5rx_compile
+	load_bytecode "PGE.pbc"
+	load_bytecode "PGE/Dumper.pir"
+	load_bytecode "PGE/Text.pir"
+	p5rx_compile = compreg "PGE::P5Regexp"
+
+	.local string target
+	.local string pattern
+	.local pmc rulesub
+	.local pmc match
+	.local pmc code
+	.local pmc exp
+	target = "<<SUBJECT>>"
+	pattern = <<PATTERN>>
+#	target = "<<SUBJECT>>"  pattern=<<PATTERN>>  expect='<<EXPECT>>'
+	(rulesub, code, exp) = p5rx_compile(pattern)
+	match = rulesub(target)
+	unless match goto Match_fail
+  Match_success:
+	eq '$-[0]', '<<REPL>>', Match_from
+	eq '$+[0]', '<<REPL>>', Match_to
+	eq '$&', '<<REPL>>', Match_whole
+	eq '-', '<<REPL>>', Match_no_check
+  Match_whole:
+	$S0 = match
+	print $S0
+	goto Match_end
+  Match_from:
+	$I0 = match.'from'()
+	print $I0
+	goto Match_end
+  Match_to:
+	$I0 = match.'to'()
+	print $I0
+	goto Match_end
+  Match_no_check:
+  Match_fail:
+	print "-"
+  Match_end:
+.end
+P5RX
 }
