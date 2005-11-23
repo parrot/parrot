@@ -1,6 +1,13 @@
-#! perl -w
-# Copyright: 2005 The Perl Foundation.  All Rights Reserved.
+#! perl
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
+
+use strict;
+use warnings;
+use lib qw( . lib ../lib ../../lib );
+use Test::More;
+use Parrot::Test tests => 1;
+
 
 =head1 NAME
 
@@ -8,7 +15,7 @@ t/src/compiler.t - Compile and run a PIR program from C.
 
 =head1 SYNOPSIS
 
-	% perl -Ilib t/src/compiler.t
+	% prove t/src/compiler.t
 
 =head1 DESCRIPTION
 
@@ -17,7 +24,6 @@ gathered in some API calls..
 
 =cut
 
-use Parrot::Test tests => 1;
 
 c_output_is(<<'CODE', <<'OUTPUT', "compreg/compile");
 

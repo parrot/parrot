@@ -1,9 +1,13 @@
-#! perl -w
-
-# Copyright: 2001-2004 The Perl Foundation.  All Rights Reserved.
+#! perl
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
-# Tests the hash.h API without reference to PMCs.
+use strict;
+use warnings;
+use lib qw( . lib ../lib ../../lib );
+use Test::More;
+use Parrot::Test tests => 11;
+
 
 =head1 NAME
 
@@ -11,15 +15,14 @@ t/src/hash.t - Hashes
 
 =head1 SYNOPSIS
 
-	% perl -Ilib t/src/hash.t
+	% prove t/src/hash.t
 
 =head1 DESCRIPTION
 
-Tests the Hash functions.
+Tests the hash.h API without reference to PMCs.
 
 =cut
 
-use Parrot::Test tests => 11;
 
 my $main = <<'CODE';
 #include <parrot/parrot.h>

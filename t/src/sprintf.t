@@ -1,7 +1,13 @@
-#! perl -w
-
-# Copyright: 2001-2004 The Perl Foundation.  All Rights Reserved.
+#! perl
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
+
+use strict;
+use warnings;
+use lib qw( . lib ../lib ../../lib );
+use Test::More;
+use Parrot::Test tests => 3;
+
 
 =head1 NAME
 
@@ -9,7 +15,7 @@ t/src/sprintf.t - Name
 
 =head1 SYNOPSIS
 
-	% perl -Ilib t/src/sprintf.t
+	% prove t/src/sprintf.t
 
 =head1 DESCRIPTION
 
@@ -17,7 +23,6 @@ Tests the various C<Parrot_sprintf_*> functions.
 
 =cut
 
-use Parrot::Test tests => 3;
 
 c_output_like(<<'CODE', <<'OUTPUT', "xxxVAL_FMT");
 #include "parrot/parrot.h"

@@ -1,7 +1,14 @@
-#! perl -w
-# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+#! perl
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
-# Tests the extension API
+
+use strict;
+use warnings;
+use lib qw( . lib ../lib ../../lib );
+use Test::More;
+use Parrot::Test tests => 13;
+use Parrot::Config;
+
 
 =head1 NAME
 
@@ -9,7 +16,7 @@ t/src/extend.t - Parrot Extension API
 
 =head1 SYNOPSIS
 
-	% perl -Ilib t/src/extend.t
+	% prove t/src/extend.t
 
 =head1 DESCRIPTION
 
@@ -17,8 +24,6 @@ Tests the extension API.
 
 =cut
 
-use Parrot::Test tests => 13;
-use Parrot::Config;
 
 c_output_is(<<'CODE', <<'OUTPUT', "set/get_intreg");
 
