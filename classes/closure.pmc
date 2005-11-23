@@ -60,8 +60,8 @@ Marks the closure as live.
         SUPER();
         if (sub->pad_stack)
             mark_stack(INTERP, sub->pad_stack);
-        if (sub->outer_ctx)
-            mark_context(INTERP, sub->outer_ctx);
+        if (sub->outer_sub)
+            pobject_lives(INTERP, (PObj*)sub->outer_sub);
     }
 
 
@@ -78,7 +78,14 @@ Invokes the closure.
     void* invoke (void* next) {
         struct Parrot_sub * sub = PMC_sub(SELF);
         CONTEXT(INTERP->ctx)->pad_stack = sub->pad_stack;
-        return SUPER(next);
+        next = SUPER(next);
+        if (sub->outer_ctx) {
+            /* during newclosure, outer's ctx was stored in
+             * sub->outer_ctx
+             */
+            sub->ctx->outer_ctx = sub->outer_ctx;
+        }
+        return next;
     }
 
 /*

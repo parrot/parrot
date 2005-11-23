@@ -65,10 +65,10 @@ typedef struct Parrot_sub {
     PMC      *lex_info;         /* LexInfo PMC */
     PMC      *outer_sub;        /* :outer for closures */
     PMC      *eval_pmc;         /* eval container / NULL */
-    parrot_context_t *outer_ctx;       /* new style */
+    parrot_context_t *ctx;      /* the context this sub is in */
 
     /* - end common */
-
+    struct Parrot_Context *outer_ctx;   /* outer context, if a closure */
     struct Stack_Chunk *pad_stack;      /* only for closure */
 } * parrot_sub_t;
 

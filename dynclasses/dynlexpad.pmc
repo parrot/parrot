@@ -105,9 +105,20 @@ Marks the lexpad hash as live.
         return b->value;
     }
 
+    PMC* get_pmc_keyed(PMC* name) {
+        STRING *s = key_string(INTERP, name);
+        return SELF.get_pmc_keyed_str(s);
+    }
+
     void set_pmc_keyed_str (STRING* key, PMC* value) {
         hash_put(INTERP, PMC_struct_val(SELF), key, value);
     }
+
+    void set_pmc_keyed(PMC* name, PMC* value) {
+        STRING *s = key_string(INTERP, name);
+        SELF.set_pmc_keyed_str(s, value);
+    }
+
 }
 
 

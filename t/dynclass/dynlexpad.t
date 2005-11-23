@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 4;
+use Parrot::Test tests => 5;
 use Parrot::Config;
 
 
@@ -107,6 +107,56 @@ pir_output_is($loadlib . << 'CODE', << 'OUTPUT', "check :outer");
 CODE
 13013
 13013
+OUTPUT
+
+pir_output_is($loadlib . << 'CODE', << 'OUTPUT', "tcl-ish upvar");
+.sub 'test' :main
+    foo()
+.end
+.sub foo :lex
+    $P1 = new .Integer
+    $P1 = 13013
+    store_lex 0, 'a', $P1
+    $P2 = find_lex 'a'
+    print $P2
+    print "\n"
+    .const .Sub bar_sub = "bar"
+    $P0 = newclosure bar_sub
+    $P0()
+    # check the upvar
+    $P2 = find_lex 'b'
+    print $P2
+    print "\n"
+.end
+.sub bar :outer(foo)
+    .const .Sub baz_sub = "baz"
+    $P0 = newclosure baz_sub
+    $P0()
+.end
+.sub baz :lex :outer(bar)
+    $P1 = find_lex 'a'
+    print $P1
+    print "\n"
+    # upvar 2 'b', 55
+    .local pmc sub, pad
+    .include 'interpinfo.pasm'
+    sub = interpinfo .INTERPINFO_CURRENT_SUB
+    sub = sub."get_outer"()
+    unless sub goto err
+    sub = sub."get_outer"()
+    unless sub goto err
+    pad = sub."get_lexpad"()
+    $P2 = new .Integer
+    $P2 = 55
+    pad['b'] = $P2
+    .return()
+err:
+    print "outer not found\n"
+.end
+CODE
+13013
+13013
+55
 OUTPUT
 
 pir_output_like($loadlib . << 'CODE', << 'OUTPUT', "check that dynlexpad honors hll", todo =>'fubared still');

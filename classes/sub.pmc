@@ -333,6 +333,11 @@ create_ctx:
              */
             context->current_cont = ccont;
         }
+        PMC_cont(ccont)->from_ctx = context;
+        /*
+         * set context of the sub
+         */
+        sub->ctx = context;
         context->current_sub = SELF;
         context->current_pc = pc;
         context->current_args = INTERP->current_args;
@@ -352,7 +357,6 @@ create_ctx:
                     PARROT_OP_get_params_pc);
         }
 
-        PMC_cont(ccont)->from_ctx = CONTEXT(INTERP->ctx);
         if (!PMC_IS_NULL(INTERP->current_object)) {
             context->current_object = INTERP->current_object;
             INTERP->current_object = NULL;
@@ -662,7 +666,8 @@ Return the LexPad PMC, if any or a Null PMC.
     }
 
     METHOD PMC* get_lexpad() {
-        return CONTEXT(INTERP->ctx)->lex_pad;
+        struct Parrot_sub * sub = PMC_sub(SELF);
+        return sub->ctx->lex_pad;
     }
 
     METHOD PMC* get_outer() {

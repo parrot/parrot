@@ -262,6 +262,7 @@ init_context(Interp *interpreter, parrot_context_t *ctx)
     ctx->current_results = NULL;
     ctx->current_args = NULL;
     ctx->malloced_mem = NULL;
+    ctx->outer_ctx = NULL;
     ctx->lex_pad = PMCNULL;
     clear_regs(interpreter, ctx);
 }

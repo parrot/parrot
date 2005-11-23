@@ -419,31 +419,21 @@ Parrot_find_pad(Interp* interpreter, STRING *lex_name)
 {
     PMC *lex_pad;
     parrot_context_t *ctx;
-    PMC *result, *sub_pmc;
+    PMC *result;
     struct Parrot_sub  *sub;
 
-    ctx = CONTEXT(interpreter->ctx);;
+    ctx = CONTEXT(interpreter->ctx);
     lex_pad = ctx->lex_pad;
-    if (PMC_IS_NULL(lex_pad))
-        return NULL;
-    sub_pmc = ctx->current_sub;
     while (1) {
+        if (PMC_IS_NULL(lex_pad))
+            return NULL;
         result = VTABLE_get_pmc_keyed_str(interpreter, lex_pad, lex_name);
         if (result)
             return lex_pad;
-        sub = PMC_sub(sub_pmc);
-        ctx = sub->outer_ctx;
+        ctx = ctx->outer_ctx;
         if (!ctx)
             return NULL;
         lex_pad = ctx->lex_pad;
-        if (PMC_IS_NULL(lex_pad))
-            return NULL;
-        /*
-         * can't use outer_sub - we need the dynamic context
-         * where registers are, not a possibly different static
-         * instance of the closure
-         */
-        sub_pmc = ctx->current_sub;
     }
     return NULL;
 }
