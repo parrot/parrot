@@ -164,7 +164,27 @@ prefix.
 
 Define the HLL for the current module. If the string C<hll_lib> isn't empty
 this B<compile time pragma> also loads the shared lib for the HLL, so that
-integer types are working for creatin new PMCs.
+integer type constants are working for creating new PMCs.
+
+=item .HLL_map .CoreTyp, .UserType
+
+Whenever Parrot has to create PMCs inside C code on behalf of the running user
+program it consults the current type mapping for the executing HLL and creates
+a PMC of type I<.UserType> instead of I<.CoreType>, if such a mapping is defined.
+
+E.g. with this code snippet ...
+
+  .sub _my_init :immediate
+    $P0 = loadlib 'dynlexpad'
+  .end
+
+  .HLL "Foo", ""
+  .HLL_map .LexPad, .DynLexPad
+
+  .sub main :main
+    ...
+
+... all subroutines for language I<Foo> would use a dynamic lexpad pmc.
 
 =item .sub <identifier>
 
