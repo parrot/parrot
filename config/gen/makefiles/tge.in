@@ -1,4 +1,4 @@
-# $Id: /offline/parrot/config/gen/makefiles/pge.in 555 2005-11-02T15:45:50.040165Z svm  $
+# $Id$
 
 # Setup some commands
 LN_S     = ${lns}

@@ -1,4 +1,4 @@
-# $Id: pge.in 8452 2005-06-25 22:30:34Z pmichaud $
+# $Id$
 
 # Setup some commands
 LN_S     = ${lns}
@@ -10,7 +10,7 @@ CP       = ${cp}
 # the default target
 all: punie.pbc
 
-punie.pbc: PunieGrammar.pir punie.pir
+punie.pbc: lib/PunieGrammar.pir punie.pir
 	$(PARROT) -o punie.pbc --output-pbc punie.pir 
 
 # This is a listing of all targets, that are meant to be called by users

@@ -26,7 +26,7 @@ single digit, in the form of:
 .sub _main :main
     .param pmc argv
 
-    load_bytecode "languages/punie/PunieGrammar.pir"
+    load_bytecode "languages/punie/lib/PunieGrammar.pir"
 
     .local string source
     source = _get_source(argv)
