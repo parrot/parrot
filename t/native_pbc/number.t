@@ -1,6 +1,15 @@
-#! perl -w
+#! perl
 # Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
+
+use strict;
+use warnings;
+use lib qw( . lib ../lib ../../lib );
+use Test::More;
+# use Parrot::Test tests => 1;
+use Parrot::Test;
+ plan  skip_all => 'Ongoing PBC format changes';
+
 
 =head1 NAME
 
@@ -8,13 +17,14 @@ t/native_pbc/number.t - Floating-Point Numbers
 
 =head1 SYNOPSIS
 
-	% perl t/native_pbc/number.t
+	% prove t/native_pbc/number.t
 
 =head1 DESCRIPTION
 
 Tests word-size/float-type/endian-ness for different architectures.
 
 =cut
+
 
 =begin comment
 
@@ -37,9 +47,6 @@ $ mv n.pbc t/native_pbc/number_$(N).pbc
 
 =cut
 
-# use Parrot::Test tests => 1;
-use Parrot::Test;
- plan  skip_all => 'Ongoing PBC format changes';
 
 my $output = << 'END_OUTPUT';
 1.000000

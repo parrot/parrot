@@ -1,10 +1,12 @@
-#! perl -w
-# Copyright: 2005 The Perl Foundation.  All Rights Reserved.
+#! perl
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 use strict;
-
+use warnings;
+use lib qw( . lib ../lib ../../lib );
 use vars qw( %docs $n_docs );
+
 
 BEGIN {
     eval "use Pod::Find";
@@ -20,7 +22,24 @@ BEGIN {
     $n_docs = scalar keys %docs;
 }
 
+
 use Test::More tests => $n_docs;
+
+
+=head1 NAME
+
+t/doc/pod.t - Pod Document tests
+
+=head1 SYNOPSIS
+
+	% prove t/doc/pod.t
+
+=head1 DESCRIPTION
+
+Tests Pod formatting for all files containing Pod.
+
+=cut
+
 
 eval "use Test::Pod 0.95";
 SKIP: {

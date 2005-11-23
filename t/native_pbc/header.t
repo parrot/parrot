@@ -1,6 +1,16 @@
-#! perl -w
+#! perl
 # Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
+
+use strict;
+use warnings;
+use lib qw( . lib ../lib ../../lib );
+use Test::More;
+use Parrot::Test tests => 8;
+
+use File::Temp;
+use Parrot::Config;
+
 
 =head1 NAME
 
@@ -8,7 +18,7 @@ t/native_pbc/header.t - PBC header format
 
 =head1 SYNOPSIS
 
-        % perl t/native_pbc/header.t
+	% prove t/native_pbc/header.t
 
 =head1 DESCRIPTION
 
@@ -16,14 +26,6 @@ Tests the layout of the PBC header.
 
 =cut
 
-use strict;
-use warnings;
-
-use Parrot::Test tests => 8;
-
-use File::Temp;
-use Test::More;
-use Parrot::Config;
 
 SKIP: {
     skip "new header format not yet implemented", 8;

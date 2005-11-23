@@ -1,6 +1,15 @@
-#! perl -w
+#! perl
 # Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
+
+use strict;
+use warnings;
+use lib qw( . lib ../lib ../../lib );
+use Test::More;
+# use Parrot::Test tests => 1;
+use Parrot::Test;
+ plan  skip_all => 'Ongoing PBC format changes';
+
 
 =head1 NAME
 
@@ -8,13 +17,14 @@ t/native_pbc/integer.t - Integers
 
 =head1 SYNOPSIS
 
-	% perl t/native_pbc/integer.t
+	% prove t/native_pbc/integer.t
 
 =head1 DESCRIPTION
 
 Tests word-size/float-type/endian-ness for different architectures.
 
 =cut
+
 
 =begin comment
 
@@ -36,9 +46,6 @@ should be included for reference.
 
 =cut
 
-use Parrot::Test;
-# tests => 1;
- plan  skip_all => 'Ongoing PBC format changes';
 
 # execute the file t/native_pbc/integer_1.pbc
 #

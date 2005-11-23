@@ -1,6 +1,13 @@
-#! perl -w
+#! perl
 # Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
+
+use strict;
+use warnings;
+use lib qw( . lib ../lib ../../lib );
+use Test::More;
+use Parrot::Test tests => 1;
+
 
 =head1 NAME
 
@@ -8,7 +15,7 @@ t/native_pbc/string.t - PBC string tests
 
 =head1 SYNOPSIS
 
-	% perl -Ilib t/native_pbc/string.t
+	% prove t/native_pbc/string.t
 
 =head1 DESCRIPTION
 
@@ -16,7 +23,6 @@ Tests word-size/string/endian-ness for different architectures.
 
 =cut
 
-use Parrot::Test tests => 1;
 
 =begin comment
 
@@ -26,6 +32,7 @@ Actually, there is a single architecture right now.
 For adding tests, see the comments in t/native_pbc/number.t
 
 =cut
+
 
 SKIP: {
   skip("string changes", 1);
