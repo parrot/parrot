@@ -138,6 +138,9 @@ e_pbc_open(Interp * interpreter, void *param)
                     IMCC_INFO(interpreter)->state->file, 1);
         /*
          * create a PMC constant holding the interpreter state
+         *
+         * see also ParrotInterpreter.thaw and .thawfinish
+         * currently just HLL_info is saved/restored
          */
         self = VTABLE_get_pmc_keyed_int(interpreter, interpreter->iglobals,
                 IGLOBALS_INTERPRETER);
