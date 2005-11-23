@@ -1,6 +1,14 @@
-#! perl -w
+#! perl
 # Copyright: 2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
+
+use strict;
+use warnings;
+use lib qw( . lib ../lib ../../lib );
+use Test::More;
+use Parrot::Test;
+use Parrot::Config;
+
 
 =head1 NAME
 
@@ -16,9 +24,6 @@ Tests the C<GDBMHash> PMC.
 
 =cut
 
-use Parrot::Test;
-use Test::More;
-use Parrot::Config;
 
 if ($PConfig{has_gdbm}) {
     plan tests => 13;

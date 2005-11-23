@@ -1,6 +1,14 @@
-#! perl -w
+#! perl
 # Copyright: 2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
+
+use strict;
+use warnings;
+use lib qw( . lib ../lib ../../lib );
+use Test::More;
+use Parrot::Test tests => 1;
+use Parrot::Config;
+
 
 =head1 NAME
 
@@ -8,9 +16,7 @@ t/examples/pir.t - Test examples in F<examples/past>
 
 =head1 SYNOPSIS
 
-    % perl -Ilib t/examples/past.t
-
-    % perl t/harness t/examples/past.t
+	% prove t/examples/past.t
 
 =head1 DESCRIPTION
 
@@ -30,8 +36,6 @@ Bernhard Schmalhofer - <Bernhard.Schmalhofer@gmx.de>
 
 =cut
 
-use strict;
-use Parrot::Test tests => 1;
 
 # Set up expected output for examples
 my %expected

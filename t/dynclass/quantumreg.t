@@ -1,6 +1,14 @@
-#! perl -w
+#! perl
 # Copyright: 2005 The Perl Foundation.  All Rights Reserved.
-# $Id: gdbmhash.t 9452 2005-10-11 13:45:38Z leo $
+# $Id$
+
+use strict;
+use warnings;
+use lib qw( . lib ../lib ../../lib );
+use Test::More;
+use Parrot::Test;
+use Parrot::Config;
+
 
 =head1 NAME
 
@@ -16,9 +24,6 @@ Tests the C<QuantumReg> PMC.
 
 =cut
 
-use Parrot::Test;
-use Test::More;
-use Parrot::Config;
 
 # There is no config probe for libquantum yet, please enable manually
 # if ( 1 ) {

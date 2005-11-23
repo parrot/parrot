@@ -1,6 +1,15 @@
-#! perl -w
+#! perl
 # Copyright: 2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
+
+use strict;
+use warnings;
+use lib qw( . lib ../lib ../../lib );
+use Test::More;
+# use Parrot::Test tests => 15;
+ plan  skip_all => 'Ongoing PBC format changes';
+use Parrot::Config;
+
 
 =head1 NAME
 
@@ -8,9 +17,7 @@ t/examples/japh.t - Test some JAPHs
 
 =head1 SYNOPSIS
 
-	% perl -Ilib t/examples/japh.t
-
-        % perl t/harness t/examples/japh.t
+	% prove t/examples/japh.t
 
 =head1 DESCRIPTION
 
@@ -29,10 +36,6 @@ Get the TODO JAPHs working or decide that they are not suitable for testing.
 
 =cut
 
-use strict;
-# use Parrot::Test tests => 15;
-use Test::More;
- plan  skip_all => 'Ongoing PBC format changes';
 
 # be pessimistic initially
 my %todo = map { $_ => 'various reasons' } ( 1 .. 15 );

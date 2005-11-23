@@ -1,6 +1,14 @@
-#! perl -w
-# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+#! perl
+# Copyright: 2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
+
+use strict;
+use warnings;
+use lib qw( . lib ../lib ../../lib );
+use Test::More;
+use Parrot::Test tests => 26;
+use Parrot::Config;
+
 
 =head1 NAME
 
@@ -8,7 +16,7 @@ t/pmc/pyint.t - Python Integer basic type
 
 =head1 SYNOPSIS
 
-	% perl -Ilib t/dynclass/pyint.t
+	% prove t/dynclass/pyint.t
 
 =head1 DESCRIPTION
 
@@ -16,8 +24,6 @@ Tests the Python Integer PMC.
 
 =cut
 
-use Parrot::Test tests => 26;
-use Parrot::Config;
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "abs");
 

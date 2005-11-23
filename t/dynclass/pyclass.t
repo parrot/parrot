@@ -1,6 +1,14 @@
-#! perl -w
-# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+#! perl
+# Copyright: 2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
+
+use strict;
+use warnings;
+use lib qw( . lib ../lib ../../lib );
+use Test::More;
+use Parrot::Test tests => 6;
+use Parrot::Config;
+
 
 =head1 NAME
 
@@ -8,7 +16,7 @@ t/dynclass/pyclass.t - Python Class type
 
 =head1 SYNOPSIS
 
-	% perl -Ilib t/dynclass/pyclass.t
+	% prove t/dynclass/pyclass.t
 
 =head1 DESCRIPTION
 
@@ -16,7 +24,6 @@ Tests the Python Class PMC.
 
 =cut
 
-use Parrot::Test tests => 6;
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "attribute");
 

@@ -1,6 +1,14 @@
-#! perl -w
+#! perl
 # Copyright: 2005 The Perl Foundation.  All Rights Reserved.
-# $Id:$
+# $Id$
+
+use strict;
+use warnings;
+use lib qw( . lib ../lib ../../lib );
+use Test::More;
+use Parrot::Test tests => 4;
+use Parrot::Config;
+
 
 =head1 NAME
 
@@ -8,7 +16,7 @@ t/dynclass/dynlexpad.t - test the DynLexPad PMC
 
 =head1 SYNOPSIS
 
-	% perl -Ilib t/dynclass/dynlexpad.t
+	% prove t/dynclass/dynlexpad.t
 
 =head1 DESCRIPTION
 
@@ -16,10 +24,6 @@ Tests the C<DynLexPad> PMC.
 
 =cut
 
-use Parrot::Test;
-use Test::More;
-use Parrot::Config;
-plan tests => 4;
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "loadlib");
 .sub main :main
