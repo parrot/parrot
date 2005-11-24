@@ -16,7 +16,7 @@ Tests Parrot calling conventions.
 
 =cut
 
-use Parrot::Test tests => 47;
+use Parrot::Test tests => 48;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "set_args - parsing");
@@ -1287,3 +1287,31 @@ has_ret:
 CODE
 ok 1
 OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "set_args via continuation -> results");
+.sub main :main
+    .local string result
+    result = foo("ok 1\n")
+    print result
+.end
+
+.sub foo
+    .param string s
+    .local pmc cc
+    .include 'interpinfo.pasm'
+    cc = interpinfo .INTERPINFO_CURRENT_CONT
+    bar(cc, s)
+.end
+
+.sub bar
+    .param pmc cc
+    .param string s
+    print s
+    cc("ok 2\n")
+.end
+CODE
+ok 1
+ok 2
+OUTPUT
+
+
