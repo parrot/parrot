@@ -386,7 +386,7 @@ premature_end:
   null value
 
   start = pos
-  if pos >= len goto failure
+###  if pos >= len goto failure XXX no such label
 
 integer:
   if pos >= len goto integer_done

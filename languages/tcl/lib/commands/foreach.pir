@@ -126,7 +126,8 @@ loop_inner_done_good:
 loop_inner_done:
   if got_one == 1 goto loop_outer_continue
   # there was nothing in this set of iterators. 
-  goto loop_outer_done 
+###   goto loop_outer_done  XXX no such label
+
  
   # Loop until all elements are consumed. If any of the lists that were
   # provided are already consumed, then simply assign the empty string.

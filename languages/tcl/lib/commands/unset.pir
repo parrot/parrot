@@ -39,5 +39,5 @@ error:
   .throw ($S0)
 
 catch:
-  goto resume
+###  goto resume   XXX no such label
 .end
