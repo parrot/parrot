@@ -66,8 +66,6 @@ TCL
 OUT
 }
 
-TODO: {
- local $TODO="global doesn't allow you to actually change the variable";
 language_output_is("tcl",<<'TCL',<<'OUT',"changing value");
  set a 4
  proc inca2 {} {
@@ -81,7 +79,6 @@ TCL
 4
 6
 OUT
-}
 
 language_output_is("tcl",<<'TCL',<<OUT,"nonvivifying global");
 proc j {} {

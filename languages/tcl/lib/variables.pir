@@ -102,10 +102,10 @@ other than the default, and multiple interpreters.
   # ends with )
   .local int char
   char = ord name, -1
-  if char != 41 goto scalar
+  if char != 41 goto find_scalar
   # contains a (
   char = index name, "("
-  if char == -1 goto scalar
+  if char == -1 goto find_scalar
 
 find_array:
   .local string var
@@ -126,17 +126,14 @@ find_array:
 
   $I0 = does array, "hash"
   unless $I0 goto cant_set_not_array
-  # goto set_array
-
-set_array:
-  array[key] = value
-  variable = clone value
-  .return(variable)
+  goto set_array
 
 create_array:
   array = new .TclArray
-  array[key] = value
   __store_var(var, array)
+
+set_array:
+  array[key] = value
   variable = clone value
   .return(variable)
 
@@ -146,11 +143,20 @@ cant_set_not_array:
   $S0 .= "\": variable isn't array"
   .throw($S0)
 
-scalar:
+find_scalar:
+  .local pmc scalar
+  null scalar
+  scalar = __find_var(name)
+  if_null scalar, create_scalar
+  assign scalar, value
+  goto return_scalar
+  
+create_scalar:
   __store_var(name, value)
+
+return_scalar:
   variable = clone value
   .return(variable)
-
 .end
 
 =head2 _Tcl::__find_var
