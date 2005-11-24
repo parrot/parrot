@@ -419,7 +419,6 @@ Parrot_find_pad(Interp* interpreter, STRING *lex_name, parrot_context_t *ctx)
 {
     PMC *lex_pad;
     parrot_context_t *outer;
-    PMC *result;
 
     while (1) {
         lex_pad = ctx->lex_pad;
@@ -427,8 +426,7 @@ Parrot_find_pad(Interp* interpreter, STRING *lex_name, parrot_context_t *ctx)
         if (!outer)
             return lex_pad;
         if (!PMC_IS_NULL(lex_pad)) {
-            result = VTABLE_get_pmc_keyed_str(interpreter, lex_pad, lex_name);
-            if (result)
+            if (VTABLE_exists_keyed_str(interpreter, lex_pad, lex_name))
                 return lex_pad;
         }
         ctx = outer;

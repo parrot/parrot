@@ -46,12 +46,16 @@ lexinfo.
 =item C<void set_pointer(void *)>
 
 Initialize the LexPad PMC and remember the associate context.
-XXX - we really should have one-stage initialisation.
-XXX - we could abuse init_pmc_props
 
 =item C<INTVAL elements()>
 
 Returns the number of elements in the hash.
+
+=item C<INTVAL exists_keyed(PMC *name)>
+
+=item C<INTVAL exists_keyed_str(STRING *name)>
+
+Returns whether a lexical C<name> exists in the hash.
 
 =item C<PMC *get_pmc_keyed_str(STRING *name)>
 
@@ -85,6 +89,17 @@ Return the LexInfo PMC, if any or a Null PMC.
     INTVAL elements() {
         PMC *info = PMC_pmc_val(SELF);
         return hash_size(INTERP, PMC_struct_val(info));
+    }
+
+    INTVAL exists_keyed_str(STRING* key) {
+        PMC *info = PMC_pmc_val(SELF);
+        return hash_get_bucket(INTERP,
+            (Hash*) PMC_struct_val(info), name) != 0;
+    }
+
+    INTVAL exists_keyed(PMC* key) {
+        STRING *s = key_string(INTERP, name);
+        return SELF.exists_keyed_str(s);
     }
 
     PMC* get_pmc_keyed_str(STRING* name) {
