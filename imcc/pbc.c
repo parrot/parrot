@@ -12,7 +12,7 @@
  * Notes:
  *
  * I'm using existing data structure here (SymReg*) to store
- * various global items e.g. bsr fixups and constants.
+ * various global items (pmc constants currently only).
  * The index in the constant table is in SymReg* ->color
  * data member. This looks odd, but the register number
  * from imc.c:allocate is also there for variables,
@@ -22,10 +22,6 @@
  * or a parrot register number, depending on data type.
  *
  * TODO memory clean up
- *
- * And finally: there might be some issues on 64bit systems with
- * my mixing of int and opcode_t, which will be looked at, when this
- * is in CVS
  *
  * -lt
  *
@@ -39,7 +35,7 @@ struct subs {
     size_t size;                        /* code size in ops */
     int ins_line;                       /* line# for debug */
     int n_basic_blocks;                 /* block count */
-    SymHash  bsrs;           /* bsr, set_addr locations */
+    SymHash  fixup;                     /* currently set_p_pc sub names only */
     IMC_Unit * unit;
     int pmc_const;                       /* index in const table */
     struct subs *prev;
@@ -84,7 +80,7 @@ imcc_globals_destroy(int ex, void *param)
         s = cs->subs;
         while (s) {
             prev_s = s->prev;
-            clear_sym_hash(&s->bsrs);
+            clear_sym_hash(&s->fixup);
             mem_sys_free(s);
             s = prev_s;
         }
@@ -205,7 +201,7 @@ make_new_sub(Interp *interpreter, IMC_Unit * unit)
     if (!globals.cs->first)
         globals.cs->first = s;
     globals.cs->subs = s;
-    create_symhash(&s->bsrs);
+    create_symhash(&s->fixup);
 #ifdef HAS_JIT
     if ((IMCC_INFO(interpreter)->optimizer_level & OPT_J)) {
         allocate_jit(interpreter, unit);
@@ -243,15 +239,15 @@ store_sub_size(size_t size, size_t ins_line)
 
 
 static void
-store_bsr(Interp *interpreter, SymReg * r, int pc, int offset)
+store_fixup(Interp *interpreter, SymReg * r, int pc, int offset)
 {
-    SymReg * bsr;
-    bsr = _mk_address(interpreter, &globals.cs->subs->bsrs,
+    SymReg * fixup;
+    fixup = _mk_address(interpreter, &globals.cs->subs->fixup,
             str_dup(r->name), U_add_all);
     if (r->set == 'p')
-        bsr->set = 'p';
-    bsr->color = pc;
-    bsr->offset = offset;        /* set_p_pc  = 2  */
+        fixup->set = 'p';
+    fixup->color = pc;
+    fixup->offset = offset;        /* set_p_pc  = 2  */
 }
 
 static void
@@ -262,11 +258,11 @@ store_key_const(char * str, int idx)
     c->color = idx;
 }
 
-/* store global labels and bsr for later fixup
+/* store globals for later fixup
  * return size in ops
  */
 static int
-store_labels(Interp *interpreter, IMC_Unit * unit, int *src_lines)
+get_codesize(Interp *interpreter, IMC_Unit * unit, int *src_lines)
 {
     Instruction * ins;
     int code_size;
@@ -276,7 +272,7 @@ store_labels(Interp *interpreter, IMC_Unit * unit, int *src_lines)
      * - calc code size
      * - calc nr of src lines for debug info
      * - remember addr of labels
-     * remember set_p_pc for global fixup
+     * - remember set_p_pc for global fixup
      */
     *src_lines = 0;
     for (code_size = 0, ins = unit->instructions; ins ; ins = ins->next) {
@@ -286,7 +282,7 @@ store_labels(Interp *interpreter, IMC_Unit * unit, int *src_lines)
         if (ins->op && *ins->op) {
             (*src_lines)++;
             if (ins->opnum < 0)
-                IMCC_fatal(interpreter, 1, "store_labels: "
+                IMCC_fatal(interpreter, 1, "get_codesize: "
                         "no opnum ins#%d %I\n",
                         ins->index, ins);
             if (ins->opnum == PARROT_OP_set_p_pc) {
@@ -296,12 +292,12 @@ store_labels(Interp *interpreter, IMC_Unit * unit, int *src_lines)
                 IMCC_debug(interpreter, DEBUG_PBC_FIXUP, "PMC constant %s\n",
                         ins->r[1]->name);
                 if (ins->r[1]->usage & U_FIXUP)
-                    store_bsr(interpreter, ins->r[1], code_size, 2);
+                    store_fixup(interpreter, ins->r[1], code_size, 2);
             }
             code_size += ins->opsize;
         }
         else if (ins->opsize)
-            IMCC_fatal(interpreter, 1, "store_labels: "
+            IMCC_fatal(interpreter, 1, "get_codesize: "
                     "non instruction with size found\n");
     }
 
@@ -323,6 +319,7 @@ find_global_label(char *name, struct subs *sym, int *pc)
                 s->unit->namespace->name : "(null");
 #endif
         r = s->unit->instructions->r[0];
+        /* if names and namespaces are matching - ok */
         if (r && !strcmp(r->name, name) &&
                     ((sym->unit->namespace && s->unit->namespace &&
                      !strcmp(sym->unit->namespace->name,
@@ -335,12 +332,12 @@ find_global_label(char *name, struct subs *sym, int *pc)
     return 0;
 }
 
-/* fix global branches */
-void
-fixup_bsrs(Interp *interpreter)
+/* fix global stuff */
+static void
+fixup_globals(Interp *interpreter)
 {
     int i, pc, addr;
-    SymReg * bsr;
+    SymReg * fixup;
     struct subs *s, *s1;
     int jumppc = 0;
     int pmc_const;
@@ -350,14 +347,14 @@ fixup_bsrs(Interp *interpreter)
     struct pcc_sub_t *pcc_sub;
 
     for (s = globals.cs->first; s; s = s->next) {
-        hsh = &s->bsrs;
+        hsh = &s->fixup;
         for (i = 0; i < hsh->size; i++) {
-            for (bsr = hsh->data[i]; bsr; bsr = bsr->next ) {
-                addr = jumppc + bsr->color;
+            for (fixup = hsh->data[i]; fixup; fixup = fixup->next ) {
+                addr = jumppc + fixup->color;
                 /*
                  * check in matching namespace
                  */
-                s1 = find_global_label(bsr->name, s, &pc);
+                s1 = find_global_label(fixup->name, s, &pc);
                 /*
                  * if failed change opcode:
                  *   set_p_pc  => find_name p_sc
@@ -373,6 +370,7 @@ fixup_bsrs(Interp *interpreter)
                         assert(r1);
                         pcc_sub = r1->pcc_sub;
                         assert(pcc_sub);
+                        /* if the sub is multi, don't insert constant */
                         if (pcc_sub->nmulti)
                             s1 = NULL;
                     }
@@ -383,7 +381,7 @@ fixup_bsrs(Interp *interpreter)
                     op = interpreter->op_lib->op_code("find_name_p_sc", 1);
                     assert(op);
                     interpreter->code->base.data[addr] = op;
-                    nam = mk_const(interpreter, str_dup(bsr->name), 'S');
+                    nam = mk_const(interpreter, str_dup(fixup->name), 'S');
                     if (nam->color >= 0)
                         col = nam->color;
                     else {
@@ -393,19 +391,19 @@ fixup_bsrs(Interp *interpreter)
                     IMCC_debug(interpreter, DEBUG_PBC_FIXUP,
                             "fixup const PMC"
                             " find_name sub '%s' const nr: %d\n",
-                            bsr->name, col);
+                            fixup->name, col);
                     continue;
                 }
                 pmc_const = s1->pmc_const;
                 if (pmc_const < 0) {
-                    IMCC_fatal(interpreter, 1, "fixup_bsrs: "
+                    IMCC_fatal(interpreter, 1, "fixup_globals: "
                             "couldn't find sub 2 '%s'\n",
-                            bsr->name);
+                            fixup->name);
                 }
-                interpreter->code->base.data[addr+bsr->offset] =
+                interpreter->code->base.data[addr+fixup->offset] =
                     pmc_const;
                 IMCC_debug(interpreter, DEBUG_PBC_FIXUP, "fixup const PMC"
-                        " sub '%s' const nr: %d\n", bsr->name,
+                        " sub '%s' const nr: %d\n", fixup->name,
                         pmc_const);
                 continue;
             }
@@ -1089,12 +1087,13 @@ int
 e_pbc_emit(Interp *interpreter, void *param, IMC_Unit * unit, Instruction * ins)
 {
     int ok = 0;
-    static opcode_t * pc, npc;
     op_info_t *op_info;
     int op, i;
     /* XXX move these statics into IMCC_INFO */
     static struct PackFile_Debug *debug_seg;
     static int ins_line;
+    static opcode_t * pc, npc;
+    /* XXX end */
 
 #if IMC_TRACE_HIGH
     PIO_eprintf(NULL, "e_pbc_emit\n");
@@ -1108,7 +1107,7 @@ e_pbc_emit(Interp *interpreter, void *param, IMC_Unit * unit, Instruction * ins)
         int bytes;
 
         oldsize = get_old_size(interpreter, &ins_line);
-        code_size = store_labels(interpreter, unit, &ins_size);
+        code_size = get_codesize(interpreter, unit, &ins_size);
         IMCC_debug(interpreter, DEBUG_PBC, "code_size(ops) %d  oldsize %d\n",
                 code_size, oldsize);
         constant_folding(interpreter, unit);
@@ -1172,7 +1171,6 @@ e_pbc_emit(Interp *interpreter, void *param, IMC_Unit * unit, Instruction * ins)
         add_const_pmc_sub(interpreter, ins->r[0], npc, npc);
     }
     if (ins->op && *ins->op) {
-        /* fixup local jumps */
         SymReg *addr, *r;
         opcode_t last_label = 0;
 #if IMC_TRACE_HIGH
@@ -1181,6 +1179,7 @@ e_pbc_emit(Interp *interpreter, void *param, IMC_Unit * unit, Instruction * ins)
         if ((ins->type & ITBRANCH) &&
                 (addr = get_branch_reg(ins)) != 0 &&
                 !(addr->type & VTREGISTER)) {
+            /* fixup local jumps - calc offset */
             if (addr->color == -1)
                 IMCC_fatal(interpreter, 1, "e_pbc_emit: "
                         "no label offset defined for '%s'\n", addr->name);
@@ -1215,6 +1214,7 @@ e_pbc_emit(Interp *interpreter, void *param, IMC_Unit * unit, Instruction * ins)
         for (i = 0; i < op_info->arg_count-1; i++) {
             switch (op_info->types[i+1]) {
                 case PARROT_ARG_IC:
+                    /* branch instruction */
                     if (op_info->labels[i+1]) {
                         if (last_label == 0)   /* we don't have a branch with offset 0 !? */
                             IMCC_fatal(interpreter, 1, "e_pbc_emit: "
@@ -1222,7 +1222,7 @@ e_pbc_emit(Interp *interpreter, void *param, IMC_Unit * unit, Instruction * ins)
                         *pc++ = last_label;
                         last_label = 0;
                         break;
-                        /* else fall trhough */
+                        /* else fall through */
                     }
                 case PARROT_ARG_I:
                 case PARROT_ARG_N:
@@ -1274,7 +1274,7 @@ int
 e_pbc_close(Interp *interpreter, void *param)
 {
     UNUSED(param);
-    fixup_bsrs(interpreter);
+    fixup_globals(interpreter);
 
     return 0;
 }
