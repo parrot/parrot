@@ -40,25 +40,23 @@ pir_output_is(<<'CODE', <<'OUT', "local labels");
 # this code is illegal for assemble.pl
 .sub __main
 	null $I0
-	bsr _sub1
-	bsr _sub2
+	_sub1()
+	_sub2()
 	end
 .end
 .sub _sub1
 	if $I0 goto L1
 	print "ok 1\n"
 L1:
-	ret
 .end
 .sub _sub2
 	branch L1
 L2:
-	ret
+	.return()
 L1:
 	print "ok 2\n"
 	unless $I0 goto L2
 	print "nok\n"
-	ret
 .end
 CODE
 ok 1
@@ -66,14 +64,11 @@ ok 2
 OUT
 
 ##############################
-pir_output_is(<<'CODE', <<'OUT', "local labels 2");
-.sub _realmain
-         bsr FOO
+pir_output_like(<<'CODE', <<'OUT', "illegal label");
+.sub bogus
          bsr _function
+         print "never\n"
          end
-
-FOO:    print "in main\n"
-         ret
 .end
 .sub _function
          bsr FOO
@@ -82,8 +77,7 @@ FOO:    print "in function\n"
          ret
 .end
 CODE
-in main
-in function
+/no label offset defined/
 OUT
 
 pir_output_is(<<'CODE', <<'OUT', "perlish func label");
@@ -106,15 +100,14 @@ CODE
 ok 1
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "perlish func label - bsr");
+pir_output_is(<<'CODE', <<'OUT', "perlish func label");
 .sub _main::test
-        bsr _main::sub
+        _main::sub()
 	print "ok 2\n"
 	end
 .end
 .sub _main::sub
 	print "ok 1\n"
-	ret
 .end
 
 

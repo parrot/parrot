@@ -34,7 +34,7 @@ OUT
 pir_output_is(<<'CODE', <<'OUT', "pod inside sub");
 .sub test :main
      print "pass\n"
-     bsr _x
+     _x()
      end
 .end
 
@@ -43,7 +43,6 @@ pir_output_is(<<'CODE', <<'OUT', "pod inside sub");
  This should be ignored, incl. digit 1.0
 =cut
   print "ok\n"
-  ret
 .end
 CODE
 pass

@@ -35,10 +35,11 @@ lp:
     print "done\n"
     end
 .pcc_sub _coro:
+loop:
     find_global P11, "i"
     dec P11
     yield
-    branch _coro
+    branch loop
 CODE
 back 1
 back 0

@@ -10,12 +10,11 @@ pir_output_is(<<'CODE', <<'OUT', "global const");
 .sub test :main
 	.globalconst string ok = "ok\n"
 	print ok
-	bsr _sub
+	_sub()
 	end
 .end
 .sub _sub
 	print ok
-	ret
 .end
 CODE
 ok
