@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 5;
+use Parrot::Test tests => 6;
 use Parrot::Config;
 
 
@@ -182,3 +182,31 @@ CODE
 DynLexPad
 LexPad
 OUTPUT
+
+pir_output_is($loadlib . << 'CODE', << 'OUTPUT', "dynlexpad - lexpad interop");
+
+.sub 'test' :main
+    foo()
+.end
+.sub foo
+    .lex 'a', $P0               # statix lexical
+    $P0 = new .String
+    $P0 = "ok 1\n"
+    $P1 = find_lex 'a'
+    print $P1
+    $P2 = new .String
+    $P2 = "ok 2\n"
+    store_lex 'a', $P2
+    print $P0                   # sic!
+    $P3 = new .String
+    $P3 = "ok 3\n"
+    store_lex 'b', $P3          # and a dynamic one
+    $P4 = find_lex 'b'
+    print $P4
+.end
+CODE
+ok 1
+ok 2
+ok 3
+OUTPUT
+

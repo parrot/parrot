@@ -91,13 +91,13 @@ Return the LexInfo PMC, if any or a Null PMC.
         return hash_size(INTERP, PMC_struct_val(info));
     }
 
-    INTVAL exists_keyed_str(STRING* key) {
+    INTVAL exists_keyed_str(STRING* name) {
         PMC *info = PMC_pmc_val(SELF);
         return hash_get_bucket(INTERP,
             (Hash*) PMC_struct_val(info), name) != 0;
     }
 
-    INTVAL exists_keyed(PMC* key) {
+    INTVAL exists_keyed(PMC* name) {
         STRING *s = key_string(INTERP, name);
         return SELF.exists_keyed_str(s);
     }

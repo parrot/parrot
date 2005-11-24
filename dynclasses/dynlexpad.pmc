@@ -70,14 +70,20 @@ Return the LexInfo PMC, if any or a Null PMC.
 
 */
     void init_pmc(PMC* lexinfo) {
-        PMC_pmc_val(SELF) = lexinfo;
-        PMC_struct_val(SELF) = NULL;
-        PObj_custom_mark_destroy_SETALL(SELF);
+        if (VTABLE_elements(INTERP, lexinfo)) {
+            PMC_pmc_val(SELF) =
+                pmc_new_init(INTERP, enum_class_LexPad, lexinfo);
+        }
+        else
+            PMC_pmc_val(SELF) = NULL;
         new_pmc_hash(INTERP, SELF);
+        PObj_custom_mark_destroy_SETALL(SELF);
     }
 
     void set_pointer(void* ctx) {
-        PMC_data(SELF) = ctx;
+        PMC *std_pad = PMC_pmc_val(SELF);
+        if (std_pad)
+            VTABLE_set_pointer(INTERP, std_pad, ctx);
     }
 
     void destroy () {
@@ -97,6 +103,9 @@ Marks the lexpad hash as live.
 */
 
     void mark () {
+        PMC *std_pad = PMC_pmc_val(SELF);
+        if (std_pad)
+            pobject_lives(INTERP, (PObj *)std_pad);
         if (PMC_struct_val(SELF))
             mark_hash(INTERP, PMC_struct_val(SELF));
     }
@@ -104,14 +113,23 @@ Marks the lexpad hash as live.
     PMC* get_pmc_keyed_str (STRING* name) {
         HashBucket *b = hash_get_bucket(INTERP,
             (Hash*) PMC_struct_val(SELF), name);
-        if (!b)
+        if (!b) {
+            PMC *std_pad = PMC_pmc_val(SELF);
+            if (std_pad)
+                return VTABLE_get_pmc_keyed_str(INTERP, std_pad, name);
             return NULL;
+        }
         return b->value;
     }
 
     INTVAL exists_keyed_str(STRING* name) {
-        return hash_get_bucket(INTERP,
-            (Hash*) PMC_struct_val(SELF), name) != 0;
+        PMC *std_pad;
+        if (hash_get_bucket(INTERP, (Hash*) PMC_struct_val(SELF), name))
+            return 1;
+        std_pad = PMC_pmc_val(SELF);
+        if (std_pad)
+            return VTABLE_exists_keyed_str(INTERP, std_pad, name);
+        return 0;
     }
 
     INTVAL exists_keyed(PMC* name) {
@@ -125,6 +143,10 @@ Marks the lexpad hash as live.
     }
 
     void set_pmc_keyed_str (STRING* name, PMC* value) {
+        PMC *std_pad = PMC_pmc_val(SELF);
+        if (std_pad && VTABLE_exists_keyed_str(INTERP, std_pad, name)) {
+            VTABLE_set_pmc_keyed_str(INTERP, std_pad, name, value);
+        }
         hash_put(INTERP, PMC_struct_val(SELF), name, value);
     }
 
