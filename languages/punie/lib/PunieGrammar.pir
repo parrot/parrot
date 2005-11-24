@@ -48,7 +48,7 @@ digit, in the form of 'print 1;'.
     find_global p6rule, 'PGE', 'p6rule'
 
     p6rule('\d', 'PunieGrammar', 'term')
-    p6rule('print \s* <PunieGrammar::expr>', 'PunieGrammar', 'gprint')
+    p6rule('(print) \s* <PunieGrammar::expr>', 'PunieGrammar', 'gprint')
     p6rule('<PunieGrammar::gprint> | <PunieGrammar::term>', 'PunieGrammar', 'expr')
     p6rule('<PunieGrammar::expr>;', 'PunieGrammar', 'line')
 .end

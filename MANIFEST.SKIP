@@ -622,6 +622,8 @@
 ^languages/punie/.*\.pbc$
 ^languages/punie/.*\.pbc/
 # generated from svn:ignore of 'languages/punie/t/'
+^languages/punie/t/.*\.pir$
+^languages/punie/t/.*\.pir/
 # generated from svn:ignore of 'languages/python/'
 # generated from svn:ignore of 'languages/python/t/'
 # generated from svn:ignore of 'languages/python/t/basic/'
