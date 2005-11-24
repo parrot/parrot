@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 6;
+use Parrot::Test tests => 7;
 use Test::More;
 use vars qw($TODO);
 
@@ -63,6 +63,23 @@ j
 puts $a
 TCL
 1
+OUT
+}
+
+TODO: {
+ local $TODO="global doesn't allow you to actually change the variable";
+language_output_is("tcl",<<'TCL',<<'OUT',"changing value");
+ set a 4
+ proc inca2 {} {
+  global a
+  set a [expr $a + 2]
+ }
+ puts $a
+ inca2
+ puts $a
+TCL
+4
+6
 OUT
 }
 
