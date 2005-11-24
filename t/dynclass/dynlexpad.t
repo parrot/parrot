@@ -157,27 +157,28 @@ CODE
 55
 OUTPUT
 
-pir_output_like($loadlib . << 'CODE', << 'OUTPUT', "check that dynlexpad honors hll", todo =>'fubared still');
+pir_output_is($loadlib . << 'CODE', << 'OUTPUT', "check that dynlexpad honors hll");
 .sub 'test' :main
     foo()
-.end
-.sub foo :lex
-    $P1 = new .Integer
-    $P1 = 13013
-    store_lex 'a', $P1
-    $P2 = find_lex 'a'
-    print $P2
-    print "\n"
     bar()
 .end
-.HLL "Parrot",""
-.sub bar :outer(foo)
-    baz()
+.sub foo :lex
+.include 'interpinfo.pasm'
+    interpinfo $P1, .INTERPINFO_CURRENT_SUB
+    $P2 = $P1."get_lexpad"()
+    $S0 = typeof $P2
+    print $S0
+    print "\n"
 .end
-.sub baz :lex :outer(bar)
-    $P1 = find_lex 'a'
-    print $P1
+.HLL "parrot",""
+.sub bar :lex
+    interpinfo $P1, .INTERPINFO_CURRENT_SUB
+    $P2 = $P1."get_lexpad"()
+    $S0 = typeof $P2
+    print $S0
+    print "\n"
 .end
 CODE
-/Null PMC access/
+DynLexPad
+LexPad
 OUTPUT
