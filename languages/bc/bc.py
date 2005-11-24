@@ -58,6 +58,17 @@ class Visitor(antlr.ASTVisitor):
       
 
 def main():
+   """Convert bc source code to PIR
+   
+   Actually different strategies will be explored.
+   One is the generate plain old PIR.
+   The other idea is to generate PIR that sets up a PAST data structure
+   that will somehow be executed. See 'languages/punie'.
+
+   As far as command line options go, there is only '-l'.
+
+   Did I mention that Python doc strings are more weird than POD?
+   """
    
    # only one option: -l
    # first argument is the input file name
@@ -66,9 +77,9 @@ def main():
    # TODO: allow multiple input files and STDIN
    bc_fn  = bc_filenames[0]
    bc_fh = open(bc_fn, 'r')
-   regexp = re.compile( r"bc$" )
-   pir_fh = open( regexp.sub("pir", bc_fn), 'w' )
-   p6_fh  = open( regexp.sub("p6", bc_fn), 'w' )
+   regexp = re.compile( r"\.bc$" )
+   pir_fh  = open( regexp.sub(".pir", bc_fn), 'w' )
+   past_pir_fh = open( regexp.sub("_past.pir", bc_fn), 'w' )
 
    L = bc.BcLexer.Lexer(bc_fh) 
    P = bc.BcParser.Parser(L)
@@ -169,16 +180,16 @@ def main():
 
    # Now dump the AST as Perl6
    # TODO: This is a dummy implementation right now
-   sys.stdout = p6_fh
-   W.gen_p6(ast);
-   p6_ast = W.getAST()
+   sys.stdout = past_pir_fh
+   W.gen_past_pir(ast);
+   past_pir_ast = W.getAST()
    print ""
    print "=begin comment"
    print ""
    print "AST after being processed by TreeParser"
    print ""
-   print "p6_ast.toStringList:" 
-   print p6_ast.toStringList()
+   print "past_pir_ast.toStringList:" 
+   print past_pir_ast.toStringList()
    print ""
 
 if __name__ == "__main__":

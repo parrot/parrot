@@ -506,9 +506,9 @@ gen_pir!
     }
   ;
 
-gen_p6!
+gen_past_pir!
   : B:expr_list
     {
-      #gen_p6 = #([PIR_HEADER, "pir header\n#"], #B, [PIR_FOOTER, "pir footer\n#"]); 
+      #gen_past_pir = #([PIR_HEADER, "pir header\n#"], #B, [PIR_FOOTER, "pir footer\n#"]); 
     }
   ;

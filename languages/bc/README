@@ -1,7 +1,7 @@
 # Copyright: 2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
-This in an implementation of 'POSIX bc' with the help Python code created from
+This in an implementation of 'POSIX bc' with the help of Python classes created from
 an ANTLR grammar.
 
 Requirements:
@@ -9,6 +9,10 @@ Requirements:
 For development ANTLR 2.7.5, and thus Java, is required.
 The runtime files for Lexer and Parser are in the Parror SVN, thus only
 python is required for running.
+
+Building lexer, parser and treeparser:
+
+'make maintain'
 
 Building:
 
@@ -18,3 +22,8 @@ Testing:
 
 'make test'. When GNU bc is available, the test suite will be run against GNU bc as well.
 For compatability with 'POSIX bc' the flags '--standard' and '--quiet' are used.
+
+Strategy:
+
+Generate PIR that sets up a PAST data structure, that will be executed by
+whatever will executes Punie.

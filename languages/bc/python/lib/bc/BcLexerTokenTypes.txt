@@ -1,4 +1,4 @@
-// $ANTLR 2.7.5 (20050425): bc_python.g -> BcLexerTokenTypes.txt$
+// $ANTLR 2.7.5 (20051104): bc_python.g -> BcLexerTokenTypes.txt$
 BcLexer    // output token vocab name
 NEWLINE=4
 STRING=5
