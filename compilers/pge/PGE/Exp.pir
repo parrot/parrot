@@ -239,7 +239,7 @@ register.
   lazy_1:
     emit(code, "  %s_l1:", label)
     bsr test
-    emit(code, "    if rep < %s goto %s_lit1", min, label)
+    emit(code, "    if rep < %s goto %s_l1", min, label)
     emit(code, "  %s_l2:", label)
     if iscut goto cut
     if max == PGE_INF goto lazy_2
