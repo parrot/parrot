@@ -183,7 +183,7 @@ Gets the actual variable from memory and returns it.
     call_level = $P1
     if call_level == 0 goto global_var
 lexical_var:
-    value = find_lex call_level, name
+    value = find_lex name
     goto clear_found
 
 coloned:
@@ -223,7 +223,7 @@ Sets the actual variable from memory.
   call_level = $P1
   if call_level == 0 goto global_var
 lexical_var:
-  store_lex call_level, name, value
+  store_lex name, value
   .return()
 
 coloned:

@@ -34,7 +34,7 @@
     clear_eh
     branch catch_var
   find_lex:
-    array = find_lex call_level, full_name
+    array = find_lex full_name
     clear_eh
 catch_var:
   if_null array, not_array

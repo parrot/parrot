@@ -34,8 +34,8 @@ loop:
   $S1 = argv[counter]
  
   push_eh catch 
-    find_lex $P1, $I0, $S0
-    store_lex $I1, $S1, $P1
+    $P1 = find_lex $S0
+    store_lex $S1, $P1
   clear_eh
 resume:
 

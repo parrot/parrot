@@ -69,13 +69,12 @@ got_args:
 
   temp_code = <<"END_PIR"
 .namespace ['Tcl']
-.sub '&%s'
+.sub '&%s' :lex
 .param pmc args :slurpy
 .include 'languages/tcl/lib/returncodes.pir'
 .local pmc call_level
 call_level=find_global '_Tcl', 'call_level'
 inc call_level
-new_pad -1
 END_PIR
 
   $P1 = new .Array
@@ -123,7 +122,7 @@ arg_loop:
 
   temp_code= <<"END_PIR"
 $P1 = args[%i]
-store_lex -1, '$%s', $P1
+store_lex '$%s', $P1
 END_PIR
 
   $P1 = new .Array
@@ -161,7 +160,7 @@ NO_SLURPY_ARGS:
   arg_list=new .TclString
   arg_list=''
 DONE:
-  store_lex -1, '$args', arg_list
+  store_lex '$args', arg_list
 END_PIR
 
    $P1 = new .Array

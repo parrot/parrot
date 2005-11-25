@@ -25,7 +25,7 @@
 
   null found_var
   if call_level == 0 goto remove_global
-  store_lex call_level, sigil_varname, found_var
+  store_lex sigil_varname, found_var
   .return ("") 
 
 remove_global:

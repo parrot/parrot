@@ -43,7 +43,7 @@
     the_array = find_global "Tcl", sigil_array_name
     goto done_find
 find_lexical:
-    the_array = find_lex call_level, sigil_array_name
+    the_array = find_lex sigil_array_name
 done_find:
   clear_eh
 resume_var:

@@ -108,7 +108,7 @@ loop_inner:
     store_global "Tcl", sigil_varname, value
     goto store_done
 store_lex:
-    store_lex -1, sigil_varname, value
+    store_lex sigil_varname, value
 store_done:
   got_one = 1
   goto loop_inner

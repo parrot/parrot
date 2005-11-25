@@ -30,7 +30,7 @@ loop:
     $P1 = find_global "Tcl", sigil_varname
   clear_eh
 
-  store_lex call_level, sigil_varname, $P1
+  store_lex sigil_varname, $P1
 
 next:
   inc ii
