@@ -184,6 +184,7 @@ typedef struct Parrot_Context {
     struct Stack_Chunk *control_stack;  /* Base of the flow control stack */
     PMC      *lex_pad;                  /* LexPad PMC */
     struct Parrot_Context *outer_ctx;   /* outer context, if a closure */
+    struct Parrot_Context *caller_ctx;  /* caller context */
     UINTVAL warns;             /* Keeps track of what warnings
                                  * have been activated */
     UINTVAL errors;            /* fatals that can be turned off */
@@ -205,7 +206,6 @@ typedef struct Parrot_Context {
     opcode_t *current_pc;       /* program counter of Sub invocation */
     String *current_package;    /* The package we're currently in */
     INTVAL current_HLL;         /* see also src/hll.c */
-    opcode_t *current_args;      /* ptr into code with set_args opcode */
     opcode_t *current_results;   /* ptr into code with get_results opcode */
     /* deref the constants - we need it all the time */
     struct PackFile_Constant ** constants;

@@ -134,6 +134,7 @@ Swaps the "context".
              */
             Parrot_alloc_context(INTERP, co->n_regs_used);
             co->ctx = ctx = CONTEXT(INTERP->ctx);
+            ctx->caller_ctx = caller_ctx;
             PMC_cont(ccont)->from_ctx = ctx;
             /*
              * XXX are our coroutines closures?
@@ -145,11 +146,9 @@ Swaps the "context".
             }
             ctx->current_sub = SELF;
             ctx->current_cont = ccont;
-            ctx->current_args = INTERP->current_args;
             ctx->current_object = NULL;
             INTERP->current_object = NULL;
             INTERP->current_cont = NULL;
-            INTERP->current_args = NULL;
 
             /* create pad if needed */
             if (!PMC_IS_NULL(co->lex_info)) {
@@ -163,13 +162,6 @@ Swaps the "context".
             PObj_get_FLAGS(SELF) |= SUB_FLAG_CORO_FF;
             wanted_seg = co->seg;
             co->caller_seg = INTERP->code;
-            /* copy args from interpreter */
-            if (*dest == PARROT_OP_get_params_pc) {
-                INTERP->current_params = dest;
-                dest = parrot_pass_args(INTERP, wanted_seg,
-                        caller_ctx,
-                        PARROT_OP_get_params_pc);
-            }
         }
         /* if calling the Coro we need the segment of the Coro */
         else if (!(PObj_get_FLAGS(SELF) & SUB_FLAG_CORO_FF)) {
@@ -193,10 +185,10 @@ Swaps the "context".
             CONTEXT(INTERP->ctx) = ctx = PMC_cont(ccont)->to_ctx;
             INTERP->ctx.bp = ctx->bp;
             INTERP->ctx.bp_ps = ctx->bp_ps;
-            /* yield values */
             if (INTERP->current_returns && ctx->current_results)
-                parrot_pass_args(INTERP, wanted_seg,
+                parrot_pass_args(INTERP,
                         co->ctx,
+                        ctx,
                         PARROT_OP_get_results_pc);
         }
 

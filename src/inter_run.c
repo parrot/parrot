@@ -260,7 +260,7 @@ Parrot_run_meth_fromc(Parrot_Interp interpreter,
     ctx = CONTEXT(interpreter->ctx);
     offset = dest - interpreter->code->base.data;
     runops(interpreter, offset);
-    return set_retval(interpreter, 0, PMC_sub(sub)->seg, ctx);
+    return set_retval(interpreter, 0, ctx);
 }
 
 void *
@@ -273,7 +273,7 @@ Parrot_runops_fromc_args(Parrot_Interp interpreter, PMC *sub,
     va_start(args, sig);
     ctx = runops_args(interpreter, sub, PMCNULL, NULL, sig, args);
     va_end(args);
-    return set_retval(interpreter, *sig, PMC_sub(sub)->seg, ctx);
+    return set_retval(interpreter, *sig, ctx);
 }
 
 
@@ -287,7 +287,7 @@ Parrot_runops_fromc_args_reti(Parrot_Interp interpreter, PMC *sub,
     va_start(args, sig);
     ctx = runops_args(interpreter, sub, PMCNULL, NULL, sig, args);
     va_end(args);
-    return set_retval_i(interpreter, *sig, PMC_sub(sub)->seg, ctx);
+    return set_retval_i(interpreter, *sig, ctx);
 }
 
 FLOATVAL
@@ -300,7 +300,7 @@ Parrot_runops_fromc_args_retf(Parrot_Interp interpreter, PMC *sub,
     va_start(args, sig);
     ctx = runops_args(interpreter, sub, PMCNULL, NULL, sig, args);
     va_end(args);
-    return set_retval_f(interpreter, *sig, PMC_sub(sub)->seg, ctx);
+    return set_retval_f(interpreter, *sig, ctx);
 }
 
 void*
@@ -313,7 +313,7 @@ Parrot_run_meth_fromc_args(Parrot_Interp interpreter,
     va_start(args, sig);
     ctx = runops_args(interpreter, sub, obj, meth, sig, args);
     va_end(args);
-    return set_retval(interpreter, *sig, PMC_sub(sub)->seg, ctx);
+    return set_retval(interpreter, *sig, ctx);
 }
 
 INTVAL
@@ -326,7 +326,7 @@ Parrot_run_meth_fromc_args_reti(Parrot_Interp interpreter,
     va_start(args, sig);
     ctx = runops_args(interpreter, sub, obj, meth, sig, args);
     va_end(args);
-    return set_retval_i(interpreter, *sig, PMC_sub(sub)->seg, ctx);
+    return set_retval_i(interpreter, *sig, ctx);
 }
 
 FLOATVAL
@@ -339,7 +339,7 @@ Parrot_run_meth_fromc_args_retf(Parrot_Interp interpreter,
     va_start(args, sig);
     ctx = runops_args(interpreter, sub, obj, meth, sig, args);
     va_end(args);
-    return set_retval_f(interpreter, *sig, PMC_sub(sub)->seg, ctx);
+    return set_retval_f(interpreter, *sig, ctx);
 }
 
 void *
@@ -349,7 +349,7 @@ Parrot_runops_fromc_arglist(Parrot_Interp interpreter, PMC *sub,
     parrot_context_t *ctx;
 
     ctx = runops_args(interpreter, sub, PMCNULL, NULL, sig, args);
-    return set_retval(interpreter, *sig, PMC_sub(sub)->seg, ctx);
+    return set_retval(interpreter, *sig, ctx);
 }
 
 INTVAL
@@ -359,7 +359,7 @@ Parrot_runops_fromc_arglist_reti(Parrot_Interp interpreter, PMC *sub,
     parrot_context_t *ctx;
 
     ctx = runops_args(interpreter, sub, PMCNULL, NULL, sig, args);
-    return set_retval_i(interpreter, *sig, PMC_sub(sub)->seg, ctx);
+    return set_retval_i(interpreter, *sig, ctx);
 }
 
 FLOATVAL
@@ -369,7 +369,7 @@ Parrot_runops_fromc_arglist_retf(Parrot_Interp interpreter, PMC *sub,
     parrot_context_t *ctx;
 
     ctx = runops_args(interpreter, sub, PMCNULL, NULL, sig, args);
-    return set_retval_f(interpreter, *sig, PMC_sub(sub)->seg, ctx);
+    return set_retval_f(interpreter, *sig, ctx);
 }
 
 void*
@@ -379,7 +379,7 @@ Parrot_run_meth_fromc_arglist(Parrot_Interp interpreter,
     parrot_context_t *ctx;
 
     ctx = runops_args(interpreter, sub, obj, meth, sig, args);
-    return set_retval(interpreter, *sig, PMC_sub(sub)->seg, ctx);
+    return set_retval(interpreter, *sig, ctx);
 }
 
 INTVAL
@@ -389,7 +389,7 @@ Parrot_run_meth_fromc_arglist_reti(Parrot_Interp interpreter,
     parrot_context_t *ctx;
 
     ctx = runops_args(interpreter, sub, obj, meth, sig, args);
-    return set_retval_i(interpreter, *sig, PMC_sub(sub)->seg, ctx);
+    return set_retval_i(interpreter, *sig, ctx);
 }
 
 FLOATVAL
@@ -399,7 +399,7 @@ Parrot_run_meth_fromc_arglist_retf(Parrot_Interp interpreter,
     parrot_context_t *ctx;
 
     ctx = runops_args(interpreter, sub, obj, meth, sig, args);
-    return set_retval_f(interpreter, *sig, PMC_sub(sub)->seg, ctx);
+    return set_retval_f(interpreter, *sig, ctx);
 }
 
 /*

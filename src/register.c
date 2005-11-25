@@ -260,7 +260,6 @@ init_context(Interp *interpreter, parrot_context_t *ctx)
 {
     ctx->ref_count = 0;
     ctx->current_results = NULL;
-    ctx->current_args = NULL;
     ctx->malloced_mem = NULL;
     ctx->outer_ctx = NULL;
     ctx->lex_pad = PMCNULL;
@@ -428,47 +427,6 @@ Parrot_alloc_context(Interp *interpreter, INTVAL *n_regs_used)
     /* this points to S0 */
     interpreter->ctx.bp_ps.regs_s = (STRING**)((char*)p + size_nip);
     init_context(interpreter, ctx);
-}
-
-void *
-Parrot_realloc_context(Interp *interpreter, INTVAL *n_regs_used)
-{
-    struct Parrot_Context *ctx;
-    size_t reg_alloc, size_n, size_nip;
-    void *p, *old_mem;
-    int i;
-
-    size_n = sizeof(FLOATVAL) * n_regs_used[REGNO_NUM];
-    size_nip = size_n +
-        sizeof(INTVAL) *   n_regs_used[REGNO_INT] +
-        sizeof(PMC*) *     n_regs_used[REGNO_PMC];
-    reg_alloc = size_nip +
-        sizeof(STRING*) *  n_regs_used[REGNO_STR];
-
-    ctx = CONTEXT(interpreter->ctx);
-    /* Need a distinct reg memory area, but we can't reallocate the
-     * context as a whole, because continuations might point to it.
-     * Therefore we just allocate the register memory and remember
-     * this in the malloced_mem pointer
-     *
-     * TODO investigate if we should preserve the original slot
-     *      so that we can reuse the context memory in _free
-     *
-     * If this is a recursive tailcall, we need the old memory
-     * which is freed after argument passing. See also
-     * src/inter_call.c
-     */
-    old_mem = ctx->malloced_mem;
-    ctx->malloced_mem = p = mem_sys_allocate(reg_alloc);
-    ctx->regs_mem_size = reg_alloc;
-    for (i = 0; i < 4; ++i)
-        ctx->n_regs_used[i] = n_regs_used[i];
-    /* ctx.bp points to I0, which has Nx at left */
-    interpreter->ctx.bp.regs_i = (INTVAL*)((char*)p + size_n);
-    /* this points to S0 */
-    interpreter->ctx.bp_ps.regs_s = (STRING**)((char*)p + size_nip);
-    clear_regs(interpreter, ctx);
-    return old_mem;
 }
 
 void

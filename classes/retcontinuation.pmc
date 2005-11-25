@@ -129,8 +129,9 @@ the frame pointer in the stack frame cache.
                  * therefore we have to block DOD
                  */
                 Parrot_block_DOD(INTERP);
-                parrot_pass_args(INTERP, cc->seg,
+                parrot_pass_args(INTERP,
                         caller_ctx,
+                        CONTEXT(INTERP->ctx),
                         PARROT_OP_get_results_pc);
                 Parrot_unblock_DOD(INTERP);
             }

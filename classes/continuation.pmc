@@ -232,7 +232,6 @@ destination to continue execution.
              * XXX what else?
              */
             ctx->current_results = cc->ctx_copy->current_results;
-            ctx->current_args = cc->ctx_copy->current_args;
         }
         pc = cc->address;
         if (pc) {
@@ -245,8 +244,9 @@ destination to continue execution.
                  * therefore we have to block DOD
                  */
                 Parrot_block_DOD(INTERP);
-                parrot_pass_args(INTERP, cc->seg,
+                parrot_pass_args(INTERP,
                         caller_ctx,
+                        ctx,
                         PARROT_OP_get_results_pc);
                 Parrot_unblock_DOD(INTERP);
             }

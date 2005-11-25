@@ -36,7 +36,6 @@ struct call_state_1 {
             PMC *signature;
         } op;
     } u;
-    struct PackFile_Constant **constants;
     parrot_context_t *ctx;
     INTVAL i;
     INTVAL n;
@@ -53,12 +52,10 @@ struct call_state {
     int opt_so_far;
 };
 
-int Parrot_init_arg_sig(Interp *, struct PackFile_ByteCode *seg,
-        parrot_context_t *ctx,
+int Parrot_init_arg_sig(Interp *, parrot_context_t *ctx,
         const char *sig, void *ap, struct call_state_1 *st);
 
-int Parrot_init_arg_op(Interp *, struct PackFile_ByteCode *seg,
-        parrot_context_t *ctx,
+int Parrot_init_arg_op(Interp *, parrot_context_t *ctx,
         opcode_t *pc, struct call_state_1 *st);
 
 int Parrot_init_arg_nci(Interp *, struct call_state *st, const char *sig);
@@ -69,19 +66,13 @@ int Parrot_fetch_arg_nci(Interp *, struct call_state *st);
 int Parrot_convert_arg(Interp *, struct call_state *st);
 int Parrot_store_arg(Interp *, struct call_state *st);
 
-opcode_t * parrot_pass_args_tail_call(Interp*, struct Parrot_sub *,
-        opcode_t *);
-
-opcode_t * parrot_pass_args(Interp *, struct PackFile_ByteCode *seg,
-        parrot_context_t *ctx, int what);
+opcode_t * parrot_pass_args(Interp *, parrot_context_t *src_ctx,
+        parrot_context_t *dest_ctx, int what);
 opcode_t * parrot_pass_args_fromc(Interp *, const char *sig,
-        opcode_t *dest, parrot_context_t * ctxp, va_list ap);
-FLOATVAL set_retval_f(Interp*, int sig_ret,
-        struct PackFile_ByteCode *seg, parrot_context_t *ctx);
-void* set_retval(Interp*, int sig_ret,
-        struct PackFile_ByteCode *seg, parrot_context_t *ctx);
-INTVAL set_retval_i(Interp*, int sig_ret,
-        struct PackFile_ByteCode *seg, parrot_context_t *ctx);
+        opcode_t *dest, parrot_context_t * ctx, va_list ap);
+FLOATVAL set_retval_f(Interp*, int sig_ret, parrot_context_t *ctx);
+void* set_retval(Interp*, int sig_ret, parrot_context_t *ctx);
+INTVAL set_retval_i(Interp*, int sig_ret, parrot_context_t *ctx);
 
 #define ADD_OP_VAR_PART(interpreter, seg, pc, n) do { \
     if (*pc == PARROT_OP_set_args_pc || \
