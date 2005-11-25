@@ -16,7 +16,7 @@ Tests Parrot calling conventions.
 
 =cut
 
-use Parrot::Test tests => 48;
+use Parrot::Test tests => 49;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "set_args - parsing");
@@ -1314,4 +1314,26 @@ ok 1
 ok 2
 OUTPUT
 
+pir_output_is(<<'CODE', <<'OUTPUT', "call evaled vtable code");
+.sub main :main
+    .local string s
+    .local pmc cl, o
+    cl = newclass "Foo"
+    s  = ".namespace ['Foo']\n"
+    s .= ".sub __get_integer_keyed_int :method\n"
+    s .= ".param int i\n"
+    s .= "i += 5\n"
+    s .= ".return(i)\n"
+    s .= ".end\n"
+    .local pmc comp
+    comp = compreg "PIR"
+    $P0 = comp(s)
+    o = new 'Foo'
+    $I0 = o[12]
+    print $I0
+    print "\n"
+.end
+CODE
+17
+OUTPUT
 
