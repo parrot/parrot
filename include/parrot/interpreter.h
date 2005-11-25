@@ -207,6 +207,8 @@ typedef struct Parrot_Context {
     INTVAL current_HLL;         /* see also src/hll.c */
     opcode_t *current_args;      /* ptr into code with set_args opcode */
     opcode_t *current_results;   /* ptr into code with get_results opcode */
+    /* deref the constants - we need it all the time */
+    struct PackFile_Constant ** constants;
 } parrot_context_t;
 
 #define ALIGNED_CTX_SIZE ( ((sizeof(struct Parrot_Context) + NUMVAL_SIZE - 1) \

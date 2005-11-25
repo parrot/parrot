@@ -19,6 +19,8 @@ C<interpinfo> opcode.
 
 use Parrot::Test tests => 7;
 
+SKIP: {
+	skip("we really shouldn't run just a label - use a sub", 1);
 output_is(<<'CODE', <<'OUTPUT', "runinterp - new style");
 	new P0, .ParrotInterpreter
 	print "calling\n"
@@ -35,6 +37,7 @@ calling
 In 2
 ending
 OUTPUT
+}
 
 # Need to disable DOD while trace is on, as there's a non-zero chance that a
 # DOD sweep would occur, causing a bonus "DOD" line in the output, which makes

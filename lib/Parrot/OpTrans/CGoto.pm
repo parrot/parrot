@@ -76,7 +76,7 @@ sub defines
 #define NREG(i) REG_NUM(cur_opcode[i])
 #define PREG(i) REG_PMC(cur_opcode[i])
 #define SREG(i) REG_STR(cur_opcode[i])
-#define CONST(i) interpreter->code->const_table->constants[cur_opcode[i]]
+#define CONST(i) CONTEXT(interpreter->ctx)->constants[cur_opcode[i]]
 END
 }
 

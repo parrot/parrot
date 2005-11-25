@@ -253,9 +253,11 @@ run_sub(Parrot_Interp interpreter, PMC* sub_pmc)
      * PackFile which isn't worth the effort - probably
      */
     if (interpreter->run_core != PARROT_CGOTO_CORE  &&
-        interpreter->run_core != PARROT_SLOW_CORE  &&
-        interpreter->run_core != PARROT_FAST_CORE)
+            interpreter->run_core != PARROT_SLOW_CORE  &&
+            interpreter->run_core != PARROT_FAST_CORE)
         interpreter->run_core = PARROT_FAST_CORE;
+    CONTEXT(interpreter->ctx)->constants =
+        interpreter->code->const_table->constants;
     retval = Parrot_runops_fromc_args(interpreter, sub_pmc, "P");
     interpreter->run_core = old;
     return retval;
@@ -2439,6 +2441,7 @@ Parrot_switch_to_cs(Interp *interpreter,
         PIO_eprintf(interpreter, "*** switching to %s\n",
                 new_cs->base.name);
     interpreter->code = new_cs;
+    CONTEXT(interpreter->ctx)->constants = new_cs->const_table->constants;
     new_cs->prev = cur_cs;
     if (really)
         prepare_for_run(interpreter);

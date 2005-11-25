@@ -815,6 +815,8 @@ Parrot_runcode(Interp *interpreter, int argc, char *argv[])
         main_sub = set_current_sub(interpreter);
     }
     CONTEXT(interpreter->ctx)->current_sub = NULL;
+    CONTEXT(interpreter->ctx)->constants =
+        interpreter->code->const_table->constants;
     Parrot_runops_fromc_args(interpreter, main_sub, "vP", userargv);
 }
 
@@ -956,6 +958,10 @@ Parrot_run_native(Parrot_Interp interpreter, native_func_t func)
     pf->cur_cs->base.size = 2;
     Parrot_loadbc(interpreter, pf);
     run_native = func;
+    if (interpreter->code && interpreter->code->const_table) {
+        CONTEXT(interpreter->ctx)->constants =
+            interpreter->code->const_table->constants;
+    }
     runops(interpreter, interpreter->resume_offset);
 }
 

@@ -1091,12 +1091,12 @@ $(SRC_DIR)/charset$(O) : $(SRC_DIR)/charset.c $(GENERAL_H_FILES)
 $(OPS_DIR)/core_ops$(O) : $(GENERAL_H_FILES) $(OPS_DIR)/core_ops.c
 
 #core_ops depends upon config.h so that it gets updated along with updates to config.h's version numbers
-$(OPS_DIR)/core_ops.c $(INC_DIR)/oplib/core_ops.h : $(OPS_FILES) $(BUILD_TOOLS_DIR)/ops2c.pl lib/Parrot/OpsFile.pm lib/Parrot/Op.pm $(INC_DIR)/config.h lib/Parrot/OpLib/core.pm
+$(OPS_DIR)/core_ops.c $(INC_DIR)/oplib/core_ops.h : $(OPS_FILES) $(BUILD_TOOLS_DIR)/ops2c.pl lib/Parrot/OpsFile.pm lib/Parrot/Op.pm $(INC_DIR)/config.h lib/Parrot/OpLib/core.pm lib/Parrot/OpTrans/C.pm
 	$(PERL) $(BUILD_TOOLS_DIR)/ops2c.pl C --core
 
 $(OPS_DIR)/core_ops_switch$(O) : $(GENERAL_H_FILES) $(OPS_DIR)/core_ops_switch.c
 
-$(OPS_DIR)/core_ops_switch.c $(INC_DIR)/oplib/core_ops_switch.h : $(OPS_FILES) $(BUILD_TOOLS_DIR)/ops2c.pl lib/Parrot/OpsFile.pm lib/Parrot/Op.pm $(INC_DIR)/config.h lib/Parrot/OpLib/core.pm
+$(OPS_DIR)/core_ops_switch.c $(INC_DIR)/oplib/core_ops_switch.h : $(OPS_FILES) $(BUILD_TOOLS_DIR)/ops2c.pl lib/Parrot/OpsFile.pm lib/Parrot/Op.pm $(INC_DIR)/config.h lib/Parrot/OpLib/core.pm lib/Parrot/OpTrans/CSwitch.pm
 	$(PERL) $(BUILD_TOOLS_DIR)/ops2c.pl CSwitch --core
 
 build_tools\parrotdef.pl : $(CLASS_PMC_FILES)
