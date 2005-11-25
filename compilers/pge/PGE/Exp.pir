@@ -1102,7 +1102,7 @@ register.
     emit(code, "    $P1 = getattribute $P0, \"PGE::Match\\x0$:from\"")
     emit(code, "    $P1 = pos")
     emit(code, "    goto %s", next)
-    goto end
+    goto subrule_commit
   subrule_4:
     emit(code, "    if $P1 < 0 goto fail")
     if iscapture == 0 goto subrule_5
