@@ -96,6 +96,22 @@ Open the file with the given mode and use the IO given layer.
 
 Class initialization.
 
+=item C<METHOD INTVAL eof()>
+
+Return 0/1 according to eof state of the object.
+
+=item C<METHOD void flush()>
+
+Flush pending writes.
+
+=item C<METHOD INTVAL setbuf(INTVAL)>
+
+XXX TBD
+
+=item C<METHOD INTVAL setlinebuf()>
+
+XXX TBD
+
 =cut
 
 */
