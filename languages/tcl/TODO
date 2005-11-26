@@ -53,11 +53,6 @@ it's functionally equivalent, internally generated PIR need not be pretty.
 
 =over 4
 
-=item pbc_merge
-
-Take advantage of the new C<pbc_merge> to combine the various .pbc files
-into a singleton.
-
 =item Makefile deps
 
 Should be more explicit about the PMC dependencies in the makefile. *something*
@@ -68,11 +63,6 @@ is causing things to get rebuilt unecessarily each time "make tclsh" is run.
 =head2 PIR tasks
 
 =over 4
-
-=item keyed access
-
-tcl is not using Keys when getting from aggregates. It probably should,
-at least for language interoperability.
 
 =item implement default globals, etc.
 
@@ -121,10 +111,6 @@ need to specify the correct errors to throw.
 =head2 Things we can't do yet (need parrot)
 
 =over 4
-
-=item [regexp], [regsub], -regexp
-
-Don't have a tcl-style RE PGE class avaialable yet.
 
 =item [pwd], [cd] [#???]
 
