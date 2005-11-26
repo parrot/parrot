@@ -153,4 +153,4 @@ TCL
 ok
 OUT
 
-
+# XXX Need -regexp tests 
