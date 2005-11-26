@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 7;
+use Parrot::Test tests => 8;
 use Parrot::Config;
 
 
@@ -24,7 +24,6 @@ Test the examples in F<examples/pasm>.
 
 =head1 TODO
 
-Check on remaining examples in 'examples/assembly'.
 Put expected output into the example files.
 
 =head1 SEE ALSO
@@ -134,3 +133,9 @@ END_EXPECTED
 while ( my ( $example, $expected ) = each %expected ) {
     example_output_is( "examples/pasm/$example", $expected );
 }
+
+TODO:
+{
+  local $TODO = 'nanoforth2.pasm not testable yet';
+  fail( 'nanoforth2.pasm' );
+};

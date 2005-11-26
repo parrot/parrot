@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 3;
+use Parrot::Test tests => 4;
 use Parrot::Config;
 
 
@@ -70,4 +70,10 @@ asdf =~ /as/
 1 match(es):
 as
 END_EXPECTED
+};
+
+TODO:
+{
+  local $TODO = 'ncurses_life.imc not testable yet';
+  fail( 'ncurses_life.imc' );
 };

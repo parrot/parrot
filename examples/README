@@ -1,10 +1,7 @@
 # $Id$
 
-The directory 'examples' provides examples of the proper,
+The directory 'examples' provides examples of proper,
 and sometimes hillarious, programs for Parrot.
-
-assembly  - Miscellaneous stuff in PASM and PIR
-            The examples will be moved to the dirs 'pir' and 'pasm'.
 
 benchmark - Contains benchmark. Run them with 'make testbench'
      

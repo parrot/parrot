@@ -1,13 +1,13 @@
-# Copyright (C) 2001-2003 The Perl Foundation.  All rights reserved.
+# Copyright (C) 2001-2005 The Perl Foundation.  All rights reserved.
 # $Id$
 
 =head1 NAME
 
-examples/assembly/ncurses_life.imc - Conway's Life (ncurses version)
+examples/library/ncurses_life.imc - Conway's Game of Life (ncurses version)
 
 =head1 SYNOPSIS
 
-    % ./parrot examples/assembly/ncurses_life.imc examples/assembly/acorn.l
+    % ./parrot examples/pasm/ncurses_life.imc examples/library/acorn.l
 
 =head1 DESCRIPTION
 
@@ -793,7 +793,7 @@ key_done:
 
 =head1 SEE ALSO
 
-F<examples/assembly/acorn.l>, F<examples/assembly/life.pasm>,
+F<examples/library/acorn.l>, F<examples/pasm/life.pasm>,
 F<library/ncurses.pasm>, F<library/ncurses.declarations>.
 
 =cut

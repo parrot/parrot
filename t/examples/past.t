@@ -22,10 +22,6 @@ t/examples/pir.t - Test examples in F<examples/past>
 
 Test the examples in F<examples/past>.
 
-=head1 TODO
-
-Perhaps use Parrot::Test::run_command().
-
 =head1 SEE ALSO
 
 F<t/examples/pasm.t>

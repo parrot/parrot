@@ -1,6 +1,10 @@
+$Id$
+
 # recursive queens placement
 # prints all 92 solutions in chess notation
 # by leo
+
+# See also: pams/queens.pasm
 
 .sub main :main
     .local pmc queen_row, queen_state

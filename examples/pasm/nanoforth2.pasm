@@ -1,3 +1,5 @@
+# $Id$
+
 =pod
 
 =head1 nanoforth2 - a totally stripped down forth kernel

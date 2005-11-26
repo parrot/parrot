@@ -1,13 +1,13 @@
-# Copyright (C) 2001-2003 The Perl Foundation.  All rights reserved.
+# Copyright (C) 2001-2005 The Perl Foundation.  All rights reserved.
 # $Id$
 
 =head1 NAME
 
-examples/assembly/hello-dwim.pasm - Parrot's confusing opcodes made easy
+examples/pir/hello-dwim.pir - Parrot's confusing opcodes made easy
 
 =head1 SYNOPSIS
 
-    % ./parrot examples/assembly/hello-dwim.pasm
+    % ./parrot examples/pir/hello-dwim.pir
 
 =head1 DESCRIPTION
 

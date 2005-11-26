@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-examples/benchmarks/mops.pasm - Calculate a benchmark
+examples/benchmarks/mops.pasm - Calculate a benchmark for Integer PMCs
 
 =head1 SYNOPSIS
 
@@ -65,7 +65,6 @@ DONE:   time   N5
 
 =head1 SEE ALSO
 
-F<examples/assembly/pmcmops.pasm>,
 F<examples/mops/mops.c>,
 F<examples/mops/mops.cs>,
 F<examples/mops/mops.il>,
@@ -77,4 +76,3 @@ F<examples/mops/mops.rb>,
 F<examples/mops/mops.scheme>.
 
 =cut
-
