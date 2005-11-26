@@ -25,15 +25,14 @@
 
   $S0 = substr position, 0, 4
   if $S0 == "end-" goto has_end
-  index_length = length $S0
-  # is this an int?
-  (retval, pos) = get_number(position,0)
-  if pos != index_length goto bad_arg
-  $I0 = isa retval, "Integer"
-  if $I0 == 0 goto bad_arg
-  .return(retval)
 
-  #if not, fail.
+  push_eh bad_arg
+    retval = __number(position)
+  clear_eh
+  $I0 = typeof retval
+  if $I0 != .TclInt goto bad_arg
+  .return(retval)
+  
 bad_arg:
   $S9  = "bad index \""
   $S9 .= position
@@ -41,22 +40,21 @@ bad_arg:
   .throw($S9)
  
 has_end:
-  # is this an int? if so, subtract it from -1 to get our parrot-style index.
-  index_length = length position
-  # is this an int?
-  (number_result,pos) = get_number(position,4)
-  if pos != index_length goto bad_arg
-  $I0 = isa number_result, "Integer"
-  if $I0 == 0 goto bad_arg
-  # say, 1 if -1
-  $I0 = number_result
-  # say, 2 if -2
-  inc $I0
- 
+  $S1 = substr position, 4
+
+  push_eh bad_arg
+    retval = __number($S1)
+  clear_eh
+
+  $I0 = typeof retval
+  if $I0 != .TclInt goto bad_arg
+
   # say, length is 6
   index_1 = length the_string
+  dec index_1 # last position is 5.
   # so, if we had end-1, then we'd be at position 4. (end is 5, -1)
-  index_1 = index_1 - $I0
+  $I1 = retval
+  index_1 = index_1 - $I1
 
  .return(index_1)
 
