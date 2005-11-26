@@ -144,22 +144,22 @@ This probably doesn't work correctly yet, but you will probably never use it.
 	is_defined = exists args['testplan']
 	unless is_defined goto DEFAULT_TESTPLAN
 
-  	testplan   = args['testplan']
+	testplan   = args['testplan']
 	goto TESTPLAN_DEFINED
 
   DEFAULT_TESTPLAN:
 	testplan   = new .String
-	set testplan, ''
+	testplan   = ''
 
   TESTPLAN_DEFINED:
 
-    results    = new .ResizablePMCArray
+	results    = new .ResizablePMCArray
 	.local int test_builder_type
 
 	find_type test_builder_type, 'Test::Builder'
 	.local pmc real_init
 	.local pmc blank_init
-	real_init = find_global 'Test::Builder', '__init'
+	real_init  = find_global 'Test::Builder', '__init'
 	blank_init = find_global 'Test::Builder', '__fake_init'
 	store_global 'Test::Builder', '__init', blank_init
 
@@ -175,7 +175,7 @@ This probably doesn't work correctly yet, but you will probably never use it.
 	.param pmc args
 
 	.local pmc single
-	single = find_global 'Test::Builder::_singleton', 'singleton'
+	single     = find_global 'Test::Builder::_singleton', 'singleton'
 
 	.local pmc output
 	.local pmc testplan
@@ -186,9 +186,9 @@ This probably doesn't work correctly yet, but you will probably never use it.
 	is_defined = isa single, 'Test::Builder'
 	unless is_defined goto CREATE_ATTRIBUTES
 
-	output   = single.'output'()
-	testplan = single.'testplan'()
-	results  = single.'results'()
+	output     = single.'output'()
+	testplan   = single.'testplan'()
+	results    = single.'results'()
 
 	goto RESULTS_DEFINED
 
@@ -212,15 +212,15 @@ This probably doesn't work correctly yet, but you will probably never use it.
 	# now try in the args hash
 	is_defined = exists args['testplan']
 	unless is_defined goto CREATE_TESTPLAN
-	testplan = args['testplan']
+	testplan   = args['testplan']
 	goto TESTPLAN_DEFINED
 
   CREATE_TESTPLAN:
 	testplan   = new .String
-	set testplan, 'global_testplan'
+	testplan   = 'global_testplan'
 
   TESTPLAN_DEFINED:
-  	is_defined = defined results
+	is_defined = defined results
 	if is_defined goto RESULTS_DEFINED
 	results    = new .ResizablePMCArray
 
@@ -258,7 +258,7 @@ This probably doesn't work correctly yet, but you will probably never use it.
 	.local pmc results
 
 	classoffset offset, self, 'Test::Builder'
-	add offset, 2
+	offset += 2
 	getattribute results, self, offset
 
 	.return( results )
@@ -309,8 +309,7 @@ declared a plan or if you pass an invalid argument.
 =cut
 
 .sub plan method
-	.param string explanation
-	.param int    tests
+	.param string tests
 
 	.local pmc testplan
 	testplan = self.'testplan'()
@@ -322,7 +321,7 @@ declared a plan or if you pass an invalid argument.
 	.local int is_plan
 
 	is_plan = isa testplan, 'Test::Builder::TestPlan'
-	eq is_plan, 1, CHECK_REPLAN
+	if is_plan == 1 goto CHECK_REPLAN
 	eq_str testplan, 'global_testplan', SET_GLOBAL_TESTPLAN
 	goto CHECK_REPLAN
 
@@ -331,31 +330,35 @@ declared a plan or if you pass an invalid argument.
 	goto CHECK_TESTNUM
 
   CHECK_REPLAN:
-  	.local int valid_tp
+	.local int valid_tp
 	valid_tp = does testplan, 'Test::Builder::TestPlan'
 
 	unless valid_tp goto CHECK_TESTNUM
 
 	.local pmc plan_exception
 	plan_exception = new .Exception
-	set   plan_exception['_message'], 'Plan already set!'
+	plan_exception['_message'] = 'Plan already set!'
 	throw plan_exception
 
   CHECK_TESTNUM:
-	unless tests goto CHECK_EXPLANATION
+	if tests == 'no_plan' goto PLAN_NULL
+
+	.local int num_tests
+	num_tests = tests
+
+	unless num_tests goto PLAN_FAILURE
 
 	.local int plan_type
 	.local pmc args
 
 	args = new .Hash
-	set args['expect'], tests
+	args['expect'] = num_tests
 
 	find_type plan_type, 'Test::Builder::TestPlan'
 	testplan = new plan_type, args
 	goto FINISH_PLAN
 
   CHECK_EXPLANATION:
-	eq_str explanation, 'no_plan', PLAN_NULL
 	goto PLAN_FAILURE
 
   PLAN_NULL:
@@ -367,7 +370,7 @@ declared a plan or if you pass an invalid argument.
   PLAN_FAILURE:
 	.local pmc plan_exception
 	plan_exception = new .Exception
-	set   plan_exception['_message'], 'Unknown test plan!'
+	plan_exception['_message'] = 'Unknown test plan!'
 	throw plan_exception
 
   FINISH_PLAN:
@@ -375,7 +378,7 @@ declared a plan or if you pass an invalid argument.
 	store_global 'Test::Builder::_singleton', 'testplan', testplan
 
   WRITE_HEADER:
-  	.local pmc output
+	.local pmc output
 	output = self.'output'()
 
 	.local string header
@@ -401,7 +404,7 @@ Records a diagnostic message for output.
 	.return()
 
   DIAGNOSTIC_SET:
-  	.local pmc output
+	.local pmc output
 	output = self.'output'()
 	output.'diag'( diagnostic )
 .end
@@ -415,8 +418,13 @@ recording it with the optional test description in C<description>.
 
 .sub ok method
 	.param int    passed
-	.param string description
+	.param string description     :optional
+	.param int    has_description :opt_flag
 
+	if has_description goto OK
+	description = ''
+
+  OK:
 	.local pmc results
 	results = self.'results'()
 
@@ -426,9 +434,9 @@ recording it with the optional test description in C<description>.
 
 	.local pmc test_args
 	test_args = new .Hash
-	set test_args['number'],      results_count
-	set test_args['passed'],      passed
-	set test_args['description'], description
+	test_args['number']      = results_count
+	test_args['passed']      = passed
+	test_args['description'] = description
 
 	self.'report_test'( test_args )
 
@@ -446,9 +454,19 @@ TODO.
 
 .sub todo method
 	.param int    passed
-	.param string description
-	.param string reason
+	.param string description     :optional
+	.param int    has_description :opt_flag
+	.param string reason          :optional
+	.param int    has_reason      :opt_flag
 
+	if has_description goto CHECK_REASON
+	description = ''
+
+  CHECK_REASON:
+	if has_reason goto TODO
+	reason = ''
+
+  TODO:
 	.local pmc results
 	results = self.'results'()
 
@@ -458,11 +476,11 @@ TODO.
 
 	.local pmc test_args
 	test_args = new .Hash
-	set test_args['todo'],        1
-	set test_args['number'],      results_count
-	set test_args['passed'],      passed
-	set test_args['reason'],      reason
-	set test_args['description'], description
+	test_args['todo']       = 1
+	test_args['number']     = results_count
+	test_args['passed']     = passed
+	test_args['reason']     = reason
+	test_args['description']= description
 
 	self.'report_test'( test_args )
 
@@ -477,15 +495,21 @@ why you've skipped them.
 =cut
 
 .sub skip method
-	.param int    number
-	.param string reason
+	.param int    number          :optional
+	.param int    has_number      :opt_flag
+	.param string reason          :optional
+	.param int    has_reason      :opt_flag
 
-	if number goto CHECK_REASON
+	if has_number goto CHECK_NUMBER
 	number = 1
 
+  CHECK_NUMBER:
+	if number > 0 goto CHECK_REASON
+	.return() # nothing to skip
+
   CHECK_REASON:
-    if reason goto SKIP_LOOP
-	set reason, 'skipped'
+	if has_reason goto SKIP_LOOP
+	reason = 'skipped'
 
   SKIP_LOOP:
 	.local pmc results
@@ -502,9 +526,9 @@ why you've skipped them.
 
 	.local pmc test_args
 	test_args = new .Hash
-	set test_args['number'], results_count
-	set test_args['skip'],   1
-	set test_args['reason'], reason
+	test_args['number'] = results_count
+	test_args['skip']   = 1
+	test_args['reason'] = reason
 
 	self.'report_test'( test_args )
 	inc loop_count
@@ -527,11 +551,11 @@ plan.  This calls C<exit>; there's little point in continuing.
 
 	.local pmc plan_exception
 	plan_exception = new .Exception
-	set   plan_exception['_message'], 'Cannot skip_all() with a plan!'
+	plan_exception['_message'] = 'Cannot skip_all() with a plan!'
 	throw plan_exception
 
   SKIP_ALL:
-  	.local pmc output
+	.local pmc output
 	output = self.'output'()
 	output.'write'( "1..0" )
 	exit 0
@@ -545,17 +569,18 @@ also calls C<exit>.
 =cut
 
 .sub BAILOUT method
-	.param string reason
+	.param string reason  :optional
+	.param int has_reason :opt_flag
 
-  	.local pmc output
-	output  = self.'output'()
+	.local pmc output
+	output   = self.'output'()
 
 	.local string bail_out
 	bail_out = 'Bail out!'
 
-	unless reason goto WRITE_REASON
-	concat bail_out, '  '
-	concat bail_out, reason
+	unless has_reason goto WRITE_REASON
+	bail_out .= '  '
+	bail_out .= reason
 
   WRITE_REASON:
 	output.'write'( bail_out )
@@ -575,7 +600,7 @@ also calls C<exit>.
 
 	.local pmc plan_exception
 	plan_exception = new .Exception
-	set   plan_exception['_message'], 'No plan set!'
+	plan_exception['_message'] = 'No plan set!'
 	throw plan_exception
 
   CREATE_TEST:
@@ -592,7 +617,7 @@ also calls C<exit>.
 	number = count
 	inc number
 
-	set test_args['number'], number
+	test_args['number'] = number
 
 	push results, test
 

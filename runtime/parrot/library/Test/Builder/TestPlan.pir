@@ -45,13 +45,17 @@ Test::Builder::NullPlan object, do not pass the hash.
 =cut
 
 .sub __init method
-	.param pmc args
+	.param pmc args     :optional
+	.param int has_args :opt_flag
+
+	unless has_args goto NULL_PLAN
 
 	.local int valid_args
 	valid_args = isa args, 'Hash'
 	if valid_args goto CHECK_ARGS
 
 	# hope this is for Test::Builder::NullPlan
+  NULL_PLAN:
 	.return()
 
   CHECK_ARGS:
