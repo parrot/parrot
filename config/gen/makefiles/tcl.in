@@ -28,6 +28,7 @@ lib${slash}commands${slash}catch.pir \
 lib${slash}commands${slash}concat.pir \
 lib${slash}builtins${slash}continue.pir \
 lib${slash}commands${slash}continue.pir \
+lib${slash}commands${slash}eof.pir \
 lib${slash}commands${slash}error.pir \
 lib${slash}commands${slash}eval.pir \
 lib${slash}commands${slash}exit.pir \
@@ -53,6 +54,7 @@ lib${slash}commands${slash}llength.pir \
 lib${slash}commands${slash}lrange.pir \
 lib${slash}commands${slash}lrepeat.pir \
 lib${slash}commands${slash}lset.pir \
+lib${slash}commands${slash}lsort.pir \
 lib${slash}commands${slash}namespace.pir \
 lib${slash}commands${slash}open.pir \
 lib${slash}commands${slash}parray.pir \
