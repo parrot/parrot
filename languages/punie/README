@@ -39,4 +39,4 @@ Compile Punie to bytecode and run its test suite:
 Run the Punie compiler via Parrot, passing it the path to a Perl 1
 source file as the only argument:
 
-  $ ../../parrot punie.pbc script.p1
+  $ ../../parrot punie.pbc demo.p1
