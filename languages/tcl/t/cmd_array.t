@@ -4,7 +4,6 @@ use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
 use Parrot::Test tests => 45;
 use Test::More;
-use vars qw($TODO);
 
 language_output_is("tcl",<<'TCL',<<OUT,"array, no args");
  array
@@ -319,12 +318,10 @@ TCL
 OUT
 
 
-TODO: {
-  local $TODO = "don't have tcl style regexp in PGE yet.";
-
 language_output_is("tcl", <<'TCL', <<'OUT',"array names, explicit regexp match");
   set a(monkey1) see
   set a(monkey2) do
+  set a(ferret)  don't
   puts [array names a -regexp ^mon.*]
 TCL
 monkey1 monkey2
@@ -337,4 +334,3 @@ language_output_is("tcl", <<'TCL', <<'OUT',"array names, explicit regexp match f
 TCL
 
 OUT
-}
