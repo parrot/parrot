@@ -56,6 +56,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "pass arguments to a tcl proc from PIR");
 CODE
 hello
 OUTPUT
+}
 
 pir_output_is(<<'CODE', <<'OUTPUT', "invoke argless tcl proc from PIR");
 .sub _main :main
@@ -68,7 +69,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "invoke argless tcl proc from PIR");
 CODE
 11
 OUTPUT
-}
+
 
 pir_output_is(<<'CODE', <<'OUTPUT', "Verify HLL autoboxing: Int");
 .HLL 'Tcl', 'tcl_group'
