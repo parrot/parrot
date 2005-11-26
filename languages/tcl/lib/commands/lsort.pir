@@ -47,16 +47,11 @@ c_int:
 
 got_list:
 
-  unless decr goto skip_decr
-  $P0 = find_global "_Tcl\0builtins\0lsort", "reverse"
-  compare = $P0(compare)
-skip_decr:
-
   .local pmc __list
   __list = find_global "_Tcl", "__list"
   $P0 = __list($P0)
 
-  sort(compare, $P0)
+  sort(compare, $P0, decr)
 
   unless unique goto skip_unique
   .local int c, size
@@ -95,12 +90,13 @@ wrong_args:
 .sub "sort"
   .param pmc compare
   .param pmc list
+  .param int decreasing
 
   .local int size
   size = list
   size -= 1
 
-  quicksort(compare, list, 0, size)
+  quicksort(compare, list, 0, size, decreasing)
 .end
 
 .sub "quicksort"
@@ -108,6 +104,7 @@ wrong_args:
   .param pmc list
   .param int lo
   .param int hi
+  .param int decreasing
 
   if lo >= hi goto done
 
@@ -122,7 +119,7 @@ move_loop:
   inc_loop:
     unless l < h goto inc_end
     $P0 = list[l]
-    $I0 = compare($P0, pivot)
+    $I0 = compare($P0, pivot, decreasing)
     unless $I0 <= 0 goto inc_end
     l += 1
     branch inc_loop
@@ -130,7 +127,7 @@ move_loop:
   dec_loop:
     unless h > l goto dec_end
     $P0 = list[h]
-    $I0 = compare($P0, pivot)
+    $I0 = compare($P0, pivot, decreasing)
     unless $I0 >= 0 goto dec_end
     h -= 1
     branch dec_loop
@@ -152,8 +149,8 @@ move_end:
 
   $I0 = l - 1
   $I1 = l + 1
-  quicksort(compare, list, lo, $I0)
-  quicksort(compare, list, $I1, hi)
+  quicksort(compare, list, lo, $I0, decreasing)
+  quicksort(compare, list, $I1, hi, decreasing)
 
 done:
   .return ()
@@ -162,34 +159,49 @@ done:
 .sub "ascii"
   .param pmc s1
   .param pmc s2
+  .param int is_decr
+  if is_decr goto decreasing
   $I0 = cmp_str s1, s2
+  .return ($I0)
+decreasing:
+  $I0 = cmp_str s2, s1
   .return ($I0)
 .end
 
 .sub "integer"
   .param pmc s1
   .param pmc s2
-# XXX check that they're actually integers
+  .param int is_decr
+
+  # check that they're actually integers.
+  .local pmc __number
+  __number = find_global '_Tcl', '__number'
+  s1 = __number(s1)
+  s2 = __number(s2)
+
+  $I0 = typeof s1
+  if $I0 != .TclInt goto bad_s1
+  $I0 = typeof s2
+  if $I0 != .TclInt goto bad_s2
+
+  if is_decr goto decreasing
   $I0 = cmp_num s1, s2
   .return ($I0)
-.end
+decreasing:
+  $I0 = cmp_num s2, s1
+  .return ($I0)
 
-.sub "reverse"
-  .param pmc compare
-  .local string code
+bad_s1:
+  $S1 = s1
+  goto bad
 
-  print "-decreasing not implemented!"
+bad_s2:
+  $S1 = s2
 
-  code = <<"END_PIR"
+bad:
+  $S0  = "expected integer but got \""
+  $S0 .= $S1
+  $S0 .= "\""
 
-.sub "reversed" :anon
-  .param string s1
-  .param string s2
-  .return (0)
-.endsub
-
-END_PIR
-
-  $P0 = compreg "PIR"
-  .return $P0(code)
+  .throw ($S0)
 .end

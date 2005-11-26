@@ -110,9 +110,6 @@ TCL
 -5 0 2 5 10 30
 OUT
 
-TODO: {
-  local $TODO = "no excuses!";
-
 language_output_is("tcl",<<'TCL',<<OUT,"integer die");
   set a {10 10.2}
   puts [lsort -integer $a]
@@ -132,6 +129,9 @@ language_output_is("tcl",<<'TCL',<<OUT,"decreasing integer unique");
 TCL
 30 10 5 2 0 -5
 OUT
+
+TODO: {
+  local $TODO = "no excuses!";
 
 language_output_is("tcl",<<'TCL',<<OUT,"dictionary");
   set a {a10 B2 b1 a1 a2}
