@@ -100,7 +100,7 @@ main(int argc, char *argv[])
 
 =head1 SEE ALSO
 
-F<examples/assembly/mops.pasm>,
+F<examples/benchmarks/mops.pasm>,
 F<examples/mops/mops.cs>,
 F<examples/mops/mops.il>,
 F<examples/mops/mops.p6>,

@@ -77,7 +77,7 @@ print "M op/s:        ",$N1,"\n"; # print  "M op/s:        "
 
 =head1 SEE ALSO
 
-F<examples/assembly/mops.pasm>,
+F<examples/benchmarks/mops.pasm>,
 F<examples/mops/mops.c>,
 F<examples/mops/mops.cs>,
 F<examples/mops/mops.il>,

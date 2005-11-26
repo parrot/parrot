@@ -3,11 +3,11 @@
 
 =head1 NAME
 
-examples/assembly/thr-primes.imc - Threads
+examples/pir/thr-primes.pir - Threads
 
 =head1 SYNOPSIS
 
-    % ./parrot examples/assembly/thr-primes.imc
+    % ./parrot examples/pir/thr-primes.pir
 
 =head1 DESCRIPTION
 

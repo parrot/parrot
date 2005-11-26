@@ -3,11 +3,11 @@
 
 =head1 NAME
 
-examples/assembly/stack.pasm - User Stack
+examples/pasm/stack.pasm - User Stack
 
 =head1 SYNOPSIS
 
-    % ./parrot examples/assembly/stack.pasm
+    % ./parrot examples/pasm/stack.pasm
 
 =head1 DESCRIPTION
 

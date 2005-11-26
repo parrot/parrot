@@ -20,7 +20,7 @@ Convert this into proper PIR.
 
 =head1 SEE ALSO
 
-F<examples/assembly/ncurses_life.imc>.
+F<examples/library/ncurses_life.imc>.
 
 =cut
 

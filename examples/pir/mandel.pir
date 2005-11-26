@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-examples/assembly/mandel.imc - Print the Mandelbrot set
+examples/pir/mandel.pir - Print the Mandelbrot set
 
 =head1 SYNOPSIS
 

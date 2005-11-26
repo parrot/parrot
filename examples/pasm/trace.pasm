@@ -3,11 +3,11 @@
 
 =head1 NAME
 
-examples/assembly/trace.pasm - Tracing
+examples/pasm/trace.pasm - Tracing
 
 =head1 SYNOPSIS
 
-    % ./parrot examples/assembly/trace.pasm
+    % ./parrot examples/pasm/trace.pasm
 
 =head1 DESCRIPTION
 

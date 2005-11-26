@@ -3,13 +3,13 @@
 
 =head1 NAME
 
-examples/assembly/hanoi.pasm - Towers of hanoi
+examples/pir/hanoi.pir - Towers of hanoi
 
 =head1 SYNOPSIS
 
 You have to pass in the height of the tower:
 
-    % ./parrot examples/assembly/hanoi.pasm 5
+    % ./parrot examples/pir/hanoi.pir 5
 
 =head1 DESCRIPTION
 

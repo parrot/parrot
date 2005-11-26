@@ -3,11 +3,11 @@
 
 =head1 NAME
 
-examples/assembly/mops.pasm - Calculate a benchmark
+examples/benchmarks/mops_intval.pasm - Calculate a benchmark
 
 =head1 SYNOPSIS
 
-    % ./parrot examples/assembly/mops.pasm
+    % ./parrot examples/benchmarks/mops_intval.pasm
 
 =head1 DESCRIPTION
 

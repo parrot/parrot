@@ -3,11 +3,11 @@
 
 =head1 NAME
 
-examples/assembly/fact.pasm - Mmmm, beer good
+examples/pasm/fact.pasm - Mmmm, beer good
 
 =head1 SYNOPSIS
 
-    % ./parrot examples/assembly/fact.pasm
+    % ./parrot examples/pasm/fact.pasm
 
 =head1 DESCRIPTION
 
