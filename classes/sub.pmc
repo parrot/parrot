@@ -286,6 +286,7 @@ Invokes the subroutine.
          */
         Parrot_alloc_context(INTERP, sub->n_regs_used);
         context = CONTEXT(INTERP->ctx);
+        context->caller_ctx = caller_ctx;
         /* check recursion/call depth */
         if (++context->recursion_depth >
                 INTERP->recursion_limit) {
@@ -297,7 +298,6 @@ Invokes the subroutine.
          */
         context->current_cont = ccont;
         PMC_cont(ccont)->from_ctx = context;
-        context->caller_ctx = caller_ctx;
         /*
          * set context of the sub
          */

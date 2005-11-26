@@ -169,11 +169,12 @@ Swaps the "context".
             wanted_seg = co->seg;
             /* remember segment of caller */
             co->caller_seg = INTERP->code;
+            ctx = co->ctx;
             /* and the recent call context */
-            ccont = co->ctx->current_cont;
-            PMC_cont(ccont)->to_ctx = CONTEXT(INTERP->ctx);
+            ccont = ctx->current_cont;
+            ctx->caller_ctx = PMC_cont(ccont)->to_ctx = CONTEXT(INTERP->ctx);
             /* set context to coro context */
-            CONTEXT(INTERP->ctx) = ctx = co->ctx;
+            CONTEXT(INTERP->ctx) = ctx;
             INTERP->ctx.bp = ctx->bp;
             INTERP->ctx.bp_ps = ctx->bp_ps;
         }

@@ -104,8 +104,6 @@ Destroys the continuation.
         if (cc) {
             if (cc->from_ctx)
                 Parrot_free_context(interpreter, cc->from_ctx, 0);
-            if (cc->ctx_copy)
-                mem_sys_free(cc->ctx_copy);
             mem_sys_free(cc);
             PMC_cont_ASSIGN(SELF, NULL);
         }
@@ -227,11 +225,9 @@ destination to continue execution.
         CONTEXT(INTERP->ctx) = ctx = cc->to_ctx;
         INTERP->ctx.bp = ctx->bp;
         INTERP->ctx.bp_ps = ctx->bp_ps;
-        if (cc->ctx_copy) {
-            /* copy only these parts that are different
-             * XXX what else?
-             */
-            ctx->current_results = cc->ctx_copy->current_results;
+        if (cc->current_results) {
+            /* where caller wants result */
+            ctx->current_results = cc->current_results;
         }
         pc = cc->address;
         if (pc) {

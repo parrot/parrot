@@ -109,7 +109,8 @@ typedef struct Parrot_cont {
     struct Parrot_Context *to_ctx;   /* pointer to dest context */
     /* a Continuation keeps the from_ctx alive */
     struct Parrot_Context *from_ctx;  /* sub, this cont is returning from */
-    struct Parrot_Context *ctx_copy; /* full continuation only */
+    opcode_t *current_results;    /* ptr into code with get_results opcode
+                                    full continuation only */
 } * parrot_cont_t;
 
 #define PMC_cont(pmc)		  ((parrot_cont_t)PMC_struct_val(pmc))

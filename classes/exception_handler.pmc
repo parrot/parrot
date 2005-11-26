@@ -60,8 +60,6 @@ Initializes the exception handler.
     void destroy () {
         struct Parrot_cont * cc = PMC_cont(SELF);
         if (cc) {
-            if (cc->ctx_copy)
-                mem_sys_free(cc->ctx_copy);
             mem_sys_free(cc);
             PMC_cont_ASSIGN(SELF, NULL);
         }
@@ -70,6 +68,13 @@ Initializes the exception handler.
         PMC *result = SUPER();
         PObj_custom_mark_CLEAR(result);
         return result;
+    }
+
+
+    void* invoke (void* next) {
+        struct Parrot_cont * cc = PMC_cont(SELF);
+        cc->to_ctx->current_results = cc->current_results = NULL;
+        return SUPER(next);
     }
 }
 

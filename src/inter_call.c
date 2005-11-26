@@ -647,7 +647,7 @@ parrot_pass_args(Interp *interpreter,  parrot_context_t *src_ctx,
         action = "params";
     }
     else {
-        dst_pc = CONTEXT(interpreter->ctx)->current_results;
+        dst_pc = dest_ctx->current_results;
         if (!dst_pc)
             return NULL;
         src_pc = interpreter->current_returns;
@@ -655,10 +655,6 @@ parrot_pass_args(Interp *interpreter,  parrot_context_t *src_ctx,
         if (!src_pc) {    /* no returns */
             /* continuation call with args
              *
-             * we move current_args into context the first time
-             * and use the context var for further get_params
-             * so that we can clean current_args and make this
-             * less ambiguous
              */
             src_pc = interpreter->current_args;
             if (!src_pc)
