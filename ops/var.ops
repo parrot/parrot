@@ -207,7 +207,7 @@ op find_lex(out PMC, in STR) {
   if (!PMC_IS_NULL(lex_pad)) {
     /* use new code */
     STRING *lex_name = $2;
-    PMC *result;
+    PMC *result = NULL;
     lex_pad = Parrot_find_pad(interpreter, lex_name, ctx);
     if (lex_pad)
       result = VTABLE_get_pmc_keyed_str(interpreter, lex_pad, lex_name);
