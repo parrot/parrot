@@ -1,4 +1,4 @@
-### $ANTLR 2.7.5 (20051104): "bc_python.g" -> "BcTreeWalker.py"$
+### $ANTLR 2.7.5 (20050416): "bc_python.g" -> "BcTreeWalker.py"$
 ### import antlr and other modules ..
 import sys
 import antlr
@@ -980,7 +980,7 @@ class Walker(antlr.TreeParser):
             _t = self._retTree
             B_AST = self.returnAST
             gen_past_pir_AST = currentAST.root
-            gen_past_pir_AST = antlr.make(self.astFactory.create(PIR_HEADER,"pir header\n#"), B_AST, self.astFactory.create(PIR_FOOTER,"pir footer\n#"));
+            gen_past_pir_AST = antlr.make(self.astFactory.create(PIR_HEADER,"# pir header past\n#"), B_AST, self.astFactory.create(PIR_FOOTER,"# pir footer past\n#"));
             currentAST.root = gen_past_pir_AST
             if (gen_past_pir_AST != None) and (gen_past_pir_AST.getFirstChild() != None):
                 currentAST.child = gen_past_pir_AST.getFirstChild()
