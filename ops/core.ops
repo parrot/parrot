@@ -491,7 +491,7 @@ op set_args(inconst PMC) {
     /* for now just point to the opcode */
     interpreter->current_args = this;
     argc = VTABLE_elements(interpreter, signature);
-    goto ADDRESS(this + 2 + argc);
+    goto OFFSET(argc + 2);
 }
 
 op get_results(inconst PMC) {
@@ -501,7 +501,7 @@ op get_results(inconst PMC) {
 
     CONTEXT(interpreter->ctx)->current_results = this;
     argc = VTABLE_elements(interpreter, signature);
-    goto ADDRESS(this + 2 + argc);
+    goto OFFSET(argc + 2);
 }
 
 op get_params(inconst PMC) {
@@ -534,7 +534,7 @@ op set_returns(inconst PMC) {
 
     interpreter->current_returns = this;
     argc = VTABLE_elements(interpreter, signature);
-    goto ADDRESS(this + 2 + argc);
+    goto OFFSET(argc + 2);
 }
 
 =item B<result_info>(out PMC)

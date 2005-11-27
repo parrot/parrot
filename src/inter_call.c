@@ -25,6 +25,17 @@ subroutines.
 #include "parrot/oplib/ops.h"
 #include "inter_call.str"
 
+#define PREMATURE_OPT
+
+#ifdef PREMATURE_OPT
+
+#undef VTABLE_elements
+#define VTABLE_elements(i, ar) PMC_int_val(ar)
+#undef VTABLE_get_integer_keyed_int
+#define VTABLE_get_integer_keyed_int(i, ar, idx) ((INTVAL*)PMC_data(ar))[idx]
+
+#endif
+
 
 static int next_arg(Interp *, struct call_state_1 *st);
 
@@ -615,15 +626,6 @@ the latter handles return values and yields.
 
 */
 
-
-#ifdef PREMATURE_OPT
-
-#undef VTABLE_elements
-#define VTABLE_elements(i, ar) PMC_int_val(ar)
-#undef VTABLE_get_integer_keyed_int
-#define VTABLE_get_integer_keyed_int(i, ar, idx) ((INTVAL*)PMC_data(ar))[idx]
-
-#endif
 
 opcode_t *
 parrot_pass_args(Interp *interpreter,  parrot_context_t *src_ctx,

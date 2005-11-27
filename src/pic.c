@@ -93,7 +93,7 @@ extern void Parrot_Integer_i_subtract_Integer(Interp* , PMC* pmc, PMC* value);
  * hack to turn on inlining - just sub_p_p for mops done
  */
 
-#define ENABLE_INLINING 1
+#define ENABLE_INLINING 0
 
 /*
 
@@ -166,6 +166,7 @@ parrot_PIC_op_is_cached(Interp *interpreter, int op_code)
 {
     switch (op_code) {
         case PARROT_OP_infix_ic_p_p: return 1;
+        case PARROT_OP_get_params_pc: return 1;
     }
     return 0;
 }
@@ -252,6 +253,127 @@ parrot_pic_opcode(Interp *interpreter, INTVAL op)
 #endif
 }
 
+static void
+pass_int(Interp *interpreter, int n,
+        struct Parrot_Context *src_ctx, opcode_t *src_pc,
+        struct Parrot_Context *dst_ctx, opcode_t *dst_pc)
+{
+    INTVAL arg;
+    for ( ; n; ++src_pc, ++dst_pc, --n) {
+        arg = CTX_REG_INT(src_ctx, *src_pc);  /* no constants */
+        CTX_REG_INT(dst_ctx, *dst_pc) = arg;
+    }
+}
+
+static void
+pass_num(Interp *interpreter, int n,
+        struct Parrot_Context *src_ctx, opcode_t *src_pc,
+        struct Parrot_Context *dst_ctx, opcode_t *dst_pc)
+{
+    FLOATVAL arg;
+    for ( ; n; ++src_pc, ++dst_pc, --n) {
+        arg = CTX_REG_NUM(src_ctx, *src_pc);
+        CTX_REG_NUM(dst_ctx, *dst_pc) = arg;
+    }
+}
+
+static void
+pass_str(Interp *interpreter, int n,
+        struct Parrot_Context *src_ctx, opcode_t *src_pc,
+        struct Parrot_Context *dst_ctx, opcode_t *dst_pc)
+{
+    STRING *arg;
+    for ( ; n; ++src_pc, ++dst_pc, --n) {
+        arg = CTX_REG_STR(src_ctx, *src_pc);
+        CTX_REG_STR(dst_ctx, *dst_pc) = arg;
+    }
+}
+
+static void
+pass_pmc(Interp *interpreter, int n,
+        struct Parrot_Context *src_ctx, opcode_t *src_pc,
+        struct Parrot_Context *dst_ctx, opcode_t *dst_pc)
+{
+    PMC *arg;
+    for ( ; n; ++src_pc, ++dst_pc, --n) {
+        arg = CTX_REG_PMC(src_ctx, *src_pc);
+        CTX_REG_PMC(dst_ctx, *dst_pc) = arg;
+    }
+}
+/*
+ * return argument count and type of the signature or -1 if not pic-able
+ */
+static int
+pic_check_sig(Interp *interpreter, PMC *sig_pmc, int *type)
+{
+    int i, n, t1, t2;
+
+    assert(PObj_is_PMC_TEST(sig_pmc));
+    assert(sig_pmc->vtable->base_type == enum_class_FixedIntegerArray);
+    n = VTABLE_elements(interpreter, sig_pmc);
+    t1 = VTABLE_get_integer_keyed_int(interpreter, sig_pmc, 0);
+
+    if (t1 & ~PARROT_ARG_TYPE_MASK)
+        return -1;
+    for (i = 1; i < n; ++i) {
+        t2 = VTABLE_get_integer_keyed_int(interpreter, sig_pmc, i);
+        if (t2 != t1)
+            return -1;
+    }
+    *type = t1;
+    return n;
+}
+
+static int
+is_pic_param(Interp *interpreter, void **pc, Parrot_MIC* mic)
+{
+    PMC *dst_sig, *src_sig;
+    PMC *sig;
+    int n, n2, type, type2;
+    parrot_context_t *caller_ctx, *ctx;
+    INTVAL const_nr;
+
+    /* check params */
+    sig = *(PMC**)pc[1];
+    n = pic_check_sig(interpreter, sig, &type);
+    if (n == -1)
+        return 0;
+    ctx = CONTEXT(interpreter->ctx);
+    caller_ctx = ctx->caller_ctx;
+    if (interpreter->current_args) {
+        const_nr = interpreter->current_args[1];
+        /* check current_args signature */
+        sig = caller_ctx->constants[const_nr]->u.key;
+        n2 = pic_check_sig(interpreter, sig, &type2);
+    }
+    else {
+        sig = NULL;
+        n2 = 0;
+        type2 = type;
+    }
+    if (n2 != n || type != type2)
+        return 0;
+    switch (type) {
+        case PARROT_ARG_INTVAL:
+            mic->lru.f.real_function = (funcptr_t)pass_int;
+            break;
+        case PARROT_ARG_FLOATVAL:
+            mic->lru.f.real_function = (funcptr_t)pass_num;
+            break;
+        case PARROT_ARG_STRING:
+            mic->lru.f.real_function = (funcptr_t)pass_str;
+            break;
+        case PARROT_ARG_PMC:
+            mic->lru.f.real_function = (funcptr_t)pass_pmc;
+            break;
+        default:
+            return 0;
+    }
+    mic->m.arg_count = n;
+    mic->lru.u.signature = sig;
+    return 1;
+}
+
 #define N_STATIC_TYPES 500
 static INTVAL pmc_type_numbers[N_STATIC_TYPES];
 
@@ -261,7 +383,17 @@ parrot_PIC_prederef(Interp *interpreter, opcode_t op, void **pc_pred, int core)
     op_func_t *prederef_op_func = interpreter->op_lib->op_func_table;
     char * _reg_base = (char*)interpreter->ctx.bp.regs_i;
     opcode_t *cur_opcode = (opcode_t*)pc_pred;
+    Parrot_MIC *mic = NULL;
 
+    if (parrot_PIC_op_is_cached(interpreter, op)) {
+        struct PackFile_ByteCode *cs = interpreter->code;
+        size_t n = cur_opcode - (opcode_t*)cs->prederef.code;
+        /*
+         * pic_index is half the size of the code
+         */
+        n = cs->pic_index->data[n / 2];
+        mic = parrot_PIC_alloc_mic(interpreter, n);
+    }
     switch (op) {
         case PARROT_OP_new_p_sc:
             {
@@ -291,20 +423,14 @@ parrot_PIC_prederef(Interp *interpreter, opcode_t op, void **pc_pred, int core)
             }
             break;
         case PARROT_OP_infix_ic_p_p:
-            {
-                Parrot_MIC *mic;
-                size_t n;
-                struct PackFile_ByteCode *cs = interpreter->code;
-
-                n = cur_opcode - (opcode_t*)cs->prederef.code;
-                /*
-                 * pic_index is half the size of the code
-                 */
-                n = cs->pic_index->data[n / 2];
-                mic = parrot_PIC_alloc_mic(interpreter, n);
-                mic->m.func_nr = *(INTVAL*) cur_opcode[1];
+            mic->m.func_nr = *(INTVAL*) cur_opcode[1];
+            pc_pred[1] = (void*) mic;
+            op = PARROT_OP_pic_infix___ic_p_p;
+            break;
+        case PARROT_OP_get_params_pc:
+            if (is_pic_param(interpreter, pc_pred, mic)) {
                 pc_pred[1] = (void*) mic;
-                op = PARROT_OP_pic_infix___ic_p_p;
+                op = PARROT_OP_pic_get_params___pc;
             }
             break;
     }
@@ -325,7 +451,7 @@ parrot_pic_move(Interp* interpreter, Parrot_MIC *mic)
     /*
      * MIC slot is empty - use it
      */
-    if (!mic->lru.lr_type)
+    if (!mic->lru.u.type)
         return;
     /*
      * need more cache slots - allocate one PIC
@@ -338,13 +464,13 @@ parrot_pic_move(Interp* interpreter, Parrot_MIC *mic)
          * PIC was already used - shift slots up
          */
         pic = mic->pic;
-        pic->lru[2].lr_type = pic->lru[1].lr_type;
+        pic->lru[2].u.type = pic->lru[1].u.type;
         pic->lru[2].f.sub = pic->lru[1].f.sub;
-        pic->lru[1].lr_type = pic->lru[0].lr_type;
+        pic->lru[1].u.type = pic->lru[0].u.type;
         pic->lru[1].f.sub = pic->lru[0].f.sub;
-        pic->lru[0].lr_type = mic->lru.lr_type;
+        pic->lru[0].u.type = mic->lru.u.type;
         pic->lru[0].f.sub = mic->lru.f.sub;
-        mic->lru.lr_type = 0;
+        mic->lru.u.type = 0;
     }
 }
 
@@ -367,8 +493,8 @@ parrot_pic_find_infix_v_pp(Interp *interpreter, PMC *left, PMC *right,
      */
     LOCK_INTERPRETER(interpreter);
     /*
- * move entries back and set topmost entry
- */
+     * move entries back and set topmost entry
+     */
     parrot_pic_move(interpreter, mic);
     /*
      * get real dispatch function
@@ -399,7 +525,7 @@ parrot_pic_find_infix_v_pp(Interp *interpreter, PMC *left, PMC *right,
             parrot_pic_opcode(interpreter, op);
         mic->lru.f.real_function = func;
     }
-    mic->lru.lr_type = (left_type << 16) | right_type;
+    mic->lru.u.type = (left_type << 16) | right_type;
     UNLOCK_INTERPRETER(interpreter);
 }
 

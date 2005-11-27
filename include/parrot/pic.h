@@ -20,7 +20,10 @@
  * extended cache slot is needed with more type entries
  */
 typedef struct Parrot_pic_lru_t {
-    INTVAL lr_type;			/* for MMD left << 16 | right type */
+    union {
+        INTVAL type;			/* for MMD left << 16 | right type */
+        PMC *signature;                 /* arg passing signature */
+    } u;
     union {
         funcptr_t real_function; 	/* the actual C code */
         PMC *sub; 			/* or a Sub PMC */
@@ -45,6 +48,7 @@ typedef struct Parrot_mic_t {
         STRING *method;                 /* for callmethod */
         INTVAL func_nr;			/* MMD function number */
         STRING *attribute;              /* obj.attribute */
+        int arg_count;                  /* arg passing */
     } m;
     Parrot_PIC *pic;                    /* more cache entries */
 } Parrot_MIC;
@@ -72,6 +76,10 @@ Parrot_PIC* parrot_PIC_alloc_pic(Interp*);
 void parrot_pic_find_infix_v_pp(Interp *, PMC *left, PMC *right,
                 Parrot_MIC *mic, opcode_t *cur_opcode);
 void * parrot_pic_opcode(Interp *, INTVAL op);
+
+typedef void (*arg_pass_f)(Interp *, int arg_count,
+        struct Parrot_Context *src_ctx, opcode_t *src_pc,
+        struct Parrot_Context *dst_ctx, opcode_t *dst_pc);
 
 #endif /* PARROT_PIC_H_GUARD */
 

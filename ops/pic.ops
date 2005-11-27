@@ -20,6 +20,9 @@ During predereferencing opcodes that allow caching are rewritten so that
 equivalent opcodes in this file are used. User code MUST never emit these
 opcodes directly.
 
+TODO fix OpTrans/ops2c that for non-prederefed runloops a PANIC
+     is in the opcode body instead of the pic opcode
+
 ###############################################################################
 
 =head2 General infix operations
@@ -49,18 +52,18 @@ inline op pic_infix__(inconst INT, in PMC, in PMC) :pic {
     right = $3;
     lru = &mic->lru;
     lr_types = (left->vtable->base_type << 16) | right->vtable->base_type;
-    if (lru->lr_type == lr_types) {
+    if (lru->u.type == lr_types) {
 runit_v_pp:
 	((mmd_f_v_pp)lru->f.real_function)(interpreter, left, right);
 	goto NEXT();
     }
     if (mic->pic) {
 	lru = mic->pic->lru;
-	if (lru->lr_type == lr_types)
+	if (lru->u.type == lr_types)
 	    goto runit_v_pp;
-	if (++lru->lr_type == lr_types)
+	if (++lru->u.type == lr_types)
 	    goto runit_v_pp;
-	if (++lru->lr_type == lr_types)
+	if (++lru->u.type == lr_types)
 	    goto runit_v_pp;
 	mic->pic->miss_count++;
 	/*
@@ -91,7 +94,7 @@ inline op pic_inline_sub__(inconst INT, in PMC, in PMC) :pic {
     lru = &mic->lru;
     rt = right->vtable->base_type;
     lr_types = (lt << 16) | rt;
-    if (lru->lr_type == lr_types) {
+    if (lru->u.type == lr_types) {
 	INTVAL a = lt == enum_class_Integer ? PMC_int_val(left) :
 	    VTABLE_get_integer(interpreter, left);
 	INTVAL b = rt == enum_class_Integer ? PMC_int_val(right) :
@@ -122,6 +125,54 @@ inline op pic_inline_sub__(inconst INT, in PMC, in PMC) :pic {
     goto NEXT();
 }
 
+=item B<pic_get_params__>(inconst PMC /* , ... */)
+
+Define function parameters for this subroutine.
+
+=cut
+
+inline op pic_get_params__(inconst PMC) :pic {
+    Parrot_MIC *mic;
+    Parrot_PIC_lru *lru;
+    PMC *sig, *ccont;
+    opcode_t *pc = CUR_OPCODE, *src_pc;
+    parrot_context_t *caller_ctx, *ctx;
+    int n;
+
+    /* avoid load dependencies - intermix derefs
+     * - yes, confusing but faster
+     */
+    ctx = CONTEXT(interpreter->ctx);
+    src_pc = interpreter->current_args;
+    mic = (Parrot_MIC *) cur_opcode[1];
+    caller_ctx = ctx->caller_ctx;
+    n = mic->m.arg_count;
+    if (src_pc) {
+	sig = caller_ctx->constants[src_pc[1]]->u.key;
+    }
+    else {
+	sig = NULL;
+    }
+    lru = &mic->lru;
+    if (lru->u.signature == sig) {
+	((arg_pass_f)lru->f.real_function)(interpreter, n,
+		caller_ctx, src_pc  + 2,
+		ctx, pc + 2);
+	ccont = ctx->current_cont;
+	if (PObj_get_FLAGS(ccont) & SUB_FLAG_TAILCALL) {
+	    PObj_get_FLAGS(ccont) &= ~SUB_FLAG_TAILCALL;
+	    --ctx->recursion_depth;
+	    ctx->caller_ctx = caller_ctx->caller_ctx;
+	    Parrot_free_context(interpreter, caller_ctx, 1);
+	}
+
+	goto OFFSET(n + 2);
+    }
+    /* no match redo plain opcode */
+    ((void**)cur_opcode)[0] =
+	parrot_pic_opcode(interpreter, PARROT_OP_get_params_pc);
+    goto OFFSET(0);
+}
 
 =back
 
