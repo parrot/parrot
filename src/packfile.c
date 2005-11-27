@@ -188,6 +188,14 @@ make_code_pointers(struct PackFile_Segment *seg)
                 pf->cur_cs->const_table = (struct PackFile_ConstTable*)seg;
                 pf->cur_cs->const_table->code = pf->cur_cs;
             }
+        case PF_UNKNOWN_SEG:
+            if (memcmp(seg->name, "PIC_idx", 7) == 0)
+                pf->cur_cs->pic_index = seg;
+            break;
+        case PF_DEBUG_SEG:
+            pf->cur_cs->debugs = (struct PackFile_Debug*)seg;
+            pf->cur_cs->debugs->code = pf->cur_cs;
+            break;
         default:
             break;
     }
