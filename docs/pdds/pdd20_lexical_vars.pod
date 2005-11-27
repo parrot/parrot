@@ -327,6 +327,23 @@ When asked to look up a variable, it finds the corresponding register
 number by querying its associated LexInfo.  It then gets or sets the
 given numbered register in its associated Parrot Context structure.
 
+=head1 INTROSPECTION WITHOUT CALL FRAME PMCS
+
+Due to implementation concerns, it will not be until late in Parrot
+development -- if ever -- that call frames will be available to user
+code as PMCs.  Until then, the interpreter and continuation PMCs will
+be the interface to use to get frame info.
+
+For example, to get the immediate caller's LexPad, use:
+
+    $P0 = getinterp
+    $P1 = $P0["lexpad"; 1]
+
+It's likely that this interface will continue to be available even
+once call frames become visible as PMCs.
+
+TODO: Full interpreter introspection interface.
+
 =head1 ATTACHMENTS
 
 None.
