@@ -2,11 +2,11 @@
 # _main
 #
 # Setup the information the interpreter needs to run,
-# then parse and interpret the tcl code we were passed.
+# then parse and interpret/compile the tcl code we were passed.
 
 #
 # the immediate sub gets run, before the .HLL_map below
-# is parsed, therefore the .DynLexPad constant is aready
+# is parsed, therefore the .DynLexPad constant is already
 # available
 #
 .sub _load_lib :immediate
