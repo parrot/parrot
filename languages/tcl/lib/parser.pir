@@ -135,8 +135,8 @@ $P1=loadlib 'dynlexpad'
 .HLL 'tcl', 'tcl_group'
 .HLL_map .LexPad, .DynLexPad
 .pragma n_operators 1
-.sub compiled_tcl_sub%i :anon
-#load_bytecode 'languages/tcl/lib/tcllib.pbc'
+.sub compiled_tcl_sub%i :anon :main
+load_bytecode 'languages/tcl/lib/tcllib.pbc'
 %s.return ($P%i)
 .end
 END_PIR
