@@ -240,7 +240,7 @@ global_var:
   .local pmc interp, lexpad, variable
   .local int depth
   interp = getinterp
-  depth = 0 # we know it's not us or our direct caller.
+  depth = 2 # we know it's not us or our direct caller.
 
 get_lexpad:
   # Is there a lexpad at this depth?
@@ -262,7 +262,7 @@ got_lexpad:
   .local pmc interp, lexpad, variable
   .local int depth
   interp = getinterp
-  depth = 0 # we know it's not us or our direct caller.
+  depth = 2 # we know it's not us or our direct caller.
 
 get_lexpad:
   # Is there a lexpad at this depth?
