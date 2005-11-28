@@ -18,7 +18,7 @@ PMCS = \
  tcllist \
  tclarray
 
-DEPS = $(PARROT) \
+DEPS = \
 lib${slash}commands${slash}after.pir \
 lib${slash}commands${slash}append.pir \
 lib${slash}commands${slash}array.pir \
@@ -87,12 +87,12 @@ lib${slash}variables.pir \
 tcl.pir_template \
 tcl.pl
 
-tcl.pbc: pmcs lib/tcllib.pbc tcl.pir
+tcl.pbc: $(PARROT) pmcs lib/tcllib.pbc tcl.pir
 	$(PARROT) --output=tcl.pbc tcl.pir
 
 PBCS = lib${slash}tcllib_temp.pbc lib${slash}tclbinaryops.pbc lib${slash}tclcommand.pbc lib${slash}tclcommandlist.pbc lib${slash}tclconst.pbc lib${slash}tclfunc.pbc lib${slash}tclops.pbc lib${slash}tclvar.pbc lib${slash}tclword.pbc
 
-lib/tcllib.pbc: $(PBCS)
+lib/tcllib.pbc: $(PBC_MERGE) $(PBCS)
 	$(PBC_MERGE) -o lib/tcllib.pbc $(PBCS)
 
 pmcs:
@@ -104,34 +104,34 @@ pmcs:
 lib${slash}tcllib.pir: $(DEPS)
 	$(PERL) tcl.pl > lib${slash}tcllib.pir
 
-lib${slash}tcllib_temp.pbc: lib${slash}tcllib.pir
+lib${slash}tcllib_temp.pbc: $(PARROT) lib${slash}tcllib.pir
 	$(PARROT) --output=$(LIBPATH)${slash}tcllib_temp.pbc $(LIBPATH)${slash}tcllib.pir
 
-lib${slash}tclbinaryops.pbc: lib${slash}tclbinaryops.pir
+lib${slash}tclbinaryops.pbc: $(PARROT) lib${slash}tclbinaryops.pir
 	$(PARROT) --output=$(LIBPATH)${slash}tclbinaryops.pbc $(LIBPATH)${slash}tclbinaryops.pir
 
-lib${slash}tclcommand.pbc: lib${slash}tclcommand.pir
+lib${slash}tclcommand.pbc: $(PARROT) lib${slash}tclcommand.pir
 	$(PARROT) --output=$(LIBPATH)${slash}tclcommand.pbc $(LIBPATH)${slash}tclcommand.pir
 
-lib${slash}tclcommandlist.pbc: lib${slash}tclcommandlist.pir
+lib${slash}tclcommandlist.pbc: $(PARROT) lib${slash}tclcommandlist.pir
 	$(PARROT) --output=$(LIBPATH)${slash}tclcommandlist.pbc $(LIBPATH)${slash}tclcommandlist.pir
 
-lib${slash}tclconst.pbc: lib${slash}tclconst.pir
+lib${slash}tclconst.pbc: $(PARROT) lib${slash}tclconst.pir
 	$(PARROT) --output=$(LIBPATH)${slash}tclconst.pbc $(LIBPATH)${slash}tclconst.pir
 
-lib${slash}tclfunc.pbc: lib${slash}tclfunc.pir
+lib${slash}tclfunc.pbc: $(PARROT) lib${slash}tclfunc.pir
 	$(PARROT) --output=$(LIBPATH)${slash}tclfunc.pbc $(LIBPATH)${slash}tclfunc.pir
 
-lib${slash}tclops.pbc: lib${slash}tclops.pir
+lib${slash}tclops.pbc: $(PARROT) lib${slash}tclops.pir
 	$(PARROT) --output=$(LIBPATH)${slash}tclops.pbc $(LIBPATH)${slash}tclops.pir
 
-lib${slash}tclvar.pbc: lib${slash}tclvar.pir
+lib${slash}tclvar.pbc: $(PARROT) lib${slash}tclvar.pir
 	$(PARROT) --output=$(LIBPATH)${slash}tclvar.pbc $(LIBPATH)${slash}tclvar.pir
 
-lib${slash}tclword.pbc: lib${slash}tclword.pir
+lib${slash}tclword.pbc: $(PARROT) lib${slash}tclword.pir
 	$(PARROT) --output=$(LIBPATH)${slash}tclword.pbc $(LIBPATH)${slash}tclword.pir
 
-tclsh: tcl.pbc
+tclsh: $(PARROT) tcl.pbc
 	$(PARROT) --gc-debug tcl.pbc
 
 test:	tcl.pbc
