@@ -140,7 +140,7 @@ not_comment:
     $I0 = typeof exp
     unless $I0 == .FixedPMCArray goto no_ar
 	$I1 = elements exp
-	if $I1 != 2 goto no_pair
+	if $I1 != 2 goto no_ar
 	.local pmc car, cdr
 	print "`"
 	car = exp[0]
