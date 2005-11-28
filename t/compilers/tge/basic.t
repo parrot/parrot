@@ -1,5 +1,13 @@
-#! perl -w
-# Copyright 2005, The Perl Foundation.
+#!perl
+# Copyright 2005, The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+use strict;
+use warnings;
+use lib qw(t . lib ../lib ../../lib ../../../lib);
+use Test::More;
+use Parrot::Test;
+
 
 =head1 NAME
 
@@ -7,15 +15,10 @@ t/basic.t - testing a few basic components of TGE and TGE::Instance
 
 =head1 SYNOPSIS
 
-        $ perl t/basic.t
+	$ prove t/basic.t
 
 =cut
 
-use strict;
-
-use lib qw(t . lib ../lib ../../lib ../../../lib);
-
-use Parrot::Test tests => 2;
 
 pir_output_is(<<'CODE', <<'OUT', 'build up a basic rule in a grammar');
 
@@ -71,3 +74,8 @@ CODE
 2
 3
 OUT
+
+
+## remember to change the number of tests :-)
+BEGIN { plan tests => 2; }
+

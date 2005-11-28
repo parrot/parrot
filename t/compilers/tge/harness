@@ -1,9 +1,12 @@
-#! perl -w
+#!perl
+# Copyright 2005, The Perl Foundation.  All Rights Reserved.
+# $Id$
 
 use strict;
-
+use warnings;
 use Test::Harness;
 use File::Spec;
+
 
 my @files;
 

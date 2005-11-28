@@ -1,5 +1,13 @@
-#! perl -w
-# Copyright 2005, The Perl Foundation.
+#!perl
+# Copyright 2005, The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+use strict;
+use warnings;
+use lib qw(t . lib ../lib ../../lib ../../../lib);
+use Test::More;
+use Parrot::Test;
+
 
 =head1 NAME
 
@@ -7,15 +15,10 @@ t/parser.t - TGE::Parser tests
 
 =head1 SYNOPSIS
 
-        $ perl t/parser.t
+	$ prove t/parser.t
 
 =cut
 
-use strict;
-
-use lib qw(t . lib ../lib ../../lib ../../../lib);
-
-use Parrot::Test tests => 1;
 
 pir_output_is(<<'CODE', <<'OUT', "parse a basic attribute grammar");
 
@@ -62,3 +65,7 @@ loaded start rule
 matched start rule
 parse succeeded
 OUT
+
+
+## remember to change the number of tests :-)
+BEGIN { plan tests => 1; }
