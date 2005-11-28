@@ -16,7 +16,7 @@ Tests Parrot calling conventions.
 
 =cut
 
-use Parrot::Test tests => 50;
+use Parrot::Test tests => 51;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "set_args - parsing");
@@ -1001,7 +1001,8 @@ pir_output_is(<<'CODE', <<'OUTPUT', "OO argument passing - 2");
     o = new "Foo"
     $S0 = o
     print $S0
-    $S0 = o[2]
+    $S1 = o[2]
+    print $S1
     print $S0
 .end
 .namespace ["Foo"]
@@ -1022,8 +1023,32 @@ pir_output_is(<<'CODE', <<'OUTPUT', "OO argument passing - 2");
 CODE
 Foo ok 1
 ok 2
+ok 1
 OUTPUT
 
+pir_output_is(<<'CODE', <<'OUTPUT', "OO argument passing - 3");
+.sub main :main
+    .local pmc cl, o, f
+    cl = newclass "Foo"
+    o = new "Foo"
+    $S0 = foo(o)
+    print $S0
+.end
+.sub foo
+    .param pmc arg
+    .return (arg) # force conversion to string
+.end
+.namespace ["Foo"]
+.sub __get_string :method
+    $S0 = typeof self
+    print $S0
+    print " "
+    .return ("ok 1\n")
+.end
+
+CODE
+Foo ok 1
+OUTPUT
 # see also tcl in leo-ctx5 by Coke; Date 28.08.2005
 pir_output_is(<<'CODE', <<'OUTPUT', "bug - :slurpy promotes to :flatten");
 .sub main :main

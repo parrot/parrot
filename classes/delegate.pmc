@@ -12,19 +12,6 @@ Delegate each and every function to parrot bytecode.
 
 Almost all methods are auto-generated in lib/Parrot/Pmc2c.pm
 
-=head2 Register Save/Restore Functions
-
-The following bit is a fast register save/restore pair. They currently
-count on the registers in the interpreter structure being in the same
-order as in the C<regsave struct>, and that the registers are at the
-beginning of the interpreter structure.
-
-Yes, it's damned evil, but it's what we need, since we have to preserve
-the registers -- vtable methods can't change them.
-
-Also note that if the vtable method clobbers a register that contains a
-string or PMC not otherwise rooted it could be collected too early.
-
 =head2 Functions
 
 =over 4
@@ -55,12 +42,6 @@ static PMC *
 find_meth(Interp* interpreter, PMC *pmc, STRING *meth) {
     PMC *class = pmc;
 
-    if (Interp_trace_TEST(interpreter, PARROT_TRACE_SUB_CALL_FLAG)) {
-        char *name = string_to_cstring(interpreter, meth);
-        PIO_eprintf(interpreter, "# Calling meth '%s'\n#", name);
-        string_cstring_free(name);
-        print_pbc_location(interpreter);
-    }
     if (PObj_is_object_TEST(pmc)) {
         class = GET_CLASS((Buffer *)PMC_data(pmc), pmc);
     }
