@@ -68,10 +68,16 @@ got_args:
   .local string proc_body, temp_code
 
   temp_code = <<"END_PIR"
+.HLL 'tcl', 'tcl_group'
+.sub '_xxx' :immediate
+  P0 = loadlib 'dynlexpad' 
+.end
+.HLL_map .LexPad, .DynLexPad
 .namespace ['Tcl']
 .sub '&%s' :lex
 .param pmc args :slurpy
 .include 'languages/tcl/lib/returncodes.pir'
+
 .local pmc call_level
 call_level=find_global '_Tcl', 'call_level'
 inc call_level

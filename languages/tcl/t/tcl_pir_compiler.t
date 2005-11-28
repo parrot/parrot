@@ -3,7 +3,6 @@
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
 use Parrot::Test tests => 7;
 use Test::More;
-use vars qw($TODO);
 
 pir_output_is(<<'CODE', <<'OUTPUT', "test tcl compiler, verify double call works");
   .sub main :main
@@ -35,9 +34,6 @@ CODE
 ok 1
 OUTPUT
 
-TODO: {
-  local $TODO = "stack too deep?";
-
 pir_output_is(<<'CODE', <<'OUTPUT', "pass arguments to a tcl proc from PIR");
 .sub main :main
 
@@ -56,7 +52,6 @@ pir_output_is(<<'CODE', <<'OUTPUT', "pass arguments to a tcl proc from PIR");
 CODE
 hello
 OUTPUT
-}
 
 pir_output_is(<<'CODE', <<'OUTPUT', "invoke argless tcl proc from PIR");
 .sub _main :main

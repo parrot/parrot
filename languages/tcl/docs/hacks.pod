@@ -26,6 +26,22 @@ list.
 
 =over 4
 
+=item PDD20 - lexical vars
+
+The new scheme (PDD20) for lexical vars means that to use the 'store_lex', and
+'find_lex' opcodes, you have to be inside a sub that's marked :lex: That
+is, inside a sub that corresponds to a HLL block that introduces a new
+lexical scope. Tcl uses helper functions to figure out whether a particular
+'$a' is referring to a global or a lexical var. To keep our current
+flexibility (which may be too flexible), these lexical calls are now
+delegated to lib/variables.pir's find_lex_pdd20 and store_lex_pdd20, which
+query the interpreter to find the closest lexical pad and perform the
+stores/finds against that.
+
+This is in contrast to the previous way lexicals were implemented, which 
+let you call the _lex opcodes anywhere, as long as at some point in the past
+of the program, you had a created a lex_pad and put it on the stack.
+
 =item subroutine meta information.
 
 Tcl provides the ability to query subroutines about their arguments

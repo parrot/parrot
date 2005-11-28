@@ -183,7 +183,7 @@ Gets the actual variable from memory and returns it.
     call_level = $P1
     if call_level == 0 goto global_var
 lexical_var:
-    value = find_lex name
+    value = find_lex_pdd20( name )
     goto clear_found
 
 coloned:
@@ -223,7 +223,7 @@ Sets the actual variable from memory.
   call_level = $P1
   if call_level == 0 goto global_var
 lexical_var:
-  store_lex name, value
+  store_lex_pdd20 ( name, value )
   .return()
 
 coloned:
@@ -231,5 +231,48 @@ coloned:
 global_var:
   store_global "Tcl", name, value
 
+  .return()
+.end
+
+.sub find_lex_pdd20
+  .param string variable_name
+
+  .local pmc interp, lexpad, variable
+  .local int depth
+  interp = getinterp
+  depth = 0 # we know it's not us or our direct caller.
+
+get_lexpad:
+  # Is there a lexpad at this depth?
+  lexpad = interp["lexpad";depth]
+  unless_null lexpad, got_lexpad
+
+  # try again
+  inc depth
+  goto get_lexpad
+got_lexpad:
+  variable = lexpad[variable_name]
+  .return(variable)
+.end
+
+.sub store_lex_pdd20
+  .param string variable_name
+  .param pmc variable
+
+  .local pmc interp, lexpad, variable
+  .local int depth
+  interp = getinterp
+  depth = 0 # we know it's not us or our direct caller.
+
+get_lexpad:
+  # Is there a lexpad at this depth?
+  lexpad = interp["lexpad";depth]
+  unless_null lexpad, got_lexpad
+
+  # try again
+  inc depth
+  goto get_lexpad
+got_lexpad:
+  lexpad[variable_name] = variable
   .return()
 .end
