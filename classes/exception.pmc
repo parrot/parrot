@@ -107,14 +107,14 @@ Initializes the exception with default values.
         DYNSELF.set_string_keyed_int(0, NULL);
         DYNSELF.set_integer_keyed_int(1, 0);
         DYNSELF.set_integer_keyed_int(2, 0);
-        DYNSELF.set_pmc_keyed_int(3, NULL);
-        DYNSELF.set_pmc_keyed_int(4, NULL);
-        DYNSELF.set_pmc_keyed_int(5, NULL);
-        DYNSELF.set_pmc_keyed_int(6, NULL);
-        DYNSELF.set_pmc_keyed_int(7, NULL);
-        DYNSELF.set_pmc_keyed_int(8, NULL);
-        DYNSELF.set_pmc_keyed_int(9, NULL);
-        DYNSELF.set_pmc_keyed_int(10, NULL);
+        DYNSELF.set_pmc_keyed_int(3, PMCNULL);
+        DYNSELF.set_pmc_keyed_int(4, PMCNULL);
+        DYNSELF.set_pmc_keyed_int(5, PMCNULL);
+        DYNSELF.set_pmc_keyed_int(6, PMCNULL);
+        DYNSELF.set_pmc_keyed_int(7, PMCNULL);
+        DYNSELF.set_pmc_keyed_int(8, PMCNULL);
+        DYNSELF.set_pmc_keyed_int(9, PMCNULL);
+        DYNSELF.set_pmc_keyed_int(10, PMCNULL);
     }
 
 /*
