@@ -17,7 +17,7 @@ C<interpinfo> opcode.
 
 =cut
 
-use Parrot::Test tests => 7;
+use Parrot::Test tests => 6;
 
 SKIP: {
 	skip("we really shouldn't run just a label - use a sub", 1);
@@ -121,19 +121,6 @@ output_is(<<'CODE', <<'OUTPUT', "check_events");
 CODE
 before
 after
-OUTPUT
-
-output_is(<<'CODE', <<'OUTPUT', "interpinfo lexpad");
-    .include "interpinfo.pasm"
-    new_pad 0
-    peek_pad P10
-    interpinfo P11, .INTERPINFO_CURRENT_LEXPAD
-    eq_addr P10, P11, ok
-    print "not "
-ok: print "ok\n"
-    end
-CODE
-ok
 OUTPUT
 
 1;
