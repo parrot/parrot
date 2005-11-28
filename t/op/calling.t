@@ -16,7 +16,7 @@ Tests Parrot calling conventions.
 
 =cut
 
-use Parrot::Test tests => 49;
+use Parrot::Test tests => 50;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "set_args - parsing");
@@ -957,7 +957,7 @@ ok 1
 ok 2
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "OO argument passig");
+pir_output_is(<<'CODE', <<'OUTPUT', "OO argument passing");
 .sub main :main
     .local pmc cl, o, f
     cl = newclass "Foo"
@@ -992,6 +992,36 @@ Foo ok 1
 Foo ok 2
 Foo ok 3
 Foo ok 4
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "OO argument passing - 2");
+.sub main :main
+    .local pmc cl, o, f
+    cl = newclass "Foo"
+    o = new "Foo"
+    $S0 = o
+    print $S0
+    $S0 = o[2]
+    print $S0
+.end
+.namespace ["Foo"]
+.sub __get_string :method
+    $S0 = typeof self
+    print $S0
+    print " "
+    .return ("ok 1\n")
+.end
+.sub __get_string_keyed_int :method
+    .param int key
+    $S0 = "ok "
+    $S1 = key
+    $S0 .= $S1
+    $S0 .= "\n"
+    .return ($S0)
+.end
+CODE
+Foo ok 1
+ok 2
 OUTPUT
 
 # see also tcl in leo-ctx5 by Coke; Date 28.08.2005
