@@ -139,12 +139,11 @@ OUTPUT
 pir_output_like( <<'CODE', <<'OUTPUT', "debug backtrace - fetch of unknown lexical" );
 .namespace ["Test2"]
 .sub main
-    new_pad 0
     print "ok 1\n"
     foo()
     print "not ok 3\n"
 .end
-.sub foo
+.sub foo :lex
     print "ok 2\n"
     find_lex $P0, "nosuchlex"
     print "not ok 3\n"

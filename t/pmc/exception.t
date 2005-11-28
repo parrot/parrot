@@ -16,7 +16,7 @@ Tests C<Exception> and C<Exception_Handler> PMCs.
 
 =cut
 
-use Parrot::Test tests => 26;
+use Parrot::Test tests => 23;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "push_eh - clear_eh");
@@ -92,30 +92,6 @@ main
 caught it
 something happend
 a string
-OUTPUT
-
-output_is(<<'CODE', <<'OUTPUT', "push_eh - throw - lexical");
-    print "main\n"
-    new_pad 0
-    new P0, .Integer
-    set P0, 42
-    store_lex -1, "$a", P0
-    push_eh _handler
-
-    new P30, .Exception
-    throw P30
-    print "not reached\n"
-    end
-_handler:
-    print "caught it\n"
-    find_lex P0, "$a"
-    print P0
-    print "\n"
-    end
-CODE
-main
-caught it
-42
 OUTPUT
 
 output_like(<<'CODE', <<'OUTPUT', "throw - no handler");
@@ -254,26 +230,6 @@ CODE
 /No exception handler and no message/
 OUT
 
-output_like(<<'CODE', <<OUT, "find_lex");
-    new_pad 0
-    push_eh _handler
-    find_lex P1, "no_such_thing"
-    clear_eh
-ok:
-    print "resumed\n"
-    end
-_handler:
-    print "caught it\n"
-    set S0, P5["_message"]
-    print S0
-    print "\n"
-    branch ok
-CODE
-/^caught it
-Lexical 'no_such_thing' not found
-resumed
-/
-OUT
 
 output_is(<<'CODE', '', "exit exception");
     noop
@@ -281,46 +237,6 @@ output_is(<<'CODE', '', "exit exception");
     print "not reached\n"
     end
 CODE
-
-pir_output_is(<<'CODE', <<'OUTPUT', "set recursion limit, method call ");
-
-# see also t/op/gc_14.imc
-
-.sub main :main
-    .local pmc n
-    new_pad 0
-    $P0 = getinterp
-    $P0."recursion_limit"(50)
-    newclass $P0, "b"
-    $I0 = find_type "b"
-    $P0 = new $I0
-    $P1 = new Integer
-    $P1 = 0
-    n = $P0."b11"($P1)
-    print "ok 1\n"
-    print n
-    print "\n"
-.end
-.namespace ["b"]
-.sub b11 method
-    .param pmc n
-    .local pmc n1
-    new_pad -1
-    store_lex -1, "n", n
-    n1 = new Integer
-    n1 = n + 1
-    push_eh catch
-    n = self."b11"(n1)
-    store_lex -1, "n", n
-    clear_eh
-catch:
-    n = find_lex "n"
-    .return(n)
-.end
-CODE
-ok 1
-49
-OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "push_eh - throw");
     print "main\n"
