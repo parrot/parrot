@@ -45,7 +45,7 @@ Dump a state file.
   iterator = new Iterator, symtab
   iterator = .ITERATE_FROM_START
   iter_loop:
-  unless iterator goto end_iter
+  unless iterator goto END_ITER
     symbol = shift iterator
     name   = symbol['name']
     text   = symbol['text']
@@ -61,7 +61,7 @@ Dump a state file.
     print frozen_fh, "\n"
 
     branch iter_loop
-  end_iter:
+END_ITER:
   close frozen_fh
 .end
 
@@ -94,7 +94,7 @@ For now we just worry about the flags 'F', 'T' and 'V'.
     printerr " not found\n"
     # TODO: proper exception handling
     end
-  READ_CONTENT:
+READ_CONTENT:
   content = read frozen_fh, 60000
   close frozen_fh
 
@@ -120,7 +120,7 @@ For now we just worry about the flags 'F', 'T' and 'V'.
   if token != '\n' goto NOT_AN_EMPTY_LINE
     # Ignore empty lines
     goto CHECK_PARSING_FINISHED
-  NOT_AN_EMPTY_LINE:
+NOT_AN_EMPTY_LINE:
 
   if token != '#' goto NOT_A_COMMENT
     # Skip everything up to the end of line
@@ -147,7 +147,7 @@ For now we just worry about the flags 'F', 'T' and 'V'.
     # rc_ is deprecated rx_is_d content, pos, UNEXPECTED
   PERHAPS_ANOTHER_DIGIT_1:
     # rc_ is deprecated rx_is_d content, pos, EXPECT_A_COMMA_1
-    goto PERHAPS_ANOTHER_DIGIT_1
+    #goto PERHAPS_ANOTHER_DIGIT_1
   EXPECT_A_COMMA_1:
     substr token, content, 0, pos, '' 
     name_len = token
@@ -159,7 +159,7 @@ For now we just worry about the flags 'F', 'T' and 'V'.
     # rc_ is deprecated rx_is_d content, pos, UNEXPECTED
   PERHAPS_ANOTHER_DIGIT_2:
     # rc_ is deprecated rx_is_d content, pos, EXPECT_A_NEWLINE_1
-    goto PERHAPS_ANOTHER_DIGIT_2
+    #goto PERHAPS_ANOTHER_DIGIT_2
   EXPECT_A_NEWLINE_1:
     substr token, content, 0, pos, '' 
     substitution_len = token
@@ -193,7 +193,7 @@ For now we just worry about the flags 'F', 'T' and 'V'.
     # rc_ is deprecated rx_is_d content, pos, UNEXPECTED
   PERHAPS_ANOTHER_DIGIT_3:
     # rc_ is deprecated rx_is_d content, pos, EXPECT_A_COMMA_2
-    goto PERHAPS_ANOTHER_DIGIT_3
+    # goto PERHAPS_ANOTHER_DIGIT_3
   EXPECT_A_COMMA_2:
     substr token, content, 0, pos, '' 
     name_len = token
@@ -205,7 +205,7 @@ For now we just worry about the flags 'F', 'T' and 'V'.
     # rc_ is deprecated rx_is_d content, pos, UNEXPECTED
   PERHAPS_ANOTHER_DIGIT_4:
     # rc_ is deprecated rx_is_d content, pos, EXPECT_A_NEWLINE_2
-    goto PERHAPS_ANOTHER_DIGIT_4
+    # goto PERHAPS_ANOTHER_DIGIT_4
   EXPECT_A_NEWLINE_2:
     substr token, content, 0, pos, '' 
     substitution_len = token
@@ -229,7 +229,7 @@ For now we just worry about the flags 'F', 'T' and 'V'.
   print token
   print "\n"
 
-  CHECK_PARSING_FINISHED:
+CHECK_PARSING_FINISHED:
   substr token, content, 0, 1, ''
   if token != '' goto HANDLE_NEXT_TOKEN
     goto FINISHED
