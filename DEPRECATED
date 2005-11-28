@@ -6,16 +6,24 @@ All are gone. Please read the history of this file for more.
 
 =back
 
-=head1 Deprecated opcodes
+=head1 PDD20
 
-All the *_pad opcodes are now deprecated. See PDD20 for information about how to
-handle lexical variables. (new_pad, peek_pad, pop_pad, push_pad)
+All the *_pad opcodes are now deprecated. See PDD20 for information about how
+to handle lexical variables. (new_pad, peek_pad, pop_pad, push_pad)
 
-store_lex and find_lex opcodes with 3 arguments (these with an additional depth argument)
-are also not needed (and don't work) with pdd20 lexicals and will be removed.   
+store_lex and find_lex opcodes with 3 arguments (these with an additional
+depth argument) are also not needed (and don't work) with pdd20 lexicals 
+and will be removed.   
 
-Related to this deprecation is: the Scratchpad PMC (classes/scratchpad.pmc) will be
-removed too including the tests - we already have 2 working LexPads instead.
+Related to this deprecation is: the Scratchpad PMC (classes/scratchpad.pmc)
+will be removed too including the tests - we already have 2 working LexPads
+instead.
+
+Also, you may get bus errors or similar failures when mixing the new style
+lexicals with the old style lexicals. These bus errors are I<not> going to be
+resolved, since the old style is going away. This might happen if you have
+a sub defined with C<:lex>, but then use a C<find_lex> in a sub with no
+such declaration.
 
 =head1 Deprecated APIs
 
