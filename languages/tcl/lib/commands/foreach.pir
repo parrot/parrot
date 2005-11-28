@@ -119,7 +119,7 @@ empty_var:
     store_global "Tcl", sigil_varname, $P0
     goto loop_inner
 store_lex2:
-    store_lex -1, sigil_varname, $P0
+    store_lex sigil_varname, $P0
   goto loop_inner
 loop_inner_done_good:
   got_one = 1
