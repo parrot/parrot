@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-config/gen/icu.pl - ICU
+config/gen/icu.pm - ICU
 
 =head1 DESCRIPTION
 

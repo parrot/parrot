@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-config/auto/sizes.pl - Various Sizes
+config/auto/sizes.pm - Various Sizes
 
 =head1 DESCRIPTION
 

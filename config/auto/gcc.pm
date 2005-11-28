@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-config/auto/gcc.pl - GNU C Compiler
+config/auto/gcc.pm - GNU C Compiler
 
 =head1 DESCRIPTION
 

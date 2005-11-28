@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-config/auto/aio.pl - Test for AIO
+config/auto/aio.pm - Test for AIO
 
 =head1 DESCRIPTION
 

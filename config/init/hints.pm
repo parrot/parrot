@@ -3,12 +3,12 @@
 
 =head1 NAME
 
-config/init/hints.pl - Platform Hints
+config/init/hints.pm - Platform Hints
 
 =head1 DESCRIPTION
 
 Loads the platform and local hints files, modifying the defaults set up
-in F<config/init/data.pl>.
+in F<config/init/default.pm>.
 
 =cut
 

@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-config/auto/lex.pl - lexical analyzer generator
+config/auto/lex.pm - lexical analyzer generator
 
 =head1 DESCRIPTION
 

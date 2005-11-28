@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-config/auto/format.pl - Sprintf Formats
+config/auto/format.pm - Sprintf Formats
 
 =head1 DESCRIPTION
 

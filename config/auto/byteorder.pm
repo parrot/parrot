@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-config/auto/byteorder.pl - Native Byteorder
+config/auto/byteorder.pm - Native Byteorder
 
 =head1 DESCRIPTION
 

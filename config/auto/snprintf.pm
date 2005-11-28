@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-config/auto/snprintf.pl - Test for snprintf
+config/auto/snprintf.pm - Test for snprintf
 
 =head1 DESCRIPTION
 

@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-config/gen/makefiles.pl - Build files
+config/gen/makefiles.pm - Build files
 
 =head1 DESCRIPTION
 

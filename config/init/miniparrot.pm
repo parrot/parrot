@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-config/init/miniparrot.pl - Miniparrot configuration
+config/init/miniparrot.pm - Miniparrot configuration
 
 =head1 DESCRIPTION
 

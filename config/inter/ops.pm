@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-config/inter/ops.pl - Ops Files
+config/inter/ops.pm - Ops Files
 
 =head1 DESCRIPTION
 

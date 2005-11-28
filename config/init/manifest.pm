@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-config/init/manifest.pl - MANIFEST Check
+config/init/manifest.pm - MANIFEST Check
 
 =head1 DESCRIPTION
 

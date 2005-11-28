@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-config/auto/inline.pl - Inline Compiler Support
+config/auto/inline.pm - Inline Compiler Support
 
 =head1 DESCRIPTION
 

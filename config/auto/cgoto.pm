@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-config/auto/cgoto.pl - Computed C<goto>
+config/auto/cgoto.pm - Computed C<goto>
 
 =head1 DESCRIPTION
 

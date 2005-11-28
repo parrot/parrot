@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-config/auto/signal.pl - Signals
+config/auto/signal.pm - Signals
 
 =head1 DESCRIPTION
 

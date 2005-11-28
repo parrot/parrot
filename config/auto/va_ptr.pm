@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-config/auto/va_ptr.pl - va_list to va_ptr conversion test
+config/auto/va_ptr.pm - va_list to va_ptr conversion test
 
 =head1 DESCRIPTION
 

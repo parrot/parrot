@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-config/inter/charset.pl - charset files
+config/inter/charset.pm - charset files
 
 =head1 DESCRIPTION
 

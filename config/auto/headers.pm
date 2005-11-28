@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-config/auto/headers.pl - C headers
+config/auto/headers.pm - C headers
 
 =head1 DESCRIPTION
 

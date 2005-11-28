@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-config/gen/parrot_include.pl - Runtime Includes
+config/gen/parrot_include.pm - Runtime Includes
 
 =head1 DESCRIPTION
 

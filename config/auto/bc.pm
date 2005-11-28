@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-config/auto/bc.pl - Check whether GNU bc works
+config/auto/bc.pm - Check whether GNU bc works
 
 =head1 DESCRIPTION
 

@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-config/auto/memalign.pl - Memory Alignment
+config/auto/memalign.pm - Memory Alignment
 
 =head1 DESCRIPTION
 

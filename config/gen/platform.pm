@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-config/gen/platform.pl - Platform Files
+config/gen/platform.pm - Platform Files
 
 =head1 DESCRIPTION
 

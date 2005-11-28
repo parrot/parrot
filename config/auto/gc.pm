@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-config/auto/gc.pl - Garbage Collection
+config/auto/gc.pm - Garbage Collection
 
 =head1 DESCRIPTION
 

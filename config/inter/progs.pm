@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-config/inter/progs.pl - C Compiler and Linker
+config/inter/progs.pm - C Compiler and Linker
 
 =head1 DESCRIPTION
 

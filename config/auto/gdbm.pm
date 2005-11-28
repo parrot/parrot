@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-config/auto/gdbm.pl - Test for GNU dbm (gdbm) library
+config/auto/gdbm.pm - Test for GNU dbm (gdbm) library
 
 =head1 DESCRIPTION
 

@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-config/init/headers.pl - Nongenerated Headers
+config/init/headers.pm - Nongenerated Headers
 
 =head1 DESCRIPTION
 

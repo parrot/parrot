@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-config/inter/exp.pl - Experimental Systems
+config/inter/exp.pm - Experimental Systems
 
 =head1 DESCRIPTION
 

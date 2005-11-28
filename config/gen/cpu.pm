@@ -3,11 +3,11 @@
 
 =head1 NAME
 
-config/gen/cpu.pl - CPU specific Files
+config/gen/cpu.pm - CPU specific Files
 
 =head1 DESCRIPTION
 
-Runs C<&run_cpu()> in F<config/gen/cpu/${cpuarch}/auto.pl> if it exists.
+Runs C<&run_cpu()> in F<config/gen/cpu/${cpuarch}/auto.pm> if it exists.
 
 =cut
 

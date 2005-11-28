@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-config/auto/env.pl - System Environment
+config/auto/env.pm - System Environment
 
 =head1 DESCRIPTION
 

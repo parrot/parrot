@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-config/auto/funcptr.pl - Function Pointer Casts
+config/auto/funcptr.pm - Function Pointer Casts
 
 =head1 DESCRIPTION
 

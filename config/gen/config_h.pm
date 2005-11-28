@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-config/gen/config_h.pl - Configuration Header
+config/gen/config_h.pm - Configuration Header
 
 =head1 DESCRIPTION
 

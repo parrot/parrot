@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-config/gen/file.pl - Core PMC List
+config/gen/core_pmcs.pm - Core PMC List
 
 =head1 DESCRIPTION
 

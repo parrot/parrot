@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-config/inter/encoding.pl - encoding files
+config/inter/encoding.pm - encoding files
 
 =head1 DESCRIPTION
 

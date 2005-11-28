@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-config/auto/gmp.pl - Test for GNU MP (GMP) Math library
+config/auto/gmp.pm - Test for GNU MP (GMP) Math library
 
 =head1 DESCRIPTION
 

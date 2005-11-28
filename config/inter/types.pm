@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-config/inter/types.pl - Sizes for Parrot Types
+config/inter/types.pm - Sizes for Parrot Types
 
 =head1 DESCRIPTION
 

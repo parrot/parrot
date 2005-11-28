@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-config/auto/yacc.pl - parser generator
+config/auto/yacc.pm - parser generator
 
 =head1 DESCRIPTION
 

@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-config/auto/alignptrs.pl - pointer alignment
+config/auto/alignptrs.pm - pointer alignment
 
 =head1 DESCRIPTION
 

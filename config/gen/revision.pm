@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-config/gen/revision.pl - Parrot's configure revision
+config/gen/revision.pm - Parrot's configure revision
 
 =head1 DESCRIPTION
 

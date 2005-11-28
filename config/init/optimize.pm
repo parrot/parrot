@@ -3,13 +3,13 @@
 
 =head1 NAME
 
-config/init/optimize.pl - Optimization
+config/init/optimize.pm - Optimization
 
 =head1 DESCRIPTION
 
 Enables optimization by adding the appropriate flags for the local
 platform to the C<CCFLAGS>.
-Should this be part of config/inter/progs.pl ? XXX
+Should this be part of config/inter/progs.pm ? XXX
 
 =cut
 
