@@ -174,31 +174,31 @@ Gets the actual variable from memory and returns it.
   
   .local pmc value
 
-  push_eh notfound
-    $S0 = substr name, 1, 2
-    if $S0 == "::"     goto coloned
+  $S0 = substr name, 1, 2
+  if $S0 == "::"     goto coloned
   
-    .local int call_level
-    $P1 = find_global "_Tcl", "call_level"
-    call_level = $P1
-    if call_level == 0 goto global_var
-lexical_var:
+  .local int call_level
+  $P1 = find_global "_Tcl", "call_level"
+  call_level = $P1
+  if call_level == 0 goto global_var
+
+  push_eh notfound
     value = find_lex_pdd20( name )
-    goto clear_found
+  clear_eh
+  goto found
 
 coloned:
     substr name, 1, 2, ""
-global_var:
-    value = find_global "Tcl", name
-    # goto clear_found
 
-clear_found:
-    clear_eh
-found:
-  .return(value)
+global_var:
+  push_eh notfound
+    value = find_global "Tcl", name
+  clear_eh
+  goto found
 
 notfound:
   null value
+found:
   .return(value)
 .end
 
@@ -213,6 +213,7 @@ Sets the actual variable from memory.
 .sub __store_var
   .param string name
   .param pmc value
+
   name = "$" . name
 
   $S0 = substr name, 1, 2
