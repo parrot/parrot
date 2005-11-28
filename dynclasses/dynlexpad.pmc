@@ -117,7 +117,7 @@ Marks the lexpad hash as live.
             PMC *std_pad = PMC_pmc_val(SELF);
             if (std_pad)
                 return VTABLE_get_pmc_keyed_str(INTERP, std_pad, name);
-            return NULL;
+            return PMCNULL;
         }
         return b->value;
     }
