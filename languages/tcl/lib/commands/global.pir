@@ -30,7 +30,9 @@ loop:
     $P1 = find_global "Tcl", sigil_varname
   clear_eh
 
-  store_lex sigil_varname, $P1
+  .local pmc store_lex_pdd20
+  store_lex_pdd20 = find_global '_Tcl', 'store_lex_pdd20'
+  store_lex_pdd20 (sigil_varname, $P1)
 
 next:
   inc ii
