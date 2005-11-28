@@ -54,7 +54,6 @@ match_success:
 
 match_fail:
     print "match failed\n"   
-    goto e_mainnd
 
 end_main:
 .end
