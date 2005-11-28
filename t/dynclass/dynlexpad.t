@@ -136,14 +136,9 @@ pir_output_is($loadlib . << 'CODE', << 'OUTPUT', "tcl-ish upvar");
     print $P1
     print "\n"
     # upvar 2 'b', 55
-    .local pmc sub, pad
-    .include 'interpinfo.pasm'
-    sub = interpinfo .INTERPINFO_CURRENT_SUB
-    sub = sub."get_outer"()
-    unless sub goto err
-    sub = sub."get_outer"()
-    unless sub goto err
-    pad = sub."get_lexpad"()
+    .local pmc pad, interp
+    interp = getinterp
+    pad = interp["lexpad"; 2]
     $P2 = new .Integer
     $P2 = 55
     pad['b'] = $P2
@@ -163,18 +158,19 @@ pir_output_is($loadlib . << 'CODE', << 'OUTPUT', "check that dynlexpad honors hl
     bar()
 .end
 .sub foo :lex
-.include 'interpinfo.pasm'
-    interpinfo $P1, .INTERPINFO_CURRENT_SUB
-    $P2 = $P1."get_lexpad"()
-    $S0 = typeof $P2
+    .local pmc pad, interp
+    interp = getinterp
+    pad = interp["lexpad"]
+    $S0 = typeof pad
     print $S0
     print "\n"
 .end
 .HLL "parrot",""
 .sub bar :lex
-    interpinfo $P1, .INTERPINFO_CURRENT_SUB
-    $P2 = $P1."get_lexpad"()
-    $S0 = typeof $P2
+    .local pmc pad, interp
+    interp = getinterp
+    pad = interp["lexpad"]
+    $S0 = typeof pad
     print $S0
     print "\n"
 .end

@@ -292,14 +292,17 @@ Returns the PMC global value for C<key>.
 
 /*
 
-=item C<PMC *get_pmc_keyed_str(STRING* key)>
+=item C<PMC *get_pmc_keyed(PMC* key)>
 
 Introspection interface. C<key> can be:
 
   "sub"            ... return Sub object of this subroutine
   "continuation"   ... return Continuation PMC
-  "pad"            ... return scratchpad PMC for this sub
-  ["<item>"; level ] ... same for caller <level>
+  "lexpad"         ... return lexpad PMC for this sub
+  "outer"          ... return outer sub of this closure
+  "<item>"; level  ... same for caller <level>
+  "outer"; "<item>"  ... same for outer level 1
+  "outer"; "<item>"; level  ... same for outer <level>
 
   "globals"        ... return global stash
 
@@ -310,7 +313,7 @@ Introspection interface. C<key> can be:
     PMC* get_pmc_keyed(PMC * key) {
         int level = 0;
         PMC* nextkey;
-        STRING *item, *s;
+        STRING *item, *s, *outer;
         parrot_context_t *ctx;
         PMC *cont;
 
@@ -318,30 +321,59 @@ Introspection interface. C<key> can be:
         s = CONST_STRING(interpreter, "globals");
         if (string_equal(interpreter, item, s) == 0)
             return interpreter->globals->stash_hash;
+        outer = NULL;
+        s = CONST_STRING(interpreter, "outer");
+        if (string_equal(interpreter, item, s) == 0) {
+            outer = item;
+            nextkey = key_next(INTERP, key);
+            if (nextkey && (PObj_get_FLAGS(nextkey) & KEY_string_FLAG)) {
+                key = nextkey;
+                item = key_string(interpreter, key);
+            }
+        }
         nextkey = key_next(INTERP, key);
         if (nextkey)
             level = key_integer(interpreter, nextkey);
+        else if (outer)
+            level = 1;
+        if (level < 0)
+            real_exception(interpreter, NULL, E_ValueError,
+                    "No such caller depth");
         ctx = CONTEXT(interpreter->ctx);
-        for (; level; --level) {
-            cont = ctx->current_cont;
-            if (PMC_IS_NULL(cont) || !PMC_cont(cont)->seg)
-                real_exception(interpreter, NULL, E_ValueError,
-                        "No such caller depth");
-            ctx = PMC_cont(cont)->to_ctx;
-            if (!ctx->current_sub)
-                real_exception(interpreter, NULL, E_ValueError,
-                        "No such caller depth");
-
+        if (outer) {
+            for (; level; --level) {
+                ctx = ctx->outer_ctx;
+                if (!ctx)
+                    real_exception(interpreter, NULL, E_ValueError,
+                            "No such outer depth");
+            }
         }
+        else {
+            for (; level; --level) {
+                cont = ctx->current_cont;
+                if (PMC_IS_NULL(cont) || !PMC_cont(cont)->seg)
+                    real_exception(interpreter, NULL, E_ValueError,
+                            "No such caller depth");
+                ctx = PMC_cont(cont)->to_ctx;
+                if (!ctx->current_sub)
+                    real_exception(interpreter, NULL, E_ValueError,
+                            "No such caller depth");
+
+            }
+        }
+        if (item == outer)
+            return ctx->current_sub;
         s = CONST_STRING(interpreter, "sub");
         if (string_equal(interpreter, item, s) == 0)
             return ctx->current_sub;
-        s = CONST_STRING(interpreter, "pad");
+        s = CONST_STRING(interpreter, "lexpad");
         if (string_equal(interpreter, item, s) == 0)
-            return stack_peek(interpreter, ctx->pad_stack, NULL);
+            return ctx->lex_pad;
         s = CONST_STRING(interpreter, "continuation");
         if (string_equal(interpreter, item, s) == 0)
             return VTABLE_clone(interpreter, ctx->current_cont);
+        real_exception(interpreter, NULL, E_ValueError,
+                "No such item %Ss", item);
         return PMCNULL;
     }
 /*

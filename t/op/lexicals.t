@@ -132,7 +132,6 @@ pir_output_is(<<'CODE', <<'OUTPUT', 'api parsing');
         load_bytecode "pcore.pir"      # TODO autoload/preload
 	interpinfo $P1, .INTERPINFO_CURRENT_SUB
 	$P2 = $P1.'get_lexinfo'()
-	$P2 = $P1.'get_lexpad'()
 	$P2 = $P1.'get_lexenv'()
 	print "ok\n"
 .end
@@ -175,10 +174,10 @@ OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', 'get_lexpad - no pad');
 .sub main :main
-.include "interpinfo.pasm"
-    interpinfo $P1, .INTERPINFO_CURRENT_SUB
-    $P2 = $P1.'get_lexpad'()
-    if null $P2 goto ok
+    .local pmc pad, interp
+    interp = getinterp
+    pad = interp["lexpad"]
+    if null pad goto ok
     print "pad not NULL\n"
     end
 ok:
@@ -194,10 +193,10 @@ pir_output_is(<<'CODE', <<'OUTPUT', 'get_lexpad - no pad inherited in coro');
      coro()
 .end
 .sub coro
-.include "interpinfo.pasm"
-    interpinfo $P1, .INTERPINFO_CURRENT_SUB
-    $P2 = $P1.'get_lexpad'()
-    if null $P2 goto ok
+    .local pmc pad, interp
+    interp = getinterp
+    pad = interp["lexpad"]
+    if null pad goto ok
     print "pad not NULL\n"
     .yield()
 ok:
@@ -210,11 +209,10 @@ OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', 'get_lexpad - set var via pad');
 .sub main
-.include "interpinfo.pasm"
+    .local pmc pad, interp
+    interp = getinterp
+    pad = interp["lexpad"]
     .lex '$a', P0
-    interpinfo $P1, .INTERPINFO_CURRENT_SUB
-    .local pmc pad
-    pad = $P1.'get_lexpad'()
     unless null pad goto ok
     print "pad is NULL\n"
     end
@@ -234,12 +232,12 @@ OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', 'get_lexpad - set two vars via pad (2 lex -> 2 pmc)');
 .sub main
-.include "interpinfo.pasm"
     .lex '$a', P0
     .lex '$b', P2
-    interpinfo $P1, .INTERPINFO_CURRENT_SUB
+    .local pmc pad, interp
+    interp = getinterp
+    pad = interp["lexpad"]
     .local pmc pad
-    pad = $P1.'get_lexpad'()
     unless null pad goto ok
     print "pad is NULL\n"
     end
@@ -250,7 +248,7 @@ ok:
     pad['$a'] = P1
     print P0
     print "\n"
-	P1 = 42
+    P1 = 42
     pad['$b'] = P1
     print P2
     print "\n"
@@ -331,11 +329,10 @@ OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', 'get_lexinfo from pad');
 .sub main
-.include "interpinfo.pasm"
     .lex '$a', P0
-    interpinfo $P1, .INTERPINFO_CURRENT_SUB
-    .local pmc pad, info
-    pad = $P1.'get_lexpad'()
+    .local pmc pad, interp, info
+    interp = getinterp
+    pad = interp["lexpad"]
     unless null pad goto ok
     print "pad is NULL\n"
     end
@@ -358,10 +355,9 @@ pir_output_is(<<'CODE', <<'OUTPUT', ':lex parsing - verify info and pad');
     print "ok\n"
 .end
 .sub foo :lex
-.include "interpinfo.pasm"
-    interpinfo $P1, .INTERPINFO_CURRENT_SUB
-    .local pmc pad, info
-    pad = $P1.'get_lexpad'()
+    .local pmc pad, interp, info
+    interp = getinterp
+    pad = interp["lexpad"]
     unless null pad goto ok
     print "pad is NULL\n"
     end
@@ -417,6 +413,49 @@ pir_output_is(<<'CODE', <<'OUTPUT', 'get_outer 2');
 CODE
 foo
 main
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', 'get_outer via interp');
+.sub "main"
+    .const .Sub foo = "foo"
+    .local pmc foo_cl
+    .lex "a", $P0
+    foo_cl = newclosure foo
+    foo_cl()
+    print $P0
+.end
+.sub foo  :outer('main')
+    .const .Sub bar = "bar"
+    .local pmc bar_cl
+    bar_cl = newclosure bar
+    bar_cl()
+.end
+.sub bar   :outer('foo')
+    .local pmc sub, interp, pad
+    interp = getinterp
+    sub = interp["outer"]
+    print sub
+    print "\n"
+    sub = interp["outer"; "sub"]
+    print sub
+    print "\n"
+    sub = interp["outer"; 2]
+    print sub
+    print "\n"
+    sub = interp["outer"; "sub"; 2]
+    print sub
+    print "\n"
+    $P0 = new .String
+    $P0 = "I messed with your var\n"
+    pad = interp["outer"; "lexpad"; 2]
+    pad['a'] = $P0
+.end
+CODE
+foo
+foo
+main
+main
+I messed with your var
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', 'closure 3');
@@ -1275,7 +1314,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "tailcalls and :outer");
     .lex '&add3', $P1
     .const .Sub add3 = "add3"
     $P1 = newclosure add3
-    .return $P1()                # tailcall 
+    .return $P1()                # tailcall
 .end
 
 .sub add3 :anon :outer(do_add3) :lex
@@ -1298,4 +1337,4 @@ CODE
 OUTPUT
 
 ## remember to change the number of tests :-)
-BEGIN { plan tests => 49; }
+BEGIN { plan tests => 50; }

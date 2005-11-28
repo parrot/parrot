@@ -561,8 +561,6 @@ Called after the subroutine as been unarchived.
 
 =over 4
 
-=item C<METHOD PMC* get_name_space()>
-
 =item C<METHOD PMC* get_namespace()>
 
 Return the namespace PMC or Undef. The namespace PMC is either a
@@ -576,20 +574,10 @@ Return amount of used registers for register kinds "I", "S", "P", "N".
 
 Return the LexInfo PMC, if any or a Null PMC.
 
-=item C<METHOD PMC* get_lexpad()>
-
-Return the LexPad PMC, if any or a Null PMC.
-
 =cut
 
 */
 
-    METHOD PMC* get_name_space() {
-        struct Parrot_sub * sub = PMC_sub(SELF);
-
-        return PMC_IS_NULL(sub->namespace) ?
-            pmc_new(INTERP, enum_class_Undef) : sub->namespace;
-    }
 
     METHOD PMC* get_namespace() {
         struct Parrot_sub * sub = PMC_sub(SELF);
@@ -622,22 +610,9 @@ Return the LexPad PMC, if any or a Null PMC.
         return sub->lex_info ? sub->lex_info : PMCNULL;
     }
 
-    METHOD PMC* get_lexpad() {
-        struct Parrot_sub * sub = PMC_sub(SELF);
-        return sub->ctx->lex_pad;
-    }
-
     METHOD PMC* get_outer() {
         struct Parrot_sub * sub = PMC_sub(SELF);
         return sub->outer_sub ? sub->outer_sub : PMCNULL;
-    }
-
-    METHOD PMC* get_caller() {
-        struct Parrot_sub * sub = PMC_sub(SELF);
-        PMC* cont, *sub_pmc;
-        cont = sub->ctx->current_cont;
-        sub_pmc = PMC_cont(cont)->to_ctx->current_sub;
-        return sub_pmc ? sub_pmc : PMCNULL;
     }
 
 }

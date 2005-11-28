@@ -16,14 +16,18 @@
 
 # implementation Sub.get_lexenv :method
 .sub do_lexenv :anon :method
-    .local pmc env, pad
+    .local pmc env, pad, interp
     env = new .ResizablePMCArray
+    .local int level
+    null level
+    interp = getinterp
     # push this pad and outies
 loop:
-    pad = self."get_lexpad"()
+    pad = interp["outer"; "lexpad"; level]
     push env, pad
     self = self."get_outer"()
     if null self goto done
+    inc level
     goto loop
 done:
     .return (env)
