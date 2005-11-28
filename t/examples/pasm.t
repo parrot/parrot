@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 8;
+use Parrot::Test tests => 7;
 use Parrot::Config;
 
 
@@ -49,35 +49,6 @@ END_EXPECTED
 
     'hello.pasm'        =>  << 'END_EXPECTED',
 Hello World
-END_EXPECTED
-
-    'lexical.pasm'      =>  << 'END_EXPECTED',
-Storing 'a' in top lexical pad
-The lexical 'a' has in the current scope the value 1.
-
-Storing 'c' in bottom lexical pad
-The lexical 'a' has in the current scope the value 1.
-The lexical 'b' has in the current scope the value 3.
-
-Overwriting 'c' in bottom lexical pad
-The lexical 'a' has in the current scope the value 2.
-The lexical 'b' has in the current scope the value 3.
-
-Adding another stack level at bottom
-The lexical 'a' has in the current scope the value 2.
-The lexical 'b' has in the current scope the value 3.
-
-Override lexicals
-The lexical 'a' has in the current scope the value 5.
-The lexical 'b' has in the current scope the value 4.
-The lexical 'a' has in scope 1 the value 5.
-The lexical 'b' has in scope 1 the value 4.
-The lexical 'a' has in scope 0 the value 2.
-The lexical 'b' has in scope 0 the value 3.
-
-Getting rid of bottom stack
-The lexical 'a' has in the current scope the value 2.
-The lexical 'b' has in the current scope the value 3.
 END_EXPECTED
 
     'queens.pasm'        =>  << 'END_EXPECTED',

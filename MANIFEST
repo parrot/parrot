@@ -598,7 +598,6 @@ examples/pasm/99beer.pasm                         [main]doc
 examples/pasm/cat.pasm                            [main]doc
 examples/pasm/fact.pasm                           [main]doc
 examples/pasm/hello.pasm                          [main]doc
-examples/pasm/lexical.pasm                        [main]doc
 examples/pasm/nanoforth.pasm                      [main]doc
 examples/pasm/nanoforth2.pasm                     [main]doc
 examples/pasm/queens.pasm                         [main]doc
