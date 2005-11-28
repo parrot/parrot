@@ -144,7 +144,12 @@ sub goto_pop
 sub run_core_func_start
 {
     return <<END_C;
-#if defined(__GNUC__) && defined(I386) && __GNUC__ < 4
+    /* at least gcc 2.95.2 miscompiles set_args - %edi
+     * is used for the vtable call and _reg_base is clobbered
+     * # if 1191 := PARROT_OP_set_args_pc
+     * (gdb) disas l_ops_addr[1191] l_ops_addr[1192]
+     */
+#if defined(__GNUC__) && defined(I386) && __GNUC__ == 3
     register opcode_t *cur_opcode asm ("esi") = cur_op;
     register char *   _reg_base   asm ("edi");
 #else
