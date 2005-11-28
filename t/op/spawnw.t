@@ -1,5 +1,13 @@
-# Copyright: 2004-2005 The Perl Foundation.  All Rights Reserved.
+#!perl
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
+
+use strict;
+use warnings;
+use lib qw( . lib ../lib ../../lib );
+use Test::More;
+use Parrot::Test;
+
 
 =head1 NAME
 
@@ -7,7 +15,7 @@ t/op/spawnw.t - Run OS commands and tell about the exit code
 
 =head1 SYNOPSIS
 
-	% perl -Ilib t/op/spawnw.t
+	% prove t/op/spawnw.t
 
 =head1 DESCRIPTION
 
@@ -34,7 +42,6 @@ Nigel Sandever - L<nigelsandever@btconnect.com>
 
 =cut
 
-use Parrot::Test tests => 7;
 
 # perl command coded this way to avoid platform 
 # quoting issue.
@@ -160,3 +167,8 @@ end:
 CODE
 return code: 10
 OUTPUT
+
+
+## remember to change the number of tests :-)
+BEGIN { plan tests => 7; }
+

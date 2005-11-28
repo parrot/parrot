@@ -1,6 +1,13 @@
-#! perl -w
+#!perl
 # Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
+
+use strict;
+use warnings;
+use lib qw( . lib ../lib ../../lib );
+use Test::More;
+use Parrot::Test;
+
 
 =head1 NAME
 
@@ -8,7 +15,7 @@ t/op/globals.t - Global Variables
 
 =head1 SYNOPSIS
 
-	% perl -Ilib t/op/globals.t
+	% prove t/op/globals.t
 
 =head1 DESCRIPTION
 
@@ -16,7 +23,6 @@ Tests the C<store_global> and C<find_global> operations.
 
 =cut
 
-use Parrot::Test tests => 4;
 
 output_is(<<'CODE', '12', "Fetch and store");
 	new P0, .Integer
@@ -60,4 +66,8 @@ CODE
 ok 1
 ok 2
 OUT
+
+
+## remember to change the number of tests :-)
+BEGIN { plan tests => 4; }
 

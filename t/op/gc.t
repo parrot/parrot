@@ -1,7 +1,13 @@
-#! perl -w
-
-# Copyright: 2001-2004 The Perl Foundation.  All Rights Reserved.
+#!perl
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
+
+use strict;
+use warnings;
+use lib qw( . lib ../lib ../../lib );
+use Test::More;
+use Parrot::Test;
+
 
 =head1 NAME
 
@@ -9,7 +15,7 @@ t/op/gc.t - Garbage Collection
 
 =head1 SYNOPSIS
 
-	% perl -Ilib t/op/gc.t
+	% prove t/op/gc.t
 
 =head1 DESCRIPTION
 
@@ -18,7 +24,6 @@ DOD/GC related bugs.
 
 =cut
 
-use Parrot::Test tests => 21;
 
 output_is( <<'CODE', '1', "sweep 1" );
       interpinfo I1, 2   # How many DOD runs have we done already?
@@ -700,3 +705,8 @@ done:
 CODE
 k1k2k3
 OUTPUT
+
+
+## remember to change the number of tests :-)
+BEGIN { plan tests => 21; }
+

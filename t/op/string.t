@@ -1,6 +1,13 @@
-#! perl -w
+#!perl
 # Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
+
+use strict;
+use warnings;
+use lib qw( . lib ../lib ../../lib );
+use Test::More;
+use Parrot::Test;
+
 
 =head1 NAME
 
@@ -8,16 +15,14 @@ t/op/string.t - Parrot Strings
 
 =head1 SYNOPSIS
 
-	% perl -Ilib t/op/string.t
+	% prove t/op/string.t
 
 =head1 DESCRIPTION
 
-Tests Parrot's string registers and operations.
+Tests Parrot string registers and operations.
 
 =cut
 
-use Parrot::Test tests => 157;
-use Test::More;
 
 output_is( <<'CODE', <<OUTPUT, "set_s_s|sc" );
 	set	S4, "JAPH\n"
@@ -2819,4 +2824,7 @@ CODE
 Cannot get character before beginning of string
 OUTPUT
 
-1;
+
+## remember to change the number of tests :-)
+BEGIN { plan tests => 157; }
+

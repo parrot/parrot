@@ -1,6 +1,13 @@
-#! perl -w
-# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+#!perl
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
+
+use strict;
+use warnings;
+use lib qw( . lib ../lib ../../lib );
+use Test::More;
+use Parrot::Test;
+
 
 =head1 NAME
 
@@ -8,7 +15,7 @@ t/op/ifunless.t - If/Unless
 
 =head1 SYNOPSIS
 
-	% perl -Ilib t/op/ifunless.t
+	% prove t/op/ifunless.t
 
 =head1 DESCRIPTION
 
@@ -16,7 +23,6 @@ Tests the conditional C<if> and C<unless> operations.
 
 =cut
 
-use Parrot::Test tests => 6;
 
 output_is(<<CODE, <<OUTPUT, "if_i_ic");
 	set	I0, 2147483647
@@ -189,3 +195,8 @@ CODE
 ok 1
 ok 2
 OUTPUT
+
+
+## remember to change the number of tests :-)
+BEGIN { plan tests => 6; }
+

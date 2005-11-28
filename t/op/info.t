@@ -1,6 +1,13 @@
-#! perl -w
-# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+#!perl
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
+
+use strict;
+use warnings;
+use lib qw( . lib ../lib ../../lib );
+use Test::More;
+use Parrot::Test;
+
 
 =head1 NAME
 
@@ -8,7 +15,7 @@ t/op/info.t - Info Ops
 
 =head1 SYNOPSIS
 
-	% perl -Ilib t/op/info.t
+	% prove t/op/info.t
 
 =head1 DESCRIPTION
 
@@ -16,8 +23,6 @@ Tests the information finding operations.
 
 =cut
 
-# These tests test the information providing opcodes
-use Parrot::Test tests => 1;
 
 output_is(<<'CODE', 'yes', "find_type");
 	set I0, .PerlArray
@@ -29,3 +34,6 @@ output_is(<<'CODE', 'yes', "find_type");
 	end
 CODE
 
+
+## remember to change the number of tests :-)
+BEGIN { plan tests => 1; }

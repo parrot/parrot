@@ -1,6 +1,13 @@
-#! perl -w
-# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+#!perl
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
+
+use strict;
+use warnings;
+use lib qw( . lib ../lib ../../lib );
+use Test::More;
+use Parrot::Test;
+
 
 =head1 NAME
 
@@ -8,7 +15,7 @@ t/op/arithmetics.t - Arithmetic Ops
 
 =head1 SYNOPSIS
 
-	% perl -Ilib t/op/arithmetics.t
+	% prove t/op/arithmetics.t
 
 =head1 DESCRIPTION
 
@@ -17,8 +24,6 @@ number types.
 
 =cut
 
-use Parrot::Test tests => 26;
-use Test::More;
 
 my $fp_equality_macro = <<'ENDOFMACRO';
 .macro fp_eq (	J, K, L )
@@ -877,3 +882,8 @@ ok 2
 ok 3
 ok 4
 OUTPUT
+
+
+## remember to change the number of tests :-)
+BEGIN { plan tests => 26; }
+

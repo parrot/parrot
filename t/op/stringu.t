@@ -1,6 +1,13 @@
-#! perl -w
-# Copyright: 2001-2004 The Perl Foundation.  All Rights Reserved.
+#!perl
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
+
+use strict;
+use warnings;
+use lib qw( . lib ../lib ../../lib );
+use Test::More;
+use Parrot::Test;
+
 
 =head1 NAME
 
@@ -8,19 +15,14 @@ t/op/stringu.t - Unicode String Test
 
 =head1 SYNOPSIS
 
-	% perl -Ilib t/op/stringu.t
+	% prove t/op/stringu.t
 
 =head1 DESCRIPTION
 
-Tests Parrot's unicode string system.
+Tests Parrot unicode string system.
 
 =cut
 
-#'
-
-use Parrot::Test tests => 19;
-use Test::More;
-#use vars qw($TODO);
 
 output_is( <<'CODE', <<OUTPUT, "angstrom" );
     getstdout P0
@@ -242,4 +244,8 @@ output_is( <<'CODE', <<OUTPUT, "substr with a UTF8 replacement #36794" );
 CODE
 AAAAAAAAAA\xd9\xa6
 OUTPUT
+
+
+## remember to change the number of tests :-)
+BEGIN { plan tests => 19; }
 

@@ -1,6 +1,13 @@
-#! perl -w
-# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+#!perl
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
+
+use strict;
+use warnings;
+use lib qw( . lib ../lib ../../lib );
+use Test::More;
+use Parrot::Test;
+
 
 =head1 NAME
 
@@ -8,7 +15,7 @@ t/op/stacks.t - Stacks
 
 =head1 SYNOPSIS
 
-	% perl -Ilib t/op/stacks.t
+	% prove t/op/stacks.t
 
 =head1 DESCRIPTION
 
@@ -17,8 +24,6 @@ where C<*> is not C<p>.
 
 =cut
 
-use Parrot::Test tests => 24;
-use Test::More;
 
 # Tests for stack operations, currently push*, push_*_c and pop*
 # where * != p.
@@ -601,3 +606,8 @@ Stack 'Control' too deep
 OUTPUT
 }
 ##############################
+
+
+## remember to change the number of tests :-)
+BEGIN { plan tests => 24; }
+

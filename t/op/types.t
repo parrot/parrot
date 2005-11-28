@@ -1,6 +1,13 @@
-#! perl -w
-# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+#!perl
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
+
+use strict;
+use warnings;
+use lib qw( . lib ../lib ../../lib );
+use Test::More;
+use Parrot::Test;
+
 
 =head1 NAME
 
@@ -8,7 +15,7 @@ t/op/types.t - Parrot Types
 
 =head1 SYNOPSIS
 
-	% perl -Ilib t/op/types.t
+	% prove t/op/types.t
 
 =head1 DESCRIPTION
 
@@ -17,7 +24,6 @@ F<t/pmc/pmc.t>.
 
 =cut
 
-use Parrot::Test tests => 3;
 
 output_is(<<'CODE', <<'OUTPUT', "data type names");
 	# first (native) type
@@ -85,5 +91,7 @@ CODE
 /^[48]4-1$/
 OUTPUT
 
-1;
+
+## remember to change the number of tests :-)
+BEGIN { plan tests => 3; }
 

@@ -1,6 +1,13 @@
-#! perl -w
-# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+#!perl
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
+
+use strict;
+use warnings;
+use lib qw( . lib ../lib ../../lib );
+use Test::More;
+use Parrot::Test;
+
 
 =head1 NAME
 
@@ -8,7 +15,7 @@ t/op/macro.t - IMCC Macros
 
 =head1 SYNOPSIS
 
-	% perl -Ilib t/op/macro.t
+	% prove t/op/macro.t
 
 =head1 DESCRIPTION
 
@@ -16,8 +23,6 @@ Tests IMCC C<.macro> syntax.
 
 =cut
 
-use Parrot::Test tests => 18;
-use Test::More;
 
 output_is( <<'CODE', <<OUTPUT, "macro, zero parameters" );
 .macro answer()
@@ -250,8 +255,8 @@ output_is( <<'CODE', <<OUTPUT, "local labels" );
 CODE
 Test label arg
 OUTPUT
-1;
 
 
-
+## remember to change the number of tests :-)
+BEGIN { plan tests => 18; }
 

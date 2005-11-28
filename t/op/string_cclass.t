@@ -1,6 +1,14 @@
-#! perl -w
-# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
-# $Id: cclass.t jrieks $
+#!perl
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+use strict;
+use warnings;
+use lib qw( . lib ../lib ../../lib );
+use Test::More;
+use Parrot::Test;
+use Parrot::Config;
+
 
 =head1 NAME
 
@@ -8,7 +16,7 @@ t/op/cclass.t - character class tests
 
 =head1 SYNOPSIS
 
-	% perl -Ilib t/op/cclass.t
+	% prove t/op/cclass.t
 
 =head1 DESCRIPTION
 
@@ -16,10 +24,6 @@ Tests find_cclass find_not_cclass, is_cclass.
 
 =cut
 
-use strict;
-
-use Parrot::Test tests => 11;
-use Parrot::Config;
 
 pir_output_is(<<'CODE', <<'OUT', "find_cclass, ascii");
 .include "cclass.pasm"
@@ -458,3 +462,8 @@ CODE
 11100000001100
 00011100100010
 OUT
+
+
+## remember to change the number of tests :-)
+BEGIN { plan tests => 11; }
+

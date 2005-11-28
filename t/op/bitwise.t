@@ -1,6 +1,13 @@
-#!perl -w
-# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+#!perl
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
+
+use strict;
+use warnings;
+use lib qw( . lib ../lib ../../lib );
+use Test::More;
+use Parrot::Test;
+
 
 =head1 NAME
 
@@ -8,7 +15,7 @@ t/op/bitwise.t - Bitwise Ops
 
 =head1 SYNOPSIS
 
-	% perl -Ilib t/op/bitwise.t
+	% prove t/op/bitwise.t
 
 =head1 DESCRIPTION
 
@@ -16,7 +23,6 @@ Tests various bitwise logical operations.
 
 =cut
 
-use Parrot::Test tests => 25;
 
 output_is(<<'CODE', <<'OUTPUT', "shr_i_i_i (>>)");
 	set I0, 0b001100
@@ -481,4 +487,8 @@ CODE
 51
 12
 OUTPUT
-1;
+
+
+## remember to change the number of tests :-)
+BEGIN { plan tests => 25; }
+

@@ -1,6 +1,13 @@
-#! perl -w
-# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+#!perl
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
+
+use strict;
+use warnings;
+use lib qw( . lib ../lib ../../lib );
+use Test::More;
+use Parrot::Test;
+
 
 =head1 NAME
 
@@ -8,7 +15,7 @@ t/op/calling.t - Parrot Calling Conventions
 
 =head1 SYNOPSIS
 
-	% perl -Ilib t/op/calling.t
+	% prove t/op/calling.t
 
 =head1 DESCRIPTION
 
@@ -16,8 +23,6 @@ Tests Parrot calling conventions.
 
 =cut
 
-use Parrot::Test tests => 51;
-use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "set_args - parsing");
     noop
@@ -1391,4 +1396,8 @@ pir_output_is(<<'CODE', <<'OUTPUT', "call evaled vtable code");
 CODE
 17
 OUTPUT
+
+
+## remember to change the number of tests :-)
+BEGIN { plan tests => 51; }
 

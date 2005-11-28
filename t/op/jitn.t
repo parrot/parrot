@@ -1,7 +1,13 @@
-#! perl -w
-# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+#!perl
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
-# test WRT JIT register allocation
+
+use strict;
+use warnings;
+use lib qw( . lib ../lib ../../lib );
+use Test::More;
+use Parrot::Test;
+
 
 =head1 NAME
 
@@ -9,7 +15,7 @@ t/op/jitn.t - JIT register allocation
 
 =head1 SYNOPSIS
 
-	% perl -Ilib t/op/jitn.t
+	% prove t/op/jitn.t
 
 =head1 DESCRIPTION
 
@@ -18,7 +24,6 @@ registers.
 
 =cut
 
-use Parrot::Test tests => 14;
 
 output_is(<<'CODE', <<'OUTPUT', "sub_n_n_n 1,2,3 mapped");
 set N0,0
@@ -327,3 +332,7 @@ z:
 CODE
 zero
 OUTPUT
+
+
+## remember to change the number of tests :-)
+BEGIN { plan tests => 14; }

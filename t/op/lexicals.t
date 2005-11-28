@@ -1,9 +1,10 @@
-#! perl
-# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+#!perl
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 use strict;
 use warnings;
+use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test;
 
@@ -14,7 +15,7 @@ t/op/lexicals.t - Lexical Ops
 
 =head1 SYNOPSIS
 
-	% perl -Ilib t/op/lexicals.t
+	% prove t/op/lexicals.t
 
 =head1 DESCRIPTION
 
@@ -862,6 +863,7 @@ pir_output_like(<<'CODE', <<'OUTPUT', 'get non existing');
 CODE
 /Lexical 'no_such' not found/
 OUTPUT
+
 
 ## remember to change the number of tests :-)
 BEGIN { plan tests => 35; }

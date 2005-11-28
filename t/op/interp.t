@@ -1,6 +1,13 @@
-#! perl -w
-# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+#!perl
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
+
+use strict;
+use warnings;
+use lib qw( . lib ../lib ../../lib );
+use Test::More;
+use Parrot::Test;
+
 
 =head1 NAME
 
@@ -8,7 +15,7 @@ t/op/interp.t - Running the Interpreter
 
 =head1 SYNOPSIS
 
-	% perl -Ilib t/op/interp.t
+	% prove t/op/interp.t
 
 =head1 DESCRIPTION
 
@@ -17,7 +24,6 @@ C<interpinfo> opcode.
 
 =cut
 
-use Parrot::Test tests => 6;
 
 SKIP: {
 	skip("we really shouldn't run just a label - use a sub", 1);
@@ -123,4 +129,6 @@ before
 after
 OUTPUT
 
-1;
+
+## remember to change the number of tests :-)
+BEGIN { plan tests => 6; }

@@ -1,6 +1,13 @@
-#! perl -w
-# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+#!perl
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
+
+use strict;
+use warnings;
+use lib qw( . lib ../lib ../../lib );
+use Test::More;
+use Parrot::Test;
+
 
 =head1 NAME
 
@@ -8,7 +15,7 @@ t/op/conv.t - C# Ops
 
 =head1 SYNOPSIS
 
-	% perl -Ilib t/op/conv.t
+	% prove t/op/conv.t
 
 =head1 DESCRIPTION
 
@@ -16,8 +23,6 @@ Tests the additional opcodes for C# compilation. See F<ops/dotgnu.ops>.
 
 =cut
 
-use Parrot::Test tests => 12;
-use Test::More;
 
 output_is(<<'CODE', <<OUTPUT, "conv_i1_i");
     set I0, 127
@@ -253,4 +258,7 @@ CODE
 Overflow exception for conv_u2_ovf
 OUTPUT
 
-1;
+
+## remember to change the number of tests :-)
+BEGIN { plan tests => 12; }
+

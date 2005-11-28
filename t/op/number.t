@@ -1,6 +1,13 @@
-#! perl -w
-# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+#!perl
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
+
+use strict;
+use warnings;
+use lib qw( . lib ../lib ../../lib );
+use Test::More;
+use Parrot::Test;
+
 
 =head1 NAME
 
@@ -8,16 +15,14 @@ t/op/number.t - Number Registers
 
 =head1 SYNOPSIS
 
-	% perl -Ilib t/op/number.t
+	% prove t/op/number.t
 
 =head1 DESCRIPTION
 
-Tests the use of Parrot's floating-point number registers.
+Tests the use of Parrot floating-point number registers.
 
 =cut
 
-use Parrot::Test tests => 40;
-use Test::More;
 
 output_is(<<CODE, <<OUTPUT, "set_n_nc");
 	set	N0, 1.0
@@ -1086,4 +1091,7 @@ CODE
 1.414214
 OUTPUT
 
+
+## remember to change the number of tests :-)
+BEGIN { plan tests => 40; }
 

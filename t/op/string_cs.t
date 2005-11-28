@@ -1,6 +1,14 @@
-#! perl -w
-# Copyright: 2001-2004 The Perl Foundation.  All Rights Reserved.
+#!perl
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
+
+use strict;
+use warnings;
+use lib qw( . lib ../lib ../../lib );
+use Test::More;
+use Parrot::Test;
+use Parrot::Config;
+
 
 =head1 NAME
 
@@ -8,7 +16,7 @@ t/op/string_cs.t - String Charset Tests
 
 =head1 SYNOPSIS
 
-	% perl -Ilib t/op/string_cs.t
+	% prove t/op/string_cs.t
 
 =head1 DESCRIPTION
 
@@ -16,9 +24,6 @@ Tests charset support.
 
 =cut
 
-use Parrot::Test tests => 51;
-use Parrot::Config;
-use Test::More;
 
 output_is( <<'CODE', <<OUTPUT, "basic syntax" );
     set S0, ascii:"ok 1\n"
@@ -837,3 +842,8 @@ output_is( <<'CODE', <<'OUTPUT', "escape unicode" );
 CODE
 \u2001\u2002\u2003\u2004\x{e01ef}\u0114
 OUTPUT
+
+
+## remember to change the number of tests :-)
+BEGIN { plan tests => 51; }
+

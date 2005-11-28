@@ -1,6 +1,13 @@
-#! perl -w
-# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+#!perl
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
+
+use strict;
+use warnings;
+use lib qw( . lib ../lib ../../lib );
+use Test::More;
+use Parrot::Test;
+
 
 =head1 NAME
 
@@ -8,7 +15,7 @@ t/op/basic.t - Basic Ops
 
 =head1 SYNOPSIS
 
-	% perl -Ilib t/op/basic.t
+	% prove t/op/basic.t
 
 =head1 DESCRIPTION
 
@@ -16,9 +23,6 @@ Tests basic string and branching operations.
 
 =cut
 
-use strict;
-
-use Parrot::Test tests => 23;
 
 # It would be very embarrassing if these didnt work...
 output_is(<<'CODE', '', "noop, end");
@@ -224,4 +228,7 @@ pir_output_like( $CODE, <<'OUTPUT', "end of line handling");
 /unexpected/
 OUTPUT
 
-1; # HONK
+
+## remember to change the number of tests :-)
+BEGIN { plan tests => 23; }
+

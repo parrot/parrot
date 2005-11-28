@@ -1,13 +1,39 @@
-use Parrot::Test;
+#!perl
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+use strict;
+use warnings;
+use lib qw( . lib ../lib ../../lib );
 use Test::More;
+use Parrot::Test;
 use Parrot::Config;
 
+
+=head1 NAME
+
+t/op/64bit.t - Testing integer ops on 64-bit platforms
+
+=head1 SYNOPSIS
+
+	% prove t/op/64bit.t
+
+=head1 DESCRIPTION
+
+Test integer operations on platforms with 64-bit integers.
+Tests are skipped on other platforms.
+
+=cut
+
+
+## remember to change the number of tests :-)
 if ($PConfig{intvalsize} == 8) {
    plan tests => 1;
 }
 else {
    plan skip_all => "64bit INTVAL platforms only";
 }
+
 
 output_is(<<'CODE', <<'OUTPUT', "bitops64");
 	# check bitops for 8-byte ints

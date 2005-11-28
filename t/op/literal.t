@@ -1,5 +1,13 @@
-# Copyright: 2004-2005 The Perl Foundation.  All Rights Reserved.
+#!perl
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
+
+use strict;
+use warnings;
+use lib qw( . lib ../lib ../../lib );
+use Test::More;
+use Parrot::Test;
+
 
 =head1 NAME
 
@@ -7,7 +15,7 @@ t/op/literal.t - Testing the PIR and PASM lexer
 
 =head1 SYNOPSIS
 
-	% perl -Ilib t/op/literal.t
+	% prove t/op/literal.t
 
 =head1 DESCRIPTION
 
@@ -24,7 +32,6 @@ L<http://rt.perl.org/rt3/Ticket/Display.html?id=31197>
 
 =cut
 
-use Parrot::Test tests => 2;
 
 pasm_output_is(<<'CODE', <<'OUTPUT', "integer literals in PASM");
         print 0x2A
@@ -60,3 +67,7 @@ CODE
 42
 42
 OUTPUT
+
+
+## remember to change the number of tests :-)
+BEGIN { plan tests => 2; }

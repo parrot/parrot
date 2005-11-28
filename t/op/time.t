@@ -1,6 +1,13 @@
-#! perl -w
-# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+#!perl
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
+
+use strict;
+use warnings;
+use lib qw( . lib ../lib ../../lib );
+use Test::More;
+use Parrot::Test;
+
 
 =head1 NAME
 
@@ -8,7 +15,7 @@ t/op/time.t - Time and Sleep
 
 =head1 SYNOPSIS
 
-	% perl -Ilib t/op/time.t
+	% prove t/op/time.t
 
 =head1 DESCRIPTION
 
@@ -16,7 +23,6 @@ Tests the C<time> and C<sleep> operations.
 
 =cut
 
-use Parrot::Test tests => 5;
 
 output_is(<<'CODE', <<'OUTPUT', "time_i");
 	time	I0
@@ -102,3 +108,8 @@ output_is(<<'CODE', $year, "decodelocaltime");
     print I0
     end
 CODE
+
+
+## remember to change the number of tests :-)
+BEGIN { plan tests => 5; }
+

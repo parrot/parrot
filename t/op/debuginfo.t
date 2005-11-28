@@ -1,6 +1,13 @@
-#! perl -w
-# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+#!perl
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
+
+use strict;
+use warnings;
+use lib qw( . lib ../lib ../../lib );
+use Test::More;
+use Parrot::Test;
+
 
 =head1 NAME
 
@@ -8,7 +15,7 @@ t/op/debuginfo.t - Debugging Info
 
 =head1 SYNOPSIS
 
-	% perl -Ilib t/op/debuginfo.t
+	% prove t/op/debuginfo.t
 
 =head1 DESCRIPTION
 
@@ -17,7 +24,6 @@ as well as backtrace tests.
 
 =cut
 
-use Parrot::Test tests => 8;
 
 SKIP:
 {
@@ -193,3 +199,8 @@ called from Sub 'rec' pc (\d+|-1) \(.*?:(\d+|-1)\)
 \.\.\. call repeated 90 times
 called from Sub 'main' pc (\d+|-1) \(.*?:(\d+|-1)\)$/
 OUTPUT
+
+
+## remember to change the number of tests :-)
+BEGIN { plan tests => 8; }
+

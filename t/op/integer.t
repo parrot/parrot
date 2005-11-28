@@ -1,6 +1,13 @@
-#! perl -w
-# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+#!perl
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
+
+use strict;
+use warnings;
+use lib qw( . lib ../lib ../../lib );
+use Test::More;
+use Parrot::Test;
+
 
 =head1 NAME
 
@@ -8,15 +15,14 @@ t/op/integer.t - Integer Registers
 
 =head1 SYNOPSIS
 
-	% perl -Ilib t/op/integer.t
+	% prove t/op/integer.t
 
 =head1 DESCRIPTION
 
-Tests the use of Parrot's integer registers.
+Tests the use of Parrot integer registers.
 
 =cut
 
-use Parrot::Test tests => 40;
 
 output_is(<<CODE, <<OUTPUT, "set_i_ic");
 	# XXX: Need a test for writing outside the set of available
@@ -1228,4 +1234,7 @@ CODE
 0
 OUTPUT
 
-1;
+
+## remember to change the number of tests :-)
+BEGIN { plan tests => 40; }
+
