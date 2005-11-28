@@ -19,12 +19,6 @@ Related to this deprecation is: the Scratchpad PMC (classes/scratchpad.pmc)
 will be removed too including the tests - we already have 2 working LexPads
 instead.
 
-Also, you may get bus errors or similar failures when mixing the new style
-lexicals with the old style lexicals. These bus errors are I<not> going to be
-resolved, since the old style is going away. This might happen if you have
-a sub defined with C<:lex>, but then use a C<find_lex> in a sub with no
-such declaration.
-
 =head1 Deprecated APIs
 
 =over 4
