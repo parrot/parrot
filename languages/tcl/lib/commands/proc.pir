@@ -35,6 +35,9 @@ Create a PIR sub on the fly for this user defined proc.
   args = args_p
 
 got_args:
+  # defining a proc. update the epoch.
+  $P0 = find_global '_Tcl', 'epoch'
+  inc $P0
 
   # Save the parsed body.
   .local pmc parsed_body
@@ -42,6 +45,7 @@ got_args:
   ($I0,$S1) = compiler(0,$S0)
   $P0 = pir_compiler($I0,$S1)
   parsed_body = $P0[0]
+
 
   # XXX these need to go away - for now, we'll just escape
   # the code portion and put it, escaped, into the proc

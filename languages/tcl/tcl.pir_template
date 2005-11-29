@@ -204,10 +204,18 @@ providing a compreg-compatible method.
   $P1 = 1
   store_global "_Tcl", "next_channel_id", $P1
 
-  # Setup the calling level (for upvar, uplevel, interpreter)
+  # calling level (for upvar, uplevel, globals vs. lex)
   $P1 = new .Integer
   $P1 = 0
   store_global "_Tcl", "call_level", $P1
+
+  # Change counter: when something is compiled, it is compared to
+  # This counter: if the counter hasn't changed since it was compiled,
+  # it's safe to use the inline version (if available)
+  # Otherwise fallback to the interpreted version.
+  $P1 = new .Integer
+  $P1 = 0
+  store_global "_Tcl", "epoch", $P1
 
   # register the TCL compiler.
   $P1 = find_global "_Tcl", "_tcl_compile"
@@ -234,6 +242,8 @@ providing a compreg-compatible method.
   ($I0,$S0) = compiler(0,tcl_code)
   .return pir_compiler($I0,$S0)
 .end
+
+${FALLBACKS}
 
 ${RULES}
 

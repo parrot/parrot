@@ -140,11 +140,16 @@ arg_loop_done:
 
    (inline_result_num,retval) = $P1(register_num,self)
    
-   register_num = inline_result_num + 1
-   # XXX Need check here for global epoch.
-   pir_code .= "inlined_command"
+   register_num = inline_result_num + 2
+   .local pmc epoch
+   epoch = find_global '_Tcl', 'epoch'
+   $S0 = epoch
+   pir_code .= ".local pmc epoch\nepoch=find_global '_Tcl', 'epoch'\n"
+   pir_code .= 'if epoch != '
+   pir_code .= $S0
+   pir_code .= ' goto dynamic_command'
    pir_code .= label_num
-   pir_code .= ":\n"
+   pir_code .= "\n"
    pir_code .= retval
  
    $S0 = inline_result_num

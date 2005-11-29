@@ -15,10 +15,15 @@
   .local string new_s
   new_s = argv[1]
 
+  # Change the epoch
+  $P0 = find_global '_Tcl', 'epoch'
+  inc $P0
+
   .local string old_proc,new_proc
   old_proc = "&" . old_s
   new_proc = "&" . new_s
 
+ 
   .local pmc theSub
   # If newName is empty, then just delete
   if new_s == "" goto delete

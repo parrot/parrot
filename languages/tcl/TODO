@@ -20,32 +20,18 @@ to the compiled version, and then remove the interpret :method.
 =item 1
 
 Generate compiler-variants for several builtins, esp. those used by
-examples/bench.tcl
-
-Modify the compiler for tclcommand to generate the inline version if
-it's available. (C<proc> and C<expr> should also be straightforward, as they
-already compile anyway.)  [Completed: incr, break, continue, for, while]
-
-Note: compiled builtins always take two args: the register_num to begin
-using for the inlined code, and a single container pmc that contains the
-pre-parsed arguments. They return just like the compile methods in lib/tcl*.pir,
-that is, the register_num the result is in, and the inlinable code.
+examples/bench.tcl - NB: bench.tcl is currently failing.
 
 =item 2
-
-When an inline compiled version exists, use it, but IFF a global counter
-indicates no procs have been redifined.  Update proc and rename to increment
-this counter whenever they are called.
-
-=item 3
 
 Add compiled TclComment objects, which do nothing other than generate
 PIR comments with the same text.
 
-=item 4
+=item 3
 
-It would be nice if C<--pir> generated human readable output. As long as
-it's functionally equivalent, internally generated PIR need not be pretty.
+It would be nice if C<--pir> generated more human readable output. It's OK,
+I think, if the generated PIR has more whitespace all the time, even if
+a human isn't peeking.
 
 =back
 
@@ -57,6 +43,8 @@ it's functionally equivalent, internally generated PIR need not be pretty.
 
 Should be more explicit about the PMC dependencies in the makefile. *something*
 is causing things to get rebuilt unecessarily each time "make tclsh" is run.
+Very likely due to the build_dynclasses targets that don't specify explicit
+deps.
 
 =back
 
@@ -89,9 +77,6 @@ Perhaps via [namespace import]? Can fake it right now with [inline]
 =over 4
 
 =item [expr]
-
-clean up the generated expr subs so that they use a unique id. (in add
-to being anon)
 
 Add "is_const" global which checks to see if something is, in fact,
 constant. (which will allow us to then constant fold. Leo assures us

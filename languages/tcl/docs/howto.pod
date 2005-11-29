@@ -23,16 +23,19 @@ has been translated, the object's C<compile> method is invoked, which then
 generates PIR which can be compiled by parrot.
 
 When writing a new builtin, preferentially put it in
-C<< lib/builtins/<builtin>.pir >> , and write a wrapper in
-C<< lib/commands/<builtin>.pir >> which calls the inlined version.
+C<< lib/builtins/<builtin>.pir >> , and follow the conventions for that
+directory. C<tcl.pl> will automatically generate a version in commands/ that
+invokes the inline'able version, compiles it, invokes it, and returns
+the result. The compiler will fall back to this version as necessary.
 
 Inlined builtins must take a register num to begin with, along with a single
 PMC with the various args. (As opposed to the interpreted-style, which takes
 a vararg list.). They must return the register in which the result of the
 command is stored, along with the generated PIR. The results of calling
 the inlined code will be used by C<lib/tclcommand.pir>. The inlined code
-is further wrapped in a protective conditional which will (eventually) skip
-the inlined version if it can no longer be trusted, and will fall back to
+is further wrapped in a protective conditional which will skip
+the inlined version if it can no longer be trusted (that is, if [proc]
+or [rename] has been invoked), and will fall back to
 the interpreted version as necessary. (And throw an exception if the command
 is not found at runtime.)
 

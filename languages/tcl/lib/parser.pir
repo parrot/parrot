@@ -94,8 +94,8 @@ done:
   .return "compile_dispatch"(commands,register_num)
 .end
 
-=item C<(pmc invokable) = pir_compiler(string PIR, int register_num)>
-=item C<(string code)   = pir_compiler(string PIR, int register_num, 1)>
+=item C<(pmc invokable) = pir_compiler(int register_num, string PIR)>
+=item C<(string code)   = pir_compiler(int register_num, string PIR, 1)>
 
 A thin wrapper for the <compreg>'d PIR compiler. 
 Given inline PIR code, wrap it in anonymous subroutine and return the
