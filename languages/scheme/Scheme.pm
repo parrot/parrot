@@ -42,7 +42,7 @@ sub link_functions {
   my $code = $main->{code};
   my $header = << 'END_HEADER';
 # Header information
-    new_pad 0
+    # new_pad 0
 END_HEADER
 
   while (@missing) {

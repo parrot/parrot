@@ -365,7 +365,7 @@ sub _op_lambda {
   $self->{regs}{P}{1} = 1;
   
   # expand the lexical scope
-  $self->_add_inst('', 'new_pad', [-1]);
+  $self->_add_inst('', '# new_pad', [-1]);
   my $oldscope = $self->{scope};
   $self->{scope} = { '*UP*' => $oldscope };
 
@@ -385,7 +385,7 @@ sub _op_lambda {
 
   $self->_add_inst('', 'set', ['P5', $temp]);
 
-  $self->_add_inst('', 'pop_pad');
+  $self->_add_inst('', '# pop_pad');
   $self->_add_inst('', 'returncc');
   $self->_add_inst("DONE_$label");
 
