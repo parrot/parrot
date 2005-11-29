@@ -16,7 +16,7 @@ Tests C<Exception> and C<Exception_Handler> PMCs.
 
 =cut
 
-use Parrot::Test tests => 24;
+use Parrot::Test tests => 25;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "push_eh - clear_eh");
@@ -66,6 +66,34 @@ handler:
     null P5
     end
 
+CODE
+main
+caught it
+Exception
+just pining
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', ".get_results() - PIR");
+.sub main :main
+    print "main\n"
+    push_eh _handler
+    new P1, .Exception
+    set P1[0], "just pining"
+    throw P1
+    print "not reached\n"
+    end
+_handler:
+    .local pmc e
+    .local string s
+    .get_results (e, s)
+    print "caught it\n"
+    typeof S1, e
+    print S1
+    print "\n"
+    print s
+    print "\n"
+    null P5
+.end
 CODE
 main
 caught it

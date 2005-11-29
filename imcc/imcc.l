@@ -275,6 +275,7 @@ SP              [ ]
 <emit,INITIAL>":lex"     return(NEED_LEX);
 
 ".result"       return(RESULT);
+".get_results"       return(GET_RESULTS);
 ".yield"        return(YIELDT);
 ".return"       return(RETURN);
 

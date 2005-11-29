@@ -93,55 +93,56 @@
      RESULT = 316,
      RETURN = 317,
      YIELDT = 318,
-     POW = 319,
-     SHIFT_RIGHT_U = 320,
-     LOG_AND = 321,
-     LOG_OR = 322,
-     COMMA = 323,
-     ESUB = 324,
-     DOTDOT = 325,
-     PCC_BEGIN = 326,
-     PCC_END = 327,
-     PCC_CALL = 328,
-     PCC_SUB = 329,
-     PCC_BEGIN_RETURN = 330,
-     PCC_END_RETURN = 331,
-     PCC_BEGIN_YIELD = 332,
-     PCC_END_YIELD = 333,
-     NCI_CALL = 334,
-     METH_CALL = 335,
-     INVOCANT = 336,
-     MAIN = 337,
-     LOAD = 338,
-     IMMEDIATE = 339,
-     POSTCOMP = 340,
-     METHOD = 341,
-     ANON = 342,
-     OUTER = 343,
-     NEED_LEX = 344,
-     MULTI = 345,
-     LABEL = 346,
-     EMIT = 347,
-     EOM = 348,
-     IREG = 349,
-     NREG = 350,
-     SREG = 351,
-     PREG = 352,
-     IDENTIFIER = 353,
-     REG = 354,
-     MACRO = 355,
-     ENDM = 356,
-     STRINGC = 357,
-     INTC = 358,
-     FLOATC = 359,
-     USTRINGC = 360,
-     PARROT_OP = 361,
-     VAR = 362,
-     LINECOMMENT = 363,
-     FILECOMMENT = 364,
-     DOT = 365,
-     CONCAT = 366,
-     POINTY = 367
+     GET_RESULTS = 319,
+     POW = 320,
+     SHIFT_RIGHT_U = 321,
+     LOG_AND = 322,
+     LOG_OR = 323,
+     COMMA = 324,
+     ESUB = 325,
+     DOTDOT = 326,
+     PCC_BEGIN = 327,
+     PCC_END = 328,
+     PCC_CALL = 329,
+     PCC_SUB = 330,
+     PCC_BEGIN_RETURN = 331,
+     PCC_END_RETURN = 332,
+     PCC_BEGIN_YIELD = 333,
+     PCC_END_YIELD = 334,
+     NCI_CALL = 335,
+     METH_CALL = 336,
+     INVOCANT = 337,
+     MAIN = 338,
+     LOAD = 339,
+     IMMEDIATE = 340,
+     POSTCOMP = 341,
+     METHOD = 342,
+     ANON = 343,
+     OUTER = 344,
+     NEED_LEX = 345,
+     MULTI = 346,
+     LABEL = 347,
+     EMIT = 348,
+     EOM = 349,
+     IREG = 350,
+     NREG = 351,
+     SREG = 352,
+     PREG = 353,
+     IDENTIFIER = 354,
+     REG = 355,
+     MACRO = 356,
+     ENDM = 357,
+     STRINGC = 358,
+     INTC = 359,
+     FLOATC = 360,
+     USTRINGC = 361,
+     PARROT_OP = 362,
+     VAR = 363,
+     LINECOMMENT = 364,
+     FILECOMMENT = 365,
+     DOT = 366,
+     CONCAT = 367,
+     POINTY = 368
    };
 #endif
 #define LOW_PREC 258
@@ -205,55 +206,56 @@
 #define RESULT 316
 #define RETURN 317
 #define YIELDT 318
-#define POW 319
-#define SHIFT_RIGHT_U 320
-#define LOG_AND 321
-#define LOG_OR 322
-#define COMMA 323
-#define ESUB 324
-#define DOTDOT 325
-#define PCC_BEGIN 326
-#define PCC_END 327
-#define PCC_CALL 328
-#define PCC_SUB 329
-#define PCC_BEGIN_RETURN 330
-#define PCC_END_RETURN 331
-#define PCC_BEGIN_YIELD 332
-#define PCC_END_YIELD 333
-#define NCI_CALL 334
-#define METH_CALL 335
-#define INVOCANT 336
-#define MAIN 337
-#define LOAD 338
-#define IMMEDIATE 339
-#define POSTCOMP 340
-#define METHOD 341
-#define ANON 342
-#define OUTER 343
-#define NEED_LEX 344
-#define MULTI 345
-#define LABEL 346
-#define EMIT 347
-#define EOM 348
-#define IREG 349
-#define NREG 350
-#define SREG 351
-#define PREG 352
-#define IDENTIFIER 353
-#define REG 354
-#define MACRO 355
-#define ENDM 356
-#define STRINGC 357
-#define INTC 358
-#define FLOATC 359
-#define USTRINGC 360
-#define PARROT_OP 361
-#define VAR 362
-#define LINECOMMENT 363
-#define FILECOMMENT 364
-#define DOT 365
-#define CONCAT 366
-#define POINTY 367
+#define GET_RESULTS 319
+#define POW 320
+#define SHIFT_RIGHT_U 321
+#define LOG_AND 322
+#define LOG_OR 323
+#define COMMA 324
+#define ESUB 325
+#define DOTDOT 326
+#define PCC_BEGIN 327
+#define PCC_END 328
+#define PCC_CALL 329
+#define PCC_SUB 330
+#define PCC_BEGIN_RETURN 331
+#define PCC_END_RETURN 332
+#define PCC_BEGIN_YIELD 333
+#define PCC_END_YIELD 334
+#define NCI_CALL 335
+#define METH_CALL 336
+#define INVOCANT 337
+#define MAIN 338
+#define LOAD 339
+#define IMMEDIATE 340
+#define POSTCOMP 341
+#define METHOD 342
+#define ANON 343
+#define OUTER 344
+#define NEED_LEX 345
+#define MULTI 346
+#define LABEL 347
+#define EMIT 348
+#define EOM 349
+#define IREG 350
+#define NREG 351
+#define SREG 352
+#define PREG 353
+#define IDENTIFIER 354
+#define REG 355
+#define MACRO 356
+#define ENDM 357
+#define STRINGC 358
+#define INTC 359
+#define FLOATC 360
+#define USTRINGC 361
+#define PARROT_OP 362
+#define VAR 363
+#define LINECOMMENT 364
+#define FILECOMMENT 365
+#define DOT 366
+#define CONCAT 367
+#define POINTY 368
 
 
 
@@ -268,7 +270,7 @@ typedef union {
     Instruction *i;
 } yystype;
 /* Line 1281 of /usr/share/bison/yacc.c.  */
-#line 272 "imcc/imcparser.h"
+#line 274 "imcc/imcparser.h"
 # define YYSTYPE yystype
 #endif
 

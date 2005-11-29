@@ -280,6 +280,13 @@ expand_pcc_sub_call(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
     Instruction *get_name;
 
     sub = ins->r[0];
+
+    if (ins->type & ITRESULT) {
+        n = sub->pcc_sub->nret;
+        ins = pcc_get_args(interp, unit, ins, "get_results", n,
+                sub->pcc_sub->ret, sub->pcc_sub->ret_flags);
+        return;
+    }
     tail_call = (sub->pcc_sub->flags & isTAIL_CALL);
 
     if (sub->pcc_sub->object) {

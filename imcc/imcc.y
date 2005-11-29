@@ -341,7 +341,8 @@ set_lexical(Interp *interp, SymReg *r, char *name)
 %token <t> SHR_ASSIGN SHL_ASSIGN SHR_U_ASSIGN
 %token <t> SHIFT_LEFT SHIFT_RIGHT INTV FLOATV STRINGV PMCV OBJECTV  LOG_XOR
 %token <t> RELOP_EQ RELOP_NE RELOP_GT RELOP_GTE RELOP_LT RELOP_LTE
-%token <t> GLOBAL GLOBALOP ADDR RESULT RETURN YIELDT POW SHIFT_RIGHT_U LOG_AND LOG_OR
+%token <t> GLOBAL GLOBALOP ADDR RESULT RETURN YIELDT GET_RESULTS
+%token <t> POW SHIFT_RIGHT_U LOG_AND LOG_OR
 %token <t> COMMA ESUB DOTDOT
 %token <t> PCC_BEGIN PCC_END PCC_CALL PCC_SUB PCC_BEGIN_RETURN PCC_END_RETURN
 %token <t> PCC_BEGIN_YIELD PCC_END_YIELD NCI_CALL METH_CALL INVOCANT
@@ -366,7 +367,7 @@ set_lexical(Interp *interp, SymReg *r, char *name)
 %type <t> pcc_return_many
 %type <t> proto sub_proto sub_proto_list multi multi_types opt_comma outer
 %type <i> instruction assignment if_statement labeled_inst opt_label op_assign
-%type <i> func_assign
+%type <i> func_assign get_results
 %type <i> opt_invocant
 %type <sr> target targetlist reg const var string result
 %type <sr> key keylist _keylist
@@ -1012,10 +1013,16 @@ assignment:
            IMCC_itcall_sub(interp, $6);
            cur_call = NULL;
          }
+   | get_results
    | op_assign
    | func_assign
    | target '=' PNULL
                    {  $$ =MK_I(interp, cur_unit, "null", 1, $1); }
+   ;
+
+get_results: GET_RESULTS { $$ = IMCC_create_itcall_label(interp);
+                           $$->type &= ~ITCALL; $$->type |= ITRESULT; }
+    '(' targetlist  ')' {  $$ = 0; }
    ;
 
 op_assign:
