@@ -106,10 +106,12 @@ Initializes the exception handler.
 
     void set_pointer (void* value) {
         opcode_t *pos = value;
+        struct Parrot_cont * cc = PMC_cont(SELF);
         if (*pos == PARROT_OP_get_results_pc) {
-            struct Parrot_cont * cc = PMC_cont(SELF);
             cc->current_results = pos;
         }
+        else
+            cc->current_results = NULL;
         SUPER(value);
     }
 
