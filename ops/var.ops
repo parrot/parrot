@@ -59,7 +59,7 @@ op DELETED_peek_pad(out PMC) {
 =item B<store_lex>(in STR, in PMC)
 
 Store object $2 as lexical symbol $1. The opcode might succeed
-or throw an exception on unknown lexical names depeding on the
+or throw an exception on unknown lexical names depending on the
 implementation of the LexPad PMC.
 Parrot's LexPad throws an exception for unknown names.
 
