@@ -49,13 +49,14 @@ sub parse_s {
 		print " */\n";
 	    }
 	    my ($bytes, $src) = ($1, $2);
+	    $src =~ s/\t/ /g;
 	    my $len = length($bytes);
 	    my @pairs = ($bytes =~ m/../g);
 	    print "    ". join '', map {"0x$_, "} @pairs;
 	    print " " x (3*(8 - $len));
 	    print "    /* $src */\n";
 	}
-	elsif (/\.type\s*(\w+),\@function/) {
+	elsif (/\.type\s+(\w+)\s*,\s*\@function/) {
 	    $in_comment = 0;
 	    $func = $1;
 	    print " *\n */\n";
