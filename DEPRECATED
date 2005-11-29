@@ -1,48 +1,28 @@
 =head1 Deprecated opcodes
 
-=over 4
-
 All are gone. Please read the history of this file for more.
 
-=back
 
 =head1 P5
 
 The use of P5 as the default exception register is deprecated. In your
-exception handler, you can any of the following to get at the the exception
-object, and optionally, the C<_message> slot. In any version, get_results
+exception handler, you can use any of the following to get at the the exception
+object. In either version, get_results
 must come before any other code (though variable declarations are OK).
 
-  handler: # Get both, manual
-   get_results "(0,0)", P0, S0
-
-  handler: # Get only the exception, manual
+  handler: # manual
    get_results "(0,0)", P0
 
-  handler: # get both, PIR
-   .get_results ($P0,$S0)
-
-  handler: # get only the exception, PIR
+  handler: # PIR
    .get_results ($P0)
 
 =cut
 
-=head1 PDD20
-
-All the *_pad opcodes are now deprecated. See PDD20 for information about how
-to handle lexical variables. (new_pad, peek_pad, pop_pad, push_pad)
-
-store_lex and find_lex opcodes with 3 arguments (these with an additional
-depth argument) are also not needed (and don't work) with pdd20 lexicals 
-and will be removed.   
-
-Related to this deprecation is: the Scratchpad PMC (classes/scratchpad.pmc)
-will be removed too including the tests - we already have 2 working LexPads
-instead.
-
 =head1 Deprecated APIs
 
 =over 4
+
+=item * 
 
 All Parrot_char_is_* functions from src/string_primitives.c will
 be removed. Please use Parrot_string_is_cclass() instead.
@@ -74,7 +54,7 @@ This syntax is also true for PGE::Glob and PGE::P5Regexp
 Not yet deprecated, but it's recommended to use the new syxtax and
 gradually change the old.
 
-=over
+=over 4
 
 =item Chip's colon
 
@@ -108,6 +88,23 @@ Will have to be:
 	print $S0
 	substr $P0, 1, 2, "x"
 
+=item Assignment Syntax
 
+Currently, C<=> is used for both assignment and aliasing. Chip says that, 
+once this change is in effect, we'll use the following syntax:
+
+   P0 := P1      # aliasing:   P0 and P1 point to same PMC
+   P0 := opcode  # aliasing:   P0 points to PMC returned by opcode
+   P0 = ...      # assignment: modifies P0, NO MATTER WHAT '...' IS
+
+   S0 := S1      # aliasing:   S0 and S1 point to same header
+   S0 := opcode  # aliasing:   S0 points to header returned by opcode
+   S0 = ...      # assignment: modifies S0, NO MATTER WHAT '...' IS
+
+   I0 := ...     # ILLEGAL
+   I0 = ...      # assignment: modifies I0
+
+   N0 := ...     # ILLEGAL
+   N0 = ...      # assignment: modifies N0
 
 =back
