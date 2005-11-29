@@ -6,35 +6,33 @@
  */
 
 /*
- * GAS LISTING /tmp/ccIoNFpi.s 			page 1
+ * GAS LISTING /home/chip/tmp/ccvNpFsi.s 			page 1
  * 
  * 
  *    1              		.file	"memcpy_sse_in.c"
- *    2              		.version	"01.01"
- *    3              	gcc2_compiled.:
- *    4              	.text
- *    5              		.align 16
- *    6              	.globl Parrot_memcpy_aligned_sse
+ *    2              		.text
+ *    3              		.p2align 4,,15
+ *    4              	.globl Parrot_memcpy_aligned_sse
  *
  */
 static const char Parrot_memcpy_aligned_sse_code[] = {
                            /* Parrot_memcpy_aligned_sse: */
     0x57,                       /* pushl %edi */
     0x56,                       /* pushl %esi */
-    0x8B, 0x44, 0x24, 0x0C,     /* movl 12(%esp),%eax */
+    0x8B, 0x44, 0x24, 0x0C,     /* movl 12(%esp), %eax */
     0x8B, 0x4C, 0x24, 0x14,     /* mov 20(%esp), %ecx */
     0x8B, 0x74, 0x24, 0x10,     /* mov 16(%esp), %esi */
     0x89, 0xC7,                 /* mov %eax, %edi */
     0xC1, 0xE9, 0x05,           /* shr $5, %ecx */
                            /* 1: */
-    0x0F, 0x10, 0x46, 0x00,     /* movups 0(%esi), %xmm0 */
+    0x0F, 0x10, 0x06,           /* movups 0(%esi), %xmm0 */
     0x0F, 0x10, 0x4E, 0x10,     /* movups 16(%esi), %xmm1 */
     0x83, 0xC6, 0x20,           /* add $32, %esi */
-    0x0F, 0x11, 0x47, 0x00,     /* movups %xmm0, 0(%edi) */
+    0x0F, 0x11, 0x07,           /* movups %xmm0, 0(%edi) */
     0x0F, 0x11, 0x4F, 0x10,     /* movups %xmm1, 16(%edi) */
     0x83, 0xC7, 0x20,           /* add $32, %edi */
     0x49,                       /* dec %ecx */
-    0x75, 0xE7,                 /* jnz 1b */
+    0x75, 0xE9,                 /* jnz 1b */
     0x5E,                       /* popl %esi */
     0x5F,                       /* popl %edi */
     0xC3,                       /* ret */
@@ -42,17 +40,17 @@ static const char Parrot_memcpy_aligned_sse_code[] = {
 };
 
 #include <stdlib.h>
-typedef void* (*Parrot_memcpy_aligned_sse_t)(void *dest, void *src, size_t);
+typedef void* (*Parrot_memcpy_aligned_sse_t)(void *dest, const void *src, size_t);
 
 #ifndef NDEBUG
 #include <assert.h>
 static void*
-Parrot_memcpy_aligned_sse_debug(void* d, void* s, size_t l)
+Parrot_memcpy_aligned_sse_debug(void* d, const void* s, size_t n)
 {
-    assert( (l & 0x1f) == 0);
+    assert( (n & 0x1f) == 0);
     assert( ((unsigned long) d & 7) == 0);
     assert( ((unsigned long) s & 7) == 0);
-    return ((Parrot_memcpy_aligned_sse_t)(Parrot_memcpy_aligned_sse_code))(d, s, l);
+    return ((Parrot_memcpy_aligned_sse_t)Parrot_memcpy_aligned_sse_code)(d, s, n);
 }
 
 Parrot_memcpy_aligned_sse_t Parrot_memcpy_aligned_sse = Parrot_memcpy_aligned_sse_debug;
@@ -67,18 +65,18 @@ Parrot_memcpy_aligned_sse_t Parrot_memcpy_aligned_sse =
 #include <stdio.h>
 int main(int argc, char *argv[]) {
     unsigned char *s, *d;
-    size_t i, l;
+    size_t i, n;
 
-    l = 640;	/* sizeof(reg_store) */
+    n = 640;	/* sizeof(reg_store) */
 
-    s = malloc(l);
-    for (i = 0; i < l; ++i)
+    s = malloc(n);
+    for (i = 0; i < n; ++i)
 	s[i] = i & 0xff;
-    d = malloc(l);
-    for (i = 0; i < l; ++i)
+    d = malloc(n);
+    for (i = 0; i < n; ++i)
 	d[i] = 0xff;
-    Parrot_memcpy_aligned_sse(d, s, l);
-    for (i = 0; i < l; ++i)
+    Parrot_memcpy_aligned_sse(d, s, n);
+    for (i = 0; i < n; ++i)
 	if (d[i] != (i & 0xff)) {
 	    printf("error s[%d] = %d d = %d\n", i, s[i], d[i]);
 	    exit(1);
