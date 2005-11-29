@@ -3,7 +3,7 @@
 # $Id$
 
 use strict;
-use Parrot::Test tests => 19;
+use Parrot::Test tests => 20;
 
 ##############################
 # Parrot Calling Conventions
@@ -493,4 +493,15 @@ pir_output_like(<<'CODE', <<'OUT', "multiple \:anon subs with same name");
 .end
 CODE
 /.*'anon'.*not found/
+OUT
+
+pir_output_is(<<'CODE', <<'OUT', "()=foo() syntax");
+.sub main :main
+	() = foo()
+.end
+.sub foo
+	print "foo\n"
+.end	
+CODE
+foo
 OUT
