@@ -609,13 +609,13 @@ pbc_merge_begin(Interp *interpreter, struct pbc_merge_input **inputs,
 /*
 
 static void
-pbc_merge_write(Interp *interpreter, struct PackFile *pf, char *filename)
+pbc_merge_write(Interp *interpreter, struct PackFile *pf, const char *filename)
 
 This functions writes out the merged packfile.
 
 */
 static void
-pbc_merge_write(Interp *interpreter, struct PackFile *pf, char *filename)
+pbc_merge_write(Interp *interpreter, struct PackFile *pf, const char *filename)
 {
     size_t size;
     opcode_t *pack;
@@ -667,7 +667,7 @@ main(int argc, char **argv)
     Interp *interpreter;
     struct longopt_opt_info opt = LONGOPT_OPT_INFO_INIT;
     int status;
-    char *output_file = NULL;
+    const char *output_file = NULL;
     struct pbc_merge_input** input_files;
     struct PackFile *merged;
     int i;
@@ -686,7 +686,7 @@ main(int argc, char **argv)
         switch (opt.opt_id) {
             case 'o':
                 if (output_file == NULL)
-                    output_file = (char*) opt.opt_arg;
+                    output_file = opt.opt_arg;
                 else
                     help();
                 break;
