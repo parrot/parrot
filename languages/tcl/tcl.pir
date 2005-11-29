@@ -69,14 +69,17 @@ input_loop:
   goto input_loop_continue
 
 loop_error:
+  .local pmc exception
+  get_results "(0)", exception
   # Are we just missing a close-foo? XXX probably not the best way to check.
-  $P0 = P5[0] # message
+  $P0 = exception[0] # message
   $S0 = $P0
   if $S0 == "missing close-brace" goto input_loop_continue2
   if $S0 == "missing quote"       goto input_loop_continue2
   
 loop_error_real:
-  .get_stacktrace(P5,$S0)
+  .catch()
+  .get_stacktrace($S0)
   print $S0
   #goto input_loop_continue
 
@@ -177,10 +180,11 @@ done:
   end
 
 file_error:
+  .catch()
+  .get_severity($I0)
   .include "except_severity.pasm"
-  $I0 = P5[2]  # _severity
   if $I0 == .EXCEPT_EXIT goto exit_exception
-  .get_stacktrace(P5,$S0)
+  .get_stacktrace($S0)
   print $S0
   end 
 

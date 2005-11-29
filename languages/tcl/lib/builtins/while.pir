@@ -57,7 +57,7 @@
   pir_code .= ex_label
   pir_code .= ":\n"
 
-  pir_code .= ".get_return_code(P5, "
+  pir_code .= ".catch()\n.get_return_code("
   pir_code .= $S0
   pir_code .= ")\n"
 

@@ -200,11 +200,12 @@ was_ok:
   .return($P0)
 not_return_nor_ok:
   dec call_level
-  .throw(P5)
+  .rethrow()
 is_return:
-  .get_return_code(P5,$I0)
+  .catch()
+  .get_return_code($I0)
   if $I0 != TCL_RETURN goto not_return_nor_ok
-  $P0 = P5[VALUE_SLOT]
+  .get_message($P0)
   dec call_level
   .return ($P0)
 .end

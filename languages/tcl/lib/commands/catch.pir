@@ -31,8 +31,10 @@
   goto got_retval
 
 non_ok:
-  code_retval = P5[0]
-  .get_return_code(P5,retval)
+  .catch()
+  null P5
+  .get_return_code(retval)
+  .get_message(code_retval)
 
 got_retval:
   #argc = argv # lost over function invoke?

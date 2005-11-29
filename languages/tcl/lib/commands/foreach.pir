@@ -144,8 +144,9 @@ do_next:
   goto loop_outer
 
 handle_continue:
+  .catch()
   .local int return_type
-  .get_return_code(P5,return_type)
+  .get_return_code(return_type)
   if return_type == TCL_BREAK goto done
   if return_type == TCL_CONTINUE goto do_next
  
