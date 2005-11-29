@@ -237,6 +237,7 @@ corolp:
     find_global P17, "no_such"
     branch corolp
 _catchc:
+    get_results '(0)' , P5
     print "catch coro\n"
     rethrow P5
     end

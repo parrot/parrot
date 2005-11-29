@@ -167,8 +167,8 @@ output_is(<<'CODE', <<'OUTPUT', "specified constructor method does not exist");
     end
 
 _handler:
+    get_results "(0,0)", P0, S0
     print "catched it\n"
-    set S0, P5["_message"]      # P5 is the exception object
     print S0
     print "\n"
     end
