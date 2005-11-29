@@ -31,7 +31,6 @@ Preamble for any tcl-related exception handler.
 .macro catch()
   .sym pmc exception
   get_results "(0)", exception
-  print "GOT THIS FAR\n"
 .endm
 
 =head2 rethrow()
