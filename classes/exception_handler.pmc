@@ -21,7 +21,41 @@ exception object's C<_P5> attribute.
 */
 
 #include "parrot/parrot.h"
-#include "parrot/method_util.h"
+#include "parrot/oplib/ops.h"
+
+static opcode_t *
+parrot_pass_args_to_result(Interp *interpreter, const char *sig,
+        opcode_t *dest, parrot_context_t * old_ctxp, va_list ap)
+{
+    int todo;
+    struct call_state st;
+
+    Parrot_init_arg_op(interpreter,
+            CONTEXT(interpreter->ctx), dest, &st.dest);
+    todo = Parrot_init_arg_sig(interpreter,
+            old_ctxp, sig, PARROT_VA_TO_VAPTR(ap), &st.src);
+    st.opt_so_far = 0;  /* XXX */
+
+    while (todo) {
+        Parrot_fetch_arg(interpreter, &st);
+        Parrot_convert_arg(interpreter, &st);
+        todo = Parrot_store_arg(interpreter, &st);
+    }
+    dest += st.dest.n + 2;
+    return dest;
+}
+
+static opcode_t *
+pass_exception_args(Interp *interpreter, const char *sig,
+        opcode_t *dest, parrot_context_t * old_ctx, ...)
+{
+    va_list ap;
+    void *next;
+    va_start(ap, old_ctx);
+    next = parrot_pass_args_to_result(interpreter, sig, dest, old_ctx, ap);
+    va_end(ap);
+    return next;
+}
 
 pmclass Exception_Handler extends Continuation need_ext {
 
@@ -70,11 +104,36 @@ Initializes the exception handler.
         return result;
     }
 
+    void set_pointer (void* value) {
+        opcode_t *pos = value;
+        if (*pos == PARROT_OP_get_results_pc) {
+            struct Parrot_cont * cc = PMC_cont(SELF);
+            cc->current_results = pos;
+        }
+        SUPER(value);
+    }
 
-    void* invoke (void* next) {
+    void* invoke (void* ex) {
         struct Parrot_cont * cc = PMC_cont(SELF);
-        cc->to_ctx->current_results = cc->current_results = NULL;
-        return SUPER(next);
+        PMC *exception = ex;
+        parrot_context_t *ex_ctx;
+        void *next;
+        /* COMPAT: */ PMC *p5 = REG_PMC(5);
+
+        cc->to_ctx->current_results = NULL;
+        ex_ctx = CONTEXT(INTERP->ctx);
+        next = SUPER(next);
+        /* COMPAT: */ VTABLE_set_pmc_keyed_int(INTERP,
+                    exception, 3, p5);
+        /* COMPAT: */ REG_PMC(5) = exception;
+        if (cc->current_results) {
+            STRING *message = VTABLE_get_string_keyed_int(INTERP,
+                    exception, 0);
+            assert(next == cc->current_results);
+            next = pass_exception_args(interpreter, "PS", next,
+                    ex_ctx, exception, message);
+        }
+        return next;
     }
 }
 
