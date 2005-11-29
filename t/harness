@@ -1,4 +1,4 @@
-#! perl -w
+#!perl
 # Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
@@ -78,13 +78,14 @@ Emit a C<smoke.html> file instead of displaying results.
 
 =cut
 
-use strict;
-use lib qw(lib imcc);
 
+use strict;
+use warnings;
+use lib qw( . lib ../lib ../../lib );
 use Getopt::Std;
 use Test::Harness();
-
 use Parrot::Config qw/%PConfig/;
+
 
 # handle the long options
 
@@ -128,11 +129,12 @@ $args .= ' --gc-debug'    if $gc_debug;
 $ENV{TEST_PROG_ARGS} = $args;
 
 # Pass in a list of tests to run on the command line, else run all the tests.
-my @default_tests = ( ( map { glob( "t/$_/*.t" ) } qw(op pmc native_pbc) ),
-                      glob( "imcc/t/*/*.t" ),
-                      glob( "t/src/*.t" ),
-                      glob( "t/library/*.t" ),
-                    );
+my @default_tests = (
+    (map {glob "t/$_/*.t"}           qw(compilers/imcc/* op pmc native_pbc)),
+    (map {glob "t/dynclass/$_.t"}    qw(foo dyn* g* )),
+    (map {glob "t/compilers/$_/*.t"} qw(pge pge/p5regexp pge/p6rules tge )),
+    (map {glob "t/$_/*.t"}           qw(library examples run src tools perl)),
+);
 my @tests = @ARGV ? map { glob( $_ ) } @ARGV : @default_tests;
 
 unless ($html) {

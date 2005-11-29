@@ -1264,19 +1264,19 @@ SRC_TEST_FILES = \
 PERL_TEST_FILES = \
 	t/perl/*.t
 RUNCORE_TEST_FILES = \
+	t/compilers/imcc/*/*.t \
 	t/op/*.t \
 	t/pmc/*.t \
 	t/native_pbc/*.t \
-	t/compilers/imcc/*/*.t \
-	t/library/*.t \
-	t/dynclass/dyn*.t \
 	t/dynclass/foo.t \
+	t/dynclass/dyn*.t \
 	t/dynclass/g*.t \
-	t/examples/*.t \
 	t/compilers/pge/*.t \
 	t/compilers/pge/p5regexp/*.t \
 	t/compilers/pge/p6rules/*.t \
-	t/compilers/tge/*.t
+	t/compilers/tge/*.t \
+	t/library/*.t \
+	t/examples/*.t
 TOOLS_TEST_FILES = \
 	t/tools/*.t
 
@@ -1284,16 +1284,12 @@ TOOLS_TEST_FILES = \
 # We propably need a complete build before running the tests.
 test_prep : all
 
-# Run test cases with a single call of t/harness
-# Users have to look at only one report.
+# Run test cases with a single call of t/harness. Users have to look at only
+# one report. The default set of tests to run is contained in t/harness,
+# make any edits there.
 # Normal core
 test : test_prep
-	$(PERL) t/harness $(EXTRA_TEST_ARGS) $(PARROT_ARGS) \
-	$(RUNCORE_TEST_FILES) \
-	$(RUN_TEST_FILES) \
-	$(SRC_TEST_FILES)  \
-	$(PERL_TEST_FILES)  \
-	$(TOOLS_TEST_FILES)
+	$(PERL) t/harness $(EXTRA_TEST_ARGS) $(PARROT_ARGS)
 
 # Test various run cores and other stuff
 # 'testC', 'testg' and 'testj' are tested only
@@ -1640,12 +1636,7 @@ tags.dummy:
 ###############################################################################
 
 smoke : all
-	$(PERL) t/harness --html $(EXTRA_TEST_ARGS) $(PARROT_ARGS) \
-	$(RUNCORE_TEST_FILES) \
-	$(RUN_TEST_FILES) \
-	$(SRC_TEST_FILES)  \
-	$(PERL_TEST_FILES)  \
-	$(TOOLS_TEST_FILES)
+	$(PERL) t/harness --html $(EXTRA_TEST_ARGS) $(PARROT_ARGS)
 	$(PERL) util/smokeserv-client.pl smoke.html
 
 smoke-clean :
