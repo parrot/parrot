@@ -120,18 +120,23 @@ Initializes the exception handler.
         PMC *exception = ex;
         parrot_context_t *ex_ctx;
         void *next;
+        opcode_t *results;
         /* COMPAT: */ PMC *p5 = REG_PMC(5);
 
-        cc->to_ctx->current_results = NULL;
+        results = cc->current_results;
+        /* clear all results, so that continuation.invoke
+         * doesn't pass any args
+         */
+        cc->to_ctx->current_results = cc->current_results= NULL;
         ex_ctx = CONTEXT(INTERP->ctx);
         next = SUPER(next);
         /* COMPAT: */ VTABLE_set_pmc_keyed_int(INTERP,
                     exception, 3, p5);
         /* COMPAT: */ REG_PMC(5) = exception;
-        if (cc->current_results) {
+        if (results) {
             STRING *message = VTABLE_get_string_keyed_int(INTERP,
                     exception, 0);
-            assert(next == cc->current_results);
+            assert(next == results);
             next = pass_exception_args(interpreter, "PS", next,
                     ex_ctx, exception, message);
         }
