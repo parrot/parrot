@@ -6,6 +6,27 @@ All are gone. Please read the history of this file for more.
 
 =back
 
+=head1 P5
+
+The use of P5 as the default exception register is deprecated. In your
+exception handler, you can any of the following to get at the the exception
+object, and optionally, the C<_message> slot. In any version, get_results
+must come before any other code (though variable declarations are OK).
+
+  handler: # Get both, manual
+   get_results "(0,0)", P0, S0
+
+  handler: # Get only the exception, manual
+   get_results "(0,0)", P0
+
+  handler: # get both, PIR
+   .get_results ($P0,$S0)
+
+  handler: # get only the exception, PIR
+   .get_results ($P0)
+
+=cut
+
 =head1 PDD20
 
 All the *_pad opcodes are now deprecated. See PDD20 for information about how
