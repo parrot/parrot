@@ -219,14 +219,6 @@ my @funcnames = qw(
 	Parrot_run_meth_fromc_arglist_reti
 	Parrot_run_meth_fromc_arglist_retf
 	Parrot_compreg
-	scratchpad_new
-	scratchpad_store
-	scratchpad_find
-	scratchpad_store_by_name
-	scratchpad_store_by_index
-	scratchpad_get_current
-	lexicals_mark
-	scratchpad_delete
 	Parrot_register_HLL
 	Parrot_register_HLL_type
 	Parrot_get_HLL_id
