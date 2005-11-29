@@ -1,6 +1,6 @@
 #include <stdlib.h>
 void*
-Parrot_memcpy_aligned_sse(void *dest, void *src, size_t n)
+Parrot_memcpy_aligned_sse(void *dest, const void *src, size_t n)
 {
     asm(
 	"mov %0, %%ecx\n\t"
@@ -25,17 +25,17 @@ Parrot_memcpy_aligned_sse(void *dest, void *src, size_t n)
 /*INTERFACE
 
 #include <stdlib.h>
-typedef void* (*@FUNC@_t)(void *dest, void *src, size_t);
+typedef void* (*@FUNC@_t)(void *dest, const void *src, size_t);
 
 #ifndef NDEBUG
 #include <assert.h>
 static void*
-@FUNC@_debug(void* d, void* s, size_t l)
+@FUNC@_debug(void* d, const void* s, size_t n)
 {
-    assert( (l & 0x1f) == 0);
+    assert( (n & 0x1f) == 0);
     assert( ((unsigned long) d & 7) == 0);
     assert( ((unsigned long) s & 7) == 0);
-    return ((@FUNC@_t)(@FUNC@_code))(d, s, l);
+    return ((@FUNC@_t)@FUNC@_code)(d, s, n);
 }
 
 @FUNC@_t @FUNC@ = @FUNC@_debug;
@@ -50,18 +50,18 @@ static void*
 #include <stdio.h>
 int main(int argc, char *argv[]) {
     unsigned char *s, *d;
-    size_t i, l;
+    size_t i, n;
 
-    l = 640;	@* sizeof(reg_store) *@
+    n = 640;	@* sizeof(reg_store) *@
 
-    s = malloc(l);
-    for (i = 0; i < l; ++i)
+    s = malloc(n);
+    for (i = 0; i < n; ++i)
 	s[i] = i & 0xff;
-    d = malloc(l);
-    for (i = 0; i < l; ++i)
+    d = malloc(n);
+    for (i = 0; i < n; ++i)
 	d[i] = 0xff;
-    @FUNC@(d, s, l);
-    for (i = 0; i < l; ++i)
+    @FUNC@(d, s, n);
+    for (i = 0; i < n; ++i)
 	if (d[i] != (i & 0xff)) {
 	    printf("error s[%d] = %d d = %d\n", i, s[i], d[i]);
 	    exit(1);
