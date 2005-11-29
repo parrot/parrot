@@ -1270,7 +1270,7 @@ RUNCORE_TEST_FILES = \
 	t/op/*.t \
 	t/pmc/*.t \
 	t/native_pbc/*.t \
-	$(IMCC_DIR)/t/*/*.t \
+	t/compilers/imcc/*/*.t \
 	t/library/*.t \
 	t/dynclass/dyn*.t \
 	t/dynclass/foo.t \
@@ -1492,13 +1492,13 @@ test-clean :
 		t/src/*.c \
 		t/tools/*.imc \
 		t/tools/*.pbc \
-		$(IMCC_DIR)/t/*/*.out \
-		$(IMCC_DIR)/t/*/*.imc \
-		$(IMCC_DIR)/t/*/*.pir \
-		$(IMCC_DIR)/t/*/*.pbc \
-		$(IMCC_DIR)/t/*/*.o \
-		$(IMCC_DIR)/t/*/*.stabs.s \
-		$(IMCC_DIR)/t/*/*.pasm
+		t/compilers/imcc/*/*.out \
+		t/compilers/imcc/*/*.imc \
+		t/compilers/imcc/*/*.pir \
+		t/compilers/imcc/*/*.pbc \
+		t/compilers/imcc/*/*.o \
+		t/compilers/imcc/*/*.stabs.s \
+		t/compilers/imcc/*/*.pasm
 
 imcc-clean:
 	$(RM_F) \
