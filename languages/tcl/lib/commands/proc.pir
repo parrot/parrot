@@ -198,9 +198,6 @@ ARGS_OK:
 was_ok:
   dec call_level
   .return($P0)
-not_return_nor_ok:
-  dec call_level
-  .rethrow()
 is_return:
   .catch()
   .get_return_code($I0)
@@ -208,6 +205,9 @@ is_return:
   .get_message($P0)
   dec call_level
   .return ($P0)
+not_return_nor_ok:
+  dec call_level
+  .rethrow()
 .end
 END_PIR
    
