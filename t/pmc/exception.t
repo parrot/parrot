@@ -16,7 +16,7 @@ Tests C<Exception> and C<Exception_Handler> PMCs.
 
 =cut
 
-use Parrot::Test tests => 25;
+use Parrot::Test tests => 24;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "push_eh - clear_eh");
@@ -111,8 +111,8 @@ output_is(<<'CODE', <<'OUTPUT', "push_eh - throw - message");
     print "not reached\n"
     end
 _handler:
+    get_results "(0,0)", P5, S0
     print "caught it\n"
-    set S0, P5["_message"]	# P5 is the exception object
     print S0
     print "\n"
     end
@@ -120,32 +120,6 @@ CODE
 main
 caught it
 something happend
-OUTPUT
-
-output_is(<<'CODE', <<'OUTPUT', "push_eh - throw - message, check P5");
-    print "main\n"
-    push_eh _handler
-
-    new P30, .Exception
-    set P30["_message"], "something happend"
-    new P5, .Undef
-    set P5, "a string\n"
-    throw P30
-    print "not reached\n"
-    end
-_handler:
-    print "caught it\n"
-    set S0, P5["_message"]	# P5 is the exception object
-    print S0
-    print "\n"
-    set P0, P5["_P5"]	# original P5
-    print P0
-    end
-CODE
-main
-caught it
-something happend
-a string
 OUTPUT
 
 output_like(<<'CODE', <<'OUTPUT', "throw - no handler");
@@ -191,14 +165,14 @@ output_is(<<'CODE', <<'OUTPUT', "2 exception handlers");
     print "not reached\n"
     end
 _handler1:
+    get_results "(0,0)", P5, S0
     print "caught it in 1\n"
-    set S0, P5["_message"]
     print S0
     print "\n"
     end
 _handler2:
+    get_results "(0,0)", P0, S0
     print "caught it in 2\n"
-    set S0, P5["_message"]
     print S0
     print "\n"
     end
@@ -219,14 +193,14 @@ output_is(<<'CODE', <<'OUTPUT', "2 exception handlers, throw next");
     print "not reached\n"
     end
 _handler1:
+    get_results "(0,0)", P5, S0
     print "caught it in 1\n"
-    set S0, P5["_message"]
     print S0
     print "\n"
     end
 _handler2:
+    get_results "(0,0)", P5, S0
     print "caught it in 2\n"
-    set S0, P5["_message"]
     print S0
     print "\n"
     throw P5	# XXX rethrow?
@@ -257,6 +231,7 @@ output_is(<<'CODE', <<OUT, "die, error, severity");
     print "not reached\n"
     end
 _handler:
+    get_results "(0,0)", P5, S0
     print "caught it\n"
     set I0, P5["_type"]
     print "error "
