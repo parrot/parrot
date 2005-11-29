@@ -11,7 +11,7 @@ $Revision$
 
 =head1 ABSTRACT
 
-This document defines the requirements and implmentation strategy for
+This document defines the requirements and implementation strategy for
 lexically scoped variables.
 
 =head1 SYNOPSIS
@@ -64,7 +64,7 @@ a.k.a. a call frame.
 
 LexInfos contain what is known at compile time about lexical variables
 of a given subroutine: their names (for most languages), perhaps their
-types, etc.  They are the interface through which the PIR compiler
+types, etc. They are the interface through which the PIR compiler
 stores and validates compile-time information about lexical variables.
 
 At compile time, each newly created Subroutine (or Subroutine
