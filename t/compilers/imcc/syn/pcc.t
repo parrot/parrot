@@ -3,7 +3,7 @@
 # $Id$
 
 use strict;
-use Parrot::Test tests => 20;
+use Parrot::Test tests => 21;
 
 ##############################
 # Parrot Calling Conventions
@@ -495,12 +495,24 @@ CODE
 /.*'anon'.*not found/
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "()=foo() syntax");
+pir_output_is(<<'CODE', <<'OUT', "()=foo() syntax, no return values");
 .sub main :main
 	() = foo()
 .end
 .sub foo
 	print "foo\n"
+.end	
+CODE
+foo
+OUT
+
+pir_output_is(<<'CODE', <<'OUT', "()=foo() syntax, skip returned value");
+.sub main :main
+	() = foo()
+.end
+.sub foo
+	print "foo\n"
+    .return(1)
 .end	
 CODE
 foo
