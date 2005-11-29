@@ -529,13 +529,15 @@ Use C<push_eh> to push an exception handler onto the stack.
     clear_eh
     exit 0
 
+An exception handler is called with 2 arguments: the exception and the message.
+More information is available inside the exception 'object' (TBD).
+
   handler:
+    get_results '(0,0') P0, S0      # PASM syntax
     print "Exception caught!\n"
     exit 1
 
 =head2 How do I access the error message of an exception I've caught?
-
-P5 is the register used for the Exception object.
 
     push_eh handler
     $P0 = new .Exception
@@ -545,9 +547,11 @@ P5 is the register used for the Exception object.
     exit 0
 
   handler:
+    .local pmc exception
+    .local string message
+    .get_results (exception, message)   # PIR syntax
     print "Exception: "
-    $S0 = P5["_message"]
-    print $S0
+    print message
     print "\n"
     exit 1
 
