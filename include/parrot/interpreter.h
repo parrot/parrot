@@ -179,7 +179,6 @@ typedef struct Parrot_Context {
     INTVAL ref_count;                   /* how often refered to */
     struct Stack_Chunk *reg_stack;      /* register stack */
 
-    struct Stack_Chunk *pad_stack;      /* Base of the lex pad stack */
     struct Stack_Chunk *user_stack;     /* Base of the scratch stack */
     struct Stack_Chunk *control_stack;  /* Base of the flow control stack */
     PMC      *lex_pad;                  /* LexPad PMC */

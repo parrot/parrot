@@ -476,7 +476,6 @@ print S <<'EOF';
   .pcc_sub _sub1:
   get_params "()"
   printerr "in sub1\n"
-  new_pad 0
   find_lex P2, "no_such_var"
   printerr "never\n"
   returncc

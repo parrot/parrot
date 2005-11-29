@@ -648,7 +648,7 @@ have_choices:
      our_cc($P3)
 .end
 
-.sub _fail
+.sub _fail :outer(main)
      print "Program failed\n"
 .end
 CODE

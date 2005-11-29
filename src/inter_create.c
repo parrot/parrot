@@ -183,9 +183,6 @@ make_interpreter(Parrot_Interp parent, Interp_flags flags)
     /* Set up the initial register chunks */
     setup_register_stacks(interpreter);
 
-    /* Stack for lexical pads */
-    CONTEXT(interpreter->ctx)->pad_stack = new_stack(interpreter, "Pad");
-
     /* Need a user stack */
     CONTEXT(interpreter->ctx)->user_stack = new_stack(interpreter, "User");
 
@@ -393,7 +390,6 @@ Parrot_really_destroy(int exit_code, void *vinterp)
     /* deinit op_lib */
     (void) PARROT_CORE_OPLIB_INIT(0);
 
-    stack_destroy(CONTEXT(interpreter->ctx)->pad_stack);
     stack_destroy(CONTEXT(interpreter->ctx)->user_stack);
     stack_destroy(CONTEXT(interpreter->ctx)->control_stack);
 

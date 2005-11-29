@@ -197,8 +197,11 @@ Parrot_get_name(Interp* interpreter, STRING *name)
 {
     PMC *g, *pad, *current_sub, *namespace;
 
+    /* TODO
     pad = scratchpad_get_current(interpreter);
     g = scratchpad_find(interpreter, pad, name);
+    */
+    pad = g = NULL;
     if (!g) {
         current_sub = CONTEXT(interpreter->ctx)->current_sub;
         if (current_sub &&

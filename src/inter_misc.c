@@ -252,7 +252,7 @@ interpinfo_p(Interp *interpreter, INTVAL what)
         case NAMESPACE_ROOT: /* XXX */
             return interpreter->globals->stash_hash;
         case CURRENT_LEXPAD:
-            return scratchpad_get_current(interpreter);
+            return CONTEXT(interpreter->ctx)->lex_pad;
         default:        /* or a warning only? */
             internal_exception(UNIMPLEMENTED,
                     "illegal argument in interpinfo");

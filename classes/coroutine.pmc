@@ -116,8 +116,6 @@ Swaps the "context".
         PMC *ccont;
 
         if (!co->ctx) {
-            PMC *pad;
-
             /* TODO factor out common code with Sub.invoke
              *      and inherit it
              */
@@ -136,14 +134,6 @@ Swaps the "context".
             co->ctx = ctx = CONTEXT(INTERP->ctx);
             ctx->caller_ctx = caller_ctx;
             PMC_cont(ccont)->from_ctx = ctx;
-            /*
-             * XXX are our coroutines closures?
-             */
-            pad = scratchpad_get_current(INTERP);
-            if (pad) {
-                stack_push(INTERP, &ctx->pad_stack, pad,
-                        STACK_ENTRY_PMC, STACK_CLEANUP_NULL);
-            }
             ctx->current_sub = SELF;
             ctx->current_cont = ccont;
             ctx->current_object = NULL;

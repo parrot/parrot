@@ -26,7 +26,7 @@ parrotlibrary.pmc	15
 constparrotlibrary.pmc  16
 parrotinterpreter.pmc	17
 parrotthread.pmc	18
-scratchpad.pmc		19
+lexpad.pmc		19
 timer.pmc		20
 pointer.pmc		21
 

@@ -58,8 +58,6 @@ Marks the closure as live.
     void mark () {
         struct Parrot_sub * sub = PMC_sub(SELF);
         SUPER();
-        if (sub->pad_stack)
-            mark_stack(INTERP, sub->pad_stack);
         if (sub->outer_sub)
             pobject_lives(INTERP, (PObj*)sub->outer_sub);
     }
@@ -77,7 +75,6 @@ Invokes the closure.
 
     void* invoke (void* next) {
         struct Parrot_sub * sub = PMC_sub(SELF);
-        CONTEXT(INTERP->ctx)->pad_stack = sub->pad_stack;
         next = SUPER(next);
         if (sub->outer_ctx) {
             /* during newclosure, outer's ctx was stored in
@@ -86,24 +83,6 @@ Invokes the closure.
             sub->ctx->outer_ctx = sub->outer_ctx;
         }
         return next;
-    }
-
-/*
-
-=item C<PMC* clone()>
-
-Creates a clone of the closure and returns it.
-
-=cut
-
-*/
-
-    PMC* clone () {
-        struct Parrot_sub * sub;
-        PMC* ret = SUPER();
-        sub = PMC_sub(ret);
-        sub->pad_stack = PMC_sub(SELF)->pad_stack;
-        return ret;
     }
 }
 

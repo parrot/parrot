@@ -26,88 +26,31 @@ Operations to create, modify and delete lexical variables.
 =cut
 
 ########################################
+=cut
 
-=item B<new_pad>(in INT)
+op DELETED_new_pad(in INT) {
+    goto NEXT();
+}
 
-Create a new lexical scope pad with static nesting depth $1
-and push it onto the lexical scope stack. Static depths 0
-through $1 - 1, inclusive, are copied from the current static
-nesting.
-
-=item B<new_pad>(out PMC, in INT)
-
-Create a new lexical scope pad with static nesting depth $2
-and store it in $1 (do NOT push on the stack). Static depths 0
-through $2 - 1, inclusive, are copied from the current static
-nesting.
+op DELETED_new_pad(out PMC, in INT) {
+    goto NEXT();
+}
 
 =cut
 
-op new_pad(in INT) {
-    PMC * pad;
-    PMC * parent = scratchpad_get_current(interpreter);
-    pad = scratchpad_new(interpreter, parent, $1);
-    stack_push(interpreter, &CONTEXT(interpreter->ctx)->pad_stack, pad,
-               STACK_ENTRY_PMC, STACK_CLEANUP_NULL);
+op DELETED_push_pad(in PMC) {
     goto NEXT();
 }
 
-op new_pad(out PMC, in INT) {
-    PMC * parent = scratchpad_get_current(interpreter);
-    $1 = scratchpad_new(interpreter, parent, $2);
+op DELETED_pop_pad() {
     goto NEXT();
 }
 
-########################################
-
-=item B<push_pad>(in PMC)
-
-Push the scratchpad in $1 onto the lexical scope stack.
-
-=cut
-
-op push_pad(in PMC) {
-    stack_push(interpreter, &CONTEXT(interpreter->ctx)->pad_stack, $1,
-               STACK_ENTRY_PMC, STACK_CLEANUP_NULL);
+op DELETED_pop_pad(out PMC) {
     goto NEXT();
 }
 
-########################################
-
-=item B<pop_pad>()
-
-Pop the current lexical scope pad off the stack
-
-=item B<pop_pad>(out PMC)
-
-Pop the current lexical scope pad off the stack and store
-it in $1
-
-=cut
-
-op pop_pad() {
-    stack_pop(interpreter, &CONTEXT(interpreter->ctx)->pad_stack,
-              NULL, STACK_ENTRY_PMC);
-    goto NEXT();
-}
-
-op pop_pad(out PMC) {
-    stack_pop(interpreter, &CONTEXT(interpreter->ctx)->pad_stack,
-              &$1, STACK_ENTRY_PMC);
-    goto NEXT();
-}
-
-########################################
-
-=item B<peek_pad>(out PMC)
-
-Store the current lexical scope pad (i.e. the one at the
-top of the lexical pad stack) in $1.
-
-=cut
-
-op peek_pad(out PMC) {
-    $1 = scratchpad_get_current(interpreter);
+op DELETED_peek_pad(out PMC) {
     goto NEXT();
 }
 
@@ -115,65 +58,31 @@ op peek_pad(out PMC) {
 
 =item B<store_lex>(in STR, in PMC)
 
-Store object $2 as lexical symbol $1.  $1 must have already been
-created at some static depth.
+Store object $2 as lexical symbol $1. The opcode might succeed
+or throw an exception on unknown lexical names depeding on the
+implementation of the LexPad PMC.
+Parrot's LexPad throws an exception for unknown names.
 
-=item B<store_lex>(in INT, in STR, in PMC)
-
-Store object $3 as lexical $2 at depth $1.  If [$1, $2] does not
-exist, it will be created.  If $1 is negative, count out from the
-current lexical scope; otherwise, count in from the outermost scope.
-So store_lex -1, .... will operate on the current pad. Lexicals can
-be retrieved by index too: the index is generated in storage order.
-
-=item B<store_lex>(in INT, in INT, in PMC)
-
-Store object $3 at lexical position $2 at depth $1.  If [$1, $2] does
-not exist, it will be created.  If $1 is negative, count out from the
-current lexical scope; otherwise, count in from the outermost scope.
-So store_lex -1, .... will operate on the current pad. Lexicals stored
-by index can only be retrieved by this index.
 
 =cut
 
 op store_lex(in STR, in PMC) {
-  parrot_context_t *ctx = CONTEXT(interpreter->ctx);
-  PMC *lex_pad = ctx->lex_pad;
-  if (!PMC_IS_NULL(lex_pad)) {
+    parrot_context_t *ctx = CONTEXT(interpreter->ctx);
     STRING *lex_name = $1;
-    /* use new code */
-    lex_pad = Parrot_find_pad(interpreter, lex_name, ctx);
-    if (!lex_pad) {
-      real_exception(interpreter, NULL, LEX_NOT_FOUND,
-	  "Lexical '%Ss' not found", lex_name);
+    PMC *lex_pad = Parrot_find_pad(interpreter, lex_name, ctx);
+    if (PMC_IS_NULL(lex_pad)) {
+	real_exception(interpreter, NULL, LEX_NOT_FOUND,
+		"Lexical '%Ss' not found", lex_name);
     }
     VTABLE_set_pmc_keyed_str(interpreter, lex_pad, lex_name, $2);
-  }
-  else {
-    PMC *pad = scratchpad_get_current(interpreter);
-    if (!pad)
-      real_exception(interpreter, NULL, PAD_NOT_FOUND,
-	  "empty lexical pad");
-    scratchpad_store(interpreter, pad, $1, $2);
-  }
+    goto NEXT();
+}
+
+op DELETED_store_lex(in INT, in STR, in PMC) {
   goto NEXT();
 }
 
-op store_lex(in INT, in STR, in PMC) {
-    PMC *pad = scratchpad_get_current(interpreter);
-    if (!pad)
-      real_exception(interpreter, NULL, PAD_NOT_FOUND,
-	  "empty lexical pad");
-    scratchpad_store_by_name(interpreter, pad, $1, $2, $3);
-  goto NEXT();
-}
-
-op store_lex(in INT, in INT, in PMC) {
-    PMC *pad = scratchpad_get_current(interpreter);
-    if (!pad)
-        real_exception(interpreter, NULL, PAD_NOT_FOUND,
-		"empty lexical pad");
-    scratchpad_store_by_index(interpreter, pad, $1, $2, $3);
+op DELETED_store_lex(in INT, in INT, in PMC) {
     goto NEXT();
 }
 
@@ -181,93 +90,37 @@ op store_lex(in INT, in INT, in PMC) {
 
 =item B<find_lex>(out PMC, in STR)
 
-Find the lexical variable named $2 (at any depth) and store it in $1.
-
-=item B<find_lex>(out PMC, in INT, in STR)
-
-Find the lexical variable named $3 at depth $2 and store it in $1.
-If $2 is negative, then count out from the current lexical scope;
-otherwise, count up from the outermost scope.
-
-=item B<find_lex>(out PMC, in INT)
-
-Find the lexical number $2 at the topmost pad.
-
-=item B<find_lex>(out PMC, in INT, in INT)
-
-Find the lexical variable at position $3 at depth $2 and store it in
-$1. If $2 is negative, then count out from the current lexical scope;
-otherwise, count up from the outermost scope.
+Find the lexical variable named $2 and store it in $1. This
+opcode either throws an exception or returns a Null PMC for the failure case,
+depending on the implementation of the LexPad PMC. Parrot's
+standard LexPad throws and exception for non-existing names.
 
 =cut
 
 op find_lex(out PMC, in STR) {
-  parrot_context_t *ctx = CONTEXT(interpreter->ctx);
-  PMC *lex_pad = ctx->lex_pad;
-  if (!PMC_IS_NULL(lex_pad)) {
-    /* use new code */
+    parrot_context_t *ctx = CONTEXT(interpreter->ctx);
     STRING *lex_name = $2;
     PMC *result = NULL;
-    lex_pad = Parrot_find_pad(interpreter, lex_name, ctx);
-    if (lex_pad)
-      result = VTABLE_get_pmc_keyed_str(interpreter, lex_pad, lex_name);
+    PMC *lex_pad = Parrot_find_pad(interpreter, lex_name, ctx);
+    if (!PMC_IS_NULL(lex_pad))
+	result = VTABLE_get_pmc_keyed_str(interpreter, lex_pad, lex_name);
     if (!result) {
-      real_exception(interpreter, NULL, LEX_NOT_FOUND,
-	  "Lexical '%Ss' not found", lex_name);
+	real_exception(interpreter, NULL, LEX_NOT_FOUND,
+		"Lexical '%Ss' not found", lex_name);
     }
     $1 = result;
-  }
-  else {
-    /* for now use old infrastructure too */
-    opcode_t * next = expr NEXT();
-    PMC *pad = scratchpad_get_current(interpreter);
-    $1 = scratchpad_find(interpreter, pad, $2);
-    if (!pad)
-      real_exception(interpreter, next, PAD_NOT_FOUND,
-	  "empty lexical pad");
-    if (!$1)
-      real_exception(interpreter, next, LEX_NOT_FOUND,
-	  "Lexical '%Ss' not found", $2);
-  }
-  goto NEXT();
-}
-
-op find_lex(out PMC, in INT) {
-    opcode_t * next = expr NEXT();
-    PMC *pad = scratchpad_get_current(interpreter);
-    if (!pad)
-        real_exception(interpreter, next, PAD_NOT_FOUND,
-		"empty lexical pad");
-    $1 = scratchpad_get_by_index(interpreter, pad, -1, $2);
-    if (!$1)
-        real_exception(interpreter, next, LEX_NOT_FOUND,
-            "Lexical #'%d' not found", (int) $2);
     goto NEXT();
 }
 
-op find_lex(out PMC, in INT, in STR) {
-    opcode_t * next = expr NEXT();
-    PMC *pad = scratchpad_get_current(interpreter);
-    if (!pad)
-        real_exception(interpreter, next, PAD_NOT_FOUND,
-		"empty lexical pad");
-    $1 = scratchpad_get_by_name(interpreter, pad, $2, $3);
-    if (!$1)
-        real_exception(interpreter, next, LEX_NOT_FOUND,
-            "Lexical '%Ss' not found", $3);
+op DELETED_find_lex(out PMC, in INT) {
     goto NEXT();
 }
 
-op find_lex(out PMC, in INT, in INT) {
-    opcode_t * next = expr NEXT();
-    PMC *pad = scratchpad_get_current(interpreter);
-    if (!pad)
-        real_exception(interpreter, next, PAD_NOT_FOUND,
-		"empty lexical pad");
-    $1 = scratchpad_get_by_index(interpreter, pad, $2, $3);
-    if (!$1)
-        real_exception(interpreter, next, LEX_NOT_FOUND,
-            "Lexical #'%d' not found", (int) $3);
+op DELETED_find_lex(out PMC, in INT, in STR) {
+    goto NEXT();
+}
+
+op DELETED_find_lex(out PMC, in INT, in INT) {
     goto NEXT();
 }
 

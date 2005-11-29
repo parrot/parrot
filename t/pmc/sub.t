@@ -331,6 +331,7 @@ back
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "equality of closures");
+.pcc_sub main:
       .const .Sub P3 = "f1"
       newclosure P0, P3
       clone P1, P0
@@ -346,11 +347,11 @@ BAD2: print "not "
 OK2:  print "ok 2\n"
       end
 
-.pcc_sub f1:
+.pcc_sub :outer(main) f1:
       print "Test\n"
       end
 
-.pcc_sub f2:
+.pcc_sub :outer(main) f2:
       new P1, .PerlUndef
       end
 CODE

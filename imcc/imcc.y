@@ -486,13 +486,16 @@ pasm_inst:         { clear_state(); }
      PARROT_OP pasm_args
                    { $$ = INS(interp, cur_unit, $2,0,regs,nargs,keyvec,1);
                      free($2); }
-   | PCC_SUB sub_proto LABEL
+   | PCC_SUB
                    {
                     imc_close_unit(interp, cur_unit);
                     cur_unit = imc_open_unit(interp, IMC_PASM);
+                    }
+     sub_proto LABEL
+                    {
                      $$ = iSUBROUTINE(interp, cur_unit,
-                                mk_sub_label(interp, $3));
-                     cur_call->pcc_sub->pragma = $2;
+                                mk_sub_label(interp, $4));
+                     cur_call->pcc_sub->pragma = $3;
                    }
    | PNULL var
                    {  $$ =MK_I(interp, cur_unit, "null", 1, $2); }

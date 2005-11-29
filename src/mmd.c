@@ -1931,20 +1931,7 @@ MMD search should stop.
 static int
 mmd_search_lexical(Interp *interpreter, STRING *meth, PMC *arg_tuple, PMC *cl)
 {
-    PMC *pad = scratchpad_get_current(interpreter);
-    PMC *pmc;
-    INTVAL depth, i;
-
-    if (!pad)
-        return 0;
-    depth = PMC_int_val(pad);
-    for (i = -1; depth; --i, --depth) {
-        pmc = scratchpad_get_by_name(interpreter, pad, i, meth);
-        if (pmc) {
-            if (mmd_maybe_candidate(interpreter, pmc, arg_tuple, cl))
-                return 1;
-        }
-    }
+    /* TODO */
     return 0;
 }
 

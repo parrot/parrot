@@ -48,8 +48,8 @@ union parrot_context_t;
 #define NEED_CONTINUATION ((void*)1)
 
 /*
- * Sub and Closure share a Parrot_sub structure, Closure has additionally
- * a lexical pad stack
+ * Sub and Closure share a Parrot_sub structure.
+ * Closures have additionally an 'outer_ctx'
  */
 typedef struct Parrot_sub {
     struct PackFile_ByteCode *seg;      /* bytecode segment */
@@ -69,7 +69,6 @@ typedef struct Parrot_sub {
 
     /* - end common */
     struct Parrot_Context *outer_ctx;   /* outer context, if a closure */
-    struct Stack_Chunk *pad_stack;      /* only for closure */
 } * parrot_sub_t;
 
 #define PMC_sub(pmc)		  ((parrot_sub_t)PMC_struct_val(pmc))
