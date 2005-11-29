@@ -460,7 +460,7 @@ if ($genfile =~ /jit_cpu.c/) {
 EOC
 }
 
-print("jit2h: $njit (+ $vjit vtable) of $core_numops ops are JITed.\n");
+print("jit2h: JITed $njit (+ $vjit vtable) of $core_numops ops\n");
 sub make_subs {
     my ($ptr, $type, $index) = @_;
     return(($ptr eq '&' ? '&' : '') . sprintf($argmaps{$type_to_arg{$type}}, $index));
