@@ -1113,6 +1113,7 @@ result: target paramtype_list  { $$ = $1; $$->type |= $2; }
 targetlist:
      targetlist COMMA result { $$ = 0; add_pcc_result(cur_call, $3); }
    | result                  { $$ = 0; add_pcc_result(cur_call, $1); }
+   | /* empty */             {  $$ = 0; }
    ;
 
 if_statement:
