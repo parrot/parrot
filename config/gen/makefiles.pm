@@ -100,6 +100,9 @@ sub makefiles {
   genfile('config/gen/makefiles/lisp.in'      => 'languages/lisp/Makefile',
           commentType       => '#',
           replace_slashes   => 1);
+  genfile('config/gen/makefiles/lua.in'       => 'languages/lua/Makefile',
+          commentType       => '#',
+          replace_slashes   => 1);
   genfile('config/gen/makefiles/miniperl.in'  => 'languages/miniperl/Makefile',
           commentType       => '#',
           replace_slashes   => 1);

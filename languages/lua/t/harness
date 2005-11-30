@@ -1,0 +1,75 @@
+# $Id: harness  $
+
+=head1 NAME
+
+languages/lua/t/harness - A harness for Parrot Lua
+
+=head1 SYNOPSIS
+
+  cd languages && perl -I../lib lua/t/harness --files
+
+  cd languages && perl -I../lib lua/t/harness 
+
+  cd languages && perl -I../lib lua/t/harness \
+                   lua/t/pmc/boolean.t
+                   
+=head1 DESCRIPTION
+
+If I'm called with a single
+argument of "--files", I just return a list of files to process.
+This list is one per line, and is relative to the languages dir.
+
+If I'm called with no args, I run the complete suite.
+
+Otherwise I run the tests that were passed on the command line.
+
+=cut
+
+use strict;
+use lib '..';
+
+use Cwd();
+use Data::Dumper;
+use File::Spec;
+use Test::Harness();
+
+my $language = 'lua';
+
+if ( grep { m/^--files$/ } @ARGV ) {
+    # Only the Makefile in 'parrot/languages' uses --files
+    my $dir = File::Spec->catfile( $language, 't' );
+    my @files = glob( File::Spec->catfile( $dir, '*/*.t' ) );
+    print join( "\n", @files );
+    print "\n" if scalar(@files);
+} else { 
+    my @files;
+    # TODO: use Getopt::Long or such
+    if ( scalar(@ARGV) ) {
+        # Someone specified tests for me to run.
+        @files = grep { -f $_ } @ARGV
+    } else {
+        ( undef, undef, my $current_dir ) = File::Spec->splitpath( Cwd::getcwd() );
+        if ( $current_dir eq 'languages' ) {
+            @files = glob( File::Spec->catfile( $language, 't', '*', '*.t' ) );
+        }
+        elsif ( $current_dir eq $language ) {
+            @files = glob( File::Spec->catfile( 't', '*', '*.t' ) );
+        }
+    }
+
+    Test::Harness::runtests( @files ) if scalar( @files );
+}
+
+=head1 HISTORY
+
+Mostly taken from tcl/t/harness.
+
+=head1 SEE ALSO
+
+  F<languages/tcl/t/harness>, F<languages/scheme/t/harness>, F<languages/m4/t/harness>, F<languages/python/t/harness>
+
+=head1 AUTHOR
+
+Francois Perrad
+
+=cut

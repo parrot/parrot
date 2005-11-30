@@ -63,6 +63,7 @@ sub new
 		$self->new_section('Ook!', 'ook.html', '', 'languages/ook'),
 		$self->new_section('Python', 'python.html', '', 'languages/python'),
 		$self->new_section('PASM', 'pasm.html', '', 'languages/parrot_compiler'),
+		$self->new_section('Lua', 'lua.html', '', 'languages/lua'),
 	);
 }
 
