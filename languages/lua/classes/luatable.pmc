@@ -1,0 +1,170 @@
+/*
+* luatable.pmc
+*
+* PMC that represents Lua tables during run-time.
+* Part of the distribution of the Lua compiler for Parrot.
+* 
+* Copyright 2005 K. Stol
+*/
+#include "parrot/parrot.h"
+
+/* The internal type of the Lua Nil class, dynamically allocated when loading
+* the PMC library, will be stored in this INTVAL, for fast access 
+*/
+static INTVAL dynclass_Lua_Nil;
+
+/* When a table is asked for its name, this STRING is returned 
+*/
+static STRING *luatable_name;
+
+
+pmclass LuaTable extends Hash dynpmc group lua_group {
+	
+	void class_init() {
+		if (pass) {
+			dynclass_Lua_Nil = Parrot_PMC_typenum(INTERP,"LuaNil");
+			luatable_name = const_string(INTERP, "table");
+		}
+	}
+	      
+  STRING* name () {
+  	return luatable_name;
+  }   
+	
+	/*
+	* only "false" and "nil" are not true, so this table is 'true'.
+	*/
+	INTVAL get_bool () {
+  	return 1;
+  }
+	
+			
+	/* Metatable methods */	
+			
+	
+	/* Accessing fields: "index" metamethod */
+	
+	/* case string key
+	*	
+	* P0 = P1["Hello"]
+	*
+	*/	
+	PMC* get_pmc_keyed_str (STRING* key) {		
+		PMC *retval = SUPER(key);
+		
+		if(retval->vtable->base_type == enum_class_None)
+		{				
+		 	return pmc_new(interpreter, dynclass_Lua_Nil);
+		}
+		return retval;
+	}
+	
+	/* case integer key
+	*	
+	* P0 = P1[42]
+	*
+	*/
+	PMC* get_pmc_keyed_int (INTVAL key) {
+		PMC *retval = SUPER(key);		
+		if(retval->vtable->base_type == enum_class_None)
+		{					
+		 	return pmc_new(interpreter, dynclass_Lua_Nil);
+		}
+		return retval;
+	}
+	
+	/* case pmc key
+	*
+	* P0 = new .Key
+	* P0 = "hiya"
+	* P1 = P2[P0]
+	*/
+	
+  PMC* get_pmc_keyed (PMC* key) {		
+		PMC *retval = SUPER(key);
+		
+		if(retval->vtable->base_type == enum_class_None)
+		{	
+		 	return pmc_new(interpreter, dynclass_Lua_Nil);
+		}		
+		return retval;
+	}
+	
+	
+	/* Accessing fields: "newindex" metamethod */
+	
+	void set_pmc_keyed (PMC* key, PMC* value) {
+  
+  }
+
+  void set_pmc_keyed_int (INTVAL key, PMC* value) {
+  
+  }
+
+  void set_pmc_keyed_str (STRING* key, PMC* value) {
+  
+  }
+	
+	
+	
+	/* Other metamethods */
+		
+	
+	STRING* get_string () {
+  	return Parrot_sprintf_c(INTERP, "table: 0x%x", SELF);
+  }
+	
+  PMC* add (PMC* value, PMC* dest) {
+  	PMC *metatable = DYNSELF.getprop("__metatable");
+  	if(metatable)
+  	{
+  		printf("found metatable\n");
+  	}
+  	else
+  	{
+  		printf("Failed to find a metatable\n");
+  	}
+  	return (PMC*)0;
+  }
+  
+  PMC* subtract (PMC* value, PMC* dest) {
+    return (PMC*)0;
+  }
+
+  PMC* multiply (PMC* value, PMC* dest) {
+    return (PMC*)0;
+  }
+  
+  PMC* divide (PMC* value, PMC* dest) {
+    return (PMC*)0;
+  }
+  
+  PMC* modulus (PMC* value, PMC* dest) {
+    return (PMC*)0;
+  }
+  
+  PMC* pow (PMC* value, PMC* dest) {
+    return (PMC*)0;
+  }
+  
+  PMC* neg (PMC* dest) {
+    return (PMC*)0;
+  }
+  
+  PMC* concatenate (PMC* value, PMC* dest) {
+    return (PMC*)0;
+  }
+  
+  void* invoke (void* next) {
+    return (void*)0;
+  }
+  
+  INTVAL cmp (PMC* value) {
+    return (INTVAL)0;
+  }
+  
+ 
+  
+}
+
+

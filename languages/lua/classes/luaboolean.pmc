@@ -1,0 +1,27 @@
+#include "parrot/parrot.h"
+
+static STRING *false_string;
+static STRING *true_string;
+static STRING *luaboolean_name;
+
+pmclass LuaBoolean extends Boolean dynpmc group lua_group {
+
+	void class_init() {
+		if (pass) {
+			 false_string = const_string(INTERP, "false");
+			 true_string = const_string(INTERP, "true");
+			 luaboolean_name = const_string(INTERP, "boolean");
+		}
+	}
+	
+	STRING* get_string () {
+  	if(PMC_int_val(SELF))  		
+  		return true_string;
+  	else
+  		return false_string;  	
+  }				
+   
+  STRING* name () {
+  	return luaboolean_name;
+  }
+}

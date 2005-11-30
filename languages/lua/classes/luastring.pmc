@@ -1,0 +1,20 @@
+#include "parrot/parrot.h"
+
+static STRING *luastring_name;
+
+pmclass LuaString extends String dynpmc group lua_group {
+
+	void class_init() {
+		if (pass) {			
+			luastring_name = const_string(INTERP, "string");
+		}
+	}
+	  
+  INTVAL get_bool () {
+		return 1;
+  }
+  
+  STRING* name () {
+  	return luastring_name;
+  }
+}

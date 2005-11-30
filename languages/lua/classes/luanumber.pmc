@@ -1,0 +1,25 @@
+#include "parrot/parrot.h"
+
+static STRING *luanumber_name;
+
+pmclass LuaNumber extends Float dynpmc group lua_group {
+
+	void class_init() {
+		if (pass) {		
+			luanumber_name = const_string(INTERP, "number");
+		}
+	}
+	
+	/* In the Lua language, only the boolean value "false" and the special
+	* "nil" value are considered as 'false'. Numbers being 0 are not, so return
+	* true.
+	*/
+	INTVAL get_bool () {
+  	return 1;
+  }
+		
+	
+	STRING* name () {
+		return luanumber_name;
+	}
+}

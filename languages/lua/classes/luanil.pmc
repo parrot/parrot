@@ -1,0 +1,52 @@
+#include "parrot/parrot.h"
+
+static STRING *string_representation;
+static PMC *Lua_Nil;
+
+pmclass LuaNil singleton extends None dynpmc group lua_group {
+
+	void class_init() {
+		if (pass) {
+			string_representation = const_string(INTERP, "nil");
+		}
+	}		
+
+	STRING* get_string () {
+  	return string_representation;
+  }	
+  
+  STRING* name () {
+  	return string_representation;
+  }
+  
+  STRING* get_repr () {
+  	return string_representation;
+  }
+  
+  INTVAL get_bool () {
+  	return 0;
+	}		
+	
+	void* get_pointer() {
+  	return Lua_Nil;
+  }
+
+  void set_pointer(void* ptr) {
+  	assert(!Lua_Nil); // do we really need this assert?
+    Lua_Nil = (PMC*) ptr;
+  }
+  
+  void set_pmc_keyed (PMC* key, PMC* value) {
+  	real_exception(INTERP, NULL, 1, "Attempt to index a nil value");  	  	 
+  }
+  
+  void set_pmc_keyed_int (INTVAL key, PMC* value) {
+  	real_exception(INTERP, NULL, 1, "Attempt to index a nil value");  	  	 
+  }
+  
+  void set_pmc_keyed_str (STRING* key, PMC* value) {
+  	real_exception(INTERP, NULL, 1, "Attempt to index a nil value");  	  	 
+  }
+  
+}
+
