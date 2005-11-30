@@ -19,10 +19,12 @@ typedef enum {
 /* error flags */
 /* &gen_from_enum(errors.pasm)  */
 typedef enum {
-    PARROT_ERRORS_ALL_FLAG      = 0xFF,
     PARROT_ERRORS_NONE_FLAG     = 0x00,
     PARROT_ERRORS_GLOBALS_FLAG  = 0x01,
-    PARROT_ERRORS_OVERFLOW_FLAG = 0x02
+    PARROT_ERRORS_OVERFLOW_FLAG = 0x02,
+    PARROT_ERRORS_PARAM_COUNT_FLAG = 0x04,
+    PARROT_ERRORS_RESULT_COUNT_FLAG = 0x08,
+    PARROT_ERRORS_ALL_FLAG      = 0xFF
 } Errors_classes;
 
 /* &end_gen */
@@ -32,7 +34,7 @@ typedef enum {
 #define PARROT_we_off(we, interp, flag) do { \
     CONTEXT((interp)->ctx)->we &= ~(flag); } while (0)
 #define PARROT_we_test(we, interp, flag)  \
-    CONTEXT((interp)->ctx)->we & (flag)
+    (CONTEXT((interp)->ctx)->we & (flag))
 
 #define PARROT_WARNINGS_on(interp, flag) PARROT_we_on(warns, interp, flag)
 #define PARROT_WARNINGS_off(interp, flag) PARROT_we_off(warns, interp, flag)

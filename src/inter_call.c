@@ -641,7 +641,7 @@ parrot_pass_args(Interp *interpreter,  parrot_context_t *src_ctx,
     if (what == PARROT_OP_get_params_pc) {
         dst_pc = interpreter->current_params;
         todo = Parrot_init_arg_op(interpreter, dest_ctx,
-                 dst_pc, &st.dest);
+                dst_pc, &st.dest);
         src_pc = interpreter->current_args;
         Parrot_init_arg_op(interpreter,
                 src_ctx, src_pc, &st.src);
@@ -674,27 +674,49 @@ parrot_pass_args(Interp *interpreter,  parrot_context_t *src_ctx,
     }
 
 
-    /* never get more then the caller expects */
-#if 0
+    if (what == PARROT_OP_get_params_pc) {
+        if (!PARROT_ERRORS_test(interpreter, PARROT_ERRORS_PARAM_COUNT_FLAG))
+            return dst_pc + st.dest.n + 2;
+    }
+    else {
+        if (!PARROT_ERRORS_test(interpreter, PARROT_ERRORS_RESULT_COUNT_FLAG))
+            return dst_pc + st.dest.n + 2;
+    }
+#if 1
     /*
      * check for arg count mismatch
      *
      * XXX not yet. PGE uses a lot of implicit :optionals
      */
-    if (src_i != src_n) {
-        /* ingore return value mismatch */
-        real_exception(interpreter, NULL, E_ValueError,
-                "too many arguments passed (%d) - %d %s expected",
-                src_n, dst_n, action);
+    if (src_pc[-3] == PARROT_OP_tailcallmethod_p_sc ||
+            src_pc[-3] == PARROT_OP_tailcallmethod_p_s) {
+        /*
+         * If we have this sequence:
+         *
+         * tailcallmethod_p_s?
+         * set_returns_pc '()'
+         * return_cc
+         *
+         * we are returning 1 retval to caller on behalf
+         * of the NCI (a PIR method had already returned
+         * all and doesn't run anything after the
+         * taicall - ignore/fix missing arg_count
+         */
+        st.src.i = st.src.n;
     }
-    else if (dst_i != dst_n) {
-        dst_sig = VTABLE_get_integer_keyed_int(interpreter,
-                dst_signature, dst_i);
-        if (!(dst_sig & (PARROT_ARG_OPTIONAL|PARROT_ARG_SLURPY_ARRAY))) {
+
+    if (st.src.i > st.src.n) {
+        if (!(st.dest.sig & (PARROT_ARG_OPTIONAL|
+                        PARROT_ARG_SLURPY_ARRAY|PARROT_ARG_OPT_FLAG))) {
             real_exception(interpreter, NULL, E_ValueError,
                     "too few arguments passed (%d) - %d %s expected",
-                    src_n, dst_n, action);
+                    st.src.n, st.dest.n, action);
         }
+    }
+    else if (st.src.n && st.src.i < st.src.n) {
+        real_exception(interpreter, NULL, E_ValueError,
+                "too many arguments passed (%d) - %d %s expected",
+                st.src.n, st.dest.n, action);
     }
 #endif
     /* skip the get_params opcode - all done here */

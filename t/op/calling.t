@@ -451,10 +451,10 @@ ok 6
 back
 OUTPUT
 
-SKIP: {
-  skip("arg count check disabled", 2);
 pir_output_like(<<'CODE', <<'OUTPUT', "argc mismatch, too few");
 .sub main :main
+    .include "errors.pasm"
+    errorson .PARROT_ERRORS_PARAM_COUNT_FLAG
     $P0 = new String
     $P0 = "hello\n"
     find_name $P1, "foo"
@@ -471,6 +471,8 @@ OUTPUT
 
 pir_output_like(<<'CODE', <<'OUTPUT', "argc mismatch, too many");
 .sub main :main
+    .include "errors.pasm"
+    errorson .PARROT_ERRORS_PARAM_COUNT_FLAG
     $P0 = new String
     $P0 = "hello\n"
     find_name $P1, "foo"
@@ -484,10 +486,35 @@ pir_output_like(<<'CODE', <<'OUTPUT', "argc mismatch, too many");
 CODE
 /too many arguments passed/
 OUTPUT
-}
+
+pir_output_like(<<'CODE', <<'OUTPUT', "argc mismatch, too many - catch exception");
+.sub main :main
+    .include "errors.pasm"
+    errorson .PARROT_ERRORS_PARAM_COUNT_FLAG
+    $P0 = new String
+    $P0 = "hello\n"
+    find_name $P1, "foo"
+    set_args "(0,0)", $P0,77
+    invokecc $P1
+.end
+.sub foo
+    push_eh arg_handler
+    get_params "(0)", $P0
+    print $P0
+    print "never\n"
+arg_handler:
+    get_results "(0,0)", $P1, $S0
+    print "catched: "
+    print $S0
+.end
+CODE
+/^catched: too many arguments passed/
+OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "argc mismatch, optional");
 .sub main :main
+    .include "errors.pasm"
+    errorson .PARROT_ERRORS_PARAM_COUNT_FLAG
     $P0 = new String
     $P0 = "hello\n"
     find_name $P1, "foo"
@@ -739,6 +766,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "pir uses no ops");
     print "\n"
     print I17
     print "\n"
+    set_returns "()"
     returncc
 .eom
 CODE
@@ -1269,6 +1297,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "result_info op");
     $I0 = elements $P0
     print $I0
     print "\n"
+    .return (0)
 .end
 CODE
 0
@@ -1399,5 +1428,5 @@ OUTPUT
 
 
 ## remember to change the number of tests :-)
-BEGIN { plan tests => 51; }
+BEGIN { plan tests => 52; }
 

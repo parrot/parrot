@@ -876,14 +876,26 @@ inline op warningsoff(in INT) {
 =item B<errorson>(in INT)
 
 Turns on error categories. Categories already turned on will
-stay on. Current default setting is PARROT_ERRORS_GLOBALS_FLAG is on.
+stay on.
 Current categories are (include "errors.pasm"):
 
 =over 4
 
 =item .PARROT_ERRORS_GLOBALS_FLAG
 
-Throw an exception, if global doesn't exist.
+Throw an exception, if global doesn't exist, default on.
+
+=item .PARROT_ERRORS_OVERFLOW_FLAG
+
+Throw math overflow instead of promoting to BigInt, default off.
+
+=item .PARROT_ERRORS_PARAM_COUNT_FLAG
+
+Throw exception on argument <-> param count mismatch, default off
+
+=item .PARROT_ERRORS_RESULT_COUNT_FLAG
+
+Throw exception on return <-> result count mismatch, default off
 
 =item .PARROT_ERRORS_ALL_FLAG
 
