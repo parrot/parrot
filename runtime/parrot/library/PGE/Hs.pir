@@ -193,7 +193,7 @@ END:
     out .= "] ["
     capt = self."get_hash"()
     if_null capt, end
-    iter = new Iterator, capt
+    iter = new .Iterator, capt
     iter = 0
     unless iter goto end
   subrules_body:

@@ -74,7 +74,7 @@ given by C<src>.
     .local string code
 
     namespace = "PGE::Rule"
-    code = new String
+    code = new .String
     p6rule = compreg "PGE::P6Rule"
     parser = find_global "PGE", "_grammar_rule"
 

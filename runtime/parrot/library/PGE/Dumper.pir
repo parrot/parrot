@@ -36,7 +36,7 @@ This method enables Data::Dumper to work on Match objects.
     hascapts = 0
     hash = self."get_hash"()
     if_null hash, dump_array
-    iter = new Iterator, hash
+    iter = new .Iterator, hash
     iter = 0
   dump_hash_1:
     unless iter goto dump_array
@@ -141,7 +141,7 @@ An alternate dump output for a Match object and all of its subcaptures.
   subrules:
     capt = self.get_hash()
     if_null capt, end
-    iter = new Iterator, capt
+    iter = new .Iterator, capt
     iter = 0
   subrules_1:
     unless iter goto end
