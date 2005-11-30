@@ -199,6 +199,19 @@ past_pir_ast.toStringList:
 
 .sub 'bc' :main
     load_bytecode 'languages/punie/lib/PAST.pir'
+
+    # Build up the result for the ROOT node
+    $P1 = new PerlArray
+    $P2 = new 'PAST::Stmt'
+    $P2.set_node('dummy stmt', 10 ,$P1)
+
+    $P3 = new PerlArray
+    push $P3, $P2
+    .local pmc past
+    past = new 'PAST::Stmts'
+    past.set_node('dummy stmts',20,$P3)
+    print "\\n\\nPAST tree dump:\\n"
+    past.dump()
 """
    print '#' + past_pir_ast.toStringList()
    print """
