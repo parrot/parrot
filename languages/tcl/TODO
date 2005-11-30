@@ -52,6 +52,16 @@ deps.
 
 =over 4
 
+=item Use new argument handling from inside [proc]s
+
+Most builtins take a varying number of arguments, so it's hard to use this
+there, but for procs without {args} arguments, this error handling can be
+help eliminate a chunk of the wrapper script. Throw an exception *inside*
+the sub, catch it, and then throw the appropriate tcl exception about the
+wrong # of args. See lt's mail to the p6i titled:
+
+ pdd03 and Overflow/Underflow - r10269
+
 =item implement default globals, etc.
 
 global variables provided by tcl libary. L<tclvars>.
@@ -75,6 +85,10 @@ Perhaps via [namespace import]? Can fake it right now with [inline]
 =head2 refactoring tasks
 
 =over 4
+
+=item returncodes.pir
+
+The __clone macro should be moved to 'lib/macros.pir'.
 
 =item [expr]
 

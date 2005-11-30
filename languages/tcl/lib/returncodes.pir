@@ -22,18 +22,18 @@ of sorts to the exceptions.
 
 =cut
 
-=head2 catch()
+=head2 catch ()
 
 Preamble for any tcl-related exception handler.
 
 =cut
 
-.macro catch()
+.macro catch ()
   .sym pmc exception
   get_results "(0)", exception
 .endm
 
-=head2 rethrow()
+=head2 rethrow ()
 
 Re-throw the current exception
 
@@ -114,7 +114,7 @@ Throw an arbitrary TCL_ERROR, TCL_CONTINUE, etc, with a given message.
   throw e
 .endm
 
-=head2 tcl_break()
+=head2 tcl_break ()
 
 Generate a TCL_BREAK with no message.
 
@@ -128,7 +128,7 @@ Generate a TCL_BREAK with no message.
   throw e
 .endm
 
-=head2 tcl_continue()
+=head2 tcl_continue ()
 
 Generate a TCL_BREAK with no message.
 
@@ -161,13 +161,14 @@ Generate a TCL_RETURN with the given return value.
 the implementation of these never change:
 define them once and just include them.
 
-=head2 cloneable
+=head2 cloneable ()
 
 Simplistic implementation of C<__clone>
 
 =cut
 
 .macro cloneable ()
+
 .sub __clone :method
   .sym pmc obj
   $I0 = typeof self
@@ -175,4 +176,5 @@ Simplistic implementation of C<__clone>
   obj = self
   .return(obj)
 .end
+
 .endm
