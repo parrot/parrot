@@ -555,7 +555,7 @@
     .param string message
     $P0 = getattribute mob, "PGE::Match\x0$:pos"
     $P0 = pos
-    $P0 = new Exception
+    $P0 = new .Exception
     $S0 = "p6rule parse error: "
     $S0 .= message
     $P0["_message"] = $S0
@@ -598,8 +598,8 @@
 
     $P0 = find_global "PGE::Rule", "p6rule"
     exp = $P0(exp)
-    pad = new Hash
-    $P0 = new Hash
+    pad = new .Hash
+    $P0 = new .Hash
     pad["reps"] = $P0
     pad["cutnum"] = PGE_CUT_GROUP
     pad["subpats"] = 0
@@ -608,7 +608,7 @@
     $P0 = $P0.p6analyze(pad)
     exp["expr"] = $P0
 
-    $P0 = new String
+    $P0 = new .String
     $P0 = "\n.namespace [ \""
     $P0 .= grammar
     $P0 .= "\" ]\n\n"
@@ -696,8 +696,8 @@
     .local pmc exp0, exp1
 
     reps = pad["reps"]
-    savereps = new Hash
-    $P0 = new Iterator, reps
+    savereps = new .Hash
+    $P0 = new .Iterator, reps
   reps_1:
     unless $P0 goto reps_2
     $P1 = shift $P0
@@ -808,7 +808,7 @@
     subpats = pad["subpats"]
     pad["subpats"] = 0
     pad["isarray"] = 0
-    $P0 = new Hash
+    $P0 = new .Hash
     pad["reps"] = $P0
     exp = self[0]
     exp = exp.p6analyze(pad)

@@ -50,9 +50,9 @@ the current position of C<mob>.
   newfrom_1:
     $I0 = isa mob, "PGE::Match"
     if $I0 goto newfrom_mob
-    target = new String
+    target = new .String
     assign target, mob
-    from = new PerlInt
+    from = new .PerlInt
     from = -1
     if has_grammar goto new_me
     grammar = "PGE::Rule"
@@ -69,7 +69,7 @@ the current position of C<mob>.
     me = new $I0
     setattribute me, "PGE::Match\x0$:target", target
     setattribute me, "PGE::Match\x0$:from", from
-    pos = new PerlInt
+    pos = new .PerlInt
     pos = -1
     setattribute me, "PGE::Match\x0$:pos", pos
     if has_fromd == 0 goto end
@@ -230,7 +230,7 @@ objects depending on the rule.
     .local pmc capt
     capt = getattribute self, "PGE::Match\x0@:capt"
     unless_null capt, set_1
-    capt = new PerlArray
+    capt = new .PerlArray
     setattribute self, "PGE::Match\x0@:capt", capt
   set_1:
     capt[key] = val

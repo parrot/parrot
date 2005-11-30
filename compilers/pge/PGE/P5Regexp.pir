@@ -285,13 +285,13 @@
     $P0 = find_global "PGE::Rule", "p5regexp"
     exp = $P0(exp)
 
-    pad = new Hash
+    pad = new .Hash
     pad["subpats"] = 0
     $P0 = exp["expr"]
     $P0 = $P0."p5analyze"(pad)
     exp["expr"] = $P0
 
-    $P0 = new String
+    $P0 = new .String
     $P0 = "\n.namespace [ \""
     $P0 .= grammar
     $P0 .= "\" ]\n\n"

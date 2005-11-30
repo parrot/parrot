@@ -19,8 +19,8 @@ PGE::TokenHash - hash implementation to speed up Token lookups
 
 .sub "__init" method
     .local pmc ihash, vhash
-    ihash = new Hash
-    vhash = new Hash
+    ihash = new .Hash
+    vhash = new .Hash
     setattribute self, "PGE::TokenHash\x0.ihash", ihash
     setattribute self, "PGE::TokenHash\x0.vhash", vhash
     .return ()

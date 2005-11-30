@@ -20,7 +20,7 @@ a number of built-in rules.
     if $I0 goto end
     base = getclass "PGE::Match"
     $P0 = subclass base, "PGE::Rule"
-    $P0 = new Hash
+    $P0 = new .Hash
     store_global "PGE::Rule", "%:cache", $P0
   end:
     .return ()

@@ -31,7 +31,7 @@
     $P1 = subclass $P0, "PGE::Exp::Modifier"
     $P1 = subclass $P0, "PGE::Exp::Closure"
     $P1 = subclass $P0, "PGE::Exp::Commit"
-    $P0 = new Integer
+    $P0 = new .Integer
     store_global "PGE::Exp", "$_serno", $P0
   end:
 .end
@@ -286,7 +286,7 @@ register.
     if $I0 goto end
     emit(code, "    $I0 = defined captscope[%s]", cname)
     emit(code, "    if $I0 goto %s_c1", label)
-    emit(code, "    $P0 = new PerlArray")
+    emit(code, "    $P0 = new .PerlArray")
     emit(code, "    captscope[%s] = $P0", cname)
     emit(code, "    save captscope")
     emit(code, "    bsr %s_c1", label)
@@ -321,7 +321,7 @@ register.
  
 .sub "reduce" :method
     .param pmc next
-    $P0 = new Exception
+    $P0 = new .Exception
     $P0["_message"] = "Attempt to reduce PGE::Exp abstract class"
     throw $P0
     .return (self)
@@ -345,7 +345,7 @@ register.
     .local pmc exp0
     .local string exp0label
 
-    code = new String
+    code = new .String
     exp0 = self["expr"]
     exp0 = exp0.reduce(self)
     self["expr"] = exp0
@@ -376,8 +376,8 @@ register.
     emit(code, "    $P0 = interpinfo %s", .INTERPINFO_CURRENT_SUB)
     emit(code, "    setattribute mob, \"PGE::Match\\x0&:corou\", $P0")
     emit(code, "    lastpos = length target")
-    emit(code, "    gpad = new PerlArray")
-    emit(code, "    rcache = new PerlHash")
+    emit(code, "    gpad = new .PerlArray")
+    emit(code, "    rcache = new .PerlHash")
     emit(code, "    captscope = mob")
     emit(code, "    pos = mfrom")
     emit(code, "    if pos >= 0 goto try_at_pos")
@@ -1089,7 +1089,7 @@ register.
   subrule_3:
     if nextchars == "" goto subrule_3a
     nextchars = self.escape(nextchars)
-    emit(code, "    $P2 = new String")
+    emit(code, "    $P2 = new .String")
     emit(code, "    $P2 = %s", nextchars)
     emit(code, "    setprop $P0, \"nextchars\", $P2")
   subrule_3a:

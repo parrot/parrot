@@ -81,7 +81,7 @@ Initializes a PGE::OPTable object.
 =cut
 
 .sub "__init" :method
-    $P0 = new Hash
+    $P0 = new .Hash
     setattribute self, "PGE::OPTable\x0%:toktable", $P0
     $I0 = find_type "PGE::TokenHash"
     $P0 = new $I0
@@ -141,7 +141,7 @@ value for C<match> is "PGE::Match".
     wsopertable = getattribute self, "PGE::OPTable\x0%:wsopertable"
 
     if has_match goto set_equiv
-    match = new String
+    match = new .String
     match = "PGE::Match"
     if has_opts goto set_equiv
     opts = "left"
@@ -170,7 +170,7 @@ value for C<match> is "PGE::Match".
     nows = 1
 
   addtok_1:
-    tok = new Hash
+    tok = new .Hash
     tok["name"] = name
     tok["opts"] = opts
     tok["equiv"] = equiv
@@ -266,9 +266,9 @@ representing the result of the parse.
     opertable = getattribute self, "PGE::OPTable\x0%:opertable"
     wstermtable = getattribute self, "PGE::OPTable\x0%:wstermtable"
     wsopertable = getattribute self, "PGE::OPTable\x0%:wsopertable"
-    termstack = new PerlArray
-    operstack = new PerlArray
-    tokstack = new PerlArray
+    termstack = new .PerlArray
+    operstack = new .PerlArray
+    tokstack = new .PerlArray
     termempty = termtable[""]
     operempty = opertable[""]
 
@@ -422,7 +422,7 @@ representing the result of the parse.
     .return (mob)
 
   term_error:
-    $P0 = new Exception
+    $P0 = new .Exception
     $S0 = "Missing term at offset "
     $S1 = wspos
     $S0 .= $S1
@@ -433,7 +433,7 @@ representing the result of the parse.
     .return (mob)
 
   ternary_error:
-    $P0 = new Exception
+    $P0 = new .Exception
     $S0 = "Missing ternary close at offset "
     $S1 = wspos
     $S0 .= $S1
