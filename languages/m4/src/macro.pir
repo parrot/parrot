@@ -132,7 +132,7 @@ NESTING_LIMIT_NOT_REACHED_YET:
   state['expansion_level'] = expansion_level
 
   .local pmc arguments
-  arguments = new ResizablePMCArray
+  arguments = new .ResizablePMCArray
   collect_arguments( state, arguments )
 
   .local string text

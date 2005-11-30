@@ -77,7 +77,7 @@ Looks at the command line arguments and acts accordingly.
   # The args are parsed with library/Getopt/Long.pir which should work 
   # somewhat like the Perl5 module Getopt::Long.
   .local pmc opt_spec      
-  opt_spec = new ResizableStringArray
+  opt_spec = new .ResizableStringArray
   # --version, boolean
   push opt_spec, "version"
   # --help, boolean
@@ -149,7 +149,7 @@ NO_HELP_FLAG:
   # TODO: In near future we propably should use objects here
   # For now let's just just use a hash with all state information
   .local pmc state
-  state = new Hash
+  state = new .Hash
 
   # Artificial limit for macro expansion in macro.pir
   # default setting of 'nesting_limit' max be overridden by
@@ -257,8 +257,8 @@ NO_UNIMPLEMENTED_OPTION:
 
   # First we set up a table of all symbols, that is macros 
   .local pmc symtab
-  #symtab = new Hash
-  symtab = new OrderedHash
+  #symtab = new .Hash
+  symtab = new .OrderedHash
   state['symtab'] = symtab    
 
   # TODO: read M4PATH with env.pmc 
@@ -283,7 +283,7 @@ ARGC_IS_OK:
 
   # We need the builtin_tab, whether '--reload_state' was passed or not
   .local pmc builtin_tab
-  builtin_tab = new OrderedHash
+  builtin_tab = new .OrderedHash
   state['builtin_tab'] = builtin_tab    
   
   builtin_tab_init( state )

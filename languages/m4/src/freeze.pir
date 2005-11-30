@@ -42,7 +42,7 @@ Dump a state file.
   .local pmc frozen_fh
   frozen_fh = open frozen_file, ">"
   .local pmc iterator
-  iterator = new Iterator, symtab
+  iterator = new .Iterator, symtab
   iterator = .ITERATE_FROM_START
   iter_loop:
   unless iterator goto END_ITER
