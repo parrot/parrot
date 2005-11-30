@@ -359,7 +359,6 @@ docs/overview.pod                                 [main]doc
 docs/parrot.pod                                   [main]doc
 docs/parrotbyte.pod                               [main]doc
 docs/pdds/README                                  [main]doc
-docs/pdds/clip/pdd00_pdd.pod                      [main]doc
 docs/pdds/clip/pdd01_overview.pod                 [main]doc
 docs/pdds/clip/pdd02_vtables.pod                  [main]doc
 docs/pdds/clip/pdd04_datatypes.pod                [main]doc
