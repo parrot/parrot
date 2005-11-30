@@ -182,13 +182,23 @@ providing a compreg-compatible method.
   store_global "_Tcl", "proc_exec", $P1
 
   # Global variable initialization
+
+   #version info
   $P0 = new .String
   $P0 = "0.1"
   store_global "Tcl", "$tcl_patchLevel", $P0
   $P0 = new .String
   $P0 = "0.1"
   store_global "Tcl", "$tcl_version", $P0
- 
+   
+    #error information
+  $P0 = new .TclString
+  $P0 = 'NONE'
+  store_global 'Tcl', '$errorCode', $P0
+  $P0 = new .TclString
+  $P0 = ''
+  store_global 'Tcl', '$errorInfo', $P0
+
   # Setup the default channelIds
   $P1 = new .TclArray
   $P2 = getstdin
