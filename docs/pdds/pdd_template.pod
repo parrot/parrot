@@ -33,5 +33,9 @@ List of footnotes to the text.
 
 List of references.
 
-=back
+=cut
 
+__END__
+Local Variables:
+  fill-column:78
+End:
