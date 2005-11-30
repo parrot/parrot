@@ -87,7 +87,8 @@ for subroutines without lexical variables will omit the LexPad.
 From the interface perspective, LexPads are basically Hashes, with
 strings as keys and PMCs as values.  They extend the basic Hash
 interface with specialized initialization (requiring a reference to an
-associated LexInfo) and the query METHOD "get_lexinfo()" (to return it).
+associated LexInfo) and the query METHOD "get_lexinfo()" (to return
+it).
 
 LexPad keys are unique.  Therefore, in each subroutine, there can be
 only one lexical variable with a given name.
@@ -109,8 +110,8 @@ If Parrot is asked to access a lexical variable named $var, Parrot
 follows the following strategy.  Note that fetch and store use the
 exact same approach.
 
-Parrot starts with the currently executing subroutine $sub, then
-loops through these steps:
+Parrot starts with the currently executing subroutine $sub, then loops
+through these steps:
 
   1. Starting at the current call frame, walk back until an active
      frame is found that is executing $sub.  Call it $frame.
@@ -132,8 +133,8 @@ Parrot does not assume that every subroutine needs lexical variables.
 Therefore, Parrot defaults to I<not> creating LexInfo or LexPad PMCs.
 It only creates a Lexinfo when it first encounters a ".lex" directive
 in the subroutine.  If no such directive is found, Parrot does not
-create a LexInfo for it at compile time, and therefore cannot create
-a LexPad for it at run time.
+create a LexInfo for it at compile time, and therefore cannot create a
+LexPad for it at run time.
 
 However, an absence of ".lex" directives is normal for some languages
 (e.g. Tcl) which lack compile-time knowledge of lexicals.  For these
@@ -156,8 +157,8 @@ a basic PMC array, but any ordered integer-indexed collection will do.
 
 The C<newclosure> op creates a Closure from a Subroutine and gives
 that Closure a new LexPad attribute.  The LexPad is then populated
-with pointers to the current I<enclosing> LexPads.  The definition
-of "enclosing" is not obvious, however.
+with pointers to the current I<enclosing> LexPads.  The definition of
+"enclosing" is not obvious, however.
 
 The algorithm used to find them is a loop of the following steps,
 starting with $sub set to the running Subroutine (which is a Closure):
@@ -355,3 +356,10 @@ None.
 =head1 REFERENCES
 
 None.
+
+=cut
+
+__END__
+Local Variables:
+  fill-column:78
+End:
