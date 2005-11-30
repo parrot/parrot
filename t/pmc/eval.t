@@ -17,7 +17,7 @@ Tests on-the-fly PASM, PIR and PAST compilation and invocation.
 
 =cut
 
-use Parrot::Test tests => 15;
+use Parrot::Test tests => 16;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "eval_sc");
@@ -460,6 +460,64 @@ pir_output_is(<<'CODE', <<'OUTPUT', "eval.thaw");
     e()
 .end
 CODE
+hello from foo_1
+hello from foo_1
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "eval.freeze+thaw");
+.sub main :main
+  .local pmc f, e
+  .local pmc io
+  f = compi("foo_1", "hello from foo_1")
+  $S0 = freeze f
+  io = open "temp.file", ">"
+  print io, $S0
+  close io
+  print "written\n"
+  "read"()
+.end
+
+.sub compi
+  .param string name
+  .param string printme
+  .local string code
+  .local pmc pir_compiler, retval
+  pir_compiler = compreg "PIR"
+  code = ".sub "
+  code .= name
+  code .= "\n"
+  code .= <<"MORE"
+  noop
+  noop
+  noop
+  noop
+MORE
+  code .= "print \""
+  code .= printme
+  code .= "\\n\"\n"
+  code .= ".end\n"
+
+  retval = pir_compiler(code)
+  .return (retval)
+.end
+
+.sub "read"
+    .local pmc io, e
+    .local string file
+    .local int size
+    file = "temp.file"
+    .include "stat.pasm"
+    size = stat file, .STAT_FILESIZE
+    io = open file, "<"
+    $S0 = read io, size
+    close io
+    e = thaw $S0
+    e()
+    e = find_global "foo_1"
+    e()
+.end
+CODE
+written
 hello from foo_1
 hello from foo_1
 OUTPUT
