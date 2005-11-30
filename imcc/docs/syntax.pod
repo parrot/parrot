@@ -256,23 +256,21 @@ Directives used for Parrot Calling Conventions.
 
 At the top of a subroutine, declare a local variable, in the mannter
 of B<.local>, into which parameter(s) of the current subroutine should
-be stored. Available flags are:
-C<:slurpy>, C<:optional>, and C<:opt_count>.  [XXX Chip - finish this
-update]
+be stored. Available flags:
+C<:slurpy>, C<:optional>, and C<:opt_flag>.
 
 =item .param <reg> [:<flag> ...]
 
 At the top of a subroutine, specify where parameter(s) of the current
-subroutine should be stored.  Available flags are:
-C<:slurpy>, C<:optional>, and C<:opt_count>.  [XXX Chip - finish this
-update]
-
+subroutine should be stored.  Available flags:
+C<:slurpy>, C<:optional>, and C<:opt_flag>.
 
 =item .return <var> [:<flag> ...]
 
 Between B<.pcc_begin_return> and B<.pcc_end_return>, specify one or
 more of the return value(s) of the current subroutine.  Available
-flags: C<:flat>.  [XXX Chip - finish this update]
+flags:
+C<:flat>.
 
 =back
 
@@ -283,16 +281,26 @@ flags: C<:flat>.  [XXX Chip - finish this update]
 =item .arg <var> [:<flag> ...]
 
 Between B<.pcc_begin> and B<.pcc_call>, specify an argument to be
-passed.  Available flags: C<:flat>.  [XXX Chip - finish this update]
+passed.  Available flags:
+C<:flat>.
 
 =item .result <var> [:<flag> ...]
 
 Between B<.pcc_call> and B<.pcc_end>, specify where one or more return
-value(s) should be stored.  Available flags are:
-C<:slurpy>, C<:optional>, and C<:opt_count>.  [XXX Chip - finish this
-update]
+value(s) should be stored.  Available flags:
+C<:slurpy>, C<:optional>, and C<:opt_count>.
 
 =back
+
+=head2 Parameter Passing Flags
+
+See L<PDD03|pdds/pdd03_calling_conventions.pod> for a description of
+the meaning of the flag bits bits C<SLURPY>, C<OPTIONAL>, C<OPT_FLAG>,
+and C<FLAT>, which correspond to the claling convention flags
+C<:slurpy>, C<:optional>, C<:opt_flag>, and C<:flat>.
+
+[TODO - once these flag bits are solidified by long-term use, then we
+may choose to copy appropriate bits of the documentation to here.]
 
 =head2 Instructions
 
