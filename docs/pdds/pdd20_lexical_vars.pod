@@ -153,12 +153,12 @@ ordered integer-indexed collection will do.
 =head3 Closure creation: Capturing the lexical environment
 
 The C<newclosure> op creates a Closure from a Subroutine and gives that
-Closure a new LexPad attribute.  The LexPad is then populated with pointers to
+Closure a new LexEnv attribute.  The LexEnv is then populated with pointers to
 the current I<enclosing> LexPads.  The definition of "enclosing" is not
-obvious, however.
+obvious, though.
 
-The algorithm used to find them is a loop of the following steps, starting
-with $sub set to the running Subroutine (which is a Closure):
+The algorithm used to find "enclosing" LexPads is a loop of the following
+steps, starting with $sub set to the running Subroutine (which is a Closure):
 
   1. Starting at the current call frame, walk back until an active frame is
      found that is executing $sub.  Call it $frame.
@@ -168,7 +168,10 @@ with $sub set to the running Subroutine (which is a Closure):
 
   2. Append $frame's LexPad to the LexEnv.
 
-  3. Set $sub to $sub.outer.  (That is, the textually enclosing subroutine.)
+  3. If $sub has a LexEnv, append $sub's LexEnv to the LexEnv being built,
+     and END LOOP.  Otherwise:
+
+  4. Set $sub to $sub.outer.  (That is, the textually enclosing subroutine.)
      But if $sub has no outer sub, END LOOP.
 
 NOTE: The C<newclosure> opcode should check to make sure that the target
