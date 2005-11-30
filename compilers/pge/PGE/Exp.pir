@@ -534,6 +534,7 @@ register.
 .namespace [ "PGE::Exp::CCShortcut" ]
 
 .sub "reduce" :method
+    .param pmc next
     $S0 = self["value"]
     if $S0 != "\\n" goto end
     self["isquant"] = 1
@@ -1158,6 +1159,7 @@ register.
 .namespace [ "PGE::Exp::Closure" ]
 
 .sub "reduce" :method
+    .param pmc next
     self["isquant"] = 1
     self["firstchars"] = ""
     .return (self)

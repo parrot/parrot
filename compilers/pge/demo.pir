@@ -1,3 +1,4 @@
+.include "errors.pasm"
 .sub _main
     .local string x
     .local string pattern
@@ -12,6 +13,8 @@
     .local pmc glob_compile
     .local int istrace
     .local string gname
+
+    errorson .PARROT_ERRORS_PARAM_COUNT_FLAG
 
     load_bytecode "PGE.pbc"
     load_bytecode "dumper.imc"
