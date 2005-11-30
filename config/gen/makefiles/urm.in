@@ -39,14 +39,15 @@ build:
 	$(PERL) -c urmc
 
 clean:
-	$(RM_F) core *.pbc *~ foo.p*
-	$(RM_F) *~ *.pasm 
-	$(RM_F) *~
-	$(RM_F) \#*
-	$(RM_F) examples/*.pasm examples/*.pbc
-	$(RM_F) examples/*~
-	$(RM_F) examples/\#*
-	$(RM_F) t/*.pasm t/*.urm t/*.out
+	$(RM_F) \
+		core *.pbc *~ foo.p* \
+		*~ *.pasm \
+		*~ \
+		\#* \
+		examples/*.pasm examples/*.pbc \
+		examples/*~ \
+		examples/\#* \
+		t/*.pasm t/*.urm t/*.out
 
 realclean: clean
 	$(RM_F) Makefile

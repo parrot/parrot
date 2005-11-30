@@ -60,17 +60,13 @@ test : all
 testclean :
 	$(RM_F) ../t/dynclass/*.pir ../t/dynclass/*.pbc
 
-dynext-clean :
 # win32 import library
-	$(RM_F) *.lib
 # win32 program data base - contains debugging info
-	$(RM_F) *.pdb
 # win32 incremental link status files
-	$(RM_F)	*.ilk
 # win32 exported functions and data items
-	$(RM_F) *.exp
 # win32 export definition files
-	$(RM_F) *.def
+dynext-clean :
+	$(RM_F) *.lib *.pdb *.ilk *.exp *.def
 
 clean : testclean dynext-clean
 	$(RM_F) *.c pmc_*.h *_group.h *$(LOAD_EXT) *.dump lib-* *$(O)
