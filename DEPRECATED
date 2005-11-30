@@ -17,11 +17,6 @@ be removed. Please use Parrot_string_is_cclass() instead.
 
 =over 4
 
-=item Sub.get_name_space()
-
-The Sub PMC method get_name_space is being replaced with get_namespace to
-reflect the internal change from name_space to the one-word namespace.
-
 =item PGE
 
 PGE::P6Rule is now a registered compiler, and should be used like so:
