@@ -362,7 +362,6 @@ docs/pdds/README                                  [main]doc
 docs/pdds/clip/pdd00_pdd.pod                      [main]doc
 docs/pdds/clip/pdd01_overview.pod                 [main]doc
 docs/pdds/clip/pdd02_vtables.pod                  [main]doc
-docs/pdds/clip/pdd03_calling_conventions.pod      [main]doc
 docs/pdds/clip/pdd04_datatypes.pod                [main]doc
 docs/pdds/clip/pdd05_opfunc.pod                   [main]doc
 docs/pdds/clip/pdd06_pasm.pod                     [main]doc
@@ -380,6 +379,7 @@ docs/pdds/clip/pdd17_basic_types.pod              [main]doc
 docs/pdds/clip/pdd18_security.pod                 [main]doc
 docs/pdds/clip/pdd19_pir.pod                      [main]doc
 docs/pdds/pdd00_pdd.pod                           [main]doc
+docs/pdds/pdd03_calling_conventions.pod           [main]doc
 docs/pdds/pdd20_lexical_vars.pod                  [main]doc
 docs/pdds/pdd_template.pod                        [main]doc
 docs/pmc.pod                                      [main]doc

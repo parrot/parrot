@@ -1,4 +1,4 @@
-# Copyright: 2001-2004 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 =head1 NAME
@@ -7,13 +7,11 @@ docs/pdds/pdd03_calling_conventions.pod - Parrot Calling Conventions
 
 =head1 ABSTRACT
 
-This PDD describes Parrot's inter-routine calling conventions.
+Parrot's inter-routine calling conventions.
 
-=head1 AND NOW FOR SOMETHING COMPLETELY DIFFERENT
+=head1 VERSION
 
-This document's current contents are a complete change of direction from the
-original direction of Parrot design.  Brand new and/or improved!  Share and
-enjoy!
+$Revision$
 
 =head1 DESCRIPTION
 
@@ -26,9 +24,6 @@ conversion rules are the same regardless of whether code is invoking a
 subroutine or a return continuation.
 
 =head2 Common Features of Argument/Return Opcodes
-
-XXX FIXME: PIR should have pretty syntactical sugar around this, but it
-doesn't.  Document here what it should look like.
 
 There are four opcodes involved in parameter and return value propagation:
 
@@ -52,6 +47,11 @@ C<get_results>, for accepting return values.
 
 =back
 
+FAQ: Given Parrot's internal use of continuation-passing style ["CPS"], it
+would be possible to use one pair of opcodes for both call and return, since
+under CPS returns I<are> calls.  And perhaps someday we will have only two
+opcodes.  But for now, certain efficiency hacks are easier with four opcodes.)
+
 The common syntax of these opcodes is:
 
     <set_opcode> "(flags0, flags1, ..., flagsN)", VAL0, VAL1, ... VALN
@@ -63,6 +63,9 @@ parentheses.  Integers may be specified either in decimal, or if prefixed with
 "0b"/"0x", in binary/hexadecimal.  There must be exactly one integer for each
 value or register given.
 
+For documentation purposes we'll number the bits 0 (low) through 30 (high).
+Bit 31 (and higher, where available) will not be used.
+
 =head3 Flag Words; Common Flag Word Bits
 
 Each integer in the flag string controls the processing of the corresponding
@@ -71,7 +74,7 @@ value or register.
 These bits of each flag word have common meanings for all argument/
 return-value opcodes:
 
-    0b0011  TYPE
+    0-1   TYPE
                0b00 = I
                0b01 = S
                0b10 = P
@@ -96,50 +99,38 @@ how to expand them for the caller's use.
 These bits of each flag word have these meanings specific to C<set_args> and
 C<set_returns>:
 
-    0b00100  CONSTANT
-               the value is a literal constant, not a register
-	       (also set by the assembler, if a onstant is given)
+    2     CONSTANT
+               The value is a literal constant, not a register.
+               (Don't set this bit yourself; the assembler sets this bit
+               automatically if a constant is given.)
 
-    0b01000  FLATTEN
-               If this bit is set on a PMC value, then the PMC must
-               be an aggregate or a scalar containing a reference to
-               an aggregate.  The contents of the aggregate, rather
-               than the aggregate itself, will be passed.
+    3     FLAT
+               If this bit is set on a PMC value, then the PMC must be an
+               aggregate or a scalar containing a reference to an aggregate.
+               The contents of the aggregate, rather than the aggregate
+               itself, will be passed.
 
-               The meaning of this bit is undefined when applied to
-               integer, number, and string values.
+               The meaning of this bit is undefined when applied to integer,
+               number, and string values.
 
-    0b10000  MAY_FLATTEN
-               If this bit is set on a PMC value, and the PMC is
-               an aggregate or a scalar containing a reference to
-               an aggregate, _and_ when the called function has a
-               slurpy flag on the corresponding parameter, then
-               the content of this aggregate is flattened.
+    4     MAYBE_FLAT
+               If:
+                (a) this bit is set on a PMC value; and,
+                (b) the PMC is an aggregate or a scalar containing a reference
+                    to an aggregate; and,
+                (c) the called function has a slurpy flag on the corresponding
+                    parameter;
+               then, pretend FLAT bit was set.
 
-    0b100000  OPTIONAL
-                Optional arguments are not considered in an
-		argument count mismatch.
+               XXX - TODO - Determine whether this is really useful.
+                            This description is kind of ad-hoc.
 
-    0b1000000 OPT_FLAG
-                A INT argument with this bit set receives a bit 1/0,
-		if the preceeding I<OPTIONAL> was passed or not.
+    5     (unused)
 
-    0b000000000
-            INVOCANT
-            INVOCANT2
+    6     (unused)
 
-    0b000000000
-            NAMED
-
-    0b000000000
-            LEXICAL
-
-    0b000000000
-            COPY
-
-    0b000000000
-            WRITABLE
-
+    7     NAMED
+               XXX - TODO
 
 
 =head2 Accepting Parameters, Accepting Return Values
@@ -162,24 +153,60 @@ constant.  That would make it a variable.)
 These bits of each flag word have these meanings specific to C<get_params> and
 C<get_results>:
 
-    0b1000  FLATTEN
-               If this bit is set on a PMC register, then the PMC
-               will be populated with an aggregate (e.g. Array)
-               that will contain all of the remaining values that
-               have not already been stored in other registers.
+    2     (unused)
 
-               All such values will be converted to PMCs according
-               to the detailed rules below, and those PMCs will be
-               stored into the new aggregate.
+    3     SLURPY (P only)
+               If this bit is set on a P register, then it will be populated
+               with an aggregate that will contain all of the remaining values
+               that have not already been stored in other registers.
 
-               The meaning of this bit is undefined when applied to
-               integer, number, and string registers.
+               All such values will be converted to PMCs according to the
+               detailed rules below, and those PMCs will be stored into the
+               new aggregate.
+
+               XXX - TODO - If NAMED is not set, the aggregate will be an
+               Array type (HLL-specific) and the contents will be all
+               unassigned positional parameters.
+
+               XXX - TODO - If NAMED is set, the aggregate will be a Hash type
+               (HLL-specific) and the contents will be all unassigned named
+               parameters.
+
+    4     (unused)
+
+    5     OPTIONAL
+               If this bit is set on a register for which no value has been
+               passed, no exception will be raised; rather, the register will
+               be set to a default value: a Null PMC for P, an empty string
+               for S, or zero for N or I.
+
+    6     OPT_FLAG (I only)
+               An I register with this bit set is set to one if the
+               immediately preceding B<OPTIONAL> register received a value;
+               otherwise, it is set to zero.
+
+    6     READONLY (P only)
+               XXX - PROPOSED ONLY - XXX
+               If this bit is set on a P register that receives a value,
+               Parrot will ensure that the final value in the P register
+               is read-only (i.e. will not permit modification).  If the
+               received value was a mutable PMC, then Parrot will create
+               and set the register to a read-only PMC wrapper around the
+               original PMC.
+
+               Parrot's algorithm for deciding what is writable may be pretty
+               simplistic.  In initial implementations, it may assume that any
+               PMC not of a known read-only-wrapper type is mutable.
+
+    7     NAMED
+               XXX - TODO
+
 
 =head3 Overflow
 
 If too many values are provided to fit into the given target registers, Parrot
 will throw an exception.  Note that if the final target is a P register with
-the FLATTEN flag bit, then this exception can never occur.
+FLAT set, then this exception can never occur.
 
 XXX - FIXME - which exception?  We really could use an exception subsystem. 
 Oh, wait, that's my job.  Never mind.  --Chip
@@ -208,8 +235,8 @@ C<set> (pass by reference).
 
 =item *
 
-When the target is a P register and the source is an integer, the P will be set
-to a new .Integer which has been C<assign>ed the given integer.
+When the target is a P register and the source is an integer, the P will be
+set to a new .Integer which has been C<assign>ed the given integer.
 
 =item *
 
@@ -231,19 +258,12 @@ Required features are missing:
 
 =item *
 
-Type checking
+Named parameters (partly done)
 
 =item *
 
-Default values
-
-=item *
-
-Optional parameters
-
-=item *
-
-Named parameters
+HLL type mapping -- e.g. for HLL "Foo", having an incoming I register map to a
+FooInteger.
 
 =item *
 
@@ -254,88 +274,16 @@ Specific exceptions to throw for specific errors.
 Also, PIR should have pretty syntactical sugar around the get and set opcodes,
 but it doesn't.  This document should specify what that looks like, too.
 
+=head1 ATTACHMENTS
+
+None.
+
 =head1 REFERENCES
 
 None.
 
-=head1 VERSION
-
-2.0
-
-=head2 CURRENT
-
-    Maintainer: Chip Salzenberg
-    Class: Internals
-    PDD Number: 03
-    Version: 2.0
-    Status: Overhauled
-    Last Modified: 13 June 2005
-    PDD Format: 1
-    Language: English
-
-=head2 HISTORY
-
-=over 4
-
-=item Version 2.0
-
-13 June 2005
-
-=item Version 1.4
-
-17 November 2003
-
-=item Version 1.3
-
-2 May 2003
-
-=item Version 1,2
-
-11 March 2003
-
-=item Version 1.1
-
-16 September 2002
-
-=item version 1
-
-None. First version
-
-=back
-
-=head1 CHANGES
-
-=over 4
-
-=item Version 2.0
-
-Meet the new boss, definitely not the same as the old boss. All the
-register-window fixed-register-number ideas are gone. In their place are
-specialized conversion opcodes.
-
-=item Version 1.4
-
-Unified call and return, tossed useless stuff
-
-=item Version 1.3
-
-No longer use the stack, with overflow going into the array in P3.
-
-Clarified some muddy language.
-
-=item Version 1.2
-
-Dropped the number of registers passed in and out of subs.
-
-=item Version 1.1
-
-We now call with a frame, rather than pushing on the stack, and we return
-frames, rather than returning a stack. We also pass in context information for
-the return.
-
-=item Version 1.0
-
-None. First version
-
-=back
-
+=cut
+__END__
+Local Variables:
+  fill-column:78
+End:
