@@ -56,6 +56,10 @@ Converted to PIR by Bernhard Schmalhofer.
   goto END
 
 SOURCE:
+  # set up flag registers
+  I10 = 0
+  I11 = 0
+  I12 = 0
   # do some simple option parsing
   .local string option
   option = shift argv
