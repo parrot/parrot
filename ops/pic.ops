@@ -127,7 +127,11 @@ inline op pic_inline_sub__(inconst INT, in PMC, in PMC) :pic {
 
 =item B<pic_get_params__>(inconst PMC /* , ... */)
 
-Define function parameters for this subroutine.
+Fetch function parameters for this subroutine.
+
+=item B<pic_set_returns__>(inconst PMC /* , ... */)
+
+Return values to caller.
 
 =cut
 
@@ -171,6 +175,46 @@ inline op pic_get_params__(inconst PMC) :pic {
     /* no match redo plain opcode */
     ((void**)cur_opcode)[0] =
 	parrot_pic_opcode(interpreter, PARROT_OP_get_params_pc);
+    goto OFFSET(0);
+}
+
+inline op pic_set_returns__(inconst PMC) :pic {
+    Parrot_MIC *mic;
+    Parrot_PIC_lru *lru;
+    PMC *sig, *ccont;
+    opcode_t *pc = CUR_OPCODE, *dest_pc;
+    parrot_context_t *caller_ctx, *ctx;
+    parrot_cont_t cc;
+    int n;
+
+    ctx = CONTEXT(interpreter->ctx);
+    mic = (Parrot_MIC *) cur_opcode[1];
+    ccont = ctx->current_cont;
+    n = mic->m.arg_count;
+    cc = PMC_cont(ccont);
+    if (!cc->address) {
+	interpreter->current_returns = pc;
+	goto OFFSET(n + 2);
+    }
+    caller_ctx = cc->to_ctx;
+    interpreter->current_args = NULL;
+    dest_pc = caller_ctx->current_results;
+    if (dest_pc) {
+	sig = caller_ctx->constants[dest_pc[1]]->u.key;
+    }
+    else {
+	sig = NULL;
+    }
+    lru = &mic->lru;
+    if (lru->u.signature == sig) {
+	((arg_pass_f)lru->f.real_function)(interpreter, n,
+		ctx, pc + 2,
+		caller_ctx, dest_pc  + 2);
+	goto OFFSET(n + 2);
+    }
+    /* no match redo plain opcode */
+    ((void**)cur_opcode)[0] =
+	parrot_pic_opcode(interpreter, PARROT_OP_set_returns_pc);
     goto OFFSET(0);
 }
 

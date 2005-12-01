@@ -167,6 +167,7 @@ parrot_PIC_op_is_cached(Interp *interpreter, int op_code)
     switch (op_code) {
         case PARROT_OP_infix_ic_p_p: return 1;
         case PARROT_OP_get_params_pc: return 1;
+        case PARROT_OP_set_returns_pc: return 1;
     }
     return 0;
 }
@@ -311,6 +312,10 @@ pic_check_sig(Interp *interpreter, PMC *sig_pmc, int *type)
     assert(PObj_is_PMC_TEST(sig_pmc));
     assert(sig_pmc->vtable->base_type == enum_class_FixedIntegerArray);
     n = VTABLE_elements(interpreter, sig_pmc);
+    if (!n) {
+        *type = 0;
+        return 0;
+    }
     t1 = VTABLE_get_integer_keyed_int(interpreter, sig_pmc, 0);
 
     if (t1 & ~PARROT_ARG_TYPE_MASK)
@@ -325,13 +330,15 @@ pic_check_sig(Interp *interpreter, PMC *sig_pmc, int *type)
 }
 
 static int
-is_pic_param(Interp *interpreter, void **pc, Parrot_MIC* mic)
+is_pic_param(Interp *interpreter, void **pc, Parrot_MIC* mic, opcode_t op)
 {
     PMC *dst_sig, *src_sig;
     PMC *sig;
     int n, n2, type, type2;
     parrot_context_t *caller_ctx, *ctx;
     INTVAL const_nr;
+    opcode_t *args;
+    PMC *ccont;
 
     /* check params */
     sig = *(PMC**)pc[1];
@@ -339,9 +346,19 @@ is_pic_param(Interp *interpreter, void **pc, Parrot_MIC* mic)
     if (n == -1)
         return 0;
     ctx = CONTEXT(interpreter->ctx);
-    caller_ctx = ctx->caller_ctx;
-    if (interpreter->current_args) {
-        const_nr = interpreter->current_args[1];
+    if (op == PARROT_OP_set_returns_pc) {
+        ccont = ctx->current_cont;
+        if (!PMC_cont(ccont)->address)
+            return 0;
+	caller_ctx = PMC_cont(ccont)->to_ctx;
+        args = caller_ctx->current_results;
+    }
+    else {
+        caller_ctx = ctx->caller_ctx;
+        args = interpreter->current_args;
+    }
+    if (args) {
+        const_nr = args[1];
         /* check current_args signature */
         sig = caller_ctx->constants[const_nr]->u.key;
         n2 = pic_check_sig(interpreter, sig, &type2);
@@ -390,7 +407,9 @@ parrot_PIC_prederef(Interp *interpreter, opcode_t op, void **pc_pred, int core)
         size_t n = cur_opcode - (opcode_t*)cs->prederef.code;
         /*
          * pic_index is half the size of the code
+         * XXX if it's there - pbc_merge needs updates
          */
+        assert(cs->pic_index);
         n = cs->pic_index->data[n / 2];
         mic = parrot_PIC_alloc_mic(interpreter, n);
     }
@@ -428,9 +447,15 @@ parrot_PIC_prederef(Interp *interpreter, opcode_t op, void **pc_pred, int core)
             op = PARROT_OP_pic_infix___ic_p_p;
             break;
         case PARROT_OP_get_params_pc:
-            if (is_pic_param(interpreter, pc_pred, mic)) {
+            if (is_pic_param(interpreter, pc_pred, mic, op)) {
                 pc_pred[1] = (void*) mic;
                 op = PARROT_OP_pic_get_params___pc;
+            }
+            break;
+        case PARROT_OP_set_returns_pc:
+            if (is_pic_param(interpreter, pc_pred, mic, op)) {
+                pc_pred[1] = (void*) mic;
+                op = PARROT_OP_pic_set_returns___pc;
             }
             break;
     }

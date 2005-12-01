@@ -1240,3 +1240,4 @@ trans_encoding_s_s_ic           1209
 trans_encoding_s_sc_i           1210
 trans_encoding_s_sc_ic          1211
 pic_get_params___pc             1212
+pic_set_returns___pc            1213
