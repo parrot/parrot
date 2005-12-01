@@ -927,6 +927,8 @@ try_rev_cmp(Parrot_Interp interpreter, IMC_Unit * unit, char *name,
     for (i = 0; i < sizeof(br_pairs)/sizeof(br_pairs[0]); i++) {
         if (strcmp(name, br_pairs[i].op) == 0) {
             to_swap =  br_pairs[i].to_swap;
+            if (r[to_swap + 1]->set == 'P')
+                return NULL;
             t = r[to_swap];
             r[to_swap] = r[to_swap + 1];
             r[to_swap + 1] = t;
