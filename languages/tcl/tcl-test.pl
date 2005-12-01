@@ -5,7 +5,7 @@ use strict;
 use vars qw($DIR);
 
 # the directory to put the tests in
-$DIR = 't-tcl';
+$DIR = 't_tcl';
 
 use File::Spec;
 use Getopt::Std;
@@ -58,7 +58,8 @@ sub convert_tests {
     my @files = glob( File::Spec->catfile( $DIR, "*.test" ) );
     for my $file (@files) {
         my $test = substr $file, 0, -3;
-        
+        # parrot's getopt dislikes filenames with - in them. 
+        $test =~ s/-/_/g;
         system("rm $test") if -e $test;
         
         open my $ffh, "<", $file
