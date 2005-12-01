@@ -448,7 +448,6 @@ parrot_class_register(Interp* interpreter, STRING *class_name,
     INTVAL new_type;
     VTABLE *new_vtable, *parent_vtable;
     PMC *vtable_pmc;
-    char *c_error;
 
     /*
      * register the class in the PMCs name class_hash

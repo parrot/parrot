@@ -429,7 +429,7 @@ parrot_new_closure(Interp *interpreter, PMC *sub_pmc)
 {
     PMC *clos_pmc;
     struct Parrot_sub *clos, *sub;
-    PMC *pad, *cont;
+    PMC *cont;
     parrot_context_t *ctx;
 
     clos_pmc = VTABLE_clone(interpreter, sub_pmc);

@@ -332,7 +332,6 @@ pic_check_sig(Interp *interpreter, PMC *sig_pmc, int *type)
 static int
 is_pic_param(Interp *interpreter, void **pc, Parrot_MIC* mic, opcode_t op)
 {
-    PMC *dst_sig, *src_sig;
     PMC *sig;
     int n, n2, type, type2;
     parrot_context_t *caller_ctx, *ctx;

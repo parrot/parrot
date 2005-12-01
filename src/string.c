@@ -2441,7 +2441,7 @@ string_escape_string_delimited(Interp * interpreter,
                     break;
             }
             if (c >= 0x20) {
-                dp[i++] = c;
+                dp[i++] = (unsigned char)c;
                 assert(i < charlen);
                 continue;
             }
