@@ -240,7 +240,7 @@ config/gen/makefiles/dynoplibs.in                 []
 config/gen/makefiles/editor.in                    []
 config/gen/makefiles/jako.in                      []
 config/gen/makefiles/languages.in                 []
-config/gen/makefiles/lua.in
+config/gen/makefiles/lua.in                       []
 config/gen/makefiles/libparrot_def.in             []
 config/gen/makefiles/lisp.in                      []
 config/gen/makefiles/m4.in                        []
