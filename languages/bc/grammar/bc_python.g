@@ -506,9 +506,139 @@ gen_pir!
     }
   ;
 
+// targets for generating PIR that sets up a PAST data structure
 gen_past_pir!
-  : B:expr_list
+  : B:past_expr_list
     {
       #gen_past_pir = #([PIR_HEADER, "# pir header past\n#"], #B, [PIR_FOOTER, "# pir footer past\n#"]); 
     }
+  ;
+
+past_expr_list
+  : (past_expr_line|PIR_FUNCTION_DEF)+
+  ;
+
+past_expr_line!
+  :   #( PIR_PRINT_PMC reg_name=E1:past_expr )
+      {
+        #past_expr_line = #( [ PIR_NOOP, "noop" ], #E1, [PIR_OP, "\nprint "], [PIR_OP,reg_name], [PIR_NEWLINE, "\nprint \"\\n\" # "] )
+      }
+    | #( ASSIGN_OP lex_name=past_namedExpression reg_name=E2:past_expr )
+      {
+        pir = "\n" + \
+              lex_name + " = " + reg_name + "\n # "
+        #past_expr_line = #( [ PIR_NOOP, "noop" ], #E2, [PIR_OP, pir] )
+      }
+    | #( INCR lex_name=past_namedExpression )
+      {
+        pir = "\n" + \
+              lex_name + " = " + lex_name + " + 1 \n # "
+        #past_expr_line = #( [ PIR_NOOP, "noop" ], [PIR_OP, pir], [PIR_OP, "\nprint "], [PIR_OP,lex_name], [PIR_NEWLINE, "\nprint \"\\n\" # "] )
+      }
+    | #( DECR lex_name=past_namedExpression )
+      {
+        pir = "\n" + \
+              lex_name + " = " + lex_name + " - 1 \n # "
+        #past_expr_line = #( [ PIR_NOOP, "noop" ], [PIR_OP, pir], [PIR_OP, "\nprint "], [PIR_OP,lex_name], [PIR_NEWLINE, "\nprint \"\\n\" # "] )
+      }
+    | #( If reg_name=E3:relational_expr p2:past_expr_line )
+      {
+        pir = "\n" + \
+              "unless " + reg_name + " goto LABEL_%d\n#" % self.label_num 
+        #past_expr_line = #( [ PIR_NOOP, "noop" ], #E3, [PIR_OP, pir], #p2, [PIR_OP,"\nLABEL_0:\n#"] )
+      }
+    | p:PIR_OP
+      {
+        #past_expr_line = #p
+      };
+
+past_expr returns [reg_name]
+  :   reg_name=past_plus
+    | reg_name=past_minus
+    | reg_name=past_mul
+    | reg_name=past_div
+    | reg_name=past_mod
+    | reg_name=past_signExpression
+    | reg_name=past_namedExpression
+  ;
+
+past_plus! returns [reg_name]
+  : #(PLUS reg_name_left=left:past_expr reg_name_right=right:past_expr)
+  {
+    reg_name = "$P%d" % self.reg_num
+    self.reg_num = self.reg_num + 1
+    pir = "\n" + \
+          reg_name + " = new .Float\n" + \
+          reg_name + " = add " + reg_name_left + ", " + reg_name_right + "\n #"
+    #past_plus = #( [ PIR_NOOP, "noop" ], #left, #right, [PIR_OP, pir] );
+  }
+  ;
+
+past_minus! returns [reg_name]
+  : #(MINUS reg_name_left=left:past_expr reg_name_right=right:past_expr)
+  {
+    reg_name = "$P%d" % self.reg_num
+    self.reg_num = self.reg_num + 1
+    pir = "\n" + \
+          reg_name + " = new .Float\n" + \
+          reg_name + " = sub " + reg_name_left + ", " + reg_name_right + "\n #"
+    #past_minus = #( [ PIR_NOOP, "noop" ], #left, #right, [PIR_OP, pir] );
+  }
+  ;
+
+past_mul! returns [reg_name]
+  : #(MUL reg_name_left=left:past_expr reg_name_right=right:past_expr)
+  {
+    reg_name = "$P%d" % self.reg_num
+    self.reg_num = self.reg_num + 1
+    pir = "\n" + \
+          reg_name + " = new .Float\n" + \
+          reg_name + " = past_mul " + reg_name_left + ", " + reg_name_right + "\n #"
+    #past_mul = #( [ PIR_NOOP, "noop" ], #left, #right, [PIR_OP, pir] );
+  }
+  ;
+
+past_div! returns [reg_name]
+  : #(DIV reg_name_left=left:past_expr reg_name_right=right:past_expr)
+  {
+    reg_name = "$P%d" % self.reg_num
+    self.reg_num = self.reg_num + 1
+    pir = "\n" + \
+          reg_name + " = new .Float\n" + \
+          reg_name + " = past_div " + reg_name_left + ", " + reg_name_right + "\n #"
+    #past_div = #( [ PIR_NOOP, "noop" ], #left, #right, [PIR_OP, pir] );
+  }
+  ;
+
+past_mod! returns [reg_name]
+  : #(MOD reg_name_left=left:past_expr reg_name_right=right:past_expr)
+  {
+    reg_name = "$P%d" % self.reg_num
+    self.reg_num = self.reg_num + 1
+    pir = "\n" + \
+          reg_name + " = new .Float\n" + \
+          reg_name + " = past_mod " + reg_name_left + ", " + reg_name_right + "\n #"
+    #past_mod = #( [ PIR_NOOP, "noop" ], #left, #right, [PIR_OP, pir] );
+  }
+  ;
+
+past_signExpression returns [reg_name]
+  :   reg_name=i1:integer
+      {
+        pir = ""
+        #past_signExpression = #( [ PIR_NOOP, "noop" ],  #past_signExpression, [PIR_OP, pir] );
+      }
+    | #( UNARY_MINUS reg_name=i2:integer )
+      {
+        pir = "\n" + \
+              "neg " + reg_name + "\n#"
+        #past_signExpression = #( [ PIR_NOOP, "noop" ],  #past_signExpression, [PIR_OP, pir] );
+      }
+  ;
+
+past_namedExpression returns [reg_name]
+  :   l:LETTER
+      {
+        reg_name = l.getText() + "_lex";
+      }
   ;
