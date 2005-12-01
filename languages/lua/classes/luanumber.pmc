@@ -1,25 +1,83 @@
+/*
+Copyright: 2005 The Perl Foundation.  All Rights Reserved.
+$Id: luanumber.pmc $
+
+=head1 NAME
+
+classes/luanumber.pmc - Lua Number
+
+=head1 DESCRIPTION
+
+C<LuaNumber> extends C<Float> to provide a class with the behaviour of
+the Lua C<Number> type.
+
+=head2 Overloaded Methods
+
+=over 4
+
+=cut
+
+*/
+
 #include "parrot/parrot.h"
 
 static STRING *luanumber_name;
 
-pmclass LuaNumber extends Float dynpmc group lua_group {
+pmclass LuaNumber 
+    extends Float
+    does float 
+    dynpmc
+    group lua_group
+    hll Lua maps Float {
 
-	void class_init() {
-		if (pass) {		
-			luanumber_name = const_string(INTERP, "number");
-		}
-	}
-	
-	/* In the Lua language, only the boolean value "false" and the special
-	* "nil" value are considered as 'false'. Numbers being 0 are not, so return
-	* true.
-	*/
-	INTVAL get_bool () {
-  	return 1;
-  }
-		
-	
-	STRING* name () {
-		return luanumber_name;
-	}
+/* Class initialization. Caches constant strings that will be used later.
+*/
+    void class_init() {
+        if (pass) {
+            luanumber_name = const_string(INTERP, "number");
+        }
+    }
+
+/*
+
+=item C<STRING* name()>
+
+Return the string "number".
+
+=cut
+
+*/
+    STRING* name () {
+        return luanumber_name;
+    }
+
+/*
+
+=item C<INTVAL get_bool()>
+
+In Lua, both C<nil> and C<false> make a condition false; any other values 
+makes it true.
+
+So return always true. 
+
+=cut
+
+*/
+    INTVAL get_bool () {
+        return 1;
+    }
+
 }
+
+/*
+
+=back
+
+=head1 AUTHORS
+
+Original code by Klaas-Jan Stol.
+
+=cut
+
+*/
+

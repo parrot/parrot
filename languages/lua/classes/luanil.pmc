@@ -1,52 +1,115 @@
+/*
+Copyright: 2005 The Perl Foundation.  All Rights Reserved.
+$Id: luanil.pmc $
+
+=head1 NAME
+
+classes/luanil.pmc - Lua Nil
+
+=head1 DESCRIPTION
+
+C<LuaNil> extends C<None> to provide a class with the behaviour of
+the Lua C<Nil> value.
+
+=head2 Overloaded Methods
+
+=over 4
+
+=cut
+
+*/
+
 #include "parrot/parrot.h"
 
 static STRING *string_representation;
 static PMC *Lua_Nil;
 
-pmclass LuaNil singleton extends None dynpmc group lua_group {
+pmclass LuaNil 
+    singleton 
+    extends None 
+    dynpmc 
+    group lua_group 
+    hll Lua maps None {
 
-	void class_init() {
-		if (pass) {
-			string_representation = const_string(INTERP, "nil");
-		}
-	}		
+/* Class initialization. Caches constant strings that will be used later.
+*/
+    void class_init() {
+        if (pass) {
+            string_representation = const_string(INTERP, "nil");
+        }
+    }
 
-	STRING* get_string () {
-  	return string_representation;
-  }	
-  
-  STRING* name () {
-  	return string_representation;
-  }
-  
-  STRING* get_repr () {
-  	return string_representation;
-  }
-  
-  INTVAL get_bool () {
-  	return 0;
-	}		
-	
-	void* get_pointer() {
-  	return Lua_Nil;
-  }
+/*
 
-  void set_pointer(void* ptr) {
-  	assert(!Lua_Nil); // do we really need this assert?
-    Lua_Nil = (PMC*) ptr;
-  }
+=item C<STRING* name()>
+
+Return the string "nil".
+
+=cut
+
+*/
+    STRING* name () {
+        return string_representation;
+    }
   
-  void set_pmc_keyed (PMC* key, PMC* value) {
-  	real_exception(INTERP, NULL, 1, "Attempt to index a nil value");  	  	 
-  }
+/*
+
+=item C<STRING* get_string ()>
+
+Return the string "nil".
+
+=cut
+
+*/
+    STRING* get_string () {
+        return string_representation;
+    }
   
-  void set_pmc_keyed_int (INTVAL key, PMC* value) {
-  	real_exception(INTERP, NULL, 1, "Attempt to index a nil value");  	  	 
-  }
+/*
+
+=item C<STRING* get_repr ()>
+
+Return the string "nil".
+
+=cut
+
+*/
+    STRING* get_repr () {
+        return string_representation;
+    }
   
-  void set_pmc_keyed_str (STRING* key, PMC* value) {
-  	real_exception(INTERP, NULL, 1, "Attempt to index a nil value");  	  	 
-  }
+    void* get_pointer() {
+        return Lua_Nil;
+    }
+
+    void set_pointer(void* ptr) {
+        assert(!Lua_Nil); /* do we really need this assert? */
+        Lua_Nil = (PMC*)ptr;
+    }
+  
+    void set_pmc_keyed (PMC* key, PMC* value) {
+        real_exception(INTERP, NULL, 1, "Attempt to index a nil value");
+    }
+  
+    void set_pmc_keyed_int (INTVAL key, PMC* value) {
+        real_exception(INTERP, NULL, 1, "Attempt to index a nil value");
+    }
+  
+    void set_pmc_keyed_str (STRING* key, PMC* value) {
+        real_exception(INTERP, NULL, 1, "Attempt to index a nil value");
+    }
   
 }
+
+/*
+
+=back
+
+=head1 AUTHORS
+
+Original code by Klaas-Jan Stol.
+
+=cut
+
+*/
 

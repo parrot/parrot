@@ -1,27 +1,89 @@
+/*
+Copyright: 2005 The Perl Foundation.  All Rights Reserved.
+$Id: luaboolean.pmc $
+
+=head1 NAME
+
+classes/luaboolean.pmc - Lua Boolean
+
+=head1 DESCRIPTION
+
+C<LuaBoolean> extends C<Boolean> to provide a class with the behaviour of
+the Lua C<Boolean> type.
+
+The value is stored as an Integer.
+
+=head2 Overloaded Methods
+
+=over 4
+
+=cut
+
+*/
+
 #include "parrot/parrot.h"
 
 static STRING *false_string;
 static STRING *true_string;
 static STRING *luaboolean_name;
 
-pmclass LuaBoolean extends Boolean dynpmc group lua_group {
+pmclass LuaBoolean 
+    extends Boolean 
+    does boolean 
+    dynpmc 
+    group lua_group 
+    hll Lua maps Boolean {
 
-	void class_init() {
-		if (pass) {
-			 false_string = const_string(INTERP, "false");
-			 true_string = const_string(INTERP, "true");
-			 luaboolean_name = const_string(INTERP, "boolean");
-		}
-	}
-	
-	STRING* get_string () {
-  	if(PMC_int_val(SELF))  		
-  		return true_string;
-  	else
-  		return false_string;  	
-  }				
+/* Class initialization. Caches constant strings that will be used later.
+*/
+    void class_init() {
+        if (pass) {
+            false_string = const_string(INTERP, "false");
+            true_string = const_string(INTERP, "true");
+            luaboolean_name = const_string(INTERP, "boolean");
+        }
+    }
+
+/*
+
+=item C<STRING* name()>
+
+Return the string "boolean".
+
+=cut
+
+*/
+    STRING* name () {
+        return luaboolean_name;
+    }
+
+/*
+
+=item C<STRING* get_string ()>
+
+Return the string "true" or "false".
+
+=cut
+
+*/
+    STRING* get_string () {
+        if (PMC_int_val(SELF))
+            return true_string;
+        else
+            return false_string;
+    }
    
-  STRING* name () {
-  	return luaboolean_name;
-  }
 }
+
+/*
+
+=back
+
+=head1 AUTHORS
+
+Original code by Klaas-Jan Stol.
+
+=cut
+
+*/
+

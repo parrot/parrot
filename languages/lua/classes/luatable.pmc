@@ -1,11 +1,24 @@
 /*
-* luatable.pmc
-*
-* PMC that represents Lua tables during run-time.
-* Part of the distribution of the Lua compiler for Parrot.
-* 
-* Copyright 2005 K. Stol
+Copyright: 2005 The Perl Foundation.  All Rights Reserved.
+$Id: luatable.pmc $
+
+=head1 NAME
+
+classes/luatable.pmc - Lua Table
+
+=head1 DESCRIPTION
+
+C<LuaTable> extends C<Hash> to provide a class with the behaviour of
+the Lua C<Table> type.
+
+=head2 Overloaded Methods
+
+=over 4
+
+=cut
+
 */
+
 #include "parrot/parrot.h"
 
 /* The internal type of the Lua Nil class, dynamically allocated when loading
@@ -18,153 +31,176 @@ static INTVAL dynclass_Lua_Nil;
 static STRING *luatable_name;
 
 
-pmclass LuaTable extends Hash dynpmc group lua_group {
-	
-	void class_init() {
-		if (pass) {
-			dynclass_Lua_Nil = Parrot_PMC_typenum(INTERP,"LuaNil");
-			luatable_name = const_string(INTERP, "table");
-		}
-	}
-	      
-  STRING* name () {
-  	return luatable_name;
-  }   
-	
-	/*
-	* only "false" and "nil" are not true, so this table is 'true'.
-	*/
-	INTVAL get_bool () {
-  	return 1;
-  }
-	
-			
-	/* Metatable methods */	
-			
-	
-	/* Accessing fields: "index" metamethod */
-	
-	/* case string key
-	*	
-	* P0 = P1["Hello"]
-	*
-	*/	
-	PMC* get_pmc_keyed_str (STRING* key) {		
-		PMC *retval = SUPER(key);
-		
-		if(retval->vtable->base_type == enum_class_None)
-		{				
-		 	return pmc_new(interpreter, dynclass_Lua_Nil);
-		}
-		return retval;
-	}
-	
-	/* case integer key
-	*	
-	* P0 = P1[42]
-	*
-	*/
-	PMC* get_pmc_keyed_int (INTVAL key) {
-		PMC *retval = SUPER(key);		
-		if(retval->vtable->base_type == enum_class_None)
-		{					
-		 	return pmc_new(interpreter, dynclass_Lua_Nil);
-		}
-		return retval;
-	}
-	
-	/* case pmc key
-	*
-	* P0 = new .Key
-	* P0 = "hiya"
-	* P1 = P2[P0]
-	*/
-	
-  PMC* get_pmc_keyed (PMC* key) {		
-		PMC *retval = SUPER(key);
-		
-		if(retval->vtable->base_type == enum_class_None)
-		{	
-		 	return pmc_new(interpreter, dynclass_Lua_Nil);
-		}		
-		return retval;
-	}
-	
-	
-	/* Accessing fields: "newindex" metamethod */
-	
-	void set_pmc_keyed (PMC* key, PMC* value) {
-  
-  }
+pmclass LuaTable
+    extends Hash 
+    does hash 
+    dynpmc 
+    group lua_group 
+    hll Lua {
 
-  void set_pmc_keyed_int (INTVAL key, PMC* value) {
-  
-  }
+/* Class initialization. Caches constant strings that will be used later.
+*/
+    void class_init() {
+        if (pass) {
+            dynclass_Lua_Nil = Parrot_PMC_typenum(INTERP, "LuaNil");
+            luatable_name = const_string(INTERP, "table");
+        }
+    }
+     
+/*
 
-  void set_pmc_keyed_str (STRING* key, PMC* value) {
-  
-  }
-	
-	
-	
-	/* Other metamethods */
-		
-	
-	STRING* get_string () {
-  	return Parrot_sprintf_c(INTERP, "table: 0x%x", SELF);
-  }
-	
-  PMC* add (PMC* value, PMC* dest) {
-  	PMC *metatable = DYNSELF.getprop("__metatable");
-  	if(metatable)
-  	{
-  		printf("found metatable\n");
-  	}
-  	else
-  	{
-  		printf("Failed to find a metatable\n");
-  	}
-  	return (PMC*)0;
-  }
-  
-  PMC* subtract (PMC* value, PMC* dest) {
-    return (PMC*)0;
-  }
+=item C<STRING* name()>
 
-  PMC* multiply (PMC* value, PMC* dest) {
-    return (PMC*)0;
-  }
+Return the string "table".
+
+=cut
+
+*/
+    STRING* name () {
+        return luatable_name;
+    }   
+
+/*
+
+=item C<INTVAL get_bool()>
+
+In Lua, both C<nil> and C<false> make a condition false; any other values 
+makes it true.
+
+So return always true. 
+
+=cut
+
+*/
+    INTVAL get_bool () {
+        return 1;
+    }
+
+    /* Metatable methods */    
+
+
+    /* Accessing fields: "index" metamethod */
+
+    /* case string key
+    *
+    * P0 = P1["Hello"]
+    *
+    */
+    PMC* get_pmc_keyed_str (STRING* key) {
+        PMC *retval = SUPER(key);
+
+        if (retval->vtable->base_type == enum_class_None) {
+            return pmc_new(interpreter, dynclass_Lua_Nil);
+        }
+        return retval;
+    }
+
+    /* case integer key
+    *
+    * P0 = P1[42]
+    *
+    */
+    PMC* get_pmc_keyed_int (INTVAL key) {
+        PMC *retval = SUPER(key);
+        if (retval->vtable->base_type == enum_class_None) {
+            return pmc_new(interpreter, dynclass_Lua_Nil);
+        }
+        return retval;
+    }
+
+    /* case pmc key
+    *
+    * P0 = new .Key
+    * P0 = "hiya"
+    * P1 = P2[P0]
+    */
+
+    PMC* get_pmc_keyed (PMC* key) {
+        PMC *retval = SUPER(key);
+
+        if (retval->vtable->base_type == enum_class_None) {
+            return pmc_new(interpreter, dynclass_Lua_Nil);
+        }
+        return retval;
+    }
+
+
+    /* Accessing fields: "newindex" metamethod */
+
+    void set_pmc_keyed (PMC* key, PMC* value) {
+    }
+
+    void set_pmc_keyed_int (INTVAL key, PMC* value) {
+    }
+
+    void set_pmc_keyed_str (STRING* key, PMC* value) {
+    }
+
+
+
+    /* Other metamethods */
+
+    STRING* get_string () {
+        return Parrot_sprintf_c(INTERP, "table: 0x%x", SELF);
+    }
+
+    PMC* add (PMC* value, PMC* dest) {
+        PMC *metatable = DYNSELF.getprop("__metatable");
+        if (metatable) {
+            printf("found metatable\n");
+        } else {
+            printf("Failed to find a metatable\n");
+        }
+        return (PMC*)0;
+    }
   
-  PMC* divide (PMC* value, PMC* dest) {
-    return (PMC*)0;
-  }
+    PMC* subtract (PMC* value, PMC* dest) {
+        return (PMC*)0;
+    }
+
+    PMC* multiply (PMC* value, PMC* dest) {
+        return (PMC*)0;
+    }
   
-  PMC* modulus (PMC* value, PMC* dest) {
-    return (PMC*)0;
-  }
+    PMC* divide (PMC* value, PMC* dest) {
+        return (PMC*)0;
+    }
   
-  PMC* pow (PMC* value, PMC* dest) {
-    return (PMC*)0;
-  }
+    PMC* modulus (PMC* value, PMC* dest) {
+        return (PMC*)0;
+    }
   
-  PMC* neg (PMC* dest) {
-    return (PMC*)0;
-  }
+    PMC* pow (PMC* value, PMC* dest) {
+        return (PMC*)0;
+    }
   
-  PMC* concatenate (PMC* value, PMC* dest) {
-    return (PMC*)0;
-  }
+    PMC* neg (PMC* dest) {
+        return (PMC*)0;
+    }
   
-  void* invoke (void* next) {
-    return (void*)0;
-  }
+    PMC* concatenate (PMC* value, PMC* dest) {
+        return (PMC*)0;
+    }
   
-  INTVAL cmp (PMC* value) {
-    return (INTVAL)0;
-  }
+    void* invoke (void* next) {
+        return (void*)0;
+    }
   
- 
-  
+    INTVAL cmp (PMC* value) {
+        return (INTVAL)0;
+    }
+    
 }
 
+/*
+
+=back
+
+=head1 AUTHORS
+
+Original code by Klaas-Jan Stol.
+
+=cut
+
+*/
 
