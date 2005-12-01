@@ -119,24 +119,6 @@ the frame pointer in the stack frame cache.
         INTERP->ctx.bp = CONTEXT(INTERP->ctx)->bp;
         INTERP->ctx.bp_ps = CONTEXT(INTERP->ctx)->bp_ps;
         next = cc->address;
-        if (next) {
-            if (CONTEXT(INTERP->ctx)->current_results) {
-                /*
-                 * the register pointer is already switched back
-                 * to the caller, therefore the registers of the
-                 * sub we are returning from aren't marked, if
-                 * inside argument passing a DOD run is triggered
-                 * therefore we have to block DOD
-                 */
-                Parrot_block_DOD(INTERP);
-                parrot_pass_args(INTERP,
-                        caller_ctx,
-                        CONTEXT(INTERP->ctx),
-                        PARROT_OP_get_results_pc);
-                Parrot_unblock_DOD(INTERP);
-            }
-            INTERP->current_returns = NULL;
-        }
         Parrot_free_context(INTERP, cc->from_ctx, 1);
         cc->from_ctx = NULL;
         /*

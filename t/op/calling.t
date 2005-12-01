@@ -575,7 +575,6 @@ pir_output_is(<<'CODE', <<'OUTPUT', "tailcall 1");
 .sub foo
     .const .Sub b = "bar"
     print "foo\n"
-    set_returns "(0)", "foo_ret\n"
     tailcall b
 .end
 .sub bar
@@ -602,7 +601,6 @@ pir_output_is(<<'CODE', <<'OUTPUT', "tailcall 2 - pass arg");
     .const .Sub b = "bar"
     print "foo\n"
     set_args "(0)", "from_foo\n"
-    set_returns "(0)", "foo_ret\n"
     tailcall b
 .end
 .sub bar
@@ -632,7 +630,6 @@ pir_output_is(<<'CODE', <<'OUTPUT', "tailcall 3 - pass arg");
     .const .Sub b = "bar"
     print "foo\n"
     set_args "(0)", "from_foo\n"
-    set_returns "(0)", "foo_ret\n"
     tailcall b
 .end
 .sub bar

@@ -328,7 +328,9 @@ Invokes the subroutine.
             Parrot_switch_to_cs(INTERP, sub->seg, 1);
         }
         if (PObj_get_FLAGS(ccont) & SUB_FLAG_TAILCALL) {
-            if (*pc != PARROT_OP_get_params_pc) {
+            if (!(*pc == PARROT_OP_get_params_pc ||
+                        (*pc == PARROT_OP_push_eh_ic &&
+                         pc[2] == PARROT_OP_get_params_pc))) {
                 /* TODO keep it or resize it */
                 --context->recursion_depth;
                 PObj_get_FLAGS(ccont) &= ~SUB_FLAG_TAILCALL;

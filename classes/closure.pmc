@@ -58,8 +58,10 @@ Marks the closure as live.
     void mark () {
         struct Parrot_sub * sub = PMC_sub(SELF);
         SUPER();
-        if (sub->outer_sub)
+        if (sub->outer_sub) {
             pobject_lives(INTERP, (PObj*)sub->outer_sub);
+            mark_context(INTERP, sub->outer_ctx);
+        }
     }
 
 

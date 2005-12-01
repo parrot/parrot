@@ -506,7 +506,6 @@ op get_results(inconst PMC) {
 
 op get_params(inconst PMC) {
     opcode_t *this = CUR_OPCODE;
-    PMC *signature = $1;
     parrot_context_t *caller_ctx, *ctx;
     PMC *ccont;
     opcode_t *pc;
@@ -523,16 +522,28 @@ op get_params(inconst PMC) {
 	--ctx->recursion_depth;
 	ctx->caller_ctx = caller_ctx->caller_ctx;
 	Parrot_free_context(interpreter, caller_ctx, 1);
+        interpreter->current_args = NULL;
     }
     goto ADDRESS(pc);
 }
 
 op set_returns(inconst PMC) {
     opcode_t *this = CUR_OPCODE;
+    parrot_context_t *caller_ctx, *ctx;
+    PMC *ccont;
     PMC *signature = $1;
     INTVAL argc;
 
     interpreter->current_returns = this;
+    ctx = CONTEXT(interpreter->ctx);
+    ccont = ctx->current_cont;
+
+    if (PMC_cont(ccont)->address) {
+	/* else its from runops_fromc */
+	caller_ctx = PMC_cont(ccont)->to_ctx;
+	parrot_pass_args(interpreter, ctx, caller_ctx,
+		PARROT_OP_get_results_pc);
+    }
     argc = VTABLE_elements(interpreter, signature);
     goto OFFSET(argc + 2);
 }

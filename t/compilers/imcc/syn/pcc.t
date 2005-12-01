@@ -192,7 +192,7 @@ loop:
     goto loop
  done:
   print "done in coroutine\n"
-  invokecc when_done
+  when_done()
 .end
 CODE
 5

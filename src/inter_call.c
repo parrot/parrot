@@ -541,8 +541,12 @@ again:
             return 0;
         goto again;
     }
-    if (st->src.i >= st->src.n)
+    if (st->src.i >= st->src.n) {
         return 0;
+    }    
+    if (st->dest.i >= st->dest.n) {
+        return 0;
+    }    
     if ((st->src.sig & PARROT_ARG_TYPE_MASK) == PARROT_ARG_PMC) {
         clone_key_arg(interpreter, st);
     }
@@ -640,32 +644,28 @@ parrot_pass_args(Interp *interpreter,  parrot_context_t *src_ctx,
 
     if (what == PARROT_OP_get_params_pc) {
         dst_pc = interpreter->current_params;
-        todo = Parrot_init_arg_op(interpreter, dest_ctx,
-                dst_pc, &st.dest);
         src_pc = interpreter->current_args;
-        Parrot_init_arg_op(interpreter,
-                src_ctx, src_pc, &st.src);
         interpreter->current_params = NULL;
         action = "params";
     }
     else {
         dst_pc = dest_ctx->current_results;
-        if (!dst_pc)
-            return NULL;
-        src_pc = interpreter->current_returns;
-        action = "results";
-        if (!src_pc) {    /* no returns */
-            /* continuation call with args
-             *
-             */
+        if (what == PARROT_OP_get_results_pc) {
+            src_pc = interpreter->current_returns;
+            interpreter->current_returns = NULL;
+            action = "results";
+        }
+        else {
+            assert(what == PARROT_OP_set_args_pc);
             src_pc = interpreter->current_args;
-            if (!src_pc)
-                return NULL;
             action = "params";
         }
-        todo = Parrot_init_arg_op(interpreter, dest_ctx, dst_pc, &st.dest);
-        Parrot_init_arg_op(interpreter, src_ctx, src_pc, &st.src);
+        interpreter->current_args = NULL;
     }
+    if (!dst_pc)
+        return NULL;
+    todo = Parrot_init_arg_op(interpreter, dest_ctx, dst_pc, &st.dest);
+    Parrot_init_arg_op(interpreter, src_ctx, src_pc, &st.src);
     st.opt_so_far = 0;  /* XXX */
     while (todo) {
         Parrot_fetch_arg(interpreter, &st);
@@ -674,19 +674,16 @@ parrot_pass_args(Interp *interpreter,  parrot_context_t *src_ctx,
     }
 
 
-    if (what == PARROT_OP_get_params_pc) {
+    if (what == PARROT_OP_get_results_pc) {
+        if (!PARROT_ERRORS_test(interpreter, PARROT_ERRORS_RESULT_COUNT_FLAG))
+            return dst_pc + st.dest.n + 2;
+    } else {
         if (!PARROT_ERRORS_test(interpreter, PARROT_ERRORS_PARAM_COUNT_FLAG))
             return dst_pc + st.dest.n + 2;
     }
-    else {
-        if (!PARROT_ERRORS_test(interpreter, PARROT_ERRORS_RESULT_COUNT_FLAG))
-            return dst_pc + st.dest.n + 2;
-    }
-#if 1
+
     /*
      * check for arg count mismatch
-     *
-     * XXX not yet. PGE uses a lot of implicit :optionals
      */
     if (src_pc[-3] == PARROT_OP_tailcallmethod_p_sc ||
             src_pc[-3] == PARROT_OP_tailcallmethod_p_s) {
@@ -700,7 +697,7 @@ parrot_pass_args(Interp *interpreter,  parrot_context_t *src_ctx,
          * we are returning 1 retval to caller on behalf
          * of the NCI (a PIR method had already returned
          * all and doesn't run anything after the
-         * taicall - ignore/fix missing arg_count
+         * tailcall - ignore/fix missing arg_count
          */
         st.src.i = st.src.n;
     }
@@ -718,7 +715,7 @@ parrot_pass_args(Interp *interpreter,  parrot_context_t *src_ctx,
                 "too many arguments passed (%d) - %d %s expected",
                 st.src.n, st.dest.n, action);
     }
-#endif
+
     /* skip the get_params opcode - all done here */
     return dst_pc + st.dest.n + 2;
 }

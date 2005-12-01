@@ -176,11 +176,6 @@ Swaps the "context".
             CONTEXT(INTERP->ctx) = ctx = PMC_cont(ccont)->to_ctx;
             INTERP->ctx.bp = ctx->bp;
             INTERP->ctx.bp_ps = ctx->bp_ps;
-            if (INTERP->current_returns && ctx->current_results)
-                parrot_pass_args(INTERP,
-                        co->ctx,
-                        ctx,
-                        PARROT_OP_get_results_pc);
         }
 
         /* toggle address */

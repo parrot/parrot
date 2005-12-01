@@ -230,29 +230,22 @@ destination to continue execution.
             ctx->current_results = cc->current_results;
         }
         pc = cc->address;
-        if (pc) {
-            if (ctx->current_results) {
-                /*
-                 * the register pointer is already switched back
-                 * to the caller, therefore the registers of the
-                 * sub we are returning from aren't marked, if
-                 * inside argument passing a DOD run is triggered
-                 * therefore we have to block DOD
-                 */
-                Parrot_block_DOD(INTERP);
-                parrot_pass_args(INTERP,
-                        caller_ctx,
-                        ctx,
-                        PARROT_OP_get_results_pc);
-                Parrot_unblock_DOD(INTERP);
-            }
-            INTERP->current_returns = NULL;
+        if (ctx->current_results && INTERP->current_args) {
+            /*
+             * the register pointer is already switched back
+             * to the caller, therefore the registers of the
+             * sub we are returning from aren't marked, if
+             * inside argument passing a DOD run is triggered
+             * therefore we have to block DOD
+             */
+            Parrot_block_DOD(INTERP);
+            parrot_pass_args(INTERP,
+                    caller_ctx,
+                    ctx,
+                    PARROT_OP_set_args_pc);
+            Parrot_unblock_DOD(INTERP);
         }
         INTERP->current_args = NULL;
-        /* no address and no segment */
-        if (!cc->seg) {
-            return NULL;
-        }
         if (INTERP->code != cc->seg) {
             Parrot_switch_to_cs(INTERP, cc->seg, 1);
         }
