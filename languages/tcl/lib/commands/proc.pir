@@ -15,16 +15,16 @@ Create a PIR sub on the fly for this user defined proc.
   if argc != 3 goto error
 
   .local string name
-  name   = argv[0]
   .local pmc args_p
-  args_p = argv[1]
   .local pmc body_p
+  name   = argv[0]
+  args_p = argv[1]
   body_p = argv[2]
 
   .local pmc retval
 
-  .local pmc compiler,pir_compiler
-  compiler = find_global "_Tcl", "compile"
+  .local pmc compiler, pir_compiler
+  compiler     = find_global "_Tcl", "compile"
   pir_compiler = find_global "_Tcl", "pir_compiler"
 
   .local pmc __list
@@ -40,21 +40,8 @@ got_args:
   inc $P0
 
   # Save the parsed body.
-  .local pmc parsed_body
-  $S0 = body_p
-  ($I0,$S1) = compiler(0,$S0)
-  $P0 = pir_compiler($I0,$S1)
-  parsed_body = $P0[0]
-
-
-  # XXX these need to go away - for now, we'll just escape
-  # the code portion and put it, escaped, into the proc
-  # definition. The arg list will be used to generate the proc's
-  # indvidual argument handling code.
-
-  # Now, shove the parsed routine into the global hash...
-  $P0 = find_global "_Tcl", "proc_parsed"
-  $P0[name] = parsed_body
+  .local string parsed_body
+  ($I0,parsed_body) = compiler(0,body_p)
 
   # Save the code for the proc for [info body]
   $P1 = find_global "_Tcl", "proc_body"
@@ -64,10 +51,6 @@ got_args:
   # XXX When dealing with defaults, this will have to be updated.
   $P1 = find_global "_Tcl", "proc_args"
   $P1[name] = args_p
-
-  .local pmc escaper
-  .local string esc_name
-  esc_name = escape name
 
   .local string proc_body, temp_code
 
@@ -131,8 +114,8 @@ arg_loop:
   if ii == last_arg goto arg_loop_done
 
   temp_code= <<"END_PIR"
-$P1 = args[%i]
-store_lex '$%s', $P1
+  $P1 = args[%i]
+  store_lex '$%s', $P1
 END_PIR
 
   $P1 = new .Array
@@ -148,7 +131,7 @@ END_PIR
   goto arg_loop
 
 arg_loop_done:
-  unless is_slurpy goto body
+  unless is_slurpy goto done_args
 
   # Convert the remaining elements returned by foldup into a TclList
   # XXX This code lifted from Tcl::&list - eventually factor this out.
@@ -179,13 +162,6 @@ END_PIR
    temp_code = sprintf temp_code, $P1
    proc_body .= temp_code
 
-body:
-  proc_body .= "  .local pmc proc_body\n"
-  proc_body .= "  $P0 = find_global \"_Tcl\", \"proc_parsed\"\n"
-  proc_body .= "  proc_body=$P0[\""
-  proc_body .=   esc_name
-  proc_body .=   "\"]\n"
-
 done_args:
   temp_code = <<"END_PIR"
   goto ARGS_OK
@@ -193,7 +169,19 @@ BAD_ARGS:
   .throw('wrong # args: should be \"%s %s\"')
 ARGS_OK:
   push_eh is_return
-    $P0 = proc_body()
+END_PIR
+   
+  $P1 = new .Array
+  $P1 = 2
+  $P1[0] = name
+  $P1[1] = args
+  
+  temp_code = sprintf temp_code, $P1
+  proc_body .= temp_code
+
+  proc_body .= parsed_body
+  
+  proc_body .= <<"END_PIR"
   clear_eh
 was_ok:
   dec call_level
@@ -210,14 +198,6 @@ not_return_nor_ok:
   .rethrow()
 .end
 END_PIR
-   
-  $P1 = new .Array
-  $P1 = 2
-  $P1[0] = name
-  $P1[1] = args
-  
-  temp_code = sprintf temp_code, $P1
-  proc_body .= temp_code
 
   .local pmc pir_compiler
   pir_compiler = compreg "PIR"
@@ -227,11 +207,6 @@ END_PIR
   proc_body = trans_charset $I0
 
   $P0 = pir_compiler(proc_body)
-
-  # XXX because of the current implementation of the PIR compiler, we must save a reference
-  # to our newly compiled function or run the risk of having it garbage collected
-  $P1 = find_global "_Tcl", "proc_exec"
-  $P1[name] = $P0
 
   .return ("")
 

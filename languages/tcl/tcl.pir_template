@@ -169,17 +169,7 @@ providing a compreg-compatible method.
   store_global "_Tcl", "proc_body", $P1
 
   $P1 = new .TclArray
-  store_global "_Tcl", "proc_parsed", $P1
-
-  $P1 = new .TclArray
   store_global "_Tcl", "proc_args", $P1
-
-  # We need to store these ourselves, because creating dynamic
-  # .subroutines in PIR runs the risk of garbage collection if we're
-  # not careful. 
-  # XXX - these should be removed when the procedure is then deleted.
-  $P1 = new .TclArray
-  store_global "_Tcl", "proc_exec", $P1
 
   # Global variable initialization
 
