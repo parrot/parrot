@@ -85,6 +85,7 @@ my @unified_testable_languages =
        bc
        befunge
        bf
+       lua
        m4
        ook
        parrot_compiler
