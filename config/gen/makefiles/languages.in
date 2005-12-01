@@ -18,6 +18,7 @@ LANGUAGES = \
     forth \
     jako \
     lisp \
+    lua \
     m4 \
     miniperl \
     ook \
@@ -79,6 +80,7 @@ clean: \
     forth.clean \
     jako.clean \
     lisp.clean \
+    lua.clean \
     m4.clean \
     miniperl.clean \
     ook.clean \
@@ -168,6 +170,14 @@ lisp.test:
 	- $(MAKE) lisp test
 lisp.clean:
 	- $(MAKE) lisp clean
+
+lua: lua.dummy
+lua.dummy:
+	- $(MAKE) lua
+lua.test:
+	- $(MAKE) lua test
+lua.clean:
+	- $(MAKE) lua clean
 
 m4: m4.dummy
 m4.dummy:

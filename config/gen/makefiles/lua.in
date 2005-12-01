@@ -26,12 +26,13 @@ pmcs:
 	@cd $(CLASSDIR) && $(BUILD) copy "--destination=$(DESTDIR)" $(PMCS)
 
 test:
-	cd .. && $(PERL) -I..${slash}lib lua${slash}t${slash}harness
+	cd .. && $(PERL) -I../lib lua/t/harness
 
 clean:
-	$(RM_F) $(CLASSDIR)${slash}*$(O) $(CLASSDIR)${slash}*$(LOAD_EXT) \
-	$(CLASSDIR)${slash}*.def $(CLASSDIR)${slash}*.dump \
-	$(CLASSDIR)${slash}*.h $(CLASSDIR)${slash}*.c
+	$(RM_F) $(CLASSDIR)/*$(O) $(CLASSDIR)/*$(LOAD_EXT) \
+	$(CLASSDIR)/*.def $(CLASSDIR)/*.dump \
+	$(CLASSDIR)/*.h $(CLASSDIR)/*.c
+	$(RM_F) t/pmc/*.pir
 
 distclean: clean
 	$(RM_F) Makefile
