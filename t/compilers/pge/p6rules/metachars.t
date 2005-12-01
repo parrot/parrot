@@ -138,8 +138,8 @@ p6rule_like("bcd", '&b', '/Missing term/', 'conjunction (&) - null left arg ille
 p6rule_like("bcd", '&', '/Missing term/', 'conjunction (&) - null both args illegal', todo => 'not yet implemented');
 p6rule_is  ("&", '\&', 'conjunction (&) - literal must be escaped');
 p6rule_isnt("&", '&', 'conjunction (&) - literal must be escaped', todo => 'not yet implemented');
-p6rule_isnt("a&|b", 'a&|b', 'alternation and conjunction (|&) - parse error', todo => 'not yet implemented');
-p6rule_isnt("a|&b", 'a|&b', 'alternation and conjunction (&|) - parse error', todo => 'not yet implemented');
+p6rule_isnt("a&|b", 'a&|b', 'alternation and conjunction (&|) - parse error');
+p6rule_isnt("a|&b", 'a|&b', 'alternation and conjunction (|&) - parse error', todo => 'not yet implemented');
 
 
 ## \p and \P -- deprecated
