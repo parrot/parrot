@@ -67,7 +67,7 @@ single digit, in the form of:
     unless $I0 goto err_no_ast # if AST fails stop
 
 #    print "\n\nAST tree dump:\n"
-    ast.dump()
+#    ast.dump()
 
     # Compile the abstract syntax tree down to an opcode syntax tree
     load_bytecode "languages/punie/lib/POST.pir"
