@@ -1,34 +1,37 @@
 =head1 NAME
 
-PAST::Val - Nodes for literal values
+POST::Op - An opcode
 
 =head1 DESCRIPTION
 
-PAST::Val is a subclass of PAST::Node.
+POST::Op is a call to an opcode in the OST. It is a subclass of
+POST::Node.
 
 =cut
 
-.namespace [ "PAST::Val" ]
+.namespace [ "POST::Op" ]
 
 .sub "__onload" @LOAD
     .local pmc base
-    $P0 = getclass 'PAST::Node'
-    base = subclass $P0, 'PAST::Val'
-    addattribute base, "value"             # the value of this leaf
+    $P0 = getclass 'POST::Node'
+    base = subclass $P0, 'POST::Op'
+    addattribute base, "op"         # the operator name
     .return ()
 .end
 
 .sub "set_node" method
     .param string source
     .param int pos
-    .param string value
+    .param string op
+    .param pmc children
     $P1 = getattribute self, "source"
     $P1 = source
     $P2 = getattribute self, "pos"
     $P2 = pos
     $P3 = new PerlString
-    $P3 = value
-    setattribute self, "value", $P3
+    $P3 = op
+    setattribute self, "op", $P3
+    setattribute self, "children", children
     .return ()
 .end
 
@@ -46,7 +49,8 @@ PAST::Val is a subclass of PAST::Node.
     # print source for this node
     self.dump_attribute("source", level)
     self.dump_attribute("pos", level)
-    self.dump_attribute("value", level)
+    self.dump_attribute("op", level)
+    self.dump_children(level)
 
     # close off current node display
     print indent
@@ -54,7 +58,7 @@ PAST::Val is a subclass of PAST::Node.
     .return ()
 .end
 
-.sub value method
-    $P2 = getattribute self, "value"
+.sub op method
+    $P2 = getattribute self, "op"
     .return ($P2)
 .end

@@ -22,23 +22,12 @@ ROOT: result(.) = {
     .local pmc result
     result = new 'PAST::Stmts'
     result.set_node($S2,$I1,$P3)
+
     .return (result)
 
   err_no_tree:
     print "The top-level node doesn't contain an 'expr' match.\n"
     end
-
-#    $P0 = new Iterator, node    # setup iterator for node
-#    set $P0, 0 # reset iterator, begin at start
-#  iter_loop:
-#    unless $P0, iter_end         # while (entries) ...
-#      shift $S2, $P0              # get key for next entry
-#      typeof I0, P0[$S2]         # get type of entry at key S2
-#      set $P2, $P0[$S2]            # extract integer
-#      $P3 = tree.get('result', $P1, $S2)
-#      goto iter_loop
-#  iter_end:
-#    .return ()
 }
 
 PunieGrammar::expr: result(.) = {

@@ -1,18 +1,18 @@
 =head1 NAME
 
-PAST::Node - a base class for PAST abstract syntax tree nodes
+POST::Node - a base class for POST opcode syntax tree nodes
 
 =head1 DESCRIPTION
 
-All PAST nodes subclass from this base type.
+All POST nodes subclass from this base type.
 
 =cut
 
-.namespace [ "PAST::Node" ]
+.namespace [ "POST::Node" ]
 
 .sub "__onload" @LOAD
     .local pmc base
-    newclass base, "PAST::Node"
+    newclass base, "POST::Node"
     addattribute base, "source"           # the original source code
     addattribute base, "pos"              # offset position in source
     addattribute base, "children"         # child nodes
@@ -56,6 +56,7 @@ All PAST nodes subclass from this base type.
     $P2 = getattribute self, "children"
     .return ($P2)
 .end
+
 
 .sub "dump" method
     .param int level

@@ -41,12 +41,12 @@ single digit, in the form of:
     # Verify the match
     $I0 = match.__get_bool()
     unless $I0 goto err_match_fail           # if match fails stop
-    print "parse succeeded\n"
-    print "Match tree dump:\n"
-    load_bytecode "dumper.imc"
-    load_bytecode "PGE/Dumper.pir"
-    $P0 = find_global "_dumper"
-    $P0(match, "$/")
+#    print "parse succeeded\n"
+#    print "Match tree dump:\n"
+#    load_bytecode "dumper.imc"
+#    load_bytecode "PGE/Dumper.pir"
+#    $P0 = find_global "_dumper"
+#    $P0(match, "$/")
 
     # "Traverse" the parse tree
     .local string tg_source
@@ -68,10 +68,46 @@ single digit, in the form of:
 
     print "\n\nAST tree dump:\n"
     ast.dump()
-#    $P7 = getattribute $P6, 'left'
-#    $P8 = getattribute $P7, 'value'
 
-    # Compile and execute the "AST"
+    # Compile the abstract syntax tree down to an opcode syntax tree
+    load_bytecode "lib/POST.pir"
+    .local string ost_tg_source
+    ost_tg_source = _slurp_file('lib/past2post.g')
+    .local pmc ostgrammar
+    ostgrammar = new 'TGE'
+    ostgrammar.agcompile(ost_tg_source)
+    .local pmc ostbuilder
+    ostbuilder = ostgrammar.apply(ast)
+    .local pmc ost
+    ost = ostbuilder.get('result')
+    $I0 = defined ost
+    unless $I0 goto err_no_ost # if OST fails stop
+
+    print "\n\nOST tree dump:\n"
+    ost.dump()
+
+    # Compile the OST down to PIR
+    .local string pir_tg_source
+    pir_tg_source = _slurp_file('lib/post2pir.g')
+    .local pmc pirgrammar
+    pirgrammar = new 'TGE'
+    pirgrammar.agcompile(pir_tg_source)
+    .local pmc pirbuilder
+    pirbuilder = pirgrammar.apply(ost)
+    .local pmc pir
+    pir = pirbuilder.get('result')
+    unless pir goto err_no_pir # if PIR not generated, stop
+
+    print "\n\nPIR dump:\n"
+    print pir
+
+    # Execute
+    .local pmc pir_compiler
+    .local pmc pir_compiled
+    pir_compiler = compreg "PIR"
+    pir_compiled = pir_compiler( pir )
+
+    pir_compiled()
 
     end
 
@@ -81,6 +117,12 @@ single digit, in the form of:
 
   err_no_ast:
     print "Unable to construct AST.\n"
+
+  err_no_ost:
+    print "Unable to construct OST.\n"
+
+  err_no_pir:
+    print "Unable to construct PIR.\n"
 
   cleanup:
     end
@@ -108,9 +150,16 @@ single digit, in the form of:
     .param string filename
     .local pmc filehandle
     filehandle = open filename, "<"
+    unless filehandle goto err_no_file
     $S1 = read filehandle, 65535
     close filehandle
     .return ($S1)
+
+  err_no_file:
+    print "Unable to open file "
+    print filename
+    print "\n"
+    end
 .end
 
 =head1 LICENSE

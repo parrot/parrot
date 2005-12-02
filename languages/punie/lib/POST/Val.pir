@@ -1,19 +1,19 @@
 =head1 NAME
 
-PAST::Val - Nodes for literal values
+POST::Val - Nodes for literal values
 
 =head1 DESCRIPTION
 
-PAST::Val is a subclass of PAST::Node.
+POST::Val is a literal value in the OST. It is a subclass of POST::Node.
 
 =cut
 
-.namespace [ "PAST::Val" ]
+.namespace [ "POST::Val" ]
 
 .sub "__onload" @LOAD
     .local pmc base
-    $P0 = getclass 'PAST::Node'
-    base = subclass $P0, 'PAST::Val'
+    $P0 = getclass 'POST::Node'
+    base = subclass $P0, 'POST::Val'
     addattribute base, "value"             # the value of this leaf
     .return ()
 .end

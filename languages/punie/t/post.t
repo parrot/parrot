@@ -2,24 +2,24 @@
 
 use strict;
 use lib qw(t . lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 7;
+use Parrot::Test tests => 3;
 
 pir_output_is(<<'CODE', <<'OUT', 'load the libraries');
 .sub _main
-    load_bytecode 'languages/punie/lib/PAST.pir'
+    load_bytecode 'languages/punie/lib/POST.pir'
 .end
 CODE
 OUT
 
-foreach my $module (qw(Code Exp Stmts Stmt Sub Var)) {
+foreach my $module (qw(Sub Var)) {
 my $code = <<'CODE'
 .sub _main
-    load_bytecode 'languages/punie/lib/PAST.pir'
+    load_bytecode 'languages/punie/lib/POST.pir'
     .local pmc node
 CODE
 ;
 
-$code .= "    node = new 'PAST::$module'\n";
+$code .= "    node = new 'POST::$module'\n";
 $code .= <<'CODE'
     $P0 = new PerlString
     $P0 = 'bar'
@@ -41,7 +41,7 @@ $code .= <<'CODE'
 CODE
 ;
 
-pir_output_is($code, <<'OUT', "set attributes for PAST::$module via method");
+pir_output_is($code, <<'OUT', "set attributes for POST::$module via method");
 foo
 42
 bar

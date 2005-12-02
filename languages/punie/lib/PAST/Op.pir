@@ -57,3 +57,8 @@ is a subclass of PAST::Node.
     print "}\n"
     .return ()
 .end
+
+.sub op method
+    $P2 = getattribute self, "op"
+    .return ($P2)
+.end
