@@ -11,6 +11,9 @@ classes/luatable.pmc - Lua Table
 C<LuaTable> extends C<Hash> to provide a class with the behaviour of
 the Lua C<Table> type.
 
+TRIVIAL IMPLEMENTATION : C<Table> is just a Parrot C<Hash>, like in Lua 4.0.
+Now, Lua 5.0 uses a hybrid data structure with a Hash part and an Array part.
+
 =head2 Overloaded Methods
 
 =over 4
@@ -21,15 +24,8 @@ the Lua C<Table> type.
 
 #include "parrot/parrot.h"
 
-/* The internal type of the Lua Nil class, dynamically allocated when loading
-* the PMC library, will be stored in this INTVAL, for fast access 
-*/
-static INTVAL dynclass_Lua_Nil;
-
-/* When a table is asked for its name, this STRING is returned 
-*/
 static STRING *luatable_name;
-
+static PMC *Lua_Nil;
 
 pmclass LuaTable
     extends Hash 
@@ -38,12 +34,12 @@ pmclass LuaTable
     group lua_group 
     hll Lua {
 
-/* Class initialization. Caches constant strings that will be used later.
+/* Class initialization. Caches constant strings & PMC that will be used later.
 */
     void class_init() {
         if (pass) {
-            dynclass_Lua_Nil = Parrot_PMC_typenum(INTERP, "LuaNil");
             luatable_name = const_string(INTERP, "table");
+            Lua_Nil = pmc_new(INTERP, Parrot_PMC_typenum(INTERP, "LuaNil"));
         }
     }
      
@@ -55,10 +51,22 @@ Return the string "table".
 
 =cut
 
-*/
+*/                                               
     STRING* name () {
         return luatable_name;
     }   
+
+
+/*
+
+=item C<STRING* get_string()>
+
+=cut
+
+*/
+    STRING* get_string () {
+        return Parrot_sprintf_c(INTERP, "table: %08X", SELF);
+    }
 
 /*
 
@@ -76,21 +84,27 @@ So return always true.
         return 1;
     }
 
-    /* Metatable methods */    
+/*
 
+=item C<PMC* get_pmc_keyed (PMC* key)>
 
-    /* Accessing fields: "index" metamethod */
+C<table> accessor.
 
-    /* case string key
+=cut
+
+*/
+
+    /* case pmc key
     *
-    * P0 = P1["Hello"]
-    *
+    * P0 = new .Key
+    * P0 = "hiya"
+    * P1 = P2[P0]
     */
-    PMC* get_pmc_keyed_str (STRING* key) {
+    PMC* get_pmc_keyed (PMC* key) {
         PMC *retval = SUPER(key);
 
-        if (retval->vtable->base_type == enum_class_None) {
-            return pmc_new(interpreter, dynclass_Lua_Nil);
+        if (enum_class_None == retval->vtable->base_type) {
+            return Lua_Nil;
         }
         return retval;
     }
@@ -102,47 +116,67 @@ So return always true.
     */
     PMC* get_pmc_keyed_int (INTVAL key) {
         PMC *retval = SUPER(key);
-        if (retval->vtable->base_type == enum_class_None) {
-            return pmc_new(interpreter, dynclass_Lua_Nil);
+
+        if (enum_class_None == retval->vtable->base_type) {
+            return Lua_Nil;
         }
         return retval;
     }
 
-    /* case pmc key
+    /* case string key
     *
-    * P0 = new .Key
-    * P0 = "hiya"
-    * P1 = P2[P0]
+    * P0 = P1["Hello"]
+    *
     */
-
-    PMC* get_pmc_keyed (PMC* key) {
+    PMC* get_pmc_keyed_str (STRING* key) {
         PMC *retval = SUPER(key);
 
-        if (retval->vtable->base_type == enum_class_None) {
-            return pmc_new(interpreter, dynclass_Lua_Nil);
+        if (enum_class_None == retval->vtable->base_type) {
+            return Lua_Nil;
         }
         return retval;
     }
 
+/*
 
-    /* Accessing fields: "newindex" metamethod */
+=item C<void set_pmc_keyed (PMC* key, PMC* value)>
 
+C<table> mutator.
+
+=cut
+
+*/
     void set_pmc_keyed (PMC* key, PMC* value) {
+        if (key == Lua_Nil) {
+            real_exception(INTERP, NULL, 1, "table index is nil");
+        }
+        if (value == Lua_Nil) {
+            Hash.SELF.delete_keyed(key);
+        } else {
+            SUPER(key, value);
+        }
     }
 
     void set_pmc_keyed_int (INTVAL key, PMC* value) {
+        SUPER(key, value);
+        if (value == Lua_Nil) {
+            default.SELF.delete_keyed_int(key);
+        } else {
+            SUPER(key, value);
+        }
     }
 
     void set_pmc_keyed_str (STRING* key, PMC* value) {
+        SUPER(key, value);
+        if (value == Lua_Nil) {
+            Hash.SELF.delete_keyed_str(key);
+        } else {
+            SUPER(key, value);
+        }
     }
-
 
 
     /* Other metamethods */
-
-    STRING* get_string () {
-        return Parrot_sprintf_c(INTERP, "table: 0x%x", SELF);
-    }
 
     PMC* add (PMC* value, PMC* dest) {
         PMC *metatable = DYNSELF.getprop("__metatable");

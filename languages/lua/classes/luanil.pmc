@@ -8,7 +8,7 @@ classes/luanil.pmc - Lua Nil
 
 =head1 DESCRIPTION
 
-C<LuaNil> extends C<None> to provide a class with the behaviour of
+C<LuaNil> extends C<Python None> to provide a class with the behaviour of
 the Lua C<Nil> value.
 
 =head2 Overloaded Methods
@@ -29,7 +29,7 @@ pmclass LuaNil
     extends None 
     dynpmc 
     group lua_group 
-    hll Lua maps None {
+    hll Lua {
 
 /* Class initialization. Caches constant strings that will be used later.
 */
@@ -78,29 +78,28 @@ Return the string "nil".
         return string_representation;
     }
   
+/*
+
+=item C<void* get_pointer()>
+
+=item C<void set_pointer(void *ptr)>
+
+These two functions are part of the singleton creation interface. For more
+information see F<src/pmc.c>.
+
+=cut
+
+*/
     void* get_pointer() {
         return Lua_Nil;
     }
 
     void set_pointer(void* ptr) {
-        assert(!Lua_Nil); /* do we really need this assert? */
         Lua_Nil = (PMC*)ptr;
     }
   
-    void set_pmc_keyed (PMC* key, PMC* value) {
-        real_exception(INTERP, NULL, 1, "Attempt to index a nil value");
-    }
-  
-    void set_pmc_keyed_int (INTVAL key, PMC* value) {
-        real_exception(INTERP, NULL, 1, "Attempt to index a nil value");
-    }
-  
-    void set_pmc_keyed_str (STRING* key, PMC* value) {
-        real_exception(INTERP, NULL, 1, "Attempt to index a nil value");
-    }
-  
 }
-
+  
 /*
 
 =back

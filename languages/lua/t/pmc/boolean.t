@@ -8,7 +8,7 @@ t/pmc/boolean.t - LuaBoolean
 
 =head1 SYNOPSIS
 
-	% perl -I../../lib t/pmc/boolean.t
+    % perl -I../../lib t/pmc/boolean.t
 
 =head1 DESCRIPTION
 

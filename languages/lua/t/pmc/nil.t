@@ -8,7 +8,7 @@ t/pmc/nil.t - LuaNil
 
 =head1 SYNOPSIS    
 
-	% perl -I../../lib t/pmc/nil.t
+    % perl -I../../lib t/pmc/nil.t
 
 =head1 DESCRIPTION
 
@@ -16,7 +16,7 @@ Tests C<LuaNil> PMC.
 
 =cut
 
-use Parrot::Test tests => 7;
+use Parrot::Test tests => 8;
 use Test::More;
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "check inheritance");
@@ -79,13 +79,29 @@ nil
 nil
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "check get_string/get_repr");
+pir_output_is(<< 'CODE', << 'OUTPUT', "check get_string");
 .sub _main
     loadlib P1, "lua_group"
     find_type $I0, "LuaNil"
     .local pmc pmc1
     pmc1 = new $I0
     print pmc1
+    print "\n"
+    end
+.end
+CODE
+nil
+OUTPUT
+
+pir_output_is(<< 'CODE', << 'OUTPUT', "check get_repr");
+.sub _main
+    loadlib P1, "lua_group"
+    find_type $I0, "LuaNil"
+    .local pmc pmc1
+    pmc1 = new $I0
+    .local string str1
+    str1 = get_repr pmc1
+    print str1
     print "\n"
     end
 .end

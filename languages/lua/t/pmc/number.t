@@ -8,7 +8,7 @@ t/pmc/number.t - LuaNumber
 
 =head1 SYNOPSIS    
 
-	% perl -I../../lib t/pmc/number.t
+    % perl -I../../lib t/pmc/number.t
 
 =head1 DESCRIPTION
 

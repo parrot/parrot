@@ -6,12 +6,11 @@ languages/lua/t/harness - A harness for Parrot Lua
 
 =head1 SYNOPSIS
 
-  cd languages && perl -I../lib lua/t/harness --files
+    cd languages && perl -I../lib lua/t/harness --files
 
-  cd languages && perl -I../lib lua/t/harness 
+    cd languages && perl -I../lib lua/t/harness 
 
-  cd languages && perl -I../lib lua/t/harness \
-                   lua/t/pmc/boolean.t
+    cd languages && perl -I../lib lua/t/harness lua/t/pmc/nil.t
                    
 =head1 DESCRIPTION
 
@@ -62,11 +61,11 @@ if ( grep { m/^--files$/ } @ARGV ) {
 
 =head1 HISTORY
 
-Mostly taken from tcl/t/harness.
+Mostly taken from F<languages/tcl/t/harness>.
 
 =head1 SEE ALSO
 
-  F<languages/tcl/t/harness>, F<languages/scheme/t/harness>, F<languages/m4/t/harness>, F<languages/python/t/harness>
+F<languages/tcl/t/harness>, F<languages/scheme/t/harness>, F<languages/m4/t/harness>, F<languages/python/t/harness>
 
 =head1 AUTHOR
 

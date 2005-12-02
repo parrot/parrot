@@ -8,7 +8,7 @@ t/pmc/string.t - LuaString
 
 =head1 SYNOPSIS    
 
-	% perl -I../../lib t/pmc/string.t
+    % perl -I../../lib t/pmc/string.t
 
 =head1 DESCRIPTION
 
