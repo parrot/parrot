@@ -232,8 +232,9 @@ retrieved with 'guest/guest'.
 You will notice that some of the content is generated directly from the Parrot
 repository. So the usual rules for Parrot patches apply for this content.
 
-For changes specific for parrotcode.org please send patches to    B<webmaster>
-I<at> B<perl> I<dot> B<org>.
+For changes specific for parrotcode.org please send patches to    
+B<webmaster> I<at> B<perl> I<dot> B<org>, and cc
+B<perl6-internals> I<at> B<perl> I<dot> B<org>.
 
 =head1 HISTORY
 
