@@ -7,33 +7,28 @@ means being able to deal with all the commands in:
 
 http://cvs.sourceforge.net/viewcvs.py/tcl/tcl/library/tcltest/tcltest.tcl?view=markup
 
-This will require a lot of work. On the plus side, we'll be passing a lot more
+This will require a *lot* of work. On the plus side, we'll be passing a lot more
 tests by then. =-)
 
 =over 4
 
-=item 0
-
-Add the "unknown command" logic from the (commented out) tclcommand's interpret
-to the compiled version, and then remove the interpret :method.
-
-=item 1
+=item *
 
 Generate compiler-variants for several builtins, esp. those used by
 examples/bench.tcl - NB: bench.tcl is currently failing.
 
-=item 2
+=item *
 
 Add compiled TclComment objects, which do nothing other than generate
 PIR comments with the same text.
 
-=item 3
+=item *
 
 It would be nice if C<--pir> generated more human readable output. It's OK,
 I think, if the generated PIR has more whitespace all the time, even if
 a human isn't peeking.
 
-=item 4
+=item *
 
 It should be possible to implement some builtins in terms of other builtins.
 See http://wiki.tcl.tk/15051 for some musings on this. We already at least
