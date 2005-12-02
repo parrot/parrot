@@ -211,6 +211,5 @@ unk_elem_loop_done:
 done:
 
   pir_code .= pir_code2
-  print pir_code
   .return (register_num,pir_code)
 .end
