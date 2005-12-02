@@ -33,6 +33,13 @@ It would be nice if C<--pir> generated more human readable output. It's OK,
 I think, if the generated PIR has more whitespace all the time, even if
 a human isn't peeking.
 
+=item 4
+
+It should be possible to implement some builtins in terms of other builtins.
+See http://wiki.tcl.tk/15051 for some musings on this. We already at least
+partial implementations of most of the items there. If we go this route, then
+we need to pre-compile the builtins-in-tcl into PIR at build time.
+
 =back
 
 =head2 Generic tasks
