@@ -199,23 +199,119 @@ past_pir_ast.toStringList:
 
 .sub 'bc' :main
     load_bytecode 'languages/punie/lib/PAST.pir'
+    load_bytecode "TGE.pbc"
+    load_bytecode "languages/punie/lib/POST.pir"
 
-    # Build up the result for the ROOT node
-    $P1 = new PerlArray
-    $P2 = new 'PAST::Stmt'
-    $P2.set_node('dummy stmt', 10 ,$P1)
+    .local pmc val
+    val = new 'PAST::Val'
+    val.set_node('1', 0, 1 )
 
-    $P3 = new PerlArray
-    push $P3, $P2
-    .local pmc past
-    past = new 'PAST::Stmts'
-    past.set_node('dummy stmts',20,$P3)
-    print "\\n\\nPAST tree dump:\\n"
-    past.dump()
-"""
-   print '#' + past_pir_ast.toStringList()
-   print """
+    .local pmc exp
+    exp = new 'PAST::Exp'
+    $P4 = new PerlArray
+    push $P4, val 
+    exp.set_node('1', 1, $P4)
+
+    .local pmc op
+    op = new 'PAST::Op'
+    $P5 = new PerlArray
+    push $P5, exp 
+    op.set_node('1', 1, 'print' ,$P5)
+
+    .local pmc exp
+    exp = new 'PAST::Exp'
+    $P6 = new PerlArray
+    push $P6, op 
+    exp.set_node('1', 1 ,$P6)
+
+    .local pmc stmt
+    stmt = new 'PAST::Stmt'
+    $P7 = new PerlArray
+    push $P7, exp 
+    stmt.set_node('1', 1 ,$P7)
+
+    .local pmc stmts
+    stmts = new 'PAST::Stmts'
+    $P8 = new PerlArray
+    push $P8, stmt
+    stmts.set_node('1', 1, $P8)
+
+    # print "\\n\\nPAST tree dump:\\n"
+    # stmts.dump()
+
+    # Compile the abstract syntax tree down to an opcode syntax tree
+    .local string ost_tg_source
+    ost_tg_source = _slurp_file('../punie/lib/past2post.g')
+    .local pmc ostgrammar
+    ostgrammar = new 'TGE'
+    ostgrammar.agcompile(ost_tg_source)
+    .local pmc ostbuilder
+    ostbuilder = ostgrammar.apply(stmts)
+    .local pmc ost
+    ost = ostbuilder.get('result')
+    $I0 = defined ost
+    unless $I0 goto err_no_ost # if OST fails stop
+
+#    print "\\n\\nOST tree dump:\\n"
+#    ost.dump()
+
+    # Compile the OST down to PIR
+    .local string pir_tg_source
+    pir_tg_source = _slurp_file('../punie/lib/post2pir.g')
+    .local pmc pirgrammar
+    pirgrammar = new 'TGE'
+    pirgrammar.agcompile(pir_tg_source)
+    .local pmc pirbuilder
+    pirbuilder = pirgrammar.apply(ost)
+    .local pmc pir
+    pir = pirbuilder.get('result')
+    unless pir goto err_no_pir # if PIR not generated, stop
+
+#    print "\\n\\nPIR dump:\\n"
+#    print pir
+
+    # Execute
+    .local pmc pir_compiler
+    .local pmc pir_compiled
+    pir_compiler = compreg "PIR"
+    pir_compiled = pir_compiler( pir )
+
+    pir_compiled()
+
+    end
+
+  err_match_fail:
+    print "parse failed"
+    goto cleanup
+
+  err_no_ast:
+    print "Unable to construct AST.\\n"
+
+  err_no_ost:
+    print "Unable to construct OST.\\n"
+
+  err_no_pir:
+    print "Unable to construct PIR.\\n"
+
+  cleanup:
 .end
+
+.sub _slurp_file
+    .param string filename
+    .local pmc filehandle
+    filehandle = open filename, "<"
+    unless filehandle goto err_no_file
+    $S1 = read filehandle, 65535
+    close filehandle
+    .return ($S1)
+
+  err_no_file:
+    print "Unable to open file "
+    print filename
+    print "\\n"
+    end
+.end
+
 """
 
 if __name__ == "__main__":
