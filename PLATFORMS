@@ -43,7 +43,7 @@ vms
 win32-bcc
 win32-cygwin_1.5.11_1        Y    Y    -     Y*5 Y   Y    Y        20041006
 win32-icl_8.0.48             -    Y    -     -   -   Y    Y/2
-win32-mingw-gcc3.4.2         Y    Y    Y     -   -   Y    Y/7   Y  20050930
+win32-mingw-gcc3.4.2         Y    Y    Y     -   -   Y    Y/10  Y  20051202
 win32-msvc_6.0               -    Y    -     -   -   Y    Y        20050804
 win32-msvc_7.1               -    Y    -     -   -   Y    Y/18     20050930
 
