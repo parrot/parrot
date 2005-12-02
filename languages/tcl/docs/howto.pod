@@ -5,9 +5,6 @@ it's ok to send patches for tcl to the RT system for anything that isn't
 "BIG STUFF" - those, please bounce off me first. I'd prefer C<diff -u>
 patches, but am happy to take complete files as well.
 
-Most of this is mentioned in the TODO - in fact, this document probably
-should merge with the TODO to avoid redundancy.
-
 Since partcl is bundled with the parrot source, svn access is handled via
 the same mechanism as for parrot itself.
 
@@ -15,29 +12,57 @@ the same mechanism as for parrot itself.
 
 =over 4
 
-=item compiler bits
+=item Writing Builtins
 
 partcl is a compiler. Given a section of tcl code, it translates that code
 into an AST (in the form of a Tcl* object from lib/*). Once a section of code
 has been translated, the object's C<compile> method is invoked, which then
 generates PIR which can be compiled by parrot.
 
-When writing a new builtin, preferentially put it in
-C<< lib/builtins/<builtin>.pir >> , and follow the conventions for that
-directory. C<tcl.pl> will automatically generate a version in commands/ that
-invokes the inline'able version, compiles it, invokes it, and returns
-the result. The compiler will fall back to this version as necessary.
+The commands themselves are have inlineable (compiled) versions: These are
+in the lib/builtins, and all new development should go here. There are many
+old, runtime-only versions that exist in lib/commands. All *new* development
+should occur in lib/builtins. Minor patches to things in lib/commands are
+ok, though.
 
-Inlined builtins must take a register num to begin with, along with a single
-PMC with the various args. (As opposed to the interpreted-style, which takes
-a vararg list.). They must return the register in which the result of the
-command is stored, along with the generated PIR. The results of calling
+When you define an inline-able builtin,
+C<tcl.pl> will automatically generate a version similar in those in
+lib/commands/ that
+invokes the inline'able version, compiles it, invokes it, and returns
+the result immediately. The compiler will fall back to this version as 
+necessary, you don't have to worry about it.
+
+Inlined builtins take two args: a register num, along with a single
+container PMC with the various args. The register num is the first $P
+register that is available for use when you generate your PIR. The container
+PMC has objects generated from parser that need to be compiled themselves
+before you can rely on their values. Your return value is going to be
+the $P register in which your result is, along with the PIR code that you
+generated which will produce this result. Be sure to include any PIR generated
+by objects you call 'compile'() on along the way.
+
+(This is as opposed to the interpreted style in lib/commands, which takes
+a variable number of already compiled args at runtime. Our fallback method
+bundles these up, passing in a starting register of 0, and uses the resulting
+PIR to generate a .sub immediately and then invoke it.)
+
+Remember, every arg to your builtin is potentially variable and may change
+at runtime. You can check the type of the object at compile time. However,
+if it's constant, then you can optimize: for example, we could optimize 
+[puts -nonewline "whee\n"] down to, basically, {print "whee\n"}... however,
+we still have to be able to deal with [set a -nonewline; puts $a "whee\n"].
+So, your first pass should probably do no optimizations. If you see a potential
+for optimization, however, at least add an XXX comment so we can get back to
+it later. At this point, I'd rather spend time working on new features than
+making existing features faster.
+
+The results of calling
 the inlined code will be used by C<lib/tclcommand.pir>. The inlined code
 is further wrapped in a protective conditional which will skip
 the inlined version if it can no longer be trusted (that is, if [proc]
 or [rename] has been invoked), and will fall back to
 the interpreted version as necessary. (And throw an exception if the command
-is not found at runtime.)
+is not found at runtime.).
 
 =item speed
 
