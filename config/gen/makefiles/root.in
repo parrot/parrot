@@ -1279,6 +1279,8 @@ RUNCORE_TEST_FILES = \
 	t/examples/*.t
 TOOLS_TEST_FILES = \
 	t/tools/*.t
+DISTRO_TEST_FILES = \
+	t/distro/*.t
 
 # Common prep for all test targets.
 # We propably need a complete build before running the tests.
@@ -1305,7 +1307,8 @@ fulltest : \
 	src_tests \
 	perl_tests \
 	testbench \
-	doc_tests
+	doc_tests \
+	distro_tests
 
 # bounds checking, slow core
 testb : test_prep
@@ -1364,6 +1367,9 @@ doc_tests :
 mopsbench : test_prep
 	$(PARROT) $(PARROT_ARGS) examples/benchmarks/mops_intval.pasm
 
+# distro tests
+distro_tests : test_prep
+	$(PERL) t/harness $(DISTRO_TEST_FILES)
 
 ###############################################################################
 #
