@@ -256,13 +256,30 @@ clear_regs(Interp *interpreter, parrot_context_t *ctx)
 }
 
 static void
-init_context(Interp *interpreter, parrot_context_t *ctx)
+init_context(Interp *interpreter, parrot_context_t *ctx, parrot_context_t *old)
 {
-    ctx->ref_count = 0;
+    ctx->ref_count = 0;                 /* TODO 1 - Exceptions !!! */
     ctx->current_results = NULL;
-    ctx->malloced_mem = NULL;
-    ctx->outer_ctx = NULL;
     ctx->lex_pad = PMCNULL;
+    ctx->outer_ctx = NULL;
+    ctx->current_cont = NULL;
+    ctx->current_package = NULL; /* XXX unused except tests */
+    ctx->current_method = NULL; /* XXX who clears it? */
+    ctx->current_object = NULL; /* XXX who clears it?  */
+    if (old) {
+        /* some items should better be COW copied */
+        ctx->constants = old->constants;
+        ctx->reg_stack = old->reg_stack;     /* XXX move into interpreter? */
+        ctx->user_stack = old->user_stack;   /* XXX move into interpreter? */
+        ctx->control_stack = old->control_stack;
+        ctx->warns = old->warns;
+        ctx->errors = old->errors;
+        ctx->trace_flags = old->trace_flags;
+        ctx->runloop_level = old->runloop_level;
+        /* end COW */
+        ctx->recursion_depth = old->recursion_depth;
+    }
+    /* other stuff is set inside Sub.invoke */
     clear_regs(interpreter, ctx);
 }
 
@@ -381,6 +398,10 @@ Parrot_alloc_context(Interp *interpreter, INTVAL *n_regs_used)
     int i, n, slot;
     size_t to_alloc, reg_alloc, size_n, size_nip;
 
+    /*
+     * TODO (OPT) if we allocate a new context due to a self-recursive call
+     *      create a spezialized version that just uses caller's size
+     */
     size_n = sizeof(FLOATVAL) * n_regs_used[REGNO_NUM];
     size_nip = size_n +
         sizeof(INTVAL) *   n_regs_used[REGNO_INT] +
@@ -400,22 +421,21 @@ Parrot_alloc_context(Interp *interpreter, INTVAL *n_regs_used)
     }
 
     ptr = interpreter->ctx_mem.free_list[slot];
+    old = CONTEXT(interpreter->ctx);
     if (ptr) {
         interpreter->ctx_mem.free_list[slot] = *(void **) ptr;
     }
     else {
         to_alloc = reg_alloc + ALIGNED_CTX_SIZE;
-        ptr = mem_sys_allocate(to_alloc);
+        if (old)
+            ptr = mem_sys_allocate(to_alloc);
+        else
+            ptr = mem_sys_allocate_zeroed(to_alloc);
     }
 #if CTX_LEAK_DEBUG
     fprintf(stderr, "alloc %p\n", ptr);
 #endif
-    old = CONTEXT(interpreter->ctx);
     CONTEXT(interpreter->ctx) = ctx = ptr;
-    if (old)
-        memcpy(ctx, old, sizeof(struct Parrot_Context));
-    else
-        memset(ctx, 0, sizeof(struct Parrot_Context));
     ctx->prev = old;
     ctx->regs_mem_size = reg_alloc;
     for (i = 0; i < 4; ++i)
@@ -426,7 +446,7 @@ Parrot_alloc_context(Interp *interpreter, INTVAL *n_regs_used)
     interpreter->ctx.bp.regs_i = (INTVAL*)((char*)p + size_n);
     /* this points to S0 */
     interpreter->ctx.bp_ps.regs_s = (STRING**)((char*)p + size_nip);
-    init_context(interpreter, ctx);
+    init_context(interpreter, ctx, old);
 }
 
 void
@@ -450,25 +470,17 @@ Parrot_free_context(Interp *interpreter, parrot_context_t *ctxp, int re_use)
             /* can't probably PIO_eprintf here */
             parrot_sub_t doomed = PMC_sub(ctxp->current_sub);
             fprintf(stderr,
-                "'ctx of sub '%s' is really dead "
-                "now and not pining at all\n",
-                (char*)doomed->name->strstart);
+                    "'ctx of sub '%s' is really dead "
+                    "now and not pining at all\n",
+                    (char*)doomed->name->strstart);
         }
 #endif
-        if (ctxp->malloced_mem) {
-            /* we don't have the orig size anymore, just free all
-            */
-            mem_sys_free(ctxp->malloced_mem);
-            mem_sys_free(ctxp);
-        }
-        else {
-            ptr = ctxp;
-            slot = ctxp->regs_mem_size >> 3;
+        ptr = ctxp;
+        slot = ctxp->regs_mem_size >> 3;
 
-            assert(slot < interpreter->ctx_mem.n_free_slots);
-            *(void **)ptr = interpreter->ctx_mem.free_list[slot];
-            interpreter->ctx_mem.free_list[slot] = ptr;
-        }
+        assert(slot < interpreter->ctx_mem.n_free_slots);
+        *(void **)ptr = interpreter->ctx_mem.free_list[slot];
+        interpreter->ctx_mem.free_list[slot] = ptr;
 #if CTX_LEAK_DEBUG
         fprintf(stderr, "free  %p\n", ctxp);
 #endif

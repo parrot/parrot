@@ -173,7 +173,6 @@ typedef struct Parrot_Context {
     Regs_ni                bp;          /* pointers to FLOATVAL & INTVAL */
     Regs_ps                bp_ps;       /* pointers to PMC & STR */
     /* end common header */
-    void  *malloced_mem;                /* used during resize */
     INTVAL n_regs_used[4];	        /* INSP in PBC */
     size_t regs_mem_size;               /* memory occupied by registers */
     INTVAL ref_count;                   /* how often refered to */

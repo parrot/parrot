@@ -287,6 +287,9 @@ Invokes the subroutine.
         Parrot_alloc_context(INTERP, sub->n_regs_used);
         context = CONTEXT(INTERP->ctx);
         context->caller_ctx = caller_ctx;
+        context->current_sub = SELF;
+        context->current_pc = pc;
+        context->current_cont = ccont;
         /* check recursion/call depth */
         if (++context->recursion_depth >
                 INTERP->recursion_limit) {
@@ -296,14 +299,11 @@ Invokes the subroutine.
         /*
          * and copy set context variables
          */
-        context->current_cont = ccont;
         PMC_cont(ccont)->from_ctx = context;
         /*
          * set context of the sub
          */
         sub->ctx = context;
-        context->current_sub = SELF;
-        context->current_pc = pc;
 
         if (!PMC_IS_NULL(INTERP->current_object)) {
             context->current_object = INTERP->current_object;
