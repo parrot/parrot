@@ -146,16 +146,19 @@ key and value that was set after it has been changed.
 =cut
 
 sub settrigger {
-    my ($self, $var, $trigger, $cb) = @_;
+    my ($self, $key, $trigger, $cb) = @_;
+
+    return unless defined $key and defined $trigger and defined $cb;
 
     my $verbose = defined $self->get('verbose') && $self->get('verbose') == 2;
 
-    if (defined $cb) {
-        print "Setting trigger $trigger on configuration key $var\n"
-            if $verbose;
+    print "Setting trigger $trigger on configuration key $key",
+        Dumper($cb), "\n"
+        if $verbose;
 
-        $triggers{$var}{$trigger} = $cb;
-    }
+    $triggers{$key}{$trigger} = $cb;
+
+    return $self;
 }
 
 =item Parrot::Configure::Data->gettriggers($key)
@@ -167,6 +170,13 @@ Get the names of all triggers set for C<$key>.
 sub gettriggers {
     my ($self, $key) = @_;
 
+    return unless defined $triggers{$key};
+
+    my $verbose = defined $self->get('verbose') && $self->get('verbose') == 2;
+
+    print "Looking up all triggers on configuration key $key\n"
+        if $verbose;
+
     return CORE::keys %{$triggers{$key}};
 }
 
@@ -177,10 +187,16 @@ Get the callback set for C<$key> under the name C<$trigger>
 =cut
 
 sub gettrigger {
-    my ($self, $key, $t) = @_;
+    my ($self, $key, $trigger) = @_;
 
-    return unless defined $triggers{$key} and defined $triggers{$key}{$t};
-    return $triggers{$key}{$t};
+    return unless defined $triggers{$key} and defined $triggers{$key}{$trigger};
+
+    my $verbose = defined $self->get('verbose') && $self->get('verbose') == 2;
+
+    print "Looking up trigger $trigger on configuration key $key\n"
+        if $verbose;
+
+    return $triggers{$key}{$trigger};
 }
 
 =item Parrot::Configure::Data->deltrigger($key, $trigger)
@@ -190,17 +206,18 @@ Removes the trigger on C<$key> named by C<$trigger>
 =cut
 
 sub deltrigger {
-    my ($self, $var, $t) = @_;
+    my ($self, $key, $trigger) = @_;
+
+    return unless defined $triggers{$key} and defined $triggers{$key}{$trigger};
 
     my $verbose = defined $self->get('verbose') && $self->get('verbose') == 2;
 
-    return unless defined $triggers{$var} and defined $triggers{$var}{$t};
-
-    print "Removing trigger $t on configuration key $var\n"
+    print "Removing trigger $trigger on configuration key $key\n"
         if $verbose;
 
-    delete $triggers{$var}{$t};
+    delete $triggers{$key}{$trigger};
 
+    return $self;
 }
 
 =back
