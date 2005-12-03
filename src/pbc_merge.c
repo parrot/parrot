@@ -502,6 +502,53 @@ pbc_merge_debugs(Interp *interpreter, struct pbc_merge_input **inputs,
     debug_seg->num_mappings = num_mappings;
 }
 
+/*
+
+static void
+pbc_merge_pic_index(Interp *interpreter, struct pbc_merge_input **inputs,
+                 int num_inputs, struct PackFile *pf,
+                 struct PackFile_ByteCode *bc)
+
+This function merges the pic_index segments from the input PBC files.
+
+*/
+
+static void
+pbc_merge_pic_index(Interp *interpreter, struct pbc_merge_input **inputs,
+                 int num_inputs, struct PackFile *pf,
+                 struct PackFile_ByteCode *bc)
+{
+    int i;
+    struct PackFile_Segment * pic_index, *in_seg; 
+    size_t size, j;
+    opcode_t k, cursor = 0, start = 0, last;
+
+    /* calc needed size */
+    for (i = 0, size = 0; i < num_inputs; i++) {
+        in_seg = inputs[i]->pf->cur_cs->pic_index;
+	size += in_seg->size;
+    }
+    pic_index = PackFile_Segment_new_seg(interpreter,
+              &pf->directory, PF_UNKNOWN_SEG, "PIC_idx_MERGED", 1);
+    pic_index->data = mem_sys_allocate_zeroed(size * sizeof(opcode_t));
+    pic_index->size = size;
+    for (i = 0, size = 0; i < num_inputs; i++) {
+        in_seg = inputs[i]->pf->cur_cs->pic_index;
+	/*
+	 * pic_index is 0 or an ever increasing (by 1) number
+	 */
+	for (j = 0; j < in_seg->size; j++) {
+	    k = in_seg->data[j];
+	    if (k) {
+		pic_index->data[cursor] = k + start;
+		last = k;
+	    }
+	    cursor++;
+	}
+	start = last;
+    }
+    bc->pic_index = pic_index;
+}
 
 /*
 
@@ -597,6 +644,7 @@ pbc_merge_begin(Interp *interpreter, struct pbc_merge_input **inputs,
     ct = pbc_merge_constants(interpreter, inputs, num_inputs, merged, bc);
     pbc_merge_fixups(interpreter, inputs, num_inputs, merged, bc);
     pbc_merge_debugs(interpreter, inputs, num_inputs, merged, bc);
+    pbc_merge_pic_index(interpreter, inputs, num_inputs, merged, bc);
 
     /* Walk bytecode and fix ops that reference the constants table. */
     pbc_merge_ctpointers(interpreter, inputs, num_inputs, merged, bc, ct);
