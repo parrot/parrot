@@ -1,14 +1,22 @@
 # Copyright: 2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
-This in an implementation of 'POSIX bc' with the help of Python classes created from
-an ANTLR grammar.
+This is an implementation of 'POSIX bc' for Parrot.
+'bc' is an arbitrary precision calculator dating back from Unix stone age.
+See L<http://en.wikipedia.org/wiki/Bc_%28Unix%29> for details.
+
+Implementation strategy:
+
+Generate PIR that sets up a PAST data structure, that will be transformed to POST
+which will be transformed to PIR, which will be  executed by Parrot.
+For details set 'languages/punie/punie.pir' and
+http://svn.lohutok.net/nam/trunk/parrot/docs/compiler_tools.pod
 
 Requirements:
 
-For development ANTLR 2.7.5, and thus Java, is required.
-The runtime files for Lexer and Parser are in the Parror SVN, thus only
-python is required for running.
+For maintainance and development ANTLR 2.7.5, and thus Java, is required.
+The runtime files for lexer and parsers are in the Parrot repository, thus only
+Python is required for running.
 
 Building lexer, parser and treeparser:
 
@@ -16,14 +24,13 @@ Building lexer, parser and treeparser:
 
 Building:
 
-'make help'
+'make'
 
 Testing:
 
 'make test'. When GNU bc is available, the test suite will be run against GNU bc as well.
 For compatability with 'POSIX bc' the flags '--standard' and '--quiet' are used.
 
-Strategy:
+Documentation:
 
-Generate PIR that sets up a PAST data structure, that will be executed by
-whatever will executes Punie.
+Sparse documentation is available in docs/parrot_bc.pod.
