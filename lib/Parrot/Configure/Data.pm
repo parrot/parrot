@@ -152,8 +152,7 @@ sub settrigger {
 
     my $verbose = defined $self->get('verbose') && $self->get('verbose') == 2;
 
-    print "Setting trigger $trigger on configuration key $key",
-        Dumper($cb), "\n"
+    print "Setting trigger $trigger on configuration key $key\n",
         if $verbose;
 
     $triggers{$key}{$trigger} = $cb;
