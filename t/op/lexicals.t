@@ -469,6 +469,121 @@ main
 I messed with your var
 OUTPUT
 
+
+pir_output_is(<<'CODE', <<'OUTPUT', 'get_outer(outer sub name reused) - always uses first sub of same name');
+.sub main :main
+	bar()
+.end
+
+.sub foo :anon :outer('main')
+.end
+
+.sub foo :anon
+.end
+
+.sub foo
+.end
+
+.sub bar :outer('foo')
+	.include 'interpinfo.pasm'
+	$P1 = interpinfo .INTERPINFO_CURRENT_SUB
+	$P2 = $P1.'get_outer'()
+	print $P2
+	print "\n"
+	$P3 = $P2.'get_outer'()
+	print $P3
+	print "\n"
+.end
+CODE
+foo
+main
+OUTPUT
+
+pir_output_like(<<'CODE', <<'OUTPUT', 'get_outer(outer sub name reused) - always uses first sub of same name');
+.sub main :main
+	bar()
+.end
+
+.sub foo :anon
+.end
+
+.sub foo :anon :outer('main')
+.end
+
+.sub foo
+.end
+
+.sub bar :outer('foo')
+	.include 'interpinfo.pasm'
+	$P1 = interpinfo .INTERPINFO_CURRENT_SUB
+	$P2 = $P1.'get_outer'()
+	print $P2
+	print "\n"
+	$P3 = $P2.'get_outer'()
+	print $P3
+	print "\n"
+.end
+CODE
+/foo\nNull PMC access in get_string()/
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', 'get_outer(outer sub name reused) - always uses first sub of same name');
+.sub main :main
+	bar()
+.end
+
+.sub foo :outer('main')
+.end
+
+.sub foo :anon
+.end
+
+.sub foo :anon
+.end
+
+.sub bar :outer('foo')
+	.include 'interpinfo.pasm'
+	$P1 = interpinfo .INTERPINFO_CURRENT_SUB
+	$P2 = $P1.'get_outer'()
+	print $P2
+	print "\n"
+	$P3 = $P2.'get_outer'()
+	print $P3
+	print "\n"
+.end
+CODE
+foo
+main
+OUTPUT
+
+pir_output_like(<<'CODE', <<'OUTPUT', 'get_outer(outer sub name reused) - always uses first sub of same name');
+.sub main :main
+	bar()
+.end
+
+.sub foo
+.end
+
+.sub foo :anon :outer('main')
+.end
+
+.sub foo :anon
+.end
+
+.sub bar :outer('foo')
+	.include 'interpinfo.pasm'
+	$P1 = interpinfo .INTERPINFO_CURRENT_SUB
+	$P2 = $P1.'get_outer'()
+	print $P2
+	print "\n"
+	$P3 = $P2.'get_outer'()
+	print $P3
+	print "\n"
+.end
+CODE
+/foo\nNull PMC access in get_string()/
+OUTPUT
+
 pir_output_is(<<'CODE', <<'OUTPUT', 'closure 3');
 # sub foo {
 #     my ($n) = @_;
@@ -876,4 +991,4 @@ OUTPUT
 
 
 ## remember to change the number of tests :-)
-BEGIN { plan tests => 36; }
+BEGIN { plan tests => 40; }
