@@ -441,6 +441,14 @@ Archives the subroutine.
         (info->visit_pmc_now)(INTERP, sub->multi_signature, info);
         info->thaw_ptr = &sub->outer_sub;
         (info->visit_pmc_now)(INTERP, sub->outer_sub, info);
+        /*
+         * XXX visit_pmc_now is wrong, because it breaks
+         *     depth-first visit inside the todo list
+         * TODO change all user visit functions to use
+         *    visit_pmc (the todo renamed visit_pm_later)
+         *
+         * Therefore the hash must be last during visit for now.   
+         */    
         info->thaw_ptr = &sub->lex_info;
         (info->visit_pmc_now)(INTERP, sub->lex_info, info);
         SUPER(info);
