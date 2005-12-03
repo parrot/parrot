@@ -103,6 +103,12 @@ Arrays so that we can use the splice opcode. Need to have better splice
 support in parrot array classes, as well as our own. See
 C<lib/commands/linsert.pir>.
 
+=item flush diagnostics
+
+At the moment, there doesn't seem to be a parrot method for determining if 
+a filehandled was opened for reading/writing. We can work around this by
+tracking it in a hash in the _Tcl namespace.
+
 =back
 
 =cut
