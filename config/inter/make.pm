@@ -45,17 +45,16 @@ sub runstep {
     if (defined $prog) {
         Parrot::Configure::Data->set($util => $prog);
         $result = 'yes';
-        return undef;
-    }
+    } else {
+        $prog = check_progs(['gmake', 'mingw32-make', 'nmake', 'make']);
 
-    $prog = check_progs(['gmake', 'mingw32-make', 'nmake', 'make']);
+        unless ($prog) {
+            # fall back to default
+            $result = 'no';
+            return undef;
+        }
+    }
     
-    unless ($prog) {
-        # fall back to default
-        $result = 'no';
-        return undef;
-    }
-
     if ($args{ask}) {
         $prog = prompt($prompt, $prog ? $prog : Parrot::Configure::Data->get($util));
     }
