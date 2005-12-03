@@ -1,4 +1,4 @@
-### $ANTLR 2.7.5 (20051104): "bc_python.g" -> "BcTreeWalker.py"$
+### $ANTLR 2.7.5 (20051104): "antlr2past.g" -> "Antlr2PastTreeWalker.py"$
 ### import antlr and other modules ..
 import sys
 import antlr
@@ -61,6 +61,11 @@ PIR_HEADER = 40
 PIR_NOOP = 41
 PIR_COMMENT = 42
 PIR_NEWLINE = 43
+PAST_Stmts = 44
+PAST_Stmt = 45
+PAST_Exp = 46
+PAST_Op = 47
+PAST_Val = 48
 
 ### user code>>>
 
@@ -94,12 +99,12 @@ class Walker(antlr.TreeParser):
         right = None
         try:      ## for error handling
             pass
-            _t83 = _t
+            _t2 = _t
             tmp1_AST = None
             tmp1_AST_in = None
             tmp1_AST = self.astFactory.create(_t)
             tmp1_AST_in = _t
-            _currentAST83 = currentAST.copy()
+            _currentAST2 = currentAST.copy()
             currentAST.root = currentAST.child
             currentAST.child = None
             self.match(_t,PLUS)
@@ -112,8 +117,8 @@ class Walker(antlr.TreeParser):
             reg_name_right=self.expr(_t)
             _t = self._retTree
             right_AST = self.returnAST
-            currentAST = _currentAST83
-            _t = _t83
+            currentAST = _currentAST2
+            _t = _t2
             _t = _t.getNextSibling()
             plus_AST = currentAST.root
             reg_name = "$P%d" % self.reg_num
@@ -223,12 +228,12 @@ class Walker(antlr.TreeParser):
         right = None
         try:      ## for error handling
             pass
-            _t85 = _t
+            _t4 = _t
             tmp2_AST = None
             tmp2_AST_in = None
             tmp2_AST = self.astFactory.create(_t)
             tmp2_AST_in = _t
-            _currentAST85 = currentAST.copy()
+            _currentAST4 = currentAST.copy()
             currentAST.root = currentAST.child
             currentAST.child = None
             self.match(_t,MINUS)
@@ -241,8 +246,8 @@ class Walker(antlr.TreeParser):
             reg_name_right=self.expr(_t)
             _t = self._retTree
             right_AST = self.returnAST
-            currentAST = _currentAST85
-            _t = _t85
+            currentAST = _currentAST4
+            _t = _t4
             _t = _t.getNextSibling()
             minus_AST = currentAST.root
             reg_name = "$P%d" % self.reg_num
@@ -282,12 +287,12 @@ class Walker(antlr.TreeParser):
         right = None
         try:      ## for error handling
             pass
-            _t87 = _t
+            _t6 = _t
             tmp3_AST = None
             tmp3_AST_in = None
             tmp3_AST = self.astFactory.create(_t)
             tmp3_AST_in = _t
-            _currentAST87 = currentAST.copy()
+            _currentAST6 = currentAST.copy()
             currentAST.root = currentAST.child
             currentAST.child = None
             self.match(_t,MUL)
@@ -300,8 +305,8 @@ class Walker(antlr.TreeParser):
             reg_name_right=self.expr(_t)
             _t = self._retTree
             right_AST = self.returnAST
-            currentAST = _currentAST87
-            _t = _t87
+            currentAST = _currentAST6
+            _t = _t6
             _t = _t.getNextSibling()
             mul_AST = currentAST.root
             reg_name = "$P%d" % self.reg_num
@@ -341,12 +346,12 @@ class Walker(antlr.TreeParser):
         right = None
         try:      ## for error handling
             pass
-            _t89 = _t
+            _t8 = _t
             tmp4_AST = None
             tmp4_AST_in = None
             tmp4_AST = self.astFactory.create(_t)
             tmp4_AST_in = _t
-            _currentAST89 = currentAST.copy()
+            _currentAST8 = currentAST.copy()
             currentAST.root = currentAST.child
             currentAST.child = None
             self.match(_t,DIV)
@@ -359,8 +364,8 @@ class Walker(antlr.TreeParser):
             reg_name_right=self.expr(_t)
             _t = self._retTree
             right_AST = self.returnAST
-            currentAST = _currentAST89
-            _t = _t89
+            currentAST = _currentAST8
+            _t = _t8
             _t = _t.getNextSibling()
             div_AST = currentAST.root
             reg_name = "$P%d" % self.reg_num
@@ -400,12 +405,12 @@ class Walker(antlr.TreeParser):
         right = None
         try:      ## for error handling
             pass
-            _t91 = _t
+            _t10 = _t
             tmp5_AST = None
             tmp5_AST_in = None
             tmp5_AST = self.astFactory.create(_t)
             tmp5_AST_in = _t
-            _currentAST91 = currentAST.copy()
+            _currentAST10 = currentAST.copy()
             currentAST.root = currentAST.child
             currentAST.child = None
             self.match(_t,MOD)
@@ -418,8 +423,8 @@ class Walker(antlr.TreeParser):
             reg_name_right=self.expr(_t)
             _t = self._retTree
             right_AST = self.returnAST
-            currentAST = _currentAST91
-            _t = _t91
+            currentAST = _currentAST10
+            _t = _t10
             _t = _t.getNextSibling()
             mod_AST = currentAST.root
             reg_name = "$P%d" % self.reg_num
@@ -523,13 +528,13 @@ class Walker(antlr.TreeParser):
                 signExpression_AST = currentAST.root
             elif la1 and la1 in [UNARY_MINUS]:
                 pass
-                _t94 = _t
+                _t13 = _t
                 tmp6_AST = None
                 tmp6_AST_in = None
                 tmp6_AST = self.astFactory.create(_t)
                 tmp6_AST_in = _t
                 self.addASTChild(currentAST, tmp6_AST)
-                _currentAST94 = currentAST.copy()
+                _currentAST13 = currentAST.copy()
                 currentAST.root = currentAST.child
                 currentAST.child = None
                 self.match(_t,UNARY_MINUS)
@@ -539,8 +544,8 @@ class Walker(antlr.TreeParser):
                 _t = self._retTree
                 i2_AST = self.returnAST
                 self.addASTChild(currentAST, self.returnAST)
-                currentAST = _currentAST94
-                _t = _t94
+                currentAST = _currentAST13
+                _t = _t13
                 _t = _t.getNextSibling()
                 signExpression_AST = currentAST.root
                 pir = "\n" + \
@@ -623,12 +628,12 @@ class Walker(antlr.TreeParser):
                 pass
             elif la1 and la1 in [PIR_PRINT_PMC]:
                 pass
-                _t98 = _t
+                _t17 = _t
                 tmp7_AST = None
                 tmp7_AST_in = None
                 tmp7_AST = self.astFactory.create(_t)
                 tmp7_AST_in = _t
-                _currentAST98 = currentAST.copy()
+                _currentAST17 = currentAST.copy()
                 currentAST.root = currentAST.child
                 currentAST.child = None
                 self.match(_t,PIR_PRINT_PMC)
@@ -637,8 +642,8 @@ class Walker(antlr.TreeParser):
                 reg_name=self.expr(_t)
                 _t = self._retTree
                 E1_AST = self.returnAST
-                currentAST = _currentAST98
-                _t = _t98
+                currentAST = _currentAST17
+                _t = _t17
                 _t = _t.getNextSibling()
                 expr_line_AST = currentAST.root
                 expr_line_AST = antlr.make(self.astFactory.create(PIR_NOOP,"noop"), E1_AST, self.astFactory.create(PIR_OP,"\nprint "), self.astFactory.create(PIR_OP,reg_name), self.astFactory.create(PIR_NEWLINE,"\nprint \"\\n\" # "))
@@ -650,12 +655,12 @@ class Walker(antlr.TreeParser):
                 currentAST.advanceChildToEnd()
             elif la1 and la1 in [ASSIGN_OP]:
                 pass
-                _t99 = _t
+                _t18 = _t
                 tmp8_AST = None
                 tmp8_AST_in = None
                 tmp8_AST = self.astFactory.create(_t)
                 tmp8_AST_in = _t
-                _currentAST99 = currentAST.copy()
+                _currentAST18 = currentAST.copy()
                 currentAST.root = currentAST.child
                 currentAST.child = None
                 self.match(_t,ASSIGN_OP)
@@ -666,8 +671,8 @@ class Walker(antlr.TreeParser):
                 reg_name=self.expr(_t)
                 _t = self._retTree
                 E2_AST = self.returnAST
-                currentAST = _currentAST99
-                _t = _t99
+                currentAST = _currentAST18
+                _t = _t18
                 _t = _t.getNextSibling()
                 expr_line_AST = currentAST.root
                 pir = "\n" + \
@@ -681,20 +686,20 @@ class Walker(antlr.TreeParser):
                 currentAST.advanceChildToEnd()
             elif la1 and la1 in [INCR]:
                 pass
-                _t100 = _t
+                _t19 = _t
                 tmp9_AST = None
                 tmp9_AST_in = None
                 tmp9_AST = self.astFactory.create(_t)
                 tmp9_AST_in = _t
-                _currentAST100 = currentAST.copy()
+                _currentAST19 = currentAST.copy()
                 currentAST.root = currentAST.child
                 currentAST.child = None
                 self.match(_t,INCR)
                 _t = _t.getFirstChild()
                 lex_name=self.namedExpression(_t)
                 _t = self._retTree
-                currentAST = _currentAST100
-                _t = _t100
+                currentAST = _currentAST19
+                _t = _t19
                 _t = _t.getNextSibling()
                 expr_line_AST = currentAST.root
                 pir = "\n" + \
@@ -708,20 +713,20 @@ class Walker(antlr.TreeParser):
                 currentAST.advanceChildToEnd()
             elif la1 and la1 in [DECR]:
                 pass
-                _t101 = _t
+                _t20 = _t
                 tmp10_AST = None
                 tmp10_AST_in = None
                 tmp10_AST = self.astFactory.create(_t)
                 tmp10_AST_in = _t
-                _currentAST101 = currentAST.copy()
+                _currentAST20 = currentAST.copy()
                 currentAST.root = currentAST.child
                 currentAST.child = None
                 self.match(_t,DECR)
                 _t = _t.getFirstChild()
                 lex_name=self.namedExpression(_t)
                 _t = self._retTree
-                currentAST = _currentAST101
-                _t = _t101
+                currentAST = _currentAST20
+                _t = _t20
                 _t = _t.getNextSibling()
                 expr_line_AST = currentAST.root
                 pir = "\n" + \
@@ -735,12 +740,12 @@ class Walker(antlr.TreeParser):
                 currentAST.advanceChildToEnd()
             elif la1 and la1 in [If]:
                 pass
-                _t102 = _t
+                _t21 = _t
                 tmp11_AST = None
                 tmp11_AST_in = None
                 tmp11_AST = self.astFactory.create(_t)
                 tmp11_AST_in = _t
-                _currentAST102 = currentAST.copy()
+                _currentAST21 = currentAST.copy()
                 currentAST.root = currentAST.child
                 currentAST.child = None
                 self.match(_t,If)
@@ -753,8 +758,8 @@ class Walker(antlr.TreeParser):
                 self.expr_line(_t)
                 _t = self._retTree
                 p2_AST = self.returnAST
-                currentAST = _currentAST102
-                _t = _t102
+                currentAST = _currentAST21
+                _t = _t21
                 _t = _t.getNextSibling()
                 expr_line_AST = currentAST.root
                 pir = "\n" + \
@@ -832,11 +837,11 @@ class Walker(antlr.TreeParser):
                 currentAST.advanceChildToEnd()
             elif la1 and la1 in [REL_OP]:
                 pass
-                _t104 = _t
+                _t23 = _t
                 op = antlr.ifelse(_t == antlr.ASTNULL, None, _t)
                 op_AST_in = None
                 op_AST = self.astFactory.create(op)
-                _currentAST104 = currentAST.copy()
+                _currentAST23 = currentAST.copy()
                 currentAST.root = currentAST.child
                 currentAST.child = None
                 self.match(_t,REL_OP)
@@ -849,8 +854,8 @@ class Walker(antlr.TreeParser):
                 reg_name_right=self.expr(_t)
                 _t = self._retTree
                 e3_AST = self.returnAST
-                currentAST = _currentAST104
-                _t = _t104
+                currentAST = _currentAST23
+                _t = _t23
                 _t = _t.getNextSibling()
                 relational_expr_AST = currentAST.root
                 reg_name = "temp_int"    # this will be returned
@@ -893,7 +898,7 @@ class Walker(antlr.TreeParser):
         expr_list_AST = None
         try:      ## for error handling
             pass
-            _cnt107= 0
+            _cnt26= 0
             while True:
                 if not _t:
                     _t = antlr.ASTNULL
@@ -917,8 +922,8 @@ class Walker(antlr.TreeParser):
                 else:
                         break
                     
-                _cnt107 += 1
-            if _cnt107 < 1:
+                _cnt26 += 1
+            if _cnt26 < 1:
                 raise antlr.NoViableAltException(_t)
             expr_list_AST = currentAST.root
         
@@ -947,7 +952,73 @@ class Walker(antlr.TreeParser):
             _t = self._retTree
             B_AST = self.returnAST
             gen_pir_AST = currentAST.root
-            gen_pir_AST = antlr.make(self.astFactory.create(PIR_HEADER,"pir header\n#"), B_AST, self.astFactory.create(PIR_FOOTER,"pir footer\n#"));
+            pir = """
+                 .local pmc val
+                 val = new 'PAST::Val'
+                 val.set_node('1', 0, 1 )
+                 
+                 .local pmc exp
+                 exp = new 'PAST::Exp'
+                 $P4 = new PerlArray
+                 push $P4, val 
+                 exp.set_node('1', 1, $P4)
+                 
+                 .local pmc op
+                 op = new 'PAST::Op'
+                 $P5 = new PerlArray
+                 push $P5, exp 
+                 op.set_node('1', 1, 'print' ,$P5)
+                 
+                 .local pmc exp
+                 exp = new 'PAST::Exp'
+                 $P6 = new PerlArray
+                 push $P6, op 
+                 exp.set_node('1', 1 ,$P6)
+                 
+                 .local pmc stmt1
+                 stmt1 = new 'PAST::Stmt'
+                 $P7 = new PerlArray
+                 push $P7, exp 
+                 stmt1.set_node('1', 1 ,$P7)
+                 
+                 .local pmc val
+                 val = new 'PAST::Val'
+                 val.set_node('1', 0, '"\\n"' )
+                 
+                 .local pmc exp
+                 exp = new 'PAST::Exp'
+                 $P4 = new PerlArray
+                 push $P4, val 
+                 exp.set_node('1', 1, $P4)
+                 
+                 .local pmc op
+                 op = new 'PAST::Op'
+                 $P5 = new PerlArray
+                 push $P5, exp 
+                 op.set_node('1', 1, 'print' ,$P5)
+                 
+                 .local pmc exp
+                 exp = new 'PAST::Exp'
+                 $P6 = new PerlArray
+                 push $P6, op 
+                 exp.set_node('1', 1 ,$P6)
+                 
+                 .local pmc stmt2
+                 stmt2 = new 'PAST::Stmt'
+                 $P7 = new PerlArray
+                 push $P7, exp 
+                 stmt2.set_node('1', 1 ,$P7)
+            
+            
+                 .local pmc stmts
+                 stmts = new 'PAST::Stmts'
+                 $P8 = new PerlArray
+                 push $P8, stmt1
+                 push $P8, stmt2
+                 stmts.set_node('1', 1, $P8)
+                 
+            #"""
+            gen_pir_AST = antlr.make(self.astFactory.create(PIR_OP,pir));
             currentAST.root = gen_pir_AST
             if (gen_pir_AST != None) and (gen_pir_AST.getFirstChild() != None):
                 currentAST.child = gen_pir_AST.getFirstChild()
@@ -1008,6 +1079,11 @@ _tokenNames = [
     "PIR_HEADER", 
     "PIR_NOOP", 
     "PIR_COMMENT", 
-    "PIR_NEWLINE"
+    "PIR_NEWLINE", 
+    "PAST_Stmts", 
+    "PAST_Stmt", 
+    "PAST_Exp", 
+    "PAST_Op", 
+    "PAST_Val"
 ]
     

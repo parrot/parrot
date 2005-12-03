@@ -4,6 +4,7 @@
 # Setup of some commands
 PERL           = ${perl}
 RM_RF          = ${rm_rf}
+CP             = ${cp}
 
 # The runtime files are also in SVN, need to be generated only by maintainer
 PYTHON_RUNTIME_FILES = \
@@ -45,8 +46,11 @@ build:
 maintain: $(PYTHON_RUNTIME_FILES)
 
 # BcLexer.py will be created too
-$(PYTHON_RUNTIME_FILES): grammar/bc_python.g
+# TODO: antlr2past shouldn't need BcLexerTokenTypes.txt
+$(PYTHON_RUNTIME_FILES): grammar/bc_python.g grammar/antlr2past.g
 	antlr -o python/lib/bc grammar/bc_python.g
+	antlr -o python/lib/antlr2past grammar/antlr2past.g
+	$(CP) python/lib/bc/BcLexerTokenTypes.txt python/lib/antlr2past
 
 clean:
 	$(RM_RF) \
