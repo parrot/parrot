@@ -328,6 +328,16 @@ CODE
 ok
 OUTPUT
 
+pir_output_is(<<'CODE', <<'OUTPUT', ':outer parsing - missing :outer');
+.sub main
+    print "ok\n"
+.end
+.sub foo :outer(oops)
+.end
+CODE
+Undefined :outer sub 'oops'.
+OUTPUT
+
 pir_output_is(<<'CODE', <<'OUTPUT', 'get_lexinfo from pad');
 .sub main
     .lex '$a', P0
@@ -866,4 +876,4 @@ OUTPUT
 
 
 ## remember to change the number of tests :-)
-BEGIN { plan tests => 35; }
+BEGIN { plan tests => 36; }

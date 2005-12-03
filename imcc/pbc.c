@@ -594,6 +594,10 @@ find_outer(Interp *interpreter, IMC_Unit *unit)
      * could be eval too - look, if :outer is the currentsub
      */
     current = CONTEXT(interpreter->ctx)->current_sub;
+    if (! current)
+        IMCC_fatal(interpreter, 1,
+                   "Undefined :outer sub '%s'.\n",
+                   unit->outer->name);
     cur_name = PMC_sub(current)->name;
     if (cur_name->strlen == len &&
             !memcmp((char*)cur_name->strstart, unit->outer->name, len)) {
