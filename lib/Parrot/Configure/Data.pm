@@ -54,13 +54,12 @@ sub set {
 	        if $verbose;
         $c{$key}=$val;
 
-        if (defined $self->gettrigger($key)) {
-            while (my ($trigger, $cb) = each %{$self->gettriggers($key)}) {
-                print "\tcalling trigger $trigger for $key\n" if $verbose;
+        foreach my $trigger ($self->gettriggers($key)) {
+            print "\tcalling trigger $trigger for $key\n" if $verbose;
+            my $cb = $self->gettrigger($key, $trigger);
 
-                &$cb($key, $val);
-            }
-	    }
+            &$cb($key, $val);
+        }
     }
 
     print ");\n" if $verbose;
