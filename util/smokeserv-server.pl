@@ -333,11 +333,11 @@ sub runcore2human {
 sub runcore_from_args {
   local $_ = shift;
 
-  /-g/ and return "goto";
-  /-j/ and return "jit";
-  /-C/ and return "cgp";
-  /-S/ and return "switch";
-  /-f/ and return "fast";
+  /\b-g\b/ and return "goto";
+  /\b-j\b/ and return "jit";
+  /\b-C\b/ and return "cgp";
+  /\b-S\b/ and return "switch";
+  /\b-f\b/ and return "fast";
   return "default";
 }
 
