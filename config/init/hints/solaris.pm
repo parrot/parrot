@@ -79,7 +79,7 @@ my $solaris_ieee_cb = sub {
     }
     else {
 	my $linkflags = Parrot::Configure::Data->get('linkflags');
-	Parrot::Configure::Data->add(' ', 'linkflags', '-xlibmieee')
+	Parrot::Configure::Data->add(linkflags => '-xlibmieee')
 		unless $linkflags =~ /-xlibmieee/;
     }
     Parrot::Configure::Data->deltrigger("gccversion", "solaris_ieee");
