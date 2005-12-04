@@ -77,8 +77,10 @@ sub runstep {
 
     if (-e "jit/$cpuarch/core.jit") {
         $jitcapable = 1;
-        if ($cpuarch =~ /sun4|sparc64/ &&
-            Parrot::Configure::Data->get('intvalsize') > Parrot::Configure::Data->get('ptrsize')) {
+	# XXX disable sun4 - doesn't even build
+        if ($cpuarch =~ /sun4|sparc64/ && (1 || 
+            Parrot::Configure::Data->get('intvalsize') > 
+	        Parrot::Configure::Data->get('ptrsize'))) {
             $jitcapable = 0;
         }
     }
