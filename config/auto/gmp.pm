@@ -34,12 +34,12 @@ sub runstep {
     my $ccflags = Parrot::Configure::Data->get('ccflags');
     if ($^O =~ /mswin32/i) {
         if ($cc =~ /^gcc/i) {
-            Parrot::Configure::Data->add(' ', 'libs', '-lgmp');
+            Parrot::Configure::Data->add(' ', libs => '-lgmp');
         } else {
-            Parrot::Configure::Data->add(' ', 'libs', 'gmp.lib');
+            Parrot::Configure::Data->add(' ', libs => 'gmp.lib');
         }
     } else {
-        Parrot::Configure::Data->add(' ', 'libs', '-lgmp');
+        Parrot::Configure::Data->add(' ', libs => '-lgmp');
     }
 
     my $archname = $Config{archname};
@@ -53,9 +53,9 @@ sub runstep {
     # where Fink lives.
     if($osname =~ /darwin/) {
         if( -f "/sw/include/gmp.h") {
-            Parrot::Configure::Data->add(' ', 'linkflags', '-L/sw/lib');
-            Parrot::Configure::Data->add(' ', 'ldflags', '-L/sw/lib');
-            Parrot::Configure::Data->add(' ', 'ccflags', '-I/sw/include');
+            Parrot::Configure::Data->add(' ', linkflags => '-L/sw/lib');
+            Parrot::Configure::Data->add(' ', ldflags => '-L/sw/lib');
+            Parrot::Configure::Data->add(' ', ccflags => '-I/sw/include');
         }
     }
 

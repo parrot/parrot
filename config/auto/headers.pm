@@ -41,7 +41,7 @@ sub runstep {
 
     for (keys %Config) {
 	next unless /^i_/;
-	Parrot::Configure::Data->set($mapping{$_}||$_, $Config{$_});
+	Parrot::Configure::Data->set($mapping{$_}||$_ => $Config{$_});
     }
 
     # some headers may not be probed-for by perl 5, or might not be
@@ -75,7 +75,7 @@ sub runstep {
 	    Parrot::Configure::Data->set(testheaders =>
 				 join ('',
 				       map {"#include <$_>\n"} @$use_headers));
-	    Parrot::Configure::Data->set(testheader =>$header);
+	    Parrot::Configure::Data->set(testheader => $header);
 
 	    cc_gen('config/auto/headers/test_c.in');
 
@@ -94,7 +94,7 @@ sub runstep {
         my $flag = "i_$header";
         $flag =~ s/\.h$//g; $flag =~ s/\///g;
 	print "$flag: $pass\n" if defined $verbose;
-	Parrot::Configure::Data->set($flag, $pass ? 'define' : undef);
+	Parrot::Configure::Data->set($flag => $pass ? 'define' : undef);
     }
 
 }

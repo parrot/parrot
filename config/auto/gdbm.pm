@@ -22,7 +22,7 @@ use base qw(Parrot::Configure::Step::Base);
 use Parrot::Configure::Step ':auto';
 
 $description = "Determining if your platform supports gdbm...";
-
+ 
 @args = qw(verbose);
 
 sub runstep {
@@ -45,9 +45,9 @@ sub runstep {
     # where Fink lives.
     if($osname =~ /darwin/) {
         if( -f "/sw/include/gdbm.h") {
-            Parrot::Configure::Data->add(' ', 'linkflags', '-L/sw/lib');
-            Parrot::Configure::Data->add(' ', 'ldflags', '-L/sw/lib');
-            Parrot::Configure::Data->add(' ', 'ccflags', '-I/sw/include');
+            Parrot::Configure::Data->add(' ', linkflags  => '-L/sw/lib');
+            Parrot::Configure::Data->add(' ', dflags    => '-L/sw/lib');
+            Parrot::Configure::Data->add(' ', cflags    => '-I/sw/include');
         }
     }
 

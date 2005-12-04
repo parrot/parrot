@@ -35,9 +35,7 @@ sub run_cpu {
 		  "HAS_i386_$suffix" => '1',
 		);
 		print " (\U$suffix) " if ($verbose);
-	        Parrot::Configure::Data->add(',',
-			"TEMP_generated" => $f
-		);
+	        Parrot::Configure::Data->add(' ', TEMP_generated => $f);
 	    }
 	}
 	cc_clean();

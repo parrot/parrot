@@ -29,7 +29,7 @@ sub runstep {
     my $test;
     my ($verbose) = @_;
     my $libs = Parrot::Configure::Data->get('libs');
-    Parrot::Configure::Data->add(' ', 'libs', '-lrt');
+    Parrot::Configure::Data->add(' ', libs => '-lrt');
 
     cc_gen('config/auto/aio/aio.in');
     eval { cc_build(); };
@@ -53,7 +53,7 @@ sub runstep {
 
     }
     else {
-	Parrot::Configure::Data->set('libs', $libs);
+	Parrot::Configure::Data->set(libs => $libs);
 	print " (no) " if $verbose;
         $result = 'no';
     }

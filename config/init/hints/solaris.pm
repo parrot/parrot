@@ -36,7 +36,7 @@ my $solaris_link_cb = sub {
     else {
 	$link =~ s/\bcc\b/CC/;
     }
-    Parrot::Configure::Data->set('link', $link);
+    Parrot::Configure::Data->set(link => $link);
     Parrot::Configure::Data->deltrigger("cc", "solaris_link");
 };
 Parrot::Configure::Data->settrigger("cc", "solaris_link", $solaris_link_cb);
@@ -50,10 +50,10 @@ Parrot::Configure::Data->settrigger("cc", "solaris_link", $solaris_link_cb);
 my $solaris_cc_shared_cb = sub {
     my ($key, $gccversion) = @_;
     if ($gccversion) {
-	Parrot::Configure::Data->set('cc_shared', '-fPIC');
+	Parrot::Configure::Data->set(cc_shared => '-fPIC');
     }
     else {
-	Parrot::Configure::Data->set('cc_shared', '-KPIC');
+	Parrot::Configure::Data->set(cc_shared => '-KPIC');
     }
     Parrot::Configure::Data->deltrigger("gccversion", "solaris_cc_shared");
 };

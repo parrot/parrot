@@ -57,13 +57,13 @@
 		);
 		# 'link' needs to be link.exe, not cl.exe.
 		# This makes 'link' and 'ld' the same.
-		Parrot::Configure::Data->set('link', Parrot::Configure::Data->get('ld'));
+		Parrot::Configure::Data->set(link => Parrot::Configure::Data->get('ld'));
 
 		# We can't use -opt: and -debug together.
 		if (Parrot::Configure::Data->get('ld_debug') =~ /-debug/) {
 			my $linkflags = Parrot::Configure::Data->get('linkflags');
 			$linkflags =~ s/-opt:\S+//;
-			Parrot::Configure::Data->set('linkflags', $linkflags);
+			Parrot::Configure::Data->set(linkflags => $linkflags);
 		}
 		
 		# We need to build a .def file to export parrot.exe symbols.
@@ -105,13 +105,13 @@
 		);
 		# 'link' needs to be xilink.exe, not icl.exe.
 		# This makes 'link' and 'ld' the same.
-		Parrot::Configure::Data->set('link', Parrot::Configure::Data->get('ld'));
+		Parrot::Configure::Data->set(link => Parrot::Configure::Data->get('ld'));
 
 		# We can't use -opt: and -debug together.
 		if (Parrot::Configure::Data->get('ld_debug') =~ /-debug/) {
 			my $linkflags = Parrot::Configure::Data->get('linkflags');
 			$linkflags =~ s/-opt:\S+//;
-			Parrot::Configure::Data->set('linkflags', $linkflags);
+			Parrot::Configure::Data->set(linkflags => $linkflags);
 		}
 	}
 	elsif( $is_bcc ) {
@@ -153,20 +153,20 @@
 		if ($make =~ /nmake/i) {
 			# ActiveState Perl or PXPerl
 			Parrot::Configure::Data->set(
-				'a' => '.a',
-				'ar' => 'ar',
-				'cc' => 'gcc',
-				'ccflags' => '-DWIN32 ',
-				'ld' => 'g++',
-				'ld_load_flags' => '-shared ',
-				'ld_share_flags' => '-shared ',
-				'ldflags' => '',
-				'libs' => '-lmsvcrt -lmoldname -lkernel32 -luser32 -lgdi32 -lwinspool -lcomdlg32 -ladvapi32 -lshell32 -lole32 -loleaut32 -lnetapi32 -luuid -lws2_32 -lmpr -lwinmm -lversion -lodbc32 ',
-				'link' => 'gcc',
-				'linkflags' => '',
-				'ncilib_link_extra' => 'src/libnci_test.def',
-				'o' => '.o',
-				'slash' => '\\',
+				a => '.a',
+				ar => 'ar',
+				cc => 'gcc',
+				ccflags => '-DWIN32 ',
+				ld => 'g++',
+				ld_load_flags => '-shared ',
+				ld_share_flags => '-shared ',
+				ldflags => '',
+				libs => '-lmsvcrt -lmoldname -lkernel32 -luser32 -lgdi32 -lwinspool -lcomdlg32 -ladvapi32 -lshell32 -lole32 -loleaut32 -lnetapi32 -luuid -lws2_32 -lmpr -lwinmm -lversion -lodbc32 ',
+				link => 'gcc',
+				linkflags => '',
+				ncilib_link_extra => 'src/libnci_test.def',
+				o => '.o',
+				slash => '\\',
 			);
 			if (Parrot::Configure::Data->get(qw(optimize)) eq "1") {
 				Parrot::Configure::Data->set(
@@ -176,9 +176,9 @@
 		} elsif ($make =~ /dmake/i) {
 			# mingw Perl
 			Parrot::Configure::Data->set(
-				'ld_load_flags' => '-shared ',
-				'ld_share_flags' => '-shared ',
-				'ncilib_link_extra' => 'src/libnci_test.def',
+				ld_load_flags => '-shared ',
+				ld_share_flags => '-shared ',
+				ncilib_link_extra => 'src/libnci_test.def',
 			);
 		} else {
 			warn "unknown configuration";

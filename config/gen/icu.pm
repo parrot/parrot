@@ -168,8 +168,7 @@ HELP
   }
   else {
     print "Adding -I $icuheaders to ccflags for icu headers.\n" if $verbose;
-    Parrot::Configure::Data->add(' ',
-    ccflags    => "-I $icuheaders");
+    Parrot::Configure::Data->add(' ', ccflags => "-I $icuheaders");
   }
   cc_clean();
 

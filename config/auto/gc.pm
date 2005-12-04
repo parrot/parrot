@@ -59,10 +59,10 @@ sub runstep {
   elsif ($gc eq 'libc') {
     # tests mallinfo after allocation of 128 bytes
     if (Parrot::Configure::Data->get('i_malloc')) {
-        Parrot::Configure::Data->set('malloc_header', 'malloc.h');
+        Parrot::Configure::Data->set(malloc_header => 'malloc.h');
     }
     else {
-        Parrot::Configure::Data->set('malloc_header', 'stdlib.h');
+        Parrot::Configure::Data->set(malloc_header => 'stdlib.h');
     }
 =for nothing
 
