@@ -123,7 +123,7 @@ Documentation for C<pdb>, the Parrot debugger.
 
 Parrot compiles and runs on a large number of platforms, including all common
 ones. The Parrot team is committed to supporting the following combinations as
-"core platforms": Linux (x86), CygWin, Win32, Tru64, OpenVMS (Alpha), Solaris
+"core platforms": Linux (x86), Cygwin, Win32, Tru64, OpenVMS (Alpha), Solaris
 (Sparc), FreeBSD (x86).
 
 =head2 Authors

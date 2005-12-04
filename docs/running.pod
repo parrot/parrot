@@ -161,7 +161,7 @@ Run with the slow core and do print an execution profile.
 
 =item -P, --predereferenced-core
 
-Prederefernce opcode function arguments on the fly.
+Predereference opcode function arguments on the fly.
 
 =item -t, --trace
 

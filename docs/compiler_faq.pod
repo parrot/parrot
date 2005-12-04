@@ -361,6 +361,8 @@ of one pad depth are numbered from 0..n-1 in the order of their declaration.
 
 =head2 How do I create a module?
 
+TODO
+
 =head2 How do I create a class?
 
 With the C<newclass> op:
@@ -500,7 +502,11 @@ key/value pairs:
 
 =head2 How do I add module/class methods?
 
+TODO
+
 =head2 How do I access module/class variables?
+
+TODO
 
 =head1 Exceptions
 
@@ -557,7 +563,7 @@ More information is available inside the exception 'object' (TBD).
 
 =head1 Misc
 
-=head2 How can I access a programs environment.
+=head2 How can I access a program's environment?
 
 Create a new C<Env> PMC and access it like a hash.
 
@@ -565,7 +571,7 @@ Create a new C<Env> PMC and access it like a hash.
     e = new .Env
     $P0 = e['USER']      # lt
 
-=head2 How can I access parrot's configuration.
+=head2 How can I access Parrot's configuration?
 
     .include "iglobals.pasm"
     .local pmc interp, cfg

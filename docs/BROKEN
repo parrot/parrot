@@ -153,7 +153,7 @@ source and argument information.
 
 Will Coleda is thinking about this.
 
-=item * Add rules engines for perl5-ish RE's in PGE.
+=item * Add rules engines for Perl 5-ish RE's in PGE.
 
 Will Coleda specifically wants
 http://www.tcl.tk/man/tcl8.5/TclCmd/re_syntax.htm, but having a P5-ish one to

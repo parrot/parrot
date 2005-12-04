@@ -160,5 +160,3 @@ list of flags. Or have a look at the information provided by:
 or
 
   shell> parrot --help-debug
-
-=back

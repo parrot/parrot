@@ -8,7 +8,7 @@ extend.pod - Parrot extension system
 =head1 SYNOPSIS 
 
     #include "parrot/extend.h"
-    
+
     int main(int argc, char *argv[]) {
     }
 
@@ -26,15 +26,11 @@ extend.pod - Parrot extension system
 
 =head2 Data Structures
 
-=over 4
-
-=back
+TODO
 
 =head2 Constants
 
-=over 4
-
-=back
+TODO
 
 =head2 Functions
 

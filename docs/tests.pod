@@ -105,24 +105,24 @@ C<language_output_is>.
 
 =over 4
 
-=item o
+=item *
 
 Probe the boundaries (including edge cases, errors thrown etc.) of whatever
 code they're testing.  These should include potentially out of band input
 unless we decide that compilers should check for this themselves.
 
-=item o
+=item *
 
 Are small and self contained, so that if the tested feature breaks we can
 identify where and why quickly.
 
-=item o
+=item *
 
 Are valid. Essentially, they should conform to the additional documentation
 that accompanies the feature (if any). [If there isn't any documentation, then
 feel free to add some and/or complain to the mailing list].
 
-=item o
+=item *
 
 Are a chunk of assembler and a chunk of expected output.
 

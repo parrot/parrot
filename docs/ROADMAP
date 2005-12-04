@@ -330,7 +330,7 @@ from floating point types, sprintf output of bignumbers. L<PDD14>
 
 =item *
 
-Implement the parrot equivalent of perl5's C<$0>, based on recent (January
+Implement the Parrot equivalent of Perl 5's C<$0>, based on recent (January
 2005) mailing list activity.
 
 =item *

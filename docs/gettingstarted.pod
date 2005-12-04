@@ -143,23 +143,23 @@ mailing list. There are a variety of interfaces to the list:
 
 =over 4
 
-=item * Mailing List Interface (subscribing, unsubscribing, etc)
+=item * Developer Mailing List Interface (subscribing, unsubscribing, etc)
 
 L<http://lists.perl.org/showlist.cgi?name=perl6-internals>
 
-=item * NNTP Interface
+=item * Perl 6 Internals NNTP Interface
 
 L<news://nntp.perl.org/perl.perl6.internals>
 
 L<http://nntp.x.perl.org/group/perl.perl6.internals>
 
-=item * Archives
+=item * Perl 6 Internals Archives
 
 L<http://groups.google.com/groups?hl=en&lr=&ie=UTF-8&oe=UTF-8&group=perl.perl6.internals>
 
 L<http://www.nntp.perl.org/group/perl.perl6.internals>
 
-=item * Searching
+=item * Searching the Perl 6 Internals Mailing List
 
 There are no directly searchable interfaces to the mailing lists. However,
 Google works quite well. After clicking the below links, just add your search
@@ -196,19 +196,19 @@ helpful to subscribe and keep up on changes that people are making.
 
 L<http://lists.perl.org/showlist.cgi?name=cvs-parrot>
 
-=item * NNTP Interface
+=item * Parrot Commits NNTP Interface
 
 L<news://nntp.perl.org/perl.cvs.parrot>
 
 L<http://nntp.x.perl.org/group/perl.cvs.parrot>
 
-=item * Archives
+=item * Commit List Archives
 
 L<http://groups.google.com/groups?hl=en&lr=&ie=UTF-8&oe=UTF-8&group=perl.cvs.parrot>
 
 L<http://www.nntp.perl.org/group/perl.cvs.parrot>
 
-=item * Searching
+=item * Searching the Parrot Commits List
 
 After clicking the below links, just add your search terms to the Google search
 box.
@@ -228,7 +228,7 @@ is an IRC channel which you may find useful if your problem is better solved
 with real-time discussion. To find this channel, visit the channel #parrot in 
 the following IRC servers (either one will do):
 
-L<irc://irc.rhizomatic.net>/ or L<irc://irc.pobox.com/>
+L<irc.rhizomatic.net> or L<irc.pobox.com>
 
 
 

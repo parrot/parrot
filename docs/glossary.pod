@@ -205,7 +205,7 @@ Acronym for Parrot Abstract Syntax Tree.
 =head2 Packfile
 
 Another name for a PBC file, due to the names used for data structures in one
-of the early implementations in Perl5.
+of the early implementations in Perl 5.
 
 =head2 PBC
 
@@ -220,7 +220,7 @@ See also L<"Packfile">.
 Acronym for Parrot Design Document. These documents describe the features that
 the Parrot interpreter should implement.
 
-See also L<"pdd00_pdd">.
+See also L<pdds/pdd00_pdd>.
 
 =head2 PIR
 
@@ -238,7 +238,7 @@ fundamental types, such as Perl's scalar values.
 
 =head2 POD
 
-POD is an acronym for Plain Old Documentation. This is for now the prefered
+POD is an acronym for Plain Old Documentation. This is for now the preferred
 form for all kinds of documentation in Parrot. See "perldoc perlpod" for
 details.
 
@@ -267,7 +267,7 @@ Core and the Prederef[erencing] Core.
 
 L<http://archive.develooper.com/perl6-internals@perl.org/msg07064.html>
 
-The week of 2003-02-09, Leopold Totsch combined Computed Goto and
+The week of 2003-02-09, Leopold Toetsch combined Computed Goto and
 Predereferencing to produce the CGP core.
 
 L<http://dev.perl.org/perl6/list-summaries/2003/p6summary.2003-02-09.html#Week_of_the_alternative_runloops>

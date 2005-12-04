@@ -10,9 +10,9 @@ docs/faq.pod - Parrot FAQ
 =head2 What is Parrot?
 
 Parrot is the new interpreter being designed from scratch to support the
-upcoming Perl6 language. It is being designed as a standalone virtual machine
-that can be used to execute bytecode compiled dynamic languages such as Perl6,
-but also Perl5. Ideally, Parrot can be used to support other dynamic,
+upcoming Perl 6 language. It is being designed as a standalone virtual machine
+that can be used to execute bytecode compiled dynamic languages such as Perl 6,
+but also Perl 5. Ideally, Parrot can be used to support other dynamic,
 bytecode-compiled languages such as Python, Ruby and Tcl.
 
 =head2 Why "Parrot"?
@@ -26,11 +26,11 @@ better.
 
 =head2 Is Parrot the same as Perl 6?
 
-No. Parrot is an implementation that is expected to be used to execute Perl6
-programs. The Perl6 language definition is currently being crafted by Larry
-Wall. While the true nature of Perl6 is still unknown, it will be substantially
+No. Parrot is an implementation that is expected to be used to execute Perl 6
+programs. The Perl 6 language definition is currently being crafted by Larry
+Wall. While the true nature of Perl 6 is still unknown, it will be substantially
 similar to Perl as we know it today, and will need a runtime system. For more
-information on the nascent Perl6 language definition, check out Larry's
+information on the nascent Perl 6 language definition, check out Larry's
 L<apocalypses|"LINKS">.
 
 =head2 Can I use Parrot today?
@@ -290,13 +290,13 @@ A variety of reasons were given for embarking on this project:
 
 =item *
 
-Perl5 is a stable, reliable, robust platform for developing software; it's not
-going away for a long time, even after Perl6 is released. (Proof: Perl4 is
+Perl 5 is a stable, reliable, robust platform for developing software; it's not
+going away for a long time, even after Perl 6 is released. (Proof: Perl 4 is
 still out there, no matter how much we all want it to go away.)
 
 =item *
 
-We have the ability to translate Perl5 into Perl6 if necessary. This preserves
+We have the ability to translate Perl 5 into Perl 6 if necessary. This preserves
 backward compatibility with a large body of existing Perl code, which is
 I<very> important.
 

@@ -255,12 +255,12 @@ with a C<#> are comments.
       # State the number of squares to sum.
       .local int maxnum
       maxnum = 10
-      
+
       # Some named registers we'll use. Note how we can declare many
       # registers of the same type on one line.
       .local int i, total, temp
       total = 0
-      
+
       # Loop to do the sum.
       i = 1
   loop:
@@ -268,7 +268,7 @@ with a C<#> are comments.
       total += temp
       inc i
       if i <= maxnum goto loop
-      
+
       # Output result.
       print "The sum of the first "
       print maxnum
@@ -318,41 +318,41 @@ compute factorial.
   .sub _fact
       # Get input parameter.
       .param int n
-      
+
       # return (n > 1 ? n * _fact(n - 1) : 1)
       .local int result
-      
+
       if n > 1 goto recurse
       result = 1
       goto return
-  
+
   recurse:
       $I0 = n - 1
       result = _fact($I0)
       result *= n
-      
+
   return:
       .return (result)
   .end
-  
-  
+
+
   .sub _main @MAIN
       .local int f, i
-      
+
       # We'll do factorial 0 to 1.
       i = 0
   loop:
       f = _fact(i)
-      
+
       print "Factorial of "
       print i
       print " is "
       print f
       print ".\n"
-      
+
       inc i
       if i <= 10 goto loop
-      
+
       # That's it.
       end
   .end
