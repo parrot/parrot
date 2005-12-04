@@ -223,16 +223,20 @@ given the Perl 6 code:
       return &a;
    }
 
-The &foo subroutiine is the outer subroutine of &a, but it is not the caller
+The &foo subroutine is the outer subroutine of &a, but it is not the caller
 of &a.
 
 In the above example, the definition of the Parrot subroutine implementing &a
 must include a notation that it is textually enclosed within &foo.  This is a
 static attribute of a Subroutine, set at compile time and never changed
 thereafter.  (Unless you're evil, or Damian.  But I repeat myself.)  This
-information is given through a ":outer()" subroutine attribute, e.g.:
+information is given through an ":outer()" subroutine attribute, e.g.:
 
     .sub a :outer(foo)
+
+Note that the "foo" sub B<must> be compiled first; in other words, "foo" must
+appear before "a" in the source text.  Compilers can easily do this via
+preorder traversal of lexically-nested subs.
 
 =head1 REQUIRED INTERFACES: LEXPAD, LEXINFO, CLOSURE
 
