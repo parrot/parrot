@@ -181,9 +181,11 @@ def main():
 
    # Now dump PIR, that uses PAST
    # TODO: This is a dummy implementation right now
+   BcW.gen_antlr_past(ast);
+   antlr_past = BcW.getAST()
    sys.stdout = past_pir_fh
    Antlr2PastW = antlr2past.Antlr2PastTreeWalker.Walker();
-   Antlr2PastW.gen_pir(ast);
+   Antlr2PastW.gen_pir_past(antlr_past);
    past_pir_ast = Antlr2PastW.getAST()
    past_pir     = "# " +  past_pir_ast.toStringList();
    print """

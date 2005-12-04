@@ -61,6 +61,7 @@ PIR_HEADER = 40
 PIR_NOOP = 41
 PIR_COMMENT = 42
 PIR_NEWLINE = 43
+PAST_Stmts = 44
 
 ### user code>>>
 
@@ -963,6 +964,39 @@ class Walker(antlr.TreeParser):
         self.returnAST = gen_pir_AST
         self._retTree = _t
     
+    def gen_antlr_past(self, _t):    
+        
+        gen_antlr_past_AST_in = None
+        if _t != antlr.ASTNULL:
+            gen_antlr_past_AST_in = _t
+        self.returnAST = None
+        currentAST = antlr.ASTPair()
+        gen_antlr_past_AST = None
+        B_AST = None
+        B = None
+        try:      ## for error handling
+            pass
+            B = antlr.ifelse(_t == antlr.ASTNULL, None, _t)
+            self.expr_list(_t)
+            _t = self._retTree
+            B_AST = self.returnAST
+            gen_antlr_past_AST = currentAST.root
+            gen_antlr_past_AST = antlr.make(self.astFactory.create(PAST_Stmts,"dummy past stmts\n#"));
+            currentAST.root = gen_antlr_past_AST
+            if (gen_antlr_past_AST != None) and (gen_antlr_past_AST.getFirstChild() != None):
+                currentAST.child = gen_antlr_past_AST.getFirstChild()
+            else:
+                currentAST.child = gen_antlr_past_AST
+            currentAST.advanceChildToEnd()
+        
+        except antlr.RecognitionException, ex:
+            self.reportError(ex)
+            if _t:
+                _t = _t.getNextSibling()
+        
+        self.returnAST = gen_antlr_past_AST
+        self._retTree = _t
+    
 
 _tokenNames = [
     "<0>", 
@@ -1008,6 +1042,7 @@ _tokenNames = [
     "PIR_HEADER", 
     "PIR_NOOP", 
     "PIR_COMMENT", 
-    "PIR_NEWLINE"
+    "PIR_NEWLINE", 
+    "PAST_Stmts"
 ]
     

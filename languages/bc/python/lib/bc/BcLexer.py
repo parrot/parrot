@@ -67,6 +67,7 @@ PIR_HEADER = 40
 PIR_NOOP = 41
 PIR_COMMENT = 42
 PIR_NEWLINE = 43
+PAST_Stmts = 44
 
 class Lexer(antlr.CharScanner) :
     ### user action >>>

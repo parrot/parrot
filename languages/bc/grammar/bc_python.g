@@ -336,6 +336,9 @@ tokens
   PIR_NOOP;       // noop
   PIR_COMMENT;    // A comment line
   PIR_NEWLINE;    // A comment line
+
+  // PAST as an ANTLR tree
+  PAST_Stmts;     // top level
 }
 
 plus! returns [reg_name]
@@ -504,5 +507,14 @@ gen_pir!
   : B:expr_list
     {
       #gen_pir = #([PIR_HEADER, "pir header\n#"], #B, [PIR_FOOTER, "pir footer\n#"]); 
+    }
+  ;
+
+// generate an AST that is equivalent to a PAST data structure
+// TODO: undummy this 
+gen_antlr_past!
+  : B:expr_list
+    {
+      #gen_antlr_past = #([PAST_Stmts, "dummy past stmts\n#"]); 
     }
   ;
