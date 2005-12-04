@@ -13,16 +13,16 @@ single type, though some overlap is allowed (for example, allowing a probe to
 ask the user what to do in an exceptional situation).
 
 The directory F<config> contains subdirectories for each type of step.  Each
-step should consist of I<exactly one> .pl file and any number of supporting .c,
-.in, etc. files. Any supporting files should be in a folder whose name is the
-same as the basename of the step's .pl file; for example, if F<foo.pl> uses
-F<bar_c.in>, F<bar_c.in> should be in a directory called F<foo>; the full path
-might be F<config/auto/foo/bar_c.in>.
+step should consist of I<exactly one> F<.pm> file and any number of supporting
+F<.c>, F<.in>, etc. files. Any supporting files should be in a folder whose
+name is the same as the basename of the step's F<.pm> file; for example, if
+F<foo.pm> uses F<bar_c.in>, F<bar_c.in> should be in a directory called F<foo>;
+the full path might be F<config/auto/foo/bar_c.in>.
 
 Generally, when adding a new test you should add a new step unless a test
 I<clearly> belongs in a current step. For example, if we added a new
 user-configurable type called C<FOOVAL>, you should add the test for its size
-in F<config/auto/sizes.pl>; however, if you were testing what dynaloading
+in F<config/auto/sizes.pm>; however, if you were testing what dynaloading
 capabilities are available, you should create a new step.
 
 =head2 Initialization Steps
@@ -85,8 +85,11 @@ automatic step.
 New steps should be added in one of the three folders mentioned above.
 
 All steps are really modules; they should start with a declaration setting the
-current package to C<Configure::Step>. Note that there is no file for the
-C<Configure::Step> package.
+current package to L<Configure::Step>. Note that there is no file for the
+L<Configure::Step> package.
+
+XXX: L<Configure::Step> will be going away in favor of individual namespaces
+I<RSN>.
 
 They should define the following:
 
@@ -102,7 +105,7 @@ Some example descriptions:
 
 =over 4
 
-=item F<inter/progs.pl>
+=item F<config/inter/progs.pm>
 
     Okay, I'm going to start by asking you a couple questions about your
     compiler and linker. Default values are in square brackets; you can
@@ -110,17 +113,17 @@ Some example descriptions:
     default will usually work--they've been intuited from your Perl 5
     configuration.
 
-=item F<auto/cgoto.pl>
+=item F<config/auto/cgoto.pm>
 
     Determining if your compiler supports computed goto...
 
-=item F<gen/config_h.pl>
+=item F<gen/config_h.pm>
 
     Generating config.h...
 
 =back
 
-Note that on non-interactive steps, the text I<done.> will be printed after the
+Note that on non-interactive steps, the text I<done> will be printed after the
 description when the step finishes executing; for example, the user will see:
 
     Determining if your compiler supports computed goto...done.
@@ -131,7 +134,7 @@ This contains the names of any command-line arguments the step cares about.
 Command-line arguments are standardized in F<Configure.pl>; this will be
 described L<later|/"Command-line Arguments"> in more detail.
 
-=item C<Configure::Step::runstep()>
+=item L<Configure::Step::runstep>
 
 This is called to actually execute the step. The command-line arguments that
 your module said it cared about are passed in; they come in the same order as
@@ -140,19 +143,25 @@ in C<@args>, and any that weren't specified are passed as C<undef>.
 =back
 
 The configuration system won't execute your step by default unless it's
-specifically told to. To do this, edit the C<Parrot::Configure::RunSteps>
+specifically told to. To do this, edit the L<Parrot::Configure::RunSteps>
 module's C<@steps> array. Steps are run in the sequence in which they appear in
 C<@steps>.
 
+XXX: L<Configure::Step> will be going away in favor of individual namespaces
+I<RSN>.
+
 Various utility functions for configuration steps are provided by the
-C<Parrot::Configure::Step> module.
+L<Parrot::Configure::Step> module.
 
 A template for a new step might look like this:
 
     package Configure::Step;
 
     use strict;
-    use vars qw($description @args);
+    use vars qw($description $result @args);
+
+    use base qw(Parrot::Configure::Step::Base);
+
     use Parrot::Configure::Step;
 
     $description="<description>";
@@ -177,30 +186,30 @@ should be listed without the dashes.
 
 =head2 Building Up Configuration Data
 
-The second step is F<config/init/data.pl>, which sets up a C<Configure::Data>
-package. You get and set configuration system's data by calling methods on this
-package. The methods are listed below.
+The second step is F<config/init/defaults.pm>, which sets up some defaults in
+the L<Parrot::Configure::Data> package.   You get and set configuration
+system's data by calling methods on this package. The methods are listed below.
 
 =over 4
 
-=item C<< Configure::Data->get(keys) >>
+=item C<< Parrot::Configure::Data->get(keys) >>
 
 Returns the values for the given keys.
 
-=item C<< Configure::Data->set(key, value, [key, value, ...]) >>
+=item C<< Parrot::Configure::Data->set(key, value, [key, value, ...]) >>
 
 Sets the given keys to the given values.
 
-=item C<< Configure::Data->add(delim, key, value, [key, value, ...]) >>
+=item C<< Parrot::Configure::Data->add(delim, key, value, [key, value, ...]) >>
 
 Sets the given keys to the given values or appends values delimited by I<delim>
 to existing keys.
 
-=item C<< Configure::Data->keys() >>
+=item C<< Parrot::Configure::Data->keys() >>
 
 Returns a list of all keys.
 
-=item C<< Configure::Data->dump() >>
+=item C<< Parrot::Configure::Data->dump() >>
 
 Returns a string that can be C<eval>ed by Perl to create a hash representing
 the configuration system's data.
@@ -237,13 +246,14 @@ entries are only used e.g. for Makefile creation.
 
 =item L<Parrot::Configure::Step>
 
-=item F<config/init/data.pl>
+=item F<config/init/data.pm>
 
 =back
 
 =head1 HISTORY
 
-The Parrot configuration system was created by Brent Dax.
+The Parrot configuration system was created by Brent Dax and has been heavily
+managled by Joshua Hoblitt.
 
 =cut
 
