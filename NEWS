@@ -1,5 +1,19 @@
 # $Id$
 
+New in 0.4.0
+- New lexical handling and closure support including better
+  introspection for caller and outer
+- PGE (Parrot Grammar Engine) provides now compilers for P6Rule, 
+  P6Grammar, P5Regexp, and Glob
+- ca. 1000 new tests including 800 for Perl5 regexp
+- Improved unicode charset and encoding support
+- Calling conventions for exception handlers
+- Punie (Perl 1) uses TGE (Tree Grammar Engine) to convert from
+  PGE match objects to AST via two steps of tree transformation grammars
+- New languages: amber and lua
+- The usual code fixes, cleanup, and improvements, including an overhaul
+  of the config and test framework
+
 New in 0.3.1
 
 - Variable sized register frames are finished. Each subroutine gets

@@ -679,6 +679,29 @@ inline op find_not_cclass(out INT, in INT, in STR, in INT, in INT) {
   goto NEXT();
 }
 
+########################################
+
+=item B<escape>(out STR, invar STR)
+
+Escape all non-ascii chars to backslashed escape sequences. A
+string with charset I<ascii> is created as result.
+
+=item B<compose>(out STR, in STR) 
+
+Compose (normalize) a string.
+
+=cut
+
+op escape(out STR, invar STR) {
+  $1 = string_escape_string(interpreter, $2);
+  goto NEXT();
+}
+
+op compose(out STR, in STR) {
+  $1 = string_compose(interpreter, $2);
+  goto NEXT();
+}
+
 =back
 
 =head1 COPYRIGHT

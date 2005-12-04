@@ -34,10 +34,6 @@ Ways to emulate these would be nice too.
 Lots of comments in the code read C<XXX>, C<???>, C<FIXME>, or 
 C<UNIMPL>.  Fix them.
 
-=item * Lexical Pads
-
-Autrijus Tang has details.
-
 =item * Nested *Struct PMCs Share State
 
 chromatic has a test case almost ready to show this.
@@ -152,12 +148,6 @@ Matt Diephouse has prepared an email on this.
 source and argument information.
 
 Will Coleda is thinking about this.
-
-=item * Add rules engines for Perl 5-ish RE's in PGE.
-
-Will Coleda specifically wants
-http://www.tcl.tk/man/tcl8.5/TclCmd/re_syntax.htm, but having a P5-ish one to
-subclass would be just dandy.  Patrick Michaud thinks this is doable.
 
 =item * Allow Runtime Compiler Registration
 

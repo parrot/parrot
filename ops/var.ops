@@ -26,35 +26,6 @@ Operations to create, modify and delete lexical variables.
 =cut
 
 ########################################
-=cut
-
-op DELETED_new_pad(in INT) {
-    goto NEXT();
-}
-
-op DELETED_new_pad(out PMC, in INT) {
-    goto NEXT();
-}
-
-=cut
-
-op DELETED_push_pad(in PMC) {
-    goto NEXT();
-}
-
-op DELETED_pop_pad() {
-    goto NEXT();
-}
-
-op DELETED_pop_pad(out PMC) {
-    goto NEXT();
-}
-
-op DELETED_peek_pad(out PMC) {
-    goto NEXT();
-}
-
-########################################
 
 =item B<store_lex>(in STR, in PMC)
 
@@ -75,14 +46,6 @@ op store_lex(in STR, in PMC) {
 		"Lexical '%Ss' not found", lex_name);
     }
     VTABLE_set_pmc_keyed_str(interpreter, lex_pad, lex_name, $2);
-    goto NEXT();
-}
-
-op DELETED_store_lex(in INT, in STR, in PMC) {
-  goto NEXT();
-}
-
-op DELETED_store_lex(in INT, in INT, in PMC) {
     goto NEXT();
 }
 
@@ -112,17 +75,6 @@ op find_lex(out PMC, in STR) {
     goto NEXT();
 }
 
-op DELETED_find_lex(out PMC, in INT) {
-    goto NEXT();
-}
-
-op DELETED_find_lex(out PMC, in INT, in STR) {
-    goto NEXT();
-}
-
-op DELETED_find_lex(out PMC, in INT, in INT) {
-    goto NEXT();
-}
 
 =back
 

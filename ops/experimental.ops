@@ -222,41 +222,6 @@ inline op exec(in STR) {
   goto NEXT();
 }
 
-########################################
-
-=item B<newclosure>(out PMC, in PMC)
-
-Create a closure of the given subroutine PMC by cloning the sub's state.
-
-=cut
-
-inline op newclosure(out PMC, in PMC) {
-  $1 = parrot_new_closure(interpreter, $2);
-  goto NEXT();
-}
-#######################################################################
-
-=item B<escape>(out STR, invar STR)
-
-Escape all non-ascii chars to backslashed escape sequences. A
-string with charset I<ascii> is created as result.
-
-=item B<compose>(out STR, in STR) 
-
-Compose (normalize) a string.
-
-=cut
-
-op escape(out STR, invar STR) {
-  $1 = string_escape_string(interpreter, $2);
-  goto NEXT();
-}
-
-op compose(out STR, in STR) {
-  $1 = string_compose(interpreter, $2);
-  goto NEXT();
-}
-
 =back
 
 =head1 COPYRIGHT

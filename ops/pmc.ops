@@ -678,7 +678,7 @@ Set $1 to the hash value of $2.
 =cut
 
 op hash(out INT, in PMC) {
-  $1 = VTABLE_hash(interpreter, $2);
+  $1 = VTABLE_hash(interpreter, $2, 0);   /* XXX */
   goto NEXT();
 }
 

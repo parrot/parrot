@@ -402,6 +402,10 @@ continuation.
 
 Return from the sub or method via the current continuation.
 
+=item B<newclosure>(out PMC, in PMC)
+
+Create a closure of the given subroutine PMC by cloning the sub's state.
+
 =cut
 
 inline op invokecc(in PMC) {
@@ -447,6 +451,11 @@ inline op returncc() {
 
   dest = (opcode_t *)p->vtable->invoke(interpreter, p, expr NEXT());
   goto ADDRESS(dest);
+}
+
+inline op newclosure(out PMC, in PMC) {
+  $1 = parrot_new_closure(interpreter, $2);
+  goto NEXT();
 }
 
 =back

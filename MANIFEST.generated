@@ -10,7 +10,7 @@ pbc_merge_shared                                  [main]bin
 disassemble                                       [main]bin
 disassemble_shared                                [main]bin
 blib/lib/libparrot.a                              [main]lib
-blib/lib/libparrot.so.0.3.1                       [main]lib
+blib/lib/libparrot.so.0.4.0                       [main]lib
 runtime/parrot/library/Data/Dumper/Base.pbc       [main]
 runtime/parrot/library/Data/Dumper/Default.pbc    [main]
 runtime/parrot/library/Data/Dumper.pbc            [main]

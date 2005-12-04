@@ -11,7 +11,7 @@ To prepare a release:
     2.  Update files with version-specific information:
 
         a.  Increment the version number in:
-	    VERSION, parrot.spec, and docs/intro.pod,
+	    VERSION, parrot.spec, 
 	    adjust IMCC_VERSION in imcc/main.c, MANIFEST.generated
 
         b.  Change the information in DEVELOPING to reflect
@@ -19,7 +19,7 @@ To prepare a release:
 
         c.  Update README.
 
-        d.  Update ChangeLog, NEWS and docs/ROADMAP.
+        d.  Update ChangeLog, NEWS, docs/ROADMAP, and docs/BROKEN.
 
         e.  Make sure nothing in TODO has been done.
 
