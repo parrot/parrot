@@ -70,6 +70,9 @@
 
 #ifdef PARROT_HAS_HEADER_SYSMMAN
 #  include <sys/mman.h>
+#  ifndef MAP_FAILED
+#    define MAP_FAILED -1
+#  endif
 #endif /* PARROT_HAS_HEADER_SYSMMAN */
 
 #ifdef PARROT_HAS_HEADER_SYSTIME
