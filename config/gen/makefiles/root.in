@@ -1418,7 +1418,7 @@ prog-clean :
 		$(INSTALLABLEPARROT) \
 		$(IMCC_DIR)/main$(O) \
 		$(PDUMP) $(PDUMP)_shared $(SRC_DIR)/pdump$(O) $(SRC_DIR)/packdump$(O) \
-		$(SRC_DIR)/pbc_info$(O) $(PINFO) \
+		$(SRC_DIR)/pbc_info$(O) $(PINFO)_shared $(PINFO) \
 		$(PDB) $(PDB)_shared $(SRC_DIR)/pdb$(O) \
 		$(PBCMERGE) $(PBCMERGE)_shared $(SRC_DIR)/pbc_merge$(O) \
 		$(DIS) $(DIS)_shared $(SRC_DIR)/disassemble$(O) \
