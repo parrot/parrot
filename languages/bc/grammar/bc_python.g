@@ -339,6 +339,10 @@ tokens
 
   // PAST as an ANTLR tree
   PAST_Stmts;     // top level
+  PAST_Stmt;    
+  PAST_Exp;    
+  PAST_Op;    
+  PAST_Val;    
 }
 
 plus! returns [reg_name]
@@ -511,10 +515,29 @@ gen_pir!
   ;
 
 // generate an AST that is equivalent to a PAST data structure
-// TODO: undummy this 
+// TODO: Create this from bc input
 gen_antlr_past!
   : B:expr_list
     {
-      #gen_antlr_past = #([PAST_Stmts, "dummy past stmts\n#"]); 
+      #gen_antlr_past = #( [ PAST_Stmts, "dummy past stmts" ],
+                             #( [ PAST_Stmt, "dummy stmt 1" ],
+                                  #( [ PAST_Exp, "dummy exp 1" ],
+                                       #( [ PAST_Op, "dummy print op 1" ],
+                                            #( [ PAST_Exp, "dummy exp 1:1" ],
+                                                 [ PAST_Val, "1" ]
+                                             )
+                                        )
+                                   )
+                              ),
+                             #( [ PAST_Stmt, "dummy stmt 2" ],
+                                  #( [ PAST_Exp, "dummy exp 2" ],
+                                       #( [ PAST_Op, "dummy print op 2" ],
+                                            #( [ PAST_Exp, "dummy exp 2:1" ],
+                                                 [ PAST_Val, "\"\\n\"" ]
+                                             )
+                                        )
+                                   )
+                              )
+                         ); 
     }
   ;

@@ -65,6 +65,10 @@ PIR_NOOP = 41
 PIR_COMMENT = 42
 PIR_NEWLINE = 43
 PAST_Stmts = 44
+PAST_Stmt = 45
+PAST_Exp = 46
+PAST_Op = 47
+PAST_Val = 48
 
 class Parser(antlr.LLkParser):
     ### user action >>>
@@ -916,7 +920,11 @@ _tokenNames = [
     "PIR_NOOP", 
     "PIR_COMMENT", 
     "PIR_NEWLINE", 
-    "PAST_Stmts"
+    "PAST_Stmts", 
+    "PAST_Stmt", 
+    "PAST_Exp", 
+    "PAST_Op", 
+    "PAST_Val"
 ]
     
 

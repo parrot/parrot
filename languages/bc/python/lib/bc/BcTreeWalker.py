@@ -62,6 +62,10 @@ PIR_NOOP = 41
 PIR_COMMENT = 42
 PIR_NEWLINE = 43
 PAST_Stmts = 44
+PAST_Stmt = 45
+PAST_Exp = 46
+PAST_Op = 47
+PAST_Val = 48
 
 ### user code>>>
 
@@ -981,7 +985,7 @@ class Walker(antlr.TreeParser):
             _t = self._retTree
             B_AST = self.returnAST
             gen_antlr_past_AST = currentAST.root
-            gen_antlr_past_AST = antlr.make(self.astFactory.create(PAST_Stmts,"dummy past stmts\n#"));
+            gen_antlr_past_AST = antlr.make(self.astFactory.create(PAST_Stmts,"dummy past stmts"), antlr.make(self.astFactory.create(PAST_Stmt,"dummy stmt 1"), antlr.make(self.astFactory.create(PAST_Exp,"dummy exp 1"), antlr.make(self.astFactory.create(PAST_Op,"dummy print op 1"), antlr.make(self.astFactory.create(PAST_Exp,"dummy exp 1:1"), self.astFactory.create(PAST_Val,"1"))))), antlr.make(self.astFactory.create(PAST_Stmt,"dummy stmt 2"), antlr.make(self.astFactory.create(PAST_Exp,"dummy exp 2"), antlr.make(self.astFactory.create(PAST_Op,"dummy print op 2"), antlr.make(self.astFactory.create(PAST_Exp,"dummy exp 2:1"), self.astFactory.create(PAST_Val,"\"\\n\""))))));
             currentAST.root = gen_antlr_past_AST
             if (gen_antlr_past_AST != None) and (gen_antlr_past_AST.getFirstChild() != None):
                 currentAST.child = gen_antlr_past_AST.getFirstChild()
@@ -1043,6 +1047,10 @@ _tokenNames = [
     "PIR_NOOP", 
     "PIR_COMMENT", 
     "PIR_NEWLINE", 
-    "PAST_Stmts"
+    "PAST_Stmts", 
+    "PAST_Stmt", 
+    "PAST_Exp", 
+    "PAST_Op", 
+    "PAST_Val"
 ]
     
