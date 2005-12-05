@@ -136,3 +136,6 @@ simple example follows:
   .endm
 
   .inc3(I0) # Expands to the obvious ('inc I0\n') x 3
+
+=cut
+

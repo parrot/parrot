@@ -300,7 +300,7 @@ config/gen/platform/win32/stat.h                  []
 config/gen/platform/win32/threads.h               []
 config/gen/platform/win32/time.c                  []
 config/gen/revision.pm                            []
-config/init/defaults.pm                               []
+config/init/defaults.pm                           []
 config/init/headers.pm                            []
 config/init/hints.pm                              []
 config/init/hints/aix.pm                          []
@@ -351,6 +351,13 @@ docs/extend.pod                                   [main]doc
 docs/faq.pod                                      [main]doc
 docs/gettingstarted.pod                           [main]doc
 docs/glossary.pod                                 [main]doc
+docs/imcc/calling_conventions.pod                 [main]doc
+docs/imcc/imcc.pod                                [main]doc
+docs/imcc/imcfaq.pod                              [main]doc
+docs/imcc/macros.pod                              [main]doc
+docs/imcc/operation.pod                           [main]doc
+docs/imcc/parsing.pod                             [main]doc
+docs/imcc/syntax.pod                              [main]doc
 docs/intro.pod                                    [main]doc
 docs/jit.pod                                      [main]doc
 docs/memory_internals.pod                         [main]doc
@@ -679,13 +686,6 @@ imcc/cfg.c                                        []
 imcc/cfg.h                                        []
 imcc/debug.c                                      []
 imcc/debug.h                                      []
-imcc/docs/calling_conventions.pod                 [main]doc
-imcc/docs/imcc.pod                                [main]doc
-imcc/docs/imcfaq.pod                              [main]doc
-imcc/docs/macros.pod                              [main]doc
-imcc/docs/operation.pod                           [main]doc
-imcc/docs/parsing.pod                             [main]doc
-imcc/docs/syntax.pod                              [main]doc
 imcc/examples/README                              [main]doc
 imcc/examples/sample.imc                          [main]doc
 imcc/examples/sub.imc                             [main]doc

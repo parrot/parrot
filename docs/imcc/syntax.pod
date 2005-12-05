@@ -405,3 +405,6 @@ F<imcc.l>, F<imcc.y>
 =head1 AUTHOR
 
 Leopold Toetsch <lt@toetsch.at>
+
+=cut
+

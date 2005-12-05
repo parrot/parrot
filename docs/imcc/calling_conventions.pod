@@ -322,8 +322,8 @@ branch from the B<ret> statement back is ignored in the CFG.
 
 =head1 FILES
 
-F<imcc/imcc.y>, F<imcc/t/syn/bsr.t>, F<imcc/t/syn/pcc.t>,
-F<imcc/t/syn/objects.t>, F<docs/pdds/pdd03_calling_conventions.pod>
+F<imcc/imcc.y>, F<t/compilers/imcc/syn/bsr.t>, F<t/compilers/imcc/syn/pcc.t>,
+F<t/compilers/imcc/syn/objects.t>, F<docs/pdds/pdd03_calling_conventions.pod>
 
 =head1 AUTHOR
 

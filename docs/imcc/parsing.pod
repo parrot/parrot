@@ -126,9 +126,11 @@ F<docs/calling_conventions.pod>
 
 =head1 FILES
 
-F<imcc.y>, F<instructions.c>, F<t/syn/sub.t>, F<t/imcpasm/sub.t>,
-F<t/syn/scope.t>
+F<imcc.y>, F<instructions.c>, F<t/compilers/imcc/syn/sub.t>,
+F<t/compilers/imcc/imcpasm/sub.t>, F<t/compilers/imcc/syn/scope.t>
 
 =head1 AUTHOR
 
 Leopold Toetsch <lt@toetsch.at>
+
+=cut

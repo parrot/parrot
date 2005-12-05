@@ -38,9 +38,9 @@ sub new
 	
 	return $self->SUPER::new(
 		'IMCC', 'imcc.html', '', 
-		$self->new_group('Documentation', '', 'imcc/docs'),
+		$self->new_group('Documentation', '', 'docs/imcc'),
 		$self->new_group('Examples', '', 'imcc/examples'),
-		$self->new_group('Tests', '', 'imcc/t'),
+		$self->new_group('Tests', '', 't/compilers/imcc'),
 	);
 }
 
