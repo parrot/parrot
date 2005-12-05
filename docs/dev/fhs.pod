@@ -1,0 +1,168 @@
+=pod
+
+=head1 Title
+
+FHS - Filesystem Hieararchy Standard and Parrot
+
+=head1 AUTHOR
+
+Florian Ragwitz E<lt>rafl@debian.orgE<gt>
+
+=head1 VERSION
+
+  Maintainer: Florian Ragwitz
+  Date: 5 Dez 2005
+  Last Modified: 5 Dez 2005
+  Number: 0
+  Version: 1
+
+This document introduces to the FHS, the Filesystem Hierarchy Standard,
+and how those concern Parrot.
+
+=head1 INTRODUCTION
+
+The FHS defines some rules for file and directory placement under
+UNIX-like operating systems. This supports interoperability of
+applications, system administration tools, development tools, and
+scripts as well as greater uniformity of documentation for these
+systems.
+
+=head1 DIRECTORIES
+
+There's a large amount of directories explained in the FHS that are not
+explained here. The reason for this is that not all of them are
+concerning Parrot.
+
+=head2 /etc
+
+Does parrot have things where it makes sense to configure them using a
+config file? I don't think so.
+
+=head2 /tmp
+
+All temporary files should be placed here. Parrot could use this
+directory for files that are generated during the compile of parrot code
+to native executables.
+
+=head2 /usr
+
+I</usr> contains is shareable, read-only data. Any information that is
+host-specific or varies with time is stored elsewhere.
+
+=head3 /usr/bin
+
+This is the primary directory of executable commands on the system. All
+executables that are intended to be called directly by the user (i.e.
+parrot, pdump, disassemble, parrot-debugger, pbc_info,  pbg_merge, ...)
+should go here. The current version number should be appended to the
+binaries itself and a symlink needs to be created that points from the
+binary with version number to the normal name of the file without a
+version. That makes installing more than one version possible.
+
+Executables that are for internal use only are stored elsewhere.
+
+=head3 /usr/include
+
+This is where all of the system's general-use include files for the C
+programming language should be placed.
+
+For parrot this is the content of I<include/parrot>. It should be placed
+in I</usr/include/parrot/$(VERSION> (i.e. I</usr/include/parrot/0.4.0>),
+including those files in I<include/parrot> that are generated during
+build time.
+
+=head3 /usr/lib
+
+I</usr/lib> includes object files, libraries, and internal binaries that
+are not intended to be executed directly by users or scripts.
+
+This is libparrot$(SOEXT).$(SOVERSION) if the parrot binary was linked
+dynamically. Otherwise nothing.
+
+Also Parrot usees a single subdirectory called I</usr/lib/parrot> to
+store all architecture-dependent data exclusively used by parrot. These
+files are grouped by the parrot version they belong to. So we'll have
+I</usr/lib/parrot/0.4.0>, I</usr/lib/parrot/0.4.1>, etc.
+
+All .pbc and .fpmc files should go there.
+
+.pbc files are kind of architecture independent, because parrot can run
+PBCs created on any architecture on any architecture, but because .pbc
+files created on 32 bit platforms differ from those created on 64 bit
+platforms and the performance of executing bytecode created on an
+architecture with another address width is much slower we consider
+parrot bytecode to be architecture dependent.
+
+=head3 /usr/share
+
+The I</usr/share> hierarchy is for all read-only architecture
+independent data files. Parrot stores those files in
+I</usr/share/parrot/$(VERSION)>. For example all .imc, .pasm and  .imc
+files should go there as well as data files for libraries like images
+and such.
+
+=head4 /usr/share/man
+
+Manpages are read-only architecture independent data files as well, but
+they belong into I</usr/share/man> instead of I</usr/share/parrot/> so
+they are in $MANPATH and can be viewed using the I<man> command.
+
+=head4 /usr/share/doc
+
+All documentation as well as examples should go into a subdirectory of
+I</usr/share/doc>.
+
+=head1 VIOLATIONS
+
+=over 2
+
+=item /usr/examples
+
+Examples should go into I</usr/share/doc/examples>.
+
+=item /usr/docs
+
+This belongs into I</usr/share/doc/docs> or something similar.
+
+=item /usr/runtime
+
+This needs to be split up into I</usr/lib> and I</usr/share> according
+to the rules that are given in the B<DIRECTORIES> section.
+
+=item /usr/include/parrot
+
+This directory conforms to the FHS, but makes it impossible to have more
+than one version of parrot installed at once. It should be
+I</usr/include/parrot/$(VERSION)>.
+
+=item /usr/bin
+
+The files in I</usr/bin> also lack support for multiple installed parrot
+versions. Also if we build a shared parrot and shared parrot utils the
+executables in this directory have a '_shared' suffix which is bad.
+
+=item /usr/imcc
+
+This directory should be removed. It only contains documentation and
+examples which belong somewhere else.
+
+=item /usr/LICENSES
+
+Move this to I</usr/share/doc/> or just remove it if it's legal.
+
+=item /usr/NEWS, /usr/PBC_COMPAT, ...
+
+This is also documentation for I</usr/share/doc>.
+
+=item /usr/parrot-config.imc
+
+This is a command which can be called from the user. It should be in
+I</usr/bin>, maybe without the .imc suffix.
+
+=back
+
+=head1 SOURCES
+
+FHS 2.3 - L<http://www.pathname.com/fhs/>
+
+=cut
