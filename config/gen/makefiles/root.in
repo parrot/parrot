@@ -179,7 +179,8 @@ GEN_MAKEFILES = \
 	compilers/tge/Makefile \
 	languages/punie/Makefile \
 	languages/bc/Makefile \
-	languages/Zcode/Makefile
+	languages/Zcode/Makefile \
+	languages/lua/Makefile
 
 GEN_CONFIGS = \
 	include/parrot/config.h \
