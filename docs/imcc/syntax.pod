@@ -207,6 +207,25 @@ the given B<type>. You can define multiple identifiers of the same type by separ
 them with commas:
   .sym int i, j
 
+=item .lex <identifier>, <reg>
+
+Declare a lexical variable that is an alias for a PMC register. The
+PIR compiler calls this method in response to a .lex STRING, PREG
+directive. For example, given this preamble:
+
+    .lex "$a", $P0
+    $P1 = new Integer
+
+    These two opcodes have an identical effect:
+
+    $P0 = $P1
+    store_lex "$a", $P1
+
+    And these two opcodes also have an identical effect:
+
+    $P1 = $P0
+    $P1 = find_lex "$a"
+
 =item .const <type> <identifier> = <const>
 
 Define a named constant of style I<type> and value I<const>.
