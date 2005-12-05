@@ -190,7 +190,7 @@ Use the C<:optional> and C<:opt_flag> pragmas:
 
 =head2 How do I create nested subroutines?
 
-Please refer to L<pdds/pdd20.pod> for details.
+Please refer to L<docs/pdds/pdd20_lexical_vars.pod> for details.
 
 =head1 Variables
 
@@ -227,11 +227,12 @@ namespace names have a NULL char prepended to their name.
 
 =head2 How do I use lexical pads to have both a function scope and a global scope?
 
-Please refer to L<pdds/pdd20.pod> for details.
+Please refer to L<docs/pdds/pdd20_lexical_vars.pod> for details.
 
 =head2 How can I delete a lexical variable?
 
-You can't.
+You can't, You can store a Null PMC as the value though, which will
+catch all further access to that variable and through an exception.
 
 =head2 How do I resolve a variable name?
 
@@ -245,26 +246,28 @@ order, and store it in C<$P0>.
 
 =head2 How do I fetch a variable from the current lexical pad?
 
-Use lexical depth -1:
+    find_lex $P0, "foo"
 
-    find_lex $P0, -1, "foo"
+or much better, if possible just use the variable defined along with
+the '.lex' definition of "foo".
 
 =head2 How do I fetch a variable from any nesting depth?
 
-Omit the depth parameter:
+That is still the same:
 
     find_lex $P0, "foo"
 
-This finds a C<foo> variable at any depth starting from the top.
+This finds a C<foo> variable at any B<outer> depth starting from the top.
+
+If your language looks up variables differently you have to walk the
+'caller' chain. See also F<t/dynclass/dynlexpad.t>.
 
 =head2 How can I produce more efficient code for lexicals?
 
-Use numeric indices instead of variable names for lexical retrieval. Lexicals
-of one pad depth are numbered from 0..n-1 in the order of their declaration.
-
-    find_lex $P0, -1, 0       # get first lexical from top pad
-    find_lex $P1, -2, 3       # get forth lexical from next inner pad
-    ...
+Don't emit C<store_lex> at all. Use C<find_lex> only if the compiler
+doesn't know the variable. You can always just use the register that was
+defined in the C<.lex> directive as an alias to that lexical, if you are in t
+the same scope.
 
 =head1 Modules, Classes, and Objects
 
