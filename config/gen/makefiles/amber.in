@@ -1,6 +1,6 @@
 RM_F     = ${rm_f}
 PERL     = ${perl}
-BUILDPMC = $(PERL) ${build_dir}${slash}build_tools${slash}build_dynclasses.pl
+BUILDPMC = $(PERL) ${build_dir}${slash}tools${slash}build${slash}build_dynclasses.pl
 DESTDIR  = ${build_dir}${slash}runtime${slash}parrot${slash}dynext
 O        = ${o}
 CLASSDIR = lib/kernel/pmc

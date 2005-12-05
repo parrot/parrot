@@ -8,7 +8,7 @@ Parrot::OpTrans::Compiled - Transform Parrot Bytecode To C
 =head1 DESCRIPTION
 
 C<Parrot::OpTrans::Compiled> inherits from C<Parrot::OpTrans> and is
-used by F<build_tools/pbc2c.pl> to transform Parrot bytecode to a C code
+used by F<tools/build/pbc2c.pl> to transform Parrot bytecode to a C code
 run loop.
 
 =head2 Instance Methods

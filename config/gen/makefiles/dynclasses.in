@@ -46,7 +46,7 @@ DISABLED_PMCS = \
   pyproxyclass \
   pyiter
 
-BUILD = $(PERL) "${build_dir}${slash}build_tools${slash}build_dynclasses.pl"
+BUILD = $(PERL) "${build_dir}${slash}tools${slash}build${slash}build_dynclasses.pl"
 
 all :
 	@$(BUILD) generate $(PMCS)

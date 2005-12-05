@@ -308,7 +308,7 @@ Parrot_init_lib(Interp *interpreter,
         /*
          * this PMC should better be constant, but then all the contents
          * and the metadata have to be constant too
-         * s. also build_tools/ops2c.pl and lib/Parrot/Pmc2c.pm
+         * s. also tools/build/ops2c.pl and lib/Parrot/Pmc2c.pm
          */
         lib_pmc = pmc_new(interpreter, enum_class_ParrotLibrary);
     }

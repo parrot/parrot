@@ -9,7 +9,7 @@ Copyright (C) 2006, the Perl Foundation.
 
 Some files have a different copyright:
 
-build_tools/pbc2c.pl, examples/pir/euclid.pir, examples/subs/jsr_ret.pasm,
+tools/build/pbc2c.pl, examples/pir/euclid.pir, examples/subs/jsr_ret.pasm,
 lib/Parrot/Op.pm, src/packdump.c, src/packfile.c, src/packout.c:
 Copyright (C) 2001-2002 Gregor N. Purdy. All rights reserved.
 

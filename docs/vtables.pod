@@ -81,7 +81,7 @@ non-existent Fooby language:
     % perl -I../lib genclass.pl FoobyNumber > foobynumber.pmc
 
 This will produce a skeleton C file (to be preprocessed by the
-F<build_tools/pmc2c.pl> program) with stubs for all the methods you need to
+F<tools/build/pmc2c.pl> program) with stubs for all the methods you need to
 fill in. The function C<init> allows you to set up anything you need to set up.
 
 Now you'll have to do something a little different depending on whether you're
@@ -299,7 +299,7 @@ classes/YOURCLASS.pmc, add the C<extends SUPERCLASS> phrase. For example:
 
   pmclass PackedArray extends Array { ...
 
-See the POD documentation in F<build_tools/pmc2c.pl> for a list of useful
+See the POD documentation in F<tools/build/pmc2c.pl> for a list of useful
 keywords that you may use in the .pmc file. (Run C<perldoc -F pmc2c.pl> to view
 the POD.)
 

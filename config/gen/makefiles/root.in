@@ -40,7 +40,7 @@ INCLUDE_DIR     = $(EXEC_PREFIX)/include
 AST_DIR         = ast
 
 # directory for build tools
-BUILD_TOOLS_DIR = build_tools
+BUILD_TOOLS_DIR = tools/build
 
 # current directory
 CUR_DIR         = .
@@ -203,7 +203,7 @@ GEN_CONFIGS = \
 	$(SRC_DIR)/nci_test$(O) \
 	libparrot.def \
 	ast/ast.y.flag \
-	build_tools/build_dynclasses.pl \
+	tools/build/build_dynclasses.pl \
 	$(IMCC_DIR)/imcc.y.flag \
 	ops/core_ops.c \
 	ops/core_ops_switch.c
@@ -535,7 +535,7 @@ $(GEN_LIBRARY) : $(PARROT)
 
 # constant string support
 .c.str :
-	$(PERL) build_tools/c2str.pl $< > $@
+	$(PERL) tools/build/c2str.pl $< > $@
 
 STR_FILES = \
 	$(SRC_DIR)/builtin.str \
@@ -552,13 +552,13 @@ STR_FILES = \
 	$(SRC_DIR)/spf_vtable.str \
 	$(CLASS_STR_FILES)
 
-$(INC_DIR)/string_private_cstring.h : $(STR_FILES) build_tools/c2str.pl
-	$(PERL) build_tools/c2str.pl --all
+$(INC_DIR)/string_private_cstring.h : $(STR_FILES) tools/build/c2str.pl
+	$(PERL) tools/build/c2str.pl --all
 
 # classes PMC build utils and rules
-PMC2CD = $(PERL) build_tools/pmc2c.pl --dump
-PMC2CC = $(PERL) build_tools/pmc2c.pl --c
-PMC2CV = $(PERL) build_tools/pmc2c.pl --vt
+PMC2CD = $(PERL) tools/build/pmc2c.pl --dump
+PMC2CC = $(PERL) tools/build/pmc2c.pl --c
+PMC2CV = $(PERL) tools/build/pmc2c.pl --vt
 
 .pmc.dump :
 	$(PMC2CD) $<
@@ -690,7 +690,7 @@ runtime/parrot/include/config.fpmc : myconfig config_lib.pasm $(MINIPARROT)
 	$(MINIPARROT) config_lib.pasm > $@
 
 parrot.def :
-	$(PERL) build_tools/parrotdef.pl
+	$(PERL) tools/build/parrotdef.pl
 
 $(PARROT) : $(IMCC_DIR)/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
 	lib/Parrot/OpLib/core.pm $(SRC_DIR)/parrot_config$(O) \
@@ -1097,7 +1097,7 @@ $(OPS_DIR)/core_ops_switch$(O) : $(GENERAL_H_FILES) $(OPS_DIR)/core_ops_switch.c
 $(OPS_DIR)/core_ops_switch.c $(INC_DIR)/oplib/core_ops_switch.h : $(OPS_FILES) $(BUILD_TOOLS_DIR)/ops2c.pl lib/Parrot/OpsFile.pm lib/Parrot/Op.pm $(INC_DIR)/config.h lib/Parrot/OpLib/core.pm lib/Parrot/OpTrans/CSwitch.pm
 	$(PERL) $(BUILD_TOOLS_DIR)/ops2c.pl CSwitch --core
 
-build_tools\parrotdef.pl : $(CLASS_PMC_FILES)
+tools${slash}build\parrotdef.pl : $(CLASS_PMC_FILES)
 
 ${TEMP_cg_c}
 
@@ -1429,7 +1429,7 @@ prog-clean :
 		install_config.fpmc \
 		$(LIBNCI_TEST_SO) \
 		$(LIBPARROT)
-	$(PERL) build_tools/c2str.pl --init
+	$(PERL) tools/build/c2str.pl --init
 	$(RM_F) \
 		$(STR_FILES) $(INC_DIR)/string_private_cstring.h \
 		classes/*.c classes/*.h classes/*.dump vtable.dump \

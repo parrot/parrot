@@ -23,7 +23,7 @@ Ops are either I<auto> or I<manual>. Manual ops are responsible for
 having explicit next-op C<RETURN()> statements, while auto ops can count
 on an automatically generated next-op to be appended to the op body.
 
-Note that F<build_tools/ops2c.pl> supplies either 'inline' or 'function'
+Note that F<tools/build/ops2c.pl> supplies either 'inline' or 'function'
 as the op's type, depending on whether the C<inline> keyword is present
 in the op definition. This has the effect of causing all ops to be
 considered manual.
@@ -438,11 +438,11 @@ sub size
 
 =item C<Parrot::OpTrans>
 
-=item F<build_tools/ops2c.pl>
+=item F<tools/build/ops2c.pl>
 
-=item F<build_tools/ops2pm.pl>
+=item F<tools/build/ops2pm.pl>
 
-=item F<build_tools/pbc2c.pl>
+=item F<tools/build/pbc2c.pl>
 
 =back
 
