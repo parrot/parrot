@@ -989,6 +989,16 @@ CODE
 /Lexical 'no_such' not found/
 OUTPUT
 
+pir_output_is(<<'CODE', <<'OUTPUT', 'api parsing');
+.sub main :main
+	.lex 'a', $P0
+	store_lex 'a', $P0
+	$P0 = find_name 'a'
+.end
+CODE
+ok
+OUTPUT
+
 
 ## remember to change the number of tests :-)
-BEGIN { plan tests => 40; }
+BEGIN { plan tests => 41; }
