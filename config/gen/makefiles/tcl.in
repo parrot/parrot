@@ -95,6 +95,8 @@ lib${slash}variables.pir \
 tcl.pir_template \
 tcl.pl
 
+all: tcl.pbc
+
 tcl.pbc: $(PARROT) pmcs lib/tcllib.pbc tcl.pir
 	$(PARROT) --output=tcl.pbc tcl.pir
 
