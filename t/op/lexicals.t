@@ -992,10 +992,17 @@ OUTPUT
 pir_output_is(<<'CODE', <<'OUTPUT', 'api parsing');
 .sub main :main
 	.lex 'a', $P0
-	store_lex 'a', $P0
-	$P0 = find_name 'a'
+        $P1 = new .String
+        $P1 = "ok\n"
+	store_lex 'a', $P1
+	$P2 = find_name 'a'
+        print $P0
+        print $P1
+        print $P2
 .end
 CODE
+ok
+ok
 ok
 OUTPUT
 
