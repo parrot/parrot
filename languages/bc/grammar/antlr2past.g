@@ -1,9 +1,11 @@
 // Copyright: 2005 The Perl Foundation.  All Rights Reserved.
 // $Id$
 
+// antlr2past.g is a misnomer. antlr_past2pir_past.g would be a better fit
+
 header "Antlr2PastTreeWalker.__init__" 
 {
-  self.reg_num   = 0;  // counter for unlimited number of PMC registers
+  self.reg       = 100;  // counter for unlimited number of PMC registers
   self.label_num = 0;  // counter for generation jump labels
   self.level     = 0;  // for indentation
 }
@@ -40,78 +42,124 @@ options
 //}
 
 gen_pir_past!
-  : #(PAST_Stmts S1:past_stmt S2:past_stmt)
+  : #(PAST_Stmts reg_S1=S1:past_stmt reg_S2=S2:past_stmt)
     {
       pir = """
 .local pmc stmts
 stmts = new 'PAST::Stmts'
-$P11 = new PerlArray
+$P%d = new PerlArray
 
-    $P12 = new 'PAST::Stmt'
-    $P13 = new PerlArray
+    $P%d = new 'PAST::Stmt'
+    $P%d = new PerlArray
 
-        $P14 = new 'PAST::Exp'
-        $P15 = new PerlArray
+        $P%d = new 'PAST::Exp'
+        $P%d = new PerlArray
 
-            $P16 = new 'PAST::Op'
-            $P17 = new PerlArray
-                $P18 = new 'PAST::Exp'
-                $P19 = new PerlArray
+            $P%d = new 'PAST::Op'
+            $P%d = new PerlArray
 
-                    $P20 = new 'PAST::Val'
-                    $P20.set_node('1', 0, 1 )
+                $P%d = new 'PAST::Exp'
+                $P%d = new PerlArray
+
+                    $P%d = new 'PAST::Val'
+                    $P%d.set_node('1', 0, 1 )
             
-                push $P19, $P20 
-                $P18.set_node('1', 1, $P19)
+                push $P%d, $P%d 
+                $P%d.set_node('1', 1, $P%d)
             
-            push $P17, $P18 
-            $P16.set_node('1', 1, 'print' ,$P17)
+            push $P%d, $P%d 
+            $P%d.set_node('1', 1, 'print' ,$P%d)
             
-        push $P15, $P16 
-        $P14.set_node('1', 1 ,$P15)
+        push $P%d, $P%d 
+        $P%d.set_node('1', 1 ,$P%d)
             
-    push $P13, $P14 
-    $P12.set_node('1', 1 ,$P13)
-push $P11, $P12
-            
-    $P21 = new 'PAST::Stmt'
-    $P22 = new PerlArray
+    push $P%d, $P%d 
+    $P%d.set_node('1', 1 ,$P%d)
 
-            $P23 = new 'PAST::Exp'
-            $P24 = new PerlArray
+push $P%d, $P%d
+            
+    $P%d = new 'PAST::Stmt'
+    $P%d = new PerlArray
 
-                $P25 = new 'PAST::Op'
-                $P26 = new PerlArray
+            $P%d = new 'PAST::Exp'
+            $P%d = new PerlArray
 
-                    $P27 = new 'PAST::Exp'
-                    $P28 = new PerlArray
+                $P%d = new 'PAST::Op'
+                $P%d = new PerlArray
+
+                    $P%d = new 'PAST::Exp'
+                    $P%d = new PerlArray
                     
-                        $P29 = new 'PAST::Val'
-                        $P29.set_node('1', 0, '"\\n"' )
+                        $P%d = new 'PAST::Val'
+                        $P%d.set_node('1', 0, '"\\n"' )
                 
-                    push $P28, $P29 
-                    $P27.set_node('1', 1, $P28)
+                    push $P%d, $P%d 
+                    $P%d.set_node('1', 1, $P%d)
             
-                push $P26, $P27 
-                $P25.set_node('1', 1, 'print' ,$P26)
+                push $P%d, $P%d 
+                $P%d.set_node('1', 1, 'print' ,$P%d)
             
-            push $P24, $P25 
-            $P23.set_node('1', 1 ,$P24)
+            push $P%d, $P%d 
+            $P%d.set_node('1', 1 ,$P%d)
             
-    push $P22, $P23 
-    $P21.set_node('1', 1 ,$P22)
-push $P11, $P21
+    push $P%d, $P%d 
+    $P%d.set_node('1', 1 ,$P%d)
 
-stmts.set_node('1', 1, $P11)
+push $P%d, $P%d
+
+stmts.set_node('1', 1, $P%d)
             
-#"""
+#""" % (
+11,
+    reg_S1,
+    reg_S1 + 1,
+        reg_S1 + 2,
+        reg_S1 + 3,
+            reg_S1 + 4,
+            reg_S1 + 5,
+                reg_S1 + 6,
+                reg_S1 + 7,
+                    reg_S1 + 8,
+                    reg_S1 + 8,
+                reg_S1 + 7, reg_S1 + 8,
+                reg_S1 + 6, reg_S1 + 7,
+            reg_S1 + 5, reg_S1 + 6,
+            reg_S1 + 4, reg_S1 + 5,
+        reg_S1 + 3, reg_S1 + 4,
+        reg_S1 + 2, reg_S1 + 3,
+    reg_S1 + 1, reg_S1 + 2,
+    reg_S1, reg_S1 + 1,
+11, reg_S1,
+    reg_S2,
+    reg_S2 + 1,
+        reg_S2 + 2,
+        reg_S2 + 3,
+            reg_S2 + 4,
+            reg_S2 + 5,
+                reg_S2 + 6,
+                reg_S2 + 7,
+                    reg_S2 + 8,
+                    reg_S2 + 8,
+                reg_S2 + 7, reg_S2 + 8,
+                reg_S2 + 6, reg_S2 + 7,
+            reg_S2 + 5, reg_S2 + 6,
+            reg_S2 + 4, reg_S2 + 5,
+        reg_S2 + 3, reg_S2 + 4,
+        reg_S2 + 2, reg_S2 + 3,
+    reg_S2 + 1, reg_S2 + 2,
+    reg_S2, reg_S2 + 1,
+11, reg_S2,
+11 
+       )
       #gen_pir_past = #( [PIR_OP, pir], #S1, #S2 ); 
     }
   ;
 
-past_stmt!
+past_stmt! returns[reg]
   : #( PAST_Stmt past_exp )
     {
+      reg = self.reg
+      self.reg = self.reg + 100;
       pir = """
       # stmt
 #"""
@@ -119,8 +167,15 @@ past_stmt!
     }
   ;
 
-past_exp!
+past_exp! returns[reg]
   : #(PAST_Exp ( past_op | past_val ) ) 
+    {
+      self.reg = self.reg + 100;
+      pir = """
+      # exp
+#"""
+      #past_stmt = #( [PIR_OP, pir] ); 
+    }
   ;
 
 past_op!
