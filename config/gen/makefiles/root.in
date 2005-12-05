@@ -1506,7 +1506,7 @@ imcc-clean:
 		$(IMCC_DIR)/imcparser.output
 
 realclean : clean
-	$(RM_F) \
+	$(RM_RF) \
 		$(STICKY_FILES) \
 		blib
 
