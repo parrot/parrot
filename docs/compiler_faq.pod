@@ -190,7 +190,7 @@ Use the C<:optional> and C<:opt_flag> pragmas:
 
 =head2 How do I create nested subroutines?
 
-Please refer to PDD20.
+Please refer to L<pdds/pdd20.pod> for details.
 
 =head1 Variables
 
@@ -227,7 +227,7 @@ namespace names have a NULL char prepended to their name.
 
 =head2 How do I use lexical pads to have both a function scope and a global scope?
 
-Please refer to PDD20.
+Please refer to L<pdds/pdd20.pod> for details.
 
 =head2 How can I delete a lexical variable?
 
