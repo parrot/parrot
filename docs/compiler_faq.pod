@@ -190,10 +190,7 @@ Use the C<:optional> and C<:opt_flag> pragmas:
 
 =head2 How do I create nested subroutines?
 
-PIR doesn't support nested subroutines. You have to emit subroutines
-one by one. If lexicals of the outer subroutine are visible inside the
-nested sub, you have to include the outer pad depth in C<new_pad>
-opcodes.
+Please refer to PDD20.
 
 =head1 Variables
 
@@ -230,99 +227,11 @@ namespace names have a NULL char prepended to their name.
 
 =head2 How do I use lexical pads to have both a function scope and a global scope?
 
-To create lexical variables, you'll need to keep track of how deeply nested
-each block of code is.  Say you have some HLL code like so:
+Please refer to PDD20.
 
-    # depth 0
-    lexical $bar
-    $foo = 3       # global foo
-    $bar = 5       # bar at depth 0
-    {
-      # depth 1
-      lexical $foo
-      $foo = 5     # foo at depth 1
-      {
-         # depth 2
-         lexical $bar
-         $foo = 7  # also foo at depth 1
-         $bar = 2  # bar at depth 2
-      }
-      {
-         # depth 2, again
-         lexical $foo
-         $foo = 11 # foo at depth 2
-      }
-    }
+=head2 How can I delete a lexical variable?
 
-When you are building your program tree, have each block reference its parent
-block, note its depth, and keep a list of all its lexical variables.  At the
-opening of each block (that has lexical variables), emit code to push a lexical
-pad:
-
-    new_pad n
-
-where C<n> is the lexical depth of the block.  After the first C<new_pad 0>,
-you can also use:
-
-    new_pad -1
-
-to create a new pad with a nesting of C<outer + 1>.
-
-At any point that you exit a block, you should emit
-
-    pop_pad
-
-This isn't necessary if you leave a block by invoking a continuation (by
-C<return>ing from a subroutine, for instance), as the continuation will
-automatically put the lexical pad stack back the way it was when the
-continuation was created.
-
-When you need to figure out how to access a certain variable, simply look at
-the topmost block and work your way down the tree until you finds a block that
-declares lexical variables. Then take the lexical depth of the block in which
-you found it and emit some code like so:
-
-    find_lex $P0, 2, "foo"
-
-where C<2> is the depth the variable was found at, C<foo> is the name of the
-variable, and $P0 is a PMC register in which to store the variable.
-
-Note that, by convention (and confusing IMCC syntax), variables, not direct
-values, are stored. So to assign to this lexical variable, you would say:
-
-    find_lex $P0, 2, "foo"
-    assign $P0, some_value
-
-instead of:
-
-    store_lex 2, "foo", some_value
-
-You will still need to do a C<store_lex> at some point (probably at the start
-of the block in which it is declared) to create the variable in the first
-place. Put a C<Undef> PMC in it or something.
-
-If, on the other hand, you never find said lexical variable (or if a block
-declares that variable to be global, or whatever other tricks your compiler
-likes to do), you might assume it to be a global, which you can access much the
-same way:
-
-    find_global $P0, "bar"
-    assign $P0, value_to_store
-
-=head2 How can I delete a lexical
-
-You can C<peek_pad> the current pad and use C<delete>.
-
-  .sub main :main
-    new_pad 0
-    $P0 = new .Integer
-    store_lex -1, "foo", $P0
-    .local pmc pad
-    pad = peek_pad
-    delete pad["foo"]                # delete from current pad
-    $P0 = find_lex "foo"
-    print "never\n"
-  .end
+You can't.
 
 =head2 How do I resolve a variable name?
 
