@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-tools/build/build_dynclasses.pl - Build script for dynamic PMCs 
+tools/build/dynclasses.pl - Build script for dynamic PMCs 
 
 =head1 DESCRIPTION
 

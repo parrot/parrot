@@ -203,7 +203,7 @@ GEN_CONFIGS = \
 	$(SRC_DIR)/nci_test$(O) \
 	libparrot.def \
 	ast/ast.y.flag \
-	tools/build/build_dynclasses.pl \
+	tools/build/dynclasses.pl \
 	$(IMCC_DIR)/imcc.y.flag \
 	ops/core_ops.c \
 	ops/core_ops_switch.c
@@ -1069,8 +1069,8 @@ $(SRC_DIR)/vtables$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/vtables.c
 
 $(SRC_DIR)/cpu_dep$(O) : $(GENERAL_H_FILES)
 
-$(SRC_DIR)/nci.c : $(SRC_DIR)/call_list.txt $(BUILD_TOOLS_DIR)/build_nativecall.pl
-	$(PERL) $(BUILD_TOOLS_DIR)/build_nativecall.pl $(SRC_DIR)/call_list.txt
+$(SRC_DIR)/nci.c : $(SRC_DIR)/call_list.txt $(BUILD_TOOLS_DIR)/nativecall.pl
+	$(PERL) $(BUILD_TOOLS_DIR)/nativecall.pl $(SRC_DIR)/call_list.txt
 
 $(SRC_DIR)/warnings$(O) : $(GENERAL_H_FILES)
 

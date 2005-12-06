@@ -42,7 +42,7 @@ sub new
 		'Tools', 'tools.html', '',
 		$self->new_group('Configuration', '',
 			$self->new_item('', 'tools/dev/cc_flags.pl'),
-			$self->new_item('', 'tools/build/build_nativecall.pl'),
+			$self->new_item('', 'tools/build/nativecall.pl'),
 			$self->new_item('', 'tools/build/jit2h.pl'),
 			$self->new_item('', 'tools/build/vtable_h.pl'),
 		),
