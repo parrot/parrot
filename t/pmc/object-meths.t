@@ -16,7 +16,7 @@ Tests PMC object methods.
 
 =cut
 
-use Parrot::Test tests => 34;
+use Parrot::Test tests => 33;
 use Test::More;
 
 output_like(<<'CODE', <<'OUTPUT', "callmethod - unknown method");
@@ -917,43 +917,6 @@ done:
 .end
 CODE
 0
-OUTPUT
-
-pir_output_is(<<'CODE', <<'OUTPUT', "print mro 1");
-#
-# A   B A   E
-#  \ /   \ /
-#   C     D
-#    \   /
-#     \ /
-#      F
-.sub main :main
-    .local pmc A, B, C, D, E, F, m, p, it
-    newclass A, "A"
-    newclass B, "B"
-    subclass C, A, "C"
-    addparent C, B
-
-    subclass D, A, "D"
-    newclass E, "E"
-    addparent D, E
-
-    subclass F, C, "F"
-    addparent F, D
-    m = get_mro F
-    it = new .Iterator, m
-    it = 0
-loop:
-    unless it goto ex
-    p = shift it
-    $S0 = classname p
-    print_item $S0
-    goto loop
-ex:
-    print_newline
-.end
-CODE
-F C D A B E
 OUTPUT
 
 
