@@ -989,7 +989,7 @@ CODE
 /Lexical 'no_such' not found/
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', 'api parsing');
+pir_output_is(<<'CODE', <<'OUTPUT', 'find_name on lexicals');
 .sub main :main
 	.lex 'a', $P0
         $P1 = new .String
@@ -1006,6 +1006,24 @@ ok
 ok
 OUTPUT
 
+pir_output_is(<<'CODE', <<'OUTPUT', 'multiple names', todo => 'unspeccced');
+.sub main :main
+	.lex 'a', $P0
+	.lex 'b', $P0
+        $P1 = new .String
+        $P1 = "ok\n"
+	store_lex 'a', $P1
+	$P2 = find_name 'b'
+        print $P0
+        print $P1
+        print $P2
+.end
+CODE
+ok
+ok
+ok
+OUTPUT
+
 
 ## remember to change the number of tests :-)
-BEGIN { plan tests => 41; }
+BEGIN { plan tests => 42; }
