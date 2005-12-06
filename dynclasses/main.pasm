@@ -10,7 +10,7 @@
 _main:
 	loadlib P1, "subproxy"
 	new P3, .Key
-	set P3, "dynclasses/ext.imc"	# file - FIXME path handling
+	set P3, "dynclasses/ext.pir"	# file - FIXME path handling
 	new P4, .Key
 	set P4, "_ext_main"	# sub label
 	push P3, P4
