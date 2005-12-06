@@ -1,5 +1,10 @@
 # $Id$
 
+2005.12.05    particle
+	* moved imcc/docs/ directory to docs/imcc/
+	* moved build_tools/ directory to tools/build/
+	* modified MANIFEST, MANIFEST.generated, and MANIFEST.SKIP
+
 2005.12.04    leo
 	* Released 0.4.0
 	* See NEWS for changes
