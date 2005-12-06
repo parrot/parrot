@@ -546,6 +546,11 @@ examples/benchmarks/vpm.rb                        [main]doc
 examples/c/test_main.c                            [main]doc
 examples/compilers/Makefile                       [main]doc
 examples/compilers/japhc.c                        [main]doc
+examples/imcc/README                              [main]doc
+examples/imcc/sample.pir                          [main]doc
+examples/imcc/sub.pir                             [main]doc
+examples/imcc/test_allocate.pir                   [main]doc
+examples/imcc/test_spilling.pir                   [main]doc
 examples/io/echo_client.imc                       [main]doc
 examples/io/http.imc                              [main]doc
 examples/io/httpd.imc                             [main]doc
@@ -672,11 +677,6 @@ imcc/cfg.c                                        []
 imcc/cfg.h                                        []
 imcc/debug.c                                      []
 imcc/debug.h                                      []
-imcc/examples/README                              [main]doc
-imcc/examples/sample.imc                          [main]doc
-imcc/examples/sub.imc                             [main]doc
-imcc/examples/test_allocate.imc                   [main]doc
-imcc/examples/test_spilling.imc                   [main]doc
 imcc/imc.c                                        []
 imcc/imc.h                                        []
 imcc/imcc.l                                       []

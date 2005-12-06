@@ -4,7 +4,7 @@
 # on the fly which is what IMCC is really doing for
 # this sample.
 #
-# Try: parrot -o - sub.imc
+# Try: parrot -o - sub.pir
 #
 # To see the PASM code.
 #
