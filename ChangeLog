@@ -2,8 +2,7 @@
 
 2005.12.06    particle
 	* moved util/ directory to tools/util/
-	* moved imcc/examples/ directory to examples/imcc/
-	* renamed examples/imcc/*.imc to *.pir
+	* removed imcc/examples/ directory
 
 2005.12.05    particle
 	* moved imcc/docs/ directory to docs/imcc/
