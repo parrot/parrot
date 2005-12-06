@@ -139,6 +139,8 @@ the defines must therefore follow a specific syntax.
     #endif
     #endif
 
+See also F<jit/skeleton/jit_emit.h> for a more detailed explanation.
+
 =head2 Defines
 
 =over 4
@@ -193,13 +195,8 @@ this feature, the definition of mapped registers can be redefined like so:
 
 =item Parrot_jit_emit_get_base_reg_no(pc)
 
-This macro, when implemented, should return the register number of the register
-base pointer. This is currently the C<interpreter> itself, but will change soon
-into a distinct frame pointer.
-
-Additionally, if this macro is implemented, the register preserving code is
-calling the register save functions with the C<_offs> suffix. These functions
-get the offsets of the registers as arguments.
+This macro should return the register number of the register
+base pointer. 
 
 =back
 
@@ -229,21 +226,9 @@ ignored.
 In general, prefixing an identifier with I<&> yields an address.  The I<*>
 prefix specifies a value.  Since Parrot register values vary during code
 execution, their values can not be obtained through identifier substitution
-alone.
+alone, therefore offsets are used for accessing registers.
 
-B<INT_REG[n]>
-
-Gets replaced by the C<INTVAL> register specified in the I<n>th argument.
-
-B<NUM_REG[n]>
-
-Gets replaced by the C<FLOATVAL> register specified in the I<n>th argument.
-
-B<STRING_REG[n]>
-
-Gets replaced by the C<STRING> register specified in the I<n>th argument.
-
-To obtain register offsets, another set of macros exists, that have C<OFFS> in
+To obtain register offsets, a set of macros exists, that have C<OFFS> in
 their names:
 
 B<REG_OFFS_INT(reg_no)> ...
@@ -597,16 +582,8 @@ these tests.
   (gdb) p &I0
   $4 = (INTVAL *) 0x8158098
 
-=head1 VERSION
+XXX (p)rinting register contents like shown above is currently not supported.
 
-=head2 CURRENT
+=head1 SEE ALSO
 
-    Maintainer: Daniel Grunblatt
-    Class: Internals
-    PDD Number: 8
-    Version: 1.3
-    Status: Developing
-    Last Modified: 26 Nov 2002
-    PDD Format: 1
-    Language:English
-
+F<docs/dev/jit_i386.dev>, F<jit/skeleton/jit_emit.h> 
