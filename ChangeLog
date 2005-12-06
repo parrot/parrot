@@ -1,5 +1,8 @@
 # $Id$
 
+2005.12.06    particle
+	* moved util/ directory to tools/util/
+
 2005.12.05    particle
 	* moved imcc/docs/ directory to docs/imcc/
 	* moved build_tools/ directory to tools/build/

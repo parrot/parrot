@@ -65,7 +65,7 @@ test:   all
 
 smoke:  all
 	$(PERL) testall --html
-	$(PERL) ../util/smokeserv-client.pl languages_smoke.html
+	$(PERL) ../tools/util/smokeserv-client.pl languages_smoke.html
 
 smoke-clean :
 	$(RM_F) languages_smoke.html

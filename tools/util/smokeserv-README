@@ -25,7 +25,7 @@ C<smoke.html>. You can achieve this by running C<make>:
 
 Then you can upload the resulting smoke:
 
-  $ ./util/smokeserv/smokeserv-client.pl ./smoke.html
+  $ ./tools/util/smokeserv-client.pl ./smoke.html
 
 You don't need to be careful to only submit a smoke only once, etc. -- the
 smokeserver takes care of this.
