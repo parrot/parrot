@@ -78,7 +78,7 @@ class Walker(antlr.TreeParser):
         antlr.TreeParser.__init__(self, *args, **kwargs)
         self.tokenNames = _tokenNames
         ### __init__ header action >>> 
-        self.reg       = 100;  # counter for unlimited number of PMC registers
+        self.reg       = 10;  # counter for unlimited number of PMC registers
         self.label_num = 0;  # counter for generation jump labels
         self.level     = 0;  # for indentation
         ### __init__ header action <<< 
@@ -122,113 +122,20 @@ class Walker(antlr.TreeParser):
             _t = _t.getNextSibling()
             gen_pir_past_AST = currentAST.root
             pir = """
+            # stmts will be used by the executing part 
             .local pmc stmts
             stmts = new 'PAST::Stmts'
-            $P%d = new PerlArray
             
-            $P%d = new 'PAST::Stmt'
-            $P%d = new PerlArray
+            .local pmc stmts_children
+            stmts_children = new PerlArray
+            push stmts_children, $P%d
+            push stmts_children, $P%d
             
-             $P%d = new 'PAST::Exp'
-             $P%d = new PerlArray
-            
-                 $P%d = new 'PAST::Op'
-                 $P%d = new PerlArray
-            
-                     $P%d = new 'PAST::Exp'
-                     $P%d = new PerlArray
-            
-                         $P%d = new 'PAST::Val'
-                         $P%d.set_node('1', 0, 1 )
+            stmts.set_node('1', 1, stmts_children)
                  
-                     push $P%d, $P%d 
-                     $P%d.set_node('1', 1, $P%d)
-                 
-                 push $P%d, $P%d 
-                 $P%d.set_node('1', 1, 'print' ,$P%d)
-                 
-             push $P%d, $P%d 
-             $P%d.set_node('1', 1 ,$P%d)
-                 
-            push $P%d, $P%d 
-            $P%d.set_node('1', 1 ,$P%d)
+            #""" % ( reg_S1, reg_S2 )
             
-            push $P%d, $P%d
-                 
-            $P%d = new 'PAST::Stmt'
-            $P%d = new PerlArray
-            
-                 $P%d = new 'PAST::Exp'
-                 $P%d = new PerlArray
-            
-                     $P%d = new 'PAST::Op'
-                     $P%d = new PerlArray
-            
-                         $P%d = new 'PAST::Exp'
-                         $P%d = new PerlArray
-                         
-                             $P%d = new 'PAST::Val'
-                             $P%d.set_node('1', 0, '"\\n"' )
-                     
-                         push $P%d, $P%d 
-                         $P%d.set_node('1', 1, $P%d)
-                 
-                     push $P%d, $P%d 
-                     $P%d.set_node('1', 1, 'print' ,$P%d)
-                 
-                 push $P%d, $P%d 
-                 $P%d.set_node('1', 1 ,$P%d)
-                 
-            push $P%d, $P%d 
-            $P%d.set_node('1', 1 ,$P%d)
-            
-            push $P%d, $P%d
-            
-            stmts.set_node('1', 1, $P%d)
-                 
-            #""" % (
-            11,
-            reg_S1,
-            reg_S1 + 1,
-             reg_S1 + 2,
-             reg_S1 + 3,
-                 reg_S1 + 4,
-                 reg_S1 + 5,
-                     reg_S1 + 6,
-                     reg_S1 + 7,
-                         reg_S1 + 8,
-                         reg_S1 + 8,
-                     reg_S1 + 7, reg_S1 + 8,
-                     reg_S1 + 6, reg_S1 + 7,
-                 reg_S1 + 5, reg_S1 + 6,
-                 reg_S1 + 4, reg_S1 + 5,
-             reg_S1 + 3, reg_S1 + 4,
-             reg_S1 + 2, reg_S1 + 3,
-            reg_S1 + 1, reg_S1 + 2,
-            reg_S1, reg_S1 + 1,
-            11, reg_S1,
-            reg_S2,
-            reg_S2 + 1,
-             reg_S2 + 2,
-             reg_S2 + 3,
-                 reg_S2 + 4,
-                 reg_S2 + 5,
-                     reg_S2 + 6,
-                     reg_S2 + 7,
-                         reg_S2 + 8,
-                         reg_S2 + 8,
-                     reg_S2 + 7, reg_S2 + 8,
-                     reg_S2 + 6, reg_S2 + 7,
-                 reg_S2 + 5, reg_S2 + 6,
-                 reg_S2 + 4, reg_S2 + 5,
-             reg_S2 + 3, reg_S2 + 4,
-             reg_S2 + 2, reg_S2 + 3,
-            reg_S2 + 1, reg_S2 + 2,
-            reg_S2, reg_S2 + 1,
-            11, reg_S2,
-            11 
-            )
-            gen_pir_past_AST = antlr.make(self.astFactory.create(PIR_OP,pir), S1_AST, S2_AST);
+            gen_pir_past_AST = antlr.make(self.astFactory.create(PIR_NOOP,"noop"), S1_AST, S2_AST, self.astFactory.create(PIR_OP,pir));
             currentAST.root = gen_pir_past_AST
             if (gen_pir_past_AST != None) and (gen_pir_past_AST.getFirstChild() != None):
                 currentAST.child = gen_pir_past_AST.getFirstChild()
@@ -253,6 +160,8 @@ class Walker(antlr.TreeParser):
         self.returnAST = None
         currentAST = antlr.ASTPair()
         past_stmt_AST = None
+        E_AST = None
+        E = None
         try:      ## for error handling
             pass
             _t4 = _t
@@ -265,18 +174,30 @@ class Walker(antlr.TreeParser):
             currentAST.child = None
             self.match(_t,PAST_Stmt)
             _t = _t.getFirstChild()
-            self.past_exp(_t)
+            E = antlr.ifelse(_t == antlr.ASTNULL, None, _t)
+            reg_E=self.past_exp(_t)
             _t = self._retTree
+            E_AST = self.returnAST
             currentAST = _currentAST4
             _t = _t4
             _t = _t.getNextSibling()
             past_stmt_AST = currentAST.root
-            reg = self.reg
-            self.reg = self.reg + 100;
+            reg = self.reg;
+            self.reg = self.reg + 10;
             pir = """
-            # stmt
-            #"""
-            past_stmt_AST = antlr.make(self.astFactory.create(PIR_OP,pir));
+            $P%d = new 'PAST::Stmt'
+            $P%d = new PerlArray
+            
+            push $P%d, $P%d 
+            $P%d.set_node('1', 1 ,$P%d)
+            #""" % (
+            reg,
+            reg + 1,
+            reg + 1, reg_E,
+            reg, reg + 1
+            )
+            
+            past_stmt_AST = antlr.make(self.astFactory.create(PIR_NOOP,"noop"), E_AST, self.astFactory.create(PIR_OP,pir));
             currentAST.root = past_stmt_AST
             if (past_stmt_AST != None) and (past_stmt_AST.getFirstChild() != None):
                 currentAST.child = past_stmt_AST.getFirstChild()
@@ -302,6 +223,10 @@ class Walker(antlr.TreeParser):
         self.returnAST = None
         currentAST = antlr.ASTPair()
         past_exp_AST = None
+        O_AST = None
+        O = None
+        V_AST = None
+        V = None
         try:      ## for error handling
             pass
             _t6 = _t
@@ -321,23 +246,70 @@ class Walker(antlr.TreeParser):
                 pass
             elif la1 and la1 in [PAST_Op]:
                 pass
-                self.past_op(_t)
+                O = antlr.ifelse(_t == antlr.ASTNULL, None, _t)
+                reg_O=self.past_op(_t)
                 _t = self._retTree
+                O_AST = self.returnAST
+                past_exp_AST = currentAST.root
+                reg = self.reg;
+                self.reg = self.reg + 10;
+                pir = """
+                         $P%d = new 'PAST::Exp'
+                         $P%d = new PerlArray
+                
+                         push $P%d, $P%d 
+                         $P%d.set_node('1', 1, $P%d)
+                #""" % (
+                         reg,
+                         reg + 1,
+                
+                         reg + 1, reg_O,
+                         reg, reg + 1
+                )
+                
+                past_exp_AST = antlr.make(self.astFactory.create(PIR_NOOP,"noop"), O_AST, self.astFactory.create(PIR_OP,pir));
+                currentAST.root = past_exp_AST
+                if (past_exp_AST != None) and (past_exp_AST.getFirstChild() != None):
+                    currentAST.child = past_exp_AST.getFirstChild()
+                else:
+                    currentAST.child = past_exp_AST
+                currentAST.advanceChildToEnd()
             elif la1 and la1 in [PAST_Val]:
                 pass
-                self.past_val(_t)
+                V = antlr.ifelse(_t == antlr.ASTNULL, None, _t)
+                reg_V=self.past_val(_t)
                 _t = self._retTree
+                V_AST = self.returnAST
+                past_exp_AST = currentAST.root
+                reg = self.reg;
+                self.reg = self.reg + 10;
+                pir = """
+                         $P%d = new 'PAST::Exp'
+                         $P%d = new PerlArray
+                
+                         push $P%d, $P%d 
+                         $P%d.set_node('1', 1, $P%d)
+                #""" % (
+                         reg,
+                         reg + 1,
+                
+                         reg + 1, reg_V,
+                         reg, reg + 1
+                )
+                
+                past_exp_AST = antlr.make(self.astFactory.create(PIR_NOOP,"noop"), V_AST, self.astFactory.create(PIR_OP,pir));
+                currentAST.root = past_exp_AST
+                if (past_exp_AST != None) and (past_exp_AST.getFirstChild() != None):
+                    currentAST.child = past_exp_AST.getFirstChild()
+                else:
+                    currentAST.child = past_exp_AST
+                currentAST.advanceChildToEnd()
             else:
                     raise antlr.NoViableAltException(_t)
                 
             currentAST = _currentAST6
             _t = _t6
             _t = _t.getNextSibling()
-            self.reg = self.reg + 100;
-            pir = """
-            # exp
-            #"""
-            past_stmt = antlr.make(self.astFactory.create(PIR_OP,pir));
         
         except antlr.RecognitionException, ex:
             self.reportError(ex)
@@ -349,6 +321,7 @@ class Walker(antlr.TreeParser):
         return reg
     
     def past_op(self, _t):    
+        reg = None
         
         past_op_AST_in = None
         if _t != antlr.ASTNULL:
@@ -356,6 +329,8 @@ class Walker(antlr.TreeParser):
         self.returnAST = None
         currentAST = antlr.ASTPair()
         past_op_AST = None
+        E_AST = None
+        E = None
         try:      ## for error handling
             pass
             _t9 = _t
@@ -368,11 +343,37 @@ class Walker(antlr.TreeParser):
             currentAST.child = None
             self.match(_t,PAST_Op)
             _t = _t.getFirstChild()
-            self.past_exp(_t)
+            E = antlr.ifelse(_t == antlr.ASTNULL, None, _t)
+            reg_E=self.past_exp(_t)
             _t = self._retTree
+            E_AST = self.returnAST
             currentAST = _currentAST9
             _t = _t9
             _t = _t.getNextSibling()
+            past_op_AST = currentAST.root
+            reg = self.reg;
+            self.reg = self.reg + 10;
+            pir = """
+                 $P%d = new 'PAST::Op'
+                 $P%d = new PerlArray
+            
+                 push $P%d, $P%d 
+                 $P%d.set_node('1', 1, 'print' ,$P%d)
+            #""" % (
+                 reg,
+                 reg + 1,
+            
+                 reg + 1, reg_E,
+                 reg, reg + 1
+            )
+            
+            past_op_AST = antlr.make(self.astFactory.create(PIR_NOOP,"noop"), E_AST, self.astFactory.create(PIR_OP,pir));
+            currentAST.root = past_op_AST
+            if (past_op_AST != None) and (past_op_AST.getFirstChild() != None):
+                currentAST.child = past_op_AST.getFirstChild()
+            else:
+                currentAST.child = past_op_AST
+            currentAST.advanceChildToEnd()
         
         except antlr.RecognitionException, ex:
             self.reportError(ex)
@@ -381,8 +382,10 @@ class Walker(antlr.TreeParser):
         
         self.returnAST = past_op_AST
         self._retTree = _t
+        return reg
     
     def past_val(self, _t):    
+        reg = None
         
         past_val_AST_in = None
         if _t != antlr.ASTNULL:
@@ -390,14 +393,30 @@ class Walker(antlr.TreeParser):
         self.returnAST = None
         currentAST = antlr.ASTPair()
         past_val_AST = None
+        V = None
+        V_AST = None
         try:      ## for error handling
             pass
-            tmp5_AST = None
-            tmp5_AST_in = None
-            tmp5_AST = self.astFactory.create(_t)
-            tmp5_AST_in = _t
+            V = _t
+            V_AST_in = None
+            V_AST = self.astFactory.create(V)
             self.match(_t,PAST_Val)
             _t = _t.getNextSibling()
+            past_val_AST = currentAST.root
+            reg = self.reg;
+            self.reg = self.reg + 10;
+            pir = """
+                         $P%d = new 'PAST::Val'
+                         $P%d.set_node('1', 0, '%s' )
+            #""" % ( reg, reg, V.getText() )
+            
+            past_val_AST = antlr.make(self.astFactory.create(PIR_OP,pir));
+            currentAST.root = past_val_AST
+            if (past_val_AST != None) and (past_val_AST.getFirstChild() != None):
+                currentAST.child = past_val_AST.getFirstChild()
+            else:
+                currentAST.child = past_val_AST
+            currentAST.advanceChildToEnd()
         
         except antlr.RecognitionException, ex:
             self.reportError(ex)
@@ -406,6 +425,7 @@ class Walker(antlr.TreeParser):
         
         self.returnAST = past_val_AST
         self._retTree = _t
+        return reg
     
 
 _tokenNames = [
