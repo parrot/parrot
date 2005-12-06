@@ -78,8 +78,11 @@ parrot_get_config_string(Interp* interpreter)
 {
     if (sizeof(parrot_config) <= 1)
 	return NULL;
-    return string_from_const_cstring(interpreter,
-	parrot_config, sizeof(parrot_config));
+    return string_make_direct(interpreter,
+	    parrot_config, sizeof(parrot_config),
+	    PARROT_DEFAULT_ENCODING, PARROT_DEFAULT_CHARSET,
+	    PObj_external_FLAG|PObj_constant_FLAG);
+
 }
 EOF
 
