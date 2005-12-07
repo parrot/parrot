@@ -7,12 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
 
-use Data::Dumper;
-use File::Find qw(find);
 use ExtUtils::Manifest;
-use Parrot::Distribution;
-use Parrot::Revision;
-
 
 =head1 NAME
 
@@ -37,8 +32,6 @@ ok(-e $ExtUtils::Manifest::MANIFEST . '.SKIP', 'MANIFEST.SKIP exists');
 
 SKIP:
 {
-    skip 'Not a working copy' => 1
-        unless ($Parrot::Revision::svn_entries || `svk ls .`);
 
     diag "this may take a while...";
 
