@@ -25,6 +25,11 @@ subroutines.
 #include "parrot/oplib/ops.h"
 #include "inter_call.str"
 
+/*
+ * the define below can't be turned on yet - all code that accesses
+ * non-signature arrays, like :slurpy, must be outside the scope of
+ * this define
+ */ 
 /* #define PREMATURE_OPT */
 
 #ifdef PREMATURE_OPT
