@@ -34,6 +34,8 @@ typedef enum {
 
 char* Parrot_locate_runtime_file(Interp *, const char *file_name,
         enum_runtime_ft);
+STRING* Parrot_locate_runtime_file_str(Interp *, STRING *file_name,
+        enum_runtime_ft);
 
 void Parrot_autoload_class(Interp *, STRING *class);
 STRING * parrot_get_config_string(Interp* );

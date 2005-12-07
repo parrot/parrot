@@ -89,28 +89,27 @@ get_search_paths(Interp *interpreter, enum_lib_paths which)
     return VTABLE_get_pmc_keyed_int(interpreter, lib_paths, which);
 }
 
-static char*
-is_abs_path(const char *file_name)
+static int
+is_abs_path(Interp* interpreter, STRING *file)
 {
     size_t length;
-    char *full_name;
+    char *file_name;
     
-    /* use absolute paths as is */
+    file_name = file->strstart;
+    if (file->strlen <= 1)
+        return 0;
 #ifdef WIN32
     if (file_name[0] == '\\' || file_name[0] == '/' ||
-        (isalpha(file_name[0]) &&
+        (isalpha(file_name[0]) && file->strlen > 2 && 
             (strncmp(file_name+1, ":\\", 2) == 0 ||
              strncmp(file_name+1, ":/",  2) == 0)))
 #else
     if (file_name[0] == '/')     /* XXX  ../foo, ./bar */
 #endif
     {
-        length = strlen(file_name) + 1;
-        full_name = mem_sys_allocate(length);
-        strcpy(full_name, file_name);
-        return full_name;
+        return 1;
     }
-    return NULL;
+    return 0;
 }
 
 /*
@@ -121,24 +120,27 @@ is_abs_path(const char *file_name)
 Locate the full path for C<file_name> and the given file type(s). If
 successful, returns a mem_sys_allocate()ed string or NULL otherwise.
 
+=item C<STRING* Parrot_locate_runtime_file_str(Interp *, STRING  *file_name,
+        enum_runtime_ft type)>
+
+Like above but use and return STRINGs. This is the prefered API function.
+
 The C<enum_runtime_ft type> is one or more of the types defined in
 F<include/parrot/library.h>.
 
 */
 
-char*
-Parrot_locate_runtime_file(Interp *interpreter, const char *file_name,
+STRING*
+Parrot_locate_runtime_file_str(Interp *interpreter, STRING *file,
         enum_runtime_ft type)
 {
-    STRING *prefix, *path, *file, *full_name, *slash, *nul;
+    STRING *prefix, *path, *full_name, *slash, *nul;
     INTVAL i, n;
     PMC *paths;
-    char *absp;
 
     /* if this is an absolute path return it as is */
-    absp = is_abs_path(file_name);
-    if (absp)
-        return absp;
+    if (is_abs_path(interpreter, file))
+        return file;
 
     if (type & PARROT_RUNTIME_FT_DYNEXT)
         paths = get_search_paths(interpreter, PARROT_LIB_PATH_DYNEXT);
@@ -148,13 +150,12 @@ Parrot_locate_runtime_file(Interp *interpreter, const char *file_name,
         paths = get_search_paths(interpreter, PARROT_LIB_PATH_INCLUDE);
 
 #ifdef WIN32
-       slash = CONST_STRING(interpreter, "\\");
+    slash = CONST_STRING(interpreter, "\\");
 #else
-       slash = CONST_STRING(interpreter, "/");
+    slash = CONST_STRING(interpreter, "/");
 #endif
-       file = string_from_const_cstring(interpreter, file_name, 0);
 
-       nul = string_from_const_cstring(interpreter, "\0", 1);
+    nul = string_from_const_cstring(interpreter, "\0", 1);
     Parrot_get_runtime_prefix(interpreter, &prefix);
     n = VTABLE_elements(interpreter, paths);
     for (i = 0; i < n; ++i) {
@@ -175,20 +176,29 @@ Parrot_locate_runtime_file(Interp *interpreter, const char *file_name,
         }
 #endif
         if (Parrot_stat_info_intval(interpreter, full_name, STAT_EXISTS)) {
-            /*
-             * XXX valgrind shows e.g. 
-             *     invalid read of size 8 inside a string of length 69
-             *     at position 64
-             *     it seems that dlopen accesses words beyond the string end
-             *
-             *     see also the log at #37814
-             */
-            return string_to_cstring(interpreter, full_name);
+            return full_name;
         }
     }
     return NULL;
 }
 
+char*
+Parrot_locate_runtime_file(Interp *interpreter, const char *file_name,
+        enum_runtime_ft type)
+{
+    STRING *file = string_from_cstring(interpreter, file_name, 0);
+    STRING *result = Parrot_locate_runtime_file_str(interpreter,
+            file, type);
+    /*
+     * XXX valgrind shows e.g. 
+     *     invalid read of size 8 inside a string of length 69
+     *     at position 64
+     *     it seems that dlopen accesses words beyond the string end
+     *
+     *     see also the log at #37814
+     */
+    return string_to_cstring(interpreter, result);
+}
 /*
 
 =item C<const char* Parrot_get_runtime_prefix(Interp *, STRING **prefix_str)>
