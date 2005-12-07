@@ -18,7 +18,7 @@ The AST (Abstract Syntax Tree) represents the code of a HLL source module.
 
 */
 
-#include "../../imcc/imc.h"
+#include "../../compilers/imcc/imc.h"
 #include "parrot/method_util.h"
 #include "ast.h"
 

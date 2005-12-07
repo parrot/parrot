@@ -106,7 +106,7 @@
 #include <stdlib.h>
 #include <assert.h>
 
-#include "../../imcc/imc.h"
+#include "../../compilers/imcc/imc.h"
 #include "ast.h"
 #include "astparser.h"
 

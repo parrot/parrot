@@ -46,7 +46,7 @@ BUILD_TOOLS_DIR = tools/build
 CUR_DIR         = .
 
 # directory for the intermediate code compiler
-IMCC_DIR        = imcc
+IMCC_DIR        = compilers/imcc
 
 # directory for header files
 INC_DIR         = ${inc}
