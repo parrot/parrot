@@ -13,7 +13,7 @@
 #include <stdlib.h>
 #include <assert.h>
 
-#include "../imcc/imc.h"
+#include "../../imcc/imc.h"
 #include "ast.h"
 #include "astparser.h"
 

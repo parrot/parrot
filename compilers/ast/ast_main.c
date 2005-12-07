@@ -4,7 +4,7 @@ $Id$
 
 =head1 NAME
 
-ast/ast_main.c - AST compiler
+compilers/ast/ast_main.c - AST compiler
 
 =head1 DESCRIPTION
 
@@ -18,7 +18,7 @@ The AST (Abstract Syntax Tree) represents the code of a HLL source module.
 
 */
 
-#include "../imcc/imc.h"
+#include "../../imcc/imc.h"
 #include "parrot/method_util.h"
 #include "ast.h"
 

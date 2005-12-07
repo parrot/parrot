@@ -3,6 +3,7 @@
 2005.12.06    particle
 	* moved util/ directory to tools/util/
 	* removed imcc/examples/ directory
+	* moved ast/ directory to compilers/ast/
 
 2005.12.05    particle
 	* moved imcc/docs/ directory to docs/imcc/

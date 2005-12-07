@@ -4,7 +4,7 @@ $Id$
 
 =head1 NAME
 
-ast/node.c - AST node handling
+compilers/ast/node.c - AST node handling
 
 =head1 DESCRIPTION
 
@@ -22,7 +22,7 @@ The AST (Abstract Syntax Tree) represents the code of a HLL source module.
 #include <stdio.h>
 
 #include "ast.h"
-#include "../imcc/imc.h"
+#include "../../imcc/imc.h"
 
 static nodeType* create_0(int nr, nodeType *self, nodeType *p);
 static nodeType* create_1(int nr, nodeType *self, nodeType *p);
