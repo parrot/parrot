@@ -21,8 +21,8 @@ src/extend.c        +{${cc_shared}}
 src/nci_test.c      +{${cc_shared}}
 
 # imcc file settings
-{^imcc/}            -{-Wwrite-strings -Wcast-qual} s/-Wno-unused/-Wunused/
-imcc/instructions.c -{-Wformat-nonliteral} # noisy
-imcc/debug.c        -{-Wformat-nonliteral} # noisy
-imcc/optimizer.c    -{-Wformat-nonliteral} # noisy
-imcc/parser_util.c  -{-Wformat-nonliteral} # noisy
+{^compilers/imcc/}            -{-Wwrite-strings -Wcast-qual} s/-Wno-unused/-Wunused/
+compilers/imcc/instructions.c -{-Wformat-nonliteral} # noisy
+compilers/imcc/debug.c        -{-Wformat-nonliteral} # noisy
+compilers/imcc/optimizer.c    -{-Wformat-nonliteral} # noisy
+compilers/imcc/parser_util.c  -{-Wformat-nonliteral} # noisy
