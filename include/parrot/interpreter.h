@@ -327,7 +327,9 @@ struct parrot_interp_t {
     /* 2:   PMC *Argv;                   list of argv */
     /* 3:   PMC *NCI func hash           hash of NCI funcs */
     /* 4:   PMC *ParrotInterpreter       that's me */
-    /* 5:   PMC *Dyn_libs           Array of dynamically loaded ParrotLibrary  */
+    /* 5:   PMC *Dyn_libs        Array of dynamically loaded ParrotLibrary  */
+    /* 6:   PMC *Config_Hash             Hash of config settings  */
+    /* 7:   PMC *Lib_Paths               LoL of search paths  */
 
     PMC* DOD_registry;                        /* registered PMCs added to the root set */
 
@@ -385,6 +387,7 @@ typedef enum {
     IGLOBALS_INTERPRETER,
     IGLOBALS_DYN_LIBS,
     IGLOBALS_CONFIG_HASH,
+    IGLOBALS_LIB_PATHS,
 
     IGLOBALS_SIZE
 } iglobals_enum;

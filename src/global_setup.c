@@ -106,6 +106,10 @@ init_world(Interp *interpreter)
                 enum_class_ResizablePMCArray);
         Parrot_register_HLL(interpreter, parrot, NULL);
     }
+    /*
+     * lib search paths
+     */
+    parrot_init_library_paths(interpreter);
 }
 
 /*

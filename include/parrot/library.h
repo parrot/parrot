@@ -24,12 +24,21 @@ typedef enum {
     PARROT_RUNTIME_FT_SOURCE  = 0x0F00
 } enum_runtime_ft;
 
+typedef enum {
+    PARROT_LIB_PATH_INCLUDE,
+    PARROT_LIB_PATH_LIBRARY,
+    PARROT_LIB_PATH_DYNEXT,
+    /* must be last: */
+    PARROT_LIB_PATH_SIZE
+} enum_lib_paths;
+
 char* Parrot_locate_runtime_file(Interp *, const char *file_name,
         enum_runtime_ft);
 
 void Parrot_autoload_class(Interp *, STRING *class);
 STRING * parrot_get_config_string(Interp* );
 const char* Parrot_get_runtime_prefix(Interp *, STRING **prefix);
+void parrot_init_library_paths(Interp *);
 
 #endif /* PARROT_LIBRARY_H_GUARD */
 
