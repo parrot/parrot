@@ -25,7 +25,7 @@ subroutines.
 #include "parrot/oplib/ops.h"
 #include "inter_call.str"
 
-#define PREMATURE_OPT
+/* #define PREMATURE_OPT */
 
 #ifdef PREMATURE_OPT
 

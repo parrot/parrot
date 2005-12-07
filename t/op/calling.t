@@ -1106,6 +1106,55 @@ ok 1
 ok 2
 OUTPUT
 
+pir_output_is(<<'CODE', <<'OUTPUT', "call :slurpy with :flat");
+.sub _fn1
+	.param pmc rest_arg :slurpy
+	print "[in _fn1]\n"
+	print rest_arg
+	print "\n"
+.end
+.sub main :main
+	$P34 = new Array
+	$P34 = 0
+	## normal flattening direct call, non-slurpy returns
+	$P35 = _fn1($P34 :flat)
+.end
+CODE
+[in _fn1]
+0
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "call with :flat in the middle");
+.sub _fn1
+    .param int arg1
+    .param int arg2
+    .param int arg3
+    .param int arg4
+    print arg1
+    print ' '
+    print arg2
+    print ' '
+    print arg3
+    print ' '
+    print arg4
+    print "\n"
+.end
+.sub main :main
+    $P30 = new Integer
+    $P30 = 2
+    $P31 = new Integer
+    $P31 = 3
+    $P34 = new Array
+    $P34 = 2
+    $P34[0] = $P30
+    $P34[1] = $P31
+    $I4 = 4
+    $P35 = _fn1(1, $P34 :flat, $I4)
+.end
+CODE
+1 2 3 4
+OUTPUT
+
 pir_output_is(<<'CODE', <<'OUTPUT', "tailcall to NCI");
 .sub main :main
     .local pmc s
@@ -1425,5 +1474,5 @@ OUTPUT
 
 
 ## remember to change the number of tests :-)
-BEGIN { plan tests => 52; }
+BEGIN { plan tests => 54; }
 
