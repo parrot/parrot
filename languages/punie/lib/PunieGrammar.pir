@@ -50,7 +50,9 @@ digit, in the form of 'print 1;'.
     p6rule('\d', 'PunieGrammar', 'term')
     p6rule('(print) \s* <PunieGrammar::expr>', 'PunieGrammar', 'gprint')
     p6rule('<PunieGrammar::gprint> | <PunieGrammar::term>', 'PunieGrammar', 'expr')
-    p6rule('^\s*<PunieGrammar::expr>;\s*$', 'PunieGrammar', 'line')
+    p6rule('\s*<PunieGrammar::expr>;\s*', 'PunieGrammar', 'line')
+    p6rule('\s*<PunieGrammar::line>*\s*', 'PunieGrammar', 'lineseq')
+    p6rule('^<PunieGrammar::lineseq>$', 'PunieGrammar', 'prog')
 .end
 
 =head1 LICENSE

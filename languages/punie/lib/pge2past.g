@@ -1,4 +1,48 @@
 ROOT: result(.) = {
+    # Ask the child node for its result
+    .local pmc child
+    $I0 = defined node["PunieGrammar::lineseq"]
+    unless $I0 goto err_no_tree
+    $P0 = node["PunieGrammar::lineseq"]
+    child = tree.get('result', $P0, 'PunieGrammar::lineseq')
+
+    .return (child)
+
+  err_no_tree:
+    print "The top-level node doesn't contain an 'lineseq' match.\n"
+    end
+}
+
+PunieGrammar::lineseq: result(.) = {
+    .local pmc newchildren
+    newchildren = new PerlArray
+    # Ask the child node for its result
+    .local pmc child
+    $I0 = defined node["PunieGrammar::line"]
+    unless $I0 goto err_no_tree
+    $P0 = node["PunieGrammar::line"]
+
+    .local pmc iter
+    iter = new Iterator, $P0    # setup iterator for node
+    iter = 0
+  iter_loop:
+    unless iter, iter_end         # while (entries) ...
+      shift $P2, iter
+      $P3 = tree.get('result', $P2, 'PunieGrammar::line')
+      push newchildren, $P3
+      goto iter_loop
+  iter_end:
+    $S1 = node 
+    $I1 = node.from()
+    $P4 = new 'PAST::Stmts'
+    $P4.set_node($S1,$I1,newchildren)
+    .return ($P4)
+  err_no_tree:
+    print "The 'lineseq' node doesn't contain a 'line' match.\n"
+    end
+}
+
+PunieGrammar::line: result(.) = {
     # get the source string and position offset from start of source
     # code for this match node
     $S2 = node 
@@ -14,19 +58,14 @@ ROOT: result(.) = {
     # Build up the result for the ROOT node
     $P1 = new PerlArray
     push $P1, child
-    $P2 = new 'PAST::Stmt'
-    $P2.set_node($S2,$I1,$P1)
-
-    $P3 = new PerlArray
-    push $P3, $P2
     .local pmc result
-    result = new 'PAST::Stmts'
-    result.set_node($S2,$I1,$P3)
+    result = new 'PAST::Stmt'
+    result.set_node($S2,$I1,$P1)
 
     .return (result)
 
   err_no_tree:
-    print "The top-level node doesn't contain an 'expr' match.\n"
+    print "The 'line' node doesn't contain an 'expr' match.\n"
     end
 }
 
