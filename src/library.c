@@ -78,6 +78,41 @@ parrot_init_library_paths(Interp *interpreter)
     VTABLE_push_string(interpreter, paths, entry);
 }
 
+static PMC* 
+get_search_paths(Interp *interpreter, enum_lib_paths which)
+{
+    PMC *iglobals, *lib_paths;
+    
+    iglobals = interpreter->iglobals;
+    lib_paths = VTABLE_get_pmc_keyed_int(interpreter, iglobals,
+            IGLOBALS_LIB_PATHS);
+    return VTABLE_get_pmc_keyed_int(interpreter, lib_paths, which);
+}
+
+static char*
+is_abs_path(const char *file_name)
+{
+    size_t length;
+    char *full_name;
+    
+    /* use absolute paths as is */
+#ifdef WIN32
+    if (file_name[0] == '\\' || file_name[0] == '/' ||
+        (isalpha(file_name[0]) &&
+            (strncmp(file_name+1, ":\\", 2) == 0 ||
+             strncmp(file_name+1, ":/",  2) == 0)))
+#else
+    if (file_name[0] == '/')     /* XXX  ../foo, ./bar */
+#endif
+    {
+        length = strlen(file_name) + 1;
+        full_name = mem_sys_allocate(length);
+        strcpy(full_name, file_name);
+        return full_name;
+    }
+    return NULL;
+}
+
 /*
 
 =item C<char* Parrot_locate_runtime_file(Interp *, const char *file_name,
@@ -95,200 +130,62 @@ char*
 Parrot_locate_runtime_file(Interp *interpreter, const char *file_name,
         enum_runtime_ft type)
 {
-    char *full_name, *ext;
-    char *parrot_path = NULL;
-    const char **ptr;
-    const char *prefix;
-    int free_prefix = 0;
-    STRING *str;
-    const char *include_paths[] = {
-        "runtime/parrot/include/",
-        "runtime/parrot/",
-        "./",
-        "lib/parrot/runtime/include/",
-        "lib/parrot/runtime/",
-        NULL
-    };
-    const char *library_paths[] = {
-        "runtime/parrot/library/",
-        "runtime/parrot/",
-        "./",
-        "lib/parrot/runtime/library/",
-        "lib/parrot/runtime/",
-        NULL
-    };
-    const char *dynext_paths[] = {
-        "runtime/parrot/dynext/",
-        "",
-        "lib/parrot/runtime/dynext/",
-        NULL
-    };
-    const char **paths;
-    size_t length;
+    STRING *prefix, *path, *file, *full_name, *slash, *nul;
+    INTVAL i, n;
+    PMC *paths;
+    char *absp;
 
-    union {
-        const void * __c_ptr;
-        void * __ptr;
-    } __ptr_u;
+    /* if this is an absolute path return it as is */
+    absp = is_abs_path(file_name);
+    if (absp)
+        return absp;
+
     if (type & PARROT_RUNTIME_FT_DYNEXT)
-        paths = dynext_paths;
+        paths = get_search_paths(interpreter, PARROT_LIB_PATH_DYNEXT);
     else if (type & (PARROT_RUNTIME_FT_PBC | PARROT_RUNTIME_FT_SOURCE))
-        paths = library_paths;
+        paths = get_search_paths(interpreter, PARROT_LIB_PATH_LIBRARY);
     else
-        paths = include_paths;
+        paths = get_search_paths(interpreter, PARROT_LIB_PATH_INCLUDE);
 
-    prefix = Parrot_get_runtime_prefix(interpreter, NULL);
-    /* note: free prefix or better use the STRING interface */
-    if (!prefix)
-        prefix = "";
-    else
-        free_prefix = 1;
-
-    ext = strchr(file_name, '.');
-    /*
-     * if the extension is given use it
-     * TODO if not try extensions according to type
-     */
-    /* let the failure propagate back for better error handling
-    if (!ext) {
-        internal_exception(UNIMPLEMENTED, "no extension: file '%s'", file_name);
-    }
-    */
-
-    /* use absolute paths as is */
 #ifdef WIN32
-    if (file_name[0] == '\\' || file_name[0] == '/' ||
-        (isalpha(file_name[0]) &&
-            (strncmp(file_name+1, ":\\", 2) == 0 ||
-             strncmp(file_name+1, ":/",  2) == 0)))
+       slash = CONST_STRING(interpreter, "\\");
 #else
-    if (file_name[0] == '/')
+       slash = CONST_STRING(interpreter, "/");
 #endif
-    {
-        length = strlen(file_name) + 1;
-        full_name = mem_sys_allocate(length);
-        strcpy(full_name, file_name);
-        return full_name;
-    }
+       file = string_from_const_cstring(interpreter, file_name, 0);
 
-    /* Otherwise look at possible library paths. */
-    length = 0;
-    for (ptr = paths; *ptr; ++ptr) {
-        size_t len = strlen(*ptr);
-        length = (len > length) ? len : length;
-    }
-    length += strlen(prefix) + strlen(file_name) + 2;
-    full_name = mem_sys_allocate(length);
-
-    /* If we're on Win32, the current path to the Parrot install will feature in our search. */
-#ifdef WIN32
-        {
-            int parrot_path_len;
-            parrot_path = mem_sys_allocate(256 + length);
-            if ((parrot_path_len = GetModuleFileName(NULL, parrot_path, 256)) > 0)
-            {
-                /* Snip off executable name. */
-                char *c = parrot_path + parrot_path_len;
-                while (*c != '\\' && c >= parrot_path)
-                    c--;
-                *c = 0;
-
-                /* If parrot is in a bin directory, runtime will be above that. */
-                if (c - 4 > parrot_path && strcmp(c - 4, "\\bin") == 0)
-                    *(c - 4) = 0;
-
-                /* Put on a \. */
-                strcat(parrot_path, "\\");
-            }
-            else
-            {
-                string_cstring_free(parrot_path);
-                parrot_path = NULL;
-            }
+       nul = string_from_const_cstring(interpreter, "\0", 1);
+    Parrot_get_runtime_prefix(interpreter, &prefix);
+    n = VTABLE_elements(interpreter, paths);
+    for (i = 0; i < n; ++i) {
+        path = VTABLE_get_string_keyed_int(interpreter, paths, i);
+        if (string_length(interpreter, prefix)) {
+            full_name = string_concat(interpreter, prefix, slash, 0);
+            full_name = string_append(interpreter, full_name, path, 0);
         }
-#endif
-
-    for (ptr = paths; *ptr; ++ptr) {
-        /* Add prefix and suggested path. */
-        strcpy(full_name, prefix);
-        if (*prefix) {
-#ifdef WIN32
-            strcat(full_name, "\\");
-#else
-            strcat(full_name, "/");
-#endif
-        }
-        strcat(full_name, *ptr);
-        strcat(full_name, file_name);
-        assert(strlen(full_name) < length);
+        else
+            full_name = string_copy(interpreter, path);
+        full_name = string_append(interpreter, full_name, file, 0);
+        full_name = string_append(interpreter, full_name, nul, 0);
 #ifdef WIN32
         {
             char *p;
-            while ( (p = strchr(full_name, '/')) )
+            while ( (p = strchr(full_name->strstart, '/')) )
                 *p = '\\';
         }
 #endif
-        str = string_from_cstring(interpreter, full_name, strlen(full_name));
-        if (Parrot_stat_info_intval(interpreter, str, STAT_EXISTS)) {
-            if (free_prefix)
-                string_cstring_free(const_cast(prefix));
-            return full_name;
-        }
-
-        /* If we are on Win32, we'll also look relative to the executable. */
-#ifdef WIN32
-        {
-            if (parrot_path)
-            {
-                /* Save current string length. */
-                int old_parrot_path_len = strlen(parrot_path);
-                char *p;
-
-                /* Pop library path and file name on it. */
-                strcat(parrot_path, *ptr);
-                strcat(parrot_path, file_name);
-
-                /* Fix up any forward slashes. */
-                while ((p = strchr(parrot_path, '/')))
-                    *p = '\\';
-
-                /* And try it. */
-                str = string_from_cstring(interpreter, parrot_path, strlen(parrot_path));
-                if (Parrot_stat_info_intval(interpreter, str, STAT_EXISTS)) {
-                    if (free_prefix)
-                        string_cstring_free(const_cast(prefix));
-                    return parrot_path;
-                }
-                else
-                {
-                    *(parrot_path + old_parrot_path_len) = 0;
-                }
-            }
-        }
-#endif
-    }
-
-    /*
-     * finally if prefix is set, try current location
-     */
-    if (*prefix) {
-        strcpy(full_name, file_name);
-#ifdef WIN32
-        {
-            char *p;
-            while ( (p = strchr(full_name, '/')) )
-                *p = '\\';
-        }
-#endif
-        str = string_from_cstring(interpreter, full_name, strlen(full_name));
-        if (Parrot_stat_info_intval(interpreter, str, STAT_EXISTS)) {
-            if (free_prefix)
-                string_cstring_free(const_cast(prefix));
-            return full_name;
+        if (Parrot_stat_info_intval(interpreter, full_name, STAT_EXISTS)) {
+            /*
+             * XXX valgrind shows e.g. 
+             *     invalid read of size 8 inside a string of length 69
+             *     at position 64
+             *     it seems that dlopen accesses words beyond the string end
+             *
+             *     see also the log at #37814
+             */
+            return string_to_cstring(interpreter, full_name);
         }
     }
-    if (free_prefix)
-        string_cstring_free(const_cast(prefix));
     return NULL;
 }
 
@@ -296,7 +193,8 @@ Parrot_locate_runtime_file(Interp *interpreter, const char *file_name,
 
 =item C<const char* Parrot_get_runtime_prefix(Interp *, STRING **prefix_str)>
 
-Returns a malloced string for the runtime prefix.
+If C<prefix_str> is not NULL, set it to the prefix, else
+return a malloced c-string for the runtime prefix.
 
 =cut
 
@@ -312,10 +210,14 @@ Parrot_get_runtime_prefix(Interp *interpreter, STRING **prefix_str)
 
     env = Parrot_getenv("PARROT_RUNTIME", &free_it);
     if (env) {
+        if (prefix_str) {
+            *prefix_str = string_from_cstring(interpreter, env, 0);
+            if (free_it)
+                free(env);
+            return NULL;
+        }
         if (!free_it)
             env = strdup(env);
-        if (prefix_str)
-            *prefix_str = string_from_cstring(interpreter, env, 0);
         return env;
     }
 
@@ -323,18 +225,22 @@ Parrot_get_runtime_prefix(Interp *interpreter, STRING **prefix_str)
             (INTVAL) IGLOBALS_CONFIG_HASH);
     key = CONST_STRING(interpreter, "prefix");
     if (!VTABLE_elements(interpreter, config_hash)) {
-        const char *pwd = "./";
+        const char *pwd = ".";
         char *ret;
 
-        if (prefix_str)
+        if (prefix_str) {
             *prefix_str = CONST_STRING(interpreter, pwd);
+            return NULL;
+        }
         ret = mem_sys_allocate(3);
         strcpy(ret, pwd);
         return ret;
     }
     s = VTABLE_get_string_keyed_str(interpreter, config_hash, key);
-    if (prefix_str)
-	*prefix_str = s;
+    if (prefix_str) {
+        *prefix_str = s;
+        return NULL;
+    }
     return string_to_cstring(interpreter, s);
 }
 

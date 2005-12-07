@@ -757,14 +757,8 @@ main(int argc, char **argv)
         /* Allocate a struct. */
         input_files[i] = mem_sys_allocate(sizeof(struct pbc_merge_input));
 
-        /* Set filename (getting the full name). */
-        input_files[i]->filename = Parrot_locate_runtime_file(interpreter,
-                                     *argv, PARROT_RUNTIME_FT_PBC);
-        if (input_files[i]->filename == NULL) {
-            PIO_eprintf(interpreter, "PBC Merge: Can't locate %s, code %i.\n",
-                        *argv, errno);
-            Parrot_exit(1);
-        }
+        /* Set filename */
+        input_files[i]->filename = *argv;
 
         /* Load the packfile and unpack it. */
         input_files[i]->pf = pbc_merge_loadpbc(interpreter,
