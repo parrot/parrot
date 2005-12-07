@@ -23,6 +23,36 @@ This file contains a C function to access parrot's bytecode library functions.
 #include <assert.h>
 #include "library.str"
 
+/*
+
+=item C<void parrot_init_library_paths(Interp *)>
+
+Create an array of StringArrays with library searchpaths and shared
+extension used for loading various files at runtime. The created
+structures looks like this:
+
+  lib_paths = [
+    [ "runtime/parrot/include", ... ],   # paths for .include 'file'
+    [ "runtime/parrot/library", ... ],   # paths for load_bytecode
+    [ "runtime/parrot/dynext", ... ],    # paths for loadlib
+    [ ".so", ... ]   TODO                # list of shared extensions
+  ]
+
+If the platform defines
+
+  #define PARROT_PLATFORM_LIB_PATH_INIT_HOOK the_init_hook
+
+if will be called as a function with this prototype:
+
+  void the_init_hook(Interp*, PMC *lib_paths);
+
+Platform code may add, delete, or replace search path entries as needed. See
+also F<include/parrot/library.h> for C<enum_lib_paths>.
+
+=cut
+
+*/
+  
 void
 parrot_init_library_paths(Interp *interpreter)
 {
@@ -76,6 +106,12 @@ parrot_init_library_paths(Interp *interpreter)
     VTABLE_push_string(interpreter, paths, entry);
     entry = CONST_STRING(interpreter, "lib/parrot/runtime/dynext/");
     VTABLE_push_string(interpreter, paths, entry);
+
+    /* TODO define shared exts */
+
+#ifdef PARROT_PLATFORM_LIB_PATH_INIT_HOOK
+    PARROT_PLATFORM_LIB_PATH_INIT_HOOK(interpreter, lib_paths);
+#endif
 }
 
 static PMC* 
@@ -118,15 +154,21 @@ is_abs_path(Interp* interpreter, STRING *file)
         enum_runtime_ft type)>
 
 Locate the full path for C<file_name> and the given file type(s). If
-successful, returns a mem_sys_allocate()ed string or NULL otherwise.
+successful, returns a C-string allocated with C<string_to_cstring> or 
+NULL otherwise.
 
 =item C<STRING* Parrot_locate_runtime_file_str(Interp *, STRING  *file_name,
         enum_runtime_ft type)>
 
-Like above but use and return STRINGs. This is the prefered API function.
+Like above but use and return STRINGs. If successful, the returned STRING
+is 0-terminated so that C<result-E<gt>strstart> is usable as B<const char*>
+c-string for C library functions like fopen(3).
+This is the prefered API function.
 
 The C<enum_runtime_ft type> is one or more of the types defined in
 F<include/parrot/library.h>.
+
+=cut
 
 */
 
@@ -259,6 +301,8 @@ Parrot_get_runtime_prefix(Interp *interpreter, STRING **prefix_str)
 =item C<void Parrot_autoload_class(Interp *, STRING *class)>
 
 Try to load a library that holds the PMC class.
+
+XXX Check if this is still needed with HLL type mappings.
 
 =cut
 
