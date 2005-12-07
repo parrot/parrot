@@ -25,9 +25,10 @@ typedef enum {
 } enum_runtime_ft;
 
 typedef enum {
-    PARROT_LIB_PATH_INCLUDE,
-    PARROT_LIB_PATH_LIBRARY,
-    PARROT_LIB_PATH_DYNEXT,
+    PARROT_LIB_PATH_INCLUDE,            /* .include "foo" */
+    PARROT_LIB_PATH_LIBRARY,            /* load_bytecode "bar" */
+    PARROT_LIB_PATH_DYNEXT,             /* loadlib "baz" */
+    PARROT_LIB_DYN_EXTS,                /* ".so", ".dylib" .. */
     /* must be last: */
     PARROT_LIB_PATH_SIZE
 } enum_lib_paths;

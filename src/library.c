@@ -35,7 +35,7 @@ structures looks like this:
     [ "runtime/parrot/include", ... ],   # paths for .include 'file'
     [ "runtime/parrot/library", ... ],   # paths for load_bytecode
     [ "runtime/parrot/dynext", ... ],    # paths for loadlib
-    [ ".so", ... ]   TODO                # list of shared extensions
+    [ ".so", ... ]                       # list of shared extensions
   ]
 
 If the platform defines
@@ -107,7 +107,16 @@ parrot_init_library_paths(Interp *interpreter)
     entry = CONST_STRING(interpreter, "lib/parrot/runtime/dynext/");
     VTABLE_push_string(interpreter, paths, entry);
 
-    /* TODO define shared exts */
+    /* shared exts */
+    paths = pmc_new(interpreter, enum_class_ResizableStringArray);
+    VTABLE_set_pmc_keyed_int(interpreter, lib_paths,
+            PARROT_LIB_DYN_EXTS, paths);
+    entry = CONST_STRING(interpreter, PARROT_LOAD_EXT);
+    VTABLE_push_string(interpreter, paths, entry);
+    if (strcmp(PARROT_LOAD_EXT, PARROT_SHARE_EXT)) {
+        entry = CONST_STRING(interpreter, PARROT_SHARE_EXT);
+        VTABLE_push_string(interpreter, paths, entry);
+    }
 
 #ifdef PARROT_PLATFORM_LIB_PATH_INIT_HOOK
     PARROT_PLATFORM_LIB_PATH_INIT_HOOK(interpreter, lib_paths);
