@@ -38,9 +38,7 @@ pmclass SubProxy dynpmc need_ext extends Sub {
 	    sub = key_next(INTERP, key);
 	    if (!sub)
 		internal_exception(1, "SubProxy: no sub");
-	    s = string_to_cstring(INTERP, file);
-	    Parrot_load_bytecode(INTERP, s);
-	    string_cstring_free(s);
+	    Parrot_load_bytecode(INTERP, file);
 	    rsub = VTABLE_get_pmc_keyed(INTERP,
 		    INTERP->globals->stash_hash, sub);
 

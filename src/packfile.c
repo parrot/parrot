@@ -3376,16 +3376,18 @@ directory.
 void * IMCC_compile_file (Parrot_Interp interp, const char *s);
 
 void
-Parrot_load_bytecode(Interp *interpreter, const char *filename)
+Parrot_load_bytecode(Interp *interpreter, STRING *file_str)
 {
     const char *ext;
     struct PackFile_ByteCode * cs;
     struct PackFile * pf;
+    char *filename;
 
 #if TRACE_PACKFILE
     fprintf(stderr, "packfile.c: parrot_load_bytecode()\n");
 #endif
 
+    filename = string_to_cstring(interpreter, file_str);
     ext = strrchr(filename, '.');
     if (ext && strcmp (ext, ".pbc") == 0) {
         const char *fullname = Parrot_locate_runtime_file(interpreter, 

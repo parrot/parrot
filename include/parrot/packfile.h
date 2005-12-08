@@ -282,7 +282,7 @@ struct PackFile_Segment * PackFile_Segment_new_seg(Interp *,
 struct PackFile_ByteCode * PF_create_default_segs(Interp*,
         const char *file_name, int add);
 
-void Parrot_load_bytecode(Interp *, const char *filename);
+void Parrot_load_bytecode(Interp *, STRING *filename);
 /*
 ** PackFile_Segment Functions:
 */
