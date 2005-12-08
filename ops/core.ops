@@ -557,8 +557,10 @@ op set_returns(inconst PMC) {
 
 =item B<result_info>(out PMC)
 
-Returns the results PMC of the caller. The number of elements of this
-PMC is equal to the number of return values that are expected.
+Returns the get_results signature PMC of the caller. This PMC is a
+FixedIntegerPMCArray. The number of elements of this PMC is equal to the number
+of return values that are expected.  The individual bits per entry are
+specified in F<docs/pdds/pdd03_calling_conventions.pod>.
 
 =cut
 
