@@ -20,7 +20,7 @@ References: http://www.gnu.org/software/m4/m4.html
 # The names of these source files should be consistent with 'GNU m4'.
 
 # subs for reading in input
-.include "languages/m4/src/input.pir"
+.include "dummy/input.pir"
 
 # subs for writing output
 .include "languages/m4/src/output.pir"

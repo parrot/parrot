@@ -5,7 +5,7 @@
 
 =head1 NAME
 
-examples/pni/PQt.C - Qt/Parrot Library
+examples/nci/PQt.C - Qt/Parrot Library
 
 =head1 SYNOPSIS
 
@@ -19,7 +19,7 @@ Or something like that...
 
 =head1 DESCRIPTION
 
-Qt Native interface for Parrot. See F<examples/pni/QtHelloWorld.pasm>
+Qt Native interface for Parrot. See F<examples/nci/QtHelloWorld.pasm>
 for more information.
 
 =cut
@@ -134,7 +134,7 @@ void QLabel_resize(QLabel *label, int x, int y)
 
 =head1 SEE ALSO
 
-F<examples/pni/QtHelloWorld.pasm>,
+F<examples/nci/QtHelloWorld.pasm>,
 F<docs/pdds/pdd03_calling_conventions.pod>.
 
 =cut

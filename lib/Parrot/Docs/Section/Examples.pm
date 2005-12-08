@@ -47,7 +47,7 @@ sub new
 		$self->new_group('Streams', '', 'examples/streams'),
 		$self->new_group('Benchmarking', '', 'examples/benchmarks'),
 		$self->new_group('Speed Comparison', '', 'examples/mops'),
-		$self->new_group('Parrot Extensions', '', 'examples/pni'),
+		$self->new_group('Parrot Extensions', '', 'examples/nci'),
 	);
 }
 

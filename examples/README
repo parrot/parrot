@@ -21,7 +21,7 @@ pasm      - Examples in PASM
 
 pir       - Examples in PIR
 
-pni       - Native call interface
+nci       - Native call interface
 
 sdl       - SDL
 

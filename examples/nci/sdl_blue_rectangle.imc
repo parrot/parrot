@@ -1,4 +1,6 @@
-.sub _main
+# $Id$
+
+.sub _main :main
 	_init()
 	_MAIN()
 	end

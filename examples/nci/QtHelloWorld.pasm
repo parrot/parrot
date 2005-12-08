@@ -3,11 +3,11 @@
 
 =head1 NAME
 
-examples/pni/QtHelloWorld.pasm - Qt Example
+examples/nci/QtHelloWorld.pasm - Qt Example
 
 =head1 SYNOPSIS
 
-    % ./parrot examples/pni/QtHelloWorld.pasm
+    % ./parrot examples/nci/QtHelloWorld.pasm
 
 =head1 DESCRIPTION
 
@@ -17,7 +17,7 @@ F<docs/pdds/pdd03_calling_conventions.pod>.
 Qt is a multiplatform C++ GUI application framework
 (Lhttp://doc.trolltech.com/3.1/aboutqt.html>). You'll need to build
 F<libPQt.so> and install it in F<runtime/parrot/dynext> for this to
-work, see F<examples/pni/PQt.C> for more information.
+work, see F<examples/nci/PQt.C> for more information.
 
 Note that this will either need JIT for building the NCI-functions on
 the fly. If this is not available try adding missing signatures to
@@ -64,6 +64,6 @@ F<src/call_list.txt> and rebuilding Parrot.
 
 =head1 SEE ALSO
 
-F<examples/pni/PQt.C>, F<docs/pdds/pdd03_calling_conventions.pod>.
+F<examples/nci/PQt.C>, F<docs/pdds/pdd03_calling_conventions.pod>.
 
 =cut

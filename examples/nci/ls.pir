@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-examples/pni/ls.pir - a directory lister
+examples/nci/ls.pir - a directory lister
 
 =head1 DESCRIPTION
 
