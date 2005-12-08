@@ -3390,6 +3390,10 @@ Parrot_load_bytecode(Interp *interpreter, const char *filename)
     if (ext && strcmp (ext, ".pbc") == 0) {
         const char *fullname = Parrot_locate_runtime_file(interpreter, 
                 filename, PARROT_RUNTIME_FT_PBC);
+        if (!fullname) {
+            internal_exception(1, "Couldn't find PBC file '%s'", filename);
+            return;
+        }
         pf = PackFile_append_pbc(interpreter, fullname);
         if (!pf) {
             internal_exception(1, "Couldn't find PBC file");
