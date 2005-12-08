@@ -326,6 +326,7 @@ docs/debugger.pod                                 [main]doc
 docs/dev/byteorder.dev                            [main]doc
 docs/dev/dod.dev                                  [devel]doc
 docs/dev/events.pod                               [devel]doc
+docs/dev/fhs.pod                                  [devel]doc
 docs/dev/infant.dev                               [devel]doc
 docs/dev/jit_i386.dev                             [main]doc
 docs/dev/longopt.dev                              [main]doc
