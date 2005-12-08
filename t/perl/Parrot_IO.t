@@ -49,20 +49,20 @@ ok($p, 'new');
 ok($p->has_suffix, 'has_suffix none');
 ok($p->has_suffix($suffix), 'has_suffix correct');
 ok(!$p->has_suffix('foo'), 'has_suffix incorrect');
-ok($p->suffix eq $suffix, 'suffix');
-ok($p->name eq $fullname, 'name');
-ok($p->name_without_suffix eq $name, 'name_without_suffix');
+is($p->suffix, $suffix, 'suffix');
+is($p->name, $fullname, 'name');
+is($p->name_without_suffix, $name, 'name_without_suffix');
 
 # Check we get the same instance each time.
-ok($p == Parrot::IO::Path->new($tmpfile), 'instance cached');
+is($p, Parrot::IO::Path->new($tmpfile), 'instance cached');
 my $oldp = "$p";
 $p->delete;
 ok(! defined $p, 'delete undefines instance');
 # This won't actually create the file on disk.
 $p = Parrot::IO::Path->new($tmpfile);
-ok($oldp ne $p, 'delete from cache');
+isnt($oldp, $p, 'delete from cache');
 
-ok($p->parent_path eq tmp_dir_path(), 'parent_path');
+is($p->parent_path, tmp_dir_path(), 'parent_path');
 
 my $r = Parrot::IO::Path->new(rootdir);
 ok(!$r->parent_path, 'root has no parent_path');
@@ -90,63 +90,63 @@ my $f = Parrot::IO::File->tmp_file($fullname);
 ok($f, 'tmp_file');
 
 # Check the instance got re-blessed.
-ok($p == $f, 'path became file');
+is($p, $f, 'path became file');
 
 my $f1 = $d1->file_with_name('file1.txt');
 my $f2 = $d2->file_with_name('file2.foo');
 ok($f1 && $f2, 'file_with_name');
 
 # Relative paths.
-ok($d->relative_path($d->path) eq '', 'relative_path same dir');
-ok($d1->relative_path($f1->path) eq 'file1.txt', 'relative_path same file');
-ok($d->relative_path($d1->path) eq 'one', 'relative_path down to dir');
-ok($d->relative_path($f1->path) eq catfile(qw(one file1.txt)), 
+is($d->relative_path($d->path), '', 'relative_path same dir');
+is($d1->relative_path($f1->path), 'file1.txt', 'relative_path same file');
+is($d->relative_path($d1->path), 'one', 'relative_path down to dir');
+is($d->relative_path($f1->path), catfile(qw(one file1.txt)), 
 	'relative_path down to file');
-ok($d1->relative_path($d->path) eq '..', 'relative_path up to dir');
-ok($d->relative_path($f->path) eq catfile(qw(.. file.txt)), 
+is($d1->relative_path($d->path), '..', 'relative_path up to dir');
+is($d->relative_path($f->path), catfile(qw(.. file.txt)), 
 	'relative_path up to file');
-ok($d1->relative_path($f->path) eq catfile(qw(.. .. file.txt)), 
+is($d1->relative_path($f->path), catfile(qw(.. .. file.txt)), 
 	'relative_path up twice to file');
 ok($d->relative_path_is_directory(catdir(qw(one two))), 
 	'relative_path_is_directory');
 ok($d->relative_path_is_file(catfile(qw(one two file2.foo))), 
 	'relative_path_is_file');
-ok($d2 == $d->directory_with_relative_path(catdir(qw(one/two))),
+is($d2, $d->directory_with_relative_path(catdir(qw(one/two))),
 	'file_with_relative_path');
-ok($f2 == $d->file_with_relative_path(catfile(qw(one two file2.foo))),
+is($f2, $d->file_with_relative_path(catfile(qw(one two file2.foo))),
 	'file_with_relative_path');
 
 # Names and paths.
 my @a = $d1->file_and_directory_names;
-ok('file1.txt two' eq join(' ', @a), 'file_and_directory_names');
+is('file1.txt two', join(' ', @a), 'file_and_directory_names');
 
 @a = $d1->file_and_directory_paths;
-ok(@a == 2, 'file_and_directory_paths');
+is(@a, 2, 'file_and_directory_paths');
 @a = $d1->directory_paths;
-ok(@a == 1, 'directory_paths');
+is(@a, 1, 'directory_paths');
 @a = $d1->file_paths;
-ok(@a == 1, 'file_paths');
+is(@a, 1, 'file_paths');
 
 # File instances
 @a = $d2->files;
-ok('file2.foo file3.bar' eq join(' ', map {$_->name} @a), 'files');
+is('file2.foo file3.bar', join(' ', map {$_->name} @a), 'files');
 @a = $d->files(1);
-ok('file1.txt file2.foo file3.bar' eq join(' ', map {$_->name} @a), 
+is('file1.txt file2.foo file3.bar', join(' ', map {$_->name} @a), 
 	'files recursive');
 @a = $d->files(1, 'two');
-ok('file1.txt' eq join(' ', map {$_->name} @a), 'files recursive ignore');
+is('file1.txt', join(' ', map {$_->name} @a), 'files recursive ignore');
 
 # File suffix
 @a = $d1->file_suffixes();
 ok('txt' eq join(' ', @a), 'file_suffixes');
 @a = $d->file_suffixes(1);
-ok('bar foo txt' eq join(' ', @a), 'file_suffixes recursive');
+is('bar foo txt', join(' ', @a), 'file_suffixes recursive');
 
 @a = $d->file_suffixes(1, 'two');
-ok('txt' eq join(' ', @a), 'file_suffixes recursive ignore');
+is('txt', join(' ', @a), 'file_suffixes recursive ignore');
 
 @a = $d->files_with_suffix('txt', 1, 'two');
-ok('file1.txt' eq join(' ', map {$_->name} @a), 
+is('file1.txt', join(' ', map {$_->name} @a), 
 	'files_with_suffix recursive ignore');
 
 # Status (stat info)
@@ -158,11 +158,11 @@ sleep 1;
 
 # Now the read/write stuff.
 $f3->write("hello");
-ok($f3->read eq "hello", 'read/write');
+is($f3->read, "hello", 'read/write');
 $f3->append("\nworld");
-ok($f3->read eq "hello\nworld", 'append and scalar read');
+is($f3->read, "hello\nworld", 'append and scalar read');
 @a = $f3->read;
-ok($a[1] eq "world", 'array read');
+is($a[1], "world", 'array read');
 
 ok($f3->modified_since($time), 'modified_since');
 
@@ -175,17 +175,17 @@ ok($f->has_cvs_id, 'has_cvs_id');
 
 $f3->delete;
 @a = $d2->files;
-ok(@a == 1, 'file delete');
+is(@a, 1, 'file delete');
 ok(! defined $f3, 'delete undefined file');
 
 $d2->delete;
 @a = $d1->directories;
-ok(@a == 0, 'directory delete');
+is(@a, 0, 'directory delete');
 ok(! defined $d2, 'delete undefined directory');
 
 $d->delete_contents;
 @a = $d->file_and_directory_paths;
-ok(@a == 0, 'delete_contents');
+is(@a, 0, 'delete_contents');
 
 teardown();
 
