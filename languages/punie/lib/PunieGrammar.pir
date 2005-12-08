@@ -39,6 +39,7 @@ digit, in the form of 'print 1;'.
 
 .sub _load :load
     load_bytecode 'PGE.pbc'
+    load_bytecode 'PGE/Text.pir'
 
     $P0 = getclass 'PGE::Rule'
     $P1 = subclass $P0, 'PunieGrammar'
@@ -47,7 +48,7 @@ digit, in the form of 'print 1;'.
     .local pmc p6rule
     find_global p6rule, 'PGE', 'p6rule'
 
-    p6rule('\d', 'PunieGrammar', 'term')
+    p6rule('\d+ | <PGE::Text::bracketed: ">', 'PunieGrammar', 'term')
     p6rule('(print) \s* <PunieGrammar::expr>', 'PunieGrammar', 'gprint')
     p6rule('<PunieGrammar::gprint> | <PunieGrammar::term>', 'PunieGrammar', 'expr')
     p6rule('\s*<PunieGrammar::expr>;\s*', 'PunieGrammar', 'line')

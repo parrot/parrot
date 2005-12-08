@@ -18,10 +18,11 @@ compiler, see:
 http://svn.lohutok.net/nam/trunk/parrot/docs/compiler_tools.pod
 
 Punie currently only parses and compiles a series of statements to print
-a single digit, in the form of:
+integers or double-quoted strings, in the form of:
 
   print 1;
-  print 5;
+  print 45;
+  print "ok 1\n";
 
 =cut
 

@@ -32,6 +32,9 @@ PunieGrammar::lineseq: result(.) = {
       push newchildren, $P3
       goto iter_loop
   iter_end:
+
+    # get the source string and position offset from start of source
+    # code for this match node
     $S1 = node 
     $I1 = node.from()
     $P4 = new 'PAST::Stmts'
