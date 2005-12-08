@@ -20,22 +20,22 @@ References: http://www.gnu.org/software/m4/m4.html
 # The names of these source files should be consistent with 'GNU m4'.
 
 # subs for reading in input
-.include "dummy/input.pir"
+.include "src/input.pir"
 
 # subs for writing output
-.include "languages/m4/src/output.pir"
+.include "src/output.pir"
 
 # This contains the initialization and execution of the builtin macros.
-.include "languages/m4/src/builtin.pir"
+.include "src/builtin.pir"
 
 # This contains reading and writing of frozen files
-.include "languages/m4/src/freeze.pir"
+.include "src/freeze.pir"
 
 # Macros are expanded in there.
-.include "languages/m4/src/macro.pir"
+.include "src/macro.pir"
 
 # Mainly for debug output
-# .include "languages/m4/library/dumper.imc"
+# .include "library/dumper.imc"
 
 
 =head1 SUBROUTINES
