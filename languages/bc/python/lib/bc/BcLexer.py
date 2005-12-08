@@ -72,6 +72,7 @@ PAST_Stmt = 45
 PAST_Exp = 46
 PAST_Op = 47
 PAST_Val = 48
+PAST_Noop = 49
 
 class Lexer(antlr.CharScanner) :
     ### user action >>>

@@ -66,6 +66,7 @@ PAST_Stmt = 45
 PAST_Exp = 46
 PAST_Op = 47
 PAST_Val = 48
+PAST_Noop = 49
 
 ### user code>>>
 
@@ -477,6 +478,7 @@ _tokenNames = [
     "PAST_Stmt", 
     "PAST_Exp", 
     "PAST_Op", 
-    "PAST_Val"
+    "PAST_Val", 
+    "PAST_Noop"
 ]
     

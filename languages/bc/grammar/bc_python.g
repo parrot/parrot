@@ -343,6 +343,7 @@ tokens
   PAST_Exp;    
   PAST_Op;    
   PAST_Val;    
+  PAST_Noop;    
 }
 
 plus! returns [reg_name]
@@ -517,27 +518,63 @@ gen_pir!
 // generate an AST that is equivalent to a PAST data structure
 // TODO: Create this from bc input
 gen_antlr_past!
-  : B:expr_list
+  : E_LIST:past_expr_list
     {
-      #gen_antlr_past = #( [ PAST_Stmts, "dummy past stmts" ],
-                             #( [ PAST_Stmt, "dummy stmt 1" ],
-                                  #( [ PAST_Exp, "dummy exp 1" ],
-                                       #( [ PAST_Op, "dummy print op 1" ],
-                                            #( [ PAST_Exp, "dummy exp 1:1" ],
-                                                 [ PAST_Val, "1" ]
-                                             )
-                                        )
-                                   )
-                              ),
-                             #( [ PAST_Stmt, "dummy stmt 2" ],
-                                  #( [ PAST_Exp, "dummy exp 2" ],
-                                       #( [ PAST_Op, "dummy print op 2" ],
-                                            #( [ PAST_Exp, "dummy exp 2:1" ],
-                                                 [ PAST_Val, "\"\\n\"" ]
-                                             )
-                                        )
-                                   )
-                              )
-                         ); 
+      #gen_antlr_past = #E_LIST;
     }
   ;
+
+
+past_expr_list
+  : ( E_LINE:past_expr_line
+      {
+        #past_expr_list = #( [ PAST_Stmts, "dummy past stmts" ],
+                             #E_LINE,
+                             #( [ PAST_Stmt, "dummy stmt 2" ],
+                                #( [ PAST_Exp, "dummy exp 2" ],
+                                   #( [ PAST_Op, "dummy print op 2" ],
+                                      #( [ PAST_Exp, "dummy exp 2:1" ],
+                                         [ PAST_Val, "\"\\n\"" ]
+                                       )
+                                    )
+                                 )
+                              )
+                           ); 
+      }
+      |
+      PIR_FUNCTION_DEF
+      {
+        #past_expr_list = #( [ PAST_Val, "not implemented yet" ] )
+      }
+    )+
+  ;
+
+past_expr_line!
+  :   #( PIR_PRINT_PMC reg_name=E1:past_expr )
+      {
+        #past_expr_line =    #( [ PAST_Stmt, "dummy stmt 1" ],
+                                #( [ PAST_Exp, "dummy exp 1" ],
+                                   #( [ PAST_Op, "dummy print op 1" ],
+                                      #( [ PAST_Exp, "dummy exp 1:1" ],
+                                         #E1
+                                       )
+                                    )
+                                 )
+                              ); 
+      }
+  ;
+
+past_expr returns [reg_name]
+  : ( reg_name=plus
+      | reg_name=minus
+      | reg_name=mul
+      | reg_name=div
+      | reg_name=mod
+      | reg_name=signExpression
+      | reg_name=namedExpression
+    )
+    {
+      #past_expr = #( [ PAST_Val, "1" ] ); 
+    }
+  ;
+
