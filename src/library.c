@@ -230,6 +230,10 @@ Parrot_locate_runtime_file_str(Interp *interpreter, STRING *file,
             return full_name;
         }
     }
+    /* finally try as is */
+        if (Parrot_stat_info_intval(interpreter, file, STAT_EXISTS)) {
+            return file;
+        }
     return NULL;
 }
 
