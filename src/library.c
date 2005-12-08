@@ -343,6 +343,53 @@ Parrot_autoload_class(Interp *interpreter, STRING *class)
 
 /*
 
+=item C<STRING *
+parrot_split_path_ext(Interp*, STRING *in, STRING **wo_ext, STRING **ext)>
+
+Split the pathstring C<in> into <path><filestem><ext>. Return the
+C<filestem> of the pathstring. Set C<wo_ext> to the part without 
+extension and C<ext> to the extension or NULL.
+
+=cut
+
+*/
+
+STRING *
+parrot_split_path_ext(Interp* interpreter, STRING *in, 
+        STRING **wo_ext, STRING **ext)
+{
+    STRING *slash1, *slash2, *dot, *stem;
+    INTVAL pos_sl, pos_dot, len;
+    slash1 = CONST_STRING(interpreter, "/");
+    slash2 = CONST_STRING(interpreter, "\\");
+    dot    = CONST_STRING(interpreter, ".");
+    len = string_length(interpreter, in);
+    pos_sl = CHARSET_RINDEX(interpreter, in, slash1, len);
+    if (pos_sl == -1)
+        pos_sl = CHARSET_RINDEX(interpreter, in, slash2, len);
+    pos_dot = CHARSET_RINDEX(interpreter, in, dot, len);
+    ++pos_dot;
+    ++pos_sl;
+    if (pos_sl && pos_dot ) {
+        stem = string_substr(interpreter, in, pos_sl, pos_dot - pos_sl - 1,
+                NULL, 0);
+        *wo_ext = string_substr(interpreter, in, 0, pos_dot - 1, NULL, 0);
+        *ext = string_substr(interpreter, in, pos_dot, len - pos_dot, NULL, 0);
+    }
+    else if (pos_dot) {
+        stem = string_substr(interpreter, in, 0, pos_dot - 1, NULL, 0);
+        *wo_ext = stem;
+        *ext = string_substr(interpreter, in, pos_dot, len - pos_dot, NULL, 0);
+    }
+    else {
+        stem = string_copy(interpreter, in);
+        *wo_ext = stem;
+        *ext = NULL;
+    }
+    return stem;
+}
+/*
+
 =back
 
 =head1 SEE ALSO

@@ -42,6 +42,8 @@ void Parrot_autoload_class(Interp *, STRING *class);
 STRING * parrot_get_config_string(Interp* );
 const char* Parrot_get_runtime_prefix(Interp *, STRING **prefix);
 void parrot_init_library_paths(Interp *);
+STRING * parrot_split_path_ext(Interp* , STRING *in, 
+        STRING **wo_ext, STRING **ext);
 
 #endif /* PARROT_LIBRARY_H_GUARD */
 
