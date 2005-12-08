@@ -35,7 +35,8 @@ of the extraction.
     .param pmc tgt                                 # target to match
     .param string delim        :optional           # optional delimiters
     .param int has_delim       :opt_flag
-    .local pmc mob                                 # return match object
+    .local pmc newfrom                             # newfrom sub
+    .local pmc mob, mfrom, mpos                    # return match object
     .local string target                           # target as string
     .local string bal, bra, ket                    # balanced brackets
     .local string delim_bra, delim_ket             # delims for this match
@@ -43,12 +44,9 @@ of the extraction.
     .local int pos                                 # current match position
     .local int balanced                            # in balanced match
 
-    $P0 = find_global "PGE::Match", "newfrom"
-    mob = $P0(tgt, 0)
-    $P0 = getattribute mob, "PGE::Match\x0$:target"
-    target = $P0
-    $P0 = getattribute mob, "PGE::Match\x0$:from"
-    pos = $P0
+    newfrom = find_global "PGE::Match", "newfrom"
+    (mob, target, mfrom, mpos) = newfrom(tgt, 0)
+    pos = mfrom
 
     if has_delim goto mkdelims
     delim = "{}()[]<>"
@@ -110,8 +108,11 @@ of the extraction.
     balanced = 1                                   # we're balancing again
     inc pos                                        # skip close char
     if lookket != '' goto next                     # still nested?
-    $P0 = getattribute mob, "PGE::Match\x0$:pos"   # we have a match!
-    $P0 = pos
+    mpos = pos                                     # we have a match!
+    ($P0, $P1, $P2, $P3) = newfrom(mob, mfrom)     # create delim-less submatch
+    $P2 = mfrom + 1
+    $P3 = mpos - 1
+    mob[0] = $P0
     goto end
   fail:                                            # fail match
     if lookket == '' goto end                      # clean up restore stack

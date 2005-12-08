@@ -272,7 +272,7 @@ Returns the array component of the match object.
 =cut
 
 .sub "get_array" method
-    .param pmc array
+    .local pmc array
     array = getattribute self, "PGE::Match\x0@:capt"
     .return (array)
 .end
