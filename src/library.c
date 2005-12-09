@@ -111,8 +111,10 @@ parrot_init_library_paths(Interp *interpreter)
     paths = pmc_new(interpreter, enum_class_ResizableStringArray);
     VTABLE_set_pmc_keyed_int(interpreter, lib_paths,
             PARROT_LIB_DYN_EXTS, paths);
+    /* no CONST_STRING here - the c2str.pl preprocessor needs "real strs" */
     entry = const_string(interpreter, PARROT_LOAD_EXT);
     VTABLE_push_string(interpreter, paths, entry);
+    /* OS/X has .dylib and .bundle */
     if (strcmp(PARROT_LOAD_EXT, PARROT_SHARE_EXT)) {
         entry = const_string(interpreter, PARROT_SHARE_EXT);
         VTABLE_push_string(interpreter, paths, entry);
@@ -139,21 +141,23 @@ is_abs_path(Interp* interpreter, STRING *file)
 {
     size_t length;
     char *file_name;
-    
+
     file_name = file->strstart;
     if (file->strlen <= 1)
         return 0;
+    assert(file->encoding == Parrot_fixed_8_encoding_ptr ||
+            file->encoding == Parrot_utf8_encoding_ptr); 
 #ifdef WIN32
     if (file_name[0] == '\\' || file_name[0] == '/' ||
-        (isalpha(file_name[0]) && file->strlen > 2 && 
-            (strncmp(file_name+1, ":\\", 2) == 0 ||
-             strncmp(file_name+1, ":/",  2) == 0)))
+            (isalpha(file_name[0]) && file->strlen > 2 && 
+             (strncmp(file_name+1, ":\\", 2) == 0 ||
+              strncmp(file_name+1, ":/",  2) == 0)))
 #else
-    if (file_name[0] == '/')     /* XXX  ../foo, ./bar */
+        if (file_name[0] == '/')     /* XXX  ../foo, ./bar */
 #endif
-    {
-        return 1;
-    }
+        {
+            return 1;
+        }
     return 0;
 }
 
@@ -218,12 +222,18 @@ Parrot_locate_runtime_file_str(Interp *interpreter, STRING *file,
         else
             full_name = string_copy(interpreter, path);
         full_name = string_append(interpreter, full_name, file, 0);
+        /* TODO create a string API that just does that
+         *      a lot of ICU lib functions also need 0-terminated strings
+         *      the goal is just to have for sure an invisible 0 at end
+         */
         full_name = string_append(interpreter, full_name, nul, 0);
 	full_name->bufused--;
 	full_name->strlen--;
 #ifdef WIN32
         {
             char *p;
+            assert(full_name->encoding == Parrot_fixed_8_encoding_ptr ||
+                   full_name->encoding == Parrot_utf8_encoding_ptr); 
             while ( (p = strchr(full_name->strstart, '/')) )
                 *p = '\\';
         }
@@ -239,6 +249,8 @@ Parrot_locate_runtime_file_str(Interp *interpreter, STRING *file,
 #ifdef WIN32
     {
         char *p;
+        assert(full_name->encoding == Parrot_fixed_8_encoding_ptr ||
+                full_name->encoding == Parrot_utf8_encoding_ptr); 
         while ( (p = strchr(full_name->strstart, '/')) )
             *p = '\\';
     }

@@ -3359,7 +3359,7 @@ PackFile_append_pbc(Interp *interpreter, const char *filename)
 /*
 
 =item C<void
-Parrot_load_bytecode(Interp *interpreter, const char *filename)>
+Parrot_load_bytecode(Interp *interpreter, STRING *filename)>
 
 Load and append a bytecode, IMC or PASM file into interpreter.
 
