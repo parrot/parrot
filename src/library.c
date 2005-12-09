@@ -231,9 +231,17 @@ Parrot_locate_runtime_file_str(Interp *interpreter, STRING *file,
         }
     }
     /* finally try as is */
-        if (Parrot_stat_info_intval(interpreter, file, STAT_EXISTS)) {
-            return file;
-        }
+    full_name = string_append(interpreter, file, nul, 0);
+#ifdef WIN32
+    {
+        char *p;
+        while ( (p = strchr(full_name->strstart, '/')) )
+            *p = '\\';
+    }
+#endif
+    if (Parrot_stat_info_intval(interpreter, full_name, STAT_EXISTS)) {
+        return full_name;
+    }
     return NULL;
 }
 
