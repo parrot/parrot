@@ -212,8 +212,7 @@ S: Lyon, France
 
 N: Jerry Gay a.k.a. particle
 E: Jerry.Gay@gmail.com
-D: remove Win32 compile warnings; pcre update; cleanup of internal exceptions
-D: add tests; doc cleanup; pick low hanging fruit
+D: Test Suite, general tidiness
 S: Seattle, WA
 
 N: John Paul Wallington
