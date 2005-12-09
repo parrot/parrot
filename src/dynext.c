@@ -199,9 +199,9 @@ get_path(Interp *interpreter, STRING *lib, void **handle, STRING **lib_name)
      */
 #ifdef WIN32
     if (memcmp(lib->strstart, "lib", 3) == 0) {
-        *handle = Parrot_dlopen(lib->strstart + 3);
+        *handle = Parrot_dlopen((char*)lib->strstart + 3);
         if (*handle) {
-            path = string_substr(interpreter, lib, 3, lib->strlen - 3);
+            path = string_substr(interpreter, lib, 3, lib->strlen - 3, NULL, 0);
             return path;
         }
     }
