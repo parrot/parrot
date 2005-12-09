@@ -28,11 +28,17 @@ pmcs:
 test:
 	cd .. && $(PERL) -I../lib lua/t/harness
 
+CLEANERS = \
+t/pmc/*.pir \
+$(CLASSDIR)/*.dump \
+$(CLASSDIR)/*.c \
+$(CLASSDIR)/*.h \
+#CONDITIONED_LINE(ld_parrot_exe_def):$(CLASSDIR)/*.def \
+$(CLASSDIR)/*$(LOAD_EXT) \
+$(CLASSDIR)/*$(O)
+
 clean:
-	$(RM_F) $(CLASSDIR)/*$(O) $(CLASSDIR)/*$(LOAD_EXT) \
-	$(CLASSDIR)/*.def $(CLASSDIR)/*.dump \
-	$(CLASSDIR)/*.h $(CLASSDIR)/*.c
-	$(RM_F) t/pmc/*.pir
+	$(RM_F) $(CLEANERS)
 
 distclean: clean
 	$(RM_F) Makefile
