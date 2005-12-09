@@ -1576,10 +1576,10 @@ ops/stack.ops                                     []
 ops/string.ops                                    []
 ops/sys.ops                                       []
 ops/var.ops                                       []
+packfile/pf_items.c                               []
 parrot-config.imc                                 [main]
 parrot.spec                                       []
 parrotbug                                         []
-pf/pf_items.c                                     []
 runtime/parrot/dynext/README                      [main]doc
 runtime/parrot/include/DWIM.imc                   [main]doc
 runtime/parrot/include/README                     [main]doc

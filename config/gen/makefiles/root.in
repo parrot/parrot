@@ -61,7 +61,7 @@ LIBRARY_DIR     = runtime/parrot/library
 OPS_DIR         = ops
 
 # directory for packfile files
-PF_DIR          = pf
+PF_DIR          = packfile
 
 # source directory
 SRC_DIR         = src
