@@ -4,7 +4,7 @@ $Id$
 
 =head1 NAME
 
-encodings/utf8.c - UTF-8 encoding
+src/encodings/utf8.c - UTF-8 encoding
 
 =head1 DESCRIPTION
 
@@ -583,7 +583,7 @@ Parrot_encoding_utf8_init(Interp *interpreter)
 
 =head1 SEE ALSO
 
-F<encodings/fixed_8.c>,
+F<src/encodings/fixed_8.c>,
 F<src/string.c>,
 F<include/parrot/string.h>,
 F<docs/string.pod>.

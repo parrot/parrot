@@ -28,8 +28,8 @@ sub runstep {
     my $self = shift;
   my @encoding=(
     sort
-    map  { m{\./encodings/(.*)} }
-    glob "./encodings/*.c"
+    map  { m{\./src/encodings/(.*)} }
+    glob "./src/encodings/*.c"
   );
 
   my $encoding_list = $_[1] || join(' ', grep {defined $_} @encoding);
@@ -57,7 +57,7 @@ E_NOTE
   foreach my $encoding (split(/\s+/, $encoding_list)) {
       $encoding =~ s/\.c$//;
       $TEMP_encoding_build .= <<END
-encodings/$encoding\$(O): encodings/$encoding.h encodings/$encoding.c \$(NONGEN_HEADERS)
+src/encodings/$encoding\$(O): src/encodings/$encoding.h src/encodings/$encoding.c \$(NONGEN_HEADERS)
 
 
 END
@@ -65,7 +65,7 @@ END
 
   # build list of libraries for link line in Makefile
   my $slash = Parrot::Configure::Data->get('slash');
-  $TEMP_encoding_o  =~ s/^| / encodings${slash}/g;
+  $TEMP_encoding_o  =~ s/^| / src${slash}encodings${slash}/g;
 
   Parrot::Configure::Data->set(
     encoding             => $encoding_list,

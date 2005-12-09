@@ -2,6 +2,7 @@
 
 2005.12-08    particle
 	* move charset/ directory to src/charset/
+	* move encodings/ directory to src/encodings/
 
 2005.12.07    particle
 	* move imcc/ directory to compilers/imcc/

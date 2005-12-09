@@ -4,7 +4,7 @@ $Id$
 
 =head1 NAME
 
-encodings/ucs2.c - UCS-2 encoding
+src/encodings/ucs2.c - UCS-2 encoding
 
 =head1 DESCRIPTION
 
@@ -265,8 +265,8 @@ Parrot_encoding_ucs2_init(Interp *interpreter)
 
 =head1 SEE ALSO
 
-F<encodings/fixed_8.c>,
-F<encodings/utf8.c>,
+F<src/encodings/fixed_8.c>,
+F<src/encodings/utf8.c>,
 F<src/string.c>,
 F<include/parrot/string.h>,
 F<docs/string.pod>.

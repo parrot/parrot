@@ -4,7 +4,7 @@ $Id$
 
 =head1 NAME
 
-encodings/fixed_8.c
+src/encodings/fixed_8.c
 
 =head1 DESCRIPTION
 
