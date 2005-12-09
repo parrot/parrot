@@ -570,6 +570,8 @@ sub _generate_functions {
             $exe_f =~ s@[\\/:]@$PConfig{slash}@g;
             my $out_f = per_test('.out', $test_no);
             my $build_f = per_test('.build', $test_no);
+            my $pdb_f = per_test('.pdb', $test_no);
+            my $ilk_f = per_test('.ilk', $test_no);
 
             open SOURCE, "> $source_f" or die "Unable to open '$source_f'";
             binmode SOURCE;
@@ -642,6 +644,8 @@ sub _generate_functions {
                 unlink $build_f;
                 unlink $exe_f;
                 unlink $obj_f;
+                unlink $pdb_f;
+                unlink $ilk_f;
             }
 
             return $pass;
