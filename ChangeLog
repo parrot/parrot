@@ -1,6 +1,9 @@
 # $Id$
 
 2005.12-08    particle
+	* move types/ directory to src/types/
+
+2005.12-08    particle
 	* move charset/ directory to src/charset/
 	* move encodings/ directory to src/encodings/
 
