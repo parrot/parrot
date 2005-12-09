@@ -7,7 +7,7 @@ examples/nci/ls.pir - a directory lister
 
 =head1 DESCRIPTION
 
-List the content of the directory 'charset'.
+List the content of the directory 'docs'.
 
 =cut
 
@@ -24,7 +24,7 @@ List the content of the directory 'charset'.
      store_global 'libc::readdir', readdir
      store_global 'libc::closedir', closedir
      .local pmc curdir
-     curdir = libc::opendir("charset")
+     curdir = libc::opendir("docs")
      .local OrderedHash entry
 
      .include "datatypes.pasm"

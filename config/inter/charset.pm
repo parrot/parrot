@@ -28,8 +28,8 @@ sub runstep {
     my $self = shift;
   my @charset=(
     sort
-    map  { m{\./charset/(.*)} }
-    glob "./charset/*.c"
+    map  { m{\./src/charset/(.*)} }
+    glob "./src/charset/*.c"
   );
 
   my $charset_list = $_[1] || join(' ', grep {defined $_} @charset);
@@ -57,7 +57,7 @@ E_NOTE
   foreach my $charset (split(/\s+/, $charset_list)) {
       $charset =~ s/\.c$//;
       $TEMP_charset_build .= <<END
-charset/$charset\$(O): charset/$charset.h charset/ascii.h charset/$charset.c \$(NONGEN_HEADERS)
+src/charset/$charset\$(O): src/charset/$charset.h src/charset/ascii.h src/charset/$charset.c \$(NONGEN_HEADERS)
 
 
 END
@@ -65,7 +65,7 @@ END
 
   # build list of libraries for link line in Makefile
   my $slash = Parrot::Configure::Data->get('slash');
-  $TEMP_charset_o  =~ s/^| / charset${slash}/g;
+  $TEMP_charset_o  =~ s/^| / src${slash}charset${slash}/g;
 
   Parrot::Configure::Data->set(
     charset             => $charset_list,

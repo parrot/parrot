@@ -90,7 +90,8 @@ sub create_table {
 # create 'charset/tables.c'
 #
 ###########################################################################
-open STDOUT, ">charset/tables.c" or die "can not open 'charset/tables.c\n";
+open STDOUT, ">src/charset/tables.c"
+    or die "can not open 'src/charset/tables.c\n";
 print <<"END";
 $header
 #include "tables.h"
@@ -108,7 +109,8 @@ close STDOUT;
 # create 'charset/tables.h'
 #
 ###########################################################################
-open STDOUT, ">charset/tables.h" or die "can not open 'charset/tables.c\n";
+open STDOUT, ">src/charset/tables.h"
+    or die "can not open 'src/charset/tables.c\n";
 print <<"END";
 $header
 #if !defined(PARROT_CHARSET_TABLES_H_GUARD)

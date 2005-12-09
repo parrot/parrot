@@ -4,7 +4,7 @@ $Id$
 
 =head1 NAME
 
-charset/iso-8859-1.c
+src/charset/iso-8859-1.c
 
 =head1 DESCRIPTION
 
