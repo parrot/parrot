@@ -111,10 +111,10 @@ parrot_init_library_paths(Interp *interpreter)
     paths = pmc_new(interpreter, enum_class_ResizableStringArray);
     VTABLE_set_pmc_keyed_int(interpreter, lib_paths,
             PARROT_LIB_DYN_EXTS, paths);
-    entry = CONST_STRING(interpreter, PARROT_LOAD_EXT);
+    entry = const_string(interpreter, PARROT_LOAD_EXT);
     VTABLE_push_string(interpreter, paths, entry);
     if (strcmp(PARROT_LOAD_EXT, PARROT_SHARE_EXT)) {
-        entry = CONST_STRING(interpreter, PARROT_SHARE_EXT);
+        entry = const_string(interpreter, PARROT_SHARE_EXT);
         VTABLE_push_string(interpreter, paths, entry);
     }
 
@@ -219,6 +219,8 @@ Parrot_locate_runtime_file_str(Interp *interpreter, STRING *file,
             full_name = string_copy(interpreter, path);
         full_name = string_append(interpreter, full_name, file, 0);
         full_name = string_append(interpreter, full_name, nul, 0);
+	full_name->bufused--;
+	full_name->strlen--;
 #ifdef WIN32
         {
             char *p;
@@ -232,6 +234,8 @@ Parrot_locate_runtime_file_str(Interp *interpreter, STRING *file,
     }
     /* finally try as is */
     full_name = string_append(interpreter, file, nul, 0);
+    full_name->bufused--;
+    full_name->strlen--;
 #ifdef WIN32
     {
         char *p;
@@ -378,25 +382,30 @@ parrot_split_path_ext(Interp* interpreter, STRING *in,
     len = string_length(interpreter, in);
     pos_sl = CHARSET_RINDEX(interpreter, in, slash1, len);
     if (pos_sl == -1)
-        pos_sl = CHARSET_RINDEX(interpreter, in, slash2, len);
+	pos_sl = CHARSET_RINDEX(interpreter, in, slash2, len);
     pos_dot = CHARSET_RINDEX(interpreter, in, dot, len);
     ++pos_dot;
     ++pos_sl;
     if (pos_sl && pos_dot ) {
-        stem = string_substr(interpreter, in, pos_sl, pos_dot - pos_sl - 1,
-                NULL, 0);
-        *wo_ext = string_substr(interpreter, in, 0, pos_dot - 1, NULL, 0);
-        *ext = string_substr(interpreter, in, pos_dot, len - pos_dot, NULL, 0);
+	stem = string_substr(interpreter, in, pos_sl, pos_dot - pos_sl - 1,
+		NULL, 0);
+	*wo_ext = string_substr(interpreter, in, 0, pos_dot - 1, NULL, 0);
+	*ext = string_substr(interpreter, in, pos_dot, len - pos_dot, NULL, 0);
     }
     else if (pos_dot) {
-        stem = string_substr(interpreter, in, 0, pos_dot - 1, NULL, 0);
-        *wo_ext = stem;
-        *ext = string_substr(interpreter, in, pos_dot, len - pos_dot, NULL, 0);
+	stem = string_substr(interpreter, in, 0, pos_dot - 1, NULL, 0);
+	*wo_ext = stem;
+	*ext = string_substr(interpreter, in, pos_dot, len - pos_dot, NULL, 0);
+    }
+    else if (pos_sl) {
+	stem = string_substr(interpreter, in, pos_sl, len - pos_sl, NULL, 0);
+	*wo_ext = string_copy(interpreter, in);
+	*ext = 0;
     }
     else {
-        stem = string_copy(interpreter, in);
-        *wo_ext = stem;
-        *ext = NULL;
+	stem = string_copy(interpreter, in);
+	*wo_ext = stem;
+	*ext = NULL;
     }
     return stem;
 }
