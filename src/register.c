@@ -616,7 +616,7 @@ mark_register_stack(Parrot_Interp interpreter, Stack_Chunk_t* chunk)
             break;
         save_r = (save_regs_t *)STACK_DATAP(chunk);
         ctx.bp.regs_i    = NULL;
-        ctx.bp_ps.regs_p = save_r->bp_ps.regs_p;
+        ctx.bp_ps.regs_p = save_r->old_bp_ps.regs_p;
         for (i = 0; i < save_r->n_regs_pmc; ++i) {
             obj = (PObj *)CTX_REG_PMC(&ctx, i);
             if (obj)
