@@ -96,7 +96,18 @@ pcc_get_args(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins,
         else if (arg_flags[i] & VT_OPT_FLAG) {
             flags |= PARROT_ARG_OPT_FLAG;
         }
-        sprintf(s, "%d", flags);
+        /* add argument type bits */
+        if (arg->type & VTCONST)
+            flags |= PARROT_ARG_CONSTANT;
+        /* TODO verify if const is allowed */
+        switch (arg->set) {
+            case 'I': break;
+            case 'S': flags |= PARROT_ARG_STRING;   break;
+            case 'N': flags |= PARROT_ARG_FLOATVAL; break;
+            case 'K':          
+            case 'P': flags |= PARROT_ARG_PMC;      break;
+        }
+        sprintf(s, "0x%x", flags);
         if (i < n - 1)
             strcat(s, ",");
         l = strlen(s);
