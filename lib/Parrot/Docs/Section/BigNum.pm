@@ -39,10 +39,10 @@ sub new
 	return $self->SUPER::new(
 		'Big Number Arithmetic', 'bignum.html', '',
 		$self->new_group('Decimal Arithmetic', '',
-			$self->new_item('', 'types/bignum.c', 'types/bignum.h'),
+			$self->new_item('', 'src/types/bignum.c', 'src/types/bignum.h'),
 		),
 		$self->new_group('Testing', '',
-			$self->new_item('', 'types/bignum_atest.pl', 'types/bignum_test.pl'),
+			$self->new_item('', 'src/types/bignum_atest.pl', 'src/types/bignum_test.pl'),
 		),
 	);
 }

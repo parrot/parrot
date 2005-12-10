@@ -33,7 +33,7 @@ sub runstep {
       return               ( $a cmp $b )
     }
     grep { !/vtable\.ops/ }
-    glob "ops/*.ops"
+    glob "src/ops/*.ops"
   );
 
 

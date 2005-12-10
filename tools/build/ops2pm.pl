@@ -322,7 +322,7 @@ sub renum_op_map_file {
     my $file = shift;
 
     if (!defined $file) {
-        $file = "ops/ops.num";
+        $file = "src/ops/ops.num";
     }
     my ($name, $number, @lines, %seen, %fixed, $fix);
     local *OP;
@@ -365,7 +365,7 @@ sub load_op_map_file {
   my $file = shift;
 
   if (!defined $file) {
-    $file = "ops/ops.num";
+    $file = "src/ops/ops.num";
   }
 
   my ($name, $number, $prev);
