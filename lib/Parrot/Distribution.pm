@@ -97,9 +97,9 @@ sub c_source_file_directories
             ->directory_with_name('imcc'),
         $self->directory_with_name('io'),
         $self->directory_with_name('ops'),
-        $self->directory_with_name('packfile'),
         $self->directory_with_name('src'),
         $self->directory_with_name('src/encodings'),
+        $self->directory_with_name('src/packfile'),
         $self->directory_with_name('src/types'),
     ;
 }
@@ -139,7 +139,11 @@ sub c_header_file_directories
 {
     my $self = shift;
     
-    return $self->directory_with_relative_path('include/parrot');
+    return
+        $self->directory_with_relative_path('compilers/ast'),
+        $self->directory_with_relative_path('compilers/imcc'),
+        $self->directory_with_relative_path('include/parrot'),
+    ;
 }
 
 =item C<c_header_file_with_name($name)>
@@ -260,12 +264,13 @@ sub gen_manifest_skip {
        my $patterns = capture_output( "$svn_cmd propget svn:ignore $dir" );
        # TODO: escape chars that are special in regular expressions
        push @skip, qq{# generated from svn:ignore of '$dir'},
-                   map { my $end = $dir_list{ $dir . $_} ? '$' : '/'; # ignore file or dir
-                         s/\./\\./g;                          # . is simply a dot
-                         s/\*/.*/g;                           # * is any amount of chars
-                         "^${dir}${_}\$",                     # SVN globs are specific to a dir
-                         "^${dir}${_}/",                      # SVN globs are specific to a dir
-                       } split( /\n/, $patterns );
+           map { 
+               my $end = $dir_list{ $dir . $_} ? '$' : '/'; # ignore file or dir
+               s/\./\\./g;                  # . is simply a dot
+               s/\*/.*/g;                   # * is any amount of chars
+               "^${dir}${_}\$",             # SVN globs are specific to a dir
+               "^${dir}${_}/",              # SVN globs are specific to a dir
+           } split( /\n/, $patterns );
     }
 
     return \@skip;

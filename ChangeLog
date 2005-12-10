@@ -2,7 +2,7 @@
 
 2005.12-08    particle
 	* move types/ directory to src/types/
-	* move pf/ directory to packfile/
+	* move pf/ directory to src/packfile/
 
 2005.12-08    particle
 	* move charset/ directory to src/charset/

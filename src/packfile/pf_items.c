@@ -4,7 +4,7 @@ $Id$
 
 =head1 NAME
 
-packfile/pf_items.c - Fetch/store packfile data
+src/packfile/pf_items.c - Fetch/store packfile data
 
 =head1 DESCRIPTION
 
