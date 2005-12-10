@@ -42,7 +42,7 @@ sub run_tests
 my @tests = 
      (
        # comments 
-       [ '/* */1', 1, 'one line comment' ],
+       [ '/* */7', 7, 'one line comment' ],
        [ "/* line1 \n line2 \n line 3 */    -2  ", -2, 'multi line comment' ],
        # Strings 
        [ qq{1;2;"asdf"   ;  3    }, [ 1, 2, 'asdf3' ], 'string' ],

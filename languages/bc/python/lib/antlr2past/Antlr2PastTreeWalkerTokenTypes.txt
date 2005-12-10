@@ -1,4 +1,4 @@
-// $ANTLR 2.7.5 (20051104): antlr2past.g -> Antlr2PastTreeWalkerTokenTypes.txt$
+// $ANTLR 2.7.5 (20050416): antlr2past.g -> Antlr2PastTreeWalkerTokenTypes.txt$
 Antlr2PastTreeWalker    // output token vocab name
 NEWLINE=4
 STRING=5
@@ -45,4 +45,3 @@ PAST_Stmt=45
 PAST_Exp=46
 PAST_Op=47
 PAST_Val=48
-PAST_Noop=49

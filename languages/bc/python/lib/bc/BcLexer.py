@@ -1,4 +1,4 @@
-### $ANTLR 2.7.5 (20051104): "bc_python.g" -> "BcLexer.py"$
+### $ANTLR 2.7.5 (20050416): "bc_python.g" -> "BcLexer.py"$
 ### import antlr and other modules ..
 import sys
 import antlr
@@ -72,7 +72,6 @@ PAST_Stmt = 45
 PAST_Exp = 46
 PAST_Op = 47
 PAST_Val = 48
-PAST_Noop = 49
 
 class Lexer(antlr.CharScanner) :
     ### user action >>>

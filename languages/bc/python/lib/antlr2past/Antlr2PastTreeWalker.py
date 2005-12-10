@@ -1,4 +1,4 @@
-### $ANTLR 2.7.5 (20051104): "antlr2past.g" -> "Antlr2PastTreeWalker.py"$
+### $ANTLR 2.7.5 (20050416): "antlr2past.g" -> "Antlr2PastTreeWalker.py"$
 ### import antlr and other modules ..
 import sys
 import antlr
@@ -66,7 +66,6 @@ PAST_Stmt = 45
 PAST_Exp = 46
 PAST_Op = 47
 PAST_Val = 48
-PAST_Noop = 49
 
 ### user code>>>
 
@@ -478,7 +477,6 @@ _tokenNames = [
     "PAST_Stmt", 
     "PAST_Exp", 
     "PAST_Op", 
-    "PAST_Val", 
-    "PAST_Noop"
+    "PAST_Val"
 ]
     
