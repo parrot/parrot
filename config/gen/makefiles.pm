@@ -138,7 +138,7 @@ sub makefiles {
   if ( Parrot::Configure::Data->get('has_perldoc') ) {
     # set up docs/Makefile, partly based on the .ops in the root dir
 
-    opendir OPS, "ops" or die "opendir ops: $!";
+    opendir OPS, "src/ops" or die "opendir ops: $!";
     my @ops = sort grep { !/^\./ && /\.ops$/ } readdir OPS;
     closedir OPS;
 
@@ -161,9 +161,9 @@ sub makefiles {
     foreach my $ops (@ops) {
         my $pod = $ops;
         $pod =~ s/\.ops$/.pod/;
-        print MAKEFILE "ops$slash$pod: ..${slash}ops${slash}$ops\n";
+        print MAKEFILE "ops$slash$pod: ..${slash}src${slash}ops${slash}$ops\n";
         if ($new_perldoc == 1) {
-            print MAKEFILE "\tperldoc -ud ops${slash}$pod ..${slash}ops${slash}$ops\n\n";
+            print MAKEFILE "\tperldoc -ud ops${slash}$pod ..${slash}src${slash}ops${slash}$ops\n\n";
         } else {
             print MAKEFILE "\tperldoc -u ..${slash}ops${slash}$ops > ops${slash}$pod\n\n";
         }
