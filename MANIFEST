@@ -441,6 +441,8 @@ editor/pasm.vim                                   [devel]
 editor/pir-mode.el                                [devel]
 editor/pmc.vim                                    [devel]
 examples/README                                   [main]doc
+examples/benchmarks/ack.pir                       [main]doc
+examples/benchmarks/ack.py                        [main]doc
 examples/benchmarks/addit.imc                     [main]doc
 examples/benchmarks/addit.pasm                    [main]doc
 examples/benchmarks/addit.pl                      [main]doc
