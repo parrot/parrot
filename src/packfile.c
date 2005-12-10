@@ -3339,7 +3339,7 @@ PackFile_Constant_unpack_key(Interp *interpreter,
 PackFile_append_pbc(Interp *interpreter, const char *filename)>
 
 Read a PBC and append it to the current directory
-Fixup local label and sub addresses in newly loaded bytecode.
+Fixup sub addresses in newly loaded bytecode and run :load subs.
 
 =cut
 
@@ -3350,9 +3350,10 @@ PackFile_append_pbc(Interp *interpreter, const char *filename)
 {
     struct PackFile * pf = Parrot_readbc(interpreter, filename);
     if (!pf)
-        return NULL;
+	return NULL;
     PackFile_add_segment(interpreter, &interpreter->initial_pf->directory,
-            &pf->directory.base);
+	    &pf->directory.base);
+    do_sub_pragmas(interpreter, pf->cur_cs, PBC_LOADED);
     return pf;
 }
 
@@ -3378,61 +3379,39 @@ void * IMCC_compile_file (Parrot_Interp interp, const char *s);
 void
 Parrot_load_bytecode(Interp *interpreter, STRING *file_str)
 {
-    const char *ext;
     struct PackFile_ByteCode * cs;
-    struct PackFile * pf;
     char *filename;
+    STRING *wo_ext, *ext, *pbc, *path;
+    enum_runtime_ft file_type;
 
-#if TRACE_PACKFILE
-    fprintf(stderr, "packfile.c: parrot_load_bytecode()\n");
-#endif
+    parrot_split_path_ext(interpreter, file_str, &wo_ext, &ext);
+    /* TODO: check if wo_ext is loaded */
+    pbc = const_string(interpreter, "pbc");
+    if (string_equal(interpreter, ext, pbc) == 0)
+	file_type = PARROT_RUNTIME_FT_PBC;
+    else
+	file_type = PARROT_RUNTIME_FT_SOURCE;
 
-    filename = string_to_cstring(interpreter, file_str);
-    ext = strrchr(filename, '.');
-    if (ext && strcmp (ext, ".pbc") == 0) {
-        const char *fullname = Parrot_locate_runtime_file(interpreter, 
-                filename, PARROT_RUNTIME_FT_PBC);
-        if (!fullname) {
-            internal_exception(1, "Couldn't find PBC file '%s'", filename);
-            return;
-        }
-        pf = PackFile_append_pbc(interpreter, fullname);
-        if (!pf) {
-            internal_exception(1, "Couldn't find PBC file");
-            return;
-        }
-        do_sub_pragmas(interpreter, pf->cur_cs, PBC_LOADED);
+    path = Parrot_locate_runtime_file_str(interpreter, file_str, file_type);
+    if (!path) {
+	real_exception(interpreter, NULL, E_LibraryNotLoadedError, 
+		"Couldn't find file '%Ss'", file_str);
+	return;
+    }
+    filename = string_to_cstring(interpreter, path);
+    if ( file_type == PARROT_RUNTIME_FT_PBC) {
+	PackFile_append_pbc(interpreter, filename);
     }
     else {
-#if 0
-        PMC * compiler, *code;
-        /* see imcc/parser_util.c */
-        PMC *key = key_new_cstring(interpreter, "FILE");
-        PMC *compreg_hash = VTABLE_get_pmc_keyed_int(interpreter,
-                interpreter->iglobals, IGLOBALS_COMPREG_HASH);
-        STRING *file;
-
-        compiler = VTABLE_get_pmc_keyed(interpreter, compreg_hash, key);
-        if (!VTABLE_defined(interpreter, compiler)) {
-            internal_exception(1, "Couldn't find FILE compiler");
-            return;
-        }
-        file = string_from_cstring(interpreter, filename, 0);
-#if TRACE_PACKFILE
-        fprintf(stderr, "packfile.c: VTABLE: compiler->invoke '%s'\n",
-                filename);
-#endif
-        code = VTABLE_invoke(interpreter, compiler, file);
-        pf = VTABLE_get_pointer(interpreter, code);
-#else
-        cs = IMCC_compile_file(interpreter, filename);
-#endif
-        if (cs) {
-            fixup_subs(interpreter, cs, PBC_LOADED, NULL);
-        }
-        else
-            internal_exception(1, "compiler returned NULL ByteCode");
+	cs = IMCC_compile_file(interpreter, filename);
+	if (cs) {
+	    fixup_subs(interpreter, cs, PBC_LOADED, NULL);
+	}
+	else
+	    real_exception(interpreter, NULL, E_LibraryNotLoadedError,
+		"compiler returned NULL ByteCode '%Ss'", file_str);
     }
+    string_cstring_free(filename);
 }
 
 /*

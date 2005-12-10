@@ -31,7 +31,6 @@
 void imcc_init(Parrot_Interp interpreter);
 PMC * imcc_compile_pir(Parrot_Interp interp, const char *s);
 PMC * imcc_compile_pasm(Parrot_Interp interp, const char *s);
-void *imcc_compile_file(Parrot_Interp interp, const char *s);
 
 static PMC * imcc_compile(Parrot_Interp interp, const char *s, int pasm);
 static const char * try_rev_cmp(Parrot_Interp, IMC_Unit * unit, char *name,
@@ -693,11 +692,11 @@ imcc_compile_pir (Parrot_Interp interp, const char *s)
 /*
  * Compile a file by filename (can be either PASM or IMCC code)
  */
-void *
-imcc_compile_file (Parrot_Interp interp, const char *s)
+static void *
+imcc_compile_file (Parrot_Interp interp, const char *fullname)
 {
     struct PackFile_ByteCode *cs_save = interp->code, *cs;
-    char *ext, *fullname = NULL;   /* gc uninit warning */
+    char *ext;
     FILE *fp;
     struct _imc_info_t *imc_info = NULL;
 
@@ -709,14 +708,9 @@ imcc_compile_file (Parrot_Interp interp, const char *s)
         IMCC_INFO(interp) = imc_info;
     }
 
-    fullname = Parrot_locate_runtime_file(interp, s, PARROT_RUNTIME_FT_SOURCE);
-    if (!fullname)
-        IMCC_fatal(interp, E_IOError,
-                "imcc_compile_file: couldn't find '%s'\n", s);
     if (!(fp = fopen(fullname, "r"))) {
         IMCC_fatal(interp, E_IOError,
                 "imcc_compile_file: couldn't open '%s'\n", fullname);
-        string_cstring_free(fullname);
         return NULL;
     }
 
@@ -729,7 +723,7 @@ imcc_compile_file (Parrot_Interp interp, const char *s)
     interp->code = NULL;
 
     IMCC_push_parser_state(interp);
-    IMCC_INFO(interp)->state->file = s;
+    IMCC_INFO(interp)->state->file = fullname;
     ext = strrchr(fullname, '.');
     line = 1;
     /*
@@ -758,7 +752,6 @@ imcc_compile_file (Parrot_Interp interp, const char *s)
 
     if (cs_save)
         (void)Parrot_switch_to_cs(interp, cs_save, 0);
-    string_cstring_free(fullname);
 
     if (imc_info) {
         IMCC_INFO(interp) = imc_info->prev;
