@@ -429,6 +429,7 @@ CODE
 1001
 OUTPUT
 
+SKIP: { skip("no instantiate", 1);
 output_is(<<'CODE', <<'OUTPUT', "instantiate - no args");
     getclass P2, "Integer"
     set I0, 0	# unproto
@@ -445,6 +446,7 @@ CODE
 Integer
 0
 OUTPUT
+}
 
 output_is(<<'CODE', <<'OUT', ".const - Sub constant");
 .pcc_sub :main main:
