@@ -38,7 +38,7 @@ sub compile
 
   $compiler->emit(".sub ___MAIN");
   $compiler->indent;
-  $compiler->emit("bsr __INLINE_0");
+  $compiler->emit("__INLINE_0()");
   $compiler->emit("end");
   $compiler->outdent;
   $compiler->emit(".end");
@@ -50,8 +50,8 @@ sub compile
       or $construct->isa("Jako::Construct::Declaration::Sub")
     ) {
       if ($last_seen ne 'sub') {
-        $compiler->emit("bsr __INLINE_" . $inline); # $inline is already the next one.
-        $compiler->emit("ret"); # Return to the previous inline chunk.
+        $compiler->emit("__INLINE_" . $inline . "()"); # $inline is already the next one.
+        $compiler->emit(".return()"); # Return to the previous inline chunk.
         $compiler->outdent;
         $compiler->emit(".end");
 
@@ -75,7 +75,7 @@ sub compile
     $compiler->indent;
   }
 
-  $compiler->emit("ret");
+  $compiler->emit(".return()");
   $compiler->outdent;
   $compiler->emit(".end");
 

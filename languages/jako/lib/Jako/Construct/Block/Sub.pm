@@ -85,11 +85,11 @@ sub compile
 
   $subname =~ s/::/__/g;
 
-  my $namespace = "_SUB_$subname";
+#  my $namespace = "_SUB_$subname";
 
   $compiler->emit(".sub _${subname}");
-  $compiler->emit(".namespace $namespace");
-  $compiler->emit("saveall");
+#  $compiler->emit(".namespace $namespace");
+#  $compiler->emit("saveall");
 
   foreach my $arg (reverse @args) {
     my ($arg_type, $arg_name) = @$arg;
@@ -103,9 +103,9 @@ sub compile
   $compiler->outdent;
 
   $compiler->emit("_${name}_LEAVE:");
-  $compiler->emit("  restoreall");
-  $compiler->emit("  ret");
-  $compiler->emit("  .endnamespace $namespace");
+#  $compiler->emit("  restoreall");
+  $compiler->emit("  .return()"); # Fallthrough return() in case the code in the sub doesn't return anything
+#  $compiler->emit("  .endnamespace $namespace");
   $compiler->emit(".end");
 
   return 1;

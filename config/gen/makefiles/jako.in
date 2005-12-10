@@ -13,7 +13,7 @@ JAKOC=$(PERL) -I lib jakoc
 INTERP=../../${test_prog}
 ASM=$(INTERP) -a --output-pbc
 
-.SUFFIXES: .jako .imc .pasm .pbc
+.SUFFIXES: .jako .imc .pbc
 
 
 #
@@ -21,23 +21,23 @@ ASM=$(INTERP) -a --output-pbc
 #
 
 all: \
-	examples/bench.pbc      \
-	examples/board.pbc      \
-	examples/euclid.pbc     \
-	examples/fact.pbc       \
-	examples/fib.pbc        \
-	examples/hello.pbc      \
-	examples/leibniz.pbc    \
-	examples/life.pbc       \
-	examples/mandelbrot.pbc \
-	examples/mandelzoom.pbc \
-	examples/mops.pbc       \
-	examples/nci.pbc        \
-	examples/pmc.pbc        \
-	examples/primes.pbc     \
-	examples/queens.pbc
+	examples/bench.imc      \
+	examples/board.imc      \
+	examples/euclid.imc     \
+	examples/fact.imc       \
+	examples/fib.imc        \
+	examples/hello.imc      \
+	examples/leibniz.imc    \
+	examples/life.imc       \
+	examples/mandelbrot.imc \
+	examples/mandelzoom.imc \
+	examples/mops.imc       \
+	examples/nci.imc        \
+	examples/pmc.imc        \
+	examples/primes.imc     \
+	examples/queens.imc
 
-#	examples/sub.pbc
+#	examples/sub.imc
 
 
 #
@@ -65,57 +65,30 @@ examples/queens.imc:     examples/queens.jako     jakoc
 
 #examples/sub.imc:        examples/sub.jako        jakoc
 
-
-#
-# Intermediate Compilation:
-#
-
-.imc.pasm:
-	$(INTERP) -o $@ $< || (rm -f $@ && false)
-
-examples/bench.pasm:      examples/bench.imc
-examples/board.pasm:      examples/board.imc
-examples/euclid.pasm:     examples/euclid.imc
-examples/fact.pasm:       examples/fact.imc
-examples/fib.pasm:        examples/fib.imc
-examples/hello.pasm:      examples/hello.imc
-examples/leibniz.pasm:    examples/leibniz.imc
-examples/life.pasm:       examples/life.imc
-examples/mandelbrot.pasm: examples/mandelbrot.imc
-examples/mandelzoom.pasm: examples/mandelzoom.imc
-examples/mops.pasm:       examples/mops.imc
-examples/nci.pasm:        examples/nci.imc
-examples/pmc.pasm:        examples/pmc.imc
-examples/primes.pasm:     examples/primes.imc
-examples/queens.pasm:     examples/queens.imc
-
-#examples/sub.pasm:        examples/sub.imc
-
-
 #
 # Assembly:
 #
 
-.pasm.pbc:
+.imc.pbc:
 	$(ASM) -o $@ $<
 
-examples/bench.pbc:      examples/bench.pasm
-examples/board.pbc:      examples/board.pasm
-examples/euclid.pbc:     examples/euclid.pasm
-examples/fact.pbc:       examples/fact.pasm
-examples/fib.pbc:        examples/fib.pasm
-examples/hello.pbc:      examples/hello.pasm
-examples/leibniz.pbc:    examples/leibniz.pasm
-examples/life.pbc:       examples/life.pasm
-examples/mandelbrot.pbc: examples/mandelbrot.pasm
-examples/mandelzoom.pbc: examples/mandelzoom.pasm
-examples/mops.pbc:       examples/mops.pasm
-examples/nci.pbc:        examples/nci.pasm
-examples/pmc.pbc:        examples/pmc.pasm
-examples/primes.pbc:     examples/primes.pasm
-examples/queens.pbc:     examples/queens.pasm
+examples/bench.pbc:      examples/bench.imc
+examples/board.pbc:      examples/board.imc
+examples/euclid.pbc:     examples/euclid.imc
+examples/fact.pbc:       examples/fact.imc
+examples/fib.pbc:        examples/fib.imc
+examples/hello.pbc:      examples/hello.imc
+examples/leibniz.pbc:    examples/leibniz.imc
+examples/life.pbc:       examples/life.imc
+examples/mandelbrot.pbc: examples/mandelbrot.imc
+examples/mandelzoom.pbc: examples/mandelzoom.imc
+examples/mops.pbc:       examples/mops.imc
+examples/nci.pbc:        examples/nci.imc
+examples/pmc.pbc:        examples/pmc.imc
+examples/primes.pbc:     examples/primes.imc
+examples/queens.pbc:     examples/queens.imc
 
-#examples/sub.pbc:        examples/sub.pasm
+#examples/sub.pbc:        examples/sub.imc
 
 
 #
@@ -123,7 +96,7 @@ examples/queens.pbc:     examples/queens.pasm
 #
 
 clean:
-	$(RM_F) examples/*.imc examples/*.pasm examples/*.list examples/*.pbc
+	$(RM_F) examples/*.imc examples/*.list examples/*.pbc
 
 over:
 	@$(MAKE) clean

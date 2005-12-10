@@ -134,14 +134,9 @@ sub compile
   else {
 #    $self->DEBUG(0, "Calling '%s' as regular sub (props = %s)...", $name, join(", ", %props));
 
-    foreach my $arg (@args) {
-      $compiler->emit("  .arg $arg");
-    }
-
     $name =~ s/::/__/g;
 
-    $compiler->emit("  call _${name}");
-    $compiler->emit("  .result $dest");
+    $compiler->emit("  $dest = _${name}(" . join(@args) . ")");
   }
 
   return 1;

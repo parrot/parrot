@@ -127,11 +127,13 @@ sub compile
       $ret_val = $temp;
     }
 
-    $compiler->emit("  .return $ret_val");
+    $compiler->emit("  .return($ret_val)");
   }
 
   #
   # Go to the subroutine exit point:
+  #
+  # TODO: Isn't this really a no-op, after doing a .return(...)?
   #
 
   $compiler->emit("  goto _${sub_name}_LEAVE");
