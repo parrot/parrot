@@ -704,6 +704,32 @@ Return a new iterator for SELF.
 
 /*
 
+=item C<INTVAL exists_keyed_int(INTVAL key)>
+
+=item C<INTVAL exists_keyed_int(PMC* key)>
+
+Returns TRUE is the element at C<key> exists; otherwise returns false.
+
+=cut
+
+*/
+    INTVAL exists_keyed_int (INTVAL key) {
+        PMC **data;
+        if (key < 0 || key >= PMC_int_val(SELF))
+            internal_exception(OUT_OF_BOUNDS,
+                "FixedPMCArray: index out of bounds!");
+
+        data = (PMC**)PMC_data(SELF);
+	return !PMC_IS_NULL(data[key]);
+    }
+
+    INTVAL exists_keyed (PMC* key) {
+        INTVAL ix = key_integer(INTERP, key);
+	return SELF.exists_keyed_int(ix);
+    }
+
+/*
+
 =item C<void visit(visit_info *info)>
 
 This is used by freeze/thaw to visit the contents of the array.
