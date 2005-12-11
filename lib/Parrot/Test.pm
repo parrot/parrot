@@ -32,7 +32,7 @@ The parameter C<$expected> is the expected result.
 The parameter C<$unexpected> is the unexpected result.
 The parameter C<$description> should describe the test.
 
-Any optional parameters can follow.  For example, to mark a test as a TODO test (where you know the implementation does not yet work), pass:
+Optional parameters may follow. For example, to mark a test as a TODO test (where you know the implementation does not yet work), pass:
 
     todo => 'reason to consider this TODO'
 
@@ -54,11 +54,6 @@ if the  output matches the expected result.
 =item C<language_output_isnt( $language, $code, $expected, $description)> 
 
 Runs a langugage test and passes the test if a string comparison
-if a string comparison of the output with the unexpected result is false.
-
-=item C<pasm_output_isnt($code, $unexpected, $description)> or C<output_isnt($code, $unexpected, $description)>
-
-Runs the Parrot Assembler code and passes the test
 if a string comparison of the output with the unexpected result is false.
 
 =item C<pasm_output_is($code, $expected, $description)> or C<output_is($code, $expected, $description)>
@@ -306,6 +301,7 @@ sub per_test {
     return $t;
 }
 
+
 sub generate_code {
     my ($code, $directory, $test_no, $code_f) = @_;
 
@@ -318,9 +314,11 @@ sub generate_code {
     return;
 }
 
+
 # We can inherit from Test::More, so we do it.
 *plan = \&Test::More::plan;
 *skip = \&Test::More::skip;
+
 
 # What about File::Slurp?
 sub slurp_file {
@@ -335,6 +333,7 @@ sub slurp_file {
     return $file;
 }
 
+# Generate subs and put them into the symbol table
 sub _generate_functions {
     my ($package, $code_generator) = @_;
 
@@ -344,25 +343,25 @@ sub _generate_functions {
     my $parrot = File::Spec->join(File::Spec->curdir(), 'parrot' . $PConfig{exe});
 
     my %parrot_test_map = (
-        output_is          => 'is_eq',
-        output_isnt        => 'isnt_eq',
-        output_like        => 'like',
-        pbc_output_is      => 'is_eq',
-        pbc_output_isnt    => 'isnt_eq',
-        pbc_output_like    => 'like',
-        pasm_output_is     => 'is_eq',
-        pasm_output_isnt   => 'isnt_eq',
-        pasm_output_like   => 'like',
-        past_output_is     => 'is_eq',
-        past_output_isnt   => 'isnt_eq',
-        past_output_like   => 'like',
-        pir_output_is      => 'is_eq',
-        pir_output_isnt    => 'isnt_eq',
-        pir_output_like    => 'like',
-        pir_2_pasm_is      => 'is_eq',
-        pir_2_pasm_isnt    => 'isnt_eq',
-        pir_2_pasm_like    => 'like',
-                          );
+           output_is          => 'is_eq',
+           output_isnt        => 'isnt_eq',
+           output_like        => 'like',
+           pbc_output_is      => 'is_eq',
+           pbc_output_isnt    => 'isnt_eq',
+           pbc_output_like    => 'like',
+           pasm_output_is     => 'is_eq',
+           pasm_output_isnt   => 'isnt_eq',
+           pasm_output_like   => 'like',
+           past_output_is     => 'is_eq',
+           past_output_isnt   => 'isnt_eq',
+           past_output_like   => 'like',
+           pir_output_is      => 'is_eq',
+           pir_output_isnt    => 'isnt_eq',
+           pir_output_like    => 'like',
+           pir_2_pasm_is      => 'is_eq',
+           pir_2_pasm_isnt    => 'isnt_eq',
+           pir_2_pasm_like    => 'like',
+       );
 
     foreach my $func ( keys %parrot_test_map ) {
         no strict 'refs';
@@ -444,7 +443,7 @@ sub _generate_functions {
             }
 
             my ( $exit_code, $cmd );
-            unless ( $run_exec ) {
+            if ( ! $run_exec ) {
                 if ( $func !~ /^pir_2_pasm_/ &&
                      ( $args =~ s/--run-pbc// || $args =~ s/-r //) ) {
                     my $pbc_f = per_test('.pbc', $test_no);
@@ -480,9 +479,10 @@ sub _generate_functions {
             }
 
             # set a TODO for Test::Builder to find
-            my $call_pkg = $builder->exported_to() || '';
-            local *{ $call_pkg . '::TODO' } = \$extra{todo}
-                if defined $extra{todo};
+            if ( defined $extra{todo} ) {
+                my $call_pkg = $builder->exported_to() || '';
+                local *{ $call_pkg . '::TODO' } = \$extra{todo}
+            }
 
             my $pass = $builder->$meth( $real_output, $expected, $desc );
             $builder->diag("'$cmd' failed with exit code $exit_code")
@@ -497,17 +497,17 @@ sub _generate_functions {
     }
 
     my %builtin_language_prefix = (
-        IMC   => 'pir',
-        PASM  => 'pasm',
-        PAST  => 'past',
-        PIR   => 'pir',
-                                  );
+           IMC   => 'pir',
+           PASM  => 'pasm',
+           PAST  => 'past',
+           PIR   => 'pir',
+       );
 
     my %language_test_map = (
-        language_output_is   => 'output_is',
-        language_output_like => 'output_like',
-        language_output_isnt => 'output_isnt',
-                            );
+           language_output_is   => 'output_is',
+           language_output_like => 'output_like',
+           language_output_isnt => 'output_isnt',
+       );
 
     foreach my $func ( keys %language_test_map ) {
         no strict 'refs';
@@ -518,7 +518,7 @@ sub _generate_functions {
             my $meth = $language_test_map{$func};
             if ( my $prefix = $builtin_language_prefix{$language} ) { 
                 my $test_func = "${package}::${prefix}_${meth}";
-                &$test_func( @remaining );
+                $test_func->(@remaining);
             }
             else {
                 # TODO: $language should be the name of the test Module
@@ -548,10 +548,10 @@ sub _generate_functions {
     }
 
     my %c_test_map = (
-         c_output_is   => 'is_eq',
-         c_output_isnt => 'isnt_eq',
-         c_output_like => 'like'
-                     );
+           c_output_is   => 'is_eq',
+           c_output_isnt => 'isnt_eq',
+           c_output_like => 'like',
+       );
 
     foreach my $func ( keys %c_test_map ) {
         no strict 'refs';
@@ -656,11 +656,12 @@ sub _generate_functions {
 sub example_output_is {
     my ($example_fn, $expected) = @_;
 
-    my %lang_for_extension 
-        = ( pasm => 'PASM',
-            past => 'PAST',
-            pir  => 'PIR',
-            imc  => 'PIR', );
+    my %lang_for_extension = (
+           pasm => 'PASM',
+           past => 'PAST',
+           pir  => 'PIR',
+           imc  => 'PIR',
+       );
 
     my ( $extension ) = $example_fn =~ m{ [.]                         # introducing extension
                                           ( pasm | pir | imc | past ) # match and capture the extension
