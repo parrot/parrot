@@ -349,10 +349,12 @@ tokens
 
   // PAST as an ANTLR tree
   PAST_Stmts;     // top level
+  PAST_Code;  
   PAST_Stmt;    
   PAST_Exp;    
   PAST_Op;    
   PAST_Val;    
+  PAST_Noop;      // used as a container
 }
 
 plus! returns [reg_name]
@@ -539,51 +541,45 @@ gen_pir!
   ;
 
 // generate an AST that is equivalent to a PAST data structure
-// TODO: Create this from bc input
 gen_antlr_past!
   : E_LIST:past_expr_list
     {
-      #gen_antlr_past = #E_LIST;
+      #gen_antlr_past = #( [ PAST_Stmts, "dummy past stmts" ], #E_LIST )
     }
   ;
 
-
+// No need to generated any nodes here
 past_expr_list
-  : ( E_LINE:past_expr_line
-      {
-        #past_expr_list = #E_LINE;
-      }
+  : ( past_p_expr_p_newline
       |
-      PIR_FUNCTION_DEF
-      {
-        #past_expr_list = #( [ PAST_Val, "not implemented yet" ] )
-      }
+      past_function_def
     )+
   ;
 
-past_expr_line!
+// TODO how to name a printable expression that is not a string
+past_p_expr_p_newline!
   : #( PIR_PRINT_PMC E1:past_expr )
     {
-      #past_expr_line = #( [ PAST_Stmts, "dummy past stmts" ],
-                           #( [ PAST_Stmt, "dummy stmt 1" ],
-                              #( [ PAST_Exp, "dummy exp 1" ],
-                                 #( [ PAST_Op, "dummy print op 1" ],
-                                    #( [ PAST_Exp, "dummy exp 1:1" ],
-                                       #E1
-                                     )
-                                  )
-                               )
-                            ),  
-                           #( [ PAST_Stmt, "dummy stmt 2" ],
-                              #( [ PAST_Exp, "dummy exp 2" ],
-                                 #( [ PAST_Op, "dummy print op 2" ],
-                                    #( [ PAST_Exp, "dummy exp 2:1" ],
-                                       [ PAST_Val, "\"\\n\"" ]
-                                     )
-                                  )
-                               )
-                            )
-                         ); 
+      #past_p_expr_p_newline = #( [ PAST_Code, "two statements" ],
+                                  #( [ PAST_Stmt, "dummy stmt 1" ],
+                                     #( [ PAST_Exp, "dummy exp 1" ],
+                                        #( [ PAST_Op, "dummy print op 1" ],
+                                           #( [ PAST_Exp, "dummy exp 1:1" ],
+                                              #E1
+                                            )
+                                         )
+                                      )
+                                   ),  
+                                  #( [ PAST_Stmt, "dummy stmt 2" ],
+                                     #( [ PAST_Exp, "dummy exp 2" ],
+                                        #( [ PAST_Op, "dummy print op 2" ],
+                                           #( [ PAST_Exp, "dummy exp 2:1" ],
+                                              [ PAST_Val, "\"\\n\"" ]
+                                            )
+                                         )
+                                      )
+                                   )
+                                ); 
     }
   ;
 
@@ -621,6 +617,14 @@ past_signExpression
     {
       val = '-' + i2.getText();
       #past_signExpression = #( [ PAST_Val, val ] ); 
+    }
+  ;
+
+
+past_function_def
+  : PIR_FUNCTION_DEF
+    {
+      #past_function_def = #( [ PAST_Val, "not implemented yet" ] )
     }
   ;
 

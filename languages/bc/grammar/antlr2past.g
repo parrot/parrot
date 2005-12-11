@@ -42,28 +42,38 @@ options
 //}
 
 gen_pir_past!
-  : #(PAST_Stmts reg_S1=S1:past_stmt reg_S2=S2:past_stmt)
+  : #(PAST_Stmts PEPN:p_expr_p_newline )
     {
-      pir = """
-# stmts will be used by the executing part 
+      pir_before = """
+.local pmc stmts_children
+stmts_children = new PerlArray
+#"""
+      pir_after = """
 .local pmc stmts
 stmts = new 'PAST::Stmts'
 
-.local pmc stmts_children
-stmts_children = new PerlArray
-push stmts_children, $P%d
-push stmts_children, $P%d
-
 stmts.set_node('1', 1, stmts_children)
             
-#""" % ( reg_S1, reg_S2 )
+#"""
 
-      #gen_pir_past = #( [ PIR_NOOP, "noop" ], #S1, #S2, [PIR_OP, pir] ); 
+      #gen_pir_past = #( [ PIR_OP, pir_before ], #PEPN, [PIR_OP, pir_after] ); 
     }
   ;
 
-past_stmt! returns[reg]
-  : #( PAST_Stmt reg_E=E:past_exp )
+p_expr_p_newline!
+  : #( PAST_Code reg_S1=S1:stmt reg_S2=S2:stmt )
+    {
+      pir = """
+push stmts_children, $P%d
+push stmts_children, $P%d
+#""" % ( reg_S1, reg_S2 )
+
+      #p_expr_p_newline = #( [ PIR_NOOP, "noop" ], #S1, #S2, [PIR_OP, pir] ); 
+    }
+  ;
+
+stmt! returns[reg]
+  : #( PAST_Stmt reg_E=E:exp )
     {
       reg = self.reg;
       self.reg = self.reg + 10;
@@ -80,12 +90,12 @@ past_stmt! returns[reg]
     reg, reg + 1
        )
 
-      #past_stmt = #( [ PIR_NOOP, "noop" ], #E, [PIR_OP, pir] ); 
+      #stmt = #( [ PIR_NOOP, "noop" ], #E, [PIR_OP, pir] ); 
     }
   ;
 
-past_exp! returns[reg]
-  : #( PAST_Exp ( reg_O=O:past_op
+exp! returns[reg]
+  : #( PAST_Exp ( reg_O=O:op
                   {
                     reg = self.reg;
                     self.reg = self.reg + 10;
@@ -103,10 +113,10 @@ past_exp! returns[reg]
                               reg, reg + 1
                      )
 
-                    #past_exp = #( [ PIR_NOOP, "noop" ], #O, [PIR_OP, pir] ); 
+                    #exp = #( [ PIR_NOOP, "noop" ], #O, [PIR_OP, pir] ); 
                   }
                   | 
-                  reg_V=V:past_val 
+                  reg_V=V:val 
                   {
                     reg = self.reg;
                     self.reg = self.reg + 10;
@@ -124,14 +134,14 @@ past_exp! returns[reg]
                               reg, reg + 1
                      )
 
-                    #past_exp = #( [ PIR_NOOP, "noop" ], #V, [PIR_OP, pir] ); 
+                    #exp = #( [ PIR_NOOP, "noop" ], #V, [PIR_OP, pir] ); 
                   }
                 )
      )
   ;
 
-past_op! returns[reg]
-  : #( PAST_Op reg_E=E:past_exp ) 
+op! returns[reg]
+  : #( PAST_Op reg_E=E:exp ) 
     {
       reg = self.reg;
       self.reg = self.reg + 10;
@@ -149,11 +159,11 @@ past_op! returns[reg]
             reg, reg + 1
        )
 
-      #past_op = #( [ PIR_NOOP, "noop" ], #E, [PIR_OP, pir] ); 
+      #op = #( [ PIR_NOOP, "noop" ], #E, [PIR_OP, pir] ); 
     }
   ;
 
-past_val! returns[reg]
+val! returns[reg]
   : V:PAST_Val 
     {
       reg = self.reg;
@@ -163,6 +173,6 @@ past_val! returns[reg]
                     $P%d.set_node('1', 0, '%s' )
 #""" % ( reg, reg, V.getText() )
        
-      #past_val = #( [PIR_OP, pir] ); 
+      #val = #( [PIR_OP, pir] ); 
     }
   ;

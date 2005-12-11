@@ -68,10 +68,12 @@ PIR_NOOP = 41
 PIR_COMMENT = 42
 PIR_NEWLINE = 43
 PAST_Stmts = 44
-PAST_Stmt = 45
-PAST_Exp = 46
-PAST_Op = 47
-PAST_Val = 48
+PAST_Code = 45
+PAST_Stmt = 46
+PAST_Exp = 47
+PAST_Op = 48
+PAST_Val = 49
+PAST_Noop = 50
 
 class Lexer(antlr.CharScanner) :
     ### user action >>>

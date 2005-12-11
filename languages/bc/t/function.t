@@ -113,7 +113,7 @@ TODO:
 {
   local $TODO = 'not implemented';
 
-  language_output_is( 'bc', << 'END_CODE', << 'END_EXPECTED', "constant function" );
+  language_output_is( 'bc', << 'END_CODE', << 'END_EXPECTED', "constant function", with_past => 1 );
 define e(x){
                return( 5 )
        }

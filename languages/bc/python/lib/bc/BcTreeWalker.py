@@ -62,10 +62,12 @@ PIR_NOOP = 41
 PIR_COMMENT = 42
 PIR_NEWLINE = 43
 PAST_Stmts = 44
-PAST_Stmt = 45
-PAST_Exp = 46
-PAST_Op = 47
-PAST_Val = 48
+PAST_Code = 45
+PAST_Stmt = 46
+PAST_Exp = 47
+PAST_Op = 48
+PAST_Val = 49
+PAST_Noop = 50
 
 ### user code>>>
 
@@ -985,7 +987,7 @@ class Walker(antlr.TreeParser):
             _t = self._retTree
             E_LIST_AST = self.returnAST
             gen_antlr_past_AST = currentAST.root
-            gen_antlr_past_AST = E_LIST_AST;
+            gen_antlr_past_AST = antlr.make(self.astFactory.create(PAST_Stmts,"dummy past stmts"), E_LIST_AST)
             currentAST.root = gen_antlr_past_AST
             if (gen_antlr_past_AST != None) and (gen_antlr_past_AST.getFirstChild() != None):
                 currentAST.child = gen_antlr_past_AST.getFirstChild()
@@ -1009,8 +1011,6 @@ class Walker(antlr.TreeParser):
         self.returnAST = None
         currentAST = antlr.ASTPair()
         past_expr_list_AST = None
-        E_LINE_AST = None
-        E_LINE = None
         try:      ## for error handling
             pass
             _cnt112= 0
@@ -1022,36 +1022,14 @@ class Walker(antlr.TreeParser):
                     pass
                 elif la1 and la1 in [PIR_PRINT_PMC]:
                     pass
-                    E_LINE = antlr.ifelse(_t == antlr.ASTNULL, None, _t)
-                    self.past_expr_line(_t)
+                    self.past_p_expr_p_newline(_t)
                     _t = self._retTree
-                    E_LINE_AST = self.returnAST
                     self.addASTChild(currentAST, self.returnAST)
-                    past_expr_list_AST = currentAST.root
-                    past_expr_list_AST = E_LINE_AST;
-                    currentAST.root = past_expr_list_AST
-                    if (past_expr_list_AST != None) and (past_expr_list_AST.getFirstChild() != None):
-                        currentAST.child = past_expr_list_AST.getFirstChild()
-                    else:
-                        currentAST.child = past_expr_list_AST
-                    currentAST.advanceChildToEnd()
                 elif la1 and la1 in [PIR_FUNCTION_DEF]:
                     pass
-                    tmp13_AST = None
-                    tmp13_AST_in = None
-                    tmp13_AST = self.astFactory.create(_t)
-                    tmp13_AST_in = _t
-                    self.addASTChild(currentAST, tmp13_AST)
-                    self.match(_t,PIR_FUNCTION_DEF)
-                    _t = _t.getNextSibling()
-                    past_expr_list_AST = currentAST.root
-                    past_expr_list_AST = antlr.make(self.astFactory.create(PAST_Val,"not implemented yet"))
-                    currentAST.root = past_expr_list_AST
-                    if (past_expr_list_AST != None) and (past_expr_list_AST.getFirstChild() != None):
-                        currentAST.child = past_expr_list_AST.getFirstChild()
-                    else:
-                        currentAST.child = past_expr_list_AST
-                    currentAST.advanceChildToEnd()
+                    self.past_function_def(_t)
+                    _t = self._retTree
+                    self.addASTChild(currentAST, self.returnAST)
                 else:
                         break
                     
@@ -1068,23 +1046,23 @@ class Walker(antlr.TreeParser):
         self.returnAST = past_expr_list_AST
         self._retTree = _t
     
-    def past_expr_line(self, _t):    
+    def past_p_expr_p_newline(self, _t):    
         
-        past_expr_line_AST_in = None
+        past_p_expr_p_newline_AST_in = None
         if _t != antlr.ASTNULL:
-            past_expr_line_AST_in = _t
+            past_p_expr_p_newline_AST_in = _t
         self.returnAST = None
         currentAST = antlr.ASTPair()
-        past_expr_line_AST = None
+        past_p_expr_p_newline_AST = None
         E1_AST = None
         E1 = None
         try:      ## for error handling
             pass
             _t114 = _t
-            tmp14_AST = None
-            tmp14_AST_in = None
-            tmp14_AST = self.astFactory.create(_t)
-            tmp14_AST_in = _t
+            tmp13_AST = None
+            tmp13_AST_in = None
+            tmp13_AST = self.astFactory.create(_t)
+            tmp13_AST_in = _t
             _currentAST114 = currentAST.copy()
             currentAST.root = currentAST.child
             currentAST.child = None
@@ -1097,13 +1075,13 @@ class Walker(antlr.TreeParser):
             currentAST = _currentAST114
             _t = _t114
             _t = _t.getNextSibling()
-            past_expr_line_AST = currentAST.root
-            past_expr_line_AST = antlr.make(self.astFactory.create(PAST_Stmts,"dummy past stmts"), antlr.make(self.astFactory.create(PAST_Stmt,"dummy stmt 1"), antlr.make(self.astFactory.create(PAST_Exp,"dummy exp 1"), antlr.make(self.astFactory.create(PAST_Op,"dummy print op 1"), antlr.make(self.astFactory.create(PAST_Exp,"dummy exp 1:1"), E1_AST)))), antlr.make(self.astFactory.create(PAST_Stmt,"dummy stmt 2"), antlr.make(self.astFactory.create(PAST_Exp,"dummy exp 2"), antlr.make(self.astFactory.create(PAST_Op,"dummy print op 2"), antlr.make(self.astFactory.create(PAST_Exp,"dummy exp 2:1"), self.astFactory.create(PAST_Val,"\"\\n\""))))));
-            currentAST.root = past_expr_line_AST
-            if (past_expr_line_AST != None) and (past_expr_line_AST.getFirstChild() != None):
-                currentAST.child = past_expr_line_AST.getFirstChild()
+            past_p_expr_p_newline_AST = currentAST.root
+            past_p_expr_p_newline_AST = antlr.make(self.astFactory.create(PAST_Code,"two statements"), antlr.make(self.astFactory.create(PAST_Stmt,"dummy stmt 1"), antlr.make(self.astFactory.create(PAST_Exp,"dummy exp 1"), antlr.make(self.astFactory.create(PAST_Op,"dummy print op 1"), antlr.make(self.astFactory.create(PAST_Exp,"dummy exp 1:1"), E1_AST)))), antlr.make(self.astFactory.create(PAST_Stmt,"dummy stmt 2"), antlr.make(self.astFactory.create(PAST_Exp,"dummy exp 2"), antlr.make(self.astFactory.create(PAST_Op,"dummy print op 2"), antlr.make(self.astFactory.create(PAST_Exp,"dummy exp 2:1"), self.astFactory.create(PAST_Val,"\"\\n\""))))));
+            currentAST.root = past_p_expr_p_newline_AST
+            if (past_p_expr_p_newline_AST != None) and (past_p_expr_p_newline_AST.getFirstChild() != None):
+                currentAST.child = past_p_expr_p_newline_AST.getFirstChild()
             else:
-                currentAST.child = past_expr_line_AST
+                currentAST.child = past_p_expr_p_newline_AST
             currentAST.advanceChildToEnd()
         
         except antlr.RecognitionException, ex:
@@ -1111,7 +1089,42 @@ class Walker(antlr.TreeParser):
             if _t:
                 _t = _t.getNextSibling()
         
-        self.returnAST = past_expr_line_AST
+        self.returnAST = past_p_expr_p_newline_AST
+        self._retTree = _t
+    
+    def past_function_def(self, _t):    
+        
+        past_function_def_AST_in = None
+        if _t != antlr.ASTNULL:
+            past_function_def_AST_in = _t
+        self.returnAST = None
+        currentAST = antlr.ASTPair()
+        past_function_def_AST = None
+        try:      ## for error handling
+            pass
+            tmp14_AST = None
+            tmp14_AST_in = None
+            tmp14_AST = self.astFactory.create(_t)
+            tmp14_AST_in = _t
+            self.addASTChild(currentAST, tmp14_AST)
+            self.match(_t,PIR_FUNCTION_DEF)
+            _t = _t.getNextSibling()
+            past_function_def_AST = currentAST.root
+            past_function_def_AST = antlr.make(self.astFactory.create(PAST_Val,"not implemented yet"))
+            currentAST.root = past_function_def_AST
+            if (past_function_def_AST != None) and (past_function_def_AST.getFirstChild() != None):
+                currentAST.child = past_function_def_AST.getFirstChild()
+            else:
+                currentAST.child = past_function_def_AST
+            currentAST.advanceChildToEnd()
+            past_function_def_AST = currentAST.root
+        
+        except antlr.RecognitionException, ex:
+            self.reportError(ex)
+            if _t:
+                _t = _t.getNextSibling()
+        
+        self.returnAST = past_function_def_AST
         self._retTree = _t
     
     def past_expr(self, _t):    
@@ -1332,9 +1345,11 @@ _tokenNames = [
     "PIR_COMMENT", 
     "PIR_NEWLINE", 
     "PAST_Stmts", 
+    "PAST_Code", 
     "PAST_Stmt", 
     "PAST_Exp", 
     "PAST_Op", 
-    "PAST_Val"
+    "PAST_Val", 
+    "PAST_Noop"
 ]
     
