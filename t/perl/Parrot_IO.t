@@ -97,7 +97,7 @@ my $f2 = $d2->file_with_name('file2.foo');
 ok($f1 && $f2, 'file_with_name');
 
 # Relative paths.
-is($d->relative_path($d->path), '', 'relative_path same dir');
+is($d->relative_path($d->path), curdir(), 'relative_path same dir');
 is($d1->relative_path($f1->path), 'file1.txt', 'relative_path same file');
 is($d->relative_path($d1->path), 'one', 'relative_path down to dir');
 is($d->relative_path($f1->path), catfile(qw(one file1.txt)), 
