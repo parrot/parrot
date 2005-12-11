@@ -173,7 +173,7 @@ typedef struct Parrot_Context {
     Regs_ni                bp;          /* pointers to FLOATVAL & INTVAL */
     Regs_ps                bp_ps;       /* pointers to PMC & STR */
     /* end common header */
-    INTVAL n_regs_used[4];	        /* INSP in PBC */
+    INTVAL *n_regs_used;	        /* INSP in PBC points to Sub */
     size_t regs_mem_size;               /* memory occupied by registers */
     INTVAL ref_count;                   /* how often refered to */
     struct Stack_Chunk *reg_stack;      /* register stack */
@@ -199,8 +199,6 @@ typedef struct Parrot_Context {
     PMC *current_cont;          /* the return continuation PMC */
     PMC *current_object;        /* current object if a method call */
     STRING *current_method;     /* name of method */
-    UINTVAL current_class_offset; /* Offset into the class array of the
-                                    currently found method */
     opcode_t *current_pc;       /* program counter of Sub invocation */
     String *current_package;    /* The package we're currently in */
     INTVAL current_HLL;         /* see also src/hll.c */

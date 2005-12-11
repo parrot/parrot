@@ -284,6 +284,7 @@ Invokes the subroutine.
          * plain subroutine call
          * create new context, place it in interpreter
          */
+#define PREMATURE_OPT 
 #ifdef PREMATURE_OPT 
 	if (caller_ctx->current_sub == SELF)
 	    context = Parrot_dup_context(INTERP, caller_ctx);

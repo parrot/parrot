@@ -1151,7 +1151,6 @@ next instance of this method.
 void
 Parrot_note_method_offset(Interp* interpreter, UINTVAL offset, PMC *method)
 {
-    CONTEXT(interpreter->ctx)->current_class_offset = offset;
 }
 
 /*
