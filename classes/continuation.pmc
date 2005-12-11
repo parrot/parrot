@@ -60,7 +60,7 @@ Initializes the continuation.
 */
 
     void init () {
-        PMC_cont_ASSIGN(SELF, new_continuation(INTERP, NULL));
+        PMC_struct_val(SELF) = new_continuation(INTERP, NULL);
         PMC_pmc_val(SELF) = NULL;
         PObj_custom_mark_destroy_SETALL(SELF);
         /* PANIC("don't do that"); */
@@ -105,7 +105,7 @@ Destroys the continuation.
             if (cc->from_ctx)
                 Parrot_free_context(interpreter, cc->from_ctx, 0);
             mem_sys_free(cc);
-            PMC_cont_ASSIGN(SELF, NULL);
+            PMC_struct_val(SELF) = NULL;
         }
     }
 /*
@@ -125,7 +125,7 @@ Creates and returns a clone of the continuation.
 
         PObj_custom_mark_destroy_SETALL(ret);
         cc = new_continuation(INTERP, cc_self);
-        PMC_cont_ASSIGN(ret, cc);
+        PMC_struct_val(ret) = cc;
         PMC_pmc_val(ret) = PMC_pmc_val(SELF);
         return ret;
     }

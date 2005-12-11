@@ -80,7 +80,7 @@ Clone the couroutine.
 */
 
     void init () {
-        PMC_coro_ASSIGN(SELF, new_coroutine(INTERP));
+        PMC_struct_val(SELF) = new_coroutine(INTERP);
         PMC_pmc_val(SELF) = NULL;
         PObj_custom_mark_destroy_SETALL(SELF);
     }
@@ -92,7 +92,7 @@ Clone the couroutine.
         sub = mem_sys_allocate(sizeof(struct Parrot_coro));
         memcpy(sub, PMC_sub(SELF), sizeof(struct Parrot_coro));
         sub->name = string_copy(INTERP, sub->name);
-        PMC_coro_ASSIGN(ret, sub);
+        PMC_struct_val(ret) = sub;
         PMC_pmc_val(ret) = NULL;
         return ret;
     }

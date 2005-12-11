@@ -70,7 +70,7 @@ Initializes the exception handler.
 */
 
     void init() {
-        PMC_cont_ASSIGN(SELF, new_continuation(INTERP, NULL));
+        PMC_struct_val(SELF) = new_continuation(INTERP, NULL);
         PMC_pmc_val(SELF) = NULL;
         /*
          * an exception handler has no separate context, its
@@ -95,7 +95,7 @@ Initializes the exception handler.
         struct Parrot_cont * cc = PMC_cont(SELF);
         if (cc) {
             mem_sys_free(cc);
-            PMC_cont_ASSIGN(SELF, NULL);
+            PMC_struct_val(SELF) = NULL;
         }
     }
     PMC* clone  () {

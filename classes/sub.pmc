@@ -98,7 +98,7 @@ Initializes the subroutine.
      *   PMC_pmc_val    ... unused / bound object in Bound_Meth PMC
      */
     void init () {
-        PMC_sub_ASSIGN(SELF, new_sub(INTERP));
+        PMC_struct_val(SELF) = new_sub(INTERP);
         PMC_pmc_val(SELF) = NULL;
         PObj_custom_mark_destroy_SETALL(SELF);
 #if 0
@@ -131,7 +131,7 @@ Destroys the subroutine.
 #endif
         clear_fixup(INTERP, SELF);
         mem_sys_free(sub);
-        PMC_sub_ASSIGN(SELF, NULL);
+        PMC_struct_val(SELF) = NULL;
     }
 
 /*
@@ -361,7 +361,7 @@ Creates and returns a clone of the subroutine.
         sub = mem_sys_allocate(sizeof(struct Parrot_sub));
         memcpy(sub, PMC_sub(SELF), sizeof(struct Parrot_sub));
         sub->name = string_copy(INTERP, sub->name);
-        PMC_sub_ASSIGN(ret, sub);
+        PMC_struct_val(ret) = sub;
         PMC_pmc_val(ret) = NULL;
         return ret;
     }
