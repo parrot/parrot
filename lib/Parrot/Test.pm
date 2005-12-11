@@ -56,11 +56,6 @@ if the  output matches the expected result.
 Runs a langugage test and passes the test if a string comparison
 if a string comparison of the output with the unexpected result is false.
 
-=item C<pasm_output_isnt($code, $unexpected, $description)> or C<output_isnt($code, $unexpected, $description)>
-
-Runs the Parrot Assembler code and passes the test
-if a string comparison of the output with the unexpected result is false.
-
 =item C<pasm_output_is($code, $expected, $description)> or C<output_is($code, $expected, $description)>
 
 Runs the Parrot Assembler code and passes the test if a string comparison
