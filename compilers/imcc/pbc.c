@@ -1258,6 +1258,9 @@ e_pbc_emit(Interp *interpreter, void *param, IMC_Unit * unit, Instruction * ins)
                 ins->opnum == PARROT_OP_get_results_pc ||
                 ins->opnum == PARROT_OP_get_params_pc ||
                 ins->opnum == PARROT_OP_set_returns_pc) {
+	    /* TODO get rid of verify_signature - PIR call sigs are already fixed
+	     *      PASM still needs it
+	     */
             verify_signature(interpreter, ins, pc);
             /* emit var_args part */
             for (; i < ins->opsize - 1; ++i) {
