@@ -1221,7 +1221,7 @@ set_reg_usage(Interp *interpreter, opcode_t *pc)
     struct PackFile_ConstTable *ct;
     PMC *sub_pmc;
     parrot_sub_t sub;
-    int i, j, ci;
+    int i, ci;
 
     seg = interpreter->code;
     ft = seg->fixups;
@@ -1237,9 +1237,7 @@ set_reg_usage(Interp *interpreter, opcode_t *pc)
                 sub_pmc = ct->constants[ci]->u.key;
                 sub = PMC_sub(sub_pmc);
                 if (pc >= sub->address && pc < sub->end) {
-                    for (j = 0; j < 4; ++j)
-                        CONTEXT(interpreter->ctx)->n_regs_used[j] =
-                            sub->n_regs_used[j];
+		    CONTEXT(interpreter->ctx)->n_regs_used = sub->n_regs_used;
                     return;
                 }
 
@@ -1287,7 +1285,7 @@ build_asm(Interp *interpreter, opcode_t *pc,
     opcode_t cur_opcode_byte, *cur_op;
     Parrot_jit_optimizer_section_ptr cur_section;
     struct PackFile_Segment *jit_seg;
-    INTVAL   n_regs_used[4];	/* INSP in PBC */
+    INTVAL *  n_regs_used;	/* INSP in PBC */
     /* XXX
      * no longer referenced due to disabled code below
     char *name;
@@ -1378,8 +1376,7 @@ build_asm(Interp *interpreter, opcode_t *pc,
     /*
      * remember register usage
      */
-    for (i = 0; i < 4; ++i)
-        n_regs_used[i] = CONTEXT(interpreter->ctx)->n_regs_used[i];
+    n_regs_used = CONTEXT(interpreter->ctx)->n_regs_used;
 
     /*
      * from C's ABI all the emitted code here is one (probably big)
@@ -1549,8 +1546,7 @@ build_asm(Interp *interpreter, opcode_t *pc,
     /*
      * restore register usage
      */
-    for (i = 0; i < 4; ++i)
-        CONTEXT(interpreter->ctx)->n_regs_used[i] = n_regs_used[i];
+    CONTEXT(interpreter->ctx)->n_regs_used = n_regs_used;
     /* Do fixups before converting offsets */
     Parrot_jit_dofixup(jit_info, interpreter);
 
