@@ -59,6 +59,9 @@ if ( grep { m/^--files$/ } @ARGV ) {
         elsif ( $current_dir eq $language ) {
             @files = glob( File::Spec->catfile( 't', '*.t' ) );
         }
+        else {
+            die "Where am I?";
+        }
     }
 
     # Always test Parrot bc

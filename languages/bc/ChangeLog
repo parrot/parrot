@@ -1,5 +1,9 @@
 # $Id$
 
+2005-12-11     Bernhard Schmalhofer
+        * Generate PIR that sets up a PAST data structure and executes it via POST
+        * Let some tests use the PAST target
+
 2005-08-25     Bernhard Schmalhofer
         * Start with assignment to lexicals
 

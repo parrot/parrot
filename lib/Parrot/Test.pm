@@ -512,7 +512,7 @@ sub _generate_functions {
     foreach my $func ( keys %language_test_map ) {
         no strict 'refs';
 
-        *{$package.'::'.$func} = sub ($$$;$) {
+        *{$package.'::'.$func} = sub ($$;$%) {
             my ( $language, @remaining ) = @_;
 
             my $meth = $language_test_map{$func};
