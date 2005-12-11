@@ -389,8 +389,37 @@ Parrot_free_context(Interp *interpreter, parrot_context_t *ctxp, int re_use)
 
 #else
 
+struct Parrot_Context *
+Parrot_dup_context(Interp *interpreter, struct Parrot_Context *old)
+{
+    size_t reg_alloc, diff;
+    int i, slot;
+    void *ptr;
+    struct Parrot_Context *ctx;
 
-void
+    reg_alloc = old->regs_mem_size;
+    slot = reg_alloc >> 3;
+    ptr = interpreter->ctx_mem.free_list[slot];
+
+    if (ptr) {
+        interpreter->ctx_mem.free_list[slot] = *(void **) ptr;
+    }
+    else {
+	ptr = mem_sys_allocate(reg_alloc + ALIGNED_CTX_SIZE);
+    }
+    CONTEXT(interpreter->ctx) = ctx = ptr;
+    ctx->regs_mem_size = reg_alloc;
+    ctx->prev = old;
+    for (i = 0; i < 4; ++i)
+        ctx->n_regs_used[i] = old->n_regs_used[i];
+    diff = (long*)ctx - (long*)old;
+    interpreter->ctx.bp.regs_i += diff;
+    interpreter->ctx.bp_ps.regs_s += diff;
+    init_context(interpreter, ctx, old);
+    return ctx;
+}
+
+struct Parrot_Context *
 Parrot_alloc_context(Interp *interpreter, INTVAL *n_regs_used)
 {
     struct Parrot_Context *old, *ctx;
@@ -447,6 +476,7 @@ Parrot_alloc_context(Interp *interpreter, INTVAL *n_regs_used)
     /* this points to S0 */
     interpreter->ctx.bp_ps.regs_s = (STRING**)((char*)p + size_nip);
     init_context(interpreter, ctx, old);
+    return ctx;
 }
 
 void

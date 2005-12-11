@@ -74,7 +74,8 @@ void Parrot_clear_p(Interp *);
 void Parrot_clear_n(Interp *);
 
 struct Parrot_Context;        /* parrot/interpreter.h */
-void Parrot_alloc_context(Interp *, INTVAL *n_regs_used);
+struct Parrot_Context * Parrot_alloc_context(Interp *, INTVAL *n_regs_used);
+struct Parrot_Context * Parrot_dup_context(Interp *, struct Parrot_Context *old);
 void Parrot_free_context(Interp *, struct Parrot_Context *, int re_use);
 void Parrot_set_context_threshold(Interp *, struct Parrot_Context *);
 void parrot_gc_context(Interp *);
