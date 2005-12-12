@@ -1,3 +1,8 @@
+#!./parrot -C
+#
+# ackermann - ack(3, 9) is default 
+# by Leopold Toetsch
+
 .sub main :main
     .param pmc argv
     .local int argc
@@ -35,8 +40,9 @@ go:
 	.return ($I0)
 a1:
     if y goto a2
-	$I1 = x - 1
-	.return ack($I1, 1)
+	$I0 = x - 1
+	$I1 = 1
+	.return ack($I0, $I1)
 a2:
     $I2 = y - 1
     $I3 = ack(x, $I2)

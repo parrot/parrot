@@ -1,0 +1,8 @@
+This directory contains PIR programs for the Computer Language Shootout at
+http://shootout.alioth.debian.org/
+
+The first line:
+
+  #!./parrot -j
+
+is indicating the prefered because fastest runcore for that benchmark.
