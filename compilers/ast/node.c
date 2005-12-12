@@ -698,7 +698,6 @@ exp_Function(Interp* interpreter, nodeType *p)
     SymReg *sub;
     Instruction *ins;
     IMC_Unit *last_unit = cur_unit;
-    SymReg *regs[3];
 
     cur_unit = p->unit;
 
@@ -823,9 +822,7 @@ exp_Py_Call(Interp* interpreter, nodeType *p)
 static SymReg*
 exp_Py_Local(Interp* interpreter, nodeType *var)
 {
-    Instruction *ins;
-    SymReg *regs[3], *temp;
-    char buf[128];
+    SymReg *temp;
 
     if (var->u.r->type == VTADDRESS)
         temp = insert_find_global(interpreter, var);

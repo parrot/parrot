@@ -139,7 +139,6 @@ get_search_paths(Interp *interpreter, enum_lib_paths which)
 static int
 is_abs_path(Interp* interpreter, STRING *file)
 {
-    size_t length;
     char *file_name;
 
     file_name = file->strstart;

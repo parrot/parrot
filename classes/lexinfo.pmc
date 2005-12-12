@@ -128,8 +128,6 @@ The implementation of the Hash PMC is called.
 
     void thaw(visit_info *info) {
         IMAGE_IO *io = info->image_io;
-        Hash *hash;
-        PMC *dummy;
 
         if (info->extra_flags == EXTRA_IS_NULL) {
             INTVAL elems = io->vtable->shift_integer(INTERP, io);
