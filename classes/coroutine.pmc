@@ -63,6 +63,15 @@ stopped. See the L<Glossary|docs/glossary.pod> for more information.
 	longjmp(exceptions->dest, 1); \
     } while(0)
 
+static void
+print_sub_name(Interp* interpreter, PMC* sub)
+{
+
+    PIO_eprintf(interpreter, "# %s coro '%Ss'\n#",
+        !(PObj_get_FLAGS(sub) & SUB_FLAG_CORO_FF) ? "Calling" : "yielding from",
+        Parrot_full_sub_name(interpreter, sub));
+    print_pbc_location(interpreter);
+}
 pmclass Coroutine extends Sub need_ext {
 
 /*
@@ -115,6 +124,9 @@ Swaps the "context".
         parrot_context_t *ctx;
         PMC *ccont;
 
+        if (Interp_trace_TEST(INTERP, PARROT_TRACE_SUB_CALL_FLAG)) {
+            print_sub_name(INTERP, SELF);
+        }
         if (!co->ctx) {
             /* TODO factor out common code with Sub.invoke
              *      and inherit it
