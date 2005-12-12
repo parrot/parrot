@@ -3383,9 +3383,14 @@ Parrot_load_bytecode(Interp *interpreter, STRING *file_str)
     char *filename;
     STRING *wo_ext, *ext, *pbc, *path;
     enum_runtime_ft file_type;
+    PMC *is_loaded_hash;
 
     parrot_split_path_ext(interpreter, file_str, &wo_ext, &ext);
-    /* TODO: check if wo_ext is loaded */
+    /* check if wo_ext is loaded */
+    is_loaded_hash = VTABLE_get_pmc_keyed_int(interpreter,
+	interpreter->iglobals, IGLOBALS_PBC_LIBS);
+    if (VTABLE_exists_keyed_str(interpreter, is_loaded_hash, wo_ext))
+	return;
     pbc = const_string(interpreter, "pbc");
     if (string_equal(interpreter, ext, pbc) == 0)
 	file_type = PARROT_RUNTIME_FT_PBC;
@@ -3398,6 +3403,9 @@ Parrot_load_bytecode(Interp *interpreter, STRING *file_str)
 		"Couldn't find file '%Ss'", file_str);
 	return;
     }
+    /* remember wo_ext => full_path mapping */
+    VTABLE_set_string_keyed_str(interpreter, is_loaded_hash, 
+	    wo_ext, path);
     filename = string_to_cstring(interpreter, path);
     if ( file_type == PARROT_RUNTIME_FT_PBC) {
 	PackFile_append_pbc(interpreter, filename);

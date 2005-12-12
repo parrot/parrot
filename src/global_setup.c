@@ -64,7 +64,7 @@ void
 init_world(Interp *interpreter)
 {
     PMC *iglobals;
-    PMC *self;
+    PMC *self, *pmc;
 
 #ifdef PARROT_HAS_PLATFORM_INIT_CODE
     Parrot_platform_init_code();
@@ -110,6 +110,12 @@ init_world(Interp *interpreter)
      * lib search paths
      */
     parrot_init_library_paths(interpreter);
+    /*
+     * load_bytecode loaded hash
+     */
+    pmc = pmc_new(interpreter, enum_class_Hash);
+    VTABLE_set_pmc_keyed_int(interpreter, iglobals,
+            IGLOBALS_PBC_LIBS, pmc);
 }
 
 /*

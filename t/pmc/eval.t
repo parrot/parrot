@@ -17,7 +17,7 @@ Tests on-the-fly PASM, PIR and PAST compilation and invocation.
 
 =cut
 
-use Parrot::Test tests => 16;
+use Parrot::Test tests => 18;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "eval_sc");
@@ -378,6 +378,73 @@ pir_output_is(<<'CODE', <<'OUTPUT', "eval.get_string");
   close io
   load_bytecode "temp.pbc"
   f2 = compi("foo_2", "hello from foo_2")
+  io = open "temp2.pbc", ">"
+  print io, f2
+  close io
+  load_bytecode "temp2.pbc"
+.end
+
+.sub compi
+  .param string name
+  .param string printme
+  .local string code
+  .local pmc pir_compiler, retval
+  pir_compiler = compreg "PIR"
+  code = ".sub "
+  code .= name
+  code .= " :load\n"
+  code .= "print \""
+  code .= printme
+  code .= "\\n\"\n"
+  code .= ".end\n"
+
+  retval = pir_compiler(code)
+  .return (retval)
+.end
+CODE
+hello from foo_1
+hello from foo_2
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "check loaded lib hash");
+.sub main
+  load_bytecode "temp.pbc"
+  load_bytecode "temp2.pbc"
+  .local pmc pbc_hash, interp
+  .include 'iglobals.pasm'
+  interp = getinterp
+  pbc_hash = interp[.IGLOBALS_PBC_LIBS]
+  $I0 = elements pbc_hash
+  print_item $I0
+  $I1 = exists pbc_hash['temp']
+  print_item $I1
+  $I2 = exists pbc_hash['temp2']
+  print_item $I2
+  $S0 = pbc_hash['temp2']
+  # print_item $S0          not portable
+  $I3 = index $S0, 'temp2.pbc'
+  $I4 = isgt $I3, -1
+  print_item $I4
+  print_newline
+.end
+CODE
+hello from foo_1
+hello from foo_2
+2 1 1 1
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "eval.get_string - same file");
+.sub main :main
+
+  .local pmc f1, f2
+  .local pmc io
+  f1 = compi("foo_1", "hello from foo_1")
+  $S0 = f1
+  io = open "temp.pbc", ">"
+  print io, $S0
+  close io
+  load_bytecode "temp.pbc"
+  f2 = compi("foo_2", "hello from foo_2")
   io = open "temp.pbc", ">"
   print io, f2
   close io
@@ -403,11 +470,10 @@ pir_output_is(<<'CODE', <<'OUTPUT', "eval.get_string");
 .end
 CODE
 hello from foo_1
-hello from foo_2
 OUTPUT
 
 END {
-	unlink "temp.pnc", "temp.file";
+	unlink "temp.pbc", "temp2.pbc", "temp.file";
 };
 
 pir_output_is(<<'CODE', <<'OUTPUT', "eval.freeze");

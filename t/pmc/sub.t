@@ -966,7 +966,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', 'multiple :load');
     load_bytecode "test_l1.imc"
     load_bytecode "test_l2.imc"
     print "main 2\n"
-    load_bytecode "test_l1.pbc"
+    load_bytecode "test_l1.pbc"	# these have to be ignored
     load_bytecode "test_l2.pbc"
     print "main 3\n"
 .end
@@ -977,10 +977,6 @@ l12
 l21
 l22
 main 2
-l11
-l12
-l21
-l22
 main 3
 OUTPUT
 
