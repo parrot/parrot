@@ -214,7 +214,7 @@ OUTPUT
 ###############################################################################
 
 c_output_is($main . <<'CODE', <<'OUTPUT', "PIO_parse_open_flags");
-#include "../io/io_private.h"
+#include "../src/io/io_private.h"
 
 static opcode_t*
 the_test(Interp *interpreter,
@@ -536,7 +536,7 @@ OUTPUT
 setup("temp.file", "abcdefg");
 
 c_output_is($main . <<'CODE', <<'OUTPUT', "PIO_seek");
-#include "../io/io_private.h"
+#include "../src/io/io_private.h"
 
 static opcode_t*
 the_test(Interp *interpreter,
