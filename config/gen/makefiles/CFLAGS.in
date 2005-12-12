@@ -13,7 +13,7 @@ ops/core_ops_switch.c  -{${optimize}}        # Overwhelms some compilers.
 src/py_func.c       +{-Iclasses}             # include pmc_default.h
 
 # io should be -Wunsed clean
-{^io/}              s/-Wno-unused/-Wunused/
+{^src/io/}              s/-Wno-unused/-Wunused/
 
 # files which make their way into dynamically loaded files should be compiled
 # with shared library options

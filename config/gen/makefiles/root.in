@@ -52,7 +52,7 @@ IMCC_DIR        = compilers/imcc
 INC_DIR         = ${inc}
 
 # directory for the IO subsystem
-IO_DIR          = io
+IO_DIR          = src/io
 
 # directory with Parrot modules
 LIBRARY_DIR     = runtime/parrot/library

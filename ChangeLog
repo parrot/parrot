@@ -1,16 +1,19 @@
 # $Id$
 
-2005.12-08    particle
-	* move types/ directory to src/types/
-	* move pf/ directory to src/packfile/
-	* move ops/ directory to src/ops/
+2005.12-12    particle
+	* moved io/ directory to src/io/
 
 2005.12-08    particle
-	* move charset/ directory to src/charset/
-	* move encodings/ directory to src/encodings/
+	* moved types/ directory to src/types/
+	* moved pf/ directory to src/packfile/
+	* moved ops/ directory to src/ops/
+
+2005.12-08    particle
+	* moved charset/ directory to src/charset/
+	* moved encodings/ directory to src/encodings/
 
 2005.12.07    particle
-	* move imcc/ directory to compilers/imcc/
+	* moved imcc/ directory to compilers/imcc/
 
 2005.12.06    particle
 	* moved util/ directory to tools/util/

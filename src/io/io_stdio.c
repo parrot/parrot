@@ -4,7 +4,7 @@ $Id$
 
 =head1 NAME
 
-io/io_stdio.c - STDIO layer
+src/io/io_stdio.c - STDIO layer
 
 =head1 DESCRIPTION
 
@@ -486,12 +486,12 @@ const ParrotIOLayerAPI pio_stdio_layer_api = {
 
 =head1 SEE ALSO
 
-F<io/io_buf.c>,
-F<io/io_passdown.c>,
-F<io/io_unix.c>,
-F<io/io_win32.c>,
-F<io/io.c>,
-F<io/io_private.h>.
+F<src/io/io_buf.c>,
+F<src/io/io_passdown.c>,
+F<src/io/io_unix.c>,
+F<src/io/io_win32.c>,
+F<src/io/io.c>,
+F<src/io/io_private.h>.
 
 =head1 HISTORY
 

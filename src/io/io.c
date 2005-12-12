@@ -4,7 +4,7 @@ $Id$
 
 =head1 NAME
 
-io/io.c - Generic IO
+src/io/io.c - Generic IO
 
 =head1 DESCRIPTION
 
@@ -15,11 +15,11 @@ stack is searched downwards until a non-C<NULL> function pointer
 is found for that particular slot.
 
 This file implements the generic functionality. Specific layers are in
-separate files: F<io/io_buf.c>, F<io/io_stdio.c>, F<io/io_unix.c>,
-F<io/io_win32.c>, and F<io/io_layers.c>.
+separate files: F<src/io/io_buf.c>, F<src/io/io_stdio.c>, F<src/io/io_unix.c>,
+F<src/io/io_win32.c>, and F<src/io/io_layers.c>.
 
 The C<ParrotIO> PMC provides the class-based interface that is used in
-Parrot ops. The C<ParrotIO struct> is defined in F<io/io_private.h>.
+Parrot ops. The C<ParrotIO struct> is defined in F<src/io/io_private.h>.
 
 =head2 Resource Functions
 

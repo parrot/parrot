@@ -4,7 +4,7 @@ $Id$
 
 =head1 NAME
 
-io/io_layers.c - IO Layer Handling
+src/io/io_layers.c - IO Layer Handling
 
 =head1 DESCRIPTION
 

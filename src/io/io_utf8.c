@@ -4,7 +4,7 @@ $Id$
 
 =head1 NAME
 
-io/io_utf8.c - IO Layer for UTF8
+src/io/io_utf8.c - IO Layer for UTF8
 
 =head1 DESCRIPTION
 
@@ -98,10 +98,10 @@ static const ParrotIOLayerAPI pio_utf8_layer_api = {
 
 =head1 SEE ALSO
 
-F<io/io_passdown.c>,
-F<io/io.c>,
-F<io/io_layers.c>,
-F<io/io_private.h>.
+F<src/io/io_passdown.c>,
+F<src/io/io.c>,
+F<src/io/io_layers.c>,
+F<src/io/io_private.h>.
 
 =head1 HISTORY
 

@@ -21,7 +21,7 @@ These are the vtable functions for Parrot IO.
 #include "parrot/parrot.h"
 
 /* This class is actually part of the io subsystem */
-#include "../io/io_private.h"
+#include "../src/io/io_private.h"
 
 
 pmclass ParrotIO need_ext {

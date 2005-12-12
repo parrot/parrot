@@ -4,7 +4,7 @@ $Id$
 
 =head1 NAME
 
-io/io_private.h - IO internals
+src/io/io_private.h - IO internals
 
 =head1 DESCRIPTION
 
@@ -278,14 +278,14 @@ STRING* PIO_pop_layer_str(Interp *interpreter, PMC *pmc);
 
 =head1 SEE ALSO
 
-F<io/io_buf.c>,
-F<io/io_layers.c>,
-F<io/io_passdown.c>,
-F<io/io_stdio.c>,
-F<io/io_unix.c>,
-F<io/io_utf8.c>,
-F<io/io_win32.c>,
-F<io/io.c>.
+F<src/io/io_buf.c>,
+F<src/io/io_layers.c>,
+F<src/io/io_passdown.c>,
+F<src/io/io_stdio.c>,
+F<src/io/io_unix.c>,
+F<src/io/io_utf8.c>,
+F<src/io/io_win32.c>,
+F<src/io/io.c>.
 
 =head1 HISTORY
 
