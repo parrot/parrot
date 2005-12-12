@@ -430,7 +430,7 @@ pir_output_is( << 'CODE', << "OUTPUT", "get_string()" );
     print "\n"
 .end
 CODE
-libnci_test$PConfig{load_ext} was successfully loaded
+libnci_test was successfully loaded
 OUTPUT
 
 

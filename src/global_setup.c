@@ -111,11 +111,14 @@ init_world(Interp *interpreter)
      */
     parrot_init_library_paths(interpreter);
     /*
-     * load_bytecode loaded hash
+     * load_bytecode and dynlib loaded hash
      */
     pmc = pmc_new(interpreter, enum_class_Hash);
     VTABLE_set_pmc_keyed_int(interpreter, iglobals,
             IGLOBALS_PBC_LIBS, pmc);
+    pmc = pmc_new(interpreter, enum_class_Hash);
+    VTABLE_set_pmc_keyed_int(interpreter, iglobals,
+            IGLOBALS_DYN_LIBS, pmc);
 }
 
 /*

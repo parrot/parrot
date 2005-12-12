@@ -69,17 +69,12 @@ store_lib_pmc(Parrot_Interp interpreter, PMC* lib_pmc, STRING *path,
     iglobals = interpreter->iglobals;
     dyn_libs = VTABLE_get_pmc_keyed_int(interpreter, iglobals,
             IGLOBALS_DYN_LIBS);
-    if (!dyn_libs) {
-        dyn_libs = pmc_new(interpreter, enum_class_ResizablePMCArray);
-        VTABLE_set_pmc_keyed_int(interpreter, iglobals,
-                IGLOBALS_DYN_LIBS, dyn_libs);
-    }
     /*
      * remember path/file in props
      */
-    set_cstring_prop(interpreter, lib_pmc, "_filename", path);
+    set_cstring_prop(interpreter, lib_pmc, "_filename", path);  /* XXX */
     set_cstring_prop(interpreter, lib_pmc, "_type", type);
-    VTABLE_push_pmc(interpreter, dyn_libs, lib_pmc);
+    VTABLE_set_pmc_keyed_str(interpreter, dyn_libs, path, lib_pmc);
 }
 
 /*
@@ -97,27 +92,14 @@ If it does, return it. Otherwise, return NULL.
 static PMC*
 is_loaded(Parrot_Interp interpreter, STRING *path)
 {
-    PMC *iglobals, *dyn_libs, *prop, *lib_pmc;
-    STRING *key;
-    INTVAL i, n;
+    PMC *iglobals, *dyn_libs;
 
     iglobals = interpreter->iglobals;
     dyn_libs = VTABLE_get_pmc_keyed_int(interpreter, iglobals,
             IGLOBALS_DYN_LIBS);
-    if (!dyn_libs) {
+    if (!VTABLE_exists_keyed_str(interpreter, dyn_libs, path))
         return NULL;
-    }
-    n = VTABLE_elements(interpreter, dyn_libs);
-    key = const_string(interpreter, "_filename");
-    /* we could use an ordered hash for faster lookup here */
-    for (i = 0; i < n; i++) {
-        lib_pmc = VTABLE_get_pmc_keyed_int(interpreter, dyn_libs, i);
-        prop = VTABLE_getprop(interpreter, lib_pmc, key);
-        if (!string_compare(interpreter,
-                    VTABLE_get_string(interpreter, prop), path))
-            return lib_pmc;
-    }
-    return NULL;
+    return VTABLE_get_pmc_keyed_str(interpreter, dyn_libs, path);
 }
 
 /*
@@ -133,9 +115,9 @@ Return path and handle of a dynamic lib, setting lib_name to just the filestem
 */
 
 static STRING *
-get_path(Interp *interpreter, STRING *lib, void **handle, STRING **lib_name)
+get_path(Interp *interpreter, STRING *lib, void **handle, STRING *wo_ext, STRING *ext)
 {
-    STRING *path, *wo_ext, *ext, *full_name;
+    STRING *path, *full_name;
     const char *err = NULL;    /* buffer returned from Parrot_dlerror */
     PMC *iglobals, *lib_paths, *share_ext;
     INTVAL i, n;
@@ -146,8 +128,6 @@ get_path(Interp *interpreter, STRING *lib, void **handle, STRING **lib_name)
     share_ext = VTABLE_get_pmc_keyed_int(interpreter, lib_paths, 
 	    PARROT_LIB_DYN_EXTS);
 
-    /* Find the pure library name, without path or extension.  */
-    *lib_name = parrot_split_path_ext(interpreter, lib, &wo_ext, &ext);
     /*
      * first, try to add an extension to the file if it has none.
      */
@@ -276,10 +256,22 @@ Parrot_load_lib(Interp *interpreter, STRING *lib, PMC *initializer)
     void (*init_func)(Interp *, PMC *);
     char *cinit_func_name, *cload_func_name;
     PMC *lib_pmc;
-    STRING *lib_name;	/* library stem without path or extension.  */
+    STRING *lib_name, *wo_ext, *ext;	/* library stem without path or extension.  */
 
     UNUSED(initializer);
-    path = get_path(interpreter, lib, &handle, &lib_name);
+    /* Find the pure library name, without path or extension.  */
+    /*
+     * TODO move the class_count_mutex here
+     *
+     * LOCK()
+     */
+    lib_name = parrot_split_path_ext(interpreter, lib, &wo_ext, &ext);
+    lib_pmc = is_loaded(interpreter, wo_ext);
+    if (lib_pmc) {
+	/* UNLOCK() */
+        return lib_pmc;
+    }
+    path = get_path(interpreter, lib, &handle, wo_ext, ext);
     if (!path || !handle) {
         /*
          * XXX internal_exception? return PMCNULL?
@@ -288,17 +280,6 @@ Parrot_load_lib(Interp *interpreter, STRING *lib, PMC *initializer)
         return pmc_new(interpreter, enum_class_Undef);
     }
 
-    /*
-     * TODO move the class_count_mutex here
-     *
-     * LOCK()
-     */
-    lib_pmc = is_loaded(interpreter, path);
-    if (lib_pmc) {
-        Parrot_dlclose(handle);
-        /* UNLOCK */
-        return lib_pmc;
-    }
     /*
      * work around gcc 3.3.3 and other problem with dynclasses
      * something during library loading doesn't stand a DOD run
@@ -334,7 +315,7 @@ Parrot_load_lib(Interp *interpreter, STRING *lib, PMC *initializer)
     /*
      * remember lib_pmc in iglobals
      */
-    store_lib_pmc(interpreter, lib_pmc, path, type);
+    store_lib_pmc(interpreter, lib_pmc, wo_ext, type);
     /* UNLOCK */
     Parrot_unblock_DOD(interpreter);
     return lib_pmc;
