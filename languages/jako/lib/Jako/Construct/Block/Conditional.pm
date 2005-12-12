@@ -54,7 +54,7 @@ sub compile
   }
 
   if ($kind eq 'if') {
-    $op = $compiler->invert_relop($op);
+    $op = $compiler->invert_relop($op); # Invert the test, since we jump *unless* the condition is true
   }
   elsif ($kind eq 'unless') {
     $kind = 'if';
