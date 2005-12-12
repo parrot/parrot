@@ -54,13 +54,11 @@ sub compile
     $right = $self->right->value;
   }
 
-  if ($kind eq 'while') {
-    $op = $compiler->invert_relop($op); # Invert the sense for 'while' loops.
-  }
-
   if ($kind eq 'while' or $kind eq 'until') {
+    my $test = ($kind eq 'while') ? 'unless' : 'if';
+
     $compiler->emit("${prefix}_NEXT:");
-    $compiler->emit("  if $left $op $right goto ${prefix}_LAST");
+    $compiler->emit("  $test $left $op $right goto ${prefix}_LAST");
     $compiler->emit("${prefix}_REDO:");
 
     if ($self->content) {
