@@ -4,8 +4,6 @@
 
 .sub "__onload" :load
     .local pmc optable
-    $I0 = find_type "PGE::Exp::WS"
-    if $I0 goto end
     $P0 = getclass "PGE::Exp::Subrule"
     $P1 = subclass $P0, "PGE::Exp::WS"
     $P0 = getclass "PGE::Exp"
@@ -87,7 +85,6 @@
 
     $P0 = find_global "PGE", "p6rule"
     compreg "PGE::P6Rule", $P0
-  end:
 .end
 
 

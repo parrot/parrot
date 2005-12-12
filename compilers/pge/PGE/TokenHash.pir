@@ -8,12 +8,9 @@ PGE::TokenHash - hash implementation to speed up Token lookups
 
 .sub "__onload" :load
     .local pmc class
-    $I0 = find_type "PGE::TokenHash"
-    if $I0 goto end
     class = newclass "PGE::TokenHash"
     addattribute class, ".ihash"
     addattribute class, ".vhash"
-  end:
     .return ()
 .end
 
