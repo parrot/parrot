@@ -26,7 +26,7 @@ in the languages directory.
 =head2 Submitting smoke test results
 
 Parrot has a status page with smoke test results
-L<http://smoke.parrotcode.org/smoke.html>. You can supply new tests
+L<http://smoke.parrotcode.org/smoke/>. You can supply new tests
 results just running C<make smoke>. It will run the same tests as
 C<make test> would, but creating a HTML table with the test
 results. At the end, it will try to upload the test results to the
