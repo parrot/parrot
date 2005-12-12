@@ -115,7 +115,12 @@ static void
 bigint_add_bigint_int(Interp *interpreter, PMC* self, INTVAL value,
         PMC *dest)
 {
-    mpz_add_ui(BN(dest), BN(self), (long)value);
+    int n = value < 0;
+    if (n) {
+        mpz_sub_ui(BN(dest), BN(self), -value);
+    }
+    else
+        mpz_add_ui(BN(dest), BN(self), value);
 }
 static void
 bigint_sub_bigint(Interp *interpreter, PMC* self, PMC *value, PMC *dest)
@@ -127,7 +132,11 @@ static void
 bigint_sub_bigint_int(Interp *interpreter, PMC* self, INTVAL value,
         PMC *dest)
 {
-    mpz_sub_ui(BN(dest), BN(self), (long)value);
+    int n = value < 0;
+    if (n) 
+        mpz_add_ui(BN(dest), BN(self), -value);
+    else
+        mpz_sub_ui(BN(dest), BN(self), value);
 }
 static void
 bigint_mul_bigint(Interp *interpreter, PMC* self, PMC *value, PMC *dest)
@@ -139,7 +148,7 @@ static void
 bigint_mul_bigint_int(Interp *interpreter, PMC* self, INTVAL value,
         PMC *dest)
 {
-    mpz_mul_ui(BN(dest), BN(self), value);
+    mpz_mul_si(BN(dest), BN(self), value);
 }
 
 static void
@@ -152,7 +161,13 @@ static void
 bigint_div_bigint_int(Interp *interpreter, PMC* self, INTVAL value, PMC *dest)
 {
     /* this is mpz_fdiv_q */
-    mpz_div_ui(BN(dest), BN(self), value);
+    int n = value < 0;
+    if (n) {
+        mpz_div_ui(BN(dest), BN(self), -value);
+        mpz_neg(BN(dest), BN(dest));
+    }
+    else
+        mpz_div_ui(BN(dest), BN(self), value);
 }
 static void
 bigint_fdiv_bigint(Interp *interpreter, PMC* self, PMC *value, PMC *dest)
@@ -162,7 +177,13 @@ bigint_fdiv_bigint(Interp *interpreter, PMC* self, PMC *value, PMC *dest)
 static void
 bigint_fdiv_bigint_int(Interp *interpreter, PMC* self, INTVAL value, PMC *dest)
 {
-    mpz_fdiv_q_ui(BN(dest), BN(self), value);
+    int n = value < 0;
+    if (n) {
+        mpz_fdiv_q_ui(BN(dest), BN(self), -value);
+        mpz_neg(BN(dest), BN(dest));
+    }
+    else
+        mpz_fdiv_q_ui(BN(dest), BN(self), value);
 }
 
 static void
@@ -174,7 +195,13 @@ bigint_mod_bigint(Interp *interpreter, PMC* self, PMC *value, PMC *dest)
 static void
 bigint_mod_bigint_int(Interp *interpreter, PMC* self, INTVAL value, PMC *dest)
 {
-    mpz_mod_ui(BN(dest), BN(self), value);
+    int n = value < 0;
+    if (n) {
+        mpz_mod_ui(BN(dest), BN(self), -value);
+        mpz_neg(BN(dest), BN(dest));
+    }
+    else
+        mpz_mod_ui(BN(dest), BN(self), value);
 }
 static INTVAL
 bigint_cmp(Interp *interpreter, PMC* self, PMC *value)
@@ -185,7 +212,7 @@ bigint_cmp(Interp *interpreter, PMC* self, PMC *value)
 static INTVAL
 bigint_cmp_int(Interp *interpreter, PMC* self, INTVAL value)
 {
-    return mpz_cmp_ui(BN(self), value);
+    return mpz_cmp_si(BN(self), value);
 }
 
 static void
