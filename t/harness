@@ -158,28 +158,52 @@ unless ($html) {
     };
     die "You must have Test::TAP::HTMLMatrix installed.\n\n$@" if $@;
 
-    my $start = time();
-    my $model = Test::TAP::Model::Visual->new_with_tests(@tests);
-    my $end = time();
+    ## FIXME: ###
+    # This is a temporary solution until Test::TAP::Model version
+    # 0.05.  At that point, this function should be removed, and the
+    # verbose line below should be uncommented.
+    {
+      no warnings qw/redefine once/;
+      *Test::TAP::Model::run_tests = sub {
+        my $self = shift;
 
-    my $duration = $end - $start;
+        $self->_init;
+        $self->{meat}{start_time} = time;
 
-    my $v = Test::TAP::HTMLMatrix->new(
+        foreach my $file (@_) {
+     print STDERR "- $file\n";
+     $self->run_test($file);
+        }
+
+        $self->{meat}{end_time} = time;
+      };
+
+      my $start = time();
+      my $model = Test::TAP::Model::Visual->new();
+      # $model->set_verbose();
+      $model->run_tests(@tests);
+
+      my $end = time();
+
+      my $duration = $end - $start;
+
+      my $v = Test::TAP::HTMLMatrix->new(
         $model,
         join("\n",
              "duration: $duration",
              "branch: unknown",
              "harness_args: " . (($args) ? $args : "N/A"),
              map { "$_: $PConfig{$_}" } sort @smoke_config_vars),
-    );
+                   );
 
-    $v->has_inline_css(1); # no separate css file
+      $v->has_inline_css(1); # no separate css file
 
-    open HTML, ">", "smoke.html";
-    print HTML $v->html;
-    close HTML;
+      open HTML, ">", "smoke.html";
+      print HTML $v->html;
+      close HTML;
 
-    print "smoke.html has been generated.\n";
+      print "smoke.html has been generated.\n";
+    }
 }
 
 =head1 HISTORY
