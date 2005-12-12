@@ -48,8 +48,8 @@ Load needed libraries
 
 .sub "__onload" @LOAD
 
-  # load_bytecode "PGE.pbc"        # Loaded by Getopt/Long.pbc
-  #load_bytecode "Getopt/Long.pbc"  # This also loads PGE
+  #load_bytecode "Getopt/Long.pbc" 
+  # load_bytecode "PGE.pbc"       
 
 .end
 
@@ -65,6 +65,7 @@ Looks at the command line arguments and acts accordingly.
 
   # TODO: put this into '__onload'
   load_bytecode "Getopt/Long.pbc"  # This also loads PGE
+  load_bytecode "PGE.pbc"          # Parrot Grammar engine
 
   .local pmc get_options
   find_global get_options, "Getopt::Long", "get_options"
