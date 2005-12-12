@@ -5,11 +5,32 @@
 
 docs/tests.pod - Testing Parrot
 
-=head1 A basic guide to writing tests for Parrot
+=head1 A basic guide to writing and running tests for Parrot
 
 This is quick and dirty pointer to how tests for Parrot should be written.  The
 testing system is liable to change in the future, but tests written following
 the guidelines below should be easy to port into a new test suite.
+
+=head1 How to test parrot
+
+The easy way to test parrot is running C<make test>. If you have
+updated your code recently and tests began failing, go for a C<make
+realclean> and recompile parrot before complaining.
+
+If your architecture supports JIT, you can test parrot JIT engine using C<make
+testj>. It works just like C<make test>, but uses the JIT engine when possible.
+
+=head2 Submitting smoke test results
+
+Parrot has a status page with smoke test results
+L<http://smoke.parrotcode.org/smoke.html>. You can supply new tests
+results just running C<make smoke>. It will run the same tests as
+C<make test> would, but creating a HTML table with the test
+results. At the end, it will try to upload the test results to the
+smoke server.
+
+It is also possible to run a smoke test on JIT. For that, try running
+C<env PARROT_ARGS=-j make smoke>.
 
 =head1 How to write a test
 
@@ -25,7 +46,7 @@ is done near the top of a test file, in a line that looks like:
 
 =head2 Parrot Assembler
 
-PASM test are mostly used for testing ops.  Appropriate test files for basic
+PASM tests are mostly used for testing ops.  Appropriate test files for basic
 ops are F<t/op/*.t>.  Perl Magic Cookies are tested in F<t/pmc/*.t>.  Add the
 new test like this:
 
@@ -136,6 +157,6 @@ TODO.  See L<Test::More> on how to do that.
 
 =head1 SEE ALSO
 
-L<http://qa.perl.org>
+L<http://qa.perl.org/>
 
 =cut
