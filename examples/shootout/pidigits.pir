@@ -1,6 +1,9 @@
 #!./parrot -C
 #
 # pidigits N  (N = 1000 for shootout)
+#
+# this requires libgmp (GMP) on the machine
+#
 # by Leopold Toetsch
 # not really optimized yet
 
