@@ -110,6 +110,10 @@ sub compile
     }
   }
 
+  #
+  # For NCI (Native Call Interface):
+  #
+
   if (exists $props{fn} or exists $props{fnlib}) {
     foreach my $arg (@args) {
       $compiler->emit("  .arg $arg");
@@ -119,6 +123,11 @@ sub compile
  
     $compiler->emit("  call _${name}_THUNK");
   }
+
+  #
+  # For built-in subs (ops):
+  #
+
   elsif (exists $props{op}) {
     my $op = $props{op};
 
@@ -131,12 +140,17 @@ sub compile
 
     $compiler->emit("  $name ", join(", ", $dest, @args));
   }
+
+  #
+  # For user-defined subs:
+  #
+
   else {
 #    $self->DEBUG(0, "Calling '%s' as regular sub (props = %s)...", $name, join(", ", %props));
 
     $name =~ s/::/__/g;
 
-    $compiler->emit("  $dest = _${name}(" . join(@args) . ")");
+    $compiler->emit("  $dest = _${name}(" . join(", ", @args) . ")");
   }
 
   return 1;
