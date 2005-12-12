@@ -1,0 +1,125 @@
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+src/classes/parrotthread.pmc - Threaded Interpreter
+
+=head1 DESCRIPTION
+
+ParrotThread extends ParrotInterpreter to provide a threaded interpreter
+which supports:
+
+    new P2, .ParrotThread     # create new threaded interp
+    find_method P0, P2, "thread3"       # thread-run function
+    find_global P5, "_th1"    # locate thread function
+    invoke                    # run thread
+
+    set I0, P2                # get thread id
+
+and these methods:
+
+    thread1
+    thread2
+    thread3                   # start thread of type 1..3
+    join
+    detach
+    yield
+    kill
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+#include "parrot/embed.h"
+#include <assert.h>
+
+/*
+ * can't do multi-threaded DOD/GC yet
+ * XXX a quick hack to pass the few tests
+ */
+static void
+stop_GC(Interp* parent, Interp *thread)
+{
+    Parrot_block_DOD(parent);
+    Parrot_block_DOD(thread);
+    Parrot_block_GC(parent);
+    Parrot_block_GC(thread);
+}
+
+
+pmclass ParrotThread extends ParrotInterpreter need_ext {
+
+/*
+
+=item C<void init()>
+
+Initializes the thread.
+
+=cut
+
+*/
+
+    void init () {
+        /*
+         * protect interpreter creation and list handling
+         */
+        LOCK(interpreter_array_mutex);
+        SUPER();
+        pt_add_to_interpreters(INTERP, PMC_data(SELF));
+        UNLOCK(interpreter_array_mutex);
+        /*
+         * can't allow DOD runs for now
+         */
+        stop_GC(INTERP, PMC_data(SELF));
+    }
+
+/*
+
+=item C<void init_pmc(PMC *parent)>
+
+Create a new thread by cloning the passed interpreter.
+
+=cut
+
+*/
+
+    void init_pmc (PMC *parent) {
+        LOCK(interpreter_array_mutex);
+        SUPER(parent);
+        pt_add_to_interpreters(PMC_data(parent), PMC_data(SELF));
+        UNLOCK(interpreter_array_mutex);
+        /*
+         * can't allow DOD runs for now
+         */
+        stop_GC(INTERP, PMC_data(SELF));
+    }
+}
+
+/*
+
+=back
+
+=head1 HISTORY
+
+2003.12.18 leo initial review.
+
+=cut
+
+*/
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+*/

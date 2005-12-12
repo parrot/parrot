@@ -251,7 +251,7 @@ push @funcnames, "Parrot_base_vtables	DATA";
 
 # Extract function names from PMC header files and the core ops file.
 my $hfile;
-foreach $hfile ((glob "classes/*.h"), "include/parrot/oplib/core_ops.h") {
+foreach $hfile ((glob "src/classes/*.h"), "include/parrot/oplib/core_ops.h") {
 	open FILE, "< $hfile" or die "Can't open $hfile: $!";
 	while (<FILE>) {
 		if (/^(?:extern\s+)?\w+\*?\s+\*?(\w+)\s*\([^)]+\)\s*;/) {

@@ -32,8 +32,8 @@ sub pmc_parent {
     return $PMC_PARENTS{$pmc} if defined $PMC_PARENTS{$pmc};
 
     local $/;
-    open(PMC, "classes/$pmc.pmc")
-      or die "open classes/$pmc.pmc failed: $!";
+    open(PMC, "src/classes/$pmc.pmc")
+      or die "open src/classes/$pmc.pmc failed: $!";
     local $_ = <PMC>;
     close PMC;
 
@@ -56,7 +56,7 @@ sub pmc_parents {
 }
 
 sub get_pmc_order {
-  open IN, 'classes/pmc.num' or die "Can't read classes/pmc.num";
+  open IN, 'src/classes/pmc.num' or die "Can't read src/classes/pmc.num";
   my %order;
   while (<IN>) {
     next if (/^#/);
@@ -92,8 +92,8 @@ sub runstep {
     my $self = shift;
   my @pmc=(
     sort
-    map  { m{\./classes/(.*)} }
-    glob "./classes/*.pmc"
+    map  { m{\./src/classes/(.*)} }
+    glob "./src/classes/*.pmc"
   );
 
   @pmc = sort_pmcs(@pmc);
@@ -132,35 +132,35 @@ E_NOTE
 
       # make each pmc depend upon its parent.
       my $parent = pmc_parent($pmc).".pmc";
-      $parent = "perlhash.pmc classes/$parent" if ($pmc eq 'orderedhash');
+      $parent = "perlhash.pmc src/classes/$parent" if ($pmc eq 'orderedhash');
       my $parent_dumps = '';
-      $parent_dumps .= "classes/$_.dump " foreach reverse((pmc_parents($pmc)));
-      $parent_dumps = "classes/perlhash.dump $parent_dumps"
+      $parent_dumps .= "src/classes/$_.dump " foreach reverse((pmc_parents($pmc)));
+      $parent_dumps = "src/classes/perlhash.dump $parent_dumps"
 		if ($pmc eq 'orderedhash');
       my $parent_headers = '';
-      $parent_headers .= "classes/pmc_$_.h " foreach (pmc_parents($pmc));
-      $parent_headers = "classes/pmc_perlhash.h $parent_headers"
+      $parent_headers .= "src/classes/pmc_$_.h " foreach (pmc_parents($pmc));
+      $parent_headers = "src/classes/pmc_perlhash.h $parent_headers"
 		if ($pmc eq 'orderedhash');
       $TEMP_pmc_build .= <<END
-classes/$pmc.c classes/pmc_$pmc.h : classes/$pmc.dump
+src/classes/$pmc.c src/classes/pmc_$pmc.h : src/classes/$pmc.dump
 
-classes/$pmc.dump : vtable.dump $parent_dumps 
+src/classes/$pmc.dump : vtable.dump $parent_dumps 
 
-classes/pmc_$pmc.h: classes/$pmc.pmc
-	\$(PMC2CC) classes/$pmc.pmc
+src/classes/pmc_$pmc.h: src/classes/$pmc.pmc
+	\$(PMC2CC) src/classes/$pmc.pmc
 
-classes/$pmc\$(O): classes/$pmc.str \$(NONGEN_HEADERS) \\
+src/classes/$pmc\$(O): src/classes/$pmc.str \$(NONGEN_HEADERS) \\
         $parent_headers
 
 END
   }
-# classes/$pmc\$(O): \$(NONGEN_HEADERS) $parent_headers classes/pmc_$pmc.h
+# src/classes/$pmc\$(O): \$(NONGEN_HEADERS) $parent_headers src/classes/pmc_$pmc.h
 
   # build list of libraries for link line in Makefile
   my $slash = Parrot::Configure::Data->get('slash');
-  (my $TEMP_pmc_classes_o    = $TEMP_pmc_o   )  =~ s/^| / classes${slash}/g;
-  (my $TEMP_pmc_classes_str  = $TEMP_pmc_str )  =~ s/^| / classes${slash}/g;
-  (my $TEMP_pmc_classes_pmc  = $pmc_list) =~ s/^| / classes${slash}/g;
+  (my $TEMP_pmc_classes_o    = $TEMP_pmc_o   )  =~ s/^| / src${slash}classes${slash}/g;
+  (my $TEMP_pmc_classes_str  = $TEMP_pmc_str )  =~ s/^| / src${slash}classes${slash}/g;
+  (my $TEMP_pmc_classes_pmc  = $pmc_list) =~ s/^| / src${slash}classes${slash}/g;
 
   # Gather the actual names (with MixedCase) of all of the
   # non-abstract built-in PMCs.
@@ -168,7 +168,7 @@ END
   PMC: foreach my $pmc_file (split(/\s+/, $pmc_list)) {
       next if ($pmc_file =~ /^const/);
       my $name;
-      open(PMC, "classes/$pmc_file") or die "open classes/$pmc_file: $!";
+      open(PMC, "src/classes/$pmc_file") or die "open src/classes/$pmc_file: $!";
       my $const;
       while (<PMC>) {
           if (/^pmclass (\w+)(.*)/) {

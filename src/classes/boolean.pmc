@@ -1,0 +1,153 @@
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+src/classes/boolean.pmc - Boolean PMC
+
+=head1 DESCRIPTION
+
+This class implements a boolean value variable.
+
+Albeit the C<Boolean PMC> is derived from the C<Integer PMC>,
+it doesn't morph to other types. Only its value is changed.
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+#include "parrot/perltypes.h"
+
+pmclass Boolean extends Integer does boolean does scalar {
+
+/*
+
+=item C<class_init ()>
+
+Define 2 pythonic globals C<True>, C<False>.
+
+XXX are these generally useful or should they be moved to src/py_func.c?
+
+=cut
+
+*/
+
+    void class_init() {
+        if (pass) {
+            PMC *t;
+            STRING *s;
+
+            t = pmc_new(INTERP, enum_class_Boolean);
+            PMC_int_val(t)  = 1;
+            s = CONST_STRING(INTERP, "True");
+            Parrot_store_global(INTERP, NULL, s, t);
+            t = pmc_new(INTERP, enum_class_Boolean);
+            s = CONST_STRING(INTERP, "False");
+            Parrot_store_global(INTERP, NULL, s, t);
+        }
+    }
+
+/*
+
+=item C<PMC* instantiate()>
+
+Object constructor. SELF is a Boolean Class object. Return a new
+C<bool> object according to the passed PMC value.
+
+=cut
+
+*/
+    PMC* instantiate() {
+        /* XXX other types */
+        int argcP = REG_INT(3);
+        PMC *res = pmc_new(interpreter, enum_class_Boolean);
+        if (argcP)
+            PMC_int_val(res) = VTABLE_get_bool(interpreter, REG_PMC(5));
+        return res;
+    }
+/*
+
+=item C<STRING* get_string ()>
+
+Return "1" or "0".
+
+=cut
+
+*/
+    STRING* get_string () {
+        return SUPER();
+    }
+
+
+/*
+
+=item C<void set_integer_native (INTVAL value)>
+
+=item C<void set_bool (INTVAL value)>
+
+=item C<void set_pmc (PMC* value)>
+
+=cut
+
+*/
+    void set_integer_native (INTVAL value) {
+        PMC_int_val(SELF) = (value != 0);
+    }
+
+
+    void set_bool (INTVAL value) {
+        PMC_int_val(SELF) = (value != 0);
+    }
+
+/*
+
+=item C<void set_number_native (FLOATVAL value)>
+
+Sets the value to C<value> evaluated in a boolean context.
+
+=cut
+
+*/
+
+    void set_number_native (FLOATVAL value) {
+        PMC_int_val(SELF) = (value!=0);
+    }
+
+/*
+
+=item C<void set_string_native (STRING* value)>
+
+Sets the value to C<*value> evaluated in a boolean context.
+
+=cut
+
+*/
+
+    void set_string_native (STRING* value) {
+        PMC_int_val(SELF) = string_bool(INTERP, value);
+    }
+}
+
+/*
+
+=back
+
+=cut
+
+*/
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+*/

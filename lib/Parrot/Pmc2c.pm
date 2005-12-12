@@ -223,7 +223,7 @@ EOC
 Returns C<$self> as a new instance.
 
 C<$self> is a hash reference C<eval>-ed from a F<*.dump> file generated
-by F<classes/pmc2c.pl> from a F<*.pmc> file. It is C<bless>-ed either into
+by F<src/classes/pmc2c.pl> from a F<*.pmc> file. It is C<bless>-ed either into
 C<Parrot::Pmc2c::::Standard>, or into one of the other I<special> PMCs:
 F<default>, C<delegate>, C<Null>, C<Ref> or C<SharedRef>.
 
@@ -497,7 +497,7 @@ sub proto ($$) {
 =item C<rewrite_nci_method($class, $method, $super, $super_table)>
 
 Rewrites the method body performing the various macro substitutions for
-nci method bodies (see F<classes/pmc2c.pl>).
+nci method bodies (see F<src/classes/pmc2c.pl>).
 
 =cut
 
@@ -515,7 +515,7 @@ sub rewrite_nci_method ($$$) {
 =item C<rewrite_vtable_method($class, $method, $super, $super_table)>
 
 Rewrites the method body performing the various macro substitutions for
-vtable method bodies (see F<classes/pmc2c.pl>).
+vtable method bodies (see F<src/classes/pmc2c.pl>).
 
 =cut
 

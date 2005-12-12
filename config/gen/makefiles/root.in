@@ -567,7 +567,7 @@ PMC2CV = $(PERL) tools/build/pmc2c.pl --vt
 	$(PMC2CC) $<
 
 # not all makes might understand this, so the rules are generated
-#classes/pmc_%.h : classes/%.c
+#src/classes/pmc_%.h : src/classes/%.c
 #	$(PMC2CC) $<
 
 vtable.dump : vtable.tbl
@@ -1097,7 +1097,7 @@ $(OPS_DIR)/core_ops_switch$(O) : $(GENERAL_H_FILES) $(OPS_DIR)/core_ops_switch.c
 $(OPS_DIR)/core_ops_switch.c $(INC_DIR)/oplib/core_ops_switch.h : $(OPS_FILES) $(BUILD_TOOLS_DIR)/ops2c.pl lib/Parrot/OpsFile.pm lib/Parrot/Op.pm $(INC_DIR)/config.h lib/Parrot/OpLib/core.pm lib/Parrot/OpTrans/CSwitch.pm
 	$(PERL) $(BUILD_TOOLS_DIR)/ops2c.pl CSwitch --core
 
-tools${slash}build\parrotdef.pl : $(CLASS_PMC_FILES)
+tools/build/parrotdef.pl : $(CLASS_PMC_FILES)
 
 ${TEMP_cg_c}
 
@@ -1432,8 +1432,8 @@ prog-clean :
 	$(PERL) tools/build/c2str.pl --init
 	$(RM_F) \
 		$(STR_FILES) $(INC_DIR)/string_private_cstring.h \
-		classes/*.c classes/*.h classes/*.dump vtable.dump \
-		*.def *.lib *.exp
+		"src/classes/*.c" "src/classes/*.h" "src/classes/*.dump" \
+		vtable.dump "*.def" "*.lib" "*.exp"
 
 dynext-clean :
 # shared libs (LOAD_EXT, SHARE_EXT)
@@ -1544,11 +1544,11 @@ patch :
 
 
 lint : $(PARROT)
-	$(LINT) $(CC_INC) ${cc_hasjit} "-Iclasses" $(LINTFLAGS) $(LINTOPTS) `echo $(O_FILES) | sed ${PQ}s/\.o/\.c/g${PQ}`
+	$(LINT) $(CC_INC) ${cc_hasjit} "-Isrc/classes" $(LINTFLAGS) $(LINTOPTS) `echo $(O_FILES) | sed ${PQ}s/\.o/\.c/g${PQ}`
 	$(LINT) $(CC_INC) $(LINTFLAGS) $(LINTOPTS) $(IMCC_DIR)/main.c
 
 lint2 : $(PARROT)
-	$(LINT) $(CC_INC) ${cc_hasjit} "-Iclasses" $(LINTFLAGS2) $(LINTOPTS) `echo $(O_FILES) | sed ${PQ}s/\.o/\.c/g${PQ}`
+	$(LINT) $(CC_INC) ${cc_hasjit} "-Isrc/classes" $(LINTFLAGS2) $(LINTOPTS) `echo $(O_FILES) | sed ${PQ}s/\.o/\.c/g${PQ}`
 	$(LINT) $(CC_INC) $(LINTFLAGS2) $(LINTOPTS) $(IMCC_DIR)/main.c
 
 

@@ -83,7 +83,7 @@ lookup of the cache has to be done in the opcode itself.
 #endif
 
 /* needs a Makefile dependency */
-/* #include "../classes/pmc_integer.h" */
+/* #include "classes/pmc_integer.h" */
 
 extern void Parrot_Integer_i_subtract_Integer(Interp* , PMC* pmc, PMC* value);
 

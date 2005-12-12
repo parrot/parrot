@@ -1,0 +1,52 @@
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+src/classes/perlhash.pmc - Perl Hash
+
+=head1 DESCRIPTION
+
+These are the vtable functions for the PerlHash base class.
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+
+/* Albeit PerlHash doesn't use PMC_data, it needs the next_for_GC pointer
+ * We would get recursive marking of a deeply nested HoHoH...
+ */
+
+pmclass PerlHash extends Hash need_ext does hash {
+
+}
+
+/*
+
+=back
+
+=head1 SEE ALSO
+
+F<docs/pdds/pdd08_keys.pod>.
+F<src/classes/hash.pmc>.
+
+=cut
+
+*/
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+*/

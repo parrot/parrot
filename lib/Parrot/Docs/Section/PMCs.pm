@@ -37,7 +37,7 @@ sub new
 {
 	my $self = shift;
 	my $dist = Parrot::Distribution->new;
-    my $dir = $dist->existing_directory_with_name('classes');
+    my $dir = $dist->existing_directory_with_name('src/classes');
 	my @tools_items = ();
 	
 	foreach my $file ($dir->files_with_suffix('pl'))

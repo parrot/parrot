@@ -71,12 +71,12 @@ sub prebuild_classes {
 
     foreach my $obj (@ARGV) {
         my $src = $obj;
-        $src =~ s/classes\/(.*)\.o/$1\.c/g;
+        $src =~ s/src\/classes\/(.*)\.o/$1\.c/g;
 
 	push @src, $src;
     }
 
-    run_command("cd classes; make @src");
+    run_command("cd src/classes && make @src");
 }
 
 sub clean {

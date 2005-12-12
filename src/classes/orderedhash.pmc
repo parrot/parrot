@@ -1,0 +1,445 @@
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+src/classes/orderedhash.pmc - Ordered Hash
+
+=head1 DESCRIPTION
+
+C<OrderedHash> extends C<PerlArray> to provide the functionality of
+C<PerlArray> (list in C<data>) and a C<Hash> (hash in
+C<struct_val>). The list holds the PMC values, the hash keys point to
+the index of the value in the list.
+
+There are 2 iterator interfaces:
+
+=over 4
+
+=item * retrieve value (in creation order)
+
+=item * retrieve key (no special order)
+
+=back
+
+See F<t/pmc/orderedhash.t>.
+
+If values are set by numeric index only, there is no hash key. Iterating
+over the hash doesn't show these values.
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+#include "pmc_hash.h"
+
+/*
+
+=item C<static PMC *undef(Interp *interpreter)>
+
+Returns the C<PerlUndef> PMC.
+
+=cut
+
+*/
+
+static PMC* undef(Interp* interpreter)
+{
+    return pmc_new(interpreter, enum_class_PerlUndef);
+}
+
+pmclass OrderedHash extends PerlArray need_ext does array does hash {
+
+/*
+
+=item C<void init()>
+
+Initializes the ordered hash.
+
+=item C<void destroy()>
+
+Destroys the ordered hash.
+
+=cut
+
+*/
+
+    void init () {
+        /* clear the Hash ptr - its not yet existing */
+        PMC_struct_val(SELF) = NULL;
+        SUPER();
+        Hash.SUPER();
+    }
+
+    void destroy () {
+        Hash.SUPER();
+    }
+
+/*
+
+=item C<void mark()>
+
+Marks the ordered hash as live.
+
+=cut
+
+*/
+
+    void mark () {
+        SUPER();
+        Hash.SUPER();
+    }
+
+/*
+
+=item C<PMC *clone()>
+
+Creates and returns a clone of the ordered hash.
+
+=cut
+
+*/
+
+    PMC* clone () {
+        PMC* dest = SUPER();
+        hash_clone(INTERP, (Hash *)PMC_struct_val(SELF),
+            (Hash**)&PMC_struct_val(dest));
+        return dest;
+    }
+
+/*
+
+=item C<PMC *get_pmc_keyed(PMC *key)>
+
+=cut
+
+*/
+
+    PMC* get_pmc_keyed (PMC* key) {
+        if (PObj_get_FLAGS(key) & KEY_integer_FLAG) {
+            return SUPER(key);
+        }
+        else {
+            INTVAL n = Hash.SELF.get_integer_keyed(key);
+            return DYNSELF.get_pmc_keyed_int(n);
+        }
+    }
+
+/*
+
+=item C<PMC *get_pmc_keyed_str(STRING *key)>
+
+Returns the PMC value associated with C<*key>.
+
+=cut
+
+*/
+
+    PMC* get_pmc_keyed_str (STRING* key) {
+        INTVAL n = Hash.SELF.get_integer_keyed_str(key);
+        return DYNSELF.get_pmc_keyed_int(n);
+    }
+
+/*
+
+=item C<INTVAL get_integer_keyed_str(STRING *key)>
+
+=cut
+
+*/
+
+    INTVAL get_integer_keyed_str (STRING* key) {
+        INTVAL n = Hash.SELF.get_integer_keyed_str(key);
+        return DYNSELF.get_integer_keyed_int(n);
+    }
+
+/*
+
+=item C<INTVAL get_integer_keyed(PMC *key)>
+
+Returns the integer value associated with C<*key>.
+
+=cut
+
+*/
+
+    INTVAL get_integer_keyed (PMC* key) {
+        INTVAL n = Hash.SELF.get_integer_keyed(key);
+        return DYNSELF.get_integer_keyed_int(n);
+    }
+
+/*
+
+=item C<FLOATVAL get_number_keyed(PMC *key)>
+
+Returns the floating-point value for the element at C<*key>.
+
+=cut
+
+*/
+
+    FLOATVAL get_number_keyed (PMC* key) {
+        INTVAL n = Hash.SELF.get_integer_keyed(key);
+        return DYNSELF.get_number_keyed_int(n);
+    }
+
+/*
+
+=item C<void set_pmc_keyed(PMC *key, PMC *value)>
+
+Associates C<*value> with C<*key>.
+
+=cut
+
+*/
+
+    void set_pmc_keyed (PMC* key, PMC* value) {
+        INTVAL n = DYNSELF.elements();
+        DYNSELF.set_pmc_keyed_int(n, value);
+        Hash.SELF.set_integer_keyed(key, n);
+    }
+
+/*
+
+=item C<void set_integer_keyed(PMC *key, INTVAL value)>
+
+Associates C<value> with C<*key>.
+
+=cut
+
+*/
+
+    void set_integer_keyed (PMC* key, INTVAL value) {
+        INTVAL n = DYNSELF.elements();
+        DYNSELF.set_integer_keyed_int(n, value);
+        Hash.SELF.set_integer_keyed(key, n);
+    }
+
+/*
+
+=item C<void set_string_keyed(PMC *key, STRING *value)>
+
+Associates C<value> with C<*key>.
+
+=cut
+
+*/
+
+    void set_string_keyed (PMC* key, STRING* value) {
+        INTVAL n = DYNSELF.elements();
+        DYNSELF.set_string_keyed_int(n, value);
+        Hash.SELF.set_integer_keyed(key, n);
+    }
+
+/*
+
+=item C<void set_pmc_keyed_str(STRING *key, PMC *value)>
+
+Associates C<*value> with C<*key>.
+
+=cut
+
+*/
+
+    void set_pmc_keyed_str (STRING* key, PMC* value) {
+        INTVAL n = DYNSELF.elements();
+        DYNSELF.set_pmc_keyed_int(n, value);
+        Hash.SELF.set_integer_keyed_str(key, n);
+    }
+
+/*
+
+=item C<void set_integer_keyed_str(STRING *key, INTVAL value)>
+
+Associates C<value> with C<*key>.
+
+=cut
+
+*/
+
+    void set_integer_keyed_str (STRING* key, INTVAL value) {
+        INTVAL n = DYNSELF.elements();
+        DYNSELF.set_integer_keyed_int(n, value);
+        Hash.SELF.set_integer_keyed_str(key, n);
+    }
+
+/*
+
+=item C<void set_number_keyed (PMC *key, FLOATVAL value)>
+
+=cut
+
+*/
+
+    void set_number_keyed (PMC* key, FLOATVAL value) {
+        INTVAL n = DYNSELF.elements();
+        DYNSELF.set_number_keyed_int(n, value);
+        Hash.SELF.set_integer_keyed(key, n);
+    }
+
+/*
+
+=item C<void set_string_keyed_str(STRING *key, STRING *value)>
+
+=cut
+
+*/
+
+    void set_string_keyed_str (STRING* key, STRING* value) {
+        INTVAL n = DYNSELF.elements();
+        DYNSELF.set_string_keyed_int(n, value);
+        Hash.SELF.set_integer_keyed_str(key, n);
+    }
+
+/*
+
+=item C<INTVAL exists_keyed(PMC *key)>
+
+=cut
+
+*/
+
+    INTVAL exists_keyed(PMC* key) {
+        if (PObj_get_FLAGS(key) & KEY_integer_FLAG) {
+            return SUPER(key);
+        }
+        else {
+            return Hash.SUPER(key);
+        }
+    }
+
+/*
+
+=item C<INTVAL exists_keyed_str(STRING *key)>
+
+Returns whether the key C<*key> exists in the hash.
+
+=cut
+
+*/
+
+    INTVAL exists_keyed_str(STRING* key) {
+        return Hash.SUPER(key);
+    }
+
+/*
+
+=item C<INTVAL defined_keyed(PMC *key)>
+
+=cut
+
+*/
+
+    INTVAL defined_keyed(PMC* key) {
+        if (PObj_get_FLAGS(key) & KEY_integer_FLAG) {
+            return SUPER(key);
+        }
+        else {
+            INTVAL n = Hash.SELF.get_integer_keyed(key);
+            return DYNSELF.defined_keyed_int(n);
+        }
+    }
+
+/*
+
+=item C<INTVAL defined_keyed_str(STRING *key)>
+
+Returns whether the value for key C<*key> is defined in the hash.
+
+=cut
+
+*/
+
+    INTVAL defined_keyed_str(STRING* key) {
+        INTVAL n = Hash.SELF.get_integer_keyed_str(key);
+        return DYNSELF.defined_keyed_int(n);
+    }
+
+/*
+
+=item C<void delete_keyed(PMC *key)>
+
+=item C<void delete_keyed_str(STRING *key)>
+
+Deletes the key C<*key> from the hash.
+
+=cut
+
+*/
+
+    void delete_keyed(PMC* key) {
+        if (PObj_get_FLAGS(key) & KEY_integer_FLAG) {
+            SUPER(key);
+        }
+        else {
+            PMC *new_undef = undef(INTERP);
+            /* fetch index into the PerlArray
+               and delete the key in the Hash afterward */
+            INTVAL n = Hash.SELF.get_integer_keyed(key);
+            Hash.SUPER(key);
+            /* remove the value from the PerlArray,
+               but don't splice the PerlArray. We don't want to mess up
+               the mapping from the Hash to the PerlArray */
+            DYNSELF.set_pmc_keyed_int(n,new_undef);
+        }
+    }
+
+    void delete_keyed_str(STRING* key) {
+        PMC *new_undef = undef(INTERP);
+        /* fetch index into the PerlArray
+           and delete the key in the Hash afterward */
+        INTVAL n = Hash.SELF.get_integer_keyed_str(key);
+        Hash.SUPER(key);
+        /* remove the value from the PerlArray,
+           but don't splice the PerlArray. We don't want to mess up
+           the mapping from the Hash to the PerlArray */
+        DYNSELF.set_pmc_keyed_int(n,new_undef);
+    }
+
+/*
+
+=item C<STRING *get_string_keyed(PMC *key)>
+
+Returns the Parrot string associated with C<*key>.
+
+=cut
+
+*/
+
+    STRING* get_string_keyed (PMC* key) {
+        return Hash.SUPER(key);
+    }
+}
+
+/*
+
+=back
+
+=head1 SEE ALSO
+
+F<docs/pdds/pdd08_keys.pod>.
+
+=head1 HISTORY
+
+Initial rev by leo 2003-08-21.
+
+=cut
+
+*/
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+*/
+

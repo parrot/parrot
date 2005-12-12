@@ -1,0 +1,71 @@
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+src/classes/compiler.pmc - Compiler PMC
+
+=head1 DESCRIPTION
+
+C<Compiler> extends C<NCI> to provide an interface for implementing
+assembler/compilers.
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+#include "parrot/method_util.h"
+#include "parrot/interp_guts.h"
+
+pmclass Compiler extends NCI need_ext {
+
+/*
+
+=item C<void *invoke(void *code_ptr)>
+
+Compiles the source code starting at C<code_ptr> and returns a new
+C<Eval> PMC with a new PackFile attached.
+
+=cut
+
+*/
+
+    void* invoke (void * code_ptr) {
+        Parrot_csub_t func = (Parrot_csub_t)D2FPTR(PMC_data(SELF));
+        INTERP->current_cont = NULL;
+        func(INTERP, SELF);
+        return code_ptr;
+    }
+}
+
+/*
+
+=back
+
+=head1 SEE ALSO
+
+F<docs/pdds/pdd06_pasm.pod>.
+
+=head1 HISTORY
+
+Initial revision by leo 2003/01/16
+
+=cut
+
+*/
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+*/

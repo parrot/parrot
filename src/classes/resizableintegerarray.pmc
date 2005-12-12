@@ -1,0 +1,206 @@
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+src/classes/resizableintegerarray.pmc - resizable array for integers only
+
+=head1 DESCRIPTION
+
+This class, ResizableIntegerArray, implements an array of resizable size, which stores INTVALs.
+It uses Integer PMCs for all of the conversions.
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+
+
+pmclass ResizableIntegerArray extends FixedIntegerArray need_ext does array {
+
+/*
+
+=item C<INTVAL get_integer_keyed_int(INTVAL key)>
+
+Returns the integer value of the element at index C<key>.
+
+=cut
+
+*/
+
+    INTVAL get_integer_keyed_int (INTVAL key) {
+        INTVAL *data;
+        if (key < 0)
+            internal_exception(OUT_OF_BOUNDS,
+                "ResizableIntegerArray: index out of bounds!");
+        if(key >= PMC_int_val(SELF))
+            DYNSELF.set_integer_native(key+1);
+
+        data = (INTVAL *)PMC_data(SELF);
+        return data[key];
+    }
+
+/*
+
+=item C<void set_integer_keyed_int(INTVAL key, INTVAL value)>
+
+Sets the integer value of the element at index C<key> to C<value>.
+
+=cut
+
+*/
+
+    void set_integer_keyed_int (INTVAL key, INTVAL value) {
+        INTVAL *data;
+        if (key < 0)
+            internal_exception(OUT_OF_BOUNDS,
+                "ResizableIntegerArray: index out of bounds!");
+        if(key >= PMC_int_val(SELF))
+            DYNSELF.set_integer_native(key+1);
+
+        data = (INTVAL *)PMC_data(SELF);
+        data[key] = value;
+    }
+
+/*
+
+=item C<void set_integer_native(INTVAL size)>
+
+Resizes the array to C<size> elements.
+
+=cut
+
+*/
+
+    void set_integer_native (INTVAL size) {
+        if (size < 0)
+            internal_exception(OUT_OF_BOUNDS,
+                    "ResizableStringArray: Can't resize!");
+
+        if(!PMC_data(SELF)) {
+            /* empty - used fixed routine */
+            if (size < 8) {
+                SUPER(8);
+                PMC_int_val(SELF) = size;
+                PMC_int_val2(SELF) = 8;
+            }
+            else {
+                SUPER(size);
+                PMC_int_val2(SELF) = size;
+            }
+        }
+        else if (size <= PMC_int_val2(SELF)) {
+            PMC_int_val(SELF) = size;
+            /* we could shrink here if necessary */
+            return;
+        }
+        else {
+            INTVAL cur, needed;
+            cur = PMC_int_val2(SELF);
+            if (cur < 8192)
+                cur = size < 2 * cur ? 2 * cur : size;
+            else {
+                needed = size - cur;
+                cur += needed + 4096;
+                cur &= ~0xfff;
+            }
+            PMC_data(SELF) = mem_sys_realloc(PMC_data(SELF),
+                    cur * sizeof(INTVAL));
+            PMC_int_val2(SELF) = cur;
+            PMC_int_val(SELF) = size;
+        }
+    }
+
+/*
+
+=item C<void push_integer (INTVAL value)>
+
+Extends the array by adding an element of value C<value> to the end
+of the array.
+
+=cut
+
+*/
+
+    void push_integer (INTVAL value) {
+        INTVAL nextix = DYNSELF.elements();
+        DYNSELF.set_integer_keyed_int(nextix, value);
+    }
+
+/*
+
+=item C<INTVAL pop_integer()>
+
+Removes and returns the last element in the array.
+
+=cut
+
+*/
+
+    INTVAL pop_integer() {
+        INTVAL size;
+        INTVAL value;
+
+        size = PMC_int_val(SELF);
+        if (size == 0) {
+            internal_exception(OUT_OF_BOUNDS,
+                    "ResizableIntegerArray: Can't pop from an empty array!");
+        }
+        value = DYNSELF.get_integer_keyed_int(size-1);
+        DYNSELF.set_integer_native(size - 1);
+        return value;
+    }
+
+/*
+
+=item C<PMC *clone()>
+
+Creates and returns a copy of the array.
+
+=cut
+
+*/
+
+    PMC* clone () {
+        PMC *copy = SUPER();
+        /* copy trimmed extra space */
+        PMC_int_val2(copy) = PMC_int_val(SELF);
+        return copy;
+    }
+
+}
+
+/*
+
+=back
+
+=head1 SEE ALSO
+
+F<docs/pdds/pdd17_basic_types.pod>.
+
+=head1 HISTORY
+
+Initial version                  - Matt Fowles 2004-06-11
+Changed allocator to double size - Matt Fowles 2004-06-15
+Added push_integer               - Bernhard Schmalhofer 2004-10-17
+moved available size to int_val2 - Matt Fowles 2005-07-22
+
+=cut
+
+*/
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+*/

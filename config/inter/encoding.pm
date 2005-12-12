@@ -45,7 +45,7 @@ END
       $encoding_list = prompt('Which encodings would you like?', $encoding_list);
     }
   }
-  # names of class files for classes/Makefile
+  # names of class files for src/classes/Makefile
   (my $TEMP_encoding_o = $encoding_list) =~ s/\.c/\$(O)/g;
 
   my $TEMP_encoding_build = <<"E_NOTE";

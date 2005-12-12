@@ -1,0 +1,791 @@
+/*
+Copyright: 2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+src/classes/string.pmc - String PMC Class
+
+=head1 DESCRIPTION
+
+C<String> extends C<scalar> to provide a string for languages
+that want a C<string> type without going to an S register. Acts as a
+wrapper for the functions in /src/string.c
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+
+pmclass String extends scalar does string does scalar {
+
+/*
+
+=item C<void init()>
+
+Initializes the string.
+
+=cut
+
+*/
+
+    void init () {
+        PMC_str_val(SELF) =
+            string_make_empty(INTERP, enum_stringrep_one, 0);
+        PObj_custom_mark_SET(SELF);
+    }
+
+/*
+
+=item C<PMC* instantiate()>
+
+Create a new String from the passed in argument. This is a class method,
+arguments are passed according to pdd03.
+
+=cut
+
+*/
+    PMC* instantiate() {
+        int argcP = REG_INT(3);
+        PMC *class = REG_PMC(2);
+        PMC *res = pmc_new(INTERP, class->vtable->base_type);
+        if (argcP)
+            VTABLE_set_string_native(INTERP, res,
+                    VTABLE_get_string(INTERP, REG_PMC(5)));
+        return res;
+    }
+/*
+
+=item C<void mark()>
+
+Marks the string as live.
+
+=cut
+
+*/
+
+    void mark () {
+        if(PMC_str_val(SELF))
+            pobject_lives(INTERP, (PObj *)PMC_str_val(SELF));
+    }
+
+/*
+
+=item C<PMC* clone()>
+
+Creates a copy of the string.
+
+=cut
+
+*/
+
+    PMC* clone () {
+        PMC* dest = pmc_new_noinit(INTERP, SELF->vtable->base_type);
+        PObj_custom_mark_SET(dest);
+        PMC_str_val(dest) = string_copy(INTERP,PMC_str_val(SELF));
+        return dest;
+    }
+
+/*
+
+=item C<INTVAL get_integer()>
+
+Returns the integer representation of the string.
+
+=cut
+
+*/
+
+    INTVAL get_integer () {
+        STRING *s = (STRING*) PMC_str_val(SELF);
+        return string_to_int(INTERP, s);
+    }
+
+/*
+
+=item C<FLOATVAL get_number()>
+
+Returns the floating-point representation of the string.
+
+=cut
+
+*/
+
+    FLOATVAL get_number () {
+        STRING *s = (STRING*) PMC_str_val(SELF);
+        return string_to_num(INTERP, s);
+    }
+
+/*
+
+=item C<PMC* get_bignum()>
+
+Returns the big numbers representation of the string.
+
+=cut
+
+*/
+
+    PMC* get_bignum () {
+	STRING *s = DYNSELF.get_string();
+        PMC *ret = pmc_new(INTERP, enum_class_BigInt);
+        VTABLE_set_string_native(INTERP, ret, s);
+        return ret;
+    }
+
+/*
+
+=item C<STRING* get_string()>
+
+Returns the string itself.
+
+=cut
+
+*/
+    /* XXX useless? */
+    STRING* get_string () {
+        return (STRING*) PMC_str_val(SELF);
+    }
+
+/*
+
+=item C<INTVAL get_bool()>
+
+Returns the boolean value of the string.
+
+=cut
+
+*/
+
+    INTVAL get_bool () {
+        STRING *s = (STRING*) PMC_str_val(SELF);
+        return string_bool(INTERP, s);
+    }
+
+/*
+
+=item C<VOID set_integer_native(INTVAL value)>
+
+=item C<VOID set_bool(INTVAL value)>
+
+Sets the value of the string to the integer C<value>.
+
+=cut
+
+*/
+
+    void set_integer_native (INTVAL value) {
+        PMC_str_val(SELF) = string_from_int(INTERP, value);
+    }
+
+    void set_bool (INTVAL value) {
+        PMC_str_val(SELF) = string_from_int(INTERP, value);
+    }
+
+/*
+
+=item C<VOID set_number_native(FLOATVAL value)>
+
+Sets the value of the string to the floating-point C<value>.
+
+=cut
+
+*/
+
+    void set_number_native (FLOATVAL value) {
+        PMC_str_val(SELF) = string_from_num(INTERP, value);
+    }
+
+
+/*
+
+=item C<VOID set_string_native(STRING* value)>
+
+Sets the value of the string to that of the specified C<string>.
+
+=cut
+
+*/
+
+    void set_string_native (STRING* value) {
+        PMC_str_val(SELF) = value;
+    }
+
+/*
+
+=item C<VOID assign_string_native(STRING* value)>
+
+Sets the value of the string to a copy of the specified C<string>.
+
+=cut
+
+*/
+
+    void assign_string_native (STRING* value) {
+        PMC_str_val(SELF) =
+            string_set(INTERP, PMC_str_val(SELF), value);
+    }
+
+/*
+
+=item C<VOID set_string_same(PMC* value)>
+
+Sets the value of the string to the value of
+the specified C<String> PMC.
+
+=cut
+
+*/
+
+    void set_string_same (PMC* value) {
+        PMC_str_val(SELF) =
+            string_set(INTERP, PMC_str_val(SELF), PMC_str_val(value));
+    }
+
+/*
+
+=item C<VOID set_pmc(PMC* value)>
+
+Sets the value of the string to the string value of
+the specified C<PMC>.
+
+=cut
+
+*/
+    void set_pmc (PMC* value) {
+        PMC_str_val(SELF) = VTABLE_get_string(INTERP, value);
+    }
+
+/*
+
+=item C<PMC* bitwise_ors(PMC* value, PMC* dest)>
+
+=item C<PMC* bitwise_ors_str(PMC* value, PMC* dest)>
+
+=item C<PMC* bitwise_ands(PMC* value, PMC* dest)>
+
+=item C<PMC* bitwise_ands_str(PMC* value, PMC* dest)>
+
+=item C<PMC* bitwise_xors(PMC* value, PMC* dest)>
+
+=item C<PMC* bitwise_xors_str(PMC* value, PMC* dest)>
+
+=item C<void bitwise_nots(PMC* value)>
+
+These functions perform bitwise operations on entire
+strings, and place the result in C<dest>.
+
+=item C<void i_bitwise_ors(PMC* value)>
+
+=item C<void i_bitwise_ors_str(PMC* value)>
+
+=item C<void i_bitwise_ands(PMC* value)>
+
+=item C<void i_bitwise_ands_str(PMC* value)>
+
+=item C<void i_bitwise_xors(PMC* value)>
+
+=item C<void i_bitwise_xors_str(PMC* value)>
+
+=item C<void i_bitwise_nots(PMC* value)>
+
+These functions perform bitwise operations on entire
+strings in place.
+
+=cut
+
+*/
+    PMC* bitwise_ors (PMC* value, PMC* dest) {
+        STRING *s = PMC_str_val(SELF);
+        STRING *v = VTABLE_get_string(INTERP, value);
+        if (!dest)
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
+        VTABLE_set_string_native(
+            INTERP, dest, string_bitwise_or(INTERP, s, v, NULL));
+        return dest;
+    }
+
+    PMC* bitwise_ors_str (STRING* value, PMC* dest) {
+        STRING *s = PMC_str_val(SELF);
+        if (!dest)
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
+        VTABLE_set_string_native(
+            INTERP, dest, string_bitwise_or(INTERP, s, value, NULL));
+        return dest;
+    }
+
+    void i_bitwise_ors (PMC* value) {
+        STRING *s = PMC_str_val(SELF);
+        STRING *v = VTABLE_get_string(INTERP, value);
+        DYNSELF.set_string_native(string_bitwise_or(INTERP, s, v, &s));
+    }
+
+    void i_bitwise_ors_str (STRING* value) {
+        STRING *s = PMC_str_val(SELF);
+        DYNSELF.set_string_native(string_bitwise_or(INTERP, s, value, &s));
+    }
+
+    PMC* bitwise_ands (PMC* value, PMC* dest) {
+        STRING *s = PMC_str_val(SELF);
+        STRING *v = VTABLE_get_string(INTERP, value);
+        if (!dest)
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
+        VTABLE_set_string_native(
+            INTERP, dest, string_bitwise_and(INTERP, s, v, NULL));
+        return dest;
+    }
+
+    PMC* bitwise_ands_str (STRING* value, PMC* dest) {
+        STRING *s = PMC_str_val(SELF);
+        if (!dest)
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
+        VTABLE_set_string_native(
+            INTERP, dest, string_bitwise_and(INTERP, s, value, NULL));
+        return dest;
+    }
+
+
+    void i_bitwise_ands (PMC* value) {
+        STRING *s = PMC_str_val(SELF);
+        STRING *v = VTABLE_get_string(INTERP, value);
+        DYNSELF.set_string_native(string_bitwise_and(INTERP, s, v, &s));
+    }
+
+    void i_bitwise_ands_str (STRING* value) {
+        STRING *s = PMC_str_val(SELF);
+        DYNSELF.set_string_native(string_bitwise_and(INTERP, s, value, &s));
+    }
+
+    PMC* bitwise_xors (PMC* value, PMC* dest) {
+        STRING *s = PMC_str_val(SELF);
+        STRING *v = VTABLE_get_string(INTERP, value);
+        if (!dest)
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
+        VTABLE_set_string_native(
+            INTERP, dest, string_bitwise_xor(INTERP, s, v, NULL));
+        return dest;
+    }
+
+    PMC* bitwise_xors_str (STRING* value, PMC* dest) {
+        STRING *s = PMC_str_val(SELF);
+        if (!dest)
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
+        VTABLE_set_string_native(
+            INTERP, dest, string_bitwise_xor(INTERP, s, value, NULL));
+        return dest;
+    }
+
+    void i_bitwise_xors (PMC* value) {
+        STRING *s = PMC_str_val(SELF);
+        STRING *v = VTABLE_get_string(INTERP, value);
+        DYNSELF.set_string_native(string_bitwise_xor(INTERP, s, v, &s));
+    }
+
+    void i_bitwise_xors_str (STRING* value) {
+        STRING *s = PMC_str_val(SELF);
+        DYNSELF.set_string_native(string_bitwise_xor(INTERP, s, value, &s));
+    }
+
+    PMC* bitwise_nots (PMC* dest) {
+        STRING *s = PMC_str_val(SELF);
+        if (!dest)
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
+        VTABLE_set_string_native(
+            INTERP, dest, string_bitwise_not(INTERP, s, NULL));
+        return dest;
+    }
+
+    void i_bitwise_nots () {
+        STRING *s = PMC_str_val(SELF);
+        VTABLE_set_string_native(
+            INTERP, SELF, string_bitwise_not(INTERP, s, &s));
+    }
+
+/*
+
+=item C<INTVAL is_equal(PMC* value)>
+
+Compares the string with C<value>; returns true if
+they match.
+
+=cut
+
+*/
+    INTVAL is_equal (PMC* value) {
+        STRING *s = PMC_str_val(SELF);
+        STRING *v = VTABLE_get_string(INTERP, value);
+        return (INTVAL)(0 == string_equal(INTERP, s, v));
+    }
+
+/*
+
+=item C<INTVAL is_equal_num(PMC* value)>
+
+Compares the numerical value of the string with that of
+C<value>; returns true if they match.
+
+=cut
+
+*/
+
+    INTVAL is_equal_num (PMC* value) {
+        FLOATVAL sf = string_to_num(INTERP, PMC_str_val(SELF));
+        FLOATVAL vf = VTABLE_get_number(INTERP, value);
+        return (INTVAL)(sf == vf);
+    }
+
+/*
+
+=item C<INTVAL is_equal_string(PMC* value)>
+
+Compares the string with C<value>; returns FALSE if they match.
+
+=cut
+
+*/
+
+    INTVAL is_equal_string (PMC* value) {
+        STRING *s = PMC_str_val(SELF);
+        STRING *v = VTABLE_get_string(INTERP, value);
+        return string_equal(INTERP, s, v) == 0;
+    }
+
+/*
+
+=item C<INTVAL is_same(PMC* value)>
+
+Compares the string in this PMC with the one in the C<value> PMC.
+Returns true if this PMC and the one in C<value> are of the same PMC
+class and their strings are aliases of the same internal string.
+
+(this can only happen if you use the set_string_native method)
+
+=cut
+
+*/
+    INTVAL is_same (PMC* value) {
+        STRING *s = PMC_str_val(SELF);
+        STRING *v = PMC_str_val(value);
+        return (INTVAL)(
+                value->vtable == SELF->vtable &&
+                s == v
+            );
+    }
+
+/*
+
+=item C<INTVAL cmp(PMC* value)>
+
+Compares the string with C<value>; returns -1 if the
+string is smaller, 0 if they are equal, and 1 if C<value>
+is smaller.
+
+=cut
+
+*/
+    INTVAL cmp (PMC* value) {
+        STRING *s = PMC_str_val(SELF);
+        STRING *v = VTABLE_get_string(INTERP, value);
+        return string_compare(INTERP, s, v);
+    }
+
+/*
+
+=item C<INTVAL cmp_num(PMC* value)>
+
+Compares the numerical value of the string with that of
+C<value>; returns -1 if the string is smaller, 0 if they
+are equal, and 1 if C<value> is smaller.
+
+=cut
+
+*/
+    INTVAL cmp_num (PMC* value) {
+        FLOATVAL sf = string_to_num(INTERP, PMC_str_val(SELF));
+        FLOATVAL vf = VTABLE_get_number(INTERP, value);
+        if(sf < vf)
+            return (INTVAL)(-1);
+        if(sf > vf)
+            return (INTVAL)(1);
+        return (INTVAL)(0);
+    }
+
+/*
+
+=item C<INTVAL cmp_string(PMC* value)>
+
+Compares the string with C<value>; returns -1 if the
+string is smaller, 0 if they are equal, and 1 if C<value>
+is smaller.
+
+=cut
+
+*/
+    INTVAL cmp_string (PMC* value) {
+        STRING *s = PMC_str_val(SELF);
+        STRING *v = VTABLE_get_string(INTERP, value);
+        return string_compare(INTERP, s, v);
+    }
+
+/*
+
+=item C<void substr(INTVAL offset, INTVAL length, PMC* dest)>
+
+Extracts the substring starting at C<offset>, with size
+C<length>, and places it in C<dest>.
+
+=cut
+
+*/
+    void substr (INTVAL offset, INTVAL length, PMC* dest) {
+        STRING *s = PMC_str_val(SELF);
+        STRING *s2 = string_substr(INTERP, s, offset, length, NULL, 0);
+        VTABLE_set_string_native(INTERP, dest, s2);
+    }
+
+/*
+
+=item C<STRING* substr(INTVAL offset, INTVAL length)>
+
+Extracts the substring starting at C<offset>, with size
+C<length>, and returns it.
+
+=cut
+
+*/
+    STRING* substr_str (INTVAL offset, INTVAL length) {
+        STRING *s = PMC_str_val(SELF);
+        return string_substr(INTERP, s, offset, length, NULL, 0);
+    }
+
+/*
+
+=item C<INTVAL exists_keyed(PMC *key)>
+
+Returns true if the C<key>'th character in the string exists. Negative
+numbers count from the end.
+
+=cut
+
+*/
+
+    INTVAL exists_keyed(PMC* key) {
+        INTVAL n = string_length(INTERP, PMC_str_val(SELF));
+        INTVAL k = VTABLE_get_integer(INTERP, key);
+        return (INTVAL)( (k>=0 && k<=n) || (k<0 && -k<=n) );
+    }
+
+/*
+
+=item C<STRING *get_string_keyed(PMC *key)>
+
+Returns the C<key>'th character in the string. Negative numbers count
+from the end.
+
+=item C<INTVAL get_integer_keyed(PMC *key)>
+
+Returns the integer value (ord) at C<*key>.
+
+=item C<void set_string_keyed(PMC *key, STRING *val)>
+
+Replace the string at C<key> with C<value>.
+
+=item C<void set_integer_keyed(PMC *key, INTVAL val)>
+
+Replace the string at C<key> with the chr of C<value>.
+
+=cut
+
+*/
+
+    STRING* get_string_keyed(PMC* key) {
+        STRING *s = PMC_str_val(SELF);
+        INTVAL k = key_integer(INTERP, key);
+        return string_substr(INTERP, s, k, 1, NULL, 0);
+    }
+
+    INTVAL get_integer_keyed(PMC* key) {
+        STRING *s = PMC_str_val(SELF);
+
+        return string_ord(INTERP, s, key_integer(INTERP, key));
+    }
+
+    void set_string_keyed(PMC* key, STRING *value) {
+        STRING *s = PMC_str_val(SELF);
+	INTVAL len = string_length(INTERP, value);
+	string_replace(INTERP, s, key_integer(INTERP, key), len, value, NULL);
+    }
+
+    void set_integer_keyed(PMC* key, INTVAL value) {
+        STRING *s = PMC_str_val(SELF);
+	STRING *c = string_chr(INTERP, (UINTVAL) value);
+	string_replace(INTERP, s, key_integer(INTERP, key), 1, c, NULL);
+    }
+/*
+
+=item C<void replace(STRING* orig, STRING* new)>
+
+Replace every occurence of C<orig> with C<new>.
+
+=cut
+
+*/
+
+    METHOD void replace(STRING* orig, STRING* new) {
+        INTVAL i  = 0;
+        STRING *s = PMC_str_val(SELF);
+        INTVAL old_len = string_length(INTERP, orig);
+        INTVAL new_len = string_length(INTERP, new);
+        
+        while (-1 != (i = string_str_index(INTERP, s, orig, i)))
+        {
+            (void)string_replace(INTERP, s, i, old_len, new, NULL);
+            i += new_len;
+        }
+    }
+/*
+
+=back
+
+=head2 Iterator Interface
+
+=over 4
+
+=item C<PMC* slice (PMC *key, INTVAL f)>
+
+Return a new iterator for the slice PMC C<key> if f==0.
+
+Return a new pythonic slice if f == 1.
+
+=item C<PMC* get_iter (PMC *key)>
+
+Return a new iterator for this string.
+
+
+=item C<INTVAL elements ()>
+
+Return length of the string.
+
+
+=cut
+
+*/
+
+    INTVAL elements () {
+	return string_length(INTERP, PMC_str_val(SELF));
+    }
+
+    PMC* slice (PMC* key, INTVAL f) {
+        switch (f) {
+            case 0:
+                {
+                    PMC *iter = pmc_new_init(INTERP,
+                            enum_class_Iterator, SELF);
+                    PMC_struct_val(iter) = key;
+                    return iter;
+                }
+        }
+        internal_exception(1, "String: Unknown slice type");
+        return NULL;
+    }
+
+    PMC* get_iter () {
+	PMC *iter = pmc_new_init(INTERP, enum_class_Iterator, SELF);
+        PMC *key =  pmc_new(INTERP, enum_class_Key);
+        PMC_struct_val(iter) = key;
+        PObj_get_FLAGS(key) |= KEY_integer_FLAG;
+        PMC_int_val(key) = 0;
+        if (!string_length(INTERP, PMC_str_val(SELF)))
+            PMC_int_val(key) = -1;
+        return iter;
+    }
+
+/*
+
+=back
+
+=head2 Freeze/thaw Interface
+
+=over 4
+
+=item C<void freeze(visit_info *info)>
+
+Used to archive the string.
+
+=cut
+
+*/
+    void freeze(visit_info *info) {
+        IMAGE_IO *io = info->image_io;
+        SUPER(info);
+        io->vtable->push_string(INTERP, io, PMC_str_val(SELF));
+    }
+
+/*
+
+=item C<void thaw(visit_info *info)>
+
+Used to unarchive the string.
+
+=cut
+
+*/
+    void thaw(visit_info *info) {
+        IMAGE_IO *io = info->image_io;
+        SUPER(info);
+        if (info->extra_flags == EXTRA_IS_NULL)
+            PMC_str_val(SELF) = io->vtable->shift_string(INTERP, io);
+    }
+/*
+
+=back
+
+=head2 NCI methods
+
+=over 4
+
+=item C<PMC* lower()>
+
+Downcase this string
+
+=cut
+
+*/
+
+    METHOD PMC* lower() {
+        STRING *s = string_downcase(INTERP, PMC_str_val(SELF));
+        PMC *ret = pmc_new_noinit(INTERP, SELF->vtable->base_type);
+        PMC_str_val(ret) = s;
+        PObj_custom_mark_SET(ret);
+        return ret;
+    }
+}
+
+/*
+
+=back
+
+=cut
+
+*/
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+*/
+
+
+
+
+
+

@@ -327,7 +327,7 @@ Parrot_load_lib(Interp *interpreter, STRING *lib, PMC *initializer)
 
 =head1 SEE ALSO
 
-F<include/parrot/dynext.h> and F<classes/parrotlibrary.pmc>.
+F<include/parrot/dynext.h> and F<src/classes/parrotlibrary.pmc>.
 
 =head1 HISTORY
 

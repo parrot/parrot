@@ -45,7 +45,7 @@ END
       $charset_list = prompt('Which charsets would you like?', $charset_list);
     }
   }
-  # names of class files for classes/Makefile
+  # names of class files for src/classes/Makefile
   (my $TEMP_charset_o = $charset_list) =~ s/\.c/\$(O)/g;
 
   my $TEMP_charset_build = <<"E_NOTE";
