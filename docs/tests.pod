@@ -20,6 +20,9 @@ realclean> and recompile parrot before complaining.
 If your architecture supports JIT, you can test parrot JIT engine using C<make
 testj>. It works just like C<make test>, but uses the JIT engine when possible.
 
+C<make languages-test> runs the test suite for most language implementations
+in the languages directory.
+
 =head2 Submitting smoke test results
 
 Parrot has a status page with smoke test results
@@ -31,6 +34,9 @@ smoke server.
 
 It is also possible to run a smoke test on JIT. For that, try running
 C<env PARROT_ARGS=-j make smoke>.
+
+C<make languages-smoke> does smoke testing for most language implementations
+in the languages directory.
 
 =head1 How to write a test
 
