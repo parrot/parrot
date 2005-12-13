@@ -38,7 +38,7 @@ sub runstep {
 
   # This key should always exist unless the program couldn't be run,
   # which should have been caught by the 'die' above.
-  unless (exists $msvc{_MSC_VER}) {
+  unless (defined $msvc{_MSC_VER}) {
     Parrot::Configure::Data->set(msvcversion => undef);
     return;
   }
