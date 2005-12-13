@@ -491,6 +491,7 @@ examples/shootout/nsieve-bits-2.pir               [main]doc
 examples/shootout/pidigits.pir                    [main]doc
 examples/shootout/pidigits.py                     [main]doc
 examples/shootout/random.pasm                     [main]doc
+examples/shootout/random.pir                      [main]doc
 examples/sdl/anim_image.imc                       [devel]
 examples/sdl/anim_image_dblbuf.imc                [devel]
 examples/sdl/blue_font.imc                        [devel]
@@ -1501,6 +1502,7 @@ runtime/parrot/library/pcre.imc                   [library]
 runtime/parrot/library/postgres.declarations      [library]
 runtime/parrot/library/postgres.imc               [library]
 runtime/parrot/library/postgres.pasm              [library]
+runtime/parrot/library/random_lib.pir             [library]
 src/builtin.c                                     []
 src/byteorder.c                                   []
 src/call_list.txt                                 [devel]doc
