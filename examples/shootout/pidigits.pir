@@ -162,5 +162,16 @@ loop:
     print "\n" 
 n:
     if i < N goto loop
+    $I0 = i % width
+    unless $I0 goto done
+    $I0 = 10 - $I0
+rest:
+        print " "
+        dec $I0
+        if $I0 goto rest
+    print "\t:"
+    print N
+    print "\n" 
+done:
 .end
     
