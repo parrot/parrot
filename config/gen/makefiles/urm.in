@@ -44,7 +44,7 @@ clean:
 		"*~" "*.pasm" \
 		"*~" \
 		"\#*" \
-		"examples/*.pasm" examples/*.pbc" \
+		"examples/*.pasm" "examples/*.pbc" \
 		"examples/*~" \
 		"examples/\#*" \
 		"t/*.pasm" "t/*.urm" "t/*.out"
