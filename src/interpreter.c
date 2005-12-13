@@ -73,16 +73,51 @@ prederef_args(void **pc_prederef, Interp *interpreter,
 {
     struct PackFile_ConstTable * const_table
         = interpreter->code->const_table;
-    int i, regs_n, regs_i, regs_p, regs_s;
+    int i, n, m, regs_n, regs_i, regs_p, regs_s;
+    PMC *sig = NULL;
 
     regs_n = CONTEXT(interpreter->ctx)->n_regs_used[REGNO_NUM];
     regs_i = CONTEXT(interpreter->ctx)->n_regs_used[REGNO_INT];
     regs_p = CONTEXT(interpreter->ctx)->n_regs_used[REGNO_PMC];
     regs_s = CONTEXT(interpreter->ctx)->n_regs_used[REGNO_STR];
-    for (i = 1; i < opinfo->arg_count; i++) {
+    /* prederef var part too */
+    n = m = opinfo->arg_count; 
+    ADD_OP_VAR_PART(interpreter, interpreter->code, pc, n);
+    for (i = 1; i < n; i++) {
         opcode_t arg = pc[i];
+        int type, sigt;
+        if (i >= m) {
+	    sig = *(PMC**) pc_prederef[1]; 
+	    sigt = VTABLE_get_integer_keyed_int(interpreter, sig, i - m);
+	    type = -1;
+	    /* TODO unify PARROT_ARG_xy below */
+	    switch (sigt & PARROT_ARG_TYPE_MASK) {
+		case PARROT_ARG_INTVAL: 
+		    type = PARROT_ARG_I; 
+		    if (sigt & PARROT_ARG_CONSTANT)
+			type = PARROT_ARG_IC;
+		    break;
+		case PARROT_ARG_FLOATVAL: 
+		    type = PARROT_ARG_N; 
+		    if (sigt & PARROT_ARG_CONSTANT)
+			type = PARROT_ARG_NC;
+		    break;
+		case PARROT_ARG_STRING: 
+		    type = PARROT_ARG_S; 
+		    if (sigt & PARROT_ARG_CONSTANT)
+			type = PARROT_ARG_SC;
+		    break;
+		case PARROT_ARG_PMC: 
+		    type = PARROT_ARG_P; 
+		    if (sigt & PARROT_ARG_CONSTANT)
+			type = PARROT_ARG_PC;
+		    break;
+	    }
+        }
+	else
+	    type = opinfo->types[i];
 
-        switch (opinfo->types[i]) {
+        switch (type) {
 
         case PARROT_ARG_KI:
         case PARROT_ARG_I:
