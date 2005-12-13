@@ -6,13 +6,13 @@
 
 t/pmc/nil.t - LuaNil
 
-=head1 SYNOPSIS    
+=head1 SYNOPSIS
 
     % perl -I../../lib t/pmc/nil.t
 
 =head1 DESCRIPTION
 
-Tests C<LuaNil> PMC. 
+Tests C<LuaNil> PMC.
 
 =cut
 
@@ -148,7 +148,7 @@ CODE
 OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "check HLL");
-.HLL "Lua", "lua_group"            
+.HLL "Lua", "lua_group"
 .sub _main
     .local pmc pmc1
     pmc1 = new .LuaNil
@@ -164,5 +164,3 @@ CODE
 nil
 1
 OUTPUT
-
-

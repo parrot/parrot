@@ -12,7 +12,7 @@ t/pmc/boolean.t - LuaBoolean
 
 =head1 DESCRIPTION
 
-Tests C<LuaBoolean> PMC. 
+Tests C<LuaBoolean> PMC.
 
 =cut
 
@@ -124,4 +124,3 @@ CODE
 true
 1
 OUTPUT
-

@@ -6,13 +6,13 @@
 
 t/pmc/number.t - LuaNumber
 
-=head1 SYNOPSIS    
+=head1 SYNOPSIS
 
     % perl -I../../lib t/pmc/number.t
 
 =head1 DESCRIPTION
 
-Tests C<LuaNumber> PMC. 
+Tests C<LuaNumber> PMC.
 
 =cut
 
@@ -24,7 +24,7 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "check inheritance");
     loadlib P1, "lua_group"
     find_type $I0, "LuaNumber"
     .local pmc pmc1
-    pmc1 = new $I0                         
+    pmc1 = new $I0
     .local int bool1
     bool1 = isa pmc1, "scalar"
     print bool1
@@ -106,7 +106,7 @@ CODE
 OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "check HLL");
-.HLL "Lua", "lua_group"            
+.HLL "Lua", "lua_group"
 .sub _main
     .local pmc pmc1
     pmc1 = new .LuaNumber
@@ -125,7 +125,7 @@ CODE
 OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "check HLL (autoboxing)");
-.HLL "Lua", "lua_group"            
+.HLL "Lua", "lua_group"
 .sub _main
     .local pmc pmc1
     pmc1 = test()
@@ -143,4 +143,3 @@ CODE
 3.14
 1
 OUTPUT
-

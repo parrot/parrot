@@ -6,17 +6,17 @@
 
 t/pmc/string.t - LuaString
 
-=head1 SYNOPSIS    
+=head1 SYNOPSIS
 
     % perl -I../../lib t/pmc/string.t
 
 =head1 DESCRIPTION
 
-Tests C<LuaString> PMC. 
+Tests C<LuaString> PMC.
 
 =cut
 
-use Parrot::Test tests => 6;
+use Parrot::Test tests => 7;
 use Test::More;
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "check inheritance");
@@ -105,8 +105,24 @@ CODE
 1
 OUTPUT
 
+pir_output_is(<< 'CODE', << 'OUTPUT', "check embedded zero");
+.sub _main
+    loadlib P1, "lua_group"
+    find_type $I0, "LuaString"
+    .local pmc pmc1
+    pmc1 = new $I0
+    pmc1 = "embe\0_dd\0_ed\0"
+    .local int len1
+    len1 = elements pmc1
+    print len1
+    print "\n"
+.end
+CODE
+13
+OUTPUT
+
 pir_output_is(<< 'CODE', << 'OUTPUT', "check HLL");
-.HLL "Lua", "lua_group"            
+.HLL "Lua", "lua_group"
 .sub _main
     .local pmc pmc1
     pmc1 = new .LuaString
@@ -125,7 +141,7 @@ simple string
 OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "check HLL (autoboxing)");
-.HLL "Lua", "lua_group"            
+.HLL "Lua", "lua_group"
 .sub _main
     .local pmc pmc1
     pmc1 = test()
@@ -143,5 +159,3 @@ CODE
 simple string
 1
 OUTPUT
-
-

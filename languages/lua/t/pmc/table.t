@@ -6,17 +6,17 @@
 
 t/pmc/table.t - LuaTable
 
-=head1 SYNOPSIS    
+=head1 SYNOPSIS
 
     % perl -I../../lib t/pmc/table.t
 
 =head1 DESCRIPTION
 
-Tests C<LuaTable> PMC. 
+Tests C<LuaTable> PMC.
 
 =cut
 
-use Parrot::Test tests => 11;
+use Parrot::Test tests => 9;
 use Test::More;
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "check inheritance");
@@ -119,72 +119,6 @@ CODE
 1
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "check key string");
-.sub _main
-    loadlib P1, "lua_group"
-    find_type $I0, "LuaTable"
-    .local pmc pmc1
-    pmc1 = new $I0
-    find_type $I0, "LuaString"
-    .local pmc val1
-    val1 = new $I0
-    val1 = "value1" 
-    .local pmc val2
-    val2 = new $I0
-    val2 = "value2" 
-    pmc1["key1"] = val1
-    pmc1["key2"] = val2
-    .local pmc ret
-    ret = pmc1["key1"]
-    print ret
-    print "\n"
-    ret = pmc1["key2"]
-    print ret
-    print "\n"
-    ret = pmc1["unknown"]
-    print ret
-    print "\n"
-    end
-.end
-CODE
-value1
-value2
-nil
-OUTPUT
-
-pir_output_is(<< 'CODE', << 'OUTPUT', "check key int");
-.sub _main
-    loadlib P1, "lua_group"
-    find_type $I0, "LuaTable"
-    .local pmc pmc1
-    pmc1 = new $I0
-    find_type $I0, "LuaString"
-    .local pmc val1
-    val1 = new $I0
-    val1 = "value1" 
-    .local pmc val2
-    val2 = new $I0
-    val2 = "value2" 
-    pmc1[1] = val1
-    pmc1[2] = val2
-    .local pmc ret
-    ret = pmc1[1]
-    print ret
-    print "\n"
-    ret = pmc1[2]
-    print ret
-    print "\n"
-    ret = pmc1[0]
-    print ret
-    print "\n"
-    end
-.end
-CODE
-value1
-value2
-nil
-OUTPUT
-
 pir_output_is(<< 'CODE', << 'OUTPUT', "check key PMC");
 .sub _main
     loadlib P1, "lua_group"
@@ -269,7 +203,7 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "check deletion by assignment of nil");
     pmc1[val1] = nil
     nb1 = elements pmc1
     print nb1
-    print "\n" 
+    print "\n"
     end
 .end
 CODE
@@ -280,7 +214,7 @@ CODE
 OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "check HLL");
-.HLL "Lua", "lua_group"            
+.HLL "Lua", "lua_group"
 .sub _main
     .local pmc pmc1
     pmc1 = new .LuaTable
@@ -293,5 +227,3 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "check HLL");
 CODE
 1
 OUTPUT
-
-
