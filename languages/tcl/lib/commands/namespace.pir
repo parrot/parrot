@@ -144,3 +144,36 @@ WHOLE:
   .throw ("wrong # args: should be \"namespace tail string\"")
 
 .end
+
+.sub 'eval'
+.end
+
+.sub 'export'
+.end
+
+.sub 'children'
+.end
+
+.sub 'code'
+.end
+
+.sub 'export'
+.end
+
+.sub 'forget'
+.end
+
+.sub 'import'
+.end
+
+.sub 'inscope'
+.end
+
+.sub 'origin'
+.end
+
+.sub 'parent'
+.end
+
+.sub 'which'
+.end

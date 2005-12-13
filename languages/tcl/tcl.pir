@@ -71,7 +71,9 @@ input_loop:
 loop_error:
   .local pmc exception
   get_results "(0)", exception
-  # Are we just missing a close-foo? XXX probably not the best way to check.
+  # Are we just missing a close-foo?
+  # XXX Should add check to make sure we're dealing with a tcl exception
+  #     and not a mere parrot one.
   $P0 = exception[0] # message
   $S0 = $P0
   if $S0 == "missing close-brace" goto input_loop_continue2
