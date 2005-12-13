@@ -31,6 +31,7 @@ sub runstep {
 
     return if $miniparrot;
 
+    my $jitbase             = "jit"; # base path for jit sources
     my $archname            =  $Config{archname};
     my ($cpuarch, $osname)  =  split( /-/, $archname);
 
@@ -73,9 +74,9 @@ sub runstep {
     my $jitarchname = "$cpuarch-$osname";
     my ( $jitcapable, $execcapable ) = ( 0, 0 );
 
-    print( qq{-e "jit/$cpuarch/core.jit" = }, -e "jit/$cpuarch/core.jit" ? 'yes' : 'no', "\n" ) if $verbose;
+    print( qq{-e "$jitbase/$cpuarch/core.jit" = }, -e "$jitbase/$cpuarch/core.jit" ? 'yes' : 'no', "\n" ) if $verbose;
 
-    if (-e "jit/$cpuarch/core.jit") {
+    if (-e "$jitbase/$cpuarch/core.jit") {
         $jitcapable = 1;
 	# XXX disable sun4 - doesn't even build
         if ($cpuarch =~ /sun4|sparc64/ && (1 || 
@@ -85,12 +86,12 @@ sub runstep {
         }
     }
 
-    if (-e "jit/$cpuarch/$jitarchname.s") {
-        copy_if_diff("jit/$cpuarch/$jitarchname.s", "src/asmfun.s");
+    if (-e "$jitbase/$cpuarch/$jitarchname.s") {
+        copy_if_diff("$jitbase/$cpuarch/$jitarchname.s", "src/asmfun.s");
         Parrot::Configure::Data->set(asmfun_o => 'src/asmfun$(O)');
     }
-    elsif (-e "jit/$cpuarch/asm.s") {
-        copy_if_diff("jit/$cpuarch/asm.s", "src/asmfun.s");
+    elsif (-e "$jitbase/$cpuarch/asm.s") {
+        copy_if_diff("$jitbase/$cpuarch/asm.s", "src/asmfun.s");
         Parrot::Configure::Data->set(asmfun_o => 'src/asmfun$(O)');
     }
     else {
