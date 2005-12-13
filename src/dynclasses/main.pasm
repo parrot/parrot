@@ -4,13 +4,13 @@
 
 # running:
 # $ export LD_LIBRARY_PATH=.:blib/lib
-# $ make -C dynclasses
-# $ parrot dynclasses/main.pasm
+# $ make -C src/dynclasses
+# $ parrot src/dynclasses/main.pasm
 
 _main:
 	loadlib P1, "subproxy"
 	new P3, .Key
-	set P3, "dynclasses/ext.pir"	# file - FIXME path handling
+	set P3, "src/dynclasses/ext.pir"	# file - FIXME path handling
 	new P4, .Key
 	set P4, "_ext_main"	# sub label
 	push P3, P4

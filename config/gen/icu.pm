@@ -98,7 +98,7 @@ sub runstep {
   if ($without) {
     Parrot::Configure::Data->set(
       has_icu     => 0,
-      icu_shared  => '',  # used for generating dynclasses/Makefile
+      icu_shared  => '',  # used for generating src/dynclasses/Makefile
       icu_datadir => '',  # used for generation Makefile
     );
     $result = "no" unless defined $Configure::Step::result;

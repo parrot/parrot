@@ -66,7 +66,7 @@ sub makefiles {
   genfile('config/gen/makefiles/tge.in'       => 'compilers/tge/Makefile',
           commentType       => '#',
           replace_slashes   => 1);
-  genfile('config/gen/makefiles/dynclasses.in' => 'dynclasses/Makefile',
+  genfile('config/gen/makefiles/dynclasses.in' => 'src/dynclasses/Makefile',
           commentType       => '#',
           replace_slashes   => 1, 
           conditioned_lines => 1);

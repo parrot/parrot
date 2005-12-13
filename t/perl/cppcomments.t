@@ -28,13 +28,13 @@ my @globs = qw(
     compilers/ast/*.h
     compilers/imcc/*.c
     compilers/imcc/*.h
-    dynclasses/*.pmc
     include/parrot/*.h
     include/parrot/oplib/*.h
     jit/*/*.h
     src/*.c
     src/classes/*.pmc
     src/classes/*.c
+    src/dynclasses/*.pmc
     src/encodings/*.c
     src/io/*.c
     src/io/*.h

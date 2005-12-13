@@ -158,7 +158,6 @@ GEN_MAKEFILES = \
 #CONDITIONED_LINE(has_perldoc):	docs/Makefile \
 	compilers/pge/Makefile \
 	compilers/tge/Makefile \
-	dynclasses/Makefile \
 	editor/Makefile \
 	languages/Makefile \
 	languages/amber/Makefile \
@@ -180,6 +179,7 @@ GEN_MAKEFILES = \
 	languages/tcl/examples/Makefile \
 	languages/urm/Makefile \
 	languages/Zcode/Makefile \
+	src/dynclasses/Makefile \
 	src/dynoplibs/Makefile
 
 GEN_CONFIGS = \
@@ -641,9 +641,9 @@ help :
 	@echo "  reconfig:          'clean' and redo configuration."
 	@echo ""
 	@echo "Dynamic PMCs:"
-	@echo "  dynclasses:        Proxy for default target of dynclasses/Makefile"
-	@echo "  dynclasses-test:   Proxy for target 'test' of dynclasses/Makefile"
-	@echo "  dynclasses-clean:  Proxy for target 'clean' of dynclasses/Makefile"
+	@echo "  dynclasses:        Proxy for default target of src/dynclasses/Makefile"
+	@echo "  dynclasses-test:   Proxy for target 'test' of src/dynclasses/Makefile"
+	@echo "  dynclasses-clean:  Proxy for target 'clean' of src/dynclasses/Makefile"
 	@echo ""
 	@echo "Language implementations:"
 	@echo "  compilers:         Proxy for default target of pge and tge compilers"
@@ -1196,13 +1196,13 @@ dynclasses : dynclasses.dummy
 
 # XXX this dependancy is too broad, and should be narrowed down
 dynclasses.dummy : $(PARROT)
-	$(MAKE) dynclasses
+	$(MAKE) src/dynclasses
 
 dynclasses-test :
-	$(MAKE) dynclasses test
+	$(MAKE) src/dynclasses test
 
 dynclasses-clean :
-	$(MAKE) dynclasses clean
+	$(MAKE) src/dynclasses clean
 
 ###############################################################################
 #

@@ -1,7 +1,7 @@
 /*
  * Sample SubProxy class
  *
- * s. dynclasses/main.pasm for usage
+ * s. src/dynclasses/main.pasm for usage
  */
 
 #include "parrot/parrot.h"
