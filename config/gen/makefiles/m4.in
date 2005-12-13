@@ -70,15 +70,15 @@ html:
 clean:
 	$(RM_RF) \
 m4.pbc \
-*.pdb \
-*.obj \
-src/*.pbc \
-src/*~ \
-t/*/*.m4 \
-t/*/*.parrot_out \
-t/*/*.gnu_out \
-t/*/*.imc \
-t/*/*.pir \
+"*.pdb" \
+"*.obj" \
+"src/*.pbc" \
+"src/*~" \
+"t/*/*.m4" \
+"t/*/*.parrot_out" \
+"t/*/*.gnu_out" \
+"t/*/*.imc" \
+"t/*/*.pir" \
 $(M4_EVALUATE_SO) 
 
 realclean: clean

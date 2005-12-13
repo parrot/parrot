@@ -46,13 +46,13 @@ pmcs:
 	@cd $(CLASSDIR) && $(BUILDPMC) copy "--destination=$(DESTDIR)" $(PMCS)
 
 CLEANERS = \
-$(CLASSDIR)${slash}pmc_*.h \
-$(CLASSDIR)${slash}amber_*.h \
-$(CLASSDIR)${slash}*.dump \
-#CONDITIONED_LINE(ld_parrot_exe_def):$(CLASSDIR)${slash}*.def \
-$(CLASSDIR)${slash}*.c \
-$(CLASSDIR)${slash}*$(LOAD_EXT) \
-$(CLASSDIR)${slash}*$(O)
+"$(CLASSDIR)${slash}pmc_*.h" \
+"$(CLASSDIR)${slash}amber_*.h" \
+"$(CLASSDIR)${slash}*.dump" \
+#CONDITIONED_LINE(ld_parrot_exe_def):"$(CLASSDIR)${slash}*.def" \
+"$(CLASSDIR)${slash}*.c" \
+"$(CLASSDIR)${slash}*$(LOAD_EXT)" \
+"$(CLASSDIR)${slash}*$(O)"
 
 clean:
 	$(RM_F) $(CLEANERS)

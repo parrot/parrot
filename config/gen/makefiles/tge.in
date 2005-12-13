@@ -43,7 +43,7 @@ test: all
 	prove -r ../../t/compilers/tge
 
 testclean:
-	$(RM_RF) ../../t/compilers/tge/*.pir
+	$(RM_RF) "../../t/compilers/tge/*.pir"
 
 clean: testclean
 	$(RM_RF) TGE.pbc $(PARROT_LIBRARY)${slash}TGE.pbc

@@ -58,7 +58,7 @@ test : all
 	cd .. ; perl -Ilib t/harness t/dynclass/*.t
 
 testclean :
-	$(RM_F) ../t/dynclass/*.pir ../t/dynclass/*.pbc
+	$(RM_F) "../t/dynclass/*.pir" "../t/dynclass/*.pbc"
 
 # win32 import library
 # win32 program data base - contains debugging info
@@ -66,10 +66,10 @@ testclean :
 # win32 exported functions and data items
 # win32 export definition files
 dynext-clean :
-	$(RM_F) *.lib *.pdb *.ilk *.exp *.def
+	$(RM_F) "*.lib" "*.pdb" "*.ilk" "*.exp" "*.def"
 
 clean : testclean dynext-clean
-	$(RM_F) *.c pmc_*.h *_group.h *$(LOAD_EXT) *.dump lib-* *$(O)
+	$(RM_F) "*.c" "pmc_*.h" "*_group.h" "*$(LOAD_EXT)" "*.dump" "lib-*" "*$(O)"
 
 realclean: clean
 	$(RM_F) Makefile build.pl

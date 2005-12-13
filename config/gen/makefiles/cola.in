@@ -51,11 +51,11 @@ nogen : gen$(O) semant$(O) sym$(O) type$(O)
 	$(CC) $(DEBUG) -o colacc$(EXE) parser$(O) lexer$(O) gen$(O) semant$(O) sym$(O) type$(O) $(LIBS)
 
 clean :
-	$(RM_F) core
-	$(RM_F) *.obj *.pdb *.ilk
-	$(RM_F) *$(O)
-	$(RM_F) parser.output
-	$(RM_F) colacc$(EXE)
+	$(RM_F) core \
+	  "*.obj" "*.pdb" "*.ilk" \
+	  "*$(O)" \
+	  parser.output \
+	  colacc$(EXE)
 
 # Don't run this target unless you have bison and flex
 # installed to regenerate the needed files.

@@ -35,9 +35,9 @@ build: ook.pasm
 
 clean:
 	$(RM_F) core \
-    *.pbc \
-    *~ \
-    foo.p*
+    "*.pbc" \
+    "*~" \
+    "foo.p*"
 
 realclean: clean
 	$(RM_RF) Makefile

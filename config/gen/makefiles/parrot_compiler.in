@@ -30,10 +30,11 @@ test :
 	cd .. && $(PERL) -I../lib parrot_compiler/t/harness
 
 clean :
-	$(RM_F) *.pbc parrot_compiler.pasm t/*/*.pbc
+	$(RM_F) "*.pbc" parrot_compiler.pasm "t/*/*.pbc"
 
 realclean : clean
-	$(RM_F) core *.pbc
+	$(RM_F) core "*.pbc"
+
 
 parrot.pbc : parrot.pasm
 	$(PARROT) -o parrot.pbc parrot.pasm

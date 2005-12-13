@@ -54,9 +54,9 @@ $(PYTHON_RUNTIME_FILES): grammar/bc_python.g grammar/antlr2past.g
 
 clean:
 	$(RM_RF) \
-    python/lib/bc/*.pyc \
-    python/lib/antlr/*.pyc \
-    t/*.bc t/*.pir t/*.posix_out t/*.parrot_out
+    "python/lib/bc/*.pyc" \
+    "python/lib/antlr/*.pyc" \
+    "t/*.bc" "t/*.pir" "t/*.posix_out" "t/*.parrot_out"
 
 realclean: clean
 	$(RM_RF) \

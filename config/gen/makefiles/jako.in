@@ -96,7 +96,7 @@ examples/queens.pbc:     examples/queens.imc
 #
 
 clean:
-	$(RM_F) examples/*.imc examples/*.list examples/*.pbc
+	$(RM_F) "examples/*.imc" "examples/*.list" "examples/*.pbc"
 
 over:
 	@$(MAKE) clean

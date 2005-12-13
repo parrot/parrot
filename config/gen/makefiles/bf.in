@@ -34,7 +34,7 @@ bfco.pbc: bfco.pir
 	$(PARROT) -o bfco.pbc bfco.pir
 
 clean:
-	$(RM_F) core *.pbc *~
+	$(RM_F) core "*.pbc" "*~"
 
 realclean: clean
 	$(RM_RF) Makefile

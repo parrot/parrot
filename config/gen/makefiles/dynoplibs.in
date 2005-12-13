@@ -43,7 +43,7 @@ all: myops_ops$(LOAD_EXT) myops_ops_cg$(LOAD_EXT) myops_ops_cgp$(LOAD_EXT) \
 	$(PERL) -MFile::Copy=cp -e ${PQ}cp q|$@|, q|../runtime/parrot/dynext/$@|${PQ}
 
 clean :
-	$(RM_F) *.c *.h *$(LOAD_EXT)
+	$(RM_F) "*.c" "*.h" "*$(LOAD_EXT)"
 
 realclean: clean
 	$(RM_F) Makefile

@@ -61,10 +61,10 @@ all: test.pbc and.pbc foo.pbc
 clean:
 	$(RM_F) \
 foo.pasm foo.pbc \
-t/*/*.pasm \
-t/*/*.pbc \
-t/*/*.mpl \
-t/*/*.out
+"t/*/*.pasm" \
+"t/*/*.pbc" \
+"t/*/*.mpl" \
+"t/*/*.out"
 
 over:
 	@make clean

@@ -40,14 +40,14 @@ build:
 
 clean:
 	$(RM_F) \
-		core *.pbc *~ foo.p* \
-		*~ *.pasm \
-		*~ \
-		\#* \
-		examples/*.pasm examples/*.pbc \
-		examples/*~ \
-		examples/\#* \
-		t/*.pasm t/*.urm t/*.out
+		core "*.pbc" "*~" "foo.p*" \
+		"*~" "*.pasm" \
+		"*~" \
+		"\#*" \
+		"examples/*.pasm" examples/*.pbc" \
+		"examples/*~" \
+		"examples/\#*" \
+		"t/*.pasm" "t/*.urm" "t/*.out"
 
 realclean: clean
 	$(RM_F) Makefile
