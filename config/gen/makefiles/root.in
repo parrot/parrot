@@ -1648,5 +1648,9 @@ smoke : all
 	$(PERL) t/harness --html $(EXTRA_TEST_ARGS) $(PARROT_ARGS)
 	$(PERL) tools/util/smokeserv-client.pl smoke.html
 
+smokej : all
+	$(PERL) t/harness --html $(EXTRA_TEST_ARGS) -j $(PARROT_ARGS)
+	$(PERL) tools/util/smokeserv-client.pl smoke.html
+
 smoke-clean :
 	$(RM_F) smoke.html

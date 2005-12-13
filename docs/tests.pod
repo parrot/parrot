@@ -33,7 +33,7 @@ results. At the end, it will try to upload the test results to the
 smoke server.
 
 It is also possible to run a smoke test on JIT. For that, try running
-C<env PARROT_ARGS=-j make smoke>.
+C<make smokej>.
 
 C<make languages-smoke> does smoke testing for most language implementations
 in the languages directory.
