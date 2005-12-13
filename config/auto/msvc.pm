@@ -38,7 +38,10 @@ sub runstep {
 
   # This key should always exist unless the program couldn't be run,
   # which should have been caught by the 'die' above.
+  # Therefore, test if it's defined to see if MSVC's installed.
+  # return 'no' if it's not.
   unless (defined $msvc{_MSC_VER}) {
+    $result = 'no';
     Parrot::Configure::Data->set(msvcversion => undef);
     return;
   }
