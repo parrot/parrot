@@ -165,7 +165,7 @@ my $include = "parrot/oplib/${base}_ops${suffix}.h";
 my $header  = "include/$include";
 my $source  = "src/ops/${base}_ops${suffix}.c";
 
-if ($base =~ m!^dynoplibs/! || $dynamic_flag) {
+if ($base =~ m!^src/dynoplibs/! || $dynamic_flag) {
     $source  =~ s!src/ops/!!;
     $header = "${base}_ops${suffix}.h";
     $base =~ s!^.*[/\\]!!;

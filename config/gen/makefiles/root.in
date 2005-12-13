@@ -155,32 +155,32 @@ NONGEN_HEADERS  = ${TEMP_nongen_headers}
 
 GEN_MAKEFILES = \
 	Makefile \
-	languages/Makefile \
 #CONDITIONED_LINE(has_perldoc):	docs/Makefile \
-	dynclasses/Makefile \
-	dynoplibs/Makefile \
-	languages/amber/Makefile \
-	languages/cola/Makefile \
-	languages/parrot_compiler/Makefile \
-	languages/jako/Makefile \
-	languages/miniperl/Makefile \
-	languages/scheme/Makefile \
-	languages/befunge/Makefile \
-	languages/bf/Makefile \
-	languages/ook/Makefile \
-	languages/lisp/Makefile \
-	languages/m4/Makefile \
-	languages/perl6/Makefile \
-	languages/urm/Makefile \
-	languages/tcl/Makefile \
-	languages/tcl/examples/Makefile \
-	editor/Makefile \
 	compilers/pge/Makefile \
 	compilers/tge/Makefile \
-	languages/punie/Makefile \
+	dynclasses/Makefile \
+	editor/Makefile \
+	languages/Makefile \
+	languages/amber/Makefile \
 	languages/bc/Makefile \
+	languages/befunge/Makefile \
+	languages/bf/Makefile \
+	languages/cola/Makefile \
+	languages/jako/Makefile \
+	languages/lisp/Makefile \
+	languages/lua/Makefile \
+	languages/m4/Makefile \
+	languages/miniperl/Makefile \
+	languages/ook/Makefile \
+	languages/parrot_compiler/Makefile \
+	languages/perl6/Makefile \
+	languages/punie/Makefile \
+	languages/scheme/Makefile \
+	languages/tcl/Makefile \
+	languages/tcl/examples/Makefile \
+	languages/urm/Makefile \
 	languages/Zcode/Makefile \
-	languages/lua/Makefile
+	src/dynoplibs/Makefile
 
 GEN_CONFIGS = \
 	include/parrot/config.h \

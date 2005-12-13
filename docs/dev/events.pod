@@ -32,7 +32,7 @@ responsible for signal and IO related events.
 
 Events can be either timed (they are due after some elapsed time) or untimed.
 For the former there is one API call: B<Parrot_new_timer_event>, used by the
-F<dynoplibs/myops.ops>:B<alarm> opcode for testing.
+F<src/dynoplibs/myops.ops>:B<alarm> opcode for testing.
 
 =head2 The B<event_thread>
 

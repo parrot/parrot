@@ -70,7 +70,7 @@ sub makefiles {
           commentType       => '#',
           replace_slashes   => 1, 
           conditioned_lines => 1);
-  genfile('config/gen/makefiles/dynoplibs.in' => 'dynoplibs/Makefile',
+  genfile('config/gen/makefiles/dynoplibs.in' => 'src/dynoplibs/Makefile',
           commentType       => '#',
           replace_slashes   => 1);
   genfile('config/gen/makefiles/editor.in'    => 'editor/Makefile',
