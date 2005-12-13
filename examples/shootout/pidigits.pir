@@ -164,7 +164,7 @@ n:
     if i < N goto loop
     $I0 = i % width
     unless $I0 goto done
-    $I0 = 10 - $I0
+    $I0 = width - $I0
 rest:
         print " "
         dec $I0
