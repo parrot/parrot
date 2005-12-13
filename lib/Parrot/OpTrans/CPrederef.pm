@@ -192,18 +192,18 @@ sub access_arg
         'op' => "cur_opcode[%ld]",
 
         'i'  => "(*(INTVAL *)OP_AS_OFFS(%ld))",
+        'ki'  => "(*(INTVAL *)OP_AS_OFFS(%ld))",
         'n'  => "(*(FLOATVAL *)OP_AS_OFFS(%ld))",
         'p'  => "(*(PMC **)OP_AS_OFFS(%ld))",
         's'  => "(*(STRING **)OP_AS_OFFS(%ld))",
         'k'  => "(*(PMC **)OP_AS_OFFS(%ld))",
-        'ki'  => "(*(INTVAL *)OP_AS_OFFS(%ld))",
 
-        'ic' => "(*(INTVAL *)cur_opcode[%ld])",
+        'ic' => "((INTVAL)cur_opcode[%ld])",
+        'kic' => "((INTVAL)cur_opcode[%ld])",
         'nc' => "(*(FLOATVAL *)cur_opcode[%ld])",
-        'pc' => "(*(PMC **)cur_opcode[%ld])",
         'sc' => "(*(STRING **)cur_opcode[%ld])",
+        'pc' => "(*(PMC **)cur_opcode[%ld])",
         'kc' => "(*(PMC **)cur_opcode[%ld])",
-        'kic' => "(*(INTVAL *)cur_opcode[%ld])"
     );
 
     die "Unrecognized type '$type' for num '$num' in opcode @{[$op->full_name]}"

@@ -147,7 +147,7 @@ prederef_args(void **pc_prederef, Interp *interpreter,
 
         case PARROT_ARG_KIC:
         case PARROT_ARG_IC:
-            pc_prederef[i] = (void *)&pc[i];
+            pc_prederef[i] = (void *)pc[i];
             break;
 
         case PARROT_ARG_NC:

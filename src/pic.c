@@ -390,9 +390,6 @@ is_pic_param(Interp *interpreter, void **pc, Parrot_MIC* mic, opcode_t op)
     return 1;
 }
 
-#define N_STATIC_TYPES 500
-static INTVAL pmc_type_numbers[N_STATIC_TYPES];
-
 void
 parrot_PIC_prederef(Interp *interpreter, opcode_t op, void **pc_pred, int core)
 {
@@ -426,22 +423,12 @@ parrot_PIC_prederef(Interp *interpreter, opcode_t op, void **pc_pred, int core)
                 if (type <= 0)
                     real_exception(interpreter, NULL, NO_CLASS,
                             "Class '%Ss' not found", class);
-                if (type >= N_STATIC_TYPES)
-                    internal_exception(1, "Unimp: too many classes");
-                /*
-                 * the prederef bytecode needs the address of
-                 * an INTVAL holding the type
-                 *
-                 * TODO if beyond limit use a malloced array
-                 *      or just C<break> instead w/o rewriting the op
-                 */
-                pmc_type_numbers[type] = type;
-                pc_pred[2] = pmc_type_numbers + type;
+                pc_pred[2] = (void*)type;
                 op = PARROT_OP_new_p_ic;
             }
             break;
         case PARROT_OP_infix_ic_p_p:
-            mic->m.func_nr = *(INTVAL*) cur_opcode[1];
+            mic->m.func_nr = (INTVAL) cur_opcode[1];
             pc_pred[1] = (void*) mic;
             op = PARROT_OP_pic_infix___ic_p_p;
             break;
@@ -535,7 +522,7 @@ parrot_pic_find_infix_v_pp(Interp *interpreter, PMC *left, PMC *right,
         ((void**)cur_opcode)[0] =
             parrot_pic_opcode(interpreter, PARROT_OP_infix_ic_p_p);
         /* restore 1st operand i.e. .MMD_func_nr */
-        ((void**)cur_opcode)[1] = (void*)real_op;
+        ((void**)cur_opcode)[1] = (void*)*real_op;
         mic->lru.f.sub = (PMC*)F2DPTR(func);
     }
     else {
