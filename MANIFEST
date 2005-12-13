@@ -490,6 +490,7 @@ examples/shootout/nsieve-bits.pir                 [main]doc
 examples/shootout/nsieve-bits-2.pir               [main]doc
 examples/shootout/pidigits.pir                    [main]doc
 examples/shootout/pidigits.py                     [main]doc
+examples/shootout/random.pasm                     [main]doc
 examples/sdl/anim_image.imc                       [devel]
 examples/sdl/anim_image_dblbuf.imc                [devel]
 examples/sdl/blue_font.imc                        [devel]
