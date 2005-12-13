@@ -84,6 +84,7 @@ imcc_globals_destroy(int ex, void *param)
             mem_sys_free(s);
             s = prev_s;
         }
+	clear_sym_hash(&cs->key_consts);
         prev_cs = cs->prev;
         mem_sys_free(cs);
         cs = prev_cs;

@@ -1216,6 +1216,8 @@ Parrot_dod_ms_run(Interp *interpreter, int flags)
      */
     if (flags & DOD_finish_FLAG) {
         Parrot_dod_sweep(interpreter, interpreter->arena_base->pmc_pool);
+        Parrot_dod_sweep(interpreter, 
+		interpreter->arena_base->constant_pmc_pool);
         return;
     }
     ++arena_base->DOD_block_level;

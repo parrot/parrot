@@ -637,8 +637,12 @@ free_sym(SymReg *r)
     if (r->pcc_sub) {
         if (r->pcc_sub->args)
             free(r->pcc_sub->args);
+        if (r->pcc_sub->arg_flags)
+            free(r->pcc_sub->arg_flags);
         if (r->pcc_sub->ret)
             free(r->pcc_sub->ret);
+        if (r->pcc_sub->ret_flags)
+            free(r->pcc_sub->ret_flags);
         free(r->pcc_sub);
     }
     /* TODO free keychain */
@@ -784,15 +788,20 @@ clear_sym_hash(SymHash *hsh)
 {
     int i;
     SymReg * p, *next;
+    if (!hsh->data) 
+	return;
     for (i = 0; i < hsh->size; i++) {
-        for (p = hsh->data[i]; p; ) {
+	for (p = hsh->data[i]; p; ) {
 	    next = p->next;
-            free_sym(p);
-            p = next;
-        }
-        hsh->data[i] = NULL;
+	    free_sym(p);
+	    p = next;
+	}
+	hsh->data[i] = NULL;
     }
+    mem_sys_free(hsh->data);
+    hsh->data = NULL;
     hsh->entries = 0;
+    hsh->size = 0;
 }
 
 void
