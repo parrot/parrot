@@ -175,6 +175,7 @@ inline op pic_get_params__(inconst PMC) :pic {
     /* no match redo plain opcode */
     ((void**)cur_opcode)[0] =
 	parrot_pic_opcode(interpreter, PARROT_OP_get_params_pc);
+    ((void**)cur_opcode)[1] = lru->u.signature;
     goto OFFSET(0);
 }
 
@@ -215,6 +216,7 @@ inline op pic_set_returns__(inconst PMC) :pic {
     /* no match redo plain opcode */
     ((void**)cur_opcode)[0] =
 	parrot_pic_opcode(interpreter, PARROT_OP_set_returns_pc);
+    ((void**)cur_opcode)[1] = lru->u.signature;
     goto OFFSET(0);
 }
 

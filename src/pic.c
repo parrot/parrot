@@ -340,7 +340,7 @@ is_pic_param(Interp *interpreter, void **pc, Parrot_MIC* mic, opcode_t op)
     PMC *ccont;
 
     /* check params */
-    sig = *(PMC**)pc[1];
+    sig = (PMC*)(pc[1]);
     n = pic_check_sig(interpreter, sig, &type);
     if (n == -1)
         return 0;
@@ -386,7 +386,7 @@ is_pic_param(Interp *interpreter, void **pc, Parrot_MIC* mic, opcode_t op)
             return 0;
     }
     mic->m.arg_count = n;
-    mic->lru.u.signature = sig;
+    mic->lru.u.signature = (PMC*)(pc[1]);
     return 1;
 }
 

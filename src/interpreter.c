@@ -87,7 +87,7 @@ prederef_args(void **pc_prederef, Interp *interpreter,
         opcode_t arg = pc[i];
         int type, sigt;
         if (i >= m) {
-	    sig = *(PMC**) pc_prederef[1]; 
+	    sig = (PMC*) pc_prederef[1]; 
 	    sigt = VTABLE_get_integer_keyed_int(interpreter, sig, i - m);
 	    type = -1;
 	    /* TODO unify PARROT_ARG_xy below */
@@ -166,8 +166,7 @@ prederef_args(void **pc_prederef, Interp *interpreter,
         case PARROT_ARG_KC:
             if (arg < 0 || arg >= const_table->const_count)
                 internal_exception(INTERP_ERROR, "Illegal constant number");
-            pc_prederef[i] = (void *)
-                &const_table->constants[arg]->u.key;
+            pc_prederef[i] = (void *)const_table->constants[arg]->u.key;
             break;
         default:
             internal_exception(ARG_OP_NOT_HANDLED,
