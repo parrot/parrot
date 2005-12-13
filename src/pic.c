@@ -414,7 +414,7 @@ parrot_PIC_prederef(Interp *interpreter, opcode_t op, void **pc_pred, int core)
             {
                 STRING *class;
                 INTVAL type;
-                class = *(STRING **)cur_opcode[2];
+                class = (STRING *)cur_opcode[2];
                 type = pmc_type(interpreter, class);
                 if (!type) {
                     Parrot_autoload_class(interpreter, class);

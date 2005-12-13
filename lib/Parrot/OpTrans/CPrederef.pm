@@ -201,7 +201,7 @@ sub access_arg
         'ic' => "((INTVAL)cur_opcode[%ld])",
         'kic' => "((INTVAL)cur_opcode[%ld])",
         'nc' => "(*(FLOATVAL *)cur_opcode[%ld])",
-        'sc' => "(*(STRING **)cur_opcode[%ld])",
+        'sc' => "((STRING *)cur_opcode[%ld])",
         'pc' => "(*(PMC **)cur_opcode[%ld])",
         'kc' => "(*(PMC **)cur_opcode[%ld])",
     );

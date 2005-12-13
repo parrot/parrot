@@ -159,8 +159,7 @@ prederef_args(void **pc_prederef, Interp *interpreter,
         case PARROT_ARG_SC:
             if (arg < 0 || arg >= const_table->const_count)
                 internal_exception(INTERP_ERROR, "Illegal constant number");
-            pc_prederef[i] = (void *)
-                &const_table->constants[arg]->u.string;
+            pc_prederef[i] = (void *)const_table->constants[arg]->u.string;
             break;
 
         case PARROT_ARG_PC:
