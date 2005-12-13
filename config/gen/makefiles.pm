@@ -81,7 +81,8 @@ sub makefiles {
           replace_slashes   => 1);
   genfile('config/gen/makefiles/amber.in'     => 'languages/amber/Makefile',
           commentType       => '#',
-          replace_slashes   => 1);
+          replace_slashes   => 1, 
+          conditioned_lines => 1);
   genfile('config/gen/makefiles/bc.in'        => 'languages/bc/Makefile',
           commentType => '#', 
           replace_slashes => 1);
@@ -102,7 +103,8 @@ sub makefiles {
           replace_slashes   => 1);
   genfile('config/gen/makefiles/lua.in'       => 'languages/lua/Makefile',
           commentType       => '#',
-          replace_slashes   => 1);
+          replace_slashes   => 1, 
+          conditioned_lines => 1);
   genfile('config/gen/makefiles/miniperl.in'  => 'languages/miniperl/Makefile',
           commentType       => '#',
           replace_slashes   => 1);
@@ -124,7 +126,8 @@ sub makefiles {
           replace_slashes   => 1);
   genfile('config/gen/makefiles/tcl.in'       => 'languages/tcl/Makefile',
           commentType       => '#',
-          replace_slashes   => 1);
+          replace_slashes   => 1, 
+          conditioned_lines => 1);
   genfile('config/gen/makefiles/tcl_examples.in' => 'languages/tcl/examples/Makefile',
           commentType       => '#',
           replace_slashes   => 1);
