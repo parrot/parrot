@@ -104,14 +104,14 @@ sub generate_pbc {
 sub generate_regular {
     my $pattern = shift;
 
-    generate_regular_imc("test.imc", $pattern);
-    generate_pbc("test.imc", "test.pbc");
+    generate_regular_imc("test_regex.pir", $pattern);
+    generate_pbc("test_regex.pir", "test_regex.pbc");
 }
 
 sub process {
     my ($input, $output) = @_;
 
-    open(TEST, "$PARROT_EXE test.pbc '$input' |");
+    open(TEST, "$PARROT_EXE test_regex.pbc '$input' |");
 
     local $/;
     my $actual_output = <TEST>;

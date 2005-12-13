@@ -170,8 +170,8 @@ sub generate_pbc {
 
 sub generate_regular {
     my $pattern = shift;
-    generate_regular_imc("test.imc", $pattern);
-    generate_pbc("test.imc", "test.pbc");
+    generate_regular_imc("test_regex.pir", $pattern);
+    generate_pbc("test_regex.pir", "test.pbc");
 }
 
 sub process {
