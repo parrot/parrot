@@ -83,7 +83,7 @@ license as The Parrot Interpreter.
 
 .sub "__onload" :load
 
-  # Load dependant libraries
+  # Load dependent libraries
   load_bytecode "PGE.pbc"
 
 .end
@@ -102,10 +102,10 @@ license as The Parrot Interpreter.
 
   find_global p6rule, "PGE", "p6rule"
   .local pmc    isnt_binary_rule, is_long_option, is_short_option, key_val_rule 
-  isnt_binary_rule = p6rule( '=' )
-  is_long_option   = p6rule( '--' )
-  is_short_option  = p6rule( '-' )
-  key_val_rule     = p6rule( '=' )
+  isnt_binary_rule = p6rule( ' = ' )
+  is_long_option   = p6rule( ' ^ -- ' )
+  is_short_option  = p6rule( ' ^ - ' )
+  key_val_rule     = p6rule( ' = ' )
   .local pmc    match
 
   # Loop over the array spec and build up two simple hashes

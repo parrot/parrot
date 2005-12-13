@@ -57,6 +57,8 @@ pir_output_is( <<'CODE', <<'OUT', "basic long options" );
   push argv, "--string=asdf"
   push argv, "--bool"
   push argv, "--integer=42"
+  push argv, "--integer=42"
+  push argv, "foo-bar"
   push argv, "some"
   push argv, "thing"
 
@@ -137,6 +139,7 @@ This is just a test.
 You have passed the option '--bool'.
 You have passed the option '--string'. The value is 'asdf'.
 You have passed the option '--integer'. The value is '42'.
+You have passed the additional argument: 'foo-bar'.
 You have passed the additional argument: 'some'.
 You have passed the additional argument: 'thing'.
 All args have been parsed.
