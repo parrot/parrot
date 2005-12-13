@@ -1,6 +1,13 @@
-#! perl -w
-# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+#!perl
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
+
+use strict;
+use warnings;
+use lib qw( t . lib ../lib ../../lib );
+use Test::More;
+use Parrot::Test;
+
 
 =head1 NAME
 
@@ -8,7 +15,7 @@ t/library/streams.t - Stream tests
 
 =head1 SYNOPSIS
 
-        % perl -Ilib t/library/streams.t
+	% prove t/library/streams.t
 
 =head1 DESCRIPTION
 
@@ -16,12 +23,8 @@ Tests string streams.
 
 =cut
 
-use strict;
 
 my @streams = qw[Combiner Coroutine Filter Lines ParrotIO Replay Sub Writer];
-
-use Parrot::Test tests => 20;
-use Test::More;
 
 for my $a ( @streams ) {
 
@@ -1480,3 +1483,8 @@ main done
 finished
 OUT
 }
+
+
+## remember to change the number of tests! :-)
+BEGIN { plan tests => 20; }
+

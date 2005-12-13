@@ -1,6 +1,13 @@
-#! perl -w
-# Copyright (C) 2001-2005 The Perl Foundation.  All rights reserved.
+#!perl
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
+
+use strict;
+use warnings;
+use lib qw( t . lib ../lib ../../lib );
+use Test::More;
+use Parrot::Test;
+
 
 =head1 NAME
 
@@ -8,7 +15,7 @@ t/library/pcre.t - testing library/pcre.imc
 
 =head1 SYNOPSIS
 
-    % perl -Ilib t/library/pcre.t
+	% prove t/library/pcre.t
 
 =head1 DESCRIPTION
 
@@ -17,9 +24,6 @@ the installed PCRE library, and matches patterns successfully.
 
 =cut
 
-use strict;
-
-use Parrot::Test tests => 1;
 
 # if we keep pcre, we need a config test
 my $cmd = ($^O =~ /MSWin32/) ? "pcregrep --version" : "pcre-config --version";
@@ -108,3 +112,8 @@ ok 5
 OUT
 
 };
+
+
+## remember to change the number of tests! :-)
+BEGIN { plan tests => 1; }
+

@@ -1,6 +1,13 @@
-#! perl -w
+#!perl
 # Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
+
+use strict;
+use warnings;
+use lib qw( t . lib ../lib ../../lib );
+use Test::More;
+use Parrot::Test;
+
 
 =head1 NAME
 
@@ -8,7 +15,7 @@ t/library/dumper.t - test dumping of data
 
 =head1 SYNOPSIS
 
-	% perl -Ilib t/library/dumper.t
+	% prove t/library/dumper.t
 
 =head1 DESCRIPTION
 
@@ -16,9 +23,6 @@ Tests data dumping.
 
 =cut
 
-use strict;
-
-use Parrot::Test tests => 27;
 
 # no. 1
 pir_output_is(<<'CODE', <<'OUT', "dumping array of sorted numbers");
@@ -974,3 +978,7 @@ OUTPUT
 
 # pir_output_is(<<'CODE', <<'OUTPUT', "dumping IntegerArray PMC");
 # pir_output_is(<<'CODE', <<'OUTPUT', "dumping FloatValArray PMC");
+
+
+## remember to change the number of tests! :-)
+BEGIN { plan tests => 27; }

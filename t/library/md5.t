@@ -1,16 +1,34 @@
 #!perl
-
-# You can create the test results using using the command-line md5sum
-# like this:
-#
-# $ echo -n Hello World! | md5sum
-# a0f32c7d31302c1427285b1a0fcbb015  -
-
-# As well as testing the MD5 library itself, it is useful for spotting
-# regressisions in the parrot VM, JIT and GC
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
+# $Id$
 
 use strict;
-use Parrot::Test tests => 6;
+use warnings;
+use lib qw( t . lib ../lib ../../lib );
+use Test::More;
+use Parrot::Test;
+
+
+=head1 NAME
+
+t/library/md5.t - test MD5 library
+
+=head1 SYNOPSIS
+
+	% prove t/library/md5.t
+
+=head1 DESCRIPTION
+
+Tests the MD5 library. You can create the test results using using
+the command-line md5sum like this:
+
+ $ echo -n Hello World! | md5sum
+ a0f32c7d31302c1427285b1a0fcbb015  -
+
+As well as testing the MD5 library itself, it is useful for spotting
+regressisions in the parrot VM, JIT and GC
+
+=cut
 
 
 ##############################
@@ -797,3 +815,8 @@ f67fa138069da8fce68c131106492372
 8408bf5f0144309374e66278bec290b2
 982e0fde28cd2f62ef8db2d8dfd0f0d7
 OUT
+
+
+## remember to change the number of tests! :-)
+BEGIN { plan tests => 6; }
+

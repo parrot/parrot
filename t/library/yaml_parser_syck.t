@@ -1,5 +1,13 @@
-# Copyright (C) 2001-2003 The Perl Foundation.  All rights reserved.
+#!perl
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
+
+use strict;
+use warnings;
+use lib qw( t . lib ../lib ../../lib );
+use Test::More;
+use Parrot::Test;
+
 
 =head1 NAME
 
@@ -7,7 +15,7 @@ t/library/yaml_parser_syck.t - testing library/YAML/Parser/Syck.imc
 
 =head1 SYNOPSIS
 
-	% perl -Ilib t/library/yaml_parser_syck.t
+	% prove t/library/yaml_parser_syck.t
 
 =head1 DESCRIPTION
 
@@ -15,10 +23,6 @@ Try to parse a YAML document.
 
 =cut
 
-use strict;
-
-use Parrot::Test tests => 1;
-use Test::More;
 
 TODO: {
 
@@ -154,6 +158,7 @@ elem12345678
 OUT
 };
 
+
 =back
 
 =head1 AUTHOR
@@ -165,3 +170,8 @@ Bernhard Schmalhofer - <Bernhard.Schmalhofer@gmx.de>
 F<runtime/parrot/library/YAML/Parser/Syck.imc>
 
 =cut
+
+
+## remember to change the number of tests! :-)
+BEGIN { plan tests => 1; }
+

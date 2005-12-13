@@ -1,6 +1,13 @@
-#! perl -w
+#!perl
 # Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
-# $Id $
+# $Id$
+
+use strict;
+use warnings;
+use lib qw( t . lib ../lib ../../lib );
+use Test::More;
+use Parrot::Test;
+
 
 =head1 NAME
 
@@ -8,7 +15,7 @@ t/library/json.t - test JSON library
 
 =head1 SYNOPSIS
 
-    % perl -Ilib t/library/json.t
+	% prove t/library/json.t
 
 =head1 DESCRIPTION
 
@@ -16,10 +23,6 @@ Tests JSON->Parrot and Parrot->JSON conversions.
 
 =cut
 
-use strict;
-
-use Parrot::Test tests => 22;
-use Test::More;
 
 # no. 1
 pir_output_is(<<'CODE', <<'OUT', 'Create JSON of an empty string');
@@ -616,3 +619,8 @@ CODE
 OUT
 
 }
+
+
+## remember to change the number of tests! :-)
+BEGIN { plan tests => 22; }
+

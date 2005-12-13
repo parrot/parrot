@@ -1,5 +1,14 @@
-# Copyright (C) 2001-2005 The Perl Foundation.  All rights reserved.
+#!perl
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
+
+use strict;
+use warnings;
+use lib qw( t . lib ../lib ../../lib );
+use Test::More;
+use Parrot::Test;
+use Parrot::Config;
+
 
 =head1 NAME
 
@@ -7,7 +16,7 @@ t/library/parrotlib.t - testing library/parrotlib.imc
 
 =head1 SYNOPSIS
 
-	% perl -Ilib t/library/parrotlib.t
+	% prove t/library/parrotlib.t
 
 =head1 DESCRIPTION
 
@@ -15,11 +24,6 @@ This test program test whether the library 'parrotlib.imc' returns the
 expected absolute filenames.
 
 =cut
-
-use strict;
-
-use Parrot::Test tests => 6;
-use Parrot::Config;
 
 
 # Common code in the test files
@@ -103,6 +107,7 @@ END_CODE
 
 END_OUT
 
+
 =head1 AUTHOR
 
 Bernhard Schmalhofer <Bernhard.Schmalhofer@gmx.de>
@@ -110,3 +115,10 @@ Bernhard Schmalhofer <Bernhard.Schmalhofer@gmx.de>
 =head1 SEE ALSO
 
 F<runtime/parrot/library/parrotlib.imc>
+
+=cut
+
+
+## remember to change the number of tests! :-)
+BEGIN { plan tests => 6; }
+

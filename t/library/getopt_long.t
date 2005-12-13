@@ -1,5 +1,13 @@
-# Copyright (C) 2004-2005 The Perl Foundation.  All rights reserved.
+#!perl
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
+
+use strict;
+use warnings;
+use lib qw( t . lib ../lib ../../lib );
+use Test::More;
+use Parrot::Test;
+
 
 =head1 NAME
 
@@ -7,7 +15,7 @@ t/library/getopt_long.t - testing library/Getopt/Long.pir
 
 =head1 SYNOPSIS
 
-	% perl -Ilib t/library/getopt_long.t
+	% prove t/library/getopt_long.t
 
 =head1 DESCRIPTION
 
@@ -16,9 +24,6 @@ library F<runtime/parrot/library/Getopt/Long.pir>.
 
 =cut
 
-use strict;
-
-use Parrot::Test tests => 1;
 
 # no. 1
 pir_output_is( <<'CODE', <<'OUT', "basic long options" );
@@ -108,7 +113,7 @@ pir_output_is( <<'CODE', <<'OUT', "basic long options" );
     print "You haven't passed the option '--integer'. This is fine with me.\n"
   END_INTEGER_OPTION:
 
-  # For some reason I can't shift from argv
+  # For some reason I can't shift from argv  #'
   .local string other_arg
   .local int    cnt_other_args
   cnt_other_args = 0
@@ -146,3 +151,8 @@ Bernhard Schmalhofer - C<Bernhard.Schmalhofer@gmx.de>
 F<runtime/parrot/library/Getopt/Long.pir>
 
 =cut
+
+
+## remember to change the number of tests! :-)
+BEGIN { plan tests => 1; }
+

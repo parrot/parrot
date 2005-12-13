@@ -1,6 +1,13 @@
-#! perl -w
-# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+#!perl
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
+
+use strict;
+use warnings;
+use lib qw( t . lib ../lib ../../lib );
+use Test::More;
+use Parrot::Test;
+
 
 =head1 NAME
 
@@ -8,7 +15,7 @@ t/library/sort.t - Sorting
 
 =head1 SYNOPSIS
 
-	% perl -Ilib t/library/sort.t
+	% prove t/library/sort.t
 
 =head1 DESCRIPTION
 
@@ -16,9 +23,6 @@ Tests sorting.
 
 =cut
 
-use strict;
-
-use Parrot::Test tests => 9;
 
 pir_output_is(<<'CODE', <<'OUT', "sorting already sorted numbers");
 
@@ -435,3 +439,8 @@ hash2
 hello
 hello2
 OUT
+
+
+## remember to change the number of tests! :-)
+BEGIN { plan tests => 9; }
+
