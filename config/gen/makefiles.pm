@@ -121,6 +121,9 @@ sub makefiles {
   genfile('config/gen/makefiles/punie.in'     => 'languages/punie/Makefile',
           commentType       => '#',
           replace_slashes   => 1);
+  genfile('config/gen/makefiles/regex.in'    => 'languages/regex/Makefile',
+          commentType       => '#',
+          replace_slashes   => 1);
   genfile('config/gen/makefiles/scheme.in'    => 'languages/scheme/Makefile',
           commentType       => '#',
           replace_slashes   => 1);
