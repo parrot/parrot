@@ -1,0 +1,31 @@
+#include <stdio.h>
+
+int
+main(int argc, char *argv[])
+{
+    puts("(");
+#ifdef _MSC_VER
+    printf("_MSC_VER => %d,\n", _MSC_VER);
+#else
+    printf("_MSC_VER => undef,\n");
+#endif
+
+#ifdef _MSC_FULL_VER
+    printf("_MSC_FULL_VER => %d,\n", _MSC_FULL_VER);
+#else
+    printf("_MSC_FULL_VER => undef,\n");
+#endif
+    puts(");");
+
+    return 0;
+}
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+ */

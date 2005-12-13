@@ -37,6 +37,7 @@ use Parrot::Configure::Data;
     inter/lex.pm
     inter/yacc.pm
     auto/gcc.pm
+    auto/msvc.pm
     init/optimize.pm
     inter/shlibs.pm
     inter/charset.pm
