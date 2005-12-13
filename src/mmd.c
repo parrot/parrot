@@ -135,7 +135,7 @@ get_mmd_dispatch_type(Interp *interpreter, INTVAL func_nr, INTVAL left_type,
         PMC *method = Parrot_MMD_search_default_infix(interpreter,
                 meth_s, left_type, r);
         if (!method)
-            real_exception(interpreter, 0, 1, "MMD function %s not found"
+            real_exception(interpreter, 0, 1, "MMD function %s not found "
                     "for types (%d, %d)", meth_c, left_type, r);
         if (method->vtable->base_type == enum_class_NCI) {
             PMC *nci;
