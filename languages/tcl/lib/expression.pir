@@ -222,15 +222,16 @@ eat_space:
   if $I0 == 1 goto number
 
   $I0 = ord expr, pos
-  if $I0 == 91 goto subcommand  # [
-  if $I0 == 40 goto subexpr     # (
-  if $I0 == 36 goto variable    # $
-  if $I0 == 46 goto number      # .
-  if $I0 == 34 goto quote       # "
-  if $I0 == 45 goto unary       # -
-  if $I0 == 43 goto unary       # +
-  if $I0 == 47 goto unary       # ~
-  if $I0 == 33 goto unary       # !
+  if $I0 ==  91 goto subcommand  # [
+  if $I0 ==  40 goto subexpr     # (
+  if $I0 ==  36 goto variable    # $
+  if $I0 ==  46 goto number      # .
+  if $I0 ==  34 goto quote       # "
+  if $I0 == 123 goto brace       # {
+  if $I0 ==  45 goto unary       # -
+  if $I0 ==  43 goto unary       # +
+  if $I0 ==  47 goto unary       # ~
+  if $I0 ==  33 goto unary       # !
 
   $I0 = is_cclass .CCLASS_WORD, expr, pos
   if $I0 == 1 goto function
@@ -255,7 +256,16 @@ number:
   .return get_number(expr, pos)
 
 quote:
-  .return get_quote(expr, pos)
+  $P0 = new .Hash
+  $P0[93] = 1 # ]
+  $P0[59] = 1 # ;
+  .return get_quote(expr, $P0, pos)
+
+brace:
+  $P0 = new .Hash
+  $P0[93] = 1 # ]
+  $P0[59] = 1 # ;
+  .return get_brace(expr, $P0, pos)
 
 unary:
   .return get_unary(expr, pos)
