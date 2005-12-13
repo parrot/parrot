@@ -76,7 +76,8 @@ sub runstep {
 
     print( qq{-e "$jitbase/$cpuarch/core.jit" = }, -e "$jitbase/$cpuarch/core.jit" ? 'yes' : 'no', "\n" ) if $verbose;
 
-    if (-e "$jitbase/$cpuarch/core.jit") {
+    # XXX disable all but i386, ppc
+    if (-e "$jitbase/$cpuarch/core.jit" && ($cpuarch eq 'i386' || $cpuarch eq 'ppc')) {
         $jitcapable = 1;
 	# XXX disable sun4 - doesn't even build
         if ($cpuarch =~ /sun4|sparc64/ && (1 || 
