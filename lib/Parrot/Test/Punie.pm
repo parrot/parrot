@@ -40,12 +40,8 @@ sub output_is() {
 
   $cmd = "$self->{parrot} $args languages/punie/punie.pbc $lang_f";
 
-  # For some reason, if you redirect both STDERR and STDOUT here, 
-  # you get a 38M file of garbage. We'll temporarily assume everything
-  # works and ignore stderr.
   $exit_code = Parrot::Test::run_command($cmd, CD => $self->{relpath},
-					 STDOUT => $out_f);
-  
+					 STDOUT => $out_f, STDERR => $out_f );
   unless ($pass) {
     my $file = Parrot::Test::slurp_file($out_f);
     $pass =$self->{builder}->is_eq( Parrot::Test::slurp_file($out_f), $output, $desc );
