@@ -18,7 +18,7 @@ use lib "$FindBin::Bin/../lib", "$FindBin::Bin/../../../lib";
 use Parrot::Test tests => 8;
 use Test::More;
 
-language_output_is( 'bc', << 'END_CODE', << 'END_EXPECTED', "block without newlines" );
+language_output_is( 'bc', << 'END_CODE', << 'END_EXPECTED', "block without newlines", with_past => 1 );
 1; { 2 }
 quit
 END_CODE
@@ -26,7 +26,7 @@ END_CODE
 2
 END_EXPECTED
 
-language_output_is( 'bc', << 'END_CODE', << 'END_EXPECTED', "block with newlines" );
+language_output_is( 'bc', << 'END_CODE', << 'END_EXPECTED', "block with newlines", with_past => 1 );
 1 
 { 
   2 
@@ -40,7 +40,7 @@ END_CODE
 END_EXPECTED
 
 
-language_output_is( 'bc', << 'END_CODE', << 'END_EXPECTED', "block with two statements" );
+language_output_is( 'bc', << 'END_CODE', << 'END_EXPECTED', "block with two statements", with_past => 1 );
 1 
 { 
   2 

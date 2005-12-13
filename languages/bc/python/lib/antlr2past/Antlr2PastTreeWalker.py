@@ -1,4 +1,4 @@
-### $ANTLR 2.7.5 (20050416): "antlr2past.g" -> "Antlr2PastTreeWalker.py"$
+### $ANTLR 2.7.5 (20051104): "antlr2past.g" -> "Antlr2PastTreeWalker.py"$
 ### import antlr and other modules ..
 import sys
 import antlr
@@ -110,7 +110,7 @@ class Walker(antlr.TreeParser):
             self.match(_t,PAST_Stmts)
             _t = _t.getFirstChild()
             PEPN = antlr.ifelse(_t == antlr.ASTNULL, None, _t)
-            self.p_expr_p_newline(_t)
+            self.code_blocks(_t)
             _t = self._retTree
             PEPN_AST = self.returnAST
             currentAST = _currentAST2
@@ -145,65 +145,59 @@ class Walker(antlr.TreeParser):
         self.returnAST = gen_pir_past_AST
         self._retTree = _t
     
-    def p_expr_p_newline(self, _t):    
+    def code_blocks(self, _t):    
         
-        p_expr_p_newline_AST_in = None
+        code_blocks_AST_in = None
         if _t != antlr.ASTNULL:
-            p_expr_p_newline_AST_in = _t
+            code_blocks_AST_in = _t
         self.returnAST = None
         currentAST = antlr.ASTPair()
-        p_expr_p_newline_AST = None
-        S1_AST = None
-        S1 = None
-        S2_AST = None
-        S2 = None
+        code_blocks_AST = None
         try:      ## for error handling
             pass
-            _t4 = _t
-            tmp2_AST = None
-            tmp2_AST_in = None
-            tmp2_AST = self.astFactory.create(_t)
-            tmp2_AST_in = _t
-            _currentAST4 = currentAST.copy()
-            currentAST.root = currentAST.child
-            currentAST.child = None
-            self.match(_t,PAST_Code)
-            _t = _t.getFirstChild()
-            S1 = antlr.ifelse(_t == antlr.ASTNULL, None, _t)
-            reg_S1=self.stmt(_t)
-            _t = self._retTree
-            S1_AST = self.returnAST
-            S2 = antlr.ifelse(_t == antlr.ASTNULL, None, _t)
-            reg_S2=self.stmt(_t)
-            _t = self._retTree
-            S2_AST = self.returnAST
-            currentAST = _currentAST4
-            _t = _t4
-            _t = _t.getNextSibling()
-            p_expr_p_newline_AST = currentAST.root
-            pir = """
-            push stmts_children, $P%d
-            push stmts_children, $P%d
-            #""" % ( reg_S1, reg_S2 )
-            
-            p_expr_p_newline_AST = antlr.make(self.astFactory.create(PIR_NOOP,"noop"), S1_AST, S2_AST, self.astFactory.create(PIR_OP,pir));
-            currentAST.root = p_expr_p_newline_AST
-            if (p_expr_p_newline_AST != None) and (p_expr_p_newline_AST.getFirstChild() != None):
-                currentAST.child = p_expr_p_newline_AST.getFirstChild()
-            else:
-                currentAST.child = p_expr_p_newline_AST
-            currentAST.advanceChildToEnd()
+            _cnt6= 0
+            while True:
+                if not _t:
+                    _t = antlr.ASTNULL
+                if (_t.getType()==PAST_Code):
+                    pass
+                    _t5 = _t
+                    tmp2_AST = None
+                    tmp2_AST_in = None
+                    tmp2_AST = self.astFactory.create(_t)
+                    tmp2_AST_in = _t
+                    self.addASTChild(currentAST, tmp2_AST)
+                    _currentAST5 = currentAST.copy()
+                    currentAST.root = currentAST.child
+                    currentAST.child = None
+                    self.match(_t,PAST_Code)
+                    _t = _t.getFirstChild()
+                    self.stmt(_t)
+                    _t = self._retTree
+                    self.addASTChild(currentAST, self.returnAST)
+                    self.stmt(_t)
+                    _t = self._retTree
+                    self.addASTChild(currentAST, self.returnAST)
+                    currentAST = _currentAST5
+                    _t = _t5
+                    _t = _t.getNextSibling()
+                else:
+                    break
+                
+                _cnt6 += 1
+            if _cnt6 < 1:
+                raise antlr.NoViableAltException(_t)
+            code_blocks_AST = currentAST.root
         
         except antlr.RecognitionException, ex:
             self.reportError(ex)
             if _t:
                 _t = _t.getNextSibling()
         
-        self.returnAST = p_expr_p_newline_AST
+        self.returnAST = code_blocks_AST
         self._retTree = _t
     
     def stmt(self, _t):    
-        reg = None
         
         stmt_AST_in = None
         if _t != antlr.ASTNULL:
@@ -215,12 +209,12 @@ class Walker(antlr.TreeParser):
         E = None
         try:      ## for error handling
             pass
-            _t6 = _t
+            _t8 = _t
             tmp3_AST = None
             tmp3_AST_in = None
             tmp3_AST = self.astFactory.create(_t)
             tmp3_AST_in = _t
-            _currentAST6 = currentAST.copy()
+            _currentAST8 = currentAST.copy()
             currentAST.root = currentAST.child
             currentAST.child = None
             self.match(_t,PAST_Stmt)
@@ -229,11 +223,11 @@ class Walker(antlr.TreeParser):
             reg_E=self.exp(_t)
             _t = self._retTree
             E_AST = self.returnAST
-            currentAST = _currentAST6
-            _t = _t6
+            currentAST = _currentAST8
+            _t = _t8
             _t = _t.getNextSibling()
             stmt_AST = currentAST.root
-            reg = self.reg;
+            reg = self.reg
             self.reg = self.reg + 10;
             pir = """
             $P%d = new 'PAST::Stmt'
@@ -241,11 +235,14 @@ class Walker(antlr.TreeParser):
             
             push $P%d, $P%d 
             $P%d.set_node('1', 1 ,$P%d)
+            
+            push stmts_children, $P%d
             #""" % (
             reg,
             reg + 1,
             reg + 1, reg_E,
-            reg, reg + 1
+            reg, reg + 1,
+            reg
             )
             
             stmt_AST = antlr.make(self.astFactory.create(PIR_NOOP,"noop"), E_AST, self.astFactory.create(PIR_OP,pir));
@@ -263,7 +260,6 @@ class Walker(antlr.TreeParser):
         
         self.returnAST = stmt_AST
         self._retTree = _t
-        return reg
     
     def exp(self, _t):    
         reg = None
@@ -280,12 +276,12 @@ class Walker(antlr.TreeParser):
         V = None
         try:      ## for error handling
             pass
-            _t8 = _t
+            _t10 = _t
             tmp4_AST = None
             tmp4_AST_in = None
             tmp4_AST = self.astFactory.create(_t)
             tmp4_AST_in = _t
-            _currentAST8 = currentAST.copy()
+            _currentAST10 = currentAST.copy()
             currentAST.root = currentAST.child
             currentAST.child = None
             self.match(_t,PAST_Exp)
@@ -358,8 +354,8 @@ class Walker(antlr.TreeParser):
             else:
                     raise antlr.NoViableAltException(_t)
                 
-            currentAST = _currentAST8
-            _t = _t8
+            currentAST = _currentAST10
+            _t = _t10
             _t = _t.getNextSibling()
         
         except antlr.RecognitionException, ex:
@@ -384,12 +380,12 @@ class Walker(antlr.TreeParser):
         E = None
         try:      ## for error handling
             pass
-            _t11 = _t
+            _t13 = _t
             tmp5_AST = None
             tmp5_AST_in = None
             tmp5_AST = self.astFactory.create(_t)
             tmp5_AST_in = _t
-            _currentAST11 = currentAST.copy()
+            _currentAST13 = currentAST.copy()
             currentAST.root = currentAST.child
             currentAST.child = None
             self.match(_t,PAST_Op)
@@ -398,8 +394,8 @@ class Walker(antlr.TreeParser):
             reg_E=self.exp(_t)
             _t = self._retTree
             E_AST = self.returnAST
-            currentAST = _currentAST11
-            _t = _t11
+            currentAST = _currentAST13
+            _t = _t13
             _t = _t.getNextSibling()
             op_AST = currentAST.root
             reg = self.reg;

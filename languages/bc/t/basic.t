@@ -15,7 +15,7 @@ use strict;
 use FindBin;
 use lib "$FindBin::Bin/../lib", "$FindBin::Bin/../../../lib";
 
-use Parrot::Test tests => 72;
+use Parrot::Test tests => 75;
 use Test::More;
 
 # A little helper to make setting up tests easier
@@ -44,6 +44,11 @@ sub run_tests {
 }
 
 my @tests = (
+       # multiple lines
+       [ '1', [ 1 ], 'one line', with_past => 1  ],
+       [ "1\n2", [ 1, 2 ], 'two lines', with_past => 1  ],
+       [ "1\n2\n3\n4\n\n5\n6\n7", [ 1, 2, 3, 4, 5, 6, 7 ], 'seven lines', with_past => 1  ],
+
        # comments 
        [ '/* */7', 7, 'one line comment', with_past => 1  ],
        [ "/* line1 \n line2 \n line 3 */    -2  ", -2, 'multi line comment', with_past => 1 ],
@@ -53,7 +58,7 @@ my @tests = (
 
        # empty lines
        [ "\n-1", '-1', 'single newline', with_past => 1, ],
-       [ "        \n    \n  -  1   \n    2", [ -1, 2 ], 'multiple empty lines' ],
+       [ "        \n    \n  -  1   \n    2", [ -1, 2 ], 'multiple empty lines', with_past => 1 ],
 
        # positive and negative Integers
        #[ '+1', '1', 'unary +', with_past => 1, ], Surprise, there is no unary + in POSIX bc
@@ -108,7 +113,7 @@ my @tests = (
        [ '  ( 1 * 2 ) + ( ( ( ( 3 + 4 ) + 5 ) * 6 ) * 7 ) ', '506' ],
 
        # semicolons
-       [ '1; 2', [1, 2], 'two expressions seperated by a semicolon', with_past => 0 ],
+       [ '1; 2', [1, 2], 'two expressions seperated by a semicolon', with_past => 1 ],
        [ '1+1*1; 2+2*2', [2, 6] ],
        [ '3-3/3; 4+4%4;  5-5+5', [2, 4, 5] ],
 

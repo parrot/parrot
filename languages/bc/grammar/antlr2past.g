@@ -42,7 +42,7 @@ options
 //}
 
 gen_pir_past!
-  : #(PAST_Stmts PEPN:p_expr_p_newline )
+  : #(PAST_Stmts PEPN:code_blocks )
     {
       pir_before = """
 .local pmc stmts_children
@@ -60,22 +60,14 @@ stmts.set_node('1', 1, stmts_children)
     }
   ;
 
-p_expr_p_newline!
-  : #( PAST_Code reg_S1=S1:stmt reg_S2=S2:stmt )
-    {
-      pir = """
-push stmts_children, $P%d
-push stmts_children, $P%d
-#""" % ( reg_S1, reg_S2 )
-
-      #p_expr_p_newline = #( [ PIR_NOOP, "noop" ], #S1, #S2, [PIR_OP, pir] ); 
-    }
+code_blocks
+  : ( #( PAST_Code stmt stmt ) )+
   ;
 
-stmt! returns[reg]
+stmt! 
   : #( PAST_Stmt reg_E=E:exp )
     {
-      reg = self.reg;
+      reg = self.reg
       self.reg = self.reg + 10;
       pir = """
     $P%d = new 'PAST::Stmt'
@@ -83,11 +75,14 @@ stmt! returns[reg]
 
     push $P%d, $P%d 
     $P%d.set_node('1', 1 ,$P%d)
+
+    push stmts_children, $P%d
 #""" % (
     reg,
     reg + 1,
     reg + 1, reg_E,
-    reg, reg + 1
+    reg, reg + 1,
+    reg
        )
 
       #stmt = #( [ PIR_NOOP, "noop" ], #E, [PIR_OP, pir] ); 
