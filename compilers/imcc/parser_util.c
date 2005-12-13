@@ -783,11 +783,14 @@ static int
 change_op(Interp *interpreter, IMC_Unit *unit, SymReg **r, int num, int emit)
 {
     int changed = 0;
-    SymReg *s;
+    SymReg *s, *c;
 
     if (r[num]->type & (VTCONST|VT_CONSTP)) {
         /* make a number const */
-        s = mk_const(interpreter, str_dup(r[num]->name), 'N');
+        c = r[num];
+        if (c->type & VT_CONSTP)
+	    c = c->reg;
+        s = mk_const(interpreter, str_dup(c->name), 'N');
         r[num] = s;
         changed = 1;
     }

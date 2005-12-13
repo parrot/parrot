@@ -578,5 +578,18 @@ CODE
 /nested heredoc not supported/
 OUT
 
+pir_output_is(<<'CODE', <<'OUT', ".const in mixed opcodes");
+.sub main :main
+    .const int I = 5
+    .local float f
+    f = 2.0
+    f *= I
+    print f
+    print "\n"
+.end
+CODE
+10.000000
+OUT
+
 ## remember to change the number of tests!
-BEGIN { plan tests => 32; }
+BEGIN { plan tests => 33; }
