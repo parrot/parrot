@@ -1,16 +1,19 @@
 # $Id$
 
-2005.12-12    particle
+2005.12.13    particle
+	* moved jit/ directory to src/jit/
+
+2005.12.12    particle
 	* moved io/ directory to src/io/
 	* moved classes/ directory to src/classes/
 	* moved dynclasses/ directory to src/dynclasses/
 
-2005.12-08    particle
+2005.12.08    particle
 	* moved types/ directory to src/types/
 	* moved pf/ directory to src/packfile/
 	* moved ops/ directory to src/ops/
 
-2005.12-08    particle
+2005.12.08    particle
 	* moved charset/ directory to src/charset/
 	* moved encodings/ directory to src/encodings/
 
