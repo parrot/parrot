@@ -51,22 +51,6 @@ pmclass TclObject dynpmc group tcl_group {
 	pmc_reuse(INTERP, SELF, type, 0);
     }
 
-    void set_pmc (PMC* value) {
-        INTVAL base_type;
-
-        base_type = value->vtable->base_type;
-
-        DYNSELF.morph(value->vtable->base_type);
-
-        if (base_type == dynclass_TclInt) {
-              DYNSELF.set_integer_same(value);
-        } else if(base_type == dynclass_TclFloat) {
-              DYNSELF.set_number_same(value);
-        } else if(base_type == dynclass_TclString) {
-              DYNSELF.set_string_same(value);
-        }
-    }
-
     void set_integer_native (INTVAL value) {
         DYNSELF.morph(dynclass_TclInt);
         PMC_int_val(SELF) = value;
