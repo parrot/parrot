@@ -1431,7 +1431,8 @@ prog-clean :
 		$(LIBPARROT)
 	$(PERL) tools/build/c2str.pl --init
 	$(RM_F) \
-		$(STR_FILES) $(INC_DIR)/string_private_cstring.h \
+		$(INC_DIR)/string_private_cstring.h \
+		"$(SRC_DIR)/*.str" "src/classes/*.str" \
 		"src/classes/*.c" "src/classes/*.h" "src/classes/*.dump" \
 		vtable.dump "*.def" "*.lib" "*.exp"
 
