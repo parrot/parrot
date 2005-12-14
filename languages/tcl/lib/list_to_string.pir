@@ -16,6 +16,7 @@ loop:
   if i >= elems goto done
   $P0 = list[i]
   $S0 = $P0
+  $S0 = clone $S0
 
 check_list:
   .local int count
