@@ -596,6 +596,7 @@ end_yield:
 .sub main :main
     .local int i
     .local pmc d
+    null i
 loop:
     d = PI()
     print d

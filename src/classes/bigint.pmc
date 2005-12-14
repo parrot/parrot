@@ -198,7 +198,6 @@ bigint_mod_bigint_int(Interp *interpreter, PMC* self, INTVAL value, PMC *dest)
     int n = value < 0;
     if (n) {
         mpz_mod_ui(BN(dest), BN(self), -value);
-        mpz_neg(BN(dest), BN(dest));
     }
     else
         mpz_mod_ui(BN(dest), BN(self), value);
