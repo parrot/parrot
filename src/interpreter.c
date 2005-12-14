@@ -388,6 +388,10 @@ init_prederef(Interp *interpreter, int which)
         void **temp = (void **)Parrot_memalign_if_possible(256,
                 N * sizeof(void *));
 #endif
+	/*
+	 * calc and remember pred_offset
+	 */
+	CONTEXT(interpreter->ctx)->pred_offset = pc - (opcode_t*)temp;
 
         /* fill with the prederef__ opcode function */
         if (which == PARROT_SWITCH_CORE)
@@ -399,14 +403,7 @@ init_prederef(Interp *interpreter, int which)
             opinfo = &interpreter->op_info_table[*pc];
             temp[i] = pred_func;
             n = opinfo->arg_count;
-            if (*pc == PARROT_OP_set_args_pc ||
-                    *pc == PARROT_OP_get_results_pc ||
-                    *pc == PARROT_OP_get_params_pc ||
-                    *pc == PARROT_OP_set_returns_pc) {
-                PMC *sig;
-                sig = interpreter->code->const_table->constants[pc[1]]->u.key;
-                n += VTABLE_elements(interpreter, sig);
-            }
+	    ADD_OP_VAR_PART(interpreter, interpreter->code, pc, n);
             /* count ops that need a PIC */
             if (parrot_PIC_op_is_cached(interpreter, *pc))
                 n_pics++;

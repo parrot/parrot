@@ -1908,6 +1908,7 @@ byte_code_new (Interp* interpreter, struct PackFile *pf,
     byte_code->debugs = NULL;
     byte_code->const_table = NULL;
     byte_code->fixups = NULL;
+    byte_code->pic_index = NULL;
     return (struct PackFile_Segment *) byte_code;
 }
 
@@ -2450,6 +2451,8 @@ Parrot_switch_to_cs(Interp *interpreter,
                 new_cs->base.name);
     interpreter->code = new_cs;
     CONTEXT(interpreter->ctx)->constants = new_cs->const_table->constants;
+    CONTEXT(interpreter->ctx)->pred_offset = 
+	    new_cs->base.data - (opcode_t*) new_cs->prederef.code;
     new_cs->prev = cur_cs;
     if (really)
         prepare_for_run(interpreter);

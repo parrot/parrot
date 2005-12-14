@@ -282,6 +282,7 @@ init_context(Interp *interpreter, parrot_context_t *ctx, parrot_context_t *old)
         ctx->errors = old->errors;
         ctx->trace_flags = old->trace_flags;
         ctx->runloop_level = old->runloop_level;
+	ctx->pred_offset = old->pred_offset;
         /* end COW */
         ctx->recursion_depth = old->recursion_depth;
     }

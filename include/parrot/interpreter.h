@@ -205,6 +205,10 @@ typedef struct Parrot_Context {
     opcode_t *current_results;   /* ptr into code with get_results opcode */
     /* deref the constants - we need it all the time */
     struct PackFile_Constant ** constants;
+    /* code->prederefed.code - code->base.data in opcodes 
+     * to simplify conversio between code ptrs in e.g. invoke
+     */
+    size_t pred_offset;
 } parrot_context_t;
 
 #define ALIGNED_CTX_SIZE ( ((sizeof(struct Parrot_Context) + NUMVAL_SIZE - 1) \

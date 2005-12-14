@@ -70,17 +70,11 @@ sub defines
 {
     return <<END;
 #define REL_PC ((size_t)((opcode_t*)cur_opcode - (opcode_t*)interpreter->code->prederef.code))
-#define CUR_OPCODE (interpreter->code->base.data + REL_PC)
+#define CUR_OPCODE ((opcode_t*)cur_opcode + CONTEXT(interpreter->ctx)->pred_offset)
 
+#  define opcode_to_prederef(i, op)   (op ? \\
+     (void**) (op   - CONTEXT(i->ctx)->pred_offset) : NULL)
 
-static void** opcode_to_prederef(Interp* interpreter,
-                                        opcode_t* opcode_addr)
-{
-    INTVAL offset_in_ops;
-    if (opcode_addr == NULL) return NULL;
-    offset_in_ops = opcode_addr - (opcode_t*) interpreter->code->base.data;
-    return interpreter->code->prederef.code + offset_in_ops;
-}
 
 #define OP_AS_OFFS(o) (_reg_base + ((opcode_t*)cur_opcode)[o])
 
@@ -149,7 +143,9 @@ code.
 sub goto_pop
 {
     my ($self) = @_;
-    return "{ cur_opcode = (opcode_t*)opcode_to_prederef(interpreter,pop_dest(interpreter));\n  goto SWITCH_AGAIN; }";
+    return "{ opcode_t *dest = (opcode_t*)pop_dest(interpreter);
+              cur_opcode = opcode_to_prederef(interpreter, dest);
+	      goto SWITCH_AGAIN; }";
 }
 
 =item C<run_core_func_decl($core)>
