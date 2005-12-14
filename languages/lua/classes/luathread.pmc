@@ -1,0 +1,92 @@
+/*
+Copyright: 2005 The Perl Foundation.  All Rights Reserved.
+$Id: luathread.pmc $
+
+=head1 NAME
+
+classes/luathread.pmc - Lua Thread
+
+=head1 DESCRIPTION
+
+C<LuaThread> extends C<Parrot Coroutine> to provide a class with the behaviour
+of the Lua C<Thread> type.
+
+=head2 Overloaded Methods
+
+=over 4
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+
+static STRING *luathread_name;
+
+pmclass LuaThread 
+    extends Coroutine
+    does sub 
+    dynpmc 
+    group lua_group 
+    hll Lua maps Coroutine {
+
+/* Class initialization. Caches constant strings that will be used later.
+*/
+    void class_init() {
+        if (pass) {
+            luathread_name = const_string(INTERP, "thread");
+        }
+    }
+  
+/*
+
+=item C<STRING* name()>
+
+Return the string "thread".
+
+=cut
+
+*/
+    STRING* name () {
+        return luathread_name;
+    }
+
+/*
+
+=item C<STRING* get_string()>
+
+=cut
+
+*/
+    STRING* get_string () {
+        return Parrot_sprintf_c(INTERP, "thread: %08X", SELF);
+    }
+
+/*
+
+=item C<INTVAL get_bool()>
+
+In Lua, both C<nil> and C<false> make a condition false; any other values 
+makes it true.
+
+So return always true. 
+
+=cut
+
+*/
+    INTVAL get_bool () {
+        return 1;
+    }
+}
+
+/*
+
+=back
+
+=head1 AUTHORS
+
+Francois Perrad
+
+=cut
+
+*/

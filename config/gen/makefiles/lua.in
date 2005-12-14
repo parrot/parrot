@@ -12,10 +12,13 @@ LOAD_EXT = ${load_ext}
 
 PMCS = \
  luaboolean \
+ luafunction \
  luanil \
  luanumber \
  luastring \
- luatable
+ luatable \
+ luathread \
+ luauserdata
 
 all: pmcs
 
