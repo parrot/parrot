@@ -162,9 +162,6 @@ sub runstep {
         yacc          => 'bison -v -y',
         lex           => 'flex',
 
-        icu_make      => '# Building of ICU disabled',
-        buildicu      => 0,
-
         # Extra flags needed for libnci_test.so
         ncilib_link_extra => '',           
 

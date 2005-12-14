@@ -263,37 +263,6 @@ string_init(Parrot_Interp interpreter)
         /* Load in the basic encodings and charsets
          */
         Parrot_charsets_encodings_init(interpreter);
-
-#if 0
-        /* DEFAULT_ICU_DATA_DIR is configured at build time, or it may be
-           set through the $PARROT_ICU_DATA_DIR environment variable. Need
-           a way to specify this via the command line as well. */
-        data_dir = Parrot_getenv("PARROT_ICU_DATA_DIR", &free_data_dir);
-        if (data_dir == NULL) {
-            const char *prefix;
-            char *p, *build_path;
-            build_path = data_dir = const_cast(DEFAULT_ICU_DATA_DIR);
-            /*
-             * if the installed --prefix directory exists then use it
-             * but only, if data_dir isn't empty
-             */
-            if (!*data_dir)
-                goto no_set;
-            prefix = Parrot_get_runtime_prefix(interpreter, NULL);
-            if (prefix && (p = strstr(build_path, "blib"))) {
-                /* .../blib/lib/... */
-                --p;        /* slash or backslash - XXX FIXME - assumes single char */
-                data_dir = mem_sys_allocate(strlen(prefix) + strlen(p) + 1);
-                strcpy(data_dir, prefix);
-                strcat(data_dir, p);
-                free_data_dir = 1;
-            }
-        }
-        string_set_data_directory(data_dir);
-no_set:
-        if (free_data_dir)
-            mem_sys_free(const_cast(data_dir));
-#endif
     }
 
     /*

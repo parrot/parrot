@@ -343,7 +343,7 @@ AST_O_FILES = \
 
 # generated list of header files
 GENERAL_H_FILES   = $(NONGEN_HEADERS) $(GEN_HEADERS) ${TEMP_cg_h}
-#CONDITIONED_LINE(has_icu):ICU_H_FILES       = ${icu_headers}
+
 ALL_H_FILES       = $(GENERAL_H_FILES)
 
 CHARSET_O_FILES   = ${TEMP_charset_o}
@@ -773,7 +773,7 @@ $(LIBPARROT) : $(O_FILES)
 
 blib/lib/libparrot$(SHARE_EXT).$(SOVERSION) : $(O_FILES) $(SRC_DIR)/install_config$(O)
 	$(MKDIR) blib blib/lib
-	$(LD) -Wl,-soname=libparrot$(SHARE_EXT).$(SOVERSION) $(LD_SHARE_FLAGS) $(LDFLAGS) ${ld_out}blib/lib/libparrot$(SHARE_EXT).$(SOVERSION) $(O_FILES) $(SRC_DIR)/install_config$(O) $(C_LIBS) $(LIBICUCORE) $(LIBICUDATA)
+	$(LD) -Wl,-soname=libparrot$(SHARE_EXT).$(SOVERSION) $(LD_SHARE_FLAGS) $(LDFLAGS) ${ld_out}blib/lib/libparrot$(SHARE_EXT).$(SOVERSION) $(O_FILES) $(SRC_DIR)/install_config$(O) $(C_LIBS) $(ICU_SHARED)) 
 	cp blib/lib/libparrot$(SHARE_EXT).$(SOVERSION) blib/lib/libparrot$(SHARE_EXT)
 
 $(PARROT_SO) : $(IMCC_DIR)/main$(O) blib/lib/libparrot$(SHARE_EXT) lib/Parrot/OpLib/core.pm
@@ -981,7 +981,7 @@ $(SRC_DIR)/sub$(O) : $(GENERAL_H_FILES)
 
 $(SRC_DIR)/string$(O) : $(GENERAL_H_FILES) $(INC_DIR)/string_private_cstring.h
 
-$(SRC_DIR)/string_primitives$(O) : $(GENERAL_H_FILES) $(ICU_H_FILES)
+$(SRC_DIR)/string_primitives$(O) : $(GENERAL_H_FILES) 
 
 $(SRC_DIR)/longopt$(O) : $(GENERAL_H_FILES)
 
@@ -1589,7 +1589,7 @@ rpms : release
 	cd /usr/src/*/SPECS ${make_and} sudo rpm -ba parrot.spec
 
 win32-inno-installer : world install
-	$(PERL) tools/dev/mk_inno.pl --version=$(VERSION) --prefix=$(PREFIX) --icudatadir=${icu_datadir}
+	$(PERL) tools/dev/mk_inno.pl --version=$(VERSION) --prefix=$(PREFIX) 
 	$(INNO_SETUP) parrot.iss
 
 ###############################################################################

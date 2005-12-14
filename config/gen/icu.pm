@@ -23,15 +23,14 @@ use Parrot::Configure::Step qw(capture_output);
 
 $description = "Determining whether ICU is installed";
 
-@args = qw(verbose icudatadir icushared icuheaders icu-config without-icu);
+@args = qw(verbose icushared icuheaders icu-config without-icu);
 
 sub runstep {
     my $self = shift;
-  my ($verbose, $icudatadir, $icushared, $icuheaders, $icuconfig, $without) = @_;
+  my ($verbose, $icushared, $icuheaders, $icuconfig, $without) = @_;
 
   my @icu_headers = qw(ucnv.h utypes.h uchar.h);
-  my $autodetect =    !defined($icudatadir)
-                   && !defined($icushared)
+  my $autodetect =    !defined($icushared)
                    && !defined($icuheaders);
 
   $result = undef;
@@ -62,7 +61,6 @@ sub runstep {
       if (defined $icushared) {
         chomp $icushared;
         $icushared =~ s/-licui18n\w*//;     # "-licui18n32" too
-        # $icushared =~ s/-licudata\w*//;
         $without = 1 if length $icushared == 0;
       }
 
@@ -75,13 +73,6 @@ sub runstep {
         $without = 1 unless -d $icuheaders;
       }
 
-      # icu data dir
-      $icudatadir = capture_output("$icuconfig --icudatadir");
-      if (defined $icudatadir) {
-        chomp $icudatadir;
-        $without = 1 unless -d $icudatadir;
-      }
-      
       if ($without) {
         $result = "failed";
       }
@@ -92,14 +83,12 @@ sub runstep {
     print "icuconfig: $icuconfig\n" if defined $icuconfig;
     print "icushared='$icushared'\n" if defined $icushared;
     print "headers='$icuheaders'\n" if defined $icuheaders;
-    print "datadir='$icudatadir'\n" if defined $icudatadir;
   }
 
   if ($without) {
     Parrot::Configure::Data->set(
       has_icu     => 0,
       icu_shared  => '',  # used for generating src/dynclasses/Makefile
-      icu_datadir => '',  # used for generation Makefile
     );
     $result = "no" unless defined $Configure::Step::result;
     return;
@@ -126,12 +115,6 @@ sub runstep {
     }
   }
 
-  unless (defined $icudatadir and -d $icudatadir ) {
-    warn "error: icudatadir not defined or invalid\n";
-    $ok = 0;
-  } else {
-    $icudatadir =~ s![\\/]$!!;
-  }
 
   die <<"HELP" unless $ok; # this text is also in Configure.PL!
 Something is wrong with your ICU installation!
@@ -142,15 +125,12 @@ Something is wrong with your ICU installation!
    --icu-config=(file)  Location of icu-config
    --icuheaders=(path)  Location of ICU headers without /unicode
    --icushared=(flags)  Full linker command to create shared libraries
-   --icudatadir=(path)  Directory to locate ICU's data file(s)
 HELP
 #'
   
   Parrot::Configure::Data->set(
     has_icu     => 1,
     icu_shared  => $icushared,
-    icu_headers => join( ' ', @icu_headers ),
-    icu_datadir => $icudatadir,
   );
 
   # Add -I $Icuheaders if necessary

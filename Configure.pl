@@ -192,28 +192,14 @@ ICU Options
 Use the specified icu-config script to determine the necessary ICU options.
 
 Use --icu-config=none to disable the autodetect feature. Parrot will
-then be build with its own ICU.
+then be build without ICU.
 
 B<Note:> If you specify another ICU option than --icu-config, the
 autodetection functionality will be disabled.
 
-=item C<--icuplatform=(platform)>
-
-Use the given platform name to pass to ICU's runConfigureICU. (See icu/source/runConfigureICU for the list of available "platform" names, which specify both operating system and compiler.)
-
-=item C<--icuconfigureargs=(arguments)>
-
-Pass the given arguments to ICU's configuration script, instead of the default.
-
-=item C<--icudatadir=(path)>
-
-Use the given directory to locate ICU's data file(s) at runtime
-
-If you have an installed unicode package, you can use these two options instead:
-
 =item C<--icushared=(linkeroption)>
 
-Linker command to link against ICU library version 2.6.
+Linker command to link against ICU library.
 
 E.g.
 
@@ -223,13 +209,11 @@ E.g.
 
 =item C<--icuheaders=(header_dir)>
 
-Location of ICU header files without the /unicode suffix. The header files must match your platform, especially F<platform.h> must be present.
+Location of ICU header files without the /unicode suffix. 
 
 E.g.
 
 --icuheaders='/home/lt/icu/'
-
-You might also need '--nomanicheck'.
 
 =back
 
