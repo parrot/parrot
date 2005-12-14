@@ -19,7 +19,9 @@
 
   .local pmc read
   read = find_global "_Tcl", "__read"
-  value = read(listname)
+  push_eh new_variable
+    value = read(listname)
+  clear_eh
   
   .local pmc __list
 

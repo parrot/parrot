@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 4;
+use Parrot::Test tests => 5;
 use Test::More;
 
 language_output_is("tcl",<<'TCL',<<OUT,"append nothing");
@@ -27,6 +27,12 @@ language_output_is("tcl",<<'TCL',<<OUT,"append multiple");
   puts $a
 TCL
 a b c d e f g
+OUT
+
+language_output_is("tcl", <<'TCL', <<'OUT', "new variable");
+  puts [lappend x 1]
+TCL
+1
 OUT
 
 language_output_is('tcl', <<'TCL', <<'OUT', 'wrong # args error');
