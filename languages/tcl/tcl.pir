@@ -19,6 +19,24 @@
 
 .include "languages/tcl/lib/returncodes.pir"
 
+.macro set_tcl_argv()
+  argc = argv # update
+  .sym pmc tcl_argv
+  tcl_argv = new "TclList"
+  .sym int ii,jj
+  ii = 1
+  jj = 0
+.local $argv_loop:
+  if ii >= argc  goto .$argv_loop_done
+  $P0 = argv[ii]
+  tcl_argv[jj] = $P0
+  inc ii
+  inc jj
+  goto .$argv_loop
+.local $argv_loop_done:
+  store_global "Tcl", "$argv", tcl_argv
+.endm
+
 .sub _main :main
   .param pmc argv
 
@@ -27,6 +45,7 @@
   .local pmc retval,source
   .local string mode,chunk,contents,filename
   .local int argc,retcode
+  argc = argv
 
   source = find_global "Tcl", "&source"
 
@@ -34,11 +53,12 @@
   tcl_interactive = new .TclInt
   store_global "Tcl", "$tcl_interactive", tcl_interactive
 
+
   .local pmc compiler,pir_compiler
   compiler = find_global "_Tcl", "compile"
   pir_compiler = find_global "_Tcl", "pir_compiler"
 
-  argc = argv
+
   if argc > 1 goto open_file
 
   tcl_interactive = 1
@@ -134,6 +154,7 @@ loop:
   goto loop
 
 gotfile:
+  .set_tcl_argv()
   unless dump_only goto run_file  
   push_eh file_error 
     ($I0,$S0) = compiler(0,contents)
@@ -159,6 +180,8 @@ badfile:
   .throw($S0)
 
 oneliner:
+  .set_tcl_argv()
+
   .local string tcl_code
   tcl_code = opt["e"]
   if dump_only goto oneliner_dump
@@ -231,3 +254,4 @@ no_prompt:
   STDOUT."flush"()
   .return()
 .end
+
