@@ -238,6 +238,8 @@ flatten:
         st->src.slurp = p_arg;
         st->src.slurp_i = 0;
         st->src.slurp_n = VTABLE_elements(interpreter, p_arg);
+	/* the -1 is because the :flat PMC itself doesn't count. */
+        st->n_actual_args += st->src.slurp_n-1;
         return Parrot_fetch_arg(interpreter, st);
     }
 
@@ -672,6 +674,7 @@ parrot_pass_args(Interp *interpreter,  parrot_context_t *src_ctx,
     todo = Parrot_init_arg_op(interpreter, dest_ctx, dst_pc, &st.dest);
     Parrot_init_arg_op(interpreter, src_ctx, src_pc, &st.src);
     st.opt_so_far = 0;  /* XXX */
+    st.n_actual_args = st.src.n;  /* initial guess, adjusted for :flat args */
     while (todo) {
         Parrot_fetch_arg(interpreter, &st);
         Parrot_convert_arg(interpreter, &st);
@@ -702,23 +705,42 @@ parrot_pass_args(Interp *interpreter,  parrot_context_t *src_ctx,
          * we are returning 1 retval to caller on behalf
          * of the NCI (a PIR method had already returned
          * all and doesn't run anything after the
-         * tailcall - ignore/fix missing arg_count
+         * tailcall - ignore arg_count
          */
-        st.src.i = st.src.n;
     }
-
-    if (st.src.i > st.src.n) {
-        if (!(st.dest.sig & (PARROT_ARG_OPTIONAL|
-                        PARROT_ARG_SLURPY_ARRAY|PARROT_ARG_OPT_FLAG))) {
-            real_exception(interpreter, NULL, E_ValueError,
-                    "too few arguments passed (%d) - %d %s expected",
-                    st.src.n, st.dest.n, action);
+    else {
+        /*
+         * compute the range of expected arguments.  we do this here when we
+         * know we need to check it.  on the other hand, we must compute
+         * st.n_actual_args as we go, as it's harder to get :flat array lengths
+         * after the fact.
+         */
+        int slurpy_p = (st.dest.sig
+                        & (PARROT_ARG_SLURPY_ARRAY|PARROT_ARG_OPT_FLAG));
+        int max_expected_args = (slurpy_p ? st.dest.n-1 : st.dest.n);
+        int min_expected_args = max_expected_args;
+        int i;
+        /* allow for optionals. */
+        for (i = 0; i < st.dest.n; i++) {
+            if (st.dest.sig & PARROT_ARG_OPTIONAL)
+                min_expected_args--;
         }
-    }
-    else if (st.src.n && st.src.i < st.src.n) {
-        real_exception(interpreter, NULL, E_ValueError,
-                "too many arguments passed (%d) - %d %s expected",
-                st.src.n, st.dest.n, action);
+
+        /* arg checks. */
+        if (st.n_actual_args < min_expected_args) {
+            real_exception(interpreter, NULL, E_ValueError,
+                    "too few arguments passed (%d) - %s%d %s expected",
+                    st.n_actual_args,
+                    (min_expected_args < max_expected_args ? "at least " : ""),
+                    min_expected_args, action);
+        }
+        else if (! slurpy_p && st.n_actual_args > max_expected_args) {
+            real_exception(interpreter, NULL, E_ValueError,
+                    "too many arguments passed (%d) - %s%d %s expected",
+                    st.n_actual_args,
+                    (min_expected_args < max_expected_args ? "at most " : ""),
+                    max_expected_args, action);
+        }
     }
 
     /* skip the get_params opcode - all done here */

@@ -50,6 +50,7 @@ struct call_state {
     struct call_state_1 dest;
     UnionVal val;
     int opt_so_far;
+    int n_actual_args;
 };
 
 int Parrot_init_arg_sig(Interp *, parrot_context_t *ctx,

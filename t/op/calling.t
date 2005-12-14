@@ -1155,6 +1155,105 @@ CODE
 1 2 3 4
 OUTPUT
 
+pir_output_is(<<'CODE', <<'OUTPUT', "right number of args via :flat");
+.sub _fn1
+    .param int arg1
+    .param int arg2
+    .param int arg3
+    .param int arg4
+    print arg1
+    print ' '
+    print arg2
+    print ' '
+    print arg3
+    print ' '
+    print arg4
+    print "\n"
+.end
+.sub main :main
+    .include "errors.pasm"
+    errorson .PARROT_ERRORS_PARAM_COUNT_FLAG
+    $P30 = new Integer
+    $P30 = 2
+    $P31 = new Integer
+    $P31 = 3
+    $P34 = new Array
+    $P34 = 3
+    $P34[0] = $P30
+    $P34[1] = $P31
+    $P34[2] = $P30
+    $P35 = _fn1(1, $P34 :flat)
+.end
+CODE
+1 2 3 2
+OUTPUT
+
+pir_output_like(<<'CODE', <<'OUTPUT', "too many args via :flat");
+.sub _fn1
+    .param int arg1
+    .param int arg2
+    .param int arg3
+    .param int arg4
+    print arg1
+    print ' '
+    print arg2
+    print ' '
+    print arg3
+    print ' '
+    print arg4
+    print "\n"
+.end
+.sub main :main
+    .include "errors.pasm"
+    errorson .PARROT_ERRORS_PARAM_COUNT_FLAG
+    $P30 = new Integer
+    $P30 = 2
+    $P31 = new Integer
+    $P31 = 3
+    $P34 = new Array
+    $P34 = 4
+    $P34[0] = $P30
+    $P34[1] = $P31
+    $P34[2] = $P30
+    $P34[3] = $P31
+    $P35 = _fn1(1, $P34 :flat)
+.end
+CODE
+/too many arguments passed \(5\) - 4 params expected/
+OUTPUT
+
+pir_output_like(<<'CODE', <<'OUTPUT', "too few args via :flat");
+.sub _fn1
+    .param int arg1
+    .param int arg2
+    .param int arg3
+    .param int arg4
+    print arg1
+    print ' '
+    print arg2
+    print ' '
+    print arg3
+    print ' '
+    print arg4
+    print "\n"
+.end
+.sub main :main
+    .include "errors.pasm"
+    errorson .PARROT_ERRORS_PARAM_COUNT_FLAG
+    $P30 = new Integer
+    $P30 = 2
+    $P31 = new Integer
+    $P31 = 3
+    $P34 = new Array
+    $P34 = 2
+    $P34[0] = $P30
+    $P34[1] = $P31
+    $P35 = _fn1(1, $P34 :flat)
+.end
+CODE
+/too few arguments passed \(3\) - 4 params expected/
+OUTPUT
+
 pir_output_is(<<'CODE', <<'OUTPUT', "tailcall to NCI");
 .sub main :main
     .local pmc s
@@ -1474,5 +1573,5 @@ OUTPUT
 
 
 ## remember to change the number of tests :-)
-BEGIN { plan tests => 54; }
+BEGIN { plan tests => 57; }
 
