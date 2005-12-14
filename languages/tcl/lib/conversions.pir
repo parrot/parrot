@@ -49,6 +49,7 @@ Given a PMC, get a number from it.
   $S0 = substr $S0, 1, $I0
 get_value:
   (value, $I1) = get_number($S0, 0)
+  if_null value, NaN
   if $I0 != $I1 goto NaN
   value *= multiplier
 
