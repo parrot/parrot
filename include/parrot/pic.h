@@ -77,9 +77,8 @@ void parrot_pic_find_infix_v_pp(Interp *, PMC *left, PMC *right,
                 Parrot_MIC *mic, opcode_t *cur_opcode);
 void * parrot_pic_opcode(Interp *, INTVAL op);
 
-typedef void (*arg_pass_f)(Interp *, int arg_count,
-        struct Parrot_Context *src_ctx, opcode_t *src_pc,
-        struct Parrot_Context *dst_ctx, opcode_t *dst_pc);
+typedef void (*arg_pass_f)(Interp *, int arg_count, 
+        char *src_base, void **src_pc, char *dest_base, void **dest_pc);
 
 #endif /* PARROT_PIC_H_GUARD */
 

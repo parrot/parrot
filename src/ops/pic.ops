@@ -139,7 +139,8 @@ inline op pic_get_params__(inconst PMC) :pic {
     Parrot_MIC *mic;
     Parrot_PIC_lru *lru;
     PMC *sig, *ccont;
-    opcode_t *pc = CUR_OPCODE, *src_pc;
+    opcode_t *src_pc;
+    void **src_pred;
     parrot_context_t *caller_ctx, *ctx;
     int n;
 
@@ -152,16 +153,20 @@ inline op pic_get_params__(inconst PMC) :pic {
     caller_ctx = ctx->caller_ctx;
     n = mic->m.arg_count;
     if (src_pc) {
-	sig = caller_ctx->constants[src_pc[1]]->u.key;
+	src_pred = (void**) src_pc - caller_ctx->pred_offset;
+	sig = (PMC*)(src_pred[1]);
     }
     else {
 	sig = NULL;
+	src_pred = NULL;	/* just for gcc */
     }
     lru = &mic->lru;
     if (lru->u.signature == sig) {
-	((arg_pass_f)lru->f.real_function)(interpreter, n,
-		caller_ctx, src_pc  + 2,
-		ctx, pc + 2);
+	if (sig) {
+	    ((arg_pass_f)lru->f.real_function)(interpreter, n, 
+		    (char*)caller_ctx->bp.regs_i, src_pred, 
+		    _reg_base, (void**)cur_opcode);
+	}
 	ccont = ctx->current_cont;
 	if (PObj_get_FLAGS(ccont) & SUB_FLAG_TAILCALL) {
 	    PObj_get_FLAGS(ccont) &= ~SUB_FLAG_TAILCALL;
@@ -183,7 +188,8 @@ inline op pic_set_returns__(inconst PMC) :pic {
     Parrot_MIC *mic;
     Parrot_PIC_lru *lru;
     PMC *sig, *ccont;
-    opcode_t *pc = CUR_OPCODE, *dest_pc;
+    opcode_t *dest_pc;
+    void **dest_pred;
     parrot_context_t *caller_ctx, *ctx;
     parrot_cont_t cc;
     int n;
@@ -191,26 +197,31 @@ inline op pic_set_returns__(inconst PMC) :pic {
     ctx = CONTEXT(interpreter->ctx);
     mic = (Parrot_MIC *) cur_opcode[1];
     ccont = ctx->current_cont;
-    n = mic->m.arg_count;
     cc = PMC_cont(ccont);
     if (!cc->address) {
-	interpreter->current_returns = pc;
+	interpreter->current_returns = CUR_OPCODE;
+	n = mic->m.arg_count;
 	goto OFFSET(n + 2);
     }
     caller_ctx = cc->to_ctx;
     interpreter->current_args = NULL;
     dest_pc = caller_ctx->current_results;
+    n = mic->m.arg_count;
     if (dest_pc) {
-	sig = caller_ctx->constants[dest_pc[1]]->u.key;
+	dest_pred = (void**) dest_pc - caller_ctx->pred_offset;
+	sig = (PMC*)(dest_pred[1]);
     }
     else {
 	sig = NULL;
+	dest_pred = NULL;
     }
     lru = &mic->lru;
     if (lru->u.signature == sig) {
-	((arg_pass_f)lru->f.real_function)(interpreter, n,
-		ctx, pc + 2,
-		caller_ctx, dest_pc  + 2);
+	if (sig) {
+	    ((arg_pass_f)lru->f.real_function)(interpreter, n, 
+		    _reg_base, (void**)cur_opcode, 
+		    (char*)caller_ctx->bp.regs_i, dest_pred);
+	}
 	goto OFFSET(n + 2);
     }
     /* no match redo plain opcode */
@@ -236,3 +247,14 @@ This program is free software. It is subject to the same license
 as the Parrot interpreter itself.
 
 =cut
+
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4 ft=c:
+*/

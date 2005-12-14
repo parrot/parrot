@@ -255,50 +255,50 @@ parrot_pic_opcode(Interp *interpreter, INTVAL op)
 }
 
 static void
-pass_int(Interp *interpreter, int n,
-        struct Parrot_Context *src_ctx, opcode_t *src_pc,
-        struct Parrot_Context *dst_ctx, opcode_t *dst_pc)
+pass_int(Interp *interpreter, int n, char *src_base, void **src, 
+		char *dest_base, void **dest)
 {
     INTVAL arg;
-    for ( ; n; ++src_pc, ++dst_pc, --n) {
-        arg = CTX_REG_INT(src_ctx, *src_pc);  /* no constants */
-        CTX_REG_INT(dst_ctx, *dst_pc) = arg;
+    int i;
+    for (i = 2 ; n; ++i, --n) {
+        arg = *(INTVAL *)(src_base + ((opcode_t*)src)[i]);
+        *(INTVAL *)(dest_base + ((opcode_t*)dest)[i])= arg;
     }
 }
 
 static void
-pass_num(Interp *interpreter, int n,
-        struct Parrot_Context *src_ctx, opcode_t *src_pc,
-        struct Parrot_Context *dst_ctx, opcode_t *dst_pc)
+pass_num(Interp *interpreter, int n, char *src_base, void **src, 
+		char *dest_base, void **dest)
 {
     FLOATVAL arg;
-    for ( ; n; ++src_pc, ++dst_pc, --n) {
-        arg = CTX_REG_NUM(src_ctx, *src_pc);
-        CTX_REG_NUM(dst_ctx, *dst_pc) = arg;
+    int i;
+    for (i = 2 ; n; ++i, --n) {
+        arg = *(FLOATVAL *)(src_base + ((opcode_t*)src)[i]);
+        *(FLOATVAL *)(dest_base + ((opcode_t*)dest)[i])= arg;
     }
 }
 
 static void
-pass_str(Interp *interpreter, int n,
-        struct Parrot_Context *src_ctx, opcode_t *src_pc,
-        struct Parrot_Context *dst_ctx, opcode_t *dst_pc)
+pass_str(Interp *interpreter, int n, char *src_base, void **src, 
+		char *dest_base, void **dest)
 {
-    STRING *arg;
-    for ( ; n; ++src_pc, ++dst_pc, --n) {
-        arg = CTX_REG_STR(src_ctx, *src_pc);
-        CTX_REG_STR(dst_ctx, *dst_pc) = arg;
+    STRING* arg;
+    int i;
+    for (i = 2 ; n; ++i, --n) {
+        arg = *(STRING* *)(src_base + ((opcode_t*)src)[i]);
+        *(STRING* *)(dest_base + ((opcode_t*)dest)[i])= arg;
     }
 }
 
 static void
-pass_pmc(Interp *interpreter, int n,
-        struct Parrot_Context *src_ctx, opcode_t *src_pc,
-        struct Parrot_Context *dst_ctx, opcode_t *dst_pc)
+pass_pmc(Interp *interpreter, int n, char *src_base, void **src, 
+		char *dest_base, void **dest)
 {
-    PMC *arg;
-    for ( ; n; ++src_pc, ++dst_pc, --n) {
-        arg = CTX_REG_PMC(src_ctx, *src_pc);
-        CTX_REG_PMC(dst_ctx, *dst_pc) = arg;
+    PMC* arg;
+    int i;
+    for (i = 2 ; n; ++i, --n) {
+        arg = *(PMC* *)(src_base + ((opcode_t*)src)[i]);
+        *(PMC* *)(dest_base + ((opcode_t*)dest)[i])= arg;
     }
 }
 /*

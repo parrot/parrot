@@ -144,7 +144,7 @@ sub goto_pop
 {
     my ($self) = @_;
     return "{ opcode_t *dest = (opcode_t*)pop_dest(interpreter);
-              cur_opcode = opcode_to_prederef(interpreter, dest);
+              cur_opcode = (opcode_t*)opcode_to_prederef(interpreter, dest);
 	      goto SWITCH_AGAIN; }";
 }
 
