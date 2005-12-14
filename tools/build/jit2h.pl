@@ -306,7 +306,7 @@ if (($cpuarch eq 'ppc') && ($genfile ne "src/jit_cpu.c")) {
 }
 
 
-%core_ops = readjit("jit/$cpuarch/core.jit");
+%core_ops = readjit("src/jit/$cpuarch/core.jit");
 
 print JITCPU $header if ($header);
 
