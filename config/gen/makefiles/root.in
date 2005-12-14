@@ -1115,15 +1115,15 @@ ${TEMP_encoding_build}
 $(INC_DIR)/vtable.h : vtable.tbl $(BUILD_TOOLS_DIR)/vtable_h.pl lib/Parrot/Vtable.pm
 	$(PERL) $(BUILD_TOOLS_DIR)/vtable_h.pl
 
-$(INC_DIR)/jit_emit.h : jit/${jitcpuarch}/jit_emit.h
-	$(CP) jit/${jitcpuarch}/jit_emit.h $(INC_DIR)/jit_emit.h
-$(INC_DIR)/exec_dep.h : jit/${jitcpuarch}/exec_dep.h
-	$(CP) jit/${jitcpuarch}/exec_dep.h $(INC_DIR)/exec_dep.h
+$(INC_DIR)/jit_emit.h : $(SRC_DIR)/jit/${jitcpuarch}/jit_emit.h
+	$(CP) $(SRC_DIR)/jit/${jitcpuarch}/jit_emit.h $(INC_DIR)/jit_emit.h
+$(INC_DIR)/exec_dep.h : $(SRC_DIR)/jit/${jitcpuarch}/exec_dep.h
+	$(CP) $(SRC_DIR)/jit/${jitcpuarch}/exec_dep.h $(INC_DIR)/exec_dep.h
 $(SRC_DIR)/jit_cpu.c : lib/Parrot/OpLib/core.pm $(INC_DIR)/jit_emit.h \
-	jit/${jitcpuarch}/core.jit $(BUILD_TOOLS_DIR)/jit2h.pl
+	$(SRC_DIR)/jit/${jitcpuarch}/core.jit $(BUILD_TOOLS_DIR)/jit2h.pl
 	$(PERL) $(BUILD_TOOLS_DIR)/jit2h.pl ${jitcpuarch} $(SRC_DIR)/jit_cpu.c
 $(SRC_DIR)/exec_cpu.c : lib/Parrot/OpLib/core.pm $(INC_DIR)/jit_emit.h \
-	jit/${jitcpuarch}/core.jit ${TEMP_exec_h} $(INC_DIR)/exec_dep.h $(BUILD_TOOLS_DIR)/jit2h.pl
+	$(SRC_DIR)/jit/${jitcpuarch}/core.jit ${TEMP_exec_h} $(INC_DIR)/exec_dep.h $(BUILD_TOOLS_DIR)/jit2h.pl
 	$(PERL) $(BUILD_TOOLS_DIR)/jit2h.pl ${jitcpuarch} $(SRC_DIR)/exec_cpu.c
 
 # imcc file dependencies

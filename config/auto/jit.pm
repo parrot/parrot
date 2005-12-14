@@ -31,7 +31,7 @@ sub runstep {
 
     return if $miniparrot;
 
-    my $jitbase             = "jit"; # base path for jit sources
+    my $jitbase             = "src/jit"; # base path for jit sources
     my $archname            =  $Config{archname};
     my ($cpuarch, $osname)  =  split( /-/, $archname);
 
