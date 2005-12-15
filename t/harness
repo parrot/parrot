@@ -170,12 +170,21 @@ unless ($html) {
         $self->_init;
         $self->{meat}{start_time} = time;
 
+	    my %stats;
+
         foreach my $file (@_) {
-     print STDERR "- $file\n";
-     $self->run_test($file);
+            my $data;
+    	    print STDERR "- $file\n";
+    	    $data = $self->run_test($file);
+    	    $stats{tests} += $data->{results}{max};
+    	    $stats{ok}    += $data->{results}{ok};
         }
 
-        $self->{meat}{end_time} = time;
+	    printf STDERR "%s OK from %s tests (%.2f%% ok)\n\n",
+            $stats{ok},
+            $stats{tests},
+            $stats{ok} / $stats{tests} * 100,
+            $self->{meat}{end_time} = time;
       };
 
       my $start = time();
