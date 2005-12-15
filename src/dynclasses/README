@@ -12,7 +12,7 @@ providing the Foo PMC class.
 =item 1
 
 Edit/create your foo.pmc source - For details on creating PMCs, see
-L<../src/classes/genclass.pl>
+F<tools/dev/gen_class.pl>
 
 There are some differences you have to be aware of when creating dynamic PMCs.
 

@@ -74,11 +74,11 @@ F<src/classes/> subdirectory; this is where all the built-in PMC classes live. (
 a good source of examples to plunder even if you're not writing a core data
 type.)
 
-You should almost always start by running F<src/classes/genclass.pl> to generate a
+You should almost always start by running F<tools/dev/gen_class.pl> to generate a
 skeleton for the class. Let's generate a number type for the beautifully
 non-existent Fooby language:
 
-    % perl -I../lib genclass.pl FoobyNumber > foobynumber.pmc
+    % perl tools/dev/gen_class.pl FoobyNumber > src/classes/foobynumber.pmc
 
 This will produce a skeleton C file (to be preprocessed by the
 F<tools/build/pmc2c.pl> program) with stubs for all the methods you need to
@@ -110,9 +110,9 @@ Rerun F<Configure.pl> to add your new PMC to the set of built-in PMCs.
 
 =head2 What You Can and Cannot Do
 
-The usual way to continue from the F<genclass.pl>-generated skeleton is to
-define a structure that will hook onto the C<data>, if your data type needs to
-use that, and then also define some user-defined flags.
+The usual way to continue from the F<tools/dev/gen_class.pl>-generated
+skeleton is to define a structure that will hook onto the C<data>, if your
+data type needs to use that, and then also define some user-defined flags.
 
 Flags are accessed by C<< pmc->flags >>. Most of the bits in the flag word are
 reserved for use by parrot itself, but a number of them have been assigned for
