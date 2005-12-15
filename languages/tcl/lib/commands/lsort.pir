@@ -55,6 +55,7 @@ got_list:
 
   unless unique goto skip_unique
   .local int c, size
+  c=0
   size = $P0
 
   if size == 0 goto strip_end
@@ -95,7 +96,6 @@ wrong_args:
   .local int size
   size = list
   size -= 1
-
   quicksort(compare, list, 0, size, decreasing)
 .end
 
@@ -105,7 +105,7 @@ wrong_args:
   .param int lo
   .param int hi
   .param int decreasing
-
+  
   if lo >= hi goto done
 
   .local pmc pivot
