@@ -44,7 +44,7 @@ my @core_opfunc = map { $_->func_name($trans) } @$Parrot::OpLib::core::ops;
 my %opcodes;
 
 for(@$Parrot::OpLib::core::ops) {
-    my $name = $_->{NAME} . '_' .join '_',@{$_->{ARGS}}[1..$#{$_->{ARGS}}];
+    my $name = $_->{NAME} . '_' .join '_',@{$_->{ARGS}}[0..$#{$_->{ARGS}}];
     $opcodes{$name} = $_->{CODE};
 }
 

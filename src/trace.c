@@ -264,7 +264,7 @@ trace_op_dump(Interp *interpreter, opcode_t *code_start,
     else
         PIO_eprintf(interpreter, "%s", info->name);
 
-    n = info->arg_count;
+    n = info->op_count;
     var_args = 0;
 
     if (*pc == PARROT_OP_set_args_pc ||
@@ -281,8 +281,8 @@ trace_op_dump(Interp *interpreter, opcode_t *code_start,
         /* pass 1 print arguments */
         for (i = s; i < n; i++) {
             opcode_t o = *(pc + i);
-            if (i < info->arg_count)
-                type = info->types[i];
+            if (i < info->op_count)
+                type = info->types[i - 1];
             else
                 type = get_var_type(interpreter, sig, i - 2);
             if (i > s &&
@@ -356,8 +356,8 @@ trace_op_dump(Interp *interpreter, opcode_t *code_start,
         /* pass 2 print argument details if needed */
         for (i = 1; i < n; i++) {
             opcode_t o = *(pc + i);
-            if (i < info->arg_count)
-                type = info->types[i];
+            if (i < info->op_count)
+                type = info->types[i - 1];
             else
                 type = get_var_type(interpreter, sig, i - 2);
             if (i > s) {

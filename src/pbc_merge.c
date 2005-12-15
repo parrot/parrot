@@ -591,10 +591,10 @@ pbc_merge_ctpointers(Interp *interpreter, struct pbc_merge_input **inputs,
         cur_op++;
 
         /* Loop over the arguments. */
-        for (cur_arg = 1; cur_arg < op->arg_count; cur_arg++)
+        for (cur_arg = 1; cur_arg < op->op_count; cur_arg++)
         {
             /* Pick out any indexes into the constant table and correct them. */
-            switch (op->types[cur_arg])
+            switch (op->types[cur_arg - 1])
             {
                 case PARROT_ARG_NC:
                 case PARROT_ARG_PC:

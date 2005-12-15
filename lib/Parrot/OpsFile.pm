@@ -481,7 +481,7 @@ sub make_op
     {
         my (@fixedargs)=split(/,/,$variant);
         my $op = Parrot::Op->new($code++, $type, $short_name,
-            [ 'op', @fixedargs ], [ '', @$argdirs ], [0, @$labels], $flags);
+            [ @fixedargs ], [ @$argdirs ], [ @$labels ], $flags);
         my $op_size = $op->size;
         my $jumps = "0";
 

@@ -81,7 +81,7 @@ prederef_args(void **pc_prederef, Interp *interpreter,
     regs_p = CONTEXT(interpreter->ctx)->n_regs_used[REGNO_PMC];
     regs_s = CONTEXT(interpreter->ctx)->n_regs_used[REGNO_STR];
     /* prederef var part too */
-    n = m = opinfo->arg_count; 
+    n = m = opinfo->op_count; 
     ADD_OP_VAR_PART(interpreter, interpreter->code, pc, n);
     for (i = 1; i < n; i++) {
         opcode_t arg = pc[i];
@@ -92,7 +92,7 @@ prederef_args(void **pc_prederef, Interp *interpreter,
             type &= (PARROT_ARG_TYPE_MASK | PARROT_ARG_CONSTANT);       
         }
 	else
-	    type = opinfo->types[i];
+	    type = opinfo->types[i - 1];
 
         switch (type) {
 
@@ -193,9 +193,9 @@ do_prederef(void **pc_prederef, Parrot_Interp interpreter, int type)
     /*
      * now remember backward branches, invoke and similar opcodes
      */
-    n = opinfo->arg_count;
+    n = opinfo->op_count;
     if (((opinfo->jump & PARROT_JUMP_RELATIVE) &&
-            opinfo->types[n - 1] == PARROT_ARG_IC &&
+            opinfo->types[n - 2] == PARROT_ARG_IC &&
             pc[n - 1] < 0) ||   /* relative backward branch */
             (opinfo->jump & PARROT_JUMP_ADDRESS)) {
         Prederef *pi = &interpreter->code->prederef;
@@ -379,7 +379,7 @@ init_prederef(Interp *interpreter, int which)
         for (i = n_pics = 0; i < N; ) {
             opinfo = &interpreter->op_info_table[*pc];
             temp[i] = pred_func;
-            n = opinfo->arg_count;
+            n = opinfo->op_count;
 	    ADD_OP_VAR_PART(interpreter, interpreter->code, pc, n);
             /* count ops that need a PIC */
             if (parrot_PIC_op_is_cached(interpreter, *pc))

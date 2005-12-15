@@ -371,8 +371,8 @@ Parrot_Context_info(Interp *interpreter, parrot_context_t *ctx,
                 break;
             }
             ADD_OP_VAR_PART(interpreter, sub->seg, pc, var_args);
-            n += op_info->arg_count + var_args;
-            pc += op_info->arg_count + var_args;
+            n += op_info->op_count + var_args;
+            pc += op_info->op_count + var_args;
         }
     }
     return 1;

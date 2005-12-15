@@ -462,7 +462,7 @@ static void jit_emit_load_i(Parrot_jit_info_t *jit_info,
     opcode_t op_type;
     int val;
 
-    op_type = interpreter->op_info_table[*jit_info->cur_op].types[param];
+    op_type = interpreter->op_info_table[*jit_info->cur_op].types[param - 1];
     val = jit_info->cur_op[param];
 
     switch(op_type){
@@ -526,7 +526,7 @@ static void jit_emit_store_i(Parrot_jit_info_t *jit_info,
     opcode_t op_type;
     int val;
 
-    op_type = interpreter->op_info_table[*jit_info->cur_op].types[param];
+    op_type = interpreter->op_info_table[*jit_info->cur_op].types[param - 1];
     val = jit_info->cur_op[param];
 
     switch(op_type){
@@ -568,7 +568,7 @@ static void jit_emit_load_n(Parrot_jit_info_t *jit_info,
     opcode_t op_type;
     long val;
 
-    op_type = interpreter->op_info_table[*jit_info->cur_op].types[param];
+    op_type = interpreter->op_info_table[*jit_info->cur_op].types[param - 1];
     val = jit_info->cur_op[param];
 
     switch(op_type){
@@ -616,7 +616,7 @@ static void jit_emit_store_n(Parrot_jit_info_t *jit_info,
     opcode_t op_type;
     int val;
 
-    op_type = interpreter->op_info_table[*jit_info->cur_op].types[param];
+    op_type = interpreter->op_info_table[*jit_info->cur_op].types[param - 1];
     val = jit_info->cur_op[param];
 
     switch(op_type){
@@ -856,7 +856,7 @@ Parrot_jit_vtable_n_op(Parrot_jit_info_t *jit_info,
         i  = args[idx - 1];
         pi = *(jit_info->cur_op + i);
 
-        switch (op_info->types[i]) {
+        switch (op_info->types[i - 1]) {
             case PARROT_ARG_S:
                 emitm_ld_i(jit_info->native_ptr, Parrot_jit_regbase,
                            REG_OFFS_STR(pi), emitm_o(rdx));
@@ -912,7 +912,7 @@ Parrot_jit_vtable_n_op(Parrot_jit_info_t *jit_info,
             default:
                 internal_exception(1,
                         "jit_vtable_n_op: unimp type %d, arg %d vtable %d",
-                        op_info->types[i], i, nvtable);
+                        op_info->types[i - 1], i, nvtable);
                 break;
         }
 
@@ -930,7 +930,7 @@ static void
 Parrot_jit_store_retval(Parrot_jit_info_t *jit_info,
                         Interp * interpreter)
 {
-    opcode_t op_type = interpreter->op_info_table[*jit_info->cur_op].types[1];
+    opcode_t op_type = interpreter->op_info_table[*jit_info->cur_op].types[0];
     long     val     = jit_info->cur_op[1];
 
     switch(op_type){

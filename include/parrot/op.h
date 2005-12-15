@@ -15,7 +15,7 @@
 
 #include "parrot/config.h"
 
-#define PARROT_MAX_ARGS 10
+#define PARROT_MAX_ARGS 8
 
 typedef enum {
     PARROT_INLINE_OP,
@@ -36,8 +36,7 @@ typedef enum {
     PARROT_ARG_P = PARROT_ARG_PMC,
     PARROT_ARG_S = PARROT_ARG_STRING,
     PARROT_ARG_K = PARROT_ARG_P         | PARROT_ARG_KEYED,
-    PARROT_ARG_KI= PARROT_ARG_I         | PARROT_ARG_KEYED,
-    PARROT_ARG_OP         /* TODO get rid of it */
+    PARROT_ARG_KI= PARROT_ARG_I         | PARROT_ARG_KEYED
 } arg_type_t;
 
 typedef enum {
@@ -79,10 +78,10 @@ typedef struct {
     const char *func_name;
     /* const char *body; unused */
     unsigned short jump;           /* s. above */
-    short arg_count;               /* Includes opcode as one arg */
-    char types[PARROT_MAX_ARGS];   /* arg_type_t, 0 = op */
-    char dirs[PARROT_MAX_ARGS];    /* arg_dir_t   0 = op */
-    char labels[PARROT_MAX_ARGS];  /* 0/1         0 = op */
+    short op_count;               /* Includes opcode as one arg */
+    char types[PARROT_MAX_ARGS];   /* arg_type_t, 0 = 1st arg */
+    char dirs[PARROT_MAX_ARGS];    /* arg_dir_t   0 = 1st arg */
+    char labels[PARROT_MAX_ARGS];  /* 0/1         0 = 1st arg */
     unsigned int flags;
 } op_info_t;
 

@@ -2288,7 +2288,7 @@ Parrot_jit_vtable_n_op(Parrot_jit_info_t *jit_info,
     for (idx = n; idx > 0; idx--) {
         i = args[idx-1];
         pi = *(jit_info->cur_op + i);
-        switch (op_info->types[i]) {
+        switch (op_info->types[i - 1]) {
             case PARROT_ARG_S:
                 emitm_movl_m_r(jit_info->native_ptr,
                         emit_EAX, emit_EBX, emit_None, 1, REG_OFFS_STR(pi));
@@ -2390,7 +2390,7 @@ store:
             default:
                 internal_exception(1,
                         "jit_vtable_n_op: unimp type %d, arg %d vtable %d",
-                        op_info->types[i], i, nvtable);
+                        op_info->types[i - 1], i, nvtable);
                 break;
         }
     }
@@ -2421,7 +2421,7 @@ Parrot_jit_store_retval(Parrot_jit_info_t *jit_info,
     int p1 = *(jit_info->cur_op + 1);
 
     /* return result is in EAX or ST(0) */
-    switch (op_info->types[1]) {
+    switch (op_info->types[0]) {
         case PARROT_ARG_I:
             emitm_movl_r_m(jit_info->native_ptr,
                     emit_EAX, emit_EBX, emit_None, 1, REG_OFFS_INT(p1));
@@ -2598,7 +2598,7 @@ Parrot_jit_vtable_newp_ic_op(Parrot_jit_info_t *jit_info,
     extern char **Parrot_exec_rel_addr;
     extern int Parrot_exec_rel_count;
 
-    assert(op_info->types[1] == PARROT_ARG_P);
+    assert(op_info->types[0] == PARROT_ARG_P);
     p1 = *(jit_info->cur_op + 1);
     i2 = *(jit_info->cur_op + 2);
     if (i2 <= 0 || i2 >= enum_class_max)

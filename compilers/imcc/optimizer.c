@@ -586,32 +586,32 @@ eval_ins(Interp *interpreter, char *op, size_t ops, SymReg **r)
     op_info = interpreter->op_info_table + opnum;
     /* now fill registers */
     eval[0] = opnum;
-    for (i = 1; i < op_info->arg_count; i++) {
+    for (i = 0; i < op_info->op_count - 1; i++) {
         switch (op_info->types[i]) {
             case PARROT_ARG_IC:
-                assert((i == 3 && ops == 2) || (i == 2 && ops == 1));
+                assert(i && ops == i);
                 /* set branch offset to zero */
-                eval[i] = 0;
+                eval[i + 1] = 0;
                 break;
             case PARROT_ARG_I:
             case PARROT_ARG_N:
             case PARROT_ARG_S:
-                eval[i] = i - 1;        /* regs used are I0, I1, I2 */
-                if (ops <= 2 || i > 1) { /* fill source regs */
-                    switch (r[i-1]->set) {
+                eval[i + 1] = i;        /* regs used are I0, I1, I2 */
+                if (ops <= 2 || i) { /* fill source regs */
+                    switch (r[i]->set) {
                         case 'I':
-                            REG_INT(i-1) =
-                                IMCC_int_from_reg(interpreter, r[i-1]);
+                            REG_INT(i) =
+                                IMCC_int_from_reg(interpreter, r[i]);
                             break;
                         case 'N':
                             s = string_from_cstring(interpreter,
-                                    r[i-1]->name, 0);
-                            REG_NUM(i-1) =
+                                    r[i]->name, 0);
+                            REG_NUM(i) =
                                 string_to_num(interpreter, s);
                             break;
                         case 'S':
-                            REG_STR(i-1) =
-                                IMCC_string_from_reg(interpreter, r[i-1]);
+                            REG_STR(i) =
+                                IMCC_string_from_reg(interpreter, r[i]);
                             break;
                     }
                 }
@@ -625,10 +625,10 @@ eval_ins(Interp *interpreter, char *op, size_t ops, SymReg **r)
 
     /* eval the opcode */
     pc = (interpreter->op_func_table[opnum]) (eval, interpreter);
-    /* the returned pc is either incremented by arg_count or is eval,
+    /* the returned pc is either incremented by op_count or is eval,
      * as the branch offset is 0 - return true if it branched
      */
-    assert(pc == eval + op_info->arg_count || pc == eval);
+    assert(pc == eval + op_info->op_count || pc == eval);
     return pc == eval;
 }
 

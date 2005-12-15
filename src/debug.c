@@ -27,6 +27,7 @@ debugger, and the C<debug> ops.
 #include "parrot/oplib.h"
 #include "parrot/trace.h"
 #include "parrot/debug.h"
+#include "parrot/oplib/ops.h"
 
 /* na(c) [Next Argument (Char pointer)]
  *
@@ -1446,14 +1447,14 @@ PDB_disassemble_op(Interp *interpreter, char* dest, int space,
     dest[size++] = ' ';
 
     /* Concat the arguments */
-    for (j = 1; j < info->arg_count; j++) {
+    for (j = 1; j < info->op_count; j++) {
         char buf[256];
         INTVAL i = 0;
         FLOATVAL f;
         PMC* k;
 
         assert(size + 2 < space);
-        switch (info->types[j]) {
+        switch (info->types[j-1]) {
         case PARROT_ARG_I:
             dest[size++] = 'I';
             goto INTEGER;
@@ -1469,7 +1470,7 @@ PDB_disassemble_op(Interp *interpreter, char* dest, int space,
         case PARROT_ARG_IC:
             /* If the opcode jumps and this is the last argument,
                that means this is a label */
-            if ((j == info->arg_count - 1) &&
+            if ((j == info->op_count - 1) &&
                 (info->jump & PARROT_JUMP_RELATIVE))
             {
                 if (file) {
@@ -1616,7 +1617,7 @@ PDB_disassemble_op(Interp *interpreter, char* dest, int space,
             internal_exception(1, "Unknown opcode type");
         }
 
-        if (j != info->arg_count - 1)
+        if (j != info->op_count - 1)
             dest[size++] = ',';
     }
 
@@ -1646,7 +1647,7 @@ PDB_disassemble(Interp *interpreter, const char *command)
 
     const unsigned int default_size = 32768;
     size_t space;  /* How much space do we have? */
-    size_t size, alloced;
+    size_t size, alloced, n;
 
     pfile = (PDB_file_t *)mem_sys_allocate(sizeof(PDB_file_t));
     pline = (PDB_line_t *)mem_sys_allocate(sizeof(PDB_line_t));
@@ -1681,7 +1682,9 @@ PDB_disassemble(Interp *interpreter, const char *command)
 
         /* Store the opcode of this line */
         pline->opcode = pc;
-        pc += interpreter->op_info_table[*pc].arg_count;
+        n = interpreter->op_info_table[*pc].op_count;
+        ADD_OP_VAR_PART(interpreter, interpreter->code, pc, n);
+        pc += n;
         /* Prepare for next line */
         newline = (PDB_line_t *)mem_sys_allocate(sizeof(PDB_line_t));
         newline->number = pline->number + 1;
@@ -1866,8 +1869,11 @@ PDB_load_source(Interp *interpreter, const char *command)
             /* If the line has an opcode move to the next one,
                otherwise leave it with NULL to skip it. */
             if (PDB_hasinstruction(pfile->source + pline->source_offset)) {
+                size_t n;
                 pline->opcode = pc;
-                pc += interpreter->op_info_table[*pc].arg_count;
+                n = interpreter->op_info_table[*pc].op_count;
+                ADD_OP_VAR_PART(interpreter, interpreter->code, pc, n);
+                pc += n;
             }
             newline =
                     (PDB_line_t *)mem_sys_allocate_zeroed(sizeof(PDB_line_t));

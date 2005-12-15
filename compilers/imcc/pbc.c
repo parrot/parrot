@@ -1216,11 +1216,11 @@ e_pbc_emit(Interp *interpreter, void *param, IMC_Unit * unit, Instruction * ins)
         /* Get the info for that opcode */
         op_info = &interpreter->op_info_table[op];
         IMCC_debug(interpreter, DEBUG_PBC, "%d %s", npc, op_info->full_name);
-        for (i = 0; i < op_info->arg_count-1; i++) {
-            switch (op_info->types[i+1]) {
+        for (i = 0; i < op_info->op_count-1; i++) {
+            switch (op_info->types[i]) {
                 case PARROT_ARG_IC:
                     /* branch instruction */
-                    if (op_info->labels[i+1]) {
+                    if (op_info->labels[i]) {
                         if (last_label == 0)   /* we don't have a branch with offset 0 !? */
                             IMCC_fatal(interpreter, 1, "e_pbc_emit: "
                                     "no label offset found\n");
