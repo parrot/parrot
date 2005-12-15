@@ -21,12 +21,24 @@ If I'm called with no args, I run the suite.
 
 my @files;
 
-# Per Leo on 18APR2005, run the test suite with --gc-debug
+# Setting these options helps flush out issues that might otherwise
+# happen to slip by.
 
-if ($ENV{TEST_PROG_ARGS} && $ENV{TEST_PROG_ARGS} !~ /\b--gc-debug\b/) {
-  $ENV{TEST_PROG_ARGS} .= " --gc-debug ";
-} elsif (! $ENV{TEST_PROG_ARGS} ) {
-  $ENV{TEST_PROG_ARGS} = " --gc-debug ";
+my @required_options = qw/--gc-debug -D40/;
+
+foreach my $option (@required_options) {
+  if ( $ENV{TEST_PROG_ARGS} !~ /\b$option\b/) {
+    $ENV{TEST_PROG_ARGS} .= " $option";
+  }
+}
+
+my $DTotal = 0;
+while ($ENV{TEST_PROG_ARGS} =~ s/-D(\d*)//) {
+  $DTotal += $1;
+}
+
+if ($DTotal) {
+  $ENV{TEST_PROG_ARGS} .= "-D$DTotal";
 }
 
 if ( grep { /^--files$/ } @ARGV ) {
