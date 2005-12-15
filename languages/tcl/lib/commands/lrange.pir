@@ -21,13 +21,18 @@
   .local pmc list_index
   list_index = find_global "_Tcl", "_list_index"
 
+  .local pmc __list
+  __list = find_global "_Tcl", "__list"
+ 
+  the_list = __list(the_list)
+
   ($P0,$I2) = list_index(the_list,first)
   first = $P0
 
   .local pmc last
   last = argv[2]
 
-  ($P0,$I2) = _list_index(the_list,last)
+  ($P0,$I2) = list_index(the_list,last)
   last = $P0
  
   .local int the_index
