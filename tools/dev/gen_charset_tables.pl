@@ -3,9 +3,27 @@ use strict;
 use warnings;
 use POSIX qw(locale_h);
 use locale;
+use File::Spec;
+
+
+=head1 NAME
+
+tools/build/gen_charset_tables.pl -- generate charset tables
+
+=head1 SYNOPSIS
+
+	perl tools/build/gen_charset_tables.pl
+
+=head1 DESCRIPTION
+
+Generate character set tables.
+
+=cut
+
 
 my ($svnid) = '$Id: gen_tables.pl jrieks $' =~ /^\$[iI][dD]:\s(.*)\$$/;
 my $fileid = '$'.'id $';
+my $charset_dir = File::Spec->catdir(qw/ src charset /);
 
 #
 # charset tables to create
@@ -64,6 +82,7 @@ sub classify {
     return $ret;
 }
 
+
 =item B<create_table>( $name )
 
 Create a whole character table
@@ -87,11 +106,12 @@ sub create_table {
 
 
 #
-# create 'charset/tables.c'
+# create 'src/charset/tables.c'
 #
 ###########################################################################
-open STDOUT, ">src/charset/tables.c"
-    or die "can not open 'src/charset/tables.c\n";
+my $c_file= File::Spec->catfile($charset_dir, 'tables.c');
+open STDOUT, '>', $c_file
+    or die "can not open '$c_file': $!\n";
 print <<"END";
 $header
 #include "tables.h"
@@ -106,11 +126,12 @@ close STDOUT;
 
 
 #
-# create 'charset/tables.h'
+# create 'src/charset/tables.h'
 #
 ###########################################################################
-open STDOUT, ">src/charset/tables.h"
-    or die "can not open 'src/charset/tables.c\n";
+my $h_file= File::Spec->catfile($charset_dir, 'tables.h');
+open STDOUT, '>', $h_file
+    or die "can not open '$h_file': $!\n";
 print <<"END";
 $header
 #if !defined(PARROT_CHARSET_TABLES_H_GUARD)
