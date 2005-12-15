@@ -82,7 +82,7 @@ sub prebuild_classes {
 sub clean {
     print "** $0: removing files in miniparrot directory\n";
     find(sub {
-	     return if ($File::Find::dir =~ /CVS/);
+	     return if ($File::Find::dir =~ /\.svn/);
 	     unlink($_) if (-f $_);
          }, 'miniparrot');
 }

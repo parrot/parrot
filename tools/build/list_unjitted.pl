@@ -6,7 +6,7 @@ unless (1 == scalar @ARGV){
     print "Must give a directory as an argument.\nPossible options are:";
     opendir DIR, 'jit' or die $!;
     while (my $dir = readdir DIR){
-        next if $dir =~ /^\./ or $dir eq 'CVS';
+        next if $dir =~ /^\./ or $dir eq '\.svn';
         print $dir;
     }
     exit 1;
