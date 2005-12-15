@@ -11,33 +11,63 @@
   .local int argc
   argc = argv
 
-  .local string varname,sigil_varname
-  varname = argv[0]
-  sigil_varname = "$" . varname
-
-  .local int call_level
-  $P0 = find_global "_Tcl", "call_level"
-  call_level = $P0
-  .local pmc find_var, found_var
+  .local string name
+  name = argv[0]
+  .local pmc find_var, var
   find_var = find_global "_Tcl", "__find_var"
-  found_var = find_var(varname)
-  if_null found_var, error
+  
+  # is this an array?
+  # ends with )
+  .local int char
+  char = ord name, -1
+  if char != 41 goto scalar
+  # contains a (
+  char = index name, "("
+  if char == -1 goto scalar
 
-  null found_var
-  if call_level == 0 goto remove_global
-  store_lex sigil_varname, found_var
-  .return ("") 
+array:
+  .local string array
+  array = substr name, 0, char
+  
+  .local string key
+  .local int len
+  len = length name
+  len -= char
+  len -= 2
+  inc char
+  key = substr name, char, len
+  
+  push_eh no_such_var
+    var = find_var(array)
+  clear_eh
+  if null var goto no_such_var
+  
+  $I0 = exists var[key]
+  if $I0 == 0 goto no_such_element
+  delete var[key]
+  .return("")
 
-remove_global:
-  store_global "Tcl", sigil_varname, found_var
-  .return ("") 
-
-error:
+no_such_element:
   $S0 = "can't unset \""
-  $S0 .= varname
-  $S0 .= "\": no such variable"
-  .throw ($S0)
+  $S0 .= name
+  $S0 .= "\": no such element in array"
+  .throw($S0)
 
-catch:
-###  goto resume   XXX no such label
+scalar:
+  push_eh no_such_var
+    var = find_var(name)
+  clear_eh
+  if null var goto no_such_var
+
+  null var
+  .local pmc store_var
+  store_var = find_global "_Tcl", "__store_var"
+  store_var(name, var)
+  .return("")
+
+no_such_var:
+  $S0 = "can't unset \""
+  $S0 .= name
+  $S0 .= "\": no such variable"
+  .throw($S0)
 .end
