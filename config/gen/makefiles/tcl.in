@@ -83,6 +83,7 @@ lib${slash}commands${slash}uplevel.pir \
 lib${slash}commands${slash}upvar.pir \
 lib${slash}builtins${slash}variable.pir \
 lib${slash}builtins${slash}while.pir \
+lib${slash}compiler.pir \
 lib${slash}conversions.pir \
 lib${slash}expression.pir \
 lib${slash}list.pir \
