@@ -27,6 +27,5 @@ language_output_is("tcl",<<'TCL',<<OUT,"while with semicolons, command in quotes
  puts $a
 TCL
 *****
-done
 OUT
 
