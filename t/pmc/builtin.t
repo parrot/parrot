@@ -54,6 +54,12 @@ pir_output_is(<<'CODE', <<'OUT', "say");
     say "ok 3"
     say io, "ok 4"
     "say"(io, "ok 5")
+    .local pmc s
+    s = new .String
+    s = "ok 6"
+    say io, s
+    s = "ok 7"
+    say s
 .end
 CODE
 ok 1
@@ -61,6 +67,8 @@ ok 2
 ok 3
 ok 4
 ok 5
+ok 6
+ok 7
 OUT
 
 SKIP: {

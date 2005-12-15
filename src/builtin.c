@@ -131,7 +131,7 @@ find_builtin_s(Interp *interpreter, STRING *func)
 }
 
 static int
-check_builtin_sig(Interp *interpreter, size_t i, char *sig)
+check_builtin_sig(Interp *interpreter, size_t i, char *sig, int pass)
 {
     Builtins *b = builtins + i;
     const char *p;
@@ -150,6 +150,8 @@ check_builtin_sig(Interp *interpreter, size_t i, char *sig)
         }
         if (*p == 'O' && *sig == 'P')
             continue;
+        if (pass && (*p == 'P' || *sig == 'P'))
+            continue;
         if (*p != *sig)
             return 0;
     }
@@ -163,7 +165,7 @@ check_builtin_sig(Interp *interpreter, size_t i, char *sig)
 int
 Parrot_is_builtin(Interp *interpreter, char *func, char *sig)
 {
-    int i, n;
+    int bi, i, n, pass;
 
     i = find_builtin(interpreter, func);
     if (i < 0)
@@ -171,18 +173,21 @@ Parrot_is_builtin(Interp *interpreter, char *func, char *sig)
     if (!sig)
         return i;
     n = sizeof(builtins) / sizeof(builtins[0]);
-    while (!check_builtin_sig(interpreter, i, sig)) {
+    bi = i;
+    for (pass = 0; pass <= 1; ++pass) {
+        i = bi;
+again:
+        if (check_builtin_sig(interpreter, i, sig, pass)) 
+            return i;
         if (i < n - 1) {
             /* try next with same name */
             ++i;
             if (strcmp(func, builtins[i].c_name))
-                return -1;
+                continue;
+            goto again;
         }
-        else
-            return -1;
     }
-
-    return i;
+    return -1;
 }
 
 PMC*
