@@ -85,34 +85,11 @@ prederef_args(void **pc_prederef, Interp *interpreter,
     ADD_OP_VAR_PART(interpreter, interpreter->code, pc, n);
     for (i = 1; i < n; i++) {
         opcode_t arg = pc[i];
-        int type, sigt;
+        int type;
         if (i >= m) {
 	    sig = (PMC*) pc_prederef[1]; 
-	    sigt = VTABLE_get_integer_keyed_int(interpreter, sig, i - m);
-	    type = -1;
-	    /* TODO unify PARROT_ARG_xy below */
-	    switch (sigt & PARROT_ARG_TYPE_MASK) {
-		case PARROT_ARG_INTVAL: 
-		    type = PARROT_ARG_I; 
-		    if (sigt & PARROT_ARG_CONSTANT)
-			type = PARROT_ARG_IC;
-		    break;
-		case PARROT_ARG_FLOATVAL: 
-		    type = PARROT_ARG_N; 
-		    if (sigt & PARROT_ARG_CONSTANT)
-			type = PARROT_ARG_NC;
-		    break;
-		case PARROT_ARG_STRING: 
-		    type = PARROT_ARG_S; 
-		    if (sigt & PARROT_ARG_CONSTANT)
-			type = PARROT_ARG_SC;
-		    break;
-		case PARROT_ARG_PMC: 
-		    type = PARROT_ARG_P; 
-		    if (sigt & PARROT_ARG_CONSTANT)
-			type = PARROT_ARG_PC;
-		    break;
-	    }
+	    type = VTABLE_get_integer_keyed_int(interpreter, sig, i - m);
+            type &= (PARROT_ARG_TYPE_MASK | PARROT_ARG_CONSTANT);       
         }
 	else
 	    type = opinfo->types[i];
@@ -170,7 +147,7 @@ prederef_args(void **pc_prederef, Interp *interpreter,
             break;
         default:
             internal_exception(ARG_OP_NOT_HANDLED,
-                               "Unhandled argtype %d\n",opinfo->types[i]);
+                               "Unhandled argtype 0x%x\n", type);
             break;
         }
     }

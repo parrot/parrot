@@ -585,11 +585,9 @@ eval_ins(Interp *interpreter, char *op, size_t ops, SymReg **r)
         IMCC_fatal(interpreter, 1, "eval_ins: op '%s' not found\n", op);
     op_info = interpreter->op_info_table + opnum;
     /* now fill registers */
-    for (i = 0; i < op_info->arg_count; i++) {
+    eval[0] = opnum;
+    for (i = 1; i < op_info->arg_count; i++) {
         switch (op_info->types[i]) {
-            case PARROT_ARG_OP:
-                eval[i] = opnum;
-                break;
             case PARROT_ARG_IC:
                 assert((i == 3 && ops == 2) || (i == 2 && ops == 1));
                 /* set branch offset to zero */
