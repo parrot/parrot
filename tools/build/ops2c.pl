@@ -474,11 +474,21 @@ END_C
 	my $body       = $op->body;
 	my $jump       = $op->jump || 0;
 	my $arg_count  = $op->size;
-	my $arg_types  = "{ " . join(", ",
-	   map { sprintf("PARROT_ARG_%s", uc $_) } $op->arg_types) . " }";
-	my $arg_dirs   = "{ " . join(", ",
-	   map { $arg_dir_mapping{$_} } $op->arg_dirs) . " }";
-	my $labels   = "{ " . join(", ",  $op->labels) . " }";
+
+	## 0 inserted if arrays are empty to prevent msvc compiler errors
+	my $arg_types  = "{ " . join(", ", scalar $op->arg_types 
+		? map { sprintf("PARROT_ARG_%s", uc $_) } $op->arg_types
+		: 0
+	) . " }"
+	;
+	my $arg_dirs   = "{ " . join(", ", scalar $op->arg_dirs
+		? map { $arg_dir_mapping{$_} } $op->arg_dirs
+		: 0
+	) . " }";
+	my $labels     = "{ " . join(", ",  scalar $op->labels
+		? $op->labels
+		: 0
+	) . " }";
 	my $flags      = 0;
 
 	print SOURCE <<END_C;
