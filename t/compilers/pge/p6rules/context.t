@@ -119,11 +119,10 @@ OUT
 pir_output_is($PRE.<<'CODE'.$POST,<<OUT,'numeric context (1E5)');
 	rulesub = p6rule('1E5abc')
 	match = rulesub('1E5abc')
-	$I0 = match
-	print $I0
+	print match
 	goto END
 CODE
-100000
+1E5abc
 OUT
 
 
