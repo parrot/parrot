@@ -13,15 +13,30 @@
 
 use sys;
 
-var int x;
+const int X = 42; # These test integer global constants
+const int Y = 137;
 
-sub printit (int x) {
-  sys::print("$x\n");
+const num A = 3.14; # These test the non-integer global constant types
+const str B = "Howdy!";
+
+var int x; # These test integer global variables
+var int y;
+
+var num a; # These test the non-integer global variable types
+var str b;
+
+x = X;
+y = Y;
+
+a = A;
+b = B;
+
+sub printit (int x, int y) {
+  sys::print("x = $x; y = $y\n");
 }
 
-x = 42;
-printit(x);
+printit(x, y);
 
 x = 1234;
-printit(x);
+printit(x, y);
 
