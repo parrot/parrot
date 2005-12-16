@@ -29,7 +29,7 @@ integers or double-quoted strings, in the form of:
 .sub _main :main
     .param pmc args
 
-    load_bytecode "languages/punie/lib/PunieGrammar.pir"
+    load_bytecode "languages/punie/lib/PunieGrammar.pbc"
 
     .local string source
     source = _get_source(args)
@@ -130,7 +130,7 @@ integers or double-quoted strings, in the form of:
     end
 .end
 
-# Read in the source either from a file or from STDIN
+# Read in the source from a file
 .sub _get_source
     .param pmc argv
     .local string filename

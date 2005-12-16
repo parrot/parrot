@@ -671,6 +671,10 @@
 ^languages/punie/.*\.pbc$
 ^languages/punie/.*\.pbc/
 # generated from svn:ignore of 'languages/punie/lib/'
+^languages/punie/lib/punie_grammar_gen\.pir$
+^languages/punie/lib/punie_grammar_gen\.pir/
+^languages/punie/lib/PunieGrammar\.pbc$
+^languages/punie/lib/PunieGrammar\.pbc/
 # generated from svn:ignore of 'languages/punie/lib/PAST/'
 # generated from svn:ignore of 'languages/punie/lib/POST/'
 # generated from svn:ignore of 'languages/punie/t/'

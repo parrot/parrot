@@ -10,7 +10,11 @@ CP       = ${cp}
 # the default target
 all: punie.pbc
 
-punie.pbc: lib/PunieGrammar.pir punie.pir
+lib/PunieGrammar.pbc: lib/PunieGrammar.pir lib/punie.g
+	$(PARROT) pge_compile.pir lib/punie.g > lib/punie_grammar_gen.pir
+	$(PARROT) -o lib/PunieGrammar.pbc --output-pbc lib/PunieGrammar.pir 
+
+punie.pbc: lib/PunieGrammar.pbc punie.pir
 	$(PARROT) -o punie.pbc --output-pbc punie.pir 
 
 # This is a listing of all targets, that are meant to be called by users
@@ -41,6 +45,8 @@ testclean:
 
 clean: testclean
 	$(RM_F) punie.pbc
+	$(RM_F) lib/punie_grammar_gen.pir
+	$(RM_F) lib/PunieGrammar.pbc
 
 realclean: clean
 	$(RM_F) Makefile

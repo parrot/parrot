@@ -43,18 +43,11 @@ digit, in the form of 'print 1;'.
 
     $P0 = getclass 'PGE::Rule'
     $P1 = subclass $P0, 'PunieGrammar'
-
-    # Construct the grammar
-    .local pmc p6rule
-    find_global p6rule, 'PGE', 'p6rule'
-
-    p6rule('\d+ | <PGE::Text::bracketed: ">', 'PunieGrammar', 'term')
-    p6rule('(print) \s* <PunieGrammar::expr>', 'PunieGrammar', 'gprint')
-    p6rule('<PunieGrammar::gprint> | <PunieGrammar::term>', 'PunieGrammar', 'expr')
-    p6rule('\s*<PunieGrammar::expr>;\s*', 'PunieGrammar', 'line')
-    p6rule('\s*<PunieGrammar::line>*\s*', 'PunieGrammar', 'lineseq')
-    p6rule('^<PunieGrammar::lineseq>$', 'PunieGrammar', 'prog')
 .end
+
+# Pull in the compiled grammar
+
+.include "languages/punie/lib/punie_grammar_gen.pir"
 
 =head1 LICENSE
 
