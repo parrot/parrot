@@ -20,6 +20,8 @@
 
   # possible options
   .local int decr, unique
+  decr = 0
+  unique = 0
 chew_flag:
   $P0 = shift argv
   unless argv goto got_list
@@ -105,7 +107,9 @@ wrong_args:
   .param int lo
   .param int hi
   .param int decreasing
-  
+
+
+  $I0 = list
   if lo >= hi goto done
 
   .local pmc pivot
@@ -149,6 +153,7 @@ move_end:
 
   $I0 = l - 1
   $I1 = l + 1
+
   quicksort(compare, list, lo, $I0, decreasing)
   quicksort(compare, list, $I1, hi, decreasing)
 
