@@ -108,8 +108,6 @@ wrong_args:
   .param int hi
   .param int decreasing
 
-
-  $I0 = list
   if lo >= hi goto done
 
   .local pmc pivot
