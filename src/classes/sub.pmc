@@ -243,7 +243,6 @@ Invokes the subroutine.
         struct Parrot_Context *context;
         PMC *ccont;
         opcode_t *pc;
-        int args_passed;
 
         if (Interp_trace_TEST(INTERP, PARROT_TRACE_SUB_CALL_FLAG)) {
             print_sub_name(INTERP, SELF);
@@ -274,7 +273,6 @@ Invokes the subroutine.
         caller_ctx = CONTEXT(INTERP->ctx);
         ccont = INTERP->current_cont;
         INTERP->current_cont = NULL;
-        args_passed = 0;
         if (ccont == NEED_CONTINUATION) {
             ccont = new_ret_continuation_pmc(interpreter, next);
         }
