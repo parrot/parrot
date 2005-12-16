@@ -541,20 +541,26 @@ create_lexinfo(Interp *interpreter, IMC_Unit *unit, PMC *sub, int need_lex)
     for (i = 0; i < hsh->size; i++) {
         for (r = hsh->data[i]; r; r = r->next) {
             if (r->set == 'P' && r->usage & U_LEXICAL) {
+                SymReg *n;
                 if (!lex_info) {
                     lex_info = pmc_new_noinit(interpreter, lex_info_id);
                     VTABLE_init_pmc(interpreter, lex_info, sub);
                 }
-                assert(r->reg); /* lexical name */
-                k = r->reg->color;
-                assert(k >= 0);
-                lex_name = constants[k]->u.string;
-                assert(PObj_is_string_TEST(lex_name));
-                IMCC_debug(interpreter, DEBUG_PBC_CONST,
-                        "add lexical '%s' to sub name '%s'\n",
-                        r->reg->name, (char*)PMC_sub(sub)->name->strstart);
-                (decl_func)(interpreter,
-                            lex_info, lex_name, r->color);
+                n = r->reg;
+                assert(n); /* at least one lexical name */
+                while (n) {
+                    k = n->color;
+                    assert(k >= 0);
+                    lex_name = constants[k]->u.string;
+                    assert(PObj_is_string_TEST(lex_name));
+                    IMCC_debug(interpreter, DEBUG_PBC_CONST,
+                            "add lexical '%s' to sub name '%s'\n",
+                            n->name, (char*)PMC_sub(sub)->name->strstart);
+                    (decl_func)(interpreter,
+                                lex_info, lex_name, r->color);
+                    /* next possible name */
+                    n = n->reg;
+                }
             }
         }
     }
@@ -969,7 +975,12 @@ constant_folding(Interp *interpreter, IMC_Unit * unit)
                 add_1_const(interpreter, r);
             }
             if (r->usage & U_LEXICAL) {
-                add_1_const(interpreter, r->reg); /* lex_name */
+                SymReg *n = r->reg;
+                /* r->reg is a chain of names for the same lex sym */
+                while (n) {
+                    add_1_const(interpreter, n); /* lex_name */
+                    n = n->reg;
+                }
             }
         }
     }

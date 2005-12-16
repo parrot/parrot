@@ -304,13 +304,12 @@ begin_return_or_yield(Interp *interp, int yield)
 static void
 set_lexical(Interp *interp, SymReg *r, char *name)
 {
-    if (r->usage & U_LEXICAL) {
-        IMCC_fataly(interp, E_SyntaxError,
-            "variable '%s' is already lexical for %s",
-            r->name, r->reg->name);
-    }
+    SymReg *n;
     r->usage |= U_LEXICAL;
-    r->reg = mk_const(interp, name, 'S');
+    n = mk_const(interp, name, 'S');
+    /* chain all names in r->reg */
+    n->reg = r->reg;
+    r->reg = n;
 }
 
 

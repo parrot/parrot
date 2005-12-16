@@ -86,41 +86,37 @@ CODE
 ok
 OUTPUT
 
-output_like(<<'CODE', <<'OUTPUT', '.lex - same PMC twice fails (PASM)');
+output_is(<<'CODE', <<'OUTPUT', '.lex - same PMC twice (PASM)');
 .pcc_sub main:
     .lex '$a', P0
     .lex '$b', P0
-	end
+    new P0, .String
+    set P0, "ok\n"
+    find_lex P1, '$a'
+    print P1
+    find_lex P2, '$a'
+    print P2
+    end
 CODE
-/variable .* is already lexical for .*/
+ok
+ok
 OUTPUT
 
-pir_output_like(<<'CODE', <<'OUTPUT', '.lex - same PMC twice fails (P0)');
+pir_output_is(<<'CODE', <<'OUTPUT', '.lex - same PMC twice fails (.local pmc ab)');
 .sub main :main
-    .lex '$a', P0
-    .lex '$b', P0
-.end
-CODE
-/variable .* is already lexical for .*/
-OUTPUT
-
-pir_output_like(<<'CODE', <<'OUTPUT', '.lex - same PMC twice fails ($P0)');
-.sub main :main
-    .lex '$a', $P0
-    .lex '$b', $P0
-.end
-CODE
-/variable .* is already lexical for .*/
-OUTPUT
-
-pir_output_like(<<'CODE', <<'OUTPUT', '.lex - same PMC twice fails (.local pmc ab)');
-.sub main :main
-	.local pmc ab
+    .local pmc ab, a, b
     .lex '$a', ab
     .lex '$b', ab
+    ab = new .String
+    ab = "ok\n"
+    a = find_lex '$a'
+    print a
+    b = find_lex '$b'
+    print b
 .end
 CODE
-/variable .* is already lexical for .*/
+ok
+ok
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', 'api parsing');
@@ -1006,10 +1002,11 @@ ok
 ok
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', 'multiple names', todo => 'unspeccced');
+pir_output_is(<<'CODE', <<'OUTPUT', 'multiple names');
 .sub main :main
 	.lex 'a', $P0
 	.lex 'b', $P0
+	.lex 'c', $P0
         $P1 = new .String
         $P1 = "ok\n"
 	store_lex 'a', $P1
@@ -1017,8 +1014,11 @@ pir_output_is(<<'CODE', <<'OUTPUT', 'multiple names', todo => 'unspeccced');
         print $P0
         print $P1
         print $P2
+	$P3 = find_lex 'c'
+        print $P3
 .end
 CODE
+ok
 ok
 ok
 ok
@@ -1026,4 +1026,4 @@ OUTPUT
 
 
 ## remember to change the number of tests :-)
-BEGIN { plan tests => 42; }
+BEGIN { plan tests => 40; }
