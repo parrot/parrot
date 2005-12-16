@@ -362,3 +362,146 @@ bad_args:
   .throw("wrong # args: should be \"string equal ?-nocase? ?-length int? string1 string2\"")
 
 .end
+
+
+# XXX doesn't currently respect the -options.
+# XXX Mdiep will probably want to change this to a hash-dispatch
+.sub "is"
+  .param pmc argv
+  .local int argc
+  argc = argv
+
+  .local int strict
+  strict = 0
+
+  if argc < 2 goto bad_args
+
+  .local int the_cclass
+
+  .local string class,the_string
+  class = argv[0]
+  the_string = argv[1]
+
+  if class == "alnum" goto alnum_check
+  if class == "alpha" goto alpha_check
+  if class == "ascii" goto ascii_check
+  if class == "control" goto control_check
+  if class == "boolean" goto boolean_check
+  if class == "digit" goto digit_check
+  if class == "double" goto double_check
+  if class == "false" goto false_check
+  if class == "graph" goto graph_check
+  if class == "integer" goto integer_check
+  if class == "lower" goto lower_check
+  if class == "print" goto print_check
+  if class == "punct" goto punct_check
+  if class == "space" goto space_check
+  if class == "true" goto true_check
+  if class == "upper" goto upper_check
+  if class == "wordchar" goto wordchar_check
+  if class == "xdigit" goto xdigit_check
+
+bad_class:
+  $S0 = 'bad class "'
+  $S0 .= class
+  $S0 .= '": must be alnum, alpha, ascii, control, boolean, digit, double, false, graph, integer, lower, print, punct, space, true, upper, wordchar, or xdigit'
+  .throw($S0)
+
+alnum_check:
+  the_cclass = .CCLASS_ALPHANUMERIC
+  goto cclass_check
+alpha_check:
+  the_cclass = .CCLASS_ALPHABETIC
+  goto cclass_check
+ascii_check:
+  goto bad_args #XXX
+control_check:
+  the_cclass = .CCLASS_CONTROL
+  goto cclass_check
+boolean_check:
+  if the_string == "true" goto yep 
+  if the_string == "false" goto yep 
+  if the_string == "yes" goto yep 
+  if the_string == "no" goto yep 
+  if the_string == "1" goto yep 
+  if the_string == "0" goto yep 
+  goto nope 
+digit_check:
+  the_cclass = .CCLASS_NUMERIC
+  goto cclass_check
+double_check:
+  $P1 = find_global "_Tcl", "__number"
+  push_eh nope
+    $P2 = $P1(the_string)
+  clear_eh
+
+  $I0 = typeof $P2
+  if $I0 == .TclFloat goto yep
+  goto nope
+false_check:
+  if the_string == "false" goto yep 
+  if the_string == "no" goto yep 
+  if the_string == "0" goto yep 
+  goto nope 
+graph_check:
+  the_cclass = .CCLASS_GRAPHICAL
+  goto cclass_check
+integer_check:
+  $P1 = find_global "_Tcl", "__number"
+  push_eh nope
+    $P2 = $P1(the_string)
+  clear_eh
+
+  $I0 = typeof $P2
+  if $I0 == .TclInt goto yep
+  goto nope
+lower_check:
+  the_cclass = .CCLASS_LOWERCASE
+  goto cclass_check
+print_check:
+  the_cclass = .CCLASS_PRINTING
+  goto cclass_check
+punct_check:
+  the_cclass = .CCLASS_PUNCTUATION
+  goto cclass_check
+space_check:
+  the_cclass = .CCLASS_WHITESPACE
+  goto cclass_check
+true_check:
+  if the_string == "true" goto yep 
+  if the_string == "yes" goto yep 
+  if the_string == "1" goto yep 
+  goto nope 
+upper_check:
+  the_cclass = .CCLASS_UPPERCASE
+  goto cclass_check
+wordchar_check:
+  the_cclass = .CCLASS_WORD
+  goto cclass_check
+xdigit_check:
+  the_cclass = .CCLASS_HEXADECIMAL
+  goto cclass_check
+
+cclass_check:
+  # Loop over the string. Die immediately if we fail.
+  # XXX Tie the index of the string into --failvar
+  .local int len,ii
+  len = length the_string
+  ii = 0
+loop:
+  if ii == len goto yep
+  $I0 = is_cclass the_cclass, the_string, ii
+  unless $I0 goto nope
+  inc ii
+  goto loop
+
+yep:
+  .return(1)
+
+nope:
+  .return(0)
+
+bad_args:
+  .throw('wrong # args: should be "string is class ?-strict? ?-failindex var? str"')
+
+.end
