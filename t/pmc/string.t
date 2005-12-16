@@ -404,86 +404,6 @@ true
 false
 OUTPUT
 
-# XXX unimplemented ops... should remove tests
-
-## XXX these tests better should get generated
-##     with all combinations of params and ops
-#output_is(<<'CODE', <<OUTPUT, "add str_int, str_int");
-#	new P0, .String
-#	set P0, "23"
-#	new P1, .String
-#	set P1, "2"
-#	new P2, .Undef
-#	add P2, P0, P1
-#	print P2
-#	print "\n"
-#	end
-#CODE
-#25
-#OUTPUT
-
-#output_is(<<"CODE", <<OUTPUT, "add str_int, str_num");
-#@{[ $fp_equality_macro ]}
-# 	new P0, .String
-# 	set P0, "23"
-# 	new P1, .String
-# 	set P1, "2.5"
-# 	new P2, .Undef
-# 	add P2, P0, P1
-#         .fp_eq(P2, 25.5, EQ1)
-#         print "not "
-# EQ1:    print "ok 1\\n"
-# 	end
-# CODE
-# ok 1
-# OUTPUT
-
-# output_is(<<'CODE', <<OUTPUT, "add str_int, int");
-# 	new P0, .String
-# 	set P0, "23"
-# 	new P1, .Integer
-# 	set P1, 2
-# 	new P2, .Undef
-# 	add P2, P0, P1
-# 	print P2
-# 	print "\n"
-# 	end
-# CODE
-# 25
-# OUTPUT
-
-# output_is(<<"CODE", <<OUTPUT, "add str_int, num");
-# @{[ $fp_equality_macro ]}
-# 	new P0, .String
-# 	set P0, "23"
-# 	new P1, .Float
-# 	set P1, 2.5
-# 	new P2, .Undef
-# 	add P2, P0, P1
-#         .fp_eq(P2, 25.5, EQ1)
-#         print "not "
-# EQ1:    print "ok 1\\n"
-# 	end
-# CODE
-# ok 1
-# OUTPUT
-
-# output_is(<<"CODE", <<OUTPUT, "add str_num, int");
-# @{[ $fp_equality_macro ]}
-# 	new P0, .String
-# 	set P0, "23.5"
-# 	new P1, .Integer
-# 	set P1, 2
-# 	new P2, .Undef
-# 	add P2, P0, P1
-#         .fp_eq(P2, 25.5, EQ1)
-#         print "not "
-# EQ1:    print "ok 1\\n"
-# 	end
-# CODE
-# ok 1
-#OUTPUT
-
 output_is(<<'CODE', <<OUTPUT, "concat");
 	new P0, .String
 	new P1, .Undef
@@ -1011,34 +931,6 @@ ok 2
 ok 3
 OUTPUT
 
-SKIP: {
-skip("No unicode yet", 1);
-output_is( <<'CODE', <<OUTPUT, "bnots 2");
- getstdout P0
- push P0, "utf8"
- new P1, .String
- new P2, .String
- set P1, "a2c"
- bnots P2, P1
- print P1
- print "\n"
- print P2
- print "\n"
- bnots P1, P1
- print P1
- print "\n"
- bnots P1, P1
- print P1
- print "\n"
- end
-CODE
-a2c
-\xC2\x9E\xC3\x8D\xC2\x9C
-\xC2\x9E\xC3\x8D\xC2\x9C
-a2c
-OUTPUT
-}
-
 output_is( <<'CODE', <<OUTPUT, "eq_str");
         new P1, .String
         new P2, .String
@@ -1191,4 +1083,15 @@ hello world
 he--o wor-d
 he--o !!!!r-d
 -o !!!!r-d
+OUTPUT
+
+output_is( <<'CODE', <<OUTPUT, "set I0, P0 - string_to_int");
+  new P0, .String
+  set P0, "12.3E5\n"
+  set I0, P0
+  print I0
+  print "\n"
+  end
+CODE
+12
 OUTPUT
