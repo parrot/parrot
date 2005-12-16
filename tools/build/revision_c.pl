@@ -39,11 +39,6 @@ int Parrot_revision(void);
 /* also in "parrot/misc.h" */
 int Parrot_config_revision(void);
 
-#if PARROT_REVISION != ${Parrot::Revision::config}
-#error revision PARROT_REVISION != configure revision ${Parrot::Revision::config}
-#endif
-
-
 int Parrot_revision(void)
 {
     return ${Parrot::Revision::current};
