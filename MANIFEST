@@ -547,7 +547,9 @@ examples/shootout/binarytrees.pir                 [main]doc
 examples/shootout/fannkuch.pir                    [main]doc
 examples/shootout/fannkuch.py                     [main]doc
 examples/shootout/fasta.pir                       [main]doc
+examples/shootout/harmonic.pir                    [main]doc
 examples/shootout/knucleotide.pir                 [main]doc
+examples/shootout/mandelbrot.pir                  [main]doc
 examples/shootout/nsieve-bits-2.pir               [main]doc
 examples/shootout/nsieve-bits.pir                 [main]doc
 examples/shootout/pidigits.pir                    [main]doc
