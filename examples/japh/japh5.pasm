@@ -1,9 +1,5 @@
-# $Id$
-
 # JaPH utilizing an object
     newclass P0, "Japh"
-    find_type I0, "Japh"
-    new P0, I0
     set P0[1], "Just"
     set P0[2], "another"
     set P0[3], "Parrot"
@@ -11,12 +7,12 @@
     end
 .namespace ["Japh"]
 .pcc_sub __set_string_keyed:
+	get_params "(0,0,0)", P5, I5, S5
     print S5
-    set I5, P5
     if I5, sp
     print "\n"
-    invoke P1
+    returncc
 sp:
     print " "
-    invoke P1
+    returncc
 

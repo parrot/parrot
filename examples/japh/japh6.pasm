@@ -1,22 +1,18 @@
-# $Id$
-
-# JaPH utilizing object
-    newclass P1, "Japh"
-    find_type I1, "Japh"
-    new P0, I1
-    set S0, P0[I0]
-    print S0
-    inc I0
-    set S0, P0[I0]
-    print S0
-    end
+	newclass P0, "Japh"
+	set S0, P0[I0]
+	print S0
+	inc I0
+	set S0, P0[I0]
+	print S0
+	end
 .namespace ["Japh"]
 .pcc_sub __get_string_keyed:
-    set I3, 0
-    set I5, P5
-    unless I5, x
-    set S5, "Parrot Hacker\n"
-    invoke P1
-x:  set S5, "Just another "
-    invoke P1
-
+	get_params "(0,0)", P1, I1
+	unless I1, x
+	set S1, "Parrot Hacker\n"
+	set_returns "(0)", S1
+	returncc
+x:
+	set S1, "Just another "
+	set_returns "(0)", S1
+	returncc
