@@ -1084,6 +1084,14 @@ string_substr(Interp *interpreter, STRING *src,
         CHARSET_GET_CODEPOINTS_INPLACE(interpreter, src,
                 true_offset, true_length, *d);
         dest = *d;
+#ifdef EVIL_STRING_HACK
+        /*
+         * EVIL - turn of COW on both sides
+         *        but currently the only way to get e.g. revcomp.pir to work  
+         */
+        PObj_COW_CLEAR(src);
+        PObj_COW_CLEAR(dest);
+#endif
     }
     else
         dest = CHARSET_GET_CODEPOINTS(interpreter, src, true_offset,
