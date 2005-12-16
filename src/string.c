@@ -1882,7 +1882,7 @@ number, rounding towards zero.
 INTVAL
 string_to_int(Interp *interpreter, const STRING *s)
 {
-#if 0
+#if 1
     INTVAL i = 0;
 
     if (s) {
@@ -1892,9 +1892,9 @@ string_to_int(Interp *interpreter, const STRING *s)
         INTVAL in_number = 0;
 
         while (start < end) {
-            UINTVAL c = s->encoding->decode(start);
+            unsigned char c = *start;
 
-            if (Parrot_char_is_digit(s->type,c)) {
+            if (isdigit(c)) {
                 in_number = 1;
                 i = i * 10 + (c - '0');
             }
@@ -1903,15 +1903,15 @@ string_to_int(Interp *interpreter, const STRING *s)
                 if (c == '-') {
                     sign = -1;
                 }
-                else {
-                    sign = 1;
-                }
+                else if (c == '+' || isspace(c))
+                    ;
+                else
+                    break;
             }
             else {
                 break;
             }
-
-            start = s->encoding->skip_forward(start, 1);
+            ++start;
         }
 
         i = i * sign;

@@ -26,6 +26,20 @@ void Parrot_perlscalar_morph(Interp* , PMC* pmc, INTVAL type);
 
 pmclass PerlString extends String does string does scalar {
 
+/*
+
+=item C<INTVAL get_integer()>
+
+Returns the integer representation of the string by converting to float first.
+See t/pmc/perlstring_13    set P0, "1.23e2" ; set I0, P0    
+
+=cut
+
+*/
+    INTVAL get_integer () {
+        double f = DYNSELF.get_number();
+        return (INTVAL)f;
+    }
 
 /*
 
