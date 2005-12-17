@@ -21,66 +21,56 @@ see F<docs/configuration.pod>.
 package Parrot::Configure::RunSteps;
 
 use strict;
-use vars qw(@steps);
 
 use Parrot::Configure::Data;
 
-# EDIT HERE TO ADD NEW TESTS
-@steps = qw(
-    init/manifest.pm
-    init/defaults.pm
-    init/miniparrot.pm
-    init/hints.pm
-    init/headers.pm
-    inter/progs.pm
-    inter/make.pm
-    inter/lex.pm
-    inter/yacc.pm
-    auto/gcc.pm
-    auto/msvc.pm
-    init/optimize.pm
-    inter/shlibs.pm
-    inter/charset.pm
-    inter/encoding.pm
-    inter/types.pm
-    inter/ops.pm
-    inter/exp.pm
-    inter/pmc.pm
-    auto/alignptrs.pm
-    auto/headers.pm
-    auto/sizes.pm
-    auto/byteorder.pm
-    auto/va_ptr.pm
-    auto/pack.pm
-    auto/format.pm
-    auto/isreg.pm
-    auto/jit.pm
-    gen/cpu.pm
-    auto/funcptr.pm
-    auto/cgoto.pm
-    auto/inline.pm
-    auto/gc.pm
-    auto/memalign.pm
-    auto/signal.pm
-    auto/env.pm
-    auto/aio.pm
-    auto/gmp.pm
-    auto/gdbm.pm
-    auto/snprintf.pm
-    auto/perldoc.pm
-    auto/python.pm
-    auto/antlr.pm
-    auto/bc.pm
-    auto/m4.pm
-    gen/icu.pm
-    gen/revision.pm
-    gen/config_h.pm
-    gen/core_pmcs.pm
-    gen/parrot_include.pm
-    gen/makefiles.pm
-    gen/platform.pm
-    gen/config_pm.pm
-);
+=item C<new()>
+
+Basic constructor.  Accepts no arguments.
+
+=cut
+
+sub new {
+    my $class = shift;
+
+    my $self = {
+        steps => [],
+    };
+
+    bless $self, ref $class || $class;
+
+    return $self;
+}
+
+=item C<steps()>
+
+Returns a list of registered configuration steps in list context or an arrayref
+to a list of configuration steps in scalar context.
+
+=cut
+
+sub steps {
+    my $self = shift;
+
+    return wantarray ? @{ $self->{steps} } : $self->{steps};
+}
+
+=item C<add_steps()>
+
+Registers a list of steps to be run.  Returns the object this method was
+invoked on.
+
+=cut
+
+sub add_steps {
+    my $self = shift;
+
+    my @new_steps = @_;
+
+    push @{ $self->{steps} }, @new_steps;
+
+    return $self;
+}
 
 =item C<runsteps()>
 
@@ -89,7 +79,8 @@ Loops over the configuration steps, running each one in turn.
 =cut
 
 sub runsteps {
-    shift;
+    my $self = shift;
+
     my %args=@_;
 
     my $step = 'Configure::Step';
@@ -101,7 +92,7 @@ sub runsteps {
     my $verbose = $args{verbose};
     my $n = 0;
 
-    for (@steps) {
+    for ($self->steps) {
         # FIXME the steps still all live in the same namespace so the value of
         # result has to be reset
         undef $Configure::Step::result;

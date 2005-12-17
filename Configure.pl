@@ -383,8 +383,67 @@ Since you're running this script, you obviously have Perl 5--I'll be pulling
 some defaults from its configuration.
 END
 
+# EDIT HERE TO ADD NEW TESTS
+my @steps = qw(
+    init/manifest.pm
+    init/defaults.pm
+    init/miniparrot.pm
+    init/hints.pm
+    init/headers.pm
+    inter/progs.pm
+    inter/make.pm
+    inter/lex.pm
+    inter/yacc.pm
+    auto/gcc.pm
+    auto/msvc.pm
+    init/optimize.pm
+    inter/shlibs.pm
+    inter/charset.pm
+    inter/encoding.pm
+    inter/types.pm
+    inter/ops.pm
+    inter/exp.pm
+    inter/pmc.pm
+    auto/alignptrs.pm
+    auto/headers.pm
+    auto/sizes.pm
+    auto/byteorder.pm
+    auto/va_ptr.pm
+    auto/pack.pm
+    auto/format.pm
+    auto/isreg.pm
+    auto/jit.pm
+    gen/cpu.pm
+    auto/funcptr.pm
+    auto/cgoto.pm
+    auto/inline.pm
+    auto/gc.pm
+    auto/memalign.pm
+    auto/signal.pm
+    auto/env.pm
+    auto/aio.pm
+    auto/gmp.pm
+    auto/gdbm.pm
+    auto/snprintf.pm
+    auto/perldoc.pm
+    auto/python.pm
+    auto/antlr.pm
+    auto/bc.pm
+    auto/m4.pm
+    gen/icu.pm
+    gen/revision.pm
+    gen/config_h.pm
+    gen/core_pmcs.pm
+    gen/parrot_include.pm
+    gen/makefiles.pm
+    gen/platform.pm
+    gen/config_pm.pm
+);
+
+my $config = Parrot::Configure::RunSteps->new;
+$config->add_steps(@steps);
 #Run the actual steps
-Parrot::Configure::RunSteps->runsteps(%args);
+$config->runsteps(%args);
 
 # tell users what to do next
 my $make = Parrot::Configure::Data->get('make');
