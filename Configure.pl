@@ -251,7 +251,7 @@ use vars qw($parrot_version @parrot_version);
 use lib 'lib';
 
 use Parrot::BuildUtil;
-use Parrot::Configure::RunSteps;
+use Parrot::Configure;
 
 $| = 1;
 
@@ -440,7 +440,7 @@ my @steps = qw(
     gen/config_pm.pm
 );
 
-my $config = Parrot::Configure::RunSteps->new;
+my $config = Parrot::Configure->new;
 $config->add_steps(@steps);
 #Run the actual steps
 $config->runsteps(%args);

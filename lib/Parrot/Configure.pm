@@ -18,7 +18,7 @@ see F<docs/configuration.pod>.
 
 =cut
 
-package Parrot::Configure::RunSteps;
+package Parrot::Configure;
 
 use strict;
 
