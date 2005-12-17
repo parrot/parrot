@@ -387,23 +387,30 @@ missing_quote:
 
 check_chars:
   $I0 = pos + 1
-  if $I0 == len goto done
+  if $I0 == len goto save_end
   $I1 = is_cclass .CCLASS_WHITESPACE, tcl_code, $I0
-  if $I1 == 1 goto done
+  if $I1 == 1 goto save_end
   $I1 = ord tcl_code, $I0
   $I1 = exists chars[$I1]
-  if $I1 == 1 goto done
+  if $I1 == 1 goto save_end
  
   .throw("extra characters after close-quote")
 
-done:
+save_end:
   $I0 = pos - start
+  if $I0 == 0 goto done
   $S0 = substr tcl_code, start, $I0
   $I0 = find_type "TclConst"
   $P0 = new $I0
   $P0 = $S0
   push word, $P0
-  
+
+done:
+  $I0 = elements word
+  if $I0 != 1 goto really_done
+  word = word[0]
+
+really_done:
   .return(word, pos)
 .end
 
