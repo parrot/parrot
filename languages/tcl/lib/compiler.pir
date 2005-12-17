@@ -146,6 +146,7 @@ $P1=loadlib 'dynlexpad'
 .pragma n_operators 1
 .sub compiled_tcl_sub%i :anon :main
 load_bytecode 'languages/tcl/lib/tcllib.pbc'
+.include "languages/tcl/lib/returncodes.pir"
 %s.return ($P%i)
 .end
 END_PIR
@@ -157,6 +158,7 @@ END_PIR
   stub_code = <<"END_PIR"
 .pragma n_operators 1
 .sub compiled_tcl_sub%i :anon
+.include "languages/tcl/lib/returncodes.pir"
 %s.return ($P%i)
 .end
 END_PIR
