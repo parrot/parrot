@@ -150,7 +150,7 @@ enum { JIT_PPC_CALL, JIT_PPC_BRANCH, JIT_PPC_UBRANCH };
     *(pc++) = 31 << 2 | S >> 3; \
     *(pc++) = (char)(S << 5 | spr); \
     *(pc++) = type >> 7; \
-    *(pc++) = (char)type << 1
+    *(pc++) = (char)(type << 1)
 
 #  define jit_emit_mtlr(pc, S) \
     jit_emit_mxspr(pc, S, 8, 467)

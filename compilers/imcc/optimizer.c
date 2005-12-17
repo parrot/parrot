@@ -589,7 +589,7 @@ eval_ins(Interp *interpreter, char *op, size_t ops, SymReg **r)
     for (i = 0; i < op_info->op_count - 1; i++) {
         switch (op_info->types[i]) {
             case PARROT_ARG_IC:
-                assert(i && ops == i);
+                assert(i && ops == (unsigned int)i);
                 /* set branch offset to zero */
                 eval[i + 1] = 0;
                 break;
