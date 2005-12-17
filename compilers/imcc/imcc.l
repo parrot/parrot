@@ -31,7 +31,8 @@ struct macro_t {
 };
 
 /* XXX: boe: rework this hack to use a hash */
-struct macro_t macros[256];
+#define N_MACROS 256
+struct macro_t macros[N_MACROS];
 int num_macros = 0;
 
 char temp_buffer[4096];
@@ -733,6 +734,9 @@ read_macro (YYSTYPE *valp, Interp *interp)
     struct macro_t *m = macros + num_macros;
     int start_cond;
 
+    if (num_macros >= N_MACROS)
+        internal_exception(1, "Too many macros");
+
     temp_buffer[0]='\0';
 
     start_cond = YY_START;
@@ -741,7 +745,7 @@ read_macro (YYSTYPE *valp, Interp *interp)
     c = yylex_skip(valp, interp, " ");
     if (c != IDENTIFIER)
         IMCC_fataly(interp, E_SyntaxError,
-            "Macro names must be identifiers");
+                "Macro names must be identifiers");
 
     m->name = valp->s;
     m->line = line;
@@ -750,27 +754,26 @@ read_macro (YYSTYPE *valp, Interp *interp)
     c = yylex_skip(valp, interp, " ");
 
     if (c == '(') {
-    free(valp->s);
+        free(valp->s);
 
-    c = read_params(NULL, interp, &m->params, m->name, 1);
+        c = read_params(NULL, interp, &m->params, m->name, 1);
 
-    c = yylex(valp, interp);
+        c = yylex(valp, interp);
     }
 
     while (c != ENDM) {
-    if (c <= 0)
+        if (c <= 0)
             IMCC_fataly(interp, E_SyntaxError,
-            "File ended before macro '%s' was complete", m->name);
+                    "File ended before macro '%s' was complete", m->name);
 
-    strcat(temp_buffer, valp->s);
-    free(valp->s);
+        strcat(temp_buffer, valp->s);
+        free(valp->s);
 
         c = yylex(valp, interp);
     }
     free(valp->s);
 
     BEGIN(start_cond);
-
     macros[num_macros].expansion = str_dup(temp_buffer);
 
     num_macros++;
@@ -784,13 +787,13 @@ find_macro_param (const char *name)
     int i;
 
     for (f = frames; f; f = (struct macro_frame_t*)f->s.next) {
-    if (f->params) {
-        for (i = 0; i < f->params->num_param; i++) {
-        if (strcmp(f->params->name[i], name) == 0) {
-            return f->expansion.name[i];
+        if (f->params) {
+            for (i = 0; i < f->params->num_param; i++) {
+                if (strcmp(f->params->name[i], name) == 0) {
+                    return f->expansion.name[i];
+                }
+            }
         }
-        }
-    }
     }
 
     return NULL;
@@ -802,7 +805,7 @@ find_macro (const char* name)
     int i;
 
     for (i = 0; i < num_macros; i++) {
-    if (strcmp(name, macros[i].name) == 0) return macros + i;
+        if (strcmp(name, macros[i].name) == 0) return macros + i;
     }
 
     return NULL;
@@ -826,54 +829,57 @@ expand_macro (YYSTYPE *valp, void *interp, const char *name)
     } __ptr_u;
 
     UNUSED(valp);
-    frame = new_frame(interp);
-    /* When an error occurs, then report it as being in a macro */
-    frame->is_macro = 1;
 
     expansion = find_macro_param(name);
     if (expansion) {
-    scan_string(frame, expansion);
-    return 1;
-    }
-
-    m = find_macro(name);
-    frame->params = &m->params;
-    if (m) {
-        /* remember macro name for error reporting
-         */
-        frame->s.file = const_cast(name);
-    /* whitespace can be savely ignored */
-    do {
-        c = input();
-    } while (c == ' ' || c == '\t');
-
-    if (c != '(') {
-        unput(c);
-        if (m->params.num_param != 0)
-                IMCC_fataly(interp, E_SyntaxError,
-            "Macro '%s' needs %d arguments",
-                        m->name, m->params.num_param);
-        scan_string(frame, m->expansion);
+        frame = new_frame(interp);
+        /* When an error occurs, then report it as being in a macro */
+        frame->is_macro = 1;
+        scan_string(frame, expansion);
         return 1;
     }
 
-    start_cond = YY_START;
-    BEGIN(macro);
+    m = find_macro(name);
+    if (m) {
+        frame = new_frame(interp);
+        frame->params = &m->params;
+        /* When an error occurs, then report it as being in a macro */
+        frame->is_macro = 1;
+        /* remember macro name for error reporting
+        */
+        frame->s.file = const_cast(name);
+        /* whitespace can be savely ignored */
+        do {
+            c = input();
+        } while (c == ' ' || c == '\t');
 
-    read_params (NULL, interp, &frame->expansion, m->name, 0);
+        if (c != '(') {
+            unput(c);
+            if (m->params.num_param != 0)
+                IMCC_fataly(interp, E_SyntaxError,
+                        "Macro '%s' needs %d arguments",
+                        m->name, m->params.num_param);
+            scan_string(frame, m->expansion);
+            return 1;
+        }
 
-    BEGIN(start_cond);
+        start_cond = YY_START;
+        BEGIN(macro);
 
-    if (frame->expansion.num_param == 0 && m->params.num_param == 1) {
-        frame->expansion.name[0] = str_dup("");
-        frame->expansion.num_param = 1;
-    }
+        read_params (NULL, interp, &frame->expansion, m->name, 0);
 
-    if (frame->expansion.num_param != m->params.num_param) {
+        BEGIN(start_cond);
+
+        if (frame->expansion.num_param == 0 && m->params.num_param == 1) {
+            frame->expansion.name[0] = str_dup("");
+            frame->expansion.num_param = 1;
+        }
+
+        if (frame->expansion.num_param != m->params.num_param) {
             IMCC_fataly(interp, E_SyntaxError,
-           "Macro '%s' requires %d arguments, but %d given",
-           m->name, m->params.num_param, frame->expansion.num_param);
-    }
+                    "Macro '%s' requires %d arguments, but %d given",
+                    m->name, m->params.num_param, frame->expansion.num_param);
+        }
 
         /* expand arguments */
         for (i = 0; i < frame->expansion.num_param; i ++) {
@@ -886,7 +892,7 @@ expand_macro (YYSTYPE *valp, void *interp, const char *name)
                 }
             } else {
                 len = strlen(current) - 1;
-                if (current[len] == '$') { /* local label */
+                if (len >= 0 && current[len] == '$') { /* local label */
                     current[len] = '\0';
                     s = mem_sys_allocate(len + 1 + 10);
                     sprintf(s, "%s%d", current, frames->label);
@@ -896,9 +902,9 @@ expand_macro (YYSTYPE *valp, void *interp, const char *name)
             }
         }
 
-    line = m->line;
-    scan_string(frame, m->expansion);
-    return 1;
+        line = m->line;
+        scan_string(frame, m->expansion);
+        return 1;
     }
 
     return 0;
