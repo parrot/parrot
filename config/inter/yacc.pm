@@ -11,7 +11,7 @@ Determines whether C<yacc> is installed and if it's actually C<bison>.
 
 =cut
 
-package Configure::Step;
+package inter::yacc;
 
 use strict;
 

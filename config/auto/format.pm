@@ -11,7 +11,7 @@ Figures out what formats should be used for C<sprintf()>.
 
 =cut
 
-package Configure::Step;
+package auto::format;
 
 use strict;
 use vars qw($description $result @args);

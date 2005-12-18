@@ -16,7 +16,7 @@ Store version of Python.
 
 =cut
 
-package Configure::Step;
+package auto::python;
 
 use strict;
 use vars qw($description $result @args);

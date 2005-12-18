@@ -1,6 +1,10 @@
 # Copyright: 2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
+package init::hints::dec_osf;
+
+use strict;
+
 # Tru64
 my $ccflags = Parrot::Configure::Data->get('ccflags');
 if ( $ccflags !~ /-pthread/ ) {
@@ -42,3 +46,5 @@ if ( $linkflags !~ /-expect_unresolved/ ) {
 Parrot::Configure::Data->set(
     link => "cxx",
 );
+
+1;

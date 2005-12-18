@@ -18,7 +18,7 @@ might help.
 
 =cut
 
-package Configure::Step;
+package auto::antlr;
 
 use strict;
 use vars qw($description $result @args);

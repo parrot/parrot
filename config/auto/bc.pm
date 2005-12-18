@@ -13,13 +13,14 @@ Parrot bc.
 
 =cut
 
-package Configure::Step;
+package auto::bc;
 
 use strict;
 use vars qw($description $result @args);
 
 use base qw(Parrot::Configure::Step::Base);
 
+use Config;
 use Parrot::Configure::Step ':auto', 'capture_output';
 
 $description = "Determining whether GNU bc is installed...";

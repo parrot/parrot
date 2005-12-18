@@ -11,7 +11,7 @@ Determines whether the C compiler is actually C<Visual C++>.
 
 =cut
 
-package Configure::Step;
+package auto::msvc;
 
 use strict;
 use vars qw($description $result @args);

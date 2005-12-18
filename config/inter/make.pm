@@ -11,7 +11,7 @@ Determines whether C<make> is installed and if it's actually GNU C<make>.
 
 =cut
 
-package Configure::Step;
+package inter::make;
 
 use strict;
 

@@ -12,14 +12,14 @@ generator program, and the F<myconfig> file.
 
 =cut
 
-package Configure::Step;
+package gen::config_pm;
 
 use strict;
 use vars qw($description $result @args);
 
 use base qw(Parrot::Configure::Step::Base);
 
-use Parrot::Configure::Step;
+use Parrot::Configure::Step qw(genfile);
 use Data::Dumper;
 use Cwd qw(cwd);
 

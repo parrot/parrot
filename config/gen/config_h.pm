@@ -15,7 +15,7 @@ features.
 
 =cut
 
-package Configure::Step;
+package gen::config_h;
 
 use strict;
 use vars qw($description $result @args);

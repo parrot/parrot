@@ -12,7 +12,7 @@ are no .svn directories, so this field is empty.
 
 =cut
 
-package Configure::Step;
+package gen::revision;
 
 use strict;
 use vars qw($description $result);

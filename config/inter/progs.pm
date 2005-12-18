@@ -13,7 +13,7 @@ whether debugging should be enabled.
 
 =cut
 
-package Configure::Step;
+package inter::progs;
 
 use strict;
 use vars qw($description $result @args);

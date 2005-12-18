@@ -1,5 +1,10 @@
 # Copyright: 2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
+
+package init::hints::solaris;
+
+use strict;
+
 use Parrot::Configure::Step qw(cc_gen cc_run);
 
 my $libs = Parrot::Configure::Data->get('libs');
@@ -85,3 +90,5 @@ my $solaris_ieee_cb = sub {
     Parrot::Configure::Data->deltrigger("gccversion", "solaris_ieee");
 };
 Parrot::Configure::Data->settrigger("gccversion", "solaris_ieee", $solaris_ieee_cb);
+
+1;

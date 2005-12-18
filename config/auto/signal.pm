@@ -11,7 +11,7 @@ Determines some signal stuff.
 
 =cut
 
-package Configure::Step;
+package auto::signal;
 
 use strict;
 use vars qw($description $result @args);

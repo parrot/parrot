@@ -11,15 +11,16 @@ Configures ICU and add appropriate targets to the Makefile.
 
 =cut
 
-package Configure::Step;
+package gen::icu;
 
 use strict;
 use vars qw($description $result @args);
 
 use base qw(Parrot::Configure::Step::Base);
 
+use Config;
 use Cwd qw(cwd);
-use Parrot::Configure::Step qw(capture_output);
+use Parrot::Configure::Step qw(capture_output cc_gen cc_clean);
 
 $description = "Determining whether ICU is installed";
 
@@ -90,7 +91,7 @@ sub runstep {
       has_icu     => 0,
       icu_shared  => '',  # used for generating src/dynclasses/Makefile
     );
-    $result = "no" unless defined $Configure::Step::result;
+    $result = "no" unless defined $gen::icu::result;
     return;
   }
 

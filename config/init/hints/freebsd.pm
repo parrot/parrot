@@ -1,6 +1,10 @@
 # Copyright: 2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
+package init::hints::freebsd;
+
+use strict;
+
 my $libs = Parrot::Configure::Data->get('libs');
 
 # get rid of old pthread-stuff, if any
@@ -30,3 +34,5 @@ Parrot::Configure::Data->set(
     libs => $libs,
     link => 'g++',
 );
+
+1;

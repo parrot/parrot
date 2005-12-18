@@ -15,6 +15,9 @@ Test for MMX/SSE functionality. Creates these Config entries
 =cut
 
 use strict;
+
+use Parrot::Configure::Step qw(cc_gen cc_build cc_run cc_clean);
+
 sub run_cpu {
     my $verbose = shift;
     my (@files) = qw( memcpy_mmx.c memcpy_sse.c );

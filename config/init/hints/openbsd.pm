@@ -1,6 +1,9 @@
 # Copyright: 2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
+package init::hints::openbsd;
+
+use strict;
 
 my $ccflags = Parrot::Configure::Data->get('ccflags');
 if ( $ccflags !~ /-pthread/ ) {
@@ -17,3 +20,5 @@ if ( $libs !~ /-lpthread/ ) {
 Parrot::Configure::Data->set(
     libs => $libs,
 );
+
+1;

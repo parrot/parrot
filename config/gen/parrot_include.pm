@@ -11,7 +11,7 @@ Generates the F<runtime/parrot/include> files.
 
 =cut
 
-package Configure::Step;
+package gen::parrot_include;
 
 use strict;
 use vars qw($description $result @args);

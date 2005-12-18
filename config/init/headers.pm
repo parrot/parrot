@@ -11,7 +11,7 @@ Uses C<ExtUtils::Manifest> to determine which headers are nongenerated.
 
 =cut
 
-package Configure::Step;
+package init::headers;
 
 use strict;
 use vars qw($description $result @args);

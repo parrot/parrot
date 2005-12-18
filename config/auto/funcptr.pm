@@ -11,7 +11,7 @@ Verifies that the compiler supports function pointer casts.
 
 =cut
 
-package Configure::Step;
+package auto::funcptr;
 
 use strict;
 use vars qw($description $result @args);

@@ -11,7 +11,7 @@ Determines whether the platform supports AIO.
 
 =cut
 
-package Configure::Step;
+package auto::aio;
 
 use strict;
 use vars qw($description $result @args);

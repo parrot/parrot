@@ -11,7 +11,7 @@ Asks the user whether to set up experimental networking.
 
 =cut
 
-package Configure::Step;
+package inter::exp;
 
 use strict;
 use vars qw($description $result @args);

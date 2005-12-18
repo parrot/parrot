@@ -12,7 +12,7 @@ should be.
 
 =cut
 
-package Configure::Step;
+package inter::types;
 
 use strict;
 use vars qw($description $result @args);

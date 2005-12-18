@@ -11,13 +11,14 @@ Determines whether the platform supports GMP.
 
 =cut
 
-package Configure::Step;
+package auto::gmp;
 
 use strict;
 use vars qw($description $result @args);
 
 use base qw(Parrot::Configure::Step::Base);
 
+use Config;
 use Parrot::Configure::Step ':auto';
 
 $description="Determining if your platform supports GMP...";

@@ -11,7 +11,7 @@ Determines whether the compiler supports C<inline>.
 
 =cut
 
-package Configure::Step;
+package auto::inline;
 
 use strict;
 use vars qw($description $result @args);

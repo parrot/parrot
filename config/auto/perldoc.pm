@@ -11,7 +11,7 @@ Determines whether perldoc exists on the system.
 
 =cut
 
-package Configure::Step;
+package auto::perldoc;
 
 use strict;
 use vars qw($description $result @args);

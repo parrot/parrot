@@ -1,9 +1,15 @@
 # Copyright: 2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
-{
-	my %args;
-	@args{@args}=@_;
+package init::hints::mswin32;
+
+use strict;
+
+sub runstep {
+    my $shelf = shift;
+
+    my %args;
+	@args{qw(cc)}=@_;
 
 	my($cc, $ccflags, $libs)=Parrot::Configure::Data->get(qw(cc ccflags libs));
 
@@ -197,3 +203,5 @@
 		);
 	}
 }
+
+1;

@@ -1,6 +1,10 @@
 # Copyright: 2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
+package init::hints::cygwin;
+
+use strict;
+
 # cygwin's perl is compiled with -lutil, which for some reason is not 
 # in the standard installation, so we get rid of it
 my $libs = Parrot::Configure::Data->get('libs');
@@ -30,3 +34,5 @@ unless($_[2]) {
 elsif($_[2] !~ /inet_[ap]ton/) {
   $_[2]=join(',', 'inet_aton', $_[2]);
 }
+
+1;

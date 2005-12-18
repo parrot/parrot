@@ -11,7 +11,7 @@ Determines whether C<lex> is installed and if it's actually C<flex>.
 
 =cut
 
-package Configure::Step;
+package inter::lex;
 
 use strict;
 

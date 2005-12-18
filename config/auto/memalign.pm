@@ -11,7 +11,7 @@ Determines if the C library supports C<memalign()>.
 
 =cut
 
-package Configure::Step;
+package auto::memalign;
 
 use strict;
 use vars qw($description $result @args);

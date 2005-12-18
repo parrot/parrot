@@ -11,7 +11,7 @@ Determines the sizes of various types.
 
 =cut
 
-package Configure::Step;
+package auto::sizes;
 
 use strict;
 use vars qw($description $result @args);

@@ -11,11 +11,12 @@ Computes the native byteorder for Parrot's wordsize.
 
 =cut
 
-package Configure::Step;
+package auto::byteorder;
 
 use strict;
 use vars qw($description $result @args);
 
+use Parrot::Configure::Step qw(:auto);
 use base qw(Parrot::Configure::Step::Base);
 
 

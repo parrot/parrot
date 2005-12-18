@@ -11,7 +11,7 @@ Determining if the C library has C<setenv()> and C<unsetenv()>.
 
 =cut
 
-package Configure::Step;
+package auto::env;
 
 use strict;
 use vars qw($description $result @args);

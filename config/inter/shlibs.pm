@@ -17,7 +17,7 @@ gccversion test.
 
 =cut
 
-package Configure::Step;
+package inter::shlibs;
 
 use strict;
 use vars qw($description $result @args);

@@ -22,6 +22,7 @@ package Parrot::Configure;
 
 use strict;
 
+use lib qw(config);
 use Parrot::Configure::Data;
 
 =item C<new()>
@@ -83,23 +84,12 @@ sub runsteps {
 
     my %args=@_;
 
-    my $step = 'Configure::Step';
-
-    local $SIG{__WARN__} = sub {
-        warn $_[0] unless $_[0] =~ /^Subroutine runstep redefined at config/
-    };
-
     my $verbose = $args{verbose};
     my $n = 0;
 
-    for ($self->steps) {
-        # FIXME the steps still all live in the same namespace so the value of
-        # result has to be reset
-        undef $Configure::Step::result;
-        my $result;
-
-        die "No config/$_" unless -e "config/$_";
-        require "config/$_";
+    for my $step ($self->steps) {
+        eval "use $step";
+        die $@ if $@;
 
         my $description = $step->description;
 
@@ -122,19 +112,18 @@ sub runsteps {
 
         print "\n" if $args{verbose} && $args{verbose} == 2;
 
-        {
-            local $_;
-            $step->runstep(@args{@Configure::Step::args});
+        if (defined $step->args) {
+            $step->runstep(@args{$step->args});
+        } else {
+            $step->runstep();
         }
 
-        $result = $step->result || 'done';
+        my $result = $step->result || 'done';
 
         print "..." if $args{verbose} && $args{verbose} == 2;
         print "." x (71 - length($description)
                         - length($result));
-        print "$result." unless m{^inter/} && $args{ask};
-
-        $args{verbose} = $verbose;
+        print "$result." unless $step =~ m{^inter/} && $args{ask};
     }
 }
 

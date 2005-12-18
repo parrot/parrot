@@ -11,7 +11,7 @@ Probes for various C headers.
 
 =cut
 
-package Configure::Step;
+package auto::headers;
 
 use strict;
 use vars qw($description $result @args);

@@ -16,7 +16,7 @@ Configure at all for miniparrot builds.
 
 =cut
 
-package Configure::Step;
+package init::miniparrot;
 
 use strict;
 use vars qw($description $result @args);

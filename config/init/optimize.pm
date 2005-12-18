@@ -13,7 +13,7 @@ Should this be part of config/inter/progs.pm ? XXX
 
 =cut
 
-package Configure::Step;
+package init::optimize;
 
 use strict;
 use vars qw($description $result @args);

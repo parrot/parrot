@@ -11,7 +11,7 @@ Figures out how to C<pack()> Parrot's types.
 
 =cut
 
-package Configure::Step;
+package auto::pack;
 
 use strict;
 use vars qw($description $result @args);

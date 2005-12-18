@@ -1,6 +1,10 @@
 # Copyright: 2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
+package init::hinits::irix;
+
+use strict;
+
 my $ccflags = Parrot::Configure::Data->get('ccflags') || "";
 # 1185 An enumerated type is mixed with another type.
 if ($ccflags =~ /-woff /) {
@@ -34,3 +38,5 @@ if ( $cc =~ /cc -64/ ) {
         link => $link,
     );
 }
+
+1;

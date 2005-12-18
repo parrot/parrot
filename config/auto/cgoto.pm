@@ -11,7 +11,7 @@ Determines whether the compiler supports computed C<goto>.
 
 =cut
 
-package Configure::Step;
+package auto::cgoto;
 
 use strict;
 use vars qw($description $result @args);

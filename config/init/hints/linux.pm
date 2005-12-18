@@ -1,6 +1,12 @@
 # Copyright: 2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
+package init::hints::linux;
+
+use strict;
+
+use Config;
+
 my $libs = Parrot::Configure::Data->get('libs');
 my $cflags = Parrot::Configure::Data->get('ccflags');
 my $cc = Parrot::Configure::Data->get('cc');
@@ -46,3 +52,5 @@ if ((split('-', $Config{archname}))[0] eq 'ia64') {
         platform_asm => 1
     );
 }
+
+1;

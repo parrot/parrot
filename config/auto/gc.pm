@@ -34,7 +34,7 @@ Use the malloc in F<src/res_lea.c> with tracing enabled.
 
 =cut
 
-package Configure::Step;
+package auto::gc;
 
 use strict;
 use vars qw($description $result @args);

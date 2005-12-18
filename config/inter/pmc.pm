@@ -11,7 +11,7 @@ Asks the user to select which PMC files to include.
 
 =cut
 
-package Configure::Step;
+package inter::pmc;
 
 use strict;
 use vars qw($description $result @args %PMC_PARENTS);

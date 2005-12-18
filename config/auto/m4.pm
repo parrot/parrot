@@ -13,13 +13,14 @@ Parrot m4.
 
 =cut
 
-package Configure::Step;
+package auto::m4;
 
 use strict;
 use vars qw($description $result @args);
 
 use base qw(Parrot::Configure::Step::Base);
 
+use Config;
 use Parrot::Configure::Step ':auto', 'capture_output';
 
 $description = "Determining whether GNU m4 is installed...";

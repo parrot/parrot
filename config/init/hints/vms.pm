@@ -1,6 +1,10 @@
 # Copyright: 2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
+package init::hints::vms;
+
+use strict;
+
 Parrot::Configure::Data->set(
   ccflags => qq{/Standard=Relaxed_ANSI/Prefix=All/Obj=.obj/NoList/NOANSI_ALIAS/include="./include"},
   perl    => "MCR $^X",
@@ -19,3 +23,5 @@ Parrot::Configure::Data->set(
     `mcr []test`
   };
 }
+
+1;

@@ -11,7 +11,7 @@ Asks the user to select which ops files to include.
 
 =cut
 
-package Configure::Step;
+package inter::ops;
 
 use strict;
 use vars qw($description $result @args);

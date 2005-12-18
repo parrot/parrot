@@ -12,7 +12,7 @@ build Parrot.
 
 =cut
 
-package Configure::Step;
+package gen::makefiles;
 
 use strict;
 use vars qw($description $result @args);

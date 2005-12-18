@@ -11,7 +11,7 @@ Runs C<&run_cpu()> in F<config/gen/cpu/${cpuarch}/auto.pm> if it exists.
 
 =cut
 
-package Configure::Step;
+package gen::cpu;
 
 use strict;
 use vars qw($description $result @args);

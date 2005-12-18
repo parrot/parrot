@@ -11,7 +11,7 @@ Determine the minimum pointer alignment.
 
 =cut
 
-package Configure::Step;
+package auto::alignptrs;
 
 use strict;
 use vars qw($description $result $result @args);

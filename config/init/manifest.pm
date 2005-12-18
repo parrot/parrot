@@ -11,7 +11,7 @@ Uses C<ExtUtils::Manifest> to check that the distribution is complete.
 
 =cut
 
-package Configure::Step;
+package init::manifest;
 
 use strict;
 use vars qw($description $result @args);

@@ -12,7 +12,7 @@ in F<config/init/default.pm>.
 
 =cut
 
-package Configure::Step;
+package init::hints;
 
 use strict;
 use vars qw($description $result @args);
@@ -27,26 +27,39 @@ $description="Loading platform and local hints files...";
 
 sub runstep {
     my $self = shift;
-  my $hints = "config/init/hints/" . lc($^O) . ".pm";
-  my $hints_used = 0;
-  print "[ " if $_[1];
-  if(-e $hints) {
-    print "$hints " if $_[1];
-    do $hints;
+
+    my %args;
+    @args{@args} = @_;
+
+    my $verbose = $args{verbose};
+
+    my $hints_used = 0;
+
+    my $hints = "init::hints::" . lc($^O);
+
+    print "[ $hints " if $verbose;
+
+    eval "use $hints";
     die $@ if $@;
+
+    # call the runstep method if it exists.  Otherwise the step must have done
+    # it's work when it was loaded.
+    $hints->runstep(@_) if $hints->can('runstep');
     $hints_used++;
-  }
-  $hints = "config/init/hints/local.pm";
-  if(-e $hints) {
-    print "$hints " if $_[1];
-    do $hints;
-    die $@ if $@;
-    $hints_used++;
-  }
-  if ($hints_used == 0) {
-    print "(no hints) " if $_[1];
-  }
-  print "]" if $_[1];
+
+    $hints = "init::hints::local";
+    print "$hints " if $verbose;
+    eval "use $hints";
+    unless ($@) {
+        $hints->runstep(@_) if $hints->can('runstep');
+        $hints_used++;
+    }
+
+    if ($hints_used == 0) {
+        print "(no hints) " if $verbose;
+    }
+
+    print "]" if $verbose;
 }
 
 1;

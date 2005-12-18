@@ -11,7 +11,7 @@ Asks the user to select which charset files to include.
 
 =cut
 
-package Configure::Step;
+package inter::charset;
 
 use strict;
 use vars qw($description $result @args);

@@ -1,6 +1,10 @@
 # Copyright: 2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
+package init::hints::darwin;
+
+use strict;
+
 my($ccflags, $ldflags, $libs)=Parrot::Configure::Data->get(qw(ccflags ldflags libs));
 
 my $OSVers = `uname -r`;
@@ -30,3 +34,5 @@ Parrot::Configure::Data->set(
   ld_load_flags => '-bundle -undefined suppress',
   memalign => 'some_memalign',
 );
+
+1;

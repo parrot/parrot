@@ -12,13 +12,14 @@ This is needed for the dynamic GDBMHash PMC.
 
 =cut
 
-package Configure::Step;
+package auto::gdbm;
 
 use strict;
 use vars qw($description $result @args);
 
 use base qw(Parrot::Configure::Step::Base);
 
+use Config;
 use Parrot::Configure::Step ':auto';
 
 $description = "Determining if your platform supports gdbm...";

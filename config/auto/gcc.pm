@@ -11,7 +11,7 @@ Determines whether the C compiler is actually C<gcc>.
 
 =cut
 
-package Configure::Step;
+package auto::gcc;
 
 use strict;
 use vars qw($description $result @args);

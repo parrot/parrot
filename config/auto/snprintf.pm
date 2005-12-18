@@ -11,13 +11,14 @@ Tests if snprintf is present and if it's C99 compliant.
 
 =cut
 
-package Configure::Step;
+package auto::snprintf;
 
 use strict;
 use vars qw($description $result @args);
 
 use base qw(Parrot::Configure::Step::Base);
 
+use Parrot::Configure::Step qw(cc_gen cc_build cc_clean cc_run);
 
 $description = "Testing snprintf ...";
 

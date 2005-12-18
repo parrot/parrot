@@ -11,13 +11,14 @@ Moves the various platform-specific files into place.
 
 =cut
 
-package Configure::Step;
+package gen::platform;
 
 use strict;
 use vars qw($description $result @args);
 
 use base qw(Parrot::Configure::Step::Base);
 
+use Config;
 use Parrot::Configure::Step qw(copy_if_diff);
 
 $description="Moving platform files into place...";

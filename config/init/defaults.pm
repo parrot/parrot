@@ -11,7 +11,7 @@ Sets up the configuration system's default values and data structures.
 
 =cut
 
-package Configure::Step;
+package init::defaults;
 
 use strict;
 use vars qw($description $result @args);

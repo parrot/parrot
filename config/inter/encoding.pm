@@ -11,7 +11,7 @@ Asks the user to select which encoding files to include.
 
 =cut
 
-package Configure::Step;
+package inter::encoding;
 
 use strict;
 use vars qw($description $result @args);
