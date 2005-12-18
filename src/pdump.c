@@ -49,6 +49,7 @@ F<src/packdump.c>.
 
 #include "parrot/parrot.h"
 #include "parrot/embed.h"
+#include "parrot/oplib/ops.h"
 
 /*
 
@@ -99,21 +100,23 @@ static void
 disas_dump (Interp *interpreter, struct PackFile_Segment *self)
 {
     opcode_t *pc;
-    size_t i;
+    size_t i, n;
     PIO_printf(interpreter, "%s => [ # %d ops at offs 0x%x\n",
             self->name, (int)self->size, (int)self->file_offset + 4);
     pc = self->data;
     while (pc < self->data + self->size) {
         /* trace_op_dump(interpreter, self->pf->src, pc); */
         PIO_printf(interpreter, " %04x:  ", (int) (pc - self->data));
+        n = (size_t)interpreter->op_info_table[*pc].op_count;
         for (i = 0; i < 6; i++)
-            if (i < (size_t)interpreter->op_info_table[*pc].arg_count)
+            if (i < n)
                 PIO_printf(interpreter, "%08lx ", (unsigned long) pc[i]);
             else
                 PIO_printf(interpreter, "         ");
         PIO_printf(interpreter, "%s\n",
                 interpreter->op_info_table[*pc].full_name);
-        pc += interpreter->op_info_table[*pc].arg_count;
+        ADD_OP_VAR_PART(interpreter, interpreter->code, pc, n);
+        pc += n;
     }
     PIO_printf(interpreter, "]\n");
 }
