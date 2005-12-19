@@ -515,7 +515,9 @@ Parrot_reallocate_string(Interp *interpreter, STRING *str,
             return PObj_bufstart(str);
         }
     }
-    copysize = (PObj_buflen(str) > tosize ? tosize : PObj_buflen(str));
+    assert(str->bufused <= tosize);
+    /* only copy used memory, not total string buffer */
+    copysize = str->bufused;
 
     if (!PObj_COW_TEST(str)) {
         pool->guaranteed_reclaimable += PObj_buflen(str);
@@ -527,7 +529,8 @@ Parrot_reallocate_string(Interp *interpreter, STRING *str,
     if (!mem) {
         return NULL;
     }
-    oldmem = PObj_bufstart(str);
+    /* copy mem from strstart, *not* bufstart */
+    oldmem = str->strstart;
     str->strstart = PObj_bufstart(str) = mem;
     PObj_buflen(str) = alloc_size;
 
