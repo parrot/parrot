@@ -411,6 +411,7 @@ Parrot_reallocate(Interp *interpreter, Buffer *buffer, size_t tosize)
     size_t alloc_size = tosize;
     void *mem;
     struct Memory_Pool *pool = interpreter->arena_base->memory_pool;
+    size_t new_size, needed, old_size;
 
     /*
      * we don't shrink buffers
@@ -426,25 +427,22 @@ Parrot_reallocate(Interp *interpreter, Buffer *buffer, size_t tosize)
      * normally, which play ping pong with buffers.
      * The normal case is therefore always to allocate a new block
      */
-    if (pool->top_block) {
-        size_t new_size, needed, old_size;
-        new_size = aligned_size(tosize, BUFFER_ALIGNMENT - 1);
-        old_size = aligned_size(PObj_buflen(buffer), BUFFER_ALIGNMENT - 1);
-        needed = new_size - old_size;
-        if (pool->top_block->free >= needed &&
-                pool->top_block->top == (char*)PObj_bufstart(buffer) +
-                old_size) {
-            pool->top_block->free -= needed;
-            pool->top_block->top  += needed;
-            PObj_buflen(buffer) = tosize;
-            return;
-        }
+    new_size = aligned_size(tosize, BUFFER_ALIGNMENT - 1);
+    old_size = aligned_size(PObj_buflen(buffer), BUFFER_ALIGNMENT - 1);
+    needed = new_size - old_size;
+    if (pool->top_block->free >= needed &&
+            pool->top_block->top == (char*)PObj_bufstart(buffer) +
+            old_size) {
+        pool->top_block->free -= needed;
+        pool->top_block->top  += needed;
+        PObj_buflen(buffer) = tosize;
+        return;
     }
-    copysize = (PObj_buflen(buffer) > tosize ? tosize : PObj_buflen(buffer));
+    copysize = PObj_buflen(buffer);
     if (!PObj_COW_TEST(buffer)) {
-        pool->guaranteed_reclaimable += PObj_buflen(buffer);
+        pool->guaranteed_reclaimable += copysize;
     }
-    pool->possibly_reclaimable += PObj_buflen(buffer);
+    pool->possibly_reclaimable += copysize;
     mem = mem_allocate(interpreter, &alloc_size,
             pool, BUFFER_ALIGNMENT - 1);
 
@@ -479,6 +477,7 @@ Parrot_reallocate_string(Interp *interpreter, STRING *str,
     size_t alloc_size = tosize;
     void *mem, *oldmem;
     struct Memory_Pool *pool;
+    size_t new_size, needed, old_size;
 
     pool = PObj_constant_TEST(str)
         ? interpreter->arena_base->constant_string_pool
@@ -494,18 +493,16 @@ Parrot_reallocate_string(Interp *interpreter, STRING *str,
      * - if the passed strings buffer is the last string in the pool and
      * - if there is enough size, we can just move the pool's top pointer
      */
-    if (pool->top_block) {
-        size_t new_size, needed, old_size;
-        new_size = aligned_size(tosize, STRING_ALIGNMENT - 1);
-        old_size = PObj_buflen(str) + sizeof(struct Buffer_Tail);
-        needed = new_size - old_size;
-        if (pool->top_block->free >= needed &&
-                pool->top_block->top == (char*)PObj_bufstart(str) +
-                old_size) {
-            pool->top_block->free -= needed;
-            pool->top_block->top  += needed;
-            PObj_buflen(str) = new_size - sizeof(struct Buffer_Tail);
-        }
+    new_size = aligned_size(tosize, STRING_ALIGNMENT - 1);
+    old_size = PObj_buflen(str) + sizeof(struct Buffer_Tail);
+    needed = new_size - old_size;
+    if (pool->top_block->free >= needed &&
+            pool->top_block->top == (char*)PObj_bufstart(str) +
+            old_size) {
+        pool->top_block->free -= needed;
+        pool->top_block->top  += needed;
+        PObj_buflen(str) = new_size - sizeof(struct Buffer_Tail);
+        return;
     }
     assert(str->bufused <= tosize);
     /* only copy used memory, not total string buffer */
