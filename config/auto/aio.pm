@@ -25,11 +25,12 @@ $description="Determining if your platform supports AIO...";
 @args=qw(verbose);
 
 sub runstep {
-    my $self = shift;
+    my ($self, $conf) = (shift, shift);
+
     my $test;
     my ($verbose) = @_;
-    my $libs = Parrot::Configure::Data->get('libs');
-    Parrot::Configure::Data->add(' ', libs => '-lrt');
+    my $libs = $conf->data->get('libs');
+    $conf->data->add(' ', libs => '-lrt');
 
     cc_gen('config/auto/aio/aio.in');
     eval { cc_build(); };
@@ -43,7 +44,7 @@ sub runstep {
 	    print " (yes) " if $verbose;
             $result = 'yes';
 
-	    Parrot::Configure::Data->set(
+	    $conf->data->set(
 		aio => 'define',
 		HAS_AIO => 1,
 		D_SIGRTMIN => $1,
@@ -53,7 +54,7 @@ sub runstep {
 
     }
     else {
-	Parrot::Configure::Data->set(libs => $libs);
+	$conf->data->set(libs => $libs);
 	print " (no) " if $verbose;
         $result = 'no';
     }

@@ -25,7 +25,8 @@ $description="Determining if your compiler supports inline...";
 @args=qw(inline verbose);
 
 sub runstep {
-    my $self = shift;
+    my ($self, $conf) = (shift, shift);
+
     my $test;
     my ($inline, $verbose) = @_;
 
@@ -60,7 +61,7 @@ sub runstep {
 	}
     }
 
-    Parrot::Configure::Data->set(
+    $conf->data->set(
 	inline => $test
     );
 }

@@ -25,7 +25,7 @@ $description = 'Determining what encoding files should be compiled in...';
 @args=qw(ask encoding);
 
 sub runstep {
-    my $self = shift;
+    my ($self, $conf) = (shift, shift);
   my @encoding=(
     sort
     map  { m{\./src/encodings/(.*)} }
@@ -64,10 +64,10 @@ END
   }
 
   # build list of libraries for link line in Makefile
-  my $slash = Parrot::Configure::Data->get('slash');
+  my $slash = $conf->data->get('slash');
   $TEMP_encoding_o  =~ s/^| / src${slash}encodings${slash}/g;
 
-  Parrot::Configure::Data->set(
+  $conf->data->set(
     encoding             => $encoding_list,
     TEMP_encoding_o           => $TEMP_encoding_o,
     TEMP_encoding_build       => $TEMP_encoding_build,

@@ -45,7 +45,8 @@ my $destdir = 'runtime/parrot/include';
 @args=qw(verbose);
 
 sub runstep {
-    my $self = shift;
+    my ($self, $conf) = (shift, shift);
+
     # need vtable.h now
     system($^X, "tools/build/vtable_h.pl");
     my @generated = ();
@@ -148,7 +149,7 @@ EOF
 	}
 	close(F);
     }
-    Parrot::Configure::Data->set(
+    $conf->data->set(
 	TEMP_gen_pasm_includes => join("\t\\\n\t", @generated)
     );
 }

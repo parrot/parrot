@@ -5,10 +5,14 @@ package init::hints::aix;
 
 use strict;
 
-Parrot::Configure::Data->set(
-    cc => 'cc_r',
-    link => 'cc_r',
-    platform_asm => 1,
-);
+sub runstep {
+    my ($self, $conf) = @_;
+
+    $conf->data->set(
+        cc => 'cc_r',
+        link => 'cc_r',
+        platform_asm => 1,
+    );
+}
 
 1;

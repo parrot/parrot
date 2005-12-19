@@ -5,34 +5,38 @@ package init::hints::freebsd;
 
 use strict;
 
-my $libs = Parrot::Configure::Data->get('libs');
+sub runstep {
+    my ($self, $conf) = @_;
 
-# get rid of old pthread-stuff, if any
-$libs =~ s/(-lpthreads|-lc_r)\b\s*//g;
+    my $libs = $conf->data->get('libs');
 
-# The following test is from FreeBSD's /usr/ports/Mk/bsd.port.mk,
-# which must be assumed to do the right thing.
+    # get rid of old pthread-stuff, if any
+    $libs =~ s/(-lpthreads|-lc_r)\b\s*//g;
 
-my $osversion;
-if (-e "/sbin/sysctl") {
-    $osversion = `/sbin/sysctl -n kern.osreldate`;
+    # The following test is from FreeBSD's /usr/ports/Mk/bsd.port.mk,
+    # which must be assumed to do the right thing.
+
+    my $osversion;
+    if (-e "/sbin/sysctl") {
+        $osversion = `/sbin/sysctl -n kern.osreldate`;
+    }
+    else {
+        $osversion = `/usr/sbin/sysctl -n kern.osreldate`;
+    }
+    chomp $osversion;
+
+    if ($osversion < 500016) { 
+        $libs .= ' -pthread';
+    }
+    else {
+        $libs =~ s/-lc\b\s*//;
+        $libs .= ' -lc_r';
+    }
+
+    $conf->data->set(
+        libs => $libs,
+        link => 'g++',
+    );
 }
-else {
-    $osversion = `/usr/sbin/sysctl -n kern.osreldate`;
-}
-chomp $osversion;
-
-if ($osversion < 500016) { 
-    $libs .= ' -pthread';
-}
-else {
-    $libs =~ s/-lc\b\s*//;
-    $libs .= ' -lc_r';
-}
-
-Parrot::Configure::Data->set(
-    libs => $libs,
-    link => 'g++',
-);
 
 1;

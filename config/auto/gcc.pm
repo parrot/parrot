@@ -25,7 +25,8 @@ $description="Determining if your C compiler is actually gcc...";
 @args=qw(miniparrot verbose);
 
 sub runstep {
-    my $self = shift;
+    my ($self, $conf) = (shift, shift);
+
   my ($miniparrot) = @_;
 
   my %gnuc;
@@ -36,7 +37,7 @@ sub runstep {
   cc_clean();
 
   my($gccversion, $warns, $ccwarn);
-  $ccwarn=Parrot::Configure::Data->get('ccwarn');
+  $ccwarn=$conf->data->get('ccwarn');
 
   # Set gccversion to undef.  This will also trigger any hints-file
   # callbacks that depend on knowing whether or not we're using gcc.
@@ -44,7 +45,7 @@ sub runstep {
   # This key should always exist unless the program couldn't be run,
   # which should have been caught by the 'die' above.
   unless (exists $gnuc{__GNUC__}) {
-    Parrot::Configure::Data->set(gccversion => undef);
+    $conf->data->set(gccversion => undef);
     return;
   }
   
@@ -53,7 +54,7 @@ sub runstep {
   unless (defined $major) {
     print " (no) " if $_[1];
     $result = 'no';
-    Parrot::Configure::Data->set(gccversion => undef);
+    $conf->data->set(gccversion => undef);
     return;
   }
   if ($major =~ tr/0-9//c) {
@@ -145,7 +146,7 @@ sub runstep {
       # make the compiler act as ANSIish as possible, and avoid enabling
       # support for GCC-specific features.
 
-      Parrot::Configure::Data->set(
+      $conf->data->set(
           ccwarn    => "-ansi -pedantic",
           gccversion => undef
       );
@@ -153,13 +154,13 @@ sub runstep {
       return;
   }
 
-  Parrot::Configure::Data->set(
+  $conf->data->set(
     ccwarn    => "$warns $ccwarn",
     gccversion => $gccversion,
     HAS_aligned_funcptr => 1
   );
 
-  Parrot::Configure::Data->set(
+  $conf->data->set(
     HAS_aligned_funcptr => 0)
       if $^O eq 'hpux';
 }

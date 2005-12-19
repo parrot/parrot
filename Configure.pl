@@ -440,13 +440,15 @@ my @steps = qw(
     gen::config_pm
 );
 
-my $config = Parrot::Configure->new;
-$config->add_steps(@steps);
-#Run the actual steps
-$config->runsteps(%args);
+my $conf = Parrot::Configure->new;
+# XXX $Parrot::Configure::Step::conf is a temporty hack
+$Parrot::Configure::Step::conf = $conf;
+$conf->add_steps(@steps);
+# Run the actual steps
+$conf->runsteps(%args);
 
 # tell users what to do next
-my $make = Parrot::Configure::Data->get('make');
+my $make = $config->data->get('make');
 
 print <<"END";
 

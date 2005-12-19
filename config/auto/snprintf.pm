@@ -25,7 +25,8 @@ $description = "Testing snprintf ...";
 @args = qw(verbose);
 
 sub runstep {
-    my $self = shift;
+    my ($self, $conf) = (shift, shift);
+
   my ($verbose) = @_;
   cc_gen('config/auto/snprintf/test.in');
   cc_build();
@@ -33,17 +34,17 @@ sub runstep {
   cc_clean();
 
   if ($res =~ /snprintf/) {
-    Parrot::Configure::Data->set(
+    $conf->data->set(
       HAS_SNPRINTF => 1,
     );
   }
   if ($res =~ /^C99 snprintf/) {
-    Parrot::Configure::Data->set(
+    $conf->data->set(
       HAS_C99_SNPRINTF => 1,
     );
   }
   elsif ($res =~ /^old snprintf/) {
-    Parrot::Configure::Data->set(
+    $conf->data->set(
       HAS_OLD_SNPRINTF => 1,
     );
   }

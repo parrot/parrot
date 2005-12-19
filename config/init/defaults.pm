@@ -21,7 +21,6 @@ use base qw(Parrot::Configure::Step::Base);
 
 use Config;
 use FindBin; # see build_dir
-use Parrot::Configure::Data;
 use Parrot::Configure::Step;
 
 $description="Setting up Configure's default values...";
@@ -29,11 +28,11 @@ $description="Setting up Configure's default values...";
 @args=('debugging', 'optimize', 'profile', 'verbose', 'prefix');
 
 sub runstep {
-    my $self = shift;
+    my ($self, $conf) = (shift, shift);
     my ($debugging, $optimize, $profile,  $verbose, $prefix) = @_;
 
     # We need a Glossary somewhere!
-    Parrot::Configure::Data->set(
+    $conf->data->set(
         debugging     => $debugging ? 1 : 0,
         # A plain --optimize means use perl5's $Config{optimize}.  If an
         # argument is given, however, use that instead.  This logic really
@@ -168,18 +167,18 @@ sub runstep {
     );
 
     unless (defined $prefix) {
-        my $VERSION   = Parrot::Configure::Data->get('VERSION'); 
-        my $DEVEL     = Parrot::Configure::Data->get('DEVEL');
+        my $VERSION   = $conf->data->get('VERSION'); 
+        my $DEVEL     = $conf->data->get('DEVEL');
         $prefix = "/usr/local/parrot-${VERSION}${DEVEL}";
     }
-    Parrot::Configure::Data->set(prefix => $prefix);
+    $conf->data->set(prefix => $prefix);
 
     # add profiling if needed
     # FIXME gcc syntax
     # we should have this in the hints files e.g. cc_profile
     # FIXME move profiling to it's own step 
     if ($profile) {
-        Parrot::Configure::Data->set(
+        $conf->data->set(
             cc_debug => " -pg ",
             ld_debug => " -pg ",
         );

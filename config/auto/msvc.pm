@@ -25,7 +25,7 @@ $description="Determining if your C compiler is actually Visual C++...";
 @args=qw(verbose);
 
 sub runstep {
-  my $self = shift;
+    my ($self, $conf) = (shift, shift);
   my ($verbose) = @_;
 
   cc_gen("config/auto/msvc/test_c.in");
@@ -42,7 +42,7 @@ sub runstep {
   # return 'no' if it's not.
   unless (defined $msvc{_MSC_VER}) {
     $result = 'no';
-    Parrot::Configure::Data->set(msvcversion => undef);
+    $conf->data->set(msvcversion => undef);
     return;
   }
   
@@ -51,7 +51,7 @@ sub runstep {
   unless (defined $major && defined $minor) {
     print " (no) " if $verbose;
     $result = 'no';
-    Parrot::Configure::Data->set(msvcversion => undef);
+    $conf->data->set(msvcversion => undef);
     return;
   }
 
@@ -59,7 +59,7 @@ sub runstep {
   print " (yep: $msvcversion )" if $verbose;
   $result = 'yes';
 
-  Parrot::Configure::Data->set(
+  $conf->data->set(
     msvcversion => $msvcversion,
   );
 
@@ -71,7 +71,7 @@ sub runstep {
       # This function or variable may be unsafe. Consider using xxx_s instead.
       # To disable deprecation, use _CRT_SECURE_NO_DEPRECATE. See online help
       # for details.
-      Parrot::Configure::Data->add(" ", "ccflags", "-D_CRT_SECURE_NO_DEPRECATE");
+      $conf->data->add(" ", "ccflags", "-D_CRT_SECURE_NO_DEPRECATE");
   }
 }
 

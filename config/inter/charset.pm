@@ -25,7 +25,7 @@ $description = 'Determining what charset files should be compiled in...';
 @args=qw(ask charset);
 
 sub runstep {
-    my $self = shift;
+    my ($self, $conf) = (shift, shift);
   my @charset=(
     sort
     map  { m{\./src/charset/(.*)} }
@@ -64,10 +64,10 @@ END
   }
 
   # build list of libraries for link line in Makefile
-  my $slash = Parrot::Configure::Data->get('slash');
+  my $slash = $conf->data->get('slash');
   $TEMP_charset_o  =~ s/^| / src${slash}charset${slash}/g;
 
-  Parrot::Configure::Data->set(
+  $conf->data->set(
     charset             => $charset_list,
     TEMP_charset_o           => $TEMP_charset_o,
     TEMP_charset_build       => $TEMP_charset_build,

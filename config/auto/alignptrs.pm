@@ -26,22 +26,23 @@ $description = "Determining your minimum pointer alignment...";
 @args = qw(miniparrot verbose);
 
 sub runstep {
-    my $self = shift;
+    my ($self, $conf) = (shift, shift);
+
     my ($miniparrot) = @_;
 
     return if $miniparrot;
 
     $result = '';
     my $align;
-    if (defined(Parrot::Configure::Data->get('ptr_alignment')))
+    if (defined($conf->data->get('ptr_alignment')))
     {
-        $align = Parrot::Configure::Data->get('ptr_alignment');
+        $align = $conf->data->get('ptr_alignment');
         $result = "configured: ";
     }
     elsif ($^O eq 'hpux' && $Config{ccflags} !~ /DD64/) {
         # HP-UX 10.20/32 hangs in this test.
         $align = 4;
-        Parrot::Configure::Data->set(ptr_alignment => $align);
+        $conf->data->set(ptr_alignment => $align);
         $result = "for hpux: ";
     }
     else {
@@ -57,7 +58,7 @@ sub runstep {
         cc_clean();
 
         die "Can't determine alignment!\n" unless defined $align;
-        Parrot::Configure::Data->set(ptr_alignment => $align);
+        $conf->data->set(ptr_alignment => $align);
     }
 
     $result .= " $align byte";

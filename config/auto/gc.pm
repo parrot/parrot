@@ -49,7 +49,8 @@ $description="Determining what allocator to use...";
 @args=qw(gc verbose);
 
 sub runstep {
-    my $self = shift;
+    my ($self, $conf) = (shift, shift);
+
   my ($gc, $verbose) = @_;
 
   if (!defined($gc)) {
@@ -58,11 +59,11 @@ sub runstep {
   }
   elsif ($gc eq 'libc') {
     # tests mallinfo after allocation of 128 bytes
-    if (Parrot::Configure::Data->get('i_malloc')) {
-        Parrot::Configure::Data->set(malloc_header => 'malloc.h');
+    if ($conf->data->get('i_malloc')) {
+        $conf->data->set(malloc_header => 'malloc.h');
     }
     else {
-        Parrot::Configure::Data->set(malloc_header => 'stdlib.h');
+        $conf->data->set(malloc_header => 'stdlib.h');
     }
 =for nothing
 
@@ -84,7 +85,7 @@ sub runstep {
   }
 
   if ($gc =~ /^malloc(?:-trace)?$/) {
-    Parrot::Configure::Data->set(
+    $conf->data->set(
       TEMP_gc_c          => <<"EOF",
 \$(SRC_DIR)/$gc\$(O):	\$(GENERAL_H_FILES) \$(SRC_DIR)/$gc.c
 \$(SRC_DIR)/res_lea\$(O):	\$(GENERAL_H_FILES) \$(SRC_DIR)/res_lea.c
@@ -94,7 +95,7 @@ EOF
     );
   }
   elsif ($gc eq 'libc') {
-    Parrot::Configure::Data->set(
+    $conf->data->set(
       TEMP_gc_c          => <<"EOF",
 \$(SRC_DIR)/res_lea\$(O):	\$(GENERAL_H_FILES) \$(SRC_DIR)/res_lea.c
 EOF
@@ -104,7 +105,7 @@ EOF
   }
   else {
       $gc = 'gc';
-    Parrot::Configure::Data->set(
+    $conf->data->set(
       TEMP_gc_c          => <<"EOF",
 \$(SRC_DIR)/resources\$(O):	\$(GENERAL_H_FILES) \$(SRC_DIR)/resources.c
 EOF

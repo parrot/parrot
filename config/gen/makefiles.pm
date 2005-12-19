@@ -26,13 +26,16 @@ $description = "Generating build files...";
 @args = ();
 
 sub runstep {
-    my $self = shift;
-  makefiles();
-  cflags();
-  genfile('config/gen/makefiles/libparrot_def.in', 'libparrot.def');
+    my ($self, $conf) = @_;
+
+    $self->makefiles($conf);
+    $self->cflags($conf);
+    genfile('config/gen/makefiles/libparrot_def.in', 'libparrot.def');
 }
 
 sub cflags {
+    my ($self, $conf) = @_;
+
   genfile('config/gen/makefiles/CFLAGS.in' => 'CFLAGS',
           commentType => '#');
 
@@ -40,7 +43,7 @@ sub cflags {
 
   # Why is this here?  I'd think this information belongs
   # in the CFLAGS.in file. -- A.D.  March 12, 2004
-  if (Parrot::Configure::Data->get('cpuarch') =~ /sun4|sparc64/) {
+  if ($conf->data->get('cpuarch') =~ /sun4|sparc64/) {
       # CFLAGS entries must be left-aligned.
       print CFLAGS <<"EOF";
 src/jit_cpu.c -{-Wcast-align}        # lots of noise!
@@ -52,6 +55,8 @@ EOF
 }
 
 sub makefiles {
+    my ($self, $conf) = @_;
+
   genfile('config/gen/makefiles/root.in'      => 'Makefile',
           commentType       => '#', 
           replace_slashes   => 1, 
@@ -141,7 +146,7 @@ sub makefiles {
           commentType       => '#',
           replace_slashes   => 1);
 
-  if ( Parrot::Configure::Data->get('has_perldoc') ) {
+  if ( $conf->data->get('has_perldoc') ) {
     # set up docs/Makefile, partly based on the .ops in the root dir
 
     opendir OPS, "src/ops" or die "opendir ops: $!";
@@ -150,19 +155,19 @@ sub makefiles {
 
     my $pod = join " ", map { my $t = $_; $t =~ s/\.ops$/.pod/; "ops/$t" } @ops;
     
-    Parrot::Configure::Data->set(pod => $pod);
+    $conf->data->set(pod => $pod);
   
     genfile('config/gen/makefiles/docs.in',      'docs/Makefile',
             commentType       => '#',
             replace_slashes   => 1,
             conditioned_lines => 1);
     
-    Parrot::Configure::Data->set(pod => undef);
+    $conf->data->set(pod => undef);
 
     open MAKEFILE, ">> docs/Makefile" or die "open >> docs/Makefile: $!";
 
-    my $slash = Parrot::Configure::Data->get('slash');
-    my $new_perldoc = Parrot::Configure::Data->get('new_perldoc');
+    my $slash = $conf->data->get('slash');
+    my $new_perldoc = $conf->data->get('new_perldoc');
 
     foreach my $ops (@ops) {
         my $pod = $ops;

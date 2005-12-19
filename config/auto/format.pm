@@ -25,9 +25,10 @@ $description = "Figuring out what formats should be used for sprintf...";
 @args=();
 
 sub runstep {
-    my $self = shift;
+    my ($self, $conf) = (shift, shift);
+
   my($ivformat, $nvformat, $nvsize);
-  my($iv, $nv, $floatsize, $doublesize, $ldsize)=Parrot::Configure::Data->get(
+  my($iv, $nv, $floatsize, $doublesize, $ldsize)=$conf->data->get(
     qw(iv nv floatsize doublesize hugefloatvalsize)
   );
 
@@ -54,7 +55,7 @@ sub runstep {
     die "Configure.pl:  Can't find a printf-style format specifier for type \"$nv\"\n";
   }
 
-  Parrot::Configure::Data->set(
+  $conf->data->set(
     intvalfmt   => $ivformat,
     floatvalfmt => $nvformat,
     nvsize      => $nvsize

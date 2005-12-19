@@ -31,9 +31,9 @@ use File::Basename qw( basename );
 use File::Copy ();
 use File::Spec;
 use File::Which;
-use Parrot::Configure::Data;
 
-use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
+# XXX $conf is a temporary hack
+use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS $conf);
 
 @ISA = qw(Exporter);
 
@@ -49,11 +49,6 @@ use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
                   capture_output check_progs)],
         gen   => [qw(genfile copy_if_diff move_if_diff)]
                );
-
-#Parrot::Configure::Data->get('key')
-#Parrot::Configure::Data->set('key', 'value')
-#Parrot::Configure::Data->keys()
-#Parrot::Configure::Data->dump()
 
 =item C<integrate($orig, $new)>
 
@@ -210,14 +205,11 @@ sub genfile {
     foreach (@comment) { print OUT $_; }
   }
 
-  while(<IN>) {
-    if (/^#perl/ && $options{feature_file}) {
+  foreach my $line (<IN>) {
+    if ($line =~ /^#perl/ && $options{feature_file}) {
       local $/ = undef;
-      $_ = <IN>;
-      s{
-	\$\{(\w+)\}
-      }{Parrot::Configure::Data->get("$1")}gx;
-      eval;
+      $line =~ s{ \$\{(\w+)\} }{$conf->data->get("$1")}gx;
+      eval $line;
       die $@ if $@;
       last;
 
@@ -227,19 +219,19 @@ sub genfile {
         # the "var" condition is false.
         # Lines with "#INVERSE_CONDITIONED_LINE(var):..." are skipped if
         # the "var" condition is true.
-        if ( m/^#CONDITIONED_LINE\(([^)]+)\):(.*)/s ) {
-            next unless Parrot::Configure::Data->get($1);
+        if ($line =~ m/^#CONDITIONED_LINE\(([^)]+)\):(.*)/s ) {
+            next unless $conf->data->get($1);
             $_ = $2;
         }
-        elsif ( m/^#INVERSE_CONDITIONED_LINE\(([^)]+)\):(.*)/s ) {
-            next if Parrot::Configure::Data->get($1);
+        elsif ($line =~ m/^#INVERSE_CONDITIONED_LINE\(([^)]+)\):(.*)/s ) {
+            next if $conf->data->get($1);
             $_ = $2;
         }
     }
-    s{
+    $line =~ s{
       \$\{(\w+)\}
     }{
-      if(defined(my $val=Parrot::Configure::Data->get($1))) {
+      if(defined(my $val=$conf->data->get($1))) {
         #use Data::Dumper;warn Dumper("val for $1 is ",$val);
         $val;
       }
@@ -249,14 +241,14 @@ sub genfile {
       }
     }egx;
     if ( $options{replace_slashes} ) {
-      s{(/+)}{
+      $line =~ s{(/+)}{
         my $len = length $1;
-        my $slash = Parrot::Configure::Data->get('slash');
+        my $slash = $conf->data->get('slash');
         '/' x ($len/2) . ($len%2 ? $slash : '');
       }eg;
-      s{(\\\*)}{\\$1}g; # replace \* with \\*, so make will not eat the \
+      $line =~ s{(\\\*)}{\\$1}g; # replace \* with \\*, so make will not eat the \
     }
-    print OUT;
+    print OUT $line;
   }
 
     close IN  or die "Can't close $source: $!";
@@ -276,7 +268,7 @@ C<$err>.
 sub _run_command {
     my ($command, $out, $err) = @_;
 
-    my $verbose = Parrot::Configure::Data->get('verbose');
+    my $verbose = $conf->data->get('verbose');
 
     if ($verbose) {
       print "$command\n";
@@ -354,7 +346,7 @@ sub cc_build {
     $link_args = '' unless defined $link_args;
 
     my ($cc, $ccflags, $ldout, $o, $link, $linkflags, $cc_exe_out, $exe, $libs)=
-    Parrot::Configure::Data->get( qw(cc ccflags ld_out o link linkflags
+    $conf->data->get( qw(cc ccflags ld_out o link linkflags
                           cc_exe_out exe libs) );
 
     _run_command("$cc $ccflags $cc_args -I./include -c test.c",
@@ -374,8 +366,8 @@ F<test.out>.
 =cut
 
 sub cc_run {
-    my $exe=Parrot::Configure::Data->get('exe');
-    my $slash=Parrot::Configure::Data->get('slash');
+    my $exe=$conf->data->get('exe');
+    my $slash=$conf->data->get('slash');
 
     if (defined($_[0]) && length($_[0])) {
         local $"=' ';
@@ -402,8 +394,8 @@ F<test.out>.
 =cut
 
 sub cc_run_capture {
-    my $exe=Parrot::Configure::Data->get('exe');
-    my $slash=Parrot::Configure::Data->get('slash');
+    my $exe=$conf->data->get('exe');
+    my $slash=$conf->data->get('slash');
 
     if (defined($_[0]) && length($_[0])) {
         local $"=' ';
@@ -431,7 +423,7 @@ Cleans up all files in the root folder that match the glob F<test.*>.
 sub cc_clean {
     unlink map "test$_",
                qw( .c .cco .ldo .out),
-               Parrot::Configure::Data->get( qw( o exe ) );
+               $conf->data->get( qw( o exe ) );
 }
 
 =item C<capture_output($command)>
@@ -486,7 +478,7 @@ sub check_progs {
     my $progs = shift;
 
     $progs = [$progs] unless ref $progs eq 'ARRAY';
-    my $verbose = Parrot::Configure::Data->get('verbose');
+    my $verbose = $conf->data->get('verbose');
 
     print "checking for program: ", join(" or ", @$progs), "\n" if $verbose;
     foreach my $prog (@$progs) {

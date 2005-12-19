@@ -27,15 +27,15 @@ $prompt         = "Do you have a lexical analyzer generator like flex or lex?";
 @args           = qw( lex ask maintainer );
 
 sub runstep {
-    my $self = shift;
+    my ($self, $conf) = (shift, shift);
     my %args;
     @args{@args}=@_;
 
     # undef means we don't have flex... default to not having flex
-    Parrot::Configure::Data->set(flex_version => undef);
+    $conf->data->set(flex_version => undef);
 
     unless ($args{maintainer}) {
-        Parrot::Configure::Data->set( $util => 'echo' );
+        $conf->data->set( $util => 'echo' );
         $result = 'skipped';
         return undef;
     }
@@ -49,7 +49,7 @@ sub runstep {
     # never override the user.  If a non-existent program is specified then
     # the user is responsible for the consequences.
     if (defined $prog) {
-        Parrot::Configure::Data->set($util => $prog);
+        $conf->data->set($util => $prog);
         $result = 'yes';
         return undef;
     }
@@ -63,7 +63,7 @@ sub runstep {
     }
 
     if ($args{ask}) {
-        $prog = prompt($prompt, $prog ? $prog : Parrot::Configure::Data->get($util));
+        $prog = prompt($prompt, $prog ? $prog : $conf->data->get($util));
     }
 
     my ($stdout, $stderr, $ret) = capture_output($prog, '--version');
@@ -79,10 +79,10 @@ sub runstep {
     # if '--version' returns a string assume that this is flex.
     # flex calls it self by $0 so it will claim to be lex if invoked as `lex`
     if ($stdout =~ /f?lex .*? (\d+) \. (\d+) \. (\d+)/x) {
-        Parrot::Configure::Data->set(flex_version => "$1.$2.$3");
+        $conf->data->set(flex_version => "$1.$2.$3");
     }
 
-    Parrot::Configure::Data->set($util => $prog);
+    $conf->data->set($util => $prog);
     $result = 'yes';
 }
 

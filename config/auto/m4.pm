@@ -28,7 +28,8 @@ $description = "Determining whether GNU m4 is installed...";
 @args = qw(verbose);
 
 sub runstep {
-    my $self = shift;
+    my ($self, $conf) = (shift, shift);
+
     my $archname =  $Config{archname};
     my ($cpuarch, $osname)       =  split('-', $archname);
     if (!defined $osname) {
@@ -49,7 +50,7 @@ sub runstep {
         $has_gnu_m4 = ( $output =~ m/^GNU [mM]4 / ) ? 1 : 0;
     }
 
-    Parrot::Configure::Data->set(has_gnu_m4 => $has_gnu_m4);
+    $conf->data->set(has_gnu_m4 => $has_gnu_m4);
     $result = $has_gnu_m4 ? 'yes' : 'no';
 }
 

@@ -26,19 +26,20 @@ $description="Figuring out how to pack() Parrot's types...";
 @args=();
 
 sub runstep {
-    my $self = shift;
+    my ($self, $conf) = (shift, shift);
+
   #
   # Alas perl5.7.2 doesn't have an INTVAL flag for pack().
   # The ! modifier only works for perl 5.6.x or greater.
   #
 
-  my $intsize=Parrot::Configure::Data->get('intsize');
-  my $longsize=Parrot::Configure::Data->get('longsize');
-  my $ptrsize=Parrot::Configure::Data->get('ptrsize');
+  my $intsize=$conf->data->get('intsize');
+  my $longsize=$conf->data->get('longsize');
+  my $ptrsize=$conf->data->get('ptrsize');
 
   foreach ('intvalsize', 'opcode_t_size') {
     my $which = $_ eq 'intvalsize' ? 'packtype_i' : 'packtype_op';
-    my $size=Parrot::Configure::Data->get($_);
+    my $size=$conf->data->get($_);
     my $format;
     if (($] >= 5.006) && ($size == $longsize) && ($size == $Config{longsize}) ) {
         $format = 'l!';
@@ -72,12 +73,12 @@ AARGH
 	$format = '?';
     }
 
-    Parrot::Configure::Data->set($which => $format);
+    $conf->data->set($which => $format);
   }
 
-  Parrot::Configure::Data->set(
+  $conf->data->set(
     packtype_b => 'C',
-    packtype_n => (Parrot::Configure::Data->get('numvalsize') == 12 ? 'D' : 'd')
+    packtype_n => ($conf->data->get('numvalsize') == 12 ? 'D' : 'd')
   );
 
   #
@@ -86,9 +87,9 @@ AARGH
   #
 
   if ($intsize == $ptrsize) {
-    Parrot::Configure::Data->set(ptrconst => "u");
+    $conf->data->set(ptrconst => "u");
   } elsif ($longsize == $ptrsize) {
-    Parrot::Configure::Data->set(ptrconst => "ul");
+    $conf->data->set(ptrconst => "ul");
   } else {
     warn <<"AARGH";
 Configure.pl:  Unable to find an integer type that fits a pointer.
