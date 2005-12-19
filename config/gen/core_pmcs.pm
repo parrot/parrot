@@ -25,16 +25,13 @@ $description="Generating core pmc list...";
 @args=();
 
 sub runstep {
-    my ($self, $conf) = @_;
-
-    $self->generate_h($conf);
-    $self->generate_c($conf);
-    $self->generate_pm($conf);
+    my $self = shift;
+    generate_h();
+    generate_c();
+    generate_pm();
 }
 
 sub generate_h {
-    my ($self, $conf) = @_;
-
     my $file = "include/parrot/core_pmcs.h";
     open(OUT, ">$file.tmp");
 
@@ -49,7 +46,7 @@ sub generate_h {
 enum {
 END
 
-    my @pmcs = split(/ /, $conf->data->get('pmc_names'));
+    my @pmcs = split(/ /, Parrot::Configure::Data->get('pmc_names'));
     print OUT "    enum_class_default,\n";
     my $i = 1;
     foreach (@pmcs) {
@@ -69,10 +66,8 @@ END
 }
 
 sub generate_c {
-    my ($self, $conf) = @_;
-
     my $file = "src/core_pmcs.c";
-    my @pmcs = split(/ /, $conf->data->get('pmc_names'));
+    my @pmcs = split(/ /, Parrot::Configure::Data->get('pmc_names'));
 
     open(OUT, ">$file.tmp");
 
@@ -154,10 +149,8 @@ END
 }
 
 sub generate_pm {
-    my ($self, $conf) = @_;
-
     my $file = "lib/Parrot/PMC.pm";
-    my @pmcs = split(/ /, $conf->data->get('pmc_names'));
+    my @pmcs = split(/ /, Parrot::Configure::Data->get('pmc_names'));
 
     open(OUT, ">$file.tmp");
 

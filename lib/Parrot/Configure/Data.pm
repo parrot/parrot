@@ -20,27 +20,9 @@ package Parrot::Configure::Data;
 
 use strict;
 
+use vars qw( %c %triggers );
+
 use Data::Dumper;
-
-=item Parrot::Configure::Data->new()
-
-Ojbect constructor.
-
-=cut
-
-sub new {
-    my $class = shift;
-
-    my $self = {
-        c           => {},
-        triggers    => {},
-    };
-
-    bless $self, ref $class || $class;
-
-    return $self;
-}
-
 
 =item Parrot::Configure::Data->get($key,...)
 
@@ -51,9 +33,7 @@ Return value or hash slice for key.
 sub get {
     my $self = shift;
 
-    my $c = $self->{c};
-
-    return @$c{@_};
+    return @c{@_};
 }
 
 =item Parrot::Configure::Data->set($key,$val, ...)
@@ -72,7 +52,7 @@ sub set {
     while (my ($key, $val) = splice @_, 0, 2) {
         print "\t$key => ", defined($val) ? "'$val'" : 'undef', ",\n"
 	        if $verbose;
-        $self->{c}{$key}=$val;
+        $c{$key}=$val;
 
         foreach my $trigger ($self->gettriggers($key)) {
             print "\tcalling trigger $trigger for $key\n" if $verbose;
@@ -95,7 +75,7 @@ sub add {
     my ($self, $delim) = @_;
 
     while (my ($key, $val) = splice @_, 0, 2) {
-        my ($old) = $self->{c}{$key};
+        my ($old) = $c{$key};
         if (defined $old) {
             $self->set($key, "$old$delim$val");
         }
@@ -112,9 +92,7 @@ Return config keys.
 =cut
 
 sub keys {
-    my $self = shift;
-
-    return keys %{$self->{c}};
+    return keys %c;
 }
 
 =item Parrot::Configure::Data->dump()
@@ -136,14 +114,12 @@ Dump config keys.
 
     if ($dd_version >= 2.12) {
         *dump=sub {
-            my $self = shift;
-            Data::Dumper->new([$self->{c}], ['*PConfig'])->Sortkeys(1)->Dump();
+            Data::Dumper->new([\%c], ['*PConfig'])->Sortkeys(1)->Dump();
         };
     }
     else {
         *dump=sub {
-            my $self = shift;
-            Data::Dumper->new([$self->{c}], ['*PConfig'])->Dump();
+            Data::Dumper->new([\%c], ['*PConfig'])->Dump();
         };
     }
 }
@@ -156,9 +132,7 @@ e.g. as file lists for Makefile generation.
 =cut
 
 sub clean {
-    my $self = shift;
-
-    delete $self->{c}{$_} for grep { /^TEMP_/ } CORE::keys %{$self->{c}};
+    delete $c{$_} for grep { /^TEMP_/ } CORE::keys %c;
 }
 
 =item Parrot::Configure::Data->settrigger($key, $trigger, $cb)
@@ -180,7 +154,7 @@ sub settrigger {
     print "Setting trigger $trigger on configuration key $key\n",
         if $verbose;
 
-    $self->{triggers}{$key}{$trigger} = $cb;
+    $triggers{$key}{$trigger} = $cb;
 
     return $self;
 }
@@ -194,14 +168,14 @@ Get the names of all triggers set for C<$key>.
 sub gettriggers {
     my ($self, $key) = @_;
 
-    return unless defined $self->{triggers}{$key};
+    return unless defined $triggers{$key};
 
     my $verbose = defined $self->get('verbose') && $self->get('verbose') == 2;
 
     print "Looking up all triggers on configuration key $key\n"
         if $verbose;
 
-    return CORE::keys %{$self->{triggers}{$key}};
+    return CORE::keys %{$triggers{$key}};
 }
 
 =item Parrot::Configure::Data->gettrigger($key, $trigger)
@@ -213,15 +187,14 @@ Get the callback set for C<$key> under the name C<$trigger>
 sub gettrigger {
     my ($self, $key, $trigger) = @_;
 
-    return unless defined $self->{triggers}{$key}
-        and defined $self->{triggers}{$key}{$trigger};
+    return unless defined $triggers{$key} and defined $triggers{$key}{$trigger};
 
     my $verbose = defined $self->get('verbose') && $self->get('verbose') == 2;
 
     print "Looking up trigger $trigger on configuration key $key\n"
         if $verbose;
 
-    return $self->{triggers}{$key}{$trigger};
+    return $triggers{$key}{$trigger};
 }
 
 =item Parrot::Configure::Data->deltrigger($key, $trigger)
@@ -233,15 +206,14 @@ Removes the trigger on C<$key> named by C<$trigger>
 sub deltrigger {
     my ($self, $key, $trigger) = @_;
 
-    return unless defined $self->{triggers}{$key}
-        and defined $self->{triggers}{$key}{$trigger};
+    return unless defined $triggers{$key} and defined $triggers{$key}{$trigger};
 
     my $verbose = defined $self->get('verbose') && $self->get('verbose') == 2;
 
     print "Removing trigger $trigger on configuration key $key\n"
         if $verbose;
 
-    delete $self->{triggers}{$key}{$trigger};
+    delete $triggers{$key}{$trigger};
 
     return $self;
 }

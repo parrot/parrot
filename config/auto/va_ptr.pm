@@ -25,8 +25,7 @@ $description="Test the type of va_ptr (this test is likely to segfault)...";
 @args=qw(verbose);
 
 sub runstep {
-    my ($self, $conf) = (shift, shift);
-
+    my $self = shift;
     my $va_type;
     cc_gen('config/auto/va_ptr/test_c.in');
     eval { cc_build('-DVA_TYPE_X86'); };
@@ -43,7 +42,7 @@ sub runstep {
     }
     cc_clean();
     $result = $va_type;
-    $conf->data->set(
+    Parrot::Configure::Data->set(
 	va_ptr_type => $va_type,
     );
 }

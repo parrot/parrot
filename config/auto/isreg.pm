@@ -25,8 +25,7 @@ $description="Determining if your C library has a working S_ISREG...";
 @args=qw(verbose);
 
 sub runstep {
-    my ($self, $conf) = (shift, shift);
-
+    my $self = shift;
     my $test = 0;
 
     cc_gen('config/auto/isreg/test_c.in');
@@ -36,7 +35,7 @@ sub runstep {
     }
     cc_clean();
 
-    $conf->data->set(
+    Parrot::Configure::Data->set(
 	isreg  => $test
     );
     print($test ? " (Yep) " : " (no) ") if $_[0];

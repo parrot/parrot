@@ -29,7 +29,7 @@ $description="Generating C headers...";
 @args=('define');
 
 sub runstep {
-    my ($self, $conf) = (shift, shift);
+    my $self = shift;
   my $define = shift;
 
   genfile('config/gen/config_h/config_h.in', 'include/parrot/config.h',
@@ -59,9 +59,9 @@ sub runstep {
 
 EOF
 
-  for (sort($conf->data->keys())) {
+  for (sort(Parrot::Configure::Data->keys())) {
     next unless /i_(\w+)/;
-    if($conf->data->get($_)) {
+    if(Parrot::Configure::Data->get($_)) {
       print HH "#define PARROT_HAS_HEADER_\U$1 1\n"
     }
     else {
@@ -93,9 +93,9 @@ EOF
  */
 
 EOF
-  for (sort($conf->data->keys())) {
+  for (sort(Parrot::Configure::Data->keys())) {
     next unless /HAS_(\w+)/;
-    if($conf->data->get($_)) {
+    if(Parrot::Configure::Data->get($_)) {
       print HH "#define PARROT_HAS_\U$1 1\n"
     }
   }
@@ -106,10 +106,10 @@ EOF
  */
 
 EOF
-  for (sort($conf->data->keys())) {
+  for (sort(Parrot::Configure::Data->keys())) {
     next unless /D_(\w+)/;
     my $val;
-    if ($val=$conf->data->get($_)) {
+    if ($val=Parrot::Configure::Data->get($_)) {
       print HH "#define PARROT_\U$1 $val\n"
     }
   }

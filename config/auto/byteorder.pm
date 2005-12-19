@@ -25,8 +25,7 @@ $description="Computing native byteorder for Parrot's wordsize...";
 @args=();
 
 sub runstep {
-    my ($self, $conf) = (shift, shift);
-
+    my $self = shift;
   cc_gen('config/auto/byteorder/test_c.in');
   cc_build();
   my $byteorder=cc_run() or die "Can't run the byteorder testing program: $!";
@@ -35,14 +34,14 @@ sub runstep {
   chomp $byteorder;
 
   if($byteorder =~ /^1234/) {
-    $conf->data->set(
+    Parrot::Configure::Data->set(
       byteorder => $byteorder,
       bigendian => 0
     );
     $result = 'little-endian';
   }
   elsif($byteorder =~ /^(8765|4321)/) {
-    $conf->data->set(
+    Parrot::Configure::Data->set(
       byteorder => $byteorder,
       bigendian => 1
     );

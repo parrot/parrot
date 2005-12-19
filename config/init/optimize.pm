@@ -27,15 +27,14 @@ $description="Enabling optimization...";
 @args=qw(verbose optimize);
 
 sub runstep {
-    my ($self, $conf) = (shift, shift);
-
+    my $self = shift;
   my ($verbose, $optimize) = @_;
-  if ($conf->data->get('optimize')) {
+  if (Parrot::Configure::Data->get('optimize')) {
     my($ccflags, $optimize) =
-      $conf->data->get(qw(ccflags optimize));
+      Parrot::Configure::Data->get(qw(ccflags optimize));
     $ccflags .= " $optimize -DDISABLE_GC_DEBUG=1 -DNDEBUG";
 
-    $conf->data->set(
+    Parrot::Configure::Data->set(
                          ccflags => $ccflags,
                         );
   }

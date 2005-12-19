@@ -32,15 +32,14 @@ $description = "Determining whether antlr is installed...";
 @args = qw(verbose);
 
 sub runstep {
-    my ($self, $conf) = (shift, shift);
-
+    my $self = shift;
     my ( $out, $err ) = capture_output( 'antlr', '-h' );
     my $output = join( '', $out || '', $err || '' );
     my ($python, $major, $minor, $revision) = 
         $output =~ m/(Python)\s+(\d+).(\d+)(?:.(\d+))?/;
     my $has_antlr = ($output =~ m/ANTLR Parser Generator/) ? 1 : 0;
 
-    $conf->data->set(has_antlr => $has_antlr);
+    Parrot::Configure::Data->set(has_antlr => $has_antlr);
 
     my $has_antlr_with_python = 0;
     if ( $has_antlr ) {
@@ -55,7 +54,7 @@ sub runstep {
                                      'no, NoClassDefFoundError' :
                                      'no';
     }
-    $conf->data->set(has_antlr_with_python => $has_antlr_with_python);
+    Parrot::Configure::Data->set(has_antlr_with_python => $has_antlr_with_python);
 }
 
 1;

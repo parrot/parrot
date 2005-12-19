@@ -24,8 +24,7 @@ $description = "Determining whether your compiler supports computed goto...";
 @args = qw(cgoto miniparrot verbose);
 
 sub runstep {
-    my ($self, $conf) = (shift, shift);
-
+    my $self = shift;
     my ($cgoto, $miniparrot, $verbose) = @_;
 
     return if $miniparrot;
@@ -41,7 +40,7 @@ sub runstep {
     }
 
     if ($test) {
-        $conf->data->set(
+        Parrot::Configure::Data->set(
             TEMP_cg_h => '$(INC_DIR)/oplib/core_ops_cg.h $(INC_DIR)/oplib/core_ops_cgp.h',
             TEMP_cg_c => <<'EOF',
 $(OPS_DIR)/core_ops_cg$(O): $(GENERAL_H_FILES) $(OPS_DIR)/core_ops_cg.c
@@ -62,7 +61,7 @@ EOF
         $result = 'yes';
     }
     else {
-        $conf->data->set(
+        Parrot::Configure::Data->set(
             TEMP_cg_h => '',
             TEMP_cg_c => '',
             TEMP_cg_o => '',

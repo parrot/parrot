@@ -26,22 +26,21 @@ $description="Determining if your platform supports GMP...";
 @args=qw(verbose);
 
 sub runstep {
-    my ($self, $conf) = (shift, shift);
-
+    my $self = shift;
     my ($verbose) = @_;
 
-    my $cc = $conf->data->get('cc');
-    my $libs = $conf->data->get('libs');
-    my $linkflags = $conf->data->get('linkflags');
-    my $ccflags = $conf->data->get('ccflags');
+    my $cc = Parrot::Configure::Data->get('cc');
+    my $libs = Parrot::Configure::Data->get('libs');
+    my $linkflags = Parrot::Configure::Data->get('linkflags');
+    my $ccflags = Parrot::Configure::Data->get('ccflags');
     if ($^O =~ /mswin32/i) {
         if ($cc =~ /^gcc/i) {
-            $conf->data->add(' ', libs => '-lgmp');
+            Parrot::Configure::Data->add(' ', libs => '-lgmp');
         } else {
-            $conf->data->add(' ', libs => 'gmp.lib');
+            Parrot::Configure::Data->add(' ', libs => 'gmp.lib');
         }
     } else {
-        $conf->data->add(' ', libs => '-lgmp');
+        Parrot::Configure::Data->add(' ', libs => '-lgmp');
     }
 
     my $archname = $Config{archname};
@@ -55,9 +54,9 @@ sub runstep {
     # where Fink lives.
     if($osname =~ /darwin/) {
         if( -f "/sw/include/gmp.h") {
-            $conf->data->add(' ', linkflags => '-L/sw/lib');
-            $conf->data->add(' ', ldflags => '-L/sw/lib');
-            $conf->data->add(' ', ccflags => '-I/sw/include');
+            Parrot::Configure::Data->add(' ', linkflags => '-L/sw/lib');
+            Parrot::Configure::Data->add(' ', ldflags => '-L/sw/lib');
+            Parrot::Configure::Data->add(' ', ccflags => '-I/sw/include');
         }
     }
 
@@ -71,7 +70,7 @@ sub runstep {
 	    print " (yes) " if $verbose;
             $result = 'yes';
 
-	    $conf->data->set(
+	    Parrot::Configure::Data->set(
 		gmp     => 'define',
 		HAS_GMP => $has_gmp,
 	    );
@@ -79,9 +78,9 @@ sub runstep {
     }
     unless ( $has_gmp ) {
         # The Config::Data settings might have changed for the test
-        $conf->data->set('libs', $libs);
-        $conf->data->set('ccflags', $ccflags);
-        $conf->data->set('linkflags', $linkflags);
+        Parrot::Configure::Data->set('libs', $libs);
+        Parrot::Configure::Data->set('ccflags', $ccflags);
+        Parrot::Configure::Data->set('linkflags', $linkflags);
         print " (no) " if $verbose;
         $result = 'no';
     }

@@ -25,10 +25,9 @@ $description = "Determining some signal stuff...";
 @args=qw(miniparrot verbose);
 
 sub runstep {
-    my ($self, $conf) = (shift, shift);
-
+    my $self = shift;
     my ($miniparrot, $verbose) = @_;
-    $conf->data->set(
+    Parrot::Configure::Data->set(
 	has___sighandler_t => undef,
 	has_sigatomic_t  => undef,
 	has_sigaction    => undef,
@@ -41,7 +40,7 @@ sub runstep {
     cc_gen('config/auto/signal/test_1.in');
     eval { cc_build(); };
     unless ($@ || cc_run() !~ /ok/) {
-	$conf->data->set(
+	Parrot::Configure::Data->set(
 	    has___sighandler_t => 'define'
 	);
 	print " (__sighandler_t)" if $verbose;
@@ -51,7 +50,7 @@ sub runstep {
     cc_gen('config/auto/signal/test_2.in');
     eval { cc_build(); };
     unless ($@ || cc_run() !~ /ok/) {
-	$conf->data->set(
+	Parrot::Configure::Data->set(
 	    has_sigaction => 'define'
 	);
 	print " (sigaction)" if $verbose;
@@ -61,7 +60,7 @@ sub runstep {
     cc_gen('config/auto/signal/test_itimer.in');
     eval { cc_build(); };
     unless ($@ || cc_run() !~ /ok/) {
-	$conf->data->set(
+	Parrot::Configure::Data->set(
 	    has_setitimer    => 'define',
 	    has_sig_atomic_t    => 'define'
 	);

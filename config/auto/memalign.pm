@@ -25,33 +25,32 @@ $description="Determining if your C library supports memalign...";
 @args=qw(miniparrot verbose);
 
 sub runstep {
-    my ($self, $conf) = (shift, shift);
-
+    my $self = shift;
     my ($miniparrot, $verbose) = @_;
 
     if ($miniparrot) {
-        $conf->data->set(memalign => '');
+        Parrot::Configure::Data->set(memalign => '');
 	print "(skipped) " if $verbose;
 	return;
     }
 
-    if (defined $conf->data->get('memalign')) {
+    if (defined Parrot::Configure::Data->get('memalign')) {
 		return; # already set; leave it alone
 	}
     my $test = 0;
 
-    if ($conf->data->get('i_malloc')) {
-	$conf->data->set(malloc_header => 'malloc.h');
+    if (Parrot::Configure::Data->get('i_malloc')) {
+	Parrot::Configure::Data->set(malloc_header => 'malloc.h');
     }
     else {
-	$conf->data->set(malloc_header => 'stdlib.h');
+	Parrot::Configure::Data->set(malloc_header => 'stdlib.h');
     }
 
-    if ($conf->data->get('ptrsize') == $conf->data->get('intsize')) {
-       $conf->data->set(ptrcast => 'int');
+    if (Parrot::Configure::Data->get('ptrsize') == Parrot::Configure::Data->get('intsize')) {
+       Parrot::Configure::Data->set(ptrcast => 'int');
       }
     else {
-       $conf->data->set(ptrcast => 'long');
+       Parrot::Configure::Data->set(ptrcast => 'long');
       }
 
     cc_gen('config/auto/memalign/test_c.in');
@@ -70,11 +69,11 @@ sub runstep {
     }
     cc_clean();
 
-    $conf->data->set(malloc_header => undef);
+    Parrot::Configure::Data->set(malloc_header => undef);
 
     my $f = $test2 ? 'posix_memalign' :
             $test  ? 'memalign'       : '';
-    $conf->data->set(memalign => $f);
+    Parrot::Configure::Data->set(memalign => $f);
     print($test ? " (Yep:$f) " : " (no) ") if $verbose;
     $result = $test ? 'yes' : 'no';
 }

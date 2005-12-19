@@ -27,13 +27,12 @@ $prompt         = "Do you have a make utility like 'gmake' or 'make'?";
 @args           = qw( make ask );
 
 sub runstep {
-    my ($self, $conf) = (shift, shift);
-
+    my $self = shift;
     my %args;
     @args{@args}=@_;
 
     # undef means we don't have GNU make... default to not having it
-    $conf->data->set(gmake_version => undef);
+    Parrot::Configure::Data->set(gmake_version => undef);
 
     my $prog;
     # precedence of sources for the program:
@@ -44,7 +43,7 @@ sub runstep {
     # never override the user.  If a non-existent program is specified then
     # the user is responsible for the consequences.
     if (defined $prog) {
-        $conf->data->set($util => $prog);
+        Parrot::Configure::Data->set($util => $prog);
         $result = 'yes';
     } else {
         $prog = check_progs(['gmake', 'mingw32-make', 'nmake', 'make']);
@@ -57,7 +56,7 @@ sub runstep {
     }
     
     if ($args{ask}) {
-        $prog = prompt($prompt, $prog ? $prog : $conf->data->get($util));
+        $prog = prompt($prompt, $prog ? $prog : Parrot::Configure::Data->get($util));
     }
 
     my ($stdout, $stderr, $ret) = capture_output($prog, '--version');
@@ -72,25 +71,25 @@ sub runstep {
 
     # if '--version' returns a string assume that this is gmake.
     if ($stdout =~ /GNU \s+ Make \s+ (\d+) \. (\d+)/x) {
-        $conf->data->set(gmake_version => "$1.$2");
+        Parrot::Configure::Data->set(gmake_version => "$1.$2");
     }
 
-    $conf->data->set($util => $prog);
+    Parrot::Configure::Data->set($util => $prog);
     $result = 'yes';
 
     # setup make_C
-    if ($conf->data->get('gmake_version')) {
-        $conf->data->set(make_c => "$prog -C" );
+    if (Parrot::Configure::Data->get('gmake_version')) {
+        Parrot::Configure::Data->set(make_c => "$prog -C" );
     } else {
         # get the default value
-        my $make_c = $conf->data->get('make_c');
+        my $make_c = Parrot::Configure::Data->get('make_c');
 
         # FIXME this is an ugly hack
         # replace the value for $(MAKE) with the actual path or we'll end up
         # with a variable that recursively refers to itself
         $make_c =~ s/\$\(MAKE\)/$prog/;
         
-        $conf->data->set(make_c => $make_c);
+        Parrot::Configure::Data->set(make_c => $make_c);
     }
 }
 

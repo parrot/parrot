@@ -30,11 +30,12 @@ $description="Tweaking settings for miniparrot...";
 @args=qw(miniparrot);
 
 sub runstep {
-    my ($self, $conf) = @_;
+    my $self = shift;
+    return unless $_[0];
 
-    $conf->data->set(
+    Parrot::Configure::Data->set(
         miniparrot         => 1,
-        DEVEL              => $conf->data->get('DEVEL').'-miniparrot',
+        DEVEL              => Parrot::Configure::Data->get('DEVEL').'-miniparrot',
         TEMP_cg_h          => '',
         TEMP_cg_c          => '',
         TEMP_cg_o          => '',
@@ -67,7 +68,7 @@ sub runstep {
     #Allow ANSI headers only
     foreach (qw(assert complex ctype errno locale math setjmp signal stdarg
                 stdio stdlib string time)) {
-        $conf->data->set("i_$_" => 1);
+        Parrot::Configure::Data->set("i_$_" => 1);
     }
 }
 

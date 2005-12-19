@@ -5,17 +5,13 @@ package init::hints::hpux;
 
 use strict;
 
-sub runstep {
-    my ($self, $conf) = @_;
-
-    my $libs = $conf->data->get('libs');
-    if ( $libs !~ /-lpthread/ ) {
-        $libs .= ' -lpthread';
-    }
-
-    $conf->data->set(
-        libs => $libs,
-    );
+my $libs = Parrot::Configure::Data->get('libs');
+if ( $libs !~ /-lpthread/ ) {
+    $libs .= ' -lpthread';
 }
+
+Parrot::Configure::Data->set(
+    libs => $libs,
+);
 
 1;

@@ -26,7 +26,7 @@ $description = 'Determining what types Parrot should use...';
 @args=qw(ask intval opcode floatval);
 
 sub runstep {
-    my ($self, $conf) = (shift, shift);
+    my $self = shift;
   my %args;
   @args{@args}=@_;
   
@@ -41,7 +41,7 @@ sub runstep {
     print "\n";
   }
   
-  $conf->data->set(
+  Parrot::Configure::Data->set(
     iv       => $intval,
     nv       => $floatval,
     opcode_t => $opcode

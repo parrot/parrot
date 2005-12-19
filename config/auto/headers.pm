@@ -26,8 +26,7 @@ $description="Probing for C headers...";
 @args=qw(miniparrot verbose);
 
 sub runstep {
-    my ($self, $conf) = (shift, shift);
-
+    my $self = shift;
     my ($miniparrot, $verbose) = @_;
 
     return if $miniparrot;
@@ -42,7 +41,7 @@ sub runstep {
 
     for (keys %Config) {
 	next unless /^i_/;
-	$conf->data->set($mapping{$_}||$_ => $Config{$_});
+	Parrot::Configure::Data->set($mapping{$_}||$_ => $Config{$_});
     }
 
     # some headers may not be probed-for by perl 5, or might not be
@@ -73,15 +72,15 @@ sub runstep {
 	# work on *BSD where some headers are documented as relying on others
 	# being included first.
 	foreach my $use_headers ([$header], [@found_headers, $header]) {
-	    $conf->data->set(testheaders =>
+	    Parrot::Configure::Data->set(testheaders =>
 				 join ('',
 				       map {"#include <$_>\n"} @$use_headers));
-	    $conf->data->set(testheader => $header);
+	    Parrot::Configure::Data->set(testheader => $header);
 
 	    cc_gen('config/auto/headers/test_c.in');
 
-	    $conf->data->set(testheaders => undef);
-	    $conf->data->set(testheader => undef);
+	    Parrot::Configure::Data->set(testheaders => undef);
+	    Parrot::Configure::Data->set(testheader => undef);
 
 	    eval { cc_build(); };
 	    if (!$@ && cc_run() =~ /^$header OK/) {
@@ -95,7 +94,7 @@ sub runstep {
         my $flag = "i_$header";
         $flag =~ s/\.h$//g; $flag =~ s/\///g;
 	print "$flag: $pass\n" if defined $verbose;
-	$conf->data->set($flag => $pass ? 'define' : undef);
+	Parrot::Configure::Data->set($flag => $pass ? 'define' : undef);
     }
 
 }

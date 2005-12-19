@@ -31,13 +31,13 @@ $description = 'Determining flags for building shared libraries...';
 @args = qw(ask verbose cc_shared);
 
 sub runstep {
-    my ($self, $conf) = (shift, shift);
+    my $self = shift;
   my ($ask, $verbose, $cc_shared) = @_;
-    $cc_shared = integrate($conf->data->get('cc_shared'), $cc_shared);
+    $cc_shared = integrate(Parrot::Configure::Data->get('cc_shared'), $cc_shared);
     $cc_shared=prompt(
 	"\nWhat flags instruct your compiler to compile code suitable for use in a shared library?",
 	$cc_shared) if $ask;
-    $conf->data->set(cc_shared =>  $cc_shared);
+    Parrot::Configure::Data->set(cc_shared =>  $cc_shared);
     $result =
         ( $cc_shared =~ m/^ ?$/ ) ? 'done' : $cc_shared;
 }
