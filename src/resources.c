@@ -127,11 +127,9 @@ mem_allocate(Interp *interpreter, size_t *req_size,
     char *return_val;
     size_t size = aligned_size(*req_size, align_1);
 
+    /* we always should have one block at least */
+    assert(pool->top_block);
     /* If not enough room, try to find some */
-    if (pool->top_block == NULL) {
-        alloc_new_block(interpreter, size, pool);
-        interpreter->arena_base->mem_allocs_since_last_collect++;
-    }
     if (pool->top_block->free < size) {
         /*
          * force a DOD run to get live flags set
@@ -574,6 +572,7 @@ Parrot_allocate_zeroed(Interp *interpreter,
         void *buffer, size_t size)>
 
 Just calls C<Parrot_allocate()>, which also returns zeroed memory.
+XXX where is it cleared? XXX
 
 =cut
 
@@ -667,20 +666,14 @@ Initialize the managed memory pools.
 void
 Parrot_initialize_memory_pools(Interp *interpreter)
 {
-    /* Buffers */
-    /* setting min_size to 16384 makes this assert: assert(new_block->size >=
-     * (size_t)new_block->top - (size_t)new_block->start); fail. 16 bytes
-     * seem to be missing, or where copied and not accounted elsewhere. This
-     * breaks 2 tests: t/op/string_29 and _94, when run with --gc-debug */
+    struct Arenas *arena_base = interpreter->arena_base;
 
-    interpreter->arena_base->memory_pool =
-            new_memory_pool(POOL_SIZE, &compact_pool);
-    alloc_new_block(interpreter, POOL_SIZE,
-                    interpreter->arena_base->memory_pool);
+    arena_base->memory_pool = new_memory_pool(POOL_SIZE, &compact_pool);
+    alloc_new_block(interpreter, POOL_SIZE, arena_base->memory_pool);
 
     /* Constant strings - not compacted */
-    interpreter->arena_base->constant_string_pool =
-            new_memory_pool(8192, (compact_f)NULLfunc);
+    arena_base->constant_string_pool = new_memory_pool(POOL_SIZE, (compact_f)NULLfunc);
+    alloc_new_block(interpreter, POOL_SIZE, arena_base->constant_string_pool);
 }
 
 /*
