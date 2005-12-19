@@ -414,8 +414,7 @@ PIO_buf_read(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
     s = *buf;
     len = s->bufused;
     if (!s->strstart) {
-        PObj_bufstart(s) = s->strstart = mem_sys_allocate(len);
-        PObj_sysmem_SET(s);
+        Parrot_allocate_string(interpreter, s, len);
     }
     out_buf = s->strstart;
     /* read Data from buffer */

@@ -119,8 +119,8 @@ PIO_mmap_read(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
     }
     s = *buf;
     if (s->strstart && PObj_sysmem_TEST(s))
-        mem_sys_free(s->strstart);
-    PObj_get_FLAGS(s) |= PObj_external_FLAG|PObj_bufstart_external_FLAG;
+        mem_sys_free(PObj_bufstart(s));
+    PObj_get_FLAGS(s) |= PObj_external_FLAG;
     PObj_bufstart(s) = s->strstart = io->b.startb + io->fpos;
     len = s->bufused ? s->bufused : io->b.size;
     io->fpos += len;

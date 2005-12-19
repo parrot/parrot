@@ -238,13 +238,11 @@ typedef enum PObj_enum {
 
     /* Memory management FLAGs */
 
-    /* The contents of the buffer can't be moved by the GC */
-    PObj_immobile_FLAG = 1 << 12,
-    /* Marks the contents as coming from a non-Parrot source,
-     * also used for COWed strings */
+    /* This is a constant--don't kill it! */
+    PObj_constant_FLAG = 1 << 12,
+    /* Marks the contents as coming from a non-Parrot source */
     PObj_external_FLAG = 1 << 13,
-    /* real external bufstart string */
-    PObj_bufstart_external_FLAG = 1 << 14,
+    /* unused 1 << 14 */
     /* Mark the buffer as pointing to system memory */
     PObj_sysmem_FLAG = 1 << 15,
 
@@ -252,8 +250,8 @@ typedef enum PObj_enum {
 
     /* Mark the contents as Copy on write */
     PObj_COW_FLAG = 1 << 16,
-    /* This is a constant--don't kill it! */
-    PObj_constant_FLAG = 1 << 17,
+    /* the Buffer may have COW copies */
+    PObj_is_COWable_FLAG = 1 << 17,
     /* Private flag for the GC system. Set if the PObj's in use as
      * far as the GC's concerned */
     b_PObj_live_FLAG = 1 << 18,
@@ -417,6 +415,9 @@ typedef enum PObj_enum {
 #define PObj_COW_SET(o) PObj_flag_SET(COW, o)
 #define PObj_COW_CLEAR(o) PObj_flag_CLEAR(COW, o)
 
+#define PObj_is_COWable_TEST(o) PObj_flag_TEST(is_COWable, o)
+#define PObj_is_COWable_SET(o) PObj_flag_SET(is_COWable, o)
+
 #define PObj_constant_TEST(o) PObj_flag_TEST(constant, o)
 #define PObj_constant_SET(o) PObj_flag_SET(constant, o)
 #define PObj_constant_CLEAR(o) PObj_flag_CLEAR(constant, o)
@@ -444,10 +445,6 @@ typedef enum PObj_enum {
 #define PObj_is_string_TEST(o) PObj_flag_TEST(is_string, o)
 #define PObj_is_string_SET(o) PObj_flag_SET(is_string, o)
 #define PObj_is_string_CLEAR(o) PObj_flag_CLEAR(is_string, o)
-
-#define PObj_immobile_TEST(o) PObj_flag_TEST(immobile, o)
-#define PObj_immobile_SET(o) PObj_flag_SET(immobile, o)
-#define PObj_immobile_CLEAR(o) PObj_flag_CLEAR(immobile, o)
 
 #define PObj_sysmem_TEST(o) PObj_flag_TEST(sysmem, o)
 #define PObj_sysmem_SET(o) PObj_flag_SET(sysmem, o)
@@ -528,22 +525,18 @@ typedef enum PObj_enum {
 #define PObj_is_cowed_SETALL(o) (PObj_get_FLAGS(o) |= \
             (PObj_COW_FLAG|PObj_constant_FLAG|PObj_external_FLAG))
 
-#define PObj_is_external_TESTALL(o) (PObj_get_FLAGS(o) & \
-            (UINTVAL)(PObj_COW_FLAG|PObj_bufstart_external_FLAG| \
-                      PObj_external_FLAG|PObj_immobile_FLAG))
-
 #define PObj_is_external_or_free_TESTALL(o) (PObj_get_FLAGS(o) & \
             (UINTVAL)(PObj_external_FLAG|PObj_on_free_list_FLAG))
 
 #define PObj_is_external_CLEARALL(o) (PObj_get_FLAGS(o) &= \
-            ~(UINTVAL)(PObj_COW_FLAG|PObj_bufstart_external_FLAG| \
-                       PObj_external_FLAG|PObj_immobile_FLAG|PObj_sysmem_FLAG))
+            ~(UINTVAL)(PObj_COW_FLAG| \
+                       PObj_external_FLAG|PObj_sysmem_FLAG))
 
 #define PObj_is_live_or_free_TESTALL(o) (PObj_get_FLAGS(o) & \
         (PObj_live_FLAG | PObj_on_free_list_FLAG))
 
 #define PObj_is_movable_TESTALL(o) (!(PObj_get_FLAGS(o) & \
-        (PObj_immobile_FLAG | PObj_sysmem_FLAG |  \
+        (PObj_sysmem_FLAG |  \
          PObj_constant_FLAG | PObj_external_FLAG)))
 
 #define PObj_custom_mark_destroy_SETALL(o) do { \

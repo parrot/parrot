@@ -854,8 +854,7 @@ PIO_read(theINTERP, PMC *pmc, void *buffer, size_t len)
 {
     ParrotIOLayer *l = PMC_struct_val(pmc);
     ParrotIO *io = PMC_data0(pmc);
-    STRING *res = new_string_header(interpreter,
-            PObj_bufstart_external_FLAG|PObj_external_FLAG);
+    STRING *res = new_string_header(interpreter, 0);
     if (!io)
         return -1;
 

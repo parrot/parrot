@@ -87,7 +87,7 @@ Parrot_unmake_COW(Interp *interpreter, STRING *s)
         PObj_bufstart(s) = PObj_bufstart(&for_alloc);
         s->strstart      = for_alloc.strstart;
         PObj_buflen(s)   = PObj_buflen(&for_alloc);
-        /* COW_FLAG | external_FLAG | bufstart_external_FLAG immobile_FLAG */
+        /* COW_FLAG | external_FLAG */
         PObj_is_external_CLEARALL(s);
     }
 
@@ -203,8 +203,9 @@ string_set(Interp *interpreter, STRING *dest, STRING *src)
         return dest;
     if (dest) { /* && dest != src */
         /* they are different, dest is not an external string */
+    /* TODO create string_free API for reusing string headers */
 #ifdef GC_IS_MALLOC
-        if (!PObj_is_external_TESTALL(dest) && PObj_bufstart(dest)) {
+        if (!PObj_is_cowed_TESTALL(dest) && PObj_bufstart(dest)) {
             mem_sys_free((INTVAL*)PObj_bufstart(dest) - 1);
         }
 #endif
@@ -663,7 +664,6 @@ string_make_direct(Interp *interpreter, const void *buffer,
            */
         PObj_bufstart(s) = s->strstart = const_cast(buffer);
         PObj_buflen(s)   = s->bufused = len;
-        PObj_bufstart_external_SET(s);
         if (encoding == Parrot_fixed_8_encoding_ptr)
             s->strlen = len;
         else
@@ -2142,37 +2142,11 @@ result in a memory leak.
 char *
 string_to_cstring(Interp * interpreter, STRING * s)
 {
-#if 0
-    if (PObj_buflen(s) == s->bufused) {
-        string_grow(interpreter, s, 1);
-    }
-    else
-        Parrot_unmake_COW(interpreter, s);
-
-    /* PObj_immobile_SET(s);
-     *
-     * XXX we don't know, how this cstring gets used by external code
-     * so setting the string to immobile would be the best thing, but
-     * immobile strings don't get moved - yes - but they get freed in
-     * compact_pool :-(
-     * The correct way to handle this is probably to malloc the memory
-     * and set the PObj_sysmem_FLAG
-     * -leo
-     */
-
-    ((char *)s->strstart)[s->bufused] = 0;
-    /* don't return local vars, return the right thing */
-    return (char*)s->strstart;
-#else
-    /* TODO XXX FIXME ;-) non ascii & memory leak  -leo
-     * the real solution WRT leak is this:
-     * the caller of this function has to free this cstring that's all
-     */
-     /*
-     or better, don't have this, but have method to return a buffer PMC
-     with the right bytes
-     */
     char *p;
+    /*
+     * TODO always provide a NUL at end of strings
+     *      ICU needs this too for a lot of string functions
+     */
     if (s == NULL) {
         return NULL;
     }
@@ -2180,7 +2154,6 @@ string_to_cstring(Interp * interpreter, STRING * s)
     memcpy(p, s->strstart, s->bufused);
     p[s->bufused] = 0;
     return p;
-#endif
 }
 
 /*
@@ -2219,15 +2192,6 @@ string_pin(Interp * interpreter, STRING * s) {
     void *memory;
     INTVAL size;
 
-    /* If this string is marked as immobile, external memory, starts
-    in external memory, is already from system memory, or is a
-    constant, we just don't do this */
-    if (PObj_get_FLAGS(s) & (PObj_immobile_FLAG | PObj_external_FLAG |
-                        PObj_bufstart_external_FLAG | PObj_sysmem_FLAG |
-                        PObj_constant_FLAG)) {
-        return;
-    }
-
     /* XXX -lt: COW strings have the external_FLAG set, so this will
      *          not work for these
      *          so probably only sysmem should be tested
@@ -2239,8 +2203,7 @@ string_pin(Interp * interpreter, STRING * s) {
     PObj_bufstart(s) = memory;
     s->strstart = memory;
     /* Mark the memory as both from the system and immobile */
-    PObj_flags_SETTO(s, PObj_get_FLAGS(s) |
-        (PObj_immobile_FLAG | PObj_sysmem_FLAG));
+    PObj_sysmem_SET(s);
 }
 
 /*
@@ -2283,7 +2246,6 @@ string_unpin(Interp * interpreter, STRING * s) {
     Parrot_unblock_GC(interpreter);
     mem_sys_memcopy(PObj_bufstart(s), memory, size);
     /* Mark the memory as neither immobile nor system allocated */
-    PObj_immobile_CLEAR(s);
     PObj_sysmem_CLEAR(s);
     /* Free up the memory */
     mem_sys_free(memory);
