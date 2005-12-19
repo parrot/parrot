@@ -80,13 +80,6 @@ license as The Parrot Interpreter.
 =cut
 
 .include "library/dumper.imc"
-
-.sub "__onload" :load
-
-  # Load dependent libraries
-  load_bytecode "PGE.pbc"
-
-.end
  
 .namespace [ "Getopt::Long" ]
 
@@ -94,19 +87,6 @@ license as The Parrot Interpreter.
   # TODO: Check whether these are really arrays  
   .param pmc argv                    # An Array containing command line args
   .param pmc spec                    # An Array containing the spec
-
-  # setting up PGE
-  # TODO: compile patterns in __onload
-  .local pmc    p6rule
-   p6rule = compreg "PGE::P6Rule"
-
-  find_global p6rule, "PGE", "p6rule"
-  .local pmc    isnt_binary_rule, is_long_option, is_short_option, key_val_rule 
-  isnt_binary_rule = p6rule( ' = ' )
-  is_long_option   = p6rule( ' ^ -- ' )
-  is_short_option  = p6rule( ' ^ - ' )
-  key_val_rule     = p6rule( ' = ' )
-  .local pmc    match
 
   # Loop over the array spec and build up two simple hashes
   .local pmc    type                 # the type of the option: binary, string, integer
@@ -126,12 +106,12 @@ license as The Parrot Interpreter.
     # the substr below modifies this hash key in place, so we
     # have to clone it
     opt_name = clone opt_name
-    match = isnt_binary_rule( opt_name ) 
-    if match goto NOT_A_BINARY_OPTION
+    
+    spec_index = index opt_name, "="
+    if spec_index != -1 goto NOT_A_BINARY_OPTION
     opt_type = 'b'
     goto OPTION_TYPE_IS_NOW_KNOWN
   NOT_A_BINARY_OPTION:
-    spec_index = match.from()        # position of the '=' in opt_name     
     inc spec_index                   # we know where '=', thus the type is one further
     opt_type = substr opt_name, spec_index, 1, ''
     dec spec_index                   # Go back to the '='
@@ -170,36 +150,37 @@ license as The Parrot Interpreter.
     arg = clone arg
 
     # Is arg a long option string like '--help'
-    # TODO: how about asdf--jkl ???
-    match = is_long_option( arg ) 
-    if match goto HANDLE_LONG_OPTION
+    $S0 = substr arg, 0, 2
+    if $S0 == "--" goto HANDLE_LONG_OPTION
 
     # Is arg a short option string like '-v'
-    match = is_short_option( arg ) 
-    if match goto HANDLE_SHORT_OPTION
+    $S0 = substr arg, 0, 1 
+    if $S0 == "-" goto HANDLE_SHORT_OPTION
     # We are done with the option
     # and we don't want to loose the remaining arguments
     goto FINISH_PARSE_ARGV
 
     HANDLE_SHORT_OPTION:
     # TODO: make it work for short options
-    HANDLE_LONG_OPTION:
-    # we take the current option off argv
     arg = shift argv
     arg = clone arg
-    # get rid of the leading '--' or '-'
-    arg_index = match.from()
-    prefix_end = match.to()
-    prefix_len = prefix_end - arg_index
-    arg = substr arg_index, prefix_len, ''
+    # get rid of the leading '-'
+    substr arg, 0, 1, ''
+    goto GET_VALUE
+    
+    HANDLE_LONG_OPTION:
+    arg = shift argv
+    arg = clone arg
+    # get rid of the leading '--'
+    substr arg, 0, 2, ''
+
+    GET_VALUE:
     # recover the value if any
-    match = key_val_rule( arg ) 
-    if match goto VALUE_PASSED
+    arg_index = index arg, "="
+    if arg_index != -1 goto VALUE_PASSED
     opt[arg] = 1
     goto VALUE_OF_OPTION_IS_NOW_KNOWN
     VALUE_PASSED:
-    # TODO: let PGE capture the value
-    arg_index = match.from()
     inc arg_index    # Go one past the '='
     .local int len_value
     len_value = length arg
