@@ -237,7 +237,8 @@ allocate_chunk(Interp *interpreter, List *list, UINTVAL items, UINTVAL size)
     chunk->n_items  = 0;
     chunk->next     = NULL;
     chunk->prev     = NULL;
-    Parrot_allocate_zeroed(interpreter, (Buffer *)chunk, size);
+    Parrot_allocate_aligned(interpreter, (Buffer *)chunk, size);
+    memset(PObj_bufstart((Buffer*)chunk), 0, size);
     /* see also src/hash.c */
     if (list->container) {
         DOD_WRITE_BARRIER(interpreter, list->container, 0, chunk);

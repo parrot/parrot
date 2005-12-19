@@ -118,6 +118,7 @@ PIO_mmap_read(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
 	*buf = new_string_header(interpreter, 0);
     }
     s = *buf;
+    /* TODO create string_free API for reusing string headers */
     if (s->strstart && PObj_sysmem_TEST(s))
         mem_sys_free(PObj_bufstart(s));
     PObj_get_FLAGS(s) |= PObj_external_FLAG;

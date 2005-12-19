@@ -391,34 +391,32 @@ Parrot_go_collect(Interp *interpreter)
 
 =over 4
 
-=item C<void *
-Parrot_reallocate(Interp *interpreter, void *from, size_t tosize)>
+=item C<void 
+Parrot_reallocate(Interp *interpreter, Buffer *from, size_t tosize)>
 
-Takes an interpreter, a buffer pointer, and a new size. The buffer
-pointer is in as a C<void *> because we may take a C<STRING> or
-something, and C doesn't subclass.
+Reallocate the Buffer's buffer memory to the given size. The allocated
+buffer will not shrink. If the buffer was allocated with 
+<Parrot_allocate_aligned> the new buffer will also be aligned. As
+with all reallocation, the new buffer might have moved and the additional
+memory is not cleared.
 
 =cut
 
 */
 
-void *
-Parrot_reallocate(Interp *interpreter, void *from, size_t tosize)
+void 
+Parrot_reallocate(Interp *interpreter, Buffer *buffer, size_t tosize)
 {
-    /* Put our void * pointer into something we don't have to cast around with
-     */
-    Buffer *buffer;
     size_t copysize;
     size_t alloc_size = tosize;
     void *mem;
     struct Memory_Pool *pool = interpreter->arena_base->memory_pool;
 
-    buffer = from;
     /*
-     * do we want to shrink buffers?
+     * we don't shrink buffers
      */
-    if (tosize == PObj_buflen(buffer))
-        return PObj_bufstart(buffer);
+    if (tosize <= PObj_buflen(buffer))
+        return;
 
     /*
      * same as below but barely used and tested - only 3 list related
@@ -439,7 +437,7 @@ Parrot_reallocate(Interp *interpreter, void *from, size_t tosize)
             pool->top_block->free -= needed;
             pool->top_block->top  += needed;
             PObj_buflen(buffer) = tosize;
-            return PObj_bufstart(buffer);
+            return;
         }
     }
     copysize = (PObj_buflen(buffer) > tosize ? tosize : PObj_buflen(buffer));
@@ -450,9 +448,6 @@ Parrot_reallocate(Interp *interpreter, void *from, size_t tosize)
     mem = mem_allocate(interpreter, &alloc_size,
             pool, BUFFER_ALIGNMENT - 1);
 
-    if (!mem) {
-        return NULL;
-    }
     /* We shouldn't ever have a 0 from size, but we do. If we can track down
      * those bugs, this can be removed which would make things cheaper */
     if (copysize) {
@@ -460,23 +455,23 @@ Parrot_reallocate(Interp *interpreter, void *from, size_t tosize)
     }
     PObj_bufstart(buffer) = mem;
     PObj_buflen(buffer) = tosize;
-    return mem;
 }
 
 /*
 
-=item C<void *
+=item C<void 
 Parrot_reallocate_string(Interp *interpreter, STRING *str,
         size_t tosize)>
 
-Takes an interpreter, a C<STRING> pointer, and a new size. The
-destination may be bigger, since we round up to the allocation quantum.
+Reallocate the STRING's buffer memory to the given size. The allocated
+buffer will not shrink. This function sets also C<str-E<gt>strstart> to the
+new buffer location, C<str-E<gt>bufused> is B<not> changed.
 
 =cut
 
 */
 
-void *
+void 
 Parrot_reallocate_string(Interp *interpreter, STRING *str,
         size_t tosize)
 {
@@ -492,7 +487,7 @@ Parrot_reallocate_string(Interp *interpreter, STRING *str,
      * if the requested size is smaller then buflen, we are done
      */
     if (tosize <= PObj_buflen(str))
-        return PObj_bufstart(str);
+        return;
 
     /*
      * first check, if we can reallocate:
@@ -510,7 +505,6 @@ Parrot_reallocate_string(Interp *interpreter, STRING *str,
             pool->top_block->free -= needed;
             pool->top_block->top  += needed;
             PObj_buflen(str) = new_size - sizeof(struct Buffer_Tail);
-            return PObj_bufstart(str);
         }
     }
     assert(str->bufused <= tosize);
@@ -524,9 +518,6 @@ Parrot_reallocate_string(Interp *interpreter, STRING *str,
 
     mem = mem_allocate(interpreter, &alloc_size, pool, STRING_ALIGNMENT - 1);
 
-    if (!mem) {
-        return NULL;
-    }
     /* copy mem from strstart, *not* bufstart */
     oldmem = str->strstart;
     str->strstart = PObj_bufstart(str) = mem;
@@ -535,70 +526,63 @@ Parrot_reallocate_string(Interp *interpreter, STRING *str,
     /* We shouldn't ever have a 0 from size, but we do. If we can track down
      * those bugs, this can be removed which would make things cheaper */
     if (copysize) {
-        /* This should tail call optimise */
-        return memcpy(mem, oldmem, copysize);
+        memcpy(mem, oldmem, copysize);
     }
-    return mem;
 }
 
 /*
 
-=item C<void *
-Parrot_allocate(Interp *interpreter, void *buffer, size_t size)>
+=item C<void 
+Parrot_allocate(Interp *interpreter, Buffer *buffer, size_t size)>
 
-Allocate exactly as much memory as they asked for.
+Allocate buffer memory for the given Buffer pointer. C<PObj_buflen>
+will be set to exactly the given C<size>.
+
+=item C<void 
+Parrot_allocate_aligned(Interp *interpreter, Buffer *buffer, size_t size)>
+
+Like above. The address of the buffer will have the same alignment as
+a pointer returned by malloc(3) suitable to hold e.g. a C<FLOATVAL> array.
 
 =cut
 
 */
 
-void *
-Parrot_allocate(Interp *interpreter, void *buffer, size_t size)
+void 
+Parrot_allocate(Interp *interpreter, Buffer *buffer, size_t size)
 {
     size_t req_size = size;
 
-    PObj_buflen((Buffer *)buffer) = 0;
-    PObj_bufstart((Buffer *)buffer) = NULL;
-    PObj_bufstart((Buffer *)buffer) = mem_allocate(interpreter, &req_size,
+    PObj_buflen(buffer) = 0;
+    PObj_bufstart(buffer) = NULL;
+    PObj_bufstart(buffer) = mem_allocate(interpreter, &req_size,
             interpreter->arena_base->memory_pool, BUFFER_ALIGNMENT - 1);
-    PObj_buflen((Buffer *)buffer) = size;
-    return buffer;
+    PObj_buflen(buffer) = size;
 }
 
-/*
 
-=item C<void *
-Parrot_allocate_zeroed(Interp *interpreter,
-        void *buffer, size_t size)>
-
-Just calls C<Parrot_allocate()>, which also returns zeroed memory.
-XXX where is it cleared? XXX
-
-=cut
-
-*/
-
-void *
-Parrot_allocate_zeroed(Interp *interpreter,
-        void *buffer, size_t size)
+void 
+Parrot_allocate_aligned(Interp *interpreter, Buffer *buffer, size_t size)
 {
-    return Parrot_allocate(interpreter, buffer, size);
+    Parrot_allocate(interpreter, buffer, size);
 }
 
 /*
 
-=item C<void *
+=item C<void 
 Parrot_allocate_string(Interp *interpreter, STRING *str,
         size_t size)>
 
-Allocate at least as much memory as they asked for. We round the amount
-up to the allocation quantum.
+Allocate the STRING's buffer memory to the given size. The allocated
+buffer maybe be slightly bigger than the given C<size>. This function
+sets also C<str-E<gt>strstart> to the new buffer location, C<str-E<gt>bufused>
+is B<not> changed.
 
 =cut
 
 */
 
-void *
+void 
 Parrot_allocate_string(Interp *interpreter, STRING *str,
         size_t size)
 {
@@ -619,7 +603,6 @@ Parrot_allocate_string(Interp *interpreter, STRING *str,
     }
     PObj_buflen(str) = req_size;
     str->strstart = PObj_bufstart(str);
-    return str;
 }
 
 /*

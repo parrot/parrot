@@ -362,6 +362,7 @@ to_encoding(Interp *interpreter, STRING *src, STRING *dest)
                 if (in_place)
                     p = mem_sys_realloc(p, dest_len);
                 else {
+                    result->bufused = dest_pos;
                     Parrot_reallocate_string(interpreter, dest, dest_len);
                     p = dest->strstart;
                 }
