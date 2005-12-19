@@ -147,7 +147,11 @@ runops_slow_core(Interp *interpreter, opcode_t *pc)
     if (Interp_trace_TEST(interpreter, PARROT_TRACE_OPS_FLAG)) {
         trace_op(interpreter, code_start, code_end, pc);
     }
-    while (pc) {/* && pc >= code_start && pc < code_end) {*/
+    while (pc) {
+        if ( pc < code_start || pc > code_end) {
+            internal_exception(1,
+                    "attempt to access code outside of current code segment");
+        }
         CONTEXT(interpreter->ctx)->current_pc = pc;
 
         DO_OP(pc, interpreter);
@@ -179,12 +183,6 @@ runops_slow_core(Interp *interpreter, opcode_t *pc)
         mem_sys_free(trace_ctx);
     }
 #endif
-
-    /*    if (pc && (pc < code_start || pc >= code_end)) {
-        internal_exception(INTERP_ERROR,
-       "Error: Control left bounds of byte-code block (now at location %d)!\n",
-       (int)(pc - code_start));
-       }*/
 #undef code_start
 #undef code_end
     return pc;
