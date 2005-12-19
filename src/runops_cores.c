@@ -148,7 +148,7 @@ runops_slow_core(Interp *interpreter, opcode_t *pc)
         trace_op(interpreter, code_start, code_end, pc);
     }
     while (pc) {
-        if ( pc < code_start || pc > code_end) {
+        if ( pc < code_start || pc >= code_end) {
             internal_exception(1,
                     "attempt to access code outside of current code segment");
         }
