@@ -448,7 +448,7 @@ $conf->add_steps(@steps);
 $conf->runsteps(%args);
 
 # tell users what to do next
-my $make = $config->data->get('make');
+my $make = $conf->data->get('make');
 
 print <<"END";
 
