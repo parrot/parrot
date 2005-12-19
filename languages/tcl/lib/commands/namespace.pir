@@ -96,6 +96,7 @@ bad_args:
   argc = argv
   if argc != 1 goto bad_args
 
+  load_bytecode "PGE.pbc"
   .local pmc p6r,match
   p6r = find_global "PGE", "p6rule"
   match = p6r("(.*)\\:\\:+<-[:]>*$$")
@@ -123,6 +124,7 @@ WHOLE:
   argc = argv
   if argc != 1 goto bad_args
 
+  load_bytecode "PGE.pbc"
   .local pmc p6r,match
   p6r = find_global "PGE", "p6rule"
   match = p6r("\:\:+(<-[:]>)$$")

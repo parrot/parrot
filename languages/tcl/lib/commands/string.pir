@@ -184,6 +184,8 @@ match_next:
   the_string = downcase the_string
 
 match_continue:
+  load_bytecode "PGE.pbc"
+  load_bytecode "PGE/Glob.pbc"
   .local pmc globber
   globber = find_global "PGE", "glob"
 

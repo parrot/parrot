@@ -71,6 +71,8 @@ exact_loop:
   branch exact_loop
 
 glob_mode:
+  load_bytecode "PGE.pbc"
+  load_bytecode "PGE/Glob.pbc"
   .local pmc globber, rule
   globber = find_global "PGE", "glob"
 glob_loop:
@@ -84,6 +86,7 @@ glob_loop:
   branch glob_loop
 
 regex_mode:
+  load_bytecode "PGE.pbc"
   .local pmc tclARE,rule,match
   tclARE = compreg "PGE::P5Regexp"
 regex_loop:

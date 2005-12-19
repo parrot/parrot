@@ -108,6 +108,8 @@ bad_args:
   retval = new .TclList
 
   if argc == 0 goto loop
+  load_bytecode "PGE.pbc"
+  load_bytecode "PGE/Glob.pbc"
   .local pmc globber,rule,match
   globber = find_global "PGE", "glob"
   $S1 = argv[0]
