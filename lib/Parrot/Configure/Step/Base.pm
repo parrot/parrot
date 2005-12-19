@@ -35,7 +35,7 @@ sub args {
     my $class = shift;
     {
         no strict 'refs';
-        ${$class . "::args"}
+        @{$class . "::args"}
     }
 }
 
