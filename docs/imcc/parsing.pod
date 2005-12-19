@@ -5,20 +5,6 @@
 
 IMCC - parsing
 
-=head1 VERSION
-
-=over 4
-
-=item 0.1 initial
-
-=item 0.2 lexicals
-
-=item 0.3 pod markers
-
-=item 0.4 deprecate nested subs and code outside compilation units
-
-=back
-
 =head1 OVERVIEW
 
 This document describes the basic parsing functionality of IMCC.
@@ -64,18 +50,9 @@ This code:
 		...
 	.end
 
-defines a subroutine with the entry point C<_name>. Subroutine entry
-points have to start with an underscore (as do all other global 
-labels). The statements in the subroutine must be valid PIR or PASM.
 
-=head2 Subroutines: .pcc_sub ... .end
-
-	.sub name
-		statements
-		...
-	.end
-
-As above, but using the Parrot calling conventions. See
+Defines a subroutine with the entry point C<_name>, 
+using the Parrot calling conventions. See
 F<docs/calling_conventions.pod> for more details.
 
 =head2 Assembly blocks .emit ... .eom
@@ -100,8 +77,7 @@ Any code appearing outside of a compilation unit will be ignored
 
 =head2 Nested subs
 
-Nested subroutines are deprecated and will be removed in the near
-future.
+Nested subroutines are not supported.
 
 =head1 Symbols, constants and labels
 
@@ -114,6 +90,18 @@ If you need global variables, please use the B<global> opcode.
 Global labels and constants are kept in the global symbol table
 C<ghash>. This allows for global constant folding beyond the scope
 of individual subroutines.
+
+This also means that you currently can't use the same global symbol (e.g. 
+subroutine name) in different namespaces. The following creates invalid code:
+
+  .sub main
+     ...
+  .end
+
+   .namespace ["main"]
+  .sub main
+     ...
+  .end
 
 Local labels in different I<compilation units> with the same name are
 allowed, though assembling the generated PASM doesn't work. However,

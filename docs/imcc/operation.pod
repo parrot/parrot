@@ -74,17 +74,6 @@ To determine the life range of variables, the code gets separated into
 pieces, called B<basic block>s. A B<basic block> starts at a label,
 which can get jumped to, and ends at a branch instruction.
 
-=head2 Special case: subroutine calls (bsr)
-
-Currently, imcc assumes that a subroutine saves all registers on entry,
-as P6C does per B<saveall>, and thus a B<bsr> doesn't count as a branch.
-
-But there is one exception to this rule: when the target of the
-subroutine is known (the label is in the same compilation unit), and when
-no B<saveall> instruction is found in the first 5 instructions after the
-label, then the control flow from the B<bsr> call to the label and from
-the B<ret> to the next basic block is calculated.
-
 =head2 Call graph
 
 All connections between the B<basic block>s are calculated. This allows
@@ -155,38 +144,6 @@ C<imcc> then starts allocating registers according to a variable's
 score. Variables deeply nested inside loops have the highest score and
 get a parrot register first. Variables with a long life range (i.e.
 with many interferences) get allocated last.
-
-=head2 Spilling
-
-When there are too many interferences, so that not all variables can be
-allocated to a parrot register, variables with lowest score are spilled,
-or stored in a B<PerlArray> when they are not used.
-
-  set $I1,1
-  set $I2,2
-  ...
-  set $I33, 33
-  ...
-  print $I1
-  ...
-  print $I33
-
-The usage of all these variables makes it necessary to spill.
-
-  new P31, .PerlArray
-  ...
-  set I0, 1
-  set P31[0], I0	# store $I1
-  set I0, 2
-  set P31[1], I0	# store $I2
-  ...
-  set I0, P31[0]	# fetch $I1
-  print I0
-
-When $I1 or $I2 are accessed, then code is generated to fetch the
-value from the spill array. The life range of such a spilled variable
-is then only one fetch and/or store operation and the actual usage.
-Therefore the variable has minimal interferences with other variables.
 
 =head1 Optimization
 

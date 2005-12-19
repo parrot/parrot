@@ -46,15 +46,6 @@ Register Allocation
   branch instruction. This is being replaced with directed graphs of
   basic blocks and flow analysis.
 
-Spilling
-
-  Currently the spiller works with the graph-coloring routines, assigning
-  spill weights based on how many times a symbol has been referenced.
-  This will be improved later as we start doing more code analysis.
-  Since Parrot lacks random access stacks, registers are spilled to
-  a fixed PMC array, currently hardcoded as P31. If no spillage is
-  required for the block, no array is allocated.
-
 Optimization
 
   We break the instructions into a directed graph of basic blocks.
@@ -117,12 +108,6 @@ Directives
   opcode, and are intentionally left generic. Some of them aren't
   ops at all, but instructions to the compiler.
 
-   .class <IDENTIFIER>
-   .endclass <IDENTIFIER>
-
-   .namespace <IDENTIFIER>
-   .endnamespace <IDENTIFIER>
-
    .sym <type> <IDENTIFIER>
 
    .sub <IDENTIFIER>
@@ -130,11 +115,7 @@ Directives
 
    .local <type> <IDENTIFIER>
 
-   .arg <lval>
-
-   .return <lval>
-
-   .result <lval>
+   .return '(' <rval> ')'
 
    .param <type> <lval>
 
@@ -176,8 +157,6 @@ Instructions
 
    <P.lval> = new <TYPE>
 
-   call <IDENTIFIER>
-
    dec <lval>
 
    inc <lval>
@@ -190,11 +169,6 @@ Instructions
 
    print rval
 
-   restoreall
-
-   ret
-
-   saveall
 
 Instructions not known to imcc are looked up in parrot's
 op_info_table and must have the proper amount and types of
