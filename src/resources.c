@@ -99,6 +99,30 @@ See L<http://archive.develooper.com/perl6-internals%40perl.org/msg12310.html>
 for details. Currently, we work around it by forcing all the C<*ALIGNMENT>
 C<#define>s in F<E<lt>include/parrot/I<file>.hE<gt>> to be the same.
 
+TODO this needs fixes - 12 bytes overhead is by far too much.
+
+- return aligned pointer *if needed*
+- return strings et al at unaligned i.e. void* boundaries 
+- remember alignment in a buffer header bit
+  use this in compaction code
+- reduce alignment to a reasonable value i.e. MALLOC_ALIGNMENT  
+  aka 2*sizeof(size_t) or just 8 (TODO make a config hint)
+
+Buffer memory layout:
+
+                    +-----------------+  
+                    |  ref_count   |f |    # GC header
+  obj->bufstart  -> +-----------------+
+                    |  data           |
+                    v                 v
+
+ * if PObj_is_COWable is set, then we have
+   - a ref_count, {inc,dec}remented by 2 always
+   - the lo bit 'f' means 'is being forwarded" - what currently TAIL_flag is
+
+ * if PObj_align_FLAG is set, obj->bufstart is aligned like discussed above  
+ * obj->buflen is the usable length excluding the optional GC part.
+
 =cut
 
 */
