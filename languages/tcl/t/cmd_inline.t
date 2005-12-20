@@ -15,7 +15,7 @@ TCL
 ok
 OUT
 
-language_output_is("tcl",<<'TCL',<<'OUT',"PIR compiler");
+language_output_is("tcl",<<'TCL',<<'OUT',"PASM compiler");
  inline PASM {
    print "ok\n"
    end
