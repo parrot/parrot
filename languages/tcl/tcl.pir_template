@@ -9,6 +9,7 @@ providing a compreg-compatible method.
 =cut
 
 .include "languages/tcl/lib/returncodes.pir"
+.include "languages/tcl/lib/macros.pir"
 .include "cclass.pasm"
 
 # don't pollute the global namespaces with our utility functions.

@@ -1,4 +1,5 @@
 .include "languages/tcl/lib/returncodes.pir"
+.include "languages/tcl/lib/macros.pir"
 
 .namespace [ "TclVar" ]
 

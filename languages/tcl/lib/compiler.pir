@@ -147,6 +147,7 @@ $P1=loadlib 'dynlexpad'
 .sub compiled_tcl_sub%i :anon :main
 load_bytecode 'languages/tcl/lib/tcllib.pbc'
 .include "languages/tcl/lib/returncodes.pir"
+.include "languages/tcl/lib/macros.pir"
 %s.return ($P%i)
 .end
 END_PIR
@@ -155,12 +156,6 @@ END_PIR
 
   # Otherwise, leave out items that will will cause reloading
   # conflicts with the parser itself.
-
-  # XXX: The include of returncodes.pir here should *NOT* be necessary,
-  # per leo. If you use a small example, you'll see that it's not
-  # necessary for the trivial case. I assume this is a problem with overall
-  # macro support that removing it here causes the macros to be unusable inside
-  # this compiled sub with the .include
 
   stub_code = <<"END_PIR"
 .pragma n_operators 1
