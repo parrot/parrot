@@ -6,8 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-# use Parrot::Test tests => 15;
- plan  skip_all => 'Ongoing PBC format changes';
+use Parrot::Test tests => 17;
 use Parrot::Config;
 
 
@@ -37,26 +36,38 @@ Get the TODO JAPHs working or decide that they are not suitable for testing.
 =cut
 
 
-# be pessimistic initially
-my %todo = map { $_ => 'various reasons' } ( 1 .. 15 );
-
 # known reasons for failure
-$todo{8}  = 'works only on little endian';
-$todo{13} = 'unreliable, but often succeeds';
-# all others: opcode renumbered
-
-# working tests
-undef $todo{$_} foreach ( 12 );
+my %todo = ( 1  => 'unknown reason',
+             2  => 'unknown reason',
+             4  => 'unknown reason',
+             8  => 'works only on little endian',
+             9  => 'unknown reason',
+             10 => 'unknown reason',
+             11 => 'unknown reason',
+             12 => 'unknown reason',
+             13 => 'unreliable, but often succeeds',
+             14 => 'unknown reason',
+             15 => 'unknown reason',
+             16 => 'unknown reason',
+             17 => 'unknown reason',
+           );
 
 # run all tests and tell about todoness
-foreach ( 1 .. 15 ) {
+foreach ( 1 .. 17 ) {
     my $pasm_fn   = "examples/japh/japh$_.pasm";
-    my $pasm_code = Parrot::Test::slurp_file($pasm_fn);
 
+    # XXX Doing this a TODO, or the 'todo' option would be much nicer,
+    # but for some reason the does not seem to work here.
     if ( defined $todo{$_} ) {
-       pasm_output_is($pasm_code, "Just another Parrot Hacker\n", $pasm_fn,
-                      todo => $todo{$_});
+        # TODO:
+        SKIP:
+        {
+        #   local $TODO = $todo{$_};
+            skip $todo{$_}, 1;
+
+            example_output_is($pasm_fn, "Just another Parrot Hacker\n");
+        };
     } else {
-       pasm_output_is($pasm_code, "Just another Parrot Hacker\n", $pasm_fn);
+       example_output_is($pasm_fn, "Just another Parrot Hacker\n");
     }
 }

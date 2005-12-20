@@ -476,6 +476,7 @@ sub _generate_functions {
 
             # set a TODO for Test::Builder to find
             my $call_pkg = $builder->exported_to() || '';
+            # die Dumper( $code, $expected, $desc, \%extra, $extra{todo}, $call_pkg ) if ( keys %extra );
             local *{ $call_pkg . '::TODO' } = \$extra{todo}
                 if defined $extra{todo};
 
@@ -649,7 +650,7 @@ sub _generate_functions {
 }
 
 sub example_output_is {
-    my ($example_fn, $expected) = @_;
+    my ($example_fn, $expected, @options) = @_;
 
     my %lang_for_extension 
         = ( pasm => 'PASM',
@@ -663,7 +664,7 @@ sub example_output_is {
                                         }ixms or Usage();
     if ( defined $extension ) { 
         my $code = slurp_file($example_fn);
-        language_output_is( $lang_for_extension{$extension}, $code, $expected, $example_fn );
+        language_output_is( $lang_for_extension{$extension}, $code, $expected, $example_fn, @options );
     }
     else {
       fail( defined $extension, "no extension recognized for $example_fn" );
