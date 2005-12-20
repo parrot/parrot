@@ -182,8 +182,10 @@ PIO_buf_setbuf(theINTERP, ParrotIOLayer *layer, ParrotIO *io, size_t bufsize)
     else
         b->flags &= ~PIO_BF_MALLOC;
 
-    if (b->size != 0)
+    if (b->size != 0) {
+        io->flags &= ~PIO_F_LINEBUF;
         io->flags |= PIO_F_BLKBUF;
+    }
     else
         io->flags &= ~(PIO_F_BLKBUF | PIO_F_LINEBUF);
 
