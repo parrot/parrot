@@ -419,6 +419,9 @@ typedef enum PObj_enum {
 #define PObj_is_COWable_TEST(o) PObj_flag_TEST(is_COWable, o)
 #define PObj_is_COWable_SET(o) PObj_flag_SET(is_COWable, o)
 
+#define PObj_aligned_TEST(o) PObj_flag_TEST(aligned, o)
+#define PObj_aligned_SET(o) PObj_flag_SET(aligned, o)
+
 #define PObj_constant_TEST(o) PObj_flag_TEST(constant, o)
 #define PObj_constant_SET(o) PObj_flag_SET(constant, o)
 #define PObj_constant_CLEAR(o) PObj_flag_CLEAR(constant, o)
@@ -537,7 +540,7 @@ typedef enum PObj_enum {
         (PObj_live_FLAG | PObj_on_free_list_FLAG))
 
 #define PObj_is_movable_TESTALL(o) (!(PObj_get_FLAGS(o) & \
-        (PObj_sysmem_FLAG |  \
+        (PObj_sysmem_FLAG | PObj_on_free_list_FLAG | \
          PObj_constant_FLAG | PObj_external_FLAG)))
 
 #define PObj_custom_mark_destroy_SETALL(o) do { \

@@ -113,7 +113,6 @@ struct Small_Object_Pool {
     int skip;
     size_t replenish_level;
     void *free_list;
-    UINTVAL align_1;    /* alignment (must be power of 2) minus one */
     /* adds a free object to the pool's free list  */
     add_free_object_fn_type     add_free_object;
     get_free_object_fn_type     get_free_object;

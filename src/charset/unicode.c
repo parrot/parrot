@@ -86,7 +86,7 @@ compose(Interp *interpreter, STRING *src)
        UErrorCode *status);
        */
     dest_len = src_len = src->strlen;
-    dest = string_make_direct(interpreter, NULL, src_len,
+    dest = string_make_direct(interpreter, NULL, src_len * sizeof(UChar),
             src->encoding, src->charset, 0);
     err = U_ZERO_ERROR;
     dest_len = unorm_normalize(src->strstart, src_len,

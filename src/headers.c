@@ -120,7 +120,6 @@ new_bufferlike_pool(Interp *interpreter,
             new_small_object_pool(interpreter, buffer_size, num_headers);
 
     pool->mem_pool = interpreter->arena_base->memory_pool;
-    pool->align_1 = BUFFER_ALIGNMENT - 1;
     (interpreter->arena_base->init_pool)(interpreter, pool);
     return pool;
 }
@@ -165,7 +164,6 @@ new_string_pool(Interp *interpreter, INTVAL constant)
         pool = make_bufferlike_pool(interpreter, sizeof(STRING));
     pool->objects_per_alloc = GC_DEBUG(interpreter) ?
             GC_DEBUG_STRING_HEADERS_PER_ALLOC : STRING_HEADERS_PER_ALLOC;
-    pool->align_1 = BUFFER_ALIGNMENT - 1;
     return pool;
 }
 
@@ -353,7 +351,7 @@ new_string_header(Interp *interpreter, UINTVAL flags)
             ? interpreter->
             arena_base->constant_string_header_pool :
             interpreter->arena_base->string_header_pool);
-    PObj_get_FLAGS(string) |= flags | PObj_is_string_FLAG;
+    PObj_get_FLAGS(string) |= flags | PObj_is_string_FLAG|PObj_is_COWable_FLAG;
     SET_NULL(string->strstart);
     return string;
 }

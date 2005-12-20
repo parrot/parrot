@@ -24,14 +24,9 @@ struct parrot_string_t;
 
 typedef struct parrot_string_t String;
 
-
-/* Tail added to end of string buffers; used for COW GC */
-struct Buffer_Tail {
-    unsigned char flags;
-};
-typedef enum TAIL_flag {
-    TAIL_moved_FLAG = 1 << 0
-} TAIL_flags;
+typedef enum Forward_flag {
+    Buffer_moved_FLAG = 1 << 0
+} Forward_flags;
 
 /* String iterator */
 typedef struct string_iterator_t {
