@@ -774,6 +774,26 @@ Used to unarchive the array.
             DYNSELF.set_integer_native(io->vtable->shift_integer(INTERP, io));
     }
 
+/*
+
+=item C<INTVAL defined_keyed_int(INTVAL key)>
+
+Returns TRUE is the element at C<key> is defined; otherwise returns false.
+
+=cut
+
+*/
+
+    INTVAL defined_keyed_int (INTVAL key) {
+        PMC* val;
+
+        val = DYNSELF.get_pmc_keyed_int(key);
+        if(PMC_IS_NULL(val))
+            return 0;
+
+        return VTABLE_defined(INTERP, val);
+    }
+
 }
 
 /*

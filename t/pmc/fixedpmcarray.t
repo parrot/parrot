@@ -1,6 +1,14 @@
-#! perl -w
+#! perl
 # Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
+
+
+use strict;
+use warnings;
+use lib qw(lib . ../lib ../../lib);
+use Parrot::Test tests => 14;
+use Test::More;
+
 
 =head1 NAME
 
@@ -8,7 +16,7 @@ t/pmc/fixedpmcarray.t - FixedPMCArray PMC
 
 =head1 SYNOPSIS
 
-	% perl -Ilib t/pmc/fixedpmcarray.t
+	% prove t/pmc/fixedpmcarray.t
 
 =head1 DESCRIPTION
 
@@ -17,8 +25,6 @@ out-of-bounds test. Checks INT and PMC keys.
 
 =cut
 
-use Parrot::Test tests => 13;
-use Test::More;
 
 my $fp_equality_macro = <<'ENDOFMACRO';
 .macro fp_eq (	J, K, L )
@@ -510,3 +516,27 @@ set_integer_keyed, get_pmc_keyed: 128
 set_integer_keyed, get_number_keyed: 128.000000
 set_integer_keyed, get_string_keyed: 128
 OUTPUT
+
+
+pir_output_is(<<'CODE', <<'OUTPUT', "defined");
+.sub main :main
+    .local pmc arr1
+    arr1 = new FixedPMCArray
+    arr1 = 2005
+    .local int defined_elem_1956
+    defined_elem_1956 = defined arr1[1956]
+    print defined_elem_1956
+    arr1[1956] = 42
+    defined_elem_1956 = defined arr1[1956]
+    print defined_elem_1956
+    .local pmc val
+    null val
+    arr1[1956] = val
+    defined_elem_1956 = defined arr1[1956]
+    print defined_elem_1956
+    print "\n"
+.end
+CODE
+010
+OUTPUT
+
