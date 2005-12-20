@@ -517,7 +517,7 @@ Parrot_reallocate_string(Interp *interpreter, STRING *str,
      * - if the passed strings buffer is the last string in the pool and
      * - if there is enough size, we can just move the pool's top pointer
      */
-    new_size = aligned_size(tosize, STRING_ALIGNMENT - 1);
+    new_size = aligned_size(tosize, BUFFER_ALIGNMENT - 1);
     old_size = PObj_buflen(str) + sizeof(struct Buffer_Tail);
     needed = new_size - old_size;
     if (pool->top_block->free >= needed &&
@@ -537,7 +537,7 @@ Parrot_reallocate_string(Interp *interpreter, STRING *str,
     }
     pool->possibly_reclaimable += PObj_buflen(str);
 
-    mem = mem_allocate(interpreter, &alloc_size, pool, STRING_ALIGNMENT - 1);
+    mem = mem_allocate(interpreter, &alloc_size, pool, BUFFER_ALIGNMENT - 1);
 
     /* copy mem from strstart, *not* bufstart */
     oldmem = str->strstart;
@@ -618,7 +618,7 @@ Parrot_allocate_string(Interp *interpreter, STRING *str,
             ? interpreter->arena_base->constant_string_pool
             : interpreter->arena_base->memory_pool;
     PObj_bufstart(str) = mem_allocate(interpreter, &req_size, pool,
-            STRING_ALIGNMENT - 1);
+            BUFFER_ALIGNMENT - 1);
     if (PObj_bufstart(str) == NULL) {
         internal_exception(ALLOCATION_ERROR, "Out of memory");
     }

@@ -165,7 +165,7 @@ new_string_pool(Interp *interpreter, INTVAL constant)
         pool = make_bufferlike_pool(interpreter, sizeof(STRING));
     pool->objects_per_alloc = GC_DEBUG(interpreter) ?
             GC_DEBUG_STRING_HEADERS_PER_ALLOC : STRING_HEADERS_PER_ALLOC;
-    pool->align_1 = STRING_ALIGNMENT - 1;
+    pool->align_1 = BUFFER_ALIGNMENT - 1;
     return pool;
 }
 

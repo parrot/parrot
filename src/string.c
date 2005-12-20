@@ -475,7 +475,7 @@ string_append(Interp *interpreter,
     total_length = a->bufused + b->bufused;
 
     /* make sure A's big enough for both  */
-    if (a_capacity < total_length) {
+    if (total_length >= a_capacity)  {
         Parrot_reallocate_string(interpreter, a,
                 total_length + EXTRA_SIZE);
     }

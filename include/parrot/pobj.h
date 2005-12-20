@@ -242,7 +242,8 @@ typedef enum PObj_enum {
     PObj_constant_FLAG = 1 << 12,
     /* Marks the contents as coming from a non-Parrot source */
     PObj_external_FLAG = 1 << 13,
-    /* unused 1 << 14 */
+    /* the Buffer is aligned to BUFFER_ALIGNMENT boundaries */
+    PObj_aligned_FLAG = 1 << 14,
     /* Mark the buffer as pointing to system memory */
     PObj_sysmem_FLAG = 1 << 15,
 
