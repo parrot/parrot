@@ -17,7 +17,7 @@ t/p6rules/context.t - PGE return value tests
 =head1 DESCRIPTION
 
 These tests are based on L<http://dev.perl.org/perl6/doc/design/syn/S05.html>,
-ver. 7, in the B<'Return values from matches'> section
+ver. 8, in the B<'Return values from matches'> section
 
 =head1 SYNOPSIS
 
@@ -195,7 +195,7 @@ pir_output_is($PRE.<<'CODE'.$POST,<<OUT,'as array ([2,1,0] => "cba")');
 CODE
 cba
 OUT
-## TODO: more 
+## TODO: more
 
 
 ## as hash
@@ -244,5 +244,91 @@ bb
 OUT
 
 
+## additional methods
+pir_output_is($PRE.<<'CODE'.$POST,<<OUT,'additional match methods');
+	rulesub = p6rule('abc')
+	match = rulesub('abc')
+	.local string from, to
+	from = match.'from'()
+	to = match.'to'()
+	print from
+	print " "
+	print to
+	goto END
+CODE
+0 3
+OUT
+pir_output_is($PRE.<<'CODE'.$POST,<<OUT,'additional match methods');
+	rulesub = p6rule('(a)(b)(c)')
+	match = rulesub('abc')
+	.local string from, to
+	$P0 = match[1]
+	from = $P0.'from'()
+	to = $P0.'to'()
+	print from
+	print " "
+	print to
+	goto END
+CODE
+1 2
+OUT
+
+
+## object isa 'PGE::Match'
+pir_output_is($PRE.<<'CODE'.$POST,<<OUT,'isa PGE::Match (success)');
+	rulesub = p6rule('(a)(b)(c)')
+	match = rulesub('abc')
+
+	.local int isa_match
+
+	$S0 = match
+	print $S0
+	print "\n"
+
+	isa_match = isa match, 'PGE::Match'
+	if isa_match goto OK1
+	print "not "
+OK1:print "ok 1\n"
+
+	$P0 = match[1]
+
+	$S0 = $P0
+	print $S0
+	print "\n"
+
+	isa_match = isa $P0, 'PGE::Match'
+	if isa_match goto OK2
+	print "not "
+OK2:print "ok 2\n"
+	goto END
+CODE
+abc
+ok 1
+b
+ok 2
+
+OUT
+pir_output_is($PRE.<<'CODE'.$POST,<<OUT,'isa PGE::Match (failure)');
+	rulesub = p6rule('(a)(b)(c)')
+	match = rulesub('xxx')
+
+	.local int isa_match
+
+	$S0 = match
+	print $S0
+	print "\n"
+
+	isa_match = isa match, 'PGE::Match'
+	if isa_match goto OK1
+	print "not "
+OK1:print "ok 1\n"
+	goto END
+CODE
+
+ok 1
+
+OUT
+
+
 # remember to change the number of tests :-)
-BEGIN { plan tests => 16; }
+BEGIN { plan tests => 20; }

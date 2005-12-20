@@ -47,6 +47,8 @@ p6rule_is  ('axxdef', '<[b..d]>', 'character range');
 p6rule_isnt('axxxef', '<[b..d]>', 'character range');
 p6rule_is  ('abcdef', '<-[b..d]>', 'negated character range');
 p6rule_isnt('bbccdd', '<-[b..d]>', 'negated character range');
+p6rule_like('bbccdd', '<-[d..b]>', qr/parse error/, 'illegal character range',
+	todo => 'specification unclear');
 
 # optional character class range
 p6rule_is  ('abcdef', '<[b..d]>?', 'optional character range');
@@ -92,12 +94,17 @@ p6rule_is  ('---x--', '<-[+\-]>?', 'negated optional escaped hyphen in range');
 p6rule_is  ('------', '<-[+\-]>?', 'negated optional escaped hyphen in range');
 
 # 'greater than' and 'less than' need no escapes
-p6rule_is(  '><', '^><[<]>', 'lt character class');
-p6rule_is(  '><', '^<[>]><', 'gt character class');
-p6rule_is(  '><', '^<[><]>**{2}', 'gt, lt character class');
-p6rule_is(  '><', '^<[<>]>**{2}', 'lt, gt  character class');
+p6rule_is  ('><', '^><[<]>', 'lt character class');
+p6rule_is  ('><', '^<[>]><', 'gt character class');
+p6rule_is  ('><', '^<[><]>**{2}', 'gt, lt character class');
+p6rule_is  ('><', '^<[<>]>**{2}', 'lt, gt  character class');
 p6rule_isnt('><', '^<-[><]>', 'not gt, lt character class');
 p6rule_isnt('><', '^<-[<>]>', 'not lt, gt  character class');
 
+# single quote -- specifies literal match
+p6rule_is  ('... --- ...', "<'... --- ...'>", "literal match (\')",
+	todo => 'not yet implemented');
+p6rule_isnt('...---...', "<'... --- ...'>", "literal match (\')");
+
 # remember to change the number of tests :-)
-BEGIN { plan tests => 59; }
+BEGIN { plan tests => 62; }
