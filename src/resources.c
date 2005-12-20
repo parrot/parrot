@@ -20,8 +20,6 @@ src/resources.c - Allocate and deallocate tracked resources
 #include "parrot/parrot.h"
 
 #define RECLAMATION_FACTOR 0.20
-#define MINIMUM_MEMPOOL_SIZE  1
-#define MAXIMUM_MEMPOOL_SIZE  8
 #define WE_WANT_EVER_GROWING_ALLOCATIONS
 
 typedef void (*compact_f) (Interp *, struct Memory_Pool *);
@@ -145,11 +143,8 @@ mem_allocate(Interp *interpreter, size_t size, struct Memory_Pool *pool)
         /* Compact the pool if allowed and worthwhile */
         if (pool->compact) {
             /* don't bother reclaiming if it's just chicken feed */
-            if (pool->possibly_reclaimable * pool->reclaim_factor
-                    > size
-                    /* don't bother reclaiming if it won't even be enough */
-                    || (pool->guaranteed_reclaimable > size)
-                    ) {
+            if ((pool->possibly_reclaimable * pool->reclaim_factor +
+                    pool->guaranteed_reclaimable) > size) {
                 (*pool->compact) (interpreter, pool);
             }
 
@@ -231,7 +226,13 @@ compact_pool(Interp *interpreter, struct Memory_Pool *pool)
             cur_block = cur_block->prev;
         }
     }
+    /*
+     * XXX for some reason the guarantee isn't correct
+     *     TODO check why
+     */
+
     /* total_size -= pool->guaranteed_reclaimable; */
+        
     /* this makes for ever increasing allocations but fewer collect runs */
 #ifdef WE_WANT_EVER_GROWING_ALLOCATIONS
     total_size += pool->minimum_block_size;
