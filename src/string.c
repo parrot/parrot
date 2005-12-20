@@ -1081,17 +1081,16 @@ string_substr(Interp *interpreter, STRING *src,
 
     /* do in-place i.e. reuse existing header if one */
     if (replace_dest && *d) {
-        CHARSET_GET_CODEPOINTS_INPLACE(interpreter, src,
-                true_offset, true_length, *d);
+        assert(src->encoding == Parrot_fixed_8_encoding_ptr);
         dest = *d;
-#ifdef EVIL_STRING_HACK
-        /*
-         * EVIL - turn of COW on both sides
-         *        but currently the only way to get e.g. revcomp.pir to work  
-         */
-        PObj_COW_CLEAR(src);
-        PObj_COW_CLEAR(dest);
-#endif
+        dest->encoding = src->encoding;
+        dest->charset = src->charset;
+
+        dest->strstart = (char *)src->strstart + true_offset ;
+        dest->bufused = true_length;
+
+        dest->strlen = true_length;
+        dest->hashval = 0;
     }
     else
         dest = CHARSET_GET_CODEPOINTS(interpreter, src, true_offset,
@@ -1141,6 +1140,24 @@ string_replace(Interp *interpreter, STRING *src,
     CHARSET *cs;
     ENCODING *enc;
     String_iter iter;
+
+    /* special case */
+    if (d == NULL &&
+            src &&
+            rep &&
+            src->encoding == Parrot_fixed_8_encoding_ptr &&
+            rep->encoding == Parrot_fixed_8_encoding_ptr &&
+            offset >= 0 &&
+            (UINTVAL)offset < src->strlen &&
+            length == 1 &&
+            rep->strlen == 1
+            ) {
+        if (PObj_is_cowed_TESTALL(src)) {
+            Parrot_unmake_COW(interpreter, src);
+        }
+        ((char*)src->strstart)[offset] = ((char*)rep->strstart)[0];
+        return NULL;
+    }
 
     true_offset = (UINTVAL)offset;
     true_length = (UINTVAL)length;

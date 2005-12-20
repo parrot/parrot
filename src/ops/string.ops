@@ -188,8 +188,6 @@ op unpin(inout STR) :base_mem {
 
 =item B<substr>(out STR, in STR, in INT, in INT)
 
-=item B<substr_r>(out STR, in STR, in INT, in INT)
-
 =item B<substr>(out STR, inout STR, in INT, in INT, in STR)
 
 =item B<substr>(inout STR, in INT, in INT, in STR)
@@ -198,7 +196,7 @@ op unpin(inout STR) :base_mem {
 
 Set $1 to the portion of $2 starting at (zero-based) character position
 $3 and having length $4. If no length ($4) is provided, it is equivalent to
-passing in the length of $2.
+passing in the length of $2. This creates a COW copy of $2.
 
 Optionally pass in string $5 for replacement. If the length of $5 is
 different from the length specified in $4, then $2 will grow or shrink
@@ -215,8 +213,18 @@ character).
 The third form is optimized for replace only, ignoring the replaced
 substring and does not waste a register to do the string replace.
 
-The B<_r> variants reuse an existing string header and therefore normally
-do not create a new string in the destination register.
+=item B<substr_r>(out STR, in STR, in INT, in INT)
+
+Make $1 refer to the given part of $2, basically like above, but it
+is reusing the given destination string and doesn't care if the
+source string is changed later. This I<is changed> includes
+also GC runs, which will move the referenced string. This also
+means that $1 has to be reset before any GC may happen.
+
+This opcode should really be just used to quickly refer to a substring of
+another part, e.g. for printing and is a temporary hack.
+
+B<Handle with care>
 
 =cut
 
@@ -233,7 +241,10 @@ inline op substr(out STR, in STR, in INT, in INT) :base_core {
 }
 
 inline op substr_r(out STR, in STR, in INT, in INT) :base_core {
-  $1 = string_substr(interpreter, $2, $3, $4, &$1, 1);
+  STRING *dest = $1;
+  if (!dest)
+    dest = new_string_header(interpreter, 0);
+  $1 = string_substr(interpreter, $2, $3, $4, &dest, 1);
   goto NEXT();
 }
 
