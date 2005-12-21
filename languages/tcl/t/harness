@@ -26,6 +26,9 @@ my @files;
 
 my @required_options = qw/--gc-debug -D40/;
 
+
+$ENV{TEST_PROG_ARGS} = "" unless defined($ENV{TEST_PROG_ARGS});
+
 foreach my $option (@required_options) {
   if ( $ENV{TEST_PROG_ARGS} !~ /\b$option\b/) {
     $ENV{TEST_PROG_ARGS} .= " $option";
