@@ -397,56 +397,23 @@ OUT
 # XXX - many of the classes are NOT tested here, and we rely
 # on the cvs tests from tcl for that.
 
-language_output_is("tcl",<<'TCL',<<OUT,"string is double: 2.1");
-  puts [string is double 2.1]
+my %doubles = qw(
+  2.1    1    
+  7.0    1
+  7      1
+  1e1    1
+  .1     1
+  no     0
+  .      0
+  +2.    1
+  -2.    1
+);
+
+foreach my $double (keys %doubles) {
+  language_output_is("tcl",<<"TCL",<<"OUT","string is double: $double");
+    puts [string is double $double]
 TCL
-1
+$doubles{$double}
 OUT
 
-language_output_is("tcl",<<'TCL',<<OUT,"string is double: 7.0");
-  puts [string is double 7.0]
-TCL
-1
-OUT
-
-language_output_is("tcl",<<'TCL',<<OUT,"string is double: 7.");
-  puts [string is double 7.]
-TCL
-1
-OUT
-
-language_output_is("tcl",<<'TCL',<<OUT,"string is double: 7");
-  puts [string is double 7]
-TCL
-1
-OUT
-
-language_output_is("tcl",<<'TCL',<<OUT,"string is double: 1e1");
-  puts [string is double 1e1]
-TCL
-1
-OUT
-
-language_output_is("tcl",<<'TCL',<<OUT,"string is double: 1e-1");
-  puts [string is double 1e-1]
-TCL
-1
-OUT
-
-language_output_is("tcl",<<'TCL',<<OUT,"string is double: .1");
-  puts [string is double .1]
-TCL
-1
-OUT
-
-language_output_is("tcl",<<'TCL',<<OUT,"string is double: no");
-  puts [string is double no]
-TCL
-0
-OUT
-
-language_output_is("tcl",<<'TCL',<<OUT,"string is double: .");
-  puts [string is double .]
-TCL
-no
-OUT
+}
