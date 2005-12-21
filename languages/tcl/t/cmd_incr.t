@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 6;
+use Parrot::Test tests => 7;
 use Test::More;
 
 language_output_is("tcl",<<'TCL',<<OUT,"simple");
@@ -43,6 +43,14 @@ language_output_is("tcl",<<'TCL',<<OUT,"negative base");
  puts $a
 TCL
 -1
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"explicit positive offset");
+ set a 2
+ incr a +3
+ puts $a
+TCL
+5
 OUT
 
 language_output_is("tcl",<<'TCL',<<OUT,"error");
