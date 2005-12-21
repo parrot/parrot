@@ -26,12 +26,12 @@ use strict;
 use Parrot::Docs::Section;
 @Parrot::Docs::Section::Config::ISA = qw(Parrot::Docs::Section);
 
-use Parrot::Configure::RunSteps;
+use Parrot::Configure;
 
 =item C<config_groups()>
 
 Dynamically creates the Configuration section's groups by studying the
-contents of C<@Parrot::Configure::RunSteps::steps>.
+contents of C<@Parrot::Configure::steps>.
 
 =cut
 
@@ -40,7 +40,7 @@ sub config_groups
 	my $self = shift;
     my %groups = ();
     
-    foreach my $path (@Parrot::Configure::RunSteps::steps)
+    foreach my $path (@Parrot::Configure::steps)
     {
         my ($dir) = $path =~ m|^([^/]+)|o;
         
@@ -79,7 +79,7 @@ sub new
 	return $self->SUPER::new(
 		'Configuration', 'config.html', 'Parrot is configured by running
 the <i>Configure.pl</i> script. This is essentially just a wrapper around
-<code>Parrot::Configure::RunSteps</code>. The steps are listed below in the order in
+<code>Parrot::Configure</code>. The steps are listed below in the order in
 which they are performed.',
 		$self->new_item('', 'Configure.pl'),
 		$self->config_groups,
