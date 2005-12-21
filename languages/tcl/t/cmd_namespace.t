@@ -2,9 +2,15 @@
 
 use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 17;
+use Parrot::Test tests => 18;
 use Test::More;
 use vars qw($TODO);
+
+language_output_is("tcl",<<'TCL',<<OUT,"refer to builtins explicitly");
+   ::puts ok
+TCL
+ok
+OUT
 
 language_output_is("tcl",<<'TCL',<<OUT,"namespace: no args");
    namespace
