@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 63;
+use Parrot::Test tests => 72;
 use Parrot::Config;
 use Test::More;
 
@@ -394,3 +394,59 @@ TCL
 OUT
 }
 
+# XXX - many of the classes are NOT tested here, and we rely
+# on the cvs tests from tcl for that.
+
+language_output_is("tcl",<<'TCL',<<OUT,"string is double: 2.1");
+  puts [string is double 2.1]
+TCL
+1
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"string is double: 7.0");
+  puts [string is double 7.0]
+TCL
+1
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"string is double: 7.");
+  puts [string is double 7.]
+TCL
+1
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"string is double: 7");
+  puts [string is double 7]
+TCL
+1
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"string is double: 1e1");
+  puts [string is double 1e1]
+TCL
+1
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"string is double: 1e-1");
+  puts [string is double 1e-1]
+TCL
+1
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"string is double: .1");
+  puts [string is double .1]
+TCL
+1
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"string is double: no");
+  puts [string is double no]
+TCL
+0
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"string is double: .");
+  puts [string is double .]
+TCL
+no
+OUT
