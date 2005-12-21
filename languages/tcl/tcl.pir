@@ -42,11 +42,6 @@
   .param pmc argv
 
   load_bytecode "languages/tcl/lib/tcllib.pbc"
-  
-  # load macros
-  $P0 = compreg "PIR"
-  $P0 = $P0(".sub main\n.include 'languages/tcl/lib/macros.pir'\n.end")
-  $P0()
 
   .local pmc retval,source
   .local string mode,chunk,contents,filename

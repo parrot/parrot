@@ -147,7 +147,6 @@ $P1=loadlib 'dynlexpad'
 .sub compiled_tcl_sub%i :anon :main
 load_bytecode 'languages/tcl/lib/tcllib.pbc'
 .include "languages/tcl/lib/returncodes.pir"
-.include "languages/tcl/lib/macros.pir"
 %s.return ($P%i)
 .end
 END_PIR

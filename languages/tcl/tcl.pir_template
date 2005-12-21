@@ -79,6 +79,12 @@ providing a compreg-compatible method.
 
 .namespace [ "_Tcl" ]
 
+.sub __load_macros :load :anon
+  $P0 = compreg "PIR"
+  $P0 = $P0(".sub main\n.include 'languages/tcl/lib/macros.pir'\n.end")
+  $P0()
+.end
+
 .sub __prepare_lib :load :anon
 
   # Load any dependant libraries.
