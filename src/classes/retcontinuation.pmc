@@ -93,7 +93,8 @@ the frame pointer in the stack frame cache.
 	 * unwind control stack
 	 */
 	stack_now = CONTEXT(INTERP->ctx)->control_stack;
-	ctr_stack = cc->to_ctx->control_stack;
+	caller_ctx = cc->to_ctx;
+	ctr_stack = caller_ctx->control_stack;
 	while (stack_now != ctr_stack) {
 	    if (!stack_now || !ctr_stack)
 		internal_exception(1, "Control stack damaged");
@@ -108,17 +109,16 @@ the frame pointer in the stack frame cache.
 
 	/* debug print before context is switched */
 	if (Interp_trace_TEST(INTERP, PARROT_TRACE_SUB_CALL_FLAG)) {
-	    PMC *to_sub = cc->to_ctx->current_sub;
+	    PMC *to_sub = caller_ctx->current_sub;
 	    PMC *from_sub = cc->from_ctx->current_sub;
 
 	    PIO_eprintf(INTERP, "# Back in sub '%Ss' from '%Ss\n",
 		    Parrot_full_sub_name(INTERP, to_sub),
 		    Parrot_full_sub_name(INTERP, from_sub));
 	}
-	caller_ctx = CONTEXT(INTERP->ctx);
-	CONTEXT(INTERP->ctx) = cc->to_ctx;
-	INTERP->ctx.bp = CONTEXT(INTERP->ctx)->bp;
-	INTERP->ctx.bp_ps = CONTEXT(INTERP->ctx)->bp_ps;
+	CONTEXT(INTERP->ctx) = caller_ctx;
+	INTERP->ctx.bp = caller_ctx->bp;
+	INTERP->ctx.bp_ps = caller_ctx->bp_ps;
 	next = cc->address;
 	Parrot_free_context(INTERP, cc->from_ctx, 1);
 	seg = cc->seg;
