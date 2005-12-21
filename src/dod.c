@@ -293,23 +293,10 @@ Parrot_dod_trace_root(Interp *interpreter, int trace_stack)
 
     /* mark it as used  */
     pobject_lives(interpreter, (PObj *)interpreter->iglobals);
-    /* Now, go run through the PMC registers and mark them as live */
-    /* First mark the current set. */
+
+    /* mark the current context. */
     ctx = CONTEXT(interpreter->ctx);
-    for (i = 0; i < (unsigned int)ctx->n_regs_used[REGNO_PMC]; i++) {
-        if (REG_PMC(i)) {
-            pobject_lives(interpreter, (PObj *)REG_PMC(i));
-        }
-    }
-    /*
-     * mark current context stuff
-     */
-    if (ctx->current_sub)
-        pobject_lives(interpreter, (PObj*)ctx->current_sub);
-    if (ctx->current_cont)
-        pobject_lives(interpreter, (PObj*)ctx->current_cont);
-    if (ctx->current_object)
-        pobject_lives(interpreter, (PObj*)ctx->current_object);
+    mark_context(interpreter, ctx);
 
     /*
      * mark vtable->data
@@ -358,8 +345,6 @@ Parrot_dod_trace_root(Interp *interpreter, int trace_stack)
     if (interpreter->DOD_registry)
         pobject_lives(interpreter, (PObj *)interpreter->DOD_registry);
 
-    /* Walk all stacks */
-    mark_context(interpreter, ctx);
 
     /* Walk the iodata */
     Parrot_IOData_mark(interpreter, interpreter->piodata);
