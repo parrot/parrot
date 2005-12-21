@@ -411,15 +411,13 @@ size_t
 get_max_buffer_address(Interp *interpreter)
 {
     UINTVAL i;
-    size_t max = interpreter->arena_base->constant_string_header_pool->
-        end_arena_memory;
+    size_t max = 0;
+    struct Arenas *arena_base = interpreter->arena_base;
 
-    for (i = 0; i < interpreter->arena_base->num_sized; i++) {
-        if (interpreter->arena_base->sized_header_pools[i]) {
-            if (max < interpreter->arena_base->
-                    sized_header_pools[i]->end_arena_memory)
-                max = interpreter->arena_base->sized_header_pools[i]->
-                        end_arena_memory;
+    for (i = 0; i < arena_base->num_sized; i++) {
+        if (arena_base->sized_header_pools[i]) {
+            if (arena_base-> sized_header_pools[i]->end_arena_memory > max)
+                max = arena_base->sized_header_pools[i]->end_arena_memory;
         }
     }
 
@@ -441,16 +439,14 @@ size_t
 get_min_buffer_address(Interp *interpreter)
 {
     UINTVAL i;
-    size_t min = interpreter->arena_base->constant_string_header_pool->
-            start_arena_memory;
+    struct Arenas *arena_base = interpreter->arena_base;
+    size_t min = (size_t) -1;
 
-    for (i = 0; i < interpreter->arena_base->num_sized; i++) {
-        if (interpreter->arena_base->sized_header_pools[i] &&
-            interpreter->arena_base->sized_header_pools[i]->start_arena_memory) {
-            if (min > interpreter->arena_base->
-                    sized_header_pools[i]->start_arena_memory)
-                min = interpreter->arena_base->sized_header_pools[i]->
-                        start_arena_memory;
+    for (i = 0; i < arena_base->num_sized; i++) {
+        if (arena_base->sized_header_pools[i] &&
+            arena_base->sized_header_pools[i]->start_arena_memory) {
+            if (arena_base->sized_header_pools[i]->start_arena_memory < min)
+                min = arena_base->sized_header_pools[i]->start_arena_memory;
         }
     }
     return min;
@@ -506,10 +502,6 @@ is_buffer_ptr(Interp *interpreter, void *ptr)
 {
     UINTVAL i;
     struct Arenas *arena_base = interpreter->arena_base;;
-
-    if (contained_in_pool(interpreter,
-                    arena_base->constant_string_header_pool, ptr))
-        return 1;
 
     for (i = 0; i < arena_base->num_sized; i++) {
         if (arena_base->sized_header_pools[i] &&
