@@ -127,11 +127,11 @@ sub makefiles {
   genfile('config/gen/makefiles/scheme.in'    => 'languages/scheme/Makefile',
           commentType       => '#',
           replace_slashes   => 1);
-  genfile('config/gen/makefiles/tcl.in'       => 'languages/tcl/Makefile',
+  genfile('languages/tcl/config/root.in'      => 'languages/tcl/Makefile',
           commentType       => '#',
           replace_slashes   => 1, 
           conditioned_lines => 1);
-  genfile('config/gen/makefiles/tcl_examples.in' => 'languages/tcl/examples/Makefile',
+  genfile('languages/tcl/config/examples.in'  => 'languages/tcl/examples/Makefile',
           commentType       => '#',
           replace_slashes   => 1);
   genfile('config/gen/makefiles/urm.in'       => 'languages/urm/Makefile',
