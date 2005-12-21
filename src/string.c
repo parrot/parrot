@@ -39,8 +39,9 @@ strings.
 
 
 #define saneify_string(s) \
-    assert(s->encoding); \
-    assert(s->charset)
+    assert(s->encoding && \
+           s->charset && \
+           !PObj_on_free_list_TEST(s))
 
 
 /*

@@ -679,7 +679,7 @@ runops_int(Interp *interpreter, size_t offset)
     opcode_t *(*core) (Interp *, opcode_t *) =
         (opcode_t *(*) (Interp *, opcode_t *)) 0;
 
-    if (interpreter->resume_flag & RESUME_INITIAL) {
+    if (!interpreter->lo_var_ptr) {
         /*
          * if we are entering the run loop the first time
          */
