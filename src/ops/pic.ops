@@ -151,7 +151,6 @@ inline op pic_get_params__(inconst PMC) :pic {
     src_pc = interpreter->current_args;
     mic = (Parrot_MIC *) cur_opcode[1];
     caller_ctx = ctx->caller_ctx;
-    n = mic->m.arg_count;
     if (src_pc) {
 	src_pred = (void**) src_pc - caller_ctx->pred_offset;
 	sig = (PMC*)(src_pred[1]);
@@ -163,10 +162,12 @@ inline op pic_get_params__(inconst PMC) :pic {
     lru = &mic->lru;
     if (lru->u.signature == sig) {
 	if (sig) {
-	    ((arg_pass_f)lru->f.real_function)(interpreter, n, 
+	    n = ((arg_pass_f)lru->f.real_function)(interpreter, sig,
 		    (char*)caller_ctx->bp.regs_i, src_pred, 
 		    _reg_base, (void**)cur_opcode);
 	}
+        else
+            n = 2;
 	ccont = ctx->current_cont;
 	if (PObj_get_FLAGS(ccont) & SUB_FLAG_TAILCALL) {
 	    PObj_get_FLAGS(ccont) &= ~SUB_FLAG_TAILCALL;
@@ -175,12 +176,12 @@ inline op pic_get_params__(inconst PMC) :pic {
 	    Parrot_free_context(interpreter, caller_ctx, 1);
 	}
 
-	goto OFFSET(n + 2);
+	goto OFFSET(n);
     }
     /* no match redo plain opcode */
     ((void**)cur_opcode)[0] =
 	parrot_pic_opcode(interpreter, PARROT_OP_get_params_pc);
-    ((void**)cur_opcode)[1] = lru->u.signature;
+    ((void**)cur_opcode)[1] = mic->m.sig;
     goto OFFSET(0);
 }
 
@@ -200,13 +201,12 @@ inline op pic_set_returns__(inconst PMC) :pic {
     cc = PMC_cont(ccont);
     if (!cc->address) {
 	interpreter->current_returns = CUR_OPCODE;
-	n = mic->m.arg_count;
+        n = PMC_int_val(mic->m.sig);
 	goto OFFSET(n + 2);
     }
     caller_ctx = cc->to_ctx;
     interpreter->current_args = NULL;
     dest_pc = caller_ctx->current_results;
-    n = mic->m.arg_count;
     if (dest_pc) {
 	dest_pred = (void**) dest_pc - caller_ctx->pred_offset;
 	sig = (PMC*)(dest_pred[1]);
@@ -218,16 +218,18 @@ inline op pic_set_returns__(inconst PMC) :pic {
     lru = &mic->lru;
     if (lru->u.signature == sig) {
 	if (sig) {
-	    ((arg_pass_f)lru->f.real_function)(interpreter, n, 
+	    n = ((arg_pass_f)lru->f.real_function)(interpreter, mic->m.sig,
 		    _reg_base, (void**)cur_opcode, 
 		    (char*)caller_ctx->bp.regs_i, dest_pred);
 	}
-	goto OFFSET(n + 2);
+        else
+            n = 2;
+	goto OFFSET(n);
     }
     /* no match redo plain opcode */
     ((void**)cur_opcode)[0] =
 	parrot_pic_opcode(interpreter, PARROT_OP_set_returns_pc);
-    ((void**)cur_opcode)[1] = lru->u.signature;
+    ((void**)cur_opcode)[1] = mic->m.sig;
     goto OFFSET(0);
 }
 

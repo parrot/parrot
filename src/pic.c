@@ -254,96 +254,173 @@ parrot_pic_opcode(Interp *interpreter, INTVAL op)
 #endif
 }
 
-static void
-pass_int(Interp *interpreter, int n, char *src_base, void **src, 
+static int
+pass_int(Interp *interpreter, PMC *sig, char *src_base, void **src, 
 		char *dest_base, void **dest)
 {
     INTVAL arg;
-    int i;
+    int i, n = PMC_int_val(sig);
     for (i = 2 ; n; ++i, --n) {
         arg = *(INTVAL *)(src_base + ((opcode_t*)src)[i]);
         *(INTVAL *)(dest_base + ((opcode_t*)dest)[i])= arg;
     }
+    return i;
 }
 
-static void
-pass_num(Interp *interpreter, int n, char *src_base, void **src, 
+static int
+pass_num(Interp *interpreter, PMC *sig, char *src_base, void **src, 
 		char *dest_base, void **dest)
 {
     FLOATVAL arg;
-    int i;
+    int i, n = PMC_int_val(sig);
     for (i = 2 ; n; ++i, --n) {
         arg = *(FLOATVAL *)(src_base + ((opcode_t*)src)[i]);
         *(FLOATVAL *)(dest_base + ((opcode_t*)dest)[i])= arg;
     }
+    return i;
 }
 
-static void
-pass_str(Interp *interpreter, int n, char *src_base, void **src, 
+static int
+pass_str(Interp *interpreter, PMC *sig, char *src_base, void **src, 
 		char *dest_base, void **dest)
 {
     STRING* arg;
-    int i;
+    int i, n = PMC_int_val(sig);
     for (i = 2 ; n; ++i, --n) {
         arg = *(STRING* *)(src_base + ((opcode_t*)src)[i]);
         *(STRING* *)(dest_base + ((opcode_t*)dest)[i])= arg;
     }
+    return i;
 }
 
-static void
-pass_pmc(Interp *interpreter, int n, char *src_base, void **src, 
+static int
+pass_pmc(Interp *interpreter, PMC *sig, char *src_base, void **src, 
 		char *dest_base, void **dest)
 {
     PMC* arg;
-    int i;
+    int i, n = PMC_int_val(sig);
     for (i = 2 ; n; ++i, --n) {
         arg = *(PMC* *)(src_base + ((opcode_t*)src)[i]);
         *(PMC* *)(dest_base + ((opcode_t*)dest)[i])= arg;
     }
+    return i;
+}
+
+static int
+pass_mixed(Interp *interpreter, PMC *sig, char *src_base, void **src, 
+		char *dest_base, void **dest)
+{
+    PMC* argP;
+    int i, n = PMC_int_val(sig);
+    INTVAL *bitp, bits;
+    INTVAL argI;
+    FLOATVAL argN;
+    STRING *argS;
+
+    assert(PObj_is_PMC_TEST(sig));
+    assert(sig->vtable->base_type == enum_class_FixedIntegerArray);
+    bitp = PMC_data(sig);
+    for (i = 2 ; n; ++i, --n) {
+        bits = *bitp++;
+        switch (bits) {
+            case PARROT_ARG_INTVAL:
+                argI = *(INTVAL *)(src_base + ((opcode_t*)src)[i]);
+                *(INTVAL *)(dest_base + ((opcode_t*)dest)[i])= argI;
+                break;
+            case PARROT_ARG_INTVAL|PARROT_ARG_CONSTANT:
+                argI = (INTVAL)(src)[i];
+                *(INTVAL *)(dest_base + ((opcode_t*)dest)[i])= argI;
+                break;
+            case PARROT_ARG_FLOATVAL:
+                argN = *(FLOATVAL *)(src_base + ((opcode_t*)src)[i]);
+                *(FLOATVAL *)(dest_base + ((opcode_t*)dest)[i])= argN;
+                break;
+            case PARROT_ARG_FLOATVAL|PARROT_ARG_CONSTANT:
+                argN = *(FLOATVAL*)(src)[i];
+                *(FLOATVAL *)(dest_base + ((opcode_t*)dest)[i])= argN;
+                break;
+            case PARROT_ARG_STRING:
+                argS = *(STRING **)(src_base + ((opcode_t*)src)[i]);
+                *(STRING* *)(dest_base + ((opcode_t*)dest)[i])= argS;
+                break;
+            case PARROT_ARG_STRING|PARROT_ARG_CONSTANT:
+                argS = (STRING*)(src)[i];
+                *(STRING* *)(dest_base + ((opcode_t*)dest)[i])= argS;
+                break;
+            case PARROT_ARG_PMC:
+                argP = *(PMC **)(src_base + ((opcode_t*)src)[i]);
+                *(PMC* *)(dest_base + ((opcode_t*)dest)[i])= argP;
+                break;
+            case PARROT_ARG_PMC|PARROT_ARG_CONSTANT:
+                argP = (PMC*)(src)[i];
+                *(PMC* *)(dest_base + ((opcode_t*)dest)[i])= argP;
+                break;
+            default:
+                internal_exception(1, "bogus signature 0x%x", bits);
+                break;
+        }
+    }
+    return i;
 }
 /*
  * return argument count and type of the signature or -1 if not pic-able
+ * the type PARROT_ARG_CONSTANT stands for mixed types or constants
  */
 static int
-pic_check_sig(Interp *interpreter, PMC *sig_pmc, int *type)
+pic_check_sig(Interp *interpreter, PMC *sig1, PMC *sig2, int *type)
 {
-    int i, n, t1, t2;
+    int i, n, t0, t1, t2;
 
-    assert(PObj_is_PMC_TEST(sig_pmc));
-    assert(sig_pmc->vtable->base_type == enum_class_FixedIntegerArray);
-    n = VTABLE_elements(interpreter, sig_pmc);
+    assert(PObj_is_PMC_TEST(sig1));
+    assert(sig1->vtable->base_type == enum_class_FixedIntegerArray);
+    assert(PObj_is_PMC_TEST(sig2));
+    assert(sig2->vtable->base_type == enum_class_FixedIntegerArray);
+    n = VTABLE_elements(interpreter, sig1);
+    if (n != VTABLE_elements(interpreter, sig2))
+        return -1;
     if (!n) {
         *type = 0;
         return 0;
     }
-    t1 = VTABLE_get_integer_keyed_int(interpreter, sig_pmc, 0);
-
-    if (t1 & ~PARROT_ARG_TYPE_MASK)
-        return -1;
-    for (i = 1; i < n; ++i) {
-        t2 = VTABLE_get_integer_keyed_int(interpreter, sig_pmc, i);
+    for (i = 0; i < n; ++i) {
+        t1 = VTABLE_get_integer_keyed_int(interpreter, sig1, i);
+        t2 = VTABLE_get_integer_keyed_int(interpreter, sig2, i);
+        if (!i) {
+            t0 = t1 & PARROT_ARG_TYPE_MASK;
+            *type = t0;
+        }
+        if (t1 & PARROT_ARG_CONSTANT) {
+            *type = PARROT_ARG_CONSTANT;
+            t1 &= ~PARROT_ARG_CONSTANT;
+        }
+        if (t1 & ~PARROT_ARG_TYPE_MASK)
+            return -1;
+        if (t2 & PARROT_ARG_CONSTANT) {
+            *type = PARROT_ARG_CONSTANT;
+            t2 &= ~PARROT_ARG_CONSTANT;
+        }
+        if (t2 & ~PARROT_ARG_TYPE_MASK)
+            return -1;
         if (t2 != t1)
             return -1;
+        if (t1 != t0)
+            *type = PARROT_ARG_CONSTANT;
     }
-    *type = t1;
     return n;
 }
 
 static int
 is_pic_param(Interp *interpreter, void **pc, Parrot_MIC* mic, opcode_t op)
 {
-    PMC *sig;
-    int n, n2, type, type2;
+    PMC *sig1, *sig2;
+    int n, type;
     parrot_context_t *caller_ctx, *ctx;
     INTVAL const_nr;
     opcode_t *args;
     PMC *ccont;
 
     /* check params */
-    sig = (PMC*)(pc[1]);
-    n = pic_check_sig(interpreter, sig, &type);
-    if (n == -1)
-        return 0;
+    sig1 = (PMC*)(pc[1]);
     ctx = CONTEXT(interpreter->ctx);
     if (op == PARROT_OP_set_returns_pc) {
         ccont = ctx->current_cont;
@@ -359,16 +436,19 @@ is_pic_param(Interp *interpreter, void **pc, Parrot_MIC* mic, opcode_t op)
     if (args) {
         const_nr = args[1];
         /* check current_args signature */
-        sig = caller_ctx->constants[const_nr]->u.key;
-        n2 = pic_check_sig(interpreter, sig, &type2);
+        sig2 = caller_ctx->constants[const_nr]->u.key;
+        n = pic_check_sig(interpreter, sig1, sig2, &type);
+        if (n == -1)
+            return 0;
     }
     else {
-        sig = NULL;
-        n2 = 0;
-        type2 = type;
+        if (VTABLE_elements(interpreter, sig1) == 0) {
+            sig2 = NULL;
+            type = n = 0;
+        }
+        else
+            return 0;
     }
-    if (n2 != n || type != type2)
-        return 0;
     switch (type) {
         case PARROT_ARG_INTVAL:
             mic->lru.f.real_function = (funcptr_t)pass_int;
@@ -382,11 +462,15 @@ is_pic_param(Interp *interpreter, void **pc, Parrot_MIC* mic, opcode_t op)
         case PARROT_ARG_PMC:
             mic->lru.f.real_function = (funcptr_t)pass_pmc;
             break;
+        case PARROT_ARG_CONSTANT:
+            mic->lru.f.real_function = (funcptr_t)pass_mixed;
+            break;
         default:
             return 0;
     }
-    mic->m.arg_count = n;
-    mic->lru.u.signature = (PMC*)(pc[1]);
+    mic->m.sig = sig1;
+    /* remember this sig2 - it has to match the other end at call time */
+    mic->lru.u.signature = sig2;
     return 1;
 }
 
