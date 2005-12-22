@@ -26,8 +26,6 @@ use strict;
 use Parrot::Docs::Section;
 @Parrot::Docs::Section::Config::ISA = qw(Parrot::Docs::Section);
 
-use Parrot::Configure;
-
 =item C<config_groups()>
 
 Dynamically creates the Configuration section's groups by studying the
@@ -37,15 +35,8 @@ contents of C<@Parrot::Configure::steps>.
 
 sub config_groups
 {
-	my $self = shift;
-    my %groups = ();
-    
-    foreach my $path (@Parrot::Configure::steps)
-    {
-        my ($dir) = $path =~ m|^([^/]+)|o;
-        
-        push @{$groups{$dir}}, "config/$path";
-    }
+    my $self = shift;
+    my $dist = Parrot::Distribution->new;
     
     my @groups = ();
     my %titles = (
@@ -55,12 +46,14 @@ sub config_groups
         'gen' => 'File Creation Steps',
     );
     
-    foreach my $dir (qw(init inter auto gen))
+    foreach my $group (qw(init inter auto gen))
     {
+        my $dir = $dist->existing_directory_with_name('config/' . $group);
+        my @files = $dir->files_with_suffix('pm', 1);    
         push @groups,
             $self->new_group(
-                $titles{$dir}, '',
-                map {$self->new_item('', $_)} @{$groups{$dir}});
+                $titles{$group}, '',
+                map {$self->new_item('', $dist->relative_path($_))} @files);
     }
     
     return @groups;

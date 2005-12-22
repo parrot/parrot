@@ -76,7 +76,7 @@ sub new
 			$self->new_item('', 'tools/dev/mk_native_pbc'),
 		),
 		$self->new_group('Utilities', '',
-			$self->new_item('', 'util'),
+			$self->new_item('', 'tools/util'),
 		),
 	);
 }

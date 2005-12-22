@@ -197,7 +197,7 @@ sub new
             'PMCs', 
             '',
             $self->c_pair_item('', 'pmc'),
-            $self->c_header_item('', 'vtable'),
+            $self->c_header_item('', 'vtables'),
             $self->c_pair_item('', 'key'),
             $self->c_pair_item('', 'sub'),
             $self->c_pair_item('', 'method_util'),
@@ -220,7 +220,7 @@ sub new
             ),
             $self->c_item(
                 'String encodings', 
-                'contents' => ['encodings']
+                'contents' => ['src/encodings']
             ),
             $self->c_header_item('', 'unicode'),
             $self->c_item(
@@ -268,7 +268,7 @@ sub new
             $self->c_item(
                 'Parrot\'s layer-based I/O subsystem.', 
                 'headers' => ['io'], 
-                'contents' => ['io']
+                'contents' => ['src/io']
             ),
         ),
         $self->new_group(

@@ -56,7 +56,7 @@ sub new
 			$self->new_item('The presence of this file indicates that the distribution is a development version.', 'DEVELOPING'),
 		),
 		$self->new_group('People', '',
-			$self->new_item('A list of some of the Parrot developers with CVS commit access.', 'RESPONSIBLE_PARTIES'),
+			$self->new_item('A list of some of the Parrot developers with SVN commit access.', 'RESPONSIBLE_PARTIES'),
 			$self->new_item('A list of some of people who have contributed to Parrot.', 'CREDITS'),
 		),
 		$self->new_group('Contents', 'See the <code>ExtUtils::Manifest</code> documentation for more information about MANIFEST files.',

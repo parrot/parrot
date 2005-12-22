@@ -38,12 +38,6 @@ sub new
 	my $self = shift;
 	my $dist = Parrot::Distribution->new;
     my $dir = $dist->existing_directory_with_name('src/classes');
-	my @tools_items = ();
-	
-	foreach my $file ($dir->files_with_suffix('pl'))
-	{
-	    push(@tools_items, $self->new_item('', $dist->relative_path($file)));
-	}
 	
 	my @concrete_items = ();
 	my @abstract_items = ();
@@ -71,7 +65,9 @@ sub new
 		    ' abstract PMCs and ' .
 		    scalar(@concrete_items) .
 		    ' concrete PMCs.',
-		$self->new_group('Tools', 'PMC-related tools.', @tools_items),
+		$self->new_group('Tools', 'PMC-related tools.', 
+			$self->new_item('', 'tools/dev/gen_class.pl'),
+		),
 		$self->new_group(
 	        'Abstract PMCs', 
 	        'These PMCs are not instantiated.', 
