@@ -272,7 +272,7 @@ to_infix(Interp *interpreter, char *name, SymReg **r, int *n, int mmd_op)
         (*n)++;
     }
     r[0] = mmd;
-    if (is_n)
+    if (is_n && *n == 4)
         return "n_infix";
     else
         return "infix";

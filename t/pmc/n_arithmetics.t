@@ -17,7 +17,7 @@ various combinations of Parrot integer and number types.
 
 =cut
 
-use Parrot::Test tests => 19;
+use Parrot::Test tests => 20;
 use Test::More;
 
 ###
@@ -569,3 +569,18 @@ CODE
 1
 ok
 OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', ".pragma n_operators - inplace");
+.pragma n_operators 1
+.sub main :main
+    .local pmc p
+    p = new .Integer
+    p = 10
+    p += 4
+    print p
+    print "\n"
+.end
+CODE
+14
+OUTPUT
+
