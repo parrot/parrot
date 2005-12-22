@@ -15,7 +15,9 @@ tests by then. =-)
 =item *
 
 Generate compiler-variants for several builtins, esp. those used by
-examples/bench.tcl - NB: bench.tcl is currently failing.
+examples/bench.tcl. We're doing a lot of thrashing of sorts, switching between
+inlined versions and non inlined versions: having everything inlined will
+give us a big boost.
 
 =item *
 
