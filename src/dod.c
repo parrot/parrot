@@ -40,7 +40,6 @@ int CONSERVATIVE_POINTER_CHASING = 0;
 #endif
 
 static size_t find_common_mask(size_t val1, size_t val2);
-static void trace_active_buffers(Interp *interpreter);
 
 /*
 
@@ -359,8 +358,6 @@ Parrot_dod_trace_root(Interp *interpreter, int trace_stack)
     if (trace_stack)
         trace_system_areas(interpreter);
 
-    /* And the buffers */
-    trace_active_buffers(interpreter);
     if (interpreter->profile)
         Parrot_dod_profile_end(interpreter, PARROT_PROF_DOD_p1);
     return 1;
@@ -475,37 +472,6 @@ Parrot_dod_trace_children(Interp *interpreter, size_t how_many)
     return 1;
 }
 
-/*
-
-=item C<static void
-trace_active_buffers(Interp *interpreter)>
-
-Scan any buffers in string registers and other non-PMC places and mark
-them as active.
-
-=cut
-
-*/
-
-static void
-trace_active_buffers(Interp *interpreter)
-{
-    UINTVAL i;
-
-    /* First mark the current set. We assume that all pointers in S registers
-     * are pointing to valid buffers. This is not a good assumption, but it'll
-     * do for now. */
-    for (i = 0; i < (unsigned int)CONTEXT(interpreter->ctx)->n_regs_used[REGNO_STR]; i++) {
-        Buffer *reg = (Buffer *)REG_STR(i);
-
-        if (reg)
-            pobject_lives(interpreter, reg);
-    }
-
-    /* The interpreter might have a few strings of its own,
-     * but currently there are none.
-     * When the interpreter gets strings again, then mark them as alive */
-}
 
 #ifdef GC_IS_MALLOC
 
