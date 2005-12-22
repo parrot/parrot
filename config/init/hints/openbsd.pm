@@ -5,20 +5,24 @@ package init::hints::openbsd;
 
 use strict;
 
-my $ccflags = Parrot::Configure::Data->get('ccflags');
-if ( $ccflags !~ /-pthread/ ) {
-    $ccflags .= ' -pthread';
-}
-Parrot::Configure::Data->set(
-    ccflags => $ccflags,
-);
+sub runstep {
+    my ($self, $conf) = @_;
 
-my $libs = Parrot::Configure::Data->get('libs');
-if ( $libs !~ /-lpthread/ ) {
-    $libs .= ' -lpthread';
+    my $ccflags = $conf->data->get('ccflags');
+    if ( $ccflags !~ /-pthread/ ) {
+        $ccflags .= ' -pthread';
+    }
+    $conf->data->set(
+        ccflags => $ccflags,
+    );
+
+    my $libs = $conf->data->get('libs');
+    if ( $libs !~ /-lpthread/ ) {
+        $libs .= ' -lpthread';
+    }
+    $conf->data->set(
+        libs => $libs,
+    );
 }
-Parrot::Configure::Data->set(
-    libs => $libs,
-);
 
 1;

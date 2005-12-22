@@ -28,7 +28,7 @@ $description = 'Determining what C compiler and linker to use...';
 	lex yacc maintainer);
 
 sub runstep {
-    my $self = shift;
+    my ($self, $conf) = (shift, shift);
   my %args;
   @args{@args}=@_;
 
@@ -64,57 +64,57 @@ END
     # Set each variable individually so that hints files can use them as
     # triggers to help pick the correct defaults for later answers.
 
-    $cc = integrate(Parrot::Configure::Data->get('cc'), $args{cc});
+    $cc = integrate($conf->data->get('cc'), $args{cc});
     $cc = prompt("What C compiler do you want to use?", $cc) if $args{ask};
-    Parrot::Configure::Data->set(cc =>  $cc);
+    $conf->data->set(cc =>  $cc);
 
-    $link = integrate(Parrot::Configure::Data->get('link'), $args{link});
+    $link = integrate($conf->data->get('link'), $args{link});
     $link = prompt("How about your linker?", $link) if $args{ask};
-    Parrot::Configure::Data->set(link =>  $link);
+    $conf->data->set(link =>  $link);
 
-    $ld = integrate(Parrot::Configure::Data->get('ld'), $args{ld});
+    $ld = integrate($conf->data->get('ld'), $args{ld});
     $ld = prompt("What program do you want to use to build shared libraries?", $ld) if $args{ask};
-    Parrot::Configure::Data->set(ld =>  $ld);
+    $conf->data->set(ld =>  $ld);
 
-    $ccflags = Parrot::Configure::Data->get('ccflags');
+    $ccflags = $conf->data->get('ccflags');
     # Remove some perl5-isms.
     $ccflags =~ s/-D((PERL|HAVE)_\w+\s*|USE_PERLIO)//g;
     $ccflags =~ s/-fno-strict-aliasing//g;
     $ccflags =~ s/-fnative-struct//g;
     $ccflags = integrate($ccflags, $args{ccflags});
     $ccflags = prompt("What flags should your C compiler receive?", $ccflags) if $args{ask};
-    Parrot::Configure::Data->set(ccflags =>  $ccflags);
+    $conf->data->set(ccflags =>  $ccflags);
 
-    $linkflags = Parrot::Configure::Data->get('linkflags');
+    $linkflags = $conf->data->get('linkflags');
     $linkflags =~ s/-libpath:\S+//g;  # XXX No idea why.
     $linkflags = integrate($linkflags, $args{linkflags});
     $linkflags = prompt("And your linker?", $linkflags) if $args{ask};
-    Parrot::Configure::Data->set(linkflags =>  $linkflags);
+    $conf->data->set(linkflags =>  $linkflags);
 
-    $ldflags = Parrot::Configure::Data->get('ldflags');
+    $ldflags = $conf->data->get('ldflags');
     $ldflags =~ s/-libpath:\S+//g;  # XXX No idea why.
     $ldflags = integrate($ldflags, $args{ldflags});
     $ldflags = prompt("And your $ld for building shared libraries?", $ldflags) if $args{ask};
-    Parrot::Configure::Data->set(ldflags =>  $ldflags);
+    $conf->data->set(ldflags =>  $ldflags);
 
-    $libs = Parrot::Configure::Data->get('libs');
+    $libs = $conf->data->get('libs');
     $libs=join ' ',
 	grep { $^O=~/VMS|MSWin/ || !/^-l(c|gdbm(_compat)?|dbm|ndbm|db)$/ }
 	    split(' ', $libs);
     $libs = integrate($libs, $args{libs});
     $libs = prompt("What libraries should your C compiler use?", $libs) if $args{ask};
-    Parrot::Configure::Data->set(libs =>  $libs);
+    $conf->data->set(libs =>  $libs);
 
-    $cxx = integrate(Parrot::Configure::Data->get('cxx'), $args{cxx});
+    $cxx = integrate($conf->data->get('cxx'), $args{cxx});
     $cxx = prompt("What C++ compiler do you want to use?", $cxx) if $args{ask};
-    Parrot::Configure::Data->set(cxx =>  $cxx);
+    $conf->data->set(cxx =>  $cxx);
 
     my $debug='n';
     $debug='y'  if $args{debugging};
     $debug = prompt("Do you want a debugging build of Parrot?", $debug) if $args{ask};
 
   if(!$debug || $debug =~ /n/i) {
-    Parrot::Configure::Data->set(
+    $conf->data->set(
       cc_debug => '',
       link_debug => '',
       ld_debug => ''
@@ -122,8 +122,8 @@ END
   }
 
   # This one isn't prompted for above.  I don't know why.
-  $ccwarn = integrate(Parrot::Configure::Data->get('ccwarn'), $args{ccwarn});
-  Parrot::Configure::Data->set(ccwarn => $ccwarn);
+  $ccwarn = integrate($conf->data->get('ccwarn'), $args{ccwarn});
+  $conf->data->set(ccwarn => $ccwarn);
 }
 
 1;

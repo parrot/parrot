@@ -11,9 +11,11 @@ Adds -fPIC to x86_64 (AMD64) ccflags, if necessary.
 use strict;
 
 sub run_cpu {
-    my $ccflags=Parrot::Configure::Data->get('ccflags');
+    my ($conf, $verbose) = @_;
+
+    my $ccflags=$conf->data->get('ccflags');
     $ccflags .= " -fPIC" unless $ccflags =~ /-fPIC/;
-    Parrot::Configure::Data->set(ccflags => $ccflags);
+    $conf->data->set(ccflags => $ccflags);
 }
 
 1;

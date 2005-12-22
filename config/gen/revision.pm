@@ -24,11 +24,12 @@ use Parrot::Revision;
 $description = "Determining Parrot's revision";
 
 sub runstep {
-    my $self = shift;
+    my ($self, $conf) = @_;
+
     my $revision = $Parrot::Revision::current;
     my $entries  = $Parrot::Revision::svn_entries;
 
-    Parrot::Configure::Data->set(
+    $conf->data->set(
 	revision => $revision,
 	SVN_ENTRIES => $entries
     );

@@ -35,12 +35,39 @@ sub new {
     my $class = shift;
 
     my $self = {
-        steps => [],
+        steps   => [],
+        data    => Parrot::Configure::Data->new,
+        options => Parrot::Configure::Data->new,
     };
 
     bless $self, ref $class || $class;
 
     return $self;
+}
+
+=item C<data()>
+
+Returns the L<Parrot::Configure::Data> object used to contain configuration
+data.
+
+=cut
+
+sub data {
+    my $self = shift;
+
+    return $self->{data};
+}
+
+=item C<options()>
+
+Returns the L<Parrot::Configure::Data> object used to contain CLI option data.
+
+=cut
+
+sub options {
+    my $self = shift;
+
+    return $self->{options};
 }
 
 =item C<steps()>
@@ -108,14 +135,14 @@ sub runsteps {
         }
 
         # cc_build uses this verbose setting
-        Parrot::Configure::Data->set('verbose' => $args{verbose}) if $n > 2;
+        $self->data->set('verbose' => $args{verbose}) if $n > 2;
 
         print "\n" if $args{verbose} && $args{verbose} == 2;
 
         if (defined $step->args) {
-            $step->runstep(@args{$step->args});
+            $step->runstep($self, @args{$step->args});
         } else {
-            $step->runstep();
+            $step->runstep($self);
         }
 
         my $result = $step->result || 'done';

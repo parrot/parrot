@@ -28,7 +28,8 @@ $description = "Determining whether GNU bc is installed...";
 @args = qw(verbose);
 
 sub runstep {
-    my $self = shift;
+    my ($self, $conf) = (shift, shift);
+
     my $has_gnu_bc;
     my $osname =  $Config{osname};
 
@@ -50,7 +51,7 @@ sub runstep {
       $has_gnu_bc = 0;
     }
 
-    Parrot::Configure::Data->set(has_gnu_bc => $has_gnu_bc);
+    $conf->data->set(has_gnu_bc => $has_gnu_bc);
     $result = $has_gnu_bc ? 'yes' : 'no';
 }
 

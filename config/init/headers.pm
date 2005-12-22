@@ -26,21 +26,21 @@ $description="Determining nongenerated header files...";
 @args=();
 
 sub runstep {
-    my $self = shift;
+    my ($self, $conf) = @_;
     my $inc = 'include/parrot';
 
     my @headers=(
-	sort
-	map  { m{^$inc/(.*\.h)\z} }
-	keys %{maniread()}
+    sort
+    map  { m{^$inc/(.*\.h)\z} }
+    keys %{maniread()}
     );
 
     $_ = "\$(INC_DIR)/$_" for @headers;
     my $TEMP_nongen_headers = join("\\\n	", @headers);
 
-    Parrot::Configure::Data->set(
-	inc            => $inc,
-	TEMP_nongen_headers => $TEMP_nongen_headers,
+    $conf->data->set(
+        inc                 => $inc,
+        TEMP_nongen_headers => $TEMP_nongen_headers,
     );
 }
 

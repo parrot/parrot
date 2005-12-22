@@ -27,13 +27,14 @@ $description = "Determining if your platform supports gdbm...";
 @args = qw(verbose);
 
 sub runstep {
-    my $self = shift;
+    my ($self, $conf) = (shift, shift);
+
     my ($verbose) = @_;
 
-    my $cc        = Parrot::Configure::Data->get('cc');
-    my $libs      = Parrot::Configure::Data->get('libs');
-    my $linkflags = Parrot::Configure::Data->get('linkflags');
-    my $ccflags   = Parrot::Configure::Data->get('ccflags');
+    my $cc        = $conf->data->get('cc');
+    my $libs      = $conf->data->get('libs');
+    my $linkflags = $conf->data->get('linkflags');
+    my $ccflags   = $conf->data->get('ccflags');
     
     my $archname = $Config{archname};
     my ($cpuarch, $osname) = split('-', $archname);
@@ -46,9 +47,9 @@ sub runstep {
     # where Fink lives.
     if($osname =~ /darwin/) {
         if( -f "/sw/include/gdbm.h") {
-            Parrot::Configure::Data->add(' ', linkflags  => '-L/sw/lib');
-            Parrot::Configure::Data->add(' ', dflags    => '-L/sw/lib');
-            Parrot::Configure::Data->add(' ', cflags    => '-I/sw/include');
+            $conf->data->add(' ', linkflags  => '-L/sw/lib');
+            $conf->data->add(' ', dflags    => '-L/sw/lib');
+            $conf->data->add(' ', cflags    => '-I/sw/include');
         }
     }
 
@@ -74,11 +75,11 @@ sub runstep {
     }
     unless ($has_gdbm) {
         # The Config::Data settings might have changed for the test 
-        Parrot::Configure::Data->set( libs      => $libs );
-        Parrot::Configure::Data->set( ccflags   => $ccflags );
-        Parrot::Configure::Data->set( linkflags => $linkflags );
+        $conf->data->set( libs      => $libs );
+        $conf->data->set( ccflags   => $ccflags );
+        $conf->data->set( linkflags => $linkflags );
         print " (no) " if $verbose;
         $result = 'no';
     }
-    Parrot::Configure::Data->set( has_gdbm => $has_gdbm ); # for gdbmhash.t and dynclasses.in
+    $conf->data->set( has_gdbm => $has_gdbm ); # for gdbmhash.t and dynclasses.in
 }

@@ -25,7 +25,7 @@ $description = 'Determining what opcode files should be compiled in...';
 @args=qw(ask ops);
 
 sub runstep {
-    my $self = shift;
+    my ($self, $conf) = (shift, shift);
   my @ops=(
     sort {
       if($a =~ /core\.ops/) { return -1 }
@@ -60,7 +60,7 @@ END
     }
   }
 
-  Parrot::Configure::Data->set(
+  $conf->data->set(
     ops => $ops
   );
 }

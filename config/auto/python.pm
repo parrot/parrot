@@ -30,7 +30,8 @@ $description = "Determining whether python is installed...";
 @args = qw(verbose);
 
 sub runstep {
-    my $self = shift;
+    my ($self, $conf) = (shift, shift);
+
     my ( $out, $err ) = capture_output( 'python', '-V' );
     my $output = join( '', $out || '', $err || '' );
     my ($python, $major, $minor, $revision) = 
@@ -38,7 +39,7 @@ sub runstep {
     $revision = 0 unless defined $revision;
     my $has_python = $python ? 1 : 0;
 
-    Parrot::Configure::Data->set(has_python => $has_python);
+    $conf->data->set(has_python => $has_python);
 
     my $has_python_2_4 = 0;
     if ( $has_python ) {
@@ -48,7 +49,7 @@ sub runstep {
     } else {
         $result = 'no';
     }
-    Parrot::Configure::Data->set(has_python_2_4 => $has_python_2_4);
+    $conf->data->set(has_python_2_4 => $has_python_2_4);
 }
 
 1;

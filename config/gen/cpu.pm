@@ -26,16 +26,18 @@ $description="Running CPU specific stuff...";
 @args=qw(miniparrot verbose);
 
 sub runstep {
-    my $self = shift;
+    my ($self, $conf) = (shift, shift);
+
   my ($miniparrot, $verbose) = @_;
   return if $miniparrot;
 
-  my $cpu = Parrot::Configure::Data->get('cpuarch');
+  my $cpu = $conf->data->get('cpuarch');
   print "\t(cpu = '$cpu') " if $verbose;
   my $f;
   if (-d "config/gen/cpu/$cpu" && -e ($f = "config/gen/cpu/$cpu/auto.pm")) {
     require $f;
-    &run_cpu($verbose);
+    # XXX change this to work like init::hints
+    &run_cpu($conf, $verbose);
   }
 }
 

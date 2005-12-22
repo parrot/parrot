@@ -25,10 +25,10 @@ $description = "Determining some sizes...";
 @args=qw(miniparrot);
 
 sub runstep {
-    my $self = shift;
+    my ($self, $conf) = (shift, shift);
 
     if (defined $_[0]) {
-        Parrot::Configure::Data->set(
+        $conf->data->set(
           doublesize       => 8,
           numvalsize       => 8,
           nvsize           => 8,
@@ -58,7 +58,7 @@ sub runstep {
   cc_clean();
 
   for(keys %results) {
-    Parrot::Configure::Data->set($_ => $results{$_});
+    $conf->data->set($_ => $results{$_});
   }
 
   if($results{ptrsize} != $results{intvalsize}) {
@@ -71,10 +71,10 @@ END
 
   # set fixed sized types
   if ($results{shortsize} == 2) {
-    Parrot::Configure::Data->set(int2_t => 'short');
+    $conf->data->set(int2_t => 'short');
   }
   else {
-    Parrot::Configure::Data->set(int2_t => 'int');
+    $conf->data->set(int2_t => 'int');
     print <<'END';
 
 Can't find a int type with size 2, conversion ops might fail!
@@ -82,16 +82,16 @@ Can't find a int type with size 2, conversion ops might fail!
 END
   }
   if ($results{shortsize} == 4) {
-    Parrot::Configure::Data->set(int4_t => 'short');
+    $conf->data->set(int4_t => 'short');
   }
   elsif ($results{intsize} == 4) {
-    Parrot::Configure::Data->set(int4_t => 'int');
+    $conf->data->set(int4_t => 'int');
   }
   elsif ($results{longsize} == 4) {
-    Parrot::Configure::Data->set(int4_t => 'long');
+    $conf->data->set(int4_t => 'long');
   }
   else {
-    Parrot::Configure::Data->set(int4_t => 'int');
+    $conf->data->set(int4_t => 'int');
     print <<'END';
 
 Can't find a int type with size 4, conversion ops might fail!
@@ -100,10 +100,10 @@ END
   }
 
   if ($results{floatsize} == 4) {
-    Parrot::Configure::Data->set(float4_t => 'float');
+    $conf->data->set(float4_t => 'float');
   }
   else {
-    Parrot::Configure::Data->set(float4_t => 'double');
+    $conf->data->set(float4_t => 'double');
     print <<'END';
 
 Can't find a float type with size 4, conversion ops might fail!
@@ -111,10 +111,10 @@ Can't find a float type with size 4, conversion ops might fail!
 END
   }
   if ($results{doublesize} == 8) {
-    Parrot::Configure::Data->set(float8_t => 'double');
+    $conf->data->set(float8_t => 'double');
   }
   else {
-    Parrot::Configure::Data->set(float8_t => 'double');
+    $conf->data->set(float8_t => 'double');
     print <<'END';
 
 Can't find a float type with size 8, conversion ops might fail!
@@ -123,12 +123,12 @@ END
   }
 
   my %hugeintval;
-  my $intval     = Parrot::Configure::Data->get('iv');
-  my $intvalsize = Parrot::Configure::Data->get('intvalsize');
+  my $intval     = $conf->data->get('iv');
+  my $intvalsize = $conf->data->get('intvalsize');
   # Get HUGEINTVAL, note that we prefer standard types
   foreach my $type ('long', 'int', 'long long', '__int64') {
 
-    Parrot::Configure::Data->set(int8_t => $type);
+    $conf->data->set(int8_t => $type);
     eval {
       cc_gen('config/auto/sizes/test2_c.in');
       cc_build();
@@ -137,20 +137,20 @@ END
 
     # clear int8_t on error
     if($@ || !exists $hugeintval{hugeintval}) {
-      Parrot::Configure::Data->set(int8_t => undef);
+      $conf->data->set(int8_t => undef);
       next;
     }
 
     if ($hugeintval{hugeintvalsize} > $intvalsize) {
         # We found something bigger than intval.
-        Parrot::Configure::Data->set(%hugeintval);
+        $conf->data->set(%hugeintval);
         last;
     }
   }
   if (!defined($hugeintval{hugeintvalsize}) ||
       $hugeintval{hugeintvalsize} == $intvalsize) {
       # Could not find anything bigger than intval. 
-      Parrot::Configure::Data->set(
+      $conf->data->set(
           hugeintval     => $intval,
           hugeintvalsize => $intvalsize,
       );
@@ -175,15 +175,15 @@ END
     cc_build();
     cc_run();
   }) {
-    Parrot::Configure::Data->set(
+    $conf->data->set(
         hugefloatval      => 'long double',
         hugefloatvalsize  => $size
     );
   }
   else {
-    Parrot::Configure::Data->set(
+    $conf->data->set(
         hugefloatval      => 'double',
-        hugefloatvalsize  => Parrot::Configure::Data->get('doublesize')
+        hugefloatvalsize  => $conf->data->get('doublesize')
     );
   }
 
