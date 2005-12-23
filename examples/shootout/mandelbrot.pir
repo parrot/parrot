@@ -83,8 +83,8 @@ IREDO:
 	Zr = Tr
 	Zi = Ti
 #	if (Zr*Zr+Zi*Zi > limit*limit) break;
-#	$N1 = Zr * Zr
-#	$N2 = Zi * Zi
+	$N1 = Zr * Zr
+	$N2 = Zi * Zi
         $N1 += $N2
         if $N1 > limit goto IBRK
 	inc i
