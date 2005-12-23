@@ -30,8 +30,9 @@ $description="Tweaking settings for miniparrot...";
 @args=qw(miniparrot);
 
 sub runstep {
-    my ($self, $conf) = (shift, shift);
-    return unless $_[0];
+    my ($self, $conf) = @_;
+
+    return unless $conf->options->get('miniparrot');
 
     $conf->data->set(
         miniparrot         => 1,

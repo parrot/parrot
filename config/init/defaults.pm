@@ -28,17 +28,20 @@ $description="Setting up Configure's default values...";
 @args=('debugging', 'optimize', 'profile', 'verbose', 'prefix');
 
 sub runstep {
-    my ($self, $conf) = (shift, shift);
-    my ($debugging, $optimize, $profile,  $verbose, $prefix) = @_;
+    my ($self, $conf) = @_;
 
     # We need a Glossary somewhere!
     $conf->data->set(
-        debugging     => $debugging ? 1 : 0,
+        debugging     => $conf->options->get('debugging') ? 1 : 0,
         # A plain --optimize means use perl5's $Config{optimize}.  If an
         # argument is given, however, use that instead.  This logic really
         # belongs in the optimize unit.
-        optimize      => $optimize ? ($optimize eq "1" ? ($Config{optimize} || "1") : $optimize) : '',
-        verbose       => $verbose,
+        optimize        => $conf->options->get('optimize')
+                        ? ($conf->options->get('optimize') eq "1"
+                            ? ($Config{optimize} || "1")
+                            : $conf->options->get('optimize'))
+                        : '',
+        verbose       => $conf->options->get('verbose'),
 
         build_dir     => $FindBin::Bin,
 
@@ -166,6 +169,7 @@ sub runstep {
 
     );
 
+    my $prefix = $conf->options->get('prefix');
     unless (defined $prefix) {
         my $VERSION   = $conf->data->get('VERSION'); 
         my $DEVEL     = $conf->data->get('DEVEL');
@@ -177,7 +181,7 @@ sub runstep {
     # FIXME gcc syntax
     # we should have this in the hints files e.g. cc_profile
     # FIXME move profiling to it's own step 
-    if ($profile) {
+    if ($conf->options->get('profile')) {
         $conf->data->set(
             cc_debug => " -pg ",
             ld_debug => " -pg ",

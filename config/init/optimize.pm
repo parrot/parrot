@@ -27,21 +27,13 @@ $description="Enabling optimization...";
 @args=qw(verbose optimize);
 
 sub runstep {
-    my ($self, $conf) = (shift, shift);
+    my ($self, $conf) = @_;
 
-  my ($verbose, $optimize) = @_;
-  if ($conf->data->get('optimize')) {
-    my($ccflags, $optimize) =
-      $conf->data->get(qw(ccflags optimize));
-    $ccflags .= " $optimize -DDISABLE_GC_DEBUG=1 -DNDEBUG";
-
-    $conf->data->set(
-                         ccflags => $ccflags,
-                        );
-  }
-  else {
-    print "(none requested) " if $verbose;
-  }
+    if ($conf->data->get('optimize')) {
+        $conf->data->add(' ', ccflags => "-DDISABLE_GC_DEBUG=1 -DNDEBUG");
+    } else {
+        print "(none requested) " if $conf->options->get('verbose');
+    }
 }
 
 1;

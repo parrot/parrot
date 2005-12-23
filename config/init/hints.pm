@@ -26,12 +26,9 @@ $description="Loading platform and local hints files...";
 @args = qw( cc verbose define );
 
 sub runstep {
-    my ($self, $conf) = (shift, shift);
+    my ($self, $conf) = @_;
 
-    my %args;
-    @args{@args} = @_;
-
-    my $verbose = $args{verbose};
+    my $verbose = $conf->options->get('verbose');
 
     my $hints_used = 0;
 

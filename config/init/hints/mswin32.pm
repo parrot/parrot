@@ -6,17 +6,14 @@ package init::hints::mswin32;
 use strict;
 
 sub runstep {
-    my $shelf = shift;
+    my ($self, $conf) = @_;
 
-    my %args;
-    @args{qw(cc)}=@_;
-
-    my($cc, $ccflags, $libs)=$conf->data->get(qw(cc ccflags libs));
+   my($cc, $ccflags, $libs) = $conf->data->get(qw(cc ccflags libs));
 
     # Later in the Parrot::Configure::RunSteps->runsteps process,
     # inter/progs.pl will merge the command-line overrides with the defaults.
     # We do one bit of its work early here, because we need the result now.
-    $cc = $args{cc} if defined $args{cc};
+    $cc = $conf->options->get('cc') if defined $conf->options->get('cc');
 
     my $is_msvc  = grep { $cc eq $_ } ( qw(cl cl.exe) );
     my $is_intel = grep { $cc eq $_ } ( qw(icl icl.exe) );

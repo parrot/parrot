@@ -441,12 +441,13 @@ my @steps = qw(
 );
 
 my $conf = Parrot::Configure->new;
-# XXX $Parrot::Configure::Step::conf is a temporty hack
 {
+    # XXX $Parrot::Configure::Step::conf is a temporty hack
     no warnings qw(once);
-$Parrot::Configure::Step::conf = $conf;
+    $Parrot::Configure::Step::conf = $conf;
 }
 $conf->add_steps(@steps);
+$conf->options->set(%args);
 # Run the actual steps
 $conf->runsteps(%args);
 
