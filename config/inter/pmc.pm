@@ -89,7 +89,7 @@ sub sort_pmcs {
 }
 
 sub runstep {
-    my ($self, $conf) = (shift, shift);
+    my ($self, $conf) = @_;
 
   my @pmc=(
     sort
@@ -99,9 +99,10 @@ sub runstep {
 
   @pmc = sort_pmcs(@pmc);
 
-  my $pmc_list = $_[1] || join(' ', grep {defined $_} @pmc);
+  my $pmc_list = $conf->options->get('pmc')
+      || join(' ', grep {defined $_} @pmc);
 
-  if($_[0]) {
+  if ($conf->options->get('ask')) {
   print <<"END";
 
 

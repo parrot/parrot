@@ -25,16 +25,18 @@ $description = 'Determining what charset files should be compiled in...';
 @args=qw(ask charset);
 
 sub runstep {
-    my ($self, $conf) = (shift, shift);
+    my ($self, $conf) = @_;
+
   my @charset=(
     sort
     map  { m{\./src/charset/(.*)} }
     glob "./src/charset/*.c"
   );
 
-  my $charset_list = $_[1] || join(' ', grep {defined $_} @charset);
+  my $charset_list = $conf->options->get('charset')
+      || join(' ', grep {defined $_} @charset);
 
-  if($_[0]) {
+  if ($conf->options->get('ask')) {
   print <<"END";
 
 

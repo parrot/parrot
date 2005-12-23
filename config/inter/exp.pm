@@ -25,21 +25,21 @@ $description="Setting up experimental systems...";
 @args=qw(ask expnetwork);
 
 sub runstep {
-    my ($self, $conf) = (shift, shift);
-  my $net=$_[1] || 'n';
+    my ($self, $conf) = @_;
 
-  if($_[0]) {
-    $net=prompt("\n\nEnable experimental networking?", $net) if $_[0];
-  }
+    my $net = $conf->options->get('expnetwork') || 'n';
 
-  if($net =~ /n/i || !$net) {
-    $net=0;
-  }
-  else {
-    $net=1;
-  }
+    if ($conf->options->get('ask')) {
+        $net = prompt("\n\nEnable experimental networking?", $net);
+    }
+
+    if ($net =~ /n/i || !$net) {
+        $net = 0;
+    } else {
+        $net = 1;
+    }
   
-  $conf->data->set(expnetworking => $net);
+    $conf->data->set(expnetworking => $net);
 }
 
 1;

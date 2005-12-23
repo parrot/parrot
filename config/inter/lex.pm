@@ -27,14 +27,12 @@ $prompt         = "Do you have a lexical analyzer generator like flex or lex?";
 @args           = qw( lex ask maintainer );
 
 sub runstep {
-    my ($self, $conf) = (shift, shift);
-    my %args;
-    @args{@args}=@_;
+    my ($self, $conf) = @_;
 
     # undef means we don't have flex... default to not having flex
     $conf->data->set(flex_version => undef);
 
-    unless ($args{maintainer}) {
+    unless ($conf->options->get('maintainer')) {
         $conf->data->set( $util => 'echo' );
         $result = 'skipped';
         return undef;
@@ -43,7 +41,7 @@ sub runstep {
     my $prog;
     # precedence of sources for the program:
     # default -> probe -> environment -> option -> ask
-    $prog ||= $args{$util};
+    $prog ||= $conf->options->get($util);
     $prog ||= $ENV{uc($util)};
 
     # never override the user.  If a non-existent program is specified then
@@ -62,7 +60,7 @@ sub runstep {
         return undef;
     }
 
-    if ($args{ask}) {
+    if ($conf->options->get('ask')) {
         $prog = prompt($prompt, $prog ? $prog : $conf->data->get($util));
     }
 
@@ -70,7 +68,7 @@ sub runstep {
 
     # don't override the user even if the program they provided appears to be
     # broken
-    if ($ret == -1 and ! $args{ask}) {
+    if ($ret == -1 and ! $conf->options->get('ask')) {
         # fall back to default
         $result = 'no';
         return undef;

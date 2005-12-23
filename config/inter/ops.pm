@@ -25,7 +25,8 @@ $description = 'Determining what opcode files should be compiled in...';
 @args=qw(ask ops);
 
 sub runstep {
-    my ($self, $conf) = (shift, shift);
+    my ($self, $conf) = @_;
+
   my @ops=(
     sort {
       if($a =~ /core\.ops/) { return -1 }
@@ -39,11 +40,11 @@ sub runstep {
 
   my $ops=join ' ', grep { !/obscure\.ops/ } @ops;
 
-  $ops=$_[1] if defined $_[1];
+  $ops = $conf->options->get('ops') if defined $conf->options->get('ops');
 
   # ops selection disabled - until we can build and load
   # opcode subset libs
-  if (0 && $_[0]) {
+  if (0 && $conf->options->get('ask')) {
   print <<"END";
 
 

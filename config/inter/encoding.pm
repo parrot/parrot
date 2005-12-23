@@ -25,16 +25,18 @@ $description = 'Determining what encoding files should be compiled in...';
 @args=qw(ask encoding);
 
 sub runstep {
-    my ($self, $conf) = (shift, shift);
+    my ($self, $conf) = @_;
+
   my @encoding=(
     sort
     map  { m{\./src/encodings/(.*)} }
     glob "./src/encodings/*.c"
   );
 
-  my $encoding_list = $_[1] || join(' ', grep {defined $_} @encoding);
+  my $encoding_list = $conf->options->get('encoding')
+      || join(' ', grep {defined $_} @encoding);
 
-  if($_[0]) {
+  if($conf->options->get('ask')) {
   print <<"END";
 
 
