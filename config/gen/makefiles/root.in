@@ -89,8 +89,7 @@ CP         = $(PERL) -MExtUtils::Command -e cp
 TOUCH      = $(PERL) -MExtUtils::Command -e touch
 YACC       = ${yacc}
 LEX        = ${lex}
-# do not die when dir already exits
-MKDIR      = $(PERL) -e ${PQ}-d or mkdir $$_,0777 or die foreach @ARGV${PQ}
+MKDIR      = ${mkdir}
 CC         = ${cc}
 CC_INC     = ${cc_inc}
 C_LIBS     = ${libs}

@@ -127,6 +127,7 @@ sub runstep {
         test_prog     => 'parrot',
         rm_f          => '$(PERL) -MExtUtils::Command -e rm_f',
         rm_rf         => '$(PERL) -MExtUtils::Command -e rm_rf',
+        mkdir         => '$(PERL) -MExtUtils::Command -e mkpath',
         ar            => $Config{ar},
         ar_flags      => 'cr',
         ar_out        => '',                  # for Win32
