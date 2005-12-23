@@ -722,7 +722,7 @@ parrot_pass_args(Interp *interpreter,  parrot_context_t *src_ctx,
         int i;
         /* allow for optionals. */
         for (i = 0; i < st.dest.n; i++) {
-            if (st.dest.sig & PARROT_ARG_OPTIONAL)
+            if (st.dest.sig & (PARROT_ARG_OPTIONAL|PARROT_ARG_OPT_FLAG))
                 min_expected_args--;
         }
 
