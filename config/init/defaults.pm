@@ -128,6 +128,7 @@ sub runstep {
         rm_f          => '$(PERL) -MExtUtils::Command -e rm_f',
         rm_rf         => '$(PERL) -MExtUtils::Command -e rm_rf',
         mkdir         => '$(PERL) -MExtUtils::Command -e mkpath',
+        touch         => '$(PERL) -MExtUtils::Command -e touch',
         ar            => $Config{ar},
         ar_flags      => 'cr',
         ar_out        => '',                  # for Win32
