@@ -30,8 +30,10 @@ sub runstep {
     my ($self, $conf) = @_;
 
     if ($conf->data->get('optimize')) {
+        $result = 'yes';
         $conf->data->add(' ', ccflags => "-DDISABLE_GC_DEBUG=1 -DNDEBUG");
     } else {
+        $result = 'no';
         print "(none requested) " if $conf->options->get('verbose');
     }
 }
