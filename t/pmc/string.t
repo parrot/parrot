@@ -16,7 +16,7 @@ Tests the C<String> PMC.
 
 =cut
 
-use Parrot::Test tests => 35;
+use Parrot::Test tests => 36;
 use Test::More; # Included for skip().
 
 my $fp_equality_macro = <<'ENDOFMACRO';
@@ -1094,4 +1094,46 @@ output_is( <<'CODE', <<OUTPUT, "set I0, P0 - string_to_int");
   end
 CODE
 12
+OUTPUT
+
+pir_output_is( <<'CODE', <<OUTPUT, 'String."trans"' );
+
+# tr{wsatugcyrkmbdhvnATUGCYRKMBDHVN}
+#            {WSTAACGRYMKVHDBNTAACGRYMKVHDBN};
+
+# create tr table at compile-time
+.sub tr_00_init :immediate
+    .local pmc tr_array
+    tr_array = new .FixedIntegerArray   # Todo char array
+    tr_array = 256                      # Python compat ;)
+    .local string from, to
+    from = 'wsatugcyrkmbdhvnATUGCYRKMBDHVN'
+    to   = 'WSTAACGRYMKVHDBNTAACGRYMKVHDBN'
+    .local int i, ch, r, len
+    len = length from
+    null i
+loop:
+    ch = ord from, i
+    r  = ord to,   i
+    tr_array[ch] = r
+    inc i
+    if i < len goto loop
+    .return(tr_array)
+.end
+
+.sub tr_test :main
+    .local string s, t
+    .local int el
+    s = "atugcsATUGCS"
+    .const .Sub tr_00 = 'tr_00_init'
+    el = elements tr_00
+    print el
+    print "\n"
+    trans s, tr_00
+    print s
+    print "\n"
+.end
+CODE
+256
+TAACGSTAACGS
 OUTPUT

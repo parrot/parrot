@@ -60,6 +60,7 @@ d	JOd      # Parrot builtins
 I       JOS
 d	v
 I	JI	 # Parrot_is_char_*
+v       JOSP     # String.trans
 
 v	JPPP	 # infix MMD
 v	JPIP

@@ -56,7 +56,8 @@ static Builtins builtins[] = {
     { "say", 	"IJS",          "ParrotIO", 	0, 0 },
     { "say", 	"IJOS",         "ParrotIO", 	0, 0 },
     { "say", 	"vJS",          "ParrotIO", 	0, 0 },
-    { "say", 	"vJOS",         "ParrotIO", 	0, 0 }
+    { "say", 	"vJOS",         "ParrotIO", 	0, 0 },
+    { "trans",  "vJSP",         "String",       0, 0 }
 };
 
 /*

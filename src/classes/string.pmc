@@ -764,6 +764,38 @@ Downcase this string
         PObj_custom_mark_SET(ret);
         return ret;
     }
+
+/*
+
+=item C<void trans(STRING* src, PMC* trams_table)>
+
+Translate C<src> with entries from C<trans_table>.
+
+=cut
+
+*/
+
+    METHOD void trans(STRING* src, PMC* table) {
+	INTVAL i, len;
+	unsigned char *p, ch;
+	INTVAL *tr_data;
+
+	len = string_length(interpreter, src);
+	if (!len)
+	    return;
+	if (src->charset != Parrot_ascii_charset_ptr)
+            real_exception(interpreter, NULL, INVALID_ENCODING,
+		    "Can't translate non-ascii"); 
+	p = src->strstart;
+	/* TODO verify trans table */
+	tr_data = PMC_data(table);	/* XXX */
+	for (i = 0; i < len; ++i, ++p) {
+	    ch = *p;
+	    ch = tr_data[ch];
+	    if (ch)
+		*p = ch;
+	}
+    }
 }
 
 /*
