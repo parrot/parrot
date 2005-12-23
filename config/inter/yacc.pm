@@ -41,7 +41,7 @@ sub runstep {
     my $prog;
     # precedence of sources for the program:
     # default -> probe -> environment -> option -> ask
-    $prog ||= $$conf->options->get($util);
+    $prog ||= $conf->options->get($util);
     $prog ||= $ENV{uc($util)};
 
     # never override the user.  If a non-existent program is specified then
