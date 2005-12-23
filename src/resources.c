@@ -20,7 +20,7 @@ src/resources.c - Allocate and deallocate tracked resources
 #include "parrot/parrot.h"
 
 #define RECLAMATION_FACTOR 0.20
-#define WE_WANT_EVER_GROWING_ALLOCATIONS
+#define WE_WANT_EVER_GROWING_ALLOCATIONS 0
 
 typedef void (*compact_f) (Interp *, struct Memory_Pool *);
 static void* aligned_mem(Buffer *buffer, char *mem);
@@ -234,7 +234,7 @@ compact_pool(Interp *interpreter, struct Memory_Pool *pool)
     /* total_size -= pool->guaranteed_reclaimable; */
         
     /* this makes for ever increasing allocations but fewer collect runs */
-#ifdef WE_WANT_EVER_GROWING_ALLOCATIONS
+#if WE_WANT_EVER_GROWING_ALLOCATIONS
     total_size += pool->minimum_block_size;
 #endif
 

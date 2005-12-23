@@ -478,7 +478,7 @@ string_append(Interp *interpreter,
     /* make sure A's big enough for both  */
     if (total_length >= a_capacity)  {
         Parrot_reallocate_string(interpreter, a,
-                total_length + EXTRA_SIZE);
+                total_length << 1);
     }
 
     /* A is now ready to receive the contents of B */
@@ -649,7 +649,8 @@ string_make_direct(Interp *interpreter, const void *buffer,
         void * __ptr;
     } __ptr_u;
 
-    s = new_string_header(interpreter, flags);
+    /* XXX somehow strings can die if the allocation is big */
+    s = new_string_header(interpreter, flags | PObj_live_FLAG);
     s->encoding = encoding;
     s->charset = charset;
 
