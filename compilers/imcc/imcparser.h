@@ -1,7 +1,7 @@
-/* A Bison parser, made by GNU Bison 1.875.  */
+/* A Bison parser, made by GNU Bison 2.0.  */
 
 /* Skeleton parser for Yacc-like parsing with Bison,
-   Copyright (C) 1984, 1989, 1990, 2000, 2001, 2002 Free Software Foundation, Inc.
+   Copyright (C) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -266,8 +266,8 @@ typedef union YYSTYPE {
     SymReg * sr;
     Instruction *i;
 } YYSTYPE;
-/* Line 1249 of yacc.c.  */
-#line 270 "compilers/imcc/imcparser.h"
+/* Line 1318 of yacc.c.  */
+#line 271 "compilers/imcc/imcparser.h"
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
 # define YYSTYPE_IS_TRIVIAL 1

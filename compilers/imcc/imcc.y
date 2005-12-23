@@ -939,14 +939,20 @@ assignment:
    | target '=' '!' var	{ $$ = MK_I(interp, cur_unit, "not", 2, $1, $4);}
    | target '=' '-' var	{ $$ = MK_I(interp, cur_unit, "neg", 2, $1, $4);}
    | target '=' '~' var	{ $$ = MK_I(interp, cur_unit, "bnot", 2, $1, $4);}
-   | target '=' var '+' var	{ $$ = MK_I(interp, cur_unit, "add", 3, $1, $3, $5); }
-   | target '=' var '-' var	{ $$ = MK_I(interp, cur_unit, "sub", 3, $1, $3, $5); }
-   | target '=' var '*' var	{ $$ = MK_I(interp, cur_unit, "mul", 3, $1, $3, $5); }
-   | target '=' var POW var	{ $$ = MK_I(interp, cur_unit, "pow", 3, $1, $3, $5); }
-   | target '=' var '/' var	{ $$ = MK_I(interp, cur_unit, "div", 3, $1, $3, $5); }
+   | target '=' var '+' var	{ $$ = MK_I(interp, cur_unit, "add", 3, $1, $3, $5);  }
+   | target '=' var '-' var	{ $$ = MK_I(interp, cur_unit, "sub", 3, $1, $3, $5);  }
+   | target '=' var '*' var	{ $$ = MK_I(interp, cur_unit, "mul", 3, $1, $3, $5);  }
+   | target '=' var POW var	{ $$ = MK_I(interp, cur_unit, "pow", 3, $1, $3, $5);  }
+   | target '=' var '/' var	{ $$ = MK_I(interp, cur_unit, "div", 3, $1, $3, $5);  }
    | target '=' var FDIV var	{ $$ = MK_I(interp, cur_unit, "fdiv", 3, $1, $3, $5); }
-   | target '=' var '%' var	{ $$ = MK_I(interp, cur_unit, "mod", 3, $1, $3, $5); }
+   | target '=' var '%' var	{ $$ = MK_I(interp, cur_unit, "mod", 3, $1, $3, $5);  }
    | target '=' var CONCAT var	{ $$ = MK_I(interp, cur_unit, "concat", 3, $1,$3,$5); }
+   | target '=' var RELOP_EQ var    { $$ = MK_I(interp, cur_unit, "iseq", 3, $1, $3, $5); }
+   | target '=' var RELOP_NE var    { $$ = MK_I(interp, cur_unit, "isne", 3, $1, $3, $5); }
+   | target '=' var RELOP_GT var    { $$ = MK_I(interp, cur_unit, "isgt", 3, $1, $3, $5); }
+   | target '=' var RELOP_LT var    { $$ = MK_I(interp, cur_unit, "islt", 3, $1, $3, $5); }
+   | target '=' var RELOP_LTE var   { $$ = MK_I(interp, cur_unit, "isle", 3, $1, $3, $5); }
+   | target '=' var RELOP_GTE var   { $$ = MK_I(interp, cur_unit, "isge", 3, $1, $3, $5); }
    | target '=' var SHIFT_LEFT var
                         { $$ = MK_I(interp, cur_unit, "shl", 3, $1, $3, $5); }
    | target '=' var SHIFT_RIGHT var

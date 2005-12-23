@@ -26,8 +26,7 @@ D: Building on various platforms.
 
 N: Alberto Manuel Brandao Simoes
 E: ambs@cpan.org
-D: reported a problem with File::Spec in Parrot::IO::Directory and provided a
-partial patch to fix it.
+D: Some random patches
 
 N: Aldo Calpini
 D: Debugging tutorial

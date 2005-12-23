@@ -3,7 +3,7 @@
 # $Id$
 
 use strict;
-use Parrot::Test tests => 25;
+use Parrot::Test tests => 31;
 
 ##############################
 pir_output_is(<<'CODE', <<'OUT', "+=");
@@ -318,4 +318,107 @@ BLAH:
 .end
 CODE
 PASS
+OUT
+
+
+pir_output_is(<<'CODE', <<'OUT', 'X = A == B');
+.sub main :main
+    $I0 = 1 == 1
+    print $I0
+    print "\n"
+
+    $I0 = 1 == 0
+    print $I0
+    print "\n"
+.end
+CODE
+1
+0
+OUT
+
+pir_output_is(<<'CODE', <<'OUT', 'X = A < B');
+.sub main :main
+    $I0 = 1 < 1
+    print $I0
+    print "\n"
+
+    $I0 = 0 < 1
+    print $I0
+    print "\n"
+.end
+CODE
+0
+1
+OUT
+
+pir_output_is(<<'CODE', <<'OUT', 'X = A > B');
+.sub main :main
+    $I0 = 1 > 1
+    print $I0
+    print "\n"
+
+    $I0 = 4 > 1
+    print $I0
+    print "\n"
+.end
+CODE
+0
+1
+OUT
+
+pir_output_is(<<'CODE', <<'OUT', 'X = A >= B');
+.sub main :main
+    $I0 = 1 >= 1
+    print $I0
+    print "\n"
+
+    $I0 = 4 >= 1
+    print $I0
+    print "\n"
+
+    $I0 = 0 >= 1
+    print $I0
+    print "\n"
+.end
+CODE
+1
+1
+0
+OUT
+
+
+pir_output_is(<<'CODE', <<'OUT', 'X = A <= B');
+.sub main :main
+    $I0 = 1 <= 1
+    print $I0
+    print "\n"
+
+    $I0 = 4 <= 1
+    print $I0
+    print "\n"
+
+    $I0 = 0 <= 1
+    print $I0
+    print "\n"
+.end
+CODE
+1
+0
+1
+OUT
+
+
+pir_output_is(<<'CODE', <<'OUT', 'X = A != B');
+.sub main :main
+    $I0 = 1 != 1
+    print $I0
+    print "\n"
+
+    $I0 = 4 != 1
+    print $I0
+    print "\n"
+.end
+CODE
+0
+1
 OUT
