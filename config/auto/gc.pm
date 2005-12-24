@@ -49,9 +49,9 @@ $description="Determining what allocator to use...";
 @args=qw(gc verbose);
 
 sub runstep {
-    my ($self, $conf) = (shift, shift);
+    my ($self, $conf) = @_; 
 
-  my ($gc, $verbose) = @_;
+    my $gc = $conf->options->get('gc');
 
   if (!defined($gc)) {
     # default is GC in resources.c
@@ -113,7 +113,7 @@ EOF
       gc_flag  => '',
     );
   }
-  print(" ($gc) ") if $verbose;
+  print(" ($gc) ") if $conf->options->get('verbose');
 }
 
 1;

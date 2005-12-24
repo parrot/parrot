@@ -29,7 +29,7 @@ $description = "Determining if your platform supports gdbm...";
 sub runstep {
     my ($self, $conf) = (shift, shift);
 
-    my ($verbose) = @_;
+    my $verbose = $conf->options->get('verbose');
 
     my $cc        = $conf->data->get('cc');
     my $libs      = $conf->data->get('libs');

@@ -25,11 +25,11 @@ $description="Determining if your C library supports memalign...";
 @args=qw(miniparrot verbose);
 
 sub runstep {
-    my ($self, $conf) = (shift, shift);
+    my ($self, $conf) = @_;
 
-    my ($miniparrot, $verbose) = @_;
+    my $verbose = $conf->options->get('verbose');
 
-    if ($miniparrot) {
+    if ($conf->options->get('miniparrot')) {
         $conf->data->set(memalign => '');
 	print "(skipped) " if $verbose;
 	return;

@@ -25,10 +25,10 @@ $description="Determining if your compiler supports inline...";
 @args=qw(inline verbose);
 
 sub runstep {
-    my ($self, $conf) = (shift, shift);
+    my ($self, $conf) = @_;
 
     my $test;
-    my ($inline, $verbose) = @_;
+    my ($inline, $verbose) = $conf->options->get(qw(inline verbose));
 
     if (defined $inline) {
 	$test = $inline;

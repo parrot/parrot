@@ -25,7 +25,7 @@ $description = "Figuring out what formats should be used for sprintf...";
 @args=();
 
 sub runstep {
-    my ($self, $conf) = (shift, shift);
+    my ($self, $conf) = @_;
 
   my($ivformat, $nvformat, $nvsize);
   my($iv, $nv, $floatsize, $doublesize, $ldsize)=$conf->data->get(

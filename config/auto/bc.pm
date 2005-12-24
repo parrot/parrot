@@ -25,10 +25,10 @@ use Parrot::Configure::Step ':auto', 'capture_output';
 
 $description = "Determining whether GNU bc is installed...";
 
-@args = qw(verbose);
+@args = qw();
 
 sub runstep {
-    my ($self, $conf) = (shift, shift);
+    my ($self, $conf) = @_;
 
     my $has_gnu_bc;
     my $osname =  $Config{osname};

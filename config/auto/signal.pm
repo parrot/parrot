@@ -25,16 +25,17 @@ $description = "Determining some signal stuff...";
 @args=qw(miniparrot verbose);
 
 sub runstep {
-    my ($self, $conf) = (shift, shift);
+    my ($self, $conf) = @_;
 
-    my ($miniparrot, $verbose) = @_;
+    my $verbose = $conf->options->get('verbose');
+
     $conf->data->set(
 	has___sighandler_t => undef,
 	has_sigatomic_t  => undef,
 	has_sigaction    => undef,
 	has_setitimer    => undef
     );
-    if (defined $miniparrot) {
+    if (defined $conf->options->get('miniparrot')) {
 	return;
     }
 

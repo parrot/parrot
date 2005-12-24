@@ -27,10 +27,10 @@ use Parrot::Configure::Step ':auto';
 
 $description = "Determining whether python is installed...";
 
-@args = qw(verbose);
+@args = qw();
 
 sub runstep {
-    my ($self, $conf) = (shift, shift);
+    my ($self, $conf) = @_;
 
     my ( $out, $err ) = capture_output( 'python', '-V' );
     my $output = join( '', $out || '', $err || '' );

@@ -25,9 +25,8 @@ $description = "Testing snprintf ...";
 @args = qw(verbose);
 
 sub runstep {
-    my ($self, $conf) = (shift, shift);
+    my ($self, $conf) = @_;
 
-  my ($verbose) = @_;
   cc_gen('config/auto/snprintf/test.in');
   cc_build();
   my $res = cc_run() or die "Can't run the snprintf testing program: $!";
@@ -48,7 +47,7 @@ sub runstep {
       HAS_OLD_SNPRINTF => 1,
     );
   }
-  print " ($res) " if $verbose;
+  print " ($res) " if $conf->options->get('verbose');
 }
 
 1;

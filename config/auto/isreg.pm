@@ -25,7 +25,7 @@ $description="Determining if your C library has a working S_ISREG...";
 @args=qw(verbose);
 
 sub runstep {
-    my ($self, $conf) = (shift, shift);
+    my ($self, $conf) = @_;
 
     my $test = 0;
 
@@ -39,7 +39,7 @@ sub runstep {
     $conf->data->set(
 	isreg  => $test
     );
-    print($test ? " (Yep) " : " (no) ") if $_[0];
+    print($test ? " (Yep) " : " (no) ") if $conf->options->get('verbose');
     $result = $test ? 'yes' : 'no';
 }
 

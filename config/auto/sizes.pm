@@ -25,9 +25,9 @@ $description = "Determining some sizes...";
 @args=qw(miniparrot);
 
 sub runstep {
-    my ($self, $conf) = (shift, shift);
+    my ($self, $conf) = @_;
 
-    if (defined $_[0]) {
+    if (defined $conf->options->get('miniparrot')) {
         $conf->data->set(
           doublesize       => 8,
           numvalsize       => 8,

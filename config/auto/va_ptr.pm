@@ -22,10 +22,10 @@ use Parrot::Configure::Step ':auto';
 
 $description="Test the type of va_ptr (this test is likely to segfault)...";
 
-@args=qw(verbose);
+@args=qw();
 
 sub runstep {
-    my ($self, $conf) = (shift, shift);
+    my ($self, $conf) = @_;
 
     my $va_type;
     cc_gen('config/auto/va_ptr/test_c.in');

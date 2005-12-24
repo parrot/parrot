@@ -26,11 +26,9 @@ $description="Probing for C headers...";
 @args=qw(miniparrot verbose);
 
 sub runstep {
-    my ($self, $conf) = (shift, shift);
+    my ($self, $conf) = @_;
 
-    my ($miniparrot, $verbose) = @_;
-
-    return if $miniparrot;
+    return if $conf->options->get('miniparrot');
     
     # perl5's Configure system doesn't call this by its full name, which may
     # confuse use later, particularly once we break free and start doing all
@@ -94,7 +92,7 @@ sub runstep {
 
         my $flag = "i_$header";
         $flag =~ s/\.h$//g; $flag =~ s/\///g;
-	print "$flag: $pass\n" if defined $verbose;
+	print "$flag: $pass\n" if defined $conf->options->get('verbose');
 	$conf->data->set($flag => $pass ? 'define' : undef);
     }
 

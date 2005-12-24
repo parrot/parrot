@@ -26,7 +26,7 @@ $description="Figuring out how to pack() Parrot's types...";
 @args=();
 
 sub runstep {
-    my ($self, $conf) = (shift, shift);
+    my ($self, $conf) = @_;
 
   #
   # Alas perl5.7.2 doesn't have an INTVAL flag for pack().

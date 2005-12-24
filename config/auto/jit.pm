@@ -27,10 +27,11 @@ $description = "Determining architecture, OS and JIT capability...";
 @args = qw(jitcapable miniparrot execcapable verbose);
 
 sub runstep {
-    my ($self, $conf) = (shift, shift);
-    my ($set_jitcapable, $miniparrot, $set_execcapable, $verbose) = @_;
+    my ($self, $conf) = @_;
 
-    return if $miniparrot;
+    return if $conf->options->get('miniparrot');
+
+    my $verbose = $conf->options->get('verbose');
 
     my $jitbase             = "src/jit"; # base path for jit sources
     my $archname            =  $Config{archname};
@@ -100,7 +101,8 @@ sub runstep {
         $conf->data->set(asmfun_o => '');
     }
 
-    $jitcapable = $set_jitcapable if defined $set_jitcapable;
+    $jitcapable = $conf->options->get('jitcapable')
+        if defined $conf->options->get('jitcapable');
 
     if ($jitcapable) {
         my($jitcpuarch, $jitosname) =  split( /-/, $jitarchname);
@@ -129,7 +131,8 @@ sub runstep {
                 $execcapable = 0;
             }
         }
-        $execcapable = $set_execcapable if defined $set_execcapable;
+        $execcapable = $conf->options->get('execcapable')
+            if defined $conf->options->get('execcapable');
         if ($execcapable) {
             $conf->data->set(
                  TEMP_exec_h       => '$(INC_DIR)/jit.h $(INC_DIR)/exec.h $(INC_DIR)/exec_dep.h $(INC_DIR)/exec_save.h',

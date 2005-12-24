@@ -25,7 +25,7 @@ $description="Computing native byteorder for Parrot's wordsize...";
 @args=();
 
 sub runstep {
-    my ($self, $conf) = (shift, shift);
+    my ($self, $conf) = @_;
 
   cc_gen('config/auto/byteorder/test_c.in');
   cc_build();

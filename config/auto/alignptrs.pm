@@ -23,14 +23,12 @@ use Config;
 
 $description = "Determining your minimum pointer alignment...";
 
-@args = qw(miniparrot verbose);
+@args = qw(miniparrot);
 
 sub runstep {
     my ($self, $conf) = (shift, shift);
 
-    my ($miniparrot) = @_;
-
-    return if $miniparrot;
+    return if $conf->options->get('miniparrot');
 
     $result = '';
     my $align;

@@ -26,6 +26,8 @@ $description="Determining if your C library has setenv / unsetenv...";
 sub runstep {
     my ($self, $conf) = (shift, shift);
 
+    my $verbose = $conf->options->get('verbose');
+
     my ($setenv, $unsetenv) = (0, 0);
 
     cc_gen('config/auto/env/test_setenv.in');
@@ -47,19 +49,19 @@ sub runstep {
     );
 
     if ($setenv && $unsetenv) {
-	print " (both) " if $_[0];
+	print " (both) " if $verbose;
         $result = 'both';
     }
     elsif ($setenv) {
-	print " (setenv) " if $_[0];
+	print " (setenv) " if $verbose;
         $result = 'setenv';
     }
     elsif ($unsetenv) {
-	print " (unsetenv) " if $_[0];
+	print " (unsetenv) " if $verbose;
         $result = 'unsetenv';
     }
     else {
-	print " (no) " if $_[0];
+	print " (no) " if $verbose;
         $result = 'no';
     }
 }

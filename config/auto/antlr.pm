@@ -32,7 +32,7 @@ $description = "Determining whether antlr is installed...";
 @args = qw(verbose);
 
 sub runstep {
-    my ($self, $conf) = (shift, shift);
+    my ($self, $conf) = @_;
 
     my ( $out, $err ) = capture_output( 'antlr', '-h' );
     my $output = join( '', $out || '', $err || '' );

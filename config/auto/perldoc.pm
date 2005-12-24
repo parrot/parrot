@@ -22,10 +22,10 @@ use Parrot::Configure::Step ':auto', 'capture_output';
 
 $description = "Determining whether perldoc is installed...";
 
-@args = qw(verbose);
+@args = qw();
 
 sub runstep {
-    my ($self, $conf) = (shift, shift);
+    my ($self, $conf) = @_;
 
     my $version = 0;
     my $a = capture_output( 'perldoc -ud c99da7c4.tmp perldoc' ) || undef;

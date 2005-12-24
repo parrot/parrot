@@ -26,7 +26,8 @@ $description="Determining if your C compiler is actually Visual C++...";
 
 sub runstep {
     my ($self, $conf) = (shift, shift);
-  my ($verbose) = @_;
+
+  my $verbose = $conf->options->get('verbose');
 
   cc_gen("config/auto/msvc/test_c.in");
   cc_build();

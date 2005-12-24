@@ -25,9 +25,9 @@ $description="Determining if your C compiler is actually gcc...";
 @args=qw(miniparrot verbose);
 
 sub runstep {
-    my ($self, $conf) = (shift, shift);
+    my ($self, $conf) = @_;
 
-  my ($miniparrot) = @_;
+    my $verbose = $conf->options->get('verbose');
 
   my %gnuc;
 
@@ -52,7 +52,7 @@ sub runstep {
   my $major = $gnuc{__GNUC__};
   my $minor = $gnuc{__GNUC_MINOR__};
   unless (defined $major) {
-    print " (no) " if $_[1];
+    print " (no) " if $verbose;
     $result = 'no';
     $conf->data->set(gccversion => undef);
     return;
@@ -67,7 +67,7 @@ sub runstep {
     $gccversion = $major;
     $gccversion .= ".$minor" if defined $minor;
   }
-  print " (yep: $gccversion )" if $_[1];
+  print " (yep: $gccversion )" if $verbose;
   $result = 'yes';
 
   if ($gccversion) {
@@ -142,7 +142,7 @@ sub runstep {
     }
   }
 
-  if (defined $miniparrot && $gccversion) {
+  if (defined $conf->options->get('miniparrot') && $gccversion) {
       # make the compiler act as ANSIish as possible, and avoid enabling
       # support for GCC-specific features.
 

@@ -25,7 +25,7 @@ $description="Verifying that the compiler supports function pointer casts...";
 @args=qw(verbose);
 
 sub runstep {
-    my ($self, $conf) = (shift, shift);
+    my ($self, $conf) = @_;
 
   my $jitcapable=$conf->data->get('jitcapable');
 
@@ -49,7 +49,7 @@ END
       exit(-1);
     }
     cc_clean();
-    print " (yes) " if $_[0];
+    print " (yes) " if $conf->options->get('verbose');
     $result = 'yes';
   }
 }

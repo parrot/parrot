@@ -28,7 +28,7 @@ sub runstep {
     my ($self, $conf) = (shift, shift);
 
     my $test;
-    my ($verbose) = @_;
+    my $verbose = $conf->options->get('verbose');
     my $libs = $conf->data->get('libs');
     $conf->data->add(' ', libs => '-lrt');
 

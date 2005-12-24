@@ -26,9 +26,9 @@ $description="Determining if your platform supports GMP...";
 @args=qw(verbose);
 
 sub runstep {
-    my ($self, $conf) = (shift, shift);
+    my ($self, $conf) = @_;
 
-    my ($verbose) = @_;
+    my $verbose = $conf->options->get('verbose');
 
     my $cc = $conf->data->get('cc');
     my $libs = $conf->data->get('libs');
