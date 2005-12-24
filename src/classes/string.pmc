@@ -769,7 +769,7 @@ Downcase this string
 
 =item C<void trans(STRING* src, PMC* trams_table)>
 
-Translate C<src> with entries from C<trans_table>.
+Translate ascii string C<src> with entries from C<trans_table>.
 
 =cut
 
@@ -794,6 +794,34 @@ Translate C<src> with entries from C<trans_table>.
 	    ch = tr_data[ch];
 	    if (ch)
 		*p = ch;
+	}
+    }
+
+/*
+
+=item C<void revserse(STRING* src)>
+
+Reverse the ascii STRING C<src> in place.
+
+=cut
+
+*/
+
+    METHOD void reverse(STRING* src) {
+	INTVAL i, len;
+	unsigned char *p, ch;
+
+	len = string_length(interpreter, src);
+	if (!len)
+	    return;
+	if (src->charset != Parrot_ascii_charset_ptr)
+	    real_exception(interpreter, NULL, INVALID_ENCODING,
+		    "Can't translate non-ascii"); 
+	p = src->strstart;
+	for (i = 0, --len; i < len; ++i, --len) {
+	    ch = p[len];
+	    p[len] = p[i];
+	    p[i] = ch;
 	}
     }
 }

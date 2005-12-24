@@ -1,8 +1,8 @@
-#!parrot -C
+#!parrot -j
 # Reads from stdin a file in the format made by fasta.pir
 # N = 2500000 for fasta
 
-# XXX Doesn't run with N = 2.5M String handling bug XXX
+# 2.2 s on AMD@2000/512K cache
 
 # Original by Joshua Isom, heavily hacked by Leopold Toetsch
 
@@ -38,7 +38,7 @@ loop:
 	stdout.'setbuf'(8192)
 
 	seq = ''
-	## printerr "Reading ...\n"
+
 beginwhile:
 	line = readline stdin
 	unless line goto endwhile
@@ -66,13 +66,11 @@ done:
 	.local int i, linelen, ch
 	linelen = length line
 
-	## printerr "Reversing...\n"
-	line = "reverse"(line, linelen)
-	## printerr "Substing\n"
+	reverse line
 
 	.const .Sub tr_00 = 'tr_00_init'
 	trans line, tr_00
-	## printerr "Printing\n"
+
 	i = 0
 	$S0 = 'x'
 print_loop:	
@@ -84,26 +82,5 @@ print_loop:
 	goto print_loop
 done:
 	$S0 = ''
-
-.end
-
-.sub reverse
-	.param string str
-	.param int len
-	.local int i
-	.local string nstr
-	i = 0
-	nstr = repeat ' ', len
-	if len == 0 goto endwhile
-	dec len
-beginwhile:
-	$S0 = substr_r str, i, 1
-	substr nstr, len, 1, $S0
-	inc i
-	dec len
-	if len >= 0 goto beginwhile
-endwhile:
-	$S0 = ''
-	.return(nstr)
 .end
 
