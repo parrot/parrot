@@ -72,7 +72,7 @@ Start with a letter, followed by any combination of letters, decimal digits and 
 
 =item * Types
 
-The built-in types are recognized as keywords: B<int>, B<num>, B<obj>, B<str>.
+The built-in types are recognized as keywords: B<int>, B<num>, B<pmc>, B<str>.
 
 =back
 
@@ -142,10 +142,10 @@ produce the include files for the various categories of ops and subs.
   sub num coversine { oplib = "obscure", op = "covers" } (num);
 
   sub int BlitSurface { fnlib = "libsdl", fn = "SDL_BlitSurface" } (
-    obj { nat = "p" } src,
-    obj { nat = "p" } srcrect,
-    obj { nat = "p" } dst,
-    obj { nat = "p" } dstrect
+    pmc { nat = "p" } src,
+    pmc { nat = "p" } srcrect,
+    pmc { nat = "p" } dst,
+    pmc { nat = "p" } dstrect
   );
 
 NOTE: The B<oplib>, B<fnlib> and B<fn> sub properties are not implemented yet.

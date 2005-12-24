@@ -54,7 +54,7 @@ DESCRIPTION
         digits and underscores.
 
     * Types
-        The built-in types are recognized as keywords: int, num, obj, str.
+        The built-in types are recognized as keywords: int, num, pmc, str.
 
   Syntax
     * Blocks
@@ -119,10 +119,10 @@ DESCRIPTION
           sub num coversine { oplib = "obscure", op = "covers" } (num);
 
           sub int BlitSurface { fnlib = "libsdl", fn = "SDL_BlitSurface" } (
-            obj { nat = "p" } src,
-            obj { nat = "p" } srcrect,
-            obj { nat = "p" } dst,
-            obj { nat = "p" } dstrect
+            pmc { nat = "p" } src,
+            pmc { nat = "p" } srcrect,
+            pmc { nat = "p" } dst,
+            pmc { nat = "p" } dstrect
           );
 
         NOTE: The oplib, fnlib and fn sub properties are not implemented

@@ -104,16 +104,7 @@ sub compile
     }
   }
 
-  if (exists $props{fn} or exists $props{fnlib}) {
-    foreach my $arg (@args) {
-      $compiler->emit("  .arg $arg");
-    }
-
-    $name =~ s/::/__/g;
-
-    $compiler->emit("  call _${name}_THUNK");
-  }
-  elsif (exists $props{op}) {
+  if (exists $props{op}) {
     my $op = $props{op};
 
 #    $self->DEBUG(0, "Calling %s%s...", $name, ($op ? ' (op $op)' : ' as op'));
@@ -128,9 +119,13 @@ sub compile
     $compiler->emit("  $name ", join(", ", @args));
   }
   else {
-#    $self->DEBUG(0, "Calling '%s' as regular sub (props = %s)...", $name, join(", ", %props));
+#    $self->DEBUG(0, "Calling '%s' as regular or NCI sub (props = %s)...", $name, join(", ", %props));
 
-    $name =~ s/::/__/;
+    $name =~ s/::/__/g;
+
+    if (exists $props{fn} or exists $props{fnlib}) {
+      $name .= "_THUNK";
+    }
 
     $compiler->emit("  _${name}(" . join(", ", @args) . ")");
   }

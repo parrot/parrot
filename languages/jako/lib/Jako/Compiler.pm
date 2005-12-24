@@ -48,7 +48,7 @@ sub temp_reg
 
 sub temp_int { return shift->temp_reg('I'); }
 sub temp_num { return shift->temp_reg('N'); }
-sub temp_obj { return shift->temp_reg('P'); }
+sub temp_pmc { return shift->temp_reg('P'); }
 sub temp_str { return shift->temp_reg('S'); }
 
 

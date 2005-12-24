@@ -37,7 +37,7 @@ sub new
   my $self = bless {
     BLOCK  => $block,
 
-    KIND   => 'const',
+    KIND   => 'var',
     TYPE   => $type,
     NAME   => $ident->value,
     FILE   => $ident->file,
@@ -90,6 +90,7 @@ sub new
 
   $sym = Jako::Symbol->new(
     $self->block,
+    ($self->is_global ? 'global' : 'local'),
     $self->kind,
     $self->type,
     $self->name,
@@ -116,6 +117,12 @@ sub name { return shift->{NAME}; }
 sub file { return shift->{FILE}; }
 sub line { return shift->{LINE}; }
 
+sub is_global
+{
+  my $self = shift;
+
+  return defined($self->block) && not(defined($self->block->block));
+}
 
 #
 # compile()
@@ -131,7 +138,17 @@ sub compile
   my $type  = $self->type->imcc;
   my $name  = $self->name;
 
-  $compiler->emit("  .local $type $name");
+  if ($self->is_global) {
+    my $pmc_type = $self->type->imcc_pmc;
+
+    my $reg = $compiler->temp_pmc();
+
+    $compiler->emit("  $reg = new $pmc_type");
+    $compiler->emit("  global \"$name\" = $reg");
+  }
+  else {
+    $compiler->emit("  .local $type $name");
+  }
 
   return 1;
 }

@@ -17,7 +17,7 @@ const int NO_QUEEN      = -1;
 const int NUM_FILES     = 8;
 const int NUM_RANKS     = 8;
 
-var obj board;
+var pmc board;
 board = new PerlArray;
 
 

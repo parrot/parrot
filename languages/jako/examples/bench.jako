@@ -24,32 +24,37 @@
 use sys;
 
 const int N = 1000;
-var   int q = 1;
 
-var num start_time;
+sub bench() {
+  var   int q = 1;
 
-start_time = sys::timen();
+  var num start_time;
 
-while (q < N) {
-  var int i, j, w = 1;
+  start_time = sys::timen();
 
-  while (w < N) {
-    i++;
-    j += i;
-    w++;
+  while (q < N) {
+    var int i, j, w = 1;
+
+    while (w < N) {
+      i++;
+      j += i;
+      w++;
 #    sys::print("$q, $w\n");
+    }
+
+    q++;
   }
 
-  q++;
+  var num end_time;
+
+  end_time = sys::timen();
+
+  var num elapsed;
+
+  elapsed = end_time - start_time;
+
+  sys::print("Elapsed: $elapsed\n");
 }
 
-var num end_time;
-
-end_time = sys::timen();
-
-var num elapsed;
-
-elapsed = end_time - start_time;
-
-sys::print("Elapsed: $elapsed\n");
+bench();
 

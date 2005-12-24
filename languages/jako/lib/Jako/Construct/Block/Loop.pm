@@ -44,21 +44,16 @@ sub compile
 
   my $namespace = $prefix;
 
-  my $left;
-  my $op;
-  my $right;
-
-  if ($kind eq 'while' or $kind eq 'until') {
-    $left  = $self->left->value;
-    $op    = $self->op;
-    $right = $self->right->value;
-  }
-
   if ($kind eq 'while' or $kind eq 'until') {
     my $test = ($kind eq 'while') ? 'unless' : 'if';
 
     $compiler->emit("${prefix}_NEXT:");
+
+    my $op    = $self->op;
+    my $left  = $self->left->compile($compiler);
+    my $right = $self->right->compile($compiler);
     $compiler->emit("  $test $left $op $right goto ${prefix}_LAST");
+
     $compiler->emit("${prefix}_REDO:");
 
     if ($self->content) {

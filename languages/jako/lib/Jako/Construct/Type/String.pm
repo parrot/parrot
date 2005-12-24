@@ -21,10 +21,11 @@ sub new
   my ($token) = @_;
 
   return bless {
-    TOKEN => $token,
-    CODE  => 'S',
-    NAME  => 'str',
-    IMCC  => 'string'
+    TOKEN    => $token,
+    CODE     => 'S',
+    NAME     => 'str',
+    IMCC     => 'string',
+    IMCC_PMC => 'String'
   }, $class;
 }
 

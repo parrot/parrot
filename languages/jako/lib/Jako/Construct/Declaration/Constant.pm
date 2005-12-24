@@ -94,6 +94,7 @@ sub new
 
   $sym = Jako::Symbol->new( # TODO: Just point at the Declaration?
     $self->block,
+    ($self->is_global ? 'global' : 'local'),
     $self->access,
     $self->type,
     $self->name,

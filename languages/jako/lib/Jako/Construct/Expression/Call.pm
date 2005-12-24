@@ -58,6 +58,8 @@ sub compile
   my $self = shift;
   my ($compiler) = @_;
 
+  my $dest_ident = $self->dest;
+
   my $dest  = $self->dest->value;
   my $name  = $self->name->value;
 
@@ -110,25 +112,15 @@ sub compile
     }
   }
 
-  #
-  # For NCI (Native Call Interface):
-  #
-
-  if (exists $props{fn} or exists $props{fnlib}) {
-    foreach my $arg (@args) {
-      $compiler->emit("  .arg $arg");
-    }
-
-    $name =~ s/::/__/g;
- 
-    $compiler->emit("  call _${name}_THUNK");
+  if (($dest_ident->kind eq 'var') and ($dest_ident->scope eq 'global')) {
+    $dest = $dest_ident->compile($compiler);
   }
 
   #
   # For built-in subs (ops):
   #
 
-  elsif (exists $props{op}) {
+  if (exists $props{op}) {
     my $op = $props{op};
 
 #    $self->DEBUG(0, "Calling %s%s...", $name, ($op ? ' (op $op)' : ' as op'));
@@ -142,7 +134,7 @@ sub compile
   }
 
   #
-  # For user-defined subs:
+  # For regular (user-defined) and NCI (Native Call Interface) subs:
   #
 
   else {
@@ -150,7 +142,22 @@ sub compile
 
     $name =~ s/::/__/g;
 
+    if (exists $props{fn} or exists $props{fnlib}) {
+      $name .= "_THUNK";
+    }
+
     $compiler->emit("  $dest = _${name}(" . join(", ", @args) . ")");
+  }
+
+  if (($dest_ident->kind eq 'var') and ($dest_ident->scope eq 'global')) {
+    my $pmc_type = $dest_ident->type->imcc_pmc();
+    my $temp_pmc = $compiler->temp_pmc();
+
+    $compiler->emit("  $temp_pmc = new $pmc_type");
+    $compiler->emit("  $temp_pmc = $dest");
+
+    my $dest_name = $dest_ident->value;
+    $compiler->emit("  global \"$dest_name\" = $temp_pmc");
   }
 
   return 1;

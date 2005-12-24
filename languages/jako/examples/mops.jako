@@ -10,36 +10,40 @@
 
 use sys;
 
-var num start_time;
-var num end_time;
-var num elapsed_time;
-var int num_ops;
-var num ops_per_sec;
-var num mops;
-
 const int num_iter       = 10000000;
 const int loop_increment = 1;
 const int ops_per_iter   = 3;
 
-var   int loop_counter   = 0;
+sub calc_mops() {
+  var num start_time;
+  var num end_time;
+  var num elapsed_time;
+  var int num_ops;
+  var num ops_per_sec;
+  var num mops;
 
-start_time     = sys::timen();
-while (loop_counter != num_iter) {
-  loop_counter += loop_increment;
+  var   int loop_counter   = 0;
+
+  start_time     = sys::timen();
+  while (loop_counter != num_iter) {
+    loop_counter += loop_increment;
+  }
+  end_time       = sys::timen();
+
+  elapsed_time   = end_time - start_time;
+  num_ops        = num_iter * ops_per_iter;
+  ops_per_sec    = num_ops / elapsed_time;
+  mops           = ops_per_sec / 1000000.0;
+
+  sys::print("Iterations:    $num_iter\n");
+  sys::print("Start time:    $start_time\n");
+  sys::print("End time:      $end_time\n");
+  sys::print("Elapsed time:  $elapsed_time\n");
+  sys::print("Count:         $loop_counter\n");
+  sys::print("Estimated ops: $num_ops\n");
+  sys::print("op/s:          $ops_per_sec\n");
+  sys::print("Mop/s:         $mops\n");
 }
-end_time       = sys::timen();
 
-elapsed_time   = end_time - start_time;
-num_ops        = num_iter * ops_per_iter;
-ops_per_sec    = num_ops / elapsed_time;
-mops           = ops_per_sec / 1000000.0;
-
-sys::print("Iterations:    $num_iter\n");
-sys::print("Start time:    $start_time\n");
-sys::print("End time:      $end_time\n");
-sys::print("Elapsed time:  $elapsed_time\n");
-sys::print("Count:         $loop_counter\n");
-sys::print("Estimated ops: $num_ops\n");
-sys::print("op/s:          $ops_per_sec\n");
-sys::print("Mop/s:         $mops\n");
+calc_mops();
 

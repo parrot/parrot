@@ -308,13 +308,60 @@ sub type_of_ident
 
 ###############################################################################
 
+=head2 BLOCK->kind_of_ident(NAME)
+
+This is a shortcut method that uses find_symbol() to locate a matching
+symbol, and then returns that symbol's kind.
+
+=cut
+
+sub kind_of_ident
+{
+  my $self = shift; # Required: Jako::Construct::Block
+  my $name = shift; # Required: string (TODO: domain)
+
+  confess "No block!"  unless defined $self and ref $self and $self->isa("Jako::Construct::Block");
+  confess "No identifier name!"  unless defined $name;
+  confess "Extra arguments!" if @_;
+
+  my $found = $self->find_symbol($name);
+
+  return $found ? $found->kind : undef;
+}
+
+
+###############################################################################
+
+=head2 BLOCK->scope_of_ident(NAME)
+
+This is a shortcut method that uses find_symbol() to locate a matching
+symbol, and then returns that symbol's scope (global or local).
+
+=cut
+
+sub scope_of_ident
+{
+  my $self = shift; # Required: Jako::Construct::Block
+  my $name = shift; # Required: string (TODO: domain)
+
+  confess "No block!"  unless defined $self and ref $self and $self->isa("Jako::Construct::Block");
+  confess "No identifier name!"  unless defined $name;
+  confess "Extra arguments!" if @_;
+
+  my $found = $self->find_symbol($name);
+
+  return $found ? $found->scope : undef;
+}
+
+
+###############################################################################
+
 =head2 BLOCK->access_of_ident(NAME)
 
 This is a shortcut method that uses find_symbol() to locate a matching
 symbol, and then returns that symbol's access (const or not).
 
 =cut
-
 
 sub access_of_ident
 {

@@ -21,24 +21,28 @@ use sys;
 const num first_den =       1.0;
 const num last_den  = 1000000.0;
 
-var num flag        =       1.0;
-var num cur_frac    =       0.0;
+sub leibniz() {
+  var num flag        =       1.0;
+  var num cur_frac    =       0.0;
 
-var num this_den;
+  var num this_den;
 
-this_den = first_den;
+  this_den = first_den;
 
-while (this_den <= last_den) {
-  var num new_frac;
-  new_frac  = flag / this_den;
-  cur_frac += new_frac;
-} continue {
-  flag     *= -1.0;
-  this_den +=  2.0;
+  while (this_den <= last_den) {
+    var num new_frac;
+    new_frac  = flag / this_den;
+    cur_frac += new_frac;
+  } continue {
+    flag     *= -1.0;
+    this_den +=  2.0;
+  }
+
+  var num pi;
+  pi = 4.0 * cur_frac;
+
+  sys::print("PI is (very) approximately: $pi\n");
 }
 
-var num pi;
-pi = 4.0 * cur_frac;
-
-sys::print("PI is (very) approximately: $pi\n");
+leibniz();
 

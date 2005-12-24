@@ -24,9 +24,9 @@ sub new
 {
   my $class = shift;
 
-  confess "Expected 9 args" unless @_ == 9;
+  confess "Expected 10 args" unless @_ == 10;
 
-  my ($block, $kind, $type, $name, $value, $props, $args, $file, $line) = @_;
+  my ($block, $scope, $kind, $type, $name, $value, $props, $args, $file, $line) = @_;
 
   $props = { } unless defined $props;
   $args  = [ ] unless defined $args;
@@ -41,12 +41,16 @@ sub new
   confess("Undefined identifier kind attribute.")
     unless defined $kind;
  
+  confess("Unrecognized identifier scope attribute '" . $scope . "'.")
+    unless $scope eq 'global' or $scope eq 'local';
+ 
   confess("Unrecognized identifier kind attribute '" . $kind . "'.")
     unless $kind eq 'module' or $kind eq 'sub' or $kind eq 'var' or $kind eq 'arg' or $kind eq 'const';
 
   my $self = bless {
     BLOCK  => $block,
 
+    SCOPE  => $scope,
     KIND   => $kind,
     TYPE   => $type,
     NAME   => $name,
@@ -69,6 +73,7 @@ sub new
 
 sub block  { return shift->{BLOCK};    }
 
+sub scope  { return shift->{SCOPE}     }
 sub kind   { return shift->{KIND};     }
 sub type   { return shift->{TYPE};     }
 sub name   { return shift->{NAME};     }
@@ -79,6 +84,8 @@ sub args   { return @{shift->{ARGS}}; }
 sub file   { return shift->{FILE};     }
 sub line   { return shift->{LINE};     }
 
+sub is_global   { return shift->scope eq 'global'; }
+sub is_local    { return shift->scope eq 'local'; }
 sub is_constant { return shift->kind eq 'const'; }
 sub is_variable { my $self = shift; return ($self->kind eq 'var') or ($self->kind eq 'arg'); }
 sub is_sub      { my $self = shift; return $self->kind eq 'sub'; }

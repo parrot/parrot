@@ -33,11 +33,9 @@ all: \
 	examples/mandelzoom.imc \
 	examples/mops.imc       \
 	examples/nci.imc        \
-	examples/pmc.imc        \
 	examples/primes.imc     \
-	examples/queens.imc
-
-#	examples/sub.imc
+	examples/queens.imc     \
+	examples/sub.imc
 
 
 #
@@ -59,11 +57,9 @@ examples/mandelbrot.imc: examples/mandelbrot.jako jakoc
 examples/mandelzoom.imc: examples/mandelzoom.jako jakoc
 examples/mops.imc:       examples/mops.jako       jakoc
 examples/nci.imc:        examples/nci.jako        jakoc
-examples/pmc.imc:        examples/pmc.jako        jakoc
 examples/primes.imc:     examples/primes.jako     jakoc
 examples/queens.imc:     examples/queens.jako     jakoc
-
-#examples/sub.imc:        examples/sub.jako        jakoc
+examples/sub.imc:        examples/sub.jako        jakoc
 
 #
 # Assembly:
@@ -84,11 +80,9 @@ examples/mandelbrot.pbc: examples/mandelbrot.imc
 examples/mandelzoom.pbc: examples/mandelzoom.imc
 examples/mops.pbc:       examples/mops.imc
 examples/nci.pbc:        examples/nci.imc
-examples/pmc.pbc:        examples/pmc.imc
 examples/primes.pbc:     examples/primes.imc
 examples/queens.pbc:     examples/queens.imc
-
-#examples/sub.pbc:        examples/sub.imc
+examples/sub.pbc:        examples/sub.imc
 
 
 #
@@ -110,16 +104,14 @@ test: all
 	$(INTERP) examples/fib.pbc
 	$(INTERP) examples/hello.pbc
 	$(INTERP) examples/leibniz.pbc
-#	$(INTERP) examples/life.pbc
+	$(INTERP) examples/life.pbc
 	$(INTERP) examples/mandelbrot.pbc
-#	$(INTERP) examples/mandelzoom.pbc
+	$(INTERP) examples/mandelzoom.pbc
 	$(INTERP) examples/mops.pbc
-#	$(INTERP) examples/nci.pbc
-	$(INTERP) examples/pmc.pbc
+	$(INTERP) examples/nci.pbc
 	$(INTERP) examples/primes.pbc
 	$(INTERP) examples/queens.pbc
-
-#	$(INTERP) examples/sub.pbc
+	$(INTERP) examples/sub.pbc
 
 
 #

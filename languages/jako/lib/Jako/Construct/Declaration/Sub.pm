@@ -87,6 +87,7 @@ sub new
 
   $sym = Jako::Symbol->new(
     $self->block,
+    'global',         # TODO: Should we support non-global subs?
     $self->kind,
     $self->type,
     $name,
@@ -142,8 +143,6 @@ sub compile
     $name = $self->block->name . "::" . $name;
   }
 
-  my %reg = ('int' => 5, 'num' => 5, 'obj' => 5, 'str' => 5);
-
   my $sym = $self->block->find_symbol($name);
 
   my %props = $sym->props;
@@ -172,48 +171,38 @@ sub compile
     $thunk =~ s/::/__/g;
 
     $compiler->emit(".sub $thunk");
-    $compiler->emit(".namespace $thunk");
-    $compiler->emit("  saveall");
 
     my $sig = defined $self->type ? $self->type->code : 'v';
-    my @params;
+
     foreach my $arg ($self->args) {
       my ($arg_type, $arg_name) = @$arg;
-      push @params, $arg_type->code . $reg{$arg_type->name}++;
+      my $imcc_type = $arg_type->imcc;
+
+      $compiler->emit("  .param $imcc_type $arg_name");
       $sig .= $arg_type->code;
     }
 
     $sig =~ tr[INPS][ifpt]; # Defaults.
 
-    foreach my $param (reverse @params) {
-      $compiler->emit("  restore $param");
-    }
-
-    my $return = defined $self->type ? -2 : 0; # -2 = one, 0 = none
-
-    $compiler->emit("  #undef P1 # NO SUCH OP");     # No continuation
-    $compiler->emit("  #undef P2 # NO SUCH OP");     # No object
-    $compiler->emit("  I0 = 0");       # Not being called with prototyped parameters.
-    $compiler->emit("  I1 = 0");       # Number of items on the stack.
-    $compiler->emit("  I2 = 0");       # Number of parameters in PMC registers.
-    $compiler->emit("  I3 = $return"); # What we expect in return
-
     my $fn_name = $fn;
 
     $fn_name =~ s/^.*::/"/;
 
-    $compiler->emit("  .local pmc lib");
-    $compiler->emit("  loadlib lib, $fnlib");
-    $compiler->emit("  dlfunc P0, lib, $fn_name, \"$sig\"");
-    $compiler->emit("  invoke");
+    $compiler->emit("  .local pmc __lib");
+    $compiler->emit("  loadlib __lib, $fnlib");
+    $compiler->emit("  .local pmc __func");
+    $compiler->emit("  dlfunc __func, __lib, $fn_name, \"$sig\"");
 
     if ($self->type) {
-      $compiler->emit("  save " . $self->type->code . '5');
+      $compiler->emit("  .local " . $self->type . " __result");
+      $compiler->emit("  __result = __func(" . join(", ", map({ $_->[1]} $self->args)) . ")");
+      $compiler->emit("  .return(__result)");
+    }
+    else {
+      $compiler->emit("  __func(" . join(", ", map({ $_->[1]} $self->args)) . ")");
+      $compiler->emit("  .return()");
     }
 
-    $compiler->emit("  restoreall");
-    $compiler->emit("  ret");
-    $compiler->emit(".endnamespace $thunk");
     $compiler->emit(".end");
   }
 
@@ -232,8 +221,6 @@ sub sax
 
   my $name  = $self->name;
   my $type  = $self->type;
-
-  my %reg = ('int' => 5, 'num' => 5, 'obj' => 5, 'str' => 5);
 
   my $sym = $self->block->find_symbol($name);
 

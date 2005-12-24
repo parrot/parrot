@@ -47,9 +47,19 @@ sub compile
   my $self = shift;
   my ($compiler) = @_;
 
-  my $ident = $self->ident->value;
+  my $ident_name = $self->ident->value;
+
+  my $ident = $self->ident->compile($compiler);
 
   $compiler->emit("  inc $ident");
+
+  if (($self->ident->kind eq 'var') and ($self->ident->scope eq 'global')) {
+    my $pmc_type = $self->ident->type->imcc_pmc;
+    my $pmc_reg = $compiler->temp_pmc();
+    $compiler->emit("  $pmc_reg = new $pmc_type");
+    $compiler->emit("  $pmc_reg = $ident");
+    $compiler->emit("  global \"$ident_name\" = $pmc_reg");
+  }
 
   return 1;
 }

@@ -53,7 +53,18 @@ sub compile
   my $left  = $self->left->value;
   my $right = $self->right->compile($compiler);
 
-  $compiler->emit("  $left = $right");
+  if ($self->block->scope_of_ident($left) eq 'global') {
+    my $type = $self->block->type_of_ident($left);
+    my $pmc_type = $type->imcc_pmc;
+    my $temp_pmc = $compiler->temp_pmc();
+
+    $compiler->emit("  $temp_pmc = new $pmc_type");
+    $compiler->emit("  $temp_pmc = $right");
+    $compiler->emit("  global \"$left\" = $temp_pmc");
+  }
+  else {
+    $compiler->emit("  $left = $right");
+  }
 
   return 1;
 }

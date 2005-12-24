@@ -27,7 +27,7 @@ use Jako::Token;
 
 use Jako::Construct::Type::Integer;
 use Jako::Construct::Type::Number;
-use Jako::Construct::Type::Object;
+use Jako::Construct::Type::PMC;
 use Jako::Construct::Type::String;
 
 my %types = ( 'I' => 'int', 'N' => 'num', 'P' => 'pmc', 'S' => 'str');
@@ -54,7 +54,7 @@ sub new
 
   return Jako::Construct::Type::Integer->new($token) if $type eq 'int';
   return Jako::Construct::Type::Number->new($token)  if $type eq 'num';
-  return Jako::Construct::Type::Object->new($token)  if $type eq 'pmc';
+  return Jako::Construct::Type::PMC->new($token)  if $type eq 'pmc';
   return Jako::Construct::Type::String->new($token)  if $type eq 'str';
 
   confess "Unable to create object for type '$type'!";
@@ -78,6 +78,11 @@ sub name
 sub imcc
 {
   return shift->{IMCC};
+}
+
+sub imcc_pmc
+{
+  return shift->{IMCC_PMC};
 }
 
 

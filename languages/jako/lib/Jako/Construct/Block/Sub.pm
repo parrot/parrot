@@ -49,7 +49,7 @@ sub new
 
   foreach my $arg (@$args) {
     my ($arg_type, $arg_name, $arg_token) = @$arg;
-    my $sym = Jako::Symbol->new($self, 'arg', $arg_type, $arg_name, undef, undef, undef, $arg_token->file, $arg_token->line );
+    my $sym = Jako::Symbol->new($self, 'local', 'arg', $arg_type, $arg_name, undef, undef, undef, $arg_token->file, $arg_token->line );
     $self->set_symbol($arg_name, $sym);
   }
 
@@ -85,13 +85,9 @@ sub compile
 
   $subname =~ s/::/__/g;
 
-#  my $namespace = "_SUB_$subname";
-
   $compiler->emit(".sub _${subname}");
-#  $compiler->emit(".namespace $namespace");
-#  $compiler->emit("saveall");
 
-  foreach my $arg (reverse @args) {
+  foreach my $arg (@args) {
     my ($arg_type, $arg_name) = @$arg;
     my $imcc_type = $arg_type->imcc;
 
@@ -103,9 +99,7 @@ sub compile
   $compiler->outdent;
 
   $compiler->emit("_${name}_LEAVE:");
-#  $compiler->emit("  restoreall");
   $compiler->emit("  .return()"); # Fallthrough return() in case the code in the sub doesn't return anything
-#  $compiler->emit("  .endnamespace $namespace");
   $compiler->emit(".end");
 
   return 1;

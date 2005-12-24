@@ -60,6 +60,8 @@ sub compile
   my $self = shift;
   my ($compiler) = @_;
 
+  my $dest_ident = $self->dest;
+
   my $block = $self->block;
   my $dest  = $self->dest;
   my $left  = $self->left;
@@ -102,9 +104,9 @@ sub compile
   $self->SYNTAX_ERROR("Can't do arithmetic on strings") if UNIVERSAL::isa($left_type, 'Jako::Construct::Type::String');
   $self->SYNTAX_ERROR("Can't do arithmetic on strings") if UNIVERSAL::isa($right_type, 'Jako::Construct::Type::String');
 
-  $self->SYNTAX_ERROR("Can't do arithmetic on objects") if UNIVERSAL::isa($dest_type, 'Jako::Construct::Type::Object');
-  $self->SYNTAX_ERROR("Can't do arithmetic on objects") if UNIVERSAL::isa($left_type, 'Jako::Construct::Type::Object');
-  $self->SYNTAX_ERROR("Can't do arithmetic on objects") if UNIVERSAL::isa($right_type, 'Jako::Construct::Type::Object');
+  $self->SYNTAX_ERROR("Can't do arithmetic on PMCs") if UNIVERSAL::isa($dest_type, 'Jako::Construct::Type::PMC');
+  $self->SYNTAX_ERROR("Can't do arithmetic on PMCs") if UNIVERSAL::isa($left_type, 'Jako::Construct::Type::PMC');
+  $self->SYNTAX_ERROR("Can't do arithmetic on PMCs") if UNIVERSAL::isa($right_type, 'Jako::Construct::Type::PMC');
 
   my $calc_type = $left_type;
   $calc_type = $right_type if UNIVERSAL::isa($right_type, 'Jako::Construct::Type::Number');
@@ -133,7 +135,8 @@ sub compile
     $right = $right->compile($compiler);
   }
 
-  $dest = $dest->value;
+  my $dest_name = $dest->value;
+  $dest = $dest->compile($compiler);
 
   unless ($dest_type->name eq $calc_type->name) {
     my $temp = $compiler->temp_reg($calc_type);
@@ -142,6 +145,15 @@ sub compile
   }
   else {
     $compiler->emit("  $dest = $left $op $right");
+  }
+
+  if (($dest_ident->kind eq 'var') and ($dest_ident->scope eq 'global')) {
+    my $pmc_type = $dest_ident->type->imcc_pmc;
+    my $pmc_reg = $compiler->temp_pmc();
+
+    $compiler->emit("  $pmc_reg = new $pmc_type");
+    $compiler->emit("  $pmc_reg = $dest");
+    $compiler->emit("  global \"$dest_name\" = $pmc_reg");
   }
 
   return 1;

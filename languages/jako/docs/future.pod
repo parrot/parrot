@@ -235,7 +235,7 @@ Instantiation as environment cloning.
 
 =head2 self
 
-The word 'self' means the enclosing environment (instance, in the case of an object
+The word 'self' means the enclosing environment (instance, in the case of a PMC
 method).
 
 The word 'class' means the enclosing environment's enclosing environment.
