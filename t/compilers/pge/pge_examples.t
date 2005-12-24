@@ -16,7 +16,7 @@ t/library/pge_examples.t - Parrot Grammar Engine tests of examples
 
 =head1 SYNOPSIS
 
-	% prove -Ilib t/library/pge_examples.t
+	% prove t/compilers/pge/pge_examples.t
 
 =cut
 
@@ -59,10 +59,6 @@ pir_output_is(<<'CODE', <<'OUT', "parse FASTA");
 # Grok fasta files, which usually contain DNA, RNA or protein sequences.
 # http://en.wikipedia.org/wiki/FASTA_format
 
-# TODO: Compose rules out of subrules
-
-.include "library/dumper.imc"
-
 .sub "example" :main
     load_bytecode 'PGE.pbc'
     load_bytecode 'PGE/Util.pir'
@@ -71,10 +67,10 @@ pir_output_is(<<'CODE', <<'OUT', "parse FASTA");
     fasta_grammar = <<'END_FASTA_GRAMMAR'
 grammar Bio::Fasta;
 
-rule file        { <entry>+ }
+rule databank    { <Bio::Fasta::entry>+ }
 rule start_entry { \> }
-rule desc_line   { <start_entry> <id> } 
-rule entry       { <desc_line> \s+ <desc> } 
+rule desc_line   { <Bio::Fasta::start_entry> <Bio::Fasta::id> \s+ <Bio::Fasta::desc> } 
+rule entry       { <Bio::Fasta::desc_line> \n <Bio::Fasta::sequence> } 
 rule id          { (\S+) }
 rule desc        { (\N*) }
 rule sequence    { (<-[>]>*) }
@@ -98,18 +94,22 @@ END_FASTA
     # print code
 
     .local pmc fasta_rule
-    fasta_rule = find_global "Bio::Fasta", "id"
+    fasta_rule = find_global "Bio::Fasta", "databank"
     .local pmc match
     ( match ) = fasta_rule( fasta )
     
     # TODO: Extract named or positional captures
     print match
-    print "\n"
 
 .end
 
 CODE
->gi|5524211|gb|AAD44166.1|
+>gi|5524211|gb|AAD44166.1| cytochrome b [Elephas maximus maximus]
+LCLYTHIGRNIYYGSYLYSETWNTGIMLLLITMATAFMGYVLPWGQMSFWGATVITNLFSAIPYIGTNLV
+EWIWGGFSVDKATLNRFFAFHFILPFTMVALAGVHLTFLHETGSNNPLGLTSDSDKIPFHPYYTIKDFLG
+LLILILLLLLLALLSPDMLGDPDNHMPADPLNTPLHIKPEWYFLFAYAILRSVPNKLGGVLALFLSIVIL
+GLMPFLHTSKHRSMMLRPLSQALFWTLTMDLLTLTWIGSQPVEYPYTIIGQMASILYFSIILAFLPIAGX
+IENY
 OUT
 
 
