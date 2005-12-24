@@ -649,8 +649,7 @@ string_make_direct(Interp *interpreter, const void *buffer,
         void * __ptr;
     } __ptr_u;
 
-    /* XXX somehow strings can die if the allocation is big */
-    s = new_string_header(interpreter, flags | PObj_live_FLAG);
+    s = new_string_header(interpreter, flags);
     s->encoding = encoding;
     s->charset = charset;
 

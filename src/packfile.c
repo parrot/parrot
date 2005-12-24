@@ -289,6 +289,7 @@ do_1_sub_pragma(Parrot_Interp interpreter, PMC* sub_pmc, int action)
     size_t start_offs;
     struct Parrot_sub * sub = PMC_sub(sub_pmc);
     PMC *result;
+    void *lo_var_ptr;
 
     switch (action) {
         case PBC_IMMEDIATE:
@@ -297,11 +298,14 @@ do_1_sub_pragma(Parrot_Interp interpreter, PMC* sub_pmc, int action)
              */
             if (PObj_get_FLAGS(sub_pmc) & SUB_FLAG_PF_IMMEDIATE) {
                 PObj_get_FLAGS(sub_pmc) &= ~SUB_FLAG_PF_IMMEDIATE;
+                lo_var_ptr = interpreter->lo_var_ptr;
                 result = run_sub(interpreter, sub_pmc);
                 /*
                  * reset initial flag so MAIN detection works
+                 * and reset lo_var_ptr to prev
                  */
                 interpreter->resume_flag = RESUME_INITIAL;
+                interpreter->lo_var_ptr = lo_var_ptr;
                 return result;
             }
         case PBC_POSTCOMP:
