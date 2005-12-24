@@ -86,6 +86,7 @@ my @unified_testable_languages =
        befunge
        bf
        lua
+       lazy-k
        m4
        ook
        parrot_compiler
@@ -95,7 +96,7 @@ my @unified_testable_languages =
        tcl
        unlambda
        urm );
-# @unified_testable_languages = qw( unlambda );
+# @unified_testable_languages = qw( lazy-k );
 
 my @harnesses =
     grep {-f $_}

@@ -1,4 +1,4 @@
-# $Id $
+# $Id$
 
 =head1 Languages targeting parrot
 
@@ -345,18 +345,19 @@ Leopold TE<ouml>tsch
 =item Description
 
 lazy-k is a pure functional programming language according to the SKI calculus.
+See also http://homepages.cwi.nl/~tromp/cl/lazy-k.html
 
 =item Status
 
-Unknown
+Working, but not complete. Part of languages smoke testing.
 
 =item Last verified with parrot version
 
-0.2.2
+0.4.0
 
 =item Location
 
-http://homepages.cwi.nl/~tromp/cl/lazy-k.html
+C<languages/lazy-k>
 
 =back
 
@@ -818,18 +819,18 @@ Leopold TE<ouml>tsch
 =item Description
 
 unlambda is a pure functional programming language with mostly eager evaluation following the SKI calculus (+ a few extensions)
-
+See also http://www.madore.org/~david/programs/unlambda/
 =item Status
 
-Bus error (OS X only?)
+Working. Part of languages smoke testing.
 
 =item Last verified with parrot version
 
-0.2.2
+0.4.0
 
 =item Location
 
-http://www.madore.org/~david/programs/unlambda/
+C<languages/unlambda>
 
 =back
 
