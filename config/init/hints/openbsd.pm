@@ -5,24 +5,21 @@ package init::hints::openbsd;
 
 use strict;
 
-sub runstep {
+sub runstep
+{
     my ($self, $conf) = @_;
 
     my $ccflags = $conf->data->get('ccflags');
-    if ( $ccflags !~ /-pthread/ ) {
+    if ($ccflags !~ /-pthread/) {
         $ccflags .= ' -pthread';
     }
-    $conf->data->set(
-        ccflags => $ccflags,
-    );
+    $conf->data->set(ccflags => $ccflags);
 
     my $libs = $conf->data->get('libs');
-    if ( $libs !~ /-lpthread/ ) {
+    if ($libs !~ /-lpthread/) {
         $libs .= ' -lpthread';
     }
-    $conf->data->set(
-        libs => $libs,
-    );
+    $conf->data->set(libs => $libs);
 }
 
 1;

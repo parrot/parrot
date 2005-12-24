@@ -22,11 +22,12 @@ use base qw(Parrot::Configure::Step::Base);
 
 use Parrot::Configure::Step;
 
-$description="Enabling optimization...";
+$description = "Enabling optimization...";
 
-@args=qw(verbose optimize);
+@args = qw(verbose optimize);
 
-sub runstep {
+sub runstep
+{
     my ($self, $conf) = @_;
 
     if ($conf->data->get('optimize')) {

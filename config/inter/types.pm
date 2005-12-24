@@ -23,27 +23,27 @@ use Parrot::Configure::Step ':inter';
 
 $description = 'Determining what types Parrot should use...';
 
-@args=qw(ask intval opcode floatval);
+@args = qw(ask intval opcode floatval);
 
-sub runstep {
+sub runstep
+{
     my ($self, $conf) = @_;
- 
-    my $intval      = $conf->options->get('intval')     || 'long';
-    my $floatval    = $conf->options->get('floatval')   || 'double';
-    my $opcode      = $conf->options->get('opcode')     || 'long';
+
+    my $intval   = $conf->options->get('intval')   || 'long';
+    my $floatval = $conf->options->get('floatval') || 'double';
+    my $opcode   = $conf->options->get('opcode')   || 'long';
 
     if ($conf->options->get('ask')) {
-        $intval     = prompt("\n\nHow big would you like your integers to be?",
-            $intval);
-        $floatval   = prompt("And your floats?", $floatval);
-        $opcode     = prompt("What's your native opcode type?", $opcode);
+        $intval   = prompt("\n\nHow big would you like your integers to be?", $intval);
+        $floatval = prompt("And your floats?",                                $floatval);
+        $opcode   = prompt("What's your native opcode type?",                 $opcode);
         print "\n";
     }
-  
+
     $conf->data->set(
-        iv          => $intval,
-        nv          => $floatval,
-        opcode_t    => $opcode
+        iv       => $intval,
+        nv       => $floatval,
+        opcode_t => $opcode
     );
 }
 

@@ -21,24 +21,26 @@ use base qw(Parrot::Configure::Step::Base);
 
 use Parrot::Configure::Step qw( :inter capture_output check_progs );
 
-$util           = 'lex';
-$description    = "Determining whether $util is installed";
-$prompt         = "Do you have a lexical analyzer generator like flex or lex?";
-@args           = qw( lex ask maintainer );
+$util        = 'lex';
+$description = "Determining whether $util is installed";
+$prompt      = "Do you have a lexical analyzer generator like flex or lex?";
+@args        = qw( lex ask maintainer );
 
-sub runstep {
+sub runstep
+{
     my ($self, $conf) = @_;
 
     # undef means we don't have flex... default to not having flex
     $conf->data->set(flex_version => undef);
 
     unless ($conf->options->get('maintainer')) {
-        $conf->data->set( $util => 'echo' );
+        $conf->data->set($util => 'echo');
         $result = 'skipped';
         return undef;
     }
 
     my $prog;
+
     # precedence of sources for the program:
     # default -> probe -> environment -> option -> ask
     $prog ||= $conf->options->get($util);
@@ -55,6 +57,7 @@ sub runstep {
     $prog = check_progs(['flex', 'lex']);
 
     unless ($prog) {
+
         # fall back to default
         $result = 'no';
         return undef;
@@ -68,7 +71,8 @@ sub runstep {
 
     # don't override the user even if the program they provided appears to be
     # broken
-    if ($ret == -1 and ! $conf->options->get('ask')) {
+    if ($ret == -1 and !$conf->options->get('ask')) {
+
         # fall back to default
         $result = 'no';
         return undef;

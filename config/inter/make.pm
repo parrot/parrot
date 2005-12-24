@@ -21,18 +21,20 @@ use base qw(Parrot::Configure::Step::Base);
 
 use Parrot::Configure::Step qw( :inter capture_output check_progs );
 
-$util           = 'make';
-$description    = "Determining whether $util is installed";
-$prompt         = "Do you have a make utility like 'gmake' or 'make'?";
-@args           = qw( make ask );
+$util        = 'make';
+$description = "Determining whether $util is installed";
+$prompt      = "Do you have a make utility like 'gmake' or 'make'?";
+@args        = qw( make ask );
 
-sub runstep {
+sub runstep
+{
     my ($self, $conf) = @_;
 
     # undef means we don't have GNU make... default to not having it
     $conf->data->set(gmake_version => undef);
 
     my $prog;
+
     # precedence of sources for the program:
     # default -> probe -> environment -> option -> ask
     $prog ||= $conf->options->get($util);
@@ -47,12 +49,13 @@ sub runstep {
         $prog = check_progs(['gmake', 'mingw32-make', 'nmake', 'make']);
 
         unless ($prog) {
+
             # fall back to default
             $result = 'no';
             return undef;
         }
     }
-    
+
     if ($conf->options->get('ask')) {
         $prog = prompt($prompt, $prog ? $prog : $conf->data->get($util));
     }
@@ -61,7 +64,8 @@ sub runstep {
 
     # don't override the user even if the program they provided appears to be
     # broken
-    if ($ret == -1 and ! $conf->options->get('ask')) {
+    if ($ret == -1 and !$conf->options->get('ask')) {
+
         # fall back to default
         $result = 'no';
         return undef;
@@ -77,8 +81,9 @@ sub runstep {
 
     # setup make_C
     if ($conf->data->get('gmake_version')) {
-        $conf->data->set(make_c => "$prog -C" );
+        $conf->data->set(make_c => "$prog -C");
     } else {
+
         # get the default value
         my $make_c = $conf->data->get('make_c');
 
@@ -86,7 +91,7 @@ sub runstep {
         # replace the value for $(MAKE) with the actual path or we'll end up
         # with a variable that recursively refers to itself
         $make_c =~ s/\$\(MAKE\)/$prog/;
-        
+
         $conf->data->set(make_c => $make_c);
     }
 }

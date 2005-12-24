@@ -21,18 +21,20 @@ use base qw(Parrot::Configure::Step::Base);
 use Parrot::Configure::Step;
 use ExtUtils::Manifest qw(maniread);
 
-$description="Determining nongenerated header files...";
+$description = "Determining nongenerated header files...";
 
-@args=();
+@args = ();
 
-sub runstep {
+sub runstep
+{
     my ($self, $conf) = @_;
+
     my $inc = 'include/parrot';
 
-    my @headers=(
-    sort
-    map  { m{^$inc/(.*\.h)\z} }
-    keys %{maniread()}
+    my @headers = (
+        sort
+            map { m{^$inc/(.*\.h)\z} }
+            keys %{maniread()}
     );
 
     $_ = "\$(INC_DIR)/$_" for @headers;

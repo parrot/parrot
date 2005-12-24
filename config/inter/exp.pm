@@ -20,11 +20,12 @@ use base qw(Parrot::Configure::Step::Base);
 
 use Parrot::Configure::Step ':inter';
 
-$description="Setting up experimental systems...";
+$description = "Setting up experimental systems...";
 
-@args=qw(ask expnetwork);
+@args = qw(ask expnetwork);
 
-sub runstep {
+sub runstep
+{
     my ($self, $conf) = @_;
 
     my $net = $conf->options->get('expnetwork') || 'n';
@@ -38,7 +39,7 @@ sub runstep {
     } else {
         $net = 1;
     }
-  
+
     $conf->data->set(expnetworking => $net);
 }
 

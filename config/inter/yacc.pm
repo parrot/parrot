@@ -21,24 +21,26 @@ use base qw(Parrot::Configure::Step::Base);
 
 use Parrot::Configure::Step qw( :inter capture_output check_progs );
 
-$util           = 'yacc';
-$description    = "Determining whether $util is installed";
-$prompt         = "Do you have a parser generator, like bison or yacc?";
-@args =          qw( yacc ask maintainer );
+$util        = 'yacc';
+$description = "Determining whether $util is installed";
+$prompt      = "Do you have a parser generator, like bison or yacc?";
+@args        = qw( yacc ask maintainer );
 
-sub runstep {
+sub runstep
+{
     my ($self, $conf) = @_;
 
     # undef means we don't have bison... default to not having bison
     $conf->data->set(bison_version => undef);
 
     unless ($conf->options->get('maintainer')) {
-        $conf->data->set( $util => 'echo' );
+        $conf->data->set($util => 'echo');
         $result = 'skipped';
         return undef;
     }
 
     my $prog;
+
     # precedence of sources for the program:
     # default -> probe -> environment -> option -> ask
     $prog ||= $conf->options->get($util);
@@ -55,6 +57,7 @@ sub runstep {
     $prog = check_progs(['bison -v -y', 'yacc', 'byacc']);
 
     unless ($prog) {
+
         # fall back to default
         $result = 'no';
         return undef;
@@ -68,7 +71,8 @@ sub runstep {
 
     # don't override the user even if the program they provided appears to be
     # broken
-    if ($ret == -1 and ! $conf->options->get('ask')) {
+    if ($ret == -1 and !$conf->options->get('ask')) {
+
         # fall back to default
         $result = 'no';
         return undef;

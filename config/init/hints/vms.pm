@@ -5,7 +5,8 @@ package init::hints::vms;
 
 use strict;
 
-sub runstep {
+sub runstep
+{
     my ($self, $conf) = @_;
 
     $conf->data->set(
@@ -15,15 +16,15 @@ sub runstep {
     );
 
     {
-        local $^W; # no warnings on redefinition
+        local $^W;    # no warnings on redefinition
 
         *Parrot::Configure::Step::cc_build = sub {
             system("$c{cc} $c{ccflags} test.c") and die "C compiler died!";
-            system("link/exe=test test") and die "Link failed!";
+            system("link/exe=test test")        and die "Link failed!";
         };
 
         *Parrot::Configure::Step::cc_run = sub {
-            `mcr []test`
+            `mcr []test`;
         };
     }
 }

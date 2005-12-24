@@ -25,18 +25,19 @@ use base qw(Parrot::Configure::Step::Base);
 
 use Parrot::Configure::Step;
 
-$description="Tweaking settings for miniparrot...";
+$description = "Tweaking settings for miniparrot...";
 
-@args=qw(miniparrot);
+@args = qw(miniparrot);
 
-sub runstep {
+sub runstep
+{
     my ($self, $conf) = @_;
 
     return unless $conf->options->get('miniparrot');
 
     $conf->data->set(
         miniparrot         => 1,
-        DEVEL              => $conf->data->get('DEVEL').'-miniparrot',
+        DEVEL              => $conf->data->get('DEVEL') . '-miniparrot',
         TEMP_cg_h          => '',
         TEMP_cg_c          => '',
         TEMP_cg_o          => '',
@@ -61,14 +62,17 @@ sub runstep {
         has_sigatomic_t    => undef,
         has_sigaction      => undef,
         has_setitimer      => undef,
+
         # we can't guarantee anything about pointer alignment under ANSI C89.
         # so we will have to check every byte.
-        ptr_alignment      => 1
+        ptr_alignment => 1
     );
-    
+
     #Allow ANSI headers only
-    foreach (qw(assert complex ctype errno locale math setjmp signal stdarg
-                stdio stdlib string time)) {
+    foreach (
+        qw(assert complex ctype errno locale math setjmp signal stdarg
+        stdio stdlib string time)
+        ) {
         $conf->data->set("i_$_" => 1);
     }
 }

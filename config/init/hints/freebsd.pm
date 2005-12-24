@@ -5,7 +5,8 @@ package init::hints::freebsd;
 
 use strict;
 
-sub runstep {
+sub runstep
+{
     my ($self, $conf) = @_;
 
     my $libs = $conf->data->get('libs');
@@ -19,16 +20,14 @@ sub runstep {
     my $osversion;
     if (-e "/sbin/sysctl") {
         $osversion = `/sbin/sysctl -n kern.osreldate`;
-    }
-    else {
+    } else {
         $osversion = `/usr/sbin/sysctl -n kern.osreldate`;
     }
     chomp $osversion;
 
-    if ($osversion < 500016) { 
+    if ($osversion < 500016) {
         $libs .= ' -pthread';
-    }
-    else {
+    } else {
         $libs =~ s/-lc\b\s*//;
         $libs .= ' -lc_r';
     }

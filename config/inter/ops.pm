@@ -22,48 +22,47 @@ use Parrot::Configure::Step ':inter';
 
 $description = 'Determining what opcode files should be compiled in...';
 
-@args=qw(ask ops);
+@args = qw(ask ops);
 
-sub runstep {
+sub runstep
+{
     my ($self, $conf) = @_;
 
-  my @ops=(
-    sort {
-      if($a =~ /core\.ops/) { return -1 }
-      if($b =~ /core\.ops/) { return  1 }
-      return               ( $a cmp $b )
-    }
-    grep { !/vtable\.ops/ }
-    glob "src/ops/*.ops"
-  );
+    my @ops = (
+        sort {
+            if ($a =~ /core\.ops/) { return -1 }
+            if ($b =~ /core\.ops/) { return 1 }
+            return ($a cmp $b)
+            }
+            grep {
+            !/vtable\.ops/
+            } glob "src/ops/*.ops"
+    );
 
+    my $ops = join ' ', grep { !/obscure\.ops/ } @ops;
 
-  my $ops=join ' ', grep { !/obscure\.ops/ } @ops;
+    $ops = $conf->options->get('ops') if defined $conf->options->get('ops');
 
-  $ops = $conf->options->get('ops') if defined $conf->options->get('ops');
-
-  # ops selection disabled - until we can build and load
-  # opcode subset libs
-  if (0 && $conf->options->get('ask')) {
-  print <<"END";
+    # ops selection disabled - until we can build and load
+    # opcode subset libs
+    if (0 && $conf->options->get('ask')) {
+        print <<"END";
 
 
 The following opcode files are available:
   @ops
 END
-    {
-      $ops=prompt('Which opcode files would you like?', $ops);
+        {
+            $ops = prompt('Which opcode files would you like?', $ops);
 
-      if($ops !~ m{\bcore\.ops}) {
-        print "core.ops must be the first selection.\n";
-        redo;
-      }
+            if ($ops !~ m{\bcore\.ops}) {
+                print "core.ops must be the first selection.\n";
+                redo;
+            }
+        }
     }
-  }
 
-  $conf->data->set(
-    ops => $ops
-  );
+    $conf->data->set(ops => $ops);
 }
 
 1;
