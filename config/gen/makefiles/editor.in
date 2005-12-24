@@ -1,6 +1,6 @@
 # $Id$
 
-OPS_DIR     = ../ops
+OPS_DIR     = ../src/ops
 VIM_DIR     = $(HOME)/.vim
 VIM_FT_DIR  = $(VIM_DIR)/ftdetect
 VIM_IN_DIR  = $(VIM_DIR)/indent
