@@ -70,6 +70,7 @@ static int branch_branch(Interp *interpreter, IMC_Unit *);
 static int branch_reorg(Interp *interpreter, IMC_Unit *);
 static int unused_label(Interp *interpreter, IMC_Unit *);
 static int dead_code_remove(Interp *interpreter, IMC_Unit *);
+static int branch_cond_loop(Interp *interpreter, IMC_Unit *);
 
 static int constant_propagation(Interp *interpreter, IMC_Unit *);
 static int used_once(Interp *, IMC_Unit *);
@@ -111,6 +112,8 @@ cfg_optimize(Interp *interpreter, IMC_Unit * unit)
         if (branch_branch(interpreter, unit))
             return 1;
         if (branch_reorg(interpreter, unit))
+            return 1;
+        if (branch_cond_loop(interpreter, unit))
             return 1;
         /* XXX cfg / loop detection breaks e.g. in t/compiler/5_3 */
         if (unused_label(interpreter, unit))
@@ -817,7 +820,7 @@ IMCC_subst_constants(Interp *interpreter, IMC_Unit * unit, char *name,
 /* optimizations with CFG built */
 
 /*
- * branch L1  => branch L2
+ * if I0 goto L1  => if IO goto L2
  * ...
  * L1:
  * branch L2
@@ -835,8 +838,8 @@ branch_branch(Interp *interpreter, IMC_Unit * unit)
     IMCC_info(interpreter, 2, "\tbranch_branch\n");
     /* reset statistic globals */
     for (ins = unit->instructions; ins; ins = ins->next) {
-        if ((ins->type & IF_goto) && !strcmp(ins->op, "branch")) {
-            r = get_sym(ins->r[0]->name);
+          if (get_branch_regno(ins) >= 0) {
+            r = get_sym(get_branch_reg(ins)->name);
 
             if (r && (r->type & VTADDRESS) && r->first_ins) {
                 next = r->first_ins->next;
@@ -848,7 +851,7 @@ branch_branch(Interp *interpreter, IMC_Unit * unit)
                             "found branch to branch '%s' %I\n",
                             r->first_ins->r[0]->name, next);
                     ostat.branch_branch++;
-                    ins->r[0] = next->r[0];
+                    ins->r[get_branch_regno(ins)] = next->r[0];
                     changed = 1;
                 }
             }
@@ -880,7 +883,7 @@ branch_reorg(Interp *interpreter, IMC_Unit * unit)
 
     IMCC_info(interpreter, 2, "\tbranch_reorg\n");
     for (i = 0; i < unit->n_basic_blocks; i++) {
-	ins = unit->bb_list[i]->end;
+        ins = unit->bb_list[i]->end;
         /* if basic block ends with unconditional jump */
         if ((ins->type & IF_goto) && !strcmp(ins->op, "branch")) {
             r = get_sym(ins->r[0]->name);
@@ -916,6 +919,120 @@ branch_reorg(Interp *interpreter, IMC_Unit * unit)
                     ostat.deleted_ins++;
                     ins = delete_ins(unit, ins, 1);
                     return 1;
+                }
+            }
+        }
+    }
+    return changed;
+}
+
+static int
+branch_cond_loop_swap(Interp *interp, IMC_Unit *unit, Instruction *branch,
+        Instruction *cond)
+{
+    int changed = 0;
+    int args;
+    const char *neg_op = get_neg_op(cond->op, &args);
+    if (neg_op) {
+        char *label;
+        int count, size, found;
+        
+        size = strlen(branch->r[0]->name) + 8; /* + '_post999' */
+        
+        label = malloc(size);
+        found = 0;
+        for (count = 1; count != 999; ++count) {
+            snprintf(label, size, "%s_post%d", branch->r[0]->name, count);
+            if (get_sym(label) == 0) {
+                found = 1;
+                break;
+            }
+        }
+        
+        if (found) {
+            Instruction *tmp;
+            SymReg **regs, *r;
+            
+            r = mk_local_label(interp, str_dup(label));
+            tmp = INS_LABEL(unit, r, 0);
+            insert_ins(unit, cond, tmp);
+            
+            regs = malloc(sizeof(SymReg*) * args);
+            for (count = 0; count != args; ++count) {
+                regs[count] = cond->r[count];
+            }
+            regs[get_branch_regno(cond)] = mk_label_address(interp, str_dup(label));
+            tmp = INS(interp, unit, (char*)neg_op, "", regs, args, 0, 0);
+            subst_ins(unit, branch, tmp, 1);
+            
+            changed = 1;
+        }
+        
+        free(label);
+    }
+
+    return changed;
+}
+
+/*
+ * start:           => start:
+ * if cond goto end    if cond goto end
+ * ...
+ * branch start        start_post1:
+ * end:                ...
+ *                     unless cond goto start_post562
+ *                     end:
+ *
+ * The basic premise is "branch (A) to conditional (B), where B goes to
+ * just after A."
+ * 
+ * Returns TRUE if any optimizations were performed. Otherwise, returns
+ * FALSE.
+ */
+static int
+branch_cond_loop(Interp *interpreter, IMC_Unit * unit)
+{
+    Instruction *ins, *cond, *end, *start;
+    SymReg * r;
+    int changed = 0, found;
+
+    IMCC_info(interpreter, 2, "\tbranch_cond_loop\n");
+    /* reset statistic globals */
+
+    for (ins = unit->instructions; ins; ins = ins->next) {
+        if ((ins->type & IF_goto) && !strcmp(ins->op, "branch") ) {
+            /* get `end` label */
+            end = ins->next;
+            /* get `start` label */
+            r = get_sym(ins->r[0]->name);
+
+            if (end && (end->type & ITLABEL) &&
+                r && (r->type & VTADDRESS) && r->first_ins) {
+
+                start = r->first_ins;
+                found = 0;
+
+                cond = start->next;
+                /*while (cond = start->next; cond; cond = cond->next) {
+                     no good if it's an unconditional branch or a label*/
+                    if (!cond) {
+                        /* */
+                    } else if (cond->type & IF_goto && !strcmp(cond->op, "branch")) {
+                        /*break;*/
+                    } else if (cond->type & ITLABEL) {
+                        /*break;*/
+                    } else if (cond->type & ITBRANCH && get_branch_regno(cond) >= 0) {
+                        found = 1;
+                        /*break;*/
+                    }
+                /*}*/
+
+                if (found) {
+                    char *lbl = get_branch_reg(cond)->name;
+                    r = get_sym(lbl);
+                    if (r && (r->type & VTADDRESS) && r->first_ins == end) {
+                        changed |= branch_cond_loop_swap(interpreter, unit, ins, cond);
+                    }
                 }
             }
         }

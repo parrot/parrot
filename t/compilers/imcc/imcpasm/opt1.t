@@ -3,7 +3,7 @@
 # $Id$
 
 use strict;
-use Parrot::Test tests => 73;
+use Parrot::Test tests => 75;
 
 # these tests are run with -O1 by TestCompiler and show
 # generated PASM code for various optimizations at level 1
@@ -140,6 +140,56 @@ _test:
    noop
    print "ok\n"
    end
+OUT
+
+##############################
+pir_2_pasm_is(<<'CODE', <<'OUT', "branch_branch from conditional");
+.sub _test
+   if I0 goto l3
+l2:
+   print "ok\n"
+l1:
+   goto l2
+l3:
+   goto l1
+.end
+CODE
+# IMCC does produce b0rken PASM files
+# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
+_test:
+   if I0, l2
+l2:
+   print "ok\n"
+   branch l2
+OUT
+
+##############################
+pir_2_pasm_is(<<'CODE', <<'OUT', "branch_cond_loop");
+.sub _test
+   I0 = 10
+start:
+   unless I0 goto end
+   print "looping\n"
+   dec I0
+   branch start
+end:
+   print "ok\n"
+   branch start
+.end
+CODE
+# IMCC does produce b0rken PASM files
+# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
+_test:
+   set I0, 10
+start:
+   unless I0, end
+start_post1:
+   print "looping\n"
+   dec I0
+   if I0, start_post1
+end:
+   print "ok\n"
+   branch start
 OUT
 
 ##############################
