@@ -41,6 +41,11 @@ N: Amir Karger
 D: editor bugfixes
 E: akarger@cgr.harvard.edu
 
+N: Amos Robinson
+D: IMCC Optimizer patches
+D: ParTcl builtins
+E: amos@coscom.net
+
 N: Andrew Rodland
 D: vim syntax files and editor doc
 

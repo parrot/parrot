@@ -338,6 +338,8 @@ print_stat(Parrot_Interp interpreter, IMC_Unit * unit)
     IMCC_info(interpreter, 1, "\t%d labels, %d lines deleted, %d if_branch, %d branch_branch\n",
             ostat.deleted_labels, ostat.deleted_ins, ostat.if_branch,
             ostat.branch_branch);
+    IMCC_info(interpreter, 1, "\t%d branch_cond_loop\n",
+            ostat.branch_cond_loop);
     IMCC_info(interpreter, 1, "\t%d used once deleted\n",
             ostat.used_once);
     IMCC_info(interpreter, 1, "\t%d invariants_moved\n", ostat.invariants_moved);

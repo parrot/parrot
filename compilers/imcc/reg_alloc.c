@@ -100,7 +100,10 @@ imc_reg_alloc(Interp *interpreter, IMC_Unit * unit)
     }
 #endif
 
-    function = unit->instructions->r[0]->name;
+    if (unit->instructions->n_r)
+      function = unit->instructions->r[0]->name;
+    else
+      function = "(not a sub)";
     IMCC_debug(interpreter, DEBUG_IMC, "\n------------------------\n");
     IMCC_debug(interpreter, DEBUG_IMC, "processing sub %s\n", function);
     IMCC_debug(interpreter, DEBUG_IMC, "------------------------\n\n");
@@ -241,7 +244,11 @@ print_stat(Parrot_Interp interpreter, IMC_Unit * unit)
 {
     int sets[4] = {0,0,0,0};
 
-    char *function = unit->instructions->r[0]->name;
+    char *function;
+    if (unit->instructions->n_r)
+        function = unit->instructions->r[0]->name;
+    else
+        function = "(not a function)";
 
     make_stat(unit, sets, unit->n_regs_used);
     IMCC_info(interpreter, 1,
@@ -254,6 +261,8 @@ print_stat(Parrot_Interp interpreter, IMC_Unit * unit)
             "%d if_branch, %d branch_branch\n",
             ostat.deleted_labels, ostat.deleted_ins, ostat.if_branch,
             ostat.branch_branch);
+    IMCC_info(interpreter, 1, "\t%d branch_cond_loop\n",
+            ostat.branch_cond_loop);
     IMCC_info(interpreter, 1, "\t%d used once deleted\n",
             ostat.used_once);
     IMCC_info(interpreter, 1, "\t%d invariants_moved\n",

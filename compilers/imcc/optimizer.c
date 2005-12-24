@@ -111,9 +111,9 @@ cfg_optimize(Interp *interpreter, IMC_Unit * unit)
         IMCC_info(interpreter, 2, "cfg_optimize\n");
         if (branch_branch(interpreter, unit))
             return 1;
-        if (branch_reorg(interpreter, unit))
-            return 1;
         if (branch_cond_loop(interpreter, unit))
+            return 1;
+        if (branch_reorg(interpreter, unit))
             return 1;
         /* XXX cfg / loop detection breaks e.g. in t/compiler/5_3 */
         if (unused_label(interpreter, unit))
@@ -453,7 +453,8 @@ strength_reduce(Interp *interpreter, IMC_Unit * unit)
         if ( (ins->opnum == PARROT_OP_set_i_ic &&
                       IMCC_int_from_reg(interpreter, ins->r[1]) == 0)
           || (ins->opnum == PARROT_OP_set_n_nc &&
-                      atof(ins->r[1]->name) == 0.0)) {
+                      atof(ins->r[1]->name) == 0.0 &&
+                      ins->r[1]->name[0] != '-')) {
             IMCC_debug(interpreter, DEBUG_OPT1, "opt1 %I => ", ins);
             --ins->r[1]->use_count;
             tmp = INS(interpreter, unit, "null", "", ins->r, 1, 0, 0);
@@ -483,16 +484,26 @@ constant_propagation(Interp *interpreter, IMC_Unit * unit)
     char fullname[128];
     SymReg *c, *old, *o;
     int any = 0;
+    int found;
 
     IMCC_info(interpreter, 2, "\tconstant_propagation\n");
     for (ins = unit->instructions; ins; ins = ins->next) {
+        found = 0;
         if (!strcmp(ins->op, "set") &&
                 ins->opsize == 3 &&             /* no keyed set */
                 ins->r[1]->type == VTCONST &&
                 ins->r[0]->set != 'P') {        /* no PMC consts */
+            found = 1;
             c = ins->r[1];
             o = ins->r[0];
+        } /* else if (!strcmp(ins->op, "null")) {
+            found = 1;
+            c = mk_const(interpreter, str_dup("0"), 'I');
+            o = ins->r[0];
+        }*/ /* this would be good because 'set I0, 0' is reduced to 'null I0'
+               before it gets to us */
 
+        if (found) {
             IMCC_debug(interpreter, DEBUG_OPT1,
                     "propagating constant %I => \n", ins);
             for (ins2 = ins->next; ins2; ins2 = ins2->next) {
@@ -843,10 +854,12 @@ branch_branch(Interp *interpreter, IMC_Unit * unit)
 
             if (r && (r->type & VTADDRESS) && r->first_ins) {
                 next = r->first_ins->next;
-                if (!next)
-                    break;
-                if ((next->type & IF_goto) &&
-                        !strcmp(next->op, "branch")) {
+/*                if (!next || !strcmp(next->r[0]->name, get_branch_reg(ins)->name))
+                    break;*/
+                if (next &&
+                      (next->type & IF_goto) &&
+                      !strcmp(next->op, "branch") &&
+                      strcmp(next->r[0]->name, get_branch_reg(ins)->name)) {
                     IMCC_debug(interpreter, DEBUG_OPT1,
                             "found branch to branch '%s' %I\n",
                             r->first_ins->r[0]->name, next);
@@ -899,26 +912,31 @@ branch_reorg(Interp *interpreter, IMC_Unit * unit)
                 /* if target block is not reached by falling into it from another block */
                 if (!found) {
                     /* move target block and its positional successors
-                     * to follow block with unconditional jump */
+                     * to follow block with unconditional jump
+                     * (this could actually be in another block) */
                     for (end = start; end->next; end = end->next) {
                         if ((end->type & IF_goto) && !strcmp(end->op, "branch")) {
                             break;
                         }
                     }
-                    ins->next->prev = end;
-                    start->prev->next = end->next;
-                    if (end->next)
-                        end->next->prev = start->prev;
-                    end->next = ins->next;
-                    ins->next = start;
-                    start->prev = ins;
-                    IMCC_debug(interpreter, DEBUG_OPT1,
-                            "found branch to reorganize '%s' %I\n",
-                            r->first_ins->r[0]->name, ins);
-                    /* unconditional jump can be eliminated */
-                    ostat.deleted_ins++;
-                    ins = delete_ins(unit, ins, 1);
-                    return 1;
+
+                    /* this was screwing up multi-block loops... */
+                    if (end != ins) {
+                        ins->next->prev = end;
+                        start->prev->next = end->next;
+                        if (end->next)
+                            end->next->prev = start->prev;
+                        end->next = ins->next;
+                        ins->next = start;
+                        start->prev = ins;
+                        IMCC_debug(interpreter, DEBUG_OPT1,
+                                "found branch to reorganize '%s' %I\n",
+                                r->first_ins->r[0]->name, ins);
+                        /* unconditional jump can be eliminated */
+                        ostat.deleted_ins++;
+                        ins = delete_ins(unit, ins, 1);
+                        return 1;
+                    }
                 }
             }
         }
@@ -928,7 +946,7 @@ branch_reorg(Interp *interpreter, IMC_Unit * unit)
 
 static int
 branch_cond_loop_swap(Interp *interp, IMC_Unit *unit, Instruction *branch,
-        Instruction *cond)
+        Instruction *start, Instruction *cond)
 {
     int changed = 0;
     int args;
@@ -957,14 +975,28 @@ branch_cond_loop_swap(Interp *interp, IMC_Unit *unit, Instruction *branch,
             tmp = INS_LABEL(unit, r, 0);
             insert_ins(unit, cond, tmp);
             
+            
+            for (start = start->next; start != cond; start = start->next) {
+                if (!(start->type & ITLABEL)) {
+                    tmp = INS(interp, unit, start->op, "", start->r, start->n_r, 0, 0);
+                    prepend_ins(unit, branch, tmp);
+                }
+            }
+            
             regs = malloc(sizeof(SymReg*) * args);
             for (count = 0; count != args; ++count) {
                 regs[count] = cond->r[count];
             }
+
             regs[get_branch_regno(cond)] = mk_label_address(interp, str_dup(label));
             tmp = INS(interp, unit, (char*)neg_op, "", regs, args, 0, 0);
             subst_ins(unit, branch, tmp, 1);
             
+            IMCC_debug(interp, DEBUG_OPT1, 
+            "loop %s -> %s converted to post-test, added label %s\n",
+            branch->r[0]->name, get_branch_reg(cond)->name, label);
+
+            ostat.branch_cond_loop++;
             changed = 1;
         }
         
@@ -1012,26 +1044,21 @@ branch_cond_loop(Interp *interpreter, IMC_Unit * unit)
                 start = r->first_ins;
                 found = 0;
 
-                cond = start->next;
-                /*while (cond = start->next; cond; cond = cond->next) {
-                     no good if it's an unconditional branch or a label*/
-                    if (!cond) {
-                        /* */
-                    } else if (cond->type & IF_goto && !strcmp(cond->op, "branch")) {
-                        /*break;*/
-                    } else if (cond->type & ITLABEL) {
-                        /*break;*/
+                for (cond = start->next; cond; cond = cond->next) {
+                    /* no good if it's an unconditional branch*/
+                    if (cond->type & IF_goto && !strcmp(cond->op, "branch")) {
+                        break;
                     } else if (cond->type & ITBRANCH && get_branch_regno(cond) >= 0) {
                         found = 1;
-                        /*break;*/
+                        break;
                     }
-                /*}*/
+                }
 
                 if (found) {
                     char *lbl = get_branch_reg(cond)->name;
                     r = get_sym(lbl);
                     if (r && (r->type & VTADDRESS) && r->first_ins == end) {
-                        changed |= branch_cond_loop_swap(interpreter, unit, ins, cond);
+                        changed |= branch_cond_loop_swap(interpreter, unit, ins, start, cond);
                     }
                 }
             }

@@ -210,7 +210,7 @@ OUTPUT
 #
 # Operations on a single NUMVAL
 #
-output_is(<<'CODE', <<OUTPUT, "turn a native number into it's negative");
+output_is(<<'CODE', <<OUTPUT, "turn a native number into its negative");
 	set N0, 0
 	neg N0
 	print N0

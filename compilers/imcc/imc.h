@@ -126,6 +126,7 @@ struct imcc_ostat {
 	int deleted_labels;
 	int if_branch;
 	int branch_branch;
+  int branch_cond_loop;
 	int invariants_moved;
 	int deleted_ins;
 	int used_once;
