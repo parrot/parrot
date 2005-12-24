@@ -153,6 +153,12 @@ mem_allocate(Interp *interpreter, size_t size, struct Memory_Pool *pool)
         if (pool->top_block->free < size) {
             if (pool->minimum_block_size < 65536*16)
                 pool->minimum_block_size *= 2;
+            /*
+             * TODO - Big blocks
+             *
+             * Mark the block as big block (it has just one item)
+             * And don't set big blocks as the top_block.
+             */
             alloc_new_block(interpreter, size, pool);
             interpreter->arena_base->mem_allocs_since_last_collect++;
             if (pool->top_block->free < size) {
@@ -222,6 +228,23 @@ compact_pool(Interp *interpreter, struct Memory_Pool *pool)
         total_size = 0;
         cur_block = pool->top_block;
         while (cur_block) {
+            /*
+             * TODO - Big blocks
+             *
+             * Currently all available blocks are compacted into on new
+             * block with total_size. This is more than suboptimal, if
+             * the block has just one live item from a big allocation.
+             *
+             * But currently it's not known, if the buffer memory is alive
+             * as the live bits are in Buffer headers. We have to run the
+             * compaction loop below to check liveness. OTOH is this
+             * compaction is running through all the buffer headers, there
+             * is no relation to the block.
+             *
+             *
+             * Moving the life bit into the buffer thus also solves this
+             * problem easily.
+             */
             total_size += cur_block->size - cur_block->free;
             cur_block = cur_block->prev;
         }
