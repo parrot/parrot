@@ -45,20 +45,14 @@ alloc_new_block(Interp *interpreter,
     size_t alloc_size;
     struct Memory_Block *new_block;
 
-    if (pool) {
-        alloc_size = (size > pool->minimum_block_size)
-                ? size : pool->minimum_block_size;
-    }
-    else {
-        alloc_size = size;
-    }
+    alloc_size = (size > pool->minimum_block_size)
+            ? size : pool->minimum_block_size;
 
-    /* Allocate a new block. Header info's on the front, plus a fudge factor
-     * for good measure */
+    /* Allocate a new block. Header info's on the front */
     new_block = mem_internal_allocate_zeroed(sizeof(struct Memory_Block) +
-            alloc_size + 32);
+            alloc_size);
     if (!new_block) {
-        fprintf(stderr, "out of mem allocsize = %d\n", (int)alloc_size+32);
+        fprintf(stderr, "out of mem allocsize = %d\n", (int)alloc_size);
         exit(1);
         return NULL;
     }
