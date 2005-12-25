@@ -12,10 +12,15 @@ pir_output_is(<<'CODE', <<'OUT', "+=");
     $I0 += 20
     print $I0
     print "\n"
+
+    $I0 += -20
+    print $I0
+    print "\n"
     end
 .end
 CODE
 30
+10
 OUT
 
 ##############################
@@ -25,10 +30,15 @@ pir_output_is(<<'CODE', <<'OUT', "-=");
     $I0 -= 20
     print $I0
     print "\n"
+
+    $I0 -= -20
+    print $I0
+    print "\n"
     end
 .end
 CODE
 -10
+10
 OUT
 
 pir_output_is(<<'CODE', <<'OUT', "*=");
@@ -37,10 +47,15 @@ pir_output_is(<<'CODE', <<'OUT', "*=");
     $I0 *= 20
     print $I0
     print "\n"
+
+    $I0 *= -2
+    print $I0
+    print "\n"
     end
 .end
 CODE
 200
+-400
 OUT
 
 pir_output_is(<<'CODE', <<'OUT', "/=");
@@ -49,10 +64,18 @@ pir_output_is(<<'CODE', <<'OUT', "/=");
     $I0 /= 2
     print $I0
     print "\n"
+
+    $N0 = 20
+    $N0 /= .5
+    $I0 = $N0
+    print $I0
+    print "\n"
+
     end
 .end
 CODE
 10
+40
 OUT
 
 pir_output_is(<<'CODE', <<'OUT', "%=");
@@ -61,10 +84,16 @@ pir_output_is(<<'CODE', <<'OUT', "%=");
     $I0 %= 7
     print $I0
     print "\n"
+
+    $I0 = 200
+    $I0 %= 2
+    print $I0
+    print "\n"
     end
 .end
 CODE
 6
+0
 OUT
 
 pir_output_is(<<'CODE', <<'OUT', ".=");
@@ -73,21 +102,32 @@ pir_output_is(<<'CODE', <<'OUT', ".=");
     $S0 .= "cd"
     print $S0
     print "\n"
+
+    $S0 .= ""
+    print $S0
+    print "\n"
     end
 .end
 CODE
 abcd
+abcd
 OUT
+
 pir_output_is(<<'CODE', <<'OUT', "&=");
 .sub test :main
     $I0 =  0b1011
     $I0 &= 0b1000
     print $I0
     print "\n"
+
+    $I0 &= 0b0000
+    print $I0
+    print "\n"
     end
 .end
 CODE
 8
+0
 OUT
 
 pir_output_is(<<'CODE', <<'OUT', "|=");
@@ -96,10 +136,15 @@ pir_output_is(<<'CODE', <<'OUT', "|=");
     $I0 |= 0b1000
     print $I0
     print "\n"
+
+    $I0 |= 0b0100
+    print $I0
+    print "\n"
     end
 .end
 CODE
 11
+15
 OUT
 
 pir_output_is(<<'CODE', <<'OUT', "~=");
@@ -108,10 +153,15 @@ pir_output_is(<<'CODE', <<'OUT', "~=");
     $I0 ~= 0b1000
     print $I0
     print "\n"
+
+    $I0 ~= 0b0011
+    print $I0
+    print "\n"
     end
 .end
 CODE
 3
+0
 OUT
 
 pir_output_is(<<'CODE', <<'OUT', ">>=");
@@ -190,10 +240,16 @@ pir_output_is(<<'CODE', <<'OUT', "x = length");
     $I0 = length s
     print $I0
     print "\n"
+
+    s = ""
+    $I0 = length s
+    print $I0
+    print "\n"
     end
 .end
 CODE
 3
+0
 OUT
 
 pir_output_is(<<'CODE', <<'OUT', "x = sin");
@@ -201,7 +257,7 @@ pir_output_is(<<'CODE', <<'OUT', "x = sin");
     $N0 = sin 0
     print $N0
     print "\n"
-end
+    end
 .end
 CODE
 0.000000
@@ -213,7 +269,7 @@ pir_output_is(<<'CODE', <<'OUT', "x = can");
     $I0 = can $P0, "puts"
     print $I0
     print "\n"
-end
+    end
 .end
 CODE
 1
@@ -225,7 +281,7 @@ pir_output_is(<<'CODE', <<'OUT', "x = isa");
     $I0 = isa $P0, "scalar"
     print $I0
     print "\n"
-end
+    end
 .end
 CODE
 1
