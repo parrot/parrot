@@ -20,11 +20,12 @@ use base qw(Parrot::Configure::Step::Base);
 
 use Parrot::Configure::Step ':gen';
 
-$description="Generating core pmc list...";
+$description = "Generating core pmc list...";
 
-@args=();
+@args = ();
 
-sub runstep {
+sub runstep
+{
     my ($self, $conf) = @_;
 
     $self->generate_h($conf);
@@ -32,7 +33,8 @@ sub runstep {
     $self->generate_pm($conf);
 }
 
-sub generate_h {
+sub generate_h
+{
     my ($self, $conf) = @_;
 
     my $file = "include/parrot/core_pmcs.h";
@@ -53,8 +55,8 @@ END
     print OUT "    enum_class_default,\n";
     my $i = 1;
     foreach (@pmcs) {
-      print OUT "    enum_class_$_,\t/*  $i */ \n";
-      $i++;
+        print OUT "    enum_class_$_,\t/*  $i */ \n";
+        $i++;
     }
     print OUT <<"END";
     enum_class_core_max
@@ -68,7 +70,8 @@ END
     move_if_diff("$file.tmp", $file);
 }
 
-sub generate_c {
+sub generate_c
+{
     my ($self, $conf) = @_;
 
     my $file = "src/core_pmcs.c";
@@ -87,8 +90,7 @@ sub generate_c {
 
 END
 
-    print OUT "extern void Parrot_${_}_class_init(Interp *, int, int);\n"
-      foreach (@pmcs);
+    print OUT "extern void Parrot_${_}_class_init(Interp *, int, int);\n" foreach (@pmcs);
 
     print OUT <<"END";
 
@@ -103,10 +105,9 @@ void Parrot_initialize_core_pmcs(Interp *interp)
  	 */
 END
 
+    print OUT "        Parrot_${_}_class_init(interp, enum_class_${_}, pass);\n" foreach (@pmcs[-1 .. -1]);
     print OUT "        Parrot_${_}_class_init(interp, enum_class_${_}, pass);\n"
-      foreach (@pmcs[-1..-1]);
-    print OUT "        Parrot_${_}_class_init(interp, enum_class_${_}, pass);\n"
-      foreach (@pmcs[0..$#pmcs-1]);
+        foreach (@pmcs[0 .. $#pmcs - 1]);
     print OUT <<"END";
 	if (!pass) {
 	    PMC *classname_hash, *iglobals;
@@ -142,8 +143,7 @@ Parrot_register_core_pmcs(Interp *interp, PMC* registry)
 {
 END
 
-    print OUT "    register_pmc(interp, registry, enum_class_$_);\n"
-      foreach (@pmcs);
+    print OUT "    register_pmc(interp, registry, enum_class_$_);\n" foreach (@pmcs);
     print OUT <<"END";
 }
 END
@@ -153,7 +153,8 @@ END
     move_if_diff("$file.tmp", $file);
 }
 
-sub generate_pm {
+sub generate_pm
+{
     my ($self, $conf) = @_;
 
     my $file = "lib/Parrot/PMC.pm";
@@ -175,8 +176,8 @@ use vars qw(@ISA %pmc_types @EXPORT_OK);
 %pmc_types = (
 END
 
-    for my $num (0..$#pmcs) {
-	my $id = $num+1;
+    for my $num (0 .. $#pmcs) {
+        my $id = $num + 1;
         print OUT "\t$pmcs[$num] => $id,\n";
     }
 

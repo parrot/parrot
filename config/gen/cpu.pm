@@ -21,24 +21,26 @@ use base qw(Parrot::Configure::Step::Base);
 use Parrot::Configure::Step qw(copy_if_diff);
 use Carp;
 
-$description="Running CPU specific stuff...";
+$description = "Running CPU specific stuff...";
 
-@args=qw(miniparrot verbose);
+@args = qw(miniparrot verbose);
 
-sub runstep {
+sub runstep
+{
     my ($self, $conf) = @_;
 
     return if $conf->options->get('miniparrot');
 
     my $verbose = $conf->options->get('verbose');
 
-  my $cpu = $conf->data->get('cpuarch');
-  print "\t(cpu = '$cpu') " if $verbose;
-  my $f;
-  if (-d "config/gen/cpu/$cpu" && -e ($f = "config/gen/cpu/$cpu/auto.pm")) {
-    require $f;
-    # XXX change this to work like init::hints
-    &run_cpu($conf, $verbose);
-  }
+    my $cpu = $conf->data->get('cpuarch');
+    print "\t(cpu = '$cpu') " if $verbose;
+    my $f;
+    if (-d "config/gen/cpu/$cpu" && -e ($f = "config/gen/cpu/$cpu/auto.pm")) {
+        require $f;
+
+        # XXX change this to work like init::hints
+        &run_cpu($conf, $verbose);
+    }
 }
 

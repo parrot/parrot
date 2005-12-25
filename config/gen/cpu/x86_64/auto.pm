@@ -1,3 +1,4 @@
+
 =head1 NAME
 
 config/gen/cpu/x86_64/auto.pl
@@ -10,10 +11,11 @@ Adds -fPIC to x86_64 (AMD64) ccflags, if necessary.
 
 use strict;
 
-sub run_cpu {
+sub run_cpu
+{
     my ($conf, $verbose) = @_;
 
-    my $ccflags=$conf->data->get('ccflags');
+    my $ccflags = $conf->data->get('ccflags');
     $ccflags .= " -fPIC" unless $ccflags =~ /-fPIC/;
     $conf->data->set(ccflags => $ccflags);
 }
