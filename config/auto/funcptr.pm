@@ -20,21 +20,22 @@ use base qw(Parrot::Configure::Step::Base);
 
 use Parrot::Configure::Step ':auto';
 
-$description="Verifying that the compiler supports function pointer casts...";
+$description = "Verifying that the compiler supports function pointer casts...";
 
-@args=qw(verbose);
+@args = qw(verbose);
 
-sub runstep {
+sub runstep
+{
     my ($self, $conf) = @_;
 
-  my $jitcapable=$conf->data->get('jitcapable');
+    my $jitcapable = $conf->data->get('jitcapable');
 
-  if ($jitcapable) {
-    cc_gen('config/auto/funcptr/test_c.in');
-    eval { cc_build(); };
+    if ($jitcapable) {
+        cc_gen('config/auto/funcptr/test_c.in');
+        eval { cc_build(); };
 
-    if ($@ || cc_run() !~ /OK/) {
-      print <<"END";
+        if ($@ || cc_run() !~ /OK/) {
+            print <<"END";
 Although it is not required by the ANSI C standard,
 Parrot requires the ability to cast from void pointers to function
 pointers for its JIT support.
@@ -46,12 +47,12 @@ to use the JIT code.
 If you wish to continue without JIT support, please re-run this script
 With the '--jitcapable=0' argument.
 END
-      exit(-1);
+            exit(-1);
+        }
+        cc_clean();
+        print " (yes) " if $conf->options->get('verbose');
+        $result = 'yes';
     }
-    cc_clean();
-    print " (yes) " if $conf->options->get('verbose');
-    $result = 'yes';
-  }
 }
 
 1;

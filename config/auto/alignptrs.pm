@@ -25,30 +25,30 @@ $description = "Determining your minimum pointer alignment...";
 
 @args = qw(miniparrot);
 
-sub runstep {
+sub runstep
+{
     my ($self, $conf) = (shift, shift);
 
     return if $conf->options->get('miniparrot');
 
     $result = '';
     my $align;
-    if (defined($conf->data->get('ptr_alignment')))
-    {
-        $align = $conf->data->get('ptr_alignment');
+    if (defined($conf->data->get('ptr_alignment'))) {
+        $align  = $conf->data->get('ptr_alignment');
         $result = "configured: ";
-    }
-    elsif ($^O eq 'hpux' && $Config{ccflags} !~ /DD64/) {
+    } elsif ($^O eq 'hpux' && $Config{ccflags} !~ /DD64/) {
+
         # HP-UX 10.20/32 hangs in this test.
         $align = 4;
         $conf->data->set(ptr_alignment => $align);
         $result = "for hpux: ";
-    }
-    else {
+    } else {
+
         # Now really test by compiling some code
         cc_gen('config/auto/alignptrs/test_c.in');
         cc_build();
         for my $try_align (64, 32, 16, 8, 4, 2, 1) {
-            my $results=cc_run_capture($try_align);
+            my $results = cc_run_capture($try_align);
             if ($results =~ /OK/ && $results !~ /align/i) {
                 $align = $try_align;
             }

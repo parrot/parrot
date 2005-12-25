@@ -20,11 +20,12 @@ use base qw(Parrot::Configure::Step::Base);
 
 use Parrot::Configure::Step ':auto';
 
-$description="Test the type of va_ptr (this test is likely to segfault)...";
+$description = "Test the type of va_ptr (this test is likely to segfault)...";
 
-@args=qw();
+@args = qw();
 
-sub runstep {
+sub runstep
+{
     my ($self, $conf) = @_;
 
     my $va_type;
@@ -32,20 +33,17 @@ sub runstep {
     eval { cc_build('-DVA_TYPE_X86'); };
 
     if ($@ || cc_run() !~ /^ok/) {
-	eval { cc_build('-DVA_TYPE_PPC'); };
-	if ($@ || cc_run() !~ /^ok/) {
-	    die "Unknown va_ptr type";
-	}
-	$va_type = 'ppc';
-    }
-    else  {
-	$va_type = 'x86';
+        eval { cc_build('-DVA_TYPE_PPC'); };
+        if ($@ || cc_run() !~ /^ok/) {
+            die "Unknown va_ptr type";
+        }
+        $va_type = 'ppc';
+    } else {
+        $va_type = 'x86';
     }
     cc_clean();
     $result = $va_type;
-    $conf->data->set(
-	va_ptr_type => $va_type,
-    );
+    $conf->data->set(va_ptr_type => $va_type);
 }
 
 1;

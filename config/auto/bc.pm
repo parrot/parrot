@@ -27,28 +27,31 @@ $description = "Determining whether GNU bc is installed...";
 
 @args = qw();
 
-sub runstep {
+sub runstep
+{
     my ($self, $conf) = @_;
 
     my $has_gnu_bc;
-    my $osname =  $Config{osname};
+    my $osname = $Config{osname};
 
     # There were some problems with a hanging bc reported.
     # So check for bc only on selected platforms.
-    # Linux should be a safe bet. 
-    # For Win32 bc is available on http://gnuwin32.sourceforge.net/ 
-    my %bc_does_not_hang = ( linux => 1, 
-                             MSWin32 => 1,
-                           );
+    # Linux should be a safe bet.
+    # For Win32 bc is available on http://gnuwin32.sourceforge.net/
+    my %bc_does_not_hang = (
+        linux   => 1,
+        MSWin32 => 1,
+    );
 
-    if ( $bc_does_not_hang{$osname} ) {
-      # This seems to work for GNU bc 1.06
-      my $answer = capture_output( 'bc', '-v' ) || '';
-      $has_gnu_bc = ( $answer =~ m/^bc / &&
-                      $answer =~ m/Free Software Foundation/ ) ? 1 : 0;
+    if ($bc_does_not_hang{$osname}) {
+
+        # This seems to work for GNU bc 1.06
+        my $answer = capture_output('bc', '-v') || '';
+        $has_gnu_bc =
+            ($answer =~ m/^bc / && $answer =~ m/Free Software Foundation/) ? 1 : 0;
 
     } else {
-      $has_gnu_bc = 0;
+        $has_gnu_bc = 0;
     }
 
     $conf->data->set(has_gnu_bc => $has_gnu_bc);

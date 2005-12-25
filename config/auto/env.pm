@@ -20,10 +20,11 @@ use base qw(Parrot::Configure::Step::Base);
 
 use Parrot::Configure::Step ':auto';
 
-$description="Determining if your C library has setenv / unsetenv...";
-@args=qw(verbose);
+$description = "Determining if your C library has setenv / unsetenv...";
+@args        = qw(verbose);
 
-sub runstep {
+sub runstep
+{
     my ($self, $conf) = (shift, shift);
 
     my $verbose = $conf->options->get('verbose');
@@ -44,24 +45,21 @@ sub runstep {
     cc_clean();
 
     $conf->data->set(
-	setenv => $setenv,
-	unsetenv => $unsetenv
+        setenv   => $setenv,
+        unsetenv => $unsetenv
     );
 
     if ($setenv && $unsetenv) {
-	print " (both) " if $verbose;
+        print " (both) " if $verbose;
         $result = 'both';
-    }
-    elsif ($setenv) {
-	print " (setenv) " if $verbose;
+    } elsif ($setenv) {
+        print " (setenv) " if $verbose;
         $result = 'setenv';
-    }
-    elsif ($unsetenv) {
-	print " (unsetenv) " if $verbose;
+    } elsif ($unsetenv) {
+        print " (unsetenv) " if $verbose;
         $result = 'unsetenv';
-    }
-    else {
-	print " (no) " if $verbose;
+    } else {
+        print " (no) " if $verbose;
         $result = 'no';
     }
 }

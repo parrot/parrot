@@ -31,29 +31,31 @@ $description = "Determining whether antlr is installed...";
 
 @args = qw(verbose);
 
-sub runstep {
+sub runstep
+{
     my ($self, $conf) = @_;
 
-    my ( $out, $err ) = capture_output( 'antlr', '-h' );
-    my $output = join( '', $out || '', $err || '' );
-    my ($python, $major, $minor, $revision) = 
-        $output =~ m/(Python)\s+(\d+).(\d+)(?:.(\d+))?/;
+    my ($out, $err) = capture_output('antlr', '-h');
+    my $output = join('', $out || '', $err || '');
+    my ($python, $major, $minor, $revision) = $output =~ m/(Python)\s+(\d+).(\d+)(?:.(\d+))?/;
     my $has_antlr = ($output =~ m/ANTLR Parser Generator/) ? 1 : 0;
 
     $conf->data->set(has_antlr => $has_antlr);
 
     my $has_antlr_with_python = 0;
-    if ( $has_antlr ) {
+    if ($has_antlr) {
         unlink <config/auto/antlr/*.py>;
-        capture_output( 'antlr', '-o', 'config/auto/antlr', 'config/auto/antlr/test_python.g' );
+        capture_output('antlr', '-o', 'config/auto/antlr', 'config/auto/antlr/test_python.g');
         $has_antlr_with_python = 1 if -e 'config/auto/antlr/test_python_l.py';
-        $result = $has_antlr_with_python ?
-                                       'yes, with python' :
-                                       'yes, no python';
+        $result =
+            $has_antlr_with_python
+            ? 'yes, with python'
+            : 'yes, no python';
     } else {
-        $result = ($output =~ m/NoClassDefFoundError/) ?
-                                     'no, NoClassDefFoundError' :
-                                     'no';
+        $result =
+            ($output =~ m/NoClassDefFoundError/)
+            ? 'no, NoClassDefFoundError'
+            : 'no';
     }
     $conf->data->set(has_antlr_with_python => $has_antlr_with_python);
 }

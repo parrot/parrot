@@ -26,16 +26,17 @@ $description = "Determining architecture, OS and JIT capability...";
 
 @args = qw(jitcapable miniparrot execcapable verbose);
 
-sub runstep {
+sub runstep
+{
     my ($self, $conf) = @_;
 
     return if $conf->options->get('miniparrot');
 
     my $verbose = $conf->options->get('verbose');
 
-    my $jitbase             = "src/jit"; # base path for jit sources
-    my $archname            =  $Config{archname};
-    my ($cpuarch, $osname)  =  split( /-/, $archname);
+    my $jitbase  = "src/jit";        # base path for jit sources
+    my $archname = $Config{archname};
+    my ($cpuarch, $osname) = split(/-/, $archname);
 
     if (!defined $osname) {
         ($osname, $cpuarch) = ($cpuarch, q{});
@@ -47,44 +48,45 @@ sub runstep {
     # On OS X if you are using the Perl that shipped with the system
     # the above split fails because archname is "darwin-thread-multi-2level".
     if ($cpuarch =~ /darwin/) {
-        $osname = 'darwin';
+        $osname  = 'darwin';
         $cpuarch = 'ppc';
-    }
-    elsif ($cpuarch =~ /MSWin32/) {
+    } elsif ($cpuarch =~ /MSWin32/) {
         $cpuarch = 'i386';
         $osname  = 'MSWin32';
-    }
-    elsif ($osname =~ /cygwin/i || $cpuarch =~ /cygwin/i) {
+    } elsif ($osname =~ /cygwin/i || $cpuarch =~ /cygwin/i) {
         $cpuarch = 'i386';
         $osname  = 'cygwin';
     }
 
-    if ( $archname =~ m/powerpc/ ) {
+    if ($archname =~ m/powerpc/) {
         $cpuarch = 'ppc';
     }
 
-    $cpuarch  =~ s/armv[34]l?/arm/i;
-    $cpuarch  =~ s/i[456]86/i386/i;
+    $cpuarch =~ s/armv[34]l?/arm/i;
+    $cpuarch =~ s/i[456]86/i386/i;
 
     $conf->data->set(
-        archname    => $archname,
-        cpuarch     => $cpuarch,
-        osname      => $osname
+        archname => $archname,
+        cpuarch  => $cpuarch,
+        osname   => $osname
     );
 
-
     my $jitarchname = "$cpuarch-$osname";
-    my ( $jitcapable, $execcapable ) = ( 0, 0 );
+    my ($jitcapable, $execcapable) = (0, 0);
 
-    print( qq{-e "$jitbase/$cpuarch/core.jit" = }, -e "$jitbase/$cpuarch/core.jit" ? 'yes' : 'no', "\n" ) if $verbose;
+    print(qq{-e "$jitbase/$cpuarch/core.jit" = }, -e "$jitbase/$cpuarch/core.jit" ? 'yes' : 'no', "\n")
+        if $verbose;
 
     # XXX disable all but i386, ppc
     if (-e "$jitbase/$cpuarch/core.jit" && ($cpuarch eq 'i386' || $cpuarch eq 'ppc')) {
         $jitcapable = 1;
-	# XXX disable sun4 - doesn't even build
-        if ($cpuarch =~ /sun4|sparc64/ && (1 || 
-            $conf->data->get('intvalsize') > 
-	        $conf->data->get('ptrsize'))) {
+
+        # XXX disable sun4 - doesn't even build
+        if (
+            $cpuarch =~ /sun4|sparc64/
+            && (1
+                || $conf->data->get('intvalsize') > $conf->data->get('ptrsize'))
+            ) {
             $jitcapable = 0;
         }
     }
@@ -92,12 +94,10 @@ sub runstep {
     if (-e "$jitbase/$cpuarch/$jitarchname.s") {
         copy_if_diff("$jitbase/$cpuarch/$jitarchname.s", "src/asmfun.s");
         $conf->data->set(asmfun_o => 'src/asmfun$(O)');
-    }
-    elsif (-e "$jitbase/$cpuarch/asm.s") {
+    } elsif (-e "$jitbase/$cpuarch/asm.s") {
         copy_if_diff("$jitbase/$cpuarch/asm.s", "src/asmfun.s");
         $conf->data->set(asmfun_o => 'src/asmfun$(O)');
-    }
-    else {
+    } else {
         $conf->data->set(asmfun_o => '');
     }
 
@@ -105,7 +105,7 @@ sub runstep {
         if defined $conf->options->get('jitcapable');
 
     if ($jitcapable) {
-        my($jitcpuarch, $jitosname) =  split( /-/, $jitarchname);
+        my ($jitcpuarch, $jitosname) = split(/-/, $jitarchname);
 
         $conf->data->set(
             jitarchname => $jitarchname,
@@ -115,19 +115,20 @@ sub runstep {
             jitcapable  => 1,
             cc_hasjit   => " -DHAS_JIT -D\U$jitcpuarch",
             TEMP_jit_h  => '$(INC_DIR)/jit.h',
-            TEMP_jit_o  => '$(SRC_DIR)/jit$(O) $(SRC_DIR)/jit_cpu$(O) $(SRC_DIR)/jit_debug$(O) $(SRC_DIR)/jit_debug_xcoff$(O)'
-                            );
+            TEMP_jit_o  =>
+                '$(SRC_DIR)/jit$(O) $(SRC_DIR)/jit_cpu$(O) $(SRC_DIR)/jit_debug$(O) $(SRC_DIR)/jit_debug_xcoff$(O)'
+        );
 
-        if (    ($jitcpuarch eq 'i386')
-             || ($jitcpuarch eq 'ppc')
-             || ($jitcpuarch eq 'arm')) {
+        if (   ($jitcpuarch eq 'i386')
+            || ($jitcpuarch eq 'ppc')
+            || ($jitcpuarch eq 'arm')) {
             $execcapable = 1;
-            unless (    ($osname eq 'openbsd')
-                     || ($osname eq 'freebsd') 
-                     || ($osname eq 'netbsd')  
-                     || ($osname eq 'linux')   
-                     || ($osname eq 'darwin')  
-                     || ($osname eq 'MSWin32') ) {
+            unless (($osname eq 'openbsd')
+                || ($osname eq 'freebsd')
+                || ($osname eq 'netbsd')
+                || ($osname eq 'linux')
+                || ($osname eq 'darwin')
+                || ($osname eq 'MSWin32')) {
                 $execcapable = 0;
             }
         }
@@ -135,17 +136,18 @@ sub runstep {
             if defined $conf->options->get('execcapable');
         if ($execcapable) {
             $conf->data->set(
-                 TEMP_exec_h       => '$(INC_DIR)/jit.h $(INC_DIR)/exec.h $(INC_DIR)/exec_dep.h $(INC_DIR)/exec_save.h',
-                 TEMP_exec_o       => '$(SRC_DIR)/exec$(O) $(SRC_DIR)/exec_cpu$(O) $(SRC_DIR)/exec_save$(O)',
-                 execcapable  => 1
-                                );
-        }
-        else {
+                TEMP_exec_h =>
+                    '$(INC_DIR)/jit.h $(INC_DIR)/exec.h $(INC_DIR)/exec_dep.h $(INC_DIR)/exec_save.h',
+                TEMP_exec_o =>
+                    '$(SRC_DIR)/exec$(O) $(SRC_DIR)/exec_cpu$(O) $(SRC_DIR)/exec_save$(O)',
+                execcapable => 1
+            );
+        } else {
             $conf->data->set(
-                TEMP_exec_h  => '',
-                TEMP_exec_o  => '',
-                execcapable  => 0
-                                );
+                TEMP_exec_h => '',
+                TEMP_exec_o => '',
+                execcapable => 0
+            );
         }
 
         # test for executable malloced memory
@@ -155,13 +157,11 @@ sub runstep {
             eval { cc_build(); };
             if ($@) {
                 print " $@) " if $verbose;
-            }
-            else {
+            } else {
                 if (cc_run(0) !~ /ok/ && cc_run(1) =~ /ok/) {
-                    $conf->data->set( has_exec_protect => 1 );
+                    $conf->data->set(has_exec_protect => 1);
                     print "yes) " if $verbose;
-                }
-                else {
+                } else {
                     print "no) " if $verbose;
                 }
             }
@@ -175,12 +175,11 @@ sub runstep {
             cc_gen('config/auto/jit/test_c.in');
             eval { cc_build(); };
             unless ($@ || cc_run() !~ /ok/) {
-                $conf->data->set( jit_i386 => 'fcomip');
+                $conf->data->set(jit_i386 => 'fcomip');
             }
             cc_clean();
         }
-    }
-    else {
+    } else {
         $conf->data->set(
             jitarchname => 'nojit',
             jitcpuarch  => $cpuarch,
@@ -193,7 +192,7 @@ sub runstep {
             TEMP_jit_o  => '',
             TEMP_exec_h => '',
             TEMP_exec_o => ''
-                            );
+        );
     }
 }
 

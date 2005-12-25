@@ -43,28 +43,30 @@ use base qw(Parrot::Configure::Step::Base);
 
 use Parrot::Configure::Step ':auto';
 
-$description="Determining what allocator to use...";
+$description = "Determining what allocator to use...";
 
 # valid libc/malloc/malloc-trace/gc
-@args=qw(gc verbose);
+@args = qw(gc verbose);
 
-sub runstep {
-    my ($self, $conf) = @_; 
+sub runstep
+{
+    my ($self, $conf) = @_;
 
     my $gc = $conf->options->get('gc');
 
-  if (!defined($gc)) {
-    # default is GC in resources.c
-    $gc = 'gc';
-  }
-  elsif ($gc eq 'libc') {
-    # tests mallinfo after allocation of 128 bytes
-    if ($conf->data->get('i_malloc')) {
-        $conf->data->set(malloc_header => 'malloc.h');
-    }
-    else {
-        $conf->data->set(malloc_header => 'stdlib.h');
-    }
+    if (!defined($gc)) {
+
+        # default is GC in resources.c
+        $gc = 'gc';
+    } elsif ($gc eq 'libc') {
+
+        # tests mallinfo after allocation of 128 bytes
+        if ($conf->data->get('i_malloc')) {
+            $conf->data->set(malloc_header => 'malloc.h');
+        } else {
+            $conf->data->set(malloc_header => 'stdlib.h');
+        }
+
 =for nothing
 
     cc_gen('config/auto/gc/test_c.in');
@@ -82,38 +84,36 @@ sub runstep {
 
 =cut
 
-  }
+    }
 
-  if ($gc =~ /^malloc(?:-trace)?$/) {
-    $conf->data->set(
-      TEMP_gc_c          => <<"EOF",
+    if ($gc =~ /^malloc(?:-trace)?$/) {
+        $conf->data->set(
+            TEMP_gc_c => <<"EOF",
 \$(SRC_DIR)/$gc\$(O):	\$(GENERAL_H_FILES) \$(SRC_DIR)/$gc.c
 \$(SRC_DIR)/res_lea\$(O):	\$(GENERAL_H_FILES) \$(SRC_DIR)/res_lea.c
 EOF
-      TEMP_gc_o          => "\$(SRC_DIR)\/$gc\$(O) \$(SRC_DIR)/res_lea\$(O)",
-      gc_flag  => '-DGC_IS_MALLOC',
-    );
-  }
-  elsif ($gc eq 'libc') {
-    $conf->data->set(
-      TEMP_gc_c          => <<"EOF",
+            TEMP_gc_o => "\$(SRC_DIR)\/$gc\$(O) \$(SRC_DIR)/res_lea\$(O)",
+            gc_flag   => '-DGC_IS_MALLOC',
+        );
+    } elsif ($gc eq 'libc') {
+        $conf->data->set(
+            TEMP_gc_c => <<"EOF",
 \$(SRC_DIR)/res_lea\$(O):	\$(GENERAL_H_FILES) \$(SRC_DIR)/res_lea.c
 EOF
-      TEMP_gc_o          => "\$(SRC_DIR)/res_lea\$(O)",
-      gc_flag  => '-DGC_IS_MALLOC',
-    );
-  }
-  else {
-      $gc = 'gc';
-    $conf->data->set(
-      TEMP_gc_c          => <<"EOF",
+            TEMP_gc_o => "\$(SRC_DIR)/res_lea\$(O)",
+            gc_flag   => '-DGC_IS_MALLOC',
+        );
+    } else {
+        $gc = 'gc';
+        $conf->data->set(
+            TEMP_gc_c => <<"EOF",
 \$(SRC_DIR)/resources\$(O):	\$(GENERAL_H_FILES) \$(SRC_DIR)/resources.c
 EOF
-      TEMP_gc_o          => "\$(SRC_DIR)/resources\$(O)",
-      gc_flag  => '',
-    );
-  }
-  print(" ($gc) ") if $conf->options->get('verbose');
+            TEMP_gc_o => "\$(SRC_DIR)/resources\$(O)",
+            gc_flag   => '',
+        );
+    }
+    print(" ($gc) ") if $conf->options->get('verbose');
 }
 
 1;

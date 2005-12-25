@@ -23,10 +23,11 @@ use Config;
 use Parrot::Configure::Step ':auto';
 
 $description = "Determining if your platform supports gdbm...";
- 
+
 @args = qw(verbose);
 
-sub runstep {
+sub runstep
+{
     my ($self, $conf) = (shift, shift);
 
     my $verbose = $conf->options->get('verbose');
@@ -35,19 +36,19 @@ sub runstep {
     my $libs      = $conf->data->get('libs');
     my $linkflags = $conf->data->get('linkflags');
     my $ccflags   = $conf->data->get('ccflags');
-    
+
     my $archname = $Config{archname};
     my ($cpuarch, $osname) = split('-', $archname);
-    if(!defined $osname) {
+    if (!defined $osname) {
         ($osname, $cpuarch) = ($cpuarch, "");
     }
 
     # On OS X check the presence of the gdbm header in the standard
-    # Fink location. TODO: Need a more generalized way for finding 
+    # Fink location. TODO: Need a more generalized way for finding
     # where Fink lives.
-    if($osname =~ /darwin/) {
-        if( -f "/sw/include/gdbm.h") {
-            $conf->data->add(' ', linkflags  => '-L/sw/lib');
+    if ($osname =~ /darwin/) {
+        if (-f "/sw/include/gdbm.h") {
+            $conf->data->add(' ', linkflags => '-L/sw/lib');
             $conf->data->add(' ', dflags    => '-L/sw/lib');
             $conf->data->add(' ', cflags    => '-I/sw/include');
         }
@@ -60,26 +61,27 @@ sub runstep {
         } else {
             eval { cc_build('', 'gdbm.lib'); };
         }
-    } else { 
+    } else {
         eval { cc_build('', '-lgdbm'); };
     }
     my $has_gdbm = 0;
-    if (! $@) {
-	my $test = cc_run();
+    if (!$@) {
+        my $test = cc_run();
         unlink "gdbm_test_db";
-	if ($test eq "gdbm is working.\n") {
+        if ($test eq "gdbm is working.\n") {
             $has_gdbm = 1;
-	    print " (yes) " if $verbose;
+            print " (yes) " if $verbose;
             $result = 'yes';
-	}
+        }
     }
     unless ($has_gdbm) {
-        # The Config::Data settings might have changed for the test 
-        $conf->data->set( libs      => $libs );
-        $conf->data->set( ccflags   => $ccflags );
-        $conf->data->set( linkflags => $linkflags );
+
+        # The Config::Data settings might have changed for the test
+        $conf->data->set(libs      => $libs);
+        $conf->data->set(ccflags   => $ccflags);
+        $conf->data->set(linkflags => $linkflags);
         print " (no) " if $verbose;
         $result = 'no';
     }
-    $conf->data->set( has_gdbm => $has_gdbm ); # for gdbmhash.t and dynclasses.in
+    $conf->data->set(has_gdbm => $has_gdbm); # for gdbmhash.t and dynclasses.in
 }

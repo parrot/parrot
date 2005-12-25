@@ -21,26 +21,24 @@ use base qw(Parrot::Configure::Step::Base);
 use Parrot::Configure::Step ':auto';
 use Config;
 
-$description="Probing for C headers...";
+$description = "Probing for C headers...";
 
-@args=qw(miniparrot verbose);
+@args = qw(miniparrot verbose);
 
-sub runstep {
+sub runstep
+{
     my ($self, $conf) = @_;
 
     return if $conf->options->get('miniparrot');
-    
+
     # perl5's Configure system doesn't call this by its full name, which may
     # confuse use later, particularly once we break free and start doing all
     # probing ourselves
-    my %mapping =
-      (
-       i_niin => "i_netinetin",
-      );
+    my %mapping = (i_niin => "i_netinetin");
 
     for (keys %Config) {
-	next unless /^i_/;
-	$conf->data->set($mapping{$_}||$_ => $Config{$_});
+        next unless /^i_/;
+        $conf->data->set($mapping{$_} || $_ => $Config{$_});
     }
 
     # some headers may not be probed-for by perl 5, or might not be
@@ -55,45 +53,44 @@ sub runstep {
     # hence add sys/types.h to the reprobe list, and have 2 goes at getting
     # the header.
     my @extra_headers = qw(malloc.h fcntl.h setjmp.h pthread.h signal.h
-			   sys/types.h sys/socket.h netinet/in.h arpa/inet.h
-			   sys/stat.h sysexit.h);
+        sys/types.h sys/socket.h netinet/in.h arpa/inet.h
+        sys/stat.h sysexit.h);
 
     # more extra_headers needed on mingw/msys; *BSD fails if they are present
     if ($^O eq "msys") {
-	push @extra_headers, qw(sysmman.h netdb.h);
+        push @extra_headers, qw(sysmman.h netdb.h);
     }
     my @found_headers;
     foreach my $header (@extra_headers) {
-	my $pass = 0;
+        my $pass = 0;
 
-	# First try with just the header. If that fails, try with all the
-	# headers we found so far. This is somewhat a hack, but makes probing
-	# work on *BSD where some headers are documented as relying on others
-	# being included first.
-	foreach my $use_headers ([$header], [@found_headers, $header]) {
-	    $conf->data->set(testheaders =>
-				 join ('',
-				       map {"#include <$_>\n"} @$use_headers));
-	    $conf->data->set(testheader => $header);
+        # First try with just the header. If that fails, try with all the
+        # headers we found so far. This is somewhat a hack, but makes probing
+        # work on *BSD where some headers are documented as relying on others
+        # being included first.
+        foreach my $use_headers ([$header], [@found_headers, $header]) {
+            $conf->data->set(testheaders => join('', map { "#include <$_>\n" } @$use_headers));
+            $conf->data->set(testheader  => $header);
 
-	    cc_gen('config/auto/headers/test_c.in');
+            cc_gen('config/auto/headers/test_c.in');
 
-	    $conf->data->set(testheaders => undef);
-	    $conf->data->set(testheader => undef);
+            $conf->data->set(testheaders => undef);
+            $conf->data->set(testheader  => undef);
 
-	    eval { cc_build(); };
-	    if (!$@ && cc_run() =~ /^$header OK/) {
-		$pass = 1;
-		push @found_headers, $header;
-	    }
-	    cc_clean();
-	    last if $pass;
-	}
+            eval { cc_build(); };
+            if (!$@ && cc_run() =~ /^$header OK/) {
+                $pass = 1;
+                push @found_headers, $header;
+            }
+            cc_clean();
+            last if $pass;
+        }
 
         my $flag = "i_$header";
-        $flag =~ s/\.h$//g; $flag =~ s/\///g;
-	print "$flag: $pass\n" if defined $conf->options->get('verbose');
-	$conf->data->set($flag => $pass ? 'define' : undef);
+        $flag =~ s/\.h$//g;
+        $flag =~ s/\///g;
+        print "$flag: $pass\n" if defined $conf->options->get('verbose');
+        $conf->data->set($flag => $pass ? 'define' : undef);
     }
 
 }
