@@ -3,11 +3,11 @@
 # $Id$
 
 use strict;
-use Parrot::Test tests => 5;
+use Parrot::Test tests => 6;
 
 
-SKIP: {
-  skip("-O2 disabled", 5);
+#SKIP: {
+#  skip("-O2 disabled", 5);
 
 # these tests are run with -O2 by TestCompiler and show
 # generated PASM code for various optimizations at level 2
@@ -21,6 +21,8 @@ pir_2_pasm_is(<<'CODE', <<'OUT', "used once lhs");
 	end
 .end
 CODE
+# IMCC does produce b0rken PASM files
+# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
 _main:
 	print 2
 	end
@@ -38,6 +40,8 @@ loop:
        end
 .end
 CODE
+# IMCC does produce b0rken PASM files
+# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
 _main:
   set I0, 5
 loop:
@@ -61,6 +65,8 @@ nxt:
   branch add
 .end
 CODE
+# IMCC does produce b0rken PASM files
+# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
 _main:
   set I1, 10
   set I0, 5
@@ -71,6 +77,22 @@ add:
 nxt:
   set I1, 20
   branch add
+OUT
+
+##############################
+pir_2_pasm_is(<<'CODE', <<'OUT', "constant prop and null_i");
+.sub _main
+  null I0
+  add I1, I0, 5
+  print I1
+.end
+CODE
+# IMCC does produce b0rken PASM files
+# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
+_main:
+  print 5
+  set_returns
+  returncc
 OUT
 
 ##############################
@@ -92,6 +114,8 @@ next:
        end
 .end
 CODE
+# IMCC does produce b0rken PASM files
+# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
 _main:
 	set I0, 5
 	set I1, 2
@@ -120,9 +144,11 @@ pir_2_pasm_is(<<'CODE', <<'OUT', "constant prop repeated");
   end
 .end
 CODE
+# IMCC does produce b0rken PASM files
+# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
 _main:
   print 15
   end
 OUT
 
-}
+#}

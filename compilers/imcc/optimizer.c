@@ -478,7 +478,7 @@ strength_reduce(Interp *interpreter, IMC_Unit * unit)
 static int
 constant_propagation(Interp *interpreter, IMC_Unit * unit)
 {
-    Instruction *ins, *ins2;
+    Instruction *ins, *ins2, *tmp;
     int op;
     int i;
     char fullname[128];
@@ -496,25 +496,24 @@ constant_propagation(Interp *interpreter, IMC_Unit * unit)
             found = 1;
             c = ins->r[1];
             o = ins->r[0];
-        } /* else if (!strcmp(ins->op, "null")) {
+        } else if (!strcmp(ins->op, "null") && ins->r[0]->set == 'I') {
             found = 1;
             c = mk_const(interpreter, str_dup("0"), 'I');
             o = ins->r[0];
-        }*/ /* this would be good because 'set I0, 0' is reduced to 'null I0'
+        } /* this would be good because 'set I0, 0' is reduced to 'null I0'
                before it gets to us */
 
         if (found) {
-            IMCC_debug(interpreter, DEBUG_OPT1,
+            IMCC_debug(interpreter, DEBUG_OPT2,
                     "propagating constant %I => \n", ins);
             for (ins2 = ins->next; ins2; ins2 = ins2->next) {
                 if (ins2->type & ITSAVES ||
                     /* restrict to within a basic block */
                     ins2->bbindex != ins->bbindex)
                     goto next_constant;
-                /* parrot opsize has opcode too, so argument count is
-                 * opsize - 1
+                /* was opsize - 2, changed to n_r - 1
                  */
-                for (i = ins2->opsize - 2; i >= 0; i--) {
+                for (i = ins2->n_r - 1; i >= 0; i--) {
                     if (!strcmp(o->name, ins2->r[i]->name)) {
                         if (instruction_writes(ins2,ins2->r[i]))
                             goto next_constant;
@@ -524,17 +523,27 @@ constant_propagation(Interp *interpreter, IMC_Unit * unit)
                                     ins2, i);
                             old = ins2->r[i];
                             ins2->r[i] = c;
-                            op = check_op(interpreter, fullname, ins2->op,
-                                    ins2->r, ins2->opsize, ins2->keys);
-                            if (op < 0) {
-                                ins2->r[i] = old;
-                                IMCC_debug(interpreter, DEBUG_OPT2," - no %s\n", fullname);
-                            }
-                            else {
-                                --old->use_count;
-                                ins2->opnum = op;
+       /* first we try subst_constants for e.g. if 10 < 5 goto next*/
+                            tmp = IMCC_subst_constants(interpreter,
+                                unit, ins2->op, ins2->r, ins2->opsize,
+                                &found);
+                            if (found) {
+                                subst_ins(interpreter, ins2, tmp, 1);
                                 any = 1;
-                                IMCC_debug(interpreter, DEBUG_OPT2," -> %I\n", ins2);
+                                IMCC_debug(interpreter, DEBUG_OPT2," reduced to %I\n", tmp);
+                            } else {
+                                op = check_op(interpreter, fullname, ins2->op,
+                                    ins2->r, ins2->n_r, ins2->keys);
+                                if (op < 0) {
+                                    ins2->r[i] = old;
+                                    IMCC_debug(interpreter, DEBUG_OPT2," - no %s\n", fullname);
+                                }
+                                else {
+                                    --old->use_count;
+                                    ins2->opnum = op;
+                                    any = 1;
+                                    IMCC_debug(interpreter, DEBUG_OPT2," -> %I\n", ins2);
+                                }
                             }
                         }
                     }

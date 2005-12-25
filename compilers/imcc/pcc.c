@@ -185,7 +185,8 @@ expand_pcc_sub(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
     if (unit->last_ins->type != (ITPCCSUB|ITLABEL) &&
             strcmp(unit->last_ins->op, "ret") &&
             strcmp(unit->last_ins->op, "exit") &&
-            strcmp(unit->last_ins->op, "end")
+            strcmp(unit->last_ins->op, "end") &&
+            strcmp(unit->last_ins->op, "returncc") /* was adding rets multiple times... */
        ) {
         if (sub->pcc_sub->pragma & P_MAIN) {
             tmp = INS(interp, unit, "end", NULL, regs, 0, 0, 0);

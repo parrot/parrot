@@ -328,8 +328,9 @@ parseflags(Parrot_Interp interp, int *argc, char **argv[])
                 }
                 if (strchr(optimizer_opt, '2')) {
                     /* FIXME -O2 is borken */
-#if 0
-                    optimizer_level |= (OPT_CFG | OPT_PRE);
+#if 1
+                    IMCC_INFO(interp)->optimizer_level |= 
+                        (OPT_PRE | OPT_CFG);
 #else
                     IMCC_INFO(interp)->optimizer_level |= OPT_PRE;
 #endif
@@ -469,8 +470,14 @@ main(int argc, char * argv[])
 
     /* Default optimization level is zero; see optimizer.c, imc.h */
     if (!*optimizer_opt) {
+#if 1
         strcpy(optimizer_opt, "0");
         IMCC_INFO(interp)->optimizer_level = 0;
+#else
+        /* won't even make with this: something with Data::Dumper and set_i_p_i*/
+        strcpy(optimizer_opt, "2");
+        IMCC_INFO(interp)->optimizer_level = (OPT_CFG | OPT_PRE);
+#endif
     }
 
     /* Read in the source and determine whether it's Parrot bytecode,
