@@ -449,7 +449,7 @@ my $conf = Parrot::Configure->new;
 $conf->add_steps(@steps);
 $conf->options->set(%args);
 # Run the actual steps
-$conf->runsteps(%args);
+$conf->runsteps;
 
 # tell users what to do next
 my $make = $conf->data->get('make');

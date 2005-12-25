@@ -109,48 +109,46 @@ Loops over the configuration steps, running each one in turn.
 sub runsteps {
     my $self = shift;
 
-    my %args=@_;
+    my ($verbose, $verbose_step, $ask) =
+        $self->options->get(qw(verbose verbose-step ask));
 
-    my $verbose = $args{verbose};
-    my $n = 0;
+    my $n = 0; # step number
+    foreach my $step ($self->steps) {
+        $n++;
 
-    for my $step ($self->steps) {
         eval "use $step";
         die $@ if $@;
 
         my $description = $step->description;
 
-        print "\n", $description;
-        print '...';
-        ++$n;
-
-        if ($args{'verbose-step'}) {
-            if ($args{'verbose-step'} =~ /^\d+$/ &&
-                $n == $args{'verbose-step'}) {
-                $args{verbose} = 2;
+        # set per step verbosity
+        if (defined $verbose_step) {
+            # by step number
+            if ($verbose_step =~ /^\d+$/ && $n == $verbose_step) {
+                $self->options->set(verbose => 2);
             }
-            elsif ($description =~ /$args{'verbose-step'}/) {
-                $args{verbose} = 2;
+            # by description 
+            elsif ($description =~ /$verbose_step/) {
+                $self->options->set(verbose => 2);
             }
         }
 
-        # cc_build uses this verbose setting
-        $self->data->set('verbose' => $args{verbose}) if $n > 2;
+        # XXX cc_build uses this verbose setting, why?
+        $self->data->set(verbose => $verbose) if $n > 2;
 
-        print "\n" if $args{verbose} && $args{verbose} == 2;
+        print "\n", $description, '...';
+        print "\n" if $verbose && $verbose == 2;
 
-        if (defined $step->args) {
-            $step->runstep($self, @args{$step->args});
-        } else {
-            $step->runstep($self);
-        }
-
+        $step->runstep($self);
         my $result = $step->result || 'done';
 
-        print "..." if $args{verbose} && $args{verbose} == 2;
+        print "..." if $verbose && $verbose == 2;
         print "." x (71 - length($description)
                         - length($result));
-        print "$result." unless $step =~ m{^inter/} && $args{ask};
+        print "$result." unless $step =~ m{^inter/} && $ask;
+        
+        # reset verbose value for the next step
+        $self->options->set(verbose => $verbose);
     }
 }
 
