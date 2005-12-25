@@ -2070,7 +2070,7 @@ mmd_create_builtin_multi_meth_2(Interp *interpreter,
         signature[0] = 'v';
     meth_name = const_string(interpreter, short_name);
     class = Parrot_base_vtables[type]->class;
-    method = Parrot_find_method_with_cache(interpreter, class, meth_name);
+    method = Parrot_find_method_direct(interpreter, class, meth_name);
     if (!method) {
         /* first method */
         method = constant_pmc_new(interpreter, enum_class_NCI);

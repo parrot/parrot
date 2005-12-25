@@ -917,6 +917,13 @@ one. If not, it creates a new method cache. Or, rather, it will when
 we've got that bit working. For now it unconditionally goes and looks up
 the name in the global stash.
 
+=item C<PMC *
+Parrot_find_method_direct(Interp* interpreter, PMC *class,
+                              STRING *method_name)>
+                              
+Find a method PMC for a named method, given the class PMC, current
+interpreter, and name of the method. Don't use a possible method cache.
+
 =item void Parrot_invalidate_method_cache(Interp *, STRING *class)
 
 Clear method cache for the given class. If class is NULL caches for
@@ -985,6 +992,8 @@ Parrot_invalidate_method_cache(Interp *interpreter, STRING *class, STRING *meth)
      * isn't yet up */
     if (!interpreter->class_hash)
         return;
+    if (interpreter->resume_flag & RESUME_INITIAL)
+        return;
     if (!class) {
         invalidate_all_caches(interpreter);
         return;
@@ -1005,6 +1014,13 @@ Parrot_invalidate_method_cache(Interp *interpreter, STRING *class, STRING *meth)
  *       i.e. from obj.$Sreg(args)
  *       If this hash is implemented mark it during DOD
  */
+PMC *
+Parrot_find_method_direct(Interp* interpreter, PMC *class,
+                              STRING *method_name)
+{
+    return find_method_direct(interpreter, class, method_name);
+}
+
 PMC *
 Parrot_find_method_with_cache(Interp* interpreter, PMC *class,
                               STRING *method_name)
