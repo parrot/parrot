@@ -74,18 +74,17 @@ sub runstep
     if ($gccversion) {
 
         # If using gcc, crank up its warnings as much as possible and make it
-        # behave  ansi-ish.
-        # Here's an attempt at a list of nasty things we can use for a given
-        # version of gcc. The earliest documentation I currently have access to is
-        # for 2.95, so I don't know what version everything came in at. If it turns
-        # out that you're using 2.7.2 and -Wfoo isn't recognised there, move it up
-        # into the next version becone (2.8)
+        # behave  ansi-ish.  Here's an attempt at a list of nasty things we can
+        # use for a given version of gcc. The earliest documentation I
+        # currently have access to is for 2.95, so I don't know what version
+        # everything came in at. If it turns out that you're using 2.7.2 and
+        # -Wfoo isn't recognised there, move it up into the next version becone
+        # (2.8)
 
-        # Don't use -ansi -pedantic.  It makes it much harder to compile
-        # using the system headers, which may well be tuned to a
-        # non-strict environment -- especially since we are using perl5
-        # compilation flags determined in a non-strict environment.
-        # An example is Solaris 8.
+        # Don't use -ansi -pedantic.  It makes it much harder to compile using
+        # the system headers, which may well be tuned to a non-strict
+        # environment -- especially since we are using perl5 compilation flags
+        # determined in a non-strict environment.  An example is Solaris 8.
 
         my @opt_and_vers = (
             0 =>
@@ -96,13 +95,13 @@ sub runstep
             # ? -Wbad-function-cast
             #   Warn whenever a function call is cast to a non-matching type
             # ? -Wmissing-declarations
-            #   Warn if a global function is defined without a previous declaration
-            # -Wmissing-noreturn
+            #   Warn if a global function is defined without a previous
+            #   declaration -Wmissing-noreturn
             # ? -Wredundant-decls
             #    Warn if anything is declared more than once in the same scope,
             # ? -Wnested-externs
-            #    Warn if an `extern' declaration is encountered within an function.
-            # -Wlong-long
+            #    Warn if an `extern' declaration is encountered within an
+            #    function.  -Wlong-long
             # Ha. this is the default! with -pedantic.
             # -Wno-long-long for the nicest bit of C99
             2.7  => "",
@@ -120,8 +119,8 @@ sub runstep
 
             # -Wsequence-point is part of -Wall
             # -Wfloat-equal may not be what we want
-            # We shouldn't be using __packed__, but I doubt -Wpacked will harm us
-            # -Wpadded may prove interesting, or even noisy.
+            # We shouldn't be using __packed__, but I doubt -Wpacked will harm
+            # us -Wpadded may prove interesting, or even noisy.
             # -Wunreachable-code might be useful in a non debugging version
         );
         $warns = "";
