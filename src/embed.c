@@ -395,9 +395,9 @@ again:
     }
 
     /*
-     * fixup constant subroutine objects
+     * Set :main routine
      */
-    fixup_subs(interpreter, pf->cur_cs, PBC_PBC, NULL);
+    do_sub_pragmas(interpreter, pf->cur_cs, PBC_PBC, NULL);
     /*
      * JITting and/or prederefing the sub/the bytecode is done
      * in switch_to_cs before actual usage of the segment
@@ -692,7 +692,7 @@ set_current_sub(Interp *interpreter)
                 if (sub->seg != cur_cs)
                     continue;
                 code_start = (opcode_t*) sub->seg->base.data;
-                offs = sub->address - code_start;
+                offs = sub->start_offs;
                 if (offs == interpreter->resume_offset) {
                     CONTEXT(interpreter->ctx)->current_sub = sub_pmc;
                     CONTEXT(interpreter->ctx)->current_HLL = sub->HLL_id;
@@ -705,7 +705,7 @@ set_current_sub(Interp *interpreter)
      * if we didn't find anything put a dummy PMC into current_sub
      */
     sub_pmc = pmc_new(interpreter, enum_class_Sub);
-    PMC_sub(sub_pmc)->address = interpreter->code->base.data;
+    PMC_sub(sub_pmc)->start_offs = 0;
     CONTEXT(interpreter->ctx)->current_sub = sub_pmc;
     return sub_pmc;
 }

@@ -279,7 +279,7 @@ Experimental: return caller PMC or Undef if none.
     METHOD PMC* caller() {
         struct Parrot_cont * cc = PMC_cont(SELF);
         PMC *caller = cc->to_ctx->current_sub;
-        if (!caller || !PMC_sub(caller)->address) {
+        if (!caller || !PMC_sub(caller)->seg) {
             caller = pmc_new(INTERP, enum_class_Undef);
         }
         return caller;

@@ -216,7 +216,7 @@ pbc_merge_bytecode(Interp *interpreter, struct pbc_merge_input **inputs,
     /* Stash produced bytecode. */
     bc_seg->base.data = bc;
     bc_seg->base.size = cursor;
-    bc_seg->base.name = "MERGED";
+    bc_seg->base.name = strdup("MERGED");
     return bc_seg;
 }
 
@@ -304,8 +304,8 @@ pbc_merge_constants(Interp *interpreter, struct pbc_merge_input **inputs,
                     case enum_class_Closure:
                     case enum_class_Coroutine:
                         sub = PMC_sub(copy->u.key);
-                        sub->address += inputs[i]->code_start;
-                        sub->end += inputs[i]->code_start;
+                        sub->start_offs += inputs[i]->code_start;
+                        sub->end_offs += inputs[i]->code_start;
                         break;
                 }
             }

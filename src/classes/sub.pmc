@@ -83,7 +83,7 @@ Initializes the subroutine.
     /*
      * Sub PMC's flags usage:
      * - private0 ... Coroutine flip/flop - C exception handler
-     * - private1 ... Fixup is done
+     * - private1 ... unused
      * - private2 ... tailcall invoked this Sub
      * - private3 ... pythonic coroutine generator flag
      * - private4 ... :main (nee @MAIN)
@@ -178,7 +178,7 @@ Sets the pointer to the actual subroutine.
 
 =item C<void *get_pointer()>
 
-Returns the pointer to the actual subroutine.
+Returns the address of the actual subroutine.
 
 =cut
 
@@ -186,7 +186,7 @@ Returns the pointer to the actual subroutine.
 
     void* get_pointer () {
         struct Parrot_sub * sub = PMC_sub(SELF);
-        return sub->address;
+        return sub->seg->base.data + sub->start_offs;
     }
 
 /*
@@ -211,7 +211,7 @@ now.> -DRS
 
 =item C<INTVAL get_bool()>
 
-Returns whether the subroutine is defined.
+Returns True.
 
 =cut
 
@@ -219,12 +219,12 @@ Returns whether the subroutine is defined.
 
     INTVAL defined () {
         struct Parrot_sub * sub = PMC_sub(SELF);
-        return sub->address != NULL;
+        return 1;
     }
 
     INTVAL get_bool () {
         struct Parrot_sub * sub = PMC_sub(SELF);
-        return sub->address != NULL;
+        return 1;
     }
 
 /*
@@ -269,7 +269,7 @@ Invokes the subroutine.
          * immediately after argument passing.
          *
          */
-        pc = sub->address;
+        pc = sub->seg->base.data + sub->start_offs;
         caller_ctx = CONTEXT(INTERP->ctx);
         ccont = INTERP->current_cont;
         INTERP->current_cont = NULL;
@@ -420,7 +420,8 @@ Returns whether the two subroutines are equal.
 
     INTVAL is_equal (PMC* value) {
         return SELF->vtable == value->vtable &&
-            (PMC_sub(SELF))->address == (PMC_sub(value))->address;
+            (PMC_sub(SELF))->start_offs == (PMC_sub(value))->start_offs &&
+            (PMC_sub(SELF))->seg == (PMC_sub(value))->seg;
     }
 
 /*
@@ -462,7 +463,6 @@ Archives the subroutine.
     void freeze(visit_info *info) {
         IMAGE_IO *io = info->image_io;
         struct Parrot_sub * sub = PMC_sub(SELF);
-        size_t start_offs, end_offs;
         int i;
 
         SUPER(info);
@@ -480,21 +480,8 @@ Archives the subroutine.
          * - lex_info
          */
 
-        /*
-         * if sub addresses are absolute, the flag is set
-         */
-        if (PObj_get_FLAGS(SELF) & SUB_FLAG_FIXUP_DONE) {
-            ptrdiff_t code = (ptrdiff_t) sub->seg->base.data;
-
-            start_offs = ((ptrdiff_t)sub->address - code) / sizeof(opcode_t*);
-            end_offs = ((ptrdiff_t)sub->end - code) / sizeof(opcode_t*);
-        }
-        else {
-            start_offs = (size_t)sub->address;
-            end_offs =   (size_t)sub->end;
-        }
-        io->vtable->push_integer(INTERP, io, (INTVAL) start_offs);
-        io->vtable->push_integer(INTERP, io, (INTVAL) end_offs);
+        io->vtable->push_integer(INTERP, io, (INTVAL) sub->start_offs);
+        io->vtable->push_integer(INTERP, io, (INTVAL) sub->end_offs);
         io->vtable->push_integer(INTERP, io,
                 PObj_get_FLAGS(pmc) & SUB_FLAG_PF_MASK);
         io->vtable->push_string(INTERP, io, sub->name);
@@ -519,17 +506,13 @@ Unarchives the subroutine.
 
         if (info->extra_flags == EXTRA_IS_NULL) {
             struct Parrot_sub * sub = PMC_sub(SELF);
-            size_t start_offs, end_offs;
             INTVAL flags;
             int i;
             /*
              * we get relative offsets
              */
-            PObj_get_FLAGS(SELF) &= ~SUB_FLAG_FIXUP_DONE;
-            start_offs = (size_t) io->vtable->shift_integer(INTERP, io);
-            end_offs   = (size_t) io->vtable->shift_integer(INTERP, io);
-            sub->address = (opcode_t*) start_offs;
-            sub->end = (opcode_t*) end_offs;
+            sub->start_offs = (size_t) io->vtable->shift_integer(INTERP, io);
+            sub->end_offs   = (size_t) io->vtable->shift_integer(INTERP, io);
             flags = io->vtable->shift_integer(INTERP, io);
             PObj_get_FLAGS(SELF) |= flags & SUB_FLAG_PF_MASK;
             sub->name = io->vtable->shift_string(INTERP, io);
@@ -537,35 +520,6 @@ Unarchives the subroutine.
             for (i = 0; i < 4; ++i)
                 sub->n_regs_used[i] = io->vtable->shift_integer(INTERP, io);
         }
-    }
-
-/*
-
-=item C<void thawfinish(visit_info *info)>
-
-Called after the subroutine as been unarchived.
-
-=cut
-
-*/
-
-    void thawfinish(visit_info *info) {
-        /*
-         * for now do fixup here until packfile issues are sorted out
-         */
-        opcode_t *code;
-        struct Parrot_sub * sub = PMC_sub(SELF);
-        opcode_t *start_offs, *end_offs;
-
-        /* if its absolute already - done */
-        if (PObj_get_FLAGS(SELF) & SUB_FLAG_FIXUP_DONE)
-            return;
-        code = sub->seg->base.data;
-        start_offs = code + (size_t) sub->address;
-        end_offs =   code + (size_t) sub->end;
-        sub->address = start_offs;
-        sub->end = end_offs;
-        PObj_get_FLAGS(SELF) |= SUB_FLAG_FIXUP_DONE;
     }
 
 /*

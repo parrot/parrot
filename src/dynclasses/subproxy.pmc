@@ -48,10 +48,10 @@ pmclass SubProxy dynpmc need_ext extends Sub {
 	    PObj_get_FLAGS(SELF) &= ~PObj_private0_FLAG;
 	    ((parrot_sub_t)(PMC_sub(SELF))) ->seg =
 		    ((parrot_sub_t)(PMC_sub(rsub))) ->seg;
-	    ((parrot_sub_t)(PMC_sub(SELF))) ->address =
-		    ((parrot_sub_t)(PMC_sub(rsub))) ->address;
-	    ((parrot_sub_t)(PMC_sub(SELF))) ->end =
-		    ((parrot_sub_t)(PMC_sub(rsub))) ->end;
+	    ((parrot_sub_t)(PMC_sub(SELF))) ->start_offs =
+		    ((parrot_sub_t)(PMC_sub(rsub))) ->start_offs;
+	    ((parrot_sub_t)(PMC_sub(SELF))) ->end_offs =
+		    ((parrot_sub_t)(PMC_sub(rsub))) ->end_offs;
 	}
 	return SUPER(next);
     }

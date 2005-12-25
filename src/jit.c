@@ -1223,6 +1223,7 @@ set_reg_usage(Interp *interpreter, opcode_t *pc)
     PMC *sub_pmc;
     parrot_sub_t sub;
     int i, ci;
+    size_t offs;
 
     seg = interpreter->code;
     ft = seg->fixups;
@@ -1237,7 +1238,8 @@ set_reg_usage(Interp *interpreter, opcode_t *pc)
                 ci = ft->fixups[i]->offset;
                 sub_pmc = ct->constants[ci]->u.key;
                 sub = PMC_sub(sub_pmc);
-                if (pc >= sub->address && pc < sub->end) {
+                offs = pc - sub->seg->base.data;
+                if (offs >= sub->start_offs && offs < sub->end_offs) {
 		    CONTEXT(interpreter->ctx)->n_regs_used = sub->n_regs_used;
                     return;
                 }

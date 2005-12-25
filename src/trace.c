@@ -108,14 +108,9 @@ trace_pmc_dump(Interp *interpreter, PMC* pmc)
             ||  pmc->vtable->base_type == enum_class_Continuation
             ||  pmc->vtable->base_type == enum_class_Sub) {
         opcode_t *pc, *seg;
-        pc = PMC_sub(pmc)->address;
-        if (pc)
-            seg = PMC_sub(pmc)->seg->base.data;
-        else
-            seg = NULL;
         PIO_eprintf(interpreter, "%S=PMC(%#p pc:%d)",
                 VTABLE_name(interpreter, pmc), pmc,
-                pc - seg);
+                PMC_sub(pmc)->start_offs);
     }
     else if (PObj_is_object_TEST(pmc)) {
         PIO_eprintf(interpreter, "Object(%Ss)=PMC(%#p)",

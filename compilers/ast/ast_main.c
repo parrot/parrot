@@ -87,8 +87,8 @@ ast_compile_past(Parrot_Interp interp, const char *src_string)
      */
     sub_data = PMC_sub(sub);
     sub_data->seg = new_cs;
-    sub_data->address = new_cs->base.data;
-    sub_data->end = new_cs->base.data + new_cs->base.size;
+    sub_data->start_offs = 0;
+    sub_data->end_offs = new_cs->base.size;
     sub_data->name = string_from_cstring(interp, "PAST", 0);
 
     if (imc_info) {

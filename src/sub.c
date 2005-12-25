@@ -314,16 +314,6 @@ Parrot_Context_info(Interp *interpreter, parrot_context_t *ctx,
         return 0;
     }
 
-    /* make sure there is a sub (not always the case, e.g in pasm code) */
-    if (ctx->current_sub->vtable->base_type == enum_class_Undef ||
-        PMC_sub(ctx->current_sub)->address == 0) {
-    /* XXX: is this correct? (try with load_bytecode) */
-    /* use the current interpreter's bytecode as start address */
-    if (ctx->current_pc != NULL)
-        info->pc = ctx->current_pc - interpreter->code->base.data;
-        return 1;
-    }
-
     /* fetch struct Parrot_sub of the current sub in the given context */
     if (!VTABLE_isa(interpreter, ctx->current_sub,
                     const_string(interpreter, "Sub")))

@@ -24,7 +24,6 @@ typedef enum {
     SUB_FLAG_CORO_FF      = PObj_private0_FLAG,
     SUB_FLAG_C_HANDLER    = PObj_private0_FLAG,
 
-    SUB_FLAG_FIXUP_DONE   = PObj_private1_FLAG,
     SUB_FLAG_TAILCALL     = PObj_private2_FLAG,
     SUB_FLAG_GENERATOR    = PObj_private3_FLAG,
 
@@ -53,8 +52,8 @@ union parrot_context_t;
  */
 typedef struct Parrot_sub {
     struct PackFile_ByteCode *seg;      /* bytecode segment */
-    opcode_t *address;          /* start of bytecode, addr to continue */
-    opcode_t *end;              /* end of bytecode */
+    size_t   start_offs;        /* sub entry in ops from seg->base.data */
+    size_t   end_offs;
 
     INTVAL   HLL_id;            /* see src/hll.c XXX or per segment? */
     PMC      *namespace;       /* where this Sub is in */
@@ -78,8 +77,8 @@ typedef struct Parrot_sub {
  */
 typedef struct Parrot_coro {
     struct PackFile_ByteCode *seg;      /* bytecode segment */
-    opcode_t *address;          /* start of bytecode, addr to continue */
-    opcode_t *end;              /* end of bytecode */
+    size_t   start_offs;        /* sub entry in ops from seg->base.data */
+    size_t   end_offs;
 
     INTVAL   HLL_id;            /* see src/hll.c XXX or per segment? */
     PMC      *namespace;       /* where this Sub is in */
@@ -95,6 +94,7 @@ typedef struct Parrot_coro {
     /* - end common */
 
     struct PackFile_ByteCode *caller_seg;  /* bytecode segment */
+    opcode_t *address;        /* next address to run - toggled each time */
 } * parrot_coro_t;
 
 #define PMC_coro(pmc) 		  ((parrot_coro_t)PMC_struct_val(pmc))

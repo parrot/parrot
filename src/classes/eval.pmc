@@ -264,10 +264,6 @@ Archives the evaled code
 
 Unarchives the code.
 
-=item C<void thawfinish(visit_info *info)>
-
-Final code fixup after thawing.
-
 =cut
 
 */
@@ -294,7 +290,7 @@ Final code fixup after thawing.
         if (!PackFile_unpack(INTERP, pf, packed->strstart, packed->strlen))
             real_exception(INTERP, NULL, E_IOError,
                     "couldn't unpack packfile");
-        fixup_subs(INTERP, pf->cur_cs, PBC_PBC, SELF);
+        do_sub_pragmas(INTERP, pf->cur_cs, PBC_PBC, SELF);
         for (i = 0; i < pf->directory.num_segments; ++i) {
             seg = pf->directory.segments[i];
             if (seg->type == PF_BYTEC_SEG) {
@@ -309,16 +305,6 @@ Final code fixup after thawing.
          *     destroyed again during interpreter destruction
          */
         /* PackFile_destroy(INTERP, pf); */
-    }
-
-    void thawfinish(visit_info *info) {
-        struct Parrot_sub * sub = PMC_sub(SELF);
-        struct PackFile_ByteCode *seg = sub->seg;
-        /* XXX why - maybe somewhere interp->code is
-         * used instead of pf->cur_cs
-         */
-        sub->address = seg->base.data;
-        sub->end = sub->address + seg->base.size;
     }
 
 }

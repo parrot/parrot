@@ -164,6 +164,7 @@ Swaps the "context".
             PObj_get_FLAGS(SELF) |= SUB_FLAG_CORO_FF;
             wanted_seg = co->seg;
             co->caller_seg = INTERP->code;
+            co->address = co->seg->base.data + co->start_offs;
         }
         /* if calling the Coro we need the segment of the Coro */
         else if (!(PObj_get_FLAGS(SELF) & SUB_FLAG_CORO_FF)) {
@@ -191,6 +192,7 @@ Swaps the "context".
         }
 
         /* toggle address */
+        dest = co->address;
         co->address = next;
         if (INTERP->code != wanted_seg) {
             Parrot_switch_to_cs(INTERP, wanted_seg, 1);

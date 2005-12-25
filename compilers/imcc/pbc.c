@@ -679,8 +679,8 @@ add_const_pmc_sub(Interp *interpreter, SymReg *r,
         }
     }
     sub->namespace = ns_pmc;
-    sub->address = (opcode_t*)(long)offs;
-    sub->end = (opcode_t*)(long)end;
+    sub->start_offs = offs;
+    sub->end_offs = end;
     sub->HLL_id = unit->HLL_id;
     for (i = 0; i < 4; ++i)
         sub->n_regs_used[i] = unit->n_regs_used[i];

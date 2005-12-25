@@ -659,8 +659,8 @@ imcc_compile(Parrot_Interp interp, const char *s, int pasm_file)
      */
     sub_data = PMC_sub(sub);
     sub_data->seg = new_cs;
-    sub_data->address = new_cs->base.data;
-    sub_data->end = new_cs->base.data + new_cs->base.size;
+    sub_data->start_offs = 0;
+    sub_data->end_offs = new_cs->base.size;
     sub_data->name = string_from_cstring(interp, name, 0);
 
     if (imc_info) {
