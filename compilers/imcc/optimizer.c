@@ -528,7 +528,7 @@ constant_propagation(Interp *interpreter, IMC_Unit * unit)
                                 unit, ins2->op, ins2->r, ins2->opsize,
                                 &found);
                             if (found) {
-                                subst_ins(interpreter, ins2, tmp, 1);
+                                subst_ins(unit, ins2, tmp, 1);
                                 any = 1;
                                 IMCC_debug(interpreter, DEBUG_OPT2," reduced to %I\n", tmp);
                             } else {
