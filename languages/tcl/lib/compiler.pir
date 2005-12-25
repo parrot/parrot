@@ -30,7 +30,7 @@ Return register_num is the register number that contains the result of this code
   .local pmc commands
   commands = parse(tcl_code)
 
-  .return "compile_dispatch"(register_num, commands)
+  .return commands.compile(register_num)
 .end
 
 =item C<(int register_num, str code) = compile_dispatch(int register_num, pmc thing)>
