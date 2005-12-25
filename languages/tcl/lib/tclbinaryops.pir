@@ -135,9 +135,9 @@ Initialize the attributes for an instance of the class
 
   .local string l_code,r_code,op_code
   .local int l_reg,r_reg
-  (l_reg,l_code) = compile(l_operand,register_num)
+  (l_reg,l_code) = compile(register_num, l_operand)
   register_num = l_reg + 1
-  (r_reg,r_code) = compile(r_operand,register_num)
+  (r_reg,r_code) = compile(register_num, r_operand)
   register_num = r_reg + 1
 
   if op == OPERATOR_MUL goto op_mul

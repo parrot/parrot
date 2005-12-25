@@ -33,7 +33,7 @@
   pir_code .= "#PRE LOOP\n"
   pir_code .= temp_code
   inc register_num
-  (register_num,temp_code) = compile_dispatch(body, register_num)
+  (register_num,temp_code) = compile_dispatch(register_num, body)
   pir_code .= temp_code
   pir_code .= ".local pmc compiler, pir_compiler, pir\n"
   pir_code .= "compiler     = find_global '_Tcl', 'compile'\n"

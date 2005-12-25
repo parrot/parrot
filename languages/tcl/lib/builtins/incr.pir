@@ -22,7 +22,7 @@
   if argc == 2 goto got_increment
   value     = argv[0]
 
-  (value_num,temp_code) = compiler(value,register_num)
+  (value_num,temp_code) = compiler(register_num, value)
   pir_code .= temp_code
   register_num = value_num + 1
 
@@ -62,10 +62,10 @@ got_increment:
   value     = argv[0]
   increment = argv[1]
 
-  (increment_num,temp_code) = compiler(increment,register_num)
+  (increment_num,temp_code) = compiler(register_num,increment)
   register_num = increment_num + 1 
   pir_code .= temp_code
-  (value_num,temp_code) = compiler(value,register_num)
+  (value_num,temp_code) = compiler(register_num, value)
   pir_code .= temp_code
   register_num = value_num + 1
 

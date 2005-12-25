@@ -31,7 +31,7 @@ Return register_num is the register number that contains the result of this code
 
   .local pmc compiler
   compiler = find_global "_Tcl", "compile_dispatch"
-  .return compiler(ast,register_num)
+  .return compiler(register_num, ast)
 .end
 
 =item C<(pmc ast) = __expression_ast(string expr)>

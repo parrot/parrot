@@ -22,7 +22,7 @@
   compiler = find_global '_Tcl', 'compile_dispatch'
   .local int value_num
   value = argv[0]
-  (value_num, temp_code) = compiler(value, register_num)
+  (value_num, temp_code) = compiler(register_num, value)
   pir_code .= temp_code
   register_num = value_num + 1
   $S0 = register_num

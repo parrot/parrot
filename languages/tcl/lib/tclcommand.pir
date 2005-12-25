@@ -46,7 +46,7 @@ Define the attributes required for the class.
 arg_loop:
    if ii == num_args goto arg_loop_done
    $P1 = self[ii]
-   (result_reg,retval) = compile($P1,register_num)
+   (result_reg,retval) = compile(register_num,$P1)
 
    push compiled_args, result_reg
    register_num = result_reg + 1
@@ -98,7 +98,7 @@ dynamic:
    pir_code2 .= label_num
    pir_code2 .= ":\n"
    .local int name_register
-   (name_register,retval) = compile(name,register_num)
+   (name_register,retval) = compile(register_num,name)
    register_num = name_register
 
    pir_code2 .= retval

@@ -30,10 +30,10 @@ Return register_num is the register number that contains the result of this code
   .local pmc commands
   commands = parse(tcl_code)
 
-  .return "compile_dispatch"(commands,register_num)
+  .return "compile_dispatch"(register_num, commands)
 .end
 
-=item C<(int register_num, str code) = compile_dispatch(pmc thing, int register_num)>
+=item C<(int register_num, str code) = compile_dispatch(int register_num, pmc thing)>
 
 Given an object, call its compile method, or, if it's constant, generate
 code on its behalf. Returns PIR code.
@@ -46,8 +46,8 @@ Return register_num is the register number that contains the result of this code
 =cut
 
 .sub compile_dispatch
-  .param pmc thing
   .param int register_num
+  .param pmc thing
 
   .local string pir_code
 

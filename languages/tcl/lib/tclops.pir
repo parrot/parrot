@@ -58,7 +58,7 @@ minus:
   goto done
 
 plus: 
-  .return compile(operand,register_num) 
+  .return compile(register_num, operand) 
 
 bitwise_not:
   opcode = "bnot"

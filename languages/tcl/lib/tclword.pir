@@ -42,7 +42,7 @@ loop:
    
   $P0 = self[i]
 
-  (register_num,temp_code) = compiler($P0,register_num)
+  (register_num,temp_code) = compiler(register_num, $P0)
   pir_code .= temp_code
   push compiled_args, register_num
   inc register_num 

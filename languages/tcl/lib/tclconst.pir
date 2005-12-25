@@ -268,5 +268,5 @@ Generate PIR code which can be used to generate our value
    .local pmc compiler
    compiler = find_global "_Tcl", "compile_dispatch"
 
-   .return compiler(value,argnum)
+   .return compiler(argnum, value)
 .end

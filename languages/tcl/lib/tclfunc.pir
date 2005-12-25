@@ -64,7 +64,7 @@ Initialize the attributes for an instance of the class
 
   .local pmc arg_code, arg_reg, name
   $P1  = getattribute self, "TclFunc\x00argument"
-  (arg_reg,pir_code)  = compile($P1,register_num)
+  (arg_reg,pir_code)  = compile(register_num, $P1)
 
   inc register_num
 
