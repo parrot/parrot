@@ -29,8 +29,7 @@ $description="Generating C headers...";
 @args=('define');
 
 sub runstep {
-    my ($self, $conf) = (shift, shift);
-  my $define = shift;
+    my ($self, $conf) = @_;
 
   genfile('config/gen/config_h/config_h.in', 'include/parrot/config.h',
     commentType => '/*',
@@ -70,6 +69,8 @@ EOF
   }
 
   print HH "\n#define BUILD_OS_NAME \"$^O\"\n";
+
+  my $define = $conf->options->get('define');
 
   if ($define) {
     my @vals = split /,/, $define;

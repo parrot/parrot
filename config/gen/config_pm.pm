@@ -28,7 +28,7 @@ $description="Recording configuration data for later retrieval";
 @args=();
 
 sub runstep {
-    my ($self, $conf) = (shift, shift);
+    my ($self, $conf) = @_;
 
   $conf->data->clean;
 

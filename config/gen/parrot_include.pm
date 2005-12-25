@@ -45,7 +45,7 @@ my $destdir = 'runtime/parrot/include';
 @args=qw(verbose);
 
 sub runstep {
-    my ($self, $conf) = (shift, shift);
+    my ($self, $conf) = @_;
 
     # need vtable.h now
     system($^X, "tools/build/vtable_h.pl");
@@ -63,7 +63,7 @@ sub runstep {
 		!x
 	    ) {
 		$inc = $2;
-		print "$2 " if $_[0];
+		print "$2 " if $conf->options->get('verbose');
 		$prefix = ($4 || '');
 		$subst = ($6 || '');
 		$in_def = $1;

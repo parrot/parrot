@@ -26,10 +26,11 @@ $description="Running CPU specific stuff...";
 @args=qw(miniparrot verbose);
 
 sub runstep {
-    my ($self, $conf) = (shift, shift);
+    my ($self, $conf) = @_;
 
-  my ($miniparrot, $verbose) = @_;
-  return if $miniparrot;
+    return if $conf->options->get('miniparrot');
+
+    my $verbose = $conf->options->get('verbose');
 
   my $cpu = $conf->data->get('cpuarch');
   print "\t(cpu = '$cpu') " if $verbose;

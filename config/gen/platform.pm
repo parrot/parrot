@@ -26,11 +26,12 @@ $description="Moving platform files into place...";
 @args=qw(miniparrot verbose);
 
 sub runstep {
-    my ($self, $conf) = (shift, shift);
-  my ($miniparrot, $verbose) = @_;
+    my ($self, $conf) = @_;
+
+  my $verbose = $conf->options->get('verbose');
   my $platform=lc $^O;
 
-  $platform="ansi" if defined($miniparrot);
+  $platform="ansi" if defined($conf->options->get('miniparrot'));
   $platform="win32" if $platform =~ /^msys/;
   $platform="win32" if $platform =~ /^mingw/;
   $platform =~ s/^ms//;
