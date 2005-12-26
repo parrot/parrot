@@ -1,31 +1,32 @@
 # $Id$
 
 The directory 'examples' provides examples of proper,
-and sometimes hillarious, programs for Parrot.
+and sometimes hillarious, programs for Parrot. 
+Most of these examples are tested by test scripts in 't/examples'.
 
-benchmark - Contains benchmark. Run them with 'make testbench'
+benchmarks - Contains benchmarks. Run them with 'make testbench'
      
-c         - Examples in C
+c          - Examples in C
 
-compilers - Examples for parrot complilers
+compilers  - Examples for parrot compilers
 
-io        - Examples how PIR and PASM programs talk with the world
+io         - Examples how PIR and PASM programs talk with the world
 
-japh      - Say 'Just another Parrot hacker' in various ways
+japh       - Say 'Just another Parrot hacker' in various ways
 
-library   - Examples on how to use PIR libraries
+library    - Examples on how to use PIR libraries
 
-mops      - Million ops per second
+mops       - Million ops per second
 
-nci       - Native call interface
+nci        - Native call interface
 
-pasm      - Examples in PASM
+pasm       - Examples in Parrot Assembler, PASM
 
-past      - Examples in Leo's PAST
+past       - Examples in Leo's Parrot Abstract Syntax Tree, PAST
 
 pge       - Parrot grammar engine
 
-pir       - Examples in PIR
+pir       - Examples in Parrot Intermediat Representation, PIR
 
 sdl       - SDL
 
