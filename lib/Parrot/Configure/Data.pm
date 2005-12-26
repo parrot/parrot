@@ -163,6 +163,8 @@ sub clean {
     my $self = shift;
 
     delete $self->{c}{$_} for grep { /^TEMP_/ } CORE::keys %{$self->{c}};
+
+    return $self;
 }
 
 =item Parrot::Configure::Data->settrigger($key, $trigger, $cb)
