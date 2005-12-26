@@ -11,7 +11,7 @@ use Parrot::Test;
 
 =head1 NAME
 
-t/library/getopt_long.t - testing library/Getopt/Long.pir
+t/library/getopt_long.t - testing the module Getopt/Long.pir
 
 =head1 SYNOPSIS
 
@@ -20,7 +20,7 @@ t/library/getopt_long.t - testing library/Getopt/Long.pir
 =head1 DESCRIPTION
 
 This test program tries to handle command line arguments with the
-library F<runtime/parrot/library/Getopt/Long.pir>.
+module F<runtime/parrot/library/Getopt/Long.pir>.
 
 =cut
 
@@ -145,6 +145,77 @@ You have passed the additional argument: 'thing'.
 All args have been parsed.
 OUT
 
+# no. 2
+pir_output_is( <<'CODE', <<'OUT', "option terminator" );
+
+.sub test :main 
+
+  load_bytecode "Getopt/Long.pbc"
+  .local pmc get_options
+  find_global get_options, "Getopt::Long", "get_options"    # get the relevant sub
+
+  # Assemble specification for get_options
+  # in an array of format specifiers
+  .local pmc opt_spec    
+  opt_spec = new ResizableStringArray
+  # --string, string
+  push opt_spec, "string=s"
+  # --integer, integer
+  push opt_spec, "integer=i"
+
+  # This comes usually from the command line
+  .local pmc argv
+  argv = new PerlArray
+  push argv, "--string=asdf"
+  push argv, "--"
+  push argv, "--integer=42"
+  push argv, "something"
+
+  .local pmc opt
+  ( opt ) = get_options( argv, opt_spec )
+
+  # Now we do what the passed options tell
+  .local int is_defined
+
+  # handle the string option
+  is_defined = defined opt["string"]
+  unless is_defined goto NO_STRING_OPTION
+    .local string string_option
+    string_option = opt["string"]
+    print "You have passed the option '--string'. The value is '"
+    print string_option
+    print "'.\n"
+    goto END_STRING_OPTION
+  NO_STRING_OPTION:
+    print "You haven't passed the option '--string'. This is fine with me.\n"
+  END_STRING_OPTION:
+
+
+  # For some reason I can not shift from argv
+  .local string other_arg
+  .local int    cnt_other_args
+  cnt_other_args = 0
+  .local int num_other_args
+  num_other_args = argv
+  goto CHECK_OTHER_ARG_LOOP
+  REDO_OTHER_ARG_LOOP:
+    other_arg = argv[cnt_other_args]
+    print "You have passed the additional argument: '"
+    print other_arg
+    print "'.\n"
+    inc cnt_other_args
+  CHECK_OTHER_ARG_LOOP:
+  if cnt_other_args < num_other_args goto REDO_OTHER_ARG_LOOP
+  print "All args have been parsed.\n"
+.end
+
+CODE
+You have passed the option '--string'. The value is 'asdf'.
+You have passed the additional argument: '--integer=42'.
+You have passed the additional argument: 'something'.
+All args have been parsed.
+OUT
+
 =head1 AUTHOR
 
 Bernhard Schmalhofer - C<Bernhard.Schmalhofer@gmx.de>
@@ -157,5 +228,5 @@ F<runtime/parrot/library/Getopt/Long.pir>
 
 
 ## remember to change the number of tests! :-)
-BEGIN { plan tests => 1; }
+BEGIN { plan tests => 2; }
 

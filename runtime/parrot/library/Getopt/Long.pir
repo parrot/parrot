@@ -40,6 +40,8 @@ library/Getopt/Long.pir - parse long and short command line options
 
 This Parrot library can be used for parsing command line options.
 The subroutine get_options() is exported into the namespace 'Getopt::Long'.
+Everything after '--' is not regarded as an option.
+Options and additional parameters cannot be mixed. Options come first.
 
 =head1 SUBROUTINES
 
@@ -65,6 +67,7 @@ Bernhard Schmalhofer - C<Bernhard.Schmalhofer@gmx.de>
 
 The Perl5 module L<Getopt::Long>.
 F<examples/library/getopt_demo.pir>
+F<t/library/getopt_long.t>
 
 =head1 COPYRIGHT
 
@@ -125,7 +128,6 @@ license as The Parrot Interpreter.
 
   # Now that we know about the allowed options,
   # we actually parse the argument vector
-  # TODO: do this correctly
   # shift from argv until a non-option is encountered
   .local pmc opt              # the return PMC
   opt = new Hash
@@ -144,19 +146,27 @@ license as The Parrot Interpreter.
     # have to clone it
     arg = clone arg
 
-    # Is arg a long option string like '--help'
+    # Is arg the option terminator '--'?
+    if arg  == "--" goto HANDLE_OPTION_TERMINATOR
+
+    # Is arg a long option string like '--help'?
     $S0 = substr arg, 0, 2
     if $S0 == "--" goto HANDLE_LONG_OPTION
 
-    # Is arg a short option string like '-v'
+    # Is arg a short option string like '-v'?
     $S0 = substr arg, 0, 1 
     if $S0 == "-" goto HANDLE_SHORT_OPTION
+
     # We are done with the option
     # and we don't want to loose the remaining arguments
     goto FINISH_PARSE_ARGV
 
+    HANDLE_OPTION_TERMINATOR:
+    # The '--' is not part of the remaining options
+    arg = shift argv
+    goto FINISH_PARSE_ARGV
+
     HANDLE_SHORT_OPTION:
-    # TODO: make it work for short options
     arg = shift argv
     arg = clone arg
     # get rid of the leading '-'
@@ -204,7 +214,7 @@ license as The Parrot Interpreter.
     if num_remaining_args > 0 goto NEXT_PARSE_ARGV
 
   FINISH_PARSE_ARGV:
-  # Nothing to do here
+  # Nothing to do 
 
   .return ( opt )
 .end
