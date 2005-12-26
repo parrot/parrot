@@ -6,12 +6,6 @@ use Parrot::Test tests => 18;
 use Test::More;
 use vars qw($TODO);
 
-language_output_is("tcl",<<'TCL',<<OUT,"refer to builtins explicitly");
-   ::puts ok
-TCL
-ok
-OUT
-
 language_output_is("tcl",<<'TCL',<<OUT,"namespace: no args");
    namespace
 TCL
@@ -116,5 +110,11 @@ language_output_is("tcl",<<'TCL',<<OUT,"namespace exists: global explicit");
    puts [namespace exists ::]
 TCL
 1
+OUT
+
+language_output_is("tcl",<<'TCL',<<'OUT',"command: global explicit");
+  ::puts ok
+TCL
+ok
 OUT
 }
