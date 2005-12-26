@@ -406,10 +406,12 @@ integer:
   inc pos
   goto integer
 integer_done:
-  if char == 46 goto floating # "."
-  if pos  ==  0 goto done     # failure
+  if char ==  46 goto floating # "."
+  if pos  ==   0 goto done     # failure
 
-  $S0 = substr expr, start, pos
+  $I0 = pos - start
+  $S0 = substr expr, start, $I0
+  if char == 101 goto e
   $I0 = $S0
   value = new .TclInt
   value = $I0
@@ -425,13 +427,41 @@ float_loop:
   inc pos
   goto float_loop
 float_done:
-
-  $S0 = substr expr, start, pos
-  if $S0 == "." goto failure
+  $I0 = pos - start
+  $S0 = substr expr, start, $I0
+  if $S0  == "." goto failure
+  if char == 101 goto e
   # XXX Can't we just assign this string directly to the the TclFloat - WJC
   $N0 = $S0
   value = new .TclFloat
   value = $N0
+  goto done
+
+e:
+  $N0 = $S0
+  value = new .TclFloat
+  value = $N0
+  inc pos
+  start = pos
+  char = ord expr, pos
+  if char == 43 goto e_sign
+  if char == 45 goto e_sign
+  goto e_loop
+e_sign:
+  inc pos
+e_loop:
+  if pos >= len goto e_done
+  char = ord expr, pos
+  if char > 57 goto e_done # > "9"
+  if char < 48 goto e_done # < "0"
+  inc pos
+  goto e_loop
+e_done:
+  $I0 = pos - start
+  $S0 = substr expr, start, $I0
+  $N0 = $S0
+  $N0 = 10.0**$N0
+  value *= $N0
   goto done
 
 failure:
