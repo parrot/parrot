@@ -406,8 +406,8 @@ integer:
   inc pos
   goto integer
 integer_done:
-  if char == 46 goto floating    # "."
-  if pos == 0 goto done # failure
+  if char == 46 goto floating # "."
+  if pos  ==  0 goto done     # failure
 
   $S0 = substr expr, start, pos
   $I0 = $S0
@@ -427,11 +427,15 @@ float_loop:
 float_done:
 
   $S0 = substr expr, start, pos
+  if $S0 == "." goto failure
   # XXX Can't we just assign this string directly to the the TclFloat - WJC
   $N0 = $S0
   value = new .TclFloat
   value = $N0
-  # goto done
+  goto done
+
+failure:
+  pos = 0
 
 done:
   .return(value, pos)
