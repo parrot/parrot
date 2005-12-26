@@ -2,11 +2,11 @@
 
 =head1 NAME
 
-languages/unlambda/t/harness - A harness for unlambda 
+languages/lazy-k/t/harness - A harness for Lazy K
 
 =head1 SYNOPSIS
 
-  cd languages && perl -I../lib unlambda/t/harness --files
+  cd languages && perl -I../lib lazy-k/t/harness --files
 
 =head1 DESCRIPTION
 
