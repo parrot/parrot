@@ -439,6 +439,7 @@ double_check:
 
   $I0 = typeof $P2
   if $I0 == .TclFloat goto yep
+  if $I0 == .TclInt   goto yep
   goto nope
 false_check:
   if the_string == "false" goto yep 
