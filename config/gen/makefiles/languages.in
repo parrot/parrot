@@ -157,7 +157,7 @@ forth.clean:
 
 jako: jako.dummy
 jako.dummy:
-# don't make jako, as tests are executed by default
+	- $(MAKE) jako
 jako.test:
 	- $(MAKE) jako test
 jako.clean:
