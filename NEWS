@@ -1,6 +1,11 @@
 # $Id$
 
+<Next Release>
+
+- Jako updates: NCI, subroutines, global variables and constants all work. (Gregor)
+
 New in 0.4.0
+
 - New lexical handling and closure support including better
   introspection for caller and outer
 - PGE (Parrot Grammar Engine) provides now compilers for P6Rule, 
