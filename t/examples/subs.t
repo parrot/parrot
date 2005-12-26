@@ -33,7 +33,7 @@ F<t/examples/pir.t>
 
 # Set up expected output for examples
 my %expected
-  = (
+    = (
     'bsr_ret.pasm'        =>  << 'END_EXPECTED',
 Main
 TestSub
@@ -71,19 +71,19 @@ Hello from subroutine
 Hello from main
 END_EXPECTED
 
-    'sub1.imc'        =>  << 'END_EXPECTED',
+    'single_retval.pir'     =>  << 'END_EXPECTED',
 7 8 nine
 return: 10
 END_EXPECTED
 
-    'sub2.imc'        =>  << 'END_EXPECTED',
+    'multi_retvals.pir'     =>  << 'END_EXPECTED',
 return: 10 11 12
 END_EXPECTED
 
-    'sub3.imc'        =>  << 'END_EXPECTED',
+    'no_retval.pir'         =>  << 'END_EXPECTED',
 7 8 nine
 END_EXPECTED
-   );
+    );
 
 while ( my ( $example, $expected ) = each %expected ) {
     example_output_is( "examples/subs/$example", $expected );

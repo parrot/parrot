@@ -573,9 +573,9 @@ examples/subs/bsr_ret.pasm                        [main]doc
 examples/subs/coroutine.pasm                      [main]doc
 examples/subs/jsr_ret.pasm                        [main]doc
 examples/subs/pasm_sub1.pasm                      [main]doc
-examples/subs/sub1.imc                            [main]doc
-examples/subs/sub2.imc                            [main]doc
-examples/subs/sub3.imc                            [main]doc
+examples/subs/single_retval.pir                   [main]doc
+examples/subs/multi_retvals.pir                   [main]doc
+examples/subs/no_retval.pir                       [main]doc
 include/parrot/autoprefix.h                       [main]
 include/parrot/builtin.h                          [main]
 include/parrot/caches.h                           [main]

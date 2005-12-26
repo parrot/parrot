@@ -3,11 +3,11 @@
 
 =head1 NAME
 
-examples/subs/sub3.imc - Subroutine Example
+examples/subs/no_retval.pir - Subroutine example
 
 =head1 SYNOPSIS
 
-    % ./parrot examples/subs/sub3.imc
+    % ./parrot examples/subs/no_retval.pir
 
 =head1 DESCRIPTION
 
@@ -15,15 +15,15 @@ Call a sub with no return values.
 
 =cut
 
-.sub _main
+.sub _main :main
   _foo(7, 8, "nine")
-  end
 .end
 
 .sub _foo
   .param int i
   .param int j
   .param string s
+
   print i
   print " "
   print j
@@ -31,10 +31,3 @@ Call a sub with no return values.
   print s
   print "\n"
 .end
-
-=head2 SEE ALSO
-
-F<examples/subs/sub1.imc>,
-F<examples/subs/sub2.imc>.
-
-=cut

@@ -3,11 +3,11 @@
 
 =head1 NAME
 
-examples/subs/sub1.imc - Subroutine Example
+examples/subs/single_retval.pir - Subroutine example
 
 =head1 SYNOPSIS
 
-    % ./parrot examples/subs/sub1.imc
+    % ./parrot examples/subs/single_retval.imc
 
 =head1 DESCRIPTION
 
@@ -15,7 +15,7 @@ Simple sub calls with 1 return value.
 
 =cut
 
-.sub _main
+.sub _main :main
   .local int i
   .local int j
   .local string s
@@ -26,13 +26,13 @@ Simple sub calls with 1 return value.
   print "return: "
   print $I0
   print "\n"
-  end
 .end
 
 .sub _foo
   .param int i
   .param int j
   .param string s
+
   print i
   print " "
   print j
@@ -42,10 +42,3 @@ Simple sub calls with 1 return value.
 
   .return( 10 )
 .end
-
-=head2 SEE ALSO
-
-F<examples/subs/sub2.imc>,
-F<examples/subs/sub3.imc>.
-
-=cut
