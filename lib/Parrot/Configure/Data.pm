@@ -83,6 +83,8 @@ sub set {
     }
 
     print ");\n" if $verbose;
+
+    return $self;
 }
 
 =item Parrot::Configure::Data->add($delim, $key,$val, ...)
@@ -103,6 +105,8 @@ sub add {
             $self->set($key, $val);
         }
     }
+
+    return $self;
 }
 
 =item Parrot::Configure::Data->keys()
