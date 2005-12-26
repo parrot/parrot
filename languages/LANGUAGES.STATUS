@@ -324,6 +324,7 @@ the VM in a language more natural than IMC.
 
 The compiler Works, and the language and examples include subroutines and global
 constants and variables. NCI also works.
+Jako examples are tested during smoke testing.
 
 Has a low-tech hand-coded lexer and parser, and the ability to spit out the parse
 tree as XML for debugging. Syntax is a bit rigid, but includes forms that will
