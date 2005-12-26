@@ -41,15 +41,17 @@ Given a PMC, get a number from it.
   multiplier = 1
 
   $S1 = substr $S0, 0, 1
+  if $S1 == "+" goto positive
   # If the first character is -, assume a negative number.
   unless $S1 == "-" goto get_value
   multiplier = -1
-  $I0 = length $S0
+positive:
+  $S0 = substr $S0, 1
+  # we check for the length below
   dec $I0
-  $S0 = substr $S0, 1, $I0
 get_value:
   (value, $I1) = get_number($S0, 0)
-  if_null value, NaN
+  if null value goto NaN
   if $I0 != $I1 goto NaN
   value *= multiplier
 
