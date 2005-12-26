@@ -1371,6 +1371,10 @@ mopsbench : test_prep
 distro_tests : test_prep
 	$(PERL) t/harness $(DISTRO_TEST_FILES)
 
+# configure tests
+configure_tests :
+	$(PERL) t/harness t/configure/*.t
+
 ###############################################################################
 #
 # For reporting success or failure with different configurations
