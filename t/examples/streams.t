@@ -35,14 +35,14 @@ Bernhard Schmalhofer - <Bernhard.Schmalhofer@gmx.de>
 
 # Set up expected output for examples
 my %expected
-    = ( 'Combiner.imc' => <<'END_EXPECTED',
+    = ( 'Combiner.pir' => <<'END_EXPECTED',
 read:[1 hello]
 read:[2 world!]
 read:[3 parrot]
 read:[4 is cool]
 END_EXPECTED
 
-        'Coroutine.imc' => <<'END_EXPECTED',
+        'Coroutine.pir' => <<'END_EXPECTED',
 read:[0]
 read:[1]
 read:[2]
@@ -55,7 +55,7 @@ read:[8]
 read:[9]
 END_EXPECTED
         
-        'FileLines.imc' => <<'END_EXPECTED',
+        'FileLines.pir' => <<'END_EXPECTED',
 read:[    1 =head1 INFORMATION]
 read:[    2 ]
 read:[    3 This is an advanced example.]
@@ -85,7 +85,7 @@ read:[   26     .local pmc combiner]
 read:[   27     .local string name]
 read:[   28 ]
 read:[   29     # get the name of the file to open]
-read:[   30     name = "examples/streams/FileLines.imc"]
+read:[   30     name = "examples/streams/FileLines.pir"]
 read:[   31     argc = argv]
 read:[   32     if argc < 2 goto NO_NAME]
 read:[   33     name = argv[1]]
@@ -163,7 +163,7 @@ read:[  104 ]
 read:[  105 =cut]
 END_EXPECTED
 
-        'Filter.imc' => <<'END_EXPECTED',
+        'Filter.pir' => <<'END_EXPECTED',
 read:[0 * 2 = 0]
 read:[1 * 2 = 2]
 read:[2 * 2 = 4]
@@ -175,7 +175,7 @@ read:[8 * 2 = 16]
 read:[9 * 2 = 18]
 END_EXPECTED
 
-        'Include.imc' => <<'END_EXPECTED',
+        'Include.pir' => <<'END_EXPECTED',
 read:[0]
 read:[1]
 read:[2]
@@ -196,14 +196,14 @@ read:[8]
 read:[9]
 END_EXPECTED
 
-        'Lines.imc' => <<'END_EXPECTED',
+        'Lines.pir' => <<'END_EXPECTED',
 read:[this]
 read:[is a]
 read:[Stream::Lines]
 read:[testcase]
 END_EXPECTED
 
-        'ParrotIO.imc' => <<'END_EXPECTED',
+        'ParrotIO.pir' => <<'END_EXPECTED',
 read:[=head1 INFORMATION\n\nThis small example shows the u]
 read:[sage of C<Stream::ParrotIO>.\n\nIt reads this file w]
 read:[ith a default block size.\n\nYou can specify another]
@@ -219,7 +219,7 @@ read:[_main :main\n    .local pmc stream\n\n    load_byteco]
 read:[de "library/Stream/ParrotIO.imc"\n\n    # create the]
 read:[ ParrotIO stream    \n    find_type $I0, "Stream::P]
 read:[arrotIO"\n    new stream, $I0\n\n    # open this file]
-read:[\n    stream."open"( "examples/streams/ParrotIO.imc]
+read:[\n    stream."open"( "examples/streams/ParrotIO.pir]
 read:[", "<" )\n    \n    # you can specifiy a custom bloc]
 read:[k size with\n    # stream."blockSize"( 10 )\n    \n  ]
 read:[  # dump the stream\n    stream."dump"()\n    \n    e]
@@ -230,7 +230,7 @@ read:[Perl 6 Internals mailing list.\n\n=head1 COPYRIGHT\n\n]
 read:[Copyright (c) 2004, the Perl Foundation.\n\n=cut\n]
 END_EXPECTED
 
-        'SubCounter.imc' => <<'END_EXPECTED',
+        'SubCounter.pir' => <<'END_EXPECTED',
 read:[0]
 read:[1]
 read:[2]
@@ -243,7 +243,7 @@ read:[8]
 read:[9]
 END_EXPECTED
 
-        'SubHello.imc' => <<'END_EXPECTED',
+        'SubHello.pir' => <<'END_EXPECTED',
 read:[hello]
 read:[world!]
 read:[parrot]
@@ -259,7 +259,7 @@ while ( my ( $example, $expected ) = each %expected ) {
 TODO:
 {
     local $TODO = 'some examples not testable yet';
-    fail( 'Bytes.imc' );
-    fail( 'Replay.imc' );
-    fail( 'Writer.imc' );
+    fail( 'Bytes.pir' );
+    fail( 'Replay.pir' );
+    fail( 'Writer.pir' );
 };

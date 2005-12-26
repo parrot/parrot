@@ -27,7 +27,7 @@ stream for it. Then it combines the stream with a stream providing line numbers.
     .local string name
 
     # get the name of the file to open
-    name = "examples/streams/FileLines.imc"
+    name = "examples/streams/FileLines.pir"
     argc = argv
     if argc < 2 goto NO_NAME
     name = argv[1]

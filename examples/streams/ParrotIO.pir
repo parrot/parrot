@@ -26,7 +26,7 @@ PMC to the stream with the C<assign> op.
     new stream, $I0
 
     # open this file
-    stream."open"( "examples/streams/ParrotIO.imc", "<" )
+    stream."open"( "examples/streams/ParrotIO.pir", "<" )
     
     # you can specifiy a custom block size with
     # stream."blockSize"( 10 )
