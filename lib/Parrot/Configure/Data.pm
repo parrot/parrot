@@ -141,13 +141,13 @@ Dump config keys.
     if ($dd_version >= 2.12) {
         *dump=sub {
             my $self = shift;
-            Data::Dumper->new([$self->{c}], ['*PConfig'])->Sortkeys(1)->Dump();
+            Data::Dumper->new([$self->{c}])->Sortkeys(1)->Dump();
         };
     }
     else {
         *dump=sub {
             my $self = shift;
-            Data::Dumper->new([$self->{c}], ['*PConfig'])->Dump();
+            Data::Dumper->new([$self->{c}])->Dump();
         };
     }
 }
