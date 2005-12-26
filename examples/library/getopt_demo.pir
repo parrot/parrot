@@ -52,13 +52,8 @@ This is executed when you call F<getopt_demo.imc>.
   .local string program_name
   program_name = shift argv
 
-  # Make a copy of argv, because this can easier be handled in get_options()
-  # TODO: remove need for cloning
-  .local pmc argv_clone
-  argv_clone = clone argv
-
   .local pmc opt
-  ( opt ) = get_options( argv_clone, opt_spec )
+  ( opt ) = get_options( argv, opt_spec )
 
   # Now we do what the passed options tell
   .local int is_defined
@@ -116,15 +111,14 @@ This is executed when you call F<getopt_demo.imc>.
     print "You haven't passed the option '--integer'. This is fine with me.\n"
   END_INTEGER_OPTION:
 
-  # For some reason I can't shift from argv_clone
   .local string other_arg
   .local int    cnt_other_args
   cnt_other_args = 0
   .local int num_other_args
-  num_other_args = argv_clone
+  num_other_args = argv
   goto CHECK_OTHER_ARG_LOOP
   REDO_OTHER_ARG_LOOP:
-    other_arg = argv_clone[cnt_other_args]
+    other_arg = argv[cnt_other_args]
     print "You have passed the additional argument: '"
     print other_arg
     print "'.\n"

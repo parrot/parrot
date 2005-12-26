@@ -23,13 +23,9 @@ library/Getopt/Long.pir - parse long and short command line options
   .local string program_name
   program_name = shift argv
 
-  # Make a copy of argv, because this can easier be handled in get_options()
-  .local pmc argv_clone
-  argv_clone = clone argv
-
   # Parse the command line params
   .local pmc opt
-  ( opt ) = get_options( argv_clone, opt_spec )
+  ( opt ) = get_options( argv, opt_spec )
 
   .local int is_defined
   is_defined = defined opt["bool"]
@@ -56,7 +52,6 @@ A Hash PMC is returned.
 
 =head1 TODO
 
-- Remove need to clone argument vector
 - Make it work for all cases, short options, long options and bundling.
 - Recognise type of return value: string, integer, binary, array, hash.
 - Get started on error reporting.

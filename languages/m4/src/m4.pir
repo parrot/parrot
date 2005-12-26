@@ -125,10 +125,8 @@ Looks at the command line arguments and acts accordingly.
 
   # Make a copy of argv, because this can easier be handled in get_options
   # TODO: eliminate need for copy
-  .local pmc cloned_argv
-  cloned_argv = clone argv
   .local pmc opt
-  ( opt ) = get_options( cloned_argv, opt_spec )
+  ( opt ) = get_options( argv, opt_spec )
 
   # Now dow what the options want
   .local int is_defined
@@ -275,8 +273,10 @@ NO_UNIMPLEMENTED_OPTION:
   # TODO: handle reading from STDIN, multiple input files
 
   # check argc, we need at least one input file
+  .local pmc argv
+  argv = clone argv
   .local int argc
-  argc = cloned_argv
+  argc = argv
   if argc >= 1 goto ARGC_IS_OK
     usage( program_name )
     end
@@ -315,9 +315,9 @@ PATH_SEARCH:
   # Name of the input file, usually with extension '.m4'
   .local string filename
 REDO_FILENAME_LOOP:
-  argc = cloned_argv
+  argc = argv
   unless argc > 0 goto LAST_FILENAME_LOOP
-    filename = shift cloned_argv
+    filename = shift argv
     push_file( filename, state )
     goto REDO_FILENAME_LOOP
 LAST_FILENAME_LOOP:

@@ -28,7 +28,7 @@ library F<runtime/parrot/library/Getopt/Long.pir>.
 # no. 1
 pir_output_is( <<'CODE', <<'OUT', "basic long options" );
 
-.sub test @MAIN 
+.sub test :main 
 
   load_bytecode "Getopt/Long.pbc"
   .local pmc get_options
