@@ -964,12 +964,12 @@ branch_cond_loop_swap(Interp *interp, IMC_Unit *unit, Instruction *branch,
         char *label;
         int count, size, found;
         
-        size = strlen(branch->r[0]->name) + 8; /* + '_post999' */
+        size = strlen(branch->r[0]->name) + 10; /* + '_post999' */
         
         label = malloc(size);
         found = 0;
         for (count = 1; count != 999; ++count) {
-            snprintf(label, size, "%s_post%d", branch->r[0]->name, count);
+            sprintf(label, "%s_post%d", branch->r[0]->name, count);
             if (get_sym(label) == 0) {
                 found = 1;
                 break;
@@ -1007,6 +1007,7 @@ branch_cond_loop_swap(Interp *interp, IMC_Unit *unit, Instruction *branch,
 
             ostat.branch_cond_loop++;
             changed = 1;
+            free(regs);
         }
         
         free(label);
