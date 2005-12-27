@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 use lib qw( . lib ../lib ../../lib );
-use Test::More tests => 69;
+use Test::More tests => 70;
 
 =head1 NAME
 
@@ -24,7 +24,7 @@ Regressions tests for the L<Parrote::Configure::Data> class.
 
 BEGIN { use_ok('Parrot::Configure::Data'); }
 
-can_ok($testpkg, qw(
+can_ok('Parrot::Configure::Data', qw(
     new
     get
     set
