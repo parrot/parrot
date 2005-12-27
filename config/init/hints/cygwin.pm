@@ -38,4 +38,6 @@ sub runstep
         $_[2] = join(',', 'inet_aton', $_[2]);
     }
 
-    1;
+}
+
+1;
