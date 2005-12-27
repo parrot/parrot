@@ -1,6 +1,12 @@
-#! perl -w
-# Copyright: 2005 The Perl Foundation.  All Rights Reserved.
+#! perl
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
+
+use strict;
+use warnings;
+use lib qw( . lib ../lib ../../lib );
+use Test::More;
+use Parrot::Test tests => 4;
 
 =head1 NAME
 
@@ -8,7 +14,7 @@ t/pmc/builtin.t - Builtin Methods
 
 =head1 SYNOPSIS
 
-	% perl -Ilib t/pmc/builtin.t
+	% prove t/pmc/builtin.t
 
 =head1 DESCRIPTION
 
@@ -16,7 +22,6 @@ Tests builtin opcode-like methods.
 
 =cut
 
-use Parrot::Test tests => 4;
 
 pir_output_is(<<'CODE', <<'OUT', "three ways to call a method");
 .sub main :main
@@ -124,3 +129,4 @@ ok 5
 OUT
 
 }
+

@@ -1,6 +1,12 @@
-#! perl -w
-# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+#! perl
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
+
+use strict;
+use warnings;
+use lib qw( . lib ../lib ../../lib );
+use Test::More;
+use Parrot::Test tests => 32;
 
 =head1 NAME
 
@@ -8,16 +14,13 @@ t/pmc/io.t - IO Ops
 
 =head1 SYNOPSIS
 
-	% perl -Ilib t/pmc/io.t
+	% prove t/pmc/io.t
 
 =head1 DESCRIPTION
 
 Tests the Parrot IO operations.
 
 =cut
-
-use Parrot::Test tests => 32;
-use Test::More;
 
 sub file_content_is {
     my ($file, $content, $name) = @_;

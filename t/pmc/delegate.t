@@ -1,6 +1,12 @@
-#! perl -w
-# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+#! perl
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
+
+use strict;
+use warnings;
+use lib qw( . lib ../lib ../../lib );
+use Test::More;
+use Parrot::Test tests => 9;
 
 =head1 NAME
 
@@ -8,16 +14,13 @@ t/pmc/delegate.t - Method Delegation
 
 =head1 SYNOPSIS
 
-	% perl -Ilib t/pmc/delegate.t
+	% prove t/pmc/delegate.t
 
 =head1 DESCRIPTION
 
 Tests method delegation.
 
 =cut
-
-use Parrot::Test tests => 9;
-use Test::More;
 
 # basic functionality - setting and getting types
 
@@ -213,4 +216,3 @@ one
 777
 3
 OUTPUT
-

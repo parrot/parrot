@@ -1,6 +1,12 @@
-#! perl -w
-# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+#! perl
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id: arithmetics.t 7810 2005-04-12 10:09:05Z leo $
+
+use strict;
+use warnings;
+use lib qw( . lib ../lib ../../lib );
+use Test::More;
+use Parrot::Test tests => 20;
 
 =head1 NAME
 
@@ -8,7 +14,7 @@ t/pmc/n_arithmetics.t - n_* Arithmetic Ops
 
 =head1 SYNOPSIS
 
-	% perl -Ilib t/pmc/n_arithmetics.t
+	% prove t/pmc/n_arithmetics.t
 
 =head1 DESCRIPTION
 
@@ -16,9 +22,6 @@ Tests basic arithmetic ops that construct a new return value on
 various combinations of Parrot integer and number types.
 
 =cut
-
-use Parrot::Test tests => 20;
-use Test::More;
 
 ###
 ### Operations on a single INTVAL

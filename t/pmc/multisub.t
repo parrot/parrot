@@ -1,6 +1,12 @@
-#! perl -w
+#! perl
 # Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
+
+use strict;
+use warnings;
+use lib qw( . lib ../lib ../../lib );
+use Test::More;
+use Parrot::Test tests => 1;
 
 =head1 NAME
 
@@ -8,16 +14,13 @@ t/pmc/multisub.t - Multi Sub PMCs
 
 =head1 SYNOPSIS
 
-	% perl -Ilib t/pmc/multisub.t
+	% prove t/pmc/multisub.t
 
 =head1 DESCRIPTION
 
 Tests the creation and invocation of Perl6 multi subs.
 
 =cut
-
-use Parrot::Test tests => 1;
-use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "create PMC");
     new P0, .MultiSub

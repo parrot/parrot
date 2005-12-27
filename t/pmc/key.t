@@ -1,6 +1,12 @@
-#! perl -w
-# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+#! perl
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
+
+use strict;
+use warnings;
+use lib qw( . lib ../lib ../../lib );
+use Test::More;
+use Parrot::Test tests => 1;
 
 =head1 NAME
 
@@ -8,16 +14,13 @@ t/pmc/key.t - Keys
 
 =head1 SYNOPSIS
 
-	% perl -Ilib t/pmc/key.t
+	% prove t/pmc/key.t
 
 =head1 DESCRIPTION
 
 Tests the C<Key> PMC.
 
 =cut
-
-use Parrot::Test tests => 1;
-use Test::More;
 
 output_is(<<'CODE', <<'OUT', 'traverse key chain');
     new P0, .Key

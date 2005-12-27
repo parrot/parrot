@@ -1,7 +1,12 @@
-#! perl -w
-
+#! perl
 # Copyright: 2001-2004 The Perl Foundation.  All Rights Reserved.
 # $Id$
+
+use strict;
+use warnings;
+use lib qw( . lib ../lib ../../lib );
+use Test::More;
+use Parrot::Test tests => 13;
 
 =head1 NAME
 
@@ -9,7 +14,7 @@ t/pmc/array.t - Array PMC
 
 =head1 SYNOPSIS
 
-	% perl -Ilib t/pmc/array.t
+	% prove t/pmc/array.t
 
 =head1 DESCRIPTION
 
@@ -18,8 +23,6 @@ out-of-bounds test. Checks INT and PMC keys.
 
 =cut
 
-use Parrot::Test tests => 13;
-use Test::More;
 
 my $fp_equality_macro = <<'ENDOFMACRO';
 .macro fp_eq (	J, K, L )
@@ -462,3 +465,4 @@ CODE
 OUTPUT
 
 1;
+

@@ -1,6 +1,13 @@
-#! perl -w
+#! perl
 # Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
+
+use strict;
+use warnings;
+use lib qw( . lib ../lib ../../lib );
+use Test::More;
+use Parrot::Test tests => 41;
+use Parrot::Config;
 
 =head1 NAME
 
@@ -8,7 +15,7 @@ t/pmc/sub.t - Subroutine PMCs
 
 =head1 SYNOPSIS
 
-	% perl -Ilib t/pmc/sub.t
+	% prove t/pmc/sub.t
 
 =head1 DESCRIPTION
 
@@ -16,10 +23,6 @@ Tests the creation and invocation of C<Sub>, C<Closure> and
 C<Continuation> PMCs.
 
 =cut
-
-use Parrot::Test tests => 41;
-use Test::More;
-use Parrot::Config;
 
 my $temp = "temp.pasm";
 

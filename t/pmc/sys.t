@@ -1,6 +1,12 @@
-#! perl -w
-# Copyright: 2001-2004 The Perl Foundation.  All Rights Reserved.
+#! perl
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
+
+use strict;
+use warnings;
+use lib qw( . lib ../lib ../../lib );
+use Test::More;
+use Parrot::Test tests => 1;
 
 =head1 NAME
 
@@ -8,16 +14,13 @@ t/pmc/sys.t - System Tests
 
 =head1 SYNOPSIS
 
-	% perl -Ilib t/pmc/sys.t
+	% prove t/pmc/sys.t
 
 =head1 DESCRIPTION
 
 Tests system dependend stuff
 
 =cut
-
-use Parrot::Test tests => 1;
-use Test::More;
 
 END {
   unlink "temp.imc";

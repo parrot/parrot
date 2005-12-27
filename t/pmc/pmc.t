@@ -1,7 +1,13 @@
-#! perl -w
-
+#! perl
 # Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
+
+use strict;
+use warnings;
+use lib qw( . lib ../lib ../../lib );
+use Test::More;
+use Parrot::Test tests => 24;
+use Parrot::PMC qw(%pmc_types);
 
 =head1 NAME
 
@@ -9,7 +15,7 @@ t/pmc/pmc.t - Perl PMCs
 
 =head1 SYNOPSIS
 
-	% perl -Ilib t/pmc/pmc.t
+	% prove t/pmc/pmc.t
 
 =head1 DESCRIPTION
 
@@ -17,9 +23,6 @@ Contains a lot of Perl PMC related tests.
 
 =cut
 
-use Parrot::Test tests => 24;
-use Test::More;
-use Parrot::PMC qw(%pmc_types);
 my $max_pmc = scalar(keys(%pmc_types)) + 1;
 
 my $fp_equality_macro = <<'ENDOFMACRO';

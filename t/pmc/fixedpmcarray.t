@@ -2,13 +2,11 @@
 # Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
-
 use strict;
 use warnings;
 use lib qw(lib . ../lib ../../lib);
 use Parrot::Test tests => 14;
 use Test::More;
-
 
 =head1 NAME
 

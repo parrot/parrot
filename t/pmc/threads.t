@@ -1,6 +1,12 @@
-#! perl -w
-# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+#! perl
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
+
+use strict;
+use warnings;
+use lib qw( . lib ../lib ../../lib );
+use Test::More;
+use Parrot::Test;
 
 =head1 NAME
 
@@ -8,7 +14,7 @@ t/pmc/threads.t - Threads
 
 =head1 SYNOPSIS
 
-	% perl -Ilib t/pmc/threads.t
+	% prove t/pmc/threads.t
 
 =head1 DESCRIPTION
 
@@ -16,9 +22,6 @@ Tests running threads. All tests skipped unless running on known-good
 platform.
 
 =cut
-
-use Parrot::Test;
-use Test::More;
 
 my %platforms = map {$_=>1} qw/
     aix

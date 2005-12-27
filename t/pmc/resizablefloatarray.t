@@ -1,6 +1,12 @@
-#! perl -w
-# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+#! perl
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
+
+use strict;
+use warnings;
+use lib qw( . lib ../lib ../../lib );
+use Test::More;
+use Parrot::Test tests => 17;
 
 =head1 NAME
 
@@ -8,7 +14,7 @@ t/pmc/resizablefloatarray.t - ResizableFloatArray PMC
 
 =head1 SYNOPSIS
 
-	% perl -Ilib t/pmc/resizablefloatarray.t
+	% prove t/pmc/resizablefloatarray.t
 
 =head1 DESCRIPTION
 
@@ -16,9 +22,6 @@ Tests C<ResizableFloatArray> PMC. Checks size, sets various elements, including
 out-of-bounds test. Checks INT and PMC keys.
 
 =cut
-
-use Parrot::Test tests => 17;
-use Test::More;
 
 my $fp_equality_macro = <<'ENDOFMACRO';
 .macro fp_eq (	J, K, L )

@@ -1,6 +1,12 @@
-#! perl -w
-# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+#! perl
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
+
+use strict;
+use warnings;
+use lib qw( . lib ../lib ../../lib );
+use Test::More;
+use Parrot::Test tests => 30;
 
 =head1 NAME
 
@@ -8,15 +14,13 @@ t/pmc/mmd.t - Multi-Method Dispatch
 
 =head1 SYNOPSIS
 
-	% perl -Ilib t/pmc/mmd.t
+	% prove t/pmc/mmd.t
 
 =head1 DESCRIPTION
 
 Tests the multi-method dispatch.
 
 =cut
-
-use Parrot::Test tests => 30;
 
 pir_output_is(<<'CODE', <<'OUTPUT', "PASM divide");
 

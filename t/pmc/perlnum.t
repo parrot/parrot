@@ -1,6 +1,12 @@
-#! perl -w
+#! perl
 # Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
+
+use strict;
+use warnings;
+use lib qw( . lib ../lib ../../lib );
+use Test::More;
+use Parrot::Test tests => 55;
 
 =head1 NAME
 
@@ -8,16 +14,13 @@ t/pmc/perlnum.t - Perl Numbers
 
 =head1 SYNOPSIS
 
-    % perl -Ilib t/pmc/perlnum.t
+    % prove t/pmc/perlnum.t
 
 =head1 DESCRIPTION
 
 Tests the C<PerlNum> PMC. Checks Perl-specific numeric behaviour.
 
 =cut
-
-use Parrot::Test tests => 55;
-use Test::More;
 
 my $fp_equality_macro = <<'ENDOFMACRO';
 .macro fp_eq (    J, K, L )

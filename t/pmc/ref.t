@@ -1,6 +1,12 @@
-#! perl -w
-# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+#! perl
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
+
+use strict;
+use warnings;
+use lib qw( . lib ../lib ../../lib );
+use Test::More;
+use Parrot::Test tests => 12;
 
 =head1 NAME
 
@@ -8,16 +14,13 @@ t/pmc/ref.t - Reference PMC
 
 =head1 SYNOPSIS
 
-	% perl -Ilib t/pmc/ref.t
+	% prove t/pmc/ref.t
 
 =head1 DESCRIPTION
 
 Tests that vtable method delegation works on a C<Ref> PMC.
 
 =cut
-
-use Parrot::Test tests => 12;
-use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "new ref");
 	new P2, .Integer

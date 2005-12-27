@@ -1,7 +1,12 @@
-#! perl -w
-
+#! perl
 # Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
+
+use strict;
+use warnings;
+use lib qw( . lib ../lib ../../lib );
+use Test::More;
+use Parrot::Test tests => 18;
 
 =head1 NAME
 
@@ -9,16 +14,13 @@ t/pmc/eval.t - Dynamic Code Evaluation
 
 =head1 SYNOPSIS
 
-	% perl -Ilib t/pmc/eval.t
+	% prove t/pmc/eval.t
 
 =head1 DESCRIPTION
 
 Tests on-the-fly PASM, PIR and PAST compilation and invocation.
 
 =cut
-
-use Parrot::Test tests => 18;
-use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "eval_sc");
 	compreg P1, "PASM"	# get compiler

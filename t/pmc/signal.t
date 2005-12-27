@@ -1,6 +1,12 @@
-#! perl -w
-# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+#! perl
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
+
+use strict;
+use warnings;
+use lib qw( . lib ../lib ../../lib );
+use Test::More;
+use Parrot::Test;
 
 =head1 NAME
 
@@ -8,17 +14,13 @@ t/pmc/signal.t - Signal Handling
 
 =head1 SYNOPSIS
 
-	% perl -Ilib t/pmc/signal.t
+	% prove t/pmc/signal.t
 
 =head1 DESCRIPTION
 
 Tests signal handling.
 
 =cut
-
-use Parrot::Test;
-use Test::More;
-use strict;
 
 # actually more platforms should work - all POSIX compliant ones - but
 # signals are currently not enabled for all in src/events.c

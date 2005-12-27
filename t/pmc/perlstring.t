@@ -1,6 +1,12 @@
-#! perl -w
+#! perl
 # Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
+
+use strict;
+use warnings;
+use lib qw( . lib ../lib ../../lib );
+use Test::More;
+use Parrot::Test tests => 67;
 
 =head1 NAME
 
@@ -8,16 +14,13 @@ t/pmc/perlstring.t - Perl Strings
 
 =head1 SYNOPSIS
 
-    % perl -Ilib t/pmc/perlstring.t
+    % prove t/pmc/perlstring.t
 
 =head1 DESCRIPTION
 
 Tests the C<PerlString> PMC. Checks Perl-specific string behaviour.
 
 =cut
-
-use Parrot::Test tests => 67;
-use Test::More; # Included for skip().
 
 my $fp_equality_macro = <<'ENDOFMACRO';
 .macro fp_eq ( J, K, L )

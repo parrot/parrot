@@ -1,7 +1,12 @@
-#! perl -w
-
-# Copyright: 2001-2004 The Perl Foundation.  All Rights Reserved.
+#! perl
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
+
+use strict;
+use warnings;
+use lib qw( . lib ../lib ../../lib );
+use Test::More;
+use Parrot::Test tests => 7;
 
 =head1 NAME
 
@@ -9,16 +14,13 @@ t/pmc/prop.t - Properties
 
 =head1 SYNOPSIS
 
-	% perl -Ilib t/pmc/prop.t
+	% prove t/pmc/prop.t
 
 =head1 DESCRIPTION
 
 Tests property access on PMCs.
 
 =cut
-
-use Parrot::Test tests => 7;
-use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "set/getprop");
     new P0, .Integer

@@ -1,6 +1,13 @@
-#! perl -w
+#! perl
 # Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
+
+use strict;
+use warnings;
+use lib qw( . lib ../lib ../../lib );
+use Test::More;
+use Parrot::Test tests => 60;
+use Parrot::Config qw(%PConfig);
 
 =head1 NAME
 
@@ -8,7 +15,7 @@ t/pmc/nci.t - test the Native Call Interface
 
 =head1 SYNOPSIS
 
-	% perl -Ilib t/pmc/nci.t
+	% prove t/pmc/nci.t
 
 =head1 DESCRIPTION
 
@@ -22,9 +29,6 @@ Most tests are skipped when the F<libnci_test.so> shared library is not found.
   F<src/nci_test.c>
 
 =cut
-
-use Parrot::Test    tests => 60;
-use Parrot::Config qw(%PConfig);
 
 SKIP: {
 unless ( -e "runtime/parrot/dynext/libnci_test$PConfig{load_ext}" ) {

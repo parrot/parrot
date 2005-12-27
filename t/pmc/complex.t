@@ -1,6 +1,12 @@
-#! perl -w
-# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+#! perl
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
+
+use strict;
+use warnings;
+use lib qw( . lib ../lib ../../lib );
+use Test::More;
+use Parrot::Test tests => 25;
 
 =head1 NAME
 
@@ -8,7 +14,7 @@ t/pmc/complex.t - Complex Numbers
 
 =head1 SYNOPSIS
 
-	% perl -Ilib t/pmc/complex.t
+	% prove t/pmc/complex.t
 
 =head1 DESCRIPTION
 
@@ -16,8 +22,7 @@ Tests the Complex PMC.
 
 =cut
 
-use Parrot::Test tests => 25;
-use Test::More;
+
 
 my $fp_equality_macro = <<'ENDOFMACRO';
 .macro fp_eq (	J, K, L )
@@ -787,4 +792,3 @@ CODE
 2.8+2i
 -2.8-2i
 OUTPUT
-

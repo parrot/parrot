@@ -1,5 +1,12 @@
+#! perl
 # Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
+
+use strict;
+use warnings;
+use lib qw( . lib ../lib ../../lib );
+use Test::More;
+use Parrot::Test tests => 9;
 
 =head1 NAME
 
@@ -7,7 +14,7 @@ t/pmc/resizablebooleanarray.t - testing the ResizableBooleanArray PMC
 
 =head1 SYNOPSIS
 
-	% perl -Ilib t/pmc/resizablebooleanarray.t
+	% prove t/pmc/resizablebooleanarray.t
 
 =head1 DESCRIPTION
 
@@ -15,9 +22,6 @@ Tests C<ResizableBooleanArray> PMC. Checks size, sets various elements, includin
 out-of-bounds test. Checks INT and PMC keys.
 
 =cut
-
-use Parrot::Test tests => 9;
-use Test::More;
 
 my $fp_equality_macro = <<'ENDOFMACRO';
 .macro fp_eq (	J, K, L )

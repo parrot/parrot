@@ -1,7 +1,12 @@
 #! perl
-
-# Copyright: 2001-2004 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
+
+use strict;
+use warnings;
+use lib qw( . lib ../lib ../../lib );
+use Test::More;
+use Parrot::Test tests => 37;
 
 =head1 NAME
 
@@ -9,7 +14,7 @@ t/pmc/hash.t - Test for the Hash PMC
 
 =head1 SYNOPSIS
 
-	% perl -Ilib t/pmc/hash.t
+	% prove t/pmc/hash.t
 
 =head1 DESCRIPTION
 
@@ -18,9 +23,6 @@ normal and potentially hazardous keys. Does a bit of stress testing as
 well.
 
 =cut
-
-use Parrot::Test tests => 37;
-use Test::More;
 
 output_is(<<CODE, <<OUTPUT, "Initial Hash tests");
 	new	P0, .Hash

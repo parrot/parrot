@@ -1,6 +1,12 @@
-#! perl -w
+#! perl
 # Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
 # $Id$
+
+use strict;
+use warnings;
+use lib qw( . lib ../lib ../../lib );
+use Test::More;
+use Parrot::Test tests => 24;
 
 =head1 NAME
 
@@ -8,16 +14,13 @@ t/pmc/exception.t - Exception Handling
 
 =head1 SYNOPSIS
 
-	% perl -Ilib t/pmc/exception.t
+	% prove t/pmc/exception.t
 
 =head1 DESCRIPTION
 
 Tests C<Exception> and C<Exception_Handler> PMCs.
 
 =cut
-
-use Parrot::Test tests => 24;
-use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "push_eh - clear_eh");
     push_eh _handler

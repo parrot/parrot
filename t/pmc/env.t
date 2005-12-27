@@ -1,6 +1,13 @@
-#! perl -w
+#! perl
 # Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
+
+use strict;
+use warnings;
+use lib qw( . lib ../lib ../../lib );
+use Test::More;
+use Parrot::Test;
+use Parrot::Config;
 
 =head1 NAME
 
@@ -8,18 +15,13 @@ t/pmc/env.t - System Environment
 
 =head1 SYNOPSIS
 
-	% perl -Ilib t/pmc/env.t
+	% prove t/pmc/env.t
 
 =head1 DESCRIPTION
 
 Tests the C<Env> PMC.
 
 =cut
-
-use Parrot::Test tests => 12;
-use Test::More;
-use Parrot::Config;
-
 
 output_is(<<'CODE', <<OUT, "all Envs are ident");
     new P0, .Env
@@ -233,3 +235,7 @@ output_like(<<'CODE', <<OUT, "setenv/getenv - PMC key");
 CODE
 /Foobar/i
 OUT
+
+
+## remember to change the number of tests :-)
+BEGIN { plan tests => 12; }

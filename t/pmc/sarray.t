@@ -1,6 +1,12 @@
-#! perl -w
-# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+#! perl
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
+
+use strict;
+use warnings;
+use lib qw( . lib ../lib ../../lib );
+use Test::More;
+use Parrot::Test tests => 33;
 
 =head1 NAME
 
@@ -8,16 +14,13 @@ t/pmc/sarray.t - Simple Array
 
 =head1 SYNOPSIS
 
-	% perl -Ilib t/pmc/sarray.t
+	% prove t/pmc/sarray.t
 
 =head1 DESCRIPTION
 
 Tests the C<SArray> PMC, which is used for parameter-passing.
 
 =cut
-
-use Parrot::Test tests => 33;
-use Test::More;
 
 my $fp_equality_macro = <<'ENDOFMACRO';
 .macro fp_eq (	J, K, L )

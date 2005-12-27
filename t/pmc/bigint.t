@@ -1,6 +1,13 @@
-#! perl -w
-# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+#! perl
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
+
+use strict;
+use warnings;
+use lib qw( . lib ../lib ../../lib );
+use Test::More;
+use Parrot::Test;
+use Parrot::Config;
 
 =head1 NAME
 
@@ -8,17 +15,13 @@ t/pmc/bigint.t - BigInt
 
 =head1 SYNOPSIS
 
-	% perl -Ilib t/pmc/bigint.t
+	% prove t/pmc/bigint.t
 
 =head1 DESCRIPTION
 
 Tests the BigInt PMC. Checks Perl-specific integer behaviour.
 
 =cut
-
-use Parrot::Test;
-use Test::More;
-use Parrot::Config;
 
 if ($PConfig{gmp}) {
     plan tests => 26;
