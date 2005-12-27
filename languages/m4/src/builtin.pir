@@ -503,9 +503,7 @@ Decrease a number.
   .local string ret
   ret = arg0
 
-  .pcc_begin_return
-    .return ret
-  .pcc_end_return
+  .return( ret )
 .end
 
 

@@ -6,7 +6,7 @@ src/macro.pir - does macro substitution
 
 =head1 DESCRIPTION
 
-Copyright:  2004 Bernhard Schmalhofer.  All Rights Reserved.
+Copyright:  2004-2005 Bernhard Schmalhofer.  All Rights Reserved.
 CVS Info:   $Id$
 History:    Ported from GNU m4 1.4
 References: http://www.gnu.org/software/m4/m4.html
@@ -178,6 +178,7 @@ NO_TOKEN_TEXT:
 TOKEN_FUNC:
   .local pmc func
   func = symbol['func']
+  # indirect call of subs, seems to need elaborate PIR syntax
   .pcc_begin 
     .arg state
     .arg arguments
