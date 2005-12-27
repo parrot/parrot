@@ -912,16 +912,16 @@ Amir Karger, Leopold TE<ouml>tsch
 
 =item Description
 
-Infocom's Z-machine
+Infocom's Z-machine. See also http://en.wikipedia.org/wiki/Z-machine.
 
 =item Status
 
 25 out of 66 Z3 opcodes all or mostly done. A long way from Zork.
-Broken with recent deprecations.
+3 out of 4 test files working.
 
 =item Last verified with parrot version
 
-0.2.3
+0.4.0
 
 =item Location
 
