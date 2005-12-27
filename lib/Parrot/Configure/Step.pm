@@ -282,9 +282,7 @@ C<$err>.
 
 sub _run_command
 {
-    my ($command, $out, $err) = @_;
-
-    my $verbose = $conf->data->get('verbose');
+    my ($command, $out, $err, $verbose) = @_;
 
     if ($verbose) {
         print "$command\n";
@@ -365,15 +363,17 @@ sub cc_build
     $cc_args   = '' unless defined $cc_args;
     $link_args = '' unless defined $link_args;
 
+    my $verbose = $conf->options->get('verbose');
+
     my ($cc, $ccflags, $ldout, $o, $link, $linkflags, $cc_exe_out, $exe, $libs) = $conf->data->get(
         qw(cc ccflags ld_out o link linkflags
             cc_exe_out exe libs)
     );
 
-    _run_command("$cc $ccflags $cc_args -I./include -c test.c", 'test.cco', 'test.cco')
+    _run_command("$cc $ccflags $cc_args -I./include -c test.c", 'test.cco', 'test.cco', $verbose)
         and confess "C compiler failed (see test.cco)";
 
-    _run_command("$link $linkflags test$o $link_args ${cc_exe_out}test$exe $libs", 'test.ldo', 'test.ldo')
+    _run_command("$link $linkflags test$o $link_args ${cc_exe_out}test$exe $libs", 'test.ldo', 'test.ldo', $verbose)
         and confess "Linker failed (see test.ldo)";
 }
 
@@ -388,12 +388,13 @@ sub cc_run
 {
     my $exe   = $conf->data->get('exe');
     my $slash = $conf->data->get('slash');
+    my $verbose = $conf->options->get('verbose');
 
     if (defined($_[0]) && length($_[0])) {
         local $" = ' ';
-        _run_command(".${slash}test${exe} @_", './test.out');
+        _run_command(".${slash}test${exe} @_", './test.out', undef, $verbose);
     } else {
-        _run_command(".${slash}test${exe}", './test.out');
+        _run_command(".${slash}test${exe}", './test.out', undef, $verbose);
     }
 
     local *OUT;
@@ -416,12 +417,15 @@ sub cc_run_capture
 {
     my $exe   = $conf->data->get('exe');
     my $slash = $conf->data->get('slash');
+    my $verbose = $conf->options->get('verbose');
 
     if (defined($_[0]) && length($_[0])) {
         local $" = ' ';
-        _run_command(".${slash}test${exe} @_", './test.out', './test.out');
+        _run_command(".${slash}test${exe} @_", './test.out', './test.out',
+            $verbose);
     } else {
-        _run_command(".${slash}test${exe}", './test.out', './test.out');
+        _run_command(".${slash}test${exe}", './test.out', './test.out',
+            $verbose);
     }
 
     local *OUT;
