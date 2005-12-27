@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2003 The Perl Foundation.  All rights reserved.
+# Copyright (C) 2001-2005 The Perl Foundation.  All rights reserved.
 # $Id$
 
 =head1 NAME
@@ -13,10 +13,15 @@ examples/subs/multi_retvals.pir - Subroutine example
 
 Call a sub with multiple return values.
 
+=head1 SEE ALSO
+
+F<docs/imcc/syntax.pod>
+F<docs/imcc/calling_conventions.pod>
+
 =cut
 
-.sub _main :main
-  ($I0, $I1, $I99) = _foo(7, 8, "nine")
+.sub example :main
+  ($I0, $I1, $I99) = foo(7, 8, "nine")
   print "return: "
   print $I0
   print " "
@@ -26,6 +31,6 @@ Call a sub with multiple return values.
   print "\n"
 .end
 
-.sub _foo
+.sub foo
   .return( 10, 11, 12 )
 .end

@@ -13,6 +13,11 @@ examples/pasm/coroutine.pasm - Sample co-routines in Parrot
 
 This shows you how to create two coroutines and C<invoke> them.
 
+=head1 SEE ALSO
+
+F<docs/ops/core.pod>
+F<docs/pdds/pdd03_calling_conventions.pod>
+
 =cut
 
 # create a coro and save it on the user stack

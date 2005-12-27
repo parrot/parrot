@@ -12,12 +12,16 @@ examples/subs/pasm_sub1.pasm - Parrot calling conventions
 =head1 DESCRIPTION
 
 Sample subroutines in Parrot assembler.
-
 Shows you how to create a C<.Sub> and C<invokecc> it.
 
 = TODO
 
 Examples for parameter passing.
+
+=head1 SEE ALSO
+
+F<docs/ops/core.pod>
+F<docs/pdds/pdd03_calling_conventions.pod>
 
 =cut
 

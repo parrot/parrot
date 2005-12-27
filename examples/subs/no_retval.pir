@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2003 The Perl Foundation.  All rights reserved.
+# Copyright (C) 2001-2005 The Perl Foundation.  All rights reserved.
 # $Id$
 
 =head1 NAME
@@ -13,13 +13,18 @@ examples/subs/no_retval.pir - Subroutine example
 
 Call a sub with no return values.
 
+=head1 SEE ALSO
+
+F<docs/imcc/syntax.pod>
+F<docs/imcc/calling_conventions.pod>
+
 =cut
 
-.sub _main :main
-  _foo(7, 8, "nine")
+.sub example :main
+  foo(7, 8, "nine")
 .end
 
-.sub _foo
+.sub foo
   .param int i
   .param int j
   .param string s

@@ -16,6 +16,11 @@ examples/subs/jsr_ret.pasm - Jumping to subroutine
 
 A program to demonstrate the use of the C<jump> and of the C<jsr> opcode.
 
+=head1 SEE ALSO
+
+F<docs/ops/core.pod>
+F<docs/pdds/pdd03_calling_conventions.pod>
+
 =cut
 
 MAIN:       print "Example of the jump op.\n"

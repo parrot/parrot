@@ -13,6 +13,11 @@ examples/subs/bsr_ret.pasm - Branch to location
 
 Shows branching and returning to a location saved on the call stack.
 
+=head1 SEE ALSO
+
+F<docs/ops/core.pod>
+F<docs/pdds/pdd03_calling_conventions.pod>
+
 =cut
 
 MAIN:	print "Main\n"
