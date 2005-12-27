@@ -43,8 +43,9 @@ sub teardown
 {
 	my $name = @_ ? shift : "temp.file";
 
-	unlink($name) if -e $name;
-	die "Failed to delete $name"if -e $name;
+	my $delete_counter;
+	unlink($name) while( -e $name and 3 > $delete_counter++ and sleep 1);
+	die "Failed to delete $name" if -e $name;
 }
 
 my $main = <<'CODE';
