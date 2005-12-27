@@ -24,6 +24,19 @@ Regressions tests for the L<Parrote::Configure::Data> class.
 
 BEGIN { use_ok('Parrot::Configure::Data'); }
 
+can_ok($testpkg, qw(
+    new
+    get
+    set
+    keys
+    dump
+    clean
+    settrigger
+    gettriggers
+    gettrigger
+    deltrigger
+));
+
 {
     my $pcd = Parrot::Configure::Data->new;
 
