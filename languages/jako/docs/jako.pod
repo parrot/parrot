@@ -121,8 +121,6 @@ Simple cases of subroutine definitions are:
         sub foo() { ... }
         sub int bar(int x, int y) { ... }
 
-NOTE: This assumes some sort of Jako include mechanism.
-
 NOTE: The below requires C<jakoc> to be able to determine the best match among
 a number of alternatives with the same name, but different signatures.
 
@@ -130,7 +128,7 @@ The B<op> property can have a string value that gives the op name, if it is
 different from the sub name. There is also an B<oplib> property that gives
 the oplib, if the op is not core.
 
-Presumably, there would be an implicit "use 'core'", that would pull in
+TODO: Presumably, there should be an implicit "use 'core'", that would pull in
 the definitions of the core ops as subs (if any).
 
 One wonders if this mechanism could be expanded to account for the
@@ -148,10 +146,9 @@ produce the include files for the various categories of ops and subs.
     pmc { nat = "p" } dstrect
   );
 
-NOTE: The B<oplib>, B<fnlib> and B<fn> sub properties are not implemented yet.
+NOTE: The B<oplib> sub property is not implemented yet.
 
 NOTE: Type properties are not implemented yet.
-
 
 =item * Assignments
 
@@ -197,6 +194,7 @@ out of the loop, again without executing the intervening statements. And,
 B<redo> jumps back to the beginning of the current iteration.
 
 Loops can be followed by an optional B<continue> block, which provides
+code to be executed between iterations.
 
 =back
 
