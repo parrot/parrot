@@ -499,10 +499,9 @@ This function is similar to C<autoconf>'s C<AC_CHECK_PROGS> macro.
 
 sub check_progs
 {
-    my $progs = shift;
+    my ($progs, $verbose) = @_;
 
     $progs = [$progs] unless ref $progs eq 'ARRAY';
-    my $verbose = $conf->data->get('verbose');
 
     print "checking for program: ", join(" or ", @$progs), "\n" if $verbose;
     foreach my $prog (@$progs) {

@@ -30,6 +30,8 @@ sub runstep
 {
     my ($self, $conf) = @_;
 
+    my $verbose = $conf->options->get('verbose');
+
     # undef means we don't have GNU make... default to not having it
     $conf->data->set(gmake_version => undef);
 
@@ -46,7 +48,8 @@ sub runstep
         $conf->data->set($util => $prog);
         $result = 'yes';
     } else {
-        $prog = check_progs(['gmake', 'mingw32-make', 'nmake', 'make']);
+        $prog = check_progs(['gmake', 'mingw32-make', 'nmake', 'make'],
+            $verbose);
 
         unless ($prog) {
 

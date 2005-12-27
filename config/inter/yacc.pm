@@ -29,6 +29,8 @@ $prompt      = "Do you have a parser generator, like bison or yacc?";
 sub runstep
 {
     my ($self, $conf) = @_;
+    
+    my $verbose = $conf->options->get('verbose');
 
     # undef means we don't have bison... default to not having bison
     $conf->data->set(bison_version => undef);
@@ -54,7 +56,7 @@ sub runstep
         return undef;
     }
 
-    $prog = check_progs(['bison -v -y', 'yacc', 'byacc']);
+    $prog = check_progs(['bison -v -y', 'yacc', 'byacc'], $verbose);
 
     unless ($prog) {
 

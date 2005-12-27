@@ -30,6 +30,8 @@ sub runstep
 {
     my ($self, $conf) = @_;
 
+    my $verbose = $conf->options->get('verbose');
+
     # undef means we don't have flex... default to not having flex
     $conf->data->set(flex_version => undef);
 
@@ -54,7 +56,7 @@ sub runstep
         return undef;
     }
 
-    $prog = check_progs(['flex', 'lex']);
+    $prog = check_progs(['flex', 'lex'], $verbose);
 
     unless ($prog) {
 
