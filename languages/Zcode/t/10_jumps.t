@@ -29,7 +29,7 @@ unless (-e $Z3_Test) {
 
 # Location of parrot -- note we'll run parrot from inside $compiler_dir
 # HACK! May not work after install, but then parrot should just be in path
-my @dots = File::Spec->updir; # aka '..'
+my @dots = File::Spec->updir(); # aka '..'
 my @dirs = (
     #$PConfig{"build_dir"}, 
     File::Spec->catfile( (@dots) x 2 ), # ../..

@@ -1,3 +1,5 @@
+# $Id$
+
 #
 # initialize - create Zmachine object
 #
@@ -61,7 +63,8 @@ done:
 #
 
 .namespace ["Zmachine"]
-.sub __instantiate method
+
+.sub instantiate method
   .param string file
   .param pmc opts
   .local pmc instance
@@ -176,9 +179,9 @@ vers_ok:
   .local pmc compi, code_sub
   # get PIR compiler
   compi = compreg "PIR"
-  $S0 = code
   # compile the code
-  code_sub = compile compi, $S0
+  # print code
+  code_sub = compi( code )
   # and run it
   code_sub(im)
 .end
@@ -244,7 +247,9 @@ vers_ok:
   .param string s
   .local pmc c
   c = getattribute self, "ZComp\0code"
-  unless argcS goto no_add
+
+  unless s goto no_add
+
     c = c . s
 no_add:
   .return(c)
@@ -475,11 +480,13 @@ done:
     .local int i, j
     .local string assigns, declares
     .local int num_locals # will be a .param (or read it in this sub)
-    num_locals = 3
+    # AFAIK, currently no params are ever passed in.
+    # Set num_locals to 0 in order to avoid obsolete usage of argcI.
+    num_locals = 0
     $S1 = ".sub R"
     $S1 .= address
     unless first goto not_first
-      $S1 .= " @MAIN"
+      $S1 .= " :main"
     not_first:
     $S1 .= "\n"
     assigns = ""

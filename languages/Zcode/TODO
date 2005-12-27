@@ -1,6 +1,12 @@
 TODO for PIR Zmachine
 ---------------------
 
+KNOWN_BUGS
+----------
+
+- The generated PIR subs accept no options INTVAL arguments,
+  as argcI has become obsolete
+
 OPCODES: about 1/3 of V3 is working
 -------
 
