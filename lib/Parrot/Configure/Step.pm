@@ -166,6 +166,8 @@ sub copy_if_diff
     # Make sure the timestamp is updated
     my $now = time;
     utime $now, $now, $to;
+
+    return 1;
 }
 
 =item C<move_if_diff($from, $to, $ignorePattern)>
