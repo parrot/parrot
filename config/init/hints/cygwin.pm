@@ -11,7 +11,7 @@ sub runstep
 
     # cygwin's perl is compiled with -lutil, which for some reason is not
     # in the standard installation, so we get rid of it
-    my $libs = $self->data->get('libs');
+    my $libs = $conf->data->get('libs');
     $libs =~ s/-lutil\b//g;
 
     # A note about building shared libraries:  Perl5 uses the 'ld2' tool, which
@@ -20,24 +20,26 @@ sub runstep
     # perl5 Configure defaults and use 'gcc -shared' instead of 'ld2'.
     # If this later causes problems, it might be worth revisiting.
     # A. Dougherty 9/9/2002
-    $self->data->set(
+    $conf->data->set(
         ld             => 'gcc',
         ld_share_flags => '-shared',
         ld_load_flags  => '-shared',
         libs           => $libs,
     );
 
-    #We need to define inet_aton on Cygwin.  The contents of the --define
-    #switch are in $_[2].  XXX EVIL EVIL EVIL HACK.  If you need to do this
-    #elsewhere, please do everyone a favor and write a proper interface for
-    #modifying the command-line args, or even better do something to make the
-    #define interface not suck.
-    unless ($_[2]) {
-        $_[2] = 'inet_aton';
-    } elsif ($_[2] !~ /inet_[ap]ton/) {
-        $_[2] = join(',', 'inet_aton', $_[2]);
+    # We need to define inet_aton on Cygwin.  The contents of the --define
+    # switch are in $_[2].  XXX EVIL EVIL EVIL HACK.  If you need to do this
+    # elsewhere, please do everyone a favor and write a proper interface for
+    # modifying the command-line args, or even better do something to make the
+    # define interface not suck.
+    # XXX CLI options shouldn't be being modified like this  
+    my $define = $conf->options->get('define');
+    unless ($define) {
+        $define = 'inet_aton';
+    } elsif ($define !~ /inet_[ap]ton/) {
+        $define = join(',', 'inet_aton', $define);
     }
-
+    $conf->options->set(define => $define);
 }
 
 1;
