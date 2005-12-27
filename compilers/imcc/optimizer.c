@@ -978,7 +978,10 @@ branch_cond_loop_swap(Interp *interp, IMC_Unit *unit, Instruction *branch,
         
         if (found) {
             Instruction *tmp;
-            SymReg **regs, *r;
+            SymReg *regs[3], *r;
+
+            /* cond_op has 2 or 3 args */
+            assert(args <= 3);
             
             r = mk_local_label(interp, str_dup(label));
             tmp = INS_LABEL(unit, r, 0);
@@ -987,17 +990,18 @@ branch_cond_loop_swap(Interp *interp, IMC_Unit *unit, Instruction *branch,
             
             for (start = start->next; start != cond; start = start->next) {
                 if (!(start->type & ITLABEL)) {
-                    tmp = INS(interp, unit, start->op, "", start->r, start->n_r, 0, 0);
+                    tmp = INS(interp, unit, start->op, "", 
+                            start->r, start->n_r, 0, 0);
                     prepend_ins(unit, branch, tmp);
                 }
             }
             
-            regs = malloc(sizeof(SymReg*) * args);
             for (count = 0; count != args; ++count) {
                 regs[count] = cond->r[count];
             }
 
-            regs[get_branch_regno(cond)] = mk_label_address(interp, str_dup(label));
+            regs[get_branch_regno(cond)] = 
+                mk_label_address(interp, str_dup(label));
             tmp = INS(interp, unit, (char*)neg_op, "", regs, args, 0, 0);
             subst_ins(unit, branch, tmp, 1);
             
@@ -1007,7 +1011,6 @@ branch_cond_loop_swap(Interp *interp, IMC_Unit *unit, Instruction *branch,
 
             ostat.branch_cond_loop++;
             changed = 1;
-            free(regs);
         }
         
         free(label);
