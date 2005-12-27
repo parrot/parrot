@@ -1,4 +1,4 @@
-# Copyright (C) 2001 Gregor N. Purdy. All rights reserved.
+# Copyright (C) 2001-2005 The Perl Foundation. All rights reserved.
 # This program is free software. It is subject to the same
 # license as Perl itself.
 # $Id$

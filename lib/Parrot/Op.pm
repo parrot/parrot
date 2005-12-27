@@ -1,5 +1,5 @@
 #! perl -w
-# Copyright: 2001-2004 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 =head1 NAME
@@ -469,7 +469,7 @@ license as Parrot itself.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2001 Gregor N. Purdy. All rights reserved.
+Copyright (C) 2001-2005 The Perl Foundation. All rights reserved.
 
 =end TODO
 
