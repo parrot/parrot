@@ -19,7 +19,8 @@ sub runstep
         local $^W;    # no warnings on redefinition
 
         *Parrot::Configure::Step::cc_build = sub {
-            system("$c{cc} $c{ccflags} test.c") and die "C compiler died!";
+            my ($cc, $ccflags) = $conf->data->get(qw(cc ccflags));
+            system("$cc $ccflags test.c") and die "C compiler died!";
             system("link/exe=test test")        and die "Link failed!";
         };
 
