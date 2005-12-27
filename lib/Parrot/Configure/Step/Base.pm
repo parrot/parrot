@@ -15,7 +15,8 @@ package Parrot::Configure::Step::Base;
 
 use strict;
 
-sub description {
+sub description
+{
     my $class = shift;
     {
         no strict 'refs';
@@ -23,7 +24,8 @@ sub description {
     }
 }
 
-sub result {
+sub result
+{
     my $class = shift;
     {
         no strict 'refs';
@@ -31,7 +33,8 @@ sub result {
     }
 }
 
-sub args {
+sub args
+{
     my $class = shift;
     {
         no strict 'refs';

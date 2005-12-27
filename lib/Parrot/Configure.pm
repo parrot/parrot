@@ -31,7 +31,8 @@ Basic constructor.  Accepts no arguments.
 
 =cut
 
-sub new {
+sub new
+{
     my $class = shift;
 
     my $self = {
@@ -52,7 +53,8 @@ data.
 
 =cut
 
-sub data {
+sub data
+{
     my $self = shift;
 
     return $self->{data};
@@ -64,7 +66,8 @@ Returns the L<Parrot::Configure::Data> object used to contain CLI option data.
 
 =cut
 
-sub options {
+sub options
+{
     my $self = shift;
 
     return $self->{options};
@@ -77,10 +80,11 @@ to a list of configuration steps in scalar context.
 
 =cut
 
-sub steps {
+sub steps
+{
     my $self = shift;
 
-    return wantarray ? @{ $self->{steps} } : $self->{steps};
+    return wantarray ? @{$self->{steps}} : $self->{steps};
 }
 
 =item C<add_steps()>
@@ -90,12 +94,13 @@ invoked on.
 
 =cut
 
-sub add_steps {
+sub add_steps
+{
     my $self = shift;
 
     my @new_steps = @_;
 
-    push @{ $self->{steps} }, @new_steps;
+    push @{$self->{steps}}, @new_steps;
 
     return $self;
 }
@@ -106,11 +111,11 @@ Loops over the configuration steps, running each one in turn.
 
 =cut
 
-sub runsteps {
+sub runsteps
+{
     my $self = shift;
 
-    my ($verbose, $verbose_step, $ask) =
-        $self->options->get(qw(verbose verbose-step ask));
+    my ($verbose, $verbose_step, $ask) = $self->options->get(qw(verbose verbose-step ask));
 
     my $n = 0; # step number
     foreach my $step ($self->steps) {
@@ -123,11 +128,13 @@ sub runsteps {
 
         # set per step verbosity
         if (defined $verbose_step) {
+
             # by step number
             if ($verbose_step =~ /^\d+$/ && $n == $verbose_step) {
                 $self->options->set(verbose => 2);
             }
-            # by description 
+
+            # by description
             elsif ($description =~ /$verbose_step/) {
                 $self->options->set(verbose => 2);
             }
@@ -143,10 +150,9 @@ sub runsteps {
         my $result = $step->result || 'done';
 
         print "..." if $verbose && $verbose == 2;
-        print "." x (71 - length($description)
-                        - length($result));
+        print "." x (71 - length($description) - length($result));
         print "$result." unless $step =~ m{^inter/} && $ask;
-        
+
         # reset verbose value for the next step
         $self->options->set(verbose => $verbose);
     }
