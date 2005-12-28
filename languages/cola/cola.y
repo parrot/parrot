@@ -1028,8 +1028,8 @@ int main(int argc, char * argv[])
     fprintf(stderr, "Pass 3: Semantic checking...\n");
     /*semant_ast(ast_start); */
 
-    freopen("a.imc", "w", stdout);
-    fprintf(stderr, "Compiling intermediate code to a.imc\n");
+    freopen("a.pir", "w", stdout);
+    fprintf(stderr, "Compiling intermediate code to a.pir\n");
 /*
     printf( "#Dump of global namespace:\n" );
     indent = 0;
@@ -1051,13 +1051,13 @@ int main(int argc, char * argv[])
     }
 
     printf("# Include standard API stuff\n");
-    printf(".include \"core.imc\"\n\n");
+    printf(".include \"core.pir\"\n\n");
     fflush(stdout);
     fprintf(stderr, "%ld lines compiled to PIR.\n", line);
     fprintf(stderr, "Generating PASM\n");
-    system("../../parrot -o a.pasm a.imc");
+    system("../../parrot -o a.pasm a.pir");
     fprintf(stderr, "Generating PBC (Bytecode)\n");
-    system("../../parrot -o a.pbc a.imc");
+    system("../../parrot -o a.pbc a.pir");
     return 0;
 }
 

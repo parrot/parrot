@@ -8,35 +8,35 @@
   .param string code
 
   .local int uniq
-  .local string imcfile
+  .local string pirfile
   .local string pir_data
   .local string cmdline
 
   uniq = time
-  imcfile = "/tmp/regex-"
+  pirfile = "/tmp/regex-"
   $S0 = uniq
-  imcfile = concat $S0
-  imcfile = concat ".imc"
+  pirfile = concat $S0
+  pirfile = concat ".pir"
   
   cmdline = "regex.pl --sub-name=_regex -o "
-  cmdline = concat imcfile
+  cmdline = concat pirfile
   cmdline = concat " '"
   cmdline = concat code
   cmdline = concat "'"
 
   $I0 = spawnw cmdline
-  unless $I0 goto imc_to_pbc
-  print "Failed to compile to .imc file.\n"
+  unless $I0 goto pir_to_pbc
+  print "Failed to compile to .pir file.\n"
 #  invoke P1
 
-imc_to_pbc:
-  pir_data = _readfile(imcfile)
+pir_to_pbc:
+  pir_data = _readfile(pirfile)
   $P0 = compreg "PIR"
   $P1 = compile $P0, pir_data
 
 #  $P0 = compreg "FILE"
-#  $P1 = $P0(imcfile)
-#  $P1 = compile $P0, imcfile
+#  $P1 = $P0(pirfile)
+#  $P1 = compile $P0, pirfile
 
   $P1 = find_global "_regex"
   .return($P1)

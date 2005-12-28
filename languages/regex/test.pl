@@ -135,7 +135,7 @@ while (1) {
 
 exit ($status ? 0 : 1);
 
-sub generate_regular_imc {
+sub generate_regular_pir {
     my ($filename, $pattern) = @_;
     open(PIR, ">$filename") or die "create $filename: $!";
 
@@ -161,8 +161,8 @@ END
 }
 
 sub generate_pbc {
-    my ($imc, $pbc) = @_;
-    my $status = system("$PARROT_EXE", "-o", $pbc, $imc);
+    my ($pir, $pbc) = @_;
+    my $status = system("$PARROT_EXE", "-o", $pbc, $pir);
     if (! defined($status) || $status) {
         die "assemble failed with status " . ($? >> 8);
     }
@@ -170,7 +170,7 @@ sub generate_pbc {
 
 sub generate_regular {
     my $pattern = shift;
-    generate_regular_imc("test_regex.pir", $pattern);
+    generate_regular_pir("test_regex.pir", $pattern);
     generate_pbc("test_regex.pir", "test.pbc");
 }
 

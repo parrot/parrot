@@ -57,8 +57,8 @@ matching routine with some input. Or, just to try it out, you can use
 the --main argument to regex.pl to generate a sample driver program
 that accepts an input string on the command line:
 
-  perl regex.pl --main -o mytest.imc 'a*x'
-  ../../parrot mytest.imc baax
+  perl regex.pl --main -o mytest.pir 'a*x'
+  ../../parrot mytest.pir baax
  (output)
   Match found
   0: 1..3
@@ -73,8 +73,8 @@ structures encoding the matching information.
 
 New stuff: now you can use the compiler as an embedded Parrot
 compiler. Run 'make regex-compiler.pbc' to generate
-regex-compiler.pbc. Then run ../../parrot 01_basic.imc, ../../parrot
-02_date.imc, etc. These will dynamically load in the regex-compiler as
+regex-compiler.pbc. Then run ../../parrot 01_basic.pir, ../../parrot
+02_date.pir, etc. These will dynamically load in the regex-compiler as
 the compiler for the "regex" language, and then use it to compile some
 code and execute it.
 
@@ -121,7 +121,7 @@ default) as well. The second example wouldn't, because it isn't valid
 PIR.
 
 Examples of using regex.pl to generate code that is compiled on the
-fly are in 01_basic.imc and 02_date.imc.
+fly are in 01_basic.pir and 02_date.pir.
 
 If you use the -d flag, you'll get a very verbose description of the
 matching progress as you run.
