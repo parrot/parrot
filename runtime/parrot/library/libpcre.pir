@@ -3,11 +3,11 @@
 
 =head1 TITEL
 
-libpcre.imc - NCI interface to Perl-Compatible Regular Expression library
+libpcre.pir - NCI interface to Perl-Compatible Regular Expression library
 
 =head1 DESCRIPTION
 
-See 'library/pcre.imc' for details on the user interface.
+See 'library/pcre.pir' for details on the user interface.
 
 =cut
 
@@ -165,7 +165,7 @@ all:
 
 =head1 FILES
 
-pcre.imc, libpcre.imc
+pcre.pir, libpcre.pir
 
 =head1 SEE ALSO
 

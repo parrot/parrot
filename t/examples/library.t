@@ -57,7 +57,7 @@ my $PARROT = ".$PConfig{slash}$PConfig{test_prog}";
     is( $sum, "fb171bd1a17bf6cd08d73105ad738a35\t$sample_fn\n", $md5sum_fn );
 }
 
-# Testing pcre.imc with a simple pattern, if we have PCRE
+# Testing pcre.pir with a simple pattern, if we have PCRE
 my $cmd = ($^O =~ /MSWin32/) ? "pcregrep --version" : "pcre-config --version";
 my $has_pcre = Parrot::Test::run_command($cmd, STDERR => '/dev/null') == 0;
 SKIP:

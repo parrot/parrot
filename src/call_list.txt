@@ -264,7 +264,7 @@ p	ptit33i
 i	ptit33i
 i	ptiit33i
 
-# The following are used by library/pcre.imc
+# The following are used by library/pcre.pir
 p	tiB3P
 p	tip3P
 i	pPtiiipi

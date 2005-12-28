@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-examples/library/pcre.imc - Perl compatible regular expressions
+examples/library/pcre.pir - Perl compatible regular expressions
 
 =head1 SYNOPSIS
 
@@ -22,7 +22,7 @@ E<lt>jerry dot gay at gmail dot com<gt>
 =cut
 
 
-.include 'library/pcre.imc'
+.include 'library/pcre.pir'
 
 
 .sub main :main

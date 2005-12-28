@@ -11,7 +11,7 @@ use Parrot::Test;
 
 =head1 NAME
 
-t/library/pcre.t - testing library/pcre.imc
+t/library/pcre.t - testing library/pcre.pir
 
 =head1 SYNOPSIS
 
@@ -19,7 +19,7 @@ t/library/pcre.t - testing library/pcre.imc
 
 =head1 DESCRIPTION
 
-This program tests whether the 'pcre.imc' library accesses
+This program tests whether the 'pcre.pir' library accesses
 the installed PCRE library, and matches patterns successfully.
 
 =cut
@@ -38,7 +38,7 @@ pir_output_is( <<'CODE', <<'OUT', 'soup to nuts' );
 
 
 .sub main :main
-    load_bytecode "library/pcre.imc"
+    load_bytecode "library/pcre.pir"
     .local pmc func
     .local pmc lib
 

@@ -3,11 +3,11 @@
 
 =head1 TITLE
 
-pcre.imc - user interface to Perl-Compatible Regular Expression library
+pcre.pir - user interface to Perl-Compatible Regular Expression library
 
 =head1 SYNOPSIS
 
-    load_bytecode 'library/pcre.imc'
+    load_bytecode 'library/pcre.pir'
     lib = pcre_init()
 
     func = find_global 'PCRE', 'compile'
@@ -25,7 +25,7 @@ This is the user interface to PCRE. Use this to initialize the library,
 compile regexes, match against strings, and return the results.
 All functions are found in the 'PCRE' namespace.
 
-The NCI interface is contained in libpcre.imc. 
+The NCI interface is contained in libpcre.pir. 
 
 =cut
 
@@ -68,7 +68,7 @@ LIB_CYGWIN:
 LIB_LOADED:
     store_global 'PCRE', 'lib', libpcre
 
-    load_bytecode 'library/libpcre.imc'
+    load_bytecode 'library/libpcre.pir'
 
     # pcre *pcre_compile(const char *pattern, int options,
     #            const char **errptr, int *erroffset,
@@ -181,7 +181,7 @@ Send bug reports to E<lt>parrotbug@parrotcode.org<gt>
 
 =head1 FILES
 
-pcre.imc, libpcre.imc
+pcre.pir, libpcre.pir
 
 =head1 SEE ALSO
 
