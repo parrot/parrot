@@ -7,8 +7,8 @@ all: build
 test: build
 	$(PARROT) -r lisp.pbc t/test.l
 
-build: lisp.imc
-	$(PARROT) -o lisp.pbc lisp.imc
+build: lisp.pir
+	$(PARROT) -o lisp.pbc lisp.pir
 
 clean:
 	$(RM_F) core "*.pbc" "*~"
