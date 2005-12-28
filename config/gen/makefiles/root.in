@@ -614,7 +614,7 @@ help :
 	@echo "  src_tests:         Run test in C-file."
 	@echo "  perl_tests:        Test the Perl modules in the distribution."
 	@echo "  testexex:          Testing the exex runcore."
-	@echo "  testbench:         Run all benchmarks."
+	@echo "  benchmark_tests:   Run all benchmarks."
 	@echo "  manitest:          Check for new and missing files."
 	@echo "  doc_tests:         Check POD syntax of all file containing POD."
 	@echo ""
@@ -1257,12 +1257,16 @@ editor-clean :
 # The --running-make-test argument is currently used by long-running tests
 # to disable GC_DEBUG.
 EXTRA_TEST_ARGS    = --gc-debug --running-make-test
-RUN_TEST_FILES = \
-	t/run/*.t
-SRC_TEST_FILES = \
-	t/src/*.t
+DISTRO_TEST_FILES = \
+	t/distro/*.t
+BENCHMARK_TEST_FILES = \
+	t/benchmark/*.t
+DOC_TEST_FILES = \
+	t/doc/*.t
 PERL_TEST_FILES = \
 	t/perl/*.t
+RUN_TEST_FILES = \
+	t/run/*.t
 RUNCORE_TEST_FILES = \
 	t/compilers/imcc/*/*.t \
 	t/op/*.t \
@@ -1277,10 +1281,10 @@ RUNCORE_TEST_FILES = \
 	t/compilers/tge/*.t \
 	t/library/*.t \
 	t/examples/*.t
+SRC_TEST_FILES = \
+	t/src/*.t
 TOOLS_TEST_FILES = \
 	t/tools/*.t
-DISTRO_TEST_FILES = \
-	t/distro/*.t
 
 # Common prep for all test targets.
 # We propably need a complete build before running the tests.
@@ -1306,7 +1310,7 @@ fulltest : \
 	testS \
 	src_tests \
 	perl_tests \
-	testbench \
+	benchmark_tests \
 	doc_tests \
 	distro_tests
 
@@ -1355,13 +1359,17 @@ run_tests :
 perl_tests :
 	$(PERL) t/harness $(PERL_TEST_FILES)
 
-# all benchmarks
-testbench: test_prep
-	$(PERL) t/harness t/benchmarks.t
+# obsolete 
+testbench : 
+	@echo "Please use the target benchmark_tests."
+
+# benchmark tests
+benchmark_tests : test_prep
+	$(PERL) t/harness $(EXTRA_TEST_ARGS) $(BENCHMARK_TEST_FILES)
 
 # doc tests
 doc_tests :
-	$(PERL) t/harness t/doc/pod.t
+	$(PERL) t/harness $(EXTRA_TEST_ARGS) $(DOC_TEST_FILES)
 
 # Running a benchmark
 mopsbench : test_prep

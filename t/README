@@ -4,6 +4,8 @@
 This directory contains the Parrot test suite. 
 For details see the documentation in 'docs/tests.pod'.
 
+benchmark:    Run all benchmarks
+
 compilers:    Mini languages distributed with Parrot
 
 configure:    Configuration subsystem 
