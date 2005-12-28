@@ -36,7 +36,7 @@ Bernhard Schmalhofer - <Bernhard.Schmalhofer@gmx.de>
 # Set up expected output for examples
 my %expected
     = (
-    'board.imc'        =>  << 'END_EXPECTED',
+    'board.pir'        =>  << 'END_EXPECTED',
   +---+---+---+---+---+---+---+---+
 8 |   | * |   | * |   | * |   | * |
   +---+---+---+---+---+---+---+---+
@@ -57,33 +57,33 @@ my %expected
     A   B   C   D   E   F   G   H  
 END_EXPECTED
 
-    'euclid.imc'        =>  << 'END_EXPECTED',
+    'euclid.pir'        =>  << 'END_EXPECTED',
 Algorithm E (Euclid's algorithm)
   Calculating gcd(96, 64) = ...
   ... = 32
 END_EXPECTED
 
-    'fact.imc'        =>  << 'END_EXPECTED',
+    'fact.pir'        =>  << 'END_EXPECTED',
 Algorithm F1 (The factorial function)
     Calculating fact(15) = ...
     ... = 2004189184
 END_EXPECTED
 
-    'fib.imc'        =>  << 'END_EXPECTED',
+    'fib.pir'        =>  << 'END_EXPECTED',
 Algorithm F2 (Fibonacci's function)
   Calculating fib(24) = ...
   ... = 46368
 END_EXPECTED
 
-    'hello.imc'        =>  << 'END_EXPECTED',
+    'hello.pir'        =>  << 'END_EXPECTED',
 Hello, world!
 END_EXPECTED
 
-    'leibniz.imc'        =>  << 'END_EXPECTED',
+    'leibniz.pir'        =>  << 'END_EXPECTED',
 PI is (very) approximately: 3.14159
 END_EXPECTED
 
-    'mandelbrot.imc'        =>  << 'END_EXPECTED',
+    'mandelbrot.pir'        =>  << 'END_EXPECTED',
 ................::::::::::::::::::::::::::::::::::::::::::::...............
 ...........::::::::::::::::::::::::::::::::::::::::::::::::::::::..........
 ........::::::::::::::::::::::::::::::::::,,,,,,,:::::::::::::::::::.......
@@ -116,13 +116,13 @@ END_EXPECTED
 ...........::::::::::::::::::::::::::::::::::::::::::::::::::::::..........
 END_EXPECTED
 
-    'primes.imc'        =>  << 'END_EXPECTED',
+    'primes.pir'        =>  << 'END_EXPECTED',
 Algorithm P (Naiive primality test)
   Printing primes up to 100...
 2  3  5  7  11  13  17  19  23  29  31  37  41  43  47  53  59  61  67  71  73  79  83  89  97  
 END_EXPECTED
 
-    'queens.imc'        =>  << 'END_EXPECTED',
+    'queens.pir'        =>  << 'END_EXPECTED',
 Making new board with 8 ranks and 8 files...
 Board length is 64.
   +---+---+---+---+---+---+---+---+
@@ -145,7 +145,7 @@ Board length is 64.
     A   B   C   D   E   F   G   H  
 END_EXPECTED
 
-    'sub.imc'        =>  << 'END_EXPECTED',
+    'sub.pir'        =>  << 'END_EXPECTED',
 x = 42; y = 137
 x = 1234; y = 137
 END_EXPECTED
@@ -160,9 +160,9 @@ TODO:
 {
     local $TODO = 'some examples not testable yet';
 
-    fail( 'bench.imc' );
-    fail( 'life.imc' );
-    fail( 'mandelzoom.imc' );
-    fail( 'mops.imc' );
-    fail( 'nci.imc' );
+    fail( 'bench.pir' );
+    fail( 'life.pir' );
+    fail( 'mandelzoom.pir' );
+    fail( 'mops.pir' );
+    fail( 'nci.pir' );
 };
