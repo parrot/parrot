@@ -131,9 +131,10 @@ $ENV{TEST_PROG_ARGS} = $args;
 # Pass in a list of tests to run on the command line, else run all the tests.
 my @default_tests = (
     (map {glob "t/$_/*.t"} qw(configure compilers/imcc/* op pmc native_pbc)),
-    (map {glob "t/dynclass/$_.t"}    qw(foo dyn* g* )),
-    (map {glob "t/compilers/$_/*.t"} qw(pge pge/p5regexp pge/p6rules tge )),
+    (map {glob "t/dynclass/$_.t"}    qw(foo dyn* g*)),
+    (map {glob "t/compilers/$_/*.t"} qw(pge pge/p5regexp pge/p6rules tge)),
     (map {glob "t/$_/*.t"}           qw(library examples run src tools perl)),
+    (map {glob "t/$_/*.t"}           qw(doc)),
 );
 my @tests = @ARGV ? map { glob( $_ ) } @ARGV : @default_tests;
 
@@ -170,17 +171,17 @@ unless ($html) {
         $self->_init;
         $self->{meat}{start_time} = time;
 
-	    my %stats;
+        my %stats;
 
         foreach my $file (@_) {
             my $data;
-    	    print STDERR "- $file\n";
-    	    $data = $self->run_test($file);
-    	    $stats{tests} += $data->{results}{max};
-    	    $stats{ok}    += $data->{results}{ok};
+            print STDERR "- $file\n";
+            $data = $self->run_test($file);
+            $stats{tests} += $data->{results}{max};
+            $stats{ok}    += $data->{results}{ok};
         }
 
-	    printf STDERR "%s OK from %s tests (%.2f%% ok)\n\n",
+        printf STDERR "%s OK from %s tests (%.2f%% ok)\n\n",
             $stats{ok},
             $stats{tests},
             $stats{ok} / $stats{tests} * 100,
