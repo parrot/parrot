@@ -6,9 +6,9 @@ bench_op - Benchmark one or more opcodes
 
 =head1 SYNOPSIS
 
-  parrot bench_op.imc 'add $I0, $I1, $I2'
-  parrot bench_op.imc --preops='newclass $P0, "Foo"' file_w_ops.imc
-  parrot bench_op.imc --help
+  parrot bench_op.pir 'add $I0, $I1, $I2'
+  parrot bench_op.pir --preops='newclass $P0, "Foo"' file_w_ops.pir
+  parrot bench_op.pir --help
 
 =head1 DESCRIPTION
 
