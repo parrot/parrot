@@ -46,6 +46,10 @@ is(integrate(1, 2), 2, "integrate(1, 1)");
 
 # file_checksum(), not exported
 
+SKIP: {
+    skip "File::Temp doesn't support ->new()", 12
+        unless File::Temp->can('new');
+
 {
     my $tmpfile = File::Temp->new(UNLINK => 1);
     print $tmpfile "foo" x 1000;
@@ -120,6 +124,8 @@ is(integrate(1, 2), 2, "integrate(1, 1)");
     is(check_progs([$prog]), $prog,
         "check_progs() returns the proper program when passed an array ref")
 }
+
+} # SKIP
 
 {
     my $cmd = 'someboguscommand';
