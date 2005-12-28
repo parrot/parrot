@@ -13,7 +13,7 @@ JAKOC=$(PERL) -I lib jakoc
 INTERP=../../${test_prog}
 ASM=$(INTERP) -a --output-pbc
 
-.SUFFIXES: .jako .imc .pbc
+.SUFFIXES: .jako .pir .pbc
 
 
 #
@@ -21,68 +21,68 @@ ASM=$(INTERP) -a --output-pbc
 #
 
 all: \
-	examples/bench.imc      \
-	examples/board.imc      \
-	examples/euclid.imc     \
-	examples/fact.imc       \
-	examples/fib.imc        \
-	examples/hello.imc      \
-	examples/leibniz.imc    \
-	examples/life.imc       \
-	examples/mandelbrot.imc \
-	examples/mandelzoom.imc \
-	examples/mops.imc       \
-	examples/nci.imc        \
-	examples/primes.imc     \
-	examples/queens.imc     \
-	examples/sub.imc
+	examples/bench.pir      \
+	examples/board.pir      \
+	examples/euclid.pir     \
+	examples/fact.pir       \
+	examples/fib.pir        \
+	examples/hello.pir      \
+	examples/leibniz.pir    \
+	examples/life.pir       \
+	examples/mandelbrot.pir \
+	examples/mandelzoom.pir \
+	examples/mops.pir       \
+	examples/nci.pir        \
+	examples/primes.pir     \
+	examples/queens.pir     \
+	examples/sub.pir
 
 
 #
 # Compilation:
 #
 
-.jako.imc:
+.jako.pir:
 	$(JAKOC) $< > $@ || (rm -f $@ && false)
 
-examples/bench.imc:      examples/bench.jako      jakoc
-examples/board.imc:      examples/board.jako      jakoc
-examples/euclid.imc:     examples/euclid.jako     jakoc
-examples/fact.imc:       examples/fact.jako       jakoc
-examples/fib.imc:        examples/fib.jako        jakoc
-examples/hello.imc:      examples/hello.jako      jakoc
-examples/leibniz.imc:    examples/leibniz.jako    jakoc
-examples/life.imc:       examples/life.jako       jakoc
-examples/mandelbrot.imc: examples/mandelbrot.jako jakoc
-examples/mandelzoom.imc: examples/mandelzoom.jako jakoc
-examples/mops.imc:       examples/mops.jako       jakoc
-examples/nci.imc:        examples/nci.jako        jakoc
-examples/primes.imc:     examples/primes.jako     jakoc
-examples/queens.imc:     examples/queens.jako     jakoc
-examples/sub.imc:        examples/sub.jako        jakoc
+examples/bench.pir:      examples/bench.jako      jakoc
+examples/board.pir:      examples/board.jako      jakoc
+examples/euclid.pir:     examples/euclid.jako     jakoc
+examples/fact.pir:       examples/fact.jako       jakoc
+examples/fib.pir:        examples/fib.jako        jakoc
+examples/hello.pir:      examples/hello.jako      jakoc
+examples/leibniz.pir:    examples/leibniz.jako    jakoc
+examples/life.pir:       examples/life.jako       jakoc
+examples/mandelbrot.pir: examples/mandelbrot.jako jakoc
+examples/mandelzoom.pir: examples/mandelzoom.jako jakoc
+examples/mops.pir:       examples/mops.jako       jakoc
+examples/nci.pir:        examples/nci.jako        jakoc
+examples/primes.pir:     examples/primes.jako     jakoc
+examples/queens.pir:     examples/queens.jako     jakoc
+examples/sub.pir:        examples/sub.jako        jakoc
 
 #
 # Assembly:
 #
 
-.imc.pbc:
+.pir.pbc:
 	$(ASM) -o $@ $<
 
-examples/bench.pbc:      examples/bench.imc
-examples/board.pbc:      examples/board.imc
-examples/euclid.pbc:     examples/euclid.imc
-examples/fact.pbc:       examples/fact.imc
-examples/fib.pbc:        examples/fib.imc
-examples/hello.pbc:      examples/hello.imc
-examples/leibniz.pbc:    examples/leibniz.imc
-examples/life.pbc:       examples/life.imc
-examples/mandelbrot.pbc: examples/mandelbrot.imc
-examples/mandelzoom.pbc: examples/mandelzoom.imc
-examples/mops.pbc:       examples/mops.imc
-examples/nci.pbc:        examples/nci.imc
-examples/primes.pbc:     examples/primes.imc
-examples/queens.pbc:     examples/queens.imc
-examples/sub.pbc:        examples/sub.imc
+examples/bench.pbc:      examples/bench.pir
+examples/board.pbc:      examples/board.pir
+examples/euclid.pbc:     examples/euclid.pir
+examples/fact.pbc:       examples/fact.pir
+examples/fib.pbc:        examples/fib.pir
+examples/hello.pbc:      examples/hello.pir
+examples/leibniz.pbc:    examples/leibniz.pir
+examples/life.pbc:       examples/life.pir
+examples/mandelbrot.pbc: examples/mandelbrot.pir
+examples/mandelzoom.pbc: examples/mandelzoom.pir
+examples/mops.pbc:       examples/mops.pir
+examples/nci.pbc:        examples/nci.pir
+examples/primes.pbc:     examples/primes.pir
+examples/queens.pbc:     examples/queens.pir
+examples/sub.pbc:        examples/sub.pir
 
 
 #
@@ -90,7 +90,7 @@ examples/sub.pbc:        examples/sub.imc
 #
 
 clean:
-	$(RM_F) "examples/*.imc" "examples/*.list" "examples/*.pbc"
+	$(RM_F) "examples/*.pir" "examples/*.list" "examples/*.pbc"
 
 over:
 	@$(MAKE) clean
