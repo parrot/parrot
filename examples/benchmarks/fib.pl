@@ -30,6 +30,6 @@ print "fib($N) = ", fib($N), "\n";
 
 =head1 SEE ALSO
 
-F<examples/benchmarks/fib.imc>.
+F<examples/benchmarks/fib.pir>.
 
 =cut

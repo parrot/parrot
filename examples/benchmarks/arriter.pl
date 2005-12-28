@@ -53,7 +53,7 @@ print "\n";
 
 =head1 SEE ALSO
 
-F<examples/benchmarks/arriter.imc>,
-F<examples/benchmarks/arriter_o1.imc>.
+F<examples/benchmarks/arriter.pir>,
+F<examples/benchmarks/arriter_o1.pir>.
 
 =cut

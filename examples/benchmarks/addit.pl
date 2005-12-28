@@ -40,7 +40,7 @@ print "$result\n";
 
 =head1 SEE ALSO
 
-F<examples/benchmarks/addit.pasm>, F<examples/benchmarks/addit.imc>,
-F<examples/benchmarks/addit2.imc>.
+F<examples/benchmarks/addit.pasm>, F<examples/benchmarks/addit.pir>,
+F<examples/benchmarks/addit2.pir>.
 
 =cut
