@@ -85,3 +85,5 @@ sub runstep
     }
     $conf->data->set(has_gdbm => $has_gdbm); # for gdbmhash.t and dynclasses.in
 }
+
+1;

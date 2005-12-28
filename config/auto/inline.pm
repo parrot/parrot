@@ -62,3 +62,5 @@ sub runstep
 
     $conf->data->set(inline => $test);
 }
+
+1;

@@ -62,3 +62,5 @@ sub runstep
         $result = 'no';
     }
 }
+
+1;
