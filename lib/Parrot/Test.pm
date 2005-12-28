@@ -146,7 +146,7 @@ expected result.
 Compiles and runs the C code, passing the test if a string comparison of
 output with the unexpected result is false.
 
-=item C<example_output_is( $example_fn, $expected )
+=item C<example_output_is( $example_fn, $expected )>
 
 Determine the language from the extension of C<$example_fn> and
 runs language_output_is().
