@@ -1,5 +1,5 @@
-.include "RT_platform_win32.imc"
-.include "RT_platform_ANSIscreen.imc"
+.include "RT_platform_win32.pir"
+.include "RT_platform_ANSIscreen.pir"
 .sub _platform_setup		# void platform_setup(void)
 	sysinfo S0, 4
 	ne S0, "MSWin32", NOTWIN

@@ -43,7 +43,7 @@ tokenize();
 #push(@ARGV);
 parse(@ARGV);
 
-open(CODE, ">TARG_test.imc") || die;
+open(CODE, ">TARG_test.pir") || die;
 
 foreach my $seg ("_main", "_basicmain", keys %code) {
 	next unless exists $code{$seg};
@@ -203,13 +203,13 @@ print CODE<<RUNTIMESHUTDOWN;
 	#
 	# Pull in the runtime libraries
 	#
-.include "RT_initialize.imc"
-.include "RT_aggregates.imc"
-.include "RT_builtins.imc"
-.include "RT_debugger.imc"
-.include "RT_io.imc"
-.include "RT_platform.imc"
-.include "RT_support.imc"
+.include "RT_initialize.pir"
+.include "RT_aggregates.pir"
+.include "RT_builtins.pir"
+.include "RT_debugger.pir"
+.include "RT_io.pir"
+.include "RT_platform.pir"
+.include "RT_support.pir"
 RUNTIMESHUTDOWN
 
 close(CODE);
