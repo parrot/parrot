@@ -184,8 +184,9 @@ unless ($html) {
         printf STDERR "%s OK from %s tests (%.2f%% ok)\n\n",
             $stats{ok},
             $stats{tests},
-            $stats{ok} / $stats{tests} * 100,
-            $self->{meat}{end_time} = time;
+            $stats{ok} / $stats{tests} * 100;
+
+        $self->{meat}{end_time} = time;
       };
 
       my $start = time();
