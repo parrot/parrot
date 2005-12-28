@@ -8,7 +8,7 @@ VIM_SYN_DIR = $(VIM_DIR)/syntax
 
 PERL  = ${perl}
 CP    = ${cp}
-MKDIR = $(PERL) -e ${PQ}-d or mkdir $$_,0777 or die foreach @ARGV${PQ}
+MKDIR = ${mkdir}
 RM_F  = ${rm_f}
 
 default: all

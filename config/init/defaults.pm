@@ -137,6 +137,7 @@ sub runstep
         rm_rf         => '$(PERL) -MExtUtils::Command -e rm_rf',
         mkdir         => '$(PERL) -MExtUtils::Command -e mkpath',
         touch         => '$(PERL) -MExtUtils::Command -e touch',
+        chmod         => '$(PERL) -MExtUtils::Command-chmod -e chmod',
         ar            => $Config{ar},
         ar_flags      => 'cr',
         ar_out        => '',                                        # for Win32

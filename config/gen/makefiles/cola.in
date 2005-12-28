@@ -5,7 +5,7 @@ PARROT  = ..${slash}..${slash}parrot${exe}
 PERL    = ${perl}
 RM_F    = ${rm_f}
 RM_RF   = ${rm_rf}
-CHMOD   = $(PERL) -e ${PQ}chmod @ARGV${PQ}
+CHMOD   = ${chmod}
 
 CC 	    = ${cc}
 CFLAGS 	= ${ccflags}
