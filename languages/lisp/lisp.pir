@@ -7,7 +7,7 @@
 .const int SESCAPE_CHAR     = 5
 .const int MESCAPE_CHAR     = 6
 
-.include "include/macros.imc"
+.include "include/macros.pir"
 
 .sub _main @MAIN
   .param pmc argv
@@ -102,10 +102,10 @@ DEBUGGER:
    goto REP_LOOP
 .end
 
-.include "types.imc"
-.include "read.imc"
-.include "eval.imc"
-.include "system.imc"
-.include "validate.imc"
-.include "cl.imc"
-.include "internals.imc"
+.include "types.pir"
+.include "read.pir"
+.include "eval.pir"
+.include "system.pir"
+.include "validate.pir"
+.include "cl.pir"
+.include "internals.pir"
