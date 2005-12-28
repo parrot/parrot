@@ -1,7 +1,7 @@
 .sub __library_data_dumper_onload :load
     find_type $I0, "Data::Dumper"
     if $I0 > 1 goto END
-    load_bytecode "library/Data/Dumper/Default.imc"
+    load_bytecode "library/Data/Dumper/Default.pir"
     newclass $P0, "Data::Dumper"
 END:
     .return ()

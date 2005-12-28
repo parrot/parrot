@@ -16,8 +16,8 @@ Creates a stream and pipes it through a Stream::Lines stream.
     .local pmc stream
     .local pmc lines
 
-    load_bytecode "library/Stream/Sub.imc"
-    load_bytecode "library/Stream/Lines.imc"
+    load_bytecode "library/Stream/Sub.pir"
+    load_bytecode "library/Stream/Lines.pir"
     
     # create a text stream
     find_type $I0, "Stream::Sub"

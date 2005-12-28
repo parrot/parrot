@@ -10,7 +10,7 @@ version 0.1
 
 =head1 SYNOPSIS
 
-    load_bytecode "library/Stream/Replay.imc"
+    load_bytecode "library/Stream/Replay.pir"
 
     $I0 = find_type "Stream::Replay"
     $P0 = new $I0
@@ -41,7 +41,7 @@ By using C<clone>, you can read data from a stream as often as you want.
     find_type $I0, "Stream::Replay"
     if $I0 > 1 goto END
     
-    load_bytecode "library/Stream/Base.imc"
+    load_bytecode "library/Stream/Base.pir"
     
     # Stream::Replay
     getclass $P0, "Stream::Base"

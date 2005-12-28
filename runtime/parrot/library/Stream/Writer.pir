@@ -36,7 +36,7 @@ version 0.1
     find_type $I0, "Stream::Writer"
     if $I0 > 1 goto END
 
-    load_bytecode "library/Stream/Base.imc"
+    load_bytecode "library/Stream/Base.pir"
 
     getclass $P0, "Stream::Base"
     subclass $P1, $P0, "Stream::Writer"

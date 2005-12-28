@@ -366,8 +366,8 @@ done:
   .return (result)
 .end
 
-.include  'library/Data/Escape.imc'
-.include  'library/Data/Sort.imc'
+.include  'library/Data/Escape.pir'
+.include  'library/Data/Sort.pir'
 
 =item (pmc) = _json_to_pmc(string)
 

@@ -8,7 +8,7 @@ version 0.1
 
 =head1 SYNOPSIS
 
-please see F<examples/streams/Filter.imc>
+please see F<examples/streams/Filter.pir>
 
 =head1 DESCRIPTION
 
@@ -28,7 +28,7 @@ TBD
     find_type i, "Stream::Filter"
     if i > 1 goto END
 
-    load_bytecode "library/Stream/Base.imc"
+    load_bytecode "library/Stream/Base.pir"
 
     getclass base, "Stream::Base"
     subclass filter, base, "Stream::Filter"

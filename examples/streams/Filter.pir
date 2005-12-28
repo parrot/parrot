@@ -21,8 +21,8 @@ Creates a counter stream that generates numbers from 0 to 9.
     .local pmc stream
     .local pmc filter
 
-    load_bytecode "library/Stream/Sub.imc"
-    load_bytecode "library/Stream/Filter.imc"
+    load_bytecode "library/Stream/Sub.pir"
+    load_bytecode "library/Stream/Filter.pir"
     
     # create the counter stream
     find_type $I0, "Stream::Sub"

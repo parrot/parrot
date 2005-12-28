@@ -57,7 +57,7 @@ LOOP:
     if i < j goto LOOP
     end
 .end
-.include "library/Data/Sort.imc"
+.include "library/Data/Sort.pir"
 CODE
 0
 1
@@ -103,7 +103,7 @@ LOOP:
     if i < j goto LOOP
     end
 .end
-.include "library/Data/Sort.imc"
+.include "library/Data/Sort.pir"
 CODE
 0
 1
@@ -150,7 +150,7 @@ LOOP:
     if i < j goto LOOP
     end
 .end
-.include "library/Data/Sort.imc"
+.include "library/Data/Sort.pir"
 CODE
 0
 1
@@ -195,7 +195,7 @@ LOOP:
     if i < j goto LOOP
     end
 .end
-.include "library/Data/Sort.imc"
+.include "library/Data/Sort.pir"
 CODE
 alpha
 bravo
@@ -238,7 +238,7 @@ LOOP:
     if i < j goto LOOP
     end
 .end
-.include "library/Data/Sort.imc"
+.include "library/Data/Sort.pir"
 CODE
 alpha
 bravo
@@ -293,7 +293,7 @@ LOOP:
     if i < j goto LOOP
     end
 .end
-.include "library/Data/Sort.imc"
+.include "library/Data/Sort.pir"
 CODE
 0
 0
@@ -344,7 +344,7 @@ LOOP:
     if i < j goto LOOP
     end
 .end
-.include "library/Data/Sort.imc"
+.include "library/Data/Sort.pir"
 CODE
 h
 w
@@ -390,7 +390,7 @@ LOOP:
     if i < j goto LOOP
     end
 .end
-.include "library/Data/Sort.imc"
+.include "library/Data/Sort.pir"
 CODE
 h
 w
@@ -429,7 +429,7 @@ LOOP:
     if i < j goto LOOP
     end
 .end
-.include "library/Data/Sort.imc"
+.include "library/Data/Sort.pir"
 CODE
 aaaa1
 aaaa2

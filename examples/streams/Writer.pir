@@ -15,7 +15,7 @@ Creates a C<Stream::Writer> and writes to it.
 .sub _main :main
     .local pmc stream
 
-    load_bytecode "library/Stream/Writer.imc"
+    load_bytecode "library/Stream/Writer.pir"
 
     find_type $I0, "Stream::Writer"
     new stream, $I0

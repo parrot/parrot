@@ -14,8 +14,8 @@ This example shows the usage of C<Stream::read_bytes>.
 .sub _main :main
     .local pmc stream
 
-    load_bytecode "library/Stream/Sub.imc"
-    load_bytecode "library/Stream/Replay.imc"
+    load_bytecode "library/Stream/Sub.pir"
+    load_bytecode "library/Stream/Replay.pir"
 
     find_type $I0, "Stream::Sub"
     new $P0, $I0

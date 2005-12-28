@@ -30,7 +30,7 @@ TBD
     find_type $I0, "Stream::Base"
     if $I0 > 1 goto END
 
-    load_bytecode "library/Data/Escape.imc"
+    load_bytecode "library/Data/Escape.pir"
 
     newclass $P0, "Stream::Base"
     addattribute $P0, 'source'
@@ -240,7 +240,7 @@ INCLUDE_DEL:
 Include stream2 in this stream. The next read on this stream will
 act on the included stream.
 
-Please have a look at F<examples/streams/Include.imc> to see how it works.
+Please have a look at F<examples/streams/Include.pir> to see how it works.
 
 =cut
 

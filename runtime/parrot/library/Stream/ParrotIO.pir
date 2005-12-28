@@ -8,7 +8,7 @@ version 0.1
 
 =head1 SYNOPSIS
 
-please see F<examples/streams/ParrotIO.imc> and F<examples/streams/FileLines.imc>
+please see F<examples/streams/ParrotIO.pir> and F<examples/streams/FileLines.pir>
 
 =head1 DESCRIPTION
 
@@ -28,7 +28,7 @@ TDB
     find_type i, "Stream::ParrotIO"
     if i > 1 goto END
 
-    load_bytecode "library/Stream/Base.imc"
+    load_bytecode "library/Stream/Base.pir"
 
     getclass base, "Stream::Base"
     subclass io, base, "Stream::ParrotIO"

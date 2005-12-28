@@ -6,7 +6,7 @@ Data::Replace - data replacing implemented in PIR
 
     ...
 
-    load_bytecode "library/Data/Replace.imc"
+    load_bytecode "library/Data/Replace.pir"
 
     .local pmc replace
 

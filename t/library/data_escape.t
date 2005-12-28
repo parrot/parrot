@@ -20,7 +20,7 @@ t/library/data_escape.t - Data::Escape tests
 =cut
 
 
-my $lib= 'Data/Escape.imc';
+my $lib= 'Data/Escape.pir';
 my $ns= 'Data::Escape';
 my @subs= qw/ String /;
 

@@ -11,8 +11,8 @@ version 0.1
 =head1 SYNOPSIS
 
 Please have a look at the examples
-F<examples/streams/Combiner.imc> and
-F<examples/streams/FileLines.imc>.
+F<examples/streams/Combiner.pir> and
+F<examples/streams/FileLines.pir>.
 
 =head1 DESCRIPTION
 
@@ -32,7 +32,7 @@ TBD
     find_type i, "Stream::Combiner"
     if i > 1 goto END
 
-    load_bytecode "library/Stream/Base.imc"
+    load_bytecode "library/Stream/Base.pir"
 
     getclass base, "Stream::Base"
     subclass comb, base, "Stream::Combiner"

@@ -6,7 +6,7 @@ Data::Sort - simple sort algorithm implemented in PIR
 
     ...
 
-    load_bytecode "library/Data/Sort.imc"
+    load_bytecode "library/Data/Sort.pir"
 
     .local pmc sort
 

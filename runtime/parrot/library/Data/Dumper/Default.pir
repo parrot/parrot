@@ -19,9 +19,9 @@ This module provides the default output style of C<Data::Dumper>.
 .sub __library_data_dumper_default_onload :load
     find_type $I0, "Data::Dumper::Default"
     if $I0 > 1 goto END
-    load_bytecode "library/Data/Dumper/Base.imc"
-    load_bytecode "library/Data/Sort.imc"
-    load_bytecode "library/Data/Escape.imc"
+    load_bytecode "library/Data/Dumper/Base.pir"
+    load_bytecode "library/Data/Sort.pir"
+    load_bytecode "library/Data/Escape.pir"
     getclass $P0, "Data::Dumper::Base"
     subclass $P0, $P0, "Data::Dumper::Default"
 END:

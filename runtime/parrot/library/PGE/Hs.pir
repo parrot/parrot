@@ -56,7 +56,7 @@ whole thing may be taken out or refactored away at any moment.
 
 .sub "__onload" :load
     .local pmc load
-    load_bytecode "Data/Escape.imc"
+    load_bytecode "Data/Escape.pir"
 .end
 
 .sub "add_rule"

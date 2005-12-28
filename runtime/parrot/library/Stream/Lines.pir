@@ -8,7 +8,7 @@ version 0.1
 
 =head1 SYNOPSIS
 
-please see F<examples/streams/Lines.imc> and F<examples/streams/FileLines.imc>
+please see F<examples/streams/Lines.pir> and F<examples/streams/FileLines.pir>
 
 =head1 DESCRIPTION
 
@@ -20,7 +20,7 @@ TBD
 
 =cut
 
-.include "library/Data/Escape.imc"
+.include "library/Data/Escape.pir"
 
 .sub onload :load, :anon
     .local int i
@@ -30,7 +30,7 @@ TBD
     find_type i, "Stream::Lines"
     if i > 1 goto END
 
-    load_bytecode "library/Stream/Base.imc"
+    load_bytecode "library/Stream/Base.pir"
 
     getclass base, "Stream::Base"
     subclass lines, base, "Stream::Lines"

@@ -6,7 +6,7 @@ Data::Escape - simple string escaping implemented in PIR
 
     ...
 
-    load_bytecode "library/Data/Escape.imc"
+    load_bytecode "library/Data/Escape.pir"
 
     .local pmc escape
 

@@ -8,7 +8,7 @@
   addattribute $P0, "file"
   addattribute $P0, "image"
   addattribute $P0, "opts"
-  load_bytecode "library/Data/Escape.imc"
+  load_bytecode "library/Data/Escape.pir"
   .return($P0)
 .end
 

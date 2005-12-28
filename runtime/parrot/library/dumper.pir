@@ -1,6 +1,6 @@
 =head1 TITLE
 
-dumper.imc - PIR version of Data::Dumper
+dumper.pir - PIR version of Data::Dumper
 
 =head1 VERSION
 
@@ -17,7 +17,7 @@ version 0.10
 	...
 
 	END
-	.include "library/dumper.imc"
+	.include "library/dumper.pir"
 
 
 =head1 DESCRIPTION
@@ -29,7 +29,7 @@ version 0.10
 # first method prints usage information
 .sub __library_dumper_onload
     print "usage:"
-    print "\tload_bytecode \"library/Data/Dumper.imc\"\n"
+    print "\tload_bytecode \"library/Data/Dumper.pir\"\n"
     print "\t...\n"
     print "\tnew dumper, \"Data::Dumper\"\n"
     print "\tdumper.\"dumper\"( foo, \"foo\" )\n\n"
@@ -68,7 +68,7 @@ B<Note:> This function currently returns nothing. It should return
 the dumped data as a string, like Perl's Data::Dumper. Instead,
 everything is printed out using C<print>.
 
-B<Note: #2> Hash keys are now sorted using C<_sort()> (library/sort.imc)
+B<Note: #2> Hash keys are now sorted using C<_sort()> (library/sort.pir)
 
 =cut
 
@@ -144,10 +144,10 @@ Returns the global dumper instance used by the non object interface.
 
     find_type mytype, "Data::Dumper"
     if mytype != 0 goto TYPE_OK
-    load_bytecode "library/Data/Dumper.imc"
+    load_bytecode "library/Data/Dumper.pir"
     find_type mytype, "Data::Dumper"
     if mytype != 0 goto TYPE_OK
-    print "fatal error: failure while loading library/Data/Dumper.imc\n"
+    print "fatal error: failure while loading library/Data/Dumper.pir\n"
     end
 TYPE_OK:
 

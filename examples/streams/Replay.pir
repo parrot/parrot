@@ -1,8 +1,8 @@
 .sub _main :main
     .local pmc stream
     
-    load_bytecode "library/Stream/Writer.imc"
-    load_bytecode "library/Stream/Replay.imc"
+    load_bytecode "library/Stream/Writer.pir"
+    load_bytecode "library/Stream/Replay.pir"
     
     find_type $I0, "Stream::Writer"
     new stream, $I0

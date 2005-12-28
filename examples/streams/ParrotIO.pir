@@ -19,7 +19,7 @@ PMC to the stream with the C<assign> op.
 .sub _main :main
     .local pmc stream
 
-    load_bytecode "library/Stream/ParrotIO.imc"
+    load_bytecode "library/Stream/ParrotIO.pir"
 
     # create the ParrotIO stream    
     find_type $I0, "Stream::ParrotIO"

@@ -33,10 +33,10 @@ stream for it. Then it combines the stream with a stream providing line numbers.
     name = argv[1]
 NO_NAME:
 
-    load_bytecode "library/Stream/ParrotIO.imc"
-    load_bytecode "library/Stream/Lines.imc"
-    load_bytecode "library/Stream/Sub.imc"
-    load_bytecode "library/Stream/Combiner.imc"
+    load_bytecode "library/Stream/ParrotIO.pir"
+    load_bytecode "library/Stream/Lines.pir"
+    load_bytecode "library/Stream/Sub.pir"
+    load_bytecode "library/Stream/Combiner.pir"
 
     # create a file stream
     find_type $I0, "Stream::ParrotIO"

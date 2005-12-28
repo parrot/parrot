@@ -60,7 +60,7 @@ The stream will be disconnected automatically if the provided sub returns.
     find_type i, "Stream::Sub"
     if i > 1 goto END
 
-    load_bytecode "library/Stream/Base.imc"
+    load_bytecode "library/Stream/Base.pir"
 
     getclass base, "Stream::Base"
     subclass sub, base, "Stream::Sub"

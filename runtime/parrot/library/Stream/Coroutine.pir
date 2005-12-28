@@ -8,7 +8,7 @@ version 0.1
 
 =head1 SYNOPSIS
 
-please see F<examples/streams/Coroutine.imc>
+please see F<examples/streams/Coroutine.pir>
 
 =head1 DESCRIPTION
 
@@ -28,7 +28,7 @@ TBD
     find_type i, "Stream::Coroutine"
     if i > 1 goto END
     
-    load_bytecode "library/Stream/Base.imc"
+    load_bytecode "library/Stream/Base.pir"
 
     getclass base, "Stream::Base"
     subclass coro, base, "Stream::Coroutine"
