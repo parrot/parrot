@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 72;
+use Parrot::Test tests => 82;
 use Parrot::Config;
 use Test::More;
 
@@ -13,13 +13,13 @@ wrong # args: should be "string option arg ?arg ...?"
 OUT
 
 language_output_is("tcl",<<TCL,<<OUT,"first, initial");
- puts [string first a abcdef]
+ puts [string first a abcdefa]
 TCL
 0
 OUT
 
 language_output_is("tcl",<<TCL,<<OUT,"first, middle");
- puts [string first a federal]
+ puts [string first a federala]
 TCL
 5
 OUT
@@ -37,7 +37,7 @@ TCL
 OUT
 
 language_output_is("tcl",<<TCL,<<OUT,"first, index, end");
- puts [string first c abcd end-3]
+ puts [string first c abcdc end-4]
 TCL
 2
 OUT
@@ -49,7 +49,7 @@ TCL
 OUT
 
 language_output_is("tcl",<<TCL,<<OUT,"first, index");
- puts [string first c abcd 1]
+ puts [string first c abcdc 1]
 TCL
 2
 OUT
@@ -71,6 +71,71 @@ language_output_is("tcl",<<TCL,<<OUT,"first, too many args");
 TCL
 wrong # args: should be "string first subString string ?startIndex?"
 OUT
+
+TODO: {
+  local $TODO = "implement string last";
+
+language_output_is("tcl",<<TCL,<<OUT,"last, initial");
+ puts [string last a abcdefa]
+TCL
+6
+OUT
+
+language_output_is("tcl",<<TCL,<<OUT,"last, middle");
+ puts [string last a federala]
+TCL
+7
+OUT
+
+language_output_is("tcl",<<TCL,<<OUT,"last, failure");
+ puts [string last c green]
+TCL
+-1
+OUT
+
+language_output_is("tcl",<<TCL,<<OUT,"last, index, failure");
+ puts [string last c green 0]
+TCL
+-1
+OUT
+
+language_output_is("tcl",<<TCL,<<OUT,"last, index, end");
+ puts [string last c abcdc end-4]
+TCL
+4
+OUT
+
+language_output_is("tcl",<<TCL,<<OUT,"last, index, overshot");
+ puts [string last c abcd 20]
+TCL
+-1
+OUT
+
+language_output_is("tcl",<<TCL,<<OUT,"last, index");
+ puts [string last c abcdc 1]
+TCL
+4
+OUT
+
+language_output_is("tcl",<<TCL,<<OUT,"last, index, invalid index");
+ puts [string last c abcd joe]
+TCL
+bad index "joe": must be integer or end?-integer?
+OUT
+
+language_output_is("tcl",<<TCL,<<OUT,"last, not enough args");
+ string last
+TCL
+wrong # args: should be "string last subString string ?startIndex?"
+OUT
+
+language_output_is("tcl",<<TCL,<<OUT,"last, too many args");
+ string last a b c d
+TCL
+wrong # args: should be "string last subString string ?startIndex?"
+OUT
+
+}
 
 language_output_is("tcl",<<TCL,<<OUT,"index, too many args");
  string index a b c
