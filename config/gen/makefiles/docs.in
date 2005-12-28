@@ -9,6 +9,7 @@ PERL = ${perl}
 RM_F = ${rm_f}
 # Make directory; do not die if dir exists.
 MKDIR = $(PERL) -e ${PQ}-d or mkdir $$_,0777 or die foreach @ARGV${PQ}
+CHMOD = $(PERL) -e ${PQ}$$mode = shift @ARGV; chmod(oct $$mode, @ARGV) or die${PQ}
 
 # long list of .pod files
 POD = ${pod}

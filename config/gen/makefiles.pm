@@ -237,9 +237,11 @@ sub makefiles
             $pod =~ s/\.ops$/.pod/;
             print MAKEFILE "ops$slash$pod: ..${slash}src${slash}ops${slash}$ops\n";
             if ($new_perldoc == 1) {
-                print MAKEFILE "\tperldoc -ud ops${slash}$pod ..${slash}src${slash}ops${slash}$ops\n\n";
+                print MAKEFILE "\tperldoc -ud ops${slash}$pod ..${slash}src${slash}ops${slash}$ops\n";
+                print MAKEFILE "\t\$(CHMOD) 0666, ops${slash}$pod\n\n";
             } else {
-                print MAKEFILE "\tperldoc -u ..${slash}ops${slash}$ops > ops${slash}$pod\n\n";
+                print MAKEFILE "\tperldoc -u ..${slash}ops${slash}$ops > ops${slash}$pod\n";
+                print MAKEFILE "\t\$(CHMOD) 0666, ..${slash}ops${slash}$pod\n\n";
             }
         }
 
