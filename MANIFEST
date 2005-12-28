@@ -465,7 +465,7 @@ examples/japh/japh9.pasm                          [main]doc
 examples/library/acorn.l                          [main]doc
 examples/library/getopt_demo.pir                  [main]doc
 examples/library/md5sum.pir                       [main]doc
-examples/library/ncurses_life.imc                 [main]doc
+examples/library/ncurses_life.pir                 [main]doc
 examples/library/pcre.pir                         [main]doc
 examples/mops/README                              [main]doc
 examples/mops/mops.c                              [main]doc
@@ -480,8 +480,8 @@ examples/mops/mops.scheme                         [main]doc
 examples/nci/PQt.C                                [main]doc
 examples/nci/QtHelloWorld.pasm                    [main]doc
 examples/nci/ls.pir                               [main]doc
-examples/nci/sdl_blue_rectangle.imc               [main]doc
-examples/nci/win32api.imc                         [main]doc
+examples/nci/sdl_blue_rectangle.pir               [main]doc
+examples/nci/win32api.pir                         [main]doc
 examples/pasm/99beer.pasm                         [main]doc
 examples/pasm/cat.pasm                            [main]doc
 examples/pasm/fact.pasm                           [main]doc

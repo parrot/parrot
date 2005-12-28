@@ -3,11 +3,11 @@
 
 =head1 NAME
 
-examples/library/ncurses_life.imc - Conway's Game of Life (ncurses version)
+examples/library/ncurses_life.pir - Conway's Game of Life (ncurses version)
 
 =head1 SYNOPSIS
 
-    % ./parrot examples/pasm/ncurses_life.imc examples/library/acorn.l
+    % ./parrot examples/library/ncurses_life.pir examples/library/acorn.l
 
 =head1 DESCRIPTION
 

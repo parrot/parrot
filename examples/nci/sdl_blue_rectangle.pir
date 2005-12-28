@@ -6,7 +6,7 @@
 	end
 .end
 
-.include "library/sdl_types.imc"
+.include "library/sdl_types.pir"
 .include "datatypes.pasm"
 
 .pcc_sub _init

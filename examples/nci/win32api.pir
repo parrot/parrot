@@ -3,11 +3,11 @@
 
 =head1 NAME
 
-examples/nci/win32api.imc - Win32 Example
+examples/nci/win32api.pir - Win32 Example
 
 =head1 SYNOPSIS
 
-    % ./parrot examples/nci/win32api.imc
+    % ./parrot examples/nci/win32api.pir
 
 =head1 DESCRIPTION
 
