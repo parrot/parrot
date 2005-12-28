@@ -167,7 +167,7 @@ Returns the match.
 .end
 
 
-.include "library/config.imc"
+.include "library/config.pir"
 
 
 =head1 BUGS

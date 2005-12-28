@@ -52,7 +52,7 @@ CODE
 
 pir_output_is(<<'CODE', <<'OUT', "load src/pbc from library path");
 .sub main :main
-    load_bytecode "config.imc"
+    load_bytecode "config.pir"
     print "ok 1\n"
     load_bytecode "config.pbc"
     print "ok 2\n"

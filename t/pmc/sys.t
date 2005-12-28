@@ -23,14 +23,14 @@ Tests system dependend stuff
 =cut
 
 END {
-  unlink "temp.imc";
+  unlink "temp.pir";
 };
 
 pir_output_is(<<'CODE', <<OUT, "spawnw, _config");
 
 .sub _test :main
      .local pmc O
-     open O, "temp.imc", ">"
+     open O, "temp.pir", ">"
      print O, ".sub _main :main\n"
      print O, "\tprint \"Hello, World!\\n\"\n"
      print O, ".end\n"
@@ -45,13 +45,13 @@ pir_output_is(<<'CODE', <<OUT, "spawnw, _config");
     cmd = '.'
     cmd .= slash
     cmd .= parrot
-    cmd .= " temp.imc"
+    cmd .= " temp.pir"
     spawnw $I0, cmd
     print $I0
     print "\n"
 .end
 
-.include "library/config.imc"
+.include "library/config.pir"
 CODE
 Hello, World!
 0

@@ -80,7 +80,7 @@ Tests can also be written in B<PIR>. This is done with C<pir_output_is> and
 friends.
 
     pir_output_is(<<'CODE',<<'OUT','nothing useful');
-        .include 'library/config.imc'
+        .include 'library/config.pir'
 
         .sub main :main
             print "hi\n"

@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-YAML/Parser/Syck.imc - Interface to libsyck
+YAML/Parser/Syck.pir - Interface to libsyck
 
 =head1 SYNOPSIS
 

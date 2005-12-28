@@ -12,7 +12,7 @@ use Parrot::Config;
 
 =head1 NAME
 
-t/library/parrotlib.t - testing library/parrotlib.imc
+t/library/parrotlib.t - testing library/parrotlib.pir
 
 =head1 SYNOPSIS
 
@@ -20,7 +20,7 @@ t/library/parrotlib.t - testing library/parrotlib.imc
 
 =head1 DESCRIPTION
 
-This test program test whether the library 'parrotlib.imc' returns the
+This test program test whether the library 'parrotlib.pir' returns the
 expected absolute filenames.
 
 =cut
@@ -114,7 +114,7 @@ Bernhard Schmalhofer <Bernhard.Schmalhofer@gmx.de>
 
 =head1 SEE ALSO
 
-F<runtime/parrot/library/parrotlib.imc>
+F<runtime/parrot/library/parrotlib.pir>
 
 =cut
 

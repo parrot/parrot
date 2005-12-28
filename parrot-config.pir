@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-config.imc - Print a Parrot configuration item
+config.pir - Print a Parrot configuration item
 
 =head1 VERSION
 
@@ -11,9 +11,9 @@ version 0.01
 
 =head1 SYNOPSIS
 
-  ./parrot parrot-config.imc VERSION
-  ./parrot parrot-config.imc ccflags
-  ./parrot parrot-config.imc --dump
+  ./parrot parrot-config.pir VERSION
+  ./parrot parrot-config.pir ccflags
+  ./parrot parrot-config.pir --dump
 
 =head1 DESCRIPTION
 

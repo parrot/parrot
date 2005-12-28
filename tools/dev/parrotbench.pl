@@ -61,7 +61,7 @@ Here is an example parrotbench.conf:
     [benchmark parrotj]
     exe       = ../../parrot -j
     type      = .pasm
-    type      = .imc
+    type      = .pir
 
     [benchmark perl_585_th]
     exe       = /usr/bin/perl585-th
@@ -82,7 +82,7 @@ it is likely that it will break somewhere.
 
 If a benchmark has multiple extensions associated with the same
 executable, the last one will be used.  For instance, with the
-configuration file above, foo.imc would be selected over foo.pasm
+configuration file above, foo.pir would be selected over foo.pasm
 
 =head1 AUTHOR
 

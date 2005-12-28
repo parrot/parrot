@@ -681,8 +681,8 @@ flags_dummy :
 	@echo Compiling with:
 	@$(PERL) tools/dev/cc_flags.pl $(CUR_DIR)/CFLAGS echo $(CC) $(CFLAGS) -I$(@D) ${cc_o_out} xx$(O) -c xx.c
 
-runtime/parrot/include/parrotlib.pbc: runtime/parrot/library/parrotlib.imc $(PARROT)
-	$(PARROT) -o $@ runtime/parrot/library/parrotlib.imc
+runtime/parrot/include/parrotlib.pbc: runtime/parrot/library/parrotlib.pir $(PARROT)
+	$(PARROT) -o $@ runtime/parrot/library/parrotlib.pir
 
 runtime/parrot/include/config.fpmc : myconfig config_lib.pasm $(MINIPARROT)
 	@echo Invoking Parrot to generate runtime/parrot/include/config.fpmc --cross your fingers

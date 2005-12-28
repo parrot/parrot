@@ -172,4 +172,4 @@ found_module:
 .end
 
 
-.include 'library/config.imc'
+.include 'library/config.pir'

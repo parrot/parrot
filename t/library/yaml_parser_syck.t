@@ -11,7 +11,7 @@ use Parrot::Test;
 
 =head1 NAME
 
-t/library/yaml_parser_syck.t - testing library/YAML/Parser/Syck.imc
+t/library/yaml_parser_syck.t - testing library/YAML/Parser/Syck.pir
 
 =head1 SYNOPSIS
 
@@ -30,7 +30,7 @@ TODO: {
 
   pir_output_is( << 'CODE', << 'OUT', "basic parsing" );
 
-.include "library/YAML/Parser/Syck.imc"
+.include "library/YAML/Parser/Syck.pir"
 .include "library/dumper.pir"
 .sub test @MAIN 
 
@@ -167,7 +167,7 @@ Bernhard Schmalhofer - <Bernhard.Schmalhofer@gmx.de>
 
 =head1 SEE ALSO
 
-F<runtime/parrot/library/YAML/Parser/Syck.imc>
+F<runtime/parrot/library/YAML/Parser/Syck.pir>
 
 =cut
 

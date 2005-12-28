@@ -97,7 +97,7 @@ parrot bytecode to be architecture dependent.
 
 The I</usr/share> hierarchy is for all read-only architecture
 independent data files. Parrot stores those files in
-I</usr/share/parrot/$(VERSION)>. For example all .imc, .pasm and  .imc
+I</usr/share/parrot/$(VERSION)>. For example all .pasm and .pir
 files should go there as well as data files for libraries like images
 and such.
 
@@ -154,10 +154,10 @@ Move this to I</usr/share/doc/> or just remove it if it's legal.
 
 This is also documentation for I</usr/share/doc>.
 
-=item /usr/parrot-config.imc
+=item /usr/parrot-config.pir
 
 This is a command which can be called from the user. It should be in
-I</usr/bin>, maybe without the .imc suffix.
+I</usr/bin>, maybe without the .pir suffix.
 
 =back
 
