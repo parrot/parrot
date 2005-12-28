@@ -84,7 +84,7 @@ SKIP: {
         "move_if_diff() true return status");
     ok(! -e "$fromfile", "move_if_diff() moved differing file");
     ok(-e "$tofile", "move_if_diff() moved differing file");
-    diag("Ignore the unlink error");
+    diag("ignore the unlink warning");
 }
 
 # genfile()
