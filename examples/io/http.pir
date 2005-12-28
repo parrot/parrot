@@ -3,11 +3,11 @@
 
 =head1 NAME
 
-examples/io/http.imc - HTTP client
+examples/io/http.pir - HTTP client
 
 =head1 SYNOPSIS
 
-    % ./parrot examples/io/http.imc
+    % ./parrot examples/io/http.pir
 
 =head1 DESCRIPTION
 

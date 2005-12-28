@@ -3,11 +3,11 @@
 
 =head1 NAME
 
-examples/io/httpd.imc - HTTP server
+examples/io/httpd.pir - HTTP server
 
 =head1 SYNOPSIS
 
-    % ./parrot examples/io/httpd.imc
+    % ./parrot examples/io/httpd.pir
 
 =head1 DESCRIPTION
 

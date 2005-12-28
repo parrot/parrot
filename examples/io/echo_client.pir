@@ -3,11 +3,11 @@
 
 =head1 NAME
 
-examples/io/echo_client.imc - Echo client
+examples/io/echo_client.pir - Echo client
 
 =head1 SYNOPSIS
 
-    % ./parrot examples/io/echo_client.imc
+    % ./parrot examples/io/echo_client.pir
 
 =head1 DESCRIPTION
 
