@@ -1,5 +1,35 @@
 # Copyright: 2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
-The directory contains part of the Parrot test suite. 
+This directory contains the Parrot test suite. 
 For details see the documentation in 'docs/tests.pod'.
+
+compilers:    Mini languages distributed with Parrot
+
+configure:    Configuration subsystem 
+
+distro:       Contains currently only a check for sanity of MANIFEST.SKIP
+
+doc:          Completeness and sanity of the documentations
+
+dynclass:     Dynamic PMCs
+
+examples:     Check whether the examples are still working
+
+library:      Parrot modules
+
+native_pbc:   Parrot Byte Code
+
+op:           Try to cover all ops
+
+perl:         Tests written in Perl5. XXX Is this a meaningful category?
+
+pmc:          Try to cover all builtin PMCs
+
+run:          Mostly command line options of the 'parrot' executable
+
+src:          Tests written in C. XXX Is this a meaningful category?
+
+stress:       Stress testing
+
+tools:        Executables besides 'parrot'

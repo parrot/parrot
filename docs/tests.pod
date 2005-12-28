@@ -7,9 +7,10 @@ docs/tests.pod - Testing Parrot
 
 =head1 A basic guide to writing and running tests for Parrot
 
-This is quick and dirty pointer to how tests for Parrot should be written.  The
-testing system is liable to change in the future, but tests written following
-the guidelines below should be easy to port into a new test suite.
+This is quick and dirty pointer to how the Parrot test suite is executed and
+to how new tests for Parrot should be written.
+The testing system is liable to change in the future, but tests written
+following the guidelines below should be easy to port into a new test suite.
 
 =head1 How to test parrot
 
@@ -38,11 +39,18 @@ C<make smokej>.
 C<make languages-smoke> does smoke testing for most language implementations
 in the languages directory.
 
-=head1 How to write a test
+=head1 Location of the test files
 
-New tests should be added to F<*.t> files. These test files can be found in the
-directories F<t>, F<imcc/t> and F<languages/*/t>.  If a new feature is tested,
+The parrot test files, the F<*.t> files, can be found in the F<t> directory.
+A quick overview over the subdirs in F<t> can be found in F<t/README>. 
+
+The language implementations usually have their test files in F<languages/*/t>.
+
+New tests should be added to an existing F<*.t> file.
+If a previously untested feature is tested,
 it might also make sense to create a new F<*.t> file.
+
+=head1 How to write a test
 
 The testing framework needs to know how many tests it should expect.  So the
 number of planned tests needs to be incremented when adding a new test.  This
@@ -159,7 +167,14 @@ Are a chunk of assembler and a chunk of expected output.
 
 In test driven development, tests are implemented first.  So the tests are
 initially expected to fail.  This can be expressed by marking the tests as
-TODO.  See L<Test::More> on how to do that.
+TODO. See L<Test::More> on how to do that.
+
+=head1 SKIP tests
+
+TODO test actually executed, so that unexpected success can be detected.
+In the case of missing requirements and in the case of serious breakdowns
+the execution of tests can be skipped.
+See L<Test::More> on how to do that.
 
 =head1 SEE ALSO
 
