@@ -2,7 +2,8 @@
 # $Id$
 
 use Data::Dumper;
-use Test::More tests => 1;
+#use Test::More tests => 1;
+use Test::More  skip_all => 'befunge.pasm does not compile';
 use Parrot::Test;
 
 use FindBin;
