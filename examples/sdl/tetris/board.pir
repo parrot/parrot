@@ -1,6 +1,6 @@
 =head1 TITLE
 
-board.imc - a tetris board class.
+board.pir - a tetris board class.
 
 =head1 SYNOPSIS
 
@@ -16,15 +16,15 @@ board.imc - a tetris board class.
 
 =cut
 
-.include "library/dumper.imc"
+.include "library/dumper.pir"
 
 .namespace ["Tetris::Board"]
 
 .sub __onload :load
     find_type $I0, "Tetris::Board"
     if $I0 > 1 goto END
-    load_bytecode "examples/sdl/tetris/boarddata.imc"
-    load_bytecode "examples/sdl/tetris/blocks.imc"
+    load_bytecode "examples/sdl/tetris/boarddata.pir"
+    load_bytecode "examples/sdl/tetris/blocks.pir"
     getclass $P0, "Tetris::BoardData"
     subclass $P0, $P0, "Tetris::Board"
 

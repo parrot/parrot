@@ -1,10 +1,10 @@
 =head1 NAME
 
-clock.imc - LCD clock
+clock.pir - LCD clock
 
 =head1 SYNOPSIS
 
-    ./parrot examples/sdl/lcd/clock.imc
+    ./parrot examples/sdl/lcd/clock.pir
 
 =head1 DESCRIPTION
 
@@ -26,10 +26,10 @@ The main function.
 =cut
 
 .sub _main :main
-    load_bytecode "library/SDL/App.imc"
-    load_bytecode "library/SDL/Event.imc"
-    load_bytecode "library/SDL/EventHandler.imc"
-    load_bytecode "library/SDL/LCD.imc"
+    load_bytecode "library/SDL/App.pir"
+    load_bytecode "library/SDL/Event.pir"
+    load_bytecode "library/SDL/EventHandler.pir"
+    load_bytecode "library/SDL/LCD.pir"
     
     # set some screen properties
     $P0 = new PerlHash

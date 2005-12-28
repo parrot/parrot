@@ -1,12 +1,12 @@
 =head1 TITLE
 
-raw_pixels.imc - paint the screen blue, pixel by pixel
+raw_pixels.pir - paint the screen blue, pixel by pixel
 
 =head1 SYNOPSIS
 
 To run this file, run the following command from the Parrot directory:
 
-	$ ./parrot examples/sdl/raw_pixels.imc
+	$ ./parrot examples/sdl/raw_pixels.pir
 	$
 
 =cut
@@ -15,9 +15,9 @@ To run this file, run the following command from the Parrot directory:
 
 .sub _main :main
 	# first load the necessary libraries
-	load_bytecode "library/SDL/App.imc"
-	load_bytecode "library/SDL/Rect.imc"
-	load_bytecode "library/SDL/Color.imc"
+	load_bytecode "library/SDL/App.pir"
+	load_bytecode "library/SDL/Rect.pir"
+	load_bytecode "library/SDL/Color.pir"
 
 	# arguments for the SDL::App constructor
 	.local pmc args

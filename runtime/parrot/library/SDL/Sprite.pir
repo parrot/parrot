@@ -5,7 +5,7 @@ SDL::Sprite - Parrot class representing sprites in Parrot SDL
 =head1 SYNOPSIS
 
 	# load this library
-	load_bytecode 'library/SDL/Sprite.imc'
+	load_bytecode 'library/SDL/Sprite.pir'
 
 	# ... load a new SDL::Image into image
 

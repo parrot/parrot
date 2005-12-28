@@ -1,6 +1,6 @@
 =head1 TITLE
 
-blockdata.imc - a tetris block data class
+blockdata.pir - a tetris block data class
 
 =head1 SYNOPSIS
 

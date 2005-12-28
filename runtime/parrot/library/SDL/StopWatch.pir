@@ -37,7 +37,7 @@ An SDL::StopWatch object has the following methods:
     $I0 = find_type 'SDL::StopWatch'
     if $I0 > 1 goto END
 
-    load_bytecode "library/SDL/LCD.imc"
+    load_bytecode "library/SDL/LCD.pir"
     $P0 = getclass 'SDL::LCD'
     $P0 = subclass $P0, 'SDL::StopWatch'
     addattribute $P0, "time"

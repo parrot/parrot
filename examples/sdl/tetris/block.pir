@@ -1,6 +1,6 @@
 =head1 TITLE
 
-block.imc - a tetris block class
+block.pir - a tetris block class
 
 =head1 SYNOPSIS
 
@@ -30,7 +30,7 @@ is not subclassed further.
 .sub __onload :load
     find_type $I0, "Tetris::Block"
     if $I0 > 1 goto END
-    load_bytecode "examples/sdl/tetris/blockdata.imc"
+    load_bytecode "examples/sdl/tetris/blockdata.pir"
     getclass $P0, "Tetris::BlockData"
     subclass $P0, $P0, "Tetris::Block"
 

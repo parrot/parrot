@@ -1,6 +1,6 @@
 =head1 TITLE
 
-eventhandler.imc - a tetris event handler class
+eventhandler.pir - a tetris event handler class
 
 =cut
 
@@ -9,7 +9,7 @@ eventhandler.imc - a tetris event handler class
 .sub __onload :load
     find_type $I0, "Tetris::EventHandler"
     if $I0 > 1 goto END
-    load_bytecode "library/SDL/EventHandler.imc"
+    load_bytecode "library/SDL/EventHandler.pir"
     
     getclass $P0, "SDL::EventHandler"
     subclass $P0, $P0, "Tetris::EventHandler"

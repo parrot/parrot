@@ -5,7 +5,7 @@ SDL::Rect - Parrot class representing rectangles in Parrot SDL
 =head1 SYNOPSIS
 
 	# load this library
-	load_bytecode 'library/SDL/Rect.imc'
+	load_bytecode 'library/SDL/Rect.pir'
 
 	# create a new SDL::Rect object
 	.local pmc rect

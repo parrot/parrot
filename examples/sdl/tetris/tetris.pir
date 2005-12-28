@@ -1,12 +1,12 @@
 =head1 TITLE
 
-tetris.imc - a second tetris for parrot (with parrot's SDL bindings)
+tetris.pir - a second tetris for parrot (with parrot's SDL bindings)
 
 =head1 SYNOPSIS
 
 To run this file, be in the Parrot directory and run the following command:
 
-	$ parrot examples/sdl/tetris/tetris.imc
+	$ parrot examples/sdl/tetris/tetris.pir
 	$
 
 =head1 FUNCTIONS
@@ -31,7 +31,7 @@ Array with commandline parameters.
     .param pmc argv
     .local pmc app
 
-    load_bytecode "examples/sdl/tetris/app.imc"
+    load_bytecode "examples/sdl/tetris/app.pir"
     
     # create the tetris app
     find_type $I0, "Tetris::App"

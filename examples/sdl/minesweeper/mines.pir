@@ -1,12 +1,12 @@
 =head1 TITLE
 
-mines.imc - a minesweeper clone for parrot (with parrot's SDL bindings)
+mines.pir - a minesweeper clone for parrot (with parrot's SDL bindings)
 
 =head1 SYNOPSIS
 
 To run this game, be in the Parrot directory and run the following command:
 
-        $ parrot examples/sdl/minesweeper/mines.imc
+        $ parrot examples/sdl/minesweeper/mines.pir
         $
 
 =head1 FUNCTIONS
@@ -29,14 +29,14 @@ The main function.
     debug = args
     dec debug
     
-    load_bytecode "library/SDL/App.imc"
-    load_bytecode "library/SDL/Event.imc"
-    load_bytecode "library/SDL/EventHandler.imc"
-    load_bytecode "library/SDL/Rect.imc"
-    load_bytecode "library/SDL/Surface.imc"
-    load_bytecode "library/SDL/Color.imc"
-    load_bytecode "library/SDL/Image.imc"
-    load_bytecode "examples/sdl/minesweeper/field.imc"
+    load_bytecode "library/SDL/App.pir"
+    load_bytecode "library/SDL/Event.pir"
+    load_bytecode "library/SDL/EventHandler.pir"
+    load_bytecode "library/SDL/Rect.pir"
+    load_bytecode "library/SDL/Surface.pir"
+    load_bytecode "library/SDL/Color.pir"
+    load_bytecode "library/SDL/Image.pir"
+    load_bytecode "examples/sdl/minesweeper/field.pir"
     
     # setup the screen properties
     $P0 = new PerlHash

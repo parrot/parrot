@@ -1,12 +1,12 @@
 =head1 TITLE
 
-blue_rect.imc - draw a blue rectangle with the SDL Parrot bindings
+blue_rect.pir - draw a blue rectangle with the SDL Parrot bindings
 
 =head1 SYNOPSIS
 
 To run this file, run the following command from the Parrot directory:
 
-	$ ./parrot examples/sdl/blue_rect.imc
+	$ ./parrot examples/sdl/blue_rect.pir
 	$
 
 =cut
@@ -14,9 +14,9 @@ To run this file, run the following command from the Parrot directory:
 .sub _main :main
 
 	# first load the necessary libraries
-	load_bytecode "library/SDL/App.imc"
-	load_bytecode "library/SDL/Rect.imc"
-	load_bytecode "library/SDL/Color.imc"
+	load_bytecode "library/SDL/App.pir"
+	load_bytecode "library/SDL/Rect.pir"
+	load_bytecode "library/SDL/Color.pir"
 
 	# arguments for the SDL::App constructor
 	.local pmc args

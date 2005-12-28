@@ -1,6 +1,6 @@
 =head1 TITLE
 
-app.imc - a tetris application object
+app.pir - a tetris application object
 
 B<Note:> The Tetris::App class is implemented as a singleton.
 
@@ -44,13 +44,13 @@ it parent classes nor is it subclassed.
     find_type $I0, "Tetris::App"
     if $I0 > 1 goto END
 
-    load_bytecode "library/SDL/App.imc"
-    load_bytecode "library/SDL/Color.imc"
-    load_bytecode "library/SDL/Event.imc"
-    load_bytecode "library/SDL/Rect.imc"
+    load_bytecode "library/SDL/App.pir"
+    load_bytecode "library/SDL/Color.pir"
+    load_bytecode "library/SDL/Event.pir"
+    load_bytecode "library/SDL/Rect.pir"
 
-    load_bytecode "examples/sdl/tetris/eventhandler.imc"
-    load_bytecode "examples/sdl/tetris/board.imc"
+    load_bytecode "examples/sdl/tetris/eventhandler.pir"
+    load_bytecode "examples/sdl/tetris/board.pir"
 
     newclass $P0, "Tetris::App"
 

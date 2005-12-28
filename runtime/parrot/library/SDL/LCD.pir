@@ -40,8 +40,8 @@ An SDL::LCD object has the following methods:
     $I0 = find_type 'SDL::LCD'
     if $I0 > 1 goto END
     
-    load_bytecode "library/SDL/Image.imc"
-    load_bytecode "library/SDL/Rect.imc"
+    load_bytecode "library/SDL/Image.pir"
+    load_bytecode "library/SDL/Rect.pir"
 
     $P0 = new PerlString
     $P0 = "runtime/parrot/library/SDL/LCD.png"

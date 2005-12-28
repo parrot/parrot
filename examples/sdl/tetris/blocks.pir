@@ -1,6 +1,6 @@
 =head1 TITLE
 
-blocks.imc - tetris block classes
+blocks.pir - tetris block classes
 
 =cut
 
@@ -10,7 +10,7 @@ blocks.imc - tetris block classes
     find_type $I0, "Tetris::Block::1"
     if $I0 > 1 goto END
 
-    load_bytecode "examples/sdl/tetris/block.imc"
+    load_bytecode "examples/sdl/tetris/block.pir"
 
     getclass $P1, "Tetris::Block"
 

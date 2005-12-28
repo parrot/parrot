@@ -1,31 +1,30 @@
 =head1 TITLE
 
-anim_image.imc - animate an image in a Parrot SDL window
+anim_image_dblbuf.pir - animate an image in a doublebuffered Parrot SDL window
 
 =head1 SYNOPSIS
 
-To run this file, run the following command from the Parrot directory:
+To run this file, run the following command from the Parrot root directory:
 
-	$ ./parrot examples/sdl/anim_image.imc
-	Drew 1080 frames in 0.948230 seconds (1138.964142 fps)
+	$ ./parrot examples/sdl/anim_image_dblbuf.pir
+	Drew 540 frames in 2.200484 seconds (245.400580 fps)
 	$ 
 
 =cut
 
 .sub _main non_prototyped, :main
-	load_bytecode "library/SDL/App.imc"
-	load_bytecode "library/SDL/Color.imc"
-	load_bytecode "library/SDL/Rect.imc"
-	load_bytecode "library/SDL/Image.imc"
-	load_bytecode "library/SDL/Sprite.imc"
-
+	load_bytecode "library/SDL/App.pir"
+	load_bytecode "library/SDL/Color.pir"
+	load_bytecode "library/SDL/Rect.pir"
+	load_bytecode "library/SDL/Image.pir"
+	load_bytecode "library/SDL/Sprite.pir"
 
 	.local pmc args
-	args           = new PerlHash
-	args['height'] = 480
-	args['width']  = 640
-	args['bpp']    =   0
-	args['flags']  =   1
+	args             = new PerlHash
+	args[ 'height' ] =        480
+	args[ 'width'  ] =        640
+	args[ 'bpp'    ] =          0
+	args[ 'flags'  ] = 1073741825
 
 	.local pmc app
 	.local int app_type
@@ -37,24 +36,24 @@ To run this file, run the following command from the Parrot directory:
 	main_screen = app.'surface'()
 
 	.local int rect_type
-	find_type rect_type, 'SDL::Rect'
+	find_type  rect_type, 'SDL::Rect'
 
-	args['height'] = 100
-	args['width']  = 100
-	args['x']      =   0
-	args['y']      = 190
+	args[ 'height' ] = 100
+	args[ 'width'  ] = 100
+	args[ 'x'      ] =   0
+	args[ 'y'      ] = 190
 
 	.local pmc dest_rect
-	dest_rect   = new rect_type, args
+	dest_rect = new rect_type, args
 
-	args['width']  = 101
+	args['width'] = 101
 	.local pmc prev_rect
-	prev_rect   = new rect_type, args
+	prev_rect = new rect_type, args
 
-	args['height'] =  56
-	args['width']  = 100
-	args['x']      =   0
-	args['y']      =   0
+	args[ 'height' ] =  56
+	args[ 'width'  ] = 100
+	args[ 'x'      ] =   0
+	args[ 'y'      ] =   0
 
 	.local pmc source_rect
 	source_rect = new rect_type, args
@@ -62,9 +61,9 @@ To run this file, run the following command from the Parrot directory:
 	.local int color_type
 	find_type  color_type, 'SDL::Color'
 
-	args['r'] = 0
-	args['g'] = 0
-	args['b'] = 0
+	args[ 'r' ] = 0
+	args[ 'g' ] = 0
+	args[ 'b' ] = 0
 
 	.local pmc black
 	black = new color_type, args
@@ -95,9 +94,9 @@ To run this file, run the following command from the Parrot directory:
 	.local float start_time
 	time start_time
 
-	_animate_on_x_axis( main_screen, sprite,   0, 540,  1)
+	_animate_on_x_axis( main_screen, sprite,   0, 540,  2)
 	sleep 1
-	_animate_on_x_axis( main_screen, sprite, 540,   0, -1)
+	_animate_on_x_axis( main_screen, sprite, 540,   0, -2)
 
 	.local float end_time
 	time end_time
@@ -107,9 +106,9 @@ To run this file, run the following command from the Parrot directory:
 	dec total_time
 
 	.local float fps
-	fps = 1080/total_time
+	fps = 540/total_time
 
-	print "Drew 1080 frames in "
+	print "Drew 540 frames in "
 	print total_time
 	print " seconds ("
 	print fps
@@ -127,25 +126,19 @@ To run this file, run the following command from the Parrot directory:
 	.param int start_pos
 	.param int end_pos
 	.param int step_size
+	# PMCs:
+	#	destination SDL::Surface and SDL::Sprite to animate
+	# Ints:
+	#	starting and x coordinates and number of pixels to move at a time
 
 	.local int x_pos
 	x_pos = start_pos
 
-	.local pmc prev_rect
-	.local pmc rect
-
-	.local pmc rect_array
-	rect_array = new Array
-	set rect_array, 2
-
 _loop:
 		add x_pos, step_size
 		sprite.'x'( x_pos )
-		(prev_rect, rect) = sprite.'draw_undraw'( screen )
-		set rect_array[ 0 ], prev_rect
-		set rect_array[ 1 ], rect
-
-		screen.'update_rects'( rect_array )
+		sprite.'draw'( screen )
+		screen.'flip'()
 		if x_pos != end_pos goto _loop
 .end
 

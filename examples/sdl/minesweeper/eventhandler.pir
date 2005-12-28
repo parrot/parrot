@@ -1,6 +1,6 @@
 =head1 TITLE
 
-eventhandler.imc - a minesweeper event handler
+eventhandler.pir - a minesweeper event handler
 
 =head1 SYNOPSIS
 

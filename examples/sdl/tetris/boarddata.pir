@@ -1,6 +1,6 @@
 =head1 TITLE
 
-boarddata.imc - a tetris board data class
+boarddata.pir - a tetris board data class
 
 =head1 SYNOPSIS
 

@@ -5,7 +5,7 @@ SDL::Surface - Parrot class representing surfaces in Parrot SDL
 =head1 SYNOPSIS
 
 	# load this library
-	load_bytecode 'library/SDL/Surface.imc'
+	load_bytecode 'library/SDL/Surface.pir'
 
 	# set the surface's arguments
 	.local pmc surface_args

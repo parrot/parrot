@@ -5,7 +5,7 @@ SDL::App - Parrot extension for SDL Applications
 =head1 SYNOPSIS
 
 	# load this library
-	load_bytecode 'library/SDL/App.imc'
+	load_bytecode 'library/SDL/App.pir'
 
 	# create a new SDL::App object
 	.local pmc app
@@ -62,9 +62,9 @@ The SDL::App object has the following methods:
 .sub _initialize @LOAD 
 
 	.include 'datatypes.pasm'
-	load_bytecode 'library/SDL.imc'
-	load_bytecode 'library/SDL/Surface.imc'
-	load_bytecode 'library/SDL/Constants.imc'
+	load_bytecode 'library/SDL.pir'
+	load_bytecode 'library/SDL/Surface.pir'
+	load_bytecode 'library/SDL/Constants.pir'
 
 	.local pmc app_class
 

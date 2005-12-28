@@ -1,12 +1,12 @@
 =head1 TITLE
 
-bounce_parrot_logo.imc - bounce a Parrot logo with the SDL Parrot bindings
+bounce_parrot_logo.pir - bounce a Parrot logo with the SDL Parrot bindings
 
 =head1 SYNOPSIS
 
 To run this file, run the following command from the Parrot directory:
 
-	$ parrot examples/sdl/bounce_parrot_logo.imc
+	$ parrot examples/sdl/bounce_parrot_logo.pir
 	$
 
 You'll see the happy Parrot logo in the middle of a new SDL window.  Use the
@@ -16,13 +16,13 @@ Use the Escape key or close the window when you've had enough.
 =cut
 
 .sub _main :main
-	load_bytecode "library/SDL/App.imc"
-	load_bytecode "library/SDL/Color.imc"
-	load_bytecode "library/SDL/Rect.imc"
-	load_bytecode "library/SDL/Image.imc"
-	load_bytecode "library/SDL/Sprite.imc"
-	load_bytecode "library/SDL/EventHandler.imc"
-	load_bytecode "library/SDL/Event.imc"
+	load_bytecode "library/SDL/App.pir"
+	load_bytecode "library/SDL/Color.pir"
+	load_bytecode "library/SDL/Rect.pir"
+	load_bytecode "library/SDL/Image.pir"
+	load_bytecode "library/SDL/Sprite.pir"
+	load_bytecode "library/SDL/EventHandler.pir"
+	load_bytecode "library/SDL/Event.pir"
 
 	.local pmc app_args
 	new app_args, .PerlHash

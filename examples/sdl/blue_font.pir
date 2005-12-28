@@ -1,12 +1,12 @@
 =head1 TITLE
 
-blue_font.imc - draw a friendly message to the screen
+blue_font.pir - draw a friendly message to the screen
 
 =head1 SYNOPSIS
 
 To run this file, run the following command from the Parrot directory:
 
-	$ ./parrot examples/sdl/blue_font.imc
+	$ ./parrot examples/sdl/blue_font.pir
 	$
 
 Note that you'll need a font named C<times.ttf> in the current directory.  I
@@ -20,10 +20,10 @@ royalty-free font file.  Maybe soon.
 .sub _main :main
 
 	# first load the necessary libraries
-	load_bytecode "library/SDL/App.imc"
-	load_bytecode "library/SDL/Rect.imc"
-	load_bytecode "library/SDL/Color.imc"
-	load_bytecode "library/SDL/Font.imc"
+	load_bytecode "library/SDL/App.pir"
+	load_bytecode "library/SDL/Rect.pir"
+	load_bytecode "library/SDL/Color.pir"
+	load_bytecode "library/SDL/Font.pir"
 
 	# arguments for the SDL::App constructor
 	.local pmc args

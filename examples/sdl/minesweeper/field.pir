@@ -1095,13 +1095,13 @@ This method is called automatically when this module is loaded.
     .local int rect_type
     .local int surface_type
 
-    load_bytecode "examples/sdl/minesweeper/eventhandler.imc"
-    load_bytecode "library/SDL/Button.imc"
-    load_bytecode "library/SDL/StopWatch.imc"
-    load_bytecode "library/SDL/Image.imc"
+    load_bytecode "examples/sdl/minesweeper/eventhandler.pir"
+    load_bytecode "library/SDL/Button.pir"
+    load_bytecode "library/SDL/StopWatch.pir"
+    load_bytecode "library/SDL/Image.pir"
 
     # XXX: remove
-    load_bytecode "library/Data/Dumper.imc"
+    load_bytecode "library/Data/Dumper.pir"
 
     $P0 = new PerlString
     $P0 = "examples/sdl/minesweeper/mines.png"

@@ -1,24 +1,24 @@
 =head1 TITLE
 
-move_parrot_logo.imc - move a Parrot logo with the SDL Parrot bindings
+move_parrot_logo.pir - move a Parrot logo with the SDL Parrot bindings
 
 =head1 SYNOPSIS
 
 To run this file, run the following command from the Parrot directory:
 
-	$ parrot examples/sdl/move_parrot_logo.imc
+	$ parrot examples/sdl/move_parrot_logo.pir
 	$
 
 =cut
 
 .sub _main :main
-	load_bytecode "library/SDL/App.imc"
-	load_bytecode "library/SDL/Color.imc"
-	load_bytecode "library/SDL/Rect.imc"
-	load_bytecode "library/SDL/Image.imc"
-	load_bytecode "library/SDL/Sprite.imc"
-	load_bytecode "library/SDL/EventHandler.imc"
-	load_bytecode "library/SDL/Event.imc"
+	load_bytecode "library/SDL/App.pir"
+	load_bytecode "library/SDL/Color.pir"
+	load_bytecode "library/SDL/Rect.pir"
+	load_bytecode "library/SDL/Image.pir"
+	load_bytecode "library/SDL/Sprite.pir"
+	load_bytecode "library/SDL/EventHandler.pir"
+	load_bytecode "library/SDL/Event.pir"
 
 	.local pmc app_args
 	new app_args, .PerlHash

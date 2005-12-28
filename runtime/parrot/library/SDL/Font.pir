@@ -5,7 +5,7 @@ SDL::Font - Parrot class representing fonts in Parrot SDL
 =head1 SYNOPSIS
 
 	# load this library
-	load_bytecode 'library/SDL/Font.imc'
+	load_bytecode 'library/SDL/Font.pir'
 
 	# set the font's arguments
 	.local pmc font_args

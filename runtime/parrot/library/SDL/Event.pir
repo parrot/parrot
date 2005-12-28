@@ -5,7 +5,7 @@ SDL::Event - Parrot extension representing SDL Events
 =head1 SYNOPSIS
 
 	# load this library
-	load_bytecode 'library/SDL/Event.imc'
+	load_bytecode 'library/SDL/Event.pir'
 
 	# create a new SDL::Event object
 	.local pmc event
