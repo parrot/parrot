@@ -9,15 +9,16 @@ Adds -fPIC to x86_64 (AMD64) ccflags, if necessary.
 
 =cut
 
+package gen::cpu::x86_64::auto;
+
 use strict;
 
-sub run_cpu
+sub runstep
 {
-    my ($conf, $verbose) = @_;
+    my ($self, $conf) = @_;
 
     my $ccflags = $conf->data->get('ccflags');
-    $ccflags .= " -fPIC" unless $ccflags =~ /-fPIC/;
-    $conf->data->set(ccflags => $ccflags);
+    $conf->data->add(' ', ccflags => "-fPIC") unless $ccflags =~ /-fPIC/;
 }
 
 1;

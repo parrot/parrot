@@ -33,14 +33,16 @@ sub runstep
 
     my $verbose = $conf->options->get('verbose');
 
-    my $cpu = $conf->data->get('cpuarch');
-    print "\t(cpu = '$cpu') " if $verbose;
-    my $f;
-    if (-d "config/gen/cpu/$cpu" && -e ($f = "config/gen/cpu/$cpu/auto.pm")) {
-        require $f;
+    my $hints = "gen::cpu::" . $conf->data->get('cpuarch') . "::auto";
 
-        # XXX change this to work like init::hints
-        &run_cpu($conf, $verbose);
+    print "\t(cpu hints = '$hints') " if $verbose;
+
+    eval "use $hints";
+    unless ($@) {
+        $hints->runstep($conf, @_);
+    } else {
+        print "(no cpu specific hints)" if $verbose;
     }
 }
 
+1;

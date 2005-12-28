@@ -14,13 +14,17 @@ Test for MMX/SSE functionality. Creates these Config entries
 
 =cut
 
+package gen::cpu::i386::auto;
+
 use strict;
 
 use Parrot::Configure::Step qw(cc_gen cc_build cc_run cc_clean);
 
-sub run_cpu
+sub runstep
 {
-    my ($conf, $verbose) = @_;
+    my ($self, $conf) = @_;
+
+    my $verbose = $conf->options->get('verbose');
 
     my (@files) = qw( memcpy_mmx.c memcpy_sse.c );
     for my $f (@files) {
