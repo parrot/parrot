@@ -47,7 +47,7 @@ is(integrate(1, 2), 2, "integrate(1, 1)");
 # file_checksum(), not exported
 
 SKIP: {
-    skip "File::Temp doesn't support ->new()", 12
+    skip "this File::Temp version doesn't support ->new()", 8
         unless File::Temp->can('new');
 
 {
