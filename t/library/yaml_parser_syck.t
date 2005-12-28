@@ -31,7 +31,7 @@ TODO: {
   pir_output_is( << 'CODE', << 'OUT', "basic parsing" );
 
 .include "library/YAML/Parser/Syck.imc"
-.include "library/dumper.imc"
+.include "library/dumper.pir"
 .sub test @MAIN 
 
   .local pmc loaded 

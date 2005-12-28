@@ -528,5 +528,5 @@ not_num:
     print "\n"
 .end
 
-.include "library/dumper.imc"
+.include "library/dumper.pir"
 # vim: ft=imc sw=4:

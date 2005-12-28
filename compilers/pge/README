@@ -64,7 +64,7 @@ the strings and subpatterns that were matched as part of the capture.
 Parrot's "Data::Dumper" can be used to quickly view the results
 of the match:
 
-    load_bytecode "dumper.imc"
+    load_bytecode "dumper.pir"
     load_bytecode "PGE/Dumper.pir"
 
   match_loop:

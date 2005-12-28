@@ -45,7 +45,7 @@ integers or double-quoted strings, in the form of:
     unless $I0 goto err_match_fail           # if match fails stop
 #    print "parse succeeded\n"
 #    print "Match tree dump:\n"
-#    load_bytecode "dumper.imc"
+#    load_bytecode "dumper.pir"
 #    load_bytecode "PGE/Dumper.pir"
 #    $P0 = find_global "_dumper"
 #    $P0(match, "$/")

@@ -35,7 +35,7 @@ References: http://www.gnu.org/software/m4/m4.html
 .include "src/macro.pir"
 
 # Mainly for debug output
-# .include "library/dumper.imc"
+# .include "library/dumper.pir"
 
 
 =head1 SUBROUTINES

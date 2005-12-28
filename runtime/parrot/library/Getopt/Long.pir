@@ -77,7 +77,7 @@ license as The Parrot Interpreter.
 
 =cut
 
-.include "library/dumper.imc"
+.include "library/dumper.pir"
  
 .namespace [ "Getopt::Long" ]
 

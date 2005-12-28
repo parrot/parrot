@@ -31,7 +31,7 @@ B<'Nothing is illegal'> sections
 my $PRE = <<PRE;
 .sub 'main' :main
     load_bytecode "PGE.pbc"
-    load_bytecode "dumper.imc"
+    load_bytecode "dumper.pir"
     load_bytecode "PGE/Dumper.pir"
     load_bytecode "PGE/Glob.pir"
     load_bytecode "PGE/Text.pir"
