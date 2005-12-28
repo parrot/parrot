@@ -1,5 +1,4 @@
-#! perl -w
-
+#! perl
 # Copyright: 2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
@@ -39,10 +38,10 @@ if (-e $PBCMERGE) {
 sub pir_to_pbc {
     my ($name, $pir) = @_;
 
-    open FILE, "> t$PConfig{slash}tools$PConfig{slash}$name.imc";
+    open FILE, "> t$PConfig{slash}tools$PConfig{slash}$name.pir";
     print FILE $pir;
     close FILE;
-    system("$PARROT -o t$PConfig{slash}tools$PConfig{slash}$name.pbc t$PConfig{slash}tools$PConfig{slash}$name.imc");
+    system("$PARROT -o t$PConfig{slash}tools$PConfig{slash}$name.pbc t$PConfig{slash}tools$PConfig{slash}$name.pir");
 }
 
 sub pbc_merge {
