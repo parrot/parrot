@@ -14,7 +14,7 @@ examples/pir/hello-dwim.pir - Parrot's confusing opcodes made easy
 The first time you run this program
 
     .sub _main
-        .include "DWIM.imc"
+        .include "DWIM.pir"
         print "The answer is\n"
         add $I0, 20, 23
         dec $I0
@@ -30,7 +30,7 @@ The code continues to work exactly as it did before, but now it looks
 like this:
 
     .sub _main
-       .include "DWIM.imc"
+       .include "DWIM.pir"
       # DWIM  "The answer is\n"
       # DWIM  $I0, 20, 23
       # DWIM  $I0
@@ -42,7 +42,7 @@ like this:
 =cut
 
 .sub _main
-    .include "DWIM.imc"
+    .include "DWIM.pir"
     print "The answer is\n"
     add $I0, 20, 23
     dec $I0

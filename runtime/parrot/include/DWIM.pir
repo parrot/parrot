@@ -136,7 +136,7 @@ err_write:
 iter_rep:
     unless iter goto iter_end
     shift line, iter
-    index $I0, line, "DWIM.imc"	# ignore
+    index $I0, line, "DWIM.pir"	# ignore
     if $I0 > 0 goto iter_rep
     index $I0, line, "  # DWIM "
     if $I0 < 0 goto l1		# normal line
@@ -250,7 +250,7 @@ Parrot::DWIM - Parrot's confusing opcodes made easy.
 =head1 SYNOPSIS
 
     .sub _main
-	.include "DWIM.imc"
+	.include "DWIM.pir"
 	print "The answer is\n"
 	add $I0, 20, 23
 	dec $I0
@@ -269,7 +269,7 @@ The code continues to work exactly as it did before, but
 now it looks like this:
 
     .sub _main
-	.include "DWIM.imc"
+	.include "DWIM.pir"
        # DWIM  "The answer is\n"
        # DWIM  $I0, 20, 23
        # DWIM  $I0

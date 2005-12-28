@@ -74,6 +74,6 @@ END_EXPECTED
 
 TODO:
 {
-  local $TODO = 'ncurses_life.imc not testable yet';
-  fail( 'ncurses_life.imc' );
+  local $TODO = 'ncurses_life.pir not testable yet';
+  fail( 'ncurses_life.pir' );
 };
