@@ -1454,7 +1454,7 @@ runtime/parrot/library/File/Spec.pir              [library]
 runtime/parrot/library/File/Spec/Unix.pir         [library]
 runtime/parrot/library/File/Spec/Win32.pir        [library]
 runtime/parrot/library/Getopt/Long.pir            [main]doc
-runtime/parrot/library/JSON.imc                   [library]
+runtime/parrot/library/JSON.pir                   [library]
 runtime/parrot/library/JSON/Parser.pir            [library]
 runtime/parrot/library/PGE/Dumper.pir             [library]
 runtime/parrot/library/PGE/Glob.pir               [library]

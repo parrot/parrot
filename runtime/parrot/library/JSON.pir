@@ -1,6 +1,6 @@
 =head1 TITLE
 
-JSON.imc - PIR implementation of JSON data interchange format.
+JSON.pir - PIR implementation of JSON data interchange format.
 
 =head1 SYNOPSIS
 
@@ -12,7 +12,7 @@ JSON.imc - PIR implementation of JSON data interchange format.
  #$P1 is now a array-like container PMC with three Integer elements.
 
  .end
- .include 'library/JSON.imc'
+ .include 'library/JSON.pir'
 
 =head1 DESCRIPTION
 

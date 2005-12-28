@@ -35,7 +35,7 @@ pir_output_is(<<'CODE', <<'OUT', 'Create JSON of an empty string');
     print $S0
     print "\n"
 .end
-.include 'library/JSON.imc'
+.include 'library/JSON.pir'
 CODE
 ""
 OUT
@@ -51,7 +51,7 @@ pir_output_is(<<'CODE', <<'OUT', 'Create JSON of a non-empty string');
     print $S0
     print "\n"
 .end
-.include 'library/JSON.imc'
+.include 'library/JSON.pir'
 CODE
 "abcdeABCDE01234$%^&*"
 OUT
@@ -67,7 +67,7 @@ pir_output_is(<<'CODE', <<'OUT', 'Create JSON of a string with simple escapes');
     print $S0
     print "\n"
 .end
-.include 'library/JSON.imc'
+.include 'library/JSON.pir'
 CODE
 "abcde\\ABCDE\"01234\n$%^&*"
 OUT
@@ -98,7 +98,7 @@ pir_output_is(<<'CODE', <<'OUT', 'Create JSON of some integers');
     print $S0
     print "\n"
 .end
-.include 'library/JSON.imc'
+.include 'library/JSON.pir'
 CODE
 0
 35
@@ -129,7 +129,7 @@ pir_output_is(<<'CODE', <<'OUT', 'Create JSON of some numbers');
     print $S0
     print "\n"
 .end
-.include 'library/JSON.imc'
+.include 'library/JSON.pir'
 CODE
 0
 2.5
@@ -156,7 +156,7 @@ pir_output_is(<<'CODE', <<'OUT', 'Create JSON of various scalars with pretty opt
     $S0 = _json( n, 1 )
     print $S0
 .end
-.include 'library/JSON.imc'
+.include 'library/JSON.pir'
 CODE
 "abcde\\ABCDE\"01234\n$%^&*"
 -42
@@ -186,7 +186,7 @@ pir_output_is(<<'CODE', <<'OUT', 'Create JSON of an array');
     print $S0
     print "\n"
 .end
-.include 'library/JSON.imc'
+.include 'library/JSON.pir'
 CODE
 [0,1,2,3,4,5,6,7,8,9]
 OUT
@@ -213,7 +213,7 @@ pir_output_is(<<'CODE', <<'OUT', 'Create pretty JSON of an array');
     $S0 = _json( array, 1 )
     print $S0
 .end
-.include 'library/JSON.imc'
+.include 'library/JSON.pir'
 CODE
 [
   0,
@@ -247,7 +247,7 @@ pir_output_is(<<'CODE', <<'OUT', 'Create JSON of array, keep element ordering');
     $S0 = _json( array, 1 )
     print $S0
 .end
-.include 'library/JSON.imc'
+.include 'library/JSON.pir'
 CODE
 [
   35,
@@ -277,7 +277,7 @@ pir_output_is(<<'CODE', <<'OUT', 'Create JSON of a mixed array');
     $S0 = _json( array, 1 )
     print $S0
 .end
-.include 'library/JSON.imc'
+.include 'library/JSON.pir'
 CODE
 [
   0,
@@ -304,7 +304,7 @@ pir_output_is(<<'CODE', <<'OUT', 'Create JSON of hash');
     $S0 = _json( hash, 1 )
     print $S0
 .end
-.include 'library/JSON.imc'
+.include 'library/JSON.pir'
 CODE
 {
   "alpha" : 29,
@@ -330,7 +330,7 @@ pir_output_is(<<'CODE', <<'OUT', 'Create non-pretty JSON of hash');
     print $S0
     print "\n"
 .end
-.include 'library/JSON.imc'
+.include 'library/JSON.pir'
 CODE
 {"alpha":29,"beta":"B","delta":"DELTA","gamma":3.1}
 OUT
@@ -366,7 +366,7 @@ pir_output_is(<<'CODE', <<'OUT', 'Create JSON of nested structure including Perl
     $S0 = _json( world, 1 )
     print $S0
 .end
-.include 'library/JSON.imc'
+.include 'library/JSON.pir'
 CODE
 {
   "population" : 1234567890,
@@ -418,7 +418,7 @@ pir_output_is(<<'CODE', <<'OUT', 'Create non-pretty JSON of nested structure');
     print $S0
     print "\n"
 .end
-.include 'library/JSON.imc'
+.include 'library/JSON.pir'
 CODE
 {"population":1234567890,"some_country":[[{"Perl":"Highway","Python":"Grove","Ruby":"Lane"},{}],[]]}
 OUT
@@ -445,7 +445,7 @@ pir_output_is(<<'CODE', <<'OUT', 'Create JSON of String PMCs');
     $S0 = _json( s, 1 )
     print $S0
 .end
-.include 'library/JSON.imc'
+.include 'library/JSON.pir'
 CODE
 ""
 ""
@@ -475,7 +475,7 @@ pir_output_is(<<'CODE', <<'OUT', 'Create JSON of Integer PMCs');
     $S0 = _json( i, 1 )
     print $S0
 .end
-.include 'library/JSON.imc'
+.include 'library/JSON.pir'
 CODE
 0
 0
@@ -505,7 +505,7 @@ pir_output_is(<<'CODE', <<'OUT', 'Create JSON of Boolean PMCs');
     $S0 = _json( b, 1 )
     print $S0
 .end
-.include 'library/JSON.imc'
+.include 'library/JSON.pir'
 CODE
 false
 false
@@ -533,7 +533,7 @@ pir_output_is(<<'CODE', <<'OUT', 'Create JSON of null and .Undef');
     $S0 = _json( n, 1 )
     print $S0
 .end
-.include 'library/JSON.imc'
+.include 'library/JSON.pir'
 CODE
 null
 null
@@ -558,7 +558,7 @@ pir_output_is(<<'CODE', <<'OUT', 'Decode JSON empty string');
     print "\n"
 
 .end
-.include 'library/JSON.imc'
+.include 'library/JSON.pir'
 CODE
 String
 
@@ -575,7 +575,7 @@ pir_output_is(<<'CODE', <<'OUT', 'Decode JSON null');
 ok:
     print "ok\n"
 .end
-.include 'library/JSON.imc'
+.include 'library/JSON.pir'
 CODE
 ok
 OUT
@@ -593,7 +593,7 @@ pir_output_is(<<'CODE', <<'OUT', 'Decode JSON true');
     print $S0
     print "\n"
 .end
-.include 'library/JSON.imc'
+.include 'library/JSON.pir'
 CODE
 .Boolean
 1
@@ -612,7 +612,7 @@ pir_output_is(<<'CODE', <<'OUT', 'Decode JSON false');
     print $S0
     print "\n"
 .end
-.include 'library/JSON.imc'
+.include 'library/JSON.pir'
 CODE
 .Boolean
 0
