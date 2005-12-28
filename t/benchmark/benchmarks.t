@@ -2,9 +2,21 @@
 # Copyright: 2004-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
+
+use strict;
+use warnings;
+use lib qw( lib . ../lib ../../lib );
+use Parrot::Test;
+use Test::More;
+
+
 =head1 NAME
 
-t/benchmarks.t - test scrips in examples/benchmarks
+t/benchmark/benchmarks.t - test scrips in examples/benchmarks
+
+=head1 SYNOPSIS
+
+	prove t/benchmarks/benchmarks.t
 
 =head1 DESCRIPTION
 
@@ -12,18 +24,13 @@ Called by 'make testbench'.
 
 =cut
 
-use strict;
-use warnings;
-
-use Parrot::Test;
-use Test::More;
 
 # Set up expected output from files in 'examples/benchmarks'
 my %outputs = (
-    q{addit.imc} => qq(21001097.970000\n),
+    q{addit.pir} => qq(21001097.970000\n),
     q{addit.pasm} => qq(21001097.970000\n),
-    q{addit2.imc} => qq(21001097.970000\n),
-    q{array_access.imc} => qr/^1\s\*\s1000\s=\s1000\n
+    q{addit2.pir} => qq(21001097.970000\n),
+    q{array_access.pir} => qr/^1\s\*\s1000\s=\s1000\n
         1000\s\*\s1000\s=\s1000000\n
         Array:\s\d+\.\d+s\n
         \n
@@ -78,8 +85,8 @@ my %outputs = (
         1\s\*\s1000\s=\s1000\n
         1000\s\*\s1000\s=\s1000000\n
         StringArray:\s\d+\.\d+s\n$/x,
-    q{arriter.imc} => qq(100000\n100000\n100000\n111111\n),
-    q{arriter_o1.imc} => qq(100000\n100000\n100000\n111111\n),
+    q{arriter.pir} => qq(100000\n100000\n100000\n111111\n),
+    q{arriter_o1.pir} => qq(100000\n100000\n100000\n111111\n),
     q{bench_newp.pasm} => qr/^\d+\.\d+\sseconds.\s\d+\.\d+\sloops\/sec\n
         A\stotal\sof\s\d+\sbytes\swere\sallocated\n
         A\stotal\sof\s\d+\sDOD\sruns\swere\smade\n
@@ -89,7 +96,7 @@ my %outputs = (
         There\sare\s\d+\stotal\sPMC\sstructs\n
         There\sare\s\d+\sactive\sBuffer\sstructs\n
         There\sare\s\d+\stotal\sBuffer\sstructs\n$/x,
-    q{fib.imc} => qr/^fib\(28\)\s=\s317811\s\d+\.\d+s$/x,
+    q{fib.pir} => qr/^fib\(28\)\s=\s317811\s\d+\.\d+s$/x,
     q{freeze.pasm} => qr/^constr.time\s\d+\.\d+\n
         freeze\stime\s\d+\.\d+\n
         \s\sthaw\stime\s\d+\.\d+\n
@@ -164,10 +171,10 @@ my %outputs = (
     q{oo2.pasm} => qq(10\n),
     q{oo3.pasm} => qq(10\n),
     q{oo4.pasm} => qq(500000\n),
-    q{oo5.imc} => qq(10\n),
-    q{oo6.imc} => qq(500000\n),
-    q{oofib.imc} => qr/^fib\(28\)\s=\s317811\s\d+\.\d+s$/x,
-    q{overload.imc} => qq(42\n),
+    q{oo5.pir} => qq(10\n),
+    q{oo6.pir} => qq(500000\n),
+    q{oofib.pir} => qr/^fib\(28\)\s=\s317811\s\d+\.\d+s$/x,
+    q{overload.pir} => qq(42\n),
     q{primes.pasm} => qr/^N\sprimes\sup\sto\s10000\sis:\s1229\n
         last\sis:\s10001\n
         Elapsed\stime:\s\d+\.\d+\n$/x,
@@ -204,21 +211,21 @@ my %outputs = (
     q{stress3.pasm} => qr/^A\stotal\sof\s\d+\sDOD\sruns\swere\smade\n
         \d+\sactive\sPMCs\n
         \d+\stotal\s\sPMCs\n$/x,
-    q{vpm.imc} => qq(100000;\nl hackerjust another per\n)
+    q{vpm.pir} => qq(100000;\nl hackerjust another per\n)
 );
 
-my %todo = ( q{arriter.imc}                     => 'syntax error',
-             q{arriter_o1.imc}                  => 'syntax error',
+my %todo = ( q{arriter.pir}                     => 'syntax error',
+             q{arriter_o1.pir}                  => 'syntax error',
              q{gc_header_new.pasm}              => 'syntax error', 
              q{gc_waves_headers.pasm}           => 'syntax error', 
              q{gc_waves_sizeable_headers.pasm}  => 'syntax error', 
              q{stress3.pasm}                    => 'Null PMC access in get_integer()',
-             q{vpm.imc}                         => 'delete_keyed() not implemented',
+             q{vpm.pir}                         => 'delete_keyed() not implemented',
            );
-# array_access.imc has weird output
-my %filters = ( q(array_access.imc) => \&array_access_imc_filter );
+# array_access.pir has weird output
+my %filters = ( q(array_access.pir) => \&array_access_pir_filter );
 
-sub array_access_imc_filter {
+sub array_access_pir_filter {
     $_[ 0 ] =~ s/arr_size = S1/arr_size = 1000/;
 }
 
@@ -248,7 +255,7 @@ foreach ( sort keys %outputs ) {
             if ( /\.pasm$/ ) {
                 pasm_output_like( $bench, $outputs{ $_ }, $_, @todo );
             }
-            elsif ( /\.imc$/ ) {
+            elsif ( /\.pir$/ ) {
                 pir_output_like( $bench, $outputs{ $_ }, $_, @todo );
             }
             else {
@@ -259,7 +266,7 @@ foreach ( sort keys %outputs ) {
             if ( /\.pasm$/ ) {
                 pasm_output_is( $bench, $outputs{ $_ }, $_, @todo );
             }
-            elsif ( /\.imc$/ ) {
+            elsif ( /\.pir$/ ) {
                 pir_output_is( $bench, $outputs{ $_ }, $_, @todo );
             }
             else {
