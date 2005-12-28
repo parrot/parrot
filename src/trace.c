@@ -107,7 +107,6 @@ trace_pmc_dump(Interp *interpreter, PMC* pmc)
     else if (pmc->vtable->base_type == enum_class_RetContinuation
             ||  pmc->vtable->base_type == enum_class_Continuation
             ||  pmc->vtable->base_type == enum_class_Sub) {
-        opcode_t *pc, *seg;
         PIO_eprintf(interpreter, "%S=PMC(%#p pc:%d)",
                 VTABLE_name(interpreter, pmc), pmc,
                 PMC_sub(pmc)->start_offs);
