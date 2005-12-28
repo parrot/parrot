@@ -16,9 +16,9 @@ Parakeet
 
   Parakeet can be used and learned through an interactive interpreter.
   To run the interpretor, point your Parrot interpreter to the
-  parakeet.imc file, like:
+  parakeet.pir file, like:
 
-    ./parrot language/parakeet/parakeet.imc
+    ./parrot language/parakeet/parakeet.pir
     0>
 
   The '0>' is the interactive prompt.  The number represents the
@@ -140,7 +140,7 @@ Words
     0> 
 
   Since the core words are still pretty flexible right now, please see
-  the source file parakeet.imc for a list of all the current words.
+  the source file parakeet.pir for a list of all the current words.
 
 Control
 

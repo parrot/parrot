@@ -82,7 +82,7 @@ $ENV{TEST_PROG_ARGS} = 'parrot_compiler.pbc --language=PIR';
 language_output_is( 'ParrotCompiler', $code{PIR}, $out{PIR},
                     $ENV{TEST_PROG_ARGS} );
 
-$ENV{TEST_PROG_ARGS} = 'parrot_compiler.imc --language=PIR';
+$ENV{TEST_PROG_ARGS} = 'parrot_compiler.pir --language=PIR';
 language_output_is( 'ParrotCompiler', $code{PIR}, $out{PIR},
                     $ENV{TEST_PROG_ARGS} );
 
@@ -99,7 +99,7 @@ TODO:
 $ENV{TEST_PROG_ARGS} = 'parrot_compiler.pbc --language=PAST';
 language_output_is( 'ParrotCompiler', $code{PAST}, $out{PAST}, $ENV{TEST_PROG_ARGS} );
 
-$ENV{TEST_PROG_ARGS} = 'parrot_compiler.imc --language=PAST';
+$ENV{TEST_PROG_ARGS} = 'parrot_compiler.pir --language=PAST';
 language_output_is( 'ParrotCompiler', $code{PAST}, $out{PAST},
                     $ENV{TEST_PROG_ARGS} );
 

@@ -39,9 +39,9 @@ realclean : clean
 parrot.pbc : parrot.pasm
 	$(PARROT) -o parrot.pbc parrot.pasm
 
-parrot_compiler.pbc : parrot_compiler.imc
-	$(PARROT) -o parrot_compiler.pbc parrot_compiler.imc
+parrot_compiler.pbc : parrot_compiler.pir
+	$(PARROT) -o parrot_compiler.pbc parrot_compiler.pir
 
-parrot_compiler.pasm : parrot_compiler.imc
-	$(PARROT) -o parrot_compiler.pasm parrot_compiler.imc
+parrot_compiler.pasm : parrot_compiler.pir
+	$(PARROT) -o parrot_compiler.pasm parrot_compiler.pir
 
