@@ -55,7 +55,7 @@ Parrot_memalign(size_t align, size_t size)
     amountToAllocate = roundUpToPageBoundary(size + padding);
     
     {
-        vm_address_t p = NULL;
+        vm_address_t p = (vm_address_t)NULL;
         kern_return_t status = vm_allocate(mach_task_self(), &p, 
                                                 amountToAllocate, 1);
         
