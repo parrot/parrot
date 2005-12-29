@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 11;
+use Parrot::Test tests => 12;
 use Test::More;
 
 language_output_is("tcl",<<'TCL',<<OUT,"return value");
@@ -14,6 +14,15 @@ language_output_is("tcl",<<'TCL',<<OUT,"return value");
 TCL
 2
 
+OUT
+
+language_output_is("tcl",<<'TCL',<<'OUT',"return value from user-defined command");
+ proc foo {} {
+   append x {foo bar}
+ }
+ puts [foo]
+TCL
+foo bar
 OUT
 
 language_output_is("tcl",<<'TCL',<<OUT,"noarg");
