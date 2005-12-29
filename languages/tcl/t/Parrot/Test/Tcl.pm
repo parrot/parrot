@@ -2,6 +2,8 @@ package Parrot::Test::Tcl;
 
 use File::Basename;
 
+require Parrot::Test;
+
 =head1 Parrot::Test::Tcl
 
 Provide language specific testing routines here...
@@ -15,7 +17,16 @@ sub new {
   return bless {};
 }
 
-sub output_is() {
+
+my %language_test_map = (
+    output_is         => 'is_eq',
+    output_like       => 'like',
+    output_isnt       => 'isnt_eq'
+                        );
+
+foreach my $func ( keys %language_test_map ) {
+
+  *{"Parrot::Test::Tcl::$func"} = sub ($$;$) {
 
   my ($self, $code, $output, $desc) = @_;
   
@@ -49,7 +60,13 @@ sub output_is() {
   
   unless ($pass) {
     my $file = Parrot::Test::slurp_file($out_f);
-    $pass =$self->{builder}->is_eq( Parrot::Test::slurp_file($out_f), $output, $desc );
+    my $builder_func = $language_test_map{$func};
+    
+    {
+       no strict 'refs';
+
+       $pass = $self->{builder}->$builder_func( Parrot::Test::slurp_file($out_f), $output, $desc );
+    }
     $self->{builder}->diag("'$cmd' failed with exit code $exit_code")
       if $exit_code and not $pass;
   }
@@ -60,6 +77,7 @@ sub output_is() {
   }
 
   return $pass;
+}
 }
 
 1;
