@@ -2,7 +2,8 @@
 
 use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 109;
+
+use Parrot::Test tests => 115;
 use Parrot::Config;
 use Test::More;
 
@@ -551,6 +552,42 @@ PARROT
 OUT
 
 
+language_output_is("tcl",<<'TCL',<<OUT,"string replace, bad args");
+    string replace
+TCL
+wrong # args: should be "string replace string first last ?string?"
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"string replace, simple");
+    puts [string replace parrcamelot 4 8]
+TCL
+parrot
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"string replace, negative index");
+    puts [string replace junkparrot -10 3]
+TCL
+parrot
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"string replace, index bigger than string");
+    puts [string replace parrotjunk 6 20]
+TCL
+parrot
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"string replace, by something");
+    puts [string replace perl 1 3 arrot]
+TCL
+parrot
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"string replace, swapped indexes");
+    puts [string replace perl 3 1 arrot]
+TCL
+perl
+OUT
+
 
 language_output_is("tcl",<<'TCL',<<OUT,"string trimleft, bad args");
    string trimleft
@@ -629,7 +666,6 @@ language_output_is("tcl",<<'TCL',<<OUT,"string trim, char set, no match");
 TCL
 abcfaoo
 OUT
-
 
 # XXX - many of the classes are NOT tested here, and we rely
 # on the cvs tests from tcl for that.

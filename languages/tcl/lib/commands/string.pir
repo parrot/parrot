@@ -712,7 +712,58 @@ nope:
 
 bad_args:
   .throw('wrong # args: should be "string is class ?-strict? ?-failindex var? str"')
+.end
 
+                           
+.sub "replace"
+  .param pmc argv
+
+  .local int argc
+  .local int low
+  .local int high
+  .local int len
+  .local pmc retval
+
+  .local pmc string_index
+  string_index = find_global "_Tcl", "__string_index"
+
+  argc = argv
+  if argc > 4 goto bad_args
+  if argc < 3 goto bad_args
+  
+  $S1 = argv[0]
+  $S4 = ""
+         
+  $S2 = argv[1]
+  low = string_index($S2, $S1)
+
+  $S3 = argv[2]
+  high = string_index($S3, $S1)
+
+  if high < low goto replace_done
+
+  if low >= 0 goto low_ok
+  low = 0
+
+low_ok:
+  len = length $S1
+  if high <= len goto high_ok
+  high = len
+
+high_ok:        
+  if argc == 1 goto replace_do
+  $S4 = argv[3]
+
+replace_do:
+  len = high - low
+  len += 1
+  substr $S1, low, len, $S4         
+
+replace_done:   
+  .return($S1)
+
+bad_args:
+  .throw ("wrong # args: should be \"string replace string first last ?string?\"")
 .end
 
          
@@ -834,3 +885,4 @@ bad_args:
 
 .end
          
+
