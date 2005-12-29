@@ -115,7 +115,8 @@ sub runsteps
 {
     my $self = shift;
 
-    my ($verbose, $verbose_step, $ask) = $self->options->get(qw(verbose verbose-step ask));
+    my ($verbose, $verbose_step, $ask) =
+        $self->options->get(qw(verbose verbose-step ask));
 
     my $n = 0; # step number
     foreach my $step ($self->steps) {
@@ -125,6 +126,7 @@ sub runsteps
         die $@ if $@;
 
         my $description = $step->description;
+        $description = "" unless defined $description;
 
         # set per step verbosity
         if (defined $verbose_step) {
