@@ -97,7 +97,7 @@ my @unified_testable_languages =
        tcl
        unlambda
        urm );
-# @unified_testable_languages = qw( jako );
+@unified_testable_languages = qw( regex );
 
 my @harnesses =
     grep {-f $_}
