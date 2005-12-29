@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 82;
+use Parrot::Test tests => 92;
 use Parrot::Config;
 use Test::More;
 
@@ -72,9 +72,6 @@ TCL
 wrong # args: should be "string first subString string ?startIndex?"
 OUT
 
-TODO: {
-  local $TODO = "implement string last";
-
 language_output_is("tcl",<<TCL,<<OUT,"last, initial");
  puts [string last a abcdefa]
 TCL
@@ -100,21 +97,23 @@ TCL
 OUT
 
 language_output_is("tcl",<<TCL,<<OUT,"last, index, end");
- puts [string last c abcdc end-4]
+ puts [string last c abcdc end-2]
 TCL
-4
+2
 OUT
 
+## Overshot is ignored in this case as the maximum between the string
+## of the offset is considered
 language_output_is("tcl",<<TCL,<<OUT,"last, index, overshot");
  puts [string last c abcd 20]
 TCL
--1
+2
 OUT
 
 language_output_is("tcl",<<TCL,<<OUT,"last, index");
  puts [string last c abcdc 1]
 TCL
-4
+-1
 OUT
 
 language_output_is("tcl",<<TCL,<<OUT,"last, index, invalid index");
@@ -126,16 +125,14 @@ OUT
 language_output_is("tcl",<<TCL,<<OUT,"last, not enough args");
  string last
 TCL
-wrong # args: should be "string last subString string ?startIndex?"
+wrong # args: should be "string last subString string ?lastIndex?"
 OUT
 
 language_output_is("tcl",<<TCL,<<OUT,"last, too many args");
  string last a b c d
 TCL
-wrong # args: should be "string last subString string ?startIndex?"
+wrong # args: should be "string last subString string ?lastIndex?"
 OUT
-
-}
 
 language_output_is("tcl",<<TCL,<<OUT,"index, too many args");
  string index a b c
@@ -458,6 +455,69 @@ TCL
 1
 OUT
 }
+
+language_output_is("tcl",<<'TCL',<<OUT,"string tolower, Simple");
+  puts [string tolower "AabcD ABC"]
+TCL
+aabcd abc
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"string tolower, bad args");
+   string tolower
+TCL
+wrong # args: should be "string tolower string ?first? ?last?"
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"string tolower, both limits");
+    puts [string tolower PARROT end-4 4]
+TCL
+ParroT
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"string tolower, single index");
+    puts [string tolower PARROT 4]
+TCL
+PARRoT
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"string tolower, single index, out of string");
+    puts [string tolower PARROT 40]
+TCL
+PARROT
+OUT
+
+
+
+language_output_is("tcl",<<'TCL',<<OUT,"string toupper, Simple");
+  puts [string toupper "AabcD ABC"]
+TCL
+AABCD ABC
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"string toupper, bad args");
+   string toupper
+TCL
+wrong # args: should be "string toupper string ?first? ?last?"
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"string toupper, both limits");
+    puts [string toupper parrot end-4 4]
+TCL
+pARROt
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"string toupper, single index");
+    puts [string toupper parrot 4]
+TCL
+parrOt
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"string toupper, single index, out of string");
+    puts [string tolower parrot 40]
+TCL
+parrot
+OUT
+
 
 # XXX - many of the classes are NOT tested here, and we rely
 # on the cvs tests from tcl for that.

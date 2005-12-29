@@ -63,6 +63,54 @@ bad_args:
 
 .end
 
+.sub "last"
+  .param pmc argv
+
+  .local int argc
+  .local pmc retval
+
+  argc = argv
+  if argc > 3 goto bad_args
+  if argc < 2 goto bad_args
+  $S1 = argv[0]
+  $S2 = argv[1]
+  
+  $I0 = length $S2
+  if argc == 2 goto last_do
+  
+  $S3 = argv[2]
+  .local pmc string_index
+  string_index = find_global "_Tcl", "__string_index"
+  $I1 = string_index($S3,$S2)
+
+  if $I1 > $I0 goto last_do
+  $I0 = $I1
+
+last_do:
+  .local int index_1
+  index_1 = index $S2, $S1, 0
+  if index_1 > $I0 goto not_found
+  if index_1 < 0   goto not_found
+
+iterate:	
+  $I1 = index_1
+  $I2 = $I1 + 1
+  index_1 = index $S2, $S1, $I2
+  if index_1 < 0   goto return
+  if index_1 > $I0 goto return
+  goto iterate
+
+return:	
+  .return($I1)
+
+not_found:
+  .return(-1)
+  
+bad_args:
+  .throw ("wrong # args: should be \"string last subString string ?lastIndex?\"")
+
+.end
+
 .sub "index"
   .param pmc argv
 
@@ -90,6 +138,110 @@ bad_index:
 done:
   .return (retval)
 .end
+
+
+.sub "tolower"
+  .param pmc argv
+
+  .local int argc
+  .local pmc retval
+
+  argc = argv
+  if argc > 3 goto bad_args
+  if argc < 1 goto bad_args
+  
+  $S1 = argv[0]
+  $I1 = length $S1 # it will be useful
+
+  # If no range is specified, do to all the string
+  $I2 = 0
+  $I3 = $I1
+  if argc == 1 goto tolower_do
+
+  .local pmc string_index
+  string_index = find_global "_Tcl", "__string_index"
+
+  $S2 = argv[1]
+  $I2 = string_index($S2, $S1)
+  # if just the first is specified, the last is the same (tclsh says so)
+  $I3 = $I2
+  if argc == 2 goto tolower_do
+  
+  $S3 = argv[2]
+  $I3 = string_index($S3, $S1)
+
+tolower_do:
+  if $I2 > $I1  goto tolower_return
+  if $I3 <= $I1 goto tolower_start
+  $I3 = $I1
+
+tolower_start:
+  $I4 = $I3 - $I2
+  $I4+= 1
+  $S2 = substr $S1, $I2, $I4
+  downcase $S2
+  substr $S1, $I2, $I4, $S2
+
+tolower_return:	
+  .return($S1)
+
+bad_args:
+  .throw ("wrong # args: should be \"string tolower string ?first? ?last?\"")
+
+.end
+
+
+
+.sub "toupper"
+  .param pmc argv
+
+  .local int argc
+  .local pmc retval
+
+  argc = argv
+  if argc > 3 goto bad_args
+  if argc < 1 goto bad_args
+  
+  $S1 = argv[0]
+  $I1 = length $S1 # it will be useful
+
+  # If no range is specified, do to all the string
+  $I2 = 0
+  $I3 = $I1
+  if argc == 1 goto toupper_do
+
+  .local pmc string_index
+  string_index = find_global "_Tcl", "__string_index"
+
+  $S2 = argv[1]
+  $I2 = string_index($S2, $S1)
+  # if just the first is specified, the last is the same (tclsh says so)
+  $I3 = $I2
+  if argc == 2 goto toupper_do
+  
+  $S3 = argv[2]
+  $I3 = string_index($S3, $S1)
+
+toupper_do:
+  if $I2 > $I1  goto toupper_return
+  if $I3 <= $I1 goto toupper_start
+  $I3 = $I1
+
+toupper_start:
+  $I4 = $I3 - $I2
+  $I4+= 1
+  $S2 = substr $S1, $I2, $I4
+  upcase $S2
+  substr $S1, $I2, $I4, $S2
+
+toupper_return:	
+  .return($S1)
+
+bad_args:
+  .throw ("wrong # args: should be \"string toupper string ?first? ?last?\"")
+
+.end
+
 
 .sub "bytelength"
   .param pmc argv
