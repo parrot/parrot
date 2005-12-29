@@ -8,7 +8,7 @@ Tcl Compiler
 
 This is the compiler portion of ParTcl.
 
-=head FUNCTIONS
+=head1 FUNCTIONS
 
 =over 4
 
@@ -185,6 +185,108 @@ compile_it:
 
   .return pir_compiler(pir_code)
 .end
+
+=back
+
+=cut
+
+.namespace [ "TclCompiler" ]
+
+=head1 TclCompiler
+
+A helper object for managing tcl compilation.
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+.sub __class_init :load
+  $P0 = newclass 'TclCompiler'
+  addattribute $P0, 'inline'   # inline PIR code.
+  addattribute $P0, 'deferred' # deferred PIR code
+  addattribute $P0, 'result'   # What's the result register?
+.end
+
+.sub __init :method
+  $P0 = new .TclString
+  setattribute self, "TclCompiler\x00inline", $P0
+  $P0 = new .TclString
+  setattribute self, "TclCompiler\x00deferred", $P0
+  $P0 = new .TclInt
+  setattribute self, "TclCompiler\x00result", $P0
+.end
+
+=item int add_code(string)
+
+compile the given string as tcl code. Return the register that the
+result is stored in.
+
+=item int add_expression(string)
+
+compile the given string as an [expr]ession. Return the register that the
+result is stored in.
+
+=item add_pir(string)
+
+add the raw PIR to be executed.
+
+=cut
+
+.sub 'add_pir' :method
+  .param string code
+
+   $P1 = getattribute self, "TclCompiler\x00inline"
+   $P1 .= code
+
+.end
+
+=item defer_pir(string)
+
+add the raw PIR to be added at the end. (For [proc], [exec], etc.)
+
+=cut
+
+.sub 'defer_pir' :method
+  .param string code
+
+   $P1 = getattribute self, "TclCompiler\x00deferred"
+   $P1 .= code
+
+.end
+
+=item set_result_register(int)
+
+If this is set, the final result of the generated sub is this register.
+
+=cut
+
+.sub 'set_result_register' :method
+  .param int reg
+
+   $P1 = getattribute self, "TclCompiler\x00result"
+   $P1 = reg
+
+.end
+
+=item int get_result_register()
+
+=cut
+
+.sub 'get_result_register' :method
+  $P1 = getattribute self, "TclCompiler\x00result"
+  .return($P1)
+.end
+
+=item __get_string()
+
+should only be called at the end of the compile cycle. Generates a PIR string
+containing all the code (immediate and deferred).
+
+=item execute()
+
+Compile and execute the code associated with this compiler object.
 
 =back
 
