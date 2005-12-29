@@ -256,16 +256,14 @@ number:
   .return get_number(expr, pos)
 
 quote:
-  $P0 = new .Hash
-  $P0[93] = 1 # ]
-  $P0[59] = 1 # ;
-  .return get_quote(expr, $P0, pos)
+  ($P0, $I0) = get_quote(expr, pos)
+  inc $I0
+  .return($P0, $I0)
 
 brace:
-  $P0 = new .Hash
-  $P0[93] = 1 # ]
-  $P0[59] = 1 # ;
-  .return get_brace(expr, $P0, pos)
+  ($P0, $I0) = get_brace(expr, pos)
+  inc $I0
+  .return($P0, $I0)
 
 unary:
   .return get_unary(expr, pos)

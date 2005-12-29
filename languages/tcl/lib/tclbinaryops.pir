@@ -76,9 +76,10 @@
   $P1[1] = l_reg
   $P1[2] = r_reg # $S%i=$P%i
   $P1[3] = r_reg
-  $P1[5] = register_num  # $I%i = isne $S%i, $S%i
-  $P1[6] = l_reg
-  $P1[7] = r_reg
+  $P1[4] = register_num  # $I%i = isne $S%i, $S%i
+  $P1[5] = l_reg
+  $P1[6] = r_reg
+  $P1[7] = register_num # $P%i = new .String
   $P1[8] = register_num # $P%i = $I%i
   $P1[9] = register_num
 

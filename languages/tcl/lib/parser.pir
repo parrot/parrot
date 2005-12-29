@@ -304,14 +304,14 @@ done:
 dispatch_sub:
   $S0 = dispatch[char]
   $P0 = find_name $S0
-  (word, pos) = $P0(tcl_code, chars, pos)
+  (word, pos) = $P0(tcl_code, pos, chars)
   inc pos
 
 really_done:
   .return(word, pos)
 .end
 
-=item C<(pmc word, int pos) = get_quote(string tcl_code, pmc chars, int pos)>
+=item C<(pmc word, int pos) = get_quote(string tcl_code, int pos, pmc chars)>
 
 Parses a quote and returns a TclWord object containing the separate
 parts (or, if there's only one, it's child).
@@ -325,8 +325,9 @@ parts (or, if there's only one, it's child).
 
 .sub get_quote
   .param string tcl_code
-  .param pmc chars
   .param int pos
+  .param pmc chars     :optional
+  .param int has_chars :opt_flag
   
   .local int start
   start = pos + 1
@@ -388,6 +389,7 @@ missing_quote:
 check_chars:
   $I0 = pos + 1
   if $I0 == len goto save_end
+  unless has_chars goto save_end
   $I1 = is_cclass .CCLASS_WHITESPACE, tcl_code, $I0
   if $I1 == 1 goto save_end
   $I1 = ord tcl_code, $I0
@@ -414,7 +416,7 @@ really_done:
   .return(word, pos)
 .end
 
-=item C<(pmc const, int pos) = get_brace(string tcl_code, pmc chars, int pos)>
+=item C<(pmc const, int pos) = get_brace(string tcl_code, int pos, pmc chars)>
 
 Parses a {} quoted expression, returning a TclConst object.
 
@@ -427,8 +429,9 @@ Parses a {} quoted expression, returning a TclConst object.
 
 .sub get_brace
   .param string tcl_code
-  .param pmc chars
   .param int pos
+  .param pmc chars     :optional
+  .param int has_chars :opt_flag
   
   .local int start, len
   start = pos + 1
@@ -462,6 +465,7 @@ missing_close_brace:
 check_chars:
   $I0 = pos + 1
   if $I0 == len goto done
+  unless has_chars goto done
   $I1 = is_cclass .CCLASS_WHITESPACE, tcl_code, $I0
   if $I1 == 1 goto done
   $I1 = ord tcl_code, $I0

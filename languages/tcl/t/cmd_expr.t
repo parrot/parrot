@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 52;
+use Parrot::Test tests => 57;
 use Test::More;
 
 language_output_is("tcl",<<TCL,<<OUT,"int");
@@ -128,7 +128,7 @@ TCL
 OUT
 
 language_output_is("tcl",<<TCL,<<OUT,"==, eq");
- puts [expr 1 == 1]
+ puts [expr 2 == 2]
 TCL
 1
 OUT
@@ -335,5 +335,35 @@ language_output_is("tcl",<<'TCL',<<'OUT',"puts inside an expr");
 TCL
 2
 
+OUT
+
+language_output_is("tcl",<<'TCL',<<'OUT',"eq, extra characters after quotes");
+  puts [expr {"foo"eq{foo}}]
+TCL
+1
+OUT
+
+language_output_is("tcl",<<'TCL',<<'OUT',"eq, extra characters after brace");
+  puts [expr {{foo}eq"foo"}]
+TCL
+1
+OUT
+
+language_output_is("tcl",<<'TCL',<<'OUT',"eq (false)");
+  puts [expr {"foo"eq{baz}}]
+TCL
+0
+OUT
+
+language_output_is("tcl",<<'TCL',<<'OUT',"ne (true)");
+  puts [expr {{foo}ne{baz}}]
+TCL
+1
+OUT
+
+language_output_is("tcl",<<'TCL',<<'OUT',"ne (false)");
+  puts [expr {{foo}ne{foo}}]
+TCL
+0
 OUT
 
