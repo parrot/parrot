@@ -192,6 +192,7 @@ bad_args:
 
 
 
+
 .sub "toupper"
   .param pmc argv
 
@@ -713,3 +714,123 @@ bad_args:
   .throw('wrong # args: should be "string is class ?-strict? ?-failindex var? str"')
 
 .end
+
+         
+.sub "trimleft"
+  .param pmc argv
+
+  .local int argc
+  .local pmc retval
+
+  argc = argv
+  if argc > 2 goto bad_args
+  if argc < 1 goto bad_args
+  
+  $S1 = argv[0]
+  $S2 = " \t\r\n"
+
+  if argc == 1 goto trimleft_do
+
+  $S2 = argv[1]
+
+trimleft_do:
+  .local string char
+
+  char = substr $S1, 0, 1
+  $I1 = index $S2, char
+
+  if $I1 < 0 goto trimleft_done
+  substr $S1, 0, 1, ""
+  goto trimleft_do
+         
+trimleft_done:  
+  .return($S1)
+
+bad_args:
+  .throw ("wrong # args: should be \"string trimleft string ?chars?\"")
+
+.end
+
+
+                  
+.sub "trimright"
+  .param pmc argv
+
+  .local int argc
+  .local pmc retval
+
+  argc = argv
+  if argc > 2 goto bad_args
+  if argc < 1 goto bad_args
+  
+  $S1 = argv[0]
+  $S2 = " \t\r\n"
+
+  if argc == 1 goto trimright_do
+
+  $S2 = argv[1]
+
+trimright_do:
+  .local string char
+
+  char = substr $S1, -1, 1
+  $I1 = index $S2, char
+
+  if $I1 < 0 goto trimright_done
+  chopn $S1, 1
+  goto trimright_do
+         
+trimright_done:  
+  .return($S1)
+
+bad_args:
+  .throw ("wrong # args: should be \"string trimright string ?chars?\"")
+
+.end
+
+# here, I might use trimleft and trim right, but I think it is
+# better to implement it here as it should be faster
+                  
+.sub "trim"
+  .param pmc argv
+
+  .local int argc
+  .local pmc retval
+
+  argc = argv
+  if argc > 2 goto bad_args
+  if argc < 1 goto bad_args
+  
+  $S1 = argv[0]
+  $S2 = " \t\r\n"
+
+  if argc == 1 goto trim_do1
+
+  $S2 = argv[1]
+
+trim_do1:
+  .local string char
+
+  char = substr $S1, -1, 1
+  $I1 = index $S2, char
+
+  if $I1 < 0 goto trim_do2
+  chopn $S1, 1
+  goto trim_do1
+
+trim_do2:       
+  char = substr $S1, 0, 1
+  $I1 = index $S2, char
+
+  if $I1 < 0 goto trim_done
+  substr $S1, 0, 1, ""
+  goto trim_do2
+         
+trim_done:  
+  .return($S1)
+
+bad_args:
+  .throw ("wrong # args: should be \"string trim string ?chars?\"")
+
+.end
+         

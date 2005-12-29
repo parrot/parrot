@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 97;
+use Parrot::Test tests => 109;
 use Parrot::Config;
 use Test::More;
 
@@ -548,6 +548,86 @@ language_output_is("tcl",<<'TCL',<<OUT,"string totitle, single index, out of str
     puts [string totitle PARROT 40]
 TCL
 PARROT
+OUT
+
+
+
+language_output_is("tcl",<<'TCL',<<OUT,"string trimleft, bad args");
+   string trimleft
+TCL
+wrong # args: should be "string trimleft string ?chars?"
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"string trimleft, no chars");
+   puts [string trimleft "  \nfoo"]
+TCL
+foo
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"string trimleft, char set");
+   puts [string trimleft "abcfaoo" abc]
+TCL
+faoo
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"string trimleft, char set, no match");
+   puts [string trimleft "abcfaoo" z]
+TCL
+abcfaoo
+OUT
+
+
+
+language_output_is("tcl",<<'TCL',<<OUT,"string trimright, bad args");
+   string trimright
+TCL
+wrong # args: should be "string trimright string ?chars?"
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"string trimright, no chars");
+   puts [string trimright " foo  "]
+TCL
+ foo
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"string trimright, char set");
+   puts [string trimright "abcfaoo" ao]
+TCL
+abcf
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"string trimright, char set, no match");
+   puts [string trimright "abcfaoo" z]
+TCL
+abcfaoo
+OUT
+
+
+
+
+
+language_output_is("tcl",<<'TCL',<<OUT,"string trim, bad args");
+   string trim
+TCL
+wrong # args: should be "string trim string ?chars?"
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"string trim, no chars");
+   puts [string trim " \n foo  "]
+TCL
+foo
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"string trim, char set");
+   puts [string trim "ooabacfaoo" ao]
+TCL
+bacf
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"string trim, char set, no match");
+   puts [string trim "abcfaoo" z]
+TCL
+abcfaoo
 OUT
 
 
