@@ -243,6 +243,59 @@ bad_args:
 .end
 
 
+
+.sub "totitle"
+  .param pmc argv
+
+  .local int argc
+  .local pmc retval
+
+  argc = argv
+  if argc > 3 goto bad_args
+  if argc < 1 goto bad_args
+  
+  $S1 = argv[0]
+  $I1 = length $S1 # it will be useful
+
+  # If no range is specified, do to all the string
+  $I2 = 0
+  $I3 = $I1
+  if argc == 1 goto totitle_do
+
+  .local pmc string_index
+  string_index = find_global "_Tcl", "__string_index"
+
+  $S2 = argv[1]
+  $I2 = string_index($S2, $S1)
+  # if just the first is specified, the last is the same (tclsh says so)
+  $I3 = $I2
+  if argc == 2 goto totitle_do
+  
+  $S3 = argv[2]
+  $I3 = string_index($S3, $S1)
+
+totitle_do:
+  if $I2 > $I1  goto totitle_return
+  if $I3 <= $I1 goto totitle_start
+  $I3 = $I1
+
+totitle_start:
+  $I4 = $I3 - $I2
+  $I4+= 1
+  $S2 = substr $S1, $I2, $I4
+  titlecase $S2
+  substr $S1, $I2, $I4, $S2
+
+totitle_return:	
+  .return($S1)
+
+bad_args:
+  .throw ("wrong # args: should be \"string totitle string ?first? ?last?\"")
+
+.end
+
+
+
 .sub "bytelength"
   .param pmc argv
 

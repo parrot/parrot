@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 92;
+use Parrot::Test tests => 97;
 use Parrot::Config;
 use Test::More;
 
@@ -516,6 +516,38 @@ language_output_is("tcl",<<'TCL',<<OUT,"string toupper, single index, out of str
     puts [string tolower parrot 40]
 TCL
 parrot
+OUT
+
+
+
+language_output_is("tcl",<<'TCL',<<OUT,"string totitle, Simple");
+  puts [string totitle "AabcD ABC"]
+TCL
+Aabcd abc
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"string totitle, bad args");
+   string totitle
+TCL
+wrong # args: should be "string totitle string ?first? ?last?"
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"string totitle, both limits");
+    puts [string totitle PARROT end-4 4]
+TCL
+PArroT
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"string totitle, single index");
+    puts [string totitle parrot 4]
+TCL
+parrOt
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"string totitle, single index, out of string");
+    puts [string totitle PARROT 40]
+TCL
+PARROT
 OUT
 
 
