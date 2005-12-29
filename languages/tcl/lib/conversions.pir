@@ -49,6 +49,7 @@ positive:
   $S0 = substr $S0, 1
   # we check for the length below
   dec $I0
+
 get_value:
   (value, $I1) = get_number($S0, 0)
   if null value goto NaN
@@ -61,3 +62,30 @@ done:
 NaN:
   .throw("Not a number!")
 .end
+
+=head2 _Tcl::__integer
+
+Given a PMC, get an integer from it.
+
+=cut
+
+.sub __integer
+  .param pmc value
+
+  push_eh not_integer
+    value = __number(value)
+  clear_eh
+  $I0 = typeof value
+  if $I0 != .TclInt goto not_integer
+
+  .return(value)
+
+not_integer:
+  $S1 = value
+  $S0 = 'expected integer but got "'
+  $S0 .= $S1
+  $S0 .= '"'
+  .throw($S0)
+.end
+
+

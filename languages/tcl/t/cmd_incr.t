@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 7;
+use Parrot::Test tests => 9;
 use Test::More;
 
 language_output_is("tcl",<<'TCL',<<OUT,"simple");
@@ -60,3 +60,18 @@ language_output_is("tcl",<<'TCL',<<OUT,"error");
 TCL
 wrong # args: should be "incr varName ?increment?"
 OUT
+
+language_output_is("tcl",<<'TCL',<<'OUT',"expected integer, got alpha");
+  set a 1
+  incr a a
+TCL
+expected integer but got "a"
+OUT
+
+language_output_is("tcl",<<'TCL',<<'OUT',"expected integer, got float");
+  set a 1
+  incr a 1.5
+TCL
+expected integer but got "1.5"
+OUT
+

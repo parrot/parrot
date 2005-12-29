@@ -27,9 +27,9 @@
   register_num = value_num + 1
 
   pir_code .= <<"END_PIR"
-.local pmc read, set, number
+.local pmc read, set, integer
 read = find_global '_Tcl', '__read'
-number = find_global '_Tcl', '__number'
+integer = find_global '_Tcl', '__integer'
 set = find_global '_Tcl', '__set'
 END_PIR
 
@@ -42,7 +42,7 @@ END_PIR
   pir_code .= ")\n$P"
   $S0 = register_num
   pir_code .= $S0
-  pir_code .= "=number($P"
+  pir_code .= "=integer($P"
   pir_code .= $S0
   pir_code .= ")\n"
 
@@ -70,9 +70,9 @@ got_increment:
   register_num = value_num + 1
 
   pir_code .= <<"END_PIR"
-.local pmc read, set, number
+.local pmc read, set, integer
 read = find_global '_Tcl', '__read'
-number = find_global '_Tcl', '__number'
+integer = find_global '_Tcl', '__integer'
 set = find_global '_Tcl', '__set'
 END_PIR
 
@@ -85,12 +85,12 @@ END_PIR
   pir_code .= ")\n$P"
   $S0 = register_num
   pir_code .= $S0
-  pir_code .= "=number($P"
+  pir_code .= "=integer($P"
   pir_code .= $S0
   pir_code .= ")\n$P"
   $S0 = increment_num
   pir_code .= $S0
-  pir_code .= "=number($P"
+  pir_code .= "=integer($P"
   pir_code .= $S0
   pir_code .= ")\n"
 
