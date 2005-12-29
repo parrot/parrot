@@ -1,9 +1,3 @@
-#!./parrot -j
-#
-# knucleotide.pir -j < f250k
-# generated from:  fasta.pir -j 250000 > f250k
-
-# by Joshua Isom
 
 .sub main :main
 	.local pmc stdin
@@ -38,14 +32,13 @@ endwhile_2:
 .sub sort_seq
 	.param string seq
 	.param int len
-	.local int seqlen
-	.local int i
+	.local int i, seqend
 	.local pmc table
 	table = new .Hash
 	i = 0
-	seqlen = length seq
+	seqend = length seq
 beginfor:
-	unless i < seqlen goto endfor
+	unless i < seqend goto endfor
 	$S0 = substr seq, i, len
 	$I1 = length $S0
 	if $I1 < len goto endfor
@@ -55,10 +48,11 @@ beginfor:
 	inc i
 	goto beginfor
 endfor:
-	sort_n_print(table, seqlen)
+	sort_n_print(table, i)
 	print "\n"
 .end
 
+.include "iterator.pasm"
 .sub sort_n_print
 	.param pmc table
 	.param int seqlen
@@ -69,7 +63,6 @@ endfor:
 	$I0 = elements table
 	array = $I0
 	
-	.include "iterator.pasm"
 	.local pmc iter
    	iter = new .Iterator, table
 	set iter, .ITERATE_FROM_START
@@ -104,7 +97,7 @@ beginfor:
 	$N0 /= $N1
 	$N0 *= 100
 	$P0[0] = $N0
-	$S0 = sprintf "%4.3f\n", $P0
+	$S0 = sprintf "%.3f\n", $P0
 	print $S0
 	inc i
 	goto beginfor
