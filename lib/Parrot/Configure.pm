@@ -156,6 +156,8 @@ sub runsteps
         # reset verbose value for the next step
         $self->options->set(verbose => $verbose);
     }
+
+    return $self;
 }
 
 =back
