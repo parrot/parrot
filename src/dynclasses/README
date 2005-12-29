@@ -51,7 +51,7 @@ PASM op C<loadlib>.
 
         pmclass Match extends Hash dynpmc group match_group { ... }
 
-and then in your .imc or .pasm file:
+and then in your .pir or .pasm file:
 
         loadlib $P0, "match_group"
 

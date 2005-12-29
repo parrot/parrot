@@ -1268,7 +1268,7 @@ Finally this code here is used to generate native executables (or better
 object files that are linked to executables), if EXEC_CAPABLE is defined.
 This functionality is triggered by
 
-  parrot -o foo.o foo.imc
+  parrot -o foo.o foo.pir
 
 which uses the JIT engine to translate to native code inside the object
 file.

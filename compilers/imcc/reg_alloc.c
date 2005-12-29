@@ -221,7 +221,7 @@ make_stat(IMC_Unit * unit, int *sets, int *cols)
     }
 }
 
-/* registes usage of .imc */
+/* registes usage of .pir */
 static void
 imc_stat_init(IMC_Unit * unit)
 {
@@ -252,7 +252,7 @@ print_stat(Parrot_Interp interpreter, IMC_Unit * unit)
 
     make_stat(unit, sets, unit->n_regs_used);
     IMCC_info(interpreter, 1,
-            "sub %s:\n\tregisters in .imc:\t I%d, N%d, S%d, P%d\n",
+            "sub %s:\n\tregisters in .pir:\t I%d, N%d, S%d, P%d\n",
             function,
             unit->n_vars_used[0], unit->n_vars_used[1],
             unit->n_vars_used[2], unit->n_vars_used[3]);

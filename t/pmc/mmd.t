@@ -233,7 +233,7 @@ ok 2
 -42
 OUTPUT
 
-my $temp = "temp.imc";
+my $temp = "temp.pir";
 END { unlink $temp; };
 
 open S, ">$temp" or die "Can't write $temp";
@@ -256,7 +256,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "PASM MMD divide - loaded sub");
 .include "mmd.pasm"
 
     .local pmc divide
-    load_bytecode "temp.imc"
+    load_bytecode "temp.pir"
     divide = global "Integer_divide_Integer"
     mmdvtregister .MMD_DIVIDE, .Integer, .Integer, divide
 
@@ -872,7 +872,7 @@ CODE
 2
 OUTPUT
 
-## my $temp = "temp.imc";
+## my $temp = "temp.pir";
 ## END { unlink $temp; };
 
 open P, ">$temp" or die "can't write $temp";
@@ -891,7 +891,7 @@ EOF
 
 pir_output_is(<<'CODE', <<'OUTPUT', "override builtin n_add");
 .sub main
-    load_bytecode "temp.imc"
+    load_bytecode "temp.pir"
     $P0 = new Integer
     $P1 = new Integer
     set $P0, 6

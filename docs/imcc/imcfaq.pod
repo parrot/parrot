@@ -12,7 +12,7 @@ Initial creation as of Parrot version 0.0.13 by Melvin Smith
 
 =item Revision 0.2 - 10 May 2005
 
-Edited to specify the .pir extension rather than .imc
+Edited to specify the .pir extension rather than .pir
 
 =back
 
@@ -148,8 +148,8 @@ simple, with no arguments or returns. Line comments are allowed in IMC using #.
 
 =head2 How do I compile and run an IMC module?
 
-Parrot uses the filename extension to detect whether the file is an IMC file
-(.pir or the outdated .imc), a Parrot Assembly file (.pasm) or a pre-compiled
+Parrot uses the filename extension to detect whether the file is an PIR file
+(.pir), a Parrot Assembly file (.pasm) or a pre-compiled
 bytecode file (.pbc).
 
 	parrot hello.pir

@@ -6,17 +6,17 @@
 
 =head1 NAME
 
-MD5.imc - calculates MD5 checksums
+MD5.pir - calculates MD5 checksums
 
 =head1 SYNOPSIS
 
-  load_bytecode "Digest/MD5.imc"
+  load_bytecode "Digest/MD5.pir"
   $P0 = _md5sum("foo")
   _md5_print($P0)
 
 or
 
-  load_bytecode "Digest/MD5.imc"
+  load_bytecode "Digest/MD5.pir"
   $P0 = _md5sum("bar")
   $S0 = _md5_hex($P0)
 

@@ -1467,7 +1467,6 @@ dynext-clean :
 test-clean :
 	$(RM_F) \
 		"t/op/*.pasm" \
-		"t/op/*.imc" \
 		"t/op/*.pir" \
 		"t/op/*.pbc" \
 		"t/op/*.out" \
@@ -1485,7 +1484,6 @@ test-clean :
 		"t/compilers/pge/p6rules/*.out" \
 		"t/compilers/tge/*.pir" \
 		"t/compilers/imcc/*/*.out" \
-		"t/compilers/imcc/*/*.imc" \
 		"t/compilers/imcc/*/*.pir" \
 		"t/compilers/imcc/*/*.pbc" \
 		"t/compilers/imcc/*/*.o" \
@@ -1493,7 +1491,6 @@ test-clean :
 		"t/compilers/imcc/*/*.pasm"
 	$(RM_F) \
 		"t/pmc/*.pasm" \
-		"t/pmc/*.imc" \
 		"t/pmc/*.pir" \
 		"t/pmc/*.pbc" \
 		"t/pmc/*.out" \
@@ -1505,12 +1502,10 @@ test-clean :
 		"t/stress/*.o" \
 		"t/stress/*.stabs.s" \
 		"t/src/*.c" \
-		"t/tools/*.imc" \
+		"t/tools/*.pir" \
 		"t/tools/*.pbc" \
-		"t/library/*.imc" \
 		"t/library/*.pir" \
 		"t/library/*.pbc" \
-		"t/benchmarks*.imc" \
 		"t/benchmarks*.pir" \
 		"t/benchmarks*.pasm"
 

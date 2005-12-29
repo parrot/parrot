@@ -200,7 +200,7 @@ get_new_pmc_header(Interp *interpreter, INTVAL base_type,
         /*
          * XXX not yet we can't assure that all contents in the
          * const PMC is const too
-         * see e.g. t/pmc/sarray_13.imc
+         * see e.g. t/pmc/sarray_13.pir
          */
 #if 0
         flags = PObj_constant_FLAG;

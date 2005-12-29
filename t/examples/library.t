@@ -34,7 +34,7 @@ F<t/examples/japh.t>
 my %expected
   = (
     'getopt_demo.pir'        =>  << 'END_EXPECTED',
-Hi, I am 'getopt_demo.imc'.
+Hi, I am 'getopt_demo.pir'.
 
 You haven't passed the option '--bool'. This is fine with me.
 You haven't passed the option '--string'. This is fine with me.

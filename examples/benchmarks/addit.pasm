@@ -50,7 +50,7 @@ DONE:
 
 =head1 SEE ALSO
 
-F<examples/benchmarks/addit.pl>, F<examples/benchmarks/addit.imc>,
-F<examples/benchmarks/addit2.imc>.
+F<examples/benchmarks/addit.pl>, F<examples/benchmarks/addit.pir>,
+F<examples/benchmarks/addit2.pir>.
 
 =cut

@@ -3,11 +3,11 @@
 
 =head1 NAME
 
-examples/benchmarks/arriter.imc - Iterator Benchmark
+examples/benchmarks/arriter.pir - Iterator Benchmark
 
 =head1 SYNOPSIS
 
-    % time ./parrot examples/benchmarks/arriter.imc
+    % time ./parrot examples/benchmarks/arriter.pir
 
 =head1 DESCRIPTION
 
@@ -148,6 +148,6 @@ iter_2_end:
 =head1 SEE ALSO
 
 F<examples/benchmarks/arriter.pl>,
-F<examples/benchmarks/arriter_o1.imc>.
+F<examples/benchmarks/arriter_o1.pir>.
 
 =cut

@@ -3,11 +3,11 @@
 
 =head1 NAME
 
-examples/benchmarks/fib.imc - Fibonacci Benchmark
+examples/benchmarks/fib.pir - Fibonacci Benchmark
 
 =head1 SYNOPSIS
 
-    % time ./parrot examples/benchmarks/fib.imc n
+    % time ./parrot examples/benchmarks/fib.pir n
 
 =head1 DESCRIPTION
 

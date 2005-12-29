@@ -3,13 +3,13 @@
 
 =head1 NAME
 
-examples/library/getopt_demo.imc - demonstrating library/Getopt/Long.pir
+examples/library/getopt_demo.pir - demonstrating library/Getopt/Long.pir
 
 =head1 SYNOPSIS
 
-    % ./parrot examples/library/getopt_demo.imc --help
-    % ./parrot examples/library/getopt_demo.imc --version
-    % ./parrot examples/library/getopt_demo.imc --string=asdf --bool --integer=42 some thing
+    % ./parrot examples/library/getopt_demo.pir --help
+    % ./parrot examples/library/getopt_demo.pir --version
+    % ./parrot examples/library/getopt_demo.pir --string=asdf --bool --integer=42 some thing
 
 =head1 DESCRIPTION
 
@@ -22,7 +22,7 @@ PIR library F<runtime/parrot/library/Getopt/Long.pir>.
 
 =head2 main
 
-This is executed when you call F<getopt_demo.imc>.
+This is executed when you call F<getopt_demo.pir>.
 
 =cut
 
@@ -61,7 +61,7 @@ This is executed when you call F<getopt_demo.imc>.
   # Was '--version' passed ?
   is_defined = defined opt["version"]
   unless is_defined goto NO_VERSION_FLAG
-    print "getopt_demo.imc 0.03\n"
+    print "getopt_demo.pir 0.03\n"
     end
   NO_VERSION_FLAG:
 
@@ -73,7 +73,7 @@ This is executed when you call F<getopt_demo.imc>.
   NO_HELP_FLAG:
 
   # Say Hi
-  print "Hi, I am 'getopt_demo.imc'.\n"
+  print "Hi, I am 'getopt_demo.pir'.\n"
   print "\n"
 
   # handle the bool option

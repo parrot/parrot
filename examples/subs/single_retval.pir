@@ -7,7 +7,7 @@ examples/subs/single_retval.pir - Subroutine example
 
 =head1 SYNOPSIS
 
-    % ./parrot examples/subs/single_retval.imc
+    % ./parrot examples/subs/single_retval.pir
 
 =head1 DESCRIPTION
 

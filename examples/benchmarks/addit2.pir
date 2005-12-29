@@ -3,11 +3,11 @@
 
 =head1 NAME
 
-examples/benchmarks/addit2.imc - Variable Argument Subroutines
+examples/benchmarks/addit2.pir - Variable Argument Subroutines
 
 =head1 SYNOPSIS
 
-    % time ./parrot examples/benchmarks/addit2.imc
+    % time ./parrot examples/benchmarks/addit2.pir
 
 =head1 DESCRIPTION
 
@@ -70,7 +70,7 @@ FIN:
 =head1 SEE ALSO
 
 F<examples/benchmarks/addit.pl>, F<examples/benchmarks/addit.pasm>,
-F<examples/benchmarks/addit.imc>.
+F<examples/benchmarks/addit.pir>.
 
 =cut
 

@@ -3,11 +3,11 @@
 
 =head1 NAME
 
-examples/benchmarks/array_access.imc - Reading from array
+examples/benchmarks/array_access.pir - Reading from array
 
 =head1 SYNOPSIS
 
-    ./parrot examples/benchmarks/array_access.imc --arr-size=1000
+    ./parrot examples/benchmarks/array_access.pir --arr-size=1000
 
 =head1 DESCRIPTION
 

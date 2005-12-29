@@ -1465,7 +1465,7 @@ run_thaw(Parrot_Interp interpreter, STRING* image, visit_enum_type what)
      *
      * XXX
      *
-     * md5_3.imc shows a segfault during thawing the config hash
+     * md5_3.pir shows a segfault during thawing the config hash
      * info->thaw_ptr becomes invalid - seems that the hash got
      * collected under us.
      */

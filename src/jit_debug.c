@@ -295,12 +295,12 @@ Parrot_jit_debug_stabs(Interp *interpreter)
         pasmfile = string_make(interpreter, src, strlen(src), NULL,
                 PObj_external_FLAG);
         file = string_copy(interpreter, pasmfile);
-        /* chop pasm/imc */
+        /* chop pasm/pir */
 
         ext = strrchr(src, '.');
         if (ext && strcmp (ext, ".pasm") == 0)
             file = string_chopn(interpreter, file, 4, 1);
-        else if (ext && strcmp (ext, ".imc") == 0)
+        else if (ext && strcmp (ext, ".pir") == 0)
             file = string_chopn(interpreter, file, 3, 1);
         else if (!ext) /* EVAL_n */
             file = string_append(interpreter, file,

@@ -1,5 +1,9 @@
 # $Id$
 
+2005.12.28    particle
+	* renamed all .imc files to .pir
+	* modified all doc references to .pir as well
+
 2005.12.13    particle
 	* moved jit/ directory to src/jit/
 

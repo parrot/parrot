@@ -5390,7 +5390,7 @@ include_file (Interp* interp, char *file_name)
             frame->s.pasm_file = 1;
             BEGIN(emit);
         }
-        else if (strcmp (ext, ".imc") == 0) {
+        else if (strcmp (ext, ".pir") == 0) {
             frame->s.pasm_file = 0;
             BEGIN(INITIAL);
         }

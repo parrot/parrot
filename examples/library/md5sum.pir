@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-examples/library/md5sum.imc - calculate MD5 checksums
+examples/library/md5sum.pir - calculate MD5 checksums
 
 =head1 SYNOPSIS
 

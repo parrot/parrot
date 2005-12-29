@@ -45,7 +45,7 @@ OUT
 unlink "temp.pasm";
 
 ##############################
-open FOO, ">temp.imc" or die "Can't write temp.imc\n";
+open FOO, ">temp.pir" or die "Can't write temp.pir\n";
 print FOO <<'ENDF';
   .const int BAR = 42
 ENDF
@@ -54,7 +54,7 @@ close FOO;
 pir_output_is(<<'CODE', <<'OUT', "include pir");
 .sub test :main
     print "before\n"
-    .include "temp.imc"
+    .include "temp.pir"
     print BAR
     print "\nafter\n"
     end
@@ -64,7 +64,7 @@ before
 42
 after
 OUT
-unlink "temp.imc";
+unlink "temp.pir";
 
 ##############################
 open FOO, ">temp.inc" or die "Can't write temp.inc\n";
@@ -140,7 +140,7 @@ OUT
 # test load_bytecode branches and subs
 
 # write sub2
-open FOO, ">temp.imc" or die "Can't write temp.imc\n";
+open FOO, ">temp.pir" or die "Can't write temp.pir\n";
 print FOO <<'ENDF';
 .pcc_sub _sub2
     print "sub2\n"
@@ -150,7 +150,7 @@ ENDF
 close FOO;
 # compile it
 
-system("$PARROT -o temp.pbc temp.imc");
+system("$PARROT -o temp.pbc temp.pir");
 
 pir_output_is(<<'CODE', <<'OUT', "call sub in external pbc");
 .pcc_sub _sub1
@@ -171,7 +171,7 @@ sub2
 OUT
 
 # write sub2
-open FOO, ">temp.imc" or die "Can't write temp.imc\n";
+open FOO, ">temp.pir" or die "Can't write temp.pir\n";
 print FOO <<'ENDF';
 .pcc_sub _sub2
     print "sub2\n"
@@ -183,7 +183,7 @@ ENDF
 close FOO;
 # compile it
 
-system("$PARROT -o temp.pbc temp.imc");
+system("$PARROT -o temp.pbc temp.pir");
 
 pir_output_is(<<'CODE', <<'OUT', "call sub in external pbc, return");
 .pcc_sub _sub1
@@ -206,7 +206,7 @@ back
 OUT
 
 # write sub2
-open FOO, ">temp.imc" or die "Can't write temp.imc\n";
+open FOO, ">temp.pir" or die "Can't write temp.pir\n";
 print FOO <<'ENDF';
 .pcc_sub _not_sub2
     print "not sub2\n"
@@ -221,7 +221,7 @@ ENDF
 close FOO;
 # compile it
 
-system("$PARROT -o temp.pbc temp.imc");
+system("$PARROT -o temp.pbc temp.pir");
 
 pir_output_is(<<'CODE', <<'OUT', "call sub in external pbc with 2 subs");
 .pcc_sub _sub1
@@ -242,7 +242,7 @@ sub2
 OUT
 
 # write sub2
-open FOO, ">temp.imc" or die "Can't write temp.imc\n";
+open FOO, ">temp.pir" or die "Can't write temp.pir\n";
 print FOO <<'ENDF';
 .pcc_sub _sub2
     print "sub2\n"
@@ -254,10 +254,10 @@ ENDF
 close FOO;
 # compile it
 
-pir_output_is(<<'CODE', <<'OUT', "call sub in external imc, return");
+pir_output_is(<<'CODE', <<'OUT', "call sub in external pir, return");
 .pcc_sub _sub1
     print "sub1\n"
-    load_bytecode "temp.imc"
+    load_bytecode "temp.pir"
     print "loaded\n"
     $P0 = global "_sub2"
     .pcc_begin
@@ -300,7 +300,7 @@ back
 OUT
 
 # write subs
-open FOO, ">temp.imc" or die "Can't write temp.imc\n";
+open FOO, ">temp.pir" or die "Can't write temp.pir\n";
 print FOO <<'ENDF';
 .pcc_sub _sub1
     print "sub1\n"
@@ -323,7 +323,7 @@ ENDF
 close FOO;
 # compile it
 
-system("$PARROT -o temp.pbc temp.imc");
+system("$PARROT -o temp.pbc temp.pir");
 
 use Test::More;
 is(`$PARROT temp.pbc`, <<OUT, "call internal sub like external, precompiled");
@@ -336,10 +336,10 @@ OUT
   # include a non-existent file and catch the error message
   my $err_msg;
   {
-    open FOO, ">temp.imc" or die "Can't write temp.imc\n";
+    open FOO, ">temp.pir" or die "Can't write temp.pir\n";
     print FOO << 'END_PIR';
 # Including a non-existent file should produce an error
-.include "non_existent.imc"
+.include "non_existent.pir"
 # An error should have been raised
 .sub test :main
   # dummy, because a main function is expected
@@ -350,7 +350,7 @@ END_PIR
     local *OLDERR;
     open OLDERR, ">&STDERR" or die "Can't save STDERR\n";
     open STDERR, ">temp.out" or die "Can't write temp.out\n";
-    system "$PARROT temp.imc";
+    system "$PARROT temp.pir";
     open FOO, "<temp.out" or die "Can't read temp.out\n";
     { local $/; $err_msg = <FOO>; }
     close FOO;
@@ -363,7 +363,7 @@ END_PIR
   {
     open FOO, "<non_existent.file";
     my $ENOENT = $! + 0;
-    open FOO, ">temp.imc" or die "Can't write temp.imc\n";
+    open FOO, ">temp.pir" or die "Can't write temp.pir\n";
     print FOO << "END_PIR";
 .sub test \:main
   # run a OS command, and get the errmessge for the exit code
@@ -374,25 +374,25 @@ END_PIR
 .end
 END_PIR
     close FOO;
-    $enoent_err_msg = qx{$PARROT temp.imc}
+    $enoent_err_msg = qx{$PARROT temp.pir}
   }
 
   $err_msg =~ s/\r//g if $^O =~ /^(MSWin32|msys)$/i;
   is( $err_msg, << "OUT", "including a non-existent file");
 error:imcc:$enoent_err_msg
-in file 'temp.imc' line 2
+in file 'temp.pir' line 2
 OUT
-  unlink "temp.imc";
+  unlink "temp.pir";
 }
 
 SKIP:
 {
   skip("multiple loading not speced - failing", 1);
 
-  pir_output_is(<<'CODE', <<'OUT', "twice call sub in external imc, return");
+  pir_output_is(<<'CODE', <<'OUT', "twice call sub in external pir, return");
 .pcc_sub _sub1
     print "sub1\n"
-    load_bytecode "temp.imc"
+    load_bytecode "temp.pir"
     print "loaded\n"
     $P0 = global "_sub2"
     .pcc_begin
@@ -401,7 +401,7 @@ SKIP:
     .pcc_end
     print "back\n"
     print "sub1 again\n"
-    load_bytecode "temp.imc"
+    load_bytecode "temp.pir"
     print "loaded again\n"
     $P0 = global "_sub2"
     .pcc_begin
@@ -426,6 +426,6 @@ OUT
 END
 {
   unlink $file;
-  unlink "temp.imc";
+  unlink "temp.pir";
   unlink "temp.pbc";
 }

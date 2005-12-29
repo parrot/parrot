@@ -642,7 +642,7 @@ second
 OUTPUT
 
 
-$temp = "temp.imc";
+$temp = "temp.pir";
 open S, ">$temp" or die "Can't write $temp";
 print S <<'EOF';
 .emit
@@ -653,10 +653,10 @@ print S <<'EOF';
 EOF
 close S;
 
-output_is(<<'CODE', <<'OUTPUT', 'load_bytecode :load first sub - imc');
+output_is(<<'CODE', <<'OUTPUT', 'load_bytecode :load first sub - pir');
 .pcc_sub _main:
     print "main\n"
-    load_bytecode "temp.imc"
+    load_bytecode "temp.pir"
     print "back\n"
     end
 CODE
@@ -681,10 +681,10 @@ print S <<'EOF';
 EOF
 close S;
 
-output_is(<<'CODE', <<'OUTPUT', 'load_bytecode :load second sub - imc');
+output_is(<<'CODE', <<'OUTPUT', 'load_bytecode :load second sub - pir');
 .pcc_sub _main:
     print "main\n"
-    load_bytecode "temp.imc"
+    load_bytecode "temp.pir"
     print "back\n"
     end
 CODE
@@ -705,10 +705,10 @@ print S <<'EOF';
 EOF
 close S;
 
-output_is(<<'CODE', <<'OUTPUT', 'load_bytecode no :load - imc');
+output_is(<<'CODE', <<'OUTPUT', 'load_bytecode no :load - pir');
 .pcc_sub _main:
     print "main\n"
-    load_bytecode "temp.imc"
+    load_bytecode "temp.pir"
     print "back\n"
     end
 CODE
@@ -934,7 +934,7 @@ ok
 Global 'foo' not found/
 OUTPUT
 
-open S, ">test_l1.imc" or die "Can't write test_l1.imc";
+open S, ">test_l1.pir" or die "Can't write test_l1.pir";
 print S <<'EOF';
 .sub l11 :load
     print "l11\n"
@@ -946,7 +946,7 @@ print S <<'EOF';
 EOF
 close S;
 
-open S, ">test_l2.imc" or die "Can't write test_l2.imc";
+open S, ">test_l2.pir" or die "Can't write test_l2.pir";
 print S <<'EOF';
 .sub l21 :load
     print "l21\n"
@@ -958,16 +958,16 @@ print S <<'EOF';
 EOF
 close S;
 
-system(".$PConfig{slash}parrot$PConfig{exe} -o test_l1.pbc test_l1.imc");
-system(".$PConfig{slash}parrot$PConfig{exe} -o test_l2.pbc test_l2.imc");
+system(".$PConfig{slash}parrot$PConfig{exe} -o test_l1.pbc test_l1.pir");
+system(".$PConfig{slash}parrot$PConfig{exe} -o test_l2.pbc test_l2.pir");
 
-END { unlink(qw/ test_l1.imc test_l2.imc test_l1.pbc test_l2.pbc /); };
+END { unlink(qw/ test_l1.pir test_l2.pir test_l1.pbc test_l2.pbc /); };
 
 pir_output_is(<<'CODE', <<'OUTPUT', 'multiple :load');
 .sub main :main
     print "main 1\n"
-    load_bytecode "test_l1.imc"
-    load_bytecode "test_l2.imc"
+    load_bytecode "test_l1.pir"
+    load_bytecode "test_l2.pir"
     print "main 2\n"
     load_bytecode "test_l1.pbc"	# these have to be ignored
     load_bytecode "test_l2.pbc"
