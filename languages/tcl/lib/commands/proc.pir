@@ -41,7 +41,8 @@ got_args:
 
   # Save the parsed body.
   .local string parsed_body
-  ($I0,parsed_body) = compiler(0,body_p)
+  .local int body_reg
+  (body_reg,parsed_body) = compiler(0,body_p)
 
   # Save the code for the proc for [info body]
   $P1 = find_global "_Tcl", "proc_body"
@@ -181,11 +182,23 @@ END_PIR
 
   proc_body .= parsed_body
   
-  proc_body .= <<"END_PIR"
+  temp_code = <<"END_PIR"
   clear_eh
 was_ok:
   dec call_level
-  .return($P0)
+  .return($P%i)
+END_PIR
+
+  $P0 = new .Integer
+  $P0 = body_reg
+  $P1 = new .Array
+  $P1 = 1
+  $P1[0] = $P0 
+
+  temp_code = sprintf temp_code, $P1
+  proc_body .= temp_code
+
+  proc_body .= <<"END_PIR"
 is_return:
   .catch()
   .get_return_code($I0)
