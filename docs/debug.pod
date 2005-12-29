@@ -72,7 +72,7 @@ different objects over the lifetime of the program.
 
 =head1 PIR AND PASM CODE
 
-Let's say you have written (or generated) a huge .pasm or .imc file.  It's not
+Let's say you have written (or generated) a huge .pasm or .pir file.  It's not
 working. You'd like some help in figuring out why.
 
 =head2 pdb
@@ -91,7 +91,7 @@ file). It is not strictly necessary, but you'll get more information into the
 bytecode this way.
 
 Let's say your file is named C<test.pasm>. (Note: these instructions will also
-work if you use C<test.imc> everywhere C<test.pasm> occurs.)
+work if you use C<test.pir> everywhere C<test.pasm> occurs.)
 
 Step 1: Generate the .pbc file with extra debugging information.
 

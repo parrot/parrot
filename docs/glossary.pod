@@ -172,7 +172,7 @@ L<http://oss.software.ibm.com/icu/index.html>
 
 Parrot InterMediate Code, or another name for PIR.  A convention once arose to
 name input files to IMCC with the extension ".imc", so the name IMC became
-synonymous with PIR.
+synonymous with PIR. This file extension has since been deprecated.
 
 See also L<"IMCC">, L<"PIR">.
 

@@ -16,7 +16,7 @@ engine and a precompiled Parrot program into a single binary.
 Generating a native executable is done in three steps: building a packfile,
 assembling a native object, and then linking the native executable. 
 
-The packfile is generated in the standard way from .imc or .pasm source by IMCC.
+The packfile is generated in the standard way from .pir or .pasm source by IMCC.
 For a program in myprog.pasm:
 
     ./parrot -o myprog.pbc myprog.pasm
