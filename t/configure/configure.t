@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 use lib qw( . lib ../lib ../../lib );
-use Test::More tests => 11;
+use Test::More tests => 12;
 
 =head1 NAME
 
@@ -101,3 +101,31 @@ can_ok('Parrot::Configure', qw(
 
     isa_ok($pc->runsteps, 'Parrot::Configure');
 }
+
+{
+    package test::step;
+
+    # XXX is there a better way of doing this?
+    $INC{'test/step.pm'}++;
+
+    use vars qw($ran);
+    use base qw(Parrot::Configure::Step::Base);
+
+    $ran = 0;
+    sub runstep
+    {
+        $ran = 1;
+    }
+
+    package main;
+
+    my $pc = Parrot::Configure->new;
+
+    $pc->add_steps('test::step');
+    $pc->runsteps;
+    # otherwise runsteps() output will make Test::Harness think this test
+    # failed.
+    print "\n";
+    is($test::step::ran, 1, "test step was invokved");
+}
+
