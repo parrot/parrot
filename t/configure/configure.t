@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 use lib qw( . lib ../lib ../../lib );
-use Test::More tests => 5;
+use Test::More tests => 11;
 
 =head1 NAME
 
@@ -57,6 +57,47 @@ can_ok('Parrot::Configure', qw(
     isa_ok($pc->options, 'Parrot::Configure::Data');
 }
 
-# ->steps()
-# ->add_steps()
+# ->steps() / ->add_steps()
+
+{
+    my $pc = Parrot::Configure->new;
+    
+    isa_ok($pc->add_steps(), 'Parrot::Configure');
+}
+
+{
+    my $pc = Parrot::Configure->new;
+    
+    is_deeply(scalar $pc->steps, [],
+        "->steps() returns array ref in scalar context");
+}
+
+{
+    my $pc = Parrot::Configure->new;
+    
+    is_deeply([$pc->steps], [], "->steps() returns () in list context");
+}
+
+{
+    my $pc = Parrot::Configure->new;
+    
+    $pc->add_steps(qw(foo::step));
+    is_deeply(scalar $pc->steps, [qw(foo::step)],
+        "->steps() returns the proper list");
+}
+
+{
+    my $pc = Parrot::Configure->new;
+    
+    $pc->add_steps(qw(foo::step bar::step baz::step));
+    is_deeply(scalar $pc->steps, [qw(foo::step bar::step baz::step)],
+        "->steps() returns the proper list");
+}
+
 # ->runsteps()
+
+{
+    my $pc = Parrot::Configure->new;
+
+    isa_ok($pc->runsteps, 'Parrot::Configure');
+}
