@@ -4,7 +4,8 @@
 use FindBin;
 use lib "$FindBin::Bin/../..";
 
-use Scheme::Test tests => 7;
+#use Scheme::Test tests => 7;
+use Scheme::Test skip_all => 'Using obsolete calling conventions';
 
 ###
 ### If

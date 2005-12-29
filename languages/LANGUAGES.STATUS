@@ -692,11 +692,11 @@ regex
 =item Status
 
 Working but fairly minimal.
-Part of languages smoke testing, a lot of tests failing.
+Part of languages smoke testing. Almost all tests are succeeding.
 
 =item Last verified with parrot version
 
-0.3.1
+0.4.0
 
 =item Location
 
@@ -778,10 +778,11 @@ Scheme
 
 Functioning, as far as implemented. Lists and functions are working but many
 functions are missing implementation. 70% pass ratio due to recent deprecations.
+Part of languages smoke testing.
 
 =item Last verified with parrot version
 
-0.3.0
+0.4.0
 
 =item Location
 

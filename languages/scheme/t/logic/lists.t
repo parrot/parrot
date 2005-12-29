@@ -4,7 +4,8 @@
 use FindBin;
 use lib "$FindBin::Bin/../..";
 
-use Scheme::Test tests => 26;
+# use Scheme::Test tests => 26;
+use Scheme::Test skip_all => 'Using obsolete calling conventions';
 
 output_is(<<'CODE', '(2 . 5)', 'cons');
 (write (cons 2 5))

@@ -4,7 +4,8 @@
 use FindBin;
 use lib "$FindBin::Bin/../..";
 
-use Scheme::Test tests => 12;
+# use Scheme::Test tests => 12;
+use Scheme::Test skip_all => 'Using obsolete calling conventions';
 
 output_is (<<'CODE', 'a', 'a symbol');
 (write 'a) ; for emacs ')
