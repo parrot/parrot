@@ -1,7 +1,7 @@
 proc fact { number } {
   set val 1
   while {$number}  {
-    set val [expr $val * $number]
+    set val [expr {$val * $number}]
     incr number -1
   }
   return $val
