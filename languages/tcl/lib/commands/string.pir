@@ -886,3 +886,60 @@ bad_args:
 .end
          
 
+                  
+.sub "compare"
+  .param pmc argv
+
+  .local int argc
+  .local pmc retval
+  .local int size
+
+  size = -1
+  argc = argv
+
+  if argc < 1 goto bad_args
+  
+  $S2 = pop argv
+  $S1 = pop argv
+
+args_processment:       
+  argc = argv
+  if argc == 0 goto args_processed
+  $S4 = shift argv
+  if $S4 == "-nocase" goto arg_nocase
+  if $S4 == "-length" goto arg_length
+  goto bad_args
+
+args_processed:
+  if $S1 == $S2 goto equal         
+  if $S1 < $S2 goto smaller
+  .return(1)
+
+smaller:        
+  .return(-1)
+
+equal:
+  .return(0)         
+         
+arg_nocase:
+  downcase $S1
+  downcase $S2
+  goto args_processment
+
+arg_length:
+  if size != -1 goto bad_args         
+  argc = argv
+  if argc == 0 goto bad_args
+  $S4 = shift argv
+  ### TODO:         
+  ### Here I should check that $S4 is really an integer
+  ### and if not, say something like: expected integer but got "5.4"
+  size = $S4
+  $S1 = substr $S1, 0, size
+  $S2 = substr $S2, 0, size
+  goto args_processment
+         
+bad_args:
+  .throw ("wrong # args: should be \"string compare ?-nocase? ?-length int? string1 string2\"")
+
+.end

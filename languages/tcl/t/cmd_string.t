@@ -3,9 +3,10 @@
 use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
 
-use Parrot::Test tests => 115;
+use Parrot::Test tests => 133;
 use Parrot::Config;
 use Test::More;
+
 
 language_output_is("tcl",<<TCL,<<OUT,"first, initial");
  string
@@ -690,3 +691,115 @@ $doubles{$double}
 OUT
 
 }
+
+
+language_output_is("tcl",<<'TCL',<<OUT,"string compare, bad args (1)");
+   string compare
+TCL
+wrong # args: should be "string compare ?-nocase? ?-length int? string1 string2"
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"string compare, bad args (2)");
+   string compare -length "aaa" "bbb"
+TCL
+wrong # args: should be "string compare ?-nocase? ?-length int? string1 string2"
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"string compare, bad args (3)");
+   string compare -length 4 -length 8 "aaa" "bbb"
+TCL
+wrong # args: should be "string compare ?-nocase? ?-length int? string1 string2"
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"string compare, same string");
+   puts [string compare aaa aaa]
+TCL
+0
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"string compare, \"lower\" string");
+   puts [string compare aaa aab]
+TCL
+-1
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"string compare, \"higher\" string");
+   puts [string compare aab aaa]
+TCL
+1
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"string compare, bigger string");
+   puts [string compare aaaa aaa]
+TCL
+1
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"string compare, smaller string");
+   puts [string compare aaa aaaa]
+TCL
+-1
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"string compare, different sizes, len specified");
+   puts [string compare -length 3 aaa aaaa]
+TCL
+0
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"string compare, different strings, len specified");
+   puts [string compare -length 4 aaabc aaabb]
+TCL
+0
+OUT
+
+
+language_output_is("tcl",<<'TCL',<<OUT,"string compare, same string, different case");
+   puts [string compare -nocase AAA aaa]
+TCL
+0
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"string compare, \"lower\" string, different case");
+   puts [string compare -nocase aaa AAB]
+TCL
+-1
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"string compare, \"higher\" string, different case");
+   puts [string compare -nocase AAB aaa]
+TCL
+1
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"string compare, bigger string, different case");
+   puts [string compare -nocase AAAA aaa]
+TCL
+1
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"string compare, smaller string, different case");
+   puts [string compare -nocase AAA aaaa]
+TCL
+-1
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"string compare, different sizes, len specified, different case");
+   puts [string compare -length 3 -nocase aaa AAAA]
+TCL
+0
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"string compare, different strings, len specified, different case");
+   puts [string compare -length 4 -nocase AAABC aaabb]
+TCL
+0
+OUT
+
+
+language_output_is("tcl",<<'TCL',<<OUT,"string compare, same string, different case");
+   puts [string compare AAAA aaaa]
+TCL
+-1
+OUT
+
