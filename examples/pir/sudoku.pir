@@ -1902,6 +1902,44 @@ that in square 2 we have a unique '7' at row 0, col 7:
 Now the tests in "create_inv_n" invalidate illegal positions
 due to multiple-blocking and other tests are likely to proceed.  
 
+=head2 TODO
+
+  # daily sudoku wed 28-dec-2005, very hard
+  # backtracking
+  ...52.63.
+  .5.....7.
+  9....8..2
+  .17..4...
+  .9.....6.
+  ...8..31.
+  1..6....5
+  .4.....9.
+  .86.95...
+
+This one starts backtracking early. The '6' is an 'X-Wing' like
+configuration (col 1 and row 2 with a common corner have just 2
+possible positions, just one is valid, when you try both).
+The same happens a bit later with '9'.
+
+  +---------+---------+---------+
+  | .  7  . | 5  2  . | 6  3  . |    666 666 666
+  | .  5  . | .  .  . | .  7  . |    .66 6.. 666
+  | 9  .  . | .  .  8 | .  .  2 |    6.6 6.6 666
+  +---------+---------+---------+
+  | .  1  7 | .  .  4 | .  .  . |    .66 6.6 666
+  | .  9  . | .  .  . | .  6  . |    666 666 666
+  | .  .  . | 8  .  . | 3  1  . |    ..6 6.. 666
+  +---------+---------+---------+
+  | 1  .  9 | 6  .  . | .  .  5 |    666 666 666
+  | .  4  . | .  .  . | .  9  6 |    666 666 666
+  | .  8  6 | .  9  5 | .  .  3 |    666 666 666
+  +---------+---------+---------+
+
+Here is starts backtracking. A possible improvement would be:
+
+  - detect such digit configuration
+  - only backtrack try this digit ('6') above
+
 =cut
 
 # vim: ft=imc sw=4:
