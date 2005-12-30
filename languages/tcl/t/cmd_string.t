@@ -3,7 +3,7 @@
 use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
 
-use Parrot::Test tests => 133;
+use Parrot::Test tests => 136;
 use Parrot::Config;
 use Test::More;
 
@@ -754,6 +754,27 @@ TCL
 OUT
 
 
+language_output_is("tcl",<<'TCL',<<OUT,"string compare, different strings, len specified");
+   string compare -length four aaabc aaabb
+TCL
+wrong # args: should be "string compare ?-nocase? ?-length int? string1 string2"
+OUT
+
+
+language_output_is("tcl",<<'TCL',<<OUT,"string compare, different strings, len specified");
+   string compare -length -10 aaabc aaabb
+TCL
+wrong # args: should be "string compare ?-nocase? ?-length int? string1 string2"
+OUT
+
+
+language_output_is("tcl",<<'TCL',<<OUT,"string compare, different strings, len specified");
+   string compare -length 4.2 aaabc aaabb
+TCL
+wrong # args: should be "string compare ?-nocase? ?-length int? string1 string2"
+OUT
+
+
 language_output_is("tcl",<<'TCL',<<OUT,"string compare, same string, different case");
    puts [string compare -nocase AAA aaa]
 TCL
@@ -795,7 +816,6 @@ language_output_is("tcl",<<'TCL',<<OUT,"string compare, different strings, len s
 TCL
 0
 OUT
-
 
 language_output_is("tcl",<<'TCL',<<OUT,"string compare, same string, different case");
    puts [string compare AAAA aaaa]

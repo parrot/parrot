@@ -931,10 +931,10 @@ arg_length:
   argc = argv
   if argc == 0 goto bad_args
   $S4 = shift argv
-  ### TODO:         
-  ### Here I should check that $S4 is really an integer
-  ### and if not, say something like: expected integer but got "5.4"
+  $I1 = is_integer $S4
+  if $I1 == 0 goto bad_args
   size = $S4
+  if size < 0 goto bad_args         
   $S1 = substr $S1, 0, size
   $S2 = substr $S2, 0, size
   goto args_processment
