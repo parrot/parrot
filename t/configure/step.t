@@ -36,7 +36,6 @@ can_ok(__PACKAGE__, @Parrot::Configure::Step::EXPORT_OK);
 
 # integrate()
 
-# XXX should the other 'features' of integrate() be tested or simply removed?
 is(integrate(undef, undef), undef, "integrate(undef, undef)");
 is(integrate(undef, 1), 1, "integrate(undef, 1)");
 is(integrate(1, undef), 1, "integrate(1, undef)");

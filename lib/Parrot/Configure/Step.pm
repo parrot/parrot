@@ -63,23 +63,12 @@ sub integrate
 {
     my ($orig, $new) = @_;
 
-    unless (defined $new) {
-
-        # Rather than sprinkling "if defined(...)", everywhere,
-        # config/inter/progs.pl just passes in potentially undefined
-        # strings.  Just pass back the original in that case.  Don't
-        # bother warning.  --AD, 12 Sep 2005
-        # warn "String to be integrated in to '$orig' undefined";
-        return $orig;
-    }
-
-    while ($new =~ s/:add\{([^}]+)\}//) {
-        $orig .= $1;
-    }
-
-    while ($new =~ s/:rem\{([^}]+)\}//) {
-        $orig =~ s/\Q$1\E//;
-    }
+    # Rather than sprinkling "if defined(...)", everywhere,
+    # config/inter/progs.pl just passes in potentially undefined
+    # strings.  Just pass back the original in that case.  Don't
+    # bother warning.  --AD, 12 Sep 2005
+    # warn "String to be integrated in to '$orig' undefined";
+    return $orig unless defined $new;
 
     if ($new =~ /\S/) {
         $orig = $new;
@@ -102,14 +91,6 @@ sub prompt
     print("$message [$value] ");
 
     chomp(my $input = <STDIN>);
-
-    while ($input =~ s/:add\{([^}]+)\}//) {
-        $value .= $1;
-    }
-
-    while ($input =~ s/:rem\{([^}]+)\}//) {
-        $value =~ s/\Q$1\E//;
-    }
 
     if ($input) {
         $value = $input;
