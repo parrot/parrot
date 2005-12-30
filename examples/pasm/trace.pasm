@@ -15,6 +15,7 @@ Shows you what happens when you turn on tracing.
 
 =cut
 
+sweepoff
 print "Howdy!\n"
 trace 1
 print "There!\n"

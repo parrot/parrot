@@ -363,6 +363,8 @@ CHAR:   restore S0
 # Main Body
 #
 MAIN:
+	set I8, 0
+
 	# For now, this is the XML that's going to get parsed.
 	# When the read() stuff gets fixed, this can be read from
 	#    a file as it's being processed.  For now, slurp it.

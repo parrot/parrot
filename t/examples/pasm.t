@@ -80,9 +80,9 @@ END_EXPECTED
 
     'trace.pasm'        =>  << 'END_EXPECTED',
 Howdy!
-     4 print "There!\n"
+     5 print "There!\n"
 There!
-     6 trace 0
+     7 trace 0
 Partner!
 END_EXPECTED
 
