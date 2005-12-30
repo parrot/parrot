@@ -106,7 +106,10 @@ SKIP: {
 # check_progs()
 
 {
-    my $tmpfile = File::Temp->new(UNLINK => 1);
+    my %tf_params = ( UNLINK => 1, );
+    $tf_params{SUFFIX} = '.exe' if 'MSWin32' eq $^O;
+    my $tmpfile = File::Temp->new(%tf_params);
+
     local $ENV{PATH} = dirname("$tmpfile");
     chmod 0777, "$tmpfile";
     my $prog = basename("$tmpfile");
@@ -116,7 +119,10 @@ SKIP: {
 }
 
 {
-    my $tmpfile = File::Temp->new(UNLINK => 1);
+    my %tf_params = ( UNLINK => 1, );
+    $tf_params{SUFFIX} = '.exe' if 'MSWin32' eq $^O;
+    my $tmpfile = File::Temp->new(%tf_params);
+
     local $ENV{PATH} = dirname("$tmpfile");
     chmod 0777, "$tmpfile";
     my $prog = basename("$tmpfile");
