@@ -12,20 +12,6 @@ tests by then. =-)
 
 =over 4
 
-=item *
-
-Generate compiler-variants for several builtins, esp. those used by
-examples/bench.tcl. We're doing a lot of thrashing of sorts, switching between
-inlined versions and non inlined versions: having everything inlined will
-give us a big boost.
-
-=item *
-
-Add compiled TclComment objects, which do nothing other than generate
-PIR comments with the same text.
-
-=item *
-
 It would be nice if C<--pir> generated more human readable output. It's OK,
 I think, if the generated PIR has more whitespace all the time, even if
 a human isn't peeking.
@@ -62,7 +48,7 @@ Most builtins take a varying number of arguments, so it's hard to use this
 there, but for procs without {args} arguments, this error handling can be
 help eliminate a chunk of the wrapper script. Throw an exception *inside*
 the sub, catch it, and then throw the appropriate tcl exception about the
-wrong # of args. See lt's mail to the p6i titled:
+wrong # of args. See Leo's mail to the p6i list titled:
 
  pdd03 and Overflow/Underflow - r10269
 
@@ -90,19 +76,7 @@ Perhaps via [namespace import]? Can fake it right now with [inline]
 
 =over 4
 
-=item returncodes.pir
-
-The __clone macro should be moved to 'lib/macros.pir'.
-
 =item [expr]
-
-Add "is_const" global which checks to see if something is, in fact,
-constant. (which will allow us to then constant fold. Leo assures us
-that constant folding isn't necessary at the language level, but.)
-
-TBD: ternary op
-
-TBD: functions that take > 1 arg.
 
 TBD: Argument type requirements - Currently works ONLY on bitand - esp need
 to get any that require int-only args, as we can now /generate/ floats,
@@ -114,16 +88,6 @@ need to specify the correct errors to throw.
 =head2 Things we can't do yet (need parrot)
 
 =over 4
-
-=item [pwd], [cd] [#???]
-
-Need this to run tcltest
-
-=item [interpinfo name] [#36277]
-
-how to do this from inside parrot? Design issue: what's the right
-answer? if we're called as C<parrot tcl.pbc foo.tcl>, do we report just
-C<parrot>, or C<parrot tcl.pbc> ?
 
 =item [after], [vwait]
 
