@@ -111,13 +111,13 @@ are not included in the checksum.
 sub file_checksum
 {
     my ($filename, $ignorePattern) = @_;
-    open(FILE, "< $filename") or die "Can't open $filename: $!";
+    open(my $file, "< $filename") or die "Can't open $filename: $!";
     my $sum = 0;
-    while (<FILE>) {
+    while (<$file>) {
         next if defined($ignorePattern) && /$ignorePattern/;
         $sum += unpack("%32C*", $_);
     }
-    close FILE;
+    close($file) or die "Can't close $filename: $!";
     return $sum;
 }
 
@@ -177,11 +177,11 @@ sub genfile
 {
     my ($source, $target, %options) = @_;
 
-    open IN, "< $source" or die "Can't open $source: $!";
+    open(my $in, "< $source") or die "Can't open $source: $!";
 
     # don't change the name of the outfile handle
     # feature.pl / feature_h.in need OUT
-    open OUT, "> $target.tmp" or die "Can't open $target.tmp: $!";
+    open(my $out, "> $target.tmp") or die "Can't open $target.tmp: $!";
 
     if ($options{commentType}) {
         my @comment = (
@@ -202,16 +202,18 @@ sub genfile
         } else {
             die "Unknown comment type '$options{commentType}'";
         }
-        foreach my $line (@comment) { print OUT $line; }
-        print OUT "\n"; # extra newline after header
+        foreach my $line (@comment) { print $out $line; }
+        print $out "\n"; # extra newline after header
     }
 
     # this loop can not be impliment as a foreach loop as the body is dependant
     # on <IN> being evaluated lazily
-    while (my $line = <IN>) {
+    while (my $line = <$in>) {
         # everything after the line starting with #perl is eval'ed
         if ($line =~ /^#perl/ && $options{feature_file}) {
-            my $text = do {local $/; <IN>};
+            # OUT was/is used at the output filehandle in eval'ed scripts
+            local *OUT = $out;
+            my $text = do {local $/; <$in>};
             $text =~ s{ \$\{(\w+)\} }{\$conf->data->get("$1")}gx;
             eval $text;
             die $@ if $@;
@@ -249,11 +251,11 @@ sub genfile
             # replace \* with \\*, so make will not eat the \
             $line =~ s{(\\\*)}{\\$1}g;
         }
-        print OUT $line;
+        print $out $line;
     }
 
-    close IN  or die "Can't close $source: $!";
-    close OUT or die "Can't close $target: $!";
+    close($in)  or die "Can't close $source: $!";
+    close($out) or die "Can't close $target: $!";
 
     move_if_diff("$target.tmp", $target, $options{ignorePattern});
 }
@@ -308,10 +310,9 @@ sub _run_command
                 && ($_ ne '/dev/null')
                 && ($_ ne 'NUL:')
                 && (!m/^&/)) {
-                local *OUT;
-                open OUT, $_;
-                print <OUT>;
-                close OUT;
+                open(my $out, $_);
+                print <$out>;
+                close $out;
             }
         }
     }
@@ -383,11 +384,10 @@ sub cc_run
         _run_command(".${slash}test${exe}", './test.out', undef, $verbose);
     }
 
-    local *OUT;
-    local $/; # enable slurp mode
-    open OUT, './test.out';
-    my $output = <OUT>;
-    close OUT;
+    # XXX replace with a slurp() sub
+    open(my $out, './test.out') or die "Can't open test.out: $!";
+    my $output = do {local $/; <$out>};
+    close($out) or die "Can't close test.out: $!";
 
     return $output;
 }
@@ -414,11 +414,10 @@ sub cc_run_capture
             $verbose);
     }
 
-    local *OUT;
-    local $/; # enable slurp mode
-    open OUT, './test.out';
-    my $output = <OUT>;
-    close OUT;
+    # XXX replace with a slurp() sub
+    open(my $out, './test.out') or die "Can't open test.out: $!";
+    my $output = do {local $/; <$out>};
+    close($out) or die "Can't close test.out: $!";
 
     return $output;
 }
@@ -457,13 +456,10 @@ sub capture_output
     open STDERR, ">&OLDERR";
 
     # slurp stderr
-    my $out_err;
-    {
-        local $/ = undef;
-        open IN, "<test.err";
-        $out_err = <IN>;
-        close IN;
-    }
+    # XXX replace with a slurp() sub
+    open(my $in, './test.err') or die "Can't open test.err: $!";
+    my $out_err = do {local $/; <$in>};
+    close($in) or die "Can't close test.err: $!";
 
     # cleanup
     unlink "test.err";
