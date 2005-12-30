@@ -931,6 +931,7 @@ arg_length:
   argc = argv
   if argc == 0 goto bad_args
   $S4 = shift argv
+  # XXX switch this to use tcl's integer checker routines.
   $I1 = is_integer $S4
   if $I1 == 0 goto bad_args
   size = $S4
