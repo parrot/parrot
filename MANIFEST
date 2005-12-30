@@ -1,6 +1,7 @@
 # $Id$
 # See tools/dev/install_files.pl for documentation on the
 # format of this file.
+# Please resort this file after *EVERY* modification
 ABI_CHANGES                                       []
 CREDITS                                           []
 ChangeLog                                         []
@@ -350,8 +351,8 @@ editor/pasm.vim                                   [devel]
 editor/pir-mode.el                                [devel]
 editor/pmc.vim                                    [devel]
 examples/README                                   [main]doc
-examples/benchmarks/addit.pir                     [main]doc
 examples/benchmarks/addit.pasm                    [main]doc
+examples/benchmarks/addit.pir                     [main]doc
 examples/benchmarks/addit.pl                      [main]doc
 examples/benchmarks/addit.rb                      [main]doc
 examples/benchmarks/addit2.pir                    [main]doc
@@ -572,10 +573,10 @@ examples/streams/Writer.pir                       [main]doc
 examples/subs/bsr_ret.pasm                        [main]doc
 examples/subs/coroutine.pasm                      [main]doc
 examples/subs/jsr_ret.pasm                        [main]doc
-examples/subs/pasm_sub1.pasm                      [main]doc
-examples/subs/single_retval.pir                   [main]doc
 examples/subs/multi_retvals.pir                   [main]doc
 examples/subs/no_retval.pir                       [main]doc
+examples/subs/pasm_sub1.pasm                      [main]doc
+examples/subs/single_retval.pir                   [main]doc
 include/parrot/autoprefix.h                       [main]
 include/parrot/builtin.h                          [main]
 include/parrot/caches.h                           [main]
@@ -1173,14 +1174,14 @@ languages/tcl/LICENSE                             [tcl]
 languages/tcl/MAINTAINER                          [tcl]
 languages/tcl/README                              [tcl]
 languages/tcl/TODO                                [tcl]
-languages/tcl/config/root.in                      [tcl]
-languages/tcl/config/examples.in                  [tcl]
 languages/tcl/classes/tclarray.pmc                [tcl]
 languages/tcl/classes/tclfloat.pmc                [tcl]
 languages/tcl/classes/tclint.pmc                  [tcl]
 languages/tcl/classes/tcllist.pmc                 [tcl]
 languages/tcl/classes/tclobject.pmc               [tcl]
 languages/tcl/classes/tclstring.pmc               [tcl]
+languages/tcl/config/examples.in                  [tcl]
+languages/tcl/config/root.in                      [tcl]
 languages/tcl/docs/hacks.pod                      [tcl]
 languages/tcl/docs/howto.pod                      [tcl]
 languages/tcl/docs/overview.pod                   [tcl]
@@ -1496,14 +1497,14 @@ runtime/parrot/library/config.pir                 [library]
 runtime/parrot/library/dumper.pir                 [library]
 runtime/parrot/library/libpcre.pir                [library]
 runtime/parrot/library/ncurses.declarations       [library]
-runtime/parrot/library/ncurses.pir                [library]
 runtime/parrot/library/ncurses.pasm               [library]
+runtime/parrot/library/ncurses.pir                [library]
 runtime/parrot/library/parrotlib.pir              [runtime]
 runtime/parrot/library/pcore.pir                  [library]
 runtime/parrot/library/pcre.pir                   [library]
 runtime/parrot/library/postgres.declarations      [library]
-runtime/parrot/library/postgres.pir               [library]
 runtime/parrot/library/postgres.pasm              [library]
+runtime/parrot/library/postgres.pir               [library]
 runtime/parrot/library/random_lib.pir             [library]
 src/builtin.c                                     []
 src/byteorder.c                                   []
