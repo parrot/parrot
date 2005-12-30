@@ -1,4 +1,5 @@
 	newclass P0, "Japh"
+	set I0, 0
 	set S0, P0[I0]
 	print S0
 	inc I0
