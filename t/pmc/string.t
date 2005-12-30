@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 36;
+use Parrot::Test tests => 38;
 
 =head1 NAME
 
@@ -1139,4 +1139,64 @@ loop:
 CODE
 256
 TAACGSTAACGS
+OUTPUT
+
+
+pir_output_is( <<'CODE', <<OUTPUT, "reverse P0 - reverse string");
+.sub main :main
+  $P0 = new String
+  $P0 = "torrap"
+  reverse $P0
+  print $P0
+  print "\n"
+  end
+.end
+CODE
+parrot
+OUTPUT
+
+
+pir_output_is( <<'CODE', <<OUTPUT, "is_integer - check integer");
+.sub main :main
+  $P0 = new String
+
+  $P0 = "543"
+  $I0 = is_integer $P0
+  print $I0
+  print "\n"
+
+  $P0 = "4.3"
+  $I0 = is_integer $P0
+  print $I0
+  print "\n"
+
+  $P0 = "foo"
+  $I0 = is_integer $P0
+  print $I0
+  print "\n"
+
+  $P0 = "-1"
+  $I0 = is_integer $P0
+  print $I0
+  print "\n"
+
+  $P0 = "+-1"
+  $I0 = is_integer $P0
+  print $I0
+  print "\n"
+
+  $P0 = "+1"
+  $I0 = is_integer $P0
+  print $I0
+  print "\n"
+
+  end
+.end
+CODE
+1
+0
+0
+1
+0
+1
 OUTPUT

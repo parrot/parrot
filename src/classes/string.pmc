@@ -799,7 +799,7 @@ Translate ascii string C<src> with entries from C<trans_table>.
 
 /*
 
-=item C<void revserse(STRING* src)>
+=item C<void reverse(STRING* src)>
 
 Reverse the ascii STRING C<src> in place.
 
@@ -823,6 +823,43 @@ Reverse the ascii STRING C<src> in place.
 	    p[len] = p[i];
 	    p[i] = ch;
 	}
+    }
+
+
+
+/*
+
+=item C<INTEGER is_integer(STRING* src)>
+
+Checks if the ascii STRING C<str> is just an integer.
+
+=cut
+
+*/
+
+    METHOD INTVAL is_integer(STRING* src) {
+	INTVAL i, len;
+	unsigned char *p, ch;
+
+	len = string_length(interpreter, src);
+	if (!len)
+	    return (INTVAL)(0);
+	if (src->charset != Parrot_ascii_charset_ptr)
+	    real_exception(interpreter, NULL, INVALID_ENCODING,
+		    "Can't translate non-ascii"); 
+
+        i = 0;
+	p = src->strstart;
+
+        if (p[i] == '-' || p[i] == '+' ||
+            (p[i] >= '0' && p[i] <= '9')) {
+            for (i = 1; i < len; ++i)
+                if (p[i] < '0' || p[i] > '9')
+                    return (INTVAL)(0);
+            return (INTVAL)(1);
+        }
+        else
+            return (INTVAL)(0);
     }
 }
 

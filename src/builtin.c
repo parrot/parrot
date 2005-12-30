@@ -58,6 +58,7 @@ static Builtins builtins[] = {
     { "say", 	"IJOS",         "ParrotIO", 	0, 0 },
     { "say", 	"vJS",          "ParrotIO", 	0, 0 },
     { "say", 	"vJOS",         "ParrotIO", 	0, 0 },
+    { "is_integer","IJS",       "String",       0, 0 },
     { "trans",  "vJSP",         "String",       0, 0 }
 };
 
