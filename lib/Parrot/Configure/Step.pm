@@ -384,10 +384,7 @@ sub cc_run
         _run_command(".${slash}test${exe}", './test.out', undef, $verbose);
     }
 
-    # XXX replace with a slurp() sub
-    open(my $out, './test.out') or die "Can't open test.out: $!";
-    my $output = do {local $/; <$out>};
-    close($out) or die "Can't close test.out: $!";
+    my $output = _slurp('./test.out');
 
     return $output;
 }
@@ -414,10 +411,7 @@ sub cc_run_capture
             $verbose);
     }
 
-    # XXX replace with a slurp() sub
-    open(my $out, './test.out') or die "Can't open test.out: $!";
-    my $output = do {local $/; <$out>};
-    close($out) or die "Can't close test.out: $!";
+    my $output = _slurp('./test.out');
 
     return $output;
 }
@@ -456,10 +450,7 @@ sub capture_output
     open STDERR, ">&OLDERR";
 
     # slurp stderr
-    # XXX replace with a slurp() sub
-    open(my $in, './test.err') or die "Can't open test.err: $!";
-    my $out_err = do {local $/; <$in>};
-    close($in) or die "Can't close test.err: $!";
+    my $out_err = _slurp('./test.err');
 
     # cleanup
     unlink "test.err";
