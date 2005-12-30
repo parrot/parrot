@@ -110,7 +110,7 @@ F<tools/dev/mk_manifests.pl>
 
 ################################################################################
 
-use File::Basename qw(dirname);
+use File::Basename qw(dirname basename);
 use File::Copy;
 use File::Spec;
 use strict;
@@ -172,7 +172,8 @@ while(<>) {
     $meta{$_} = 1 for (keys %meta); # Laziness
 
     if ($meta{lib}) {
-        $dest = File::Spec->catdir($options{libdir}, $dest);
+        # don't allow libraries to be installed into subdirs of libdir
+        $dest = File::Spec->catdir($options{libdir}, basename($dest));
     } elsif ($meta{bin}) {
 	$dest =~ s/^installable_//;	# parrot with different config
         $dest = File::Spec->catdir($options{bindir}, $dest);
