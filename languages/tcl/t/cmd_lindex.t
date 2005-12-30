@@ -32,7 +32,7 @@ local $TODO = "wrong index types";
 language_output_is("tcl",<<'TCL',<<'OUT',"bogus index")
  lindex a bogus
 TCL
-bad index "bogus": must be integer or end?-integer?
+bad index "bogus": must be integer?[+-]integer? or end?[+-]integer?
 OUT
 }
 

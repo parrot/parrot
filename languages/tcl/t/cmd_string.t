@@ -58,7 +58,7 @@ OUT
 language_output_is("tcl",<<TCL,<<OUT,"first, index, invalid index");
  puts [string first c abcd joe]
 TCL
-bad index "joe": must be integer or end?-integer?
+bad index "joe": must be integer?[+-]integer? or end?[+-]integer?
 OUT
 
 language_output_is("tcl",<<TCL,<<OUT,"first, not enough args");
@@ -120,7 +120,7 @@ OUT
 language_output_is("tcl",<<TCL,<<OUT,"last, index, invalid index");
  puts [string last c abcd joe]
 TCL
-bad index "joe": must be integer or end?-integer?
+bad index "joe": must be integer?[+-]integer? or end?[+-]integer?
 OUT
 
 language_output_is("tcl",<<TCL,<<OUT,"last, not enough args");
@@ -180,7 +180,7 @@ OUT
 language_output_is("tcl",<<TCL,<<OUT,"index, float");
  puts [string index abcde 1.2]
 TCL
-bad index "1.2": must be integer or end?-integer?
+bad index "1.2": must be integer?[+-]integer? or end?[+-]integer?
 OUT
 
 language_output_is("tcl",<<TCL,<<OUT,"index, end-float");
@@ -198,7 +198,7 @@ OUT
 language_output_is("tcl",<<TCL,<<OUT,"index, bad -end");
  puts [string index abcde end-bogus]
 TCL
-bad index "end-bogus": must be integer or end?-integer?
+bad index "end-bogus": must be integer?[+-]integer? or end?[+-]integer?
 OUT
 
 language_output_is("tcl",<<TCL,<<OUT,"length, too many args");
