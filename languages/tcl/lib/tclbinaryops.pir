@@ -40,7 +40,7 @@
   goto done
 .endm 
 
-.macro binary_op2(FORMAT)
+.macro binary_op2num(FORMAT)
   $P1 = new .Array
   $P1 = 6 
   $P1[0] = register_num
@@ -68,6 +68,22 @@
   pir_code .= op_code
   goto done
 .endm 
+
+.macro binary_op2(FORMAT)
+  $P1 = new .Array
+  $P1 = 6
+  $P1[0] = register_num
+  $P1[1] = l_reg
+  $P1[2] = r_reg
+  $P1[3] = register_num
+  $P1[4] = register_num
+  $P1[5] = register_num
+  op_code = sprintf .FORMAT, $P1
+  pir_code = l_code . r_code
+
+  pir_code .= op_code
+  goto done
+.endm
 
 .macro binary_op3(FORMAT)
   $P1 = new .Array
@@ -184,7 +200,7 @@ $P%i=new .TclInt
 $P%i= $I%i
 END_PIR
 
-  .binary_op2 ($S0)
+  .binary_op2num ($S0)
 op_gt:
 
   $S0 = <<"END_PIR"
@@ -193,7 +209,7 @@ $P%i=new .TclInt
 $P%i= $I%i
 END_PIR
 
-  .binary_op2 ($S0)
+  .binary_op2num ($S0)
 op_lte:
 
   $S0 = <<"END_PIR"
@@ -202,7 +218,7 @@ $P%i=new .TclInt
 $P%i= $I%i
 END_PIR
 
-  .binary_op2 ($S0)
+  .binary_op2num ($S0)
 op_gte:
 
   $S0 = <<"END_PIR"
@@ -211,7 +227,7 @@ $P%i=new .TclInt
 $P%i= $I%i
 END_PIR
 
-  .binary_op2 ($S0)
+  .binary_op2num ($S0)
 op_equal:
 
   $S0 = <<"END_PIR"
@@ -220,7 +236,7 @@ $P%i=new .TclInt
 $P%i= $I%i
 END_PIR
 
-  .binary_op2 ($S0)
+  .binary_op2($S0)
 op_unequal:
 
   $S0 = <<"END_PIR"
@@ -229,7 +245,7 @@ $P%i=new .TclInt
 $P%i= $I%i
 END_PIR
 
-  .binary_op2 ($S0)
+  .binary_op2($S0)
 op_bitand:
   .binary_op("$P%i = band $P%i, $P%i\n")
 op_bitxor:

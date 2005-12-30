@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 57;
+use Parrot::Test tests => 61;
 use Test::More;
 
 language_output_is("tcl",<<TCL,<<OUT,"int");
@@ -363,6 +363,30 @@ OUT
 
 language_output_is("tcl",<<'TCL',<<'OUT',"ne (false)");
   puts [expr {{foo}ne{foo}}]
+TCL
+0
+OUT
+
+language_output_is("tcl",<<'TCL',<<'OUT',"string == (true)");
+  puts [expr {"foo"=="foo"}]
+TCL
+1
+OUT
+
+language_output_is("tcl",<<'TCL',<<'OUT',"string == (false)");
+  puts [expr {"foo"=="baz"}]
+TCL
+0
+OUT
+
+language_output_is("tcl",<<'TCL',<<'OUT',"string != (true)");
+  puts [expr {"foo" != "baz"}]
+TCL
+1
+OUT
+
+language_output_is("tcl",<<'TCL',<<'OUT',"string != (false)");
+  puts [expr {"foo"!="foo"}]
 TCL
 0
 OUT
