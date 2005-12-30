@@ -187,7 +187,13 @@ sub runstep
         my $DEVEL   = $conf->data->get('DEVEL');
         $prefix = "/usr/local/parrot-${VERSION}${DEVEL}";
     }
-    $conf->data->set(prefix => $prefix);
+    $conf->data->set(
+        prefix      => $prefix,
+        exec_prefix => $prefix,
+        bin_dir     => $prefix . "/bin",
+        lib_dir     => $prefix . "/lib",
+        include_dir => $prefix . "/include",
+    );
 
     # add profiling if needed
     # FIXME gcc syntax

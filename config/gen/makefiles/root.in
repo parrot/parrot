@@ -22,10 +22,10 @@ SOVERSION       = ${VERSION}
 # to be using this outside of your build area.
 BUILDPREFIX     =
 PREFIX          = ${prefix}
-EXEC_PREFIX     = $(PREFIX)
-BIN_DIR         = $(EXEC_PREFIX)/bin
-LIB_DIR         = $(EXEC_PREFIX)/lib
-INCLUDE_DIR     = $(EXEC_PREFIX)/include
+EXEC_PREFIX     = ${exec_prefix}
+BIN_DIR         = ${bin_dir}
+LIB_DIR         = ${lib_dir}
+INCLUDE_DIR     = ${include_dir}
 
 
 ###############################################################################
