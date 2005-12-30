@@ -88,3 +88,4 @@ tqueue.pmc		55
 parrotclass.pmc		56
 parrotobject.pmc	57
 
+os.pmc                  58

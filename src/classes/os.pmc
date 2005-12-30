@@ -1,0 +1,82 @@
+/*
+Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+src/classes/os.pmc - Files and Directories PMC
+
+=head1 DESCRIPTION
+
+C<os> is a singleton class which provides access to the system
+files and directories.
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+
+static PMC * OS_PMC;
+pmclass OS singleton {
+
+/*
+
+=item C<void* get_pointer()>
+
+=item C<void set_pointer(void *ptr)>
+
+These two functions are part of the singleton creation interface. For more
+information see F<src/pmc.c>.
+
+=cut
+
+*/
+
+    void* get_pointer() {
+        return OS_PMC;
+    }
+
+    void set_pointer(void* ptr) {
+        OS_PMC = (PMC*) ptr;
+    }
+
+
+/*
+
+=item C<char* cwd()>
+
+=cut
+
+*/
+
+    METHOD STRING* cwd() {
+        char * cwd = getcwd(NULL, 0);
+        return string_from_cstring(interpreter, cwd, strlen(cwd));
+    }
+
+}
+/*
+
+=back
+
+=head1 SEE ALS0
+
+
+=cut
+
+*/
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+*/
