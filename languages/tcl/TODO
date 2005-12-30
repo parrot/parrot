@@ -12,10 +12,6 @@ tests by then. =-)
 
 =over 4
 
-It would be nice if C<--pir> generated more human readable output. It's OK,
-I think, if the generated PIR has more whitespace all the time, even if
-a human isn't peeking.
-
 =item *
 
 It should be possible to implement some builtins in terms of other builtins.
@@ -25,32 +21,9 @@ we need to pre-compile the builtins-in-tcl into PIR at build time.
 
 =back
 
-=head2 Generic tasks
-
-=over 4
-
-=item Makefile deps
-
-Should be more explicit about the PMC dependencies in the makefile. *something*
-is causing things to get rebuilt unecessarily each time "make tclsh" is run.
-Very likely due to the build_dynclasses targets that don't specify explicit
-deps.
-
-=back
-
 =head2 PIR tasks
 
 =over 4
-
-=item Use new argument handling from inside [proc]s
-
-Most builtins take a varying number of arguments, so it's hard to use this
-there, but for procs without {args} arguments, this error handling can be
-help eliminate a chunk of the wrapper script. Throw an exception *inside*
-the sub, catch it, and then throw the appropriate tcl exception about the
-wrong # of args. See Leo's mail to the p6i list titled:
-
- pdd03 and Overflow/Underflow - r10269
 
 =item implement default globals, etc.
 
