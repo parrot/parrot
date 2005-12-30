@@ -816,7 +816,7 @@ Reverse the ascii STRING C<src> in place.
 	    return;
 	if (src->charset != Parrot_ascii_charset_ptr)
 	    real_exception(interpreter, NULL, INVALID_ENCODING,
-		    "Can't translate non-ascii"); 
+		    "Can't reverse non-ascii"); 
 	p = src->strstart;
 	for (i = 0, --len; i < len; ++i, --len) {
 	    ch = p[len];
@@ -846,7 +846,7 @@ Checks if the ascii STRING C<str> is just an integer.
 	    return (INTVAL)(0);
 	if (src->charset != Parrot_ascii_charset_ptr)
 	    real_exception(interpreter, NULL, INVALID_ENCODING,
-		    "Can't translate non-ascii"); 
+		    "Can't is_integer non-ascii"); 
 
         i = 0;
 	p = src->strstart;

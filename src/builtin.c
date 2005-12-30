@@ -50,6 +50,7 @@ static Builtins builtins[] = {
     { "tan", 	"PJO", 		"Float", 	0, 0 },
     { "tanh", 	"PJO", 		"Float", 	0, 0 },
     { "index",  "IJSS.I",       "String",       0, 0 },
+    { "is_integer","IJS",       "String",       0, 0 },
     { "lower", 	"PJO",	        "String", 	0, 0 },
     { "open", 	"PJS.S",	"ParrotIO", 	0, 0 },
     { "puts", 	"IJOS",         "ParrotIO", 	0, 0 },
@@ -58,7 +59,6 @@ static Builtins builtins[] = {
     { "say", 	"IJOS",         "ParrotIO", 	0, 0 },
     { "say", 	"vJS",          "ParrotIO", 	0, 0 },
     { "say", 	"vJOS",         "ParrotIO", 	0, 0 },
-    { "is_integer","IJS",       "String",       0, 0 },
     { "trans",  "vJSP",         "String",       0, 0 }
 };
 
