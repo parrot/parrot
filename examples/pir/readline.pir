@@ -18,6 +18,8 @@ received the buffer is printed and the program is terminated.
 
 =cut
 
+.include 'cclass.pasm'
+
 .sub "example" :main
         .local pmc stdin
         .local string buffer, line
@@ -29,6 +31,12 @@ AGAIN:
 	line = readline stdin
 	I1 = length line
 	if I1 <= 1 goto MAINLOOP
+	# test for multi-char newlines
+	if I1 >=3 goto CONCAT
+	I2 = is_cclass .CCLASS_NEWLINE, line, 0
+	if I2, MAINLOOP
+
+CONCAT:
 	concat buffer, line
 	branch AGAIN
 
