@@ -503,6 +503,23 @@ sub check_progs
     return;
 }
 
+=item C<_slurp($filename)>
+
+Slurps C<$filename> into memory and returns it as a string.
+
+=cut
+
+sub _slurp
+{
+    my $filename = shift;
+
+    open(my $fh, $filename) or die "Can't open $filename: $!";
+    my $text = do {local $/; <$fh>};
+    close($fh) or die "Can't close $filename: $!";
+
+    return $text;
+}
+
 =back
 
 =head1 SEE ALSO

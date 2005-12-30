@@ -7,7 +7,7 @@ use warnings;
 
 use lib qw( . lib ../lib ../../lib );
 
-use Test::More tests => 18;
+use Test::More tests => 19;
 
 use File::Basename qw(basename dirname);
 use File::Temp;
@@ -142,4 +142,14 @@ SKIP: {
         "check_progs() returns () in list context on failure");
     is_deeply([check_progs($cmd)], [],
         "check_progs() returns () in list context on failure");
+}
+
+# _slurp(), not exported
+
+{
+    my $tmpfile = File::Temp->new(UNLINK => 1);
+    print $tmpfile "foo" x 1000;
+    $tmpfile->flush;
+    is(Parrot::Configure::Step::_slurp($tmpfile), "foo" x 1000,
+        "_slurp() slurped the file");
 }
