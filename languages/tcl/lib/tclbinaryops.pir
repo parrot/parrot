@@ -200,7 +200,7 @@ $P%i=new .TclInt
 $P%i= $I%i
 END_PIR
 
-  .binary_op2num ($S0)
+  .binary_op2($S0)
 op_gt:
 
   $S0 = <<"END_PIR"
@@ -209,7 +209,7 @@ $P%i=new .TclInt
 $P%i= $I%i
 END_PIR
 
-  .binary_op2num ($S0)
+  .binary_op2($S0)
 op_lte:
 
   $S0 = <<"END_PIR"
@@ -218,7 +218,7 @@ $P%i=new .TclInt
 $P%i= $I%i
 END_PIR
 
-  .binary_op2num ($S0)
+  .binary_op2($S0)
 op_gte:
 
   $S0 = <<"END_PIR"
@@ -227,7 +227,7 @@ $P%i=new .TclInt
 $P%i= $I%i
 END_PIR
 
-  .binary_op2num ($S0)
+  .binary_op2($S0)
 op_equal:
 
   $S0 = <<"END_PIR"

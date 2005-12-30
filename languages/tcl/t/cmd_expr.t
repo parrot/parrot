@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 61;
+use Parrot::Test tests => 73;
 use Test::More;
 
 language_output_is("tcl",<<TCL,<<OUT,"int");
@@ -387,6 +387,78 @@ OUT
 
 language_output_is("tcl",<<'TCL',<<'OUT',"string != (false)");
   puts [expr {"foo"!="foo"}]
+TCL
+0
+OUT
+
+language_output_is("tcl",<<'TCL',<<'OUT',"string <= (less)");
+  puts [expr {"abb"<="abc"}]
+TCL
+1
+OUT
+
+language_output_is("tcl",<<'TCL',<<'OUT',"string <= (greater)");
+  puts [expr {"abc"<="abb"}]
+TCL
+0
+OUT
+
+language_output_is("tcl",<<'TCL',<<'OUT',"string <= (equal)");
+  puts [expr {"abc"<="abc"}]
+TCL
+1
+OUT
+
+language_output_is("tcl",<<'TCL',<<'OUT',"string >= (less)");
+  puts [expr {"abb" >= "abc"}]
+TCL
+0
+OUT
+
+language_output_is("tcl",<<'TCL',<<'OUT',"string >= (greater)");
+  puts [expr {"abc" >= "abb"}]
+TCL
+1
+OUT
+
+language_output_is("tcl",<<'TCL',<<'OUT',"string >= (equal)");
+  puts [expr {"abc" >= "abc"}]
+TCL
+1
+OUT
+
+language_output_is("tcl",<<'TCL',<<'OUT',"string < (less)");
+  puts [expr {"abb" < "abc"}]
+TCL
+1
+OUT
+
+language_output_is("tcl",<<'TCL',<<'OUT',"string < (greater)");
+  puts [expr {"abc" < "abb"}]
+TCL
+0
+OUT
+
+language_output_is("tcl",<<'TCL',<<'OUT',"string < (equal)");
+  puts [expr {"abc" < "abc"}]
+TCL
+0
+OUT
+
+language_output_is("tcl",<<'TCL',<<'OUT',"string > (less)");
+  puts [expr {"abb" > "abc"}]
+TCL
+0
+OUT
+
+language_output_is("tcl",<<'TCL',<<'OUT',"string > (greater)");
+  puts [expr {"abc" > "abb"}]
+TCL
+1
+OUT
+
+language_output_is("tcl",<<'TCL',<<'OUT',"string > (equal)");
+  puts [expr {"abc" > "abc"}]
 TCL
 0
 OUT
