@@ -36,7 +36,7 @@
 bad_arg:
   $S9  = "bad index \""
   $S9 .= position
-  $S9 .= "\": must be integer or end?-integer?"
+  $S9 .= "\": must be integer?[+-]integer? or end?[+-]integer?"
   .throw($S9)
  
 has_end:

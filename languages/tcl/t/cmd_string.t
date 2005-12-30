@@ -187,13 +187,13 @@ OUT
 language_output_is("tcl",<<TCL,<<OUT,"index, end-float");
  puts [string index abcde end-1.2]
 TCL
-bad index "end-1.2": must be integer or end?-integer?
+bad index "end-1.2": must be integer?[+-]integer? or end?[+-]integer?
 OUT
 
 language_output_is("tcl",<<TCL,<<OUT,"index, overshot, neg.");
  puts [string index abcde bogus]
 TCL
-bad index "bogus": must be integer or end?-integer?
+bad index "bogus": must be integer?[+-]integer? or end?[+-]integer?
 OUT
 
 language_output_is("tcl",<<TCL,<<OUT,"index, bad -end");
