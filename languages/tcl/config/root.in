@@ -70,7 +70,7 @@ lib${slash}commands${slash}puts.pir \
 lib${slash}commands${slash}regexp.pir \
 lib${slash}builtins${slash}regsub.pir \
 lib${slash}commands${slash}rename.pir \
-lib${slash}commands${slash}return.pir \
+lib${slash}builtins${slash}return.pir \
 lib${slash}commands${slash}set.pir \
 lib${slash}commands${slash}source.pir \
 lib${slash}commands${slash}string.pir \
