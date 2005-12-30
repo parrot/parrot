@@ -202,13 +202,10 @@ sub genfile
         if (/^#perl/ && $options{feature_file}) {
             local $/ = undef;
             $_ = <IN>;
-            s{
-    \$\{(\w+)\}
-      }{\$conf->data->get("$1")}gx;
+            s{ \$\{(\w+)\} }{\$conf->data->get("$1")}gx;
             eval;
             die $@ if $@;
             last;
-
         }
         if ($options{conditioned_lines}) {
 
@@ -224,24 +221,21 @@ sub genfile
                 $_ = $2;
             }
         }
-        s{
-      \$\{(\w+)\}
-    }{
-      if(defined(my $val=$conf->data->get($1))) {
-        #use Data::Dumper;warn Dumper("val for $1 is ",$val);
-        $val;
-      }
-      else {
-        warn "value for '$1' in $source is undef";
-        '';
-      }
-    }egx;
+        s{ \$\{(\w+)\} }{
+            if(defined(my $val=$conf->data->get($1))) {
+                #use Data::Dumper;warn Dumper("val for $1 is ",$val);
+                $val;
+            } else {
+                warn "value for '$1' in $source is undef";
+                '';
+            }
+        }egx;
         if ($options{replace_slashes}) {
             s{(/+)}{
-        my $len = length $1;
-        my $slash = $conf->data->get('slash');
-        '/' x ($len/2) . ($len%2 ? $slash : '');
-      }eg;
+                my $len = length $1;
+                my $slash = $conf->data->get('slash');
+                '/' x ($len/2) . ($len%2 ? $slash : '');
+            }eg;
             s{(\\\*)}{\\$1}g; # replace \* with \\*, so make will not eat the \
         }
         print OUT;
