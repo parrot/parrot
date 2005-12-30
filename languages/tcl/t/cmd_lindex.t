@@ -4,7 +4,6 @@ use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
 use Parrot::Test tests => 4;
 use Test::More;
-use vars qw($TODO);
 
 language_output_is("tcl",<<'TCL',<<OUT,"lindex with list");
  set a {a b c}
@@ -27,12 +26,8 @@ TCL
 b
 OUT
 
-TODO: {
-local $TODO = "wrong index types";
 language_output_is("tcl",<<'TCL',<<'OUT',"bogus index")
  lindex a bogus
 TCL
 bad index "bogus": must be integer?[+-]integer? or end?[+-]integer?
 OUT
-}
-
