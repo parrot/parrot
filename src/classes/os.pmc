@@ -65,7 +65,8 @@ information see F<src/pmc.c>.
             switch(errno) {
             case EACCES:
                 real_exception(interpreter, NULL, E_SystemError,
-                               "Read or search permission was denied for a component of the pathname.");
+                               "Read or search permission was denied for a "
+                               "component of the pathname.");
                 break;
             case EINVAL:
                 real_exception(interpreter, NULL, E_SystemError,
@@ -81,7 +82,9 @@ information see F<src/pmc.c>.
                 break;
             case ERANGE:
                 real_exception(interpreter, NULL, E_SystemError,
-                               "The size argument is greater than zero but smaller than the length of the pathname plus 1.");
+                               "The size argument is greater than zero but "
+                               "smaller than the length of the pathname "
+                               "plus 1.");
             }
             return NULL;
         }
@@ -105,11 +108,14 @@ information see F<src/pmc.c>.
             switch(errno) {
             case ENOTDIR:
                 real_exception(interpreter, NULL, E_SystemError,
-                               "A component of the path prefix is not a directory.");
+                               "A component of the path prefix is not a "
+                               "directory.");
                 break;
             case ENAMETOOLONG:
                 real_exception(interpreter, NULL, E_SystemError,
-                               "A component of a pathname exceeded %d characters, or an entire path name exceeded %d characters.", NAME_MAX, PATH_MAX);
+                               "A component of a pathname exceeded %d "
+                               "characters, or an entire path name exceeded %d "
+                               "characters.", NAME_MAX, PATH_MAX);
                 break;
             case ENOENT:
                 real_exception(interpreter, NULL, E_SystemError,
@@ -117,20 +123,106 @@ information see F<src/pmc.c>.
                 break;
             case ELOOP:
                 real_exception(interpreter, NULL, E_SystemError, 
-                               "Too many symbolic links were encountered in translating the pathname.");
+                               "Too many symbolic links were encountered in "
+                               "translating the pathname.");
                 break;
             case EACCES:
                 real_exception(interpreter, NULL, E_SystemError, 
-                               "Search permission is denied for any component of the path name.");
+                               "Search permission is denied for any component "
+                               "of the path name.");
                 break;
             case EFAULT:
                 real_exception(interpreter, NULL, E_SystemError, 
-                               "Path points outside the process's allocated address space.");
+                               "Path points outside the process's allocated "
+                               "address space.");
                 break;
             case EIO:
                 real_exception(interpreter, NULL, E_SystemError, 
-                               "An I/O error occurred while reading from or writing to the file system.");
+                               "An I/O error occurred while reading from or "
+                               "writing to the file system.");
                 break;
+            }
+        }
+    }
+
+
+/*
+
+=item C<void rm(char *path)>
+
+Removes C<files>
+
+=cut
+
+*/
+
+    METHOD void rm(STRING *path) {
+        int error;
+        char *cpath = string_to_cstring(interpreter, path);
+        error = unlink(cpath);
+        string_cstring_free(cpath);
+        if (error) {
+            switch(errno) {
+            case ENOTDIR:
+                real_exception(interpreter, NULL, E_SystemError, 
+                               "A component of the path prefix is not a "
+                               "directory.");
+                break;
+
+            case ENAMETOOLONG:
+                real_exception(interpreter, NULL, E_SystemError, 
+                               "A component of a pathname exceeded %d "
+                               "characters, or an entire path name exceeded %d "
+                               "characters.", NAME_MAX, PATH_MAX);
+                break;
+
+            case ENOENT:
+                real_exception(interpreter, NULL, E_SystemError, 
+                               "The named file does not exist.");
+                break;
+
+            case EACCES:
+                real_exception(interpreter, NULL, E_SystemError, 
+                               "Search permission is denied for a component of "
+                               "the path prefix or write permission is denied "
+                               "on the directory containing the link to be "
+                               "removed.");
+                break;
+
+            case ELOOP:
+                real_exception(interpreter, NULL, E_SystemError, 
+                               "Too many symbolic links were encountered in "
+                               "translating the pathname.");
+                break;
+
+            case EPERM:
+                real_exception(interpreter, NULL, E_SystemError, 
+                               "The named file is a directory and the effective"
+                               " user ID of the process is not the super-user.");
+                break;
+
+            case EBUSY:
+                real_exception(interpreter, NULL, E_SystemError, 
+                               "The entry to be unlinked is the mount point "
+                               "for a mounted file system.");
+                break;
+
+            case EIO:
+                real_exception(interpreter, NULL, E_SystemError, 
+                               "An I/O error occurred while deleting the "
+                               "directory entry or deallocating the inode.");
+                break;
+
+            case EROFS:
+                real_exception(interpreter, NULL, E_SystemError, 
+                               "The named file resides on a read-only file "
+                               "system.");
+                break;
+
+            case EFAULT:
+                real_exception(interpreter, NULL, E_SystemError, 
+                               "Path points outside the process's allocated "
+                               "address space.");
             }
         }
     }
@@ -141,7 +233,7 @@ information see F<src/pmc.c>.
 
 =head1 SEE ALS0
 
-   man chdir(2), getcwd(3)
+   man chdir(2), getcwd(3), unlink(2)
 
 =cut
 

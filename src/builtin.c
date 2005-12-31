@@ -57,6 +57,7 @@ static Builtins builtins[] = {
     { "open", 	"PJS.S",	"ParrotIO", 	0, 0 },
     { "puts", 	"IJOS",         "ParrotIO", 	0, 0 },
     { "reverse","vJS",          "String",       0, 0 },
+    { "rm",     "vJS",          "OS",           0, 0 },
     { "say", 	"IJS",          "ParrotIO", 	0, 0 },
     { "say", 	"IJOS",         "ParrotIO", 	0, 0 },
     { "say", 	"vJS",          "ParrotIO", 	0, 0 },
