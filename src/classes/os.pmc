@@ -56,7 +56,9 @@ information see F<src/pmc.c>.
 
     METHOD STRING* cwd() {
         char * cwd = getcwd(NULL, 0);
-        return string_from_cstring(interpreter, cwd, strlen(cwd));
+        STRING *scwd = string_from_cstring(interpreter, cwd, strlen(cwd));
+        free(cwd);
+        return scwd;
     }
 
 }
