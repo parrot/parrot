@@ -13,7 +13,7 @@ use Cwd;
 if ($^O =~ m!MSWin32!) {
   plan skip_all => 'win32 implementation missing'
 } else {
-  plan tests => 1
+  plan tests => 2
 }
 
 =head1 NAME
@@ -36,6 +36,8 @@ my $cwd = getcwd;
 $cwd =~ m!([/\\])parrot([/\\]?)$!;
 my $upcwd = "$`$2";
 my $xpto = "$cwd$1xpto$2";
+
+rmdir "xpto" if -d "xpto";
 
 pir_output_is(<<'CODE', <<"OUT", "cwd");
 .sub main :main
@@ -67,6 +69,12 @@ pir_output_is(<<'CODE', <<"OUT", "cwd");
         print $S1
         print "\n"
 
+        $S1 = ".."
+        $P1."cd"($S1)
+
+        $S1 = "xpto"
+        $P1."rm"($S1)
+
         end
 .end
 CODE
@@ -76,5 +84,5 @@ $cwd
 $xpto
 OUT
 
-rmdir $xpto if -d $xpto;
+ok(!-d $xpto);
 

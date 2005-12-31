@@ -164,7 +164,8 @@ Changes the current working directory to the one specified by C<path>.
 
 =item C<void rm(STRING* path)>
 
-Calls C<unlink> to remove the file specified by C<path>.
+Calls C<remove> to remove the file or empty directory specified by
+C<path>.
 
 =cut
 
@@ -172,10 +173,9 @@ Calls C<unlink> to remove the file specified by C<path>.
 
 
     METHOD void rm(STRING *path) {
-#ifndef _MSC_VER
         int error;
         char *cpath = string_to_cstring(interpreter, path);
-        error = unlink(cpath);
+        error = remove(cpath);
         string_cstring_free(cpath);
         if (error) {
             switch(errno) {
@@ -190,6 +190,12 @@ Calls C<unlink> to remove the file specified by C<path>.
                                "A component of a pathname exceeded %d "
                                "characters, or an entire path name exceeded %d "
                                "characters.", NAME_MAX, PATH_MAX);
+                break;
+
+            case ENOTEMPTY:
+                real_exception(interpreter, NULL, E_SystemError,
+                               "The named directory contains files other "
+                               "than `.' and `..' in it.");
                 break;
 
             case ENOENT:
@@ -243,9 +249,6 @@ Calls C<unlink> to remove the file specified by C<path>.
                                "address space.");
             }
         }
-#else
-        internal_exception(UNIMPLEMENTED, "Win32 is not POSIX. Need win32 developer!");
-#endif
     }
 
 
