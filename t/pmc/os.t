@@ -27,8 +27,9 @@ Tests the C<OS> PMC.
 my $cwd = getcwd;
 
 # Ugly hack. I accept suggestions.
-$cwd =~ m![/\\]parrot([/\\]?)$!;
-my $upcwd = "$`$1";
+$cwd =~ m!([/\\])parrot([/\\]?)$!;
+my $upcwd = "$`$2";
+my $xpto = "$cwd$1xpto$2";
 
 pir_output_is(<<'CODE', <<"OUT", "cwd");
 .sub main :main
@@ -51,13 +52,25 @@ pir_output_is(<<'CODE', <<"OUT", "cwd");
         print $S1
         print "\n"
 
+        $S1 = "xpto"
+        $S2 = "0555"
+        $P1."mkdir"($S1,$S2)
+        $P1."cd"($S1)
+
+        $S1 = $P1."cwd"()
+        print $S1
+        print "\n"
+
         end
 .end
 CODE
 $cwd
 $upcwd
 $cwd
+$xpto
 OUT
+
+rmdir $xpto if -d $xpto;
 
 ## remember to change the number of tests :-)
 BEGIN { plan tests => 1; }

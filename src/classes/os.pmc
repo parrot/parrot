@@ -48,7 +48,7 @@ information see F<src/pmc.c>.
 
 /*
 
-=item C<char* cwd()>
+=item C<STRING* cwd()>
 
 =cut
 
@@ -93,7 +93,7 @@ information see F<src/pmc.c>.
 
 /*
 
-=item C<void cd(char *path)>
+=item C<void cd(STRING *path)>
 
 =cut
 
@@ -149,7 +149,7 @@ information see F<src/pmc.c>.
 
 /*
 
-=item C<void rm(char *path)>
+=item C<void rm(STRING* path)>
 
 Removes C<files> (unlink)
 
@@ -229,6 +229,110 @@ Removes C<files> (unlink)
             }
         }
     }
+
+
+/*
+
+=item C<void mkdir(STRING* path, STRING* mode)>
+
+Creates directories
+
+=cut
+
+*/
+
+    METHOD void mkdir(STRING *path, STRING *mode) {
+        int error;
+        char *cpath = string_to_cstring(interpreter, path);
+        char *cmode = string_to_cstring(interpreter, mode);
+        /* should we validate cmode? */
+        error = mkdir(cpath, strtol(cmode, NULL, 8));
+        string_cstring_free(cpath);
+        string_cstring_free(cmode);
+        if (error) {
+            switch(errno) {
+            case ENOTDIR:
+                real_exception(interpreter, NULL, E_SystemError, 
+                               "A component of the path prefix is not a "
+                               "directory.");
+                break;
+
+            case ENAMETOOLONG:
+                real_exception(interpreter, NULL, E_SystemError, 
+                               "A component of a pathname exceeded %d "
+                               "characters, or an entire path name "
+                               "exceeded %d characters.",
+                               NAME_MAX, PATH_MAX);
+                break;
+                      
+            case ENOENT:           
+                real_exception(interpreter, NULL, E_SystemError, 
+                               "A component of the path prefix does not "
+                               "exist.");
+                break;
+
+            case EACCES:
+                real_exception(interpreter, NULL, E_SystemError, 
+                               "Search permission is denied for a component "
+                               "of the path prefix.");
+                break;
+
+#ifdef ELOOP
+               case ELOOP:
+                real_exception(interpreter, NULL, E_SystemError, 
+                               "Too many symbolic links were encountered in "
+                               "translating the pathname.");
+                break;
+#endif
+
+            case EROFS:
+                real_exception(interpreter, NULL, E_SystemError, 
+                               "The named file resides on a read-only file "
+                               "system.");
+                break;
+
+            case EEXIST:
+                real_exception(interpreter, NULL, E_SystemError, 
+                               "The named file exists.");
+                break;
+
+            case ENOSPC:
+                real_exception(interpreter, NULL, E_SystemError, 
+                               "The new directory cannot be created because "
+                               "there is no space left on the file system "
+                               "that will contain the directory or there are "
+                               "no free inodes on the file system on which "
+                               "the directory is being created.");
+                break;
+
+            case EDQUOT:
+                real_exception(interpreter, NULL, E_SystemError, 
+                               "The new directory cannot be created because "
+                               "the user's quota of disk blocks on the file "
+                               "system that will contain the directory has "
+                               "been exhausted, or the user's quota of inodes "
+                               "on the file system on which the directory is "
+                               "being created has been exhausted.");
+                break;
+                
+#ifdef EIO
+            case EIO:
+                real_exception(interpreter, NULL, E_SystemError, 
+                               "An I/O error occurred while making the "
+                               "directory entry or allocating the inode or "
+                               "an I/O error occurred while reading from or "
+                               "writing to the file system.");
+                break;
+#endif
+                
+            case EFAULT:          
+                real_exception(interpreter, NULL, E_SystemError, 
+                               "Path points outside the process's allocated "
+                               "address space.");
+                
+            }
+        }
+    }
 }
 /*
 
@@ -236,7 +340,7 @@ Removes C<files> (unlink)
 
 =head1 SEE ALS0
 
-   man chdir(2), getcwd(3), unlink(2)
+   man chdir(2), getcwd(3), unlink(2), mkdir(2)
 
 =cut
 
