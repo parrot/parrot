@@ -62,27 +62,28 @@ information see F<src/pmc.c>.
             mem_sys_free(cwd);
             return scwd;
         } else {
-            /* XXX RAISE EXCEPTION (check errno)
-               The getcwd() function will fail if:
-
-               [EACCES]           
-               Read or search permission was denied for a component
-               of the pathname.
-
-               [EINVAL]
-               The size argument is zero.
-
-               [ENOENT]
-               A component of the pathname no longer exists.
-
-               [ENOMEM]
-               Insufficient memory is available.
-
-               [ERANGE]
-               The size argument is greater than zero but smaller
-               than the length of the pathname plus 1.
-            */
-
+            switch(errno) {
+            case EACCES:
+                real_exception(interpreter, NULL, E_SystemError,
+                               "Read or search permission was denied for a component of the pathname.");
+                break;
+            case EINVAL:
+                real_exception(interpreter, NULL, E_SystemError,
+                               "The size argument is zero.");
+                break;
+            case ENOENT:
+                real_exception(interpreter, NULL, E_SystemError,
+                               "A component of the pathname no longer exists.");
+                break;
+            case ENOMEM:
+                real_exception(interpreter, NULL, E_SystemError,
+                               "Insufficient memory is available.");
+                break;
+            case ERANGE:
+                real_exception(interpreter, NULL, E_SystemError,
+                               "The size argument is greater than zero but smaller than the length of the pathname plus 1.");
+            }
+            return NULL;
         }
     }
 
@@ -101,35 +102,36 @@ information see F<src/pmc.c>.
         error = chdir(cpath);
         string_cstring_free(cpath);
         if (error) {
-            /* XXX Check errno:
-
-            [ENOTDIR]
-            A component of the path prefix is not a directory.
-
-            [ENAMETOOLONG]
-            A component of a pathname exceeded {NAME_MAX} charac-
-            ters, or an entire path name exceeded {PATH_MAX} char-
-            acters.
-            
-            [ENOENT]
-            The named directory does not exist.
-
-            [ELOOP]
-            Too many symbolic links were encountered in translat-
-            ing the pathname.
-
-            [EACCES]
-            Search permission is denied for any component of the
-            path name.
-
-            [EFAULT]
-            Path points outside the process's allocated address
-            space.
-
-            [EIO]
-            An I/O error occurred while reading from or writing to
-            the file system.
-            */
+            switch(errno) {
+            case ENOTDIR:
+                real_exception(interpreter, NULL, E_SystemError,
+                               "A component of the path prefix is not a directory.");
+                break;
+            case ENAMETOOLONG:
+                real_exception(interpreter, NULL, E_SystemError,
+                               "A component of a pathname exceeded %d characters, or an entire path name exceeded %d characters.", NAME_MAX, PATH_MAX);
+                break;
+            case ENOENT:
+                real_exception(interpreter, NULL, E_SystemError,
+                               "The named directory does not exist.");
+                break;
+            case ELOOP:
+                real_exception(interpreter, NULL, E_SystemError, 
+                               "Too many symbolic links were encountered in translating the pathname.");
+                break;
+            case EACCES:
+                real_exception(interpreter, NULL, E_SystemError, 
+                               "Search permission is denied for any component of the path name.");
+                break;
+            case EFAULT:
+                real_exception(interpreter, NULL, E_SystemError, 
+                               "Path points outside the process's allocated address space.");
+                break;
+            case EIO:
+                real_exception(interpreter, NULL, E_SystemError, 
+                               "An I/O error occurred while reading from or writing to the file system.");
+                break;
+            }
         }
     }
 }
