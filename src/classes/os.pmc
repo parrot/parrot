@@ -55,12 +55,83 @@ information see F<src/pmc.c>.
 */
 
     METHOD STRING* cwd() {
+        STRING *scwd;
         char * cwd = getcwd(NULL, 0);
-        STRING *scwd = string_from_cstring(interpreter, cwd, strlen(cwd));
-        free(cwd);
-        return scwd;
+        if (cwd) {
+            scwd = string_from_cstring(interpreter, cwd, strlen(cwd));
+            mem_sys_free(cwd);
+            return scwd;
+        } else {
+            /* XXX RAISE EXCEPTION (check errno)
+               The getcwd() function will fail if:
+
+               [EACCES]           
+               Read or search permission was denied for a component
+               of the pathname.
+
+               [EINVAL]
+               The size argument is zero.
+
+               [ENOENT]
+               A component of the pathname no longer exists.
+
+               [ENOMEM]
+               Insufficient memory is available.
+
+               [ERANGE]
+               The size argument is greater than zero but smaller
+               than the length of the pathname plus 1.
+            */
+
+        }
     }
 
+
+/*
+
+=item C<void cd(char *path)>
+
+=cut
+
+*/
+
+    METHOD void cd(STRING *path) {
+        int error;
+        char *cpath = string_to_cstring(interpreter, path);
+        error = chdir(cpath);
+        string_cstring_free(cpath);
+        if (error) {
+            /* XXX Check errno:
+
+            [ENOTDIR]
+            A component of the path prefix is not a directory.
+
+            [ENAMETOOLONG]
+            A component of a pathname exceeded {NAME_MAX} charac-
+            ters, or an entire path name exceeded {PATH_MAX} char-
+            acters.
+            
+            [ENOENT]
+            The named directory does not exist.
+
+            [ELOOP]
+            Too many symbolic links were encountered in translat-
+            ing the pathname.
+
+            [EACCES]
+            Search permission is denied for any component of the
+            path name.
+
+            [EFAULT]
+            Path points outside the process's allocated address
+            space.
+
+            [EIO]
+            An I/O error occurred while reading from or writing to
+            the file system.
+            */
+        }
+    }
 }
 /*
 
@@ -68,6 +139,7 @@ information see F<src/pmc.c>.
 
 =head1 SEE ALS0
 
+   man chdir(2), getcwd(3)
 
 =cut
 

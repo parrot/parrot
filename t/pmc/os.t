@@ -25,15 +25,37 @@ Tests the C<OS> PMC.
 =cut
 
 my $cwd = getcwd;
+
+# Ugly hack. I accept suggestions.
+$cwd =~ m![/\\]parrot([/\\]?)$!;
+my $upcwd = "$`$1";
+
 pir_output_is(<<'CODE', <<"OUT", "cwd");
 .sub main :main
         $P1 = new .OS
         $S1 = $P1."cwd"()
         print $S1
         print "\n"
+
+        $S1 = ".."
+        $P1."cd"($S1)
+
+        $S1 = $P1."cwd"()
+        print $S1
+        print "\n"
+
+        $S1 = "parrot"
+        $P1."cd"($S1)
+
+        $S1 = $P1."cwd"()
+        print $S1
+        print "\n"
+
         end
 .end
 CODE
+$cwd
+$upcwd
 $cwd
 OUT
 
