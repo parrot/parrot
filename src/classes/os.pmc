@@ -56,6 +56,7 @@ Returns the current working directory.
 
 */
 
+#ifndef _MSC_VER
     METHOD STRING* cwd() {
         STRING *scwd;
         char * cwd = getcwd(NULL, 0);
@@ -91,7 +92,7 @@ Returns the current working directory.
             return NULL;
         }
     }
-
+#endif
 
 /*
 
@@ -103,6 +104,7 @@ Changes the current working directory to the one specified by C<path>.
 
 */
 
+#ifndef _MSC_VER
     METHOD void cd(STRING *path) {
         int error;
         char *cpath = string_to_cstring(interpreter, path);
@@ -125,11 +127,13 @@ Changes the current working directory to the one specified by C<path>.
                 real_exception(interpreter, NULL, E_SystemError,
                                "The named directory does not exist.");
                 break;
+#ifdef ELOOP
             case ELOOP:
                 real_exception(interpreter, NULL, E_SystemError, 
                                "Too many symbolic links were encountered in "
                                "translating the pathname.");
                 break;
+#endif
             case EACCES:
                 real_exception(interpreter, NULL, E_SystemError, 
                                "Search permission is denied for any component "
@@ -149,7 +153,7 @@ Changes the current working directory to the one specified by C<path>.
             }
         }
     }
-
+#endif
 
 /*
 
@@ -161,6 +165,7 @@ Calls C<unlink> to remove the file specified by C<path>.
 
 */
 
+#ifndef _MSC_VER
     METHOD void rm(STRING *path) {
         int error;
         char *cpath = string_to_cstring(interpreter, path);
@@ -233,7 +238,7 @@ Calls C<unlink> to remove the file specified by C<path>.
             }
         }
     }
-
+#endif
 
 /*
 
@@ -245,6 +250,7 @@ Creates a directory specified by C<path> with mode C<mode>.
 
 */
 
+#ifndef _MSC_VER
     METHOD void mkdir(STRING *path, STRING *mode) {
         int error;
         char *cpath = string_to_cstring(interpreter, path);
@@ -282,13 +288,13 @@ Creates a directory specified by C<path> with mode C<mode>.
                 break;
 
 #ifdef ELOOP
-               case ELOOP:
+            case ELOOP:
                 real_exception(interpreter, NULL, E_SystemError, 
                                "Too many symbolic links were encountered in "
                                "translating the pathname.");
                 break;
 #endif
-
+                
             case EROFS:
                 real_exception(interpreter, NULL, E_SystemError, 
                                "The named file resides on a read-only file "
@@ -337,6 +343,8 @@ Creates a directory specified by C<path> with mode C<mode>.
             }
         }
     }
+#endif
+
 }
 /*
 
