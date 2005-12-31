@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 73;
+use Parrot::Test tests => 74;
 use Test::More;
 
 language_output_is("tcl",<<TCL,<<OUT,"int");
@@ -461,5 +461,11 @@ language_output_is("tcl",<<'TCL',<<'OUT',"string > (equal)");
   puts [expr {"abc" > "abc"}]
 TCL
 0
+OUT
+
+language_output_is("tcl",<<'TCL',<<'OUT',"unknown math function");
+  puts [expr fink()]
+TCL
+unknown math function "fink"
 OUT
 

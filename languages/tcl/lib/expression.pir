@@ -550,7 +550,7 @@ unknown_func:
   $S1 = "unknown math function \""
   $S1 .= $S0
   $S1 .= "\""
-  .throw($S0)
+  .throw($S1)
 .end
 
 .sub get_unary
