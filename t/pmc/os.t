@@ -10,6 +10,12 @@ use Parrot::Test;
 use Parrot::Config;
 use Cwd;
 
+if ($^O =~ m!MSWin32!) {
+  plan skip_all => 'win32 implementation missing'
+} else {
+  plan tests => 1
+}
+
 =head1 NAME
 
 t/pmc/os.t - Files and Dirs
@@ -72,5 +78,3 @@ OUT
 
 rmdir $xpto if -d $xpto;
 
-## remember to change the number of tests :-)
-BEGIN { plan tests => 1; }
