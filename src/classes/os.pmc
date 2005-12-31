@@ -136,11 +136,12 @@ information see F<src/pmc.c>.
                                "Path points outside the process's allocated "
                                "address space.");
                 break;
+#ifdef EIO
             case EIO:
                 real_exception(interpreter, NULL, E_SystemError, 
                                "An I/O error occurred while reading from or "
                                "writing to the file system.");
-                break;
+#endif
             }
         }
     }
@@ -207,12 +208,13 @@ Removes C<files>
                                "for a mounted file system.");
                 break;
 
+#ifdef EIO
             case EIO:
                 real_exception(interpreter, NULL, E_SystemError, 
                                "An I/O error occurred while deleting the "
                                "directory entry or deallocating the inode.");
                 break;
-
+#endif
             case EROFS:
                 real_exception(interpreter, NULL, E_SystemError, 
                                "The named file resides on a read-only file "
