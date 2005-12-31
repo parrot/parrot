@@ -1438,7 +1438,7 @@ lib/Test/Builder.pm                               [devel]
 lib/Test/More.pm                                  [devel]
 lib/Test/Simple.pm                                [devel]
 lib/Text/Balanced.pm                              [devel]
-parrot-config.pir                                 [main]
+parrot-config                                     [main]bin
 parrot.spec                                       []
 parrotbug                                         []
 runtime/parrot/dynext/README                      [main]doc
