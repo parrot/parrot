@@ -1,6 +1,6 @@
 /*
 Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
-$Id$
+$Id:$
 
 =head1 NAME
 
@@ -50,6 +50,8 @@ information see F<src/pmc.c>.
 
 =item C<STRING* cwd()>
 
+Returns the current working directory.
+
 =cut
 
 */
@@ -94,6 +96,8 @@ information see F<src/pmc.c>.
 /*
 
 =item C<void cd(STRING *path)>
+
+Changes the current working directory to the one specified by C<path>.
 
 =cut
 
@@ -151,7 +155,7 @@ information see F<src/pmc.c>.
 
 =item C<void rm(STRING* path)>
 
-Removes C<files> (unlink)
+Calls C<unlink> to remove the file specified by C<path>.
 
 =cut
 
@@ -235,7 +239,7 @@ Removes C<files> (unlink)
 
 =item C<void mkdir(STRING* path, STRING* mode)>
 
-Creates directories
+Creates a directory specified by C<path> with mode C<mode>.
 
 =cut
 
