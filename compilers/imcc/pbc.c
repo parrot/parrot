@@ -878,6 +878,8 @@ IMCC_int_from_reg(Interp *interpreter, SymReg *r)
         r = r->reg;
     if (r->name[0] == '0' && (r->name[1] == 'x' || r->name[1] == 'X'))
         i = strtoul(r->name+2, 0, 16);
+    else if (r->name[0] == '0' && (r->name[1] == 'O' || r->name[1] == 'o'))
+        i = strtoul(r->name+2, 0, 8);
     else if (r->name[0] == '0' &&
             (r->name[1] == 'b' || r->name[1] == 'B'))
         i = strtoul(r->name+2, 0, 2);

@@ -88,9 +88,10 @@ static char *heredoc_content;
 LETTER          [a-zA-Z_@]
 DIGIT           [0-9]
 DIGITS          {DIGIT}+
-HEX        0[xX][0-9A-Fa-f]+
+HEX             0[xX][0-9A-Fa-f]+
+OCT             0[oO][0-7]+
 BIN             0[bB][01]+
-DOT        [.]
+DOT             [.]
 SIGN            [-+]
 BIGINT          {SIGN}?{DIGITS}"L"
 FLOATNUM        {SIGN}?(({DIGITS}{DOT}{DIGIT}*|{DOT}{DIGITS})([eE]{SIGN}?{DIGITS})?|{DIGITS}[eE]{SIGN}?{DIGITS})
@@ -468,6 +469,7 @@ SP              [ ]
 <*>{SIGN}?{DIGIT}+    DUP_AND_RET(valp, INTC);
 <*>{HEX}              DUP_AND_RET(valp, INTC);
 <*>{BIN}              DUP_AND_RET(valp, INTC);
+<*>{OCT}              DUP_AND_RET(valp, INTC);
 
 <*>{BIGINT}         {
     valp->s = str_dup(yytext);
