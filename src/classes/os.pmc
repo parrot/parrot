@@ -151,7 +151,7 @@ information see F<src/pmc.c>.
 
 =item C<void rm(char *path)>
 
-Removes C<files>
+Removes C<files> (unlink)
 
 =cut
 
@@ -190,12 +190,13 @@ Removes C<files>
                                "removed.");
                 break;
 
+#ifdef ELOOP
             case ELOOP:
                 real_exception(interpreter, NULL, E_SystemError, 
                                "Too many symbolic links were encountered in "
                                "translating the pathname.");
                 break;
-
+#endif
             case EPERM:
                 real_exception(interpreter, NULL, E_SystemError, 
                                "The named file is a directory and the effective"
