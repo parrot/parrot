@@ -1,9 +1,13 @@
-#!perl -w
+#!perl
 # Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 use strict;
-use Parrot::Test tests => 31;
+use warnings;
+use lib qw( . lib ../lib ../../lib );
+use Test::More;
+use Parrot::Config;
+use Parrot::Test tests => 32;
 
 ##############################
 pir_output_is(<<'CODE', <<'OUT', "+=");
@@ -477,4 +481,15 @@ pir_output_is(<<'CODE', <<'OUT', 'X = A != B');
 CODE
 0
 1
+OUT
+
+
+pir_output_is(<<'CODE', <<'OUT', 'Not an op. Test octal numbers');
+.sub main :main
+    $I0 = 0o77
+    print $I0
+    print "\n"
+.end
+CODE
+63
 OUT

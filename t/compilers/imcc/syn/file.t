@@ -1,6 +1,13 @@
-#!perl -w
+#!perl
 # Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
+
+use strict;
+use warnings;
+use lib qw( . lib ../lib ../../lib );
+use Test::More;
+use Parrot::Config;
+use Parrot::Test tests => 12;
 
 =head1 NAME
 
@@ -12,11 +19,7 @@ A test script which is supposed to be called by Test::Harness.
 
 =cut
 
-use strict;
 use 5;
-
-use Parrot::Config;
-use Parrot::Test tests => 12;
 
 # Do not assume that . is in $PATH
 my $PARROT = ".$PConfig{slash}parrot$PConfig{exe}";

@@ -3,6 +3,10 @@
 # $Id$
 
 use strict;
+use warnings;
+use lib qw( . lib ../lib ../../lib );
+use Test::More;
+use Parrot::Config;
 use Parrot::Test tests => 6;
 
 ##############################
