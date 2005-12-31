@@ -56,8 +56,8 @@ Returns the current working directory.
 
 */
 
-#ifndef _MSC_VER
     METHOD STRING* cwd() {
+#ifndef _MSC_VER
         STRING *scwd;
         char * cwd = getcwd(NULL, 0);
         if (cwd) {
@@ -91,8 +91,10 @@ Returns the current working directory.
             }
             return NULL;
         }
-    }
+#else
+        internal_exception(UNIMPLEMENTED, "Win32 is not POSIX. Need win32 developer!");
 #endif
+    }
 
 /*
 
@@ -104,8 +106,8 @@ Changes the current working directory to the one specified by C<path>.
 
 */
 
-#ifndef _MSC_VER
     METHOD void cd(STRING *path) {
+#ifndef _MSC_VER
         int error;
         char *cpath = string_to_cstring(interpreter, path);
         error = chdir(cpath);
@@ -152,8 +154,11 @@ Changes the current working directory to the one specified by C<path>.
 #endif
             }
         }
-    }
+#else
+        internal_exception(UNIMPLEMENTED, "Win32 is not POSIX. Need win32 developer!");
 #endif
+    }
+
 
 /*
 
@@ -165,8 +170,9 @@ Calls C<unlink> to remove the file specified by C<path>.
 
 */
 
-#ifndef _MSC_VER
+
     METHOD void rm(STRING *path) {
+#ifndef _MSC_VER
         int error;
         char *cpath = string_to_cstring(interpreter, path);
         error = unlink(cpath);
@@ -237,8 +243,11 @@ Calls C<unlink> to remove the file specified by C<path>.
                                "address space.");
             }
         }
-    }
+#else
+        internal_exception(UNIMPLEMENTED, "Win32 is not POSIX. Need win32 developer!");
 #endif
+    }
+
 
 /*
 
@@ -250,8 +259,9 @@ Creates a directory specified by C<path> with mode C<mode>.
 
 */
 
-#ifndef _MSC_VER
+
     METHOD void mkdir(STRING *path, STRING *mode) {
+#ifndef _MSC_VER
         int error;
         char *cpath = string_to_cstring(interpreter, path);
         char *cmode = string_to_cstring(interpreter, mode);
@@ -342,8 +352,11 @@ Creates a directory specified by C<path> with mode C<mode>.
                 
             }
         }
-    }
+#else
+        internal_exception(UNIMPLEMENTED, "Win32 is not POSIX. Need win32 developer!");
 #endif
+    }
+
 
 }
 /*

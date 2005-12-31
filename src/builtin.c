@@ -39,14 +39,10 @@ static Builtins builtins[] = {
     { "atan2", 	"PJOP",		"Float", 	0, 0 },
     { "cos", 	"PJO", 		"Float", 	0, 0 },
     { "cosh", 	"PJO", 		"Float", 	0, 0 },
-#ifndef _MSC_VER
     { "cd",     "vJS",          "OS",           0, 0 },
     { "cwd",    "SJ",           "OS",           0, 0 },
-#endif
     { "exp", 	"PJO", 		"Float", 	0, 0 },
-#ifndef _MSC_VER
     { "mkdir",  "vJSS",         "OS",           0, 0 },
-#endif
     { "ln", 	"PJO", 		"Float", 	0, 0 },
     { "log10", 	"PJO", 		"Float", 	0, 0 },
     { "log2", 	"PJO", 		"Float", 	0, 0 },
@@ -62,9 +58,7 @@ static Builtins builtins[] = {
     { "open", 	"PJS.S",	"ParrotIO", 	0, 0 },
     { "puts", 	"IJOS",         "ParrotIO", 	0, 0 },
     { "reverse","vJS",          "String",       0, 0 },
-#ifndef _MSC_VER
     { "rm",     "vJS",          "OS",           0, 0 },
-#endif
     { "say", 	"IJS",          "ParrotIO", 	0, 0 },
     { "say", 	"IJOS",         "ParrotIO", 	0, 0 },
     { "say", 	"vJS",          "ParrotIO", 	0, 0 },
