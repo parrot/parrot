@@ -263,15 +263,13 @@ Creates a directory specified by C<path> with mode C<mode>.
 */
 
 
-    METHOD void mkdir(STRING *path, STRING *mode) {
+    METHOD void mkdir(STRING *path, INTVAL mode) {
 #ifndef _MSC_VER
         int error;
         char *cpath = string_to_cstring(interpreter, path);
-        char *cmode = string_to_cstring(interpreter, mode);
-        /* should we validate cmode? */
-        error = mkdir(cpath, strtol(cmode, NULL, 8));
+        /* should we validate mode? */
+        error = mkdir(cpath, mode);
         string_cstring_free(cpath);
-        string_cstring_free(cmode);
         if (error) {
             switch(errno) {
             case ENOTDIR:

@@ -61,8 +61,8 @@ pir_output_is(<<'CODE', <<"OUT", "cwd");
         print "\n"
 
         $S1 = "xpto"
-        $S2 = "0555"
-        $P1."mkdir"($S1,$S2)
+        $I1 = 0o555
+        $P1."mkdir"($S1,$I1)
         $P1."cd"($S1)
 
         $S1 = $P1."cwd"()
