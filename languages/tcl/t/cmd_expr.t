@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 74;
+use Parrot::Test tests => 84;
 use Test::More;
 
 language_output_is("tcl",<<TCL,<<OUT,"int");
@@ -469,3 +469,67 @@ TCL
 unknown math function "fink"
 OUT
 
+TODO: {
+  local $TODO = "not all string cases are currently working properly";
+
+language_output_is("tcl",<<TCL,<<OUT,"string mul");
+ puts [expr {"a" * "b"}]
+TCL
+can't use non-numeric string as operand of "*"
+OUT
+
+language_output_is("tcl",<<TCL,<<OUT,"string div");
+ puts [expr {"a" / "b"}]
+TCL
+can't use non-numeric string as operand of "/"
+OUT
+
+language_output_is("tcl",<<TCL,<<OUT,"string remainder");
+ puts [expr {"a" % "b"}]
+TCL
+can't use non-numeric string as operand of "%"
+OUT
+
+language_output_is("tcl",<<TCL,<<OUT,"string plus");
+ puts [expr {"a" + "b"}]
+TCL
+can't use non-numeric string as operand of "+"
+OUT
+
+language_output_is("tcl",<<TCL,<<OUT,"string minus");
+ puts [expr {"a" - "b"}]
+TCL
+can't use non-numeric string as operand of "-"
+OUT
+
+language_output_is("tcl",<<TCL,<<OUT,"string left shift");
+ puts [expr {"a" << "b"}]
+TCL
+can't use non-numeric string as operand of "<<"
+OUT
+
+language_output_is("tcl",<<TCL,<<OUT,"string right shift");
+ puts [expr {"a" >> "b"}]
+TCL
+can't use non-numeric string as operand of ">>"
+OUT
+
+language_output_is("tcl",<<TCL,<<OUT,"string &");
+ puts [expr {"a" & "b"}]
+TCL
+can't use non-numeric string as operand of "&"
+OUT
+
+language_output_is("tcl",<<TCL,<<OUT,"string |");
+ puts [expr {"a" | "b"}]
+TCL
+can't use non-numeric string as operand of "|"
+OUT
+
+language_output_is("tcl",<<TCL,<<OUT,"string ^");
+ puts [expr {"a" ^ "b"}]
+TCL
+can't use non-numeric string as operand of "^"
+OUT
+
+}
