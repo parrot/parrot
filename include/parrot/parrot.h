@@ -104,6 +104,10 @@ typedef jmp_buf Parrot_jump_buff;
 #  include <pthread.h>
 #endif /* PARROT_HAS_HEADER_PTHREAD */
 
+#ifdef PARROT_HAS_HEADER_LIMITS
+#  include <limits.h>
+#endif /* PARROT_HAS_HEADER_LIMITS */
+
 #define NUM_REGISTERS 32
 #define PARROT_MAGIC 0x13155a1
 
