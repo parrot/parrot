@@ -62,6 +62,7 @@ d	v
 I	JI	 # Parrot_is_char_*
 v       JOSP     # String.trans
 v       JOS      # String.reverse
+P       JOS      # Added for os.stat
 
 v	JPPP	 # infix MMD
 v	JPIP
@@ -333,3 +334,6 @@ S      JOi
 v      JOi
 I      JO
 N      JO
+
+
+

@@ -269,7 +269,6 @@ Creates a directory specified by C<path> with mode C<mode>.
 
 */
 
-
     METHOD void mkdir(STRING *path, INTVAL mode) {
 #ifndef _MSC_VER
         int error;
@@ -370,20 +369,65 @@ Creates a directory specified by C<path> with mode C<mode>.
 
 =item C<void stat(STRING* path)>
 
-Stats a file.
+Stats a file, and returns a 13 position array as in Perl:
+
+     0 dev      device number of filesystem
+     1 ino      inode number
+     2 mode     file mode  (type and permissions)
+     3 nlink    number of (hard) links to the file
+     4 uid      numeric user ID of file's owner
+     5 gid      numeric group ID of file's owner
+     6 rdev     the device identifier (special files only)
+     7 size     total size of file, in bytes
+     8 atime    last access time in seconds since the epoch
+     9 mtime    last modify time in seconds since the epoch
+    10 ctime    inode change time in seconds since the epoch (*)
+    11 blksize  preferred block size for file system I/O
+    12 blocks   actual number of blocks allocated
 
 =cut
 
 */
 
-
-    METHOD void stat(STRING *path) {
+    METHOD PMC* stat(STRING *path) {
 #ifndef _MSC_VER
         struct stat info;
+        PMC *array;
 
         char *cpath = string_to_cstring(interpreter, path);
         int error = stat(cpath, &info);
         string_cstring_free(cpath);
+
+        array = pmc_new(interpreter, enum_class_FixedPMCArray);
+        VTABLE_set_integer_native(interpreter, array, 13);
+/*        VTABLE_init(interpreter, array); */
+        VTABLE_set_integer_keyed_int(interpreter, array, 0,
+                                     info.st_dev);
+        VTABLE_set_integer_keyed_int(interpreter, array, 1,
+                                     info.st_ino);
+        VTABLE_set_integer_keyed_int(interpreter, array, 2,
+                                     info.st_mode);
+        VTABLE_set_integer_keyed_int(interpreter, array, 3,
+                                     info.st_nlink);
+        VTABLE_set_integer_keyed_int(interpreter, array, 4,
+                                     info.st_uid);
+        VTABLE_set_integer_keyed_int(interpreter, array, 5,
+                                     info.st_gid);
+        VTABLE_set_integer_keyed_int(interpreter, array, 6,
+                                     info.st_rdev);
+        VTABLE_set_integer_keyed_int(interpreter, array, 7,
+                                     info.st_size);
+        VTABLE_set_integer_keyed_int(interpreter, array, 8,
+                                     info.st_atime);
+        VTABLE_set_integer_keyed_int(interpreter, array, 9,
+                                     info.st_mtime);
+        VTABLE_set_integer_keyed_int(interpreter, array,10,
+                                     info.st_ctime);
+        VTABLE_set_integer_keyed_int(interpreter, array,11,
+                                     info.st_blksize);
+        VTABLE_set_integer_keyed_int(interpreter, array,12,
+                                     info.st_blocks);
+
         if (error) {
             switch(errno) {
             case ENOTDIR:
@@ -432,7 +476,12 @@ Stats a file.
                 break;
 #endif
             }
+            return NULL;
+        } else {
+            return array;
         }
+#else
+        internal_exception(UNIMPLEMENTED, "Win32 is not POSIX. Need win32 developer!");
 #endif
     }
 
