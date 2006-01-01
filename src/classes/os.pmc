@@ -21,6 +21,11 @@ files and directories.
 
 #include "parrot/parrot.h"
 
+/* XXX this is a hack to fix the build on Solaris */
+#ifndef NAME_MAX
+#define NAME_MAX 14
+#endif
+
 static PMC * OS_PMC;
 pmclass OS singleton {
 
