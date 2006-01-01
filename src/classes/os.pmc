@@ -186,11 +186,18 @@ C<path>.
                 break;
 
             case ENAMETOOLONG:
+#if defined NAME_MAX && defined PATH_MAX
                 real_exception(interpreter, NULL, E_SystemError, 
                                "A component of a pathname exceeded %d "
                                "characters, or an entire path name exceeded %d "
                                "characters.", NAME_MAX, PATH_MAX);
+#else
+                real_exception(interpreter, NULL, E_SystemError, 
+                               "A component of a pathname exceeded the limit "
+                               "of alowed characters.");
+#endif
                 break;
+
 
             case ENOTEMPTY:
                 real_exception(interpreter, NULL, E_SystemError,
@@ -358,6 +365,76 @@ Creates a directory specified by C<path> with mode C<mode>.
 #endif
     }
 
+
+/*
+
+=item C<void stat(STRING* path)>
+
+Stats a file.
+
+=cut
+
+*/
+
+
+    METHOD void stat(STRING *path) {
+#ifndef _MSC_VER
+        struct stat info;
+
+        char *cpath = string_to_cstring(interpreter, path);
+        int error = stat(cpath, &info);
+        string_cstring_free(cpath);
+        if (error) {
+            switch(errno) {
+            case ENOTDIR:
+                real_exception(interpreter, NULL, E_SystemError, 
+                               "A component of the path prefix is not a "
+                               "directory.");
+                break;
+                
+            case ENAMETOOLONG:
+                real_exception(interpreter, NULL, E_SystemError, 
+                               "A component of a pathname exceeded %d "
+                               "characters, or an entire path name "
+                               "exceeded %d characters.",
+                               NAME_MAX, PATH_MAX);
+                break;
+
+            case ENOENT:
+                real_exception(interpreter, NULL, E_SystemError, 
+                               "The named file does not exist.");
+                break;
+
+            case EACCES:
+                real_exception(interpreter, NULL, E_SystemError, 
+                               "Search permission is denied for a component "
+                               "of the path prefix.");
+                break;
+
+#ifdef ELOOP
+            case ELOOP:
+                real_exception(interpreter, NULL, E_SystemError, 
+                               "Too many symbolic links were encountered in "
+                               "translating the pathname.");
+                break;
+#endif
+
+            case EFAULT:
+                real_exception(interpreter, NULL, E_SystemError, 
+                               "Sb or name points to an invalid address.");
+                break;
+
+#ifdef EIO
+            case EIO:
+                real_exception(interpreter, NULL, E_SystemError, 
+                               "An I/O error occurred while reading from or "
+                               "writing to the file system.");
+                break;
+#endif
+            }
+        }
+#endif
+    }
 
 }
 /*
