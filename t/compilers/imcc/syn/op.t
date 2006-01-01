@@ -484,12 +484,48 @@ CODE
 OUT
 
 
-pir_output_is(<<'CODE', <<'OUT', 'Not an op. Test octal numbers');
+pir_output_is(<<'CODE', <<'OUT', 'Test octal/hex/bin/dec numbers');
 .sub main :main
+    $I0 = 0077
+    print $I0
+    print "\n"
+
     $I0 = 0o77
     print $I0
     print "\n"
+
+    $I0 = 0xfF
+    print $I0
+    print "\n"
+
+    $I0 = 0b1101
+    print $I0
+    print "\n"
+
+    $I0 = 0O10
+    print $I0
+    print "\n"
+
+    $I0 = 0X10
+    print $I0
+    print "\n"
+
+    $I0 = 0B10
+    print $I0
+    print "\n"
+
+    $I0 = 10
+    print $I0
+    print "\n"
+
 .end
 CODE
+77
 63
+255
+13
+8
+16
+2
+10
 OUT
