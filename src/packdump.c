@@ -121,8 +121,8 @@ PackFile_Constant_dump(Interp *interpreter,
                             "\tname => '%Ss',\n"
                             "\tnamespace => '%Ss'\n",
                             pmc->vtable->whoami,
-                            sub->address - code_start,
-                            sub->end - code_start,
+                            sub->start_offs,
+                            sub->end_offs,
                             sub->name,
                             sub->namespace ?
                                 (sub->namespace->vtable->base_type ==
