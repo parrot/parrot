@@ -8,7 +8,7 @@ src/classes/os.pmc - Files and Directories PMC
 
 =head1 DESCRIPTION
 
-C<os> is a singleton class which provides access to the system
+C<OS> is a singleton class which provides access to the filesystem
 files and directories.
 
 =head2 Methods
@@ -186,7 +186,7 @@ C<path>.
                 break;
 
             case ENAMETOOLONG:
-#if defined NAME_MAX && defined PATH_MAX
+#ifdef PARROT_HAS_HEADER_LIMITS
                 real_exception(interpreter, NULL, E_SystemError, 
                                "A component of a pathname exceeded %d "
                                "characters, or an entire path name exceeded %d "
@@ -367,7 +367,7 @@ Creates a directory specified by C<path> with mode C<mode>.
 
 /*
 
-=item C<void stat(STRING* path)>
+=item C<fixedpmcarray* stat(STRING* path)>
 
 Stats a file, and returns a 13 position array as in Perl:
 
@@ -486,6 +486,121 @@ Stats a file, and returns a 13 position array as in Perl:
 #endif
     }
 
+
+/*
+
+=item C<void symlink(STRING* path)>
+
+Creates a symlink, where available
+
+=cut
+
+*/
+
+    METHOD void symlink(STRING *from, STRING *to) {
+#ifndef _MSC_VER
+
+        char *cfrom = string_to_cstring(interpreter, from);
+        char *cto = string_to_cstring(interpreter, to);
+        int error = symlink(cfrom, cto);
+        string_cstring_free(cfrom);
+        string_cstring_free(cto);
+        if (error) {
+            switch(errno) {
+            case ENOTDIR:
+                real_exception(interpreter, NULL, E_SystemError, 
+                               "A component of the name2 prefix is not a "
+                               "directory.");
+                break;
+
+            case ENAMETOOLONG:
+                real_exception(interpreter, NULL, E_SystemError, 
+                               "A component of a pathname exceeded %d "
+                               "characters, or an entire path name exceeded "
+                               "%d characters.",NAME_MAX,PATH_MAX);
+                break;
+
+            case ENOENT:
+                real_exception(interpreter, NULL, E_SystemError, 
+                               "The named file does not exist.");
+                break;
+
+            case EACCES:
+                real_exception(interpreter, NULL, E_SystemError, 
+                               "A component of the name2 path prefix denies "
+                               "search permission.");
+                break;
+
+#ifdef ELOOP
+            case ELOOP:
+                real_exception(interpreter, NULL, E_SystemError, 
+                               "Too many symbolic links were encountered in "
+                               "translating the pathname.");
+                break;
+#endif
+
+            case EEXIST:
+                real_exception(interpreter, NULL, E_SystemError, 
+                               "Name2 already exists.");
+                break;
+
+#ifdef EIO
+            case EIO:
+                real_exception(interpreter, NULL, E_SystemError, 
+                               "An I/O error occurred while making the "
+                               "directory entry for name2, or allocating "
+                               "the inode for name2, or writing out the "
+                               "link contents of name2.");
+                break;
+#endif
+
+            case EROFS:
+                real_exception(interpreter, NULL, E_SystemError, 
+                               "The file name2 would reside on a read-only "
+                               "file system.");
+                break;
+
+            case ENOSPC:
+                real_exception(interpreter, NULL, E_SystemError, 
+                               "The directory in which the entry for the new "
+                               "symbolic link is being placed cannot be extended"
+                               " because there is no space left on the file "
+                               "system containing the directory, the new "
+                               "symbolic link cannot be created because there "
+                               "is no space left on the file system that will "
+                               "contain the symbolic link or there are no free "
+                               "inodes on the file system on which the symbolic"
+                               " link is being created.");
+                break;
+
+            case EDQUOT:
+                real_exception(interpreter, NULL, E_SystemError, 
+                               "The directory in which the entry for the new "
+                               "symbolic link is being placed cannot be "
+                               "extended because the user's quota of disk "
+                               "blocks on the file system containing the "
+                               "directory has been exhausted, the new symbolic "
+                               "link cannot be created because the user's "
+                               "quota of disk blocks on the file system that "
+                               "will contain the symbolic link has been "
+                               "exhausted, the new symbolic link cannot be "
+                               "created because the user's quota of disk "
+                               "blocks on the file system that will contain "
+                               "the symbolic link has been exhausted, or "
+                               "the user's quota of inodes on the file "
+                               "system on which the symbolic link is being "
+                               "created has been exhausted.");
+                break;
+
+            case EFAULT:
+                real_exception(interpreter, NULL, E_SystemError, 
+                               "Name1 or name2 points outside the process's "
+                               "allocated address space.");
+                break;
+            }
+        }
+#endif
+    }
 }
 /*
 
@@ -493,7 +608,7 @@ Stats a file, and returns a 13 position array as in Perl:
 
 =head1 SEE ALS0
 
-   man chdir(2), getcwd(3), unlink(2), mkdir(2)
+   man chdir(2), getcwd(3), unlink(2), mkdir(2), stat(2), symlink(2)
 
 =cut
 
