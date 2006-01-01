@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 4;
+use Parrot::Test tests => 5;
 use Test::More;
 
 language_output_is("tcl",<<'TCL',<<OUT,"rename");
@@ -35,3 +35,15 @@ language_output_is("tcl",<<'TCL',<<'OUT',"test fallback to interpreted versions 
 TCL
 3
 OUT
+
+language_output_is("tcl",<<'TCL',<<'OUT',"delete inlined sub");
+ set a 1
+ incr a
+ puts $a
+ rename incr {}
+ incr a
+TCL
+2
+invalid command name "incr"
+OUT
+
