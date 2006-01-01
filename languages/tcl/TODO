@@ -1,4 +1,4 @@
-All TODO items should be documented in RT. (http://rt.perl.org/)
+All TODO items should be documented in RT (http://rt.perl.org/) or the test suite (t/*)
 
 A listing of all TODO items is available at:
 
@@ -15,4 +15,4 @@ line is:
 '[TODO] Tcl - <summary of task>'
 
 Note that while TODO automatically makes it a TODO, Tcl doesn't automatically assign
-it to the tcl - this needs to be set in RT, under the section "Custom Fields"
+it to tcl - this needs to be set in RT, under the section "Custom Fields".
