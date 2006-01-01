@@ -67,6 +67,7 @@ lib${slash}builtins${slash}package.pir \
 lib${slash}commands${slash}parray.pir \
 lib${slash}commands${slash}proc.pir \
 lib${slash}commands${slash}puts.pir \
+lib${slash}builtins${slash}pwd.pir \
 lib${slash}commands${slash}regexp.pir \
 lib${slash}builtins${slash}regsub.pir \
 lib${slash}commands${slash}rename.pir \
