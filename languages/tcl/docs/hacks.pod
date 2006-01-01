@@ -109,7 +109,12 @@ At the moment, there doesn't seem to be a parrot method for determining if
 a filehandled was opened for reading/writing. We can work around this by
 tracking it in a hash in the _Tcl namespace.
 
+=item [after], [vwait]
+
+This is waiting, pending the event system re-thunk.
+
 =back
+
 
 =cut
 

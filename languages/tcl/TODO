@@ -1,71 +1,18 @@
-=head1 Tcl TODOs
+All TODO items should be documented in RT. (http://rt.perl.org/)
 
-=head2 Milestones
+A listing of all TODO items is available at:
 
-The next *big* milestone is to be able to run tcl's test suite natively. That
-means being able to deal with all the commands in:
+ http://rt.perl.org/rt3/NoAuth/parrot/List.html?Field=Lang&Value=tcl
 
-http://cvs.sourceforge.net/viewcvs.py/tcl/tcl/library/tcltest/tcltest.tcl?view=markup
+To add TODOs to this list (which is powered by RT), send an email to
 
-This will require a *lot* of work. On the plus side, we'll be passing a lot more
-tests by then. =-)
+ parrotbugs@parrotcode.org
 
-=over 4
+Begin your subject with '[TODO]' so that the bug is automatically marked as a
+TODO ticket.  For reasons of consistency, the encouraged format of the subject
+line is:
 
-=item *
+'[TODO] Tcl - <summary of task>'
 
-It should be possible to implement some builtins in terms of other builtins.
-See http://wiki.tcl.tk/15051 for some musings on this. We already at least
-partial implementations of most of the items there. If we go this route, then
-we need to pre-compile the builtins-in-tcl into PIR at build time.
-
-=back
-
-=head2 PIR tasks
-
-=over 4
-
-=item implement default globals, etc.
-
-global variables provided by tcl libary. L<tclvars>.
-
-global variables provided by tcl interpreter. L<tclsh>
-
-source per-user settings. L<tclsh>
-
-=back
-
-=head2 Design tasks
-
-=over 4
-
-=item provide a way to access existing library PIR from Tcl.
-
-Perhaps via [namespace import]? Can fake it right now with [inline]
-
-=back
-
-=head2 refactoring tasks
-
-=over 4
-
-=item [expr]
-
-TBD: Argument type requirements - Currently works ONLY on bitand - esp need
-to get any that require int-only args, as we can now /generate/ floats,
-even if we cannot specify them. This is all supportable by MMD - we just
-need to specify the correct errors to throw.
-
-=back
-
-=head2 Things we can't do yet (need parrot)
-
-=over 4
-
-=item [after], [vwait]
-
-pending the event system thunk.
-
-=back
-
-=cut
+Note that while TODO automatically makes it a TODO, Tcl doesn't automatically assign
+it to the tcl - this needs to be set in RT, under the section "Custom Fields"
