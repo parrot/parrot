@@ -7,9 +7,9 @@ config/auto/bc.pm - Check whether GNU bc works
 
 =head1 DESCRIPTION
 
-Determines whether GNU bc, the basic calculator, exists on the system.
-It is OK when it doesn't exist. Currently GNU bc is only used for doublechecking
-Parrot bc.
+Determines whether GNU bc, the basic calculator, exists on the system. It is OK
+when it doesn't exist. Currently GNU bc is only used for doublechecking Parrot
+bc.
 
 =cut
 

@@ -7,9 +7,8 @@ config/auto/m4 - Check whether GNU m4 works
 
 =head1 DESCRIPTION
 
-Determines whether GNU m4 exists on the system.
-It is OK when it doesn't exist. Currently GNU m4 is only used for doublechecking
-Parrot m4.
+Determines whether GNU m4 exists on the system. It is OK when it doesn't exist.
+Currently GNU m4 is only used for doublechecking Parrot m4.
 
 =cut
 

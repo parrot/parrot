@@ -7,12 +7,12 @@ config/init/miniparrot.pm - Miniparrot configuration
 
 =head1 DESCRIPTION
 
-Modifies settings to match miniparrot (ANSI C Parrot)'s needs.  This step primarily 
-overwrites a lot of settings in the Configure database to disable JIT and match ANSI 
-characteristics.
+Modifies settings to match miniparrot (ANSI C Parrot)'s needs.  This step
+primarily  overwrites a lot of settings in the Configure database to disable
+JIT and match ANSI  characteristics.
 
-Centralizing these settings will (hopefully) allow for an eventual move away from using 
-Configure at all for miniparrot builds.
+Centralizing these settings will (hopefully) allow for an eventual move away
+from using  Configure at all for miniparrot builds.
 
 =cut
 

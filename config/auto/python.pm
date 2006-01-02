@@ -7,8 +7,7 @@ config/auto/python - Check whether python is there
 
 =head1 DESCRIPTION
 
-Determines whether python is there.
-Checks also whether we have Python 2.4.
+Determines whether python is there. Checks also whether we have Python 2.4.
 
 =head1 TODO
 

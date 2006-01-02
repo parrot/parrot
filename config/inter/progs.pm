@@ -7,9 +7,9 @@ config/inter/progs.pm - C Compiler and Linker
 
 =head1 DESCRIPTION
 
-Asks the user which compiler, linker, shared library builder, C
-libraries, lexical analyzer generator and parser generator to use. Also
-whether debugging should be enabled.
+Asks the user which compiler, linker, shared library builder, C libraries,
+lexical analyzer generator and parser generator to use. Also whether debugging
+should be enabled.
 
 =cut
 

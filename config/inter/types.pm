@@ -7,8 +7,8 @@ config/inter/types.pm - Sizes for Parrot Types
 
 =head1 DESCRIPTION
 
-Asks the user which size integer, floating-point number and opcode types
-should be.
+Asks the user which size integer, floating-point number and opcode types should
+be.
 
 =cut
 

@@ -155,8 +155,8 @@ Dump config keys.
 
 =item Parrot::Configure::Data->clean()
 
-Delete keys matching /^TEMP_/ from config. These are used only temporarly
-e.g. as file lists for Makefile generation.
+Delete keys matching /^TEMP_/ from config. These are used only temporarly e.g.
+as file lists for Makefile generation.
 
 =cut
 
@@ -171,10 +171,10 @@ sub clean
 
 =item Parrot::Configure::Data->settrigger($key, $trigger, $cb)
 
-Set a callback on C<$key> named C<$trigger>.  Multiple triggers can be
-set on a given key.  When the key is set via C<set> or C<add> then all
-callbacks that are defined will be called.  Triggers are passed the
-key and value that was set after it has been changed.
+Set a callback on C<$key> named C<$trigger>.  Multiple triggers can be set on a
+given key.  When the key is set via C<set> or C<add> then all callbacks that
+are defined will be called.  Triggers are passed the key and value that was set
+after it has been changed.
 
 =cut
 

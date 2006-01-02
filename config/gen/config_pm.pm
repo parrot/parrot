@@ -7,8 +7,9 @@ config/gen/config_pm.pm - Record configuration data
 
 =head1 DESCRIPTION
 
-Writes the C<Parrot::Config> Perl module, the F<runtime/parrot/library/config.fpmc>
-generator program, and the F<myconfig> file.
+Writes the C<Parrot::Config> Perl module, the
+F<runtime/parrot/library/config.fpmc> generator program, and the F<myconfig>
+file.
 
 =cut
 

@@ -7,8 +7,8 @@ config/auto/gc.pm - Garbage Collection
 
 =head1 DESCRIPTION
 
-Checks whether the C<--gc> command-line option was passed to
-F<Configure.pl> and sets the memory allocator accordingly. 
+Checks whether the C<--gc> command-line option was passed to F<Configure.pl>
+and sets the memory allocator accordingly.
 
 C<--gc> can take the values:
 

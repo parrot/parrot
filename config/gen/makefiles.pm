@@ -7,8 +7,7 @@ config/gen/makefiles.pm - Build files
 
 =head1 DESCRIPTION
 
-Generates the various F<Makefile>s and other files needed to
-build Parrot.
+Generates the various F<Makefile>s and other files needed to build Parrot.
 
 =cut
 

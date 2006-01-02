@@ -7,8 +7,8 @@ config/init/hints.pm - Platform Hints
 
 =head1 DESCRIPTION
 
-Loads the platform and local hints files, modifying the defaults set up
-in F<config/init/default.pm>.
+Loads the platform and local hints files, modifying the defaults set up in
+F<config/init/default.pm>.
 
 =cut
 

@@ -7,13 +7,12 @@ config/inter/shlibs.pm - Flags for shared libraries.
 
 =head1 DESCRIPTION
 
-Asks the user which flags are needed for compiling position-independent
-code for use in shared libraries.  Eventually, other
-shared-library-related prompts may end up here.
+Asks the user which flags are needed for compiling position-independent code
+for use in shared libraries.  Eventually, other shared-library-related prompts
+may end up here.
 
-This is a separate unit from config/inter/progs.pm because the answers
-depend on which compiler is in use.  Thus it should come after the
-gccversion test.
+This is a separate unit from config/inter/progs.pm because the answers depend
+on which compiler is in use.  Thus it should come after the gccversion test.
 
 =cut
 

@@ -12,8 +12,8 @@ Configure.pl - Parrot's Configuration Script
 
 =head1 DESCRIPTION
 
-This is Parrot's configuration script. It should be run to create the
-necessary system-specific files before building Parrot.
+This is Parrot's configuration script. It should be run to create the necessary
+system-specific files before building Parrot.
 
 =head2 Command-line Options
 
@@ -31,8 +31,8 @@ Prints out the version number of Configure.pl and exits.
 
 =item C<--verbose>
 
-Tells Configure.pl to output extra information about the configuration
-data it is setting.
+Tells Configure.pl to output extra information about the configuration data it
+is setting.
 
 =item C<--verbose=2>
 
@@ -59,8 +59,8 @@ This turns on the user prompts.
 
 Compile Options
 
-You can add and remove option values with C<< :rem{<opt>} >> and
-C<< :add{<opt>} >>. For example:
+You can add and remove option values with C<< :rem{<opt>} >> and C<<
+:add{<opt>} >>. For example:
 
     perl Configure.pl --ccflags=":rem{-g} :add{-O2}"
 
@@ -132,8 +132,8 @@ Specify which parser to use.
 
 =item C<--define=val1[,val2]>
 
-Generate "#define PARROT_DEF_VAL1 1" ... entries in has_header.h.
-Currently needed to use inet_aton for systems that lack inet_pton:
+Generate "#define PARROT_DEF_VAL1 1" ... entries in has_header.h. Currently
+needed to use inet_aton for systems that lack inet_pton:
 
   --define=inet_aton
 
@@ -177,9 +177,8 @@ Use JIT to emit a native executable.
 
 =item C<--gc=(type)>
 
-Determine the type of garbage collection. The value for C<type> should
-be one of: C<gc>, C<libc>, C<malloc> or C<malloc-trace>. The default is
-C<gc>.
+Determine the type of garbage collection. The value for C<type> should be one
+of: C<gc>, C<libc>, C<malloc> or C<malloc-trace>. The default is C<gc>.
 
 =back
 
@@ -191,11 +190,11 @@ ICU Options
 
 Use the specified icu-config script to determine the necessary ICU options.
 
-Use --icu-config=none to disable the autodetect feature. Parrot will
-then be build without ICU.
+Use --icu-config=none to disable the autodetect feature. Parrot will then be
+build without ICU.
 
-B<Note:> If you specify another ICU option than --icu-config, the
-autodetection functionality will be disabled.
+B<Note:> If you specify another ICU option than --icu-config, the autodetection
+functionality will be disabled.
 
 =item C<--icushared=(linkeroption)>
 
@@ -209,7 +208,7 @@ E.g.
 
 =item C<--icuheaders=(header_dir)>
 
-Location of ICU header files without the /unicode suffix. 
+Location of ICU header files without the /unicode suffix.
 
 E.g.
 
@@ -223,8 +222,8 @@ Other Options
 
 =item C<--maintainer>
 
-Use this option if you want imcc's parser and lexer files to be
-generated. Needs a working parser and lexer.
+Use this option if you want imcc's parser and lexer files to be generated.
+Needs a working parser and lexer.
 
 =item C<--miniparrot>
 
@@ -232,8 +231,8 @@ Build parrot assuming only pure ANSI C is available.
 
 =item C<--expnetwork>
 
-Enable experimental networking. This is an unused option and should
-probably be removed.
+Enable experimental networking. This is an unused option and should probably be
+removed.
 
 =back
 

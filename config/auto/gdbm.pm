@@ -7,8 +7,8 @@ config/auto/gdbm.pm - Test for GNU dbm (gdbm) library
 
 =head1 DESCRIPTION
 
-Determines whether the platform supports gdbm.
-This is needed for the dynamic GDBMHash PMC.
+Determines whether the platform supports gdbm. This is needed for the dynamic
+GDBMHash PMC.
 
 =cut
 

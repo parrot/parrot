@@ -7,8 +7,8 @@ config/gen/revision.pm - Parrot's configure revision
 
 =head1 DESCRIPTION
 
-Determines parrot's SVN revision.  In a release, there
-are no .svn directories, so this field is empty.
+Determines parrot's SVN revision.  In a release, there are no .svn directories,
+so this field is empty.
 
 =cut
 

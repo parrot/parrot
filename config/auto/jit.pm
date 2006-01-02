@@ -7,8 +7,8 @@ config/auto/jit - JIT Capability
 
 =head1 DESCRIPTION
 
-Determines the CPU architecture, the operating system, and whether there
-is JIT capability available.
+Determines the CPU architecture, the operating system, and whether there is JIT
+capability available.
 
 =cut
 

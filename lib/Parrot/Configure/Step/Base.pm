@@ -7,7 +7,8 @@ Parrot::Configure::Step::Base - Configuration Step Base Class
 
 =head1 DESCRIPTION
 
-The C<Parrot::Configure::Step::Base> module contains utility methods that should be inherited by all configuration steps. 
+The C<Parrot::Configure::Step::Base> module contains utility methods that
+should be inherited by all configuration steps.
 
 =cut
 

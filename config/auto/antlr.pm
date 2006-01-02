@@ -7,8 +7,8 @@ config/auto/antlr - Check whether antlr works
 
 =head1 DESCRIPTION
 
-Determines wheter antlr exists on the system.
-Is so, then check whether there is support for Python output.
+Determines wheter antlr exists on the system. Is so, then check whether there
+is support for Python output.
 
 When antlr is not found, then something like
 

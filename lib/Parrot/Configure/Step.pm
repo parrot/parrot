@@ -10,10 +10,10 @@ Parrot::Configure::Step - Configuration Step Utilities
 The C<Parrot::Configure::Step> module contains utility functions for steps to
 use.
 
-Note that the actual configuration step itself is NOT an instance of
-this class, rather it is defined to be in the C<package>
-C<Configure::Step>. See F<docs/configuration.pod> for more information
-on how to create new configuration steps.
+Note that the actual configuration step itself is NOT an instance of this
+class, rather it is defined to be in the C<package> C<Configure::Step>. See
+F<docs/configuration.pod> for more information on how to create new
+configuration steps.
 
 =head2 Functions
 
@@ -54,8 +54,7 @@ use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS $conf);
 
 =item C<integrate($orig, $new)>
 
-Integrates C<$new> into C<$orig>.  Returns C<$orig> if C<$new>
-is undefined.
+Integrates C<$new> into C<$orig>.  Returns C<$orig> if C<$new> is undefined.
 
 =cut
 
@@ -79,8 +78,8 @@ sub integrate
 
 =item C<prompt($message, $value)>
 
-Prints out "message [default] " and waits for the user's response.
-Returns the response, or the default if the user just hit C<ENTER>.
+Prints out "message [default] " and waits for the user's response. Returns the
+response, or the default if the user just hit C<ENTER>.
 
 =cut
 
@@ -103,8 +102,8 @@ sub prompt
 
 Creates a checksum for the specified file. This is used to compare files.
 
-Any lines matching the regular expression specified by C<$ignorePattern>
-are not included in the checksum.
+Any lines matching the regular expression specified by C<$ignorePattern> are
+not included in the checksum.
 
 =cut
 
@@ -123,8 +122,8 @@ sub file_checksum
 
 =item C<copy_if_diff($from, $to, $ignorePattern)>
 
-Copies the file specified by C<$from> to the location specified by C<$to>
-if it's contents have changed.
+Copies the file specified by C<$from> to the location specified by C<$to> if
+it's contents have changed.
 
 The regular expression specified by C<$ignorePattern> is passed to
 C<file_checksum()> when comparing the files.
@@ -153,8 +152,8 @@ sub copy_if_diff
 
 =item C<move_if_diff($from, $to, $ignorePattern)>
 
-Moves the file specified by C<$from> to the location specified by C<$to>
-if it's contents have changed.
+Moves the file specified by C<$from> to the location specified by C<$to> if
+it's contents have changed.
 
 =cut
 
@@ -168,8 +167,8 @@ sub move_if_diff
 =item C<genfile($source, $target, %options)>
 
 Takes the specified source file, substitutes any sequences matching
-C</\$\{\w+\}/> for the given key's value in the configuration system's
-data, and writes the results to specified target file.
+C</\$\{\w+\}/> for the given key's value in the configuration system's data,
+and writes the results to specified target file.
 
 =cut
 
@@ -263,8 +262,7 @@ sub genfile
 =item C<_run_command($command, $out, $err)>
 
 Runs the specified command. Output is directed to the file specified by
-C<$out>, warnings and errors are directed to the file specified by
-C<$err>.
+C<$out>, warnings and errors are directed to the file specified by C<$err>.
 
 =cut
 
@@ -429,8 +427,9 @@ sub cc_clean
 
 =item C<capture_output($command)>
 
-Executes the given command. The command's output (both stdout and stderr), and its return status is returned as a 3-tuple.
-B<STDERR> is redirected to F<test.err> during the execution, and deleted after the command's run.
+Executes the given command. The command's output (both stdout and stderr), and
+its return status is returned as a 3-tuple. B<STDERR> is redirected to
+F<test.err> during the execution, and deleted after the command's run.
 
 =cut
 

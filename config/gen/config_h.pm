@@ -7,10 +7,9 @@ config/gen/config_h.pm - Configuration Header
 
 =head1 DESCRIPTION
 
-Generates F<include/parrot/config.h> with platform-specific
-configuration values, F<include/parrot/has_header.h> with
-platform-specific header information, and
-F<include/parrot/feature.h> with information on optional
+Generates F<include/parrot/config.h> with platform-specific configuration
+values, F<include/parrot/has_header.h> with platform-specific header
+information, and F<include/parrot/feature.h> with information on optional
 features.
 
 =cut
