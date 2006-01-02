@@ -31,11 +31,11 @@ Tests the C<OS> PMC.
 =cut
 
 my $cwd = getcwd;
-
-# Ugly hack. I accept suggestions.
-$cwd =~ m!([/\\])parrot([/\\]?)$!;
-my $upcwd = "$`$2";
-my $xpto = "$cwd$1xpto$2";
+chdir "src";
+my $upcwd = getcwd;
+chdir "..";
+my $xpto = $upcwd;
+$xpto =~ s/src/xpto/;
 
 rmdir "xpto" if -d "xpto";
 rmdir "xpto" if -f "xpto";
@@ -47,14 +47,14 @@ pir_output_is(<<'CODE', <<"OUT", "cwd, cd, mkdir");
         print $S1
         print "\n"
 
-        $S1 = ".."
+        $S1 = "src"
         $P1."cd"($S1)
 
         $S1 = $P1."cwd"()
         print $S1
         print "\n"
 
-        $S1 = "parrot"
+        $S1 = ".."
         $P1."cd"($S1)
 
         $S1 = $P1."cwd"()
