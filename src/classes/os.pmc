@@ -26,6 +26,11 @@ files and directories.
 #define NAME_MAX 14
 #endif
 
+/* XXX this is the max for linux machines... */
+#ifndef PATH_MAX
+#define PATH_MAX 4096
+#endif
+
 static PMC * OS_PMC;
 pmclass OS singleton {
 
