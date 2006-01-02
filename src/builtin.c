@@ -39,10 +39,10 @@ static Builtins builtins[] = {
     { "atan2", 	"PJOP",		"Float", 	0, 0 },
     { "cos", 	"PJO", 		"Float", 	0, 0 },
     { "cosh", 	"PJO", 		"Float", 	0, 0 },
-    { "cd",     "vJS",          "OS",           0, 0 },
-    { "cwd",    "SJ",           "OS",           0, 0 },
+    { "cd",     "vJOS",         "OS",           0, 0 },
+    { "cwd",    "SJO",          "OS",           0, 0 },
     { "exp", 	"PJO", 		"Float", 	0, 0 },
-    { "mkdir",  "vJSI",         "OS",           0, 0 },
+    { "mkdir",  "vJOSI",        "OS",           0, 0 },
     { "ln", 	"PJO", 		"Float", 	0, 0 },
     { "log10", 	"PJO", 		"Float", 	0, 0 },
     { "log2", 	"PJO", 		"Float", 	0, 0 },
@@ -58,11 +58,12 @@ static Builtins builtins[] = {
     { "open", 	"PJS.S",	"ParrotIO", 	0, 0 },
     { "puts", 	"IJOS",         "ParrotIO", 	0, 0 },
     { "reverse","vJS",          "String",       0, 0 },
-    { "rm",     "vJS",          "OS",           0, 0 },
+    { "rm",     "vJOS",         "OS",           0, 0 },
     { "say", 	"IJS",          "ParrotIO", 	0, 0 },
     { "say", 	"IJOS",         "ParrotIO", 	0, 0 },
     { "say", 	"vJS",          "ParrotIO", 	0, 0 },
     { "say", 	"vJOS",         "ParrotIO", 	0, 0 },
+    { "symlink","vJOSS",        "OS",           0, 0 },
     { "trans",  "vJSP",         "String",       0, 0 }
 };
 
