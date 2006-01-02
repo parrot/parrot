@@ -44,7 +44,7 @@ static Builtins builtins[] = {
     { "exp", 	"PJO", 		"Float", 	0, 0 },
     { "mkdir",  "vJOSI",        "OS",           0, 0 },
     { "ln", 	"PJO", 		"Float", 	0, 0 },
-    { "log10", 	"PJO", 		"Float", 	0, 0 },
+    { "log10",  "PJO",          "Float", 	0, 0 },
     { "log2", 	"PJO", 		"Float", 	0, 0 },
     { "sec", 	"PJO", 		"Float", 	0, 0 },
     { "sech", 	"PJO", 		"Float", 	0, 0 },
@@ -54,6 +54,7 @@ static Builtins builtins[] = {
     { "tanh", 	"PJO", 		"Float", 	0, 0 },
     { "index",  "IJSS.I",       "String",       0, 0 },
     { "is_integer","IJS",       "String",       0, 0 },
+    { "link",   "vJOSS",        "OS",           0, 0 },
     { "lower", 	"PJO",	        "String", 	0, 0 },
     { "open", 	"PJS.S",	"ParrotIO", 	0, 0 },
     { "puts", 	"IJOS",         "ParrotIO", 	0, 0 },
@@ -64,7 +65,8 @@ static Builtins builtins[] = {
     { "say", 	"vJS",          "ParrotIO", 	0, 0 },
     { "say", 	"vJOS",         "ParrotIO", 	0, 0 },
     { "symlink","vJOSS",        "OS",           0, 0 },
-    { "trans",  "vJSP",         "String",       0, 0 }
+    { "trans",  "vJSP",         "String",       0, 0 },
+    { "umask",  "IJOI",         "OS",           0, 0 },
 };
 
 /*

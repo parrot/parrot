@@ -22,6 +22,7 @@ files and directories.
 #include "parrot/parrot.h"
 
 /* XXX Check if we need to deallocate strerror strings */
+/* XXX apparently, strerror_r is thread-safe and should be used instead.*/
 
 /* XXX this is a hack to fix the build on Solaris --> linux uses 255 */
 #ifndef NAME_MAX
@@ -252,7 +253,6 @@ Creates a symlink, where available
 
     METHOD void symlink(STRING *from, STRING *to) {
 #ifndef _MSC_VER
-
         char *cfrom = string_to_cstring(interpreter, from);
         char *cto = string_to_cstring(interpreter, to);
         int error = symlink(cfrom, cto);
@@ -280,7 +280,6 @@ Creates a hard link, where available(?)
 
     METHOD void link(STRING *from, STRING *to) {
 #ifndef _MSC_VER
-
         char *cfrom = string_to_cstring(interpreter, from);
         char *cto = string_to_cstring(interpreter, to);
         int error = link(cfrom, cto);
@@ -295,6 +294,26 @@ Creates a hard link, where available(?)
 #endif
     }
 
+/*
+
+=item C<INTVAL umask(INTVAL mask)>
+
+umask sets the process's file mode creation mask (and returns the
+previous one).
+
+=cut
+
+*/
+
+    METHOD INTVAL umask(INTVAL mask) {
+#ifndef _MSC_VER
+        INTVAL old = umask(mask);
+        return old;
+#else
+        internal_exception(UNIMPLEMENTED, "Win32 is not POSIX. Need win32 developer!");
+#endif
+    }
+
 }
 /*
 
@@ -302,7 +321,8 @@ Creates a hard link, where available(?)
 
 =head1 SEE ALS0
 
-   chdir(2), getcwd(3), unlink(2), mkdir(2), stat(2), symlink(2), link(2)
+   chdir(2), getcwd(3), unlink(2), mkdir(2), stat(2), symlink(2),
+   link(2), umask(2)
 
 =cut
 
