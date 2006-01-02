@@ -21,6 +21,8 @@ files and directories.
 
 #include "parrot/parrot.h"
 
+/* XXX Check if we need to deallocate strerror strings */
+
 /* XXX this is a hack to fix the build on Solaris --> linux uses 255 */
 #ifndef NAME_MAX
 #define NAME_MAX 14
@@ -75,30 +77,8 @@ Returns the current working directory.
             mem_sys_free(cwd);
             return scwd;
         } else {
-            switch(errno) {
-            case EACCES:
-                real_exception(interpreter, NULL, E_SystemError,
-                               "Read or search permission was denied for a "
-                               "component of the pathname.");
-                break;
-            case EINVAL:
-                real_exception(interpreter, NULL, E_SystemError,
-                               "The size argument is zero.");
-                break;
-            case ENOENT:
-                real_exception(interpreter, NULL, E_SystemError,
-                               "A component of the pathname no longer exists.");
-                break;
-            case ENOMEM:
-                real_exception(interpreter, NULL, E_SystemError,
-                               "Insufficient memory is available.");
-                break;
-            case ERANGE:
-                real_exception(interpreter, NULL, E_SystemError,
-                               "The size argument is greater than zero but "
-                               "smaller than the length of the pathname "
-                               "plus 1.");
-            }
+            char *errmsg = strerror(errno);
+            real_exception(interpreter, NULL, E_SystemError, errmsg);
             return NULL;
         }
 #else
@@ -123,46 +103,8 @@ Changes the current working directory to the one specified by C<path>.
         error = chdir(cpath);
         string_cstring_free(cpath);
         if (error) {
-            switch(errno) {
-            case ENOTDIR:
-                real_exception(interpreter, NULL, E_SystemError,
-                               "A component of the path prefix is not a "
-                               "directory.");
-                break;
-            case ENAMETOOLONG:
-                real_exception(interpreter, NULL, E_SystemError,
-                               "A component of a pathname exceeded %d "
-                               "characters, or an entire path name exceeded %d "
-                               "characters.", NAME_MAX, PATH_MAX);
-                break;
-            case ENOENT:
-                real_exception(interpreter, NULL, E_SystemError,
-                               "The named directory does not exist.");
-                break;
-#ifdef ELOOP
-            case ELOOP:
-                real_exception(interpreter, NULL, E_SystemError, 
-                               "Too many symbolic links were encountered in "
-                               "translating the pathname.");
-                break;
-#endif
-            case EACCES:
-                real_exception(interpreter, NULL, E_SystemError, 
-                               "Search permission is denied for any component "
-                               "of the path name.");
-                break;
-            case EFAULT:
-                real_exception(interpreter, NULL, E_SystemError, 
-                               "Path points outside the process's allocated "
-                               "address space.");
-                break;
-#ifdef EIO
-            case EIO:
-                real_exception(interpreter, NULL, E_SystemError, 
-                               "An I/O error occurred while reading from or "
-                               "writing to the file system.");
-#endif
-            }
+            char *errmsg = strerror(errno);
+            real_exception(interpreter, NULL, E_SystemError, errmsg);
         }
 #else
         internal_exception(UNIMPLEMENTED, "Win32 is not POSIX. Need win32 developer!");
@@ -188,77 +130,8 @@ C<path>.
         error = remove(cpath);
         string_cstring_free(cpath);
         if (error) {
-            switch(errno) {
-            case ENOTDIR:
-                real_exception(interpreter, NULL, E_SystemError, 
-                               "A component of the path prefix is not a "
-                               "directory.");
-                break;
-
-            case ENAMETOOLONG:
-                real_exception(interpreter, NULL, E_SystemError, 
-                               "A component of a pathname exceeded %d "
-                               "characters, or an entire path name exceeded %d "
-                               "characters.", NAME_MAX, PATH_MAX);
-                break;
-
-
-            case ENOTEMPTY:
-                real_exception(interpreter, NULL, E_SystemError,
-                               "The named directory contains files other "
-                               "than `.' and `..' in it.");
-                break;
-
-            case ENOENT:
-                real_exception(interpreter, NULL, E_SystemError, 
-                               "The named file does not exist.");
-                break;
-
-            case EACCES:
-                real_exception(interpreter, NULL, E_SystemError, 
-                               "Search permission is denied for a component of "
-                               "the path prefix or write permission is denied "
-                               "on the directory containing the link to be "
-                               "removed.");
-                break;
-
-#ifdef ELOOP
-            case ELOOP:
-                real_exception(interpreter, NULL, E_SystemError, 
-                               "Too many symbolic links were encountered in "
-                               "translating the pathname.");
-                break;
-#endif
-            case EPERM:
-                real_exception(interpreter, NULL, E_SystemError, 
-                               "The named file is a directory and the effective"
-                               " user ID of the process is not the super-user.");
-                break;
-
-            case EBUSY:
-                real_exception(interpreter, NULL, E_SystemError, 
-                               "The entry to be unlinked is the mount point "
-                               "for a mounted file system.");
-                break;
-
-#ifdef EIO
-            case EIO:
-                real_exception(interpreter, NULL, E_SystemError, 
-                               "An I/O error occurred while deleting the "
-                               "directory entry or deallocating the inode.");
-                break;
-#endif
-            case EROFS:
-                real_exception(interpreter, NULL, E_SystemError, 
-                               "The named file resides on a read-only file "
-                               "system.");
-                break;
-
-            case EFAULT:
-                real_exception(interpreter, NULL, E_SystemError, 
-                               "Path points outside the process's allocated "
-                               "address space.");
-            }
+            char *errmsg = strerror(errno);
+            real_exception(interpreter, NULL, E_SystemError, errmsg);
         }
     }
 
@@ -281,87 +154,8 @@ Creates a directory specified by C<path> with mode C<mode>.
         error = mkdir(cpath, mode);
         string_cstring_free(cpath);
         if (error) {
-            switch(errno) {
-            case ENOTDIR:
-                real_exception(interpreter, NULL, E_SystemError, 
-                               "A component of the path prefix is not a "
-                               "directory.");
-                break;
-
-            case ENAMETOOLONG:
-                real_exception(interpreter, NULL, E_SystemError, 
-                               "A component of a pathname exceeded %d "
-                               "characters, or an entire path name "
-                               "exceeded %d characters.",
-                               NAME_MAX, PATH_MAX);
-                break;
-                      
-            case ENOENT:           
-                real_exception(interpreter, NULL, E_SystemError, 
-                               "A component of the path prefix does not "
-                               "exist.");
-                break;
-
-            case EACCES:
-                real_exception(interpreter, NULL, E_SystemError, 
-                               "Search permission is denied for a component "
-                               "of the path prefix.");
-                break;
-
-#ifdef ELOOP
-            case ELOOP:
-                real_exception(interpreter, NULL, E_SystemError, 
-                               "Too many symbolic links were encountered in "
-                               "translating the pathname.");
-                break;
-#endif
-                
-            case EROFS:
-                real_exception(interpreter, NULL, E_SystemError, 
-                               "The named file resides on a read-only file "
-                               "system.");
-                break;
-
-            case EEXIST:
-                real_exception(interpreter, NULL, E_SystemError, 
-                               "The named file exists.");
-                break;
-
-            case ENOSPC:
-                real_exception(interpreter, NULL, E_SystemError, 
-                               "The new directory cannot be created because "
-                               "there is no space left on the file system "
-                               "that will contain the directory or there are "
-                               "no free inodes on the file system on which "
-                               "the directory is being created.");
-                break;
-
-            case EDQUOT:
-                real_exception(interpreter, NULL, E_SystemError, 
-                               "The new directory cannot be created because "
-                               "the user's quota of disk blocks on the file "
-                               "system that will contain the directory has "
-                               "been exhausted, or the user's quota of inodes "
-                               "on the file system on which the directory is "
-                               "being created has been exhausted.");
-                break;
-                
-#ifdef EIO
-            case EIO:
-                real_exception(interpreter, NULL, E_SystemError, 
-                               "An I/O error occurred while making the "
-                               "directory entry or allocating the inode or "
-                               "an I/O error occurred while reading from or "
-                               "writing to the file system.");
-                break;
-#endif
-                
-            case EFAULT:          
-                real_exception(interpreter, NULL, E_SystemError, 
-                               "Path points outside the process's allocated "
-                               "address space.");
-                
-            }
+            char *errmsg = strerror(errno);
+            real_exception(interpreter, NULL, E_SystemError, errmsg);
         }
 #else
         internal_exception(UNIMPLEMENTED, "Win32 is not POSIX. Need win32 developer!");
@@ -403,59 +197,14 @@ Stats a file, and returns a 13 position array as in Perl:
         string_cstring_free(cpath);
 
         if (error) {
-            switch(errno) {
-            case ENOTDIR:
-                real_exception(interpreter, NULL, E_SystemError, 
-                               "A component of the path prefix is not a "
-                               "directory.");
-                break;
-                
-            case ENAMETOOLONG:
-                real_exception(interpreter, NULL, E_SystemError, 
-                               "A component of a pathname exceeded %d "
-                               "characters, or an entire path name "
-                               "exceeded %d characters.",
-                               NAME_MAX, PATH_MAX);
-                break;
-
-            case ENOENT:
-                real_exception(interpreter, NULL, E_SystemError, 
-                               "The named file does not exist.");
-                break;
-
-            case EACCES:
-                real_exception(interpreter, NULL, E_SystemError, 
-                               "Search permission is denied for a component "
-                               "of the path prefix.");
-                break;
-
-#ifdef ELOOP
-            case ELOOP:
-                real_exception(interpreter, NULL, E_SystemError, 
-                               "Too many symbolic links were encountered in "
-                               "translating the pathname.");
-                break;
-#endif
-
-            case EFAULT:
-                real_exception(interpreter, NULL, E_SystemError, 
-                               "Sb or name points to an invalid address.");
-                break;
-
-#ifdef EIO
-            case EIO:
-                real_exception(interpreter, NULL, E_SystemError, 
-                               "An I/O error occurred while reading from or "
-                               "writing to the file system.");
-                break;
-#endif
-            }
+            char *errmsg = strerror(errno);
+            real_exception(interpreter, NULL, E_SystemError, errmsg);
             return NULL;
-        } else {
-
+        }
+        else {
             array = pmc_new(interpreter, enum_class_FixedPMCArray);
             VTABLE_set_integer_native(interpreter, array, 13);
-
+            
             VTABLE_set_integer_keyed_int(interpreter, array, 0,
                                          info.st_dev);
             VTABLE_set_integer_keyed_int(interpreter, array, 1,
@@ -510,99 +259,11 @@ Creates a symlink, where available
         string_cstring_free(cfrom);
         string_cstring_free(cto);
         if (error) {
-            switch(errno) {
-            case ENOTDIR:
-                real_exception(interpreter, NULL, E_SystemError, 
-                               "A component of the name2 prefix is not a "
-                               "directory.");
-                break;
-
-            case ENAMETOOLONG:
-                real_exception(interpreter, NULL, E_SystemError, 
-                               "A component of a pathname exceeded %d "
-                               "characters, or an entire path name exceeded "
-                               "%d characters.",NAME_MAX,PATH_MAX);
-                break;
-
-            case ENOENT:
-                real_exception(interpreter, NULL, E_SystemError, 
-                               "The named file does not exist.");
-                break;
-
-            case EACCES:
-                real_exception(interpreter, NULL, E_SystemError, 
-                               "A component of the name2 path prefix denies "
-                               "search permission.");
-                break;
-
-#ifdef ELOOP
-            case ELOOP:
-                real_exception(interpreter, NULL, E_SystemError, 
-                               "Too many symbolic links were encountered in "
-                               "translating the pathname.");
-                break;
-#endif
-
-            case EEXIST:
-                real_exception(interpreter, NULL, E_SystemError, 
-                               "Name2 already exists.");
-                break;
-
-#ifdef EIO
-            case EIO:
-                real_exception(interpreter, NULL, E_SystemError, 
-                               "An I/O error occurred while making the "
-                               "directory entry for name2, or allocating "
-                               "the inode for name2, or writing out the "
-                               "link contents of name2.");
-                break;
-#endif
-
-            case EROFS:
-                real_exception(interpreter, NULL, E_SystemError, 
-                               "The file name2 would reside on a read-only "
-                               "file system.");
-                break;
-
-            case ENOSPC:
-                real_exception(interpreter, NULL, E_SystemError, 
-                               "The directory in which the entry for the new "
-                               "symbolic link is being placed cannot be extended"
-                               " because there is no space left on the file "
-                               "system containing the directory, the new "
-                               "symbolic link cannot be created because there "
-                               "is no space left on the file system that will "
-                               "contain the symbolic link or there are no free "
-                               "inodes on the file system on which the symbolic"
-                               " link is being created.");
-                break;
-
-            case EDQUOT:
-                real_exception(interpreter, NULL, E_SystemError, 
-                               "The directory in which the entry for the new "
-                               "symbolic link is being placed cannot be "
-                               "extended because the user's quota of disk "
-                               "blocks on the file system containing the "
-                               "directory has been exhausted, the new symbolic "
-                               "link cannot be created because the user's "
-                               "quota of disk blocks on the file system that "
-                               "will contain the symbolic link has been "
-                               "exhausted, the new symbolic link cannot be "
-                               "created because the user's quota of disk "
-                               "blocks on the file system that will contain "
-                               "the symbolic link has been exhausted, or "
-                               "the user's quota of inodes on the file "
-                               "system on which the symbolic link is being "
-                               "created has been exhausted.");
-                break;
-
-            case EFAULT:
-                real_exception(interpreter, NULL, E_SystemError, 
-                               "Name1 or name2 points outside the process's "
-                               "allocated address space.");
-                break;
-            }
+            char *errmsg = strerror(errno);
+            real_exception(interpreter, NULL, E_SystemError, errmsg);
         }
+#else
+        internal_exception(UNIMPLEMENTED, "Win32 is not POSIX. Need win32 developer!");
 #endif
     }
 
@@ -626,100 +287,11 @@ Creates a hard link, where available(?)
         string_cstring_free(cfrom);
         string_cstring_free(cto);
         if (error) {
-            switch(errno) {
-            case ENOTDIR:
-                real_exception(interpreter, NULL, E_SystemError, 
-                               "A component of either path prefix is not a "
-                               "directory.");
-                break;
-
-            case ENAMETOOLONG:
-                real_exception(interpreter, NULL, E_SystemError, 
-                               "A component of a pathname exceeded %d "
-                               "characters, or an entire path name exceeded "
-                               "%d characters.",NAME_MAX, PATH_MAX);
-
-                break;
-
-            case ENOENT:
-                real_exception(interpreter, NULL, E_SystemError, 
-                               "A component of either path prefix does not "
-                               "exist ot the file named by name1 does not "
-                               "exist.");
-                break;
-
-            case EACCES:
-                real_exception(interpreter, NULL, E_SystemError, 
-                               "A component of either path prefix denies search"
-                               " permission or the requested link requires "
-                               "writing in a directory with a mode that "
-                               "denies write permission.");
-                break;
-
-#ifdef ELOOP
-            case ELOOP:
-                real_exception(interpreter, NULL, E_SystemError, 
-                               "Too many symbolic links were encountered in "
-                               "translating one of the pathnames.");
-                break;
-#endif
-
-            case EEXIST:
-                real_exception(interpreter, NULL, E_SystemError, 
-                               "The link named by name2 does exist.");
-                break;
-
-            case EPERM:
-                real_exception(interpreter, NULL, E_SystemError, 
-                               "The file named by name1 is a directory.");
-                break;
-
-            case EXDEV:
-                real_exception(interpreter, NULL, E_SystemError, 
-                               "The link named by name2 and the file named by "
-                               "name1 are on different file systems.");
-                break;
-
-            case ENOSPC:
-                real_exception(interpreter, NULL, E_SystemError, 
-                               "The directory in which the entry for the new "
-                               "link is being placed cannot be extended because"
-                               " there is no space left on the file system"
-                               " containing the directory.");
-                break;
-
-            case EDQUOT:
-                real_exception(interpreter, NULL, E_SystemError, 
-                               "The directory in which the entry for the new"
-                               " link is being placed cannot be extended "
-                               "because the user's quota of disk blocks on"
-                               " the file system containing the directory"
-                               " has been exhausted.");
-                break;
-
-#ifdef EIO
-            case EIO:
-                real_exception(interpreter, NULL, E_SystemError, 
-                               "An I/O error occurred while reading from or "
-                               "writing to the file system to make the "
-                               "directory entry.");
-                break;
-#endif
-
-            case EROFS:
-                real_exception(interpreter, NULL, E_SystemError, 
-                               "The requested link requires writing in a "
-                               "directory on a read-only file system.");
-                break;
-
-            case EFAULT:
-                real_exception(interpreter, NULL, E_SystemError, 
-                               "One of the pathnames specified is outside the"
-                               "process's allocated address space.");
-                break;
-
-            }
+            char *errmsg = strerror(errno);
+            real_exception(interpreter, NULL, E_SystemError, errmsg);
         }
+#else
+        internal_exception(UNIMPLEMENTED, "Win32 is not POSIX. Need win32 developer!");
 #endif
     }
 
@@ -730,7 +302,7 @@ Creates a hard link, where available(?)
 
 =head1 SEE ALS0
 
-   chdir(2), getcwd(3), unlink(2), mkdir(2), stat(2), symlink(2)
+   chdir(2), getcwd(3), unlink(2), mkdir(2), stat(2), symlink(2), link(2)
 
 =cut
 
