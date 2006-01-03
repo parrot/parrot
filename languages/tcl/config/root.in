@@ -26,6 +26,7 @@ lib${slash}builtins${slash}auto_execok.pir \
 lib${slash}builtins${slash}auto_load.pir \
 lib${slash}builtins${slash}break.pir \
 lib${slash}commands${slash}catch.pir \
+lib${slash}builtins${slash}cd.pir \
 lib${slash}builtins${slash}close.pir \
 lib${slash}commands${slash}concat.pir \
 lib${slash}builtins${slash}continue.pir \
