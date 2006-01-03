@@ -132,7 +132,7 @@ Returns the big numbers representation of the string.
 */
 
     PMC* get_bignum () {
-	STRING *s = DYNSELF.get_string();
+        STRING *s = DYNSELF.get_string();
         PMC *ret = pmc_new(INTERP, enum_class_BigInt);
         VTABLE_set_string_native(INTERP, ret, s);
         return ret;
@@ -617,14 +617,14 @@ Replace the string at C<key> with the chr of C<value>.
 
     void set_string_keyed(PMC* key, STRING *value) {
         STRING *s = PMC_str_val(SELF);
-	INTVAL len = string_length(INTERP, value);
-	string_replace(INTERP, s, key_integer(INTERP, key), len, value, NULL);
+        INTVAL len = string_length(INTERP, value);
+        string_replace(INTERP, s, key_integer(INTERP, key), len, value, NULL);
     }
 
     void set_integer_keyed(PMC* key, INTVAL value) {
         STRING *s = PMC_str_val(SELF);
-	STRING *c = string_chr(INTERP, (UINTVAL) value);
-	string_replace(INTERP, s, key_integer(INTERP, key), 1, c, NULL);
+        STRING *c = string_chr(INTERP, (UINTVAL) value);
+        string_replace(INTERP, s, key_integer(INTERP, key), 1, c, NULL);
     }
 /*
 
@@ -677,7 +677,7 @@ Return length of the string.
 */
 
     INTVAL elements () {
-	return string_length(INTERP, PMC_str_val(SELF));
+        return string_length(INTERP, PMC_str_val(SELF));
     }
 
     PMC* slice (PMC* key, INTVAL f) {
@@ -695,7 +695,7 @@ Return length of the string.
     }
 
     PMC* get_iter () {
-	PMC *iter = pmc_new_init(INTERP, enum_class_Iterator, SELF);
+        PMC *iter = pmc_new_init(INTERP, enum_class_Iterator, SELF);
         PMC *key =  pmc_new(INTERP, enum_class_Key);
         PMC_struct_val(iter) = key;
         PObj_get_FLAGS(key) |= KEY_integer_FLAG;
@@ -776,25 +776,25 @@ Translate ascii string C<src> with entries from C<trans_table>.
 */
 
     METHOD void trans(STRING* src, PMC* table) {
-	INTVAL i, len;
-	unsigned char *p, ch;
-	INTVAL *tr_data;
+    INTVAL i, len;
+    unsigned char *p, ch;
+    INTVAL *tr_data;
 
-	len = string_length(interpreter, src);
-	if (!len)
-	    return;
-	if (src->charset != Parrot_ascii_charset_ptr)
-            real_exception(interpreter, NULL, INVALID_ENCODING,
-		    "Can't translate non-ascii"); 
-	p = src->strstart;
-	/* TODO verify trans table */
-	tr_data = PMC_data(table);	/* XXX */
-	for (i = 0; i < len; ++i, ++p) {
-	    ch = *p;
-	    ch = tr_data[ch];
-	    if (ch)
-		*p = ch;
-	}
+    len = string_length(interpreter, src);
+    if (!len)
+        return;
+    if (src->charset != Parrot_ascii_charset_ptr)
+        real_exception(interpreter, NULL, INVALID_ENCODING,
+            "Can't translate non-ascii"); 
+    p = src->strstart;
+    /* TODO verify trans table */
+    tr_data = PMC_data(table);    /* XXX */
+    for (i = 0; i < len; ++i, ++p) {
+        ch = *p;
+        ch = tr_data[ch];
+        if (ch)
+            *p = ch;
+        }
     }
 
 /*
@@ -808,21 +808,21 @@ Reverse the ascii STRING C<src> in place.
 */
 
     METHOD void reverse(STRING* src) {
-	INTVAL i, len;
-	unsigned char *p, ch;
+        INTVAL i, len;
+        unsigned char *p, ch;
 
-	len = string_length(interpreter, src);
-	if (!len)
-	    return;
-	if (src->charset != Parrot_ascii_charset_ptr)
-	    real_exception(interpreter, NULL, INVALID_ENCODING,
-		    "Can't reverse non-ascii"); 
-	p = src->strstart;
-	for (i = 0, --len; i < len; ++i, --len) {
-	    ch = p[len];
-	    p[len] = p[i];
-	    p[i] = ch;
-	}
+        len = string_length(interpreter, src);
+        if (!len)
+            return;
+        if (src->charset != Parrot_ascii_charset_ptr)
+            real_exception(interpreter, NULL, INVALID_ENCODING,
+                "Can't reverse non-ascii"); 
+        p = src->strstart;
+        for (i = 0, --len; i < len; ++i, --len) {
+            ch = p[len];
+            p[len] = p[i];
+            p[i] = ch;
+        }
     }
 
 
@@ -838,18 +838,18 @@ Checks if the ascii STRING C<str> is just an integer.
 */
 
     METHOD INTVAL is_integer(STRING* src) {
-	INTVAL i, len;
-	unsigned char *p, ch;
+        INTVAL i, len;
+        unsigned char *p, ch;
 
-	len = string_length(interpreter, src);
-	if (!len)
-	    return (INTVAL)(0);
-	if (src->charset != Parrot_ascii_charset_ptr)
-	    real_exception(interpreter, NULL, INVALID_ENCODING,
-		    "Can't is_integer non-ascii"); 
+        len = string_length(interpreter, src);
+        if (!len)
+            return (INTVAL)(0);
+        if (src->charset != Parrot_ascii_charset_ptr)
+            real_exception(interpreter, NULL, INVALID_ENCODING,
+                "Can't is_integer non-ascii"); 
 
         i = 0;
-	p = src->strstart;
+        p = src->strstart;
 
         if (p[i] == '-' || p[i] == '+' ||
             (p[i] >= '0' && p[i] <= '9')) {
@@ -880,9 +880,4 @@ Checks if the ascii STRING C<str> is just an integer.
  *
  * vim: expandtab shiftwidth=4:
 */
-
-
-
-
-
 
