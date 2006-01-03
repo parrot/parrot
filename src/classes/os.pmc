@@ -63,17 +63,14 @@ Returns the current working directory.
 #ifndef _MSC_VER
         char * cwd;
 #ifdef PATH_MAX
-        char buf[PATH_MAX+1];
-        cwd = getcwd(buf, PATH_MAX+1);
+        cwd = getcwd(NULL, PATH_MAX+1);
 #else 
         cwd = getcwd(NULL, 0);
 #endif
         if (cwd) {
             STRING *scwd;
             scwd = string_from_cstring(interpreter, cwd, strlen(cwd));
-#ifndef PATH_MAX
             mem_sys_free(cwd);
-#endif
             return scwd;
         } else {
             char *errmsg = strerror(errno);
