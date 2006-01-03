@@ -79,11 +79,27 @@ SKIP: {
     print $fromfile "foo" x 1000;
     $fromfile->flush;
 
+    # redirect STDERR to avoid warnings
+    # windows wants '>nul', most everything else wants '>/dev/null'
+    my $redir = $^O =~ /^(MSWin\d+)$/ ? q{2>nul} : q{2>/dev/null};
+
+    # copy file descriptors
+    open OLDERR, ">&STDERR";
+
     ok(move_if_diff("$fromfile", "$tofile"),
         "move_if_diff() true return status");
     ok(! -e "$fromfile", "move_if_diff() moved differing file");
+
+    # redirect STDERR for the test below
+    close STDERR;
+    open STDERR, $redir;
+
     ok(-e "$tofile", "move_if_diff() moved differing file");
-    diag("ignore the unlink warning");
+
+    # restore STDERR
+    close STDERR;
+    open STDERR, ">&OLDERR";
+    close OLDERR;
 }
 
 # genfile()
