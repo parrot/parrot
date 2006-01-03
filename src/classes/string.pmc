@@ -611,7 +611,6 @@ Replace the string at C<key> with the chr of C<value>.
 
     INTVAL get_integer_keyed(PMC* key) {
         STRING *s = PMC_str_val(SELF);
-
         return string_ord(INTERP, s, key_integer(INTERP, key));
     }
 
@@ -642,8 +641,7 @@ Replace every occurence of C<orig> with C<new>.
         INTVAL old_len = string_length(INTERP, orig);
         INTVAL new_len = string_length(INTERP, new);
         
-        while (-1 != (i = string_str_index(INTERP, s, orig, i)))
-        {
+        while (-1 != (i = string_str_index(INTERP, s, orig, i))) {
             (void)string_replace(INTERP, s, i, old_len, new, NULL);
             i += new_len;
         }
@@ -776,24 +774,24 @@ Translate ascii string C<src> with entries from C<trans_table>.
 */
 
     METHOD void trans(STRING* src, PMC* table) {
-    INTVAL i, len;
-    unsigned char *p, ch;
-    INTVAL *tr_data;
+        INTVAL i, len;
+        unsigned char *p, ch;
+        INTVAL *tr_data;
 
-    len = string_length(interpreter, src);
-    if (!len)
-        return;
-    if (src->charset != Parrot_ascii_charset_ptr)
-        real_exception(interpreter, NULL, INVALID_ENCODING,
-            "Can't translate non-ascii"); 
-    p = src->strstart;
-    /* TODO verify trans table */
-    tr_data = PMC_data(table);    /* XXX */
-    for (i = 0; i < len; ++i, ++p) {
-        ch = *p;
-        ch = tr_data[ch];
-        if (ch)
-            *p = ch;
+        len = string_length(interpreter, src);
+        if (!len)
+            return;
+        if (src->charset != Parrot_ascii_charset_ptr)
+            real_exception(interpreter, NULL, INVALID_ENCODING,
+                "Can't translate non-ascii"); 
+        p = src->strstart;
+        /* TODO verify trans table */
+        tr_data = PMC_data(table);    /* XXX */
+        for (i = 0; i < len; ++i, ++p) {
+            ch = *p;
+            ch = tr_data[ch];
+            if (ch)
+                *p = ch;
         }
     }
 
