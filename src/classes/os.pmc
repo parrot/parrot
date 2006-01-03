@@ -152,7 +152,11 @@ Creates a directory specified by C<path> with mode C<mode>.
         int error;
         char *cpath = string_to_cstring(interpreter, path);
         /* should we validate mode? */
+#ifdef WIN32
+        error = mkdir(cpath);
+#else
         error = mkdir(cpath, mode);
+#endif
         string_cstring_free(cpath);
         if (error) {
             char *errmsg = strerror(errno);
@@ -205,7 +209,7 @@ Stats a file, and returns a 13 position array as in Perl:
         else {
             array = pmc_new(interpreter, enum_class_FixedPMCArray);
             VTABLE_set_integer_native(interpreter, array, 13);
-            
+
             VTABLE_set_integer_keyed_int(interpreter, array, 0,
                                          info.st_dev);
             VTABLE_set_integer_keyed_int(interpreter, array, 1,
@@ -228,11 +232,12 @@ Stats a file, and returns a 13 position array as in Perl:
                                          info.st_mtime);
             VTABLE_set_integer_keyed_int(interpreter, array,10,
                                          info.st_ctime);
+#ifndef WIN32
             VTABLE_set_integer_keyed_int(interpreter, array,11,
                                          info.st_blksize);
             VTABLE_set_integer_keyed_int(interpreter, array,12,
                                          info.st_blocks);
-            
+#endif
             return array;
         }
 #else
@@ -252,7 +257,7 @@ Creates a symlink, where available
 */
 
     METHOD void symlink(STRING *from, STRING *to) {
-#ifndef _MSC_VER
+#ifndef WIN32
         char *cfrom = string_to_cstring(interpreter, from);
         char *cto = string_to_cstring(interpreter, to);
         int error = symlink(cfrom, cto);
@@ -279,7 +284,7 @@ Creates a hard link, where available(?)
 */
 
     METHOD void link(STRING *from, STRING *to) {
-#ifndef _MSC_VER
+#ifndef WIN32
         char *cfrom = string_to_cstring(interpreter, from);
         char *cto = string_to_cstring(interpreter, to);
         int error = link(cfrom, cto);
