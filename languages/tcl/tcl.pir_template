@@ -91,7 +91,21 @@ providing a compreg-compatible method.
   load_bytecode "Getopt/Long.pir"
 
   #_load_grammar()
- 
+
+
+  # keep track of names of file types.
+  .local pmc filetypes
+  filetypes = new .TclArray
+  filetypes[0o060000] = 'blockSpecial'
+  filetypes[0o020000] = 'characterSpecial'
+  filetypes[0o040000] = 'directory'
+  filetypes[0o010000] = 'file'
+  filetypes[0o100000] = 'fifo'
+  filetypes[0o120000] = 'link'
+  filetypes[0o140000] = 'socket'
+
+   store_global '_Tcl', 'filetypes', filetypes
+
   .local pmc operators
   .local pmc math_funcs
   .local pmc precedence
