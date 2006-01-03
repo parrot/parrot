@@ -273,7 +273,7 @@ This is used for implementing Pythons xrange()
     }
 
     PMC* get_iter() {
-	PMC *iter = pmc_new_init(INTERP, enum_class_Iterator, SELF);
+        PMC *iter = pmc_new_init(INTERP, enum_class_Iterator, SELF);
         PMC_struct_val(iter) = SELF;
         return iter;
     }

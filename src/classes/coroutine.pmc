@@ -59,8 +59,8 @@ stopped. See the L<Glossary|docs/glossary.pod> for more information.
 
 #define THROW(e)  \
     do { \
-	exceptions->err = e; \
-	longjmp(exceptions->dest, 1); \
+        exceptions->err = e; \
+        longjmp(exceptions->dest, 1); \
     } while(0)
 
 static void

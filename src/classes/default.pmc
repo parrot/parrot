@@ -56,7 +56,7 @@ cant_do_method(Interp* interpreter, PMC * pmc, const char *methname)
 {
     real_exception(interpreter, NULL, ILL_INHERIT,
                        "%s() not implemented in class '%s'", methname,
-        	       caller(interpreter, pmc));
+                       caller(interpreter, pmc));
 }
 
 /*

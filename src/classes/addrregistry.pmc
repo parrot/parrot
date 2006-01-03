@@ -118,8 +118,8 @@ Returns true if the hash size is not zero.
 
         b = hash_get_bucket(INTERP, hash, key);
         if (b == NULL)
-	    return 0;
-	return (INTVAL) b->value;
+            return 0;
+        return (INTVAL) b->value;
     }
 
     INTVAL elements () {
@@ -147,25 +147,25 @@ reaches 0, delete the entry.
 */
 
     void set_pmc_keyed (PMC* key, PMC* value) {
-	Hash * hash = (Hash *)PMC_struct_val(SELF);
-	HashBucket *b;
-	b = hash_get_bucket(INTERP, hash, key);
-	if (b)
-	    LVALUE_CAST(char *, b->value) ++;
-	else
-	    hash_put(INTERP, hash, key, (void *) 1);
+        Hash * hash = (Hash *)PMC_struct_val(SELF);
+        HashBucket *b;
+        b = hash_get_bucket(INTERP, hash, key);
+        if (b)
+            LVALUE_CAST(char *, b->value) ++;
+        else
+            hash_put(INTERP, hash, key, (void *) 1);
     }
 
     void delete_keyed(PMC* key) {
-	Hash * hash = (Hash *)PMC_struct_val(SELF);
-	HashBucket *b;
-	b = hash_get_bucket(INTERP, hash, key);
-	if (b) {
-	    if ((long) b->value == 1L)
-		hash_delete(INTERP, hash, key);
-	    else
-		LVALUE_CAST(long, b->value) --;
-	}
+        Hash * hash = (Hash *)PMC_struct_val(SELF);
+        HashBucket *b;
+        b = hash_get_bucket(INTERP, hash, key);
+        if (b) {
+            if ((long) b->value == 1L)
+                hash_delete(INTERP, hash, key);
+            else
+                LVALUE_CAST(long, b->value) --;
+        }
     }
 
 /*
@@ -183,17 +183,17 @@ If called from iteration, return the key PMC, else PMCNULL is returned.
 */
 
     PMC* get_iter () {
-	return Parrot_Hash_get_iter(INTERP, SELF);
+        return Parrot_Hash_get_iter(INTERP, SELF);
     }
 
     PMC* get_pmc_keyed (PMC* key) {
-	Hash *hash = PMC_struct_val(SELF);
+        Hash *hash = PMC_struct_val(SELF);
 
-	if ((PObj_get_FLAGS(key) & KEY_type_FLAGS) ==
-		KEY_hash_iterator_FLAGS) {
-	    return hash_get_idx(INTERP, hash, key);
-	}
-	return PMCNULL;
+        if ((PObj_get_FLAGS(key) & KEY_type_FLAGS) ==
+                KEY_hash_iterator_FLAGS) {
+            return hash_get_idx(INTERP, hash, key);
+        }
+        return PMCNULL;
     }
 }
 

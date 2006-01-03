@@ -284,14 +284,12 @@ Invokes the subroutine.
          */
 #define PREMATURE_OPT 
 #ifdef PREMATURE_OPT 
-	if (caller_ctx->current_sub == SELF)
-	    context = Parrot_dup_context(INTERP, caller_ctx);
-	else 
+        if (caller_ctx->current_sub == SELF)
+            context = Parrot_dup_context(INTERP, caller_ctx);
+        else 
 #endif
-	{
-	    context = Parrot_alloc_context(INTERP, sub->n_regs_used);
-	}
-	context->current_sub = SELF;
+            context = Parrot_alloc_context(INTERP, sub->n_regs_used);
+        context->current_sub = SELF;
         context->caller_ctx = caller_ctx;
         context->current_pc = pc;
         context->current_cont = ccont;

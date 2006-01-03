@@ -118,7 +118,7 @@ Returns a Parrot string representation of the number.
     STRING* get_repr () {
         double d = (double) PMC_num_val(SELF);
         const char *sign = "-";
-	if (!signbit(PMC_num_val(SELF)))
+        if (!signbit(PMC_num_val(SELF)))
             sign = "";
         d = fabs(d);
         return Parrot_sprintf_c(INTERP, "%s" FLOATVAL_FMT, sign, d);

@@ -53,19 +53,19 @@ information see F<src/pmc.c>.
     }
 
     STRING* name () {
-	return SELF->vtable->whoami;
+        return SELF->vtable->whoami;
     }
 
     STRING* get_string () {
-	return SELF->vtable->whoami;
+        return SELF->vtable->whoami;
     }
 
     INTVAL get_bool () {
-	return 0;
+        return 0;
     }
 
     INTVAL get_integer () {
-	return Parrot_None_get_bool( INTERP, SELF );
+        return Parrot_None_get_bool( INTERP, SELF );
     }
 
     FLOATVAL get_number() {
@@ -73,7 +73,7 @@ information see F<src/pmc.c>.
     }
 
     INTVAL type () {
-	return SELF->vtable->base_type;
+        return SELF->vtable->base_type;
     }
 
     INTVAL is_equal(PMC* other) {

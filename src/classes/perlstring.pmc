@@ -124,12 +124,12 @@ Perl 5 like string increment/decrement.
 
     void increment () {
         STRING* s = PMC_str_val(SELF);
-	PMC_str_val(SELF) = string_increment(INTERP, s);
+        PMC_str_val(SELF) = string_increment(INTERP, s);
     }
 
     void decrement () {
         INTVAL i = VTABLE_get_integer(INTERP, SELF);
-	VTABLE_set_integer_native(INTERP, SELF, i - 1);
+        VTABLE_set_integer_native(INTERP, SELF, i - 1);
     }
 
 

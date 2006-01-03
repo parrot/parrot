@@ -63,21 +63,21 @@ Find the method for C<*name> in the parent class of the bound object.
 */
 
     void init() {
-	PMC_pmc_val(SELF) = PMC_struct_val(SELF) = PMCNULL;
+        PMC_pmc_val(SELF) = PMC_struct_val(SELF) = PMCNULL;
     }
 
     void init_pmc(PMC *obj) {
-	PMC_struct_val(SELF) = PMCNULL;
-	SELF.set_pmc(obj);
+        PMC_struct_val(SELF) = PMCNULL;
+        SELF.set_pmc(obj);
     }
 
     void set_pmc(PMC *obj) {
         PMC_pmc_val(SELF) = obj;
         if (!PMC_IS_NULL(obj)) {
-	    PMC *mro = obj->vtable->mro;
-	    if (VTABLE_elements(INTERP, mro) <= 1)
-		real_exception(INTERP, NULL, E_TypeError,
-                        "object has no parent");
+            PMC *mro = obj->vtable->mro;
+            if (VTABLE_elements(INTERP, mro) <= 1)
+                real_exception(INTERP, NULL, E_TypeError,
+                    "object has no parent");
             PObj_custom_mark_SET(SELF);
         }
     }
@@ -90,8 +90,8 @@ Find the method for C<*name> in the parent class of the bound object.
     void mark() {
         if (PMC_pmc_val(SELF))
             pobject_lives(INTERP, (PObj *)PMC_pmc_val(SELF));
-	if (PMC_struct_val(SELF))
-	    pobject_lives(INTERP, (PObj *)PMC_struct_val(SELF));
+        if (PMC_struct_val(SELF))
+            pobject_lives(INTERP, (PObj *)PMC_struct_val(SELF));
     }
 
     PMC* find_method(STRING* name) {
@@ -99,8 +99,8 @@ Find the method for C<*name> in the parent class of the bound object.
 
         obj = PMC_pmc_val(SELF);
         if (PMC_IS_NULL(obj)) {
-		real_exception(INTERP, NULL, E_TypeError,
-                        "no object bound to super");
+            real_exception(INTERP, NULL, E_TypeError,
+                "no object bound to super");
         }
         interpreter->current_object = obj;
         mro = obj->vtable->mro;

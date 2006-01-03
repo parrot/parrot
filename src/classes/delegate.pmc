@@ -79,7 +79,7 @@ find_or_die(Interp* interpreter, PMC *pmc, STRING *meth) {
                 "Can't find method '%s' - erroneous PMC",
                 string_to_cstring(interpreter, meth)
                 );
-	}
+        }
     }
     return returnPMC;
 }

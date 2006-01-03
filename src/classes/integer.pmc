@@ -1067,7 +1067,7 @@ TODO Complex and BigInt rhs.
                     break;
                 prev = temp;
                 temp *= temp;
-	 	if (prev != 0 && temp / prev != prev) {
+                if (prev != 0 && temp / prev != prev) {
                     return overflow(INTERP, SELF, b, dest, MMD_POW);
                 }
             }
