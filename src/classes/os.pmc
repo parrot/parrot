@@ -24,16 +24,6 @@ files and directories.
 /* XXX Check if we need to deallocate strerror strings */
 /* XXX apparently, strerror_r is thread-safe and should be used instead.*/
 
-/* XXX this is a hack to fix the build on Solaris --> linux uses 255 */
-#ifndef NAME_MAX
-#define NAME_MAX 14
-#endif
-
-/* XXX this is the max for linux machines... */
-#ifndef PATH_MAX
-#define PATH_MAX 4096
-#endif
-
 static PMC * OS_PMC;
 pmclass OS singleton {
 
