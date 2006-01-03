@@ -19,6 +19,7 @@ use vars qw($description $result @args);
 
 use base qw(Parrot::Configure::Step::Base);
 
+use Config;
 use Parrot::Configure::Step;
 
 $description = "Enabling optimization...";
@@ -29,9 +30,23 @@ sub runstep
 {
     my ($self, $conf) = @_;
 
-    if ($conf->data->get('optimize')) {
+    # A plain --optimize means use perl5's $Config{optimize}.  If an argument
+    # is given, however, use that instead. 
+    my $optimize = $conf->options->get('optimize');
+    if (defined $optimize) {
         $result = 'yes';
+        # record that optimization was enabled
+        $conf->data->set(optimize => $optimize);
+        # disable debug flags
+        $conf->data->set(cc_debug => '');
         $conf->data->add(' ', ccflags => "-DDISABLE_GC_DEBUG=1 -DNDEBUG");
+        if ($optimize eq "1") {
+            # use perl5's value
+            $conf->data->add(' ', ccflags => $Config{optimize});
+        } else {
+            # use what was passed to --optimize on the CLI
+            $conf->data->add(' ', ccflags => $optimize);
+        }
     } else {
         $result = 'no';
         print "(none requested) " if $conf->options->get('verbose');

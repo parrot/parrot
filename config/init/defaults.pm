@@ -33,19 +33,8 @@ sub runstep
     # We need a Glossary somewhere!
     $conf->data->set(
         debugging => $conf->options->get('debugging') ? 1 : 0,
-
-        # A plain --optimize means use perl5's $Config{optimize}.  If an
-        # argument is given, however, use that instead.  This logic really
-        # belongs in the optimize unit.
-        optimize => $conf->options->get('optimize')
-        ? (
-            $conf->options->get('optimize') eq "1"
-            ? ($Config{optimize} || "1")
-            : $conf->options->get('optimize')
-            )
-        : '',
-        verbose => $conf->options->get('verbose'),
-
+        optimize  => 0,
+        verbose   => $conf->options->get('verbose'),
         build_dir => $FindBin::Bin,
 
         # Compiler -- used to turn .c files into object files.
@@ -131,17 +120,21 @@ sub runstep
         # should we have a dependancy upon arc to generate .a's?
         blib_lib_libparrot_a => 'blib/lib/libparrot$(A)',
 
-        perl          => $^X,
-        test_prog     => 'parrot',
-        rm_f          => '$(PERL) -MExtUtils::Command -e rm_f',
-        rm_rf         => '$(PERL) -MExtUtils::Command -e rm_rf',
-        mkdir         => '$(PERL) -MExtUtils::Command -e mkpath',
-        touch         => '$(PERL) -MExtUtils::Command -e touch',
-        chmod         => '$(PERL) -MExtUtils::Command-chmod -e chmod',
-        ar            => $Config{ar},
-        ar_flags      => 'cr',
-        ar_out        => '',                                        # for Win32
-        ar_extra      => '',                                        # for Borland C
+        perl      => $^X,
+        test_prog => 'parrot',
+        rm_f      => '$(PERL) -MExtUtils::Command -e rm_f',
+        rm_rf     => '$(PERL) -MExtUtils::Command -e rm_rf',
+        mkdir     => '$(PERL) -MExtUtils::Command -e mkpath',
+        touch     => '$(PERL) -MExtUtils::Command -e touch',
+        chmod     => '$(PERL) -MExtUtils::Command-chmod -e chmod',
+        ar        => $Config{ar},
+        ar_flags  => 'cr',
+
+        # for Win32
+        ar_out => '',
+
+        # for Borland C
+        ar_extra      => '',
         ranlib        => $Config{ranlib},
         rpath         => '-Wl,-rpath=',
         make          => $Config{make},
