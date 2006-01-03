@@ -74,6 +74,7 @@ Returns the current working directory.
         }
 #else
         internal_exception(UNIMPLEMENTED, "Win32 is not POSIX. Need win32 developer!");
+        return NULL;
 #endif
     }
 
@@ -232,6 +233,7 @@ Stats a file, and returns a 13 position array as in Perl:
         }
 #else
         internal_exception(UNIMPLEMENTED, "Win32 is not POSIX. Need win32 developer!");
+        return NULL;
 #endif
     }
 
@@ -306,6 +308,7 @@ previous one).
         return old;
 #else
         internal_exception(UNIMPLEMENTED, "Win32 is not POSIX. Need win32 developer!");
+        return NULL;
 #endif
     }
 
