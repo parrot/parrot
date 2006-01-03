@@ -21,7 +21,7 @@ OUT
 
 #XXX portably write a test that cd's to a safe dir and checks it...
 SKIP: {
-  skip("Too dumb to create a directory") unless -d "/tmp";
+  skip("Too dumb to create a directory") unless -d "/usr";
 
 language_output_is("tcl",<<'TCL',<<"OUT","cd home");
  cd /usr
