@@ -74,6 +74,7 @@ lib${slash}commands${slash}rename.pir \
 lib${slash}builtins${slash}return.pir \
 lib${slash}commands${slash}set.pir \
 lib${slash}commands${slash}source.pir \
+lib${slash}commands${slash}split.pir \
 lib${slash}commands${slash}string.pir \
 lib${slash}commands${slash}switch.pir \
 lib${slash}commands${slash}time.pir \
