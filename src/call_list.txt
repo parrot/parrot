@@ -8,23 +8,29 @@
 # Types
 
 # INT register stuff
+# I - INTVAL
 # c - char
 # s - short
 # i - int
 # l - long
 
 # NUM register stuff
+# N - FLOATVAL
 # f - float
 # d - double
 
 # STR register stuff
-# t - character string
+# S - pointer to a STRING-register
+# t - character string (0-terminated)
+# Buffers are not valid return parameters,
+# use 'p' when the native function returns a pointer value
+# b - void *
+# B - void **
 
 # PMC register stuff
-# p - data pointer from PMC (on store into a new UnManagedStruct PMC)
 # P - pointer to a PMC-register
-# S - pointer to a STRING-register ????
-# O - pointer to PMC-register #2 (object)
+# O - pointer to PMC-register (object)
+# p - data pointer from PMC (on store into a new UnManagedStruct PMC)
 # 2 - pointer to short
 # 3 - pointer to int
 # 4 - pointer to long
@@ -32,18 +38,9 @@
 # void stuff
 # v - void
 
-# Buffers are not valid return parameters,
-# use 'p' when the native function returns a pointer value
-# b - void *
-# B - void **
-
 # special stuff
 # 0 - insert a NULL (pointer) - doesn't comsume a register
 # J - Parrot_Interp param
-
-# Arrayish things, terminated with NULL/0
-# L - Long array
-# T - Array of string pointers (Converted to cstrings)
 
 # Callback Things
 
