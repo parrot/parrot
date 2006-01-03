@@ -789,7 +789,7 @@ Translate ascii string C<src> with entries from C<trans_table>.
         tr_data = PMC_data(table);    /* XXX */
         for (i = 0; i < len; ++i, ++p) {
             ch = *p;
-            ch = tr_data[ch];
+            ch = (unsigned char)tr_data[ch];
             if (ch)
                 *p = ch;
         }
@@ -837,7 +837,7 @@ Checks if the ascii STRING C<str> is just an integer.
 
     METHOD INTVAL is_integer(STRING* src) {
         INTVAL i, len;
-        unsigned char *p, ch;
+        unsigned char *p;
 
         len = string_length(interpreter, src);
         if (!len)
