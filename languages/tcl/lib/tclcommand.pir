@@ -26,15 +26,19 @@ Define the attributes required for the class.
 
    .local string label_num
    label_num = register_num
-   .local int inline_result_num
-   .local int inline_available
-   inline_available=0
+   .local int inlineable
+   inlineable = 0
    .local pmc compile
    compile = find_global "_Tcl", "compile_dispatch"
 
-   .local string pir_code,pir_code2
+   .local string pir_code, args, inlined, dynamic, invalid, error, eh_label
    pir_code = ""
-   pir_code2 = ''
+   args     = ""
+   inlined  = ""
+   dynamic  = ""
+   invalid  = ""
+   error    = ""
+   eh_label = "invalid_"
 
    .local string retval
    # Generate partial code for each of our arguments
@@ -43,19 +47,44 @@ Define the attributes required for the class.
    ii = 0
    .local pmc compiled_args
    compiled_args = new .TclList
+   $I0 = find_type "TclConst"
 arg_loop:
    if ii == num_args goto arg_loop_done
    $P1 = self[ii]
+   $I1 = typeof $P1
+   if $I0 == $I1 goto arg_const
+   
    (result_reg,retval) = compile(register_num,$P1)
 
-   push compiled_args, result_reg
-   register_num = result_reg + 1
-   pir_code .= retval 
+   $S0 = result_reg
+   $S0 = "$P" . $S0
+   $P0 = new .String
+   $P0 = $S0
+   push compiled_args, $P0
+   register_num = result_reg
+   args .= retval 
    inc ii 
    goto arg_loop
+
+arg_const:
+   $S0 = $P1
+   $I1 = charset $S0
+   $S1 = charsetname $I1
+   $S0 = escape $S0
+
+   $P0 = new .String
+   $P0 = $S1
+   $P0 .= ':"'
+   $P0 .= $S0
+   $P0 .= '"'
+   push compiled_args, $P0
+   inc ii
+   goto arg_loop
+
 arg_loop_done:
-   # Generate code that will invoke our name'd command.
-   pir_code .= ".local pmc command\n"
+   inc register_num
+   .local int result_num
+   result_num = register_num
 
    # XXX Need to trap a missing command
    # Need to actually compile our name, as it might not be constant.
@@ -65,152 +94,136 @@ arg_loop_done:
 
    $I0 = typeof name
    $I1 = find_type "TclConst"
-   if $I0 != $I1 goto dynamic
+   if $I0 != $I1 goto dynamic_command
 
-   push_eh dynamic
+   push_eh dynamic_command
      $S0 = name
      $P1 = find_global "_Tcl::builtins", $S0
    clear_eh
 
-   (inline_result_num,retval) = $P1(register_num,self)
+   (result_num,retval) = $P1(register_num,self)
    
-   register_num = inline_result_num + 2
-   .local pmc epoch
-   epoch = find_global '_Tcl', 'epoch'
-   $S0 = epoch
-   pir_code .= ".local pmc epoch\nepoch=find_global '_Tcl', 'epoch'\n"
-   pir_code .= 'if epoch != '
-   pir_code .= $S0
-   pir_code .= ' goto dynamic_command'
-   pir_code .= label_num
-   pir_code .= "\n"
-   pir_code .= retval
- 
-   $S0 = inline_result_num
-   pir_code2 .= $S0
-   pir_code2 .= "\n"
-   pir_code2 .= "goto done_command"
-   pir_code2 .= label_num
-   pir_code2 .= "\n"
-   inline_available = 1
-dynamic:
-   pir_code2 .= "dynamic_command"
-   pir_code2 .= label_num
-   pir_code2 .= ":\n"
-   .local int name_register
-   (name_register,retval) = compile(register_num,name)
-   register_num = name_register
+   register_num = result_num
+   inlined .= "inline_"
+   inlined .= label_num
+   inlined .= ":\n"
+   inlined .= retval
 
-   pir_code2 .= retval
+   inlined .= "goto end_"
+   inlined .= label_num
+   inlined .= "\n"
+   inlineable = 1
+   eh_label = "inline_"
+dynamic_command:
+   dynamic .= ".local pmc command\n"
+   .local int name_register
+   name_register = register_num + 1
+   (name_register,retval) = compile(name_register,name)
+
+   dynamic .= retval
+   $S0 = name_register
    $S1 = "$P"
-   $S0 = register_num
    $S1 .= $S0
 
-   inc register_num
-   $S0 = register_num
    $S2 = "$S"
    $S2 .= $S0
 
    # Get a string version of the name
-   pir_code2 .= $S2
-   pir_code2 .= "="
-   pir_code2 .= $S1
-   pir_code2 .= "\n"
+   dynamic .= $S2
+   dynamic .= "="
+   dynamic .= $S1
+   dynamic .= "\n"
    
    # Prepend a "&"
-   pir_code2 .= $S2
-   pir_code2 .= " = \"&\" . "
-   pir_code2 .= $S2
-   pir_code2 .= "\n"
+   dynamic .= $S2
+   dynamic .= " = \"&\" . "
+   dynamic .= $S2
+   dynamic .= "\n"
 
-   pir_code2 .= "push_eh bad_command"
-   $S0 = register_num
-   pir_code2 .= $S0
-   pir_code2 .= "\n"
-   pir_code2 .= "command = find_global \"Tcl\", "
-   pir_code2 .= $S2
-   pir_code2 .= "\nclear_eh\nif_null command, bad_command"
-   pir_code2 .= $S0
-   pir_code2 .= "\n$P"
-   pir_code2 .= $S0
-   pir_code2 .= " = command("
+   dynamic .= "push_eh "
+   dynamic .= eh_label
+   dynamic .= label_num
+   dynamic .= "\n"
+   dynamic .= "command = find_global \"Tcl\", "
+   dynamic .= $S2
+   dynamic .= "\nclear_eh\nif_null command, invalid_"
+   dynamic .= label_num
+   dynamic .= "\n$P"
+   $S0 = result_num
+   dynamic .= $S0
+   dynamic .= " = command("
 
    ii = 0
 elem_loop:
    if ii == num_args goto elem_loop_done   
    $S0 = compiled_args[ii]
-   pir_code2 .= "$P"
-   pir_code2 .= $S0
+   dynamic .= $S0
    inc ii 
    if ii == num_args goto elem_loop_done
-   pir_code2 .= ","
+   dynamic .= ","
    goto elem_loop 
 elem_loop_done:
-   pir_code2 .= ")\ngoto resume"
-   $S0 = register_num
-   pir_code2 .= $S0
-   pir_code2 .="\n" 
-   pir_code2 .= "bad_command"
-   pir_code2 .= $S0
-   pir_code2 .= ":\n"
-   pir_code2 .= ".local pmc interactive\ninteractive=find_global 'Tcl', '$tcl_interactive'\nunless interactive goto err_command"
-   pir_code2 .= $S0
-   pir_code2 .= "\n"
-   pir_code2 .= ".local pmc unk\nunk=find_global 'Tcl', '&unknown'\n"
-   pir_code2 .= "unk($P"
+   dynamic .= ")\ngoto end_"
+   dynamic .= label_num
+   dynamic .= "\n"
+
+   invalid .= ".local pmc interactive\ninteractive=find_global 'Tcl', '$tcl_interactive'\nunless interactive goto err_command"
+   invalid .= label_num
+   invalid .= "\n"
+   invalid .= ".local pmc unk\nunk=find_global 'Tcl', '&unknown'\n"
+   invalid .= "unk($P"
    $S1 = name_register
-   pir_code2 .= $S1
+   invalid .= $S1
    
    ii = 0
 unk_elem_loop:
    if ii == num_args goto unk_elem_loop_done   
    $S1 = compiled_args[ii]
-   pir_code2 .= ",$P"
-   pir_code2 .= $S1
+   invalid .= ","
+   invalid .= $S1
    inc ii 
    goto unk_elem_loop 
 unk_elem_loop_done:
+   invalid .= ")\n"
+   invalid .= "goto end_"
+   invalid .= label_num
+   invalid .= "\n"
 
-   pir_code2 .= ")\ngoto done_command"
-   pir_code2 .= label_num
-   pir_code2 .= "\nerr_command"
-   pir_code2 .= $S0
-   pir_code2 .= ":\n$S"
-   pir_code2 .= $S0
-   pir_code2 .= "=$P"
+   error .= "err_command"
+   error .= label_num
+   error .= ":\n$S"
+   $S0 = register_num
+   error .= $S0
+   error .= "=$P"
    $S1 = name_register
-   pir_code2 .= $S1
-   pir_code2 .= "\n$S"
-   pir_code2 .= $S0
-   pir_code2 .= "=concat \"invalid command name \\\"\" ,"
-   pir_code2 .= "$S"
-   pir_code2 .= $S0
-   pir_code2 .= "\n$S"
-   pir_code2 .= $S0
-   pir_code2 .= ".=\"\\\"\"\n.throw($S"
-   pir_code2 .= $S0
-   pir_code2 .= ")\n"  
+   error .= $S1
+   error .= "\n$S"
+   error .= $S0
+   error .= "=concat \"invalid command name \\\"\" ,"
+   error .= "$S"
+   error .= $S0
+   error .= "\n$S"
+   error .= $S0
+   error .= ".=\"\\\"\"\n.throw($S"
+   error .= $S0
+   error .= ")\n"  
 
-   pir_code2 .= "resume"
-   pir_code2 .= $S0
-   pir_code2 .= ":\n"
+   pir_code .= args
+   pir_code .= "start_"
+   pir_code .= label_num
+   pir_code .= ":\n"
+   pir_code .= dynamic
+   pir_code .= inlined
+   pir_code .= "invalid_"
+   pir_code .= label_num
+   pir_code .= ":\n"
+   pir_code .= invalid
+   pir_code .= error
    # return the code and the new register_num 
-   pir_code2 .= "done_command"
-   pir_code2 .= label_num
-   pir_code2 .= ":\n"
-
-   unless inline_available goto done
-
-   .local pmc printf_args
-   printf_args = new .Array
-   printf_args = 1
-   printf_args[0] = register_num
-
-   $S1 = sprintf '$P%i=$P', printf_args
-   pir_code .= $S1
+   pir_code .= "end_"
+   pir_code .= label_num
+   pir_code .= ":\n"
 
 done:
-
-  pir_code .= pir_code2
   .return (register_num,pir_code)
 .end
