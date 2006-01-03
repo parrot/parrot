@@ -25,14 +25,15 @@
 
  
   .local pmc theSub
-  # If newName is empty, then just delete
-  if new_s == "" goto delete
-
-add:
   # Grab the original sub
   push_eh doesnt_exist
     theSub = find_global "Tcl", old_proc
   clear_eh
+
+  # If newName is empty, then just delete
+  if new_s == "" goto delete
+
+add:
   # Create the new sub
   store_global "Tcl", new_proc, theSub
 
