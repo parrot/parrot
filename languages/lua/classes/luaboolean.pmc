@@ -27,12 +27,14 @@ static STRING *false_string;
 static STRING *true_string;
 static STRING *luaboolean_name;
 
-pmclass LuaBoolean 
-    extends Boolean 
-    does boolean 
-    dynpmc 
-    group lua_group 
-    hll Lua maps Boolean {
+
+pmclass LuaBoolean
+    extends Boolean
+    does boolean
+    does integer
+    dynpmc
+    group lua_group
+    hll Lua maps Integer {
 
 /* Class initialization. Caches constant strings that will be used later.
 */
@@ -72,7 +74,7 @@ Return the string "true" or "false".
         else
             return false_string;
     }
-   
+
 }
 
 /*

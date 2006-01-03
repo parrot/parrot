@@ -23,11 +23,11 @@ the Lua C<String> type.
 
 static STRING *luastring_name;
 
-pmclass LuaString 
+pmclass LuaString
     extends String
-    does string 
-    dynpmc 
-    group lua_group 
+    does string
+    dynpmc
+    group lua_group
     hll Lua maps String {
 
 /* Class initialization. Caches constant strings that will be used later.
@@ -37,7 +37,7 @@ pmclass LuaString
             luastring_name = const_string(INTERP, "string");
         }
     }
-  
+
 /*
 
 =item C<STRING* name()>
@@ -55,10 +55,10 @@ Return the string "string".
 
 =item C<INTVAL get_bool()>
 
-In Lua, both C<nil> and C<false> make a condition false; any other values 
+In Lua, both C<nil> and C<false> make a condition false; any other values
 makes it true.
 
-So return always true. 
+So return always true.
 
 =cut
 
@@ -66,7 +66,7 @@ So return always true.
     INTVAL get_bool () {
         return 1;
     }
-  
+
 }
 
 /*
@@ -80,4 +80,3 @@ Original code by Klaas-Jan Stol.
 =cut
 
 */
-

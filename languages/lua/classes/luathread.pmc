@@ -23,11 +23,11 @@ of the Lua C<Thread> type.
 
 static STRING *luathread_name;
 
-pmclass LuaThread 
+pmclass LuaThread
     extends Coroutine
-    does sub 
-    dynpmc 
-    group lua_group 
+    does sub
+    dynpmc
+    group lua_group
     hll Lua maps Coroutine {
 
 /* Class initialization. Caches constant strings that will be used later.
@@ -37,7 +37,7 @@ pmclass LuaThread
             luathread_name = const_string(INTERP, "thread");
         }
     }
-  
+
 /*
 
 =item C<STRING* name()>
@@ -66,10 +66,10 @@ Return the string "thread".
 
 =item C<INTVAL get_bool()>
 
-In Lua, both C<nil> and C<false> make a condition false; any other values 
+In Lua, both C<nil> and C<false> make a condition false; any other values
 makes it true.
 
-So return always true. 
+So return always true.
 
 =cut
 
@@ -77,6 +77,23 @@ So return always true.
     INTVAL get_bool () {
         return 1;
     }
+
+/*
+
+=item C<PMC logical_not(PMC *dest)>
+
+Return always false.
+
+=cut
+
+*/
+    PMC* logical_not (PMC* dest) {
+        if (!dest)
+            dest = pmc_new(INTERP, Parrot_PMC_typenum(INTERP, "LuaBoolean"));
+        VTABLE_set_integer_native(INTERP, dest, 0);
+        return dest;
+    }
+
 }
 
 /*

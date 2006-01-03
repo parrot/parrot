@@ -24,11 +24,11 @@ the Lua C<Nil> value.
 static STRING *string_representation;
 static PMC *Lua_Nil;
 
-pmclass LuaNil 
-    singleton 
-    extends None 
-    dynpmc 
-    group lua_group 
+pmclass LuaNil
+    singleton
+    extends None
+    dynpmc
+    group lua_group
     hll Lua {
 
 /* Class initialization. Caches constant strings that will be used later.
@@ -51,7 +51,7 @@ Return the string "nil".
     STRING* name () {
         return string_representation;
     }
-  
+
 /*
 
 =item C<STRING* get_string ()>
@@ -64,7 +64,7 @@ Return the string "nil".
     STRING* get_string () {
         return string_representation;
     }
-  
+
 /*
 
 =item C<STRING* get_repr ()>
@@ -77,7 +77,7 @@ Return the string "nil".
     STRING* get_repr () {
         return string_representation;
     }
-  
+
 /*
 
 =item C<void* get_pointer()>
@@ -97,9 +97,25 @@ information see F<src/pmc.c>.
     void set_pointer(void* ptr) {
         Lua_Nil = (PMC*)ptr;
     }
-  
+
+/*
+
+=item C<PMC logical_not(PMC *dest)>
+
+Return always true.
+
+=cut
+
+*/
+    PMC* logical_not (PMC* dest) {
+        if (!dest)
+            dest = pmc_new(INTERP, Parrot_PMC_typenum(INTERP, "LuaBoolean"));
+        VTABLE_set_integer_native(INTERP, dest, 1);
+        return dest;
+    }
+
 }
-  
+
 /*
 
 =back

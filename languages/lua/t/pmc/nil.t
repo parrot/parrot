@@ -12,11 +12,12 @@ t/pmc/nil.t - LuaNil
 
 =head1 DESCRIPTION
 
-Tests C<LuaNil> PMC.
+Tests C<LuaNil> PMC
+(implemented in F<languages/lua/classes/luanil.pmc>).
 
 =cut
 
-use Parrot::Test tests => 8;
+use Parrot::Test tests => 9;
 use Test::More;
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "check inheritance");
@@ -24,7 +25,7 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "check inheritance");
     loadlib P1, "lua_group"
     find_type $I0, "LuaNil"
     .local pmc pmc1
-    pmc1 = new $I0                         
+    pmc1 = new $I0
     .local int bool1
     bool1 = isa pmc1, "None"
     print bool1
@@ -123,6 +124,29 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "check get_bool");
 .end
 CODE
 1
+OUTPUT
+
+pir_output_is(<< 'CODE', << 'OUTPUT', "check logical_not");
+.sub _main
+    loadlib P1, "lua_group"
+    find_type $I0, "LuaNil"
+    .local pmc pmc1
+    pmc1 = new $I0
+    find_type $I0, "LuaBoolean"
+    .local pmc pmc2
+    pmc2 = new $I0
+    pmc2 = not pmc1
+    print pmc2
+    print "\n"
+    .local string str1
+    str1 = typeof pmc2
+    print str1
+    print "\n"
+    end
+.end
+CODE
+true
+boolean
 OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "check singleton");

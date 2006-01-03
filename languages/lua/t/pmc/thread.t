@@ -12,11 +12,12 @@ t/pmc/thread.t - LuaThread
 
 =head1 DESCRIPTION
 
-Tests C<LuaThread> PMC. 
+Tests C<LuaThread> PMC
+(implemented in F<languages/lua/classes/luathread.pmc>).
 
 =cut
 
-use Parrot::Test tests => 7;
+use Parrot::Test tests => 8;
 use Test::More;
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "check inheritance");
@@ -24,7 +25,7 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "check inheritance");
     loadlib P1, "lua_group"
     find_type $I0, "LuaThread"
     .local pmc pmc1
-    pmc1 = new $I0                         
+    pmc1 = new $I0
     .local int bool1
     bool1 = isa pmc1, "scalar"
     print bool1
@@ -131,11 +132,34 @@ CODE
 1
 OUTPUT
 
+pir_output_is(<< 'CODE', << 'OUTPUT', "check logical_not");
+.sub _main
+    loadlib P1, "lua_group"
+    find_type $I0, "LuaThread"
+    .local pmc pmc1
+    pmc1 = new $I0
+    find_type $I0, "LuaBoolean"
+    .local pmc pmc2
+    pmc2 = new $I0
+    pmc2 = not pmc1
+    print pmc2
+    print "\n"
+    .local string str1
+    str1 = typeof pmc2
+    print str1
+    print "\n"
+    end
+.end
+CODE
+false
+boolean
+OUTPUT
+
 SKIP: {
 skip("not implemented.", 2);
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "check HLL");
-.HLL "Lua", "lua_group"            
+.HLL "Lua", "lua_group"
 .sub _main
     .local pmc pmc1
     pmc1 = new .LuaThread
@@ -157,7 +181,7 @@ CODE
 OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "check HLL (autoboxing)");
-.HLL "Lua", "lua_group"            
+.HLL "Lua", "lua_group"
 .sub _main
     .local pmc pmc1
     pmc1 = test()

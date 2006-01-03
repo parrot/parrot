@@ -12,11 +12,12 @@ t/pmc/table.t - LuaTable
 
 =head1 DESCRIPTION
 
-Tests C<LuaTable> PMC.
+Tests C<LuaTable> PMC
+(implemented in F<languages/lua/classes/luatable.pmc>).
 
 =cut
 
-use Parrot::Test tests => 9;
+use Parrot::Test tests => 10;
 use Test::More;
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "check inheritance");
@@ -24,7 +25,7 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "check inheritance");
     loadlib P1, "lua_group"
     find_type $I0, "LuaTable"
     .local pmc pmc1
-    pmc1 = new $I0                         
+    pmc1 = new $I0
     .local int bool1
     bool1 = isa pmc1, "scalar"
     print bool1
@@ -119,6 +120,29 @@ CODE
 1
 OUTPUT
 
+pir_output_is(<< 'CODE', << 'OUTPUT', "check logical_not");
+.sub _main
+    loadlib P1, "lua_group"
+    find_type $I0, "LuaTable"
+    .local pmc pmc1
+    pmc1 = new $I0
+    find_type $I0, "LuaBoolean"
+    .local pmc pmc2
+    pmc2 = new $I0
+    pmc2 = not pmc1
+    print pmc2
+    print "\n"
+    .local string str1
+    str1 = typeof pmc2
+    print str1
+    print "\n"
+    end
+.end
+CODE
+false
+boolean
+OUTPUT
+
 pir_output_is(<< 'CODE', << 'OUTPUT', "check key PMC");
 .sub _main
     loadlib P1, "lua_group"
@@ -128,10 +152,10 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "check key PMC");
     find_type $I0, "LuaString"
     .local pmc val1
     val1 = new $I0
-    val1 = "value1" 
+    val1 = "value1"
     .local pmc val2
     val2 = new $I0
-    val2 = "value2" 
+    val2 = "value2"
     pmc1[val1] = val1
     pmc1[val2] = val2
     .local pmc ret
@@ -161,7 +185,7 @@ pir_output_like(<< 'CODE', << 'OUTPUT', "check key nil");
     find_type $I0, "LuaString"
     .local pmc val1
     val1 = new $I0
-    val1 = "value1" 
+    val1 = "value1"
     find_type $I0, "LuaNil"
     .local pmc nil
     nil = new $I0
@@ -181,22 +205,22 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "check deletion by assignment of nil");
     find_type $I0, "LuaString"
     .local pmc val1
     val1 = new $I0
-    val1 = "value1" 
+    val1 = "value1"
     .local pmc val2
     val2 = new $I0
     val2 = "value2"
     .local int nb1
     nb1 = elements pmc1
     print nb1
-    print "\n" 
+    print "\n"
     pmc1[val1] = val1
     nb1 = elements pmc1
     print nb1
-    print "\n" 
+    print "\n"
     pmc1[val2] = val2
     nb1 = elements pmc1
     print nb1
-    print "\n" 
+    print "\n"
     find_type $I0, "LuaNil"
     .local pmc nil
     nil = new $I0

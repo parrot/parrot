@@ -1,4 +1,5 @@
-# $Id: harness  $
+# Copyright: 2005 The Perl Foundation.  All Rights Reserved.
+# $Id: harness $
 
 =head1 NAME
 
@@ -6,12 +7,14 @@ languages/lua/t/harness - A harness for Parrot Lua
 
 =head1 SYNOPSIS
 
-    cd languages && perl -I../lib lua/t/harness --files
+    cd languages && perl -I../lib -Ilua/t lua/t/harness --files
 
-    cd languages && perl -I../lib lua/t/harness 
+    cd languages && perl -I../lib -Ilua/t lua/t/harness
+
+    cd languages && perl -I../lib -Ilua/t lua/t/harness lua/t/examples.t
 
     cd languages && perl -I../lib lua/t/harness lua/t/pmc/nil.t
-                   
+
 =head1 DESCRIPTION
 
 If I'm called with a single
@@ -19,6 +22,9 @@ argument of "--files", I just return a list of files to process.
 This list is one per line, and is relative to the languages dir.
 
 If I'm called with no args, I run the complete suite.
+
+If I'm called with "--use-lua", I run with the original lua
+in order to valid of the test suite.
 
 Otherwise I run the tests that were passed on the command line.
 
@@ -37,31 +43,44 @@ my $language = 'lua';
 if ( grep { m/^--files$/ } @ARGV ) {
     # Only the Makefile in 'parrot/languages' uses --files
     my $dir = File::Spec->catfile( $language, 't' );
-    my @files = glob( File::Spec->catfile( $dir, '*/*.t' ) );
+    my @files = glob( File::Spec->catfile( $dir, '*.t' ) );
+    push @files, glob( File::Spec->catfile( $dir, '*/*.t' ) );
     print join( "\n", @files );
     print "\n" if scalar(@files);
-} else { 
+} else {
     my @files;
     # TODO: use Getopt::Long or such
+    my $use_orig_lua = ( grep { m/^--use-lua$/ } @ARGV ) ? 1 : 0;
+    @ARGV = grep { ! m/^--use-lua$/ } @ARGV;
     if ( scalar(@ARGV) ) {
         # Someone specified tests for me to run.
         @files = grep { -f $_ } @ARGV
     } else {
         ( undef, undef, my $current_dir ) = File::Spec->splitpath( Cwd::getcwd() );
         if ( $current_dir eq 'languages' ) {
-            @files = glob( File::Spec->catfile( $language, 't', '*', '*.t' ) );
+            @files = glob( File::Spec->catfile( $language, 't', '*.t' ) );
+            push @files, glob( File::Spec->catfile( $language, 't', '*', '*.t' ) )
+                    unless ( $use_orig_lua );
         }
         elsif ( $current_dir eq $language ) {
-            @files = glob( File::Spec->catfile( 't', '*', '*.t' ) );
+            @files = glob( File::Spec->catfile( 't', '*.t' ) );
+            push @files, glob( File::Spec->catfile( 't', '*', '*.t' ) )
+                    unless ( $use_orig_lua );
         }
     }
 
-    Test::Harness::runtests( @files ) if scalar( @files );
+    if ( $use_orig_lua ) {
+        $ENV{PARROT_LUA_TEST_PROG} = 'lua';
+        Test::Harness::runtests( @files ) if scalar( @files );
+    } else {
+        $ENV{PARROT_LUA_TEST_PROG} = '';
+        Test::Harness::runtests( @files ) if scalar( @files );
+    }
 }
 
 =head1 HISTORY
 
-Mostly taken from F<languages/tcl/t/harness>.
+Mostly taken from F<languages/bc/t/harness>.
 
 =head1 SEE ALSO
 

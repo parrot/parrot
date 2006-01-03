@@ -23,9 +23,9 @@ the Lua C<Number> type.
 
 static STRING *luanumber_name;
 
-pmclass LuaNumber 
+pmclass LuaNumber
     extends Float
-    does float 
+    does float
     dynpmc
     group lua_group
     hll Lua maps Float {
@@ -55,10 +55,10 @@ Return the string "number".
 
 =item C<INTVAL get_bool()>
 
-In Lua, both C<nil> and C<false> make a condition false; any other values 
+In Lua, both C<nil> and C<false> make a condition false; any other values
 makes it true.
 
-So return always true. 
+So return always true.
 
 =cut
 
@@ -80,4 +80,3 @@ Original code by Klaas-Jan Stol.
 =cut
 
 */
-

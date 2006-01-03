@@ -28,10 +28,10 @@ static STRING *luatable_name;
 static PMC *Lua_Nil;
 
 pmclass LuaTable
-    extends Hash 
-    does hash 
-    dynpmc 
-    group lua_group 
+    extends Hash
+    does hash
+    dynpmc
+    group lua_group
     hll Lua {
 
 /* Class initialization. Caches constant strings & PMC that will be used later.
@@ -42,7 +42,7 @@ pmclass LuaTable
             Lua_Nil = pmc_new(INTERP, Parrot_PMC_typenum(INTERP, "LuaNil"));
         }
     }
-     
+
 /*
 
 =item C<STRING* name()>
@@ -51,10 +51,10 @@ Return the string "table".
 
 =cut
 
-*/                                               
+*/
     STRING* name () {
         return luatable_name;
-    }   
+    }
 
 
 /*
@@ -72,10 +72,10 @@ Return the string "table".
 
 =item C<INTVAL get_bool()>
 
-In Lua, both C<nil> and C<false> make a condition false; any other values 
+In Lua, both C<nil> and C<false> make a condition false; any other values
 makes it true.
 
-So return always true. 
+So return always true.
 
 =cut
 
@@ -93,42 +93,7 @@ C<table> accessor.
 =cut
 
 */
-
-    /* case pmc key
-    *
-    * P0 = new .Key
-    * P0 = "hiya"
-    * P1 = P2[P0]
-    */
     PMC* get_pmc_keyed (PMC* key) {
-        PMC *retval = SUPER(key);
-
-        if (enum_class_None == retval->vtable->base_type) {
-            return Lua_Nil;
-        }
-        return retval;
-    }
-
-    /* case integer key
-    *
-    * P0 = P1[42]
-    *
-    */
-    PMC* get_pmc_keyed_int (INTVAL key) {
-        PMC *retval = SUPER(key);
-
-        if (enum_class_None == retval->vtable->base_type) {
-            return Lua_Nil;
-        }
-        return retval;
-    }
-
-    /* case string key
-    *
-    * P0 = P1["Hello"]
-    *
-    */
-    PMC* get_pmc_keyed_str (STRING* key) {
         PMC *retval = SUPER(key);
 
         if (enum_class_None == retval->vtable->base_type) {
@@ -157,24 +122,21 @@ C<table> mutator.
         }
     }
 
-    void set_pmc_keyed_int (INTVAL key, PMC* value) {
-        SUPER(key, value);
-        if (value == Lua_Nil) {
-            default.SELF.delete_keyed_int(key);
-        } else {
-            SUPER(key, value);
-        }
-    }
+/*
 
-    void set_pmc_keyed_str (STRING* key, PMC* value) {
-        SUPER(key, value);
-        if (value == Lua_Nil) {
-            Hash.SELF.delete_keyed_str(key);
-        } else {
-            SUPER(key, value);
-        }
-    }
+=item C<PMC logical_not(PMC *dest)>
 
+Return always false.
+
+=cut
+
+*/
+    PMC* logical_not (PMC* dest) {
+        if (!dest)
+            dest = pmc_new(INTERP, Parrot_PMC_typenum(INTERP, "LuaBoolean"));
+        VTABLE_set_integer_native(INTERP, dest, 0);
+        return dest;
+    }
 
     /* Other metamethods */
 
@@ -187,7 +149,7 @@ C<table> mutator.
         }
         return (PMC*)0;
     }
-  
+
     PMC* subtract (PMC* value, PMC* dest) {
         return (PMC*)0;
     }
@@ -195,35 +157,35 @@ C<table> mutator.
     PMC* multiply (PMC* value, PMC* dest) {
         return (PMC*)0;
     }
-  
+
     PMC* divide (PMC* value, PMC* dest) {
         return (PMC*)0;
     }
-  
+
     PMC* modulus (PMC* value, PMC* dest) {
         return (PMC*)0;
     }
-  
+
     PMC* pow (PMC* value, PMC* dest) {
         return (PMC*)0;
     }
-  
+
     PMC* neg (PMC* dest) {
         return (PMC*)0;
     }
-  
+
     PMC* concatenate (PMC* value, PMC* dest) {
         return (PMC*)0;
     }
-  
+
     void* invoke (void* next) {
         return (void*)0;
     }
-  
+
     INTVAL cmp (PMC* value) {
         return (INTVAL)0;
     }
-    
+
 }
 
 /*
@@ -237,4 +199,3 @@ Original code by Klaas-Jan Stol.
 =cut
 
 */
-
