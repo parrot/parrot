@@ -86,7 +86,7 @@ OUT
 # Test mkdir
 
 my $xpto = $upcwd;
-$xpto =~ s/src/xpto/;
+$xpto =~ s/src([\/\\]?)$/xpto$1/;
 
 pir_output_is(<<'CODE', <<"OUT", "Test mkdir");
 .sub main :main
