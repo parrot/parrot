@@ -18,7 +18,7 @@ First tests in order to check infrastructure.
 
 use strict;
 use FindBin;
-use lib "$FindBin::Bin/../../lib", "$FindBin::Bin/../../../../lib";
+use lib "$FindBin::Bin";
 
 use Parrot::Test tests => 3;
 

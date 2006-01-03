@@ -20,7 +20,7 @@ Tests Lua Mathematic Library
 
 use strict;
 use FindBin;
-use lib "$FindBin::Bin/../../lib", "$FindBin::Bin/../../../../lib";
+use lib "$FindBin::Bin";
 
 use Parrot::Test tests => 4;
 

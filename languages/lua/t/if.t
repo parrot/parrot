@@ -4,7 +4,7 @@
 
 =head1 NAME
 
-t/if.t - Lua if statement 
+t/if.t - Lua if statement
 
 =head1 SYNOPSIS
 
@@ -14,13 +14,13 @@ t/if.t - Lua if statement
 
 See "Lua 5.0 Reference Manual", section 2.4.4 "Control Structures".
 
-See "Programming in Lua", section 4.3 "Control Structures". 
+See "Programming in Lua", section 4.3 "Control Structures".
 
 =cut
 
 use strict;
 use FindBin;
-use lib "$FindBin::Bin/../../lib", "$FindBin::Bin/../../../../lib";
+use lib "$FindBin::Bin";
 
 use Parrot::Test tests => 5;
 
@@ -73,9 +73,9 @@ elseif op == "*" then
     r = a * b
 elseif op == "/" then
     r = a / b
-else    
+else
     error("invalid operation")
-end    
+end
 print(r)
 CODE
 21

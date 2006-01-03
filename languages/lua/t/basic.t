@@ -17,6 +17,10 @@ Tests Lua Basic Library
 
 =cut
 
+use strict;
+use FindBin;
+use lib "$FindBin::Bin";
+
 use Parrot::Test tests => 7;
 use Test::More;
 

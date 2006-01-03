@@ -20,7 +20,7 @@ See "Programming in Lua", section 3 "Expressions".
 
 use strict;
 use FindBin;
-use lib "$FindBin::Bin/../../lib", "$FindBin::Bin/../../../../lib";
+use lib "$FindBin::Bin";
 
 use Parrot::Test tests => 6;
 
