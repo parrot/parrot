@@ -308,7 +308,7 @@ previous one).
         return old;
 #else
         internal_exception(UNIMPLEMENTED, "Win32 is not POSIX. Need win32 developer!");
-        return NULL;
+        return 0;
 #endif
     }
 
