@@ -37,7 +37,7 @@ lib${slash}builtins${slash}exec.pir \
 lib${slash}commands${slash}exit.pir \
 lib${slash}commands${slash}expr.pir \
 lib${slash}builtins${slash}fconfigure.pir \
-lib${slash}builtins${slash}file.pir \
+lib${slash}commands${slash}file.pir \
 lib${slash}builtins${slash}flush.pir \
 lib${slash}builtins${slash}for.pir \
 lib${slash}commands${slash}foreach.pir \
