@@ -35,17 +35,19 @@ sub runstep
     my $optimize = $conf->options->get('optimize');
     if (defined $optimize) {
         $result = 'yes';
-        # record that optimization was enabled
-        $conf->data->set(optimize => $optimize);
         # disable debug flags
         $conf->data->set(cc_debug => '');
         $conf->data->add(' ', ccflags => "-DDISABLE_GC_DEBUG=1 -DNDEBUG");
         if ($optimize eq "1") {
             # use perl5's value
             $conf->data->add(' ', ccflags => $Config{optimize});
+            # record what optimization was enabled
+            $conf->data->set(optimize => $Config{optimize});
         } else {
             # use what was passed to --optimize on the CLI
             $conf->data->add(' ', ccflags => $optimize);
+            # record what optimization was enabled
+            $conf->data->set(optimize => $optimize);
         }
     } else {
         $result = 'no';

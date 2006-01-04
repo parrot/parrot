@@ -33,7 +33,7 @@ sub runstep
     # We need a Glossary somewhere!
     $conf->data->set(
         debugging => $conf->options->get('debugging') ? 1 : 0,
-        optimize  => 0,
+        optimize  => '',
         verbose   => $conf->options->get('verbose'),
         build_dir => $FindBin::Bin,
 
