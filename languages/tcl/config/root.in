@@ -20,7 +20,8 @@ PMCS = \
  tclarray
 
 GENERATED_INLINES = \
- $(BUILTIN)incr.pir
+ $(BUILTIN)incr.pir \
+ $(BUILTIN)join.pir
 
 DEPS = \
 lib${slash}commands${slash}after.pir \
@@ -53,7 +54,6 @@ lib${slash}commands${slash}if.pir \
 lib${slash}commands${slash}info.pir \
 lib${slash}commands${slash}inline.pir \
 lib${slash}builtins${slash}interp.pir \
-lib${slash}commands${slash}join.pir \
 lib${slash}commands${slash}lappend.pir \
 lib${slash}commands${slash}lassign.pir \
 lib${slash}commands${slash}lindex.pir \
@@ -110,8 +110,10 @@ tcl.pbc: $(PARROT) pmcs lib/tcllib.pbc tcl.pir
 
 $(GENERATED_INLINES) : tools/gen_inline.pl
 
-$(BUILTIN)incr.pir : $(BUILTIN)incr.tmt
-	$(PERL) tools/gen_inline.pl $(BUILTIN)incr.tmt > $(BUILTIN)incr.pir
+.SUFFIXES : .pir .tmt
+
+.tmt.pir :
+	$(PERL) tools/gen_inline.pl $< > $@
 
 PBCS = lib${slash}tcllib_temp.pbc lib${slash}tclbinaryops.pbc lib${slash}tclcommand.pbc lib${slash}tclcommandlist.pbc lib${slash}tclconst.pbc lib${slash}tclfunc.pbc lib${slash}tclops.pbc lib${slash}tclvar.pbc lib${slash}tclword.pbc
 

@@ -1,0 +1,24 @@
+{
+  command => 'join',
+  args =>
+  [
+    {
+      name     => 'list',
+      type     => 'list',
+    },
+    {
+      name     => 'joinString',
+      type     => 'string',
+      optional => 1,
+      default  => " ",
+    }
+  ],
+  bad_args => 'wrong # args: should be "join list ?joinString?"',
+  code => <<'END_PIR',
+
+$S{register_joinString} = $P{register_joinString}
+$S{register_num} = join $S{register_joinString}, $P{register_list}
+$P{register_num} = new .TclString
+$P{register_num} = $S{register_num}
+END_PIR
+}

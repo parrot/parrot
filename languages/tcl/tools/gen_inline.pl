@@ -125,6 +125,8 @@ END_PIR
   __set      = find_global '_Tcl', '__set'
   .local pmc __integer
   __integer  = find_global '_Tcl', '__integer'
+  .local pmc __list
+  __list     = find_global '_Tcl', '__list'
 END_PIR
 
    # Now, grab each arg off the list and compile it, handling defaults, etc.
@@ -137,7 +139,7 @@ END_PIR
      my $arg_default  = "default_$arg->{name}";
      my $arg_done     = "done_$arg->{name}";
      my $type         = "TclString";
-     my $typequotes   = '"';
+     my $typequotes   = "'";
 
      push @pir_code, [ WRAP => <<END_PIR];
   .local pmc $argument
@@ -176,6 +178,34 @@ END_PIR
 END_PIR
 
       push @pir_code, [ WRAP => "goto $arg_done\n"] ;
+
+     }
+     elsif ($arg->{type} eq "list")
+     {
+       push @pir_code, [ WRAP => <<END_PIR];
+  ($arg_register,temp_code) = compiler(register_num, $argument)
+  register_num = $arg_register + 1
+END_PIR
+
+      push @pir_code, [ VAR => "temp_code" ];
+
+      push @pir_code, [ INLINE => <<END_PIR];
+  \$P{$arg_register} = __list(\$P{$arg_register})
+END_PIR
+
+      push @pir_code, [ WRAP => "goto $arg_done\n" ];
+     }
+     elsif ($arg->{type} eq "string")
+     {
+       push @pir_code, [ WRAP => <<END_PIR];
+  ($arg_register,temp_code) = compiler(register_num, $argument)
+  register_num = $arg_register + 1
+END_PIR
+
+      push @pir_code, [ VAR => "temp_code" ];
+
+      push @pir_code, [ WRAP => "goto $arg_done\n" ];
+
 
      }
      elsif ($arg->{type} eq "integer")
@@ -267,6 +297,7 @@ END_PIR
     {
       foreach my $line (split/\n/, $chunk->[1])
       {
+        $line =~ s/\\/\\\\/g;
         $line =~ s/"/\\"/g;
         $line =~ s/\\n/\\\\n/g;
         if ($line =~ s/(.*?){(.*?)}//) {
