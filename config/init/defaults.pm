@@ -128,7 +128,7 @@ sub runstep
         libparrot_is_shared => 0,
 
         #avoid a warning during Configure.pl
-        libparrot_soname => 'libparrot$(SHARE_EXT).$(SOVERSION)',
+        libparrot_soname => '',
 
         perl      => $^X,
         test_prog => 'parrot',
