@@ -32,6 +32,47 @@ few_args:
 
 .namespace [ "_Tcl\0builtins\0file" ]
 
+.sub 'join'
+  .param pmc argv
+  
+  .local int argc
+  argc = argv
+  if argc == 0 goto bad_args
+
+  .local string dirsep
+  dirsep = "/" # XXX should pull from parrot config.
+
+  .local string result
+  result = ''
+  .local int ii
+  ii = 0
+
+name_loop:
+  if ii == argc goto name_loop_done 
+
+  .local string name,char
+  name = argv[ii]
+
+  char = substr name, 0, 1
+  if char == dirsep goto absolute
+  result .= name
+  goto name_loop_next
+
+absolute:
+  result = name
+ 
+name_loop_next:
+  inc ii
+  if ii == argc goto name_loop_done
+  result .= dirsep
+  goto name_loop
+
+name_loop_done:
+  .return(result)
+
+bad_args:
+  .throw('wrong # args: should be "file join name ?name ...?"')
+.end
 
 .sub 'stat' 
   .param pmc argv
@@ -97,12 +138,81 @@ no_file:
   .throw($S0)
 bad_args:
   .throw('wrong # args: should be "file state name varName"')
- 
+.end
+
+.sub 'isdirectory'
+  .param pmc argv
+  
+  .local int argc
+  argc = argv
+
+  if argc != 1 goto bad_args
+
+  .local string file
+  file = shift argv
+
+  $P1 = new .OS
+  push_eh no_file
+    $P2 = $P1.'stat'(file)
+  clear_eh
+
+  $I1 = $P2[2]
+  $I3 = $I1 & 0o170000 #S_IFMT
+
+  if $I3 == 0o040000 goto true # directory mask
+
+  .return(0)
+
+true:
+  .return(1)
+
+# XXX should be more discriminating about the error messages .OS generates
+no_file:
+  $S0  = 'could not read "'
+  $S0 .= file
+  $S0 .= '": no such file or directory'
+  .throw($S0)
+bad_args:
+  .throw('wrong # args: should be "file isdirectory name"')
 
 .end
 
+.sub 'isfile'
+  .param pmc argv
+ 
+  .local int argc
+  argc = argv
 
-### The stat-based functions: listed in order by key into the stat struct
+  if argc != 1 goto bad_args
+
+  .local string file
+  file = shift argv
+
+  $P1 = new .OS
+  push_eh no_file
+    $P2 = $P1.'stat'(file)
+  clear_eh
+
+  $I1 = $P2[2]
+  $I3 = $I1 & 0o170000   #S_IFMT
+  
+  if $I3 == 0o100000 goto true # file mask
+  
+  .return(0)
+
+true:
+  .return(1)
+
+# XXX should be more discriminating about the error messages .OS generates
+no_file:
+  $S0  = 'could not read "'
+  $S0 .= file
+  $S0 .= '": no such file or directory'
+  .throw($S0)
+bad_args:
+  .throw('wrong # args: should be "file isfile name"')
+
+.end
 
 .sub 'type'
   .param pmc argv
