@@ -4,6 +4,7 @@ PARROT  = ..${slash}..${slash}parrot${exe}
 PBC_MERGE = ..${slash}..${slash}pbc_merge${exe}
 
 LIBPATH  = lib
+BUILTIN  = $(LIBPATH)${slash}builtins${slash}
 BUILD   = $(PERL) ${build_dir}${slash}tools${slash}build${slash}dynclasses.pl
 DESTDIR = ${build_dir}${slash}runtime${slash}parrot${slash}dynext
 O       = ${o}
@@ -17,6 +18,9 @@ PMCS = \
  tclfloat \
  tcllist \
  tclarray
+
+GENERATED_INLINES = \
+ $(BUILTIN)incr.pir
 
 DEPS = \
 lib${slash}commands${slash}after.pir \
@@ -46,7 +50,6 @@ lib${slash}commands${slash}gets.pir \
 lib${slash}builtins${slash}glob.pir \
 lib${slash}commands${slash}global.pir \
 lib${slash}commands${slash}if.pir \
-lib${slash}builtins${slash}incr.pir \
 lib${slash}commands${slash}info.pir \
 lib${slash}commands${slash}inline.pir \
 lib${slash}builtins${slash}interp.pir \
@@ -106,6 +109,11 @@ all: tcl.pbc
 tcl.pbc: $(PARROT) pmcs lib/tcllib.pbc tcl.pir
 	$(PARROT) --output=tcl.pbc tcl.pir
 
+$(GENERATED_INLINES) : tools/gen_inline.pl
+
+$(BUILTIN)incr.pir : $(BUILTIN)incr.tmt
+	$(PERL) tools/gen_inline.pl $(BUILTIN)incr.tmt > $(BUILTIN)incr.pir
+
 PBCS = lib${slash}tcllib_temp.pbc lib${slash}tclbinaryops.pbc lib${slash}tclcommand.pbc lib${slash}tclcommandlist.pbc lib${slash}tclconst.pbc lib${slash}tclfunc.pbc lib${slash}tclops.pbc lib${slash}tclvar.pbc lib${slash}tclword.pbc
 
 lib/tcllib.pbc: $(PBC_MERGE) $(PBCS)
@@ -117,7 +125,7 @@ pmcs:
 	@cd $(CLASSDIR) && $(BUILD) linklibs $(PMCS)
 	@cd $(CLASSDIR) && $(BUILD) copy "--destination=$(DESTDIR)" $(PMCS)
 
-lib${slash}tcllib.pir: $(DEPS)
+lib${slash}tcllib.pir: $(GENERATED_INLINES) $(DEPS)
 	$(PERL) tcl.pl > lib${slash}tcllib.pir
 
 lib${slash}tcllib_temp.pbc: $(PARROT) lib${slash}tcllib.pir
@@ -172,7 +180,8 @@ tcl.pbc \
 "$(CLASSDIR)${slash}*.dump" \
 #CONDITIONED_LINE(ld_parrot_exe_def):"$(CLASSDIR)${slash}*.def" \
 "$(CLASSDIR)${slash}*.c" \
-"$(CLASSDIR)${slash}*$(O)"
+"$(CLASSDIR)${slash}*$(O)" \
+$(GENERATED_INLINES)
 
 clean:
 	$(RM_F) $(CLEANERS)
