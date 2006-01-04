@@ -26,17 +26,18 @@ sub runstep
     $ldflags .= " -flat_namespace ";
 
     $conf->data->set(
-        ccflags        => $ccflags,
-        ldflags        => $ldflags,
-        ccwarn         => "-Wno-shadow",
-        libs           => $libs,
-        share_ext      => '.dylib',
-        load_ext       => '.bundle',
-        link           => 'c++',
-        ld             => 'c++',
-        ld_share_flags => '-dynamiclib',
-        ld_load_flags  => '-bundle -undefined suppress',
-        memalign       => 'some_memalign',
+        ccflags             => $ccflags,
+        ldflags             => $ldflags,
+        ccwarn              => "-Wno-shadow",
+        libs                => $libs,
+        share_ext           => '.dylib',
+        load_ext            => '.bundle',
+        link                => 'c++',
+        ld                  => 'c++',
+        ld_share_flags      => '-dynamiclib',
+        ld_load_flags       => '-bundle -undefined suppress',
+        memalign            => 'some_memalign',
+        libparrot_is_shared => 1,
     );
 }
 
