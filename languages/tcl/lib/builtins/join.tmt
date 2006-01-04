@@ -13,7 +13,6 @@
       default  => " ",
     }
   ],
-  bad_args => 'wrong # args: should be "join list ?joinString?"',
   code => <<'END_PIR',
 
 $S{register_joinString} = $P{register_joinString}

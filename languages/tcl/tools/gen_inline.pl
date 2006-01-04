@@ -276,15 +276,39 @@ END_PIR
   # End template code
 END_PIR
 
-  push @pir_code, [ WRAP => <<END_PIR ];
-  .return(register_num,pir_code)
+  push @pir_code, [ WRAP => <<END_PIR];
 
+.return(register_num,pir_code)
 bad_args:
-  .throw('$template->{bad_args}')
-.end
-
 END_PIR
 
+  if ($template->{bad_args})
+  {
+
+    push @pir_code, [ WRAP => <<END_PIR];
+.throw('$template->{bad_args}')
+END_PIR
+
+  }
+  else
+  {
+    my $argstr = join(" ", map {
+      my $display = $_->{name};
+      if ($_->{optional})
+      {
+        $display = "?$display?";
+      };
+      $display;
+    } @{$template->{args}}
+    );
+    if ($argstr) { $argstr = " $argstr"}
+ 
+    push @pir_code, [ WRAP => <<END_PIR];
+  .throw('wrong # args: should be "$template->{command}$argstr"')
+END_PIR
+  }
+
+  push @pir_code, [ WRAP => ".end\n" ];
 
   # Now dump out the code we've been accumulating.
   foreach my $chunk (@pir_code)

@@ -9,7 +9,6 @@
       default  => 0,
     }
   ],
-  bad_args => 'wrong # args: should be "exit ?returnCode?"',
   code => <<'END_PIR',
 $I{register_returnCode} = $P{register_returnCode}
 exit $I{register_returnCode}
