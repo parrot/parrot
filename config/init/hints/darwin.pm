@@ -37,7 +37,7 @@ sub runstep
         ld_share_flags      => '-dynamiclib',
         ld_load_flags       => '-bundle -undefined suppress',
         memalign            => 'some_memalign',
-        libparrot_is_shared => 1,
+        libparrot_is_shared => 0,
     );
 }
 
