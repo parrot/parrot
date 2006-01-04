@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 9;
+use Parrot::Test tests => 10;
 use Test::More;
 
 language_output_is("tcl",<<'TCL',<<OUT,"simple");
@@ -53,9 +53,17 @@ TCL
 5
 OUT
 
-language_output_is("tcl",<<'TCL',<<OUT,"error");
+language_output_is("tcl",<<'TCL',<<OUT,"too many args");
  set a 1
  incr a 3 2
+ puts $a
+TCL
+wrong # args: should be "incr varName ?increment?"
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"too few args");
+ set a 1
+ incr
  puts $a
 TCL
 wrong # args: should be "incr varName ?increment?"
