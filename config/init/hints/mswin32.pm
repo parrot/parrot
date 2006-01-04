@@ -54,10 +54,12 @@ sub runstep
             ld_load_flags        => '-dll -def:libparrot.def',
             ld_out               => '-out:',
             ldflags              => '-nologo -nodefaultlib',
-            blib_lib_libparrot_a => 'blib/lib/libparrot_s$(A)',
+            libparrot_static     => 'libparrot_s$(A)',
+            libparrot_shared     => 'libparrot_s$(SHARE_EXT)',
             ar_flags             => '',
             ar_out               => '-out:',
             slash                => '\\',
+            blib_dir             => 'blib\\lib',
             ccflags              => $ccflags,
             ccwarn               => ''
         );
@@ -101,11 +103,11 @@ sub runstep
             ld_load_flags        => '-dll -def:libparrot.def',
             ld_out               => '-out:',
             ldflags              => '-nologo -nodefaultlib',
-            blib_lib_libparrot_a => 'blib/lib/libparrot_s$(A)',
             ar                   => 'xilib',
             ar_flags             => '',
             ar_out               => '-out:',
             slash                => '\\',
+            blib_dir             => 'blib\\lib',
             ccflags              => $ccflags,
             ccwarn               => ''
         );
@@ -149,9 +151,8 @@ sub runstep
             ar_out   => '',
             ar_extra => '/au',
             slash    => '\\',
+            blib_dir => 'blib\\lib',
             make_and => "\n\t",
-
-            blib_lib_libparrot_a => 'blib\lib\libparrot.lib',
         );
     } elsif ($is_mingw) {
         my $make = $conf->data->get(qw(make));
@@ -174,6 +175,7 @@ sub runstep
                 ncilib_link_extra => 'src/libnci_test.def',
                 o                 => '.o',
                 slash             => '\\',
+                blib_dir          => 'blib\\lib',
             );
             if ($conf->data->get(qw(optimize)) eq "1") {
                 $conf->data->set(optimize => '-O2');

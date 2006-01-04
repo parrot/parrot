@@ -397,6 +397,7 @@ my @steps = qw(
     auto::msvc
     init::optimize
     inter::shlibs
+    inter::libparrot
     inter::charset
     inter::encoding
     inter::types

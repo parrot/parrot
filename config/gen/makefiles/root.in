@@ -456,18 +456,29 @@ OPS_FILES = ${ops} $(GEN_OPSFILES)
 # Executables
 PARROT            = $(CUR_DIR)/${test_prog}$(EXE)
 MINIPARROT        = $(CUR_DIR)/miniparrot$(EXE)
-INSTALLABLEPARROT = $(CUR_DIR)/installable_parrot$(EXE)
-PARROT_SO         = $(CUR_DIR)/${test_prog}_so$(EXE)
 DIS               = $(CUR_DIR)/disassemble$(EXE)
 PDUMP             = $(CUR_DIR)/pdump$(EXE)
 PINFO             = $(CUR_DIR)/pbc_info$(EXE)
 PBCMERGE          = $(CUR_DIR)/pbc_merge$(EXE)
 PDB               = $(CUR_DIR)/pdb$(EXE)
 
-# libs
-LIBPARROT         = ${blib_lib_libparrot_a}
-#CONDITIONED_LINE(has_icu):ICU_SHARED      = ${icu_shared}
-ALL_PARROT_LIBS   = $(LIBPARROT) $(ICU_SHARED) $(C_LIBS)
+# Installable executables
+INSTALLABLEPARROT   = $(CUR_DIR)/installable_parrot$(EXE)
+INSTALLABLEDIS      = $(CUR_DIR)/installable_disassemble$(EXE)
+INSTALLABLEPDUMP    = $(CUR_DIR)/installable_pdump$(EXE)
+INSTALLABLEPINFO    = $(CUR_DIR)/installable_pbc_info$(EXE)
+INSTALLABLEPBCMERGE = $(CUR_DIR)/installable_pbc_merge$(EXE)
+INSTALLABLEPDB      = $(CUR_DIR)/installable_pdb$(EXE)
+
+# Libraries
+LIBPARROT_STATIC  = ${blib_dir}${slash}${libparrot_static}
+LIBPARROT_SHARED  = ${blib_dir}${slash}${libparrot_shared}
+
+# This line controls whether a static or shared library is built
+LIBPARROT         = ${libparrot}
+
+#CONDITIONED_LINE(has_icu):ICU_SHARED  = ${icu_shared}
+ALL_PARROT_LIBS   = -L${blib_dir} -lparrot $(ICU_SHARED) $(C_LIBS)
 
 # dynamic extensions
 DYNEXT_DIR        = runtime/parrot/dynext
@@ -582,11 +593,8 @@ help :
 	@echo "  all:               'parrot' and the documentation."
 	@echo "                     This is the default."
 	@echo ""
-	@echo "  shared:            'parrot', dynamically linked"
-	@echo "  all_shared:        'parrot', dynamically linked and the documentation"
-	@echo ""
 	@echo "  world:             'all' and 'parrot_utils'."
-	@echo "  world_shared:      'all_shared' and 'parrot_utils_shared'"
+	@echo "  installable:       same as 'world', but targets for installation"
 	@echo ""
 	@echo "  parrot_utils:      $(PDUMP), $(DIS), $(PINFO), $(PDB) and $(PBCMERGE)"
 	@echo "  $(PDUMP):             Parrot Dumper"
@@ -594,8 +602,6 @@ help :
 	@echo "  $(PINFO):          Information about Parrot Byte Code"
 	@echo "  $(PDB):               Parrot Debugger"
 	@echo "  $(PBCMERGE):         Parrot Debugger"
-	@echo ""
-	@echo "  parrot_utils_shared: same as parrot_utils, but linked against a shared libparrot"
 	@echo ""
 	@echo "Installation:"
 	@echo "  install:           Install under '/usr/local/parrot' on Unix systems"
@@ -672,10 +678,9 @@ help :
 
 world : all parrot_utils
 
-world_shared: all_shared parrot_utils_shared
-
 parrot_utils : $(PDUMP) $(DIS) $(PINFO) $(PDB) $(PBCMERGE)
-parrot_utils_shared : $(PDUMP)_shared $(DIS)_shared $(PINFO)_shared $(PDB)_shared $(PBCMERGE)_shared
+
+installable: all $(INSTALLABLEPARROT) $(INSTALLABLEPDUMP) $(INSTALLABLEDIS) $(INSTALLABLEPINFO) $(INSTALLABLEPDB) $(INSTALLABLEPBCMERGE)
 
 flags_dummy :
 	@echo Compiling with:
@@ -694,20 +699,21 @@ parrot.def :
 $(PARROT) : $(IMCC_DIR)/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
 	lib/Parrot/OpLib/core.pm $(SRC_DIR)/parrot_config$(O) \
 	$(MINIPARROT) ${parrot_exe_def}
-	$(LINK) ${ld_out}$(PARROT) $(LINKFLAGS) $(LINK_DYNAMIC) ${ld_parrot_exe_def} \
-	$(IMCC_DIR)/main$(O) $(ALL_PARROT_LIBS) $(SRC_DIR)/parrot_config$(O)
+	$(LINK) ${ld_out}$@ $(LINKFLAGS) $(LINK_DYNAMIC) ${ld_parrot_exe_def} \
+	$(IMCC_DIR)/main$(O) ${rpath_blib} $(ALL_PARROT_LIBS) \
+	$(SRC_DIR)/parrot_config$(O)
 #
 # TODO build the real miniparrot
 #
 $(MINIPARROT) : $(IMCC_DIR)/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
 	lib/Parrot/OpLib/core.pm $(SRC_DIR)/null_config$(O)
-	$(LINK) ${ld_out}$(MINIPARROT) $(LINKFLAGS) $(IMCC_DIR)/main$(O) \
-	$(ALL_PARROT_LIBS) $(SRC_DIR)/null_config$(O)
+	$(LINK) ${ld_out}$@ $(LINKFLAGS) $(IMCC_DIR)/main$(O) \
+	${rpath_blib} $(ALL_PARROT_LIBS) $(SRC_DIR)/null_config$(O)
 
 $(INSTALLABLEPARROT) : $(IMCC_DIR)/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
 	lib/Parrot/OpLib/core.pm $(SRC_DIR)/install_config$(O) \
 	$(PARROT)
-	$(LINK) ${ld_out}$(INSTALLABLEPARROT) $(LINKFLAGS) \
+	$(LINK) ${ld_out}$@ $(LINKFLAGS) \
 	$(IMCC_DIR)/main$(O) \
 	$(ALL_PARROT_LIBS) $(SRC_DIR)/install_config$(O)
 
@@ -746,39 +752,25 @@ lib_deps : lib_deps_object lib_deps_source
 check_source : $(GENERAL_H_FILES)
 	$(PERL) tools/dev/check_source_standards.pl all_source
 
-###############################################################################
-#
-# Shared Library Targets:
-#
-###############################################################################
-
-shared : $(GEN_HEADERS) blib/lib/libparrot$(SHARE_EXT).$(SOVERSION) $(LIBPARROT) $(INSTALLABLEPARROT)
-	$(LINK) ${ld_out}$(INSTALLABLEPARROT) $(LINKFLAGS) $(IMCC_DIR)/main$(O) -Lblib/lib -lparrot $(ICU_SHARED) $(C_LIBS)
-
-all_shared : all shared
-
-static : $(GEN_HEADERS) $(LIBPARROT)
-
 # XXX changes don't always propagate into libparrot
 # e.g. when I change debug:fataly to xfataly, nm still shows the old symbol
 # and parrot builds fine (except for the unproto warning
 # so always delete the lib -leo
 
-$(LIBPARROT) : $(O_FILES)
+$(LIBPARROT_STATIC) : $(O_FILES)
 	$(RM_F) $@
-	$(MKDIR) blib blib/lib
+	$(MKDIR) ${blib_dir}
+	$(RM_F) $(LIBPARROT_STATIC) $(LIBPARROT_SHARED)
 	$(AR_CR) ${ar_out}$@ ${ar_extra} $(O_FILES)
 	$(RANLIB) $@
 
-blib/lib/libparrot$(SHARE_EXT).$(SOVERSION) : $(O_FILES) $(SRC_DIR)/install_config$(O)
-	$(MKDIR) blib blib/lib
-	$(LD) -Wl,-soname=libparrot$(SHARE_EXT).$(SOVERSION) $(LD_SHARE_FLAGS) $(LDFLAGS) ${ld_out}blib/lib/libparrot$(SHARE_EXT).$(SOVERSION) $(O_FILES) $(SRC_DIR)/install_config$(O) $(C_LIBS) $(ICU_SHARED)) 
-	cp blib/lib/libparrot$(SHARE_EXT).$(SOVERSION) blib/lib/libparrot$(SHARE_EXT)
+$(LIBPARROT_SHARED) : $(O_FILES)
+	$(MKDIR) ${blib_dir}
+	$(RM_F) $(LIBPARROT_STATIC) $(LIBPARROT_SHARED)
+	$(LD) $(LD_SHARE_FLAGS) $(LDFLAGS) ${ld_out}$@ ${libparrot_soname} \
+	$(O_FILES) $(C_LIBS) $(ICU_SHARED)
+#CONDITIONED_LINE(libparrot_shared_alias):	( cd ${blib_dir} ; ln -sf ${libparrot_shared} ${libparrot_shared_alias} )
 
-$(PARROT_SO) : $(IMCC_DIR)/main$(O) blib/lib/libparrot$(SHARE_EXT) lib/Parrot/OpLib/core.pm
-	$(LINK) $(LINKFLAGS) ${ld_out}$(PARROT) $(IMCC_DIR)/main$(O) \
-	$(SRC_DIR)/parrot_config$(O) -Lblib/lib -lparrot \
-	$(C_LIBS) $(ICU_SHARED)
 
 #
 # Parrot Debugger
@@ -787,15 +779,16 @@ $(PARROT_SO) : $(IMCC_DIR)/main$(O) blib/lib/libparrot$(SHARE_EXT) lib/Parrot/Op
 $(SRC_DIR)/pdb$(O) : $(GENERAL_H_FILES)
 
 $(PDB) : $(SRC_DIR)/pdb$(O) $(LIBPARROT)
-	$(LINK) ${ld_out}$(PDB) \
+	$(LINK) ${ld_out}$@ \
 	$(SRC_DIR)/pdb$(O) \
 	$(SRC_DIR)/null_config$(O) \
-	$(LINKFLAGS) $(ALL_PARROT_LIBS)
+	$(LINKFLAGS) ${rpath_blib} $(ALL_PARROT_LIBS)
 
-$(PDB)_shared : $(SRC_DIR)/pdb$(O) blib/lib/libparrot$(SHARE_EXT).$(SOVERSION)
-	$(LINK) ${ld_out}$(PDB)_shared \
+$(INSTALLABLEPDB) : $(SRC_DIR)/pdb$(O) $(LIBPARROT)
+	$(LINK) ${ld_out}$@ \
 	$(SRC_DIR)/pdb$(O) \
-	$(LINKFLAGS) -Lblib/lib -lparrot $(ALL_PARROT_LIBS)
+	$(SRC_DIR)/install_config$(O) \
+	$(LINKFLAGS) $(ALL_PARROT_LIBS)
 
 #
 # Parrot Disassembler
@@ -804,59 +797,62 @@ $(PDB)_shared : $(SRC_DIR)/pdb$(O) blib/lib/libparrot$(SHARE_EXT).$(SOVERSION)
 $(SRC_DIR)/disassemble$(O) : $(GENERAL_H_FILES)
 
 $(DIS) : $(SRC_DIR)/disassemble$(O) $(LIBPARROT)
-	$(LINK) ${ld_out}$(DIS) \
+	$(LINK) ${ld_out}$@ \
 	$(SRC_DIR)/disassemble$(O) \
 	$(SRC_DIR)/null_config$(O) \
-	$(LINKFLAGS) $(ALL_PARROT_LIBS)
+	$(LINKFLAGS) ${rpath_blib} $(ALL_PARROT_LIBS)
 
-$(DIS)_shared : $(SRC_DIR)/disassemble$(O) blib/lib/libparrot$(SHARE_EXT).$(SOVERSION)
-	$(LINK) ${ld_out}$(DIS)_shared \
+$(INSTALLABLEDIS) : $(SRC_DIR)/disassemble$(O) $(LIBPARROT)
+	$(LINK) ${ld_out}$@ \
 	$(SRC_DIR)/disassemble$(O) \
-	$(LINKFLAGS) -Lblib/lib -lparrot $(ALL_PARROT_LIBS)
+	$(SRC_DIR)/install_config$(O) \
+	$(LINKFLAGS) $(ALL_PARROT_LIBS)
 
 #
 # Parrot Dump
 #
 
 $(PDUMP) : $(SRC_DIR)/pdump$(O) $(SRC_DIR)/packdump$(O) $(LIBPARROT)
-	$(LINK) ${ld_out}$(PDUMP) \
+	$(LINK) ${ld_out}$@ \
 	$(SRC_DIR)/pdump$(O) \
 	$(SRC_DIR)/null_config$(O) \
-	$(SRC_DIR)/packdump$(O) $(LINKFLAGS) $(ALL_PARROT_LIBS)
+	$(SRC_DIR)/packdump$(O) $(LINKFLAGS) ${rpath_blib} $(ALL_PARROT_LIBS)
 
-$(PDUMP)_shared : $(SRC_DIR)/pdump$(O) $(SRC_DIR)/packdump$(O) blib/lib/libparrot$(SHARE_EXT).$(SOVERSION)
-	$(LINK) ${ld_out}$(PDUMP)_shared \
+$(INSTALLABLEPDUMP) : $(SRC_DIR)/pdump$(O) $(SRC_DIR)/packdump$(O) $(LIBPARROT)
+	$(LINK) ${ld_out}$@ \
 	$(SRC_DIR)/pdump$(O) \
-	$(SRC_DIR)/packdump$(O) \
-	$(LINKFLAGS) -Lblib/lib -lparrot $(ALL_PARROT_LIBS)
+	$(SRC_DIR)/install_config$(O) \
+	$(SRC_DIR)/packdump$(O) $(LINKFLAGS) $(ALL_PARROT_LIBS)
 
 
 # pbc_info
 $(PINFO) : $(SRC_DIR)/pbc_info$(O) $(LIBPARROT)
-	$(LINK) ${ld_out}$(PINFO) \
+	$(LINK) ${ld_out}$@ \
 	$(SRC_DIR)/pbc_info$(O) \
 	$(SRC_DIR)/null_config$(O) \
-	$(LINKFLAGS) $(ALL_PARROT_LIBS)
+	$(LINKFLAGS) ${rpath_blib} $(ALL_PARROT_LIBS)
 
-$(PINFO)_shared : $(SRC_DIR)/pbc_info$(O) blib/lib/libparrot$(SHARE_EXT).$(SOVERSION)
-	$(LINK) ${ld_out}$(PINFO)_shared \
+$(INSTALLABLEPINFO) : $(SRC_DIR)/pbc_info$(O) $(LIBPARROT)
+	$(LINK) ${ld_out}$@ \
 	$(SRC_DIR)/pbc_info$(O) \
-	$(LINKFLAGS) -Lblib/lib -lparrot $(ALL_PARROT_LIBS)
+	$(SRC_DIR)/install_config$(O) \
+	$(LINKFLAGS) $(ALL_PARROT_LIBS)
 
 #
 # Parrot Bytecode File Merger
 #
 
 $(PBCMERGE) : $(SRC_DIR)/pbc_merge$(O) $(LIBPARROT) $(SRC_DIR)/parrot_config$(O)
-	$(LINK) ${ld_out}$(PBCMERGE) \
+	$(LINK) ${ld_out}$@ \
 	$(SRC_DIR)/pbc_merge$(O) \
 	$(SRC_DIR)/parrot_config$(O) \
-	$(LINKFLAGS) $(LINK_DYNAMIC) $(ALL_PARROT_LIBS)
+	$(LINKFLAGS) $(LINK_DYNAMIC) ${rpath_blib} $(ALL_PARROT_LIBS)
 
-$(PBCMERGE)_shared : $(SRC_DIR)/pbc_merge$(O) blib/lib/libparrot$(SHARE_EXT).$(SOVERSION)
-	$(LINK) ${ld_out}$(PBCMERGE)_shared \
+$(INSTALLABLEPBCMERGE) : $(SRC_DIR)/pbc_merge$(O) $(LIBPARROT)
+	$(LINK) ${ld_out}$@ \
 	$(SRC_DIR)/pbc_merge$(O) \
-	$(LINKFLAGS) -Lblib/lib -lparrot $(ALL_PARROT_LIBS)
+	$(SRC_DIR)/install_config$(O) \
+	$(LINKFLAGS) $(ALL_PARROT_LIBS)
 
 
 ###############################################################################
@@ -1428,18 +1424,24 @@ prog-clean :
 		$(PARROT) \
 		$(MINIPARROT) \
 		$(INSTALLABLEPARROT) \
+		$(INSTALLABLEDIS) \
+		$(INSTALLABLEPDUMP) \
+		$(INSTALLABLEPINFO) \
+		$(INSTALLABLEPBCMERGE) \
+		$(INSTALLABLEPDB) \
 		$(IMCC_DIR)/main$(O) \
-		$(PDUMP) $(PDUMP)_shared $(SRC_DIR)/pdump$(O) $(SRC_DIR)/packdump$(O) \
-		$(SRC_DIR)/pbc_info$(O) $(PINFO)_shared $(PINFO) \
-		$(PDB) $(PDB)_shared $(SRC_DIR)/pdb$(O) \
-		$(PBCMERGE) $(PBCMERGE)_shared $(SRC_DIR)/pbc_merge$(O) \
-		$(DIS) $(DIS)_shared $(SRC_DIR)/disassemble$(O) \
+		$(PDUMP) $(SRC_DIR)/pdump$(O) $(SRC_DIR)/packdump$(O) \
+		$(SRC_DIR)/pbc_info$(O) $(PINFO) \
+		$(PDB) $(SRC_DIR)/pdb$(O) \
+		$(PBCMERGE) $(SRC_DIR)/pbc_merge$(O) \
+		$(DIS) $(SRC_DIR)/disassemble$(O) \
 		$(SRC_DIR)/null_config$(O) \
 		$(SRC_DIR)/parrot_config$(O) \
 		$(SRC_DIR)/install_config$(O) \
 		install_config.fpmc \
 		$(LIBNCI_TEST_SO) \
-		$(LIBPARROT)
+		$(LIBPARROT_STATIC) \
+		$(LIBPARROT_SHARED)
 	$(PERL) tools/build/c2str.pl --init
 	$(RM_F) \
 		$(INC_DIR)/string_private_cstring.h \
@@ -1565,7 +1567,7 @@ lint2 : $(PARROT)
 #
 ###############################################################################
 
-install : $(INSTALLABLEPARROT)
+install : installable
 	$(PERL) tools/dev/install_files.pl \
 	--buildprefix=$(BUILDPREFIX) \
 	--prefix=$(PREFIX) \
@@ -1622,10 +1624,7 @@ win32-inno-installer : world install
 ###############################################################################
 
 exec : $(SRC_DIR)/exec_start$(O) $(SRC_DIR)/parrot_config$(O) $(LIBPARROT)
-	$(LINK) ${ld_out}$(EXEC)$(EXE) $(LINKFLAGS) $(EXEC)$(O) $(SRC_DIR)/exec_start$(O) $(SRC_DIR)/parrot_config$(O) $(ALL_PARROT_LIBS)
-
-exec_so : $(SRC_DIR)/exec_start$(O) blib/lib/libparrot$(SHARE_EXT)
-	$(LINK) ${ld_out}$(EXEC)$(SHARE_EXT) $(LINKFLAGS) $(EXEC)$(O) $(SRC_DIR)/exec_start$(O) $(SRC_DIR)/parrot_config$(O) -lparrot $(C_LIBS)
+	$(LINK) ${ld_out}$(EXEC)$(EXE) $(LINKFLAGS) $(EXEC)$(O) $(SRC_DIR)/exec_start$(O) $(SRC_DIR)/parrot_config$(O) ${rpath_blib} $(ALL_PARROT_LIBS)
 
 ###### OS depend targets ##########
 

@@ -575,17 +575,7 @@ sub _generate_functions {
             print SOURCE $source;
             close SOURCE;
 
-            (my $libparrot_root = $PConfig{blib_lib_libparrot_a}) =~ s/\$\(A\)//;
-            my $libparrot_dynamic = $libparrot_root.$PConfig{share_ext};
-
-            my $libparrot;
-
-            # use shared library version if available
-            if( -e $libparrot_dynamic ) {
-                $libparrot = '-Lblib/lib -lparrot';
-            } else {
-                $libparrot = $libparrot_root.$PConfig{a};
-            }
+            my $libparrot="$PConfig{rpath_blib} -L$PConfig{blib_dir} -lparrot";
 
             my $iculibs = "";
             if ($PConfig{'has_icu'}) {

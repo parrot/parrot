@@ -23,9 +23,9 @@ build: build-stamp
 
 build-stamp: configure-stamp 
 	dh_testdir
-	$(MAKE) world_shared
+	$(MAKE) installable
 	pod2man --section=1 --release="Debian Project" --center="Debian GNU/Linux manual" docs/running.pod debian/parrot.1
-	pod2man --section=1 --release="Debian Project" --center="Debian GNU/Linux manual" parrot-config.imc debian/parrot-config.imc.1
+	pod2man --section=1 --release="Debian Project" --center="Debian GNU/Linux manual" parrot-config debian/parrot-config.1
 	pod2man --section=1 --release="Debian Project" --center="Debian GNU/Linux manual" src/pdump.c debian/pdump.1
 	pod2man --section=1 --release="Debian Project" --center="Debian GNU/Linux manual" src/disassemble.c debian/disassemble.1
 	pod2man --section=1 --release="Debian Project" --center="Debian GNU/Linux manual" src/pdb.c debian/parrot-debugger.1
@@ -48,7 +48,7 @@ install: build debian/libparrot$(SOVERSION).install
 	dh_testroot
 	dh_clean -k 
 	dh_installdirs -plibparrot-dev usr/share/lintian/overrides
-	$(MAKE) install PREFIX=$(CURDIR)/debian/tmp/usr
+	$(MAKE) install PREFIX=$(CURDIR)/debian/tmp/usr BIN_DIR=$(CURDIR)/debian/tmp/usr/bin
 	dh_install --sourcedir=$(CURDIR)/debian/tmp --list-missing
 	install -m755 $(CURDIR)/debian/tmp/usr/bin/pdump_shared $(CURDIR)/debian/parrot/usr/bin/pdump
 	install -m755 $(CURDIR)/debian/tmp/usr/bin/pdb_shared $(CURDIR)/debian/parrot/usr/bin/parrot-debugger

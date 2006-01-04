@@ -117,8 +117,15 @@ sub runstep
         # include debug info in executable
         ld_debug => '',
 
-        # should we have a dependancy upon arc to generate .a's?
-        blib_lib_libparrot_a => 'blib/lib/libparrot$(A)',
+        # Library build directory
+        blib_dir      => 'blib/lib',
+
+        # libparrot library names
+        libparrot_static => 'libparrot$(A)',
+        libparrot_shared => 'libparrot$(SHARE_EXT)',
+
+        # default behaviour for building libparrot static or shared
+        libparrot_is_shared => 0,
 
         perl      => $^X,
         test_prog => 'parrot',
