@@ -20,6 +20,7 @@ PMCS = \
  tclarray
 
 GENERATED_INLINES = \
+ $(BUILTIN)exit.pir \
  $(BUILTIN)incr.pir \
  $(BUILTIN)join.pir
 
@@ -39,7 +40,6 @@ lib${slash}commands${slash}eof.pir \
 lib${slash}commands${slash}error.pir \
 lib${slash}commands${slash}eval.pir \
 lib${slash}builtins${slash}exec.pir \
-lib${slash}commands${slash}exit.pir \
 lib${slash}commands${slash}expr.pir \
 lib${slash}builtins${slash}fconfigure.pir \
 lib${slash}commands${slash}file.pir \

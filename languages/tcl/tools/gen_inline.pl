@@ -177,7 +177,7 @@ END_PIR
   \$P{$arg_register} = __read(\$P{${arg_register}_varname})
 END_PIR
 
-      push @pir_code, [ WRAP => "goto $arg_done\n"] ;
+      push @pir_code, [ WRAP => "  goto $arg_done\n"] ;
 
      }
      elsif ($arg->{type} eq "list")
@@ -193,7 +193,7 @@ END_PIR
   \$P{$arg_register} = __list(\$P{$arg_register})
 END_PIR
 
-      push @pir_code, [ WRAP => "goto $arg_done\n" ];
+      push @pir_code, [ WRAP => "  goto $arg_done\n" ];
      }
      elsif ($arg->{type} eq "string")
      {
@@ -204,7 +204,7 @@ END_PIR
 
       push @pir_code, [ VAR => "temp_code" ];
 
-      push @pir_code, [ WRAP => "goto $arg_done\n" ];
+      push @pir_code, [ WRAP => "  goto $arg_done\n" ];
 
 
      }
@@ -223,7 +223,7 @@ END_PIR
   \$P{$arg_register} = __integer(\$P{$arg_register})
 END_PIR
 
-      push @pir_code, [ WRAP => "goto $arg_done\n" ];
+      push @pir_code, [ WRAP => "  goto $arg_done\n" ];
 
 
      }
@@ -236,7 +236,7 @@ END_PIR
 $arg_default:
 END_PIR
 
-    if ($arg->{default})
+    if (defined $arg->{default})
     {
        push @pir_code, [ WRAP => <<END_PIR];
   $arg_register = register_num
@@ -313,7 +313,7 @@ END_PIR
     }
     else # VAR
     {
-      print "pir_code .= $chunk->[1]\n";
+      print "  pir_code .= $chunk->[1]\n";
     }
   }
 }
