@@ -101,8 +101,7 @@ lib${slash}string_to_list.pir \
 lib${slash}string.pir \
 lib${slash}tcl.p6r \
 lib${slash}variables.pir \
-tcl.pir_template \
-tcl.pl
+tcl.pir_template
 
 all: tcl.pbc
 
@@ -125,8 +124,8 @@ pmcs:
 	@cd $(CLASSDIR) && $(BUILD) linklibs $(PMCS)
 	@cd $(CLASSDIR) && $(BUILD) copy "--destination=$(DESTDIR)" $(PMCS)
 
-lib${slash}tcllib.pir: $(GENERATED_INLINES) $(DEPS)
-	$(PERL) tcl.pl > lib${slash}tcllib.pir
+lib${slash}tcllib.pir: $(GENERATED_INLINES) $(DEPS) tools${slash}gen_lib.pl
+	$(PERL) tools${slash}gen_lib.pl tcl.pir_template > lib${slash}tcllib.pir
 
 lib${slash}tcllib_temp.pbc: $(PARROT) lib${slash}tcllib.pir
 	$(PARROT) --output=$(LIBPATH)${slash}tcllib_temp.pbc $(LIBPATH)${slash}tcllib.pir
