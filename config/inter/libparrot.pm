@@ -63,7 +63,7 @@ sub runstep {
     $conf->data->set(
      libparrot_ldflags => ($libparrot_is_shared)
      ? '-L' . $conf->data->get('blib_dir') . ' -lparrot'
-     : ''
+     : $conf->data->get('libparrot')
     );
 
     $result = $libparrot_is_shared ? 'yes' : 'no';
