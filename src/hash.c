@@ -410,7 +410,10 @@ expand_hash(Interp *interpreter, Hash *hash)
     /* clear freshly allocated bucket index */
     memset(new_bi + old_size, 0, sizeof(HashBucket*) * old_size);
     /*
-     * reloc pointers
+     * reloc pointers - this part would be also needed, if we
+     * allocate hash memory from GC movable memory, and then
+     * also the free_list needs updating (this is empty now,
+     * as expand_hash is only called for that case).
      */
     if (offset) {
 	for (i = 0; i < old_size; ++i) {
@@ -440,6 +443,10 @@ expand_hash(Interp *interpreter, Hash *hash)
 	}
     }
     /* add new buckets to free_list */
+    /* TODO reverse free_list filling so that we can use
+     *      buckets[i] directly in an OrderedHash, *if* nothing
+     *      was deleted
+     */
     for (i = 0, b = (HashBucket*)old_bi; i < old_nb; ++i, ++b) {
 	b->next = hash->free_list;
 	b->key = b->value = NULL;
@@ -566,6 +573,10 @@ init_hash(Interp *interpreter, Hash *hash,
      */
     hash->bu.bs = mem_sys_allocate(HASH_ALLOC_SIZE(INITIAL_BUCKETS));
     hash->free_list = NULL;
+    /* TODO reverse free_list filling so that we can use
+     *      buckets[i] directly in an OrderedHash, *if* nothing
+     *      was deleted
+     */
     for (i = 0, bp = hash->bu.bs; i < N_BUCKETS(INITIAL_BUCKETS); ++i, ++bp) {
 	bp->next = hash->free_list;
 	bp->key = bp->value = NULL;
