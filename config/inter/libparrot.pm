@@ -48,12 +48,23 @@ sub runstep {
 	 libparrot => $libparrot_is_shared
 	 ? '$(LIBPARROT_SHARED)'
 	 : '$(LIBPARROT_STATIC)',
+	);
 
-	 rpath_blib =>
-	 $conf->data->get('rpath') . 
-	 $conf->data->get('build_dir') . 
-	 $conf->data->get('slash') . 
-	 $conf->data->get('blib_dir'));
+    $conf->data->set(
+	 rpath_blib => ($libparrot_is_shared) 
+     ?
+         $conf->data->get('rpath') . 
+         $conf->data->get('build_dir') . 
+         $conf->data->get('slash') . 
+         $conf->data->get('blib_dir')
+     : ''
+    );
+
+    $conf->data->set(
+     libparrot_ldflags => ($libparrot_is_shared)
+     ? '-L' . $conf->data->get('blib_dir') . ' -lparrot'
+     : ''
+    );
 
     $result = $libparrot_is_shared ? 'yes' : 'no';
 }

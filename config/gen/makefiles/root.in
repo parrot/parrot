@@ -478,7 +478,7 @@ LIBPARROT_SHARED  = ${blib_dir}${slash}${libparrot_shared}
 LIBPARROT         = ${libparrot}
 
 #CONDITIONED_LINE(has_icu):ICU_SHARED  = ${icu_shared}
-ALL_PARROT_LIBS   = -L${blib_dir} -lparrot $(ICU_SHARED) $(C_LIBS)
+ALL_PARROT_LIBS   = ${libparrot_ldflags} $(ICU_SHARED) $(C_LIBS)
 
 # dynamic extensions
 DYNEXT_DIR        = runtime/parrot/dynext

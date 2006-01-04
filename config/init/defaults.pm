@@ -127,6 +127,9 @@ sub runstep
         # default behaviour for building libparrot static or shared
         libparrot_is_shared => 0,
 
+        #avoid a warning during Configure.pl
+        libparrot_soname => 'libparrot$(SHARE_EXT).$(SOVERSION)',
+
         perl      => $^X,
         test_prog => 'parrot',
         rm_f      => '$(PERL) -MExtUtils::Command -e rm_f',
