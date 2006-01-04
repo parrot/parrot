@@ -1,3 +1,4 @@
+        bounds 1
 	push_eh _x
 	newclass P1, "YaPH"
 	find_method P0, P1, "Just another Parrot Hacker\n"
