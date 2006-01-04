@@ -22,7 +22,7 @@ use lib qw( lib . ../lib ../../lib );
 use Test::More;
 use Parrot::Test;
 use Parrot::Config;
-use File::Temp;
+use File::Temp 0.13 qw/tempfile/;
 
 
 my $PARROT = ".$PConfig{slash}$PConfig{test_prog}";
@@ -75,9 +75,9 @@ exit;
 sub create_pir_file
 {
     my $word= shift;
-    my $fh = File::Temp->new(UNLINK => 0, SUFFIX => '.pir');
+    my($fh, $filename) = tempfile(UNLINK => 0, SUFFIX => '.pir');
     print $fh qq{.sub main :main\n\tprint "$word\\n"\n.end};
     close $fh;
-    return $fh;
+    return $filename;
 }
 
