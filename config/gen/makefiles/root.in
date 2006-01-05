@@ -531,7 +531,7 @@ MAKE = ${make_c}
 
 all : \
 	flags_dummy \
-	$(PARROT_LIBS) \
+	PARROT_LIBS \
 	$(PARROT) \
 	runtime/parrot/include/parrotlib.pbc \
 	runtime/parrot/include/config.fpmc \
