@@ -121,8 +121,8 @@ sub runstep
         blib_dir      => 'blib/lib',
 
         # libparrot library names
-        libparrot_static => 'libparrot$(A)',
-        libparrot_shared => 'libparrot$(SHARE_EXT)',
+        libparrot_static => 'libparrot'.$Config{_a},
+        libparrot_shared => 'libparrot.'.$Config{so},
 
         # does the system know about static/dynamic linking?
         has_static_linking => 1,
