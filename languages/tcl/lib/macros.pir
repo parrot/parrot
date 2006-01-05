@@ -78,11 +78,11 @@ Given a string, construct and throw a TCL_ERROR.
 =cut
 
 .macro throw (mess)
-  .sym pmc e
-  e = new .Exception
-  e[VALUE_SLOT] = .mess
-  e[CODE_SLOT]  = TCL_ERROR
-  throw e
+  .sym pmc throwable
+  throwable = new .Exception
+  throwable[VALUE_SLOT] = .mess
+  throwable[CODE_SLOT]  = TCL_ERROR
+  throw throwable
 .endm
 
 =head2 throw_with_code (IN int code, IN string mess)

@@ -410,6 +410,44 @@ integer_done:
   $I0 = pos - start
   $S0 = substr expr, start, $I0
   if char == 101 goto e
+  
+  # At this point, if there's no e, we're definitely an integer, 
+  # check for octal.
+  $S1 = substr $S0, 0, 1
+  if $S1 != "0" goto integer_return
+
+  .local int octal_value
+  .local int octal_digit
+  .local int octal_counter
+  .local int octal_length
+  octal_length = length $S0
+  octal_counter = 1 #skip the first 0
+  dec octal_counter
+  octal_value = 0
+  # at this point, string should consist only of digits 0-9
+octal_loop:
+  if octal_counter == octal_length goto octal_done # skip first 0
+  octal_digit = ord $S0, octal_counter
+  octal_digit -= 48 # ascii value of 0
+  if octal_digit >= 8 goto bad_octal
+  octal_value *= 8
+  octal_value += octal_digit
+  inc octal_counter
+  goto octal_loop
+
+octal_done:
+  value = new .TclInt
+  value = octal_value
+  .return(value, pos)
+
+bad_octal:
+  .local string msg
+  msg  = 'expected integer but got "'
+  msg .= $S0
+  msg .= '" (looks like invalid octal number)'
+  .throw (msg)
+
+integer_return:
   $I0 = $S0
   value = new .TclInt
   value = $I0
@@ -571,6 +609,5 @@ unknown_func:
   unary = new $I0
   setattribute unary, "TclUnaryOp\x00name", name
   setattribute unary, "TclUnaryOp\x00operand", operand
-
   .return(unary, pos)
 .end

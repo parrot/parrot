@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 10;
+use Parrot::Test tests => 11;
 use Test::More;
 
 language_output_is("tcl",<<'TCL',<<OUT,"simple");
@@ -83,3 +83,11 @@ TCL
 expected integer but got "1.5"
 OUT
 
+# Uses the same parsing mechanism as 
+# [expr <octal>] - all the edge cases are tested there.
+language_output_is("tcl",<<'TCL',<<'OUT',"octal offset");
+  set i 25; incr i 000012345
+  puts $i
+TCL
+5374
+OUT

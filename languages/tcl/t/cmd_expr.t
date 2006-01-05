@@ -2,13 +2,46 @@
 
 use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 84;
+use Parrot::Test tests => 94;
 use Test::More;
 
 language_output_is("tcl",<<TCL,<<OUT,"int");
  puts [expr 42]
 TCL
 42
+OUT
+
+language_output_is("tcl",<<TCL,<<OUT,"unary -");
+ puts [expr -2]
+TCL
+-2
+OUT
+
+language_output_is("tcl",<<TCL,<<OUT,"unary +");
+ puts [expr +2]
+TCL
+2
+OUT
+
+TODO: {
+  local $TODO = "~ operator not supported yet.";
+language_output_is("tcl",<<TCL,<<OUT,"unary ~");
+ puts [expr ~0]
+TCL
+-1
+OUT
+}
+
+language_output_is("tcl",<<TCL,<<OUT,"unary !");
+ puts [expr !2]
+TCL
+0
+OUT
+
+language_output_is("tcl",<<TCL,<<OUT,"double unary !");
+ puts [expr !!2]
+TCL
+1
 OUT
 
 language_output_is("tcl",<<TCL,<<OUT,"mul");
@@ -533,3 +566,57 @@ can't use non-numeric string as operand of "^"
 OUT
 
 }
+
+language_output_is("tcl",<<TCL,<<OUT,"octal");
+ puts [expr 000012345]
+TCL
+5349
+OUT
+
+language_output_is("tcl",<<TCL,<<OUT,"neg octal");
+ puts [expr -000012345]
+TCL
+-5349
+OUT
+
+language_output_is("tcl",<<TCL,<<OUT,"pos octal");
+ puts [expr +000012345]
+TCL
+5349
+OUT
+
+language_output_is("tcl",<<TCL,<<OUT,"bad octal");
+ puts [expr 0000912345]
+TCL
+expected integer but got "0000912345" (looks like invalid octal number)
+OUT
+
+language_output_is("tcl",<<TCL,<<OUT,"floats aren't octal");
+ puts [expr 000012345.0]
+TCL
+12345.0
+OUT
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
