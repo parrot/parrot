@@ -805,13 +805,12 @@ A from scratch implementation of a Tcl 8.5 compiler in parrot.
 
 =item Status
 
-Some tests failing due to unimplemented unicode features.
-Passes about 10% of *tcl*'s test suite (modulo clock).
-Still many builtins to implement.
+[break],[continue],[rename] - some tests failing.
+Passes about 5.5% of tcl's (converted) test suite
 
 =item Last verified with parrot version
 
-0.3.1
+0.4.0
 
 =item Location
 
