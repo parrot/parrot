@@ -34,10 +34,23 @@ sub runstep
         load_ext            => '.bundle',
         link                => 'c++',
         ld                  => 'c++',
-        ld_share_flags      => '-dynamiclib',
+        ld_share_flags      => '-dynamiclib -undefined suppress',
         ld_load_flags       => '-bundle -undefined suppress',
         memalign            => 'some_memalign',
-        parrot_is_shared    => 0,
+	has_dynamic_linking     => 1,
+        parrot_is_shared     => 1,
+        libparrot_shared        => 'libparrot$(SHARE_EXT).$(SOVERSION)',
+        libparrot_shared_alias  => 'libparrot$(SHARE_EXT)',
+        # This variable needs renaming to be more general
+	# XXX ugly hack for rpath_lib in config/inter/libparrot.pm
+        rpath                   => "-L",
+        libparrot_soname    => "-install_name " .
+                               $conf->data->get('build_dir') .
+                               $conf->data->get('slash') .
+                               $conf->data->get('blib_dir') .
+                               $conf->data->get('slash') .
+                               "libparrot" .
+                               $conf->data->get('share_ext')
     );
 }
 
