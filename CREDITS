@@ -335,11 +335,10 @@ N: Nicholas Clark
 D: Building and platform compat and more.
 
 N: Nick Glencross
-D: Bugfixes to trace and more.
-D: fixes file perms for hpux & cygwin in config/gen/makefiles/dynclasses_pl
-D: A patch to skip tests that hang on hp-ux in t/pmc/nci.t
-D: The example circle.pir
-E: nickg@glencros.demon.co.uk
+D: Various low hanging bug fixes
+D: Build and smoke fixes for HP-UX and cygwin
+D: Some examples, such as circle.pir and MD5.pir
+E: nick.glencross@gmail.com
 
 N: Nick Kostirya
 D: Win32, FreeBSD build fixes
