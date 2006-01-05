@@ -61,7 +61,7 @@ arg_loop:
    $P0 = new .String
    $P0 = $S0
    push compiled_args, $P0
-   register_num = result_reg
+   register_num = result_reg + 1 # Otherwise we can overlap results.
    args .= retval 
    inc ii 
    goto arg_loop
