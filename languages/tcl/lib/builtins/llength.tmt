@@ -1,0 +1,16 @@
+{
+  command => 'llength',
+  args =>
+  [
+    {
+      name     => 'list',
+      type     => 'list',
+    }
+  ],
+  code => <<'END_PIR',
+
+$I{register_num} = $P{register_list}
+$P{register_num} = new .TclInt
+$P{register_num} = $I{register_num}
+END_PIR
+}

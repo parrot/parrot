@@ -22,7 +22,8 @@ PMCS = \
 GENERATED_INLINES = \
  $(BUILTIN)exit.pir \
  $(BUILTIN)incr.pir \
- $(BUILTIN)join.pir
+ $(BUILTIN)join.pir \
+ $(BUILTIN)llength.pir
 
 DEPS = \
 lib${slash}commands${slash}after.pir \
@@ -59,7 +60,6 @@ lib${slash}commands${slash}lassign.pir \
 lib${slash}commands${slash}lindex.pir \
 lib${slash}commands${slash}linsert.pir \
 lib${slash}commands${slash}list.pir \
-lib${slash}commands${slash}llength.pir \
 lib${slash}commands${slash}lrange.pir \
 lib${slash}commands${slash}lrepeat.pir \
 lib${slash}builtins${slash}lsearch.pir \

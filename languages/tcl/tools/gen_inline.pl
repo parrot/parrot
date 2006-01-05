@@ -8,7 +8,7 @@ gen_inline.pl
 
 =head1 SYNOPSIS
 
- %perl languages/tcl/tools/gen_inline.pl lib/builtins/*.tmt > output.pir
+ %perl languages/tcl/tools/gen_inline.pl lib/builtins/foo.tmt > lib/builtins/foo.pir
 
 =head1 DESCRIPTION
 
@@ -22,9 +22,12 @@ of optimizations. By making the inline'd versions more declarative, this
 lets us do this work B<once> instead of many times, which B<should> make it
 easier to inline more builtins accurately.j
 
+Currently support options with no arguments, and the following types of
+arguments: variable name, integer, channel, list, and string.
+
 =cut
 
-my $namespace = "_Tcl::builtins";
+my $namespace = "_Tcl::builtins"; # The namespace all these commands live in
 
 local undef $/;
 
@@ -77,7 +80,6 @@ eventually be compiled (C<INLINED>).
   eval "\$template = $contents";       # ewww...
   die "error processing $file: $@" if ($@);
 
-
   push @pir_code, [ WRAP => <<END_PIR];
 
 .namespace [ "_Tcl::builtins"]
@@ -115,9 +117,9 @@ END_PIR
 
    }
 
-  # XXX We're including more here than we strictly need to. Check for which
-  # arguments are required.
-
+  # XXX We're including more here than we need to. Check for which
+  # arguments are required based 
+ 
   push @pir_code, [ INLINE => <<END_PIR];
   .local pmc __read
   __read     = find_global '_Tcl', '__read'
@@ -127,12 +129,28 @@ END_PIR
   __integer  = find_global '_Tcl', '__integer'
   .local pmc __list
   __list     = find_global '_Tcl', '__list'
+  .local pmc channels
+  channels   = find_global '_Tcl', 'channels'
 END_PIR
 
+   # Now, grab each option off the list and compile it. 
+   # XXX Refactor when we add subcommands
+   # XXX Only deal with value-less options atm.
+   if ($template->{options})
+   {
+
+     # For each option, peek at the stack
+     # if the value *is* the option (which in unoptimized case we
+     # can't know until we execute the code) then pop it off the
+     # args.
+
+     # XXX Not done yet.
+   }
+
    # Now, grab each arg off the list and compile it, handling defaults, etc.
-   # XXX make this a sub when we add subcommands...
+   # XXX Refactor when we add subcommands
    my $ii = 0;
-   foreach my $arg (@ {$template->{args}})
+   foreach my $arg (@{$template->{args}})
    {
      my $argument     = "argument_$arg->{name}";
      my $arg_register = "register_$arg->{name}";
@@ -161,7 +179,7 @@ END_PIR
 
      if ($arg->{type} eq "variable")
      {
-       # Using variable means we have two registers we care about:
+       # Using 'variable' means we have two registers we care about:
        # $arg_register is the register of the resulting value
        # $arg_register_varname is the register of the variable name.
         
@@ -175,6 +193,27 @@ END_PIR
 
       push @pir_code, [ INLINE => <<END_PIR];
   \$P{$arg_register} = __read(\$P{${arg_register}_varname})
+END_PIR
+
+      push @pir_code, [ WRAP => "  goto $arg_done\n"] ;
+
+     }
+     elsif ($arg->{type} eq "channel")
+     {
+       # Using 'chanel' means we have two registers we care about:
+       # $arg_register is the register of the channel itself
+       # $arg_register_varname is the register of the channel's name
+        
+       push @pir_code, [ WRAP => <<END_PIR];
+  .local int ${arg_register}_varname
+  (${arg_register}_varname,temp_code) = compiler(register_num, $argument)
+  $arg_register = ${arg_register}_varname + 1
+  register_num = $arg_register + 1
+END_PIR
+      push @pir_code, [ VAR => "temp_code" ];
+
+      push @pir_code, [ INLINE => <<END_PIR];
+  \$P{$arg_register} = channels[\$P{${arg_register}_varname}]
 END_PIR
 
       push @pir_code, [ WRAP => "  goto $arg_done\n"] ;
@@ -224,7 +263,6 @@ END_PIR
 END_PIR
 
       push @pir_code, [ WRAP => "  goto $arg_done\n" ];
-
 
      }
      else
@@ -292,6 +330,12 @@ END_PIR
   }
   else
   {
+    # XXX need to deal with options that take values.
+    my $optstr = join (" ", map {
+      "?-" . $_->{name} . "?"
+    } @{$template->{options}}
+    );
+
     my $argstr = join(" ", map {
       my $display = $_->{name};
       if ($_->{optional})
@@ -301,10 +345,20 @@ END_PIR
       $display;
     } @{$template->{args}}
     );
-    if ($argstr) { $argstr = " $argstr"}
+
+    my $combined ;
+   
+    if ($optstr)
+    {
+      $combined = " $optstr";
+    }
+    if ($argstr)
+    {
+      $combined .= " $argstr";
+    } 
  
     push @pir_code, [ WRAP => <<END_PIR];
-  .throw('wrong # args: should be "$template->{command}$argstr"')
+  .throw('wrong # args: should be "$template->{command}$combined"')
 END_PIR
   }
 
@@ -354,15 +408,35 @@ for this builtin.
 sub num_args {
   my ($template) = shift;
 
-  my $args = $template->{args};
-
   my ($max,$min);
-  $max = $min =  @$args;
+  $min = $max = 0;
 
-  foreach my $arg (reverse @$args)
+  if ($template->{args})
   {
-    $min-- if ($arg->{optional});
+    my $args    = $template->{args};
+    $min = $max = @$args;
+
+    # Subtract out optional arguments...
+    foreach my $arg (@$args)
+    {
+      $min-- if ($arg->{optional});
+    }
   }
+
+  if ($template->{options})
+  {
+    # Add in optional... options.
+    my $options = $template->{options};
+    foreach my $option (@$options)
+    {
+      $max++;   # the option
+      if ($option->{arg})
+      {
+        $max++; # its value
+      }
+    }
+  }
+
   return ($min,$max);
 }
 
