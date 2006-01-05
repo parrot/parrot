@@ -20,10 +20,12 @@ PMCS = \
  tclarray
 
 GENERATED_INLINES = \
+ $(BUILTIN)cd.pir \
  $(BUILTIN)exit.pir \
  $(BUILTIN)incr.pir \
  $(BUILTIN)join.pir \
- $(BUILTIN)llength.pir
+ $(BUILTIN)llength.pir \
+ $(BUILTIN)pwd.pir \
 
 DEPS = \
 lib${slash}commands${slash}after.pir \
@@ -33,7 +35,6 @@ lib${slash}builtins${slash}auto_execok.pir \
 lib${slash}builtins${slash}auto_load.pir \
 lib${slash}builtins${slash}break.pir \
 lib${slash}commands${slash}catch.pir \
-lib${slash}builtins${slash}cd.pir \
 lib${slash}builtins${slash}close.pir \
 lib${slash}commands${slash}concat.pir \
 lib${slash}builtins${slash}continue.pir \
@@ -71,7 +72,6 @@ lib${slash}builtins${slash}package.pir \
 lib${slash}commands${slash}parray.pir \
 lib${slash}commands${slash}proc.pir \
 lib${slash}commands${slash}puts.pir \
-lib${slash}builtins${slash}pwd.pir \
 lib${slash}commands${slash}regexp.pir \
 lib${slash}builtins${slash}regsub.pir \
 lib${slash}commands${slash}rename.pir \
