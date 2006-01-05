@@ -71,8 +71,19 @@ sub BuildLiteral {
 		);
 		$parser->YYData->{symbtab_cst}->Insert($value, $defn);
 		if      ($type eq 'string') {
-			$value = "\"$value\"";
-			# TODO escape sequence
+			my $str = "";
+			for (split//, $value) {
+				if (ord $_ < 32) {
+					$str .= sprintf("\\x%02x", ord $_);
+				} elsif (ord $_ >= 128) {
+					$str .= sprintf("\\u%04x", ord $_);
+				} elsif ($_ eq '"') {
+					$str .= '\"';
+				} else {
+					$str .= $_;
+				}
+			}
+			$value = "\"$str\"";
 		} elsif ($type eq 'number') {
 			$value = $value->bsstr();
 		} elsif ($type eq 'boolean') {

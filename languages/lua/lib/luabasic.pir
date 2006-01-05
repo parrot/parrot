@@ -462,7 +462,7 @@ STILL INCOMPLETE.
     .local int argc
     .local int i
     .local pmc curr
-    .local string str
+#    .local string str
     argc = argv
     i = 0
 L1:

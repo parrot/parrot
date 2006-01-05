@@ -106,6 +106,18 @@ See "Lua 5.0 Reference Manual", section 5.3 "String Manipulation".
 
 .end
 
+
+.sub posrelat @ANON
+    .param int pos
+    .param int len
+    if pos >= 0 goto L0
+    pos = len + pos
+    pos = pos + 1
+L0:
+    .return (pos)
+.end
+
+
 =item C<string.byte (s [, i])>
 
 Returns the internal numerical code of the C<i>-th character of C<s>, or
@@ -114,12 +126,26 @@ to be 1. C<i> may be negative.
 
 Note that numerical codes are not necessarily portable across platforms.
 
-NOT YET IMPLEMENTED.
-
 =cut
 
 .sub _string_byte @ANON
-    not_implemented()
+    .param pmc s
+    .param pmc n
+    .local pmc ret
+    $S0 = checkstring(s)
+    $I0 = length $S0
+    $I1 = optint(n, 1)
+    $I1 = posrelat($I1, $I0)
+    if $I1 == 0 goto L0
+    if $I1 > $I0 goto L0
+    $I1 = $I1 - 1
+    $I2 = ord $S0, $I1
+    new ret, .LuaNumber
+    ret = $I2
+    .return (ret)
+L0:    
+    new ret, .LuaNil
+    .return (ret)
 .end
 
 =item C<string.char (i1, i2, ...)>
@@ -130,12 +156,32 @@ to its correspondent argument.
 
 Note that numerical codes are not necessarily portable across platforms.
 
-NOT YET IMPLEMENTED.
-
 =cut
 
 .sub _string_char @ANON
-    not_implemented()
+    .param pmc argv :slurpy
+    .local pmc ret
+    .local int argc
+    .local int i
+    .local int c
+    .local pmc curr
+    .local string b
+    .local string s
+    b = ""
+    argc = argv
+    i = 0
+L1:
+    if i >= argc goto L2
+    curr = argv[i]
+    c = checknumber(curr)
+    s = chr c
+    b = concat b, s
+    i = i + 1
+    goto L1
+L2:
+    new ret, .LuaString
+    ret = b
+    .return (ret)
 .end
 
 =item C<string.dump (function)>
@@ -178,12 +224,16 @@ NOT YET IMPLEMENTED.
 Receives a string and returns its length. The empty string C<""> has length 0.
 Embedded zeros are counted, so C<"a\000b\000c"> has length 5.
 
-NOT YET IMPLEMENTED.
-
 =cut
 
 .sub _string_len @ANON
-    not_implemented()
+    .param pmc s
+    .local pmc ret
+    $S0 = checkstring(s)
+    $I0 = length $S0
+    new ret, .LuaNumber
+    ret = $I0
+    .return (ret)
 .end
 
 =item C<string.lower (s)>
@@ -192,24 +242,37 @@ Receives a string and returns a copy of that string with all uppercase letters
 changed to lowercase. All other characters are left unchanged. The definition
 of what is an uppercase letter depends on the current locale.
 
-NOT YET IMPLEMENTED.
-
 =cut
 
 .sub _string_lower @ANON
-    not_implemented()
+    .param pmc s
+    .local pmc ret
+    $S0 = checkstring(s)
+    downcase $S0
+    new ret, .LuaString
+    ret = $S0
+    .return (ret)
 .end
 
 =item C<string.rep (s, n)>
 
 Returns a string that is the concatenation of C<n> copies of the string C<s>.
 
-NOT YET IMPLEMENTED.
-
 =cut
 
 .sub _string_rep @ANON
-    not_implemented()
+    .param pmc s
+    .param pmc n
+    .local pmc ret
+    $S0 = checkstring(s)
+    $I0 = checknumber(n)
+    if $I0 >= 0 goto L0
+    $I0 = 0
+L0:
+    $S1 = repeat $S0, $I0
+    new ret, .LuaString
+    ret = $S1
+    .return (ret)
 .end
 
 =item C<string.sub (s, i [, j])>
@@ -220,12 +283,35 @@ equal to -1 (which is the same as the string length). In particular, the call
 C<string.sub(s,1,j)> returns a prefix of C<s> with length C<j>, and
 C<string.sub(s, -i)> returns a suffix of C<s> with length C<i>.
 
-NOT YET IMPLEMENTED.
-
 =cut
 
 .sub _string_sub @ANON
-    not_implemented()
+    .param pmc s
+    .param pmc i
+    .param pmc j
+    .local pmc ret
+    $S0 = checkstring(s)
+    $I0 = length $S0
+    $I1 = checknumber(i)
+    $I1 = posrelat($I1, $I0)
+    $I2 = optint(j, -1)
+    $I2 = posrelat($I2, $I0)
+    unless $I1 < 1 goto L0
+    $I1 = 1
+L0:
+    unless $I2 > $I0 goto L1
+    $I2 = $I0
+L1:
+    unless $I1 <= $I2 goto L2
+    $I1 = $I1 - 1
+    $S1 = substr $S0, $I1, $I2
+    goto L3
+L2:
+    $S1 = ""
+L3:    
+    new ret, .LuaString
+    ret = $S1
+    .return (ret)
 .end
 
 =item C<string.upper (s)>
@@ -234,12 +320,16 @@ Receives a string and returns a copy of that string with all lowercase letters
 changed to uppercase. All other characters are left unchanged. The definition
 of what is a lowercase letter depends on the current locale.
 
-NOT YET IMPLEMENTED.
-
 =cut
 
 .sub _string_upper @ANON
-    not_implemented()
+    .param pmc s
+    .local pmc ret
+    $S0 = checkstring(s)
+    upcase $S0
+    new ret, .LuaString
+    ret = $S0
+    .return (ret)
 .end
 
 =item C<string.format (formatstring, e1, e2, ...)>
@@ -341,6 +431,7 @@ NOT YET IMPLEMENTED.
 
 =head1 AUTHORS
 
+Francois Perrad
 
 =cut
 
