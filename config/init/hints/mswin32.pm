@@ -54,7 +54,7 @@ sub runstep
             ld_load_flags        => '-dll -def:libparrot.def',
             ld_out               => '-out:',
             ldflags              => '-nologo -nodefaultlib',
-            libparrot_static     => 'libparrot_s$(A)',
+            libparrot_static     => 'libparrot_s'.$conf->data->get('a'),
             libparrot_shared     => 'libparrot_s$(SHARE_EXT)',
             ar_flags             => '',
             ar_out               => '-out:',
