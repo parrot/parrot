@@ -70,6 +70,10 @@ You can add and remove option values with C<< :rem{<opt>} >> and C<<
 
 Debugging is turned on by default. Use this to disable it.
 
+=item C<--parrot_is_shared>
+
+Link parrot dynamically.
+
 =item C<--profile>
 
 Turn on profiled compile (gcc only for now)
@@ -299,10 +303,11 @@ You can add and remove option values with :rem{<opt>} and :add{<opt>}
 e.g. : --ccflags="rem{-g} :add{-O2}"
 
    --debugging=0        Disable debugging, default = 1
-   --profile            Turn on profiled compile (gcc only for now)
+   --inline             Compiler supports inline
    --optimize           Optimized compile
    --optimize=flags     Add given optimizer flags
-   --inline             Compiler supports inline
+   --parrot_is_shared   Link parrot dynamically
+   --profile            Turn on profiled compile (gcc only for now)
 
    --cc=(compiler)      Use the given compiler
    --ccflags=(flags)    Use the given compiler flags
