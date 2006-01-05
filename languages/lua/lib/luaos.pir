@@ -210,12 +210,30 @@ L0:
 Deletes the file with the given name. If this function fails, it returns
 B<nil>, plus a string describing the error.
 
-NOT YET IMPLEMENTED.
-
 =cut
 
 .sub _os_remove @ANON
-    not_implemented()
+    .param pmc filename
+    .local pmc ret
+    $S0 = checkstring(filename)
+    new $P0, .OS
+    push_eh _handler
+    $P0."rm"($S0)
+    new ret, .LuaBoolean
+    ret = 1
+    .return (ret)
+_handler:
+    .local pmc nil
+    .local pmc msg
+    .local pmc e
+    .local string s
+    .get_results (e, s)
+    concat $S0, ": "
+    concat $S0, s
+    new nil, .LuaNil
+    new msg, .LuaString
+    msg = $S0
+    .return (nil, msg)
 .end
 
 =item C<os.rename (oldname, newname)>
@@ -223,7 +241,7 @@ NOT YET IMPLEMENTED.
 Renames file named C<oldname> to C<newname>. If this function fails, it
 returns B<nil>, plus a string describing the error.
 
-NOT YET IMPLEMENTED.
+NOT YET IMPLEMENTED.              
 
 =cut
 
