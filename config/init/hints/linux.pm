@@ -61,7 +61,7 @@ sub runstep
         link           => $link,
         rpath          => '-Wl,-rpath=',
 
-		has_dynamic_linking     => 1,
+        has_dynamic_linking     => 1,
         parrot_is_shared        => 1,
         libparrot_shared        => 'libparrot$(SHARE_EXT).$(SOVERSION)',
         libparrot_shared_alias  => 'libparrot$(SHARE_EXT)',
