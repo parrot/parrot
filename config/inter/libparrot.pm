@@ -21,37 +21,39 @@ use base qw(Parrot::Configure::Step::Base);
 
 use Parrot::Configure::Step ':inter';
 
-$description = 'Determine if libparrot should be a shared library...';
+$description = 'Determine if parrot should be linked against a shared library...';
 
-@args = qw(ask verbose libparrot_is_shared);
+@args = qw(ask parrot_is_shared);
 
 sub runstep {
     my ($self, $conf) = @_;
-    my ($ask, $verbose, $libparrot_is_shared) = @_;
+    my $parrot_is_shared = $conf->options->get('parrot_is_shared');
 
-    $libparrot_is_shared =
-	integrate($conf->data->get('libparrot_is_shared'),
-		  $libparrot_is_shared);
+    $parrot_is_shared =
+	integrate($conf->data->get('parrot_is_shared'),
+		  $parrot_is_shared);
 
-    if ($conf->options->get('ask'))
+    $parrot_is_shared = 0 unless $conf->data->get('has_dynamic_linking');
+
+    if ($conf->options->get('ask') && $conf->data->get('has_dynamic_linking'))
     {
-	$libparrot_is_shared=
-	    prompt("\nShould libparrot be built as a shared library?",
-		   $libparrot_is_shared ? 'y' : 'n');
+	$parrot_is_shared=
+	    prompt("\nShould parrot be built using a shared library?",
+		   $parrot_is_shared ? 'y' : 'n');
 
-	$libparrot_is_shared = lc($libparrot_is_shared) eq 'y';
+	$parrot_is_shared = lc($parrot_is_shared) eq 'y';
     }
 
-    $conf->data->set
-	(libparrot_is_shared => $libparrot_is_shared,
-	 
-	 libparrot => $libparrot_is_shared
-	 ? '$(LIBPARROT_SHARED)'
-	 : '$(LIBPARROT_STATIC)',
-	);
+    $conf->data->set                                             
+    (parrot_is_shared => $parrot_is_shared,  
+
+      libparrot => $parrot_is_shared         
+      ? '$(LIBPARROT_SHARED)'      
+      : '$(LIBPARROT_STATIC)',
+    );                       
 
     $conf->data->set(
-	 rpath_blib => ($libparrot_is_shared) 
+	 rpath_blib => ($parrot_is_shared) 
      ?
          $conf->data->get('rpath') . 
          $conf->data->get('build_dir') . 
@@ -61,12 +63,12 @@ sub runstep {
     );
 
     $conf->data->set(
-     libparrot_ldflags => ($libparrot_is_shared)
+     libparrot_ldflags => ($parrot_is_shared)
      ? '-L' . $conf->data->get('blib_dir') . ' -lparrot'
      : $conf->data->get('libparrot')
     );
 
-    $result = $libparrot_is_shared ? 'yes' : 'no';
+    $result = $parrot_is_shared ? 'yes' : 'no';
 }
 
 1;

@@ -124,8 +124,12 @@ sub runstep
         libparrot_static => 'libparrot$(A)',
         libparrot_shared => 'libparrot$(SHARE_EXT)',
 
-        # default behaviour for building libparrot static or shared
-        libparrot_is_shared => 0,
+        # does the system know about static/dynamic linking?
+        has_static_linking => 1,
+        has_dynamic_linking => 0,
+
+        # default behaviour for linking parrot to a static or shared libparrot
+        parrot_is_shared => 0,
 
         #avoid a warning during Configure.pl
         libparrot_soname => '',
@@ -146,7 +150,7 @@ sub runstep
         # for Borland C
         ar_extra      => '',
         ranlib        => $Config{ranlib},
-        rpath         => '-Wl,-rpath=',
+        rpath         => '',
         make          => $Config{make},
         make_set_make => $Config{make_set_make},
         make_and      => '&&',
