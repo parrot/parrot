@@ -25,12 +25,7 @@ sub runstep
     }
     chomp $osversion;
 
-    if ($osversion < 500016) {
-        $libs .= ' -pthread';
-    } else {
-        $libs =~ s/-lc\b\s*//;
-        $libs .= ' -lc_r';
-    }
+    $libs .= ' -pthread';
 
     $conf->data->set(
         libs => $libs,
