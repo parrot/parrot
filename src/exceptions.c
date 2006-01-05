@@ -220,22 +220,28 @@ find_exception_handler(Interp * interpreter, PMC *exception)
      */
     message = VTABLE_get_string_keyed_int(interpreter, exception, 0);
     do {
+        PMC *cleanup_sub = NULL;
         Stack_Entry_t *e = stack_entry(interpreter,
                 CONTEXT(interpreter->ctx)->control_stack, 0);
+
         if (!e)
             break;
         if (e->entry_type == STACK_ENTRY_ACTION) {
             /*
-             * Clear automatic cleanup routine run in stack_pop
-             * and run the action subroutine with an INTVAL argument.
-             * of 1
+             * Disable automatic cleanup routine execution in stack_pop so that
+             * we can run the action subroutine manually with an INTVAL argument
+             * of 1.  Note that we have to run the sub AFTER it has been popped,
+             * lest a new error in the sub cause an infinite loop.
              */
-            PMC *sub = UVal_pmc(e->entry);
+            cleanup_sub = UVal_pmc(e->entry);
             e->cleanup = STACK_CLEANUP_NULL;
-            Parrot_runops_fromc_args(interpreter, sub, "vI", 1);
         }
         (void)stack_pop(interpreter, &CONTEXT(interpreter->ctx)->control_stack,
                         NULL, e->entry_type);
+        if (cleanup_sub) {
+            /* Now it's safe to run. */
+            Parrot_runops_fromc_args(interpreter, cleanup_sub, "vI", 1);
+        }
         if (e->entry_type == STACK_ENTRY_PMC) {
             /*
              * During interpreter creation there is an initial context

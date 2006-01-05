@@ -308,7 +308,7 @@ stack_pop(Interp *interpreter, Stack_Chunk_t **stack_p,
     }
 
     /* Cleanup routine? */
-    if (entry->cleanup) {
+    if (entry->cleanup != STACK_CLEANUP_NULL) {
         (*entry->cleanup) (interpreter, entry);
     }
 
