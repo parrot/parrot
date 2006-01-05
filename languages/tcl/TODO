@@ -1,6 +1,7 @@
-All TODO items should be documented in RT (http://rt.perl.org/) or the test suite (t/*)
+All TODO items should be documented in RT (http://rt.perl.org/) 
+or the test suite (t/*.t)
 
-A listing of all TODO items is available at:
+A listing of all RT TODO items is available at:
 
  http://rt.perl.org/rt3/NoAuth/parrot/List.html?Field=Lang&Value=tcl
 
@@ -14,5 +15,8 @@ line is:
 
 '[TODO] Tcl - <summary of task>'
 
-Note that while TODO automatically makes it a TODO, Tcl doesn't automatically assign
-it to tcl - this needs to be set in RT, under the section "Custom Fields".
+Note that while TODO automatically makes it a TODO, Tcl doesn't automatically
+assign it to tcl - this needs to be set in RT, under the section
+"Custom Fields". If you can't set this, don't worry: one of the bugadmins
+will eventually get to it.
+
