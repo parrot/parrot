@@ -14,7 +14,7 @@ sub new {
 .namespace [ "Lua" ]
 .HLL "Lua", "lua_group"
 
-.sub __start @MAIN, @ANON
+.sub __start :main
 #    print "start Lua\n"
     load_bytecode "languages/lua/lib/luabasic.pbc"
     load_bytecode "languages/lua/lib/luacoroutine.pbc"

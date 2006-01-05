@@ -21,7 +21,7 @@ See "Lua 5.0 Reference Manual", section 5.1 "Basic Functions".
 .HLL "Lua", "lua_group"
 
 
-.sub init @LOAD, @ANON
+.sub init :load, :anon
 
     load_bytecode "languages/lua/lib/luapir.pbc"
 
@@ -203,7 +203,7 @@ it defaults to "assertion failed!"
 
 =cut
 
-.sub _lua_assert @ANON
+.sub _lua_assert :anon
     .param pmc v
     .param pmc message :optional
     checkany(v)
@@ -225,7 +225,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _lua_collectgarbage @ANON
+.sub _lua_collectgarbage :anon
     not_implemented()
 .end
 
@@ -241,7 +241,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _lua_dofile @ANON
+.sub _lua_dofile :anon
     not_implemented()
 .end
 
@@ -259,7 +259,7 @@ STILL INCOMPLETE.
 
 =cut
 
-.sub _lua_error @ANON
+.sub _lua_error :anon
     .param pmc message
     .param pmc level :optional
     $I0 = optint(level, 1)
@@ -284,7 +284,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _lua_getfenv @ANON
+.sub _lua_getfenv :anon
     not_implemented()
 .end
 
@@ -298,7 +298,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _lua_getmetatable @ANON
+.sub _lua_getmetatable :anon
     not_implemented()
 .end
 
@@ -311,7 +311,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _lua_gcinfo @ANON
+.sub _lua_gcinfo :anon
     not_implemented()
 .end
 
@@ -328,7 +328,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _lua_ipairs @ANON
+.sub _lua_ipairs :anon
     not_implemented()
 .end
 
@@ -343,7 +343,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _lua_loadfile @ANON
+.sub _lua_loadfile :anon
     not_implemented()
 .end
 
@@ -359,7 +359,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _lua_loadlib @ANON
+.sub _lua_loadlib :anon
     not_implemented()
 .end
 
@@ -381,7 +381,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _lua_loadstring @ANON
+.sub _lua_loadstring :anon
     not_implemented()
 .end
 
@@ -408,7 +408,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _lua_next @ANON
+.sub _lua_next :anon
     not_implemented()
 .end
 
@@ -425,7 +425,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _lua_pairs @ANON
+.sub _lua_pairs :anon
     not_implemented()
 .end
 
@@ -442,7 +442,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _lua_pcall @ANON
+.sub _lua_pcall :anon
     not_implemented()
 .end
 
@@ -457,7 +457,7 @@ STILL INCOMPLETE.
 
 =cut
 
-.sub _lua_print @ANON
+.sub _lua_print :anon
     .param pmc argv :slurpy
     .local int argc
     .local int i
@@ -489,7 +489,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _lua_rawequal @ANON
+.sub _lua_rawequal :anon
     not_implemented()
 .end
 
@@ -502,7 +502,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _lua_rawget @ANON
+.sub _lua_rawget :anon
     not_implemented()
 .end
 
@@ -516,7 +516,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _lua_rawset @ANON
+.sub _lua_rawset :anon
     not_implemented()
 .end
 
@@ -561,7 +561,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _lua_require @ANON
+.sub _lua_require :anon
     not_implemented()
 .end
 
@@ -579,7 +579,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _lua_setfenv @ANON
+.sub _lua_setfenv :anon
     not_implemented()
 .end
 
@@ -594,7 +594,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _lua_setmetatable @ANON
+.sub _lua_setmetatable :anon
     not_implemented()
 .end
 
@@ -615,7 +615,7 @@ STILL INCOMPLETE.
 
 =cut
 
-.sub _lua_tonumber @ANON
+.sub _lua_tonumber :anon
     .param pmc e
     .param pmc base :optional
     .local pmc ret
@@ -657,7 +657,7 @@ STILL INCOMPLETE.
 
 =cut
 
-.sub _lua_tostring @ANON
+.sub _lua_tostring :anon
     .param pmc e
     .local pmc ret
     checkany(e)
@@ -681,7 +681,7 @@ C<"userdata">.
 
 =cut
 
-.sub _lua_type @ANON
+.sub _lua_type :anon
     .param pmc v
     .local pmc ret
     checkany(v)
@@ -704,7 +704,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _lua_unpack @ANON
+.sub _lua_unpack :anon
     not_implemented()
 .end
 
@@ -725,7 +725,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _lua_xpcall @ANON
+.sub _lua_xpcall :anon
     not_implemented()
 .end
 

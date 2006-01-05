@@ -47,7 +47,7 @@ See "Lua 5.0 Reference Manual", section 5.4 "Table Manipulation".
 .HLL "Lua", "lua_group"
 
 
-.sub init @LOAD, @ANON
+.sub init :load, :anon
 
     load_bytecode "languages/lua/lib/luapir.pbc"
     load_bytecode "languages/lua/lib/luabasic.pbc"
@@ -116,7 +116,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _table_concat @ANON
+.sub _table_concat :anon
     not_implemented()
 .end
 
@@ -133,7 +133,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _table_foreach @ANON
+.sub _table_foreach :anon
     not_implemented()
 .end
 
@@ -149,7 +149,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _table_foreachi @ANON
+.sub _table_foreachi :anon
     not_implemented()
 .end
 
@@ -165,7 +165,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _table_getn @ANON
+.sub _table_getn :anon
     not_implemented()
 .end
 
@@ -185,7 +185,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _table_sort @ANON
+.sub _table_sort :anon
     not_implemented()
 .end
 
@@ -201,7 +201,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _table_insert @ANON
+.sub _table_insert :anon
     not_implemented()
 .end
 
@@ -218,7 +218,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _table_remove @ANON
+.sub _table_remove :anon
     not_implemented()
 .end
 
@@ -232,7 +232,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _table_setn @ANON
+.sub _table_setn :anon
     not_implemented()
 .end
 

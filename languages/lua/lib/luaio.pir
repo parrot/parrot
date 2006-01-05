@@ -39,7 +39,7 @@ See "Lua 5.0 Reference Manual", section 5.6 "Input and Ouput Facilities".
 .HLL "Lua", "lua_group"
 
 
-.sub init @LOAD, @ANON
+.sub init :load, :anon
 
     load_bytecode "languages/lua/lib/luapir.pbc"
     load_bytecode "languages/lua/lib/luabasic.pbc"
@@ -163,7 +163,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _io_close @ANON
+.sub _io_close :anon
     not_implemented()
 .end
 
@@ -175,7 +175,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _io_flush @ANON
+.sub _io_flush :anon
     not_implemented()
 .end
 
@@ -193,7 +193,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _io_input @ANON
+.sub _io_input :anon
     not_implemented()
 .end
 
@@ -217,7 +217,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _io_lines @ANON
+.sub _io_lines :anon
     not_implemented()
 .end
 
@@ -249,7 +249,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _io_open @ANON
+.sub _io_open :anon
     not_implemented()
 .end
 
@@ -261,7 +261,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _io_output @ANON
+.sub _io_output :anon
     not_implemented()
 .end
 
@@ -273,7 +273,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _io_read @ANON
+.sub _io_read :anon
     not_implemented()
 .end
 
@@ -286,7 +286,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _io_tmpfile @ANON
+.sub _io_tmpfile :anon
     not_implemented()
 .end
 
@@ -300,7 +300,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _io_type @ANON
+.sub _io_type :anon
     not_implemented()
 .end
 
@@ -312,7 +312,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _io_write @ANON
+.sub _io_write :anon
     not_implemented()
 .end
 
@@ -324,7 +324,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _file_close @ANON
+.sub _file_close :anon
     not_implemented()
 .end
 
@@ -336,7 +336,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _file_flush @ANON
+.sub _file_flush :anon
     not_implemented()
 .end
 
@@ -354,7 +354,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _file_lines @ANON
+.sub _file_lines :anon
     not_implemented()
 .end
 
@@ -385,7 +385,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _file_read @ANON
+.sub _file_read :anon
     not_implemented()
 .end
 
@@ -415,7 +415,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _file_seek @ANON
+.sub _file_seek :anon
     not_implemented()
 .end
 
@@ -429,7 +429,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _file_write @ANON
+.sub _file_write :anon
     not_implemented()
 .end
 

@@ -21,7 +21,7 @@ See "Lua 5.0 Reference Manual", section 5.7 "Operating System Facilities".
 .HLL "Lua", "lua_group"
 
 
-.sub init @LOAD, @ANON
+.sub init :load, :anon
 
     load_bytecode "languages/lua/lib/luapir.pbc"
     load_bytecode "languages/lua/lib/luabasic.pbc"
@@ -103,7 +103,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _os_clock @ANON
+.sub _os_clock :anon
     not_implemented()
 .end
 
@@ -134,7 +134,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _os_date @ANON
+.sub _os_date :anon
     not_implemented()
 .end
 
@@ -147,7 +147,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _os_difftime @ANON
+.sub _os_difftime :anon
     not_implemented()
 .end
 
@@ -159,7 +159,7 @@ is system-dependent.
 
 =cut
 
-.sub _os_execute @ANON
+.sub _os_execute :anon
     .param pmc command
     .local pmc ret
     $S0 = checkstring(command)
@@ -177,7 +177,7 @@ program. The default value for C<code> is the success code.
 
 =cut
 
-.sub _os_exit @ANON
+.sub _os_exit :anon
     .param pmc code :optional
     $I0 = optint(code, 0)
     exit $I0
@@ -190,7 +190,7 @@ if the variable is not defined.
 
 =cut
 
-.sub _os_getenv @ANON
+.sub _os_getenv :anon
     .param pmc varname
     .local pmc ret
     $S0 = checkstring(varname)
@@ -212,7 +212,7 @@ B<nil>, plus a string describing the error.
 
 =cut
 
-.sub _os_remove @ANON
+.sub _os_remove :anon
     .param pmc filename
     .local pmc ret
     $S0 = checkstring(filename)
@@ -245,7 +245,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _os_rename @ANON
+.sub _os_rename :anon
     not_implemented()
 .end
 
@@ -261,7 +261,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _os_setlocale @ANON
+.sub _os_setlocale :anon
     not_implemented()
 .end
 
@@ -282,7 +282,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _os_time @ANON
+.sub _os_time :anon
     not_implemented()
 .end
 
@@ -300,7 +300,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _os_tmpname @ANON
+.sub _os_tmpname :anon
     not_implemented()
 .end
 

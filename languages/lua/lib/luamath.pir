@@ -46,7 +46,7 @@ See "Lua 5.0 Reference Manual", section 5.5 "Mathematical Functions".
 .HLL "Lua", "lua_group"
 
 
-.sub init @LOAD, @ANON
+.sub init :load, :anon
 
     load_bytecode "languages/lua/lib/luapir.pbc"
     load_bytecode "languages/lua/lib/luabasic.pbc"
@@ -190,7 +190,7 @@ See "Lua 5.0 Reference Manual", section 5.5 "Mathematical Functions".
 
 .end
 
-.sub _math_abs @ANON
+.sub _math_abs :anon
     .param pmc x
     .local pmc ret
     $N0 = checknumber(x)
@@ -200,7 +200,7 @@ See "Lua 5.0 Reference Manual", section 5.5 "Mathematical Functions".
     .return (ret)
 .end
 
-.sub _math_acos @ANON
+.sub _math_acos :anon
     .param pmc x
     .local pmc ret
     $N0 = checknumber(x)
@@ -210,7 +210,7 @@ See "Lua 5.0 Reference Manual", section 5.5 "Mathematical Functions".
     .return (ret)
 .end
 
-.sub _math_asin @ANON
+.sub _math_asin :anon
     .param pmc x
     .local pmc ret
     $N0 = checknumber(x)
@@ -220,7 +220,7 @@ See "Lua 5.0 Reference Manual", section 5.5 "Mathematical Functions".
     .return (ret)
 .end
 
-.sub _math_atan @ANON
+.sub _math_atan :anon
     .param pmc x
     .local pmc ret
     $N0 = checknumber(x)
@@ -230,7 +230,7 @@ See "Lua 5.0 Reference Manual", section 5.5 "Mathematical Functions".
     .return (ret)
 .end
 
-.sub _math_atan2 @ANON
+.sub _math_atan2 :anon
     .param pmc y
     .param pmc x
     .local pmc ret
@@ -242,7 +242,7 @@ See "Lua 5.0 Reference Manual", section 5.5 "Mathematical Functions".
     .return (ret)
 .end
 
-.sub _math_ceil @ANON
+.sub _math_ceil :anon
     .param pmc x
     .local pmc ret
     $N0 = checknumber(x)
@@ -252,7 +252,7 @@ See "Lua 5.0 Reference Manual", section 5.5 "Mathematical Functions".
     .return (ret)
 .end
 
-.sub _math_cos @ANON
+.sub _math_cos :anon
     .param pmc x
     .local pmc ret
     $N0 = checknumber(x)
@@ -262,7 +262,7 @@ See "Lua 5.0 Reference Manual", section 5.5 "Mathematical Functions".
     .return (ret)
 .end
 
-.sub _math_deg @ANON
+.sub _math_deg :anon
     .param pmc x
     .local pmc ret
     $N0 = checknumber(x)
@@ -273,7 +273,7 @@ See "Lua 5.0 Reference Manual", section 5.5 "Mathematical Functions".
     .return (ret)
 .end
 
-.sub _math_exp @ANON
+.sub _math_exp :anon
     .param pmc x
     .local pmc ret
     $N0 = checknumber(x)
@@ -283,7 +283,7 @@ See "Lua 5.0 Reference Manual", section 5.5 "Mathematical Functions".
     .return (ret)
 .end
 
-.sub _math_floor @ANON
+.sub _math_floor :anon
     .param pmc x
     .local pmc ret
     $N0 = checknumber(x)
@@ -293,7 +293,7 @@ See "Lua 5.0 Reference Manual", section 5.5 "Mathematical Functions".
     .return (ret)
 .end
 
-.sub _math_log @ANON
+.sub _math_log :anon
     .param pmc x
     .local pmc ret
     $N0 = checknumber(x)
@@ -303,7 +303,7 @@ See "Lua 5.0 Reference Manual", section 5.5 "Mathematical Functions".
     .return (ret)
 .end
 
-.sub _math_log10 @ANON
+.sub _math_log10 :anon
     .param pmc x
     .local pmc ret
     $N0 = checknumber(x)
@@ -313,7 +313,7 @@ See "Lua 5.0 Reference Manual", section 5.5 "Mathematical Functions".
     .return (ret)
 .end
 
-.sub _math_max @ANON
+.sub _math_max :anon
     .param pmc argv :slurpy
     .local int argc
     .local int i
@@ -337,7 +337,7 @@ L2:
 L3:
 .end
 
-.sub _math_min @ANON
+.sub _math_min :anon
     .param pmc argv :slurpy
     .local int argc
     .local int i
@@ -361,7 +361,7 @@ L2:
 L3:
 .end
 
-.sub _math_mod @ANON
+.sub _math_mod :anon
     .param pmc x
     .param pmc y
     .local pmc ret
@@ -373,7 +373,7 @@ L3:
     .return (ret)
 .end
 
-.sub _math_pow @ANON
+.sub _math_pow :anon
     .param pmc x
     .param pmc y
     .local pmc ret
@@ -385,7 +385,7 @@ L3:
     .return (ret)
 .end
 
-.sub _math_rad @ANON
+.sub _math_rad :anon
     .param pmc x
     .local pmc ret
     $N0 = checknumber(x)
@@ -396,7 +396,7 @@ L3:
     .return (ret)
 .end
 
-.sub _math_sin @ANON
+.sub _math_sin :anon
     .param pmc x
     .local pmc ret
     $N0 = checknumber(x)
@@ -406,7 +406,7 @@ L3:
     .return (ret)
 .end
 
-.sub _math_sqrt @ANON
+.sub _math_sqrt :anon
     .param pmc x
     .local pmc ret
     $N0 = checknumber(x)
@@ -416,7 +416,7 @@ L3:
     .return (ret)
 .end
 
-.sub _math_tan @ANON
+.sub _math_tan :anon
     .param pmc x
     .local pmc ret
     $N0 = checknumber(x)
@@ -426,19 +426,19 @@ L3:
     .return (ret)
 .end
 
-.sub _math_frexp @ANON
+.sub _math_frexp :anon
     not_implemented()
 .end
 
-.sub _math_ldexp @ANON
+.sub _math_ldexp :anon
     not_implemented()
 .end
 
-.sub _math_random @ANON
+.sub _math_random :anon
     not_implemented()
 .end
 
-.sub _math_randomseed @ANON
+.sub _math_randomseed :anon
     not_implemented()
 .end
 

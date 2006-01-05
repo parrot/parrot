@@ -22,7 +22,7 @@ See "Lua 5.0 Reference Manual", section 5.2 "Coroutine Manipulation".
 .HLL "Lua", "lua_group"
 
 
-.sub init @LOAD, @ANON
+.sub init :load, :anon
 
     load_bytecode "languages/lua/lib/luapir.pbc"
     load_bytecode "languages/lua/lib/luabasic.pbc"
@@ -74,7 +74,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _coroutine_create @ANON
+.sub _coroutine_create :anon
     not_implemented()
 .end
 
@@ -95,7 +95,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _coroutine_resume @ANON
+.sub _coroutine_resume :anon
     not_implemented()
 .end
 
@@ -111,7 +111,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _coroutine_status @ANON
+.sub _coroutine_status :anon
     not_implemented()
 .end
 
@@ -127,7 +127,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _coroutine_wrap @ANON
+.sub _coroutine_wrap :anon
     not_implemented()
 .end
 
@@ -141,7 +141,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _coroutine_yield @ANON
+.sub _coroutine_yield :anon
     not_implemented()
 .end
 

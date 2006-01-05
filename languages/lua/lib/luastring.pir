@@ -28,7 +28,7 @@ See "Lua 5.0 Reference Manual", section 5.3 "String Manipulation".
 .HLL "Lua", "lua_group"
 
 
-.sub init @LOAD, @ANON
+.sub init :load, :anon
 
     load_bytecode "languages/lua/lib/luapir.pbc"
     load_bytecode "languages/lua/lib/luabasic.pbc"
@@ -107,7 +107,7 @@ See "Lua 5.0 Reference Manual", section 5.3 "String Manipulation".
 .end
 
 
-.sub posrelat @ANON
+.sub posrelat :anon
     .param int pos
     .param int len
     if pos >= 0 goto L0
@@ -128,7 +128,7 @@ Note that numerical codes are not necessarily portable across platforms.
 
 =cut
 
-.sub _string_byte @ANON
+.sub _string_byte :anon
     .param pmc s
     .param pmc n
     .local pmc ret
@@ -158,7 +158,7 @@ Note that numerical codes are not necessarily portable across platforms.
 
 =cut
 
-.sub _string_char @ANON
+.sub _string_char :anon
     .param pmc argv :slurpy
     .local pmc ret
     .local int argc
@@ -194,7 +194,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _string_dump @ANON
+.sub _string_dump :anon
     not_implemented()
 .end
 
@@ -215,7 +215,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _string_find @ANON
+.sub _string_find :anon
     not_implemented()
 .end
 
@@ -226,7 +226,7 @@ Embedded zeros are counted, so C<"a\000b\000c"> has length 5.
 
 =cut
 
-.sub _string_len @ANON
+.sub _string_len :anon
     .param pmc s
     .local pmc ret
     $S0 = checkstring(s)
@@ -244,7 +244,7 @@ of what is an uppercase letter depends on the current locale.
 
 =cut
 
-.sub _string_lower @ANON
+.sub _string_lower :anon
     .param pmc s
     .local pmc ret
     $S0 = checkstring(s)
@@ -260,7 +260,7 @@ Returns a string that is the concatenation of C<n> copies of the string C<s>.
 
 =cut
 
-.sub _string_rep @ANON
+.sub _string_rep :anon
     .param pmc s
     .param pmc n
     .local pmc ret
@@ -285,7 +285,7 @@ C<string.sub(s, -i)> returns a suffix of C<s> with length C<i>.
 
 =cut
 
-.sub _string_sub @ANON
+.sub _string_sub :anon
     .param pmc s
     .param pmc i
     .param pmc j
@@ -322,7 +322,7 @@ of what is a lowercase letter depends on the current locale.
 
 =cut
 
-.sub _string_upper @ANON
+.sub _string_upper :anon
     .param pmc s
     .local pmc ret
     $S0 = checkstring(s)
@@ -362,7 +362,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _string_format @ANON
+.sub _string_format :anon
     not_implemented()
 .end
 
@@ -394,7 +394,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _string_gfind @ANON
+.sub _string_gfind :anon
     not_implemented()
 .end
 
@@ -423,7 +423,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _string_gsub @ANON
+.sub _string_gsub :anon
     not_implemented()
 .end
 
