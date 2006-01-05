@@ -376,7 +376,7 @@ $args{maintainer} = 1 if defined $args{lex} or defined $args{yacc};
 
 print <<"END";
 Parrot Version $parrot_version Configure 2.0
-Copyright (C) 2001-2005 The Perl Foundation.  All Rights Reserved.
+Copyright (C) 2001-2006 The Perl Foundation.  All Rights Reserved.
 
 Hello, I'm Configure. My job is to poke and prod your system to figure out
 how to build Parrot. The process is completely automated, unless you passed in
