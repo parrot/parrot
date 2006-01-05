@@ -129,8 +129,8 @@ END_PIR
   __integer  = find_global '_Tcl', '__integer'
   .local pmc __list
   __list     = find_global '_Tcl', '__list'
-  .local pmc channels
-  channels   = find_global '_Tcl', 'channels'
+  .local pmc __channel
+  __channel  = find_global '_Tcl', '__channel'
 END_PIR
 
    # Now, grab each option off the list and compile it. 
@@ -200,24 +200,18 @@ END_PIR
      }
      elsif ($arg->{type} eq "channel")
      {
-       # Using 'chanel' means we have two registers we care about:
-       # $arg_register is the register of the channel itself
-       # $arg_register_varname is the register of the channel's name
-        
        push @pir_code, [ WRAP => <<END_PIR];
-  .local int ${arg_register}_varname
-  (${arg_register}_varname,temp_code) = compiler(register_num, $argument)
-  $arg_register = ${arg_register}_varname + 1
+  ($arg_register,temp_code) = compiler(register_num, $argument)
   register_num = $arg_register + 1
 END_PIR
+
       push @pir_code, [ VAR => "temp_code" ];
 
       push @pir_code, [ INLINE => <<END_PIR];
-  \$P{$arg_register} = channels[\$P{${arg_register}_varname}]
+  \$P{$arg_register} = __channel(\$P{$arg_register})
 END_PIR
 
-      push @pir_code, [ WRAP => "  goto $arg_done\n"] ;
-
+      push @pir_code, [ WRAP => "  goto $arg_done\n" ];
      }
      elsif ($arg->{type} eq "list")
      {

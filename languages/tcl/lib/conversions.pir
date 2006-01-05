@@ -88,4 +88,29 @@ not_integer:
   .throw($S0)
 .end
 
+=head2 _Tcl::__channel
 
+Given a string, return the appropriate channel.
+
+=cut
+
+.sub __channel
+  .param string channelID
+
+  .local pmc channels
+  channels = find_global '_Tcl', 'channels'
+
+  .local pmc io_obj
+  io_obj = channels[channelID]
+  if_null io_obj, bad_channel
+  $I0 = typeof io_obj 
+  if $I0 != .ParrotIO goto bad_channel # Should never happen?
+  .return (io_obj)
+
+bad_channel:
+  $S0 = "can not find channel named \""
+  $S0 .= channelID
+  $S0 .= "\""
+ .throw($S0)
+
+.end

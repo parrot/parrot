@@ -9,12 +9,14 @@ read a line from a channel
 .sub "&gets"
   .param pmc argv :slurpy
 
-  $S1 = shift argv
+  .local string channelID
+  channelID = argv[0]
 
-  $P2 = find_global "_Tcl", "channels"
+  .local pmc __channel
+  __channel = find_global "_Tcl", "__channel"
 
   .local pmc io
-  io = $P2[$S1]
+  io = __channel(channelID)
 
   .local string line
   line = readline io
