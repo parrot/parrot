@@ -10,7 +10,7 @@ use lib qw( . lib ../lib ../../lib );
 use Test::More tests => 19;
 
 use File::Basename qw(basename dirname);
-use File::Temp;
+use File::Temp 0.13 qw/tempfile/;
 
 =head1 NAME
 
@@ -45,37 +45,33 @@ is(integrate(1, 2), 2, "integrate(1, 1)");
 
 # file_checksum(), not exported
 
-SKIP: {
-    skip "this File::Temp version doesn't support ->new()", 8
-        unless File::Temp->can('new');
-
 {
-    my $tmpfile = File::Temp->new(UNLINK => 1);
+    my( $tmpfile, $fname ) = tempfile(UNLINK => 1);
     print $tmpfile "foo" x 1000;
     $tmpfile->flush;
-    is(Parrot::Configure::Step::file_checksum("$tmpfile"), '324000',
+    is(Parrot::Configure::Step::file_checksum("$fname"), '324000',
         "file_checksum() returns correct checksum");
 }
 
 # copy_if_diff()
 
 {
-    my $fromfile = File::Temp->new(UNLINK => 1);
-    my $tofile = File::Temp->new(UNLINK => 1);
+    my( $fromfile, $fromfname ) = tempfile(UNLINK => 1);
+    my( $tofile, $tofname ) = tempfile(UNLINK => 1);
     print $fromfile "foo" x 1000;
     $fromfile->flush;
 
-    ok(copy_if_diff("$fromfile", "$tofile"),
+    ok(copy_if_diff("$fromfname", "$tofname"),
         "copy_if_diff() true return status");
-    is(Parrot::Configure::Step::file_checksum("$tofile"), '324000',
+    is(Parrot::Configure::Step::file_checksum("$tofname"), '324000',
         "copy_if_diff() copied differing files");
 }
 
 # move_if_diff()
 
 {
-    my $fromfile = File::Temp->new(UNLINK => 1);
-    my $tofile = File::Temp->new(UNLINK => 1);
+    my( $fromfile, $fromfname ) = tempfile(UNLINK => 1);
+    my( $tofile, $tofname ) = tempfile(UNLINK => 1);
     print $fromfile "foo" x 1000;
     $fromfile->flush;
 
@@ -86,15 +82,15 @@ SKIP: {
     # copy file descriptors
     open OLDERR, ">&STDERR";
 
-    ok(move_if_diff("$fromfile", "$tofile"),
+    ok(move_if_diff("$fromfname", "$tofname"),
         "move_if_diff() true return status");
-    ok(! -e "$fromfile", "move_if_diff() moved differing file");
+    ok(! -e "$fromfname", "move_if_diff() moved differing file");
 
     # redirect STDERR for the test below
     close STDERR;
     open STDERR, $redir;
 
-    ok(-e "$tofile", "move_if_diff() moved differing file");
+    ok(-e "$tofname", "move_if_diff() moved differing file");
 
     # restore STDERR
     close STDERR;
@@ -123,11 +119,11 @@ SKIP: {
 {
     my %tf_params = ( UNLINK => 1, );
     $tf_params{SUFFIX} = '.exe' if 'MSWin32' eq $^O;
-    my $tmpfile = File::Temp->new(%tf_params);
+    my( $tmpfile, $fname ) = tempfile(%tf_params);
 
-    local $ENV{PATH} = dirname("$tmpfile");
-    chmod 0777, "$tmpfile";
-    my $prog = basename("$tmpfile");
+    local $ENV{PATH} = dirname("$fname");
+    chmod 0777, "$fname";
+    my $prog = basename("$fname");
 
     is(check_progs($prog), $prog,
         "check_progs() returns the proper program")
@@ -136,17 +132,15 @@ SKIP: {
 {
     my %tf_params = ( UNLINK => 1, );
     $tf_params{SUFFIX} = '.exe' if 'MSWin32' eq $^O;
-    my $tmpfile = File::Temp->new(%tf_params);
+    my( $tmpfile, $fname ) = tempfile(%tf_params);
 
-    local $ENV{PATH} = dirname("$tmpfile");
-    chmod 0777, "$tmpfile";
-    my $prog = basename("$tmpfile");
+    local $ENV{PATH} = dirname("$fname");
+    chmod 0777, "$fname";
+    my $prog = basename("$fname");
 
     is(check_progs([$prog]), $prog,
         "check_progs() returns the proper program when passed an array ref")
 }
-
-} # SKIP
 
 {
     my $cmd = 'someboguscommand';
@@ -163,9 +157,9 @@ SKIP: {
 # _slurp(), not exported
 
 {
-    my $tmpfile = File::Temp->new(UNLINK => 1);
+    my( $tmpfile, $fname ) = tempfile(UNLINK => 1);
     print $tmpfile "foo" x 1000;
     $tmpfile->flush;
-    is(Parrot::Configure::Step::_slurp($tmpfile), "foo" x 1000,
+    is(Parrot::Configure::Step::_slurp($fname), "foo" x 1000,
         "_slurp() slurped the file");
 }
