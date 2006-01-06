@@ -53,7 +53,7 @@ sub runstep {
     );                       
 
     $conf->data->set(
-        rpath_blib => ($parrot_is_shared) 
+        rpath_blib => ($parrot_is_shared && $conf->data->get('rpath'))
         ? $conf->data->get('rpath')
           .  $conf->data->get('build_dir')
           .  $conf->data->get('slash')
