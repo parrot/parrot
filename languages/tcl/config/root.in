@@ -4,7 +4,7 @@ PARROT  = ..${slash}..${slash}parrot${exe}
 PBC_MERGE = ..${slash}..${slash}pbc_merge${exe}
 
 LIBPATH  = lib
-BUILTIN  = $(LIBPATH)${slash}builtins${slash}
+BUILTIN  = $(LIBPATH)${slash}builtins
 BUILD   = $(PERL) ${build_dir}${slash}tools${slash}build${slash}dynclasses.pl
 DESTDIR = ${build_dir}${slash}runtime${slash}parrot${slash}dynext
 O       = ${o}
@@ -20,12 +20,12 @@ PMCS = \
  tclarray
 
 GENERATED_INLINES = \
- $(BUILTIN)eof.pir \
- $(BUILTIN)exit.pir \
- $(BUILTIN)incr.pir \
- $(BUILTIN)join.pir \
- $(BUILTIN)llength.pir \
- $(BUILTIN)pwd.pir \
+ $(BUILTIN)${slash}eof.pir \
+ $(BUILTIN)${slash}exit.pir \
+ $(BUILTIN)${slash}incr.pir \
+ $(BUILTIN)${slash}join.pir \
+ $(BUILTIN)${slash}llength.pir \
+ $(BUILTIN)${slash}pwd.pir
 
 DEPS = \
 lib${slash}commands${slash}after.pir \
