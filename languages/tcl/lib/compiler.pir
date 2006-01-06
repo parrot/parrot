@@ -147,6 +147,8 @@ $P1=loadlib 'dynlexpad'
 .sub compiled_tcl_sub%i :anon :main
 load_bytecode 'languages/tcl/lib/tcllib.pbc'
 .include "languages/tcl/lib/returncodes.pir"
+.local pmc epoch
+epoch = find_global "_Tcl", "epoch"
 %s.return ($P%i)
 .end
 END_PIR
@@ -160,6 +162,8 @@ END_PIR
 .pragma n_operators 1
 .sub compiled_tcl_sub%i :anon
 .include "languages/tcl/lib/returncodes.pir"
+.local pmc epoch
+epoch = find_global "_Tcl", "epoch"
 %s.return ($P%i)
 .end
 END_PIR

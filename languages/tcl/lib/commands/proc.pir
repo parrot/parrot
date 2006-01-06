@@ -65,6 +65,8 @@ got_args:
 .sub '&%s' :lex
 .param pmc args :slurpy
 .include 'languages/tcl/lib/returncodes.pir'
+.local pmc epoch
+epoch = find_global "_Tcl", "epoch"
 
 .local pmc call_level
 call_level=find_global '_Tcl', 'call_level'

@@ -262,6 +262,8 @@ providing a compreg-compatible method.
   .return pir_compiler($I0,$S0)
 .end
 
+${FALLBACKS}
+
 ${RULES}
 
 ${INCLUDES}

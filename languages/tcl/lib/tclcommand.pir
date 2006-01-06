@@ -31,14 +31,13 @@ Define the attributes required for the class.
    .local pmc compile
    compile = find_global "_Tcl", "compile_dispatch"
 
-   .local string pir_code, args, inlined, dynamic, invalid, error, eh_label
+   .local string pir_code, args, inlined, dynamic, invalid, error
    pir_code = ""
    args     = ""
    inlined  = ""
    dynamic  = ""
    invalid  = ""
    error    = ""
-   eh_label = "invalid_"
 
    .local string retval
    # Generate partial code for each of our arguments
@@ -102,18 +101,22 @@ arg_loop_done:
    clear_eh
 
    (result_num,retval) = $P1(register_num,self)
-   
    register_num = result_num
-   inlined .= "inline_"
+
+   .local pmc epoch
+   epoch = find_global '_Tcl', 'epoch'
+   $S0 = epoch
+   inlined .= "if epoch != "
+   inlined .= $S0
+   inlined .= " goto dynamic_"
    inlined .= label_num
-   inlined .= ":\n"
+   inlined .= "\n"
    inlined .= retval
 
    inlined .= "goto end_"
    inlined .= label_num
    inlined .= "\n"
    inlineable = 1
-   eh_label = "inline_"
 dynamic_command:
    dynamic .= ".local pmc command\n"
    .local int name_register
@@ -140,8 +143,7 @@ dynamic_command:
    dynamic .= $S2
    dynamic .= "\n"
 
-   dynamic .= "push_eh "
-   dynamic .= eh_label
+   dynamic .= "push_eh invalid_"
    dynamic .= label_num
    dynamic .= "\n"
    dynamic .= "command = find_global \"Tcl\", "
@@ -212,8 +214,11 @@ unk_elem_loop_done:
    pir_code .= "start_"
    pir_code .= label_num
    pir_code .= ":\n"
-   pir_code .= dynamic
    pir_code .= inlined
+   pir_code .= "dynamic_"
+   pir_code .= label_num
+   pir_code .= ":\n"
+   pir_code .= dynamic
    pir_code .= "invalid_"
    pir_code .= label_num
    pir_code .= ":\n"
