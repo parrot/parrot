@@ -46,8 +46,9 @@ D: IMCC Optimizer patches
 D: ParTcl builtins
 E: amos@coscom.net
 
-N: Anders Nor Berle a.k.a. Debolaz
-D: cleanup in MANIFESTs and Configure.pl
+N: Anders Nor Berle
+D: Some cleanups and FreeBSD related fixes.
+E: debolaz@gmail.com
 
 N: Andrew Rodland
 D: vim syntax files and editor doc
