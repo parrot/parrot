@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 94;
+use Parrot::Test tests => 97;
 use Test::More;
 
 language_output_is("tcl",<<TCL,<<OUT,"int");
@@ -594,26 +594,21 @@ TCL
 12345.0
 OUT
 
+language_output_is("tcl",<<'TCL',<<'OUT',"string > int");
+ puts [expr {"a" > 10}]
+TCL
+1
+OUT
 
+language_output_is("tcl",<<'TCL',<<'OUT',"string int < int");
+ puts [expr {"2" < 10}]
+TCL
+1
+OUT
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+language_output_is("tcl",<<'TCL',<<'OUT',"string int < string int");
+ puts [expr {"2" < "10"}]
+TCL
+1
+OUT
 
