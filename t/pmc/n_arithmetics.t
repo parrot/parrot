@@ -1,6 +1,6 @@
 #! perl
 # Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
-# $Id: arithmetics.t 7810 2005-04-12 10:09:05Z leo $
+# $Id$
 
 use strict;
 use warnings;

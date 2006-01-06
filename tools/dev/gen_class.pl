@@ -1,6 +1,6 @@
 #! perl
 # Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
-# $Id: genclass.pl 10472 2005-12-12 22:12:28Z particle $
+# $Id$
 
 =head1 NAME
 

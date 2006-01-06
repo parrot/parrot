@@ -21,7 +21,7 @@ Generate character set tables.
 =cut
 
 
-my ($svnid) = '$Id: gen_tables.pl jrieks $' =~ /^\$[iI][dD]:\s(.*)\$$/;
+my ($svnid) = '$Id$' =~ /^\$[iI][dD]:\s(.*)\$$/;
 my $fileid = '$'.'id $';
 my $charset_dir = File::Spec->catdir(qw/ src charset /);
 

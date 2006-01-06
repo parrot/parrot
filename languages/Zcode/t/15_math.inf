@@ -1,4 +1,4 @@
-! $Id: $
+! $Id$
 
 Include "declare.inf"; ! variable declarations
 Include "assert.inf"; ! p/f/pt (ok/not_ok) routines

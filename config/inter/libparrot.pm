@@ -1,5 +1,5 @@
 # Copyright: 2005 The Perl Foundation.  All Rights Reserved.
-# $Id: libparrot.pm $
+# $Id$
 
 =head1 NAME
 

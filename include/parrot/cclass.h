@@ -1,6 +1,6 @@
 /* cclass.h
 *
-* $Id: cclass.h jrieks $
+* $Id$
 *
 *   Parrot character classes
 */

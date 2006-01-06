@@ -1,5 +1,5 @@
 # Copyright: 2005 The Perl Foundation.  All Rights Reserved.
-# $Id: cc_shared.pl $
+# $Id$
 
 =head1 NAME
 

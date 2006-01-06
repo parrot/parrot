@@ -1,5 +1,5 @@
 # Copyright: 2005 The Perl Foundation.  All Rights Reserved.
-# $Id: revision.pl 7804 2005-04-11 14:12:16Z jrieks $
+# $Id$
 
 =head1 NAME
 

@@ -1,6 +1,6 @@
 #! perl
 # Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
-# $Id: manifest.t 10143 2005-11-23 02:08:19Z particle $
+# $Id$
 
 use strict;
 use warnings;

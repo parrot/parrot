@@ -1,6 +1,6 @@
 #! perl
 # Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
-# $Id: pge.t 9188 2005-09-13 02:53:47Z azuroth $
+# $Id$
 
 use strict;
 use warnings;

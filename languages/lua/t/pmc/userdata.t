@@ -1,6 +1,6 @@
 #! perl -w
 # Copyright: 2005 The Perl Foundation.  All Rights Reserved.
-# $Id: string.t  $
+# $Id$
 
 =head1 NAME
 

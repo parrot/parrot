@@ -1,5 +1,5 @@
 # Copyright: 2005 The Perl Foundation.  All Rights Reserved.
-# $Id: luamath.pir $
+# $Id$
 
 =head1 NAME
 

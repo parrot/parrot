@@ -1,5 +1,5 @@
 # Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
-# $Id: data.pm 9910 2005-11-11 22:50:48Z jhoblitt $
+# $Id$
 
 =head1 NAME
 

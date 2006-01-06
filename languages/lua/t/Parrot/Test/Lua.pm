@@ -1,5 +1,5 @@
 # Copyright: 2005 The Perl Foundation.  All Rights Reserved.
-# $Id: Lua.pm $
+# $Id$
 
 package Parrot::Test::Lua;
 
