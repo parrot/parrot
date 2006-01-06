@@ -23,14 +23,11 @@ TCL
 2
 OUT
 
-TODO: {
-  local $TODO = "~ operator not supported yet.";
 language_output_is("tcl",<<TCL,<<OUT,"unary ~");
  puts [expr ~0]
 TCL
 -1
 OUT
-}
 
 language_output_is("tcl",<<TCL,<<OUT,"unary !");
  puts [expr !2]

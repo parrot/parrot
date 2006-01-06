@@ -230,7 +230,7 @@ eat_space:
   if $I0 == 123 goto brace       # {
   if $I0 ==  45 goto unary       # -
   if $I0 ==  43 goto unary       # +
-  if $I0 ==  47 goto unary       # ~
+  if $I0 == 126 goto unary       # ~
   if $I0 ==  33 goto unary       # !
 
   $I0 = is_cclass .CCLASS_WORD, expr, pos
