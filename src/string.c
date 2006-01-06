@@ -1928,9 +1928,10 @@ string_to_int(Interp *interpreter, const STRING *s)
                 /* we've not yet seen any digits */
                 if (c == '-') {
                     sign = -1;
+                    in_number = 1;
                 }
                 else if (c == '+' || isspace(c))
-                    ;
+                    in_number = 1;
                 else
                     break;
             }

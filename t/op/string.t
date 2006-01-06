@@ -2824,7 +2824,25 @@ CODE
 Cannot get character before beginning of string
 OUTPUT
 
+pir_output_is(<<'CODE', <<'OUT', 'string_to_int --4');
+   .sub 'main' :main
+      print_as_integer('-4')
+      print_as_integer('X-4')
+      print_as_integer('--4')
+   .end
+
+   .sub 'print_as_integer'
+      .param string s
+      $I0 = s
+      print $I0
+      print "\n"
+   .end
+CODE
+-4
+0
+0
+OUT
 
 ## remember to change the number of tests :-)
-BEGIN { plan tests => 157; }
+BEGIN { plan tests => 158; }
 
