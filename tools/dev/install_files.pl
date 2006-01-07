@@ -122,12 +122,14 @@ my $exe = $PConfig{'exe'};
 # When run from the makefile, which is probably the only time this
 # script will ever be used, all of these defaults will get overridden.
 my %options = ( buildprefix => '',
-                prefix => '/usr',
+                prefix      => '/usr',
+                destdir     => '',
                 exec_prefix => '/usr',
-                bindir => '/usr/bin',
-                libdir => '/usr/lib',
-                includedir => '/usr/include',
-		'dry-run' => 0,
+                bindir      => '/usr/bin',
+                libdir      => '/usr/lib',
+                includedir  => '/usr/include',
+                docdir      => '/usr/share/doc',
+                'dry-run'   => 0,
               );
 
 my @manifests;
@@ -188,8 +190,12 @@ while(<>) {
             next;
         }
     } elsif ($meta{include}) {
+        $dest =~ s/^include//;
         $dest = File::Spec->catdir($options{includedir}, $dest);
+    } elsif ($meta{doc}) {
+        $dest = File::Spec->catdir($options{docdir}, $dest);
     } else {
+        $dest =~ s/^runtime/lib/;
         $dest = File::Spec->catdir($options{prefix}, $dest);
     }
 
@@ -203,7 +209,7 @@ while(<>) {
 }
 
 unless ($options{'dry-run'}) {
-    for my $dir (keys %directories) {
+    for my $dir (map { $options{destdir} . $_ } keys %directories) {
 	unless (-d $dir) {
 	    # Make full path to the directory $dir
 	    my @dirs;
@@ -220,6 +226,7 @@ unless ($options{'dry-run'}) {
 print("Installing ...\n");
 foreach (@files, @installable_exe) {
     my ($src, $dest) = @$_;
+    $dest = $options{destdir}.$dest;
     if ($options{'dry-run'}) {
 	print "$src -> $dest\n";
 	next;

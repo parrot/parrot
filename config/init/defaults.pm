@@ -200,6 +200,7 @@ sub runstep
         bin_dir     => $prefix . "/bin",
         lib_dir     => $prefix . "/lib",
         include_dir => $prefix . "/include",
+        doc_dir     => $prefix . "/share/doc/parrot",
     );
 
     # add profiling if needed

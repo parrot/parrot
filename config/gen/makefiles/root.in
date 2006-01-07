@@ -23,9 +23,11 @@ SOVERSION       = ${VERSION}
 BUILDPREFIX     =
 PREFIX          = ${prefix}
 EXEC_PREFIX     = ${exec_prefix}
+DESTDIR         =
 BIN_DIR         = ${bin_dir}
 LIB_DIR         = ${lib_dir}
 INCLUDE_DIR     = ${include_dir}
+DOC_DIR         = ${doc_dir}
 
 
 ###############################################################################
@@ -1581,6 +1583,8 @@ install : installable
 	--bindir=$(BIN_DIR) \
 	--libdir=$(LIB_DIR) \
 	--includedir=$(INCLUDE_DIR) \
+	--destdir=$(DEST_DIR) \
+	--docdir=$(DOC_DIR) \
 	MANIFEST MANIFEST.generated
 
 ###############################################################################

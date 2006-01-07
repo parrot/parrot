@@ -76,9 +76,9 @@ parrot_init_library_paths(Interp *interpreter)
     VTABLE_push_string(interpreter, paths, entry);
     entry = CONST_STRING(interpreter, "./");
     VTABLE_push_string(interpreter, paths, entry);
-    entry = CONST_STRING(interpreter, "lib/parrot/runtime/include/");
+    entry = CONST_STRING(interpreter, "lib/parrot/include/");
     VTABLE_push_string(interpreter, paths, entry);
-    entry = CONST_STRING(interpreter, "lib/parrot/runtime/");
+    entry = CONST_STRING(interpreter, "lib/parrot/");
     VTABLE_push_string(interpreter, paths, entry);
 
     /* define library paths */
@@ -91,9 +91,9 @@ parrot_init_library_paths(Interp *interpreter)
     VTABLE_push_string(interpreter, paths, entry);
     entry = CONST_STRING(interpreter, "./");
     VTABLE_push_string(interpreter, paths, entry);
-    entry = CONST_STRING(interpreter, "lib/parrot/runtime/library/");
+    entry = CONST_STRING(interpreter, "lib/parrot/library/");
     VTABLE_push_string(interpreter, paths, entry);
-    entry = CONST_STRING(interpreter, "lib/parrot/runtime/");
+    entry = CONST_STRING(interpreter, "lib/parrot/");
     VTABLE_push_string(interpreter, paths, entry);
 
     /* define dynext paths */
@@ -104,7 +104,7 @@ parrot_init_library_paths(Interp *interpreter)
     VTABLE_push_string(interpreter, paths, entry);
     entry = CONST_STRING(interpreter, "");
     VTABLE_push_string(interpreter, paths, entry);
-    entry = CONST_STRING(interpreter, "lib/parrot/runtime/dynext/");
+    entry = CONST_STRING(interpreter, "lib/parrot/dynext/");
     VTABLE_push_string(interpreter, paths, entry);
 
     /* shared exts */
