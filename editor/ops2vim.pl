@@ -1,6 +1,6 @@
 #! perl -w
 
-my $cline = my $prefix = 'syn keyword imcOp';
+my $cline = my $prefix = 'syn keyword pirOp';
 
 my %seen;
 

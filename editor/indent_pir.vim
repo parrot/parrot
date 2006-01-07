@@ -8,14 +8,14 @@ if exists("b:did_indent")
 endif
 let b:did_indent=1
 
-setlocal indentexpr=IMCIndent()
+setlocal indentexpr=PIRIndent()
 setlocal indentkeys=o,O,*<Return>,<bs>,:,=.end,0#
 
 fun! InPOD(lnum)
 	return synIDattr(synID(a:lnum, 1, 1), "name") =~? '^myPod$\|^pod[A-Z]'
 endfun
 
-fun! IMCIndent()
+fun! PIRIndent()
 	let thisline = getline(v:lnum)
 
 	let POD_START = '^=[a-z]'
