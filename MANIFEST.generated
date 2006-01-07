@@ -46,6 +46,11 @@ include/parrot/oplib/core_ops_cg.h                [main]include
 include/parrot/oplib/core_ops_cgp.h               [main]include
 include/parrot/oplib/core_ops_switch.h            [main]include
 include/parrot/oplib/ops.h                        [main]include
+runtime/parrot/dynext/dynlexpad.so                [library]
+runtime/parrot/dynext/gdbmhash.so                 [library]
+runtime/parrot/dynext/libnci_test.so              [library]
+runtime/parrot/dynext/match_group.so              [library]
+runtime/parrot/dynext/subproxy.so                 [library]
 runtime/parrot/library/Data/Dumper/Base.pbc       [main]
 runtime/parrot/library/Data/Dumper/Default.pbc    [main]
 runtime/parrot/library/Data/Dumper.pbc            [main]
