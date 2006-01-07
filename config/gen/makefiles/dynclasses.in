@@ -1,7 +1,7 @@
 PERL = ${perl}
 RM_F = ${rm_f}
 LOAD_EXT = ${load_ext}
-DEST_DIR = ${build_dir}${slash}runtime${slash}parrot${slash}dynext
+RUNTIME_DIR = ${build_dir}${slash}runtime${slash}parrot${slash}dynext
 O = ${o}
 
 # add your dynamic pmcs here
@@ -52,7 +52,7 @@ all :
 	@$(BUILD) generate $(PMCS)
 	@$(BUILD) compile $(PMCS)
 	@$(BUILD) linklibs $(PMCS)
-	@$(BUILD) copy "--destination=$(DEST_DIR)" $(PMCS)
+	@$(BUILD) copy "--destination=$(RUNTIME_DIR)" $(PMCS)
 
 test : all
 	cd .. ; perl -Ilib t/harness t/dynclass/*.t
