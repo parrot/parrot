@@ -21,7 +21,7 @@ README.win32                                      [main]doc
 RELEASE_INSTRUCTIONS                              []
 RESPONSIBLE_PARTIES                               [main]doc
 TODO                                              [main]doc
-VERSION                                           [main]doc
+VERSION                                           []
 compilers/ast/README                              []
 compilers/ast/ast.h                               []
 compilers/ast/ast.l                               []
