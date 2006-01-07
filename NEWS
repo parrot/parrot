@@ -5,6 +5,7 @@ New in 0.4.1
 - Shootout examples
 - OS pmc started (mkdir,cd,cwd,rm,umask,stat)
 - Configure system rearragement
+- Installation improvements
 - Produce shared library versions as well as static versions
 - Add support for octal number constants
 - Test files are now testable with 'prove'
