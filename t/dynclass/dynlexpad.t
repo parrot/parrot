@@ -50,7 +50,7 @@ my $loadlib = <<'EOC';
     lib = loadlib "dynlexpad"
 .end
 
-.HLL "Some", ""
+.HLL "Some", "dynlexpad"
 .HLL_map .LexPad, .DynLexPad
 
 EOC
