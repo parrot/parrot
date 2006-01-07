@@ -100,12 +100,10 @@ On some systems you can install parrot:
 
     make install
 
-This installs a bunch of files in /usr/local/parrot-$VERSION. The parrot
-executable is in /usr/local/parrot-$VERSION/bin. Please note that this
-feature is currently experimental. You have to link or copy the executable
-somewhere into your path. Finally no dynamic extensions from
-runtime/parrot/dynext are installed, albeit dynamic extensions are searched
-for in the installed directory structure.
+This installs a bunch of files in /usr/local. The parrot executable is in
+/usr/local/bin.   Please note that this feature is currently experimental.  No
+dynamic extensions from runtime/parrot/dynext are installed, albeit dynamic
+extensions are searched for in the installed directory structure.
 
 Look at docs/parrot.pod and docs/intro.pod for where to go from here.  If you
 have any problems, see the section "Reporting Problems" in docs/intro.pod.
@@ -130,8 +128,8 @@ previous versions, please see NEWS.
 KNOWN ISSUES
 ------------
 
-Some PASM examples are currently broken.  The docs/BROKEN file lists other
-major subsystems and regressions that block progress.
+The docs/BROKEN file lists other major subsystems and regressions that block
+progress.
 
 MAILING LISTS
 -------------
