@@ -175,6 +175,7 @@ GEN_MAKEFILES = \
 	languages/parrot_compiler/Makefile \
 	languages/perl6/Makefile \
 	languages/punie/Makefile \
+	languages/regex/Makefile \
 	languages/scheme/Makefile \
 	languages/tcl/Makefile \
 	languages/tcl/examples/Makefile \
