@@ -36,7 +36,7 @@ build-stamp: configure-stamp
 clean:
 	dh_testdir
 	dh_testroot
-	rm -f build-stamp configure-stamp debian/parrot.1 debian/parrot-config.imc.1 debian/pdump.1 debian/disassemble.1 debian/parrot-debugger.1 debian/pbc_info.1 debian/pbc_merge.1 debian/libparrot$(SOVERSION).install
+	rm -f build-stamp configure-stamp debian/parrot.1 debian/parrot-config.1 debian/pdump.1 debian/disassemble.1 debian/parrot-debugger.1 debian/pbc_info.1 debian/pbc_merge.1 debian/libparrot$(SOVERSION).install
 	-$(MAKE) realclean
 	dh_clean 
 
@@ -48,13 +48,9 @@ install: build debian/libparrot$(SOVERSION).install
 	dh_testroot
 	dh_clean -k 
 	dh_installdirs -plibparrot-dev usr/share/lintian/overrides
-	$(MAKE) install PREFIX=$(CURDIR)/debian/tmp/usr BIN_DIR=$(CURDIR)/debian/tmp/usr/bin
+	$(MAKE) install PREFIX=$(CURDIR)/debian/tmp/usr BIN_DIR=$(CURDIR)/debian/tmp/usr/bin INCLUDE_DIR=$(CURDIR)/debian/tmp/usr LIB_DIR=$(CURDIR)/debian/tmp/usr/lib
 	dh_install --sourcedir=$(CURDIR)/debian/tmp --list-missing
-	install -m755 $(CURDIR)/debian/tmp/usr/bin/pdump_shared $(CURDIR)/debian/parrot/usr/bin/pdump
-	install -m755 $(CURDIR)/debian/tmp/usr/bin/pdb_shared $(CURDIR)/debian/parrot/usr/bin/parrot-debugger
-	install -m755 $(CURDIR)/debian/tmp/usr/bin/pbc_info_shared $(CURDIR)/debian/parrot/usr/bin/pbc_info
-	install -m755 $(CURDIR)/debian/tmp/usr/bin/pbc_merge_shared $(CURDIR)/debian/parrot/usr/bin/pbc_merge
-	install -m755 $(CURDIR)/debian/tmp/usr/bin/disassemble_shared $(CURDIR)/debian/parrot/usr/bin/disassemble
+	install -m755 $(CURDIR)/debian/tmp/usr/bin/pdb $(CURDIR)/debian/parrot/usr/bin/parrot-debugger
 	install -m644 debian/libparrot-dev.lintian-overrides $(CURDIR)/debian/libparrot-dev/usr/share/lintian/overrides/libparrot-dev
 
 # Build architecture-independent files here.
@@ -62,7 +58,7 @@ binary-indep: build install
 	dh_testdir -i 
 	dh_testroot -i
 	dh_installchangelogs -i ChangeLog
-	dh_installman -plibparrot-dev debian/parrot-config.imc.1
+	dh_installman -plibparrot-dev debian/parrot-config.1
 	dh_installdocs -i
 	dh_link -plibparrot-dev usr/lib/libparrot.so.$(SOVERSION) usr/lib/libparrot.so
 	dh_compress -pparrot-doc -X.pod
