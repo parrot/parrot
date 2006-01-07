@@ -991,7 +991,7 @@ branch_cond_loop_swap(Interp *interp, IMC_Unit *unit, Instruction *branch,
             for (start = start->next; start != cond; start = start->next) {
                 if (!(start->type & ITLABEL)) {
                     tmp = INS(interp, unit, start->op, "", 
-                            start->r, start->n_r, 0, 0);
+                            start->r, start->n_r, start->keys, 0);
                     prepend_ins(unit, branch, tmp);
                 }
             }
@@ -1061,6 +1061,10 @@ branch_cond_loop(Interp *interpreter, IMC_Unit * unit)
                     /* no good if it's an unconditional branch*/
                     if (cond->type & IF_goto && !strcmp(cond->op, "branch")) {
                         break;
+                    } else if (cond->type & ITPCCRET || cond->type & ITPCCSUB
+                            || cond->type & ITCALL) {
+                        break;
+                        /* just until we can copy set_args et al */
                     } else if (cond->type & ITBRANCH && get_branch_regno(cond) >= 0) {
                         found = 1;
                         break;

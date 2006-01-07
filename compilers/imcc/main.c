@@ -475,8 +475,8 @@ main(int argc, char * argv[])
         IMCC_INFO(interp)->optimizer_level = 0;
 #else
         /* won't even make with this: something with Data::Dumper and set_i_p_i*/
-        strcpy(optimizer_opt, "2");
-        IMCC_INFO(interp)->optimizer_level = (OPT_CFG | OPT_PRE);
+        strcpy(optimizer_opt, "1");
+        IMCC_INFO(interp)->optimizer_level = OPT_PRE;
 #endif
     }
 
