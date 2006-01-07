@@ -37,12 +37,14 @@ sub runstep
         ld_share_flags      => '-dynamiclib -undefined suppress',
         ld_load_flags       => '-bundle -undefined suppress',
         memalign            => 'some_memalign',
-	has_dynamic_linking     => 1,
-        parrot_is_shared     => 1,
+        has_dynamic_linking     => 1,
+        # XXX when built against a dynamic libparrot installable_parrot records
+        # the path to the blib version of the library
+        parrot_is_shared     => 0,
         libparrot_shared        => 'libparrot$(SHARE_EXT).$(SOVERSION)',
         libparrot_shared_alias  => 'libparrot$(SHARE_EXT)',
         # This variable needs renaming to be more general
-	# XXX ugly hack for rpath_lib in config/inter/libparrot.pm
+        # XXX ugly hack for rpath_lib in config/inter/libparrot.pm
         rpath                   => "-L",
         libparrot_soname    => "-install_name " .
                                $conf->data->get('build_dir') .
