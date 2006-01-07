@@ -331,7 +331,7 @@ pir_output_like(<<'CODE', <<'OUTPUT', ':outer parsing - missing :outer');
 .sub foo :outer(oops)
 .end
 CODE
-/Undefined :outer sub 'oops'./
+/Undefined :outer sub 'oops'\./
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', 'get_lexinfo from pad');
