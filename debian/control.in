@@ -31,7 +31,7 @@ Description: virtual machine to execute bytecode for interpreted languages
  This package contains the parrot shared library.
  
 Package: libparrot-dev
-Architecture: all
+Architecture: any
 Section: libdevel
 Depends: libparrot%SOVERSION% (= ${Source-Version})
 Description: virtual machine to execute bytecode for interpreted languages
