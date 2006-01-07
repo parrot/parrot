@@ -192,7 +192,7 @@ sub runstep
     unless (defined $prefix) {
         my $VERSION = $conf->data->get('VERSION');
         my $DEVEL   = $conf->data->get('DEVEL');
-        $prefix = "/usr/local/parrot-${VERSION}${DEVEL}";
+        $prefix = "/usr/local";
     }
     $conf->data->set(
         prefix      => $prefix,
