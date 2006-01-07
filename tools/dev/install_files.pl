@@ -143,6 +143,7 @@ foreach (@ARGV) {
 my %seen;
 
 my @files;
+my @installable_exe;
 my %directories;
 @ARGV = @manifests;
 while(<>) {
@@ -175,11 +176,16 @@ while(<>) {
         # don't allow libraries to be installed into subdirs of libdir
         $dest = File::Spec->catdir($options{libdir}, basename($dest));
     } elsif ($meta{bin}) {
-	$dest =~ s/^installable_//;	# parrot with different config
+        my $copy = $dest;
+        $dest =~ s/^installable_//; # parrot with different config
         $dest = File::Spec->catdir($options{bindir}, $dest);
         if ($exe) {
            $src .= $exe;
            $dest .= $exe;
+        }
+        if ($copy =~ /^installable/) {
+            push @installable_exe, [$src, $dest];
+            next;
         }
     } elsif ($meta{include}) {
         $dest = File::Spec->catdir($options{includedir}, $dest);
@@ -212,7 +218,7 @@ unless ($options{'dry-run'}) {
     }
 }
 print("Installing ...\n");
-foreach (@files) {
+foreach (@files, @installable_exe) {
     my ($src, $dest) = @$_;
     if ($options{'dry-run'}) {
 	print "$src -> $dest\n";
