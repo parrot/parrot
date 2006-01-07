@@ -11,9 +11,9 @@ New in 0.4.1
 - Test files are now testable with 'prove'
 - Smoke (and smokej) outputs progress 
 - PIR supports: I = A < B (>,<=,>=,==,!=)
-- TCL updates:
-  - a lot of new [string] commands
-  - started [file] commands
+- partcl updates:
+  - almost finish [string]; start [file]
+  - add build tool for generating inline'd tcl builtins from templates.
 - Jako updates: NCI, subroutines, global variables and constants all work. (Gregor)
 
 New in 0.4.0
