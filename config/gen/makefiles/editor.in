@@ -2,7 +2,7 @@
 
 OPS_DIR     = ../src/ops
 VIM_DIR     = $(HOME)/.vim
-VIM_FT_DIR  = $(VIM_DIR)/ftdetect
+VIM_FT_DIR  = $(VIM_DIR)/plugin
 VIM_IN_DIR  = $(VIM_DIR)/indent
 VIM_SYN_DIR = $(VIM_DIR)/syntax
 
@@ -13,7 +13,7 @@ RM_F  = ${rm_f}
 
 default: all
 
-all: imc.vim imc.kate
+all: pir.vim imc.kate
 
 # This is a listing of all targets, that are meant to be called by users
 help :
@@ -31,20 +31,20 @@ help :
 	@echo "  realclean:         clean up local files including Makefile"
 	@echo ""
 
-imc.vim: imc.vim.in $(OPS_DIR)/*.ops
-	$(CP) imc.vim.in imc.vim
-	$(PERL) ops2vim.pl $(OPS_DIR)/*.ops >> imc.vim
+pir.vim: pir.vim.in $(OPS_DIR)/*.ops
+	$(CP) pir.vim.in pir.vim
+	$(PERL) ops2vim.pl $(OPS_DIR)/*.ops >> pir.vim
 
-vim-install: imc.vim
+vim-install: pir.vim
 	$(MKDIR) $(VIM_DIR)
 	$(MKDIR) $(VIM_SYN_DIR)
-	$(CP) imc.vim $(VIM_SYN_DIR)
+	$(CP) pir.vim $(VIM_SYN_DIR)
 	$(CP) pasm.vim $(VIM_SYN_DIR)
 	$(CP) pmc.vim $(VIM_SYN_DIR)
 	$(MKDIR) $(VIM_FT_DIR)
 	$(CP) filetype_parrot.vim $(VIM_FT_DIR)/parrot.vim
 	$(MKDIR) $(VIM_IN_DIR)
-	$(CP) indent_imc.vim $(VIM_IN_DIR)/imc.vim
+	$(CP) indent_pir.vim $(VIM_IN_DIR)/pir.vim
 
 imc.kate: imcc.xml
 
@@ -52,14 +52,14 @@ imcc.xml:
 	$(PERL) kate_syntax.pl '..${slash}' > imcc.xml
 
 vim-uninstall:
-	$(RM_F) $(VIM_SYN_DIR)/imc.vim
+	$(RM_F) $(VIM_SYN_DIR)/pir.vim
 	$(RM_F) $(VIM_SYN_DIR)/pasm.vim
 	$(RM_F) $(VIM_SYN_DIR)/pmc.vim
 	$(RM_F) $(VIM_FT_DIR)/parrot.vim
-	$(RM_F) $(VIM_IN_DIR)/imc.vim
+	$(RM_F) $(VIM_IN_DIR)/pir.vim
 
 clean:
-	$(RM_F) imc.vim
+	$(RM_F) pir.vim
 	$(RM_F) imcc.xml
 
 realclean: clean
