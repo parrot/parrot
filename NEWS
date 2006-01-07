@@ -3,15 +3,16 @@
 New in 0.4.1
 
 - Shootout examples
-- OS pmc started
+- OS pmc started (mkdir,cd,cwd,rm,umask,stat)
 - Configure system rearragement
 - Produce shared library versions as well as static versions
 - Add support for octal number constants
 - Test files are now testable with 'prove'
-- Smoke now outputs progress 
+- Smoke (and smokej) outputs progress 
 - PIR supports: I = A < B (>,<=,>=,==,!=)
 - TCL updates:
-  - [string] commands
+  - a lot of new [string] commands
+  - started [file] commands
 - Jako updates: NCI, subroutines, global variables and constants all work. (Gregor)
 
 New in 0.4.0
