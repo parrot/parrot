@@ -1583,7 +1583,7 @@ install : installable
 	--bindir=$(BIN_DIR) \
 	--libdir=$(LIB_DIR) \
 	--includedir=$(INCLUDE_DIR) \
-	--destdir=$(DEST_DIR) \
+	--destdir=$(DESTDIR) \
 	--docdir=$(DOC_DIR) \
 	MANIFEST MANIFEST.generated
 
