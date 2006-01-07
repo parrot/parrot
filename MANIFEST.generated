@@ -10,6 +10,7 @@ pdb                                               [main]bin
 pbc_info                                          [main]bin
 pbc_merge                                         [main]bin
 blib/lib/libparrot.a                              [main]lib
+blib/lib/libparrot.so                             [main]lib
 blib/lib/libparrot.so.0.4.0                       [main]lib
 docs/ops/bit.pod                                  [main]doc
 docs/ops/cmp.pod                                  [main]doc
@@ -94,4 +95,4 @@ runtime/parrot/include/timer.pasm                 [main]
 runtime/parrot/include/tm.pasm                    [main]
 runtime/parrot/include/vtable_methods.pasm        [main]
 runtime/parrot/include/warnings.pasm              [main]
-tools/build/dynclasses.pl                         [main]
+tools/build/dynclasses.pl                         [devel]
