@@ -48,7 +48,7 @@ install: build debian/libparrot$(SOVERSION).install
 	dh_testroot
 	dh_clean -k 
 	dh_installdirs -plibparrot-dev usr/share/lintian/overrides
-	$(MAKE) install PREFIX=$(CURDIR)/debian/tmp/usr BIN_DIR=$(CURDIR)/debian/tmp/usr/bin INCLUDE_DIR=$(CURDIR)/debian/tmp/usr LIB_DIR=$(CURDIR)/debian/tmp/usr/lib
+	$(MAKE) install DESTDIR=$(CURDIR)/debian/tmp
 	dh_install --sourcedir=$(CURDIR)/debian/tmp --list-missing
 	install -m755 $(CURDIR)/debian/tmp/usr/bin/pdb $(CURDIR)/debian/parrot/usr/bin/parrot-debugger
 	install -m644 debian/libparrot-dev.lintian-overrides $(CURDIR)/debian/libparrot-dev/usr/share/lintian/overrides/libparrot-dev
