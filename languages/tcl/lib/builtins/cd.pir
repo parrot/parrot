@@ -50,7 +50,7 @@ cd_it:
   pir_code .= $S2
   pir_code .= " = $P"
   pir_code .= $S1
-  pir_code .= '."cd"($P'
+  pir_code .= '."chdir"($P'
   $S2 = directory_num
   pir_code .= $S2
   pir_code .= ")\n"

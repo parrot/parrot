@@ -1,5 +1,5 @@
 /*
-Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
+Copyright: 2001-2006 The Perl Foundation.  All Rights Reserved.
 $Id$
 
 =head1 NAME
@@ -85,7 +85,7 @@ Returns the current working directory.
 
 /*
 
-=item C<void cd(STRING *path)>
+=item C<void chdir(STRING *path)>
 
 Changes the current working directory to the one specified by C<path>.
 
@@ -93,7 +93,7 @@ Changes the current working directory to the one specified by C<path>.
 
 */
 
-    METHOD void cd(STRING *path) {
+    METHOD void chdir(STRING *path) {
 #ifndef _MSC_VER
         int error;
         char *cpath = string_to_cstring(interpreter, path);
@@ -108,7 +108,6 @@ Changes the current working directory to the one specified by C<path>.
 #endif
     }
 
-
 /*
 
 =item C<void rm(STRING* path)>
@@ -120,7 +119,6 @@ C<path>.
 
 */
 
-
     METHOD void rm(STRING *path) {
         int error;
         char *cpath = string_to_cstring(interpreter, path);
@@ -131,7 +129,6 @@ C<path>.
             real_exception(interpreter, NULL, E_SystemError, errmsg);
         }
     }
-
 
 /*
 
@@ -163,7 +160,6 @@ Creates a directory specified by C<path> with mode C<mode>.
 #endif
     }
 
-
 /*
 
 =item C<fixedpmcarray* stat(STRING* path)>
@@ -183,6 +179,8 @@ Stats a file, and returns a 13 position array as in Perl:
     10 ctime    inode change time in seconds since the epoch (*)
     11 blksize  preferred block size for file system I/O
     12 blocks   actual number of blocks allocated
+
+11 and 12 are not available under Windows.
 
 =cut
 
@@ -242,6 +240,85 @@ Stats a file, and returns a 13 position array as in Perl:
 #endif
     }
 
+/*
+
+=item C<fixedpmcarray* stat(STRING* path)>
+
+Stats a file, and returns a 13 position array as in Perl:
+
+     0 dev      device number of filesystem
+     1 ino      inode number
+     2 mode     file mode  (type and permissions)
+     3 nlink    number of (hard) links to the file
+     4 uid      numeric user ID of file's owner
+     5 gid      numeric group ID of file's owner
+     6 rdev     the device identifier (special files only)
+     7 size     total size of file, in bytes
+     8 atime    last access time in seconds since the epoch
+     9 mtime    last modify time in seconds since the epoch
+    10 ctime    inode change time in seconds since the epoch (*)
+    11 blksize  preferred block size for file system I/O
+    12 blocks   actual number of blocks allocated
+
+11 and 12 are not available under Windows.
+
+=cut
+
+*/
+
+    METHOD PMC* lstat(STRING *path) {
+#ifndef _MSC_VER
+        struct stat info;
+        PMC *array;
+
+        char *cpath = string_to_cstring(interpreter, path);
+        int error = lstat(cpath, &info);
+        string_cstring_free(cpath);
+
+        if (error) {
+            char *errmsg = strerror(errno);
+            real_exception(interpreter, NULL, E_SystemError, errmsg);
+            return NULL;
+        }
+        else {
+            array = pmc_new(interpreter, enum_class_FixedPMCArray);
+            VTABLE_set_integer_native(interpreter, array, 13);
+
+            VTABLE_set_integer_keyed_int(interpreter, array, 0,
+                                         info.st_dev);
+            VTABLE_set_integer_keyed_int(interpreter, array, 1,
+                                         info.st_ino);
+            VTABLE_set_integer_keyed_int(interpreter, array, 2,
+                                         info.st_mode);
+            VTABLE_set_integer_keyed_int(interpreter, array, 3,
+                                         info.st_nlink);
+            VTABLE_set_integer_keyed_int(interpreter, array, 4,
+                                         info.st_uid);
+            VTABLE_set_integer_keyed_int(interpreter, array, 5,
+                                         info.st_gid);
+            VTABLE_set_integer_keyed_int(interpreter, array, 6,
+                                         info.st_rdev);
+            VTABLE_set_integer_keyed_int(interpreter, array, 7,
+                                         info.st_size);
+            VTABLE_set_integer_keyed_int(interpreter, array, 8,
+                                         info.st_atime);
+            VTABLE_set_integer_keyed_int(interpreter, array, 9,
+                                         info.st_mtime);
+            VTABLE_set_integer_keyed_int(interpreter, array,10,
+                                         info.st_ctime);
+#ifndef WIN32
+            VTABLE_set_integer_keyed_int(interpreter, array,11,
+                                         info.st_blksize);
+            VTABLE_set_integer_keyed_int(interpreter, array,12,
+                                         info.st_blocks);
+#endif
+            return array;
+        }
+#else
+        internal_exception(UNIMPLEMENTED, "Win32 is not POSIX. Need win32 developer!");
+        return NULL;
+#endif
+    }
 
 /*
 
@@ -268,7 +345,6 @@ Creates a symlink, where available
         internal_exception(UNIMPLEMENTED, "Win32 is not POSIX. Need win32 developer!");
 #endif
     }
-
 
 /*
 
@@ -317,15 +393,41 @@ previous one).
 #endif
     }
 
+/*
+
+=item C<INTVAL chroot(STRING* path)>
+
+it makes the named directory the new root directory for all further
+pathnames that begin with a "/" by your process and all its children.
+
+=cut
+
+*/
+
+    METHOD void chroot(STRING* path) {
+#ifndef _MSC_VER
+        char *cpath = string_to_cstring(interpreter, path);
+        int error = chroot(cpath);
+        string_cstring_free(cpath);
+        if (error) {
+            char *errmsg = strerror(errno);
+            real_exception(interpreter, NULL, E_SystemError, errmsg);
+        }
+#else
+        internal_exception(UNIMPLEMENTED, "Win32 is not POSIX. Need win32 developer!");
+#endif
+    }
+
 }
+
 /*
 
 =back
 
 =head1 SEE ALS0
 
-   chdir(2), getcwd(3), unlink(2), mkdir(2), stat(2), symlink(2),
-   link(2), umask(2)
+   chdir(2), getcwd(3), unlink(2), mkdir(2), stat(2), lstat(2),
+   symlink(2), link(2), umask(2), chroot(2)
 
 =cut
 

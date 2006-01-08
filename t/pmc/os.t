@@ -52,24 +52,24 @@ OUT
 
 
 
-#  TEST cd
+#  TEST chdir
 chdir "src";
 my $upcwd = getcwd;
 chdir "..";
 
-pir_output_is(<<'CODE', <<"OUT", "Test cd");
+pir_output_is(<<'CODE', <<"OUT", "Test chdir");
 .sub main :main
         $P1 = new .OS
 
         $S1 = "src"
-        $P1."cd"($S1)
+        $P1."chdir"($S1)
 
         $S1 = $P1."cwd"()
         print $S1
         print "\n"
 
         $S1 = ".."
-        $P1."cd"($S1)
+        $P1."chdir"($S1)
 
         $S1 = $P1."cwd"()
         print $S1
@@ -95,14 +95,14 @@ pir_output_is(<<'CODE', <<"OUT", "Test mkdir");
         $S1 = "xpto"
         $I1 = 0o555
         $P1."mkdir"($S1,$I1)
-        $P1."cd"($S1)
+        $P1."chdir"($S1)
 
         $S1 = $P1."cwd"()
         print $S1
         print "\n"
 
         $S1 = ".."
-        $P1."cd"($S1)
+        $P1."chdir"($S1)
 
         $S1 = $P1."cwd"()
         print $S1
