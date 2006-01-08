@@ -59,11 +59,6 @@ This turns on the user prompts.
 
 Compile Options
 
-You can add and remove option values with C<< :rem{<opt>} >> and C<<
-:add{<opt>} >>. For example:
-
-    perl Configure.pl --ccflags=":rem{-g} :add{-O2}"
-
 =over
 
 =item C<--debugging=0>
