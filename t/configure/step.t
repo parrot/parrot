@@ -11,6 +11,7 @@ use Test::More tests => 19;
 
 use File::Basename qw(basename dirname);
 use File::Temp 0.13 qw/tempfile/;
+use IO::Handle;
 
 =head1 NAME
 
