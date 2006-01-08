@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 8;
+use Parrot::Test tests => 9;
 use Parrot::Config;
 use Cwd;
 
@@ -179,6 +179,37 @@ done:
 .end
 CODE
 }
+
+
+# test lstat
+
+my $lstat = join("\n",lstat("xpto"))."\n";
+
+
+SKIP: {
+  skip "lstat not available on Win 32 yet", 1 if $MSWin32;
+
+  pir_output_is(<<'CODE', $lstat, "Test OS.lstat");
+.sub main :main
+        $P1 = new .OS
+        $S1 = "xpto"
+        $P2 = $P1."lstat"($S1)
+
+        $I1 = 0
+loop:
+        $S1 = $P2[$I1]
+        print $S1
+        print "\n"
+        $I1 += 1
+        if $I1 == 13 goto done
+        goto loop
+done:
+        end
+.end
+CODE
+}
+
+
 
 # Test remove on a file
 pir_output_is(<<'CODE', <<"OUT", "Test rm call in a file");
