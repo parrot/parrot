@@ -25,6 +25,7 @@ sub runstep
         ld_share_flags      => '-shared',
         ld_load_flags       => '-shared',
         libs                => $libs,
+        has_static_linking  => 0,
         has_dynamic_linking => 1,
         parrot_is_shared    => 1
     );
