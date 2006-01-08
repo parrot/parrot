@@ -1076,7 +1076,7 @@ class Walker(antlr.TreeParser):
             _t = _t114
             _t = _t.getNextSibling()
             past_p_expr_p_newline_AST = currentAST.root
-            past_p_expr_p_newline_AST = antlr.make(self.astFactory.create(PAST_Code,"two statements"), antlr.make(self.astFactory.create(PAST_Stmt,"dummy stmt 1"), antlr.make(self.astFactory.create(PAST_Exp,"dummy exp 1"), antlr.make(self.astFactory.create(PAST_Op,"dummy print op 1"), antlr.make(self.astFactory.create(PAST_Exp,"dummy exp 1:1"), E1_AST)))), antlr.make(self.astFactory.create(PAST_Stmt,"dummy stmt 2"), antlr.make(self.astFactory.create(PAST_Exp,"dummy exp 2"), antlr.make(self.astFactory.create(PAST_Op,"dummy print op 2"), antlr.make(self.astFactory.create(PAST_Exp,"dummy exp 2:1"), self.astFactory.create(PAST_Val,"\"\\n\""))))));
+            past_p_expr_p_newline_AST = antlr.make(self.astFactory.create(PAST_Code,"two statements"), antlr.make(self.astFactory.create(PAST_Stmt,"dummy stmt 1"), antlr.make(self.astFactory.create(PAST_Exp,"dummy exp 1"), antlr.make(self.astFactory.create(PAST_Op,"dummy print op 1"), antlr.make(self.astFactory.create(PAST_Exp,"dummy exp 1:1"), E1_AST)))), antlr.make(self.astFactory.create(PAST_Stmt,"dummy stmt 2"), antlr.make(self.astFactory.create(PAST_Exp,"dummy exp 2"), antlr.make(self.astFactory.create(PAST_Op,"dummy print op 2"), antlr.make(self.astFactory.create(PAST_Exp,"dummy exp 2:1"), self.astFactory.create(PAST_Val,"\\n"))))));
             currentAST.root = past_p_expr_p_newline_AST
             if (past_p_expr_p_newline_AST != None) and (past_p_expr_p_newline_AST.getFirstChild() != None):
                 currentAST.child = past_p_expr_p_newline_AST.getFirstChild()

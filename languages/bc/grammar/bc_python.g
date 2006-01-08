@@ -574,7 +574,7 @@ past_p_expr_p_newline!
                                      #( [ PAST_Exp, "dummy exp 2" ],
                                         #( [ PAST_Op, "dummy print op 2" ],
                                            #( [ PAST_Exp, "dummy exp 2:1" ],
-                                              [ PAST_Val, "\"\\n\"" ]
+                                              [ PAST_Val, "\\n" ]
                                             )
                                          )
                                       )

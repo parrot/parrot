@@ -64,13 +64,13 @@ my @tests = (
        #[ '+1', '1', 'unary +', with_past => 1, ], Surprise, there is no unary + in POSIX bc
        [ '-1', '-1', 'unary -', with_past => 1, ],
        [ '0', '0', undef, with_past => 1, ],
-       [ '-0', '0', undef, with_past => 1, ],
+       [ '-0', '0', undef, with_past => 0, ],
        [ '1', '1', undef, with_past => 1, ],
        [ '-10', '-10', undef, with_past => 1, ],
        [ '123456789', '123456789', undef, with_past => 1, ],
        [ '-123456789', '-123456789', undef, with_past => 1, ],
-       [ '0001', '1', undef, with_past => 1, ],
-       [ '-0001', '-1', undef, with_past => 1 ],
+       [ '0001', '1', undef, with_past => 0, ],
+       [ '-0001', '-1', undef, with_past => 0 ],
 
        # floats
        [ '-1.0001', '-1.0001' ],
