@@ -10,8 +10,9 @@ use Parrot::Test tests => 9;
 use Parrot::Config;
 use Cwd;
 
-our ($MSWin32);
+our ($MSWin32, $cygwin);
 $MSWin32 = 1 if $^O =~ m!MSWin32!;
+$cygwin  = 1 if $^O =~ m!cygwin!;
 
 =head1 NAME
 
@@ -159,7 +160,10 @@ my $stat = join("\n",stat("xpto"))."\n";
 SKIP: {
   skip "stat not available on Win 32 yet", 1 if $MSWin32;
 
-  pir_output_is(<<'CODE', $stat, "Test OS.stat");
+ TODO: {
+    local $TODO = "stat test under cygwin needs work" if $cygwin;
+
+    pir_output_is(<<'CODE', $stat, "Test OS.stat");
 .sub main :main
         $P1 = new .OS
         $S1 = "xpto"
@@ -177,6 +181,7 @@ done:
         end
 .end
 CODE
+  }
 }
 
 
@@ -188,7 +193,10 @@ my $lstat = join("\n",lstat("xpto"))."\n";
 SKIP: {
   skip "lstat not available on Win 32 yet", 1 if $MSWin32;
 
-  pir_output_is(<<'CODE', $lstat, "Test OS.lstat");
+ TODO: {
+    local $TODO = "stat test under cygwin needs work" if $cygwin;
+
+    pir_output_is(<<'CODE', $lstat, "Test OS.lstat");
 .sub main :main
         $P1 = new .OS
         $S1 = "xpto"
@@ -206,6 +214,7 @@ done:
         end
 .end
 CODE
+  }
 }
 
 # Test remove on a file
