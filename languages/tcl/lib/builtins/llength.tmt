@@ -1,12 +1,6 @@
 {
   command => 'llength',
-  args =>
-  [
-    {
-      name     => 'list',
-      type     => 'list',
-    }
-  ],
+  usage => "list:list",
   code => <<'END_PIR',
 
 $I{register_num} = $P{register_list}

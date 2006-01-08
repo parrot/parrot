@@ -1,18 +1,6 @@
 {
   command => 'incr',
-  args =>
-  [
-    {
-      name     => 'varName',
-      type     => 'variable',
-    },
-    {
-      name     => 'increment',
-      type     => 'integer',
-      optional => 1,
-      default  => 1,
-    }
-  ],
+  usage=> "varName:var ?increment:int=1?",
   code => <<'END_PIR',
 $P{register_num} = $P{register_varName} + $P{register_increment}
 __set($P{register_varName_varname},$P{register_num})

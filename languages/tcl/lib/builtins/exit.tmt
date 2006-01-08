@@ -1,14 +1,6 @@
 {
   command => 'exit',
-  args =>
-  [
-    {
-      name     => 'returnCode',
-      type     => 'integer',
-      optional => 1,
-      default  => 0,
-    }
-  ],
+  usage => "?returnCode:int=0?",
   code => <<'END_PIR',
 $I{register_returnCode} = $P{register_returnCode}
 exit $I{register_returnCode}

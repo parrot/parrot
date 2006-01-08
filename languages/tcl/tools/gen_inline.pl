@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/perl -w
 
 use strict;
 
@@ -27,18 +27,17 @@ arguments: variable name, integer, channel, list, and string.
 
 =cut
 
-my $namespace = "_Tcl::builtins"; # The namespace all these commands live in
+my $namespace = "_Tcl::builtins";    # The namespace all these commands live in
 
 local undef $/;
 
-FILE:
-foreach my $file (@ARGV)
-{
-  open my $handle, "<", $file or die "can't open $file for reading";
+my $file = shift @ARGV;
 
-  my $template; # perl variable containing the commands DS.
-  my $contents; # raw contents of the .tmt file
-  my @pir_code; # see comment below
+open my $handle, "<", $file or die "can't open $file for reading";
+
+my $template;                        # perl variable containing the commands DS.
+my $contents;                        # raw contents of the .tmt file
+my @pir_code;                        # see comment below
 
 =head2 Internal notes...
 
@@ -74,13 +73,13 @@ eventually be compiled (C<INLINED>).
 
 =cut
 
-  $contents = <$handle>;
+$contents = <$handle>;
 
-  my $code = "\$template = $contents";
-  eval "\$template = $contents";       # ewww...
-  die "error processing $file: $@" if ($@);
+my $code = "\$template = $contents";
+eval "\$template = $contents";    # ewww...
+die "error processing $file: $@" if ($@);
 
-  push @pir_code, [ WRAP => <<END_PIR];
+add_wrapped(<<END_PIR);
 
 .namespace [ "_Tcl::builtins"]
 
@@ -97,30 +96,32 @@ eventually be compiled (C<INLINED>).
   argc = argv
 END_PIR
 
-  my ($min_args,$max_args) = num_args($template);
+my @args_opts = parse_usage( $template->{usage} );
 
-  if ($max_args == $min_args)
-   {
+my ( $min_args, $max_args ) = num_args(@args_opts);
 
-     push @pir_code, [ WRAP => <<END_PIR];
+if ( $max_args == $min_args ) {
+    add_wrapped(<<END_PIR);
   if argc != $max_args goto bad_args
 END_PIR
 
-   }
-   else
-   {
+}
+else {
 
-     push @pir_code, [ WRAP => <<END_PIR];
+    add_wrapped(<<END_PIR);
   if argc < $min_args goto bad_args
   if argc > $max_args goto bad_args
 END_PIR
 
-   }
+}
 
-  # XXX We're including more here than we need to. Check for which
-  # arguments are required based 
- 
-  push @pir_code, [ INLINE => <<END_PIR];
+# XXX We're including more here than we need to. Check for which
+# arguments are required - even better, push this out to the compiler.
+# Eventually all these helpers should be inlined, but in the meantime,
+# we can scan the compiled code for __foo( and pull in the global def
+# as needed.
+
+add_inlined(<<END_PIR);
   .local pmc __read
   __read     = find_global '_Tcl', '__read'
   .local pmc __set
@@ -131,312 +132,329 @@ END_PIR
   __list     = find_global '_Tcl', '__list'
   .local pmc __channel
   __channel  = find_global '_Tcl', '__channel'
+  .local pmc __script_compile
+  __script_compile = find_global '_Tcl', 'compile'
+  .local pmc __pir_compile
+  __pir_compile = find_global '_Tcl', 'pir_compiler'
+  trace 1
 END_PIR
 
-   # Now, grab each option off the list and compile it. 
-   # XXX Refactor when we add subcommands
-   # XXX Only deal with value-less options atm.
-   if ($template->{options})
-   {
+# Now, grab each arg off the list and compile it, handling defaults, etc.
+# XXX Refactor when we add subcommands
+my $ii = 0;
+foreach my $arg (@args_opts) {
+    my $argument     = "argument_$arg->{name}";
+    my $arg_register = "register_$arg->{name}";
+    my $arg_default  = "default_$arg->{name}";
+    my $arg_done     = "done_$arg->{name}";
+    my $type         = "TclString";
+    my $typequotes   = "'";
 
-     # For each option, peek at the stack
-     # if the value *is* the option (which in unoptimized case we
-     # can't know until we execute the code) then pop it off the
-     # args.
-
-     # XXX Not done yet.
-   }
-
-   # Now, grab each arg off the list and compile it, handling defaults, etc.
-   # XXX Refactor when we add subcommands
-   my $ii = 0;
-   foreach my $arg (@{$template->{args}})
-   {
-     my $argument     = "argument_$arg->{name}";
-     my $arg_register = "register_$arg->{name}";
-     my $arg_default  = "default_$arg->{name}";
-     my $arg_done     = "done_$arg->{name}";
-     my $type         = "TclString";
-     my $typequotes   = "'";
-
-     push @pir_code, [ WRAP => <<END_PIR];
-  .local pmc $argument
-  .local int $arg_register
+    my $type_handlers = {
+        script => {
+            pre => sub {
+                add_wrapped(<<END_PIR);
+  ($arg_register,temp_code) = compiler(register_num, $argument)
+  register_num = $arg_register + 1
 END_PIR
-
-     if ($arg->{optional})
-     {
-       my $next_arg = $ii + 1;
-       push @pir_code, [ WRAP => <<END_PIR];
-  if argc < $next_arg goto $arg_default
+            },
+            post => sub {
+                add_inlined(<<END_PIR);
+  (\$I{$arg_register},\$P{$arg_register}) = __script_compile(\$P{${arg_register}})
+  (\$P{$arg_register}) = __pir_compile(\$I{$arg_register},\$P{${arg_register}})
 END_PIR
+              }
+        },
+        var => {
+            pre => sub {
 
-     }
+                # Using 'variable' means we have two registers we care about:
+                # $arg_register is the register of the resulting value
+                # $arg_register_varname is the register of the variable name.
 
-     push @pir_code, [ WRAP => <<END_PIR];
-  $argument = argv[$ii]
-END_PIR
-
-     if ($arg->{type} eq "variable")
-     {
-       # Using 'variable' means we have two registers we care about:
-       # $arg_register is the register of the resulting value
-       # $arg_register_varname is the register of the variable name.
-        
-       push @pir_code, [ WRAP => <<END_PIR];
+                add_wrapped(<<END_PIR);
   .local int ${arg_register}_varname
   (${arg_register}_varname,temp_code) = compiler(register_num, $argument)
   $arg_register = ${arg_register}_varname + 1
   register_num = $arg_register + 1
 END_PIR
-      push @pir_code, [ VAR => "temp_code" ];
-
-      push @pir_code, [ INLINE => <<END_PIR];
+            },
+            post => sub {
+                add_inlined(<<END_PIR);
   \$P{$arg_register} = __read(\$P{${arg_register}_varname})
 END_PIR
-
-      push @pir_code, [ WRAP => "  goto $arg_done\n"] ;
-
-     }
-     elsif ($arg->{type} eq "channel")
-     {
-       push @pir_code, [ WRAP => <<END_PIR];
+              }
+        },
+        channel => {
+            pre => sub {
+                add_wrapped(<<END_PIR);
   ($arg_register,temp_code) = compiler(register_num, $argument)
   register_num = $arg_register + 1
 END_PIR
-
-      push @pir_code, [ VAR => "temp_code" ];
-
-      push @pir_code, [ INLINE => <<END_PIR];
+            },
+            post => sub {
+                add_inlined(<<END_PIR);
   \$P{$arg_register} = __channel(\$P{$arg_register})
 END_PIR
-
-      push @pir_code, [ WRAP => "  goto $arg_done\n" ];
-     }
-     elsif ($arg->{type} eq "list")
-     {
-       push @pir_code, [ WRAP => <<END_PIR];
+              }
+        },
+        list => {
+            pre => sub {
+                add_wrapped(<<END_PIR);
   ($arg_register,temp_code) = compiler(register_num, $argument)
   register_num = $arg_register + 1
 END_PIR
-
-      push @pir_code, [ VAR => "temp_code" ];
-
-      push @pir_code, [ INLINE => <<END_PIR];
+            },
+            post => sub {
+                add_inlined(<<END_PIR);
   \$P{$arg_register} = __list(\$P{$arg_register})
 END_PIR
-
-      push @pir_code, [ WRAP => "  goto $arg_done\n" ];
-     }
-     elsif ($arg->{type} eq "string")
-     {
-       push @pir_code, [ WRAP => <<END_PIR];
+              }
+        },
+        int => {
+            pre => sub {
+                $type       = "TclInt";
+                $typequotes = '';
+                add_wrapped(<<END_PIR);
   ($arg_register,temp_code) = compiler(register_num, $argument)
   register_num = $arg_register + 1
 END_PIR
-
-      push @pir_code, [ VAR => "temp_code" ];
-
-      push @pir_code, [ WRAP => "  goto $arg_done\n" ];
-
-
-     }
-     elsif ($arg->{type} eq "integer")
-     {
-       $type = "TclInt";
-       undef $typequotes;
-       push @pir_code, [ WRAP => <<END_PIR];
-  ($arg_register,temp_code) = compiler(register_num, $argument)
-  register_num = $arg_register + 1
-END_PIR
-
-      push @pir_code, [ VAR => "temp_code" ];
-
-      push @pir_code, [ INLINE => <<END_PIR];
+            },
+            post => sub {
+                add_inlined(<<END_PIR);
   \$P{$arg_register} = __integer(\$P{$arg_register})
 END_PIR
+              }
+        },
+        string => {
+            pre => sub {
+                add_wrapped(<<END_PIR);
+  ($arg_register,temp_code) = compiler(register_num, $argument)
+  register_num = $arg_register + 1
+END_PIR
+            },
+            post => sub {
+                add_var('temp_code');
+              }
+        }
+    };
 
-      push @pir_code, [ WRAP => "  goto $arg_done\n" ];
+    add_wrapped(<<END_PIR);
+  .local pmc $argument
+  .local int $arg_register
+END_PIR
 
-     }
-     else
-     {
-       die "Invalid argument type '$arg->{type}' specified in $file\n";
-     }
+    if ( $arg->{optional} ) {
+        my $next_arg = $ii + 1;
+        add_wrapped(<<END_PIR);
+  if argc < $next_arg goto $arg_default
+END_PIR
 
-     push @pir_code, [ WRAP => <<END_PIR];
+    }
+
+    add_wrapped(<<END_PIR);
+  $argument = argv[$ii]
+END_PIR
+
+    my $pre  = $type_handlers->{ $arg->{type} }->{pre};
+    my $post = $type_handlers->{ $arg->{type} }->{post};
+
+    if ($pre) {
+        $pre->();
+        add_var('temp_code');
+    }
+    if ($post) { $post->() }
+
+    add_wrapped(<<END_PIR);
+  goto $arg_done
 $arg_default:
 END_PIR
 
-    if (defined $arg->{default})
-    {
-       push @pir_code, [ WRAP => <<END_PIR];
+    if ( defined $arg->{default} ) {
+        add_wrapped(<<END_PIR);
   $arg_register = register_num
   register_num = $arg_register + 1
 END_PIR
 
-       push @pir_code, [ INLINE => <<END_PIR];
+        add_inlined(<<END_PIR);
   \$P{$arg_register} = new .$type
   \$P{$arg_register} = $typequotes$arg->{default}$typequotes
 END_PIR
 
     }
-    else
-    {
-
-     push @pir_code, [ WRAP => <<END_PIR];
-# no default
-END_PIR
-
+    else {
+        add_wrapped("  #no default\n");
     }
 
-     push @pir_code, [ WRAP => <<END_PIR];
+    add_wrapped(<<END_PIR);
 $arg_done:
 END_PIR
 
-     $ii++;
-  }
+    $ii++;
+}
 
-  push @pir_code, [ WRAP => <<"END_PIR"];
+add_wrapped(<<END_PIR);
   inc register_num
   # Begin template code
 END_PIR
 
-  push @pir_code, [ INLINE => $template->{code} ];
+add_inlined( $template->{code} );
 
-  push @pir_code, [ WRAP => <<"END_PIR"];
+add_wrapped(<<"END_PIR");
   # End template code
 END_PIR
 
-  push @pir_code, [ WRAP => <<END_PIR];
-
+add_wrapped(<<"END_PIR");
 .return(register_num,pir_code)
 bad_args:
 END_PIR
 
-  if ($template->{bad_args})
-  {
+if ( $template->{bad_args} ) {
 
-    push @pir_code, [ WRAP => <<END_PIR];
+    add_inlined(<<END_PIR);
 .throw('$template->{bad_args}')
 END_PIR
 
-  }
-  else
-  {
-    # XXX need to deal with options that take values.
-    my $optstr = join (" ", map {
-      "?-" . $_->{name} . "?"
-    } @{$template->{options}}
-    );
-
-    my $argstr = join(" ", map {
-      my $display = $_->{name};
-      if ($_->{optional})
-      {
-        $display = "?$display?";
-      };
-      $display;
-    } @{$template->{args}}
-    );
-
-    my $combined ;
-   
-    if ($optstr)
-    {
-      $combined = " $optstr";
-    }
-    if ($argstr)
-    {
-      $combined .= " $argstr";
-    } 
- 
-    push @pir_code, [ WRAP => <<END_PIR];
-  .throw('wrong # args: should be "$template->{command}$combined"')
+}
+else {
+    my $usage_str = create_usage(@args_opts);
+    add_wrapped(<<END_PIR);
+  .throw('wrong # args: should be "$template->{command}$usage_str"')
 END_PIR
-  }
+}
 
-  push @pir_code, [ WRAP => ".end\n" ];
+add_wrapped(".end\n");
 
-  # Now dump out the code we've been accumulating.
-  foreach my $chunk (@pir_code)
-  {
-    if ($chunk->[0] eq "WRAP")
-    {
-      print $chunk->[1];
+# Now dump out the code we've been accumulating.
+foreach my $chunk (@pir_code) {
+    if ( $chunk->[0] eq "WRAP" ) {
+        print $chunk->[1];
     }
-    elsif ($chunk->[0] eq "INLINE")
-    {
-      foreach my $line (split/\n/, $chunk->[1])
-      {
-        $line =~ s/\\/\\\\/g;
-        $line =~ s/"/\\"/g;
-        $line =~ s/\\n/\\\\n/g;
-        if ($line =~ s/(.*?){(.*?)}//) {
-          print "  pir_code .= \"$1\"\n";
-          print "  \$S0 = $2\n";
-          print "  pir_code .= \$S0\n";
-          redo; # keep processing this line until we've gotten all the elements
+    elsif ( $chunk->[0] eq "INLINE" ) {
+        foreach my $line ( split /\n/, $chunk->[1] ) {
+            $line =~ s/\\/\\\\/g;
+            $line =~ s/"/\\"/g;
+            $line =~ s/\\n/\\\\n/g;
+            if ( $line =~ s/(.*?){(.*?)}// ) {
+                print "  pir_code .= \"$1\"\n";
+                print "  \$S0 = $2\n";
+                print "  pir_code .= \$S0\n";
+                redo
+                  ; # keep processing this line until we've gotten all the elements
+            }
+            else {
+                print "  pir_code .= \"$line\\n\"\n";
+            }
         }
-        else {
-          print "  pir_code .= \"$line\\n\"\n";
-        }
-      }
     }
-    else # VAR
+    else            # VAR
     {
-      print "  pir_code .= $chunk->[1]\n";
+        print "  pir_code .= $chunk->[1]\n";
     }
-  }
 }
 
 =head1 Utility Methods
 
 =head2 (min,max) = num_args($template)
 
-Given a template, figure out the minimum and maximum number of args required
+Given an argset, figure out the minimum and maximum number of args required
 for this builtin.
 
 =cut
 
 sub num_args {
-  my ($template) = shift;
+    my @args = @_;
 
-  my ($max,$min);
-  $min = $max = 0;
+    my ( $max, $min );
+    $min = $max = @args;
 
-  if ($template->{args})
-  {
-    my $args    = $template->{args};
-    $min = $max = @$args;
+    foreach my $arg (@args) {
+        $min-- if ( $arg->{optional} );
 
-    # Subtract out optional arguments...
-    foreach my $arg (@$args)
-    {
-      $min-- if ($arg->{optional});
+        # XXX this isn't quite right. Need to be more clever with options.
+        $max++ if ( $arg->{option} && $arg->{type} );
     }
-  }
 
-  if ($template->{options})
-  {
-    # Add in optional... options.
-    my $options = $template->{options};
-    foreach my $option (@$options)
-    {
-      $max++;   # the option
-      if ($option->{arg})
-      {
-        $max++; # its value
-      }
-    }
-  }
-
-  return ($min,$max);
+    return ( $min, $max );
 }
 
-=head1 BUGS
+sub parse_usage {
+    my $usage = shift;
 
-Doesn't support subcommands. Or anything other than [incr], really.
+    my @results;
+
+    while ($usage) {
+        my $arg;
+        $usage =~ s/^ +//;
+        next unless $usage;
+        if (
+            $usage =~ s{
+      ^
+      (\??)     # literal, optional ?
+      (-?)      # option marker
+      (\w+)     # name
+      (?:
+        :       # literal :
+        (int | string | var | list | channel | script)
+      )?
+      (?:
+        =
+        ([^?]*)  # default value
+      )?
+      (?:\1)
+    }{}x
+          )
+        {
+            $arg->{optional} = ( $1 ? 1 : 0 );
+            $arg->{option}   = ( $2 ? 1 : 0 );
+            $arg->{name}     = $3;
+            $arg->{type} = ( $4 ? $4 : ( $arg->{option} ? undef: "string" ) );
+            $arg->{default} = ( defined($5) ? $5 : undef );
+            if ( $arg->{option} && !$arg->{optional} ) {
+                die "Optionals need to be optional.\n";
+            }
+        }
+        else {
+            die "invalid usage '$usage'\n";
+        }
+        push @results, $arg;
+    }
+
+    return @results;
+}
+
+# the usage from the .tmt file is not the same as the generated error
+# messages: construct a user-visible usage.
+
+sub create_usage {
+    my @args = @_;
+
+    my @results;
+
+    foreach my $arg (@args) {
+        my $usage = $arg->{name};
+        if ( $arg->{option} ) {
+            $usage = "-$usage";
+            if ( defined( $arg->{type} ) ) {
+                $usage = "$usage $arg->{type}";
+            }
+        }
+        $usage = "?$usage?" if ( $arg->{optional} );
+        push @results, $usage;
+    }
+
+    my $result = join( " ", @results );
+    $result = " $result" if @results;
+    return $result;
+}
+
+sub add_inlined { push @pir_code, [ INLINE => $_ ] for @_; }
+sub add_wrapped { push @pir_code, [ WRAP   => $_ ] for @_; }
+sub add_var     { push @pir_code, [ VAR    => $_ ] for @_; }
+
+=head1 TODO
+
+Doesn't support subcommands. 
 
 =cut
 

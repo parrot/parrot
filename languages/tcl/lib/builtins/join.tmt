@@ -1,18 +1,6 @@
 {
   command => 'join',
-  args =>
-  [
-    {
-      name     => 'list',
-      type     => 'list',
-    },
-    {
-      name     => 'joinString',
-      type     => 'string',
-      optional => 1,
-      default  => " ",
-    }
-  ],
+  usage => "list:list ?joinString= ?",
   code => <<'END_PIR',
 
 $S{register_joinString} = $P{register_joinString}
