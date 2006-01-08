@@ -1,5 +1,5 @@
 #! perl
-# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2001-2006 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 use strict;
@@ -11,8 +11,7 @@ use Parrot::Config;
 use Cwd;
 
 our ($MSWin32);
-
-$MSWin32 = 1 if ($^O =~ m!MSWin32!);
+$MSWin32 = 1 if $^O =~ m!MSWin32!;
 
 =head1 NAME
 
@@ -208,8 +207,6 @@ done:
 .end
 CODE
 }
-
-
 
 # Test remove on a file
 pir_output_is(<<'CODE', <<"OUT", "Test rm call in a file");
