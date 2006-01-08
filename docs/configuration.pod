@@ -1,6 +1,8 @@
 # Copyright: 2004 The Perl Foundation. All Rights Reserved.
 # $Id$
 
+=pod
+
 =head1 NAME
 
 docs/configuration.pod - Parrot Configuration System
@@ -256,22 +258,14 @@ entries are only used e.g. for Makefile creation.
 
 =back
 
-=head1 SEE ALSO
-
-=over 4
-
-=item L<Parrot::Configure::RunSteps>
-
-=item L<Parrot::Configure::Step>
-
-=item F<config/init/data.pm>
-
-=back
-
 =head1 HISTORY
 
 The Parrot configuration system was created by Brent Dax and has been heavily
 mangled by Joshua Hoblitt.
+
+=head1 SEE ALSO
+
+L<Parrot::Configure>, L<Parrot::Configure::Data>, L<Parrot::Configure::Step>, L<Parrot::Configure::Step::Base>
 
 =cut
 
