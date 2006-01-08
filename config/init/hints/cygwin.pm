@@ -25,7 +25,8 @@ sub runstep
         ld_share_flags      => '-shared',
         ld_load_flags       => '-shared',
         libs                => $libs,
-        libparrot_is_shared => 1
+        has_dynamic_linking => 1,
+        parrot_is_shared    => 1
     );
 
     # We need to define inet_aton on Cygwin.  The contents of the --define
