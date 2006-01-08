@@ -129,7 +129,7 @@ imcc_version(void)
     if (PARROT_REVISION != rev) {
 	printf( "Warning: used Configure.pl revision %d!\n", rev );
     }
-    printf("Copyright (C) 2001-2005 The Perl Foundation.  All Rights Reserved.\n\
+    printf("Copyright (C) 2001-2006 The Perl Foundation.  All Rights Reserved.\n\
 \n\
 Parrot may be copied only under the terms of either the Artistic License or the\n\
 GNU General Public License, which may be found in the Parrot source kit.\n\
