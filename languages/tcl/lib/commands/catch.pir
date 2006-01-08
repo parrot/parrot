@@ -32,7 +32,6 @@
 
 non_ok:
   .catch()
-  null P5
   .get_return_code(retval)
   .get_message(code_retval)
 
