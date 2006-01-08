@@ -475,7 +475,8 @@ INSTALLABLEPDB      = $(CUR_DIR)/installable_pdb$(EXE)
 
 # Libraries
 LIBPARROT_STATIC  = ${blib_dir}${slash}${libparrot_static}
-LIBPARROT_SHARED  = ${blib_dir}${slash}${libparrot_shared}
+#CONDITIONED_LINE(win32):LIBPARROT_SHARED  = ${libparrot_shared}
+#INVERSE_CONDITIONED_LINE(win32):LIBPARROT_SHARED  = ${blib_dir}${slash}${libparrot_shared}
 
 # This line controls whether a static or shared library is built
 LIBPARROT         = ${libparrot}
@@ -697,15 +698,15 @@ runtime/parrot/include/config.fpmc : myconfig config_lib.pasm $(MINIPARROT)
 	@echo Invoking Parrot to generate runtime/parrot/include/config.fpmc --cross your fingers
 	$(MINIPARROT) config_lib.pasm > $@
 
-parrot.def :
+parrot.def : tools/build/parrotdef.pl
 	$(PERL) tools/build/parrotdef.pl
 
 $(PARROT) : $(IMCC_DIR)/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
 	lib/Parrot/OpLib/core.pm $(SRC_DIR)/parrot_config$(O) \
 	$(MINIPARROT) ${parrot_exe_def}
-	$(LINK) ${ld_out}$@ $(LINKFLAGS) $(LINK_DYNAMIC) ${ld_parrot_exe_def} \
+	$(LINK) ${ld_out}$@ $(LINKFLAGS) $(LINK_DYNAMIC) \
 	$(IMCC_DIR)/main$(O) ${rpath_blib} $(ALL_PARROT_LIBS) \
-	$(SRC_DIR)/parrot_config$(O)
+	$(SRC_DIR)/parrot_config$(O) ${ld_parrot_exe_def}
 #
 # TODO build the real miniparrot
 #
@@ -773,11 +774,11 @@ $(LIBPARROT_STATIC) : $(O_FILES)
 	$(AR_CR) ${ar_out}$@ ${ar_extra} $(O_FILES)
 	$(RANLIB) $@
 
-$(LIBPARROT_SHARED) : $(O_FILES)
+$(LIBPARROT_SHARED) : $(O_FILES) ${parrot_dll_def}
 	$(MKDIR) ${blib_dir}
 	$(RM_F) $(LIBPARROT_SHARED)
 	$(LD) $(LD_SHARE_FLAGS) $(LDFLAGS) ${ld_out}$@ ${libparrot_soname} \
-	$(O_FILES) $(C_LIBS) $(ICU_SHARED)
+	$(O_FILES) $(C_LIBS) $(ICU_SHARED) ${ld_parrot_dll_def}
 #CONDITIONED_LINE(libparrot_shared_alias):	( cd ${blib_dir} ; ln -sf ${libparrot_shared} ${libparrot_shared_alias} )
 
 
@@ -790,13 +791,11 @@ $(SRC_DIR)/pdb$(O) : $(GENERAL_H_FILES)
 $(PDB) : $(SRC_DIR)/pdb$(O) $(LIBPARROT)
 	$(LINK) ${ld_out}$@ \
 	$(SRC_DIR)/pdb$(O) \
-	$(SRC_DIR)/null_config$(O) \
 	$(LINKFLAGS) ${rpath_blib} $(ALL_PARROT_LIBS)
 
 $(INSTALLABLEPDB) : $(SRC_DIR)/pdb$(O) $(LIBPARROT)
 	$(LINK) ${ld_out}$@ \
 	$(SRC_DIR)/pdb$(O) \
-	$(SRC_DIR)/install_config$(O) \
 	$(LINKFLAGS) $(ALL_PARROT_LIBS)
 
 #
@@ -808,13 +807,11 @@ $(SRC_DIR)/disassemble$(O) : $(GENERAL_H_FILES)
 $(DIS) : $(SRC_DIR)/disassemble$(O) $(LIBPARROT)
 	$(LINK) ${ld_out}$@ \
 	$(SRC_DIR)/disassemble$(O) \
-	$(SRC_DIR)/null_config$(O) \
 	$(LINKFLAGS) ${rpath_blib} $(ALL_PARROT_LIBS)
 
 $(INSTALLABLEDIS) : $(SRC_DIR)/disassemble$(O) $(LIBPARROT)
 	$(LINK) ${ld_out}$@ \
 	$(SRC_DIR)/disassemble$(O) \
-	$(SRC_DIR)/install_config$(O) \
 	$(LINKFLAGS) $(ALL_PARROT_LIBS)
 
 #
@@ -824,13 +821,11 @@ $(INSTALLABLEDIS) : $(SRC_DIR)/disassemble$(O) $(LIBPARROT)
 $(PDUMP) : $(SRC_DIR)/pdump$(O) $(SRC_DIR)/packdump$(O) $(LIBPARROT)
 	$(LINK) ${ld_out}$@ \
 	$(SRC_DIR)/pdump$(O) \
-	$(SRC_DIR)/null_config$(O) \
 	$(SRC_DIR)/packdump$(O) $(LINKFLAGS) ${rpath_blib} $(ALL_PARROT_LIBS)
 
 $(INSTALLABLEPDUMP) : $(SRC_DIR)/pdump$(O) $(SRC_DIR)/packdump$(O) $(LIBPARROT)
 	$(LINK) ${ld_out}$@ \
 	$(SRC_DIR)/pdump$(O) \
-	$(SRC_DIR)/install_config$(O) \
 	$(SRC_DIR)/packdump$(O) $(LINKFLAGS) $(ALL_PARROT_LIBS)
 
 
@@ -838,13 +833,11 @@ $(INSTALLABLEPDUMP) : $(SRC_DIR)/pdump$(O) $(SRC_DIR)/packdump$(O) $(LIBPARROT)
 $(PINFO) : $(SRC_DIR)/pbc_info$(O) $(LIBPARROT)
 	$(LINK) ${ld_out}$@ \
 	$(SRC_DIR)/pbc_info$(O) \
-	$(SRC_DIR)/null_config$(O) \
 	$(LINKFLAGS) ${rpath_blib} $(ALL_PARROT_LIBS)
 
 $(INSTALLABLEPINFO) : $(SRC_DIR)/pbc_info$(O) $(LIBPARROT)
 	$(LINK) ${ld_out}$@ \
 	$(SRC_DIR)/pbc_info$(O) \
-	$(SRC_DIR)/install_config$(O) \
 	$(LINKFLAGS) $(ALL_PARROT_LIBS)
 
 #

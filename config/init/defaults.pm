@@ -89,6 +89,8 @@ sub runstep
         ld_load_flags     => $Config{lddlflags},
         parrot_exe_def    => '',
         ld_parrot_exe_def => '',
+        parrot_dll_def    => '',
+        ld_parrot_dll_def => '',
 
         libs => $Config{libs},
 

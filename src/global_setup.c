@@ -28,21 +28,69 @@ I<What are these global variables?>
 /* These functions are defined in the auto-generated file core_pmcs.c */
 extern void Parrot_initialize_core_pmcs(Interp *interp);
 
-static void
-create_config_hash(Interp *interpreter, PMC *iglobals)
-{
-    STRING *config = parrot_get_config_string(interpreter);
-    PMC *hash;
+static const unsigned char* parrot_config_stored = NULL;
+static unsigned int parrot_config_size_stored = 0;
 
-    if (config) {
-        hash = Parrot_thaw(interpreter, config);
+
+/*
+
+=item C<void
+Parrot_set_config_hash_internal (const unsigned char* parrot_config,
+                                 unsigned int parrot_config_size)>
+
+Called by Parrot_set_config_hash with the serialised hash which
+will be used in subsequently created Interpreters
+
+=cut
+
+*/
+
+void
+Parrot_set_config_hash_internal (const unsigned char* parrot_config,
+                                 unsigned int parrot_config_size)
+{
+    parrot_config_stored      = parrot_config;
+    parrot_config_size_stored = parrot_config_size;
+}
+
+/*
+
+=item C<void parrot_set_config_hash_interpreter (Interp* interpreter)>
+
+
+Used internally to associate the config hash with an Interpreter
+using the last registered config data.
+
+=cut
+
+*/
+
+static void parrot_set_config_hash_interpreter (Interp* interpreter)
+{
+    PMC *iglobals = interpreter->iglobals;
+
+    PMC *config_hash = NULL;
+
+    if (parrot_config_size_stored > 1)
+    {
+        STRING *config_string =
+            string_make_direct(interpreter,
+                               parrot_config_stored, parrot_config_size_stored,
+                               PARROT_DEFAULT_ENCODING, PARROT_DEFAULT_CHARSET,
+                               PObj_external_FLAG|PObj_constant_FLAG);
+
+        config_hash = Parrot_thaw(interpreter, config_string);
     }
     else
-        hash = pmc_new(interpreter, enum_class_Hash);
-    VTABLE_set_pmc_keyed_int(interpreter, iglobals,
-            (INTVAL) IGLOBALS_CONFIG_HASH, hash);
+    {
+        config_hash = pmc_new(interpreter, enum_class_Hash);
+    }
 
+    VTABLE_set_pmc_keyed_int(interpreter, iglobals,
+                             (INTVAL) IGLOBALS_CONFIG_HASH, config_hash);
 }
+
+
 /*
 
 =item C<void init_world(Interp *interpreter)>
@@ -91,10 +139,9 @@ init_world(Interp *interpreter)
     PMC_data(self) = interpreter;
     VTABLE_set_pmc_keyed_int(interpreter, iglobals,
             (INTVAL) IGLOBALS_INTERPRETER, self);
-    /*
-     * create runtime config hash
-     */
-    create_config_hash(interpreter, iglobals);
+
+    parrot_set_config_hash_interpreter(interpreter);
+
     /*
      * HLL support
      */
@@ -120,6 +167,7 @@ init_world(Interp *interpreter)
     VTABLE_set_pmc_keyed_int(interpreter, iglobals,
             IGLOBALS_DYN_LIBS, pmc);
 }
+
 
 /*
 

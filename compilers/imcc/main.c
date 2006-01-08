@@ -24,7 +24,12 @@
 
 static int load_pbc, run_pbc, write_pbc, pre_process, pasm_file;
 static char optimizer_opt[20];
+
+#ifdef MSVC
+__declspec(dllimport) FILE *yyin;
+#else
 extern FILE *yyin;
+#endif
 
 static void
 usage(FILE* fp)
@@ -455,7 +460,12 @@ main(int argc, char * argv[])
     char *sourcefile;
     const char *output_file;
 
-    Interp *interp = Parrot_new(NULL);
+    Interp *interp;
+
+    Parrot_set_config_hash();
+
+    interp = Parrot_new(NULL);
+
 
     Parrot_init(interp);
 

@@ -245,6 +245,40 @@ my @funcnames = qw(
 	Parrot_make_COW_reference
 	Parrot_switch_to_cs
 	PackFile_Segment_new_seg
+	PackFile_fixup_subs
+	PackFile_pack
+	PackFile_pack_size
+	line
+	imc_cleanup
+	imc_compile_all_units
+	imc_compile_all_units_for_ast
+	IMCC_ast_compile
+	emit_open
+	IMCC_push_parser_state
+	PackFile_new
+	IMCC_info
+	Parrot_set_run_core
+	Parrot_exit
+	IMCC_fatal
+	IMCC_ast_init
+	imcc_init
+	Parrot_get_runtime_prefix
+	Parrot_set_debug
+	Parrot_set_trace
+	Parrot_set_flag
+	longopt_get
+	Parrot_config_revision
+	Parrot_revision
+	Parrot_set_config_hash_internal
+	yyin
+	yydebug
+	yylex
+	yyparse
+	make_interpreter
+	PackFile_unpack
+	Parrot_stat_info_intval
+	PackFile_add_segment
+	Parrot_new_debug_seg
 );
 push @funcnames, "PMCNULL	DATA";
 push @funcnames, "Parrot_base_vtables	DATA";

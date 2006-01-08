@@ -22,6 +22,7 @@ sub runstep
     my $is_bcc   = grep { $cc eq $_ } (qw(bcc32 bcc32.exe));
 
     $conf->data->set(
+        win32             => 1,
         PQ                => '"',
         make_c            => '$(PERL) -e "chdir shift @ARGV; system \'$(MAKE)\', @ARGV; exit $$? >> 8;"',
         ncilib_link_extra => '-def:src/libnci_test.def',
@@ -61,8 +62,13 @@ sub runstep
             slash                => '\\',
             blib_dir             => 'blib\\lib',
             ccflags              => $ccflags,
-            ccwarn               => ''
+            ccwarn               => '',
+            has_dynamic_linking  => 1
         );
+        
+        # We'll build shared by default.
+        $conf->data->set('parrot_is_shared') = 1
+            unless defined($conf->data->get('parrot_is_shared'));
 
         # 'link' needs to be link.exe, not cl.exe.
         # This makes 'link' and 'ld' the same.
@@ -75,11 +81,19 @@ sub runstep
             $conf->data->set(linkflags => $linkflags);
         }
 
-        # We need to build a .def file to export parrot.exe symbols.
-        $conf->data->set(
-            ld_parrot_exe_def => '-def:parrot.def',
-            parrot_exe_def    => 'parrot.def'
-        );
+        # We need to build a .def file to export parrot.exe symbols in a
+        # static build and similarly to the shared lib otherwise.
+        if ($conf->data->get('parrot_is_shared')) {
+            $conf->data->set(
+                ld_parrot_dll_def => '-def:parrot.def',
+                parrot_dll_def    => 'parrot.def'
+            );
+        } else {
+            $conf->data->set(
+                ld_parrot_exe_def => '-def:parrot.def',
+                parrot_exe_def    => 'parrot.def'
+            );
+        }
 
         # When building dynclasses we need to flag up the need to
         # mark shared variables with __declspec(dllimport).
@@ -109,7 +123,8 @@ sub runstep
             slash                => '\\',
             blib_dir             => 'blib\\lib',
             ccflags              => $ccflags,
-            ccwarn               => ''
+            ccwarn               => '',
+            has_dynamic_linking  => 1,
         );
 
         # 'link' needs to be xilink.exe, not icl.exe.

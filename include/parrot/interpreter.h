@@ -431,6 +431,8 @@ Interp *make_interpreter(Interp * parent, Interp_flags);
 void Parrot_init(Interp *);
 void Parrot_destroy(Interp *);
 
+void Parrot_set_config_hash_internal(const unsigned char*, unsigned int);
+
 INTVAL interpinfo(Interp *interpreter, INTVAL what);
 PMC*   interpinfo_p(Interp *interpreter, INTVAL what);
 STRING*interpinfo_s(Interp *interpreter, INTVAL what);

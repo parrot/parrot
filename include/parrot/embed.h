@@ -62,6 +62,11 @@ void Parrot_exit(int status);
 
 void Parrot_run_native(Parrot_Interp interpreter, native_func_t func);
 
+/* Parrot_set_config_hash exists in *_config.o (e.g install_config.o),
+   so if you make this call then you will need to link with it in
+   addition to libparrot */
+void Parrot_set_config_hash(void);
+
 int Parrot_revision(void);
 
 #endif /* PARROT_EMBED_H_GUARD */
