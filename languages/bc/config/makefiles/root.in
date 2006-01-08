@@ -10,7 +10,8 @@ CP             = ${cp}
 PYTHON_RUNTIME_FILES = \
     python/lib/bc/BcLexer.py \
     python/lib/bc/BcParser.py \
-    python/lib/bc/BcTreeWalker.py
+    python/lib/bc/BcTreeWalker.py \
+    python/lib/antlr_past2pir_past/AntlrPast2PirPastTreeWalker.py
 
 # the default target
 all: build 
@@ -46,16 +47,16 @@ build:
 maintain: $(PYTHON_RUNTIME_FILES)
 
 # BcLexer.py will be created too
-# TODO: antlr2past shouldn't need BcLexerTokenTypes.txt
-$(PYTHON_RUNTIME_FILES): grammar/bc_python.g grammar/antlr2past.g
+# TODO: antlr_past2pir_past shouldn't need BcLexerTokenTypes.txt
+$(PYTHON_RUNTIME_FILES): grammar/bc_python.g grammar/antlr_past2pir_past.g
 	antlr -o python/lib/bc grammar/bc_python.g
-	$(CP) python/lib/bc/BcLexerTokenTypes.txt python/lib/antlr2past
-	antlr -o python/lib/antlr2past grammar/antlr2past.g
+	$(CP) python/lib/bc/BcLexerTokenTypes.txt python/lib/antlr_past2pir_past
+	antlr -o python/lib/antlr_past2pir_past grammar/antlr_past2pir_past.g
 
 clean:
 	$(RM_RF) \
     "python/lib/bc/*.pyc" \
-    "python/lib/antlr/*.pyc" \
+    "python/lib/antlr_past2pir_past/*.pyc" \
     "t/*.bc" "t/*.pir" "t/*.posix_out" "t/*.parrot_out"
 
 realclean: clean

@@ -1,13 +1,9 @@
 // Copyright: 2005 The Perl Foundation.  All Rights Reserved.
 // $Id$
 
-// antlr2past.g is a misnomer. antlr_past2pir_past.g would be a better fit
-
-header "Antlr2PastTreeWalker.__init__" 
+header "AntlrPast2PirPastTreeWalker.__init__" 
 {
   self.reg       = 10;  // counter for unlimited number of PMC registers
-  self.label_num = 0;  // counter for generation jump labels
-  self.level     = 0;  // for indentation
 }
 
 //-----------------------------------------------------------------------------
@@ -22,7 +18,7 @@ options
 //----------------------------------------------------------------------------
 // Transform ANTLR PAST to PIR that sets up PAST
 //----------------------------------------------------------------------------
-class Antlr2PastTreeWalker extends TreeParser;
+class AntlrPast2PirPastTreeWalker extends TreeParser;
 
 options
 {
