@@ -395,6 +395,11 @@ parrot_split_path_ext(Interp* interpreter, STRING *in,
     if (pos_sl == -1)
 	pos_sl = CHARSET_RINDEX(interpreter, in, slash2, len);
     pos_dot = CHARSET_RINDEX(interpreter, in, dot, len);
+    
+    /* XXX directory parrot-0.4.1 or such */
+    if (pos_dot != -1 && isdigit( ((char*)in->strstart)[pos_dot+1]))
+        pos_dot = -1;
+
     ++pos_dot;
     ++pos_sl;
     if (pos_sl && pos_dot ) {
