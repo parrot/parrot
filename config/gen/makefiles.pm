@@ -112,9 +112,9 @@ sub makefiles
         conditioned_lines               => 1
     );
     genfile(
-        'config/gen/makefiles/bc.in' => 'languages/bc/Makefile',
-        commentType                  => '#',
-        replace_slashes              => 1
+        'languages/bc/config/makefiles/root.in' => 'languages/bc/Makefile',
+        commentType                             => '#',
+        replace_slashes                         => 1
     );
     genfile(
         'config/gen/makefiles/befunge.in' => 'languages/befunge/Makefile',
