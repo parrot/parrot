@@ -136,7 +136,6 @@ add_inlined(<<END_PIR);
   __script_compile = find_global '_Tcl', 'compile'
   .local pmc __pir_compile
   __pir_compile = find_global '_Tcl', 'pir_compiler'
-  trace 1
 END_PIR
 
 # Now, grab each arg off the list and compile it, handling defaults, etc.
