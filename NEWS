@@ -2,19 +2,21 @@
 
 New in 0.4.1
 
-- Shootout examples
-- OS pmc started (mkdir,cd,cwd,rm,umask,stat)
+- Installation: 'make install' is using standard locations now
+  (/usr/local is the default --prefix)
+- Produce static and shared libraries on some systems
 - Configure system rearragement
-- Installation improvements
-- Produce shared library versions as well as static versions
-- Add support for octal number constants
+- OS pmc started (mkdir,cd,cwd,rm,umask,stat)
+- Shootout examples
 - Test files are now testable with 'prove'
 - Smoke (and smokej) outputs progress 
 - PIR supports: I = A < B (>,<=,>=,==,!=)
+- Add support for octal number constants
 - partcl updates:
   - almost finish [string]; start [file]
   - add build tool for generating inline'd tcl builtins from templates.
-- Jako updates: NCI, subroutines, global variables and constants all work. (Gregor)
+- Jako updates: NCI, subroutines, global variables and constants all work. 
+  (Gregor)
 
 New in 0.4.0
 

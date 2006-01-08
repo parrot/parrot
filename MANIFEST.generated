@@ -11,7 +11,7 @@ pbc_info                                          [main]bin
 pbc_merge                                         [main]bin
 blib/lib/libparrot.a                              [main]lib
 blib/lib/libparrot.so                             [main]lib
-blib/lib/libparrot.so.0.4.0                       [main]lib
+blib/lib/libparrot.so.0.4.1                       [main]lib
 docs/ops/bit.pod                                  [main]doc
 docs/ops/cmp.pod                                  [main]doc
 docs/ops/core.pod                                 [main]doc
