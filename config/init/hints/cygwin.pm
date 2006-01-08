@@ -21,10 +21,11 @@ sub runstep
     # If this later causes problems, it might be worth revisiting.
     # A. Dougherty 9/9/2002
     $conf->data->set(
-        ld             => 'gcc',
-        ld_share_flags => '-shared',
-        ld_load_flags  => '-shared',
-        libs           => $libs,
+        ld                  => 'gcc',
+        ld_share_flags      => '-shared',
+        ld_load_flags       => '-shared',
+        libs                => $libs,
+        libparrot_is_shared => 1
     );
 
     # We need to define inet_aton on Cygwin.  The contents of the --define

@@ -63,7 +63,9 @@ sub runstep {
 
     $conf->data->set(
         libparrot_ldflags => ($parrot_is_shared)
-        ? '-L' . $conf->data->get('blib_dir') . ' -lparrot'
+        ? '-L' . $conf->data->get('build_dir')
+               . $conf->data->get('slash')
+               . $conf->data->get('blib_dir') . ' -lparrot'
         : $conf->data->get('libparrot')
     );
 
