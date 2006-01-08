@@ -154,16 +154,41 @@ open X, ">xpto";
 print X "xpto";
 close X;
 
-my $stat = join("\n",stat("xpto"))."\n";
-
+my $stat;
 
 SKIP: {
   skip "stat not available on Win 32 yet", 1 if $MSWin32;
 
- TODO: {
-    local $TODO = "stat test under cygwin needs work" if $cygwin;
-
+  if ($cygwin) {
+    # Skip inode number
+    my @s = stat('xpto');
+    $stat = join("\n",$s[0],@s[2..12])."\n";
     pir_output_is(<<'CODE', $stat, "Test OS.stat");
+.sub main :main
+        $P1 = new .OS
+        $S1 = "xpto"
+        $P2 = $P1."stat"($S1)
+
+        $I1 = 0
+loop:
+        $S1 = $P2[$I1]
+        print $S1
+        print "\n"
+        $I1 += 1
+        if $I1 == 1 goto inc
+        if $I1 == 13 goto done
+        goto loop
+inc:
+        $I1 += 1
+        goto loop
+
+done:
+        end
+.end
+CODE
+} else {
+  $stat = join("\n",stat("xpto"))."\n";
+  pir_output_is(<<'CODE', $stat, "Test OS.stat");
 .sub main :main
         $P1 = new .OS
         $S1 = "xpto"
@@ -181,22 +206,51 @@ done:
         end
 .end
 CODE
-  }
+
+}
 }
 
 
 # test lstat
 
-my $lstat = join("\n",lstat("xpto"))."\n";
+my $lstat;
+
+
 
 
 SKIP: {
   skip "lstat not available on Win 32 yet", 1 if $MSWin32;
 
- TODO: {
-    local $TODO = "stat test under cygwin needs work" if $cygwin;
+  if ($cygwin) {
+    # Skip inode number
+    my @s = stat('xpto');
+    $stat = join("\n",$s[0],@s[2..12])."\n";
+    pir_output_is(<<'CODE', $stat, "Test OS.lstat");
+.sub main :main
+        $P1 = new .OS
+        $S1 = "xpto"
+        $P2 = $P1."lstat"($S1)
 
-    pir_output_is(<<'CODE', $lstat, "Test OS.lstat");
+        $I1 = 0
+loop:
+        $S1 = $P2[$I1]
+        print $S1
+        print "\n"
+        $I1 += 1
+        if $I1 == 1 goto inc
+        if $I1 == 13 goto done
+        goto loop
+inc:
+        $I1 += 1
+        goto loop
+
+done:
+        end
+.end
+CODE
+  } else {
+    $lstat = join("\n",lstat("xpto"))."\n";
+  pir_output_is(<<'CODE', $lstat, "Test OS.lstat");
 .sub main :main
         $P1 = new .OS
         $S1 = "xpto"
@@ -216,6 +270,7 @@ done:
 CODE
   }
 }
+
 
 # Test remove on a file
 pir_output_is(<<'CODE', <<"OUT", "Test rm call in a file");
