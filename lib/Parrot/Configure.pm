@@ -1,20 +1,36 @@
 # Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
+=pod
+
 =head1 NAME
 
-Parrot::Configure::RunSteps - Configuration Steps
+Parrot::Configure - Conducts the execution of Configuration Steps
+
+=head1 SYNOPSIS
+
+    use Parrot::Configure;
+
+    my $conf = Parrot::Configure->new;
+    my $data = $conf->data;
+    my $options = $conf->options;
+    my @steps = $conf->steps;
+    $conf->add_steps(@steps);
+    $conf->runsteps;
 
 =head1 DESCRIPTION
 
-This module lists, in order, the configuration steps that will be run by
-F<Configure.pl>. It should be edited when adding a new step. For more
-information on Parrot's configuration system, and how to add new steps,
-see F<docs/configuration.pod>.
+This module provides provides a mean for registering, executing, and
+coordinating one or more Configuration steps.  Please see
+F<docs/configuration.pod> for further details about the configuration
+framework.
 
-=head2 Functions
+=head1 USAGE
 
-=over 4
+=head2 Import Parameters
+
+This module accepts no arguments to it's C<import> method and exports no
+I<symbols>.
 
 =cut
 
@@ -25,9 +41,17 @@ use strict;
 use lib qw(config);
 use Parrot::Configure::Data;
 
-=item C<new()>
+=head2 Methods
 
-Basic constructor.  Accepts no arguments.
+=head3 Constructors
+
+=over 4
+
+=item * C<new()>
+
+Basic constructor.
+
+Accepts no arguments and returns a L<Parrot::Configure> object.
 
 =cut
 
@@ -46,10 +70,18 @@ sub new
     return $self;
 }
 
-=item C<data()>
+=back
 
-Returns the L<Parrot::Configure::Data> object used to contain configuration
-data.
+=head3 Object Methods
+
+=over 4
+
+=item * C<data()>
+
+Provides access to a L<Parrot::Configure::Data> object intended to contain
+initial and discovered configuration data.
+
+Accepts no arguments and returns a L<Parrot::Configure::Data> object.
 
 =cut
 
@@ -60,9 +92,12 @@ sub data
     return $self->{data};
 }
 
-=item C<options()>
+=item * C<options()>
 
-Returns the L<Parrot::Configure::Data> object used to contain CLI option data.
+Provides access to a L<Parrot::Configure::Data> object intended to contain CLI
+option data.
+
+Accepts no arguments and returns a L<Parrot::Configure::Data> object.
 
 =cut
 
@@ -73,10 +108,12 @@ sub options
     return $self->{options};
 }
 
-=item C<steps()>
+=item * C<steps()>
 
-Returns a list of registered configuration steps in list context or an arrayref
-to a list of configuration steps in scalar context.
+Provides a list of registered steps.
+
+Accepts no arguments and returns a list in list context or an arrayref in
+scalar context.
 
 =cut
 
@@ -87,10 +124,11 @@ sub steps
     return wantarray ? @{$self->{steps}} : $self->{steps};
 }
 
-=item C<add_steps()>
+=item * C<add_steps()>
 
-Registers a list of steps to be run.  Returns the object this method was
-invoked on.
+Registers a new step to be run at the end of the execution queue.
+
+Accepts a list and returns a L<Parrot::Configure> object.
 
 =cut
 
@@ -105,9 +143,13 @@ sub add_steps
     return $self;
 }
 
-=item C<runsteps()>
+=item * C<runsteps()>
 
-Loops over the configuration steps, running each one in turn.
+Sequentially executes step in the order they were registered.  The invoking
+L<Parrot::Configure> object is passed as the first argument to each steps
+C<runstep()> method.
+
+Accepts no arguments and returns a L<Parrot::Configure::Data> object.
 
 =cut
 
@@ -164,15 +206,19 @@ sub runsteps
 
 =back
 
+=head1 CREDITS
+
+The L</runsteps()> method is largely based on code written by Brent
+Royal-Gordon C<brent@brentdax.com>.
+
+=head1 AUTHOR
+
+Joshua Hoblitt C<jhoblitt@cpan.org>
+
 =head1 SEE ALSO
 
-=over 4
-
-=item C<Parrot::Configure::Step>
-
-=item F<docs/configuration.pod>
-
-=back
+F<docs/configuration.pod>, L<Parrot::Configure::Data>,
+L<Parrot::Configure::Step>, L<Parrot::Configure::Step::Base>
 
 =cut
 
