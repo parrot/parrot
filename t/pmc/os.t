@@ -6,15 +6,13 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test;
+use Parrot::Test tests => 8;
 use Parrot::Config;
 use Cwd;
 
-if ($^O =~ m!MSWin32!) {
-  plan skip_all => 'win32 implementation missing'
-} else {
-  plan tests => 8
-}
+our ($MSWin32);
+
+$MSWin32 = 1 if ($^O =~ m!MSWin32!);
 
 =head1 NAME
 
@@ -38,7 +36,10 @@ END {
 
 # test 'cwd'
 my $cwd = getcwd;
-pir_output_is(<<'CODE', <<"OUT", "Test cwd");
+SKIP: {
+  skip "cwd not available yet under windows", 1 if $MSWin32;
+
+  pir_output_is(<<'CODE', <<"OUT", "Test cwd");
 .sub main :main
         $P1 = new .OS
         $S1 = $P1."cwd"()
@@ -49,7 +50,7 @@ pir_output_is(<<'CODE', <<"OUT", "Test cwd");
 CODE
 $cwd
 OUT
-
+}
 
 
 #  TEST chdir
@@ -57,7 +58,10 @@ chdir "src";
 my $upcwd = getcwd;
 chdir "..";
 
-pir_output_is(<<'CODE', <<"OUT", "Test chdir");
+SKIP: {
+  skip "cwd and chdir not available on Win 32 yet", 1 if $MSWin32;
+
+  pir_output_is(<<'CODE', <<"OUT", "Test chdir");
 .sub main :main
         $P1 = new .OS
 
@@ -81,14 +85,18 @@ CODE
 $upcwd
 $cwd
 OUT
-
+}
 
 # Test mkdir
 
 my $xpto = $upcwd;
 $xpto =~ s/src([\/\\]?)$/xpto$1/;
 
-pir_output_is(<<'CODE', <<"OUT", "Test mkdir");
+
+SKIP: {
+  skip "cwd, mkdir and chdir not available on Win 32 yet", 1 if $MSWin32;
+
+  pir_output_is(<<'CODE', <<"OUT", "Test mkdir");
 .sub main :main
         $P1 = new .OS
 
@@ -114,8 +122,11 @@ CODE
 $xpto
 $cwd
 OUT
+}
 
 # Test remove on a directory
+
+mkdir "xpto" unless -d "xpto";
 
 pir_output_is(<<'CODE', <<"OUT", "Test rm call in a directory");
 .sub main :main
@@ -145,7 +156,11 @@ close X;
 
 my $stat = join("\n",stat("xpto"))."\n";
 
-pir_output_is(<<'CODE', $stat, "Test OS.stat");
+
+SKIP: {
+  skip "stat not available on Win 32 yet", 1 if $MSWin32;
+
+  pir_output_is(<<'CODE', $stat, "Test OS.stat");
 .sub main :main
         $P1 = new .OS
         $S1 = "xpto"
@@ -163,10 +178,9 @@ done:
         end
 .end
 CODE
-
+}
 
 # Test remove on a file
-
 pir_output_is(<<'CODE', <<"OUT", "Test rm call in a file");
 .sub main :main
         $P1 = new .OS
@@ -182,6 +196,5 @@ CODE
 ok
 OUT
 
-ok(!-d $xpto, "Test that rm removed file");
+ok(!-f $xpto, "Test that rm removed file");
 rmdir $xpto if -f $xpto; # this way next test doesn't fail if this one does
-
