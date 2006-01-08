@@ -41,5 +41,7 @@ POST::Op: result(.) = {
 
 POST::Val: result(.) = {
     $S1 = node.value()
-    .return ($S1)
+    $S2 = '"' . $S1 # temporarily treat all values as strings
+    $S2 .= '"'
+    .return ($S2)
 }

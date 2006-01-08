@@ -6,7 +6,7 @@ PunieGrammar -- A grammar for parsing Perl 1
 
   .sub _main :main
       load_bytecode 'PunieGrammar.pir'
-      .local pmc line
+      .local pmc start_rule
       .local pmc match
       .local string source
  
@@ -14,10 +14,10 @@ PunieGrammar -- A grammar for parsing Perl 1
       source = 'print 1;'
 
       # Retrieve the start rule
-      line = find_global 'PunieGrammar', 'line'
+      start_rule = find_global 'PunieGrammar', 'prog'
 
       # Parse the source and return a match object
-      match = line(source)
+      match = prog(source)
 
       ... # Do something with the parse tree
 

@@ -131,6 +131,25 @@ PunieGrammar::term: result(.) = {
     # code for this match node
     $S2 = node 
     $I3 = node.from()
-    result.set_node($S2,$I3,$S2)
+
+    $S3 = tree.get('value', node, 'PunieGrammar::term')
+
+    result.set_node($S2,$I3,$S3)
     .return (result)
+}
+
+PunieGrammar::term: value(.) = {
+    .local string value
+
+    # Check if this is a string match
+    $I0 = defined node["PGE::Text::bracketed"]
+    if $I0 goto bracketed_value
+    value = node
+    goto no_bracketed_value
+  bracketed_value:
+    $P1 = node["PGE::Text::bracketed"]
+    $P2 = $P1[0]
+    value = $P2
+  no_bracketed_value:
+    .return (value)
 }
