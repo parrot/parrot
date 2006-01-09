@@ -86,7 +86,7 @@ _end_block
 		}
 |	RETURN
 		{
-			BuildReturn($_[0], undef);
+			BuildReturn($_[0], []);
 		}
 |	BREAK
 		{
@@ -139,11 +139,17 @@ stat
 		}
 |	FUNCTION	funcname	funcbody
 		{
-			BuildFunction($_[0], $_[2], $_[3]);
+			[
+				BuildAssigns($_[0], [$_[2]], [$_[3]])
+			];
 		}
 |	LOCAL	FUNCTION	NAME	funcbody
 		{
-			BuildLocalFunction($_[0], $_[3], $_[4]);
+			my $var = BuildLocalVariable($_[0], $_[3]); 
+			[
+				BuildLocalVariables($_[0], [$var]),
+				BuildAssigns($_[0], [$var], [$_[4]])
+			];
 		}
 |	LOCAL	namelist	'='	explist1
 		{
@@ -180,7 +186,13 @@ funcname
 
 _funcname
 :	_funcname	'.'	NAME
+		{
+			[@{$_[1]}, $_[3]];
+		}
 |	NAME
+		{
+			[$_[1]];
+		}
 ;
 
 varlist1
@@ -221,11 +233,16 @@ key
 namelist
 :	namelist	','	NAME
 		{
-			[@{$_[1]}, [$_[3]]];
+			[
+				@{$_[1]},
+				BuildLocalVariable($_[0], $_[3])
+			];
 		}
 |	NAME
 		{
-			[[$_[1]]];
+			[
+				BuildLocalVariable($_[0], $_[1])
+			]
 		}
 ;
 
@@ -391,17 +408,38 @@ args
 
 function
 :	FUNCTION	funcbody
+		{
+			$_[2];
+		}
 ;
 
 funcbody
 :	'('	parlist1	')'	block	END
+		{
+			BuildFunctionBody($_[0], $_[2], $_[4]);
+		}
 |	'('	')'	block	END
+		{
+			BuildFunctionBody($_[0], [], $_[3]);
+		}
 ;
 
 parlist1
 :	namelist	','	'...'
+		{
+			[
+				@{$_[1]},
+				BuildLocalVariable($_[0], $_[3])
+			];
+		}
 |	namelist
+		#default action
 |	'...'
+		{
+			[
+				BuildLocalVariable($_[0], $_[1])
+			];
+		}
 ;
 
 tableconstructor
@@ -485,6 +523,7 @@ sub Run {
 	$parser->YYData->{symbtab_cst} = new SymbTabConst($parser);
 	$parser->YYData->{idx_tmp} = 0;
 	$parser->YYData->{idx_lbl} = 0;
+	$parser->YYData->{idx_fct} = 0;
 	$parser->YYParse(
 			yylex	=> \&_Lexer,
 			yyerror	=> sub { return; },
@@ -520,6 +559,7 @@ sub Generate {
 				$_->visit($generator);
 			} else {
 				print $_,"\n";
+				die;
 			}
 		}
 	}

@@ -159,7 +159,7 @@ sub visitSubDir {
 	my $self = shift;
 	my ($dir) = @_;
 	my $FH = $self->{fh};
-	print $FH ".sub $dir->{result}->{symbol} \@ANON\n";
+	print $FH ".sub $dir->{result}->{symbol} :anon\n";
 }
 
 sub visitEndDir {
@@ -167,24 +167,32 @@ sub visitEndDir {
 	my ($dir) = @_;
 	my $FH = $self->{fh};
 	print $FH ".end\n";
+	print $FH "\n";
 }
 
 sub visitParamDir {
 	my $self = shift;
 	my ($dir) = @_;
 	my $FH = $self->{fh};
-	print $FH "    .param $dir->{result}->{type}->{symbol} $dir->{result}->{symbol}\n";
+	if (exists $dir->{pragma}) {
+		print $FH "    .param $dir->{result}->{type} $dir->{result}->{symbol} $dir->{pragma}\n";
+	} else {
+		print $FH "    .param $dir->{result}->{type} $dir->{result}->{symbol}\n";
+	}
 }
 
 sub visitReturnDir {
 	my $self = shift;
 	my ($dir) = @_;
 	my $FH = $self->{fh};
-	if (exists $dir->{result}) {
-		print $FH "    .return ($dir->{result}->{symbol})\n";
-	} else {
-		print $FH "    .return ()\n";
+	print $FH "    .return (";
+	my $first = 1;
+	foreach (@{$dir->{result}}) {
+		print $FH ", " unless ($first);
+		print $FH "$_->{symbol}";
+		$first = 0;
 	}
+	print $FH ")\n";
 }
 
 sub visitLocalDir {
@@ -202,6 +210,13 @@ sub visitLexDir {
 	my ($dir) = @_;
 	my $FH = $self->{fh};
 	print $FH "    .lex \"$dir->{result}\", $dir->{arg1}->{symbol}\n";
+}
+
+sub visitConstDir {
+	my $self = shift;
+	my ($dir) = @_;
+	my $FH = $self->{fh};
+	print $FH "    .const .$dir->{type} $dir->{result}->{symbol} = $dir->{arg1}\n";
 }
 
 1;
