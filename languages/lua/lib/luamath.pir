@@ -1,4 +1,4 @@
-# Copyright: 2005 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2005-2006 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 =head1 NAME
@@ -322,6 +322,9 @@ See "Lua 5.0 Reference Manual", section 5.5 "Mathematical Functions".
     .local pmc curr
     .local pmc ret
     argc = argv
+    unless argc == 0 goto L0
+    tag_error("no value", "number")
+L0:    
     curr = argv[0]
     dmax = checknumber(curr)
     i = 1
@@ -335,30 +338,39 @@ L2:
     i = i + 1
     goto L1
 L3:
+    new ret, .LuaNumber
+    ret = dmax
+    .return (ret)
 .end
 
 .sub _math_min :anon
     .param pmc argv :slurpy
     .local int argc
     .local int i
-    .local float dmax
+    .local float dmin
     .local float d
     .local pmc curr
     .local pmc ret
     argc = argv
+    unless argc == 0 goto L0
+    tag_error("no value", "number")
+L0:    
     curr = argv[0]
-    dmax = checknumber(curr)
+    dmin = checknumber(curr)
     i = 1
 L1:
     if i >= argc goto L3
     curr = argv[i]
     d = checknumber(curr)
-    if dmax < d goto L2
-    dmax = d
+    if dmin < d goto L2
+    dmin = d
 L2:
     i = i + 1
     goto L1
 L3:
+    new ret, .LuaNumber
+    ret = dmin
+    .return (ret)
 .end
 
 .sub _math_mod :anon
@@ -367,7 +379,7 @@ L3:
     .local pmc ret
     $N0 = checknumber(x)
     $N1 = checknumber(y)
-    $N2 = mod $N0, $N1
+    $N2 = cmod $N0, $N1
     new ret, .LuaNumber
     ret = $N2
     .return (ret)
@@ -427,10 +439,16 @@ L3:
 .end
 
 .sub _math_frexp :anon
+    .param pmc x
+    $N0 = checknumber(x)
     not_implemented()
 .end
 
 .sub _math_ldexp :anon
+    .param pmc x
+    .param pmc exp
+    $N0 = checknumber(x)
+    $I0 = checkint(exp)
     not_implemented()
 .end
 
@@ -439,6 +457,8 @@ L3:
 .end
 
 .sub _math_randomseed :anon
+    .param pmc seed
+    $I0 = checkint(seed)
     not_implemented()
 .end
 
