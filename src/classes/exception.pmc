@@ -30,13 +30,9 @@ The exception type, (see F<include/parrot/exceptions.h>, F<except_type.pasm>).
 The severity of the exception, (see F<src/exceptions.h>,
 F<except_severity.pasm>).
 
-=item 3 C<_P5>
+=item 3 C<unused>
 
-The contents of C<REG_PMC(5)>.
-
-=item 4 C<_return_cc>
-
-The return continuation.
+=item 4 C<unused>
 
 =back
 
@@ -60,7 +56,7 @@ The PASM/PIR/Perl file in which the exception was raised.
 
 The line of PASM/PIR/Perl code on which the exception was raised.
 
-=item ...
+=item 9, 10 C<unused>
 
 Any information attached by the HL. This shouldn't start with an
 underscore (that is reserved for Parrot's internal usage. These are
@@ -72,8 +68,8 @@ are available for the HLL - This is subject to change.
 =back
 
 When an exception handler is called, the exception object is passed as
-C<REG_PMC(5)>, the original contents of this register is in the
-exception object's C<_P5> attribute.
+as the first argument, the message as the second argument of the call.
+These arguments can be retrieved with the C<get_results> opcode.
 
 This is experimental code. The C<enum_class> of the C<Exception> isn't
 fixed. The interface isn't fixed.
@@ -177,12 +173,6 @@ Returns the PMC value for C<*key>.
 
     PMC* get_pmc_keyed(PMC* key) {
         STRING* s = key_string(INTERP, key);
-        if (!string_compare(INTERP, s,
-            string_from_cstring(INTERP, "_P5", 0)))
-            return DYNSELF.get_pmc_keyed_int(3);
-        if (!string_compare(INTERP, s,
-            string_from_cstring(INTERP, "_invoke_cc", 0)))
-            return DYNSELF.get_pmc_keyed_int(4);
         return DYNSELF.getprop(s);
     }
 
