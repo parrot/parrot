@@ -19,10 +19,10 @@ all :
 	@$(BUILD) copy "--destination=$(RUNTIME_DIR)" $(OPLIBS)
 
 test : all
-	# cd .. ; perl -Ilib t/harness t/dynops/*.t
+#	 cd .. ; perl -Ilib t/harness t/dynops/*.t
 
 testclean :
-	# $(RM_F) "../../t/dynops/*.pir" "../../t/dynops/*.pbc"
+#	 $(RM_F) "../../t/dynops/*.pir" "../../t/dynops/*.pbc"
 
 # win32 import library
 # win32 program data base - contains debugging info
@@ -32,7 +32,7 @@ testclean :
 dynext-clean :
 	$(RM_F) "*.lib" "*.pdb" "*.ilk" "*.exp" "*.def"
 
-clean : testclean
+clean : testclean dynext-clean
 	$(RM_F) "*.h" "*.c" "*$(LOAD_EXT)" "*$(O)"
 
 realclean: clean

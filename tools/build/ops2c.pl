@@ -113,6 +113,7 @@ use Getopt::Long;
 
 use Parrot::OpsFile;
 use Parrot::OpLib::core;
+use Parrot::Config;
 
 my %arg_dir_mapping = (
 	''   => 'PARROT_ARGDIR_IGNORED',
@@ -171,6 +172,12 @@ if ($base =~ m!^src/dynoplibs/! || $dynamic_flag) {
     $base =~ s!^.*[/\\]!!;
     $include = "${base}_ops${suffix}.h";
     $dynamic_flag = 1;
+}
+
+my $sym_export = '';
+if ($dynamic_flag && ($PConfig{'osname'} =~ /cygwin/i ||
+    ($PConfig{'osname'} =~ /win32/i && $PConfig{'cc'} =~ /cl|gcc/i))) {
+    $sym_export = '__declspec(dllexport)';
 }
 
 my %hashed_ops;
@@ -259,7 +266,7 @@ print HEADER <<END_C;
 #include "parrot/parrot.h"
 #include "parrot/oplib.h"
 
-extern op_lib_t *$init_func(long init);
+$sym_export extern op_lib_t *$init_func(long init);
 
 END_C
 my $cg_func = $trans->core_prefix . $base;
@@ -307,7 +314,7 @@ my ($prev_source, $prev_func_name, $prev_def);
 foreach my $op ($ops->ops) {
     my $func_name  = $op->func_name($trans);
     my $arg_types  = "$opsarraytype *, Interp *";
-    my $prototype  = "$opsarraytype * $func_name ($arg_types)";
+    my $prototype  = "$sym_export $opsarraytype * $func_name ($arg_types)";
     my $args       = "$opsarraytype *cur_opcode, Interp * interpreter";
     my $definition;
     my $comment = '';
@@ -324,7 +331,7 @@ foreach my $op ($ops->ops) {
 END_C
     }
     elsif ($suffix eq '') {
-        $definition = "$opsarraytype * $func_name ($args);\n";
+        $definition = "$sym_export $opsarraytype * $func_name ($args);\n";
         $definition .= "$opsarraytype *\n$func_name ($args)";
     }
     else {
@@ -697,7 +704,7 @@ if ($dynamic_flag) {
  * dynamic lib load function - called once
  */
 
-PMC*
+$sym_export PMC*
 $load_func(Parrot_Interp interpreter)
 {
     PMC *lib = pmc_new(interpreter, enum_class_ParrotLibrary);
