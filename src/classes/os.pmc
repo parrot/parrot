@@ -267,7 +267,7 @@ Stats a file, and returns a 13 position array as in Perl:
 */
 
     METHOD PMC* lstat(STRING *path) {
-#ifndef _MSC_VER
+#ifndef WIN32
         struct stat info;
         PMC *array;
 
@@ -306,12 +306,10 @@ Stats a file, and returns a 13 position array as in Perl:
                                          info.st_mtime);
             VTABLE_set_integer_keyed_int(interpreter, array,10,
                                          info.st_ctime);
-#ifndef WIN32
             VTABLE_set_integer_keyed_int(interpreter, array,11,
                                          info.st_blksize);
             VTABLE_set_integer_keyed_int(interpreter, array,12,
                                          info.st_blocks);
-#endif
             return array;
         }
 #else
@@ -405,7 +403,7 @@ pathnames that begin with a "/" by your process and all its children.
 */
 
     METHOD void chroot(STRING* path) {
-#ifndef _MSC_VER
+#ifndef WIN32
         char *cpath = string_to_cstring(interpreter, path);
         int error = chroot(cpath);
         string_cstring_free(cpath);
