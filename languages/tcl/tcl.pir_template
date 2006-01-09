@@ -92,6 +92,25 @@ providing a compreg-compatible method.
 
   #_load_grammar()
 
+  # Expose Environment variables.
+  .local pmc env,tcl_env,iterator
+  env = new .Env
+  tcl_env = new .TclArray
+  
+  iterator = new .Iterator, env
+  iterator = 0
+
+  .local string key,value
+env_loop:
+  unless iterator goto env_loop_done
+  key = shift iterator
+  value = env[key]
+  tcl_env[key] = value
+
+  goto env_loop
+
+env_loop_done:
+  store_global "Tcl", "$env", tcl_env
 
   # keep track of names of file types.
   .local pmc filetypes

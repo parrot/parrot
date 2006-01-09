@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 22;
+use Parrot::Test tests => 23;
 use Test::More;
 
 language_output_is("tcl",<<'TCL',<<OUT,"leading spacex2 should be ok");
@@ -155,6 +155,18 @@ TCL
 1 {unmatched open brace in list}
 OUT
 
+{
+  local undef %ENV;
+  $ENV{cow}    = "moo";
+  $ENV{pig}    = "oink";
+  $ENV{cowpig} = "moink";
 
-
+language_output_is("tcl",<<'TCL',<<'OUT',"compiler bug with reusing registers");
+  parray env
+TCL
+env(cow)    = moo
+env(cowpig) = moink
+env(pig)    = oink
+OUT
+}
 
