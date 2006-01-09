@@ -55,10 +55,8 @@ typedef struct _hashbucket {
 } HashBucket;
 
 typedef struct _hash {
-    union {
-	HashBucket **bi;        /* list of Bucket pointers */
-	HashBucket *bs;         /* store of buckets */
-    } bu;
+    HashBucket *bs;             /* store of buckets */
+    HashBucket **bi;            /* list of Bucket pointers */
     HashBucket *free_list;      /* empty buckets */
     UINTVAL entries;            /* Number of values stored in hashtable */
     UINTVAL mask;               /* alloced - 1 */

@@ -14,8 +14,7 @@ creation the types of key and value as well as appropriate compare and
 hashing functions can be set.
 
 This hash implementation uses just one piece of malloced memory. The
-C<< hash->bu >> union points into this regions. At positive indices are
-bucket pointers, at negative indices is the bucket store itself.
+C<< hash->bs >> bucket store points this regions. 
 
 This hash doesn't move during GC, therefore a lot of the old caveats
 don't apply.
@@ -200,7 +199,7 @@ mark_hash(Interp *interpreter, Hash *hash)
         return;
 
     for (i = 0; i <= hash->mask; i++) {
-        bucket = hash->bu.bi[i];
+        bucket = hash->bi[i];
         while (bucket) {
             if (++found > hash->entries)
                 internal_exception(1,
@@ -280,7 +279,7 @@ hash_freeze(Interp *interpreter, Hash *hash, visit_info* info)
     HashBucket *b;
 
     for (i = 0; i <= hash->mask; i++) {
-        b = hash->bu.bi[i];
+        b = hash->bi[i];
         while (b) {
             switch (hash->key_type) {
                 case Hash_key_type_STRING:
@@ -377,13 +376,13 @@ expand_hash(Interp *interpreter, Hash *hash)
        e.g. 3 buckets, 4 pointers:
 
          +---+---+---+-+-+-+-+
-	 | bs <--    | -> bi |
+	 | --> bs    | -> bi |
          +---+---+---+-+-+-+-+
 	 ^           ^
-	 | old_mem   | hash->bu
+	 | old_mem   | hash->bi
     */
     old_nb = N_BUCKETS(old_size);
-    old_mem = hash->bu.bs - old_nb;
+    old_mem = hash->bs;
     /*
      * resize mem
      */
@@ -393,7 +392,7 @@ expand_hash(Interp *interpreter, Hash *hash)
 	 |  bs       | old_bi    |  new_bi       |
          +---+---+---+---+---+---+-+-+-+-+-+-+-+-+
   	 ^                       ^
-	 | new_mem	         | hash->bu
+	 | new_mem	         | hash->bi
     */
     bs = new_mem;
     old_bi = (HashBucket**) (bs + old_nb);
@@ -404,7 +403,8 @@ expand_hash(Interp *interpreter, Hash *hash)
     mem_sys_memmove(new_bi, old_bi, old_size * sizeof(HashBucket*));
 
     /* update hash data */
-    hash->bu.bi = new_bi;
+    hash->bi = new_bi;
+    hash->bs = bs;
     hash->mask = new_size - 1;
 
     /* clear freshly allocated bucket index */
@@ -442,12 +442,10 @@ expand_hash(Interp *interpreter, Hash *hash)
 		next_p = &b->next;
 	}
     }
-    /* add new buckets to free_list */
-    /* TODO reverse free_list filling so that we can use
-     *      buckets[i] directly in an OrderedHash, *if* nothing
-     *      was deleted
+    /* add new buckets to free_list in reverse order
+     * lowest bucket is top on free list and will be used first
      */
-    for (i = 0, b = (HashBucket*)old_bi; i < old_nb; ++i, ++b) {
+    for (i = 0, b = (HashBucket*)new_bi - 1; i < old_nb; ++i, --b) {
 	b->next = hash->free_list;
 	b->key = b->value = NULL;
 	hash->free_list = b;
@@ -571,33 +569,29 @@ init_hash(Interp *interpreter, Hash *hash,
      * - use the bucket store and bi inside this structure
      * - when reallocate copy this part
      */
-    hash->bu.bs = mem_sys_allocate(HASH_ALLOC_SIZE(INITIAL_BUCKETS));
+    bp = mem_sys_allocate(HASH_ALLOC_SIZE(INITIAL_BUCKETS));
     hash->free_list = NULL;
-    /* TODO reverse free_list filling so that we can use
-     *      buckets[i] directly in an OrderedHash, *if* nothing
-     *      was deleted
+    /* fill free_list from hi addresses so that we can use
+     * buckets[i] directly in an OrderedHash, *if* nothing
+     * was deleted
      */
-    for (i = 0, bp = hash->bu.bs; i < N_BUCKETS(INITIAL_BUCKETS); ++i, ++bp) {
+    hash->bs = bp;
+    bp += N_BUCKETS(INITIAL_BUCKETS);
+    hash->bi = (HashBucket**) bp;
+    for (i = 0, --bp; i < N_BUCKETS(INITIAL_BUCKETS); ++i, --bp) {
 	bp->next = hash->free_list;
 	bp->key = bp->value = NULL;
 	hash->free_list = bp;
     }
-    /* see the graphic in expand_hash */
-    hash->bu.bs = bp;
     for (i = 0; i < INITIAL_BUCKETS; ++i) {
-	hash->bu.bi[i] = NULL;
+	hash->bi[i] = NULL;
     }
 }
 
 void
 hash_destroy(Interp * interpreter, Hash *hash)
 {
-    UINTVAL nb;
-    void *mem;
-
-    nb = N_BUCKETS(hash->mask + 1);
-    mem = hash->bu.bs - nb;
-    mem_sys_free(mem);
+    mem_sys_free(hash->bs);
     mem_sys_free(hash);
 }
 
@@ -691,21 +685,23 @@ hash_get_idx(Interp *interpreter, Hash *hash, PMC * key)
     BucketIndex bi = (BucketIndex)PMC_data(key);
     HashBucket *b;
     void *res;
+    INTVAL size;
 
     /* idx directly in the bucket store, which is at negative
      * address from the data pointer
      */
     /* locate initial */
+    size = (INTVAL)N_BUCKETS(hash->mask + 1);
     if (bi == INITBucketIndex) {
         i = 0;
         PMC_data(key) = NULL;
     }
-    else if (i >= (INTVAL)N_BUCKETS(hash->mask + 1)) {
+    else if (i >= size || i < 0) {
         PMC_int_val(key) = -1;
         return NULL;
     }
     res = NULL;
-    for (b = hash->bu.bs-i-1; i < (INTVAL)N_BUCKETS(hash->mask + 1); ++i, --b) {
+    for (b = hash->bs + i; i < size ; ++i, ++b) {
 	/* XXX int keys may be zero - use different iterator
 	 */
 	if (b->key) {
@@ -717,7 +713,7 @@ hash_get_idx(Interp *interpreter, Hash *hash, PMC * key)
             }
         }
     }
-    if (i >= (INTVAL)N_BUCKETS(hash->mask + 1))
+    if (i >= size)
         i = -1;
     PMC_int_val(key) = i;
     return res;
@@ -738,7 +734,7 @@ HashBucket *
 hash_get_bucket(Interp *interpreter, Hash *hash, void *key)
 {
     UINTVAL hashval = (hash->hash_val)(interpreter, key, hash->seed);
-    HashBucket *bucket = hash->bu.bi[hashval & hash->mask];
+    HashBucket *bucket = hash->bi[hashval & hash->mask];
     while (bucket) {
 	/* store hash_val or not */
         if ((hash->compare)(interpreter, key, bucket->key) == 0)
@@ -800,7 +796,7 @@ HashBucket*
 hash_put(Interp *interpreter, Hash *hash, void *key, void *value)
 {
     UINTVAL hashval = (hash->hash_val)(interpreter, key, hash->seed);
-    HashBucket *bucket = hash->bu.bi[hashval & hash->mask];
+    HashBucket *bucket = hash->bi[hashval & hash->mask];
     while (bucket) {
 	/* store hash_val or not */
         if ((hash->compare)(interpreter, key, bucket->key) == 0)
@@ -829,8 +825,8 @@ hash_put(Interp *interpreter, Hash *hash, void *key, void *value)
 	hash->free_list = bucket->next;
         bucket->key = key;
         bucket->value = value;
-	bucket->next = hash->bu.bi[hashval & hash->mask];
-	hash->bu.bi[hashval & hash->mask] = bucket;
+	bucket->next = hash->bi[hashval & hash->mask];
+	hash->bi[hashval & hash->mask] = bucket;
     }
     return bucket;
 }
@@ -855,12 +851,12 @@ hash_delete(Interp *interpreter, Hash *hash, void *key)
 
     hashval = (hash->hash_val)(interpreter, key, hash->seed) & hash->mask;
 
-    for (bucket = hash->bu.bi[hashval]; bucket; bucket = bucket->next) {
+    for (bucket = hash->bi[hashval]; bucket; bucket = bucket->next) {
         if ((hash->compare)(interpreter, key, bucket->key) == 0) {
             if (prev)
                 prev->next = bucket->next;
             else {
-                hash->bu.bi[hashval] = bucket->next;
+                hash->bi[hashval] = bucket->next;
             }
             hash->entries--;
             bucket->next = hash->free_list;
@@ -892,7 +888,7 @@ hash_clone(Interp *interp, Hash *hash, Hash **dest)
     new_hash_x(interp, dest, hash->entry_type,
             hash->key_type, hash->compare, hash->hash_val);
     for (i = 0; i <= hash->mask; i++) {
-        b = hash->bu.bi[i];
+        b = hash->bi[i];
         while (b) {
             void *key = b->key;
             void *valtmp;
