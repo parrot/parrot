@@ -473,6 +473,55 @@ More information is available inside the exception 'object' (TBD).
     print "\n"
     exit 1
 
+=head1 C Extensions
+
+=head2 How do I create PMCs for my compiler?
+
+Parrot supports dynamic PMCs, loadable at runtime, to allow compiler writers
+to extend Parrot with additional types. For more information about writing
+PMCs, see L<tools/build/pmc2c.pl> and L<docs/pmc.pod>.
+
+To build dynamic PMCs, add something like the following to your makefile:
+
+  PERL     = /usr/bin/perl
+  PMCBUILD = $(PERL) /path/to/parrot/tools/build/dynclasses.pl
+  DESTDIR  = /path/to/parrot/runtime/parrot/dynext
+  LOAD_EXT = .so
+  
+  PMCDIR    = pmc
+  PMCS      = MyInteger MyFloat MyString MyObject
+  PMC_FILES = MyInteger.pmc MyFloat.pmc MyString.pmc MyObject.pmc
+  
+  dynpmcs : $(PMC_FILES)
+      @cd $(PMCDIR) && $(BUILD) generate $(PMCS)
+      @cd $(PMCDIR) && $(BUILD) compile $(PMCS)
+      @cd $(PMCDIR) && $(BUILD) linklibs $(PMCS)
+      @cd $(PMCDIR) && $(BUILD) copy "--destination=$(DESTDIR)" $(PMCS)
+
+=head2 How do I add another op to Parrot?
+
+Parrot supports dynamic op libraries. These allow for ops specific to one
+language to be used without having to place them into the Parrot core itself.
+For examples of dynamic op libraries, see L<src/dynoplibs>. 
+
+To build dynamic op libraries, add something like the following to your
+makefile:
+
+  PERL     = /usr/bin/perl
+  OPSBUILD = $(PERL) /path/to/parrot/tools/build/dynops.pl
+  DESTDIR  = /path/to/parrot/runtime/parrot/dynext
+  LOAD_EXT = .so
+  
+  OPSDIR    = ops
+  OPLIBS    = myops
+  OPS_FILES = myops.ops
+  
+  dynops : $(OPS_FILES)
+      @cd $(OPSDIR) && $(BUILD) generate $(OPLIBS)
+      @cd $(OPSDIR) && $(BUILD) compile $(OPLIBS)
+      @cd $(OPSDIR) && $(BUILD) linklibs $(OPLIBS)
+      @cd $(OPSDIR) && $(BUILD) copy "--destination=$(DESTDIR)" $(OPLIBS)
+
 =head1 Misc
 
 =head2 How can I access a program's environment?
