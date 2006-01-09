@@ -125,9 +125,6 @@ OUT
 }
 
 
-SKIP: {
-  skip "remove for windows 32 is not working yet", 1 if $MSWin32;
-
 # Test remove on a directory
 
 mkdir "xpto" unless -d "xpto";
@@ -150,7 +147,6 @@ OUT
 ok(!-d $xpto, "Test that rm removed the directory");
 rmdir $xpto if -d $xpto; # this way next test doesn't fail if this one does
 
-}
 
 # test stat
 
@@ -218,9 +214,6 @@ CODE
 # test lstat
 
 my $lstat;
-
-
-
 
 SKIP: {
   skip "lstat not available on Win 32 yet", 1 if $MSWin32;

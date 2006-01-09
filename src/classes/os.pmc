@@ -120,13 +120,32 @@ C<path>.
 */
 
     METHOD void rm(STRING *path) {
-        int error;
+        struct stat info;
         char *cpath = string_to_cstring(interpreter, path);
-        error = remove(cpath);
-        string_cstring_free(cpath);
+        int error = stat(cpath, &info);
         if (error) {
             char *errmsg = strerror(errno);
             real_exception(interpreter, NULL, E_SystemError, errmsg);
+        }
+
+        if (S_ISDIR(info.st_mode)) {
+#ifdef WIN32
+            error = _rmdir(cpath);
+#else 
+            error = rmdir(cpath);
+#endif
+            string_cstring_free(cpath);
+            if (error) {
+                char *errmsg = strerror(errno);
+                real_exception(interpreter, NULL, E_SystemError, errmsg);
+            }
+        } else {
+            error = remove(cpath);
+            string_cstring_free(cpath);
+            if (error) {
+                char *errmsg = strerror(errno);
+                real_exception(interpreter, NULL, E_SystemError, errmsg);
+            }
         }
     }
 
