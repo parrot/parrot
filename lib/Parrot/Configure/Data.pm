@@ -1,18 +1,53 @@
 # Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
+=pod
+
 =head1 NAME
 
 Parrot::Configure::Data - Configuration data container
+
+=head1 SYNOPSIS
+
+    use Parrot::Configure::Data;
+
+    my $data = Parrot::Configure::Data->new;
+    my @values = $data->get(@keys);
+    $data->set($key1 => $value1, $key2 => $value2);
+    $data->add($delimiter, $key1 => $value1, $key2 => $value2);
+    my @keys = $data->keys;
+    my $serialized = $data->dump;
+    $data->clean;
+    $data->settrigger($key, $trigger, $cb);
+    $data->gettriggers($key);
+    $data->gettrigger($key, $trigger);
+    $data->deltrigger($key, $trigger);
+
+=pod
+
+=head1 NAME
+
+Parrot::Configure::Data - Configuration data container
+
+=head1 SYNOPSIS
+
+    use Parrot::Configure::Data;
+
+    my $data = Parrot::Configure::Data->new;
+    my @values = $data->get(@keys);
+    $data->set($key1 => $value1, $key2 => $value2);
 
 =head1 DESCRIPTION
 
 This module contains configuration data for use by the other
 L<Parrot::Configure::*> modules.
 
-=head1 METHODS
+=head1 USAGE
 
-=over 4
+=head2 Import Parameters
+
+This module accepts no arguments to it's C<import> method and exports no
+I<symbols>.
 
 =cut
 
@@ -22,9 +57,17 @@ use strict;
 
 use Data::Dumper;
 
-=item Parrot::Configure::Data->new()
+=head2 Methods
 
-Ojbect constructor.
+=head3 Constructors
+
+=over 4
+
+=item C<new()>
+
+Basic object constructor.
+
+Accepts no arguments and returns a L<Parrot::Configure::Data> object.
 
 =cut
 
@@ -42,9 +85,17 @@ sub new
     return $self;
 }
 
-=item Parrot::Configure::Data->get($key,...)
+=back
 
-Return value or hash slice for key.
+=head3 Object Methods
+
+=over 4
+
+=item C<get($key, ...)>
+
+Provides access to key values.
+
+Accepts a list and returns a list.
 
 =cut
 
@@ -57,9 +108,12 @@ sub get
     return @$c{@_};
 }
 
-=item Parrot::Configure::Data->set($key,$val, ...)
+=item C<set($key => $val, ...)>
 
-Set config values
+Modifies or creates a new value.
+
+Accepts a list of C<key => value> pairs and returns a
+L<Parrot::Configure::Data> object.
 
 =cut
 
@@ -89,9 +143,13 @@ sub set
     return $self;
 }
 
-=item Parrot::Configure::Data->add($delim, $key,$val, ...)
+=item C<add($delim, $key => $val, ...)>
 
-Append values delimited by C<$delim> to existing keys or set values.
+Either creates a new key or appends to an existing key, with the previous/new
+values joined together by C<$delim>.
+
+Accepts a delimiter value followed by a list of C<key => value> pairs and
+returns a L<Parrot::Configure::Data> object.
 
 =cut
 
@@ -111,9 +169,11 @@ sub add
     return $self;
 }
 
-=item Parrot::Configure::Data->keys()
+=item C<keys()>
 
-Return config keys.
+Provides a list of keys.
+
+Accepts no arguments and returns a list.
 
 =cut
 
@@ -124,9 +184,13 @@ sub keys
     return keys %{$self->{c}};
 }
 
-=item Parrot::Configure::Data->dump()
+=item C<dump()>
 
-Dump config keys.
+Provides a L<Data::Dumper> serialized string of the objects key/value pairs
+suitable for being C<eval>ed.  The variable name of the structure is
+C<PConfig>.
+
+Accepts no arguments and returns a string.
 
 =cut
 
@@ -153,10 +217,13 @@ Dump config keys.
     }
 }
 
-=item Parrot::Configure::Data->clean()
+=item C<clean()>
 
-Delete keys matching /^TEMP_/ from config. These are used only temporarly e.g.
-as file lists for Makefile generation.
+Deletes keys matching C</^TEMP_/>.  Keys using this naming convention are
+intended to be used only temporally, e.g.  as file lists for Makefile
+generation.
+
+Accepts no arguments and returns a L<Parrot::Configure::Data> object.
 
 =cut
 
@@ -169,12 +236,15 @@ sub clean
     return $self;
 }
 
-=item Parrot::Configure::Data->settrigger($key, $trigger, $cb)
+=item C<settrigger($key, $trigger, $cb)>
 
 Set a callback on C<$key> named C<$trigger>.  Multiple triggers can be set on a
 given key.  When the key is set via C<set> or C<add> then all callbacks that
 are defined will be called.  Triggers are passed the key and value that was set
 after it has been changed.
+
+Accepts a key name, a trigger name, & a C<CODE> ref and returns a
+L<Parrot::Configure::Data> object.
 
 =cut
 
@@ -194,9 +264,11 @@ sub settrigger
     return $self;
 }
 
-=item Parrot::Configure::Data->gettriggers($key)
+=item C<gettriggers($key)>
 
 Get the names of all triggers set for C<$key>.
+
+Accepts a key name and returns a list.
 
 =cut
 
@@ -214,9 +286,11 @@ sub gettriggers
     return CORE::keys %{$self->{triggers}{$key}};
 }
 
-=item Parrot::Configure::Data->gettrigger($key, $trigger)
+=item C<gettrigger($key, $trigger)>
 
 Get the callback set for C<$key> under the name C<$trigger>
+
+Accepts a key name & a trigger name and returns a C<CODE> ref.
 
 =cut
 
@@ -236,9 +310,12 @@ sub gettrigger
     return $self->{triggers}{$key}{$trigger};
 }
 
-=item Parrot::Configure::Data->deltrigger($key, $trigger)
+=item C<deltrigger($key, $trigger)>
 
 Removes the trigger on C<$key> named by C<$trigger>
+
+Accepts a key name & a trigger name and returns a L<Parrot::Configure::Data>
+object.
 
 =cut
 
@@ -261,6 +338,19 @@ sub deltrigger
 }
 
 =back
+
+=head1 CREDITS
+
+Based largely on code written by Brent Royal-Gordon C<brent@brentdax.com>.
+
+=head1 AUTHOR
+
+Joshua Hoblitt C<jhoblitt@cpan.org>
+
+=head1 SEE ALSO
+
+F<docs/configuration.pod>, L<Parrot::Configure>, L<Parrot::Configure::Step>,
+L<Parrot::Configure::Step::Base>
 
 =cut
 
