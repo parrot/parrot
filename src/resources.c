@@ -193,7 +193,6 @@ compact_pool(Interp *interpreter, struct Memory_Pool *pool)
     UINTVAL total_size;
     struct Memory_Block *new_block;     /* A pointer to our working block */
     char *cur_spot;             /* Where we're currently copying to */
-    UINTVAL cur_size;           /* How big our chunk is going to be */
     struct Arenas *arena_base = interpreter->arena_base;
     struct Small_Object_Arena *cur_buffer_arena;
     struct Small_Object_Pool *header_pool;

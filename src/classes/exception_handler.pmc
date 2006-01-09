@@ -119,13 +119,13 @@ Initializes the exception handler.
         struct Parrot_cont * cc = PMC_cont(SELF);
         PMC *exception = ex;
         parrot_context_t *ex_ctx;
-        void *next;
+        void *next = NULL;
         opcode_t *results;
         /* COMPAT:  PMC *p5 = REG_PMC(5);*/
 
         results = cc->current_results;
         /* clear all results, so that continuation.invoke
-         * doesn't pass any args
+         * doesn't pass any args #'
          */
         cc->to_ctx->current_results = cc->current_results= NULL;
         ex_ctx = CONTEXT(INTERP->ctx);

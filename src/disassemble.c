@@ -41,7 +41,7 @@ int
 main(int argc, char *argv[])
 {
     Parrot_Interp interpreter;
-    char *filename, *disassemble;
+    char *filename;
     Parrot_PackFile pf;
 
     interpreter = Parrot_new(NULL);
