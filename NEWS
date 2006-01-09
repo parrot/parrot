@@ -1,5 +1,9 @@
 # $Id$
 
+New in 0.x.x
+
+- META.yml support proper indexing on CPAN
+
 New in 0.4.1
 
 - Installation: 'make install' is using standard locations now

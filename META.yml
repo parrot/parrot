@@ -1,0 +1,20 @@
+---
+name: parrot
+version: 0.4.1
+author: ~
+abstract: ~
+license: perl
+no_index:
+    directory:
+        - config
+        - languages
+        - lib/Class
+        - lib/Digest
+        - lib/File
+        - lib/Parse
+        - lib/Pod
+        - lib/Test
+        - lib/Text
+        - t
+        - tools
+generated_by: Hummans

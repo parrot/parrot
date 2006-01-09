@@ -15,6 +15,7 @@ To prepare a release:
             - parrot.spec, 
 	    - compilers/imcc/main.c
             - MANIFEST.generated
+            - META.yml
 
         b.  Change the information in DEVELOPING to reflect
             this release's version number and date.

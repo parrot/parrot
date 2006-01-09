@@ -13,6 +13,7 @@ LICENSES/gpl.txt                                  [devel]doc
 MANIFEST                                          []
 MANIFEST.SKIP                                     []
 MANIFEST.generated                                []
+META.yml                                          []
 NEWS                                              [devel]doc
 PBC_COMPAT                                        [devel]doc
 PLATFORMS                                         [devel]doc
