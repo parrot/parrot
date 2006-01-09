@@ -26,8 +26,10 @@ ok3:
     print I1
     print " libs\n"
     null I0
-lp: ge I0, I1, fin
-    set P4, P3[I0]
+    iter P7, P3
+lp: unless P7, fin
+    shift S4, P7
+    set P4, P7[S4] 
     getprop P5, "_type", P4
     print P5
     print "   "
