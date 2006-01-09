@@ -1,4 +1,4 @@
-# Copyright: 2005 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2005-2006 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 =head1 NAME
@@ -226,6 +226,8 @@ NOT YET IMPLEMENTED.
 =cut
 
 .sub _lua_collectgarbage :anon
+    .param pmc limit
+    $I0 = optint(limit, 0)
     not_implemented()
 .end
 
@@ -242,6 +244,8 @@ NOT YET IMPLEMENTED.
 =cut
 
 .sub _lua_dofile :anon
+    .param pmc filename
+    $S0 = optstring(filename, "")
     not_implemented()
 .end
 
@@ -299,6 +303,8 @@ NOT YET IMPLEMENTED.
 =cut
 
 .sub _lua_getmetatable :anon
+    .param pmc obj
+    checkany(obj)
     not_implemented()
 .end
 
@@ -329,6 +335,8 @@ NOT YET IMPLEMENTED.
 =cut
 
 .sub _lua_ipairs :anon
+    .param pmc t
+    checktype(t, "table")
     not_implemented()
 .end
 
@@ -344,6 +352,8 @@ NOT YET IMPLEMENTED.
 =cut
 
 .sub _lua_loadfile :anon
+    .param pmc filename
+    $S0 = optstring(filename, "")
     not_implemented()
 .end
 
@@ -382,6 +392,10 @@ NOT YET IMPLEMENTED.
 =cut
 
 .sub _lua_loadstring :anon
+    .param pmc s
+    .param pmc chunkname :optional
+    $S0 = checkstring(s)
+    $S1 = optstring(chunkname, s)
     not_implemented()
 .end
 
@@ -409,6 +423,9 @@ NOT YET IMPLEMENTED.
 =cut
 
 .sub _lua_next :anon
+    .param pmc table
+    .param pmc index :optional
+    checktype(table, "table")
     not_implemented()
 .end
 
@@ -426,6 +443,8 @@ NOT YET IMPLEMENTED.
 =cut
 
 .sub _lua_pairs :anon
+    .param pmc t
+    checktype(t, "table")
     not_implemented()
 .end
 
@@ -438,12 +457,28 @@ boolean), which is B<true> if the call succeeds without errors. In such case,
 C<pcall> also returns all results from the call, after this first result.
 In case of any error, C<pcall> returns B<false> plus the error message.
 
-NOT YET IMPLEMENTED.
-
 =cut
 
 .sub _lua_pcall :anon
-    not_implemented()
+    .param pmc f
+    .param pmc argv :slurpy
+    .local pmc ret
+    .local pmc status
+    new status, .LuaBoolean
+    checkany(f)
+    push_eh _handler
+    (ret :slurpy) = f(argv :flat)
+    status = 1
+    .return (status, ret :flat)
+_handler:
+    .local pmc e
+    .local string s
+    .local pmc msg
+    .get_results (e, s)
+    status = 0    
+    new msg, .LuaString
+    msg = s
+    .return (status, msg)
 .end
 
 =item C<print (e1, e2, ...)>
@@ -490,6 +525,10 @@ NOT YET IMPLEMENTED.
 =cut
 
 .sub _lua_rawequal :anon
+    .param pmc v1
+    .param pmc v2
+    checkany(v1)
+    checkany(v2)
     not_implemented()
 .end
 
@@ -503,6 +542,10 @@ NOT YET IMPLEMENTED.
 =cut
 
 .sub _lua_rawget :anon
+    .param pmc table
+    .param pmc index
+    checktype(table, "table")
+    checkany(index)
     not_implemented()
 .end
 
@@ -517,6 +560,12 @@ NOT YET IMPLEMENTED.
 =cut
 
 .sub _lua_rawset :anon
+    .param pmc table
+    .param pmc index
+    .param pmc value
+    checktype(table, "table")
+    checkany(index)
+    checkany(value)
     not_implemented()
 .end
 
@@ -562,6 +611,8 @@ NOT YET IMPLEMENTED.
 =cut
 
 .sub _lua_require :anon
+    .param pmc packagename
+    $S0 = checkstring(packagename)
     not_implemented()
 .end
 
@@ -580,6 +631,9 @@ NOT YET IMPLEMENTED.
 =cut
 
 .sub _lua_setfenv :anon
+    .param pmc f
+    .param pmc table
+    checktype(table, "table")
     not_implemented()
 .end
 
@@ -595,6 +649,16 @@ NOT YET IMPLEMENTED.
 =cut
 
 .sub _lua_setmetatable :anon
+    .param pmc table
+    .param pmc metatable
+    checktype(table, "table")
+    if_null metatable, L0
+    $S0 = typeof metatable
+    if $S0 == "nil" goto L1
+    if $S0 == "table" goto L1
+L0:
+    argerror("nil or table expected")
+L1:    
     not_implemented()
 .end
 
@@ -624,7 +688,7 @@ STILL INCOMPLETE.
     checkany(e)
     $I1 = isa e, "LuaNumber"
     unless $I1 goto L1
-    return (e)
+    .return (e)
 L1:
     $I1 = isa e, "LuaString"
     unless $I1 goto L2
@@ -705,6 +769,8 @@ NOT YET IMPLEMENTED.
 =cut
 
 .sub _lua_unpack :anon
+    .param pmc list
+    checktype(list, "table")
     not_implemented()
 .end
 
@@ -721,12 +787,31 @@ is true if the call succeeds without errors. In such case, C<xpcall> also
 returns all results from the call, after this first result. In case of any
 error, C<xpcall> returns false plus the result from C<err>.
 
-NOT YET IMPLEMENTED.
-
 =cut
 
 .sub _lua_xpcall :anon
-    not_implemented()
+    .param pmc f
+    .param pmc err
+    .local pmc ret
+    .local pmc status
+    new status, .LuaBoolean
+    checkany(f)
+    checkany(err)
+    push_eh _handler
+    (ret :slurpy) = f()
+    status = 1
+    .return (status, ret :flat)
+_handler:
+    .local pmc e
+    .local pmc msg
+    status = 0
+    $S0 = typeof err
+    unless $S0 == "Sub" goto L0    
+    .get_results (e)
+    (ret :slurpy) = err(e)
+    .return (status, ret :flat)
+L0:
+    .return (status)    
 .end
 
 =back

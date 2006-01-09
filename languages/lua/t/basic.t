@@ -1,5 +1,5 @@
 #! perl -w
-# Copyright: 2005 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2005-2006 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 =head1 NAME
@@ -21,7 +21,7 @@ use strict;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 7;
+use Parrot::Test tests => 9;
 use Test::More;
 
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', "function assert(false, msg)");
@@ -40,6 +40,19 @@ language_output_like( 'lua', << 'CODE', << 'OUTPUT', "function assert(false, nil
 assert(false, nil)
 CODE
 /assertion failed!/
+OUTPUT
+
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', "function pcall");
+r = pcall(assert, true)
+print(r)
+r = pcall(assert, false, "catched")
+print(r)
+r = pcall(assert)
+print(r)
+CODE
+true
+false
+false
 OUTPUT
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', "function type");
@@ -86,3 +99,11 @@ nil
 OUTPUT
 
 }
+
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', "function xpcall");
+r = xpcall(assert, nil)
+print(r)
+CODE
+false
+OUTPUT
+
