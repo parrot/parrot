@@ -36,10 +36,7 @@ END {
 
 # test 'cwd'
 my $cwd = getcwd;
-SKIP: {
-  skip "cwd not available yet under windows", 1 if $MSWin32;
-
-  pir_output_is(<<'CODE', <<"OUT", "Test cwd");
+pir_output_is(<<'CODE', <<"OUT", "Test cwd");
 .sub main :main
         $P1 = new .OS
         $S1 = $P1."cwd"()
@@ -50,7 +47,6 @@ SKIP: {
 CODE
 $cwd
 OUT
-}
 
 
 #  TEST chdir
@@ -58,10 +54,7 @@ chdir "src";
 my $upcwd = getcwd;
 chdir "..";
 
-SKIP: {
-  skip "cwd and chdir not available on Win 32 yet", 1 if $MSWin32;
-
-  pir_output_is(<<'CODE', <<"OUT", "Test chdir");
+pir_output_is(<<'CODE', <<"OUT", "Test chdir");
 .sub main :main
         $P1 = new .OS
 
@@ -85,7 +78,7 @@ CODE
 $upcwd
 $cwd
 OUT
-}
+
 
 # Test mkdir
 
@@ -93,10 +86,7 @@ my $xpto = $upcwd;
 $xpto =~ s/src([\/\\]?)$/xpto$1/;
 
 
-SKIP: {
-  skip "cwd, mkdir and chdir not available on Win 32 yet", 1 if $MSWin32;
-
-  pir_output_is(<<'CODE', <<"OUT", "Test mkdir");
+pir_output_is(<<'CODE', <<"OUT", "Test mkdir");
 .sub main :main
         $P1 = new .OS
 
@@ -122,7 +112,7 @@ CODE
 $xpto
 $cwd
 OUT
-}
+
 
 
 # Test remove on a directory

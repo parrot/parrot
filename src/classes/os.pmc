@@ -60,12 +60,15 @@ Returns the current working directory.
 */
 
     METHOD STRING* cwd() {
-#ifndef _MSC_VER
         char * cwd;
+#ifdef WIN32
+        cwd = _getcwd(NULL, 0);
+#else
 #ifdef PATH_MAX
         cwd = getcwd(NULL, PATH_MAX+1);
 #else 
         cwd = getcwd(NULL, 0);
+#endif
 #endif
         if (cwd) {
             STRING *scwd;
@@ -77,10 +80,6 @@ Returns the current working directory.
             real_exception(interpreter, NULL, E_SystemError, errmsg);
             return NULL;
         }
-#else
-        internal_exception(UNIMPLEMENTED, "Win32 is not POSIX. Need win32 developer!");
-        return NULL;
-#endif
     }
 
 /*
@@ -94,18 +93,18 @@ Changes the current working directory to the one specified by C<path>.
 */
 
     METHOD void chdir(STRING *path) {
-#ifndef _MSC_VER
         int error;
         char *cpath = string_to_cstring(interpreter, path);
+#ifdef WIN32
+        error = _chdir(cpath);
+#else
         error = chdir(cpath);
+#endif
         string_cstring_free(cpath);
         if (error) {
             char *errmsg = strerror(errno);
             real_exception(interpreter, NULL, E_SystemError, errmsg);
         }
-#else
-        internal_exception(UNIMPLEMENTED, "Win32 is not POSIX. Need win32 developer!");
-#endif
     }
 
 /*
@@ -160,12 +159,11 @@ Creates a directory specified by C<path> with mode C<mode>.
 */
 
     METHOD void mkdir(STRING *path, INTVAL mode) {
-#ifndef _MSC_VER
         int error;
         char *cpath = string_to_cstring(interpreter, path);
         /* should we validate mode? */
 #ifdef WIN32
-        error = mkdir(cpath);
+        error = _mkdir(cpath);
 #else
         error = mkdir(cpath, mode);
 #endif
@@ -174,9 +172,6 @@ Creates a directory specified by C<path> with mode C<mode>.
             char *errmsg = strerror(errno);
             real_exception(interpreter, NULL, E_SystemError, errmsg);
         }
-#else
-        internal_exception(UNIMPLEMENTED, "Win32 is not POSIX. Need win32 developer!");
-#endif
     }
 
 /*
