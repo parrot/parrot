@@ -1,4 +1,4 @@
-# Copyright: 2005 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2005-2006 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 =head1 NAME
@@ -104,6 +104,8 @@ NOT YET IMPLEMENTED.
 =cut
 
 .sub _os_clock :anon
+    .local pmc ret
+    new ret, .LuaNumber
     not_implemented()
 .end
 
@@ -135,6 +137,10 @@ NOT YET IMPLEMENTED.
 =cut
 
 .sub _os_date :anon
+    .param pmc format :optional
+    .param pmc time :optional
+    $S0 = optstring(format, "%c")
+    $I0 = optint(time, -1)
     not_implemented()
 .end
 
@@ -148,6 +154,10 @@ NOT YET IMPLEMENTED.
 =cut
 
 .sub _os_difftime :anon
+    .param pmc t2
+    .param pmc t1
+    $I0 = checkint(t2)
+    $I1 = optint(t1, 0)
     not_implemented()
 .end
 
@@ -246,6 +256,10 @@ NOT YET IMPLEMENTED.
 =cut
 
 .sub _os_rename :anon
+    .param pmc oldname
+    .param pmc newname
+    $S0 = checkstring(oldname)
+    $S1 = checkstring(newname)
     not_implemented()
 .end
 
@@ -262,6 +276,9 @@ NOT YET IMPLEMENTED.
 =cut
 
 .sub _os_setlocale :anon
+    .param pmc locale
+    .param pmc category :optional
+    $S1 = optstring(category, "all")
     not_implemented()
 .end
 
@@ -278,11 +295,23 @@ seconds since some given start time (the "epoch"). In other systems, the
 meaning is not specified, and the number returned by C<time> can be used only
 as an argument to C<date> and C<difftime>.
 
-NOT YET IMPLEMENTED.
+STILL INCOMPLETE.
 
 =cut
 
 .sub _os_time :anon
+    .param pmc table :optional
+    .local pmc ret
+    if_null table, L0
+    $S0 = typeof table
+    if $S0 != "nil" goto L1
+L0:
+    $I0 = time
+    new ret, .LuaNumber
+    ret = $I0
+    .return (ret)
+L1:
+    checktype(table, "table")
     not_implemented()
 .end
 
@@ -301,6 +330,8 @@ NOT YET IMPLEMENTED.
 =cut
 
 .sub _os_tmpname :anon
+    .local pmc ret
+    new ret, .LuaString
     not_implemented()
 .end
 

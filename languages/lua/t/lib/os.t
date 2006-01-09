@@ -1,5 +1,5 @@
 #! perl -w
-# Copyright: 2005 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2005-2006 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 =head1 NAME
@@ -18,7 +18,7 @@ Tests Lua Operating System Library
 
 =cut
 
-use Parrot::Test tests => 5;
+use Parrot::Test tests => 7;
 use Test::More;
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "function execute");
@@ -51,6 +51,34 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "function execute");
 CODE
 test
 2
+OUTPUT
+
+pir_output_is(<< 'CODE', << 'OUTPUT', "function exit");
+.namespace [ "Lua" ]
+.HLL "Lua", "lua_group"
+.sub _main
+    load_bytecode "languages/lua/lib/luaos.pbc"
+    .local pmc _G
+    _G = global "_G"
+    .local pmc key1
+    key1 = new .LuaString
+    key1 = "os"
+    .local pmc os
+    os = new .LuaTable
+    os = _G[key1]
+    .local pmc key2
+    key2 = new .LuaString
+    key2 = "exit"
+    .local pmc fct1
+    fct1 = os[key2]
+    .local pmc ret1
+    print "reached\n"
+    fct1()
+    print "not reached\n"
+    end
+.end
+CODE
+reached
 OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "function getenv");
@@ -162,5 +190,35 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "function remove");
 CODE
 nil
 file.rm: No such file or directory
+OUTPUT
+
+pir_output_is(<< 'CODE', << 'OUTPUT', "function time");
+.namespace [ "Lua" ]
+.HLL "Lua", "lua_group"
+.sub _main
+    load_bytecode "languages/lua/lib/luaos.pbc"
+    .local pmc _G
+    _G = global "_G"
+    .local pmc key1
+    key1 = new .LuaString
+    key1 = "os"
+    .local pmc os
+    os = new .LuaTable
+    os = _G[key1]
+    .local pmc key2
+    key2 = new .LuaString
+    key2 = "time"
+    .local pmc fct1
+    fct1 = os[key2]
+    .local pmc ret1
+    (ret1) = fct1()
+    $I0 = time
+    unless ret1 == $I0 goto L0
+    print "ok\n"
+L0:    
+    end
+.end
+CODE
+ok
 OUTPUT
 

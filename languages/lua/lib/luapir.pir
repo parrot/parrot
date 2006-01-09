@@ -1,4 +1,4 @@
-# Copyright: 2005 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2005-2006 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 =head1 NAME
@@ -45,9 +45,17 @@ L1:
 .sub checknumber
     .param pmc arg
     .local float val
+    $S0 = "no value"
+    if_null arg, L0
+    $S0 = typeof arg
+#    print $S0
+#    print "\n"
+    if $S0 == "nil" goto L0
     val = arg
     # TODO
     .return (val)
+L0:
+    tag_error($S0, "number")    
 .end
 
 =item C<checkstring (arg)>
@@ -62,6 +70,22 @@ L1:
     .return (val)
 .end
 
+=item C<checktype (arg, type)>
+
+=cut
+
+.sub checktype
+    .param pmc arg
+    .param string type
+    $S0 = "no value"
+    if_null arg, L0
+    $S0 = typeof arg
+    if $S0 != type goto L0
+    .return ()
+L0:
+    tag_error($S0, type)
+.end
+
 =item C<error (message)>
 
 =cut
@@ -72,6 +96,15 @@ L1:
     ex = new .Exception
     ex["_message"] =  message
     throw ex
+.end
+
+=item C<getn (table)>
+
+=cut
+
+.sub getn
+    .param pmc table
+    not_implemented()
 .end
 
 =item C<not_implemented ()>
@@ -117,6 +150,16 @@ L0:
     .return (default)
 .end
 
+=item C<setn (table, n)>
+
+=cut
+
+.sub setn
+    .param pmc table
+    .param int n
+    not_implemented()
+.end
+
 #.sub tostring
 #    .param pmc arg
 #    .local string str
@@ -125,6 +168,19 @@ L0:
 ##    str = arg.get_string()
 #    .return (str)
 #.end
+
+=item C<tag_error (got, expec)>
+
+=cut
+
+.sub tag_error
+    .param string got
+    .param string expec
+    $S0 = expec 
+    concat $S0, " expected, got "
+    concat $S0, got
+    argerror($S0)
+.end
 
 =back
 
