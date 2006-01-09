@@ -1,4 +1,4 @@
-# Copyright: 2005 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2005-2006 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 =head1 NAME
@@ -117,6 +117,14 @@ NOT YET IMPLEMENTED.
 =cut
 
 .sub _table_concat :anon
+    .param pmc table
+    .param pmc sep :optional
+    .param pmc i :optional
+    .param pmc j :optional
+    $S0 = optstring(sep, "")
+    $I0 = optint(i, 1)
+    $I1 = optint(j, 0)
+    checktype(table, "table")
     not_implemented()
 .end
 
@@ -134,6 +142,10 @@ NOT YET IMPLEMENTED.
 =cut
 
 .sub _table_foreach :anon
+    .param pmc table
+    .param pmc f
+    checktype(table, "table")
+    checktype(f, "Sub")
     not_implemented()
 .end
 
@@ -150,6 +162,11 @@ NOT YET IMPLEMENTED.
 =cut
 
 .sub _table_foreachi :anon
+    .param pmc table
+    .param pmc f
+    checktype(table, "table")
+    checktype(f, "Sub")
+    $I0 = getn(table)
     not_implemented()
 .end
 
@@ -166,7 +183,13 @@ NOT YET IMPLEMENTED.
 =cut
 
 .sub _table_getn :anon
-    not_implemented()
+    .param pmc table
+    .local pmc ret
+    checktype(table, "table")
+    $I0 = getn(table)
+    new ret, .LuaNumber
+    ret = $I0
+    .return (ret)
 .end
 
 =item C<table.sort (table [, comp])>
@@ -186,6 +209,10 @@ NOT YET IMPLEMENTED.
 =cut
 
 .sub _table_sort :anon
+    .param pmc table
+    .param pmc comp :optional
+    checktype(table, "table")
+    $I0 = getn(table)
     not_implemented()
 .end
 
@@ -202,6 +229,10 @@ NOT YET IMPLEMENTED.
 =cut
 
 .sub _table_insert :anon
+    .param pmc table
+    
+    checktype(table, "table")
+    $I0 = getn(table)
     not_implemented()
 .end
 
@@ -219,6 +250,11 @@ NOT YET IMPLEMENTED.
 =cut
 
 .sub _table_remove :anon
+    .param pmc table
+    .param pmc pos :optional
+    checktype(table, "table")
+    $I0 = getn(table)
+    $I1 = optint(pos, $I0)
     not_implemented()
 .end
 
@@ -233,7 +269,11 @@ NOT YET IMPLEMENTED.
 =cut
 
 .sub _table_setn :anon
-    not_implemented()
+    .param pmc table
+    .param pmc n
+    checktype(table, "table")
+    $I0 = checknumber(n)
+    setn(table, $I0)
 .end
 
 =back

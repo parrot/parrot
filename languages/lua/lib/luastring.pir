@@ -1,4 +1,4 @@
-# Copyright: 2005 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2005-2006 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 =head1 NAME
@@ -195,6 +195,8 @@ NOT YET IMPLEMENTED.
 =cut
 
 .sub _string_dump :anon
+    .param pmc function
+    checktype(function, "Sub")
     not_implemented()
 .end
 
@@ -216,6 +218,15 @@ NOT YET IMPLEMENTED.
 =cut
 
 .sub _string_find :anon
+    .param pmc s
+    .param pmc pattern
+    .param pmc init :optional
+    .param pmc plain :optional
+    $S0 = checkstring(s)
+    $I0 = length $S0
+    $S1 = checkstring(pattern)
+    $I1 = length $S1
+    $I2 = optint(init, 1)
     not_implemented()
 .end
 
@@ -363,6 +374,10 @@ NOT YET IMPLEMENTED.
 =cut
 
 .sub _string_format :anon
+    .param pmc formatstring
+    .param pmc argv :slurpy
+    $S0 = checkstring(formatstring)
+    $I0 = length $S0
     not_implemented()
 .end
 
@@ -395,6 +410,10 @@ NOT YET IMPLEMENTED.
 =cut
 
 .sub _string_gfind :anon
+    .param pmc s
+    .param pmc pat
+    $S0 = checkstring(s)
+    $S1 = checkstring(pat)
     not_implemented()
 .end
 
@@ -424,6 +443,15 @@ NOT YET IMPLEMENTED.
 =cut
 
 .sub _string_gsub :anon
+    .param pmc s
+    .param pmc pat
+    .param pmc repl
+    .param pmc n :optional
+    $S0 = checkstring(s)
+    $I0 = length $S0
+    $S1 = checkstring(pat)
+    $I1 = $I0 + 1
+    $I2 = optint(n, $I1)
     not_implemented()
 .end
 
