@@ -279,6 +279,9 @@ my @funcnames = qw(
 	Parrot_stat_info_intval
 	PackFile_add_segment
 	Parrot_new_debug_seg
+	Parrot_do_check_events
+	dynop_register
+	Parrot_new_timer_event
 );
 push @funcnames, "PMCNULL	DATA";
 push @funcnames, "Parrot_base_vtables	DATA";

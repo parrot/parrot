@@ -74,6 +74,12 @@ sub makefiles
         replace_slashes                         => 0,
         conditioned_lines                       => 1
     );
+	genfile(
+        'config/gen/makefiles/dynoplibs_pl.in' => 'tools/build/dynoplibs.pl',
+        commentType                             => '#',
+        replace_slashes                         => 0,
+        conditioned_lines                       => 1
+    );
     genfile(
         'config/gen/makefiles/pge.in' => 'compilers/pge/Makefile',
         commentType                   => '#',

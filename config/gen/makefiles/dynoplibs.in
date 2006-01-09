@@ -1,49 +1,39 @@
-#
-# sample Makefile
-#
-LD = ${ld}
-LD_LOAD_FLAGS = ${ld_load_flags}
 PERL = ${perl}
 RM_F = ${rm_f}
 LOAD_EXT = ${load_ext}
-OPS2C = -I..${slash}lib ..${slash}tools${slash}build${slash}ops2c.pl
-CFLAGS = ${ccflags} ${cc_debug} ${ccwarn} ${cc_hasjit} ${cg_flag} ${gc_flag}
+RUNTIME_DIR = ${build_dir}${slash}runtime${slash}parrot${slash}dynext
+O = ${o}
 
+# add your dynamic op libraries here
+#
+OPLIBS = \
+  myops \
+  dan
 
-# add your dynamic oplibs here
+BUILD = $(PERL) "${build_dir}${slash}tools${slash}build${slash}dynoplibs.pl"
 
-all: myops_ops$(LOAD_EXT) myops_ops_cg$(LOAD_EXT) myops_ops_cgp$(LOAD_EXT) \
-     myops_ops_switch$(LOAD_EXT) \
-     \
-     dan_ops$(LOAD_EXT) dan_ops_cg$(LOAD_EXT) dan_ops_cgp$(LOAD_EXT) \
-     dan_ops_switch$(LOAD_EXT)
+all :
+	@$(BUILD) generate $(OPLIBS)
+	@$(BUILD) compile $(OPLIBS)
+	@$(BUILD) linklibs $(OPLIBS)
+	@$(BUILD) copy "--destination=$(RUNTIME_DIR)" $(OPLIBS)
 
-.SUFFIXES: .ops .c $(LOAD_EXT)
+test : all
+	# cd .. ; perl -Ilib t/harness t/dynops/*.t
 
-# preserve .c if needed
-.PRECIOUS: %_ops.c %_ops_cgp.c %_ops_cg.c %_ops_switch.c
+testclean :
+	# $(RM_F) "../../t/dynops/*.pir" "../../t/dynops/*.pbc"
 
-%_ops.c  : %.ops
-	$(PERL) $(OPS2C) C --dynamic $<
+# win32 import library
+# win32 program data base - contains debugging info
+# win32 incremental link status files
+# win32 exported functions and data items
+# win32 export definition files
+dynext-clean :
+	$(RM_F) "*.lib" "*.pdb" "*.ilk" "*.exp" "*.def"
 
-%_ops_cgp.c  : %.ops
-	$(PERL) $(OPS2C) CGP --dynamic $<
-
-%_ops_cg.c  : %.ops
-	$(PERL) $(OPS2C) CGoto --dynamic $<
-
-%_ops_switch.c  : %.ops
-	$(PERL) $(OPS2C) CSwitch --dynamic $<
-
-.c$(LOAD_EXT) :
-	$(LD) $(CFLAGS) $(LD_LOAD_FLAGS) $(LDFLAGS) \
-	${cc_o_out}$@ \
-		-I..${slash}include \
-		-L..${slash}blib${slash}lib -lparrot $<
-	$(PERL) -MFile::Copy=cp -e ${PQ}cp q|$@|, q|../runtime/parrot/dynext/$@|${PQ}
-
-clean :
-	$(RM_F) "*.c" "*.h" "*$(LOAD_EXT)"
+clean : testclean
+	$(RM_F) "*.h" "*.c" "*$(LOAD_EXT)" "*$(O)"
 
 realclean: clean
 	$(RM_F) Makefile
