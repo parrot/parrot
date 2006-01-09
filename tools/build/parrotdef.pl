@@ -235,8 +235,12 @@ my @funcnames = qw(
 	stack_push
 	Parrot_signbit
 	new_ret_continuation_pmc
+	Parrot_PMC_typenum
+	Parrot_call_sub
 	Parrot_get_global
 	string_make_empty
+	Parrot_PMC_get_intval
+	Parrot_call_method
 	string_replace
 	Parrot_make_COW_reference
 	Parrot_switch_to_cs
