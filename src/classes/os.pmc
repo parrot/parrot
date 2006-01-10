@@ -19,6 +19,10 @@ files and directories.
 
 */
 
+#ifdef WIN32
+#include <direct.h>
+#endif
+
 #include "parrot/parrot.h"
 
 /* XXX Check if we need to deallocate strerror strings */
