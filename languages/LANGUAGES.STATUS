@@ -382,7 +382,8 @@ Klaas-Jan Stol
 Making Lua work on Parrot.
 Implemented in C. The lexer is built with Flex. The Parser is built with Bison.
 TreeCC is used to generate the code for creating the Abstract Syntax Tree.
-Lua bytecode translation is being investigated.
+
+There is also a Lua bytecode to PIR compiler at http://members.home.nl/joeijoei/lua2pir/
 
 =item Status
 
@@ -390,7 +391,7 @@ Simple examples are working. The current version is 0.2.2.
 
 =item Last verified with parrot version
 
-0.4.0
+0.4.1
 
 =item Location
 
