@@ -22,6 +22,10 @@ src/resources.c - Allocate and deallocate tracked resources
 #define RECLAMATION_FACTOR 0.20
 #define WE_WANT_EVER_GROWING_ALLOCATIONS 0
 
+/* show allocated blocks on stderr */
+#define RESOURCE_DEBUG 0
+#define RESOURCE_DEBUG_SIZE 1000000
+
 typedef void (*compact_f) (Interp *, struct Memory_Pool *);
 static void* aligned_mem(Buffer *buffer, char *mem);
 
@@ -29,10 +33,11 @@ static void* aligned_mem(Buffer *buffer, char *mem);
 
 =item C<static void *
 alloc_new_block(Interp *interpreter,
-        size_t size, struct Memory_Pool *pool)>
+        size_t size, struct Memory_Pool *pool, const char *why)>
 
 Allocate a new memory block. We allocate the larger of however much was
-asked for or the default size, whichever's larger.
+asked for or the default size, whichever's larger. The given text is
+used for debugging.
 
 =cut
 
@@ -40,13 +45,19 @@ asked for or the default size, whichever's larger.
 
 static void *
 alloc_new_block(Interp *interpreter,
-        size_t size, struct Memory_Pool *pool)
+        size_t size, struct Memory_Pool *pool, const char *why)
 {
     size_t alloc_size;
     struct Memory_Block *new_block;
 
     alloc_size = (size > pool->minimum_block_size)
             ? size : pool->minimum_block_size;
+#if RESOURCE_DEBUG
+    fprintf(stderr, "new_block (%s) size %u -> %u\n",
+        why, size, alloc_size);
+#else
+    UNUSED(why)
+#endif    
 
     /* Allocate a new block. Header info's on the front */
     new_block = mem_internal_allocate_zeroed(sizeof(struct Memory_Block) +
@@ -153,7 +164,7 @@ mem_allocate(Interp *interpreter, size_t size, struct Memory_Pool *pool)
              * Mark the block as big block (it has just one item)
              * And don't set big blocks as the top_block.
              */
-            alloc_new_block(interpreter, size, pool);
+            alloc_new_block(interpreter, size, pool, "compact failed");
             interpreter->arena_base->mem_allocs_since_last_collect++;
             if (pool->top_block->free < size) {
                 fprintf(stderr, "out of mem\n");
@@ -169,6 +180,34 @@ mem_allocate(Interp *interpreter, size_t size, struct Memory_Pool *pool)
     return (void *)return_val;
 }
 
+#if RESOURCE_DEBUG
+static const char* 
+buffer_location(Interp *interpreter, PObj *b)
+{
+    PObj *obj;
+    parrot_context_t* ctx;
+    int i;
+    const char *s = "???";
+    static char reg[10];
+
+    ctx = CONTEXT(interpreter->ctx);
+    for (i = 0; i < ctx->n_regs_used[REGNO_STR]; ++i) {
+        obj = (PObj*) CTX_REG_STR(ctx, i);
+        if (obj == b) {
+            sprintf(reg, "S%d", i);
+            return reg;
+        }
+    }
+    return s;
+}
+static void
+debug_print_buf(Interp *interpreter, PObj *b)
+{
+    fprintf(stderr, "found %p, len %d, flags 0x%08x at %s\n",
+            b, (int)PObj_buflen(b), PObj_get_FLAGS(b),
+            buffer_location(interpreter, b));
+}
+#endif
 
 /*
 
@@ -255,7 +294,8 @@ compact_pool(Interp *interpreter, struct Memory_Pool *pool)
 #endif
 
     /* Snag a block big enough for everything */
-    new_block = alloc_new_block(interpreter, total_size, pool);
+    new_block = alloc_new_block(interpreter, total_size, pool, 
+            "inside compact");
 
     /* Start at the beginning */
     cur_spot = new_block->start;
@@ -279,6 +319,11 @@ compact_pool(Interp *interpreter, struct Memory_Pool *pool)
                 /* ! (on_free_list | constant | external | sysmem) */
                 if (PObj_buflen(b) && PObj_is_movable_TESTALL(b)) {
                     ptrdiff_t offset = 0;
+#if RESOURCE_DEBUG
+                    if (PObj_buflen(b) >= RESOURCE_DEBUG_SIZE) {
+                        debug_print_buf(interpreter, b);
+                    }
+#endif
 
                     /* we can't perform the math all the time, because
                      * strstart might be in unallocated memory */
@@ -719,11 +764,12 @@ Parrot_initialize_memory_pools(Interp *interpreter)
     struct Arenas *arena_base = interpreter->arena_base;
 
     arena_base->memory_pool = new_memory_pool(POOL_SIZE, &compact_pool);
-    alloc_new_block(interpreter, POOL_SIZE, arena_base->memory_pool);
+    alloc_new_block(interpreter, POOL_SIZE, arena_base->memory_pool, "init");
 
     /* Constant strings - not compacted */
     arena_base->constant_string_pool = new_memory_pool(POOL_SIZE, (compact_f)NULLfunc);
-    alloc_new_block(interpreter, POOL_SIZE, arena_base->constant_string_pool);
+    alloc_new_block(interpreter, POOL_SIZE, arena_base->constant_string_pool, 
+            "init");
 }
 
 /*

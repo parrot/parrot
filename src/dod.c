@@ -691,17 +691,6 @@ Parrot_dod_sweep(Interp *interpreter,
     UINTVAL free_arenas = 0, old_total_used = 0;
 #endif
 
-    /*
-     * A DOD run is triggered by any pool's resource shortage.
-     * If one pool has plenty of free objects, we don't run through the
-     * pool to free only some objects, except it's the pmc_pool
-     * which might need timely destruction.
-     */
-    if (pool != arena_base->pmc_pool &&
-            pool->num_free_objects >
-            pool->total_objects - pool->replenish_level)
-        return;
-
     /* Run through all the buffer header pools and mark */
     for (cur_arena = pool->last_Arena;
             NULL != cur_arena; cur_arena = cur_arena->prev) {
@@ -988,6 +977,7 @@ trace_mem_block(Interp *interpreter,
                 /* ...and since pobject_lives doesn't care about bufstart, it
                  * doesn't really matter if it sets a flag */
                 pobject_lives(interpreter, (PObj *)ptr);
+                            
             }
         }
     }
