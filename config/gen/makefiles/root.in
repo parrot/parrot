@@ -655,6 +655,11 @@ help :
 	@echo "  dynclasses-test:   Proxy for target 'test' of src/dynclasses/Makefile"
 	@echo "  dynclasses-clean:  Proxy for target 'clean' of src/dynclasses/Makefile"
 	@echo ""
+	@echo "Dynamic oplibs:"
+	@echo "  dynoplibs:         Proxy for default target of src/dynoplibs/Makefile"
+	@echo "  dynoplibs-test:    Proxy for target 'test' of src/dynoplibs/Makefile"
+	@echo "  dynoplibs-clean:   Proxy for target 'clean' of src/dynoplibs/Makefile"
+	@echo ""
 	@echo "Language implementations:"
 	@echo "  compilers:         Proxy for default target of pge and tge compilers"
 	@echo "  languages:         Proxy for default target of languages/Makefile"
@@ -1203,6 +1208,24 @@ dynclasses-clean :
 
 ###############################################################################
 #
+# dynamic oplibs targets:
+#
+###############################################################################
+
+dynoplibs : dynoplibs.dummy
+
+# XXX this dependancy is too broad, and should be narrowed down
+dynoplibs.dummy : $(PARROT)
+	$(MAKE) src/dynoplibs
+
+dynoplibs-test :
+	$(MAKE) src/dynoplibs test
+
+dynoplibs-clean :
+	$(MAKE) src/dynoplibs clean
+
+###############################################################################
+#
 # language implementation targets:
 #
 ###############################################################################
@@ -1412,6 +1435,7 @@ clean : \
 	languages-clean \
 #CONDITIONED_LINE(has_perldoc):	docs-clean \
 	dynclasses-clean \
+	dynoplibs-clean \
 	examples-clean \
 	imcc-clean \
 	compilers-clean \
