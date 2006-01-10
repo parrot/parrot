@@ -1638,44 +1638,56 @@ div_rr_n(Parrot_jit_info_t *jit_info, int r1)
     jit_info->native_ptr = pc; \
     pc = div_rr_n(jit_info, r)
 
+static char *
+mod_rr_n(Parrot_jit_info_t *jit_info, int r)
+{
+    char *L1;
+    static const char* div_by_zero = "Divide by zero";
+    char *pc = jit_info->native_ptr;
+
+    jit_emit_test_r_n(pc, 0);   /* TOS */
+    L1 = pc;
+    emitm_jxs(pc, emitm_jnz, 0);
+    emitm_pushl_i(pc, div_by_zero);
+    emitm_pushl_i(pc, E_ZeroDivisionError);
+    emitm_pushl_i(pc, 0);    /* NULL */
+    Parrot_jit_emit_get_INTERP(pc, emit_ECX);
+    emitm_pushl_r(pc, emit_ECX);
+    jit_info->native_ptr = pc;
+    call_func(jit_info, (void*) real_exception);
+    pc = jit_info->native_ptr;
+    /* L1: */
+    L1[1] = pc - L1 - 2;
+    /* L2: */
+    emitm_fxch(pc, 1); 
+    emitm_fprem(pc); 
+    emitm_fstw(pc); 
+    emitm_sahf(pc);
+    emitm_jxs(pc, emitm_jp, -7); /* jo L2 */
+    emitm_fstp(pc, (r+1)); 
+    return pc;
+}
+
 /* ST(i) %= MEM
  * please note the hardccded jumps */
-#  define jit_emit_cmod_RM_n(pc, r, offs) { \
+#  define jit_emit_cmod_RM_n(pc, r, offs)  \
     if (r)  \
       emitm_fxch(pc, r); \
     jit_emit_fload_mb_n(pc, emit_EBX, offs); \
-    emitm_fxch(pc, 1); \
-    emitm_fprem(pc); \
-    emitm_fstw(pc); \
-    emitm_sahf(pc); \
-    emitm_jxs(pc, emitm_jp, -7); \
-    emitm_fstp(pc, (r+1)); \
-}
+    pc = mod_rr_n(jit_info, r)
 
-#  define jit_emit_cmod_ri_n(pc, r, mem) { \
+#  define jit_emit_cmod_ri_n(pc, r, mem)  \
     if (r)  \
       emitm_fxch(pc, r); \
     jit_emit_fload_m_n(pc, mem); \
-    emitm_fxch(pc, 1); \
-    emitm_fprem(pc); \
-    emitm_fstw(pc); \
-    emitm_sahf(pc); \
-    emitm_jxs(pc, emitm_jp, -7); \
-    emitm_fstp(pc, (r+1)); \
-}
+    pc = mod_rr_n(jit_info, r)
 
 /* ST(r1) %= ST(r2) */
-#  define jit_emit_cmod_rr_n(pc, r1, r2) { \
+#  define jit_emit_cmod_rr_n(pc, r1, r2)  \
     if (r1)  \
       emitm_fxch(pc, r1); \
     emitm_fld(pc, r2); \
-    emitm_fxch(pc, 1); \
-    emitm_fprem(pc); \
-    emitm_fstw(pc); \
-    emitm_sahf(pc); \
-    emitm_jxs(pc, emitm_jp, -7); \
-    emitm_fstp(pc, (r1+1)); \
-}
+    pc = mod_rr_n(jit_info, r1)
 
 /* compare ST(r) <-> mem i.e. constant */
 #  define jit_emit_cmp_ri_n(pc, r, mem) { \
