@@ -1,7 +1,7 @@
 # $Id$
 # See tools/dev/install_files.pl for documentation on the
 # format of this file.
-# Please resort this file after *EVERY* modification
+# Please re-sort this file after *EVERY* modification
 ABI_CHANGES                                       []
 CREDITS                                           []
 ChangeLog                                         []
@@ -347,13 +347,13 @@ docs/vtables.pod                                  [main]doc
 editor/README.pod                                 [devel]
 editor/addtags                                    [devel]
 editor/filetype_parrot.vim                        [devel]
-editor/pir.vim.in                                 [devel]
 editor/indent_pir.vim                             [devel]
 editor/kate_syntax.pl                             [devel]
 editor/ops2vim.pl                                 [devel]
 editor/pasm.el                                    [devel]
 editor/pasm.vim                                   [devel]
 editor/pir-mode.el                                [devel]
+editor/pir.vim.in                                 [devel]
 editor/pmc.vim                                    [devel]
 examples/README                                   [main]doc
 examples/benchmarks/addit.pasm                    [main]doc
