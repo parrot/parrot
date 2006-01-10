@@ -3,7 +3,7 @@
 New in 0.x.x
 
 - pkgconfig support
-- META.yml support proper indexing on CPAN
+- META.yml to support proper indexing on CPAN
 
 New in 0.4.1
 
