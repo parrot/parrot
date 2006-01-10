@@ -47,6 +47,7 @@ installable_pbc_info                              [main]bin
 installable_pbc_merge                             [main]bin
 installable_pdb                                   [main]bin
 installable_pdump                                 [main]bin
+parrot.pc                                         [main]pkgconfig
 pbc_info                                          [main]bin
 pbc_merge                                         [main]bin
 pdb                                               [main]bin
