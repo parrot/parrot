@@ -147,10 +147,7 @@ close X;
 
 my $stat;
 
-SKIP: {
-  skip "stat not available on Win 32 yet", 1 if $MSWin32;
-
-  if ($cygwin) {
+if ($cygwin || $MSWin32) {
     # Skip inode number
     my @s = stat('xpto');
     $stat = join("\n",$s[0],@s[2..12])."\n";
@@ -198,7 +195,6 @@ done:
 .end
 CODE
 
-}
 }
 
 
