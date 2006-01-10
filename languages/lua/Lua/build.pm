@@ -137,6 +137,47 @@ sub BuildTable {
 	return [$result, \@opcodes1];
 }
 
+sub BuildVariable {
+	my ($parser, $var) = @_;
+	my @opcodes = ();
+	my $idf = shift(@{$var});
+	my $name = "var_" . $idf;
+	my $defn = $parser->YYData->{symbtab}->Lookup($name);
+	if (defined $defn) {
+		my $assign = new AssignOp($parser,
+				'arg1'					=>	undef,
+				'result'				=>	$defn,
+		);
+		return [$defn, [], $assign];
+	} else {
+		my $global = get_global($parser);
+		push @opcodes, @{$global->[1]};
+		my $key = BuildLiteral($parser, $idf, "string");
+		push @opcodes, @{$key->[1]};
+		my $result = $global->[0];
+		foreach my $key2 (@{$var}) {
+			my $result2 = new_tmp($parser, "pmc");
+			push @opcodes, new LocalDir($parser,
+					'result'				=>	$result2,
+			);
+			push @opcodes, new KeyedGetOp($parser,
+					'result'				=>	$result2,
+					'arg1'					=>	$result,
+					'arg2'					=>	$key->[0],
+			);
+			$result = $result2;
+			$key = $key2;
+			push @opcodes, @{$key->[1]};
+		}
+		my $assign = new KeyedSetOp($parser,
+				'arg1'					=>	$key->[0],
+				'arg2'					=>	undef,
+				'result'				=>	$result,
+		);
+		return [$result, \@opcodes, $assign];
+	}
+}
+
 sub BuildAssigns {
 	my ($parser, $vars, $exprs) = @_;
 	while (scalar @{$exprs} < scalar @{$vars}) {
@@ -144,60 +185,28 @@ sub BuildAssigns {
 	}
 	my @opcodes1 = ();
 	my @opcodes2 = ();
+	my @opcodes3 = ();
 	for my $var (@{$vars}) {
-		if (ref($var->[0]) eq "defn") {
-			push @opcodes1, @{$var->[1]};
-		}
-	}
-	for my $var (@{$vars}) {
+		push @opcodes1, @{$var->[1]};
 		my $expr = shift @{$exprs};
-		push @opcodes1, @{$expr->[1]};
-		if (ref($var->[0]) eq "defn") {
-			push @opcodes2, new AssignOp($parser,
+		push @opcodes2, @{$expr->[1]};
+		my $assign = $var->[2];
+		if ($assign->isa("AssignOp")) {
+			$assign->configure(
 					'arg1'					=>	$expr->[0],
-					'result'				=>	$var->[0],
 			);
 		} else {
-			my $idf = shift(@{$var});
-			my $name = "var_" . $idf;
-			my $defn = $parser->YYData->{symbtab}->Lookup($name);
-			if (defined $defn) {
-				push @opcodes2, new AssignOp($parser,
-						'arg1'					=>	$expr->[0],
-						'result'				=>	$defn,
-				);
-			} else {
-				my $global = get_global($parser);
-				push @opcodes1, @{$global->[1]};
-				my $key = BuildLiteral($parser, $idf, "string");
-				push @opcodes1, @{$key->[1]};
-				my $result = $global->[0];
-				foreach my $key2 (@{$var}) {
-					my $result2 = new_tmp($parser, "pmc");
-					push @opcodes1, new LocalDir($parser,
-							'result'				=>	$result2,
-					);
-					push @opcodes1, new KeyedGetOp($parser,
-							'result'				=>	$result2,
-							'arg1'					=>	$result,
-							'arg2'					=>	$key->[0],
-					);
-					$result = $result2;
-					$key = $key2;
-					push @opcodes1, @{$key->[1]};
-				}
-				push @opcodes2, new KeyedSetOp($parser,
-						'arg1'					=>	$key->[0],
-						'arg2'					=>	$expr->[0],
-						'result'				=>	$result,
-				);
-			}
+			$assign->configure(
+					'arg2'					=>	$expr->[0],
+			);
 		}
+		push @opcodes3, $assign;
 	}
-	return @opcodes1, @opcodes2;
+	push @opcodes1, @opcodes2, @opcodes3;
+	return \@opcodes1;
 }
 
-sub BuildCallVar {
+sub BuildCallVariable {
 	my ($parser, $var) = @_;
 	my $result;
 	my @opcodes = ();
@@ -400,34 +409,21 @@ sub  BuildLocalVariable {
 	my @opcodes = ();
 	my $defn;
 	my $name;
-	if ($idf eq "...") {
-		$name = "var_arg";
-		$defn = new defn($name, "local", "pmc", "table");
-	} else {
-		$name = "var_" . $idf;
-		$defn = new defn($name, "local", "pmc");
-	}
+	$name = "var_" . $idf;
+	$defn = new defn($name, "local", "pmc");
 	$parser->YYData->{symbtab}->Insert($name, $defn);
-	return [$defn, []];
-}
-
-sub  BuildLocalVariables {
-	my ($parser, $vars) = @_;
-	my @opcodes = ();
-	for my $var (@{$vars}) {
-		my $defn = $var->[0];
-		my $idf = $defn->{symbol};
-		$idf =~ s/^var_//;
-		push @opcodes, @{$var->[1]};
-		push @opcodes, new LocalDir($parser,
-				'result'				=>	$defn,
-		);
-		push @opcodes, new LexDir($parser,
-				'result'				=>	$idf,
-				'arg1'					=>	$defn,
-		);
-	}
-	return @opcodes;
+	push @opcodes, new LocalDir($parser,
+			'result'				=>	$defn,
+	);
+	push @opcodes, new LexDir($parser,
+			'result'				=>	$idf,
+			'arg1'					=>	$defn,
+	);
+	my $assign = new AssignOp($parser,
+			'arg1'					=>	undef,
+			'result'				=>	$defn,
+	);
+	return [$defn, \@opcodes, $assign];
 }
 
 sub BuildIf {
@@ -667,34 +663,72 @@ sub BuildReturn {
 	return \@opcodes;
 }
 
+sub  BuildParam {
+	my ($parser, $idf) = @_;
+	my @opcodes1 = ();
+	my @opcodes2 = ();
+	my $defn;
+	my $name;
+	if ($idf eq "...") {
+		my $argv = new defn("argv", "local", "pmc");
+		push @opcodes1, new ParamDir($parser,
+				'result'				=>	$argv,
+				'pragma'				=>	":slurpy",
+		);
+		$name = "var_arg";
+		$defn = new defn($name, "local", "pmc");
+		push @opcodes1, new LocalDir($parser,
+				'result'				=>	$defn,
+		);
+		my $fct = new defn("mkarg", "util");
+		push @opcodes1, new CallOp($parser,
+				'result'				=>	[$defn],
+				'arg1'					=>	$fct,
+				'arg2'					=>	[$argv],
+		);
+	} else {
+		$name = "var_" . $idf;
+		$defn = new defn($name, "local", "pmc");
+		push @opcodes1, new ParamDir($parser,
+				'result'				=>	$defn,
+		);
+		my $nil = BuildLiteral($parser, 'nil', 'nil');
+		push @opcodes2, @{$nil->[1]};
+		push @opcodes2, new LexDir($parser,
+				'result'				=>	$idf,
+				'arg1'					=>	$defn,
+		);
+		my $lbl = new_label($parser);
+		push @opcodes2, new BranchUnlessNullOp($parser,
+				'arg1'					=>	$defn,
+				'result'				=>	$lbl,
+		);
+		push @opcodes2, new AssignOp($parser,
+				'result'				=>	$defn,
+				'arg1'					=>	$nil->[0],
+		);
+		push @opcodes2, new LabelOp($parser,
+				'arg1'					=>	$lbl,
+		);
+	}
+	$parser->YYData->{symbtab}->Insert($name, $defn);
+	return [$defn, \@opcodes1, \@opcodes2];
+}
+
 sub BuildFunctionBody {
 	my ($parser, $params, $block) = @_;
 	my @opcodes1 = ();
 	my @opcodes2 = ();
-	my @opcodes3 = ();
 	my $fct = new_fct($parser);
 	push @opcodes2, new SubDir($parser,
 			'result'				=>	$fct,
 	);
 	for my $param (@{$params}) {
-		my $defn = $param->[0];
-		my $idf = $defn->{symbol};
-		$idf =~ s/^var_//;
-		if (exists $defn->{subtype}) {
-			push @opcodes2, new ParamDir($parser,
-					'result'				=>	$defn,
-			);
-		} else {
-			push @opcodes2, new ParamDir($parser,
-					'result'				=>	$defn,
-			);
-			push @opcodes3, new LexDir($parser,
-					'result'				=>	$idf,
-					'arg1'					=>	$defn,
-			);
-		}
+		push @opcodes2, @{$param->[1]};
 	}
-	push @opcodes2, @opcodes3;
+	for my $param (@{$params}) {
+		push @opcodes2, @{$param->[2]};
+	}
 	push @opcodes2, @{$block};
 	push @opcodes2, new EndDir($parser
 	);

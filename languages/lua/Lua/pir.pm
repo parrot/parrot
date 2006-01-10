@@ -141,6 +141,13 @@ sub visitBranchUnlessOp {
 	}
 }
 
+sub visitBranchUnlessNullOp {
+	my $self = shift;
+	my ($op) = @_;
+	my $FH = $self->{fh};
+	print $FH "    unless_null $op->{arg1}->{symbol}, $op->{result}->{symbol}\n";
+}
+
 sub visitBranchOp {
 	my $self = shift;
 	my ($op) = @_;

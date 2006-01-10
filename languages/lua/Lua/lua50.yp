@@ -97,9 +97,7 @@ _end_block
 stat
 :	varlist1	'='	explist1
 		{
-			[
-				BuildAssigns($_[0], $_[1], $_[3])
-			];
+			BuildAssigns($_[0], $_[1], $_[3])
 		}
 |	functioncall	%prec	NONARG
 		{
@@ -139,31 +137,21 @@ stat
 		}
 |	FUNCTION	funcname	funcbody
 		{
-			[
-				BuildAssigns($_[0], [$_[2]], [$_[3]])
-			];
+			my $var = BuildVariable($_[0], $_[2]); 
+			BuildAssigns($_[0], [$var], [$_[3]])
 		}
 |	LOCAL	FUNCTION	NAME	funcbody
 		{
 			my $var = BuildLocalVariable($_[0], $_[3]); 
-			[
-				BuildLocalVariables($_[0], [$var]),
-				BuildAssigns($_[0], [$var], [$_[4]])
-			];
+			BuildAssigns($_[0], [$var], [$_[4]])
 		}
 |	LOCAL	namelist	'='	explist1
 		{
-			[
-				BuildLocalVariables($_[0], $_[2]),
-				BuildAssigns($_[0], $_[2], $_[4])
-			];
+			BuildAssigns($_[0], $_[2], $_[4])
 		}
 |	LOCAL	namelist
 		{
-			[
-				BuildLocalVariables($_[0], $_[2]),
-				BuildAssigns($_[0], $_[2], [])
-			];
+			BuildAssigns($_[0], $_[2], [])
 		}
 ;
 
@@ -198,11 +186,16 @@ _funcname
 varlist1
 :	varlist1	','	var
 		{
-			[@{$_[1]}, $_[3]];
+			[
+				@{$_[1]}, 
+				BuildVariable($_[0], $_[3])
+			]
 		}
 |	var
 		{
-			[$_[1]];
+			[
+				BuildVariable($_[0], $_[1])
+			]
 		}
 ;
 
@@ -246,7 +239,6 @@ namelist
 		}
 ;
 
-
 explist1
 :	explist1	','	exp
 		{
@@ -263,7 +255,7 @@ exp
 		#default action
 |	var	%prec	NONARG
 		{
-			BuildCallVar($_[0], $_[1]);
+			BuildCallVariable($_[0], $_[1]);
 		}
 |	functioncall	%prec	NONARG
 		#default action
@@ -372,7 +364,7 @@ functioncall
 |	'('	exp	')'	':'	NAME	args
 |	var	args
 		{
-			my $fct = BuildCallVar($_[0], $_[1]);
+			my $fct = BuildCallVariable($_[0], $_[1]);
 			BuildCallFunction($_[0], $fct, $_[2]);
 		}
 |	var	':'	NAME	args
@@ -425,20 +417,36 @@ funcbody
 ;
 
 parlist1
-:	namelist	','	'...'
+:	parlist	','	'...'
 		{
 			[
 				@{$_[1]},
-				BuildLocalVariable($_[0], $_[3])
+				BuildParam($_[0], $_[3])
 			];
 		}
-|	namelist
+|	parlist
 		#default action
 |	'...'
 		{
 			[
-				BuildLocalVariable($_[0], $_[1])
+				BuildParam($_[0], $_[1])
 			];
+		}
+;
+
+parlist
+:	parlist	','	NAME
+		{
+			[
+				@{$_[1]},
+				BuildParam($_[0], $_[3])
+			];
+		}
+|	NAME
+		{
+			[
+				BuildParam($_[0], $_[1])
+			]
 		}
 ;
 

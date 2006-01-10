@@ -107,6 +107,38 @@ L0:
     not_implemented()
 .end
 
+=item C<getn (table)>
+
+Support variable number of arguments function call.
+
+=cut
+
+.sub mkarg
+    .param pmc argv
+    .local pmc ret
+    .local pmc key
+    .local pmc n
+    .local pmc curr
+    .local int argc
+    .local int i
+    new ret, .LuaTable
+    new key, .LuaNumber
+    argc = argv
+    i = 0
+L1:
+    if i >= argc goto L2
+    curr = argv[i]
+    i = i + 1
+    key = i
+    ret[key] = curr
+    goto L1
+L2:
+    new n, .LuaString
+    n = "n"
+    ret[n] = key
+    .return (ret)
+.end
+
 =item C<not_implemented ()>
 
 =cut

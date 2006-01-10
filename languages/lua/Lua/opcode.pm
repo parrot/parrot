@@ -85,6 +85,9 @@ use base qw(Lua::opcode);
 package BranchUnlessOp;
 use base qw(Lua::opcode);
 
+package BranchUnlessNullOp;
+use base qw(Lua::opcode);
+
 package SubDir;
 use base qw(Lua::opcode);
 

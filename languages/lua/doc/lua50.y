@@ -180,9 +180,14 @@ funcbody
 ;
 
 parlist1
-:	namelist	','	'...'
-|	namelist
+:	parlist	','	'...'
+|	parlist
 |	'...'
+;
+
+parlist
+:	parlist	','	NAME
+|	NAME
 ;
 
 tableconstructor
