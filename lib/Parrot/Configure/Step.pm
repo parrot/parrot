@@ -205,8 +205,8 @@ sub genfile
         print $out "\n"; # extra newline after header
     }
 
-    # this loop can not be impliment as a foreach loop as the body is dependant
-    # on <IN> being evaluated lazily
+    # this loop can not be implemented as a foreach loop as the body
+    # is dependant on <IN> being evaluated lazily
     while (my $line = <$in>) {
         # everything after the line starting with #perl is eval'ed
         if ($line =~ /^#perl/ && $options{feature_file}) {
@@ -250,6 +250,8 @@ sub genfile
             # replace \* with \\*, so make will not eat the \
             $line =~ s{(\\\*)}{\\$1}g;
         }
+        # Unquote text quoted using ${{word}} notation
+        $line =~ s/\${{(\w+)}}/\${$1}/g;
         print $out $line;
     }
 

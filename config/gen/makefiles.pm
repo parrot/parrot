@@ -210,6 +210,9 @@ sub makefiles
         commentType                     => '#',
         replace_slashes                 => 1
     );
+    genfile(
+        'config/gen/makefiles/parrot.pc.in' => 'parrot.pc'
+    );
 
     if ($conf->data->get('has_perldoc')) {
 
