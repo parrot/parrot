@@ -1587,11 +1587,46 @@ static unsigned char *lastpc;
     emitm_fstp(pc, (r+1)); \
 }
 
-/* ST(r1) /= ST(r2) */
-#  define jit_emit_div_rr_n(pc, r1, r2) { \
-    emitm_fld(pc, r2); \
-    emitm_fdivp(pc, (r1+1)); \
+/* test r for zero */
+#  define jit_emit_test_r_n(pc, r) { \
+    if (r) { \
+      emitm_fxch(pc, r); \
+    } \
+    emitm_ftst(pc); \
+    emitm_fstw(pc); \
+    emitm_sahf(pc); \
+    if (r) { \
+      emitm_fxch(pc, r); \
+    } \
 }
+
+/* ST(r1) /= ST(r2) */
+static char *
+div_rr_n(Parrot_jit_info_t *jit_info, int r1, int r2)
+{
+    char *L1;
+    static const char* div_by_zero = "Divide by zero";
+    char *pc = jit_info->native_ptr;
+
+    emitm_fld(pc, r2); 
+    jit_emit_test_r_n(pc, r2);
+    L1 = pc;
+    emitm_jxs(pc, emitm_jnz, 0);
+    emitm_pushl_i(pc, div_by_zero);
+    emitm_pushl_i(pc, E_ZeroDivisionError);
+    emitm_pushl_i(pc, 0);    /* NULL */
+    Parrot_jit_emit_get_INTERP(pc, emit_ECX);
+    emitm_pushl_r(pc, emit_ECX);
+    jit_info->native_ptr = pc;
+    call_func(jit_info, (void*) real_exception);
+    pc = jit_info->native_ptr;
+    /* L1: */
+    L1[1] = pc - L1 - 2;
+    emitm_fdivp(pc, (r1+1)); 
+    return pc;
+}
+
+#  define jit_emit_div_rr_n(pc, r1, r2) pc = div_rr_n(jit_info, r1, r2)
 
 /* ST(i) %= MEM
  * please note the hardccded jumps */
@@ -1676,19 +1711,6 @@ static unsigned char *lastpc;
       else { \
         emitm_fcomi(pc, r2); \
       } \
-    } \
-}
-
-/* test r for zero */
-#  define jit_emit_test_r_n(pc, r) { \
-    if (r) { \
-      emitm_fxch(pc, r); \
-    } \
-    emitm_ftst(pc); \
-    emitm_fstw(pc); \
-    emitm_sahf(pc); \
-    if (r) { \
-      emitm_fxch(pc, r); \
     } \
 }
 
