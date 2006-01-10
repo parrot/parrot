@@ -250,6 +250,8 @@ NOT_IN_CACHE:
     if $I0 goto DUMP
 
     func = "genericNumber"
+	$I0 = does _dump, "boolean"
+    if $I0 goto DUMP
     $I0 = does _dump, "integer"
     if $I0 goto DUMP
     $I0 = does _dump, "float"
