@@ -2824,11 +2824,23 @@ CODE
 Cannot get character before beginning of string
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUT', 'string_to_int --4');
+pir_output_is(<<'CODE', <<'OUT', 'more string_to_int');
    .sub 'main' :main
       print_as_integer('-4')
       print_as_integer('X-4')
       print_as_integer('--4')
+      print_as_integer('+')
+      print_as_integer('++')
+      print_as_integer('+2')
+      print_as_integer(' +3')
+      print_as_integer('++4')
+      print_as_integer('+ 5')
+      print_as_integer('-')
+      print_as_integer('--56')
+      print_as_integer('  -+67')
+      print_as_integer('+-78')
+      print_as_integer('  -089xyz')
+      print_as_integer('- 89')
    .end
 
    .sub 'print_as_integer'
@@ -2840,6 +2852,18 @@ pir_output_is(<<'CODE', <<'OUT', 'string_to_int --4');
 CODE
 -4
 0
+0
+0
+0
+2
+3
+0
+0
+0
+0
+0
+0
+-89
 0
 OUT
 

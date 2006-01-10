@@ -1930,8 +1930,10 @@ string_to_int(Interp *interpreter, const STRING *s)
                     sign = -1;
                     in_number = 1;
                 }
-                else if (c == '+' || isspace(c))
+                else if (c == '+')
                     in_number = 1;
+                else if (isspace(c))
+                    ;
                 else
                     break;
             }
