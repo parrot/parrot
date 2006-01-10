@@ -25,7 +25,8 @@ GENERATED_INLINES = \
  $(BUILTIN)${slash}incr.pir \
  $(BUILTIN)${slash}join.pir \
  $(BUILTIN)${slash}llength.pir \
- $(BUILTIN)${slash}pwd.pir
+ $(BUILTIN)${slash}pwd.pir \
+ $(BUILTIN)${slash}time.pir
 
 DEPS = \
 lib${slash}commands${slash}after.pir \
@@ -81,7 +82,6 @@ lib${slash}commands${slash}source.pir \
 lib${slash}commands${slash}split.pir \
 lib${slash}commands${slash}string.pir \
 lib${slash}commands${slash}switch.pir \
-lib${slash}commands${slash}time.pir \
 lib${slash}builtins${slash}trace.pir \
 lib${slash}commands${slash}unknown.pir \
 lib${slash}commands${slash}unset.pir \

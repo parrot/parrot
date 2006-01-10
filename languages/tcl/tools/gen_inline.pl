@@ -132,10 +132,10 @@ add_inlined(<<END_PIR);
   __list     = find_global '_Tcl', '__list'
   .local pmc __channel
   __channel  = find_global '_Tcl', '__channel'
+END_PIR
+add_wrapped(<<END_PIR);
   .local pmc __script_compile
   __script_compile = find_global '_Tcl', 'compile'
-  .local pmc __pir_compile
-  __pir_compile = find_global '_Tcl', 'pir_compiler'
 END_PIR
 
 # Now, grab each arg off the list and compile it, handling defaults, etc.
@@ -153,16 +153,16 @@ foreach my $arg (@args_opts) {
         script => {
             pre => sub {
                 add_wrapped(<<END_PIR);
-  ($arg_register,temp_code) = compiler(register_num, $argument)
-  register_num = $arg_register + 1
+  .local string ${arg_register}_code
+  ($arg_register,${arg_register}_code) = __script_compile(register_num, $argument)
+  #XXX This wild increase in register numbers is to avoid a problem in 
+  #    tcl command's compiler which, in one case, used \$P5 to calculate an
+  #    argument, but then returned the result in \$P4. Register usage should be
+  #    bounded between the value you pass in and the value you return. Using
+  #    something outside that range is bad, mmkay? -coke
+  register_num = $arg_register + 100 
 END_PIR
             },
-            post => sub {
-                add_inlined(<<END_PIR);
-  (\$I{$arg_register},\$P{$arg_register}) = __script_compile(\$P{${arg_register}})
-  (\$P{$arg_register}) = __pir_compile(\$I{$arg_register},\$P{${arg_register}})
-END_PIR
-              }
         },
         var => {
             pre => sub {
@@ -177,6 +177,7 @@ END_PIR
   $arg_register = ${arg_register}_varname + 1
   register_num = $arg_register + 1
 END_PIR
+  add_var('temp_code');
             },
             post => sub {
                 add_inlined(<<END_PIR);
@@ -190,6 +191,7 @@ END_PIR
   ($arg_register,temp_code) = compiler(register_num, $argument)
   register_num = $arg_register + 1
 END_PIR
+  add_var('temp_code');
             },
             post => sub {
                 add_inlined(<<END_PIR);
@@ -203,6 +205,7 @@ END_PIR
   ($arg_register,temp_code) = compiler(register_num, $argument)
   register_num = $arg_register + 1
 END_PIR
+  add_var('temp_code');
             },
             post => sub {
                 add_inlined(<<END_PIR);
@@ -218,6 +221,7 @@ END_PIR
   ($arg_register,temp_code) = compiler(register_num, $argument)
   register_num = $arg_register + 1
 END_PIR
+  add_var('temp_code');
             },
             post => sub {
                 add_inlined(<<END_PIR);
@@ -231,10 +235,8 @@ END_PIR
   ($arg_register,temp_code) = compiler(register_num, $argument)
   register_num = $arg_register + 1
 END_PIR
+  add_var('temp_code');
             },
-            post => sub {
-                add_var('temp_code');
-              }
         }
     };
 
@@ -258,10 +260,7 @@ END_PIR
     my $pre  = $type_handlers->{ $arg->{type} }->{pre};
     my $post = $type_handlers->{ $arg->{type} }->{post};
 
-    if ($pre) {
-        $pre->();
-        add_var('temp_code');
-    }
+    if ($pre)  { $pre->()  }
     if ($post) { $post->() }
 
     add_wrapped(<<END_PIR);
@@ -335,7 +334,10 @@ foreach my $chunk (@pir_code) {
             $line =~ s/"/\\"/g;
             $line =~ s/\\n/\\\\n/g;
             if ( $line =~ s/(.*?){(.*?)}// ) {
-                print "  pir_code .= \"$1\"\n";
+                # register interpolation
+                if ($1 ne "") {
+                  print "  pir_code .= \"$1\"\n";
+                }
                 print "  \$S0 = $2\n";
                 print "  pir_code .= \$S0\n";
                 redo
