@@ -1308,7 +1308,29 @@ CODE
 /.*Divide by zero.*/
 OUTPUT
 
+output_like(<<'CODE', <<OUTPUT, "cmod_i_i_i by zero");
+	set I0, 0
+	set I1, 10
+	cmod I2, I1, I0
+CODE
+/.*Divide by zero.*/
+OUTPUT
+
+output_like(<<'CODE', <<OUTPUT, "cmod_i_ic_i by zero");
+	set I0, 0
+	cmod I2, 10, I0
+CODE
+/.*Divide by zero.*/
+OUTPUT
+
+output_like(<<'CODE', <<OUTPUT, "cmod_i_i_ic by zero");
+	set I1, 10
+	cmod I2, I1, 0
+CODE
+/.*Divide by zero.*/
+OUTPUT
+
 
 ## remember to change the number of tests :-)
-BEGIN { plan tests => 50; }
+BEGIN { plan tests => 53; }
 
