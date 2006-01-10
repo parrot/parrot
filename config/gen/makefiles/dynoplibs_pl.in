@@ -44,7 +44,9 @@ if ($^O eq 'MSWin32') {
 }
 
 # OPS2C Config
-our $OPS2C = "$PERL " . '-I..${slash}..${slash}lib ' . $PATHQUOTE .
+our $OPS2C = "$PERL -I $PATHQUOTE" . 
+             q[${build_dir}${slash}lib] .
+             "$PATHQUOTE $PATHQUOTE" .
              q[${build_dir}${slash}tools${slash}build${slash}ops2c.pl] .
 			 $PATHQUOTE;
 our %cores = (
