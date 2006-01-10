@@ -32,8 +32,8 @@ use strict;
 
 my ($mini_parrot, $install_parrot);
 
-$mini_parrot = 1    if (@ARGV && $ARGV[0] =~ /mini/);
-$install_parrot = 1 if (@ARGV && $ARGV[0] =~ /install/);
+$mini_parrot = 1    if @ARGV && $ARGV[0] =~ /mini/;
+$install_parrot = 1 if @ARGV && $ARGV[0] =~ /install/;
 
 print << "EOF";
 /*
@@ -69,9 +69,11 @@ else {
     binmode F;
     $_ = <F>;
     close F;
-#    $_ ||= "\0";
+
     my @c = split '';
-    printf '    ';
+    die "'$image_file' is truncated. Remove it and rerun make\n" if !@c;
+
+    print '    ';
     my $i;
     for (@c) {
         printf "0x%02x", ord($_);
