@@ -1234,7 +1234,7 @@ CODE
 0
 OUTPUT
 
-output_like(<<'CODE', <<OUTPUT, "div_i_i by zero", todo => 'not yet implemented');
+output_like(<<'CODE', <<OUTPUT, "div_i_i by zero");
 	set I0, 0
 	set I1, 10
 	div I1, I0
@@ -1242,14 +1242,14 @@ CODE
 /.*Divide by zero.*/
 OUTPUT
 
-output_like(<<'CODE', <<OUTPUT, "div_i_ic by zero", todo => 'not yet implemented');
+output_like(<<'CODE', <<OUTPUT, "div_i_ic by zero");
 	set I1, 10
 	div I1, 0
 CODE
 /.*Divide by zero.*/
 OUTPUT
 
-output_like(<<'CODE', <<OUTPUT, "div_i_i_i by zero", todo => 'not yet implemented');
+output_like(<<'CODE', <<OUTPUT, "div_i_i_i by zero");
 	set I0, 0
 	set I1, 10
 	div I2, I1, I0
@@ -1257,21 +1257,21 @@ CODE
 /.*Divide by zero.*/
 OUTPUT
 
-output_like(<<'CODE', <<OUTPUT, "div_i_ic_i by zero", todo => 'not yet implemented');
+output_like(<<'CODE', <<OUTPUT, "div_i_ic_i by zero");
 	set I0, 0
 	div I2, 10, I0
 CODE
 /.*Divide by zero.*/
 OUTPUT
 
-output_like(<<'CODE', <<OUTPUT, "div_i_i_ic by zero", todo => 'not yet implemented');
+output_like(<<'CODE', <<OUTPUT, "div_i_i_ic by zero");
 	set I1, 10
 	div I2, I1, 0
 CODE
 /.*Divide by zero.*/
 OUTPUT
 
-output_like(<<'CODE', <<OUTPUT, "fdiv_i_i by zero", todo => 'not yet implemented');
+output_like(<<'CODE', <<OUTPUT, "fdiv_i_i by zero");
 	set I0, 0
 	set I1, 10
 	fdiv I1, I0
@@ -1279,14 +1279,14 @@ CODE
 /.*Divide by zero.*/
 OUTPUT
 
-output_like(<<'CODE', <<OUTPUT, "fdiv_i_ic by zero", todo => 'not yet implemented');
+output_like(<<'CODE', <<OUTPUT, "fdiv_i_ic by zero");
 	set I1, 10
 	fdiv I1, 0
 CODE
 /.*Divide by zero.*/
 OUTPUT
 
-output_like(<<'CODE', <<OUTPUT, "fdiv_i_i_i by zero", todo => 'not yet implemented');
+output_like(<<'CODE', <<OUTPUT, "fdiv_i_i_i by zero");
 	set I0, 0
 	set I1, 10
 	fdiv I2, I1, I0
@@ -1294,14 +1294,14 @@ CODE
 /.*Divide by zero.*/
 OUTPUT
 
-output_like(<<'CODE', <<OUTPUT, "fdiv_i_ic_i by zero", todo => 'not yet implemented');
+output_like(<<'CODE', <<OUTPUT, "fdiv_i_ic_i by zero");
 	set I0, 0
 	fdiv I2, 10, I0
 CODE
 /.*Divide by zero.*/
 OUTPUT
 
-output_like(<<'CODE', <<OUTPUT, "fdiv_i_i_ic by zero", todo => 'not yet implemented');
+output_like(<<'CODE', <<OUTPUT, "fdiv_i_i_ic by zero");
 	set I1, 10
 	fdiv I2, I1, 0
 CODE

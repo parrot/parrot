@@ -360,26 +360,43 @@ Divide $1 by $2.
 
 Set $1 to the quotient of $2 divided by $3. In the case of INTVAL division, the
 result is truncated (NOT rounded or floored).
+If the denominator is zero, a 'Divide by zero' exception is thrown.
 
 =cut
 
 inline op div(inout INT, in INT) :base_core {
-  $1 /= $2;
+  INTVAL den = $2;
+  if ($2 == 0)
+    real_exception(interpreter, NULL, E_ZeroDivisionError,
+		    "Divide by zero");
+  $1 /= den;
   goto NEXT();
 }
 
 inline op div(inout NUM, in NUM) :base_core {
-  $1 /= $2;
+  FLOATVAL den = $2;
+  if ($2 == 0.0)
+    real_exception(interpreter, NULL, E_ZeroDivisionError,
+		    "Divide by zero");
+  $1 /= den;
   goto NEXT();
 }
 
 inline op div(out INT, in INT, in INT) :base_core {
-  $1 = $2 / $3;
+  INTVAL den = $3;
+  if ($3 == 0)
+    real_exception(interpreter, NULL, E_ZeroDivisionError,
+		    "Divide by zero");
+  $1 = $2 / den;
   goto NEXT();
 }
 
 inline op div(out NUM, in NUM, in NUM) :base_core {
-  $1 = $2 / $3;
+  FLOATVAL den = $3;
+  if ($3 == 0.0)
+    real_exception(interpreter, NULL, E_ZeroDivisionError,
+		    "Divide by zero");
+  $1 = $2 / den;
   goto NEXT();
 }
 
@@ -395,26 +412,43 @@ Floor divide $1 by $2.
 
 Set $1 to the quotient of $2 divided by $3. The result is the floor()
 of the division i.e. the next whole integer towards -inf.
+If the denominator is zero, a 'Divide by zero' exception is thrown.
 
 =cut
 
 inline op fdiv(inout INT, in INT) :base_core {
-  $1 = (INTVAL)floor($1 / $2);
+  INTVAL den = $2;
+  if ($2 == 0)
+    real_exception(interpreter, NULL, E_ZeroDivisionError,
+		    "Divide by zero");
+  $1 = (INTVAL)floor($1 / den);
   goto NEXT();
 }
 
 inline op fdiv(inout NUM, in NUM) :base_core {
-  $1 = floor($1 / $2);
+  FLOATVAL den = $2;
+  if ($2 == 0.0)
+    real_exception(interpreter, NULL, E_ZeroDivisionError,
+		    "Divide by zero");
+  $1 = floor($1 / den);
   goto NEXT();
 }
 
 inline op fdiv(out INT, in INT, in INT) :base_core {
-  $1 = (INTVAL)floor($2 / $3);
+  INTVAL den = $3;
+  if ($3 == 0)
+    real_exception(interpreter, NULL, E_ZeroDivisionError,
+		    "Divide by zero");
+  $1 = (INTVAL)floor($2 / den);
   goto NEXT();
 }
 
 inline op fdiv(out NUM, in NUM, in NUM) :base_core {
-  $1 = floor($2 / $3);
+  FLOATVAL den = $3;
+  if ($3 == 0.0)
+    real_exception(interpreter, NULL, E_ZeroDivisionError,
+		    "Divide by zero");
+  $1 = floor($2 / den);
   goto NEXT();
 }
 
