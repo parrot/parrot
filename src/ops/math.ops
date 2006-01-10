@@ -274,12 +274,16 @@ and defined with y == 0 is provided by the mod op.
   [1] Brian W. Kernighan and Dennis M. Ritchie, *The C Programming
       Language*, Second Edition. Prentice Hall, 1988.
 
-TODO: Doesn't the Parrot interpreter need to catch the exception?
+If the denominator is zero, a 'Divide by zero' exception is thrown.
 
 =cut
 
 inline op cmod(out INT, in INT, in INT) :base_core {
-  $1 = $2 % $3;
+  INTVAL den = $3;
+  if ($3 == 0)
+    real_exception(interpreter, NULL, E_ZeroDivisionError,
+		    "Divide by zero");
+  $1 = $2 % den;
   goto NEXT();
 }
 
@@ -310,12 +314,16 @@ defined with y == 0 is provided by the mod op.
   [1] Brian W. Kernighan and Dennis M. Ritchie, *The C Programming
       Language*, Second Edition. Prentice Hall, 1988.
 
-TODO: Doesn't the Parrot interpreter need to catch the exception?
+If the denominator is zero, a 'Divide by zero' exception is thrown.
 
 =cut
 
 inline op cmod(out NUM, in NUM, in NUM) :base_core {
-  $1 = fmod($2, $3);
+  FLOATVAL den = $3;
+  if ($3 == 0.0)
+    real_exception(interpreter, NULL, E_ZeroDivisionError,
+		    "Divide by zero");
+  $1 = fmod($2, den);
   goto NEXT();
 }
 
