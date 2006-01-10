@@ -189,7 +189,6 @@ Stats a file, and returns a 13 position array as in Perl:
 */
 
     METHOD PMC* stat(STRING *path) {
-#ifndef _MSC_VER
         struct stat info;
         PMC *array;
 
@@ -236,15 +235,11 @@ Stats a file, and returns a 13 position array as in Perl:
 #endif
             return array;
         }
-#else
-        internal_exception(UNIMPLEMENTED, "Win32 is not POSIX. Need win32 developer!");
-        return NULL;
-#endif
     }
 
 /*
 
-=item C<fixedpmcarray* stat(STRING* path)>
+=item C<fixedpmcarray* lstat(STRING* path)>
 
 Stats a file, and returns a 13 position array as in Perl:
 
