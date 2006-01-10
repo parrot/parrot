@@ -1238,6 +1238,7 @@ output_like(<<'CODE', <<OUTPUT, "div_i_i by zero");
 	set I0, 0
 	set I1, 10
 	div I1, I0
+	end
 CODE
 /.*Divide by zero.*/
 OUTPUT
@@ -1245,6 +1246,7 @@ OUTPUT
 output_like(<<'CODE', <<OUTPUT, "div_i_ic by zero");
 	set I1, 10
 	div I1, 0
+	end
 CODE
 /.*Divide by zero.*/
 OUTPUT
@@ -1253,6 +1255,7 @@ output_like(<<'CODE', <<OUTPUT, "div_i_i_i by zero");
 	set I0, 0
 	set I1, 10
 	div I2, I1, I0
+	end
 CODE
 /.*Divide by zero.*/
 OUTPUT
@@ -1260,6 +1263,7 @@ OUTPUT
 output_like(<<'CODE', <<OUTPUT, "div_i_ic_i by zero");
 	set I0, 0
 	div I2, 10, I0
+	end
 CODE
 /.*Divide by zero.*/
 OUTPUT
@@ -1267,6 +1271,7 @@ OUTPUT
 output_like(<<'CODE', <<OUTPUT, "div_i_i_ic by zero");
 	set I1, 10
 	div I2, I1, 0
+	end
 CODE
 /.*Divide by zero.*/
 OUTPUT
@@ -1275,6 +1280,7 @@ output_like(<<'CODE', <<OUTPUT, "fdiv_i_i by zero");
 	set I0, 0
 	set I1, 10
 	fdiv I1, I0
+	end
 CODE
 /.*Divide by zero.*/
 OUTPUT
@@ -1282,6 +1288,7 @@ OUTPUT
 output_like(<<'CODE', <<OUTPUT, "fdiv_i_ic by zero");
 	set I1, 10
 	fdiv I1, 0
+	end
 CODE
 /.*Divide by zero.*/
 OUTPUT
@@ -1290,6 +1297,7 @@ output_like(<<'CODE', <<OUTPUT, "fdiv_i_i_i by zero");
 	set I0, 0
 	set I1, 10
 	fdiv I2, I1, I0
+	end
 CODE
 /.*Divide by zero.*/
 OUTPUT
@@ -1297,6 +1305,7 @@ OUTPUT
 output_like(<<'CODE', <<OUTPUT, "fdiv_i_ic_i by zero");
 	set I0, 0
 	fdiv I2, 10, I0
+	end
 CODE
 /.*Divide by zero.*/
 OUTPUT
@@ -1304,6 +1313,7 @@ OUTPUT
 output_like(<<'CODE', <<OUTPUT, "fdiv_i_i_ic by zero");
 	set I1, 10
 	fdiv I2, I1, 0
+	end
 CODE
 /.*Divide by zero.*/
 OUTPUT
@@ -1312,6 +1322,7 @@ output_like(<<'CODE', <<OUTPUT, "cmod_i_i_i by zero");
 	set I0, 0
 	set I1, 10
 	cmod I2, I1, I0
+	end
 CODE
 /.*Divide by zero.*/
 OUTPUT
@@ -1319,6 +1330,7 @@ OUTPUT
 output_like(<<'CODE', <<OUTPUT, "cmod_i_ic_i by zero");
 	set I0, 0
 	cmod I2, 10, I0
+	end
 CODE
 /.*Divide by zero.*/
 OUTPUT
@@ -1326,11 +1338,43 @@ OUTPUT
 output_like(<<'CODE', <<OUTPUT, "cmod_i_i_ic by zero");
 	set I1, 10
 	cmod I2, I1, 0
+	end
 CODE
 /.*Divide by zero.*/
 OUTPUT
 
+output_is(<<'CODE', <<OUTPUT, "mod_i_i_i by zero");
+	set I0, 0
+	set I1, 10
+	mod I2, I1, I0
+	print I2
+	print "\n"
+	end
+CODE
+10
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "mod_i_ic_i by zero");
+	set I0, 0
+	mod I2, 10, I0
+	print I2
+	print "\n"
+	end
+CODE
+10
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "mod_i_i_ic by zero");
+	set I1, 10
+	mod I2, I1, 0
+	print I2
+	print "\n"
+	end
+CODE
+10
+OUTPUT
+
 
 ## remember to change the number of tests :-)
-BEGIN { plan tests => 53; }
+BEGIN { plan tests => 56; }
 

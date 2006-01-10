@@ -1095,6 +1095,7 @@ output_like(<<'CODE', <<OUTPUT, "div_n_n by zero");
 	set N0, 0
 	set N1, 10
 	div N1, N0
+	end
 CODE
 /.*Divide by zero.*/
 OUTPUT
@@ -1102,6 +1103,7 @@ OUTPUT
 output_like(<<'CODE', <<OUTPUT, "div_n_nc by zero");
 	set N1, 10
 	div N1, 0
+	end
 CODE
 /.*Divide by zero.*/
 OUTPUT
@@ -1110,6 +1112,7 @@ output_like(<<'CODE', <<OUTPUT, "div_n_n_n by zero");
 	set N0, 0
 	set N1, 10
 	div N2, N1, N0
+	end
 CODE
 /.*Divide by zero.*/
 OUTPUT
@@ -1117,6 +1120,7 @@ OUTPUT
 output_like(<<'CODE', <<OUTPUT, "div_n_nc_n by zero");
 	set N0, 0
 	div N2, 10, N0
+	end
 CODE
 /.*Divide by zero.*/
 OUTPUT
@@ -1124,6 +1128,7 @@ OUTPUT
 output_like(<<'CODE', <<OUTPUT, "div_n_n_nc by zero");
 	set N1, 10
 	div N2, N1, 0
+	end
 CODE
 /.*Divide by zero.*/
 OUTPUT
@@ -1132,6 +1137,7 @@ output_like(<<'CODE', <<OUTPUT, "fdiv_n_n by zero");
 	set N0, 0
 	set N1, 10
 	fdiv N1, N0
+	end
 CODE
 /.*Divide by zero.*/
 OUTPUT
@@ -1139,6 +1145,7 @@ OUTPUT
 output_like(<<'CODE', <<OUTPUT, "fdiv_n_nc by zero");
 	set N1, 10
 	fdiv N1, 0
+	end
 CODE
 /.*Divide by zero.*/
 OUTPUT
@@ -1147,6 +1154,7 @@ output_like(<<'CODE', <<OUTPUT, "fdiv_n_n_n by zero");
 	set N0, 0
 	set N1, 10
 	fdiv N2, N1, N0
+	end
 CODE
 /.*Divide by zero.*/
 OUTPUT
@@ -1154,6 +1162,7 @@ OUTPUT
 output_like(<<'CODE', <<OUTPUT, "fdiv_n_nc_n by zero");
 	set N0, 0
 	fdiv N2, 10, N0
+	end
 CODE
 /.*Divide by zero.*/
 OUTPUT
@@ -1161,6 +1170,7 @@ OUTPUT
 output_like(<<'CODE', <<OUTPUT, "fdiv_n_n_nc by zero");
 	set N1, 10
 	fdiv N2, N1, 0
+	end
 CODE
 /.*Divide by zero.*/
 OUTPUT
@@ -1169,6 +1179,7 @@ output_like(<<'CODE', <<OUTPUT, "cmod_n_n_n by zero");
 	set N0, 0
 	set N1, 10
 	cmod N2, N1, N0
+	end
 CODE
 /.*Divide by zero.*/
 OUTPUT
@@ -1176,6 +1187,7 @@ OUTPUT
 output_like(<<'CODE', <<OUTPUT, "cmod_n_nc_n by zero");
 	set N0, 0
 	cmod N2, 10, N0
+	end
 CODE
 /.*Divide by zero.*/
 OUTPUT
@@ -1183,11 +1195,34 @@ OUTPUT
 output_like(<<'CODE', <<OUTPUT, "cmod_n_n_nc by zero");
 	set N1, 10
 	cmod N2, N1, 0
+	end
 CODE
 /.*Divide by zero.*/
 OUTPUT
 
+output_is(<<'CODE', <<OUTPUT, "mod_n_n_n by zero");
+	set N0, 0
+	set N1, 10
+	mod N2, N1, N0
+	end
+CODE
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "mod_n_nc_n by zero");
+	set N0, 0
+	mod N2, 10, N0
+	end
+CODE
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "mod_n_n_nc by zero");
+	set N1, 10
+	mod N2, N1, 0
+	end
+CODE
+OUTPUT
+
 
 ## remember to change the number of tests :-)
-BEGIN { plan tests => 53; }
+BEGIN { plan tests => 56; }
 
