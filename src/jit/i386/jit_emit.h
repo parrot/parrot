@@ -1511,12 +1511,10 @@ static unsigned char *lastpc;
 #  define jit_emit_add_ri_n(pc, r, m) jit_emit_xxx_rm_n(add, pc, r, m)
 #  define jit_emit_sub_ri_n(pc, r, m) jit_emit_xxx_rm_n(sub, pc, r, m)
 #  define jit_emit_mul_ri_n(pc, r, m) jit_emit_xxx_rm_n(mul, pc, r, m)
-#  define jit_emit_div_ri_n(pc, r, m) jit_emit_xxx_rm_n(div, pc, r, m)
 
 #  define jit_emit_add_RM_n(pc, r, o) jit_emit_xxx_RM_n(add, pc, r, o)
 #  define jit_emit_sub_RM_n(pc, r, o) jit_emit_xxx_RM_n(sub, pc, r, o)
 #  define jit_emit_mul_RM_n(pc, r, o) jit_emit_xxx_RM_n(mul, pc, r, o)
-#  define jit_emit_div_RM_n(pc, r, o) jit_emit_xxx_RM_n(div, pc, r, o)
 
 
 /* ST(r1) += ST(r2) */
@@ -1602,14 +1600,13 @@ static unsigned char *lastpc;
 
 /* ST(r1) /= ST(r2) */
 static char *
-div_rr_n(Parrot_jit_info_t *jit_info, int r1, int r2)
+div_rr_n(Parrot_jit_info_t *jit_info, int r1)
 {
     char *L1;
     static const char* div_by_zero = "Divide by zero";
     char *pc = jit_info->native_ptr;
 
-    emitm_fld(pc, r2); 
-    jit_emit_test_r_n(pc, r2);
+    jit_emit_test_r_n(pc, 0);   /* TOS */
     L1 = pc;
     emitm_jxs(pc, emitm_jnz, 0);
     emitm_pushl_i(pc, div_by_zero);
@@ -1626,7 +1623,20 @@ div_rr_n(Parrot_jit_info_t *jit_info, int r1, int r2)
     return pc;
 }
 
-#  define jit_emit_div_rr_n(pc, r1, r2) pc = div_rr_n(jit_info, r1, r2)
+#  define jit_emit_div_rr_n(pc, r1, r2) \
+    emitm_fld(pc, r2); \
+    jit_info->native_ptr = pc; \
+    pc = div_rr_n(jit_info, r1)
+
+#  define jit_emit_div_ri_n(pc, r, m) \
+    jit_emit_fload_m_n(pc, m); \
+    jit_info->native_ptr = pc; \
+    pc = div_rr_n(jit_info, r)
+
+#  define jit_emit_div_RM_n(pc, r, o) \
+    jit_emit_fload_mb_n(pc, emit_EBX, o); \
+    jit_info->native_ptr = pc; \
+    pc = div_rr_n(jit_info, r)
 
 /* ST(i) %= MEM
  * please note the hardccded jumps */
