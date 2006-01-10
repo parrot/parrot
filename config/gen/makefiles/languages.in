@@ -61,10 +61,10 @@ help:
 	@echo ""
 
 test:   all
-	$(PERL) testall
+	$(PERL) t/harness
 
 smoke:  all
-	$(PERL) testall --html
+	$(PERL) t/harness --html
 	$(PERL) ../tools/util/smokeserv-client.pl languages_smoke.html
 
 smoke-clean :

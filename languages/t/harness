@@ -1,18 +1,19 @@
 #! perl -w
-# Copyright: 2004-2005 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2004-2006 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 use strict;
+use warnings;
 
 use FindBin;
-use lib "$FindBin::Bin/../lib";
+use lib "$FindBin::Bin/../../lib";
 
 use Data::Dumper;
 use File::Spec;
 use Test::Harness();
 use Parrot::Config qw/%PConfig/;
 
-=head1 languages harness
+=head1 Languages harness
 
 There are 3 ways to run a language test: 
 
@@ -24,7 +25,15 @@ C<make languages-test>
 
 or
 
-C<cd languages && make test> or
+C<cd languages && make test>
+
+=item Smoke testing
+
+C<make languages-smoke> 
+
+or
+
+C<cd languages && make smoke> or
 
 =item * Per Language Harness
 
@@ -34,7 +43,7 @@ C<cd languages/tcl && make test>
 
 =item * Run a single test for more detailed output.
 
-e.g., C<cd languages/tcl && t/joe_test.t>
+e.g., C<cd languages/tcl && prove t/joe_test.t>
 
 =back
 
