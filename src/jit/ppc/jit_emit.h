@@ -284,8 +284,12 @@ enum { JIT_PPC_CALL, JIT_PPC_BRANCH, JIT_PPC_UBRANCH };
 #  define jit_emit_mul_rrr(pc, D, A, B) \
     jit_emit_3reg(pc, 31, D, A, B, 0, 235, 0);
 
-#  define jit_emit_div_rrr(pc, D, A, B) \
+#  define jit_emit_div_rrr_no_check(pc, D, A, B) \
     jit_emit_3reg(pc, 31, D, A, B, 0, 491, 0);
+
+#  define jit_emit_cmp_ri(pc, ra, simm) \
+    _emit_cmpi(pc, 11, 0, ra, simm);
+
 
 #  define jit_emit_and_rrr(pc, D, A, B) \
     jit_emit_3reg_x(pc, 31, A, D, B, 28, 0)
@@ -408,7 +412,7 @@ enum { JIT_PPC_CALL, JIT_PPC_BRANCH, JIT_PPC_UBRANCH };
 #  define jit_emit_fadd_rrr(pc, D, A, B) jit_emit_3a(pc, 63, D, A, B, 0, 21, 0)
 #  define jit_emit_fsub_rrr(pc, D, A, B) jit_emit_3a(pc, 63, D, A, B, 0, 20, 0)
 #  define jit_emit_fmul_rrr(pc, D, A, B) jit_emit_3a(pc, 63, D, A, 0, B, 25, 0)
-#  define jit_emit_fdiv_rrr(pc, D, A, B) jit_emit_3a(pc, 63, D, A, B, 0, 18, 0)
+#  define jit_emit_fdiv_rrr_no_check(pc, D, A, B) jit_emit_3a(pc, 63, D, A, B, 0, 18, 0)
 #  define jit_emit_fsel(pc, D, A, B, C) jit_emit_3a(pc, 63, D, A, B, C, 23, 0)
 
 #  define jit_emit_fabs_rrr(pc, D, A)  jit_emit_3reg_x(pc, 63, D, 0, A, 264, 0)
@@ -461,9 +465,6 @@ enum { JIT_PPC_CALL, JIT_PPC_BRANCH, JIT_PPC_UBRANCH };
     *(pc++) = (char)(bf << 7 | ra); \
     *(pc++) = simm >> 8; \
     *(pc++) = (char)simm
-
-#  define jit_emit_cmp_ri(pc, ra, simm) \
-    _emit_cmpi(pc, 11, 0, ra, simm);
 
 /* Branch conditional to immediate
  *
@@ -616,6 +617,70 @@ jit_emit_bx(Parrot_jit_info_t *jit_info, char type, opcode_t disp)
       Parrot_exec_add_text_rellocation(jit_info->objfile, \
         pc, RTYPE_DATA1, "const_table", -2);
 #endif /* EXEC_CAPABLE */
+
+static char *
+div_rrr(Parrot_jit_info_t *jit_info, char D, char A, char B)
+{
+    char *jmp_ptr, *sav_ptr;
+    static const char* div_by_zero = "Divide by zero";
+    char *pc = jit_info->native_ptr;
+
+    jit_emit_cmp_ri(pc, B, 0);
+     /* remember PC */
+    jmp_ptr = pc;
+    /* emit jump past exception code, dummy offset */
+    _emit_bc(pc, BNE, 0, 0, 0);
+    jit_emit_mov_rr(pc, r3, r16); /* interp */
+    jit_emit_mov_ri_i(pc, r4, 0);          /* NULL */
+    jit_emit_mov_ri_i(pc, r5, E_ZeroDivisionError);          /* type */
+    jit_emit_mov_ri_i(pc, r6, div_by_zero); 
+    jit_info->native_ptr = pc;
+    jit_emit_call_func(pc, (void*) real_exception);
+    pc = jit_info->native_ptr;
+    /* fixup above jump */
+    sav_ptr = pc;
+    pc = jmp_ptr;
+    _emit_bc(pc, BNE, ((long)(sav_ptr - jmp_ptr)), 0, 0);
+    /* restore PC */
+    pc = sav_ptr;
+    jit_emit_div_rrr_no_check(pc, D, A, B);
+    return pc;
+}
+
+static char *
+fdiv_rrr(Parrot_jit_info_t *jit_info, char D, char A, char B)
+{
+    char *jmp_ptr, *sav_ptr;
+    static const char* div_by_zero = "Divide by zero";
+    char *pc = jit_info->native_ptr;
+    static const double zero = 0.0;
+
+    jit_emit_mov_ri_i(pc, ISR1, &zero);
+    jit_emit_lfd(pc, f1, 0, ISR1);
+
+    jit_emit_fcmp_rr(pc, B, f1);   /* XXX be sure it's unmapped */
+     /* remember PC */
+    jmp_ptr = pc;
+    /* emit jump past exception code, dummy offset */
+    _emit_bc(pc, BNE, 0, 0, 0);
+    jit_emit_mov_rr(pc, r3, r16); /* interp */
+    jit_emit_mov_ri_i(pc, r4, 0);          /* NULL */
+    jit_emit_mov_ri_i(pc, r5, E_ZeroDivisionError);          /* type */
+    jit_emit_mov_ri_i(pc, r6, div_by_zero); 
+    jit_info->native_ptr = pc;
+    jit_emit_call_func(pc, (void*) real_exception);
+    pc = jit_info->native_ptr;
+    /* fixup above jump */
+    sav_ptr = pc;
+    pc = jmp_ptr;
+    _emit_bc(pc, BNE, ((long)(sav_ptr - jmp_ptr)), 0, 0);
+    /* restore PC */
+    pc = sav_ptr;
+    jit_emit_fdiv_rrr_no_check(pc, D, A, B);
+    return pc;
+}
+#  define jit_emit_div_rrr(pc, D, A, B) pc = div_rrr(jit_info, D, A, B)
+#  define jit_emit_fdiv_rrr(pc, D, A, B) pc = fdiv_rrr(jit_info, D, A, B)
 
 #endif /* JIT_EMIT */
 
