@@ -61,18 +61,17 @@ have already been built.
 
 # Step 0: handle command line args
 
-my $html = grep { $_ eq '--html' } @ARGV;
+my $do_gen_html = grep { $_ eq '--html' } @ARGV;
 @ARGV = grep { $_ ne '--html' } @ARGV;
 
 # Step 1: find harness files for testable languages
 
-# These could all be tested:
+# Various languages are not yet in smoke testing, some will never be.
 #
 # BASIC                No t/harness, two implementations
 # cola                 not maintained
 # conversion           No t/harness
 # forth                No t/harness
-# jako                 No t/harness
 # lisp                 No t/harness
 # miniperl             not maintained, should be removed
 # parakeet             No t/harness
@@ -117,7 +116,7 @@ chomp(@tests);
 
 # Step 3: test.
 
-unless ($html) {
+if ( ! $do_gen_html ) {
     Test::Harness::runtests(@tests);
 } else {
     my @smoke_config_vars = qw(
@@ -138,28 +137,60 @@ unless ($html) {
     };
     die "You must have Test::TAP::HTMLMatrix installed.\n\n$@" if $@;
 
-    my $start = time;
-    my $model = Test::TAP::Model::Visual->new_with_tests(@tests);
-    my $end = time;
+    ## FIXME: ###
+    # This is a temporary solution until Test::TAP::Model version
+    # 0.05.  At that point, this function should be removed, and the
+    # verbose line below should be uncommented.
+    {
+        no warnings qw/redefine once/;
+        *Test::TAP::Model::run_tests = sub {
+            my $self = shift;
 
-    my $duration = $end - $start;
-    my $languages = join( q{ }, @unified_testable_languages );
-    my $v = Test::TAP::HTMLMatrix->new(
-        $model,
-        join("\n",
-             "languages: $languages",
-             "duration: $duration",
-             "branch: unknown",
-             "harness_args: languages",
-             map { "$_: $PConfig{$_}" } sort @smoke_config_vars),
-    );
+            $self->_init;
+            $self->{meat}{start_time} = time();
 
-    $v->has_inline_css(1); # no separate css file
+            my %stats;
 
-    open HTML, ">", "languages_smoke.html";
-    print HTML $v->html();
-    close HTML;
+            foreach my $file (@_) {
+                my $data;
+                print STDERR "- $file\n";
+                $data = $self->run_test($file);
+                $stats{tests} += $data->{results}{max};
+                $stats{ok}    += $data->{results}{ok};
+            }
 
-    print "smoke.html has been generated.\n";
+            printf STDERR "%s OK from %s tests (%.2f%% ok)\n\n",
+            $stats{ok},
+            $stats{tests},
+            $stats{ok} / $stats{tests} * 100;
+
+            $self->{meat}{end_time} = time;
+        };
+
+        my $start = time;
+        my $model = Test::TAP::Model::Visual->new_with_tests(@tests);
+        my $end = time;
+
+        my $duration = $end - $start;
+        my $languages = join( q{ }, @unified_testable_languages );
+        my $v = Test::TAP::HTMLMatrix->new(
+            $model,
+            join("\n",
+                 "languages: $languages",
+                 "duration: $duration",
+                 "branch: unknown",
+                 "harness_args: languages",
+                 map { "$_: $PConfig{$_}" } sort @smoke_config_vars),
+        );
+
+        $v->has_inline_css(1); # no separate css file
+
+        my $html_fn = "languages_smoke.html";
+        open HTML, '>', $html_fn;
+        print HTML $v->html();
+        close HTML;
+
+        print "$html_fn has been generated.\n";
+    }
 }
 
