@@ -150,7 +150,7 @@ my $stat;
 if ($cygwin || $MSWin32) {
     # Skip inode number
     my @s = stat('xpto');
-    $stat = join("\n",$s[0],@s[2..12])."\n";
+    $stat = join("\n",$s[0],@s[2..10])."\n";
     pir_output_is(<<'CODE', $stat, "Test OS.stat");
 .sub main :main
         $P1 = new .OS
@@ -164,7 +164,7 @@ loop:
         print "\n"
         $I1 += 1
         if $I1 == 1 goto inc
-        if $I1 == 13 goto done
+        if $I1 == 11 goto done
         goto loop
 inc:
         $I1 += 1
