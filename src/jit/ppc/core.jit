@@ -245,8 +245,12 @@ Parrot_mul_i_i {
     Parrot_binop_x_x s/<_N>/_i/ s/<op>/mul/ s/<s1>/ISR1/ s/<s2>/ISR2/ s/<T>/INT/
 }
 
-Parrot_div_i_i {
-    Parrot_binop_x_x s/<_N>/_i/ s/<op>/div/ s/<s1>/ISR1/ s/<s2>/ISR2/ s/<T>/INT/
+parrot_div_i_i {
+    parrot_binop_x_x s/<_n>/_i/ s/<op>/div/ s/<s1>/isr1/ s/<s2>/isr2/ s/<t>/int/
+}
+
+parrot_cmod_i_i {
+    parrot_binop_x_x s/<_n>/_i/ s/<op>/cmod/ s/<s1>/isr1/ s/<s2>/isr2/ s/<t>/int/
 }
 
 Parrot_band_i_ic {
@@ -275,6 +279,10 @@ Parrot_mul_i_ic {
 
 Parrot_div_i_ic {
     Parrot_binop_i_ic s/<op>/div/
+}
+
+Parrot_cmod_i_ic {
+    Parrot_binop_i_ic s/<op>/cmod/
 }
 
 Parrot_add_n_n {
@@ -321,6 +329,10 @@ Parrot_div_i_i_i {
     Parrot_binop_x_x_x s/<_N>/_i/ s/<op>/div/ s/<s1>/ISR1/ s/<s2>/ISR2/ s/<T>/INT/
 }
 
+Parrot_cmod_i_i_i {
+    Parrot_binop_x_x_x s/<_N>/_i/ s/<op>/cmod/ s/<s1>/ISR1/ s/<s2>/ISR2/ s/<T>/INT/
+}
+
 Parrot_band_i_i_ic {
     Parrot_binop_i_i_ic s/<op>/and/
 }
@@ -347,6 +359,10 @@ Parrot_mul_i_i_ic {
 
 Parrot_div_i_i_ic {
     Parrot_binop_i_i_ic s/<op>/div/
+}
+
+Parrot_cmod_i_i_ic {
+    Parrot_binop_i_i_ic s/<op>/cmod/
 }
 
 Parrot_band_i_ic_i {
@@ -377,6 +393,10 @@ Parrot_div_i_ic_i {
     Parrot_binop_i_ic_i s/<op>/div/
 }
 
+Parrot_cmod_i_ic_i {
+    Parrot_binop_i_ic_i s/<op>/cmod/
+}
+
 Parrot_add_n_n_n {
     Parrot_binop_x_x_x s/<_N>/_n/ s/<op>/fadd/ s/<s1>/FSR1/ s/<s2>/FSR2/ s/<T>/NUM/
 }
@@ -391,63 +411,6 @@ Parrot_mul_n_n_n {
 
 Parrot_div_n_n_n {
     Parrot_binop_x_x_x s/<_N>/_n/ s/<op>/fdiv/ s/<s1>/FSR1/ s/<s2>/FSR2/ s/<T>/NUM/
-}
-
-Parrot_cmod_i_i_i {
-    if (MAP[1] && MAP[2] && MAP[3]) {
-        jit_emit_div_rrr(NATIVECODE, MAP[1], MAP[2], MAP[3]);
-        jit_emit_mul_rrr(NATIVECODE, MAP[1], MAP[1], MAP[3]);
-        jit_emit_sub_rrr(NATIVECODE, MAP[1], MAP[2], MAP[1]);
-    }
-    else if (MAP[1] && MAP[2]) {
-        jit_emit_mov_rm_i(NATIVECODE, ISR1, ROFFS_INT(3));
-        jit_emit_div_rrr(NATIVECODE, MAP[1], MAP[2], ISR1);
-        jit_emit_mul_rrr(NATIVECODE, MAP[1], MAP[1], ISR1);
-        jit_emit_sub_rrr(NATIVECODE, MAP[1], MAP[2], MAP[1]);
-    }
-    else if (MAP[1] && MAP[3]) {
-        jit_emit_mov_rm_i(NATIVECODE, ISR1, ROFFS_INT(2));
-        jit_emit_div_rrr(NATIVECODE, MAP[1], ISR1, MAP[3]);
-        jit_emit_mul_rrr(NATIVECODE, MAP[1], MAP[1], MAP[3]);
-        jit_emit_sub_rrr(NATIVECODE, MAP[1], ISR1, MAP[1]);
-    }
-    else if (MAP[2] && MAP[3]) {
-        jit_emit_div_rrr(NATIVECODE, ISR1, MAP[2], MAP[3]);
-        jit_emit_mul_rrr(NATIVECODE, ISR1, ISR1, MAP[3]);
-        jit_emit_sub_rrr(NATIVECODE, ISR1, MAP[2], ISR1);
-        jit_emit_mov_mr_i(NATIVECODE, ROFFS_INT(1), ISR1);
-    }
-    else if (MAP[1]) {
-        jit_emit_mov_rm_i(NATIVECODE, ISR2, ROFFS_INT(3));
-        jit_emit_mov_rm_i(NATIVECODE, ISR1, ROFFS_INT(2));
-        jit_emit_div_rrr(NATIVECODE, MAP[1], ISR1, ISR2);
-        jit_emit_mul_rrr(NATIVECODE, MAP[1], MAP[1], ISR2);
-        jit_emit_sub_rrr(NATIVECODE, MAP[1], ISR1, MAP[1]);
-    }
-    else if (MAP[2]) {
-        jit_emit_mov_rm_i(NATIVECODE, ISR1, ROFFS_INT(3));
-        jit_emit_div_rrr(NATIVECODE, ISR2, MAP[2], ISR1);
-        jit_emit_mul_rrr(NATIVECODE, ISR2, ISR2, ISR1);
-        jit_emit_sub_rrr(NATIVECODE, ISR2, MAP[2], ISR2);
-        jit_emit_mov_mr_i(NATIVECODE, ROFFS_INT(1), ISR2);
-    }
-    else if (MAP[3]) {
-        jit_emit_mov_rm_i(NATIVECODE, ISR2, ROFFS_INT(2));
-        jit_emit_div_rrr(NATIVECODE, ISR1, ISR2, MAP[3]);
-        jit_emit_mul_rrr(NATIVECODE, ISR1, ISR1, MAP[3]);
-        jit_emit_sub_rrr(NATIVECODE, ISR1, ISR2, ISR1);
-        jit_emit_mov_mr_i(NATIVECODE, ROFFS_INT(1), ISR1);
-    }
-    else {
-; XXX: blech.  Not enough temp registers.
-        jit_emit_mov_rm_i(NATIVECODE, ISR2, ROFFS_INT(3));
-        jit_emit_mov_rm_i(NATIVECODE, ISR1, ROFFS_INT(2));
-        jit_emit_div_rrr(NATIVECODE, ISR1, ISR1, ISR2);
-        jit_emit_mul_rrr(NATIVECODE, ISR1, ISR1, ISR2);
-        jit_emit_mov_rm_i(NATIVECODE, ISR2, ROFFS_INT(2));
-        jit_emit_sub_rrr(NATIVECODE, ISR1, ISR1, ISR2);
-        jit_emit_mov_mr_i(NATIVECODE, ROFFS_INT(1), ISR1);
-    }
 }
 
 Parrot_inc_i {

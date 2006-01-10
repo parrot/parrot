@@ -679,8 +679,23 @@ fdiv_rrr(Parrot_jit_info_t *jit_info, char D, char A, char B)
     jit_emit_fdiv_rrr_no_check(pc, D, A, B);
     return pc;
 }
+
 #  define jit_emit_div_rrr(pc, D, A, B) pc = div_rrr(jit_info, D, A, B)
 #  define jit_emit_fdiv_rrr(pc, D, A, B) pc = fdiv_rrr(jit_info, D, A, B)
+
+/* XXX except A = -2^31 and B = -1 */
+
+static char *
+cmod_rrr(Parrot_jit_info_t *jit_info, char D, char A, char B)
+{
+    char *pc;
+    pc = div_rrr(jit_info, D, A, B); 
+    jit_emit_mul_rrr(pc, D, D, B); 
+    jit_emit_sub_rrr(pc, D, A, D); 
+    return pc;
+}
+
+#  define jit_emit_cmod_rrr(pc, D, A, B) pc = cmod_rrr(jit_info, D, A, B)
 
 #endif /* JIT_EMIT */
 
