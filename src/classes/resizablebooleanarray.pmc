@@ -8,10 +8,10 @@ src/classes/resizablebooleanarray.pmc - resizable array for booleans only
 
 =head1 DESCRIPTION
 
-The C<ResizableBooleanArray PMC> implements an array of resizable
-size, which stores booleans.
+The C<ResizableBooleanArray PMC> implements an array of resizable size,
+which stores booleans.
 It uses the C<Boolean PMC> for all conversions.
-C<ResizableBooleanArray PMC> extends C<FixedBooleanArray PMC>
+The C<ResizableBooleanArray PMC> extends the C<FixedBooleanArray PMC>.
 
 =head2 Functions
 
@@ -25,6 +25,7 @@ C<ResizableBooleanArray PMC> extends C<FixedBooleanArray PMC>
 
 
 #define BITS_PER_CHAR 8
+#define MIN_ALLOC 8 * BITS_PER_CHAR
 
 pmclass ResizableBooleanArray extends FixedBooleanArray need_ext does array {
 
@@ -49,9 +50,17 @@ Returns the integer value of the element at index C<key>.
 */
 
     INTVAL get_integer_keyed_int (INTVAL key) {
+        /* Try to make negative index into a real index */
+        if (key < 0) key = SELF.elements() + key;
+
+        /* If it's still negative, we have a problem */
         if (key < 0)
-            internal_exception(OUT_OF_BOUNDS,
+            real_exception(interpreter, NULL, E_IndexError,
                 "ResizableBooleanArray: index out of bounds!");
+
+        /* Adjust key for the current head position */
+        key += PMC_int_val2(SELF);
+
         if(key >= PMC_int_val(SELF))
             DYNSELF.set_integer_native(key+1);
 
@@ -69,9 +78,17 @@ Sets the integer value of the element at index C<key> to C<value>.
 */
 
     void set_integer_keyed_int (INTVAL key, INTVAL value) {
+        /* Try to make negative index into a real index */
+        if (key < 0) key = SELF.elements() + key;
+
+        /* If it's still negative, we have a problem */
         if (key < 0)
-            internal_exception(OUT_OF_BOUNDS,
+            real_exception(interpreter, NULL, E_IndexError,
                 "ResizableBooleanArray: index out of bounds!");
+
+        /* Adjust key for the current head position */
+        key += PMC_int_val2(SELF);
+
         if(key >= PMC_int_val(SELF))
             DYNSELF.set_integer_native(key+1);
 
@@ -89,38 +106,232 @@ Resizes the array to C<size> elements.
 */
 
     void set_integer_native (INTVAL size) {
-        if (size < 0)
-            internal_exception(OUT_OF_BOUNDS,
-                    "ResizableBooleanArray: Can't resize!");
+        Parrot_UInt1 *sd;
+        INTVAL newASize;
+        INTVAL currSize = PMC_int_val(SELF) - PMC_int_val2(SELF);
 
+        /* We are already at the requested size. Yay */
+        if(size == currSize) return;
+
+        if (size < 0)
+            real_exception(interpreter, NULL, E_IndexError,
+                "ResizableBooleanArray: Can't resize!");
+
+        newASize = (size / MIN_ALLOC + 1) * MIN_ALLOC;
+
+        /* Nothing allocated yet */
         if ( ! PMC_data(SELF) ) {
-            SUPER(size);
-        }
-        else if (size <= PMC_int_val2(SELF)) {
-            PMC_int_val(SELF) = size;
-            /* we could shrink here if necessary */
-            return;
+            PMC_data(SELF) = mem_sys_allocate_zeroed(newASize);
         }
         else {
-            INTVAL cur, needed;
-            cur = PMC_int_val2(SELF);
-            if (cur < 8192) {
-                cur = size < 2 * cur ? 2 * cur
-                    : (size/BITS_PER_CHAR+1)*BITS_PER_CHAR;
-            }
-            else {
-                needed = size - cur;
-                cur += needed + 4096;
-                cur &= ~0xfff;
-            }
-            PMC_data(SELF) = mem_sys_realloc(PMC_data(SELF),
-                    cur/BITS_PER_CHAR);
-            PMC_int_val(SELF) = size;
-            PMC_int_val2(SELF) = cur;
+            sd = PMC_data(SELF);
+            PMC_data(SELF) = mem_sys_realloc(sd, newASize);
         }
+
+        PMC_int_val2(SELF) = 0;
+        PMC_int_val(SELF) = size;
     }
 
-}
+/*
+
+=item C<void push_integer(INTVAL size)>
+
+Extends the array by adding an element of value C<value> to the end.
+
+=cut
+
+*/
+
+    void push_integer (INTVAL value) {
+        INTVAL size = PMC_int_val(SELF) - PMC_int_val2(SELF);
+        DYNSELF.set_integer_native(size + 1);
+        DYNSELF.set_integer_keyed_int(size, value);
+    }
+
+/*
+
+=item C<void pop_integer(INTVAL size)>
+
+Removes and returns the last element.
+
+=cut
+
+*/
+
+    INTVAL pop_integer () {
+        INTVAL size, value;
+
+        if (DYNSELF.elements() < 1)
+            real_exception(interpreter, NULL, E_IndexError,
+                "ResizableBooleanArray: Can't pop from an empty array!");
+
+        size = PMC_int_val(SELF) - PMC_int_val2(SELF);
+        value = DYNSELF.get_integer_keyed_int(size - 1);
+        DYNSELF.set_integer_native(size - 1);
+
+        return value;
+    }
+
+/*
+
+=item C<void unshift_integer(INTVAL size)>
+
+Extends the array by adding an element of value C<value> to the 
+beginning.
+
+=cut
+
+*/
+
+    void unshift_integer (INTVAL value) {
+        Parrot_UInt1 *sdOld, *sdNew;
+
+        /* If int_val2 is smaller than 0, size this thing up */
+        if(PMC_int_val2(SELF) <= 0) {
+            sdOld = PMC_data(SELF);
+            sdNew = mem_sys_allocate_zeroed(
+                ((PMC_int_val2(SELF) / MIN_ALLOC) * MIN_ALLOC) 
+                + PMC_int_val(SELF)
+                + ((PMC_int_val(SELF) / MIN_ALLOC + 1) * MIN_ALLOC)
+            );
+            mem_sys_memmove(sdNew, sdOld + PMC_int_val2(SELF), 
+                PMC_int_val(SELF));
+            mem_sys_free(sdOld);
+            PMC_data(SELF) = sdNew;
+            PMC_int_val2(SELF) += MIN_ALLOC;
+            PMC_int_val(SELF) += MIN_ALLOC;
+        }
+
+        /* Move the head position */
+        PMC_int_val2(SELF)--;
+
+        /* Assign the new value as the first item */
+        DYNSELF.set_integer_keyed_int(0, value);
+    }
+
+/*
+
+=item C<void shift_integer(INTVAL size)>
+
+Removes and returns the first element.
+
+=cut
+
+*/
+
+    INTVAL shift_integer () {
+        INTVAL value;
+        Parrot_UInt1 *sdOld, *sdNew;
+
+        if (DYNSELF.elements() < 1)
+            real_exception(interpreter, NULL, E_IndexError,
+                "ResizableBooleanArray: Can't shift from an empty array!");
+
+        /* Get head value */
+        value = DYNSELF.get_integer_keyed_int(0);
+
+        /* Move the head position */
+        PMC_int_val2(SELF)++;
+
+        /* If int_val2 is bigger than our allocation unit size, size
+            this thing down */
+        if(PMC_int_val2(SELF) >= MIN_ALLOC) {
+            sdOld = PMC_data(SELF);
+            sdNew = mem_sys_allocate_zeroed(
+                ((PMC_int_val2(SELF) / MIN_ALLOC) * MIN_ALLOC) 
+                + PMC_int_val(SELF)
+                + ((PMC_int_val(SELF) / MIN_ALLOC + 1) * MIN_ALLOC)
+            );
+            mem_sys_memmove(sdNew, sdOld + PMC_int_val2(SELF), 
+                PMC_int_val(SELF));
+            mem_sys_free(sdOld);
+            PMC_data(SELF) = sdNew;
+        }
+
+        return value;
+    }
+
+/*
+
+=item C<INTVAL elements()>
+
+=cut
+
+*/
+
+    INTVAL elements () {
+        return PMC_int_val(SELF) - PMC_int_val2(SELF);
+    }
+
+/*
+
+=item C<INTVAL get_integer()>
+
+Returns the number of elements in the array.
+
+=cut
+
+*/
+
+    INTVAL get_integer () {
+        return SELF.elements();
+    }
+
+/*
+
+=back
+
+=head2 Freeze/thaw Interface
+
+=over 4
+
+=item C<void freeze(visit_info *info)>
+
+Used to archive the string.
+
+=cut
+
+*/
+    void freeze(visit_info *info) {
+        /* XXX Dino - I'm concerned about freezing the entire
+            allocated block of memory, it's dependent on the
+            BITS_PER_CHAR value.
+            Maybe we need to store that during the freeze as well
+            and use it during thaw?
+        */
+
+        IMAGE_IO *io = info->image_io;
+        STRING *s;
+        INTVAL size = (PMC_int_val(SELF) / MIN_ALLOC + 1) * MIN_ALLOC;
+
+        io->vtable->push_integer(INTERP, io, PMC_int_val2(SELF));
+        io->vtable->push_integer(INTERP, io, PMC_int_val(SELF));
+        s = string_from_cstring(INTERP, PMC_data(SELF), size);
+        io->vtable->push_string(INTERP, io, s);
+    }
+
+/*
+
+=item C<void thaw(visit_info *info)>
+
+Used to unarchive the string.
+
+=cut
+
+*/
+    void thaw(visit_info *info) {
+        IMAGE_IO *io = info->image_io;
+        INTVAL headPos = io->vtable->shift_integer(INTERP, io);
+        INTVAL tailPos = io->vtable->shift_integer(INTERP, io);
+        STRING *s = io->vtable->shift_string(INTERP, io);
+
+        PMC_data(SELF) = mem_sys_allocate_zeroed(s->bufused);
+        mem_sys_memcopy(PMC_data(SELF), s->strstart, s->bufused);
+        PMC_int_val2(SELF) = headPos;
+        PMC_int_val(SELF) = tailPos;
+    }
+
+}  /* pmclass */
 
 /*
 
@@ -133,7 +344,14 @@ F<docs/pdds/pdd17_basic_types.pod>.
 =head1 HISTORY
 
 Initial version                  - Matt Fowles 2004-06-11
+
 Changed allocator to double size - Matt Fowles 2004-06-15
+
+Added push_integer               - Bernhard Schmalhofer 2004-10-17
+
+Changed allocation code, added   - Dino Morelli 2005-06-10
+  push_, pop_, shift_, 
+  unshift_integer, freeze, thaw
 
 =cut
 
