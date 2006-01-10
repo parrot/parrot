@@ -233,10 +233,82 @@ B<XXX> At the moment, it just leaks most of it.
 
 =back
 
+=head1 COMPILING
+
+Note: This section is aimed at you if you are writing an application
+external to parrot which links against an installed parrot library.
+
+Your application will need to include the appropriate header files and
+link against parrot and its dependencies.
+
+Since the location of these files can vary from platform to platform,
+and build to build, a general method is provided to find out the
+necessary flags to use.
+
+The pkg-config is a helper tool, now common on many platforms,
+which many packages have adopted to provide the necessary compiler and
+linker flags required to build against a library. parrot will install
+the parrot.pc which can be queried using pkg-config.
+
+To start with, let's find out what version of parrot is installed
+
+  pkg-config --modversion parrot
+  0.4.1
+
+To find out the necessary -I flags, use
+
+  pkg-config --cflags parrot
+
+and to find the necessary -L and -l flags, use
+
+  pkg-config --libs parrot
+
+Where both compiling and linking are performed in one step, both sets
+of flags can be queries with
+
+  pkg-config --cflags --libs parrot
+
+The pkg-config command can be incorporated with a compile as shown here.
+
+  cc src/disassemble.c `pkg-config --cflags --libs parrot`
+
+Most applications will probably choose to run pkg-config as part of a
+configure script, so if you are using autoconf you could use a test
+such as this.
+
+  PARROT_REQUIRED_VERSION=0.4.1
+  AC_SUBST(PARROT_REQUIRED_VERSION)
+  PKG_CHECK_MODULES(PARROT, parrot >= $PARROT_REQUIRED_VERSION,
+                    [AC_DEFINE([HAVE_PARROT], 1, [define if have parrot])])
+  AC_SUBST(PARROT_LIBS)
+  AC_SUBST(PARROT_CFLAGS)
+
+If parrot has been installed system-wide, then any of the previous
+lines should have returned the relevent flags. If it is not installed
+in one of the standard places that pkg-config looks, then you will get
+an error message.
+
+  pkg-config --libs parrot
+  Package parrot was not found in the pkg-config search path.
+  Perhaps you should add the directory containing `parrot.pc'
+  to the PKG_CONFIG_PATH environment variable
+  No package 'parrot' found
+
+As stated in the error message, an environment varable can be used to
+make pkg-config look in more locations.
+
+  export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig
+
+The last part of the variable will almost certainly be
+.../lib/pkgconfig. This variable will have to be set in your login
+scripts if you need it to be available in future.
+
 =head1 SEE ALSO
 
 F<embed.c> and F<embed.h> for the implementation.
 
 F<src/test_main.c> for Parrot's use of the embedding system.
+
+L<http://pkgconfig.freedesktop.org/wiki/> A pkg-config page
 
 =cut
