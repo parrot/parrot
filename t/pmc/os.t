@@ -9,6 +9,7 @@ use Test::More;
 use Parrot::Test tests => 9;
 use Parrot::Config;
 use Cwd;
+use File::Spec;
 
 our ($MSWin32, $cygwin);
 $MSWin32 = 1 if $^O =~ m!MSWin32!;
@@ -35,7 +36,7 @@ END {
 }
 
 # test 'cwd'
-my $cwd = getcwd;
+my $cwd = File::Spec->canonpath(getcwd);
 pir_output_is(<<'CODE', <<"OUT", "Test cwd");
 .sub main :main
         $P1 = new .OS
@@ -51,7 +52,7 @@ OUT
 
 #  TEST chdir
 chdir "src";
-my $upcwd = getcwd;
+my $upcwd = File::Spec->canonpath(getcwd);
 chdir "..";
 
 pir_output_is(<<'CODE', <<"OUT", "Test chdir");
