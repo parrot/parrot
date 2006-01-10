@@ -1606,7 +1606,7 @@ div_rr_n(Parrot_jit_info_t *jit_info, int r1)
     static const char* div_by_zero = "Divide by zero";
     char *pc = jit_info->native_ptr;
 
-    jit_emit_test_r_n(pc, 0);   /* TOS */
+    jit_emit_test_r_n(pc, (char)0);   /* TOS */
     L1 = pc;
     emitm_jxs(pc, emitm_jnz, 0);
     emitm_pushl_i(pc, div_by_zero);
@@ -1645,7 +1645,7 @@ mod_rr_n(Parrot_jit_info_t *jit_info, int r)
     static const char* div_by_zero = "Divide by zero";
     char *pc = jit_info->native_ptr;
 
-    jit_emit_test_r_n(pc, 0);   /* TOS */
+    jit_emit_test_r_n(pc, (char)0);   /* TOS */
     L1 = pc;
     emitm_jxs(pc, emitm_jnz, 0);
     emitm_pushl_i(pc, div_by_zero);
@@ -1659,7 +1659,7 @@ mod_rr_n(Parrot_jit_info_t *jit_info, int r)
     /* L1: */
     L1[1] = pc - L1 - 2;
     /* L2: */
-    emitm_fxch(pc, 1); 
+    emitm_fxch(pc, (char)1); 
     emitm_fprem(pc); 
     emitm_fstw(pc); 
     emitm_sahf(pc);
