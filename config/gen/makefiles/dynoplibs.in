@@ -19,10 +19,10 @@ all :
 	@$(BUILD) copy "--destination=$(RUNTIME_DIR)" $(OPLIBS)
 
 test : all
-#	 cd .. ; perl -Ilib t/harness t/dynops/*.t
+	 cd ..${slash}.. ; perl -Ilib t/harness t/dynoplibs/*.t
 
 testclean :
-#	 $(RM_F) "../../t/dynops/*.pir" "../../t/dynops/*.pbc"
+	 $(RM_F) "../../t/dynoplibs/*.pir" "../../t/dynoplibs/*.pbc"
 
 # win32 import library
 # win32 program data base - contains debugging info

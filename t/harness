@@ -132,6 +132,7 @@ $ENV{TEST_PROG_ARGS} = $args;
 my @default_tests = (
     (map {glob "t/$_/*.t"} qw(configure compilers/imcc/* op pmc native_pbc)),
     (map {glob "t/dynclass/$_.t"}    qw(foo dyn* g*)),
+    (glob "t/dynoplibs/*.t"),
     (map {glob "t/compilers/$_/*.t"} qw(pge pge/p5regexp pge/p6rules tge)),
     (map {glob "t/$_/*.t"}           qw(library examples run src tools perl)),
     (map {glob "t/$_/*.t"}           qw(doc)),

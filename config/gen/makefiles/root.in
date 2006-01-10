@@ -206,6 +206,7 @@ GEN_CONFIGS = \
 	libparrot.def \
 	compilers/ast/ast.y.flag \
 	tools/build/dynclasses.pl \
+	tools/build/dynoplibs.pl \
 	$(IMCC_DIR)/imcc.y.flag \
 	$(OPS_DIR)/core_ops.c \
 	$(OPS_DIR)/core_ops_switch.c
@@ -543,6 +544,7 @@ all : \
 	$(LIBNCI_TEST_SO) \
 	$(GEN_LIBRARY) \
 	dynclasses \
+	dynoplibs \
 	compilers \
 	$(PBCMERGE)
 
