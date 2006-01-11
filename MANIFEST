@@ -281,6 +281,7 @@ docs/dev/longopt.dev                              [main]doc
 docs/dev/nanoparrot.c                             [main]doc
 docs/dev/optimizer.pod                            [main]doc
 docs/dev/pmc_freeze.pod                           [devel]doc
+docs/dev/wranglers.pod                            [main]doc
 docs/embed.pod                                    [main]doc
 docs/extend.pod                                   [main]doc
 docs/faq.pod                                      [main]doc

@@ -1,0 +1,206 @@
+=pod
+
+=head1 NAME
+
+docs/dev/wranglers.pod - Tips for Bug Wranglers
+
+=head1 ABSTRACT
+
+This document attempts to outline a set of "best practices" for dealing with
+bugs in Parrot's RT system.  It is targeted at Parrot developers and "Bug
+Wranglers" and is I<not> intended as advice or instruction for end users.  Bug
+filing procedures for end user's are documented in F<docs/submissions.pod>.
+
+=head1 WHAT IS A BUG WRANGLER?
+
+A developer with sufficient permissions to modify the tickets in Parrot's RT
+system.  All Parrot developers are expect to pitch in and help keep the bug
+tracker in a healthy state.  I<This means you!>
+
+=head1 WHERE IS IT?
+
+The Parrot bug tracker is currently the same as the I<Perlbug> system used for
+Perl5 Development.  It is available via HTTP at L<http://bugs.perl.org> (XXX is
+this the official URL?).
+
+=head1 BUG HANDLING PROCEDURES 
+
+=head2 New Bugs
+
+Where I<New> refers to a pre-existing bug sitting in the Parrot queue with a
+status of C<new>.
+
+=over 4
+
+=item * Check for duplicate bugs
+
+RT doesn't handle them in a graceful manner.  Add a comment to the bug along
+the lines of "Duplicate of Bug #123" and change the Tag field to "duplicate".
+
+=item * Is there enough information?
+
+=item * Is it a [TODO] bug?
+
+Is the subject line in the format C<"[TODO] subsystem - issue>?
+
+C<[TODO]> bugs should have their status changed to C<open> to prevent them from
+appearing in a listing of C<new> bugs.
+
+=item * Is it a [PATCH] bug?
+
+Is the subject line in the format C<"[PATCH] subsystem - issue>?
+
+Make sure that there is actually a patch attached to the bug...
+
+=item * Assign the bug to someone if at all possible.
+
+=back
+
+=head2 TODO Bugs
+
+=over 4
+
+=item * Claim ownership or interest ( CC ) of the ticket. In this way you will be received further correspondence about the ticket.
+
+=item * Run the test suite
+
+=item * make manitest
+
+=item * add the patch author to CREDITS or update the authors entry in CREDITS
+
+=item * add correspondence to the bug stating that the patch was applied AND
+the svn revision number.
+
+=item * make sure that the bugs 'Tag' includes 'Patch'
+
+=item * set the bugs 'Patch Status' to 'Applied'
+
+=item * set the bugs 'Status' to 'resolved'
+
+=back
+
+=head2 Old Bugs
+
+If the bug is more then I<1 month> old then it's considered an I<old> bug.
+
+=over 4
+
+=item * Ping the requestor
+
+Give the requestor at least I<1 week> to respond.  If no response is received
+then add a comment to the bug saying that the bug is being close because of no
+response from the requestor change the status to C<rejected>.
+
+If it's a [PATCH] bug it's possible that the patch was applied but the
+bug/patch status was never changed.   Also, not all list traffic regarding a
+bug ends up in RT.  It's best to look at the SVN repo to attempt to determine if
+the bug actual was resolved.
+
+=back
+
+=head1 TIPS FOR CORRESPONDENCE
+
+=head2 Don't be a Butthead
+
+Remember that every word you type into the bug tracker is I<On The Record>.
+Try not to say anything that could offend or hurt the feelings of I<anyone>.
+That includes the bug submitter and other developers.  When, as a Parrot
+developer with commit rights, you send correspondence you are representing the
+Parrot project and by proxy TPF.  If in doubt, either send the message
+privately or not at all.
+
+=head2 Say thank you!
+
+Try to add a little token of appreciation to every message you send in response
+to a bug.  Bug requestors are doing labor for free!  The least you can do is
+let them know that you appreciate their efforts.
+
+Something like:
+
+    Thanks,
+
+    Thanks for following up.
+
+    Thanks for reporting.
+
+    Thanks for X!
+
+Can work wonders.  If you can make someone feel good about themselves maybe
+they'll submit another bug/patch/whatever or perhaps some day become a Parrot
+developer.
+
+=head2 Don't say "problem"
+
+Supposedly it's better customer relations to use I<issue(s)> instead of the
+I<problem(s)>.  Don't ask me why...
+
+=head2 Make it clear why the bug status changed
+
+Always note why the bug is having it's status changed.  Particularly if it is
+being closed or rejected.  Nothing will irritate people more then letting them
+think that their bug was unimportant or ignored.
+
+=head2 Example Correspondence
+
+    Hi,
+
+    Can you retest for this bug with the latest sources from SVN and confirm
+    that this still an open issue?
+
+    Thanks,
+
+    -J
+
+or
+
+    Hi,
+
+    Would you mind retesting with the latest sources from SVN?
+
+    Thanks,
+
+    -J
+
+or
+
+    Hi,
+
+    Can you resubmit this patch different against SVN trunk?
+
+    Thanks,
+
+    -J
+
+or
+
+    Patch applied as rXXX.  Thanks for submitting.
+
+    -J
+
+or
+
+    No response for requestor.  Bug being marked as 'rejected'.
+    Thanks for reporting.
+
+    -J
+
+or
+
+    This doesn't appear to be an issue anymore.
+    Thanks for submitting
+
+    -J
+
+or
+
+    Marking this bug as 'resolved' because it seems to have fixed itself.
+    Thanks for following up.
+
+    -J
+
+=head1 AUTHOR
+
+Joshua Hoblitt (JHOBLITT) C<jhoblitt@cpan.org>
+
+=cut
+
