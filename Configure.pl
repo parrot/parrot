@@ -427,7 +427,6 @@ my @steps = qw(
     auto::snprintf
     auto::perldoc
     auto::python
-    auto::antlr
     auto::bc
     auto::m4
     gen::icu
