@@ -1,6 +1,10 @@
 # $Id$
 
 2005-12-11     Bernhard Schmalhofer
+        * ANTLR is only needed for maintainance,
+	  so probing for ANTLR during Parrot configuration is not needed
+
+2005-12-11     Bernhard Schmalhofer
         * Generate PIR that sets up a PAST data structure and executes it via POST
         * Let some tests use the PAST target
 
