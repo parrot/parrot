@@ -61,13 +61,13 @@ OUTPUT
 pir_output_is(<< 'CODE', << 'OUTPUT', "mul_i_ic_n");
 .sub main :main
     loadlib P1, "dan_ops"
-	$N3 = 8.1
-    mul $I1, 100, $N3
+	$N3 = 4.2
+    mul $I1, 10, $N3
     print $I1
     print "\n"
 .end
 CODE
-810
+42
 OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "mul_i_i_n");
