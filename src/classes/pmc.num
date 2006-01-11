@@ -89,3 +89,4 @@ parrotclass.pmc		56
 parrotobject.pmc	57
 
 os.pmc                  58
+file.pmc                59

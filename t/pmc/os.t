@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 10;
+use Parrot::Test tests => 9;
 use Parrot::Config;
 use Cwd;
 use File::Spec;
@@ -112,26 +112,6 @@ pir_output_is(<<'CODE', <<"OUT", "Test mkdir");
 CODE
 $xpto
 $cwd
-OUT
-
-# test is_dir
-mkdir "xpto" unless -d "xpto";
-pir_output_is(<<'CODE', <<"OUT", "Test rm call in a directory");
-.sub main :main
-        $P1 = new .OS
-
-        $S1 = "xpto"
-        $I1 = $P1."is_dir"($S1)
-
-        if $I1 goto ok
-        print "not "
-
-ok:
-        print "ok\n"
-        end
-.end
-CODE
-ok
 OUT
 
 # Test remove on a directory
