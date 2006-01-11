@@ -146,61 +146,61 @@ extern ParrotIOLayer pio_mmap_layer;
 extern INTVAL pio_errno;
 
 /* io.c - If you add new layers, register them in init_layers() */
-extern void PIO_init(theINTERP);
-extern void PIO_finish(theINTERP);
-void PIO_internal_shutdown(theINTERP);
-extern INTVAL PIO_init_stacks(theINTERP);
-extern void PIO_atexit(theINTERP);
-extern INTVAL PIO_push_layer(theINTERP, PMC *, ParrotIOLayer *);
-extern ParrotIOLayer *PIO_pop_layer(theINTERP, PMC *);
-extern ParrotIOLayer *PIO_copy_stack(ParrotIOLayer *);
-ParrotIOLayer *PIO_get_layer(Interp *, const char *name);
+PARROT_API extern void PIO_init(theINTERP);
+PARROT_API extern void PIO_finish(theINTERP);
+PARROT_API void PIO_internal_shutdown(theINTERP);
+PARROT_API extern INTVAL PIO_init_stacks(theINTERP);
+PARROT_API extern void PIO_atexit(theINTERP);
+PARROT_API extern INTVAL PIO_push_layer(theINTERP, PMC *, ParrotIOLayer *);
+PARROT_API extern ParrotIOLayer *PIO_pop_layer(theINTERP, PMC *);
+PARROT_API extern ParrotIOLayer *PIO_copy_stack(ParrotIOLayer *);
+PARROT_API ParrotIOLayer *PIO_get_layer(Interp *, const char *name);
 
 
-extern struct PMC *new_io_pmc(Interp *, ParrotIO *);
-extern void free_io_header(ParrotIO *);
-extern ParrotIO *PIO_new(Interp *, INTVAL, INTVAL, INTVAL);
-extern void PIO_destroy(theINTERP, PMC *io);
+PARROT_API extern struct PMC *new_io_pmc(Interp *, ParrotIO *);
+PARROT_API extern void free_io_header(ParrotIO *);
+PARROT_API extern ParrotIO *PIO_new(Interp *, INTVAL, INTVAL, INTVAL);
+PARROT_API extern void PIO_destroy(theINTERP, PMC *io);
 
-extern INTVAL PIO_base_init(theINTERP, ParrotIOLayer *proto);
-extern ParrotIOLayer *PIO_base_new_layer(ParrotIOLayer *proto);
-extern void PIO_base_delete_layer(ParrotIOLayer *proto);
+PARROT_API extern INTVAL PIO_base_init(theINTERP, ParrotIOLayer *proto);
+PARROT_API extern ParrotIOLayer *PIO_base_new_layer(ParrotIOLayer *proto);
+PARROT_API extern void PIO_base_delete_layer(ParrotIOLayer *proto);
 
-extern INTVAL PIO_parse_open_flags(const char *flagstr);
-extern PMC *PIO_open(theINTERP, ParrotIOLayer *, const char *, const char *);
-extern PMC *PIO_fdopen(theINTERP, ParrotIOLayer *, PIOHANDLE, const char *);
-extern INTVAL PIO_close(theINTERP, PMC *);
-extern void PIO_flush(theINTERP, PMC *);
-extern STRING *PIO_reads(theINTERP, PMC *, size_t);
-extern INTVAL PIO_read(theINTERP, PMC *, void *, size_t);
-extern INTVAL PIO_write(theINTERP, PMC *, const void *, size_t);
-extern INTVAL PIO_setbuf(theINTERP, PMC *, size_t);
-extern INTVAL PIO_setlinebuf(theINTERP, PMC *);
-extern INTVAL PIO_puts(theINTERP, PMC *, const char *);
-extern INTVAL PIO_peek(theINTERP, PMC *, STRING **);
-extern PIOOFF_T PIO_seek(theINTERP, PMC *, PIOOFF_T offset, INTVAL whence);
-extern INTVAL PIO_eof(theINTERP, PMC *);
-extern INTVAL PIO_pioctl(theINTERP, PMC *, INTVAL cmd, INTVAL arg);
-extern INTVAL PIO_poll(theINTERP, PMC *pmc, INTVAL which, INTVAL sec, INTVAL usec);
-extern PMC *PIO_socket(theINTERP, INTVAL fam, INTVAL type, INTVAL proto);
-extern INTVAL PIO_recv(theINTERP, PMC *pmc, STRING **buf);
-extern INTVAL PIO_send(theINTERP, PMC *pmc, STRING *buf);
-extern INTVAL PIO_connect(theINTERP, PMC *pmc, STRING *address);
-extern INTVAL PIO_bind(theINTERP, PMC *pmc, STRING *address);
-extern INTVAL PIO_listen(theINTERP, PMC *pmc, INTVAL backlog);
-extern PMC *PIO_accept(theINTERP, PMC *pmc);
+PARROT_API extern INTVAL PIO_parse_open_flags(const char *flagstr);
+PARROT_API extern PMC *PIO_open(theINTERP, ParrotIOLayer *, const char *, const char *);
+PARROT_API extern PMC *PIO_fdopen(theINTERP, ParrotIOLayer *, PIOHANDLE, const char *);
+PARROT_API extern INTVAL PIO_close(theINTERP, PMC *);
+PARROT_API extern void PIO_flush(theINTERP, PMC *);
+PARROT_API extern STRING *PIO_reads(theINTERP, PMC *, size_t);
+PARROT_API extern INTVAL PIO_read(theINTERP, PMC *, void *, size_t);
+PARROT_API extern INTVAL PIO_write(theINTERP, PMC *, const void *, size_t);
+PARROT_API extern INTVAL PIO_setbuf(theINTERP, PMC *, size_t);
+PARROT_API extern INTVAL PIO_setlinebuf(theINTERP, PMC *);
+PARROT_API extern INTVAL PIO_puts(theINTERP, PMC *, const char *);
+PARROT_API extern INTVAL PIO_peek(theINTERP, PMC *, STRING **);
+PARROT_API extern PIOOFF_T PIO_seek(theINTERP, PMC *, PIOOFF_T offset, INTVAL whence);
+PARROT_API extern INTVAL PIO_eof(theINTERP, PMC *);
+PARROT_API extern INTVAL PIO_pioctl(theINTERP, PMC *, INTVAL cmd, INTVAL arg);
+PARROT_API extern INTVAL PIO_poll(theINTERP, PMC *pmc, INTVAL which, INTVAL sec, INTVAL usec);
+PARROT_API extern PMC *PIO_socket(theINTERP, INTVAL fam, INTVAL type, INTVAL proto);
+PARROT_API extern INTVAL PIO_recv(theINTERP, PMC *pmc, STRING **buf);
+PARROT_API extern INTVAL PIO_send(theINTERP, PMC *pmc, STRING *buf);
+PARROT_API extern INTVAL PIO_connect(theINTERP, PMC *pmc, STRING *address);
+PARROT_API extern INTVAL PIO_bind(theINTERP, PMC *pmc, STRING *address);
+PARROT_API extern INTVAL PIO_listen(theINTERP, PMC *pmc, INTVAL backlog);
+PARROT_API extern PMC *PIO_accept(theINTERP, PMC *pmc);
 
 
-extern INTVAL PIO_putps(theINTERP, PMC *io, STRING *s);
-extern INTVAL PIO_fprintf(theINTERP, PMC *io, const char *s, ...);
-extern INTVAL PIO_printf(theINTERP, const char *s, ...);
-extern INTVAL PIO_eprintf(theINTERP, const char *s, ...);
-extern PIOHANDLE PIO_getfd(theINTERP, PMC *io);
-extern PIOOFF_T PIO_tell(theINTERP, PMC *io);
+PARROT_API extern INTVAL PIO_putps(theINTERP, PMC *io, STRING *s);
+PARROT_API extern INTVAL PIO_fprintf(theINTERP, PMC *io, const char *s, ...);
+PARROT_API extern INTVAL PIO_printf(theINTERP, const char *s, ...);
+PARROT_API extern INTVAL PIO_eprintf(theINTERP, const char *s, ...);
+PARROT_API extern PIOHANDLE PIO_getfd(theINTERP, PMC *io);
+PARROT_API extern PIOOFF_T PIO_tell(theINTERP, PMC *io);
 
-extern void Parrot_IOData_mark(theINTERP, ParrotIOData *piodata);
+PARROT_API extern void Parrot_IOData_mark(theINTERP, ParrotIOData *piodata);
 
-extern INTVAL PIO_isatty(theINTERP, PMC *io);
+PARROT_API extern INTVAL PIO_isatty(theINTERP, PMC *io);
 
 /* Put platform specific macros here if you must */
 #ifdef PIO_OS_WIN32

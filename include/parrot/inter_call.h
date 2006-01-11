@@ -53,19 +53,19 @@ struct call_state {
     int n_actual_args;
 };
 
-int Parrot_init_arg_sig(Interp *, parrot_context_t *ctx,
+PARROT_API int Parrot_init_arg_sig(Interp *, parrot_context_t *ctx,
         const char *sig, void *ap, struct call_state_1 *st);
 
-int Parrot_init_arg_op(Interp *, parrot_context_t *ctx,
+PARROT_API int Parrot_init_arg_op(Interp *, parrot_context_t *ctx,
         opcode_t *pc, struct call_state_1 *st);
 
-int Parrot_init_arg_nci(Interp *, struct call_state *st, const char *sig);
-int Parrot_init_ret_nci(Interp *, struct call_state *st, const char *sig);
+PARROT_API int Parrot_init_arg_nci(Interp *, struct call_state *st, const char *sig);
+PARROT_API int Parrot_init_ret_nci(Interp *, struct call_state *st, const char *sig);
 
-int Parrot_fetch_arg(Interp *, struct call_state *st);
-int Parrot_fetch_arg_nci(Interp *, struct call_state *st);
-int Parrot_convert_arg(Interp *, struct call_state *st);
-int Parrot_store_arg(Interp *, struct call_state *st);
+PARROT_API int Parrot_fetch_arg(Interp *, struct call_state *st);
+PARROT_API int Parrot_fetch_arg_nci(Interp *, struct call_state *st);
+PARROT_API int Parrot_convert_arg(Interp *, struct call_state *st);
+PARROT_API int Parrot_store_arg(Interp *, struct call_state *st);
 
 opcode_t * parrot_pass_args(Interp *, parrot_context_t *src_ctx,
         parrot_context_t *dest_ctx, int what);
