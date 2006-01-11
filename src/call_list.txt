@@ -235,6 +235,10 @@ P	JO
 S	JO
 i       P
 
+# Needed by integer.pmc
+S	JOI
+
+
 # the following are use by t/pmc/nci.t
 i	sc
 s	sc
