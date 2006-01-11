@@ -161,7 +161,7 @@ OUTPUT
 
 # TODO: Rewrite these properly when we have exceptions
 
-output_is(<<'CODE', <<'OUTPUT', "Setting out-of-bounds elements");
+output_like(<<'CODE', <<'OUTPUT', "Setting out-of-bounds elements");
         new P0, .FixedIntegerArray
         set P0, 1
 
@@ -169,37 +169,41 @@ output_is(<<'CODE', <<'OUTPUT', "Setting out-of-bounds elements");
 
 	end
 CODE
-FixedIntegerArray: index out of bounds!
+/FixedIntegerArray: index out of bounds!
+current instr\.:.*/
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "Getting out-of-bounds elements");
+output_like(<<'CODE', <<'OUTPUT', "Getting out-of-bounds elements");
         new P0, .FixedIntegerArray
         set P0, 1
 
 	set I0, P0[1]
 	end
 CODE
-FixedIntegerArray: index out of bounds!
+/FixedIntegerArray: index out of bounds!
+current instr\.:.*/
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "Getting out-of-bounds elements, I");
+output_like(<<'CODE', <<'OUTPUT', "Getting out-of-bounds elements, I");
         new P0, .FixedIntegerArray
         set P0, 1
 	set I1, 1
 	set I0, P0[I1]
 	end
 CODE
-FixedIntegerArray: index out of bounds!
+/FixedIntegerArray: index out of bounds!
+current instr\.:.*/
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "Getting out-of-bounds elements, -I");
+output_like(<<'CODE', <<'OUTPUT', "Getting out-of-bounds elements, -I");
         new P0, .FixedIntegerArray
         set P0, 1
 	set I1, -1
 	set I0, P0[I1]
 	end
 CODE
-FixedIntegerArray: index out of bounds!
+/FixedIntegerArray: index out of bounds!
+current instr\.:.*/
 OUTPUT
 
 

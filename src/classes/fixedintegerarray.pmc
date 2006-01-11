@@ -242,7 +242,7 @@ Returns the integer value of the element at index C<key>.
     INTVAL get_integer_keyed_int (INTVAL key) {
         INTVAL *data;
         if (key < 0 || key >= PMC_int_val(SELF))
-            internal_exception(OUT_OF_BOUNDS,
+            real_exception(interpreter, NULL, E_IndexError,
                 "FixedIntegerArray: index out of bounds!");
 
         data = (INTVAL *)PMC_data(SELF);
@@ -394,7 +394,7 @@ Sets the integer value of the element at index C<key> to C<value>.
     void set_integer_keyed_int (INTVAL key, INTVAL value) {
         INTVAL *data;
         if (key < 0 || key >= PMC_int_val(SELF))
-            internal_exception(OUT_OF_BOUNDS,
+            real_exception(interpreter, NULL, E_IndexError,
                 "FixedIntegerArray: index out of bounds!");
 
         data = (INTVAL*)PMC_data(SELF);
