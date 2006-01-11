@@ -3,14 +3,14 @@
 
 =head1 NAME
 
-docs/dev/dod.dev - Dead object detection (DOD)
+docs/dev/dod.pod - Dead object detection (DOD)
 
 =head1 Overview
 
 The DOD code performs dead object detection and reclamation, thereby
 implementing a mark and copy garbage collector.  The official garbage
 collection PDD is PDD 9 and is located in the docs/pdds directory of the parrot
-distribution.  This .dev file is only meant to describe the current state of
+distribution.  This Pod file is only meant to describe the current state of
 the code and is not meant to replace a thorough understanding of PDD 9.
 
 =head1 Data Structures and Algorithms

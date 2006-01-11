@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-docs/dev/longopt.dev - Long option parsing
+docs/dev/longopt.pod - Long option parsing
 
 =head1 SUMMARY
 

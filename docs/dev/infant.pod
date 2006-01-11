@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-docs/dev/infant.dev - Infant Mortality
+docs/dev/infant.pod - Infant Mortality
 
 =head1 Overview
 

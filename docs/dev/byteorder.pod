@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-docs/dev/byteorder.dev - Byteorder Conversion Functions
+docs/dev/byteorder.pod - Byteorder Conversion Functions
 
 =head1 Overview
 

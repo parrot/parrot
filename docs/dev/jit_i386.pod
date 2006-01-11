@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-docs/dev/jit_i386.dev - Parrot JIT (i386/gcc)
+docs/dev/jit_i386.pod - Parrot JIT (i386/gcc)
 
 =head1 ABSTRACT
 
