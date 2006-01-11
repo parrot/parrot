@@ -87,8 +87,8 @@ CODE
 number
 OUTPUT
 
-SKIP: {
-skip("tonumber !", 1);
+TODO: {
+local $TODO = "tonumber !";
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', "function tonumber");
 a = "text12"

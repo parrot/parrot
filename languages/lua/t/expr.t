@@ -1,5 +1,5 @@
 #! perl -w
-# Copyright: 2005 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2005-2006 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 =head1 NAME
@@ -23,9 +23,10 @@ use FindBin;
 use lib "$FindBin::Bin";
 
 use Parrot::Test tests => 6;
+use Test::More;
 
-SKIP: {
-skip("pb convertion.", 3);
+TODO: {
+local $TODO = "pb convertion.";
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'relational op (by reference)' );
 a = {}; a.x = 1; a.y = 0;
@@ -100,5 +101,4 @@ Hello World
 Hello World
 Hello
 OUT
-
 

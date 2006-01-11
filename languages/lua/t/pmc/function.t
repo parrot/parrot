@@ -1,5 +1,5 @@
 #! perl -w
-# Copyright: 2005 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2005-2006 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 =head1 NAME
@@ -159,8 +159,8 @@ false
 boolean
 OUTPUT
 
-SKIP: {
-skip("not implemented.", 2);
+TODO: {
+local $TODO = "not implemented.";
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "check HLL");
 .HLL "Lua", "lua_group"
