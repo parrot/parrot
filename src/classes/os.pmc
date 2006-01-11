@@ -408,6 +408,9 @@ previous one).
 it makes the named directory the new root directory for all further
 pathnames that begin with a "/" by your process and all its children.
 
+B<NOTE>: perl restricts this operation to superusers. It might be a good
+idea to do the same with parrot.
+
 =cut
 
 */
@@ -424,6 +427,63 @@ pathnames that begin with a "/" by your process and all its children.
 #else
         internal_exception(UNIMPLEMENTED, "Win32 is not POSIX. Need win32 developer!");
 #endif
+    }
+
+
+
+/*
+
+=item C<INTVAL is_dir(STRING* path)>
+
+Returns a true value (1) if the supplied path is a directory.
+
+=cut
+
+*/
+
+    METHOD INTVAL is_dir(STRING *path) {
+        struct stat info;
+        char *cpath = string_to_cstring(interpreter, path);
+        int error = stat(cpath, &info);
+        if (error) {
+            char *errmsg = strerror(errno);
+            real_exception(interpreter, NULL, E_SystemError, errmsg);
+        }
+
+        if (S_ISDIR(info.st_mode)) {
+            return 1;
+        } else {
+            return 0;
+        }
+    }
+
+
+
+
+/*
+
+=item C<INTVAL is_link(STRING* path)>
+
+Returns a true value (1) if the supplied path is a link.
+
+=cut
+
+*/
+
+    METHOD INTVAL is_link(STRING *path) {
+        struct stat info;
+        char *cpath = string_to_cstring(interpreter, path);
+        int error = stat(cpath, &info);
+        if (error) {
+            char *errmsg = strerror(errno);
+            real_exception(interpreter, NULL, E_SystemError, errmsg);
+        }
+
+        if (S_ISLNK(info.st_mode)) {
+            return 1;
+        } else {
+            return 0;
+        }
     }
 
 }
