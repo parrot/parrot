@@ -305,7 +305,8 @@ PMC_int_val(-1) means end of iteration.
                  * with an Integer KEY
                  */
                  _hash = CONST_STRING(interpreter, "Hash");
-                if (VTABLE_isa(INTERP, agg, _hash))
+                if (VTABLE_isa(INTERP, agg, _hash) &&
+                     agg->vtable->base_type != enum_class_OrderedHash)
                     PObj_get_FLAGS(ret) |= KEY_hash_iterator_FLAGS;
         init:
                 PMC_int_val(ret) = 0;

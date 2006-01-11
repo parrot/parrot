@@ -89,7 +89,7 @@ key_2_idx(Interp* interpreter, PMC *pmc, PMC *key)
                 key_string(interpreter, key));
             if (!b)
                 internal_exception(1, "key doesn't exist");
-            ix = VTABLE_get_integer(interpreter, (PMC*) b->value);
+            ix = b - hash->bs;
         }
         else
             internal_exception(1, "unhandled type aggregate");

@@ -8,25 +8,29 @@ src/classes/orderedhash.pmc - Ordered Hash
 
 =head1 DESCRIPTION
 
-C<OrderedHash> extends C<PerlArray> to provide the functionality of
-C<PerlArray> (list in C<data>) and a C<Hash> (hash in
-C<struct_val>). The list holds the PMC values, the hash keys point to
-the index of the value in the list.
+C<OrderedHash> extends C<Hash> to provide the interfaces of
+C<array> and C<hash>. To achieve the functionality of an ordered
+hash there are a few restrictions though: C<delete_keyed> never removes 
+items, they are just nulled. 
+
+Please note that if values are set via integer idx, these indices
+have to be in strict order. Using C<push_xx> simplifies this task.
+This creates a key "\1idx" for C<idx> and is therefore not fully transparent.
 
 There are 2 iterator interfaces:
 
 =over 4
 
-=item * retrieve value (in creation order)
+=item * retrieve values (in creation order)
 
-=item * retrieve key (no special order)
+Please note that after a C<delete_keyed> operation, iterating over
+values doesn't work any more, you'll get an error 'No such key'.
+
+=item * retrieve keys (in creation order)
 
 =back
 
 See F<t/pmc/orderedhash.t>.
-
-If values are set by numeric index only, there is no hash key. Iterating
-over the hash doesn't show these values.
 
 =head2 Methods
 
@@ -39,326 +43,364 @@ over the hash doesn't show these values.
 #include "parrot/parrot.h"
 #include "pmc_hash.h"
 
-/*
 
-=item C<static PMC *undef(Interp *interpreter)>
-
-Returns the C<PerlUndef> PMC.
-
-=cut
-
-*/
-
-static PMC* undef(Interp* interpreter)
-{
-    return pmc_new(interpreter, enum_class_PerlUndef);
-}
-
-pmclass OrderedHash extends PerlArray need_ext does array does hash {
-
-/*
-
-=item C<void init()>
-
-Initializes the ordered hash.
-
-=item C<void destroy()>
-
-Destroys the ordered hash.
-
-=cut
-
-*/
-
-    void init () {
-        /* clear the Hash ptr - its not yet existing */
-        PMC_struct_val(SELF) = NULL;
-        SUPER();
-        Hash.SUPER();
-    }
-
-    void destroy () {
-        Hash.SUPER();
-    }
-
-/*
-
-=item C<void mark()>
-
-Marks the ordered hash as live.
-
-=cut
-
-*/
-
-    void mark () {
-        SUPER();
-        Hash.SUPER();
-    }
-
-/*
-
-=item C<PMC *clone()>
-
-Creates and returns a clone of the ordered hash.
-
-=cut
-
-*/
-
-    PMC* clone () {
-        PMC* dest = SUPER();
-        hash_clone(INTERP, (Hash *)PMC_struct_val(SELF),
-            (Hash**)&PMC_struct_val(dest));
-        return dest;
-    }
+pmclass OrderedHash extends Hash need_ext does array does hash {
 
 /*
 
 =item C<PMC *get_pmc_keyed(PMC *key)>
 
-=cut
-
-*/
-
-    PMC* get_pmc_keyed (PMC* key) {
-        if (PObj_get_FLAGS(key) & KEY_integer_FLAG) {
-            return SUPER(key);
-        }
-        else {
-            INTVAL n = Hash.SELF.get_integer_keyed(key);
-            return DYNSELF.get_pmc_keyed_int(n);
-        }
-    }
-
-/*
+=item C<PMC *get_pmc_keyed_int(INTVAL key)>
 
 =item C<PMC *get_pmc_keyed_str(STRING *key)>
 
-Returns the PMC value associated with C<*key>.
-
 =cut
 
 */
 
-    PMC* get_pmc_keyed_str (STRING* key) {
-        INTVAL n = Hash.SELF.get_integer_keyed_str(key);
-        return DYNSELF.get_pmc_keyed_int(n);
+    PMC* get_pmc_keyed_int (INTVAL idx) {
+        Hash *h = PMC_struct_val(SELF);
+        INTVAL n;
+        HashBucket *b;
+
+        n = h->entries;
+        if (idx < 0)
+            idx += n;
+        if (idx < 0 || idx >= n) {
+            real_exception(INTERP, NULL, KEY_NOT_FOUND,
+                    "OrderedHash: index out of bounds!");
+        }
+        b = h->bs + idx;
+        if (b->key)
+            return (PMC*) b->value;
+        real_exception(INTERP, NULL, KEY_NOT_FOUND,
+                "OrderedHash: No such key");
+        return PMCNULL;
+    }
+
+    PMC* get_pmc_keyed (PMC* key) {
+        switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
+            case KEY_hash_iterator_FLAGS:
+                return SUPER(key);
+            case KEY_integer_FLAG:
+                return SELF.get_pmc_keyed_int(key_integer(INTERP, key));
+            default:
+                return SUPER(key);
+        }
     }
 
 /*
 
-=item C<INTVAL get_integer_keyed_str(STRING *key)>
+=item C<STRING *get_string_keyed(PMC *key)>
+
+=item C<STRING *get_string_keyed_int(INTVAL key)>
+
+=item C<STRING *get_string_keyed_str(STRING *key)>
 
 =cut
 
 */
 
-    INTVAL get_integer_keyed_str (STRING* key) {
-        INTVAL n = Hash.SELF.get_integer_keyed_str(key);
-        return DYNSELF.get_integer_keyed_int(n);
+    STRING* get_string_keyed_int (INTVAL idx) {
+        Hash *h = PMC_struct_val(SELF);
+        INTVAL n;
+        HashBucket *b;
+
+        n = h->entries;
+        if (idx < 0)
+            idx += n;
+        if (idx < 0 || idx >= n) {
+            real_exception(INTERP, NULL, KEY_NOT_FOUND,
+                    "OrderedHash: index out of bounds!");
+        }
+        b = h->bs + idx;
+        if (b->key)
+            return VTABLE_get_string(INTERP, (PMC*) b->value);
+        real_exception(INTERP, NULL, KEY_NOT_FOUND,
+                "OrderedHash: No such key");
+        return NULL;
     }
 
+    STRING* get_string_keyed (PMC* key) {
+        switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
+            case KEY_hash_iterator_FLAGS:
+                return SUPER(key);
+            case KEY_integer_FLAG:
+                return SELF.get_string_keyed_int(key_integer(INTERP, key));
+            default:
+                return SUPER(key);
+        }
+    }
 /*
 
 =item C<INTVAL get_integer_keyed(PMC *key)>
 
-Returns the integer value associated with C<*key>.
+=item C<INTVAL get_integer_keyed_str(STRING *key)>
+
+=item C<INTVAL get_integer_keyed_int(INTVAL key)>
+
+Returns the integer value associated with C<key>. 
 
 =cut
 
 */
 
+
+    INTVAL get_integer_keyed_int (INTVAL idx) {
+        Hash *h = PMC_struct_val(SELF);
+        INTVAL n;
+        HashBucket *b;
+
+        n = h->entries;
+        if (idx < 0)
+            idx += n;
+        if (idx < 0 || idx >= n) {
+            real_exception(INTERP, NULL, OUT_OF_BOUNDS,
+                    "OrderedHash: index out of bounds!");
+        }
+        b = h->bs + idx;
+        if (b->key)
+            return VTABLE_get_integer(INTERP, (PMC*) b->value);
+        real_exception(INTERP, NULL, KEY_NOT_FOUND,
+                "OrderedHash: No such key");
+        return 0;
+    }
+
     INTVAL get_integer_keyed (PMC* key) {
-        INTVAL n = Hash.SELF.get_integer_keyed(key);
-        return DYNSELF.get_integer_keyed_int(n);
+        switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
+            case KEY_hash_iterator_FLAGS:
+                return SUPER(key);
+            case KEY_integer_FLAG:
+                return SELF.get_integer_keyed_int(key_integer(INTERP, key));
+            default:
+                return SUPER(key);
+        }
     }
 
 /*
 
 =item C<FLOATVAL get_number_keyed(PMC *key)>
 
-Returns the floating-point value for the element at C<*key>.
+=item C<FLOATVAL get_number_keyed_int(INTVAL key)>
+
+=item C<FLOATVAL get_number_keyed_str(STRING* key)>
+
+Returns the floating-point value for the element at C<key>.
 
 =cut
 
 */
+
+    FLOATVAL get_number_keyed_int (INTVAL idx) {
+        Hash *h = PMC_struct_val(SELF);
+        INTVAL n;
+        HashBucket *b;
+
+        n = h->entries;
+        if (idx < 0)
+            idx += n;
+        if (idx < 0 || idx >= n) {
+            real_exception(INTERP, NULL, OUT_OF_BOUNDS,
+                    "OrderedHash: index out of bounds!");
+        }
+        b = h->bs + idx;
+        if (b->key)
+            return VTABLE_get_number(INTERP, (PMC*) b->value);
+        real_exception(INTERP, NULL, KEY_NOT_FOUND,
+                "OrderedHash: No such key");
+        return 0.0;
+    }
 
     FLOATVAL get_number_keyed (PMC* key) {
-        INTVAL n = Hash.SELF.get_integer_keyed(key);
-        return DYNSELF.get_number_keyed_int(n);
+        switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
+            case KEY_hash_iterator_FLAGS:
+                return SUPER(key);
+            case KEY_integer_FLAG:
+                return SELF.get_number_keyed_int(key_integer(INTERP, key));
+            default:
+                return SUPER(key);
+        }
     }
 
 /*
 
-=item C<void set_pmc_keyed(PMC *key, PMC *value)>
+=item C<void set_pmc_keyed_int(INTVAL idx, PMC *val)>
 
-Associates C<*value> with C<*key>.
+=item C<void set_integer_keyed_int(INTVAL key, INTVAL value)>
+
+=item C<void set_number_keyed_int(INTVAL key, FLOATVAL value)>
+
+=item C<void set_string_keyed_int(INTVAL key, STRING *value)>
+
+Sets the PMC value of the element at index C<key> to C<val>.
+The created key = "\1idx".
 
 =cut
 
 */
 
-    void set_pmc_keyed (PMC* key, PMC* value) {
-        INTVAL n = DYNSELF.elements();
-        DYNSELF.set_pmc_keyed_int(n, value);
-        Hash.SELF.set_integer_keyed(key, n);
+    void set_pmc_keyed_int (INTVAL idx, PMC* val) {
+        STRING *key, *fmt;
+        Hash *h = PMC_struct_val(SELF);
+        INTVAL n;
+        HashBucket *b;
+
+        n = h->entries;
+        if (idx < -n)
+            idx = -idx - n - 1;
+        else if (idx < 0)
+            idx += n;
+        fmt = CONST_STRING(INTERP, "\1%d");
+        if (idx >= n) {
+            /* TODO warn or fill if there are holes */
+            key = Parrot_sprintf_s(INTERP, fmt, idx);
+            DYNSELF.set_pmc_keyed_str(key, val);
+        }
+        else {
+            b = h->bs + idx;
+            if (!b->key) {
+                b->key = Parrot_sprintf_s(INTERP, fmt, idx);
+            }
+            b->value = val;
+        }
     }
 
+    void set_integer_keyed_int (INTVAL idx, INTVAL value) {
+        PMC *v = pmc_new(INTERP, Parrot_get_ctx_HLL_type(INTERP,
+                    enum_class_Integer));
+        VTABLE_set_integer_native(INTERP, v, value);
+        SELF.set_pmc_keyed_int(idx, v);
+    }
+
+    void set_number_keyed_int (INTVAL idx, FLOATVAL value) {
+        PMC *v = pmc_new(INTERP, Parrot_get_ctx_HLL_type(INTERP,
+                    enum_class_Float));
+        VTABLE_set_number_native(INTERP, v, value);
+        SELF.set_pmc_keyed_int(idx, v);
+    }
+
+    void set_string_keyed_int (INTVAL idx, STRING* value) {
+        PMC *v = pmc_new(INTERP, Parrot_get_ctx_HLL_type(INTERP,
+                    enum_class_String));
+        VTABLE_set_string_native(INTERP, v, value);
+        SELF.set_pmc_keyed_int(idx, v);
+    }
 /*
 
-=item C<void set_integer_keyed(PMC *key, INTVAL value)>
+=item C<void push_float(FLOATVAL value)>
 
-Associates C<value> with C<*key>.
+=item C<void push_integer(INTVAL value)>
+
+=item C<void push_pmc(PMC* value)>
+
+=item C<void push_string(STRING* value)>
 
 =cut
 
 */
 
-    void set_integer_keyed (PMC* key, INTVAL value) {
+    void push_pmc(PMC* value) {
         INTVAL n = DYNSELF.elements();
-        DYNSELF.set_integer_keyed_int(n, value);
-        Hash.SELF.set_integer_keyed(key, n);
+        SELF.set_pmc_keyed_int(n, value);
     }
 
-/*
-
-=item C<void set_string_keyed(PMC *key, STRING *value)>
-
-Associates C<value> with C<*key>.
-
-=cut
-
-*/
-
-    void set_string_keyed (PMC* key, STRING* value) {
+    void push_float(FLOATVAL value) {
         INTVAL n = DYNSELF.elements();
-        DYNSELF.set_string_keyed_int(n, value);
-        Hash.SELF.set_integer_keyed(key, n);
+        SELF.set_number_keyed_int(n, value);
     }
 
-/*
-
-=item C<void set_pmc_keyed_str(STRING *key, PMC *value)>
-
-Associates C<*value> with C<*key>.
-
-=cut
-
-*/
-
-    void set_pmc_keyed_str (STRING* key, PMC* value) {
+    void push_integer(INTVAL value) {
         INTVAL n = DYNSELF.elements();
-        DYNSELF.set_pmc_keyed_int(n, value);
-        Hash.SELF.set_integer_keyed_str(key, n);
+        SELF.set_integer_keyed_int(n, value);
     }
 
-/*
-
-=item C<void set_integer_keyed_str(STRING *key, INTVAL value)>
-
-Associates C<value> with C<*key>.
-
-=cut
-
-*/
-
-    void set_integer_keyed_str (STRING* key, INTVAL value) {
+    void push_string(STRING* value) {
         INTVAL n = DYNSELF.elements();
-        DYNSELF.set_integer_keyed_int(n, value);
-        Hash.SELF.set_integer_keyed_str(key, n);
-    }
-
-/*
-
-=item C<void set_number_keyed (PMC *key, FLOATVAL value)>
-
-=cut
-
-*/
-
-    void set_number_keyed (PMC* key, FLOATVAL value) {
-        INTVAL n = DYNSELF.elements();
-        DYNSELF.set_number_keyed_int(n, value);
-        Hash.SELF.set_integer_keyed(key, n);
-    }
-
-/*
-
-=item C<void set_string_keyed_str(STRING *key, STRING *value)>
-
-=cut
-
-*/
-
-    void set_string_keyed_str (STRING* key, STRING* value) {
-        INTVAL n = DYNSELF.elements();
-        DYNSELF.set_string_keyed_int(n, value);
-        Hash.SELF.set_integer_keyed_str(key, n);
+        SELF.set_string_keyed_int(n, value);
     }
 
 /*
 
 =item C<INTVAL exists_keyed(PMC *key)>
 
+=item C<INTVAL exists_keyed_str(STRING *key)>
+
+=item C<INTVAL exists_keyed_int(INTVAL key)>
+
 =cut
 
 */
 
+    INTVAL exists_keyed_int(INTVAL idx) {
+        Hash *h = PMC_struct_val(SELF);
+        INTVAL n;
+        HashBucket *b;
+
+        n = h->entries;
+        if (idx < 0)
+            idx += n;
+        if (idx < 0 || idx >= n) {
+            return 0;
+        }
+        b = h->bs + idx;
+        if (b->key)
+            return 1;
+        return 0;
+    }
     INTVAL exists_keyed(PMC* key) {
         if (PObj_get_FLAGS(key) & KEY_integer_FLAG) {
-            return SUPER(key);
+            return SELF.exists_keyed_int(key_integer(INTERP, key));
         }
         else {
-            return Hash.SUPER(key);
+            /* TODO handle composite keys */
+            return SELF.exists_keyed_str(key_string(INTERP, key));
         }
     }
 
-/*
-
-=item C<INTVAL exists_keyed_str(STRING *key)>
-
-Returns whether the key C<*key> exists in the hash.
-
-=cut
-
-*/
-
     INTVAL exists_keyed_str(STRING* key) {
-        return Hash.SUPER(key);
+        Hash *h = PMC_struct_val(SELF);
+        HashBucket *b;
+        b = hash_get_bucket(INTERP, h, key);
+        if (b && b->key)
+            return 1;
+        return 0;
     }
 
 /*
 
 =item C<INTVAL defined_keyed(PMC *key)>
 
-=cut
-
-*/
-
-    INTVAL defined_keyed(PMC* key) {
-        if (PObj_get_FLAGS(key) & KEY_integer_FLAG) {
-            return SUPER(key);
-        }
-        else {
-            INTVAL n = Hash.SELF.get_integer_keyed(key);
-            return DYNSELF.defined_keyed_int(n);
-        }
-    }
-
-/*
-
 =item C<INTVAL defined_keyed_str(STRING *key)>
 
-Returns whether the value for key C<*key> is defined in the hash.
+=item C<INTVAL defined_keyed_int(INTVAL key)>
 
 =cut
 
 */
 
-    INTVAL defined_keyed_str(STRING* key) {
-        INTVAL n = Hash.SELF.get_integer_keyed_str(key);
-        return DYNSELF.defined_keyed_int(n);
+
+    INTVAL defined_keyed(PMC *key) {
+        if (PObj_get_FLAGS(key) & KEY_integer_FLAG) {
+            return SELF.defined_keyed_int(key_integer(INTERP, key));
+        }
+        return SUPER(key);
+    }
+
+    INTVAL defined_keyed_int(INTVAL idx) {
+        Hash *h = PMC_struct_val(SELF);
+        INTVAL n;
+        HashBucket *b;
+
+        n = h->entries;
+        if (idx < 0)
+            idx += n;
+        if (idx < 0 || idx >= n) {
+            return 0;
+        }
+        b = h->bs + idx;
+        if (b->key)
+            return VTABLE_defined(INTERP, (PMC*)b->value);
+        return 0;
     }
 
 /*
@@ -366,6 +408,8 @@ Returns whether the value for key C<*key> is defined in the hash.
 =item C<void delete_keyed(PMC *key)>
 
 =item C<void delete_keyed_str(STRING *key)>
+
+=item C<void delete_keyed_int(INTVAL key)>
 
 Deletes the key C<*key> from the hash.
 
@@ -375,45 +419,72 @@ Deletes the key C<*key> from the hash.
 
     void delete_keyed(PMC* key) {
         if (PObj_get_FLAGS(key) & KEY_integer_FLAG) {
-            SUPER(key);
+            SELF.delete_keyed_int(key_integer(INTERP, key));
         }
         else {
-            PMC *new_undef = undef(INTERP);
-            /* fetch index into the PerlArray
-               and delete the key in the Hash afterward */
-            INTVAL n = Hash.SELF.get_integer_keyed(key);
-            Hash.SUPER(key);
-            /* remove the value from the PerlArray,
-               but don't splice the PerlArray. We don't want to mess up
-               the mapping from the Hash to the PerlArray */
-            DYNSELF.set_pmc_keyed_int(n,new_undef);
+            /* TODO handle composite keys */
+            SELF.delete_keyed_str(key_string(INTERP, key));
         }
     }
 
+    void delete_keyed_int(INTVAL idx) {
+        Hash *h = PMC_struct_val(SELF);
+        INTVAL n;
+        HashBucket *b;
+
+        n = h->entries;
+        if (idx < 0)
+            idx += n;
+        if (idx < 0 || idx >= n) {
+            return;
+        }
+        b = h->bs + idx;
+        if (b)
+            b->key = NULL;
+    }
+
     void delete_keyed_str(STRING* key) {
-        PMC *new_undef = undef(INTERP);
-        /* fetch index into the PerlArray
-           and delete the key in the Hash afterward */
-        INTVAL n = Hash.SELF.get_integer_keyed_str(key);
-        Hash.SUPER(key);
-        /* remove the value from the PerlArray,
-           but don't splice the PerlArray. We don't want to mess up
-           the mapping from the Hash to the PerlArray */
-        DYNSELF.set_pmc_keyed_int(n,new_undef);
+        Hash *h = PMC_struct_val(SELF);
+        HashBucket *b;
+        b = hash_get_bucket(INTERP, h, key);
+        if (b)
+            b->key = NULL;
     }
 
 /*
 
-=item C<STRING *get_string_keyed(PMC *key)>
+=item C<PMC* clone()>
 
-Returns the Parrot string associated with C<*key>.
+Create a clone of the OrderedHash. Non-existent keys are compacted.
+Accessing the clone via integers has different indices, if items
+were deleted
 
 =cut
 
 */
 
-    STRING* get_string_keyed (PMC* key) {
-        return Hash.SUPER(key);
+    PMC* clone() {
+        PMC *dest;
+        Hash *hash = PMC_struct_val(SELF), *h_dest;
+
+        UINTVAL i;
+        HashBucket *b;
+        void *key;
+        void *valtmp;
+
+        dest = pmc_new_noinit(INTERP, SELF->vtable->base_type);
+        new_pmc_hash_x(INTERP, dest, hash->entry_type,
+                hash->key_type, hash->compare, hash->hash_val);
+        h_dest = PMC_struct_val(dest);
+        for (i = 0; i <= hash->mask; i++) {
+            b = hash->bs + i;
+            key = b->key;
+            if (!key)
+                continue;
+            valtmp = VTABLE_clone(INTERP, (PMC*)b->value);
+            hash_put(INTERP, h_dest, key, valtmp);
+        }
+        return dest;
     }
 }
 

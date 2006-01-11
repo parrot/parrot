@@ -119,11 +119,11 @@ OUT
 output_is(<<'CODE', <<OUT, "idx only");
     new P0, .OrderedHash
     new P1, .String
-    set P1, "ok 2\n"
-    set P0[1], P1
-    new P1, .String
     set P1, "ok 1\n"
     set P0[0], P1
+    new P1, .String
+    set P1, "ok 2\n"
+    set P0[1], P1
 
     set P2, P0[0]
     print P2
@@ -268,20 +268,22 @@ output_is(<<'CODE', <<OUT, "delete");
     delete P0["a"]
 
     new P2, .Iterator, P0
-    set P2, .ITERATE_FROM_START
+    set P2, .ITERATE_FROM_START_KEYS
 iter_loop:
     unless P2, end_iter
-    shift P3, P2
+    shift S3, P2
+    set P3, P2[S3]
     print P3
     branch iter_loop
 end_iter:
 
     delete P0[0]
 
-    set P2, .ITERATE_FROM_START
+    set P2, .ITERATE_FROM_START_KEYS
 iter_loop2:
     unless P2, end_iter2
-    shift P3, P2
+    shift S3, P2
+    set P3, P2[S3]
     print P3
     branch iter_loop2
 end_iter2:
@@ -293,8 +295,6 @@ ok 3
 ok 3
 OUT
 
-SKIP: {
-    skip("Mixing keyed & indexed access is broken - see ticket 33641", 1);
 output_is(<<'CODE', <<'OUTPUT', "delete with int keys");
     new P0, .OrderedHash
     set P0["abc"], "Foo"
@@ -315,11 +315,11 @@ output_is(<<'CODE', <<'OUTPUT', "delete with int keys");
     print I0
     exists I0, P0[2]
     print I0
+    print "\n"
     end
 CODE
-101110
+101101
 OUTPUT
-}
 
 output_like(<<'CODE', '/[axj]/', "iterate over keys");
     .include "iterator.pasm"
@@ -493,7 +493,7 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "OrderedHash set_number_keyed");
     end
 .end
 CODE
--16.160000
+-16.16
 OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "OrderedHash get_integer");
