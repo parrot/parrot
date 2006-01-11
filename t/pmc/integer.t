@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 11;
+use Parrot::Test tests => 16;
 
 =head1 NAME
 
@@ -350,4 +350,123 @@ CODE
 3
 0
 36
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "can get_as_base()");
+.sub main :main
+	$P0 = new Integer
+	$P0 = 42
+	$I0 = can $P0, 'get_as_base'
+	if $I0, OK
+	print "not "
+OK: print "ok\n"
+.end
+CODE
+ok
+OUTPUT
+
+pir_output_like(<<'CODE', <<'OUTPUT', "get_as_base() bounds check");
+.sub main :main
+	$P0 = new .Integer
+	$P0 = 42
+
+	$S0 = $P0.'get_as_base'(1)
+
+	print $S0
+	print "\n"
+.end
+CODE
+/get_as_base: base out of bounds
+.*/
+OUTPUT
+
+pir_output_like(<<'CODE', <<'OUTPUT', "get_as_base() bounds check");
+.sub main :main
+	$P0 = new .Integer
+	$P0 = 42
+
+	$S0 = $P0.'get_as_base'(37)
+
+	print $S0
+	print "\n"
+.end
+CODE
+/get_as_base: base out of bounds
+.*/
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "get_as_base(10)");
+.sub main :main
+	$P0 = new .Integer
+	$P0 = 42
+
+	$S0 = $P0.'get_as_base'(10)
+
+	print $S0
+	print "\n"
+.end
+CODE
+42
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "get_as_base(various)", todo => 'failures above base 19');
+.sub main :main
+	$P0 = new .Integer
+	$P0 = 42
+
+	$S0 = $P0.'get_as_base'(2)
+	bsr PRINT
+
+	$S0 = $P0.'get_as_base'(3)
+	bsr PRINT
+
+	$S0 = $P0.'get_as_base'(5)
+	bsr PRINT
+
+	$S0 = $P0.'get_as_base'(7)
+	bsr PRINT
+
+	$S0 = $P0.'get_as_base'(11)
+	bsr PRINT
+
+	$S0 = $P0.'get_as_base'(13)
+	bsr PRINT
+
+	$S0 = $P0.'get_as_base'(17)
+	bsr PRINT
+
+	$S0 = $P0.'get_as_base'(19)
+	bsr PRINT
+
+	$S0 = $P0.'get_as_base'(19)
+	bsr PRINT
+
+	$S0 = $P0.'get_as_base'(23)
+	bsr PRINT
+
+	$S0 = $P0.'get_as_base'(29)
+	bsr PRINT
+
+	$S0 = $P0.'get_as_base'(31)
+	bsr PRINT
+	goto END
+
+PRINT:
+	print $S0
+	print "\n"
+	ret
+END:
+.end
+CODE
+101010
+1120
+132
+60
+39
+33
+28
+24
+1t
+1m
+1k
 OUTPUT

@@ -1235,6 +1235,28 @@ Sets C<dest> to the absolute value of SELF.
 
 /*
 
+=item C<STRING* get_as_base(INTVAL base)>
+
+Converts and returns the integer in base C<base>.
+C<base> must be between 2 and 36, inclusize.
+
+=cut
+
+*/
+
+    METHOD STRING* get_as_base(INTVAL base) {
+        char buf[128];
+
+        if((base < 2) || (base > 36))
+            real_exception(interpreter, NULL, E_RuntimeError,
+                    "get_as_base: base out of bounds");
+
+        return int_to_str(interpreter, buf,
+                (HUGEINTVAL)PMC_int_val(SELF), base);
+    }
+
+/*
+
 =item C<void freeze(visit_info *info)>
 
 Used to archive the integer.
