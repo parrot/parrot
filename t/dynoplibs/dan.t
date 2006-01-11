@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 6;
+use Parrot::Test tests => 7;
 use Parrot::Config;
 
 
@@ -94,4 +94,14 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "mul pir syntax");
 .end
 CODE
 42
+OUTPUT
+
+pasm_output_is(<< 'CODE', << 'OUTPUT', "mul pasm syntax");
+    loadlib P0, "dan_ops"
+    mul I0, 3, 3.9
+    print I0
+    print "\n"
+    end
+CODE
+11
 OUTPUT

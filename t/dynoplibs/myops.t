@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 3;
+use Parrot::Test tests => 5;
 use Parrot::Config;
 
 
@@ -55,4 +55,83 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "what_do_you_get_if_you_multiply_six_by_ni
 .end
 CODE
 fortytwo
+OUTPUT
+
+
+pir_output_is(<< 'CODE', << 'OUTPUT', "one alarm");
+
+.sub main :main
+    P1 = loadlib "myops_ops"
+    find_global P0, "_alarm"
+    alarm 2.0, P0
+    set I0, 1
+loop:
+    sleep 1
+    print I0
+    print "\n"
+    inc I0
+    # check_events
+    le I0, 3, loop
+    print "done.\n"
+.end
+
+.sub _alarm
+    print "alarm\n"
+.end
+CODE
+1
+alarm
+2
+3
+done.
+OUTPUT
+
+pir_output_is(<< 'CODE', << 'OUTPUT', "three alarm");
+
+.sub main :main
+    P1 = loadlib "myops_ops"
+    find_global P0, "_alarm3"
+    alarm 3.3, 0.4, P0
+    find_global P0, "_alarm2"
+    alarm 2.2, P0
+    find_global P0, "_alarm1"
+    alarm 1.5, 2.0, P0
+    set I0, 1
+loop:
+    sleep 1
+    print I0
+    print "\n"
+    inc I0
+    # check_events
+    le I0, 5, loop
+    print "done.\n"
+.end
+
+.sub _alarm1
+    print "alarm1\n"
+.end
+
+.sub _alarm2
+    print "alarm2\n"
+.end
+
+.sub _alarm3
+    print "alarm3\n"
+.end
+
+CODE
+1
+alarm1
+2
+alarm2
+3
+alarm3
+alarm1
+alarm3
+4
+alarm3
+alarm3
+alarm3
+5
+done.
 OUTPUT
