@@ -60,32 +60,32 @@ struct _encoding {
 typedef struct _encoding ENCODING;
 
 #if !defined PARROT_NO_EXTERN_ENCODING_PTRS
-extern ENCODING *Parrot_fixed_8_encoding_ptr;
-extern ENCODING *Parrot_utf8_encoding_ptr;
-extern ENCODING *Parrot_utf16_encoding_ptr;
-extern ENCODING *Parrot_ucs2_encoding_ptr;
-extern ENCODING *Parrot_default_encoding_ptr;
+PARROT_API extern ENCODING *Parrot_fixed_8_encoding_ptr;
+PARROT_API extern ENCODING *Parrot_utf8_encoding_ptr;
+PARROT_API extern ENCODING *Parrot_utf16_encoding_ptr;
+PARROT_API extern ENCODING *Parrot_ucs2_encoding_ptr;
+PARROT_API extern ENCODING *Parrot_default_encoding_ptr;
 #endif
 
 #define PARROT_DEFAULT_ENCODING Parrot_fixed_8_encoding_ptr
 #define PARROT_FIXED_8_ENCODING Parrot_fixed_8_encoding_ptr
 #define PARROT_DEFAULT_FOR_UNICODE_ENCODING NULL
 
-ENCODING *Parrot_new_encoding(Interp*);
-ENCODING *Parrot_load_encoding(Interp*, const char *encoding_name);
-ENCODING *Parrot_find_encoding(Interp *, const char *encodingname);
-INTVAL Parrot_register_encoding(Interp *, const char *encodingname, ENCODING *encoding);
-INTVAL Parrot_make_default_encoding(Interp *, const char *encodingname, ENCODING *encoding);
-ENCODING *Parrot_default_encoding(Interp *);
+PARROT_API ENCODING *Parrot_new_encoding(Interp*);
+PARROT_API ENCODING *Parrot_load_encoding(Interp*, const char *encoding_name);
+PARROT_API ENCODING *Parrot_find_encoding(Interp *, const char *encodingname);
+PARROT_API INTVAL Parrot_register_encoding(Interp *, const char *encodingname, ENCODING *encoding);
+PARROT_API INTVAL Parrot_make_default_encoding(Interp *, const char *encodingname, ENCODING *encoding);
+PARROT_API ENCODING *Parrot_default_encoding(Interp *);
 typedef INTVAL (*encoding_converter_t)(Interp *, ENCODING *lhs, ENCODING *rhs);
-encoding_converter_t Parrot_find_encoding_converter(Interp *, ENCODING *lhs, ENCODING *rhs);
+PARROT_API encoding_converter_t Parrot_find_encoding_converter(Interp *, ENCODING *lhs, ENCODING *rhs);
 
 void parrot_deinit_encodings(Interp *);
-INTVAL Parrot_encoding_number(Interp *, STRING *encodingname);
-INTVAL Parrot_encoding_number_of_str(Interp *, STRING *src);
-STRING* Parrot_encoding_name(Interp *, INTVAL number_of_encoding);
-ENCODING* Parrot_get_encoding(Interp *, INTVAL number_of_encoding);
-const char * Parrot_encoding_c_name(Interp *, INTVAL number_of_encoding);
+PARROT_API INTVAL Parrot_encoding_number(Interp *, STRING *encodingname);
+PARROT_API INTVAL Parrot_encoding_number_of_str(Interp *, STRING *src);
+PARROT_API STRING* Parrot_encoding_name(Interp *, INTVAL number_of_encoding);
+PARROT_API ENCODING* Parrot_get_encoding(Interp *, INTVAL number_of_encoding);
+PARROT_API const char * Parrot_encoding_c_name(Interp *, INTVAL number_of_encoding);
 
 #define ENCODING_MAX_BYTES_PER_CODEPOINT(i, src) \
     ((ENCODING *)src->encoding)->max_bytes_per_codepoint

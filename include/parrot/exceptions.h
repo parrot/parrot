@@ -17,10 +17,10 @@
 /* Prototypes */
 void Parrot_init_exceptions(Interp *interpreter);
 
-void internal_exception(int exitcode, const char *format, ...);
-void real_exception(Interp *interpreter,
+PARROT_API void internal_exception(int exitcode, const char *format, ...);
+PARROT_API void real_exception(Interp *interpreter,
         void *ret_addr, int exitcode,  const char *format, ...);
-void do_panic(Interp *interpreter, const char *message,
+PARROT_API void do_panic(Interp *interpreter, const char *message,
               const char *file, int line);
 
 #define PANIC(message)\
@@ -159,31 +159,31 @@ typedef struct parrot_exception_t Parrot_exception;
 /*
  * user level exception handling
  */
-void push_exception(Parrot_Interp, PMC *);
-void pop_exception(Parrot_Interp);
-void * throw_exception(Parrot_Interp, PMC *, void *);
-void * rethrow_exception(Parrot_Interp, PMC *);
+PARROT_API void push_exception(Parrot_Interp, PMC *);
+PARROT_API void pop_exception(Parrot_Interp);
+PARROT_API void * throw_exception(Parrot_Interp, PMC *, void *);
+PARROT_API void * rethrow_exception(Parrot_Interp, PMC *);
 
-size_t handle_exception(Parrot_Interp);
+PARROT_API size_t handle_exception(Parrot_Interp);
 
-PMC* new_c_exception_handler(Parrot_Interp, Parrot_exception *jb);
-void push_new_c_exception_handler(Parrot_Interp, Parrot_exception *jb);
-void rethrow_c_exception(Parrot_Interp interpreter);
+PARROT_API PMC* new_c_exception_handler(Parrot_Interp, Parrot_exception *jb);
+PARROT_API void push_new_c_exception_handler(Parrot_Interp, Parrot_exception *jb);
+PARROT_API void rethrow_c_exception(Parrot_Interp interpreter);
 
 /*
  * internal exception handling
  */
-void do_exception(Parrot_Interp, exception_severity severity, long error);
-void new_internal_exception(Parrot_Interp);
-void free_internal_exception(Parrot_Interp);
+PARROT_API void do_exception(Parrot_Interp, exception_severity severity, long error);
+PARROT_API void new_internal_exception(Parrot_Interp);
+PARROT_API void free_internal_exception(Parrot_Interp);
 
 /*
  * control stack marks and action
  */
 
-void Parrot_push_mark(Interp *, INTVAL mark);
-void Parrot_pop_mark(Interp *, INTVAL mark);
-void Parrot_push_action(Interp *, PMC *sub);
+PARROT_API void Parrot_push_mark(Interp *, INTVAL mark);
+PARROT_API void Parrot_pop_mark(Interp *, INTVAL mark);
+PARROT_API void Parrot_push_action(Interp *, PMC *sub);
 
 #endif /* PARROT_EXCEPTIONS_H_GUARD */
 

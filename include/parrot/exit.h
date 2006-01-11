@@ -14,8 +14,8 @@
 #if !defined(PARROT_EXIT_H_GUARD)
 #define PARROT_EXIT_H_GUARD
 
-int Parrot_on_exit(void (*function)(int , void *), void *arg);
-void Parrot_exit(int status);
+PARROT_API int Parrot_on_exit(void (*function)(int , void *), void *arg);
+PARROT_API void Parrot_exit(int status);
 
 #endif /* PARROT_EXIT_H_GUARD */
 

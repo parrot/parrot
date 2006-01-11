@@ -127,8 +127,8 @@ extern const struct _data_types data_types[];
 #endif
 
 
-INTVAL Parrot_get_datatype_enum(Parrot_Interp, STRING *);
-STRING * Parrot_get_datatype_name(Parrot_Interp, INTVAL );
+PARROT_API INTVAL Parrot_get_datatype_enum(Parrot_Interp, STRING *);
+PARROT_API STRING * Parrot_get_datatype_name(Parrot_Interp, INTVAL );
 
 #endif /* PARROT_DATATYPES_H_GUARD */
 

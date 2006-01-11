@@ -59,30 +59,30 @@ typedef struct {
 } parrot_event;
 
 struct QUEUE_ENTRY;
-void Parrot_schedule_event(Parrot_Interp, parrot_event*);
-void Parrot_schedule_interp_event(Parrot_Interp, parrot_event*);
-void Parrot_schedule_interp_qentry(Parrot_Interp, struct QUEUE_ENTRY* entry);
+PARROT_API void Parrot_schedule_event(Parrot_Interp, parrot_event*);
+PARROT_API void Parrot_schedule_interp_event(Parrot_Interp, parrot_event*);
+PARROT_API void Parrot_schedule_interp_qentry(Parrot_Interp, struct QUEUE_ENTRY* entry);
 
 #define CHECK_EVENTS(i, n)  Parrot_do_check_events(i, n)
 #define HANDLE_EVENTS(i, n) Parrot_do_handle_events(i, 1, n)
 
-void Parrot_init_signals(void);
-void Parrot_init_events(Parrot_Interp);
-void* Parrot_do_check_events(Parrot_Interp, void*);
-void* Parrot_do_handle_events(Parrot_Interp, int, void*);
+PARROT_API void Parrot_init_signals(void);
+PARROT_API void Parrot_init_events(Parrot_Interp);
+PARROT_API void* Parrot_do_check_events(Parrot_Interp, void*);
+PARROT_API void* Parrot_do_handle_events(Parrot_Interp, int, void*);
 
-void Parrot_new_timer_event(Parrot_Interp, PMC*, FLOATVAL,
+PARROT_API void Parrot_new_timer_event(Parrot_Interp, PMC*, FLOATVAL,
         FLOATVAL, int, PMC*, parrot_event_type_enum);
-void Parrot_del_timer_event(Parrot_Interp, PMC* timer);
-void Parrot_new_terminate_event(Parrot_Interp);
-void disable_event_checking(Parrot_Interp);
-void enable_event_checking(Parrot_Interp);
+PARROT_API void Parrot_del_timer_event(Parrot_Interp, PMC* timer);
+PARROT_API void Parrot_new_terminate_event(Parrot_Interp);
+PARROT_API void disable_event_checking(Parrot_Interp);
+PARROT_API void enable_event_checking(Parrot_Interp);
 
-void Parrot_new_cb_event(Parrot_Interp, PMC* cbi, void*ext);
-void Parrot_run_callback(Parrot_Interp, PMC* cbi, void*ext);
+PARROT_API void Parrot_new_cb_event(Parrot_Interp, PMC* cbi, void*ext);
+PARROT_API void Parrot_run_callback(Parrot_Interp, PMC* cbi, void*ext);
 
-void Parrot_kill_event_loop(void);
-void* Parrot_sleep_on_event(Parrot_Interp, FLOATVAL t, void* next);
+PARROT_API void Parrot_kill_event_loop(void);
+PARROT_API void* Parrot_sleep_on_event(Parrot_Interp, FLOATVAL t, void* next);
 
 #endif /* PARROT_EVENTS_H_GUARD */
 

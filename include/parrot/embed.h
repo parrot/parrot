@@ -21,53 +21,53 @@
 
 typedef int Parrot_warnclass;
 
-Parrot_Interp Parrot_new(Parrot_Interp parent);
+PARROT_API Parrot_Interp Parrot_new(Parrot_Interp parent);
 
-void Parrot_init(Parrot_Interp);
-void Parrot_init_stacktop(Parrot_Interp, void *);
+PARROT_API void Parrot_init(Parrot_Interp);
+PARROT_API void Parrot_init_stacktop(Parrot_Interp, void *);
 
-void Parrot_set_flag(Parrot_Interp, Parrot_Interp_flag);
-void Parrot_clear_flag(Parrot_Interp, Parrot_Interp_flag);
-Parrot_Int Parrot_test_flag(Parrot_Interp, Parrot_Interp_flag);
+PARROT_API void Parrot_set_flag(Parrot_Interp, Parrot_Interp_flag);
+PARROT_API void Parrot_clear_flag(Parrot_Interp, Parrot_Interp_flag);
+PARROT_API Parrot_Int Parrot_test_flag(Parrot_Interp, Parrot_Interp_flag);
 
-void Parrot_set_trace(Parrot_Interp, Parrot_UInt);
-void Parrot_clear_trace(Parrot_Interp, Parrot_UInt);
-Parrot_UInt Parrot_test_trace(Parrot_Interp, Parrot_UInt);
+PARROT_API void Parrot_set_trace(Parrot_Interp, Parrot_UInt);
+PARROT_API void Parrot_clear_trace(Parrot_Interp, Parrot_UInt);
+PARROT_API Parrot_UInt Parrot_test_trace(Parrot_Interp, Parrot_UInt);
 
-void Parrot_set_debug(Parrot_Interp, Parrot_UInt);
-void Parrot_clear_debug(Parrot_Interp, Parrot_UInt);
-Parrot_UInt Parrot_test_debug(Parrot_Interp, Parrot_UInt);
+PARROT_API void Parrot_set_debug(Parrot_Interp, Parrot_UInt);
+PARROT_API void Parrot_clear_debug(Parrot_Interp, Parrot_UInt);
+PARROT_API Parrot_UInt Parrot_test_debug(Parrot_Interp, Parrot_UInt);
 
-void Parrot_set_run_core( Parrot_Interp, Parrot_Run_core_t core);
+PARROT_API void Parrot_set_run_core( Parrot_Interp, Parrot_Run_core_t core);
 
-void Parrot_setwarnings(Parrot_Interp, Parrot_warnclass);
+PARROT_API void Parrot_setwarnings(Parrot_Interp, Parrot_warnclass);
 
-Parrot_PackFile Parrot_readbc(Parrot_Interp, const char *);
+PARROT_API Parrot_PackFile Parrot_readbc(Parrot_Interp, const char *);
 
-void Parrot_loadbc(Parrot_Interp, Parrot_PackFile);
+PARROT_API void Parrot_loadbc(Parrot_Interp, Parrot_PackFile);
 
-void Parrot_setup_argv(Parrot_Interp, int argc, char ** argv);
+PARROT_API void Parrot_setup_argv(Parrot_Interp, int argc, char ** argv);
 
-void Parrot_setup_opt(Parrot_Interp, int n, char *argv);
+PARROT_API void Parrot_setup_opt(Parrot_Interp, int n, char *argv);
 
-void Parrot_runcode(Parrot_Interp, int argc, char *argv[]);
+PARROT_API void Parrot_runcode(Parrot_Interp, int argc, char *argv[]);
 
-void Parrot_destroy(Parrot_Interp);
+PARROT_API void Parrot_destroy(Parrot_Interp);
 
-void Parrot_debug(Parrot_Interp, int argc, char ** argv);
+PARROT_API void Parrot_debug(Parrot_Interp, int argc, char ** argv);
 
-void Parrot_disassemble(Parrot_Interp);
+PARROT_API void Parrot_disassemble(Parrot_Interp);
 
-void Parrot_exit(int status);
+PARROT_API void Parrot_exit(int status);
 
-void Parrot_run_native(Parrot_Interp interpreter, native_func_t func);
+PARROT_API void Parrot_run_native(Parrot_Interp interpreter, native_func_t func);
 
 /* Parrot_set_config_hash exists in *_config.o (e.g install_config.o),
    so if you make this call then you will need to link with it in
    addition to libparrot */
-void Parrot_set_config_hash(void);
+PARROT_API void Parrot_set_config_hash(void);
 
-int Parrot_revision(void);
+PARROT_API int Parrot_revision(void);
 
 #endif /* PARROT_EMBED_H_GUARD */
 
