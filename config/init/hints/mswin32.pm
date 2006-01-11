@@ -63,7 +63,10 @@ sub runstep
             blib_dir             => 'blib\\lib',
             ccflags              => $ccflags,
             ccwarn               => '',
-            has_dynamic_linking  => 1
+            has_dynamic_linking  => 1,
+
+            sym_export => '__declspec(dllexport)',
+            sym_import => '__declspec(dllimport)'
         );
         
         # We'll build shared by default.
@@ -124,7 +127,7 @@ sub runstep
             blib_dir             => 'blib\\lib',
             ccflags              => $ccflags,
             ccwarn               => '',
-            has_dynamic_linking  => 1,
+            has_dynamic_linking  => 1
         );
 
         # 'link' needs to be xilink.exe, not icl.exe.
@@ -217,6 +220,12 @@ sub runstep
         # When building dynclasses we need to flag up the need to
         # mark shared variables with __declspec(dllimport).
         $conf->data->set(cc_building_dynclass_flag => '-DPARROT_BUILDING_WIN32_DLL');
+
+        # Export decorations.
+        $conf->data->set(
+            sym_export => '__declspec(dllexport)',
+            sym_import => '__declspec(dllimport)'
+        );
     }
 }
 

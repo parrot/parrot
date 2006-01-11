@@ -114,6 +114,7 @@ typedef void DPOINTER;
 #define FRAMES_PER_INT_REG_CHUNK FRAMES_PER_CHUNK
 #define FRAMES_PER_STR_REG_CHUNK FRAMES_PER_CHUNK
 
+/* JIT and exec cores. */
 #define JIT_CPUARCH  "${jitcpuarch}"
 #define JIT_OSNAME   "${jitosname}"
 #define JIT_ARCHNAME "${jitarchname}"
@@ -128,7 +129,7 @@ typedef void DPOINTER;
  */
 #define EXP_NETWORKING ${expnetworking}
 
-
+/* Oplib and dynamic ops related. */
 #define PARROT_CORE_OPLIB_NAME "core"
 #define PARROT_CORE_OPLIB_INIT Parrot_DynOp_core_${MAJOR}_${MINOR}_${PATCH}
 #define PARROT_CORE_PREDEREF_OPLIB_INIT Parrot_DynOp_core_prederef_${MAJOR}_${MINOR}_${PATCH}
@@ -136,8 +137,17 @@ typedef void DPOINTER;
 #define PARROT_CORE_CG_OPLIB_INIT Parrot_DynOp_core_cg_${MAJOR}_${MINOR}_${PATCH}
 #define PARROT_CORE_CGP_OPLIB_INIT Parrot_DynOp_core_cgp_${MAJOR}_${MINOR}_${PATCH}
 
+/* Symbol export and import decoration. */
+#if defined(PARROT_IN_CORE)
+#define PARROT_API ${sym_export}
+#else
+#define PARROT_API ${sym_import}
+#endif
+
+/* ICU. */
 #define PARROT_HAS_ICU ${has_icu}
 
+/* Int and float formats. */
 #define INTVAL_FMT "${intvalfmt}"
 #define FLOATVAL_FMT "${floatvalfmt}"
 

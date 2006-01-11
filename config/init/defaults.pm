@@ -119,6 +119,11 @@ sub runstep
         # include debug info in executable
         ld_debug => '',
 
+        # Way to decorate a function to mark it as an exportable or
+        # importable symbol.
+        sym_export => '',
+        sym_import => '',
+
         # Library build directory
         blib_dir      => 'blib/lib',
 

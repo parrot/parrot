@@ -27,7 +27,9 @@ sub runstep
         libs                => $libs,
         has_static_linking  => 0,
         has_dynamic_linking => 1,
-        parrot_is_shared    => 1
+        parrot_is_shared    => 1,
+        sym_export => '__declspec(dllexport)',
+        sym_import => '__declspec(dllimport)'
     );
 
     # We need to define inet_aton on Cygwin.  The contents of the --define
