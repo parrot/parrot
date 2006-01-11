@@ -79,6 +79,32 @@ Returns a true value (1) if the supplied path is a directory.
 
 /*
 
+=item C<INTVAL is_dir(STRING* path)>
+
+Returns a true value (1) if the supplied path is a directory.
+
+=cut
+
+*/
+
+    METHOD INTVAL is_file(STRING *path) {
+        struct stat info;
+        char *cpath = string_to_cstring(interpreter, path);
+        int error = stat(cpath, &info);
+        if (error) {
+            char *errmsg = strerror(errno);
+            real_exception(interpreter, NULL, E_SystemError, errmsg);
+        }
+
+        if (S_ISREG(info.st_mode)) {
+            return 1;
+        } else {
+            return 0;
+        }
+    }
+
+/*
+
 =item C<INTVAL is_link(STRING* path)>
 
 Returns a true value (1) if the supplied path is a link.
