@@ -245,21 +245,22 @@ Since the location of these files can vary from platform to platform,
 and build to build, a general method is provided to find out the
 necessary flags to use.
 
-The pkg-config is a helper tool, now common on many platforms,
+pkg-config is a helper tool, now common on many platforms,
 which many packages have adopted to provide the necessary compiler and
 linker flags required to build against a library. parrot will install
-the parrot.pc which can be queried using pkg-config.
+a file called parrot.pc which can be queried using pkg-config.
 
 To start with, let's find out what version of parrot is installed
+by running pkg-config with the --modversion flag. If this command fails
+with an error, skip to the bottom of this section.
 
   pkg-config --modversion parrot
-  0.4.1
 
-To find out the necessary -I flags, use
+To find out the necessary -I flags, use --cflags
 
   pkg-config --cflags parrot
 
-and to find the necessary -L and -l flags, use
+and to find the necessary -L and -l flags, use --libs
 
   pkg-config --libs parrot
 
@@ -284,7 +285,7 @@ such as this.
   AC_SUBST(PARROT_CFLAGS)
 
 If parrot has been installed system-wide, then any of the previous
-lines should have returned the relevent flags. If it is not installed
+lines should have returned the relevant flags. If it is not installed
 in one of the standard places that pkg-config looks, then you will get
 an error message.
 
@@ -294,7 +295,7 @@ an error message.
   to the PKG_CONFIG_PATH environment variable
   No package 'parrot' found
 
-As stated in the error message, an environment varable can be used to
+As stated in the error message, an environment variable can be used to
 make pkg-config look in more locations.
 
   export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig
