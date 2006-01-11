@@ -23,6 +23,7 @@ and its utility functions.
 
 #include "parrot/parrot.h"
 #include "spf_render.str"
+#include <assert.h>
 
 /* Per Dan's orders, we will not use sprintf if snprintf isn't
  * around for us.
@@ -39,7 +40,9 @@ uint_to_str(Interp *interpreter,
 
 Returns C<num> converted to a Parrot C<STRING>.
 
-Note that C<base> must be defined, a default of 10 is not assumed.
+Note that C<base> must be defined, a default of 10 is not assumed. The 
+caller has to verify that C<< base >= 2 && base <= 36 >>
+The buffer C<tc> must be at least C<sizeof(UHUGEINTVAL)*8 + 1> chars big.
 
 If C<minus> is true then C<-> is prepended to the string representation.
 
@@ -56,6 +59,7 @@ uint_to_str(Interp *interpreter,
     /* the buffer must be at least as long as this */
     tail = p = tc + sizeof(UHUGEINTVAL)*8 + 1;
 
+    assert(base >= 2 && base <= 36);
     do {
         cur = (char)(num % base);
         if (cur < 10) {
