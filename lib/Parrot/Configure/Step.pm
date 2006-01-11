@@ -213,7 +213,10 @@ sub genfile
             # OUT was/is used at the output filehandle in eval'ed scripts
             local *OUT = $out;
             my $text = do {local $/; <$in>};
+            # XXX depreciated
             $text =~ s{ \$\{(\w+)\} }{\$conf->data->get("$1")}gx;
+            # interoplate @foo@ values
+            $text =~ s{ \@ (\w+) \@ }{\$conf->data->get("$1")}gx;
             eval $text;
             die $@ if $@;
             last;
@@ -232,6 +235,8 @@ sub genfile
                 $line = $2;
             }
         }
+
+        # XXX depreciated
         $line =~ s{ \$\{(\w+)\} }{
             if(defined(my $val=$conf->data->get($1))) {
                 #use Data::Dumper;warn Dumper("val for $1 is ",$val);
@@ -241,6 +246,18 @@ sub genfile
                 '';
             }
         }egx;
+
+        # interoplate @foo@ values
+        $line =~ s{ \@ (\w+) \@ }{
+            if(defined(my $val=$conf->data->get($1))) {
+                #use Data::Dumper;warn Dumper("val for $1 is ",$val);
+                $val;
+            } else {
+                warn "value for '$1' in $source is undef";
+                '';
+            }
+        }egx;
+
         if ($options{replace_slashes}) {
             $line =~ s{(/+)}{
                 my $len = length $1;
@@ -250,6 +267,8 @@ sub genfile
             # replace \* with \\*, so make will not eat the \
             $line =~ s{(\\\*)}{\\$1}g;
         }
+
+        # XXX depreciated
         # Unquote text quoted using ${{word}} notation
         $line =~ s/\${{(\w+)}}/\${$1}/g;
         print $out $line;

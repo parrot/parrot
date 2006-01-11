@@ -1,4 +1,4 @@
-prefix=${prefix}
+prefix=@prefix@
 exec_prefix=${{prefix}}
 libdir=${{exec_prefix}}/lib
 includedir=${{prefix}}/include
@@ -6,5 +6,5 @@ includedir=${{prefix}}/include
 Name: parrot
 Description: virtual machine to execute bytecode for interpreted languages
 Version: ${VERSION}
-Libs: -L${{libdir}} -lparrot ${icu_shared} ${libs}
+Libs: -L${{libdir}} -lparrot @icu_shared@ @libs@
 Cflags: -I${{includedir}} 
