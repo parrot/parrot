@@ -292,7 +292,7 @@ CODE
 ok
 OUT
 
-  ok(-l "xpto", "symlink was really created"); 
+  ok(-l "xpto", "symlink was really created");
   unlink "xpto" if -f "xpto"
 }
 
@@ -317,7 +317,7 @@ CODE
 ok
 OUT
 
-  my (undef, undef, undef, $nl) = stat("MANIFEST");
+  my $nl = [ stat("MANIFEST") ] -> [ 3 ];
   ok( $nl > 1, "hard link was really created");
   unlink "xpto" if -f "xpto"
 }
