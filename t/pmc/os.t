@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 11;
+use Parrot::Test tests => 13;
 use Parrot::Config;
 use Cwd;
 use File::Spec;
@@ -274,14 +274,14 @@ rmdir $xpto if -f $xpto; # this way next test doesn't fail if this one does
 
 # Test symlink
 SKIP: {
-  skip "Symlinks not available under Windows", 1 if $MSWin32;
+  skip "Symlinks not available under Windows", 2 if $MSWin32;
 
   pir_output_is(<<'CODE', <<"OUT", "Test symlink");
 .sub main :main
         $P1 = new .OS
 
         $S1 = "xpto"
-        $S2 = "src"
+        $S2 = "MANIFEST"
         $P1."symlink"($S2, $S1)
 
         print "ok\n"
@@ -292,6 +292,32 @@ CODE
 ok
 OUT
 
-  ok(-l "xpto"); 
+  ok(-l "xpto", "symlink was really created"); 
+  unlink "xpto" if -f "xpto"
+}
+
+
+# Test link
+SKIP: {
+  skip "Parrot link not implemented for Windows, yet", 2 if $MSWin32;
+
+  pir_output_is(<<'CODE', <<"OUT", "Test link");
+.sub main :main
+        $P1 = new .OS
+
+        $S1 = "xpto"
+        $S2 = "MANIFEST"
+        $P1."link"($S2, $S1)
+
+        print "ok\n"
+
+        end
+.end
+CODE
+ok
+OUT
+
+  my (undef, undef, undef, $nl) = stat("MANIFEST");
+  ok( $nl > 1, "hard link was really created");
   unlink "xpto" if -f "xpto"
 }
