@@ -47,11 +47,12 @@ typedef @float8_t@              Parrot_Float8;
 /* Temporary until we find a way to make it work in the right place. */
 struct PackFile;      typedef struct PackFile * Parrot_PackFile;
 
-/* Symbol export and import decoration. */
-#if defined(PARROT_IN_CORE)
-#define PARROT_API @sym_export@
-#else
+/* Symbol export and import decoration. At the time of writing, note that
+ * PARROT_IN_CORE won't always imply !PARROT_IN_EXTENSION. */
+#if defined(PARROT_IN_EXTENSION)
 #define PARROT_API @sym_import@
+#else
+#define PARROT_API @sym_export@
 #endif
 
 #if defined(PARROT_IN_CORE)

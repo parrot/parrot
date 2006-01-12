@@ -27,7 +27,7 @@ use Parrot::Pmc2c qw(dynext_load_code dont_edit);
 =item C<new($opt, $vtable_dump, %pmcs)>
 
     $library = Parrot::Pmc2c::Library->new
-        ( $options,     # hash refernce, the same passet to other constructors
+        ( $options,     # hash refernce, the same passed to other constructors
           $vtable_dump, # vtable.dump
           pmc1        => $pmc1_dump,
           pmc2        => $pmc2_dump,
@@ -115,6 +115,7 @@ sub gen_h {
     my $lc_libname = lc $self->{opt}{library};
 
     $hout .= <<"EOH";
+#define PARROT_IN_EXTENSION
 Parrot_PMC Parrot_lib_${lc_libname}_load(Parrot_INTERP interpreter);
 EOH
 
@@ -149,6 +150,7 @@ sub includes() {
     my $self = shift;
     my $cout = "";
     $cout .= <<"EOC";
+#define PARROT_IN_EXTENSION
 #include "parrot/parrot.h"
 #include "parrot/extend.h"
 #include "parrot/dynext.h"

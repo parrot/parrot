@@ -175,7 +175,7 @@ if ($base =~ m!^src/dynoplibs/! || $dynamic_flag) {
     $dynamic_flag = 1;
 }
 
-my $sym_export = $PConfig{'sym_export'};
+my $sym_export = $dynamic_flag ? $PConfig{'sym_export'} : '';
 
 my %hashed_ops;
 
@@ -258,6 +258,9 @@ my $mmp_v = "${major_version}_${minor_version}_${patch_version}";
 my $init_func = "Parrot_DynOp_${base}${suffix}_$mmp_v";
 
 print HEADER $preamble;
+if ($dynamic_flag) {
+    print HEADER "#define PARROT_IN_EXTENSION\n";
+}
 print HEADER <<END_C;
 #include "parrot/parrot.h"
 #include "parrot/oplib.h"

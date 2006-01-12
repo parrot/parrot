@@ -1014,6 +1014,9 @@ sub gen_c {
     my ($self, $out_name) = @_;
 
     my $cout = dont_edit($self->{file});
+    if ($self->{flags}{dynpmc}) {
+        $cout .= "#define PARROT_IN_EXTENSION\n";
+    }
     $cout .= $self->line_directive(1, $self->{file})
 	. $self->{pre};
     $cout .= $self->line_directive_here($cout, $out_name)
@@ -1079,6 +1082,10 @@ sub gen_h() {
 #define PARROT_PMC_${name}_H_GUARD
 
 EOH
+
+    if ($self->{flags}{dynpmc}) {
+        $hout .= "#define PARROT_IN_EXTENSION\n";
+    }
 
     $hout .= $self->hdecls();
     if ($self->{const}) {
