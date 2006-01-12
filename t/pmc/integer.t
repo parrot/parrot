@@ -409,7 +409,7 @@ CODE
 42
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "get_as_base(various)", todo => 'failures above base 19');
+pir_output_is(<<'CODE', <<'OUTPUT', "get_as_base(various)");
 .sub main :main
 	$P0 = new .Integer
 	$P0 = 42
@@ -433,9 +433,6 @@ pir_output_is(<<'CODE', <<'OUTPUT', "get_as_base(various)", todo => 'failures ab
 	bsr PRINT
 
 	$S0 = $P0.'get_as_base'(17)
-	bsr PRINT
-
-	$S0 = $P0.'get_as_base'(19)
 	bsr PRINT
 
 	$S0 = $P0.'get_as_base'(19)
@@ -466,7 +463,7 @@ CODE
 33
 28
 24
-1t
-1m
-1k
+1j
+1d
+1b
 OUTPUT
