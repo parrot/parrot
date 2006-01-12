@@ -79,11 +79,16 @@ pmclass OrderedHash extends Hash need_ext does array does hash {
     }
 
     PMC* get_pmc_keyed (PMC* key) {
+        PMC *item, *next;
         switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
             case KEY_hash_iterator_FLAGS:
                 return SUPER(key);
             case KEY_integer_FLAG:
-                return SELF.get_pmc_keyed_int(key_integer(INTERP, key));
+                item = SELF.get_pmc_keyed_int(key_integer(INTERP, key));
+                next = key_next(INTERP, key);
+                if (!next)
+                    return item;
+                return VTABLE_get_pmc_keyed(INTERP, item, next);
             default:
                 return SUPER(key);
         }
@@ -122,11 +127,16 @@ pmclass OrderedHash extends Hash need_ext does array does hash {
     }
 
     STRING* get_string_keyed (PMC* key) {
+        PMC *item, *next;
         switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
             case KEY_hash_iterator_FLAGS:
                 return SUPER(key);
             case KEY_integer_FLAG:
-                return SELF.get_string_keyed_int(key_integer(INTERP, key));
+                item = SELF.get_pmc_keyed_int(key_integer(INTERP, key));
+                next = key_next(INTERP, key);
+                if (!next)
+                    return VTABLE_get_string(INTERP, item);
+                return VTABLE_get_string_keyed(INTERP, item, next);
             default:
                 return SUPER(key);
         }
@@ -167,11 +177,16 @@ Returns the integer value associated with C<key>.
     }
 
     INTVAL get_integer_keyed (PMC* key) {
+        PMC *item, *next;
         switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
             case KEY_hash_iterator_FLAGS:
                 return SUPER(key);
             case KEY_integer_FLAG:
-                return SELF.get_integer_keyed_int(key_integer(INTERP, key));
+                item = SELF.get_pmc_keyed_int(key_integer(INTERP, key));
+                next = key_next(INTERP, key);
+                if (!next)
+                    return VTABLE_get_integer(INTERP, item);
+                return VTABLE_get_integer_keyed(INTERP, item, next);
             default:
                 return SUPER(key);
         }
@@ -212,11 +227,16 @@ Returns the floating-point value for the element at C<key>.
     }
 
     FLOATVAL get_number_keyed (PMC* key) {
+        PMC *item, *next;
         switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
             case KEY_hash_iterator_FLAGS:
                 return SUPER(key);
             case KEY_integer_FLAG:
-                return SELF.get_number_keyed_int(key_integer(INTERP, key));
+                item = SELF.get_pmc_keyed_int(key_integer(INTERP, key));
+                next = key_next(INTERP, key);
+                if (!next)
+                    return VTABLE_get_number(INTERP, item);
+                return VTABLE_get_number_keyed(INTERP, item, next);
             default:
                 return SUPER(key);
         }
@@ -347,13 +367,32 @@ The created key = "\1idx".
             return 1;
         return 0;
     }
+
     INTVAL exists_keyed(PMC* key) {
+        PMC *item, *next;
         if (PObj_get_FLAGS(key) & KEY_integer_FLAG) {
-            return SELF.exists_keyed_int(key_integer(INTERP, key));
+            Hash *h = PMC_struct_val(SELF);
+            INTVAL n, idx;
+            HashBucket *b;
+
+            idx = key_integer(INTERP, key);
+            n = h->entries;
+            if (idx < 0)
+                idx += n;
+            if (idx < 0 || idx >= n) {
+                return 0;
+            }
+            b = h->bs + idx;
+            if (!b->key)
+                return 0;
+            item = b->value;
+            next = key_next(INTERP, key);
+            if (!next)
+                return 1;
+            return VTABLE_exists_keyed(INTERP, item, next);
         }
         else {
-            /* TODO handle composite keys */
-            return SELF.exists_keyed_str(key_string(INTERP, key));
+            return SUPER(key);
         }
     }
 
@@ -380,8 +419,28 @@ The created key = "\1idx".
 
 
     INTVAL defined_keyed(PMC *key) {
+        PMC *item, *next;
         if (PObj_get_FLAGS(key) & KEY_integer_FLAG) {
-            return SELF.defined_keyed_int(key_integer(INTERP, key));
+            Hash *h = PMC_struct_val(SELF);
+            INTVAL n, idx;
+            HashBucket *b;
+
+            idx = key_integer(INTERP, key);
+            n = h->entries;
+            if (idx < 0)
+                idx += n;
+            if (idx < 0 || idx >= n) {
+                /* XXX non-existant is undefined - is this correct */
+                return 0;
+            }
+            b = h->bs + idx;
+            if (!b->key)
+                return 0;
+            item = b->value;
+            next = key_next(INTERP, key);
+            if (!next)
+                return VTABLE_defined(INTERP, item);
+            return VTABLE_defined_keyed(INTERP, item, next);
         }
         return SUPER(key);
     }
@@ -418,11 +477,22 @@ Deletes the key C<*key> from the hash.
 */
 
     void delete_keyed(PMC* key) {
+        PMC *item, *next;
+        next = key_next(INTERP, key);
         if (PObj_get_FLAGS(key) & KEY_integer_FLAG) {
+            if (next) {
+                item = SELF.get_pmc_keyed_int(key_integer(INTERP, key));
+                VTABLE_delete_keyed(INTERP, item, next);
+                return;
+            }
             SELF.delete_keyed_int(key_integer(INTERP, key));
         }
         else {
-            /* TODO handle composite keys */
+            if (next) {
+                item = DYNSELF.get_pmc_keyed_str(key_string(INTERP, key));
+                VTABLE_delete_keyed(INTERP, item, next);
+                return;
+            }
             SELF.delete_keyed_str(key_string(INTERP, key));
         }
     }

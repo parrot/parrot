@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 22;
+use Parrot::Test tests => 25;
 
 =head1 NAME
 
@@ -638,3 +638,117 @@ ok 2
 ok 3
 ok 4
 OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "set/get compound key");
+    new P0, .OrderedHash
+    set P0["a"], "Foo\n"
+    new P1, .Hash
+    set P1['foo'], "bar\n"
+    set P0["b"], P1
+    set P2, P0['b'; 'foo']
+    print P2
+    set P0['b'; 'foo'], "baz\n"
+    set P0['b'; 'quux'], "xyzzy\n"
+    set P2, P0['b'; 'foo']
+    print P2
+    set P2, P0['b'; 'quux']
+    print P2
+    print "--\n"
+    set P2, P0[0] 
+    print P2
+    set P2, P0[1, 'foo'] 
+    print P2
+    set P2, P0[1, 'quux'] 
+    print P2
+    end
+CODE
+bar
+baz
+xyzzy
+--
+Foo
+baz
+xyzzy
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "exists compound key");
+    new P0, .OrderedHash
+    set P0["a"], "Foo"
+    new P1, .Hash
+    set P1['foo'], "bar\n"
+    set P0["b"], P1
+    set P0['b'; 'quux'], "xyzzy\n"
+    exists I0, P0['a']
+    print I0
+    exists I0, P0['b'; 'foo']
+    print I0
+    exists I0, P0['b'; 'quux']
+    print I0
+    exists I0, P0['b'; 'nada']
+    print I0
+    exists I0, P0['c']
+    print I0
+    print "\n--\n"
+    exists I0, P0[0]
+    print I0
+    exists I0, P0[1; 'foo']
+    print I0
+    exists I0, P0[1; 'quux']
+    print I0
+    exists I0, P0[1; 'nada']
+    print I0
+    exists I0, P0[2]
+    print I0
+    print "\n"
+    end
+CODE
+11100
+--
+11100
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "delete compound key");
+    new P0, .OrderedHash
+    set P0["a"], "Foo"
+    new P1, .Hash
+    set P1['foo'], "bar\n"
+    set P0["b"], P1
+    set P0['b'; 'quux'], "xyzzy\n"
+    delete  P0['b'; 'foo']
+    exists I0, P0['a']
+    print I0
+    exists I0, P0['b'; 'foo']
+    print I0
+    exists I0, P0['b'; 'quux']
+    print I0
+    exists I0, P0['b'; 'nada']
+    print I0
+    exists I0, P0['c']
+    print I0
+    print "\n--\n"
+    exists I0, P0[0]
+    print I0
+    exists I0, P0[1; 'foo']
+    print I0
+    exists I0, P0[1; 'quux']
+    print I0
+    exists I0, P0[1; 'nada']
+    print I0
+    exists I0, P0[2]
+    print I0
+    print "\n--\n"
+    delete P0[1, 'quux']
+    exists I0, P0['b'; 'quux']
+    print I0
+    exists I0, P0[1; 'quux']
+    print I0
+    print "\n"
+    end
+CODE
+10100
+--
+10100
+--
+00
+OUTPUT
+
