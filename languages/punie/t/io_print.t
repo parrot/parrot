@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(t . lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 5;
+use Parrot::Test tests => 6;
 
 language_output_is('punie', <<'EOC', '1', 'printing one');
 print 1;
@@ -30,3 +30,11 @@ ok 1
 ok 2
 OUT
 
+language_output_is('punie', <<'CODE', <<'OUT', 'printing list of strings');
+print "ok 2\n","ok 3\n","ok 4\n","ok 5\n";
+CODE
+ok 2
+ok 3
+ok 4
+ok 5
+OUT

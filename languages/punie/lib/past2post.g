@@ -49,6 +49,19 @@ PAST::Op: result(.) = {
       push newchildren, $P3
       goto iter_loop
   iter_end:
+
+    # In the context of an Op node, collapse a child comma op, so the
+    # child's children become the children of the current node.
+    $I0 = elements newchildren
+    if $I0 > 1 goto no_munge
+      $P5 = newchildren[0]
+      $S3 = typeof $P5
+    unless $S3 == 'POST::Op' goto no_munge
+      $S4 = $P5.op()
+    unless $S4 == 'O_COMMA' goto no_munge
+      newchildren = $P5.children()
+
+  no_munge:
     # The results for the children become the children of the new node.
     $S1 = node.source()
     $I1 = node.pos()

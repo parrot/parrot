@@ -123,6 +123,43 @@ PunieGrammar::gprint: result(.) = {
     .return (result)
 }
 
+PunieGrammar::cexpr: result(.) = {
+    .local pmc result
+    $I0 = defined node["PunieGrammar::term"]
+    unless $I0 goto err_no_term
+    $P1 = node["PunieGrammar::term"]
+    .local pmc children
+    children = new PerlArray
+    $P0 = new Iterator, $P1    # setup iterator for node
+    set $P0, 0 # reset iterator, begin at start
+  iter_loop:
+    unless $P0, iter_end         # while (entries) ...
+      shift $P2, $P0             # get next entry
+      $P3 = tree.get('result', $P2, 'PunieGrammar::term')
+      push children, $P3
+      goto iter_loop
+  iter_end:
+
+    # If there's only one child node, it's a single element, not a list,
+    # so just return the single element. Otherwise, we have a comma
+    # separated list, so build a comma op node.
+    $I0 = elements children
+    unless $I0 > 1 goto no_comma
+    result = new 'PAST::Op'
+    # get the source string and position offset from start of source
+    # code for this match node
+    $S2 = node 
+    $I3 = node.from()
+    result.set_node($S2,$I3,'O_COMMA',children)
+    .return (result)
+  no_comma:
+    result = shift children # there's only one result
+    .return (result)
+  err_no_term:
+    print "The cexpr node doesn't contain a 'term' match.\n"
+    end
+}
+
 PunieGrammar::term: result(.) = {
     .local pmc result
     result = new 'PAST::Val'
