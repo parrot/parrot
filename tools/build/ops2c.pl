@@ -116,10 +116,10 @@ use Parrot::OpLib::core;
 use Parrot::Config;
 
 my %arg_dir_mapping = (
-	''   => 'PARROT_ARGDIR_IGNORED',
-	'i'  => 'PARROT_ARGDIR_IN',
-	'o'  => 'PARROT_ARGDIR_OUT',
-	'io' => 'PARROT_ARGDIR_INOUT'
+    ''   => 'PARROT_ARGDIR_IGNORED',
+    'i'  => 'PARROT_ARGDIR_IN',
+    'o'  => 'PARROT_ARGDIR_OUT',
+    'io' => 'PARROT_ARGDIR_INOUT'
 );
 
 #
@@ -130,11 +130,12 @@ sub Usage {
 }
 
 my ( $nolines_flag, $help_flag, $dynamic_flag, $core_flag );
-GetOptions( "no-lines"      => \$nolines_flag,
-            "help"          => \$help_flag,
-            "dynamic|d"     => \$dynamic_flag,
-            "core"          => \$core_flag,
-          ) || Usage();
+GetOptions(
+    "no-lines"      => \$nolines_flag,
+    "help"          => \$help_flag,
+    "dynamic|d"     => \$dynamic_flag,
+    "core"          => \$core_flag,
+) || Usage();
 
 Usage() if $help_flag;
 Usage() unless @ARGV;
@@ -175,10 +176,6 @@ if ($base =~ m!^src/dynoplibs/! || $dynamic_flag) {
 }
 
 my $sym_export = $PConfig{'sym_export'};
-#if ($dynamic_flag && ($PConfig{'osname'} =~ /cygwin/i ||
-#    ($PConfig{'osname'} =~ /win32/i && $PConfig{'cc'} =~ /cl|gcc/i))) {
-#    $sym_export = '__declspec(dllexport)';
-#}
 
 my %hashed_ops;
 
@@ -197,23 +194,22 @@ else {
     my @opsfiles;
 
     foreach my $opsfile ($file, @ARGV) {
-	if ($opsfiles{$opsfile}) {
-	    print STDERR "$0: Ops file '$opsfile' mentioned more than once!\n";
-	    next;
-	}
+        if ($opsfiles{$opsfile}) {
+            print STDERR "$0: Ops file '$opsfile' mentioned more than once!\n";
+            next;
+        }
 
-	$opsfiles{$opsfile} = 1;
-	push @opsfiles, $opsfile;
+        $opsfiles{$opsfile} = 1;
+        push @opsfiles, $opsfile;
 
-	die "$0: Could not read ops file '$opsfile'!\n" unless -r $opsfile;
+        die "$0: Could not read ops file '$opsfile'!\n" unless -r $opsfile;
     }
 
     $ops = Parrot::OpsFile->new( \@opsfiles, $nolines_flag );
 
     my $cur_code = 0;
     for(@{$ops->{OPS}}) {
-	$_->{CODE}=$cur_code++;
-
+        $_->{CODE}=$cur_code++;
     }
 }
 
@@ -235,10 +231,10 @@ if (!$dynamic_flag && ! -d $incdir) {
 }
 
 open HEADER, ">$header"
-  or die "ops2c.pl: Could not open header file '$header' for writing: $!!\n";
+    or die "ops2c.pl: Cannot open header file '$header' for writing: $!!\n";
 
 open SOURCE, ">$source"
-  or die "ops2c.pl: Could not open source file '$source' for writing: $!!\n";
+    or die "ops2c.pl: Cannot open source file '$source' for writing: $!!\n";
 
 
 #
@@ -317,37 +313,38 @@ foreach my $op ($ops->ops) {
     my $prototype  = "$sym_export $opsarraytype * $func_name ($arg_types)";
     my $args       = "$opsarraytype *cur_opcode, Interp * interpreter";
     my $definition;
-    my $comment = '';
-    $prev_def = '';
-    my $one_op = "";
+    my $comment    = '';
+    $prev_def      = '';
+    my $one_op     = "";
+
     if ($suffix =~ /cg/) {
-	$prev_def = $definition = "PC_$index:";
-	$comment =  "/* ". $op->func_name($trans) ." */";
-	push @cg_jump_table, "        &&PC_$index,\n";
+        $prev_def = $definition = "PC_$index:";
+        $comment  =  "/* ". $op->func_name($trans) ." */";
+        push @cg_jump_table, "        &&PC_$index,\n";
     } elsif ($suffix =~ /switch/) {
-	$comment =  "/* ". $op->func_name($trans) ." */";
-	$one_op = <<END_C;
-	case $index:	$comment
+      $comment    =  "/* ". $op->func_name($trans) ." */";
+      $one_op     = <<END_C;
+    case $index:	$comment
 END_C
     }
     elsif ($suffix eq '') {
-        $definition = "$sym_export $opsarraytype * $func_name ($args);\n";
+        $definition  = "$sym_export $opsarraytype * $func_name ($args);\n";
         $definition .= "$opsarraytype *\n$func_name ($args)";
     }
     else {
-        $definition = "static $opsarraytype *\n$func_name ($args)";
+        $definition  = "static $opsarraytype *\n$func_name ($args)";
     }
-    my $source     = $op->source($trans);
-    $source =~ s/\bop_lib\b/${bs}op_lib/;
-    $source =~ s/\bops_addr\b/${bs}ops_addr/g;
+    my $source = $op->source($trans);
+    $source    =~ s/\bop_lib\b/${bs}op_lib/;
+    $source    =~ s/\bops_addr\b/${bs}ops_addr/g;
 
     if ($suffix =~ /switch/) {
-	$one_op .= "\t{\n$source}\n\n";
+        $one_op .= "\t{\n$source}\n\n";
     }
     else {
-	push @op_func_table, sprintf("  %-50s /* %6ld */\n",
-	    "$func_name,", $index);
-	$one_op .= "$definition $comment {\n$source}\n\n";
+        push @op_func_table, sprintf("  %-50s /* %6ld */\n",
+            "$func_name,", $index);
+        $one_op .= "$definition $comment {\n$source}\n\n";
     }
     push @op_funcs, $one_op;
     $index++;
@@ -360,7 +357,6 @@ if ($suffix =~ /cg/) {
     };
 END_C
     print SOURCE $trans->run_core_after_addr_table($bs);
-
 }
 
 if ($suffix =~ /cgp/) {
@@ -368,7 +364,7 @@ if ($suffix =~ /cgp/) {
 #ifdef __GNUC__
 # ifdef I386
     else if (cur_opcode == (opcode_t *) 1)
-	asm ("jmp *4(%ebp)");	/* jump to ret addr, used by JIT */
+    asm ("jmp *4(%ebp)");	/* jump to ret addr, used by JIT */
 # endif
 #endif
     _reg_base = (char*)interpreter->ctx.bp.regs_i;
@@ -397,7 +393,7 @@ END_C
 my $CORE_SPLIT = 300;
 for (my $i = 0; $i < @op_funcs; $i++) {
     if ($i && $i % $CORE_SPLIT == 0 && $trans->can("run_core_split")) {
-	print SOURCE $trans->run_core_split($base);
+        print SOURCE $trans->run_core_split($base);
     }
     print SOURCE $op_funcs[$i];
 }
@@ -452,7 +448,6 @@ END_C
 
 
 END_C
-
 }
 
 my (%names, $tot);
@@ -473,32 +468,31 @@ END_C
     $index = 0;
 
     foreach my $op ($ops->ops) {
-	my $type       = sprintf("PARROT_%s_OP", uc $op->type);
-	my $name       = $op->name;
-	$names{$name} = 1;
-	my $full_name  = $op->full_name;
-	my $func_name  = $op->func_name($trans);
-	my $body       = $op->body;
-	my $jump       = $op->jump || 0;
-	my $arg_count  = $op->size;
+        my $type       = sprintf("PARROT_%s_OP", uc $op->type);
+        my $name       = $op->name;
+        $names{$name} = 1;
+        my $full_name  = $op->full_name;
+        my $func_name  = $op->func_name($trans);
+        my $body       = $op->body;
+        my $jump       = $op->jump || 0;
+        my $arg_count  = $op->size;
 
-	## 0 inserted if arrays are empty to prevent msvc compiler errors
-	my $arg_types  = "{ " . join(", ", scalar $op->arg_types 
-		? map { sprintf("PARROT_ARG_%s", uc $_) } $op->arg_types
-		: 0
-	) . " }"
-	;
-	my $arg_dirs   = "{ " . join(", ", scalar $op->arg_dirs
-		? map { $arg_dir_mapping{$_} } $op->arg_dirs
-		: 0
-	) . " }";
-	my $labels     = "{ " . join(", ",  scalar $op->labels
-		? $op->labels
-		: 0
-	) . " }";
-	my $flags      = 0;
+    ## 0 inserted if arrays are empty to prevent msvc compiler errors
+        my $arg_types  = "{ " . join(", ", scalar $op->arg_types
+            ? map { sprintf("PARROT_ARG_%s", uc $_) } $op->arg_types
+            : 0
+        ) . " }";
+        my $arg_dirs   = "{ " . join(", ", scalar $op->arg_dirs
+            ? map { $arg_dir_mapping{$_} } $op->arg_dirs
+            : 0
+        ) . " }";
+        my $labels     = "{ " . join(", ",  scalar $op->labels
+            ? $op->labels
+            : 0
+        ) . " }";
+        my $flags      = 0;
 
-	print SOURCE <<END_C;
+        print SOURCE <<END_C;
   { /* $index */
     /* type $type, */
     "$name",
@@ -514,7 +508,7 @@ END_C
   },
 END_C
 
-	$index++;
+        $index++;
     }
     print SOURCE <<END_C;
 };
@@ -527,9 +521,9 @@ if ($suffix eq '' && !$dynamic_flag) {
     my $hash_size = 3041;
     $tot = $index + scalar keys(%names);
     if ($hash_size < $tot * 1.2) {
-	    print STDERR
-	    "please increase hash_size ($hash_size) in tools/build/ops2c.pl " .
-	    "to a prime number > ", $tot *1.2, "\n";
+        print STDERR
+            "please increase hash_size ($hash_size) in tools/build/ops2c.pl " .
+            "to a prime number > ", $tot *1.2, "\n";
     }
     print SOURCE <<END_C;
 
@@ -582,7 +576,7 @@ static size_t hash_str(const char * str) {
     size_t key = 0;
     const char * s;
     for(s=str; *s; s++)
-	key = key * 65599 + *s;
+    key = key * 65599 + *s;
     return key;
 }
 
@@ -598,12 +592,12 @@ static int get_op(const char * name, int full) {
     HOP * p;
     size_t hidx = hash_str(name) % OP_HASH_SIZE;
     if (!hop) {
-	hop = mem_sys_allocate_zeroed(OP_HASH_SIZE * sizeof(HOP*));
-	hop_init();
+    hop = mem_sys_allocate_zeroed(OP_HASH_SIZE * sizeof(HOP*));
+    hop_init();
     }
     for(p = hop[hidx]; p; p = p->next) {
-	if(!strcmp(name, full ? p->info->full_name : p->info->name))
-	    return p->info - ${bs}op_lib.op_info_table;
+    if(!strcmp(name, full ? p->info->full_name : p->info->name))
+        return p->info - ${bs}op_lib.op_info_table;
     }
     return -1;
 }
@@ -612,24 +606,24 @@ static void hop_init() {
     op_info_t * info = ${bs}op_lib.op_info_table;
     /* store full names */
     for (i = 0; i < ${bs}op_lib.op_count; i++)
-	store_op(info + i, 1);
+    store_op(info + i, 1);
     /* plus one short name */
     for (i = 0; i < ${bs}op_lib.op_count; i++)
-	if (get_op(info[i].name, 0) == -1)
-	    store_op(info + i, 0);
+    if (get_op(info[i].name, 0) == -1)
+        store_op(info + i, 0);
 }
 static void hop_deinit(void)
 {
     HOP *p, *next;
     size_t i;
     if (hop) {
-	for (i = 0; i < OP_HASH_SIZE; i++)
-	    for(p = hop[i]; p; ) {
-		next = p->next;
-		free(p);
-		p = next;
-	}
-	free(hop);
+    for (i = 0; i < OP_HASH_SIZE; i++)
+        for(p = hop[i]; p; ) {
+        next = p->next;
+        free(p);
+        p = next;
+    }
+    free(hop);
     }
     hop = 0;
 }
@@ -682,7 +676,7 @@ $init_func(long init) {
     /* initialize and return op_lib ptr */
     if (init == 1) {
 $init1_code
-	return &${bs}op_lib;
+    return &${bs}op_lib;
     }
     /* set op_lib to the passed ptr (in init) */
     else if (init) {
@@ -690,7 +684,7 @@ $init_set_dispatch
     }
     /* deinit - free resources */
     else {
-	hop_deinit();
+    hop_deinit();
     }
     return NULL;
 }
