@@ -1,10 +1,10 @@
 # $Id$
 
 # setup of commands
-${make_set_make}
-PERL      = ${perl}
-MAKE      = ${make_c}
-RM_F      = ${rm_f}
+@make_set_make@
+PERL      = @perl@
+MAKE      = @make_c@
+RM_F      = @rm_f@
 
 # add new languages here
 # remove obsolete languages here

@@ -10,9 +10,9 @@
 int main(int argc, char **argv) {
 	printf("(");
 	
-	printf("\tintvalsize => %d,\n",		sizeof(${iv}));
-	printf("\tnumvalsize => %d,\n",		sizeof(${nv}));
-	printf("\topcode_t_size => %d,\n",	sizeof(${opcode_t}));
+	printf("\tintvalsize => %d,\n",		sizeof(@iv@));
+	printf("\tnumvalsize => %d,\n",		sizeof(@nv@));
+	printf("\topcode_t_size => %d,\n",	sizeof(@opcode_t@));
 	
 	printf("\tshortsize => %d,\n",		sizeof(short));
 	printf("\tintsize => %d,\n",		sizeof(int));

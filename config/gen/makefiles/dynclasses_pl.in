@@ -21,17 +21,17 @@ use File::Copy qw(copy);
 # (eg FreeBSD) have ""s embedded in their substution values. q[] is used in
 # some places as Win32 paths have \'s in, which qq[] treats as escape sequences.
 # Config stuff
-our $CC = qq[${cc} -c];
-our $LD = qq[${ld}];
-our $LDFLAGS = qq[${ldflags} ${ld_debug}];
-our $LD_LOAD_FLAGS = qq[${ld_load_flags}];
-our $PERL = q[${perl}];
-our $LOAD_EXT = qq[${load_ext}];
-our $O = qq[${o}];
-our $CFLAGS = qq[${ccflags} ${cc_shared} ${cc_debug} ${ccwarn} ${cc_hasjit} ${cg_flag} ${gc_flag} ${cc_building_dynclass_flag}];
+our $CC = qq[@cc@ -c];
+our $LD = qq[@ld@];
+our $LDFLAGS = qq[@ldflags@ @ld_debug@];
+our $LD_LOAD_FLAGS = qq[@ld_load_flags@];
+our $PERL = q[@perl@];
+our $LOAD_EXT = qq[@load_ext@];
+our $O = qq[@o@];
+our $CFLAGS = qq[@ccflags@ @cc_shared@ @cc_debug@ @ccwarn@ @cc_hasjit@ @cg_flag@ @gc_flag@ @cc_building_dynclass_flag@];
 
 our $LIBPARROT = qq[];
-#CONDITIONED_LINE(parrot_is_shared):$LIBPARROT = qq[${libparrot_ldflags}];
+#CONDITIONED_LINE(parrot_is_shared):$LIBPARROT = qq[@libparrot_ldflags@];
 
 # Here comes some stuff for Win32.
 our $PATHQUOTE = '';
@@ -40,11 +40,11 @@ if ($^O eq 'MSWin32') {
     $PATHQUOTE = '"';
     
     $LD_LOAD_FLAGS =~ s/(-def:)/$1..\\/;
-    $LIBPARROT = '${build_dir}/parrot${a}';
+    $LIBPARROT = '@build_dir@/parrot@a@';
 }
 
 # PMC2C Config
-our $PMC2C = "$PERL $PATHQUOTE" . q[${build_dir}${slash}tools${slash}build${slash}pmc2c.pl] . $PATHQUOTE;
+our $PMC2C = "$PERL $PATHQUOTE" . q[@build_dir@@slash@tools@slash@build@slash@pmc2c.pl] . $PATHQUOTE;
 
 # Actual commands
 sub compile_cmd {
@@ -52,9 +52,9 @@ sub compile_cmd {
 
     return
         "$CC $CFLAGS " .
-        "${cc_o_out}" . $target . " " .
-        "-I" . $PATHQUOTE . '${build_dir}${slash}include' . $PATHQUOTE . " " .
-        "-I" . $PATHQUOTE . '${build_dir}${slash}src${slash}classes' . $PATHQUOTE . " " .
+        "@cc_o_out@" . $target . " " .
+        "-I" . $PATHQUOTE . '@build_dir@@slash@include' . $PATHQUOTE . " " .
+        "-I" . $PATHQUOTE . '@build_dir@@slash@src@slash@classes' . $PATHQUOTE . " " .
         $source;
 };
 
@@ -69,7 +69,7 @@ sub partial_link_cmd {
         if ($CC =~ /gcc/i) {
             $liblist =~ s/gdbm\.lib/-llibgdbm/i;
         }
-        my $extraLibs = '${libs} ${icu_shared}';
+        my $extraLibs = '@libs@ @icu_shared@';
         $extraLibs =~ s/blib/..\\blib/g;
         $extraLibs =~ s/\Q$(A)\E/.lib/g;
         $liblist .= ' ' . $extraLibs;
@@ -85,7 +85,7 @@ sub partial_link_cmd {
 
     return
         "$LD $LDFLAGS $LD_LOAD_FLAGS ".
-        "${ld_out}" . $target . " " . $def .
+        "@ld_out@" . $target . " " . $def .
         join(" ", map {"$PATHQUOTE$_$PATHQUOTE"} @$sources) .
         " $liblist $PATHQUOTE$LIBPARROT$PATHQUOTE";
 }
@@ -157,7 +157,7 @@ elsif ($mode eq 'copy') {
         # Execute permissions on libraries is especially important on
         # some platforms
         if ($^O eq 'hpux' or $^O eq 'cygwin') {
-            chmod 0755, "$dest${slash}$_$LOAD_EXT";
+            chmod 0755, "$dest@slash@$_$LOAD_EXT";
         }
 
     }

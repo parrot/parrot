@@ -10,4 +10,4 @@ EXPORTS
 	Parrot_destroy
 	Parrot_debug
 	Parrot_disassemble
-	Parrot_DynOp_core_${MAJOR}_${MINOR}_${PATCH}
+	Parrot_DynOp_core_@MAJOR@_@MINOR@_@PATCH@

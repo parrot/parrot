@@ -4,8 +4,8 @@
 
 # Setup of some commands
 PARROT     = ../../parrot
-PERL       = ${perl}
-RM_F       = ${rm_f}
+PERL       = @perl@
+RM_F       = @rm_f@
 
 default: all
 

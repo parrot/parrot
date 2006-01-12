@@ -15,43 +15,43 @@
 ** Other symbols may go below.
 */
 
-#define PARROT_VERSION         "${VERSION}${DEVEL}"
-#define PARROT_REVISION        ${revision}
-#define PARROT_CONFIG_DATE     "${configdate}"
-#define PARROT_MAJOR_VERSION    ${MAJOR}
-#define PARROT_MINOR_VERSION    ${MINOR}
-#define PARROT_PATCH_VERSION    ${PATCH}
-#define PARROT_ARCHNAME        "${jitarchname}"
-#define PARROT_JIT_CAPABLE      ${jitcapable}
-#define PARROT_EXEC_CAPABLE     ${execcapable}
-#define PARROT_SHARE_EXT        "${share_ext}"
-#define PARROT_LOAD_EXT         "${load_ext}"
-#define PARROT_OBJ_EXT          "${o}"
+#define PARROT_VERSION          "@VERSION@@DEVEL@"
+#define PARROT_REVISION         @revision@
+#define PARROT_CONFIG_DATE      "@configdate@"
+#define PARROT_MAJOR_VERSION    @MAJOR@
+#define PARROT_MINOR_VERSION    @MINOR@
+#define PARROT_PATCH_VERSION    @PATCH@
+#define PARROT_ARCHNAME         "@jitarchname@"
+#define PARROT_JIT_CAPABLE      @jitcapable@
+#define PARROT_EXEC_CAPABLE     @execcapable@
+#define PARROT_SHARE_EXT        "@share_ext@"
+#define PARROT_LOAD_EXT         "@load_ext@"
+#define PARROT_OBJ_EXT          "@o@"
 
-typedef ${iv}                   Parrot_Int;
-typedef unsigned ${iv}          Parrot_UInt;
-typedef ${nv}                   Parrot_Float;
-typedef ${opcode_t}             Parrot_Opcode;
+typedef @iv@                    Parrot_Int;
+typedef unsigned @iv@           Parrot_UInt;
+typedef @nv@                    Parrot_Float;
+typedef @opcode_t@              Parrot_Opcode;
 typedef void *                  Parrot_Pointer;
 
 typedef char                    Parrot_Int1;
 typedef unsigned char           Parrot_UInt1;
-typedef ${int2_t}               Parrot_Int2;
-typedef unsigned ${int2_t}      Parrot_UInt2;
-typedef ${int4_t}               Parrot_Int4;
-typedef unsigned ${int4_t}      Parrot_UInt4;
+typedef @int2_t@                Parrot_Int2;
+typedef unsigned @int2_t@       Parrot_UInt2;
+typedef @int4_t@                Parrot_Int4;
+typedef unsigned @int4_t@       Parrot_UInt4;
 
-typedef ${float4_t}             Parrot_Float4;
-typedef ${float8_t}             Parrot_Float8;
+typedef @float4_t@              Parrot_Float4;
+typedef @float8_t@              Parrot_Float8;
 
 /* Temporary until we find a way to make it work in the right place. */
 struct PackFile;      typedef struct PackFile * Parrot_PackFile;
 
 /* Symbol export and import decoration. */
 #if defined(PARROT_IN_CORE)
-#define PARROT_API ${sym_export}
+#define PARROT_API @sym_export@
 #else
-#define PARROT_API ${sym_import}
+#define PARROT_API @sym_import@
 #endif
 
 #if defined(PARROT_IN_CORE)
@@ -60,11 +60,11 @@ struct PackFile;      typedef struct PackFile * Parrot_PackFile;
 
 #include <stddef.h>
 
-#define PARROT_CPU_ARCH        "${jitcpuarch}"
-#define PARROT_OS_NAME         "${jitosname}"
-#define PARROT_BYTEORDER        0x${byteorder}
-#define PARROT_BIGENDIAN        ${bigendian}
-#define PARROT_PTR_ALIGNMENT    ${ptr_alignment}
+#define PARROT_CPU_ARCH         "@jitcpuarch@"
+#define PARROT_OS_NAME          "@jitosname@"
+#define PARROT_BYTEORDER        0x@byteorder@
+#define PARROT_BIGENDIAN        @bigendian@
+#define PARROT_PTR_ALIGNMENT    @ptr_alignment@
 
 #define PARROT_LITTLEENDIAN	!(PARROT_BIGENDIAN)
 
@@ -72,19 +72,19 @@ typedef Parrot_Int INTVAL;
 typedef Parrot_UInt UINTVAL;
 typedef Parrot_Float FLOATVAL;
 
-typedef ${hugeintval} HUGEINTVAL;
-typedef unsigned ${hugeintval} UHUGEINTVAL;
-typedef ${hugefloatval} HUGEFLOATVAL;
+typedef @hugeintval@ HUGEINTVAL;
+typedef unsigned @hugeintval@ UHUGEINTVAL;
+typedef @hugefloatval@ HUGEFLOATVAL;
 
-#define INTVAL_SIZE ${intvalsize}
-#define NUMVAL_SIZE ${nvsize}
-#define OPCODE_T_SIZE ${opcode_t_size}
-#define PTR_SIZE ${ptrsize}
-#define SHORT_SIZE ${shortsize}
-#define INT_SIZE ${intsize}
-#define LONG_SIZE ${longsize}
-#define HUGEINTVAL_SIZE ${hugeintvalsize}
-#define DOUBLE_SIZE ${doublesize}
+#define INTVAL_SIZE @intvalsize@
+#define NUMVAL_SIZE @nvsize@
+#define OPCODE_T_SIZE @opcode_t_size@
+#define PTR_SIZE @ptrsize@
+#define SHORT_SIZE @shortsize@
+#define INT_SIZE @intsize@
+#define LONG_SIZE @longsize@
+#define HUGEINTVAL_SIZE @hugeintvalsize@
+#define DOUBLE_SIZE @doublesize@
 
 /* We don't have a portable config for 64-bit
  * registers yet. */
@@ -122,34 +122,34 @@ typedef void DPOINTER;
 #define FRAMES_PER_STR_REG_CHUNK FRAMES_PER_CHUNK
 
 /* JIT and exec cores. */
-#define JIT_CPUARCH  "${jitcpuarch}"
-#define JIT_OSNAME   "${jitosname}"
-#define JIT_ARCHNAME "${jitarchname}"
-#define JIT_CAPABLE  ${jitcapable}
-#define EXEC_CAPABLE ${execcapable}
-#define PARROT_EXEC_OS_${jitosname} 1
-#define PARROT_${jitcpu} 1
+#define JIT_CPUARCH  "@jitcpuarch@"
+#define JIT_OSNAME   "@jitosname@"
+#define JIT_ARCHNAME "@jitarchname@"
+#define JIT_CAPABLE  @jitcapable@
+#define EXEC_CAPABLE @execcapable@
+#define PARROT_EXEC_OS_@jitosname@ 1
+#define PARROT_@jitcpu@ 1
 
 /*
  * Switches to turn on/off new code so people can compile
  * the core with minimal breakage.
  */
-#define EXP_NETWORKING ${expnetworking}
+#define EXP_NETWORKING @expnetworking@
 
 /* Oplib and dynamic ops related. */
 #define PARROT_CORE_OPLIB_NAME "core"
-#define PARROT_CORE_OPLIB_INIT Parrot_DynOp_core_${MAJOR}_${MINOR}_${PATCH}
-#define PARROT_CORE_PREDEREF_OPLIB_INIT Parrot_DynOp_core_prederef_${MAJOR}_${MINOR}_${PATCH}
-#define PARROT_CORE_SWITCH_OPLIB_INIT Parrot_DynOp_core_switch_${MAJOR}_${MINOR}_${PATCH}
-#define PARROT_CORE_CG_OPLIB_INIT Parrot_DynOp_core_cg_${MAJOR}_${MINOR}_${PATCH}
-#define PARROT_CORE_CGP_OPLIB_INIT Parrot_DynOp_core_cgp_${MAJOR}_${MINOR}_${PATCH}
+#define PARROT_CORE_OPLIB_INIT Parrot_DynOp_core_@MAJOR@_@MINOR@_@PATCH@
+#define PARROT_CORE_PREDEREF_OPLIB_INIT Parrot_DynOp_core_prederef_@MAJOR@_@MINOR@_@PATCH@
+#define PARROT_CORE_SWITCH_OPLIB_INIT Parrot_DynOp_core_switch_@MAJOR@_@MINOR@_@PATCH@
+#define PARROT_CORE_CG_OPLIB_INIT Parrot_DynOp_core_cg_@MAJOR@_@MINOR@_@PATCH@
+#define PARROT_CORE_CGP_OPLIB_INIT Parrot_DynOp_core_cgp_@MAJOR@_@MINOR@_@PATCH@
 
 /* ICU. */
-#define PARROT_HAS_ICU ${has_icu}
+#define PARROT_HAS_ICU @has_icu@
 
 /* Int and float formats. */
-#define INTVAL_FMT "${intvalfmt}"
-#define FLOATVAL_FMT "${floatvalfmt}"
+#define INTVAL_FMT "@intvalfmt@"
+#define FLOATVAL_FMT "@floatvalfmt@"
 
 #include "parrot/has_header.h"
 #include "parrot/feature.h"

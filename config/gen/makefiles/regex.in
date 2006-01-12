@@ -4,9 +4,9 @@
 # Makefile for languages/regex
 
 # Setup of some commands
-PARROT = ..${slash}..${slash}parrot${exe}
-PERL = ${perl}
-RM_F = ${rm_f}
+PARROT = ..@slash@..@slash@parrot@exe@
+PERL = @perl@
+RM_F = @rm_f@
 YAPP = yapp
 
 all : lib/Regex/Grammar.pm regex-compiler.pbc

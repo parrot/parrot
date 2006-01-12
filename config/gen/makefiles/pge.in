@@ -1,19 +1,19 @@
 # $Id$
 
 # Setup some commands
-LN_S     = ${lns}
-PERL     = ${perl}
-RM_RF    = ${rm_rf}
-PARROT   = ..${slash}..${slash}parrot${exe}
-CP       = ${cp}
+LN_S     = @lns@
+PERL     = @perl@
+RM_RF    = @rm_rf@
+PARROT   = ..@slash@..@slash@parrot@exe@
+CP       = @cp@
 
 # Where to put things
-PARROT_LIBRARY    = ..${slash}..${slash}runtime${slash}parrot${slash}library
+PARROT_LIBRARY    = ..@slash@..@slash@runtime@slash@parrot@slash@library
 
 # the default target
-all: $(PARROT_LIBRARY)${slash}PGE.pbc
+all: $(PARROT_LIBRARY)@slash@PGE.pbc
 
-$(PARROT_LIBRARY)${slash}PGE.pbc: PGE.pbc
+$(PARROT_LIBRARY)@slash@PGE.pbc: PGE.pbc
 	$(CP) PGE.pbc $(PARROT_LIBRARY)
 
 PGE.pbc: PGE.pir PGE/Exp.pir PGE/Match.pir PGE/Rule.pir PGE/P6Rule.pir PGE/TokenHash.pir PGE/OPTable.pir PGE/P5Regexp.pir mklib.pir library.pge
@@ -54,7 +54,7 @@ testclean:
 	$(RM_RF) "../../t/p6rules/*.pbc" 
 
 clean: testclean
-	$(RM_RF) PGE.pbc $(PARROT_LIBRARY)${slash}PGE.pbc PGE/Library.pir
+	$(RM_RF) PGE.pbc $(PARROT_LIBRARY)@slash@PGE.pbc PGE/Library.pir
 
 realclean: clean
 	$(RM_RF) Makefile

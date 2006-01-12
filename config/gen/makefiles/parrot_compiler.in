@@ -3,10 +3,10 @@
 
 # Makefile for languages/parrot_compiler
 
-EXE      = ${exe}
-PERL     = ${perl}
-RM_F     = ${rm_f}
-PARROT   = ../../${test_prog}$(EXE)
+EXE      = @exe@
+PERL     = @perl@
+RM_F     = @rm_f@
+PARROT   = ../../@test_prog@$(EXE)
 
 default: all
 all : parrot.pbc parrot_compiler.pbc parrot_compiler.pasm

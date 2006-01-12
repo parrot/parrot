@@ -6,10 +6,10 @@ VIM_FT_DIR  = $(VIM_DIR)/plugin
 VIM_IN_DIR  = $(VIM_DIR)/indent
 VIM_SYN_DIR = $(VIM_DIR)/syntax
 
-PERL  = ${perl}
-CP    = ${cp}
-MKDIR = ${mkdir}
-RM_F  = ${rm_f}
+PERL  = @perl@
+CP    = @cp@
+MKDIR = @mkdir@
+RM_F  = @rm_f@
 
 default: all
 
@@ -49,7 +49,7 @@ vim-install: pir.vim
 imc.kate: imcc.xml
 
 imcc.xml:
-	$(PERL) kate_syntax.pl '..${slash}' > imcc.xml
+	$(PERL) kate_syntax.pl '..@slash@' > imcc.xml
 
 vim-uninstall:
 	$(RM_F) $(VIM_SYN_DIR)/pir.vim

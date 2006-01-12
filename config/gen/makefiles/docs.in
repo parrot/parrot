@@ -5,14 +5,14 @@
 # Setup of some commands
 #
 
-PERL = ${perl}
-RM_F = ${rm_f}
+PERL = @perl@
+RM_F = @rm_f@
 # Make directory; do not die if dir exists.
-MKDIR = ${mkdir}
-CHMOD = ${chmod}
+MKDIR = @mkdir@
+CHMOD = @chmod@
 
 # long list of .pod files
-POD = ${pod}
+POD = @pod@
 
 #
 # Targets

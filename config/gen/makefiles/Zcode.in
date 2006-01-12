@@ -3,11 +3,11 @@
 # Makefile for languages/Zcode
 
 # Setup of some commands
-PARROT  = ..${slash}..${slash}parrot${exe}
-PERL       = ${perl}
-RM_F       = ${rm_f}
+PARROT  = ..@slash@..@slash@parrot@exe@
+PERL       = @perl@
+RM_F       = @rm_f@
 
-EXAMPLES = examples${slash}small.z3 examples${slash}hello.z3
+EXAMPLES = examples@slash@small.z3 examples@slash@hello.z3
 
 default: all
 

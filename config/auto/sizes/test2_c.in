@@ -8,12 +8,12 @@
 #include <stdio.h>
 
 int main(int argc, char **argv) {
-	${int8_t} dummy;
+	@int8_t@ dummy;
 
 	printf("(");
 
-	printf("\thugeintval => '%s',\n", 	"${int8_t}");
-	printf("\thugeintvalsize => %d,\n",	sizeof(${int8_t}));
+	printf("\thugeintval => '%s',\n", 	"@int8_t@");
+	printf("\thugeintvalsize => %d,\n",	sizeof(@int8_t@));
 
 	printf(");");
 	

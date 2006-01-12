@@ -1,10 +1,10 @@
-RM_F     = ${rm_f}
-PERL     = ${perl}
-BUILDPMC = $(PERL) ${build_dir}${slash}tools${slash}build${slash}dynclasses.pl
-DESTDIR  = ${build_dir}${slash}runtime${slash}parrot${slash}dynext
-O        = ${o}
+RM_F     = @rm_f@
+PERL     = @perl@
+BUILDPMC = $(PERL) @build_dir@@slash@tools@slash@build@slash@dynclasses.pl
+DESTDIR  = @build_dir@@slash@runtime@slash@parrot@slash@dynext
+O        = @o@
 CLASSDIR = lib/kernel/pmc
-LOAD_EXT = ${load_ext}
+LOAD_EXT = @load_ext@
 
 # Order matters!
 PMCS = \
@@ -46,13 +46,13 @@ pmcs:
 	@cd $(CLASSDIR) && $(BUILDPMC) copy "--destination=$(DESTDIR)" $(PMCS)
 
 CLEANERS = \
-"$(CLASSDIR)${slash}pmc_*.h" \
-"$(CLASSDIR)${slash}amber_*.h" \
-"$(CLASSDIR)${slash}*.dump" \
-#CONDITIONED_LINE(ld_parrot_exe_def):"$(CLASSDIR)${slash}*.def" \
-"$(CLASSDIR)${slash}*.c" \
-"$(CLASSDIR)${slash}*$(LOAD_EXT)" \
-"$(CLASSDIR)${slash}*$(O)"
+"$(CLASSDIR)@slash@pmc_*.h" \
+"$(CLASSDIR)@slash@amber_*.h" \
+"$(CLASSDIR)@slash@*.dump" \
+#CONDITIONED_LINE(ld_parrot_exe_def):"$(CLASSDIR)@slash@*.def" \
+"$(CLASSDIR)@slash@*.c" \
+"$(CLASSDIR)@slash@*$(LOAD_EXT)" \
+"$(CLASSDIR)@slash@*$(O)"
 
 clean:
 	$(RM_F) $(CLEANERS)

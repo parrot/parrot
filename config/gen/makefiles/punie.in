@@ -1,11 +1,11 @@
 # $Id$
 
 # Setup some commands
-LN_S     = ${lns}
-PERL     = ${perl}
-RM_F     = ${rm_f}
-PARROT   = ..${slash}..${slash}parrot${exe}
-CP       = ${cp}
+LN_S     = @lns@
+PERL     = @perl@
+RM_F     = @rm_f@
+PARROT   = ..@slash@..@slash@parrot@exe@
+CP       = @cp@
 
 # the default target
 all: punie.pbc

@@ -1,8 +1,8 @@
-PERL = ${perl}
-RM_F = ${rm_f}
-LOAD_EXT = ${load_ext}
-RUNTIME_DIR = ${build_dir}${slash}runtime${slash}parrot${slash}dynext
-O = ${o}
+PERL = @perl@
+RM_F = @rm_f@
+LOAD_EXT = @load_ext@
+RUNTIME_DIR = @build_dir@@slash@runtime@slash@parrot@slash@dynext
+O = @o@
 
 # add your dynamic pmcs here
 #
@@ -46,7 +46,7 @@ DISABLED_PMCS = \
   pyproxyclass \
   pyiter
 
-BUILD = $(PERL) "${build_dir}${slash}tools${slash}build${slash}dynclasses.pl"
+BUILD = $(PERL) "@build_dir@@slash@tools@slash@build@slash@dynclasses.pl"
 
 all :
 	@$(BUILD) generate $(PMCS)

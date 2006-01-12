@@ -3,8 +3,8 @@
 # Makefile for languages/urm
 
 # Setup of some commands
-RM_F   = ${rm_f}
-PERL   = ${perl}
+RM_F   = @rm_f@
+PERL   = @perl@
 PARROT = ../../parrot
 
 default: build

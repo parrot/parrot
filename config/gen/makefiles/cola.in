@@ -1,28 +1,28 @@
 #
 # Makefile for languages/cola
 #
-PARROT  = ..${slash}..${slash}parrot${exe}
-PERL    = ${perl}
-RM_F    = ${rm_f}
-RM_RF   = ${rm_rf}
-CHMOD   = ${chmod}
+PARROT  = ..@slash@..@slash@parrot@exe@
+PERL    = @perl@
+RM_F    = @rm_f@
+RM_RF   = @rm_rf@
+CHMOD   = @chmod@
 
-CC 	    = ${cc}
-CFLAGS 	= ${ccflags}
-DEBUG 	= ${cc_debug}
-LINK 	= ${link}
+CC 	    = @cc@
+CFLAGS 	= @ccflags@
+DEBUG 	= @cc_debug@
+LINK 	= @link@
 
-YACC 	= ${yacc}
-LEX 	= ${lex}
+YACC 	= @yacc@
+LEX 	= @lex@
 
-O       = ${o}
-EXE     = ${exe}
+O       = @o@
+EXE     = @exe@
 
 # Libraries:  Ordinarily, no special libraries are needed
 # for cola, but one of the following settings might be helpful
 # in some cases.
 # Use the same libraries as Parrot:
-# LIBS 	= ${libs}
+# LIBS 	= @libs@
 # You might need these for some versions of flex and/or yacc:
 # LIBS = -ll -ly
 # Ordinarily, no special libraries are needed for cola.

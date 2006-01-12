@@ -4,8 +4,8 @@
 int main() {
 	int i;
 	union W {
-		unsigned char b[sizeof(${iv})/sizeof(unsigned char)];
-		${iv} w;
+		unsigned char b[sizeof(@iv@)/sizeof(unsigned char)];
+		@iv@ w;
 	} w;
 	if(sizeof(w) == 4) {
 		w.w = 0x04030201;
