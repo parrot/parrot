@@ -65,19 +65,19 @@
 
 struct Stack_Chunk;
 
-void Parrot_push_regs(Interp *);
-void Parrot_pop_regs(Interp *);
+PARROT_API void Parrot_push_regs(Interp *);
+PARROT_API void Parrot_pop_regs(Interp *);
 
-void Parrot_clear_i(Interp *);
-void Parrot_clear_s(Interp *);
-void Parrot_clear_p(Interp *);
-void Parrot_clear_n(Interp *);
+PARROT_API void Parrot_clear_i(Interp *);
+PARROT_API void Parrot_clear_s(Interp *);
+PARROT_API void Parrot_clear_p(Interp *);
+PARROT_API void Parrot_clear_n(Interp *);
 
 struct Parrot_Context;        /* parrot/interpreter.h */
 struct Parrot_Context * Parrot_alloc_context(Interp *, INTVAL *n_regs_used);
 struct Parrot_Context * Parrot_dup_context(Interp *, struct Parrot_Context *old);
-void Parrot_free_context(Interp *, struct Parrot_Context *, int re_use);
-void Parrot_set_context_threshold(Interp *, struct Parrot_Context *);
+PARROT_API void Parrot_free_context(Interp *, struct Parrot_Context *, int re_use);
+PARROT_API void Parrot_set_context_threshold(Interp *, struct Parrot_Context *);
 void parrot_gc_context(Interp *);
 
 void create_initial_context(Interp *);

@@ -84,13 +84,13 @@ typedef struct _visit_info {
 /*
  * public interfaces
  */
-STRING* Parrot_freeze(Parrot_Interp, PMC*);
-STRING* Parrot_freeze_at_destruct(Parrot_Interp, PMC*);
+PARROT_API STRING* Parrot_freeze(Parrot_Interp, PMC*);
+PARROT_API STRING* Parrot_freeze_at_destruct(Parrot_Interp, PMC*);
 
-PMC*    Parrot_thaw(Parrot_Interp, STRING*);
-PMC*    Parrot_thaw_constants(Parrot_Interp, STRING*);
+PARROT_API PMC*    Parrot_thaw(Parrot_Interp, STRING*);
+PARROT_API PMC*    Parrot_thaw_constants(Parrot_Interp, STRING*);
 
-PMC*    Parrot_clone(Parrot_Interp, PMC*);
+PARROT_API PMC*    Parrot_clone(Parrot_Interp, PMC*);
 
 #endif /* PARROT_PMC_FREEZE_H_GUARD */
 

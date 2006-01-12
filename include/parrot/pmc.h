@@ -31,25 +31,25 @@ VAR_SCOPE Parrot_mutex class_count_mutex;
 PMC *pmc_init_null(Interp * interpreter);
 
 /* Prototypes */
-PMC *pmc_new(Interp *interpreter, INTVAL base_type);
-PMC *pmc_reuse(Interp *interpreter, PMC *pmc, INTVAL new_type, UINTVAL flags);
-PMC *pmc_new_noinit(Interp *interpreter, INTVAL base_type);
-PMC *pmc_new_init(Interp *interpreter, INTVAL base_type, PMC *p);
-PMC *constant_pmc_new_noinit(Interp *, INTVAL base_type);
-PMC *constant_pmc_new(Interp *, INTVAL base_type);
-PMC *constant_pmc_new_init(Interp *, INTVAL base_type, PMC *);
+PARROT_API PMC *pmc_new(Interp *interpreter, INTVAL base_type);
+PARROT_API PMC *pmc_reuse(Interp *interpreter, PMC *pmc, INTVAL new_type, UINTVAL flags);
+PARROT_API PMC *pmc_new_noinit(Interp *interpreter, INTVAL base_type);
+PARROT_API PMC *pmc_new_init(Interp *interpreter, INTVAL base_type, PMC *p);
+PARROT_API PMC *constant_pmc_new_noinit(Interp *, INTVAL base_type);
+PARROT_API PMC *constant_pmc_new(Interp *, INTVAL base_type);
+PARROT_API PMC *constant_pmc_new_init(Interp *, INTVAL base_type, PMC *);
 
-INTVAL pmc_register(Interp *, STRING *);
-INTVAL pmc_type(Interp *, STRING *);
+PARROT_API INTVAL pmc_register(Interp *, STRING *);
+PARROT_API INTVAL pmc_type(Interp *, STRING *);
 
 /*
  * DOD registry interface
  */
-void dod_register_pmc(Interp *, PMC*);
-void dod_unregister_pmc(Interp *, PMC*);
+PARROT_API void dod_register_pmc(Interp *, PMC*);
+PARROT_API void dod_unregister_pmc(Interp *, PMC*);
 
 /* mro creation */
-void Parrot_create_mro(Interp *, INTVAL);
+PARROT_API void Parrot_create_mro(Interp *, INTVAL);
 
 #endif /* PARROT_PMC_H_GUARD */
 

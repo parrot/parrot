@@ -50,9 +50,9 @@ typedef enum {
 
 void print_pbc_location(Parrot_Interp);
 
-INTVAL Parrot_warn(Parrot_Interp, INTVAL warnclass, const char *message, ...);
+PARROT_API INTVAL Parrot_warn(Parrot_Interp, INTVAL warnclass, const char *message, ...);
 
-INTVAL Parrot_warn_s(Parrot_Interp, INTVAL warnclass, STRING *message, ...);
+PARROT_API INTVAL Parrot_warn_s(Parrot_Interp, INTVAL warnclass, STRING *message, ...);
 
 #endif /* PARROT_IN_CORE */
 #endif /* PARROT_WARNINGS_H_GUARD */

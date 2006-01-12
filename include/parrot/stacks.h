@@ -47,8 +47,8 @@ typedef void (*Stack_cleanup_method)(Interp*, Stack_Entry_t *);
 
 #define STACK_CLEANUP_NULL ((Stack_cleanup_method)NULLfunc)
 
-void stack_system_init(Interp *interpreter);
-void stack_destroy(Stack_Chunk_t * top);
+PARROT_API void stack_system_init(Interp *interpreter);
+PARROT_API void stack_destroy(Stack_Chunk_t * top);
 
 /*
  * stack_common functions
@@ -63,30 +63,30 @@ void mark_stack_chunk_cache(Parrot_Interp interpreter);
  * pad, user, control stacks
  */
 
-Stack_Chunk_t * new_stack(Interp *interpreter, const char *name);
-void mark_stack(Interp *, Stack_Chunk_t * cur_stack);
+PARROT_API Stack_Chunk_t * new_stack(Interp *interpreter, const char *name);
+PARROT_API void mark_stack(Interp *, Stack_Chunk_t * cur_stack);
 
-size_t stack_height(Interp *interpreter, Stack_Chunk_t *stack_base);
+PARROT_API size_t stack_height(Interp *interpreter, Stack_Chunk_t *stack_base);
 
-Stack_Entry_t * stack_entry(Interp *intepreter, Stack_Chunk_t *stack_base,
+PARROT_API Stack_Entry_t * stack_entry(Interp *intepreter, Stack_Chunk_t *stack_base,
                           INTVAL stack_depth);
 
-void rotate_entries(Interp *interpreter, Stack_Chunk_t **stack_base,
+PARROT_API void rotate_entries(Interp *interpreter, Stack_Chunk_t **stack_base,
                     INTVAL num_entries);
 
-void stack_push(Interp *interpreter, Stack_Chunk_t **stack_base,
+PARROT_API void stack_push(Interp *interpreter, Stack_Chunk_t **stack_base,
                 void *thing, Stack_entry_type type,
                 Stack_cleanup_method cleanup);
 
-void *stack_pop(Interp *interpreter, Stack_Chunk_t **stack_base,
+PARROT_API void *stack_pop(Interp *interpreter, Stack_Chunk_t **stack_base,
                 void *where, Stack_entry_type type);
 
-void *pop_dest(Interp *interpreter);
+PARROT_API void *pop_dest(Interp *interpreter);
 
-void *stack_peek(Interp *interpreter, Stack_Chunk_t *stack,
+PARROT_API void *stack_peek(Interp *interpreter, Stack_Chunk_t *stack,
                 Stack_entry_type *type);
 
-Stack_entry_type get_entry_type(Interp *interpreter, Stack_Entry_t *entry);
+PARROT_API Stack_entry_type get_entry_type(Interp *interpreter, Stack_Entry_t *entry);
 
 
 
