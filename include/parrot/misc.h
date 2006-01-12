@@ -29,20 +29,20 @@
 INTVAL   intval_mod(INTVAL i2, INTVAL i3);
 FLOATVAL floatval_mod(FLOATVAL n2, FLOATVAL n3);
 
-FLOATVAL Parrot_float_rand(INTVAL how_random);
-INTVAL Parrot_uint_rand(INTVAL how_random);
-INTVAL Parrot_int_rand(INTVAL how_random);
-INTVAL Parrot_range_rand(INTVAL from, INTVAL to, INTVAL how_random);
-void Parrot_srand(INTVAL seed);
+PARROT_API FLOATVAL Parrot_float_rand(INTVAL how_random);
+PARROT_API INTVAL Parrot_uint_rand(INTVAL how_random);
+PARROT_API INTVAL Parrot_int_rand(INTVAL how_random);
+PARROT_API INTVAL Parrot_range_rand(INTVAL from, INTVAL to, INTVAL how_random);
+PARROT_API void Parrot_srand(INTVAL seed);
 
-void *Parrot_make_la(Interp *, PMC *);
-void *Parrot_make_cpa(Interp *, PMC *);
-void Parrot_destroy_la(long *);
-void Parrot_destroy_cpa(char **);
+PARROT_API void *Parrot_make_la(Interp *, PMC *);
+PARROT_API void *Parrot_make_cpa(Interp *, PMC *);
+PARROT_API void Parrot_destroy_la(long *);
+PARROT_API void Parrot_destroy_cpa(char **);
 PMC* tm_to_array(Parrot_Interp interpreter, struct tm *tm);
-INTVAL Parrot_byte_index(Interp *interpreter, const STRING *base,
+PARROT_API INTVAL Parrot_byte_index(Interp *interpreter, const STRING *base,
         const STRING *search, UINTVAL start_offset);
-INTVAL Parrot_byte_rindex(Interp *interpreter, const STRING *base,
+PARROT_API INTVAL Parrot_byte_rindex(Interp *interpreter, const STRING *base,
         const STRING *search, UINTVAL start_offset);
 /*
  * misc.c

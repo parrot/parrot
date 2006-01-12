@@ -75,25 +75,25 @@ typedef enum {
  * 10^6 list_get, MAX_ITEMS 1024: 0.34s, 2048: 0.33s
  */
 
-List * list_new(Interp *interpreter, INTVAL type);
-List * list_new_init(Interp *interpreter, INTVAL type, PMC *init);
-void list_pmc_new(Interp *interpreter, PMC *container);
-void list_pmc_new_init(Interp *interpreter, PMC *container, PMC *init);
-List * list_clone(Interp *interpreter, List *other);
-void list_mark(Interp* interpreter, List* list);
-void list_visit(Interp* interpreter, List* list, void*);
-INTVAL list_length(Interp* interpreter, List* list);
-void list_set_length(Interp* interpreter, List* list, INTVAL len);
-void list_push(Interp *interpreter, List *list, void *item, int type);
-void list_unshift(Interp *interpreter, List *list, void *item, int type);
-void * list_pop(Interp *interpreter, List *list, int type);
-void * list_shift(Interp *interpreter, List *list, int type);
-void list_assign(Interp *interpreter, List *list, INTVAL idx,
+PARROT_API List * list_new(Interp *interpreter, INTVAL type);
+PARROT_API List * list_new_init(Interp *interpreter, INTVAL type, PMC *init);
+PARROT_API void list_pmc_new(Interp *interpreter, PMC *container);
+PARROT_API void list_pmc_new_init(Interp *interpreter, PMC *container, PMC *init);
+PARROT_API List * list_clone(Interp *interpreter, List *other);
+PARROT_API void list_mark(Interp* interpreter, List* list);
+PARROT_API void list_visit(Interp* interpreter, List* list, void*);
+PARROT_API INTVAL list_length(Interp* interpreter, List* list);
+PARROT_API void list_set_length(Interp* interpreter, List* list, INTVAL len);
+PARROT_API void list_push(Interp *interpreter, List *list, void *item, int type);
+PARROT_API void list_unshift(Interp *interpreter, List *list, void *item, int type);
+PARROT_API void * list_pop(Interp *interpreter, List *list, int type);
+PARROT_API void * list_shift(Interp *interpreter, List *list, int type);
+PARROT_API void list_assign(Interp *interpreter, List *list, INTVAL idx,
                  void *item, int type);
-void * list_get(Interp *interpreter, List *list, INTVAL idx, int type);
-void list_insert(Interp *interpreter, List *list, INTVAL idx, INTVAL n_items);
-void list_delete(Interp *interpreter, List *list, INTVAL idx, INTVAL n_items);
-void list_splice(Interp *interpreter, List *list, List* value, INTVAL offset,
+PARROT_API void * list_get(Interp *interpreter, List *list, INTVAL idx, int type);
+PARROT_API void list_insert(Interp *interpreter, List *list, INTVAL idx, INTVAL n_items);
+PARROT_API void list_delete(Interp *interpreter, List *list, INTVAL idx, INTVAL n_items);
+PARROT_API void list_splice(Interp *interpreter, List *list, List* value, INTVAL offset,
                  INTVAL count);
 
 #endif /* PARROT_LIST_H_GUARD */

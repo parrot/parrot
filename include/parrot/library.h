@@ -33,13 +33,13 @@ typedef enum {
     PARROT_LIB_PATH_SIZE
 } enum_lib_paths;
 
-char* Parrot_locate_runtime_file(Interp *, const char *file_name,
+PARROT_API char* Parrot_locate_runtime_file(Interp *, const char *file_name,
         enum_runtime_ft);
-STRING* Parrot_locate_runtime_file_str(Interp *, STRING *file_name,
+PARROT_API STRING* Parrot_locate_runtime_file_str(Interp *, STRING *file_name,
         enum_runtime_ft);
 
-void Parrot_autoload_class(Interp *, STRING *class);
-const char* Parrot_get_runtime_prefix(Interp *, STRING **prefix);
+PARROT_API void Parrot_autoload_class(Interp *, STRING *class);
+PARROT_API const char* Parrot_get_runtime_prefix(Interp *, STRING **prefix);
 void parrot_init_library_paths(Interp *);
 STRING * parrot_split_path_ext(Interp* , STRING *in, 
         STRING **wo_ext, STRING **ext);

@@ -35,33 +35,33 @@ typedef enum {
     POD_FIRST_ATTRIB    /* attributes start here */
 } PARROT_OBJECT_DATA_ENUM;
 
-PMC *Parrot_single_subclass(Parrot_Interp, PMC *, STRING *);
-void Parrot_new_class(Parrot_Interp, PMC *, STRING *);
-PMC *Parrot_class_lookup(Parrot_Interp, STRING *);
-PMC *Parrot_add_parent(Parrot_Interp, PMC *, PMC *);
-PMC *Parrot_remove_parent(Parrot_Interp, PMC *, PMC *);
-PMC *Parrot_multi_subclass(Parrot_Interp, PMC *, STRING *);
-void Parrot_instantiate_object(Parrot_Interp, PMC *);
-void Parrot_instantiate_object_init(Parrot_Interp, PMC *, PMC *);
-INTVAL Parrot_object_isa(Parrot_Interp interpreter, PMC *, PMC *);
-PMC *Parrot_new_method_cache(Parrot_Interp);
-PMC *Parrot_find_method_with_cache(Parrot_Interp, PMC *, STRING *);
-PMC *Parrot_find_method_direct(Parrot_Interp, PMC *, STRING *);
-INTVAL Parrot_add_attribute(Parrot_Interp, PMC*, STRING*);
-void Parrot_note_method_offset(Parrot_Interp, UINTVAL, PMC *);
-PMC *Parrot_get_attrib_by_num(Parrot_Interp, PMC *, INTVAL);
-void Parrot_set_attrib_by_num(Parrot_Interp, PMC *, INTVAL, PMC *);
-PMC *Parrot_get_attrib_by_str(Parrot_Interp, PMC *, STRING*);
-void Parrot_set_attrib_by_str(Parrot_Interp, PMC *, STRING*, PMC *);
-INTVAL Parrot_get_attrib_num(Parrot_Interp, PMC *, STRING *);
-INTVAL Parrot_class_offset(Parrot_Interp, PMC *, STRING *);
-PMC *Parrot_find_class_constructor(Parrot_Interp, STRING *, INTVAL);
-PMC *Parrot_find_class_destructor(Parrot_Interp, STRING *, INTVAL);
-PMC *Parrot_find_class_fallback(Parrot_Interp, STRING *, INTVAL);
-void Parrot_set_class_constructor(Parrot_Interp, STRING *, INTVAL, STRING *);
-void Parrot_set_class_destructor(Parrot_Interp, STRING *, INTVAL, STRING *);
-void Parrot_set_class_fallback(Parrot_Interp, STRING *, INTVAL, STRING *);
-void Parrot_invalidate_method_cache(Interp*, STRING *class, STRING *meth);
+PARROT_API PMC *Parrot_single_subclass(Parrot_Interp, PMC *, STRING *);
+PARROT_API void Parrot_new_class(Parrot_Interp, PMC *, STRING *);
+PARROT_API PMC *Parrot_class_lookup(Parrot_Interp, STRING *);
+PARROT_API PMC *Parrot_add_parent(Parrot_Interp, PMC *, PMC *);
+PARROT_API PMC *Parrot_remove_parent(Parrot_Interp, PMC *, PMC *);
+PARROT_API PMC *Parrot_multi_subclass(Parrot_Interp, PMC *, STRING *);
+PARROT_API void Parrot_instantiate_object(Parrot_Interp, PMC *);
+PARROT_API void Parrot_instantiate_object_init(Parrot_Interp, PMC *, PMC *);
+PARROT_API INTVAL Parrot_object_isa(Parrot_Interp interpreter, PMC *, PMC *);
+PARROT_API PMC *Parrot_new_method_cache(Parrot_Interp);
+PARROT_API PMC *Parrot_find_method_with_cache(Parrot_Interp, PMC *, STRING *);
+PARROT_API PMC *Parrot_find_method_direct(Parrot_Interp, PMC *, STRING *);
+PARROT_API INTVAL Parrot_add_attribute(Parrot_Interp, PMC*, STRING*);
+PARROT_API void Parrot_note_method_offset(Parrot_Interp, UINTVAL, PMC *);
+PARROT_API PMC *Parrot_get_attrib_by_num(Parrot_Interp, PMC *, INTVAL);
+PARROT_API void Parrot_set_attrib_by_num(Parrot_Interp, PMC *, INTVAL, PMC *);
+PARROT_API PMC *Parrot_get_attrib_by_str(Parrot_Interp, PMC *, STRING*);
+PARROT_API void Parrot_set_attrib_by_str(Parrot_Interp, PMC *, STRING*, PMC *);
+PARROT_API INTVAL Parrot_get_attrib_num(Parrot_Interp, PMC *, STRING *);
+PARROT_API INTVAL Parrot_class_offset(Parrot_Interp, PMC *, STRING *);
+PARROT_API PMC *Parrot_find_class_constructor(Parrot_Interp, STRING *, INTVAL);
+PARROT_API PMC *Parrot_find_class_destructor(Parrot_Interp, STRING *, INTVAL);
+PARROT_API PMC *Parrot_find_class_fallback(Parrot_Interp, STRING *, INTVAL);
+PARROT_API void Parrot_set_class_constructor(Parrot_Interp, STRING *, INTVAL, STRING *);
+PARROT_API void Parrot_set_class_destructor(Parrot_Interp, STRING *, INTVAL, STRING *);
+PARROT_API void Parrot_set_class_fallback(Parrot_Interp, STRING *, INTVAL, STRING *);
+PARROT_API void Parrot_invalidate_method_cache(Interp*, STRING *class, STRING *meth);
 
 /* Objects, classes and PMCarrays all use the same data scheme:
  * PMC_data() holds a malloced array, PMC_int_val() is the size of it

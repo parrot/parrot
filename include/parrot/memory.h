@@ -13,13 +13,13 @@
 #if !defined(PARROT_MEMORY_H_GUARD)
 #define PARROT_MEMORY_H_GUARD
 #include <assert.h>
-void *mem_sys_allocate(size_t);
+PARROT_API void *mem_sys_allocate(size_t);
 
-void *mem_sys_allocate_zeroed(size_t);
+PARROT_API void *mem_sys_allocate_zeroed(size_t);
 
-void *mem__sys_realloc(void *, size_t);
+PARROT_API void *mem__sys_realloc(void *, size_t);
 #define mem_sys_realloc(x,y) (assert(x!=NULL), mem__sys_realloc(x,y))
-void mem_sys_free(void *);
+PARROT_API void mem_sys_free(void *);
 
 void *mem__internal_allocate(size_t, const char *, int);
 #define mem_internal_allocate(x) mem__internal_allocate(x, __FILE__, __LINE__)

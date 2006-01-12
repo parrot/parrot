@@ -17,26 +17,26 @@
 #include "parrot/pmc.h"
 #include "parrot/config.h"
 
-void Parrot_push_argv(Interp * interp, INTVAL argc, PMC * argv[]);
-INTVAL Parrot_pop_argv(Interp * interp, PMC *** argv);
-void Parrot_push_proto(Interp * interp,
+PARROT_API void Parrot_push_argv(Interp * interp, INTVAL argc, PMC * argv[]);
+PARROT_API INTVAL Parrot_pop_argv(Interp * interp, PMC *** argv);
+PARROT_API void Parrot_push_proto(Interp * interp,
                        INTVAL intc, INTVAL * intv,
                        INTVAL numc, FLOATVAL * numv,
                        INTVAL strc, STRING ** strv,
                        INTVAL pmcc, PMC ** pmcv);
 
 typedef INTVAL (*Parrot_csub_t)(Interp * , PMC * );
-PMC * Parrot_new_csub(Interp * interp, Parrot_csub_t func);
+PARROT_API PMC * Parrot_new_csub(Interp * interp, Parrot_csub_t func);
 
 struct method_rec_t {
     char * name;
     Parrot_csub_t sub;
 };
 
-void Parrot_init_stash(Interp * interp, struct method_rec_t * recp,
+PARROT_API void Parrot_init_stash(Interp * interp, struct method_rec_t * recp,
                        struct Stash * stash);
 
-PMC * Parrot_find_method(Interp * interp, struct Stash * stash,
+PARROT_API PMC * Parrot_find_method(Interp * interp, struct Stash * stash,
                          PMC * key);
 
 
