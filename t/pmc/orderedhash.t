@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 25;
+use Parrot::Test tests => 27;
 
 =head1 NAME
 
@@ -750,5 +750,62 @@ CODE
 10100
 --
 00
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "freeze/thaw 1");
+    new P0, .OrderedHash
+    set P0["a"], "Foo\n"
+    set P0["b"], "Bar\n"
+    
+    freeze S0, P0
+    thaw P1, S0
+    set P2, P1["a"]
+    print P2
+    set P2, P1[0]
+    print P2
+    set P2, P1["b"]
+    print P2
+    set P2, P1[1]
+    print P2
+  
+    end
+CODE
+Foo
+Foo
+Bar
+Bar
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "freeze/thaw 2");
+    new P0, .OrderedHash
+    set P0["a"], "Foo\n"
+    new P1, .Hash
+    set P1['foo'], "bar\n"
+    set P0["b"], P1
+    set P0['b'; 'quux'], "xyzzy\n"
+    
+    freeze S0, P0
+    thaw P1, S0
+    set P2, P1["a"]
+    print P2
+    set P2, P1[0]
+    print P2
+    set P2, P1["b";"foo"]
+    print P2
+    set P2, P1[1; "foo"]
+    print P2
+    set P2, P1["b";"quux"]
+    print P2
+    set P2, P1[1; "quux"]
+    print P2
+  
+    end
+CODE
+Foo
+Foo
+bar
+bar
+xyzzy
+xyzzy
 OUTPUT
 

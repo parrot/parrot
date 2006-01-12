@@ -556,6 +556,57 @@ were deleted
         }
         return dest;
     }
+/*
+
+=item C<void visit(visit_info *info)>
+
+Used during archiving to visit the elements in the hash.
+
+=item C<void freeze(visit_info *info)>
+
+Used to archive the hash.
+
+=item C<void thaw(visit_info *info)>
+
+Used to unarchive the hash.
+
+Freeze/thaw are inherited from hash, onyl thaw.visit is special, as
+we have to preserver key/value order.
+
+=cut
+
+*/
+
+    void visit(visit_info *info) {
+        UINTVAL i, n;
+        HashBucket *b;
+        void *key;
+        IMAGE_IO *io = info->image_io;
+        Hash *hash = (Hash *)PMC_struct_val(SELF);
+
+        info->container = SELF;
+        switch (info->what) {
+            case VISIT_THAW_NORMAL:
+            case VISIT_THAW_CONSTANTS:
+                SUPER(info);
+                break;
+            case VISIT_FREEZE_NORMAL:
+            case VISIT_FREEZE_AT_DESTRUCT:
+                for (i = 0; i <= hash->mask; i++) {
+                    b = hash->bs + i;
+                    key = b->key;
+                    if (!key)
+                        continue;
+                    io->vtable->push_string(interpreter, io, key);
+                    (info->visit_pmc_now)(interpreter, b->value, info);
+                }
+                break;
+            default:
+                internal_exception(1, "unhandled visit action (%d)",
+                        info->what);
+        }
+    }
+
 }
 
 /*
