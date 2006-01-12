@@ -369,6 +369,35 @@ C<languages/lazy-k>
 =back
 
 
+=head2 Lua
+
+=over 4
+
+=item Author
+
+Francois Perrad
+
+=item Description
+
+Lua 5.0 compiler, implemented in Perl5 with yapp.
+
+Lua Standard Libraries implemented in PIR (still incomplete).
+
+=item Status
+
+Early stage - but all examples and test cases are working.
+
+=item Last verified with parrot version
+
+0.4.1
+
+=item Location
+
+C<languages/lua>
+
+=back
+
+
 =head2 Monkey, an implementation of Lua on Parrot
 
 =over 4
@@ -391,12 +420,13 @@ Simple examples are working. The current version is 0.2.2.
 
 =item Last verified with parrot version
 
-0.4.1
+0.2.x
 
 =item Location
 
 http://members.home.nl/joeijoei/parrot/
-The Lua PMCs are in <languages/lua>.
+
+The Lua PMCs are in C<languages/lua>.
 
 =back
 
