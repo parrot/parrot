@@ -23,8 +23,13 @@ This list is one per line, and is relative to the languages dir.
 
 If I'm called with no args, I run the complete suite.
 
-If I'm called with "--use-lua", I run with the original lua
+If I'm called with "--use-lua", I run with the original C<lua>
 in order to valid of the test suite.
+
+If I'm called with "--use-monkey", I run with C<monkey>.
+
+If I'm called with "--use-lua2pir", I run with C<lua2pir> (and just after 
+C<luac>).
 
 Otherwise I run the tests that were passed on the command line.
 
@@ -51,7 +56,11 @@ if ( grep { m/^--files$/ } @ARGV ) {
     my @files;
     # TODO: use Getopt::Long or such
     my $use_orig_lua = ( grep { m/^--use-lua$/ } @ARGV ) ? 1 : 0;
+    my $use_monkey = ( grep { m/^--use-monkey$/ } @ARGV ) ? 1 : 0;
+    my $use_lua2pir = ( grep { m/^--use-lua2pir$/ } @ARGV ) ? 1 : 0;
     @ARGV = grep { ! m/^--use-lua$/ } @ARGV;
+    @ARGV = grep { ! m/^--use-monkey$/ } @ARGV;
+    @ARGV = grep { ! m/^--use-lua2pir$/ } @ARGV;
     if ( scalar(@ARGV) ) {
         # Someone specified tests for me to run.
         @files = grep { -f $_ } @ARGV
@@ -71,6 +80,12 @@ if ( grep { m/^--files$/ } @ARGV ) {
 
     if ( $use_orig_lua ) {
         $ENV{PARROT_LUA_TEST_PROG} = 'lua';
+        Test::Harness::runtests( @files ) if scalar( @files );
+    } elsif ( $use_monkey ) {
+        $ENV{PARROT_LUA_TEST_PROG} = 'monkey';
+        Test::Harness::runtests( @files ) if scalar( @files );
+    } elsif ( $use_lua2pir ) {
+        $ENV{PARROT_LUA_TEST_PROG} = 'lua2pir';
         Test::Harness::runtests( @files ) if scalar( @files );
     } else {
         $ENV{PARROT_LUA_TEST_PROG} = '';

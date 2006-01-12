@@ -46,14 +46,29 @@ foreach my $func ( keys %language_test_map ) {
         my $count = $self->{builder}->current_test + 1;
 
         # flatten filenames (don't use directories)
+        my $lua_test       = $ENV{PARROT_LUA_TEST_PROG} || ''; 
         my $lang_fn        = Parrot::Test::per_test( '.lua', $count );
         my $pir_fn         = Parrot::Test::per_test( '.pir', $count );
-        my $lua_out_fn     = Parrot::Test::per_test( $ENV{PARROT_LUA_TEST_PROG} ? '.orig_out' : '.parrot_out', $count );
+        my $lua_out_fn     = Parrot::Test::per_test( $lua_test eq "lua" ? '.orig_out' : '.parrot_out', $count );
         my $test_prog_args = $ENV{TEST_PROG_ARGS} || '';
-        my @test_prog      = $ENV{PARROT_LUA_TEST_PROG} ?
-                 ( "$ENV{PARROT_LUA_TEST_PROG}  ${test_prog_args} languages/${lang_fn}" ):
+        my @test_prog;
+        if      ($lua_test eq "lua") {
+            @test_prog =
+                 ( "$ENV{PARROT_LUA_TEST_PROG}  ${test_prog_args} languages/${lang_fn}" );
+        } elsif ($lua_test eq "monkey") {
+            @test_prog = 
+                 ( "monkey -o languages/${pir_fn} languages/${lang_fn}",
+                   "$self->{parrot} languages/${pir_fn}" );
+        } elsif ($lua_test eq "lua2pir") {
+            @test_prog = 
+                 ( "luac languages/${lang_fn}",
+                   "l2p -o languages/${pir_fn} > nul",
+                   "$self->{parrot} languages/${pir_fn}" );
+        } else {
+            @test_prog = 
                  ( "perl -Ilanguages/lua languages/lua/luac.pl languages/${lang_fn}",
                    "$self->{parrot} languages/${pir_fn}" );
+        }
 
         # This does not create byte code, but lua code
         my $parrotdir       = dirname( $self->{parrot} );
