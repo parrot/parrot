@@ -1360,7 +1360,7 @@ lp1:
     h[k] = i
     inc i
     if i < 10 goto lp1
-  
+
     it = iter h
     ar = new ResizablePMCArray
     i = 20
@@ -1391,5 +1391,5 @@ lp3:
 CODE
 29_28_27_26_25_24_23_22_21_20_9_8_7_6_5_4_3_2_1_0_
 OUTPUT
-}    
+}
 
