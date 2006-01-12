@@ -39,7 +39,7 @@ if ($^O eq 'MSWin32') {
     # Paths need quoting as they may contain spaces.
     $PATHQUOTE = '"';
     
-    $LD_LOAD_FLAGS =~ s/(-def:)/$1..\\/;
+    $LD_LOAD_FLAGS =~ s/-def\S+//;
     $LIBPARROT = '@build_dir@/parrot@a@';
 }
 
@@ -62,7 +62,6 @@ sub partial_link_cmd {
     my ($target, $libs, $sources) = @_;
     
     my $liblist;
-    my $def = '';
     if ($^O =~ /mswin32/i) {
         # Need to put various libraries in the link line.
         $liblist = join( ' ', map { "$_.lib" } keys %$libs );
@@ -73,19 +72,13 @@ sub partial_link_cmd {
         $extraLibs =~ s/blib/..\\blib/g;
         $extraLibs =~ s/\Q$(A)\E/.lib/g;
         $liblist .= ' ' . $extraLibs;
-        if ($CC =~ /gcc/i) {
-            $def = "$target ";
-        } else {
-            $def = "-def:$target ";
-        }
-        $def =~ s/\.dll/.def/i;
     } else {
         $liblist = join( ' ', map { "-l$_" } keys %$libs );
     }
 
     return
         "$LD $LDFLAGS $LD_LOAD_FLAGS ".
-        "@ld_out@" . $target . " " . $def .
+        "@ld_out@" . $target . " " .
         join(" ", map {"$PATHQUOTE$_$PATHQUOTE"} @$sources) .
         " $liblist $PATHQUOTE$LIBPARROT$PATHQUOTE";
 }

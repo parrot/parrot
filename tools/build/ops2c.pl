@@ -175,7 +175,7 @@ if ($base =~ m!^src/dynoplibs/! || $dynamic_flag) {
     $dynamic_flag = 1;
 }
 
-my $sym_export = $dynamic_flag ? $PConfig{'sym_export'} : '';
+my $sym_export = $dynamic_flag ? 'PARROT_DYNEXT_EXPORT' : '';
 
 my %hashed_ops;
 

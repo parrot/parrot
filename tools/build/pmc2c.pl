@@ -746,14 +746,14 @@ sub gen_c {
     Parrot::Pmc2c::Library
         ->new( \%opt, read_dump($include, "vtable.pmc"), %pmcs )
         ->write_all_files;
-    
-    gen_def($include, \%pmcs) if $^O eq 'MSWin32';
 }
 
 #
 #   gen_def( [$dir1, $dir2], \%pmc )
 # 
 # Generate a .def file for symbols to export for dynamic PMCs.
+# Currently unused, but retained for being a basis for supporting
+# platforms that need a symbol export list.
 #
 sub gen_def {
     my ($include, $pmcs) = @_;

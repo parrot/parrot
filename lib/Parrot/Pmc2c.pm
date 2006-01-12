@@ -159,7 +159,7 @@ sub dynext_load_code {
 EOC
     $cout .= <<"EOC";
 
-extern Parrot_PMC Parrot_lib_${lc_libname}_load(Parrot_INTERP interpreter); /* don't warn */
+PARROT_DYNEXT_EXPORT extern Parrot_PMC Parrot_lib_${lc_libname}_load(Parrot_INTERP interpreter); /* don't warn */
 Parrot_PMC Parrot_lib_${lc_libname}_load(Parrot_INTERP interpreter)
 {
     Parrot_STRING whoami;
@@ -379,22 +379,24 @@ sub decl() {
     my $meth= $method->{meth};
     my $args= $method->{parameters};
     $args = ", $args" if $args =~ /\S/;
-    my ($extern, $newl, $semi, $interp, $pmc);
+    my ($export, $extern, $newl, $semi, $interp, $pmc);
     if ($for_header) {
-	$extern = "extern ";
-	$newl = " ";
-	$semi = ";";
+        $export = $self->{flags}->{dynpmc} ? 'PARROT_DYNEXT_EXPORT ' : '';
+        $extern = "extern ";
+	    $newl = " ";
+	    $semi = ";";
         $interp = $pmc = "";
     }
     else {
-	$extern = "";
-	$newl = "\n";
-	$semi = "";
+	    $export = "";
+	    $extern = "";
+	    $newl = "\n";
+	    $semi = "";
         $interp = ' interpreter';
         $pmc = ' pmc';
     }
     return <<"EOC";
-$extern$ret${newl}Parrot_${classname}_$meth(Interp*$interp, PMC*$pmc$args)$semi
+$export$extern$ret${newl}Parrot_${classname}_$meth(Interp*$interp, PMC*$pmc$args)$semi
 EOC
 }
 
@@ -1057,6 +1059,9 @@ sub hdecls() {
         $hout .= $self->decl($classname, $method, 1);
     }
     # class init decl
+    if ($self->{flags}->{dynpmc}) {
+        $hout .= 'PARROT_DYNEXT_EXPORT ';
+    }
     $hout .= <<"EOC";
 void Parrot_${classname}_class_init(Parrot_Interp, int, int);
 EOC

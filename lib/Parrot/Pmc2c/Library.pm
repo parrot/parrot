@@ -116,7 +116,7 @@ sub gen_h {
 
     $hout .= <<"EOH";
 #define PARROT_IN_EXTENSION
-Parrot_PMC Parrot_lib_${lc_libname}_load(Parrot_INTERP interpreter);
+PARROT_DYNEXT_EXPORT Parrot_PMC Parrot_lib_${lc_libname}_load(Parrot_INTERP interpreter);
 EOH
 
     return $hout;
