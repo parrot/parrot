@@ -350,7 +350,7 @@ Creates a symlink, where available
             real_exception(interpreter, NULL, E_SystemError, errmsg);
         }
 #else
-        internal_exception(UNIMPLEMENTED, "Win32 is not POSIX. Need win32 developer!");
+        internal_exception(UNIMPLEMENTED, "Win32 does not support symlinks!");
 #endif
     }
 

@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 9;
+use Parrot::Test tests => 11;
 use Parrot::Config;
 use Cwd;
 use File::Spec;
@@ -271,3 +271,27 @@ OUT
 
 ok(!-f $xpto, "Test that rm removed file");
 rmdir $xpto if -f $xpto; # this way next test doesn't fail if this one does
+
+# Test symlink
+SKIP: {
+  skip "Symlinks not available under Windows", 1 if $MSWin32;
+
+  pir_output_is(<<'CODE', <<"OUT", "Test symlink");
+.sub main :main
+        $P1 = new .OS
+
+        $S1 = "xpto"
+        $S2 = "src"
+        $P1."symlink"($S2, $S1)
+
+        print "ok\n"
+
+        end
+.end
+CODE
+ok
+OUT
+
+  ok(-l "xpto"); 
+  unlink "xpto" if -f "xpto"
+}
