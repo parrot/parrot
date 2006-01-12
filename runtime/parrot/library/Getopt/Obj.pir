@@ -13,11 +13,24 @@ library/Getopt/Obj.pir - parse long and short command line options
      getopts = new "Getopt::Obj"
      getopts."notOptStop"(1)
 
+     # these two are identical, with the exception of the call to name
+
+     push getopts, "foo|f:s"
+
      $P0 = getopts."add"()
      $P0."name"("FooBar")
      $P0."long"("foo")
      $P0."short"("f")
      $P0."optarg"(1)
+     $P0."type"(.String)
+
+     # these two are identical
+
+     push getopts, "bar|b=s"
+
+     $P0 = getopts."add"()
+     $P0."long"("bar")
+     $P0."short"("b")
      $P0."type"(.String)
 
      .local pmc opts
@@ -34,6 +47,7 @@ and of these forms, currently:
  --foo=bar         Set foo to bar
  -f bar            Set f to bar (with conditions)
  -fthis=that       If f is a Hash, set key 'this' to 'that'
+ -f this=that      If f is a Hash, set key 'this' to 'that'
  -f                Set f (if it's Boolean or has an optional argument)
  -fbar             Set f to bar if it's not a Boolean
  -abc              If -a -b and -c are all Booleans, set them all
@@ -177,16 +191,19 @@ error_0:
     ################  SHORT  ###########################
 
 shortarg:
+
     # get the first char
     key = substr arg, 1, 1
     # and the others...
     val = substr arg, 2
 
     (name, spec) = self."getNameForKey"(key)
+
     key = name
 
     $I1 = spec."type"()
     $I2 = length val
+
     unless $I1 == .Boolean goto else_6
     if $I2 == 0 goto beginstore
     # ok, boolean and bundled
@@ -235,9 +252,10 @@ error_2:
     throw $P0
 
     ################  STORE  ###########################
-
 beginstore:
+
     (name, spec) = self."getNameForKey"(key)
+
     # Store the value...
     $I0 = spec."type"()
     $S0 = typeof $I0
@@ -353,6 +371,118 @@ endfor:
     assign argv, argnew
 .end
 
+=item C<__push_string(STRING format)>
+
+A vtable method, invoked by e.g. C<push getopts, "foo|f=s">.  The format is as such.
+
+=over 4
+
+=item "foo|f"
+
+A long option of "foo" and a short option of "f" is set to C<.Boolean>.
+
+=item "foo"
+
+A long option of "foo" is set to C<.Boolean>.
+
+=item "f"
+
+A short option of "f" is set to C<.Boolean>.
+
+=item "f=s"
+
+A short option of "f" is set to C<.String>.  Use C<i> for C<.Integer>, C<f> for
+C<.Float>, C<@> for an C<.Array>, and C<%> for a C<.Hash>.
+
+
+=item "foo:s"
+
+A long option of "foo" is set to C<.String>, with "optarg" set to a true value.
+
+=back
+
+=cut
+
+.sub "__push_string" :method
+    .param string format
+    .local string key, type, long, short
+    $P0 = self."add"()
+
+    $I0 = index format, ':'
+    if $I0 == -1 goto process
+    substr format, $I0, 1, '='
+    $P0."optarg"(1)
+process:
+    $I0 = index format, '='
+    unless $I0 == -1 goto else_0
+    # Is a boolean
+    $I0 = index format, '|'
+    unless $I0 != -1 goto else_1
+    # long then a short
+    long = substr format, 0, $I0
+    inc $I0
+    # force one character
+    short = substr format, $I0, 1
+    $P0."long"(long)
+    $P0."short"(short)
+    .return()
+else_1:
+    $I0 = length format
+    unless $I0 == 1 goto long_0
+    $P0."short"(format)
+    .return()
+long_0:
+    $P0."long"(format)
+    .return()
+#---------------------------
+else_0:
+    $I0 = index format, '='
+    key = substr format, 0, $I0
+    inc $I0
+    # force one character
+    type = substr format, $I0, 1
+
+    if type == 's' goto str
+    if type == '@' goto array
+    if type == '%' goto hash
+    if type == 'i' goto integer
+    if type == 'f' goto flt
+str:
+    $P0."type"(.String)
+    goto endcase
+array:
+    $P0."type"(.Array)
+    goto endcase
+hash:
+    $P0."type"(.Hash)
+    goto endcase
+integer:
+    $P0."type"(.Integer)
+    goto endcase
+flt:
+    $P0."type"(.Float)
+endcase:
+    $I0 = index key, '|'
+    unless $I0 == -1 goto endif_2
+    # only short or long
+    $I0 = length key
+    unless $I0 == 1 goto else_3
+    $P0."short"(key)
+    .return()
+else_3:
+    $P0."long"(key)
+    .return()
+endif_2:
+    # short and long
+    $I0 = index key, '|'
+    long = substr key, 0, $I0
+    inc $I0
+    short = substr key, $I0
+    $P0."long"(long)
+    $P0."short"(short)
+    .return()
+.end
+
 =item C<Getopt::Obj::Spec add()>
 
 Adds a new option to the parsing.  You don't need to know what class it is
@@ -451,7 +581,7 @@ When a required argument is missing, throws an exception with the message
     #printerr "\n"
     #exit 1
     $P0 = new .Exception
-	$P0["_message"] = "Missing a required argument"
+    $P0["_message"] = "Missing a required argument"
     throw $P0
 .end
 
@@ -774,5 +904,10 @@ Copyright (C) 2006 The Perl Foundation.  All rights reserved.
 This program is free software. It is subject to the same
 license as The Parrot Interpreter.
 
+=for vim
+
+" vim: ts=4 expandtab
+
 =cut
+
 

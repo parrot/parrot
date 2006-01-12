@@ -556,137 +556,100 @@ argv[0] is -
 OUT
 
 # 13
-pir_output_is(<<'CODE', <<'OUT', "complex example, touch of everything");
-.include "library/dumper.pir"
+pir_output_is(<<'CODE', <<'OUT', "push interface");
 .sub main :main 
 	.local pmc argv
 	argv = new .ResizablePMCArray
-	push argv, '-DHi=Hello'
-	push argv, '-DBye=Good Bye'
-	push argv, '-DDefined'
-	push argv, '--define=hi=hello'
-	push argv, '--ignored'
-	push argv, '-i'
-	push argv, '--ignored=hello'
 	push argv, '--foo=file'
-	push argv, '-I/usr/include'
-	push argv, 'argv'
-	push argv, '-I'
-	push argv, '/usr/local/include'
-	push argv, '-abc'
-	push argv, '-e'
-	push argv, 'codea'
-	push argv, 'stay'
-	push argv, '-'
-	push argv, '--bar=3.1'
-	push argv, '--baz=z'
-	push argv, '--ban=3.14'
-	push argv, '--baz'
-	push argv, 'with me'
-	push argv, '-f'
-	push argv, 'file.txt'
-	push argv, '-e'
-	push argv, 'codeb'
-	push argv, '-r'
-	push argv, '12'
+	push argv, '-bfile.txt'
 	push argv, '-x'
-	push argv, 'foobar'
+	push argv, 'file.t'
+	push argv, '-z'
+	push argv, 'text'
+	push argv, '-I'
+	push argv, 'texta'
+	push argv, '-I'
+	push argv, 'textb'
+	push argv, '-Dfoo=bar'
+	push argv, '--define=bax=baz'
+	push argv, '-Dfoobar'
 
 	load_bytecode "Getopt/Obj.pir"
 	.local pmc getopts
 	getopts = new "Getopt::Obj"
 
-	$P0 = getopts."add"()
-	$P0."name"("Foo")
-	$P0."long"("foo")
-	$P0."short"("f")
-	$P0."type"(.String)
+	push getopts, 'foo=s'
+	push getopts, 'bar|b=s'
+	push getopts, 'bax|x=s'
+	push getopts, 'baz|z:s'
+	push getopts, 'I=@'
+	push getopts, 'define|D:%'
 
-	$P0 = getopts."add"()
-	$P0."name"("Bar")
-	$P0."long"("bar")
-	$P0."short"("r")
-	$P0."type"(.Integer)
-
-	$P0 = getopts."add"()
-	$P0."long"("ban")
-	$P0."type"(.Float)
-
-	$P0 = getopts."add"()
-	$P0."long"("baz")
-	$P0."short"("z")
-	$P0."type"(.Boolean)
-
-	$P0 = getopts."add"()
-	$P0."name"("FooBar")
-	$P0."long"("foobar")
-	$P0."short"("x")
-	$P0."type"(.String)
-
-	$P0 = getopts."add"()
-	$P0."name"("code")
-	$P0."short"("e")
-	$P0."type"(.Array)
-
-	$P0 = getopts."add"()
-	$P0."short"("I")
-	$P0."type"(.Array)
-
-	$P0 = getopts."add"()
-	$P0."long"("define")
-	$P0."short"("D")
-	$P0."type"(.Hash)
-
-	$P0 = getopts."add"()
-	$P0."name"("alpha")
-	$P0."short"("a")
-	$P0 = getopts."add"()
-	$P0."name"("beta")
-	$P0."short"("b")
-	$P0 = getopts."add"()
-	$P0."name"("cab")
-	$P0."short"("c")
 	$P1 = getopts."get_options"(argv)
+	
 
-	_dumper(argv, "argv")
-	_dumper($P1, "return")
+	$S0 = $P1["foo"]
+	print "foo is "
+	print $S0
+	print "\n"
 
+	$S0 = $P1["bar"]
+	print "bar is "
+	print $S0
+	print "\n"
+
+	$S0 = $P1["bax"]
+	print "bax is "
+	print $S0
+	print "\n"
+
+	$S0 = $P1["baz"]
+	print "baz is "
+	print $S0
+	print "\n"
+
+	$S0 = $P1["I";0]
+	print "I[0] is "
+	print $S0
+	print "\n"
+
+	$S0 = $P1["I";1]
+	print "I[1] is "
+	print $S0
+	print "\n"
+
+	$S0 = $P1["define";"foo"]
+	print "define[foo] is "
+	print $S0
+	print "\n"
+
+	$S0 = $P1["define";"bax"]
+	print "define[bax] is "
+	print $S0
+	print "\n"
+
+	$S0 = $P1["define";"foobar"]
+	print "define[foobar] is "
+	print $S0
+	print "\n"
+
+	$S0 = argv[0]
+	print "argv[0] is "
+	print $S0
+	print "\n"
 
 .end
 CODE
-"argv" => ResizablePMCArray (size:7) [
-    "--ignored",
-    "-i",
-    "--ignored=hello",
-    "argv",
-    "stay",
-    "-",
-    "with me"
-]
-"return" => Hash {
-    "Bar" => 12,
-    "Foo" => "file.txt",
-    "FooBar" => "foobar",
-    "I" => ResizablePMCArray (size:2) [
-        "/usr/include",
-        "/usr/local/include"
-    ],
-    "alpha" => 1,
-    "ban" => 3.14,
-    "baz" => 1,
-    "beta" => 1,
-    "cab" => 1,
-    "code" => ResizablePMCArray (size:2) [
-        "codea",
-        "codeb"
-    ],
-    "define" => Hash {
-        "Bye" => "Good Bye",
-        "Defined" => 1,
-        "Hi" => "Hello",
-        "hi" => "hello"
-    }
-}
+foo is file
+bar is file.txt
+bax is file.t
+baz is 
+I[0] is texta
+I[1] is textb
+define[foo] is bar
+define[bax] is baz
+define[foobar] is 1
+argv[0] is text
 OUT
 
 =head1 AUTHOR
