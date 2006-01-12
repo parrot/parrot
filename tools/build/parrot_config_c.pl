@@ -45,7 +45,7 @@ print << "EOF";
  *
  */
 
-#include "parrot/embed.h"
+#include "parrot/parrot.h"
 
 void
 Parrot_set_config_hash_internal (const unsigned char* parrot_config,
