@@ -47,6 +47,11 @@ print << "EOF";
 
 #include "parrot/parrot.h"
 
+/* proto is in embed.h, but we don't include anything here, which
+ * could pull in some globals
+ */
+void Parrot_set_config_hash(void);  
+
 void
 Parrot_set_config_hash_internal (const unsigned char* parrot_config,
                                  unsigned int parrot_config_size);
