@@ -1252,7 +1252,7 @@ C<base> must be between 2 and 36, inclusize.
                     "get_as_base: base out of bounds");
 
         return int_to_str(interpreter, buf,
-                (HUGEINTVAL)PMC_int_val(SELF), base);
+                (HUGEINTVAL)PMC_int_val(SELF), (char)base);
     }
 
 /*

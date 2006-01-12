@@ -578,7 +578,7 @@ we have to preserver key/value order.
 */
 
     void visit(visit_info *info) {
-        UINTVAL i, n;
+        UINTVAL i;
         HashBucket *b;
         void *key;
         IMAGE_IO *io = info->image_io;
