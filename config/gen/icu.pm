@@ -1,4 +1,4 @@
-# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2001-2006 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 =head1 NAME
@@ -20,6 +20,7 @@ use base qw(Parrot::Configure::Step::Base);
 
 use Config;
 use Cwd qw(cwd);
+use File::Basename;
 use Parrot::Configure::Step qw(capture_output cc_gen cc_clean);
 
 $description = "Determining whether ICU is installed";
@@ -92,6 +93,7 @@ sub runstep
         $conf->data->set(
             has_icu    => 0,
             icu_shared => '', # used for generating src/dynclasses/Makefile
+            icu_dir    => '',
         );
         $result = "no" unless defined $gen::icu::result;
         return;
@@ -131,9 +133,12 @@ HELP
 
     #'
 
+    my $icudir = dirname($icuheaders);
+
     $conf->data->set(
         has_icu    => 1,
         icu_shared => $icushared,
+        icu_dir    => $icudir,
     );
 
     # Add -I $Icuheaders if necessary

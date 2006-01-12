@@ -1,6 +1,6 @@
 #! perl -w
 ################################################################################
-# Copyright: 2005 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2005-2006 The Perl Foundation.  All Rights Reserved.
 # $Id$
 ################################################################################
 
@@ -26,9 +26,9 @@ The install prefix.
 
 The parrot version.
 
-=item C<icudatadir>
+=item C<icudir>
 
-The directory to locate ICU's data file(s).
+The directory to locate ICU.
 
 =back
 
@@ -45,7 +45,7 @@ use strict;
 my %options = (
 		version => 'x.y.z',
 		prefix => '\usr\local\parrot',
-		icudatadir => '',
+		icudir => '',
 );
 
 foreach (@ARGV) {
@@ -55,15 +55,13 @@ foreach (@ARGV) {
 }
 
 $options{prefix} =~ s/\//\\/g;
-$options{icudatadir} =~ s/\//\\/g;
+$options{icudir} =~ s/\//\\/g;
 
 my $icu_section = '';
-if ($options{icudatadir}) {
-	my $icuroot = $options{icudatadir};
-	$icuroot =~ s/\\\w+$//;
+if ($options{icudir}) {
 	$icu_section = qq{
-Source: "$icuroot\\license.html"; DestDir: "{app}\\icu"; Flags:
-Source: "$icuroot\\bin\\icu*.dll"; DestDir: "{app}\\bin"; Flags:
+Source: "$options{icudir}\\license.html"; DestDir: "{app}\\icu"; Flags:
+Source: "$options{icudir}\\bin\\icu*.dll"; DestDir: "{app}\\bin"; Flags:
 };
 }
 
