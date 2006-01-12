@@ -26,7 +26,8 @@ Tests the Enumerate PMC.
 
 pir_output_is(<<'CODE', <<'OUT', 'new');
 .sub 'test' :main
-	new P0, .Enumerate
+	new P1, .Array
+	new P0, .Enumerate, P1
 	print "ok 1\n"
 .end
 CODE
