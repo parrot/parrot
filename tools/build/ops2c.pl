@@ -174,11 +174,11 @@ if ($base =~ m!^src/dynoplibs/! || $dynamic_flag) {
     $dynamic_flag = 1;
 }
 
-my $sym_export = '';
-if ($dynamic_flag && ($PConfig{'osname'} =~ /cygwin/i ||
-    ($PConfig{'osname'} =~ /win32/i && $PConfig{'cc'} =~ /cl|gcc/i))) {
-    $sym_export = '__declspec(dllexport)';
-}
+my $sym_export = $PConfig{'sym_export'};
+#if ($dynamic_flag && ($PConfig{'osname'} =~ /cygwin/i ||
+#    ($PConfig{'osname'} =~ /win32/i && $PConfig{'cc'} =~ /cl|gcc/i))) {
+#    $sym_export = '__declspec(dllexport)';
+#}
 
 my %hashed_ops;
 
