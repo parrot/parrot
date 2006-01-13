@@ -215,13 +215,11 @@ Converts C<key> to a PMC key and calls C<delete_keyed()> with it.
 
     void delete_keyed_int (INTVAL key) {
         PMC **data; 
-        INTVAL size;
+        INTVAL size, i;
         size = PMC_int_val(SELF);
 
-        INTVAL i;
-        INTVAL n = PMC_int_val(SELF);
         data = PMC_data(SELF);
-        for (i = key; i < n - 1; ++i)
+        for (i = key; i < size - 1; ++i)
             data[i] = data[i + 1];
         DYNSELF.set_integer_native(size - 1);
     }
@@ -238,14 +236,12 @@ Removes the element at C<*key>.
 
     void delete_keyed (PMC* key) {
         PMC **data; 
-        INTVAL size;
+        INTVAL size, idx, i, n;
         size = PMC_int_val(SELF);
-        INTVAL idx = key_integer(INTERP, key);
+        idx = key_integer(INTERP, key);
 
-        INTVAL i;
-        INTVAL n = PMC_int_val(SELF);
         data = PMC_data(SELF);
-        for (i = idx; i < n - 1; ++i)
+        for (i = idx; i < size - 1; ++i)
             data[i] = data[i + 1];
         DYNSELF.set_integer_native(size - 1);
     }
