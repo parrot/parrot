@@ -20,31 +20,8 @@ dynamic PMCs. It looks at header files to build its list.
 use strict;
 
 # This is a list of symbols we'll export 
-my @funcnames = qw(
-	line
-	imc_cleanup
-	imc_compile_all_units
-	imc_compile_all_units_for_ast
-	IMCC_ast_compile
-	emit_open
-	IMCC_push_parser_state
-	PackFile_new
-	IMCC_info
-	Parrot_set_run_core
-	Parrot_exit
-	IMCC_fatal
-	IMCC_ast_init
-	imcc_init
-	Parrot_get_runtime_prefix
-	longopt_get
-	Parrot_config_revision
-	Parrot_revision
-	Parrot_set_config_hash_internal
-	yyin
-	yydebug
-	yylex
-	yyparse
-);
+my @funcnames;
+push @funcnames, "yyin";
 push @funcnames, "PMCNULL	DATA";
 push @funcnames, "Parrot_base_vtables	DATA";
 

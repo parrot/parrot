@@ -120,12 +120,12 @@ typedef struct _emittert {
 
 enum Emitter_type { EMIT_FILE, EMIT_PBC };
 
-int emit_open(Interp *, int type, void *param);
-int emit_flush(Interp *, void *param, struct _IMC_Unit *);
-int emit_close(Interp *, void *param);
+PARROT_API int emit_open(Interp *, int type, void *param);
+PARROT_API int emit_flush(Interp *, void *param, struct _IMC_Unit *);
+PARROT_API int emit_close(Interp *, void *param);
 
-void open_comp_unit(void);
-void close_comp_unit(Parrot_Interp);
+PARROT_API void open_comp_unit(void);
+PARROT_API void close_comp_unit(Parrot_Interp);
 
 #endif /* PARROT_IMCC_INSTRUCTIONS_H_GUARD */
 

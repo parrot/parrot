@@ -54,11 +54,11 @@
 /*
  * imc.c
  */
-void imc_compile_all_units(Interp *);
-void imc_compile_all_units_for_ast(Interp *);
-void imc_compile_unit(Interp *, IMC_Unit * unit);
-void imc_cleanup(Interp *);
-void imc_pragma(char * str);
+PARROT_API void imc_compile_all_units(Interp *);
+PARROT_API void imc_compile_all_units_for_ast(Interp *);
+PARROT_API void imc_compile_unit(Interp *, IMC_Unit * unit);
+PARROT_API void imc_cleanup(Interp *);
+PARROT_API void imc_pragma(char * str);
 
 /*
  * instructions.c
@@ -104,8 +104,7 @@ typedef enum {
 } _imc_pragmas;
 
 /* globals XXX */
-EXTERN int        line;	/* and line */
-
+PARROT_API EXTERN int        line;	/* and line */
 
 EXTERN enum {
 	OPT_NONE,
@@ -156,7 +155,7 @@ typedef enum _AsmState {
     AsmInYield
 } AsmState;
 
-void IMCC_push_parser_state(Interp*);
+PARROT_API void IMCC_push_parser_state(Interp*);
 
 typedef struct _imc_info_t {
     struct _imc_info_t *prev;
@@ -196,10 +195,10 @@ extern IMC_Unit * cur_unit;
  * ast interface
  */
 
-void IMCC_ast_init(Interp* interpreter);
-void IMCC_ast_compile(Interp *interpreter, FILE *fp);
-Instruction * IMCC_create_itcall_label(Interp *);
-void IMCC_itcall_sub(Interp* interpreter, SymReg* sub);
+PARROT_API void IMCC_ast_init(Interp* interpreter);
+PARROT_API void IMCC_ast_compile(Interp *interpreter, FILE *fp);
+PARROT_API Instruction * IMCC_create_itcall_label(Interp *);
+PARROT_API void IMCC_itcall_sub(Interp* interpreter, SymReg* sub);
 
 STRING * IMCC_string_from_reg(Interp *interpreter, SymReg *r);
 INTVAL   IMCC_int_from_reg(Interp *interpreter, SymReg *r);

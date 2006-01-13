@@ -167,7 +167,7 @@ STRING *Parrot_psprintf(Interp *interpreter, STRING *pat,
 /*
  * generated src/revision.c
  */
-int Parrot_config_revision(void);
+PARROT_API int Parrot_config_revision(void);
 
 #endif /* PARROT_MISC_H_GUARD */
 
