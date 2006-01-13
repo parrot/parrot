@@ -49,7 +49,7 @@ enum {
                                              set, i.e. registers */
 };
 
-void Parrot_do_dod_run(Interp *, UINTVAL flags);
+PARROT_API void Parrot_do_dod_run(Interp *, UINTVAL flags);
 void trace_system_areas(Interp *);
 void trace_mem_block(Interp *, size_t, size_t);
 
@@ -70,10 +70,10 @@ void clear_cow(Interp *interpreter,
 	parrot_gc_gms_pobject_lives(i, o); \
   } while (0)
 
-void parrot_gc_gms_pobject_lives(Interp* interpreter, PObj *obj);
+PARROT_API void parrot_gc_gms_pobject_lives(Interp* interpreter, PObj *obj);
 
 #else
-void pobject_lives(Interp *interpreter, PObj *buffer);
+PARROT_API void pobject_lives(Interp *interpreter, PObj *buffer);
 #endif
 
 #if ! DISABLE_GC_DEBUG
@@ -81,23 +81,23 @@ void pobject_lives(Interp *interpreter, PObj *buffer);
 extern int CONSERVATIVE_POINTER_CHASING;
 #endif
 
-int Parrot_dod_trace_root(Interp *, int trace_stack);
-int Parrot_dod_trace_children(Interp *, size_t how_many);
-void Parrot_dod_sweep(Interp *, struct Small_Object_Pool *pool);
-void Parrot_dod_ms_run_init(Interp *interpreter);
-void Parrot_dod_clear_live_bits(Interp*);
+PARROT_API int Parrot_dod_trace_root(Interp *, int trace_stack);
+PARROT_API int Parrot_dod_trace_children(Interp *, size_t how_many);
+PARROT_API void Parrot_dod_sweep(Interp *, struct Small_Object_Pool *pool);
+PARROT_API void Parrot_dod_ms_run_init(Interp *interpreter);
+PARROT_API void Parrot_dod_clear_live_bits(Interp*);
 
-void Parrot_dod_profile_start(Parrot_Interp interpreter);
-void Parrot_dod_profile_end(Parrot_Interp interpreter, int what);
+PARROT_API void Parrot_dod_profile_start(Parrot_Interp interpreter);
+PARROT_API void Parrot_dod_profile_end(Parrot_Interp interpreter, int what);
 
 /* GC subsystem init functions */
-void Parrot_gc_ms_init(Interp* interpreter);
-void Parrot_gc_ims_init(Interp* interpreter);
-void Parrot_gc_gms_init(Interp* interpreter);
+PARROT_API void Parrot_gc_ms_init(Interp* interpreter);
+PARROT_API void Parrot_gc_ims_init(Interp* interpreter);
+PARROT_API void Parrot_gc_gms_init(Interp* interpreter);
 /* do_dod_run function for MS */
-void Parrot_dod_ms_run(Interp *interpreter, int flags);
+PARROT_API void Parrot_dod_ms_run(Interp *interpreter, int flags);
 
-void Parrot_dod_ims_wb(Interp*, PMC *, PMC *);
+PARROT_API void Parrot_dod_ims_wb(Interp*, PMC *, PMC *);
 /*
  * write barrier
  */

@@ -89,10 +89,10 @@ PARROT_API void *hash_get(Interp * interpreter, Hash *hash, void *key);
 PARROT_API INTVAL hash_exists(Interp * interpreter, Hash *hash, void *key);
 PARROT_API HashBucket *hash_put(Interp * interpreter, Hash *hash, void *key, void *value);
 PARROT_API void hash_delete(Interp * interpreter, Hash *hash, void *key);
-void mark_hash(Interp * interpreter, Hash *hash);
-void hash_visit(Interp * interpreter, Hash *hash, void*);
-void dump_hash(Interp * interpreter, Hash *hash);
-void* hash_get_idx(Interp *interpreter, Hash *hash, PMC *key);
+PARROT_API void mark_hash(Interp * interpreter, Hash *hash);
+PARROT_API void hash_visit(Interp * interpreter, Hash *hash, void*);
+PARROT_API void dump_hash(Interp * interpreter, Hash *hash);
+PARROT_API void* hash_get_idx(Interp *interpreter, Hash *hash, PMC *key);
 
 #endif /* PARROT_HASH_H_GUARD */
 
