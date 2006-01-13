@@ -8,8 +8,8 @@ ChangeLog                                         []
 Configure.pl                                      []
 DEPRECATED                                        []
 DEVELOPING                                        []
-LICENSES/Artistic                                 [devel]doc
-LICENSES/gpl.txt                                  [devel]doc
+LICENSES/Artistic                                 [main]doc
+LICENSES/gpl.txt                                  [main]doc
 MANIFEST                                          []
 MANIFEST.SKIP                                     []
 MANIFEST.generated                                []
