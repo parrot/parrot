@@ -286,20 +286,6 @@ my @funcnames = qw(
 push @funcnames, "PMCNULL	DATA";
 push @funcnames, "Parrot_base_vtables	DATA";
 
-# Extract function names from the core ops file.
-my $hfile;
-foreach $hfile ("include/parrot/oplib/core_ops.h") {
-	open FILE, "< $hfile" or die "Can't open $hfile: $!";
-	while (<FILE>) {
-		if (/^(?:extern\s+)?\w+\*?\s+\*?(\w+)\s*\([^)]+\)\s*;/) {
-			my $func = $1;
-			next if $func =~ /_class_init$/;
-			push @funcnames, $func;
-		}
-	}
-	close FILE;
-}
-
 # Remove dupes, if we have any.
 my %seen;
 @funcnames = grep { ! $seen{$_}++ } @funcnames;
