@@ -18,6 +18,7 @@
    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#define PARROT_IN_EXTENSION
 #include <stdlib.h>
 #include <stdio.h>
 #include <ctype.h>
@@ -85,7 +86,7 @@ static eval_error          exp_term( eval_token, eval_t * );
 static eval_error          unary_term( eval_token, eval_t * );
 static eval_error          simple_term( eval_token, eval_t * );
 boolean_for_m4             evaluate (const char *, eval_t *);
-int                        m4_evaluate(void *);
+PARROT_DYNEXT_EXPORT int   m4_evaluate(void *);
 
 /*--------------------.
 | Lexical functions.  |
