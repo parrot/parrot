@@ -39,7 +39,8 @@ pmclass LuaTable
     void class_init() {
         if (pass) {
             luatable_name = const_string(INTERP, "table");
-            Lua_Nil = pmc_new(INTERP, Parrot_PMC_typenum(INTERP, "LuaNil"));
+            Lua_Nil = pmc_new(INTERP, pmc_type(INTERP,
+              string_from_const_cstring(INTERP, "LuaNil", 0)));
         }
     }
 
@@ -133,7 +134,8 @@ Return always false.
 */
     PMC* logical_not (PMC* dest) {
         if (!dest)
-            dest = pmc_new(INTERP, Parrot_PMC_typenum(INTERP, "LuaBoolean"));
+            dest = pmc_new(INTERP, pmc_type(INTERP,
+              string_from_const_cstring(INTERP, "LuaBoolean", 0)));
         VTABLE_set_integer_native(INTERP, dest, 0);
         return dest;
     }
