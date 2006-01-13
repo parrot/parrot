@@ -256,19 +256,9 @@ number:
   .return get_number(expr, pos)
 
 quote:
-  ($P0, $I0) = get_quote(expr, pos)
+  ($P0,$I0) = get_quote(expr,pos)
   inc $I0
-  .local string type_o
-  type_o = typeof $P0
-  #XXX Too protective?
-  if type_o != "TclConst" goto done_quote
-  # quotes can contain numbers that should be treated as such. Is this a number?
-  push_eh done_quote
-    $P1 = __number($P0)
-  clear_eh
-  .return ($P1,$I0)
-done_quote:
-  .return($P0, $I0)
+  .return ($P0,$I0)
 
 brace:
   ($P0, $I0) = get_brace(expr, pos)

@@ -40,6 +40,7 @@
   goto done
 .endm 
 
+#XXX This macro is unused?
 .macro binary_op2num(FORMAT)
   $P1 = new .Array
   $P1 = 6 
@@ -156,6 +157,47 @@ Initialize the attributes for an instance of the class
   register_num = l_reg + 1
   (r_reg,r_code) = compile(register_num, r_operand)
   register_num = r_reg + 1
+
+
+  # Operands have a chance to be treated numerically. 
+  # XXX This is overkill, as it tries to numerify things that
+  #     we just declared as constants: more logic needs to go
+  #     in here to only do this if we know it's of a certain 
+  #     type.
+  .local string temp_code
+  temp_code = <<"END_PIR"
+  .local pmc __number
+  __number = find_global "_Tcl", "__number"
+push_eh l_code_check_%s
+  $P%s = __number($P%s)
+clear_eh
+l_code_check_%s:
+END_PIR
+  $P1 = new Array
+  $P1 =8
+  $P1[0] = l_reg 
+  $P1[1] = l_reg
+  $P1[2] = l_reg
+  $P1[3] = l_reg
+  $S0 = sprintf temp_code, $P1
+  l_code .= $S0
+
+  temp_code = <<"END_PIR"
+push_eh r_code_check_%s
+  $P%s = __number($P%s)
+clear_eh
+r_code_check_%s:
+END_PIR
+  $P1 = new Array
+  $P1 =8
+  $P1[0] = r_reg
+  $P1[1] = r_reg
+  $P1[2] = r_reg
+  $P1[3] = r_reg
+  $S0 = sprintf temp_code, $P1
+  r_code .= $S0
+
+  ## end numeric_check
 
   if op == OPERATOR_MUL goto op_mul
   if op == OPERATOR_DIV goto op_div
@@ -360,7 +402,6 @@ END_PIR
   pir_code .= $S1
 
 done:
-
   .return(register_num, pir_code)
 
 .end
