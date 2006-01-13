@@ -80,7 +80,7 @@ Returns the list as a string
         listToString = Parrot_get_global(INTERP, namespace, sub, NULL);
         CONTEXT(INTERP->ctx)->constants =
           PMC_sub(listToString)->seg->const_table->constants;
-        value        = Parrot_runops_fromc_arglist
+        value        = Parrot_runops_fromc_args
                          (INTERP, listToString, "SP", SELF);
         return value;
     }
