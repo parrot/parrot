@@ -205,6 +205,31 @@ Removes and returns an item from the start of the array.
 
 /*
 
+=item C<void unshift_string(STRING *value)>
+
+Extends the array by adding an element of value C<*value> to the start
+of the array.
+
+=cut
+
+*/  
+
+    void unshift_string (STRING *value) {
+        PMC **data; 
+        INTVAL size, i;
+        
+        size = PMC_int_val(SELF);
+        data = (PMC**)PMC_data(SELF);
+
+        DYNSELF.set_integer_native(size + 1);
+        data = PMC_data(SELF);
+        for (i = size; i; --i)
+            data[i] = data[i - 1];
+        DYNSELF.set_string_keyed_int(0, value);
+    }
+
+/*
+
 =item C<void delete_keyed_int(INTVAL key)>
 
 Converts C<key> to a PMC key and calls C<delete_keyed()> with it.
@@ -236,7 +261,7 @@ Removes the element at C<*key>.
 
     void delete_keyed (PMC* key) {
         PMC **data; 
-        INTVAL size, idx, i, n;
+        INTVAL size, idx, i;
         size = PMC_int_val(SELF);
         idx = key_integer(INTERP, key);
 
