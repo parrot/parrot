@@ -1,7 +1,7 @@
 prefix=@prefix@
-exec_prefix=${prefix}
-libdir=${exec_prefix}/lib
-includedir=${prefix}/include
+exec_prefix=@exec_prefix@
+libdir=@lib_dir@
+includedir=@include_dir@
 
 Name: parrot
 Description: virtual machine to execute bytecode for interpreted languages
