@@ -64,7 +64,7 @@ Returns a true value (1) if the supplied path is a directory.
     METHOD INTVAL is_dir(STRING *path) {
         struct stat info;
         char *cpath = string_to_cstring(interpreter, path);
-        int error = stat(cpath, &info);
+        int error = lstat(cpath, &info);
         if (error) {
             char *errmsg = strerror(errno);
             real_exception(interpreter, NULL, E_SystemError, errmsg);
@@ -90,7 +90,7 @@ Returns a true value (1) if the supplied path is a directory.
     METHOD INTVAL is_file(STRING *path) {
         struct stat info;
         char *cpath = string_to_cstring(interpreter, path);
-        int error = stat(cpath, &info);
+        int error = lstat(cpath, &info);
         if (error) {
             char *errmsg = strerror(errno);
             real_exception(interpreter, NULL, E_SystemError, errmsg);
