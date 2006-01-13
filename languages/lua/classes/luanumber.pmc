@@ -1,5 +1,5 @@
 /*
-Copyright: 2005 The Perl Foundation.  All Rights Reserved.
+Copyright: 2005-2006 The Perl Foundation.  All Rights Reserved.
 $Id$
 
 =head1 NAME
@@ -65,6 +65,34 @@ So return always true.
 */
     INTVAL get_bool () {
         return 1;
+    }
+
+/*
+
+=item C<PMC* new_from_string(STRING *rep, INTVAL flags)>
+
+Return a LuaNumber PMC created from a string (Implementation
+is based on new_from_string() from Integer PMC).
+
+Allow :
+
+    .const .LuaNumber n = "12.34"
+
+=cut
+
+*/
+    PMC* new_from_string(STRING *rep, INTVAL flags) {
+        INTVAL type;
+        PMC *res;
+
+        type = SELF->vtable->base_type;
+        if (flags & PObj_constant_FLAG)
+            res = constant_pmc_new(INTERP, type);
+        else
+            res = pmc_new(INTERP, type);
+
+        PMC_num_val(res) = string_to_num(INTERP, rep);
+        return res;
     }
 
 }
