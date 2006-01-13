@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 97;
+use Parrot::Test tests => 98;
 use Test::More;
 
 language_output_is("tcl",<<TCL,<<OUT,"int");
@@ -93,6 +93,13 @@ OUT
 language_output_is("tcl",<<'TCL',<<OUT,"lt, numeric, not alpha, with vars");
  set a 10
  puts [expr $a < 9]
+TCL
+0
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"lt, numeric, not alpha, with vars and braces");
+ set a 10
+ puts [expr {$a < 9}]
 TCL
 0
 OUT
