@@ -30,7 +30,6 @@ sub runstep
 
     $self->makefiles($conf);
     $self->cflags($conf);
-    genfile('config/gen/makefiles/libparrot_def.in', 'libparrot.def');
 }
 
 sub cflags

@@ -51,8 +51,8 @@ sub runstep
             # ZI messes with __LINE__
             cc_debug             => '-Zi',
             ld_debug             => '-debug',
-            ld_share_flags       => '-dll -def:libparrot.def',
-            ld_load_flags        => '-dll -def:libparrot.def',
+            ld_share_flags       => '-dll',
+            ld_load_flags        => '-dll',
             ld_out               => '-out:',
             ldflags              => '-nologo -nodefaultlib',
             libparrot_static     => 'libparrot'.$conf->data->get('a'),
@@ -83,24 +83,6 @@ sub runstep
             $linkflags =~ s/-opt:\S+//;
             $conf->data->set(linkflags => $linkflags);
         }
-
-        # We need to build a .def file to export parrot.exe symbols in a
-        # static build and similarly to the shared lib otherwise.
-        if ($conf->data->get('parrot_is_shared')) {
-            $conf->data->set(
-                ld_parrot_dll_def => '-def:parrot.def',
-                parrot_dll_def    => 'parrot.def'
-            );
-        } else {
-            $conf->data->set(
-                ld_parrot_exe_def => '-def:parrot.def',
-                parrot_exe_def    => 'parrot.def'
-            );
-        }
-
-        # When building dynclasses we need to flag up the need to
-        # mark shared variables with __declspec(dllimport).
-        $conf->data->set(cc_building_dynclass_flag => '-DPARROT_BUILDING_WIN32_DLL');
     } elsif ($is_intel) {
         $conf->data->set(
             share_ext  => '.dll',
@@ -116,8 +98,8 @@ sub runstep
             libs                 => "$libs libircmt.lib",
             ld                   => 'xilink',
             ld_debug             => '-debug',
-            ld_share_flags       => '-dll -def:libparrot.def',
-            ld_load_flags        => '-dll -def:libparrot.def',
+            ld_share_flags       => '-dll',
+            ld_load_flags        => '-dll',
             ld_out               => '-out:',
             ldflags              => '-nologo -nodefaultlib',
             ar                   => 'xilib',
@@ -210,16 +192,9 @@ sub runstep
             warn "unknown configuration";
         }
 
-        # We need to build a .def file to export parrot.exe symbols.
         $conf->data->set(
-            ld_parrot_exe_def => 'parrot.def',
-            parrot_exe_def    => 'parrot.def',
             link_dynamic      => '-Wl,--out-implib,parrot.a',
         );
-
-        # When building dynclasses we need to flag up the need to
-        # mark shared variables with __declspec(dllimport).
-        $conf->data->set(cc_building_dynclass_flag => '-DPARROT_BUILDING_WIN32_DLL');
 
         # Export decorations.
         $conf->data->set(

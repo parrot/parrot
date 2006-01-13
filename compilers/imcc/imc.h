@@ -59,6 +59,8 @@ PARROT_API void imc_compile_all_units_for_ast(Interp *);
 PARROT_API void imc_compile_unit(Interp *, IMC_Unit * unit);
 PARROT_API void imc_cleanup(Interp *);
 PARROT_API void imc_pragma(char * str);
+PARROT_API FILE* imc_yyin_set(FILE*);
+PARROT_API FILE* imc_yyin_get();
 
 /*
  * instructions.c

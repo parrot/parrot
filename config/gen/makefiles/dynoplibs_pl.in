@@ -28,7 +28,7 @@ our $LD_LOAD_FLAGS = qq[@ld_load_flags@];
 our $PERL = q[@perl@];
 our $LOAD_EXT = qq[@load_ext@];
 our $O = qq[@o@];
-our $CFLAGS = qq[@ccflags@ @cc_shared@ @cc_debug@ @ccwarn@ @cc_hasjit@ @cg_flag@ @gc_flag@ @cc_building_dynclass_flag@];
+our $CFLAGS = qq[@ccflags@ @cc_shared@ @cc_debug@ @ccwarn@ @cc_hasjit@ @cg_flag@ @gc_flag@];
 
 our $LIBPARROT = qq[];
 #CONDITIONED_LINE(parrot_is_shared):$LIBPARROT = qq[@libparrot_ldflags@];
@@ -38,8 +38,7 @@ our $PATHQUOTE = '';
 if ($^O eq 'MSWin32') {
     # Paths need quoting as they may contain spaces.
     $PATHQUOTE = '"';
-    
-    $LD_LOAD_FLAGS =~ s/(-def:)/$1..\\/;
+
     $LIBPARROT = '@build_dir@/parrot@a@';
 }
 
@@ -82,9 +81,6 @@ sub partial_link_cmd {
         $extraLibs =~ s/blib/..\\blib/g;
         $extraLibs =~ s/\Q$(A)\E/.lib/g;
         $liblist .= ' ' . $extraLibs;
-
-		# Get rid of the -def:.
-		$LD_LOAD_FLAGS =~ s/-def:\S+//;
     } else {
         $liblist = join( ' ', map { "-l$_" } keys %$libs );
     }

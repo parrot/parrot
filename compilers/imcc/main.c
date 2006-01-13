@@ -25,12 +25,6 @@
 static int load_pbc, run_pbc, write_pbc, pre_process, pasm_file;
 static char optimizer_opt[20];
 
-#ifdef MSVC
-__declspec(dllimport) FILE *yyin;
-#else
-extern FILE *yyin;
-#endif
-
 static void
 usage(FILE* fp)
 {
@@ -497,7 +491,7 @@ main(int argc, char * argv[])
         IMCC_fatal(interp, 1, "main: No source file specified.\n" );
     }
     else if (!strcmp(sourcefile, "-")) {
-        yyin = stdin;
+        imc_yyin_set(stdin);
     }
     else {
         char *ext;
@@ -507,7 +501,7 @@ main(int argc, char * argv[])
             write_pbc = 0;
         }
         else if (!load_pbc) {
-            if (!(yyin = fopen(sourcefile, "r")))    {
+            if (!(imc_yyin_set(fopen(sourcefile, "r"))))    {
                 IMCC_fatal(interp, E_IOError,
                     "Error reading source file %s.\n",
                         sourcefile);
@@ -554,7 +548,8 @@ main(int argc, char * argv[])
 
     if (IMCC_INFO(interp)->verbose) {
         IMCC_info(interp, 1,"debug = 0x%x\n", IMCC_INFO(interp)->debug);
-        IMCC_info(interp, 1,"Reading %s\n", yyin == stdin ? "stdin":sourcefile);
+        IMCC_info(interp, 1,"Reading %s\n", 
+                  imc_yyin_get() == stdin ? "stdin":sourcefile);
     }
 
     /* If the input file is Parrot bytecode, then we simply read it
@@ -582,7 +577,7 @@ main(int argc, char * argv[])
         IMCC_info(interp, 1, "Starting parse...\n");
 
         if (ast_file) {
-            IMCC_ast_compile(interp, yyin);
+            IMCC_ast_compile(interp, imc_yyin_get());
             imc_compile_all_units_for_ast(interp);
         }
         else {
@@ -593,7 +588,7 @@ main(int argc, char * argv[])
 
         imc_cleanup(interp);
 
-        fclose(yyin);
+        fclose(imc_yyin_get());
 
         IMCC_info(interp, 1, "%ld lines compiled.\n", line);
     }

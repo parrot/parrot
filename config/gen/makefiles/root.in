@@ -203,7 +203,6 @@ GEN_CONFIGS = \
 	$(IMCC_DIR)/CFLAGS \
 	config_lib.pasm \
 	$(SRC_DIR)/nci_test$(O) \
-	libparrot.def \
 	compilers/ast/ast.y.flag \
 	tools/build/dynclasses.pl \
 	tools/build/dynoplibs.pl \
@@ -705,15 +704,12 @@ runtime/parrot/include/config.fpmc : myconfig config_lib.pasm $(MINIPARROT)
 	@echo Invoking Parrot to generate runtime/parrot/include/config.fpmc --cross your fingers
 	$(MINIPARROT) config_lib.pasm > $@
 
-parrot.def : tools/build/parrotdef.pl
-	$(PERL) tools/build/parrotdef.pl
-
 $(PARROT) : $(IMCC_DIR)/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
 	lib/Parrot/OpLib/core.pm $(SRC_DIR)/parrot_config$(O) \
-	$(MINIPARROT) @parrot_exe_def@
+	$(MINIPARROT)
 	$(LINK) @ld_out@$@ $(LINKFLAGS) $(LINK_DYNAMIC) \
 	$(IMCC_DIR)/main$(O) @rpath_blib@ $(ALL_PARROT_LIBS) \
-	$(SRC_DIR)/parrot_config$(O) @ld_parrot_exe_def@
+	$(SRC_DIR)/parrot_config$(O)
 #
 # TODO build the real miniparrot
 #
@@ -781,11 +777,11 @@ $(LIBPARROT_STATIC) : $(O_FILES)
 	$(AR_CR) @ar_out@$@ @ar_extra@ $(O_FILES)
 	$(RANLIB) $@
 
-$(LIBPARROT_SHARED) : $(O_FILES) @parrot_dll_def@
+$(LIBPARROT_SHARED) : $(O_FILES)
 	$(MKDIR) @blib_dir@
 	$(RM_F) $(LIBPARROT_SHARED)
 	$(LD) $(LD_SHARE_FLAGS) $(LDFLAGS) @ld_out@$@ @libparrot_soname@ \
-	$(O_FILES) $(C_LIBS) $(ICU_SHARED) @ld_parrot_dll_def@
+	$(O_FILES) $(C_LIBS) $(ICU_SHARED)
 #CONDITIONED_LINE(libparrot_shared_alias):	( cd @blib_dir@ ; ln -sf @libparrot_shared@ @libparrot_shared_alias@ )
 
 
@@ -1100,8 +1096,6 @@ $(OPS_DIR)/core_ops_switch$(O) : $(GENERAL_H_FILES) $(OPS_DIR)/core_ops_switch.c
 
 $(OPS_DIR)/core_ops_switch.c $(INC_DIR)/oplib/core_ops_switch.h : $(OPS_FILES) $(BUILD_TOOLS_DIR)/ops2c.pl lib/Parrot/OpsFile.pm lib/Parrot/Op.pm $(INC_DIR)/config.h lib/Parrot/OpLib/core.pm lib/Parrot/OpTrans/CSwitch.pm
 	$(PERL) $(BUILD_TOOLS_DIR)/ops2c.pl CSwitch --core
-
-tools/build/parrotdef.pl : $(CLASS_PMC_FILES)
 
 @TEMP_cg_c@
 
