@@ -48,7 +48,7 @@ Load needed libraries
 
 .sub "__onload" @LOAD
 
-  #load_bytecode "Getopt/Long.pbc" 
+  #load_bytecode "Getopt/Obj.pbc" 
   # load_bytecode "PGE.pbc"       
 
 .end
@@ -64,69 +64,79 @@ Looks at the command line arguments and acts accordingly.
   .param pmc argv
 
   # TODO: put this into '__onload'
-  load_bytecode "Getopt/Long.pbc"  # This also loads PGE
+  load_bytecode "Getopt/Obj.pbc"  
   load_bytecode "PGE.pbc"          # Parrot Grammar engine
 
-  .local pmc get_options
-  find_global get_options, "Getopt::Long", "get_options"
-
-  # name of the program
+  # shift name of the program, so that argv contains only options and extra params
   .local string program_name
   program_name = shift argv
 
-  # Specification of known command line arguments.
-  # The args are parsed with library/Getopt/Long.pir which should work 
-  # somewhat like the Perl5 module Getopt::Long.
-  .local pmc opt_spec      
-  opt_spec = new .ResizableStringArray
+  # Specification of command line arguments.
+  .local pmc getopts
+  getopts = new "Getopt::Obj"
+  # getopts."notOptStop"(1)
+
   # --version, boolean
-  push opt_spec, "version"
+  push getopts, "version"
   # --help, boolean
-  push opt_spec, "help"
+  push getopts, "help"
   # -G or --traditional, boolean
-  push opt_spec, "traditional"
+  push getopts, "traditional"
   # -E or --fatal-warnings, boolean
-  push opt_spec, "fatal-warnings"
+  push getopts, "fatal-warnings"
   # -d or --debug, string
-  push opt_spec, "debug=s"
+  push getopts, "debug=s"
   # -l or --arglength, number
-  push opt_spec, "arglength=i"
+  push getopts, "arglength=i"
   # -o or --error-output, string
-  push opt_spec, "error-output=s"
+  push getopts, "error-output=s"
   # -I or --include, string
-  push opt_spec, "include=s"
+  push getopts, "include=s"
   # -e or --interactive, boolean
-  push opt_spec, "interactive"
+  push getopts, "interactive"
   # -s or --synclines, boolean
-  push opt_spec, "synclines"
+  push getopts, "synclines"
   # -P or --prefix-builtins, boolean
-  push opt_spec, "prefix-builtins"
+  push getopts, "prefix-builtins"
   # -W or --word-regexp, string
-  push opt_spec, "word-regexp=s"
+  push getopts, "word-regexp=s"
   # -H or --hash-size, integer
-  push opt_spec, "hash-size=i"
+  push getopts, "hash-size=i"
   # -L or --nesting-limit, integer
-  push opt_spec, "nesting-limit=i"
+  push getopts, "nesting-limit=i"
   # -Q or --quiet or --silent, boolean
-  push opt_spec, "quiet"
-  push opt_spec, "silent"
+  push getopts, "quiet"
+  push getopts, "silent"
   # -N or --diversions, integer
-  push opt_spec, "diversions=i"
+  push getopts, "diversions=i"
   # -D or --define, string
-  push opt_spec, "define=s"
+  push getopts, "define=s"
   # -U or --undefine, string
-  push opt_spec, "undefine=s"
+  push getopts, "undefine=s"
   # -t or --trace, string
-  push opt_spec, "trace=s"
+  push getopts, "trace=s"
   # --freeze-state=m4.frozen, string
-  push opt_spec, "freeze-state=s"
+  push getopts, "freeze-state=s"
   # --reload-state=m4.frozen, string
-  push opt_spec, "reload-state=s"
+  push getopts, "reload-state=s"
 
   # Make a copy of argv, because this can easier be handled in get_options
   # TODO: eliminate need for copy
+  .local pmc argv_pmc_arr
+  argv_pmc_arr = new .ResizablePMCArray
+  .local int k, argc
+  k = 0
+  argc = argv
+  beginfor:
+    unless k < argc goto endfor
+    $P0 = shift argv
+    push argv_pmc_arr, $P0
+    inc k
+    goto beginfor
+  endfor:
+
   .local pmc opt
-  ( opt ) = get_options( argv, opt_spec )
+  opt = getopts."get_options"(argv_pmc_arr)
 
   # Now dow what the options want
   .local int is_defined
@@ -273,10 +283,8 @@ NO_UNIMPLEMENTED_OPTION:
   # TODO: handle reading from STDIN, multiple input files
 
   # check argc, we need at least one input file
-  .local pmc argv
-  argv = clone argv
   .local int argc
-  argc = argv
+  argc = argv_pmc_arr
   if argc >= 1 goto ARGC_IS_OK
     usage( program_name )
     end
@@ -315,9 +323,9 @@ PATH_SEARCH:
   # Name of the input file, usually with extension '.m4'
   .local string filename
 REDO_FILENAME_LOOP:
-  argc = argv
+  argc = argv_pmc_arr
   unless argc > 0 goto LAST_FILENAME_LOOP
-    filename = shift argv
+    filename = shift argv_pmc_arr
     push_file( filename, state )
     goto REDO_FILENAME_LOOP
 LAST_FILENAME_LOOP:

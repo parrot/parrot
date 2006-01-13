@@ -1,30 +1,39 @@
 # Copyright: 2002-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
-.sub main @MAIN 
+.sub main :main
   .param pmc argv
 
-  load_bytecode "Getopt/Long.pbc"
-  .local pmc get_options
-  find_global get_options, "Getopt::Long", "get_options"
+  load_bytecode "Getopt/Obj.pbc"
 
-  # Assemble specification for get_options
-  # in an array of format specifiers
-  .local pmc opt_spec    
-  opt_spec = new ResizableStringArray
-  push opt_spec, "language=s"
+  # Specification of command line arguments.
+  .local pmc getopts
+  getopts = new "Getopt::Obj"
+  push getopts, "language=s"
+  # getopts."notOptStop"(1)
+
 
   # the program name is the first element in argv
   .local string program_name
   program_name = shift argv
 
-  # Make a copy of argv, because this can easier be handled in get_options()
-  # TODO: remove need for cloning
-  .local pmc argv_clone
-  argv_clone = clone argv
+  # Make a copy of argv, because this can easier be handled in get_options
+  # TODO: eliminate need for copy
+  .local pmc argv_pmc_arr
+  argv_pmc_arr = new .ResizablePMCArray
+  .local int k, argc
+  k = 0
+  argc = argv
+  beginfor:
+    unless k < argc goto endfor
+    $P0 = shift argv
+    push argv_pmc_arr, $P0
+    inc k
+    goto beginfor
+  endfor:
 
   .local pmc opt
-  ( opt ) = get_options( argv_clone, opt_spec )
+  opt = getopts."get_options"(argv_pmc_arr)
 
   # Now we do what the passed options tell
   .local int is_defined
