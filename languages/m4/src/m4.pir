@@ -266,8 +266,8 @@ NO_UNIMPLEMENTED_OPTION:
 
   # First we set up a table of all symbols, that is macros 
   .local pmc symtab
-  #symtab = new .Hash
-  symtab = new .OrderedHash
+  symtab = new .Hash
+  # symtab = new .OrderedHash
   state['symtab'] = symtab    
 
   # TODO: read M4PATH with env.pmc 
