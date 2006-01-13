@@ -381,7 +381,8 @@ sub decl() {
     $args = ", $args" if $args =~ /\S/;
     my ($export, $extern, $newl, $semi, $interp, $pmc);
     if ($for_header) {
-        $export = $self->{flags}->{dynpmc} ? 'PARROT_DYNEXT_EXPORT ' : '';
+        $export = $self->{flags}->{dynpmc} ? 'PARROT_DYNEXT_EXPORT ' :
+                                             'PARROT_API ';
         $extern = "extern ";
 	    $newl = " ";
 	    $semi = ";";
@@ -626,14 +627,14 @@ sub body
         }
         else {
             my $sub_meth_decl = $self->decl($classname, $method);
+            my $sub_meth_decl_h = $self->decl($classname, $method, 1);
             $sub_meth_decl =~ /(\w+)\(/;
             my $sub_meth_name = $1;
             my $sub_meth =  $sub_meth_decl;   # no "static ." ...
             $sub_meth =~ s/\(/_$right_type(/;
-            $sub_meth_decl = $sub_meth;
-            $sub_meth_decl =~ s/\n/ /g;
+            $sub_meth_decl_h =~ s/\(/_$right_type(/;
             $self->{hdecls} .= <<EOH;
-$sub_meth_decl;
+$sub_meth_decl_h
 EOH
             $additional_bodies .= $sub_meth;
             $additional_bodies .= "{$body_part\n}";
