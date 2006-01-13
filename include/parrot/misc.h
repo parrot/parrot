@@ -48,26 +48,26 @@ PARROT_API INTVAL Parrot_byte_rindex(Interp *interpreter, const STRING *base,
  * misc.c
  */
 
-STRING *Parrot_vsprintf_s(Interp *, STRING *pat, va_list);
+PARROT_API STRING *Parrot_vsprintf_s(Interp *, STRING *pat, va_list);
 
-STRING *Parrot_vsprintf_c(Interp *, const char *pat, va_list);
+PARROT_API STRING *Parrot_vsprintf_c(Interp *, const char *pat, va_list);
 
-void Parrot_vsprintf(Interp *, char *targ, const char *pat,
+PARROT_API void Parrot_vsprintf(Interp *, char *targ, const char *pat,
                      va_list);
 
-void Parrot_vsnprintf(Interp *, char *targ, size_t len,
+PARROT_API void Parrot_vsnprintf(Interp *, char *targ, size_t len,
                       const char *pat, va_list);
 
-STRING *Parrot_sprintf_s(Interp *, STRING *pat, ...);
+PARROT_API STRING *Parrot_sprintf_s(Interp *, STRING *pat, ...);
 
-STRING *Parrot_sprintf_c(Interp *, const char *pat, ...);
+PARROT_API STRING *Parrot_sprintf_c(Interp *, const char *pat, ...);
 
-void Parrot_sprintf(Interp *, char *targ, const char *pat, ...);
+PARROT_API void Parrot_sprintf(Interp *, char *targ, const char *pat, ...);
 
-void Parrot_snprintf(Interp *, char *targ, size_t len,
+PARROT_API void Parrot_snprintf(Interp *, char *targ, size_t len,
                      const char *pat, ...);
 
-STRING *Parrot_psprintf(Interp *interpreter, STRING *pat,
+PARROT_API STRING *Parrot_psprintf(Interp *interpreter, STRING *pat,
                         PMC * ary);
 
 

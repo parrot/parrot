@@ -487,7 +487,7 @@ void do_prederef(void **pc_prederef, Interp * interpreter, int type);
 
 void clone_interpreter(PMC* dest, PMC* self);
 
-void enter_nci_method(Interp *, int type,
+PARROT_API void enter_nci_method(Interp *, int type,
 		 void *func, const char *name, const char *proto);
 
 

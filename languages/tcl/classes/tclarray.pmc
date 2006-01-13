@@ -65,7 +65,8 @@ Initializes variables needed by the class.
 
     void class_init () {
         if (pass) {
-            dynclass_TclString = Parrot_PMC_typenum(INTERP,"TclString");
+            dynclass_TclString = pmc_type(INTERP,
+                string_from_const_cstring(INTERP, "TclString", 0));
         }
     }
 

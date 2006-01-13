@@ -28,9 +28,12 @@ pmclass TclObject dynpmc group tcl_group {
 
     void class_init() {
         if (pass) {
-            dynclass_TclString = Parrot_PMC_typenum(INTERP,"TclString");
-            dynclass_TclInt    = Parrot_PMC_typenum(INTERP,"TclInt");
-            dynclass_TclFloat  = Parrot_PMC_typenum(INTERP,"TclFloat");
+            dynclass_TclString = pmc_type(INTERP,
+                string_from_const_cstring(INTERP, "TclString", 0));
+            dynclass_TclInt    = pmc_type(INTERP,
+                string_from_const_cstring(INTERP, "TclInt", 0));
+            dynclass_TclFloat  = pmc_type(INTERP,
+                string_from_const_cstring(INTERP, "TclFloat", 0));
         }
     }
 

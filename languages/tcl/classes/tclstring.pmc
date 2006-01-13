@@ -26,7 +26,8 @@ pmclass TclString extends String dynpmc group tcl_group hll Tcl maps String {
             yes   = string_from_const_cstring(INTERP, "yes",3);
             no    = string_from_const_cstring(INTERP, "no",2);
             fixedstringarray_typenum =
-              Parrot_PMC_typenum(INTERP, "FixedStringArray");
+              pmc_type(INTERP,
+                string_from_const_cstring(INTERP, "FixedStringArray", 0));
             string_anchor = pmc_new(INTERP,fixedstringarray_typenum);
             VTABLE_set_integer_native(INTERP,string_anchor,4);
             VTABLE_set_string_keyed_int(INTERP,string_anchor,0,true);

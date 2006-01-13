@@ -41,7 +41,8 @@ Class initialization. Caches the type id of various PMCs.
         PMC *string_anchor;
         INTVAL fixedstringarray_typenum;
         if (pass) {
-            dynclass_TclInt    = Parrot_PMC_typenum(INTERP, "TclInt");
+            dynclass_TclInt    = pmc_type(INTERP,
+                string_from_const_cstring(INTERP, "TclInt", 0));
  
             space = string_from_const_cstring(INTERP, " ", 1);
             ob    = string_from_const_cstring(INTERP, "{", 1);
@@ -49,7 +50,8 @@ Class initialization. Caches the type id of various PMCs.
 
             /* Avoid having these strings GC'd */ 
             fixedstringarray_typenum =
-              Parrot_PMC_typenum(INTERP, "FixedStringArray");
+              pmc_type(INTERP,
+                string_from_const_cstring(INTERP, "FixedStringArray", 0));
             string_anchor = pmc_new(INTERP,fixedstringarray_typenum);
             VTABLE_set_integer_native(INTERP, string_anchor, 3);
             VTABLE_set_string_keyed_int(INTERP,string_anchor,0,space);
@@ -76,8 +78,10 @@ Returns the list as a string
         namespace    = string_from_const_cstring(INTERP, "_Tcl", 4);
         sub          = string_from_const_cstring(INTERP, "__listToString", 14);
         listToString = Parrot_get_global(INTERP, namespace, sub, NULL);
-        value        = Parrot_call_sub(INTERP, listToString, "SP", SELF);
-        
+        CONTEXT(INTERP->ctx)->constants =
+          PMC_sub(listToString)->seg->const_table->constants;
+        value        = Parrot_runops_fromc_arglist
+                         (INTERP, listToString, "SP", SELF);
         return value;
     }
 
