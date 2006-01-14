@@ -76,7 +76,6 @@ D: Numerous improvements and proposals.
 N: Bernhard Schmalhofer
 D: Bugfixes
 D: Parrot m4
-D: Getopt/Long.pir
 D: Parrot bc
 D: Cleanup of examples/assembly 
 
@@ -255,6 +254,9 @@ N: Joshua Hoblitt
 E: jhoblitt@cpan.org
 D: bug wrangling, doc & makefile cleanups, and Pod tests
 D: mucking around with Configure
+
+N: Joshua Isom, a.k.a jisom
+D: Getopt/Obj.pir
 
 N: Josh Wilmes
 
