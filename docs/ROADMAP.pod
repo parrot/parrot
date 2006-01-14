@@ -88,7 +88,7 @@ The intention was to comb through the various sources of things to be done and
 collate them in some fashion. At the time of that writing, none of the tasks
 documented in those directories were documented in a central area.  Something a
 little nicer than grep -r 'XXX', but that would certainly do for a start.
-See also L<docs/BROKEN> --Coke
+See also L<docs/BROKEN.pod> --Coke
 
 =back
 

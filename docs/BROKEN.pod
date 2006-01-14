@@ -126,7 +126,7 @@ F<languages/perl[6]>).
 
 =over 4
 
-=item * Everything in F<DEPRECATED>
+=item * Everything in F<DEPRECATED.pod>
 
 =back
 
