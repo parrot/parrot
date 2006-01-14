@@ -28,14 +28,6 @@
 
 =back
 
-=head1 Perl5
-
-=over
-
-=item Test with Perl 5.005
-
-=back
-
 =head1 Features
 
 The features that need to be implemented are arranged
