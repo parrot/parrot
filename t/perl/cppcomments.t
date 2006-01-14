@@ -1,5 +1,5 @@
 #! perl
-# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2001-2006 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 use strict;
@@ -41,8 +41,6 @@ my @globs = qw(
     src/ops/*.ops
     src/ops/*.c
     src/packfile/*.c
-    src/types/*.c
-    src/types/*.h
 );
 
 my @comments;
@@ -63,5 +61,5 @@ foreach my $glob ( @globs ) {
     }
 }
 
-ok ( !@comments, 'C++ style comments')
+ok( ! scalar(@comments), 'C++ style comments')
 or diag( "C++ style comments found:\n@comments" );

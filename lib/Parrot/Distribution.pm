@@ -102,7 +102,6 @@ sub c_source_file_directories
         $self->directory_with_name('src/io'),
         $self->directory_with_name('src/ops'),
         $self->directory_with_name('src/packfile'),
-        $self->directory_with_name('src/types'),
     ;
 }
 

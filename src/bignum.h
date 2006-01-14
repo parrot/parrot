@@ -4,7 +4,7 @@ $Id$
 
 =head1 NAME
 
-types/bignum.h - Infinite precision bcd for parrot
+src/bignum.h - Infinite precision bcd for parrot
 
 =head1 DESCRIPTION
 

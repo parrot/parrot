@@ -1,4 +1,4 @@
-# Copyright: 2004 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2004-2006 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 =head1 NAME
@@ -39,10 +39,10 @@ sub new
 	return $self->SUPER::new(
 		'Big Number Arithmetic', 'bignum.html', '',
 		$self->new_group('Decimal Arithmetic', '',
-			$self->new_item('', 'src/types/bignum.c', 'src/types/bignum.h'),
+			$self->new_item('', 'src/bignum.c', 'src/bignum.h'),
 		),
 		$self->new_group('Testing', '',
-			$self->new_item('', 'src/types/bignum_atest.pl', 'src/types/bignum_test.pl'),
+			$self->new_item('', 't/pmc/bignum.t' ),
 		),
 	);
 }

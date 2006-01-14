@@ -4,7 +4,7 @@ $Id$
 
 =head1 NAME
 
-types/bignum.c - A decimal arithmetic library for Perl and Parrot
+src/bignum.c - A decimal arithmetic library for Perl and Parrot
 
 =head1 DESCRIPTION
 
