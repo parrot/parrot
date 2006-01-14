@@ -31,7 +31,7 @@ partcl supports two command line options (that are B<not> standard Tcl):
 Analagous to perl's C<-e> switch, this option will let you specify tcl
 code in the command line, which will then be executed. e.g:
 
- $ ../../parrot tcl.pbc -e='puts {Hello World}'
+ $ ../../parrot tcl.pbc -e 'puts {Hello World}'
  Hello World
 
 You will need to properly quote the tcl to protect it from your shell, and
