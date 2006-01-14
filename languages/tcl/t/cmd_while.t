@@ -2,9 +2,26 @@
 
 use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 2;
+use Parrot::Test tests => 5;
 use Test::More;
 
+language_output_is("tcl",<<'TCL',<<OUT,"while no args");
+ while
+TCL
+wrong # args: should be "while test command"
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"while one args");
+ while we
+TCL
+wrong # args: should be "while test command"
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"while too many args");
+ while we wait outside
+TCL
+wrong # args: should be "while test command"
+OUT
 language_output_is("tcl",<<'TCL',<<OUT,"simple while");
  set a 3
  while {$a} {
