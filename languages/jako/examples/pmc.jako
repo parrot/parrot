@@ -1,8 +1,10 @@
+# $Id$
+
 use sys;
 
 var pmc foo, bar;
-bar = new PerlUndef;
-foo = new PerlString;
+bar = new Undef;
+foo = new String;
 foo = "Hello, world!\n";
 sys::print(foo);
 

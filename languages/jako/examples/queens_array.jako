@@ -3,7 +3,7 @@
 #
 # A program to find solutions to the 8-queens problem.
 #
-# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2001-2006 The Perl Foundation.  All Rights Reserved.
 # This program is free software. It is subject to the same
 # license as the Parrot interpreter.
 #
@@ -18,7 +18,7 @@ const int NUM_FILES     = 8;
 const int NUM_RANKS     = 8;
 
 var pmc board;
-board = new PerlArray;
+board = new Array;
 
 
 #
