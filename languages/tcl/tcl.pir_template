@@ -88,7 +88,7 @@ providing a compreg-compatible method.
 .sub __prepare_lib :load :anon
 
   # Load any dependant libraries.
-  load_bytecode "Getopt/Long.pir"
+  load_bytecode "Getopt/Obj.pir"
 
   #_load_grammar()
 

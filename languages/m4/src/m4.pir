@@ -120,23 +120,8 @@ Looks at the command line arguments and acts accordingly.
   # --reload-state=m4.frozen, string
   push getopts, "reload-state=s"
 
-  # Make a copy of argv, because this can easier be handled in get_options
-  # TODO: eliminate need for copy
-  .local pmc argv_pmc_arr
-  argv_pmc_arr = new .ResizablePMCArray
-  .local int k, argc
-  k = 0
-  argc = argv
-  beginfor:
-    unless k < argc goto endfor
-    $P0 = shift argv
-    push argv_pmc_arr, $P0
-    inc k
-    goto beginfor
-  endfor:
-
   .local pmc opt
-  opt = getopts."get_options"(argv_pmc_arr)
+  opt = getopts."get_options"(argv)
 
   # Now dow what the options want
   .local int is_defined
@@ -284,7 +269,7 @@ NO_UNIMPLEMENTED_OPTION:
 
   # check argc, we need at least one input file
   .local int argc
-  argc = argv_pmc_arr
+  argc = argv
   if argc >= 1 goto ARGC_IS_OK
     usage( program_name )
     end
@@ -323,9 +308,9 @@ PATH_SEARCH:
   # Name of the input file, usually with extension '.m4'
   .local string filename
 REDO_FILENAME_LOOP:
-  argc = argv_pmc_arr
+  argc = argv
   unless argc > 0 goto LAST_FILENAME_LOOP
-    filename = shift argv_pmc_arr
+    filename = shift argv
     push_file( filename, state )
     goto REDO_FILENAME_LOOP
 LAST_FILENAME_LOOP:

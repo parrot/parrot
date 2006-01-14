@@ -119,18 +119,13 @@ open_file:
   tcl_interactive = 0
  
   .local pmc get_options
-  get_options = find_global "Getopt::Long", "get_options"
-  
-  .local pmc opt_spec
-  opt_spec = new .Array
-  opt_spec = 2
-  opt_spec[0] = "pir"
-  opt_spec[1] = "e=s"
+  get_options = new "Getopt::Obj"
+  push get_options, 'pir'
+  push get_options, 'e=s'
 
-  .local pmc opt, argv_clone
-  $P1 = shift argv # drop program name.
-  argv_clone = clone argv
-  opt = get_options(argv_clone, opt_spec)
+  .local pmc opt
+  $S1 = shift argv # drop program name.
+  opt = get_options."get_options"(argv)
 
   .local int dump_only, execute
   dump_only = defined opt["pir"]
@@ -141,7 +136,7 @@ open_file:
   .local pmc handle
   .local string chunk,contents
 file:
-  filename = shift argv_clone
+  filename = shift argv
   $S1="<"
   handle = open filename, $S1
   $I0 = typeof handle

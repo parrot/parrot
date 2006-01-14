@@ -117,8 +117,6 @@ wanted.
 
 .sub get_options :method
     .param pmc argv
-    # This is necessary to get access to some vtable methods
-    makeResizable(argv)
     .local pmc return, spec
     .local int i, j, argc
     .local string name, long, short, arg, key, val
@@ -280,8 +278,8 @@ optelse:
 array:
     $P0 = return[name]
     $I0 = typeof $P0
-    unless $I0 != .ResizablePMCArray goto endif_5
-    $P0 = new .ResizablePMCArray
+    unless $I0 != .ResizableStringArray goto endif_5
+    $P0 = new .ResizableStringArray
 endif_5:
     push $P0, val
     goto endifelse
@@ -345,30 +343,6 @@ endif_6:
 finish:
     clear_eh
     .return(return)
-.end
-
-=item C<makeResizable(PMC argv)>
-
-Converts the given array into a ResizablePMCArray...  Morph won't morph it
-and some of the things we do to it need certain vtable methods available.
-
-=cut
-
-.sub makeResizable
-    .param pmc argv
-    .local pmc argnew
-    .local int k, argc
-    argnew = new .ResizablePMCArray
-    k = 0
-    argc = argv
-beginfor:
-    unless k < argc goto endfor
-    $S0 = shift argv
-    push argnew, $S0
-    inc k
-    goto beginfor
-endfor:
-    assign argv, argnew
 .end
 
 =item C<__push_string(STRING format)>
