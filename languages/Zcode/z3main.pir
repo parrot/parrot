@@ -220,7 +220,7 @@ vers_ok:
   setattribute self, "ZComp\0labels", $P0
   $P0 = new Hash
   setattribute self, "ZComp\0subs", $P0
-  $P0 = new PerlArray
+  $P0 = new ResizablePMCArray
   setattribute self, "ZComp\0todo_subs", $P0
   .local pmc ops
   ops = self."set_oplist"()
