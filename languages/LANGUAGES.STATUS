@@ -29,7 +29,8 @@ Incomplete - but all examples and test cases are working.
 
 =item Location
 
-http://xamber.org/
+http://xamber.org/.
+The Amber PMCs are in C<languages/amber>.
 
 =back
 
@@ -813,7 +814,7 @@ Part of languages smoke testing.
 
 =item Last verified with parrot version
 
-0.4.0
+0.4.1
 
 =item Location
 
