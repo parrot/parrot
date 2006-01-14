@@ -192,10 +192,10 @@ sub _morph {
     if ($from =~ /P/) {
       $self->_add_inst ('', 'clone',[$to,$from]);
     } elsif ($from =~ /I/) {
-      $self->_add_inst ('', 'new',[$to,'.PerlInt']);
+      $self->_add_inst ('', 'new',[$to,'.Integer']);
       $self->_add_inst ('', 'set',[$to,$from]);
     } elsif ($from =~ /N/) {
-      $self->_add_inst ('', 'new',[$to,'.PerlNum']);
+      $self->_add_inst ('', 'new',[$to,'.Float']);
       $self->_add_inst ('', 'set',[$to,$from]);
     }
   }
@@ -209,22 +209,22 @@ sub __quoted {
   if (exists $node->{value}) {
     my $value = $node->{value};
     if ($value =~ /^[-+]?\d+$/) {
-      $self->_add_inst ('', 'new',[$return,'.PerlInt']);
+      $self->_add_inst ('', 'new',[$return,'.Integer']);
       $self->_add_inst ('', 'set',[$return,$value]);
     }
     elsif ($value =~ /^[-+]?((\d+\.\d*)|(\.d+))([eE][-+]?\d+)?$/) {
-      $self->_add_inst ('', 'new',[$return,'.PerlNum']);
+      $self->_add_inst ('', 'new',[$return,'.Float']);
       $self->_add_inst ('', 'set',[$return,$value]);
     }
     else { # assume its a symbol
-      $self->_add_inst ('', 'new',[$return,'.PerlString']);
+      $self->_add_inst ('', 'new',[$return,'.String']);
       $self->_add_inst ('', 'set',[$return,"\"$value\""]);
     }
   }
   elsif (exists $node->{children}) {
     my $children = $node->{children};
  
-    $self->_add_inst ('', 'new', [$return,'.PerlUndef']);
+    $self->_add_inst ('', 'new', [$return,'.Undef']);
     for (reverse @$children) {
       if (exists $_->{children}) {
         my $arg0 = _get_arg($_, 0);
@@ -314,7 +314,7 @@ sub _qq_unquote_splicing {
 
   # check for empty list
   $self->_add_inst('', 'typeof', [$type, $list]);
-  $self->_add_inst('', 'eq', [$type,'.PerlUndef',"DONE_$label"]);
+  $self->_add_inst('', 'eq', [$type,'.Undef',"DONE_$label"]);
 
   my $copy = $self->_new_pair;
 
@@ -328,7 +328,7 @@ sub _qq_unquote_splicing {
 
   $self->_add_inst('', 'set', [$list,$list.'[1]']);
   $self->_add_inst('', 'typeof', [$type,$list]);
-  $self->_add_inst('', 'eq', [$type,'.PerlUndef',"FINISH_$label"]);
+  $self->_add_inst('', 'eq', [$type,'.Undef',"FINISH_$label"]);
 
   $temp = $self->_new_pair;
   $self->_add_inst('', 'set', [$copy.'[1]',$temp]);
@@ -724,7 +724,7 @@ sub _op_null_p {
 
   my $temp = $self->_generate(_get_arg($node,1));
   $self->_add_inst ('', 'typeof',[$return,$temp]);
-  $self->_add_inst ('', 'ne', [$return,'.PerlUndef',"FAIL_$label"]);
+  $self->_add_inst ('', 'ne', [$return,'.Undef',"FAIL_$label"]);
   $self->_add_inst ('', 'set', [$return,1]);
   $self->_add_inst ('', 'branch', ["DONE_$label"]);
   $self->_add_inst ("FAIL_$label", 'set', [$return,0]);
@@ -742,7 +742,7 @@ sub _op_list {
   my $label = $self->_gensym ();
   my $return = $self->_save_1 ('P');
 
-  $self->_add_inst ('', 'new',[$return,'.PerlUndef']);
+  $self->_add_inst ('', 'new',[$return,'.Undef']);
 
   my @reverse = reverse _get_args($node);
 
@@ -774,7 +774,7 @@ sub _op_length {
   $self->_add_inst ('', 'set',[$return,'0']);
   my $type = $self->_save_1 ('I');
   $self->_add_inst ("NEXT_$label", 'typeof',[$type,$list]);
-  $self->_add_inst ('', 'eq',[$type,'.PerlUndef', "DONE_$label"]);
+  $self->_add_inst ('', 'eq',[$type,'.Undef', "DONE_$label"]);
   $self->_add_inst ('', 'ne',[$type,'.Array', "ERR_$label"]);
   $self->_add_inst ('', 'inc',[$return]);
   $self->_add_inst ('', 'set',[$list,$list.'[1]']);
