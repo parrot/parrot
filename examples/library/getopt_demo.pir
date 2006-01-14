@@ -1,9 +1,9 @@
-# Copyright (C) 2004-2005 The Perl Foundation.  All rights reserved.
+# Copyright (C) 2004-2006 The Perl Foundation.  All rights reserved.
 # $Id$
 
 =head1 NAME
 
-examples/library/getopt_demo.pir - demonstrating library/Getopt/Long.pir
+examples/library/getopt_demo.pir - demonstrating library/Getopt/Obj.pir
 
 =head1 SYNOPSIS
 
@@ -14,7 +14,7 @@ examples/library/getopt_demo.pir - demonstrating library/Getopt/Long.pir
 =head1 DESCRIPTION
 
 This demo program shows how to handle command line arguments with the
-PIR library F<runtime/parrot/library/Getopt/Long.pir>.
+PIR library F<runtime/parrot/library/Getopt/Obj.pir>.
 
 =cut
 
@@ -26,34 +26,33 @@ This is executed when you call F<getopt_demo.pir>.
 
 =cut
 
-.sub main @MAIN 
+.sub main :main
   .param pmc argv
 
-  load_bytecode "Getopt/Long.pbc"
-  .local pmc get_options
-  find_global get_options, "Getopt::Long", "get_options"
+  load_bytecode "Getopt/Obj.pbc"
 
-  # Assemble specification for get_options
-  # in an array of format specifiers
-  .local pmc opt_spec    
-  opt_spec = new ResizableStringArray 
-  # --version, boolean
-  push opt_spec, "version"
-  # --help, boolean
-  push opt_spec, "help"
-  # --bool, boolean
-  push opt_spec, "bool"
-  # --string, string
-  push opt_spec, "string=s"
-  # --integer, integer
-  push opt_spec, "integer=i"
-
-  # the program name is the first element in argv
+  # shift name of the program, so that argv contains only options and extra params
   .local string program_name
   program_name = shift argv
 
+  # Specification of command line arguments.
+  .local pmc getopts
+  getopts = new "Getopt::Obj"
+  # getopts."notOptStop"(1)
+
+  # --version, boolean
+  push getopts, "version"
+  # --help, boolean
+  push getopts, "help"
+  # --bool, boolean
+  push getopts, "bool"
+  # --string, string
+  push getopts, "string=s"
+  # --integer, integer
+  push getopts, "integer=i"
+
   .local pmc opt
-  ( opt ) = get_options( argv, opt_spec )
+  opt = getopts."get_options"(argv)
 
   # Now we do what the passed options tell
   .local int is_defined
@@ -161,6 +160,6 @@ Bernhard Schmalhofer - C<Bernhard.Schmalhofer@gmx.de>
 
 =head1 SEE ALSO
 
-F<runtime/parrot/library/Getopt/Long.pir>
+F<runtime/parrot/library/Getopt/Obj.pir>
 
 =cut
