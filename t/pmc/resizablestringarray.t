@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 27;
+use Parrot::Test tests => 28;
 
 =head1 NAME
 
@@ -543,6 +543,47 @@ b[1]
 a[0]
 d[63]
 [63]
+OUTPUT
+
+pir_output_is(<< 'CODE', << 'OUTPUT', "shift pmc");
+.sub test :main
+       .local string s, s_elem
+       .local pmc pmc_arr, p_elem
+       .local int elements
+
+       pmc_arr= new .ResizableStringArray
+	   push pmc_arr, 'a'
+	   push pmc_arr, 'b'
+
+       print_num_elements( pmc_arr )
+
+	   p_elem = shift pmc_arr
+	   print p_elem
+       print_num_elements( pmc_arr )
+
+       p_elem = shift pmc_arr
+       print p_elem
+       print_num_elements( pmc_arr )
+
+       print_num_elements( pmc_arr )
+
+.end
+
+.sub print_num_elements
+       .param pmc pmc_arr
+       .local int elements
+       elements = pmc_arr
+       print '['
+       print elements
+       print "]\n"
+       .return()
+.end
+
+CODE
+[2]
+a[1]
+b[0]
+[0]
 OUTPUT
 
 

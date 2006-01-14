@@ -205,6 +205,33 @@ Removes and returns an item from the start of the array.
 
 /*
 
+=item C<PMC* shift_pmc()>
+        
+Removes and returns a String PMC from the start of the array.
+
+=cut    
+                
+*/  
+
+    PMC* shift_pmc () {
+        INTVAL size;
+        PMC *ret;
+        STRING* value;
+
+        size = PMC_int_val(SELF);
+        if (size == 0)
+            internal_exception(OUT_OF_BOUNDS,
+                    "ResizableStringArray: Can't shift from an empty array!");
+
+        value = DYNSELF.get_string_keyed_int(0);
+        ret = pmc_new(INTERP, enum_class_String);
+        VTABLE_set_string_native(INTERP, ret, value);
+        DYNSELF.delete_keyed_int(0);
+        return ret;
+    } 
+
+/*
+
 =item C<void unshift_string(STRING *value)>
 
 Extends the array by adding an element of value C<*value> to the start
@@ -271,6 +298,7 @@ Removes the element at C<*key>.
         DYNSELF.set_integer_native(size - 1);
     }
 }
+
 
 
 /*
