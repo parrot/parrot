@@ -2,8 +2,40 @@
 
 use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 2;
+use Parrot::Test tests => 7;
 use Test::More;
+
+language_output_is("tcl",<<'TCL',<<OUT,"for no args");
+ for
+TCL
+wrong # args: should be "for start test next command"
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"for 1 arg");
+ for pete's
+TCL
+wrong # args: should be "for start test next command"
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"for 2 arg");
+ for pete's sake
+TCL
+wrong # args: should be "for start test next command"
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"for 3 arg");
+ for pete's sake don't
+TCL
+wrong # args: should be "for start test next command"
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"for too many args");
+ for pete's sake don't do that.
+TCL
+wrong # args: should be "for start test next command"
+OUT
+
+
 
 language_output_is("tcl",<<'TCL',<<OUT,"simple for");
  for {set a 0} {$a < 5} {incr a} {
