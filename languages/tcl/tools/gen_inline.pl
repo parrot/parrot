@@ -20,10 +20,10 @@ actual compiler for that command.
 Many builtins need to use the same type of code, and do the same kind
 of optimizations. By making the inline'd versions more declarative, this
 lets us do this work B<once> instead of many times, which B<should> make it
-easier to inline more builtins accurately.j
+easier to inline more builtins accurately.
 
-Currently support options with no arguments, and the following types of
-arguments: variable name, integer, channel, list, and string.
+Currently supports the following types of arguments: 
+variable name, integer, channel, list, string, script, and expressions.
 
 =cut
 
@@ -136,6 +136,8 @@ END_PIR
 add_wrapped(<<END_PIR);
   .local pmc __script_compile
   __script_compile = find_global '_Tcl', 'compile'
+  .local pmc __expression_compile
+  __expression_compile = find_global '_Tcl', '__expression_compile'
 END_PIR
 
 # Now, grab each arg off the list and compile it, handling defaults, etc.
@@ -161,6 +163,15 @@ foreach my $arg (@args_opts) {
   #    bounded between the value you pass in and the value you return. Using
   #    something outside that range is bad, mmkay? -coke
   register_num = $arg_register + 100 
+END_PIR
+            },
+        },
+        expr => {
+            pre => sub {
+                add_wrapped(<<END_PIR);
+  .local string ${arg_register}_code
+  ($arg_register,${arg_register}_code) = __expression_compile(register_num, $argument)
+  register_num = $arg_register + 100
 END_PIR
             },
         },
@@ -396,7 +407,7 @@ sub parse_usage {
       (\w+)     # name
       (?:
         :       # literal :
-        (int | string | var | list | channel | script)
+        (int | string | var | list | channel | script | expr)
       )?
       (?:
         =

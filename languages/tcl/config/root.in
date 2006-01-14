@@ -26,7 +26,8 @@ GENERATED_INLINES = \
  $(BUILTIN)@slash@join.pir \
  $(BUILTIN)@slash@llength.pir \
  $(BUILTIN)@slash@pwd.pir \
- $(BUILTIN)@slash@time.pir
+ $(BUILTIN)@slash@time.pir \
+ $(BUILTIN)@slash@while.pir
 
 DEPS = \
 lib@slash@commands@slash@after.pir \
@@ -88,7 +89,6 @@ lib@slash@commands@slash@unset.pir \
 lib@slash@commands@slash@uplevel.pir \
 lib@slash@commands@slash@upvar.pir \
 lib@slash@builtins@slash@variable.pir \
-lib@slash@builtins@slash@while.pir \
 lib@slash@compiler.pir \
 lib@slash@conversions.pir \
 lib@slash@expression.pir \

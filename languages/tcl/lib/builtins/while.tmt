@@ -1,0 +1,16 @@
+{
+  command => 'while',
+  usage=> "test:expr command:script",
+  code => <<'END_PIR'
+
+while_loop_{register_command}:
+{register_test_code}
+$I{register_test} = $P{register_test}
+unless $I{register_test} goto while_loop_done_{register_command}
+{register_command_code}
+goto while_loop_{register_command}
+
+while_loop_done_{register_command}:
+
+END_PIR
+}
