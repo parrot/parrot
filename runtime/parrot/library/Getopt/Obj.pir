@@ -363,8 +363,8 @@ and some of the things we do to it need certain vtable methods available.
     argc = argv
 beginfor:
     unless k < argc goto endfor
-    $P0 = shift argv
-    push argnew, $P0
+    $S0 = shift argv
+    push argnew, $S0
     inc k
     goto beginfor
 endfor:
