@@ -34,9 +34,7 @@ code in the command line, which will then be executed. e.g:
  $ ../../parrot tcl.pbc -e 'puts {Hello World}'
  Hello World
 
-You will need to properly quote the tcl to protect it from your shell, and
-you must specify the C<=>.  (Because parrot's getopt implementation requires
-it.)
+You will need to properly quote the tcl to protect it from your shell.
 
 =item --pir
 
