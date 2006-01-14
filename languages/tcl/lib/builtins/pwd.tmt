@@ -1,7 +1,7 @@
-{
-  command => 'pwd',
-  code => <<'END_PIR',
+command => 'pwd',
+code => <<'END_PIR'
+
 $P{register_num} = new .OS
 $P{register_num} = $P{register_num}.'cwd'()
+
 END_PIR
-}

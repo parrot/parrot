@@ -1,11 +1,9 @@
-{
-  command => 'join',
-  usage => "list:list ?joinString= ?",
-  code => <<'END_PIR',
+command => 'join',
+usage => "list:list ?joinString= ?",
+code => <<'END_PIR'
 
 $S{register_joinString} = $P{register_joinString}
 $S{register_num} = join $S{register_joinString}, $P{register_list}
 $P{register_num} = new .TclString
 $P{register_num} = $S{register_num}
 END_PIR
-}

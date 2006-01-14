@@ -76,7 +76,7 @@ eventually be compiled (C<INLINED>).
 $contents = <$handle>;
 
 my $code = "\$template = $contents";
-eval "\$template = $contents";    # ewww...
+eval "\$template = { $contents }";    # ewww...
 die "error processing $file: $@" if ($@);
 
 add_wrapped(<<END_PIR);

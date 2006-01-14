@@ -1,7 +1,7 @@
-{
-  command => 'time',
-  usage=> "script:script ?count:int=1?",
-  code => <<'END_PIR',
+command => 'time',
+usage=> "script:script ?count:int=1?",
+code => <<'END_PIR'
+
 $I0 = $P{register_count}
 time_loop_{register_num}:
 if $I0 == 0 goto time_{register_num}_done
@@ -19,5 +19,5 @@ $S{register_num}  = $N{register_num}
 $S{register_num} .= ' microseconds per iteration'
 $P{register_num} = new .TclString
 $P{register_num} = $S{register_num}
+
 END_PIR
-}

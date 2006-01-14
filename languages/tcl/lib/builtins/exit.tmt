@@ -1,8 +1,8 @@
-{
-  command => 'exit',
-  usage => "?returnCode:int=0?",
-  code => <<'END_PIR',
+command => 'exit',
+usage => "?returnCode:int=0?",
+code => <<'END_PIR'
+
 $I{register_returnCode} = $P{register_returnCode}
 exit $I{register_returnCode}
+
 END_PIR
-}

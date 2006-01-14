@@ -1,8 +1,7 @@
-{
-  command => 'incr',
-  usage=> "varName:var ?increment:int=1?",
-  code => <<'END_PIR',
+command => 'incr',
+usage=> "varName:var ?increment:int=1?",
+code => <<'END_PIR'
+
 $P{register_num} = $P{register_varName} + $P{register_increment}
 __set($P{register_varName_varname},$P{register_num})
 END_PIR
-}

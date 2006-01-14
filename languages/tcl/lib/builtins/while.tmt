@@ -1,16 +1,23 @@
-{
-  command => 'while',
-  usage=> "test:expr command:script",
-  code => <<'END_PIR'
+command => 'while',
+usage => "test:expr command:script",
+code => <<'END_PIR'
 
 while_loop_{register_command}:
 {register_test_code}
 $I{register_test} = $P{register_test}
 unless $I{register_test} goto while_loop_done_{register_command}
-{register_command_code}
+push_eh while_loop_exception_{register_command}
+  {register_command_code}
+clear_eh
 goto while_loop_{register_command}
+
+while_loop_exception_{register_command}:
+  .catch()
+  .get_return_code($I{register_test})
+  if $I{register_test} == TCL_CONTINUE goto while_loop_{register_command}
+  if $I{register_test} == TCL_BREAK    goto while_loop_done_{register_command}
+  .rethrow()
 
 while_loop_done_{register_command}:
 
 END_PIR
-}
