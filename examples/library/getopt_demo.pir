@@ -51,8 +51,23 @@ This is executed when you call F<getopt_demo.pir>.
   # --integer, integer
   push getopts, "integer=i"
 
+  # Make a copy of argv, because this can easier be handled in get_options
+  # TODO: eliminate need for copy
+  .local pmc argv_pmc_arr
+  argv_pmc_arr = new .ResizablePMCArray
+  .local int k, argc
+  k = 0
+  argc = argv
+  beginfor:
+    unless k < argc goto endfor
+    $P0 = shift argv
+    push argv_pmc_arr, $P0
+    inc k
+    goto beginfor
+  endfor:
+
   .local pmc opt
-  opt = getopts."get_options"(argv)
+  opt = getopts."get_options"(argv_pmc_arr)
 
   # Now we do what the passed options tell
   .local int is_defined
@@ -114,10 +129,10 @@ This is executed when you call F<getopt_demo.pir>.
   .local int    cnt_other_args
   cnt_other_args = 0
   .local int num_other_args
-  num_other_args = argv
+  num_other_args = argv_pmc_arr
   goto CHECK_OTHER_ARG_LOOP
   REDO_OTHER_ARG_LOOP:
-    other_arg = argv[cnt_other_args]
+    other_arg = argv_pmc_arr[cnt_other_args]
     print "You have passed the additional argument: '"
     print other_arg
     print "'.\n"
