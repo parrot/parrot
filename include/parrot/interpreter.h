@@ -169,7 +169,7 @@ typedef union {
 
 typedef struct Parrot_Context {
     /* common header with Interp_Context */
-    struct Parrot_Context *prev;
+    struct Parrot_Context *unused1;	/* placeholder */
     Regs_ni                bp;          /* pointers to FLOATVAL & INTVAL */
     Regs_ps                bp_ps;       /* pointers to PMC & STR */
     /* end common header */

@@ -2823,7 +2823,7 @@ PDB_backtrace(Interp *interpreter)
         /* get the next Continuation */
         ctx = PMC_cont(sub)->to_ctx;
         old = sub;
-        if (!ctx || !ctx->prev)
+        if (!ctx)
             break;
     }
     if (rec_level != 0) {

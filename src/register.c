@@ -416,7 +416,6 @@ Parrot_dup_context(Interp *interpreter, struct Parrot_Context *old)
     }
     CONTEXT(interpreter->ctx) = ctx = ptr;
     ctx->regs_mem_size = reg_alloc;
-    ctx->prev = old;
     ctx->n_regs_used = old->n_regs_used;
     diff = (long*)ctx - (long*)old;
     interpreter->ctx.bp.regs_i += diff;
@@ -471,7 +470,6 @@ Parrot_alloc_context(Interp *interpreter, INTVAL *n_regs_used)
     fprintf(stderr, "alloc %p\n", ptr);
 #endif
     CONTEXT(interpreter->ctx) = ctx = ptr;
-    ctx->prev = old;
     ctx->regs_mem_size = reg_alloc;
     ctx->n_regs_used = n_regs_used;
     /* regs start past the context */
