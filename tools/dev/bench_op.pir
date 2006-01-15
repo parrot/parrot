@@ -27,12 +27,10 @@ The given opcode(s) are compiled into a sequence:
     #
     inc i
     lt i, N, loop
-    invoke P1
   .end
 
-so they should conform to PCC, specifically they should not destroy the return
-continuation and not use registers in the lower frames. The code gets executed
-with the PIR compiler - using symbolic variables is always ok.
+so they should conform to Parrot Calling Conventions.
+The code gets executed with the PIR compiler - using symbolic variables is always ok.
 
 Output is the time in seconds for 1.000.000 instruction(s).
 
@@ -45,8 +43,9 @@ Output is the time in seconds for 1.000.000 instruction(s).
 Run the given opcode(s) in a loop I<N> time.
 If no I<--times> options is given 100.000 is used.
 
-=item I<--verbose[=2]>
+=item I<--verbose=i>
 
+Set I<--verbose> to 1 to see the total time.
 Set I<--verbose> to 2 to see the compiled programs.
 
 =item I<--preops='opcode(s)'>
@@ -56,24 +55,22 @@ that have side effects like B<newclass>.
 
 =item I<--help>
 
-Print a short description
+Print a short description and exit.
 
 =item I<--version>
 
-Print program version.
+Print program version and exit.
 
 =back
 
 =cut
 
-.const string VERSION = "0.1.0"
+.const string VERSION = "0.1.1"
 
 .sub main :main
     .param pmc argv
 
-    load_bytecode "Getopt/Long.pbc"
-    .local pmc get_options
-    find_global get_options, "Getopt::Long", "get_options"
+    load_bytecode "Getopt/Obj.pbc"
 
     .local int times
     times = 100000
@@ -81,22 +78,26 @@ Print program version.
     .local int verbose
     verbose = 0
 
-    .local pmc opt_spec
-    opt_spec = new PerlArray
-    push opt_spec, "version=i"
-    push opt_spec, "verbose"
-    push opt_spec, "help"
-    push opt_spec, "times=i"
-    push opt_spec, "preops=s"
+    # Specification of command line arguments.
+    .local pmc getopts
+    getopts = new "Getopt::Obj"
+    # getopts."notOptStop"(1)
+    push getopts, "version"
+    push getopts, "verbose=i"
+    push getopts, "help"
+    push getopts, "times=i"
+    push getopts, "preops=s"
 
     .local string program
     shift program, argv
+
+    .local pmc opt
+    opt = getopts."get_options"(argv)
+
     .local int argc
     argc = argv
     unless argc goto do_help
-    .local pmc opt
-    opt = new PerlUndef
-    opt = get_options( argv, opt_spec )
+
     .local int def
     def = defined opt
     unless def goto do_help
@@ -129,7 +130,7 @@ do_def:
 
 do_help:
     print program
-    print " [--help] [--version] [--verbose[=2]] [--times=N] \\ \n"
+    print " [--help] [--version] [--verbose=i]] [--times=N] \\ \n"
     print "\t[--preops='op(s)'] file | opcode\n"
     print "\nRun opcode on commandline or from file <N> times.\n"
     print "s. perldoc -F "
@@ -183,7 +184,7 @@ no_v2:
 no_v3:
     test = diff * 1.0E6
     test = test / times
-    print "Time for 1M ins: "
+    print "Time for 1 million instructions: "
     print test
     print "\n"
 .end
@@ -212,7 +213,9 @@ no_v3:
     prog = prog . ops
     prog = prog . "\ninc i\nlt i, N, loop\n.end\n"
     if verbose < 2 goto no_v2
+	print "\n#---------\n"
 	print prog
+	print "#---------\n"
 no_v2:
     compiled = compiler(prog)
     .local float now
@@ -223,6 +226,7 @@ no_v2:
     .local float later
     time later
     later = later - now
+
     .return(later)
 .end
 
