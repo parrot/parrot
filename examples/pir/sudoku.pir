@@ -94,7 +94,7 @@ which take different types and amounts of arguments.
 
 =item Libraries
 
-The program uses Getopt/Long and the ncurses library.
+The program uses Getopt/Obj and the ncurses library.
 
 =item Exception handling
 
@@ -267,20 +267,25 @@ err:
 .sub parse_options
     .param pmc argv
 
+    load_bytecode "Getopt/Obj.pbc"
+
     .local string prog
     prog = shift argv
-    load_bytecode "Getopt/Long.pbc"
-    .local pmc get_options, opt_spec, opt
-    find_global get_options, "Getopt::Long", "get_options"
-    opt_spec = new ResizableStringArray
+
+    # Specification of command line arguments.
     # --version, --debug, --inv=nnn, --builtin=name, --nc, --help
-    push opt_spec, "version"
-    push opt_spec, "debug"
-    push opt_spec, "inv=s"
-    push opt_spec, "builtin=s"
-    push opt_spec, "nc"
-    push opt_spec, "help"
-    opt = get_options(argv, opt_spec)
+    .local pmc getopts
+    getopts = new "Getopt::Obj"
+    push getopts, "version"
+    push getopts, "debug"
+    push getopts, "inv=s"
+    push getopts, "builtin=s"
+    push getopts, "nc"
+    push getopts, "help"
+
+    .local pmc opt
+    opt = getopts."get_options"(argv)
+
     $I0 = defined opt['version']
     unless $I0 goto n_ver
 	print prog
