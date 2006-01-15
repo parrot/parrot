@@ -1,5 +1,10 @@
 # $Id$
 
+2006.01.15    leo
+
+        * find_global and friends returns a .Null PMC instead of .Undef on
+	  lookup failure, iff lookup exceptions are off
+
 2006.01.08    leo
 	* Released 0.4.1
 
