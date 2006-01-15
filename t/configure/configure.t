@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 use lib qw( . lib ../lib ../../lib );
-use Test::More tests => 12;
+use Test::More tests => 22;
 
 =head1 NAME
 
@@ -94,6 +94,34 @@ can_ok('Parrot::Configure', qw(
         "->steps() returns the proper list");
 }
 
+# ->steps() / ->add_step()
+
+SKIP: {
+    skip "->add_step() is unimplimented", 3;
+
+{
+    my $pc = Parrot::Configure->new;
+    
+    isa_ok($pc->add_step(), 'Parrot::Configure');
+}
+
+{
+    my $pc = Parrot::Configure->new;
+    
+    $pc->add_step('foo::step');
+    is_deeply(scalar $pc->steps, [qw(foo::step)],
+        "->steps() returns the proper list after ->add_step() w/o args");
+}
+
+{
+    my $pc = Parrot::Configure->new;
+    
+    $pc->add_step('foo::step', qw(bar baz));
+    is_deeply(scalar $pc->steps, [qw(foo::step)],
+        "->steps() returns the proper list after ->add_step() with args");
+}
+}
+
 # ->runsteps()
 
 {
@@ -127,5 +155,69 @@ can_ok('Parrot::Configure', qw(
     # failed.
     print "\n";
     is($test::step::ran, 1, "test step was invokved");
+}
+
+{
+    package test::step::params;
+
+    # XXX is there a better way of doing this?
+    $INC{'test/step/params.pm'}++;
+
+    use vars qw($self $conf @params);
+    use base qw(Parrot::Configure::Step::Base);
+
+    sub runstep
+    {
+        ($self, $conf, @params) = @_;
+    }
+
+    package main;
+
+    my $pc = Parrot::Configure->new;
+
+    $pc->add_steps('test::step::params');
+    $pc->runsteps;
+    # otherwise runsteps() output will make Test::Harness think this test
+    # failed.
+    print "\n";
+    is($test::step::params::self, 'test::step::params',
+        "->runstep() is called as class method");
+    isa_ok($test::step::params::conf, 'Parrot::Configure');
+    is_deeply(\@test::step::params::conf, [],
+        "no extra parameters were passed to ->runstep()");
+}
+
+SKIP: {
+    skip "->add_step() is unimplimented", 4;
+{
+    package test::step::stepparams;
+
+    # XXX is there a better way of doing this?
+    $INC{'test/step/stepparams.pm'}++;
+
+    use vars qw($self $conf @params);
+    use base qw(Parrot::Configure::Step::Base);
+
+    sub runstep
+    {
+        ($self, $conf, @params) = @_;
+    }
+
+    package main;
+
+    my $pc = Parrot::Configure->new;
+
+    $pc->add_step('test::step::stepparams', 24, qw( bar baz bong ), 42);
+    $pc->runsteps;
+    # otherwise runsteps() output will make Test::Harness think this test
+    # failed.
+    print "\n";
+    isa_ok($test::step::stepparams::self, 'Parrot::Configure');
+    isa_ok($test::step::stepparams::conf, 'Parrot::Configure');
+    cmp_ok($test::step::stepparams::self, 'ne', $test::step::stepparams::conf,
+        '$self and $conf params are not the same object');
+    is_deeply(\@test::step::stepparams::conf, [24, qw( bar baz bong ), 42],
+        "proper additional parameters were passed to ->runstep()");
+}
 }
 
