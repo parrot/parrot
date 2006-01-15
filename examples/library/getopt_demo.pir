@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-examples/library/getopt_demo.pir - demonstrating library/Getopt/Obj.pir
+examples/library/getopt_demo.pir - demonstrating use of the module Getopt/Obj.pir
 
 =head1 SYNOPSIS
 
@@ -50,9 +50,6 @@ This is executed when you call F<getopt_demo.pir>.
   push getopts, "string=s"
   # --integer, integer
   push getopts, "integer=i"
-
-  # Make a copy of argv, because this can easier be handled in get_options
-  # TODO: eliminate need for copy
 
   .local pmc opt
   opt = getopts."get_options"(argv)
