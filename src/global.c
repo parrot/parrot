@@ -38,7 +38,7 @@ Return NULL if the global isn't found or the global.
 Parrot_get_global(Parrot_Interp interpreter, STRING *class, STRING *globalname)>
 
 If the global exists, return it. If not either throw an exception or return an
-C<Undef> depending on the interpreter's error settings.
+C<Null> PMC depending on the interpreter's error settings.
 
 =cut
 
@@ -162,7 +162,7 @@ Parrot_get_global(Parrot_Interp interpreter, STRING *class,
                 "Global '%Ss' not found",
                 name);
     }
-    return pmc_new(interpreter, enum_class_Undef);
+    return PMCNULL;
 }
 
 PMC *
@@ -176,7 +176,7 @@ Parrot_get_global_p(Parrot_Interp interpreter, PMC *ns, STRING *name)
                 "Global '%Ss' not found",
                 name);
     }
-    return pmc_new(interpreter, enum_class_Undef);
+    return PMCNULL;
 }
 
 /*
@@ -184,7 +184,7 @@ Parrot_get_global_p(Parrot_Interp interpreter, PMC *ns, STRING *name)
 =item C<PMC* Parrot_get_name(Interp* interpreter, STRING *name)>
 
 Find the name in lexicals, globals, and builtins. If the name
-isn't found throw and exception or return Undef, depending on
+isn't found throw and exception or return the Null PMC, depending on
 the interpreter's errors setting.
 
 =cut
@@ -232,7 +232,7 @@ Parrot_get_name(Interp* interpreter, STRING *name)
                 "Name '%Ss' not found", name);
     }
 
-    return pmc_new(interpreter, enum_class_Undef);
+    return PMCNULL;
 }
 
 /*

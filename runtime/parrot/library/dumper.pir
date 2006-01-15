@@ -154,10 +154,11 @@ TYPE_OK:
     errorsoff .PARROT_ERRORS_GLOBALS_FLAG
     find_global self, "Data::Dumper", "global"
     errorson .PARROT_ERRORS_GLOBALS_FLAG
+    if null self goto create_type
 
     typeof type, self
     if type == mytype goto END
-
+create_type:
     new self, mytype
     store_global "Data::Dumper", "global", self
 
