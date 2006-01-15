@@ -82,7 +82,7 @@ can_ok('Parrot::Configure', qw(
     my $pc = Parrot::Configure->new;
     
     $pc->add_steps(qw(foo::step));
-    is_deeply(scalar $pc->steps, [qw(foo::step)],
+    is_deeply(scalar $pc->steps, [['foo::step']],
         "->steps() returns the proper list");
 }
 
@@ -90,14 +90,11 @@ can_ok('Parrot::Configure', qw(
     my $pc = Parrot::Configure->new;
     
     $pc->add_steps(qw(foo::step bar::step baz::step));
-    is_deeply(scalar $pc->steps, [qw(foo::step bar::step baz::step)],
+    is_deeply(scalar $pc->steps, [['foo::step'], ['bar::step'], ['baz::step']],
         "->steps() returns the proper list");
 }
 
 # ->steps() / ->add_step()
-
-SKIP: {
-    skip "->add_step() is unimplimented", 3;
 
 {
     my $pc = Parrot::Configure->new;
@@ -109,7 +106,7 @@ SKIP: {
     my $pc = Parrot::Configure->new;
     
     $pc->add_step('foo::step');
-    is_deeply(scalar $pc->steps, [qw(foo::step)],
+    is_deeply(scalar $pc->steps, [['foo::step']],
         "->steps() returns the proper list after ->add_step() w/o args");
 }
 
@@ -117,9 +114,8 @@ SKIP: {
     my $pc = Parrot::Configure->new;
     
     $pc->add_step('foo::step', qw(bar baz));
-    is_deeply(scalar $pc->steps, [qw(foo::step)],
+    is_deeply(scalar $pc->steps, [['foo::step', qw(bar baz)]],
         "->steps() returns the proper list after ->add_step() with args");
-}
 }
 
 # ->runsteps()
@@ -187,8 +183,6 @@ SKIP: {
         "no extra parameters were passed to ->runstep()");
 }
 
-SKIP: {
-    skip "->add_step() is unimplimented", 4;
 {
     package test::step::stepparams;
 
@@ -212,12 +206,12 @@ SKIP: {
     # otherwise runsteps() output will make Test::Harness think this test
     # failed.
     print "\n";
-    isa_ok($test::step::stepparams::self, 'Parrot::Configure');
+    is($test::step::stepparams::self, 'test::step::stepparams',
+        "->runstep() is called as class method");
     isa_ok($test::step::stepparams::conf, 'Parrot::Configure');
     cmp_ok($test::step::stepparams::self, 'ne', $test::step::stepparams::conf,
         '$self and $conf params are not the same object');
-    is_deeply(\@test::step::stepparams::conf, [24, qw( bar baz bong ), 42],
+    is_deeply(\@test::step::stepparams::params, [24, qw( bar baz bong ), 42],
         "proper additional parameters were passed to ->runstep()");
-}
 }
 

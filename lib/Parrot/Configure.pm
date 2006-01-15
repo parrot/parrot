@@ -110,7 +110,9 @@ sub options
 
 =item * C<steps()>
 
-Provides a list of registered steps.
+Provides a list of registered steps.  Where each steps is represented by an
+array in the format of C<['stepname', @params]>.  Steps are returned in the
+order in which they were registered in.
 
 Accepts no arguments and returns a list in list context or an arrayref in
 scalar context.
@@ -124,6 +126,25 @@ sub steps
     return wantarray ? @{$self->{steps}} : $self->{steps};
 }
 
+=item * C<add_step()>
+
+Registers a new step and any parameters that should be passed to it.  With the
+first parameter being the class name of the step register.  All other
+parameters are saved and passed to the registered class's C<runstep()> method.
+
+Accepts a list and returns a L<Parrot::Configure> object.
+
+=cut
+
+sub add_step
+{
+    my ($self, $step, @params) = @_;
+
+    push @{$self->{steps}}, [$step, @params];
+
+    return $self;
+}
+
 =item * C<add_steps()>
 
 Registers a new step to be run at the end of the execution queue.
@@ -134,11 +155,11 @@ Accepts a list and returns a L<Parrot::Configure> object.
 
 sub add_steps
 {
-    my $self = shift;
+    my ($self, @new_steps) = @_;
 
-    my @new_steps = @_;
-
-    push @{$self->{steps}}, @new_steps;
+    foreach my $step (@new_steps) {
+        $self->add_step($step);
+    }
 
     return $self;
 }
@@ -147,7 +168,8 @@ sub add_steps
 
 Sequentially executes step in the order they were registered.  The invoking
 L<Parrot::Configure> object is passed as the first argument to each steps
-C<runstep()> method.
+C<runstep()> method followed by any parameters that were registered for that
+step.
 
 Accepts no arguments and returns a L<Parrot::Configure::Data> object.
 
@@ -161,7 +183,10 @@ sub runsteps
         $self->options->get(qw(verbose verbose-step ask));
 
     my $n = 0; # step number
-    foreach my $step ($self->steps) {
+    foreach my $registered_step ($self->steps) {
+        my $step = shift @$registered_step;
+        my @step_params = @$registered_step;
+
         $n++;
 
         eval "use $step";
@@ -190,7 +215,12 @@ sub runsteps
         print "\n", $description, '...';
         print "\n" if $verbose && $verbose == 2;
 
-        $step->runstep($self);
+        if (@step_params) {
+            $step->runstep($self, @step_params);
+        } else {
+            $step->runstep($self);
+        }
+
         my $result = $step->result || 'done';
 
         print "..." if $verbose && $verbose == 2;
