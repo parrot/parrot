@@ -41,15 +41,15 @@ This is executed when you call F<getopt_demo.pir>.
   # getopts."notOptStop"(1)
 
   # --version, boolean
-  push getopts, "version"
+  push getopts, "version|v"
   # --help, boolean
-  push getopts, "help"
+  push getopts, "help|h"
   # --bool, boolean
-  push getopts, "bool"
+  push getopts, "bool|b"
   # --string, string
-  push getopts, "string=s"
+  push getopts, "string|s=s"
   # --integer, integer
-  push getopts, "integer=i"
+  push getopts, "integer|i=i"
 
   .local pmc opt
   opt = getopts."get_options"(argv)
@@ -60,7 +60,7 @@ This is executed when you call F<getopt_demo.pir>.
   # Was '--version' passed ?
   is_defined = defined opt["version"]
   unless is_defined goto NO_VERSION_FLAG
-    print "getopt_demo.pir 0.03\n"
+    print "getopt_demo.pir 0.04\n"
     end
   NO_VERSION_FLAG:
 
@@ -142,16 +142,14 @@ TODO: Pass a flag for EXIT_FAILURE and EXIT_SUCCESS
   print program_name
   print " [OPTION]... [STRING]...\n"
   print "\n"
-  print "Currently only long options are available.\n"
-  print "\n"
   print "Operation modes:\n"
-  print "      --help                   display this help and exit\n"
-  print "      --version                output version information and exit\n"
+  print "   -h --help                   display this help and exit\n"
+  print "   -v --version                output version information and exit\n"
   print "\n"
   print "For demo of option parsing:\n"
-  print "      --string=STRING          a string option\n"
-  print "      --integer=INTEGER        an integer option\n"
-  print "      --bool                   a boolean option\n"
+  print "   -s --string=STRING          a string option\n"
+  print "   -i --integer=INTEGER        an integer option\n"
+  print "   -b --bool                   a boolean option\n"
 .end
 
 =head1 AUTHOR
