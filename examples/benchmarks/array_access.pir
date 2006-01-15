@@ -7,7 +7,7 @@ examples/benchmarks/array_access.pir - Reading from array
 
 =head1 SYNOPSIS
 
-    ./parrot examples/benchmarks/array_access.pir --arr-size=1000
+    ./parrot examples/benchmarks/array_access.pir --arr-size=2000
 
 =head1 DESCRIPTION
 
@@ -40,16 +40,19 @@ Inspired by computer language shootout.
     ( opt ) = get_options( argv_clone, opt_spec )
 
     .local int arr_size
-    S1 = opt['arr-size']
-    arr_size = S1
-    
+    arr_size = 100
+    .local int def
+    def = defined opt["arr-size"]
+    unless def goto use_default_arr_size
+    arr_size = opt['arr-size']
+use_default_arr_size:
+
     _bench( .Array, arr_size )
     _bench( .FixedFloatArray, arr_size )
     _bench( .FixedIntegerArray, arr_size )
     _bench( .FixedPMCArray, arr_size )
     _bench( .FixedStringArray, arr_size )
     _bench( .IntList, arr_size )
-    _bench( .OrderedHash, arr_size )
     _bench( .PerlArray, arr_size )
     _bench( .ResizableFloatArray, arr_size )
     _bench( .ResizableIntegerArray, arr_size )

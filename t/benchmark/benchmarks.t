@@ -30,61 +30,59 @@ my %outputs = (
     q{addit.pir} => qq(21001097.970000\n),
     q{addit.pasm} => qq(21001097.970000\n),
     q{addit2.pir} => qq(21001097.970000\n),
-    q{array_access.pir} => qr/^1\s\*\s1000\s=\s1000\n
-        1000\s\*\s1000\s=\s1000000\n
-        Array:\s\d+\.\d+s\n
-        \n
-        1\s\*\s1000\s=\s1000\n
-        1000\s\*\s1000\s=\s1000000\n
-        FixedFloatArray:\s\d+\.\d+s\n
-        \n
-        1\s\*\s1000\s=\s1000\n
-        1000\s\*\s1000\s=\s1000000\n
-        FixedIntegerArray:\s\d+\.\d+s\n
-        \n
-        1\s\*\s1000\s=\s1000\n
-        1000\s\*\s1000\s=\s1000000\n
-        FixedPMCArray:\s\d+\.\d+s\n
-        \n
-        1\s\*\s1000\s=\s1000\n
-        1000\s\*\s1000\s=\s1000000\n
-        FixedStringArray:\s\d+\.\d+s\n
-        \n
-        1\s\*\s1000\s=\s1000\n
-        1000\s\*\s1000\s=\s1000000\n
-        IntList:\s\d+\.\d+s\n
-        \n
-        1\s\*\s1000\s=\s1000\n
-        1000\s\*\s1000\s=\s1000000\n
-        OrderedHash:\s\d+\.\d+s\n
-        \n
-        1\s\*\s1000\s=\s1000\n
-        1000\s\*\s1000\s=\s1000000\n
-        PerlArray:\s\d+\.\d+s\n
-        \n
-        1\s\*\s1000\s=\s1000\n
-        1000\s\*\s1000\s=\s1000000\n
-        ResizableFloatArray:\s\d+\.\d+s\n
-        \n
-        1\s\*\s1000\s=\s1000\n
-        1000\s\*\s1000\s=\s1000000\n
-        ResizableIntegerArray:\s\d+\.\d+s\n
-        \n
-        1\s\*\s1000\s=\s1000\n
-        1000\s\*\s1000\s=\s1000000\n
-        ResizablePMCArray:\s\d+\.\d+s\n
-        \n
-        1\s\*\s1000\s=\s1000\n
-        1000\s\*\s1000\s=\s1000000\n
-        ResizableStringArray:\s\d+\.\d+s\n
-        \n
-        1\s\*\s1000\s=\s1000\n
-        1000\s\*\s1000\s=\s1000000\n
-        SArray:\s\d+\.\d+s\n
-        \n
-        1\s\*\s1000\s=\s1000\n
-        1000\s\*\s1000\s=\s1000000\n
-        StringArray:\s\d+\.\d+s\n$/x,
+    q{array_access.pir} => qr/
+1\s\*\s1000\s=\s1000\n
+100\s\*\s1000\s=\s100000\n
+Array:\s\d+\.\d+s\n
+\n
+1\s\*\s1000\s=\s1000\n
+100\s\*\s1000\s=\s100000\n
+FixedFloatArray:\s\d+\.\d+s\n
+\n
+1\s\*\s1000\s=\s1000\n
+100\s\*\s1000\s=\s100000\n
+FixedIntegerArray:\s\d+\.\d+s\n
+\n
+1\s\*\s1000\s=\s1000\n
+100\s\*\s1000\s=\s100000\n
+FixedPMCArray:\s\d+\.\d+s\n
+\n
+1\s\*\s1000\s=\s1000\n
+100\s\*\s1000\s=\s100000\n
+FixedStringArray:\s\d+\.\d+s\n
+\n
+1\s\*\s1000\s=\s1000\n
+100\s\*\s1000\s=\s100000\n
+IntList:\s\d+\.\d+s\n
+\n
+1\s\*\s1000\s=\s1000\n
+100\s\*\s1000\s=\s100000\n
+PerlArray:\s\d+\.\d+s\n
+\n
+1\s\*\s1000\s=\s1000\n
+100\s\*\s1000\s=\s100000\n
+ResizableFloatArray:\s\d+\.\d+s\n
+\n
+1\s\*\s1000\s=\s1000\n
+100\s\*\s1000\s=\s100000\n
+ResizableIntegerArray:\s\d+\.\d+s\n
+\n
+1\s\*\s1000\s=\s1000\n
+100\s\*\s1000\s=\s100000\n
+ResizablePMCArray:\s\d+\.\d+s\n
+\n
+1\s\*\s1000\s=\s1000\n
+100\s\*\s1000\s=\s100000\n
+ResizableStringArray:\s\d+\.\d+s\n
+\n
+1\s\*\s1000\s=\s1000\n
+100\s\*\s1000\s=\s100000\n
+SArray:\s\d+\.\d+s\n
+\n
+1\s\*\s1000\s=\s1000\n
+100\s\*\s1000\s=\s100000\n
+StringArray:\s\d+\.\d+s\n
+      \n$/x,
     q{arriter.pir} => qq(100000\n100000\n100000\n111111\n),
     q{arriter_o1.pir} => qq(100000\n100000\n100000\n111111\n),
     q{bench_newp.pasm} => qr/^\d+\.\d+\sseconds.\s\d+\.\d+\sloops\/sec\n
@@ -222,12 +220,7 @@ my %todo = ( q{arriter.pir}                     => 'syntax error',
              q{stress3.pasm}                    => 'Null PMC access in get_integer()',
              q{vpm.pir}                         => 'delete_keyed() not implemented',
            );
-# array_access.pir has weird output
-my %filters = ( q(array_access.pir) => \&array_access_pir_filter );
 
-sub array_access_pir_filter {
-    $_[ 0 ] =~ s/arr_size = S1/arr_size = 1000/;
-}
 
 plan tests => scalar keys %outputs;
 # plan skip_all => 'currently not working';1
@@ -241,10 +234,6 @@ foreach ( sort keys %outputs ) {
               or die qq(Could not open $_:  $!.\n); 
             while ( my $line = <BENCH> ) { $bench .= $line; }
             close( BENCH );
-
-            if ( exists $filters{ $_ } ) {
-                &{ $filters{ $_ } }( $bench );
-            }
         };
         skip( $@, 1 ) if $@;
 
