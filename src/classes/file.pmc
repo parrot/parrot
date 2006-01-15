@@ -69,6 +69,7 @@ Returns a true value (1) if the supplied path is a directory.
 #else
         int error = lstat(cpath, &info);
 #endif
+        string_cstring_free(cpath);
         if (error) {
             char *errmsg = strerror(errno);
             real_exception(interpreter, NULL, E_SystemError, errmsg);
@@ -99,6 +100,7 @@ Returns a true value (1) if the supplied path is a directory.
 #else
         int error = lstat(cpath, &info);
 #endif
+        string_cstring_free(cpath);
         if (error) {
             char *errmsg = strerror(errno);
             real_exception(interpreter, NULL, E_SystemError, errmsg);
@@ -128,6 +130,7 @@ Returns a true value (1) if the supplied path is a link.
         struct stat info;
         char *cpath = string_to_cstring(interpreter, path);
         int error = lstat(cpath, &info);
+        string_cstring_free(cpath);
         if (error) {
             char *errmsg = strerror(errno);
             real_exception(interpreter, NULL, E_SystemError, errmsg);
@@ -139,6 +142,62 @@ Returns a true value (1) if the supplied path is a link.
             return 0;
         }
 #endif
+    }
+
+
+
+/*
+
+=item C<void copy(STRING* from, STRING *to)>
+
+Copy the contents from file represented by path C<from> to the path
+C<to>.
+
+Uses the "work everywhere method". It is good enough to start with.
+
+NOTE: I'm sure that there should be more efficient ways to do this. Be
+free to change or give me hints on how to change it. -- ambs
+
+=cut
+
+*/
+
+    METHOD void copy(STRING *from, STRING *to) {
+#define CHUNK_SIZE 1024
+        FILE *source = NULL;
+        FILE *target = NULL;
+
+        char *cfrom = string_to_cstring(interpreter, from);
+        char *cto = string_to_cstring(interpreter, to);
+        source = fopen(cfrom, "rb");
+        if (source) {
+            target = fopen(cto, "w+b");
+            if (target) {
+                char buf[CHUNK_SIZE];
+                int bytes_read, bytes_written;
+                while(!feof(source)) {
+                    bytes_read = fread(buf, 1, CHUNK_SIZE, source);
+                    if (bytes_read) {
+                        bytes_written = fwrite(buf, 1, bytes_read, target);
+                        if (bytes_read != bytes_written) {
+                            real_exception(interpreter, NULL, E_SystemError, 
+                                           "Error writting file");
+                            break;
+                        }
+                    }
+                }
+                fclose(target);
+            } else {
+                char *errmsg = strerror(errno);
+                real_exception(interpreter, NULL, E_SystemError, errmsg);
+            }
+            fclose(source);
+        } else {
+            char *errmsg = strerror(errno);
+            real_exception(interpreter, NULL, E_SystemError, errmsg);
+        }
+        string_cstring_free(cfrom);
+        string_cstring_free(cto);
     }
 
 }
