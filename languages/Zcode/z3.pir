@@ -27,16 +27,19 @@ Compile z3 to PIR and run it.
 .sub main :main
   .param pmc argv
 
+  load_bytecode "Getopt/Obj.pbc"
+
   .local pmc    zm, zc, ini, opt_spec, opts
   .local string file
 
-  opt_spec = new ResizableStringArray
-  push opt_spec, "debug"
+  # Specification of command line arguments.
+  .local pmc getopts
+  getopts = new "Getopt::Obj"
+  push getopts, "debug"
+
   $S0 = shift argv	# the program
-  load_bytecode "Getopt/Long.pbc"
-  .local pmc get_options
-  find_global get_options, "Getopt::Long", "get_options"
-  opts = get_options(argv, opt_spec)
+  .local pmc opt
+  opt = getopts."get_options"(argv)
 
   load_bytecode "z3main.pir"
   ini = global "zm_init"

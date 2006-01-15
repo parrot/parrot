@@ -52,6 +52,7 @@ INCOMPLETE
 - print_paddr variable address (and other opcodes taking vars)
 - print abbreviations, Zchars > 127
 - indirect varaibles taking vars
+- debug option
 
 INFRASTRUCTURE
 --------------
