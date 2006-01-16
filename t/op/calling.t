@@ -469,7 +469,7 @@ CODE
 /too few arguments passed/
 OUTPUT
 
-pir_output_like(<<'CODE', <<'OUTPUT', "argc mismatch, too few", todo => 'no get_params at all');
+pir_output_like(<<'CODE', <<'OUTPUT', "argc mismatch, too many - no getparams", todo => 'no get_params at all');
 .sub main :main
     .include "errors.pasm"
     errorson .PARROT_ERRORS_PARAM_COUNT_FLAG
@@ -479,7 +479,24 @@ pir_output_like(<<'CODE', <<'OUTPUT', "argc mismatch, too few", todo => 'no get_
     print "nada"
 .end
 CODE
-/too few arguments passed/
+/too many arguments passed/
+OUTPUT
+
+pir_output_like(<<'CODE', <<'OUTPUT', "argc mismatch, too mayn - force get_params");
+.macro no_params
+    get_params '()'
+.endm
+.sub main :main
+    .include "errors.pasm"
+    errorson .PARROT_ERRORS_PARAM_COUNT_FLAG
+    foo(5)
+.end
+.sub foo
+    .no_params
+    print "nada"
+.end
+CODE
+/too many arguments passed/
 OUTPUT
 
 pir_output_like(<<'CODE', <<'OUTPUT', "argc mismatch, too many");
@@ -1586,5 +1603,5 @@ OUTPUT
 
 
 ## remember to change the number of tests :-)
-BEGIN { plan tests => 58; }
+BEGIN { plan tests => 59; }
 

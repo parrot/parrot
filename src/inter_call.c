@@ -675,6 +675,9 @@ parrot_pass_args(Interp *interpreter,  parrot_context_t *src_ctx,
     Parrot_init_arg_op(interpreter, src_ctx, src_pc, &st.src);
     st.opt_so_far = 0;  /* XXX */
     st.n_actual_args = st.src.n;  /* initial guess, adjusted for :flat args */
+    if (!todo) {
+        st.dest.sig = 0;
+    }
     while (todo) {
         Parrot_fetch_arg(interpreter, &st);
         Parrot_convert_arg(interpreter, &st);
