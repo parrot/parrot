@@ -656,7 +656,8 @@ add_const_pmc_sub(Interp *interpreter, SymReg *r,
 
 
     type = (r->pcc_sub->calls_a_sub & ITPCCYIELD) ?
-        enum_class_Coroutine : enum_class_Sub;
+        enum_class_Coroutine :
+        unit->outer ? enum_class_Closure : enum_class_Sub;
     /* TODO constant - see also src/packfile.c
     */
     sub_pmc = pmc_new(interpreter, type);

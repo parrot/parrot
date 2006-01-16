@@ -465,121 +465,6 @@ main
 I messed with your var
 OUTPUT
 
-
-pir_output_is(<<'CODE', <<'OUTPUT', 'get_outer(outer sub name reused) - always uses first sub of same name');
-.sub main :main
-	bar()
-.end
-
-.sub foo :anon :outer('main')
-.end
-
-.sub foo :anon
-.end
-
-.sub foo
-.end
-
-.sub bar :outer('foo')
-	.include 'interpinfo.pasm'
-	$P1 = interpinfo .INTERPINFO_CURRENT_SUB
-	$P2 = $P1.'get_outer'()
-	print $P2
-	print "\n"
-	$P3 = $P2.'get_outer'()
-	print $P3
-	print "\n"
-.end
-CODE
-foo
-main
-OUTPUT
-
-pir_output_like(<<'CODE', <<'OUTPUT', 'get_outer(outer sub name reused) - always uses first sub of same name');
-.sub main :main
-	bar()
-.end
-
-.sub foo :anon
-.end
-
-.sub foo :anon :outer('main')
-.end
-
-.sub foo
-.end
-
-.sub bar :outer('foo')
-	.include 'interpinfo.pasm'
-	$P1 = interpinfo .INTERPINFO_CURRENT_SUB
-	$P2 = $P1.'get_outer'()
-	print $P2
-	print "\n"
-	$P3 = $P2.'get_outer'()
-	print $P3
-	print "\n"
-.end
-CODE
-/foo\nNull PMC access in get_string()/
-OUTPUT
-
-pir_output_is(<<'CODE', <<'OUTPUT', 'get_outer(outer sub name reused) - always uses first sub of same name');
-.sub main :main
-	bar()
-.end
-
-.sub foo :outer('main')
-.end
-
-.sub foo :anon
-.end
-
-.sub foo :anon
-.end
-
-.sub bar :outer('foo')
-	.include 'interpinfo.pasm'
-	$P1 = interpinfo .INTERPINFO_CURRENT_SUB
-	$P2 = $P1.'get_outer'()
-	print $P2
-	print "\n"
-	$P3 = $P2.'get_outer'()
-	print $P3
-	print "\n"
-.end
-CODE
-foo
-main
-OUTPUT
-
-pir_output_like(<<'CODE', <<'OUTPUT', 'get_outer(outer sub name reused) - always uses first sub of same name');
-.sub main :main
-	bar()
-.end
-
-.sub foo
-.end
-
-.sub foo :anon :outer('main')
-.end
-
-.sub foo :anon
-.end
-
-.sub bar :outer('foo')
-	.include 'interpinfo.pasm'
-	$P1 = interpinfo .INTERPINFO_CURRENT_SUB
-	$P2 = $P1.'get_outer'()
-	print $P2
-	print "\n"
-	$P3 = $P2.'get_outer'()
-	print $P3
-	print "\n"
-.end
-CODE
-/foo\nNull PMC access in get_string()/
-OUTPUT
-
 pir_output_is(<<'CODE', <<'OUTPUT', 'closure 3');
 # sub foo {
 #     my ($n) = @_;
@@ -1024,6 +909,59 @@ ok
 ok
 OUTPUT
 
+pir_output_is(<<'CODE', <<'OUTPUT', 'package-scoped closure 1');
+# my $x;
+# sub f{$x++}
+# f()
+# print "$x\n"
+.sub '&main' :main :anon
+    .local pmc sx
+    .lex '$x', sx
+    sx = new .PerlUndef
+    '&f'()
+    print sx	# no find_lex needed - 'sx' is defined here
+    print "\n"
+.end
+
+.sub '&f' :outer('&main') 
+    $P0 = find_lex '$x'           # find_lex needed
+    inc $P0
+.end
+CODE
+1
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', 'package-scoped closure 2');
+# my $x;
+# sub f{$x++}
+# sub g{f();f()}
+# g()
+# print "$x\n"
+.sub '&main' :main :anon
+    .local pmc sx
+    .lex '$x', sx
+    sx = new .PerlUndef
+    '&g'()
+    print sx
+    print "\n"
+.end
+
+.sub '&f' :outer('&main') 
+    $P0 = find_lex '$x'
+    inc $P0
+.end
+
+.sub '&g' :outer('&main') # :outer not needed - no find_lex
+    '&f'()
+    '&f'()
+.end
+
+
+
+CODE
+2
+OUTPUT
+
 
 ## remember to change the number of tests :-)
-BEGIN { plan tests => 40; }
+BEGIN { plan tests => 38; }

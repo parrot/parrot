@@ -84,6 +84,21 @@ Invokes the closure.
              */
             sub->ctx->outer_ctx = sub->outer_ctx;
         }
+        else {
+            /* closure is just invoked - located :outer's ctx */
+            parrot_context_t *caller = sub->ctx->caller_ctx;
+            while (caller) {
+                if (caller->current_sub == sub->outer_sub) {
+                    sub->ctx->outer_ctx = caller;
+                    break;
+                }
+                caller = caller->caller_ctx;
+            }
+            if (!caller)
+                real_exception(interpreter, NULL, INVALID_OPERATION,
+                        ":outer '%Ss' not found", 
+                        VTABLE_get_string(INTERP, sub->outer_sub));
+        }
         return next;
     }
 }
