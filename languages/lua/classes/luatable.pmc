@@ -71,6 +71,25 @@ Return the string "table".
 
 /*
 
+=item C<PMC* clone()>
+
+PMCs are always handled by-reference in Parrot. So, copying register contents only copies 
+the reference to the PMC. For LuaString, LuaNumber, LuaBoolean, this is not correct,
+as Lua has by-value semantics for these types. In order to be able to handle register
+"move" instructions, this should be implemented using clone(). However, LuaTable and LuaFunction
+do have by-reference semantics. As you don't know the type during compile-time of an object,
+just always use clone() to copy register contents. LuaTable and LuaFunction should therefore
+only clone the reference to themselves, not make a deep copy.
+
+=cut
+
+*/
+     PMC* clone() {
+         return SELF;
+     }
+
+/*
+
 =item C<INTVAL get_bool()>
 
 In Lua, both C<nil> and C<false> make a condition false; any other values
@@ -91,16 +110,25 @@ So return always true.
 
 C<table> accessor.
 
+A copy of the value is retrieved, otherwise, this could happen:
+
+	temp = table[key]
+	temp = <some other value>
+	temp2 = table[key]
+	# temp2 is now <some other value> due to the by-reference semantics of PMCs
+
 =cut
 
 */
     PMC* get_pmc_keyed (PMC* key) {
+        PMC *newcopy;
         PMC *retval = SUPER(key);
 
         if (enum_class_None == retval->vtable->base_type) {
-            return Lua_Nil;
+            return Lua_Nil; /* should we create a New LuaNil object every time? Or is returning the same LuaNil over and over again ok? */
         }
-        return retval;
+        newcopy = retval->vtable->clone(INTERP, retval);
+        return newcopy;
     }
 
 /*
@@ -109,17 +137,29 @@ C<table> accessor.
 
 C<table> mutator.
 
+A copy of the value is stored, otherwise, this could happen:
+ 
+	table[key] = value
+	value = <some other value>
+	temp = table[key]
+	# temp is now <some other value> due to the by-reference semantics of PMCs
+
 =cut
 
 */
     void set_pmc_keyed (PMC* key, PMC* value) {
+        
+        /* XXX should check for "isa", not equality with "==", since LuaNil is no singular anymore */
+
         if (key == Lua_Nil) {
             real_exception(INTERP, NULL, 1, "table index is nil");
         }
         if (value == Lua_Nil) {
             Hash.SELF.delete_keyed(key);
-        } else {
-            SUPER(key, value);
+        } 
+        else {
+            PMC *newcopy = value->vtable->clone(INTERP, value);
+            SUPER(key, newcopy);
         }
     }
 
@@ -151,6 +191,8 @@ Return always false.
         }
         return (PMC*)0;
     }
+
+    /* TODO: Implement the Metamethod mechanism, see the Lua ref.man. */
 
     PMC* subtract (PMC* value, PMC* dest) {
         return (PMC*)0;
