@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
-use Test::More;
+use Test::More skip_all => "Python dynamic PMCs are not maintained";
 use Parrot::Test tests => 4;
 use Parrot::Config;
 
