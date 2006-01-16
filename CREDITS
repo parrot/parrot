@@ -157,9 +157,10 @@ W: http://www.tu-chemnitz.de/~rafl/
 D: Debian packaging
 S: Chemnitz, Germany
 
-N: François PERRAD
+N: François Perrad
 D: build fixes for MinGW
 D: a patch to remove slash_exec from config
+D: language Lua
 
 N: Garrett Rooney
 D: Fix typo in PARROT_BIGENDIAN case
@@ -273,6 +274,7 @@ D: Warnings fix
 
 N: Klaas-Jan Stol
 D: dynclasses and doc updates
+D: Lua PMC
 E: vanderlay@home.nl
 
 N: Lars Balker Rasmussen
