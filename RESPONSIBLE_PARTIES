@@ -16,4 +16,4 @@ Misc core stuff                 Leopold Toetsch
 Debian packaging                Florian Ragwitz
 Test suite                      Jerry Gay
 
-See also languages/LANGUAGES.STATUS for language authors/maintainers.
+See also languages/LANGUAGES.STATUS.pod for language authors/maintainers.

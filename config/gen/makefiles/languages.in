@@ -57,7 +57,7 @@ help:
 	@echo "  make <lang>"
 	@echo "  make <lang>.test"
 	@echo "  make <lang>.clean"
-	@echo "For the status of individual languages see LANGUAGES.STATUS"
+	@echo "For the status of individual languages see LANGUAGES.STATUS.pod"
 	@echo ""
 
 test:   all
