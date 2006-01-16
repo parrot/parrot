@@ -1,5 +1,5 @@
 #!perl
-# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2001-2006 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 =head1 NAME
@@ -129,14 +129,24 @@ $args .= ' --gc-debug'    if $gc_debug;
 $ENV{TEST_PROG_ARGS} = $args;
 
 # Pass in a list of tests to run on the command line, else run all the tests.
-my @default_tests = (
-    (map {glob "t/$_/*.t"} qw(configure compilers/imcc/* op pmc native_pbc)),
-    (map {glob "t/dynclass/$_.t"}    qw(foo dyn* g*)),
-    (glob "t/dynoplibs/*.t"),
-    (map {glob "t/compilers/$_/*.t"} qw(pge pge/p5regexp pge/p6rules tge)),
-    (map {glob "t/$_/*.t"}           qw(library examples run src tools perl)),
-    (map {glob "t/$_/*.t"}           qw(doc)),
-);
+my @default_tests = map {glob "t/$_/*.t"} qw( configure
+                                              compilers/imcc/*
+                                              op
+                                              pmc
+                                              native_pbc
+                                              dynclass
+                                              dynoplibs
+                                              compilers/pge
+                                              compilers/pge/p5regexp
+                                              compilers/pge/p6rules
+                                              compilers/tge
+                                              library
+                                              examples
+                                              run
+                                              src
+                                              tools
+                                              perl
+                                              doc );
 my @tests = @ARGV ? map { glob( $_ ) } @ARGV : @default_tests;
 
 unless ($html) {
