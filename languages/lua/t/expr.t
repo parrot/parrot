@@ -22,11 +22,8 @@ use strict;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 6;
+use Parrot::Test tests => 7;
 use Test::More;
-
-TODO: {
-local $TODO = "pb convertion.";
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'relational op (by reference)' );
 a = {}; a.x = 1; a.y = 0;
@@ -54,7 +51,12 @@ print(2<"15")
 CODE
 /compare/
 OUT
-}
+
+language_output_like( 'lua', <<'CODE', <<'OUT', 'relational op' );
+print("2"<15)
+CODE
+/compare/
+OUT
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'logical op' );
 print(4 and 5)

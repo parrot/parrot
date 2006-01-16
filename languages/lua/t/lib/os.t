@@ -28,17 +28,13 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "function execute");
     load_bytecode "languages/lua/lib/luaos.pbc"
     .local pmc _G
     _G = global "_G"
-    .local pmc key1
-    key1 = new .LuaString
-    key1 = "os"
+    .const .LuaString key1 = "os"
     .local pmc os
-    os = new .LuaTable
     os = _G[key1]
-    .local pmc key2
-    key2 = new .LuaString
-    key2 = "execute"
+    .const .LuaString key2 = "execute"
     .local pmc fct1
     fct1 = os[key2]
+    .const .LuaString arg1 = 'perl -e "print \"test\n\"; exit(2)"'
     .local pmc arg1
     .local pmc ret1
     new arg1, .LuaString
@@ -60,15 +56,10 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "function exit");
     load_bytecode "languages/lua/lib/luaos.pbc"
     .local pmc _G
     _G = global "_G"
-    .local pmc key1
-    key1 = new .LuaString
-    key1 = "os"
+    .const .LuaString key1 = "os"
     .local pmc os
-    os = new .LuaTable
     os = _G[key1]
-    .local pmc key2
-    key2 = new .LuaString
-    key2 = "exit"
+    .const .LuaString key2 = "exit"
     .local pmc fct1
     fct1 = os[key2]
     .local pmc ret1
@@ -88,21 +79,14 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "function getenv");
     load_bytecode "languages/lua/lib/luaos.pbc"
     .local pmc _G
     _G = global "_G"
-    .local pmc key1
-    key1 = new .LuaString
-    key1 = "os"
+    .const .LuaString key1 = "os"
     .local pmc os
-    os = new .LuaTable
     os = _G[key1]
-    .local pmc key2
-    key2 = new .LuaString
-    key2 = "getenv"
+    .const .LuaString key2 = "getenv"
     .local pmc fct1
     fct1 = os[key2]
-    .local pmc arg1
+    .const .LuaString arg1 = "PARROT_TMP"
     .local pmc ret1
-    new arg1, .LuaString
-    arg1 = "PARROT_TMP"
     (ret1) = fct1(arg1)
     print ret1
     print "\n"
@@ -130,21 +114,14 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "function remove");
     load_bytecode "languages/lua/lib/luaos.pbc"
     .local pmc _G
     _G = global "_G"
-    .local pmc key1
-    key1 = new .LuaString
-    key1 = "os"
+    .const .LuaString key1 = "os"
     .local pmc os
-    os = new .LuaTable
     os = _G[key1]
-    .local pmc key2
-    key2 = new .LuaString
-    key2 = "remove"
+    .const .LuaString key2 = "remove"
     .local pmc fct1
     fct1 = os[key2]
-    .local pmc arg1
+    .const .LuaString arg1 = "file.rm"
     .local pmc ret1
-    new arg1, .LuaString
-    arg1 = "file.rm"
     ret1 = fct1(arg1)
     print ret1
     print "\n"
@@ -164,22 +141,15 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "function remove");
     load_bytecode "languages/lua/lib/luaos.pbc"
     .local pmc _G
     _G = global "_G"
-    .local pmc key1
-    key1 = new .LuaString
-    key1 = "os"
+    .const .LuaString key1 = "os"
     .local pmc os
-    os = new .LuaTable
     os = _G[key1]
-    .local pmc key2
-    key2 = new .LuaString
-    key2 = "remove"
+    .const .LuaString key2 = "remove"
     .local pmc fct1
     fct1 = os[key2]
-    .local pmc arg1
+    .const .LuaString arg1 = "file.rm"
     .local pmc ret1
     .local pmc msg1
-    new arg1, .LuaString
-    arg1 = "file.rm"
     (ret1, msg1) = fct1(arg1)
     print ret1
     print "\n"
@@ -199,15 +169,10 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "function time");
     load_bytecode "languages/lua/lib/luaos.pbc"
     .local pmc _G
     _G = global "_G"
-    .local pmc key1
-    key1 = new .LuaString
-    key1 = "os"
+    .const .LuaString key1 = "os"
     .local pmc os
-    os = new .LuaTable
     os = _G[key1]
-    .local pmc key2
-    key2 = new .LuaString
-    key2 = "time"
+    .const .LuaString key2 = "time"
     .local pmc fct1
     fct1 = os[key2]
     .local pmc ret1

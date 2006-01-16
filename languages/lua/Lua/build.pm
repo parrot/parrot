@@ -66,41 +66,47 @@ sub BuildLiteral {
 	my ($parser, $value, $type) = @_;
 
 	my $name = "cst_" . $parser->YYData->{idx_cst}++;
-	my $defn = $parser->YYData->{symbtab_cst}->Lookup($value);
+	my $defn = $parser->YYData->{symbtab_cst}->Lookup($type . $value);
 	if ($defn) {
 		return [$defn, []];
 	} else {
 		my @opcodes = ();
 		$defn = new defn($name, "const", "pmc", $type);
-		push @opcodes, new LocalDir($parser,
+		$parser->YYData->{symbtab_cst}->Insert($type . $value, $defn);
+		if      ($type eq 'key') {
+			push @opcodes, new ConstDir($parser,
 				'result'				=>	$defn,
-		);
-		$parser->YYData->{symbtab_cst}->Insert($value, $defn);
-		if      ($type eq 'string') {
-			my $str = "";
-			for (split//, $value) {
-				if (ord $_ < 32) {
-					$str .= sprintf("\\x%02x", ord $_);
-				} elsif (ord $_ >= 128) {
-					$str .= sprintf("\\u%04x", ord $_);
-				} elsif ($_ eq '"') {
-					$str .= '\"';
-				} else {
-					$str .= $_;
-				}
-			}
-			$value = "\"$str\"";
-		} elsif ($type eq 'number') {
-			$value = $value->bsstr();
-		} elsif ($type eq 'boolean') {
-			$value = ($value eq "true") ? 1 : 0;
-		}
-		unless ($type eq "nil") {
-			my $expr = new defn($value, "literal", "pmc", $type);
-			push @opcodes, new AssignOp($parser,
-					'arg1'					=>	$expr,
+				'arg1'					=>	$value,
+				'type'					=>	"LuaString",
+			);
+		} else {
+			push @opcodes, new LocalDir($parser,
 					'result'				=>	$defn,
 			);
+			if      ($type eq 'string') {
+				my $str = "";
+				for (split//, $value) {
+					if (ord $_ < 32) {
+						$str .= sprintf("\\x%02x", ord $_);
+					} elsif (ord $_ >= 128) {
+						$str .= sprintf("\\u%04x", ord $_);
+					} elsif ($_ eq '"') {
+						$str .= '\"';
+					} else {
+						$str .= $_;
+					}
+				}
+				$value = "\"$str\"";
+			} elsif ($type eq 'boolean') {
+				$value = ($value eq "true") ? 1 : 0;
+			}
+			unless ($type eq "nil") {
+				my $expr = new defn($value, "literal", "pmc", $type);
+				push @opcodes, new AssignOp($parser,
+						'arg1'					=>	$expr,
+						'result'				=>	$defn,
+				);
+			}
 		}
 		return [$defn, \@opcodes];
 	}
@@ -152,7 +158,7 @@ sub BuildVariable {
 	} else {
 		my $global = get_global($parser);
 		push @opcodes, @{$global->[1]};
-		my $key = BuildLiteral($parser, $idf, "string");
+		my $key = BuildLiteral($parser, $idf, "key");
 		push @opcodes, @{$key->[1]};
 		my $result = $global->[0];
 		foreach my $key2 (@{$var}) {
@@ -218,7 +224,7 @@ sub BuildCallVariable {
 	} else {
 		my $global = get_global($parser);
 		push @opcodes, @{$global->[1]};
-		my $key = BuildLiteral($parser, $idf, "string");
+		my $key = BuildLiteral($parser, $idf, "key");
 		push @opcodes, @{$key->[1]};
 		$result = new_tmp($parser, "pmc");
 		push @opcodes, new LocalDir($parser,
@@ -542,7 +548,7 @@ sub BuildForNum {
 	push @opcodes, @{$e_step->[1]};
 	my $global = get_global($parser);
 	push @opcodes, @{$global->[1]};
-	my $key_tonumber = BuildLiteral($parser, "tonumber", "string");
+	my $key_tonumber = BuildLiteral($parser, "tonumber", "key");
 	push @opcodes, @{$key_tonumber->[1]};
 	my $fct_tonumber = new_tmp($parser, "pmc");
 	push @opcodes, new LocalDir($parser,
@@ -598,7 +604,7 @@ sub BuildForNum {
 	push @opcodes, new LabelOp($parser,
 			'arg1'					=>	$lbl_err,
 	);
-	my $key_error = BuildLiteral($parser, "error", "string");
+	my $key_error = BuildLiteral($parser, "error", "key");
 	push @opcodes, @{$key_error->[1]};
 	my $fct_error = new_tmp($parser, "pmc");
 	push @opcodes, new LocalDir($parser,
@@ -739,7 +745,7 @@ sub BuildFunctionBody {
 	);
 	push @opcodes1, new ConstDir($parser,
 			'result'				=>	$fct,
-			'arg1'					=>	"\"$fct->{symbol}\"",
+			'arg1'					=>	$fct->{symbol},
 			'type'					=>	"Sub",
 	);
 	push @opcodes1, new AssignOp($parser,

@@ -69,6 +69,17 @@ So return always true.
 
 /*
 
+=item C<void set_integer_native(INTVAL value)>
+
+=cut
+
+*/
+    void set_integer_native (INTVAL value) {
+        PMC_num_val(SELF) = (FLOATVAL)value;
+    }
+
+/*
+
 =item C<PMC* new_from_string(STRING *rep, INTVAL flags)>
 
 Return a LuaNumber PMC created from a string (Implementation
@@ -93,6 +104,43 @@ Allow :
 
         PMC_num_val(res) = string_to_num(INTERP, rep);
         return res;
+    }
+
+/*
+
+=item C<INTVAL is_equal(PMC* value)>
+
+=cut
+
+*/
+    INTVAL is_equal (PMC* value) {
+MMD_Float: {
+            return (INTVAL)(PMC_num_val(SELF) == PMC_num_val(value));
+        }
+MMD_DEFAULT: {
+            return (INTVAL)0;
+        }
+    }
+
+/*
+
+=item C<INTVAL cmp(PMC* value)>
+
+=cut
+
+*/
+    INTVAL cmp(PMC* value) {
+MMD_Float: {
+            FLOATVAL diff;
+            diff = PMC_num_val(SELF) - PMC_num_val(value);
+            return diff > 0 ? 1 : diff < 0 ? -1 : 0;
+        }
+MMD_DEFAULT: {
+            real_exception(INTERP, NULL, ILL_INHERIT,
+                    "attempt to compare number with %s",
+                    string_to_cstring(INTERP, VTABLE_name(INTERP, value)));
+            return (INTVAL)0;
+        }
     }
 
 }

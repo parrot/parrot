@@ -67,6 +67,79 @@ So return always true.
         return 1;
     }
 
+/*
+
+=item C<PMC* new_from_string(STRING *rep, INTVAL flags)>
+
+Allow :
+
+    .const .LuaString s = "Hello World!"
+
+=cut
+
+*/
+    PMC* new_from_string (STRING *rep, INTVAL flags) {
+        INTVAL type;
+        PMC *res;
+
+        type = SELF->vtable->base_type;
+        if (flags & PObj_constant_FLAG)
+            res = constant_pmc_new(INTERP, type);
+        else
+            res = pmc_new(INTERP, type);
+
+        PMC_str_val(res) = string_copy(INTERP, rep);
+        return res;
+    }
+
+/*
+
+=item C<INTVAL is_equal(PMC* value)>
+
+Compares the string with C<value>; returns true if
+they match.
+
+=cut
+
+*/
+    INTVAL is_equal (PMC* value) {
+MMD_String: {
+            STRING *s = PMC_str_val(SELF);
+            STRING *v = VTABLE_get_string(INTERP, value);
+            return (INTVAL)(0 == string_equal(INTERP, s, v));
+        }
+MMD_DEFAULT: {
+            return (INTVAL)0;
+        }
+    }
+
+/*
+
+=item C<INTVAL cmp(PMC* value)>
+
+Compares the string with C<value>; returns -1 if the
+string is smaller, 0 if they are equal, and 1 if C<value>
+is smaller.
+
+Throws an exception unless C<value> is a LuaString.
+                                          
+=cut
+
+*/
+    INTVAL cmp (PMC* value) {
+MMD_String: {
+            STRING *s = PMC_str_val(SELF);
+            STRING *v = VTABLE_get_string(INTERP, value);
+            return string_compare(INTERP, s, v);
+        }
+MMD_DEFAULT: {
+            real_exception(INTERP, NULL, ILL_INHERIT,
+                    "attempt to compare string with %s",
+                    string_to_cstring(INTERP, VTABLE_name(INTERP, value)));
+            return (INTVAL)0;
+        }
+    }
+
 }
 
 /*

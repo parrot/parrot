@@ -1,5 +1,5 @@
 #! perl -w
-# Copyright: 2005 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2005-2006 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 =head1 NAME
@@ -17,7 +17,7 @@ Tests C<LuaNumber> PMC
 
 =cut
 
-use Parrot::Test tests => 7;
+use Parrot::Test tests => 9;
 use Test::More;
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "check inheritance");
@@ -82,6 +82,34 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "check name");
 CODE
 number
 number
+OUTPUT
+
+pir_output_is(<< 'CODE', << 'OUTPUT', "check set_integer_native");
+.sub _main
+    loadlib P1, "lua_group"
+    find_type $I0, "LuaNumber"
+    .local pmc pmc1
+    .local string str1
+    pmc1 = new $I0
+    pmc1 = 3.14
+    str1 = typeof pmc1
+    print str1
+    print "\n"
+    print pmc1
+    print "\n"
+    pmc1 = 2
+    str1 = typeof pmc1
+    print str1
+    print "\n"
+    print pmc1
+    print "\n"
+    end
+.end
+CODE
+number
+3.14
+number
+2
 OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "check get_bool");
@@ -168,3 +196,20 @@ CODE
 3.14
 1
 OUTPUT
+
+pir_output_is(<< 'CODE', << 'OUTPUT', "check HLL & .const");
+.HLL "Lua", "lua_group"
+.sub _main
+    .const .LuaNumber cst1 = "3.14"
+    print cst1
+    print "\n"
+    .local int bool1
+    bool1 = isa cst1, "LuaNumber"
+    print bool1
+    print "\n"
+.end
+CODE
+3.14
+1
+OUTPUT
+

@@ -223,7 +223,7 @@ sub visitConstDir {
 	my $self = shift;
 	my ($dir) = @_;
 	my $FH = $self->{fh};
-	print $FH "    .const .$dir->{type} $dir->{result}->{symbol} = $dir->{arg1}\n";
+	print $FH "    .const .$dir->{type} $dir->{result}->{symbol} = \"$dir->{arg1}\"\n";
 }
 
 1;

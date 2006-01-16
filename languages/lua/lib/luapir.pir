@@ -32,8 +32,7 @@ lib/luapir.pir - Lua PIR Library
 
 .sub checkany
     .param pmc arg
-    $I0 = defined arg
-    if $I0, L1
+    unless_null arg, L1
     argerror("value expected")
 L1:
 .end

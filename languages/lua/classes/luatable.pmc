@@ -1,5 +1,5 @@
 /*
-Copyright: 2005 The Perl Foundation.  All Rights Reserved.
+Copyright: 2005-2006 The Perl Foundation.  All Rights Reserved.
 $Id$
 
 =head1 NAME
@@ -25,7 +25,7 @@ Now, Lua 5.0 uses a hybrid data structure with a Hash part and an Array part.
 #include "parrot/parrot.h"
 
 static STRING *luatable_name;
-static PMC *Lua_Nil;
+static INTVAL dynclass_LuaNil;
 
 pmclass LuaTable
     extends Hash
@@ -39,8 +39,8 @@ pmclass LuaTable
     void class_init() {
         if (pass) {
             luatable_name = const_string(INTERP, "table");
-            Lua_Nil = pmc_new(INTERP, pmc_type(INTERP,
-              string_from_const_cstring(INTERP, "LuaNil", 0)));
+            dynclass_LuaNil = pmc_type(INTERP,
+              string_from_const_cstring(INTERP, "LuaNil", 0));
         }
     }
 
@@ -125,7 +125,8 @@ A copy of the value is retrieved, otherwise, this could happen:
         PMC *retval = SUPER(key);
 
         if (enum_class_None == retval->vtable->base_type) {
-            return Lua_Nil; /* should we create a New LuaNil object every time? Or is returning the same LuaNil over and over again ok? */
+            retval = pmc_new(INTERP, dynclass_LuaNil);
+            return retval;
         }
         newcopy = retval->vtable->clone(INTERP, retval);
         return newcopy;
@@ -148,13 +149,10 @@ A copy of the value is stored, otherwise, this could happen:
 
 */
     void set_pmc_keyed (PMC* key, PMC* value) {
-        
-        /* XXX should check for "isa", not equality with "==", since LuaNil is no singular anymore */
-
-        if (key == Lua_Nil) {
+        if (dynclass_LuaNil == key->vtable->base_type) {
             real_exception(INTERP, NULL, 1, "table index is nil");
         }
-        if (value == Lua_Nil) {
+        if (dynclass_LuaNil == value->vtable->base_type) {
             Hash.SELF.delete_keyed(key);
         } 
         else {
@@ -178,6 +176,22 @@ Return always false.
               string_from_const_cstring(INTERP, "LuaBoolean", 0)));
         VTABLE_set_integer_native(INTERP, dest, 0);
         return dest;
+    }
+
+/*
+
+=item C<INTVAL is_equal (PMC* value)>
+
+The C<==> operation. Compares reference (not in depth).
+
+=cut
+
+*/
+    INTVAL is_equal (PMC* value) {
+        if (SELF == value)
+            return (INTVAL)1;
+        else 
+            return (INTVAL)0;
     }
 
     /* Other metamethods */
@@ -238,7 +252,9 @@ Return always false.
 
 =head1 AUTHORS
 
-Original code by Klaas-Jan Stol.
+Francois Perrad
+
+Klaas-Jan Stol
 
 =cut
 

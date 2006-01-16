@@ -1,5 +1,5 @@
 #! perl -w
-# Copyright: 2005 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2005-2006 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 =head1 NAME
@@ -17,7 +17,7 @@ Tests C<LuaNil> PMC
 
 =cut
 
-use Parrot::Test tests => 9;
+use Parrot::Test tests => 12;
 use Test::More;
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "check inheritance");
@@ -27,16 +27,12 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "check inheritance");
     .local pmc pmc1
     pmc1 = new $I0
     .local int bool1
-    bool1 = isa pmc1, "None"
-    print bool1
-    print "\n"
     bool1 = isa pmc1, "LuaNil"
     print bool1
     print "\n"
     end
 .end
 CODE
-1
 1
 OUTPUT
 
@@ -149,28 +145,6 @@ true
 boolean
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "check singleton");
-.sub _main
-    loadlib P1, "lua_group"
-    find_type $I0, "LuaNil"
-    .local pmc pmc1
-    pmc1 = new $I0
-    .local pmc pmc2
-    pmc2 = new $I0
-    .local int bool1
-    bool1 = iseq pmc1, pmc2
-    print bool1
-    print "\n"
-    bool1 = issame pmc1, pmc2
-    print bool1
-    print "\n"
-    end
-.end
-CODE
-1
-1
-OUTPUT
-
 pir_output_is(<< 'CODE', << 'OUTPUT', "check HLL");
 .HLL "Lua", "lua_group"
 .sub _main
@@ -188,3 +162,102 @@ CODE
 nil
 1
 OUTPUT
+
+TODO: {
+local $TODO = "not implemented.";
+
+pir_output_is(<< 'CODE', << 'OUTPUT', "check HLL & .const");
+.HLL "Lua", "lua_group"
+.sub _main
+    .const .LuaNil cst1 = ""
+    print cst1
+    print "\n"
+    .local int bool1
+    bool1 = isa cst1, "LuaNil"
+    print bool1
+    print "\n"
+.end
+CODE
+nil
+1
+OUTPUT
+}
+
+pir_output_is(<< 'CODE', << 'OUTPUT', "morph to string");
+.HLL "Lua", "lua_group"
+.sub _main
+    .local pmc pmc1
+    pmc1 = new .LuaNil
+    print pmc1
+    print "\n"
+    pmc1 = "text"
+    .local string str1
+    str1 = typeof pmc1
+    print str1
+    print "\n"
+    print pmc1
+    print "\n"
+    end
+.end
+CODE
+nil
+string
+text
+OUTPUT
+
+pir_output_is(<< 'CODE', << 'OUTPUT', "morph to boolean");
+.HLL "Lua", "lua_group"
+.sub _main
+    .local pmc pmc1
+    pmc1 = new .LuaNil
+    print pmc1
+    print "\n"
+    pmc1 = 1
+    .local string str1
+    str1 = typeof pmc1
+    print str1
+    print "\n"
+    print pmc1
+    print "\n"
+    end
+.end
+CODE
+nil
+boolean
+true
+OUTPUT
+
+pir_output_is(<< 'CODE', << 'OUTPUT', "morph to number");
+.HLL "Lua", "lua_group"
+.sub _main
+    .local pmc pmc1
+    pmc1 = new .LuaNil
+    print pmc1
+    print "\n"
+    pmc1 = 3.14
+    .local string str1
+    str1 = typeof pmc1
+    print str1
+    print "\n"
+    print pmc1                                    
+    print "\n"
+    .local pmc pmc2
+    pmc2 = new .LuaNil
+    $N2 = 2			# prevent morph to boolean
+    pmc2 = $N2
+    .local string str2
+    str2 = typeof pmc2
+    print str2
+    print "\n"
+    print pmc2
+    print "\n"
+    end
+.end
+CODE
+nil
+number
+3.14
+number
+2
+OUTPUT
+

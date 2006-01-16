@@ -219,7 +219,7 @@ key
 		}
 |	'.'	NAME
 		{
-			BuildLiteral($_[0], $_[2], 'string');
+			BuildLiteral($_[0], $_[2], 'key');
 		}
 ;
 
@@ -486,7 +486,7 @@ field
 		}
 |	NAME	'='	exp
 		{
-			[BuildLiteral($_[0], $_[1], 'string'), $_[3]]
+			[BuildLiteral($_[0], $_[1], 'key'), $_[3]]
 		}
 |	exp
 		{

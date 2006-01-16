@@ -2882,7 +2882,7 @@ sub
 sub
 #line 221 "Lua\lua50.yp"
 {
-			BuildLiteral($_[0], $_[2], 'string');
+			BuildLiteral($_[0], $_[2], 'key');
 		}
 	],
 	[#Rule 40
@@ -3308,7 +3308,7 @@ sub
 sub
 #line 488 "Lua\lua50.yp"
 {
-			[BuildLiteral($_[0], $_[1], 'string'), $_[3]]
+			[BuildLiteral($_[0], $_[1], 'key'), $_[3]]
 		}
 	],
 	[#Rule 97

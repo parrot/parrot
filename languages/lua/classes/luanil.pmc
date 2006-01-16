@@ -1,5 +1,5 @@
 /*
-Copyright: 2005 The Perl Foundation.  All Rights Reserved.
+Copyright: 2005-2006 The Perl Foundation.  All Rights Reserved.
 $Id$
 
 =head1 NAME
@@ -99,6 +99,19 @@ Return the string "nil".
 
 /*
 
+=item C<INTVAL get_bool()>
+
+Return always false.
+
+=cut
+
+*/
+    INTVAL get_bool () {
+        return 0;
+    }
+
+/*
+
 =item C<PMC logical_not(PMC *dest)>
 
 Return always true.
@@ -132,6 +145,8 @@ Return always true.
 
 =item C<void set_string_native(STRING *)>
 
+=item C<void set_integer_native(INTVAL)>
+
 =item C<void set_bool(INTVAL)>
 
 Methods to set a new value to this LuaNil PMC. First,
@@ -154,6 +169,11 @@ Morph to another Lua type.
         VTABLE_set_string_native(INTERP, SELF, value);
     }
 
+    void set_integer_native(INTVAL value) {
+        VTABLE_morph(INTERP, SELF, dynclass_LuaBoolean);
+        VTABLE_set_bool(INTERP, SELF, value);
+    }
+
     void set_bool (INTVAL value) {
         VTABLE_morph(INTERP, SELF, dynclass_LuaBoolean);
         VTABLE_set_bool(INTERP, SELF, value);
@@ -165,3 +185,14 @@ Morph to another Lua type.
 
 }
 
+/*
+
+=back
+
+=head1 AUTHORS
+
+Original code by Klaas-Jan Stol.
+
+=cut
+
+*/

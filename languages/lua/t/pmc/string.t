@@ -1,5 +1,5 @@
 #! perl -w
-# Copyright: 2005 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2005-2006 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 =head1 NAME
@@ -17,7 +17,7 @@ Tests C<LuaString> PMC
 
 =cut
 
-use Parrot::Test tests => 8;
+use Parrot::Test tests => 9;
 use Test::More;
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "check inheritance");
@@ -184,3 +184,20 @@ CODE
 simple string
 1
 OUTPUT
+
+pir_output_is(<< 'CODE', << 'OUTPUT', "check HLL & .const");
+.HLL "Lua", "lua_group"
+.sub _main
+    .const .LuaString cst1 = "simple string"
+    print cst1
+    print "\n"
+    .local int bool1
+    bool1 = isa cst1, "LuaString"
+    print bool1
+    print "\n"
+.end
+CODE
+simple string
+1
+OUTPUT
+
