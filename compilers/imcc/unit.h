@@ -47,7 +47,6 @@ typedef struct _IMC_Unit {
     int n_vars_used[4];	/* INSP in PIR */
     int n_regs_used[4];	/* INSP in PBC */
     int first_avail[4];	/* INSP */
-    int has_push_eh;
     SymReg *outer;
     PMC *sub_pmc;	/* this sub */
 } IMC_Unit;
