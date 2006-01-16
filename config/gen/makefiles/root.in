@@ -262,7 +262,6 @@ GEN_LIBRARY = \
 	$(LIBRARY_DIR)/Data/Sort.pbc \
 	$(LIBRARY_DIR)/Digest/MD5.pbc \
 	$(LIBRARY_DIR)/dumper.pbc \
-	$(LIBRARY_DIR)/Getopt/Long.pbc \
 	$(LIBRARY_DIR)/Getopt/Obj.pbc \
 	$(LIBRARY_DIR)/JSON.pbc \
 	$(LIBRARY_DIR)/ncurses.pbc \

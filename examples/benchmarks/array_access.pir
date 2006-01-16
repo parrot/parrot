@@ -18,26 +18,23 @@ Inspired by computer language shootout.
 .sub main :main
     .param pmc argv
 
-    load_bytecode "Getopt/Long.pbc"
-    .local pmc get_options
-    find_global get_options, "Getopt::Long", "get_options"
-
+    load_bytecode "Getopt/Obj.pbc"
+    
     # name of the program
     .local string program_name
     program_name = shift argv
 
-    # Assemble specification for get_options
-    # in an array of format specifiers
-    .local pmc opt_spec  
-    opt_spec = new PerlArray  
-    push opt_spec, "arr-size=i"
+    # Specification of command line arguments.
+    .local pmc getopts
+    getopts = new "Getopt::Obj"
+    push getopts, "arr-size=i"
 
     # Make a copy of argv, because this can easier be handled in get_options()
     .local pmc argv_clone
     argv_clone = clone argv
 
     .local pmc opt
-    ( opt ) = get_options( argv_clone, opt_spec )
+    opt = getopts."get_options"(argv)
 
     .local int arr_size
     arr_size = 100
