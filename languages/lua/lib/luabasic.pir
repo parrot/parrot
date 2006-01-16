@@ -418,15 +418,22 @@ in numeric order, use a numerical for or the C<ipairs> function.)
 The behavior of C<next> is I<undefined> if, during the traversal, you assign
 any value to a non-existent field in the table.
 
-NOT YET IMPLEMENTED.
+STILL INCOMPLETE (see next in luapir.pir).
 
 =cut
 
 .sub _lua_next :anon
     .param pmc table
     .param pmc index :optional
+    .local pmc idx
+    .local pmc value
     checktype(table, "table")
-    not_implemented()
+    (idx, value) = next(table, index)
+    $I0 = isa idx, "LuaNil"
+    if $I0 goto L1
+    .return (idx, value) 
+L1:
+    .return (idx)	# nil                               
 .end
 
 =item C<pairs (t)>
@@ -537,16 +544,16 @@ NOT YET IMPLEMENTED.
 Gets the real value of C<table[index]>, without invoking any metamethod.
 C<table> must be a table; C<index> is any value different from B<nil>.
 
-NOT YET IMPLEMENTED.
-
 =cut
 
 .sub _lua_rawget :anon
     .param pmc table
     .param pmc index
+    .local pmc ret
     checktype(table, "table")
     checkany(index)
-    not_implemented()
+    ret = table[index]
+    .return (ret)
 .end
 
 =item C<rawset (table, index, value)>
@@ -554,8 +561,6 @@ NOT YET IMPLEMENTED.
 Sets the real value of C<table[index]> to value, without invoking any
 metamethod. C<table> must be a table, C<index> is any value different from
 B<nil>, and C<value> is any Lua value.
-
-NOT YET IMPLEMENTED.
 
 =cut
 
@@ -566,7 +571,8 @@ NOT YET IMPLEMENTED.
     checktype(table, "table")
     checkany(index)
     checkany(value)
-    not_implemented()
+    table[index] = value
+    .return ()
 .end
 
 =item C<require (packagename)>
@@ -764,14 +770,28 @@ Returns all elements from the given list. This function is equivalent to
 except that the above code can be written only for a fixed I<n>. The number
 I<n> is the size of the list, as defined for the C<table.getn> function.
 
-NOT YET IMPLEMENTED.
-
 =cut
 
 .sub _lua_unpack :anon
     .param pmc list
+    .local pmc ret
     checktype(list, "table")
-    not_implemented()
+    $I0 = getn(list)
+    new ret, .Array
+    set ret, $I0
+    new $P1, .LuaNumber
+    $P1 = 1.0
+    $I1 = 0
+L0:    
+    unless $I1 <= $I0 goto L1
+    $P2 = list[$P1]
+#    ret[$I1] = $P2
+    push ret, $P2
+    add $P1, 1.0
+    add $I1, 1
+    goto L0
+L1:
+    .return (ret :flat)
 .end
 
 =item C<xpcall (f, err)>

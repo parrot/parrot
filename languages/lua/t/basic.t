@@ -21,7 +21,7 @@ use strict;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 9;
+use Parrot::Test tests => 12;
 use Test::More;
 
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', "function assert(false, msg)");
@@ -42,6 +42,23 @@ CODE
 /assertion failed!/
 OUTPUT
 
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', "function next (array)");
+t = {"a","b","c"}
+a = next(t, nil)
+print(a)
+a = next(t, 1) 
+print(a)
+a = next(t, 2) 
+print(a)
+a = next(t, 3) 
+print(a)
+CODE
+1
+2
+3
+nil
+OUTPUT
+
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', "function pcall");
 r = pcall(assert, true)
 print(r)
@@ -53,6 +70,21 @@ CODE
 true
 false
 false
+OUTPUT
+
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', "function rawget");
+t = {a = "letter a", b = "letter b"}
+print(rawget(t, "a"))
+CODE
+letter a
+OUTPUT
+
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', "function rawset");
+t = {}
+rawset(t, "a", "letter a")
+print(t.a)
+CODE
+letter a
 OUTPUT
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', "function type");

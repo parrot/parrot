@@ -112,8 +112,6 @@ C<sep> is the empty string, the default for C<i> is 1, and the default for
 C<j> is the size of the table. If C<i> is greater than C<j>, returns the
 empty string.
 
-NOT YET IMPLEMENTED.
-
 =cut
 
 .sub _table_concat :anon
@@ -121,11 +119,39 @@ NOT YET IMPLEMENTED.
     .param pmc sep :optional
     .param pmc i :optional
     .param pmc j :optional
+    .local pmc idx
+    .local pmc value
+    .local pmc ret
     $S0 = optstring(sep, "")
     $I0 = optint(i, 1)
     $I1 = optint(j, 0)
     checktype(table, "table")
-    not_implemented()
+    unless $I1 == 0 goto L1
+    $I1 = getn(table)
+L1:
+    $S1 = ""
+    new idx, .LuaNumber 
+L2:
+    unless $I0 <= $I1 goto L3
+    idx = $I0
+    value = table[idx]
+    $I2 = isa value, "LuaString"
+    if $I2 goto L4
+    $I2 = isa value, "LuaNumber"
+    if $I2 goto L4
+    argerror("table contains non-strings")
+L4:
+    $S2 = value
+    concat $S1, $S2
+    unless $I0 != $I1 goto L5
+    concat $S1, $S0
+L5:    
+    add $I0, 1
+    goto L2
+L3:
+    new ret, .LuaString
+    ret = $S1
+    .return (ret)
 .end
 
 =item C<table.foreach (table, f)>
@@ -137,16 +163,29 @@ the final value of C<foreach>.
 
 See the C<next> function for extra information about table traversals.
 
-NOT YET IMPLEMENTED.
+STILL INCOMPLETE (see next in luapir.pir).
 
 =cut
 
 .sub _table_foreach :anon
     .param pmc table
     .param pmc f
+    .local pmc idx
+    .local pmc value
+    .local pmc ret
     checktype(table, "table")
     checktype(f, "Sub")
-    not_implemented()
+    new idx, .LuaNil
+L1:
+    (idx, value) = next(table, idx)
+    $I0 = isa idx, "LuaNil"
+    unless $I0 goto L2
+    .return ()
+L2:
+    (ret) = f(idx, value)
+    $I0 = defined ret
+    unless $I0 goto L1
+    .return (ret)       
 .end
 
 =item C<table.foreachi (table, f)>
@@ -157,20 +196,35 @@ Indices are visited in sequential order, from 1 to C<n>, where C<n> is the
 size of the table. If C<f> returns a non-B<nil> value, then the loop is
 broken and this value is returned as the result of C<foreachi>.
 
-NOT YET IMPLEMENTED.
-
 =cut
 
 .sub _table_foreachi :anon
     .param pmc table
     .param pmc f
+    .local pmc index
+    .local pmc value
+    .local pmc ret
+    .local int i
+    .local int n
     checktype(table, "table")
     checktype(f, "Sub")
-    $I0 = getn(table)
-    not_implemented()
+    n = getn(table)
+    i = 0
+    new index, .LuaNumber
+L1:
+    add i, 1
+    unless i <= n goto L2
+    index = i
+    value = table[index]
+    (ret) = f(index, value) 
+    $I0 = defined ret
+    unless $I0 goto L1
+    .return (ret)       
+L2:
+    .return ()
 .end
 
-=item C<table.getn (table)>
+=item C<table.getn (table)>       
 
 Returns the size of a table, when seen as a list. If the table has an C<n>
 field with a numeric value, this value is the size of the table. Otherwise,
@@ -178,7 +232,7 @@ if there was a previous call to C<table.setn> over this table, the respective
 value is returned. Otherwise, the size is one less the first integer index
 with a B<nil> value.
 
-NOT YET IMPLEMENTED.
+STILL INCOMPLETE (see getn in luapir.pir).
 
 =cut
 
@@ -264,7 +318,7 @@ Updates the size of a table. If the table has a field C<"n"> with a numerical
 value, that value is changed to the given C<n>. Otherwise, it updates an
 internal state so that subsequent calls to C<table.getn(table)> return C<n>.
 
-NOT YET IMPLEMENTED.
+STILL INCOMPLETE (see setn in luapir.pir).
 
 =cut
 
@@ -280,6 +334,7 @@ NOT YET IMPLEMENTED.
 
 =head1 AUTHORS
 
+Francois Perrad
 
 =cut
 

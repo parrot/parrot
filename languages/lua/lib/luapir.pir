@@ -26,6 +26,7 @@ lib/luapir.pir - Lua PIR Library
     error(extramsg)
 .end
 
+
 =item C<checkany (arg)>
 
 =cut
@@ -36,6 +37,7 @@ lib/luapir.pir - Lua PIR Library
     argerror("value expected")
 L1:
 .end
+
 
 =item C<checknumber (arg)>
 
@@ -57,6 +59,7 @@ L0:
     tag_error($S0, "number")    
 .end
 
+
 =item C<checkstring (arg)>
 
 =cut
@@ -68,6 +71,7 @@ L0:
     # TODO
     .return (val)
 .end
+
 
 =item C<checktype (arg, type)>
 
@@ -85,6 +89,7 @@ L0:
     tag_error($S0, type)
 .end
 
+
 =item C<error (message)>
 
 =cut
@@ -97,16 +102,40 @@ L0:
     throw ex
 .end
 
+
 =item C<getn (table)>
 
 =cut
 
 .sub getn
     .param pmc table
-    not_implemented()
+    .const .LuaString n = "n"
+    $P0 = table[n]
+    if_null $P0, L0
+    $I0 = isa $P0, "LuaNumber"
+    unless $I0, L0
+    $I1 = $P0
+    unless $I1 >= 0 goto L0
+    .return ($I1)
+L0:
+    $I1 = 0
+    new $P1, .LuaNumber
+    $P1 = 1 
+L1:
+    $P0 = table[$P1]
+    $I0 = isa $P0, "LuaNil"
+    if $I0 goto L2
+#    $I0 = defined $P0
+#    unless $I0, L2
+    add $I1, 1
+    add $P1, 1
+    goto L1
+L2:
+    .return ($I1)
 .end
 
-=item C<getn (table)>
+
+=item C<mkarg (argv)>
 
 Support variable number of arguments function call.
 
@@ -116,7 +145,6 @@ Support variable number of arguments function call.
     .param pmc argv
     .local pmc ret
     .local pmc key
-    .local pmc n
     .local pmc curr
     .local int argc
     .local int i
@@ -132,11 +160,34 @@ L1:
     ret[key] = curr
     goto L1
 L2:
-    new n, .LuaString
-    n = "n"
+    .const .LuaString n = "n"
     ret[n] = key
     .return (ret)
 .end
+
+
+=item C<next (table, index)>
+
+=cut
+
+.sub next
+    .param pmc table
+    .param pmc index
+    .local pmc value
+    $I0 = defined index
+    if $I0 goto L1
+    new index, .LuaNumber
+    index = 0
+L1:
+    add index, 1
+    value = table[index]
+    $I0 = isa value, "LuaNil"
+    if $I0 goto L2
+    .return (index, value)    
+L2:
+    .return (value)		# nil
+.end
+
 
 =item C<not_implemented ()>
 
@@ -148,6 +199,7 @@ L2:
     ex["_message"] =  "not implemented"
     throw ex
 .end
+
 
 =item C<optint (arg)>
 
@@ -165,6 +217,7 @@ L0:
     .return (default)
 .end
 
+
 =item C<optstring (arg)>
 
 =cut
@@ -181,6 +234,7 @@ L0:
     .return (default)
 .end
 
+
 =item C<setn (table, n)>
 
 =cut
@@ -188,7 +242,10 @@ L0:
 .sub setn
     .param pmc table
     .param int n
-    not_implemented()
+    .const .LuaString key_n = "n"
+    new $P0, .LuaNumber
+    $P0 = n
+    table[key_n] = $P0
 .end
 
 #.sub tostring
