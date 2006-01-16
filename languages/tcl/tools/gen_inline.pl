@@ -110,15 +110,19 @@ else {
 
     add_wrapped(<<END_PIR);
   if argc < $min_args goto bad_args
-  if argc > $max_args goto bad_args
 END_PIR
 
+  if ($max_args) {
+    add_wrapped(<<END_PIR);
+  if argc > $max_args goto bad_args
+END_PIR
+  }
 }
 
 # XXX We're including more here than we need to. Check for which
 # arguments are required - even better, push this out to the compiler.
 # Eventually all these helpers should be inlined, but in the meantime,
-# we can scan the compiled code for __foo( and pull in the global def
+# we could scan the compiled code for __foo( and pull in the global def
 # as needed.
 
 add_inlined(<<END_PIR);
@@ -380,14 +384,21 @@ sub num_args {
     my ( $max, $min );
     $min = $max = @args;
 
+    my $is_repeating; 
+
     foreach my $arg (@args) {
         $min-- if ( $arg->{optional} );
 
         # XXX this isn't quite right. Need to be more clever with options.
         $max++ if ( $arg->{option} && $arg->{type} );
+        $is_repeating = $arg->{repeating};
     }
 
-    return ( $min, $max );
+    if ($is_repeating) {
+      return ( $min, undef);
+    } else {
+      return ( $min, $max );
+    }
 }
 
 sub parse_usage {
@@ -413,6 +424,7 @@ sub parse_usage {
         =
         ([^?]*)  # default value
       )?
+      (\+?)       # is this repeating?
       (?:\1)
     }{}x
           )
@@ -422,6 +434,7 @@ sub parse_usage {
             $arg->{name}     = $3;
             $arg->{type} = ( $4 ? $4 : ( $arg->{option} ? undef: "string" ) );
             $arg->{default} = ( defined($5) ? $5 : undef );
+            $arg->{repeating} = ($6 eq "+") ? 1 : 0;
             if ( $arg->{option} && !$arg->{optional} ) {
                 die "Optionals need to be optional.\n";
             }
@@ -451,7 +464,15 @@ sub create_usage {
                 $usage = "$usage $arg->{type}";
             }
         }
-        $usage = "?$usage?" if ( $arg->{optional} );
+        if ($arg->{repeating}) {
+          if ($arg->{optional}) {
+            $usage = "?$usage $usage ...?";
+          } else {
+            $usage = "$usage ?$usage ...?";
+          }
+        } else {
+          $usage = "?$usage?" if ( $arg->{optional} );
+        }
         push @results, $usage;
     }
 
