@@ -8,8 +8,13 @@ classes/luanil.pmc - Lua Nil
 
 =head1 DESCRIPTION
 
-C<LuaNil> extends C<Python None> to provide a class with the behaviour of
-the Lua C<Nil> value.
+C<LuaNil> provides a class with the behaviour of the Lua C<Nil> value.
+Implementation is based on the Undef PMC. LuaNil is no longer a singleton;
+this would be a problem, as all uninitialized values in Lua are LuaNil.
+If some value is assigned, the LuaNil should morph into the correct type,
+and so a new PMC is constructed anyway. Therefore, we may as well create
+a new PMC right away. Also, creating a new PMC from a singleton class is
+troublesome (if not possible?).
 
 =head2 Overloaded Methods
 
@@ -22,20 +27,27 @@ the Lua C<Nil> value.
 #include "parrot/parrot.h"
 
 static STRING *string_representation;
-static PMC *Lua_Nil;
+static INTVAL dynclass_LuaNumber;
+static INTVAL dynclass_LuaString;
+static INTVAL dynclass_LuaBoolean;
 
-pmclass LuaNil
-    singleton
-    extends None
+pmclass LuaNil   
     dynpmc
     group lua_group
     hll Lua {
 
-/* Class initialization. Caches constant strings that will be used later.
+/* 
+* Class initialization. Caches constant strings that will be used later.
 */
     void class_init() {
         if (pass) {
             string_representation = const_string(INTERP, "nil");
+            dynclass_LuaNumber = pmc_type(INTERP,
+                    string_from_const_cstring(INTERP, "LuaNumber", 0));
+            dynclass_LuaString = pmc_type(INTERP,
+                    string_from_const_cstring(INTERP, "LuaString", 0));
+            dynclass_LuaBoolean = pmc_type(INTERP, 
+                    string_from_const_cstring(INTERP, "LuaBoolean", 0));
         }
     }
 
@@ -78,24 +90,11 @@ Return the string "nil".
         return string_representation;
     }
 
-/*
 
-=item C<void* get_pointer()>
-
-=item C<void set_pointer(void *ptr)>
-
-These two functions are part of the singleton creation interface. For more
-information see F<src/pmc.c>.
-
-=cut
-
-*/
-    void* get_pointer() {
-        return Lua_Nil;
-    }
-
-    void set_pointer(void* ptr) {
-        Lua_Nil = (PMC*)ptr;
+    PMC* clone () {
+        PMC* dest = pmc_new(INTERP, SELF->vtable->base_type);
+        memcpy(&PMC_union(dest), &PMC_union(SELF), sizeof(UnionVal));
+        return dest;
     }
 
 /*
@@ -109,23 +108,60 @@ Return always true.
 */
     PMC* logical_not (PMC* dest) {
         if (!dest)
-            dest = pmc_new(INTERP, pmc_type(INTERP,
-              string_from_const_cstring(INTERP, "LuaBoolean", 0)));
+            dest = pmc_new(INTERP, dynclass_LuaBoolean);
         VTABLE_set_integer_native(INTERP, dest, 1);
         return dest;
     }
 
-}
-
 /*
 
-=back
+=item C<INTVAL defined()>
 
-=head1 AUTHORS
-
-Original code by Klaas-Jan Stol.
+"nil" in Lua is always undefined.
 
 =cut
 
 */
+    INTVAL defined() {
+        return 0;
+    }
+
+/*
+
+=item C<void set_number_native(FLOATVAL)>
+
+=item C<void set_string_native(STRING *)>
+
+=item C<void set_bool(INTVAL)>
+
+Methods to set a new value to this LuaNil PMC. First,
+this PMC is morph'ed into the correct Lua type.
+
+=item C<void morph(INTVAL)>
+
+Morph to another Lua type.
+
+=cut
+
+*/
+    void set_number_native(FLOATVAL value) {
+        VTABLE_morph(INTERP, SELF, dynclass_LuaNumber);
+        VTABLE_set_number_native(INTERP, SELF, value);
+    }
+
+    void set_string_native(STRING *value) {
+        VTABLE_morph(INTERP, SELF, dynclass_LuaString);
+        VTABLE_set_string_native(INTERP, SELF, value);
+    }
+
+    void set_bool (INTVAL value) {
+        VTABLE_morph(INTERP, SELF, dynclass_LuaBoolean);
+        VTABLE_set_bool(INTERP, SELF, value);
+    }
+
+    void morph(INTVAL new_type) {
+        pmc_reuse(INTERP, SELF, new_type, 0);
+    }
+
+}
 
