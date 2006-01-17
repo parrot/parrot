@@ -1518,6 +1518,9 @@ test-clean :
 		"t/pmc/*.out" \
 		"t/pmc/*.o" \
 		"t/pmc/*.stabs.s" \
+		"t/examples/*.pasm" \
+		"t/examples/*.past" \
+		"t/examples/*.pir" \
 		"t/stress/*.pasm" \
 		"t/stress/*.pbc" \
 		"t/stress/*.out" \
