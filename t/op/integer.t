@@ -1276,6 +1276,13 @@ CODE
 /.*Divide by zero.*/
 OUTPUT
 
+output_like(<<'CODE', <<OUTPUT, "div_i_ic_ic by zero");
+	div I2, 0, 0
+	end
+CODE
+/.*Divide by zero.*/
+OUTPUT
+
 output_like(<<'CODE', <<OUTPUT, "fdiv_i_i by zero");
 	set I0, 0
 	set I1, 10
@@ -1376,5 +1383,5 @@ OUTPUT
 
 
 ## remember to change the number of tests :-)
-BEGIN { plan tests => 56; }
+BEGIN { plan tests => 57; }
 

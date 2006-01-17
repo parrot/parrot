@@ -647,7 +647,13 @@ eval_ins(Interp *interpreter, char *op, size_t ops, SymReg **r)
     }
 
     /* eval the opcode */
+    new_internal_exception(interpreter);
+    if (setjmp(interpreter->exceptions->destination)) {
+        fprintf(stderr, "eval_ins: op '%s' failed\n", op);
+        handle_exception(interpreter);
+    }
     pc = (interpreter->op_func_table[opnum]) (eval, interpreter);
+    free_internal_exception(interpreter);
     /* the returned pc is either incremented by op_count or is eval,
      * as the branch offset is 0 - return true if it branched
      */

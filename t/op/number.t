@@ -1108,6 +1108,13 @@ CODE
 /.*Divide by zero.*/
 OUTPUT
 
+output_like(<<'CODE', <<OUTPUT, "div_n_nc_nc by zero");
+	div N1, 0, 0
+	end
+CODE
+/.*Divide by zero.*/
+OUTPUT
+
 output_like(<<'CODE', <<OUTPUT, "div_n_n_n by zero");
 	set N0, 0
 	set N1, 10
@@ -1224,5 +1231,5 @@ OUTPUT
 
 
 ## remember to change the number of tests :-)
-BEGIN { plan tests => 56; }
+BEGIN { plan tests => 57; }
 
