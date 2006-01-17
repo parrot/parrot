@@ -571,7 +571,7 @@ Interpolates a formatstring with a set of values.
         /*
          * SELF is formatstring, value = argument array or item
          */
-        /* TODO: figure out why C<DOES> doesn't work for dynclasses */
+        /* TODO: figure out why C<DOES> doesn't work for dynamic PMCs */
         if (value->vtable->base_type != PyBuiltin_PyTuple) {
             /* not a tuple - make one */
             ar = pmc_new(INTERP, PyBuiltin_PyTuple);

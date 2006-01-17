@@ -12,11 +12,11 @@ use Parrot::Config;
 
 =head1 NAME
 
-t/dynclass/pyclass.t - Python Class type
+t/pmc/pyclass.t - Python Class type
 
 =head1 SYNOPSIS
 
-	% prove t/dynclass/pyclass.t
+	% prove t/pmc/pyclass.t
 
 =head1 DESCRIPTION
 

@@ -12,11 +12,11 @@ use Parrot::Config;
 
 =head1 NAME
 
-t/dynclass/pyfunc.t - Python Functions
+t/pmc/pyfunc.t - Python Functions
 
 =head1 SYNOPSIS
 
-	% prove t/dynclass/pyfunc.t
+	% prove t/pmc/pyfunc.t
 
 =head1 DESCRIPTION
 

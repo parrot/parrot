@@ -33,13 +33,13 @@ C<String> is -- for example:
 a dynamic PMC such as C<TclInt> must instead perform a runtime lookup
 of its corresponding C<TclString> PMC, resulting in the more complicated:
 
-  static INTVAL dynclass_TclString;
+  static INTVAL dynpmc_TclString;
 
   pmclass TclInt extends TclObject extends Integer dynpmc group tcl_group {
 
     void class_init() {
       if (pass) {
-	dynclass_TclString = Parrot_PMC_typenum(INTERP,"TclString");
+	dynpmc_TclString = Parrot_PMC_typenum(INTERP,"TclString");
       }
     }
   }
@@ -57,8 +57,8 @@ and then in your .pir or .pasm file:
 
 =item 2
 
-Edit C<../../config/gen/makefiles/dynclasses.in> and append your PMC(s) to
-the build target. The dynclasses.in file is processed by Configure.pl to 
+Edit C<../../config/gen/makefiles/dynpmc.in> and append your PMC(s) to
+the build target. The dynpmc.in file is processed by Configure.pl to 
 create the real makefiles. So, invoke the configure script, then make:
 		
 	$ perl Configure.pl
@@ -68,6 +68,6 @@ create the real makefiles. So, invoke the configure script, then make:
 
 If anything changes inside parrot, be sure to:
 
-	$ make dynclasses-clean
+	$ make dynpmc-clean
 
 =back

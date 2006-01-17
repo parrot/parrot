@@ -4,7 +4,7 @@ $Id$
 
 =head1 NAME
 
-dynclasses/dynlexpad.pmc - DynLexPad PMC
+src/dynpmc/dynlexpad.pmc - DynLexPad PMC
 
 =head1 DESCRIPTION
 

@@ -16,7 +16,7 @@ t/pmc/pyint.t - Python Complex type
 
 =head1 SYNOPSIS
 
-	% prove t/dynclass/pyint.t
+	% prove t/pmc/pyint.t
 
 =head1 DESCRIPTION
 

@@ -12,11 +12,11 @@ use Parrot::Config;
 
 =head1 NAME
 
-t/dynclass/pybuiltin.t - Python Builtins
+t/pmc/pybuiltin.t - Python Builtins
 
 =head1 SYNOPSIS
 
-	% prove t/dynclass/pybuiltin.t
+	% prove t/pmc/pybuiltin.t
 
 =head1 DESCRIPTION
 

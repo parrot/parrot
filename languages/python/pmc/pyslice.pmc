@@ -4,7 +4,7 @@ $Id$
 
 =head1 NAME
 
-dynclasses/pyslice.pmc - Python Slice PMC
+pmc/pyslice.pmc - Python Slice PMC
 
 =head1 DESCRIPTION
 
