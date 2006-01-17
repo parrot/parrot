@@ -83,7 +83,8 @@ Initializes the subroutine.
     /*
      * Sub PMC's flags usage:
      * - private0 ... Coroutine flip/flop - C exception handler
-     * - private1 ... unused
+     * - private1 ... _IS_OUTER - have to preserve context
+     *                as some other sub has :outer(this) 
      * - private2 ... tailcall invoked this Sub
      * - private3 ... pythonic coroutine generator flag
      * - private4 ... :main (nee @MAIN)
@@ -307,6 +308,11 @@ Invokes the subroutine.
          * set context of the sub
          */
         sub->ctx = context;
+        if (PObj_get_FLAGS(SELF) & SUB_FLAG_IS_OUTER) {
+            /* don't destroy context */
+            ccont->vtable = Parrot_base_vtables[enum_class_Continuation];
+            context->ref_count++;
+        }
 
         if (!PMC_IS_NULL(INTERP->current_object)) {
             context->current_object = INTERP->current_object;

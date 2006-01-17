@@ -77,27 +77,51 @@ Invokes the closure.
 
     void* invoke (void* next) {
         struct Parrot_sub * sub = PMC_sub(SELF);
+        PMC *cont, *outer_sub;
+
         next = SUPER(next);
+        outer_sub = sub->outer_sub;
         if (sub->outer_ctx) {
             /* during newclosure, outer's ctx was stored in
              * sub->outer_ctx
              */
             sub->ctx->outer_ctx = sub->outer_ctx;
         }
+        else if ((PObj_get_FLAGS(outer_sub) & SUB_FLAG_IS_OUTER &&
+            PMC_sub(outer_sub)->ctx)) {
+            /* the sub was invoked earlier - it still has the context
+             * due to the SUB_FLAG_IS_OUTER flag
+             */
+            sub->outer_ctx = sub->ctx->outer_ctx = PMC_sub(outer_sub)->ctx;
+        }
         else {
             /* closure is just invoked - located :outer's ctx */
             parrot_context_t *caller = sub->ctx->caller_ctx;
             while (caller) {
-                if (caller->current_sub == sub->outer_sub) {
-                    sub->ctx->outer_ctx = caller;
-                    break;
+                if (caller->current_sub == outer_sub) {
+                    cont = caller->current_cont;
+                    cont->vtable = Parrot_base_vtables[enum_class_Continuation];
+                    sub->outer_ctx = sub->ctx->outer_ctx = caller;
+                    caller->ref_count++;
+                    return next;
                 }
                 caller = caller->caller_ctx;
             }
-            if (!caller)
-                real_exception(interpreter, NULL, INVALID_OPERATION,
-                        ":outer '%Ss' not found", 
-                        VTABLE_get_string(INTERP, sub->outer_sub));
+            if (!caller) {
+                /* outer has never been invoked, we fake a subroutine call
+                 * which builds the LexPad and return immediately
+                 * this will usually just lead to a Null PMC access
+                 * exception
+                 */
+                INTERP->current_cont = NEED_CONTINUATION;
+                (void)VTABLE_invoke(INTERP, sub->outer_sub, next);
+                caller = CONTEXT(INTERP->ctx);
+                cont = caller->current_cont;
+                cont->vtable = Parrot_base_vtables[enum_class_Continuation];
+                sub->outer_ctx = sub->ctx->outer_ctx = caller;
+                caller->ref_count++;
+                (void)VTABLE_invoke(INTERP, cont, next);
+            }
         }
         return next;
     }

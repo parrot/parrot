@@ -594,6 +594,7 @@ find_outer(Interp *interpreter, IMC_Unit *unit)
     for (s = globals.cs->first; s; s = s->next) {
         sub = s->unit->instructions->r[0];
         if (!strcmp(sub->name, unit->outer->name)) {
+            PObj_get_FLAGS(s->unit->sub_pmc) |= SUB_FLAG_IS_OUTER;
             return s->unit->sub_pmc;
         }
     }

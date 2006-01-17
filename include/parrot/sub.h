@@ -24,6 +24,8 @@ typedef enum {
     SUB_FLAG_CORO_FF      = PObj_private0_FLAG,
     SUB_FLAG_C_HANDLER    = PObj_private0_FLAG,
 
+    SUB_FLAG_IS_OUTER     = PObj_private1_FLAG,
+
     SUB_FLAG_TAILCALL     = PObj_private2_FLAG,
     SUB_FLAG_GENERATOR    = PObj_private3_FLAG,
 

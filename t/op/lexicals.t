@@ -955,13 +955,124 @@ pir_output_is(<<'CODE', <<'OUTPUT', 'package-scoped closure 2');
     '&f'()
     '&f'()
 .end
-
-
-
 CODE
 2
 OUTPUT
 
+pir_output_is(<<'CODE', <<'OUTPUT', 'package-scoped closure 3 - autoclose');
+#     sub f ($x) { 
+#         sub g ($y) { $x + $y }; g($x); 
+#     } 
+#     f(10); # 20 
+#     g(100); # 110
+.sub '&f' 
+    .param pmc x
+    .lex '$x', x
+    $P0 = '&g'(x)
+    .return ($P0)
+.end
+
+.sub '&g' :outer('&f')
+    .param pmc y
+    .lex '$y', y
+    .local pmc x
+    x = find_lex '$x'
+    $P0 = n_add x, y
+    .return ($P0)
+.end
+
+.sub '&main' :main :anon
+    $P0 = '&f'(10)
+    print $P0
+    print "\n"
+    $P0 = '&g'(100)
+    print $P0
+    print "\n"
+.end
+
+
+CODE
+20
+110
+OUTPUT
+
+pir_output_like(<<'CODE', <<'OUTPUT', 'package-scoped closure 4 - autoclose');
+#     sub f ($x) { 
+#         sub g () { print $x }; 
+#     } 
+#     g(); 
+.sub '&f' 
+    .param pmc x
+    .lex '$x', x
+.end
+
+.sub '&g' :outer('&f')
+    .local pmc x
+    x = find_lex '$x'
+    print x
+.end
+
+.sub '&main' :main :anon
+    '&g'()
+    print "never\n"
+.end
+CODE
+/Null PMC access/
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', 'package-scoped closure 5 - autoclose');
+#     sub f ($x) { 
+#         sub g () { print "$x\n" }; 
+#     } 
+#     f(10); 
+#     g(); 
+.sub '&f' 
+    .param pmc x
+    .lex '$x', x
+.end
+
+.sub '&g' :outer('&f')
+    .local pmc x
+    x = find_lex '$x'
+    print x
+    print "\n"
+.end
+
+.sub '&main' :main :anon
+    '&f'(10)
+    '&g'()
+.end
+CODE
+10
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', 'package-scoped closure 6 - autoclose');
+#     sub f ($x) { 
+#         sub g () { print "$x\n" }; 
+#     } 
+#     f(10); 
+#     f(20); 
+#     g(); 
+.sub '&f' 
+    .param pmc x
+    .lex '$x', x
+.end
+
+.sub '&g' :outer('&f')
+    .local pmc x
+    x = find_lex '$x'
+    print x
+    print "\n"
+.end
+
+.sub '&main' :main :anon
+    '&f'(10)
+    '&f'(20)
+    '&g'()
+.end
+CODE
+20
+OUTPUT
 
 ## remember to change the number of tests :-)
-BEGIN { plan tests => 38; }
+BEGIN { plan tests => 42; }
