@@ -204,8 +204,9 @@ GEN_CONFIGS = \
 	config_lib.pasm \
 	$(SRC_DIR)/nci_test$(O) \
 	compilers/ast/ast.y.flag \
-	tools/build/dynpmc.pl \
-	tools/build/dynoplibs.pl \
+	$(BUILD_TOOLS_DIR)/dynpmc.pl \
+	$(BUILD_TOOLS_DIR)/dynoplibs.pl \
+	parrot.pc \
 	$(IMCC_DIR)/imcc.y.flag \
 	$(OPS_DIR)/core_ops.c \
 	$(OPS_DIR)/core_ops_switch.c
@@ -1459,6 +1460,7 @@ prog-clean :
 		$(SRC_DIR)/parrot_config$(O) \
 		$(SRC_DIR)/install_config$(O) \
 		install_config.fpmc \
+		$(SRC_DIR)/asmfun.s \
 		$(LIBNCI_TEST_SO) \
 		$(LIBPARROT_STATIC) \
 		$(LIBPARROT_SHARED)
@@ -1531,8 +1533,11 @@ test-clean :
 		"t/tools/*.pbc" \
 		"t/library/*.pir" \
 		"t/library/*.pbc" \
-		"t/benchmarks*.pir" \
-		"t/benchmarks*.pasm"
+		"t/examples/*.pasm" \
+		"t/examples/*.past" \
+		"t/examples/*.pir" \
+		"t/benchmark/*.pir" \
+		"t/benchmark/*.pasm"
 
 imcc-clean:
 	$(RM_F) \
@@ -1547,8 +1552,10 @@ realclean : clean
 
 distclean : realclean
 
-svnclobber :
-	$(PERL) "-MExtUtils::Manifest=filecheck" -le @PQ@sub ExtUtils::Manifest::_maniskip{sub{0}};$$ExtUtils::Manifest::Quiet=1; do { unlink $$_ unless $$_ =~ m!(?:\.svn)! } for filecheck()@PQ@
+# Require .svn to exist first
+# Otherwise it'll remove every last file
+svnclobber : .svn
+	$(PERL) -MFile::Find -e 'find(sub{unlink $$File::Find::name if -f and not $$File::Find::name =~ m[/\.svn/] and not -e ".svn/text-base/$$_.svn-base";},".")'
 
 reconfig : clean
 	$(PERL) Configure.pl --reconfig
