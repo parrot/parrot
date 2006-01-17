@@ -48,7 +48,7 @@ All of this really ought to be in a usage message.
 
 To run any of the generated code, you need the Match and MatchRange
 PMCs. They should be generated automatically now by the root makefile,
-but if for some reason they aren't, run 'make' in parrot/dynclasses/
+but if for some reason they aren't, run 'make' in src/dynpmc/
 to generate them.
 
 The above commands only generate subroutines for matching regular
@@ -315,7 +315,7 @@ are:
     matches, but that's really because it falls out of any sane
     implementation (you have to keep all that state around somehow
     anyway)
-  - l/rx uses match objects (dynclasses/match.pmc) and automatically
+  - l/rx uses match objects (src/dynpmc/match.pmc) and automatically
     generates a parse tree out of them. PGE has a dynamically created
     Parrot class "PGE::Match" that I assume does something similar.
   - PGE has built-in "dump out the matching info" routines; I make my

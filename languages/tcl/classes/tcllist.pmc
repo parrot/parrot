@@ -22,7 +22,7 @@ These are the vtable functions for the TclList base class
 
 /* cache of classes referenced */
 
-static INTVAL dynclass_TclInt;
+static INTVAL dynpmc_TclInt;
 static STRING *space, *ob, *cb;
 
 pmclass TclList extends Array need_ext does array dynpmc group tcl_group hll Tcl maps Array {
@@ -41,7 +41,7 @@ Class initialization. Caches the type id of various PMCs.
         PMC *string_anchor;
         INTVAL fixedstringarray_typenum;
         if (pass) {
-            dynclass_TclInt    = pmc_type(INTERP,
+            dynpmc_TclInt    = pmc_type(INTERP,
                 string_from_const_cstring(INTERP, "TclInt", 0));
  
             space = string_from_const_cstring(INTERP, " ", 1);
@@ -99,7 +99,7 @@ isn't tested.
 */
 
     void set_integer_keyed_int (INTVAL key, INTVAL value) {
-        PMC *src = pmc_new_noinit(INTERP, dynclass_TclInt);
+        PMC *src = pmc_new_noinit(INTERP, dynpmc_TclInt);
         PMC_int_val(src) = value;
         list_assign(INTERP, (List *) PMC_data(SELF), key, src, enum_type_PMC);
     }

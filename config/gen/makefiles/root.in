@@ -181,7 +181,7 @@ GEN_MAKEFILES = \
 	languages/tcl/examples/Makefile \
 	languages/urm/Makefile \
 	languages/Zcode/Makefile \
-	src/dynclasses/Makefile \
+	src/dynpmc/Makefile \
 	src/dynoplibs/Makefile
 
 GEN_CONFIGS = \
@@ -204,7 +204,7 @@ GEN_CONFIGS = \
 	config_lib.pasm \
 	$(SRC_DIR)/nci_test$(O) \
 	compilers/ast/ast.y.flag \
-	tools/build/dynclasses.pl \
+	tools/build/dynpmc.pl \
 	tools/build/dynoplibs.pl \
 	$(IMCC_DIR)/imcc.y.flag \
 	$(OPS_DIR)/core_ops.c \
@@ -542,7 +542,7 @@ all : \
 	docs \
 	$(LIBNCI_TEST_SO) \
 	$(GEN_LIBRARY) \
-	dynclasses \
+	dynpmc \
 	dynoplibs \
 	compilers \
 	$(PBCMERGE)
@@ -652,9 +652,9 @@ help :
 	@echo "  reconfig:          'clean' and redo configuration."
 	@echo ""
 	@echo "Dynamic PMCs:"
-	@echo "  dynclasses:        Proxy for default target of src/dynclasses/Makefile"
-	@echo "  dynclasses-test:   Proxy for target 'test' of src/dynclasses/Makefile"
-	@echo "  dynclasses-clean:  Proxy for target 'clean' of src/dynclasses/Makefile"
+	@echo "  dynpmc:            Proxy for default target of src/dynpmc/Makefile"
+	@echo "  dynpmc-test:       Proxy for target 'test' of src/dynpmc/Makefile"
+	@echo "  dynpmc-clean:      Proxy for target 'clean' of src/dynpmc/Makefile"
 	@echo ""
 	@echo "Dynamic oplibs:"
 	@echo "  dynoplibs:         Proxy for default target of src/dynoplibs/Makefile"
@@ -1190,17 +1190,17 @@ html-clean :
 #
 ###############################################################################
 
-dynclasses : dynclasses.dummy
+dynpmc : dynpmc.dummy
 
 # XXX this dependancy is too broad, and should be narrowed down
-dynclasses.dummy : $(PARROT)
-	$(MAKE) src/dynclasses
+dynpmc.dummy : $(PARROT)
+	$(MAKE) src/dynpmc
 
-dynclasses-test :
-	$(MAKE) src/dynclasses test
+dynpmc-test :
+	$(MAKE) src/dynpmc test
 
-dynclasses-clean :
-	$(MAKE) src/dynclasses clean
+dynpmc-clean :
+	$(MAKE) src/dynpmc clean
 
 ###############################################################################
 #
@@ -1289,7 +1289,7 @@ RUNCORE_TEST_FILES = \
 	t/op/*.t \
 	t/pmc/*.t \
 	t/native_pbc/*.t \
-	t/dynclass/*.t \
+	t/dynpmc/*.t \
 	t/compilers/pge/*.t \
 	t/compilers/pge/p5regexp/*.t \
 	t/compilers/pge/p6rules/*.t \
@@ -1428,7 +1428,7 @@ clean : \
 	dynext-clean \
 	languages-clean \
 #CONDITIONED_LINE(has_perldoc):	docs-clean \
-	dynclasses-clean \
+	dynpmc-clean \
 	dynoplibs-clean \
 	examples-clean \
 	imcc-clean \

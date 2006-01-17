@@ -12,11 +12,11 @@ use Parrot::Config;
 
 =head1 NAME
 
-t/dynclass/quantumreg.t - test the QuantumReg PMC 
+t/dynpmc/quantumreg.t - test the QuantumReg PMC 
 
 =head1 SYNOPSIS
 
-	% perl -Ilib t/dynclass/quantumreg.t
+	% perl -Ilib t/dynpmc/quantumreg.t
 
 =head1 DESCRIPTION
 

@@ -959,10 +959,10 @@ EOC
 EOC
 
     # declare auxiliary variables for dyncpmc IDs
-    foreach my $dynclass (keys %init_mmds) {
-        next if $dynclass eq $classname;
+    foreach my $dynpmc (keys %init_mmds) {
+        next if $dynpmc eq $classname;
         $cout .= <<"EOC";
-        int my_enum_class_$dynclass = Parrot_PMC_typenum(interp, "$dynclass");
+        int my_enum_class_$dynpmc = Parrot_PMC_typenum(interp, "$dynpmc");
 EOC
     }
         $cout .= <<"EOC";
@@ -982,10 +982,10 @@ EOC
         }
     }
     # just to be safe
-    foreach my $dynclass (keys %init_mmds) {
-        next if $dynclass eq $classname;
+    foreach my $dynpmc (keys %init_mmds) {
+        next if $dynpmc eq $classname;
         $cout .= <<"EOC";
-        assert(my_enum_class_$dynclass != enum_class_default);
+        assert(my_enum_class_$dynpmc != enum_class_default);
 EOC
     }
     if (scalar @mmds) {

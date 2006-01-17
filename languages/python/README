@@ -9,7 +9,7 @@ Parrot and a set of Parrot PMCs which will implement the Python
 specific behavior required.
 
 For now, Pirate, its tests, and the tests in this directory and those
-in the t/dynclass directory are being used to flesh out the runtime.
+in the t/dynpmc directory are being used to flesh out the runtime.
 
 You can get the latest version of Pirate from:
 
@@ -24,7 +24,7 @@ Outstanding Parrot archicture/design issues/major todos:
   Bound vs Unbound methods
   "Const"-ness (particularly for dictionaries)
   isinstance VTABLE entry?
-  DOES for dynclasses
+  DOES for dynpmc
   bounds checking
   "in" dict vs "in" tuple vs exists_key
 

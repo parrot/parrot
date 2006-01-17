@@ -68,7 +68,7 @@ sub makefiles
         conditioned_lines              => 1
     );
     genfile(
-        'config/gen/makefiles/dynclasses_pl.in' => 'tools/build/dynclasses.pl',
+        'config/gen/makefiles/dynpmc_pl.in' => 'tools/build/dynpmc.pl',
         commentType                             => '#',
         replace_slashes                         => 0,
         conditioned_lines                       => 1
@@ -90,7 +90,7 @@ sub makefiles
         replace_slashes               => 1
     );
     genfile(
-        'config/gen/makefiles/dynclasses.in' => 'src/dynclasses/Makefile',
+        'config/gen/makefiles/dynpmc.in' => 'src/dynpmc/Makefile',
         commentType                          => '#',
         replace_slashes                      => 1,
         conditioned_lines                    => 1

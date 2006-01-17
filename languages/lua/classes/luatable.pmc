@@ -25,7 +25,7 @@ Now, Lua 5.0 uses a hybrid data structure with a Hash part and an Array part.
 #include "parrot/parrot.h"
 
 static STRING *luatable_name;
-static INTVAL dynclass_LuaNil;
+static INTVAL dynpmc_LuaNil;
 
 pmclass LuaTable
     extends Hash
@@ -39,7 +39,7 @@ pmclass LuaTable
     void class_init() {
         if (pass) {
             luatable_name = const_string(INTERP, "table");
-            dynclass_LuaNil = pmc_type(INTERP,
+            dynpmc_LuaNil = pmc_type(INTERP,
               string_from_const_cstring(INTERP, "LuaNil", 0));
         }
     }
@@ -125,7 +125,7 @@ A copy of the value is retrieved, otherwise, this could happen:
         PMC *retval = SUPER(key);
 
         if (enum_class_None == retval->vtable->base_type) {
-            retval = pmc_new(INTERP, dynclass_LuaNil);
+            retval = pmc_new(INTERP, dynpmc_LuaNil);
             return retval;
         }
         newcopy = retval->vtable->clone(INTERP, retval);
@@ -149,10 +149,10 @@ A copy of the value is stored, otherwise, this could happen:
 
 */
     void set_pmc_keyed (PMC* key, PMC* value) {
-        if (dynclass_LuaNil == key->vtable->base_type) {
+        if (dynpmc_LuaNil == key->vtable->base_type) {
             real_exception(INTERP, NULL, 1, "table index is nil");
         }
-        if (dynclass_LuaNil == value->vtable->base_type) {
+        if (dynpmc_LuaNil == value->vtable->base_type) {
             Hash.SELF.delete_keyed(key);
         } 
         else {

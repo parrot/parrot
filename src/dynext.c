@@ -281,7 +281,7 @@ Parrot_load_lib(Interp *interpreter, STRING *lib, PMC *initializer)
     }
 
     /*
-     * work around gcc 3.3.3 and other problem with dynclasses
+     * work around gcc 3.3.3 and other problem with dynpmcs
      * something during library loading doesn't stand a DOD run
      */
     Parrot_block_DOD(interpreter);

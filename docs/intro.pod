@@ -152,7 +152,7 @@ will look something like this:
 
   C:\Perl\bin\perl.exe t\harness --gc-debug --running-make-test
     t\library\*.t  t\op\*.t  t\pmc\*.t  t\run\*.t  t\native_pbc\*.t
-    imcc\t\*\*.t  t\dynclass\*.t  t\p6rules\*.t t\src\*.t t\perl\*.t
+    imcc\t\*\*.t  t\dynpmc\*.t  t\p6rules\*.t t\src\*.t t\perl\*.t
   t\library\dumper...............ok
   t\library\getopt_long..........ok
   ...

@@ -260,7 +260,7 @@ That is still the same:
 This finds a C<foo> variable at any B<outer> depth starting from the top.
 
 If your language looks up variables differently you have to walk the
-'caller' chain. See also F<t/dynclass/dynlexpad.t>.
+'caller' chain. See also F<t/dynpmc/dynlexpad.t>.
 
 =head2 How can I produce more efficient code for lexicals?
 
@@ -484,7 +484,7 @@ PMCs, see L<tools/build/pmc2c.pl> and L<docs/pmc.pod>.
 To build dynamic PMCs, add something like the following to your makefile:
 
   PERL     = /usr/bin/perl
-  PMCBUILD = $(PERL) /path/to/parrot/tools/build/dynclasses.pl
+  PMCBUILD = $(PERL) /path/to/parrot/tools/build/dynpmc.pl
   DESTDIR  = /path/to/parrot/runtime/parrot/dynext
   LOAD_EXT = .so
   

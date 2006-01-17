@@ -92,7 +92,7 @@ sub runstep
     if ($without) {
         $conf->data->set(
             has_icu    => 0,
-            icu_shared => '', # used for generating src/dynclasses/Makefile
+            icu_shared => '', # used for generating src/dynpmc/Makefile
             icu_dir    => '',
         );
         $result = "no" unless defined $gen::icu::result;

@@ -34,7 +34,7 @@ my @globs = qw(
     src/*.c
     src/classes/*.pmc
     src/classes/*.c
-    src/dynclasses/*.pmc
+    src/dynpmc/*.pmc
     src/encodings/*.c
     src/io/*.c
     src/io/*.h

@@ -9,6 +9,6 @@ testbench:
 	perl t/harness t/pie/b*.t
 
 testclass:
-	cd ../.. ; perl -Ilib t/harness t/dynclass/py*.t
+	cd ../.. ; perl -Ilib t/harness t/dynpmc/py*.t
 
 clean:

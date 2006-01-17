@@ -12,7 +12,7 @@
 
 =head1 NAME
 
-dynclasses/tclarray.pmc - Tcl Array PMC
+classes/tclarray.pmc - Tcl Array PMC
 
 =head1 DESCRIPTION
 
@@ -28,7 +28,7 @@ This is the Array PMC for the Tcl implementation.
 
 #include "parrot/parrot.h"
 
-static INTVAL dynclass_TclString;
+static INTVAL dynpmc_TclString;
 
 /*
 
@@ -65,7 +65,7 @@ Initializes variables needed by the class.
 
     void class_init () {
         if (pass) {
-            dynclass_TclString = pmc_type(INTERP,
+            dynpmc_TclString = pmc_type(INTERP,
                 string_from_const_cstring(INTERP, "TclString", 0));
         }
     }
@@ -91,7 +91,7 @@ XXX - Why is Hash's implementation insufficient here??
         switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
             case KEY_hash_iterator_FLAGS:
                 s = hash_get_idx(INTERP, hash, key);
-                result = pmc_new(INTERP, dynclass_TclString);
+                result = pmc_new(INTERP, dynpmc_TclString);
                 VTABLE_set_string_native(INTERP, result, s);
                 return result;
         }

@@ -12,11 +12,11 @@ use Parrot::Config;
 
 =head1 NAME
 
-t/dynclass/gdbmhash.t - test the GDBMHash PMC 
+t/dynpmc/gdbmhash.t - test the GDBMHash PMC 
 
 =head1 SYNOPSIS
 
-	% perl -Ilib t/dynclass/gdbmhash.t
+	% perl -Ilib t/dynpmc/gdbmhash.t
 
 =head1 DESCRIPTION
 

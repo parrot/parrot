@@ -12,11 +12,11 @@ use Parrot::Config;
 
 =head1 NAME
 
-t/dynclass/dynlexpad.t - test the DynLexPad PMC
+t/dynpmc/dynlexpad.t - test the DynLexPad PMC
 
 =head1 SYNOPSIS
 
-	% prove t/dynclass/dynlexpad.t
+	% prove t/dynpmc/dynlexpad.t
 
 =head1 DESCRIPTION
 

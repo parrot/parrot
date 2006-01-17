@@ -20,19 +20,19 @@
 
 #include "parrot/parrot.h"
 
-static INTVAL dynclass_TclString;
-static INTVAL dynclass_TclFloat;
-static INTVAL dynclass_TclInt;
+static INTVAL dynpmc_TclString;
+static INTVAL dynpmc_TclFloat;
+static INTVAL dynpmc_TclInt;
 
 pmclass TclObject dynpmc group tcl_group {
 
     void class_init() {
         if (pass) {
-            dynclass_TclString = pmc_type(INTERP,
+            dynpmc_TclString = pmc_type(INTERP,
                 string_from_const_cstring(INTERP, "TclString", 0));
-            dynclass_TclInt    = pmc_type(INTERP,
+            dynpmc_TclInt    = pmc_type(INTERP,
                 string_from_const_cstring(INTERP, "TclInt", 0));
-            dynclass_TclFloat  = pmc_type(INTERP,
+            dynpmc_TclFloat  = pmc_type(INTERP,
                 string_from_const_cstring(INTERP, "TclFloat", 0));
         }
     }
@@ -42,30 +42,30 @@ pmclass TclObject dynpmc group tcl_group {
             return;
 	switch (type) {
 	    case enum_class_String:
-		type = dynclass_TclString;
+		type = dynpmc_TclString;
 		break;
 	    case enum_class_Integer:
-		type = dynclass_TclInt;
+		type = dynpmc_TclInt;
 		break;
 	    case enum_class_Float:
-		type = dynclass_TclFloat;
+		type = dynpmc_TclFloat;
 		break;
 	}
 	pmc_reuse(INTERP, SELF, type, 0);
     }
 
     void set_integer_native (INTVAL value) {
-        DYNSELF.morph(dynclass_TclInt);
+        DYNSELF.morph(dynpmc_TclInt);
         PMC_int_val(SELF) = value;
     }
 
     void set_number_native (FLOATVAL value) {
-        DYNSELF.morph(dynclass_TclFloat);
+        DYNSELF.morph(dynpmc_TclFloat);
         PMC_num_val(SELF) = value;
     }
 
     void set_string_native (STRING* value) {
-        DYNSELF.morph(dynclass_TclString);
+        DYNSELF.morph(dynpmc_TclString);
         PMC_str_val(SELF) = string_copy(INTERP, value);
     }
 }

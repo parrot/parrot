@@ -5,7 +5,7 @@ PBC_MERGE = ..@slash@..@slash@pbc_merge@exe@
 
 LIBPATH  = lib
 BUILTIN  = $(LIBPATH)@slash@builtins
-BUILD   = $(PERL) @build_dir@@slash@tools@slash@build@slash@dynclasses.pl
+BUILD   = $(PERL) @build_dir@@slash@tools@slash@build@slash@dynpmc.pl
 DESTDIR = @build_dir@@slash@runtime@slash@parrot@slash@dynext
 O       = @o@
 CLASSDIR = classes

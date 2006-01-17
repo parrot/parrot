@@ -38,7 +38,7 @@ sub new
 	
 	return $self->SUPER::new(
 		'Dynamic PMCs', 'dynapmc.html', '',
-		$self->new_group('Loading', '', 'src/dynclasses'),
+		$self->new_group('Loading', '', 'src/dynpmc'),
 		$self->new_group('Runtime', '', 'runtime/parrot/include'),
 	);
 }

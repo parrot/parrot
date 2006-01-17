@@ -46,7 +46,7 @@ DISABLED_PMCS = \
   pyproxyclass \
   pyiter
 
-BUILD = $(PERL) "@build_dir@@slash@tools@slash@build@slash@dynclasses.pl"
+BUILD = $(PERL) "@build_dir@@slash@tools@slash@build@slash@dynpmc.pl"
 
 all :
 	@$(BUILD) generate $(PMCS)
@@ -55,10 +55,10 @@ all :
 	@$(BUILD) copy "--destination=$(RUNTIME_DIR)" $(PMCS)
 
 test : all
-	cd .. ; perl -Ilib t/harness t/dynclass/*.t
+	cd .. ; perl -Ilib t/harness t/dynpmc/*.t
 
 testclean :
-	$(RM_F) "../../t/dynclass/*.pir" "../../t/dynclass/*.pbc"
+	$(RM_F) "../../t/dynpmc/*.pir" "../../t/dynpmc/*.pbc"
 
 # win32 import library
 # win32 program data base - contains debugging info

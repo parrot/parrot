@@ -309,7 +309,7 @@ Parrot_dod_trace_root(Interp *interpreter, int trace_stack)
     for (i = 1; i < (unsigned int)enum_class_max; i++) {
         VTABLE *vtable;
         /*
-         * XXX dynclasses groups have empty slots for abstract objects
+         * XXX dynpmc groups have empty slots for abstract objects
          */
         if ( (vtable = Parrot_base_vtables[i])) {
 #if 0

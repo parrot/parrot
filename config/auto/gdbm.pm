@@ -83,7 +83,7 @@ sub runstep
         print " (no) " if $verbose;
         $result = 'no';
     }
-    $conf->data->set(has_gdbm => $has_gdbm); # for gdbmhash.t and dynclasses.in
+    $conf->data->set(has_gdbm => $has_gdbm); # for gdbmhash.t and dynpmc.in
 }
 
 1;

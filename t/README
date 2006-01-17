@@ -14,7 +14,7 @@ distro:       Contains currently only a check for sanity of MANIFEST.SKIP
 
 doc:          Completeness and sanity of the documentations
 
-dynclass:     Dynamic PMCs
+dynpmc:       Dynamic PMCs
 
 examples:     Check whether the examples are still working
 

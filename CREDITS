@@ -237,7 +237,7 @@ D: Lexical pads, CPS.
 N: Jonathan Stowe
 
 N: Jonathan Worthington
-D: Win32 dynclasses support, Win32 fixes, PBC utilities, debug segment work
+D: Win32 dynpmc support, Win32 fixes, PBC utilities, debug segment work
 D: and various patches
 E: jonathan@jwcs.net
 W: http://www.jwcs.net/~jonathan/
@@ -273,7 +273,7 @@ N: Kevin Tew
 D: Warnings fix
 
 N: Klaas-Jan Stol
-D: dynclasses and doc updates
+D: dynpmc and doc updates
 D: Lua PMC
 E: vanderlay@home.nl
 
