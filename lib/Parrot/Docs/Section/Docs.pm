@@ -55,7 +55,7 @@ sub new
 			$self->new_item('', 'docs/strings.pod'),
 			$self->new_item('', 'docs/memory_internals.pod'),
 			$self->new_item('', 'docs/parrotbyte.pod'),
-			$self->new_item('', 'docs/packfile-c.pod'),
+			$self->new_item('', 'docs/parrotbyte.pod'),
 			$self->new_item('', 'docs/jit.pod'),
 			$self->new_item('', 'docs/native_exec.pod'),
 			$self->new_item('', 'docs/running.pod'),

@@ -180,8 +180,7 @@ sub new
             '',
             $self->c_item(
                 'Parrot Packfile API and utilities.', 
-                'pairs' => ['packfile'],
-                'sources' => ['packdump', 'packout', 'pdump', 'pf_items']
+                'contents' => ['src/packfile'],
             ),
             $self->c_source_item('', 'byteorder'),
         ),
@@ -238,11 +237,6 @@ sub new
             'Extensions', 
             '',
             $self->c_pair_item('', 'extend'),
-        ),
-        $self->new_group(
-            'NCI', 
-            '',
-            $self->c_pair_item('', 'nci'),
         ),
         $self->new_group(
             'JIT', 
