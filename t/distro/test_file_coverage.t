@@ -1,6 +1,6 @@
 #! perl
 # Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
-# $Id: manifest_skip.t 10933 2006-01-06 01:43:24Z particle $
+# $Id$
 
 use strict;
 use warnings;
