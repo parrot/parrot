@@ -285,6 +285,8 @@ SP              [ ]
 ":slurpy"       return(ADV_SLURPY);
 ":optional"     return(ADV_OPTIONAL);
 ":opt_flag"     return(ADV_OPT_FLAG);
+":named"        return(ADV_NAMED);
+"=>"            return(ADV_ARROW);
 
 <emit,INITIAL>".namespace"    return(NAMESPACE);
 <emit,INITIAL>".HLL"          return(HLL);

@@ -61,7 +61,8 @@ typedef enum {
     PARROT_ARG_MAYBE_FLATTEN    = 0x10, /* flatten, if slurping and the
                                            argument is array */
     PARROT_ARG_OPTIONAL         = 0x20,
-    PARROT_ARG_OPT_FLAG         = 0x40  /* pev optional was set */
+    PARROT_ARG_OPT_FLAG         = 0x40, /* prev optional was set */
+    PARROT_ARG_NAME             = 0x80  /* this String is an arg name */
     /* more to come soon */
 
 } Call_bits_enum_t;
