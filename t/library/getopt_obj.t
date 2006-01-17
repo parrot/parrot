@@ -1,6 +1,6 @@
 #!perl
 # Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
-# $Id: getopt_obj.t 10677 2005-12-26 14:05:52Z jisom $
+# $Id$
 
 use strict;
 use warnings;

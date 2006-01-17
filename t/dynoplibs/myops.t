@@ -1,6 +1,6 @@
 #! perl
 # Copyright: 2006 The Perl Foundation.  All Rights Reserved.
-# $Id: myops.t 10145 2005-11-23 03:15:23Z jonathan $
+# $Id$
 
 use strict;
 use warnings;
