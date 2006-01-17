@@ -669,8 +669,10 @@ parrot_pass_args(Interp *interpreter,  parrot_context_t *src_ctx,
         }
         interpreter->current_args = NULL;
     }
-    if (!dst_pc)
+    if (!dst_pc) {
+        /* XXX error checking */
         return NULL;
+    }
     todo = Parrot_init_arg_op(interpreter, dest_ctx, dst_pc, &st.dest);
     Parrot_init_arg_op(interpreter, src_ctx, src_pc, &st.src);
     st.opt_so_far = 0;  /* XXX */
@@ -725,6 +727,9 @@ parrot_pass_args(Interp *interpreter,  parrot_context_t *src_ctx,
         int i;
         /* allow for optionals. */
         for (i = 0; i < st.dest.n; i++) {
+            /* XXX this is wrong - dest.sig isn't fetched, it's 
+             * just the last one
+             */
             if (st.dest.sig & (PARROT_ARG_OPTIONAL|PARROT_ARG_OPT_FLAG))
                 min_expected_args--;
         }

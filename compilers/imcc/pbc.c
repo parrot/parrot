@@ -1059,11 +1059,12 @@ verify_signature(Interp *interpreter, Instruction *ins, opcode_t *pc)
     n = VTABLE_elements(interpreter, sig_arr);
     for (i = 0; i < n; ++i) {
         r = ins->r[i + 1];
-        if (no_consts && (r->type & VTCONST))
-                IMCC_fatal(interpreter, 1, "e_pbc_emit: "
-                        "constant argument '%s' in get param/result\n",
-                        r->name);
         sig = VTABLE_get_integer_keyed_int(interpreter, sig_arr, i);
+        if (! (sig & PARROT_ARG_NAME) && 
+                no_consts && (r->type & VTCONST))
+            IMCC_fatal(interpreter, 1, "e_pbc_emit: "
+                    "constant argument '%s' in get param/result\n",
+                    r->name);
         if ((r->type & VTCONST) && !(sig & PARROT_ARG_CONSTANT)) {
             if (!changed_sig)
                 changed_sig = VTABLE_clone(interpreter, sig_arr);
