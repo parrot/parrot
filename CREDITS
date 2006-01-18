@@ -302,7 +302,7 @@ D: Various patches for pmc2c.pl
 D: Run Tcl test suite in partcl, and add various partcl bits
 
 N: Matt Fowles
-D: Resizable*Array classes
+D: Resizable*Array PMCs
 
 N: Mattia Barbon
 D: Win32 fixes, dynamic PMC creation and loading

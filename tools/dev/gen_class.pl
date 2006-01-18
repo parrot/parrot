@@ -8,7 +8,7 @@ tools/dev/gen_class.pl - Create a template PMC file
 
 =head1 SYNOPSIS
 
-	% perl tools/dev/gen_class.pl Foo > src/classes/Foo.pmc
+	% perl tools/dev/gen_class.pl Foo > src/pmc/Foo.pmc
 
 =head1 DESCRIPTION
 
@@ -19,8 +19,8 @@ information on adding a new PMC to Parrot.
 To see what a minimal PMC looks like, create a PMC template and compile
 it to C.
 
-	% perl tools/dev/gen_class.pl Foo > src/classes/foo.pmc
-	% perl tools/build/pmc2c.pl -c src/classes/foo.pmc
+	% perl tools/dev/gen_class.pl Foo > src/pmc/foo.pmc
+	% perl tools/build/pmc2c.pl -c src/pmc/foo.pmc
 
 =head1 SEE ALSO
 

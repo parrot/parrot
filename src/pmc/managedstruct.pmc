@@ -1,0 +1,126 @@
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 DESCRIPTION
+
+src/pmc/managedstruct.pmc - Memory-managed C struct
+
+=head1 DESCRIPTION
+
+C<ManagedStruct> extends C<UnManagedStruct> to provide a class to hold C
+C<struct> values that Parrot is responsible for disposing of.
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+#include "parrot/method_util.h"
+
+
+INTVAL key_2_idx(Interp* interpreter, PMC *pmc, PMC *key);
+
+pmclass ManagedStruct extends UnManagedStruct need_ext {
+
+/*
+
+=item C<void init()>
+
+Initializes an empty struct.
+
+=cut
+
+*/
+
+    void init () {
+        SUPER();
+        PObj_active_destroy_SET(SELF);
+        PMC_int_val(SELF) = 0;
+    }
+
+/*
+
+=item C<void init_pmc(PMC *value)>
+
+Initializes the struct with C<*value>.
+
+=cut
+
+*/
+
+    void init_pmc (PMC* value) {
+        SELF.init();
+        SUPER(value);
+    }
+
+/*
+
+=item C<void destroy()>
+
+Destroys the struct, freeing the allocated memory.
+
+=cut
+
+*/
+
+    void destroy () {
+        if (PMC_data(SELF)) {
+            mem_sys_free(PMC_data(SELF));
+        }
+    }
+
+/*
+
+=item C<void set_integer_native(INTVAL value)>
+
+(Re)allocates C<value> bytes for the struct.
+
+=cut
+
+*/
+
+    void set_integer_native (INTVAL value) {
+        if (PMC_data(SELF) && (! value)) {
+            mem_sys_free(PMC_data(SELF));
+            PMC_data(SELF) = NULL;
+            PMC_int_val(SELF) = 0;
+        }
+        else if (value && (! PMC_data(SELF))) {
+            PMC_data(SELF) = mem_sys_allocate_zeroed(value);
+            PMC_int_val(SELF) = value;
+        }
+        else if (value && PMC_data(SELF)) {
+            PMC_data(SELF) = mem_sys_realloc(PMC_data(SELF), value);
+            PMC_int_val(SELF) = value;
+        }
+        return;
+    }
+
+}
+
+/*
+
+=back
+
+=head1 HISTORY
+
+Initial revision by sean 2002/08/04.
+
+=cut
+
+*/
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+*/

@@ -4,7 +4,7 @@ $Id$
 
 =head1 NAME
 
-classes/match.pmc - Match object for rules
+src/dynpmc/match.pmc - Match object for rules
 
 =head1 DESCRIPTION
 

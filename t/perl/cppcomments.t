@@ -32,8 +32,8 @@ my @globs = qw(
     include/parrot/oplib/*.h
     jit/*/*.h
     src/*.c
-    src/classes/*.pmc
-    src/classes/*.c
+    src/pmc/*.pmc
+    src/pmc/*.c
     src/dynpmc/*.pmc
     src/encodings/*.c
     src/io/*.c

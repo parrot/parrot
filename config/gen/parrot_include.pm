@@ -37,7 +37,7 @@ my @files = qw(
     include/parrot/string.h
     include/parrot/vtable.h
     include/parrot/warnings.h
-    src/classes/timer.pmc
+    src/pmc/timer.pmc
     src/utils.c
 );
 my $destdir = 'runtime/parrot/include';

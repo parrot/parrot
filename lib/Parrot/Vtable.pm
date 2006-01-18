@@ -14,7 +14,7 @@ Parrot::Vtable - Functions for manipulating vtables
 C<Parrot::Vtable> provides a collection of functions for manipulating
 PMC vtables. It is used by F<tools/build/jit2h.pl>, F<tools/build/pmc2c.pl>,
 F<tools/build/vtable_h.pl>, F<tools/dev/gen_class.pl>, and
-F<src/classes/null.pl>.
+F<src/pmc/null.pl>.
 
 =head2 Functions
 
@@ -403,7 +403,7 @@ sub parse_params
 
 =item F<tools/dev/gen_class.pl>
 
-=item F<src/classes/null.pl>
+=item F<src/pmc/null.pl>
 
 =back
 

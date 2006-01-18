@@ -29,7 +29,7 @@ Makes sure that specific source files have matching test files.
 ## make sure PMC files match test files
 PMC: {
 
-	my $pmc_dir = 'src/classes';
+	my $pmc_dir = 'src/pmc';
 	my $pmc_suffix = '.pmc';
 
 	my $test_dir = 't/pmc';

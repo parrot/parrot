@@ -1,0 +1,547 @@
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+src/pmc/perlundef.pmc - Perl Undef
+
+=head1 DESCRIPTION
+
+C<PerlUndef> extends C<PerlInt> to provide a class with the behaviour of
+the Perl C<undef> value.
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+#include "parrot/perltypes.h"
+
+pmclass PerlUndef extends PerlInt {
+
+/*
+
+=item C<INTVAL get_integer()>
+
+Warns of the use of an unitialized value, and returns C<0>.
+
+=cut
+
+*/
+
+    INTVAL get_integer () {
+        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
+        "Use of uninitialized value in integer context");
+        return 0;
+    }
+
+/*
+
+=item C<FLOATVAL get_number()>
+
+Warns of the use of an unitialized value, and returns C<0.0>.
+
+=cut
+
+*/
+
+    FLOATVAL get_number () {
+        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
+        "Use of uninitialized value in numeric context");
+        return 0.0;
+    }
+
+/*
+
+=item C<STRING *get_string()>
+
+Warns of the use of an initialized value and returns an empty Parrot
+string.
+
+=cut
+
+*/
+
+    STRING* get_string () {
+        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
+        "Use of uninitialized value in string context");
+        return string_make_empty(INTERP,enum_stringrep_one,0);
+    }
+
+/*
+
+=item C<PMC *get_pmc()>
+
+Warns of the use of an initialized value and returns itself.
+
+=cut
+
+*/
+
+    PMC* get_pmc() {
+        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
+        "Use of uninitialized value in PMC context");
+        return SELF;
+    }
+
+/*
+
+=item C<INTVAL get_bool()>
+
+Returns false.
+
+Note that no warning is raised, as per:
+
+    my $a; print $a if $a;
+
+=cut
+
+*/
+
+    INTVAL get_bool () {
+        return 0;
+    }
+
+/*
+
+=item C<INTVAL is_same(PMC *pmc2)>
+
+Returns whether C<*pmc2> shares the same vtable.
+
+=cut
+
+*/
+
+    INTVAL is_same (PMC* pmc2) {
+        return (INTVAL)(pmc2->vtable == pmc->vtable);
+    }
+
+/*
+
+=item C<void set_integer_native(INTVAL value)>
+
+Morphs to a C<PerlInt> with value C<value>.
+
+=cut
+
+*/
+
+    void set_integer_native (INTVAL value) {
+        DYNSELF.morph(enum_class_PerlInt);
+        DYNSELF.set_integer_native(value);
+    }
+
+/*
+
+=item C<void set_integer_same(PMC* value)>
+
+All undefs have the same value, so this does nothing.
+
+=cut
+
+*/
+
+    void set_integer_same (PMC* value) {
+        /* Do nothing; Can't happen? */
+    }
+
+/*
+
+=item C<void set_string_native(STRING *value)>
+
+Morphs to a C<PerlString> with the value of C<*value>.
+
+=cut
+
+*/
+
+    void set_string_native (STRING* value) {
+        DYNSELF.morph(enum_class_PerlString);
+        DYNSELF.set_string_native(value);
+    }
+
+/*
+
+=item C<PMC* add(PMC *value,  PMC *dest)>
+
+=cut
+
+*/
+
+    PMC* add (PMC* value,  PMC* dest) {
+        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
+        "Use of uninitialized value in addition");
+        return SUPER(value, dest);
+    }
+
+/*
+
+=item C<PMC* add_int(INTVAL value,  PMC *dest)>
+
+=cut
+
+*/
+
+    PMC* add_int (INTVAL value,  PMC* dest) {
+        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
+                "Use of uninitialized value in integer addition");
+        return SUPER(value, dest);
+    }
+
+
+/*
+
+=item C<PMC* add_float(FLOATVAL value,  PMC *dest)>
+
+=cut
+
+*/
+
+    PMC* add_float (FLOATVAL value,  PMC* dest) {
+        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
+                "Use of uninitialized value in numeric addition");
+        return SUPER(value, dest);
+    }
+
+/*
+
+=item C<PMC* subtract(PMC *value,  PMC *dest)>
+
+=cut
+
+*/
+
+    PMC* subtract (PMC* value,  PMC* dest) {
+        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
+                "Use of uninitialized value in subtraction");
+        return SUPER(value, dest);
+    }
+
+/*
+
+=item C<PMC* subtract_int(INTVAL value,  PMC *dest)>
+
+=cut
+
+*/
+
+    PMC* subtract_int (INTVAL value,  PMC* dest) {
+        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
+                "Use of uninitialized value in integer subtraction");
+        return SUPER(value, dest);
+    }
+
+
+/*
+
+=item C<PMC* subtract_float(FLOATVAL value, PMC *dest)>
+
+=cut
+
+*/
+
+    PMC* subtract_float (FLOATVAL value,  PMC* dest) {
+        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
+                "Use of uninitialized value in numeric subtraction");
+        return SUPER(value, dest);
+    }
+
+/*
+
+=item C<PMC* multiply(PMC *value, PMC *dest)>
+
+=cut
+
+*/
+
+    PMC* multiply (PMC* value,  PMC* dest) {
+        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
+                "Use of uninitialized value in multiplication");
+        return SUPER(value, dest);
+    }
+
+/*
+
+=item C<PMC* multiply_int(INTVAL value, PMC *dest)>
+
+=cut
+
+*/
+
+    PMC* multiply_int (INTVAL value,  PMC* dest) {
+        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
+                "Use of uninitialized value in integer multiplication");
+        return SUPER(value, dest);
+    }
+
+
+/*
+
+=item C<PMC* multiply_float(FLOATVAL value, PMC *dest)>
+
+=cut
+
+*/
+
+    PMC* multiply_float (FLOATVAL value,  PMC* dest) {
+        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
+                "Use of uninitialized value in numeric multiplication");
+        return SUPER(value, dest);
+    }
+
+/*
+
+=item C<void divide(PMC *value, PMC *dest)>
+
+=cut
+
+*/
+
+    PMC* divide (PMC* value,  PMC* dest) {
+        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
+            "Use of uninitialized value in division");
+        return SUPER(value, dest);
+    }
+
+/*
+
+=item C<PMC* divide_int(INTVAL value, PMC *dest)>
+
+=cut
+
+*/
+
+    PMC* divide_int (INTVAL value,  PMC* dest) {
+        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
+            "Use of uninitialized value in integer division");
+        return SUPER(value, dest);
+    }
+
+
+/*
+
+=item C<PMC* divide_float(FLOATVAL value, PMC *dest)>
+
+=cut
+
+*/
+
+    PMC* divide_float (FLOATVAL value,  PMC* dest) {
+        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
+            "Use of uninitialized value in numeric division");
+        return SUPER(value, dest);
+    }
+
+/*
+
+=item C<PMC* modulus(PMC *value, PMC *dest)>
+
+=cut
+
+*/
+
+    PMC* modulus (PMC* value,  PMC* dest) {
+        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
+            "Use of uninitialized value in modulus");
+        return SUPER(value, dest);
+    }
+
+/*
+
+=item C<PMC* modulus_int(INTVAL value, PMC *dest)>
+
+=cut
+
+*/
+
+    PMC* modulus_int (INTVAL value,  PMC* dest) {
+        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
+            "Use of uninitialized value in integer modulus");
+        return SUPER(value, dest);
+    }
+
+
+/*
+
+=item C<PMC* modulus_float(FLOATVAL value, PMC *dest)>
+
+=cut
+
+*/
+
+    PMC* modulus_float (FLOATVAL value,  PMC* dest) {
+        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
+            "Use of uninitialized value in numeric modulus");
+        return SUPER(value, dest);
+    }
+
+
+
+/*
+
+=item C<INTVAL is_equal(PMC *value)>
+
+Warns of the use of an undefined value and returns whether the boolean
+value of C<*value> is false.
+
+=cut
+
+*/
+
+    INTVAL is_equal (PMC* value) {
+        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
+        "Use of uninitialized value in equals");
+        if (VTABLE_get_bool(INTERP, value) == 0) {
+            return 1;
+        }
+        else {
+            return 0;
+        }
+    }
+
+/*
+
+=item C<PMC* logical_or(PMC *value, PMC *dest)>
+
+=cut
+
+*/
+
+    PMC* logical_or (PMC* value,  PMC* dest) {
+        return value;
+    }
+
+/*
+
+=item C<PMC* logical_and(PMC *value, PMC *dest)>
+
+=cut
+
+*/
+
+    PMC* logical_and (PMC* value,  PMC* dest) {
+        return SELF;
+    }
+
+/*
+
+=item C<PMC* logical_xor(PMC *value, PMC *dest)>
+
+=item C<void i_logical_xor(PMC *value, PMC *dest)>
+
+=cut
+
+*/
+
+    PMC* logical_xor (PMC* value,  PMC* dest) {
+MMD_PerlUndef: {
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
+            VTABLE_set_bool(INTERP, dest, 0);
+            return dest;
+        }
+MMD_DEFAULT: {
+
+            INTVAL value_bool = VTABLE_get_bool(INTERP, value);
+            if (value_bool) {
+                return value;
+            }
+            else {
+                dest = pmc_new(INTERP, SELF->vtable->base_type);
+                VTABLE_set_bool(INTERP, dest, 0);
+            }
+            return dest;
+        }
+    }
+
+/*
+
+=item C<PMC logical_not(PMC *dest)>
+
+=item C<void i_logical_not()>
+
+Since we know that we're false, the logical ops are particularly
+simple, and there's no need to use the versions in C<PerlScalar>.
+
+All these methods simply return undef itself.
+
+=cut
+
+*/
+
+    PMC* logical_not (PMC* dest) {
+        if (!dest)
+            dest = pmc_new(INTERP, enum_class_PerlInt);
+        VTABLE_set_integer_native(INTERP, dest, 1);
+        return dest;
+    }
+    void i_logical_not () {
+        VTABLE_set_integer_native(INTERP, SELF, 1);
+    }
+
+/*
+
+=item C<INTVAL defined()>
+
+Returns false, of course.
+
+=cut
+
+*/
+
+    INTVAL defined () {
+        return 0;
+    }
+
+/*
+
+=item C<void increment()>
+
+Morphs to a C<PerlInt> with value C<1>.
+
+=cut
+
+*/
+
+    void increment () {
+        DYNSELF.morph(enum_class_PerlInt);
+        PMC_int_val(SELF) = 1;
+    }
+
+/*
+
+=item C<void decrement()>
+
+Morphs to a C<PerlInt> with value C<-1>.
+
+=cut
+
+*/
+
+    void decrement () {
+        DYNSELF.morph(enum_class_PerlInt);
+        PMC_int_val(SELF) = -1;
+    }
+}
+
+/*
+
+=back
+
+=cut
+
+*/
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+*/

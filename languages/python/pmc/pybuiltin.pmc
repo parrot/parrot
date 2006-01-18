@@ -4,7 +4,7 @@ $Id$
 
 =head1 NAME
 
-classes/pybuiltin.pmc - Python "builtin" Functions
+pmc/pybuiltin.pmc - Python "builtin" Functions
 
 =head1 DESCRIPTION
 

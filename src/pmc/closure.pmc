@@ -1,0 +1,200 @@
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+src/pmc/closure.pmc - Closure PMC
+
+=head1 DESCRIPTION
+
+This class implements a closure, i.e. a subroutine which take a context
+structure.
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+#include "parrot/method_util.h"
+
+pmclass Closure extends Sub need_ext {
+
+/*
+
+=item C<void init()>
+
+Initializes the closure.
+
+=cut
+
+*/
+
+    void init () {
+        PMC_struct_val(SELF) = new_closure(INTERP);
+        PMC_pmc_val(SELF) = NULL;
+        PObj_custom_mark_destroy_SETALL(SELF);
+#if 0
+        if (Interp_flags_TEST(INTERP, PARROT_DEBUG_FLAG))
+            printf("Address of base segment is %p\n",
+                    (PMC_sub(SELF))->seg->base.pf->base.data);
+#endif
+    }
+
+/*
+
+=item C<void mark()>
+
+Marks the closure as live.
+
+=cut
+
+*/
+
+    void mark () {
+        struct Parrot_sub * sub = PMC_sub(SELF);
+        SUPER();
+        if (sub->outer_sub) {
+            pobject_lives(INTERP, (PObj*)sub->outer_sub);
+            mark_context(INTERP, sub->outer_ctx);
+        }
+    }
+
+
+/*
+
+=item C<void* invoke(void* next)>
+
+Invokes the closure.
+
+=cut
+
+*/
+
+    void* invoke (void* next) {
+        struct Parrot_sub * sub = PMC_sub(SELF);
+        PMC *cont, *outer_sub;
+
+        next = SUPER(next);
+        outer_sub = sub->outer_sub;
+        if (sub->outer_ctx) {
+            /* during newclosure, outer's ctx was stored in
+             * sub->outer_ctx
+             */
+            sub->ctx->outer_ctx = sub->outer_ctx;
+        }
+        else if ((PObj_get_FLAGS(outer_sub) & SUB_FLAG_IS_OUTER &&
+            PMC_sub(outer_sub)->ctx)) {
+            /* the sub was invoked earlier - it still has the context
+             * due to the SUB_FLAG_IS_OUTER flag
+             */
+            sub->outer_ctx = sub->ctx->outer_ctx = PMC_sub(outer_sub)->ctx;
+        }
+        else {
+            /* closure is just invoked - located :outer's ctx */
+            parrot_context_t *caller = sub->ctx->caller_ctx;
+            while (caller) {
+                if (caller->current_sub == outer_sub) {
+                    cont = caller->current_cont;
+                    cont->vtable = Parrot_base_vtables[enum_class_Continuation];
+                    sub->outer_ctx = sub->ctx->outer_ctx = caller;
+                    caller->ref_count++;
+                    return next;
+                }
+                caller = caller->caller_ctx;
+            }
+            if (!caller) {
+                /* outer has never been invoked, we fake a subroutine call
+                 * which builds the LexPad and return immediately
+                 * this will usually just lead to a Null PMC access
+                 * exception
+                 */
+                INTERP->current_cont = NEED_CONTINUATION;
+                (void)VTABLE_invoke(INTERP, sub->outer_sub, next);
+                caller = CONTEXT(INTERP->ctx);
+                cont = caller->current_cont;
+                cont->vtable = Parrot_base_vtables[enum_class_Continuation];
+                sub->outer_ctx = sub->ctx->outer_ctx = caller;
+                caller->ref_count++;
+                (void)VTABLE_invoke(INTERP, cont, next);
+            }
+        }
+        return next;
+    }
+
+    void thawfinish(visit_info *info) {
+        struct Parrot_sub * sub = PMC_sub(SELF);
+        PMC *outer;
+        opcode_t i, ci;
+        struct PackFile_FixupTable *ft;
+        struct PackFile_ConstTable *ct;
+
+        /*
+         * XXX TODO
+         *
+         * A Sub PMC is frozen/thawed per item, OTOH it can refer to other
+         * subs via the outer_sub (:outer) syntax. This outer though, is created
+         * independently when running from .pbc, which breaks referential
+         * integrity.
+         *
+         * The only fix (except this ugly and slow code) is to freeze/thaw
+         * a code segment as one structure, which will take care of all
+         * refs and self-refs. 
+         *
+         * TODO - intermediate step:
+         *
+         * Investigate if we can:
+         * - freeze array of subs (instead of the useless fixup seg)
+         * - do we need the Sub constant in the const seg as PMC constant?  
+         */
+
+        if (PMC_IS_NULL(sub->outer_sub))
+            return;
+        ft = sub->seg->fixups;
+        ct = sub->seg->const_table;
+        for (i = 0; i < ft->fixup_count; i++) {
+            switch (ft->fixups[i]->type) {
+                case enum_fixup_sub:
+                    ci = ft->fixups[i]->offset;
+                    if (ci < 0 || ci >= ct->const_count - 1)
+                        return; /* not yet thawed */
+                    if (ct->constants[ci]->type != PFC_PMC)
+                        return; /* same */
+                    outer = ct->constants[ci]->u.key;
+                    if (PMC_IS_NULL(outer))
+                        continue;
+                    if (0 == string_equal(INTERP, PMC_sub(outer)->name,
+                                PMC_sub(sub->outer_sub)->name)) {
+                        sub->outer_sub = outer;
+                        break;
+                    }
+            } 
+        }
+    }
+}
+
+/*
+
+=back
+
+=head1 HISTORY
+
+Initial version by Leo.
+
+=cut
+
+*/
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+*/

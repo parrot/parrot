@@ -4,7 +4,7 @@ $Id$
 
 =head1 NAME
 
-classes/nci.pmc - Python Native Call Interface Functions
+pmc/pyboundcall.pmc - Python Native Call Interface Functions
 
 =head1 DESCRIPTION
 

@@ -4,7 +4,7 @@ $Id$
 
 =head1 NAME
 
-classes/pycomplex.pmc - Python Complex Numbers PMC Class
+pmc/pycomplex.pmc - Python Complex Numbers PMC Class
 
 =head1 DESCRIPTION
 

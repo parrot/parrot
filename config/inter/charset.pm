@@ -48,7 +48,7 @@ END
         }
     }
 
-    # names of class files for src/classes/Makefile
+    # names of class files for src/pmc/Makefile
     (my $TEMP_charset_o = $charset_list) =~ s/\.c/\$(O)/g;
 
     my $TEMP_charset_build = <<"E_NOTE";

@@ -1041,7 +1041,7 @@ DOD run.
 =iterm <Parrot_PMC Parrot_get_dod_registry(Parrot_INTERP)>
 
 Return Parrot's internal DOD registry PMC.
-See also: F<src/classes/addrregistry.pmc>.
+See also: F<src/pmc/addrregistry.pmc>.
 
 =cut
 

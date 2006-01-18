@@ -2,6 +2,7 @@
 
 2006.01.16    bernhard
 	 * rename src/dynclasses to src/dynpmc 
+	 * rename src/classes to src/pmc 
 
 2006.01.15    leo
 

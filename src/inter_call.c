@@ -979,7 +979,7 @@ set_retval_f(Parrot_Interp interpreter, int sig_ret, parrot_context_t *ctx)
 
 =head1 SEE ALSO
 
-F<include/parrot/interpreter.h>, F<src/inter_run.c>, F<src/classes/sub.pmc>.
+F<include/parrot/interpreter.h>, F<src/inter_run.c>, F<src/pmc/sub.pmc>.
 
 =cut
 

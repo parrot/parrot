@@ -4,7 +4,7 @@ $Id$
 
 =head1 NAME
 
-classes/pyiter.pmc - Python Iterator
+pmc/pyiter.pmc - Python Iterator
 
 =head1 DESCRIPTION
 

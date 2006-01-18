@@ -1,0 +1,167 @@
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+src/pmc/exception_handler.pmc - Exception Handler PMC
+
+=head1 DESCRIPTION
+
+When an exception handler is called, the exception object is passed as
+C<REG_PMC(5)>, the original contents of this register is in the
+exception object's C<_P5> attribute.
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+#include "parrot/oplib/ops.h"
+
+static opcode_t *
+parrot_pass_args_to_result(Interp *interpreter, const char *sig,
+        opcode_t *dest, parrot_context_t * old_ctxp, va_list ap)
+{
+    int todo;
+    struct call_state st;
+
+    Parrot_init_arg_op(interpreter,
+            CONTEXT(interpreter->ctx), dest, &st.dest);
+    todo = Parrot_init_arg_sig(interpreter,
+            old_ctxp, sig, PARROT_VA_TO_VAPTR(ap), &st.src);
+    st.opt_so_far = 0;  /* XXX */
+
+    while (todo) {
+        Parrot_fetch_arg(interpreter, &st);
+        Parrot_convert_arg(interpreter, &st);
+        todo = Parrot_store_arg(interpreter, &st);
+    }
+    dest += st.dest.n + 2;
+    return dest;
+}
+
+static opcode_t *
+pass_exception_args(Interp *interpreter, const char *sig,
+        opcode_t *dest, parrot_context_t * old_ctx, ...)
+{
+    va_list ap;
+    void *next;
+    va_start(ap, old_ctx);
+    next = parrot_pass_args_to_result(interpreter, sig, dest, old_ctx, ap);
+    va_end(ap);
+    return next;
+}
+
+pmclass Exception_Handler extends Continuation need_ext {
+
+/*
+
+=item C<void init()>
+
+Initializes the exception handler.
+
+=cut
+
+*/
+
+    void init() {
+        PMC_struct_val(SELF) = new_continuation(INTERP, NULL);
+        PMC_pmc_val(SELF) = NULL;
+        /*
+         * an exception handler has no separate context, its
+         * only a snapshot of an "earlier" context, which is
+         * contained in the interpreter's context - the stacks
+         * can only be deeper in the interpreter - so no
+         * mark of context is needed
+         */
+        PObj_active_destroy_SET(SELF);
+    }
+
+    /*
+     * can't reuse Continuation's destroy yet -
+     * XXX fix ref_count handling for exception_handlers first
+     *
+     * An Exception_Handler is kind of a limited Continuation
+     * (can only call 'up the stack') Therefore we probably don't
+     * have to convert all RetContinuations to real Continuations
+     */
+
+    void destroy () {
+        struct Parrot_cont * cc = PMC_cont(SELF);
+        if (cc) {
+            mem_sys_free(cc);
+            PMC_struct_val(SELF) = NULL;
+        }
+    }
+    PMC* clone  () {
+        PMC *result = SUPER();
+        PObj_custom_mark_CLEAR(result);
+        return result;
+    }
+
+    void set_pointer (void* value) {
+        opcode_t *pos = value;
+        struct Parrot_cont * cc = PMC_cont(SELF);
+        if (*pos == PARROT_OP_get_results_pc) {
+            cc->current_results = pos;
+        }
+        else
+            cc->current_results = NULL;
+        SUPER(value);
+    }
+
+    void* invoke (void* ex) {
+        struct Parrot_cont * cc = PMC_cont(SELF);
+        PMC *exception = ex;
+        parrot_context_t *ex_ctx;
+        void *next = NULL;
+        opcode_t *results;
+        /* COMPAT:  PMC *p5 = REG_PMC(5);*/
+
+        results = cc->current_results;
+        /* clear all results, so that continuation.invoke
+         * doesn't pass any args #'
+         */
+        cc->to_ctx->current_results = cc->current_results= NULL;
+        ex_ctx = CONTEXT(INTERP->ctx);
+        next = SUPER(next);
+        /* COMPAT:  VTABLE_set_pmc_keyed_int(INTERP,
+                    exception, 3, p5);
+                    REG_PMC(5) = exception;*/
+        if (results) {
+            STRING *message = VTABLE_get_string_keyed_int(INTERP,
+                    exception, 0);
+            assert(next == results);
+            next = pass_exception_args(interpreter, "PS", next,
+                    ex_ctx, exception, message);
+        }
+        return next;
+    }
+}
+
+/*
+
+=back
+
+=head1 HISTORY
+
+Initial revision by leo 2003.07.10.
+
+=cut
+
+*/
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+*/

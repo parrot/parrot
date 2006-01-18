@@ -269,7 +269,7 @@ C isn't finished.
 
 =head1 FILES
 
-F<classes/unmanagedstruct.pmc>, F<classes/managedstruct.pmc>
+F<src/pmc/unmanagedstruct.pmc>, F<src/pmc/managedstruct.pmc>
 
 =head1 SEE ALSO
 

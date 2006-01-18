@@ -223,7 +223,7 @@ EOC
 Returns C<$self> as a new instance.
 
 C<$self> is a hash reference C<eval>-ed from a F<*.dump> file generated
-by F<src/classes/pmc2c.pl> from a F<*.pmc> file. It is C<bless>-ed either into
+by F<tools/build/pmc2c.pl> from a F<*.pmc> file. It is C<bless>-ed either into
 C<Parrot::Pmc2c::::Standard>, or into one of the other I<special> PMCs:
 F<default>, C<delegate>, C<Null>, C<Ref> or C<SharedRef>.
 
@@ -500,7 +500,7 @@ sub proto ($$) {
 =item C<rewrite_nci_method($class, $method, $super, $super_table)>
 
 Rewrites the method body performing the various macro substitutions for
-nci method bodies (see F<src/classes/pmc2c.pl>).
+nci method bodies (see F<tools/build/pmc2c.pl>).
 
 =cut
 
@@ -518,7 +518,7 @@ sub rewrite_nci_method ($$$) {
 =item C<rewrite_vtable_method($class, $method, $super, $super_table)>
 
 Rewrites the method body performing the various macro substitutions for
-vtable method bodies (see F<src/classes/pmc2c.pl>).
+vtable method bodies (see F<tools/build/pmc2c.pl>).
 
 =cut
 
@@ -801,7 +801,7 @@ sub init_func() {
         if ($method->{mmd} =~ /MMD_/ && !$defaulted) {
             my ($func, $left, $right);
             $func = $method->{mmd};
-            # dynamic classes need the runtime type
+            # dynamic PMCs need the runtime type
             # which is passed in entry to class_init
             $left = 0;  # set to 'entry' below in initialization loop.
             $right = 'enum_type_PMC';
@@ -863,7 +863,7 @@ EOC
    $const MMD_init _temp_mmd_init[] = {
         $mmd_list
     };
-    /*  Dynamic classes need the runtime type
+    /*  Dynamic PMCs need the runtime type
 	which is passed in entry to class_init.
     */
 EOC

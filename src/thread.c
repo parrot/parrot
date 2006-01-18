@@ -683,7 +683,7 @@ pt_DOD_stop_mark(Parrot_Interp interpreter)
 
 =head1 SEE ALSO
 
-F<src/classes/parrotinterpreter.pmc>, F<docs/dev/events.pod>.
+F<src/pmc/parrotinterpreter.pmc>, F<docs/dev/events.pod>.
 
 =cut
 

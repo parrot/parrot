@@ -184,8 +184,8 @@ When a subroutine label is prefixed by B<.pcc_sub>, the name of the subroutine
 
 =head1 FILES
 
-F<src/classes/sub.pmc>, F<src/classes/closure.pmc>,
-F<src/classes/continuation.pmc>, F<src/classes/coroutine.pmc>, F<sub.c>,
+F<src/pmc/sub.pmc>, F<src/pmc/closure.pmc>,
+F<src/pmc/continuation.pmc>, F<src/pmc/coroutine.pmc>, F<sub.c>,
 F<t/pmc/sub.t>
 
 =head1 SEE ALSO

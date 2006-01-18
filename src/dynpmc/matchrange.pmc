@@ -4,7 +4,7 @@ $Id$
 
 =head1 NAME
 
-classes/matchrange.pmc - MatchRange Numbers PMC Class
+src/dynpmc/matchrange.pmc - MatchRange Numbers PMC Class
 
 =head1 DESCRIPTION
 

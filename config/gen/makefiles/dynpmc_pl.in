@@ -53,7 +53,7 @@ sub compile_cmd {
         "$CC $CFLAGS " .
         "@cc_o_out@" . $target . " " .
         "-I" . $PATHQUOTE . '@build_dir@@slash@include' . $PATHQUOTE . " " .
-        "-I" . $PATHQUOTE . '@build_dir@@slash@src@slash@classes' . $PATHQUOTE . " " .
+        "-I" . $PATHQUOTE . '@build_dir@@slash@src@slash@pmc' . $PATHQUOTE . " " .
         $source;
 };
 

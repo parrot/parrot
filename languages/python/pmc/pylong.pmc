@@ -4,7 +4,7 @@ $Id$
 
 =head1 NAME
 
-classes/pylong.pmc - Python BigInt PMC class
+pmc/pylong.pmc - Python BigInt PMC class
 
 =head1 DESCRIPTION
 

@@ -584,7 +584,7 @@ PMC2CV = $(PERL) tools/build/pmc2c.pl --vt
 	$(PMC2CC) $<
 
 # not all makes might understand this, so the rules are generated
-#src/classes/pmc_%.h : src/classes/%.c
+#src/pmc/pmc_%.h : src/pmc/%.c
 #	$(PMC2CC) $<
 
 vtable.dump : vtable.tbl
@@ -1470,8 +1470,8 @@ prog-clean :
 	$(PERL) tools/build/c2str.pl --init
 	$(RM_F) \
 		$(INC_DIR)/string_private_cstring.h \
-		"$(SRC_DIR)/*.str" "src/classes/*.str" \
-		"src/classes/*.c" "src/classes/*.h" "src/classes/*.dump" \
+		"$(SRC_DIR)/*.str" "src/pmc/*.str" \
+		"src/pmc/*.c" "src/pmc/*.h" "src/pmc/*.dump" \
 		vtable.dump "*.def" "*.lib" "*.exp"
 
 dynext-clean :
@@ -1586,11 +1586,11 @@ patch :
 
 
 lint : $(PARROT)
-	$(LINT) $(CC_INC) @cc_hasjit@ "-Isrc/classes" $(LINTFLAGS) $(LINTOPTS) `echo $(O_FILES) | sed @PQ@s/\.o/\.c/g@PQ@`
+	$(LINT) $(CC_INC) @cc_hasjit@ "-Isrc/pmc" $(LINTFLAGS) $(LINTOPTS) `echo $(O_FILES) | sed @PQ@s/\.o/\.c/g@PQ@`
 	$(LINT) $(CC_INC) $(LINTFLAGS) $(LINTOPTS) $(IMCC_DIR)/main.c
 
 lint2 : $(PARROT)
-	$(LINT) $(CC_INC) @cc_hasjit@ "-Isrc/classes" $(LINTFLAGS2) $(LINTOPTS) `echo $(O_FILES) | sed @PQ@s/\.o/\.c/g@PQ@`
+	$(LINT) $(CC_INC) @cc_hasjit@ "-Isrc/pmc" $(LINTFLAGS2) $(LINTOPTS) `echo $(O_FILES) | sed @PQ@s/\.o/\.c/g@PQ@`
 	$(LINT) $(CC_INC) $(LINTFLAGS2) $(LINTOPTS) $(IMCC_DIR)/main.c
 
 
@@ -1645,7 +1645,7 @@ win32-inno-installer : world install
 #	@tools/dev/rebuild_miniparrot.pl --action=clean
 #	@tools/dev/rebuild_miniparrot.pl --action=prebuild_classes $(CLASS_O_FILES)
 #	@tools/dev/rebuild_miniparrot.pl --action=copy_src $(GEN_CONFIGS) $(FLUID_FILES) $(ALL_H_FILES)
-#	@tools/dev/rebuild_miniparrot.pl --action=copy_src classes/*.h $(IMCC_DIR)/main.c $(INC_DIR)/debug.h
+#	@tools/dev/rebuild_miniparrot.pl --action=copy_src pmc/*.h $(IMCC_DIR)/main.c $(INC_DIR)/debug.h
 #	@tools/dev/rebuild_miniparrot.pl --action=copy_src_from_obj $(O_FILES)
 #	@tools/dev/rebuild_miniparrot.pl --action=write_buildscripts --executable=parrot $(O_FILES) $(IMCC_DIR)/main$(O)
 #

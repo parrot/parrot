@@ -8,9 +8,9 @@ tools/build/pmc2c.pl - PMC compiler (Version 2)
 
 =head1 SYNOPSIS
 
-Create F<src/classes/foo.dump>:
+Create F<src/pmc/foo.dump>:
 
-    % perl tools/build/pmc2c.pl --dump src/classes/foo.pmc ...
+    % perl tools/build/pmc2c.pl --dump src/pmc/foo.pmc ...
 
 Create F<vtable.dump>:
 
@@ -18,17 +18,17 @@ Create F<vtable.dump>:
 
 Print a class tree for the specified PMCs:
 
-    % perl tools/build/pmc2c.pl --tree src/classes/*.pmc
+    % perl tools/build/pmc2c.pl --tree src/pmc/*.pmc
 
-Create F<src/classes/foo.c> and C<pmc_foo.h> from F<src/classes/foo.dump>:
+Create F<src/pmc/foo.c> and C<pmc_foo.h> from F<src/pmc/foo.dump>:
 
-    % perl tools/build/pmc2c.pl -c src/classes/foo.pmc ...
+    % perl tools/build/pmc2c.pl -c src/pmc/foo.pmc ...
 
 Create fooX.c and pmc_fooX.h from fooX.dump files, also create libfoo.c
 containing the initialization function for all fooX PMCs.
 
     % perl tools/build/pmc2c.pl --library libfoo -c \
-           src/classes/foo1.pmc src/classes/foo2.pmc ...
+           src/pmc/foo1.pmc src/pmc/foo2.pmc ...
 
 =head1 DESCRIPTION
 
@@ -850,7 +850,7 @@ sub main {
         "verbose+"      => \$opt{verbose},
         "library=s"     => \$opt{library},
     );
-    unshift @include, ".", "$FindBin::Bin/../..", "$FindBin::Bin/../../src/classes/";
+    unshift @include, ".", "$FindBin::Bin/../..", "$FindBin::Bin/../../src/pmc/";
 
     dump_default()                  and exit if $default;
     dump_pmc(\@include, @ARGV)      and exit if $dump;

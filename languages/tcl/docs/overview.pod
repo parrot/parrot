@@ -91,7 +91,7 @@ elements and concatenates the results.
 =head2 PMCS
 
 The Tcl PMCs (Parrot Magic Cookies) are the user visible data types. These
-live in the C<*.pmc> files in C<classes/>. They are compiled into a
+live in the C<*.pmc> files in F<pmc/>. They are compiled into a
 dynamically loadable library which is loaded with the C<.HLL> directive
 (HLL stands for High Level Language). Most of the functionality associated
 with these PMCS is derived from the base parrot classes, except as noted below.

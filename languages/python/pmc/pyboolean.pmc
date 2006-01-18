@@ -4,7 +4,7 @@ $Id$
 
 =head1 NAME
 
-classes/pyboolean.pmc - PyBoolean PMC
+pmc/pyboolean.pmc - PyBoolean PMC
 
 =head1 DESCRIPTION
 

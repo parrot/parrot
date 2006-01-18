@@ -4,7 +4,7 @@ $Id$
 
 =head1 NAME
 
-classes/pyproxytype.pmc - Python Proxy Type
+pmc/pyproxytype.pmc - Python Proxy Type
 
 =head1 DESCRIPTION
 

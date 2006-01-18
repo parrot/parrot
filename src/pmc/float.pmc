@@ -1,0 +1,551 @@
+/*
+Copyright: 2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+src/pmc/float.pmc - Floating-point number
+
+=head1 DESCRIPTION
+
+C<Float> extends C<scalar> to provide floating-point number operations.
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+
+pmclass Float extends scalar does float does scalar {
+
+/*
+
+=item C<void init()>
+
+Initializes the number to zero.
+
+=cut
+
+*/
+
+    void init() {
+        PMC_num_val(SELF) = 0.0;
+    }
+
+/*
+
+=item C<PMC* instantiate()>
+
+Create a new Float from the passed in argument. This is a class method,
+arguments are passed according to pdd03.
+
+=cut
+
+*/
+    PMC* instantiate() {
+        int argcP = REG_INT(3);
+        PMC *class = REG_PMC(2);
+        PMC *res = pmc_new(INTERP, class->vtable->base_type);
+        /* TODO non-PMC arguments */
+        if (argcP)
+            VTABLE_set_number_native(INTERP, res,
+                    VTABLE_get_number(INTERP, REG_PMC(5)));
+        return res;
+    }
+
+/*
+
+=item C<FLOATVAL get_number()>
+
+Returns the value of the number.
+
+=cut
+
+*/
+
+    FLOATVAL get_number() {
+        return PMC_num_val(SELF);
+    }
+
+/*
+
+=item C<INTVAL get_integer()>
+
+Returns an integer representation of the number (by casting).
+
+=cut
+
+*/
+
+   INTVAL get_integer() {
+        return (INTVAL) PMC_num_val(SELF);
+   }
+
+/*
+
+=item C<INTVAL get_bool()>
+
+Evaluates the number as a boolean, i.e. it's true if it's not zero.
+
+=cut
+
+*/
+
+    INTVAL get_bool () {
+        return (INTVAL)(PMC_num_val(SELF) != 0.0);
+    }
+
+/*
+
+=item C<STRING* get_string()>
+
+Returns a Parrot string representation of the number.
+
+=item C<STRING* get_repr()>
+
+=cut
+
+*/
+
+    STRING* get_string() {
+        return string_from_num(INTERP, PMC_num_val(SELF));
+    }
+
+    STRING* get_repr () {
+        double d = (double) PMC_num_val(SELF);
+        const char *sign = "-";
+        if (!signbit(PMC_num_val(SELF)))
+            sign = "";
+        d = fabs(d);
+        return Parrot_sprintf_c(INTERP, "%s" FLOATVAL_FMT, sign, d);
+    }
+
+/*
+
+=item C<void set_integer_native(INTVAL value)>
+
+=item C<void set_bool(INTVAL value)>
+
+=cut
+
+*/
+
+    void set_integer_native (INTVAL value) {
+        DYNSELF.morph(enum_class_Integer);
+        DYNSELF.set_integer_native(value);
+    }
+
+    void set_bool (INTVAL value) {
+        DYNSELF.morph(enum_class_Boolean);
+        DYNSELF.set_bool(value);
+    }
+
+/*
+
+=item C<void set_number_native(FLOATVAL value)>
+
+Sets the value of the number to C<value>.
+
+=cut
+
+*/
+
+    void set_number_native(FLOATVAL value) {
+        PMC_num_val(SELF) = value;
+    }
+
+/*
+
+=item C<void set_number_same(PMC* value)>
+
+Sets the value of the number to the value of C<*value>.
+
+=cut
+
+*/
+
+    void set_number_same (PMC* value) {
+        PMC_num_val(SELF) = PMC_num_val(value);
+    }
+
+/*
+
+=item C<void set_string_native(STRING *value)>
+
+Sets the value of the number to the value of C<*value>.
+
+Note that this method morphs the number into a C<String>.
+
+=cut
+
+*/
+
+    void set_string_native (STRING * value) {
+        DYNSELF.morph(enum_class_String);
+        DYNSELF.set_string_native(value);
+    }
+
+/*
+
+=item C<void set_pmc(PMC *value)>
+
+Sets the value of the number to the value in C<*value>.
+
+=cut
+
+*/
+
+    void set_pmc(PMC *value) {
+        PMC_num_val(SELF) = VTABLE_get_number(INTERP, value);
+    }
+/*
+
+=item C<void morph(INTVAL type)>
+
+Morphs the scalar to the specified type.
+
+=cut
+
+*/
+
+    void morph (INTVAL type) {
+        pmc_reuse(INTERP, SELF, type, 0);
+    }
+
+
+
+/*
+
+=item C<PMC* neg(PMC *dest)>
+
+=item C<void i_neg()>
+
+Set C<dest> to the negated value of C<SELF>.
+
+=cut
+
+*/
+
+    PMC* neg (PMC * dest) {
+        FLOATVAL a = - DYNSELF.get_number();
+        if (!dest)
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
+        VTABLE_set_number_native(INTERP, dest, a);
+        return dest;
+    }
+
+    void i_neg() {
+        FLOATVAL a = - DYNSELF.get_number();
+        VTABLE_set_number_native(INTERP, SELF, a);
+    }
+
+/*
+
+=item C<INTVAL is_equal(PMC* value)>
+
+The C<==> operation.
+
+=cut
+
+*/
+
+    INTVAL is_equal (PMC* value) {
+MMD_Float: {
+        return (INTVAL)(PMC_num_val(SELF) == PMC_num_val(value));
+        }
+MMD_DEFAULT: {
+        return (INTVAL)(PMC_num_val(SELF) == VTABLE_get_number(INTERP, value));
+        }
+    }
+
+    INTVAL is_equal_num (PMC* value) {
+MMD_Float: {
+        return (INTVAL)(PMC_num_val(SELF) == PMC_num_val(value));
+        }
+MMD_DEFAULT: {
+        return (INTVAL)(PMC_num_val(SELF) == VTABLE_get_number(INTERP, value));
+        }
+    }
+
+/*
+
+=item C<INTVAL cmp(PMC* value)>
+
+
+
+=cut
+
+*/
+
+    INTVAL cmp(PMC* value) {
+MMD_Float: {
+            FLOATVAL diff;
+            diff = PMC_num_val(SELF) - PMC_num_val(value);
+            return diff > 0 ? 1 : diff < 0 ? -1 : 0;
+        }
+MMD_DEFAULT: {
+            FLOATVAL diff;
+            diff = PMC_num_val(SELF) - VTABLE_get_number(INTERP, value);
+            return diff > 0 ? 1 : diff < 0 ? -1 : 0;
+        }
+    }
+
+/*
+
+=item C<INTVAL cmp_num(PMC *value)>
+
+Returns the result of comparing the number with C<*value>.
+
+=cut
+
+*/
+
+    INTVAL cmp_num(PMC* value) {
+MMD_Float: {
+            FLOATVAL diff;
+            diff = PMC_num_val(SELF) - PMC_num_val(value);
+            return diff > 0 ? 1 : diff < 0 ? -1 : 0;
+        }
+MMD_DEFAULT: {
+            FLOATVAL diff;
+            diff = PMC_num_val(SELF) - VTABLE_get_number(INTERP, value);
+            return diff > 0 ? 1 : diff < 0 ? -1 : 0;
+        }
+    }
+
+/*
+
+=item C<void increment()>
+
+Increments the number.
+
+=cut
+
+*/
+
+    void increment () {
+        PMC_num_val(SELF) ++;
+    }
+
+/*
+
+=item C<void decrement()>
+
+Decrements the number.
+
+=cut
+
+*/
+
+    void decrement () {
+        PMC_num_val(SELF) --;
+    }
+/*
+
+=item C<PMC* absolute(PMC *dest)>
+
+=item C<void i_absolute()>
+
+Sets C<dest> to the absolute value of SELF.
+
+=cut
+
+*/
+
+    PMC* absolute(PMC *dest) {
+        FLOATVAL a = fabs(DYNSELF.get_number());
+        if (!dest)
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
+        VTABLE_set_number_native(INTERP, dest, a);
+        return dest;
+    }
+
+    void i_absolute() {
+        FLOATVAL a = fabs(DYNSELF.get_number());
+        VTABLE_set_number_native(INTERP, SELF, a);
+    }
+
+/*
+
+=item C<void freeze(visit_info *info)>
+
+Used to archive the number.
+
+=cut
+
+*/
+    void freeze(visit_info *info) {
+        IMAGE_IO *io = info->image_io;
+        SUPER(info);
+        io->vtable->push_float(INTERP, io, PMC_num_val(SELF));
+    }
+
+/*
+
+=item C<void thaw(visit_info *info)>
+
+Used to unarchive the number.
+
+=cut
+
+*/
+    void thaw(visit_info *info) {
+        IMAGE_IO *io = info->image_io;
+        SUPER(info);
+        if (info->extra_flags == EXTRA_IS_NULL)
+            PMC_num_val(SELF) = io->vtable->shift_float(INTERP, io);
+    }
+/*
+
+=back
+
+=head2 Methods
+
+=over 4
+
+=item C<METHOD PMC* acos()>
+
+=item C<METHOD PMC* asec()>
+
+=item C<METHOD PMC* asin()>
+
+=item C<METHOD PMC* cos()>
+
+=item C<METHOD PMC* cosh()>
+
+=item C<METHOD PMC* exp()>
+
+=item C<METHOD PMC* ln()>
+
+=item C<METHOD PMC* log10()>
+
+=item C<METHOD PMC* log2()>
+
+=item C<METHOD PMC* sec()>
+
+=item C<METHOD PMC* sech()>
+
+=item C<METHOD PMC* sin()>
+
+=item C<METHOD PMC* sinh()>
+
+=item C<METHOD PMC* tan()>
+
+=item C<METHOD PMC* tanh()>
+
+Return a new PMC of the type of C<SELF> with I<FUNC>(value) of SELF.
+
+=cut
+
+*/
+
+    METHOD PMC* acos() {
+        PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC_num_val(d) = acos(PMC_num_val(SELF));
+        return d;
+    }
+    METHOD PMC* cos() {
+        PMC *d = pmc_new(INTERP,
+                Parrot_get_ctx_HLL_type(INTERP, enum_class_Float));
+        PMC_num_val(d) = cos(VTABLE_get_number(interpreter, SELF));
+        return d;
+    }
+    METHOD PMC* asec() {
+        PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC_num_val(d) = acos(1.0 / PMC_num_val(SELF));
+        return d;
+    }
+    METHOD PMC* asin() {
+        PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC_num_val(d) = asin(PMC_num_val(SELF));
+        return d;
+    }
+    METHOD PMC* atan() {
+        PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC_num_val(d) = atan(PMC_num_val(SELF));
+        return d;
+    }
+    METHOD PMC* atan2(PMC *val) {
+        PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC_num_val(d) = atan2(PMC_num_val(SELF), PMC_num_val(val));
+        return d;
+    }
+    METHOD PMC* cosh() {
+        PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC_num_val(d) = cosh(PMC_num_val(SELF));
+        return d;
+    }
+    METHOD PMC* exp() {
+        PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC_num_val(d) = exp(PMC_num_val(SELF));
+        return d;
+    }
+    METHOD PMC* ln() {
+        PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC_num_val(d) = log(PMC_num_val(SELF));
+        return d;
+    }
+    METHOD PMC* log10() {
+        PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC_num_val(d) = log10(PMC_num_val(SELF));
+        return d;
+    }
+    METHOD PMC* log2() {
+        PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC_num_val(d) = log(PMC_num_val(SELF)) / log(2.0);
+        return d;
+    }
+    METHOD PMC* sec() {
+        PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC_num_val(d) = 1.0 / cos(PMC_num_val(SELF));
+        return d;
+    }
+    METHOD PMC* sech() {
+        PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC_num_val(d) = 1.0 / cosh(PMC_num_val(SELF));
+        return d;
+    }
+    METHOD PMC* sin() {
+        PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC_num_val(d) = sin(PMC_num_val(SELF));
+        return d;
+    }
+    METHOD PMC* sinh() {
+        PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC_num_val(d) = sinh(PMC_num_val(SELF));
+        return d;
+    }
+    METHOD PMC* tan() {
+        PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC_num_val(d) = tan(PMC_num_val(SELF));
+        return d;
+    }
+    METHOD PMC* tanh() {
+        PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC_num_val(d) = tanh(PMC_num_val(SELF));
+        return d;
+    }
+
+}
+
+/*
+
+=back
+
+=cut
+
+*/
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+*/

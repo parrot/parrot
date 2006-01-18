@@ -4,7 +4,7 @@ $Id$
 
 =head1 NAME
 
-classes/pyboundmeth.pmc - Python Bound Method
+pmc/pyboundmeth.pmc - Python Bound Method
 
 =head1 DESCRIPTION
 

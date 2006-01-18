@@ -4,7 +4,7 @@ $Id$
 
 =head1 NAME
 
-classes/pyobject.pmc - Python Object
+pmc/pyobject.pmc - Python Object
 
 =head1 DESCRIPTION
 

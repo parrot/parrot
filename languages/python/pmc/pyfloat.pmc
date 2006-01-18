@@ -4,7 +4,7 @@ $Id$
 
 =head1 NAME
 
-classes/pyfloat.pmc - Python Floating-Point Number
+pmc/pyfloat.pmc - Python Floating-Point Number
 
 =head1 DESCRIPTION
 

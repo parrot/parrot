@@ -33,8 +33,8 @@ sub pmc_parent
     return $PMC_PARENTS{$pmc} if defined $PMC_PARENTS{$pmc};
 
     local $/;
-    open(PMC, "src/classes/$pmc.pmc")
-        or die "open src/classes/$pmc.pmc failed: $!";
+    open(PMC, "src/pmc/$pmc.pmc")
+        or die "open src/pmc/$pmc.pmc failed: $!";
     local $_ = <PMC>;
     close PMC;
 
@@ -59,7 +59,7 @@ sub pmc_parents
 
 sub get_pmc_order
 {
-    open IN, 'src/classes/pmc.num' or die "Can't read src/classes/pmc.num";
+    open IN, 'src/pmc/pmc.num' or die "Can't read src/pmc/pmc.num";
     my %order;
     while (<IN>) {
         next if (/^#/);
@@ -98,7 +98,7 @@ sub runstep
 
     my @pmc = (
         sort
-            map { m{\./src/classes/(.*)} } glob "./src/classes/*.pmc"
+            map { m{\./src/pmc/(.*)} } glob "./src/pmc/*.pmc"
     );
 
     @pmc = sort_pmcs(@pmc);
@@ -122,11 +122,11 @@ END
     # user could deactivate vital PMCs like PerlHash or SArray
     # so there would be tests needed, that check for vital classes
 
-    # names of class files for classes/Makefile
+    # names of class files for src/pmc/Makefile
     (my $TEMP_pmc_o   = $pmc_list) =~ s/\.pmc/\$(O)/g;
     (my $TEMP_pmc_str = $pmc_list) =~ s/\.pmc/\.str/g;
 
-    # calls to pmc2c.pl for classes/Makefile
+    # calls to pmc2c.pl for src/pmc/Makefile
     my $TEMP_pmc_build = <<"E_NOTE";
 
 # the following part of the Makefile was built by 'config/inter/pmc.pm'
@@ -139,36 +139,36 @@ E_NOTE
 
         # make each pmc depend upon its parent.
         my $parent = pmc_parent($pmc) . ".pmc";
-        $parent = "perlhash.pmc src/classes/$parent" if ($pmc eq 'orderedhash');
+        $parent = "perlhash.pmc src/pmc/$parent" if ($pmc eq 'orderedhash');
         my $parent_dumps = '';
-        $parent_dumps .= "src/classes/$_.dump " foreach reverse((pmc_parents($pmc)));
-        $parent_dumps = "src/classes/perlhash.dump $parent_dumps"
+        $parent_dumps .= "src/pmc/$_.dump " foreach reverse((pmc_parents($pmc)));
+        $parent_dumps = "src/pmc/perlhash.dump $parent_dumps"
             if ($pmc eq 'orderedhash');
         my $parent_headers = '';
-        $parent_headers .= "src/classes/pmc_$_.h " foreach (pmc_parents($pmc));
-        $parent_headers = "src/classes/pmc_perlhash.h $parent_headers"
+        $parent_headers .= "src/pmc/pmc_$_.h " foreach (pmc_parents($pmc));
+        $parent_headers = "src/pmc/pmc_perlhash.h $parent_headers"
             if ($pmc eq 'orderedhash');
         $TEMP_pmc_build .= <<END
-src/classes/$pmc.c src/classes/pmc_$pmc.h : src/classes/$pmc.dump
+src/pmc/$pmc.c src/pmc/pmc_$pmc.h : src/pmc/$pmc.dump
 
-src/classes/$pmc.dump : vtable.dump $parent_dumps 
+src/pmc/$pmc.dump : vtable.dump $parent_dumps 
 
-src/classes/pmc_$pmc.h: src/classes/$pmc.pmc
-	\$(PMC2CC) src/classes/$pmc.pmc
+src/pmc/pmc_$pmc.h: src/pmc/$pmc.pmc
+	\$(PMC2CC) src/pmc/$pmc.pmc
 
-src/classes/$pmc\$(O): src/classes/$pmc.str \$(NONGEN_HEADERS) \\
+src/pmc/$pmc\$(O): src/pmc/$pmc.str \$(NONGEN_HEADERS) \\
         $parent_headers
 
 END
     }
 
-    # src/classes/$pmc\$(O): \$(NONGEN_HEADERS) $parent_headers src/classes/pmc_$pmc.h
+    # src/pmc/$pmc\$(O): \$(NONGEN_HEADERS) $parent_headers src/pmc/pmc_$pmc.h
 
     # build list of libraries for link line in Makefile
     my $slash = $conf->data->get('slash');
-    (my $TEMP_pmc_classes_o   = $TEMP_pmc_o)   =~ s/^| / src${slash}classes${slash}/g;
-    (my $TEMP_pmc_classes_str = $TEMP_pmc_str) =~ s/^| / src${slash}classes${slash}/g;
-    (my $TEMP_pmc_classes_pmc = $pmc_list)     =~ s/^| / src${slash}classes${slash}/g;
+    (my $TEMP_pmc_classes_o   = $TEMP_pmc_o)   =~ s/^| / src${slash}pmc${slash}/g;
+    (my $TEMP_pmc_classes_str = $TEMP_pmc_str) =~ s/^| / src${slash}pmc${slash}/g;
+    (my $TEMP_pmc_classes_pmc = $pmc_list)     =~ s/^| / src${slash}pmc${slash}/g;
 
     # Gather the actual names (with MixedCase) of all of the
     # non-abstract built-in PMCs.
@@ -176,7 +176,7 @@ END
     PMC: foreach my $pmc_file (split(/\s+/, $pmc_list)) {
         next if ($pmc_file =~ /^const/);
         my $name;
-        open(PMC, "src/classes/$pmc_file") or die "open src/classes/$pmc_file: $!";
+        open(PMC, "src/pmc/$pmc_file") or die "open src/pmc/$pmc_file: $!";
         my $const;
         while (<PMC>) {
             if (/^pmclass (\w+)(.*)/) {

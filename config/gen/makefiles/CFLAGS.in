@@ -10,7 +10,7 @@ src/spf_render.c    -{-Wformat-nonliteral}   # noisy
 src/tsq.c           -{@optimize@}           # never optimize tsq.c!
 src/ops/core_ops_cg.c      -{@optimize@}    # takes too long
 src/ops/core_ops_switch.c  -{@optimize@}    # Overwhelms some compilers.
-src/py_func.c       +{-Iclasses}             # include pmc_default.h
+src/py_func.c       +{-Ipmc}             # include pmc_default.h
 
 # io should be -Wunsed clean
 {^src/io/}              s/-Wno-unused/-Wunused/

@@ -56,7 +56,7 @@ Iterate from the end of the aggregate (Array like classes only):
 
 =head1 FILES
 
-F<src/classes/iterator.pmc>, F<t/pmc/iter.t>
+F<src/pmc/iterator.pmc>, F<t/pmc/iter.t>
 
 =head1 AUTHOR
 

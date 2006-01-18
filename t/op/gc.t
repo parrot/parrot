@@ -257,7 +257,7 @@ hello
 OUTPUT
 
 # this is a stripped down version of imcc/t/syn/pcc_16
-# s. also src/classes/retcontinuation.pmc
+# s. also src/pmc/retcontinuation.pmc
 output_is(<<'CODE', <<OUTPUT, "coro context and invalid return continuations");
 .pcc_sub main:
     .const .Sub P0 = "co1"

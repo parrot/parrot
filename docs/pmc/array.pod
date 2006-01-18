@@ -8,7 +8,7 @@ Array base class
 =head1 ABSTRACT
 
 This pod file documents the Array base class usage. For implementation details
-you should look inside the class file, found at C<classes/array.pmc> in the
+you should look inside the class file, found at F<src/pmc/array.pmc> in the
 parrot source code.
 
 =head1 SYNOPSIS

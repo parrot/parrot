@@ -70,7 +70,7 @@ is supposed to do this.
 
 If you're adding data types to the core of Parrot, (and you've checked with
 Chip that you're supposed to be doing so) you should be creating a file in the
-F<src/classes/> subdirectory; this is where all the built-in PMC classes live. (And
+F<src/pmc/> subdirectory; this is where all the built-in PMC classes live. (And
 a good source of examples to plunder even if you're not writing a core data
 type.)
 
@@ -78,7 +78,7 @@ You should almost always start by running F<tools/dev/gen_class.pl> to generate 
 skeleton for the class. Let's generate a number type for the beautifully
 non-existent Fooby language:
 
-    % perl tools/dev/gen_class.pl FoobyNumber > src/classes/foobynumber.pmc
+    % perl tools/dev/gen_class.pl FoobyNumber > src/pmc/foobynumber.pmc
 
 This will produce a skeleton C file (to be preprocessed by the
 F<tools/build/pmc2c.pl> program) with stubs for all the methods you need to
@@ -90,7 +90,7 @@ class, then you'll see a reference to C<enum_class_FoobyNumber> in the C<init>
 function. For built-in classes, this is automatically defined in F<pmc.h> when
 you run F<Configure.pl>.  If you're not writing a built-in class, you need to
 indicate this by using the 'extension' keyword after the 'pmclass YOURCLASS'
-declaration in F<src/classes/YOURCLASS.pmc>. Then, change the type of the C<init>
+declaration in F<src/pmc/YOURCLASS.pmc>. Then, change the type of the C<init>
 function to return C<struct _vtable>, and then return C<temp_base_vtable>
 instead of assigning to the C<Parrot_base_vtables> array.
 
@@ -100,7 +100,7 @@ To finish up adding a built-in class:
 
 =item 1.
 
-Add src/classes/YOURCLASS.pmc to the MANIFEST
+Add src/pmc/YOURCLASS.pmc to the MANIFEST
 
 =item 2.
 
@@ -295,7 +295,7 @@ from, will throw an exception, if this method would be called.
 
 If your class is a modification of an existing class, you may wish to use
 inheritance. At the beginning of your vtable specification in
-src/classes/YOURCLASS.pmc, add the C<extends SUPERCLASS> phrase. For example:
+src/pmc/YOURCLASS.pmc, add the C<extends SUPERCLASS> phrase. For example:
 
   pmclass PackedArray extends Array { ...
 

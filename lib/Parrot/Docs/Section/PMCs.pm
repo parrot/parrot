@@ -37,7 +37,7 @@ sub new
 {
 	my $self = shift;
 	my $dist = Parrot::Distribution->new;
-    my $dir = $dist->existing_directory_with_name('src/classes');
+    my $dir = $dist->existing_directory_with_name('src/pmc');
 	
 	my @concrete_items = ();
 	my @abstract_items = ();
