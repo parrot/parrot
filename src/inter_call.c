@@ -375,6 +375,8 @@ Parrot_fetch_arg(Interp *interpreter, struct call_state *st)
     if (st->dest.mode & CALL_STATE_NEXT_ARG) {
         next_arg(interpreter, &st->dest);
     }
+    if (!st->src.n)
+        return 0;
     if (st->src.mode & CALL_STATE_NEXT_ARG) {
         if (!next_arg(interpreter, &st->src))
             return 0;
@@ -392,6 +394,11 @@ Parrot_fetch_arg(Interp *interpreter, struct call_state *st)
         st->src.mode |= CALL_STATE_NEXT_ARG;
         /* advance src - get next arg */
         return Parrot_fetch_arg(interpreter, st);
+    }
+    if (st->src.sig & PARROT_ARG_NAME) {
+        fetch_arg(interpreter, st);
+        st->name = UVal_str(st->val);
+        next_arg(interpreter, &st->src);
     }
     return fetch_arg(interpreter, st);
 }
@@ -540,10 +547,58 @@ clone_key_arg(Interp *interpreter, struct call_state *st)
     }
 }
 
+static int
+locate_name(Interp *interpreter, struct call_state *st)
+{
+    int i, start, idx;
+    INTVAL sig;
+    STRING *param;
+
+    if (st->dest.mode & CALL_STATE_SIG)
+        real_exception(interpreter, NULL, E_ValueError,
+                "Can't call C function with named arguments");
+    if (st->first_named >= 0)
+        start = st->first_named;
+    else
+        start = 0;
+    for (i = start; i < st->dest.n; ++i) {
+        sig = VTABLE_get_integer_keyed_int(interpreter, 
+                st->dest.u.op.signature, i);
+        if (!(sig & PARROT_ARG_NAME))
+            continue;
+        if (st->first_named < 0)
+            st->first_named = i;
+        idx = st->dest.u.op.pc[i];
+        param = st->dest.ctx->constants[idx]->u.string;
+        if (st->name == param ||
+                0 == string_equal(interpreter, st->name, param)) {
+            st->dest.sig = VTABLE_get_integer_keyed_int(interpreter, 
+                    st->dest.u.op.signature, i + 1);
+            st->dest.i = i + 1;
+            idx = st->dest.u.op.pc[i + 1];
+            return idx;
+        }
+    }
+    real_exception(interpreter, NULL, E_ValueError,
+            "Named param '%Ss' not found", st->name);
+    return 0;
+}
+
 int
 Parrot_convert_arg(Interp *interpreter, struct call_state *st)
 {
 again:
+    if (st->src.i >= st->src.n && (st->dest.mode & CALL_STATE_NAMED)) {
+        st->dest.i = st->dest.n;        /* XXX that's plain wrong */
+        return 0;
+    }
+    if (st->dest.sig & PARROT_ARG_NAME) {
+        st->dest.mode |= CALL_STATE_NAMED;
+        locate_name(interpreter, st);
+    }
+    else if (st->dest.mode & CALL_STATE_NAMED)
+        locate_name(interpreter, st);
+    
     if (st->dest.sig & PARROT_ARG_OPTIONAL) {
         if (st->src.i < st->src.n) {
             ++st->opt_so_far;
@@ -634,7 +689,8 @@ Parrot_store_arg(Interp *interpreter, struct call_state *st)
             CTX_REG_PMC(st->dest.ctx, idx) =  UVal_pmc(st->val);
             break;
     }
-    st->dest.mode |= CALL_STATE_NEXT_ARG;
+    if (!(st->dest.mode & CALL_STATE_NAMED))
+        st->dest.mode |= CALL_STATE_NEXT_ARG;
     return 1;
 }
 
@@ -646,6 +702,7 @@ init_call_stats(struct call_state *st)
     st->optionals = 0; 
     st->params = 0; 
     st->name = NULL; 
+    st->first_named = -1; 
 }
 
 /*

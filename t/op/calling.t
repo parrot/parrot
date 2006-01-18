@@ -1625,7 +1625,25 @@ CODE
 17
 OUTPUT
 
+output_is(<<'CODE', <<'OUTPUT', "named - 1");
+.pcc_sub main:
+    set_args "(0x80, 0, 0x80, 0)", "b", 10, "a", 20
+    get_results "()"
+    find_name P1, "foo"
+    invokecc P1
+    print "ok\n"
+    end
+.pcc_sub foo:
+    get_params "(0x80, 0, 0x80, 0)", "a", I0, "b", I1
+    print_item I1
+    print_item I0
+    print_newline
+    returncc
+CODE
+10 20
+ok
+OUTPUT
 
 ## remember to change the number of tests :-)
-BEGIN { plan tests => 60; }
+BEGIN { plan tests => 61; }
 
