@@ -220,6 +220,9 @@ sub_pragma(Parrot_Interp interpreter, int action, PMC *sub_pmc)
     int pragmas = PObj_get_FLAGS(sub_pmc) & SUB_FLAG_PF_MASK;
     int todo = 0;
 
+    pragmas &= ~SUB_FLAG_IS_OUTER;
+    if (!pragmas)
+        return 0;
     switch (action) {
         case PBC_PBC:
         case PBC_MAIN:

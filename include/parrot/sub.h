@@ -36,7 +36,7 @@ typedef enum {
     SUB_FLAG_PF_IMMEDIATE = PObj_private6_FLAG,
     SUB_FLAG_PF_POSTCOMP  = PObj_private7_FLAG,
 
-    SUB_FLAG_PF_MASK      = 0xf8   /* anon ... postcomp */
+    SUB_FLAG_PF_MASK      = 0xfa   /* anon ... postcomp, is_outer*/
 
 } sub_flags_enum;
 

@@ -125,6 +125,56 @@ Invokes the closure.
         }
         return next;
     }
+
+    void thawfinish(visit_info *info) {
+        struct Parrot_sub * sub = PMC_sub(SELF);
+        PMC *outer;
+        opcode_t i, ci;
+        struct PackFile_FixupTable *ft;
+        struct PackFile_ConstTable *ct;
+
+        /*
+         * XXX TODO
+         *
+         * A Sub PMC is frozen/thawed per item, OTOH it can refer to other
+         * subs via the outer_sub (:outer) syntax. This outer though, is created
+         * independently when running from .pbc, which breaks referential
+         * integrity.
+         *
+         * The only fix (except this ugly and slow code) is to freeze/thaw
+         * a code segment as one structure, which will take care of all
+         * refs and self-refs. 
+         *
+         * TODO - intermediate step:
+         *
+         * Investigate if we can:
+         * - freeze array of subs (instead of the useless fixup seg)
+         * - do we need the Sub constant in the const seg as PMC constant?  
+         */
+
+        if (PMC_IS_NULL(sub->outer_sub))
+            return;
+        ft = sub->seg->fixups;
+        ct = sub->seg->const_table;
+        for (i = 0; i < ft->fixup_count; i++) {
+            switch (ft->fixups[i]->type) {
+                case enum_fixup_sub:
+                    ci = ft->fixups[i]->offset;
+                    if (ci < 0 || ci >= ct->const_count - 1)
+                        return; /* not yet thawed */
+                    if (ct->constants[ci]->type != PFC_PMC)
+                        return; /* same */
+                    outer = ct->constants[ci]->u.key;
+                    if (PMC_IS_NULL(outer))
+                        continue;
+                    if (0 == string_equal(INTERP, PMC_sub(outer)->name,
+                                PMC_sub(sub->outer_sub)->name)) {
+                        sub->outer_sub = outer;
+                        break;
+                    }
+            } 
+        }
+    }
 }
 
 /*
