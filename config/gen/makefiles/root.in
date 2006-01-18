@@ -1558,7 +1558,7 @@ distclean : realclean
 # Require .svn to exist first
 # Otherwise it'll remove every last file
 svnclobber : .svn
-	$(PERL) -MFile::Find -e 'find(sub{unlink $$File::Find::name if -f and not $$File::Find::name =~ m[/\.svn/] and not -e ".svn/text-base/$$_.svn-base";},".")'
+	$(PERL) -MFile::Find -e 'find(sub{unlink $$_ if -f and not $$File::Find::name =~ m[/\.svn/] and not -e ".svn/text-base/$$_.svn-base";},".")'
 
 reconfig : clean
 	$(PERL) Configure.pl --reconfig
