@@ -2166,6 +2166,7 @@ Parrot_mmd_register_table(Interp* interpreter, INTVAL type,
      * register default mmds for this type
      */
     for (i = 0; i < n; ++i) {
+        assert((PTR2UINTVAL(mmd_table[i].func_ptr) & 3) == 0);
         mmd_register(interpreter,
                 mmd_table[i].func_nr, type,
                 mmd_table[i].right, mmd_table[i].func_ptr);
