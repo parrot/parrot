@@ -545,8 +545,10 @@ Parrot_convert_arg(Interp *interpreter, struct call_state *st)
 {
 again:
     if (st->dest.sig & PARROT_ARG_OPTIONAL) {
-        if (st->src.i < st->src.n)
+        if (st->src.i < st->src.n) {
             ++st->opt_so_far;
+        }
+        ++st->optionals;
     }
     else if (st->dest.sig & PARROT_ARG_OPT_FLAG) {
         if ((st->dest.sig & PARROT_ARG_TYPE_MASK) != PARROT_ARG_INTVAL)
@@ -602,6 +604,7 @@ Parrot_store_arg(Interp *interpreter, struct call_state *st)
         return 1;
     }
     idx = st->dest.u.op.pc[st->dest.i];
+    st->params++;
     if (st->dest.sig & PARROT_ARG_SLURPY_ARRAY) {
         /* create array */
         st->dest.slurp = pmc_new(interpreter,
@@ -633,6 +636,16 @@ Parrot_store_arg(Interp *interpreter, struct call_state *st)
     }
     st->dest.mode |= CALL_STATE_NEXT_ARG;
     return 1;
+}
+
+static void
+init_call_stats(struct call_state *st)
+{
+    st->opt_so_far = 0; 
+    st->n_actual_args = st->src.n;  /* initial guess, adjusted for :flat args */
+    st->optionals = 0; 
+    st->params = 0; 
+    st->name = NULL; 
 }
 
 /*
@@ -692,8 +705,7 @@ parrot_pass_args(Interp *interpreter,  parrot_context_t *src_ctx,
     }
     todo = Parrot_init_arg_op(interpreter, dest_ctx, dst_pc, &st.dest);
     Parrot_init_arg_op(interpreter, src_ctx, src_pc, &st.src);
-    st.opt_so_far = 0;  /* XXX */
-    st.n_actual_args = st.src.n;  /* initial guess, adjusted for :flat args */
+    init_call_stats(&st);
     if (!todo) {
         st.dest.sig = 0;
     }
@@ -731,25 +743,8 @@ parrot_pass_args(Interp *interpreter,  parrot_context_t *src_ctx,
          */
     }
     else {
-        /*
-         * compute the range of expected arguments.  we do this here when we
-         * know we need to check it.  on the other hand, we must compute
-         * st.n_actual_args as we go, as it's harder to get :flat array lengths
-         * after the fact.
-         */
-        int slurpy_p = (st.dest.sig
-                        & (PARROT_ARG_SLURPY_ARRAY|PARROT_ARG_OPT_FLAG));
-        int max_expected_args = (slurpy_p ? st.dest.n-1 : st.dest.n);
-        int min_expected_args = max_expected_args;
-        int i;
-        /* allow for optionals. */
-        for (i = 0; i < st.dest.n; i++) {
-            /* XXX this is wrong - dest.sig isn't fetched, it's 
-             * just the last one
-             */
-            if (st.dest.sig & (PARROT_ARG_OPTIONAL|PARROT_ARG_OPT_FLAG))
-                min_expected_args--;
-        }
+        int max_expected_args = st.params;
+        int min_expected_args = max_expected_args - st.optionals;
 
         /* arg checks. */
         if (st.n_actual_args < min_expected_args) {
@@ -759,7 +754,7 @@ parrot_pass_args(Interp *interpreter,  parrot_context_t *src_ctx,
                     (min_expected_args < max_expected_args ? "at least " : ""),
                     min_expected_args, action);
         }
-        else if (! slurpy_p && st.n_actual_args > max_expected_args) {
+        else if (st.n_actual_args > max_expected_args) {
             real_exception(interpreter, NULL, E_ValueError,
                     "too many arguments passed (%d) - %s%d %s expected",
                     st.n_actual_args,

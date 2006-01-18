@@ -482,7 +482,7 @@ CODE
 /too many arguments passed/
 OUTPUT
 
-pir_output_like(<<'CODE', <<'OUTPUT', "argc mismatch, too mayn - force get_params");
+pir_output_like(<<'CODE', <<'OUTPUT', "argc mismatch, too many - force get_params");
 .macro no_params
     get_params '()'
 .endm
@@ -552,7 +552,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "argc mismatch, optional");
     invokecc $P1
 .end
 .sub foo
-    get_params "(0,0x20)", $P0, $P1
+    get_params "(0,0x20,0x40)", $P0, $P1, $I0
     print $P0
     if_null $P1, ok
     print "not "
@@ -564,7 +564,7 @@ hello
 ok
 OUTPUT
 
-pir_output_like(<<'CODE', <<'OUTPUT', "argc mismatch, optional", todo=>'wrong counts');
+pir_output_like(<<'CODE', <<'OUTPUT', "argc mismatch, optional");
 .sub main :main
     .include "errors.pasm"
     errorson .PARROT_ERRORS_PARAM_COUNT_FLAG
