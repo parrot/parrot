@@ -29,7 +29,7 @@ PARROT_API int yyerror(char *);
 PARROT_API int yyparse(void *param);
 PARROT_API int yylex(YYSTYPE *valp, Interp *);
 void op_fullname(char * dest, const char * name, SymReg * args[], int, int);
-void open_comp_unit(void);
+PARROT_API void open_comp_unit(void);
 void register_compilers(Parrot_Interp);
 void *imcc_eval_pasm(Parrot_Interp, const char *s);
 void *imcc_eval_pir (Parrot_Interp, const char *s);
