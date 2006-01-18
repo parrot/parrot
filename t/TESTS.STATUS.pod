@@ -1,0 +1,200 @@
+# $Id$
+
+=head1 Parrot Testing Status
+
+The primary goal of the Parrot testing effort is to provide complete coverage
+of the critical Parrot core subsystems on all targeted platforms. Secondary
+goals include testing of non-critical core subsystems, and non-core code.
+This document tracks the status of our effort.
+
+Until we have an automated way of quantitatively tracking test coverage,
+coverage will be tracked quantitatively, using the scale described below:
+
+=over 4
+
+=item Poor
+
+Very little, or no coverage of a component. This status is completely
+unacceptable and should be remedied immediately.
+
+=item Fair
+
+Some coverage of basic component operation. Missing some subtests of basic
+operation, failure cases, and invalid input. Component functionality may only
+be tested on a subset of platforms that provide that functionality.
+
+=item Good
+
+Full or nearly-full coverage of basic component operation, failure cases,
+and invalid input. Tests are run on all platforms which allow component
+operation. Hard-to-test code is not yet well-covered. Some missing
+functionality is partially tested with failing B<TODO> and B<SKIP> tests.
+
+=item Excellent
+
+Full coverage of basic component operation, failure cases, and invalid input
+on all platforms. Hard-to-test code is well-covered. Missing component
+functionality, including basic operation, failure cases, and invalid input
+is tested with failing B<TODO> and B<SKIP> tests.
+
+=back
+
+=head2 Parrot Core Subsystems
+
+Below is a breakdown of the Parrot core subsystems, and a qualitative measure
+of testing status.
+
+=head3 Parser
+
+This module tokenizes the input.
+
+=over 4
+
+=item Status
+
+B<Fair>. There are tests for basic operation, however these tests are spread
+throughout the test suite, and are not comprehensive. We can assume basic
+operation is well-tested, otherwise the compiler, optimizer, and interpreter
+probably wouldn't work very well.
+
+=item Location
+
+B<t/compilers/imcc/syn/>, and others.
+
+=back
+
+=head3 Compilers: IMCC, PGE, TGE
+
+=over 4
+
+=item Status
+
+B<Good>.
+
+=back
+
+=head3 Optimizer
+
+This rearranges B<PASM> code to make it run faster.
+
+=over 4
+
+=item Status
+
+B<TBD>. Tests exist, but coverage has not been evaluated.
+
+=item Location
+
+B<t/compilers/imcc/imcparser/>
+
+=back
+
+=head3 Interpreter
+
+This is the core of Parrot. It comprises the various runcores, input/output,
+threading, events, exceptions, objects, bytecode loader, etc. Test coverage
+of the Parrot Interpreter is critical.
+
+=over 4
+
+=item Status
+
+B<Fair>. A breakdown of Interpreter subsystems below lists individual status.
+
+=over 4
+
+=item PMCs
+
+B<Fair>. Each PMC file has a corresponding test file. Some PMCs are heavily
+undertested. Tests under B<t/pmc/>.
+
+=item Operators
+
+B<Good>. Most operators are well-tested. Tests under B<t/op/>.
+
+=item IO
+
+B<TBD>. Tests exist, but coverage has not been evaluated.
+
+=item Dynamic PMCs
+
+B<TBD>. Tests exist, but coverage has not been evaluated.
+
+=item Dynamic ops
+
+B<Poor>. Only a few tests exist, and coverage of important test cases is
+weak. Tests under B<t/dynops/>.
+
+=item Packfiles
+
+B<TBD>. Tests exist, but coverage has not been evaluated.
+
+=back
+
+=back
+
+=head3 Runtime Libraries and Includes
+
+=over 4
+
+=item Status
+
+B<TBD>. Tests exist, but coverage has not been evaluated.
+
+=back
+
+=head3 Configure Libraries
+
+=over 4
+
+=item Status
+
+B<Poor>. Tests exist, but do not yet cover basic functionality of all
+components.
+
+=back
+
+=head3 Test Libraries
+
+=over 4
+
+=item Status
+
+B<Poor>. Few tests exist, and coverage is poor. However, the test suite
+*seems* to run fine, giving a false sense of security.
+
+=back
+
+=head3 Documentation
+
+=over 4
+
+=item Status
+
+B<TBD>. Tests exist, but coverage has not been evaluated.
+
+=back
+
+=head3 Examples and Benchmarks
+
+=over 4
+
+=item Status
+
+B<Fair>. Tests exist, and cover basic functionality of nearly all examples
+and benchmarks. Extensive testing of failures is not a priority. Tests under
+B<t/examples/> and B<t/benchmark/>.
+
+=back
+
+=head3 Tools
+
+=over 4
+
+=item Status
+
+B<Poor>. Few tests exist, and coverage is sparse.
+
+=back
+
+=cut
