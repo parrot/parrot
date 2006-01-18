@@ -50,10 +50,10 @@ Halt and Catch Fire. Tries to crash parrot.
 =cut
 
 op hcf() {
-  int *a,i;
-  *a= 0;
+  int *a, i;
+  a = NULL;
   i = *a;
-  goto NEXT() ; /* in case your compiler is very forgiving. */
+  goto NEXT() ; /* in case your runtime is very forgiving. */
 }
 
 =item B<alarm>(in NUM, in PMC)
