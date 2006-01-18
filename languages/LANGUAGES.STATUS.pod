@@ -107,7 +107,7 @@ Very simple arithmetic expressions are working. Some test failures
 
 =item Last verified with parrot version
 
-0.3.0
+0.4.1
 
 =item Location
 
@@ -446,12 +446,12 @@ Port of GNU m4 to PIR.
 
 =item Status
 
-Functioning for handcrafted test cases. Eval compiler and loading frozen
-state are currently broken. Far from complete. Revision 0.0.14
+Functioning for handcrafted test cases. Loading frozen
+state is currently broken. Far from complete. Revision 0.0.14
 
 =item Last verified with parrot version
 
-0.3.1
+0.4.1
 
 =item Location
 
