@@ -20,6 +20,8 @@ enum call_state_mode {
     CALL_STATE_MASK       =  0x003,
 
     CALL_STATE_FLATTEN    =  0x010,
+    CALL_STATE_NAMED      =  0x020,
+    CALL_STATE_NAMED_FLATTEN    =  0x040,
 
     CALL_STATE_NEXT_ARG   =  0x100
 };
@@ -49,8 +51,13 @@ struct call_state {
     struct call_state_1 src;
     struct call_state_1 dest;
     UnionVal val;
-    int opt_so_far;
-    int n_actual_args;
+    int opt_so_far;     /* opt_flag handling */
+    int n_actual_args;  /* arguments incl. flatten */
+    int optionals;      /* sum of optionals */
+    int params;         /* sum of params */
+    int first_named;    /* param idx of 1st named */
+    UINTVAL named_done; /* bit mask, 1 if named was assigned */
+    STRING *name;       /* name of argument if any */
 };
 
 PARROT_API int Parrot_init_arg_sig(Interp *, parrot_context_t *ctx,

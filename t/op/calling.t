@@ -564,6 +564,30 @@ hello
 ok
 OUTPUT
 
+pir_output_like(<<'CODE', <<'OUTPUT', "argc mismatch, optional", todo=>'wrong counts');
+.sub main :main
+    .include "errors.pasm"
+    errorson .PARROT_ERRORS_PARAM_COUNT_FLAG
+    .local pmc ar
+    ar = new ResizableIntegerArray
+    push ar, 1
+    push ar, 2
+    push ar, 3
+    push ar, 4
+    foo(ar :flat)
+    print "never\n"
+.end
+.sub foo
+    .param int i
+    .param int j     :optional
+    .param int got_j :opt_flag
+    .param int k     :optional
+    .param int got_k :opt_flag
+.end
+CODE
+/too many arguments passed/
+OUTPUT
+
 output_is(<<'CODE', <<'OUTPUT', "get_param later");
 .pcc_sub main:
     set I16, 77
@@ -1603,5 +1627,5 @@ OUTPUT
 
 
 ## remember to change the number of tests :-)
-BEGIN { plan tests => 59; }
+BEGIN { plan tests => 60; }
 
