@@ -130,9 +130,11 @@ imc_reg_alloc(Interp *interpreter, IMC_Unit * unit)
             first = 0;
         } while (cfg_optimize(interpreter, unit));
 
-        compute_dominators(interpreter, unit);
-        compute_dominance_frontiers(interpreter, unit);
-        find_loops(interpreter, unit);
+        if (IMCC_INFO(interpreter)->optimizer_level) {
+            compute_dominators(interpreter, unit);
+            compute_dominance_frontiers(interpreter, unit);
+            find_loops(interpreter, unit);
+        }
 
         build_reglist(interpreter, unit);
         life_analysis(interpreter, unit);
