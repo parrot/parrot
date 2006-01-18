@@ -43,6 +43,19 @@ inline op what_do_you_get_if_you_multiply_six_by_nine(out STR) {
     goto NEXT();
 }
 
+=item B<hcf>
+
+Halt and Catch Fire. Tries to crash parrot.
+
+=cut
+
+op hcf() {
+  int *a,i;
+  *a= 0;
+  i = *a;
+  goto NEXT() ; /* in case your compiler is very forgiving. */
+}
+
 =item B<alarm>(in NUM, in PMC)
 
 Call alarm handler sub $2 after $1 time has elapsed.
