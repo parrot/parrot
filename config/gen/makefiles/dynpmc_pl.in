@@ -39,7 +39,7 @@ if ($^O eq 'MSWin32') {
     # Paths need quoting as they may contain spaces.
     $PATHQUOTE = '"';
 
-    $LIBPARROT = '@build_dir@/parrot@a@';
+    $LIBPARROT = '@build_dir@/libparrot@a@';
 }
 
 # PMC2C Config

@@ -35,9 +35,9 @@ print <<"EOF";
 #include "parrot/config.h"
 
 /* also in "parrot/embed.h" */
-int Parrot_revision(void);
+PARROT_API int Parrot_revision(void);
 /* also in "parrot/misc.h" */
-int Parrot_config_revision(void);
+PARROT_API int Parrot_config_revision(void);
 
 int Parrot_revision(void)
 {

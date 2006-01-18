@@ -64,14 +64,17 @@ sub runstep
             ccflags              => $ccflags,
             ccwarn               => '',
             has_dynamic_linking  => 1,
+            parrot_is_shared     => 1,
 
             sym_export => '__declspec(dllexport)',
             sym_import => '__declspec(dllimport)'
         );
-        
-        # We'll build shared by default.
-        $conf->data->set('parrot_is_shared') = 1
-            unless defined($conf->data->get('parrot_is_shared'));
+
+        # If we are building shared, need to include dynamic libparrot.lib, otherwise
+        # the static libparrot.lib.
+        if ($conf->data->get('parrot_is_shared')) {
+            $conf->data->set(libparrot_ldflags => 'libparrot$(A)');
+        }
 
         # 'link' needs to be link.exe, not cl.exe.
         # This makes 'link' and 'ld' the same.

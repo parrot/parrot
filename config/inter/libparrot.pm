@@ -61,13 +61,15 @@ sub runstep {
         : ''
     );
 
-    $conf->data->set(
-        libparrot_ldflags => ($parrot_is_shared)
-        ? '-L' . $conf->data->get('build_dir')
-               . $conf->data->get('slash')
-               . $conf->data->get('blib_dir') . ' -lparrot'
-        : $conf->data->get('libparrot')
-    );
+    unless (defined($conf->data->get('libparrot_ldflags'))) {
+        $conf->data->set(
+            libparrot_ldflags => ($parrot_is_shared)
+            ? '-L' . $conf->data->get('build_dir')
+                   . $conf->data->get('slash')
+                   . $conf->data->get('blib_dir') . ' -lparrot'
+            : $conf->data->get('libparrot')
+        );
+    }
 
     $result = $parrot_is_shared ? 'yes' : 'no';
 }

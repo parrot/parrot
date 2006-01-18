@@ -9,6 +9,8 @@
  *
  */
 
+#define PARROT_IN_EXTENSION
+
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>

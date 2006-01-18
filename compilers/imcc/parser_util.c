@@ -28,7 +28,7 @@
  * FIXME create an official interface
  *       this is needed for the debugger pdb and called from imcc/main.c
  */
-void imcc_init(Parrot_Interp interpreter);
+PARROT_API void imcc_init(Parrot_Interp interpreter);
 PMC * imcc_compile_pir(Parrot_Interp interp, const char *s);
 PMC * imcc_compile_pasm(Parrot_Interp interp, const char *s);
 
