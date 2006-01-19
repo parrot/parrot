@@ -67,7 +67,6 @@ sub new
 		),
 		$self->new_group('Building', '',
 			$self->new_item('', 'tools/dev/manicheck.pl'),
-			$self->new_item('', 'tools/dev/genrpt.pl'),
 			$self->new_item('', 'tools/dev/mk_manifests.pl'),
 			$self->new_item('', 'tools/dev/install_files.pl'),
 			$self->new_item('', 'tools/dev/rebuild_miniparrot.pl'),
