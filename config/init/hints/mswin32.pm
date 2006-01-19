@@ -192,7 +192,7 @@ sub runstep
             has_dynamic_linking  => 1,
             ld_load_flags        => '-shared ',
             ld_share_flags       => '-shared ',
-            libparrot_ldflags    => $conf->data->get('build_dir') . '/libparrot.dll'
+            libparrot_ldflags    => $conf->data->get('build_dir') . '/libparrot.dll',
             ncilib_link_extra    => 'src/libnci_test.def',
             sym_export           => '__declspec(dllexport)',
             sym_import           => '__declspec(dllimport)',
