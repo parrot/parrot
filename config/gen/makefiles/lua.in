@@ -7,7 +7,7 @@ LIBPATH  = lib
 BUILD   = $(PERL) @build_dir@@slash@tools@slash@build@slash@dynpmc.pl
 DESTDIR = @build_dir@@slash@runtime@slash@parrot@slash@dynext
 O       = @o@
-CLASSDIR = classes
+CLASSDIR = pmc
 LOAD_EXT = @load_ext@
 
 PMCS = \
@@ -78,7 +78,6 @@ CLEANERS = \
 "$(CLASSDIR)/*.dump" \
 "$(CLASSDIR)/*.c" \
 "$(CLASSDIR)/*.h" \
-#CONDITIONED_LINE(ld_parrot_exe_def):"$(CLASSDIR)/*.def" \
 "$(CLASSDIR)/*$(LOAD_EXT)" \
 "$(CLASSDIR)/*$(O)" \
 "$(LIBPATH)/*.pbc"
@@ -88,4 +87,3 @@ clean:
 
 distclean: clean
 	$(RM_F) Makefile
-
