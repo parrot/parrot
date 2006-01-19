@@ -1693,6 +1693,26 @@ CODE
 ok
 OUTPUT
 
+output_is(<<'CODE', <<'OUTPUT', "named - 4 positional -> named");
+.pcc_sub main:
+    set_args  "(0, 0, 0)", 10, 20, 30
+    get_results "()"
+    find_name P1, "foo"
+    invokecc P1
+    print "ok\n"
+    end
+.pcc_sub foo:
+    get_params "(0x80, 0, 0x80, 0, 0x80, 0)", "a", I0, "b", I1, 'c', I2
+    print_item I0
+    print_item I1
+    print_item I2
+    print_newline
+    returncc
+CODE
+10 20 30
+ok
+OUTPUT
+
 ## remember to change the number of tests :-)
-BEGIN { plan tests => 63; }
+BEGIN { plan tests => 64; }
 

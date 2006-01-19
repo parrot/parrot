@@ -628,13 +628,23 @@ locate_name(Interp *interpreter, struct call_state *st)
         if (sig & PARROT_ARG_SLURPY_ARRAY)
             break;
         n_named++;
+        if (!st->name) {
+            /* src is still positional - locate next named
+             */
+            if (st->named_done & 1 << n_named)
+                continue;
+            goto set_i;
+            ++i;
+        }
         idx = st->dest.u.op.pc[i];
         param = st->dest.ctx->constants[idx]->u.string;
         if (st->name == param ||
                 0 == string_equal(interpreter, st->name, param)) {
+set_i:
+            ++i;
             st->dest.sig = VTABLE_get_integer_keyed_int(interpreter, 
-                    st->dest.u.op.signature, i + 1);
-            st->dest.i = i + 1;
+                    st->dest.u.op.signature, i);
+            st->dest.i = i;
             st->dest.mode &= ~CALL_STATE_FLATTEN;
             st->named_done |= 1 << n_named;
             return;
