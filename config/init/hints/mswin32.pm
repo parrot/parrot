@@ -168,14 +168,11 @@ sub runstep
                 cc             => 'gcc',
                 ccflags        => '-DWIN32 ',
                 ld             => 'g++',
-                ld_load_flags  => '-shared ',
-                ld_share_flags => '-shared ',
                 ldflags        => '',
                 libs           =>
                     '-lmsvcrt -lmoldname -lkernel32 -luser32 -lgdi32 -lwinspool -lcomdlg32 -ladvapi32 -lshell32 -lole32 -loleaut32 -lnetapi32 -luuid -lws2_32 -lmpr -lwinmm -lversion -lodbc32 ',
                 link              => 'gcc',
                 linkflags         => '',
-                ncilib_link_extra => 'src/libnci_test.def',
                 o                 => '.o',
                 slash             => '\\',
                 blib_dir          => 'blib\\lib',
@@ -186,23 +183,19 @@ sub runstep
         } elsif ($make =~ /dmake/i) {
 
             # mingw Perl
-            $conf->data->set(
-                ld_load_flags     => '-shared ',
-                ld_share_flags    => '-shared ',
-                ncilib_link_extra => 'src/libnci_test.def',
-            );
         } else {
             warn "unknown configuration";
         }
 
         $conf->data->set(
-            link_dynamic      => '-Wl,--out-implib,parrot.a',
-        );
-
-        # Export decorations.
-        $conf->data->set(
-            sym_export => '__declspec(dllexport)',
-            sym_import => '__declspec(dllimport)'
+            parrot_is_shared     => 1,
+            has_dynamic_linking  => 1,
+            ld_load_flags        => '-shared ',
+            ld_share_flags       => '-shared ',
+            libparrot_ldflags    => $conf->data->get('build_dir') . '/libparrot.dll'
+            ncilib_link_extra    => 'src/libnci_test.def',
+            sym_export           => '__declspec(dllexport)',
+            sym_import           => '__declspec(dllimport)',
         );
     }
 }

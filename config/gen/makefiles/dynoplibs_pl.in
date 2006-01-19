@@ -39,7 +39,9 @@ if ($^O eq 'MSWin32') {
     # Paths need quoting as they may contain spaces.
     $PATHQUOTE = '"';
 
-    $LIBPARROT = '@build_dir@/libparrot@a@';
+    unless ($CC =~ /gcc/i) {
+        $LIBPARROT = '@build_dir@/libparrot@a@';
+    }
 }
 
 # OPS2C Config
