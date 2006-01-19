@@ -21,7 +21,9 @@ enum call_state_mode {
 
     CALL_STATE_FLATTEN    =  0x010,
     CALL_STATE_NAMED      =  0x020,
-    CALL_STATE_NAMED_FLATTEN    =  0x040,
+    CALL_STATE_NAMED_FLATTEN    =  0x030,
+
+    CALL_STATE_DONE    =  0x080,
 
     CALL_STATE_NEXT_ARG   =  0x100
 };
@@ -58,6 +60,7 @@ struct call_state {
     int first_named;    /* param idx of 1st named */
     UINTVAL named_done; /* bit mask, 1 if named was assigned */
     STRING *name;       /* name of argument if any */
+    PMC *key;           /* to iterate a flattening hash */
 };
 
 PARROT_API int Parrot_init_arg_sig(Interp *, parrot_context_t *ctx,

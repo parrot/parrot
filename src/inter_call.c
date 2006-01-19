@@ -231,7 +231,7 @@ fetch_arg_pmc_op(Interp *interpreter, struct call_state *st)
 {
     INTVAL idx;
     PMC *p_arg;
-    STRING *_array;
+    STRING *_array, *_hash;
 
     idx = st->src.u.op.pc[st->src.i];
     if ((st->src.sig & PARROT_ARG_CONSTANT)) {
@@ -241,11 +241,26 @@ fetch_arg_pmc_op(Interp *interpreter, struct call_state *st)
         p_arg = CTX_REG_PMC(st->src.ctx, idx);
     }
     if (st->src.sig & PARROT_ARG_FLATTEN) {
-        _array = CONST_STRING(interpreter, "array");
-        if (!VTABLE_does(interpreter, p_arg, _array)) {
-            /* src ought to be an array */
-            real_exception(interpreter, NULL, E_ValueError,
-                    "argument doesn't array");
+        if (st->src.sig & PARROT_ARG_NAME) {
+            _hash = CONST_STRING(interpreter, "hash");
+            if (!VTABLE_does(interpreter, p_arg, _hash)) {
+                /* src ought to be an hash */
+                real_exception(interpreter, NULL, E_ValueError,
+                        "argument doesn't hash");
+            }
+            st->src.mode |= CALL_STATE_NAMED_FLATTEN;
+            /* need a key to iterate the hash */
+            st->key = pmc_new(interpreter, enum_class_Key);
+            PMC_int_val(st->key) = 0;
+            PMC_data(st->key)    = (void*)INITBucketIndex;
+        }
+        else {
+            _array = CONST_STRING(interpreter, "array");
+            if (!VTABLE_does(interpreter, p_arg, _array)) {
+                /* src ought to be an array */
+                real_exception(interpreter, NULL, E_ValueError,
+                        "argument doesn't array");
+            }
         }
 flatten:
         st->src.mode |= CALL_STATE_FLATTEN;
@@ -383,8 +398,19 @@ Parrot_fetch_arg(Interp *interpreter, struct call_state *st)
     }
     if (st->src.mode & CALL_STATE_FLATTEN) {
         if (st->src.slurp_i < st->src.slurp_n) {
-            PMC *elem = VTABLE_get_pmc_keyed_int(interpreter, st->src.slurp,
-                    st->src.slurp_i++);
+            PMC *elem;
+            if (st->src.mode & CALL_STATE_NAMED) {
+                st->src.slurp_i++;
+                st->name = hash_get_idx(interpreter, 
+                        PMC_struct_val(st->src.slurp), st->key);
+                assert(st->name);
+                elem = VTABLE_get_pmc_keyed_str(interpreter, st->src.slurp,
+                        st->name);
+            }
+            else {
+                elem = VTABLE_get_pmc_keyed_int(interpreter, st->src.slurp,
+                        st->src.slurp_i++);
+            }
             st->src.sig = PARROT_ARG_PMC;
             UVal_pmc(st->val) = elem;
             return 1;
@@ -395,7 +421,8 @@ Parrot_fetch_arg(Interp *interpreter, struct call_state *st)
         /* advance src - get next arg */
         return Parrot_fetch_arg(interpreter, st);
     }
-    if (st->src.sig & PARROT_ARG_NAME) {
+    if ((st->src.sig & PARROT_ARG_NAME) && 
+            !(st->src.sig & PARROT_ARG_FLATTEN)) {
         fetch_arg(interpreter, st);
         st->name = UVal_str(st->val);
         next_arg(interpreter, &st->src);

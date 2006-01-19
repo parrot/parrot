@@ -1644,6 +1644,28 @@ CODE
 ok
 OUTPUT
 
+output_is(<<'CODE', <<'OUTPUT', "named - 2 flatten");
+.pcc_sub main:
+    new P0, .Hash
+    set P0['a'], 20
+    set P0['b'], 10
+    set_args "(0x88)", P0            # :flatten :named
+    get_results "()"
+    find_name P1, "foo"
+    invokecc P1
+    print "ok\n"
+    end
+.pcc_sub foo:
+    get_params "(0x80, 0, 0x80, 0)", "a", I0, "b", I1
+    print_item I1
+    print_item I0
+    print_newline
+    returncc
+CODE
+10 20
+ok
+OUTPUT
+
 ## remember to change the number of tests :-)
-BEGIN { plan tests => 61; }
+BEGIN { plan tests => 62; }
 
