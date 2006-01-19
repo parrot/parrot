@@ -574,27 +574,60 @@ clone_key_arg(Interp *interpreter, struct call_state *st)
     }
 }
 
-static int
-locate_name(Interp *interpreter, struct call_state *st)
+static void
+init_named(Interp *interpreter, struct call_state *st)
 {
-    int i, start, idx;
+    int i, n_named, idx;
     INTVAL sig;
-    STRING *param;
-
+    
     if (st->dest.mode & CALL_STATE_SIG)
         real_exception(interpreter, NULL, E_ValueError,
                 "Can't call C function with named arguments");
-    if (st->first_named >= 0)
-        start = st->first_named;
-    else
-        start = 0;
-    for (i = start; i < st->dest.n; ++i) {
+    st->first_named = st->dest.i;
+    n_named = 0;
+    /*
+     * if we were slurpying, we are done
+     */
+    st->dest.mode &= ~CALL_STATE_FLATTEN;
+    st->dest.slurp = NULL;
+    for (i = st->dest.i; i < st->dest.n; ++i) {
         sig = VTABLE_get_integer_keyed_int(interpreter, 
                 st->dest.u.op.signature, i);
         if (!(sig & PARROT_ARG_NAME))
             continue;
-        if (st->first_named < 0)
-            st->first_named = i;
+        if (sig & PARROT_ARG_SLURPY_ARRAY) {
+            st->dest.slurp = pmc_new(interpreter,
+                Parrot_get_ctx_HLL_type(interpreter,
+                    enum_class_Hash));
+            /* pass the slurpy hash */
+            idx = st->dest.u.op.pc[i];
+            CTX_REG_PMC(st->dest.ctx, idx) = st->dest.slurp;
+        }
+        else
+            n_named++;
+    }
+    if (n_named >= (int)(sizeof(UINTVAL) * 8))
+        real_exception(interpreter, NULL, E_ValueError,
+                "Too many named arguments");
+    st->named_done = 0;
+}
+
+static void
+locate_name(Interp *interpreter, struct call_state *st)
+{
+    int i, n_named, idx;
+    INTVAL sig;
+    STRING *param;
+
+    n_named = -1;
+    for (i = st->first_named; i < st->dest.n; ++i) {
+        sig = VTABLE_get_integer_keyed_int(interpreter, 
+                st->dest.u.op.signature, i);
+        if (!(sig & PARROT_ARG_NAME))
+            continue;
+        if (sig & PARROT_ARG_SLURPY_ARRAY)
+            break;
+        n_named++;
         idx = st->dest.u.op.pc[i];
         param = st->dest.ctx->constants[idx]->u.string;
         if (st->name == param ||
@@ -602,13 +635,19 @@ locate_name(Interp *interpreter, struct call_state *st)
             st->dest.sig = VTABLE_get_integer_keyed_int(interpreter, 
                     st->dest.u.op.signature, i + 1);
             st->dest.i = i + 1;
-            idx = st->dest.u.op.pc[i + 1];
-            return idx;
+            st->dest.mode &= ~CALL_STATE_FLATTEN;
+            st->named_done |= 1 << n_named;
+            return;
         }
     }
-    real_exception(interpreter, NULL, E_ValueError,
-            "Named param '%Ss' not found", st->name);
-    return 0;
+    if (st->dest.slurp) {
+        st->dest.mode |= CALL_STATE_FLATTEN;
+        st->dest.sig = PARROT_ARG_PMC;
+    }
+    else {
+        real_exception(interpreter, NULL, E_ValueError,
+                "Named param '%Ss' not found", st->name);
+    }
 }
 
 int
@@ -619,12 +658,16 @@ again:
         st->dest.i = st->dest.n;        /* XXX that's plain wrong */
         return 0;
     }
-    if (st->dest.sig & PARROT_ARG_NAME) {
-        st->dest.mode |= CALL_STATE_NAMED;
+    if (st->dest.mode & CALL_STATE_NAMED) {
         locate_name(interpreter, st);
     }
-    else if (st->dest.mode & CALL_STATE_NAMED)
+    else if ((st->dest.sig & PARROT_ARG_NAME) &&
+            !(st->dest.sig & PARROT_ARG_SLURPY_ARRAY)) {
+        /* entering the named zone */
+        st->dest.mode |= CALL_STATE_NAMED;
+        init_named(interpreter, st);
         locate_name(interpreter, st);
+    }
     
     if (st->dest.sig & PARROT_ARG_OPTIONAL) {
         if (st->src.i < st->src.n) {
@@ -682,12 +725,19 @@ Parrot_store_arg(Interp *interpreter, struct call_state *st)
     if (st->dest.mode & CALL_STATE_FLATTEN) {
         if (st->src.i >= st->src.n)
             return 0;
-        VTABLE_push_pmc(interpreter, st->dest.slurp, UVal_pmc(st->val));
+        if (st->dest.mode & CALL_STATE_NAMED) {
+            VTABLE_set_pmc_keyed_str(interpreter, st->dest.slurp, 
+                    st->name, UVal_pmc(st->val));
+        }
+        else {
+            VTABLE_push_pmc(interpreter, st->dest.slurp, UVal_pmc(st->val));
+        }
         return 1;
     }
     idx = st->dest.u.op.pc[st->dest.i];
     st->params++;
     if (st->dest.sig & PARROT_ARG_SLURPY_ARRAY) {
+        assert(!(st->dest.mode & CALL_STATE_NAMED));
         /* create array */
         st->dest.slurp = pmc_new(interpreter,
                 Parrot_get_ctx_HLL_type(interpreter,

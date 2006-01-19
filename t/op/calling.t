@@ -1666,6 +1666,33 @@ CODE
 ok
 OUTPUT
 
+output_is(<<'CODE', <<'OUTPUT', "named - 3 slurpy hash");
+.pcc_sub main:
+    set_args "(0x80, 0, 0x80, 0,0x80, 0)", "b", 10, "a", 20, 'c', 30
+    get_results "()"
+    find_name P1, "foo"
+    invokecc P1
+    print "ok\n"
+    end
+.pcc_sub foo:
+    get_params "(0x80, 0, 0x88)", "a", I0, P0
+    print_item I0
+    elements I1, P0
+    print_item I1
+    typeof S0, P0
+    print_item S0
+    set I2, P0['b']
+    print_item I2
+    set I2, P0['c']
+    print_item I2
+    print_newline
+    returncc
+
+CODE
+20 2 Hash 10 30
+ok
+OUTPUT
+
 ## remember to change the number of tests :-)
-BEGIN { plan tests => 62; }
+BEGIN { plan tests => 63; }
 
