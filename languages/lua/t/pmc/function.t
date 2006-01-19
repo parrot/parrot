@@ -13,7 +13,7 @@ t/pmc/function.t - LuaFunction
 =head1 DESCRIPTION
 
 Tests C<LuaFunction> PMC
-(implemented in F<languages/lua/classes/luafunction.pmc>).
+(implemented in F<languages/lua/pmc/luafunction.pmc>).
 
 =cut
 

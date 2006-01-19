@@ -13,7 +13,7 @@ t/pmc/string.t - LuaString
 =head1 DESCRIPTION
 
 Tests C<LuaString> PMC
-(implemented in F<languages/lua/classes/luastring.pmc>).
+(implemented in F<languages/lua/pmc/luastring.pmc>).
 
 =cut
 

@@ -13,7 +13,7 @@ t/pmc/boolean.t - LuaBoolean
 =head1 DESCRIPTION
 
 Tests C<LuaBoolean> PMC
-(implemented in F<languages/lua/classes/luaboolean.pmc>).
+(implemented in F<languages/lua/pmc/luaboolean.pmc>).
 
 =cut
 

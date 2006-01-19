@@ -13,7 +13,7 @@ t/pmc/nil.t - LuaNil
 =head1 DESCRIPTION
 
 Tests C<LuaNil> PMC
-(implemented in F<languages/lua/classes/luanil.pmc>).
+(implemented in F<languages/lua/pmc/luanil.pmc>).
 
 =cut
 

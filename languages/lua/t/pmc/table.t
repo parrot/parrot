@@ -13,7 +13,7 @@ t/pmc/table.t - LuaTable
 =head1 DESCRIPTION
 
 Tests C<LuaTable> PMC
-(implemented in F<languages/lua/classes/luatable.pmc>).
+(implemented in F<languages/lua/pmc/luatable.pmc>).
 
 =cut
 

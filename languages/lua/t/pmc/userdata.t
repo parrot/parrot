@@ -13,7 +13,7 @@ t/pmc/userdata.t - LuaUserdata
 =head1 DESCRIPTION
 
 Tests C<LuaUserdata> PMC
-(implemented in F<languages/lua/classes/luauserdata.pmc>).
+(implemented in F<languages/lua/pmc/luauserdata.pmc>).
 
 =cut
 

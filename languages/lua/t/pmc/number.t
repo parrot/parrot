@@ -13,7 +13,7 @@ t/pmc/number.t - LuaNumber
 =head1 DESCRIPTION
 
 Tests C<LuaNumber> PMC
-(implemented in F<languages/lua/classes/luanumber.pmc>).
+(implemented in F<languages/lua/pmc/luanumber.pmc>).
 
 =cut
 

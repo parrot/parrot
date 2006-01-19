@@ -13,7 +13,7 @@ t/pmc/thread.t - LuaThread
 =head1 DESCRIPTION
 
 Tests C<LuaThread> PMC
-(implemented in F<languages/lua/classes/luathread.pmc>).
+(implemented in F<languages/lua/pmc/luathread.pmc>).
 
 =cut
 
