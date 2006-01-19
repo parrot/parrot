@@ -426,6 +426,11 @@ Parrot_fetch_arg(Interp *interpreter, struct call_state *st)
         fetch_arg(interpreter, st);
         st->name = UVal_str(st->val);
         next_arg(interpreter, &st->src);
+        if ((st->dest.mode & CALL_STATE_NAMED_FLATTEN) == CALL_STATE_FLATTEN) {
+            st->dest.slurp = NULL;
+            st->dest.mode &= ~CALL_STATE_FLATTEN;
+            next_arg(interpreter, &st->dest);
+        }
     }
     return fetch_arg(interpreter, st);
 }

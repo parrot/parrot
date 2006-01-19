@@ -1713,6 +1713,30 @@ CODE
 ok
 OUTPUT
 
+output_is(<<'CODE', <<'OUTPUT', "named - 5 slurpy array -> named");
+.pcc_sub main:
+    set_args  "(0, 0, 0, 0x80, 0, 0x80, 0)", 10, 20, 30, 'a', 40, 'b', 50
+    get_results "()"
+    find_name P1, "foo"
+    invokecc P1
+    print "ok\n"
+    end
+.pcc_sub foo:
+    get_params "(0, 0x08, 0x80, 0, 0x80, 0)", I0, P0, "b", I1, "a", I2
+    print_item I0
+    set I0, P0[0]
+    print_item I0
+    set I0, P0[1]
+    print_item I0
+    print_item I1
+    print_item I2
+    print_newline
+    returncc
+CODE
+10 20 30 50 40
+ok
+OUTPUT
+
 ## remember to change the number of tests :-)
-BEGIN { plan tests => 64; }
+BEGIN { plan tests => 65; }
 
