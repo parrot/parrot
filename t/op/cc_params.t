@@ -1,6 +1,6 @@
 #!perl
 # Copyright: 2006 The Perl Foundation.  All Rights Reserved.
-# $Id: calling.t 11261 2006-01-19 14:01:27Z leo $
+# $Id$
 
 use strict;
 use warnings;
