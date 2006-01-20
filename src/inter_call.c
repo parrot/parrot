@@ -176,7 +176,7 @@ Parrot_init_arg_sig(Interp *interpreter, parrot_context_t *ctx,
     return st->n > 0;
 }
 
-static int
+static void
 fetch_arg_int_op(Interp *interpreter, struct call_state *st)
 {
     INTVAL idx;
@@ -187,10 +187,9 @@ fetch_arg_int_op(Interp *interpreter, struct call_state *st)
     }
     UVal_int(st->val) = idx;
     st->src.mode |= CALL_STATE_NEXT_ARG;
-    return 1;
 }
 
-static int
+static void
 fetch_arg_str_op(Interp *interpreter, struct call_state *st)
 {
     INTVAL idx;
@@ -205,10 +204,9 @@ fetch_arg_str_op(Interp *interpreter, struct call_state *st)
     }
     UVal_str(st->val) = s_arg;
     st->src.mode |= CALL_STATE_NEXT_ARG;
-    return 1;
 }
 
-static int
+static void
 fetch_arg_num_op(Interp *interpreter, struct call_state *st)
 {
     INTVAL idx;
@@ -223,10 +221,9 @@ fetch_arg_num_op(Interp *interpreter, struct call_state *st)
     }
     UVal_num(st->val) = f_arg;
     st->src.mode |= CALL_STATE_NEXT_ARG;
-    return 1;
 }
 
-static int
+static void
 fetch_arg_pmc_op(Interp *interpreter, struct call_state *st)
 {
     INTVAL idx;
@@ -269,7 +266,8 @@ flatten:
         st->src.slurp_n = VTABLE_elements(interpreter, p_arg);
 	/* the -1 is because the :flat PMC itself doesn't count. */
         st->n_actual_args += st->src.slurp_n-1;
-        return Parrot_fetch_arg(interpreter, st);
+        Parrot_fetch_arg(interpreter, st);
+        return;
     }
 
     if ((st->dest.sig & PARROT_ARG_SLURPY_ARRAY) &&
@@ -280,37 +278,33 @@ flatten:
     }
     UVal_pmc(st->val) = p_arg;
     st->src.mode |= CALL_STATE_NEXT_ARG;
-    return 1;
 }
 
-static int
+static void
 fetch_arg_int_sig(Interp *interpreter, struct call_state *st)
 {
     va_list *ap = (va_list*)(st->src.u.sig.ap);
     UVal_int(st->val) = va_arg(*ap, INTVAL);
     st->src.mode |= CALL_STATE_NEXT_ARG;
-    return 1;
 }
 
-static int
+static void
 fetch_arg_num_sig(Interp *interpreter, struct call_state *st)
 {
     va_list *ap = (va_list*)(st->src.u.sig.ap);
     UVal_num(st->val) = va_arg(*ap, FLOATVAL);
     st->src.mode |= CALL_STATE_NEXT_ARG;
-    return 1;
 }
 
-static int
+static void
 fetch_arg_str_sig(Interp *interpreter, struct call_state *st)
 {
     va_list *ap = (va_list*)(st->src.u.sig.ap);
     UVal_str(st->val) = va_arg(*ap, STRING*);
     st->src.mode |= CALL_STATE_NEXT_ARG;
-    return 1;
 }
 
-static int
+static void
 fetch_arg_pmc_sig(Interp *interpreter, struct call_state *st)
 {
     if (st->src.u.sig.sig[st->src.i] == 'O')
@@ -320,7 +314,6 @@ fetch_arg_pmc_sig(Interp *interpreter, struct call_state *st)
         UVal_pmc(st->val) = va_arg(*ap, PMC*);
     }
     st->src.mode |= CALL_STATE_NEXT_ARG;
-    return 1;
 }
 
 static int
@@ -352,37 +345,53 @@ next_arg(Interp *interpreter, struct call_state_1 *st)
     return 1;
 }
 
-static int
-fetch_arg(Interp *interpreter, struct call_state *st)
+static void
+fetch_arg_sig(Interp *interpreter, struct call_state *st)
 {
-    switch (st->src.mode & CALL_STATE_MASK) {
-        case CALL_STATE_OP:
-            switch (st->src.sig & PARROT_ARG_TYPE_MASK) {
-                case PARROT_ARG_INTVAL:
-                    return fetch_arg_int_op(interpreter, st);
-                case PARROT_ARG_STRING:
-                    return fetch_arg_str_op(interpreter, st);
-                case PARROT_ARG_FLOATVAL:
-                    return fetch_arg_num_op(interpreter, st);
-                case PARROT_ARG_PMC:
-                    return fetch_arg_pmc_op(interpreter, st);
-            }
+    if (st->dest.mode & CALL_STATE_NEXT_ARG) {
+        next_arg(interpreter, &st->dest);
+    }
+    if (!st->src.n)
+        return;
+    if (st->src.mode & CALL_STATE_NEXT_ARG) {
+        if (!next_arg(interpreter, &st->src))
+            return;
+    }
+    switch (st->src.sig) {
+        case PARROT_ARG_INTVAL:
+            fetch_arg_int_sig(interpreter, st);
             break;
-        case CALL_STATE_SIG:
-            switch (st->src.sig) {
-                case PARROT_ARG_INTVAL:
-                    return fetch_arg_int_sig(interpreter, st);
-                case PARROT_ARG_STRING:
-                    return fetch_arg_str_sig(interpreter, st);
-                case PARROT_ARG_FLOATVAL:
-                    return fetch_arg_num_sig(interpreter, st);
-                case PARROT_ARG_PMC:
-                    return fetch_arg_pmc_sig(interpreter, st);
-            }
+        case PARROT_ARG_STRING:
+            fetch_arg_str_sig(interpreter, st);
+            break;
+        case PARROT_ARG_FLOATVAL:
+            fetch_arg_num_sig(interpreter, st);
+            break;
+        case PARROT_ARG_PMC:
+            fetch_arg_pmc_sig(interpreter, st);
             break;
     }
-    return 0;
 }
+
+static void
+fetch_arg_op(Interp *interpreter, struct call_state *st)
+{
+    switch (st->src.sig & PARROT_ARG_TYPE_MASK) {
+        case PARROT_ARG_INTVAL:
+            fetch_arg_int_op(interpreter, st);
+            break;
+        case PARROT_ARG_STRING:
+            fetch_arg_str_op(interpreter, st);
+            break;
+        case PARROT_ARG_FLOATVAL:
+            fetch_arg_num_op(interpreter, st);
+            break;
+        case PARROT_ARG_PMC:
+            fetch_arg_pmc_op(interpreter, st);
+            break;
+    }
+}
+
 
 int
 Parrot_fetch_arg(Interp *interpreter, struct call_state *st)
@@ -423,7 +432,7 @@ Parrot_fetch_arg(Interp *interpreter, struct call_state *st)
     }
     if ((st->src.sig & PARROT_ARG_NAME) && 
             !(st->src.sig & PARROT_ARG_FLATTEN)) {
-        fetch_arg(interpreter, st);
+        fetch_arg_op(interpreter, st);
         st->name = UVal_str(st->val);
         next_arg(interpreter, &st->src);
         if ((st->dest.mode & CALL_STATE_NAMED_FLATTEN) == CALL_STATE_FLATTEN) {
@@ -432,7 +441,8 @@ Parrot_fetch_arg(Interp *interpreter, struct call_state *st)
             next_arg(interpreter, &st->dest);
         }
     }
-    return fetch_arg(interpreter, st);
+    fetch_arg_op(interpreter, st);
+    return 1;
 }
 
 
@@ -952,7 +962,7 @@ parrot_pass_args_fromc(Interp *interpreter, const char *sig,
     st.opt_so_far = 0;  /* XXX */
 
     while (todo) {
-        Parrot_fetch_arg(interpreter, &st);
+        fetch_arg_sig(interpreter, &st);
         Parrot_convert_arg(interpreter, &st);
         todo = Parrot_store_arg(interpreter, &st);
     }
@@ -972,6 +982,28 @@ parrot_pass_args_fromc(Interp *interpreter, const char *sig,
         }
     }
 
+    dest += st.dest.n + 2;
+    return dest;
+}
+
+opcode_t *
+parrot_pass_args_to_result(Interp *interpreter, const char *sig,
+        opcode_t *dest, parrot_context_t * old_ctxp, va_list ap)
+{
+    int todo;
+    struct call_state st;
+
+    Parrot_init_arg_op(interpreter,
+            CONTEXT(interpreter->ctx), dest, &st.dest);
+    todo = Parrot_init_arg_sig(interpreter,
+            old_ctxp, sig, PARROT_VA_TO_VAPTR(ap), &st.src);
+    st.opt_so_far = 0;  /* XXX */
+
+    while (todo) {
+        fetch_arg_sig(interpreter, &st);
+        Parrot_convert_arg(interpreter, &st);
+        todo = Parrot_store_arg(interpreter, &st);
+    }
     dest += st.dest.n + 2;
     return dest;
 }

@@ -81,6 +81,10 @@ opcode_t * parrot_pass_args(Interp *, parrot_context_t *src_ctx,
         parrot_context_t *dest_ctx, int what);
 opcode_t * parrot_pass_args_fromc(Interp *, const char *sig,
         opcode_t *dest, parrot_context_t * ctx, va_list ap);
+opcode_t *
+parrot_pass_args_to_result(Interp *interpreter, const char *sig,
+        opcode_t *dest, parrot_context_t * old_ctxp, va_list ap);
+
 FLOATVAL set_retval_f(Interp*, int sig_ret, parrot_context_t *ctx);
 void* set_retval(Interp*, int sig_ret, parrot_context_t *ctx);
 INTVAL set_retval_i(Interp*, int sig_ret, parrot_context_t *ctx);
