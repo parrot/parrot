@@ -147,6 +147,10 @@ sub create_params
 				0..$#{ $self->{_PARAMS} }
 		);
 	}
+	else
+	{
+		$self->{INIT_PARAMS} = q{    get_params '()'};
+	}
 }
 
 
