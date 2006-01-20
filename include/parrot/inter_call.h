@@ -74,7 +74,7 @@ PARROT_API int Parrot_init_ret_nci(Interp *, struct call_state *st, const char *
 
 PARROT_API int Parrot_fetch_arg(Interp *, struct call_state *st);
 PARROT_API int Parrot_fetch_arg_nci(Interp *, struct call_state *st);
-PARROT_API int Parrot_convert_arg(Interp *, struct call_state *st);
+PARROT_API void Parrot_convert_arg(Interp *, struct call_state *st);
 PARROT_API int Parrot_store_arg(Interp *, struct call_state *st);
 
 opcode_t * parrot_pass_args(Interp *, parrot_context_t *src_ctx,

@@ -455,7 +455,7 @@ Parrot_fetch_arg_nci(Interp *interpreter, struct call_state *st)
     return 1;
 }
 
-static int
+static void
 convert_arg_from_int(Interp *interpreter, struct call_state *st)
 {
     PMC *d;
@@ -463,11 +463,11 @@ convert_arg_from_int(Interp *interpreter, struct call_state *st)
     switch (st->dest.sig & PARROT_ARG_TYPE_MASK) {
         case PARROT_ARG_FLOATVAL:
             UVal_num(st->val) = (FLOATVAL)UVal_int(st->val);
-            return 1;
+            break;
         case PARROT_ARG_STRING:
             UVal_str(st->val) =
                 string_from_int(interpreter, UVal_int(st->val));
-            return 1;
+            break;
         case PARROT_ARG_PMC:
             d = pmc_new(interpreter,
                     Parrot_get_ctx_HLL_type(interpreter,
@@ -475,12 +475,11 @@ convert_arg_from_int(Interp *interpreter, struct call_state *st)
             VTABLE_set_integer_native(interpreter, d,
                     UVal_int(st->val));
             UVal_pmc(st->val) = d;
-            return 1;
+            break;
     }
-    return 0;
 }
 
-static int
+static void
 convert_arg_from_num(Interp *interpreter, struct call_state *st)
 {
     PMC *d;
@@ -488,23 +487,22 @@ convert_arg_from_num(Interp *interpreter, struct call_state *st)
     switch (st->dest.sig & PARROT_ARG_TYPE_MASK) {
         case PARROT_ARG_INTVAL:
             UVal_int(st->val) = (INTVAL)UVal_num(st->val);
-            return 1;
+            break;
         case PARROT_ARG_STRING:
             UVal_str(st->val) =
                 string_from_num(interpreter, UVal_num(st->val));
-            return 1;
+            break;
         case PARROT_ARG_PMC:
             d = pmc_new(interpreter,
                     Parrot_get_ctx_HLL_type(interpreter,
                         enum_class_Float));
             VTABLE_set_number_native(interpreter, d, UVal_num(st->val));
             UVal_pmc(st->val) = d;
-            return 1;
+            break;
     }
-    return 0;
 }
 
-static int
+static void
 convert_arg_from_str(Interp *interpreter, struct call_state *st)
 {
     PMC *d;
@@ -513,41 +511,40 @@ convert_arg_from_str(Interp *interpreter, struct call_state *st)
         case PARROT_ARG_INTVAL:
             UVal_int(st->val) =
                 string_to_int(interpreter, UVal_str(st->val));
-            return 1;
+            break;
         case PARROT_ARG_FLOATVAL:
             UVal_num(st->val) =
                 string_to_num(interpreter, UVal_str(st->val));
-            return 1;
+            break;
         case PARROT_ARG_PMC:
             d = pmc_new(interpreter,
                     Parrot_get_ctx_HLL_type(interpreter,
                         enum_class_String));
             VTABLE_set_string_native(interpreter, d, UVal_str(st->val));
             UVal_pmc(st->val) = d;
-            return 1;
+            break;
     }
-    return 0;
 }
 
-static int
+static void
 convert_arg_from_pmc(Interp *interpreter, struct call_state *st)
 {
     switch (st->dest.sig & PARROT_ARG_TYPE_MASK) {
         case PARROT_ARG_INTVAL:
             UVal_int(st->val) = VTABLE_get_integer(interpreter,
                     UVal_pmc(st->val));
-            return 1;
+            break;
         case PARROT_ARG_FLOATVAL:
             UVal_num(st->val) = VTABLE_get_number(interpreter,
                     UVal_pmc(st->val));
-            return 1;
+            break;
         case PARROT_ARG_STRING:
             UVal_str(st->val) = VTABLE_get_string(interpreter,
                     UVal_pmc(st->val));
-            return 1;
+            break;
     }
-    return 0;
 }
+
 /*
  * replace any src register by their values (done inside clone)
  * need a test for tailcalls too, but I think there is no syntax
@@ -675,13 +672,13 @@ set_i:
     }
 }
 
-int
-Parrot_convert_arg(Interp *interpreter, struct call_state *st)
+static void
+convert_arg_ex(Interp *interpreter, struct call_state *st)
 {
 again:
     if (st->src.i >= st->src.n && (st->dest.mode & CALL_STATE_NAMED)) {
         st->dest.i = st->dest.n;        /* XXX that's plain wrong */
-        return 0;
+        return;
     }
     if (st->dest.mode & CALL_STATE_NAMED) {
         locate_name(interpreter, st);
@@ -711,33 +708,48 @@ again:
             st->opt_so_far;
         st->opt_so_far = 0;
         if (!next_arg(interpreter, &st->dest))
-            return 0;
+            return;
         goto again;
     }
     if (st->src.i >= st->src.n) {
-        return 0;
+        return;
     }    
     if (st->dest.i >= st->dest.n) {
-        return 0;
+        return;
     }    
     if ((st->src.sig & PARROT_ARG_TYPE_MASK) == PARROT_ARG_PMC) {
         clone_key_arg(interpreter, st);
     }
+    Parrot_convert_arg(interpreter, st);
+}
+
+void
+Parrot_convert_arg(Interp *interpreter, struct call_state *st)
+{
+    if (st->src.i >= st->src.n) {
+        return;
+    }    
+    if (st->dest.i >= st->dest.n) {
+        return;
+    }    
     if ((st->dest.sig & PARROT_ARG_TYPE_MASK) ==
         (st->src.sig & PARROT_ARG_TYPE_MASK))
-        return 0;
+        return;
     switch (st->src.sig & PARROT_ARG_TYPE_MASK) {
         case PARROT_ARG_INTVAL:
-            return convert_arg_from_int(interpreter, st);
+            convert_arg_from_int(interpreter, st);
+            break;
         case PARROT_ARG_FLOATVAL:
-            return convert_arg_from_num(interpreter, st);
+            convert_arg_from_num(interpreter, st);
+            break;
         case PARROT_ARG_STRING:
-            return convert_arg_from_str(interpreter, st);
+            convert_arg_from_str(interpreter, st);
+            break;
         case PARROT_ARG_PMC:
-            return convert_arg_from_pmc(interpreter, st);
+            convert_arg_from_pmc(interpreter, st);
+            break;
 
     }
-    return 0;
 }
 
 int
@@ -870,7 +882,7 @@ parrot_pass_args(Interp *interpreter,  parrot_context_t *src_ctx,
     }
     while (todo) {
         Parrot_fetch_arg(interpreter, &st);
-        Parrot_convert_arg(interpreter, &st);
+        convert_arg_ex(interpreter, &st);
         todo = Parrot_store_arg(interpreter, &st);
     }
 
@@ -963,7 +975,7 @@ parrot_pass_args_fromc(Interp *interpreter, const char *sig,
 
     while (todo) {
         fetch_arg_sig(interpreter, &st);
-        Parrot_convert_arg(interpreter, &st);
+        convert_arg_ex(interpreter, &st);
         todo = Parrot_store_arg(interpreter, &st);
     }
     /*
