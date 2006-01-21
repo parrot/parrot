@@ -1877,6 +1877,36 @@ CODE
 ok
 OUTPUT
 
+
+## Named
+pir_output_is(<<'CODE', <<'OUTPUT', " 'foo' => d syntax for return");
+.sub main :main
+        ("b" => $I0 , "a" => $I1) = foo( "b" => 10 , "a" => 20)
+        print_item $I0
+        print_item $I1
+        print_newline
+        print "ok\n"
+
+        end
+.end
+
+.sub foo
+        .param int "a" => c
+        .param int "b" => d
+
+        print_item d
+        print_item c
+        print_newline
+
+        .return ( "a" => 10, "b" => 20 )
+.end
+CODE
+10 20
+20 10
+ok
+OUTPUT
+
+
 ## remember to change the number of tests :-)
-BEGIN { plan tests => 71 }
+BEGIN { plan tests => 72 }
 

@@ -831,6 +831,13 @@ var_returns:
            adv_named_id = NULL;
       }
       add_pcc_return(IMCC_INFO(interp)->sr_return, $1);    }
+  | STRINGC ADV_ARROW var {
+      SymReg *r;
+      r = mk_const(interp, $1, 'S');
+      r->type |= VT_NAMED;
+      add_pcc_return(IMCC_INFO(interp)->sr_return, r);
+      add_pcc_return(IMCC_INFO(interp)->sr_return, $3);
+  }
   | var_returns COMMA arg   {  
       if (adv_named_id) {
            SymReg *r;
@@ -840,6 +847,13 @@ var_returns:
            adv_named_id = NULL;
       }
       add_pcc_return(IMCC_INFO(interp)->sr_return, $3);    }
+  | var_returns COMMA STRINGC ADV_ARROW var   {  
+      SymReg *r;
+      r = mk_const(interp, $3, 'S');
+      r->type |= VT_NAMED;
+      add_pcc_return(IMCC_INFO(interp)->sr_return, r);
+      add_pcc_return(IMCC_INFO(interp)->sr_return, $5);
+  }
   ;
 
 
