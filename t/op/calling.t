@@ -1714,6 +1714,38 @@ CODE
 ok
 OUTPUT
 
+pir_output_is(<<'CODE', <<'OUTPUT', ":optional followed by :slurpy (empty)");
+.sub main :main
+	_write_thing(3)
+.end
+.sub _write_thing
+	.param pmc arg1 :optional
+	.param pmc rest_arg :slurpy
+	print arg1
+	print ' '
+	print rest_arg
+	print "\n"
+.end
+CODE
+3 0
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', ":optional followed by :slurpy (used)");
+.sub main :main
+	_write_thing(3, 4, 5)
+.end
+.sub _write_thing
+	.param pmc arg1 :optional
+	.param pmc rest_arg :slurpy
+	print arg1
+	print ' '
+	print rest_arg
+	print "\n"
+.end
+CODE
+3 2
+OUTPUT
+
 ## remember to change the number of tests :-)
-BEGIN { plan tests => 64; }
+BEGIN { plan tests => 66; }
 

@@ -728,6 +728,7 @@ create_slurpy_ar(Interp *interpreter, struct call_state *st, INTVAL idx)
                 enum_class_ResizablePMCArray));
     CTX_REG_PMC(st->dest.ctx, idx) = st->dest.slurp;
     st->dest.mode |= CALL_STATE_SLURP;
+    st->dest.mode &= ~CALL_STATE_OPT;
 }
 
 static void 
@@ -916,8 +917,9 @@ again:
                 break;
 
             default:
-                internal_exception(1, "Unhandled process_args state 0x%x",
-                        state);
+                real_exception(interpreter, NULL, 0,
+                               "Unhandled process_args state 0x%x",
+                               state);
         }
     } while (1);
 }
