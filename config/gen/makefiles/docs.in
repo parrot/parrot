@@ -1,13 +1,9 @@
 # Copyright: 2001-2004 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
-#
 # Setup of some commands
-#
-
-PERL = @perl@
-RM_F = @rm_f@
-# Make directory; do not die if dir exists.
+PERL  = @perl@
+RM_F  = @rm_f@
 MKDIR = @mkdir@
 CHMOD = @chmod@
 
@@ -48,5 +44,5 @@ html:
 	$(PERL) -I../lib ../tools/docs/write_docs.pl --silent
 
 html-clean:
-	$(PERL) -I../lib -MParrot::Distribution -e "Parrot::Distribution->new->delete_html_docs"
+	$(PERL) -I../lib -MParrot::Distribution -e "Parrot::Distribution->new()->delete_html_docs()"
 
