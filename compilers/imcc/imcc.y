@@ -361,7 +361,7 @@ set_lexical(Interp *interp, SymReg *r, char *name)
 %type <s> classname relop
 %type <i> labels _labels label  statement sub_call
 %type <i> pcc_sub_call
-%type <sr> sub_param sub_params pcc_arg pcc_result pcc_args pcc_results
+%type <sr> sub_param sub_params pcc_arg pcc_result pcc_args pcc_results sub_param_type_def
 %type <sr> pcc_returns pcc_return pcc_call arg arglist the_sub multi_type
 %type <t> argtype_list argtype paramtype_list paramtype
 %type <t> pcc_return_many
@@ -574,9 +574,14 @@ sub_params:
    ;
 
 sub_param:
-     PARAM                             { is_def=1; }
-     type IDENTIFIER  paramtype_list   { $$ = mk_ident(interp, $4, $3);
-                                         is_def=0; $$->type |= $5; }
+   PARAM { is_def=1; } sub_param_type_def { $$ = $3; is_def=0; }
+   ;
+
+sub_param_type_def:
+     type IDENTIFIER paramtype_list    { $$ = mk_ident(interp, $2, $1);
+                                         $$->type |= $3; }
+   | type STRINGC ADV_ARROW IDENTIFIER { $$ = mk_ident(interp, $4, $1);
+                                         adv_named_id = $2;}
    ;
 
 opt_comma:
