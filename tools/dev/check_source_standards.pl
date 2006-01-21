@@ -1,12 +1,10 @@
 #! perl -w
-################################################################################
-# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2001-2006 The Perl Foundation.  All Rights Reserved.
 # $Id$
-################################################################################
 
 =head1 NAME
 
-tools/dev/check_source_standards.pl - Check source code conforms to PDD 7
+tools/dev/check_source_standards.pl - Check conformancs of C source code to PDD 7
 
 =head1 SYNOPSIS
 
@@ -22,6 +20,18 @@ PDD 7.
 To run it on all the C source code files in the distribution pass in
 C<all_source> instead of a list of files.
 
+=head1 TODO
+
+Make better use of CPAN modules.
+
+=head1 HISTORY
+
+Started by josh in 2002.
+
+=head1 AUTHOR
+
+josh
+
 =head1 SEE ALSO
 
 F<docs/pdds/pdd07_codingstd.pod>.
@@ -30,10 +40,14 @@ F<docs/pdds/pdd07_codingstd.pod>.
 
 ################################################################################
 
+use strict;
+use warnings;
+use 5.008;
+
+use Data::Dumper;
 use Text::Wrap;
 use File::Find;
 use File::Basename;
-use strict;
 
 my @files = @ARGV;
 
@@ -46,8 +60,7 @@ if ($files[0] eq "all_source") {
     # do a little "find" action for now.
     @files = ();
     File::Find::find({wanted => sub {
-                          if ($File::Find::dir =~ m:(languages/[^/]+|icu|examples|miniparrot)$: &&
-			      $File::Find::dir !~ m:languages/imcc$:) {
+                          if ( $File::Find::dir =~ m:(languages|examples)$: ) {
                               $File::Find::prune = 1;	
 			      return;
                           }
@@ -58,6 +71,7 @@ if ($files[0] eq "all_source") {
                             push @files, $File::Find::name;
                       }}, '.');
 }
+
 
 FILE:
 foreach my $file (@files) {
