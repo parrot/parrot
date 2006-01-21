@@ -894,6 +894,12 @@ set_opt_flag:
                 VTABLE_push_pmc(interpreter, st->dest.slurp, 
                         UVal_pmc(st->val));
                 break;
+            case CALL_STATE_NAMED_POS: 
+            case CALL_STATE_NAMED_POS_OPT: 
+            case CALL_STATE_NAMED_POS_SLURP: 
+                real_exception(interpreter, NULL, E_ValueError,
+                        "too many named arguments");
+                break;
             case CALL_STATE_NAMED_NAMED_SLURP: 
                 Parrot_convert_arg(interpreter, st);
                 VTABLE_set_pmc_keyed_str(interpreter, st->dest.slurp, 
@@ -902,8 +908,8 @@ set_opt_flag:
 
             default:
                 real_exception(interpreter, NULL, 0,
-                               "Unhandled process_args state 0x%x",
-                               state);
+                        "Unhandled process_args state 0x%x",
+                        state);
         }
     } while (1);
 }

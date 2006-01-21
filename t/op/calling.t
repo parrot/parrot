@@ -1906,7 +1906,21 @@ CODE
 ok
 OUTPUT
 
+pir_output_like(<<'CODE', <<'OUTPUT', "named => pos passing");
+.sub main :main
+        foo( "b" => 10 , "a" => 20)
+        print "never\n"
+        end
+.end
+
+.sub foo
+        .param int a
+        .param int b
+.end
+CODE
+/many named arguments/
+OUTPUT
 
 ## remember to change the number of tests :-)
-BEGIN { plan tests => 72 }
+BEGIN { plan tests => 73 }
 
