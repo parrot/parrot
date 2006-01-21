@@ -1195,16 +1195,32 @@ targetlist:
              adv_named_id = NULL;
          }
          add_pcc_result(cur_call, $3); }
+   | targetlist COMMA STRINGC ADV_ARROW target {
+       SymReg *r;
+       $$ = 0;
+       r = mk_const(interp, $3, 'S');
+       r->type |= VT_NAMED;
+       add_pcc_result(cur_call, r);
+       add_pcc_result(cur_call, $5);
+     }
    | result                  { 
        $$ = 0;
-         if (adv_named_id) {
-             SymReg *r;
-             r = mk_const(interp, adv_named_id, 'S');
-             r->type |= VT_NAMED;
-             add_pcc_result(cur_call, r);
-             adv_named_id = NULL;
-         }
+       if (adv_named_id) {
+           SymReg *r;
+           r = mk_const(interp, adv_named_id, 'S');
+           r->type |= VT_NAMED;
+           add_pcc_result(cur_call, r);
+           adv_named_id = NULL;
+       }
        add_pcc_result(cur_call, $1); }
+   | STRINGC ADV_ARROW target {
+       SymReg *r;
+       $$ = 0;
+       r = mk_const(interp, $1, 'S');
+       r->type |= VT_NAMED;
+       add_pcc_result(cur_call, r);
+       add_pcc_result(cur_call, $3);
+     }
    | /* empty */             {  $$ = 0; }
    ;
 
