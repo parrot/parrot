@@ -162,6 +162,31 @@ PunieGrammar::cexpr: result(.) = {
 
 PunieGrammar::term: result(.) = {
     .local pmc result
+    .local pmc children
+    children = new PerlArray
+    $P1 = node.get_hash()
+    $P0 = new Iterator, $P1    # setup iterator for node
+    set $P0, 0 # reset iterator, begin at start
+  iter_loop:
+    unless $P0, iter_end         # while (entries) ...
+      shift $S2, $P0             # get key for next entry
+      $P2 = $P0[$S2]      # get entry at current key
+      $P3 = tree.get('result', $P2, $S2)
+      push children, $P3
+      goto iter_loop
+  iter_end:
+
+    $I0 = elements children
+    unless $I0 == 1 goto err_too_many
+    result = children[0]
+    .return (result)
+
+  err_too_many:
+    print "error: Currently, 'term' nodes should have only one child.\n"
+}
+
+PunieGrammar::number: result(.) = {
+    .local pmc result
     result = new 'PAST::Val'
 
     # get the source string and position offset from start of source
@@ -169,15 +194,35 @@ PunieGrammar::term: result(.) = {
     $S2 = node 
     $I3 = node.from()
 
-    $S3 = tree.get('value', node, 'PunieGrammar::term')
-
-    result.set_node($S2,$I3,$S3)
+    result.set_node($S2,$I3,$S2)
+    result.valtype('num')
     .return (result)
 }
 
-PunieGrammar::term: value(.) = {
-    .local string value
+PunieGrammar::integer: result(.) = {
+    .local pmc result
+    result = new 'PAST::Val'
 
+    # get the source string and position offset from start of source
+    # code for this match node
+    $S2 = node 
+    $I3 = node.from()
+
+    result.set_node($S2,$I3,$S2)
+    result.valtype('int')
+    .return (result)
+}
+
+PunieGrammar::stringdouble: result(.) = {
+    .local pmc result
+    result = new 'PAST::Val'
+
+    # get the source string and position offset from start of source
+    # code for this match node
+    $S2 = node 
+    $I3 = node.from()
+
+    .local string value
     # Check if this is a string match
     $I0 = defined node["PGE::Text::bracketed"]
     if $I0 goto bracketed_value
@@ -188,5 +233,34 @@ PunieGrammar::term: value(.) = {
     $P2 = $P1[0]
     value = $P2
   no_bracketed_value:
-    .return (value)
+
+    result.set_node($S2,$I3,value)
+    result.valtype('strqq')
+    .return (result)
+}
+
+PunieGrammar::stringsingle: result(.) = {
+    .local pmc result
+    result = new 'PAST::Val'
+
+    # get the source string and position offset from start of source
+    # code for this match node
+    $S2 = node 
+    $I3 = node.from()
+
+    .local string value
+    # Check if this is a string match
+    $I0 = defined node["PGE::Text::bracketed"]
+    if $I0 goto bracketed_value
+    value = node
+    goto no_bracketed_value
+  bracketed_value:
+    $P1 = node["PGE::Text::bracketed"]
+    $P2 = $P1[0]
+    value = $P2
+  no_bracketed_value:
+
+    result.set_node($S2,$I3,value)
+    result.valtype('strq')
+    .return (result)
 }

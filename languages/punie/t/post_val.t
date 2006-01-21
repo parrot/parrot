@@ -41,5 +41,6 @@ CODE
     'source' => 'foo',
     'pos' => '42',
     'value' => 'bar',
+    'valtype' => undef,
 }
 OUT

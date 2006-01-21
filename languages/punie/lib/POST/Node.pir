@@ -89,10 +89,18 @@ All POST nodes subclass from this base type.
     print indent
     print "'"
     print name
-    print "' => '"
+    print "' => "
     $P1 = getattribute self, name
+    $I0 = defined $P1
+    unless $I0 goto attribute_undef
+    print "'"
     print $P1
-    print "',\n"
+    print "'"
+    goto attribute_def
+  attribute_undef:
+    print "undef"
+  attribute_def:
+    print ",\n"
     .return ()
 .end
 

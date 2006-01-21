@@ -14,7 +14,8 @@ PAST::Val is a subclass of PAST::Node.
     .local pmc base
     $P0 = getclass 'PAST::Node'
     base = subclass $P0, 'PAST::Val'
-    addattribute base, "value"             # the value of this leaf
+    addattribute base, "value"            # the value of this leaf
+    addattribute base, "valtype"          # the value type of this leaf
     .return ()
 .end
 
@@ -47,6 +48,7 @@ PAST::Val is a subclass of PAST::Node.
     self.dump_attribute("source", level)
     self.dump_attribute("pos", level)
     self.dump_attribute("value", level)
+    self.dump_attribute("valtype", level)
 
     # close off current node display
     print indent
@@ -56,5 +58,18 @@ PAST::Val is a subclass of PAST::Node.
 
 .sub value method
     $P2 = getattribute self, "value"
+    .return ($P2)
+.end
+
+.sub valtype method
+    .param string valtype
+    unless valtype goto get
+  set:
+    $P1 = new PerlString
+    $P1 = valtype
+    setattribute self, "valtype", $P1
+    .return ($P1)
+  get:
+    $P2 = getattribute self, "valtype"
     .return ($P2)
 .end

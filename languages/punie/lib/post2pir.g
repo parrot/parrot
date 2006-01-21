@@ -59,7 +59,19 @@ POST::Op: result(.) = {
 
 POST::Val: result(.) = {
     $S1 = node.value()
-    $S2 = '"' . $S1 # temporarily treat all values as strings
-    $S2 .= '"'
-    .return ($S2)
+    $S2 = node.valtype()
+    if $S2 == 'strq' goto wrap_string_single
+    if $S2 == 'strqq' goto wrap_string_double
+    # Otherwise, it's not a string value, so return it straight.
+    .return ($S1)
+  wrap_string_double:
+    # Wrap double quoted strings in double quotes
+    $S3 = '"' . $S1
+    $S3 .= '"'
+    .return ($S3)
+  wrap_string_single:
+    # Wrap single quoted strings in single quotes
+    $S3 = "'" . $S1
+    $S3 .= "'"
+    .return ($S3)
 }

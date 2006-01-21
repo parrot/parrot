@@ -75,7 +75,9 @@ PAST::Val: result(.) = {
     $S1 = node.source()
     $I1 = node.pos()
     $P1 = node.value()
+    $P3 = node.valtype()
     $P2 = new 'POST::Val'
     $P2.set_node($S1,$I1,$P1)
+    $P2.valtype($P3)
     .return ($P2)
 }

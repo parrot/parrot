@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(t . lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 6;
+use Parrot::Test tests => 8;
 
 language_output_is('punie', <<'EOC', '1', 'printing one');
 print 1;
@@ -14,6 +14,10 @@ EOC
 
 language_output_is('punie', <<'EOC', '42', 'printing a number with multiple digits');
 print 42;
+EOC
+
+language_output_is('punie', <<'EOC', '64.999000', 'printing a number with decimal point');
+print 64.999;
 EOC
 
 language_output_is('punie', <<'EOC', '135', 'printing multiple numbers');
@@ -28,6 +32,14 @@ print "ok 2\n";
 CODE
 ok 1
 ok 2
+OUT
+
+language_output_is('punie', <<'CODE', <<'OUT', 'printing single quoted strings');
+print 'ok 1\n';
+print 'ok 2\n';
+print "\n";
+CODE
+ok 1\nok 2\n
 OUT
 
 language_output_is('punie', <<'CODE', <<'OUT', 'printing list of strings');
