@@ -2038,17 +2038,17 @@ pir_output_is(<<'CODE', <<'OUTPUT', "default value for an unused :optional");
 .sub main :main
 	print 1
 	foo(1)
-	foo(2)  
-	foo()           
-	print "\n"      
-.end            
-.sub foo        
+	foo(2)
+	foo()
+	print "\n"
+.end
+.sub foo
 	.param int var :optional
-	print var               
-.end                    
-CODE                    
-1120                    
-OUTPUT                  
+	print var
+.end
+CODE
+1120
+OUTPUT
 
 
 ## remember to change the number of tests :-)
