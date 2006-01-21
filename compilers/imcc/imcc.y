@@ -764,13 +764,14 @@ paramtype:
      ADV_SLURPY                        {  $$ = VT_FLAT;   }
    | ADV_OPTIONAL                      {  $$ = VT_OPTIONAL; }
    | ADV_OPT_FLAG                      {  $$ = VT_OPT_FLAG; }
+   | ADV_NAMED                         {  $$ = VT_NAMED; }
    | ADV_NAMED '(' STRINGC ')'         {  adv_named_id = $3; $$ = 0; }
    ;
 
 
 begin_ret_or_yield:
      PCC_BEGIN_RETURN { $$ = 0; }
-   | PCC_BEGIN_YIELD { $$ = 1; }
+   | PCC_BEGIN_YIELD  { $$ = 1; }
    ;
 
 end_ret_or_yield:
@@ -1192,6 +1193,7 @@ argtype_list:
 
 argtype:
      ADV_FLAT                  { $$ = VT_FLAT; }
+   | ADV_NAMED { $$ = VT_NAMED; }
    | ADV_NAMED '(' STRINGC ')' { adv_named_id = $3; $$ = 0; }
    ;
 

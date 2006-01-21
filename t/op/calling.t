@@ -1979,6 +1979,31 @@ CODE
 ok
 OUTPUT
 
+pir_output_is(<<'CODE', <<'OUTPUT', "named flat/slurpy");
+.sub main :main
+        .local pmc h
+        h = new .Hash
+        h['a'] = 20
+        h['b'] = 10
+        foo( h :named :flat )
+        print "ok\n"
+        end
+.end
+
+.sub foo
+        .param pmc h :named :slurpy
+        $I0 = h['a']
+        $I1 = h['b']
+        print_item $I0
+        print_item $I1
+        print_newline
+.end
+CODE
+20 10
+ok
+OUTPUT
+
+
 ## remember to change the number of tests :-)
-BEGIN { plan tests => 76 }
+BEGIN { plan tests => 77 }
 
