@@ -844,6 +844,11 @@ again:
                 store_arg(st, idx);
                 st->dest.mode |= CALL_STATE_NEXT_ARG;
                 break;
+            case CALL_STATE_NAMED_NAMED_OPT: 
+                if (!locate_named_named(interpreter, st))
+                    goto again;
+                idx = st->dest.u.op.pc[st->dest.i];
+                /* go on */
             case CALL_STATE_POS_POS_OPT: 
                 ++st->optionals;
                 Parrot_convert_arg(interpreter, st);
@@ -871,6 +876,7 @@ set_opt_flag:
                 store_arg(st, idx);
                 opt_flag = 0;
                 goto set_opt_flag;
+            case CALL_STATE_END_NAMED_NAMED|CALL_STATE_OPT: 
             case CALL_STATE_END_NAMED_NAMED: 
             case CALL_STATE_END_POS_NAMED: 
                 /* TODO err check */

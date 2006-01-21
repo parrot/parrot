@@ -1921,6 +1921,64 @@ CODE
 /many named arguments/
 OUTPUT
 
+pir_output_is(<<'CODE', <<'OUTPUT', "named optional - set");
+.sub main :main
+        foo ('a'=>20,'b'=>10)
+        print "ok\n"
+.end
+
+.sub foo
+        .param int d :named('b')
+	.param int c :named('a') :optional
+        print_item d
+        print_item c
+        print_newline
+.end
+CODE
+10 20
+ok
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "named optional - set", todo => 'imcc.y support');
+.sub main :main
+        foo ('a'=>20,'b'=>10)
+        print "ok\n"
+.end
+
+.sub foo
+        .param int 'b' => d
+	.param int 'a' => c  :optional
+        print_item d
+        print_item c
+        print_newline
+.end
+CODE
+10 20
+ok
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "named optional - set, :opt_flag");
+.sub main :main
+        foo ('a'=>20,'b'=>10)
+        print "ok\n"
+.end
+
+.sub foo
+        .param int d :named('b') :optional
+	.param int has_d :opt_flag
+	.param int c :named('a') :optional
+	.param int has_c :opt_flag
+        print_item d
+        print_item has_d
+        print_item c
+        print_item has_c
+        print_newline
+.end
+CODE
+10 1 20 1
+ok
+OUTPUT
+
 ## remember to change the number of tests :-)
-BEGIN { plan tests => 73 }
+BEGIN { plan tests => 76 }
 
