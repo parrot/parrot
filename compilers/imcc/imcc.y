@@ -786,10 +786,12 @@ pcc_ret:
 
 pcc_returns:
      /* empty */   {  $$ = 0; }
-   | pcc_returns '\n'
-                   {  if($1) add_pcc_return(IMCC_INFO(interp)->sr_return, $1); }
-   | pcc_returns pcc_return '\n'
-                   {  if($2) add_pcc_return(IMCC_INFO(interp)->sr_return, $2); }
+   | pcc_returns '\n'      {
+       if($1) add_pcc_return(IMCC_INFO(interp)->sr_return, $1); 
+   }
+   | pcc_returns pcc_return '\n'      {
+       if($2) add_pcc_return(IMCC_INFO(interp)->sr_return, $2); 
+   }
    ;
 
 pcc_return:
@@ -815,8 +817,24 @@ pcc_return_many:
 
 var_returns:
     /* empty */ { $$ = 0; }
-  | arg                     {  add_pcc_return(IMCC_INFO(interp)->sr_return, $1);    }
-  | var_returns COMMA arg   {  add_pcc_return(IMCC_INFO(interp)->sr_return, $3);    }
+  | arg                     {  
+      if (adv_named_id) {
+           SymReg *r;
+           r = mk_const(interp, adv_named_id, 'S');
+           r->type |= VT_NAMED; 
+           add_pcc_return(IMCC_INFO(interp)->sr_return, r);
+           adv_named_id = NULL;
+      }
+      add_pcc_return(IMCC_INFO(interp)->sr_return, $1);    }
+  | var_returns COMMA arg   {  
+      if (adv_named_id) {
+           SymReg *r;
+           r = mk_const(interp, adv_named_id, 'S');
+           r->type |= VT_NAMED; 
+           add_pcc_return(IMCC_INFO(interp)->sr_return, r);
+           adv_named_id = NULL;
+      }
+      add_pcc_return(IMCC_INFO(interp)->sr_return, $3);    }
   ;
 
 
@@ -1146,8 +1164,26 @@ result: target paramtype_list  { $$ = $1; $$->type |= $2; }
    ;
 
 targetlist:
-     targetlist COMMA result { $$ = 0; add_pcc_result(cur_call, $3); }
-   | result                  { $$ = 0; add_pcc_result(cur_call, $1); }
+     targetlist COMMA result { 
+         $$ = 0;
+         if (adv_named_id) {
+             SymReg *r;
+             r = mk_const(interp, adv_named_id, 'S');
+             r->type |= VT_NAMED;
+             add_pcc_result(cur_call, r);
+             adv_named_id = NULL;
+         }
+         add_pcc_result(cur_call, $3); }
+   | result                  { 
+       $$ = 0;
+         if (adv_named_id) {
+             SymReg *r;
+             r = mk_const(interp, adv_named_id, 'S');
+             r->type |= VT_NAMED;
+             add_pcc_result(cur_call, r);
+             adv_named_id = NULL;
+         }
+       add_pcc_result(cur_call, $1); }
    | /* empty */             {  $$ = 0; }
    ;
 
