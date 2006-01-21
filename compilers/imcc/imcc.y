@@ -359,6 +359,15 @@ add_pcc_named_return(Interp *interp, SymReg *cur_call, char *name, SymReg *value
     add_pcc_return(cur_call, value);
 }
 
+static void
+adv_named_set(Interp *interp, char *name) {
+    if (adv_named_id) {
+        IMCC_fataly(interp, E_SyntaxError,
+                    "Named parameter with more than one name.\n");
+    }
+    adv_named_id = name;
+}
+
 
 %}
 
@@ -624,7 +633,7 @@ sub_param_type_def:
                                          $$->type |= $3; }
    | type STRINGC ADV_ARROW IDENTIFIER paramtype_list { $$ = mk_ident(interp, $4, $1);
                                          $$->type |= $5;
-                                         adv_named_id = $2;}
+                                         adv_named_set(interp,$2);}
    ;
 
 opt_comma:
@@ -808,7 +817,7 @@ paramtype:
    | ADV_OPTIONAL                      {  $$ = VT_OPTIONAL; }
    | ADV_OPT_FLAG                      {  $$ = VT_OPT_FLAG; }
    | ADV_NAMED                         {  $$ = VT_NAMED; }
-   | ADV_NAMED '(' STRINGC ')'         {  adv_named_id = $3; $$ = 0; }
+   | ADV_NAMED '(' STRINGC ')'         {  adv_named_set(interp,$3); $$ = 0; }
    ;
 
 
@@ -1200,7 +1209,7 @@ argtype_list:
 argtype:
      ADV_FLAT                  { $$ = VT_FLAT; }
    | ADV_NAMED                 { $$ = VT_NAMED; }
-   | ADV_NAMED '(' STRINGC ')' { adv_named_id = $3; $$ = 0; }
+   | ADV_NAMED '(' STRINGC ')' { adv_named_set(interp,$3); $$ = 0; }
    ;
 
 result: target paramtype_list  { $$ = $1; $$->type |= $2; }

@@ -2003,7 +2003,37 @@ CODE
 ok
 OUTPUT
 
+pir_output_like(<<'CODE', <<'OUTPUT', "param .. 'a' => v :named('foo'");
+.sub main :main
+        foo( "b" => 10, "a" => 20)
+        print "never\n"
+        end
+.end
+
+.sub foo
+        .param int "a" => c :named("foo")
+        .param int "b" => d
+.end
+CODE
+/Named parameter with more than one name/
+OUTPUT
+
+
+pir_output_like(<<'CODE', <<'OUTPUT', "param .. 'a' => v :named('foo'");
+.sub main :main
+        foo( "b" => 10, "a" => 20)
+        print "never\n"
+        end
+.end
+
+.sub foo
+        .param int  c :named("foo") :named("bar")
+        .param int "b" => d
+.end
+CODE
+/Named parameter with more than one name/
+OUTPUT
 
 ## remember to change the number of tests :-)
-BEGIN { plan tests => 77 }
+BEGIN { plan tests => 79 }
 
