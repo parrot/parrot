@@ -766,7 +766,7 @@ static void
 process_args(Interp *interpreter, struct call_state *st, 
         const char *action, int err_check)
 {
-    int state;
+    int state, opt_flag;
     INTVAL idx;
 
     if (!st->src.n)
@@ -848,6 +848,9 @@ again:
                 ++st->optionals;
                 Parrot_convert_arg(interpreter, st);
                 store_arg(st, idx);
+                opt_flag = 1;
+                /* :opt_flag is truely optional */
+set_opt_flag:
                 if (!next_arg(interpreter, &st->dest)) {
                     st->dest.mode |= CALL_STATE_x_END;
                     break;
@@ -855,38 +858,19 @@ again:
                 if (!(st->dest.sig & PARROT_ARG_OPT_FLAG)) {
                     st->dest.i--;
                     st->dest.mode |= CALL_STATE_NEXT_ARG;
-#if 0
-                    real_exception(interpreter, NULL, E_ValueError,
-                            ":opt_flag not present");
-#endif
                     break;
                 }
                 --st->params;
                 idx = st->dest.u.op.pc[st->dest.i];
-                CTX_REG_INT(st->dest.ctx, idx) = 1;
+                CTX_REG_INT(st->dest.ctx, idx) = opt_flag;
                 st->dest.mode |= CALL_STATE_NEXT_ARG;
                 break;
             case CALL_STATE_END_POS_OPT: 
                 ++st->optionals;
                 UVal_num(st->val) = 0.0;        /* XXX assumes all bits 0 */
                 store_arg(st, idx);
-                /* XXX is :opt_flag optional ? */
-                if (!next_arg(interpreter, &st->dest)) 
-                    return;
-                if (!(st->dest.sig & PARROT_ARG_OPT_FLAG)) {
-                    st->dest.i--;
-                    st->dest.mode |= CALL_STATE_NEXT_ARG;
-#if 0
-                    real_exception(interpreter, NULL, E_ValueError,
-                            ":opt_flag not present");
-#endif
-                    break;
-                }
-                --st->params;
-                idx = st->dest.u.op.pc[st->dest.i];
-                CTX_REG_INT(st->dest.ctx, idx) = 0;
-                st->dest.mode |= CALL_STATE_NEXT_ARG;
-                break;
+                opt_flag = 0;
+                goto set_opt_flag;
             case CALL_STATE_END_NAMED_NAMED: 
             case CALL_STATE_END_POS_NAMED: 
                 /* TODO err check */
