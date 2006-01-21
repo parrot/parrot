@@ -1,5 +1,5 @@
 #!perl
-# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2001-2006 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 use strict;
@@ -2049,7 +2049,6 @@ pir_output_is(<<'CODE', <<'OUTPUT', "default value for an unused :optional");
 CODE
 1120
 OUTPUT
-
 
 ## remember to change the number of tests :-)
 BEGIN { plan tests => 80 }

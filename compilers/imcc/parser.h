@@ -25,7 +25,7 @@ PARROT_API EXTERN int yydebug;
 
 
 SymReg * macro(Interp *, char *name);
-PARROT_API int yyerror(char *);
+PARROT_API int yyerror(Interp*, char *);
 PARROT_API int yyparse(void *param);
 PARROT_API int yylex(YYSTYPE *valp, Interp *);
 void op_fullname(char * dest, const char * name, SymReg * args[], int, int);

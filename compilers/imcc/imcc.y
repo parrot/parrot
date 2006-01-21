@@ -441,6 +441,8 @@ adv_named_set(Interp *interp, char *name) {
 
 %pure_parser
 
+%parse-param {Interp *interp}
+
 %start program
 
 /* In effort to make the grammar readable but not militaristic, please space indent
@@ -1361,14 +1363,13 @@ string:
 %%
 
 
-/* XXX how to get an Interp* here */
-int yyerror(char * s)
+int yyerror(Interp *interp, char * s)
 {
     /* support bison 1.75, convert 'parse error to syntax error' */
     if (!memcmp(s, "parse", 5))
-        IMCC_fataly(NULL, E_SyntaxError, "syntax%s", s+5);
+        IMCC_fataly(interp, E_SyntaxError, "syntax%s", s+5);
     else
-        IMCC_fataly(NULL, E_SyntaxError, s);
+        IMCC_fataly(interp, E_SyntaxError, s);
     /* fprintf(stderr, "last token = [%s]\n", yylval.s); */
     return 0;
 }
