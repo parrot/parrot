@@ -622,7 +622,8 @@ sub_param:
 sub_param_type_def:
      type IDENTIFIER paramtype_list    { $$ = mk_ident(interp, $2, $1);
                                          $$->type |= $3; }
-   | type STRINGC ADV_ARROW IDENTIFIER { $$ = mk_ident(interp, $4, $1);
+   | type STRINGC ADV_ARROW IDENTIFIER paramtype_list { $$ = mk_ident(interp, $4, $1);
+                                         $$->type |= $5;
                                          adv_named_id = $2;}
    ;
 

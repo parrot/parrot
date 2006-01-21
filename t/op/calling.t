@@ -1939,7 +1939,7 @@ CODE
 ok
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "named optional - set", todo => 'imcc.y support');
+pir_output_is(<<'CODE', <<'OUTPUT', "named optional - set");
 .sub main :main
         foo ('a'=>20,'b'=>10)
         print "ok\n"
