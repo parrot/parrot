@@ -749,7 +749,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "empty args");
     invokecc $P1
 .end
 .sub foo
-    get_params "(0x20)", $P1
+    get_params "(0x20, 0x40)", $P1, $I0
     if_null $P1, ok
     print "not "
 ok:
@@ -768,7 +768,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "optional args");
     invokecc $P1
 .end
 .sub foo
-    get_params "(0x20)", $P1
+    get_params "(0x20, 0x40)", $P1, $I0
     unless_null $P1, ok
     print "not "
 ok:
@@ -778,30 +778,6 @@ CODE
 ok
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "optional, argcX");
-.sub main :main
-    $P0 = new String
-    $P0 = "hello\n"
-    find_name $P1, "foo"
-    set_args "(0,0)", $P0, 10
-    invokecc $P1
-.end
-.sub foo
-    .local int opt_argc
-    get_params "(0,0,0x20,0x20,0x20,0x20,0x40)", $P0, $I0, $P1, $S1, $I1, $N1, opt_argc
-    print $P0
-    if_null $P1, ok
-    print "not "
-ok:
-    print "ok\n"
-    print opt_argc
-    print "\n"
-.end
-CODE
-hello
-ok
-0
-OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "pir uses no ops");
 .sub main :main
@@ -913,6 +889,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "type conversion - PIR const");
 .end
 .sub "foo"
     .param string str1 :optional
+    .param int has_s   :opt_flag
     print str1
     print "\n"
 .end
@@ -1668,7 +1645,7 @@ OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "named - 3 slurpy hash");
 .pcc_sub main:
-    set_args "(0x80, 0, 0x80, 0,0x80, 0)", "b", 10, "a", 20, 'c', 30
+    set_args "(0x80, 0, 0x80, 0,0x80, 0)", "a", 10, "b", 20, 'c', 30
     get_results "()"
     find_name P1, "foo"
     invokecc P1
@@ -1689,7 +1666,7 @@ output_is(<<'CODE', <<'OUTPUT', "named - 3 slurpy hash");
     returncc
 
 CODE
-20 2 Hash 10 30
+10 2 Hash 20 30
 ok
 OUTPUT
 
@@ -1738,5 +1715,5 @@ ok
 OUTPUT
 
 ## remember to change the number of tests :-)
-BEGIN { plan tests => 65; }
+BEGIN { plan tests => 64; }
 

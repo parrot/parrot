@@ -15,17 +15,37 @@
 #define PARROT_INTER_CALL_H_GUARD
 
 enum call_state_mode {
-    CALL_STATE_SIG        =  0x001,     /* runops, nci */
-    CALL_STATE_OP         =  0x002,     /* get_, set_ ops */
-    CALL_STATE_MASK       =  0x003,
+    /* arg processing states
+     *       <src>_<dest>           sd  nibbles    */
+    CALL_STATE_POS_POS          = 0x00,
+    CALL_STATE_OPT              = 0x01,  /* dest only */
+    CALL_STATE_SLURP            = 0x02,  /* dest only */
+    CALL_STATE_NAMED_x          = 0x40,
+    CALL_STATE_END_x            = 0x80,
+    CALL_STATE_x_NAMED          = 0x04,
+    CALL_STATE_x_END            = 0x08,
+    CALL_STATE_POS_POS_OPT      = CALL_STATE_OPT, 
+    CALL_STATE_POS_POS_SLURP    = CALL_STATE_SLURP,
+    CALL_STATE_POS_NAMED        = CALL_STATE_x_NAMED,
+    CALL_STATE_POS_NAMED_OPT    = CALL_STATE_POS_NAMED|CALL_STATE_OPT,
+    CALL_STATE_POS_END          = CALL_STATE_x_END, 
+    CALL_STATE_NAMED_NAMED      = CALL_STATE_NAMED_x|CALL_STATE_x_NAMED,
+    CALL_STATE_NAMED_NAMED_OPT  = CALL_STATE_NAMED_NAMED|CALL_STATE_OPT,
+    CALL_STATE_NAMED_NAMED_SLURP= CALL_STATE_NAMED_NAMED|CALL_STATE_SLURP,
+    CALL_STATE_END_POS_OPT      = CALL_STATE_END_x|CALL_STATE_OPT,
+    CALL_STATE_END_NAMED_NAMED  = CALL_STATE_END_x|CALL_STATE_NAMED_NAMED,
+    CALL_STATE_END_POS_NAMED    = CALL_STATE_END_x|CALL_STATE_POS_NAMED,
+    CALL_STATE_END_NAMED_OPT    = CALL_STATE_END_x|CALL_STATE_POS_NAMED_OPT,
+    CALL_STATE_END_END          = CALL_STATE_END_x|CALL_STATE_x_END,
+    CALL_STATE_MASK             = 0xff,
 
-    CALL_STATE_FLATTEN    =  0x010,
-    CALL_STATE_NAMED      =  0x020,
-    CALL_STATE_NAMED_FLATTEN    =  0x030,
+    CALL_STATE_SIG        =  0x100,     /* runops, nci */
+    CALL_STATE_OP         =  0x200,     /* get_, set_ ops */
+    CALL_S_D_MASK         =  0x300,     /* src/dest mask */
 
-    CALL_STATE_DONE    =  0x080,
+    CALL_STATE_FLATTEN    =  0x400,     /* flatten src */
+    CALL_STATE_NEXT_ARG   =  0x800
 
-    CALL_STATE_NEXT_ARG   =  0x100
 };
 
 struct call_state_1 {
