@@ -1144,6 +1144,22 @@ arglist:
            adv_named_id = NULL;
        }
        add_pcc_arg(cur_call, $1); }
+   | arglist COMMA STRINGC ADV_ARROW var {
+       SymReg *r;
+       $$ = 0;
+       r = mk_const(interp, $3, 'S');
+       r->type |= VT_NAMED;
+       add_pcc_arg(cur_call, r);
+       add_pcc_arg(cur_call, $5);
+   }
+   | STRINGC ADV_ARROW var {
+       SymReg *r;
+       $$ = 0;
+       r = mk_const(interp, $1, 'S');
+       r->type |= VT_NAMED;
+       add_pcc_arg(cur_call, r);
+       add_pcc_arg(cur_call, $3);
+   }
    ;
 
 arg:

@@ -1772,7 +1772,6 @@ OUTPUT
 ## Named
 pir_output_is(<<'CODE', <<'OUTPUT', ":named(\"...\") syntax for the 4 kind");
 .sub main :main
-        # foo ('b'=>10,'a'=>20)
         ($I0 :named("b"), $I1 :named("a")) = foo( 10 :named("b"), 20 :named("a"))
         print_item $I0
         print_item $I1
@@ -1798,6 +1797,32 @@ CODE
 ok
 OUTPUT
 
+
+
+## Named
+pir_output_is(<<'CODE', <<'OUTPUT', " 'foo' => 10 syntax for function call");
+.sub main :main
+        foo ('a'=>20,'b'=>10)
+        print "ok\n"
+
+        end
+.end
+
+.sub foo
+        .param int c :named("a")
+        .param int d :named("b")
+
+        print_item d
+        print_item c
+        print_newline
+
+        .return ()
+.end
+CODE
+10 20
+ok
+OUTPUT
+
 ## remember to change the number of tests :-)
-BEGIN { plan tests => 68 }
+BEGIN { plan tests => 69 }
 
