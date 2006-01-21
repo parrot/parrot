@@ -96,6 +96,9 @@ pcc_get_args(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins,
         else if (arg_flags[i] & VT_OPT_FLAG) {
             flags |= PARROT_ARG_OPT_FLAG;
         }
+        if (arg_flags[i] & VT_NAMED) {
+            flags |= PARROT_ARG_NAME;
+        }
         /* add argument type bits */
         if (arg->type & VTCONST)
             flags |= PARROT_ARG_CONSTANT;

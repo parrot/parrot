@@ -44,6 +44,7 @@
  * Some convenient vars
  */
 static SymReg *cur_obj, *cur_call;
+static char *adv_named_id = NULL;
 int cur_pmc_type;      /* used in mk_ident */
 IMC_Unit * cur_unit;
 SymReg *cur_namespace; /* ugly hack for mk_address */
@@ -558,9 +559,18 @@ sub:
    ;
 
 sub_params:
-     /* empty */                       { $$ = 0; } %prec LOW_PREC
-   | '\n'                              { $$ = 0; }
-   | sub_params sub_param '\n'         { add_pcc_param(cur_call, $2);}
+     /* empty */                        { $$ = 0; } %prec LOW_PREC
+   | '\n'                               { $$ = 0; }
+   | sub_params sub_param '\n'          { 
+         if (adv_named_id) {
+             SymReg *r;
+             r = mk_const(interp, adv_named_id, 'S');
+             r->type |= VT_NAMED; 
+             add_pcc_param(cur_call, r);
+             adv_named_id = NULL;
+         }
+         add_pcc_param(cur_call, $2);
+   }
    ;
 
 sub_param:
@@ -742,13 +752,14 @@ pcc_result:
 
 paramtype_list:
      /* empty */                       {  $$ = 0; }
-   | paramtype_list paramtype        {  $$ = $1 | $2; }
+   | paramtype_list paramtype          {  $$ = $1 | $2; }
    ;
 
 paramtype:
      ADV_SLURPY                        {  $$ = VT_FLAT;   }
    | ADV_OPTIONAL                      {  $$ = VT_OPTIONAL; }
    | ADV_OPT_FLAG                      {  $$ = VT_OPT_FLAG; }
+   | ADV_NAMED '(' STRINGC ')'         {  adv_named_id = $3; $$ = 0; }
    ;
 
 
@@ -1095,8 +1106,26 @@ sub_call:
 
 arglist:
      /* empty */             {  $$ = 0; }
-   | arglist COMMA arg       {  $$ = 0; add_pcc_arg(cur_call, $3); }
-   | arg                     {  $$ = 0; add_pcc_arg(cur_call, $1); }
+   | arglist COMMA arg       {
+       $$ = 0; 
+       if (adv_named_id) {
+           SymReg *r;
+           r = mk_const(interp, adv_named_id, 'S');
+           r->type |= VT_NAMED; 
+           add_pcc_arg(cur_call, r);
+           adv_named_id = NULL;
+       }
+       add_pcc_arg(cur_call, $3); }
+   | arg                     {  
+       $$ = 0; 
+       if (adv_named_id) {
+           SymReg *r;
+           r = mk_const(interp, adv_named_id, 'S');
+           r->type |= VT_NAMED; 
+           add_pcc_arg(cur_call, r);
+           adv_named_id = NULL;
+       }
+       add_pcc_arg(cur_call, $1); }
    ;
 
 arg:
@@ -1109,7 +1138,8 @@ argtype_list:
    ;
 
 argtype:
-     ADV_FLAT                {  $$ = VT_FLAT; }
+     ADV_FLAT                  { $$ = VT_FLAT; }
+   | ADV_NAMED '(' STRINGC ')' { adv_named_id = $3; $$ = 0; }
    ;
 
 result: target paramtype_list  { $$ = $1; $$->type |= $2; }

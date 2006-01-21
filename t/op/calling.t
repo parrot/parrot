@@ -1746,6 +1746,28 @@ CODE
 3 2
 OUTPUT
 
+## Named
+pir_output_is(<<'CODE', <<'OUTPUT', ":named(\"...\") syntax for .param and sub call");
+.sub main :main
+        foo( 10 :named("b"), 20 :named("a"))
+        print "ok\n"
+        end
+.end
+
+.sub foo
+        .param int c :named("a")
+        .param int d :named("b")
+
+        print_item d
+        print_item c
+        print_newline
+        .return()
+.end
+CODE
+10 20
+ok
+OUTPUT
+
 ## remember to change the number of tests :-)
-BEGIN { plan tests => 66; }
+BEGIN { plan tests => 67 }
 

@@ -123,6 +123,7 @@ symreg_to_str(SymReg * s)
     if (t & VT_PCC_SUB)   { strcat(buf, "VT_PCC_SUB ");   }
     if (t & VT_FLAT)      { strcat(buf, "VT_FLAT ");      }
     if (t & VT_OPTIONAL)  { strcat(buf, "VT_OPTIONAL ");  }
+    if (t & VT_NAMED)     { strcat(buf, "VT_NAMED ");  }
     strcat(buf, "]");
     return str_dup(buf);
 }
@@ -183,7 +184,7 @@ add_pcc_arg(SymReg *r, SymReg * arg)
     r->pcc_sub->args[n] = arg;
     r->pcc_sub->arg_flags = realloc(r->pcc_sub->arg_flags, (n + 1) * sizeof(int));
     r->pcc_sub->arg_flags[n] = arg->type;
-    arg->type &= ~(VT_FLAT|VT_OPTIONAL|VT_OPT_FLAG );
+    arg->type &= ~(VT_FLAT|VT_OPTIONAL|VT_OPT_FLAG|VT_NAMED);
     r->pcc_sub->nargs++;
 }
 
@@ -204,7 +205,7 @@ add_pcc_result(SymReg *r, SymReg * arg)
      */
     r->pcc_sub->ret_flags = realloc(r->pcc_sub->ret_flags, (n + 1) * sizeof(int));
     r->pcc_sub->ret_flags[n] = arg->type;
-    arg->type &= ~(VT_FLAT|VT_OPTIONAL|VT_OPT_FLAG );
+    arg->type &= ~(VT_FLAT|VT_OPTIONAL|VT_OPT_FLAG|VT_NAMED);
     r->pcc_sub->nret++;
 }
 
