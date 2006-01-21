@@ -314,6 +314,49 @@ set_lexical(Interp *interp, SymReg *r, char *name)
 }
 
 
+static void
+add_pcc_named_arg(Interp *interp, SymReg *cur_call, char *name, SymReg *value)
+{
+    SymReg *r;
+    r = mk_const(interp, name, 'S');
+    r->type |= VT_NAMED;
+    add_pcc_arg(cur_call, r);
+    add_pcc_arg(cur_call, value);
+}
+
+
+static void
+add_pcc_named_result(Interp *interp, SymReg *cur_call, char *name, SymReg *value)
+{
+    SymReg *r;
+    r = mk_const(interp, name, 'S');
+    r->type |= VT_NAMED;
+    add_pcc_result(cur_call, r);
+    add_pcc_result(cur_call, value);
+}
+
+
+static void
+add_pcc_named_param(Interp *interp, SymReg *cur_call, char *name, SymReg *value)
+{
+    SymReg *r;
+    r = mk_const(interp, name, 'S');
+    r->type |= VT_NAMED;
+    add_pcc_param(cur_call, r);
+    add_pcc_param(cur_call, value);
+}
+
+static void
+add_pcc_named_return(Interp *interp, SymReg *cur_call, char *name, SymReg *value)
+{
+    SymReg *r;
+    r = mk_const(interp, name, 'S');
+    r->type |= VT_NAMED;
+    add_pcc_return(cur_call, r);
+    add_pcc_return(cur_call, value);
+}
+
+
 %}
 
 %union {
@@ -563,13 +606,9 @@ sub_params:
    | '\n'                               { $$ = 0; }
    | sub_params sub_param '\n'          { 
          if (adv_named_id) {
-             SymReg *r;
-             r = mk_const(interp, adv_named_id, 'S');
-             r->type |= VT_NAMED; 
-             add_pcc_param(cur_call, r);
+             add_pcc_named_param(interp,cur_call,adv_named_id,$2);
              adv_named_id = NULL;
-         }
-         add_pcc_param(cur_call, $2);
+         } else add_pcc_param(cur_call, $2);
    }
    ;
 
@@ -825,36 +864,20 @@ var_returns:
     /* empty */ { $$ = 0; }
   | arg                     {  
       if (adv_named_id) {
-           SymReg *r;
-           r = mk_const(interp, adv_named_id, 'S');
-           r->type |= VT_NAMED; 
-           add_pcc_return(IMCC_INFO(interp)->sr_return, r);
-           adv_named_id = NULL;
-      }
-      add_pcc_return(IMCC_INFO(interp)->sr_return, $1);    }
+          add_pcc_named_return(interp,IMCC_INFO(interp)->sr_return,
+                               adv_named_id, $1);
+          adv_named_id = NULL;
+      } else add_pcc_return(IMCC_INFO(interp)->sr_return, $1); }
   | STRINGC ADV_ARROW var {
-      SymReg *r;
-      r = mk_const(interp, $1, 'S');
-      r->type |= VT_NAMED;
-      add_pcc_return(IMCC_INFO(interp)->sr_return, r);
-      add_pcc_return(IMCC_INFO(interp)->sr_return, $3);
-  }
+      add_pcc_named_return(interp,IMCC_INFO(interp)->sr_return,$1,$3);}
   | var_returns COMMA arg   {  
       if (adv_named_id) {
-           SymReg *r;
-           r = mk_const(interp, adv_named_id, 'S');
-           r->type |= VT_NAMED; 
-           add_pcc_return(IMCC_INFO(interp)->sr_return, r);
+          add_pcc_named_return(interp,IMCC_INFO(interp)->sr_return,
+                               adv_named_id,$3);
            adv_named_id = NULL;
-      }
-      add_pcc_return(IMCC_INFO(interp)->sr_return, $3);    }
+      } else add_pcc_return(IMCC_INFO(interp)->sr_return, $3);    }
   | var_returns COMMA STRINGC ADV_ARROW var   {  
-      SymReg *r;
-      r = mk_const(interp, $3, 'S');
-      r->type |= VT_NAMED;
-      add_pcc_return(IMCC_INFO(interp)->sr_return, r);
-      add_pcc_return(IMCC_INFO(interp)->sr_return, $5);
-  }
+      add_pcc_named_return(interp,IMCC_INFO(interp)->sr_return,$3,$5);}
   ;
 
 
@@ -1144,42 +1167,21 @@ sub_call:
 
 arglist:
      /* empty */             {  $$ = 0; }
-   | arglist COMMA arg       {
-       $$ = 0; 
+   | arglist COMMA arg       {  $$ = 0; 
        if (adv_named_id) {
-           SymReg *r;
-           r = mk_const(interp, adv_named_id, 'S');
-           r->type |= VT_NAMED; 
-           add_pcc_arg(cur_call, r);
+           add_pcc_named_arg(interp, cur_call, adv_named_id, $3);
            adv_named_id = NULL;
-       }
-       add_pcc_arg(cur_call, $3); }
-   | arg                     {  
-       $$ = 0; 
+       } else add_pcc_arg(cur_call, $3); 
+   }
+   | arg                     {  $$ = 0; 
        if (adv_named_id) {
-           SymReg *r;
-           r = mk_const(interp, adv_named_id, 'S');
-           r->type |= VT_NAMED; 
-           add_pcc_arg(cur_call, r);
+           add_pcc_named_arg(interp, cur_call,adv_named_id,$1);
            adv_named_id = NULL;
-       }
-       add_pcc_arg(cur_call, $1); }
-   | arglist COMMA STRINGC ADV_ARROW var {
-       SymReg *r;
-       $$ = 0;
-       r = mk_const(interp, $3, 'S');
-       r->type |= VT_NAMED;
-       add_pcc_arg(cur_call, r);
-       add_pcc_arg(cur_call, $5);
+       } else add_pcc_arg(cur_call, $1);
    }
-   | STRINGC ADV_ARROW var {
-       SymReg *r;
-       $$ = 0;
-       r = mk_const(interp, $1, 'S');
-       r->type |= VT_NAMED;
-       add_pcc_arg(cur_call, r);
-       add_pcc_arg(cur_call, $3);
-   }
+   | arglist COMMA STRINGC ADV_ARROW var { $$ = 0;
+                                     add_pcc_named_arg(interp,cur_call,$3,$5);}
+   | STRINGC ADV_ARROW var { $$ = 0; add_pcc_named_arg(interp,cur_call,$1,$3);}
    ;
 
 arg:
@@ -1193,7 +1195,7 @@ argtype_list:
 
 argtype:
      ADV_FLAT                  { $$ = VT_FLAT; }
-   | ADV_NAMED { $$ = VT_NAMED; }
+   | ADV_NAMED                 { $$ = VT_NAMED; }
    | ADV_NAMED '(' STRINGC ')' { adv_named_id = $3; $$ = 0; }
    ;
 
@@ -1204,39 +1206,18 @@ targetlist:
      targetlist COMMA result { 
          $$ = 0;
          if (adv_named_id) {
-             SymReg *r;
-             r = mk_const(interp, adv_named_id, 'S');
-             r->type |= VT_NAMED;
-             add_pcc_result(cur_call, r);
+             add_pcc_named_result(interp,cur_call,adv_named_id,$3);
              adv_named_id = NULL;
-         }
-         add_pcc_result(cur_call, $3); }
-   | targetlist COMMA STRINGC ADV_ARROW target {
-       SymReg *r;
-       $$ = 0;
-       r = mk_const(interp, $3, 'S');
-       r->type |= VT_NAMED;
-       add_pcc_result(cur_call, r);
-       add_pcc_result(cur_call, $5);
-     }
+         } else add_pcc_result(cur_call, $3); }
+   | targetlist COMMA STRINGC ADV_ARROW target { 
+        add_pcc_named_result(interp,cur_call,$3,$5); }
    | result                  { 
        $$ = 0;
        if (adv_named_id) {
-           SymReg *r;
-           r = mk_const(interp, adv_named_id, 'S');
-           r->type |= VT_NAMED;
-           add_pcc_result(cur_call, r);
+           add_pcc_named_result(interp,cur_call,adv_named_id,$1);
            adv_named_id = NULL;
-       }
-       add_pcc_result(cur_call, $1); }
-   | STRINGC ADV_ARROW target {
-       SymReg *r;
-       $$ = 0;
-       r = mk_const(interp, $1, 'S');
-       r->type |= VT_NAMED;
-       add_pcc_result(cur_call, r);
-       add_pcc_result(cur_call, $3);
-     }
+       } else add_pcc_result(cur_call, $1); }
+   | STRINGC ADV_ARROW target { add_pcc_named_result(interp,cur_call,$1,$3); }
    | /* empty */             {  $$ = 0; }
    ;
 
