@@ -2034,6 +2034,23 @@ CODE
 /Named parameter with more than one name/
 OUTPUT
 
+pir_output_is(<<'CODE', <<'OUTPUT', "default value for an unused :optional");
+.sub main :main
+	print 1
+	foo(1)
+	foo(2)  
+	foo()           
+	print "\n"      
+.end            
+.sub foo        
+	.param int var :optional
+	print var               
+.end                    
+CODE                    
+1120                    
+OUTPUT                  
+
+
 ## remember to change the number of tests :-)
-BEGIN { plan tests => 79 }
+BEGIN { plan tests => 80 }
 
