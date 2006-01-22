@@ -509,6 +509,7 @@ examples/pir/euclid.pir                           [main]doc
 examples/pir/hanoi.pir                            [main]doc
 examples/pir/hello-dwim.pir                       [main]doc
 examples/pir/io.pir                               [main]doc
+examples/pir/levenshtein.pir                      [main]doc
 examples/pir/life.pir                             [main]doc
 examples/pir/local_label.pir                      [main]doc
 examples/pir/mandel.pir                           [main]doc
