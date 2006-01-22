@@ -734,6 +734,7 @@ languages/bc/TODO                                                               
 languages/bc/VERSION                                                                   [bc]
 languages/bc/bc.py                                                                     [bc]
 languages/bc/config/makefiles/root.in                                                  [bc]
+languages/bc/docs/antlr_3.pod                                                          [bc]
 languages/bc/docs/parrot_bc.pod                                                        [bc]
 languages/bc/grammar/antlr_past2pir_past.g                                             [bc]
 languages/bc/grammar/bc_python.g                                                       [bc]
