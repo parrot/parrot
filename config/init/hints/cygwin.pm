@@ -32,12 +32,7 @@ sub runstep
         sym_import => '__declspec(dllimport)'
     );
 
-    # We need to define inet_aton on Cygwin.  The contents of the --define
-    # switch are in $_[2].  XXX EVIL EVIL EVIL HACK.  If you need to do this
-    # elsewhere, please do everyone a favor and write a proper interface for
-    # modifying the command-line args, or even better do something to make the
-    # define interface not suck.
-    # XXX CLI options shouldn't be being modified like this  
+    # inet_aton needs to be defined on Cygwin.
     my $define = $conf->options->get('define');
     unless ($define) {
         $define = 'inet_aton';
