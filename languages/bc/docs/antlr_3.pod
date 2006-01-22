@@ -1,0 +1,43 @@
+# $Id: parrot_bc.pod 10933 2006-01-06 01:43:24Z particle $
+
+=head1 Overview
+
+This are some rumblings on using ANTLR 3 for Parrot bc, or with Parrot in general.
+
+=head1 Parsing in general
+
+=head1 ANTLR 3
+
+=head1 Lexer
+
+The lexer specification can be in the parser specification.
+A lexer grammar is automatically generated.
+'protected' is gone.
+
+=head2 Parser
+
+=head2 TreeParser
+
+=head2 StringTemplate
+
+=head2 Backends
+
+=head1 ANTLR and Parrot
+
+=head2 Backend for Parrot
+
+=head2 Parrot bc
+
+=head1 Glossary
+
+=head1 AUTHOR
+
+Bernhard Schmalhofer - <Bernhard.Schmalhofer@gmx.de>
+
+=head1 SEE ALSO
+
+  L<http://www.antlr.org/>
+  L<http://www.antlr.org/blog/index.tml>
+  L<http://www.antlr.org:8080/pipermail/antlr-dev/>
+
+=cut

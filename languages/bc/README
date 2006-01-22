@@ -34,3 +34,5 @@ For compatability with 'POSIX bc' the flags '--standard' and '--quiet' are used.
 Documentation:
 
 Sparse documentation is available in docs/parrot_bc.pod.
+
+Rumblings on ANTLR 3 are in docs/antlr_3.pod.
