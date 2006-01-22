@@ -2078,6 +2078,63 @@ CODE
 1120
 OUTPUT
 
+pir_output_like(<<'CODE', <<'OUTPUT', "argc mismatch - missing named");
+.sub main :main
+    .include "errors.pasm"
+    errorson .PARROT_ERRORS_PARAM_COUNT_FLAG
+        foo ('b'=>10)
+        print "ok\n"
+.end
+
+.sub foo
+        .param int d :named('b') 
+	.param int c :named('a') 
+        print_item d
+        print_item c
+        print_newline
+.end
+CODE
+/too few arguments/
+OUTPUT
+
+pir_output_like(<<'CODE', <<'OUTPUT', "argc mismatch - missing named");
+.sub main :main
+    .include "errors.pasm"
+    errorson .PARROT_ERRORS_PARAM_COUNT_FLAG
+        foo ('a'=>10)
+        print "ok\n"
+.end
+
+.sub foo
+        .param int d :named('b') 
+	.param int c :named('a') 
+        print_item d
+        print_item c
+        print_newline
+.end
+CODE
+/too few arguments/
+OUTPUT
+
+pir_output_like(<<'CODE', <<'OUTPUT', "argc mismatch - too many named");
+.sub main :main
+    .include "errors.pasm"
+    errorson .PARROT_ERRORS_PARAM_COUNT_FLAG
+        foo ('a'=>10, 'b'=>20, 'c'=>30)
+        print "ok\n"
+.end
+
+.sub foo
+        .param int d :named('b') 
+	.param int c :named('a') 
+        print_item d
+        print_item c
+        print_newline
+.end
+CODE
+/too many/
+OUTPUT
+
 ## remember to change the number of tests :-)
-BEGIN { plan tests => 81 }
+BEGIN { plan tests => 84 }
 

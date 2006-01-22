@@ -664,7 +664,7 @@ locate_pos_named(Interp *interpreter, struct call_state *st)
 }
 
 /*
- * locate destination name, return 0 if state changed
+ * locate destination name, return 0 if not found
  */
 static int
 locate_named_named(Interp *interpreter, struct call_state *st)
@@ -683,7 +683,7 @@ locate_named_named(Interp *interpreter, struct call_state *st)
             continue;
         if (sig & PARROT_ARG_SLURPY_ARRAY) {
             st->dest.mode |= CALL_STATE_SLURP;
-            return 0;
+            return 1;
         }
         n_named++;
         idx = st->dest.u.op.pc[i];
@@ -765,6 +765,34 @@ too_many(Interp *interpreter, struct call_state *st, const char *action)
     }
 }
 
+static void 
+check_named(Interp *interpreter, struct call_state *st, const char *action) 
+{
+    int i, n_named, idx;
+    INTVAL sig;
+    STRING *param;
+
+    n_named = -1;
+    st->dest.mode &= ~CALL_STATE_SLURP;
+    st->dest.mode |= CALL_STATE_x_NAMED;
+    for (i = st->first_named; i < st->dest.n; ++i) {
+        sig = VTABLE_get_integer_keyed_int(interpreter, 
+                st->dest.u.op.signature, i);
+        if (!(sig & PARROT_ARG_NAME))
+            continue;
+        if (sig & PARROT_ARG_SLURPY_ARRAY)
+            break;
+        n_named++;
+        if (st->named_done & (1 << n_named))
+            continue;
+        idx = st->dest.u.op.pc[i];
+        param = st->dest.ctx->constants[idx]->u.string;
+        real_exception(interpreter, NULL, E_ValueError,
+                "too few arguments passed - missing required named arg '%Ss'",
+                param);
+    }
+}
+
 static void
 process_args(Interp *interpreter, struct call_state *st, 
         const char *action, int err_check)
@@ -821,7 +849,10 @@ process_args(Interp *interpreter, struct call_state *st,
         switch(state) {
             case CALL_STATE_NAMED_NAMED: 
             case CALL_STATE_NAMED_NAMED_OPT: 
-                locate_named_named(interpreter, st);
+                if (!locate_named_named(interpreter, st))
+                    real_exception(interpreter, NULL, E_ValueError,
+                            "too many named arguments - '%Ss' no expected",
+                            st->name);
                 if (st->dest.mode & CALL_STATE_SLURP)
                     state         |= CALL_STATE_SLURP;
                 break;
@@ -890,7 +921,8 @@ set_opt_flag:
             case CALL_STATE_END_NAMED_NAMED|CALL_STATE_OPT: 
             case CALL_STATE_END_NAMED_NAMED: 
             case CALL_STATE_END_POS_NAMED: 
-                /* TODO err check */
+                if (err_check)
+                    check_named(interpreter, st, action);
                 return;
             case CALL_STATE_END_x: 
                 if (err_check)
