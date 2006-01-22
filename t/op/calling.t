@@ -2135,6 +2135,24 @@ CODE
 /too many/
 OUTPUT
 
+pir_output_like(<<'CODE', <<'OUTPUT', "argc mismatch - duplicate named");
+.sub main :main
+    .include "errors.pasm"
+    errorson .PARROT_ERRORS_PARAM_COUNT_FLAG
+        foo ('a'=>10, 'b'=>20, 'a'=>30)
+        print "ok\n"
+.end
+
+.sub foo
+        .param int d :named('b') 
+	.param int c :named('a') 
+        print_item d
+        print_item c
+        print_newline
+.end
+CODE
+/duplicate name/
+OUTPUT
 ## remember to change the number of tests :-)
-BEGIN { plan tests => 84 }
+BEGIN { plan tests => 85 }
 

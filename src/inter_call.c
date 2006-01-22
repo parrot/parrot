@@ -694,7 +694,11 @@ locate_named_named(Interp *interpreter, struct call_state *st)
             st->dest.sig = VTABLE_get_integer_keyed_int(interpreter, 
                     st->dest.u.op.signature, i);
             st->dest.i = i;
-            /* TODO if bit is set we got duplicated */
+            /* if bit is set we got duplicated */
+            if (st->named_done & (1 << n_named))
+                real_exception(interpreter, NULL, E_ValueError,
+                        "duplicate named argument - '%Ss' no expected",
+                        param);
             st->named_done |= 1 << n_named;
             return 1;
         }
