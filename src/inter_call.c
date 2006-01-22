@@ -640,6 +640,8 @@ locate_pos_named(Interp *interpreter, struct call_state *st)
     INTVAL sig;
 
     n_named = -1;
+    st->dest.mode &= ~CALL_STATE_SLURP;
+    st->dest.mode |= CALL_STATE_x_NAMED;
     for (i = st->first_named; i < st->dest.n; ++i) {
         sig = VTABLE_get_integer_keyed_int(interpreter, 
                 st->dest.u.op.signature, i);
@@ -673,6 +675,7 @@ locate_named_named(Interp *interpreter, struct call_state *st)
 
     n_named = -1;
     st->dest.mode &= ~CALL_STATE_SLURP;
+    st->dest.mode &= ~CALL_STATE_OPT;
     for (i = st->first_named; i < st->dest.n; ++i) {
         sig = VTABLE_get_integer_keyed_int(interpreter, 
                 st->dest.u.op.signature, i);
@@ -813,8 +816,19 @@ process_args(Interp *interpreter, struct call_state *st,
             /* pos -> named dest */
             init_named(interpreter, st);
         }
-again:
+
         state = st->dest.mode & CALL_STATE_MASK;
+        switch(state) {
+            case CALL_STATE_NAMED_NAMED: 
+            case CALL_STATE_NAMED_NAMED_OPT: 
+                locate_named_named(interpreter, st);
+                if (st->dest.mode & CALL_STATE_SLURP)
+                    state         |= CALL_STATE_SLURP;
+                break;
+            case CALL_STATE_POS_NAMED: 
+                locate_pos_named(interpreter, st);
+                break;
+        }
         if (st->dest.sig & PARROT_ARG_OPTIONAL) {
             st->dest.mode |= CALL_STATE_OPT;
             state         |= CALL_STATE_OPT;
@@ -826,15 +840,11 @@ again:
 
         switch(state) {
             case CALL_STATE_NAMED_NAMED: 
-                if (!locate_named_named(interpreter, st))
-                    goto again;
                 Parrot_convert_arg(interpreter, st);
                 idx = st->dest.u.op.pc[st->dest.i];
                 store_arg(st, idx);
                 break;
             case CALL_STATE_POS_NAMED: 
-                if (!locate_pos_named(interpreter, st))
-                    goto again;
                 Parrot_convert_arg(interpreter, st);
                 idx = st->dest.u.op.pc[st->dest.i];
                 store_arg(st, idx);
@@ -845,8 +855,6 @@ again:
                 st->dest.mode |= CALL_STATE_NEXT_ARG;
                 break;
             case CALL_STATE_NAMED_NAMED_OPT: 
-                if (!locate_named_named(interpreter, st))
-                    goto again;
                 idx = st->dest.u.op.pc[st->dest.i];
                 /* go on */
             case CALL_STATE_POS_POS_OPT: 
@@ -857,18 +865,21 @@ again:
                 /* :opt_flag is truely optional */
 set_opt_flag:
                 if (!next_arg(interpreter, &st->dest)) {
-                    st->dest.mode |= CALL_STATE_x_END;
+                    if (!(state & CALL_STATE_x_NAMED))
+                        st->dest.mode |= CALL_STATE_x_END;
                     break;
                 }
                 if (!(st->dest.sig & PARROT_ARG_OPT_FLAG)) {
                     st->dest.i--;
-                    st->dest.mode |= CALL_STATE_NEXT_ARG;
+                    if (!(state & CALL_STATE_x_NAMED))
+                        st->dest.mode |= CALL_STATE_NEXT_ARG;
                     break;
                 }
                 --st->params;
                 idx = st->dest.u.op.pc[st->dest.i];
                 CTX_REG_INT(st->dest.ctx, idx) = opt_flag;
-                st->dest.mode |= CALL_STATE_NEXT_ARG;
+                if (!(state & CALL_STATE_x_NAMED))
+                    st->dest.mode |= CALL_STATE_NEXT_ARG;
                 break;
             case CALL_STATE_END_POS_OPT: 
                 ++st->optionals;
