@@ -34,7 +34,8 @@ options
   // PAST_Stmt;
   // PAST_Exp;
   // PAST_Op;
-  // PAST_Val;
+  // PAST_Val_Strqq;
+  // PAST_Val_Num;
 //}
 
 gen_pir_past!
@@ -107,7 +108,7 @@ exp! returns[reg]
                     #exp = #( [ PIR_NOOP, "noop" ], #O, [PIR_OP, pir] ); 
                   }
                   | 
-                  reg_V=V:val 
+                  reg_V_STRQQ=V_STRQQ:val_strqq
                   {
                     reg = self.reg;
                     self.reg = self.reg + 10;
@@ -121,11 +122,32 @@ exp! returns[reg]
                               reg,
                               reg + 1,
               
-                              reg + 1, reg_V,
+                              reg + 1, reg_V_STRQQ,
                               reg, reg + 1
                      )
 
-                    #exp = #( [ PIR_NOOP, "noop" ], #V, [PIR_OP, pir] ); 
+                    #exp = #( [ PIR_NOOP, "noop" ], #V_STRQQ, [PIR_OP, pir] ); 
+                  }
+                  | 
+                  reg_V_NUM=V_NUM:val_num
+                  {
+                    reg = self.reg;
+                    self.reg = self.reg + 10;
+                    pir = """
+                              $P%d = new 'PAST::Exp'
+                              $P%d = new PerlArray
+
+                              push $P%d, $P%d 
+                              $P%d.set_node('1', 1, $P%d)
+              #""" % (
+                              reg,
+                              reg + 1,
+              
+                              reg + 1, reg_V_NUM,
+                              reg, reg + 1
+                     )
+
+                    #exp = #( [ PIR_NOOP, "noop" ], #V_NUM, [PIR_OP, pir] ); 
                   }
                 )
      )
@@ -154,8 +176,8 @@ op! returns[reg]
     }
   ;
 
-val! returns[reg]
-  : V:PAST_Val 
+val_strqq! returns[reg]
+  : V:PAST_Val_Strqq 
     {
       reg = self.reg;
       self.reg = self.reg + 10;
@@ -165,6 +187,21 @@ val! returns[reg]
                     $P%d.valtype( 'strqq' )
 #""" % ( reg, reg, V.getText(), reg )
        
-      #val = #( [PIR_OP, pir] ); 
+      #val_strqq = #( [PIR_OP, pir] ); 
+    }
+  ;
+
+val_num! returns[reg]
+  : V:PAST_Val_Num 
+    {
+      reg = self.reg;
+      self.reg = self.reg + 10;
+      pir = """
+                    $P%d = new 'PAST::Val'
+                    $P%d.set_node( '1', 0, '%s' )
+                    $P%d.valtype( 'num' )
+#""" % ( reg, reg, V.getText(), reg )
+       
+      #val_num = #( [PIR_OP, pir] ); 
     }
   ;

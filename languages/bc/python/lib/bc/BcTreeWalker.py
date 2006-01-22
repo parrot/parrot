@@ -66,8 +66,9 @@ PAST_Code = 45
 PAST_Stmt = 46
 PAST_Exp = 47
 PAST_Op = 48
-PAST_Val = 49
-PAST_Noop = 50
+PAST_Val_Strqq = 49
+PAST_Val_Num = 50
+PAST_Noop = 51
 
 ### user code>>>
 
@@ -1076,7 +1077,7 @@ class Walker(antlr.TreeParser):
             _t = _t114
             _t = _t.getNextSibling()
             past_p_expr_p_newline_AST = currentAST.root
-            past_p_expr_p_newline_AST = antlr.make(self.astFactory.create(PAST_Code,"two statements"), antlr.make(self.astFactory.create(PAST_Stmt,"dummy stmt 1"), antlr.make(self.astFactory.create(PAST_Exp,"dummy exp 1"), antlr.make(self.astFactory.create(PAST_Op,"dummy print op 1"), antlr.make(self.astFactory.create(PAST_Exp,"dummy exp 1:1"), E1_AST)))), antlr.make(self.astFactory.create(PAST_Stmt,"dummy stmt 2"), antlr.make(self.astFactory.create(PAST_Exp,"dummy exp 2"), antlr.make(self.astFactory.create(PAST_Op,"dummy print op 2"), antlr.make(self.astFactory.create(PAST_Exp,"dummy exp 2:1"), self.astFactory.create(PAST_Val,"\\n"))))));
+            past_p_expr_p_newline_AST = antlr.make(self.astFactory.create(PAST_Code,"two statements"), antlr.make(self.astFactory.create(PAST_Stmt,"dummy stmt 1"), antlr.make(self.astFactory.create(PAST_Exp,"dummy exp 1"), antlr.make(self.astFactory.create(PAST_Op,"dummy print op 1"), antlr.make(self.astFactory.create(PAST_Exp,"dummy exp 1:1"), E1_AST)))), antlr.make(self.astFactory.create(PAST_Stmt,"dummy stmt 2"), antlr.make(self.astFactory.create(PAST_Exp,"dummy exp 2"), antlr.make(self.astFactory.create(PAST_Op,"dummy print op 2"), antlr.make(self.astFactory.create(PAST_Exp,"dummy exp 2:1"), self.astFactory.create(PAST_Val_Strqq,"\\n"))))));
             currentAST.root = past_p_expr_p_newline_AST
             if (past_p_expr_p_newline_AST != None) and (past_p_expr_p_newline_AST.getFirstChild() != None):
                 currentAST.child = past_p_expr_p_newline_AST.getFirstChild()
@@ -1110,7 +1111,7 @@ class Walker(antlr.TreeParser):
             self.match(_t,PIR_FUNCTION_DEF)
             _t = _t.getNextSibling()
             past_function_def_AST = currentAST.root
-            past_function_def_AST = antlr.make(self.astFactory.create(PAST_Val,"not implemented yet"))
+            past_function_def_AST = antlr.make(self.astFactory.create(PAST_Val_Strqq,"not implemented yet"))
             currentAST.root = past_function_def_AST
             if (past_function_def_AST != None) and (past_function_def_AST.getFirstChild() != None):
                 currentAST.child = past_function_def_AST.getFirstChild()
@@ -1184,7 +1185,7 @@ class Walker(antlr.TreeParser):
                         raise antlr.NoViableAltException(_t)
                     
                 past_expr_AST = currentAST.root
-                past_expr_AST = antlr.make(self.astFactory.create(PAST_Val,"Not implemented yet"));
+                past_expr_AST = antlr.make(self.astFactory.create(PAST_Val_Strqq,"Not implemented yet"));
                 currentAST.root = past_expr_AST
                 if (past_expr_AST != None) and (past_expr_AST.getFirstChild() != None):
                     currentAST.child = past_expr_AST.getFirstChild()
@@ -1247,7 +1248,7 @@ class Walker(antlr.TreeParser):
                 self.addASTChild(currentAST, self.returnAST)
                 past_signExpression_AST = currentAST.root
                 val = i1.getText();
-                past_signExpression_AST = antlr.make(self.astFactory.create(PAST_Val,val));
+                past_signExpression_AST = antlr.make(self.astFactory.create(PAST_Val_Num,val));
                 currentAST.root = past_signExpression_AST
                 if (past_signExpression_AST != None) and (past_signExpression_AST.getFirstChild() != None):
                     currentAST.child = past_signExpression_AST.getFirstChild()
@@ -1278,7 +1279,7 @@ class Walker(antlr.TreeParser):
                 _t = _t.getNextSibling()
                 past_signExpression_AST = currentAST.root
                 val = '-' + i2.getText();
-                past_signExpression_AST = antlr.make(self.astFactory.create(PAST_Val,val));
+                past_signExpression_AST = antlr.make(self.astFactory.create(PAST_Val_Num,val));
                 currentAST.root = past_signExpression_AST
                 if (past_signExpression_AST != None) and (past_signExpression_AST.getFirstChild() != None):
                     currentAST.child = past_signExpression_AST.getFirstChild()
@@ -1349,7 +1350,8 @@ _tokenNames = [
     "PAST_Stmt", 
     "PAST_Exp", 
     "PAST_Op", 
-    "PAST_Val", 
+    "PAST_Val_Strqq", 
+    "PAST_Val_Num", 
     "PAST_Noop"
 ]
     

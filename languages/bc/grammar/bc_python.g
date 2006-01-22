@@ -353,7 +353,8 @@ tokens
   PAST_Stmt;    
   PAST_Exp;    
   PAST_Op;    
-  PAST_Val;    
+  PAST_Val_Strqq;    
+  PAST_Val_Num;    
   PAST_Noop;      // used as a container
 }
 
@@ -574,7 +575,7 @@ past_p_expr_p_newline!
                                      #( [ PAST_Exp, "dummy exp 2" ],
                                         #( [ PAST_Op, "dummy print op 2" ],
                                            #( [ PAST_Exp, "dummy exp 2:1" ],
-                                              [ PAST_Val, "\\n" ]
+                                              [ PAST_Val_Strqq, "\\n" ]
                                             )
                                          )
                                       )
@@ -597,7 +598,7 @@ past_expr
       namedExpression
     )
     {
-      #past_expr = #( [ PAST_Val, "Not implemented yet" ] ); 
+      #past_expr = #( [ PAST_Val_Strqq, "Not implemented yet" ] ); 
     }
     |
     E:past_signExpression
@@ -610,13 +611,13 @@ past_signExpression
   : i1:integer
     {
       val = i1.getText();
-      #past_signExpression = #( [ PAST_Val, val ] ); 
+      #past_signExpression = #( [ PAST_Val_Num, val ] ); 
     }
     |
     #( UNARY_MINUS i2:integer )
     {
       val = '-' + i2.getText();
-      #past_signExpression = #( [ PAST_Val, val ] ); 
+      #past_signExpression = #( [ PAST_Val_Num, val ] ); 
     }
   ;
 
@@ -624,7 +625,7 @@ past_signExpression
 past_function_def
   : PIR_FUNCTION_DEF
     {
-      #past_function_def = #( [ PAST_Val, "not implemented yet" ] )
+      #past_function_def = #( [ PAST_Val_Strqq, "not implemented yet" ] )
     }
   ;
 

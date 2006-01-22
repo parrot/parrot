@@ -1,9 +1,8 @@
 # $Id$
 
 2005-01-22     Bernhard Schmalhofer
-        * All Past::Val nodes are now marked as 'strqq'. This make 'bc'
-          work again after adding 'valtype' support to 'punie', but
-          is still incorrect when it comes to numbers.
+        * Break the ANTLR PAST_Val nodes up into PAST_Val_Strqq and PAST_Val_Num.
+          This allows support for the 'valtype' attribute in Allison's PAST. 
 
 2005-12-11     Bernhard Schmalhofer
         * ANTLR is only needed for maintainance,
