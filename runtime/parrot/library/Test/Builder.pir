@@ -94,7 +94,7 @@ the same state.
 .end
 
 .sub __init method
-	.param pmc args
+	.param pmc args :optional
 	.local pmc output
 	.local pmc testplan
 	.local pmc results

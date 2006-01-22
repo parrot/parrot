@@ -446,7 +446,14 @@ Parrot_fetch_arg(Interp *interpreter, struct call_state *st)
         st->name = UVal_str(st->val);
         next_arg(interpreter, &st->src);
     }
-    fetch_arg_op(interpreter, st);
+    switch (st->src.mode & CALL_S_D_MASK) {
+        case CALL_STATE_OP:
+            fetch_arg_op(interpreter, st);
+            break;
+        case CALL_STATE_SIG:
+            fetch_arg_sig(interpreter, st);
+            break;
+    }
     return 1;
 }
 
@@ -1141,7 +1148,6 @@ opcode_t *
 parrot_pass_args_fromc(Interp *interpreter, const char *sig,
         opcode_t *dest, parrot_context_t * old_ctxp, va_list ap)
 {
-    int todo;
     struct call_state st;
 
     if (dest[0] != PARROT_OP_get_params_pc) {
@@ -1157,32 +1163,13 @@ parrot_pass_args_fromc(Interp *interpreter, const char *sig,
 
     Parrot_init_arg_op(interpreter,
             CONTEXT(interpreter->ctx), dest, &st.dest);
-    todo = Parrot_init_arg_sig(interpreter,
+    Parrot_init_arg_sig(interpreter,
             old_ctxp, sig, PARROT_VA_TO_VAPTR(ap), &st.src);
 
-    while (todo) {
-        fetch_arg_sig(interpreter, &st);
-        Parrot_convert_arg(interpreter, &st);
-        todo = Parrot_store_arg(interpreter, &st);
-    }
-    /*
-     * check for arg count mismatch
-     */
-    if (st.src.i < st.src.n) {
-        real_exception(interpreter, NULL, E_ValueError,
-                "too many arguments passed (%d) - %d params expected",
-                st.src.n, st.dest.n);
-    }
-    else if (st.dest.i < st.dest.n) {
-        if (!(st.dest.sig & (PARROT_ARG_OPTIONAL|PARROT_ARG_SLURPY_ARRAY))) {
-            real_exception(interpreter, NULL, E_ValueError,
-                    "too few arguments passed (%d) - %d params expected",
-                    st.src.n, st.dest.n);
-        }
-    }
+    init_call_stats(&st);
+    process_args(interpreter, &st, "params", 1);
 
-    dest += st.dest.n + 2;
-    return dest;
+    return dest + st.dest.n + 2;
 }
 
 opcode_t *
@@ -1202,8 +1189,7 @@ parrot_pass_args_to_result(Interp *interpreter, const char *sig,
         Parrot_convert_arg(interpreter, &st);
         todo = Parrot_store_arg(interpreter, &st);
     }
-    dest += st.dest.n + 2;
-    return dest;
+    return dest + st.dest.n + 2;
 }
 
 /*
