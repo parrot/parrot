@@ -829,11 +829,11 @@ process_args(Interp *interpreter, struct call_state *st,
         /*
          * handle state changes
          */
-        idx = st->dest.u.op.pc[st->dest.i];
         if (!(state & CALL_STATE_NAMED_x)) {
             if (!(state & CALL_STATE_SLURP) &&
                     st->dest.sig & PARROT_ARG_SLURPY_ARRAY) {
                 /* create array */
+                idx = st->dest.u.op.pc[st->dest.i];
                 create_slurpy_ar(interpreter, st, idx);
             }
             /* positional src -> named src */
@@ -881,31 +881,24 @@ process_args(Interp *interpreter, struct call_state *st,
         }
 
         switch(state) {
+            case CALL_STATE_POS_POS: 
+                st->dest.mode |= CALL_STATE_NEXT_ARG;
+                /* fall through */
             case CALL_STATE_NAMED_NAMED: 
-                Parrot_convert_arg(interpreter, st);
-                idx = st->dest.u.op.pc[st->dest.i];
-                store_arg(st, idx);
-                break;
             case CALL_STATE_POS_NAMED: 
                 Parrot_convert_arg(interpreter, st);
                 idx = st->dest.u.op.pc[st->dest.i];
                 store_arg(st, idx);
                 break;
-            case CALL_STATE_POS_POS: 
-                Parrot_convert_arg(interpreter, st);
-                store_arg(st, idx);
-                st->dest.mode |= CALL_STATE_NEXT_ARG;
-                break;
             case CALL_STATE_NAMED_NAMED_OPT: 
-                idx = st->dest.u.op.pc[st->dest.i];
-                /* go on */
             case CALL_STATE_POS_POS_OPT: 
                 ++st->optionals;
                 Parrot_convert_arg(interpreter, st);
-                store_arg(st, idx);
                 opt_flag = 1;
+store_opt:
+                idx = st->dest.u.op.pc[st->dest.i];
+                store_arg(st, idx);
                 /* :opt_flag is truely optional */
-set_opt_flag:
                 if (!next_arg(interpreter, &st->dest)) {
                     if (!(state & CALL_STATE_x_NAMED))
                         st->dest.mode |= CALL_STATE_x_END;
@@ -926,9 +919,8 @@ set_opt_flag:
             case CALL_STATE_END_POS_OPT: 
                 ++st->optionals;
                 UVal_num(st->val) = 0.0;        /* XXX assumes all bits 0 */
-                store_arg(st, idx);
                 opt_flag = 0;
-                goto set_opt_flag;
+                goto store_opt;
             case CALL_STATE_END_NAMED_NAMED|CALL_STATE_OPT: 
             case CALL_STATE_END_NAMED_NAMED: 
             case CALL_STATE_END_POS_NAMED: 
