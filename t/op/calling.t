@@ -1979,6 +1979,34 @@ CODE
 ok
 OUTPUT
 
+pir_output_is(<<'CODE', <<'OUTPUT', "named optional - mix");
+.sub main :main
+        foo ('a'=>20,'b'=>10)
+        foo ('b'=>10)
+        foo ('a'=>20)
+        foo ()
+        print "ok\n"
+.end
+
+.sub foo
+        .param int d :named('b') :optional
+	.param int has_d :opt_flag
+	.param int c :named('a') :optional
+	.param int has_c :opt_flag
+        print_item d
+        print_item has_d
+        print_item c
+        print_item has_c
+        print_newline
+.end
+CODE
+10 1 20 1
+10 1 0 0
+0 0 20 1
+0 0 0 0
+ok
+OUTPUT
+
 pir_output_is(<<'CODE', <<'OUTPUT', "named flat/slurpy");
 .sub main :main
         .local pmc h
@@ -2051,5 +2079,5 @@ CODE
 OUTPUT
 
 ## remember to change the number of tests :-)
-BEGIN { plan tests => 80 }
+BEGIN { plan tests => 81 }
 
