@@ -161,8 +161,9 @@ val! returns[reg]
       self.reg = self.reg + 10;
       pir = """
                     $P%d = new 'PAST::Val'
-                    $P%d.set_node('1', 0, '%s' )
-#""" % ( reg, reg, V.getText() )
+                    $P%d.set_node( '1', 0, '%s' )
+                    $P%d.valtype( 'strqq' )
+#""" % ( reg, reg, V.getText(), reg )
        
       #val = #( [PIR_OP, pir] ); 
     }

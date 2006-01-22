@@ -1,4 +1,4 @@
-### $ANTLR 2.7.5 (20051104): "antlr_past2pir_past.g" -> "AntlrPast2PirPastTreeWalker.py"$
+### $ANTLR 2.7.5 (20050416): "antlr_past2pir_past.g" -> "AntlrPast2PirPastTreeWalker.py"$
 ### import antlr and other modules ..
 import sys
 import antlr
@@ -452,8 +452,9 @@ class Walker(antlr.TreeParser):
             self.reg = self.reg + 10;
             pir = """
                          $P%d = new 'PAST::Val'
-                         $P%d.set_node('1', 0, '%s' )
-            #""" % ( reg, reg, V.getText() )
+                         $P%d.set_node( '1', 0, '%s' )
+                         $P%d.valtype( 'strqq' )
+            #""" % ( reg, reg, V.getText(), reg )
             
             val_AST = antlr.make(self.astFactory.create(PIR_OP,pir));
             currentAST.root = val_AST

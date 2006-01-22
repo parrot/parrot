@@ -1,5 +1,10 @@
 # $Id$
 
+2005-01-22     Bernhard Schmalhofer
+        * All Past::Val nodes are now marked as 'strqq'. This make 'bc'
+          work again after adding 'valtype' support to 'punie', but
+          is still incorrect when it comes to numbers.
+
 2005-12-11     Bernhard Schmalhofer
         * ANTLR is only needed for maintainance,
 	  so probing for ANTLR during Parrot configuration is not needed
