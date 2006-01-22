@@ -1030,7 +1030,6 @@ Parrot_store_arg(Interp *interpreter, struct call_state *st)
 static void
 init_call_stats(struct call_state *st)
 {
-    st->opt_so_far = 0; 
     st->n_actual_args = st->src.n;  /* initial guess, adjusted for :flat args */
     st->optionals = 0; 
     st->params = st->dest.n; 
@@ -1160,7 +1159,6 @@ parrot_pass_args_fromc(Interp *interpreter, const char *sig,
             CONTEXT(interpreter->ctx), dest, &st.dest);
     todo = Parrot_init_arg_sig(interpreter,
             old_ctxp, sig, PARROT_VA_TO_VAPTR(ap), &st.src);
-    st.opt_so_far = 0;  /* XXX */
 
     while (todo) {
         fetch_arg_sig(interpreter, &st);
@@ -1198,7 +1196,6 @@ parrot_pass_args_to_result(Interp *interpreter, const char *sig,
             CONTEXT(interpreter->ctx), dest, &st.dest);
     todo = Parrot_init_arg_sig(interpreter,
             old_ctxp, sig, PARROT_VA_TO_VAPTR(ap), &st.src);
-    st.opt_so_far = 0;  /* XXX */
 
     while (todo) {
         fetch_arg_sig(interpreter, &st);

@@ -76,7 +76,6 @@ struct call_state {
     struct call_state_1 src;
     struct call_state_1 dest;
     UnionVal val;
-    int opt_so_far;     /* opt_flag handling */
     int n_actual_args;  /* arguments incl. flatten */
     int optionals;      /* sum of optionals */
     int params;         /* sum of params */
