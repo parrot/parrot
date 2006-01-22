@@ -200,6 +200,27 @@ free to change or give me hints on how to change it. -- ambs
         string_cstring_free(cto);
     }
 
+/*
+
+=item C<void rename(STRING* from, STRING *to)>
+
+Rename a file C<from> to the path C<to>.
+
+=cut
+
+*/
+
+    METHOD void rename(STRING *from, STRING *to) {
+        char *cfrom = string_to_cstring(interpreter, from);
+        char *cto = string_to_cstring(interpreter, to);
+        int error = rename(cfrom, cto);
+        string_cstring_free(cfrom);
+        string_cstring_free(cto);
+        if (error) {
+            char *errmsg = strerror(errno);
+            real_exception(interpreter, NULL, E_SystemError, errmsg);
+        }
+    }
 }
 
 /*
@@ -208,7 +229,7 @@ free to change or give me hints on how to change it. -- ambs
 
 =head1 SEE ALS0
 
-   stat(2)
+   stat(2), rename(2)
 
 =cut
 

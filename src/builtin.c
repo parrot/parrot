@@ -1,5 +1,5 @@
 /*
-Copyright: 2003 The Perl Foundation.  All Rights Reserved.
+Copyright: 2003-2006 The Perl Foundation.  All Rights Reserved.
 $Id$
 
 =head1 NAME
@@ -37,6 +37,7 @@ static Builtins builtins[] = {
     { "asin", 	"PJO", 		"Float", 	0, 0 },
     { "atan", 	"PJO", 		"Float", 	0, 0 },
     { "atan2", 	"PJOP",		"Float", 	0, 0 },
+    { "copy",   "vJOSS",        "File",         0, 0 },
     { "cos", 	"PJO", 		"Float", 	0, 0 },
     { "cosh", 	"PJO", 		"Float", 	0, 0 },
     { "chdir",  "vJOS",         "OS",           0, 0 },
@@ -47,6 +48,7 @@ static Builtins builtins[] = {
     { "ln", 	"PJO", 		"Float", 	0, 0 },
     { "log10",  "PJO",          "Float", 	0, 0 },
     { "log2", 	"PJO", 		"Float", 	0, 0 },
+    { "rename", "vJOSS",        "File",         0, 0 },
     { "sec", 	"PJO", 		"Float", 	0, 0 },
     { "sech", 	"PJO", 		"Float", 	0, 0 },
     { "sin", 	"PJO", 		"Float", 	0, 0 },

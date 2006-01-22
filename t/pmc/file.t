@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 4;
+use Parrot::Test tests => 6;
 use Parrot::Config;
 use Cwd;
 use File::Spec;
@@ -30,13 +30,14 @@ Tests the C<File> PMC.
 =cut
 
 END {
-  # XXX - FIXME - Use Tempfir
+  # XXX - FIXME - Use Tempdir
 
   # Clean up environment on exit
-  unlink  "otpx" if -f "otpx";
-  unlink "lotpx" if -l "lotpx";
-  rmdir  "xpto"  if -d "xpto";
-  unlink "xptol" if -l "xptol";
+  unlink "otpx"     if -f "otpx";
+  unlink "otpxcopy" if -f "otpxcopy";
+  unlink "lotpx"    if -l "lotpx";
+  rmdir  "xpto"     if -d "xpto";
+  unlink "xptol"    if -l "xptol";
 }
 
 mkdir "xpto" unless -d "xpto";
@@ -173,5 +174,70 @@ CODE
 ok 1
 ok 2
 OUT
-
 }
+
+# test copy
+pir_output_is(<<'CODE', <<"OUT", "Test copy for files");
+.sub main :main
+       $S1 = "otpx"
+       $S2 = "otpxcopy"
+
+       $P1 = new .File
+       $P2 = new .OS
+
+       $P1."copy"($S1,$S2)
+       print "ok\n"
+
+       $P3 = $P2."stat"($S1)
+       $P4 = $P2."stat"($S2)
+
+       $I1 = $P3[7]
+       $I2 = $P4[7]
+
+       if $I1 == $I2 goto ok
+       print "not "
+ok:
+       print "ok\n"
+
+       end
+.end
+CODE
+ok
+ok
+OUT
+
+#clean-up a file...
+unlink "otpxcopy" if -f "otpxcopy";
+
+
+# test rename
+pir_output_is(<<'CODE', <<"OUT", "Test rename for files");
+.sub main :main
+       $S1 = "otpx"
+       $S2 = "otpxcopy"
+
+       $P1 = new .File
+       $P2 = new .OS
+
+       $P3 = $P2."stat"($S1)
+       $I1 = $P3[7]
+
+       $P1."rename"($S1,$S2)
+       print "ok\n"
+
+       $P4 = $P2."stat"($S2)
+       $I2 = $P4[7]
+
+       if $I1 == $I2 goto ok
+       print "not "
+ok:
+       print "ok\n"
+
+       end
+.end
+CODE
+ok
+ok
+OUT
+
+
