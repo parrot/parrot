@@ -1,8 +1,17 @@
-#!./parrot -C
+#!./parrot -j
 # The Computer Language Shootout
 # http://shootout.alioth.debian.org/
 # 
 # Contributed by Joshua Isom
+# speeded up by 75% by Leopold Toetsch
+
+.const int x = 0
+.const int y = 1
+.const int z = 2
+.const int vx = 3
+.const int vy = 4
+.const int vz = 5
+.const int m = 6
 
 # save on repetition of code
 .macro InitBodies (bodies, i, num1, num2, num3, num4, num5, num6, num7)
@@ -13,13 +22,13 @@
 	$P0 = new .FixedFloatArray
 	$P0 = 7
 	.bodies[.i] = $P0
-	.bodies[.i;0] = .num1
-	.bodies[.i;1] = .num2
-	.bodies[.i;2] = .num3
-	.bodies[.i;3] = $N0
-	.bodies[.i;4] = $N1
-	.bodies[.i;5] = $N2
-	.bodies[.i;6] = $N3
+	.bodies[.i; x] = .num1
+	.bodies[.i; y] = .num2
+	.bodies[.i; z] = .num3
+	.bodies[.i; vx] = $N0
+	.bodies[.i; vy] = $N1
+	.bodies[.i; vz] = $N2
+	.bodies[.i; m] = $N3
 .endm
 
 .sub main :main
@@ -109,16 +118,16 @@ endfor:
 	i = 0
 beginfor:
 	unless i < nbodies goto endfor
-	$N0 = bodies[i;3]
-	$N1 = bodies[i;6]
+	$N0 = bodies[i; vx]
+	$N1 = bodies[i; m]
 	$N0 *= $N1
 	px += $N0
-	$N0 = bodies[i;4]
-	$N1 = bodies[i;6]
+	$N0 = bodies[i; vy]
+	$N1 = bodies[i; m]
 	$N0 *= $N1
 	py += $N0
-	$N0 = bodies[i;5]
-	$N1 = bodies[i;6]
+	$N0 = bodies[i; vz]
+	$N1 = bodies[i; m]
 	$N0 *= $N1
 	pz += $N0
 	inc i
@@ -126,11 +135,11 @@ beginfor:
 endfor:
 	# bodies[0].vx = - px / solar_mass;
 	px /= -39.478417604357428
-	bodies[0;3] = px
+	bodies[0; vx] = px
 	py /= -39.478417604357428
-	bodies[0;4] = py
+	bodies[0; vy] = py
 	pz /= -39.478417604357428
-	bodies[0;5] = pz
+	bodies[0; vz] = pz
 .end
 
 .sub energy
@@ -144,17 +153,17 @@ beginfor_0:
 	unless i < nbodies goto endfor_0
 
 	# e += 0.5 * b->mass * (b->vx * b->vx + b->vy * b->vy + b->vz * b->vz);
-	$N0 = bodies[i;6] # mass
+	$N0 = bodies[i; m] # mass
 	$N0 *= 0.5
 
-	$N1 = bodies[i;3] # vx
+	$N1 = bodies[i; vx] # vx
 	$N3 = pow $N1, 2.0
 	
-	$N1 = bodies[i;4] # vy
+	$N1 = bodies[i; vy] # vy
 	$N2 = pow $N1, 2.0
 	$N3 += $N2
 	
-	$N1 = bodies[i;5] # vz
+	$N1 = bodies[i; vz] # vz
 	$N2 = pow $N1, 2.0
 	$N3 += $N2
 
@@ -168,31 +177,31 @@ beginfor_1:
 	.local float dx, dy, dz, distance
 
 	# dx = b->x - b2->x;
-	$N0 = bodies[i;0]
-	$N1 = bodies[j;0]
+	$N0 = bodies[i; x]
+	$N1 = bodies[j; x]
 	dx = $N0 - $N1
 
 	# dy = b->y - b2->y;
-	$N0 = bodies[i;1]
-	$N1 = bodies[j;1]
+	$N0 = bodies[i; y]
+	$N1 = bodies[j; y]
 	dy = $N0 - $N1
 
 	# dz = b->z - b2->z;
-	$N0 = bodies[i;2]
-	$N1 = bodies[j;2]
+	$N0 = bodies[i; z]
+	$N1 = bodies[j; z]
 	dz = $N0 - $N1
 
 	# distance = sqrt(dx * dx + dy * dy + dz * dz);
-	$N0 = pow dx, 2.0
-	$N1 = pow dy, 2.0
-	$N2 = pow dz, 2.0
+	$N0 = dx * dx
+	$N1 = dy * dy
+	$N2 = dz * dz
 	$N0 += $N1
 	$N0 += $N2
 	distance = sqrt $N0
 	
 	# e -= (b->mass * b2->mass) / distance;
-	$N0 = bodies[i;6]
-	$N1 = bodies[j;6]
+	$N0 = bodies[i; m]
+	$N1 = bodies[j; m]
 	$N0 *= $N1
 	$N0 /= distance
 	e -= $N0
@@ -213,90 +222,89 @@ endfor_0:
 	.param float dt
 	.local int i, j
 	.local float dx, dy, dz, distance, mag
+	.local float bx, by, bz, bm, bvx, bvy, bvz
+	.local float b2x, b2y, b2z, b2m
 	i = 0
 beginfor_0:
 	unless i < nbodies goto endfor_0
+	bx = bodies[i, x]
+	by = bodies[i, y]
+	bz = bodies[i, z]
+	bm = bodies[i, m]
+	bvx = bodies[i, vx]
+	bvy = bodies[i, vy]
+	bvz = bodies[i, vz]
 	
 	j = i + 1
 	beginfor_1:
 		unless j < nbodies goto endfor_1
+		b2x = bodies[j, x]
+		b2y = bodies[j, y]
+		b2z = bodies[j, z]
+		b2m = bodies[j, m]
 
 		# dx = b->x - b2->x;
-		$N0 = bodies[i;0]
-		$N1 = bodies[j;0]
-		dx = $N0 - $N1
+		dx = bx - b2x
 		# dy = b->y - b2->y;
-		$N0 = bodies[i;1]
-		$N1 = bodies[j;1]
-		dy = $N0 - $N1
+		dy = by - b2y
 		# dz = b->z - b2->z;
-		$N0 = bodies[i;2]
-		$N1 = bodies[j;2]
-		dz = $N0 - $N1
+		dz = bz - b2z
 
 		# distance = sqrt(dx * dx + dy * dy + dz * dz);
-		$N0 = pow dx, 2.0
-		$N1 = pow dy, 2.0
+		$N0 = dx * dx
+		$N1 = dy * dy
 		$N0 += $N1
-		$N1 = pow dz, 2.0
+		$N1 = dz * dz
 		$N0 += $N1
 		distance = sqrt $N0
 
 		# mag = dt / (distance * distance * distance);
-		$N0 = pow distance, 3.0
+		$N0 = distance * distance
+		$N0 *= distance
 		mag = dt / $N0
 
 		# b->vx -= dx * b2->mass * mag;
-		$N0 = bodies[j;6]
-		$N0 *= dx
+		$N0 = dx * b2m
 		$N0 *= mag
-		$N1 = bodies[i;3]
-		$N1 -= $N0
-		bodies[i;3] = $N1
+		bvx -= $N0
 
 		# b->vy -= dy * b2->mass * mag;
-		$N0 = bodies[j;6]
-		$N0 *= dy
+		$N0 = dy * b2m
 		$N0 *= mag
-		$N1 = bodies[i;4]
-		$N1 -= $N0
-		bodies[i;4] = $N1
+		bvy -= $N0
 
 		# b->vz -= dz * b2->mass * mag;
-		$N0 = bodies[j;6]
-		$N0 *= dz
+		$N0 = dz * b2m
 		$N0 *= mag
-		$N1 = bodies[i;5]
-		$N1 -= $N0
-		bodies[i;5] = $N1
+		bvz -= $N0
 
 		# b2->vx += dx * b->mass * mag;
-		$N0 = bodies[i;6]
-		$N0 *= dx
+		$N0 = dx * bm
 		$N0 *= mag
-		$N1 = bodies[j;3]
+		$N1 = bodies[j; vx]
 		$N1 += $N0
-		bodies[j;3] = $N1
+		bodies[j; vx] = $N1
 
 		# b2->vy += dy * b->mass * mag;
-		$N0 = bodies[i;6]
-		$N0 *= dy
+		$N0 = dy * bm
 		$N0 *= mag
-		$N1 = bodies[j;4]
+		$N1 = bodies[j; vy]
 		$N1 += $N0
-		bodies[j;4] = $N1
+		bodies[j; vy] = $N1
 
 		# b2->vz += dz * b->mass * mag;
-		$N0 = bodies[i;6]
-		$N0 *= dz
+		$N0 = dz * bm
 		$N0 *= mag
-		$N1 = bodies[j;5]
+		$N1 = bodies[j; vz]
 		$N1 += $N0
-		bodies[j;5] = $N1
+		bodies[j; vz] = $N1
 
 		inc j
 		goto beginfor_1
 	endfor_1:
+	bodies[i; vx] = bvx
+	bodies[i; vy] = bvy
+	bodies[i; vz] = bvz
 
 	inc i
 	goto beginfor_0
@@ -306,25 +314,25 @@ endfor_0:
 beginfor_2:
 	unless i < nbodies goto endfor_2
 	# b->x += dt * b->vx;
-	$N0 = bodies[i;3]
+	$N0 = bodies[i; vx]
 	$N1 = dt * $N0
-	$N0 = bodies[i;0]
+	$N0 = bodies[i; x]
 	$N0 += $N1
-	bodies[i;0] = $N0
+	bodies[i; x] = $N0
 
 	# b->y += dt * b->vy;
-	$N0 = bodies[i;4]
+	$N0 = bodies[i; vy]
 	$N1 = dt * $N0
-	$N0 = bodies[i;1]
+	$N0 = bodies[i; y]
 	$N0 += $N1
-	bodies[i;1] = $N0
+	bodies[i; y] = $N0
 
 	# b->z += dt * b->vz;
-	$N0 = bodies[i;5]
+	$N0 = bodies[i; vz]
 	$N1 = dt * $N0
-	$N0 = bodies[i;2]
+	$N0 = bodies[i; z]
 	$N0 += $N1
-	bodies[i;2] = $N0
+	bodies[i; z] = $N0
 
 	inc i
 	goto beginfor_2
