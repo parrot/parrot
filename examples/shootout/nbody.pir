@@ -3,7 +3,7 @@
 # http://shootout.alioth.debian.org/
 # 
 # Contributed by Joshua Isom
-# speeded up by 75% by Leopold Toetsch
+# speed up  from 1m25 to 6s by Leopold Toetsch
 
 .const int x = 0
 .const int y = 1
@@ -224,24 +224,27 @@ endfor_0:
 	.local float dx, dy, dz, distance, mag
 	.local float bx, by, bz, bm, bvx, bvy, bvz
 	.local float b2x, b2y, b2z, b2m
+	.local pmc bi, bj
 	i = 0
 beginfor_0:
 	unless i < nbodies goto endfor_0
-	bx = bodies[i, x]
-	by = bodies[i, y]
-	bz = bodies[i, z]
-	bm = bodies[i, m]
-	bvx = bodies[i, vx]
-	bvy = bodies[i, vy]
-	bvz = bodies[i, vz]
+	bi = bodies[i]
+	bx = bi[x]
+	by = bi[y]
+	bz = bi[z]
+	bm = bi[m]
+	bvx = bi[vx]
+	bvy = bi[vy]
+	bvz = bi[vz]
 	
 	j = i + 1
 	beginfor_1:
 		unless j < nbodies goto endfor_1
-		b2x = bodies[j, x]
-		b2y = bodies[j, y]
-		b2z = bodies[j, z]
-		b2m = bodies[j, m]
+		bj = bodies[j]
+		b2x = bj[x]
+		b2y = bj[y]
+		b2z = bj[z]
+		b2m = bj[m]
 
 		# dx = b->x - b2->x;
 		dx = bx - b2x
@@ -281,30 +284,30 @@ beginfor_0:
 		# b2->vx += dx * b->mass * mag;
 		$N0 = dx * bm
 		$N0 *= mag
-		$N1 = bodies[j; vx]
+		$N1 = bj[vx]
 		$N1 += $N0
-		bodies[j; vx] = $N1
+		bj[vx] = $N1
 
 		# b2->vy += dy * b->mass * mag;
 		$N0 = dy * bm
 		$N0 *= mag
-		$N1 = bodies[j; vy]
+		$N1 = bj[vy]
 		$N1 += $N0
-		bodies[j; vy] = $N1
+		bj[vy] = $N1
 
 		# b2->vz += dz * b->mass * mag;
 		$N0 = dz * bm
 		$N0 *= mag
-		$N1 = bodies[j; vz]
+		$N1 = bj[vz]
 		$N1 += $N0
-		bodies[j; vz] = $N1
+		bj[vz] = $N1
 
 		inc j
 		goto beginfor_1
 	endfor_1:
-	bodies[i; vx] = bvx
-	bodies[i; vy] = bvy
-	bodies[i; vz] = bvz
+	bi[vx] = bvx
+	bi[vy] = bvy
+	bi[vz] = bvz
 
 	inc i
 	goto beginfor_0
@@ -313,26 +316,27 @@ endfor_0:
 	i = 0
 beginfor_2:
 	unless i < nbodies goto endfor_2
+	bi = bodies[i]
 	# b->x += dt * b->vx;
-	$N0 = bodies[i; vx]
+	$N0 = bi[vx]
 	$N1 = dt * $N0
-	$N0 = bodies[i; x]
+	$N0 = bi[x]
 	$N0 += $N1
-	bodies[i; x] = $N0
+	bi[x] = $N0
 
 	# b->y += dt * b->vy;
-	$N0 = bodies[i; vy]
+	$N0 = bi[vy]
 	$N1 = dt * $N0
-	$N0 = bodies[i; y]
+	$N0 = bi[y]
 	$N0 += $N1
-	bodies[i; y] = $N0
+	bi[y] = $N0
 
 	# b->z += dt * b->vz;
-	$N0 = bodies[i; vz]
+	$N0 = bi[vz]
 	$N1 = dt * $N0
-	$N0 = bodies[i; z]
+	$N0 = bi[z]
 	$N0 += $N1
-	bodies[i; z] = $N0
+	bi[z] = $N0
 
 	inc i
 	goto beginfor_2
