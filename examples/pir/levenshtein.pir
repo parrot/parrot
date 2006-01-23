@@ -5,16 +5,17 @@
 # First implementation by Alberto Simoes (ambs <at> cpan.org)
 #
 # $Id$
-.sub main :main
-        $S1 = "stupid"
-        $S2 = "one"
 
-        $I1 = levenshtein($S1,$S2)
+# .sub main :main
+#         $S1 = "purl"
+#         $S2 = "perl"
 
-        print $I1
-        print "\n"
-        end
-.end
+#         $I1 = levenshtein($S1,$S2)
+
+#         print $I1
+#         print "\n"
+#         end
+# .end
 
 # Levenshtein distance. Pass two strings in
 .sub levenshtein
