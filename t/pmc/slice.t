@@ -33,6 +33,29 @@ CODE
 ok 1
 OUT
 
+pir_output_is(<<'CODE', <<'OUT', 'bug with slice bits', todo => 'parser');
+# the VT_CONSTP status gets destroyed, if this constant is
+# used somewhere else as slice index
+.const int vx = 3
+
+.sub main :main
+    .local pmc b, bj
+    b = new FixedPMCArray
+    b = 4
+    bj = new .FixedFloatArray
+    bj = 5
+    b[3] = bj
+    $N0 = b[3 .. vx]
+    bj = b[3]
+    $N1 = bj[vx]
+    $N1 += 1.0
+    bj[vx] = $N1
+    print $N1
+    print "\n"
+.end
+CODE
+1.000000
+OUT
 
 # remember to change the number of tests :-)
-BEGIN { plan tests => 1; }
+BEGIN { plan tests => 2; }
