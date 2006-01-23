@@ -105,6 +105,9 @@ sub visitCallOp {
 		foreach (@{$op->{result}}) {
 			print $FH ", " unless ($first);
 			print $FH "$_->{symbol}";
+			if (exists $_->{pragma} and $_->{pragma} eq "multi") {
+				print $FH " :slurpy";
+			}
 			$first = 0;
 		}
 		print $FH ") = ";
@@ -114,6 +117,9 @@ sub visitCallOp {
 	foreach (@{$op->{arg2}}) {
 		print $FH ", " unless ($first);
 		print $FH "$_->{symbol}";
+		if (exists $_->{pragma} and $_->{pragma} eq "multi") {
+			print $FH " :flat";
+		}
 		$first = 0;
 	}
 	print $FH ")\n";
@@ -197,6 +203,9 @@ sub visitReturnDir {
 	foreach (@{$dir->{result}}) {
 		print $FH ", " unless ($first);
 		print $FH "$_->{symbol}";
+		if (exists $_->{pragma} and $_->{pragma} eq "multi") {
+			print $FH " :flat";
+		}
 		$first = 0;
 	}
 	print $FH ")\n";

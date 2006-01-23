@@ -22,7 +22,7 @@ use strict;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 7;
+use Parrot::Test tests => 8;
 use Test::More;
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'relational op (by reference)' );
@@ -72,6 +72,22 @@ false
 4
 5
 text
+OUT
+
+language_output_is( 'lua', <<'CODE', <<'OUT', 'logical op' );
+--print(10 or error("err"))
+print(nil or "a")
+print(nil and 10)
+--print(false and error("err"))
+print(false and nil)
+print(false or nil)
+print(10 and 20)
+CODE
+a
+nil
+false
+nil
+20
 OUT
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'logical not' );

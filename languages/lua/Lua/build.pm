@@ -56,6 +56,7 @@ sub get_void {
 	my ($parser, $expr) = @_;
 	my ($defn, $opcodes) = @{$expr};
 	my $call = pop @{$opcodes};
+	my $ass = pop @{$opcodes};
 	my $decl = pop @{$opcodes};
 	delete $call->{result};
 	push @{$opcodes}, $call;
@@ -121,7 +122,7 @@ sub BuildTable {
 			'result'				=>	$result,
 	);
 	my $idx = 1;
-	for my $field (@{$fields}) {
+	while (my $field = shift @{$fields}) {
 		my ($val, $key);
 		if (scalar(@{$field}) == 1) {
 			$val = $field->[0];
@@ -186,15 +187,38 @@ sub BuildVariable {
 
 sub BuildAssigns {
 	my ($parser, $vars, $exprs) = @_;
-	while (scalar @{$exprs} < scalar @{$vars}) {
-		push @{$exprs}, BuildLiteral($parser, 'nil', 'nil');
-	}
 	my @opcodes1 = ();
 	my @opcodes2 = ();
 	my @opcodes3 = ();
-	for my $var (@{$vars}) {
+	while (my $var = shift @{$vars}) { 
 		push @opcodes1, @{$var->[1]};
 		my $expr = shift @{$exprs};
+		unless (defined $expr) {
+			$expr = BuildLiteral($parser, 'nil', 'nil');
+		}
+		if (        scalar(@{$exprs}) == 0
+				and scalar(@{$vars}) != 0
+				and scalar(@{$expr->[1]}) != 0 
+				and ${$expr->[1]}[-1]->isa("CallOp") ) {
+			my $result;
+			my $callop = pop @{$expr->[1]};
+			my $nil = BuildLiteral($parser, 'nil', 'nil');
+			push @{$expr->[1]}, @{$nil->[1]};
+			my $n = scalar(@{$vars});
+			while ($n--) {
+				$result = new_tmp($parser, "pmc");
+				push @{$expr->[1]}, new LocalDir($parser,
+						'result'				=>	$result,
+				);
+				push @{$expr->[1]}, new AssignOp($parser,
+						'result'				=>	$result,
+						'arg1'					=>	$nil->[0],
+				);
+				push @{$exprs}, [$result, []];
+				push @{$callop->{result}}, $result;
+			}
+			push @{$expr->[1]}, $callop;
+		}
 		push @opcodes2, @{$expr->[1]};
 		my $assign = $var->[2];
 		if ($assign->isa("AssignOp")) {
@@ -262,10 +286,21 @@ sub BuildCallFunction {
 		push @opcodes, @{$arg->[1]};
 		push @params, $arg->[0];
 	}
+	if (scalar(@opcodes) and $opcodes[-1]->isa("CallOp")) {
+		unless (exists $params[-1]->{pragma}) { 
+			$params[-1]->{pragma} = "multi";
+		}
+	}
 	push @opcodes, @{$fct->[1]};
+	my $nil = BuildLiteral($parser, 'nil', 'nil');
+	push @opcodes, @{$nil->[1]};
 	$result = new_tmp($parser, "pmc");
 	push @opcodes, new LocalDir($parser,
 			'result'				=>	$result,
+	);
+	push @opcodes, new AssignOp($parser,
+			'result'				=>	$result,
+			'arg1'					=>	$nil->[0],
 	);
 	push @returns, $result;
 	push @opcodes, new CallOp($parser,
@@ -393,7 +428,7 @@ sub BuildLogop {
 			'result'				=>	$result,
 			'arg1'					=>	$expr1->[0],
 	);
-	my $lbl2 = new_label($parser);
+	my $lbl2 = new_label($parser);                        
 	push @opcodes, new BranchOp($parser,
 			'result'				=>	$lbl2,
 	);
@@ -408,6 +443,15 @@ sub BuildLogop {
 			'arg1'					=>	$lbl2,
 	);
 	return [$result, \@opcodes];
+}
+
+sub BuildParenthesedExpression {
+	my ($parser, $expr) = @_;
+	my ($defn, $opcodes) = @{$expr};
+	if (scalar(@{$opcodes}) and $opcodes->[-1]->isa("CallOp")) {
+		$defn->{pragma} = "first";
+	}
+	return $expr;
 }
 
 sub  BuildLocalVariable {
@@ -662,6 +706,9 @@ sub BuildReturn {
 	for my $expr (@{$exprs}) {
 		push @opcodes, @{$expr->[1]};
 		push @returns, $expr->[0];
+	}
+	if (scalar(@opcodes) and $opcodes[-1]->isa("CallOp")) {
+		$returns[-1]->{pragma} = "multi";
 	}
 	push @opcodes, new ReturnDir($parser,
 			'result'				=>	\@returns,

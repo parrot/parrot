@@ -775,20 +775,23 @@ I<n> is the size of the list, as defined for the C<table.getn> function.
 .sub _lua_unpack :anon
     .param pmc list
     .local pmc ret
+    .local pmc index
+    .local int n
+    .local int i
     checktype(list, "table")
-    $I0 = getn(list)
+    n = getn(list)
     new ret, .Array
-    set ret, $I0
-    new $P1, .LuaNumber
-    $P1 = 1.0
-    $I1 = 0
+    set ret, n
+    new index, .LuaNumber
+    index = 1
+    i = 0
 L0:    
-    unless $I1 <= $I0 goto L1
-    $P2 = list[$P1]
-#    ret[$I1] = $P2
-    push ret, $P2
-    add $P1, 1.0
-    add $I1, 1
+    unless i < n goto L1
+    $P0 = list[index]
+    ret[i] = $P0
+#    push ret, $P0
+    index = index + 1.0
+    i = i + 1
     goto L0
 L1:
     .return (ret :flat)

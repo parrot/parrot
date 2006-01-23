@@ -501,17 +501,17 @@ sub new {
 [
 	{#State 0
 		ACTIONS => {
-			'FUNCTION' => -4,
 			'' => -4,
 			'NAME' => -4,
-			'WHILE' => -4,
 			'REPEAT' => -4,
-			'error' => 1,
 			'FOR' => -4,
-			'LOCAL' => -4,
-			'DO' => -4,
+			"(" => -4,
 			'IF' => -4,
-			"(" => -4
+			'error' => 1,
+			'FUNCTION' => -4,
+			'DO' => -4,
+			'LOCAL' => -4,
+			'WHILE' => -4
 		},
 		GOTOS => {
 			'chunk' => 2,
@@ -523,22 +523,22 @@ sub new {
 	},
 	{#State 2
 		ACTIONS => {
-			'FUNCTION' => 5,
-			'NAME' => 7,
-			'WHILE' => 8,
-			'REPEAT' => 9,
-			'FOR' => 10,
-			'LOCAL' => 11,
-			'DO' => 13,
-			'IF' => 14,
-			"(" => 16
+			'NAME' => 4,
+			'REPEAT' => 5,
+			'FOR' => 6,
+			"(" => 8,
+			'IF' => 10,
+			'FUNCTION' => 12,
+			'DO' => 14,
+			'LOCAL' => 15,
+			'WHILE' => 16
 		},
 		DEFAULT => -1,
 		GOTOS => {
-			'functioncall' => 6,
-			'var' => 4,
-			'stat' => 12,
-			'varlist1' => 15
+			'functioncall' => 9,
+			'var' => 11,
+			'varlist1' => 13,
+			'stat' => 7
 		}
 	},
 	{#State 3
@@ -547,162 +547,162 @@ sub new {
 		}
 	},
 	{#State 4
-		ACTIONS => {
-			":" => 18,
-			'LITERAL' => 19,
-			"[" => 20,
-			"{" => 21,
-			"." => 23,
-			"(" => 26
-		},
-		DEFAULT => -33,
-		GOTOS => {
-			'args' => 22,
-			'key' => 24,
-			'tableconstructor' => 25
-		}
+		DEFAULT => -34
 	},
 	{#State 5
-		ACTIONS => {
-			'NAME' => 27
-		},
+		DEFAULT => -4,
 		GOTOS => {
-			'funcname' => 29,
-			'_funcname' => 28
+			'block' => 19,
+			'chunk' => 18
 		}
 	},
 	{#State 6
 		ACTIONS => {
-			"(" => 26,
-			":" => 30,
-			'LITERAL' => 19,
-			"[" => 20,
-			"{" => 21,
-			"." => 23
+			'NAME' => 20
 		},
-		DEFAULT => -13,
 		GOTOS => {
-			'args' => 31,
-			'key' => 32,
-			'tableconstructor' => 25
+			'namelist' => 21
 		}
 	},
 	{#State 7
-		DEFAULT => -34
+		ACTIONS => {
+			";" => 22
+		},
+		DEFAULT => -6,
+		GOTOS => {
+			'_semicolon_opt' => 23
+		}
 	},
 	{#State 8
 		ACTIONS => {
-			'FUNCTION' => 33,
-			'NUMBER' => 36,
-			'NAME' => 7,
-			'NOT' => 37,
-			'LITERAL' => 39,
-			"{" => 21,
-			"-" => 41,
-			'FALSE' => 43,
-			"(" => 47,
-			'NIL' => 46,
-			'TRUE' => 45
+			"-" => 24,
+			'NAME' => 4,
+			'TRUE' => 25,
+			"{" => 38,
+			'NOT' => 27,
+			'LITERAL' => 29,
+			"(" => 39,
+			'NIL' => 30,
+			'FALSE' => 33,
+			'FUNCTION' => 34,
+			'NUMBER' => 36
 		},
 		GOTOS => {
-			'function' => 40,
-			'functioncall' => 35,
-			'var' => 34,
-			'exp' => 42,
-			'primary' => 38,
-			'tableconstructor' => 44
+			'exp' => 37,
+			'functioncall' => 31,
+			'function' => 26,
+			'tableconstructor' => 32,
+			'var' => 35,
+			'primary' => 28
 		}
 	},
 	{#State 9
-		DEFAULT => -4,
+		ACTIONS => {
+			":" => 40,
+			'LITERAL' => 42,
+			"[" => 45,
+			"{" => 38,
+			"(" => 46,
+			"." => 47
+		},
+		DEFAULT => -13,
 		GOTOS => {
-			'block' => 49,
-			'chunk' => 48
+			'tableconstructor' => 44,
+			'args' => 41,
+			'key' => 43
 		}
 	},
 	{#State 10
 		ACTIONS => {
-			'NAME' => 50
+			"-" => 24,
+			'NAME' => 4,
+			'TRUE' => 25,
+			"{" => 38,
+			'NOT' => 27,
+			'LITERAL' => 29,
+			"(" => 39,
+			'NIL' => 30,
+			'FALSE' => 33,
+			'FUNCTION' => 34,
+			'NUMBER' => 36
 		},
 		GOTOS => {
-			'namelist' => 51
+			'exp' => 48,
+			'functioncall' => 31,
+			'function' => 26,
+			'tableconstructor' => 32,
+			'var' => 35,
+			'primary' => 28
 		}
 	},
 	{#State 11
 		ACTIONS => {
-			'FUNCTION' => 52,
-			'NAME' => 53
+			":" => 49,
+			"{" => 38,
+			'LITERAL' => 42,
+			"(" => 46,
+			"[" => 45,
+			"." => 47
 		},
+		DEFAULT => -33,
 		GOTOS => {
-			'namelist' => 54
+			'tableconstructor' => 44,
+			'args' => 50,
+			'key' => 51
 		}
 	},
 	{#State 12
 		ACTIONS => {
-			";" => 56
+			'NAME' => 52
 		},
-		DEFAULT => -6,
 		GOTOS => {
-			'_semicolon_opt' => 55
+			'funcname' => 53,
+			'_funcname' => 54
 		}
 	},
 	{#State 13
-		DEFAULT => -4,
-		GOTOS => {
-			'block' => 57,
-			'chunk' => 48
+		ACTIONS => {
+			"," => 55,
+			"=" => 56
 		}
 	},
 	{#State 14
-		ACTIONS => {
-			'FUNCTION' => 33,
-			'NUMBER' => 36,
-			'NAME' => 7,
-			'NOT' => 37,
-			'LITERAL' => 39,
-			"{" => 21,
-			"-" => 41,
-			'FALSE' => 43,
-			"(" => 47,
-			'NIL' => 46,
-			'TRUE' => 45
-		},
+		DEFAULT => -4,
 		GOTOS => {
-			'function' => 40,
-			'functioncall' => 35,
-			'var' => 34,
-			'exp' => 58,
-			'primary' => 38,
-			'tableconstructor' => 44
+			'block' => 57,
+			'chunk' => 18
 		}
 	},
 	{#State 15
 		ACTIONS => {
-			"=" => 60,
-			"," => 59
+			'NAME' => 59,
+			'FUNCTION' => 58
+		},
+		GOTOS => {
+			'namelist' => 60
 		}
 	},
 	{#State 16
 		ACTIONS => {
-			'FUNCTION' => 33,
-			'NUMBER' => 36,
-			'NAME' => 7,
-			'NOT' => 37,
-			'LITERAL' => 39,
-			"{" => 21,
-			"-" => 41,
-			'FALSE' => 43,
-			"(" => 47,
-			'NIL' => 46,
-			'TRUE' => 45
+			"-" => 24,
+			'NAME' => 4,
+			'TRUE' => 25,
+			"{" => 38,
+			'NOT' => 27,
+			'LITERAL' => 29,
+			"(" => 39,
+			'NIL' => 30,
+			'FALSE' => 33,
+			'FUNCTION' => 34,
+			'NUMBER' => 36
 		},
 		GOTOS => {
-			'function' => 40,
-			'functioncall' => 35,
-			'var' => 34,
 			'exp' => 61,
-			'primary' => 38,
-			'tableconstructor' => 44
+			'functioncall' => 31,
+			'function' => 26,
+			'tableconstructor' => 32,
+			'var' => 35,
+			'primary' => 28
 		}
 	},
 	{#State 17
@@ -710,169 +710,155 @@ sub new {
 	},
 	{#State 18
 		ACTIONS => {
-			'NAME' => 62
+			'NAME' => 4,
+			'BREAK' => 62,
+			'REPEAT' => 5,
+			'FOR' => 6,
+			"(" => 8,
+			'IF' => 10,
+			'RETURN' => 64,
+			'FUNCTION' => 12,
+			'DO' => 14,
+			'LOCAL' => 15,
+			'WHILE' => 16
+		},
+		DEFAULT => -7,
+		GOTOS => {
+			'functioncall' => 9,
+			'var' => 11,
+			'_end_block' => 63,
+			'varlist1' => 13,
+			'stat' => 7
 		}
 	},
 	{#State 19
-		DEFAULT => -80
+		ACTIONS => {
+			'UNTIL' => 65
+		}
 	},
 	{#State 20
 		ACTIONS => {
-			'FUNCTION' => 33,
-			'NUMBER' => 36,
-			'NAME' => 7,
-			'NOT' => 37,
-			'LITERAL' => 39,
-			"{" => 21,
-			"-" => 41,
-			'FALSE' => 43,
-			"(" => 47,
-			'NIL' => 46,
-			'TRUE' => 45
+			"=" => 66
 		},
-		GOTOS => {
-			'function' => 40,
-			'functioncall' => 35,
-			'var' => 34,
-			'exp' => 63,
-			'primary' => 38,
-			'tableconstructor' => 44
-		}
+		DEFAULT => -41
 	},
 	{#State 21
 		ACTIONS => {
-			'FUNCTION' => 33,
-			'NUMBER' => 36,
-			'NAME' => 65,
-			'NOT' => 37,
-			'LITERAL' => 39,
-			"[" => 67,
-			"{" => 21,
-			"-" => 41,
-			'FALSE' => 43,
-			"}" => 69,
-			'TRUE' => 45,
-			'NIL' => 46,
-			"(" => 47
-		},
-		GOTOS => {
-			'functioncall' => 35,
-			'fieldlist' => 64,
-			'var' => 34,
-			'primary' => 38,
-			'_field_plus' => 66,
-			'function' => 40,
-			'exp' => 68,
-			'field' => 70,
-			'tableconstructor' => 44
+			"," => 67,
+			'IN' => 68
 		}
 	},
 	{#State 22
-		DEFAULT => -73
+		DEFAULT => -5
 	},
 	{#State 23
-		ACTIONS => {
-			'NAME' => 71
-		}
+		DEFAULT => -3
 	},
 	{#State 24
-		DEFAULT => -37
+		ACTIONS => {
+			"-" => 24,
+			'NAME' => 4,
+			'TRUE' => 25,
+			"{" => 38,
+			'NOT' => 27,
+			'LITERAL' => 29,
+			"(" => 39,
+			'NIL' => 30,
+			'FALSE' => 33,
+			'FUNCTION' => 34,
+			'NUMBER' => 36
+		},
+		GOTOS => {
+			'exp' => 69,
+			'functioncall' => 31,
+			'function' => 26,
+			'tableconstructor' => 32,
+			'var' => 35,
+			'primary' => 28
+		}
 	},
 	{#State 25
-		DEFAULT => -79
+		DEFAULT => -65
 	},
 	{#State 26
-		ACTIONS => {
-			'FUNCTION' => 33,
-			")" => 72,
-			'NUMBER' => 36,
-			'NAME' => 7,
-			'NOT' => 37,
-			'LITERAL' => 39,
-			"{" => 21,
-			"-" => 41,
-			'FALSE' => 43,
-			'TRUE' => 45,
-			'NIL' => 46,
-			"(" => 47
-		},
-		GOTOS => {
-			'function' => 40,
-			'functioncall' => 35,
-			'var' => 34,
-			'exp' => 73,
-			'explist1' => 74,
-			'primary' => 38,
-			'tableconstructor' => 44
-		}
+		DEFAULT => -68
 	},
 	{#State 27
-		DEFAULT => -31
+		ACTIONS => {
+			"-" => 24,
+			'NAME' => 4,
+			'TRUE' => 25,
+			"{" => 38,
+			'NOT' => 27,
+			'LITERAL' => 29,
+			"(" => 39,
+			'NIL' => 30,
+			'FALSE' => 33,
+			'FUNCTION' => 34,
+			'NUMBER' => 36
+		},
+		GOTOS => {
+			'exp' => 70,
+			'functioncall' => 31,
+			'function' => 26,
+			'tableconstructor' => 32,
+			'var' => 35,
+			'primary' => 28
+		}
 	},
 	{#State 28
-		ACTIONS => {
-			"." => 76,
-			":" => 75
-		},
-		DEFAULT => -28
+		DEFAULT => -44
 	},
 	{#State 29
-		ACTIONS => {
-			"(" => 77
-		},
-		GOTOS => {
-			'funcbody' => 78
-		}
+		DEFAULT => -67
 	},
 	{#State 30
-		ACTIONS => {
-			'NAME' => 79
-		}
+		DEFAULT => -63
 	},
 	{#State 31
-		DEFAULT => -75
+		ACTIONS => {
+			":" => 40,
+			"[" => 45,
+			"(" => 46,
+			"." => 47,
+			'LITERAL' => 42,
+			"{" => 38
+		},
+		DEFAULT => -46,
+		GOTOS => {
+			'tableconstructor' => 44,
+			'args' => 41,
+			'key' => 43
+		}
 	},
 	{#State 32
-		DEFAULT => -36
+		DEFAULT => -69
 	},
 	{#State 33
-		ACTIONS => {
-			"(" => 77
-		},
-		GOTOS => {
-			'funcbody' => 80
-		}
+		DEFAULT => -64
 	},
 	{#State 34
 		ACTIONS => {
-			"(" => 26,
-			'LITERAL' => 19,
-			"[" => 20,
-			"{" => 21,
-			"." => 23,
-			":" => 18
+			"(" => 72
 		},
-		DEFAULT => -45,
 		GOTOS => {
-			'args' => 22,
-			'key' => 24,
-			'tableconstructor' => 25
+			'funcbody' => 71
 		}
 	},
 	{#State 35
 		ACTIONS => {
-			"(" => 26,
-			'LITERAL' => 19,
-			"[" => 20,
-			"{" => 21,
-			"." => 23,
-			":" => 30
+			":" => 49,
+			"[" => 45,
+			"(" => 46,
+			"." => 47,
+			'LITERAL' => 42,
+			"{" => 38
 		},
-		DEFAULT => -46,
+		DEFAULT => -45,
 		GOTOS => {
-			'args' => 31,
-			'key' => 32,
-			'tableconstructor' => 25
+			'tableconstructor' => 44,
+			'args' => 50,
+			'key' => 51
 		}
 	},
 	{#State 36
@@ -880,1641 +866,1655 @@ sub new {
 	},
 	{#State 37
 		ACTIONS => {
-			'FUNCTION' => 33,
-			'NUMBER' => 36,
-			'NAME' => 7,
-			'NOT' => 37,
-			'LITERAL' => 39,
-			"{" => 21,
-			"-" => 41,
-			'FALSE' => 43,
-			'TRUE' => 45,
-			'NIL' => 46,
-			"(" => 47
-		},
-		GOTOS => {
-			'function' => 40,
-			'functioncall' => 35,
-			'var' => 34,
-			'exp' => 81,
-			'primary' => 38,
-			'tableconstructor' => 44
+			"-" => 74,
+			".." => 73,
+			"<" => 76,
+			"~=" => 75,
+			"+" => 77,
+			"/" => 83,
+			"==" => 78,
+			">=" => 79,
+			'AND' => 84,
+			"^" => 80,
+			"*" => 81,
+			"<=" => 86,
+			'OR' => 85,
+			")" => 82,
+			">" => 87
 		}
 	},
 	{#State 38
-		DEFAULT => -44
-	},
-	{#State 39
-		DEFAULT => -67
-	},
-	{#State 40
-		DEFAULT => -68
-	},
-	{#State 41
 		ACTIONS => {
-			'FUNCTION' => 33,
-			'NUMBER' => 36,
-			'NAME' => 7,
-			'NOT' => 37,
-			'LITERAL' => 39,
-			"{" => 21,
-			"-" => 41,
-			'FALSE' => 43,
-			'TRUE' => 45,
-			'NIL' => 46,
-			"(" => 47
+			"}" => 88,
+			"-" => 24,
+			'NAME' => 92,
+			'TRUE' => 25,
+			"{" => 38,
+			'NOT' => 27,
+			'LITERAL' => 29,
+			"(" => 39,
+			'NIL' => 30,
+			'FALSE' => 33,
+			'FUNCTION' => 34,
+			"[" => 89,
+			'NUMBER' => 36
 		},
 		GOTOS => {
-			'function' => 40,
-			'functioncall' => 35,
-			'var' => 34,
-			'exp' => 82,
-			'primary' => 38,
-			'tableconstructor' => 44
+			'exp' => 91,
+			'function' => 26,
+			'primary' => 28,
+			'fieldlist' => 93,
+			'functioncall' => 31,
+			'tableconstructor' => 32,
+			'var' => 35,
+			'_field_plus' => 94,
+			'field' => 90
 		}
+	},
+	{#State 39
+		ACTIONS => {
+			"-" => 24,
+			'NAME' => 4,
+			'TRUE' => 25,
+			"{" => 38,
+			'NOT' => 27,
+			'LITERAL' => 29,
+			"(" => 39,
+			'NIL' => 30,
+			'FALSE' => 33,
+			'FUNCTION' => 34,
+			'NUMBER' => 36
+		},
+		GOTOS => {
+			'exp' => 95,
+			'functioncall' => 31,
+			'function' => 26,
+			'tableconstructor' => 32,
+			'var' => 35,
+			'primary' => 28
+		}
+	},
+	{#State 40
+		ACTIONS => {
+			'NAME' => 96
+		}
+	},
+	{#State 41
+		DEFAULT => -75
 	},
 	{#State 42
-		ACTIONS => {
-			"*" => 85,
-			"+" => 87,
-			'OR' => 86,
-			"<=" => 88,
-			"<" => 89,
-			'AND' => 83,
-			"-" => 90,
-			"==" => 91,
-			'DO' => 92,
-			">" => 93,
-			"/" => 96,
-			"^" => 95,
-			">=" => 94,
-			".." => 84,
-			"~=" => 97
-		}
+		DEFAULT => -80
 	},
 	{#State 43
-		DEFAULT => -64
+		DEFAULT => -36
 	},
 	{#State 44
-		DEFAULT => -69
+		DEFAULT => -79
 	},
 	{#State 45
-		DEFAULT => -65
+		ACTIONS => {
+			"-" => 24,
+			'NAME' => 4,
+			'TRUE' => 25,
+			"{" => 38,
+			'NOT' => 27,
+			'LITERAL' => 29,
+			"(" => 39,
+			'NIL' => 30,
+			'FALSE' => 33,
+			'FUNCTION' => 34,
+			'NUMBER' => 36
+		},
+		GOTOS => {
+			'exp' => 97,
+			'functioncall' => 31,
+			'function' => 26,
+			'tableconstructor' => 32,
+			'var' => 35,
+			'primary' => 28
+		}
 	},
 	{#State 46
-		DEFAULT => -63
+		ACTIONS => {
+			"-" => 24,
+			'NAME' => 4,
+			'TRUE' => 25,
+			"{" => 38,
+			'NOT' => 27,
+			'LITERAL' => 29,
+			"(" => 39,
+			'NIL' => 30,
+			'FALSE' => 33,
+			'FUNCTION' => 34,
+			'NUMBER' => 36,
+			")" => 99
+		},
+		GOTOS => {
+			'exp' => 100,
+			'functioncall' => 31,
+			'explist1' => 98,
+			'function' => 26,
+			'tableconstructor' => 32,
+			'var' => 35,
+			'primary' => 28
+		}
 	},
 	{#State 47
 		ACTIONS => {
-			'FUNCTION' => 33,
-			'NUMBER' => 36,
-			'NAME' => 7,
-			'NOT' => 37,
-			'LITERAL' => 39,
-			"{" => 21,
-			"-" => 41,
-			'FALSE' => 43,
-			'TRUE' => 45,
-			'NIL' => 46,
-			"(" => 47
-		},
-		GOTOS => {
-			'function' => 40,
-			'functioncall' => 35,
-			'var' => 34,
-			'exp' => 98,
-			'primary' => 38,
-			'tableconstructor' => 44
+			'NAME' => 101
 		}
 	},
 	{#State 48
 		ACTIONS => {
-			'FUNCTION' => 5,
-			'NAME' => 7,
-			'RETURN' => 100,
-			'WHILE' => 8,
-			'REPEAT' => 9,
-			'FOR' => 10,
-			'BREAK' => 101,
-			'LOCAL' => 11,
-			'DO' => 13,
-			'IF' => 14,
-			"(" => 16
-		},
-		DEFAULT => -7,
-		GOTOS => {
-			'functioncall' => 6,
-			'var' => 4,
-			'_end_block' => 99,
-			'stat' => 12,
-			'varlist1' => 15
+			"-" => 74,
+			".." => 73,
+			"<" => 76,
+			"~=" => 75,
+			"+" => 77,
+			"/" => 83,
+			"==" => 78,
+			">=" => 79,
+			'AND' => 84,
+			"^" => 80,
+			"*" => 81,
+			'THEN' => 102,
+			"<=" => 86,
+			'OR' => 85,
+			">" => 87
 		}
 	},
 	{#State 49
 		ACTIONS => {
-			'UNTIL' => 102
+			'NAME' => 103
 		}
 	},
 	{#State 50
-		ACTIONS => {
-			"=" => 103
-		},
-		DEFAULT => -41
+		DEFAULT => -73
 	},
 	{#State 51
-		ACTIONS => {
-			'IN' => 104,
-			"," => 105
-		}
+		DEFAULT => -37
 	},
 	{#State 52
-		ACTIONS => {
-			'NAME' => 106
-		}
+		DEFAULT => -31
 	},
 	{#State 53
-		DEFAULT => -41
+		ACTIONS => {
+			"(" => 72
+		},
+		GOTOS => {
+			'funcbody' => 104
+		}
 	},
 	{#State 54
 		ACTIONS => {
-			"," => 105,
-			"=" => 107
+			":" => 105,
+			"." => 106
 		},
-		DEFAULT => -25
+		DEFAULT => -28
 	},
 	{#State 55
-		DEFAULT => -3
+		ACTIONS => {
+			"(" => 8,
+			'NAME' => 4
+		},
+		GOTOS => {
+			'functioncall' => 107,
+			'var' => 108
+		}
 	},
 	{#State 56
-		DEFAULT => -5
+		ACTIONS => {
+			"-" => 24,
+			'NAME' => 4,
+			'TRUE' => 25,
+			"{" => 38,
+			'NOT' => 27,
+			'LITERAL' => 29,
+			"(" => 39,
+			'NIL' => 30,
+			'FALSE' => 33,
+			'FUNCTION' => 34,
+			'NUMBER' => 36
+		},
+		GOTOS => {
+			'exp' => 100,
+			'functioncall' => 31,
+			'explist1' => 109,
+			'function' => 26,
+			'tableconstructor' => 32,
+			'var' => 35,
+			'primary' => 28
+		}
 	},
 	{#State 57
 		ACTIONS => {
-			'END' => 108
+			'END' => 110
 		}
 	},
 	{#State 58
 		ACTIONS => {
-			"*" => 85,
-			"+" => 87,
-			'OR' => 86,
-			"<=" => 88,
-			"<" => 89,
-			"-" => 90,
-			'AND' => 83,
-			'THEN' => 109,
-			"==" => 91,
-			">" => 93,
-			"/" => 96,
-			"^" => 95,
-			">=" => 94,
-			".." => 84,
-			"~=" => 97
+			'NAME' => 111
 		}
 	},
 	{#State 59
-		ACTIONS => {
-			'NAME' => 7,
-			"(" => 16
-		},
-		GOTOS => {
-			'functioncall' => 111,
-			'var' => 110
-		}
+		DEFAULT => -41
 	},
 	{#State 60
 		ACTIONS => {
-			'FUNCTION' => 33,
-			'NUMBER' => 36,
-			'NAME' => 7,
-			'NOT' => 37,
-			'LITERAL' => 39,
-			"{" => 21,
-			"-" => 41,
-			'FALSE' => 43,
-			'TRUE' => 45,
-			'NIL' => 46,
-			"(" => 47
+			"," => 67,
+			"=" => 112
 		},
-		GOTOS => {
-			'function' => 40,
-			'functioncall' => 35,
-			'var' => 34,
-			'exp' => 73,
-			'explist1' => 112,
-			'primary' => 38,
-			'tableconstructor' => 44
-		}
+		DEFAULT => -25
 	},
 	{#State 61
 		ACTIONS => {
-			")" => 113,
-			"*" => 85,
-			"+" => 87,
-			'OR' => 86,
-			"<=" => 88,
-			"<" => 89,
-			"-" => 90,
-			'AND' => 83,
-			"==" => 91,
-			">" => 93,
-			"/" => 96,
-			"^" => 95,
-			">=" => 94,
-			".." => 84,
-			"~=" => 97
+			"-" => 74,
+			".." => 73,
+			"<" => 76,
+			"~=" => 75,
+			"+" => 77,
+			"/" => 83,
+			"==" => 78,
+			">=" => 79,
+			'AND' => 84,
+			"^" => 80,
+			"*" => 81,
+			'DO' => 113,
+			"<=" => 86,
+			'OR' => 85,
+			">" => 87
 		}
 	},
 	{#State 62
-		ACTIONS => {
-			"{" => 21,
-			'LITERAL' => 19,
-			"(" => 26
-		},
-		GOTOS => {
-			'args' => 114,
-			'tableconstructor' => 25
-		}
+		DEFAULT => -11
 	},
 	{#State 63
 		ACTIONS => {
-			"*" => 85,
-			"+" => 87,
-			'OR' => 86,
-			"<=" => 88,
-			"<" => 89,
-			'AND' => 83,
-			"-" => 90,
-			"==" => 91,
-			"]" => 115,
-			">" => 93,
-			"/" => 96,
-			"^" => 95,
-			">=" => 94,
-			".." => 84,
-			"~=" => 97
+			";" => 22
+		},
+		DEFAULT => -6,
+		GOTOS => {
+			'_semicolon_opt' => 114
 		}
 	},
 	{#State 64
 		ACTIONS => {
-			"}" => 116
+			"-" => 24,
+			'TRUE' => 25,
+			'NOT' => 27,
+			'LITERAL' => 29,
+			'NIL' => 30,
+			'FALSE' => 33,
+			'FUNCTION' => 34,
+			'NUMBER' => 36,
+			'NAME' => 4,
+			"{" => 38,
+			"(" => 39
+		},
+		DEFAULT => -10,
+		GOTOS => {
+			'exp' => 100,
+			'functioncall' => 31,
+			'explist1' => 115,
+			'function' => 26,
+			'tableconstructor' => 32,
+			'var' => 35,
+			'primary' => 28
 		}
 	},
 	{#State 65
 		ACTIONS => {
-			"=" => 117
+			"-" => 24,
+			'NAME' => 4,
+			'TRUE' => 25,
+			"{" => 38,
+			'NOT' => 27,
+			'LITERAL' => 29,
+			"(" => 39,
+			'NIL' => 30,
+			'FALSE' => 33,
+			'FUNCTION' => 34,
+			'NUMBER' => 36
 		},
-		DEFAULT => -34
+		GOTOS => {
+			'exp' => 116,
+			'functioncall' => 31,
+			'function' => 26,
+			'tableconstructor' => 32,
+			'var' => 35,
+			'primary' => 28
+		}
 	},
 	{#State 66
 		ACTIONS => {
-			";" => 119,
-			"," => 120
+			"-" => 24,
+			'NAME' => 4,
+			'TRUE' => 25,
+			"{" => 38,
+			'NOT' => 27,
+			'LITERAL' => 29,
+			"(" => 39,
+			'NIL' => 30,
+			'FALSE' => 33,
+			'FUNCTION' => 34,
+			'NUMBER' => 36
 		},
-		DEFAULT => -92,
 		GOTOS => {
-			'fieldsep' => 118
+			'exp' => 117,
+			'functioncall' => 31,
+			'function' => 26,
+			'tableconstructor' => 32,
+			'var' => 35,
+			'primary' => 28
 		}
 	},
 	{#State 67
 		ACTIONS => {
-			'FUNCTION' => 33,
-			'NUMBER' => 36,
-			'NAME' => 7,
-			'NOT' => 37,
-			'LITERAL' => 39,
-			"{" => 21,
-			"-" => 41,
-			'FALSE' => 43,
-			'TRUE' => 45,
-			'NIL' => 46,
-			"(" => 47
-		},
-		GOTOS => {
-			'function' => 40,
-			'functioncall' => 35,
-			'var' => 34,
-			'exp' => 121,
-			'primary' => 38,
-			'tableconstructor' => 44
+			'NAME' => 118
 		}
 	},
 	{#State 68
 		ACTIONS => {
-			'AND' => 83,
-			".." => 84,
-			"*" => 85,
-			'OR' => 86,
-			"+" => 87,
-			"<=" => 88,
-			"<" => 89,
-			"-" => 90,
-			"==" => 91,
-			">" => 93,
-			">=" => 94,
-			"^" => 95,
-			"/" => 96,
-			"~=" => 97
+			"-" => 24,
+			'NAME' => 4,
+			'TRUE' => 25,
+			"{" => 38,
+			'NOT' => 27,
+			'LITERAL' => 29,
+			"(" => 39,
+			'NIL' => 30,
+			'FALSE' => 33,
+			'FUNCTION' => 34,
+			'NUMBER' => 36
 		},
-		DEFAULT => -97
+		GOTOS => {
+			'exp' => 100,
+			'functioncall' => 31,
+			'explist1' => 119,
+			'function' => 26,
+			'tableconstructor' => 32,
+			'var' => 35,
+			'primary' => 28
+		}
 	},
 	{#State 69
-		DEFAULT => -90
+		ACTIONS => {
+			"^" => 80
+		},
+		DEFAULT => -61
 	},
 	{#State 70
-		DEFAULT => -94
+		ACTIONS => {
+			"^" => 80
+		},
+		DEFAULT => -62
 	},
 	{#State 71
-		DEFAULT => -39
+		DEFAULT => -81
 	},
 	{#State 72
-		DEFAULT => -78
+		ACTIONS => {
+			'NAME' => 122,
+			"..." => 123,
+			")" => 121
+		},
+		GOTOS => {
+			'parlist' => 120,
+			'parlist1' => 124
+		}
 	},
 	{#State 73
 		ACTIONS => {
-			'AND' => 83,
-			".." => 84,
-			"*" => 85,
-			'OR' => 86,
-			"+" => 87,
-			"<=" => 88,
-			"<" => 89,
-			"-" => 90,
-			"==" => 91,
-			">" => 93,
-			">=" => 94,
-			"^" => 95,
-			"/" => 96,
-			"~=" => 97
+			"-" => 24,
+			'NAME' => 4,
+			'TRUE' => 25,
+			"{" => 38,
+			'NOT' => 27,
+			'LITERAL' => 29,
+			"(" => 39,
+			'NIL' => 30,
+			'FALSE' => 33,
+			'FUNCTION' => 34,
+			'NUMBER' => 36
 		},
-		DEFAULT => -43
+		GOTOS => {
+			'exp' => 125,
+			'functioncall' => 31,
+			'function' => 26,
+			'tableconstructor' => 32,
+			'var' => 35,
+			'primary' => 28
+		}
 	},
 	{#State 74
 		ACTIONS => {
-			")" => 122,
-			"," => 123
+			"-" => 24,
+			'NAME' => 4,
+			'TRUE' => 25,
+			"{" => 38,
+			'NOT' => 27,
+			'LITERAL' => 29,
+			"(" => 39,
+			'NIL' => 30,
+			'FALSE' => 33,
+			'FUNCTION' => 34,
+			'NUMBER' => 36
+		},
+		GOTOS => {
+			'exp' => 126,
+			'functioncall' => 31,
+			'function' => 26,
+			'tableconstructor' => 32,
+			'var' => 35,
+			'primary' => 28
 		}
 	},
 	{#State 75
 		ACTIONS => {
-			'NAME' => 124
+			"-" => 24,
+			'NAME' => 4,
+			'TRUE' => 25,
+			"{" => 38,
+			'NOT' => 27,
+			'LITERAL' => 29,
+			"(" => 39,
+			'NIL' => 30,
+			'FALSE' => 33,
+			'FUNCTION' => 34,
+			'NUMBER' => 36
+		},
+		GOTOS => {
+			'exp' => 127,
+			'functioncall' => 31,
+			'function' => 26,
+			'tableconstructor' => 32,
+			'var' => 35,
+			'primary' => 28
 		}
 	},
 	{#State 76
 		ACTIONS => {
-			'NAME' => 125
+			"-" => 24,
+			'NAME' => 4,
+			'TRUE' => 25,
+			"{" => 38,
+			'NOT' => 27,
+			'LITERAL' => 29,
+			"(" => 39,
+			'NIL' => 30,
+			'FALSE' => 33,
+			'FUNCTION' => 34,
+			'NUMBER' => 36
+		},
+		GOTOS => {
+			'exp' => 128,
+			'functioncall' => 31,
+			'function' => 26,
+			'tableconstructor' => 32,
+			'var' => 35,
+			'primary' => 28
 		}
 	},
 	{#State 77
 		ACTIONS => {
-			")" => 129,
-			'NAME' => 126,
-			"..." => 128
+			"-" => 24,
+			'NAME' => 4,
+			'TRUE' => 25,
+			"{" => 38,
+			'NOT' => 27,
+			'LITERAL' => 29,
+			"(" => 39,
+			'NIL' => 30,
+			'FALSE' => 33,
+			'FUNCTION' => 34,
+			'NUMBER' => 36
 		},
 		GOTOS => {
-			'parlist' => 127,
-			'parlist1' => 130
+			'exp' => 129,
+			'functioncall' => 31,
+			'function' => 26,
+			'tableconstructor' => 32,
+			'var' => 35,
+			'primary' => 28
 		}
 	},
 	{#State 78
-		DEFAULT => -22
+		ACTIONS => {
+			"-" => 24,
+			'NAME' => 4,
+			'TRUE' => 25,
+			"{" => 38,
+			'NOT' => 27,
+			'LITERAL' => 29,
+			"(" => 39,
+			'NIL' => 30,
+			'FALSE' => 33,
+			'FUNCTION' => 34,
+			'NUMBER' => 36
+		},
+		GOTOS => {
+			'exp' => 130,
+			'functioncall' => 31,
+			'function' => 26,
+			'tableconstructor' => 32,
+			'var' => 35,
+			'primary' => 28
+		}
 	},
 	{#State 79
 		ACTIONS => {
-			"{" => 21,
-			'LITERAL' => 19,
-			"(" => 26
+			"-" => 24,
+			'NAME' => 4,
+			'TRUE' => 25,
+			"{" => 38,
+			'NOT' => 27,
+			'LITERAL' => 29,
+			"(" => 39,
+			'NIL' => 30,
+			'FALSE' => 33,
+			'FUNCTION' => 34,
+			'NUMBER' => 36
 		},
 		GOTOS => {
-			'args' => 131,
-			'tableconstructor' => 25
+			'exp' => 131,
+			'functioncall' => 31,
+			'function' => 26,
+			'tableconstructor' => 32,
+			'var' => 35,
+			'primary' => 28
 		}
 	},
 	{#State 80
-		DEFAULT => -81
+		ACTIONS => {
+			"-" => 24,
+			'NAME' => 4,
+			'TRUE' => 25,
+			"{" => 38,
+			'NOT' => 27,
+			'LITERAL' => 29,
+			"(" => 39,
+			'NIL' => 30,
+			'FALSE' => 33,
+			'FUNCTION' => 34,
+			'NUMBER' => 36
+		},
+		GOTOS => {
+			'exp' => 132,
+			'functioncall' => 31,
+			'function' => 26,
+			'tableconstructor' => 32,
+			'var' => 35,
+			'primary' => 28
+		}
 	},
 	{#State 81
 		ACTIONS => {
-			"^" => 95
+			"-" => 24,
+			'NAME' => 4,
+			'TRUE' => 25,
+			"{" => 38,
+			'NOT' => 27,
+			'LITERAL' => 29,
+			"(" => 39,
+			'NIL' => 30,
+			'FALSE' => 33,
+			'FUNCTION' => 34,
+			'NUMBER' => 36
 		},
-		DEFAULT => -62
+		GOTOS => {
+			'exp' => 133,
+			'functioncall' => 31,
+			'function' => 26,
+			'tableconstructor' => 32,
+			'var' => 35,
+			'primary' => 28
+		}
 	},
 	{#State 82
 		ACTIONS => {
-			"^" => 95
+			":" => 134,
+			"(" => 46,
+			"{" => 38,
+			"[" => 45,
+			'LITERAL' => 42,
+			"." => 47
 		},
-		DEFAULT => -61
+		GOTOS => {
+			'tableconstructor' => 44,
+			'args' => 135,
+			'key' => 136
+		}
 	},
 	{#State 83
 		ACTIONS => {
-			'FUNCTION' => 33,
-			'NUMBER' => 36,
-			'NAME' => 7,
-			'NOT' => 37,
-			'LITERAL' => 39,
-			"{" => 21,
-			"-" => 41,
-			'FALSE' => 43,
-			'TRUE' => 45,
-			'NIL' => 46,
-			"(" => 47
+			"-" => 24,
+			'NAME' => 4,
+			'TRUE' => 25,
+			"{" => 38,
+			'NOT' => 27,
+			'LITERAL' => 29,
+			"(" => 39,
+			'NIL' => 30,
+			'FALSE' => 33,
+			'FUNCTION' => 34,
+			'NUMBER' => 36
 		},
 		GOTOS => {
-			'function' => 40,
-			'functioncall' => 35,
-			'var' => 34,
-			'exp' => 132,
-			'primary' => 38,
-			'tableconstructor' => 44
+			'exp' => 137,
+			'functioncall' => 31,
+			'function' => 26,
+			'tableconstructor' => 32,
+			'var' => 35,
+			'primary' => 28
 		}
 	},
 	{#State 84
 		ACTIONS => {
-			'FUNCTION' => 33,
-			'NUMBER' => 36,
-			'NAME' => 7,
-			'NOT' => 37,
-			'LITERAL' => 39,
-			"{" => 21,
-			"-" => 41,
-			'FALSE' => 43,
-			'TRUE' => 45,
-			'NIL' => 46,
-			"(" => 47
+			"-" => 24,
+			'NAME' => 4,
+			'TRUE' => 25,
+			"{" => 38,
+			'NOT' => 27,
+			'LITERAL' => 29,
+			"(" => 39,
+			'NIL' => 30,
+			'FALSE' => 33,
+			'FUNCTION' => 34,
+			'NUMBER' => 36
 		},
 		GOTOS => {
-			'function' => 40,
-			'functioncall' => 35,
-			'var' => 34,
-			'exp' => 133,
-			'primary' => 38,
-			'tableconstructor' => 44
+			'exp' => 138,
+			'functioncall' => 31,
+			'function' => 26,
+			'tableconstructor' => 32,
+			'var' => 35,
+			'primary' => 28
 		}
 	},
 	{#State 85
 		ACTIONS => {
-			'FUNCTION' => 33,
-			'NUMBER' => 36,
-			'NAME' => 7,
-			'NOT' => 37,
-			'LITERAL' => 39,
-			"{" => 21,
-			"-" => 41,
-			'FALSE' => 43,
-			'TRUE' => 45,
-			'NIL' => 46,
-			"(" => 47
+			"-" => 24,
+			'NAME' => 4,
+			'TRUE' => 25,
+			"{" => 38,
+			'NOT' => 27,
+			'LITERAL' => 29,
+			"(" => 39,
+			'NIL' => 30,
+			'FALSE' => 33,
+			'FUNCTION' => 34,
+			'NUMBER' => 36
 		},
 		GOTOS => {
-			'function' => 40,
-			'functioncall' => 35,
-			'var' => 34,
-			'exp' => 134,
-			'primary' => 38,
-			'tableconstructor' => 44
+			'exp' => 139,
+			'functioncall' => 31,
+			'function' => 26,
+			'tableconstructor' => 32,
+			'var' => 35,
+			'primary' => 28
 		}
 	},
 	{#State 86
 		ACTIONS => {
-			'FUNCTION' => 33,
-			'NUMBER' => 36,
-			'NAME' => 7,
-			'NOT' => 37,
-			'LITERAL' => 39,
-			"{" => 21,
-			"-" => 41,
-			'FALSE' => 43,
-			'TRUE' => 45,
-			'NIL' => 46,
-			"(" => 47
+			"-" => 24,
+			'NAME' => 4,
+			'TRUE' => 25,
+			"{" => 38,
+			'NOT' => 27,
+			'LITERAL' => 29,
+			"(" => 39,
+			'NIL' => 30,
+			'FALSE' => 33,
+			'FUNCTION' => 34,
+			'NUMBER' => 36
 		},
 		GOTOS => {
-			'function' => 40,
-			'functioncall' => 35,
-			'var' => 34,
-			'exp' => 135,
-			'primary' => 38,
-			'tableconstructor' => 44
+			'exp' => 140,
+			'functioncall' => 31,
+			'function' => 26,
+			'tableconstructor' => 32,
+			'var' => 35,
+			'primary' => 28
 		}
 	},
 	{#State 87
 		ACTIONS => {
-			'FUNCTION' => 33,
-			'NUMBER' => 36,
-			'NAME' => 7,
-			'NOT' => 37,
-			'LITERAL' => 39,
-			"{" => 21,
-			"-" => 41,
-			'FALSE' => 43,
-			'TRUE' => 45,
-			'NIL' => 46,
-			"(" => 47
+			"-" => 24,
+			'NAME' => 4,
+			'TRUE' => 25,
+			"{" => 38,
+			'NOT' => 27,
+			'LITERAL' => 29,
+			"(" => 39,
+			'NIL' => 30,
+			'FALSE' => 33,
+			'FUNCTION' => 34,
+			'NUMBER' => 36
 		},
 		GOTOS => {
-			'function' => 40,
-			'functioncall' => 35,
-			'var' => 34,
-			'exp' => 136,
-			'primary' => 38,
-			'tableconstructor' => 44
+			'exp' => 141,
+			'functioncall' => 31,
+			'function' => 26,
+			'tableconstructor' => 32,
+			'var' => 35,
+			'primary' => 28
 		}
 	},
 	{#State 88
-		ACTIONS => {
-			'FUNCTION' => 33,
-			'NUMBER' => 36,
-			'NAME' => 7,
-			'NOT' => 37,
-			'LITERAL' => 39,
-			"{" => 21,
-			"-" => 41,
-			'FALSE' => 43,
-			'TRUE' => 45,
-			'NIL' => 46,
-			"(" => 47
-		},
-		GOTOS => {
-			'function' => 40,
-			'functioncall' => 35,
-			'var' => 34,
-			'exp' => 137,
-			'primary' => 38,
-			'tableconstructor' => 44
-		}
+		DEFAULT => -90
 	},
 	{#State 89
 		ACTIONS => {
-			'FUNCTION' => 33,
-			'NUMBER' => 36,
-			'NAME' => 7,
-			'NOT' => 37,
-			'LITERAL' => 39,
-			"{" => 21,
-			"-" => 41,
-			'FALSE' => 43,
-			'TRUE' => 45,
-			'NIL' => 46,
-			"(" => 47
+			"-" => 24,
+			'NAME' => 4,
+			'TRUE' => 25,
+			"{" => 38,
+			'NOT' => 27,
+			'LITERAL' => 29,
+			"(" => 39,
+			'NIL' => 30,
+			'FALSE' => 33,
+			'FUNCTION' => 34,
+			'NUMBER' => 36
 		},
 		GOTOS => {
-			'function' => 40,
-			'functioncall' => 35,
-			'var' => 34,
-			'exp' => 138,
-			'primary' => 38,
-			'tableconstructor' => 44
+			'exp' => 142,
+			'functioncall' => 31,
+			'function' => 26,
+			'tableconstructor' => 32,
+			'var' => 35,
+			'primary' => 28
 		}
 	},
 	{#State 90
-		ACTIONS => {
-			'FUNCTION' => 33,
-			'NUMBER' => 36,
-			'NAME' => 7,
-			'NOT' => 37,
-			'LITERAL' => 39,
-			"{" => 21,
-			"-" => 41,
-			'FALSE' => 43,
-			'TRUE' => 45,
-			'NIL' => 46,
-			"(" => 47
-		},
-		GOTOS => {
-			'function' => 40,
-			'functioncall' => 35,
-			'var' => 34,
-			'exp' => 139,
-			'primary' => 38,
-			'tableconstructor' => 44
-		}
+		DEFAULT => -94
 	},
 	{#State 91
 		ACTIONS => {
-			'FUNCTION' => 33,
-			'NUMBER' => 36,
-			'NAME' => 7,
-			'NOT' => 37,
-			'LITERAL' => 39,
-			"{" => 21,
-			"-" => 41,
-			'FALSE' => 43,
-			'TRUE' => 45,
-			'NIL' => 46,
-			"(" => 47
+			"-" => 74,
+			".." => 73,
+			"<" => 76,
+			"~=" => 75,
+			"+" => 77,
+			"==" => 78,
+			">=" => 79,
+			"^" => 80,
+			"*" => 81,
+			"/" => 83,
+			'AND' => 84,
+			'OR' => 85,
+			"<=" => 86,
+			">" => 87
 		},
-		GOTOS => {
-			'function' => 40,
-			'functioncall' => 35,
-			'var' => 34,
-			'exp' => 140,
-			'primary' => 38,
-			'tableconstructor' => 44
-		}
+		DEFAULT => -97
 	},
 	{#State 92
-		DEFAULT => -4,
-		GOTOS => {
-			'block' => 141,
-			'chunk' => 48
-		}
+		ACTIONS => {
+			"=" => 143
+		},
+		DEFAULT => -34
 	},
 	{#State 93
 		ACTIONS => {
-			'FUNCTION' => 33,
-			'NUMBER' => 36,
-			'NAME' => 7,
-			'NOT' => 37,
-			'LITERAL' => 39,
-			"{" => 21,
-			"-" => 41,
-			'FALSE' => 43,
-			'TRUE' => 45,
-			'NIL' => 46,
-			"(" => 47
-		},
-		GOTOS => {
-			'function' => 40,
-			'functioncall' => 35,
-			'var' => 34,
-			'exp' => 142,
-			'primary' => 38,
-			'tableconstructor' => 44
+			"}" => 144
 		}
 	},
 	{#State 94
 		ACTIONS => {
-			'FUNCTION' => 33,
-			'NUMBER' => 36,
-			'NAME' => 7,
-			'NOT' => 37,
-			'LITERAL' => 39,
-			"{" => 21,
-			"-" => 41,
-			'FALSE' => 43,
-			'TRUE' => 45,
-			'NIL' => 46,
-			"(" => 47
+			";" => 146,
+			"," => 147
 		},
+		DEFAULT => -92,
 		GOTOS => {
-			'function' => 40,
-			'functioncall' => 35,
-			'var' => 34,
-			'exp' => 143,
-			'primary' => 38,
-			'tableconstructor' => 44
+			'fieldsep' => 145
 		}
 	},
 	{#State 95
 		ACTIONS => {
-			'FUNCTION' => 33,
-			'NUMBER' => 36,
-			'NAME' => 7,
-			'NOT' => 37,
-			'LITERAL' => 39,
-			"{" => 21,
-			"-" => 41,
-			'FALSE' => 43,
-			'TRUE' => 45,
-			'NIL' => 46,
-			"(" => 47
-		},
-		GOTOS => {
-			'function' => 40,
-			'functioncall' => 35,
-			'var' => 34,
-			'exp' => 144,
-			'primary' => 38,
-			'tableconstructor' => 44
+			"-" => 74,
+			".." => 73,
+			"<" => 76,
+			"~=" => 75,
+			"+" => 77,
+			"/" => 83,
+			"==" => 78,
+			">=" => 79,
+			'AND' => 84,
+			"^" => 80,
+			"*" => 81,
+			"<=" => 86,
+			'OR' => 85,
+			")" => 148,
+			">" => 87
 		}
 	},
 	{#State 96
 		ACTIONS => {
-			'FUNCTION' => 33,
-			'NUMBER' => 36,
-			'NAME' => 7,
-			'NOT' => 37,
-			'LITERAL' => 39,
-			"{" => 21,
-			"-" => 41,
-			'FALSE' => 43,
-			'TRUE' => 45,
-			'NIL' => 46,
-			"(" => 47
+			"(" => 46,
+			"{" => 38,
+			'LITERAL' => 42
 		},
 		GOTOS => {
-			'function' => 40,
-			'functioncall' => 35,
-			'var' => 34,
-			'exp' => 145,
-			'primary' => 38,
-			'tableconstructor' => 44
+			'tableconstructor' => 44,
+			'args' => 149
 		}
 	},
 	{#State 97
 		ACTIONS => {
-			'FUNCTION' => 33,
-			'NUMBER' => 36,
-			'NAME' => 7,
-			'NOT' => 37,
-			'LITERAL' => 39,
-			"{" => 21,
-			"-" => 41,
-			'FALSE' => 43,
-			'TRUE' => 45,
-			'NIL' => 46,
-			"(" => 47
-		},
-		GOTOS => {
-			'function' => 40,
-			'functioncall' => 35,
-			'var' => 34,
-			'exp' => 146,
-			'primary' => 38,
-			'tableconstructor' => 44
+			"-" => 74,
+			".." => 73,
+			"<" => 76,
+			"~=" => 75,
+			"+" => 77,
+			"/" => 83,
+			"==" => 78,
+			">=" => 79,
+			'AND' => 84,
+			"^" => 80,
+			"*" => 81,
+			"<=" => 86,
+			'OR' => 85,
+			"]" => 150,
+			">" => 87
 		}
 	},
 	{#State 98
 		ACTIONS => {
-			")" => 147,
-			"*" => 85,
-			"+" => 87,
-			'OR' => 86,
-			"<=" => 88,
-			"<" => 89,
-			"-" => 90,
-			'AND' => 83,
-			"==" => 91,
-			">" => 93,
-			"/" => 96,
-			"^" => 95,
-			">=" => 94,
-			".." => 84,
-			"~=" => 97
+			"," => 151,
+			")" => 152
 		}
 	},
 	{#State 99
-		ACTIONS => {
-			";" => 56
-		},
-		DEFAULT => -6,
-		GOTOS => {
-			'_semicolon_opt' => 148
-		}
+		DEFAULT => -78
 	},
 	{#State 100
 		ACTIONS => {
-			'NUMBER' => 36,
-			'NAME' => 7,
-			'NOT' => 37,
-			'NIL' => 46,
-			"(" => 47,
-			'FUNCTION' => 33,
-			'LITERAL' => 39,
-			"{" => 21,
-			"-" => 41,
-			'FALSE' => 43,
-			'TRUE' => 45
+			"-" => 74,
+			"<" => 76,
+			"==" => 78,
+			">=" => 79,
+			"*" => 81,
+			'AND' => 84,
+			'OR' => 85,
+			"<=" => 86,
+			">" => 87,
+			".." => 73,
+			"~=" => 75,
+			"+" => 77,
+			"^" => 80,
+			"/" => 83
 		},
-		DEFAULT => -10,
-		GOTOS => {
-			'function' => 40,
-			'functioncall' => 35,
-			'var' => 34,
-			'exp' => 73,
-			'explist1' => 149,
-			'primary' => 38,
-			'tableconstructor' => 44
-		}
+		DEFAULT => -43
 	},
 	{#State 101
-		DEFAULT => -11
+		DEFAULT => -39
 	},
 	{#State 102
-		ACTIONS => {
-			'FUNCTION' => 33,
-			'NUMBER' => 36,
-			'NAME' => 7,
-			'NOT' => 37,
-			'LITERAL' => 39,
-			"{" => 21,
-			"-" => 41,
-			'FALSE' => 43,
-			'TRUE' => 45,
-			'NIL' => 46,
-			"(" => 47
-		},
+		DEFAULT => -4,
 		GOTOS => {
-			'function' => 40,
-			'functioncall' => 35,
-			'var' => 34,
-			'exp' => 150,
-			'primary' => 38,
-			'tableconstructor' => 44
+			'block' => 153,
+			'chunk' => 18
 		}
 	},
 	{#State 103
 		ACTIONS => {
-			'FUNCTION' => 33,
-			'NUMBER' => 36,
-			'NAME' => 7,
-			'NOT' => 37,
-			'LITERAL' => 39,
-			"{" => 21,
-			"-" => 41,
-			'FALSE' => 43,
-			'TRUE' => 45,
-			'NIL' => 46,
-			"(" => 47
+			"(" => 46,
+			"{" => 38,
+			'LITERAL' => 42
 		},
 		GOTOS => {
-			'function' => 40,
-			'functioncall' => 35,
-			'var' => 34,
-			'exp' => 151,
-			'primary' => 38,
-			'tableconstructor' => 44
+			'tableconstructor' => 44,
+			'args' => 154
 		}
 	},
 	{#State 104
-		ACTIONS => {
-			'FUNCTION' => 33,
-			'NUMBER' => 36,
-			'NAME' => 7,
-			'NOT' => 37,
-			'LITERAL' => 39,
-			"{" => 21,
-			"-" => 41,
-			'FALSE' => 43,
-			'TRUE' => 45,
-			'NIL' => 46,
-			"(" => 47
-		},
-		GOTOS => {
-			'function' => 40,
-			'functioncall' => 35,
-			'var' => 34,
-			'exp' => 73,
-			'explist1' => 152,
-			'primary' => 38,
-			'tableconstructor' => 44
-		}
+		DEFAULT => -22
 	},
 	{#State 105
 		ACTIONS => {
-			'NAME' => 153
+			'NAME' => 155
 		}
 	},
 	{#State 106
 		ACTIONS => {
-			"(" => 77
-		},
-		GOTOS => {
-			'funcbody' => 154
+			'NAME' => 156
 		}
 	},
 	{#State 107
 		ACTIONS => {
-			'FUNCTION' => 33,
-			'NUMBER' => 36,
-			'NAME' => 7,
-			'NOT' => 37,
-			'LITERAL' => 39,
-			"{" => 21,
-			"-" => 41,
-			'FALSE' => 43,
-			'TRUE' => 45,
-			'NIL' => 46,
-			"(" => 47
+			":" => 40,
+			"(" => 46,
+			"{" => 38,
+			"[" => 45,
+			'LITERAL' => 42,
+			"." => 47
 		},
 		GOTOS => {
-			'function' => 40,
-			'functioncall' => 35,
-			'var' => 34,
-			'exp' => 73,
-			'explist1' => 155,
-			'primary' => 38,
-			'tableconstructor' => 44
+			'tableconstructor' => 44,
+			'args' => 41,
+			'key' => 43
 		}
 	},
 	{#State 108
-		DEFAULT => -14
-	},
-	{#State 109
-		DEFAULT => -4,
-		GOTOS => {
-			'block' => 156,
-			'chunk' => 48
-		}
-	},
-	{#State 110
 		ACTIONS => {
-			":" => 18,
-			'LITERAL' => 19,
-			"[" => 20,
-			"{" => 21,
-			"." => 23,
-			"(" => 26
+			":" => 49,
+			"{" => 38,
+			'LITERAL' => 42,
+			"(" => 46,
+			"[" => 45,
+			"." => 47
 		},
 		DEFAULT => -32,
 		GOTOS => {
-			'args' => 22,
-			'key' => 24,
-			'tableconstructor' => 25
+			'tableconstructor' => 44,
+			'args' => 50,
+			'key' => 51
 		}
+	},
+	{#State 109
+		ACTIONS => {
+			"," => 151
+		},
+		DEFAULT => -12
+	},
+	{#State 110
+		DEFAULT => -14
 	},
 	{#State 111
 		ACTIONS => {
-			"{" => 21,
-			"." => 23,
-			":" => 30,
-			'LITERAL' => 19,
-			"[" => 20,
-			"(" => 26
+			"(" => 72
 		},
 		GOTOS => {
-			'args' => 31,
-			'key' => 32,
-			'tableconstructor' => 25
+			'funcbody' => 157
 		}
 	},
 	{#State 112
 		ACTIONS => {
-			"," => 123
-		},
-		DEFAULT => -12
-	},
-	{#State 113
-		ACTIONS => {
-			"{" => 21,
-			"." => 23,
-			":" => 159,
-			'LITERAL' => 19,
-			"[" => 20,
-			"(" => 26
+			"-" => 24,
+			'NAME' => 4,
+			'TRUE' => 25,
+			"{" => 38,
+			'NOT' => 27,
+			'LITERAL' => 29,
+			"(" => 39,
+			'NIL' => 30,
+			'FALSE' => 33,
+			'FUNCTION' => 34,
+			'NUMBER' => 36
 		},
 		GOTOS => {
-			'args' => 157,
-			'key' => 158,
-			'tableconstructor' => 25
+			'exp' => 100,
+			'functioncall' => 31,
+			'explist1' => 158,
+			'function' => 26,
+			'tableconstructor' => 32,
+			'var' => 35,
+			'primary' => 28
+		}
+	},
+	{#State 113
+		DEFAULT => -4,
+		GOTOS => {
+			'block' => 159,
+			'chunk' => 18
 		}
 	},
 	{#State 114
-		DEFAULT => -74
-	},
-	{#State 115
-		DEFAULT => -38
-	},
-	{#State 116
-		DEFAULT => -89
-	},
-	{#State 117
-		ACTIONS => {
-			'FUNCTION' => 33,
-			'NUMBER' => 36,
-			'NAME' => 7,
-			'NOT' => 37,
-			'LITERAL' => 39,
-			"{" => 21,
-			"-" => 41,
-			'FALSE' => 43,
-			'TRUE' => 45,
-			'NIL' => 46,
-			"(" => 47
-		},
-		GOTOS => {
-			'function' => 40,
-			'functioncall' => 35,
-			'var' => 34,
-			'exp' => 160,
-			'primary' => 38,
-			'tableconstructor' => 44
-		}
-	},
-	{#State 118
-		ACTIONS => {
-			'FUNCTION' => 33,
-			'NUMBER' => 36,
-			'NAME' => 65,
-			'NOT' => 37,
-			'LITERAL' => 39,
-			"[" => 67,
-			"{" => 21,
-			"-" => 41,
-			'FALSE' => 43,
-			'TRUE' => 45,
-			'NIL' => 46,
-			"(" => 47
-		},
-		DEFAULT => -91,
-		GOTOS => {
-			'function' => 40,
-			'functioncall' => 35,
-			'var' => 34,
-			'exp' => 68,
-			'field' => 161,
-			'primary' => 38,
-			'tableconstructor' => 44
-		}
-	},
-	{#State 119
-		DEFAULT => -99
-	},
-	{#State 120
-		DEFAULT => -98
-	},
-	{#State 121
-		ACTIONS => {
-			"*" => 85,
-			"+" => 87,
-			'OR' => 86,
-			"<=" => 88,
-			"<" => 89,
-			'AND' => 83,
-			"-" => 90,
-			"==" => 91,
-			"]" => 162,
-			">" => 93,
-			"/" => 96,
-			"^" => 95,
-			">=" => 94,
-			".." => 84,
-			"~=" => 97
-		}
-	},
-	{#State 122
-		DEFAULT => -77
-	},
-	{#State 123
-		ACTIONS => {
-			'FUNCTION' => 33,
-			'NUMBER' => 36,
-			'NAME' => 7,
-			'NOT' => 37,
-			'LITERAL' => 39,
-			"{" => 21,
-			"-" => 41,
-			'FALSE' => 43,
-			'TRUE' => 45,
-			'NIL' => 46,
-			"(" => 47
-		},
-		GOTOS => {
-			'function' => 40,
-			'functioncall' => 35,
-			'var' => 34,
-			'exp' => 163,
-			'primary' => 38,
-			'tableconstructor' => 44
-		}
-	},
-	{#State 124
-		DEFAULT => -29
-	},
-	{#State 125
-		DEFAULT => -30
-	},
-	{#State 126
-		DEFAULT => -88
-	},
-	{#State 127
-		ACTIONS => {
-			"," => 164
-		},
-		DEFAULT => -85
-	},
-	{#State 128
-		DEFAULT => -86
-	},
-	{#State 129
-		DEFAULT => -4,
-		GOTOS => {
-			'block' => 165,
-			'chunk' => 48
-		}
-	},
-	{#State 130
-		ACTIONS => {
-			")" => 166
-		}
-	},
-	{#State 131
-		DEFAULT => -76
-	},
-	{#State 132
-		ACTIONS => {
-			".." => 84,
-			"*" => 85,
-			"+" => 87,
-			"<=" => 88,
-			"<" => 89,
-			"-" => 90,
-			"==" => 91,
-			">" => 93,
-			">=" => 94,
-			"^" => 95,
-			"/" => 96,
-			"~=" => 97
-		},
-		DEFAULT => -59
-	},
-	{#State 133
-		ACTIONS => {
-			"*" => 85,
-			"+" => 87,
-			"-" => 90,
-			"^" => 95,
-			"/" => 96
-		},
-		DEFAULT => -52
-	},
-	{#State 134
-		ACTIONS => {
-			"^" => 95
-		},
-		DEFAULT => -49
-	},
-	{#State 135
-		ACTIONS => {
-			".." => 84,
-			"*" => 85,
-			"+" => 87,
-			"<=" => 88,
-			"<" => 89,
-			"-" => 90,
-			"==" => 91,
-			">" => 93,
-			">=" => 94,
-			"^" => 95,
-			"/" => 96,
-			"~=" => 97
-		},
-		DEFAULT => -60
-	},
-	{#State 136
-		ACTIONS => {
-			"*" => 85,
-			"^" => 95,
-			"/" => 96
-		},
-		DEFAULT => -47
-	},
-	{#State 137
-		ACTIONS => {
-			".." => 84,
-			"*" => 85,
-			"+" => 87,
-			"-" => 90,
-			"^" => 95,
-			"/" => 96
-		},
-		DEFAULT => -54
-	},
-	{#State 138
-		ACTIONS => {
-			".." => 84,
-			"*" => 85,
-			"+" => 87,
-			"-" => 90,
-			"^" => 95,
-			"/" => 96
-		},
-		DEFAULT => -53
-	},
-	{#State 139
-		ACTIONS => {
-			"*" => 85,
-			"^" => 95,
-			"/" => 96
-		},
-		DEFAULT => -48
-	},
-	{#State 140
-		ACTIONS => {
-			".." => 84,
-			"*" => 85,
-			"+" => 87,
-			"-" => 90,
-			"^" => 95,
-			"/" => 96
-		},
-		DEFAULT => -57
-	},
-	{#State 141
-		ACTIONS => {
-			'END' => 167
-		}
-	},
-	{#State 142
-		ACTIONS => {
-			".." => 84,
-			"*" => 85,
-			"+" => 87,
-			"-" => 90,
-			"^" => 95,
-			"/" => 96
-		},
-		DEFAULT => -55
-	},
-	{#State 143
-		ACTIONS => {
-			".." => 84,
-			"*" => 85,
-			"+" => 87,
-			"-" => 90,
-			"^" => 95,
-			"/" => 96
-		},
-		DEFAULT => -56
-	},
-	{#State 144
-		ACTIONS => {
-			"^" => 95
-		},
-		DEFAULT => -51
-	},
-	{#State 145
-		ACTIONS => {
-			"^" => 95
-		},
-		DEFAULT => -50
-	},
-	{#State 146
-		ACTIONS => {
-			".." => 84,
-			"*" => 85,
-			"+" => 87,
-			"-" => 90,
-			"^" => 95,
-			"/" => 96
-		},
-		DEFAULT => -58
-	},
-	{#State 147
-		ACTIONS => {
-			"(" => 26,
-			'LITERAL' => 19,
-			"[" => 20,
-			"{" => 21,
-			"." => 23,
-			":" => 159
-		},
-		DEFAULT => -70,
-		GOTOS => {
-			'args' => 157,
-			'key' => 158,
-			'tableconstructor' => 25
-		}
-	},
-	{#State 148
 		DEFAULT => -8
 	},
-	{#State 149
+	{#State 115
 		ACTIONS => {
-			"," => 123
+			"," => 151
 		},
 		DEFAULT => -9
 	},
-	{#State 150
+	{#State 116
 		ACTIONS => {
-			'AND' => 83,
-			".." => 84,
-			"*" => 85,
-			'OR' => 86,
-			"+" => 87,
-			"<=" => 88,
-			"<" => 89,
-			"-" => 90,
-			"==" => 91,
-			">" => 93,
-			">=" => 94,
-			"^" => 95,
-			"/" => 96,
-			"~=" => 97
+			"-" => 74,
+			"<" => 76,
+			"==" => 78,
+			">=" => 79,
+			"*" => 81,
+			'AND' => 84,
+			'OR' => 85,
+			"<=" => 86,
+			">" => 87,
+			".." => 73,
+			"~=" => 75,
+			"+" => 77,
+			"^" => 80,
+			"/" => 83
 		},
 		DEFAULT => -16
 	},
+	{#State 117
+		ACTIONS => {
+			"-" => 74,
+			".." => 73,
+			"<" => 76,
+			"~=" => 75,
+			"+" => 77,
+			"/" => 83,
+			"," => 160,
+			"==" => 78,
+			">=" => 79,
+			'AND' => 84,
+			"^" => 80,
+			"*" => 81,
+			"<=" => 86,
+			'OR' => 85,
+			">" => 87
+		}
+	},
+	{#State 118
+		DEFAULT => -40
+	},
+	{#State 119
+		ACTIONS => {
+			"," => 151,
+			'DO' => 161
+		}
+	},
+	{#State 120
+		ACTIONS => {
+			"," => 162
+		},
+		DEFAULT => -85
+	},
+	{#State 121
+		DEFAULT => -4,
+		GOTOS => {
+			'block' => 163,
+			'chunk' => 18
+		}
+	},
+	{#State 122
+		DEFAULT => -88
+	},
+	{#State 123
+		DEFAULT => -86
+	},
+	{#State 124
+		ACTIONS => {
+			")" => 164
+		}
+	},
+	{#State 125
+		ACTIONS => {
+			"-" => 74,
+			"*" => 81,
+			"+" => 77,
+			"^" => 80,
+			"/" => 83
+		},
+		DEFAULT => -52
+	},
+	{#State 126
+		ACTIONS => {
+			"*" => 81,
+			"^" => 80,
+			"/" => 83
+		},
+		DEFAULT => -48
+	},
+	{#State 127
+		ACTIONS => {
+			"-" => 74,
+			"*" => 81,
+			".." => 73,
+			"+" => 77,
+			"^" => 80,
+			"/" => 83
+		},
+		DEFAULT => -58
+	},
+	{#State 128
+		ACTIONS => {
+			"-" => 74,
+			"*" => 81,
+			".." => 73,
+			"+" => 77,
+			"^" => 80,
+			"/" => 83
+		},
+		DEFAULT => -53
+	},
+	{#State 129
+		ACTIONS => {
+			"*" => 81,
+			"^" => 80,
+			"/" => 83
+		},
+		DEFAULT => -47
+	},
+	{#State 130
+		ACTIONS => {
+			"-" => 74,
+			"*" => 81,
+			".." => 73,
+			"+" => 77,
+			"^" => 80,
+			"/" => 83
+		},
+		DEFAULT => -57
+	},
+	{#State 131
+		ACTIONS => {
+			"-" => 74,
+			"*" => 81,
+			".." => 73,
+			"+" => 77,
+			"^" => 80,
+			"/" => 83
+		},
+		DEFAULT => -56
+	},
+	{#State 132
+		ACTIONS => {
+			"^" => 80
+		},
+		DEFAULT => -51
+	},
+	{#State 133
+		ACTIONS => {
+			"^" => 80
+		},
+		DEFAULT => -49
+	},
+	{#State 134
+		ACTIONS => {
+			'NAME' => 165
+		}
+	},
+	{#State 135
+		DEFAULT => -71
+	},
+	{#State 136
+		DEFAULT => -35
+	},
+	{#State 137
+		ACTIONS => {
+			"^" => 80
+		},
+		DEFAULT => -50
+	},
+	{#State 138
+		ACTIONS => {
+			"-" => 74,
+			"<" => 76,
+			"==" => 78,
+			">=" => 79,
+			"*" => 81,
+			"<=" => 86,
+			">" => 87,
+			".." => 73,
+			"~=" => 75,
+			"+" => 77,
+			"^" => 80,
+			"/" => 83
+		},
+		DEFAULT => -59
+	},
+	{#State 139
+		ACTIONS => {
+			"-" => 74,
+			"<" => 76,
+			"==" => 78,
+			">=" => 79,
+			"*" => 81,
+			"<=" => 86,
+			">" => 87,
+			".." => 73,
+			"~=" => 75,
+			"+" => 77,
+			"^" => 80,
+			"/" => 83
+		},
+		DEFAULT => -60
+	},
+	{#State 140
+		ACTIONS => {
+			"-" => 74,
+			"*" => 81,
+			".." => 73,
+			"+" => 77,
+			"^" => 80,
+			"/" => 83
+		},
+		DEFAULT => -54
+	},
+	{#State 141
+		ACTIONS => {
+			"-" => 74,
+			"*" => 81,
+			".." => 73,
+			"+" => 77,
+			"^" => 80,
+			"/" => 83
+		},
+		DEFAULT => -55
+	},
+	{#State 142
+		ACTIONS => {
+			"-" => 74,
+			".." => 73,
+			"<" => 76,
+			"~=" => 75,
+			"+" => 77,
+			"/" => 83,
+			"==" => 78,
+			">=" => 79,
+			'AND' => 84,
+			"^" => 80,
+			"*" => 81,
+			"<=" => 86,
+			'OR' => 85,
+			"]" => 166,
+			">" => 87
+		}
+	},
+	{#State 143
+		ACTIONS => {
+			"-" => 24,
+			'NAME' => 4,
+			'TRUE' => 25,
+			"{" => 38,
+			'NOT' => 27,
+			'LITERAL' => 29,
+			"(" => 39,
+			'NIL' => 30,
+			'FALSE' => 33,
+			'FUNCTION' => 34,
+			'NUMBER' => 36
+		},
+		GOTOS => {
+			'exp' => 167,
+			'functioncall' => 31,
+			'function' => 26,
+			'tableconstructor' => 32,
+			'var' => 35,
+			'primary' => 28
+		}
+	},
+	{#State 144
+		DEFAULT => -89
+	},
+	{#State 145
+		ACTIONS => {
+			"-" => 24,
+			'NAME' => 92,
+			'TRUE' => 25,
+			"{" => 38,
+			'NOT' => 27,
+			'LITERAL' => 29,
+			"(" => 39,
+			'NIL' => 30,
+			'FALSE' => 33,
+			'FUNCTION' => 34,
+			"[" => 89,
+			'NUMBER' => 36
+		},
+		DEFAULT => -91,
+		GOTOS => {
+			'exp' => 91,
+			'functioncall' => 31,
+			'function' => 26,
+			'tableconstructor' => 32,
+			'var' => 35,
+			'primary' => 28,
+			'field' => 168
+		}
+	},
+	{#State 146
+		DEFAULT => -99
+	},
+	{#State 147
+		DEFAULT => -98
+	},
+	{#State 148
+		ACTIONS => {
+			":" => 134,
+			"[" => 45,
+			"(" => 46,
+			"." => 47,
+			'LITERAL' => 42,
+			"{" => 38
+		},
+		DEFAULT => -70,
+		GOTOS => {
+			'tableconstructor' => 44,
+			'args' => 135,
+			'key' => 136
+		}
+	},
+	{#State 149
+		DEFAULT => -76
+	},
+	{#State 150
+		DEFAULT => -38
+	},
 	{#State 151
 		ACTIONS => {
-			"*" => 85,
-			"+" => 87,
-			'OR' => 86,
-			"," => 168,
-			"<=" => 88,
-			"<" => 89,
-			"-" => 90,
-			'AND' => 83,
-			"==" => 91,
-			">" => 93,
-			"/" => 96,
-			"^" => 95,
-			">=" => 94,
-			".." => 84,
-			"~=" => 97
+			"-" => 24,
+			'NAME' => 4,
+			'TRUE' => 25,
+			"{" => 38,
+			'NOT' => 27,
+			'LITERAL' => 29,
+			"(" => 39,
+			'NIL' => 30,
+			'FALSE' => 33,
+			'FUNCTION' => 34,
+			'NUMBER' => 36
+		},
+		GOTOS => {
+			'exp' => 169,
+			'functioncall' => 31,
+			'function' => 26,
+			'tableconstructor' => 32,
+			'var' => 35,
+			'primary' => 28
 		}
 	},
 	{#State 152
-		ACTIONS => {
-			'DO' => 169,
-			"," => 123
-		}
+		DEFAULT => -77
 	},
 	{#State 153
-		DEFAULT => -40
-	},
-	{#State 154
-		DEFAULT => -23
-	},
-	{#State 155
-		ACTIONS => {
-			"," => 123
-		},
-		DEFAULT => -24
-	},
-	{#State 156
 		DEFAULT => -27,
 		GOTOS => {
 			'_elseif_star' => 170
 		}
 	},
+	{#State 154
+		DEFAULT => -74
+	},
+	{#State 155
+		DEFAULT => -29
+	},
+	{#State 156
+		DEFAULT => -30
+	},
 	{#State 157
-		DEFAULT => -71
+		DEFAULT => -23
 	},
 	{#State 158
-		DEFAULT => -35
+		ACTIONS => {
+			"," => 151
+		},
+		DEFAULT => -24
 	},
 	{#State 159
 		ACTIONS => {
-			'NAME' => 171
+			'END' => 171
 		}
 	},
 	{#State 160
 		ACTIONS => {
-			'AND' => 83,
-			".." => 84,
-			"*" => 85,
-			'OR' => 86,
-			"+" => 87,
-			"<=" => 88,
-			"<" => 89,
-			"-" => 90,
-			"==" => 91,
-			">" => 93,
-			">=" => 94,
-			"^" => 95,
-			"/" => 96,
-			"~=" => 97
+			"-" => 24,
+			'NAME' => 4,
+			'TRUE' => 25,
+			"{" => 38,
+			'NOT' => 27,
+			'LITERAL' => 29,
+			"(" => 39,
+			'NIL' => 30,
+			'FALSE' => 33,
+			'FUNCTION' => 34,
+			'NUMBER' => 36
 		},
-		DEFAULT => -96
+		GOTOS => {
+			'exp' => 172,
+			'functioncall' => 31,
+			'function' => 26,
+			'tableconstructor' => 32,
+			'var' => 35,
+			'primary' => 28
+		}
 	},
 	{#State 161
-		DEFAULT => -93
+		DEFAULT => -4,
+		GOTOS => {
+			'block' => 173,
+			'chunk' => 18
+		}
 	},
 	{#State 162
 		ACTIONS => {
-			"=" => 172
+			'NAME' => 174,
+			"..." => 175
 		}
 	},
 	{#State 163
 		ACTIONS => {
-			'AND' => 83,
-			".." => 84,
-			"*" => 85,
-			'OR' => 86,
-			"+" => 87,
-			"<=" => 88,
-			"<" => 89,
-			"-" => 90,
-			"==" => 91,
-			">" => 93,
-			">=" => 94,
-			"^" => 95,
-			"/" => 96,
-			"~=" => 97
-		},
-		DEFAULT => -42
+			'END' => 176
+		}
 	},
 	{#State 164
-		ACTIONS => {
-			'NAME' => 173,
-			"..." => 174
+		DEFAULT => -4,
+		GOTOS => {
+			'block' => 177,
+			'chunk' => 18
 		}
 	},
 	{#State 165
 		ACTIONS => {
-			'END' => 175
+			"(" => 46,
+			"{" => 38,
+			'LITERAL' => 42
+		},
+		GOTOS => {
+			'tableconstructor' => 44,
+			'args' => 178
 		}
 	},
 	{#State 166
-		DEFAULT => -4,
-		GOTOS => {
-			'block' => 176,
-			'chunk' => 48
+		ACTIONS => {
+			"=" => 179
 		}
 	},
 	{#State 167
-		DEFAULT => -15
+		ACTIONS => {
+			"-" => 74,
+			".." => 73,
+			"<" => 76,
+			"~=" => 75,
+			"+" => 77,
+			"==" => 78,
+			">=" => 79,
+			"^" => 80,
+			"*" => 81,
+			"/" => 83,
+			'AND' => 84,
+			'OR' => 85,
+			"<=" => 86,
+			">" => 87
+		},
+		DEFAULT => -96
 	},
 	{#State 168
-		ACTIONS => {
-			'FUNCTION' => 33,
-			'NUMBER' => 36,
-			'NAME' => 7,
-			'NOT' => 37,
-			'LITERAL' => 39,
-			"{" => 21,
-			"-" => 41,
-			'FALSE' => 43,
-			'TRUE' => 45,
-			'NIL' => 46,
-			"(" => 47
-		},
-		GOTOS => {
-			'function' => 40,
-			'functioncall' => 35,
-			'var' => 34,
-			'exp' => 177,
-			'primary' => 38,
-			'tableconstructor' => 44
-		}
+		DEFAULT => -93
 	},
 	{#State 169
-		DEFAULT => -4,
-		GOTOS => {
-			'block' => 178,
-			'chunk' => 48
-		}
+		ACTIONS => {
+			"-" => 74,
+			"<" => 76,
+			"==" => 78,
+			">=" => 79,
+			"*" => 81,
+			'AND' => 84,
+			'OR' => 85,
+			"<=" => 86,
+			">" => 87,
+			".." => 73,
+			"~=" => 75,
+			"+" => 77,
+			"^" => 80,
+			"/" => 83
+		},
+		DEFAULT => -42
 	},
 	{#State 170
 		ACTIONS => {
-			'ELSEIF' => 181,
-			'ELSE' => 179,
-			'END' => 180
+			'ELSE' => 180,
+			'ELSEIF' => 182,
+			'END' => 181
 		}
 	},
 	{#State 171
-		ACTIONS => {
-			"{" => 21,
-			'LITERAL' => 19,
-			"(" => 26
-		},
-		GOTOS => {
-			'args' => 182,
-			'tableconstructor' => 25
-		}
+		DEFAULT => -15
 	},
 	{#State 172
 		ACTIONS => {
-			'FUNCTION' => 33,
-			'NUMBER' => 36,
-			'NAME' => 7,
-			'NOT' => 37,
-			'LITERAL' => 39,
-			"{" => 21,
-			"-" => 41,
-			'FALSE' => 43,
-			'TRUE' => 45,
-			'NIL' => 46,
-			"(" => 47
-		},
-		GOTOS => {
-			'function' => 40,
-			'functioncall' => 35,
-			'var' => 34,
-			'exp' => 183,
-			'primary' => 38,
-			'tableconstructor' => 44
+			"-" => 74,
+			".." => 73,
+			"<" => 76,
+			"~=" => 75,
+			"+" => 77,
+			"/" => 83,
+			"," => 183,
+			"==" => 78,
+			">=" => 79,
+			'AND' => 84,
+			"^" => 80,
+			"*" => 81,
+			'DO' => 184,
+			"<=" => 86,
+			'OR' => 85,
+			">" => 87
 		}
 	},
 	{#State 173
-		DEFAULT => -87
+		ACTIONS => {
+			'END' => 185
+		}
 	},
 	{#State 174
-		DEFAULT => -84
+		DEFAULT => -87
 	},
 	{#State 175
-		DEFAULT => -83
+		DEFAULT => -84
 	},
 	{#State 176
-		ACTIONS => {
-			'END' => 184
-		}
+		DEFAULT => -83
 	},
 	{#State 177
 		ACTIONS => {
-			'AND' => 83,
-			".." => 84,
-			"*" => 85,
-			'OR' => 86,
-			"+" => 87,
-			"<=" => 88,
-			"," => 185,
-			"<" => 89,
-			"-" => 90,
-			"==" => 91,
-			'DO' => 186,
-			">" => 93,
-			">=" => 94,
-			"^" => 95,
-			"/" => 96,
-			"~=" => 97
+			'END' => 186
 		}
 	},
 	{#State 178
-		ACTIONS => {
-			'END' => 187
-		}
+		DEFAULT => -72
 	},
 	{#State 179
-		DEFAULT => -4,
+		ACTIONS => {
+			"-" => 24,
+			'NAME' => 4,
+			'TRUE' => 25,
+			"{" => 38,
+			'NOT' => 27,
+			'LITERAL' => 29,
+			"(" => 39,
+			'NIL' => 30,
+			'FALSE' => 33,
+			'FUNCTION' => 34,
+			'NUMBER' => 36
+		},
 		GOTOS => {
-			'block' => 188,
-			'chunk' => 48
+			'exp' => 187,
+			'functioncall' => 31,
+			'function' => 26,
+			'tableconstructor' => 32,
+			'var' => 35,
+			'primary' => 28
 		}
 	},
 	{#State 180
-		DEFAULT => -18
-	},
-	{#State 181
-		ACTIONS => {
-			'FUNCTION' => 33,
-			'NUMBER' => 36,
-			'NAME' => 7,
-			'NOT' => 37,
-			'LITERAL' => 39,
-			"{" => 21,
-			"-" => 41,
-			'FALSE' => 43,
-			'TRUE' => 45,
-			'NIL' => 46,
-			"(" => 47
-		},
+		DEFAULT => -4,
 		GOTOS => {
-			'function' => 40,
-			'functioncall' => 35,
-			'var' => 34,
-			'exp' => 189,
-			'primary' => 38,
-			'tableconstructor' => 44
+			'block' => 188,
+			'chunk' => 18
 		}
 	},
+	{#State 181
+		DEFAULT => -18
+	},
 	{#State 182
-		DEFAULT => -72
+		ACTIONS => {
+			"-" => 24,
+			'NAME' => 4,
+			'TRUE' => 25,
+			"{" => 38,
+			'NOT' => 27,
+			'LITERAL' => 29,
+			"(" => 39,
+			'NIL' => 30,
+			'FALSE' => 33,
+			'FUNCTION' => 34,
+			'NUMBER' => 36
+		},
+		GOTOS => {
+			'exp' => 189,
+			'functioncall' => 31,
+			'function' => 26,
+			'tableconstructor' => 32,
+			'var' => 35,
+			'primary' => 28
+		}
 	},
 	{#State 183
 		ACTIONS => {
-			'AND' => 83,
-			".." => 84,
-			"*" => 85,
-			'OR' => 86,
-			"+" => 87,
-			"<=" => 88,
-			"<" => 89,
-			"-" => 90,
-			"==" => 91,
-			">" => 93,
-			">=" => 94,
-			"^" => 95,
-			"/" => 96,
-			"~=" => 97
-		},
-		DEFAULT => -95
-	},
-	{#State 184
-		DEFAULT => -82
-	},
-	{#State 185
-		ACTIONS => {
-			'FUNCTION' => 33,
-			'NUMBER' => 36,
-			'NAME' => 7,
-			'NOT' => 37,
-			'LITERAL' => 39,
-			"{" => 21,
-			"-" => 41,
-			'FALSE' => 43,
-			'TRUE' => 45,
-			'NIL' => 46,
-			"(" => 47
+			"-" => 24,
+			'NAME' => 4,
+			'TRUE' => 25,
+			"{" => 38,
+			'NOT' => 27,
+			'LITERAL' => 29,
+			"(" => 39,
+			'NIL' => 30,
+			'FALSE' => 33,
+			'FUNCTION' => 34,
+			'NUMBER' => 36
 		},
 		GOTOS => {
-			'function' => 40,
-			'functioncall' => 35,
-			'var' => 34,
 			'exp' => 190,
-			'primary' => 38,
-			'tableconstructor' => 44
+			'functioncall' => 31,
+			'function' => 26,
+			'tableconstructor' => 32,
+			'var' => 35,
+			'primary' => 28
 		}
 	},
-	{#State 186
+	{#State 184
 		DEFAULT => -4,
 		GOTOS => {
 			'block' => 191,
-			'chunk' => 48
+			'chunk' => 18
 		}
 	},
-	{#State 187
+	{#State 185
 		DEFAULT => -21
+	},
+	{#State 186
+		DEFAULT => -82
+	},
+	{#State 187
+		ACTIONS => {
+			"-" => 74,
+			".." => 73,
+			"<" => 76,
+			"~=" => 75,
+			"+" => 77,
+			"==" => 78,
+			">=" => 79,
+			"^" => 80,
+			"*" => 81,
+			"/" => 83,
+			'AND' => 84,
+			'OR' => 85,
+			"<=" => 86,
+			">" => 87
+		},
+		DEFAULT => -95
 	},
 	{#State 188
 		ACTIONS => {
@@ -2523,40 +2523,40 @@ sub new {
 	},
 	{#State 189
 		ACTIONS => {
-			"*" => 85,
-			"+" => 87,
-			'OR' => 86,
-			"<=" => 88,
-			"<" => 89,
-			"-" => 90,
-			'AND' => 83,
+			"-" => 74,
+			".." => 73,
+			"<" => 76,
+			"~=" => 75,
+			"+" => 77,
+			"/" => 83,
+			"==" => 78,
+			">=" => 79,
+			'AND' => 84,
+			"^" => 80,
+			"*" => 81,
 			'THEN' => 193,
-			"==" => 91,
-			">" => 93,
-			"/" => 96,
-			"^" => 95,
-			">=" => 94,
-			".." => 84,
-			"~=" => 97
+			"<=" => 86,
+			'OR' => 85,
+			">" => 87
 		}
 	},
 	{#State 190
 		ACTIONS => {
-			"*" => 85,
-			"+" => 87,
-			'OR' => 86,
-			"<=" => 88,
-			"<" => 89,
-			'AND' => 83,
-			"-" => 90,
-			"==" => 91,
+			"-" => 74,
+			".." => 73,
+			"<" => 76,
+			"~=" => 75,
+			"+" => 77,
+			"/" => 83,
+			"==" => 78,
+			">=" => 79,
+			'AND' => 84,
+			"^" => 80,
+			"*" => 81,
 			'DO' => 194,
-			">" => 93,
-			"/" => 96,
-			"^" => 95,
-			">=" => 94,
-			".." => 84,
-			"~=" => 97
+			"<=" => 86,
+			'OR' => 85,
+			">" => 87
 		}
 	},
 	{#State 191
@@ -2571,14 +2571,14 @@ sub new {
 		DEFAULT => -4,
 		GOTOS => {
 			'block' => 196,
-			'chunk' => 48
+			'chunk' => 18
 		}
 	},
 	{#State 194
 		DEFAULT => -4,
 		GOTOS => {
 			'block' => 197,
-			'chunk' => 48
+			'chunk' => 18
 		}
 	},
 	{#State 195
@@ -3115,7 +3115,7 @@ sub
 sub
 #line 354 "Lua\lua50.yp"
 {
-			$_[2];
+			BuildParenthesedExpression($_[0], $_[2]);
 		}
 	],
 	[#Rule 71
@@ -3389,6 +3389,7 @@ sub Generate {
 			or die "can't open $filename ($!).\n";
 
 	my $generator = new pirVisitor(\*FH);
+#	my $generator = new pirVisitor(\*STDOUT);
 	print FH $generator->{prologue};
 	foreach my $fct (@{$parser->YYData->{functs}}) {
 		foreach (@{$fct}) {

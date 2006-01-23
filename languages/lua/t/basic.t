@@ -21,7 +21,7 @@ use strict;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 12;
+use Parrot::Test tests => 14;
 use Test::More;
 
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', "function assert(false, msg)");
@@ -62,14 +62,21 @@ OUTPUT
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', "function pcall");
 r = pcall(assert, true)
 print(r)
-r = pcall(assert, false, "catched")
-print(r)
+r, msg = pcall(assert, false, "catched")
+print(r, msg)
 r = pcall(assert)
 print(r)
 CODE
 true
+false	catched
 false
-false
+OUTPUT
+
+language_output_like( 'lua', << 'CODE', << 'OUTPUT', "function pcall (incomplete)");
+r, msg = pcall(assert)
+print(msg)
+CODE
+/value expected/
 OUTPUT
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', "function rawget");
@@ -131,6 +138,18 @@ nil
 OUTPUT
 
 }
+
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', "function unpack");
+print(unpack{})
+print(unpack{"a"})
+print(unpack{"a","b","c"})
+print((unpack{"a","b","c"}))
+CODE
+
+a
+a	b	c
+a
+OUTPUT
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', "function xpcall");
 r = xpcall(assert, nil)

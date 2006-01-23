@@ -22,7 +22,7 @@ use strict;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 2;
+use Parrot::Test tests => 3;
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'fct1' );
 function f(a, b) return a or b end
@@ -49,5 +49,23 @@ CODE
 3	nil	0	nil	nil
 3	4	0	nil	nil
 3	4	2	5	8
+OUT
+
+
+language_output_is( 'lua', <<'CODE', <<'OUT', 'var args' );
+local function f() return 1, 2 end
+local function g() return "a", f() end
+local function h() return f(), "b" end
+local function k() return "c", (f()) end
+
+print(f())
+print(g())
+print(h())
+print(k())
+CODE
+1	2
+a	1	2
+1	b
+c	1
 OUT
 

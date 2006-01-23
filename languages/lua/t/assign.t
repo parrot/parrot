@@ -1,5 +1,5 @@
 #! perl -w
-# Copyright: 2005 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2005-2006 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 =head1 NAME
@@ -22,7 +22,7 @@ use strict;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 5;
+use Parrot::Test tests => 6;
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'global variable' );
 print(b)
@@ -69,6 +69,14 @@ CODE
 0	1	nil
 1	2
 0	nil	nil
+OUT
+
+language_output_is( 'lua', <<'CODE', <<'OUT', 'adjust with function' );
+function f() return 1, 2 end
+a, b, c, d = f()
+print(a, b, c, d)
+CODE
+1	2	nil	nil
 OUT
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'local variable' );
