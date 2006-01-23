@@ -322,6 +322,7 @@ docs/pdds/clip/pdd19_pir.pod                      [main]doc
 docs/pdds/pdd00_pdd.pod                           [main]doc
 docs/pdds/pdd03_calling_conventions.pod           [main]doc
 docs/pdds/pdd20_lexical_vars.pod                  [main]doc
+docs/pdds/pdd21_namespaces.pod                    [main]doc
 docs/pdds/pdd_template.pod                        [main]doc
 docs/pmc.pod                                      [main]doc
 docs/pmc/array.pod                                [main]doc
