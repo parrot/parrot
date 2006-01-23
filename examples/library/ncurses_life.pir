@@ -321,7 +321,7 @@ dumpend:
 	$I0 = COLOR_PAIR(1)
 	
 	# We pass what's returned from COLOR_PAIR straight on
-	WATTRON($I0)
+	WATTRON(STDSCR, $I0)
 
 	CURS_SET(0)			# turn off cursor
 	NODELAY(STDSCR, 1)	# set nodelay mode
