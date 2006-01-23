@@ -258,16 +258,41 @@ operator C<<> is used instead.
 The sort algorithm is I<not> stable, that is, elements considered equal by
 the given order may have their relative positions changed by the sort.
 
-NOT YET IMPLEMENTED.
+NOT YET IMPLEMENTED (see auxsort).
 
 =cut
 
 .sub _table_sort :anon
     .param pmc table
     .param pmc comp :optional
+    .local int n
     checktype(table, "table")
-    $I0 = getn(table)
+    n = getn(table)
+    if_null comp, L1
+    $I0 = isa comp, "LuaNil"
+    if $I0 goto L1
+    checktype(comp, "Sub")
+    goto L2
+L1:    
+    .const .Sub lessthan = "lessthan"
+    comp = lessthan
+L2:
+    auxsort(table, comp, n)
+.end
+
+.sub auxsort :anon
+    .param pmc table
+    .param pmc comp
+    .param int u
     not_implemented()
+.end
+
+.sub lessthan :anon
+    .param pmc l
+    .param pmc r
+    .local int ret
+    ret = cmp l, r
+    .return (ret)
 .end
 
 =item C<table.insert (table, [pos,] value)>
@@ -278,16 +303,46 @@ where C<n> is the size of the table, so that a call C<table.insert(t,x)>
 inserts C<x> at the end of table C<t>. This function also updates the size
 of the table by calling C<table.setn(table, n+1)>.
 
-NOT YET IMPLEMENTED.
+STILL INCOMPLETE (see setn in luapir.pir).
 
 =cut
 
 .sub _table_insert :anon
     .param pmc table
-    
+    .param pmc arg2
+    .param pmc arg3
+    .local pmc value
+    .local pmc index
+    .local int n
+    .local int pos
     checktype(table, "table")
-    $I0 = getn(table)
-    not_implemented()
+    n = getn(table)
+    n = n + 1
+    unless_null arg3, L1
+    pos = n
+    value = arg2
+    goto L2
+L1:
+    pos = checknumber(arg2)    
+    unless pos > n goto L3
+    n = pos
+L3:
+    value = arg3
+L2:
+    setn(table, n)
+    new index, .LuaNumber
+L4:
+    n = n - 1
+    unless n >= pos goto L5
+    index = n
+    $P0 = table[index]
+    $I0 = n + 1
+    index = $I0
+    table[index] = $P0
+    goto L4
+L5:
+    index = pos
+    table[index] = value
 .end
 
 =item C<table.remove (table [, pos])>
@@ -299,17 +354,43 @@ table, so that a call C<table.remove(t)> removes the last element of table
 C<t>. This function also updates the size of the table by calling
 C<table.setn(table, n-1)>.
 
-NOT YET IMPLEMENTED.
+STILL INCOMPLETE (see setn in luapir.pir).
 
 =cut
 
 .sub _table_remove :anon
     .param pmc table
     .param pmc pos :optional
+    .local pmc index
+    .local pmc ret
+    .local int n
+    .local int ipos
     checktype(table, "table")
-    $I0 = getn(table)
-    $I1 = optint(pos, $I0)
-    not_implemented()
+    n = getn(table)
+    ipos = optint(pos, n)
+    unless n <= 0 goto L1
+    new ret, .LuaNil
+    .return (ret)
+L1:      
+    $I1 = n - 1
+    setn(table, $I1)
+    new index, .LuaNumber
+    index = ipos
+    ret = table[index]
+L2:
+    unless ipos < n goto L3
+    $I2 = ipos + 1
+    index = $I2
+    $P0 = table[index]
+    index = ipos
+    table[index] = $P0
+    ipos = $I2
+    goto L2
+L3:
+    new $P0, .LuaNil
+    index = n
+    table[index] = $P0        
+    .return (ret)
 .end
 
 =item C<table.setn (table, n)>
