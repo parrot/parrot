@@ -529,7 +529,10 @@ sub _generate_functions {
                 $builder->level(2);
 
                 # get modified parrot command.
-                require "Parrot/Test/$language.pm";
+                my $module_fn = "Parrot/Test/$language.pm";
+                $module_fn =~ s{::}{/}g;
+                require $module_fn;
+
                 # set the builder object, and parrot config.
                 my $obj = eval "Parrot::Test::${language}->new()";
                 $obj->{builder} = $builder;

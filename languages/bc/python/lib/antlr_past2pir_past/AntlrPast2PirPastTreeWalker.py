@@ -1,4 +1,4 @@
-### $ANTLR 2.7.5 (20050416): "antlr_past2pir_past.g" -> "AntlrPast2PirPastTreeWalker.py"$
+### $ANTLR 2.7.5 (20051104): "antlr_past2pir_past.g" -> "AntlrPast2PirPastTreeWalker.py"$
 ### import antlr and other modules ..
 import sys
 import antlr

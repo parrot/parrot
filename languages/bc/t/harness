@@ -70,6 +70,7 @@ if ( grep { m/^--files$/ } @ARGV ) {
         $ENV{PARROT_BC_TEST_PROG} = '';
         Test::Harness::runtests( @files ) if scalar( @files );
     };
+    # XXX There should be a better to indicate which implementation should be used
     if ( $use_gnu_bc ) {
        if ($^O =~ /MSWin32/) {
            $ENV{PARROT_BC_TEST_PROG} = 'bc';

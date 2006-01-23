@@ -1,4 +1,4 @@
-// $ANTLR 2.7.5 (20050416): antlr_past2pir_past.g -> AntlrPast2PirPastTreeWalkerTokenTypes.txt$
+// $ANTLR 2.7.5 (20051104): antlr_past2pir_past.g -> AntlrPast2PirPastTreeWalkerTokenTypes.txt$
 AntlrPast2PirPastTreeWalker    // output token vocab name
 NEWLINE=4
 STRING=5

@@ -48,10 +48,10 @@ maintain: $(PYTHON_RUNTIME_FILES)
 
 # BcLexer.py will be created too
 # TODO: antlr_past2pir_past shouldn't need BcLexerTokenTypes.txt
-$(PYTHON_RUNTIME_FILES): grammar/bc_python.g grammar/antlr_past2pir_past.g
-	antlr -o python/lib/bc grammar/bc_python.g
+$(PYTHON_RUNTIME_FILES): grammar/antlr_2/bc_python.g grammar/antlr_2/antlr_past2pir_past.g
+	antlr -o python/lib/bc grammar/antlr_2/bc_python.g
 	$(CP) python/lib/bc/BcLexerTokenTypes.txt python/lib/antlr_past2pir_past
-	antlr -o python/lib/antlr_past2pir_past grammar/antlr_past2pir_past.g
+	antlr -o python/lib/antlr_past2pir_past grammar/antlr_2/antlr_past2pir_past.g
 
 clean:
 	$(RM_RF) \

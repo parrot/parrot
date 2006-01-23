@@ -7,7 +7,10 @@ use strict;
 use Data::Dumper;
 use File::Basename;
 
-require Parrot::Test;
+use Parrot::Test;
+use Parrot::Test::Bc::Antlr2;
+use Parrot::Test::Bc::Antlr3;
+use Parrot::Test::Bc::Posix;
 
 =head1 NAME
 
@@ -21,12 +24,16 @@ Call 'Parrot bc' and 'POSIX bc'.
 
 =head2 new
 
-Yet another constructor.
+A kind of factory, that finds the proper subclass of Parrot::Test::Bc.
+XXX: Do not configure with environment variables.
 
 =cut
 
 sub new {
-    return bless {};
+    return $ENV{PARROT_BC_TEST_PROG} ?
+        ( bless {}, 'Parrot::Test::Bc::Posix' )              
+        :
+        ( bless {}, 'Parrot::Test::Bc::Antlr2' );              
 }
 
 my %language_test_map = (
@@ -45,30 +52,24 @@ foreach my $func ( keys %language_test_map ) {
         my $count = $self->{builder}->current_test + 1;
 
         # flatten filenames (don't use directories)
-        my $lang_fn        = Parrot::Test::per_test( '.bc', $count );
-        # bc.py always produced '.pir' and '_past.pir'.
         # The 'with_past' option indicates which on should be tested
-        my $pir_fn         = $options{with_past} ?
-                                 Parrot::Test::per_test( '_past.pir', $count )
-                                 :
-                                 Parrot::Test::per_test( '.pir', $count );
-        my $bc_out_fn      = Parrot::Test::per_test( $ENV{PARROT_BC_TEST_PROG} ? '.posix_out' : '.parrot_out', $count );
-        my $test_prog_args = $ENV{TEST_PROG_ARGS} || '';
-        my @test_prog      = $ENV{PARROT_BC_TEST_PROG} ?
-                 ( "$ENV{PARROT_BC_TEST_PROG}  ${test_prog_args} languages/${lang_fn}" ):
-                 ( "python languages/bc/bc.py languages/${lang_fn}", 
-                   "$self->{parrot} languages/${pir_fn}" );
+        my $bc_out_fn = $self->get_out_fn( $count );
+        my @test_prog = $self->get_test_prog( $count, $options{with_past} );
+
  
         # This does not create byte code, but bc code
-        my $parrotdir       = dirname( $self->{parrot} );
+        my $parrotdir = dirname( $self->{parrot} );
+        my $lang_fn   = Parrot::Test::per_test( '.bc', $count );
         Parrot::Test::generate_code( $code, $parrotdir, $count, $lang_fn );
 
         # STDERR is written into same output file
+        # die Dumper( \@test_prog );
         my $exit_code = Parrot::Test::run_command( 
-            \@test_prog, 
-            CD => $self->{relpath}, 
-            STDOUT => $bc_out_fn, STDERR => $bc_out_fn 
-        );
+                            \@test_prog, 
+                            CD     => $self->{relpath}, 
+                            STDOUT => $bc_out_fn,
+                            STDERR => $bc_out_fn 
+                        );
   
         my $builder_func = $language_test_map{$func};
         # That's the reason for:   no strict 'refs';
