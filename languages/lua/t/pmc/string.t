@@ -17,7 +17,7 @@ Tests C<LuaString> PMC
 
 =cut
 
-use Parrot::Test tests => 9;
+use Parrot::Test tests => 10;
 use Test::More;
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "check inheritance");
@@ -201,3 +201,22 @@ simple string
 1
 OUTPUT
 
+TODO: {
+local $TODO = "empty string not handled by PIR.";
+
+pir_output_is(<< 'CODE', << 'OUTPUT', ".const & empty string");
+.HLL "Lua", "lua_group"
+.sub _main
+    .const .LuaString cst1 = ""
+    print cst1
+    print "\n"
+    .local int bool1
+    bool1 = isa cst1, "LuaString"
+    print bool1
+    print "\n"
+.end
+CODE
+
+1
+OUTPUT
+}

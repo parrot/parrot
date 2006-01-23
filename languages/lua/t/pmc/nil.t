@@ -163,13 +163,10 @@ nil
 1
 OUTPUT
 
-TODO: {
-local $TODO = "not implemented.";
-
 pir_output_is(<< 'CODE', << 'OUTPUT', "check HLL & .const");
 .HLL "Lua", "lua_group"
 .sub _main
-    .const .LuaNil cst1 = ""
+    .const .LuaNil cst1 = "dummy"
     print cst1
     print "\n"
     .local int bool1
@@ -181,7 +178,6 @@ CODE
 nil
 1
 OUTPUT
-}
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "morph to string");
 .HLL "Lua", "lua_group"

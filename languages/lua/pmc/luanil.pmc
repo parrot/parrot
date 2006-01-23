@@ -183,6 +183,30 @@ Morph to another Lua type.
         pmc_reuse(INTERP, SELF, new_type, 0);
     }
 
+/*
+
+=item C<PMC* new_from_string(STRING *rep, INTVAL flags)>
+
+Allow :
+
+    .const .LuaNil nil = "dummy"
+
+=cut
+
+*/
+    PMC* new_from_string(STRING *rep, INTVAL flags) {
+        INTVAL type;
+        PMC *res;
+
+        type = SELF->vtable->base_type;
+        if (flags & PObj_constant_FLAG)
+            res = constant_pmc_new(INTERP, type);
+        else
+            res = pmc_new(INTERP, type);
+
+        return res;
+    }
+
 }
 
 /*
