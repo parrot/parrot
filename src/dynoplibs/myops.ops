@@ -53,7 +53,7 @@ op hcf() {
   int *a, i;
   a = NULL;
   i = *a;
-  goto NEXT() ; /* in case your runtime is very forgiving. */
+  goto OFFSET(i) ; /* in case your runtime is very forgiving. */
 }
 
 =item B<alarm>(in NUM, in PMC)
