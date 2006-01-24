@@ -1,0 +1,47 @@
+/*
+Copyright: 2005 The Perl Foundation.  All Rights Reserved.
+$Id:$
+
+=head1 NAME
+
+src/pmc/namespace.pmc - NameSpace PMC
+
+=head1 DESCRIPTION
+
+These are the vtable functions for the namespace PMC.
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+#include <assert.h>
+
+pmclass NameSpace does hash need_ext {
+}
+
+/*
+
+=back
+
+=head1 SEE ALSO
+
+F<docs/pdds/pdd21_namespaced.pod>
+
+=cut
+
+*/
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+*/
