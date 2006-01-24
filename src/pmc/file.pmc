@@ -84,9 +84,9 @@ Returns a true value (1) if the supplied path is a directory.
 
 /*
 
-=item C<INTVAL is_dir(STRING* path)>
+=item C<INTVAL is_file(STRING* path)>
 
-Returns a true value (1) if the supplied path is a directory.
+Returns a true value (1) if the supplied path is a plain file.
 
 =cut
 
@@ -125,6 +125,7 @@ Returns a true value (1) if the supplied path is a link.
 
     METHOD INTVAL is_link(STRING *path) {
 #ifdef WIN32
+        /* I love win32 implementations */
         return 0;
 #else
         struct stat info;
@@ -143,8 +144,6 @@ Returns a true value (1) if the supplied path is a link.
         }
 #endif
     }
-
-
 
 /*
 
@@ -198,6 +197,7 @@ free to change or give me hints on how to change it. -- ambs
         }
         string_cstring_free(cfrom);
         string_cstring_free(cto);
+#undef CHUNK_SIZE 1024
     }
 
 /*
