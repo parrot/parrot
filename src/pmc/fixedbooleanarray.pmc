@@ -516,6 +516,28 @@ Used to unarchive the string.
             mem_sys_memcopy(PMC_data(SELF), s->strstart, s->bufused);
         }
     }
+
+/*
+
+=item C<METHOD void fill(INTVAL fill)>
+
+Sets all of the entires to true if fill is a true value, otherwise
+sets them all to false.
+
+=cut
+
+*/
+
+    
+    METHOD void fill(INTVAL fill) {
+        Parrot_UInt1 *sd = PMC_data(SELF);
+        INTVAL j;
+        j = PMC_int_val(SELF) / BITS_PER_CHAR;
+        if (fill)
+            memset(sd, 0xff, j);
+        else
+            memset(sd, 0, j);
+    }
 }
 
 /*
