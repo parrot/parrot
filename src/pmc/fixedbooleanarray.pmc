@@ -532,7 +532,7 @@ sets them all to false.
     METHOD void fill(INTVAL fill) {
         Parrot_UInt1 *sd = PMC_data(SELF);
         INTVAL j;
-        j = PMC_int_val(SELF) / BITS_PER_CHAR;
+        j = PMC_int_val(SELF) / BITS_PER_CHAR + 1;
         if (fill)
             memset(sd, 0xff, j);
         else
