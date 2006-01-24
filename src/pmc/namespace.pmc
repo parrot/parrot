@@ -30,7 +30,7 @@ pmclass NameSpace extends Hash need_ext {
 
 =head1 SEE ALSO
 
-F<docs/pdds/pdd21_namespaced.pod>
+F<docs/pdds/pdd21_namespaces.pod>
 
 =cut
 
