@@ -30,20 +30,6 @@ sub runstep
 {
     my ($self, $conf) = @_;
 
-    # Remove all -Lxxx entries from Perl's ldflags and lddlflags as they
-    # will be Perl-specific.
-    my $ldflags = $Config{ldflags};
-    $ldflags =~ s/-L\s*".*?"//g;      # Quoted directory
-    $ldflags =~ s/-L\s*[^\s]+//g;     # Non-quoted directory
-    $ldflags =~ s/^\s+//;
-    $ldflags =~ s/\s+$//;
-
-    my $lddlflags = $Config{lddlflags};
-    $lddlflags =~ s/-L\s*".*?"//g;
-    $lddlflags =~ s/-L\s*[^\s]+//g;
-    $lddlflags =~ s/^\s+//;
-    $lddlflags =~ s/\s+$//;
-
     # We need a Glossary somewhere!
     $conf->data->set(
         debugging => $conf->options->get('debugging') ? 1 : 0,
@@ -76,7 +62,7 @@ sub runstep
         # Perl5's Configure doesn't distinguish linking from loading, so
         # make a reasonable guess at defaults.
         link      => $Config{cc},
-        linkflags => $ldflags,
+        linkflags => $Config{ldflags},
 
         # Linker Flags to have this binary work with the shared and dynamically
         # loadable libraries we're building.  On HP-UX, for example, we need to
@@ -87,16 +73,16 @@ sub runstep
         # modules. Often $cc on Unix-ish systems, but apparently sometimes
         # it's ld.
         ld      => $Config{ld},
-        ldflags => $ldflags,
+        ldflags => $Config{ldflags},
 
         # Some operating systems (e.g. Darwin) distinguish between shared
         # libraries and modules that can be dynamically loaded.  Flags to tell
         # ld to build a shared library, e.g.  -shared for GNU ld.
-        ld_share_flags => $lddlflags,
+        ld_share_flags => $Config{lddlflags},
 
         # Flags to tell ld to build a dynamically loadable module, e.g.
         # -shared for GNU ld.
-        ld_load_flags     => $lddlflags,
+        ld_load_flags     => $Config{lddlflags},
 
         libs => $Config{libs},
 

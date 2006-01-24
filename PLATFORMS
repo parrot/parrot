@@ -75,7 +75,7 @@ Remarks:
 *2 needs Configure.pl --define=inet_aton
 *3 kernel 2.6.1 NPTL: signal_2 and _4 failing due to test script problems
 *4 need deactivating of  PARROT_HAS_HEADER_DLFCN
-*5 need PATH=$PWD/blib/lib:$PATH (in the build dir) to locate parrot DLL
+*5 need PATH=$PATH:$PWD/blib/lib to locate DLL
 *6 needs "gmake"
 *7 needs perl Configure.pl --cc=gcc --link=gcc --ld=gcc --cxx=gcc
 

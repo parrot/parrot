@@ -578,7 +578,10 @@ sub _generate_functions {
             print SOURCE $source;
             close SOURCE;
 
-            my $libparrot = $PConfig{libparrot_ldflags};
+            my $libparrot_shared = "$PConfig{rpath_blib} -L$PConfig{blib_dir} -lparrot";
+            my $libparrot_static  = $PConfig{blib_dir}.$PConfig{slash}.$PConfig{libparrot_static};
+
+            my $libparrot = $PConfig{parrot_is_shared} ? $libparrot_shared : $libparrot_static;
 
             my $iculibs = "";
             if ($PConfig{'has_icu'}) {
