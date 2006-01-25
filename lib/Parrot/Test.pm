@@ -519,8 +519,7 @@ sub _generate_functions {
             else {
                 # TODO: $language should be the name of the test Module
                 #       that would open the door for Scheme::Test
-                # try it both ways
-                $language = ucfirst($language) unless ( $language eq 'm4' );
+                $language = ucfirst($language);
 
                 # make sure TODO will work, by telling Test::Builder which package
                 # the .t file is in (one more than usual, due to the extra layer
@@ -528,10 +527,8 @@ sub _generate_functions {
                 my $level = $builder->level();
                 $builder->level(2);
 
-                # get modified parrot command.
-                my $module_fn = "Parrot/Test/$language.pm";
-                $module_fn =~ s{::}{/}g;
-                require $module_fn;
+                # Load module that knows how to test the language implementation
+                require "Parrot/Test/$language.pm";
 
                 # set the builder object, and parrot config.
                 my $obj = eval "Parrot::Test::${language}->new()";

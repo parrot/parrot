@@ -1,6 +1,6 @@
 # $Id$
 
-package Parrot::Test::m4;
+package Parrot::Test::M4;
 
 use strict;
 
@@ -11,7 +11,7 @@ require Parrot::Test;
 
 =head1 NAME
 
-Test/m4.pm - Testing routines specific to 'm4'.
+Test/M4.pm - Testing routines specific to 'm4'.
 
 =head1 DESCRIPTION
 
@@ -38,7 +38,7 @@ my %language_test_map = (
 foreach my $func ( keys %language_test_map ) {
     no strict 'refs';
 
-    *{"Parrot::Test::m4::$func"} = sub ($$;$) {
+    *{"Parrot::Test::M4::$func"} = sub ($$;$) {
         my $self = shift;
         my ( $code, $output, $desc ) = @_;
   
