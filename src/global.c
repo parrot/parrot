@@ -141,7 +141,7 @@ Parrot_find_global_p(Parrot_Interp interpreter, PMC *ns, STRING *name)
             }
             return Parrot_find_global_p(interpreter, stash, name);
             /* fall through */
-        case enum_class_Hash:
+        case enum_class_NameSpace:
             if (!VTABLE_exists_keyed_str(interpreter, ns, name)) {
                 return NULL;
             }
@@ -263,7 +263,7 @@ Parrot_global_namespace(Interp *interpreter, PMC *globals, STRING *class)
             string_from_cstring(interpreter, "\0", 1),
             class, 0);
     if (!VTABLE_exists_keyed_str(interpreter, globals, ns_name)) {
-        stash = pmc_new(interpreter, enum_class_Hash);
+        stash = pmc_new(interpreter, enum_class_NameSpace);
         VTABLE_set_pmc_keyed_str(interpreter, globals, ns_name, stash);
     }
     else {

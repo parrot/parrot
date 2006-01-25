@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 17;
+use Parrot::Test tests => 18;
 
 =head1 NAME
 
@@ -37,6 +37,21 @@ ok
 bar
 OUTPUT
 
+pir_output_is(<<'CODE', <<'OUTPUT', "verify NameSpace type");
+.sub 'main' :main
+    $P0 = find_global "\0Foo"
+    typeof $S0, $P0
+    print $S0
+    print "\n"
+.end
+
+.namespace ["Foo"]
+.sub 'bar'
+    noop
+.end
+CODE
+NameSpace
+OUTPUT
 pir_output_is(<<'CODE', <<'OUTPUT', "find_global Foo::bar");
 .sub 'main' :main
     $P0 = find_global "Foo", "bar"
