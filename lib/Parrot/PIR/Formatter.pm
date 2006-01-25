@@ -16,8 +16,6 @@ format it nicely.
 
 =head2 Functions
 
-=over
-
 =cut
 
 package Parrot::PIR::Formatter;
