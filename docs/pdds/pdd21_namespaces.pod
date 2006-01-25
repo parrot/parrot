@@ -87,62 +87,42 @@ exportation.
 =head2 Namespace PMC Interfaces: Generic and Typed
 
 Most languages leave their symbols plain, which makes lookups quite
-straightforward.  Others use sigils or other mangling techniques,
-complicating the problem of interoperability.
+straightforward.  Others use sigils or other mangling techniques, complicating
+the problem of interoperability.
 
-Parrot namespaces assist with interoperability by providing two
-interface subsets: the I<raw interface> and the I<typed interface>.
+Parrot namespaces assist with interoperability by providing two interface
+subsets: the I<raw interface> and the I<typed interface>.
 
 =head3 Raw Interface
 
-Each HLL may, when working with its own namespace objects, use the
-I<raw interface>, which allows direct naming in the native style of
-the namespace's HLL.  This interface consists of the following
-methods:
+Each HLL may, when working with its own namespace objects, use the I<raw
+interface>, which allows direct naming in the native style of the namespace's
+HLL.
 
-TODO: Decide whether this is best exposed by "does hash".
+This interface consists of standard Parrot hash interface, with all its keys,
+values, lookups, deletions, etc.  Just treat the namespace like a hash.  (It
+probably is one, really, deep down.)
 
-=over 4
-
-=item add($S0, $P0)
-
-Store the PMC in $P0 under the raw name $S0.
-
-=item del($S0)
-
-Delete the entry named $S0.
-
-=item $P0 = find($S0)
-
-Find the sub, namespace, or variable named $S0.  Return a null PMC
-on lookup failure.
-
-=item $P0 = names()
-
-Get an array of the names contained in the namespace.
-
-NOTE: The return value may be a psuedo-array holding a reference to
-the namespace and some kind of internal iterator.
-
-=back
+It's kind of an anticlimax, isn't it, giving a fancy name like "raw interface"
+to a hash?  "It's a just a hash," you say.  Oh well.  I'll try to live with
+the shame.
 
 =head3 Typed Interface
 
-When a given namespace's HLL is either different from the current HLL
-or unknown, an HLL should generally use only the language-agnostic
-namespace interface.  This interface isolates HLLs from each others'
-naming quirks.  It consists of add_foo(), find_foo(), and del_foo()
-methods, for values of "foo" including "sub" (something executable),
-"namespace" (something in which to find more names), and "var" (anything).
+When a given namespace's HLL is either different from the current HLL or
+unknown, an HLL should generally use only the language-agnostic namespace
+interface.  This interface isolates HLLs from each others' naming quirks.  It
+consists of add_foo(), find_foo(), and del_foo() methods, for values of "foo"
+including "sub" (something executable), "namespace" (something in which to
+find more names), and "var" (anything).
 
-NOTE: The job of the typed interface is to bridge I<naming>
-differences, and I<only> naming differences.  Therefore:
+NOTE: The job of the typed interface is to bridge I<naming> differences, and
+I<only> naming differences.  Therefore:
 
-(1) It does
-not enforce, nor even notice, the interface requirements of "sub" or
-"namespace": e.g. execution of add_sub("foo", $P0) does I<not>
-automatically guarantee that $P0 is an invokable subroutine; and: (2)
-It does not prevent overwriting one type with another
+(1) It does not enforce, nor even notice, the interface requirements of "sub"
+or "namespace": e.g. execution of add_sub("foo", $P0) does I<not>
+automatically guarantee that $P0 is an invokable subroutine; and: (2) It does
+not prevent overwriting one type with another
 
 =over 4
 
@@ -158,9 +138,9 @@ Store $P0 as a subroutine with the name of $S0.
 
 Store $P0 as a variable under the name of $S0.
 
-IMPLEMENTATION NOTE: perl6::namespace.add_var may choose to check which
-parts of the variable interface are implemented by $P0 so it can decide
-on an appropriate sigil.
+IMPLEMENTATION NOTE: perl6::namespace.add_var may choose to check which parts
+of the variable interface are implemented by $P0 so it can decide on an
+appropriate sigil.
 
 =item del_namespace($S0)
 
@@ -179,28 +159,20 @@ Delete the sub, namespace, or variable named $S0.
 Find the sub, namespace, or variable named $S0.
 
 IMPLEMENTATION NOTE: perl6::namespace.find_var should check all variable
-sigils, but the order is not to be counted on by users.  If you're
-planning to let Python code see your module, don't have both C<our $A> and
-C<our @A>.
+sigils, but the order is not to be counted on by users.  If you're planning to
+let Python code see your module, don't have both C<our $A> and C<our @A>.
 
-=item $P0 = namespaces()
+=item export_to($P0, $P1)
 
-=item $P0 = subs()
+Export items from the current namespace into the namespace in $P0.  The items
+to export are named in the array $P1; a null $P1 requests the 'default' set of
+items.  The interpretation of the array in $P1 always follows the conventions
+of the source (exporting) namespace.
 
-=item $P0 = vars()
-
-Get an array of the namespaces, subs, or variables in the namespace.
-
-IMPLEMENTATION NOTE: perl6::namespace.vars should follow the same rules as
-find_var, so that the list of names returned by vars() should equal the list
-of names for which find_var() will succeed.
-
-=item export_to($P0, ...)
-
-Export items from the current namespace into the namespace in $P0.  The
-namespace may any number or kinds of values to export, such as the name of
-subroutines, patterns, or tags.  The interpretation of these arguments always
-follow the conventions of the source (exporting) namespace.
+The base Parrot namespace export_to() function interprets item names as
+literals -- no wildcards or other special meaning.  There is no default list
+of items to export, so $P1 of null and $P1 of an empty array have the same
+behavior.
 
 NOTE: Exportation may entail non-obvious, odd, or even mischievious behavior.
 For example, Perl's pragmata are implemented as exports, and they don't
@@ -215,6 +187,9 @@ IMPLEMENTATION NOTE: Most namespace export_to implementations will restrict
 themselves to using the typed interface on the target namespace.  However,
 they may also decide to check the type of the target namespace and, if it
 turns out to be of a compatible type, to use same-language shortcuts.
+
+DESIGN TODO: Figure out a good convention for a default export list in the
+base namespace PMC.  Maybe a standard method "expand_export_list()"?
 
 =back
 
@@ -239,11 +214,11 @@ NOTE: This is a naive method.  It does not account for any aliasing.
 
 =over 4
 
-=item load_library($S0, $S1, ...)
+=item load_library($P0)
 
-Ask this compiler to load a library/module named by the strings $S0, $S1, ...  So
-perl5:Some::Module should be loaded using
-C<perl5.load_library("Some", "Module")>.
+Ask this compiler to load a library/module named by the elements of the array
+in $P0.  So perl5:Some::Module should be loaded using (in pseudo Perl 6):
+C<perl5.load_library(["Some", "Module"])>.
 
 =back
 
