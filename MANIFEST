@@ -18,7 +18,7 @@ NEWS                                              [devel]doc
 PBC_COMPAT                                        [devel]doc
 PLATFORMS                                         [devel]doc
 README                                            [devel]doc
-README.win32                                      [devel]doc
+README.win32.pod                                  [devel]doc
 RELEASE_INSTRUCTIONS                              []
 RESPONSIBLE_PARTIES                               [main]doc
 TODO                                              [main]doc
