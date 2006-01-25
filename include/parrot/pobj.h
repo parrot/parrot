@@ -136,10 +136,6 @@ struct parrot_string_t {
     UINTVAL hashval; /* cached hash value computation; not yet used */
 };
 
-    /* cache.* is intended to just be *shortcuts* to*/
-    /* commonly-accessed data, *not* pointers to */
-    /* completely different data.  That's why it's */
-    /* referred to as a "cache". */
 
 /* put data into the PMC_EXT structure */
 #define PMC_DATA_IN_EXT 1

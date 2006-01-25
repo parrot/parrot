@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 62;
+use Parrot::Test tests => 63;
 
 =head1 NAME
 
@@ -1916,3 +1916,41 @@ CODE
 10
 20
 OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "init with and w/o arg");
+.sub 'main' :main 
+    .local pmc cl, o, h, a
+    cl = newclass "Foo"
+    addattribute cl, "a"
+    o = new 'Foo'
+    a = getattribute o, "a"
+    print a
+    h = new .Hash
+    $P0 = new .PerlString
+    $P0 = "ok 2\n"
+    h['a'] = $P0
+    $I0 = find_type 'Foo'
+    o  = new $I0, h
+    a = getattribute o, "a"
+    print a
+.end
+
+.namespace ["Foo"]
+.sub __init :method
+    .param pmc args :optional
+    if null args goto set_default
+    $P0 = args['a']
+    setattribute self, 'a', $P0
+    .return ()
+
+set_default:    
+    $P0 = new .PerlString
+    $P0 = "ok 1\n"
+    setattribute self, 'a', $P0
+.end
+CODE
+ok 1
+ok 2
+OUTPUT
+    
+    
