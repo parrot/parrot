@@ -3,6 +3,7 @@
 package Parrot::Test::Bc;
 
 use strict;
+use warnings;
 
 use Data::Dumper;
 use File::Basename;

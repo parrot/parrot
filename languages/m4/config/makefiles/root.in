@@ -76,9 +76,8 @@ m4.pbc \
 "src/*.pbc" \
 "src/*~" \
 "t/*/*.m4" \
-"t/*/*.parrot_out" \
+"t/*/*.pir_out" \
 "t/*/*.gnu_out" \
-"t/*/*.imc" \
 "t/*/*.pir" \
 $(M4_EVALUATE_SO) 
 

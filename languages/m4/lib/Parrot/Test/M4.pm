@@ -3,11 +3,14 @@
 package Parrot::Test::M4;
 
 use strict;
+use warnings;
 
 use Data::Dumper;
 use File::Basename;
 
-require Parrot::Test;
+use Parrot::Test;
+use Parrot::Test::M4::Gnu;
+use Parrot::Test::M4::PIR;
 
 =head1 NAME
 
@@ -21,12 +24,16 @@ Call 'Parrot m4' and 'GNU m4'.
 
 =head2 new
 
-Yet another constructor.
+A kind of factory, that finds the proper subclass of Parrot::Test::M4.
+XXX: Do not configure with environment variables.
 
 =cut
 
 sub new {
-    return bless {};
+    return $ENV{PARROT_M4_TEST_PROG} ?
+        ( bless {}, 'Parrot::Test::M4::Gnu' )              
+        :
+        ( bless {}, 'Parrot::Test::M4::PIR' );              
 }
 
 my %language_test_map = (
@@ -45,34 +52,33 @@ foreach my $func ( keys %language_test_map ) {
         my $count = $self->{builder}->current_test + 1;
 
         # flatten filenames (don't use directories)
-        my $lang_f        = Parrot::Test::per_test( '.m4', $count );
-        my $m4_out_f      = Parrot::Test::per_test( $ENV{PARROT_M4_TEST_PROG} ? '.gnu_out' : '.parrot_out', $count );
-        my $test_prog_args = $ENV{TEST_PROG_ARGS} || '';
-        my $test_prog      = $ENV{PARROT_M4_TEST_PROG} || 
-                                 "$self->{parrot} languages/m4/m4.pbc";
-        $test_prog .= " ${test_prog_args} languages/${lang_f}";
-         # die Dumper( $test_prog, \%ENV );
+        my $lang_fn        = Parrot::Test::per_test( '.m4', $count );
+        my $m4_out_fn = $self->get_out_fn( $count );
+        my @test_prog = $self->get_test_prog( $count );
 
         # This does nor create byte code, but m4 code
         my $parrotdir       = dirname( $self->{parrot} );
-        Parrot::Test::generate_code( $code, $parrotdir, $count, $lang_f );
+        Parrot::Test::generate_code( $code, $parrotdir, $count, $lang_fn );
 
         # STDERR is written into same output file
+        print Dumper( \@test_prog, $self );
         my $exit_code = Parrot::Test::run_command( 
-            $test_prog, 
-            CD => $self->{relpath}, 
-            STDOUT => $m4_out_f, STDERR => $m4_out_f 
-        );
+                            \@test_prog, 
+                            CD     => $self->{relpath}, 
+                            STDOUT => $m4_out_fn,
+                            STDERR => $m4_out_fn 
+                        );
   
         my $builder_func = $language_test_map{$func};
         # That's the reason for:   no strict 'refs';
         my $pass = $self->{builder}->$builder_func(
-                       Parrot::Test::slurp_file($m4_out_f),
+                       Parrot::Test::slurp_file($m4_out_fn),
                        $output,
                        $desc
                                                   );
         unless ( $pass ) {
             my $diag = '';
+            my $test_prog = join ' && ', @test_prog;
             $diag .= "'$test_prog' failed with exit code $exit_code." if $exit_code;
             $self->{builder}->diag( $diag ) if $diag;
         }
