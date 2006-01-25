@@ -78,7 +78,7 @@ Many things to muck with line could be done here:
 
  o remove extraneous spaces.
  o add in "proper" spacing (after commas, etc.)
- o turn opcode, <IN>, <OUT> into <IN> = opcode <OUT>
+ o turn opcode, <OUT>, <IN> into <OUT> = opcode <IN>
  o heredocs could be treated as blocks to set them off visually.
  o could remove explicit declarations of string type when not needed.
  o could add in single quotes wrapping .sub names.
