@@ -244,7 +244,7 @@ Get the specified currrent namespace.
 
 Find the variable $3 in $2.
 
-=cutt
+=cut
 
 op get_namespace(out PMC) {
     PMC *current_sub;
@@ -257,6 +257,8 @@ op find_global(out PMC, in KEY, in STR) {
     $1 = Parrot_find_global_p(interpreter, $2, $3);
     goto NEXT();
 }
+
+=back
 
 =head1 COPYRIGHT
 
