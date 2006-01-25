@@ -1287,6 +1287,11 @@ _var_or_i:
                       keyvec |= KEY_BIT(nargs);
                       regs[nargs++] = $3; $$ = $1;
                    }
+   | '[' keylist ']'
+                   {
+                      regs[nargs++] = $2;
+                      $$ = $2;
+                   }
    ;
 sub_label_op_c:
      sub_label_op

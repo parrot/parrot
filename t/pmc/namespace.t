@@ -72,8 +72,7 @@ OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "find_global Foo::bar ns");
 .sub 'main' :main
-    $P0 = find_global "\0Foo"
-    $P1 = find_global $P0, "bar"
+    $P1 = find_global ["Foo"], "bar"
     print "ok\n"
     $P1()
 .end
@@ -125,9 +124,7 @@ OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "find_global Foo::Bar::baz");
 .sub 'main' :main
-    $P0 = find_global "\0Foo"
-    $P1 = find_global $P0, "\0Bar"
-    $P2 = find_global $P1, "baz"
+    $P2 = find_global ["Foo";"Bar"], "baz"
     print "ok\n"
     $P2()
 .end
