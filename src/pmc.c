@@ -69,47 +69,53 @@ PMC*
 pmc_reuse(Interp *interpreter, PMC *pmc, INTVAL new_type,
           UINTVAL flags)
 {
-    INTVAL has_ext = 0, new_flags = 0;
+    INTVAL has_ext, new_flags;
+    VTABLE *new_vtable;
 
     if (pmc->vtable->base_type == new_type)
         return pmc;
 
-    /* First, is the destination a singleton? No joy for us there */
-    if (Parrot_base_vtables[new_type]->flags & VTABLE_PMC_IS_SINGLETON) {
-         internal_exception(ALLOCATION_ERROR,
-                            "Parrot VM: Can't turn to a singleton type!\n");
-        return NULL;
-    }
+    new_vtable = Parrot_base_vtables[new_type];
 
-    /* First, is the destination a constant? No joy for us there */
-    if (Parrot_base_vtables[new_type]->flags & VTABLE_IS_CONST_FLAG) {
-         internal_exception(ALLOCATION_ERROR,
-                            "Parrot VM: Can't turn to a constant type!\n");
-        return NULL;
-    }
+    /* Singleton/const PMCs/types are not eligible */
 
-    /* Is the source a singleton? */
-    if (pmc->vtable->flags & VTABLE_PMC_IS_SINGLETON) {
-         internal_exception(ALLOCATION_ERROR,
-                            "Parrot VM: Can't modify a singleton\n");
-        return NULL;
-    }
+    if ((pmc->vtable->flags | new_vtable->flags)
+        & (VTABLE_PMC_IS_SINGLETON | VTABLE_IS_CONST_FLAG))
+    {
+        /* First, is the destination a singleton? No joy for us there */
+        if (new_vtable->flags & VTABLE_PMC_IS_SINGLETON) {
+            internal_exception(ALLOCATION_ERROR,
+                               "Parrot VM: Can't turn to a singleton type!\n");
+            return NULL;
+        }
 
-    /* Is the source constant? */
-    if (pmc->vtable->flags & VTABLE_IS_CONST_FLAG) {
-         internal_exception(ALLOCATION_ERROR,
-                            "Parrot VM: Can't modify a constant\n");
-        return NULL;
+        /* First, is the destination a constant? No joy for us there */
+        if (new_vtable->flags & VTABLE_IS_CONST_FLAG) {
+            internal_exception(ALLOCATION_ERROR,
+                               "Parrot VM: Can't turn to a constant type!\n");
+            return NULL;
+        }
+
+        /* Is the source a singleton? */
+        if (pmc->vtable->flags & VTABLE_PMC_IS_SINGLETON) {
+            internal_exception(ALLOCATION_ERROR,
+                               "Parrot VM: Can't modify a singleton\n");
+            return NULL;
+        }
+
+        /* Is the source constant? */
+        if (pmc->vtable->flags & VTABLE_IS_CONST_FLAG) {
+            internal_exception(ALLOCATION_ERROR,
+                               "Parrot VM: Can't modify a constant\n");
+            return NULL;
+        }
     }
 
     /* Do we have an extension area? */
-    if (PObj_is_PMC_EXT_TEST(pmc) && pmc->pmc_ext) {
-        has_ext = 1;
-    }
+    has_ext = (PObj_is_PMC_EXT_TEST(pmc) && pmc->pmc_ext);
 
     /* Do we need one? */
-    if (Parrot_base_vtables[new_type]->flags & VTABLE_PMC_NEEDS_EXT) {
-
+    if (new_vtable->flags & VTABLE_PMC_NEEDS_EXT) {
         if (!has_ext) {
             /* If we need an ext area, go allocate one */
             add_pmc_ext(interpreter, pmc);
@@ -129,15 +135,18 @@ pmc_reuse(Interp *interpreter, PMC *pmc, INTVAL new_type,
 #if ! PMC_DATA_IN_EXT
         PMC_data(pmc) = NULL;
 #endif
+        new_flags = 0;
     }
 
     /* we are a PMC + maybe is_PMC_EXT */
     PObj_flags_SETTO(pmc, PObj_is_PMC_FLAG | new_flags);
 
     /* Set the right vtable */
-    pmc->vtable = Parrot_base_vtables[new_type];
+    pmc->vtable = new_vtable;
+
     /* Call the base init for the redone pmc */
     VTABLE_init(interpreter, pmc);
+
     return pmc;
 }
 
