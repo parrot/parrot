@@ -50,10 +50,21 @@ Halt and Catch Fire. Tries to crash parrot.
 =cut
 
 op hcf() {
-  int *a, i;
-  a = NULL;
-  i = *a;
-  goto OFFSET(i) ; /* in case your runtime is very forgiving. */
+    int *a, i;
+    a = NULL;
+    i = *a;
+    goto OFFSET(i) ; /* in case your runtime is very forgiving. */
+}
+
+=item B<q>
+
+Support for writing a very short quine.
+
+=cut
+
+op q() {
+    PIO_printf(interpreter, "loadlib P1, \"myops_ops\"\nq\n" );
+    HALT();
 }
 
 =item B<alarm>(in NUM, in PMC)

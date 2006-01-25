@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 6;
+use Parrot::Test tests => 7;
 use Parrot::Config;
 
 
@@ -68,7 +68,13 @@ CODE
 neither here
 OUTPUT
 
-
+{
+    my $quine = <<'END_PASM';
+loadlib P1, "myops_ops"
+q
+END_PASM
+    pasm_output_is( $quine, $quine, 'a short cheating quine');
+}
 pir_output_is(<< 'CODE', << 'OUTPUT', "one alarm");
 
 .sub main :main
