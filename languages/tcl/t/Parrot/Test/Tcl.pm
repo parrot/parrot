@@ -53,7 +53,11 @@ foreach my $func ( keys %language_test_map ) {
     my $exit_code = 0;
     my $pass = 0;
 
-    $cmd = "$self->{parrot} $args languages/tcl/tcl.pbc $lang_f";
+    my $executable = "$self->{parrot} $args languages/tcl/tcl.pbc"; 
+    if (defined($ENV{PARROT_TCLSH})) {
+      $executable = $ENV{PARROT_TCLSH};
+    }
+    $cmd = "$executable $lang_f";
 
     $exit_code = Parrot::Test::run_command($cmd, CD => $self->{relpath},
 					   STDOUT => $out_f, STDERR => $out_f);
