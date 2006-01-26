@@ -31,7 +31,6 @@ stopped. See the L<Glossary|docs/glossary.pod> for more information.
 */
 
 #include "parrot/parrot.h"
-#include "parrot/method_util.h"
 #include "parrot/oplib/ops.h"
 #include <assert.h>
 

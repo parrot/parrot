@@ -26,7 +26,6 @@ There's also a verbose mode for garbage collection.
 
 #define DOD_C_SOURCE
 #include "parrot/parrot.h"
-#include "parrot/method_util.h"
 #include <assert.h>
 
 /* Set this to 1 to see if unanchored objects are found in system areas.

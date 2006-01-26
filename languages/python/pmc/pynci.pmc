@@ -19,7 +19,6 @@ Extends Parrot's NCI to include attributes, implemented as properties.
 */
 
 #include "parrot/parrot.h"
-#include "parrot/method_util.h"
 
 pmclass PyNCI extends NCI extends PyFunc dynpmc group python_group {
 

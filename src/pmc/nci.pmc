@@ -23,7 +23,6 @@ The caller has to preserve registers if needed.
 */
 
 #include "parrot/parrot.h"
-#include "parrot/method_util.h"
 
 pmclass NCI need_ext {
 
@@ -123,7 +122,8 @@ shifted down.
 */
 
     void* invoke (void * next) {
-        Parrot_csub_t func = (Parrot_csub_t)D2FPTR(PMC_data(SELF));
+        typedef INTVAL (*nci_sub_t)(Interp * , PMC * );
+        nci_sub_t func = (nci_sub_t)D2FPTR(PMC_data(SELF));
 
         INTERP->current_cont = NULL;
         if (!func)

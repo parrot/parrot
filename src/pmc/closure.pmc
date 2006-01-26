@@ -20,7 +20,6 @@ structure.
 */
 
 #include "parrot/parrot.h"
-#include "parrot/method_util.h"
 
 pmclass Closure extends Sub need_ext {
 

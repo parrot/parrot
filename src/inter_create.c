@@ -21,7 +21,6 @@ Create or destroy a Parrot interpreter.c
 
 #include <assert.h>
 #include "parrot/parrot.h"
-#include "parrot/method_util.h"
 #include "parrot/oplib/core_ops.h"
 
 #if EXEC_CAPABLE

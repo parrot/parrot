@@ -411,7 +411,6 @@ INTERP_O_FILES = \
 	$(SRC_DIR)/dod$(O) \
 	$(SRC_DIR)/gc_ims$(O) \
 	$(SRC_DIR)/gc_gms$(O) \
-	$(SRC_DIR)/method_util$(O) \
 	$(SRC_DIR)/exit$(O) \
 	$(SRC_DIR)/misc$(O) \
 	$(SRC_DIR)/spf_render$(O) \
@@ -969,8 +968,6 @@ $(SRC_DIR)/core_pmcs$(O) : $(GENERAL_H_FILES)
 $(SRC_DIR)/trace$(O) : $(GENERAL_H_FILES)
 
 $(SRC_DIR)/debug$(O) : $(GENERAL_H_FILES) $(INC_DIR)/debug.h
-
-$(SRC_DIR)/method_util$(O) : $(GENERAL_H_FILES)
 
 $(SRC_DIR)/sub$(O) : $(GENERAL_H_FILES)
 

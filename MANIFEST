@@ -620,7 +620,6 @@ include/parrot/library.h                          [main]include
 include/parrot/list.h                             [main]include
 include/parrot/longopt.h                          [main]include
 include/parrot/memory.h                           [main]include
-include/parrot/method_util.h                      [main]include
 include/parrot/misc.h                             [main]include
 include/parrot/mmd.h                              [main]include
 include/parrot/nci.h                              [main]include
@@ -1787,7 +1786,6 @@ src/longopt.c                                     []
 src/malloc-trace.c                                []
 src/malloc.c                                      []
 src/memory.c                                      []
-src/method_util.c                                 []
 src/misc.c                                        []
 src/mmd.c                                         []
 src/nci_test.c                                    []

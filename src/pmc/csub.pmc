@@ -15,7 +15,6 @@ This class has been superseded by C<NCI>.
 */
 
 #include "parrot/parrot.h"
-#include "parrot/method_util.h"
 
 pmclass CSub {
     void init () {
@@ -51,13 +50,6 @@ pmclass CSub {
 
     INTVAL defined () {
         return PMC_struct_val(SELF) != NULL;
-    }
-
-    void* invoke (void * next) {
-        Parrot_csub_t func =
-        (Parrot_csub_t)D2FPTR(PMC_struct_val(SELF));
-        func(INTERP, SELF);
-        return next;
     }
 }
 

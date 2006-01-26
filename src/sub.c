@@ -19,7 +19,6 @@ Subroutines, continuations, co-routines and other fun stuff...
 */
 
 #include "parrot/parrot.h"
-#include "parrot/method_util.h"
 #include "parrot/oplib/ops.h"
 
 /*

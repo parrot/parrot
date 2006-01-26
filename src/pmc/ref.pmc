@@ -22,7 +22,6 @@ C<Parrot::Pmc2c>.
 */
 
 #include "parrot/parrot.h"
-#include "parrot/method_util.h"
 
 pmclass Ref does ref {
 

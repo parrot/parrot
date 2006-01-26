@@ -1198,10 +1198,10 @@ inline op loadlib(out PMC, in STR) {
 op dlfunc (out PMC, in PMC, in STR, in STR) {
   char * name = string_to_cstring(interpreter, ($3));
 
-  Parrot_csub_t p = (Parrot_csub_t)D2FPTR(
-	  Parrot_dlsym(PMC_IS_NULL($2) ? NULL : PMC_data($2), name));
+  funcptr_t p = D2FPTR(Parrot_dlsym(PMC_IS_NULL($2) ? 
+	NULL : PMC_data($2), name));
   string_cstring_free(name);
-  if (p == NULL) {
+  if (p == NULLfunc) {
       const char * err = Parrot_dlerror();
       Parrot_warn(interpreter, PARROT_WARNINGS_UNDEF_FLAG,
 	 "Symbol '%s' not found: %s\n", name, err ? err : "unknown reason");

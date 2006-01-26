@@ -20,7 +20,6 @@ bound to this call instance.
 */
 
 #include "parrot/parrot.h"
-#include "parrot/method_util.h"
 
 pmclass Bound_NCI extends NCI need_ext {
 

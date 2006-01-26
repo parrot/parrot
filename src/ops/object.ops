@@ -2,7 +2,6 @@
 ** object.ops
 */
 
-#include "parrot/method_util.h"
 
 VERSION = PARROT_VERSION;
 

@@ -20,7 +20,6 @@ assembler/compilers.
 */
 
 #include "parrot/parrot.h"
-#include "parrot/method_util.h"
 #include "parrot/interp_guts.h"
 
 pmclass Compiler extends NCI need_ext {
@@ -37,7 +36,9 @@ C<Eval> PMC with a new PackFile attached.
 */
 
     void* invoke (void * code_ptr) {
-        Parrot_csub_t func = (Parrot_csub_t)D2FPTR(PMC_data(SELF));
+        typedef INTVAL (*nci_sub_t)(Interp * , PMC * );
+        nci_sub_t func = (nci_sub_t)D2FPTR(PMC_data(SELF));
+        
         INTERP->current_cont = NULL;
         func(INTERP, SELF);
         return code_ptr;

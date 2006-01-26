@@ -56,7 +56,6 @@ initializer.
 */
 
 #include "parrot/parrot.h"
-#include "parrot/method_util.h"
 
 /* interface constants */
 /* &gen_from_enum(timer.pasm) */
