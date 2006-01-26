@@ -3,7 +3,6 @@ package Lua::parser;
 
 use strict;
 
-use Math::BigFloat;
 use Lua::opcode;
 use Lua::symbtab;
 
@@ -121,13 +120,47 @@ sub BuildTable {
 	push @opcodes1, new LocalDir($parser,
 			'result'				=>	$result,
 	);
-	my $idx = 1;
+	my $num_key;
 	while (my $field = shift @{$fields}) {
 		my ($val, $key);
 		if (scalar(@{$field}) == 1) {
 			$val = $field->[0];
-			$key = BuildLiteral($parser, new Math::BigFloat($idx), "number");
-			$idx ++;
+			if (defined $num_key) {
+				my $incr = new IncrOp($parser,
+						'result'				=>	$num_key,
+				);
+				$key = [$num_key, [$incr]];
+			} else {
+				my $unit = BuildLiteral($parser, 1, "number");
+				my @opcodes3 = @{$unit->[1]};
+				$num_key = new_tmp($parser, "pmc");
+				push @opcodes3, new LocalDir($parser,
+						'result'				=>	$num_key,
+				);
+				push @opcodes3, new CloneOp($parser,
+						'arg1'					=>	$unit->[0],
+						'result'				=>	$num_key,
+				);
+				$key = [$num_key, \@opcodes3];
+			}
+			if (        scalar @{$fields} == 0
+					and scalar @{$val->[1]} != 0
+					and ${$val->[1]}[-1]->isa("CallOp") 
+					and !exists ${$val->[1]}[-1]->{result}[0]->{pragma} ) {
+				my $callop = ${$val->[1]}[-1]; 
+				$callop->{result}[0]->{pragma} = "multi";
+				push @opcodes1, @{$val->[1]};
+				push @opcodes2, @{$key->[1]};
+				my $fct = new defn("tconstruct", "util");
+				push @opcodes2, new CallOp($parser,
+						'result'				=>	[$result],
+						'arg1'					=>	$fct,
+						'arg2'					=>	[$result, $num_key, $callop->{result}[0]],
+				);
+				push @opcodes2, new NoOp($parser);
+				push @opcodes1, @opcodes2;
+				return [$result, \@opcodes1];
+			}
 		} else {
 			$key = $field->[0];
 			$val = $field->[1];
@@ -585,7 +618,7 @@ sub BuildForNum {
 	my ($parser, $idf, $e_start, $e_limit, $e_step, $block) = @_;
 	my @opcodes = ();
 	unless (defined $e_step) {
-		$e_step = BuildLiteral($_[0], new Math::BigFloat(1), 'number');
+		$e_step = BuildLiteral($_[0], 1, 'number');
 	}
 	push @opcodes, @{$e_start->[1]};
 	push @opcodes, @{$e_limit->[1]};
@@ -708,7 +741,9 @@ sub BuildReturn {
 		push @returns, $expr->[0];
 	}
 	if (scalar(@opcodes) and $opcodes[-1]->isa("CallOp")) {
-		$returns[-1]->{pragma} = "multi";
+		unless (exists $returns[-1]->{pragma}) { 
+			$returns[-1]->{pragma} = "multi";
+		}
 	}
 	push @opcodes, new ReturnDir($parser,
 			'result'				=>	\@returns,

@@ -270,6 +270,31 @@ L0:
     argerror($S0)
 .end
 
+
+=item C<tconstruct (table, index, argv)>
+
+=cut
+
+.sub tconstruct
+    .param pmc table
+    .param pmc index
+    .param pmc argv :slurpy
+    .local int argc
+    .local int i
+    argc = argv
+    i = 0
+L1:
+    if i >= argc goto L2
+    $P0 = argv[i]
+    table[index] = $P0
+    add index, 1
+    i = i + 1
+    goto L1
+L2:
+    .return (table)
+.end
+
+
 =back
 
 =head1 AUTHORS

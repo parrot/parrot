@@ -1,5 +1,5 @@
 #! perl -w
-# Copyright: 2005 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2005-2006 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 =head1 NAME
@@ -22,7 +22,7 @@ use strict;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 5;
+use Parrot::Test tests => 6;
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'list-style init' );
 days = {"Sunday", "Monday", "Tuesday", "Wednesday",
@@ -76,5 +76,19 @@ print(a[22])
 CODE
 sub
 ---
+OUT
+
+language_output_is( 'lua', <<'CODE', <<'OUT', '' );
+local function f() return 10, 20 end
+
+print(unpack{f()})
+print(unpack{"a", f()})
+print(unpack{f(), "b"})
+print(unpack{"c", (f())})
+CODE
+10	20
+a	10	20
+10	b
+c	10
 OUT
 

@@ -61,6 +61,12 @@ use base qw(Lua::opcode);
 package KeyedSetOp;
 use base qw(Lua::opcode);
 
+package IncrOp;
+use base qw(Lua::opcode);
+
+package NoOp;
+use base qw(Lua::opcode);
+
 package FindGlobalOp;
 use base qw(Lua::opcode);
 

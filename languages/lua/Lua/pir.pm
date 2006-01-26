@@ -72,6 +72,13 @@ sub visitKeyedSetOp {
 	print $FH "    $op->{result}->{symbol}\[$op->{arg1}->{symbol}\] = $op->{arg2}->{symbol}\n";
 }
 
+sub visitIncrOp {
+	my $self = shift;
+	my ($op) = @_;
+	my $FH = $self->{fh};
+	print $FH "    add $op->{result}->{symbol}, 1\n";
+}
+
 sub visitFindGlobalOp {
 	my $self = shift;
 	my ($op) = @_;
@@ -85,6 +92,13 @@ sub visitCloneOp {
 	my ($op) = @_;
 	my $FH = $self->{fh};
 	print $FH "    $op->{result}->{symbol} = clone $op->{arg1}->{symbol}\n";
+}
+
+sub visitNoOp {
+	my $self = shift;
+	my ($op) = @_;
+	my $FH = $self->{fh};
+#	print $FH "    noop\n";
 }
 
 sub visitToBoolOp {
