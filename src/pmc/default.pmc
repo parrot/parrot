@@ -358,19 +358,11 @@ C<type_keyed()> with it.
 
 Returns the name of the PMC.
 
-=item C<STRING *namespace_name()>
-
-Returns the namespace name of the PMC.
-
 =cut
 
 */
 
     STRING* name () {
-        return SELF->vtable->whoami;
-    }
-
-    STRING* namespace_name () {
         return SELF->vtable->whoami;
     }
 
@@ -402,7 +394,7 @@ Store the method as a global in the namespace of this class.
     }
 
     void add_method(STRING *method_name, PMC *sub_pmc) {
-        STRING *names = DYNSELF.namespace_name();
+        STRING *names = DYNSELF.name();
         Parrot_store_global(INTERP, names, method_name, sub_pmc);
     }
 /*

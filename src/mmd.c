@@ -1725,18 +1725,15 @@ mmd_distance(Interp *interpreter, PMC *pmc, PMC *arg_tuple)
 #if MMD_DEBUG
         {
             STRING *s1, *s2;
-            PMC *c;
             if (type_sig < 0)
                 s1 = Parrot_get_datatype_name(interpreter, type_sig);
             else {
-                c = Parrot_base_vtables[type_sig]->class;
-                s1 = VTABLE_namespace_name(interpreter, c);
+                s1 = Parrot_base_vtables[type_sig]->whoami;
             }
             if (type_call < 0)
                 s2 = Parrot_get_datatype_name(interpreter, type_call);
             else {
-                c = Parrot_base_vtables[type_call]->class;
-                s2 = VTABLE_namespace_name(interpreter, c);
+                s2 = Parrot_base_vtables[type_call]->whoami;
             }
             PIO_eprintf(interpreter, "arg %d: dist %d sig %Ss arg %Ss\n",
                 i, dist, s1, s2);

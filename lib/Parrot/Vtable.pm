@@ -138,7 +138,7 @@ typedef enum {
 } vtable_flags_t;
 
 struct _vtable {
-    struct PACKAGE *package; /* Pointer to package this vtable belongs to */
+    PMC *namespace;          /* Pointer to namespace for this class */
     INTVAL base_type;        /* 'type' value for MMD */
     STRING* whoami;          /* Name of class this vtable is for */
     UINTVAL flags;           /* Flags. Duh */
@@ -215,7 +215,7 @@ EOM
  */
 #ifdef PARROT_IN_OBJECTS_C
 static const char * const Parrot_vtable_slot_names[] = {
-    "",     /* Pointer to package this vtable belongs to */
+    "",     /* Pointer to namespace for this class */
     "",     /* 'type' value for MMD */
     "",     /* Name of class this vtable is for */
     "",     /* Flags. Duh */

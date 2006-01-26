@@ -352,7 +352,6 @@ void become_parent(PMC* class)
 INTVAL class_type()
 void add_method(STRING* method, PMC* sub_pmc)
 void remove_method(STRING* method)
-STRING* namespace_name()
 PMC* new_singleton()
 PMC* get_anonymous_subclass()
 

@@ -63,10 +63,6 @@ pmclass deleg_pmc {
         return res;
     }
 
-    STRING* namespace_name() {
-        return SELF.name();
-    }
-
     STRING* name() {
         PMC **class_data;
         class_data = (PMC **)PMC_data(SELF);

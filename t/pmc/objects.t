@@ -1266,7 +1266,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "PMC as classes - subclass");
 CODE
 ok 1
 ok 2
-ParrotClass
+MyInt
 11
 OUTPUT
 

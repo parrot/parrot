@@ -102,10 +102,9 @@ Returns whether the class is or inherits from C<*classname>.
 
 Return SELF.
 
-=item C<STRING* namespace_name()>
+=item C<STRING* name()>
 
-Return the name of the namespace, which is the classname of ParrotClass
-classes.
+Return the classname.
 
 =cut
 
@@ -115,12 +114,16 @@ classes.
         return SELF;
     }
 
-    STRING* namespace_name() {
+    STRING* name() {
         PMC **class_data;
         class_data = (PMC **)PMC_data(SELF);
 
-        return VTABLE_get_string(INTERP, class_data[PCD_CLASS_NAME]);
+        return class_data ? 
+            VTABLE_get_string(INTERP, class_data[PCD_CLASS_NAME]) :
+            SELF->vtable->whoami;
     }
+
+
 
 /*
 

@@ -844,7 +844,7 @@ void
 Parrot_${classname}_class_init(Parrot_Interp interp, int entry, int pass)
 {
     const struct _vtable temp_base_vtable = {
-        NULL,	/* package */
+        NULL,	/* namespace */
         $enum_name,	/* base_type */
         NULL,	/* whoami */
         $vtbl_flag, /* flags */

@@ -179,9 +179,10 @@ useful defaults and don't throw exceptions.
         SUPER(method_name, sub_pmc);
     }
 
-    STRING* namespace_name () {
-        return SUPER();
+    STRING* name() {
+        return SELF->vtable->whoami;
     }
+
 }
 
 /*
