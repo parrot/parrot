@@ -11,7 +11,7 @@ docs/dev/wranglers.pod - Tips for Bug Wranglers
 This document attempts to outline a set of "best practices" for dealing with
 bugs in Parrot's RT system.  It is targeted at Parrot developers and "Bug
 Wranglers" and is I<not> intended as advice or instruction for end users.  Bug
-filing procedures for end user's are documented in F<docs/submissions.pod>.
+filing procedures for end users are documented in F<docs/submissions.pod>.
 
 =head1 WHAT IS A BUG WRANGLER?
 
@@ -22,10 +22,9 @@ tracker in a healthy state.  I<This means you!>
 =head1 WHERE IS IT?
 
 The Parrot bug tracker is currently the same as the I<Perlbug> system used for
-Perl5 Development.  It is available via HTTP at L<http://bugs.perl.org> (XXX is
-this the official URL?).
+Perl5 Development.  It is available via HTTP at L<http://rt.perl.org>.
 
-=head1 BUG HANDLING PROCEDURES 
+=head1 BUG HANDLING PROCEDURES
 
 =head2 New Bugs
 
@@ -62,7 +61,9 @@ Make sure that there is actually a patch attached to the bug...
 
 =over 4
 
-=item * Claim ownership or interest ( CC ) of the ticket. In this way you will be received further correspondence about the ticket.
+=item * Claim ownership or interest ( CC ) of the ticket.
+
+This way you will receive further correspondence about the ticket.
 
 =item * Run the test suite
 
@@ -96,7 +97,7 @@ response from the requestor change the status to C<rejected>.
 If it's a [PATCH] bug it's possible that the patch was applied but the
 bug/patch status was never changed.   Also, not all list traffic regarding a
 bug ends up in RT.  It's best to look at the SVN repo to attempt to determine if
-the bug actual was resolved.
+the bug was resolved.
 
 =back
 

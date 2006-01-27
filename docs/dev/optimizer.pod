@@ -10,7 +10,7 @@ This document describes how the IMCC optimizer works.
 
 =head1 DESCRIPTION
 
-The objective of the IMCC optimizer is to take a PASM function as input and 
+The objective of the IMCC optimizer is to take a PASM function as input and
 apply code-improving transformations to it to be more efficient, i.e. improving
 execution time and reducing code size.  It must do this while preserving the
 same code behavior.
@@ -24,7 +24,7 @@ be optimized.
 
 =item IMC_Unit
 
-The IMC_Unit structure contains all the information known about a function.   
+The IMC_Unit structure contains all the information known about a function.
 It is passed in to each optimizer method.
 
 =item Instruction
@@ -43,10 +43,10 @@ list.  To iterate through all Instructions, use:
 Basic blocks are the most important structure for optimization.  A basic block
 identifies a block of instructions that will all execute in sequence without
 jumps into or out of that block.  All labels will appear at the beginning of a
-block, and all conditional or unconditional jumps will appear at the end. 
+block, and all conditional or unconditional jumps will appear at the end.
 Basic_block structures are stored as an array of pointers, each with an index
 that denotes their position in the array.  Block 0 is implicitly the top block.
- To iterate through all Basic_blocks, use:
+To iterate through all Basic_blocks, use:
 
     int i;
     for (i = 0; i < unit->n_basic_blocks; i++) {
@@ -76,7 +76,7 @@ depth of the loop.
 =item Set
 
 Set is a useful structure for defining sets of integers, which map to indexes
-of structures.  This is used most often to create sets of Basic_blocks. 
+of structures.  This is used most often to create sets of Basic_blocks.
 Dominators, dominance frontiers, and loops use Set.  A Set must be a defined
 size, and cannot grow or shrink.  Most standard set operations are implemented:
 add, contains, copy, equal, union, and intersection.
@@ -87,7 +87,7 @@ add, contains, copy, equal, union, and intersection.
 
 Optimizations are organized into an optimization loop within imc_reg_alloc() in
 reg_alloc.c.  The ordering is based on the amount of CFG information needed by
-each group of optimizations: pre_optimize(), cfg_optimize(), and optimize(). 
+each group of optimizations: pre_optimize(), cfg_optimize(), and optimize().
 Each optimization function (group and individual) returns an int, with TRUE
 denoting that an optimization has been performed and a change to the code has
 been made.  The power of the optimizer is that performing one optimization may

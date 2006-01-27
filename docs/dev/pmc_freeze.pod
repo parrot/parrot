@@ -28,8 +28,8 @@ example:
 
 =item freeze
 
-Called from user code to serialize the state of a PMC into some (possibly      
-  binary) representation held in a STRING.
+Called from user code to serialize the state of a PMC into some (possibly
+binary) representation held in a STRING.
 
 =item freeze_at_destruct
 
@@ -60,8 +60,8 @@ destroyed in an appropriate order. This is also called on interpreter shutdown.
 
 Mark all objects as being live by calling B<pobject_lives> called from DOD.
 While the functionality is the same, it will not be implemented on top of this
-general scheme for performance reasons. This leads to some code duplication,   
-     but DOD is run permanently and deserves all the speed it can get.
+general scheme for performance reasons. This leads to some code duplication,
+but DOD is run permanently and deserves all the speed it can get.
 
 =back
 
@@ -150,8 +150,8 @@ to be remembered.
 
 Using a B<Hash> is one method to avoid duplicates. The B<seen> hash holds keys
 being the address of the PMC and values being a PMC B<id>, which is unique for
-this PMC. While this is straight forward, it consumes 16 bytes per PMC (plus   
-     overhead, 32-bit system assumed). Hash lookups also take a considerable
+this PMC. While this is straight forward, it consumes 16 bytes per PMC (plus
+overhead, 32-bit system assumed). Hash lookups also take a considerable
 amount of time.
 
 =item B<next_for_GC>
