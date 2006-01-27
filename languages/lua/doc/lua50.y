@@ -73,8 +73,10 @@ stat
 |	FOR	NAME	'='	exp	','	exp	','	exp	DO	block	END
 |	FOR	NAME	'='	exp	','	exp	DO	block	END
 |	FOR	namelist	IN	explist1	DO	block	END
-|	FUNCTION	funcname	funcbody
-|	LOCAL	FUNCTION	NAME	funcbody
+|	FUNCTION
+				funcname	funcbody
+|	LOCAL	FUNCTION
+						NAME	funcbody
 |	LOCAL	namelist	'='	explist1
 |	LOCAL	namelist
 ;

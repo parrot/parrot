@@ -94,6 +94,13 @@ sub visitCloneOp {
 	print $FH "    $op->{result}->{symbol} = clone $op->{arg1}->{symbol}\n";
 }
 
+sub visitNewOp {
+	my $self = shift;
+	my ($op) = @_;
+	my $FH = $self->{fh};
+	print $FH "    $op->{result}->{symbol} = new $op->{arg1}\n";
+}
+
 sub visitNoOp {
 	my $self = shift;
 	my ($op) = @_;

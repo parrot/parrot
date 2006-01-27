@@ -1,5 +1,5 @@
 #! perl -w
-# Copyright: 2005 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2005-2006 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 =head1 NAME
@@ -64,7 +64,7 @@ language_output_is( 'lua', <<'CODE', <<'OUT', 'elseifs' );
 a = 3
 b = 7
 op = "*"
-r = 0
+r = 0 -- fix
 if op == "+" then
     r = a + b
 elseif op == "-" then

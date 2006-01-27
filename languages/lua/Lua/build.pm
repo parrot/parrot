@@ -27,7 +27,7 @@ sub new_fct {
 sub get_global {
 	my ($parser) = @_;
 	my @opcodes = ();
-	unless (exists $parser->YYData->{_G}) {
+	unless ($parser->YYData->{_G}) {
 		$parser->YYData->{_G} = new_tmp($parser, "pmc");
 		push @opcodes, new LocalDir($parser,
 			'result'				=>	$parser->YYData->{_G},
@@ -60,6 +60,29 @@ sub get_void {
 	delete $call->{result};
 	push @{$opcodes}, $call;
 	return $opcodes;
+}
+
+sub PushScope {
+	my ($parser) = @_;
+
+#	push @{$parser->YYData->{scope}}, $parser->YYData->{_G};
+	delete $parser->YYData->{_G};
+	push @{$parser->YYData->{scope}}, $parser->YYData->{symbtab};
+	$parser->YYData->{symbtab} = new SymbTabVar($parser);
+	push @{$parser->YYData->{scope}}, $parser->YYData->{symbtab_cst};
+	$parser->YYData->{symbtab_cst} = new SymbTabConst($parser);
+}
+
+sub PopScope {                 
+	my ($parser) = @_;
+
+	my $symbtab = pop @{$parser->YYData->{scope}};
+	$parser->YYData->{symbtab_cst} = $symbtab;
+	$symbtab = pop @{$parser->YYData->{scope}};
+	$parser->YYData->{symbtab} = $symbtab;
+#	my $g = pop @{$parser->YYData->{scope}};
+#	$parser->YYData->{_G} = $g if ($g); 
+	delete $parser->YYData->{_G};
 }
 
 sub BuildLiteral {
@@ -805,6 +828,7 @@ sub  BuildParam {
 
 sub BuildFunctionBody {
 	my ($parser, $params, $block) = @_;
+	PopScope($parser);
 	my @opcodes1 = ();
 	my @opcodes2 = ();
 	my $fct = new_fct($parser);

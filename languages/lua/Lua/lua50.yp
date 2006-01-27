@@ -135,15 +135,23 @@ stat
 		{
 			BuildForList($_[0], $_[2], $_[4], $_[6]);
 		}
-|	FUNCTION	funcname	funcbody
+|	FUNCTION
 		{
-			my $var = BuildVariable($_[0], $_[2]); 
-			BuildAssigns($_[0], [$var], [$_[3]])
+			PushScope($_[0]);
 		}
-|	LOCAL	FUNCTION	NAME	funcbody
+				funcname	funcbody
 		{
-			my $var = BuildLocalVariable($_[0], $_[3]); 
+			my $var = BuildVariable($_[0], $_[3]); 
 			BuildAssigns($_[0], [$var], [$_[4]])
+		}
+|	LOCAL	FUNCTION
+		{
+			PushScope($_[0]);
+		}
+						NAME	funcbody
+		{
+			my $var = BuildLocalVariable($_[0], $_[4]); 
+			BuildAssigns($_[0], [$var], [$_[5]])
 		}
 |	LOCAL	namelist	'='	explist1
 		{
@@ -527,6 +535,7 @@ sub Run {
 	$parser->YYData->{srcname_mtime} = $st[9];
 	$parser->_InitLexico();
 	$parser->YYData->{functs} = [];
+	$parser->YYData->{scope} = [];
 	$parser->YYData->{symbtab} = new SymbTabVar($parser);
 	$parser->YYData->{symbtab_cst} = new SymbTabConst($parser);
 	$parser->YYData->{idx_tmp} = 0;

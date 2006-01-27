@@ -150,6 +150,8 @@ Support variable number of arguments function call.
     .local int i
     new ret, .LuaTable
     new key, .LuaNumber
+    key = 0
+    if_null argv, L2
     argc = argv
     i = 0
 L1:

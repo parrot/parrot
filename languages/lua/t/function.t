@@ -53,10 +53,10 @@ OUT
 
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'var args' );
-local function f() return 1, 2 end
-local function g() return "a", f() end
-local function h() return f(), "b" end
-local function k() return "c", (f()) end
+function f() return 1, 2 end
+function g() return "a", f() end
+function h() return f(), "b" end
+function k() return "c", (f()) end
 
 print(f())
 print(g())

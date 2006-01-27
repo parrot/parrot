@@ -70,6 +70,9 @@ use base qw(Lua::opcode);
 package FindGlobalOp;
 use base qw(Lua::opcode);
 
+package NewOp;
+use base qw(Lua::opcode);
+
 package CloneOp;
 use base qw(Lua::opcode);
 
