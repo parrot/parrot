@@ -514,6 +514,7 @@ examples/pir/levenshtein.pir                      [main]doc
 examples/pir/life.pir                             [main]doc
 examples/pir/local_label.pir                      [main]doc
 examples/pir/mandel.pir                           [main]doc
+examples/pir/quine_ord.pir                        [main]doc
 examples/pir/queens_r.pir                         [main]doc
 examples/pir/readline.pir                         [main]doc
 examples/pir/substr.pir                           [main]doc
