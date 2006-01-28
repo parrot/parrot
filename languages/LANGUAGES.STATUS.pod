@@ -306,6 +306,33 @@ C<languages/forth>
 =back
 
 
+=head2 HQ9plus
+
+=over 4
+
+=item Author
+
+Bernhard Schmalhofer
+
+=item Description
+
+A joke language.
+
+=item Status
+
+Works.
+
+=item Last verified with parrot version
+
+0.4.1
+
+=item Location
+
+C<languages/HQ9plus>
+
+=back
+
+
 =head2 Jako
 
 =over 4

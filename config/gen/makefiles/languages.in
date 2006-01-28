@@ -10,6 +10,7 @@ RM_F      = @rm_f@
 # remove obsolete languages here
 LANGUAGES = \
     BASIC \
+    HQ9plus \
     Zcode \
     bc \
     befunge \
@@ -72,6 +73,7 @@ smoke-clean :
 
 clean: \
     BASIC.clean \
+    HQ9plus.clean \
     Zcode.clean \
     bc.clean \
     befunge.clean \
@@ -154,6 +156,14 @@ forth.test:
 # Looks like there are no tests for forth
 forth.clean:
 # no Makefile
+
+HQ9plus: HQ9plus.dummy
+HQ9plus.dummy:
+	- $(MAKE) HQ9plus
+HQ9plus.test:
+	- $(MAKE) HQ9plus test
+HQ9plus.clean:
+	- $(MAKE) HQ9plus clean
 
 jako: jako.dummy
 jako.dummy:

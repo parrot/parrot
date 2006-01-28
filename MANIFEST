@@ -488,7 +488,6 @@ examples/nci/QtHelloWorld.pasm                    [main]doc
 examples/nci/ls.pir                               [main]doc
 examples/nci/sdl_blue_rectangle.pir               [main]doc
 examples/nci/win32api.pir                         [main]doc
-examples/pasm/99beer.pasm                         [main]doc
 examples/pasm/cat.pasm                            [main]doc
 examples/pasm/fact.pasm                           [main]doc
 examples/pasm/hello.pasm                          [main]doc
@@ -694,6 +693,12 @@ languages/BASIC/interpreter/sampleb.bas           [BASIC]
 languages/BASIC/interpreter/stackops.pasm         [BASIC]
 languages/BASIC/interpreter/tokenize.pasm         [BASIC]
 languages/BASIC/interpreter/wumpus.bas            [BASIC]
+languages/HQ9plus/HQ9plus.pir                     [HQ9plus]
+languages/HQ9plus/README                          [HQ9plus]
+languages/HQ9plus/config/makefiles/root.in        [HQ9plus]
+languages/HQ9plus/lib/Parrot/Test/HQ9plus.pm      [HQ9plus]
+languages/HQ9plus/t/basic.t                       [HQ9plus]
+languages/HQ9plus/t/harness                       [HQ9plus]
 languages/LANGUAGES.STATUS.pod                    []
 languages/Zcode/CHANGES                           [Zcode]
 languages/Zcode/README                            [Zcode]

@@ -166,6 +166,7 @@ GEN_MAKEFILES = \
 	languages/befunge/Makefile \
 	languages/bf/Makefile \
 	languages/cola/Makefile \
+	languages/HQ9plus/Makefile \
 	languages/jako/Makefile \
 	languages/lisp/Makefile \
 	languages/lua/Makefile \

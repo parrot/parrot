@@ -137,6 +137,12 @@ sub makefiles
         replace_slashes                => 1
     );
     genfile(
+        'languages/HQ9plus/config/makefiles/root.in' => 'languages/HQ9plus/Makefile',
+        commentType                  => '#',
+        replace_slashes              => 1,
+        conditioned_lines            => 1
+    );
+    genfile(
         'config/gen/makefiles/jako.in' => 'languages/jako/Makefile',
         commentType                    => '#',
         replace_slashes                => 1

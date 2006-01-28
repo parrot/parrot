@@ -90,7 +90,8 @@ my $do_gen_html = grep { $_ eq '--html' } @ARGV;
 
 
 my @unified_testable_languages = 
-   qw( Zcode
+   qw( HQ9plus
+       Zcode
        bc
        befunge
        bf
