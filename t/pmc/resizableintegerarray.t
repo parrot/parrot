@@ -66,8 +66,8 @@ my $fp_equality_macro = <<'ENDOFMACRO';
 .endm
 ENDOFMACRO
 
-output_is(<<'CODE', <<'OUTPUT', "Setting array size");
-	new P0,.ResizableIntegerArray
+pasm_output_is(<<'CODE', <<'OUTPUT', "Setting array size");
+	new P0, .ResizableIntegerArray
 
 	set I0,P0
 	eq I0,0,OK_1
@@ -107,7 +107,7 @@ ok 4
 ok 5
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "Setting first element");
+pasm_output_is(<<'CODE', <<'OUTPUT', "Setting first element");
         new P0, .ResizableIntegerArray
         set P0, 1
 
@@ -136,7 +136,7 @@ ok 2
 ok 3
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "Setting second element");
+pasm_output_is(<<'CODE', <<'OUTPUT', "Setting second element");
         new P0, .ResizableIntegerArray
 
 	set P0[1], -7
@@ -166,7 +166,7 @@ OUTPUT
 
 # TODO: Rewrite these properly when we have exceptions
 
-output_is(<<'CODE', <<'OUTPUT', "Setting out-of-bounds elements");
+pasm_output_is(<<'CODE', <<'OUTPUT', "Setting out-of-bounds elements");
         new P0, .ResizableIntegerArray
         set P0, 1
 
@@ -178,7 +178,7 @@ CODE
 ok 1
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "Getting out-of-bounds elements");
+pasm_output_is(<<'CODE', <<'OUTPUT', "Getting out-of-bounds elements");
         new P0, .ResizableIntegerArray
         set P0, 1
 
@@ -190,7 +190,7 @@ ok 1
 OUTPUT
 
 
-output_is(<<"CODE", <<'OUTPUT', "Set via PMC keys, access via INTs");
+pasm_output_is(<<"CODE", <<'OUTPUT', "Set via PMC keys, access via INTs");
 @{[ $fp_equality_macro ]}
      new P0, .ResizableIntegerArray
      new P1, .Key
@@ -226,7 +226,7 @@ ok 2
 ok 3
 OUTPUT
 
-output_is(<<"CODE", <<'OUTPUT', "Set via INTs, access via PMC Keys");
+pasm_output_is(<<"CODE", <<'OUTPUT', "Set via INTs, access via PMC Keys");
 @{[ $fp_equality_macro ]}
      new P0, .ResizableIntegerArray
      set P0, 1
@@ -274,7 +274,7 @@ OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "check whether interface is done");
 
-.sub _main
+.sub test :main
     .local pmc pmc1
     pmc1 = new ResizableIntegerArray
     .local int bool1
@@ -297,7 +297,7 @@ OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "push integer");
 
-.sub _main
+.sub test :main
     .local pmc pmc1
     pmc1 = new ResizableIntegerArray
     pmc1[9999] = 0
@@ -317,7 +317,7 @@ CODE
 10001
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', 'basic pop');
+pasm_output_is(<<'CODE', <<'OUTPUT', 'basic pop');
      new P0, .ResizableIntegerArray
      set P0[0], 4
      set P0[1], 8
@@ -346,7 +346,7 @@ ok 2
 ok 3
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', 'pop many values');
+pasm_output_is(<<'CODE', <<'OUTPUT', 'pop many values');
      new P0, .ResizableIntegerArray
      set I0, 0
 L1:  set P0[I0], I0
@@ -371,7 +371,7 @@ CODE
 ok
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', 'push/pop');
+pasm_output_is(<<'CODE', <<'OUTPUT', 'push/pop');
      new P0, .ResizableIntegerArray
      push P0, 2
      push P0, 4
@@ -385,7 +385,7 @@ CODE
 ok 1
 OUTPUT
 
-output_like(<<'CODE', <<'OUTPUT', 'pop from empty array');
+pasm_output_like(<<'CODE', <<'OUTPUT', 'pop from empty array');
      new P0, .ResizableIntegerArray
      pop I0, P0
      end
