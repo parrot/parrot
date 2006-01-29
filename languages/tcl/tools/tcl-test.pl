@@ -9,6 +9,7 @@ $DIR = 't_tcl';
 
 use File::Spec;
 use Getopt::Std;
+use Text::Balanced; #XXX temporarily limit ourselves to perl 5.8...
 use Test::Harness;
 
 $|=1;
@@ -118,6 +119,47 @@ sub extract_tests {
     my %tests;
    
     my $regex = qr[
+        test \s+ (\S+)                  # test ident
+             \s+ \{ ([^}]+) \}          # test description
+             \s+ (?:\S+ \s+)? \{ \n     # optional test harness info (ignoring)
+                 ( (?:\s+ [^\n]+\n)+ )  # test body
+        \} \s+
+            (?: \{ ([^\n]+) \}          # test result
+              | " ((?:[^"\\]|\\.)+) "   #" (keep my editor happy)
+              | (\w+) )
+    ]sx;
+    
+    while ($source =~ m[$regex]go) {
+        my ($name, $expl, $body, $out) = ($1, $2, $3, choose($4, unescape($5), $6));
+        
+        # make the test print the last line of output
+        # XXX This should be "print the last command". Which is harder.
+        $body =~ s/^(\s*)([^\n]+)\s*\Z/$1puts [$2]/m;
+        
+        $tests{$name} = [$expl, $body, $out];
+    }
+    
+    return %tests;
+}
+
+##
+## $preamble = extract_preamble($string)
+##
+## Extract the preamable for tests from the .test file.
+## This consists of any procedures defined in the test file outside of a test,
+## as well as any catch commands.
+##
+sub extract_preamble {
+    my ($source) = @_;
+    my $preamble;
+
+    my $regex = qr[
+        ^                               # preambles begin the line
+        (                               # then contain one of...
+        catch {                       # a catch statement
+
+        |                               # or
+        proc                            # a procedure definition
         test \s+ (\S+)                  # test ident
              \s+ \{ ([^}]+) \}          # test description
              \s+ (?:\S+ \s+)? \{ \n     # optional test harness info (ignoring)
