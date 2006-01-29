@@ -70,6 +70,9 @@ for my $file (@skip) {
 }
 
 my @tests = map {"$teetcl/$_.t"} @keep;
+if (! @tests) {
+  die "Couldn't find any tcl test files to run.\n";
+}
 my $cmd = "$^X t/harness @tests";
 print "$cmd\n";
 system($cmd);
