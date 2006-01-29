@@ -136,7 +136,7 @@ To run the test suite, C<make test>. If you want to also get output from the
 TODO tests, C<make devtest> instead. This is NOT the tcl test suite.
 No failures are expected.
 
-To run the tcl test suite, type "make tcl-test". This will checkout the latest
+To run the tcl test suite, type C<make tcl-test>. This will checkout the latest
 cvs copy of the tests from the tcl repository and run them. Warning:
 
 =over 4

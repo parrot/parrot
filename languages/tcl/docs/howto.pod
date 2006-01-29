@@ -2,11 +2,11 @@
 
 a brief overview on how to help out, if you're interested. In general, 
 it's ok to send patches for tcl to the RT system for anything that isn't
-"BIG STUFF" - those, please bounce off me first. I'd prefer C<diff -u>
-patches, but am happy to take complete files as well.
+"BIG STUFF" - those, please bounce off the MAINTAINERS first.
+We'd prefer C<diff -u> patches, but are happy to take complete files as well.
 
 Since partcl is bundled with the parrot source, svn access is handled via
-the same mechanism as for parrot itself.
+the same mechanism as for parrot itself. 
 
 =head1 BIG STUFF
 
@@ -19,8 +19,9 @@ into an AST (in the form of a Tcl* object from lib/*). Once a section of code
 has been translated, the object's C<compile> method is invoked, which then
 generates PIR which can be compiled by parrot.
 
-The commands themselves are have inlineable (compiled) versions: These are
-in the lib/builtins, and all new development should go here. There are many
+The commands themselves have (well, some of them do) inlineable (compiled) 
+versions: These are
+in lib/builtins, and all new development should go here. There are many
 old, runtime-only versions that exist in lib/commands. All *new* development
 should occur in lib/builtins. Minor patches to things in lib/commands are
 ok, though.
@@ -43,21 +44,19 @@ code, as well as simplify generations. While we're using perl to generate
 the code, this is a one time cost at build time: at run time, we
 are using PIR. (Which in turn generates PIR itself).
 
-Handrolled inlined builtins take two args: a register num, along with a single
-container PMC with the various args. The register num is the first $P
-register that is available for use when you generate your PIR. The container
+Handrolled inlined builtins take two args: a TclCompiler, and a single
+container PMC with the various args. The container
 PMC has objects generated from parser that need to be compiled themselves
-before you can rely on their values. Your return value is going to be
-the $P register in which your result is, along with the PIR code that you
-generated which will produce this result. Be sure to include any PIR generated
-by objects you call 'compile'() on along the way. You should only use this
+before you can rely on their values. Your return value is simply the compiler
+object.  You should only use this
 method for generating builtins if a builtin cannot be defined using a template,
 and even then, extending the template parser is probably the right answer.
 
 (This is as opposed to the interpreted style in lib/commands, which takes
 a variable number of already compiled args at runtime. Our fallback method
 bundles these up, passing in a starting register of 0, and uses the resulting
-PIR to generate a .sub immediately and then invoke it.)
+PIR to generate a .sub immediately and then invoke it. The runtime fallback
+is always going to be necessary for HLL interoperability.)
 
 Remember, every arg to your builtin is potentially variable and may change
 at runtime. You can check the type of the object at compile time. However,
