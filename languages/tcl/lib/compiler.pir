@@ -16,10 +16,11 @@ This is the compiler portion of ParTcl.
 
 Parses the Tcl code and returns generated PIR code.
 
-Argument register_num is the first register number that is available for use by the
-generated PIR.
+Argument register_num is the first register number that is available for use
+by the generated PIR.
 
-Return register_num is the register number that contains the result of this code.
+Return register_num is the register number that contains the result of
+this code.
 
 =cut
 
@@ -76,18 +77,14 @@ stringish:
   rquote = "\"" 
 set_args:
 
-  .local pmc printf_args
-  printf_args = new .Array
-  printf_args = 6
-  printf_args[0] = register_num
-  printf_args[1] = thing_type
-  printf_args[2] = register_num
-  printf_args[3] = lquote
-  printf_args[4] = $S0
-  printf_args[5] = rquote
- 
-  pir_code = sprintf "$P%i = new .%s\n$P%i=%s%s%s\n", printf_args
+   .local string template
+   template = <<"END_PIR"
+$P%i = new .%s
+$P%i=%s%s%s
+END_PIR
 
+  .sprintf6(pir_code, template, register_num, thing_type, register_num, lquote, $S0, rquote)
+ 
   # PIR's compiler can't deal with the utf16 code is generated as a result
   # of the string manipulation that brings us to this point. So, we need
   # to downcast it to ASCII. Which should be lossless, given the code that
@@ -104,6 +101,7 @@ can_compile:
 .end
 
 =item C<(pmc invokable) = pir_compiler(int register_num, string PIR)>
+
 =item C<(string code)   = pir_compiler(int register_num, string PIR, 1)>
 
 A thin wrapper for the <compreg>'d PIR compiler. 

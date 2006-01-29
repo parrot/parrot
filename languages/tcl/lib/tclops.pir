@@ -69,17 +69,10 @@ logical_not:
 done:
   (register_num,pir_code) = compile(register_num,operand)
 
-  .local pmc printf_args
-  printf_args = new .Array
-  printf_args = 3
-  inc register_num
-  printf_args[0] = register_num
-  printf_args[1] = opcode
-  dec register_num
-  printf_args[2] = register_num
-  inc register_num
+  $I0 = register_num + 1
+  .sprintf3($S0, "$P%i=%s $P%i\n", $I0, opcode, register_num)
+  register_num = $I0
 
-  $S0 = sprintf "$P%i=%s $P%i\n", printf_args
   pir_code .= $S0
 
   .return(register_num, pir_code)

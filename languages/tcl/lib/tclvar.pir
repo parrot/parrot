@@ -22,17 +22,15 @@ Define the attributes required for the class.
     .param int register_num
 
     .local string pir_code
-    pir_code = ""
-    .local pmc args
- 
-    args = new .Array
-    args = 4
-    args[0] = register_num
-    $S0 = self
-    args[1] = $S0
+    .local string template
+    template = <<"END_PIR"
+.local pmc read
+read = find_global '_Tcl', '__read'
+$P%i = read("%s")
+END_PIR
 
-    $S1 = sprintf ".local pmc read\nread=find_global \"_Tcl\", \"__read\"\n$P%i = read(\"%s\")\n", args
-    pir_code .= $S1 
- 
+     $S0 = self
+    .sprintf2(pir_code, template, register_num, $S0)
+
     .return (register_num,pir_code)
 .end
