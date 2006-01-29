@@ -81,8 +81,8 @@ def main():
    bc_fn       = bc_filenames[0]
    bc_fh       = open(bc_fn, 'r')
    regexp      = re.compile( r"\.bc$" )
-   pir_fh      = open( regexp.sub(".pir", bc_fn), 'w' )
-   past_pir_fh = open( regexp.sub("_past.pir", bc_fn), 'w' )
+   no_past_fh  = open( regexp.sub("_antlr2_no_past.pir", bc_fn), 'w' )
+   past_fh     = open( regexp.sub("_antlr2.pir", bc_fn), 'w' )
 
    L = bc.BcLexer.Lexer(bc_fh) 
    P = bc.BcParser.Parser(L)
@@ -108,7 +108,7 @@ def main():
    BcW = bc.BcTreeWalker.Walker();
    BcW.gen_pir(ast);
    pir_ast = BcW.getAST()
-   sys.stdout = pir_fh
+   sys.stdout = no_past_fh
    print """
 ##!/usr/bin/env parrot
 
@@ -152,7 +152,7 @@ def main():
 
    # Now dump PIR, that uses PAST
    # TODO: This is a dummy implementation right now
-   sys.stdout = past_pir_fh
+   sys.stdout = past_fh
    visitor = Visitor()    # Construct Visitor after reassigning sys.stdout
    BcW.gen_antlr_past(ast);
    antlr_past = BcW.getAST()

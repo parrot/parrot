@@ -45,7 +45,7 @@ sub run_tests {
 
 my @tests = (
        # multiple lines
-       [ '1', [ 1 ], 'one line', with_past => 1  ],
+       [ '1', [ 1 ], 'one line', with_past => 1, with_antlr3 => 1  ],
        [ "1\n2", [ 1, 2 ], 'two lines', with_past => 1  ],
        [ "1\n2\n3\n4\n\n5\n6\n7", [ 1, 2, 3, 4, 5, 6, 7 ], 'seven lines', with_past => 1  ],
 

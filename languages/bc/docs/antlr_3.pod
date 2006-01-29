@@ -8,7 +8,13 @@ This are some rumblings on using ANTLR 3 for Parrot bc, or with Parrot in genera
 
 =head1 ANTLR 3
 
-=head1 Lexer
+=head2 Running
+
+  export CLASSPATH=/home/bernhard/devel/ANTLR/v3/antlr-3.0ea7/lib/antlr-3.0ea7.jar:/home/bernhard/devel/ANTLR/v3/antlr-3.0ea7/lib/antlr-2.7.5.jar:/home/bernhard/devel/ANTLR/v3/antlr-3.0ea7/lib/stringtemplate-2.3b4.jar:$CLASSPATH
+
+And see Makefile.
+ 
+=head2 Lexer
 
 The lexer specification can be in the parser specification.
 A lexer grammar is automatically generated.
@@ -20,7 +26,13 @@ A lexer grammar is automatically generated.
 
 =head2 StringTemplate
 
-=head2 Backends
+=head1 ANTLR Backends
+
+=head2 Java
+
+=head2 Python
+
+=head2 Perl5
 
 =head1 ANTLR and Parrot
 

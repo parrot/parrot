@@ -21,14 +21,18 @@ help:
 	@echo ""
 	@echo "Following targets are available for the user:"
 	@echo ""
+	@echo "Building:"
 	@echo "  all:               BcLexer.py and BcParser.py"
 	@echo "                     This is the default."
+	@echo "  build_python:      Build implementation in Python"
 	@echo ""
-	@echo "  maintain:          Generate Python runtime files"
-	@echo "                     Needs ANTLR and Python"
+	@echo "  build_java:        Build implementation in Java"
 	@echo ""
 	@echo "Testing:"
 	@echo "  test:              Run the test suite."
+	@echo "  test_python:       Run the test suite for Parrot bc in Python."
+	@echo "  test_java:         Run the test suite for Parrot bc in Java."
+	@echo "  test_posix:        Run the test suite for POSIX bc."
 	@echo ""
 	@echo "Cleaning:"
 	@echo "  clean:             Basic cleaning up."
@@ -37,14 +41,40 @@ help:
 	@echo "Misc:"
 	@echo "  help:              Print this help message."
 	@echo ""
+	@echo "Only for maintainer:"
+	@echo "  maintain:          Generate Python runtime files"
+	@echo "                     Needs ANTLR and Python"
+	@echo ""
 
-test: build
-	cd .. && $(PERL) -I../lib -I bc/lib bc/t/harness --use-gnu-bc
+test: test_python test_posix test_java
 
-build:
+test_python: build_python
+	cd .. && $(PERL) -I../lib -I bc/lib bc/t/harness --with-python
+
+test_posix: 
+	cd .. && $(PERL) -I../lib -I bc/lib bc/t/harness --with-posix
+
+test_java: build_java
+	cd .. && $(PERL) -I../lib -I bc/lib bc/t/harness --with-java
+
+# For smoke testing build only the Implementation in Python
+build: build_python
+
+build_python:
 # Nothing to do
 
-maintain: $(PYTHON_RUNTIME_FILES)
+build_java: Bc.class 
+
+Bc.class: 
+	@echo 'Be sure to set CLASSPATH first'
+	javac Bc.java 
+
+maintain: maintain_python maintain_java
+
+maintain_python: $(PYTHON_RUNTIME_FILES)
+
+maintain_java:
+# Nothing to do yet
 
 # BcLexer.py will be created too
 # TODO: antlr_past2pir_past shouldn't need BcLexerTokenTypes.txt
@@ -53,11 +83,18 @@ $(PYTHON_RUNTIME_FILES): grammar/antlr_2/bc_python.g grammar/antlr_2/antlr_past2
 	$(CP) python/lib/bc/BcLexerTokenTypes.txt python/lib/antlr_past2pir_past
 	antlr -o python/lib/antlr_past2pir_past grammar/antlr_2/antlr_past2pir_past.g
 
-clean:
+clean: clean_python clean_java
+	$(RM_RF) \
+    "t/*.bc" "t/*.pir" "t/*.out" "t/*.out"
+
+clean_python:
 	$(RM_RF) \
     "python/lib/bc/*.pyc" \
-    "python/lib/antlr_past2pir_past/*.pyc" \
-    "t/*.bc" "t/*.pir" "t/*.posix_out" "t/*.parrot_out"
+    "python/lib/antlr_past2pir_past/*.pyc" 
+
+clean_java:
+	$(RM_RF) \
+    "*.class"
 
 realclean: clean
 	$(RM_RF) \

@@ -739,6 +739,7 @@ languages/bc/MAINTAINER                                                         
 languages/bc/README                                                                    [bc]
 languages/bc/TODO                                                                      [bc]
 languages/bc/VERSION                                                                   [bc]
+languages/bc/Bc.java                                                                   [bc]
 languages/bc/bc.py                                                                     [bc]
 languages/bc/config/makefiles/root.in                                                  [bc]
 languages/bc/docs/antlr_3.pod                                                          [bc]

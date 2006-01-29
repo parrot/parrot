@@ -10,7 +10,11 @@ languages/bc/t/harness - A harness for Parrot bc
 
   cd languages && perl -I../lib bc/t/harness 
 
-  cd languages && perl -I../lib bc/t/harness --use-gnu-bc
+  cd languages && perl -I../lib bc/t/harness --with-posix
+
+  cd languages && perl -I../lib bc/t/harness --with-python
+
+  cd languages && perl -I../lib bc/t/harness --with-java
 
   cd languages && perl -I../lib bc/t/harness \
                    bc/t/basic/integer.t 
@@ -46,8 +50,15 @@ if ( grep { m/^--files$/ } @ARGV ) {
 } else { 
     my @files;
     # TODO: use Getopt::Long or such
-    my $use_gnu_bc = ( grep { m/^--use-gnu-bc$/ } @ARGV ) ? 1 : 0;
-    @ARGV = grep { ! m/^--use-gnu-bc$/ } @ARGV;
+    my $with_posix = ( grep { m/^--with-posix$/ } @ARGV ) ? 1 : 0;
+    @ARGV = grep { ! m/^--with-posix$/ } @ARGV;
+
+    my $with_python = ( grep { m/^--with-python$/ } @ARGV ) ? 1 : 0;
+    @ARGV = grep { ! m/^--with-python$/ } @ARGV;
+
+    my $with_java = ( grep { m/^--with-java$/ } @ARGV ) ? 1 : 0;
+    @ARGV = grep { ! m/^--with-java$/ } @ARGV;
+
     if ( scalar(@ARGV) ) {
         # Someone specified tests for me to run.
         @files = grep { -f $_ } @ARGV
@@ -64,21 +75,21 @@ if ( grep { m/^--files$/ } @ARGV ) {
         }
     }
 
-    # Always test Parrot bc
-    eval
-    {
-        $ENV{PARROT_BC_TEST_PROG} = '';
-        Test::Harness::runtests( @files ) if scalar( @files );
-    };
     # XXX There should be a better to indicate which implementation should be used
-    if ( $use_gnu_bc ) {
-       if ($^O =~ /MSWin32/) {
-           $ENV{PARROT_BC_TEST_PROG} = 'bc';
-       } else {
-           $ENV{PARROT_BC_TEST_PROG} = 'bc --standard --quiet';
-       }
-       Test::Harness::runtests( @files ) if scalar( @files );
+    if ( $with_posix ) {
+       $ENV{'PARROT_BC_TEST_MODULE'} = 'Parrot::Test::Bc::Posix';
     }
+    elsif ( $with_java ) {
+       $ENV{'PARROT_BC_TEST_MODULE'} = 'Parrot::Test::Bc::Antlr3';
+    }
+    elsif ( $with_python ) {
+       $ENV{'PARROT_BC_TEST_MODULE'} = 'Parrot::Test::Bc::Antlr2';
+    }
+    else {
+       $ENV{'PARROT_BC_TEST_MODULE'} = 'Parrot::Test::Bc::Antlr2';
+    }
+
+    Test::Harness::runtests( @files ) if scalar( @files );
 }
 
 =head1 HISTORY

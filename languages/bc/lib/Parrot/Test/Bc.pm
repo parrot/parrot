@@ -27,14 +27,14 @@ Call 'Parrot bc' and 'POSIX bc'.
 
 A kind of factory, that finds the proper subclass of Parrot::Test::Bc.
 XXX: Do not configure with environment variables.
+Use Antlr2 in smoke testing.
 
 =cut
 
 sub new {
-    return $ENV{PARROT_BC_TEST_PROG} ?
-        ( bless {}, 'Parrot::Test::Bc::Posix' )              
-        :
-        ( bless {}, 'Parrot::Test::Bc::Antlr2' );              
+    my $test_module = $ENV{'PARROT_BC_TEST_MODULE'} || 'Parrot::Test::Bc::Antlr2';
+                
+    return bless {}, $test_module;
 }
 
 my %language_test_map = (
@@ -52,30 +52,31 @@ foreach my $func ( keys %language_test_map ) {
   
         my $count = $self->{builder}->current_test + 1;
 
-        # flatten filenames (don't use directories)
-        # The 'with_past' option indicates which on should be tested
-        my $bc_out_fn = $self->get_out_fn( $count );
-        my @test_prog = $self->get_test_prog( $count, $options{with_past} );
+        # These are the thing that depend on the actual Bc implementation
+        my $out_fn    = $self->get_out_fn( $count, \%options );
+        my @test_prog = $self->get_test_prog( $count, \%options );
+        $self->set_todo( \%options );
 
- 
         # This does not create byte code, but bc code
-        my $parrotdir = dirname( $self->{parrot} );
-        my $lang_fn   = Parrot::Test::per_test( '.bc', $count );
-        Parrot::Test::generate_code( $code, $parrotdir, $count, $lang_fn );
+        {
+            my $parrotdir = dirname( $self->{parrot} );
+            my $lang_fn   = Parrot::Test::per_test( '.bc', $count );
+            Parrot::Test::generate_code( $code, $parrotdir, $count, $lang_fn );
+        }
 
         # STDERR is written into same output file
         # die Dumper( \@test_prog );
         my $exit_code = Parrot::Test::run_command( 
                             \@test_prog, 
                             CD     => $self->{relpath}, 
-                            STDOUT => $bc_out_fn,
-                            STDERR => $bc_out_fn 
+                            STDOUT => $out_fn,
+                            STDERR => $out_fn 
                         );
   
         my $builder_func = $language_test_map{$func};
         # That's the reason for:   no strict 'refs';
         my $pass = $self->{builder}->$builder_func(
-                       Parrot::Test::slurp_file($bc_out_fn),
+                       Parrot::Test::slurp_file($out_fn),
                        $output,
                        $desc
                                                   );
