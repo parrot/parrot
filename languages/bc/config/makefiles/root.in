@@ -2,9 +2,9 @@
 # $Id$
 
 # Setup of some commands
-PERL           = @perl@
-RM_RF          = @rm_rf@
-CP             = @cp@
+PERL          = @perl@
+RM_F          = @rm_f@
+CP            = @cp@
 
 # The runtime files are also in SVN, need to be generated only by maintainer
 PYTHON_RUNTIME_FILES = \
@@ -24,15 +24,15 @@ help:
 	@echo "Building:"
 	@echo "  all:               BcLexer.py and BcParser.py"
 	@echo "                     This is the default."
-	@echo "  build_python:      Build implementation in Python"
+	@echo "  build-python:      Build implementation in Python"
 	@echo ""
-	@echo "  build_java:        Build implementation in Java"
+	@echo "  build-java:        Build implementation in Java"
 	@echo ""
 	@echo "Testing:"
 	@echo "  test:              Run the test suite."
-	@echo "  test_python:       Run the test suite for Parrot bc in Python."
-	@echo "  test_java:         Run the test suite for Parrot bc in Java."
-	@echo "  test_posix:        Run the test suite for POSIX bc."
+	@echo "  test-python:       Run the test suite for Parrot bc in Python."
+	@echo "  test-java:         Run the test suite for Parrot bc in Java."
+	@echo "  test-posix:        Run the test suite for POSIX bc."
 	@echo ""
 	@echo "Cleaning:"
 	@echo "  clean:             Basic cleaning up."
@@ -46,34 +46,37 @@ help:
 	@echo "                     Needs ANTLR and Python"
 	@echo ""
 
-test: test_python test_posix test_java
+test: test-python test-posix test-java
 
-test_python: build_python
+test-python: build-python
 	cd .. && $(PERL) -I../lib -I bc/lib bc/t/harness --with-python
 
-test_posix: 
+test-posix: build-posix 
 	cd .. && $(PERL) -I../lib -I bc/lib bc/t/harness --with-posix
 
-test_java: build_java
+test-java: build-java
 	cd .. && $(PERL) -I../lib -I bc/lib bc/t/harness --with-java
 
 # For smoke testing build only the Implementation in Python
-build: build_python
+build: build-python
 
-build_python:
+build-python:
 # Nothing to do
 
-build_java: Bc.class 
+build-posix:
+# Nothing to do
+
+build-java: Bc.class 
 
 Bc.class: 
 	@echo 'Be sure to set CLASSPATH first'
 	javac Bc.java 
 
-maintain: maintain_python maintain_java
+maintain: maintain-python maintain-java
 
-maintain_python: $(PYTHON_RUNTIME_FILES)
+maintain-python: $(PYTHON_RUNTIME_FILES)
 
-maintain_java:
+maintain-java:
 # Nothing to do yet
 
 # BcLexer.py will be created too
@@ -83,21 +86,23 @@ $(PYTHON_RUNTIME_FILES): grammar/antlr_2/bc_python.g grammar/antlr_2/antlr_past2
 	$(CP) python/lib/bc/BcLexerTokenTypes.txt python/lib/antlr_past2pir_past
 	antlr -o python/lib/antlr_past2pir_past grammar/antlr_2/antlr_past2pir_past.g
 
-clean: clean_python clean_java
-	$(RM_RF) \
-    "t/*.bc" "t/*.pir" "t/*.out" "t/*.out"
+clean: clean-test clean-python clean-java
 
-clean_python:
-	$(RM_RF) \
+clean-test: 
+	$(RM_F) \
+    "t/*.bc" "t/*.pir" "t/*.out"
+
+clean-python:
+	$(RM_F) \
     "python/lib/bc/*.pyc" \
     "python/lib/antlr_past2pir_past/*.pyc" 
 
-clean_java:
-	$(RM_RF) \
+clean-java:
+	$(RM_F) \
     "*.class"
 
 realclean: clean
-	$(RM_RF) \
+	$(RM_F) \
     Makefile
 
 distclean: realclean
