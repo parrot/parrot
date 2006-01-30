@@ -167,16 +167,10 @@ epoch = find_global "_Tcl", "epoch"
 END_PIR
 
 set_args:
-  $P1 = new .Array
-  $P1 = 3
-  $P1[0] = compiled_num
-  $P1[1] = pir_code
-  $P1[2] = result_reg
-
   # The pir_code element above should always end in a \n, so we don't
   # need to add one explicitly before the .return
 
-  pir_code = sprintf stub_code, $P1
+  .sprintf3(pir_code, stub_code, compiled_num, pir_code, result_reg)
 
   unless code_only goto compile_it
   .return (pir_code)

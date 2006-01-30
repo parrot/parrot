@@ -92,13 +92,9 @@ Initialize the attributes for an instance of the class
   if $I0 == FUNCTION_TANH goto func_tanh
   
 func_abs:
-  .local pmc printf_args
-  printf_args = new .Array
-  printf_args = 2
-  printf_args[0] = register_num
-  printf_args[1] = arg_reg
+  .sprintf2($S0,"$P%i = abs $P%i\n",register_num,arg_reg)
 
-  pir_code .= "$P%i = abs $P%i\n"
+  pir_code .= $S0
   goto done_all
 
 func_acos:
@@ -154,28 +150,20 @@ func_tanh:
 
 
 done:
-  .local pmc printf_args
-  printf_args = new .Array
-  printf_args = 8
-  printf_args[0] = register_num
-  printf_args[1] = arg_reg
-  printf_args[2] = register_num
-  printf_args[3] = opcode_name
-  printf_args[4] = register_num
-  printf_args[5] = register_num
-  printf_args[6] = register_num
-  printf_args[7] = register_num
-
-  pir_code .= <<"END_PIR"
+  .local string format
+  format = <<"END_PIR"
 $N%i=$P%i
 $N%i=%s $N%i
 $P%i=new .TclFloat
 $P%i=$N%i
 END_PIR
 
+  .sprintf8($S0,format, register_num, arg_reg, register_num, opcode_name, register_num, register_num, register_num, register_num)
+
+  pir_code .= $S0
+
 done_all:
 
-  pir_code = sprintf pir_code, printf_args
   .return(register_num,pir_code)
 
 .end

@@ -29,57 +29,15 @@
   .const int OPERATOR_UNEQUAL= 45 
 
 .macro binary_op(FORMAT)
-  $P1 = new .Array
-  $P1 = 3
-  $P1[0] = register_num
-  $P1[1] = l_reg
-  $P1[2] = r_reg
-  op_code = sprintf .FORMAT, $P1
+  .sprintf3(op_code,.FORMAT,register_num,l_reg,r_reg)
   pir_code = l_code . r_code
-  pir_code .= op_code
-  goto done
-.endm 
-
-#XXX This macro is unused?
-.macro binary_op2num(FORMAT)
-  $P1 = new .Array
-  $P1 = 6 
-  $P1[0] = register_num
-  $P1[1] = l_reg
-  $P1[2] = r_reg
-  $P1[3] = register_num
-  $P1[4] = register_num
-  $P1[5] = register_num
-  op_code = sprintf .FORMAT, $P1
-  pir_code = l_code . r_code
-  pir_code .= ".local pmc number\n"
-  pir_code .= "number = find_global \"_Tcl\", \"__number\"\n"
-  $S99 = "$P%i = number($P%i)\n"
-  $P1 = 2
-  $P1[0] = l_reg
-  $P1[1] = l_reg
-  $S98 = sprintf $S99, $P1
-  pir_code .= $S98 
-  $P1 = 2
-  $P1[0] = r_reg
-  $P1[1] = r_reg
-  $S98 = sprintf $S99, $P1
-  pir_code .= $S98 
-
   pir_code .= op_code
   goto done
 .endm 
 
 .macro binary_op2(FORMAT)
-  $P1 = new .Array
-  $P1 = 6
-  $P1[0] = register_num
-  $P1[1] = l_reg
-  $P1[2] = r_reg
-  $P1[3] = register_num
-  $P1[4] = register_num
-  $P1[5] = register_num
-  op_code = sprintf .FORMAT, $P1
+  .sprintf6(op_code, .FORMAT, register_num, l_reg, r_reg, register_num, register_num, register_num)
+
   pir_code = l_code . r_code
 
   pir_code .= op_code
@@ -87,20 +45,8 @@
 .endm
 
 .macro binary_op3(FORMAT)
-  $P1 = new .Array
-  $P1 = 10
-  $P1[0] = l_reg # $S%i=$P%i
-  $P1[1] = l_reg
-  $P1[2] = r_reg # $S%i=$P%i
-  $P1[3] = r_reg
-  $P1[4] = register_num  # $I%i = isne $S%i, $S%i
-  $P1[5] = l_reg
-  $P1[6] = r_reg
-  $P1[7] = register_num # $P%i = new .String
-  $P1[8] = register_num # $P%i = $I%i
-  $P1[9] = register_num
+  .sprintf10(op_code,.FORMAT, l_reg, l_reg, r_reg, r_reg, register_num, l_reg, r_reg, register_num, register_num, register_num)
 
-  op_code = sprintf .FORMAT, $P1
   pir_code = l_code . r_code
   pir_code .= op_code
   goto done
@@ -173,13 +119,8 @@ push_eh l_code_check_%s
 clear_eh
 l_code_check_%s:
 END_PIR
-  $P1 = new Array
-  $P1 =8
-  $P1[0] = l_reg 
-  $P1[1] = l_reg
-  $P1[2] = l_reg
-  $P1[3] = l_reg
-  $S0 = sprintf temp_code, $P1
+
+  .sprintf4($S0, temp_code, l_reg, l_reg, l_reg, l_reg)
   l_code .= $S0
 
   temp_code = <<"END_PIR"
@@ -188,13 +129,7 @@ push_eh r_code_check_%s
 clear_eh
 r_code_check_%s:
 END_PIR
-  $P1 = new Array
-  $P1 =8
-  $P1[0] = r_reg
-  $P1[1] = r_reg
-  $P1[2] = r_reg
-  $P1[3] = r_reg
-  $S0 = sprintf temp_code, $P1
+  .sprintf4($S0, temp_code, r_reg, r_reg, r_reg, r_reg)
   r_code .= $S0
 
   ## end numeric_check
@@ -322,24 +257,6 @@ op_and:
   jump_label = register_num
   inc register_num
 
-  .local pmc printf_args
-  printf_args = new .Array
-  printf_args = 14
-  printf_args[0]  = l_code
-  printf_args[1]  = l_reg
-  printf_args[2]  = jump_label
-  printf_args[3]  = r_code
-  printf_args[4]  = r_reg
-  printf_args[5]  = jump_label
-  printf_args[6]  = jump_label
-  printf_args[7]  = register_num
-  printf_args[8]  = register_num
-  printf_args[9]  = jump_label
-  printf_args[10] = jump_label
-  printf_args[11] = register_num
-  printf_args[12] = register_num
-  printf_args[13] = jump_label
-
    $S0 = <<"END_PIR"
 %s
 unless $P%i goto false%i
@@ -355,7 +272,8 @@ $P%i=0
 done%i:
 END_PIR
 
-  $S1 = sprintf $S0, printf_args 
+  .sprintf14($S1, $S0, l_code, l_reg, jump_label, r_code, r_reg, jump_label, jump_label, register_num, register_num, jump_label, jump_label, register_num, register_num, jump_label)
+
   pir_code .= $S1
 
   goto done
@@ -365,23 +283,6 @@ op_or:
   jump_label = register_num
   inc register_num
 
-  .local pmc printf_args
-  printf_args = new .Array
-  printf_args = 14
-  printf_args[0]  = l_code
-  printf_args[1]  = l_reg
-  printf_args[2]  = jump_label
-  printf_args[3]  = r_code
-  printf_args[4]  = r_reg
-  printf_args[5]  = jump_label
-  printf_args[6]  = jump_label
-  printf_args[7]  = register_num
-  printf_args[8]  = register_num
-  printf_args[9]  = jump_label
-  printf_args[10] = jump_label
-  printf_args[11] = register_num
-  printf_args[12] = register_num
-  printf_args[13] = jump_label
 
   $S0 =<<"END_PIR"
 %s
@@ -398,7 +299,8 @@ $P%i=1
 done%i:
 END_PIR
 
-  $S1 = sprintf $S0, printf_args
+  .sprintf14($S1, $S0, l_code, l_reg, jump_label, r_code, r_reg, jump_label, jump_label, register_num, register_num, jump_label, jump_label, register_num, register_num, jump_label)
+
   pir_code .= $S1
 
 done:

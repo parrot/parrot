@@ -73,11 +73,7 @@ call_level=find_global '_Tcl', 'call_level'
 inc call_level
 END_PIR
 
-  $P1 = new .Array
-  $P1 = 1
-  $P1[0] = name
-
-  proc_body = sprintf temp_code, $P1
+  .sprintf1(proc_body, temp_code, name)
 
   .local int arg_count
   arg_count = args_p
@@ -121,14 +117,10 @@ arg_loop:
   store_lex '$%s', $P1
 END_PIR
 
-  $P1 = new .Array
-  $P1 = 2
-  $P1[0] = ii
   $S0 = args_p[ii]  #Escape this?
-  $P1[1] = $S0
+  .sprintf2($S1, temp_code, ii, $S0) 
 
-  temp_code = sprintf temp_code, $P1
-  proc_body.= temp_code
+  proc_body .= $S1
 
   ii = ii + 1
   goto arg_loop
@@ -159,11 +151,8 @@ DONE:
   store_lex '$args', arg_list
 END_PIR
 
-   $P1 = new .Array
-   $P1 = 1
-   $P1[0] = ii
-   temp_code = sprintf temp_code, $P1
-   proc_body .= temp_code
+   .sprintf1($S1,temp_code, ii)
+   proc_body .= $S1
 
 done_args:
   temp_code = <<"END_PIR"
@@ -174,13 +163,8 @@ ARGS_OK:
   push_eh is_return
 END_PIR
    
-  $P1 = new .Array
-  $P1 = 2
-  $P1[0] = name
-  $P1[1] = args
-  
-  temp_code = sprintf temp_code, $P1
-  proc_body .= temp_code
+  .sprintf2($S1, temp_code, name, args) 
+  proc_body .= $S1
 
   proc_body .= parsed_body
   
@@ -191,14 +175,8 @@ was_ok:
   .return($P%i)
 END_PIR
 
-  $P0 = new .Integer
-  $P0 = body_reg
-  $P1 = new .Array
-  $P1 = 1
-  $P1[0] = $P0 
-
-  temp_code = sprintf temp_code, $P1
-  proc_body .= temp_code
+  .sprintf1($S1, temp_code, body_reg)
+  proc_body .= $S1
 
   proc_body .= <<"END_PIR"
 is_return:
