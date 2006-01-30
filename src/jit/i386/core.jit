@@ -1422,6 +1422,23 @@ Parrot_ord_i_sc_i {
     Parrot_ord_i_sx_i s/<typ>/c/
 }
 
+; the following 4 ops don't branch but are translated as cpfp
+; which adds unneeded overhead - convert to normal ops
+extern Parrot_set_args_pc {
+    Parrot_jit_normal_op(jit_info, interpreter);
+}
+
+extern Parrot_set_returns_pc {
+    Parrot_jit_normal_op(jit_info, interpreter);
+}
+
+extern Parrot_get_params_pc {
+    Parrot_jit_normal_op(jit_info, interpreter);
+}
+
+extern Parrot_get_results_pc {
+    Parrot_jit_normal_op(jit_info, interpreter);
+}
 ; TODO or,and,not,cmp
 
 
