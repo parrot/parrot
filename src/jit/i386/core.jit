@@ -1424,8 +1424,11 @@ Parrot_ord_i_sc_i {
 
 ; the following 4 ops don't branch but are translated as cpfp
 ; which adds unneeded overhead - convert to normal ops
-extern Parrot_set_args_pc {
-    Parrot_jit_normal_op(jit_info, interpreter);
+; or just JIT the 2 easy ones
+Parrot_set_args_pc {
+    Parrot_jit_emit_get_INTERP(jit_info->native_ptr, emit_EAX);
+    emitm_movl_i_m(NATIVECODE, jit_info->cur_op, emit_EAX, emit_None, 1,
+            offsetof(Interp, current_args));
 }
 
 extern Parrot_set_returns_pc {
@@ -1436,8 +1439,12 @@ extern Parrot_get_params_pc {
     Parrot_jit_normal_op(jit_info, interpreter);
 }
 
-extern Parrot_get_results_pc {
-    Parrot_jit_normal_op(jit_info, interpreter);
+Parrot_get_results_pc {
+    Parrot_jit_emit_get_INTERP(jit_info->native_ptr, emit_EAX);
+    emitm_movl_m_r(NATIVECODE, emit_EAX, emit_EAX, emit_None, 1,
+            offsetof(Interp, ctx.state));
+    emitm_movl_i_m(NATIVECODE, jit_info->cur_op, emit_EAX, emit_None, 1,
+            offsetof(parrot_context_t, current_results));
 }
 ; TODO or,and,not,cmp
 
