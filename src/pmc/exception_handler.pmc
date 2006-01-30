@@ -82,17 +82,6 @@ Initializes the exception handler.
         return result;
     }
 
-    void set_pointer (void* value) {
-        opcode_t *pos = value;
-        struct Parrot_cont * cc = PMC_cont(SELF);
-        if (*pos == PARROT_OP_get_results_pc) {
-            cc->current_results = pos;
-        }
-        else
-            cc->current_results = NULL;
-        SUPER(value);
-    }
-
     void* invoke (void* ex) {
         struct Parrot_cont * cc = PMC_cont(SELF);
         PMC *exception = ex;

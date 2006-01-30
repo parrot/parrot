@@ -1579,6 +1579,31 @@ ok 1
 ok 2
 OUTPUT
 
+pir_output_is(<<'CODE', <<'OUTPUT', "set_args via explicit continuation");
+.sub main :main
+    .local string result
+    result = "not ok 2\n"
+    .local pmc cont
+    cont = new .Continuation
+    set_addr cont, cont_dest
+    bar(cont, "ok 1\n")
+    print "oops\n"
+cont_dest:
+    .get_results (result)
+    print result
+.end
+
+.sub bar
+    .param pmc cc
+    .param string s
+    print s
+    cc("ok 2\n")
+.end
+CODE
+ok 1
+ok 2
+OUTPUT
+
 pir_output_is(<<'CODE', <<'OUTPUT', "call evaled vtable code");
 .sub main :main
     .local string s
@@ -2154,5 +2179,5 @@ CODE
 /duplicate name/
 OUTPUT
 ## remember to change the number of tests :-)
-BEGIN { plan tests => 85 }
+BEGIN { plan tests => 86 }
 

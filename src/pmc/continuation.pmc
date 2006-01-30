@@ -150,22 +150,30 @@ Assign context.
 
 =item C<void set_pointer(void *value)>
 
-Sets the pointer to the actual subroutine.
+Sets the pointer to the return instruction.
 
 =cut
 
 */
 
     void set_pointer (void* value) {
+        opcode_t *pos = value;
+        struct Parrot_cont * cc = PMC_cont(SELF);
+
         PObj_get_FLAGS(SELF) |= PObj_private1_FLAG;
-        PMC_cont(SELF)->address = value;
+        cc->address = value;
+        if (pos && *pos == PARROT_OP_get_results_pc) {
+            cc->current_results = pos;
+        }
+        else
+            cc->current_results = NULL;
     }
 
 /*
 
 =item C<void *get_pointer()>
 
-Returns the pointer to the actual subroutine.
+Returns the pointer to the return instruction.
 
 =cut
 
