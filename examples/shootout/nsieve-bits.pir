@@ -2,15 +2,14 @@
 #
 # nsieve-bits N  (N = 9 for shootout)
 # by Leopold Toetsch
+# modified by Joshua Isom
 
 # set bits - this might be cheating see nsieve-bits-2 for resetting bits
 
 .sub primes_in_range
     .param int M
-    .local pmc flags
-    .local int i, prim, count
-    flags = new FixedBooleanArray
-    flags = M
+    .param pmc flags
+    .local int i, count
     i = 2
     count = 0
 lp1:
@@ -34,15 +33,20 @@ not_p:
     .param pmc argv
     $S0 = argv[1]
     .local int i, j, N, M, count
+	.local pmc flags
+    flags = new .FixedBooleanArray
     N = $S0
-    null i
+	M = 1 << N
+	M *= 10000
+	flags = M
+	null i
     null j
 loop:
     $I0 = N - j
     inc j
     $I1 = 1 << $I0
     M = $I1 * 10000
-    count = primes_in_range(M)
+    count = primes_in_range(M, flags)
     $P0 = new .FixedIntegerArray
     $P0 = 2
     $P0[0] = M

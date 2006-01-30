@@ -169,7 +169,6 @@ argsok:
 	$S0 = argv[1]
 	n = $S0
 argsdone:
-	load_bytecode "random_lib.pir"
 
 	.local pmc iub
 	iub = new .FixedPMCArray
@@ -211,5 +210,27 @@ argsdone:
 	makeRandomFasta ("TWO", "IUB ambiguity codes", iub, 15, $I0)
 	$I0 = n * 5
 	makeRandomFasta ("THREE", "Homo sapiens frequency", homosapiens, 4, $I0)
+.end
+
+.const float IM = 139968.0
+.const float IA = 3877.0
+.const float IC = 29573.0
+
+.sub gen_random
+	.param float max
+	.local float last
+	last = 42.0
+loop:
+	$N0 = last
+	$N0 *= IA
+	$N0 += IC
+	$N0 %= IM
+	$N1 = max
+	$N1 *= $N0
+	$N1 /= IM
+	last = $N0
+	.yield($N1)
+	get_params "(0)", max
+	goto loop
 .end
 
