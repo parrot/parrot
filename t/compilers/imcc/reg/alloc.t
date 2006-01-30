@@ -3,7 +3,7 @@
 # $Id$
 
 use strict;
-use Parrot::Test tests => 3;
+use Parrot::Test tests => 2;
 
 pir_output_is(<<'CODE', <<'OUT', "alligator");
 # if the side-effect of set_addr/continuation isn't
@@ -59,27 +59,4 @@ pir_output_is(<<'CODE', <<'OUT', "alligator 2 - r9629");
 CODE
 abc
 def
-OUT
-
-pir_2_pasm_is(<<'CODE', <<'OUT', ":non_volatile");
-.sub main
-  .local int i :non_volatile
-  .local int j :non_volatile
-  .local int k :non_volatile
-  .local int l :non_volatile
-  i = 5
-  j = 10
-  k = i + j
-  l = k + j
-.end
-CODE
-# IMCC does produce b0rken PASM files
-# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
-main:
-  set I0, 5
-  set I1, 10
-  add I2, I0, I1
-  add I3, I2, I1
-  set_returns
-  returncc
 OUT

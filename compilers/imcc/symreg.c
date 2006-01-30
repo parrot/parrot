@@ -294,14 +294,6 @@ mk_ident(Interp *interp, char * name, int t)
     return r;
 }
 
-SymReg*
-mk_ident_nv(Interp *interp, char * name, int t)
-{
-    SymReg * r = mk_ident(interp, name, t);
-    r->usage |= U_NON_VOLATILE;
-    return r;
-}
-
 static SymReg*
 mk_pmc_const_2(Parrot_Interp interp, IMC_Unit *unit, SymReg *left, SymReg *rhs)
 {

@@ -15,7 +15,6 @@
 
 typedef struct _IdList {
     char* id;
-    int non_volatile;
     struct _IdList*  next;
 } IdList;
 

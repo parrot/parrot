@@ -198,18 +198,14 @@ Define a I<compilation unit> with the label B<identifier:>.
 
 Define a I<compilation unit> containing PASM code.
 
-=item .local <type> <identifier> [:non_volatile]
+=item .local <type> <identifier>
 
 =item .sym <type> <identifier>
 
 Define a local name B<identifier> for this I<compilation unit> and of
-the given B<type>. You can define multiple identifiers of the same type by
-separating them with commas:
-
+the given B<type>. You can define multiple identifiers of the same type by separating
+them with commas:
   .sym int i, j
-
-The optional B<:non_volatile> modifier requests that the local is assigned a
-register that will not be re-used in the current compilation unit.
 
 =item .lex <identifier>, <reg>
 
@@ -280,7 +276,7 @@ Directives used for Parrot Calling Conventions.
 At the top of a subroutine, declare a local variable, in the mannter
 of B<.local>, into which parameter(s) of the current subroutine should
 be stored. Available flags:
-C<:slurpy>, C<:optional>, C<:opt_flag> and C<:non_volatile>.
+C<:slurpy>, C<:optional>, and C<:opt_flag>.
 
 =item .param <reg> [:<flag> ...]
 

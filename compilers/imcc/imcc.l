@@ -275,7 +275,6 @@ SP              [ ]
 <emit,INITIAL>":anon"    return(ANON);
 <emit,INITIAL>":outer"   return(OUTER);
 <emit,INITIAL>":lex"     return(NEED_LEX);
-":non_volatile"  return(NON_VOLATILE);
 
 ".result"       return(RESULT);
 ".get_results"       return(GET_RESULTS);
