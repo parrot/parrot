@@ -746,6 +746,7 @@ languages/bc/docs/antlr_3.pod                                                   
 languages/bc/docs/parrot_bc.pod                                                        [bc]
 languages/bc/grammar/antlr_2/antlr_past2pir_past.g                                     [bc]
 languages/bc/grammar/antlr_2/bc_python.g                                               [bc]
+languages/bc/grammar/antlr_3/bc.g                                                      [bc]
 languages/bc/lib/Parrot/Test/Bc.pm                                                     [bc]
 languages/bc/lib/Parrot/Test/Bc/Antlr2.pm                                              [bc]
 languages/bc/lib/Parrot/Test/Bc/Antlr3.pm                                              [bc]

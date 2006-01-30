@@ -68,7 +68,7 @@ build-posix:
 
 build-java: Bc.class 
 
-Bc.class: 
+Bc.class: Bc.java 
 	@echo 'Be sure to set CLASSPATH first'
 	javac Bc.java 
 
@@ -76,8 +76,10 @@ maintain: maintain-python maintain-java
 
 maintain-python: $(PYTHON_RUNTIME_FILES)
 
-maintain-java:
-# Nothing to do yet
+maintain-java: grammar/antlr_3/bc.g
+	@echo 'Be sure to set CLASSPATH first'
+	java org.antlr.Tool grammar/antlr_3/bc.g
+	javac grammar/antlr_3/*.java
 
 # BcLexer.py will be created too
 # TODO: antlr_past2pir_past shouldn't need BcLexerTokenTypes.txt

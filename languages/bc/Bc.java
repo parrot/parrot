@@ -8,10 +8,10 @@ public class Bc
   {
     CharStream input = new ANTLRFileStream(args[0]);
     System.out.println( "1" );
-    // SimpleCLexer lex = new SimpleCLexer(input);
+    // BcLexer lex = new BcLexer(input);
     // CommonTokenStream tokens = new CommonTokenStream(lex);
     // System.out.println("tokens="+tokens);
-    // SimpleC parser = new SimpleC(tokens);
+    // BcParser parser = new BcParser(tokens);
     // parser.program();
   }
 }

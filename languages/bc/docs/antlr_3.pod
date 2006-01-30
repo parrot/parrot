@@ -2,7 +2,7 @@
 
 =head1 Overview
 
-This are some rumblings on using ANTLR 3 for Parrot bc, or with Parrot in general.
+These are some rumblings on using ANTLR 3 for Parrot bc, or with Parrot in general.
 
 =head1 Parsing in general
 
@@ -13,6 +13,11 @@ This are some rumblings on using ANTLR 3 for Parrot bc, or with Parrot in genera
   export CLASSPATH=/home/bernhard/devel/ANTLR/v3/antlr-3.0ea7/lib/antlr-3.0ea7.jar:/home/bernhard/devel/ANTLR/v3/antlr-3.0ea7/lib/antlr-2.7.5.jar:/home/bernhard/devel/ANTLR/v3/antlr-3.0ea7/lib/stringtemplate-2.3b4.jar:$CLASSPATH
 
 And see Makefile.
+
+=head2 Syntax
+
+Lexer, Parser and TreeParser are in the same file, speak grammar.
+C-comments serve as comments. C++ style as well ?
  
 =head2 Lexer
 
