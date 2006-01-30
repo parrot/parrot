@@ -42,6 +42,9 @@ Given this option, partcl will compile the tcl code to PIR, and output
 the PIR on STDOUT. This PIR can then be compiled to parrot bytecode, or
 run directly through parrot. (Works with C<-e>.).
 
+To pretty print the PIR that is generated, you can use the I<experimental>
+utility in C<../../tools/util/pirtidy.pl>. 
+
 =back
 
 =head2 Examples
