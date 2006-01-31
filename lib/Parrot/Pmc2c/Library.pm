@@ -115,8 +115,7 @@ sub gen_h {
     my $lc_libname = lc $self->{opt}{library};
 
     $hout .= <<"EOH";
-#define PARROT_IN_EXTENSION
-PARROT_DYNEXT_EXPORT Parrot_PMC Parrot_lib_${lc_libname}_load(Parrot_INTERP interpreter);
+Parrot_PMC Parrot_lib_${lc_libname}_load(Parrot_INTERP interpreter);
 EOH
 
     return $hout;
