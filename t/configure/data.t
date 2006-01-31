@@ -173,7 +173,7 @@ can_ok('Parrot::Configure::Data', qw(
 {
     my $pcd = Parrot::Configure::Data->new;
 
-    $pcd->set(
+    $pcd->add('',
         'a' => 1,
         'b' => 2,
         'c' => 3,

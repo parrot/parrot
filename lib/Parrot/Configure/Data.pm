@@ -155,8 +155,9 @@ returns a L<Parrot::Configure::Data> object.
 
 sub add
 {
-    my ($self, $delim) = @_;
-
+    my $self = shift;
+    my $delim = shift;
+    
     while (my ($key, $val) = splice @_, 0, 2) {
         my ($old) = $self->{c}{$key};
         if (defined $old) {
