@@ -28,12 +28,13 @@ Given this bytecode:
   | infix_ic_p_p | .MMD_SUBTRACT | P5 | P6 | callmethodcc_sc | "method" |
   +--------------+---------------+----+----+-----------------+----------+
 
-In init_prederef the opcodes are replaced with prederef__, operands are
-replaced with their addresses:
+In init_prederef the opcodes are replaced with prederef__, operands
+are replaced with their addresses (&) in the const table or offsets
+(+) in the register frame:
 
     0               1              2    3    4                5
   +--------------+---------------+----+----+-----------------+----------+
-  | prederef__   |&.MMD_SUBTRACT | &P5| &P6| prederef__      |&"method" |
+  | prederef__   | .MMD_SUBTRACT | +P5| +P6| prederef__      |&"method" |
   +--------------+---------------+----+----+-----------------+----------+
 
 we have code->pic_index with an index into pic_store - the pic_index is
@@ -50,14 +51,14 @@ in the pic_store at the index pic_index:
 
     0                    1     2    3
   +--------------------+-----+----+----+-----------------------+-----+
-  | pic_infix___ic_p_p | MIC1|&P5 |&P6 | pic_callmethodcc___sc | MIC2|
+  | pic_infix___ic_p_p | MIC1|+P5 |+P6 | pic_callmethodcc___sc | MIC2|
   +--------------------+-----+----+----+-----------------------+-----+
 
 This can be further optimized due to static inlining:
 
     0                    1     2    3
   +--------------------+-----+----+----+-----------------------+-----+
-  | pic_inline_sub_p_p | MIC1|&P5 |&P6 | pic_callmethodcc___sc | MIC2|
+  | pic_inline_sub_p_p | MIC1|+P5 |+P6 | pic_callmethodcc___sc | MIC2|
   +--------------------+-----+----+----+-----------------------+-----+
 
 The opcode is an opcode number for the switched core or the actual code address

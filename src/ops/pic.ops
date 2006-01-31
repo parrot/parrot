@@ -20,9 +20,6 @@ During predereferencing opcodes that allow caching are rewritten so that
 equivalent opcodes in this file are used. User code MUST never emit these
 opcodes directly.
 
-TODO fix OpTrans/ops2c that for non-prederefed runloops a PANIC
-     is in the opcode body instead of the pic opcode
-
 ###############################################################################
 
 =head2 General infix operations
