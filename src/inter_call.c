@@ -777,26 +777,57 @@ too_many(Interp *interpreter, struct call_state *st, const char *action)
 }
 
 static void 
+null_val(int sig, struct call_state *st) 
+{
+    switch (sig & PARROT_ARG_TYPE_MASK) {
+        case PARROT_ARG_INTVAL:
+            UVal_int(st->val) = 0; break;
+        case PARROT_ARG_FLOATVAL:
+            UVal_num(st->val) = 0.0; break;
+        case PARROT_ARG_STRING:
+            UVal_str(st->val) = NULL; break;
+        case PARROT_ARG_PMC:
+            UVal_pmc(st->val) = PMCNULL; break;
+    }
+}
+
+static void 
 check_named(Interp *interpreter, struct call_state *st, const char *action) 
 {
-    int i, n_named, idx;
+    int i, n_named, idx, was_set, n_i;
     INTVAL sig;
     STRING *param;
 
     n_named = -1;
-    st->dest.mode &= ~CALL_STATE_SLURP;
-    st->dest.mode |= CALL_STATE_x_NAMED;
+    was_set = n_i = 0;
     for (i = st->first_named; i < st->dest.n; ++i) {
-        sig = VTABLE_get_integer_keyed_int(interpreter, 
+        st->dest.sig = sig = VTABLE_get_integer_keyed_int(interpreter, 
                 st->dest.u.op.signature, i);
-        if (!(sig & PARROT_ARG_NAME))
+        if ((sig & PARROT_ARG_NAME)) {
+            if (sig & PARROT_ARG_SLURPY_ARRAY)
+                break;
+            was_set = 0;
+            n_named++;
+            n_i = i;
+            if (st->named_done & (1 << n_named)) {
+                was_set = 1;
+            }
             continue;
-        if (sig & PARROT_ARG_SLURPY_ARRAY)
-            break;
-        n_named++;
-        if (st->named_done & (1 << n_named))
+        }
+        if (was_set)
             continue;
-        idx = st->dest.u.op.pc[i];
+        if (sig & PARROT_ARG_OPTIONAL) {
+            null_val(sig, st);
+            idx = st->dest.u.op.pc[i];
+            store_arg(st, idx);
+            continue;
+        }
+        if (sig & PARROT_ARG_OPT_FLAG) {
+            idx = st->dest.u.op.pc[i];
+            CTX_REG_INT(st->dest.ctx, idx) = 0;
+            continue;
+        }
+        idx = st->dest.u.op.pc[n_i];
         param = st->dest.ctx->constants[idx]->u.string;
         real_exception(interpreter, NULL, E_ValueError,
                 "too few arguments passed - missing required named arg '%Ss'",
@@ -918,14 +949,13 @@ store_opt:
                 break;
             case CALL_STATE_END_POS_OPT: 
                 ++st->optionals;
-                UVal_num(st->val) = 0.0;        /* XXX assumes all bits 0 */
+                null_val(st->dest.sig, st);
                 opt_flag = 0;
                 goto store_opt;
             case CALL_STATE_END_NAMED_NAMED|CALL_STATE_OPT: 
             case CALL_STATE_END_NAMED_NAMED: 
             case CALL_STATE_END_POS_NAMED: 
-                if (err_check)
-                    check_named(interpreter, st, action);
+                check_named(interpreter, st, action);
                 return;
             case CALL_STATE_END_x: 
                 if (err_check)
