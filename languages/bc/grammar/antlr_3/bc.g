@@ -3,9 +3,32 @@
  */
 grammar BcParser;
 
-program
-    :   INT 
-    ;
+options 
+{
+  output=AST;
+  ASTLabelType=CommonTree;
+}
 
-INT :	('0'..'9')+
-    ;
+  /* PROGRAM; */
+
+
+
+program 
+  : INT WS quit WS
+  ;
+
+INT
+ : ('0'..'9')+
+ ;
+
+quit
+ : 'quit'
+ ;    
+
+WS
+ : (   ' '
+     |   '\t'
+     |   '\r'
+     |   '\n'
+   )+
+ ;    

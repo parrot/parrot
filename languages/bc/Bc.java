@@ -1,6 +1,7 @@
 // $Id$
 
 import org.antlr.runtime.*;
+import org.antlr.runtime.tree.*;
 
 public class Bc 
 {
@@ -8,10 +9,11 @@ public class Bc
   {
     CharStream input = new ANTLRFileStream(args[0]);
     System.out.println( "1" );
-    // BcLexer lex = new BcLexer(input);
-    // CommonTokenStream tokens = new CommonTokenStream(lex);
+    BcParserLexer lex = new BcParserLexer(input);
+    CommonTokenStream tokens = new CommonTokenStream(lex);
     // System.out.println("tokens="+tokens);
-    // BcParser parser = new BcParser(tokens);
-    // parser.program();
+    BcParser parser = new BcParser(tokens);
+    BcParser.program_return r = parser.program();
+    // System.out.println("tree: "+((Tree)r.tree).toStringTree());
   }
 }
