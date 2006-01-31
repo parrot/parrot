@@ -2077,9 +2077,9 @@ Parrot_emit_jump_to_eax(Parrot_jit_info_t *jit_info,
          */
         emitm_movl_m_r(jit_info->native_ptr,
                 emit_EBX, emit_EBP, emit_None, 1, INTERP_BP_OFFS);
-        emitm_movl_m_r(jit_info->native_ptr, emit_EDX, emit_EBX, 0, 1,
+        emitm_movl_m_r(jit_info->native_ptr, emit_ECX, emit_EBX, 0, 1,
                 offsetof(Interp, code));
-        emitm_movl_m_r(jit_info->native_ptr, emit_EDX, emit_EDX, 0, 1,
+        emitm_movl_m_r(jit_info->native_ptr, emit_EDX, emit_ECX, 0, 1,
                 offsetof(struct PackFile_Segment, data));
         jit_emit_sub_rr_i(jit_info->native_ptr, emit_EAX, emit_EDX);
         /*
@@ -2089,9 +2089,7 @@ Parrot_emit_jump_to_eax(Parrot_jit_info_t *jit_info,
          *
          * TODO interleave these 2 calculations
          */
-        emitm_movl_m_r(jit_info->native_ptr, emit_EDX, emit_EBX, 0, 1,
-                offsetof(Interp, code));
-        emitm_movl_m_r(jit_info->native_ptr, emit_EDX, emit_EDX, 0, 1,
+        emitm_movl_m_r(jit_info->native_ptr, emit_EDX, emit_ECX, 0, 1,
                 offsetof(struct PackFile_ByteCode, jit_info));
         emitm_lea_m_r(jit_info->native_ptr, emit_EDX, emit_EDX, 0, 1,
                 offsetof(Parrot_jit_info_t, arena));
