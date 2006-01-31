@@ -81,7 +81,6 @@ sub new
     };
 
     bless $self, ref $class || $class;
-
     return $self;
 }
 
