@@ -32,7 +32,7 @@ sub get_test_prog {
  
  
 
-sub set_todo {
+sub skip_why {
     my $self = shift;
     my ( $options ) = @_;
 

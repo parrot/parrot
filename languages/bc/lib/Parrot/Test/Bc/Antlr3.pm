@@ -6,6 +6,8 @@ use strict;
 
 use base 'Parrot::Test::Bc';
 
+use Data::Dumper;
+
 sub get_out_fn {
     my $self = shift;
     my ( $count, $options ) = @_;
@@ -25,16 +27,15 @@ sub get_test_prog {
 }
  
 
-sub set_todo {
+sub skip_why {
     my $self = shift;
     my ( $options ) = @_;
 
-    if ( ! $options->{with_antlr3} ) {
-        # XXX make this work
-        # $self->{builder}->todo_skip( 'Not implemented with ANTLR3' );
+    if ( $options->{with_antlr3} ) {
+        return;
+    } else {
+        return 'Not implemented with ANTLR3';
     }
-
-    return;
 }
  
 

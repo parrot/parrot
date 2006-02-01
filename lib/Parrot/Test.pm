@@ -514,7 +514,7 @@ sub _generate_functions {
             my $meth = $language_test_map{$func};
             if ( my $prefix = $builtin_language_prefix{$language} ) { 
                 my $test_func = "${package}::${prefix}_${meth}";
-                &$test_func( @remaining );
+                $test_func->( @remaining );
             }
             else {
                 # TODO: $language should be the name of the test Module
