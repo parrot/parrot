@@ -9,12 +9,14 @@ options
   ASTLabelType=CommonTree;
 }
 
-  /* PROGRAM; */
-
+tokens 
+{
+  PROGRAM;
+} 
 
 
 program 
-  : INT WS quit WS
+  : INT WS quit WS -> ^( PROGRAM INT )
   ;
 
 INT

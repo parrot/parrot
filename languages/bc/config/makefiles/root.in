@@ -79,6 +79,7 @@ maintain-python: $(PYTHON_RUNTIME_FILES)
 maintain-java: grammar/antlr_3/bc.g
 	@echo 'Be sure to set CLASSPATH first'
 	java org.antlr.Tool grammar/antlr_3/bc.g
+	java org.antlr.Tool grammar/antlr_3/antlr_past2pir_past.g
 	javac grammar/antlr_3/*.java
 
 # BcLexer.py will be created too
