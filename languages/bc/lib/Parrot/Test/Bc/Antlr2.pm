@@ -20,11 +20,11 @@ sub get_test_prog {
     my $self = shift;
     my ( $count, $options ) = @_;
 
-    my $lang_fn        = Parrot::Test::per_test( '.bc', $count );
-    my $pir_fn         = $options->{with_past} ?
-                             Parrot::Test::per_test( '_antlr2.pir', $count )
-                             :
-                             Parrot::Test::per_test( '_antlr2_no_past.pir', $count );
+    my $lang_fn = Parrot::Test::per_test( '.bc', $count );
+    my $pir_fn  = $options->{with_past} ?
+                    Parrot::Test::per_test( '_antlr2.pir', $count )
+                    :
+                    Parrot::Test::per_test( '_antlr2_no_past.pir', $count );
 
     return ( "python languages/bc/bc.py languages/${lang_fn}", 
              "$self->{parrot} languages/${pir_fn}" );

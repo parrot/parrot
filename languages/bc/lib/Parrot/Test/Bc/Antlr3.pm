@@ -17,9 +17,11 @@ sub get_test_prog {
     my $self = shift;
     my ( $count, $options ) = @_;
 
-    my $lang_fn        = Parrot::Test::per_test( '.bc', $count );
+    my $lang_fn = Parrot::Test::per_test( '.bc', $count );
+    my $pir_fn  = Parrot::Test::per_test( '_antlr3.pir', $count );
 
-    return ( "java Bc languages/${lang_fn}", );
+    return ( "java Bc languages/${lang_fn} languages/${pir_fn}",
+             "$self->{parrot} languages/${pir_fn}" );
 }
  
 
@@ -28,6 +30,7 @@ sub set_todo {
     my ( $options ) = @_;
 
     if ( ! $options->{with_antlr3} ) {
+        # XXX make this work
         # $self->{builder}->todo_skip( 'Not implemented with ANTLR3' );
     }
 
