@@ -2071,16 +2071,19 @@ Parrot_emit_jump_to_eax(Parrot_jit_info_t *jit_info,
      * due too intersegment branches
      */
 
+    /* get interpreter
+     */
+    emitm_movl_m_r(jit_info->native_ptr,
+            emit_EBX, emit_EBP, emit_None, 1, INTERP_BP_OFFS);
     if (!jit_info->objfile) {
-        /* get interpreter
+        /* 
          * emit interpreter->code->base.data
          */
-        emitm_movl_m_r(jit_info->native_ptr,
-                emit_EBX, emit_EBP, emit_None, 1, INTERP_BP_OFFS);
         emitm_movl_m_r(jit_info->native_ptr, emit_ECX, emit_EBX, 0, 1,
                 offsetof(Interp, code));
         emitm_movl_m_r(jit_info->native_ptr, emit_EDX, emit_ECX, 0, 1,
                 offsetof(struct PackFile_Segment, data));
+        /* calc code offset */
         jit_emit_sub_rr_i(jit_info->native_ptr, emit_EAX, emit_EDX);
         /*
          * now we have the offset of the ins in EAX
@@ -2095,9 +2098,6 @@ Parrot_emit_jump_to_eax(Parrot_jit_info_t *jit_info,
                 offsetof(Parrot_jit_info_t, arena));
         emitm_movl_m_r(jit_info->native_ptr, emit_EDX, emit_EDX, 0, 1,
                 offsetof(Parrot_jit_arena_t, op_map));
-        /* get base pointer */
-        emitm_movl_m_r(jit_info->native_ptr, emit_EBX, emit_EBX, 0, 1,
-                offsetof(Interp, ctx.bp));
 
     }
 #  if EXEC_CAPABLE
@@ -2111,6 +2111,9 @@ Parrot_emit_jump_to_eax(Parrot_jit_info_t *jit_info,
                 jit_info->native_ptr, "opcode_map", 0, 0));
     }
 #  endif
+    /* get base pointer */
+    emitm_movl_m_r(jit_info->native_ptr, emit_EBX, emit_EBX, 0, 1,
+            offsetof(Interp, ctx.bp));
 
     /* This jumps to the address in op_map[EDX + sizeof(void *) * INDEX] */
     emitm_jumpm(jit_info->native_ptr, emit_EDX, emit_EAX,
