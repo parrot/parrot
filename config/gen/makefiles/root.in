@@ -1417,7 +1417,27 @@ clean : \
 	@TEMP_cg_r@
 	$(RM_F) chartypes "*.s" "*~" $(FLUID_FILES)
 
-prog-clean : archclean
+prog-clean :
+	$(RM_F) \
+		$(O_FILES) \
+		$(PARROT) \
+		$(MINIPARROT) \
+		$(INSTALLABLEPARROT) \
+		$(INSTALLABLEDIS) \
+		$(INSTALLABLEPDUMP) \
+		$(INSTALLABLEPINFO) \
+		$(INSTALLABLEPBCMERGE) \
+		$(INSTALLABLEPDB) \
+		$(IMCC_DIR)/main$(O) \
+		$(PDUMP) $(SRC_DIR)/pdump$(O) $(SRC_DIR)/packdump$(O) \
+		$(SRC_DIR)/pbc_info$(O) $(PINFO) \
+		$(PDB) $(SRC_DIR)/pdb$(O) \
+		$(PBCMERGE) $(SRC_DIR)/pbc_merge$(O) \
+		$(DIS) $(SRC_DIR)/disassemble$(O) \
+		$(SRC_DIR)/null_config$(O) \
+		$(SRC_DIR)/parrot_config$(O) \
+		$(SRC_DIR)/install_config$(O) \
+		install_config.fpmc
 	$(PERL) tools/build/c2str.pl --init
 	$(RM_F) \
 		$(INC_DIR)/string_private_cstring.h \
