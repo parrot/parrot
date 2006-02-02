@@ -208,13 +208,14 @@ instruction_reads(Instruction* ins, SymReg* r) {
     }
     /* a sub call reads the previous args */
     if (ins->type & ITPCCSUB) {
-        assert(ins->r[0]->pcc_sub);
-        for (i = 0; i < ins->r[0]->pcc_sub->nargs; ++i) {
-            if (r == ins->r[0]->pcc_sub->args[i])
+        while (ins && ins->opnum != PARROT_OP_set_args_pc)
+            ins = ins->prev;
+        if (!ins)
+            return 0;
+        for (i = 0; i < ins->n_r; i++) {
+            if (ins->r[i] == r)
                 return 1;
         }
-
-
     }
     return 0;
 }

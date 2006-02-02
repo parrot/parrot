@@ -466,19 +466,7 @@ expand_pcc_sub_call(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
             ins = insINS(interp, unit, ins, "invokecc" ,regs, 1);
         }
     }
-    /*
-     * move the pcc_sub structure from the dummy call label to the
-     * invoke statement
-     */
-    regs[0]->pcc_sub = sub->pcc_sub;
-    sub->pcc_sub = NULL;
     ins->type |= ITPCCSUB;
-    /*
-     * locate return label, if there is one skip it
-     */
-    if (regs[0]->pcc_sub->label && ins->next->type == ITLABEL) {
-        ins = ins->next;
-    }
 }
 
 /*
