@@ -23,7 +23,6 @@ void graph_coloring_reg_alloc(Interp *interpreter, IMC_Unit * unit);
 static void make_stat(IMC_Unit *, int *sets, int *cols);
 static void imc_stat_init(IMC_Unit *);
 static void print_stat(Parrot_Interp, IMC_Unit *);
-static void allocate_wanted_regs(IMC_Unit *);
 static void build_reglist(Parrot_Interp, IMC_Unit * unit);
 static void rebuild_reglist(Parrot_Interp, IMC_Unit * unit);
 static void build_interference_graph(Parrot_Interp, IMC_Unit *);
@@ -184,8 +183,6 @@ graph_coloring_reg_alloc(Interp *interpreter, IMC_Unit * unit)
 {
 
     build_interference_graph(interpreter, unit);
-    if (IMCC_INFO(interpreter)->optimizer_level & OPT_SUB)
-        allocate_wanted_regs(unit);
 
     try_allocate(interpreter, unit);
     IMCC_INFO(interpreter)->allocated = 1;
@@ -592,36 +589,6 @@ interferes(Interp *interpreter, IMC_Unit * unit, SymReg * r0, SymReg * r1)
     return 0;
 }
 
-/*
- * try to allocate as much as possible
- */
-static void
-allocate_wanted_regs(IMC_Unit * unit)
-{
-    int i, y, interf, n_symbols;
-    SymReg *r;
-
-    n_symbols = unit->n_symbols;
-    for (i = 0; i < n_symbols; i++) {
-        r = unit->reglist[i];
-        if (r->color >= 0 || r->want_regno == -1 || strchr("ISPN", r->set == 0))
-            continue;
-        interf = 0;
-        for (y = 0; y < n_symbols; y++) {
-            SymReg *s;
-            if (! ig_test(i, y, n_symbols, unit->interference_graph))
-                continue;
-            s = unit->reglist[y];
-            if (   s
-                && s->color == r->want_regno
-                && s->set == r->set) {
-                interf = 1;
-            }
-        }
-        if (!interf)
-            r->color = r->want_regno;
-    }
-}
 /*
  * find available color for register #x in available colors
  */
