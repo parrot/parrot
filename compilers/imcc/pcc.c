@@ -1,20 +1,7 @@
 /*
  * pcc.c
  *
- * A specific calling convention implementation. Called by the generic
- * API for subs (see sub.c).
- *
- * FASTCALL convention can be enabled with:
- * .pragma fastcall
- * at the start of an IMC module.
- *
- * This will allow library developers (or non-Perl languages) to turn
- * on very efficient optimizations and a lightweight calling convention.
- * It could also be used for internal libs that do not callout to PCC
- * routines, but present PCC entry points for the module itself.
- *
- * XXX FIXME: FASTCALL is not currently finished and may not be completely
- * compatible with PCC convention. (ie. you can't mix and match, for now at least)
+ * Parrot calling convention implementation. 
  *
  * see: docs/pdds/pdd03_calling_conventions.pod
  *
@@ -258,11 +245,70 @@ expand_pcc_sub_ret(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
     }
 }
 
+/*
+ * convert a recursive tailcall into a loop
+ */
+
+static int
+recursive_tail_call(Parrot_Interp interp, IMC_Unit * unit,
+        Instruction *ins, SymReg *sub)
+{
+    SymReg *called_sub, *this_sub, *r0, *r1, *label;
+    SymReg *regs[2];
+    int i;
+    Instruction *get_params, *tmp_ins;
+    char *buf;
+
+    if (!(unit->instructions->type & ITLABEL))
+        return 0;
+    this_sub = unit->instructions->r[0];
+    if (!this_sub)
+        return 0;
+    called_sub = sub->pcc_sub->sub;
+    if (strcmp(this_sub->name, called_sub->name))
+        return 0;
+    if (sub->pcc_sub->nargs != this_sub->pcc_sub->nargs)
+        return 0;
+    /* TODO check if we have only positional args
+     */
+
+    get_params = unit->instructions->next;
+    if (get_params->opnum != PARROT_OP_get_params_pc)
+        return 0;
+    buf = malloc(strlen(this_sub->name) + 3);
+    sprintf(buf, "%s@0", this_sub->name); 
+    if ( (label = find_sym(interp, buf)) == NULL) {
+        label = mk_local_label(interp, str_dup(buf));
+        tmp_ins = INS_LABEL(unit, label, 0);
+        insert_ins(unit, get_params, tmp_ins);
+    }
+    free(buf);
+
+    for (i = 0; i < sub->pcc_sub->nargs; ++i) {
+        /*
+         * TODO if there is a register collision
+         *      try to reverse assignmened order
+         *      or use a temp var
+         */
+        r0 = this_sub->pcc_sub->args[i];
+        r1 = sub->pcc_sub->args[i];
+        if (r0 != r1) {
+            regs[0] = r0;
+            regs[1] = r1;
+            ins = insINS(interp, unit, ins, "set", regs, 2);
+        }
+    }
+    regs[0] = label;
+    insINS(interp, unit, ins, "branch", regs, 1);
+    return 1;
+}
+
 static void
 insert_tail_call(Parrot_Interp interp, IMC_Unit * unit,
         Instruction *ins, SymReg *sub, int meth_call, SymReg *s0)
 {
     SymReg *regs[2];
+
 
     if (meth_call) {
         s0 = s0 ? s0 : get_pasm_reg(interp, "S0");
@@ -303,6 +349,10 @@ expand_pcc_sub_call(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
         return;
     }
     tail_call = (sub->pcc_sub->flags & isTAIL_CALL);
+    if (tail_call && IMCC_INFO(interp)->optimizer_level & OPT_SUB) {
+        if (recursive_tail_call(interp, unit, ins, sub))
+            return;
+    }
 
     if (sub->pcc_sub->object) {
         meth_call = 1;
