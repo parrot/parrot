@@ -16,7 +16,7 @@ tokens
 
 
 program 
-  : INT WS quit WS -> ^( PROGRAM INT )
+  : INT quit -> ^( PROGRAM INT )
   ;
 
 INT
@@ -33,4 +33,7 @@ WS
      |   '\r'
      |   '\n'
    )+
+   {
+      channel = 99;
+   }
  ;    
