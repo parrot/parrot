@@ -557,7 +557,10 @@ INS(Interp *interpreter, IMC_Unit * unit, char *name,
     }
     if (op_info->jump && op_info->jump != PARROT_JUMP_ENEXT) {
         ins->type |= ITBRANCH;
-        if (!strcmp(name, "branch"))
+        /* TODO use opnum constants */
+        if (!strcmp(name, "branch") ||
+            !strcmp(name, "tailcall") ||
+            !strcmp(name, "returncc"))    
             ins->type |= IF_goto;
         else if (!strcmp(fullname, "jump_i") ||
                 !strcmp(fullname, "jsr_i") ||

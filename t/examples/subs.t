@@ -72,9 +72,9 @@ Hello from main
 END_EXPECTED
 
     'single_retval.pir'     =>  << 'END_EXPECTED',
-7 10 nine 10
+7 8 nine 10
 return: 10
-7 10 nine 10
+7 8 nine 10
 return: 10
 END_EXPECTED
 

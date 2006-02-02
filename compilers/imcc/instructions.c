@@ -228,8 +228,24 @@ instruction_writes(Instruction* ins, SymReg* r) {
 
     f = ins->flags;
 
-    if (ins->opnum == PARROT_OP_get_params_pc ||
-            ins->opnum == PARROT_OP_get_results_pc) {
+    /* 
+     * a get_results opcode is before the actual sub call
+     * but for the register allocator, the effect matters, thus
+     * postpone the effect after the invoke
+     */
+    if (ins->opnum == PARROT_OP_get_results_pc) 
+        return 0;
+    else if (ins->prev && (ins->prev->type & ITPCCSUB)) {
+        ins = ins->prev;
+        assert(ins->r[0]->pcc_sub);
+        for (i = 0; i < ins->r[0]->pcc_sub->nret; ++i) {
+            if (r == ins->r[0]->pcc_sub->ret[i])
+                return 1;
+        }
+        return 0;
+    }
+
+    if (ins->opnum == PARROT_OP_get_params_pc) {
         for (i = 0; i < ins->n_r; i++) {
             if (ins->r[i] == r)
                 return 1;

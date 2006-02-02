@@ -513,7 +513,8 @@ analyse_life_symbol(Parrot_Interp interpreter, IMC_Unit * unit, SymReg* r)
              */
             if (ins->prev) {
                 prev = ins->prev;
-                if (prev->type & (ITPCCSUB|ITPCCYIELD))
+                if ((prev->type & (ITPCCSUB|ITPCCYIELD)) &&
+                        prev->opnum != PARROT_OP_tailcall_p)
                     r->usage |= U_NON_VOLATILE;
                 else if (prev->opnum == PARROT_OP_invoke_p_p ||
                          prev->opnum == PARROT_OP_invokecc_p)
@@ -574,14 +575,9 @@ analyse_life_block(Parrot_Interp interpreter, Basic_block* bb, SymReg* r)
                     "Index %i of %i has NULL instruction\n",
                     ins->index, bb->end->index);
         }
-        if (ins->opnum == -1) {
-            if (ins == bb->end)
-                break;
-            continue;
-        }
         /*
          * if we have a setp_ind opcode, it may write all PMC
-         * registers from 5..15
+         * registers 
          */
         if (ins->opnum == PARROT_OP_setp_ind_i_p && r->set == 'P') {
             r->usage |= U_NON_VOLATILE;
