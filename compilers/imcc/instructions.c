@@ -237,9 +237,17 @@ instruction_writes(Instruction* ins, SymReg* r) {
         return 0;
     else if (ins->prev && (ins->prev->type & ITPCCSUB)) {
         ins = ins->prev;
-        assert(ins->r[0]->pcc_sub);
-        for (i = 0; i < ins->r[0]->pcc_sub->nret; ++i) {
-            if (r == ins->r[0]->pcc_sub->ret[i])
+        /* can't used pcc_sub->ret due to bug #38406
+         * it seems that all sub SymRegs are shared
+         * and point to the most recemt pcc_sub
+         * structure
+         */
+        while (ins && ins->opnum != PARROT_OP_get_results_pc)
+            ins = ins->prev;
+        if (!ins)
+            return 0;
+        for (i = 0; i < ins->n_r; i++) {
+            if (ins->r[i] == r)
                 return 1;
         }
         return 0;

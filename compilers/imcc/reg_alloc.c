@@ -338,6 +338,8 @@ build_reglist(Parrot_Interp interpreter, IMC_Unit * unit)
         }
     }
     unit->n_symbols = n_symbols = count;
+    if (IMCC_INFO(interpreter)->debug & DEBUG_IMC)
+        dump_symreg(unit);
     compute_du_chain(unit);
     /* we might have unused symbols here, from optimizations */
     for (i = count = unused = 0; i < n_symbols; i++) {

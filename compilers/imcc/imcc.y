@@ -1096,11 +1096,11 @@ assignment:
             cur_call = NULL;
             $$ = 0;
          }
-   |
+   | '('
          {
             $<i>$ = IMCC_create_itcall_label(interp);
          }
-     '(' targetlist  ')' '=' the_sub '(' arglist ')'
+      targetlist  ')' '=' the_sub '(' arglist ')'
          {
            IMCC_itcall_sub(interp, $6);
            cur_call = NULL;
