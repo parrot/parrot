@@ -130,10 +130,10 @@ imc_reg_alloc(Interp *interpreter, IMC_Unit * unit)
             first = 0;
         } while (cfg_optimize(interpreter, unit));
 
+        compute_dominators(interpreter, unit);
+        find_loops(interpreter, unit);
         if (IMCC_INFO(interpreter)->optimizer_level) {
-            compute_dominators(interpreter, unit);
             compute_dominance_frontiers(interpreter, unit);
-            find_loops(interpreter, unit);
         }
 
         build_reglist(interpreter, unit);
@@ -529,6 +529,35 @@ interferes(Interp *interpreter, IMC_Unit * unit, SymReg * r0, SymReg * r1)
      * if this instrucion does modify r0, if its value is never used
      * later, then they can share the same register.
      */
+#if 1
+    /* If they only overlap one instruction and one is used RHS only
+     * and the other LHS, then that's ok
+     *
+     * But only, if that isn't inside a loop, tested via loop_depth
+     * see also imcc/t/reg/alloc_2
+     *
+     * TODO no interferences, if the life range ends in this
+     *      basic block, because it's end is e.g. a returncc
+     */
+    if (r0->first_ins->index == r1->last_ins->index &&
+            instruction_writes(r0->first_ins, r0) &&
+            instruction_reads(r1->last_ins, r1) &&
+            !instruction_reads(r0->first_ins, r0)) {
+        Basic_block *bb;
+        bb = unit->bb_list[r0->first_ins->bbindex];
+        if (bb->loop_depth == 0)
+            return 0;
+    }
+    if (r1->first_ins->index == r0->last_ins->index &&
+            instruction_writes(r1->first_ins, r1) &&
+            instruction_reads(r0->last_ins, r0) &&
+            !instruction_reads(r1->first_ins, r1)) {
+        Basic_block *bb;
+        bb = unit->bb_list[r1->first_ins->bbindex];
+        if (bb->loop_depth == 0)
+            return 0;
+    }
+#endif
 
     /* Now: */
 
@@ -556,25 +585,6 @@ interferes(Interp *interpreter, IMC_Unit * unit, SymReg * r0, SymReg * r1)
         if (l1->first_ins->index > l0->last_ins->index)
             continue;
 
-#if 0
-        /* If they only overlap one instruction and one is used RHS only
-         * and the other LHS, then that's ok
-         * same if both are LHS
-         *
-         * XXX While the idea is ok, the following tests are wrong
-         * see imcc/t/reg/alloc_2
-         */
-        if (l0->first_ins->index == l1->last_ins->index &&
-                instruction_writes(l0->first_ins, r0) &&
-                instruction_reads(l1->last_ins, r1) &&
-                !instruction_reads(l0->first_ins, r0))
-            continue;
-        if (l1->first_ins->index == l0->last_ins->index &&
-                instruction_writes(l1->first_ins, r1) &&
-                instruction_reads(l0->last_ins, r0) &&
-                !instruction_reads(l1->first_ins, r1))
-            continue;
-#endif
 
         return 1;
     }
