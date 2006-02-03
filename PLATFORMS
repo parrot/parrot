@@ -39,14 +39,14 @@ solaris8-sparc-gcc3.4.3 B    -    -    -     -   -   -    -        20051202
 solaris9-sparc-gcc3.3.2 B    -    Y/2  -     Y       Y    Y/2      20050814
 solaris10-sparc-gcc3.4.3 B                           Y*7  Y/1      20050804
 tru64-alpha-gcc          8                   Y       Y    Y
-tru64-alpha-dec_c_v6.5   8                   Y       Y    Y        20040816
+tru64-alpha-compaq_c6.5  8                   Y       Y    Y/2      20060203
 vms
 win32-bcc
 win32-cygwin_1.5.18          Y    Y    -     Y   Y   Y*5  Y/2      20060108
 win32-icl_8.0.48             -    Y    -     -   -   Y    Y/2
 win32-mingw-gcc3.4.2         Y    Y    Y     -   -   Y    Y/10  Y  20051202
 win32-msvc_6.0               -    Y    -     -   -   Y    Y        20050804
-win32-msvc_7.1               -    Y    -     -   -   Y    Y/18     20050930
+win32-msvc_7.1               -    Y    -     -   -   Y    Y/71     20060203
 
 -   ... no
 Y   ... yes
