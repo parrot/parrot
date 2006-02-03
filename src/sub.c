@@ -347,6 +347,8 @@ Parrot_Context_info(Interp *interpreter, parrot_context_t *ctx,
         size_t i, n;
         opcode_t *pc = sub->seg->base.data;
         struct PackFile_Debug *debug = sub->seg->debugs;
+        if (!debug)
+            return 0;
         for (i = n = 0; n < sub->seg->base.size; i++) {
             op_info_t *op_info = &interpreter->op_info_table[*pc];
             opcode_t var_args = 0;
