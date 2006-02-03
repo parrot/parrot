@@ -2,9 +2,17 @@ grammar PunieGrammar;
 
 rule prog    { ^<PunieGrammar::lineseq>$ }
 
+rule blue { \w* }
+
+rule block { \s* \{ \s*<PunieGrammar::lineseq>\s* \} \s* }
+
 rule lineseq { \s*<PunieGrammar::line>*\s* }
 
-rule line    { \s*<PunieGrammar::expr>;\s* }
+rule line    { <PunieGrammar::label> <PunieGrammar::expr>;\s* }
+
+rule label { \s* [<PunieGrammar::word>\:]? \s* }
+
+rule word { \w[\w|\d]* }
 
 rule expr    { <PunieGrammar::gprint> | <PunieGrammar::cexpr> }
 
