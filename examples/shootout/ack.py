@@ -9,7 +9,7 @@ def ack(m, n):
 
 def main():
     n = int(sys.argv[1])
-    sys.setrecursionlimit(10000)
+    sys.setrecursionlimit(100000)
     print "Ack(3, %d) = %d" % (n, ack(3, n))
 
 main()
