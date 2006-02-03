@@ -1835,6 +1835,7 @@ byte_code_destroy (Interp* interpreter, struct PackFile_Segment *self)
 #ifdef HAS_JIT
     Parrot_destroy_jit(byte_code->jit_info);
 #endif
+    parrot_PIC_destroy(interpreter, byte_code);
     if (byte_code->prederef.code) {
         Parrot_free_memalign(byte_code->prederef.code);
 	byte_code->prederef.code = NULL;
@@ -1876,6 +1877,7 @@ byte_code_new (Interp* interpreter, struct PackFile *pf,
     byte_code->const_table = NULL;
     byte_code->fixups = NULL;
     byte_code->pic_index = NULL;
+    byte_code->pic_store = NULL;
     return (struct PackFile_Segment *) byte_code;
 }
 
