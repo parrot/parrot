@@ -305,15 +305,14 @@ recursive_tail_call(Parrot_Interp interp, IMC_Unit * unit,
 
 static void
 insert_tail_call(Parrot_Interp interp, IMC_Unit * unit,
-        Instruction *ins, SymReg *sub, int meth_call, SymReg *s0)
+        Instruction *ins, SymReg *sub, SymReg *meth)
 {
     SymReg *regs[2];
 
 
-    if (meth_call) {
-        s0 = s0 ? s0 : get_pasm_reg(interp, "S0");
+    if (meth) {
         regs[0] = sub->pcc_sub->object;
-        regs[1] = s0;
+        regs[1] = meth;
         ins = insINS(interp, unit, ins, "tailcallmethod", regs, 2);
     }
     else {
@@ -337,7 +336,7 @@ expand_pcc_sub_call(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
     int  n;
     int tail_call;
     int meth_call = 0;
-    SymReg *s0 = NULL;
+    SymReg *meth = NULL;
     Instruction *get_name;
 
     sub = ins->r[0];
@@ -416,13 +415,14 @@ expand_pcc_sub_call(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
         ins = get_name;
     }
 
-    s0 = arg = sub->pcc_sub->sub;
+    arg = sub->pcc_sub->sub;
     if (meth_call) {
+        meth = arg;
         if (arg->set != 'P') {
             if ( !(arg->type == VTIDENTIFIER ||
                         arg->type == VTPASM ||
                         arg->type == VTREG))
-                s0 = mk_const(interp, str_dup(arg->name), 'S');
+                meth = mk_const(interp, str_dup(arg->name), 'S');
         }
 
     }
@@ -432,7 +432,7 @@ expand_pcc_sub_call(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
      * insert a tailcall opcode
      */
     if (tail_call) {
-        insert_tail_call(interp, unit, ins, sub, meth_call, s0);
+        insert_tail_call(interp, unit, ins, sub, meth);
         return;
     }
 
@@ -445,7 +445,7 @@ expand_pcc_sub_call(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
     /* insert the call */
     if (meth_call) {
         regs[0] = sub->pcc_sub->object;
-        regs[1] = s0;
+        regs[1] = meth;
         arg = sub->pcc_sub->cc;
         if (arg) {
             regs[2] = arg;
