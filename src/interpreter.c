@@ -472,6 +472,8 @@ init_jit(Interp *interpreter, opcode_t *pc)
     UINTVAL code_size;          /* in opcodes */
     opcode_t *code_end;
     jit_f jit_code;
+    Parrot_jit_info_t *jit_info;
+
     if (interpreter->code->jit_info)
         return ((Parrot_jit_info_t *)interpreter->code->jit_info)->arena.start;
 
@@ -486,8 +488,10 @@ init_jit(Interp *interpreter, opcode_t *pc)
 #    endif
 #  endif
 
-    jit_code = build_asm(interpreter, code_start, code_start, code_end, NULL);
-    return F2DPTR(jit_code);
+    interpreter->code->jit_info = 
+        jit_info = parrot_build_asm(interpreter, code_start, code_end, 
+            NULL, JIT_CODE_FILE);
+    return jit_info->arena.start;
 #else
     return NULL;
 #endif

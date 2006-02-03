@@ -90,12 +90,12 @@ array, which maps from opcode addresses to native code addresses.
 
 =item jit.c
 
-B<build_asm>() is the main routine of the code generator, which loops over the
-parrot bytecode, calling the code generating routines for each opcode while
-filling in the B<op_map> array.  This array is used by the JIT subsystem to
-perform certain types of fixups on native code, as well as by the native code
-itself to convert bytecode program counters values (opcode_t *'s) to hardware
-program counter values.
+B<parrot_build_asm>() is the main routine of the code generator, which loops
+over the parrot bytecode, calling the code generating routines for each opcode
+while filling in the B<op_map> array.  This array is used by the JIT subsystem
+to perform certain types of fixups on native code, as well as by the native
+code itself to convert bytecode program counters values (opcode_t *'s) to
+hardware program counter values.
 
 The bytecode is considered an array of B<opcode_t> sized elements, with
 parallel entries in B<op_map>.  B<op_map> is initially populated with the
@@ -512,7 +512,7 @@ from Parrot_jit_debug, which generates a symbol file in I<stabs> format, s.
 B<info stabs> for more (or less :-()
 
 The following script calls F<ddd> (the graphic debugger fronted) and attaches
-the symbol file, after it got built in F<build_asm>.
+the symbol file, after it got built in F<parrot_build_asm>.
 
     # dddp
     # run ddd parrot with given file

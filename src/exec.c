@@ -75,8 +75,8 @@ Parrot_exec(Interp *interpreter, opcode_t *pc,
     Parrot_exec_rel_addr = (char **)mem_sys_allocate_zeroed(4 * sizeof(char *));
     obj->bytecode_header_size =
         (interpreter->code->base.file_offset + 4) * sizeof(opcode_t);
-    (void) build_asm(interpreter, pc, code_start, code_end, obj);
-    jit_info = interpreter->code->jit_info;
+    jit_info = parrot_build_asm(interpreter, code_start, code_end, 
+            obj, JIT_CODE_FILE);
 
     /* TODO Go zero the calls to jited opcodes. */
     /* Place the program code in the data section. */

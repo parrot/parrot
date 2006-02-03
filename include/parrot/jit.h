@@ -9,9 +9,6 @@
 
 typedef void (*jit_f)(Interp *interpreter, opcode_t *pc);
 
-jit_f build_asm(Interp *interpreter, opcode_t *pc,
-                opcode_t *code_start, opcode_t *code_end,
-                void *objfile);
 
 void Parrot_destroy_jit(void *);
 
@@ -246,23 +243,8 @@ void Parrot_exec_restart_op(Parrot_jit_info_t *jit_info,
 
 /*
  * interface functions for the register save/restore code
- *
- * 1) old style with memory location of the register
- */
-
-void Parrot_jit_emit_mov_mr_n(
-    Interp *interpreter, char *mem, int);
-void Parrot_jit_emit_mov_mr(
-    Interp *interpreter, char *mem, int);
-void Parrot_jit_emit_mov_rm_n(
-    Interp *interpreter, int reg, char *mem);
-void Parrot_jit_emit_mov_rm(
-    Interp *interpreter, int reg, char *mem);
-
-/*
- * 2) new style with offsets relative to the base register
- *    These are used if the platform defines the macro
- *    Parrot_jit_emit_get_base_reg_no
+ * with offsets relative to the base register (obtained by
+ * Parrot_jit_emit_get_base_reg_no)
  */
 void Parrot_jit_emit_mov_mr_n_offs(
     Interp *, int base_reg, size_t offs, int src_reg);
@@ -273,6 +255,19 @@ void Parrot_jit_emit_mov_rm_n_offs(
 void Parrot_jit_emit_mov_rm_offs(
     Interp *, int dst_reg, int base_reg, size_t offs);
 
+typedef enum {
+    JIT_CODE_FILE,
+    JIT_CODE_SUB,
+    JIT_CODE_SUB_REGS_ONLY
+} enum_jit_code_type;
+
+/*
+ * interface to create JIT code
+ */
+Parrot_jit_info_t *
+parrot_build_asm(Interp *interpreter, 
+                opcode_t *code_start, opcode_t *code_end,
+                void *objfile, enum_jit_code_type);
 /*
  * NCI interface
  */
