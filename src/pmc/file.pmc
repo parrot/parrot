@@ -197,7 +197,7 @@ free to change or give me hints on how to change it. -- ambs
         }
         string_cstring_free(cfrom);
         string_cstring_free(cto);
-#undef CHUNK_SIZE 1024
+#undef CHUNK_SIZE
     }
 
 /*
