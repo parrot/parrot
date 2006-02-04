@@ -6,6 +6,8 @@
 
 #include "parrot/oplib/ops.h"
 
+typedef opcode_t* (*interface_f)(Interp*, INTVAL*, void **);
+
 VERSION = PARROT_VERSION;
 
 =head1 NAME
@@ -228,6 +230,50 @@ inline op pic_set_returns__(inconst PMC) :pic {
 	parrot_pic_opcode(interpreter, PARROT_OP_set_returns_pc);
     ((void**)cur_opcode)[1] = mic->m.sig;
     goto OFFSET(0);
+}
+
+=item B<pic_callr__>(inconst PMC)
+
+Call the function $1 as C<pc = func(interp, 0, **args)>. args[0] holds the
+address of the function result, args[1..] are function arguments, both
+according to the C<get_results> and C<set_args> opcodes. The function is
+a C interface function (or NCI) or a JITed PIR function. args[n] holds the
+C<pc> of the next opcode and is usually just returned.
+
+=cut
+
+inline op pic_callr__(inconst PMC) :pic {
+    Parrot_MIC *mic;
+    Parrot_PIC_lru *lru;
+    void *args[6];      /* TODO ARG_MAX */
+    parrot_context_t *ctx;
+    opcode_t *pc;
+    void **pred_pc;
+    PMC *sig;
+    INTVAL *bitp, n_args;
+
+    ctx = CONTEXT(interpreter->ctx);
+    mic = (Parrot_MIC *) cur_opcode[1];
+    pc = ctx->current_results;
+    if (pc) {
+	pred_pc = (void**) pc - ctx->pred_offset;
+        args[0] = (_reg_base + ((opcode_t*)pred_pc)[2]);
+	assert((sig = (PMC*)(pred_pc[1])) &&
+                    PObj_is_PMC_TEST(sig) &&
+                    sig->vtable->base_type == enum_class_FixedIntegerArray &&
+                    VTABLE_elements(interpreter, sig) == 1);
+    }
+    else
+        args[0] = NULL;
+    /* TODO set_args */
+    n_args = 0;
+    /* set_args (); set_p_pc; get_results (1), x; invokecc_p */
+    pc = CUR_OPCODE + 2 + n_args + 3 + 3 + 2;    
+    args[1 + n_args] = pc;
+    lru = &mic->lru;
+    /* TODO verify $1 didn't change */
+    pc = ((interface_f)lru->f.real_function)(interpreter, NULL, args);
+    goto ADDRESS(pc);
 }
 
 =back

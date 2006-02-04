@@ -83,6 +83,8 @@ lookup of the cache has to be done in the opcode itself.
 #  include "parrot/oplib/core_ops_cgp.h"
 #endif
 
+#define PIC_TEST 0
+
 /* needs a Makefile dependency */
 /* #include "pmc/pmc_integer.h" */
 
@@ -169,6 +171,7 @@ parrot_PIC_op_is_cached(Interp *interpreter, int op_code)
         case PARROT_OP_infix_ic_p_p: return 1;
         case PARROT_OP_get_params_pc: return 1;
         case PARROT_OP_set_returns_pc: return 1;
+        case PARROT_OP_set_args_pc: return 1;
     }
     return 0;
 }
@@ -475,6 +478,99 @@ is_pic_param(Interp *interpreter, void **pc, Parrot_MIC* mic, opcode_t op)
     return 1;
 }
 
+#if PIC_TEST
+/*
+ * just for testing the whole scheme ...
+
+.sub main :main
+    .local int i
+    i = __pic_test()
+    print i
+    print "\n"
+.end
+.sub __pic_test
+    .return (10)
+.end
+
+... prints 42, if PIC_TEST is 1, because the C function is called
+    with -C and -S runcores.
+*/
+
+static opcode_t *
+pic_test_func(Interp *interpreter, INTVAL *sig_bits, void **args)
+{
+    opcode_t *pc;
+    INTVAL *result;
+
+    result = (INTVAL*) args[0];
+    *result = 42;
+    pc = args[1];
+    return pc;
+}
+#endif
+
+static int
+is_pic_func(Interp *interpreter, void **pc, Parrot_MIC *mic, int core_type)
+{
+    PMC *sub, *sig;
+    char *base;
+    parrot_context_t *ctx;
+    opcode_t *op, n;
+#if PIC_TEST
+    STRING *name;
+#endif
+    
+    /*
+     * if we have these opcodes
+     *
+     *   set_args '(..)' ...
+     *   set_p_pc Px, PFunx
+     *   get_results '(..)' ...
+     *   invokecc_p Px
+     *
+     * and all args are matching the called sub and we don't have
+     * too many args, and only INTVAL or FLOATVAL, the 
+     * whole sequence is replaced by the C<callr> pic opcode.  
+     *
+     * Oh, I forgot to mention - the to-be-called C function is of
+     * course compiled on-the-fly by the JIT compiler ;)
+     *
+     * pc is at set_args
+     */
+
+    base = (char*)interpreter->ctx.bp.regs_i;
+    ctx = CONTEXT(interpreter->ctx);
+    sig = (PMC*)(pc[1]);
+    assert(PObj_is_PMC_TEST(sig));
+    assert(sig->vtable->base_type == enum_class_FixedIntegerArray);
+    n = VTABLE_elements(interpreter, sig);
+    interpreter->current_args = (opcode_t*)pc + ctx->pred_offset;
+    pc += 2 + n;
+    op = (opcode_t*)pc + ctx->pred_offset;
+    if (*op != PARROT_OP_set_p_pc)
+        return 0;
+    do_prederef(pc, interpreter, core_type);
+    sub = (PMC*)(pc[2]);
+    assert(PObj_is_PMC_TEST(sub)); 
+    if (sub->vtable->base_type != enum_class_Sub)
+        return 0;
+    pc += 3;    /* results */
+    op = (opcode_t*)pc + ctx->pred_offset;
+    if (*op != PARROT_OP_get_results_pc)
+        return 0;
+    do_prederef(pc, interpreter, core_type);
+    ctx->current_results = (opcode_t*)pc + ctx->pred_offset;
+#if PIC_TEST
+    name = VTABLE_get_string(interpreter, sub);
+    if (memcmp((char*) name->strstart, "__pic_test", 10) == 0) {
+        
+        mic->lru.f.real_function = (funcptr_t) pic_test_func;
+        return 1;
+    }
+#endif
+    return 0;
+}
+
 void
 parrot_PIC_prederef(Interp *interpreter, opcode_t op, void **pc_pred, int core)
 {
@@ -527,6 +623,12 @@ parrot_PIC_prederef(Interp *interpreter, opcode_t op, void **pc_pred, int core)
             if (is_pic_param(interpreter, pc_pred, mic, op)) {
                 pc_pred[1] = (void*) mic;
                 op = PARROT_OP_pic_set_returns___pc;
+            }
+            break;
+        case PARROT_OP_set_args_pc:
+            if (is_pic_func(interpreter, pc_pred, mic, core)) {
+                pc_pred[1] = (void*) mic;
+                op = PARROT_OP_pic_callr___pc;
             }
             break;
     }
