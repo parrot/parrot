@@ -99,8 +99,6 @@ typedef enum {
     f31
 } ppc_fregister_t;
 
-#if JIT_EMIT
-
 /* Scratch registers. */
 
 
@@ -697,7 +695,6 @@ cmod_rrr(Parrot_jit_info_t *jit_info, char D, char A, char B)
 
 #  define jit_emit_cmod_rrr(pc, D, A, B) pc = cmod_rrr(jit_info, D, A, B)
 
-#endif /* JIT_EMIT */
 
 void Parrot_ppc_jit_restore_nonvolatile_registers(void);
 
@@ -716,46 +713,6 @@ void Parrot_ppc_jit_restore_nonvolatile_registers(void);
 #define PPC_JIT_FRAME_SIZE (PPC_JIT_GP_REGISTER_SAVE_SPACE + PPC_JIT_FP_REGISTER_SAVE_SPACE + 68)
 
 #if JIT_EMIT == 2
-/*
- * emit stack frame according to ABI
- * see also jit/ppc/core.jit for Parrot_end
- */
-void
-Parrot_jit_begin(Parrot_jit_info_t *jit_info,
-                 Interp * interpreter)
-{
-    int i;
-    jit_emit_mflr(jit_info->native_ptr, r0);
-    jit_emit_stmw(jit_info->native_ptr, r13, -PPC_JIT_GP_REGISTER_SAVE_SPACE, r1);
-
-    for( i = 1; i <= 18; ++i )
-    {
-        jit_emit_stfd(jit_info->native_ptr, (i + 13), (-PPC_JIT_GP_REGISTER_SAVE_SPACE - i*8), r1);
-    }
-    jit_emit_stw(jit_info->native_ptr, r0, 8, r1);
-    jit_emit_stwu(jit_info->native_ptr, r1, -PPC_JIT_FRAME_SIZE, r1);
-    jit_emit_xor_rrr(jit_info->native_ptr, r31, r31, r31);
-    jit_emit_mov_rr(jit_info->native_ptr, r16, r3);  /* interp */
-    if (!jit_info->objfile) {
-        jit_emit_load_op_map(jit_info->native_ptr);
-    }
-#  if EXEC_CAPABLE
-    else {
-        jit_emit_oris(jit_info->native_ptr, r14, r31, 0);
-        Parrot_exec_add_text_rellocation(jit_info->objfile,
-            jit_info->native_ptr, RTYPE_DATA, "opcode_map", -2);
-        jit_emit_ori(jit_info->native_ptr, r14, r14, 0);
-        Parrot_exec_add_text_rellocation(jit_info->objfile,
-            jit_info->native_ptr, RTYPE_DATA1, "opcode_map", -2);
-    }
-#  endif
-
-    jit_emit_load_code_start(jit_info->native_ptr);
-
-    /* jit_emit restart code: branch to the program counter passed into
-       the JIT invocation as the second parameter, which is r4 */
-    jit_emit_branch_to_opcode(jit_info->native_ptr, r4);
-}
 
 void
 Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
@@ -826,7 +783,63 @@ Parrot_jit_restart_op(Parrot_jit_info_t *jit_info,
     jit_emit_branch_to_opcode(jit_info->native_ptr, r3);
 }
 
-void
+#endif /* JIT_EMIT == 2 */
+#if JIT_EMIT == 0
+
+/*
+ * emit stack frame according to ABI
+ * see also jit/ppc/core.jit for Parrot_end
+ */
+static void
+Parrot_jit_begin(Parrot_jit_info_t *jit_info,
+                 Interp * interpreter)
+{
+    int i;
+    jit_emit_mflr(jit_info->native_ptr, r0);
+    jit_emit_stmw(jit_info->native_ptr, r13, -PPC_JIT_GP_REGISTER_SAVE_SPACE, r1);
+
+    for( i = 1; i <= 18; ++i )
+    {
+        jit_emit_stfd(jit_info->native_ptr, (i + 13), (-PPC_JIT_GP_REGISTER_SAVE_SPACE - i*8), r1);
+    }
+    jit_emit_stw(jit_info->native_ptr, r0, 8, r1);
+    jit_emit_stwu(jit_info->native_ptr, r1, -PPC_JIT_FRAME_SIZE, r1);
+    jit_emit_xor_rrr(jit_info->native_ptr, r31, r31, r31);
+    jit_emit_mov_rr(jit_info->native_ptr, r16, r3);  /* interp */
+    if (!jit_info->objfile) {
+        jit_emit_load_op_map(jit_info->native_ptr);
+    }
+#  if EXEC_CAPABLE
+    else {
+        jit_emit_oris(jit_info->native_ptr, r14, r31, 0);
+        Parrot_exec_add_text_rellocation(jit_info->objfile,
+            jit_info->native_ptr, RTYPE_DATA, "opcode_map", -2);
+        jit_emit_ori(jit_info->native_ptr, r14, r14, 0);
+        Parrot_exec_add_text_rellocation(jit_info->objfile,
+            jit_info->native_ptr, RTYPE_DATA1, "opcode_map", -2);
+    }
+#  endif
+
+    jit_emit_load_code_start(jit_info->native_ptr);
+
+    /* jit_emit restart code: branch to the program counter passed into
+       the JIT invocation as the second parameter, which is r4 */
+    jit_emit_branch_to_opcode(jit_info->native_ptr, r4);
+}
+
+static void
+Parrot_jit_begin_sub(Parrot_jit_info_t *jit_info,
+                 Interp * interpreter)
+{
+}
+
+static void
+Parrot_jit_begin_sub_regs(Parrot_jit_info_t *jit_info,
+                 Interp * interpreter)
+{
+}
+
+static void
 Parrot_jit_dofixup(Parrot_jit_info_t *jit_info,
                    Interp * interpreter)
 {
@@ -877,48 +890,41 @@ Parrot_jit_dofixup(Parrot_jit_info_t *jit_info,
     }
 }
 
+
 /* move reg to mem (i.e. intreg) */
-void
-Parrot_jit_emit_mov_mr_offs(Interp * interpreter, int base, size_t offs, int reg)
+static void
+jit_mov_mr_offs(Parrot_jit_info_t *jit_info, int base, INTVAL offs, int reg)
 {
-    jit_emit_mov_mr_i(
-        ((Parrot_jit_info_t *)(interpreter->code->jit_info))->native_ptr, offs, reg);
+    jit_emit_mov_mr_i(jit_info->native_ptr, offs, reg);
     /*
      * if we save registers, the last instruction isn't the ins that
      * sets condition codes, so the speed hack in Parrot_ifunless_i_ic
      * doesn't work.
      */
-    ((Parrot_jit_info_t *)(interpreter->code->jit_info))->prev_op = 0;
+    jit_info->prev_op = 0;
 }
 
 /* move mem (i.e. intreg) to reg */
-void
-Parrot_jit_emit_mov_rm_offs(Interp * interpreter, int reg, int base, size_t offs)
+static void
+jit_mov_rm_offs(Parrot_jit_info_t *jit_info, int reg, int base, INTVAL offs)
 {
-    jit_emit_mov_rm_i(
-        ((Parrot_jit_info_t *)(interpreter->code->jit_info))->native_ptr, reg, offs);
+    jit_emit_mov_rm_i( jit_info->native_ptr, reg, offs);
 }
 
 /* move reg to mem (i.e. numreg) */
-void
-Parrot_jit_emit_mov_mr_n_offs(Interp * interpreter, int base, size_t offs, int reg)
+static void
+jit_mov_mr_n_offs(Parrot_jit_info_t * jit_info, int base, INTVAL offs, int reg)
 {
-    jit_emit_mov_mr_n(
-        ((Parrot_jit_info_t *)(interpreter->code->jit_info))->native_ptr, offs, reg);
-    ((Parrot_jit_info_t *)(interpreter->code->jit_info))->prev_op = 0;
+    jit_emit_mov_mr_n( jit_info->native_ptr, offs, reg);
+    jit_info->prev_op = 0;
 }
 
 /* move mem (i.e. numreg) to reg */
-void
-Parrot_jit_emit_mov_rm_n_offs(Interp * interpreter, int reg, int base, size_t offs)
+static void
+jit_mov_rm_n_offs(Parrot_jit_info_t * jit_info, int reg, int base, INTVAL offs)
 {
-    jit_emit_mov_rm_n(
-        ((Parrot_jit_info_t *)(interpreter->code->jit_info))->native_ptr, reg, offs);
+    jit_emit_mov_rm_n(jit_info->native_ptr, reg, offs);
 }
-
-#endif /* JIT_EMIT == 2 */
-#if JIT_EMIT == 0
-
 #  define REQUIRES_CONSTANT_POOL 0
 #  ifdef PARROT_EXEC_OS_AIX
 #    define INT_REGISTERS_TO_MAP 14
@@ -949,27 +955,30 @@ Parrot_jit_emit_mov_rm_n_offs(Interp * interpreter, int reg, int base, size_t of
  */
 
 
-#ifndef JIT_IMCC
-char intval_map[INT_REGISTERS_TO_MAP] =
-
+static const char intval_map[INT_REGISTERS_TO_MAP] =
     { r17, r18, r19, r20, r21, r22, r23,
       r24, r25, r26, r27, r28, r29, r30
 #  ifndef PARROT_EXEC_OS_AIX
       /* AIX calling convention reserves r2 */
       /* r2, */
 #  endif
-      /* r3, r4, r5, r6, r7, r8, r9, r10 */ };
+    };
+
+static const char intval_map_sub[] =
+    { r3, r4, r6, r7, r8, r9, r10 };
 /*
  * f0, f13 are used as scratch registers
  * f1  - f12 are (additional) volatile registers
  * f14 - f31 are not nonvolatile, and preserved in begin/end
  */
-char floatval_map[FLOAT_REGISTERS_TO_MAP] =
+static const char floatval_map[FLOAT_REGISTERS_TO_MAP] =
     {
-      /* f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12 */
       f14, f15, f16, f17, f18, f19, f20, f21,
       f22, f23, f24, f25, f26, f27, f28, f29, f30, f31
     };
+
+static const char floatval_map_sub[] =
+{ f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12 };
 
 void ppc_flush_line(char *_sync);
 void ppc_sync(void);
@@ -1007,7 +1016,58 @@ ppc_sync_cache (void *_start, void *_end)
     ppc_sync();
 }
 
-#endif /* JIT_IMCC */
+static void
+ppc_flush_cache(Parrot_jit_info_t * jit_info, Interp *i)
+{
+    ppc_sync_cache(jit_info->arena.start, jit_info->native_ptr);
+}
+
+
+static const jit_arch_info arch_info = {
+    jit_mov_rm_offs,
+    jit_mov_rm_n_offs,
+    jit_mov_mr_offs,
+    jit_mov_mr_n_offs,
+    Parrot_jit_dofixup,
+    ppc_flush_cache,
+    {
+        {
+            Parrot_jit_begin,   /* emit code prologue */
+            INT_REGISTERS_TO_MAP,   /* mapped ints */
+            INT_REGISTERS_TO_MAP,   /* all are preserved */
+            intval_map,
+            FLOAT_REGISTERS_TO_MAP,    /* mapped float regs */
+            FLOAT_REGISTERS_TO_MAP,    /* all preserved */
+            floatval_map
+        },
+        {
+            Parrot_jit_begin_sub,   /* emit code prologue */
+            7,                  /* 7 mapped ints */
+            7,                  /* all volatile */
+            intval_map_sub,
+            12,                  /* mapped float regs */
+            12,                  /* all volatile */
+            floatval_map_sub
+        },
+        {
+            Parrot_jit_begin_sub_regs,   /* emit code prologue */
+            7,                  /* 7 mapped ints */
+            7,                  /* all volatile */
+            intval_map_sub,
+            12,                  /* 12 mapped float regs */
+            12,                  /* all volatile */
+            floatval_map_sub
+        }
+    }
+};
+
+
+const jit_arch_info * 
+Parrot_jit_init(Interp *interpreter)
+{
+    return &arch_info;
+}
+
 #endif /* JIT_EMIT == 0 */
 #endif /* PARROT_PPC_JIT_EMIT_H_GUARD */
 

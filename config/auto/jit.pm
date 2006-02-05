@@ -80,7 +80,7 @@ sub runstep
     # XXX disable all but i386, ppc
     my %working_jit = (
 	i386 => 1,
-	# ppc => 1,	# needs jit_arch_info - coming soon
+	ppc => 1,	
 	# all others are seriously b0rked
     );
 

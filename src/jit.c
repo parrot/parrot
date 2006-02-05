@@ -1595,31 +1595,11 @@ parrot_build_asm(Interp *interpreter,
             (unsigned int)(jit_info->native_ptr - jit_info->arena.start));
 #endif
 
-/*
- * TODO just call a sync function, which the architecture defines
- *      or not if not
- *
- *      This should be generalized and go along with the executable
- *      allocation functions as e.g. mem_close_executable()
- */
-
+    /*
+     * sync data cache if needed - we are executing it as code in some usecs
+     */
     if (arch_info->jit_flush_cache)
         (arch_info->jit_flush_cache)(jit_info, interpreter);
-
-#ifdef PARROT_ARM
-    arm_sync_d_i_cache(jit_info->arena.start, jit_info->native_ptr);
-#endif
-#ifdef PARROT_PPC
-    ppc_sync_cache(jit_info->arena.start, jit_info->native_ptr);
-#endif
-#ifdef PARROT_HPPA
-    hppa_sync_cache(jit_info->arena.start, jit_info->native_ptr);
-#endif
-#ifdef PARROT_IA64
-    ia64_sync_cache(jit_info->arena.start, jit_info->native_ptr);
-    return jit_info;
-#endif
-
 
     /* assume gdb is available: generate symbol information  */
 #if defined __GNUC__ || defined __IBMC__

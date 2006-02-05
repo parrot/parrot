@@ -943,3 +943,26 @@ Parrot_set_p_pc {
     jit_emit_mov_ri_i(NATIVECODE, ISR1, CONST(2)->u.key);
     jit_emit_mov_mr_i(NATIVECODE, ROFFS_PMC(1), ISR1); 
 }
+
+; the following 4 ops don't branch but are translated as cpfp
+; which adds unneeded overhead - convert to normal ops
+; or just JIT (TODO)  the 2 easy ones
+Parrot_set_args_pc {
+    jit_emit_mov_ri_i(NATIVECODE, ISR1, jit_info->cur_op);
+    jit_emit_stw(NATIVECODE, ISR1, offsetof(Interp, current_args), r16);
+}
+
+extern Parrot_set_returns_pc {
+    Parrot_jit_normal_op(jit_info, interpreter);
+}
+
+extern Parrot_get_params_pc {
+    Parrot_jit_normal_op(jit_info, interpreter);
+}
+
+Parrot_get_results_pc {
+    jit_emit_mov_ri_i(NATIVECODE, ISR1, jit_info->cur_op);
+    jit_emit_lwz(NATIVECODE, ISR2, offsetof(Interp, ctx.state), r16);
+    jit_emit_stw(NATIVECODE, ISR1, 
+            offsetof(parrot_context_t, current_results), ISR2);
+}
