@@ -541,7 +541,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', 'cleanup global:  throw');
 	print "skipped.\n"
 eh:
 	.local pmc exception
-	.get_results (exception)
+	.get_results (exception, $S0)
 	print "Error: "
 	print exception
 	print "\n"

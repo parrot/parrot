@@ -1198,19 +1198,15 @@ opcode_t *
 parrot_pass_args_to_result(Interp *interpreter, const char *sig,
         opcode_t *dest, parrot_context_t * old_ctxp, va_list ap)
 {
-    int todo;
     struct call_state st;
 
     Parrot_init_arg_op(interpreter,
             CONTEXT(interpreter->ctx), dest, &st.dest);
-    todo = Parrot_init_arg_sig(interpreter,
+    Parrot_init_arg_sig(interpreter,
             old_ctxp, sig, PARROT_VA_TO_VAPTR(ap), &st.src);
 
-    while (todo) {
-        fetch_arg_sig(interpreter, &st);
-        Parrot_convert_arg(interpreter, &st);
-        todo = Parrot_store_arg(interpreter, &st);
-    }
+    init_call_stats(&st);
+    process_args(interpreter, &st, "params", 1);
     return dest + st.dest.n + 2;
 }
 
