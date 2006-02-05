@@ -106,6 +106,8 @@
     $I0 = is_cclass .CCLASS_WHITESPACE, target, pos
     if $I0 goto term_ws
     initchar = substr target, pos, 1
+    $I0 = index "<>[](){}:*?+|&^$.", initchar
+    if $I0 >= 0 goto err_noterm
     inc pos
     if initchar == "#" goto term_ws
     if initchar != "\\" goto term_literal
@@ -203,6 +205,9 @@
     $P0 = pos
     .return (mob)
 
+  err_noterm:
+    parse_error(mob, pos, "Term expected")
+    goto end
   err_backslash_digit:
     parse_error(mob, pos, "\\1 and \\012 illegal, use $1, \\o012, or \\x0a")
     goto end
@@ -555,6 +560,15 @@
     $P0 = new .Exception
     $S0 = "p6rule parse error: "
     $S0 .= message
+    $S0 .= " at offset "
+    $S1 = pos
+    $S0 .= $S1
+    $S0 .= ", found '"
+    $P1 = getattribute mob, "PGE::Match\x0$:target"
+    $S1 = $P1
+    $S1 = substr $S1, pos, 1
+    $S0 .= $S1
+    $S0 .= "'"
     $P0["_message"] = $S0
     throw $P0
     .return ()
