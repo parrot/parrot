@@ -38,26 +38,8 @@ extern int jit_op_count(void);
  * s. jit/$jitcpuarch/jit_emit.h for the meaning of these defs
  */
 
-#ifndef INT_REGISTERS_TO_MAP
-#  define INT_REGISTERS_TO_MAP 0
-  char *intval_map = 0;
-#endif
-
-#ifndef FLOAT_REGISTERS_TO_MAP
-#  define FLOAT_REGISTERS_TO_MAP 0
-  char *floatval_map = 0;
-#endif
-
 #ifndef ALLOCATE_REGISTERS_PER_SECTION
 #  define ALLOCATE_REGISTERS_PER_SECTION 1
-#endif
-
-#ifndef PRESERVED_INT_REGS
-#  define PRESERVED_INT_REGS 0
-#endif
-
-#ifndef PRESERVED_FLOAT_REGS
-#  define PRESERVED_FLOAT_REGS 0
 #endif
 
 #if defined __GNUC__ || defined __IBMC__
@@ -568,7 +550,8 @@ make_branch_targets(Interp *interpreter,
 
 =item C<static void
 sort_registers(Interp *interpreter,
-        Parrot_jit_optimizer_t *optimizer, opcode_t * code_start)>
+        Parrot_jit_info_t *jit_info,
+        opcode_t * code_start)>
 
 Sorts the Parrot registers prior to mapping them to actual hardware registers.
 
@@ -578,13 +561,20 @@ Sorts the Parrot registers prior to mapping them to actual hardware registers.
 
 static void
 sort_registers(Interp *interpreter,
-        Parrot_jit_optimizer_t *optimizer, opcode_t * code_start)
+        Parrot_jit_info_t *jit_info,
+        opcode_t * code_start)
 {
+    Parrot_jit_optimizer_t *optimizer;
     Parrot_jit_optimizer_section_ptr cur_section, next, prev;
-    int i, any, k, typ;
+    int i, any, k, typ, code_type;
     int max_count, max_i = 0;
-    int to_map[] = { INT_REGISTERS_TO_MAP, 0, 0, FLOAT_REGISTERS_TO_MAP };
+    int to_map[] = { 0, 0, 0, 0 };
 
+    code_type = jit_info->code_type;
+    to_map[0] = jit_info->arch_info->regs[code_type].n_mapped_I;
+    to_map[3] = jit_info->arch_info->regs[code_type].n_mapped_F;
+
+    optimizer = jit_info->optimizer;
     /* Start from the first section */
     cur_section = optimizer->sections;
 
@@ -668,7 +658,7 @@ sort_registers(Interp *interpreter,
 
 =item C<static void
 assign_registers(Interp *interpreter,
-        Parrot_jit_optimizer_t *optimizer,
+        Parrot_jit_info_t *jit_info,
         Parrot_jit_optimizer_section_ptr cur_section,
         opcode_t * code_start, int from_imcc)>
 
@@ -715,18 +705,22 @@ complicate the allocation code a bit.
 
 static void
 assign_registers(Interp *interpreter,
-        Parrot_jit_optimizer_t *optimizer,
+        Parrot_jit_info_t *jit_info,
         Parrot_jit_optimizer_section_ptr cur_section,
         opcode_t * code_start, int from_imcc)
 {
     char *map;
+    Parrot_jit_optimizer_t *optimizer;
     op_info_t *op_info;
-    int i, op_arg, typ, n;
+    int i, op_arg, typ, n, code_type;
     opcode_t * cur_op;
-    char * maps[] = {0, 0, 0, 0};
-    maps[0] = intval_map;
-    maps[3] = floatval_map;
+    const char * maps[] = {0, 0, 0, 0};
 
+    code_type = jit_info->code_type;
+    maps[0] = jit_info->arch_info->regs[code_type].map_I;
+    maps[3] = jit_info->arch_info->regs[code_type].map_F;
+
+    optimizer = jit_info->optimizer;
     map = optimizer->map_branch;
     /* For each opcode in this section */
     cur_op = cur_section->begin;
@@ -773,7 +767,7 @@ assign_registers(Interp *interpreter,
 
 =item C<static void
 map_registers(Interp *interpreter,
-        Parrot_jit_optimizer_t *optimizer, opcode_t * code_start)>
+        Parrot_jit_info_t *jit_info, opcode_t * code_start)>
 
 Maps the most used Parrot registers to hardware registers.
 
@@ -783,17 +777,20 @@ Maps the most used Parrot registers to hardware registers.
 
 static void
 map_registers(Interp *interpreter,
-        Parrot_jit_optimizer_t *optimizer, opcode_t * code_start)
+        Parrot_jit_info_t *jit_info,
+         opcode_t * code_start)
 {
+    Parrot_jit_optimizer_t *optimizer;
     Parrot_jit_optimizer_section_ptr cur_section;
 
+    optimizer = jit_info->optimizer;
     /* Start from the first section */
     cur_section = optimizer->sections;
 
     /* While there is section */
     while (cur_section) {
 
-        assign_registers(interpreter, optimizer, cur_section, code_start, 0);
+        assign_registers(interpreter, jit_info, cur_section, code_start, 0);
 
         /* Move to the next section */
         cur_section = cur_section->next;
@@ -901,6 +898,7 @@ debug_sections(Interp *interpreter,
 
 =item C<static Parrot_jit_optimizer_t *
 optimize_jit(Interp *interpreter, 
+            Parrot_jit_info_t *jit_info,
              opcode_t *code_start, opcode_t *code_end)>
 
 Called by C<parrot_build_asm()> to run the optimizer.
@@ -909,15 +907,17 @@ Called by C<parrot_build_asm()> to run the optimizer.
 
 */
 
-static Parrot_jit_optimizer_t *
+static void
 optimize_jit(Interp *interpreter, 
-             opcode_t *code_start, opcode_t *code_end)
+            Parrot_jit_info_t *jit_info,
+            opcode_t *code_start, opcode_t *code_end)
 {
     Parrot_jit_optimizer_t *optimizer;
 
     /* Allocate space for the optimizer */
-    optimizer = (Parrot_jit_optimizer_t *)
-        mem_sys_allocate_zeroed(sizeof(Parrot_jit_optimizer_t));
+    jit_info->optimizer =
+        optimizer = (Parrot_jit_optimizer_t *)
+            mem_sys_allocate_zeroed(sizeof(Parrot_jit_optimizer_t));
 
     /* Look, which opcodes might branch */
     make_branch_list(interpreter, optimizer, code_start, code_end);
@@ -934,22 +934,21 @@ optimize_jit(Interp *interpreter,
 #if JIT_DEBUG > 2
     debug_sections(interpreter, optimizer, code_start);
 #endif
-    sort_registers(interpreter, optimizer, code_start);
-    map_registers(interpreter, optimizer, code_start);
+    sort_registers(interpreter, jit_info, code_start);
+    map_registers(interpreter, jit_info, code_start);
 
 #if JIT_DEBUG
     debug_sections(interpreter, optimizer, code_start);
 #endif
-
-    return optimizer;
 }
 
 /*
 
 =item C<static Parrot_jit_optimizer_t *
 optimize_imcc_jit(Interp *interpreter, 
-             opcode_t *code_start, opcode_t *code_end,
-             struct PackFile_Segment *jit_seg)>
+            Parrot_jit_info_t *jit_info,
+            opcode_t *code_start, opcode_t *code_end,
+            struct PackFile_Segment *jit_seg)>
 
 Generate optimizer stuff from the C<_JIT> section in the packfile.
 
@@ -957,8 +956,9 @@ Generate optimizer stuff from the C<_JIT> section in the packfile.
 
 */
 
-static Parrot_jit_optimizer_t *
+static void
 optimize_imcc_jit(Interp *interpreter, 
+            Parrot_jit_info_t *jit_info,
              opcode_t *code_start, opcode_t *code_end,
              struct PackFile_Segment *jit_seg)
 {
@@ -972,8 +972,9 @@ optimize_imcc_jit(Interp *interpreter,
     opcode_t *cur_op;
 
     /* Allocate space for the optimizer */
-    optimizer = (Parrot_jit_optimizer_t *)
-        mem_sys_allocate_zeroed(sizeof(Parrot_jit_optimizer_t));
+    jit_info->optimizer =
+        optimizer = (Parrot_jit_optimizer_t *)
+            mem_sys_allocate_zeroed(sizeof(Parrot_jit_optimizer_t));
     /*
      * TODO: pass the whole map_branch in the PBC
      *       this would save two runs through all the opcode
@@ -1020,13 +1021,12 @@ optimize_imcc_jit(Interp *interpreter,
             ADD_OP_VAR_PART(interpreter, interpreter->code, cur_op, n);
             cur_op += n;
         }
-        assign_registers(interpreter, optimizer, section, code_start, 1);
+        assign_registers(interpreter, jit_info, section, code_start, 1);
     }
     insert_fixup_targets(interpreter, branch, code_end - code_start);
 #if JIT_DEBUG
     debug_sections(interpreter, optimizer, code_start);
 #endif
-    return optimizer;
 }
 
 /*
@@ -1078,16 +1078,22 @@ Parrot_jit_load_registers(Parrot_jit_info_t *jit_info,
     Parrot_jit_optimizer_section_t *sect = jit_info->optimizer->cur_section;
     Parrot_jit_register_usage_t *ru = sect->ru;
     int i, typ;
-    void (*mov_f[4])(Interp *, int, int, size_t)
-        = { Parrot_jit_emit_mov_rm_offs, 0, 0, Parrot_jit_emit_mov_rm_n_offs};
     size_t offs;
     int base_reg = 0;   /* -O3 warning */
-    int lasts[] = { PRESERVED_INT_REGS, 0,0,  PRESERVED_FLOAT_REGS };
-    char * maps[] = {0, 0, 0, 0};
+    int lasts[] = { 0, 0, 0, 0 };
+    const char * maps[] = {0, 0, 0, 0};
     int first = 1;
+    int code_type;
+    const jit_arch_info *arch_info;
+    const jit_arch_regs *reg_info;
 
-    maps[0] = jit_info->intval_map;
-    maps[3] = jit_info->floatval_map;
+    arch_info = jit_info->arch_info;   
+    code_type = jit_info->code_type;
+    reg_info = arch_info->regs + code_type;
+    maps[0]  = reg_info->map_I;
+    maps[3]  = reg_info->map_F;
+    lasts[0] = reg_info->n_preserved_I;
+    lasts[3] = reg_info->n_preserved_F;
 
     for (typ = 0; typ < 4; typ++) {
         if (maps[typ]) {
@@ -1095,7 +1101,7 @@ Parrot_jit_load_registers(Parrot_jit_info_t *jit_info,
                 int us = ru[typ].reg_usage[i];
                 int is_used = i >= lasts[typ] && ru[typ].reg_dir[us];
                 if ((is_used && volatiles) ||
-                    (!volatiles &&
+                        (!volatiles &&
                          ((ru[typ].reg_dir[us] & PARROT_ARGDIR_IN)))) {
                     if (first) {
                         base_reg = Parrot_jit_emit_get_base_reg_no(
@@ -1103,7 +1109,13 @@ Parrot_jit_load_registers(Parrot_jit_info_t *jit_info,
                         first = 0;
                     }
                     offs = reg_offs(interpreter, typ, us);
-                    (mov_f[typ])(interpreter, maps[typ][i], base_reg, offs);
+                    if (typ == 3)
+                        (arch_info->mov_RM_n)(jit_info, 
+                                              maps[typ][i], base_reg, offs);
+                    else
+                        (arch_info->mov_RM_i)(jit_info, 
+                                              maps[typ][i], base_reg, offs);
+
                 }
             }
         }
@@ -1137,16 +1149,23 @@ Parrot_jit_save_registers(Parrot_jit_info_t *jit_info,
     Parrot_jit_optimizer_section_t *sect = jit_info->optimizer->cur_section;
     Parrot_jit_register_usage_t *ru = sect->ru;
     int i, typ;
-    void (*mov_f[4])(Interp * ,int, size_t, int)
-        = { Parrot_jit_emit_mov_mr_offs, 0, 0, Parrot_jit_emit_mov_mr_n_offs};
     size_t offs;
     int base_reg = 0; /* -O3 warning */
-    int lasts[] = { PRESERVED_INT_REGS, 0,0,  PRESERVED_FLOAT_REGS };
-    char * maps[] = {0, 0, 0, 0};
+    int lasts[] = { 0, 0, 0, 0 };
+    const char * maps[] = {0, 0, 0, 0};
     int first = 1;
+    int code_type;
+    const jit_arch_info *arch_info;
+    const jit_arch_regs *reg_info;
 
-    maps[0] = jit_info->intval_map;
-    maps[3] = jit_info->floatval_map;
+    arch_info = jit_info->arch_info;   
+    code_type = jit_info->code_type;
+    reg_info = arch_info->regs + code_type;
+    maps[0]  = reg_info->map_I;
+    maps[3]  = reg_info->map_F;
+    lasts[0] = reg_info->n_preserved_I;
+    lasts[3] = reg_info->n_preserved_F;
+
     for (typ = 0; typ < 4; typ++) {
         if (maps[typ])
             for (i = 0; i < ru[typ].registers_used; ++i) {
@@ -1162,7 +1181,13 @@ Parrot_jit_save_registers(Parrot_jit_info_t *jit_info,
                     }
 
                     offs = reg_offs(interpreter, typ, us);
-                    (mov_f[typ])(interpreter, base_reg, offs, maps[typ][i]);
+                    if (typ == 3)
+                        (arch_info->mov_MR_n)(jit_info, 
+                                 base_reg, offs, maps[typ][i]);
+                    else
+                        (arch_info->mov_MR_i)(jit_info, 
+                                 base_reg, offs, maps[typ][i]);
+
                 }
             }
     }
@@ -1305,9 +1330,13 @@ parrot_build_asm(Interp *interpreter,
 #endif
     op_info_t *op_info;
     int n;
+    const jit_arch_info *arch_info;
 
     jit_info = interpreter->code->jit_info =
             mem_sys_allocate(sizeof(Parrot_jit_info_t));
+
+    jit_info->code_type = jit_type;
+    arch_info = jit_info->arch_info = Parrot_jit_init(interpreter);
 
     jit_info->objfile = NULL;
 #if EXEC_CAPABLE
@@ -1340,15 +1369,9 @@ parrot_build_asm(Interp *interpreter,
     jit_seg = NULL;
 #endif
     if (jit_seg)
-        jit_info->optimizer =
-            optimize_imcc_jit(interpreter, code_start, code_end, jit_seg);
+        optimize_imcc_jit(interpreter, jit_info, code_start, code_end, jit_seg);
     else
-        jit_info->optimizer =
-            optimize_jit(interpreter, code_start, code_end);
-
-    /* Attach the register map to the jit_info structure */
-    jit_info->intval_map = intval_map;
-    jit_info->floatval_map = floatval_map;
+        optimize_jit(interpreter, jit_info, code_start, code_end);
 
     /* Byte code size in opcode_t's */
     jit_info->arena.map_size = (code_end - code_start) + 1;
@@ -1385,7 +1408,7 @@ parrot_build_asm(Interp *interpreter,
      * function. So we have to generate an appropriate function
      * prologue, that makes all this look like a normal function ;)
      */
-    Parrot_jit_begin(jit_info, interpreter);
+    (arch_info->regs[jit_type].jit_begin)(jit_info, interpreter);
     /*
      * the function epilog can basically be anywhere, that's done
      * by the Parrot_end opcode somewhere in core.jit
@@ -1550,7 +1573,7 @@ parrot_build_asm(Interp *interpreter,
      */
     CONTEXT(interpreter->ctx)->n_regs_used = n_regs_used;
     /* Do fixups before converting offsets */
-    Parrot_jit_dofixup(jit_info, interpreter);
+    (arch_info->jit_dofixup)(jit_info, interpreter);
 
     /* Convert offsets to pointers */
     if (!objfile)
@@ -1579,6 +1602,9 @@ parrot_build_asm(Interp *interpreter,
  *      This should be generalized and go along with the executable
  *      allocation functions as e.g. mem_close_executable()
  */
+
+    if (arch_info->jit_flush_cache)
+        (arch_info->jit_flush_cache)(jit_info, interpreter);
 
 #ifdef PARROT_ARM
     arm_sync_d_i_cache(jit_info->arena.start, jit_info->native_ptr);

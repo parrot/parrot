@@ -25,6 +25,15 @@
 #include "pbc.h"
 
 #ifdef HAS_JIT
+void
+allocate_jit(Interp *interpreter, IMC_Unit * unit)
+{
+    UNUSED(interpreter);
+    UNUSED(unit);
+}
+
+#ifdef DO_JIT_IMCC
+/* turned off for now - needs to be redone */
 
 #define JIT_IMCC
 #include "parrot/jit.h"
@@ -332,9 +341,9 @@ allocate_jit(Interp *interpreter, IMC_Unit * unit)
     }
 }
 
-#else
+#endif  /* DO_JIT_IMCC */
 
-#endif
+#endif  /* HAS_JIT */
 /*
  * Local variables:
  * c-indentation-style: bsd

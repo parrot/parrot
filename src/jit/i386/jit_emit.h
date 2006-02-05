@@ -75,7 +75,6 @@ extern UINTVAL ld(UINTVAL);
 
 #  define INT_REGISTERS_TO_MAP 4
 
-#if JIT_EMIT
 
 /* Scratch register. */
 
@@ -2765,11 +2764,10 @@ Parrot_jit_vtable_newp_ic_op(Parrot_jit_info_t *jit_info,
      }
 
 #  endif /* JIT_CGP */
-#endif /* JIT_EMIT */
 
-#if JIT_EMIT > 1
+#if JIT_EMIT == 0
 
-void
+static void
 Parrot_jit_dofixup(Parrot_jit_info_t *jit_info,
                    Interp * interpreter)
 {
@@ -2813,95 +2811,6 @@ Parrot_jit_dofixup(Parrot_jit_info_t *jit_info,
 
 static int control_word = 0x27f;
 
-#  ifndef JIT_CGP
-void
-Parrot_jit_begin(Parrot_jit_info_t *jit_info,
-                 Interp * interpreter)
-{
-    /* the generated code gets called as:
-     * (jit_code)(interpreter, pc)
-     * jumping to pc is the same code as used in Parrot_jit_cpcf_op()
-     */
-
-    /* Maintain the stack frame pointer for the sake of gdb */
-    jit_emit_stack_frame_enter(jit_info->native_ptr);
-    emitm_fldcw(jit_info->native_ptr, &control_word);
-    /* stack:
-     *  12   pc
-     *   8   interpreter
-     *   4   retaddr
-     *   0   ebp <----- ebp
-     *  -4   ebx .. preserved regs
-     *  -8   esi ..
-     * -12   edi ..
-     * -16   interpreter
-     */
-
-    /* Save all callee-saved registers (cdecl)
-     */
-    emitm_pushl_r(jit_info->native_ptr, emit_EBX);
-    emitm_pushl_r(jit_info->native_ptr, emit_ESI);
-    emitm_pushl_r(jit_info->native_ptr, emit_EDI);
-
-    /* Cheat on op function calls by writing the interpreter arg on the stack
-     * just once. If an op function ever modifies the interpreter argument on
-     * the stack this will stop working !!! */
-
-    /* get the interpreter from stack:  mov 8(%ebp), %eax */
-    emitm_movl_m_r(jit_info->native_ptr, emit_EAX, emit_EBP, emit_None, 1, 8);
-    emitm_pushl_r(jit_info->native_ptr, emit_EAX);
-
-    /* get the pc from stack:  mov 12(%ebp), %eax */
-    emitm_movl_m_r(jit_info->native_ptr, emit_EAX, emit_EBP, emit_None, 1, 12);
-
-    /* jump to restart pos or first op */
-    Parrot_emit_jump_to_eax(jit_info, interpreter);
-}
-#  endif
-
-
-
-void
-Parrot_jit_emit_mov_mr_n_offs(Interp *interpreter,
-        int base_reg, size_t offs, int src_reg)
-{
-    emitm_fld(((Parrot_jit_info_t *)(interpreter->code->jit_info))->native_ptr,
-            src_reg);
-    jit_emit_fstore_mb_n(((Parrot_jit_info_t *)(interpreter->code->jit_info))->
-            native_ptr, base_reg, offs);
-}
-
-void
-Parrot_jit_emit_mov_mr_offs(Interp *interpreter,
-        int base_reg, size_t offs, int src_reg)
-{
-    emitm_movl_r_m(((Parrot_jit_info_t *)(interpreter->code->jit_info))->native_ptr,
-            src_reg, base_reg, emit_None, 1, offs);
-}
-
-void
-Parrot_jit_emit_mov_rm_n_offs(Interp *interpreter,
-        int dst_reg, int base_reg, size_t offs)
-{
-    jit_emit_fload_mb_n(((Parrot_jit_info_t *)(interpreter->code->jit_info))->
-            native_ptr, base_reg,  offs);
-    emitm_fstp(((Parrot_jit_info_t *)(interpreter->code->jit_info))->native_ptr,
-            (dst_reg+1));
-}
-
-void
-Parrot_jit_emit_mov_rm_offs(Interp *interpreter,
-        int dst_reg, int base_reg, size_t offs)
-{
-    emitm_movl_m_r(((Parrot_jit_info_t *)(interpreter->code->jit_info))->native_ptr,
-            dst_reg, base_reg, emit_None, 1, offs);
-}
-
-static void
-Parrot_jit_emit_finit(Parrot_jit_info_t *jit_info)
-{
-    jit_emit_finit(jit_info->native_ptr);
-}
 #  ifdef JIT_CGP
 
 #    include <parrot/oplib/core_ops_cgp.h>
@@ -2936,7 +2845,7 @@ Parrot_jit_emit_finit(Parrot_jit_info_t *jit_info)
  *
  */
 
-void
+static void
 Parrot_jit_begin(Parrot_jit_info_t *jit_info,
                  Interp * interpreter)
 {
@@ -2979,6 +2888,106 @@ Parrot_jit_begin(Parrot_jit_info_t *jit_info,
 /* code_start: */
 }
 
+#else /* JIT_CGP */
+static void
+Parrot_jit_begin(Parrot_jit_info_t *jit_info,
+                 Interp * interpreter)
+{
+    /* the generated code gets called as:
+     * (jit_code)(interpreter, pc)
+     * jumping to pc is the same code as used in Parrot_jit_cpcf_op()
+     */
+
+    /* Maintain the stack frame pointer for the sake of gdb */
+    jit_emit_stack_frame_enter(jit_info->native_ptr);
+    emitm_fldcw(jit_info->native_ptr, &control_word);
+    /* stack:
+     *  12   pc
+     *   8   interpreter
+     *   4   retaddr
+     *   0   ebp <----- ebp
+     *  -4   ebx .. preserved regs
+     *  -8   esi ..
+     * -12   edi ..
+     * -16   interpreter
+     */
+
+    /* Save all callee-saved registers (cdecl)
+     */
+    emitm_pushl_r(jit_info->native_ptr, emit_EBX);
+    emitm_pushl_r(jit_info->native_ptr, emit_ESI);
+    emitm_pushl_r(jit_info->native_ptr, emit_EDI);
+
+    /* Cheat on op function calls by writing the interpreter arg on the stack
+     * just once. If an op function ever modifies the interpreter argument on
+     * the stack this will stop working !!! */
+
+    /* get the interpreter from stack:  mov 8(%ebp), %eax */
+    emitm_movl_m_r(jit_info->native_ptr, emit_EAX, emit_EBP, emit_None, 1, 8);
+    emitm_pushl_r(jit_info->native_ptr, emit_EAX);
+
+    /* get the pc from stack:  mov 12(%ebp), %eax */
+    emitm_movl_m_r(jit_info->native_ptr, emit_EAX, emit_EBP, emit_None, 1, 12);
+
+    /* jump to restart pos or first op */
+    Parrot_emit_jump_to_eax(jit_info, interpreter);
+}
+
+#endif /* JIT_CGP */
+
+static void
+Parrot_jit_begin_sub(Parrot_jit_info_t *jit_info,
+                 Interp * interpreter)
+{
+}
+
+
+static void
+jit_mov_mr_n_offs(Parrot_jit_info_t *jit_info,
+        int base_reg, INTVAL offs, int src_reg)
+{
+    emitm_fld(jit_info->native_ptr, src_reg);
+    jit_emit_fstore_mb_n(jit_info->native_ptr, base_reg, offs);
+}
+
+static void
+jit_mov_mr_offs(Parrot_jit_info_t *jit_info,
+        int base_reg, INTVAL offs, int src_reg)
+{
+    emitm_movl_r_m(jit_info->native_ptr,
+            src_reg, base_reg, emit_None, 1, offs);
+}
+
+static void
+jit_mov_rm_n_offs(Parrot_jit_info_t *jit_info,
+        int dst_reg, int base_reg, INTVAL offs)
+{
+    jit_emit_fload_mb_n(jit_info->native_ptr, base_reg,  offs);
+    emitm_fstp(jit_info->native_ptr, (dst_reg+1));
+}
+
+static void
+jit_mov_rm_offs(Parrot_jit_info_t *jit_info,
+        int dst_reg, int base_reg, INTVAL offs)
+{
+    emitm_movl_m_r(jit_info->native_ptr,
+            dst_reg, base_reg, emit_None, 1, offs);
+}
+
+#endif
+
+#if JIT_EMIT == 2
+/* generate code just once */
+
+static void
+Parrot_jit_emit_finit(Parrot_jit_info_t *jit_info)
+{
+    jit_emit_finit(jit_info->native_ptr);
+}
+
+
+
+#  ifdef JIT_CGP
 /*
  * XXX needs some fixing
  * s. t/sub/pmc_{8,9}.t: the 2 print in tail call without that 'end'
@@ -3076,8 +3085,6 @@ Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
 
 #  endif /* JIT_CGP */
 
-static void Parrot_end_jit(Parrot_jit_info_t *, Interp * );
-
 void
 Parrot_jit_cpcf_op(Parrot_jit_info_t *jit_info,
                    Interp * interpreter)
@@ -3086,6 +3093,10 @@ Parrot_jit_cpcf_op(Parrot_jit_info_t *jit_info,
     Parrot_emit_jump_to_eax(jit_info, interpreter);
 }
 
+
+/* autogened inside core.ops */
+static void
+Parrot_end_jit(Parrot_jit_info_t *jit_info, Interp * interpreter);
 
 #  undef Parrot_jit_restart_op
 void
@@ -3111,6 +3122,7 @@ Parrot_jit_restart_op(Parrot_jit_info_t *jit_info,
     jit_info->native_ptr = sav_ptr;
     Parrot_emit_jump_to_eax(jit_info, interpreter);
 }
+
 /*
  * params are put rigth to left on the stack
  * parrot registers are counted left to right
@@ -3455,10 +3467,11 @@ preg:
     return (jit_f)D2FPTR(jit_info.arena.start);
 }
 
-#endif /* JIT_EMIT */
+#endif
+
 #if JIT_EMIT == 0
+
 #  define REQUIRES_CONSTANT_POOL 0
-/* #  define INT_REGISTERS_TO_MAP 4 definition at top */
 /*
  * examples/pir/mandel.pir and t/op/jitn_14 show rounding problems
  * due to keeping intermediate results in FP registers
@@ -3471,7 +3484,6 @@ preg:
  */
 #  define FLOAT_REGISTERS_TO_MAP 4
 
-#  ifndef JIT_IMCC
 /*
  * register usage
  * %edi, %esi ... mapped, preserved
@@ -3479,33 +3491,58 @@ preg:
  * %ebx       ... base pointer for register access, preserved
  * %eax       ... scratch, return value register
  */
-char intval_map[] =
-    /* Note: don't change order of these */
+
+static const char intval_map[] =
     { emit_EDI, emit_ESI, emit_EDX, emit_ECX };
+static const char floatval_map[] =
+    { 1,2,3,4 };         /* ST(1) .. (ST(4) */
 
-/* ST(0) is used as a scratch register,
- * using more then 4 registers breaks C<time N0>
- */
-char floatval_map[] = { 1,2,3,4 };
-#  endif
+static const char intval_map_sub[] =
+    { emit_EDX, emit_ECX, emit_EBX, emit_EDI, emit_ESI };
 
-/* of these registers that much (from 0 < n) are callee saved, i.e. are
- * not changed around external calls
- */
+static const jit_arch_info arch_info = {
+    jit_mov_rm_offs,
+    jit_mov_rm_n_offs,
+    jit_mov_mr_offs,
+    jit_mov_mr_n_offs,
+    Parrot_jit_dofixup,
+    (jit_arch_f)0,              /* no cache flush needed */      
+    {
+        {
+            Parrot_jit_begin,   /* emit code prologue */
+            4,                  /* 4 mapped ints */
+            2,                  /* first 2 are preserved */
+            intval_map,
+            4,                  /* 4 mapped float regs */
+            0,                  /* ABI sez it's not preserved */
+            floatval_map
+        },
+        {
+            Parrot_jit_begin_sub,   /* emit code prologue */
+            4,                  /* 4 mapped ints */
+            2,                  /* first 2 are *non*preserved */
+            intval_map_sub,
+            4,                  /* 4 mapped float regs */
+            0,                  /* ABI sez it's not preserved */
+            floatval_map
+        },{
+            Parrot_jit_begin_sub,   /* emit code prologue */
+            4,                  /* 4 mapped ints */
+            2,                  /* first 2 are *non*preserved */
+            intval_map_sub,
+            4,                  /* 4 mapped float regs */
+            0,                  /* ABI sez it's not preserved */
+            floatval_map
+        }
+    }
+};
 
-#  define PRESERVED_INT_REGS 2
 
-/* XXX
- * this 4 floatvals are currently assumed to be callee saved,
- * what is strictly not true conforming to the ABI
- * but currently, we don't have external functions, which
- * globber these regs
- * to be save the following line should be enabled:
- *
- *
- */
-
-# define PRESERVED_FLOAT_REGS 0
+const jit_arch_info * 
+Parrot_jit_init(Interp *interpreter)
+{
+    return &arch_info;
+}
 
 /*
  * if jit_emit_noop is defined, it does align a jump target
@@ -3543,8 +3580,9 @@ char floatval_map[] = { 1,2,3,4 };
 #    define INTERP_BP_OFFS -16
 #  endif
 
+#endif  /* JIT_EMIT */
 
-#endif /* JIT_EMIT */
+#  undef INT_REGISTERS_TO_MAP
 #endif /* PARROT_I386_JIT_EMIT_H_GUARD */
 
 /*

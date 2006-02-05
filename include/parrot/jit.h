@@ -162,6 +162,15 @@ typedef struct {
     INTVAL                          *slot_ptr;
 } Parrot_jit_constant_pool_t;
 
+typedef enum {
+    JIT_CODE_FILE,
+    JIT_CODE_SUB,
+    JIT_CODE_SUB_REGS_ONLY,
+
+    /* size */
+    JIT_CODE_TYPES
+} enum_jit_code_type;
+
 /*  Parrot_jit_info_t
  *      All the information needed to jit the bytecode will be here.
  *
@@ -183,9 +192,8 @@ typedef struct {
     Parrot_jit_arena_t               arena;
     Parrot_jit_optimizer_t          *optimizer;
     Parrot_jit_constant_pool_t      *constant_pool;
-    char                            *intval_map;
-    char                            *floatval_map;
-    struct jit_arch_info_t          *arch_info;
+    enum_jit_code_type              code_type; 
+    const struct jit_arch_info_t    *arch_info;
 #  if EXEC_CAPABLE
     Parrot_exec_objfile_t           *objfile;
 #  else
@@ -218,12 +226,6 @@ extern Parrot_jit_fn_info_t op_exec[];
 
 void Parrot_jit_newfixup(Parrot_jit_info_t *jit_info);
 
-void Parrot_jit_begin(Parrot_jit_info_t *jit_info,
-                      Interp *interpreter);
-
-void Parrot_jit_dofixup(Parrot_jit_info_t *jit_info,
-                        Interp *interpreter);
-
 void Parrot_jit_cpcf_op(Parrot_jit_info_t *jit_info,
                         Interp *interpreter);
 
@@ -255,15 +257,6 @@ void Parrot_jit_emit_mov_rm_n_offs(
     Interp *, int dst_reg, int base_reg, size_t offs);
 void Parrot_jit_emit_mov_rm_offs(
     Interp *, int dst_reg, int base_reg, size_t offs);
-
-typedef enum {
-    JIT_CODE_FILE,
-    JIT_CODE_SUB,
-    JIT_CODE_SUB_REGS_ONLY,
-
-    /* size */
-    JIT_CODE_TYPES
-} enum_jit_code_type;
 
 /*
  * interface to architecture specific details
@@ -302,13 +295,13 @@ typedef struct jit_arch_info_t {
     /* flush caches */
     jit_arch_f jit_flush_cache;
     /* register mapping info */
-    jit_arch_regs regs[JIT_CODE_TYPES];
+    const jit_arch_regs regs[JIT_CODE_TYPES];
 } jit_arch_info;
 
 /*
  * return the jit_arch_info for the given JIT_CODE type
  */
-jit_arch_info * Parrot_jit_init(Interp *, enum_jit_code_type);
+const jit_arch_info * Parrot_jit_init(Interp *);
 
 /*
  * interface to create JIT code

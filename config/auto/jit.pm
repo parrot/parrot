@@ -78,17 +78,14 @@ sub runstep
         if $verbose;
 
     # XXX disable all but i386, ppc
-    if (-e "$jitbase/$cpuarch/core.jit" && ($cpuarch eq 'i386' || $cpuarch eq 'ppc')) {
-        $jitcapable = 1;
+    my %working_jit = (
+	i386 => 1,
+	# ppc => 1,	# needs jit_arch_info - coming soon
+	# all others are seriously b0rked
+    );
 
-        # XXX disable sun4 - doesn't even build
-        if (
-            $cpuarch =~ /sun4|sparc64/
-            && (1
-                || $conf->data->get('intvalsize') > $conf->data->get('ptrsize'))
-            ) {
-            $jitcapable = 0;
-        }
+    if (-e "$jitbase/$cpuarch/core.jit" && $working_jit{$cpuarch}) {
+        $jitcapable = 1;
     }
 
     if (-e "$jitbase/$cpuarch/$jitarchname.s") {
