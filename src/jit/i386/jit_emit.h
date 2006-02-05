@@ -2936,11 +2936,64 @@ Parrot_jit_begin(Parrot_jit_info_t *jit_info,
 #endif /* JIT_CGP */
 
 static void
+Parrot_jit_begin_sub_regs(Parrot_jit_info_t *jit_info,
+                 Interp * interpreter)
+{
+    jit_emit_stack_frame_enter(jit_info->native_ptr);
+    /* stack:
+     *  16   args
+     *  12   sig_bits
+     *   8   interpreter
+     *   4   retaddr
+     *   0   ebp <----- ebp
+     * [ -4   ebx .. preserved regs ]
+     */
+    /*
+     * TODO check register usage of the subroutine
+     *      how many we have to preserve
+     */ 
+#if 0
+    emitm_pushl_r(jit_info->native_ptr, emit_EBX);
+    emitm_pushl_r(jit_info->native_ptr, emit_ESI);
+    emitm_pushl_r(jit_info->native_ptr, emit_EDI);
+#endif
+    /* XXX just a quick test */
+
+    /* mov 16(%ebp), %eax - fetch args ptr */
+    emitm_movl_m_r(jit_info->native_ptr, emit_EAX, emit_EBP, emit_None, 1, 16);
+
+    /* code emitted by set_returns */
+    /* mov 0(%eax), %ecx 
+     * mov $42, (%ecx) - return 42 */
+    emitm_movl_m_r(jit_info->native_ptr, emit_ECX, emit_EAX, emit_None, 1, 0);
+    emitm_movl_i_m(jit_info->native_ptr, 42, emit_ECX, emit_None, 1, 0);
+
+    /* code emitted by returncc */
+    /* fetch retval pc -> %eax i.e. return it */
+    emitm_movl_m_r(jit_info->native_ptr, emit_EAX, emit_EAX, emit_None, 1, 4);
+    jit_emit_stack_frame_leave(jit_info->native_ptr);
+    emitm_ret(jit_info->native_ptr);
+}
+
+
+/*
+ * create a JITted version of a PIR sub, where everything
+ * resided in registers
+ *
+ * The sub is called as
+ *
+ *   opcode_t * func(Interp *i, INTVAL *sig_bits, void **args);
+ *
+ *   args[0] ...    NULL / return value address
+ *   args[1..n] ... addresses of n arguments
+ *   args[n + 1] .. opcode_t* next - ususally just returned
+ */
+
+static void
 Parrot_jit_begin_sub(Parrot_jit_info_t *jit_info,
                  Interp * interpreter)
 {
 }
-
 
 static void
 jit_mov_mr_n_offs(Parrot_jit_info_t *jit_info,
@@ -3526,7 +3579,7 @@ static const jit_arch_info arch_info = {
             0,                  /* ABI sez it's not preserved */
             floatval_map
         },{
-            Parrot_jit_begin_sub,   /* emit code prologue */
+            Parrot_jit_begin_sub_regs,   /* emit code prologue */
             4,                  /* 4 mapped ints */
             2,                  /* first 2 are *non*preserved */
             intval_map_sub,

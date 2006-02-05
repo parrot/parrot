@@ -83,7 +83,12 @@ lookup of the cache has to be done in the opcode itself.
 #  include "parrot/oplib/core_ops_cgp.h"
 #endif
 
-#define PIC_TEST 0
+#if HAS_JIT
+#include "parrot/exec.h"
+#include "parrot/jit.h"
+#endif
+
+#define PIC_TEST 1
 
 /* needs a Makefile dependency */
 /* #include "pmc/pmc_integer.h" */
@@ -563,9 +568,28 @@ is_pic_func(Interp *interpreter, void **pc, Parrot_MIC *mic, int core_type)
 #if PIC_TEST
     name = VTABLE_get_string(interpreter, sub);
     if (memcmp((char*) name->strstart, "__pic_test", 10) == 0) {
+#if HAS_JIT
+        /*
+         * create JIT code - just a test
+         */
+        Parrot_jit_info_t *jit_info;
+        opcode_t *base, *start, *end;
         
-        mic->lru.f.real_function = (funcptr_t) pic_test_func;
+        base = interpreter->code->base.data;
+        start = base + PMC_sub(sub)->start_offs;
+        end   = base + PMC_sub(sub)->end_offs;
+        /* TODO pass Sub */
+
+        jit_info = parrot_build_asm(interpreter, start, end, NULL,
+            JIT_CODE_SUB_REGS_ONLY);
+        if (!jit_info)
+            return 0;
+        
+        mic->lru.f.real_function = (funcptr_t) jit_info->arena.start;
         return 1;
+#else
+        return 0;
+#endif
     }
 #endif
     return 0;
