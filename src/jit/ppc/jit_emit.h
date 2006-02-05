@@ -837,6 +837,32 @@ static void
 Parrot_jit_begin_sub_regs(Parrot_jit_info_t *jit_info,
                  Interp * interpreter)
 {
+    jit_emit_mflr(jit_info->native_ptr, r0);    /* optional */
+    jit_emit_stw(jit_info->native_ptr, r0, 8, r1); /* stw     r0,8(r1) */
+    /* preserve r31 */
+    jit_emit_stw(jit_info->native_ptr, r31, -4, r1); 
+    /* 24 linkage area, 0 params , 1 word local, roundup => 32 */
+    jit_emit_stwu(jit_info->native_ptr, r1, -32, r1);
+    /* r31 = 0 - needed for load immediate */
+    jit_emit_xor_rrr(jit_info->native_ptr, r31, r31, r31);
+
+    /* TEST implement __pic_test */
+
+    /* fetch args[0] */
+    jit_emit_lwz(jit_info->native_ptr, ISR1, 0, r5);
+    /* set return value to 42 */
+    jit_emit_mov_ri_i(jit_info->native_ptr, ISR2, 42);
+    jit_emit_stw(jit_info->native_ptr, ISR2, 0, ISR1);
+
+    /* fetch args[1] -> retval */
+    jit_emit_lwz(jit_info->native_ptr, r3, 4, r5);
+
+    /* return sequence */
+    jit_emit_lwz(jit_info->native_ptr, r1, 0, r1);
+    jit_emit_lwz(jit_info->native_ptr, r31, -4, r1);
+    jit_emit_lwz(jit_info->native_ptr, r0, 8, r1);   /* opt */
+    jit_emit_mtlr(jit_info->native_ptr, r0);   /* opt */
+    jit_emit_blr(jit_info->native_ptr);
 }
 
 static void
@@ -1050,7 +1076,7 @@ static const jit_arch_info arch_info = {
             floatval_map_sub
         },
         {
-            Parrot_jit_begin_sub_regs,   /* emit code prologue */
+            Parrot_jit_begin_sub_regs,  /* emit code prologue */
             7,                  /* 7 mapped ints */
             7,                  /* all volatile */
             intval_map_sub,
