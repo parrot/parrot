@@ -185,6 +185,7 @@ typedef struct {
     Parrot_jit_constant_pool_t      *constant_pool;
     char                            *intval_map;
     char                            *floatval_map;
+    struct jit_arch_info_t          *arch_info;
 #  if EXEC_CAPABLE
     Parrot_exec_objfile_t           *objfile;
 #  else
@@ -258,8 +259,56 @@ void Parrot_jit_emit_mov_rm_offs(
 typedef enum {
     JIT_CODE_FILE,
     JIT_CODE_SUB,
-    JIT_CODE_SUB_REGS_ONLY
+    JIT_CODE_SUB_REGS_ONLY,
+
+    /* size */
+    JIT_CODE_TYPES
 } enum_jit_code_type;
+
+/*
+ * interface to architecture specific details
+ */
+typedef void (*jit_arch_f)(Parrot_jit_info_t *, Interp *);
+
+typedef struct {
+    /*
+     * begin function - emit ABI call prologue 
+     */
+    jit_arch_f jit_begin;
+
+    int n_mapped_I;
+    int n_preserved_I;
+    const char *map_I;
+    int n_mapped_F;
+    int n_preserved_F;
+    const char *map_F;
+} jit_arch_regs;
+
+typedef void (*mov_RM_f)(Parrot_jit_info_t *, 
+        int cpu_reg, int base_reg, INTVAL offs);
+typedef void (*mov_MR_f)(Parrot_jit_info_t *, 
+        int base_reg, INTVAL offs, int cpu_reg);
+        
+typedef struct jit_arch_info_t {
+    /* CPU <- Parrot reg move functions */
+    mov_RM_f mov_RM_i;
+    mov_RM_f mov_RM_n;
+    /* Parrot <- CPU reg move functions */
+    mov_MR_f mov_MR_i;
+    mov_MR_f mov_MR_n;
+
+    /* fixup branches and calls after codegen */
+    jit_arch_f jit_dofixup;
+    /* flush caches */
+    jit_arch_f jit_flush_cache;
+    /* register mapping info */
+    jit_arch_regs regs[JIT_CODE_TYPES];
+} jit_arch_info;
+
+/*
+ * return the jit_arch_info for the given JIT_CODE type
+ */
+jit_arch_info * Parrot_jit_init(Interp *, enum_jit_code_type);
 
 /*
  * interface to create JIT code
