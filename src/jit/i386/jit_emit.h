@@ -2957,22 +2957,6 @@ Parrot_jit_begin_sub_regs(Parrot_jit_info_t *jit_info,
     emitm_pushl_r(jit_info->native_ptr, emit_ESI);
     emitm_pushl_r(jit_info->native_ptr, emit_EDI);
 #endif
-    /* XXX just a quick test */
-
-    /* mov 16(%ebp), %eax - fetch args ptr */
-    emitm_movl_m_r(jit_info->native_ptr, emit_EAX, emit_EBP, emit_None, 1, 16);
-
-    /* code emitted by set_returns */
-    /* mov 0(%eax), %ecx 
-     * mov $42, (%ecx) - return 42 */
-    emitm_movl_m_r(jit_info->native_ptr, emit_ECX, emit_EAX, emit_None, 1, 0);
-    emitm_movl_i_m(jit_info->native_ptr, 42, emit_ECX, emit_None, 1, 0);
-
-    /* code emitted by returncc */
-    /* fetch retval pc -> %eax i.e. return it */
-    emitm_movl_m_r(jit_info->native_ptr, emit_EAX, emit_EAX, emit_None, 1, 4);
-    jit_emit_stack_frame_leave(jit_info->native_ptr);
-    emitm_ret(jit_info->native_ptr);
 }
 
 

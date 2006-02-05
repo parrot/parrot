@@ -1331,7 +1331,9 @@ parrot_build_asm(Interp *interpreter,
     op_info_t *op_info;
     int n;
     const jit_arch_info *arch_info;
+    int needs_fs;       /* fetch/store */
 
+    needs_fs = jit_type != JIT_CODE_SUB_REGS_ONLY;
     jit_info = interpreter->code->jit_info =
             mem_sys_allocate(sizeof(Parrot_jit_info_t));
 
@@ -1452,7 +1454,7 @@ parrot_build_asm(Interp *interpreter,
         set_reg_usage(interpreter, cur_op);
 
         /* Load mapped registers for this section, if JIT */
-        if (!jit_seg && cur_section->isjit) {
+        if (!jit_seg && cur_section->isjit && needs_fs) {
             Parrot_jit_load_registers(jit_info, interpreter, 0);
         }
 
@@ -1497,21 +1499,23 @@ parrot_build_asm(Interp *interpreter,
              * save also, if we have a jitted sections and encounter
              * an "end" opcode, e.g. in evaled code
              */
-            if ((((map[cur_op - code_start] == JIT_BRANCH_SOURCE) &&
+            if (needs_fs) {
+                if ((((map[cur_op - code_start] == JIT_BRANCH_SOURCE) &&
                             (cur_section->branch_target != cur_section)) ||
-                        !cur_opcode_byte) &&
-                    cur_section->isjit &&
-                    !jit_seg) {
-                Parrot_jit_save_registers(jit_info, interpreter, 0);
-            }
-            else if (CALLS_C_CODE(cur_opcode_byte)) {
-                /*
-                 * a JITted function with a function call, we have to
-                 * save volatile registers but
-                 * TODO not if the previous opcode was also one
-                 *      that called C code
-                 */
-                Parrot_jit_save_registers(jit_info, interpreter, 1);
+                            !cur_opcode_byte) &&
+                        cur_section->isjit &&
+                        !jit_seg) {
+                    Parrot_jit_save_registers(jit_info, interpreter, 0);
+                }
+                else if (CALLS_C_CODE(cur_opcode_byte)) {
+                    /*
+                     * a JITted function with a function call, we have to
+                     * save volatile registers but
+                     * TODO not if the previous opcode was also one
+                     *      that called C code
+                     */
+                    Parrot_jit_save_registers(jit_info, interpreter, 1);
+                }
             }
 
             /* Generate native code for current op */
@@ -1520,7 +1524,7 @@ parrot_build_asm(Interp *interpreter,
             }
             (op_func[cur_opcode_byte].fn) (jit_info, interpreter);
 
-            if (CALLS_C_CODE(cur_opcode_byte)) {
+            if (CALLS_C_CODE(cur_opcode_byte) && needs_fs) {
                 /*
                  * restore volatiles only - and TODO only if next
                  *      wouldn't load registers anyway
@@ -1556,7 +1560,7 @@ parrot_build_asm(Interp *interpreter,
         }
 
         /* Save mapped registers back to the Parrot registers */
-        if (!jit_seg && cur_section->isjit)
+        if (!jit_seg && cur_section->isjit && needs_fs)
             Parrot_jit_save_registers(jit_info, interpreter, 0);
 
         /* update the offset for saved registers */

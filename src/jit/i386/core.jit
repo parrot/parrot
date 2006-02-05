@@ -1432,7 +1432,42 @@ Parrot_set_args_pc {
 }
 
 extern Parrot_set_returns_pc {
-    Parrot_jit_normal_op(jit_info, interpreter);
+    if (jit_info->code_type == JIT_CODE_FILE)
+        Parrot_jit_normal_op(jit_info, interpreter);
+    else {
+        PMC *sig_pmc;
+        INTVAL *sig_bits, sig;
+
+        sig_pmc = CONTEXT(interpreter->ctx)->constants[CUR_OPCODE[1]]->u.key;
+        sig_bits = PMC_data(sig_pmc);
+        sig = sig_bits[0];
+        /* mov 16(%ebp), %eax - fetch args ptr */
+        emitm_movl_m_r(NATIVECODE, emit_EAX, emit_EBP, emit_None, 1, 16);
+        emitm_movl_m_r(NATIVECODE, emit_EAX, emit_EAX, emit_None, 1, 0);
+        switch (sig & (PARROT_ARG_TYPE_MASK|PARROT_ARG_CONSTANT)) {
+            case PARROT_ARG_INTVAL:
+                emitm_movl_r_m(NATIVECODE, MAP(2), emit_EAX, 0, 1, 0);
+                break;
+            case PARROT_ARG_INTVAL|PARROT_ARG_CONSTANT:
+                emitm_movl_i_m(NATIVECODE, *INT_CONST[2], emit_EAX, 0, 1, 0);
+                break;
+            default:
+                internal_exception(1, "set_returns_jit - unknown tyep");
+                break;
+        }
+    }
+}
+
+extern Parrot_returncc {
+    if (jit_info->code_type == JIT_CODE_FILE)
+        Parrot_jit_restart_op(jit_info, interpreter);
+    else {
+        emitm_movl_m_r(NATIVECODE, emit_EAX, emit_EBP, emit_None, 1, 16);
+        /* TODO 4 + n_args * 4 */
+        emitm_movl_m_r(NATIVECODE, emit_EAX, emit_EAX, emit_None, 1, 4);
+        jit_emit_stack_frame_leave(NATIVECODE);
+        emitm_ret(NATIVECODE);
+    }
 }
 
 extern Parrot_get_params_pc {
