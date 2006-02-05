@@ -411,7 +411,7 @@ PIR:
     $P1.add_sub("bar", $P0)
     end
   .end
-  
+
   .sub foo
     ...
   .end
