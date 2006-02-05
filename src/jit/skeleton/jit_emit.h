@@ -166,23 +166,6 @@ jit_emit_bc(Parrot_jit_info_t *jit_info, branch_t cond, opcode_t disp)
 #endif /* JIT_EMIT */
 
 #if JIT_EMIT == 2
-/*
- * emit stack frame according to ABI
- * preserve mapped registers according to ABI
- * load INTERP, OP_MAP, CODE_START, BP registers
- * then run the code at pc
- *
- * the function is called as
- *   runops(interp, pc)
- *
- * at runtime
- */
-void
-Parrot_jit_begin(Parrot_jit_info_t *jit_info,
-                 Interp * interpreter)
-{
-    ...
-}
 
 /*
  * emit code that calls a core.ops function from src/core_ops.c,
@@ -233,11 +216,32 @@ Parrot_jit_restart_op(Parrot_jit_info_t *jit_info,
 {
 }
 
+#endif /* JIT_EMIT == 2 */
+
+#if JIT_EMIT == 0
+
+/*
+ * emit stack frame according to ABI
+ * preserve mapped registers according to ABI
+ * load INTERP, OP_MAP, CODE_START, BP registers
+ * then run the code at pc
+ *
+ * the function is called as
+ *   runops(interp, pc)
+ *
+ * at runtime
+ */
+void
+Parrot_jit_begin(Parrot_jit_info_t *jit_info,
+                 Interp * interpreter)
+{
+    ...
+}
 /*
  * fix up all emitted branches
  * see  ppc or i386
  */
-void
+static void
 Parrot_jit_dofixup(Parrot_jit_info_t *jit_info,
                    Interp * interpreter)
 {
@@ -249,19 +253,16 @@ Parrot_jit_dofixup(Parrot_jit_info_t *jit_info,
  *
  * see ppc or x86
  */
-void
-Parrot_jit_emit_mov_mr_offs(...) {}
-void
-Parrot_jit_emit_mov_rm_offs(...) {}
 
-void
-Parrot_jit_emit_mov_mr_n_offs(...) {}
-void
-Parrot_jit_emit_mov_rm_n_offs(...) {}
+static void
+jit_mov_mr_offs(...) {}
+static void
+jit_mov_rm_offs(...) {}
 
-#endif /* JIT_EMIT == 2 */
-
-#if JIT_EMIT == 0
+static void
+jit_mov_mr_n_offs(...) {}
+static void
+jit_mov_rm_n_offs(...) {}
 
 /*
  * define how many int and float registers can be used by the
@@ -271,22 +272,19 @@ Parrot_jit_emit_mov_rm_n_offs(...) {}
 #  define INT_REGISTERS_TO_MAP 14
 #  define FLOAT_REGISTERS_TO_MAP 2
 
-#ifndef JIT_IMCC
-
 /*
  * enumerate these mapped registers
  * please note that you have to preserve registers in
  * Parrot_jit_begin according to the ABI of the architecture
  */
 
-/* static */
-char intval_map[INT_REGISTERS_TO_MAP] =
+static const char intval_map[INT_REGISTERS_TO_MAP] =
 
     { r17, r18, r19, r20, r21, r22, r23,
       r24, r25, r26, r27, r28, r29, r30
     };
-/* static */
-char floatval_map[FLOAT_REGISTERS_TO_MAP] =
+
+static const char floatval_map[FLOAT_REGISTERS_TO_MAP] =
     {
 
       f4, f5
@@ -297,9 +295,67 @@ char floatval_map[FLOAT_REGISTERS_TO_MAP] =
  * JIT compilation is done
  */
 static void
-ppc_sync_cache (void *_start, void *_end) {}
+ppc_flush_cache(Parrot_jit_info_t * jit_info, Interp *i)
+{
+ ...
+}
 
-#endif /* JIT_IMCC */
+/*
+ * define arch specific details in jit_arch_info
+ */
+
+static const jit_arch_info arch_info = {
+    jit_mov_rm_offs,
+    jit_mov_rm_n_offs,
+    jit_mov_mr_offs,
+    jit_mov_mr_n_offs,
+    Parrot_jit_dofixup,
+    ppc_flush_cache,
+    {
+        /* JIT_CODE_FILE */
+        {
+            Parrot_jit_begin,   /* emit code prologue */
+            INT_REGISTERS_TO_MAP,   /* mapped ints */
+            INT_REGISTERS_TO_MAP,   /* all are preserved */
+            intval_map,
+            FLOAT_REGISTERS_TO_MAP,    /* mapped float regs */
+            FLOAT_REGISTERS_TO_MAP,    /* all preserved */
+            floatval_map
+        },
+        /* JIT_CODE_SUB */
+        {
+            Parrot_jit_begin_sub,   /* emit code prologue */
+            7,                  /* 7 mapped ints */
+            7,                  /* all volatile */
+            intval_map_sub,
+            12,                  /* mapped float regs */
+            12,                  /* all volatile */
+            floatval_map_sub
+        },
+        /* JIT_CODE_SUB_REGS_ONLY */
+        {
+            Parrot_jit_begin_sub_regs,  /* emit code prologue */
+            7,                  /* 7 mapped ints */
+            7,                  /* all volatile */
+            intval_map_sub,
+            12,                  /* 12 mapped float regs */
+            12,                  /* all volatile */
+            floatval_map_sub
+        }
+    }
+};
+
+/*
+ * and finally you need an interface function to return above structure
+ */
+
+const jit_arch_info * 
+Parrot_jit_init(Interp *interpreter)
+{
+    return &arch_info;
+}
+
+
 #endif /* JIT_EMIT == 0 */
 #endif /* PARROT_PPC_JIT_EMIT_H_GUARD */
 

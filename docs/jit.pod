@@ -105,9 +105,7 @@ offsets are converted to absolute addresses.  This trades the low up-front cost
 of converting all offsets once, for the unknown cost of repeatedly converting
 these offsets while executing native code.
 
-If the architecture defines B<INT_REGISTERS_TO_MAP> and
-B<FLOAT_REGISTERS_TO_MAP> as nonzero, this amount of most used registers per
-code section are mapped to native processor registers.
+See F<src/jit/skeleton/jit_emit.h> for details.
 
 =item jit2h.pl
 
@@ -130,18 +128,18 @@ the defines must therefore follow a specific syntax.
     #else
 
     ... defines
-
-    #ifndef JIT_IMCC
-
-    ... initialization of maps
-    ... and possibly private static functions
+    static const jit_arch_info arch_info = {
+       ... initialization of maps
+       ... and possibly private static functions
+    }
 
     #endif
-    #endif
 
-See also F<jit/skeleton/jit_emit.h> for a more detailed explanation.
+See F<jit/skeleton/jit_emit.h> for a more detailed explanation.
 
 =head2 Defines
+
+XXX most are moved into C<jit_arch_info> now.
 
 =over 4
 
