@@ -471,7 +471,6 @@ init_jit(Interp *interpreter, opcode_t *pc)
     opcode_t *code_start;
     UINTVAL code_size;          /* in opcodes */
     opcode_t *code_end;
-    jit_f jit_code;
     Parrot_jit_info_t *jit_info;
 
     if (interpreter->code->jit_info)

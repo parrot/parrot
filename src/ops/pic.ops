@@ -249,8 +249,7 @@ inline op pic_callr__(inconst PMC) :pic {
     parrot_context_t *ctx;
     opcode_t *pc;
     void **pred_pc;
-    PMC *sig;
-    INTVAL *bitp, n_args;
+    INTVAL n_args;
 
     ctx = CONTEXT(interpreter->ctx);
     mic = (Parrot_MIC *) cur_opcode[1];

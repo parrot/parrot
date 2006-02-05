@@ -643,7 +643,7 @@ init_named(Interp *interpreter, struct call_state *st)
 static int
 locate_pos_named(Interp *interpreter, struct call_state *st)
 {
-    int i, n_named, idx;
+    int i, n_named;
     INTVAL sig;
 
     n_named = -1;
