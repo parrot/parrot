@@ -114,10 +114,6 @@ use File::Basename qw(dirname basename);
 use File::Copy;
 use File::Spec;
 use strict;
-use lib 'lib';
-use Parrot::Config;
-
-my $exe = $PConfig{'exe'};
 
 # When run from the makefile, which is probably the only time this
 # script will ever be used, all of these defaults will get overridden.
@@ -181,10 +177,6 @@ while(<>) {
         my $copy = $dest;
         $dest =~ s/^installable_//; # parrot with different config
         $dest = File::Spec->catdir($options{bindir}, $dest);
-        if ($exe) {
-           $src .= $exe;
-           $dest .= $exe;
-        }
         if ($copy =~ /^installable/) {
             push @installable_exe, [$src, $dest];
             next;
