@@ -2935,6 +2935,19 @@ Parrot_jit_begin(Parrot_jit_info_t *jit_info,
 
 #endif /* JIT_CGP */
 
+/*
+ * create a JITted version of a PIR sub, where everything
+ * resided in registers
+ *
+ * The sub is called as
+ *
+ *   opcode_t * func(Interp *i, INTVAL *sig_bits, void **args);
+ *
+ *   args[0] ...    NULL / return value address
+ *   args[1..n] ... addresses of n arguments
+ *   args[n + 1] .. opcode_t* next - ususally just returned
+ */
+
 static void
 Parrot_jit_begin_sub_regs(Parrot_jit_info_t *jit_info,
                  Interp * interpreter)
@@ -2963,19 +2976,6 @@ Parrot_jit_begin_sub_regs(Parrot_jit_info_t *jit_info,
         emitm_pushl_r(jit_info->native_ptr, reg_info->map_I[i]);
 }
 
-
-/*
- * create a JITted version of a PIR sub, where everything
- * resided in registers
- *
- * The sub is called as
- *
- *   opcode_t * func(Interp *i, INTVAL *sig_bits, void **args);
- *
- *   args[0] ...    NULL / return value address
- *   args[1..n] ... addresses of n arguments
- *   args[n + 1] .. opcode_t* next - ususally just returned
- */
 
 static void
 Parrot_jit_begin_sub(Parrot_jit_info_t *jit_info,
