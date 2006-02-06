@@ -23,7 +23,6 @@ $parser->YYData->{verbose_error} = 1;		# 0, 1
 $parser->YYData->{verbose_warning} = 1;		# 0, 1
 $parser->YYData->{verbose_info} = 1;		# 0, 1
 $parser->Run(@ARGV);
-$parser->Generate();
 
 if (exists $parser->YYData->{nb_error}) {
 	my $nb = $parser->YYData->{nb_error};
@@ -38,6 +37,10 @@ if (        $parser->YYData->{verbose_info}
 		and exists $parser->YYData->{nb_info} ) {
 	my $nb = $parser->YYData->{nb_info};
 	print "$nb info(s).\n"
+}
+
+unless (exists $parser->YYData->{nb_error}) {
+	$parser->Generate();
 }
 
 __END__

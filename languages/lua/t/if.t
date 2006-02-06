@@ -19,10 +19,9 @@ See "Programming in Lua", section 4.3 "Control Structures".
 =cut
 
 use strict;
-use FindBin;
-use lib "$FindBin::Bin";
 
 use Parrot::Test tests => 5;
+use Test::More;
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'if' );
 a = -2
@@ -43,7 +42,6 @@ OUT
 language_output_is( 'lua', <<'CODE', <<'OUT', 'if else' );
 a = 12
 b = 34
-r = 0
 if a < b then r = b else r = a end
 print(r)
 CODE
@@ -53,7 +51,6 @@ OUT
 language_output_is( 'lua', <<'CODE', <<'OUT', 'if else' );
 a = 12
 b = 34
-r = 0
 if a > b then r = b else r = a end
 print(r)
 CODE
@@ -64,7 +61,6 @@ language_output_is( 'lua', <<'CODE', <<'OUT', 'elseifs' );
 a = 3
 b = 7
 op = "*"
-r = 0 -- fix
 if op == "+" then
     r = a + b
 elseif op == "-" then

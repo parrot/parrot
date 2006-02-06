@@ -19,10 +19,8 @@ See "Programming in Lua", section 3 "Expressions".
 =cut
 
 use strict;
-use FindBin;
-use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 8;
+use Parrot::Test tests => 11;
 use Test::More;
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'relational op (by reference)' );
@@ -75,16 +73,18 @@ text
 OUT
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'logical op' );
---print(10 or error("err"))
+print(10 or error())
 print(nil or "a")
 print(nil and 10)
---print(false and error("err"))
+print(false and error())
 print(false and nil)
 print(false or nil)
 print(10 and 20)
 CODE
+10
 a
 nil
+false
 false
 nil
 20
@@ -119,4 +119,51 @@ Hello World
 Hello World
 Hello
 OUT
+
+language_output_is( 'lua', <<'CODE', <<'OUT', 'coercion' );
+print("10" + 1)
+print("10 + 1")
+print("-5.3" * "2")
+print(10 .. 20)
+print(tostring(10) == "10")
+print(10 .. "" == "10")
+CODE
+11
+10 + 1
+-10.6
+1020
+true
+true
+OUT
+
+TODO: {
+local $TODO = "! tostring";
+
+language_output_like( 'lua', <<'CODE', <<'OUT', 'no coercion' );
+print("hello" + 1)
+CODE
+/perform arithmetic/
+OUT
+}
+
+language_output_is( 'lua', <<'CODE', <<'OUT', 'clone ?' );
+print(10 + 2)
+print(10 + 5)
+a = 20
+print(a + 3)
+print(a + 6)
+b = 30
+c = b + 4
+d = b + 7
+print(c)
+print(d)
+CODE
+12
+15
+23
+26
+34
+37
+OUT
+
 

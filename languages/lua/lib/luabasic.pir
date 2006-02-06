@@ -330,14 +330,33 @@ Returns an iterator function, the table C<t>, and 0, so that the construction
 will iterate over the pairs (C<1,t[1]>), (C<2,t[2]>), ... , up to the first
 integer key with a nil value in the table.
 
-NOT YET IMPLEMENTED.
-
 =cut
 
 .sub _lua_ipairs :anon
     .param pmc t
+    .param pmc i :optional
     checktype(t, "table")
-    not_implemented()
+    unless_null i, L0
+    .local pmc _G
+    _G = global "_G"
+    .const .LuaString key_ipairs = "ipairs"
+    .local pmc ipairs
+    ipairs = _G[key_ipairs]
+    .local pmc zero
+    new zero, .LuaNumber
+    zero = 0
+    .return (ipairs, t, zero)
+L0:
+    .local pmc n
+    .local pmc ret
+    new n, .LuaNumber
+    n = i + 1
+    ret = t[n]
+    $I0 = isa ret, "LuaNil"
+    if $I0 goto L1
+    .return (n, ret)
+L1:
+    .return ()
 .end
 
 =item C<loadfile (filename)>
@@ -445,14 +464,21 @@ construction
 
 will iterate over all key-value pairs of table C<t>.
 
-NOT YET IMPLEMENTED.
+STILL INCOMPLETE (see next).
 
 =cut
 
 .sub _lua_pairs :anon
     .param pmc t
     checktype(t, "table")
-    not_implemented()
+    .local pmc _G
+    _G = global "_G"
+    .const .LuaString key_next = "next"
+    .local pmc next
+    next = _G[key_next]
+    .local pmc nil
+    new nil, .LuaNil
+    .return (next, t, nil)
 .end
 
 =item C<pcall (f, arg1, arg2, ...)>
@@ -694,7 +720,8 @@ STILL INCOMPLETE.
     checkany(e)
     $I1 = isa e, "LuaNumber"
     unless $I1 goto L1
-    .return (e)
+    ret = clone e
+    .return (ret)
 L1:
     $I1 = isa e, "LuaString"
     unless $I1 goto L2

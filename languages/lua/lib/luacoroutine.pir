@@ -70,12 +70,14 @@ See "Lua 5.0 Reference Manual", section 5.2 "Coroutine Manipulation".
 Creates a new coroutine, with body C<f>. C<f> must be a Lua function.
 Returns this new coroutine, an object with type C<"thread">.
 
-NOT YET IMPLEMENTED.
-
 =cut
 
 .sub _coroutine_create :anon
-    not_implemented()
+    .param pmc f
+    .local pmc ret
+    checktype(f, "Closure")
+    ret = new .Coroutine, f
+    .return (ret)
 .end
 
 =item C<coroutine.resume (co, val1, ...)>
@@ -91,12 +93,28 @@ values passed to yield (if the coroutine yields) or any values returned by
 the body function (if the coroutine terminates). If there is any error,
 C<resume> returns B<false> plus the error message.
 
-NOT YET IMPLEMENTED.
-
 =cut
 
 .sub _coroutine_resume :anon
-    not_implemented()
+    .param pmc co
+    .param pmc argv :slurpy
+    .local pmc ret
+    .local pmc status
+    new status, .LuaBoolean
+    checktype(co, "Coroutine")
+    push_eh _handler
+    (ret :slurpy) = co(argv :flat)
+    status = 1
+    .return (status, ret :flat)
+_handler:
+    .local pmc e
+    .local string s
+    .local pmc msg
+    .get_results (e, s)
+    status = 0    
+    new msg, .LuaString
+    msg = s
+    .return (status, msg)
 .end
 
 =item C<coroutine.status (co)>
@@ -107,12 +125,17 @@ coroutine is suspended in a call to yield, or if it has not started running
 yet; and C<"dead"> if the coroutine has finished its body function, or if it
 has stopped with an error.
 
-NOT YET IMPLEMENTED.
+DUMMY IMPLEMENTATION.
 
 =cut
 
 .sub _coroutine_status :anon
-    not_implemented()
+    .param pmc co
+    .local pmc ret
+    checktype(co, "Coroutine")
+    new ret, .LuaString 
+    ret = "suspended"
+    .return (ret)
 .end
 
 =item C<coroutine.wrap (f)>
@@ -128,6 +151,8 @@ NOT YET IMPLEMENTED.
 =cut
 
 .sub _coroutine_wrap :anon
+    .param pmc f
+    checktype(f, "Closure")
     not_implemented()
 .end
 
@@ -137,18 +162,18 @@ Suspends the execution of the calling coroutine. The coroutine cannot be
 running neither a C function, nor a metamethod, nor an iterator.
 Any arguments to C<yield> go as extra results to C<resume>.
 
-NOT YET IMPLEMENTED.
-
 =cut
 
 .sub _coroutine_yield :anon
-    not_implemented()
+    .param pmc argv :slurpy
+    .yield(argv)
 .end
 
 =back
 
 =head1 AUTHORS
 
+Francois Perrad.
 
 =cut
 

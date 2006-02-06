@@ -19,10 +19,9 @@ Tests Lua Mathematic Library
 =cut
 
 use strict;
-use FindBin;
-use lib "$FindBin::Bin";
 
 use Parrot::Test tests => 23;
+use Test::More;
 
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', "variable pi");
 print(math.pi)

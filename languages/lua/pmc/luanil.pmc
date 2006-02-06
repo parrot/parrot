@@ -207,6 +207,22 @@ Allow :
         return res;
     }
 
+/*
+
+=item C<INTVAL is_equal(PMC* value)>
+
+=cut
+
+*/
+    INTVAL is_equal (PMC* value) {
+MMD_LuaNil: {
+            return (INTVAL)1;
+        }
+MMD_DEFAULT: {
+            return (INTVAL)0;
+        }
+    }
+
 }
 
 /*

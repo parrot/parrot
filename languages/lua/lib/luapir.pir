@@ -250,14 +250,6 @@ L0:
     table[key_n] = $P0
 .end
 
-#.sub tostring
-#    .param pmc arg
-#    .local string str
-#    str = get_repr arg
-##    str = get_string arg
-##    str = arg.get_string()
-#    .return (str)
-#.end
 
 =item C<tag_error (got, expec)>
 

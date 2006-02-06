@@ -7,7 +7,7 @@ package Lua::parser;
 
 use strict;
 
-use Math::BigFloat;
+#use Math::BigFloat;
 
 sub Error {
 	my $parser = shift;
@@ -21,7 +21,7 @@ sub Error {
 		$parser->YYData->{nb_error} = 1;
 	}
 
-	print STDOUT '#',$parser->YYData->{srcname},':',$parser->YYData->{lineno},'#Error: ',$msg
+	print STDOUT 'lua: ',$parser->YYData->{srcname},':',$parser->YYData->{lineno},': ',$msg
 			if (		exists $parser->YYData->{verbose_error}
 					and $parser->YYData->{verbose_error});
 }
@@ -38,7 +38,7 @@ sub Warning {
 		$parser->YYData->{nb_warning} = 1;
 	}
 
-	print STDOUT '#',$parser->YYData->{srcname},':',$parser->YYData->{lineno},'#Warning: ',$msg
+	print STDOUT 'lua: ',$parser->YYData->{srcname},':',$parser->YYData->{lineno},': ',$msg
 			if (		exists $parser->YYData->{verbose_warning}
 					and $parser->YYData->{verbose_warning});
 }
@@ -55,7 +55,7 @@ sub Info {
 		$parser->YYData->{nb_info} = 1;
 	}
 
-	print STDOUT '#',$parser->YYData->{srcname},':',$parser->YYData->{lineno},'#Info: ',$msg
+	print STDOUT 'lua: ',$parser->YYData->{srcname},':',$parser->YYData->{lineno},': ',$msg
 			if (		exists $parser->YYData->{verbose_info}
 					and $parser->YYData->{verbose_info});
 }
@@ -265,7 +265,8 @@ sub _Lexer {
 					    last;
 
 			s/^(\d+(\.\d*)?|\.\d+)([Ee][+\-]?\d+)?//
-					and return ('NUMBER', new Math::BigFloat($1));
+#					and return ('NUMBER', new Math::BigFloat($1));
+					and return ('NUMBER', $1);
 
 			s/^\"//
 					and return $parser->_DoubleQuoteStringLexer();

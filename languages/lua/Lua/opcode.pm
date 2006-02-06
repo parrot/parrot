@@ -70,7 +70,16 @@ use base qw(Lua::opcode);
 package FindGlobalOp;
 use base qw(Lua::opcode);
 
+package FindLexOp;
+use base qw(Lua::opcode);
+
+package StoreLexOp;
+use base qw(Lua::opcode);
+
 package NewOp;
+use base qw(Lua::opcode);
+
+package NewClosureOp;
 use base qw(Lua::opcode);
 
 package CloneOp;

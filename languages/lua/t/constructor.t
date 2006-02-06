@@ -19,10 +19,9 @@ See "Programming in Lua", section 3.6 "Table Constructors".
 =cut
 
 use strict;
-use FindBin;
-use lib "$FindBin::Bin";
 
 use Parrot::Test tests => 6;
+use Test::More;
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'list-style init' );
 days = {"Sunday", "Monday", "Tuesday", "Wednesday",

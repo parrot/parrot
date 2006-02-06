@@ -72,9 +72,13 @@ _semicolon_opt
 
 block
 :	chunk
-		#default action
+		{
+			PopScope($_[0]);
+			$_[1];
+		}
 |	chunk	_end_block	_semicolon_opt
 		{
+			PopScope($_[0]);
 			[@{$_[1]}, @{$_[2]}];
 		}
 ;
@@ -101,42 +105,76 @@ stat
 		}
 |	functioncall	%prec	NONARG
 		{
-			get_void($_[0], $_[1]);
+			BuildVoidFunctionCall($_[0], $_[1]);
 		}
-|	DO	block	END
+|	DO
 		{
-			$_[2];
+			PushScope($_[0]);
 		}
-|	WHILE	exp	DO	block	END
+		block	END
 		{
-			BuildWhile($_[0], $_[2], $_[4]);
+			$_[3];
 		}
-|	REPEAT	block	UNTIL	exp
+|	WHILE
 		{
-			BuildRepeat($_[0], $_[2], $_[4]);
+			PushScope($_[0]);
 		}
-|	IF	exp	THEN	block	_elseif_star	ELSE	block	END
+			exp	DO	block	END
 		{
-			BuildIf($_[0], $_[2], $_[4], $_[5], $_[7]);
+			BuildWhile($_[0], $_[3], $_[5]);
 		}
-|	IF	exp	THEN	block	_elseif_star	END
+|	REPEAT
 		{
-			BuildIf($_[0], $_[2], $_[4], $_[5], undef);
+			PushScope($_[0]);
 		}
-|	FOR	NAME	'='	exp	','	exp	','	exp	DO	block	END
+			block	UNTIL	exp
 		{
-			BuildForNum($_[0], $_[2], $_[4], $_[6], $_[8], $_[10]);
+			BuildRepeat($_[0], $_[3], $_[5]);
 		}
-|	FOR	NAME	'='	exp	','	exp	DO	block	END
+|	_if_then	block	_elseif_star	ELSE
 		{
-			BuildForNum($_[0], $_[2], $_[4], $_[6], undef, $_[8]);
+			PushScope($_[0]);
 		}
-|	FOR	namelist	IN	explist1	DO	block	END
+													block	END
 		{
-			BuildForList($_[0], $_[2], $_[4], $_[6]);
+			BuildIf($_[0], $_[1], $_[2], $_[3], $_[6]);
+		}
+|	_if_then	block	_elseif_star	END
+		{
+			BuildIf($_[0], $_[1], $_[2], $_[3], undef);
+		}
+|	FOR	NAME	'='	exp	','	exp	','	exp	DO
+		{
+			PushScope($_[0]);
+			my $var = BuildLocalVariable($_[0], $_[2]);
+			Insert($_[0], $var);
+		}
+											block	END
+		{
+			BuildForNum($_[0], $_[10], $_[4], $_[6], $_[8], $_[11]);
+		}
+|	FOR	NAME	'='	exp	','	exp	DO
+		{
+			PushScope($_[0]);
+			my $var = BuildLocalVariable($_[0], $_[2]);
+			Insert($_[0], $var);
+		}
+									block	END
+		{
+			BuildForNum($_[0], $_[8], $_[4], $_[6], undef, $_[9]);
+		}
+|	FOR	namelist	IN	explist1	DO
+		{
+			PushScope($_[0]);
+			InsertList($_[0], $_[2]);
+		}
+										block	END
+		{
+			BuildForList($_[0], $_[2], $_[4], $_[7]);
 		}
 |	FUNCTION
 		{
+			PushScopeF($_[0]);
 			PushScope($_[0]);
 		}
 				funcname	funcbody
@@ -146,27 +184,43 @@ stat
 		}
 |	LOCAL	FUNCTION
 		{
+			PushScopeF($_[0]);
 			PushScope($_[0]);
 		}
 						NAME	funcbody
 		{
-			my $var = BuildLocalVariable($_[0], $_[4]); 
+			my $var = BuildLocalVariable($_[0], $_[4]);
+			Insert($_[0], $var);
 			BuildAssigns($_[0], [$var], [$_[5]])
 		}
 |	LOCAL	namelist	'='	explist1
 		{
+			InsertList($_[0], $_[2]);
 			BuildAssigns($_[0], $_[2], $_[4])
 		}
 |	LOCAL	namelist
 		{
+			InsertList($_[0], $_[2]);
 			BuildAssigns($_[0], $_[2], [])
 		}
 ;
 
-_elseif_star
-:	_elseif_star	ELSEIF	exp	THEN	block
+_if_then
+:	IF	exp	THEN
 		{
-			[@{$_[1]}, [$_[3], $_[5]]];
+			PushScope($_[0]);
+			$_[2];
+		}
+;
+
+_elseif_star
+:	_elseif_star	ELSEIF	exp	THEN
+		{
+			PushScope($_[0]);
+		}
+										block
+		{
+			[@{$_[1]}, [$_[3], $_[6]]];
 		}
 |	/* empty */
 		{
@@ -407,19 +461,26 @@ args
 ;
 
 function
-:	FUNCTION	funcbody
+:	FUNCTION
 		{
-			$_[2];
+			PushScopeF($_[0]);
+			PushScope($_[0]);
+		}
+				funcbody
+		{
+			$_[3];
 		}
 ;
 
 funcbody
 :	'('	parlist1	')'	block	END
 		{
+			PopScopeF($_[0]);
 			BuildFunctionBody($_[0], $_[2], $_[4]);
 		}
 |	'('	')'	block	END
 		{
+			PopScopeF($_[0]);
 			BuildFunctionBody($_[0], [], $_[3]);
 		}
 ;
@@ -536,8 +597,10 @@ sub Run {
 	$parser->_InitLexico();
 	$parser->YYData->{functs} = [];
 	$parser->YYData->{scope} = [];
+	$parser->YYData->{scopef} = [];
 	$parser->YYData->{symbtab} = new SymbTabVar($parser);
 	$parser->YYData->{symbtab_cst} = new SymbTabConst($parser);
+	$parser->YYData->{_G} = undef;
 	$parser->YYData->{idx_tmp} = 0;
 	$parser->YYData->{idx_lbl} = 0;
 	$parser->YYData->{idx_fct} = 0;
@@ -574,11 +637,16 @@ sub Generate {
 		foreach (@{$fct}) {
 #			if (ref $_) {
 			if (ref($_) =~ /(Dir|Op)$/) {
-				$_->visit($generator);
+				$_->visit($generator) if (exists $_->{prolog});
+#				$_->visit($generator);
 			} else {
 				print $_,"\n";
 				die;
 			}
+		}
+		print FH "  # end of prolog\n";
+		foreach (@{$fct}) {
+			$_->visit($generator) unless (exists $_->{prolog});
 		}
 	}
 }

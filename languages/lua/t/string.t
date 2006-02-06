@@ -1,5 +1,5 @@
 #! perl -w
-# Copyright: 2005 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2005-2006 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 =head1 NAME
@@ -18,8 +18,6 @@ Tests Lua String Library
 =cut
 
 use strict;
-use FindBin;
-use lib "$FindBin::Bin";
 
 use Parrot::Test tests => 7;
 use Test::More;

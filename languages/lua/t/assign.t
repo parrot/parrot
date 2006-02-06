@@ -19,10 +19,9 @@ See "Programming in Lua", section 4.1 "Assignment".
 =cut
 
 use strict;
-use FindBin;
-use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 6;
+use Parrot::Test tests => 7;
+use Test::More;
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'global variable' );
 print(b)
@@ -84,8 +83,28 @@ j = 10
 local i = 1
 print(i)
 print(j)
+local i = 2
+print(i)
 CODE
 1
 10
+2
 OUT
+
+language_output_is( 'lua', <<'CODE', <<'OUT', 'param & result of function' );
+local function f(x) return 2*x end
+
+print(f(2))
+a = 2
+a = f(a)
+print(a)
+local b = 2
+b = f(b)
+print(b)
+CODE
+4
+4
+4
+OUT
+
 

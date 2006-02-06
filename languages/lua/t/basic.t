@@ -18,10 +18,8 @@ Tests Lua Basic Library
 =cut
 
 use strict;
-use FindBin;
-use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 14;
+use Parrot::Test tests => 17;
 use Test::More;
 
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', "function assert(false, msg)");
@@ -42,6 +40,31 @@ CODE
 /assertion failed!/
 OUTPUT
 
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', "function ipairs");
+a = {"a","b","c"}
+local f, v, s = ipairs(a)
+if type(f) == type(type) then print "ok" end
+if a == v then print "ok" end
+print(s)
+-- print(type(f), type(v), s)
+s, v = f(a, s)
+print(s, v)
+s, v = f(a, s)
+print(s, v)
+s, v = f(a, s)
+print(s, v)
+s, v = f(a, s)
+print(s, v)
+CODE
+ok
+ok
+0
+1	a
+2	b
+3	c
+nil	nil
+OUTPUT
+
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', "function next (array)");
 t = {"a","b","c"}
 a = next(t, nil)
@@ -53,6 +76,31 @@ print(a)
 a = next(t, 3) 
 print(a)
 CODE
+1
+2
+3
+nil
+OUTPUT
+
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', "function pairs");
+a = {"a","b","c"}
+local f, v, s = pairs(a)
+if type(f) == type(type) then print "ok" end
+if a == v then print "ok" end
+print(s)
+-- print(type(f), type(v), s)
+s = f(v, s)
+print(s)
+s = f(v, s)
+print(s)
+s = f(v, s)
+print(s)
+s = f(v, s)
+print(s)
+CODE
+ok
+ok
+nil
 1
 2
 3
@@ -110,13 +158,27 @@ nil
 string
 OUTPUT
 
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', "function type");
+print(type(a))
+a = 10
+print(type(a))
+a = "a string!!"
+print(type(a))
+a = print
+-- a(type(a))
+CODE
+nil
+number
+string
+OUTPUT
+
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', "function type (no arg)");
 type()
 CODE
 /value expected/
 OUTPUT
 
-language_output_is( 'lua', << 'CODE', << 'OUTPUT', "function tonumber");
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', "function type");
 a = 12.34
 t = type(a)
 print(a)
