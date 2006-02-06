@@ -1464,6 +1464,7 @@ extern Parrot_returncc {
     else {
         int i, used_i, save_i;
         const jit_arch_regs *reg_info;
+
         /* restore pushed regs if any */
         used_i = CONTEXT(interpreter->ctx)->n_regs_used[REGNO_INT];
         reg_info = &jit_info->arch_info->regs[jit_info->code_type]; 
@@ -1473,14 +1474,29 @@ extern Parrot_returncc {
             emitm_popl_r(jit_info->native_ptr, reg_info->map_I[i]);
         emitm_movl_m_r(NATIVECODE, emit_EAX, emit_EBP, emit_None, 1, 16);
         /* TODO 4 + n_args * 4 */
-        emitm_movl_m_r(NATIVECODE, emit_EAX, emit_EAX, emit_None, 1, 4);
+        emitm_movl_m_r(NATIVECODE, emit_EAX, emit_EAX, emit_None, 1, 
+                4 + jit_info->n_args * 4);
         jit_emit_stack_frame_leave(NATIVECODE);
         emitm_ret(NATIVECODE);
     }
 }
 
 extern Parrot_get_params_pc {
-    Parrot_jit_normal_op(jit_info, interpreter);
+    if (jit_info->code_type == JIT_CODE_FILE)
+        Parrot_jit_normal_op(jit_info, interpreter);
+    else {
+        PMC *sig_pmc;
+        INTVAL *sig_bits, sig, i, n;
+
+        sig_pmc = CONTEXT(interpreter->ctx)->constants[CUR_OPCODE[1]]->u.key;
+        sig_bits = PMC_data(sig_pmc);
+        n = PMC_int_val(sig_pmc);
+        jit_info->n_args = n;
+        emitm_movl_m_r(NATIVECODE, emit_EAX, emit_EBP, emit_None, 1, 16);
+        for (i = 0; i < n; ++i)
+            emitm_movl_m_r(NATIVECODE, MAP(2+i), emit_EAX, emit_None, 
+                    1, 4 + i*4);
+    }
 }
 
 Parrot_get_results_pc {

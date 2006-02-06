@@ -249,7 +249,7 @@ inline op pic_callr__(inconst PMC) :pic {
     parrot_context_t *ctx;
     opcode_t *pc;
     void **pred_pc;
-    INTVAL n_args;
+    INTVAL i, n_args, *sig_bits;
 #ifndef NDEBUG
     PMC *sig;       /* sig is currently only inside the assert */
 #endif
@@ -258,23 +258,40 @@ inline op pic_callr__(inconst PMC) :pic {
     mic = (Parrot_MIC *) cur_opcode[1];
     pc = ctx->current_results;
     if (pc) {
-	pred_pc = (void**) pc - ctx->pred_offset;
+        pred_pc = (void**) pc - ctx->pred_offset;
         args[0] = (_reg_base + ((opcode_t*)pred_pc)[2]);
-	assert((sig = (PMC*)(pred_pc[1])) &&
-                    PObj_is_PMC_TEST(sig) &&
-                    sig->vtable->base_type == enum_class_FixedIntegerArray &&
-                    VTABLE_elements(interpreter, sig) == 1);
+        assert((sig = (PMC*)(pred_pc[1])) &&
+                PObj_is_PMC_TEST(sig) &&
+                sig->vtable->base_type == enum_class_FixedIntegerArray &&
+                VTABLE_elements(interpreter, sig) == 1);
     }
     else
         args[0] = NULL;
-    /* TODO set_args */
+    /* set_args */
     n_args = 0;
+    sig = mic->m.sig;
+    assert(PObj_is_PMC_TEST(sig) &&
+            sig->vtable->base_type == enum_class_FixedIntegerArray);
+    n_args = VTABLE_elements(interpreter, sig);
+    sig_bits = PMC_data(sig);
+    for (i = 0; i < n_args; ++i) {
+        switch (sig_bits[i]) {
+            case PARROT_ARG_INTVAL:
+                args[1 + i] = (void*)*(INTVAL*)(_reg_base + cur_opcode[2 + i]);
+                break;
+            case PARROT_ARG_INTVAL|PARROT_ARG_CONSTANT:
+                args[1 + i] = (void**)cur_opcode[2 + i];
+                break;
+            default:
+                internal_exception(1, "unhandled sig_bits");
+        }
+    }
     /* set_args (); set_p_pc; get_results (1), x; invokecc_p */
     pc = CUR_OPCODE + 2 + n_args + 3 + 3 + 2;    
     args[1 + n_args] = pc;
     lru = &mic->lru;
     /* TODO verify $1 didn't change */
-    pc = ((interface_f)lru->f.real_function)(interpreter, NULL, args);
+    pc = ((interface_f)lru->f.real_function)(interpreter, sig_bits, args);
     goto ADDRESS(pc);
 }
 

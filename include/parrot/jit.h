@@ -194,6 +194,7 @@ typedef struct {
     Parrot_jit_constant_pool_t      *constant_pool;
     enum_jit_code_type              code_type; 
     const struct jit_arch_info_t    *arch_info;
+    int                              n_args;
 #  if EXEC_CAPABLE
     Parrot_exec_objfile_t           *objfile;
 #  else

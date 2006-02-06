@@ -487,16 +487,20 @@ is_pic_param(Interp *interpreter, void **pc, Parrot_MIC* mic, opcode_t op)
 /*
  * just for testing the whole scheme ...
 
+
 .sub main :main
     .local int i
-    i = __pic_test()
+    i = 32
+    i = __pic_test(i, 10)
     print i
     print "\n"
 .end
 .sub __pic_test
-    .return (10)
+    .param int i
+    .param int j
+    $I0 = i + j
+    .return ($I0)
 .end
-
 ... prints 42, if PIC_TEST is 1, because the C function is called
     with -C and -S runcores.
 */
@@ -505,11 +509,13 @@ static opcode_t *
 pic_test_func(Interp *interpreter, INTVAL *sig_bits, void **args)
 {
     opcode_t *pc;
-    INTVAL *result;
+    INTVAL *result, i, j;
 
     result = (INTVAL*) args[0];
-    *result = 42;
-    pc = args[1];
+    i = (INTVAL) args[1];
+    j = (INTVAL) args[2];
+    *result = i + j;
+    pc = args[2];
     return pc;
 }
 #endif
@@ -568,6 +574,11 @@ is_pic_func(Interp *interpreter, void **pc, Parrot_MIC *mic, int core_type)
 #if PIC_TEST
     name = VTABLE_get_string(interpreter, sub);
     if (memcmp((char*) name->strstart, "__pic_test", 10) == 0) {
+#if 0
+        mic->lru.f.real_function = (funcptr_t) pic_test_func;
+        mic->m.sig = sig;
+        return 1;
+#else
 #if HAS_JIT
         /*
          * create JIT code - just a test
@@ -586,9 +597,11 @@ is_pic_func(Interp *interpreter, void **pc, Parrot_MIC *mic, int core_type)
             return 0;
         
         mic->lru.f.real_function = (funcptr_t) jit_info->arena.start;
+        mic->m.sig = sig;
         return 1;
 #else
         return 0;
+#endif
 #endif
     }
 #endif
