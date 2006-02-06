@@ -1473,7 +1473,7 @@ extern Parrot_returncc {
         for (i = used_i - 1; i >= save_i; --i)
             emitm_popl_r(jit_info->native_ptr, reg_info->map_I[i]);
         emitm_movl_m_r(NATIVECODE, emit_EAX, emit_EBP, emit_None, 1, 16);
-        /* TODO 4 + n_args * 4 */
+        /* retval = pc is at 4 + n_args * 4 */
         emitm_movl_m_r(NATIVECODE, emit_EAX, emit_EAX, emit_None, 1, 
                 4 + jit_info->n_args * 4);
         jit_emit_stack_frame_leave(NATIVECODE);

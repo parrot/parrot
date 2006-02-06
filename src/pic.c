@@ -515,7 +515,7 @@ pic_test_func(Interp *interpreter, INTVAL *sig_bits, void **args)
     i = (INTVAL) args[1];
     j = (INTVAL) args[2];
     *result = i + j;
-    pc = args[2];
+    pc = args[3];
     return pc;
 }
 #endif
