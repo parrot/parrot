@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 26;
+use Parrot::Test tests => 28;
 
 =head1 NAME
 
@@ -591,3 +591,44 @@ Innerer value
 Error: something happened
 Outer value
 OUTPUT
+
+
+pir_output_like(<<'CODE', <<'OUTPUT', 'clear_eh out of context (1)');
+.sub main :main
+	pushmark 1
+	clear_eh
+	print "no exceptions.\n"
+.end
+CODE
+/No exception to pop./
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', 'clear_eh out of context (2)');
+.sub main :main
+	.local pmc outer, cont
+	push_eh handler
+	test1()
+	print "skipped.\n"
+	goto done
+handler:
+	.local pmc exception
+	.get_results (exception, $S0)
+	print "Error: "
+	print $S0
+	print "\n"
+done:
+	print "done.\n"
+.end
+.sub test1
+	.local pmc exit
+	print "[in test1]\n"
+	## clear_eh is illegal here, and signals an exception.
+	clear_eh
+	print "[cleared]\n"
+.end
+CODE
+[in test1]
+Error: No exception to pop.
+done.
+OUTPUT
+
