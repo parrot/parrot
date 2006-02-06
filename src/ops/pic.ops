@@ -250,9 +250,7 @@ inline op pic_callr__(inconst PMC) :pic {
     opcode_t *pc;
     void **pred_pc;
     INTVAL i, n_args, *sig_bits;
-#ifndef NDEBUG
     PMC *sig;       /* sig is currently only inside the assert */
-#endif
 
     ctx = CONTEXT(interpreter->ctx);
     mic = (Parrot_MIC *) cur_opcode[1];
