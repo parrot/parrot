@@ -55,7 +55,7 @@ PARROT_API STRING *string_grow(Interp *, STRING *s, INTVAL addlen);
 PARROT_API const char* string_primary_encoding_for_representation(Interp *,
 					parrot_string_representation_t representation);
 PARROT_API STRING *string_make(Interp *interpreter, const void *buffer,
-            UINTVAL len, const char *encoding_name, UINTVAL flags);
+            UINTVAL len, const char *charset_name, UINTVAL flags);
 PARROT_API STRING *string_make_direct(Interp *interpreter, const void *buffer, UINTVAL len, ENCODING *encoding, CHARSET *charset, UINTVAL flags);
 PARROT_API STRING * string_make_empty(Interp *interpreter,
 					parrot_string_representation_t representation,
