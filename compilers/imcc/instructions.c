@@ -236,7 +236,7 @@ instruction_writes(Instruction* ins, SymReg* r) {
      */
     if (ins->opnum == PARROT_OP_get_results_pc) 
         return 0;
-    else if (ins->prev && (ins->prev->type & ITPCCSUB)) {
+    else if (ins->type & ITPCCSUB) {
         ins = ins->prev;
         /* can't used pcc_sub->ret due to bug #38406
          * it seems that all sub SymRegs are shared

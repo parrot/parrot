@@ -700,7 +700,7 @@ map_colors(IMC_Unit* unit, int x, unsigned int *graph, char avail[],
  */
 
 static int
-first_avail(IMC_Unit *unit, int reg_set)
+first_avail(IMC_Unit *unit, int reg_set, Set **avail)
 {
     int i, n, first;
     SymReg * r;
@@ -723,7 +723,10 @@ first_avail(IMC_Unit *unit, int reg_set)
         }
     }
     first = set_first_zero(allocated);
-    set_free(allocated);
+    if (avail)
+        *avail = allocated;
+    else
+        set_free(allocated);
     return first;
 }
 
@@ -739,11 +742,12 @@ allocate_uniq(Parrot_Interp interpreter, IMC_Unit *unit, int usage)
     int i, j, reg_set, first_reg;
     SymReg * r;
     SymHash *hsh;
+    Set *avail;
 
     hsh = &unit->hash;
     for (j = 0; j < 4; j++) {
         reg_set = type[j];
-        first_reg = first_avail(unit, reg_set);
+        first_reg = first_avail(unit, reg_set, &avail);
         for (i = 0; i < hsh->size; i++) {
             for (r = hsh->data[i]; r; r = r->next) {
                 if (r->set != reg_set)
@@ -751,6 +755,9 @@ allocate_uniq(Parrot_Interp interpreter, IMC_Unit *unit, int usage)
                 if ((r->type & VTREGISTER) &&
                         r->color == -1 &&
                         (r->usage & usage)) {
+                    if (set_contains(avail, first_reg))
+                        first_reg = first_avail(unit, reg_set, NULL);
+                    set_add(avail, first_reg);
                     r->color = first_reg++;
                     IMCC_debug(interpreter, DEBUG_IMC,
                             "allocate %s sym %c '%s'  color %d\n",
@@ -759,6 +766,7 @@ allocate_uniq(Parrot_Interp interpreter, IMC_Unit *unit, int usage)
                 }
             }
         }
+        set_free(avail);
         unit->first_avail[j] = first_reg;
     }
     /*
