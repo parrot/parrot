@@ -519,9 +519,21 @@
     if $S0 == '<' goto name
     $I0 = find_not_cclass .CCLASS_NUMERIC, target, pos, lastpos
     if $I0 > pos goto numeric
+    $I0 = find_not_cclass .CCLASS_WORD, target, pos, lastpos
+    if $I0 > pos goto scalar
   eos_anchor:
     (mob, $P0, mfrom, mpos) = newfrom(mob, 0, "PGE::Exp::Anchor")
     mob["value"] = "$"
+    goto end
+  scalar:
+    (mob, $P0, mfrom, mpos) = newfrom(mob, 0, "PGE::Exp::Scalar")
+    dec pos
+    $I1 = $I0 - pos
+    cname = substr target, pos, $I1
+    cname = concat '"', cname
+    cname = concat cname, '"'
+    mob["cname"] = cname
+    pos = $I0
     goto end
   numeric:
     (mob, $P0, mfrom, mpos) = newfrom(mob, 0, "PGE::Exp::Scalar")
