@@ -199,7 +199,6 @@ sub new
             $self->c_header_item('', 'vtables'),
             $self->c_pair_item('', 'key'),
             $self->c_pair_item('', 'sub'),
-            $self->c_pair_item('', 'method_util'),
             $self->c_header_item('', 'pobj'),
             $self->c_header_item('', 'perltypes'),
             $self->c_pair_item('', 'pmc_freeze'),
