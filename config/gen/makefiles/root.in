@@ -1407,6 +1407,7 @@ clean : \
 	dynext-clean \
 	languages-clean \
 #CONDITIONED_LINE(has_perldoc):	docs-clean \
+#CONDITIONED_LINE(has_perldoc):	html-clean \
 	dynpmc-clean \
 	dynoplibs-clean \
 	examples-clean \
