@@ -3529,12 +3529,12 @@ preg:
  * %eax       ... scratch, return value register
  */
 
-static const char intval_map[] =
+static const char i_map[] =
     { emit_EDI, emit_ESI, emit_EDX, emit_ECX };
 static const char floatval_map[] =
     { 1,2,3,4 };         /* ST(1) .. (ST(4) */
 
-static const char intval_map_sub[] =
+static const char i_map_sub[] =
     { emit_EDX, emit_ECX, emit_EBX, emit_EDI, emit_ESI };
 
 static const jit_arch_info arch_info = {
@@ -3549,7 +3549,7 @@ static const jit_arch_info arch_info = {
             Parrot_jit_begin,   /* emit code prologue */
             4,                  /* 4 mapped ints */
             2,                  /* first 2 are preserved */
-            intval_map,
+            i_map,
             4,                  /* 4 mapped float regs */
             0,                  /* ABI sez it's not preserved */
             floatval_map
@@ -3558,7 +3558,7 @@ static const jit_arch_info arch_info = {
             Parrot_jit_begin_sub,   /* emit code prologue */
             4,                  /* 4 mapped ints */
             2,                  /* first 2 are *non*preserved */
-            intval_map_sub,
+            i_map_sub,
             4,                  /* 4 mapped float regs */
             0,                  /* ABI sez it's not preserved */
             floatval_map
@@ -3566,7 +3566,7 @@ static const jit_arch_info arch_info = {
             Parrot_jit_begin_sub_regs,   /* emit code prologue */
             4,                  /* 4 mapped ints */
             2,                  /* first 2 are *non*preserved */
-            intval_map_sub,
+            i_map_sub,
             4,                  /* 4 mapped float regs */
             0,                  /* ABI sez it's not preserved */
             floatval_map

@@ -268,7 +268,7 @@ set_register_usage(Interp *interpreter,
         Parrot_jit_optimizer_section_ptr cur_section,
         op_info_t *op_info, opcode_t *cur_op, opcode_t *code_start)
 {
-    int argn;
+    int argn, args, argt;
     int typ;
     Parrot_jit_register_usage_t *ru = cur_section->ru;
     char *map = optimizer->map_branch;
@@ -279,10 +279,23 @@ set_register_usage(Interp *interpreter,
      *
      * registers are set per their type [IPSN]
      * */
-    for (argn = op_info->op_count - 1; argn > 0; argn--) {
+    args = argt = op_info->op_count; 
+    ADD_OP_VAR_PART(interpreter, interpreter->code, cur_op, argt);
+    for (argn = argt - 1; argn > 0; argn--) {
         /* TODO check the argn-1 entries */
         int idx = *(cur_op + argn);
-        switch (op_info->types[argn-1]) {
+        int arg_type;
+        PMC *sig;
+        if (argn >= args) {
+	    sig = CONTEXT(interpreter->ctx)->constants[cur_op[1]]->u.key;
+	    arg_type = VTABLE_get_integer_keyed_int(interpreter, 
+                    sig, argn - args);
+            arg_type &= (PARROT_ARG_TYPE_MASK | PARROT_ARG_CONSTANT);       
+        }
+        else
+	    arg_type = op_info->types[argn - 1];
+
+        switch (arg_type) {
             case PARROT_ARG_I:
             case PARROT_ARG_KI:
                 typ = 0;
@@ -339,7 +352,7 @@ set_register_usage(Interp *interpreter,
             }
         }
         /* key constants may have register keys */
-        else if (op_info->types[argn-1] == PARROT_ARG_KC) {
+        else if (arg_type == PARROT_ARG_KC) {
             PMC *key = interpreter->code->const_table->constants[idx]->u.key;
             while (key) {
                 UINTVAL flags = PObj_get_FLAGS(key);
@@ -731,6 +744,7 @@ assign_registers(Interp *interpreter,
         op_info = &interpreter->op_info_table[op];
         /* For each argument of the current opcode */
         n = op_info->op_count;
+        ADD_OP_VAR_PART(interpreter, interpreter->code, cur_op, n);
         for (op_arg = 1; op_arg < n; op_arg++) {
             /* get the register typ */
             typ = map[cur_op + op_arg - code_start];
@@ -758,7 +772,6 @@ assign_registers(Interp *interpreter,
         }
 
         /* Move to the next opcode */
-        ADD_OP_VAR_PART(interpreter, interpreter->code, cur_op, n);
         cur_op += n;
     }
 }
@@ -846,15 +859,14 @@ debug_sections(Interp *interpreter,
                     op_info, cur_op, NULL, code_start, 0);
             PIO_eprintf(interpreter, "\t\tOP%vu: ext %3d\t%s\n",
                     cur_op - code_start, op_jit[*cur_op].extcall, instr);
+            n = op_info->op_count;
+            ADD_OP_VAR_PART(interpreter, interpreter->code, cur_op, n);
 #  if JIT_DEBUG > 1
             PIO_eprintf(interpreter, "\t\t\tmap_branch: ");
-            for (i = 0; i < op_info->op_count; i++)
+            for (i = 0; i < n; i++)
                 PIO_eprintf(interpreter, "%02x ", map[cur_op-code_start+i]);
             PIO_eprintf(interpreter, "\n");
 #  endif
-
-            n = op_info->op_count;
-            ADD_OP_VAR_PART(interpreter, interpreter->code, cur_op, n);
             cur_op += n;
         }
         PIO_eprintf(interpreter, "\tbegin:\t%#p\t(%Ou)\n",
@@ -1333,14 +1345,6 @@ parrot_build_asm(Interp *interpreter,
     const jit_arch_info *arch_info;
     int needs_fs;       /* fetch/store */
 
-    needs_fs = jit_type != JIT_CODE_SUB_REGS_ONLY;
-    jit_info = interpreter->code->jit_info =
-            mem_sys_allocate(sizeof(Parrot_jit_info_t));
-
-    jit_info->code_type = jit_type;
-    arch_info = jit_info->arch_info = Parrot_jit_init(interpreter);
-
-    jit_info->objfile = NULL;
 #if EXEC_CAPABLE
     if (objfile) {
         op_func = op_exec;
@@ -1349,6 +1353,19 @@ parrot_build_asm(Interp *interpreter,
     else
 #endif
         op_func = op_jit;
+
+    needs_fs = jit_type != JIT_CODE_SUB_REGS_ONLY;
+    if (jit_type == JIT_CODE_SUB_REGS_ONLY) {
+        op_func[PARROT_OP_set_returns_pc].extcall = 0;
+        op_func[PARROT_OP_get_params_pc].extcall = 0;
+    }
+    jit_info = interpreter->code->jit_info =
+            mem_sys_allocate(sizeof(Parrot_jit_info_t));
+
+    jit_info->code_type = jit_type;
+    arch_info = jit_info->arch_info = Parrot_jit_init(interpreter);
+
+    jit_info->objfile = NULL;
 
     /*
      * check if IMCC did all he work. If yes, we got a PF segment with
