@@ -161,7 +161,7 @@ OUT
   $ENV{pig}    = "oink";
   $ENV{cowpig} = "moink";
 
-language_output_is("tcl",<<'TCL',<<'OUT',"compiler bug with reusing registers");
+language_output_is("tcl",<<'TCL',<<'OUT',"reading environment variables");
   parray env
 TCL
 env(cow)    = moo
