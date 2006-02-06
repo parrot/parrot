@@ -15,8 +15,16 @@ use strict;
 use FindBin;
 use lib "$FindBin::Bin/../lib", "$FindBin::Bin/../../../lib";
 
-use Parrot::Test tests => 75;
+use Parrot::Config qw(%PConfig);
+use Parrot::Test;
 use Test::More;
+
+if ( $PConfig{has_python} ) {
+  plan tests => 75;
+}
+else {
+  plan skip_all => 'ANTLR2 based bc needs Python';
+}
 
 # A little helper to make setting up tests easier
 sub run_tests {

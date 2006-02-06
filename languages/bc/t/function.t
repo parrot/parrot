@@ -15,8 +15,16 @@ use strict;
 use FindBin;
 use lib "$FindBin::Bin/../lib", "$FindBin::Bin/../../../lib";
 
-use Parrot::Test tests => 8;
+use Parrot::Config qw(%PConfig);
+use Parrot::Test;
 use Test::More;
+
+if ( $PConfig{has_python} ) {
+  plan tests => 8;
+}
+else {
+  plan skip_all => 'ANTLR2 based bc needs Python';
+}
 
 language_output_is( 'bc', << 'END_CODE', << 'END_EXPECTED', "block without newlines", with_past => 1 );
 1; { 2 }
