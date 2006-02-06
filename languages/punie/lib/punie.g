@@ -2,8 +2,6 @@ grammar PunieGrammar;
 
 rule prog    { ^<PunieGrammar::lineseq>$ }
 
-rule blue { \w* }
-
 rule block { \s* \{ \s*<PunieGrammar::lineseq>\s* \} \s* }
 
 rule lineseq { \s*<PunieGrammar::line>*\s* }

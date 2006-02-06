@@ -34,7 +34,7 @@ POST::Val is a literal value in the OST. It is a subclass of POST::Node.
 .end
 
 .sub "dump" method
-    .param int level
+    .param int level :optional
     .local string indent
     indent = repeat "    ", level # tab is 4 spaces here
     level += 1 # set level for attributes
@@ -62,7 +62,7 @@ POST::Val is a literal value in the OST. It is a subclass of POST::Node.
 .end
 
 .sub valtype method
-    .param string valtype
+    .param string valtype :optional
     unless valtype goto get
   set:
     $P1 = new PerlString

@@ -36,7 +36,7 @@ is a subclass of PAST::Node.
 .end
 
 .sub "dump" method
-    .param int level
+    .param int level :optional
     .local string indent
     indent = repeat "    ", level # tab is 4 spaces here
     level += 1 # set level for attributes

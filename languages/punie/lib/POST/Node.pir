@@ -59,7 +59,7 @@ All POST nodes subclass from this base type.
 
 
 .sub "dump" method
-    .param int level
+    .param int level :optional
     .local string indent
     indent = repeat "    ", level # tab is 4 spaces here
     level += 1 # set level for attributes
@@ -82,7 +82,7 @@ All POST nodes subclass from this base type.
 
 .sub "dump_attribute" method
     .param string name
-    .param int level
+    .param int level :optional
     .local string indent
     indent = repeat "    ", level # tab is 4 spaces here
     # print value for this attribute
@@ -105,7 +105,7 @@ All POST nodes subclass from this base type.
 .end
 
 .sub "dump_children" method
-    .param int level
+    .param int level :optional
     .local string indent
     indent = repeat "    ", level # tab is 4 spaces here
     level += 1 # set level to pass on to children
