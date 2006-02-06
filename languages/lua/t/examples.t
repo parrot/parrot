@@ -17,6 +17,8 @@ First tests in order to check infrastructure.
 =cut
 
 use strict;
+use FindBin;
+use lib "$FindBin::Bin";
 
 use Parrot::Test tests => 5;
 use Test::More;

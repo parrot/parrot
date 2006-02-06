@@ -20,6 +20,8 @@ use strict;
 
 use Parrot::Test tests => 1;
 use Test::More;
+use FindBin;
+use lib "$FindBin::Bin";
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'list_iter' );
 function list_iter (t)

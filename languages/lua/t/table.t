@@ -22,6 +22,8 @@ See "Programming in Lua", section 19 "The Table Library".
 =cut
 
 use strict;
+use FindBin;
+use lib "$FindBin::Bin";
 
 use Parrot::Test tests => 10;
 use Test::More;

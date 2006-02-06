@@ -19,6 +19,8 @@ See "Programming in Lua", section 4.3 "Control Structures".
 =cut
 
 use strict;
+use FindBin;
+use lib "$FindBin::Bin";
 
 use Parrot::Test tests => 4;
 use Test::More;

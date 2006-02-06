@@ -19,6 +19,8 @@ See "Programming in Lua", section 5 "Functions".
 =cut
 
 use strict;
+use FindBin;
+use lib "$FindBin::Bin";
 
 use Parrot::Test tests => 9;
 use Test::More;

@@ -19,6 +19,8 @@ See "Programming in Lua", section 4.2 "Local Variables and Blocks".
 =cut
 
 use strict;
+use FindBin;
+use lib "$FindBin::Bin";
 
 use Parrot::Test tests => 3;
 use Test::More;
