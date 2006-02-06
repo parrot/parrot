@@ -675,7 +675,17 @@ multi_type:
                               r = mk_const(interp, str_dup("PMC"), 'S');
                            }
                            $$ = r;
-                       }
+                      }
+   | STRINGC          {
+                          SymReg *r;
+                          if (strcmp($1, "_"))
+                              r = mk_const(interp, $1, 'S');
+                          else {
+                              free($1),
+                              r = mk_const(interp, str_dup("PMC"), 'S');
+                           }
+                           $$ = r;
+                      }
    ;
 
 sub_body:

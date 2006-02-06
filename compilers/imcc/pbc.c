@@ -495,7 +495,12 @@ mk_multi_sig(Interp* interpreter, SymReg *r)
     n = pcc_sub->nmulti;
     VTABLE_set_integer_native(interpreter, multi_sig, n);
     for (i = 0; i < n; ++i) {
-        sig = string_from_cstring(interpreter, pcc_sub->multi[i]->name, 0);
+        if (pcc_sub->multi[i]->name[0] == '"')
+            sig = string_unescape_cstring(interpreter, 
+                                          pcc_sub->multi[i]->name + 1, '"',
+                                          NULL);
+        else
+            sig = string_from_cstring(interpreter, pcc_sub->multi[i]->name, 0);
         VTABLE_set_string_keyed_int(interpreter, multi_sig, i, sig);
     }
     return multi_sig;
