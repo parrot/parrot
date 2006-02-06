@@ -1486,7 +1486,7 @@ extern Parrot_get_params_pc {
         Parrot_jit_normal_op(jit_info, interpreter);
     else {
         PMC *sig_pmc;
-        INTVAL *sig_bits, sig, i, n;
+        INTVAL *sig_bits, i, n;
 
         sig_pmc = CONTEXT(interpreter->ctx)->constants[CUR_OPCODE[1]]->u.key;
         sig_bits = PMC_data(sig_pmc);
