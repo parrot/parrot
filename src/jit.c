@@ -1422,17 +1422,18 @@ parrot_build_asm(Interp *interpreter,
      */
     n_regs_used = CONTEXT(interpreter->ctx)->n_regs_used;
 
+    /* The first section */
+    cur_section = jit_info->optimizer->cur_section =
+        jit_info->optimizer->sections;
+    map = jit_info->optimizer->map_branch;
+
     /*
      * from C's ABI all the emitted code here is one (probably big)
      * function. So we have to generate an appropriate function
      * prologue, that makes all this look like a normal function ;)
      */
+    set_reg_usage(interpreter, cur_section->begin);
     (arch_info->regs[jit_type].jit_begin)(jit_info, interpreter);
-    /*
-     * the function epilog can basically be anywhere, that's done
-     * by the Parrot_end opcode somewhere in core.jit
-     */
-
     /*
      *   op_map holds the offset from arena.start
      *   of the parrot op at the given opcode index
@@ -1442,10 +1443,10 @@ parrot_build_asm(Interp *interpreter,
     jit_info->arena.op_map[jit_info->op_i].offset =
         jit_info->native_ptr - jit_info->arena.start;
 
-    /* The first section */
-    cur_section = jit_info->optimizer->cur_section =
-        jit_info->optimizer->sections;
-    map = jit_info->optimizer->map_branch;
+    /*
+     * the function epilog can basically be anywhere, that's done
+     * by the Parrot_end opcode somewhere in core.jit
+     */
 
     while (jit_info->optimizer->cur_section) {
         /* the code emitting functions need cur_op and cur_section

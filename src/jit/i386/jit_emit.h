@@ -2939,6 +2939,9 @@ static void
 Parrot_jit_begin_sub_regs(Parrot_jit_info_t *jit_info,
                  Interp * interpreter)
 {
+    int i, used_i, save_i;
+    const jit_arch_regs *reg_info;
+    
     jit_emit_stack_frame_enter(jit_info->native_ptr);
     /* stack:
      *  16   args
@@ -2947,16 +2950,17 @@ Parrot_jit_begin_sub_regs(Parrot_jit_info_t *jit_info,
      *   4   retaddr
      *   0   ebp <----- ebp
      * [ -4   ebx .. preserved regs ]
+     * [ -8   edi .. preserved regs ]
      */
     /*
-     * TODO check register usage of the subroutine
-     *      how many we have to preserve
+     * check register usage of the subroutine
+     * how many we have to preserve
      */ 
-#if 0
-    emitm_pushl_r(jit_info->native_ptr, emit_EBX);
-    emitm_pushl_r(jit_info->native_ptr, emit_ESI);
-    emitm_pushl_r(jit_info->native_ptr, emit_EDI);
-#endif
+    used_i = CONTEXT(interpreter->ctx)->n_regs_used[REGNO_INT];
+    reg_info = &jit_info->arch_info->regs[jit_info->code_type]; 
+    save_i = reg_info->n_preserved_I;
+    for (i = save_i; i < used_i; ++i)
+        emitm_pushl_r(jit_info->native_ptr, reg_info->map_I[i]);
 }
 
 
