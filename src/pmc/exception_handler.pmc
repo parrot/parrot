@@ -90,6 +90,7 @@ Initializes the exception handler.
         opcode_t *results;
         /* COMPAT:  PMC *p5 = REG_PMC(5);*/
 
+        assert(cc->to_ctx == cc->from_ctx);
         results = cc->current_results;
         /* clear all results, so that continuation.invoke
          * doesn't pass any args #'
@@ -97,9 +98,6 @@ Initializes the exception handler.
         cc->to_ctx->current_results = cc->current_results= NULL;
         ex_ctx = CONTEXT(INTERP->ctx);
         next = SUPER(next);
-        /* COMPAT:  VTABLE_set_pmc_keyed_int(INTERP,
-                    exception, 3, p5);
-                    REG_PMC(5) = exception;*/
         if (results) {
             STRING *message = VTABLE_get_string_keyed_int(INTERP,
                     exception, 0);
