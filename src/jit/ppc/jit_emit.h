@@ -784,6 +784,63 @@ Parrot_jit_restart_op(Parrot_jit_info_t *jit_info,
 }
 
 #endif /* JIT_EMIT == 2 */
+
+#define NATIVECODE jit_info->native_ptr
+#define CUR_OPCODE jit_info->cur_op
+#define MAP(i) jit_info->optimizer->map_branch[jit_info->op_i + (i)]
+static void
+jit_get_params_pc(Parrot_jit_info_t *jit_info, Interp * interpreter)
+{
+    PMC *sig_pmc;
+    INTVAL *sig_bits, i, n;
+
+    sig_pmc = CONTEXT(interpreter->ctx)->constants[CUR_OPCODE[1]]->u.key;
+    sig_bits = PMC_data(sig_pmc);
+    n = PMC_int_val(sig_pmc);
+    jit_info->n_args = n;
+    for (i = 0; i < n; ++i) {
+        jit_emit_lwz(NATIVECODE, MAP(2+i), 4 + i*4, r5);
+    }
+}
+
+static void
+jit_set_returns_pc(Parrot_jit_info_t *jit_info, Interp * interpreter, 
+        int recursive)
+{
+    PMC *sig_pmc;
+    INTVAL *sig_bits, sig;
+
+    sig_pmc = CONTEXT(interpreter->ctx)->constants[CUR_OPCODE[1]]->u.key;
+    sig_bits = PMC_data(sig_pmc);
+    sig = sig_bits[0];
+    if (!recursive) {
+        /* ISR2 <- args[0] */ 
+        jit_emit_lwz(jit_info->native_ptr, ISR2, 0, r5);
+    }
+    switch (sig & (PARROT_ARG_TYPE_MASK|PARROT_ARG_CONSTANT)) {
+        case PARROT_ARG_INTVAL:
+            if (recursive) {
+                if (r3 != MAP(2))
+                    jit_emit_mov_rr(NATIVECODE, r3, MAP(2));
+            }
+            else {
+                jit_emit_stw(jit_info->native_ptr, MAP(2), 0, ISR2);
+            }
+            break;
+        case PARROT_ARG_INTVAL|PARROT_ARG_CONSTANT:
+            if (recursive) {
+                jit_emit_mov_ri_i(NATIVECODE, r3, CUR_OPCODE[2]);
+            }
+            else {
+                jit_emit_stw(jit_info->native_ptr, ISR1, 0, ISR2);
+            }
+            break;
+        default:
+            internal_exception(1, "set_returns_jit - unknown tyep");
+            break;
+    }
+}
+
 #if JIT_EMIT == 0
 
 /*
@@ -846,7 +903,33 @@ Parrot_jit_begin_sub_regs(Parrot_jit_info_t *jit_info,
     /* r31 = 0 - needed for load immediate */
     jit_emit_xor_rrr(jit_info->native_ptr, r31, r31, r31);
 
-
+    if (jit_info->flags & JIT_CODE_RECURSIVE) {
+        char * L1;
+        int offs;
+        jit_get_params_pc(jit_info, interpreter);
+        /* remember fixup position - call sub */
+        L1 = NATIVECODE;
+        _emit_bx(NATIVECODE, 1, 0xbeef); /* bl */
+        /* fetch args */
+        jit_emit_lwz(jit_info->native_ptr, ISR2, 0, r5);
+        /* store INTVAL result */
+        jit_emit_stw(jit_info->native_ptr, r3, 0, ISR2);
+        /* fetch pc -> return it */
+        jit_emit_lwz(jit_info->native_ptr, r3, 4 + jit_info->n_args * 4, r5);
+	/* return sequence */
+	jit_emit_lwz(jit_info->native_ptr, r1, 0, r1);
+	jit_emit_lwz(jit_info->native_ptr, r31, -4, r1);
+	jit_emit_lwz(jit_info->native_ptr, r0, 8, r1);   /* opt */
+	jit_emit_mtlr(jit_info->native_ptr, r0);   /* opt */
+	jit_emit_blr(jit_info->native_ptr);
+        /* re-emit call */
+        offs = NATIVECODE - L1;
+        _emit_bx(L1, 1, offs); /* bl */
+        /* TODO this is a part of call */
+        jit_emit_mflr(jit_info->native_ptr, r0);
+        jit_emit_stw(jit_info->native_ptr, r0, 8, r1); /* stw     r0,8(r1) */
+        jit_emit_stwu(jit_info->native_ptr, r1, -32, r1);
+    }
 }
 
 static void

@@ -956,26 +956,8 @@ extern Parrot_set_returns_pc {
     if (jit_info->code_type == JIT_CODE_FILE)
 	Parrot_jit_normal_op(jit_info, interpreter);
     else {
-	PMC *sig_pmc;
-	INTVAL *sig_bits, sig;
-
-	sig_pmc = CONTEXT(interpreter->ctx)->constants[CUR_OPCODE[1]]->u.key;
-	sig_bits = PMC_data(sig_pmc);
-	sig = sig_bits[0];
-	/* ISR2 <- args[0] */ 
-	jit_emit_lwz(jit_info->native_ptr, ISR2, 0, r5);
-	switch (sig & (PARROT_ARG_TYPE_MASK|PARROT_ARG_CONSTANT)) {
-	    case PARROT_ARG_INTVAL:
-		jit_emit_stw(jit_info->native_ptr, MAP(2), 0, ISR2);
-		break;
-	    case PARROT_ARG_INTVAL|PARROT_ARG_CONSTANT:
-		jit_emit_mov_ri_i(NATIVECODE, ISR1, *INT_CONST[2]);
-		jit_emit_stw(jit_info->native_ptr, ISR1, 0, ISR2);
-		break;
-	    default:
-		internal_exception(1, "set_returns_jit - unknown tyep");
-		break;
-	}
+        jit_set_returns_pc(jit_info, interpreter, 
+            jit_info->flags & JIT_CODE_RECURSIVE);
     }
 }
 
@@ -984,11 +966,15 @@ extern Parrot_returncc {
 	Parrot_jit_restart_op(jit_info, interpreter);
     else {
 	/* fetch args[n+1] -> retval */
-	jit_emit_lwz(jit_info->native_ptr, r3, 4 + jit_info->n_args * 4, r5);
+        if (!(jit_info->flags & JIT_CODE_RECURSIVE)) {
+	    jit_emit_lwz(jit_info->native_ptr, r3, 4 + jit_info->n_args * 4, r5);
+	}
 
 	/* return sequence */
 	jit_emit_lwz(jit_info->native_ptr, r1, 0, r1);
-	jit_emit_lwz(jit_info->native_ptr, r31, -4, r1);
+        if (!(jit_info->flags & JIT_CODE_RECURSIVE)) {
+	    jit_emit_lwz(jit_info->native_ptr, r31, -4, r1);
+	}
 	jit_emit_lwz(jit_info->native_ptr, r0, 8, r1);   /* opt */
 	jit_emit_mtlr(jit_info->native_ptr, r0);   /* opt */
 	jit_emit_blr(jit_info->native_ptr);
@@ -998,17 +984,8 @@ extern Parrot_returncc {
 extern Parrot_get_params_pc {
     if (jit_info->code_type == JIT_CODE_FILE)
 	Parrot_jit_normal_op(jit_info, interpreter);
-    else {
-        PMC *sig_pmc;
-        INTVAL *sig_bits, i, n;
-
-        sig_pmc = CONTEXT(interpreter->ctx)->constants[CUR_OPCODE[1]]->u.key;
-        sig_bits = PMC_data(sig_pmc);
-        n = PMC_int_val(sig_pmc);
-        jit_info->n_args = n;
-        for (i = 0; i < n; ++i) {
-            jit_emit_lwz(NATIVECODE, MAP(2+i), 4 + i*4, r5);
-	}
+    else if (!(jit_info->flags & JIT_CODE_RECURSIVE)) {
+        jit_get_params_pc(jit_info, interpreter);
     }
 }
 
