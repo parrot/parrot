@@ -39,13 +39,13 @@ constructor parameters.
 # Call all visitors for a given node
 .sub _scan_node method
     .param pmc node
-    .param pmc name
+    .param pmc name     :optional
+    .param int got_name :opt_flag
     .local string type
 
     # If the user passed in a special name, look up visit actions for that one,
     # otherwise look them up for the type name of the node.
-    $I1 = defined name
-    if $I1 goto name_from_arg
+    if got_name goto name_from_arg
     type = typeof node
     goto name_set
 name_from_arg:
@@ -90,11 +90,13 @@ node.
 
 .sub get method
     .param pmc name
-    .param pmc node
-    .param pmc type
+    .param pmc node     :optional
+    .param int got_node :opt_flag
+    .param pmc type     :optional
+    .param int got_type :opt_flag
 
     # If no node was passed in, use top level node.
-    unless null node goto node_exists
+    if got_node goto node_exists
     node = getattribute self, 'data'
 node_exists:
 
@@ -115,7 +117,12 @@ name_hash_exists:
     $I0 = defined cell
     if $I0 goto eval_cell
 scan_name:
+    if got_type goto scan_with_type
+    self._scan_node(node)
+    goto done_scan
+scan_with_type:
     self._scan_node(node,type)
+done_scan:
     # Second check to see if _scan_node defined the cell
     cell = $P2[id]
     $I0 = defined cell
