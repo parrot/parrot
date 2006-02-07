@@ -18,7 +18,7 @@ Tests Lua Operating System Library
 
 =cut
 
-use Parrot::Test tests => 7;
+use Parrot::Test tests => 11;
 use Test::More;
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "function execute");
@@ -160,6 +160,69 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "function remove");
 CODE
 nil
 file.rm: No such file or directory
+OUTPUT
+
+open X, "> ../file.old";
+print X "file to rename";
+close X;
+
+pir_output_is(<< 'CODE', << 'OUTPUT', "function rename");
+.namespace [ "Lua" ]
+.HLL "Lua", "lua_group"
+.sub _main
+    load_bytecode "languages/lua/lib/luaos.pbc"
+    .local pmc _G
+    _G = global "_G"
+    .const .LuaString key1 = "os"
+    .local pmc os
+    os = _G[key1]
+    .const .LuaString key2 = "rename"
+    .local pmc fct1
+    fct1 = os[key2]
+    .const .LuaString arg1 = "file.old"
+    .const .LuaString arg2 = "file.new"
+    .local pmc ret1
+    ret1 = fct1(arg1, arg2)
+    print ret1
+    print "\n"
+    end
+.end
+CODE
+true
+OUTPUT
+
+ok(!-e "../file.old", "Test that old file is missing");
+ok(-e "../file.new", "Test that new file is here");
+unlink("../file.old") if (-e "../file.old");
+unlink("../file.new") if (-e "../file.new");
+
+pir_output_is(<< 'CODE', << 'OUTPUT', "function rename");
+.namespace [ "Lua" ]
+.HLL "Lua", "lua_group"
+.sub _main
+    load_bytecode "languages/lua/lib/luaos.pbc"
+    .local pmc _G
+    _G = global "_G"
+    .const .LuaString key1 = "os"
+    .local pmc os
+    os = _G[key1]
+    .const .LuaString key2 = "rename"
+    .local pmc fct1
+    fct1 = os[key2]
+    .const .LuaString arg1 = "file.old"
+    .const .LuaString arg2 = "file.new"
+    .local pmc ret1
+    .local pmc msg1
+    (ret1, msg1) = fct1(arg1, arg2)
+    print ret1
+    print "\n"
+    print msg1
+    print "\n"
+    end
+.end
+CODE
+nil
+file.old: No such file or directory
 OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "function time");

@@ -226,6 +226,7 @@ B<nil>, plus a string describing the error.
     .param pmc filename
     .local pmc ret
     $S0 = checkstring(filename)
+    $S1 = $S0
     new $P0, .OS
     push_eh _handler
     $P0."rm"($S0)
@@ -238,11 +239,11 @@ _handler:
     .local pmc e
     .local string s
     .get_results (e, s)
-    concat $S0, ": "
-    concat $S0, s
+    concat $S1, ": "
+    concat $S1, s
     new nil, .LuaNil
     new msg, .LuaString
-    msg = $S0
+    msg = $S1
     .return (nil, msg)
 .end
 
@@ -251,16 +252,33 @@ _handler:
 Renames file named C<oldname> to C<newname>. If this function fails, it
 returns B<nil>, plus a string describing the error.
 
-NOT YET IMPLEMENTED.              
-
 =cut
 
 .sub _os_rename :anon
     .param pmc oldname
     .param pmc newname
+    .local pmc ret
     $S0 = checkstring(oldname)
+    $S2 = $S0
     $S1 = checkstring(newname)
-    not_implemented()
+    new $P0, .File
+    push_eh _handler
+    $P0."rename"($S0, $S1)
+    new ret, .LuaBoolean
+    ret = 1
+    .return (ret)
+_handler:
+    .local pmc nil
+    .local pmc msg
+    .local pmc e
+    .local string s
+    .get_results (e, s)
+    concat $S2, ": "
+    concat $S2, s
+    new nil, .LuaNil
+    new msg, .LuaString
+    msg = $S2
+    .return (nil, msg)
 .end
 
 =item C<os.setlocale (locale [, category])>
