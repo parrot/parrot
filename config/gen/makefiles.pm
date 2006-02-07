@@ -153,7 +153,7 @@ sub makefiles
         replace_slashes                => 1
     );
     genfile(
-        'config/gen/makefiles/lua.in' => 'languages/lua/Makefile',
+        'languages/lua/config/makefiles/root.in' => 'languages/lua/Makefile',
         commentType                   => '#',
         replace_slashes               => 1,
         conditioned_lines             => 1
