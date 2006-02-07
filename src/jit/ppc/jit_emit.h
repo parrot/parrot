@@ -371,6 +371,9 @@ enum { JIT_PPC_CALL, JIT_PPC_BRANCH, JIT_PPC_UBRANCH };
 #  define jit_emit_lwz(pc, D, disp, A) \
     jit_emit_2reg(pc, 32, D, A, disp)
 
+#  define jit_emit_lwzu(pc, D, disp, A) \
+    jit_emit_2reg(pc, 33, D, A, disp)
+
 #  define jit_emit_lwzx(pc, D, A, B) \
     jit_emit_3reg_x(pc, 31, D, A, B, 23, 0)
 
