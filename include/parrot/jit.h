@@ -168,7 +168,10 @@ typedef enum {
     JIT_CODE_SUB_REGS_ONLY,
 
     /* size */
-    JIT_CODE_TYPES
+    JIT_CODE_TYPES,
+    /* special cases */  
+    JIT_CODE_RECURSIVE     = 0x10,
+    JIT_CODE_SUB_REGS_ONLY_REC = JIT_CODE_SUB_REGS_ONLY|JIT_CODE_RECURSIVE
 } enum_jit_code_type;
 
 /*  Parrot_jit_info_t
@@ -193,6 +196,7 @@ typedef struct {
     Parrot_jit_optimizer_t          *optimizer;
     Parrot_jit_constant_pool_t      *constant_pool;
     enum_jit_code_type              code_type; 
+    int                             flags;
     const struct jit_arch_info_t    *arch_info;
     int                              n_args;
 #  if EXEC_CAPABLE

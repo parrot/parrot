@@ -2765,11 +2765,82 @@ Parrot_jit_vtable_newp_ic_op(Parrot_jit_info_t *jit_info,
 
 #  endif /* JIT_CGP */
 
+#define NATIVECODE jit_info->native_ptr
+#define CUR_OPCODE jit_info->cur_op
+static void
+jit_get_params_pc(Parrot_jit_info_t *jit_info, Interp * interpreter)
+{
+    PMC *sig_pmc;
+    INTVAL *sig_bits, i, n;
+
+    sig_pmc = CONTEXT(interpreter->ctx)->constants[CUR_OPCODE[1]]->u.key;
+    sig_bits = PMC_data(sig_pmc);
+    n = PMC_int_val(sig_pmc);
+    jit_info->n_args = n;
+    emitm_movl_m_r(NATIVECODE, emit_EAX, emit_EBP, emit_None, 1, 16);
+    for (i = 0; i < n; ++i)
+        emitm_movl_m_r(NATIVECODE, MAP(2+i), emit_EAX, emit_None, 
+                1, 4 + i*4);
+}
+
+static void 
+jit_restore_regs(Parrot_jit_info_t *jit_info, Interp * interpreter)
+{
+
+    int i, used_i, save_i;
+    const jit_arch_regs *reg_info;
+
+    used_i = CONTEXT(interpreter->ctx)->n_regs_used[REGNO_INT];
+    reg_info = &jit_info->arch_info->regs[jit_info->code_type]; 
+    save_i = reg_info->n_preserved_I;
+    /* note - reversed order of Parrot_jit_begin_sub_regs */
+    for (i = used_i - 1; i >= save_i; --i)
+        emitm_popl_r(jit_info->native_ptr, reg_info->map_I[i]);
+}
+
+static void
+jit_set_returns_pc(Parrot_jit_info_t *jit_info, Interp * interpreter, 
+        int recursive)
+{
+    PMC *sig_pmc;
+    INTVAL *sig_bits, sig;
+
+    sig_pmc = CONTEXT(interpreter->ctx)->constants[CUR_OPCODE[1]]->u.key;
+    sig_bits = PMC_data(sig_pmc);
+    sig = sig_bits[0];
+    if (!recursive) {
+        /* mov 16(%ebp), %eax - fetch args ptr */
+        emitm_movl_m_r(NATIVECODE, emit_EAX, emit_EBP, emit_None, 1, 16);
+        emitm_movl_m_r(NATIVECODE, emit_EAX, emit_EAX, emit_None, 1, 0);
+    }
+    /*
+     * recursive returns according to ABI */
+    switch (sig & (PARROT_ARG_TYPE_MASK|PARROT_ARG_CONSTANT)) {
+        case PARROT_ARG_INTVAL:
+            if (recursive) {
+                jit_emit_mov_rr_i(NATIVECODE, emit_EAX, MAP(2));
+            }
+            else {
+                emitm_movl_r_m(NATIVECODE, MAP(2), emit_EAX, 0, 1, 0);
+            }
+            break;
+        case PARROT_ARG_INTVAL|PARROT_ARG_CONSTANT:
+            if (recursive) {
+                jit_emit_mov_ri_i(NATIVECODE, emit_EAX, CUR_OPCODE[2]);
+            }
+            else {
+                emitm_movl_i_m(NATIVECODE, CUR_OPCODE[2], emit_EAX, 0, 1, 0);
+            }
+            break;
+        default:
+            internal_exception(1, "set_returns_jit - unknown tyep");
+            break;
+    }
+}
 #if JIT_EMIT == 0
 
 static void
-Parrot_jit_dofixup(Parrot_jit_info_t *jit_info,
-                   Interp * interpreter)
+Parrot_jit_dofixup(Parrot_jit_info_t *jit_info, Interp * interpreter)
 {
     Parrot_jit_fixup_t *fixup, *next;
     char *fixup_ptr;
@@ -2974,6 +3045,32 @@ Parrot_jit_begin_sub_regs(Parrot_jit_info_t *jit_info,
     save_i = reg_info->n_preserved_I;
     for (i = save_i; i < used_i; ++i)
         emitm_pushl_r(jit_info->native_ptr, reg_info->map_I[i]);
+    /* when it's a recursive sub, we fetch params to registers
+     * and all a inner helper sub, which run with registers only
+     */
+    if (jit_info->flags & JIT_CODE_RECURSIVE) {
+        char * L1;
+        jit_get_params_pc(jit_info, interpreter);
+        /* remember fixup position - call sub */
+        L1 = NATIVECODE;
+        emitm_calll(NATIVECODE, 0);
+        /* fetch args to %edx */
+        emitm_movl_m_r(NATIVECODE, emit_EDX, emit_EBP, emit_None, 1, 16);
+        emitm_movl_m_r(NATIVECODE, emit_ECX, emit_EDX, emit_None, 1, 0);
+        /* store return value *INTVAL* %eax into result location */
+        /* XXX numbers */
+        emitm_movl_r_m(NATIVECODE, emit_EAX, emit_ECX, 0, 1, 0);
+        /* fetch pc and return it */
+        emitm_movl_m_r(NATIVECODE, emit_EAX, emit_EDX, emit_None, 1, 
+                    4 + jit_info->n_args * 4);
+        /* restore pushed callee saved */
+        jit_restore_regs(jit_info, interpreter);
+        jit_emit_stack_frame_leave(NATIVECODE);
+        emitm_ret(NATIVECODE);
+        /* fixup call statement */
+        L1[1] = NATIVECODE - L1 - 5;
+    }
+    /* TODO be sure we got a label here in map_branch */
 }
 
 

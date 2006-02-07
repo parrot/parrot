@@ -1434,27 +1434,9 @@ Parrot_set_args_pc {
 extern Parrot_set_returns_pc {
     if (jit_info->code_type == JIT_CODE_FILE)
         Parrot_jit_normal_op(jit_info, interpreter);
-    else {
-        PMC *sig_pmc;
-        INTVAL *sig_bits, sig;
-
-        sig_pmc = CONTEXT(interpreter->ctx)->constants[CUR_OPCODE[1]]->u.key;
-        sig_bits = PMC_data(sig_pmc);
-        sig = sig_bits[0];
-        /* mov 16(%ebp), %eax - fetch args ptr */
-        emitm_movl_m_r(NATIVECODE, emit_EAX, emit_EBP, emit_None, 1, 16);
-        emitm_movl_m_r(NATIVECODE, emit_EAX, emit_EAX, emit_None, 1, 0);
-        switch (sig & (PARROT_ARG_TYPE_MASK|PARROT_ARG_CONSTANT)) {
-            case PARROT_ARG_INTVAL:
-                emitm_movl_r_m(NATIVECODE, MAP(2), emit_EAX, 0, 1, 0);
-                break;
-            case PARROT_ARG_INTVAL|PARROT_ARG_CONSTANT:
-                emitm_movl_i_m(NATIVECODE, *INT_CONST[2], emit_EAX, 0, 1, 0);
-                break;
-            default:
-                internal_exception(1, "set_returns_jit - unknown tyep");
-                break;
-        }
+    else  {
+        jit_set_returns_pc(jit_info, interpreter, 
+            jit_info->flags & JIT_CODE_RECURSIVE);
     }
 }
 
@@ -1462,21 +1444,15 @@ extern Parrot_returncc {
     if (jit_info->code_type == JIT_CODE_FILE)
         Parrot_jit_restart_op(jit_info, interpreter);
     else {
-        int i, used_i, save_i;
-        const jit_arch_regs *reg_info;
-
         /* restore pushed regs if any */
-        used_i = CONTEXT(interpreter->ctx)->n_regs_used[REGNO_INT];
-        reg_info = &jit_info->arch_info->regs[jit_info->code_type]; 
-        save_i = reg_info->n_preserved_I;
-        /* note - reversed order of Parrot_jit_begin_sub_regs */
-        for (i = used_i - 1; i >= save_i; --i)
-            emitm_popl_r(jit_info->native_ptr, reg_info->map_I[i]);
-        emitm_movl_m_r(NATIVECODE, emit_EAX, emit_EBP, emit_None, 1, 16);
-        /* retval = pc is at 4 + n_args * 4 */
-        emitm_movl_m_r(NATIVECODE, emit_EAX, emit_EAX, emit_None, 1, 
-                4 + jit_info->n_args * 4);
-        jit_emit_stack_frame_leave(NATIVECODE);
+        if (!(jit_info->flags & JIT_CODE_RECURSIVE)) {
+            jit_restore_regs(jit_info, interpreter);
+            emitm_movl_m_r(NATIVECODE, emit_EAX, emit_EBP, emit_None, 1, 16);
+            /* retval = pc is at 4 + n_args * 4 */
+            emitm_movl_m_r(NATIVECODE, emit_EAX, emit_EAX, emit_None, 1, 
+                    4 + jit_info->n_args * 4);
+            jit_emit_stack_frame_leave(NATIVECODE);
+        }
         emitm_ret(NATIVECODE);
     }
 }
@@ -1484,18 +1460,8 @@ extern Parrot_returncc {
 extern Parrot_get_params_pc {
     if (jit_info->code_type == JIT_CODE_FILE)
         Parrot_jit_normal_op(jit_info, interpreter);
-    else {
-        PMC *sig_pmc;
-        INTVAL *sig_bits, i, n;
-
-        sig_pmc = CONTEXT(interpreter->ctx)->constants[CUR_OPCODE[1]]->u.key;
-        sig_bits = PMC_data(sig_pmc);
-        n = PMC_int_val(sig_pmc);
-        jit_info->n_args = n;
-        emitm_movl_m_r(NATIVECODE, emit_EAX, emit_EBP, emit_None, 1, 16);
-        for (i = 0; i < n; ++i)
-            emitm_movl_m_r(NATIVECODE, MAP(2+i), emit_EAX, emit_None, 
-                    1, 4 + i*4);
+    else if (!(jit_info->flags & JIT_CODE_RECURSIVE)) {
+        jit_get_params_pc(jit_info, interpreter);
     }
 }
 

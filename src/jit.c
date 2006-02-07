@@ -1385,6 +1385,14 @@ parrot_build_asm(Interp *interpreter,
     const jit_arch_info *arch_info;
     int needs_fs;       /* fetch/store */
 
+    jit_info = interpreter->code->jit_info =
+            mem_sys_allocate(sizeof(Parrot_jit_info_t));
+
+    jit_info->flags     = jit_type & JIT_CODE_RECURSIVE;
+    jit_type &= ~ JIT_CODE_RECURSIVE;
+    jit_info->code_type = jit_type;
+    needs_fs = jit_type != JIT_CODE_SUB_REGS_ONLY;
+
 #if EXEC_CAPABLE
     if (objfile) {
         op_func = op_exec;
@@ -1392,20 +1400,19 @@ parrot_build_asm(Interp *interpreter,
     }
     else
 #endif
+    {
         op_func = op_jit;
+        jit_info->objfile = NULL;
+    }
 
-    needs_fs = jit_type != JIT_CODE_SUB_REGS_ONLY;
+    /* reset some exctall bits - all is JITed
+     */
     if (jit_type == JIT_CODE_SUB_REGS_ONLY) {
         op_func[PARROT_OP_set_returns_pc].extcall = 0;
         op_func[PARROT_OP_get_params_pc].extcall = 0;
     }
-    jit_info = interpreter->code->jit_info =
-            mem_sys_allocate(sizeof(Parrot_jit_info_t));
-
-    jit_info->code_type = jit_type;
+    /* get register mappings and such */
     arch_info = jit_info->arch_info = Parrot_jit_init(interpreter);
-
-    jit_info->objfile = NULL;
 
     /*
      * check if IMCC did all he work. If yes, we got a PF segment with
@@ -1474,6 +1481,7 @@ parrot_build_asm(Interp *interpreter,
      * function. So we have to generate an appropriate function
      * prologue, that makes all this look like a normal function ;)
      */
+    jit_info->cur_op = cur_section->begin;
     (arch_info->regs[jit_type].jit_begin)(jit_info, interpreter);
     /*
      *   op_map holds the offset from arena.start
