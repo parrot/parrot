@@ -252,7 +252,7 @@ make_branch_list(Interp *interpreter,
 
 =item C<static void
 set_register_usage(Interp *interpreter,
-        Parrot_jit_optimizer_t * optimizer,
+        Parrot_jit_info_t *jit_info,
         Parrot_jit_optimizer_section_ptr cur_section,
         op_info_t *op_info, opcode_t *cur_op, opcode_t *code_start)>
 
@@ -264,13 +264,14 @@ Sets the register usage counts.
 
 static void
 set_register_usage(Interp *interpreter,
-        Parrot_jit_optimizer_t * optimizer,
+        Parrot_jit_info_t *jit_info,
         Parrot_jit_optimizer_section_ptr cur_section,
         op_info_t *op_info, opcode_t *cur_op, opcode_t *code_start)
 {
     int argn, args, argt;
     int typ;
     Parrot_jit_register_usage_t *ru = cur_section->ru;
+    Parrot_jit_optimizer_t * optimizer = jit_info->optimizer;
     char *map = optimizer->map_branch;
 
     /* For each argument that has the opcode increment the usage count,
@@ -381,9 +382,39 @@ set_register_usage(Interp *interpreter,
 
 /*
 
+=item C<static void 
+init_regusage(Interp *interpreter,
+        Parrot_jit_optimizer_section_ptr cur_section)>
+
+Init all register usage to Parrot register usage. Used when JITting
+subroutines to registers only
+
+=cut
+
+*/
+
+static void 
+init_regusage(Interp *interpreter,
+        Parrot_jit_optimizer_section_ptr cur_section)
+{
+    int typ, j;
+
+    cur_section->ru[0].registers_used = 
+        CONTEXT(interpreter->ctx)->n_regs_used[REGNO_INT];
+    cur_section->ru[3].registers_used = 
+        CONTEXT(interpreter->ctx)->n_regs_used[REGNO_NUM];
+    cur_section->ru[1].registers_used = 
+        cur_section->ru[2].registers_used = 0;
+    for (typ = 0; typ < 4; typ++)
+        for (j = 0; j < cur_section->ru[typ].registers_used; j++)
+            cur_section->ru[typ].reg_usage[j] = j;
+}
+
+/*
+
 =item C<static void
 make_sections(Interp *interpreter,
-        Parrot_jit_optimizer_t * optimizer,
+        Parrot_jit_info_t *jit_info,
         opcode_t *code_start, opcode_t *code_end)>
 
 I386 has JITed vtables, which have the vtable# in extcall.
@@ -401,7 +432,7 @@ This C<Parrot_jit_vtable_n_op()> does use register mappings.
 
 static void
 make_sections(Interp *interpreter,
-        Parrot_jit_optimizer_t * optimizer,
+        Parrot_jit_info_t *jit_info,
          opcode_t *code_start, opcode_t *code_end)
 {
     Parrot_jit_optimizer_section_ptr cur_section, t_section, prev_section;
@@ -410,7 +441,9 @@ make_sections(Interp *interpreter,
     char *branch;
     int branched, start_new;
     opcode_t *cur_op;
+    Parrot_jit_optimizer_t * optimizer;
 
+    optimizer = jit_info->optimizer;
     branch = optimizer->map_branch;
 
     /* Allocate the first section */
@@ -420,6 +453,9 @@ make_sections(Interp *interpreter,
     prev_section = cur_section;
 
     cur_op = code_start;
+    /* set all regs to Parrot's */
+    if (jit_info->code_type == JIT_CODE_SUB_REGS_ONLY) 
+        init_regusage(interpreter, cur_section);
     while (cur_section) {
         opcode_t op = *cur_op;
         if (*cur_op >= jit_op_count())
@@ -437,7 +473,7 @@ make_sections(Interp *interpreter,
         cur_section->op_count++;
 
         /* set register usage for this section */
-        set_register_usage(interpreter, optimizer, cur_section,
+        set_register_usage(interpreter, jit_info, cur_section,
                 op_info, cur_op, code_start);
 
         /*
@@ -486,6 +522,9 @@ make_sections(Interp *interpreter,
                 t_section->prev = cur_section;
                 /* Make the new section be the current one */
                 cur_section = t_section;
+                /* set all regs to Parrot's */
+                if (jit_info->code_type == JIT_CODE_SUB_REGS_ONLY) 
+                    init_regusage(interpreter, cur_section);
 
                 /* registers get either allocated per section or
                  * per basic block (i.e. one or more sections divided
@@ -935,7 +974,7 @@ optimize_jit(Interp *interpreter,
     make_branch_list(interpreter, optimizer, code_start, code_end);
 
     /* ok, let's loop again and generate the sections */
-    make_sections(interpreter, optimizer, code_start, code_end);
+    make_sections(interpreter, jit_info, code_start, code_end);
 
     /* look where a section jumps to */
     make_branch_targets(interpreter, optimizer, code_start);
@@ -946,7 +985,8 @@ optimize_jit(Interp *interpreter,
 #if JIT_DEBUG > 2
     debug_sections(interpreter, optimizer, code_start);
 #endif
-    sort_registers(interpreter, jit_info, code_start);
+    if (jit_info->code_type != JIT_CODE_SUB_REGS_ONLY)
+        sort_registers(interpreter, jit_info, code_start);
     map_registers(interpreter, jit_info, code_start);
 
 #if JIT_DEBUG
@@ -1026,7 +1066,7 @@ optimize_imcc_jit(Interp *interpreter,
             if (*cur_op >= jit_op_count())
                 op = CORE_OPS_wrapper__;
             op_info = &interpreter->op_info_table[op];
-            set_register_usage(interpreter, optimizer, section,
+            set_register_usage(interpreter, jit_info, section,
                     op_info, cur_op, code_start);
             section->op_count++;
             n = op_info->op_count;
@@ -1387,6 +1427,12 @@ parrot_build_asm(Interp *interpreter,
 #else
     jit_seg = NULL;
 #endif
+    /*
+     * remember register usage
+     */
+    n_regs_used = CONTEXT(interpreter->ctx)->n_regs_used;
+    set_reg_usage(interpreter, code_start);
+
     if (jit_seg)
         optimize_imcc_jit(interpreter, jit_info, code_start, code_end, jit_seg);
     else
@@ -1417,10 +1463,6 @@ parrot_build_asm(Interp *interpreter,
 
     jit_info->op_i = 0;
     jit_info->arena.fixups = NULL;
-    /*
-     * remember register usage
-     */
-    n_regs_used = CONTEXT(interpreter->ctx)->n_regs_used;
 
     /* The first section */
     cur_section = jit_info->optimizer->cur_section =
@@ -1432,7 +1474,6 @@ parrot_build_asm(Interp *interpreter,
      * function. So we have to generate an appropriate function
      * prologue, that makes all this look like a normal function ;)
      */
-    set_reg_usage(interpreter, cur_section->begin);
     (arch_info->regs[jit_type].jit_begin)(jit_info, interpreter);
     /*
      *   op_map holds the offset from arena.start
