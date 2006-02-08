@@ -403,6 +403,7 @@ adv_named_set(Interp *interp, char *name) {
 %token <t> PCC_BEGIN_YIELD PCC_END_YIELD NCI_CALL METH_CALL INVOCANT
 %token <t> MAIN LOAD IMMEDIATE POSTCOMP METHOD ANON OUTER NEED_LEX
 %token <t> MULTI
+%token <t> UNIQUE_REG
 %token <s> LABEL
 %token <t> EMIT EOM
 %token <s> IREG NREG SREG PREG IDENTIFIER REG MACRO ENDM
@@ -434,7 +435,7 @@ adv_named_set(Interp *interp, char *name) {
 %type <t> begin_ret_or_yield end_ret_or_yield
 %token <t> LINECOMMENT
 %token <s> FILECOMMENT
-%type <idlist> id_list
+%type <idlist> id_list id_list_id
 
 %nonassoc CONCAT DOT
 %nonassoc  <t> POINTY
@@ -631,9 +632,16 @@ sub_param:
    ;
 
 sub_param_type_def:
-     type IDENTIFIER paramtype_list    { $$ = mk_ident(interp, $2, $1);
+     type IDENTIFIER paramtype_list    { if ($3 & VT_UNIQUE_REG)
+                                             $$ = mk_ident_ur(interp, $2, $1);
+                                         else
+                                             $$ = mk_ident(interp, $2, $1);
                                          $$->type |= $3; }
-   | type STRINGC ADV_ARROW IDENTIFIER paramtype_list { $$ = mk_ident(interp, $4, $1);
+   | type STRINGC ADV_ARROW IDENTIFIER paramtype_list { 
+                                         if ($5 & VT_UNIQUE_REG)
+                                             $$ = mk_ident_ur(interp, $4, $1);
+                                         else
+                                             $$ = mk_ident(interp, $4, $1);
                                          $$->type |= $5;
                                          adv_named_set(interp,$2);}
    ;
@@ -815,8 +823,16 @@ pcc_results:
 
 pcc_result:
      RESULT target paramtype_list      {  $$ = $2; $$->type |= $3; }
-   | LOCAL { is_def=1; }
-             type IDENTIFIER           {  mk_ident(interp, $4, $3); is_def=0; $$=0; }
+   | LOCAL { is_def=1; } type id_list_id           
+     {
+         IdList* l = $4;
+         if (l->unique_reg)
+                 mk_ident_ur(interp, l->id, $3);
+             else
+                 mk_ident(interp, l->id, $3);
+         is_def=0;
+         $$=0;
+     }
    ;
 
 paramtype_list:
@@ -830,6 +846,7 @@ paramtype:
    | ADV_OPT_FLAG                      {  $$ = VT_OPT_FLAG; }
    | ADV_NAMED                         {  $$ = VT_NAMED; }
    | ADV_NAMED '(' STRINGC ')'         {  adv_named_set(interp,$3); $$ = 0; }
+   | UNIQUE_REG                      {  $$ = VT_UNIQUE_REG; }
    ;
 
 
@@ -952,21 +969,39 @@ instruction:
                    { $$ = $2; }
     ;
 
-id_list : IDENTIFIER
-         {
-            IdList* l = malloc(sizeof(IdList));
-            l->next = NULL;
-            l->id = $1;
-            $$ = l;
-         }
+id_list : 
+     id_list_id
+     {
+         IdList* l = $1;
+         l->next = NULL;
+         $$ = l;
+     }
 
-        | id_list COMMA IDENTIFIER
-        {  IdList* l = malloc(sizeof(IdList));
-           l->id = $3;
-           l->next = $1;
-           $$ = l;
-        }
-        ;
+   | id_list COMMA id_list_id
+     {  
+         IdList* l = $3;
+         l->next = $1;
+         $$ = l;
+     }
+   ;
+
+id_list_id :
+     IDENTIFIER UNIQUE_REG
+     {
+         IdList* l = malloc(sizeof(IdList));
+         l->id = $1;
+         l->unique_reg = 1;
+         $$ = l;
+     }
+
+   | IDENTIFIER
+     {
+         IdList* l = malloc(sizeof(IdList));
+         l->id = $1;
+         l->unique_reg = 0;
+         $$ = l;
+     }
+   ;
 
 labeled_inst:
      assignment
@@ -975,17 +1010,19 @@ labeled_inst:
    | ENDNAMESPACE IDENTIFIER         { pop_namespace($2); }
    | LOCAL           { is_def=1; } type id_list
      {
-        IdList* l = $4;
+         IdList* l = $4;
          while(l) {
              IdList* l1;
-             mk_ident(interp, l->id, $3);
+             if (l->unique_reg)
+                 mk_ident_ur(interp, l->id, $3);
+             else
+                 mk_ident(interp, l->id, $3);
              l1 = l;
              l = l->next;
              free(l1);
+         }
+         is_def=0; $$=0;
      }
-    is_def=0; $$=0;
-
-   }
    | LEXICAL STRINGC COMMA target
                     {
                        set_lexical(interp, $4, $2); $$ = 0;

@@ -275,6 +275,7 @@ SP              [ ]
 <emit,INITIAL>":anon"    return(ANON);
 <emit,INITIAL>":outer"   return(OUTER);
 <emit,INITIAL>":lex"     return(NEED_LEX);
+":unique_reg"  return(UNIQUE_REG);
 
 ".result"       return(RESULT);
 ".get_results"       return(GET_RESULTS);

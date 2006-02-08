@@ -196,14 +196,19 @@ Define a I<compilation unit> with the label B<identifier:>.
 
 Define a I<compilation unit> containing PASM code.
 
-=item .local <type> <identifier>
+=item .local <type> <identifier> [:unique_reg]
 
-=item .sym <type> <identifier>
+=item .sym <type> <identifier> [:unique_reg]
 
-Define a local name B<identifier> for this I<compilation unit> and of
-the given B<type>. You can define multiple identifiers of the same type by separating
-them with commas:
+Define a local name B<identifier> for this I<compilation unit> and of the
+given B<type>. You can define multiple identifiers of the same type by
+separating them with commas:
+
   .sym int i, j
+
+The optional C<:unique_reg> modifier will force the register allocator to
+associate the identifier with a unique register for the duration of the
+compilation unit.
 
 =item .lex <identifier>, <reg>
 
@@ -274,13 +279,13 @@ Directives used for Parrot Calling Conventions.
 At the top of a subroutine, declare a local variable, in the mannter
 of B<.local>, into which parameter(s) of the current subroutine should
 be stored. Available flags:
-C<:slurpy>, C<:optional>, and C<:opt_flag>.
+C<:slurpy>, C<:optional>, C<:opt_flag> and C<:unique_reg>.
 
 =item .param <reg> [:<flag> ...]
 
 At the top of a subroutine, specify where parameter(s) of the current
 subroutine should be stored.  Available flags:
-C<:slurpy>, C<:optional>, and C<:opt_flag>.
+C<:slurpy>, C<:optional>, C<:opt_flag> and C<:unique_reg>.
 
 =item .return <var> [:<flag> ...]
 

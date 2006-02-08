@@ -3,7 +3,7 @@
 # $Id$
 
 use strict;
-use Parrot::Test tests => 2;
+use Parrot::Test tests => 3;
 
 pir_output_is(<<'CODE', <<'OUT', "alligator");
 # if the side-effect of set_addr/continuation isn't
@@ -59,4 +59,25 @@ pir_output_is(<<'CODE', <<'OUT', "alligator 2 - r9629");
 CODE
 abc
 def
+OUT
+
+pir_2_pasm_is(<<'CODE', <<'OUT', ":unique_reg");
+.sub main
+    .param int i :unique_reg
+    .local int j :unique_reg
+    .local int k :unique_reg
+    i = 5
+    j = 2
+    k = j * 2
+.end
+CODE
+# IMCC does produce b0rken PASM files
+# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
+main:
+        get_params
+        set I0, 5
+        set I1, 2
+        mul I2, I1, 2
+        set_returns
+        returncc
 OUT

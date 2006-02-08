@@ -22,7 +22,8 @@ enum VARTYPE {		/* variable type can be */
     VT_SLICE_BITS  = PF_VT_SLICE_BITS,
     VT_ENCODED   = 1 << 16,     /* unicode string constant */
     VT_OPT_FLAG  = 1 << 17,	/* var :opt_flag */
-    VT_NAMED     = 1 << 18 	/* var :named(name) */
+    VT_NAMED     = 1 << 18,	/* var :named(name) */
+    VT_UNIQUE_REG = 1 << 19
 };
 
 /* this VARTYPE needs register allocation and such */
@@ -109,6 +110,7 @@ struct _IMC_Unit;
 SymReg * mk_symreg(Interp *, char *, int t);
 SymReg * mk_temp_reg(Interp *, int t);
 SymReg * mk_ident(Interp *, char *, int t);
+SymReg * mk_ident_ur(Interp *, char *, int t);
 SymReg * mk_const(Interp *, char *, int t);
 SymReg * mk_const_ident(Interp *, char *, int t, SymReg *, int);
 

@@ -15,6 +15,7 @@
 
 typedef struct _IdList {
     char* id;
+    int unique_reg;
     struct _IdList*  next;
 } IdList;
 
