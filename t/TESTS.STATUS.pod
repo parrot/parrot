@@ -56,10 +56,7 @@ B<Fair>. There are tests for basic operation, however these tests are spread
 throughout the test suite, and are not comprehensive. We can assume basic
 operation is well-tested, otherwise the compiler, optimizer, and interpreter
 probably wouldn't work very well.
-
-=item Location
-
-B<t/compilers/imcc/syn/>, and others.
+Tests under B<t/compilers/imcc/syn/>, and others.
 
 =back
 
@@ -81,13 +78,8 @@ This rearranges B<PASM> code to make it run faster.
 
 =item Status
 
-B<TBD>. Tests exist, but coverage has not been evaluated.
-
-=item Location
-
-B<t/compilers/imcc/imcparser/>
-
-=back
+B<Good>. Most optimizations are well-tested.
+Tests under B<t/compilers/imcc/imcpasm/>.
 
 =head3 Interpreter
 
@@ -114,11 +106,13 @@ B<Good>. Most operators are well-tested. Tests under B<t/op/>.
 
 =item IO
 
-B<TBD>. Tests exist, but coverage has not been evaluated.
+B<Fair>. Tests exist, but do not run on all platforms, and do not test
+some important cases. Tests in B<t/pmc/io.t> and B<t/src/io.t>.
 
 =item Dynamic PMCs
 
-B<TBD>. Tests exist, but coverage has not been evaluated.
+B<Poor>. Some dynamic PMCs do not have test files. Coverage in existing
+test files is far from complete. Tests under B<t/dynpmc/>.
 
 =item Dynamic ops
 
@@ -127,7 +121,7 @@ weak. Tests under B<t/dynops/>.
 
 =item Packfiles
 
-B<TBD>. Tests exist, but coverage has not been evaluated.
+B<Poor>. All packfile tests have been skipped. Tests under B<t/native_pbc>.
 
 =back
 
@@ -139,7 +133,8 @@ B<TBD>. Tests exist, but coverage has not been evaluated.
 
 =item Status
 
-B<TBD>. Tests exist, but coverage has not been evaluated.
+B<Poor>. Some runtime libraries are tested, while others are not. No tests
+exist for include files. Tests under B<t/library/>.
 
 =back
 
@@ -150,7 +145,7 @@ B<TBD>. Tests exist, but coverage has not been evaluated.
 =item Status
 
 B<Poor>. Tests exist, but do not yet cover basic functionality of all
-components.
+components. Tests under B<t/configure/>.
 
 =back
 
@@ -161,7 +156,7 @@ components.
 =item Status
 
 B<Poor>. Few tests exist, and coverage is poor. However, the test suite
-*seems* to run fine, giving a false sense of security.
+I<seems> to run fine, giving a false sense of security.
 
 =back
 
@@ -171,7 +166,9 @@ B<Poor>. Few tests exist, and coverage is poor. However, the test suite
 
 =item Status
 
-B<TBD>. Tests exist, but coverage has not been evaluated.
+B<Fair>. Opcode documentation is well-tested, and Pod files are checked
+for standards-conformance, but many documentation tests are missing.
+Tests under B<t/doc>.
 
 =back
 
@@ -193,7 +190,7 @@ B<t/examples/> and B<t/benchmark/>.
 
 =item Status
 
-B<Poor>. Few tests exist, and coverage is sparse.
+B<Poor>. Few tests exist, and coverage is sparse. Tests under B<t/tools/>.
 
 =back
 

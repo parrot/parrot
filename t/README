@@ -1,18 +1,19 @@
 # Copyright: 2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
-This directory contains the Parrot test suite. 
-For details see the documentation in 'docs/tests.pod'.
+This directory contains the Parrot test suite.
+For details, see the documentation in 'docs/tests.pod'.
+For status of the testing effort, see 'TESTS.STATUS.pod' in this directory.
 
 benchmark:    Run all benchmarks
 
 compilers:    Mini languages distributed with Parrot
 
-configure:    Configuration subsystem 
+configure:    Configuration subsystem
 
-distro:       Contains currently only a check for sanity of MANIFEST.SKIP
+distro:       Tests run before a distro is released
 
-doc:          Completeness and sanity of the documentations
+doc:          Completeness and sanity of the documentation
 
 dynpmc:       Dynamic PMCs
 
@@ -22,7 +23,7 @@ library:      Parrot modules
 
 native_pbc:   Parrot Byte Code
 
-op:           Try to cover all ops
+op:           Try to cover all core operators
 
 perl:         Tests written in Perl5. XXX Is this a meaningful category?
 
