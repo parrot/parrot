@@ -36,7 +36,7 @@ Initialize the attributes for an instance of the class
   .param int register_num
 
   .local string pir_code
-  pir_code = ""
+  pir_code = "# lib/tclops.pir :: compile\n"
 
   .local pmc retval
   retval = new .TclInt

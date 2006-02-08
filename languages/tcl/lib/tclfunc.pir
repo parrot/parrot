@@ -152,6 +152,7 @@ func_tanh:
 done:
   .local string format
   format = <<"END_PIR"
+# lib/tclfunc.pir :: compile
 $N%i=$P%i
 $N%i=%s $N%i
 $P%i=new .TclFloat

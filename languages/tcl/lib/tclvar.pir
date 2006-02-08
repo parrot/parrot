@@ -24,6 +24,7 @@ Define the attributes required for the class.
     .local string pir_code
     .local string template
     template = <<"END_PIR"
+# lib/tclvar.pir :: compile
 .local pmc read
 read = find_global '_Tcl', '__read'
 $P%i = read("%s")

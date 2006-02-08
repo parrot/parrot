@@ -16,7 +16,7 @@
   .param int register_num
 
   .local string pir_code,temp_code
-  pir_code = ""
+  pir_code = "# lib/tclcommandlist.pir :: compile\n"
 
   .local pmc retval
   .local int i, elems

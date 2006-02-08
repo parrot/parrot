@@ -32,7 +32,7 @@ Define the attributes required for the class.
    compile = find_global "_Tcl", "compile_dispatch"
 
    .local string pir_code, args, inlined, dynamic, invalid, error
-   pir_code = ""
+   pir_code = "# lib/tclcommand.pir :: compile\n"
    args     = ""
    inlined  = ""
    dynamic  = ""

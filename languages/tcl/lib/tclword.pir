@@ -30,7 +30,7 @@ Define the attributes required for the class.
   len = self
   
   .local string pir_code,temp_code
-  pir_code = ""
+  pir_code = "# lib/tclword.pir :: compile\n"
   .local pmc compiled_args
   compiled_args = new .TclList
 

@@ -79,6 +79,7 @@ set_args:
 
    .local string template
    template = <<"END_PIR"
+# lib/compiler.pir :: compile_dispatch
 $P%i = new .%s
 $P%i=%s%s%s
 END_PIR
@@ -136,6 +137,7 @@ done_init:
   # The library bits that they'll need.
 
   stub_code = <<"END_PIR"
+# lib/compiler.pir :: pir_compiler (1)
 .sub _dynlexload :immediate
 $P1=loadlib 'dynlexpad'
 .end
@@ -157,6 +159,7 @@ END_PIR
   # conflicts with the parser itself.
 
   stub_code = <<"END_PIR"
+# lib/compiler.pir :: pir_compiler (2)
 .pragma n_operators 1
 .sub compiled_tcl_sub%i :anon
 .include "languages/tcl/lib/returncodes.pir"
