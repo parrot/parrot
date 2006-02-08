@@ -1426,9 +1426,15 @@ Parrot_ord_i_sc_i {
 ; which adds unneeded overhead - convert to normal ops
 ; or just JIT the 2 easy ones
 Parrot_set_args_pc {
-    Parrot_jit_emit_get_INTERP(jit_info->native_ptr, emit_EAX);
-    emitm_movl_i_m(NATIVECODE, jit_info->cur_op, emit_EAX, emit_None, 1,
-            offsetof(Interp, current_args));
+    if (jit_info->code_type == JIT_CODE_FILE) {
+        Parrot_jit_emit_get_INTERP(jit_info->native_ptr, emit_EAX);
+        emitm_movl_i_m(NATIVECODE, jit_info->cur_op, emit_EAX, emit_None, 1,
+                offsetof(Interp, current_args));
+    }
+    else  {
+        jit_set_args_pc(jit_info, interpreter, 
+            jit_info->flags & JIT_CODE_RECURSIVE);
+    }
 }
 
 extern Parrot_set_returns_pc {
@@ -1446,7 +1452,7 @@ extern Parrot_returncc {
     else {
         /* restore pushed regs if any */
         if (!(jit_info->flags & JIT_CODE_RECURSIVE)) {
-            jit_restore_regs(jit_info, interpreter);
+            jit_restore_regs(jit_info, interpreter, -1);
             emitm_movl_m_r(NATIVECODE, emit_EAX, emit_EBP, emit_None, 1, 16);
             /* retval = pc is at 4 + n_args * 4 */
             emitm_movl_m_r(NATIVECODE, emit_EAX, emit_EAX, emit_None, 1, 
@@ -1455,6 +1461,35 @@ extern Parrot_returncc {
         }
         emitm_ret(NATIVECODE);
     }
+}
+
+Parrot_pic_callr___pc {
+    int offset, here, op_i;
+    struct PackFile_Constant ** constants;
+    PMC *sig_params, *sig_result;
+    opcode_t *params;
+    int skip;
+
+    constants = CONTEXT(interpreter->ctx)->constants;
+    params = jit_info->optimizer->sections->begin;
+    sig_params = constants[params[1]]->u.key;
+    op_i = 2 + PMC_int_val(sig_params);
+
+    offset = jit_info->arena.op_map[op_i].offset;
+    /* TODO preserve necessary regs */
+    assert(*CUR_OPCODE == PARROT_OP_get_results_pc);
+    constants = CONTEXT(interpreter->ctx)->constants;
+    sig_result = constants[CUR_OPCODE[1]]->u.key;
+    if (!PMC_int_val(sig_result))
+        skip = -1;
+    else 
+        skip = MAP(2);      /* skip result - save rest */
+    jit_save_regs(jit_info, interpreter, skip);
+
+    here = NATIVECODE - jit_info->arena.start;
+    emitm_calll(NATIVECODE, offset - here - 5);
+
+    jit_restore_regs(jit_info, interpreter, skip);
 }
 
 extern Parrot_get_params_pc {
@@ -1466,11 +1501,24 @@ extern Parrot_get_params_pc {
 }
 
 Parrot_get_results_pc {
-    Parrot_jit_emit_get_INTERP(jit_info->native_ptr, emit_EAX);
-    emitm_movl_m_r(NATIVECODE, emit_EAX, emit_EAX, emit_None, 1,
-            offsetof(Interp, ctx.state));
-    emitm_movl_i_m(NATIVECODE, jit_info->cur_op, emit_EAX, emit_None, 1,
-            offsetof(parrot_context_t, current_results));
+    if (jit_info->code_type == JIT_CODE_FILE) {
+        Parrot_jit_emit_get_INTERP(jit_info->native_ptr, emit_EAX);
+        emitm_movl_m_r(NATIVECODE, emit_EAX, emit_EAX, emit_None, 1,
+                offsetof(Interp, ctx.state));
+        emitm_movl_i_m(NATIVECODE, jit_info->cur_op, emit_EAX, emit_None, 1,
+                offsetof(parrot_context_t, current_results));
+    }
+    else {
+        struct PackFile_Constant ** constants;
+        PMC *sig_result;
+
+        constants = CONTEXT(interpreter->ctx)->constants;
+        sig_result = constants[CUR_OPCODE[1]]->u.key;
+        if (!PMC_int_val(sig_result))
+            return;
+        /* result is eax TODO Nums */
+        jit_emit_mov_rr_i(NATIVECODE, MAP(2), emit_EAX);
+    }
 }
 ; TODO or,and,not,cmp
 

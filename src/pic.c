@@ -592,7 +592,7 @@ is_pic_func(Interp *interpreter, void **pc, Parrot_MIC *mic, int core_type)
         /* TODO pass Sub */
 
         jit_info = parrot_build_asm(interpreter, start, end, NULL,
-            JIT_CODE_SUB_REGS_ONLY);
+            JIT_CODE_SUB_REGS_ONLY_REC);
         if (!jit_info)
             return 0;
         

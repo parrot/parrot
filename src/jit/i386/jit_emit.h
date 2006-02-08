@@ -2783,8 +2783,31 @@ jit_get_params_pc(Parrot_jit_info_t *jit_info, Interp * interpreter)
                 1, 4 + i*4);
 }
 
+/*
+ * preserve registers
+ * a) all callee saved on function entry (skip == -1)
+ * b) all used register around a call (skip >= 0 := return result
+ *    TODO save N regs for b) too
+ */
 static void 
-jit_restore_regs(Parrot_jit_info_t *jit_info, Interp * interpreter)
+jit_save_regs(Parrot_jit_info_t *jit_info, Interp * interpreter, int skip)
+{
+    int i, used_i, save_i;
+    const jit_arch_regs *reg_info;
+
+    used_i = CONTEXT(interpreter->ctx)->n_regs_used[REGNO_INT];
+    reg_info = &jit_info->arch_info->regs[jit_info->code_type]; 
+    save_i = skip >= 0 ? 0 : reg_info->n_preserved_I;
+    for (i = save_i; i < used_i; ++i) {
+        if (reg_info->map_I[i] == skip)
+            continue;
+        emitm_pushl_r(jit_info->native_ptr, reg_info->map_I[i]);
+    }
+}
+
+/* restore saved regs, see above */
+static void 
+jit_restore_regs(Parrot_jit_info_t *jit_info, Interp * interpreter, int skip)
 {
 
     int i, used_i, save_i;
@@ -2792,10 +2815,13 @@ jit_restore_regs(Parrot_jit_info_t *jit_info, Interp * interpreter)
 
     used_i = CONTEXT(interpreter->ctx)->n_regs_used[REGNO_INT];
     reg_info = &jit_info->arch_info->regs[jit_info->code_type]; 
-    save_i = reg_info->n_preserved_I;
-    /* note - reversed order of Parrot_jit_begin_sub_regs */
-    for (i = used_i - 1; i >= save_i; --i)
+    save_i = skip >= 0 ? 0 : reg_info->n_preserved_I;
+    /* note - reversed order of jit_save_regs  */
+    for (i = used_i - 1; i >= save_i; --i) {
+        if (reg_info->map_I[i] == skip)
+            continue;
         emitm_popl_r(jit_info->native_ptr, reg_info->map_I[i]);
+    }
 }
 
 static void
@@ -2806,6 +2832,8 @@ jit_set_returns_pc(Parrot_jit_info_t *jit_info, Interp * interpreter,
     INTVAL *sig_bits, sig;
 
     sig_pmc = CONTEXT(interpreter->ctx)->constants[CUR_OPCODE[1]]->u.key;
+    if (!PMC_int_val(sig_pmc))
+        return;
     sig_bits = PMC_data(sig_pmc);
     sig = sig_bits[0];
     if (!recursive) {
@@ -2833,10 +2861,55 @@ jit_set_returns_pc(Parrot_jit_info_t *jit_info, Interp * interpreter,
             }
             break;
         default:
-            internal_exception(1, "set_returns_jit - unknown tyep");
+            internal_exception(1, "set_returns_jit - unknown typ");
             break;
     }
 }
+
+static void
+jit_set_args_pc(Parrot_jit_info_t *jit_info, Interp * interpreter, 
+        int recursive)
+{
+    PMC *sig_args, *sig_params;
+    INTVAL *sig_bits, sig, i, n;
+    struct PackFile_Constant ** constants;
+    opcode_t *params;
+    char params_map;
+
+    if (!recursive) {
+        /* create args array */
+        internal_exception(1, "set_args_jit - can't do that yet ");
+    }
+
+    constants = CONTEXT(interpreter->ctx)->constants;
+    sig_args = constants[CUR_OPCODE[1]]->u.key;
+    if (!PMC_int_val(sig_args))
+        return;
+    params = jit_info->optimizer->sections->begin;
+    sig_params = constants[params[1]]->u.key;
+    assert(PObj_is_PMC_TEST(sig_params));
+    assert(sig_params->vtable->base_type == enum_class_FixedIntegerArray);
+    sig_bits = PMC_data(sig_args);
+    n = PMC_int_val(sig_args);  
+    for (i = 0; i < n; ++i) {
+        sig = sig_bits[i];
+        /* move args to params regs */
+        params_map = jit_info->optimizer->map_branch[2 + i];
+        /* TODO check for overlaps/collision */
+        switch (sig & (PARROT_ARG_TYPE_MASK|PARROT_ARG_CONSTANT)) {
+            case PARROT_ARG_INTVAL:
+                jit_emit_mov_rr_i(NATIVECODE, params_map, MAP(2 + i));
+                break;
+            case PARROT_ARG_INTVAL|PARROT_ARG_CONSTANT:
+                jit_emit_mov_ri_i(NATIVECODE, params_map, CUR_OPCODE[2 + i]);
+                break;
+            default:
+                internal_exception(1, "set_args_jit - unknown typ");
+                break;
+        }
+    }
+}
+
 #if JIT_EMIT == 0
 
 static void
@@ -3023,9 +3096,6 @@ static void
 Parrot_jit_begin_sub_regs(Parrot_jit_info_t *jit_info,
                  Interp * interpreter)
 {
-    int i, used_i, save_i;
-    const jit_arch_regs *reg_info;
-    
     jit_emit_stack_frame_enter(jit_info->native_ptr);
     /* stack:
      *  16   args
@@ -3040,11 +3110,7 @@ Parrot_jit_begin_sub_regs(Parrot_jit_info_t *jit_info,
      * check register usage of the subroutine
      * how many we have to preserve
      */ 
-    used_i = CONTEXT(interpreter->ctx)->n_regs_used[REGNO_INT];
-    reg_info = &jit_info->arch_info->regs[jit_info->code_type]; 
-    save_i = reg_info->n_preserved_I;
-    for (i = save_i; i < used_i; ++i)
-        emitm_pushl_r(jit_info->native_ptr, reg_info->map_I[i]);
+    jit_save_regs(jit_info, interpreter, -1);
     /* when it's a recursive sub, we fetch params to registers
      * and all a inner helper sub, which run with registers only
      */
@@ -3064,7 +3130,7 @@ Parrot_jit_begin_sub_regs(Parrot_jit_info_t *jit_info,
         emitm_movl_m_r(NATIVECODE, emit_EAX, emit_EDX, emit_None, 1, 
                     4 + jit_info->n_args * 4);
         /* restore pushed callee saved */
-        jit_restore_regs(jit_info, interpreter);
+        jit_restore_regs(jit_info, interpreter, -1);
         jit_emit_stack_frame_leave(NATIVECODE);
         emitm_ret(NATIVECODE);
         /* fixup call statement */

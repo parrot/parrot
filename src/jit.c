@@ -192,11 +192,15 @@ make_branch_list(Interp *interpreter,
         /* if op_info->jump is not 0 this opcode may jump,
          * so mark this opcode as a branch source */
         rel_offset = cur_op - code_start;
-        if (op_info->jump)
-            branch[rel_offset] |= JIT_BRANCH_SOURCE;
 
         n = op_info->op_count;
 
+        if (op == PARROT_OP_set_args_pc ||
+                op == PARROT_OP_set_returns_pc ||
+                op == PARROT_OP_get_results_pc)
+            goto no_branch;    
+        if (op_info->jump)
+            branch[rel_offset] |= JIT_BRANCH_SOURCE;
         for (i = 1; i < n; ++i) {
             /* If it's not a constant, no joy */
             if (op_info->types[i-1] == PARROT_ARG_IC && op_info->labels[i-1]) {
@@ -241,6 +245,7 @@ make_branch_list(Interp *interpreter,
              */
             optimizer->has_unpredictable_jump = 1;
         }
+no_branch:
         /* Move to the next opcode */
         ADD_OP_VAR_PART(interpreter, interpreter->code, cur_op, n);
         cur_op += n;
@@ -1410,6 +1415,8 @@ parrot_build_asm(Interp *interpreter,
     if (jit_type == JIT_CODE_SUB_REGS_ONLY) {
         op_func[PARROT_OP_set_returns_pc].extcall = 0;
         op_func[PARROT_OP_get_params_pc].extcall = 0;
+        op_func[PARROT_OP_get_params_pc].extcall = 0;
+        op_func[PARROT_OP_invokecc_p].extcall = 0;
     }
     /* get register mappings and such */
     arch_info = jit_info->arch_info = Parrot_jit_init(interpreter);
@@ -1609,6 +1616,34 @@ parrot_build_asm(Interp *interpreter,
             jit_info->op_i += n;
             jit_info->cur_op += n;
 
+            if (*jit_info->prev_op == PARROT_OP_set_args_pc &&
+                    jit_type == JIT_CODE_SUB_REGS_ONLY) {
+                assert(*cur_op == PARROT_OP_set_p_pc);
+                cur_op += 3;    /* skip it */
+                jit_info->op_i += 3;
+                jit_info->cur_op += 3;
+                jit_info->arena.op_map[jit_info->op_i].offset =
+                    jit_info->native_ptr - jit_info->arena.start;
+                assert(*cur_op == PARROT_OP_get_results_pc);
+                /* now emit the call - use special op for this */
+                (op_func[PARROT_OP_pic_callr___pc].fn)(jit_info, interpreter);
+                /* and the get_results */
+                (op_func[*cur_op].fn)(jit_info, interpreter);
+                op_info = &interpreter->op_info_table[*cur_op];
+                n = op_info->op_count;
+                ADD_OP_VAR_PART(interpreter, interpreter->code, cur_op, n);
+                cur_op += n;
+                /* update op_i and cur_op accordingly */
+                jit_info->op_i += n;
+                jit_info->cur_op += n;
+                jit_info->arena.op_map[jit_info->op_i].offset =
+                    jit_info->native_ptr - jit_info->arena.start;
+                /* now at invoke */
+                assert(*cur_op == PARROT_OP_invokecc_p);
+                cur_op += 2;    /* skip it */
+                jit_info->op_i += 2;
+                jit_info->cur_op += 2;
+            }
             /* if this is a branch target, align it */
 #ifdef jit_emit_noop
 #  if JUMP_ALIGN
@@ -1629,7 +1664,6 @@ parrot_build_asm(Interp *interpreter,
         /* Save mapped registers back to the Parrot registers */
         if (!jit_seg && cur_section->isjit && needs_fs)
             Parrot_jit_save_registers(jit_info, interpreter, 0);
-
         /* update the offset for saved registers */
         jit_info->arena.op_map[jit_info->op_i].offset =
             jit_info->native_ptr - jit_info->arena.start;
