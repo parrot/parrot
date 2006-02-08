@@ -2910,6 +2910,32 @@ jit_set_args_pc(Parrot_jit_info_t *jit_info, Interp * interpreter,
     }
 }
 
+/*
+ * if jit_emit_noop is defined, it does align a jump target
+ * to 1 << JUMP_ALIGN
+ * It may emit exactly one byte, or some desired padding.
+ * The instructions must perform like a noop.
+ *
+ * Alignment effects seem to be rather processor specific and
+ * it's not quite clear if the branch src or target should be
+ * aligned. Turned off for now.
+ *
+ * s. also info gcc /align-jump
+ *
+ * noop; mov %esi, %esi; lea 0(%esi), %esi
+ */
+
+#  define jit_emit_noop(pc) do { \
+     switch ( ((unsigned long) pc) & 3) { \
+       case 1: *pc++ = (char) 0x8d; *pc++ = (char) 0x76; *pc++ = (char) 0x00; break; \
+       case 2: *pc++ = (char) 0x89; *pc++ = (char) 0xf6; break; \
+       case 3: *pc++ = (char) 0x90; break; \
+     } \
+   } while (0)
+
+#  define JUMP_ALIGN 0
+#  define SUB_ALIGN 0
+
 #if JIT_EMIT == 0
 
 static void
@@ -3133,6 +3159,12 @@ Parrot_jit_begin_sub_regs(Parrot_jit_info_t *jit_info,
         jit_restore_regs(jit_info, interpreter, -1);
         jit_emit_stack_frame_leave(NATIVECODE);
         emitm_ret(NATIVECODE);
+        /* align the inner sub */
+#  if SUB_ALIGN
+        while ((long)jit_info->native_ptr & ((1<<SUB_ALIGN) - 1)) {
+            jit_emit_noop(jit_info->native_ptr);
+        }
+#  endif
         /* fixup call statement */
         L1[1] = NATIVECODE - L1 - 5;
     }
@@ -3748,27 +3780,6 @@ Parrot_jit_init(Interp *interpreter)
     return &arch_info;
 }
 
-/*
- * if jit_emit_noop is defined, it does align a jump target
- * to 1 << JUMP_ALIGN
- * It may emit exactly one byte, or some desired padding.
- * The instructions must perfomr like a noop.
- *
- *
- * s. also info gcc /align-jump
- *
- * noop; mov %esi, %esi; lea 0(%esi), %esi
- */
-
-#  define jit_emit_noop(pc) do { \
-     switch ( ((unsigned long) pc) & 3) { \
-       case 1: *pc++ = (char) 0x8d; *pc++ = (char) 0x76; *pc++ = (char) 0x00; break; \
-       case 2: *pc++ = (char) 0x89; *pc++ = (char) 0xf6; break; \
-       case 3: *pc++ = (char) 0x90; break; \
-     } \
-   } while (0)
-
-#  define JUMP_ALIGN 2
 
 /* registers are either allocate per section or per basic block
  * set this to 1 or 0 to change allocation scheme
