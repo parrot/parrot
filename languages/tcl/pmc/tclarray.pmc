@@ -12,7 +12,7 @@
 
 =head1 NAME
 
-classes/tclarray.pmc - Tcl Array PMC
+pmc/tclarray.pmc - Tcl Array PMC
 
 =head1 DESCRIPTION
 

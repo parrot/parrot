@@ -4,7 +4,7 @@ $Id$
 
 =head1 NAME
 
-classes/tcllist.pmc - Tcl List
+pmc/tcllist.pmc - Tcl List
 
 =head1 DESCRIPTION
 
