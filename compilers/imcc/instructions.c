@@ -234,8 +234,19 @@ instruction_writes(Instruction* ins, SymReg* r) {
      * but for the register allocator, the effect matters, thus
      * postpone the effect after the invoke
      */
-    if (ins->opnum == PARROT_OP_get_results_pc) 
+    if (ins->opnum == PARROT_OP_get_results_pc) {
+        /* but only, if it isn't the get_results opcode of
+         * an exception_handler, which doesn't have
+         * a call next
+         */
+        if (ins->next && (ins->next->type & ITPCCSUB)) 
+            return 0;
+        for (i = 0; i < ins->n_r; i++) {
+            if (ins->r[i] == r)
+                return 1;
+        }
         return 0;
+    }
     else if (ins->type & ITPCCSUB) {
         ins = ins->prev;
         /* can't used pcc_sub->ret due to bug #38406

@@ -865,6 +865,7 @@ process_args(Interp *interpreter, struct call_state *st,
                     st->dest.sig & PARROT_ARG_SLURPY_ARRAY) {
                 /* create array */
                 idx = st->dest.u.op.pc[st->dest.i];
+                assert(idx >= 0);
                 create_slurpy_ar(interpreter, st, idx);
             }
             /* positional src -> named src */
@@ -919,6 +920,7 @@ process_args(Interp *interpreter, struct call_state *st,
             case CALL_STATE_POS_NAMED: 
                 Parrot_convert_arg(interpreter, st);
                 idx = st->dest.u.op.pc[st->dest.i];
+                assert(idx >= 0);
                 store_arg(st, idx);
                 break;
             case CALL_STATE_NAMED_NAMED_OPT: 
@@ -928,6 +930,7 @@ process_args(Interp *interpreter, struct call_state *st,
                 opt_flag = 1;
 store_opt:
                 idx = st->dest.u.op.pc[st->dest.i];
+                assert(idx >= 0);
                 store_arg(st, idx);
                 /* :opt_flag is truely optional */
                 if (!next_arg(interpreter, &st->dest)) {
@@ -943,6 +946,7 @@ store_opt:
                 }
                 --st->params;
                 idx = st->dest.u.op.pc[st->dest.i];
+                assert(idx >= 0);
                 CTX_REG_INT(st->dest.ctx, idx) = opt_flag;
                 if (!(state & CALL_STATE_x_NAMED))
                     st->dest.mode |= CALL_STATE_NEXT_ARG;
@@ -1037,6 +1041,7 @@ Parrot_store_arg(Interp *interpreter, struct call_state *st)
         return 0;
     assert(st->dest.mode & CALL_STATE_OP);
     idx = st->dest.u.op.pc[st->dest.i];
+    assert(idx >= 0);
     switch (st->dest.sig & PARROT_ARG_TYPE_MASK) {
         case PARROT_ARG_INTVAL:
             CTX_REG_INT(st->dest.ctx, idx) = UVal_int(st->val);

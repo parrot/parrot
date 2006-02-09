@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 28;
+use Parrot::Test tests => 29;
 
 =head1 NAME
 
@@ -74,6 +74,27 @@ main
 caught it
 Exception
 just pining
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "get_results - be sure registers are ok");
+# see also #38459
+    print "main\n"
+    new P0, .Integer
+    push_eh handler
+    new P1, .Exception
+    set P1[0], "just pining"
+    throw P1
+    print "not reached\n"
+    end
+handler:
+    get_results "(0,0)", P1, S0
+    inc P0
+    print "ok\n"
+    end
+
+CODE
+main
+ok
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', ".get_results() - PIR");
