@@ -339,3 +339,6 @@ N      JO
 v      JON
 P      JOi
 v      JOI
+
+# Make lua stop panic'ing.
+P      JOI
