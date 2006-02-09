@@ -480,53 +480,14 @@ is_pic_param(Interp *interpreter, void **pc, Parrot_MIC* mic, opcode_t op)
     return 1;
 }
 
-#if PIC_TEST
-/*
- * just for testing the whole scheme ...
-
-
-.sub main :main
-    .local int i
-    i = 32
-    i = __pic_test(i, 10)
-    print i
-    print "\n"
-.end
-.sub __pic_test
-    .param int i
-    .param int j
-    $I0 = i + j
-    .return ($I0)
-.end
-... prints 42, if PIC_TEST is 1, because the C function is called
-    with -C and -S runcores.
-*/
-
-static opcode_t *
-pic_test_func(Interp *interpreter, INTVAL *sig_bits, void **args)
-{
-    opcode_t *pc;
-    INTVAL *result, i, j;
-
-    result = (INTVAL*) args[0];
-    i = (INTVAL) args[1];
-    j = (INTVAL) args[2];
-    *result = i + j;
-    pc = args[3];
-    return pc;
-}
-#endif
 
 static int
 is_pic_func(Interp *interpreter, void **pc, Parrot_MIC *mic, int core_type)
 {
-    PMC *sub, *sig;
+    PMC *sub, *sig_args, *sig_results;
     char *base;
     parrot_context_t *ctx;
     opcode_t *op, n;
-#if PIC_TEST
-    STRING *name;
-#endif
     
     /*
      * if we have these opcodes
@@ -548,9 +509,9 @@ is_pic_func(Interp *interpreter, void **pc, Parrot_MIC *mic, int core_type)
 
     base = (char*)interpreter->ctx.bp.regs_i;
     ctx = CONTEXT(interpreter->ctx);
-    sig = (PMC*)(pc[1]);
-    ASSERT_SIG_PMC(sig);
-    n = SIG_ELEMS(sig);
+    sig_args = (PMC*)(pc[1]);
+    ASSERT_SIG_PMC(sig_args);
+    n = SIG_ELEMS(sig_args);
     interpreter->current_args = (opcode_t*)pc + ctx->pred_offset;
     pc += 2 + n;
     op = (opcode_t*)pc + ctx->pred_offset;
@@ -566,42 +527,15 @@ is_pic_func(Interp *interpreter, void **pc, Parrot_MIC *mic, int core_type)
     if (*op != PARROT_OP_get_results_pc)
         return 0;
     do_prederef(pc, interpreter, core_type);
-    ctx->current_results = (opcode_t*)pc + ctx->pred_offset;
-#if PIC_TEST
-    name = VTABLE_get_string(interpreter, sub);
-    if (memcmp((char*) name->strstart, "__pic_test", 10) == 0) {
-#if 0
-        mic->lru.f.real_function = (funcptr_t) pic_test_func;
-        mic->m.sig = sig;
-        return 1;
-#else
-#if HAS_JIT
-        /*
-         * create JIT code - just a test
-         */
-        Parrot_jit_info_t *jit_info;
-        opcode_t *base, *start, *end;
-        
-        base = interpreter->code->base.data;
-        start = base + PMC_sub(sub)->start_offs;
-        end   = base + PMC_sub(sub)->end_offs;
-        /* TODO pass Sub */
+    sig_results = (PMC*)(pc[1]);
+    ASSERT_SIG_PMC(sig_results);
 
-        jit_info = parrot_build_asm(interpreter, start, end, NULL,
-            JIT_CODE_SUB_REGS_ONLY_REC);
-        if (!jit_info)
-            return 0;
-        
-        mic->lru.f.real_function = (funcptr_t) jit_info->arena.start;
-        mic->m.sig = sig;
-        return 1;
-#else
+    ctx->current_results = (opcode_t*)pc + ctx->pred_offset;
+    if (!parrot_pic_is_save_to_jit(interpreter, sub, sig_args, sig_results))
         return 0;
-#endif
-#endif
-    }
-#endif
-    return 0;
+    mic->lru.f.real_function = parrot_pic_JIT_sub(interpreter, sub);
+    mic->m.sig = sig_args;
+    return 1;
 }
 
 void

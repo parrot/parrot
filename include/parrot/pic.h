@@ -80,6 +80,11 @@ void * parrot_pic_opcode(Interp *, INTVAL op);
 typedef int (*arg_pass_f)(Interp *, PMC *sig,
         char *src_base, void **src_pc, char *dest_base, void **dest_pc);
 
+int parrot_pic_is_save_to_jit(Interp *, PMC *sub,
+	PMC *sig_args, PMC *sig_results);
+
+funcptr_t  parrot_pic_JIT_sub(Interp *, PMC *sub);
+
 #endif /* PARROT_PIC_H_GUARD */
 
 /*
