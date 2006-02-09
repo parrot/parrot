@@ -275,7 +275,7 @@ CODE
 42
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "PASM INTVAL - new result");
+pasm_output_is(<<'CODE', <<'OUTPUT', "PASM INTVAL - new result");
 .include "pmctypes.pasm"
 .include "datatypes.pasm"
 .include "mmd.pasm"
@@ -302,7 +302,7 @@ ok
 1
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "PASM INTVAL - existing result");
+pasm_output_is(<<'CODE', <<'OUTPUT', "PASM INTVAL - existing result");
 .include "pmctypes.pasm"
 .include "datatypes.pasm"
 .include "mmd.pasm"
@@ -329,7 +329,7 @@ ok
 1
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "PASM INTVAL - mixed");
+pasm_output_is(<<'CODE', <<'OUTPUT', "PASM INTVAL - mixed");
 .include "pmctypes.pasm"
 .include "datatypes.pasm"
 .include "mmd.pasm"

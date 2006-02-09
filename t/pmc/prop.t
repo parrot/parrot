@@ -22,7 +22,7 @@ Tests property access on PMCs.
 
 =cut
 
-output_is(<<'CODE', <<'OUTPUT', "set/getprop");
+pasm_output_is(<<'CODE', <<'OUTPUT', "set/getprop");
     new P0, .Integer
     set P0, 10
     new P1, .String
@@ -46,7 +46,7 @@ ten
 zehn
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "Property values are references");
+pasm_output_is(<<'CODE', <<'OUTPUT', "Property values are references");
     new P0, .String
     new P1, .String
     set P0, "Dog"
@@ -74,7 +74,7 @@ No
 No
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "resetting a property");
+pasm_output_is(<<'CODE', <<'OUTPUT', "resetting a property");
     new P0, .PerlArray
     new P1, .String
     new P2, .String
@@ -99,7 +99,7 @@ Integer
 Float
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "getting a unset property");
+pasm_output_is(<<'CODE', <<'OUTPUT', "getting a unset property");
     new P1, .Float
     new P2, .Integer
 
@@ -113,7 +113,7 @@ CODE
 ok
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "delprop");
+pasm_output_is(<<'CODE', <<'OUTPUT', "delprop");
     new P0, .Integer
     set P0, 10
     new P1, .String
@@ -142,7 +142,7 @@ zehn
 -
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "prophash");
+pasm_output_is(<<'CODE', <<'OUTPUT', "prophash");
     new P0, .Integer
     set P0, 10
     new P1, .String
@@ -168,7 +168,7 @@ zehn
 -
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "new_init_props");
+pasm_output_is(<<'CODE', <<'OUTPUT', "new_init_props");
     new P1, .Hash
     new P2, .String
     set P2, "value"

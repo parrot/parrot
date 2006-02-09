@@ -68,7 +68,7 @@ my $fp_equality_macro = <<'ENDOFMACRO';
 .endm
 ENDOFMACRO
 
-output_is(<<'CODE', <<'OUTPUT', "newpmc");
+pasm_output_is(<<'CODE', <<'OUTPUT', "newpmc");
 	print "starting\n"
 	new P0, .PerlInt
 	print "ending\n"
@@ -78,21 +78,21 @@ starting
 ending
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "illegal min newpmc");
+pasm_output_is(<<'CODE', <<'OUTPUT', "illegal min newpmc");
 	new P0, 0
 	end
 CODE
 Illegal PMC enum (0) in new
 OUTPUT
 
-output_is(<<"CODE", <<"OUTPUT", "illegal max newpmc");
+pasm_output_is(<<"CODE", <<"OUTPUT", "illegal max newpmc");
 	new P0, $max_pmc
 	end
 CODE
 Illegal PMC enum ($max_pmc) in new
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "typeof");
+pasm_output_is(<<CODE, <<OUTPUT, "typeof");
     new P0,.PerlInt
     typeof S0,P0
     eq     S0,"PerlInt",OK_1
@@ -139,7 +139,7 @@ EOPASM
 CHECK
 }
 
-output_is(<<"CODE", <<OUTPUT, "PMC type check");
+pasm_output_is(<<"CODE", <<OUTPUT, "PMC type check");
     new P10, .Hash # Type id hash
     new P11, .Hash # Type name hash
 $checkTypes
@@ -174,7 +174,7 @@ CODE
 All names and ids ok.
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "assign Px,Py");
+pasm_output_is(<<'CODE', <<OUTPUT, "assign Px,Py");
     new P0, .PerlInt
     new P1, .PerlNum
     new P2, .PerlString
@@ -249,7 +249,7 @@ CODE
 666:666:666:666
 OUTPUT
 
-output_is(<<"CODE", <<OUTPUT, "exchange");
+pasm_output_is(<<"CODE", <<OUTPUT, "exchange");
 @{[ $fp_equality_macro ]}
 	new P0, .PerlInt
         new P1, .PerlInt
@@ -302,7 +302,7 @@ ok 5
 ok 6
 OUTPUT
 
-output_like(<<"CODE", <<'OUTPUT', "find_method");
+pasm_output_like(<<"CODE", <<'OUTPUT', "find_method");
 	new P1, .PerlInt
 	find_method P0, P1, "no_such_meth"
 	end
@@ -310,7 +310,7 @@ CODE
 /Method 'no_such_meth' not found/
 OUTPUT
 
-output_like(<<'CODE', <<'OUTPUT', "new with a native type");
+pasm_output_like(<<'CODE', <<'OUTPUT', "new with a native type");
         new P1, .INTVAL
 	print "never\n"
 	end
@@ -318,7 +318,7 @@ CODE
 /(unknown macro|unexpected DOT)/
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "bxor undef");
+pasm_output_is(<<'CODE', <<'OUTPUT', "bxor undef");
     new P0, .PerlUndef
     bxor P0, 0b00001111
     print  P0
@@ -336,7 +336,7 @@ CODE
 240
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "band undef");
+pasm_output_is(<<'CODE', <<'OUTPUT', "band undef");
     new P0, .PerlUndef
     band P0, 0b00001111
     print  P0
@@ -354,7 +354,7 @@ CODE
 0
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "eq_addr same");
+pasm_output_is(<<'CODE', <<'OUTPUT', "eq_addr same");
       new P0, .Integer
       set P1, P0
       eq_addr P0, P1, OK1
@@ -370,7 +370,7 @@ ok 1
 ok 2
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "eq_addr diff");
+pasm_output_is(<<'CODE', <<'OUTPUT', "eq_addr diff");
       new P0, .Integer
       new P1, .Integer
       ne_addr P0, P1, OK1
@@ -386,7 +386,7 @@ ok 1
 ok 2
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "if_null");
+pasm_output_is(<<'CODE', <<'OUTPUT', "if_null");
       null P0
       if_null P0, OK1
       print "not "
@@ -402,7 +402,7 @@ ok 1
 ok 2
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "Random PMCs are singletons");
+pasm_output_is(<<'CODE', <<'OUTPUT', "Random PMCs are singletons");
     new P0, .Random
     new P1, .Random
     eq_addr P0, P1, ok
@@ -413,7 +413,7 @@ CODE
 ok
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "issame");
+pasm_output_is(<<'CODE', <<'OUTPUT', "issame");
     new P0, .Undef
     new P1, .Undef
     set P1, P0
@@ -433,7 +433,7 @@ CODE
 OUTPUT
 
 SKIP: { skip("no instantiate", 1);
-output_is(<<'CODE', <<'OUTPUT', "instantiate - no args");
+pasm_output_is(<<'CODE', <<'OUTPUT', "instantiate - no args");
     getclass P2, "Integer"
     set I0, 0	# unproto
     set I3, 0	# no P args
@@ -451,7 +451,7 @@ Integer
 OUTPUT
 }
 
-output_is(<<'CODE', <<'OUT', ".const - Sub constant");
+pasm_output_is(<<'CODE', <<'OUT', ".const - Sub constant");
 .pcc_sub :main main:
     print "ok 1\n"
     .const .Sub P0 = "foo"
@@ -467,7 +467,7 @@ ok 2
 ok 3
 OUT
 
-output_is(<<'CODE', <<'OUT', "get_mro");
+pasm_output_is(<<'CODE', <<'OUT', "get_mro");
     new P0, .PerlInt
     get_mro P1, P0
     print "ok 1\n"
@@ -507,7 +507,7 @@ CODE
 42
 OUT
 
-output_is(<<'CODE', <<'OUT', "pmc constant PASM");
+pasm_output_is(<<'CODE', <<'OUT', "pmc constant PASM");
     .const .Integer P0 = "42"
     print P0
     print "\n"
@@ -516,7 +516,7 @@ CODE
 42
 OUT
 
-output_is(<<'CODE', <<'OUT', "logical or, and, xor");
+pasm_output_is(<<'CODE', <<'OUT', "logical or, and, xor");
     new P0, .Integer
     set P0, 2
     new P1, .Undef
@@ -542,7 +542,7 @@ ok 2
 ok 3
 OUT
 
-output_is(<<'CODE', <<'OUTPUT', "new_p_i_s");
+pasm_output_is(<<'CODE', <<'OUTPUT', "new_p_i_s");
     new P3, .Integer, "42"
     typeof S0, P3
     print S0

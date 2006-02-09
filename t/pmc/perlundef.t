@@ -113,7 +113,7 @@ CODE
 ab0c349c910xy1z
 OUTPUT
 
-output_is(<<"CODE", <<'OUTPUT', "undef-add");
+pasm_output_is(<<"CODE", <<'OUTPUT', "undef-add");
 @{[ $fp_equality_macro ]}
     new P1, .PerlUndef
 
@@ -151,7 +151,7 @@ CODE
 ok
 OUTPUT
 
-output_is(<<"CODE", <<'OUTPUT', "undef-subtract");
+pasm_output_is(<<"CODE", <<'OUTPUT', "undef-subtract");
 @{[ $fp_equality_macro ]}
     new P0, .PerlInt
     new P1, .PerlUndef
@@ -186,7 +186,7 @@ CODE
 ok
 OUTPUT
 
-output_is(<<"CODE", <<'OUTPUT', "undef-multiply");
+pasm_output_is(<<"CODE", <<'OUTPUT', "undef-multiply");
 @{[ $fp_equality_macro ]}
 
     new P0, .PerlInt
@@ -218,7 +218,7 @@ CODE
 0
 OUTPUT
 
-output_is(<<"CODE", <<'OUTPUT', "undef-divide");
+pasm_output_is(<<"CODE", <<'OUTPUT', "undef-divide");
     new P0, .PerlInt
     new P1, .PerlUndef
     new P2, .PerlInt
@@ -242,7 +242,7 @@ CODE
 0
 OUTPUT
 
-output_is(<<"CODE", <<'OUTPUT', "undef-string");
+pasm_output_is(<<"CODE", <<'OUTPUT', "undef-string");
     new P0, .PerlUndef
     set S0, P0
     eq S0, "", OK
@@ -253,7 +253,7 @@ CODE
 ok
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "arithmetic with PerlUndef and native ints");
+pasm_output_is(<<'CODE', <<OUTPUT, "arithmetic with PerlUndef and native ints");
     new P0, .PerlUndef
     add P0, 10
     set I1, P0
@@ -285,7 +285,7 @@ CODE
 0
 OUTPUT
 
-output_is(<<"CODE", <<OUTPUT, "arithmetic with PerlUndef and native floats");
+pasm_output_is(<<"CODE", <<OUTPUT, "arithmetic with PerlUndef and native floats");
 @{[ $fp_equality_macro ]}
     new P0, .PerlUndef
     add P0, 10.0
@@ -322,7 +322,7 @@ ok 3
 ok 4
 OUTPUT
 
-output_like(<<"CODE", <<'OUTPUT', "undef warning");
+pasm_output_like(<<"CODE", <<'OUTPUT', "undef warning");
     .include "warnings.pasm"
     warningson .PARROT_WARNINGS_UNDEF_FLAG
     new P0, .PerlUndef
@@ -333,7 +333,7 @@ CODE
 current instr\.: '\(null\)' pc (\d+|-1) /
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "bor undef");
+pasm_output_is(<<'CODE', <<'OUTPUT', "bor undef");
     new P0, .PerlUndef
     bor P0, 0b00001111
     print  P0

@@ -67,7 +67,7 @@ my $fp_equality_macro = <<'ENDOFMACRO';
 .endm
 ENDOFMACRO
 
-output_is(<<'CODE', <<'OUTPUT', "Setting array size");
+pasm_output_is(<<'CODE', <<'OUTPUT', "Setting array size");
 	new P0,.FixedPMCArray
 
 	set I0,P0
@@ -87,7 +87,7 @@ ok 1
 ok 2
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "Resetting array size (and getting an exception)");
+pasm_output_is(<<'CODE', <<'OUTPUT', "Resetting array size (and getting an exception)");
 	new P0, .FixedPMCArray
 
 	set I0,P0
@@ -102,7 +102,7 @@ FixedPMCArray: Can't resize!
 OUTPUT
 #VIM's syntax highlighter needs this line
 
-output_is(<<'CODE', <<'OUTPUT', "Truth and falsehood");
+pasm_output_is(<<'CODE', <<'OUTPUT', "Truth and falsehood");
         new P0, .FixedPMCArray
 
         set P0, 0
@@ -131,7 +131,7 @@ ok 3
 ok 4
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "Setting first element");
+pasm_output_is(<<'CODE', <<'OUTPUT', "Setting first element");
         new P0, .FixedPMCArray
         set P0, 1
 
@@ -160,7 +160,7 @@ ok 2
 ok 3
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "Setting second element");
+pasm_output_is(<<'CODE', <<'OUTPUT', "Setting second element");
         new P0, .FixedPMCArray
         set P0, 2
 
@@ -191,7 +191,7 @@ OUTPUT
 
 # TODO: Rewrite these properly when we have exceptions
 
-output_is(<<'CODE', <<'OUTPUT', "Setting out-of-bounds elements");
+pasm_output_is(<<'CODE', <<'OUTPUT', "Setting out-of-bounds elements");
         new P0, .FixedPMCArray
         set P0, 1
 
@@ -202,7 +202,7 @@ CODE
 FixedPMCArray: index out of bounds!
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "Getting out-of-bounds elements");
+pasm_output_is(<<'CODE', <<'OUTPUT', "Getting out-of-bounds elements");
         new P0, .FixedPMCArray
         set P0, 1
 
@@ -213,7 +213,7 @@ FixedPMCArray: index out of bounds!
 OUTPUT
 
 
-output_is(<<"CODE", <<'OUTPUT', "Set via PMC keys, access via INTs");
+pasm_output_is(<<"CODE", <<'OUTPUT', "Set via PMC keys, access via INTs");
 @{[ $fp_equality_macro ]}
      new P0, .FixedPMCArray
      set P0, 3
@@ -250,7 +250,7 @@ ok 2
 ok 3
 OUTPUT
 
-output_is(<<"CODE", <<'OUTPUT', "Set via INTs, access via PMC Keys");
+pasm_output_is(<<"CODE", <<'OUTPUT', "Set via INTs, access via PMC Keys");
 @{[ $fp_equality_macro ]}
      new P0, .FixedPMCArray
      set P0, 1024

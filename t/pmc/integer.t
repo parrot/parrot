@@ -287,7 +287,7 @@ CODE
 1
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "if/unless with Integer PMC");
+pasm_output_is(<<'CODE', <<'OUTPUT', "if/unless with Integer PMC");
       new P0, .Integer
       set P0, 10
       if P0, OK1

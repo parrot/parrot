@@ -22,7 +22,7 @@ Tests the thread queue.
 
 =cut
 
-output_is(<<'CODE', <<'OUT', "thread safe queue 1");
+pasm_output_is(<<'CODE', <<'OUT', "thread safe queue 1");
     new P10, .TQueue
     print "ok 1\n"
     set I0, P10

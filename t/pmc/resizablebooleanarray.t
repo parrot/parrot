@@ -340,7 +340,7 @@ CODE
 OUTPUT
 
 
-output_is(<<'CODE', <<'OUTPUT', "creation");
+pasm_output_is(<<'CODE', <<'OUTPUT', "creation");
         new P0, .ResizableBooleanArray
         set I0, P0
         print "Created ResizableBooleanArray with "
@@ -503,7 +503,7 @@ OUTPUT
 #'
 
 
-output_is(<<'CODE', <<'OUTPUT', "aerobics");
+pasm_output_is(<<'CODE', <<'OUTPUT', "aerobics");
         new P0, .ResizableBooleanArray
         set I10, 10000
 
@@ -616,7 +616,7 @@ OUTPUT
 
 
 my $SPEEDUP = $ENV{RUNNING_MAKE_TEST} ? "gc_debug 0\n" : "";
-output_is($SPEEDUP . <<'CODE', <<'OUTPUT', "direct access");
+pasm_output_is($SPEEDUP . <<'CODE', <<'OUTPUT', "direct access");
     new P0, .ResizableBooleanArray
     set S0, ""
     set S1, "abcdefghijklmnopqrst"
@@ -659,7 +659,7 @@ ok
 OUTPUT
 
 
-output_is(<<'CODE', <<'OUTPUT', "direct access 2");
+pasm_output_is(<<'CODE', <<'OUTPUT', "direct access 2");
     #new P0, .IntList
     new P0, .ResizableBooleanArray
     set I10, 1100000
@@ -719,7 +719,7 @@ ok
 OUTPUT
 
 
-output_is(<<'CODE', <<'OUTPUT', "sparse access");
+pasm_output_is(<<'CODE', <<'OUTPUT', "sparse access");
     new P0, .ResizableBooleanArray
        set I10, 110000
        set I0, 1
@@ -797,7 +797,7 @@ OUTPUT
 TODO: {
     local $TODO = "this is broken";
 
-output_is(<<'CODE', <<'OUTPUT', "check for zeroedness");
+pasm_output_is(<<'CODE', <<'OUTPUT', "check for zeroedness");
     new P0, .ResizableBooleanArray
     set I0, 0
 lp1:
@@ -827,7 +827,7 @@ ok
 OUTPUT
 
 
-output_is(<<'CODE', <<'OUTPUT', "pop into sparse");
+pasm_output_is(<<'CODE', <<'OUTPUT', "pop into sparse");
     new P0, .ResizableBooleanArray
        set I10, 100
        set I0, 0
@@ -900,7 +900,7 @@ ok
 OUTPUT
 
 
-output_is(<<'CODE', <<'OUTPUT', "clone");
+pasm_output_is(<<'CODE', <<'OUTPUT', "clone");
     new P0, .ResizableBooleanArray
        set P0[0], 1
        set P0[5000], 1

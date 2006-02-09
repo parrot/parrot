@@ -65,7 +65,7 @@ my $fp_equality_macro = <<'ENDOFMACRO';
 .endm
 ENDOFMACRO
 
-output_is(<<'CODE', <<'OUTPUT', "Setting sarray size");
+pasm_output_is(<<'CODE', <<'OUTPUT', "Setting sarray size");
 	new P0, .SArray
 	set I0, P0
 	eq I0, 0, OK_1
@@ -84,7 +84,7 @@ ok 1
 ok 2
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "attempt resize");
+pasm_output_is(<<'CODE', <<'OUTPUT', "attempt resize");
 	new P0, .SArray
 	set P0, 1
 	set P0[0], 100
@@ -101,7 +101,7 @@ SArray: Can't resize!
 OUTPUT
 # '
 
-output_is(<<'CODE', <<'OUTPUT', "indexed access");
+pasm_output_is(<<'CODE', <<'OUTPUT', "indexed access");
 	new P0, .SArray
 	set P0, 3
 	set P0[0], 100
@@ -141,7 +141,7 @@ ok 5
 ok 6
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "push");
+pasm_output_is(<<'CODE', <<'OUTPUT', "push");
 	new P0, .SArray
 	set P0, 3
 	push P0, 100
@@ -181,7 +181,7 @@ ok 5
 ok 6
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "push / indexed");
+pasm_output_is(<<'CODE', <<'OUTPUT', "push / indexed");
 	new P0, .SArray
 	set P0, 3
 	push P0, 100
@@ -221,7 +221,7 @@ ok 5
 ok 6
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "mixed indexed");
+pasm_output_is(<<'CODE', <<'OUTPUT', "mixed indexed");
 	new P0, .SArray
 	set P0, 4
 	set P0[0], 1000
@@ -254,7 +254,7 @@ string
 42
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "mixed push");
+pasm_output_is(<<'CODE', <<'OUTPUT', "mixed push");
 	new P0, .SArray
 	set P0, 4
 	push P0, 1000
@@ -287,7 +287,7 @@ string
 42
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "mixed push - clone");
+pasm_output_is(<<'CODE', <<'OUTPUT', "mixed push - clone");
 	new P2, .SArray
 	set P2, 4
 	push P2, 1000
@@ -322,7 +322,7 @@ string
 42
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "shift_integer");
+pasm_output_is(<<'CODE', <<'OUTPUT', "shift_integer");
 	new P0, .SArray
 	set P0, 3
 	set P0[0], 100
@@ -362,7 +362,7 @@ ok 5
 ok 6
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "mixed shift");
+pasm_output_is(<<'CODE', <<'OUTPUT', "mixed shift");
 	new P0, .SArray
 	set P0, 4
 	push P0, 1000
@@ -395,7 +395,7 @@ string
 42
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "iterator");
+pasm_output_is(<<'CODE', <<'OUTPUT', "iterator");
     .include "iterator.pasm"
 	new P0, .SArray		# empty array
 	new P2, .SArray		# array with 2 elements
@@ -472,7 +472,7 @@ ok 11
 ok 12
 OUTPUT
 
-output_like(<<'CODE', <<'OUTPUT', "const SArray 1");
+pasm_output_like(<<'CODE', <<'OUTPUT', "const SArray 1");
     new P0, .ConstSArray
     set P0, 10
     new P1, .Integer
@@ -484,7 +484,7 @@ CODE
 /^set_integer_native\(\) in ConstSArray/
 OUTPUT
 
-output_like(<<'CODE', <<'OUTPUT', "const SArray 2");
+pasm_output_like(<<'CODE', <<'OUTPUT', "const SArray 2");
     new P0, .ConstSArray
     set P0, 2
     push P0, 10
@@ -505,7 +505,7 @@ CODE
 shift_integer\(\) in ConstSArray/
 OUTPUT
 
-output_like(<<'CODE', <<'OUTPUT', "const SArray try to unset _ro");
+pasm_output_like(<<'CODE', <<'OUTPUT', "const SArray try to unset _ro");
     new P0, .ConstSArray
     set P0, 10
     new P1, .Integer
@@ -543,7 +543,7 @@ CODE
 0
 OUTPUT
 
-output_is(<< "CODE", << 'OUTPUT', "Access via Key PMC");
+pasm_output_is(<< "CODE", << 'OUTPUT', "Access via Key PMC");
 @{[ $fp_equality_macro ]}
 	new P0, .SArray
 	set P0, 4
@@ -586,7 +586,7 @@ ok 3
 ok 4
 OUTPUT
 
-output_is(<< 'CODE', << 'OUTPUT', "Store PMC, get int");
+pasm_output_is(<< 'CODE', << 'OUTPUT', "Store PMC, get int");
 	new P0, .SArray
 	set P0, 2
         new P1, .Integer
@@ -609,7 +609,7 @@ ok 1
 ok 2
 OUTPUT
 
-output_like(<< 'CODE', << 'OUTPUT', "Store num, get int");
+pasm_output_like(<< 'CODE', << 'OUTPUT', "Store num, get int");
 	new P0, .SArray
 	set P0, 1
         set P0[0], 4.2
@@ -620,7 +620,7 @@ CODE
 /SArray: Entry not an integer!/
 OUTPUT
 
-output_like(<< 'CODE', << 'OUTPUT', "Store string, get int");
+pasm_output_like(<< 'CODE', << 'OUTPUT', "Store string, get int");
 	new P0, .SArray
 	set P0, 1
         set P0[0], "Non-numeric string"
@@ -631,7 +631,7 @@ CODE
 /SArray: Entry not an integer!/
 OUTPUT
 
-output_is(<< "CODE", << 'OUTPUT', "Store PMC, get num");
+pasm_output_is(<< "CODE", << 'OUTPUT', "Store PMC, get num");
 @{[ $fp_equality_macro ]}
 	new P0, .SArray
 	set P0, 2
@@ -655,7 +655,7 @@ ok 1
 ok 2
 OUTPUT
 
-output_like(<< 'CODE', << 'OUTPUT', "Store int, get num");
+pasm_output_like(<< 'CODE', << 'OUTPUT', "Store int, get num");
 	new P0, .SArray
 	set P0, 1
         set P0[0], 12
@@ -666,7 +666,7 @@ CODE
 /SArray: Entry not a number!/
 OUTPUT
 
-output_like(<< 'CODE', << 'OUTPUT', "Store string, get num");
+pasm_output_like(<< 'CODE', << 'OUTPUT', "Store string, get num");
 	new P0, .SArray
 	set P0, 1
         set P0[0], "Non-numeric string"
@@ -677,7 +677,7 @@ CODE
 /SArray: Entry not a number!/
 OUTPUT
 
-output_is(<< 'CODE', << 'OUTPUT', "Store PMC, get string");
+pasm_output_is(<< 'CODE', << 'OUTPUT', "Store PMC, get string");
 	new P0, .SArray
 	set P0, 2
         new P1, .String
@@ -700,7 +700,7 @@ ok 1
 ok 2
 OUTPUT
 
-output_like(<< 'CODE', << 'OUTPUT', "Store int, get string");
+pasm_output_like(<< 'CODE', << 'OUTPUT', "Store int, get string");
 	new P0, .SArray
 	set P0, 1
         set P0[0], 12
@@ -711,7 +711,7 @@ CODE
 /SArray: Entry not a string!/
 OUTPUT
 
-output_like(<< 'CODE', << 'OUTPUT', "Store num, get string");
+pasm_output_like(<< 'CODE', << 'OUTPUT', "Store num, get string");
 	new P0, .SArray
 	set P0, 1
         set P0[0], 12.5
@@ -722,7 +722,7 @@ CODE
 /SArray: Entry not a string!/
 OUTPUT
 
-output_is(<< "CODE", << 'OUTPUT', "Store num, get PMC");
+pasm_output_is(<< "CODE", << 'OUTPUT', "Store num, get PMC");
 @{[ $fp_equality_macro ]}
 	new P0, .SArray
 	set P0, 2
@@ -746,7 +746,7 @@ ok 1
 ok 2
 OUTPUT
 
-output_like(<< 'CODE', << 'OUTPUT', "Out-of-bounds access: int");
+pasm_output_like(<< 'CODE', << 'OUTPUT', "Out-of-bounds access: int");
 	new P0, .SArray
 	set P0, 1
         set P0[5], 12
@@ -757,7 +757,7 @@ CODE
 /SArray index out of bounds/
 OUTPUT
 
-output_like(<< 'CODE', << 'OUTPUT', "Out-of-bounds access: num");
+pasm_output_like(<< 'CODE', << 'OUTPUT', "Out-of-bounds access: num");
 	new P0, .SArray
 	set P0, 1
         set P0[5], 12.5
@@ -768,7 +768,7 @@ CODE
 /SArray index out of bounds/
 OUTPUT
 
-output_like(<< 'CODE', << 'OUTPUT', "Out-of-bounds access: string");
+pasm_output_like(<< 'CODE', << 'OUTPUT', "Out-of-bounds access: string");
 	new P0, .SArray
 	set P0, 1
         set P0[5], "asdf"
@@ -779,7 +779,7 @@ CODE
 /SArray index out of bounds/
 OUTPUT
 
-output_like(<< 'CODE', << 'OUTPUT', "Out-of-bounds access: push int");
+pasm_output_like(<< 'CODE', << 'OUTPUT', "Out-of-bounds access: push int");
 	new P0, .SArray
         push P0, 12
         set I0, P0[0]
@@ -789,7 +789,7 @@ CODE
 /SArray index out of bounds/
 OUTPUT
 
-output_like(<< 'CODE', << 'OUTPUT', "Out-of-bounds access: push num");
+pasm_output_like(<< 'CODE', << 'OUTPUT', "Out-of-bounds access: push num");
 	new P0, .SArray
         push P0, 12.09
         set N0, P0[0]
@@ -799,7 +799,7 @@ CODE
 /SArray index out of bounds/
 OUTPUT
 
-output_like(<< 'CODE', << 'OUTPUT', "Out-of-bounds access: push string");
+pasm_output_like(<< 'CODE', << 'OUTPUT', "Out-of-bounds access: push string");
 	new P0, .SArray
         push P0, "Ygnve"
         set S0, P0[0]
@@ -809,7 +809,7 @@ CODE
 /SArray index out of bounds/
 OUTPUT
 
-output_like(<< 'CODE', << 'OUTPUT', "Out-of-bounds access: push pmc");
+pasm_output_like(<< 'CODE', << 'OUTPUT', "Out-of-bounds access: push pmc");
 	new P0, .SArray
         new P1, .Integer
         set P1, 1234

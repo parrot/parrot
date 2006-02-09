@@ -22,7 +22,7 @@ Tests PMC object methods.
 
 =cut
 
-output_like(<<'CODE', <<'OUTPUT', "callmethod - unknown method");
+pasm_output_like(<<'CODE', <<'OUTPUT', "callmethod - unknown method");
     newclass P2, "Foo"
     set S0, "nada"
     callmethodcc P2, S0
@@ -32,7 +32,7 @@ CODE
 /Method 'nada' not found/
 OUTPUT
 
-output_like(<<'CODE', <<'OUTPUT', "callmethod (STR) - unknown method");
+pasm_output_like(<<'CODE', <<'OUTPUT', "callmethod (STR) - unknown method");
     newclass P2, "Foo"
     set S1, "nada"
     callmethod P2, S1, P1
@@ -42,7 +42,7 @@ CODE
 /Method 'nada' not found/
 OUTPUT
 
-output_like(<<'CODE', <<'OUTPUT', "callmethodcc - unknown method");
+pasm_output_like(<<'CODE', <<'OUTPUT', "callmethodcc - unknown method");
     newclass P2, "Foo"
     set S0, "nada"
     callmethodcc P2, S0
@@ -52,7 +52,7 @@ CODE
 /Method 'nada' not found/
 OUTPUT
 
-output_like(<<'CODE', <<'OUTPUT', "callmethodcc (STR) - unknown method");
+pasm_output_like(<<'CODE', <<'OUTPUT', "callmethodcc (STR) - unknown method");
     newclass P2, "Foo"
     set S1, "nada"
     callmethodcc P2, S1
@@ -62,7 +62,7 @@ CODE
 /Method 'nada' not found/
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "callmethod 1");
+pasm_output_is(<<'CODE', <<'OUTPUT', "callmethod 1");
     newclass P2, "Foo"
     set S0, "meth"
 
@@ -81,7 +81,7 @@ in meth
 back
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "can class");
+pasm_output_is(<<'CODE', <<'OUTPUT', "can class");
     newclass P2, "Foo"
     set S0, "meth"
 
@@ -101,7 +101,7 @@ CODE
 0
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "can object");
+pasm_output_is(<<'CODE', <<'OUTPUT', "can object");
     newclass P2, "Foo"
     find_type I0, "Foo"
     new P2, I0
@@ -124,7 +124,7 @@ CODE
 0
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "constructor");
+pasm_output_is(<<'CODE', <<'OUTPUT', "constructor");
     newclass P1, "Foo"
     find_type I1, "Foo"
     new P3, I1
@@ -140,7 +140,7 @@ ok 1
 ok 2
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "disabling the constructor");
+pasm_output_is(<<'CODE', <<'OUTPUT', "disabling the constructor");
     newclass P1, "Foo"
     new P0, .String
     setprop P1, "BUILD", P0
@@ -156,7 +156,7 @@ CODE
 ok 1
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "specified constructor method does not exist");
+pasm_output_is(<<'CODE', <<'OUTPUT', "specified constructor method does not exist");
     newclass P1, "Foo"
     new P0, .String
     set P0, "bar"
@@ -185,7 +185,7 @@ catched it
 Class BUILD method ('bar') not found
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "constructor - init attr");
+pasm_output_is(<<'CODE', <<'OUTPUT', "constructor - init attr");
     newclass P1, "Foo"
     addattribute P1, ".i"
     find_type I1, "Foo"
@@ -216,7 +216,7 @@ ok 2
 42
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "constructor - parents");
+pasm_output_is(<<'CODE', <<'OUTPUT', "constructor - parents");
     newclass P1, "Foo"
     subclass P2, P1, "Bar"
     subclass P3, P2, "Baz"
@@ -442,7 +442,7 @@ OUTPUT
 
 SKIP: {
   skip("currently broken", 1);
-output_is(<<'CODE', <<'OUTPUT', "exceptions and different runloops");
+pasm_output_is(<<'CODE', <<'OUTPUT', "exceptions and different runloops");
 _main:
     push_eh eh
 
@@ -471,7 +471,7 @@ back in main
 OUTPUT
 }
 
-output_is(<<'CODE', <<'OUTPUT', "fetchmethod");
+pasm_output_is(<<'CODE', <<'OUTPUT', "fetchmethod");
     newclass P3, "Foo"
     find_type I0, "Foo"
     new P2, I0
@@ -499,7 +499,7 @@ in meth
 back
 OUTPUT
 
-output_like(<<'CODE', <<'OUTPUT', "fetchmethod - unknown method");
+pasm_output_like(<<'CODE', <<'OUTPUT', "fetchmethod - unknown method");
     newclass P2, "Foo"
     set S0, "nada"
     fetchmethod P0, P2, S0
@@ -509,7 +509,7 @@ CODE
 /Method 'nada' not found/
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "constructor - diamond parents");
+pasm_output_is(<<'CODE', <<'OUTPUT', "constructor - diamond parents");
 #
 # A   B A   E
 #  \ /   \ /
@@ -653,7 +653,7 @@ done
 OUTPUT
 
 
-output_is(<<'CODE', <<'OUTPUT', "constructor - parents BUILD");
+pasm_output_is(<<'CODE', <<'OUTPUT', "constructor - parents BUILD");
     new P10, .String
     set P10, "_new"
     newclass P1, "Foo"
@@ -850,7 +850,7 @@ ok 1
 ok 2
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "callmethod - method name");
+pasm_output_is(<<'CODE', <<'OUTPUT', "callmethod - method name");
     newclass P2, "Foo"
     set S0, "meth"
 

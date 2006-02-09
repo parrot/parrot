@@ -73,7 +73,7 @@ my $fp_equality_macro = <<'ENDOFMACRO';
 .endm
 ENDOFMACRO
 
-output_is(<<'CODE', <<'OUT', "create");
+pasm_output_is(<<'CODE', <<'OUT', "create");
    new P0, .BigInt
    print "ok\n"
    end
@@ -81,7 +81,7 @@ CODE
 ok
 OUT
 
-output_is(<<'CODE', <<'OUT', "set/get int");
+pasm_output_is(<<'CODE', <<'OUT', "set/get int");
    new P0, .BigInt
    set P0, 999999
    set I1, P0
@@ -96,7 +96,7 @@ CODE
 999999L
 OUT
 
-output_is(<<"CODE", <<'OUT', "set int, get double");
+pasm_output_is(<<"CODE", <<'OUT', "set int, get double");
 @{[ $fp_equality_macro ]}
      new P0, .BigInt
      set P0, 999999
@@ -130,7 +130,7 @@ ok 3
 ok 4
 OUT
 
-output_is(<<'CODE', <<'OUT', "set double, get str");
+pasm_output_is(<<'CODE', <<'OUT', "set double, get str");
    new P0, .BigInt
    set P0, 1.23e12
    print P0
@@ -140,7 +140,7 @@ CODE
 1230000000000
 OUT
 
-output_is(<<'CODE', <<'OUT', "set str, get str");
+pasm_output_is(<<'CODE', <<'OUT', "set str, get str");
    new P0, .BigInt
    set P0, "1230000000000"
    print P0
@@ -150,7 +150,7 @@ CODE
 1230000000000
 OUT
 
-output_is(<<'CODE', <<'OUT', "add");
+pasm_output_is(<<'CODE', <<'OUT', "add");
    new P0, .BigInt
    set P0, 999999
    new P1, .BigInt
@@ -172,7 +172,7 @@ CODE
 22345678987654321
 OUT
 
-output_is(<<'CODE', <<'OUT', "add_int");
+pasm_output_is(<<'CODE', <<'OUT', "add_int");
    new P0, .BigInt
    set P0, 999999
    new P2, .BigInt
@@ -191,7 +191,7 @@ CODE
 100000000000001000000
 OUT
 
-output_is(<<'CODE', <<'OUTPUT', "sub bigint");
+pasm_output_is(<<'CODE', <<'OUTPUT', "sub bigint");
      new P0, .BigInt
      set P0, 12345678
      new P1, .BigInt
@@ -222,7 +222,7 @@ ok 2
 ok 3
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "sub native int");
+pasm_output_is(<<'CODE', <<'OUTPUT', "sub native int");
      new P0, .BigInt
      set P0, 12345678
      new P2, .BigInt
@@ -244,7 +244,7 @@ ok 1
 ok 2
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "sub other int");
+pasm_output_is(<<'CODE', <<'OUTPUT', "sub other int");
      new P0, .BigInt
      set P0, 12345678
      new P1, .PerlInt
@@ -284,7 +284,7 @@ ok 3
 ok 4
 OUTPUT
 
-output_is(<<'CODE', <<'OUT', "mul");
+pasm_output_is(<<'CODE', <<'OUT', "mul");
    new P0, .BigInt
    set P0, 999999
    new P1, .BigInt
@@ -299,7 +299,7 @@ CODE
 999999000000
 OUT
 
-output_is(<<'CODE', <<'OUT', "mul_int");
+pasm_output_is(<<'CODE', <<'OUT', "mul_int");
    new P0, .BigInt
    set P0, 999999
    new P2, .BigInt
@@ -311,7 +311,7 @@ CODE
 999999000000
 OUT
 
-output_is(<<'CODE', <<'OUT', "div bigint");
+pasm_output_is(<<'CODE', <<'OUT', "div bigint");
      new P0, .BigInt
      set P0, "100000000000000000000"
      new P1, .BigInt
@@ -352,7 +352,7 @@ ok 3
 ok 4
 OUT
 
-output_is(<<'CODE', <<'OUT', "div native int");
+pasm_output_is(<<'CODE', <<'OUT', "div native int");
      new P0, .BigInt
      set P0, "100000000000000000000"
      new P1, .BigInt
@@ -375,7 +375,7 @@ ok 1
 ok 2
 OUT
 
-output_is(<<'CODE', <<'OUT', "div other int");
+pasm_output_is(<<'CODE', <<'OUT', "div other int");
      new P0, .BigInt
      set P0, "100000000000000000000"
      new P1, .BigInt
@@ -421,7 +421,7 @@ if ($PConfig{intvalsize} == 8) {
     die "\$PConfig{intvalsize} == $PConfig{intvalsize}?\n";
 }
 
-output_is(<<CODE, <<OUT, "add overflow Integer");
+pasm_output_is(<<CODE, <<OUT, "add overflow Integer");
    new P0, .Integer
    set P0, $a
    new P1, .Integer
@@ -450,7 +450,7 @@ $e BigInt
 ok
 OUT
 
-output_is(<<CODE, <<OUT, "add overflow PerlInt");
+pasm_output_is(<<CODE, <<OUT, "add overflow PerlInt");
    new P0, .PerlInt
    set P0, $a
    new P1, .PerlInt
@@ -479,7 +479,7 @@ $e BigInt
 ok
 OUT
 
-output_is(<<'CODE', <<'OUT', "abs");
+pasm_output_is(<<'CODE', <<'OUT', "abs");
    new P0, .BigInt
    set P0, "-1230000000000"
    new P1, .Undef
@@ -517,7 +517,7 @@ CODE
 0
 OUTPUT
 
-output_is(<<"CODE", <<'OUTPUT', "Truth");
+pasm_output_is(<<"CODE", <<'OUTPUT', "Truth");
      new P0, .BigInt
      set P0, "123456789123456789"
      if P0, OK1
@@ -533,7 +533,7 @@ ok 1
 ok 2
 OUTPUT
 
-output_is(<<"CODE", <<'OUTPUT', "neg");
+pasm_output_is(<<"CODE", <<'OUTPUT', "neg");
      new P0, .BigInt
      new P1, .BigInt
      set P0, "123456789123456789"
@@ -662,7 +662,7 @@ CODE
 
 OUTPUT
 
-output_is(<<'CODE', <<'OUT', "shl_bigint");
+pasm_output_is(<<'CODE', <<'OUT', "shl_bigint");
    new P0, .BigInt
    set P0, "2"
    new P1, .BigInt
@@ -684,7 +684,7 @@ CODE
 102400000000000
 OUT
 
-output_is(<<'CODE', <<'OUT', "shl_int");
+pasm_output_is(<<'CODE', <<'OUT', "shl_int");
    new P0, .BigInt
    set P0, 2
    new P1, .Integer
@@ -713,7 +713,7 @@ CODE
 102400000000000
 OUT
 
-output_is(<<'CODE', <<'OUT', "shr_bigint");
+pasm_output_is(<<'CODE', <<'OUT', "shr_bigint");
    new P0, .BigInt
    set P0, 8
    new P1, .BigInt
@@ -735,7 +735,7 @@ CODE
 100000000000
 OUT
 
-output_is(<<'CODE', <<'OUT', "shr_int");
+pasm_output_is(<<'CODE', <<'OUT', "shr_int");
    new P0, .BigInt
    set P0, 4
    new P1, .Integer

@@ -87,7 +87,7 @@ sub check_running {
 
 send_SIGHUP;
 
-output_is(<<'CODE', <<'OUTPUT', "SIGHUP event - sleep");
+pasm_output_is(<<'CODE', <<'OUTPUT', "SIGHUP event - sleep");
     print "start\n"
     # no exception handler - parrot should die silently
     sleep 2
@@ -101,7 +101,7 @@ OUTPUT
 
 send_SIGHUP;
 
-output_is(<<'CODE', <<'OUTPUT', "SIGHUP event - loop");
+pasm_output_is(<<'CODE', <<'OUTPUT', "SIGHUP event - loop");
     bounds 1 # no JIT
     print "start\n"
     # no exception handler - parrot should die silently
@@ -122,7 +122,7 @@ SKIP: {
   skip("works standalone but not in test", 1);
 send_SIGHUP;
 
-output_is(<<'CODE', <<'OUTPUT', "SIGHUP event - sleep, catch");
+pasm_output_is(<<'CODE', <<'OUTPUT', "SIGHUP event - sleep, catch");
     push_eh _handler
     print "start\n"
     sleep 2

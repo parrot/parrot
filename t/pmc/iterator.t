@@ -22,7 +22,7 @@ Tests the C<Iterator> PMC.
 
 =cut
 
-output_is(<<'CODE', <<'OUTPUT', "new iter");
+pasm_output_is(<<'CODE', <<'OUTPUT', "new iter");
 	new P2, .PerlArray
 	new P1, .Iterator, P2
 	print "ok 1\n"
@@ -31,7 +31,7 @@ CODE
 ok 1
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "int test");
+pasm_output_is(<<'CODE', <<'OUTPUT', "int test");
     .include "iterator.pasm"
 	new P0, .PerlArray	# empty array
 	new P2, .PerlArray	# array with 2 elements
@@ -107,7 +107,7 @@ ok 11
 ok 12
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "PerlHash iter 1");
+pasm_output_is(<<'CODE', <<'OUTPUT', "PerlHash iter 1");
     .include "iterator.pasm"
 	new P0, .PerlHash	# empty Hash
 	new P2, .PerlHash	# Hash with 2 elements
@@ -161,7 +161,7 @@ ok 7
 ok 8
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "Hash iter 1");
+pasm_output_is(<<'CODE', <<'OUTPUT', "Hash iter 1");
     .include "iterator.pasm"
 	new P0, .Hash	# empty Hash
 	new P2, .Hash	# Hash with 2 elements
@@ -215,7 +215,7 @@ ok 7
 ok 8
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "PerlHash iter 2");
+pasm_output_is(<<'CODE', <<'OUTPUT', "PerlHash iter 2");
     .include "iterator.pasm"
 	new P0, .PerlHash	# Hash for iteration
 	new P2, .PerlHash	# for test
@@ -261,7 +261,7 @@ ok 1
 ok 2
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "Hash iter 2");
+pasm_output_is(<<'CODE', <<'OUTPUT', "Hash iter 2");
     .include "iterator.pasm"
 	new P0, .Hash	# Hash for iteration
 	new P2, .Hash	# for test
@@ -306,7 +306,7 @@ CODE
 ok 1
 ok 2
 OUTPUT
-output_is(<<'CODE', <<OUTPUT, "string iteration forward");
+pasm_output_is(<<'CODE', <<OUTPUT, "string iteration forward");
     .include "iterator.pasm"
 	new P2, .String
 	set P2, "parrot"
@@ -327,7 +327,7 @@ parrot
 parrot
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "string iteration backward");
+pasm_output_is(<<'CODE', <<OUTPUT, "string iteration backward");
     .include "iterator.pasm"
 	new P2, .String
 	set P2, "parrot"
@@ -348,7 +348,7 @@ torrap
 parrot
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "string iteration forward get ord");
+pasm_output_is(<<'CODE', <<OUTPUT, "string iteration forward get ord");
     .include "iterator.pasm"
 	new P2, .String
 	set P2, "ABC"
@@ -369,7 +369,7 @@ CODE
 ABC
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "string iteration backward get ord");
+pasm_output_is(<<'CODE', <<OUTPUT, "string iteration backward get ord");
 .include "iterator.pasm"
 	new P2, .String
 	set P2, "ABC"
@@ -588,7 +588,7 @@ OUTPUT
 
 SKIP: {
 skip("N/Y: length of rest of array ", 1);
-output_is(<<'CODE', <<'OUTPUT', "shift + index access");
+pasm_output_is(<<'CODE', <<'OUTPUT', "shift + index access");
     .include "iterator.pasm"
 
 	new P2, .PerlArray	# array with 4 elements
@@ -632,7 +632,7 @@ ok 6
 OUTPUT
 }
 
-output_is(<<'CODE', <<'OUTPUT', "slice syntax");
+pasm_output_is(<<'CODE', <<'OUTPUT', "slice syntax");
    new P0, .PerlArray
    slice P2, P0[2 .. 3, 4, 5 ..6]
    slice P2, P0[10 ..]
@@ -646,7 +646,7 @@ CODE
 ok
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "slice creates an iterator");
+pasm_output_is(<<'CODE', <<'OUTPUT', "slice creates an iterator");
    new P0, .PerlArray
    slice P2, P0[2 .. 3, 4, 5 ..6]
    typeof S0, P2
@@ -657,7 +657,7 @@ CODE
 Iterator
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "slice iter simple array elements");
+pasm_output_is(<<'CODE', <<'OUTPUT', "slice iter simple array elements");
    .include "iterator.pasm"
    new P0, .PerlArray
    push P0, 100
@@ -684,7 +684,7 @@ CODE
 ok
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "slice iter simple array elements - repeat");
+pasm_output_is(<<'CODE', <<'OUTPUT', "slice iter simple array elements - repeat");
    .include "iterator.pasm"
    new P0, .PerlArray
    push P0, 100
@@ -721,7 +721,7 @@ CODE
 ok
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "slice iter string");
+pasm_output_is(<<'CODE', <<OUTPUT, "slice iter string");
     .include "iterator.pasm"
 	new P2, .String
 	set P2, "parrot"
@@ -742,7 +742,7 @@ paot
 parrot
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "slice iter start range");
+pasm_output_is(<<'CODE', <<'OUTPUT', "slice iter start range");
    .include "iterator.pasm"
    new P0, .PerlArray
    push P0, 100
@@ -768,7 +768,7 @@ CODE
 ok
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "slice iter end range");
+pasm_output_is(<<'CODE', <<'OUTPUT', "slice iter end range");
    .include "iterator.pasm"
    new P0, .PerlArray
    push P0, 100
@@ -794,7 +794,7 @@ CODE
 ok
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "slice iter start range, value");
+pasm_output_is(<<'CODE', <<'OUTPUT', "slice iter start range, value");
    .include "iterator.pasm"
    new P0, .PerlArray
    push P0, 100
@@ -822,7 +822,7 @@ CODE
 ok
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "slice iter range, value");
+pasm_output_is(<<'CODE', <<'OUTPUT', "slice iter range, value");
    .include "iterator.pasm"
    new P0, .PerlArray
    push P0, 100
@@ -851,7 +851,7 @@ CODE
 ok
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "slice iter range, range");
+pasm_output_is(<<'CODE', <<'OUTPUT', "slice iter range, range");
    .include "iterator.pasm"
    new P0, .PerlArray
    push P0, 100
@@ -883,7 +883,7 @@ CODE
 ok
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "slice iter string range");
+pasm_output_is(<<'CODE', <<OUTPUT, "slice iter string range");
     .include "iterator.pasm"
 	new P2, .String
 	set P2, "parrot rocks"
@@ -904,7 +904,7 @@ arrtoc
 parrot rocks
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "slice iter string range 2");
+pasm_output_is(<<'CODE', <<OUTPUT, "slice iter string range 2");
     .include "iterator.pasm"
 	new P2, .String
 	set P2, "parrot rocks"
@@ -925,7 +925,7 @@ parrtocks
 parrot rocks
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "slice iter string variable range");
+pasm_output_is(<<'CODE', <<OUTPUT, "slice iter string variable range");
     .include "iterator.pasm"
 	new P2, .String
 	set P2, "parrot rocks"
@@ -950,7 +950,7 @@ arrtoc
 parrot rocks
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "slice iter hash values");
+pasm_output_is(<<'CODE', <<OUTPUT, "slice iter hash values");
     .include "iterator.pasm"
 	new P2, .Hash
 	set P2["a"], 100
@@ -974,7 +974,7 @@ CODE
 ok
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "slice iter hash values 2");
+pasm_output_is(<<'CODE', <<OUTPUT, "slice iter hash values 2");
     .include "iterator.pasm"
 	new P2, .Hash
 	set P2["a"], 100
@@ -1002,7 +1002,7 @@ CODE
 ok
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "slice iter range");
+pasm_output_is(<<'CODE', <<OUTPUT, "slice iter range");
     .include "iterator.pasm"
 	new P2, .Hash
 	set P2["a"], 10
@@ -1028,7 +1028,7 @@ CODE
 ok
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "slice iter range 2");
+pasm_output_is(<<'CODE', <<OUTPUT, "slice iter range 2");
     .include "iterator.pasm"
 	new P2, .Hash
 	set P2["a"], 10
@@ -1062,7 +1062,7 @@ CODE
 ok
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "slice iter range - vars");
+pasm_output_is(<<'CODE', <<OUTPUT, "slice iter range - vars");
     .include "iterator.pasm"
 	new P2, .Hash
 	set P2["a"], 10
@@ -1184,7 +1184,7 @@ CODE
 bcdeok
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "iter vtable");
+pasm_output_is(<<'CODE', <<'OUTPUT', "iter vtable");
    .include "iterator.pasm"
    new P0, .PerlArray
    push P0, 100
@@ -1219,7 +1219,7 @@ ok 1
 ok 2
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "string iteration with get_iter");
+pasm_output_is(<<'CODE', <<OUTPUT, "string iteration with get_iter");
     .include "iterator.pasm"
 	new P2, .String
 	set P2, "parrot"
@@ -1239,7 +1239,7 @@ parrot
 parrot
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "intlist iter vtable");
+pasm_output_is(<<'CODE', <<'OUTPUT', "intlist iter vtable");
    .include "iterator.pasm"
    new P0, .IntList
    push P0, 100
@@ -1300,7 +1300,7 @@ CODE
 ok
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "enumerate class");
+pasm_output_is(<<'CODE', <<'OUTPUT', "enumerate class");
    new P0, .PerlString
    set P0, "abcdef"
    new P1, .Enumerate, P0

@@ -66,7 +66,7 @@ my $fp_equality_macro = <<'ENDOFMACRO';
 .endm
 ENDOFMACRO
 
-output_is(<<'CODE', <<'OUTPUT', "Setting array size");
+pasm_output_is(<<'CODE', <<'OUTPUT', "Setting array size");
 	new P0,.ResizableStringArray
 
 	set I0,P0
@@ -107,7 +107,7 @@ ok 4
 ok 5
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "Setting first element");
+pasm_output_is(<<'CODE', <<'OUTPUT', "Setting first element");
         new P0, .ResizableStringArray
         set P0, 1
 
@@ -136,7 +136,7 @@ ok 2
 ok 3
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "Setting second element");
+pasm_output_is(<<'CODE', <<'OUTPUT', "Setting second element");
         new P0, .ResizableStringArray
         set P0, 2
 
@@ -167,7 +167,7 @@ OUTPUT
 
 # TODO: Rewrite these properly when we have exceptions
 
-output_is(<<'CODE', <<'OUTPUT', "Setting out-of-bounds elements");
+pasm_output_is(<<'CODE', <<'OUTPUT', "Setting out-of-bounds elements");
         new P0, .ResizableStringArray
         set P0, 1
 
@@ -179,7 +179,7 @@ CODE
 ok 1
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "Getting out-of-bounds elements");
+pasm_output_is(<<'CODE', <<'OUTPUT', "Getting out-of-bounds elements");
         new P0, .ResizableStringArray
         set P0, 1
 
@@ -191,7 +191,7 @@ ok 1
 OUTPUT
 
 
-output_is(<<"CODE", <<'OUTPUT', "Set via PMC keys, access via INTs");
+pasm_output_is(<<"CODE", <<'OUTPUT', "Set via PMC keys, access via INTs");
 @{[ $fp_equality_macro ]}
      new P0, .ResizableStringArray
      new P1, .Key
@@ -227,7 +227,7 @@ ok 2
 ok 3
 OUTPUT
 
-output_is(<<"CODE", <<'OUTPUT', "Set via INTs, access via PMC Keys");
+pasm_output_is(<<"CODE", <<'OUTPUT', "Set via INTs, access via PMC Keys");
 @{[ $fp_equality_macro ]}
      new P0, .ResizableStringArray
      set P0, 1
@@ -318,7 +318,7 @@ CODE
 two zero one zero
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "creation");
+pasm_output_is(<<'CODE', <<'OUTPUT', "creation");
         new P0, .ResizableStringArray
         set I0, P0
         print "Created ResizableStringArray with "
@@ -330,7 +330,7 @@ Created ResizableStringArray with 0 elements to start with.
 OUTPUT
 
 
-output_is(<<'CODE', <<'OUTPUT', 'basic pop');
+pasm_output_is(<<'CODE', <<'OUTPUT', 'basic pop');
      new P0, .ResizableStringArray
      set P0[0], "foo"
      set P0[1], "bar"
@@ -356,7 +356,7 @@ ok 2
 ok 3
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', 'pop many values');
+pasm_output_is(<<'CODE', <<'OUTPUT', 'pop many values');
      new P0, .ResizableStringArray
      set I0, 0
 L1:  set S0, I0
@@ -383,7 +383,7 @@ CODE
 ok
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', 'push/pop');
+pasm_output_is(<<'CODE', <<'OUTPUT', 'push/pop');
      new P0, .ResizableStringArray
      push P0, "abcde"
      push P0, "bcdea"
@@ -397,7 +397,7 @@ CODE
 ok 1
 OUTPUT
 
-output_like(<<'CODE', <<'OUTPUT', 'pop from empty array');
+pasm_output_like(<<'CODE', <<'OUTPUT', 'pop from empty array');
      new P0, .ResizableStringArray
      pop S0, P0
      end
@@ -598,7 +598,7 @@ OUTPUT
 #'
 
 
-output_is(<<'CODE', <<'OUTPUT', "aerobics", todo => 'not yet working');
+pasm_output_is(<<'CODE', <<'OUTPUT', "aerobics", todo => 'not yet working');
         new P0, .ResizableStringArray
         set I10, 10000
 
@@ -719,7 +719,7 @@ OUTPUT
 
 
 my $SPEEDUP = $ENV{RUNNING_MAKE_TEST} ? "gc_debug 0\n" : "";
-output_is($SPEEDUP . <<'CODE', <<'OUTPUT', "direct access");
+pasm_output_is($SPEEDUP . <<'CODE', <<'OUTPUT', "direct access");
     new P0, .ResizableStringArray
     set S0, ""
     set S1, "abcdefghijklmnopqrst"
@@ -764,7 +764,7 @@ ok
 OUTPUT
 
 
-output_is(<<'CODE', <<'OUTPUT', "direct access 2");
+pasm_output_is(<<'CODE', <<'OUTPUT', "direct access 2");
     #new P0, .IntList
     new P0, .ResizableStringArray
     set I10, 1100000
@@ -828,7 +828,7 @@ ok
 OUTPUT
 
 
-output_is(<<'CODE', <<'OUTPUT', "sparse access");
+pasm_output_is(<<'CODE', <<'OUTPUT', "sparse access");
     new P0, .ResizableStringArray
        set I10, 110000
        set I0, 1
@@ -909,7 +909,7 @@ ok 1
 ok 2
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "check for zeroedness");
+pasm_output_is(<<'CODE', <<'OUTPUT', "check for zeroedness");
     new P0, .ResizableStringArray
     set I0, 0
 lp1:
@@ -941,7 +941,7 @@ ok
 OUTPUT
 
 
-output_is(<<'CODE', <<'OUTPUT', "pop into sparse");
+pasm_output_is(<<'CODE', <<'OUTPUT', "pop into sparse");
     new P0, .ResizableStringArray
        set I10, 100
        set I0, 0
@@ -1017,7 +1017,7 @@ CODE
 ok
 OUTPUT
 
-output_is(<< 'CODE', << 'OUTPUT', "clone");
+pasm_output_is(<< 'CODE', << 'OUTPUT', "clone");
      new P0, .ResizableStringArray
      set P0, 1024
      set I0, 0
@@ -1038,7 +1038,7 @@ CODE
 1023
 OUTPUT
 
-output_is(<< 'CODE', << 'OUTPUT', "Resizing to negative value");
+pasm_output_is(<< 'CODE', << 'OUTPUT', "Resizing to negative value");
      new P0, .ResizableStringArray
      set P0, -1
      end
@@ -1046,7 +1046,7 @@ CODE
 ResizableStringArray: Can't resize!
 OUTPUT
 
-output_is(<< 'CODE', << 'OUTPUT', "Retrieving from negative index");
+pasm_output_is(<< 'CODE', << 'OUTPUT', "Retrieving from negative index");
      new P0, .ResizableStringArray
      set P0, 100
      set S0, P0[-1]

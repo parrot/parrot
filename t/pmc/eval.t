@@ -22,7 +22,7 @@ Tests on-the-fly PASM, PIR and PAST compilation and invocation.
 
 =cut
 
-output_is(<<'CODE', <<'OUTPUT', "eval_sc");
+pasm_output_is(<<'CODE', <<'OUTPUT', "eval_sc");
 	compreg P1, "PASM"	# get compiler
 	set_args "(0)", "print \"in eval\\n\"\nset_returns \"()\"\nreturncc\n"
 	get_results "(0)", P0
@@ -36,7 +36,7 @@ back again
 OUTPUT
 
 
-output_is(<<'CODE', <<'OUTPUT', "call subs in evaled code ");
+pasm_output_is(<<'CODE', <<'OUTPUT', "call subs in evaled code ");
     set S5, ".pcc_sub _foo:\n"
     concat S5, "print \"foo\\n\"\n"
     concat S5, "set_returns \"()\"\n"
@@ -53,7 +53,7 @@ foo
 back
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "call 2 subs in evaled code ");
+pasm_output_is(<<'CODE', <<'OUTPUT', "call 2 subs in evaled code ");
     set S5, ".pcc_sub _foo:\n"
     concat S5, "print \"foo\\n\"\n"
     concat S5, "set_returns \"()\"\n"
@@ -82,7 +82,7 @@ OUTPUT
 
 SKIP: {
   skip("too much old calling conventions", 1);
-output_is(<<'CODE', <<'OUTPUT', "nano forth sub");
+pasm_output_is(<<'CODE', <<'OUTPUT', "nano forth sub");
 _main:
     load_bytecode "examples/assembly/nanoforth2.pasm"
     print "ok 1\n"
@@ -213,7 +213,7 @@ before
 after
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "compile PAST in PASM");
+pasm_output_is(<<'CODE', <<'OUTPUT', "compile PAST in PASM");
     compreg P1, "PAST"	# get compiler
     set_args "(0)", 'Parrot_AST( PCC_Sub( Stmts( Py_Print( Const(8) ) Py_Print_nl() ) ) )'
     get_results "(0)", P6

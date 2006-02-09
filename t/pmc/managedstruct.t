@@ -23,7 +23,7 @@ Tests the ManagedStruct PMC. Checks element access and memory allocation.
 
 =cut
 
-output_is(<<'CODE', <<'OUTPUT', "Setting ManagedStruct size");
+pasm_output_is(<<'CODE', <<'OUTPUT', "Setting ManagedStruct size");
 	new P0,.ManagedStruct
 	set I0,P0
 	eq I0,0,OK_1
@@ -47,7 +47,7 @@ ok 3
 OUTPUT
 
 
-output_is(<<'CODE', <<'OUTPUT', "element access - float, double");
+pasm_output_is(<<'CODE', <<'OUTPUT', "element access - float, double");
     new P2, .PerlArray
     .include "datatypes.pasm"
     push P2, .DATATYPE_FLOAT
@@ -83,7 +83,7 @@ CODE
 14.300000
 OUTPUT
 
-output_like(<<'CODE', <<'OUTPUT', "element access - char, short");
+pasm_output_like(<<'CODE', <<'OUTPUT', "element access - char, short");
     new P2, .PerlArray
     .include "datatypes.pasm"
     push P2, .DATATYPE_CHAR
@@ -178,7 +178,7 @@ x: 2
 y: 16
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "nested struct offsets");
+pasm_output_is(<<'CODE', <<'OUTPUT', "nested struct offsets");
   # the nested structure
   .include "datatypes.pasm"
   new P3, .PerlArray

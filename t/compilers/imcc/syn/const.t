@@ -148,7 +148,7 @@ ok 3
 OUT
 
 
-output_is(<<'CODE', <<'OUT', "const I/N mismatch");
+pasm_output_is(<<'CODE', <<'OUT', "const I/N mismatch");
     set I0, 2.0
     print I0
     print "\n"

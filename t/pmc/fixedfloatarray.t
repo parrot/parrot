@@ -66,7 +66,7 @@ my $fp_equality_macro = <<'ENDOFMACRO';
 .endm
 ENDOFMACRO
 
-output_is(<<'CODE', <<'OUTPUT', "Setting array size");
+pasm_output_is(<<'CODE', <<'OUTPUT', "Setting array size");
 	new P0,.FixedFloatArray
 
 	set I0,P0
@@ -86,7 +86,7 @@ ok 1
 ok 2
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "Resetting array size (and getting an exception)");
+pasm_output_is(<<'CODE', <<'OUTPUT', "Resetting array size (and getting an exception)");
 	new P0, .FixedFloatArray
 
 	set I0,P0
@@ -101,7 +101,7 @@ FixedFloatArray: Can't resize!
 OUTPUT
 #VIM's syntax highlighter needs this line
 
-output_is(<<'CODE', <<'OUTPUT', "Setting first element");
+pasm_output_is(<<'CODE', <<'OUTPUT', "Setting first element");
         new P0, .FixedFloatArray
         set P0, 1
 
@@ -130,7 +130,7 @@ ok 2
 ok 3
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "Setting second element");
+pasm_output_is(<<'CODE', <<'OUTPUT', "Setting second element");
         new P0, .FixedFloatArray
         set P0, 2
 
@@ -161,7 +161,7 @@ OUTPUT
 
 # TODO: Rewrite these properly when we have exceptions
 
-output_is(<<'CODE', <<'OUTPUT', "Setting out-of-bounds elements");
+pasm_output_is(<<'CODE', <<'OUTPUT', "Setting out-of-bounds elements");
         new P0, .FixedFloatArray
         set P0, 1
 
@@ -172,7 +172,7 @@ CODE
 FixedFloatArray: index out of bounds!
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "Getting out-of-bounds elements");
+pasm_output_is(<<'CODE', <<'OUTPUT', "Getting out-of-bounds elements");
         new P0, .FixedFloatArray
         set P0, 1
 
@@ -183,7 +183,7 @@ FixedFloatArray: index out of bounds!
 OUTPUT
 
 
-output_is(<<"CODE", <<'OUTPUT', "Set via PMC keys, access via INTs");
+pasm_output_is(<<"CODE", <<'OUTPUT', "Set via PMC keys, access via INTs");
 @{[ $fp_equality_macro ]}
      new P0, .FixedFloatArray
      set P0, 3
@@ -220,7 +220,7 @@ ok 2
 ok 3
 OUTPUT
 
-output_is(<<"CODE", <<'OUTPUT', "Set via INTs, access via PMC Keys");
+pasm_output_is(<<"CODE", <<'OUTPUT', "Set via INTs, access via PMC Keys");
 @{[ $fp_equality_macro ]}
      new P0, .FixedFloatArray
      set P0, 1024
@@ -267,7 +267,7 @@ ok 4
 OUTPUT
 
 
-output_is(<<"CODE", <<'OUTPUT', "Clone");
+pasm_output_is(<<"CODE", <<'OUTPUT', "Clone");
 @{[ $fp_equality_macro ]}
      set I30, 2000
      new P0, .FixedFloatArray
@@ -298,7 +298,7 @@ CODE
 ok
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "Truth");
+pasm_output_is(<<'CODE', <<'OUTPUT', "Truth");
 	new P0, .FixedFloatArray
         unless P0, OK1
 	print "not "

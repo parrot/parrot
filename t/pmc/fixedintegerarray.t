@@ -66,7 +66,7 @@ my $fp_equality_macro = <<'ENDOFMACRO';
 .endm
 ENDOFMACRO
 
-output_is(<<'CODE', <<'OUTPUT', "Setting array size");
+pasm_output_is(<<'CODE', <<'OUTPUT', "Setting array size");
 	new P0,.FixedIntegerArray
 
 	set I0,P0
@@ -86,7 +86,7 @@ ok 1
 ok 2
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "Resetting array size (and getting an exception)");
+pasm_output_is(<<'CODE', <<'OUTPUT', "Resetting array size (and getting an exception)");
 	new P0, .FixedIntegerArray
 
 	set I0,P0
@@ -101,7 +101,7 @@ FixedIntegerArray: Can't resize!
 OUTPUT
 #VIM's syntax highlighter needs this line
 
-output_is(<<'CODE', <<'OUTPUT', "Setting first element");
+pasm_output_is(<<'CODE', <<'OUTPUT', "Setting first element");
         new P0, .FixedIntegerArray
         set P0, 1
 
@@ -130,7 +130,7 @@ ok 2
 ok 3
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "Setting second element");
+pasm_output_is(<<'CODE', <<'OUTPUT', "Setting second element");
         new P0, .FixedIntegerArray
         set P0, 2
 
@@ -161,7 +161,7 @@ OUTPUT
 
 # TODO: Rewrite these properly when we have exceptions
 
-output_like(<<'CODE', <<'OUTPUT', "Setting out-of-bounds elements");
+pasm_output_like(<<'CODE', <<'OUTPUT', "Setting out-of-bounds elements");
         new P0, .FixedIntegerArray
         set P0, 1
 
@@ -173,7 +173,7 @@ CODE
 current instr\.:.*/
 OUTPUT
 
-output_like(<<'CODE', <<'OUTPUT', "Getting out-of-bounds elements");
+pasm_output_like(<<'CODE', <<'OUTPUT', "Getting out-of-bounds elements");
         new P0, .FixedIntegerArray
         set P0, 1
 
@@ -184,7 +184,7 @@ CODE
 current instr\.:.*/
 OUTPUT
 
-output_like(<<'CODE', <<'OUTPUT', "Getting out-of-bounds elements, I");
+pasm_output_like(<<'CODE', <<'OUTPUT', "Getting out-of-bounds elements, I");
         new P0, .FixedIntegerArray
         set P0, 1
 	set I1, 1
@@ -195,7 +195,7 @@ CODE
 current instr\.:.*/
 OUTPUT
 
-output_like(<<'CODE', <<'OUTPUT', "Getting out-of-bounds elements, -I");
+pasm_output_like(<<'CODE', <<'OUTPUT', "Getting out-of-bounds elements, -I");
         new P0, .FixedIntegerArray
         set P0, 1
 	set I1, -1
@@ -207,7 +207,7 @@ current instr\.:.*/
 OUTPUT
 
 
-output_is(<<"CODE", <<'OUTPUT', "Set via PMC keys, access via INTs");
+pasm_output_is(<<"CODE", <<'OUTPUT', "Set via PMC keys, access via INTs");
 @{[ $fp_equality_macro ]}
      new P0, .FixedIntegerArray
      set P0, 3
@@ -244,7 +244,7 @@ ok 2
 ok 3
 OUTPUT
 
-output_is(<<"CODE", <<'OUTPUT', "Set via INTs, access via PMC Keys");
+pasm_output_is(<<"CODE", <<'OUTPUT', "Set via INTs, access via PMC Keys");
 @{[ $fp_equality_macro ]}
      new P0, .FixedIntegerArray
      set P0, 1024
@@ -313,7 +313,7 @@ CODE
 0
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "new_p_i_s");
+pasm_output_is(<<'CODE', <<'OUTPUT', "new_p_i_s");
     new P0, .FixedIntegerArray, "(1, 17,42,0,77,0b111,    0Xff)"
     set I0, P0
     print I0

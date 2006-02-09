@@ -23,7 +23,7 @@ and cloning.
 
 =cut
 
-output_is(<<'CODE', <<'OUTPUT', "multiarray creation");
+pasm_output_is(<<'CODE', <<'OUTPUT', "multiarray creation");
 	new P1, .PerlArray
 	# intial size
 	set P1[0], 0
@@ -44,7 +44,7 @@ CODE
 ok
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "multiarray access 2d");
+pasm_output_is(<<'CODE', <<'OUTPUT', "multiarray access 2d");
 	new P1, .PerlArray
 	# intial size
 	set P1[0], 0
@@ -101,7 +101,7 @@ ok 1
 ok 2
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "multiarray access 3d");
+pasm_output_is(<<'CODE', <<'OUTPUT', "multiarray access 3d");
 	new P1, .PerlArray
 	# initial size
 	set P1[0], 0

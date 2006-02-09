@@ -65,7 +65,7 @@ my $fp_equality_macro = <<'ENDOFMACRO';
 .endm
 ENDOFMACRO
 
-output_is(<<CODE, <<OUTPUT, "Set/get strings");
+pasm_output_is(<<CODE, <<OUTPUT, "Set/get strings");
     new P0, .PerlString
     set P0, "foo"
     set S0, P0
@@ -113,7 +113,7 @@ ok 5
 ok 6
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "set/get string value");
+pasm_output_is(<<'CODE', <<'OUTPUT', "set/get string value");
     new P0, .PerlString
     set P0, "foo"
     set S0, P0
@@ -161,7 +161,7 @@ ok 5
 ok 6
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "Setting integers");
+pasm_output_is(<<CODE, <<OUTPUT, "Setting integers");
     new P0, .PerlString
     set P0, "1"
     set I0, P0
@@ -201,7 +201,7 @@ CODE
 0
 OUTPUT
 
-output_is(<<"CODE", <<OUTPUT, "Setting numbers");
+pasm_output_is(<<"CODE", <<OUTPUT, "Setting numbers");
 @{[ $fp_equality_macro ]}
     new P0, .PerlString
     set P0, "1"
@@ -255,7 +255,7 @@ ok 5
 ok 6
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "assign string");
+pasm_output_is(<<'CODE', <<OUTPUT, "assign string");
     new P0, .PerlInt
     assign P0, "Albert"
     print P0
@@ -284,7 +284,7 @@ Charlie
 Doris
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "ensure that concat ppp copies strings");
+pasm_output_is(<<CODE, <<OUTPUT, "ensure that concat ppp copies strings");
     new P0, .PerlString
     new P1, .PerlString
     new P2, .PerlString
@@ -316,7 +316,7 @@ clear physics
 You can't teach an old dog new...clear physics
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "ensure that concat pps copies strings");
+pasm_output_is(<<CODE, <<OUTPUT, "ensure that concat pps copies strings");
     new P0, .PerlString
     new P1, .PerlString
 
@@ -338,7 +338,7 @@ fnargh
 fnarghGrunties
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "Setting string references");
+pasm_output_is(<<CODE, <<OUTPUT, "Setting string references");
     new P0, .PerlString
     set S0, "C2H5OH + 10H20"
     set P0, S0
@@ -354,7 +354,7 @@ C2H5OH
 C2H5OH
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "Assigning string copies");
+pasm_output_is(<<CODE, <<OUTPUT, "Assigning string copies");
     new P0, .PerlString
     set S0, "C2H5OH + 10H20"
     assign P0, S0
@@ -370,7 +370,7 @@ C2H5OH
 C2H5OH + 10H20
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "if (P) - String");
+pasm_output_is(<<CODE, <<OUTPUT, "if (P) - String");
     new    P0, .PerlString
 
     set    P0, "I've told you once, I've told you twice..."
@@ -433,7 +433,7 @@ ok 8
 ok 9
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "unless (P) - String");
+pasm_output_is(<<CODE, <<OUTPUT, "unless (P) - String");
     new    P0, .PerlString
 
     set    P0, "0"
@@ -456,7 +456,7 @@ OUTPUT
 #
 # Basic string number conversion
 #
-output_is(<<CODE, <<OUTPUT, "string to int");
+pasm_output_is(<<CODE, <<OUTPUT, "string to int");
     new    P0, .PerlString
 
     set    P0, "1"
@@ -495,7 +495,7 @@ CODE
 0
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "nasty string -> int");
+pasm_output_is(<<'CODE', <<OUTPUT, "nasty string -> int");
     new    P0, .PerlInt
     set    P0, "Z1"
     set    I0, P0
@@ -519,7 +519,7 @@ CODE
 123
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "string to number conversion");
+pasm_output_is(<<CODE, <<OUTPUT, "string to number conversion");
 @{[ $fp_equality_macro ]}
     new    P0, .PerlNum
 
@@ -623,7 +623,7 @@ ok 11
 ok 12
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "concatenate string to number");
+pasm_output_is(<<'CODE', <<OUTPUT, "concatenate string to number");
     new P0, .PerlString
     new P1, .PerlNum
     set P0, "bar"
@@ -636,7 +636,7 @@ CODE
 bar2.700000
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "concatenate string to string");
+pasm_output_is(<<'CODE', <<OUTPUT, "concatenate string to string");
     new P0, .PerlString
     new P1, .PerlString
     set P0, "foo"
@@ -649,7 +649,7 @@ CODE
 foobar
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "concatenate <foo> to undef");
+pasm_output_is(<<'CODE', <<OUTPUT, "concatenate <foo> to undef");
     new P0, .PerlUndef
     new P1, .PerlInt
     set P1, 10
@@ -692,7 +692,7 @@ ok 3
 ok 4
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "concatenate undef to <foo>");
+pasm_output_is(<<'CODE', <<OUTPUT, "concatenate undef to <foo>");
     new P0, .PerlUndef
     new P1, .PerlInt
     set P1, 10
@@ -727,7 +727,7 @@ ok 2
 ok 3
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "concatenate STRING to undef");
+pasm_output_is(<<'CODE', <<OUTPUT, "concatenate STRING to undef");
     new P0, .PerlUndef
     concat P0, P0, "Foo"
     set S0, P0
@@ -739,7 +739,7 @@ CODE
 ok 1
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "concatenate number to string");
+pasm_output_is(<<'CODE', <<OUTPUT, "concatenate number to string");
     new P0, .PerlNum
     new P1, .PerlString
     set P0, 5.43
@@ -752,7 +752,7 @@ CODE
 5.430000bar
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "repeat");
+pasm_output_is(<<'CODE', <<OUTPUT, "repeat");
     new P0, .PerlString
     set P0, "x"
     new P1, .PerlInt
@@ -790,7 +790,7 @@ zzz
 
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "repeat_int");
+pasm_output_is(<<'CODE', <<OUTPUT, "repeat_int");
     new P0, .PerlString
     set P0, "x"
     set I1, 12
@@ -810,7 +810,7 @@ xxxxxxxxxxxx
 zazaza
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "if(PerlString)");
+pasm_output_is(<<CODE, <<OUTPUT, "if(PerlString)");
     new P0, .PerlString
     set S0, "True"
     set P0, S0
@@ -864,7 +864,7 @@ OUTPUT
 
 # XXX these tests better should get generated
 #    with all combinations of params and ops
-output_is(<<'CODE', <<OUTPUT, "add str_int, str_int");
+pasm_output_is(<<'CODE', <<OUTPUT, "add str_int, str_int");
     new P0, .PerlString
     set P0, "23"
     new P1, .PerlString
@@ -878,7 +878,7 @@ CODE
 25
 OUTPUT
 
-output_is(<<"CODE", <<OUTPUT, "add str_int, str_num");
+pasm_output_is(<<"CODE", <<OUTPUT, "add str_int, str_num");
 @{[ $fp_equality_macro ]}
     new P0, .PerlString
     set P0, "23"
@@ -894,7 +894,7 @@ CODE
 ok 1
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "add str_int, int");
+pasm_output_is(<<'CODE', <<OUTPUT, "add str_int, int");
     new P0, .PerlString
     set P0, "23"
     new P1, .PerlInt
@@ -908,7 +908,7 @@ CODE
 25
 OUTPUT
 
-output_is(<<"CODE", <<OUTPUT, "add str_int, num");
+pasm_output_is(<<"CODE", <<OUTPUT, "add str_int, num");
 @{[ $fp_equality_macro ]}
     new P0, .PerlString
     set P0, "23"
@@ -924,7 +924,7 @@ CODE
 ok 1
 OUTPUT
 
-output_is(<<"CODE", <<OUTPUT, "add str_num, int");
+pasm_output_is(<<"CODE", <<OUTPUT, "add str_num, int");
 @{[ $fp_equality_macro ]}
     new P0, .PerlString
     set P0, "23.5"
@@ -941,7 +941,7 @@ ok 1
 OUTPUT
 
 # XXX - should test for appropriate warnings
-output_is(<<"CODE", <<OUTPUT, "add non-numeric string");
+pasm_output_is(<<"CODE", <<OUTPUT, "add non-numeric string");
 @{[ $fp_equality_macro ]}
     new P0, .PerlString
     set P0, "12"
@@ -971,7 +971,7 @@ ok 2
 ok 3
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "sub str_int, str_int");
+pasm_output_is(<<'CODE', <<OUTPUT, "sub str_int, str_int");
     new P0, .PerlString
     set P0, "23"
     new P1, .PerlString
@@ -985,7 +985,7 @@ CODE
 21
 OUTPUT
 
-output_is(<<"CODE", <<OUTPUT, "sub str_int, str_num");
+pasm_output_is(<<"CODE", <<OUTPUT, "sub str_int, str_num");
 @{[ $fp_equality_macro ]}
     new P0, .PerlString
     set P0, "23"
@@ -1001,7 +1001,7 @@ CODE
 ok 1
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "sub str_int, int");
+pasm_output_is(<<'CODE', <<OUTPUT, "sub str_int, int");
     new P0, .PerlString
     set P0, "23"
     new P1, .PerlInt
@@ -1015,7 +1015,7 @@ CODE
 21
 OUTPUT
 
-output_is(<<"CODE", <<OUTPUT, "sub str_int, num");
+pasm_output_is(<<"CODE", <<OUTPUT, "sub str_int, num");
 @{[ $fp_equality_macro ]}
     new P0, .PerlString
     set P0, "23"
@@ -1031,7 +1031,7 @@ CODE
 ok 1
 OUTPUT
 
-output_is(<<"CODE", <<OUTPUT, "sub str_num, int");
+pasm_output_is(<<"CODE", <<OUTPUT, "sub str_num, int");
 @{[ $fp_equality_macro ]}
     new P0, .PerlString
     set P0, "23.5"
@@ -1049,7 +1049,7 @@ ok 1
 OUTPUT
 
 # XXX - should test for appropriate warnings
-output_is(<<"CODE", <<OUTPUT, "sub non-numeric string");
+pasm_output_is(<<"CODE", <<OUTPUT, "sub non-numeric string");
 @{[ $fp_equality_macro ]}
     new P0, .PerlString
     set P0, "24"
@@ -1079,7 +1079,7 @@ ok 2
 ok 3
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "mul str_int, str_int");
+pasm_output_is(<<'CODE', <<OUTPUT, "mul str_int, str_int");
     new P0, .PerlString
     set P0, "23"
     new P1, .PerlString
@@ -1093,7 +1093,7 @@ CODE
 46
 OUTPUT
 
-output_is(<<"CODE", <<OUTPUT, "mul str_int, str_num");
+pasm_output_is(<<"CODE", <<OUTPUT, "mul str_int, str_num");
 @{[ $fp_equality_macro ]}
     new P0, .PerlString
     set P0, "5"
@@ -1109,7 +1109,7 @@ CODE
 ok 1
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "mul str_int, int");
+pasm_output_is(<<'CODE', <<OUTPUT, "mul str_int, int");
     new P0, .PerlString
     set P0, "23"
     new P1, .PerlInt
@@ -1123,7 +1123,7 @@ CODE
 46
 OUTPUT
 
-output_is(<<"CODE", <<OUTPUT, "mul str_int, num");
+pasm_output_is(<<"CODE", <<OUTPUT, "mul str_int, num");
 @{[ $fp_equality_macro ]}
     new P0, .PerlString
     set P0, "19"
@@ -1139,7 +1139,7 @@ CODE
 ok 1
 OUTPUT
 
-output_is(<<"CODE", <<OUTPUT, "mul str_num, int");
+pasm_output_is(<<"CODE", <<OUTPUT, "mul str_num, int");
 @{[ $fp_equality_macro ]}
     new P0, .PerlString
     set P0, "23.4"
@@ -1157,7 +1157,7 @@ ok 1
 OUTPUT
 
 # XXX - should test for appropriate warnings
-output_is(<<"CODE", <<OUTPUT, "mul non-numeric string");
+pasm_output_is(<<"CODE", <<OUTPUT, "mul non-numeric string");
 @{[ $fp_equality_macro ]}
     new P0, .PerlString
     set P0, "24"
@@ -1187,7 +1187,7 @@ ok 2
 ok 3
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "concat must morph dest to a string");
+pasm_output_is(<<'CODE', <<OUTPUT, "concat must morph dest to a string");
     new P0, .PerlString
     new P1, .PerlUndef
     set P0, "foo"
@@ -1215,7 +1215,7 @@ bar
 bar
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "cmp");
+pasm_output_is(<<'CODE', <<OUTPUT, "cmp");
     new P1, .PerlString
     new P2, .PerlString
 
@@ -1244,7 +1244,7 @@ CODE
 -1
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "cmp with PerlInt");
+pasm_output_is(<<'CODE', <<OUTPUT, "cmp with PerlInt");
     new P1, .PerlInt
     new P2, .PerlString
     set P2, "10"
@@ -1291,7 +1291,7 @@ CODE
 0
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "repeat");
+pasm_output_is(<<'CODE', <<OUTPUT, "repeat");
     new P0, .PerlUndef
     new P1, .PerlString
     new P2, .PerlInt
@@ -1316,7 +1316,7 @@ ok 1
 ok 2
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "substr");
+pasm_output_is(<<'CODE', <<OUTPUT, "substr");
     new P0, .PerlString
     set P0, "This is a test\n"
     substr S0, P0, 0, 5
@@ -1334,7 +1334,7 @@ This test is a test
 This is a test
 OUTPUT
 
-output_like(<<'CODE', <<'OUTPUT', "Out-of-bounds substr, +ve offset");
+pasm_output_like(<<'CODE', <<'OUTPUT', "Out-of-bounds substr, +ve offset");
     new P0, .PerlString
     set P0, "Woburn"
     substr S0, P0, 123, 22
@@ -1343,7 +1343,7 @@ CODE
 /^Cannot take substr outside string$/
 OUTPUT
 
-output_like(<<'CODE', <<'OUTPUT', "Out-of-bounds substr, -ve offset");
+pasm_output_like(<<'CODE', <<'OUTPUT', "Out-of-bounds substr, -ve offset");
     new P0, .PerlString
     set P0, "Woburn"
     substr S0, P0, -123, 22
@@ -1352,7 +1352,7 @@ CODE
 /^Cannot take substr outside string$/
 OUTPUT
 
-output_is( <<'CODE', <<OUTPUT, "bands NULL string");
+pasm_output_is( <<'CODE', <<OUTPUT, "bands NULL string");
     new P1, .PerlString
     new P2, .PerlString
     new P3, .PerlString
@@ -1394,7 +1394,7 @@ ok 3
 ok 4
 OUTPUT
 
-output_is( <<'CODE', <<OUTPUT, "bands 2");
+pasm_output_is( <<'CODE', <<OUTPUT, "bands 2");
     new P1, .PerlString
     new P2, .PerlString
     set P1, "abc"
@@ -1410,7 +1410,7 @@ A@
 EE
 OUTPUT
 
-output_is( <<'CODE', <<OUTPUT, "bands 3");
+pasm_output_is( <<'CODE', <<OUTPUT, "bands 3");
     new P1, .PerlString
     new P2, .PerlString
     new P0, .PerlString
@@ -1430,7 +1430,7 @@ abc
 EE
 OUTPUT
 
-output_is( <<'CODE', <<OUTPUT, "bors NULL string");
+pasm_output_is( <<'CODE', <<OUTPUT, "bors NULL string");
     new P1, .PerlString
     new P2, .PerlString
     new P3, .PerlString
@@ -1516,7 +1516,7 @@ ok 9
 ok 10
 OUTPUT
 
-output_is( <<'CODE', <<OUTPUT, "bors 2");
+pasm_output_is( <<'CODE', <<OUTPUT, "bors 2");
     new P1, .PerlString
     new P2, .PerlString
     set P1, "abc"
@@ -1532,7 +1532,7 @@ egc
 EE
 OUTPUT
 
-output_is( <<'CODE', <<OUTPUT, "bors 3");
+pasm_output_is( <<'CODE', <<OUTPUT, "bors 3");
     new P1, .PerlString
     new P2, .PerlString
     new P0, .PerlString
@@ -1552,7 +1552,7 @@ abc
 EE
 OUTPUT
 
-output_is( <<'CODE', <<OUTPUT, "bxors NULL string");
+pasm_output_is( <<'CODE', <<OUTPUT, "bxors NULL string");
     new P1, .PerlString
     new P2, .PerlString
     new P3, .PerlString
@@ -1636,7 +1636,7 @@ ok 9
 ok 10
 OUTPUT
 
-output_is( <<'CODE', <<OUTPUT, "bxors 2");
+pasm_output_is( <<'CODE', <<OUTPUT, "bxors 2");
     new P1, .PerlString
     new P2, .PerlString
     new P3, .PerlString
@@ -1662,7 +1662,7 @@ ABCX
    X
 OUTPUT
 
-output_is( <<'CODE', <<OUTPUT, "bxors 3");
+pasm_output_is( <<'CODE', <<OUTPUT, "bxors 3");
     new P1, .PerlString
     new P2, .PerlString
     new P0, .PerlString
@@ -1694,7 +1694,7 @@ abc
    Y
 OUTPUT
 
-output_is( <<'CODE', <<OUTPUT, "bnots NULL string");
+pasm_output_is( <<'CODE', <<OUTPUT, "bnots NULL string");
     new P1, .PerlString
     new P2, .PerlString
     new P3, .PerlString
@@ -1727,7 +1727,7 @@ ok 2
 ok 3
 OUTPUT
 
-output_is( <<'CODE', <<OUTPUT, "eq");
+pasm_output_is( <<'CODE', <<OUTPUT, "eq");
     new P1, .PerlString
     set P1, "ABC"
     set S1, "ABC"
@@ -1775,7 +1775,7 @@ ok 5
 ok 6
 OUTPUT
 
-output_is( <<'CODE', <<OUTPUT, "eq_str");
+pasm_output_is( <<'CODE', <<OUTPUT, "eq_str");
     new P1, .PerlString
     new P2, .PerlString
     set P1, "ABC"
@@ -1810,7 +1810,7 @@ ok 3
 ok 4
 OUTPUT
 
-output_is( <<'CODE', <<OUTPUT, "ne");
+pasm_output_is( <<'CODE', <<OUTPUT, "ne");
     new P1, .PerlString
     set P1, "ABC"
     set S1, "CBA"
@@ -1855,7 +1855,7 @@ ok 5
 ok 6
 OUTPUT
 
-output_is( <<'CODE', <<OUTPUT, "ne_str");
+pasm_output_is( <<'CODE', <<OUTPUT, "ne_str");
     new P1, .PerlString
     new P2, .PerlString
     set P1, "ABC"
@@ -1888,7 +1888,7 @@ ok 3
 ok 4
 OUTPUT
 
-output_is( <<'CODE', <<OUTPUT, "set const and chop");
+pasm_output_is( <<'CODE', <<OUTPUT, "set const and chop");
    new P0, .PerlString
    set P0, "str"
    set S0, P0
@@ -1900,7 +1900,7 @@ CODE
 str
 OUTPUT
 
-output_is( <<'CODE', <<OUTPUT, "increment");
+pasm_output_is( <<'CODE', <<OUTPUT, "increment");
    new P0, .PerlString
    set P0, 'a'
    inc P0
@@ -1918,7 +1918,7 @@ CODE
 bcFG
 OUTPUT
 
-output_is( <<'CODE', <<OUTPUT, "decrement");
+pasm_output_is( <<'CODE', <<OUTPUT, "decrement");
    new P0, .PerlString
    set P0, '9'
    dec P0

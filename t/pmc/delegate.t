@@ -24,7 +24,7 @@ Tests method delegation.
 
 # basic functionality - setting and getting types
 
-output_is(<<'CODE', <<'OUTPUT', "delegate set_integer_native");
+pasm_output_is(<<'CODE', <<'OUTPUT', "delegate set_integer_native");
     new P0, .delegate
     set P0, 42
     end
@@ -41,7 +41,7 @@ CODE
 42
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "delegate get_integer");
+pasm_output_is(<<'CODE', <<'OUTPUT', "delegate get_integer");
     new P0, .delegate
     set I0, P0
     print I0
@@ -57,7 +57,7 @@ CODE
 42
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "delegate set_string_native");
+pasm_output_is(<<'CODE', <<'OUTPUT', "delegate set_string_native");
     new P0, .delegate
     set P0, "fortytwo"
     end
@@ -71,7 +71,7 @@ CODE
 fortytwo
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "delegate get_string");
+pasm_output_is(<<'CODE', <<'OUTPUT', "delegate get_string");
     new P0, .delegate
     set S0, P0
     print S0
@@ -87,7 +87,7 @@ CODE
 fortytwo
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "delegate set_number_native");
+pasm_output_is(<<'CODE', <<'OUTPUT', "delegate set_number_native");
     new P0, .delegate
     set P0, 47.11
     end
@@ -101,7 +101,7 @@ CODE
 47.110000
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "delegate get_number");
+pasm_output_is(<<'CODE', <<'OUTPUT', "delegate get_number");
     new P0, .delegate
     set N0, P0
     print N0
@@ -117,7 +117,7 @@ CODE
 47.110000
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "delegate assign_pmc");
+pasm_output_is(<<'CODE', <<'OUTPUT', "delegate assign_pmc");
     new P0, .delegate
     new P1, .Integer
     set P1, 42

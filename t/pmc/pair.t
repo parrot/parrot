@@ -22,7 +22,7 @@ Tests the C<Pair> PMC.
 
 =cut
 
-output_is(<<'CODE', <<'OUT', 'create');
+pasm_output_is(<<'CODE', <<'OUT', 'create');
     new P0, .Pair
     print "ok 1\n"
     new P1, .Integer

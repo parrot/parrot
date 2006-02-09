@@ -22,7 +22,7 @@ Tests the C<Key> PMC.
 
 =cut
 
-output_is(<<'CODE', <<'OUT', 'traverse key chain');
+pasm_output_is(<<'CODE', <<'OUT', 'traverse key chain');
     new P0, .Key
     set P0, "1"
     new P1, .Key

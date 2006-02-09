@@ -23,7 +23,7 @@ Tests the C<Env> PMC.
 
 =cut
 
-output_is(<<'CODE', <<OUT, "all Envs are ident");
+pasm_output_is(<<'CODE', <<OUT, "all Envs are ident");
     new P0, .Env
     new P1, .Env
     eq_addr P0, P1, ok
@@ -35,7 +35,7 @@ ok
 OUT
 
 $ENV{"PARROT_TMP"} = "riding a ponie";
-output_like(<<'CODE', <<OUT, "getenv");
+pasm_output_like(<<'CODE', <<OUT, "getenv");
     new P0, .Env
     set S0, P0["PARROT_TMP"]
     print S0
@@ -45,7 +45,7 @@ CODE
 OUT
 
 delete $ENV{"PARROT_TMP"};
-output_like(<<'CODE', <<OUT, "setenv/getenv");
+pasm_output_like(<<'CODE', <<OUT, "setenv/getenv");
     new P0, .Env
     set P0["PARROT_TMP"], "hello polly"
     set S0, P0["PARROT_TMP"]
@@ -55,7 +55,7 @@ CODE
 /hello polly/i
 OUT
 
-output_is(<<'CODE', <<OUT, "envs are all the same");
+pasm_output_is(<<'CODE', <<OUT, "envs are all the same");
     new P0, .Env
     set P0["PARROT_TMP"], "hello polly"
     set S0, P0["PARROT_TMP"]
@@ -71,7 +71,7 @@ CODE
 ok
 OUT
 
-output_is(<<'CODE', <<OUT, "gone/delete");
+pasm_output_is(<<'CODE', <<OUT, "gone/delete");
     new P0, .Env
     set P0["PARROT_TMP"], "hello polly"
     exists I0, P0["PARROT_TMP"]
@@ -95,7 +95,7 @@ SKIP:
 {
 	skip 'iterator not available on win32' => 1
 		if 'MSWin32' eq $^O;
-output_is(<<'CODE', <<OUT, "iterate");
+pasm_output_is(<<'CODE', <<OUT, "iterate");
     new P0, .Env
     set P0["PARROT_1"], "hello"
     set P0["PARROT_2"], "polly"
@@ -125,7 +125,7 @@ OUT
 SKIP: {
     # This will not work on our unsetenv implementation
     skip("no native unsetenv", 1) unless $PConfig{"unsetenv"};
-output_is(<<'CODE', <<OUT, "exists/delete");
+pasm_output_is(<<'CODE', <<OUT, "exists/delete");
     new P0, .Env
     set P0["PARROT_TMP"], "hello polly"
     exists I0, P0["PARROT_TMP"]
@@ -210,7 +210,7 @@ CODE
 3.000000
 OUTPUT
 
-output_is(<<'CODE', <<OUT, "getenv - null key");
+pasm_output_is(<<'CODE', <<OUT, "getenv - null key");
     new P0, .Env
     set S0, P0[""]
     eq S0, "", OK
@@ -221,7 +221,7 @@ CODE
 ok
 OUT
 
-output_like(<<'CODE', <<OUT, "setenv/getenv - PMC key");
+pasm_output_like(<<'CODE', <<OUT, "setenv/getenv - PMC key");
     new P0, .Env
     new P1, .Key
     set P1, "PARROT_TMP"

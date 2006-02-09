@@ -22,7 +22,7 @@ Tests the C<Coroutine> PMC.
 
 =cut
 
-output_is(<<'CODE', <<'OUTPUT', "Coroutine 1");
+pasm_output_is(<<'CODE', <<'OUTPUT', "Coroutine 1");
 .include "interpinfo.pasm"
 .pcc_sub _main:
     .const .Sub P0 = "_coro"
@@ -105,7 +105,7 @@ CODE
 10 0
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "Coroutine - exception in main");
+pasm_output_is(<<'CODE', <<'OUTPUT', "Coroutine - exception in main");
 .include "interpinfo.pasm"
 _main:
     .const .Sub P0 = "_coro"
@@ -143,7 +143,7 @@ back 1
 catch main
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "Coroutine - exception in coro");
+pasm_output_is(<<'CODE', <<'OUTPUT', "Coroutine - exception in coro");
 .include "interpinfo.pasm"
 _main:
     .const .Sub P0 = "_coro"
@@ -181,7 +181,7 @@ back 1
 catch coro
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "Coroutine - exception in coro no handler");
+pasm_output_is(<<'CODE', <<'OUTPUT', "Coroutine - exception in coro no handler");
 .include "interpinfo.pasm"
 _main:
     .const .Sub P0 = "_coro"
@@ -216,7 +216,7 @@ back 1
 catch main
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "Coroutine - exception in coro rethrow");
+pasm_output_is(<<'CODE', <<'OUTPUT', "Coroutine - exception in coro rethrow");
 .include "interpinfo.pasm"
 _main:
     .const .Sub P0 = "_coro"

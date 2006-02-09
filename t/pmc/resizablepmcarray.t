@@ -67,7 +67,7 @@ my $fp_equality_macro = <<'ENDOFMACRO';
 .endm
 ENDOFMACRO
 
-output_is(<<'CODE', <<'OUTPUT', "Setting array size");
+pasm_output_is(<<'CODE', <<'OUTPUT', "Setting array size");
 	new P0,.ResizablePMCArray
 
 	set I0,P0
@@ -107,7 +107,7 @@ ok 4
 ok 5
 OUTPUT
 
-output_like(<<'CODE', <<'OUTPUT', "Setting negative array size");
+pasm_output_like(<<'CODE', <<'OUTPUT', "Setting negative array size");
 	new P0, .ResizablePMCArray
         set P0, -1
         end
@@ -115,7 +115,7 @@ CODE
 /ResizablePMCArray: Can't resize!/
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "Setting first element");
+pasm_output_is(<<'CODE', <<'OUTPUT', "Setting first element");
         new P0, .ResizablePMCArray
         set P0, 1
 
@@ -144,7 +144,7 @@ ok 2
 ok 3
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "Setting second element");
+pasm_output_is(<<'CODE', <<'OUTPUT', "Setting second element");
         new P0, .ResizablePMCArray
 
 	set P0[1], -7
@@ -172,7 +172,7 @@ ok 2
 ok 3
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "Setting last element");
+pasm_output_is(<<'CODE', <<'OUTPUT', "Setting last element");
         new P0, .ResizablePMCArray
         set P0, 10
         new P1, .Integer
@@ -187,7 +187,7 @@ CODE
 1234
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "Getting last element");
+pasm_output_is(<<'CODE', <<'OUTPUT', "Getting last element");
         new P0, .ResizablePMCArray
         set P0, 100
         new P1, .Integer
@@ -204,7 +204,7 @@ OUTPUT
 
 # TODO: Rewrite these properly when we have exceptions
 
-output_is(<<'CODE', <<'OUTPUT', "Setting out-of-bounds elements");
+pasm_output_is(<<'CODE', <<'OUTPUT', "Setting out-of-bounds elements");
         new P0, .ResizablePMCArray
         set P0, 1
 
@@ -216,7 +216,7 @@ CODE
 ok 1
 OUTPUT
 
-output_like(<<'CODE', <<'OUTPUT', "Setting -ve out-of-bounds elements");
+pasm_output_like(<<'CODE', <<'OUTPUT', "Setting -ve out-of-bounds elements");
         new P0, .ResizablePMCArray
         set P0, 1
         new P1, .Integer
@@ -228,7 +228,7 @@ CODE
 /ResizablePMCArray: index out of bounds!/
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "Getting out-of-bounds elements");
+pasm_output_is(<<'CODE', <<'OUTPUT', "Getting out-of-bounds elements");
         new P0, .ResizablePMCArray
         set P0, 1
 
@@ -239,7 +239,7 @@ CODE
 ok 1
 OUTPUT
 
-output_like(<<'CODE', <<'OUTPUT', "Getting -ve out-of-bounds elements");
+pasm_output_like(<<'CODE', <<'OUTPUT', "Getting -ve out-of-bounds elements");
         new P0, .ResizablePMCArray
         set P0, 1
         new P1, .Integer
@@ -249,7 +249,7 @@ CODE
 /ResizablePMCArray: index out of bounds!/
 OUTPUT
 
-output_is(<<"CODE", <<'OUTPUT', "Set via PMC keys, access via INTs");
+pasm_output_is(<<"CODE", <<'OUTPUT', "Set via PMC keys, access via INTs");
 @{[ $fp_equality_macro ]}
      new P0, .ResizablePMCArray
      new P1, .Key
@@ -298,7 +298,7 @@ ok 3
 ok 4
 OUTPUT
 
-output_is(<<"CODE", <<'OUTPUT', "Set via INTs, access via PMC Keys");
+pasm_output_is(<<"CODE", <<'OUTPUT', "Set via INTs, access via PMC Keys");
 @{[ $fp_equality_macro ]}
      new P0, .ResizablePMCArray
      set P0, 1
@@ -540,7 +540,7 @@ CODE
 0 0
 OUTPUT
 
-output_is(<< 'CODE', << 'OUTPUT', "unshift pmc");
+pasm_output_is(<< 'CODE', << 'OUTPUT', "unshift pmc");
     new P0, .ResizablePMCArray
     new P1, .Integer
     set P1, 1
@@ -571,7 +571,7 @@ CODE
 1
 OUTPUT
 
-output_is(<<'CODE', <<'OUT', "get_mro");
+pasm_output_is(<<'CODE', <<'OUT', "get_mro");
     new P0, .ResizablePMCArray
     get_mro P1, P0
     print "ok 1\n"

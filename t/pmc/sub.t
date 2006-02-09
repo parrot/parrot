@@ -30,7 +30,7 @@ END {
     unlink($temp, 'temp.pbc');
 };
 
-output_is(<<'CODE', <<'OUTPUT', "PASM subs - invokecc");
+pasm_output_is(<<'CODE', <<'OUTPUT', "PASM subs - invokecc");
     .const .Sub P0 = "func"
 
     set I5, 3
@@ -63,7 +63,7 @@ CODE
 3
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "Continuation");
+pasm_output_is(<<'CODE', <<'OUTPUT', "Continuation");
     new P5, .Integer
     set P5, 3
     store_global "foo", P5
@@ -95,7 +95,7 @@ here 0
 done
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "definedness of Continuation");
+pasm_output_is(<<'CODE', <<'OUTPUT', "definedness of Continuation");
     new P1, .Continuation
     defined I1, P1
     print I1
@@ -115,7 +115,7 @@ CODE
 1
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "pcc sub");
+pasm_output_is(<<'CODE', <<'OUTPUT', "pcc sub");
     find_global P0, "_the_sub"
     defined I0, P0
     if I0, ok
@@ -134,7 +134,7 @@ in sub
 back
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "pcc sub, tail call");
+pasm_output_is(<<'CODE', <<'OUTPUT', "pcc sub, tail call");
     find_global P0, "_the_sub"
     defined I0, P0
     if I0, ok
@@ -164,7 +164,7 @@ in next sub
 back
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "pcc sub perl::syn::tax");
+pasm_output_is(<<'CODE', <<'OUTPUT', "pcc sub perl::syn::tax");
     find_global P0, "_the::sub::some::where"
     defined I0, P0
     if I0, ok
@@ -191,7 +191,7 @@ print S <<'EOF';
 EOF
 close S;
 
-output_is(<<'CODE', <<'OUTPUT', "load_bytecode call sub");
+pasm_output_is(<<'CODE', <<'OUTPUT', "load_bytecode call sub");
 .pcc_sub _main:
     print "main\n"
     load_bytecode "temp.pasm"
@@ -220,7 +220,7 @@ print S <<'EOF';
 EOF
 close S;
 
-output_is(<<'CODE', <<'OUTPUT', "load_bytecode call sub, ret");
+pasm_output_is(<<'CODE', <<'OUTPUT', "load_bytecode call sub, ret");
 .pcc_sub _main:
     print "main\n"
     load_bytecode "temp.pasm"
@@ -253,7 +253,7 @@ print S <<'EOF';
 EOF
 close S;
 
-output_is(<<'CODE', <<'OUTPUT', "load_bytecode call different subs, ret");
+pasm_output_is(<<'CODE', <<'OUTPUT', "load_bytecode call different subs, ret");
 .pcc_sub _main:
     print "main\n"
     load_bytecode "temp.pasm"
@@ -294,7 +294,7 @@ OUTPUT
 
 system(".$PConfig{slash}parrot$PConfig{exe} -o temp.pbc $temp");
 
-output_is(<<'CODE', <<'OUTPUT', "load_bytecode PBC call different subs, ret");
+pasm_output_is(<<'CODE', <<'OUTPUT', "load_bytecode PBC call different subs, ret");
 .pcc_sub _main:
     print "main\n"
     load_bytecode "temp.pbc"
@@ -333,7 +333,7 @@ in sub1
 back
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "equality of closures");
+pasm_output_is(<<'CODE', <<'OUTPUT', "equality of closures");
 .pcc_sub main:
       .const .Sub P3 = "f1"
       newclosure P0, P3
@@ -362,7 +362,7 @@ ok 1
 ok 2
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "equality of subs");
+pasm_output_is(<<'CODE', <<'OUTPUT', "equality of subs");
       .const .Sub P0 = "f1"
       clone P1, P0
       eq P0, P1, OK1
@@ -389,7 +389,7 @@ ok 1
 ok 2
 OUTPUT
 
-output_is(<<'CODE', <<'OUT', "MAIN pragma, syntax only");
+pasm_output_is(<<'CODE', <<'OUT', "MAIN pragma, syntax only");
 .pcc_sub :main _main:
     print "ok\n"
     end
@@ -405,7 +405,7 @@ print S <<'EOF';
 EOF
 close S;
 
-output_is(<<'CODE', <<'OUTPUT', 'load_bytecode :load');
+pasm_output_is(<<'CODE', <<'OUTPUT', 'load_bytecode :load');
 .pcc_sub _main:
     print "main\n"
     load_bytecode "temp.pasm"
@@ -427,7 +427,7 @@ print S <<'EOF';
 EOF
 close S;
 
-output_is(<<'CODE', <<'OUTPUT', 'load_bytecode :load second sub');
+pasm_output_is(<<'CODE', <<'OUTPUT', 'load_bytecode :load second sub');
 .pcc_sub _main:
     print "main\n"
     load_bytecode "temp.pasm"
@@ -441,7 +441,7 @@ OUTPUT
 
 system(".$PConfig{slash}parrot$PConfig{exe} -o temp.pbc $temp");
 
-output_is(<<'CODE', <<'OUTPUT', 'load_bytecode :load in pbc');
+pasm_output_is(<<'CODE', <<'OUTPUT', 'load_bytecode :load in pbc');
 .pcc_sub _main:
     print "main\n"
     load_bytecode "temp.pbc"
@@ -464,7 +464,7 @@ print S <<'EOF';
 EOF
 close S;
 
-output_is(<<'CODE', <<'OUTPUT', "load_bytecode autorun first");
+pasm_output_is(<<'CODE', <<'OUTPUT', "load_bytecode autorun first");
 .pcc_sub _main:
     print "main\n"
     load_bytecode "temp.pasm"
@@ -483,7 +483,7 @@ OUTPUT
 
 system(".$PConfig{slash}parrot$PConfig{exe} -o temp.pbc $temp");
 
-output_is(<<'CODE', <<'OUTPUT', "load_bytecode autorun first in pbc");
+pasm_output_is(<<'CODE', <<'OUTPUT', "load_bytecode autorun first in pbc");
 .pcc_sub _main:
     print "main\n"
     load_bytecode "temp.pbc"
@@ -511,7 +511,7 @@ print S <<'EOF';
 EOF
 close S;
 
-output_is(<<'CODE', <<'OUTPUT', "load_bytecode autorun second");
+pasm_output_is(<<'CODE', <<'OUTPUT', "load_bytecode autorun second");
 .pcc_sub _main:
     print "main\n"
     load_bytecode "temp.pasm"
@@ -530,7 +530,7 @@ OUTPUT
 
 system(".$PConfig{slash}parrot$PConfig{exe} -o temp.pbc $temp");
 
-output_is(<<'CODE', <<'OUTPUT', "load_bytecode autorun second in pbc");
+pasm_output_is(<<'CODE', <<'OUTPUT', "load_bytecode autorun second in pbc");
 .pcc_sub _main:
     print "main\n"
     load_bytecode "temp.pbc"
@@ -558,7 +558,7 @@ print S <<'EOF';
 EOF
 close S;
 
-output_is(<<'CODE', <<'OUTPUT', "load_bytecode autorun both");
+pasm_output_is(<<'CODE', <<'OUTPUT', "load_bytecode autorun both");
 .pcc_sub _main:
     print "main\n"
     load_bytecode "temp.pasm"
@@ -578,7 +578,7 @@ OUTPUT
 
 system(".$PConfig{slash}parrot$PConfig{exe} -o temp.pbc $temp");
 
-output_is(<<'CODE', <<'OUTPUT', "load_bytecode autorun both in pbc");
+pasm_output_is(<<'CODE', <<'OUTPUT', "load_bytecode autorun both in pbc");
 .pcc_sub _main:
     print "main\n"
     load_bytecode "temp.pbc"
@@ -596,7 +596,7 @@ in sub1
 back
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', ':main pragma');
+pasm_output_is(<<'CODE', <<'OUTPUT', ':main pragma');
 .pcc_sub _first:
     print "first\n"
     returncc
@@ -607,7 +607,7 @@ CODE
 main
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', 'two :main pragmas');
+pasm_output_is(<<'CODE', <<'OUTPUT', 'two :main pragmas');
 .pcc_sub _first:
     print "first\n"
     returncc
@@ -621,7 +621,7 @@ CODE
 main
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', ':main pragma call subs');
+pasm_output_is(<<'CODE', <<'OUTPUT', ':main pragma call subs');
 .pcc_sub _first:
     print "first\n"
     returncc
@@ -653,7 +653,7 @@ print S <<'EOF';
 EOF
 close S;
 
-output_is(<<'CODE', <<'OUTPUT', 'load_bytecode :load first sub - pir');
+pasm_output_is(<<'CODE', <<'OUTPUT', 'load_bytecode :load first sub - pir');
 .pcc_sub _main:
     print "main\n"
     load_bytecode "temp.pir"
@@ -681,7 +681,7 @@ print S <<'EOF';
 EOF
 close S;
 
-output_is(<<'CODE', <<'OUTPUT', 'load_bytecode :load second sub - pir');
+pasm_output_is(<<'CODE', <<'OUTPUT', 'load_bytecode :load second sub - pir');
 .pcc_sub _main:
     print "main\n"
     load_bytecode "temp.pir"
@@ -705,7 +705,7 @@ print S <<'EOF';
 EOF
 close S;
 
-output_is(<<'CODE', <<'OUTPUT', 'load_bytecode no :load - pir');
+pasm_output_is(<<'CODE', <<'OUTPUT', 'load_bytecode no :load - pir');
 .pcc_sub _main:
     print "main\n"
     load_bytecode "temp.pir"
@@ -768,7 +768,7 @@ CODE
 /uninit.*\n.*\nback\nok/
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "sub names");
+pasm_output_is(<<'CODE', <<'OUTPUT', "sub names");
 .pcc_sub main:
     .include "interpinfo.pasm"
     interpinfo P20, .INTERPINFO_CURRENT_SUB
@@ -792,7 +792,7 @@ the_sub
 main
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "sub names w MAIN");
+pasm_output_is(<<'CODE', <<'OUTPUT', "sub names w MAIN");
 .pcc_sub dummy:
     print "never\n"
     noop

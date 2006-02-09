@@ -84,7 +84,7 @@ String ok 3
 OUTPUT
 };
 
-output_is(<<'CODE', <<'OUTPUT', "open/close");
+pasm_output_is(<<'CODE', <<'OUTPUT', "open/close");
 	open P0, "temp.file", ">"
 	print P0, "a line\n"
 	close P0
@@ -96,7 +96,7 @@ CODE
 a line
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "timely destruction");
+pasm_output_is(<<'CODE', <<'OUTPUT', "timely destruction");
 	interpinfo I0, 2	# DOD runs
 	open P0, "temp.file", ">"
         needs_destroy P0
@@ -111,7 +111,7 @@ CODE
 a line
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "getfd/fdopen");
+pasm_output_is(<<'CODE', <<'OUTPUT', "getfd/fdopen");
         getstdout P0
         getfd I0, P0
 	fdopen P1, I0, ">"
@@ -127,7 +127,7 @@ CODE
 ok
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "fdopen - no close");
+pasm_output_is(<<'CODE', <<'OUTPUT', "fdopen - no close");
         getstdout P0
         getfd I0, P0
 	fdopen P1, I0, ">"
@@ -144,7 +144,7 @@ OUTPUT
 
 unlink "no_such_file" if (-e "no_such_file");
 
-output_is(<<'CODE', <<'OUTPUT', "get_bool");
+pasm_output_is(<<'CODE', <<'OUTPUT', "get_bool");
 	open P0, "no_such_file", "<"
 	unless P0, ok1
 	print "Huh: 'no_such_file' exists? - not "
@@ -182,7 +182,7 @@ ok 6
 OUTPUT
 
 
-output_is(<<'CODE', <<'OUTPUT', "read on invalid fh should throw exception");
+pasm_output_is(<<'CODE', <<'OUTPUT', "read on invalid fh should throw exception");
 	open P0, "no_such_file", "<"
 	unless P0, ok1
 	print "Huh: 'no_such_file' exists? - not "
@@ -218,7 +218,7 @@ OUTPUT
 
 SKIP: {
     skip ("clone not finished yet", 1);
-output_is(<<'CODE', <<'OUTPUT', "clone");
+pasm_output_is(<<'CODE', <<'OUTPUT', "clone");
 	open P0, "temp.file", "<"
 	clone P1, P0
 	read S0, P1, 1024
@@ -233,7 +233,7 @@ OUTPUT
 open FOO, ">temp.file";
 print FOO "2\n1\n";
 close FOO;
-output_is(<<'CODE', <<'OUTPUT', "open and readline");
+pasm_output_is(<<'CODE', <<'OUTPUT', "open and readline");
 	open P0, "temp.file"
 	set S0, ""
 	set S1, ""
@@ -250,7 +250,7 @@ OUTPUT
 open FOO, ">temp.file";  # Clobber previous contents
 close FOO;
 
-output_is(<<'CODE', <<'OUTPUT', "open & print");
+pasm_output_is(<<'CODE', <<'OUTPUT', "open & print");
        set I0, -12
        set N0, 2.2
        set S0, "Foo"
@@ -278,7 +278,7 @@ open FOO, ">temp.file";  # Clobber previous contents
 close FOO;
 
 # write to file opened for reading
-output_is(<<'CODE', <<'OUTPUT', "3-arg open");
+pasm_output_is(<<'CODE', <<'OUTPUT', "3-arg open");
        open P1, "temp.file", "<"
        print P1, "Foobar\n"
        close P1
@@ -296,7 +296,7 @@ OUTPUT
 
 unlink("temp.file");
 
-output_is(<<'CODE', <<'OUTPUT', 'open and close');
+pasm_output_is(<<'CODE', <<'OUTPUT', 'open and close');
        open P1, "temp.file"
        print P1, "Hello, World!\n"
        close P1
@@ -310,7 +310,7 @@ file_content_is("temp.file", <<'OUTPUT', 'file contents');
 Hello, World!
 OUTPUT
 
-output_is(<<'CODE', '', 'append');
+pasm_output_is(<<'CODE', '', 'append');
        open P1, "temp.file", ">>"
        print P1, "Parrot flies\n"
        close P1
@@ -322,7 +322,7 @@ Hello, World!
 Parrot flies
 OUTPUT
 
-output_is(<<'CODE', '', 'write to file');
+pasm_output_is(<<'CODE', '', 'write to file');
        open P1, "temp.file", ">"
        print P1, "Parrot overwrites\n"
        close P1
@@ -335,7 +335,7 @@ OUTPUT
 
 unlink("temp.file");
 
-output_is(<<'CODE', <<'OUT', 'standard file descriptors');
+pasm_output_is(<<'CODE', <<'OUT', 'standard file descriptors');
        getstdin P0
        getfd I0, P0
        # I0 is 0 on Unix and non-Null on stdio and win32
@@ -357,7 +357,7 @@ ok 2
 ok 3
 OUT
 
-output_is(<<'CODE', <<'OUTPUT', 'printerr');
+pasm_output_is(<<'CODE', <<'OUTPUT', 'printerr');
        new P0, .String
        set P0, "This is a test\n"
        printerr 10
@@ -375,7 +375,7 @@ foo
 This is a test
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', 'puts method');
+pasm_output_is(<<'CODE', <<'OUTPUT', 'puts method');
        getstdout P2
        can I0, P2, "puts"
        if I0, ok1
@@ -408,7 +408,7 @@ ok 1
 ok 2
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', 'callmethod puts');
+pasm_output_is(<<'CODE', <<'OUTPUT', 'callmethod puts');
        getstderr P2	# the object
        set S0, "puts"	# method
        set S5, "ok 1\n"	# 2nd param
@@ -423,7 +423,7 @@ ok 1
 ok 2
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', 'seek/tell');
+pasm_output_is(<<'CODE', <<'OUTPUT', 'seek/tell');
        open P0, "temp.file", ">"
        print P0, "Hello "
        tell I0, P0
@@ -441,7 +441,7 @@ ok 1
 Hello Parrot!
 OUTPUT
 
-output_like(<<'CODE', <<'OUTPUT', '32bit seek: exception');
+pasm_output_like(<<'CODE', <<'OUTPUT', '32bit seek: exception');
        open P0, "temp.file", ">"
        seek P0, -1, 0
        print "error!\n"
@@ -450,7 +450,7 @@ CODE
 /seek failed \(32bit\)/
 OUTPUT
 
-output_like(<<'CODE', <<'OUTPUT', '64bit seek: exception');
+pasm_output_like(<<'CODE', <<'OUTPUT', '64bit seek: exception');
        open P0, "temp.file", ">"
        seek P0, -1, -1, 0
        print "error!\n"
@@ -459,7 +459,7 @@ CODE
 /seek failed \(64bit\)/
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "peek");
+pasm_output_is(<<'CODE', <<'OUTPUT', "peek");
         open P0, "temp.file", ">"
         print P0, "a line\n"
         close P0
@@ -479,7 +479,7 @@ aa
 l
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "peek on an empty file");
+pasm_output_is(<<'CODE', <<'OUTPUT', "peek on an empty file");
         open P0, "temp.file", ">"
         close P0
         open P0, "temp.file", "<"
@@ -494,7 +494,7 @@ OUTPUT
 
 unlink "temp.file";
 
-output_like(<<'CODE', <<'OUTPUT', "layer names");
+pasm_output_like(<<'CODE', <<'OUTPUT', "layer names");
     getstdin P0
     set S0, P0[0]
     print S0
@@ -516,7 +516,7 @@ CODE
 /^(unix|win32|stdio)-buf-buf-\1--$/
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "layer push, pop");
+pasm_output_is(<<'CODE', <<'OUTPUT', "layer push, pop");
     getstdin P0
     push P0, "utf8"
     set S0, P0[-1]

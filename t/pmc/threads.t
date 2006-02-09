@@ -53,7 +53,7 @@ else {
 }
 
 
-output_is(<<'CODE', <<'OUTPUT', "interp identity");
+pasm_output_is(<<'CODE', <<'OUTPUT', "interp identity");
     getinterp P2
     clone P3, P2
     eq P3, P2, ok1
@@ -71,7 +71,7 @@ ok 1
 ok 2
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "thread type 1");
+pasm_output_is(<<'CODE', <<'OUTPUT', "thread type 1");
     set I5, 10
     #
     # set regs P2 = thread-interp, P5 = sub
@@ -106,7 +106,7 @@ main 10
 OUTPUT
 
 
-output_is(<<'CODE', <<'OUTPUT', "thread type 2");
+pasm_output_is(<<'CODE', <<'OUTPUT', "thread type 2");
     set I5, 10
     set S5, " interp\n"
     new P6, .String
@@ -157,7 +157,7 @@ ParrotThread tid 1
 from 10 interp
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "thread - kill");
+pasm_output_is(<<'CODE', <<'OUTPUT', "thread - kill");
     bounds 1	# assert slow core -S and -g are fine too
     find_global P5, "_foo"
     new P2, .ParrotThread
@@ -247,7 +247,7 @@ OUTPUT
 
 SKIP: {
 	skip("detatch broken on $^O", 1) if ($^O =~ /MSWin32/);
-output_like(<<'CODE', <<'OUTPUT', "detach");
+pasm_output_like(<<'CODE', <<'OUTPUT', "detach");
     find_global P5, "_foo"
     new P2, .ParrotThread
     new P6, .TQueue	# need a flag that thread is done
@@ -274,7 +274,7 @@ CODE
 OUTPUT
 }
 
-output_is(<<'CODE', <<'OUTPUT', "share a PMC");
+pasm_output_is(<<'CODE', <<'OUTPUT', "share a PMC");
     find_global P5, "_foo"
     new P2, .ParrotThread
     new P20, .Integer
@@ -307,7 +307,7 @@ done
 OUTPUT
 
 
-output_is(<<'CODE', <<'OUT', "multi-threaded");
+pasm_output_is(<<'CODE', <<'OUT', "multi-threaded");
     new P10, .TQueue
     new P6, .Integer
     set P6, 1
@@ -353,7 +353,7 @@ done thread
 done main
 OUT
 
-output_is(<<'CODE', <<'OUT', "multi-threaded strings via SharedRef");
+pasm_output_is(<<'CODE', <<'OUT', "multi-threaded strings via SharedRef");
     new P10, .TQueue
     new P7, .String
     set P7, "ok 1\n"
@@ -403,7 +403,7 @@ OUT
 
 SKIP: {
 skip("no shared Strings yet", 2);
-output_is(<<'CODE', <<'OUT', "thread safe queue strings 1");
+pasm_output_is(<<'CODE', <<'OUT', "thread safe queue strings 1");
     new P10, .TQueue
     print "ok 1\n"
     set I0, P10
@@ -432,7 +432,7 @@ ok 2
 ok 3
 OUT
 
-output_is(<<'CODE', <<'OUT', "multi-threaded strings");
+pasm_output_is(<<'CODE', <<'OUT', "multi-threaded strings");
     new P10, .TQueue
     new P7, .String
     set P7, "ok 1\n"

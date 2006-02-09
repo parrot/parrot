@@ -65,7 +65,7 @@ my $fp_equality_macro = <<'ENDOFMACRO';
 .endm
 ENDOFMACRO
 
-output_is(<<'CODE', <<'OUTPUT', "size of the array");
+pasm_output_is(<<'CODE', <<'OUTPUT', "size of the array");
     new P0,.PerlArray
     set P0,0
     set I0,P0
@@ -89,7 +89,7 @@ CODE
 5
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "set/get by index");
+pasm_output_is(<<'CODE', <<'OUTPUT', "set/get by index");
     new P0,.PerlArray
     set P0[0],3
     set I1,P0[0]
@@ -124,7 +124,7 @@ hey
 42
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "same, but with implicit resizing");
+pasm_output_is(<<'CODE', <<'OUTPUT', "same, but with implicit resizing");
     new P0,.PerlArray
     set P0[0],3
     set I1,P0[0]
@@ -156,7 +156,7 @@ hey
 42
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "If P");
+pasm_output_is(<<'CODE', <<'OUTPUT', "If P");
     new P0, .PerlArray
     if P0, TR
     print "false\n"
@@ -190,7 +190,7 @@ true
 false
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "Negative and Positive array accesses");
+pasm_output_is(<<'CODE', <<'OUTPUT', "Negative and Positive array accesses");
     new P0,.PerlArray
 
     set I0,P0
@@ -384,7 +384,7 @@ ok 27
 ok 28
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "Bracketed access test suite");
+pasm_output_is(<<'CODE', <<'OUTPUT', "Bracketed access test suite");
     new P0, .PerlArray
 
     #
@@ -593,7 +593,7 @@ ok 16
 ok 17
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "PerlArray integer access, two locations");
+pasm_output_is(<<'CODE', <<'OUTPUT', "PerlArray integer access, two locations");
     new P0, .PerlArray
 
     set P0[0],37
@@ -629,7 +629,7 @@ ok 3
 ok 4
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "PerlArray integer/register access, two locations");
+pasm_output_is(<<'CODE', <<'OUTPUT', "PerlArray integer/register access, two locations");
     new P0, .PerlArray
 
     set I0,0
@@ -667,7 +667,7 @@ ok 3
 ok 4
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "PerlArray string register/access, two locations");
+pasm_output_is(<<'CODE', <<'OUTPUT', "PerlArray string register/access, two locations");
     new P0, .PerlArray
 
     set I0,0
@@ -705,7 +705,7 @@ ok 3
 ok 4
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "PerlArray string access, two locations");
+pasm_output_is(<<'CODE', <<'OUTPUT', "PerlArray string access, two locations");
     new P0, .PerlArray
 
     set P0[0],"foo"
@@ -741,7 +741,7 @@ ok 3
 ok 4
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "PerlArray numeric access, two locations");
+pasm_output_is(<<'CODE', <<'OUTPUT', "PerlArray numeric access, two locations");
     new P0, .PerlArray
 
     set P0[0],3.100000
@@ -777,7 +777,7 @@ ok 3
 ok 4
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "PerlArray numeric/register access, two locations");
+pasm_output_is(<<'CODE', <<'OUTPUT', "PerlArray numeric/register access, two locations");
     new P0, .PerlArray
 
     set I0,0
@@ -815,7 +815,7 @@ ok 3
 ok 4
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "Resize negative index");
+pasm_output_is(<<'CODE', <<OUTPUT, "Resize negative index");
     new P0, .PerlArray
     set P0[-1], 55
     set I0, P0[0]
@@ -834,7 +834,7 @@ ok 1
 ok 2
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "Testing clone");
+pasm_output_is(<<'CODE', <<OUTPUT, "Testing clone");
     new P0, .PerlArray
     set P0[0], 1
     set P0[1], 2
@@ -876,7 +876,7 @@ ok 3
 ok 4
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "Testing multi-level fetch");
+pasm_output_is(<<'CODE', <<OUTPUT, "Testing multi-level fetch");
     new P0, .PerlArray
     new P1, .PerlArray
     set P1[0], "0;0"
@@ -935,7 +935,7 @@ CODE
 1;1
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "push/pop");
+pasm_output_is(<<'CODE', <<'OUTPUT', "push/pop");
     new P0, .PerlArray
     new P1, .PerlInt
     set P1, 42
@@ -977,7 +977,7 @@ CODE
 ok
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "unshift/shift");
+pasm_output_is(<<'CODE', <<'OUTPUT', "unshift/shift");
     new P0, .PerlArray
     new P1, .PerlInt
     set P1, 42
@@ -1019,7 +1019,7 @@ CODE
 ok
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "set intial size");
+pasm_output_is(<<'CODE', <<'OUTPUT', "set intial size");
     new P1, .PerlArray
     set P1[0], 0    # size key
     set I1, 100000    # value
@@ -1037,7 +1037,7 @@ CODE
 ok
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "splice");
+pasm_output_is(<<'CODE', <<'OUTPUT', "splice");
     new P0, .PerlArray
     new P1, .PerlArray
     push P0, 100
@@ -1169,7 +1169,7 @@ ok 6
 ok 7
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "defined");
+pasm_output_is(<<'CODE', <<OUTPUT, "defined");
     new P0, .PerlArray
     defined I0, P0
     print I0
@@ -1204,7 +1204,7 @@ CODE
 0
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "exists");
+pasm_output_is(<<'CODE', <<OUTPUT, "exists");
     new P0, .PerlArray
     set P0, 5
     set P0[0], 1
@@ -1231,7 +1231,7 @@ CODE
 1
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "set_integer_keyed - nested #19328");
+pasm_output_is(<<'CODE', <<OUTPUT, "set_integer_keyed - nested #19328");
     new P0, .PerlArray
     new P1, .PerlArray
     push P1, 9
@@ -1275,7 +1275,7 @@ CODE
 OUTPUT
 
 
-output_is(<<'CODE', <<OUT, "multikeyed access I arg");
+pasm_output_is(<<'CODE', <<OUT, "multikeyed access I arg");
     new P0, .PerlArray
     new P1, .PerlArray
     set P0[10], P1
@@ -1300,7 +1300,7 @@ PerlArray
 20202020
 OUT
 
-output_is(<<'CODE', <<OUT, "multikeyed access P arg");
+pasm_output_is(<<'CODE', <<OUT, "multikeyed access P arg");
     new P0, .PerlArray
     new P1, .PerlArray
     new P3, .PerlInt
@@ -1328,7 +1328,7 @@ PerlArray
 OUT
 
 
-output_is(<<"CODE", <<OUTPUT, "Fetching undefined values (no warnings)");
+pasm_output_is(<<"CODE", <<OUTPUT, "Fetching undefined values (no warnings)");
 @{[ $fp_equality_macro ]}
     warningsoff 1
     new P0, .PerlArray
@@ -1357,7 +1357,7 @@ ok 3
 ok 4
 OUTPUT
 
-output_like(<<"CODE", <<'OUTPUT', "Fetching undefined values (with warnings)");
+pasm_output_like(<<"CODE", <<'OUTPUT', "Fetching undefined values (with warnings)");
 @{[ $fp_equality_macro ]}
     warningson 1
     new P0, .PerlArray
@@ -1417,7 +1417,7 @@ CODE
 0
 OUTPUT
 
-output_is(<< "CODE", << 'OUTPUT', "Keyed access");
+pasm_output_is(<< "CODE", << 'OUTPUT', "Keyed access");
 @{[ $fp_equality_macro ]}
     new P0, .PerlArray
     new P1, .Key

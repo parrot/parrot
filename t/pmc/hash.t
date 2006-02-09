@@ -24,7 +24,7 @@ well.
 
 =cut
 
-output_is(<<CODE, <<OUTPUT, "Initial Hash tests");
+pasm_output_is(<<CODE, <<OUTPUT, "Initial Hash tests");
 	new	P0, .Hash
 
 	set	P0["foo"], -7
@@ -77,7 +77,7 @@ ok 5
 ok 6
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "more than one Hash");
+pasm_output_is(<<'CODE', <<OUTPUT, "more than one Hash");
 	new P0, .Hash
 	set S0, "key"
 	set P0[S0], 1
@@ -99,7 +99,7 @@ CODE
 2
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "hash keys with nulls in them");
+pasm_output_is(<<'CODE', <<OUTPUT, "hash keys with nulls in them");
 	new P0, .Hash
 	set S0, "parp\0me"
 	set S1, "parp\0you"
@@ -120,7 +120,7 @@ CODE
 2
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "nearly the same hash keys");
+pasm_output_is(<<'CODE', <<OUTPUT, "nearly the same hash keys");
 	new P0, .Hash
 	set S0, "a\0"
 	set S1, "\0a"
@@ -142,7 +142,7 @@ CODE
 2
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "The same hash keys");
+pasm_output_is(<<'CODE', <<OUTPUT, "The same hash keys");
 	new P0, .Hash
 	set S0, "Happy"
 	set S1, "Happy"
@@ -167,7 +167,7 @@ OUTPUT
 # NB Next test depends on "key2" hashing to zero, which it does with
 # the current algorithm; if the algorithm changes, change the test!
 
-output_is(<<'CODE', <<OUTPUT, "key that hashes to zero");
+pasm_output_is(<<'CODE', <<OUTPUT, "key that hashes to zero");
         new P0, .Hash
         set S0, "key2"
         set P0[S0], 1
@@ -179,7 +179,7 @@ CODE
 1
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "size of the hash");
+pasm_output_is(<<'CODE', <<OUTPUT, "size of the hash");
 	new P0, .Hash
 
 	set P0["0"], 1
@@ -204,7 +204,7 @@ CODE
 2
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "stress test: loop(set, check)");
+pasm_output_is(<<CODE, <<OUTPUT, "stress test: loop(set, check)");
 	new	P0, .Hash
 
         set I0, 200
@@ -394,7 +394,7 @@ done.
 OUTPUT
 
 # Check all values after setting all of them
-output_is(<<CODE, <<OUTPUT, "stress test: loop(set), loop(check)");
+pasm_output_is(<<CODE, <<OUTPUT, "stress test: loop(set), loop(check)");
 	new	P0, .Hash
 
         set I0, 200
@@ -430,7 +430,7 @@ CODE
 done
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "Testing two hash indices with integers at a time");
+pasm_output_is(<<'CODE', <<OUTPUT, "Testing two hash indices with integers at a time");
       new P0, .Hash
 
       set P0["foo"],37
@@ -466,7 +466,7 @@ ok 3
 ok 4
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "Testing two hash indices with numbers at a time");
+pasm_output_is(<<'CODE', <<OUTPUT, "Testing two hash indices with numbers at a time");
       new P0, .Hash
 
       set P0["foo"],37.100000
@@ -502,7 +502,7 @@ ok 3
 ok 4
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "Testing two hash indices with strings at a time");
+pasm_output_is(<<'CODE', <<OUTPUT, "Testing two hash indices with strings at a time");
       new P0, .Hash
 
       set P0["foo"],"baz"
@@ -542,7 +542,7 @@ OUTPUT
 # So far, we've only used INTVALs, FLOATVALs and STRINGs as values
 # and/or keys. Now we try PMCs.
 
-output_is(<<'CODE', <<OUTPUT, "Setting & getting scalar PMCs");
+pasm_output_is(<<'CODE', <<OUTPUT, "Setting & getting scalar PMCs");
       new P0, .Hash
       new P1, .Integer
       new P2, .Integer
@@ -586,7 +586,7 @@ ok 3
 ok 4
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "Setting scalar PMCs & getting scalar values");
+pasm_output_is(<<'CODE', <<OUTPUT, "Setting scalar PMCs & getting scalar values");
       new P0, .Hash
       new P1, .Integer
 
@@ -623,7 +623,7 @@ ok 2
 ok 3
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "Getting values from undefined keys");
+pasm_output_is(<<'CODE', <<OUTPUT, "Getting values from undefined keys");
       new P2, .Hash
 
       set I0, P2["qwerty"]
@@ -655,7 +655,7 @@ ok 3
 ok 4
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "Setting & getting non-scalar PMCs");
+pasm_output_is(<<CODE, <<OUTPUT, "Setting & getting non-scalar PMCs");
         new P0,.Hash
         new P1,.PerlArray
         new P2,.PerlArray
@@ -670,7 +670,7 @@ CODE
 string
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "Testing clone");
+pasm_output_is(<<'CODE', <<OUTPUT, "Testing clone");
     new P0, .Hash
     set S0, "a"
     set P0[S0], S0
@@ -739,7 +739,7 @@ ok 4
 ok 5
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "Compound keys");
+pasm_output_is(<<'CODE', <<OUTPUT, "Compound keys");
     new P0, .Hash
     new P1, .Hash
     new P2, .PerlArray
@@ -796,7 +796,7 @@ ok 5
 ok 6
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "Getting PMCs from compound keys");
+pasm_output_is(<<'CODE', <<OUTPUT, "Getting PMCs from compound keys");
     new P0, .Hash
     new P1, .Hash
     new P2, .Integer
@@ -811,7 +811,7 @@ CODE
 12
 OUTPUT
 
-output_is(<< 'CODE', << 'OUTPUT', "Getting PMCs from string;int compound keys");
+pasm_output_is(<< 'CODE', << 'OUTPUT', "Getting PMCs from string;int compound keys");
     new P0, .Hash
     new P1, .Hash
     new P2, .Integer
@@ -833,7 +833,7 @@ OUTPUT
 
 # A hash is only false if it has size 0
 
-output_is(<<'CODE', <<OUTPUT, "if (Hash)");
+pasm_output_is(<<'CODE', <<OUTPUT, "if (Hash)");
       new P0, .Hash
 
       if P0, BAD1
@@ -866,7 +866,7 @@ ok 3
 ok 4
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "unless (Hash)");
+pasm_output_is(<<'CODE', <<OUTPUT, "unless (Hash)");
       new P0, .Hash
 
       unless P0, OK1
@@ -903,7 +903,7 @@ ok 3
 ok 4
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "defined");
+pasm_output_is(<<'CODE', <<OUTPUT, "defined");
     new P0, .Hash
     defined I0, P0
     print I0
@@ -933,7 +933,7 @@ CODE
 0
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "exists");
+pasm_output_is(<<'CODE', <<OUTPUT, "exists");
     new P0, .Hash
     set P0["a"], 1
     exists I0, P0["a"]
@@ -955,7 +955,7 @@ CODE
 1
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "delete");
+pasm_output_is(<<'CODE', <<OUTPUT, "delete");
     new P0, .Hash
     set P0["a"], 1
     exists I0, P0["a"]
@@ -971,7 +971,7 @@ CODE
 0
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "Cloning keys");
+pasm_output_is(<<'CODE', <<OUTPUT, "Cloning keys");
     new P10, .Hash
     new P1, .Key
 
@@ -993,7 +993,7 @@ Food
 Sheep
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "Cloning PMC vals");
+pasm_output_is(<<'CODE', <<OUTPUT, "Cloning PMC vals");
     new P10, .Hash
     new P1, .Undef
     set P1, "value\n"
@@ -1011,7 +1011,7 @@ CODE
 42value
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "entry types - type_keyed");
+pasm_output_is(<<'CODE', <<OUTPUT, "entry types - type_keyed");
 .include "pmctypes.pasm"
     new P1, .Hash
 
@@ -1056,7 +1056,7 @@ Float
 String
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "delete and free_list");
+pasm_output_is(<<'CODE', <<OUTPUT, "delete and free_list");
     set I2, 10
     set I1, 1
     new P0, .SArray
@@ -1096,7 +1096,7 @@ ok 10
 10
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "exists with constant string key");
+pasm_output_is(<<'CODE', <<OUTPUT, "exists with constant string key");
     new P16, .Hash
     set P16["key1"], "value for key1\n"
     set S16, P16["key1"]
@@ -1264,7 +1264,7 @@ changed inner_hash:133
 -135.135000
 OUTPUT
 
-output_is(<< 'CODE', << 'OUTPUT', "mutating the lookup string");
+pasm_output_is(<< 'CODE', << 'OUTPUT', "mutating the lookup string");
     new P0, .Hash
     set P0["a"], "one"
     set P0["ab"], "two"

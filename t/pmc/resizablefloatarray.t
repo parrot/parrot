@@ -66,7 +66,7 @@ my $fp_equality_macro = <<'ENDOFMACRO';
 .endm
 ENDOFMACRO
 
-output_is(<<'CODE', <<'OUTPUT', 'creation');
+pasm_output_is(<<'CODE', <<'OUTPUT', 'creation');
     new P0, .ResizableFloatArray
     print "ok\n"
     end
@@ -74,7 +74,7 @@ CODE
 ok
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "Setting array size");
+pasm_output_is(<<'CODE', <<'OUTPUT', "Setting array size");
 	new P0,.ResizableFloatArray
 
 	set I0,P0
@@ -115,7 +115,7 @@ ok 4
 ok 5
 OUTPUT
 
-output_like(<<'CODE', <<'OUTPUT', "Setting negative array size");
+pasm_output_like(<<'CODE', <<'OUTPUT', "Setting negative array size");
 	new P0, .ResizableFloatArray
         set P0, -100
         end
@@ -123,7 +123,7 @@ CODE
 /ResizableFloatArray: Can't resize to negative value!/
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "Setting first element");
+pasm_output_is(<<'CODE', <<'OUTPUT', "Setting first element");
         new P0, .ResizableFloatArray
         set P0, 1
 
@@ -152,7 +152,7 @@ ok 2
 ok 3
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "Setting second element");
+pasm_output_is(<<'CODE', <<'OUTPUT', "Setting second element");
         new P0, .ResizableFloatArray
 
 	set P0[1], -7
@@ -182,7 +182,7 @@ OUTPUT
 
 # TODO: Rewrite these properly when we have exceptions
 
-output_is(<<'CODE', <<'OUTPUT', "Setting out-of-bounds elements");
+pasm_output_is(<<'CODE', <<'OUTPUT', "Setting out-of-bounds elements");
         new P0, .ResizableFloatArray
         set P0, 1
 
@@ -194,7 +194,7 @@ CODE
 ok 1
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "Getting out-of-bounds elements");
+pasm_output_is(<<'CODE', <<'OUTPUT', "Getting out-of-bounds elements");
         new P0, .ResizableFloatArray
         set P0, 1
 
@@ -206,7 +206,7 @@ ok 1
 OUTPUT
 
 
-output_is(<<"CODE", <<'OUTPUT', "Set via PMC keys, access via INTs");
+pasm_output_is(<<"CODE", <<'OUTPUT', "Set via PMC keys, access via INTs");
 @{[ $fp_equality_macro ]}
      new P0, .ResizableFloatArray
      new P1, .Key
@@ -242,7 +242,7 @@ ok 2
 ok 3
 OUTPUT
 
-output_is(<<"CODE", <<'OUTPUT', "Set via INTs, access via PMC Keys");
+pasm_output_is(<<"CODE", <<'OUTPUT', "Set via INTs, access via PMC Keys");
 @{[ $fp_equality_macro ]}
      new P0, .ResizableFloatArray
      set P0, 1
@@ -288,7 +288,7 @@ ok 3
 ok 4
 OUTPUT
 
-output_is(<<"CODE", <<'OUTPUT', 'basic push');
+pasm_output_is(<<"CODE", <<'OUTPUT', 'basic push');
 @{[ $fp_equality_macro ]}
      new P0, .ResizableFloatArray
      push P0, 1.0
@@ -315,7 +315,7 @@ ok 2
 ok 3
 OUTPUT
 
-output_is(<<"CODE", <<'OUTPUT', 'push many values');
+pasm_output_is(<<"CODE", <<'OUTPUT', 'push many values');
 @{[ $fp_equality_macro ]}
      new P0, .ResizableFloatArray
      set I0, 0
@@ -334,7 +334,7 @@ CODE
 ok 1
 OUTPUT
 
-output_is(<<"CODE", <<'OUTPUT', 'basic pop');
+pasm_output_is(<<"CODE", <<'OUTPUT', 'basic pop');
 @{[ $fp_equality_macro ]}
      new P0, .ResizableFloatArray
      set P0[0], 1.0
@@ -361,7 +361,7 @@ ok 2
 ok 3
 OUTPUT
 
-output_is(<<"CODE", <<'OUTPUT', 'pop many values');
+pasm_output_is(<<"CODE", <<'OUTPUT', 'pop many values');
 @{[ $fp_equality_macro ]}
      new P0, .ResizableFloatArray
      set I0, 0
@@ -389,7 +389,7 @@ CODE
 ok
 OUTPUT
 
-output_is(<<"CODE", <<'OUTPUT', 'push/pop');
+pasm_output_is(<<"CODE", <<'OUTPUT', 'push/pop');
 @{[ $fp_equality_macro ]}
      new P0, .ResizableFloatArray
      push P0, 1.0
@@ -404,7 +404,7 @@ CODE
 ok 1
 OUTPUT
 
-output_like(<<'CODE', <<'OUTPUT', 'pop from empty array');
+pasm_output_like(<<'CODE', <<'OUTPUT', 'pop from empty array');
      new P0, .ResizableFloatArray
      pop N0, P0
      end

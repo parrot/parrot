@@ -68,7 +68,7 @@ my $fp_equality_macro = <<'ENDOFMACRO';
 ENDOFMACRO
 
 
-output_is(<<'CODE', <<'OUTPUT', "String parsing");
+pasm_output_is(<<'CODE', <<'OUTPUT', "String parsing");
     new P0, .Complex
     new P1, .String
 
@@ -159,7 +159,7 @@ CODE
 -13+2i
 OUTPUT
 
-output_like(<<'CODE', <<'OUTPUT', "Malformed string: real part");
+pasm_output_like(<<'CODE', <<'OUTPUT', "Malformed string: real part");
     new P0, .Complex
     set P0, "q + 3i"
     end
@@ -167,7 +167,7 @@ CODE
 /Complex: malformed string/
 OUTPUT
 
-output_like(<<'CODE', <<'OUTPUT', "Malformed string: imaginary part");
+pasm_output_like(<<'CODE', <<'OUTPUT', "Malformed string: imaginary part");
     new P0, .Complex
     set P0, "1 + ij"
     end
@@ -175,14 +175,14 @@ CODE
 /Complex: malformed string/
 OUTPUT
 
-output_like(<<'CODE', <<'OUTPUT', "Malformed string: missing +/-");
+pasm_output_like(<<'CODE', <<'OUTPUT', "Malformed string: missing +/-");
     new P0, .Complex
     set P0, "1 * i"
 CODE
 /Complex: malformed string/
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "add");
+pasm_output_is(<<'CODE', <<'OUTPUT', "add");
 	new P0, .Complex
 	new P1, .Complex
 	new P2, .Float
@@ -248,7 +248,7 @@ CODE
 0+3i
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "subtract");
+pasm_output_is(<<'CODE', <<'OUTPUT', "subtract");
 	new P0, .Complex
 	new P1, .Complex
 	new P2, .Float
@@ -314,7 +314,7 @@ CODE
 1024+3i
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "multiply");
+pasm_output_is(<<'CODE', <<'OUTPUT', "multiply");
 	new P0, .Complex
 	new P1, .Complex
 	new P2, .Float
@@ -375,7 +375,7 @@ CODE
 10+10i
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "divide");
+pasm_output_is(<<'CODE', <<'OUTPUT', "divide");
 	new P0, .Complex
 	new P1, .Complex
 	new P2, .Float
@@ -429,7 +429,7 @@ CODE
 4-6i
 OUTPUT
 
-output_is(<<"CODE", <<'OUTPUT', "get int/num/bool");
+pasm_output_is(<<"CODE", <<'OUTPUT', "get int/num/bool");
 @{[ $fp_equality_macro ]}
         new P0, .Complex
         set P0, "2 - 1.5i"
@@ -463,7 +463,7 @@ true
 false
 OUTPUT
 
-output_is(<<"CODE", <<'OUTPUT', "get keyed");
+pasm_output_is(<<"CODE", <<'OUTPUT', "get keyed");
 @{[ $fp_equality_macro ]}
         new P0, .Complex
         new P1, .String
@@ -507,7 +507,7 @@ N0 N1 N2 OK
 1
 OUTPUT
 
-output_like(<<"CODE", <<'OUTPUT', "get keyed: invalid string key");
+pasm_output_like(<<"CODE", <<'OUTPUT', "get keyed: invalid string key");
     new P0, .Complex
     set P0, "5 + 3.5i"
     set N0, P0["Foo"]
@@ -516,7 +516,7 @@ CODE
 /Complex: key is neither 'real' or 'imag'/
 OUTPUT
 
-output_like(<<"CODE", <<'OUTPUT', "get keyed: invalid numeric key");
+pasm_output_like(<<"CODE", <<'OUTPUT', "get keyed: invalid numeric key");
     new P0, .Complex
     set P0, "5 + 3.5i"
     set N0, P0[2]
@@ -525,7 +525,7 @@ CODE
 /Complex: key must be 0 or 1/
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "set int/num");
+pasm_output_is(<<'CODE', <<'OUTPUT', "set int/num");
     new P0, .Complex
 
     set P0, "3 + 4i"
@@ -544,7 +544,7 @@ CODE
 0.4+0i
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "set keyed");
+pasm_output_is(<<'CODE', <<'OUTPUT', "set keyed");
     new P0, .Complex
     new P1, .String
     new P2, .String
@@ -574,7 +574,7 @@ CODE
 0.5+6i
 OUTPUT
 
-output_like(<<'CODE', <<'OUTPUT', "set keyed: invalid key");
+pasm_output_like(<<'CODE', <<'OUTPUT', "set keyed: invalid key");
     new P0, .Complex
     set P0[2], 12.5
     end
@@ -582,7 +582,7 @@ CODE
 /Complex: key must be 0 or 1/
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "is_equal");
+pasm_output_is(<<'CODE', <<'OUTPUT', "is_equal");
     new P0, .Complex
     new P1, .Complex
 
@@ -605,7 +605,7 @@ ok1
 ok2
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "abs");
+pasm_output_is(<<'CODE', <<'OUTPUT', "abs");
     new P0, .Complex
     set P0, "4 + 3j"
     new P1, .Undef
@@ -637,7 +637,7 @@ CODE
 0
 OUTPUT
 
-output_is(<< 'CODE', << 'OUTPUT', "instantiate, PASM, I");
+pasm_output_is(<< 'CODE', << 'OUTPUT', "instantiate, PASM, I");
     set I0, 1
     set I1, 2
     set I2, 0
@@ -700,7 +700,7 @@ CODE
 OUTPUT
 }
 
-output_is(<<"CODE", <<'OUTPUT', "neg");
+pasm_output_is(<<"CODE", <<'OUTPUT', "neg");
 @{[ $fp_equality_macro ]}
      new P0, .Complex
      set P0, "1.3 + 1.7i"
@@ -720,7 +720,7 @@ ok 1
 ok 2
 OUTPUT
 
-output_is(<<"CODE", <<'OUTPUT', "clone");
+pasm_output_is(<<"CODE", <<'OUTPUT', "clone");
 @{[ $fp_equality_macro ]}
      new P0, .Complex
      set P0, "1 - 3i"

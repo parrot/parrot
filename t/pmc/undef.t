@@ -22,7 +22,7 @@ Tests mainly morphing undef to other types.
 
 =cut
 
-output_is(<<'CODE', <<'OUTPUT', "morph to string");
+pasm_output_is(<<'CODE', <<'OUTPUT', "morph to string");
         new P0, .String
         new P1, .Undef
         set P0, "foo"

@@ -22,7 +22,7 @@ Tests the C<FloatvalArray> PMC.
 
 =cut
 
-output_is(<<'CODE', <<'OUTPUT', 'creation');
+pasm_output_is(<<'CODE', <<'OUTPUT', 'creation');
     new P0, .FloatvalArray
     print "ok\n"
     end
@@ -30,7 +30,7 @@ CODE
 ok
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', 'get/set keyed');
+pasm_output_is(<<'CODE', <<'OUTPUT', 'get/set keyed');
     new P0, .FloatvalArray
     set P0[10], 10.0
     set N0, P0[10]
@@ -41,7 +41,7 @@ CODE
 10.000000
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', 'get unset');
+pasm_output_is(<<'CODE', <<'OUTPUT', 'get unset');
     new P0, .FloatvalArray
     set N0, P0[10]
     print N0
@@ -51,7 +51,7 @@ CODE
 0.000000
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', 'get from sparse');
+pasm_output_is(<<'CODE', <<'OUTPUT', 'get from sparse');
     new P0, .FloatvalArray
     set P0[1000000], 10.0
     set N0, P0[10000]
@@ -62,7 +62,7 @@ CODE
 0.000000
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', 'push/get last');
+pasm_output_is(<<'CODE', <<'OUTPUT', 'push/get last');
     new P0, .FloatvalArray
     push P0, 1.0
     push P0, 2.0
@@ -75,7 +75,7 @@ CODE
 3.000000
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', 'push/pop');
+pasm_output_is(<<'CODE', <<'OUTPUT', 'push/pop');
     new P0, .FloatvalArray
     push P0, 1.0
     push P0, 2.0
@@ -88,7 +88,7 @@ CODE
 3.000000
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', 'unshift/shift');
+pasm_output_is(<<'CODE', <<'OUTPUT', 'unshift/shift');
     new P0, .FloatvalArray
     unshift P0, 1.0
     unshift P0, 2.0
@@ -101,7 +101,7 @@ CODE
 3.000000
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', 'push get elements');
+pasm_output_is(<<'CODE', <<'OUTPUT', 'push get elements');
     new P0, .FloatvalArray
     push P0, 1.0
     push P0, 2.0
@@ -114,7 +114,7 @@ CODE
 3
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', 'set array size');
+pasm_output_is(<<'CODE', <<'OUTPUT', 'set array size');
     new P0, .FloatvalArray
     set P0, 10
     print "Done\n"

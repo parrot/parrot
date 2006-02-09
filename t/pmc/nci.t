@@ -825,7 +825,7 @@ CODE
 OUTPUT
 
 
-output_like(<<'CODE', <<'OUTPUT', "nci_pi - align");
+pasm_output_like(<<'CODE', <<'OUTPUT', "nci_pi - align");
   loadlib P1, "libnci_test"
   dlfunc P0, P1, "nci_pi", "pi"
   # this test function returns a struct { char; int }
