@@ -45,16 +45,16 @@ foreach my $func ( keys %language_test_map ) {
 
     my $path_to_parrot = $INC{"Parrot/Config.pm"};
     $path_to_parrot =~ s:/lib/Parrot/Config.pm$::;
-    print "$path_to_parrot\n";
     my $dir_count = scalar(File::Spec->splitdir($path_to_parrot));
     my $path_to_tcl;
-    print "DIR COUNT : $dir_count\n";
-    if ($dir_count <2) {
-      $path_to_tcl = File::Spec->join((qw{languages tcl})[0..$dir_count]);
+    if ($dir_count == 0) {
+      $path_to_tcl = File::Spec->join('languages','tcl');
+    } elsif ($dir_count == 1) {
+      $path_to_tcl = 'tcl';
+    } elsif ($dir_count == 2) {
+      $path_to_tcl = '.';
     } elsif ($dir_count >2) {
       $path_to_tcl = File::Spec->join(File::Spec->updir() x ($dir_count - 2));
-    } else {
-      $path_to_tcl = ".";
     }
 
     my $lang_f = Parrot::Test::per_test('.tcl',$count);
@@ -71,7 +71,6 @@ foreach my $func ( keys %language_test_map ) {
 
     my $executable = File::Spec->join($path_to_parrot,$self->{parrot}) . 
     " $args " . File::Spec->join($path_to_tcl, 'tcl.pbc');
-    print "USING $executable\n";
     if (defined($ENV{PARROT_TCLSH})) {
       $executable = $ENV{PARROT_TCLSH};
     }
