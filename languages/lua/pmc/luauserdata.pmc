@@ -22,6 +22,9 @@ the Lua C<Userdata> type.
 #include "parrot/parrot.h"
 
 static STRING *luauserdata_name;
+static INTVAL dynpmc_LuaNil;
+static INTVAL dynpmc_LuaString;
+
 
 pmclass LuaUserdata 
     extends String
@@ -33,7 +36,29 @@ pmclass LuaUserdata
 */
     void class_init() {
         if (pass) {
+            PMC *meth;
+
             luauserdata_name = const_string(INTERP, "userdata");
+            dynpmc_LuaNil = pmc_type(INTERP,
+              string_from_const_cstring(INTERP, "LuaNil", 0));
+            dynpmc_LuaString = pmc_type(INTERP,
+              string_from_const_cstring(INTERP, "LuaString", 0));
+
+            /* namespace hack */
+            meth = Parrot_find_global(INTERP,
+                const_string(INTERP, "LuaUserdata"),
+                const_string(INTERP, "tostring"));
+            Parrot_store_global(INTERP,
+                const_string(INTERP, "userdata"),
+                const_string(INTERP, "tostring"),
+                meth);
+            meth = Parrot_find_global(INTERP,
+                const_string(INTERP, "LuaUserdata"),
+                const_string(INTERP, "tonumber"));
+            Parrot_store_global(INTERP,
+                const_string(INTERP, "userdata"),
+                const_string(INTERP, "tonumber"),
+                meth);
         }
     }
 
@@ -75,6 +100,44 @@ So return always true.
 */
     INTVAL get_bool () {
         return 1;
+    }
+
+/*
+
+=back
+
+=head2 Specific Methods
+
+=over 4
+
+=item C<PMC* tonumber()>
+
+=cut
+
+*/
+    METHOD PMC* tonumber() {
+        PMC *retval;
+
+        retval = pmc_new(INTERP, dynpmc_LuaNil);
+        return retval;
+    }
+
+/*
+
+=item C<PMC* tostring()>
+
+=cut
+
+*/
+    METHOD PMC* tostring() {
+        PMC *retval;
+        STRING *rep;
+
+        /* TODO: __tostring */
+        retval = pmc_new(INTERP, dynpmc_LuaString);
+        rep = VTABLE_get_string(INTERP, SELF);
+        PMC_str_val(retval) = rep;
+        return retval;
     }
 
 }

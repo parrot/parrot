@@ -17,7 +17,7 @@ Tests C<LuaString> PMC
 
 =cut
 
-use Parrot::Test tests => 10;
+use Parrot::Test tests => 13;
 use Test::More;
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "check inheritance");
@@ -220,3 +220,67 @@ CODE
 1
 OUTPUT
 }
+
+pir_output_is(<< 'CODE', << 'OUTPUT', "check tostring");
+.HLL "Lua", "lua_group"
+.sub _main
+    .local pmc pmc1
+    pmc1 = new .LuaString
+    pmc1 = "value"
+    print pmc1
+    print "\n"
+    $P0 = pmc1."tostring"()
+    print $P0
+    print "\n"
+    $S0 = typeof $P0
+    print $S0
+    print "\n"
+.end
+CODE
+value
+value
+string
+OUTPUT
+
+pir_output_is(<< 'CODE', << 'OUTPUT', "check tonumber");
+.HLL "Lua", "lua_group"
+.sub _main
+    .local pmc pmc1
+    pmc1 = new .LuaString
+    pmc1 = "3.14"
+    print pmc1
+    print "\n"
+    $P0 = pmc1."tonumber"()
+    print $P0
+    print "\n"
+    $S0 = typeof $P0
+    print $S0
+    print "\n"
+.end
+CODE
+3.14
+3.14
+number
+OUTPUT
+
+pir_output_is(<< 'CODE', << 'OUTPUT', "check tobase");
+.HLL "Lua", "lua_group"
+.sub _main
+    .local pmc pmc1
+    pmc1 = new .LuaString
+    pmc1 = "111"
+    print pmc1
+    print "\n"
+    $P0 = pmc1."tobase"(2)
+    print $P0
+    print "\n"
+    $S0 = typeof $P0
+    print $S0
+    print "\n"
+.end
+CODE
+111
+7
+number
+OUTPUT
+

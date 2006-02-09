@@ -27,6 +27,7 @@ troublesome (if not possible?).
 #include "parrot/parrot.h"
 
 static STRING *string_representation;
+static INTVAL dynpmc_LuaNil;
 static INTVAL dynpmc_LuaNumber;
 static INTVAL dynpmc_LuaString;
 static INTVAL dynpmc_LuaBoolean;
@@ -41,13 +42,33 @@ pmclass LuaNil
 */
     void class_init() {
         if (pass) {
+            PMC *meth;
+
             string_representation = const_string(INTERP, "nil");
+            dynpmc_LuaNil = pmc_type(INTERP,
+                    string_from_const_cstring(INTERP, "LuaNil", 0));
             dynpmc_LuaNumber = pmc_type(INTERP,
                     string_from_const_cstring(INTERP, "LuaNumber", 0));
             dynpmc_LuaString = pmc_type(INTERP,
                     string_from_const_cstring(INTERP, "LuaString", 0));
             dynpmc_LuaBoolean = pmc_type(INTERP, 
                     string_from_const_cstring(INTERP, "LuaBoolean", 0));
+
+            /* namespace hack */
+            meth = Parrot_find_global(INTERP,
+                const_string(INTERP, "LuaNil"),
+                const_string(INTERP, "tostring"));
+            Parrot_store_global(INTERP,
+                const_string(INTERP, "nil"),
+                const_string(INTERP, "tostring"),
+                meth);
+            meth = Parrot_find_global(INTERP,
+                const_string(INTERP, "LuaNil"),
+                const_string(INTERP, "tonumber"));
+            Parrot_store_global(INTERP,
+                const_string(INTERP, "nil"),
+                const_string(INTERP, "tonumber"),
+                meth);
         }
     }
 
@@ -221,6 +242,43 @@ MMD_LuaNil: {
 MMD_DEFAULT: {
             return (INTVAL)0;
         }
+    }
+
+/*
+
+=back
+
+=head2 Specific Methods
+
+=over 4
+
+=item C<PMC* tonumber()>
+
+=cut
+
+*/
+    METHOD PMC* tonumber() {
+        PMC *retval;
+
+        retval = pmc_new(INTERP, dynpmc_LuaNil);
+        return retval;
+    }
+
+/*
+
+=item C<PMC* tostring()>
+
+=cut
+
+*/
+    METHOD PMC* tostring() {
+        PMC *retval;
+        STRING *rep;
+
+        retval = pmc_new(INTERP, dynpmc_LuaString);
+        rep = VTABLE_get_string(INTERP, SELF);
+        PMC_str_val(retval) = rep;
+        return retval;
     }
 
 }

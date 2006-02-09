@@ -21,7 +21,7 @@ use strict;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 17;
+use Parrot::Test tests => 20;
 use Test::More;
 
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', "function assert(false, msg)");
@@ -190,18 +190,56 @@ CODE
 number
 OUTPUT
 
-TODO: {
-local $TODO = "tonumber !";
-
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', "function tonumber");
-a = "text12"
-i = tonumber(a)
-print(i)
+r = tonumber("text12")
+print(type(r), r)
+r = tonumber("12text")
+print(type(r), r)
+r = tonumber(3.14)
+print(type(r), r)
+r = tonumber("3.14")
+print(type(r), r)
+r = tonumber("  3.14  ")
+print(type(r), r)
+r = tonumber(111, 2)
+print(type(r), r)
+r = tonumber("111", 2)
+print(type(r), r)
+r = tonumber("  111  ", 2)
+print(type(r), r)
+a = {}
+r = tonumber(a)
+print(type(r), r)
 CODE
-nil
+nil	nil
+nil	nil
+number	3.14
+number	3.14
+number	3.14
+number	7
+number	7
+number	7
+nil	nil
 OUTPUT
 
-}
+language_output_like( 'lua', << 'CODE', << 'OUTPUT', "function tonumber (no arg)");
+tonumber()
+CODE
+/value expected/
+OUTPUT
+
+language_output_like( 'lua', << 'CODE', << 'OUTPUT', "function tonumber (bad base)");
+r = tonumber("111", 200)
+print(type(r), r)
+CODE
+/base out of range/
+OUTPUT
+
+language_output_like( 'lua', << 'CODE', << 'OUTPUT', "function tostring (no arg)");
+tostring()
+CODE
+/value expected/
+OUTPUT
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', "function unpack");
 print(unpack{})

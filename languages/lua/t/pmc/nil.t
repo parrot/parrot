@@ -17,7 +17,7 @@ Tests C<LuaNil> PMC
 
 =cut
 
-use Parrot::Test tests => 12;
+use Parrot::Test tests => 14;
 use Test::More;
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "check inheritance");
@@ -257,3 +257,42 @@ number
 2
 OUTPUT
 
+pir_output_is(<< 'CODE', << 'OUTPUT', "check tostring");
+.HLL "Lua", "lua_group"
+.sub _main
+    .local pmc pmc1
+    pmc1 = new .LuaNil
+    print pmc1                 
+    print "\n"
+    $P0 = pmc1."tostring"()
+    print $P0
+    print "\n"
+    $S0 = typeof $P0
+    print $S0
+    print "\n"
+.end
+CODE
+nil
+nil
+string
+OUTPUT
+
+pir_output_is(<< 'CODE', << 'OUTPUT', "check tonumber");
+.HLL "Lua", "lua_group"
+.sub _main
+    .local pmc pmc1
+    pmc1 = new .LuaNil
+    print pmc1
+    print "\n"
+    $P0 = pmc1."tonumber"()
+    print $P0
+    print "\n"
+    $S0 = typeof $P0
+    print $S0
+    print "\n"
+.end
+CODE
+nil
+nil
+nil
+OUTPUT

@@ -17,7 +17,7 @@ Tests C<LuaUserdata> PMC
 
 =cut
 
-use Parrot::Test tests => 7;
+use Parrot::Test tests => 9;
 use Test::More;
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "check inheritance");
@@ -160,3 +160,41 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "check HLL");
 CODE
 1
 OUTPUT
+
+pir_output_like(<< 'CODE', << 'OUTPUT', "check tostring");
+.HLL "Lua", "lua_group"
+.sub _main
+    .local pmc pmc1
+    pmc1 = new .LuaUserdata
+    pmc1 = "value"
+    print pmc1
+    print "\n"
+    $P0 = pmc1."tostring"()
+    print $P0
+    print "\n"
+    $S0 = typeof $P0
+    print $S0
+    print "\n"
+.end
+CODE
+/userdata: [0-9A-Fa-f]{8}\nuserdata: [0-9A-Fa-f]{8}\nstring/
+OUTPUT
+
+pir_output_is(<< 'CODE', << 'OUTPUT', "check tonumber");
+.HLL "Lua", "lua_group"
+.sub _main
+    .local pmc pmc1
+    pmc1 = new .LuaUserdata
+    pmc1 = "value"
+    $P0 = pmc1."tonumber"()
+    print $P0
+    print "\n"
+    $S0 = typeof $P0
+    print $S0
+    print "\n"
+.end
+CODE
+nil
+nil
+OUTPUT
+

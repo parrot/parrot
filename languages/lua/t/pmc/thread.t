@@ -17,7 +17,7 @@ Tests C<LuaThread> PMC
 
 =cut
 
-use Parrot::Test tests => 8;
+use Parrot::Test tests => 10;
 use Test::More;
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "check inheritance");
@@ -200,3 +200,37 @@ OUTPUT
 
 }
 
+pir_output_like(<< 'CODE', << 'OUTPUT', "check tostring");
+.HLL "Lua", "lua_group"
+.sub _main
+    .local pmc pmc1
+    pmc1 = new .LuaThread
+    print pmc1
+    print "\n"
+    $P0 = pmc1."tostring"()
+    print $P0
+    print "\n"
+    $S0 = typeof $P0
+    print $S0
+    print "\n"
+.end
+CODE
+/thread: [0-9A-Fa-f]{8}\nthread: [0-9A-Fa-f]{8}\nstring/
+OUTPUT
+
+pir_output_is(<< 'CODE', << 'OUTPUT', "check tonumber");
+.HLL "Lua", "lua_group"
+.sub _main
+    .local pmc pmc1
+    pmc1 = new .LuaThread
+    $P0 = pmc1."tonumber"()
+    print $P0
+    print "\n"
+    $S0 = typeof $P0
+    print $S0
+    print "\n"
+.end
+CODE
+nil
+nil
+OUTPUT

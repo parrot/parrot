@@ -26,6 +26,7 @@ Now, Lua 5.0 uses a hybrid data structure with a Hash part and an Array part.
 
 static STRING *luatable_name;
 static INTVAL dynpmc_LuaNil;
+static INTVAL dynpmc_LuaString;
 
 pmclass LuaTable
     extends Hash
@@ -38,9 +39,29 @@ pmclass LuaTable
 */
     void class_init() {
         if (pass) {
+            PMC *meth;
+
             luatable_name = const_string(INTERP, "table");
             dynpmc_LuaNil = pmc_type(INTERP,
               string_from_const_cstring(INTERP, "LuaNil", 0));
+            dynpmc_LuaString = pmc_type(INTERP,
+              string_from_const_cstring(INTERP, "LuaString", 0));
+
+            /* namespace hack */
+            meth = Parrot_find_global(INTERP,
+                const_string(INTERP, "LuaTable"),
+                const_string(INTERP, "tostring"));
+            Parrot_store_global(INTERP,
+                const_string(INTERP, "table"),
+                const_string(INTERP, "tostring"),
+                meth);
+            meth = Parrot_find_global(INTERP,
+                const_string(INTERP, "LuaTable"),
+                const_string(INTERP, "tonumber"));
+            Parrot_store_global(INTERP,
+                const_string(INTERP, "table"),
+                const_string(INTERP, "tonumber"),
+                meth);
         }
     }
 
@@ -242,6 +263,44 @@ The C<==> operation. Compares reference (not in depth).
 
     INTVAL cmp (PMC* value) {
         return (INTVAL)0;
+    }
+
+/*
+
+=back
+
+=head2 Specific Methods
+
+=over 4
+
+=item C<PMC* tonumber()>
+
+=cut
+
+*/
+    METHOD PMC* tonumber() {
+        PMC *retval;
+
+        retval = pmc_new(INTERP, dynpmc_LuaNil);
+        return retval;
+    }
+
+/*
+
+=item C<PMC* tostring()>
+
+=cut
+
+*/
+    METHOD PMC* tostring() {
+        PMC *retval;
+        STRING *rep;
+
+        /* TODO: __tostring */
+        retval = pmc_new(INTERP, dynpmc_LuaString);
+        rep = VTABLE_get_string(INTERP, SELF);
+        PMC_str_val(retval) = rep;
+        return retval;
     }
 
 }

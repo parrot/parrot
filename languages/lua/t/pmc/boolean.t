@@ -17,7 +17,7 @@ Tests C<LuaBoolean> PMC
 
 =cut
 
-use Parrot::Test tests => 7;
+use Parrot::Test tests => 9;
 use Test::More;
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "check inheritance");
@@ -164,5 +164,47 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "check HLL & .const");
 CODE
 true
 1
+OUTPUT
+
+pir_output_is(<< 'CODE', << 'OUTPUT', "check tostring");
+.HLL "Lua", "lua_group"
+.sub _main
+    .local pmc pmc1
+    pmc1 = new .LuaBoolean
+    pmc1 = 1
+    print pmc1
+    print "\n"
+    $P0 = pmc1."tostring"()
+    print $P0
+    print "\n"
+    $S0 = typeof $P0
+    print $S0
+    print "\n"
+.end
+CODE
+true
+true
+string
+OUTPUT
+
+pir_output_is(<< 'CODE', << 'OUTPUT', "check tonumber");
+.HLL "Lua", "lua_group"
+.sub _main
+    .local pmc pmc1
+    pmc1 = new .LuaBoolean
+    pmc1 = 1
+    print pmc1
+    print "\n"
+    $P0 = pmc1."tonumber"()
+    print $P0
+    print "\n"
+    $S0 = typeof $P0
+    print $S0
+    print "\n"
+.end
+CODE
+true
+nil
+nil
 OUTPUT
 

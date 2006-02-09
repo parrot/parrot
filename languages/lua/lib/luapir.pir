@@ -49,11 +49,17 @@ L1:
     $S0 = "no value"
     if_null arg, L0
     $S0 = typeof arg
-#    print $S0
-#    print "\n"
-    if $S0 == "nil" goto L0
+    $I0 = isa arg, "LuaNumber"
+    unless $I0 goto L1
     val = arg
-    # TODO
+    .return (val)    
+L1:
+    $I0 = isa arg, "LuaString"
+    unless $I0 goto L0
+    $P0 = arg."tonumber"()
+    $I0 = isa $P0, "LuaNumber"
+    unless $I0 goto L0
+    val = $P0
     .return (val)
 L0:
     tag_error($S0, "number")    
@@ -66,10 +72,21 @@ L0:
 
 .sub checkstring
     .param pmc arg
-    .local string val
+    .local pmc val
+    $S0 = "no value"
+    if_null arg, L0
+    $S0 = typeof arg
+    $I0 = isa arg, "LuaString"
+    unless $I0 goto L1
     val = arg
-    # TODO
+    .return (val)    
+L1:
+    $I0 = isa arg, "LuaNumber"
+    unless $I0 goto L0
+    val = arg."tostring"()
     .return (val)
+L0:
+    tag_error($S0, "string")    
 .end
 
 
@@ -80,9 +97,9 @@ L0:
 .sub checktype
     .param pmc arg
     .param string type
-    $S0 = "no value"
+    $S0 = "no value"       
     if_null arg, L0
-    $S0 = typeof arg
+    $S0 = typeof arg       
     if $S0 != type goto L0
     .return ()
 L0:

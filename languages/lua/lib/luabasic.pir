@@ -521,7 +521,7 @@ the C<tostring> function to convert them to strings. This function is not
 intended for formatted output, but only as a quick way to show a value,
 typically for debugging. For formatted output, use C<format>.
 
-STILL INCOMPLETE.
+STILL INCOMPLETE (see tostring).
 
 =cut
 
@@ -529,8 +529,6 @@ STILL INCOMPLETE.
     .param pmc argv :slurpy
     .local int argc
     .local int i
-    .local pmc curr
-#    .local string str
     argc = argv
     i = 0
 L1:
@@ -538,10 +536,9 @@ L1:
     if i == 0 goto L2
     print "\t"
 L2:
-    curr = argv[i]
-    print curr
-#    str = tostring(curr)
-#    print str
+    $P0 = argv[i]
+    $P1 = $P0."tostring"()
+    print $P1
     i = i + 1
     goto L1
 L3:
@@ -707,38 +704,27 @@ with ‘Z’ representing 35. In base 10 (the default), the number may have a
 decimal part, as well as an optional exponent part. In other bases, only
 unsigned integers are accepted.
 
-STILL INCOMPLETE.
-
 =cut
 
 .sub _lua_tonumber :anon
     .param pmc e
     .param pmc base :optional
     .local pmc ret
-    $I0 = optint(base, 10)
-    unless $I0 == 10 goto L0
     checkany(e)
-    $I1 = isa e, "LuaNumber"
-    unless $I1 goto L1
-    ret = clone e
+    $I0 = optint(base, 10)
+    unless $I0 == 10 goto L1
+    ret = e."tonumber"()
     .return (ret)
 L1:
-    $I1 = isa e, "LuaString"
-    unless $I1 goto L2
-    $S0 = e
-#    print $S0
-#    print "\n"
-    $N0 = $S0
-#    print $N0
-#    print "\n"
-    new ret, .LuaNumber
-    ret = $N0
-    .return (ret)
+    $P0 = checkstring(e)
+    unless 2 <= $I0 goto L2
+    unless $I0 <= 36 goto L2
+    goto L3
 L2:
-    new ret, .LuaNil
+    argerror("base out of range")
+L3:
+    ret = $P0."tobase"($I0)
     .return (ret)
-L0:
-    not_implemented()
 .end
 
 =item C<tostring (e)>
@@ -750,7 +736,7 @@ If the metatable of e has a C<"__tostring"> field, C<tostring> calls the
 corresponding value with C<e> as argument, and uses the result of the call
 as its result.
 
-STILL INCOMPLETE.
+STILL INCOMPLETE (see tostring in luatable.pmc & luauserdata.pmc).
 
 =cut
 
@@ -758,14 +744,7 @@ STILL INCOMPLETE.
     .param pmc e
     .local pmc ret
     checkany(e)
-    # TODO: __tostring
-    $I1 = isa e, "LuaString"
-    unless $I1 goto L1
-    .return (e)
-L1:
-    $S0 = e
-    new ret, .LuaString
-    ret = $S0
+    ret = e."tostring"()
     .return (ret)
 .end
 
