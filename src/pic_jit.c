@@ -137,6 +137,136 @@ args_match_params(Interp *interpreter, PMC *sig_args,
     return 0;
 }
 
+static int
+returns_match_results(Interp *interpreter, PMC *sig_ret, PMC *sig_result)
+{
+    int n, type;
+    
+    n = parrot_pic_check_sig(interpreter, sig_ret, sig_result, &type);
+    if (n == -1 && !SIG_ELEMS(sig_ret)) {
+        /* XXX we currently have a spurious set_returns after a
+         * tail_call -O1 would get rid of that dead block but is 
+         * broken currently - work around ignore empty set_returns
+         */
+        return 1;
+    }
+    if (n == -1) {
+        /* arg count mismatch */
+        return 0;
+    }
+    if (!n) {
+        /* no args - this would be save, if the JIT code could already
+         * deal with no args
+         * TODO
+         */
+        return 0;
+    }
+    type &= ~PARROT_ARG_CONSTANT;
+    switch (type) {
+        case PARROT_ARG_INTVAL:
+        case PARROT_ARG_FLOATVAL:
+            return 1;
+    }
+    return 0;
+}
+
+static int
+call_is_safe(Interp *interpreter, PMC *sub, opcode_t **set_args)
+{
+    opcode_t *pc;
+    PMC *sig_args, *called, *sig_results;
+    int i;
+
+    pc = *set_args;
+    sig_args = PMC_sub(sub)->seg->const_table->constants[pc[1]]->u.key;
+    /* ignore the signature for now */
+    pc += 2 + SIG_ELEMS(sig_args);
+    if (*pc != PARROT_OP_set_p_pc)
+       return 0; 
+    called = PMC_sub(sub)->seg->const_table->constants[pc[2]]->u.key;
+    if (called != sub) {
+        /* we can JIT just recursive subs for now */
+        return 0;
+    }
+    pc += 3;
+    if (*pc != PARROT_OP_get_results_pc)
+        return 0;
+    sig_results = PMC_sub(sub)->seg->const_table->constants[pc[1]]->u.key;
+    pc += 2 + SIG_ELEMS(sig_results);
+    if (*pc != PARROT_OP_invokecc_p)
+        return 0;
+    pc += 2;
+    *set_args = pc;
+    return 1;
+}
+
+static int
+ops_jittable(Interp *interpreter, PMC *sub, PMC *sig_results, 
+        struct PackFile_ByteCode *seg,
+        opcode_t *pc, opcode_t *end)
+{
+    op_info_t *op_info;
+    int i, n, op;
+    PMC *sig_ret;
+
+    while (pc < end) {
+        op = *pc;
+        /*
+         * some special opcodes, which are handled, but not marked
+         * as JITtable
+         */
+        op_info = interpreter->op_info_table + op;
+        n = op_info->op_count;
+
+        switch (op) {
+            case PARROT_OP_returncc:
+            case PARROT_OP_get_params_pc:
+                goto op_is_ok;
+                break;
+            case PARROT_OP_set_returns_pc:
+                sig_ret = seg->const_table->constants[pc[1]]->u.key;
+                if (!returns_match_results(interpreter, sig_ret, sig_results))
+                    return 0;
+                goto op_is_ok;
+                break;
+            case PARROT_OP_set_args_pc:
+                /* verify call, return address after the call */
+                if (!call_is_safe(interpreter, sub, &pc))
+                    return 0;
+                continue;
+            default:
+                if (op_jit[op].extcall != 0) {
+                    /* non-jitted or JITted vtable */
+                    return 0;
+                }
+                break;
+        }
+        /*
+         * there are some JITted opcodes like set_s_s, which we can't
+         * handle (yet)
+         */
+        for (i = 1; i < n; i++) {
+            opcode_t arg = pc[i];
+            int type;
+
+            type = op_info->types[i - 1];
+            switch (type) {
+                case PARROT_ARG_I:
+                case PARROT_ARG_N:
+                case PARROT_ARG_IC:
+                case PARROT_ARG_NC:
+                    break;
+                default:
+                    return 0;
+            }
+        }
+op_is_ok:
+        ADD_OP_VAR_PART(interpreter, seg, pc, n);
+        pc += n;
+    }
+    return 1;
+}
+
 int
 parrot_pic_is_save_to_jit(Interp *interpreter, PMC *sub,
 	PMC *sig_args, PMC *sig_results)
@@ -171,9 +301,14 @@ parrot_pic_is_save_to_jit(Interp *interpreter, PMC *sub,
     if (!args_match_params(interpreter, sig_args, PMC_sub(sub)->seg, start))
         return 0;
 
-    /* XXX test code */
-    if (memcmp((char*) name->strstart, "__pic_test", 10) != 0)
-	return 0;
+    /*
+     * 3) verify if all opcodes are JITtable, also check set_returns
+     *   if it's reached
+     */
+    if (!ops_jittable(interpreter, sub, sig_results, 
+                PMC_sub(sub)->seg, start, end))
+        return 0;
+
     return 1;
 }
 
