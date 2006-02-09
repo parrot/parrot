@@ -122,10 +122,15 @@ enum { JIT_PPC_CALL, JIT_PPC_BRANCH, JIT_PPC_UBRANCH };
  * 0    5 6                     29 30 31
  * */
 #  define jit_emit_mov_rr(pc, dst, src) \
-    *(pc++) = emit_op(31) | emit_r3(src); \
-    *(pc++) = (char)(emit_l5(src) | dst); \
-    *(pc++) = (char)(0x3 | src * 8); \
-    *(pc++) = 0x78
+    do { \
+        if (dst != src) { \
+        *(pc++) = emit_op(31) | emit_r3(src); \
+        *(pc++) = (char)(emit_l5(src) | dst); \
+        *(pc++) = (char)(0x3 | src * 8); \
+        *(pc++) = 0x78; \
+        } \
+    } \
+    while (0)    
 
 /* Move from/to special purpose register.
  *
@@ -904,6 +909,8 @@ jit_save_regs_call(Parrot_jit_info_t *jit_info, Interp * interpreter, int skip)
     const jit_arch_regs *reg_info;
 
     /* create stack frame 24 link + 32 params -> 64 */
+    jit_emit_mflr(jit_info->native_ptr, r0);    /* store link reg */
+    jit_emit_stw(jit_info->native_ptr, r0, 8, r1); /* stw     r0,8(r1) */
     jit_emit_stwu(jit_info->native_ptr, r1, -64, r1);
     used_i = CONTEXT(interpreter->ctx)->n_regs_used[REGNO_INT];
     reg_info = &jit_info->arch_info->regs[jit_info->code_type]; 
@@ -914,8 +921,6 @@ jit_save_regs_call(Parrot_jit_info_t *jit_info, Interp * interpreter, int skip)
         jit_emit_stw(jit_info->native_ptr, reg_info->map_I[i], 24 + i*4, r1);
     }
     /* preserve link register */
-    jit_emit_mflr(jit_info->native_ptr, r0);    /* optional */
-    jit_emit_stw(jit_info->native_ptr, r0, 8, r1); /* stw     r0,8(r1) */
 }
 
 static void 
@@ -935,11 +940,11 @@ jit_restore_regs_call(Parrot_jit_info_t *jit_info, Interp * interpreter,
         /* we use param area sp+24 := r3, sp+52 := r10 */
         jit_emit_lwz(jit_info->native_ptr, reg_info->map_I[i], 24 + i*4, r1);
     }
+    /* pop stack frame */
+    jit_emit_add_rri_i(jit_info->native_ptr, r1, r1, 64);
     /* restore link reg */
     jit_emit_lwz(jit_info->native_ptr, r0, 8, r1);   
     jit_emit_mtlr(jit_info->native_ptr, r0);   
-    /* pop stack frame */
-    jit_emit_lwz(jit_info->native_ptr, r1, 0, r1);
     /* TODO other types */
 }
 
