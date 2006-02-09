@@ -3788,6 +3788,7 @@ static const jit_arch_info arch_info = {
             0,                  /* ABI sez it's not preserved */
             floatval_map
         },
+        /* unused */
         {
             Parrot_jit_begin_sub,   /* emit code prologue */
             4,                  /* 4 mapped ints */
@@ -3796,12 +3797,21 @@ static const jit_arch_info arch_info = {
             4,                  /* 4 mapped float regs */
             0,                  /* ABI sez it's not preserved */
             floatval_map
-        },{
+        },
+        /*
+         * compile a sub to registers only
+         * if a mapped count is 0, code containing this register kind
+         * will not be created
+         *
+         * TODO implement FLOATVAL arg passing and set mapped
+         * register count.
+         */
+        {
             Parrot_jit_begin_sub_regs,   /* emit code prologue */
-            4,                  /* 4 mapped ints */
+            5,                  /* 5 mapped ints */
             2,                  /* first 2 are *non*preserved */
             i_map_sub,
-            4,                  /* 4 mapped float regs */
+            0,                  /* TODO 0 mapped float regs */
             0,                  /* ABI sez it's not preserved */
             floatval_map
         }

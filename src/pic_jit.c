@@ -1,6 +1,6 @@
 /*
 Copyright: 2006 The Perl Foundation.  All Rights Reserved.
-$Id:$
+$Id$
 
 =head1 NAME
 
@@ -72,13 +72,98 @@ pic_test_func(Interp *interpreter, INTVAL *sig_bits, void **args)
 }
 #endif
 
+static int
+jit_can_compile_sub(Interp *interpreter, PMC *sub)
+{
+    const jit_arch_info *info;
+    const jit_arch_regs *regs;
+    INTVAL *n_regs_used;
+          
+    info = Parrot_jit_init(interpreter);
+
+    regs = info->regs + JIT_CODE_SUB_REGS_ONLY;
+    n_regs_used = PMC_sub(sub)->n_regs_used;
+
+    /* if the sub is using more regs than the arch has
+     * we don't JIT it at all
+     */
+    if (n_regs_used[REGNO_INT] > regs->n_mapped_I)
+        return 0;
+    if (n_regs_used[REGNO_NUM] > regs->n_mapped_F)
+        return 0;
+    /* if the Sub is using S regs, we can't JIT it yet */
+    if (n_regs_used[REGNO_STR])
+        return 0;
+    /* if the Sub is using more than 1 P reg, we can't JIT it yet 
+     * the P reg could be a (recursive) call to a sub 
+     */
+    if (n_regs_used[REGNO_PMC] > 1)
+        return 0;
+    return 1;
+}
+
+        
+static int
+args_match_params(Interp *interpreter, PMC *sig_args,
+        struct PackFile_ByteCode *seg, opcode_t *start)
+{
+    PMC *sig_params;
+    int n, type;
+    
+    if (*start != PARROT_OP_get_params_pc)
+        return 0;
+    sig_params = seg->const_table->constants[start[1]]->u.key;
+    /* verify that we actually can pass arguments */
+    ASSERT_SIG_PMC(sig_params);
+
+    n = parrot_pic_check_sig(interpreter, sig_args, sig_params, &type);
+    if (n == -1) {
+        /* arg count mismatch */
+        return 0;
+    }
+    if (!n) {
+        /* no args - this would be save, if the JIT code could already
+         * deal with no args
+         * TODO
+         */
+        return 0;
+    }
+    type &= ~PARROT_ARG_CONSTANT;
+    switch (type) {
+        case PARROT_ARG_INTVAL:
+        case PARROT_ARG_FLOATVAL:
+            return 1;
+    }
+    return 0;
+}
+
 int
 parrot_pic_is_save_to_jit(Interp *interpreter, PMC *sub,
 	PMC *sig_args, PMC *sig_results)
 {
     STRING *name;
 
+    opcode_t *base, *start, *end;
+
+    /* simplify debugging */
     name = VTABLE_get_string(interpreter, sub);
+
+    /* 1) if the JIT system can't JIT_CODE_SUB_REGS_ONLY
+     *    or the sub is using too many registers
+     */ 
+    if (!jit_can_compile_sub(interpreter, sub))
+        return 0;
+    /*
+     * 2) check if get_params is matching set_args
+     */
+
+    base = PMC_sub(sub)->seg->base.data;
+    start = base + PMC_sub(sub)->start_offs;
+    end   = base + PMC_sub(sub)->end_offs;
+
+    if (!args_match_params(interpreter, sig_args, PMC_sub(sub)->seg, start))
+        return 0;
+
     /* XXX test code */
     if (memcmp((char*) name->strstart, "__pic_test", 10) != 0)
 	return 0;
@@ -98,7 +183,7 @@ parrot_pic_JIT_sub(Interp *interpreter, PMC *sub) {
     Parrot_jit_info_t *jit_info;
     opcode_t *base, *start, *end;
 
-    base = interpreter->code->base.data;
+    base = PMC_sub(sub)->seg->base.data;
     start = base + PMC_sub(sub)->start_offs;
     end   = base + PMC_sub(sub)->end_offs;
     /* TODO pass Sub */

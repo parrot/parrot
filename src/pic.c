@@ -374,8 +374,8 @@ pass_mixed(Interp *interpreter, PMC *sig, char *src_base, void **src,
  * return argument count and type of the signature or -1 if not pic-able
  * the type PARROT_ARG_CONSTANT stands for mixed types or constants
  */
-static int
-pic_check_sig(Interp *interpreter, PMC *sig1, PMC *sig2, int *type)
+int
+parrot_pic_check_sig(Interp *interpreter, PMC *sig1, PMC *sig2, int *type)
 {
     int i, n, t0, t1, t2;
 
@@ -443,7 +443,7 @@ is_pic_param(Interp *interpreter, void **pc, Parrot_MIC* mic, opcode_t op)
         const_nr = args[1];
         /* check current_args signature */
         sig2 = caller_ctx->constants[const_nr]->u.key;
-        n = pic_check_sig(interpreter, sig1, sig2, &type);
+        n = parrot_pic_check_sig(interpreter, sig1, sig2, &type);
         if (n == -1)
             return 0;
     }
