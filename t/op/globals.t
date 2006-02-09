@@ -24,7 +24,7 @@ Tests the C<store_global> and C<find_global> operations.
 =cut
 
 
-output_is(<<'CODE', '12', "Fetch and store");
+pasm_output_is(<<'CODE', '12', "Fetch and store");
 	new P0, .Integer
 	new P1, .Integer
 	set P0, 12
@@ -35,7 +35,7 @@ output_is(<<'CODE', '12', "Fetch and store");
 	end
 CODE
 
-output_like(<<'CODE', <<'OUTPUT', "Find null global");
+pasm_output_like(<<'CODE', <<'OUTPUT', "Find null global");
        null S0
        find_global P1, S0
        end
@@ -43,7 +43,7 @@ CODE
 /Tried to get null global/
 OUTPUT
 
-output_like(<<'CODE', <<OUT, "not found exception");
+pasm_output_like(<<'CODE', <<OUT, "not found exception");
 	find_global P1, "no_such_global"
 	print "ok 1\n"
 	print P1
@@ -52,7 +52,7 @@ CODE
 /Global 'no_such_global' not found/
 OUT
 
-output_is(<<'CODE', <<OUT, "not found - error turned off");
+pasm_output_is(<<'CODE', <<OUT, "not found - error turned off");
         .include "errors.pasm"
         errorsoff .PARROT_ERRORS_GLOBALS_FLAG
 	find_global P1, "no_such_global"

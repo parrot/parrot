@@ -25,7 +25,7 @@ DOD/GC related bugs.
 =cut
 
 
-output_is( <<'CODE', '1', "sweep 1" );
+pasm_output_is( <<'CODE', '1', "sweep 1" );
       interpinfo I1, 2   # How many DOD runs have we done already?
       sweep 1
       interpinfo I2, 2   # Should be one more now
@@ -34,7 +34,7 @@ output_is( <<'CODE', '1', "sweep 1" );
       end
 CODE
 
-output_is( <<'CODE', '0', "sweep 0" );
+pasm_output_is( <<'CODE', '0', "sweep 0" );
       interpinfo I1, 2   # How many DOD runs have we done already?
       sweep 0
       interpinfo I2, 2   # Should be same
@@ -43,7 +43,7 @@ output_is( <<'CODE', '0', "sweep 0" );
       end
 CODE
 
-output_is( <<'CODE', '1', "sweep 0, with object that need destroy" );
+pasm_output_is( <<'CODE', '1', "sweep 0, with object that need destroy" );
       interpinfo I1, 2   # How many DOD runs have we done already?
       new P0, .Undef
       needs_destroy P0
@@ -54,7 +54,7 @@ output_is( <<'CODE', '1', "sweep 0, with object that need destroy" );
       end
 CODE
 
-output_is( <<'CODE', '10', "sweep 0, with object that need destroy/destroy");
+pasm_output_is( <<'CODE', '10', "sweep 0, with object that need destroy/destroy");
       interpinfo I1, 2   # How many DOD runs have we done already?
       new P0, .Undef
       needs_destroy P0
@@ -70,7 +70,7 @@ output_is( <<'CODE', '10', "sweep 0, with object that need destroy/destroy");
       end
 CODE
 
-output_is( <<'CODE', '1', "collect" );
+pasm_output_is( <<'CODE', '1', "collect" );
       interpinfo I1, 3   # How many garbage collections have we done already?
       collect
       interpinfo I2, 3   # Should be one more now
@@ -79,7 +79,7 @@ output_is( <<'CODE', '1', "collect" );
       end
 CODE
 
-output_is( <<'CODE', <<'OUTPUT', "collectoff/on" );
+pasm_output_is( <<'CODE', <<'OUTPUT', "collectoff/on" );
       interpinfo I1, 3
       collectoff
       collect
@@ -101,7 +101,7 @@ CODE
 1
 OUTPUT
 
-output_is( <<'CODE', <<'OUTPUT', "Nested collectoff/collecton" );
+pasm_output_is( <<'CODE', <<'OUTPUT', "Nested collectoff/collecton" );
       interpinfo I1, 3
       collectoff
       collectoff
@@ -125,7 +125,7 @@ CODE
 1
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "sweepoff with newpmcs");
+pasm_output_is(<<'CODE', <<OUTPUT, "sweepoff with newpmcs");
     print "starting\n"
 
     sweepoff
@@ -145,7 +145,7 @@ starting
 ending
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "vanishing slingleton PMC");
+pasm_output_is(<<'CODE', <<OUTPUT, "vanishing slingleton PMC");
 _main:
     .const .Sub P0 = "_rand"
     set I16, 100
@@ -214,7 +214,7 @@ back from _inc
 ok
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "failing if regsave is not marked");
+pasm_output_is(<<'CODE', <<OUTPUT, "failing if regsave is not marked");
     newclass P9, "Source"
     newclass P10, "Source::Buffer"
     find_type I9,"Source"
@@ -258,7 +258,7 @@ OUTPUT
 
 # this is a stripped down version of imcc/t/syn/pcc_16
 # s. also src/pmc/retcontinuation.pmc
-output_is(<<'CODE', <<OUTPUT, "coro context and invalid return continuations");
+pasm_output_is(<<'CODE', <<OUTPUT, "coro context and invalid return continuations");
 .pcc_sub main:
     .const .Sub P0 = "co1"
     set I20, 0
@@ -325,7 +325,7 @@ ok 1
 9
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "write barrier 1");
+pasm_output_is(<<'CODE', <<OUTPUT, "write barrier 1");
     null I2
     set I3, 100
 lp3:
@@ -377,7 +377,7 @@ CODE
 ok
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "write barrier 2 - hash");
+pasm_output_is(<<'CODE', <<OUTPUT, "write barrier 2 - hash");
     null I2
     set I3, 100
 lp3:
@@ -433,7 +433,7 @@ CODE
 ok
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "write barrier 3 - ref");
+pasm_output_is(<<'CODE', <<OUTPUT, "write barrier 3 - ref");
     null I2
     set I3, 10
 lp3:
@@ -501,7 +501,7 @@ CODE
 ok
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "write barrier 4 - tqueue");
+pasm_output_is(<<'CODE', <<OUTPUT, "write barrier 4 - tqueue");
     null I2
     set I3, 100
 lp3:
@@ -709,7 +709,7 @@ CODE
 k1k2k3
 OUTPUT
 
-output_is( <<'CODE', <<'OUT', "reg_stack marking" );
+pasm_output_is( <<'CODE', <<'OUT', "reg_stack marking" );
 new P1, .PerlInt
 set P1, 0
 new P3, .PerlInt

@@ -24,7 +24,7 @@ Tests random number generation
 =cut
 
 
-output_is(<<'CODE', <<OUT, "generate random int");
+pasm_output_is(<<'CODE', <<OUT, "generate random int");
     new P0, .Random
     set I0, P0
     print "Called random just fine\n"

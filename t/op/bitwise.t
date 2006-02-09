@@ -24,7 +24,7 @@ Tests various bitwise logical operations.
 =cut
 
 
-output_is(<<'CODE', <<'OUTPUT', "shr_i_i_i (>>)");
+pasm_output_is(<<'CODE', <<'OUTPUT', "shr_i_i_i (>>)");
 	set I0, 0b001100
 	set I1, 0b010100
 	set I2, 1
@@ -48,7 +48,7 @@ CODE
 12
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "shr_i_i (>>)");
+pasm_output_is(<<'CODE', <<'OUTPUT', "shr_i_i (>>)");
 	set I0, 0b001100
 	set I1, 0b010100
 	set I2, 1
@@ -65,7 +65,7 @@ CODE
 5
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "shr_i_i_ic (>>)");
+pasm_output_is(<<'CODE', <<'OUTPUT', "shr_i_i_ic (>>)");
 	set	I0, 0b001100
 	set	I1, 0b010100
 	shr	I2, I0, 1
@@ -83,7 +83,7 @@ CODE
 12
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "shr_i_ic_i (>>)");
+pasm_output_is(<<'CODE', <<'OUTPUT', "shr_i_ic_i (>>)");
  	set I0, 1
  	set I1, 2
  	shr I2, 0b001100, I0
@@ -98,7 +98,7 @@ CODE
 5
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "shr_i_ic_ic (>>)");
+pasm_output_is(<<'CODE', <<'OUTPUT', "shr_i_ic_ic (>>)");
  	shr I2, 0b001100, 1
  	shr I1, 0b010100, 2
  	print I2
@@ -114,7 +114,7 @@ OUTPUT
 # The crux of this test is that a proper logical right shift
 # will clear the most significant bit, so the shifted value
 # will be a positive value on any 2's or 1's complement CPU
-output_is(<<'CODE', <<'OUTPUT', "lsr_i_ic_ic (>>)");
+pasm_output_is(<<'CODE', <<'OUTPUT', "lsr_i_ic_ic (>>)");
  	lsr I2, -40, 1
  	lt I2, 0, BAD
 	print "OK\n"
@@ -127,7 +127,7 @@ CODE
 OK
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "lsr_i_ic (>>)");
+pasm_output_is(<<'CODE', <<'OUTPUT', "lsr_i_ic (>>)");
 	set I2, -100
  	lsr I2, 1
  	lt I2, 0, BAD
@@ -141,7 +141,7 @@ CODE
 OK
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "lsr_i_i_i (>>)");
+pasm_output_is(<<'CODE', <<'OUTPUT', "lsr_i_i_i (>>)");
 	set I0, -40
 	set I1, 1
  	lsr I2, I0, I1
@@ -157,7 +157,7 @@ OK
 OUTPUT
 
 # ... and the missing op signature was untested and wrong in JIT/i386
-output_is(<<'CODE', <<'OUTPUT', "lsr_i_i_ic (>>)");
+pasm_output_is(<<'CODE', <<'OUTPUT', "lsr_i_i_ic (>>)");
 	set I0, -40
  	lsr I2, I0, 1
  	lt I2, 0, BAD
@@ -171,7 +171,7 @@ CODE
 OK
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "shr_i_i_ic (>>) negative");
+pasm_output_is(<<'CODE', <<'OUTPUT', "shr_i_i_ic (>>) negative");
 	set I0, -40
  	shr I2, I0, 1
  	ge I2, 0, BAD
@@ -184,7 +184,7 @@ BAD:
 CODE
 OK
 OUTPUT
-output_is(<<'CODE', <<'OUTPUT', "shl_i_i_i (<<)");
+pasm_output_is(<<'CODE', <<'OUTPUT', "shl_i_i_i (<<)");
  	set I0, 0b001100
  	set I1, 0b010100
  	set I2, 2
@@ -208,7 +208,7 @@ CODE
 12
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "shl_i_i_ic (<<)");
+pasm_output_is(<<'CODE', <<'OUTPUT', "shl_i_i_ic (<<)");
  	set I0, 0b001100
  	set I1, 0b010100
  	shl I2, I0, 2
@@ -226,7 +226,7 @@ CODE
 12
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "shl_i_ic_i (<<)");
+pasm_output_is(<<'CODE', <<'OUTPUT', "shl_i_ic_i (<<)");
  	set I0, 2
  	set I1, 1
  	shl I2, 0b001100, I0
@@ -241,7 +241,7 @@ CODE
 40
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "shl_i_ic_ic (<<)");
+pasm_output_is(<<'CODE', <<'OUTPUT', "shl_i_ic_ic (<<)");
  	shl I2, 0b001100, 2
  	shl I1, 0b010100, 1
  	print I2
@@ -254,7 +254,7 @@ CODE
 40
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "shl_i_i (<<)");
+pasm_output_is(<<'CODE', <<'OUTPUT', "shl_i_i (<<)");
 	set I0, 0b001100
 	set I1, 0b010100
 	set I2, 1
@@ -271,7 +271,7 @@ CODE
 80
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "bxor_i_i_i (^)");
+pasm_output_is(<<'CODE', <<'OUTPUT', "bxor_i_i_i (^)");
 	set	I0, 0b001100
 	set	I1, 0b100110
 	bxor	I2, I0, I1
@@ -289,7 +289,7 @@ CODE
 12
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "bxor_i_i_ic (^)");
+pasm_output_is(<<'CODE', <<'OUTPUT', "bxor_i_i_ic (^)");
  	set I0, 0b001100
 	bxor I2, I0, 0b100110
  	print I2
@@ -306,7 +306,7 @@ CODE
 42
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "bxor_i|ic (^)");
+pasm_output_is(<<'CODE', <<'OUTPUT', "bxor_i|ic (^)");
  	set I0, 0b001100
         set I2, 0b000011
 	bxor I2, I0
@@ -336,7 +336,7 @@ CODE
 22
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "band_i_i_i (&)");
+pasm_output_is(<<'CODE', <<'OUTPUT', "band_i_i_i (&)");
 	set	I0, 0b001100
 	set	I1, 0b010110
 	band	I2, I0,I1
@@ -354,7 +354,7 @@ CODE
 12
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "band_i_i_ic (&)");
+pasm_output_is(<<'CODE', <<'OUTPUT', "band_i_i_ic (&)");
  	set I0, 0b001100
 	band I2, I0,0b010110
  	print I2
@@ -371,7 +371,7 @@ CODE
 4
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "band_i_i|ic (&)");
+pasm_output_is(<<'CODE', <<'OUTPUT', "band_i_i|ic (&)");
  	set I0, 0b001100
         set I2, 0b000011
 	band I2, I0
@@ -401,7 +401,7 @@ CODE
 1
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "bor_i_i_i (|)");
+pasm_output_is(<<'CODE', <<'OUTPUT', "bor_i_i_i (|)");
  	set I0, 0b001100
  	set I1, 0b010110
 	bor I2, I0,I1
@@ -419,7 +419,7 @@ CODE
 12
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "bor_i_i_ic (|)");
+pasm_output_is(<<'CODE', <<'OUTPUT', "bor_i_i_ic (|)");
  	set I0, 0b001100
 	bor I2, I0,0b010110
  	print I2
@@ -436,7 +436,7 @@ CODE
 30
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "bor_i_i|ic (|)");
+pasm_output_is(<<'CODE', <<'OUTPUT', "bor_i_i|ic (|)");
  	set I0, 0b001100
         set I2, 0b000011
 	bor I2, I0
@@ -467,7 +467,7 @@ CODE
 OUTPUT
 
 # use C<and> to only check low order bits, this should be platform nice
-output_is(<<'CODE', <<'OUTPUT', "bnot_i_i (~)");
+pasm_output_is(<<'CODE', <<'OUTPUT', "bnot_i_i (~)");
 	set	I0, 0b001100
 	set	I1, 0b001100
 	set	I31, 0b111111

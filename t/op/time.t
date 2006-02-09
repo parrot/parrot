@@ -24,7 +24,7 @@ Tests the C<time> and C<sleep> operations.
 =cut
 
 
-output_is(<<'CODE', <<'OUTPUT', "time_i");
+pasm_output_is(<<'CODE', <<'OUTPUT', "time_i");
 	time	I0
 	time	I1
 	ge	I0, 0, OK1
@@ -47,7 +47,7 @@ ok, (!= 1970) Grateful Dead not
 ok, (now>before) timelords need not apply
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "time_n");
+pasm_output_is(<<'CODE', <<'OUTPUT', "time_n");
 	time	N0
 	time	N1
 	ge	N0, 0.0, OK1
@@ -65,7 +65,7 @@ ok, (!= 1970) Grateful Dead not
 ok, (now>before) timelords need not apply
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "sleep");
+pasm_output_is(<<CODE, <<OUTPUT, "sleep");
 	print	"start\\n"
 
 	time	I1
@@ -87,7 +87,7 @@ start
 done
 OUTPUT
 
-output_like(<<CODE, <<OUT , "sleep");
+pasm_output_like(<<CODE, <<OUT , "sleep");
 	sleep	-1
 	end
 CODE
@@ -100,7 +100,7 @@ $year += 1900;
 
 # don't run this test 1 tick before the year changes #'
 
-output_is(<<'CODE', $year, "decodelocaltime");
+pasm_output_is(<<'CODE', $year, "decodelocaltime");
     time I0
     decodelocaltime P0, I0
     .include "tm.pasm"

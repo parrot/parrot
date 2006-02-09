@@ -74,7 +74,7 @@ my $fp_equality_macro = <<'ENDOFMACRO';
 .endm
 ENDOFMACRO
 
-output_is( <<"CODE", <<OUTPUT, "sin" );
+pasm_output_is( <<"CODE", <<OUTPUT, "sin" );
 @{[ $fp_equality_macro ]}
 	set	N1, 1.0
 	sin	N2, N1
@@ -94,7 +94,7 @@ ok 1
 ok 2
 OUTPUT
 
-output_is( <<"CODE", <<OUTPUT, "cos" );
+pasm_output_is( <<"CODE", <<OUTPUT, "cos" );
 @{[ $fp_equality_macro ]}
 	set	N1, 1.0
 	cos	N2, N1
@@ -113,7 +113,7 @@ ok 1
 ok 2
 OUTPUT
 
-output_is( <<"CODE", <<OUTPUT, "tan" );
+pasm_output_is( <<"CODE", <<OUTPUT, "tan" );
 @{[ $fp_equality_macro ]}
     	set	N1, 1.0
     	tan	N2, N1
@@ -132,7 +132,7 @@ ok 1
 ok 2
 OUTPUT
 
-output_is( <<"CODE", <<OUTPUT, "sec" );
+pasm_output_is( <<"CODE", <<OUTPUT, "sec" );
 @{[ $fp_equality_macro ]}
 	set N1, 1.0
 	sec N2, N1
@@ -151,7 +151,7 @@ ok 1
 ok 2
 OUTPUT
 
-output_is( <<"CODE", <<OUTPUT, "atan" );
+pasm_output_is( <<"CODE", <<OUTPUT, "atan" );
 @{[ $fp_equality_macro ]}
 	set N1, 1.0
 	atan N2, N1
@@ -170,7 +170,7 @@ ok 1
 ok 2
 OUTPUT
 
-output_is( <<"CODE", <<OUTPUT, "asin" );
+pasm_output_is( <<"CODE", <<OUTPUT, "asin" );
 @{[ $fp_equality_macro ]}
 	set N1, 1.0
 	asin N2, N1
@@ -190,7 +190,7 @@ ok 1
 ok 2
 OUTPUT
 
-output_is( <<"CODE", <<OUTPUT, "acos" );
+pasm_output_is( <<"CODE", <<OUTPUT, "acos" );
 @{[ $fp_equality_macro ]}
 	set N1, 1.0
 	acos N2, N1
@@ -210,7 +210,7 @@ ok 1
 ok 2
 OUTPUT
 
-output_is( <<"CODE", <<OUTPUT, "asec" );
+pasm_output_is( <<"CODE", <<OUTPUT, "asec" );
 @{[ $fp_equality_macro ]}
 	set N1, 1.0
 	asec N2, N1
@@ -230,7 +230,7 @@ ok 1
 ok 2
 OUTPUT
 
-output_is( <<"CODE", <<OUTPUT, "cosh" );
+pasm_output_is( <<"CODE", <<OUTPUT, "cosh" );
 @{[ $fp_equality_macro ]}
 	set N1, 1.0
 	cosh N2, N1
@@ -250,7 +250,7 @@ ok 1
 ok 2
 OUTPUT
 
-output_is( <<"CODE", <<OUTPUT, "sinh" );
+pasm_output_is( <<"CODE", <<OUTPUT, "sinh" );
 @{[ $fp_equality_macro ]}
 	set N1, 1.0
 	sinh N2, N1
@@ -270,7 +270,7 @@ ok 1
 ok 2
 OUTPUT
 
-output_is( <<"CODE", <<OUTPUT, "tanh" );
+pasm_output_is( <<"CODE", <<OUTPUT, "tanh" );
 @{[ $fp_equality_macro ]}
 	set N1, 1.0
 	tanh N2, N1
@@ -290,7 +290,7 @@ ok 1
 ok 2
 OUTPUT
 
-output_is( <<"CODE", <<OUTPUT, "sech" );
+pasm_output_is( <<"CODE", <<OUTPUT, "sech" );
 @{[ $fp_equality_macro ]}
 	set N1, 1.0
 	sech N2, N1
@@ -310,7 +310,7 @@ ok 1
 ok 2
 OUTPUT
 
-output_is( <<"CODE", <<OUTPUT, "atan2" );
+pasm_output_is( <<"CODE", <<OUTPUT, "atan2" );
 @{[ $fp_equality_macro]}
         set N0, 0.0
         set I0, 0
@@ -427,7 +427,7 @@ ok 16
 ok 17
 OUTPUT
 
-output_is( <<"CODE", <<OUTPUT, "log2" );
+pasm_output_is( <<"CODE", <<OUTPUT, "log2" );
 @{[ $fp_equality_macro ]}
 	set N1, 10.0
 	log2 N2, N1
@@ -447,7 +447,7 @@ ok 1
 ok 2
 OUTPUT
 
-output_is( <<"CODE", <<OUTPUT, "log10" );
+pasm_output_is( <<"CODE", <<OUTPUT, "log10" );
 @{[ $fp_equality_macro ]}
 	set N1, 15.0
 	log10 N2, N1
@@ -467,7 +467,7 @@ ok 1
 ok 2
 OUTPUT
 
-output_is( <<"CODE", <<OUTPUT, "ln" );
+pasm_output_is( <<"CODE", <<OUTPUT, "ln" );
 @{[ $fp_equality_macro ]}
 	set N1, 10.0
 	ln N2, N1
@@ -486,7 +486,7 @@ ok 1
 ok 2
 OUTPUT
 
-output_is( <<"CODE", <<OUTPUT, "exp" );
+pasm_output_is( <<"CODE", <<OUTPUT, "exp" );
 @{[ $fp_equality_macro ]}
 	set N1, 10.0
 	exp N2, N1
@@ -505,7 +505,7 @@ ok 1
 ok 2
 OUTPUT
 
-output_is( <<"CODE", <<OUTPUT, "pow" );
+pasm_output_is( <<"CODE", <<OUTPUT, "pow" );
 @{[ $fp_equality_macro ]}
 	set N1, 3.0
 	set I1, 3
@@ -616,7 +616,7 @@ ok 15
 ok 16
 OUTPUT
 
-output_is( <<"CODE", <<OUTPUT, "sqrt" );
+pasm_output_is( <<"CODE", <<OUTPUT, "sqrt" );
 @{[ $fp_equality_macro ]}
        set N1, 9.0
        sqrt N2, N1

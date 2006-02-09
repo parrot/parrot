@@ -35,7 +35,7 @@ else {
 }
 
 
-output_is(<<'CODE', <<'OUTPUT', "bitops64");
+pasm_output_is(<<'CODE', <<'OUTPUT', "bitops64");
 	# check bitops for 8-byte ints
 	set I0, 0xffffffffffffffff
 	print I0 # -1

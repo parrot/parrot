@@ -24,7 +24,7 @@ Tests the additional opcodes for C# compilation. See F<ops/dotgnu.ops>.
 =cut
 
 
-output_is(<<'CODE', <<OUTPUT, "conv_i1_i");
+pasm_output_is(<<'CODE', <<OUTPUT, "conv_i1_i");
     set I0, 127
     conv_i1 I0
     print I0
@@ -54,7 +54,7 @@ CODE
 127
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "conv_u1_i");
+pasm_output_is(<<'CODE', <<OUTPUT, "conv_u1_i");
     set I0, 127
     conv_u1 I0
     print I0
@@ -84,7 +84,7 @@ CODE
 255
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "conv_i2_i");
+pasm_output_is(<<'CODE', <<OUTPUT, "conv_i2_i");
     set I0, 32767
     conv_i2 I0
     print I0
@@ -114,7 +114,7 @@ CODE
 32767
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "conv_u2_i");
+pasm_output_is(<<'CODE', <<OUTPUT, "conv_u2_i");
     set I0, 32767
     conv_u2 I0
     print I0
@@ -145,7 +145,7 @@ CODE
 OUTPUT
 
 
-output_is(<<'CODE', <<OUTPUT, "conv_i1_ofv_i, positive direction");
+pasm_output_is(<<'CODE', <<OUTPUT, "conv_i1_ofv_i, positive direction");
     set I0, 127
     conv_i1_ovf I0
     print I0
@@ -159,7 +159,7 @@ CODE
 Overflow exception for conv_i1_ovf
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "conv_i1_ofv_i, negative direction");
+pasm_output_is(<<'CODE', <<OUTPUT, "conv_i1_ofv_i, negative direction");
     set I0, -128
     conv_i1_ovf I0
     print I0
@@ -173,7 +173,7 @@ CODE
 Overflow exception for conv_i1_ovf
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "conv_u1_ofv_i, positive direction");
+pasm_output_is(<<'CODE', <<OUTPUT, "conv_u1_ofv_i, positive direction");
     set I0, 255
     conv_u1_ovf I0
     print I0
@@ -187,7 +187,7 @@ CODE
 Overflow exception for conv_u1_ovf
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "conv_u1_ofv_i, negative direction");
+pasm_output_is(<<'CODE', <<OUTPUT, "conv_u1_ofv_i, negative direction");
     set I0, 0
     conv_u1_ovf I0
     print I0
@@ -201,7 +201,7 @@ CODE
 Overflow exception for conv_u1_ovf
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "conv_i2_ofv_i, positive direction");
+pasm_output_is(<<'CODE', <<OUTPUT, "conv_i2_ofv_i, positive direction");
     set I0, 32767
     conv_i2_ovf I0
     print I0
@@ -215,7 +215,7 @@ CODE
 Overflow exception for conv_i2_ovf
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "conv_i2_ofv_i, negative direction");
+pasm_output_is(<<'CODE', <<OUTPUT, "conv_i2_ofv_i, negative direction");
     set I0, -32768
     conv_i2_ovf I0
     print I0
@@ -229,7 +229,7 @@ CODE
 Overflow exception for conv_i2_ovf
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "conv_u2_ofv_i, positive direction");
+pasm_output_is(<<'CODE', <<OUTPUT, "conv_u2_ofv_i, positive direction");
     set I0, 65535
     conv_u2_ovf I0
     print I0
@@ -244,7 +244,7 @@ CODE
 Overflow exception for conv_u2_ovf
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "conv_u2_ofv_i, negative direction");
+pasm_output_is(<<'CODE', <<OUTPUT, "conv_u2_ofv_i, negative direction");
     set I0, 0
     conv_u2_ovf I0
     print I0

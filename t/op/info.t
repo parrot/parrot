@@ -24,7 +24,7 @@ Tests the information finding operations.
 =cut
 
 
-output_is(<<'CODE', 'yes', "find_type");
+pasm_output_is(<<'CODE', 'yes', "find_type");
 	set I0, .PerlArray
 	find_type I1, "PerlArray"
 	eq I0, I1, YES

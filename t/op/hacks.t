@@ -37,7 +37,7 @@ sub has_signal {
 SKIP: {
   skip("no universal SIGFPE handling", 2);
 
-output_is(<<'CODE', <<OUT, "catch a SIGFPE");
+pasm_output_is(<<'CODE', <<OUT, "catch a SIGFPE");
     push_eh _handler
     div I10, 0
     print "not reached\n"
@@ -60,7 +60,7 @@ error -8
 severity 0
 OUT
 
-output_is(<<'CODE', <<OUT, "catch a SIGFPE 2");
+pasm_output_is(<<'CODE', <<OUT, "catch a SIGFPE 2");
     push_eh _handler
     div I10, 0
     print "not reached\n"

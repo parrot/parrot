@@ -24,7 +24,7 @@ Tests IMCC C<.macro> syntax.
 =cut
 
 
-output_is( <<'CODE', <<OUTPUT, "macro, zero parameters" );
+pasm_output_is( <<'CODE', <<OUTPUT, "macro, zero parameters" );
 .macro answer()
 	print	42
 	print	"\n"
@@ -35,7 +35,7 @@ CODE
 42
 OUTPUT
 
-output_is( <<'CODE', <<OUTPUT, "macro, one unused parameter, literal term" );
+pasm_output_is( <<'CODE', <<OUTPUT, "macro, one unused parameter, literal term" );
 .macro answer(A)
 	print	42
 .endm
@@ -46,7 +46,7 @@ CODE
 42
 OUTPUT
 
-output_is( <<'CODE', <<OUTPUT, "macro, one unused parameter, register term" );
+pasm_output_is( <<'CODE', <<OUTPUT, "macro, one unused parameter, register term" );
 .macro answer(A)
 	print	42
 .endm
@@ -58,7 +58,7 @@ CODE
 42
 OUTPUT
 
-output_is( <<'CODE', <<OUTPUT, "macro, one used parameter, literal" );
+pasm_output_is( <<'CODE', <<OUTPUT, "macro, one used parameter, literal" );
 .macro answer(A)
 	print	.A
 .endm
@@ -71,7 +71,7 @@ OUTPUT
 
 SKIP: { skip("Await exceptions", 1);
 
-output_is( <<'CODE', <<OUTPUT, "macro, one parameter in call, not in def" );
+pasm_output_is( <<'CODE', <<OUTPUT, "macro, one parameter in call, not in def" );
 .macro answer(A)
 	print .A
 .endm
@@ -83,7 +83,7 @@ CODE
 OUTPUT
 }
 
-output_is( <<'CODE', <<OUTPUT, "macro, one used parameter, register" );
+pasm_output_is( <<'CODE', <<OUTPUT, "macro, one used parameter, register" );
 .macro answer(A)
 	print	.A
 .endm
@@ -95,7 +95,7 @@ CODE
 42
 OUTPUT
 
-output_is( <<'CODE', <<OUTPUT, "macro, one used parameter, called twice" );
+pasm_output_is( <<'CODE', <<OUTPUT, "macro, one used parameter, called twice" );
 .macro answer(A)
 	print	.A
 	print	"\n"
@@ -110,7 +110,7 @@ CODE
 43
 OUTPUT
 
-output_is( <<'CODE', <<OUTPUT, "macro, one used parameter, label" );
+pasm_output_is( <<'CODE', <<OUTPUT, "macro, one used parameter, label" );
 .macro answer(A)
 	ne	I0,42,.$done
 	print	.A
@@ -124,7 +124,7 @@ CODE
 42
 OUTPUT
 
-output_is( <<'CODE', <<OUTPUT, "macro, one used parameter run twice, label" );
+pasm_output_is( <<'CODE', <<OUTPUT, "macro, one used parameter run twice, label" );
 .macro answer(A)
 	ne	I0,42,.$done
 	print	.A
@@ -140,26 +140,26 @@ CODE
 42
 OUTPUT
 
-output_is(<<'CODE', '32', "constant defined and used");
+pasm_output_is(<<'CODE', '32', "constant defined and used");
 .constant FOO 32
   print .FOO
   end
 CODE
 
-output_is(<<'CODE', 'foo', "constant defined and used");
+pasm_output_is(<<'CODE', 'foo', "constant defined and used");
 .constant FOO "foo"
   print .FOO
   end
 CODE
 
-output_is(<<'CODE', 'foo', "constant defined and used");
+pasm_output_is(<<'CODE', 'foo', "constant defined and used");
 .constant FOO S0
   set .FOO,"foo"
   print .FOO
   end
 CODE
 
-output_is(<<'CODE', 'foo', "constant defined, used in a macro call");
+pasm_output_is(<<'CODE', 'foo', "constant defined, used in a macro call");
 .constant FOO S0
 .macro answer (bar)
   print .bar
@@ -175,7 +175,7 @@ print FOO <<'ENDF';
 ENDF
 close FOO;
 
-output_is(<<"CODE", <<OUTPUT, "basic include macro");
+pasm_output_is(<<"CODE", <<OUTPUT, "basic include macro");
 .include "macro.tempfile"
   print S0
 
@@ -202,7 +202,7 @@ print FOO <<'ENDF';
 ENDF
 close FOO;
 
-output_is(<<"CODE", <<OUTPUT, "include a file defining a macro");
+pasm_output_is(<<"CODE", <<OUTPUT, "include a file defining a macro");
 .include "macro.tempfile"
   .multiply(12,13)
   print P2
@@ -213,7 +213,7 @@ CODE
 OUTPUT
 
 ##############################
-output_is(<<'CODE', '1', "find file in runtime includes");
+pasm_output_is(<<'CODE', '1', "find file in runtime includes");
     .include "stdio.pasm"
     print .PIO_STDOUT_FILENO
     end
@@ -223,7 +223,7 @@ open FOO, ">macro.tempfile";   # Clobber previous
 close FOO;
 unlink("macro.tempfile");
 
-output_is( <<'CODE', <<OUTPUT, "macro, same args" );
+pasm_output_is( <<'CODE', <<OUTPUT, "macro, same args" );
 .macro Test(X)
     print .X
     print "\n"
@@ -239,7 +239,7 @@ CODE
 hi
 OUTPUT
 
-output_is( <<'CODE', <<OUTPUT, "local labels" );
+pasm_output_is( <<'CODE', <<OUTPUT, "local labels" );
 .macro Test(X)
     print "Test label arg\n"
     branch .X

@@ -24,7 +24,7 @@ Tests Parrot calling conventions.
 =cut
 
 
-output_is(<<'CODE', <<'OUTPUT', "set_args - parsing");
+pasm_output_is(<<'CODE', <<'OUTPUT', "set_args - parsing");
     noop
     set_args "(0b10, 0)", P0, I0
     print "Ok 1\n"
@@ -36,7 +36,7 @@ Ok 1
 Ok 2
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "var_args - parsing");
+pasm_output_is(<<'CODE', <<'OUTPUT', "var_args - parsing");
 .pcc_sub main:
     print "Ok 1\n"
     set_args "(0b10, 0)", P0, I0
@@ -60,7 +60,7 @@ Ok 4
 Ok 5
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "call - i, ic");
+pasm_output_is(<<'CODE', <<'OUTPUT', "call - i, ic");
 .pcc_sub main:
     set I16, 77
     set_args "(0b100, 0)", 42, I16
@@ -81,7 +81,7 @@ CODE
 back
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "call - i, ic, return i, ic");
+pasm_output_is(<<'CODE', <<'OUTPUT', "call - i, ic, return i, ic");
 .pcc_sub main:
     set I16, 77
     set_args "(0b100, 0)", 42, I16
@@ -110,7 +110,7 @@ CODE
 back
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "call - i, ic, return i, ic - adjust sig");
+pasm_output_is(<<'CODE', <<'OUTPUT', "call - i, ic, return i, ic - adjust sig");
 .pcc_sub main:
     set I16, 77
     set_args "(0, 0)", 42, I16
@@ -139,7 +139,7 @@ CODE
 back
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "all together now");
+pasm_output_is(<<'CODE', <<'OUTPUT', "all together now");
 .pcc_sub main:
     set I16, 77
     set N16, 2.3
@@ -192,7 +192,7 @@ ok 3
 ok 4
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "flatten arg");
+pasm_output_is(<<'CODE', <<'OUTPUT', "flatten arg");
 .pcc_sub main:
     new P16, .String
     set P16, "ok 1\n"
@@ -224,7 +224,7 @@ ok 5
 back
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "slurpy param");
+pasm_output_is(<<'CODE', <<'OUTPUT', "slurpy param");
 .pcc_sub main:
     new P16, .String
     set P16, "ok 1\n"
@@ -273,7 +273,7 @@ CODE
 hello
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "flatten + slurpy param");
+pasm_output_is(<<'CODE', <<'OUTPUT', "flatten + slurpy param");
 .pcc_sub main:
     new P16, .String
     set P16, "ok 1\n"
@@ -396,7 +396,7 @@ CODE
 hello 42 again 47.11
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "maybe flatten + slurpy param");
+pasm_output_is(<<'CODE', <<'OUTPUT', "maybe flatten + slurpy param");
 .pcc_sub main:
     new P16, .String
     set P16, "ok 1\n"
@@ -588,7 +588,7 @@ CODE
 /too many arguments passed/
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "get_param later");
+pasm_output_is(<<'CODE', <<'OUTPUT', "get_param later");
 .pcc_sub main:
     set I16, 77
     set_args "(0b100, 0)", 42, I16
@@ -701,7 +701,7 @@ from_foo
 bar_ret
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "get_params twice");
+pasm_output_is(<<'CODE', <<'OUTPUT', "get_params twice");
 .pcc_sub main:
     new P16, .String
     set P16, "ok 1\n"
@@ -1627,7 +1627,7 @@ CODE
 17
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "named - 1");
+pasm_output_is(<<'CODE', <<'OUTPUT', "named - 1");
 .pcc_sub main:
     set_args "(0x80, 0, 0x80, 0)", "b", 10, "a", 20
     get_results "()"
@@ -1646,7 +1646,7 @@ CODE
 ok
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "named - 2 flatten");
+pasm_output_is(<<'CODE', <<'OUTPUT', "named - 2 flatten");
 .pcc_sub main:
     new P0, .Hash
     set P0['a'], 20
@@ -1668,7 +1668,7 @@ CODE
 ok
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "named - 3 slurpy hash");
+pasm_output_is(<<'CODE', <<'OUTPUT', "named - 3 slurpy hash");
 .pcc_sub main:
     set_args "(0x80, 0, 0x80, 0,0x80, 0)", "a", 10, "b", 20, 'c', 30
     get_results "()"
@@ -1695,7 +1695,7 @@ CODE
 ok
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "named - 4 positional -> named");
+pasm_output_is(<<'CODE', <<'OUTPUT', "named - 4 positional -> named");
 .pcc_sub main:
     set_args  "(0, 0, 0)", 10, 20, 30
     get_results "()"
@@ -1715,7 +1715,7 @@ CODE
 ok
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "named - 5 slurpy array -> named");
+pasm_output_is(<<'CODE', <<'OUTPUT', "named - 5 slurpy array -> named");
 .pcc_sub main:
     set_args  "(0, 0, 0, 0x80, 0, 0x80, 0)", 10, 20, 30, 'a', 40, 'b', 50
     get_results "()"

@@ -24,7 +24,7 @@ Tests file formats.
 =cut
 
 
-output_is(<<'CODE', <<'OUT', "fileformat unix");
+pasm_output_is(<<'CODE', <<'OUT', "fileformat unix");
     print "ok\n"
     end
 CODE

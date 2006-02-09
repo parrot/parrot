@@ -25,12 +25,12 @@ Tests file formats.
 
 
 my $code = qq(print "ok\\n"\r\nend\r\n);
-output_is($code, <<'OUT', "fileformat dos");
+pasm_output_is($code, <<'OUT', "fileformat dos");
 ok
 OUT
 
 $code = qq(print "ok\\n"\r\nend\r\n\cZ\r\n);
-output_is($code, <<'OUT', "fileformat dos w ctrl-z");
+pasm_output_is($code, <<'OUT', "fileformat dos w ctrl-z");
 ok
 OUT
 

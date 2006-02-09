@@ -83,7 +83,7 @@ ENDOFMACRO
 
 
 # Test proper stack chunk handling
-output_is(<<CODE, <<'OUTPUT', 'save_i & restore_i');
+pasm_output_is(<<CODE, <<'OUTPUT', 'save_i & restore_i');
 	set     I3, 1
 
 testloop:
@@ -111,7 +111,7 @@ OK
 OUTPUT
 
 # Rotate
-output_is(<<"CODE", <<'OUTPUT', 'rotate 0');
+pasm_output_is(<<"CODE", <<'OUTPUT', 'rotate 0');
     set I0, 1
     save I0
     set I0, 2
@@ -125,7 +125,7 @@ CODE
 2
 OUTPUT
 
-output_is(<<"CODE", <<'OUTPUT', 'rotate 1');
+pasm_output_is(<<"CODE", <<'OUTPUT', 'rotate 1');
     set I0, 1
     save I0
     set I0, 2
@@ -139,7 +139,7 @@ CODE
 2
 OUTPUT
 
-output_is(<<"CODE", <<'OUTPUT', 'rotate 2');
+pasm_output_is(<<"CODE", <<'OUTPUT', 'rotate 2');
     set I0, 1
     save I0
     set I0, 2
@@ -153,7 +153,7 @@ CODE
 1
 OUTPUT
 
-output_is(<<"CODE", <<'OUTPUT', 'rotate 3');
+pasm_output_is(<<"CODE", <<'OUTPUT', 'rotate 3');
     set I0, 1
     save I0
     set I0, 2
@@ -174,7 +174,7 @@ CODE
 OUTPUT
 
 
-output_is(<<"CODE", <<'OUTPUT', 'rotate -1');
+pasm_output_is(<<"CODE", <<'OUTPUT', 'rotate -1');
     set I0, 1
     save I0
     set I0, 2
@@ -194,7 +194,7 @@ CODE
 321
 OUTPUT
 
-output_is(<<"CODE", <<'OUTPUT', 'rotate -2');
+pasm_output_is(<<"CODE", <<'OUTPUT', 'rotate -2');
     set I0, 1
     save I0
     set I0, 2
@@ -214,7 +214,7 @@ CODE
 231
 OUTPUT
 
-output_is(<<"CODE", <<'OUTPUT', 'rotate -3');
+pasm_output_is(<<"CODE", <<'OUTPUT', 'rotate -3');
     set I0, 1
     save I0
     set I0, 2
@@ -234,7 +234,7 @@ CODE
 132
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', 'rotate with a full stack chunk');
+pasm_output_is(<<'CODE', <<'OUTPUT', 'rotate with a full stack chunk');
       set I0, 0
 FOO:  save I0
       inc I0
@@ -250,7 +250,7 @@ CODE
 254
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', 'rotate across stack chunk boundary');
+pasm_output_is(<<'CODE', <<'OUTPUT', 'rotate across stack chunk boundary');
       set I0, 0
 FOO:  save I0
       inc I0
@@ -266,7 +266,7 @@ CODE
 255
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', 'rotate by stack chunk size');
+pasm_output_is(<<'CODE', <<'OUTPUT', 'rotate by stack chunk size');
       set I0, 0
 FOO:  save I0
       inc I0
@@ -282,7 +282,7 @@ CODE
 44
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', 'rotate by more than stack chunk size');
+pasm_output_is(<<'CODE', <<'OUTPUT', 'rotate by more than stack chunk size');
       set I0, 0
 FOO:  save I0
       inc I0
@@ -298,7 +298,7 @@ CODE
 43
 OUTPUT
 
-output_is(<<"CODE", <<'OUTPUT', 'rotate up by more than stack size');
+pasm_output_is(<<"CODE", <<'OUTPUT', 'rotate up by more than stack size');
     set I0, 1
     save I0
     set I0, 2
@@ -309,7 +309,7 @@ CODE
 Stack too shallow!
 OUTPUT
 
-output_is(<<"CODE", <<'OUTPUT', 'rotate down by more than stack size');
+pasm_output_is(<<"CODE", <<'OUTPUT', 'rotate down by more than stack size');
     set I0, 1
     save I0
     set I0, 2
@@ -320,7 +320,7 @@ CODE
 Stack too shallow!
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', 'save/savec for strings');
+pasm_output_is(<<'CODE', <<'OUTPUT', 'save/savec for strings');
       set S0, "Foobar"
       savec S0
       chopn S0, 3
@@ -346,7 +346,7 @@ Foo
 Foo
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "save, restore");
+pasm_output_is(<<CODE, <<OUTPUT, "save, restore");
 @{[ $fp_equality_macro ]}
 	set	I0, 1
 	save	I0
@@ -414,7 +414,7 @@ find themselves caught in a loop
 never to escape
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "entrytype");
+pasm_output_is(<<CODE, <<OUTPUT, "entrytype");
 	set	I0, 12
 	set	N0, 0.1
 	set	S0, "Difference Engine #2"
@@ -452,7 +452,7 @@ starting
 done
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "entrytype, beyond stack depth");
+pasm_output_is(<<CODE, <<OUTPUT, "entrytype, beyond stack depth");
 	save	12
 	print	"ready\\n"
 	entrytype	I0, 1
@@ -463,7 +463,7 @@ ready
 Stack Depth wrong
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "depth op");
+pasm_output_is(<<'CODE', <<'OUTPUT', "depth op");
         depth I0
         print I0
         print "\n"
@@ -489,7 +489,7 @@ CODE
 1024
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "saveall/restoreall");
+pasm_output_is(<<'CODE', <<'OUTPUT', "saveall/restoreall");
         set S0,"test ok"
         set N0,4.3
         set I0,6
@@ -511,7 +511,7 @@ CODE
 test ok
 OUTPUT
 
-output_is(<<CODE, <<'OUTPUT', "lookback");
+pasm_output_is(<<CODE, <<'OUTPUT', "lookback");
 @{[ $fp_equality_macro ]}
         save 1
         save 1.0
@@ -579,7 +579,7 @@ OUTPUT
 
 SKIP: {
   skip("no stack limit currently", 3);
-output_is(<<CODE, <<'OUTPUT', "check limit - User");
+pasm_output_is(<<CODE, <<'OUTPUT', "check limit - User");
 lp:
 	save I0
 	branch lp
@@ -588,7 +588,7 @@ CODE
 Stack 'User' too deep
 OUTPUT
 
-output_is(<<CODE, <<'OUTPUT', "check limit - Pad");
+pasm_output_is(<<CODE, <<'OUTPUT', "check limit - Pad");
 lp:
 	new_pad 0
 	branch lp
@@ -597,7 +597,7 @@ CODE
 Stack 'Pad' too deep
 OUTPUT
 
-output_is(<<CODE, <<'OUTPUT', "check limit - Control");
+pasm_output_is(<<CODE, <<'OUTPUT', "check limit - Control");
 lp:
 	bsr lp
 	end

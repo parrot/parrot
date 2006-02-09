@@ -25,7 +25,7 @@ Tests charset support.
 =cut
 
 
-output_is( <<'CODE', <<OUTPUT, "basic syntax" );
+pasm_output_is( <<'CODE', <<OUTPUT, "basic syntax" );
     set S0, ascii:"ok 1\n"
     print S0
     set S0, binary:"ok 2\n"
@@ -39,7 +39,7 @@ ok 2
 ok 3
 OUTPUT
 
-output_is( <<'CODE', <<OUTPUT, "charset name" );
+pasm_output_is( <<'CODE', <<OUTPUT, "charset name" );
     set S0, "ok 1\n"
     charset I0, S0
     charsetname S1, I0
@@ -50,7 +50,7 @@ CODE
 ascii
 OUTPUT
 
-output_is( <<'CODE', <<OUTPUT, "find_charset" );
+pasm_output_is( <<'CODE', <<OUTPUT, "find_charset" );
     find_charset I0, "iso-8859-1"
     print "ok 1\n"
     find_charset I0, "ascii"
@@ -64,14 +64,14 @@ ok 2
 ok 3
 OUTPUT
 
-output_like( <<'CODE', <<OUTPUT, "find_charset - not existing" );
+pasm_output_like( <<'CODE', <<OUTPUT, "find_charset - not existing" );
     find_charset I0, "no_such"
     end
 CODE
 /charset 'no_such' not found/
 OUTPUT
 
-output_is( <<'CODE', <<OUTPUT, "downcase" );
+pasm_output_is( <<'CODE', <<OUTPUT, "downcase" );
     set S0, iso-8859-1:"AEIOU_ÄÖÜ\n"
     downcase S1, S0
     print S1
@@ -80,7 +80,7 @@ CODE
 aeiou_äöü
 OUTPUT
 
-output_is( <<'CODE', <<OUTPUT, "upcase" );
+pasm_output_is( <<'CODE', <<OUTPUT, "upcase" );
     set S0, iso-8859-1:"aeiou_äöüß\n"
     upcase S1, S0
     print S1
@@ -89,7 +89,7 @@ CODE
 AEIOU_ÄÖÜß
 OUTPUT
 
-output_is( <<'CODE', <<OUTPUT, "titlecase" );
+pasm_output_is( <<'CODE', <<OUTPUT, "titlecase" );
     set S0, iso-8859-1:"zAEIOU_ÄÖÜ\n"
     titlecase S1, S0
     print S1
@@ -98,7 +98,7 @@ CODE
 Zaeiou_äöü
 OUTPUT
 
-output_is( <<'CODE', <<OUTPUT, "is_whitespace");
+pasm_output_is( <<'CODE', <<OUTPUT, "is_whitespace");
     set S0, iso-8859-1:"a\t\n \xa0" # is 0xa0 a whitespace in iso-8859-1??
     .include "cclass.pasm"
     is_cclass I0, .CCLASS_WHITESPACE, S0, 0
@@ -131,7 +131,7 @@ CODE
 01110
 OUTPUT
 
-output_is( <<'CODE', <<OUTPUT, "is_wordchar");
+pasm_output_is( <<'CODE', <<OUTPUT, "is_wordchar");
     .include "cclass.pasm"
     set S0, "az019-,._"
     length I1, S0
@@ -147,7 +147,7 @@ CODE
 111110001
 OUTPUT
 
-output_is( <<'CODE', <<OUTPUT, "is_digit");
+pasm_output_is( <<'CODE', <<OUTPUT, "is_digit");
     .include "cclass.pasm"
     set S0, "az019-,._"
     length I1, S0
@@ -163,7 +163,7 @@ CODE
 001110000
 OUTPUT
 
-output_is( <<'CODE', <<OUTPUT, "is_punctuation");
+pasm_output_is( <<'CODE', <<OUTPUT, "is_punctuation");
     .include "cclass.pasm"
     set S0, "az019-,._"
     length I1, S0
@@ -179,7 +179,7 @@ CODE
 000001111
 OUTPUT
 
-output_is( <<'CODE', <<OUTPUT, "is_newline");
+pasm_output_is( <<'CODE', <<OUTPUT, "is_newline");
     .include "cclass.pasm"
     set S0, "a\n"
     is_cclass I0, .CCLASS_NEWLINE, S0, 0
@@ -192,7 +192,7 @@ CODE
 01
 OUTPUT
 
-output_is( <<'CODE', <<OUTPUT, "find_wordchar");
+pasm_output_is( <<'CODE', <<OUTPUT, "find_wordchar");
     .include "cclass.pasm"
     set S0, "_ ab 09"
     set I0, 0
@@ -211,7 +211,7 @@ CODE
 0 2 3 5 6 7 ok
 OUTPUT
 
-output_is( <<'CODE', <<OUTPUT, "find_digit");
+pasm_output_is( <<'CODE', <<OUTPUT, "find_digit");
     .include "cclass.pasm"
     set S0, "_ ab 09"
     set I0, 0
@@ -230,7 +230,7 @@ CODE
 5 6 7 ok
 OUTPUT
 
-output_is( <<'CODE', <<OUTPUT, "find_punctuation");
+pasm_output_is( <<'CODE', <<OUTPUT, "find_punctuation");
     .include "cclass.pasm"
     set S0, "_ .b ,9"
     set I0, 0
@@ -251,7 +251,7 @@ OUTPUT
 
 SKIP: {
   skip('TODO wordboundary has no cclass', 1);
-output_is( <<'CODE', <<OUTPUT, "find a word_boundary");
+pasm_output_is( <<'CODE', <<OUTPUT, "find a word_boundary");
     set S0, "_ab 09z"
     set I0, 0
 lp:
@@ -269,7 +269,7 @@ CODE
 OUTPUT
 }
 
-output_is( <<'CODE', <<OUTPUT, "trans_charset_s_s_i");
+pasm_output_is( <<'CODE', <<OUTPUT, "trans_charset_s_s_i");
     set S0, "abc"
     find_charset I0, "iso-8859-1"
     trans_charset S1, S0, I0
@@ -285,7 +285,7 @@ abc
 iso-8859-1
 OUTPUT
 
-output_is( <<'CODE', <<OUTPUT, "trans_charset_s_i");
+pasm_output_is( <<'CODE', <<OUTPUT, "trans_charset_s_i");
     set S1, "abc"
     find_charset I0, "iso-8859-1"
     trans_charset S1, I0
@@ -302,7 +302,7 @@ iso-8859-1
 OUTPUT
 
 
-output_like( <<'CODE', <<OUTPUT, "trans_charset_s_i - lossy");
+pasm_output_like( <<'CODE', <<OUTPUT, "trans_charset_s_i - lossy");
     set S1, iso-8859-1:"abcä"
     find_charset I0, "ascii"
     trans_charset S1, I0
@@ -312,7 +312,7 @@ CODE
 /lossy conversion to ascii/
 OUTPUT
 
-output_is( <<'CODE', <<OUTPUT, "trans_charset_s_i - same");
+pasm_output_is( <<'CODE', <<OUTPUT, "trans_charset_s_i - same");
     set S1, ascii:"abc"
     find_charset I0, "ascii"
     trans_charset S1, I0
@@ -328,7 +328,7 @@ abc
 ascii
 OUTPUT
 
-output_is( <<'CODE', <<OUTPUT, "trans_charset_s_s_i iso-8859-1 to binary");
+pasm_output_is( <<'CODE', <<OUTPUT, "trans_charset_s_s_i iso-8859-1 to binary");
     set S0, iso-8859-1:"abc"
     find_charset I0, "binary"
     trans_charset S1, S0, I0
@@ -344,7 +344,7 @@ abc
 binary
 OUTPUT
 
-output_is( <<'CODE', <<OUTPUT, "trans_charset_s_i iso-8859-1 to binary");
+pasm_output_is( <<'CODE', <<OUTPUT, "trans_charset_s_i iso-8859-1 to binary");
     set S1, iso-8859-1:"abc"
     find_charset I0, "binary"
     trans_charset S1, I0
@@ -360,7 +360,7 @@ abc
 binary
 OUTPUT
 
-output_is( <<'CODE', <<OUTPUT, "trans_charset_s_s_i ascii to binary");
+pasm_output_is( <<'CODE', <<OUTPUT, "trans_charset_s_s_i ascii to binary");
     set S0, ascii:"abc"
     find_charset I0, "binary"
     trans_charset S1, S0, I0
@@ -376,7 +376,7 @@ abc
 binary
 OUTPUT
 
-output_is( <<'CODE', <<OUTPUT, "trans_charset_s_i ascii to binary");
+pasm_output_is( <<'CODE', <<OUTPUT, "trans_charset_s_i ascii to binary");
     set S1, ascii:"abc"
     find_charset I0, "binary"
     trans_charset S1, I0
@@ -392,7 +392,7 @@ abc
 binary
 OUTPUT
 
-output_is( <<'CODE', <<OUTPUT, "trans_charset_s_s_i ascii to iso-8859-1");
+pasm_output_is( <<'CODE', <<OUTPUT, "trans_charset_s_s_i ascii to iso-8859-1");
     set S0, ascii:"abc"
     find_charset I0, "iso-8859-1"
     trans_charset S1, S0, I0
@@ -408,7 +408,7 @@ abc
 iso-8859-1
 OUTPUT
 
-output_is( <<'CODE', <<OUTPUT, "trans_charset_s_i ascii to iso-8859-1");
+pasm_output_is( <<'CODE', <<OUTPUT, "trans_charset_s_i ascii to iso-8859-1");
     set S1, ascii:"abc"
     find_charset I0, "iso-8859-1"
     trans_charset S1, I0
@@ -424,7 +424,7 @@ abc
 iso-8859-1
 OUTPUT
 
-output_is( <<'CODE', <<OUTPUT, "trans_charset_s_s_i iso-8859-1 to unicode");
+pasm_output_is( <<'CODE', <<OUTPUT, "trans_charset_s_s_i iso-8859-1 to unicode");
     set S0, iso-8859-1:"abc_ä_"
     find_charset I0, "unicode"
     trans_charset S1, S0, I0
@@ -444,7 +444,7 @@ unicode
 6
 OUTPUT
 
-output_is( <<'CODE', <<OUTPUT, "trans_charset_s_s_i unicode to iso-8859-1");
+pasm_output_is( <<'CODE', <<OUTPUT, "trans_charset_s_s_i unicode to iso-8859-1");
     set S0, unicode:"abc_\xe4_"
     bytelength I2, S0	# XXX its 7 for utf8 only
     print I2
@@ -513,7 +513,7 @@ OUTPUT
 
 SKIP: {
   skip('no ICU lib', 16) unless $PConfig{has_icu};
-output_is( <<'CODE', <<"OUTPUT", "unicode downcase");
+pasm_output_is( <<'CODE', <<"OUTPUT", "unicode downcase");
     set S0, iso-8859-1:"TÖTSCH"
     find_charset I0, "unicode"
     trans_charset S1, S0, I0
@@ -527,7 +527,7 @@ CODE
 t\xc3\xb6tsch
 OUTPUT
 
-output_is( <<'CODE', <<"OUTPUT", "unicode downcase, trans_charset_s_i");
+pasm_output_is( <<'CODE', <<"OUTPUT", "unicode downcase, trans_charset_s_i");
     set S0, iso-8859-1:"TÖTSCH"
     find_charset I0, "unicode"
     trans_charset S1, S0, I0
@@ -540,7 +540,7 @@ output_is( <<'CODE', <<"OUTPUT", "unicode downcase, trans_charset_s_i");
 CODE
 t\xf6tsch
 OUTPUT
-output_is( <<'CODE', <<"OUTPUT", "unicode downcase - transcharset");
+pasm_output_is( <<'CODE', <<"OUTPUT", "unicode downcase - transcharset");
     set S0, iso-8859-1:"TÖTSCH"
     find_charset I0, "unicode"
     trans_charset S1, S0, I0
@@ -554,7 +554,7 @@ CODE
 t\xc3\xb6tsch
 OUTPUT
 
-output_is( <<'CODE', <<"OUTPUT", "utf16 ord, length");
+pasm_output_is( <<'CODE', <<"OUTPUT", "utf16 ord, length");
     set S0, iso-8859-1:"TÖTSCH"
     find_charset I0, "unicode"
     trans_charset S1, S0, I0
@@ -577,7 +577,7 @@ CODE
 84_214_84_83_67_72_
 OUTPUT
 
-output_is( <<'CODE', <<"OUTPUT", "chopn utf8");
+pasm_output_is( <<'CODE', <<"OUTPUT", "chopn utf8");
     set S0, iso-8859-1:"TTÖÖ"
     find_charset I0, "unicode"
     trans_charset S1, S0, I0
@@ -594,7 +594,7 @@ CODE
 TT 2 2
 OUTPUT
 
-output_is( <<'CODE', <<"OUTPUT", "utf16 append");
+pasm_output_is( <<'CODE', <<"OUTPUT", "utf16 append");
     set S0, iso-8859-1:"Tötsch"
     find_charset I0, "unicode"
     trans_charset S1, S0, I0
@@ -617,7 +617,7 @@ CODE
 T\xc3\xb6tsch Leo
 OUTPUT
 
-output_is( <<'CODE', <<"OUTPUT", "utf16 concat");
+pasm_output_is( <<'CODE', <<"OUTPUT", "utf16 concat");
     set S0, iso-8859-1:"Tötsch"
     find_charset I0, "unicode"
     trans_charset S1, S0, I0
@@ -640,7 +640,7 @@ CODE
 T\xc3\xb6tsch Leo
 OUTPUT
 
-output_is( <<'CODE', <<"OUTPUT", "utf16 substr");
+pasm_output_is( <<'CODE', <<"OUTPUT", "utf16 substr");
     set S0, iso-8859-1:"Tötsch"
     find_charset I0, "unicode"
     trans_charset S1, S0, I0
@@ -656,7 +656,7 @@ CODE
 \xc3\xb6t
 OUTPUT
 
-output_is( <<'CODE', <<"OUTPUT", "utf16 replace");
+pasm_output_is( <<'CODE', <<"OUTPUT", "utf16 replace");
     set S0, iso-8859-1:"Tötsch"
     find_charset I0, "unicode"
     trans_charset S1, S0, I0
@@ -676,7 +676,7 @@ CODE
 Toetsch
 OUTPUT
 
-output_is( <<'CODE', <<"OUTPUT", "utf16 index, latin1 search");
+pasm_output_is( <<'CODE', <<"OUTPUT", "utf16 index, latin1 search");
     set S0, iso-8859-1:"TÖTSCH"
     find_charset I0, "unicode"
     trans_charset S1, S0, I0
@@ -690,7 +690,7 @@ CODE
 1
 OUTPUT
 
-output_is( <<'CODE', <<"OUTPUT", "utf16 index, latin1 search");
+pasm_output_is( <<'CODE', <<"OUTPUT", "utf16 index, latin1 search");
     set S0, iso-8859-1:"TÖTSCH"
     find_charset I0, "unicode"
     trans_charset S1, S0, I0
@@ -709,7 +709,7 @@ CODE
 6
 OUTPUT
 
-output_is( <<'CODE', <<"OUTPUT", "unicode upcase");
+pasm_output_is( <<'CODE', <<"OUTPUT", "unicode upcase");
     set S0, iso-8859-1:"tötsch"
     find_charset I0, "unicode"
     trans_charset S1, S0, I0
@@ -723,7 +723,7 @@ CODE
 T\x{c3}\x{96}TSCH
 OUTPUT
 
-output_is( <<'CODE', <<"OUTPUT", "unicode upcase to combined char");
+pasm_output_is( <<'CODE', <<"OUTPUT", "unicode upcase to combined char");
     set S1, unicode:"hacek j \u01f0"
     upcase S1
     getstdout P0          # need to convert back to utf8
@@ -751,7 +751,7 @@ OUTPUT
 # (gdb) x /8h src->strstart
 # 0x844fb60:      0x005f  0x005f  0x005f  0x004a  0x030c  0x0031  0x0032  0x0000
 
-output_is( <<'CODE', <<"OUTPUT", "unicode upcase to combined char 3.2 bug?");
+pasm_output_is( <<'CODE', <<"OUTPUT", "unicode upcase to combined char 3.2 bug?");
     set S1, unicode:"___\u01f0123"
     upcase S1
     getstdout P0          # need to convert back to utf8
@@ -763,7 +763,7 @@ CODE
 ___J\xcc\x8c123
 OUTPUT
 
-output_is( <<'CODE', <<"OUTPUT", "unicode titlecase");
+pasm_output_is( <<'CODE', <<"OUTPUT", "unicode titlecase");
     set S0, iso-8859-1:"tötsch leo"
     find_charset I0, "unicode"
     trans_charset S1, S0, I0
@@ -777,7 +777,7 @@ CODE
 T\x{c3}\x{b6}tsch Leo
 OUTPUT
 
-output_is( <<'CODE', <<OUTPUT, "combose combined char" );
+pasm_output_is( <<'CODE', <<OUTPUT, "combose combined char" );
     set S1, unicode:"___\u01f0___"
     length I0, S1
     upcase S1        # decompose J+hacek
@@ -803,7 +803,7 @@ OUTPUT
 
 }  # SKIP
 
-output_is( <<'CODE', <<'OUTPUT', "escape ascii" );
+pasm_output_is( <<'CODE', <<'OUTPUT', "escape ascii" );
     set S0, "abcdefghi\n"
     escape S1, S0
     print S1
@@ -813,7 +813,7 @@ CODE
 abcdefghi\n
 OUTPUT
 
-output_is( <<'CODE', <<'OUTPUT', "escape ctrl" );
+pasm_output_is( <<'CODE', <<'OUTPUT', "escape ctrl" );
     set S0, "\x00\x01\x1f\x7f"
     escape S1, S0
     print S1
@@ -823,7 +823,7 @@ CODE
 \x{0}\x{1}\x{1f}\x{7f}
 OUTPUT
 
-output_is( <<'CODE', <<'OUTPUT', "escape latin1");
+pasm_output_is( <<'CODE', <<'OUTPUT', "escape latin1");
     set S0, iso-8859-1:"tötsch leo"
     escape S1, S0
     print S1
@@ -833,7 +833,7 @@ CODE
 t\x{f6}tsch leo
 OUTPUT
 
-output_is( <<'CODE', <<'OUTPUT', "escape unicode" );
+pasm_output_is( <<'CODE', <<'OUTPUT', "escape unicode" );
     set S0, unicode:"\u2001\u2002\u2003\u2004\x{e01ef}\u0114"
     escape S1, S0
     print S1

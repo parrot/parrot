@@ -24,7 +24,7 @@ Tests the use of Parrot floating-point number registers.
 =cut
 
 
-output_is(<<CODE, <<OUTPUT, "set_n_nc");
+pasm_output_is(<<CODE, <<OUTPUT, "set_n_nc");
 	set	N0, 1.0
 	set	N1, 4.0
 	set	N2, 16.0
@@ -134,7 +134,7 @@ CODE
 1125899906842620.000000
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "set_n");
+pasm_output_is(<<CODE, <<OUTPUT, "set_n");
 	set	N0, 42.0
 	set	N1, N0
 	print	N1
@@ -144,7 +144,7 @@ CODE
 42.000000
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "add_n_n_n");
+pasm_output_is(<<CODE, <<OUTPUT, "add_n_n_n");
 	set	N0, 1.0
 	add	N1, N0, N0
 	print	N1
@@ -164,7 +164,7 @@ CODE
 6.000000
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "add_n_n");
+pasm_output_is(<<CODE, <<OUTPUT, "add_n_n");
 	set	N0, 1.0
 	add	N0, N0
 	print	N0
@@ -185,7 +185,7 @@ CODE
 6.000000
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "sub_n_n_n");
+pasm_output_is(<<CODE, <<OUTPUT, "sub_n_n_n");
 	set	N0, 424242.0
 	set	N1, 4200.0
 	sub	N2, N0, N1
@@ -196,7 +196,7 @@ CODE
 420042.000000
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "sub_n_n");
+pasm_output_is(<<CODE, <<OUTPUT, "sub_n_n");
 	set	N0, 424242.0
 	set	N1, 4200.0
 	sub	N0, N1
@@ -213,7 +213,7 @@ CODE
 OUTPUT
 
 
-output_is(<<'CODE', <<'OUTPUT', "abs(n, i|ic|n|nc)");
+pasm_output_is(<<'CODE', <<'OUTPUT', "abs(n, i|ic|n|nc)");
 	set	I0, -1
 	abs	N0, I0
 	abs	N1, -1
@@ -255,7 +255,7 @@ CODE
 1.000000
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "mul_i");
+pasm_output_is(<<CODE, <<OUTPUT, "mul_i");
 	set	N0, 2.0
 	mul	N1, N0, N0
 	mul	N1, N1, N0
@@ -271,7 +271,7 @@ CODE
 256.000000
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "div_i");
+pasm_output_is(<<CODE, <<OUTPUT, "div_i");
 	set	N0, 10.0
 	set	N1, 2.0
 	div	N2, N0, N1
@@ -296,7 +296,7 @@ CODE
 -2.250000
 OUTPUT
 
-output_like(<<CODE, <<OUTPUT, "mod_n");
+pasm_output_like(<<CODE, <<OUTPUT, "mod_n");
 	set	N0, 5.0
 	set	N1, 0.0
 	mod	N2, N0, N1
@@ -344,7 +344,7 @@ CODE
 /
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "cmod_n");
+pasm_output_is(<<CODE, <<OUTPUT, "cmod_n");
 	set	N0, 5.000
 	set	N1, 3.000
 	cmod	N2, N0, N1
@@ -356,7 +356,7 @@ CODE
 2.000000
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "eq_n_ic");
+pasm_output_is(<<CODE, <<OUTPUT, "eq_n_ic");
 	set	N0, 5.000001
 	set	N1, 5.000001
 	set	N2, 5.000002
@@ -383,7 +383,7 @@ ok 1
 ok 2
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "eq_nc_ic");
+pasm_output_is(<<CODE, <<OUTPUT, "eq_nc_ic");
 	set	N0, 1.000001
 
 	eq	N0, 1.000000, ERROR
@@ -408,7 +408,7 @@ ok 1
 ok 2
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "ne_n_ic");
+pasm_output_is(<<CODE, <<OUTPUT, "ne_n_ic");
 	set	N0, -22.222222
 	set	N1, -22.222222
 	set	N2, 0.0
@@ -435,7 +435,7 @@ ok 1
 ok 2
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "ne_n_nc_ic");
+pasm_output_is(<<CODE, <<OUTPUT, "ne_n_nc_ic");
 	set	N0, 1073741824.0
 	ne	N0, 1073741824.0, nok1
 	print	"ok 1\\n"
@@ -456,7 +456,7 @@ ok 1
 ok 2
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "lt_n_ic");
+pasm_output_is(<<CODE, <<OUTPUT, "lt_n_ic");
 	set	N0, 1000.0
 	set	N1, 500.0
 	set	N2, 0.0
@@ -491,7 +491,7 @@ ok 2
 ok 3
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "lt_nc_ic");
+pasm_output_is(<<CODE, <<OUTPUT, "lt_nc_ic");
 	set	N0, 1000.0
 	set	N1, 500.0
 	set	N2, 0.0
@@ -525,7 +525,7 @@ ok 2
 ok 3
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "le_n_ic");
+pasm_output_is(<<CODE, <<OUTPUT, "le_n_ic");
 	set	N0, 1000.0
 	set	N1, 500.0
 	set	N2, 0.0
@@ -560,7 +560,7 @@ ok 2
 ok 3
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "le_nc_ic");
+pasm_output_is(<<CODE, <<OUTPUT, "le_nc_ic");
 	set	N0, 1000.0
 	set	N1, 500.0
 	set	N2, 0.0
@@ -594,7 +594,7 @@ ok 2
 ok 3
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "gt_n_ic");
+pasm_output_is(<<CODE, <<OUTPUT, "gt_n_ic");
 	set	N0, 500.0
 	set	N1, 1000.0
 	set	N2, 0.0
@@ -629,7 +629,7 @@ ok 2
 ok 3
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "gt_nc_ic");
+pasm_output_is(<<CODE, <<OUTPUT, "gt_nc_ic");
 	set	N0, 500.0
 	set	N1, 1000.0
 	set	N2, 0.0
@@ -663,7 +663,7 @@ ok 2
 ok 3
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "ge_n_ic");
+pasm_output_is(<<CODE, <<OUTPUT, "ge_n_ic");
 	set	N0, 500.0
 	set	N1, 1000.0
 	set	N2, 0.0
@@ -698,7 +698,7 @@ ok 2
 ok 3
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "ge_nc_ic");
+pasm_output_is(<<CODE, <<OUTPUT, "ge_nc_ic");
 	set	N0, 500.0
 	set	N1, 1000.0
 	set	N2, 0.0
@@ -732,7 +732,7 @@ ok 2
 ok 3
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "if_n_ic");
+pasm_output_is(<<CODE, <<OUTPUT, "if_n_ic");
 	set	N0, 1000.0
 	set	N1, 500.0
 	set	N2, 0.0
@@ -766,7 +766,7 @@ ok 2
 ok 3
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "inc_n");
+pasm_output_is(<<CODE, <<OUTPUT, "inc_n");
 	set	N0, 0.0
 
 	inc	N0
@@ -785,7 +785,7 @@ CODE
 5.000000
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "dec_n");
+pasm_output_is(<<CODE, <<OUTPUT, "dec_n");
 	set	N0, 0.0
 
 	dec	N0
@@ -804,7 +804,7 @@ CODE
 -5.000000
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "set_i_n");
+pasm_output_is(<<CODE, <<OUTPUT, "set_i_n");
 	set	N0, 0.0
 	set	I0, N0
 	print	I0
@@ -826,7 +826,7 @@ CODE
 -2147483648
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "clearn");
+pasm_output_is(<<CODE, <<OUTPUT, "clearn");
 	set	N0, 547972.0
 	set	N1, 547972.0
 	set	N2, 547972.0
@@ -898,7 +898,7 @@ CODE
 0.0000000.0000000.0000000.0000000.0000000.0000000.0000000.0000000.0000000.0000000.0000000.0000000.0000000.0000000.0000000.0000000.0000000.0000000.0000000.0000000.0000000.0000000.0000000.0000000.0000000.0000000.0000000.0000000.0000000.0000000.0000000.000000
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "neg_n");
+pasm_output_is(<<CODE, <<OUTPUT, "neg_n");
     neg N0,3.0
     neg N0,N0
     neg N0
@@ -909,7 +909,7 @@ CODE
 -3.000000
 OUTPUT
 
-output_like(<<CODE, <<OUTPUT, "neg 0.0");
+pasm_output_like(<<CODE, <<OUTPUT, "neg 0.0");
     set N1, 0
     neg N1
     print N1
@@ -919,7 +919,7 @@ CODE
 /-?0\.0+/
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "mul_n_n");
+pasm_output_is(<<CODE, <<OUTPUT, "mul_n_n");
     set N0,3.0
     set N1,4.0
     mul N0,N1
@@ -930,7 +930,7 @@ CODE
 12.000000
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "fact_n_i");
+pasm_output_is(<<CODE, <<OUTPUT, "fact_n_i");
     set I0, 3
     set I1, 11
     set I2, 0
@@ -955,7 +955,7 @@ CODE
 1.000000
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "fact_n_ic");
+pasm_output_is(<<CODE, <<OUTPUT, "fact_n_ic");
     fact N5, 3
     print N5
     print "\\n"
@@ -976,7 +976,7 @@ CODE
 1.000000
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "exchange");
+pasm_output_is(<<'CODE', <<OUTPUT, "exchange");
     set N1, 1.234560
     set N2, 9.876540
     exchange N1, N2
@@ -996,7 +996,7 @@ CODE
 -100.200300
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "op_n_nc_nc");
+pasm_output_is(<<'CODE', <<OUTPUT, "op_n_nc_nc");
     add N1, 2.0, 3.0
     print N1
     print "\n"
@@ -1009,7 +1009,7 @@ CODE
 -2.000000
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "lt_nc_nc_ic");
+pasm_output_is(<<'CODE', <<OUTPUT, "lt_nc_nc_ic");
     lt 2.0, 1.0, nok
     print "ok 1\n"
     lt 3.0, 4.0, ok_2
@@ -1024,7 +1024,7 @@ ok 1
 ok 2
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "string -> num");
+pasm_output_is(<<'CODE', <<OUTPUT, "string -> num");
     set S0, "1"
     set S1, "12.0"
     set S2, "-2.45"
@@ -1057,7 +1057,7 @@ CODE
 0.000000
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "null");
+pasm_output_is(<<'CODE', <<OUTPUT, "null");
     set N31, 12.5
     print N31
     print "\n"
@@ -1072,7 +1072,7 @@ CODE
 0.000000
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, ".dig parsing");
+pasm_output_is(<<'CODE', <<OUTPUT, ".dig parsing");
    set N0, .5
    print N0
    print "\n"
@@ -1081,7 +1081,7 @@ CODE
 0.500000
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "sqrt_n_n");
+pasm_output_is(<<'CODE', <<OUTPUT, "sqrt_n_n");
 	set N1, 2
 	sqrt N2, N1
 	print N2
@@ -1091,7 +1091,7 @@ CODE
 1.414214
 OUTPUT
 
-output_like(<<'CODE', <<OUTPUT, "div_n_n by zero");
+pasm_output_like(<<'CODE', <<OUTPUT, "div_n_n by zero");
 	set N0, 0
 	set N1, 10
 	div N1, N0
@@ -1100,7 +1100,7 @@ CODE
 /.*Divide by zero.*/
 OUTPUT
 
-output_like(<<'CODE', <<OUTPUT, "div_n_nc by zero");
+pasm_output_like(<<'CODE', <<OUTPUT, "div_n_nc by zero");
 	set N1, 10
 	div N1, 0
 	end
@@ -1108,14 +1108,14 @@ CODE
 /.*Divide by zero.*/
 OUTPUT
 
-output_like(<<'CODE', <<OUTPUT, "div_n_nc_nc by zero");
+pasm_output_like(<<'CODE', <<OUTPUT, "div_n_nc_nc by zero");
 	div N1, 0, 0
 	end
 CODE
 /.*Divide by zero.*/
 OUTPUT
 
-output_like(<<'CODE', <<OUTPUT, "div_n_n_n by zero");
+pasm_output_like(<<'CODE', <<OUTPUT, "div_n_n_n by zero");
 	set N0, 0
 	set N1, 10
 	div N2, N1, N0
@@ -1124,7 +1124,7 @@ CODE
 /.*Divide by zero.*/
 OUTPUT
 
-output_like(<<'CODE', <<OUTPUT, "div_n_nc_n by zero");
+pasm_output_like(<<'CODE', <<OUTPUT, "div_n_nc_n by zero");
 	set N0, 0
 	div N2, 10, N0
 	end
@@ -1132,7 +1132,7 @@ CODE
 /.*Divide by zero.*/
 OUTPUT
 
-output_like(<<'CODE', <<OUTPUT, "div_n_n_nc by zero");
+pasm_output_like(<<'CODE', <<OUTPUT, "div_n_n_nc by zero");
 	set N1, 10
 	div N2, N1, 0
 	end
@@ -1140,7 +1140,7 @@ CODE
 /.*Divide by zero.*/
 OUTPUT
 
-output_like(<<'CODE', <<OUTPUT, "fdiv_n_n by zero");
+pasm_output_like(<<'CODE', <<OUTPUT, "fdiv_n_n by zero");
 	set N0, 0
 	set N1, 10
 	fdiv N1, N0
@@ -1149,7 +1149,7 @@ CODE
 /.*Divide by zero.*/
 OUTPUT
 
-output_like(<<'CODE', <<OUTPUT, "fdiv_n_nc by zero");
+pasm_output_like(<<'CODE', <<OUTPUT, "fdiv_n_nc by zero");
 	set N1, 10
 	fdiv N1, 0
 	end
@@ -1157,7 +1157,7 @@ CODE
 /.*Divide by zero.*/
 OUTPUT
 
-output_like(<<'CODE', <<OUTPUT, "fdiv_n_n_n by zero");
+pasm_output_like(<<'CODE', <<OUTPUT, "fdiv_n_n_n by zero");
 	set N0, 0
 	set N1, 10
 	fdiv N2, N1, N0
@@ -1166,7 +1166,7 @@ CODE
 /.*Divide by zero.*/
 OUTPUT
 
-output_like(<<'CODE', <<OUTPUT, "fdiv_n_nc_n by zero");
+pasm_output_like(<<'CODE', <<OUTPUT, "fdiv_n_nc_n by zero");
 	set N0, 0
 	fdiv N2, 10, N0
 	end
@@ -1174,7 +1174,7 @@ CODE
 /.*Divide by zero.*/
 OUTPUT
 
-output_like(<<'CODE', <<OUTPUT, "fdiv_n_n_nc by zero");
+pasm_output_like(<<'CODE', <<OUTPUT, "fdiv_n_n_nc by zero");
 	set N1, 10
 	fdiv N2, N1, 0
 	end
@@ -1182,7 +1182,7 @@ CODE
 /.*Divide by zero.*/
 OUTPUT
 
-output_like(<<'CODE', <<OUTPUT, "cmod_n_n_n by zero");
+pasm_output_like(<<'CODE', <<OUTPUT, "cmod_n_n_n by zero");
 	set N0, 0
 	set N1, 10
 	cmod N2, N1, N0
@@ -1191,7 +1191,7 @@ CODE
 /.*Divide by zero.*/
 OUTPUT
 
-output_like(<<'CODE', <<OUTPUT, "cmod_n_nc_n by zero");
+pasm_output_like(<<'CODE', <<OUTPUT, "cmod_n_nc_n by zero");
 	set N0, 0
 	cmod N2, 10, N0
 	end
@@ -1199,7 +1199,7 @@ CODE
 /.*Divide by zero.*/
 OUTPUT
 
-output_like(<<'CODE', <<OUTPUT, "cmod_n_n_nc by zero");
+pasm_output_like(<<'CODE', <<OUTPUT, "cmod_n_n_nc by zero");
 	set N1, 10
 	cmod N2, N1, 0
 	end
@@ -1207,7 +1207,7 @@ CODE
 /.*Divide by zero.*/
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "mod_n_n_n by zero");
+pasm_output_is(<<'CODE', <<OUTPUT, "mod_n_n_n by zero");
 	set N0, 0
 	set N1, 10
 	mod N2, N1, N0
@@ -1215,14 +1215,14 @@ output_is(<<'CODE', <<OUTPUT, "mod_n_n_n by zero");
 CODE
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "mod_n_nc_n by zero");
+pasm_output_is(<<'CODE', <<OUTPUT, "mod_n_nc_n by zero");
 	set N0, 0
 	mod N2, 10, N0
 	end
 CODE
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "mod_n_n_nc by zero");
+pasm_output_is(<<'CODE', <<OUTPUT, "mod_n_n_nc by zero");
 	set N1, 10
 	mod N2, N1, 0
 	end

@@ -27,7 +27,7 @@ C<interpinfo> opcode.
 
 SKIP: {
 	skip("we really shouldn't run just a label - use a sub", 1);
-output_is(<<'CODE', <<'OUTPUT', "runinterp - new style");
+pasm_output_is(<<'CODE', <<'OUTPUT', "runinterp - new style");
 	new P0, .ParrotInterpreter
 	print "calling\n"
 	# set_addr/invoke ?
@@ -48,7 +48,7 @@ OUTPUT
 # Need to disable DOD while trace is on, as there's a non-zero chance that a
 # DOD sweep would occur, causing a bonus "DOD" line in the output, which makes
 # the test fail.
-output_like(<<'CODE', <<'OUTPUT', "restart trace");
+pasm_output_like(<<'CODE', <<'OUTPUT', "restart trace");
 	printerr "ok 1\n"
 	sweepoff
 	set I0, 1
@@ -68,7 +68,7 @@ ok\s2\n
 ok\s3\n$/x
 OUTPUT
 
-output_like(<<'CODE', <<'OUTPUT', "interp - warnings");
+pasm_output_like(<<'CODE', <<'OUTPUT', "interp - warnings");
 	new P0, .PerlUndef
 	set I0, P0
 	printerr "nada:"
@@ -80,7 +80,7 @@ CODE
 /^nada:Use of uninitialized value in integer context/
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "getinterp");
+pasm_output_is(<<'CODE', <<'OUTPUT', "getinterp");
     .include "interpinfo.pasm"
     getinterp P0
     print "ok 1\n"
@@ -96,7 +96,7 @@ ok 1
 ok 2
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "access argv");
+pasm_output_is(<<'CODE', <<'OUTPUT', "access argv");
     get_params "(0)", P5
     .include "iglobals.pasm"
     getinterp P1
@@ -119,7 +119,7 @@ ok 1
 ok 2
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "check_events");
+pasm_output_is(<<'CODE', <<'OUTPUT', "check_events");
     print "before\n"
     check_events
     print "after\n"

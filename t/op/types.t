@@ -25,7 +25,7 @@ F<t/pmc/pmc.t>.
 =cut
 
 
-output_is(<<'CODE', <<'OUTPUT', "data type names");
+pasm_output_is(<<'CODE', <<'OUTPUT', "data type names");
 	# first (native) type
 	set I0, -100
 	typeof S0, I0
@@ -67,7 +67,7 @@ CODE
 ok 1
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "find_type with invalid type");
+pasm_output_is(<<'CODE', <<'OUTPUT', "find_type with invalid type");
         find_type I0, "Smurf"
         print I0
         print "\n"
@@ -76,7 +76,7 @@ CODE
 0
 OUTPUT
 
-output_like(<<'CODE', <<'OUTPUT', "data type sizes");
+pasm_output_like(<<'CODE', <<'OUTPUT', "data type sizes");
        find_type I0, "int"
        sizeof I1, I0
        print I1

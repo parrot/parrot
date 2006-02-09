@@ -24,7 +24,7 @@ Tests Parrot unicode string system.
 =cut
 
 
-output_is( <<'CODE', <<OUTPUT, "angstrom" );
+pasm_output_is( <<'CODE', <<OUTPUT, "angstrom" );
     getstdout P0
     push P0, "utf8"
     chr S0, 0x212B
@@ -35,7 +35,7 @@ CODE
 \xe2\x84\xab
 OUTPUT
 
-output_is( <<'CODE', <<OUTPUT, "escaped angstrom" );
+pasm_output_is( <<'CODE', <<OUTPUT, "escaped angstrom" );
     getstdout P0
     push P0, "utf8"
     set S0, unicode:"\x{212b}"
@@ -46,7 +46,7 @@ CODE
 \xe2\x84\xab
 OUTPUT
 
-output_is( <<'CODE', <<OUTPUT, "escaped angstrom 2" );
+pasm_output_is( <<'CODE', <<OUTPUT, "escaped angstrom 2" );
     getstdout P0
     push P0, "utf8"
     set S0, unicode:"aaaaaa\x{212b}"
@@ -57,7 +57,7 @@ CODE
 aaaaaa\xe2\x84\xab
 OUTPUT
 
-output_is( <<'CODE', <<OUTPUT, "escaped angstrom 3" );
+pasm_output_is( <<'CODE', <<OUTPUT, "escaped angstrom 3" );
     getstdout P0
     push P0, "utf8"
     set S0, unicode:"aaaaaa\x{212b}-aaaaaa"
@@ -68,7 +68,7 @@ CODE
 aaaaaa\xe2\x84\xab-aaaaaa
 OUTPUT
 
-output_is( <<'CODE', <<OUTPUT, 'escaped angstrom 3 \uhhhh' );
+pasm_output_is( <<'CODE', <<OUTPUT, 'escaped angstrom 3 \uhhhh' );
     getstdout P0
     push P0, "utf8"
     set S0, unicode:"aaaaaa\u212b-aaaaaa"
@@ -79,7 +79,7 @@ CODE
 aaaaaa\xe2\x84\xab-aaaaaa
 OUTPUT
 
-output_is( <<'CODE', <<OUTPUT, "MATHEMATICAL BOLD CAPITAL A");
+pasm_output_is( <<'CODE', <<OUTPUT, "MATHEMATICAL BOLD CAPITAL A");
     getstdout P0
     push P0, "utf8"
     set S0, unicode:"aaaaaa\x{1d400}-aaaaaa"
@@ -90,7 +90,7 @@ CODE
 aaaaaa\xf0\x9d\x90\x80-aaaaaa
 OUTPUT
 
-output_is( <<'CODE', <<OUTPUT, 'MATHEMATICAL BOLD CAPITAL A \U');
+pasm_output_is( <<'CODE', <<OUTPUT, 'MATHEMATICAL BOLD CAPITAL A \U');
     getstdout P0
     push P0, "utf8"
     set S0, unicode:"aaaaaa\U0001d400-aaaaaa"
@@ -101,7 +101,7 @@ CODE
 aaaaaa\xf0\x9d\x90\x80-aaaaaa
 OUTPUT
 
-output_is( <<'CODE', <<OUTPUT, "two upscales");
+pasm_output_is( <<'CODE', <<OUTPUT, "two upscales");
     getstdout P0
     push P0, "utf8"
     set S0, unicode:"aaaaaa\x{212b}-bbbbbb\x{1d400}-cccccc"
@@ -116,7 +116,7 @@ aaaaaa\xe2\x84\xab-bbbbbb\xf0\x9d\x90\x80-cccccc
 22
 OUTPUT
 
-output_is( <<'CODE', <<OUTPUT, "two upscales - don't downscale");
+pasm_output_is( <<'CODE', <<OUTPUT, "two upscales - don't downscale");
     getstdout P0
     push P0, "utf8"
     set S0, unicode:"aaaaaa\x{1d400}-bbbbbb\x{212b}-cccccc"
@@ -131,7 +131,7 @@ aaaaaa\xf0\x9d\x90\x80-bbbbbb\xe2\x84\xab-cccccc
 22
 OUTPUT
 
-output_is( <<'CODE', <<OUTPUT, '\cX, \ooo');
+pasm_output_is( <<'CODE', <<OUTPUT, '\cX, \ooo');
     getstdout P0
     push P0, "utf8"
     set S0, "ok 1\cJ"
@@ -153,7 +153,7 @@ ok 4
 ok 5
 OUTPUT
 
-output_like( <<'CODE', <<OUTPUT, 'illegal \u');
+pasm_output_like( <<'CODE', <<OUTPUT, 'illegal \u');
     set S0, "x\uy"
     print "never\n"
     end
@@ -161,7 +161,7 @@ CODE
 /Illegal escape sequence in/
 OUTPUT
 
-output_like( <<'CODE', <<OUTPUT, 'illegal \u123');
+pasm_output_like( <<'CODE', <<OUTPUT, 'illegal \u123');
     set S0, "x\u123y"
     print "never\n"
     end
@@ -169,7 +169,7 @@ CODE
 /Illegal escape sequence in/
 OUTPUT
 
-output_like( <<'CODE', <<OUTPUT, 'illegal \U123');
+pasm_output_like( <<'CODE', <<OUTPUT, 'illegal \U123');
     set S0, "x\U123y"
     print "never\n"
     end
@@ -177,7 +177,7 @@ CODE
 /Illegal escape sequence in/
 OUTPUT
 
-output_like( <<'CODE', <<OUTPUT, 'illegal \x');
+pasm_output_like( <<'CODE', <<OUTPUT, 'illegal \x');
     set S0, "x\xy"
     print "never\n"
     end
@@ -185,7 +185,7 @@ CODE
 /Illegal escape sequence in/
 OUTPUT
 
-output_is( <<'CODE', <<OUTPUT, "UTF8 literals" );
+pasm_output_is( <<'CODE', <<OUTPUT, "UTF8 literals" );
     set S0, utf8:unicode:"«"
     length I0, S0
     print I0
@@ -198,7 +198,7 @@ CODE
 \xc2\xab
 OUTPUT
 
-output_is( <<'CODE', <<OUTPUT, "UTF8 literals" );
+pasm_output_is( <<'CODE', <<OUTPUT, "UTF8 literals" );
     set S0, utf8:unicode:"\xc2\xab"
     length I0, S0
     print I0
@@ -211,7 +211,7 @@ CODE
 \xc2\xab
 OUTPUT
 
-output_like( <<'CODE', <<OUTPUT, "UTF8 literals - illegal" );
+pasm_output_like( <<'CODE', <<OUTPUT, "UTF8 literals - illegal" );
     set S0, utf8:unicode:"\xf2\xab"
     length I0, S0
     print I0
@@ -223,7 +223,7 @@ CODE
 /Malformed UTF-8 string/
 OUTPUT
 
-output_like( <<'CODE', <<OUTPUT, "UTF8 as malformed ascii" );
+pasm_output_like( <<'CODE', <<OUTPUT, "UTF8 as malformed ascii" );
     set S0, ascii:"«"
     length I0, S0
     print I0
@@ -233,7 +233,7 @@ CODE
 /Malformed string/
 OUTPUT
 
-output_is( <<'CODE', <<OUTPUT, "substr with a UTF8 replacement #36794" );
+pasm_output_is( <<'CODE', <<OUTPUT, "substr with a UTF8 replacement #36794" );
     set S0, "AAAAAAAAAA\\u666"
     set I0, 0x666
     chr S1, I0

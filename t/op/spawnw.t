@@ -61,7 +61,7 @@ CODE
 return code: 0
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "exit code: 123");
+pasm_output_is(<<'CODE', <<'OUTPUT', "exit code: 123");
         set     S1, 'perl -e "exit(123)"'
         set     I1, 99
         spawnw  I1, S1
@@ -74,7 +74,7 @@ CODE
 return code: 123
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "exit code: 3");
+pasm_output_is(<<'CODE', <<'OUTPUT', "exit code: 3");
         set     S1, 'perl -e "exit(3)"'
         set     I1, 99
         spawnw  I1, S1
@@ -89,7 +89,7 @@ OUTPUT
 
 # test array version of spawnw
 
-output_is(<<'CODE', <<'OUTPUT', "exit code: 0");
+pasm_output_is(<<'CODE', <<'OUTPUT', "exit code: 0");
         new     P0, .Array
         set     P0, 3
         set     P0[0], "perl"
@@ -106,7 +106,7 @@ CODE
 return code: 0
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "exit code: 123");
+pasm_output_is(<<'CODE', <<'OUTPUT', "exit code: 123");
         new     P0, .Array
         set     P0, 3
         set     P0[0], "perl"
@@ -123,7 +123,7 @@ CODE
 return code: 123
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "exit code: 3");
+pasm_output_is(<<'CODE', <<'OUTPUT', "exit code: 3");
         new     P0, .Array
         set     P0, 3
         set     P0[0], "perl"

@@ -24,7 +24,7 @@ Tests various lexical scratchpad operations, as described in PDD20.
 =cut
 
 
-output_is(<<'CODE', <<'OUTPUT', '.lex parsing - PASM (\'$a\') succeeds');
+pasm_output_is(<<'CODE', <<'OUTPUT', '.lex parsing - PASM (\'$a\') succeeds');
 .pcc_sub main:
     .lex "$a", P0
     print "ok\n"
@@ -33,7 +33,7 @@ CODE
 ok
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', '.lex parsing - PASM (S0) fails', todo => 'specification unclear');
+pasm_output_is(<<'CODE', <<'OUTPUT', '.lex parsing - PASM (S0) fails', todo => 'specification unclear');
 .pcc_sub main:
 	S0 = '$a'
     .lex S0, P0
@@ -43,7 +43,7 @@ CODE
 ok
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', '.lex parsing - PASM ($S0) fails', todo => 'specification unclear');
+pasm_output_is(<<'CODE', <<'OUTPUT', '.lex parsing - PASM ($S0) fails', todo => 'specification unclear');
 .pcc_sub main:
 	$S0 = '$a'
     .lex $S0, P0
@@ -86,7 +86,7 @@ CODE
 ok
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', '.lex - same PMC twice (PASM)');
+pasm_output_is(<<'CODE', <<'OUTPUT', '.lex - same PMC twice (PASM)');
 .pcc_sub main:
     .lex '$a', P0
     .lex '$b', P0
@@ -271,7 +271,7 @@ CODE
 13013
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', ':lex parsing - PASM');
+pasm_output_is(<<'CODE', <<'OUTPUT', ':lex parsing - PASM');
 .pcc_sub main:
     print "ok\n"
     end
@@ -291,7 +291,7 @@ CODE
 ok
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', ':outer parsing - PASM');
+pasm_output_is(<<'CODE', <<'OUTPUT', ':outer parsing - PASM');
 .pcc_sub main:
     print "ok\n"
     end

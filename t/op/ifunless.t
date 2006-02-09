@@ -24,7 +24,7 @@ Tests the conditional C<if> and C<unless> operations.
 =cut
 
 
-output_is(<<CODE, <<OUTPUT, "if_i_ic");
+pasm_output_is(<<CODE, <<OUTPUT, "if_i_ic");
 	set	I0, 2147483647
 	set	I1, -2147483648
 	set	I2, 0
@@ -58,7 +58,7 @@ ok 2
 ok 3
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "if_n_ic");
+pasm_output_is(<<CODE, <<OUTPUT, "if_n_ic");
 	set	N0, 0.1
 	set	N1, -0.1
 	set	N2, 0.0
@@ -92,7 +92,7 @@ ok 2
 ok 3
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "if_s_ic");
+pasm_output_is(<<CODE, <<OUTPUT, "if_s_ic");
 	set	S0, "Hello World"
 	set	S1, ""
 
@@ -118,7 +118,7 @@ ok 1
 ok 2
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "unless_i_ic");
+pasm_output_is(<<CODE, <<OUTPUT, "unless_i_ic");
 	set	I0, 0
 	set	I1, -2147483648
 
@@ -144,7 +144,7 @@ ok 1
 ok 2
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "unless_n_ic");
+pasm_output_is(<<CODE, <<OUTPUT, "unless_n_ic");
 	set	N0, 0.0
 	set	N1, -0.1
 
@@ -170,7 +170,7 @@ ok 1
 ok 2
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "unless_s_ic");
+pasm_output_is(<<CODE, <<OUTPUT, "unless_s_ic");
 	set	S1, "Hello World"
 	set	S0, ""
 

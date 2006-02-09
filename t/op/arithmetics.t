@@ -72,7 +72,7 @@ ENDOFMACRO
 #
 # Operations on a single INTVAL
 #
-output_is(<<'CODE', <<OUTPUT, "take the negative of a native integer");
+pasm_output_is(<<'CODE', <<OUTPUT, "take the negative of a native integer");
 	set I0, 0
 	neg I0
 	print I0
@@ -108,7 +108,7 @@ CODE
 1234567890
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "take the absolute of a native integer");
+pasm_output_is(<<'CODE', <<OUTPUT, "take the absolute of a native integer");
 	set I0, 0
 	abs I0
 	print I0
@@ -147,7 +147,7 @@ OUTPUT
 #
 # first arg is INTVAL, second arg is INTVAL
 #
-output_is(<<'CODE', <<OUTPUT, "add native integer to native integer");
+pasm_output_is(<<'CODE', <<OUTPUT, "add native integer to native integer");
 	set I0, 4000
 	set I1, -123
 	add I2, I0, I1
@@ -162,7 +162,7 @@ CODE
 3877
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "subtract native integer from native integer");
+pasm_output_is(<<'CODE', <<OUTPUT, "subtract native integer from native integer");
 	set I0, 4000
 	set I1, -123
 	sub I2, I0, I1
@@ -177,7 +177,7 @@ CODE
 4123
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "multiply native integer with native integer");
+pasm_output_is(<<'CODE', <<OUTPUT, "multiply native integer with native integer");
 	set I0, 4000
 	set I1, -123
 	mul I2, I0, I1
@@ -192,7 +192,7 @@ CODE
 -492000
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "divide native integer by native integer");
+pasm_output_is(<<'CODE', <<OUTPUT, "divide native integer by native integer");
 	set I0, 4000
 	set I1, -123
 	div I2, I0, I1
@@ -210,7 +210,7 @@ OUTPUT
 #
 # Operations on a single NUMVAL
 #
-output_is(<<'CODE', <<OUTPUT, "turn a native number into its negative");
+pasm_output_is(<<'CODE', <<OUTPUT, "turn a native number into its negative");
 	set N0, 0
 	neg N0
 	print N0
@@ -256,7 +256,7 @@ CODE
 123.456789
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "take the absolute of a native number");
+pasm_output_is(<<'CODE', <<OUTPUT, "take the absolute of a native number");
 	set N0, 0
 	abs N0
 	print N0
@@ -305,7 +305,7 @@ CODE
 123.456789
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "ceil of a native number");
+pasm_output_is(<<'CODE', <<OUTPUT, "ceil of a native number");
        set N0, 0
        ceil N0
        print N0
@@ -373,7 +373,7 @@ CODE
 -123
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "floor of a native number");
+pasm_output_is(<<'CODE', <<OUTPUT, "floor of a native number");
        set N0, 0
        floor N0
        print N0
@@ -444,7 +444,7 @@ OUTPUT
 #
 # FLOATVAL and INTVAL tests
 #
-output_is(<<'CODE', <<OUTPUT, "add native integer to native number");
+pasm_output_is(<<'CODE', <<OUTPUT, "add native integer to native number");
 	set I0, 4000
 	set N0, -123.123
 	add N1, N0, I0
@@ -463,7 +463,7 @@ CODE
 7876.877000
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "subtract native integer from native number");
+pasm_output_is(<<'CODE', <<OUTPUT, "subtract native integer from native number");
 	set I0, 4000
 	set N0, -123.123
 	sub N1, N0, I0
@@ -482,7 +482,7 @@ CODE
 -8123.123000
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "multiply native number with native integer");
+pasm_output_is(<<'CODE', <<OUTPUT, "multiply native number with native integer");
 	set I0, 4000
 	set N0, -123.123
 	mul N1, N0, I0
@@ -501,7 +501,7 @@ CODE
 984984.000000
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "divide native number by native integer");
+pasm_output_is(<<'CODE', <<OUTPUT, "divide native number by native integer");
 	set I0, 4000
 	set N0, -123.123
 	div N1, N0, I0
@@ -532,7 +532,7 @@ OUTPUT
 #
 # FLOATVAL and FLOATVAL tests
 #
-output_is(<<'CODE', <<OUTPUT, "add native number to native number");
+pasm_output_is(<<'CODE', <<OUTPUT, "add native number to native number");
 	set N2, 4000.246
 	set N0, -123.123
 	add N1, N0, N2
@@ -547,7 +547,7 @@ CODE
 3877.123000
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "subtract native number from native number");
+pasm_output_is(<<'CODE', <<OUTPUT, "subtract native number from native number");
 	set N2, 4000.246
 	set N0, -123.123
 	sub N1, N0, N2
@@ -562,7 +562,7 @@ CODE
 -4123.369000
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "multiply native number with native number");
+pasm_output_is(<<'CODE', <<OUTPUT, "multiply native number with native number");
 	set N2, 4000.246
 	set N0, -123.123
 	mul N1, N0, N2
@@ -577,7 +577,7 @@ CODE
 -492522.288258
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "divide native number by native number");
+pasm_output_is(<<'CODE', <<OUTPUT, "divide native number by native number");
 	set N2, 4000.246
 	set N0, -123.123
 	div N1, N0, N2
@@ -594,7 +594,7 @@ OUTPUT
 
 
 
-output_is(<<'CODE', <<OUTPUT, "lcm_I_I_I");
+pasm_output_is(<<'CODE', <<OUTPUT, "lcm_I_I_I");
         set I0, 10
         set I1, 10
         lcm I2, I1, I0
@@ -639,7 +639,7 @@ ok 4
 ok 5
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "gcd(int,int,int)");
+pasm_output_is(<<'CODE', <<OUTPUT, "gcd(int,int,int)");
         set I0, 125
         set I1, 15
         gcd I2, I1, I0
@@ -651,7 +651,7 @@ CODE
 ok 1
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "is gcd(int,int,int) transitive?");
+pasm_output_is(<<'CODE', <<OUTPUT, "is gcd(int,int,int) transitive?");
         set I0, 125
         set I1, 15
         gcd I2, I1, I0
@@ -687,7 +687,7 @@ ok 2
 ok 3
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "gcd num (with whole numbers)");
+pasm_output_is(<<'CODE', <<OUTPUT, "gcd num (with whole numbers)");
         set N0, 125.0
         set N1, 15.0
         gcd I0, N1, N0
@@ -699,7 +699,7 @@ CODE
 ok 1
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "gcd num (2)");
+pasm_output_is(<<'CODE', <<OUTPUT, "gcd num (2)");
         set N0, 12.3
         set N1, 24.6
         gcd I0, N1, N0
@@ -712,7 +712,7 @@ CODE
 ok 1
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "is gcd(int,num,num) transitive?");
+pasm_output_is(<<'CODE', <<OUTPUT, "is gcd(int,num,num) transitive?");
         set N0, 125
         set N1, 15
         gcd I2, N1, N0
@@ -749,7 +749,7 @@ ok 3
 OUTPUT
 
 
-output_is(<<'CODE', <<OUTPUT, "gcd - 5 args version");
+pasm_output_is(<<'CODE', <<OUTPUT, "gcd - 5 args version");
         set I3, +100
         set I4,  +35
         gcd I0, I1, I2, I3, I4
@@ -824,7 +824,7 @@ CODE
 done
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "is gcd(int,int,int,int,int) transitive?");
+pasm_output_is(<<'CODE', <<OUTPUT, "is gcd(int,int,int,int,int) transitive?");
         set I0, 130
         set I1, -35
 	gcd I7, I0, I1

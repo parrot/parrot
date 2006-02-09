@@ -25,59 +25,59 @@ Tests basic string and branching operations.
 
 
 # It would be very embarrassing if these didnt work...
-output_is(<<'CODE', '', "noop, end");
+pasm_output_is(<<'CODE', '', "noop, end");
 	noop
 	end
 CODE
 
-output_is(<<'CODE', '1', "print 1");
+pasm_output_is(<<'CODE', '1', "print 1");
 	print	1
 	end
 CODE
 
-output_is(<<'CODE', 'Parrot flies', "print string");
+pasm_output_is(<<'CODE', 'Parrot flies', "print string");
 	print 'Parrot flies'
 	end
 CODE
 
-output_is(<<'CODE', 'Parrot flies', "print double-quoted string");
+pasm_output_is(<<'CODE', 'Parrot flies', "print double-quoted string");
        print "Parrot flies"
        end
 CODE
 
-output_is(<<'CODE', 'Parrot	flies', "print double-quoted string, tabs");
+pasm_output_is(<<'CODE', 'Parrot	flies', "print double-quoted string, tabs");
        print "Parrot\tflies"
        end
 CODE
 
-output_is(<<'CODE', q('Parrot' flies), "print double-quoted string, nested single");
+pasm_output_is(<<'CODE', q('Parrot' flies), "print double-quoted string, nested single");
        print "'Parrot' flies"
        end
 CODE
 
-output_is(<<'CODE', q("Parrot" flies), "print single-quoted string, nested double");
+pasm_output_is(<<'CODE', q("Parrot" flies), "print single-quoted string, nested double");
        print '"Parrot" flies'
        end
 CODE
 
-output_is(<<'CODE', q(Parrot flies), "print string with embedded hex escape");
+pasm_output_is(<<'CODE', q(Parrot flies), "print string with embedded hex escape");
        print "Parrot\x20flies"
        end
 CODE
 
-output_is(<<'CODE', q(Parrot flies), "escaped non-special");
+pasm_output_is(<<'CODE', q(Parrot flies), "escaped non-special");
        print "Parrot fl\ies"
        end
 CODE
 
-output_is(<<'CODE', <<OUTPUT, "print string with embedded newline");
+pasm_output_is(<<'CODE', <<OUTPUT, "print string with embedded newline");
        print "Parrot flies\n"
        end
 CODE
 Parrot flies
 OUTPUT
 
-output_is( <<'CODE', '42', "branch_ic" );
+pasm_output_is( <<'CODE', '42', "branch_ic" );
 	set	I4, 42
 	branch	HERE
 	set	I4, 1234
@@ -87,7 +87,7 @@ HERE:
 CODE
 
 
-output_is( <<'CODE', '42', "branch_ic (backward)" );
+pasm_output_is( <<'CODE', '42', "branch_ic (backward)" );
 	set	I4, 42
 	branch	one
 two:	branch	three
@@ -101,7 +101,7 @@ three:
 CODE
 
 
-output_is(<<'CODE', <<'OUTPUT', "bsr_i");
+pasm_output_is(<<'CODE', <<'OUTPUT', "bsr_i");
 	print	"start\n"
 
 	bsr	LAB1
@@ -117,7 +117,7 @@ lab 1
 done
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "set_addr");
+pasm_output_is(<<'CODE', <<'OUTPUT', "set_addr");
        set_addr I1, FOO
        jump I1
        print "Jump failed\n"
@@ -129,7 +129,7 @@ CODE
 Jump succeeded
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "multiple labels");
+pasm_output_is(<<'CODE', <<'OUTPUT', "multiple labels");
      if 0,FOO
      if 1,BAR
      print "not "
@@ -141,7 +141,7 @@ CODE
 ok 1
 OUTPUT
 
-output_is(<<'CODE', 32, "Predeclared opcodes");
+pasm_output_is(<<'CODE', 32, "Predeclared opcodes");
      set_i_ic I0,32
      print I0
      end
