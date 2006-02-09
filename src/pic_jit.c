@@ -148,6 +148,13 @@ parrot_pic_is_save_to_jit(Interp *interpreter, PMC *sub,
     /* simplify debugging */
     name = VTABLE_get_string(interpreter, sub);
 
+    /*
+     * 0) if runcore setting doesn't contain JIT
+     *    forget it
+     */
+    if (!(interpreter->run_core & PARROT_JIT_CORE))
+        return 0;
+
     /* 1) if the JIT system can't JIT_CODE_SUB_REGS_ONLY
      *    or the sub is using too many registers
      */ 

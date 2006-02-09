@@ -747,9 +747,11 @@ Parrot_runcode(Interp *interpreter, int argc, char *argv[])
                 PIO_eprintf(interpreter, "Fast core");
                 break;
             case PARROT_SWITCH_CORE:
+            case PARROT_SWITCH_JIT_CORE:
                 PIO_eprintf(interpreter, "Switch core");
                 break;
             case PARROT_CGP_CORE:
+            case PARROT_CGP_JIT_CORE:
                 PIO_eprintf(interpreter, "CGP core");
                 break;
             case PARROT_CGOTO_CORE:

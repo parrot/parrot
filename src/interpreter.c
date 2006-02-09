@@ -182,7 +182,9 @@ do_prederef(void **pc_prederef, Parrot_Interp interpreter, int type)
     prederef_args(pc_prederef, interpreter, pc, opinfo);
     switch (type) {
         case PARROT_SWITCH_CORE:
+        case PARROT_SWITCH_JIT_CORE:
         case PARROT_CGP_CORE:
+        case PARROT_CGP_JIT_CORE:
             parrot_PIC_prederef(interpreter, *pc, pc_prederef, type);
             break;
         default:
@@ -283,10 +285,12 @@ get_op_lib_init(int core_op, int which, PMC *lib)
     if (core_op) {
         switch (which) {
             case PARROT_SWITCH_CORE:
+            case PARROT_SWITCH_JIT_CORE:
                 init_func = PARROT_CORE_SWITCH_OPLIB_INIT;
                 break;
 #ifdef HAVE_COMPUTED_GOTO
             case PARROT_CGP_CORE:
+            case PARROT_CGP_JIT_CORE:
                 init_func = PARROT_CORE_CGP_OPLIB_INIT;
                 break;
             case PARROT_CGOTO_CORE:
@@ -515,7 +519,9 @@ prepare_for_run(Parrot_Interp interpreter)
             (void) init_jit(interpreter, interpreter->code->base.data);
             break;
         case PARROT_SWITCH_CORE:
+        case PARROT_SWITCH_JIT_CORE:
         case PARROT_CGP_CORE:
+        case PARROT_CGP_JIT_CORE:
             init_prederef(interpreter, interpreter->run_core);
             break;
         default:
@@ -731,6 +737,7 @@ runops_int(Interp *interpreter, size_t offset)
 #endif
                 break;
             case PARROT_CGP_CORE:
+            case PARROT_CGP_JIT_CORE:
 #ifdef HAVE_COMPUTED_GOTO
                 core = runops_cgp;
 #else
@@ -738,6 +745,7 @@ runops_int(Interp *interpreter, size_t offset)
 #endif
                 break;
             case PARROT_SWITCH_CORE:
+            case PARROT_SWITCH_JIT_CORE:
                 core = runops_switch;
                 break;
             case PARROT_JIT_CORE:
@@ -755,6 +763,10 @@ runops_int(Interp *interpreter, size_t offset)
                         "but interpreter is not EXEC_CAPABLE!\n");
 #endif
                 core = runops_exec;
+                break;
+            default:
+                internal_exception(UNIMPLEMENTED,
+                        "ambigious runcore switch used");
                 break;
         }
 

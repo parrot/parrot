@@ -142,7 +142,7 @@ the GNU General Public License or the Artistic License for more details.\n\n");
 #define SET_FLAG(flag)   Parrot_set_flag(interp, flag)
 #define SET_DEBUG(flag)  Parrot_set_debug(interp, flag)
 #define SET_TRACE(flag)  Parrot_set_trace(interp, flag)
-#define SET_CORE(core)   Parrot_set_run_core(interp, core)
+#define SET_CORE(core)   interp->run_core |= core
 
 #define OPT_GC_DEBUG     128
 #define OPT_DESTROY_FLAG 129
