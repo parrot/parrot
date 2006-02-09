@@ -2774,31 +2774,50 @@ jit_get_params_pc(Parrot_jit_info_t *jit_info, Interp * interpreter)
     INTVAL *sig_bits, i, n;
 
     sig_pmc = CONTEXT(interpreter->ctx)->constants[CUR_OPCODE[1]]->u.key;
-    sig_bits = PMC_data(sig_pmc);
-    n = PMC_int_val(sig_pmc);
+    sig_bits = SIG_ARRAY(sig_pmc);
+    n = SIG_ELEMS(sig_pmc);
     jit_info->n_args = n;
     emitm_movl_m_r(NATIVECODE, emit_EAX, emit_EBP, emit_None, 1, 16);
-    for (i = 0; i < n; ++i)
+    for (i = 0; i < n; ++i) {
+        /* TODO other arg types */
         emitm_movl_m_r(NATIVECODE, MAP(2+i), emit_EAX, emit_None, 
                 1, 4 + i*4);
+    }
 }
 
 /*
  * preserve registers
- * a) all callee saved on function entry (skip == -1)
- * b) all used register around a call (skip >= 0 := return result
- *    TODO save N regs for b) too
+ * a) all callee saved on function entry 
  */
 static void 
-jit_save_regs(Parrot_jit_info_t *jit_info, Interp * interpreter, int skip)
+jit_save_regs(Parrot_jit_info_t *jit_info, Interp * interpreter)
 {
     int i, used_i, save_i;
     const jit_arch_regs *reg_info;
 
     used_i = CONTEXT(interpreter->ctx)->n_regs_used[REGNO_INT];
     reg_info = &jit_info->arch_info->regs[jit_info->code_type]; 
-    save_i = skip >= 0 ? 0 : reg_info->n_preserved_I;
+    save_i = reg_info->n_preserved_I;
     for (i = save_i; i < used_i; ++i) {
+        emitm_pushl_r(jit_info->native_ptr, reg_info->map_I[i]);
+    }
+}
+
+/*
+ * preserve registers around a functioncall
+ * 
+ * b) all used register around a call (skip >= 0 := return result
+ *    TODO save N regs for b) too
+ */
+static void 
+jit_save_regs_call(Parrot_jit_info_t *jit_info, Interp * interpreter, int skip)
+{
+    int i, used_i, save_i;
+    const jit_arch_regs *reg_info;
+
+    used_i = CONTEXT(interpreter->ctx)->n_regs_used[REGNO_INT];
+    reg_info = &jit_info->arch_info->regs[jit_info->code_type]; 
+    for (i = 0; i < used_i; ++i) {
         if (reg_info->map_I[i] == skip)
             continue;
         emitm_pushl_r(jit_info->native_ptr, reg_info->map_I[i]);
@@ -2807,7 +2826,7 @@ jit_save_regs(Parrot_jit_info_t *jit_info, Interp * interpreter, int skip)
 
 /* restore saved regs, see above */
 static void 
-jit_restore_regs(Parrot_jit_info_t *jit_info, Interp * interpreter, int skip)
+jit_restore_regs(Parrot_jit_info_t *jit_info, Interp * interpreter)
 {
 
     int i, used_i, save_i;
@@ -2815,13 +2834,30 @@ jit_restore_regs(Parrot_jit_info_t *jit_info, Interp * interpreter, int skip)
 
     used_i = CONTEXT(interpreter->ctx)->n_regs_used[REGNO_INT];
     reg_info = &jit_info->arch_info->regs[jit_info->code_type]; 
-    save_i = skip >= 0 ? 0 : reg_info->n_preserved_I;
+    save_i = reg_info->n_preserved_I;
     /* note - reversed order of jit_save_regs  */
     for (i = used_i - 1; i >= save_i; --i) {
+        emitm_popl_r(jit_info->native_ptr, reg_info->map_I[i]);
+    }
+}
+
+static void 
+jit_restore_regs_call(Parrot_jit_info_t *jit_info, Interp * interpreter, 
+        int skip)
+{
+
+    int i, used_i, save_i;
+    const jit_arch_regs *reg_info;
+
+    used_i = CONTEXT(interpreter->ctx)->n_regs_used[REGNO_INT];
+    reg_info = &jit_info->arch_info->regs[jit_info->code_type]; 
+    /* note - reversed order of jit_save_regs  */
+    for (i = used_i - 1; i >= 0; --i) {
         if (reg_info->map_I[i] == skip)
             continue;
         emitm_popl_r(jit_info->native_ptr, reg_info->map_I[i]);
     }
+    /* TODO other types */
 }
 
 static void
@@ -2832,9 +2868,9 @@ jit_set_returns_pc(Parrot_jit_info_t *jit_info, Interp * interpreter,
     INTVAL *sig_bits, sig;
 
     sig_pmc = CONTEXT(interpreter->ctx)->constants[CUR_OPCODE[1]]->u.key;
-    if (!PMC_int_val(sig_pmc))
+    if (!SIG_ELEMS(sig_pmc))
         return;
-    sig_bits = PMC_data(sig_pmc);
+    sig_bits = SIG_ARRAY(sig_pmc);
     sig = sig_bits[0];
     if (!recursive) {
         /* mov 16(%ebp), %eax - fetch args ptr */
@@ -2883,14 +2919,13 @@ jit_set_args_pc(Parrot_jit_info_t *jit_info, Interp * interpreter,
 
     constants = CONTEXT(interpreter->ctx)->constants;
     sig_args = constants[CUR_OPCODE[1]]->u.key;
-    if (!PMC_int_val(sig_args))
+    if (!SIG_ELEMS(sig_args))
         return;
     params = jit_info->optimizer->sections->begin;
     sig_params = constants[params[1]]->u.key;
-    assert(PObj_is_PMC_TEST(sig_params));
-    assert(sig_params->vtable->base_type == enum_class_FixedIntegerArray);
-    sig_bits = PMC_data(sig_args);
-    n = PMC_int_val(sig_args);  
+    ASSERT_SIG_PMC(sig_params);
+    sig_bits = SIG_ARRAY(sig_args);
+    n = SIG_ELEMS(sig_args);  
     for (i = 0; i < n; ++i) {
         sig = sig_bits[i];
         /* move args to params regs */
@@ -3136,7 +3171,7 @@ Parrot_jit_begin_sub_regs(Parrot_jit_info_t *jit_info,
      * check register usage of the subroutine
      * how many we have to preserve
      */ 
-    jit_save_regs(jit_info, interpreter, -1);
+    jit_save_regs(jit_info, interpreter);
     /* when it's a recursive sub, we fetch params to registers
      * and all a inner helper sub, which run with registers only
      */
@@ -3156,7 +3191,7 @@ Parrot_jit_begin_sub_regs(Parrot_jit_info_t *jit_info,
         emitm_movl_m_r(NATIVECODE, emit_EAX, emit_EDX, emit_None, 1, 
                     4 + jit_info->n_args * 4);
         /* restore pushed callee saved */
-        jit_restore_regs(jit_info, interpreter, -1);
+        jit_restore_regs(jit_info, interpreter);
         jit_emit_stack_frame_leave(NATIVECODE);
         emitm_ret(NATIVECODE);
         /* align the inner sub */

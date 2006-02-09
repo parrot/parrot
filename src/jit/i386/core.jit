@@ -1452,7 +1452,7 @@ extern Parrot_returncc {
     else {
         /* restore pushed regs if any */
         if (!(jit_info->flags & JIT_CODE_RECURSIVE)) {
-            jit_restore_regs(jit_info, interpreter, -1);
+            jit_restore_regs(jit_info, interpreter);
             emitm_movl_m_r(NATIVECODE, emit_EAX, emit_EBP, emit_None, 1, 16);
             /* retval = pc is at 4 + n_args * 4 */
             emitm_movl_m_r(NATIVECODE, emit_EAX, emit_EAX, emit_None, 1, 
@@ -1473,23 +1473,23 @@ Parrot_pic_callr___pc {
     constants = CONTEXT(interpreter->ctx)->constants;
     params = jit_info->optimizer->sections->begin;
     sig_params = constants[params[1]]->u.key;
-    op_i = 2 + PMC_int_val(sig_params);
+    op_i = 2 + SIG_ELEMS(sig_params);
 
     offset = jit_info->arena.op_map[op_i].offset;
     /* TODO preserve necessary regs */
     assert(*CUR_OPCODE == PARROT_OP_get_results_pc);
     constants = CONTEXT(interpreter->ctx)->constants;
     sig_result = constants[CUR_OPCODE[1]]->u.key;
-    if (!PMC_int_val(sig_result))
+    if (!SIG_ELEMS(sig_result))
         skip = -1;
     else 
         skip = MAP(2);      /* skip result - save rest */
-    jit_save_regs(jit_info, interpreter, skip);
+    jit_save_regs_call(jit_info, interpreter, skip);
 
     here = NATIVECODE - jit_info->arena.start;
     emitm_calll(NATIVECODE, offset - here - 5);
 
-    jit_restore_regs(jit_info, interpreter, skip);
+    jit_restore_regs_call(jit_info, interpreter, skip);
 }
 
 extern Parrot_get_params_pc {
@@ -1514,7 +1514,7 @@ Parrot_get_results_pc {
 
         constants = CONTEXT(interpreter->ctx)->constants;
         sig_result = constants[CUR_OPCODE[1]]->u.key;
-        if (!PMC_int_val(sig_result))
+        if (!SIG_ELEMS(sig_result))
             return;
         /* result is eax TODO Nums */
         jit_emit_mov_rr_i(NATIVECODE, MAP(2), emit_EAX);

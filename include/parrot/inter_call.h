@@ -111,17 +111,6 @@ FLOATVAL set_retval_f(Interp*, int sig_ret, parrot_context_t *ctx);
 void* set_retval(Interp*, int sig_ret, parrot_context_t *ctx);
 INTVAL set_retval_i(Interp*, int sig_ret, parrot_context_t *ctx);
 
-#define ADD_OP_VAR_PART(interpreter, seg, pc, n) do { \
-    if (*pc == PARROT_OP_set_args_pc || \
-            *pc == PARROT_OP_get_results_pc || \
-            *pc == PARROT_OP_get_params_pc || \
-            *pc == PARROT_OP_set_returns_pc) { \
-        PMC *sig; \
-        sig = seg->const_table->constants[pc[1]]->u.key; \
-        n += VTABLE_elements(interpreter, sig); \
-    } \
-} while (0)
-
 #define ASSERT_SIG_PMC(sig) \
     assert(PObj_is_PMC_TEST(sig) && \
            sig->vtable->base_type == enum_class_FixedIntegerArray)
@@ -129,6 +118,17 @@ INTVAL set_retval_i(Interp*, int sig_ret, parrot_context_t *ctx);
 #define SIG_ELEMS(sig) PMC_int_val(sig)
 #define SIG_ARRAY(sig) (INTVAL*)PMC_data(sig)
 #define SIG_ITEM(sig, idx) (SIG_ARRAY(sig))[idx]
+#define ADD_OP_VAR_PART(interpreter, seg, pc, n) do { \
+    if (*pc == PARROT_OP_set_args_pc || \
+            *pc == PARROT_OP_get_results_pc || \
+            *pc == PARROT_OP_get_params_pc || \
+            *pc == PARROT_OP_set_returns_pc) { \
+        PMC *sig; \
+        sig = seg->const_table->constants[pc[1]]->u.key; \
+        n += SIG_ELEMS(sig); \
+    } \
+} while (0)
+
 
 #endif /* PARROT_INTER_CALL_H_GUARD */
 
