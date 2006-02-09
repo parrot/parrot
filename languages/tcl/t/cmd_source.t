@@ -4,10 +4,6 @@ use strict;
 use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
 use Parrot::Test tests => 2;
 use Test::More;
-use vars qw($TODO);
-
-TODO: {
-  local $TODO = "fails when run as .t - probably due to path changing.";
     
 # prolly not portable, patches welcome.
 my $source_filename = "tmp.tcl";
@@ -29,7 +25,6 @@ OUT
 
 # clean up temp file.
 unlink($source_filename);
-}
 
 language_output_is("tcl",<<'TCL',<<'OUT',"invalid file");
  source "hopefullynonexistantfile.tcl"

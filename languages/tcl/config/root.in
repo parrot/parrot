@@ -193,6 +193,8 @@ tcl.pbc \
 #CONDITIONED_LINE(ld_parrot_exe_def):"$(PMCDIR)@slash@*.def" \
 "$(PMCDIR)@slash@*.c" \
 "$(PMCDIR)@slash@*$(O)" \
+"t@slash@*.pir" \
+"t@slash@*.tcl" \
 $(GENERATED_INLINES)
 
 clean:

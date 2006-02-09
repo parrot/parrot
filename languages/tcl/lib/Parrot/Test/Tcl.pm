@@ -33,33 +33,51 @@ foreach my $func ( keys %language_test_map ) {
     $count = $self->{builder}->current_test + 1;
 
     $desc = $language unless $desc;
-  
+
+    # Figure out how many levels we have to go back to get to parrot.
+    # And, conversely, how many levels we have to go down to get to
+    # the tcl binary.
+
+    # There are basically 3 choices: run in one of:
+    #  languages
+    #  languages/tcl
+    #  languages/tcl/t
+
+    my $path_to_parrot = $INC{"Parrot/Config.pm"};
+    $path_to_parrot =~ s:/lib/Parrot/Config.pm$::;
+    print "$path_to_parrot\n";
+    my $dir_count = scalar(File::Spec->splitdir($path_to_parrot));
+    my $path_to_tcl;
+    print "DIR COUNT : $dir_count\n";
+    if ($dir_count <2) {
+      $path_to_tcl = File::Spec->join((qw{languages tcl})[0..$dir_count]);
+    } elsif ($dir_count >2) {
+      $path_to_tcl = File::Spec->join(File::Spec->updir() x ($dir_count - 2));
+    } else {
+      $path_to_tcl = ".";
+    }
+
     my $lang_f = Parrot::Test::per_test('.tcl',$count);
     my $out_f = Parrot::Test::per_test('.out',$count);
-    my $parrotdir = dirname $self->{parrot};
 
     $TEST_PROG_ARGS = $ENV{TEST_PROG_ARGS} || '';
     my $args = $TEST_PROG_ARGS;
 
-    # flatten filenames (don't use directories)
-    $lang_f = (File::Spec->splitpath($lang_f))[2];
-    $out_f =  (File::Spec->splitpath($out_f))[2];
-    # but, always put the test in a tempdir, so we're not cluttering
-    $lang_f = File::Spec->catfile(File::Spec->tmpdir(),$lang_f);
-    $out_f = File::Spec->catfile(File::Spec->tmpdir(),$out_f);
-    Parrot::Test::generate_code( $code, $parrotdir, $count, $lang_f );
+    Parrot::Test::generate_code( $code, undef, undef, $lang_f );
 
     my $cmd;
     my $exit_code = 0;
     my $pass = 0;
 
-    my $executable = "$self->{parrot} $args languages/tcl/tcl.pbc"; 
+    my $executable = File::Spec->join($path_to_parrot,$self->{parrot}) . 
+    " $args " . File::Spec->join($path_to_tcl, 'tcl.pbc');
+    print "USING $executable\n";
     if (defined($ENV{PARROT_TCLSH})) {
       $executable = $ENV{PARROT_TCLSH};
     }
     $cmd = "$executable $lang_f";
 
-    $exit_code = Parrot::Test::run_command($cmd, CD => $self->{relpath},
+    $exit_code = Parrot::Test::run_command($cmd, #CD => $self->{relpath},
 					   STDOUT => $out_f, STDERR => $out_f);
   
     unless ($pass) {
@@ -76,7 +94,6 @@ foreach my $func ( keys %language_test_map ) {
     }
 
     unless($ENV{POSTMORTEM}) {
-      unlink $lang_f;
       unlink $out_f;
     }
 

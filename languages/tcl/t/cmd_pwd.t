@@ -11,9 +11,6 @@ TCL
 wrong # args: should be "pwd"
 OUT
 
-TODO: {
-  local $TODO = "test harness does a chdir...";
-
 use Cwd;
 my $dir = getcwd;
 
@@ -22,4 +19,3 @@ language_output_is("tcl",<<'TCL',<<"OUT","pwd simple");
 TCL
 $dir
 OUT
-}
