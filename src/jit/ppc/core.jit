@@ -948,8 +948,14 @@ Parrot_set_p_pc {
 ; which adds unneeded overhead - convert to normal ops
 ; or just JIT (TODO)  the 2 easy ones
 Parrot_set_args_pc {
-    jit_emit_mov_ri_i(NATIVECODE, ISR1, jit_info->cur_op);
-    jit_emit_stw(NATIVECODE, ISR1, offsetof(Interp, current_args), r16);
+    if (jit_info->code_type == JIT_CODE_FILE) {
+	jit_emit_mov_ri_i(NATIVECODE, ISR1, jit_info->cur_op);
+	jit_emit_stw(NATIVECODE, ISR1, offsetof(Interp, current_args), r16);
+    }
+    else  {
+        jit_set_args_pc(jit_info, interpreter, 
+            jit_info->flags & JIT_CODE_RECURSIVE);
+    }
 }
 
 extern Parrot_set_returns_pc {
@@ -967,18 +973,44 @@ extern Parrot_returncc {
     else {
 	/* fetch args[n+1] -> retval */
         if (!(jit_info->flags & JIT_CODE_RECURSIVE)) {
+	    jit_emit_lwz(jit_info->native_ptr, r1, 0, r1);
 	    jit_emit_lwz(jit_info->native_ptr, r3, 4 + jit_info->n_args * 4, r5);
-	}
-
-	/* return sequence */
-	jit_emit_lwz(jit_info->native_ptr, r1, 0, r1);
-        if (!(jit_info->flags & JIT_CODE_RECURSIVE)) {
 	    jit_emit_lwz(jit_info->native_ptr, r31, -4, r1);
+	    jit_emit_lwz(jit_info->native_ptr, r0, 8, r1);   /* get link reg */
+	    jit_emit_mtlr(jit_info->native_ptr, r0);   /* move to link reg */
 	}
-	jit_emit_lwz(jit_info->native_ptr, r0, 8, r1);   /* opt */
-	jit_emit_mtlr(jit_info->native_ptr, r0);   /* opt */
 	jit_emit_blr(jit_info->native_ptr);
     }
+}
+
+Parrot_pic_callr___pc {
+    int offset, here, op_i;
+    struct PackFile_Constant ** constants;
+    PMC *sig_params, *sig_result;
+    opcode_t *params;
+    int skip;
+
+    constants = CONTEXT(interpreter->ctx)->constants;
+    params = jit_info->optimizer->sections->begin;
+    sig_params = constants[params[1]]->u.key;
+    op_i = 2 + SIG_ELEMS(sig_params);
+
+    offset = jit_info->arena.op_map[op_i].offset;
+    /* TODO preserve necessary regs */
+    assert(*CUR_OPCODE == PARROT_OP_get_results_pc);
+    constants = CONTEXT(interpreter->ctx)->constants;
+    sig_result = constants[CUR_OPCODE[1]]->u.key;
+    if (!SIG_ELEMS(sig_result))
+	skip = -1;
+    else 
+	skip = MAP(2);      /* skip result - save rest */
+    jit_save_regs_call(jit_info, interpreter, skip);
+
+    here = NATIVECODE - jit_info->arena.start;
+    offset -= here;
+    _emit_bx(NATIVECODE, 1, offset); /* bl */
+
+    jit_restore_regs_call(jit_info, interpreter, skip);
 }
 
 extern Parrot_get_params_pc {
@@ -990,8 +1022,21 @@ extern Parrot_get_params_pc {
 }
 
 Parrot_get_results_pc {
-    jit_emit_mov_ri_i(NATIVECODE, ISR1, jit_info->cur_op);
-    jit_emit_lwz(NATIVECODE, ISR2, offsetof(Interp, ctx.state), r16);
-    jit_emit_stw(NATIVECODE, ISR1, 
-            offsetof(parrot_context_t, current_results), ISR2);
+    if (jit_info->code_type == JIT_CODE_FILE) {
+	jit_emit_mov_ri_i(NATIVECODE, ISR1, jit_info->cur_op);
+	jit_emit_lwz(NATIVECODE, ISR2, offsetof(Interp, ctx.state), r16);
+	jit_emit_stw(NATIVECODE, ISR1, 
+		offsetof(parrot_context_t, current_results), ISR2);
+    }
+    else {
+	struct PackFile_Constant ** constants;
+	PMC *sig_result;
+
+	constants = CONTEXT(interpreter->ctx)->constants;
+	sig_result = constants[CUR_OPCODE[1]]->u.key;
+	if (!SIG_ELEMS(sig_result))
+	    return;
+	/* result is r3 TODO Nums */
+	jit_emit_mov_rr(NATIVECODE, MAP(2), r3);
+    }
 }

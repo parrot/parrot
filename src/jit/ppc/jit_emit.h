@@ -12,6 +12,8 @@
 #include <unistd.h>
 #include <sys/mman.h>
 #include <limits.h>
+#include "parrot/oplib/ops.h"
+
 #ifndef CACHELINESIZE
    /* TODO this should be determined by configure */
 #  if PARROT_EXEC_OS_AIX
@@ -814,7 +816,9 @@ jit_set_returns_pc(Parrot_jit_info_t *jit_info, Interp * interpreter,
     INTVAL *sig_bits, sig;
 
     sig_pmc = CONTEXT(interpreter->ctx)->constants[CUR_OPCODE[1]]->u.key;
-    sig_bits = PMC_data(sig_pmc);
+    if (!SIG_ELEMS(sig_pmc))
+        return;
+    sig_bits = SIG_ARRAY(sig_pmc);
     sig = sig_bits[0];
     if (!recursive) {
         /* ISR2 <- args[0] */ 
@@ -842,6 +846,101 @@ jit_set_returns_pc(Parrot_jit_info_t *jit_info, Interp * interpreter,
             internal_exception(1, "set_returns_jit - unknown tyep");
             break;
     }
+}
+
+static void
+jit_set_args_pc(Parrot_jit_info_t *jit_info, Interp * interpreter, 
+        int recursive)
+{
+    PMC *sig_args, *sig_params;
+    INTVAL *sig_bits, sig, i, n;
+    struct PackFile_Constant ** constants;
+    opcode_t *params;
+    char params_map;
+
+    if (!recursive) {
+        /* create args array */
+        internal_exception(1, "set_args_jit - can't do that yet ");
+    }
+
+    constants = CONTEXT(interpreter->ctx)->constants;
+    sig_args = constants[CUR_OPCODE[1]]->u.key;
+    if (!SIG_ELEMS(sig_args))
+        return;
+    params = jit_info->optimizer->sections->begin;
+    sig_params = constants[params[1]]->u.key;
+    ASSERT_SIG_PMC(sig_params);
+    sig_bits = SIG_ARRAY(sig_args);
+    n = SIG_ELEMS(sig_args);  
+    for (i = 0; i < n; ++i) {
+        sig = sig_bits[i];
+        /* move args to params regs */
+        params_map = jit_info->optimizer->map_branch[2 + i];
+        /* TODO check for overlaps/collision */
+        switch (sig & (PARROT_ARG_TYPE_MASK|PARROT_ARG_CONSTANT)) {
+            case PARROT_ARG_INTVAL:
+                jit_emit_mov_rr(NATIVECODE, params_map, MAP(2 + i));
+                break;
+            case PARROT_ARG_INTVAL|PARROT_ARG_CONSTANT:
+                jit_emit_mov_ri_i(NATIVECODE, params_map, CUR_OPCODE[2 + i]);
+                break;
+            default:
+                internal_exception(1, "set_args_jit - unknown typ");
+                break;
+        }
+    }
+}
+
+/*
+ * preserve registers around a functioncall
+ * 
+ * b) all used register around a call (skip >= 0 := return result
+ *    TODO save N regs for b) too
+ */
+static void 
+jit_save_regs_call(Parrot_jit_info_t *jit_info, Interp * interpreter, int skip)
+{
+    int i, used_i, save_i;
+    const jit_arch_regs *reg_info;
+
+    /* create stack frame 24 link + 32 params -> 64 */
+    jit_emit_stwu(jit_info->native_ptr, r1, -64, r1);
+    used_i = CONTEXT(interpreter->ctx)->n_regs_used[REGNO_INT];
+    reg_info = &jit_info->arch_info->regs[jit_info->code_type]; 
+    for (i = 0; i < used_i; ++i) {
+        if (reg_info->map_I[i] == skip)
+            continue;
+        /* we use param area sp+24 := r3, sp+52 := r10 */
+        jit_emit_stw(jit_info->native_ptr, reg_info->map_I[i], 24 + i*4, r1);
+    }
+    /* preserve link register */
+    jit_emit_mflr(jit_info->native_ptr, r0);    /* optional */
+    jit_emit_stw(jit_info->native_ptr, r0, 8, r1); /* stw     r0,8(r1) */
+}
+
+static void 
+jit_restore_regs_call(Parrot_jit_info_t *jit_info, Interp * interpreter, 
+        int skip)
+{
+
+    int i, used_i, save_i;
+    const jit_arch_regs *reg_info;
+
+    used_i = CONTEXT(interpreter->ctx)->n_regs_used[REGNO_INT];
+    reg_info = &jit_info->arch_info->regs[jit_info->code_type]; 
+    /* note - reversed order of jit_save_regs  */
+    for (i = used_i - 1; i >= 0; --i) {
+        if (reg_info->map_I[i] == skip)
+            continue;
+        /* we use param area sp+24 := r3, sp+52 := r10 */
+        jit_emit_lwz(jit_info->native_ptr, reg_info->map_I[i], 24 + i*4, r1);
+    }
+    /* restore link reg */
+    jit_emit_lwz(jit_info->native_ptr, r0, 8, r1);   
+    jit_emit_mtlr(jit_info->native_ptr, r0);   
+    /* pop stack frame */
+    jit_emit_lwz(jit_info->native_ptr, r1, 0, r1);
+    /* TODO other types */
 }
 
 #if JIT_EMIT == 0
@@ -901,8 +1000,8 @@ Parrot_jit_begin_sub_regs(Parrot_jit_info_t *jit_info,
     jit_emit_stw(jit_info->native_ptr, r0, 8, r1); /* stw     r0,8(r1) */
     /* preserve r31 */
     jit_emit_stw(jit_info->native_ptr, r31, -4, r1); 
-    /* 24 linkage area, 0 params , 1 word local, roundup => 32 */
-    jit_emit_stwu(jit_info->native_ptr, r1, -32, r1);
+    /* 24 linkage area, 32 params , 1 word local, roundup => 32 */
+    jit_emit_stwu(jit_info->native_ptr, r1, -64, r1);
     /* r31 = 0 - needed for load immediate */
     jit_emit_xor_rrr(jit_info->native_ptr, r31, r31, r31);
 
@@ -928,10 +1027,6 @@ Parrot_jit_begin_sub_regs(Parrot_jit_info_t *jit_info,
         /* re-emit call */
         offs = NATIVECODE - L1;
         _emit_bx(L1, 1, offs); /* bl */
-        /* TODO this is a part of call */
-        jit_emit_mflr(jit_info->native_ptr, r0);
-        jit_emit_stw(jit_info->native_ptr, r0, 8, r1); /* stw     r0,8(r1) */
-        jit_emit_stwu(jit_info->native_ptr, r1, -32, r1);
     }
 }
 
@@ -1061,7 +1156,7 @@ static const char intval_map[INT_REGISTERS_TO_MAP] =
     };
 
 static const char intval_map_sub[] =
-    { r3, r4, r6, r7, r8, r9, r10 };
+    { r4, r6, r7, r8, r9, r10 };
 /*
  * f0, f13 are used as scratch registers
  * f1  - f12 are (additional) volatile registers
@@ -1138,8 +1233,8 @@ static const jit_arch_info arch_info = {
         },
         {
             Parrot_jit_begin_sub,   /* emit code prologue */
-            7,                  /* 7 mapped ints */
-            7,                  /* all volatile */
+            6,                  /* 6 mapped ints */
+            6,                  /* all volatile */
             intval_map_sub,
             12,                  /* mapped float regs */
             12,                  /* all volatile */
@@ -1147,10 +1242,10 @@ static const jit_arch_info arch_info = {
         },
         {
             Parrot_jit_begin_sub_regs,  /* emit code prologue */
-            7,                  /* 7 mapped ints */
-            7,                  /* all volatile */
+            6,                  /* 6 mapped ints */
+            6,                  /* all volatile */
             intval_map_sub,
-            12,                  /* 12 mapped float regs */
+            0,                  /* TODO 12 mapped float regs */
             12,                  /* all volatile */
             floatval_map_sub
         }
