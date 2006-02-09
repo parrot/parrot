@@ -1,5 +1,5 @@
-.include "languages/tcl/lib/returncodes.pir"
-.include "languages/tcl/lib/macros.pir"
+.include "languages/tcl/src/returncodes.pir"
+.include "languages/tcl/src/macros.pir"
 
 .namespace [ "TclFunc" ]
 
@@ -152,7 +152,7 @@ func_tanh:
 done:
   .local string format
   format = <<"END_PIR"
-# lib/tclfunc.pir :: compile
+# src/class/tclfunc.pir :: compile
 $N%i=$P%i
 $N%i=%s $N%i
 $P%i=new .TclFloat

@@ -79,7 +79,7 @@ set_args:
 
    .local string template
    template = <<"END_PIR"
-# lib/compiler.pir :: compile_dispatch
+# src/compiler.pir :: compile_dispatch
 $P%i = new .%s
 $P%i=%s%s%s
 END_PIR
@@ -137,7 +137,7 @@ done_init:
   # The library bits that they'll need.
 
   stub_code = <<"END_PIR"
-# lib/compiler.pir :: pir_compiler (1)
+# src/compiler.pir :: pir_compiler (1)
 .sub _dynlexload :immediate
 $P1=loadlib 'dynlexpad'
 .end
@@ -145,8 +145,8 @@ $P1=loadlib 'dynlexpad'
 .HLL_map .LexPad, .DynLexPad
 .pragma n_operators 1
 .sub compiled_tcl_sub%i :anon :main
-load_bytecode 'languages/tcl/lib/tcllib.pbc'
-.include "languages/tcl/lib/returncodes.pir"
+load_bytecode 'languages/tcl/runtime/tcllib.pbc'
+.include "languages/tcl/src/returncodes.pir"
 .local pmc epoch
 epoch = find_global "_Tcl", "epoch"
 %s.return ($P%i)
@@ -159,10 +159,10 @@ END_PIR
   # conflicts with the parser itself.
 
   stub_code = <<"END_PIR"
-# lib/compiler.pir :: pir_compiler (2)
+# src/compiler.pir :: pir_compiler (2)
 .pragma n_operators 1
 .sub compiled_tcl_sub%i :anon
-.include "languages/tcl/lib/returncodes.pir"
+.include "languages/tcl/src/returncodes.pir"
 .local pmc epoch
 epoch = find_global "_Tcl", "epoch"
 %s.return ($P%i)

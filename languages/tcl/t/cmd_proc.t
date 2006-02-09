@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 use strict;
-use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
+use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
 use Parrot::Test tests => 12;
 use Test::More;
 

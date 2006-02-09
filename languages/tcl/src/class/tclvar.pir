@@ -1,5 +1,5 @@
-.include "languages/tcl/lib/returncodes.pir"
-.include "languages/tcl/lib/macros.pir"
+.include "languages/tcl/src/returncodes.pir"
+.include "languages/tcl/src/macros.pir"
 
 .namespace [ "TclVar" ]
 
@@ -24,7 +24,7 @@ Define the attributes required for the class.
     .local string pir_code
     .local string template
     template = <<"END_PIR"
-# lib/tclvar.pir :: compile
+# src/class/tclvar.pir :: compile
 .local pmc read
 read = find_global '_Tcl', '__read'
 $P%i = read("%s")

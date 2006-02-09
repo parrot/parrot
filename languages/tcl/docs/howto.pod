@@ -118,15 +118,16 @@ get them added to the C<TODO>), and that they are coherent.
 
 =item Missing Commands
 
-Every builtin command corresponds to a file with an appropriately named
-sub in C<lib/commands> - Each of these subs takes some number of PMCs
+Every builtin command corresponds to an appropriately named file
+in C<src/builtins> or C<runtime/builtins> - Each of these subs takes some
+number of PMCs
 as arguments. For those commands that take a fixed number of parameters,
 we declare them with C<.param>. For those that take a variable number,
 we use the C<foldup> opcode.
 
 If the return value would be TCL_OK, then simply C<.return> the value
 from the sub. For any other return type, use one of the macros in 
-C<lib/returncodes.pir>: C<.throw>, etc. the value can be any simple
+C<src/returncodes.pir>: C<.throw>, etc. the value can be any simple
 register or a PMC, the calling conventions will autobox as necessary.
 
 Before adding new functionality, add a test (or a test in an existing) file 

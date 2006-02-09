@@ -1,5 +1,5 @@
-.include "languages/tcl/lib/returncodes.pir"
-.include "languages/tcl/lib/macros.pir"
+.include "languages/tcl/src/returncodes.pir"
+.include "languages/tcl/src/macros.pir"
 
 .namespace [ "TclUnaryOp" ]
 
@@ -36,7 +36,7 @@ Initialize the attributes for an instance of the class
   .param int register_num
 
   .local string pir_code
-  pir_code = "# lib/tclops.pir :: compile\n"
+  pir_code = "# src/class/tclops.pir :: compile\n"
 
   .local pmc retval
   retval = new .TclInt

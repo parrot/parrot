@@ -64,7 +64,7 @@ got_args:
 .namespace ['Tcl']
 .sub '&%s' :lex
 .param pmc args :slurpy
-.include 'languages/tcl/lib/returncodes.pir'
+.include 'languages/tcl/src/returncodes.pir'
 .local pmc epoch
 epoch = find_global "_Tcl", "epoch"
 

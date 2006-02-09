@@ -8,8 +8,8 @@ providing a compreg-compatible method.
 
 =cut
 
-.include "languages/tcl/lib/returncodes.pir"
-.include "languages/tcl/lib/macros.pir"
+.include "languages/tcl/src/returncodes.pir"
+.include "languages/tcl/src/macros.pir"
 .include "cclass.pasm"
 
 # don't pollute the global namespaces with our utility functions.
@@ -81,7 +81,7 @@ providing a compreg-compatible method.
 
 .sub __load_macros :load :anon
   $P0 = compreg "PIR"
-  $P0 = $P0(".sub main\n.include 'languages/tcl/lib/macros.pir'\n.end")
+  $P0 = $P0(".sub main\n.include 'languages/tcl/src/macros.pir'\n.end")
   $P0()
 .end
 

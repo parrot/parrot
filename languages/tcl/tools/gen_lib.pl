@@ -16,36 +16,35 @@ local $/ = undef;
 my $contents = $header . <TEMPLATE>;
 close(TEMPLATE);
 
-my $command_dir = "lib/commands";
+my $command_dir = "runtime/builtin";
 opendir(CMDDIR,$command_dir);
 my @cmd_files = readdir(CMDDIR);
 closedir(CMDDIR);
 
-my $builtins_dir = "lib/builtins";
+my $builtins_dir = "src/builtin";
 opendir(CMDDIR,$builtins_dir);
 my @blt_files = readdir(CMDDIR);
 closedir(CMDDIR);
 
-my $macro_dir = "lib/macros";
-opendir(CMDDIR,$macro_dir);
-my @macro_files = readdir(CMDDIR);
-closedir(CMDDIR);
-
 my @cmd_includes = map {"$command_dir/$_"} grep {m/\.pir$/}  @cmd_files;
 my @blt_includes = map {"$builtins_dir/$_"} grep {m/\.pir$/} @blt_files;
-my @macro_includes = map {"$macro_dir/$_"} grep {m/\.pir$/}  @macro_files;
 
 # remove extensions from @cmd_files and @blt_files
 # (this uses $_ as an alias -- somewhat subtle and evil)
 my @commands = grep {s/\.(pir|tmt)$//} @cmd_files, @blt_files;
 
-my $lib_dir = "lib";
+my $lib_dir = "runtime";
 opendir(LIBDIR,$lib_dir) or die;
-my @libs = map {"$lib_dir/$_"} grep {m/\.pir$/} grep {! m/^tcl(lib|command|commandlist|const|func|ops|binaryops|var|word).pir$/} readdir(LIBDIR);
+my @libs = map {"$lib_dir/$_"} grep {m/\.pir$/} grep {$_ ne "tcllib.pir"} readdir(LIBDIR);
 closedir(LIBDIR);
 
+my $src_dir = "src";
+opendir(SRCDIR,$src_dir) or die;
+my @srcs = map {"$src_dir/$_"} grep {! m/^(tclsh|macros|returncodes).pir$/} grep {m/\.pir$/} readdir(SRCDIR);
+closedir(SRCDIR);
+
 my $includes;
-foreach my $file (@macro_includes, @cmd_includes, @blt_includes, @libs) {
+foreach my $file (@cmd_includes, @blt_includes, @libs, @srcs) {
   $includes .= "  .include \"languages/tcl/$file\"\n";
 }
 

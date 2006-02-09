@@ -17,8 +17,8 @@
 .HLL "Tcl", "tcl_group"
 .HLL_map .LexPad, .DynLexPad
 
-.include "languages/tcl/lib/returncodes.pir"
-.include "languages/tcl/lib/macros.pir"
+.include "languages/tcl/src/returncodes.pir"
+.include "languages/tcl/src/macros.pir"
 
 .macro set_tcl_argv()
   argc = argv # update
@@ -41,7 +41,7 @@
 .sub _main :main
   .param pmc argv
 
-  load_bytecode "languages/tcl/lib/tcllib.pbc"
+  load_bytecode "languages/tcl/runtime/tcllib.pbc"
 
   .local pmc retval,source
   .local string mode,chunk,contents,filename

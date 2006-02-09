@@ -1,4 +1,4 @@
-.include "languages/tcl/lib/returncodes.pir"
+.include "languages/tcl/src/returncodes.pir"
 
 =head1 exception handling macros
 

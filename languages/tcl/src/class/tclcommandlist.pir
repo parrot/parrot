@@ -1,5 +1,5 @@
-.include "languages/tcl/lib/returncodes.pir"
-.include "languages/tcl/lib/macros.pir"
+.include "languages/tcl/src/returncodes.pir"
+.include "languages/tcl/src/macros.pir"
 
 .namespace [ "TclCommandList" ]
 
@@ -16,7 +16,7 @@
   .param int register_num
 
   .local string pir_code,temp_code
-  pir_code = "# lib/tclcommandlist.pir :: compile\n"
+  pir_code = "# src/class/tclcommandlist.pir :: compile\n"
 
   .local pmc retval
   .local int i, elems

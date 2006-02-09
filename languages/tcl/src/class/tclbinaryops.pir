@@ -1,5 +1,5 @@
-.include "languages/tcl/lib/returncodes.pir"
-.include "languages/tcl/lib/macros.pir"
+.include "languages/tcl/src/returncodes.pir"
+.include "languages/tcl/src/macros.pir"
 
 .namespace [ "TclBinaryOp" ]
 
@@ -84,7 +84,7 @@ Initialize the attributes for an instance of the class
   .param int register_num
 
   .local string pir_code
-  pir_code="# lib/tclbinaryops.pir :: compile (1)\n"
+  pir_code="# src/class/tclbinaryops.pir :: compile (1)\n"
 
   .local pmc retval
   retval = new .TclInt
@@ -111,7 +111,7 @@ Initialize the attributes for an instance of the class
   #     type.
   .local string temp_code
   temp_code = <<"END_PIR"
-# lib/tclbinaryops.pir :: compile (2)
+# src/class/tclbinaryops.pir :: compile (2)
   .local pmc __number
   __number = find_global "_Tcl", "__number"
 push_eh l_code_check_%s
@@ -124,7 +124,7 @@ END_PIR
   l_code .= $S0
 
   temp_code = <<"END_PIR"
-# lib/tclbinaryops.pir :: compile (3)
+# src/class/tclbinaryops.pir :: compile (3)
 push_eh r_code_check_%s
   $P%s = __number($P%s)
 clear_eh

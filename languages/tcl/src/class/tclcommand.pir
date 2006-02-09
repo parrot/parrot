@@ -1,5 +1,5 @@
-.include "languages/tcl/lib/returncodes.pir"
-.include "languages/tcl/lib/macros.pir"
+.include "languages/tcl/src/returncodes.pir"
+.include "languages/tcl/src/macros.pir"
 
 .namespace [ "TclCommand" ]
 
@@ -32,7 +32,7 @@ Define the attributes required for the class.
    compile = find_global "_Tcl", "compile_dispatch"
 
    .local string pir_code, args, inlined, dynamic, invalid, error
-   pir_code = "# lib/tclcommand.pir :: compile\n"
+   pir_code = "# src/class/tclcommand.pir :: compile\n"
    args     = ""
    inlined  = ""
    dynamic  = ""

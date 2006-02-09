@@ -1,5 +1,5 @@
-.include "languages/tcl/lib/returncodes.pir"
-.include "languages/tcl/lib/macros.pir"
+.include "languages/tcl/src/returncodes.pir"
+.include "languages/tcl/src/macros.pir"
 
 .namespace [ "TclWord" ]
 
@@ -30,7 +30,7 @@ Define the attributes required for the class.
   len = self
   
   .local string pir_code,temp_code
-  pir_code = "# lib/tclword.pir :: compile\n"
+  pir_code = "# src/class/tclword.pir :: compile\n"
   .local pmc compiled_args
   compiled_args = new .TclList
 
