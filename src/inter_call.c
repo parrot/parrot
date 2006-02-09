@@ -25,21 +25,6 @@ subroutines.
 #include "parrot/oplib/ops.h"
 #include "inter_call.str"
 
-/*
- * the define below can't be turned on yet - all code that accesses
- * non-signature arrays, like :slurpy, must be outside the scope of
- * this define
- */ 
-/* #define PREMATURE_OPT */
-
-#ifdef PREMATURE_OPT
-
-#undef VTABLE_elements
-#define VTABLE_elements(i, ar) PMC_int_val(ar)
-#undef VTABLE_get_integer_keyed_int
-#define VTABLE_get_integer_keyed_int(i, ar, idx) ((INTVAL*)PMC_data(ar))[idx]
-
-#endif
 
 
 static int next_arg(Interp *, struct call_state_1 *st);
@@ -132,14 +117,12 @@ Parrot_init_arg_op(Interp *interpreter, parrot_context_t *ctx,
     if (pc) {
         ++pc;
         sig_pmc = ctx->constants[*pc]->u.key;
-        assert(PObj_is_PMC_TEST(sig_pmc));
-        assert(sig_pmc->vtable->base_type == enum_class_FixedIntegerArray);
+        ASSERT_SIG_PMC(sig_pmc);
         st->u.op.signature = sig_pmc;
         st->u.op.pc = pc + 1;
-        st->n = VTABLE_elements(interpreter, sig_pmc);
+        st->n = SIG_ELEMS(sig_pmc);
         if (st->n)
-            st->sig = VTABLE_get_integer_keyed_int(interpreter,
-                    sig_pmc, 0);
+            st->sig = SIG_ITEM(sig_pmc, 0);
     }
     return st->n > 0;
 }
@@ -329,8 +312,7 @@ next_arg(Interp *interpreter, struct call_state_1 *st)
     st->mode &= ~CALL_STATE_NEXT_ARG;
     switch (st->mode & CALL_S_D_MASK) {
         case CALL_STATE_OP:
-            st->sig = VTABLE_get_integer_keyed_int(interpreter,
-                    st->u.op.signature, st->i);
+            st->sig = SIG_ITEM(st->u.op.signature, st->i);
             break;
         case CALL_STATE_SIG:
             switch (st->u.sig.sig[st->i]) {
@@ -616,8 +598,7 @@ init_named(Interp *interpreter, struct call_state *st)
     st->dest.mode |= CALL_STATE_x_NAMED;
     st->dest.slurp = NULL;
     for (i = st->dest.i; i < st->dest.n; ++i) {
-        sig = VTABLE_get_integer_keyed_int(interpreter, 
-                st->dest.u.op.signature, i);
+        sig = SIG_ITEM(st->dest.u.op.signature, i);
         if (!(sig & PARROT_ARG_NAME))
             continue;
         if (sig & PARROT_ARG_SLURPY_ARRAY) {
@@ -650,8 +631,7 @@ locate_pos_named(Interp *interpreter, struct call_state *st)
     st->dest.mode &= ~CALL_STATE_SLURP;
     st->dest.mode |= CALL_STATE_x_NAMED;
     for (i = st->first_named; i < st->dest.n; ++i) {
-        sig = VTABLE_get_integer_keyed_int(interpreter, 
-                st->dest.u.op.signature, i);
+        sig = SIG_ITEM(st->dest.u.op.signature, i);
         if (!(sig & PARROT_ARG_NAME))
             continue;
         if (sig & PARROT_ARG_SLURPY_ARRAY)
@@ -660,8 +640,7 @@ locate_pos_named(Interp *interpreter, struct call_state *st)
         if (st->named_done & (1 << n_named))
             continue;
         ++i;
-        st->dest.sig = VTABLE_get_integer_keyed_int(interpreter, 
-                st->dest.u.op.signature, i);
+        st->dest.sig = SIG_ITEM(st->dest.u.op.signature, i);
         st->dest.i = i;
         st->named_done |= 1 << n_named;
         return 1;
@@ -684,8 +663,7 @@ locate_named_named(Interp *interpreter, struct call_state *st)
     st->dest.mode &= ~CALL_STATE_SLURP;
     st->dest.mode &= ~CALL_STATE_OPT;
     for (i = st->first_named; i < st->dest.n; ++i) {
-        sig = VTABLE_get_integer_keyed_int(interpreter, 
-                st->dest.u.op.signature, i);
+        sig = SIG_ITEM(st->dest.u.op.signature, i);
         if (!(sig & PARROT_ARG_NAME))
             continue;
         if (sig & PARROT_ARG_SLURPY_ARRAY) {
@@ -698,8 +676,7 @@ locate_named_named(Interp *interpreter, struct call_state *st)
         if (st->name == param ||
                 0 == string_equal(interpreter, st->name, param)) {
             ++i;
-            st->dest.sig = VTABLE_get_integer_keyed_int(interpreter, 
-                    st->dest.u.op.signature, i);
+            st->dest.sig = SIG_ITEM(st->dest.u.op.signature, i);
             st->dest.i = i;
             /* if bit is set we got duplicated */
             if (st->named_done & (1 << n_named))
@@ -801,8 +778,7 @@ check_named(Interp *interpreter, struct call_state *st, const char *action)
     n_named = -1;
     was_set = n_i = 0;
     for (i = st->first_named; i < st->dest.n; ++i) {
-        st->dest.sig = sig = VTABLE_get_integer_keyed_int(interpreter, 
-                st->dest.u.op.signature, i);
+        st->dest.sig = sig = SIG_ITEM(st->dest.u.op.signature, i);
         if ((sig & PARROT_ARG_NAME)) {
             if (sig & PARROT_ARG_SLURPY_ARRAY)
                 break;
