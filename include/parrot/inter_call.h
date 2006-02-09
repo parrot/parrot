@@ -122,6 +122,14 @@ INTVAL set_retval_i(Interp*, int sig_ret, parrot_context_t *ctx);
     } \
 } while (0)
 
+#define ASSERT_SIG_PMC(sig) \
+    assert(PObj_is_PMC_TEST(sig) && \
+           sig->vtable->base_type == enum_class_FixedIntegerArray)
+
+#define SIG_ELEMS(sig) PMC_int_val(sig)
+#define SIG_ARRAY(sig) (INTVAL*)PMC_data(sig)
+#define SIG_ITEM(sig, idx) (SIG_ARRAY(sig))[idx]
+
 #endif /* PARROT_INTER_CALL_H_GUARD */
 
 /*

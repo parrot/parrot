@@ -268,7 +268,7 @@ pass_int(Interp *interpreter, PMC *sig, char *src_base, void **src,
 		char *dest_base, void **dest)
 {
     INTVAL arg;
-    int i, n = PMC_int_val(sig);
+    int i, n = SIG_ELEMS(sig);
     for (i = 2 ; n; ++i, --n) {
         arg = *(INTVAL *)(src_base + ((opcode_t*)src)[i]);
         *(INTVAL *)(dest_base + ((opcode_t*)dest)[i])= arg;
@@ -281,7 +281,7 @@ pass_num(Interp *interpreter, PMC *sig, char *src_base, void **src,
 		char *dest_base, void **dest)
 {
     FLOATVAL arg;
-    int i, n = PMC_int_val(sig);
+    int i, n = SIG_ELEMS(sig);
     for (i = 2 ; n; ++i, --n) {
         arg = *(FLOATVAL *)(src_base + ((opcode_t*)src)[i]);
         *(FLOATVAL *)(dest_base + ((opcode_t*)dest)[i])= arg;
@@ -294,7 +294,7 @@ pass_str(Interp *interpreter, PMC *sig, char *src_base, void **src,
 		char *dest_base, void **dest)
 {
     STRING* arg;
-    int i, n = PMC_int_val(sig);
+    int i, n = SIG_ELEMS(sig);
     for (i = 2 ; n; ++i, --n) {
         arg = *(STRING* *)(src_base + ((opcode_t*)src)[i]);
         *(STRING* *)(dest_base + ((opcode_t*)dest)[i])= arg;
@@ -307,7 +307,7 @@ pass_pmc(Interp *interpreter, PMC *sig, char *src_base, void **src,
 		char *dest_base, void **dest)
 {
     PMC* arg;
-    int i, n = PMC_int_val(sig);
+    int i, n = SIG_ELEMS(sig);
     for (i = 2 ; n; ++i, --n) {
         arg = *(PMC* *)(src_base + ((opcode_t*)src)[i]);
         *(PMC* *)(dest_base + ((opcode_t*)dest)[i])= arg;
@@ -320,15 +320,14 @@ pass_mixed(Interp *interpreter, PMC *sig, char *src_base, void **src,
 		char *dest_base, void **dest)
 {
     PMC* argP;
-    int i, n = PMC_int_val(sig);
+    int i, n = SIG_ELEMS(sig);
     INTVAL *bitp, bits;
     INTVAL argI;
     FLOATVAL argN;
     STRING *argS;
 
-    assert(PObj_is_PMC_TEST(sig));
-    assert(sig->vtable->base_type == enum_class_FixedIntegerArray);
-    bitp = PMC_data(sig);
+    ASSERT_SIG_PMC(sig);
+    bitp = SIG_ARRAY(sig);
     for (i = 2 ; n; ++i, --n) {
         bits = *bitp++;
         switch (bits) {
@@ -380,20 +379,18 @@ pic_check_sig(Interp *interpreter, PMC *sig1, PMC *sig2, int *type)
 {
     int i, n, t0, t1, t2;
 
-    assert(PObj_is_PMC_TEST(sig1));
-    assert(sig1->vtable->base_type == enum_class_FixedIntegerArray);
-    assert(PObj_is_PMC_TEST(sig2));
-    assert(sig2->vtable->base_type == enum_class_FixedIntegerArray);
-    n = VTABLE_elements(interpreter, sig1);
-    if (n != VTABLE_elements(interpreter, sig2))
+    ASSERT_SIG_PMC(sig1);
+    ASSERT_SIG_PMC(sig2);
+    n = SIG_ELEMS(sig1);
+    if (n != SIG_ELEMS(sig2))
         return -1;
     if (!n) {
         *type = 0;
         return 0;
     }
     for (i = 0; i < n; ++i) {
-        t1 = VTABLE_get_integer_keyed_int(interpreter, sig1, i);
-        t2 = VTABLE_get_integer_keyed_int(interpreter, sig2, i);
+        t1 = SIG_ITEM(sig1, i);
+        t2 = SIG_ITEM(sig2, i);
         if (!i) {
             t0 = t1 & PARROT_ARG_TYPE_MASK;
             *type = t0;
@@ -451,7 +448,7 @@ is_pic_param(Interp *interpreter, void **pc, Parrot_MIC* mic, opcode_t op)
             return 0;
     }
     else {
-        if (VTABLE_elements(interpreter, sig1) == 0) {
+        if (SIG_ELEMS(sig1) == 0) {
             sig2 = NULL;
             type = n = 0;
         }
@@ -552,9 +549,8 @@ is_pic_func(Interp *interpreter, void **pc, Parrot_MIC *mic, int core_type)
     base = (char*)interpreter->ctx.bp.regs_i;
     ctx = CONTEXT(interpreter->ctx);
     sig = (PMC*)(pc[1]);
-    assert(PObj_is_PMC_TEST(sig));
-    assert(sig->vtable->base_type == enum_class_FixedIntegerArray);
-    n = VTABLE_elements(interpreter, sig);
+    ASSERT_SIG_PMC(sig);
+    n = SIG_ELEMS(sig);
     interpreter->current_args = (opcode_t*)pc + ctx->pred_offset;
     pc += 2 + n;
     op = (opcode_t*)pc + ctx->pred_offset;
