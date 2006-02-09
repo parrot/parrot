@@ -497,7 +497,7 @@ op set_args(inconst PMC) {
 
     /* for now just point to the opcode */
     interpreter->current_args = this;
-    argc = VTABLE_elements(interpreter, signature);
+    argc = SIG_ELEMS(signature);
     goto OFFSET(argc + 2);
 }
 
@@ -507,7 +507,7 @@ op get_results(inconst PMC) {
     INTVAL argc;
 
     CONTEXT(interpreter->ctx)->current_results = this;
-    argc = VTABLE_elements(interpreter, signature);
+    argc = SIG_ELEMS(signature);
     goto OFFSET(argc + 2);
 }
 
@@ -551,7 +551,7 @@ op set_returns(inconst PMC) {
 	parrot_pass_args(interpreter, ctx, caller_ctx,
 		PARROT_OP_get_results_pc);
     }
-    argc = VTABLE_elements(interpreter, signature);
+    argc = SIG_ELEMS(signature);
     goto OFFSET(argc + 2);
 }
 
@@ -567,19 +567,21 @@ specified in F<docs/pdds/pdd03_calling_conventions.pod>.
 inline op result_info(out PMC) {
     /* Get context of callee from return continuation. */
     PMC *cc = CONTEXT(interpreter->ctx)->current_cont;
-    PMC *i = NULL;
-    if (cc && PMC_cont(cc)->to_ctx)
-    {
-        /* Find results PMC index and get PMC. */
-        opcode_t results_pmc = PMC_cont(cc)->to_ctx->current_results[1];
-        i = PF_CONST(PMC_cont(cc)->seg, results_pmc)->u.key;
+    PMC *sig = NULL;
+    if (cc && PMC_cont(cc)->to_ctx) {
+	/* caller context has results */
+        opcode_t *results = PMC_cont(cc)->to_ctx->current_results;
+        if (results) {
+	    /* get results PMC index and get PMC. */
+	    sig = PF_CONST(PMC_cont(cc)->seg, results[1])->u.key;
+	}
     }
 
     /* If no elements, hand back empty array; otherwise PMC. */
-    if (PMC_IS_NULL(i))
+    if (!sig)
         $1 = pmc_new(interpreter, enum_class_FixedIntegerArray);
     else
-        $1 = i;
+        $1 = sig;
     goto NEXT();
 }
 

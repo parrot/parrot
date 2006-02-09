@@ -257,21 +257,20 @@ inline op pic_callr__(inconst PMC) :pic {
     pc = ctx->current_results;
     if (pc) {
         pred_pc = (void**) pc - ctx->pred_offset;
-        args[0] = (_reg_base + ((opcode_t*)pred_pc)[2]);
-        assert((sig = (PMC*)(pred_pc[1])) &&
-                PObj_is_PMC_TEST(sig) &&
-                sig->vtable->base_type == enum_class_FixedIntegerArray &&
-                VTABLE_elements(interpreter, sig) == 1);
+        sig = (PMC*)(pred_pc[1]);
+        ASSERT_SIG_PMC(sig);
+        assert(SIG_ELEMS(sig) <= 1);
+        args[0] = SIG_ELEMS(sig) ? 
+            (_reg_base + ((opcode_t*)pred_pc)[2]) : NULL;
     }
     else
         args[0] = NULL;
     /* set_args */
     n_args = 0;
     sig = mic->m.sig;
-    assert(PObj_is_PMC_TEST(sig) &&
-            sig->vtable->base_type == enum_class_FixedIntegerArray);
-    n_args = VTABLE_elements(interpreter, sig);
-    sig_bits = PMC_data(sig);
+    ASSERT_SIG_PMC(sig);
+    n_args = SIG_ELEMS(sig);
+    sig_bits = SIG_ARRAY(sig);
     for (i = 0; i < n_args; ++i) {
         switch (sig_bits[i]) {
             case PARROT_ARG_INTVAL:
