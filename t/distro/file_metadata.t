@@ -32,6 +32,12 @@ NOTE: these tests take a B<LONG> time to run.
 
 =cut
 
+
+# get files listed in MANIFEST
+my @manifest_files =
+	sort keys %{maniread( catfile $PConfig{build_dir}, 'MANIFEST' )};
+
+
 ## all test files have "text/plain" mime-type
 TEST_MIME: {
 	my $test_dir = 't';
@@ -58,18 +64,15 @@ TEST_MIME: {
 	) for @test_files;
 } # TEST_MIME
 
+
 ## keyword expansion
 KEYWORD_EXP: {
-	my @all_files;
-
 	diag "this may take a while...";
-
-	# get files listed in MANIFEST
-	@all_files = sort keys %{maniread( catfile $PConfig{build_dir}, 'MANIFEST' )};
 
 	my @cmd = qw(svn pg svn:mime-type);
 
-	my @plain_files = grep { $_ if qx(@cmd $_) =~ m!text/plain! } @all_files;
+	my @plain_files =
+		grep { $_ if qx(@cmd $_) =~ m!text/plain! } @manifest_files;
 	chomp @plain_files;
 
 	@cmd = qw(svn pg svn:keywords);
@@ -84,6 +87,34 @@ KEYWORD_EXP: {
 	) for @plain_files;
 } # KEYWORD_EXP
 
+
+## Copyright keyword
+COPYRIGHT: {
+	my $readme = catfile( $PConfig{build_dir}, 'README' );
+	open my $IN, '<' => $readme
+		or die qq|can't open $readme: $!|;
+
+	my $official_copyright;
+	while( <$IN> )
+	{
+		next unless m/^Parrot is (Copyright .*)/;
+		$official_copyright = $1;
+		last;
+	}
+	fail('official copyright not found') and last COPYRIGHT
+		unless length $official_copyright;
+
+	my @cmd = qw(svn pg Copyright);
+
+	my $msg = 'Copyright property matches official copyright';
+	diag $msg;
+
+	is(
+		sub{ my $r = qx(@cmd $_); chomp $r; "$_: $r" }->(),
+		"$_: $official_copyright",
+		"$msg ($_)"
+	) for @manifest_files;
+}
 
 # remember to change the number of tests :-)
 BEGIN {
