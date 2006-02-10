@@ -22,7 +22,7 @@ use strict;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 8;
+use Parrot::Test tests => 10;
 use Test::More;
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'for 1, 10, 2' );
@@ -104,5 +104,35 @@ end
 CODE
 1
 3
+OUT
+
+language_output_is( 'lua', <<'CODE', <<'OUT', 'for tonumber' );
+local function first() print("first",1); return 1 end
+local function limit() print("limit",8); return 8 end
+local function step()  print("step",2);  return 2 end
+
+for i = first(), limit(), step() do
+    print(i)
+end
+CODE
+first	1
+limit	8
+step	2
+1
+3
+5
+7
+OUT
+
+language_output_like( 'lua', <<'CODE', <<'OUT', 'for tonumber' );
+local function first() return 1 end
+local function limit() return end
+local function step()  return 2 end
+
+for i = first(), limit(), step() do
+    print(i)
+end
+CODE
+/`for' limit must be a number/
 OUT
 

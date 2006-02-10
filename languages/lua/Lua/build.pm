@@ -790,76 +790,21 @@ sub BuildForNum {
 	push @opcodes, @{$e_start->[1]};
 	push @opcodes, @{$e_limit->[1]};
 	push @opcodes, @{$e_step->[1]};
-	my $global = get_global($parser);
-	push @opcodes, @{$global->[1]};
-	my $key_tonumber = BuildLiteral($parser, "tonumber", "key");
-	push @opcodes, @{$key_tonumber->[1]};
-	my $fct_tonumber = new_tmp($parser, "pmc");
-	push @opcodes, new LocalDir($parser,
-			'result'				=>	$fct_tonumber,
-	);
-	push @opcodes, new KeyedGetOp($parser,
-			'result'				=>	$fct_tonumber,
-			'arg1'					=>	$global->[0],
-			'arg2'					=>	$key_tonumber->[0],
-	);
-	push @opcodes, new CallOp($parser,
-			'result'				=>	[ $var->[0] ],
-			'arg1'					=>	$fct_tonumber,
-			'arg2'					=>	[ $e_start->[0]],
-	);
 	my $limit = new_tmp($parser, "pmc", "number");
 	push @opcodes, new LocalDir($parser,
 			'result'				=>	$limit,
-	);
-	push @opcodes, new CallOp($parser,
-			'result'				=>	[ $limit ],
-			'arg1'					=>	$fct_tonumber,
-			'arg2'					=>	[ $e_limit->[0]],
 	);
 	my $step = new_tmp($parser, "pmc", "number");
 	push @opcodes, new LocalDir($parser,
 			'result'				=>	$step,
 	);
+	my $fct = new defn("checkforloop", "util");
 	push @opcodes, new CallOp($parser,
-			'result'				=>	[ $step ],
-			'arg1'					=>	$fct_tonumber,
-			'arg2'					=>	[ $e_step->[0]],
-	);
-	my $lbl_err = new_label($parser);
-	push @opcodes, new BranchUnlessOp($parser,
-			'arg1'					=>	$var->[0],
-			'result'				=>	$lbl_err,
-	);
-	push @opcodes, new BranchUnlessOp($parser,
-			'arg1'					=>	$limit,
-			'result'				=>	$lbl_err,
-	);
-	push @opcodes, new BranchUnlessOp($parser,
-			'arg1'					=>	$step,
-			'result'				=>	$lbl_err,
+			'result'				=>	[ $var->[0], $limit, $step ],
+			'arg1'					=>	$fct,
+			'arg2'					=>	[ $e_start->[0], $e_limit->[0], $e_step->[0] ],
 	);
 	my $lbl_loop = new_label($parser);
-	push @opcodes, new BranchOp($parser,
-			'result'				=>	$lbl_loop,
-	);
-	push @opcodes, new LabelOp($parser,
-			'arg1'					=>	$lbl_err,
-	);
-	my $key_error = BuildLiteral($parser, "error", "key");
-	push @opcodes, @{$key_error->[1]};
-	my $fct_error = new_tmp($parser, "pmc");
-	push @opcodes, new LocalDir($parser,
-			'result'				=>	$fct_error,
-	);
-	push @opcodes, new KeyedGetOp($parser,
-			'result'				=>	$fct_error,
-			'arg1'					=>	$global->[0],
-			'arg2'					=>	$key_error->[0],
-	);
-	push @opcodes, new CallOp($parser,
-			'arg1'					=>	$fct_error,
-	);
 	push @opcodes, new LabelOp($parser,
 			'arg1'					=>	$lbl_loop,
 	);

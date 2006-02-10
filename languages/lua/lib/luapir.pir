@@ -39,6 +39,33 @@ L1:
 .end
 
 
+=item C<checkforloop (start, limit, step)>
+
+=cut
+
+.sub checkforloop
+    .param pmc start
+    .param pmc limit
+    .param pmc step
+    .local pmc ret_start
+    ret_start = start."tonumber"()
+    if ret_start goto L1
+    error("`for' initial value must be a number")
+L1:    
+    .local pmc ret_limit
+    ret_limit = limit."tonumber"()
+    if ret_limit goto L2
+    error("`for' limit must be a number")
+L2:    
+    .local pmc ret_step
+    ret_step = step."tonumber"()
+    if ret_step goto L3
+    error("`for' step must be a number")
+L3:    
+    .return (ret_start, ret_limit, ret_step)
+.end
+
+
 =item C<checknumber (arg)>
 
 =cut
