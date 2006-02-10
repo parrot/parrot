@@ -1,3 +1,6 @@
+# $Copyright$
+# $Id$
+
 =pod
 
 =head1 Title

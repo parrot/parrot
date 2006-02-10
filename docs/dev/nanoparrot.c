@@ -1,5 +1,6 @@
 /*
- * nanoparrot.c
+ * $Copyright$
+ * $Id$
  *
  * - demonstrates how the interpreter interprets bytecode
  *   its vastly simplified but the very basics are the same

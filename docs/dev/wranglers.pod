@@ -1,3 +1,4 @@
+# $Copyright$
 # $Id$
 
 =pod

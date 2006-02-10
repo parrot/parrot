@@ -1,3 +1,4 @@
+$ $Copyright$
 # $Id$
 
 =head1 NAME
