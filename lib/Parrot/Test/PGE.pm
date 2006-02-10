@@ -201,15 +201,19 @@ sub _generate_pir_for {
             target = $unicode"$target"
             pattern = "$pattern"
             (rulesub, code, exp) = p6rule_compile(pattern)
+            if_null rulesub, rule_fail
             match = rulesub(target)
             unless match goto match_fail
           match_success:
             print "matched"
             $captures
-            goto match_end
+            goto end
           match_fail:
             print "failed"
-          match_end:
+            goto end
+          rule_fail:
+            print "rule error"
+          end:
         .end\n);
 }
 

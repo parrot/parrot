@@ -610,6 +610,8 @@
     .local pmc sub
     .local pmc pad
 
+    null code
+    null sub
     if has_name goto p6rule_1
     name = "_pge_rule"
     if has_gram goto p6rule_1
@@ -621,6 +623,9 @@
 
     $P0 = find_global "PGE::Rule", "p6rule"
     exp = $P0(exp)
+    unless exp goto end
+    $S0 = exp
+    if $S0 != pattern goto end
     pad = new .Hash
     $P0 = new .Hash
     pad["reps"] = $P0
@@ -630,6 +635,7 @@
     $P0 = exp["expr"]
     $P0 = $P0.p6analyze(pad)
     exp["expr"] = $P0
+    if_null $P0, end
 
     $P0 = new .String
     $P0 = "\n.namespace [ \""

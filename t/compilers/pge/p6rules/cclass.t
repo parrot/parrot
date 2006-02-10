@@ -94,7 +94,7 @@ p6rule_is  ('---x--', '<-[+\-]>?', 'negated optional escaped hyphen in range');
 p6rule_is  ('------', '<-[+\-]>?', 'negated optional escaped hyphen in range');
 
 # 'greater than' and 'less than' need no escapes
-p6rule_is  ('><', '^><[<]>', 'lt character class');
+p6rule_like('><', '^><[<]>', '/rule error/', 'lt character class');
 p6rule_is  ('><', '^<[>]><', 'gt character class',
         todo => 'parse error not yet implemented');
 p6rule_is  ('><', '^<[><]>**{2}', 'gt, lt character class');

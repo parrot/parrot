@@ -286,6 +286,7 @@ representing the result of the parse.
     unless tok goto expect_term_empty
     bsr tok_match
     if oper goto found_term
+    if key == "" goto null_term
   expect_term_empty:
     unless termempty goto null_term
     tok = termempty
@@ -294,14 +295,19 @@ representing the result of the parse.
     bsr tok_match
     if oper goto found_term
   null_term:
-    unless tokstack goto term_error
+    unless tokstack goto missing_term
     top = tokstack[-1]
     $S0 = top["opts"]
     $I0 = index $S0, "nullterm"
-    if $I0 < 0 goto term_error
-    oper = newfrom(mob, wspos, "PGE::Match")
+    if $I0 < 0 goto missing_term
+    (oper, $S0, $P0, $P1) = newfrom(mob, wspos, "PGE::Match")
+    $P1 = wspos
     push termstack, oper
     goto expect_oper
+  missing_term:
+    $P0 = newfrom(mob, wspos, "PGE::Match")
+    push termstack, $P0
+    goto end
   found_term:
     tokcat = tok["syncat"]
     pos = oper.to()
@@ -380,13 +386,19 @@ representing the result of the parse.
     arity = $P0["arity"]
     $P0 = pop operstack
   reduce_args:
-    if arity < 1 goto reduce_end
-    dec arity
+    if arity < 1 goto reduce_saveterm
     $P1 = pop termstack
+    unless $P1 goto reduce_backtrack
+    dec arity
     $P0[arity] = $P1
     goto reduce_args
-  reduce_end:
+  reduce_backtrack:
+    pos = $P0.from()
+    if arity > 1 goto reduce_end
+    $P0 = $P1
+  reduce_saveterm:
     push termstack, $P0
+  reduce_end:
     ret
 
   tok_match:
@@ -413,20 +425,15 @@ representing the result of the parse.
     bsr reduce
     goto end
   end_1:
+    $I0 = elements termstack
+    if $I0 < 1 goto end_2
     $P0 = pop termstack
+    unless $P0 goto end_2
     mob["expr"] = $P0
     mpos = pos
     .return (mob)
-
-  term_error:
-    $P0 = new .Exception
-    $S0 = "Missing term at offset "
-    $S1 = wspos
-    $S0 .= $S1
-    $S0 .= "\n"
-    $P0["_message"] = $S0
-    throw $P0
-    mpos = -1
+  end_2:
+    mpos = -1 
     .return (mob)
 
   ternary_error:

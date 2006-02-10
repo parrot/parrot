@@ -188,7 +188,7 @@ p6rule_is  ('az', '<+alpha>+', 'metasyntax with leading + (<+...>)',
 
 
 ## null pattern is illegal
-p6rule_like($str, '', '/Missing term at offset.*/',
+p6rule_like($str, '', '/rule error/',
     'null pattern ()');
 
 
