@@ -260,6 +260,28 @@ op find_global(out PMC, in KEY, in STR) {
 
 =back
 
+=head2 More Experimental Ops
+
+=over 4
+
+=item C<debug_brk>
+
+Break into debugger. Implementation notes:
+
+ - x86/gcc ... works with gdb
+ - TODO
+
+For other architectures, this is a C<noop>.
+
+=cut
+
+op debug_brk() {
+#if defined(__GNUC__) && defined(i386)
+    __asm__("int3");       /* opcode 0xcc */
+#endif
+    goto NEXT();
+}
+
 =head1 COPYRIGHT
 
 Copyright (C) 2001-2004 The Perl Foundation.  All rights reserved.
