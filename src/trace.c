@@ -243,6 +243,8 @@ trace_op_dump(Interp *interpreter, opcode_t *code_start,
     PMC *sig;
     int type;
 
+    sig = NULL; /* silence compiler uninit warning */
+
     s = 1;
     PIO_eprintf(interpreter, "%6vu ", (UINTVAL)(pc - code_start));
     if (strcmp(info->name, "infix") == 0) {

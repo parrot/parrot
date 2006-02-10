@@ -944,6 +944,8 @@ multi_keyed(Interp *interpreter, IMC_Unit * unit, char *name,
     SymReg *nreg[3];
     Instruction *ins = 0;
 
+    UNUSED(emit);
+
     /* count keys in keyvec */
     kv = keyvec;
     for (i = keyf = 0; i < nr; i++, kv >>= 1)

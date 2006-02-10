@@ -1054,7 +1054,7 @@ verify_signature(Interp *interpreter, Instruction *ins, opcode_t *pc)
     PMC *sig_arr = interpreter->code->const_table->constants[pc[-1]]->u.key;
     INTVAL i, n, sig;
     SymReg *r;
-    int no_consts, needed;
+    int no_consts, needed=0;
     PMC *changed_sig = NULL;
 
     assert(PObj_is_PMC_TEST(sig_arr));

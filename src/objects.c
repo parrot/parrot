@@ -736,6 +736,7 @@ class_mro_merge(Interp* interpreter, PMC *seqs)
 {
     PMC *res, *seq, *cand, *nseqs, *s;
     INTVAL i, j, k;
+    cand = NULL; /* silence compiler uninit warning */
 
     res = pmc_new(interpreter, enum_class_ResizablePMCArray);
     while (1) {

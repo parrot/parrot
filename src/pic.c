@@ -378,6 +378,7 @@ int
 parrot_pic_check_sig(Interp *interpreter, PMC *sig1, PMC *sig2, int *type)
 {
     int i, n, t0, t1, t2;
+    t0 = 0; /* silence compiler uninit warning */
 
     ASSERT_SIG_PMC(sig1);
     ASSERT_SIG_PMC(sig2);

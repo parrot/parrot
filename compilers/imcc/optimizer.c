@@ -486,6 +486,8 @@ constant_propagation(Interp *interpreter, IMC_Unit * unit)
     int any = 0;
     int found;
 
+    o = c = NULL; /* silence compiler uninit warning */
+
     IMCC_info(interpreter, 2, "\tconstant_propagation\n");
     for (ins = unit->instructions; ins; ins = ins->next) {
         found = 0;
