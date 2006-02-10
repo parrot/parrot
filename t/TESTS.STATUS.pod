@@ -81,6 +81,8 @@ This rearranges B<PASM> code to make it run faster.
 B<Good>. Most optimizations are well-tested.
 Tests under B<t/compilers/imcc/imcpasm/>.
 
+=back
+
 =head3 Interpreter
 
 This is the core of Parrot. It comprises the various runcores, input/output,
