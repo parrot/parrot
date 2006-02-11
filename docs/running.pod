@@ -133,6 +133,8 @@ Preprocess source file (i.e. expand macros) and print result to stdout. E.g.
 
 =head2 Run Core Options
 
+TODO:  The default run core should be indicated.
+
 =over 4
 
 =item -b, --bounds-checks, --slow-core
@@ -141,7 +143,7 @@ Select the bounds-checking slow core.
 
 =item -C, --CGP-core
 
-Select the CGP (CGoto Predereferenced) core.
+Select the CGP (CGoto Predereferenced) core (if available).
 
 =item -f, --fast-core
 
@@ -149,19 +151,19 @@ Select the fast (or function) core.
 
 =item -g, --computed-goto-core
 
-Select the CGoto core.
+Select the CGoto core (if available).
 
 =item -j, --jit-core
 
-Run with the JIT subsystem.
+Run with the JIT subsystem (if available).
 
 =item -p, --profile
 
-Run with the slow core and do print an execution profile.
+Run with the slow core and print an execution profile.
 
-=item -P, --predereferenced-core
+=item -S, --switched-core
 
-Predereference opcode function arguments on the fly.
+TODO:  This needs to be documented briefly here and also in glossary.pod.
 
 =item -t, --trace
 

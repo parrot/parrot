@@ -13,7 +13,7 @@ familiarity with common VM techniques but relatively little knowledge of Parrot
 internals.  For each feature, a brief description of its purpose, hints on
 helping to port it, and pointers to more information are included.
 
-=head1 CGoto
+=head1 CGoto or CGP (CGoto Predereferenced)
 
 =head2 What it is
 
