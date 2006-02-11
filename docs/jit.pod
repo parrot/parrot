@@ -584,4 +584,4 @@ XXX (p)rinting register contents like shown above is currently not supported.
 
 =head1 SEE ALSO
 
-F<docs/dev/jit_i386.dev>, F<jit/skeleton/jit_emit.h> 
+F<docs/dev/jit_i386.pod>, F<jit/skeleton/jit_emit.h> 
