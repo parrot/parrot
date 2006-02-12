@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 14;
+use Parrot::Test tests => 13;
 use Parrot::Config;
 use Cwd;
 use File::Spec;
@@ -321,26 +321,3 @@ OUT
   ok( $nl > 1, "hard link was really created");
   unlink "xpto" if -f "xpto"
 }
-
-# Test ls
-pir_output_is(<< 'CODE', << "OUT", "Test ls");
-.sub main :main
-    $P1 = new .OS
-    $P2 = $P1."ls"('.')
-
-    $I0 = 0
-foo:
-    $I1 = $P2
-    unless $I0 < $I1 goto bar
-    $S0 = $P2[$I0]
-    if $S0 == "MANIFEST" goto baz
-    inc $I0
-    goto foo
-bar:
-    print "not "
-baz:
-    print "ok\n"
-.end
-CODE
-ok
-OUT

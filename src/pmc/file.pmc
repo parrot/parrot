@@ -2,9 +2,6 @@
 Copyright: 2001-2006 The Perl Foundation.  All Rights Reserved.
 $Id$
 
-This document might be useful:
-  http://mail.python.org/pipermail/python-dev/2006-January/060026.html
-
 =head1 NAME
 
 src/pmc/file.pmc - File PMC

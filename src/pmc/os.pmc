@@ -21,8 +21,6 @@ files and directories.
 
 #ifdef WIN32
 #include <direct.h>
-#else
-#include <dirent.h>
 #endif
 
 #include "parrot/parrot.h"
@@ -431,47 +429,6 @@ idea to do the same with parrot.
 #endif
     }
 
-/*
-
-=item C<PMC* ls(STRING *path)>
-
-Changes the current working directory to the one specified by C<path>.
-
-=cut
-
-*/
-
-    METHOD PMC* ls(STRING *path) {
-#ifndef WIN32
-        int error;
-        DIR* dir;
-        struct dirent* file;
-        PMC *array;
-        STRING *filename;
-        char *cpath = string_to_cstring(interpreter, path);
-        array = pmc_new(interpreter, enum_class_ResizableStringArray);
-        if ((dir = opendir(cpath)) != NULL) {
-            while ((file = readdir(dir)) != NULL) {
-                filename = string_from_cstring(interpreter, file->d_name, file->d_namlen);
-                VTABLE_push_string(interpreter, array, filename);
-            }
-            string_cstring_free(cpath);
-            error = closedir(dir);
-            if (error) {
-                char *errmsg = strerror(errno);
-                real_exception(interpreter, NULL, E_SystemError, errmsg);
-            }
-        }
-        else {
-            char *errmsg = strerror(errno);
-            real_exception(interpreter, NULL, E_SystemError, errmsg);
-        }
-        return array;
-#else
-        internal_exception(UNIMPLEMENTED, "Win32 is not POSIX. Need win32 developer!");
-        return NULL;
-#endif
-    }
 }
 
 /*
@@ -481,7 +438,7 @@ Changes the current working directory to the one specified by C<path>.
 =head1 SEE ALS0
 
    chdir(2), getcwd(3), unlink(2), mkdir(2), stat(2), lstat(2),
-   symlink(2), link(2), umask(2), chroot(2), dir(5)
+   symlink(2), link(2), umask(2), chroot(2)
 
 =cut
 
