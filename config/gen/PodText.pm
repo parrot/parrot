@@ -47,7 +47,7 @@ use base qw(Parrot::Configure::Step::Base);
 
 use Pod::Text;
 
-$description = "Generating plain text docs...";
+$description = "Generating plain text docs from Pod...";
 
 @args = qw(verbose);
 
@@ -59,7 +59,10 @@ sub runstep
 
     my $parser = Pod::Text->new(width => 79);
 
+    my $count = 0; # number of processed files
     foreach my $pod (keys %docs) {
+        $count++;
+
         my $plain = $docs{$pod};
         $parser->parse_from_file($pod, $plain);
 
@@ -80,7 +83,9 @@ sub runstep
         close($fh) or die "can not close file $plain: $!";
     }
 
-    $result = 'Done';
+    $result = $count ? 'done' : 'no files to process';
+
+    return $self;
 }
 
 1;
