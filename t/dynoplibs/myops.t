@@ -57,7 +57,7 @@ CODE
 fortytwo
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "hcf");
+pir_output_like(<< 'CODE', << 'OUTPUT', "hcf");
 .sub main :main
     loadlib P1, "myops_ops"
     print "neither here\n"
@@ -65,7 +65,8 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "hcf");
     print "nor there\n"
 .end
 CODE
-neither here
+/neither here
+(?!nor there)/
 OUTPUT
 
 {
