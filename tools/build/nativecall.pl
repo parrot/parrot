@@ -8,7 +8,7 @@ tools/build/nativecall.pl - Build up the native call routines
 
 =head1 SYNOPSIS
 
-	% perl tools/build/nativecall.pl src/call_list.txt
+    % perl tools/build/nativecall.pl src/call_list.txt
 
 =head1 DESCRIPTION
 
@@ -200,15 +200,15 @@ while (<>) {
         foreach (split //, $args) {
             push @arg, make_arg($_, $reg_num++, \$temp_cnt, \@temps,
                                 \@extra_preamble, \@extra_postamble);
-	    $sig .= $sig_char{$_};
-	    $_ eq 'J' && $reg_num--;
+            $sig .= $sig_char{$_};
+            $_ eq 'J' && $reg_num--;
         }
     }
 
     print_function($sig, $ret, $args, [@arg], $ret_type{$ret},
                  $ret_type_decl{$ret}, $func_call_assign{$ret},
                  $other_decl{$ret}, $ret_assign{$ret},
-		 \@temps,
+                 \@temps,
                  \@extra_preamble, \@extra_postamble,
                  \@put_pointer,
                  \%proto_type);
@@ -360,122 +360,122 @@ sub make_arg {
     # can operate in sequence
     #
     my ($argtype, $reg_num, $temp_cnt_ref, $temps_ref,
-	$extra_preamble_ref, $extra_postamble_ref) = @_;
+        $extra_preamble_ref, $extra_postamble_ref) = @_;
 
-	local $_ = $argtype;
+    local $_ = $argtype;
     my $temp_num = ${$temp_cnt_ref}++;
     /p/ && do {
-	push @{$temps_ref}, "PMC *t_$temp_num;";
-	push @{$extra_preamble_ref},
-	    "t_$temp_num = GET_NCI_P($reg_num);";
-	return "PMC_data(t_$temp_num)";
+        push @{$temps_ref}, "PMC *t_$temp_num;";
+        push @{$extra_preamble_ref},
+            "t_$temp_num = GET_NCI_P($reg_num);";
+        return "PMC_data(t_$temp_num)";
     };
     /i/ && do {
-	push @{$temps_ref}, "int t_$temp_num;";
-	push @{$extra_preamble_ref},
-	    "t_$temp_num = (int)GET_NCI_I($reg_num);";
-	return "t_$temp_num";
+        push @{$temps_ref}, "int t_$temp_num;";
+        push @{$extra_preamble_ref},
+            "t_$temp_num = (int)GET_NCI_I($reg_num);";
+        return "t_$temp_num";
     };
     /3/ && do {
-	push @{$temps_ref}, "PMC *t_$temp_num;";
-	push @{$extra_preamble_ref},
-	    "t_$temp_num = GET_NCI_P($reg_num);";
-	return "(int*)&PMC_int_val(t_$temp_num)";
+        push @{$temps_ref}, "PMC *t_$temp_num;";
+        push @{$extra_preamble_ref},
+            "t_$temp_num = GET_NCI_P($reg_num);";
+        return "(int*)&PMC_int_val(t_$temp_num)";
     };
     /l/ && do {
-	push @{$temps_ref}, "long t_$temp_num;";
-	push @{$extra_preamble_ref},
-	    "t_$temp_num = (long)GET_NCI_I($reg_num);";
-	return "t_$temp_num";
+        push @{$temps_ref}, "long t_$temp_num;";
+        push @{$extra_preamble_ref},
+            "t_$temp_num = (long)GET_NCI_I($reg_num);";
+        return "t_$temp_num";
     };
     /I/ && do {
-	push @{$temps_ref}, "INTVAL t_$temp_num;";
-	push @{$extra_preamble_ref},
-	     "t_$temp_num = GET_NCI_I($reg_num);";
-	return "t_$temp_num";
+        push @{$temps_ref}, "INTVAL t_$temp_num;";
+        push @{$extra_preamble_ref},
+             "t_$temp_num = GET_NCI_I($reg_num);";
+        return "t_$temp_num";
     };
     /4/ && do {
-	push @{$temps_ref}, "PMC *t_$temp_num;";
-	push @{$extra_preamble_ref},
-	     "t_$temp_num = GET_NCI_P($reg_num);";
-	return "(long*)&PMC_int_val(t_$temp_num)";
+        push @{$temps_ref}, "PMC *t_$temp_num;";
+        push @{$extra_preamble_ref},
+             "t_$temp_num = GET_NCI_P($reg_num);";
+        return "(long*)&PMC_int_val(t_$temp_num)";
     };
     /s/ && do {
-	push @{$temps_ref}, "short t_$temp_num;";
-	push @{$extra_preamble_ref},
-	    "t_$temp_num = (short)GET_NCI_I($reg_num);";
-	return "t_$temp_num";
+        push @{$temps_ref}, "short t_$temp_num;";
+        push @{$extra_preamble_ref},
+            "t_$temp_num = (short)GET_NCI_I($reg_num);";
+        return "t_$temp_num";
     };
     /c/ && do {
-	push @{$temps_ref}, "char t_$temp_num;";
-	push @{$extra_preamble_ref},
-	    "t_$temp_num = (char)GET_NCI_I($reg_num);";
-	return "t_$temp_num";
+        push @{$temps_ref}, "char t_$temp_num;";
+        push @{$extra_preamble_ref},
+            "t_$temp_num = (char)GET_NCI_I($reg_num);";
+        return "t_$temp_num";
     };
     /2/ && do {
-	push @{$temps_ref}, "PMC* t_$temp_num;";
-	push @{$extra_preamble_ref},
-	    "t_$temp_num = GET_NCI_P($reg_num);";
-	return "(short*)&PMC_int_val(t_$temp_num)";
+        push @{$temps_ref}, "PMC* t_$temp_num;";
+        push @{$extra_preamble_ref},
+            "t_$temp_num = GET_NCI_P($reg_num);";
+        return "(short*)&PMC_int_val(t_$temp_num)";
     };
     /f/ && do {
-	push @{$temps_ref}, "float t_$temp_num;";
-	push @{$extra_preamble_ref},
-	    "t_$temp_num = (float)GET_NCI_N($reg_num);";
-	return "t_$temp_num";
+        push @{$temps_ref}, "float t_$temp_num;";
+        push @{$extra_preamble_ref},
+            "t_$temp_num = (float)GET_NCI_N($reg_num);";
+        return "t_$temp_num";
     };
     /d/ && do {
-	push @{$temps_ref}, "double t_$temp_num;";
-	push @{$extra_preamble_ref},
-	    "t_$temp_num = (double)GET_NCI_N($reg_num);";
-	return "t_$temp_num";
+        push @{$temps_ref}, "double t_$temp_num;";
+        push @{$extra_preamble_ref},
+            "t_$temp_num = (double)GET_NCI_N($reg_num);";
+        return "t_$temp_num";
     };
     /N/ && do {
-	push @{$temps_ref}, "FLOATVAL t_$temp_num;";
-	push @{$extra_preamble_ref},
-	    "t_$temp_num = GET_NCI_N($reg_num);";
-	return "t_$temp_num";
+        push @{$temps_ref}, "FLOATVAL t_$temp_num;";
+        push @{$extra_preamble_ref},
+            "t_$temp_num = GET_NCI_N($reg_num);";
+        return "t_$temp_num";
     };
     /t/ && do {
-	push @{$temps_ref}, "char *t_$temp_num;";
-	push @{$extra_preamble_ref},
-	"t_$temp_num = string_to_cstring(interpreter, GET_NCI_S($reg_num));";
-	push @{$extra_postamble_ref}, "string_cstring_free(t_$temp_num);";
-	return "t_$temp_num";
+        push @{$temps_ref}, "char *t_$temp_num;";
+        push @{$extra_preamble_ref},
+        "t_$temp_num = string_to_cstring(interpreter, GET_NCI_S($reg_num));";
+        push @{$extra_postamble_ref}, "string_cstring_free(t_$temp_num);";
+        return "t_$temp_num";
     };
     /b/ && do {
-	push @{$temps_ref}, "STRING *t_$temp_num;";
-	push @{$extra_preamble_ref},
-	    "t_$temp_num = GET_NCI_S($reg_num);";
-	return "PObj_bufstart(t_$temp_num)";
+        push @{$temps_ref}, "STRING *t_$temp_num;";
+        push @{$extra_preamble_ref},
+            "t_$temp_num = GET_NCI_S($reg_num);";
+        return "PObj_bufstart(t_$temp_num)";
     };
     /B/ && do {
-	push @{$temps_ref}, "STRING *t_$temp_num;";
-	push @{$extra_preamble_ref},
-	    "t_$temp_num = GET_NCI_S($reg_num);";
-	return "&PObj_bufstart(t_$temp_num)";
+        push @{$temps_ref}, "STRING *t_$temp_num;";
+        push @{$extra_preamble_ref},
+            "t_$temp_num = GET_NCI_S($reg_num);";
+        return "&PObj_bufstart(t_$temp_num)";
     };
     /J/ && do {
-	return "interpreter";
+        return "interpreter";
     };
     /[OP]/ && do {
-	push @{$temps_ref}, "PMC *t_$temp_num;";
-	push @{$extra_preamble_ref},
-	    "t_$temp_num = GET_NCI_P($reg_num);";
-	return "t_$temp_num == PMCNULL ? NULL : t_$temp_num";
+        push @{$temps_ref}, "PMC *t_$temp_num;";
+        push @{$extra_preamble_ref},
+            "t_$temp_num = GET_NCI_P($reg_num);";
+        return "t_$temp_num == PMCNULL ? NULL : t_$temp_num";
     };
     /S/ && do {
-	push @{$temps_ref}, "STRING *t_$temp_num;";
-	push @{$extra_preamble_ref},
-	    "t_$temp_num = GET_NCI_S($reg_num);";
-	return "t_$temp_num";
+        push @{$temps_ref}, "STRING *t_$temp_num;";
+        push @{$extra_preamble_ref},
+            "t_$temp_num = GET_NCI_S($reg_num);";
+        return "t_$temp_num";
     };
 }
 
 sub print_function {
     my ($sig, $return, $params, $args, $ret_type, $ret_type_decl,
         $return_assign, $other_decl, $final_assign,
-	$temps_ref,
+        $temps_ref,
         $extra_preamble_ref, $extra_postamble_ref,
         $put_pointer_ref,
         $proto_type_ref) = @_;
@@ -483,7 +483,7 @@ sub print_function {
     $other_decl ||= "";
 
     $other_decl .= join("\n    ", @{$temps_ref});
-	my $call_state = 'struct call_state st;';
+    my $call_state = 'struct call_state st;';
     my $extra_preamble  = join("\n    ", @{$extra_preamble_ref});
     my $extra_postamble = join("\n    ", @{$extra_postamble_ref});
     my $return_data     = "$return_assign $final_assign" =~ /return_data/ ?
@@ -507,12 +507,12 @@ sub print_function {
         my $call_params = join(",", @$args);
         my @tempi = grep { defined $temp[$_] } 0..$#$args;
         my $temp_decl = join("\n    ", map { "$temp[$_]->[0] arg$_;"} @tempi);
-		## shorts need to be properly cast
+        ## shorts need to be properly cast
         my $temp_in   = join("\n    ", map {
-				"arg$_ = "
-				. ( 'short' eq $temp[$_]->[0] ? '(short)' : '' )
-				. "$temp[$_]->[1];"
-			} @tempi);
+                                "arg$_ = "
+                                . ( 'short' eq $temp[$_]->[0] ? '(short)' : '' )
+                                . "$temp[$_]->[1];"
+                        } @tempi);
         my $temp_out  = join("\n    ", map { "$temp[$_]->[1] = arg$_;"} @tempi);
         print NCI << "HEADER";
 static void
@@ -538,8 +538,8 @@ HEADER
     }
     else {
         # Things are more simple, when there are no params
-		# call state var not needed if there are no params and a void return
-		$call_state = '' if 'v' eq $return;
+        # call state var not needed if there are no params and a void return
+        $call_state = '' if 'v' eq $return;
         print NCI << "HEADER";
 static void
 pcf_${return}(Interp *interpreter, PMC *self)
@@ -615,13 +615,13 @@ build_call_func(Interp *interpreter, PMC *pmc_nci,
     iglobals = interpreter->iglobals;
 
     if (PMC_IS_NULL(iglobals))
-	PANIC("iglobals isnÄt created yet");
+        PANIC("iglobals isnÄt created yet");
     HashPointer = VTABLE_get_pmc_keyed_int(interpreter, iglobals,
             IGLOBALS_NCI_FUNCS);
 
     if (!HashPointer) {
         HashPointer = pmc_new(interpreter, enum_class_Hash);
-	VTABLE_set_pmc_keyed_int(interpreter, iglobals, IGLOBALS_NCI_FUNCS,
+        VTABLE_set_pmc_keyed_int(interpreter, iglobals, IGLOBALS_NCI_FUNCS,
                 HashPointer);
 
 $put_pointer
