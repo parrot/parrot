@@ -367,6 +367,12 @@ enum { JIT_PPC_CALL, JIT_PPC_BRANCH, JIT_PPC_UBRANCH };
 #  define jit_emit_oris(pc, D, S, immediate) \
     jit_emit_2reg(pc, 25, S, D, immediate)
 
+#  define jit_emit_xori(pc, D, S, immediate) \
+    jit_emit_2reg(pc, 26, S, D, immediate)
+
+#  define jit_emit_xoris(pc, D, S, immediate) \
+    jit_emit_2reg(pc, 27, S, D, immediate)
+
 #  define jit_emit_andil(pc, S, A, uimm) \
     jit_emit_2reg(pc, 28, S, A, uimm)
 
