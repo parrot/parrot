@@ -1,5 +1,5 @@
 /*
- * $Copyright$
+ * Copyright (C) 2001-2006, The Perl Foundation.
  * $Id$
  *
  * - demonstrates how the interpreter interprets bytecode
