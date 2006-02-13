@@ -820,8 +820,9 @@ intreg_is_used(Parrot_jit_info_t *jit_info, char reg)
 {
     int i;
     const jit_arch_regs *reg_info;
-    reg_info = jit_info->arch_info->regs + jit_info->code_type;
     Parrot_jit_register_usage_t *ru = jit_info->optimizer->cur_section->ru;
+
+    reg_info = jit_info->arch_info->regs + jit_info->code_type;
 
     for (i = 0; i < ru[0].registers_used; ++i) {
         if (reg_info->map_I[i] == reg) {
