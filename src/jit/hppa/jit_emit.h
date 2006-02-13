@@ -141,10 +141,10 @@ enum { JIT_HPPA_BRANCH, JIT_HPPA_CALL };
     emit_ls(pc, 19, b, r, 0, d)
 
 #  define emit_ldd(pc, b, t, d) \
-    emit_ls(pc, XX, b, t, 0, d)
+    emit_ls(pc, 20, b, t, 0, d)
 
 #  define emit_std(pc, b, r, d) \
-    emit_ls(pc, XX, b, r, 0, d)
+    emit_ls(pc, 28, b, r, 0, d)
 
 /* Load / Store Indexed.
  *
