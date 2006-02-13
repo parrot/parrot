@@ -2779,9 +2779,21 @@ jit_get_params_pc(Parrot_jit_info_t *jit_info, Interp * interpreter)
     jit_info->n_args = n;
     emitm_movl_m_r(NATIVECODE, emit_EAX, emit_EBP, emit_None, 1, 16);
     for (i = 0; i < n; ++i) {
-        /* TODO other arg types */
-        emitm_movl_m_r(NATIVECODE, MAP(2+i), emit_EAX, emit_None, 
-                1, 4 + i*4);
+        switch (sig_bits[i] & PARROT_ARG_TYPE_MASK) {
+            case PARROT_ARG_INTVAL:
+                emitm_movl_m_r(NATIVECODE, MAP(2+i), emit_EAX, emit_None, 
+                        1, 4 + i*4);
+                break;
+            case PARROT_ARG_FLOATVAL:
+                emitm_movl_m_r(NATIVECODE, emit_EAX, emit_EAX, emit_None, 
+                        1, 4+ i*4);
+                jit_emit_fload_mb_n(NATIVECODE, emit_EAX, 0);
+                emitm_fstp(NATIVECODE, (MAP(2+i) + 1));
+                if (i < n - 1)
+                    emitm_movl_m_r(NATIVECODE, emit_EAX, emit_EBP, 
+                            emit_None, 1, 16);
+                break;
+        }
     }
 }
 
@@ -2894,6 +2906,15 @@ jit_set_returns_pc(Parrot_jit_info_t *jit_info, Interp * interpreter,
             }
             else {
                 emitm_movl_i_m(NATIVECODE, CUR_OPCODE[2], emit_EAX, 0, 1, 0);
+            }
+            break;
+        case PARROT_ARG_FLOATVAL:
+            if (recursive) {
+                jit_emit_mov_rr_n(NATIVECODE, FSR1, MAP(2));
+            }
+            else {
+                emitm_fld(NATIVECODE, MAP(2));
+                jit_emit_fstore_mb_n(NATIVECODE, emit_EAX, 0);
             }
             break;
         default:
@@ -3811,8 +3832,8 @@ static const jit_arch_info arch_info = {
             5,                  /* 5 mapped ints */
             2,                  /* first 2 are *non*preserved */
             i_map_sub,
-            0,                  /* TODO 0 mapped float regs */
-            0,                  /* ABI sez it's not preserved */
+            4,                  /* TODO 0 mapped float regs */
+            4,                  /* ABI sez it's not preserved */
             floatval_map
         }
     }

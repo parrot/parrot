@@ -203,7 +203,7 @@ call_is_safe(Interp *interpreter, PMC *sub, opcode_t **set_args)
 static int
 ops_jittable(Interp *interpreter, PMC *sub, PMC *sig_results, 
         struct PackFile_ByteCode *seg,
-        opcode_t *pc, opcode_t *end)
+        opcode_t *pc, opcode_t *end, int *flags)
 {
     op_info_t *op_info;
     int i, n, op;
@@ -233,6 +233,7 @@ ops_jittable(Interp *interpreter, PMC *sub, PMC *sig_results,
                 /* verify call, return address after the call */
                 if (!call_is_safe(interpreter, sub, &pc))
                     return 0;
+                *flags |= JIT_CODE_RECURSIVE;
                 continue;
             default:
                 if (op_jit[op].extcall != 0) {
@@ -269,12 +270,13 @@ op_is_ok:
 
 int
 parrot_pic_is_save_to_jit(Interp *interpreter, PMC *sub,
-	PMC *sig_args, PMC *sig_results)
+	PMC *sig_args, PMC *sig_results, int *flags)
 {
     STRING *name;
 
     opcode_t *base, *start, *end;
 
+    *flags = 0;
     /* simplify debugging */
     name = VTABLE_get_string(interpreter, sub);
 
@@ -306,14 +308,14 @@ parrot_pic_is_save_to_jit(Interp *interpreter, PMC *sub,
      *   if it's reached
      */
     if (!ops_jittable(interpreter, sub, sig_results, 
-                PMC_sub(sub)->seg, start, end))
+                PMC_sub(sub)->seg, start, end, flags))
         return 0;
 
     return 1;
 }
 
 funcptr_t 
-parrot_pic_JIT_sub(Interp *interpreter, PMC *sub) {
+parrot_pic_JIT_sub(Interp *interpreter, PMC *sub, int flags) {
 #if PIC_TEST
     UNUSED(interpreter);
     UNUSED(sub);
@@ -331,7 +333,7 @@ parrot_pic_JIT_sub(Interp *interpreter, PMC *sub) {
     /* TODO pass Sub */
 
     jit_info = parrot_build_asm(interpreter, start, end, NULL,
-            JIT_CODE_SUB_REGS_ONLY_REC);
+            JIT_CODE_SUB_REGS_ONLY | flags);
     if (!jit_info)
         return NULLfunc;
     return (funcptr_t) jit_info->arena.start;
@@ -350,13 +352,13 @@ parrot_pic_JIT_sub(Interp *interpreter, PMC *sub) {
 
 int
 parrot_pic_is_save_to_jit(Interp *interpreter, PMC *sub,
-	PMC *sig_args, PMC *sig_results)
+	PMC *sig_args, PMC *sig_results, int *flags)
 {
     return 0;
 }
 
 funcptr_t 
-parrot_pic_JIT_sub(Interp *interpreter, PMC *sub) {
+parrot_pic_JIT_sub(Interp *interpreter, PMC *sub, int flags) {
     UNUSED(interpreter);
     UNUSED(sub);
 
