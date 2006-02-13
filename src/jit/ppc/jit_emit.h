@@ -427,6 +427,7 @@ enum { JIT_PPC_CALL, JIT_PPC_BRANCH, JIT_PPC_UBRANCH };
 #  define jit_emit_fneg_rrr(pc, D, A)   jit_emit_3reg_x(pc, 63, D, 0, A, 40, 0)
 
 #  define jit_emit_fmr(pc, D, A)   jit_emit_3reg_x(pc, 63, D, 0, A, 72, 0)
+#  define jit_emit_mov_rr_n(pc, D, A) jit_emit_fmr(pc, D, A)
 
 /* not in core.ops, but probably should be: */
 #  define jit_emit_fsqrt(pc, D, A) jit_emit_3reg(pc, 63, D, 0, A, 0, 18, 0)
@@ -809,10 +810,19 @@ jit_get_params_pc(Parrot_jit_info_t *jit_info, Interp * interpreter)
     n = PMC_int_val(sig_pmc);
     jit_info->n_args = n;
     for (i = 0; i < n; ++i) {
-        jit_emit_lwz(NATIVECODE, MAP(2+i), 4 + i*4, r5);
+        switch (sig_bits[i] & PARROT_ARG_TYPE_MASK) {
+            case PARROT_ARG_INTVAL:
+                jit_emit_lwz(NATIVECODE, MAP(2+i), 4 + i*4, r5);
+                break;
+            case PARROT_ARG_FLOATVAL:
+                jit_emit_lwz(NATIVECODE, ISR1, 4 + i*4, r5);
+                jit_emit_lfd(jit_info->native_ptr, MAP(2+i), 0, ISR1);
+                break;
+        }
     }
 }
 
+#define CONST(i) interpreter->code->const_table->constants[jit_info->cur_op[i]]
 static void
 jit_set_returns_pc(Parrot_jit_info_t *jit_info, Interp * interpreter, 
         int recursive)
@@ -832,8 +842,7 @@ jit_set_returns_pc(Parrot_jit_info_t *jit_info, Interp * interpreter,
     switch (sig & (PARROT_ARG_TYPE_MASK|PARROT_ARG_CONSTANT)) {
         case PARROT_ARG_INTVAL:
             if (recursive) {
-                if (r3 != MAP(2))
-                    jit_emit_mov_rr(NATIVECODE, r3, MAP(2));
+                jit_emit_mov_rr(NATIVECODE, r3, MAP(2));
             }
             else {
                 jit_emit_stw(jit_info->native_ptr, MAP(2), 0, ISR2);
@@ -844,11 +853,31 @@ jit_set_returns_pc(Parrot_jit_info_t *jit_info, Interp * interpreter,
                 jit_emit_mov_ri_i(NATIVECODE, r3, CUR_OPCODE[2]);
             }
             else {
+                jit_emit_mov_ri_i(NATIVECODE, ISR1, CUR_OPCODE[2]);
                 jit_emit_stw(jit_info->native_ptr, ISR1, 0, ISR2);
             }
             break;
+        case PARROT_ARG_FLOATVAL:
+            if (recursive) {
+                /* floats are returned in f1 according to ABI */
+                jit_emit_mov_rr_n(NATIVECODE, f1, MAP(2));
+            }
+            else {
+                jit_emit_stfd(jit_info->native_ptr, MAP(2), 0, ISR2);
+            }
+            break;
+        case PARROT_ARG_FLOATVAL|PARROT_ARG_CONSTANT:
+            jit_emit_mov_ri_i(NATIVECODE, ISR1, &CONST(2)->u.number);
+            if (recursive) {
+                jit_emit_lfd(jit_info->native_ptr, f1, 0, ISR1);
+            }
+            else {
+                jit_emit_lfd(jit_info->native_ptr, FSR1, 0, ISR1);
+                jit_emit_stfd(jit_info->native_ptr, FSR1, 0, ISR2);
+            }
+            break;
         default:
-            internal_exception(1, "set_returns_jit - unknown tyep");
+            internal_exception(1, "set_returns_jit - unknown type");
             break;
     }
 }
@@ -1250,7 +1279,7 @@ static const jit_arch_info arch_info = {
             6,                  /* 6 mapped ints */
             6,                  /* all volatile */
             intval_map_sub,
-            0,                  /* TODO 12 mapped float regs */
+            12,                  /* TODO 12 mapped float regs */
             12,                  /* all volatile */
             floatval_map_sub
         }
