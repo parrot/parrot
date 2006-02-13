@@ -87,7 +87,7 @@ sub runstep
     }
 
     $conf->data->set($util => $prog);
-    $self->set_result = 'yes';
+    $self->set_result('yes');
 
     return $self;
 }
