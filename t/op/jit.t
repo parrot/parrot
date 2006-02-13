@@ -1216,6 +1216,37 @@ CODE
 2
 OUTPUT
 
+pir_output_is(<<'CODE', <<'OUTPUT', "shr_i_i");
+# on x86 the shift count is always in %cl
+.sub main :main
+    .local int i
+    i = 2
+    $I0 = 'shr'(i, i, i, i, 32)
+    print $I0
+    print "\n"
+.end
+.sub 'shr'
+    .param int i
+    .param int j
+    .param int k
+    .param int l
+    .param int m
+    i = i + 1  # force shown reg alloc on x86
+    i = i + 1
+    i = i + 1
+    i = i + 1  # edi
+    j = j + 1
+    j = j + 1
+    j = j + 1  # esi
+    k = k + 1
+    k = k + 1  # edx 
+    m = m + 32 # ecx
+    m >>= l    # opt_shift_rm (count l in memory)
+    .return (m)
+.end
+CODE
+16
+OUTPUT
 
 ## remember to change the number of tests :-)
-BEGIN { plan tests => 60; }
+BEGIN { plan tests => 61; }

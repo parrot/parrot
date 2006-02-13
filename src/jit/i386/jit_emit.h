@@ -874,13 +874,22 @@ opt_shift_rm(Parrot_jit_info_t *jit_info, int dest, int offs, int op)
     char *pc = jit_info->native_ptr;
     int saved = 0;
     /* if ECX is mapped, save it */
-    if (intreg_is_used(jit_info, emit_ECX)) {
+    if (dest != emit_ECX && intreg_is_used(jit_info, emit_ECX)) {
         emitm_pushl_r(pc, emit_ECX);
         saved = 1;
     }
-    /* jit_emit_mov_RM_i(pc, emit_ECX, count); */
-    emitm_movl_m_r(pc, emit_ECX, emit_EBX, emit_None, 1, offs)
-    pc = emit_shift_r_r(pc, op, emit_ECX, dest);
+    if (dest == emit_ECX) {
+        /* jit_emit_mov_RM_i(pc, emit_EAX, count); */
+        emitm_movl_m_r(pc, emit_EAX, emit_EBX, emit_None, 1, offs);
+        jit_emit_xchg_rr_i(pc, dest, emit_EAX);
+        pc = emit_shift_r_r(pc, op, emit_ECX, emit_EAX);
+        jit_emit_xchg_rr_i(pc, dest, emit_EAX);
+    }
+    else {
+        /* jit_emit_mov_RM_i(pc, emit_ECX, count); */
+        emitm_movl_m_r(pc, emit_ECX, emit_EBX, emit_None, 1, offs);
+        pc = emit_shift_r_r(pc, op, emit_ECX, dest);
+    }
     if (saved) {
         emitm_popl_r(pc, emit_ECX);
     }
