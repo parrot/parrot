@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 use lib qw( . lib ../lib ../../lib );
-use Test::More tests => 5;
+use Test::More tests => 7;
 
 =head1 NAME
 
@@ -39,9 +39,11 @@ package main;
 
 my $testpkg = 'Test::Parrot::Configure::Step::Base';
 
-can_ok($testpkg, qw(description result args));
+can_ok($testpkg, qw(description result set_result args));
 
 is($testpkg->description, 'foo', "->description() returns the proper value");
 is($testpkg->result, 'bar', "->result() returns the proper value");
+is($testpkg->set_result('baz'), $testpkg, "->set_result() returns the class");
+is($testpkg->result, 'baz', "->set_result() changed the result value");
 is_deeply([$testpkg->args], [qw(foo bar baz)],
     "->args() returns the proper value");

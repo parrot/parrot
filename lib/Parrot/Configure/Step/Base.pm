@@ -67,6 +67,24 @@ sub result
     }
 }
 
+=item * C<set_result()>
+
+Accepts a scalar values and assigns it to the inheriting classes C<$result>
+variable.  Returns the inheriting classes name.
+
+=cut
+
+sub set_result
+{
+    my ($class, $result) = @_;
+    {
+        no strict 'refs';
+        ${$class . "::result"} = $result;
+    }
+
+    return $class;
+}
+
 =item * C<args()>
 
 Accepts no arguments and returns the value of C<@args> from the inheriting
