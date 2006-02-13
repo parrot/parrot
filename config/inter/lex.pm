@@ -37,8 +37,8 @@ sub runstep
 
     unless ($conf->options->get('maintainer')) {
         $conf->data->set($util => 'echo');
-        $result = 'skipped';
-        return undef;
+        $self->set_result('skipped');
+        return $self;
     }
 
     my $prog;
@@ -52,8 +52,8 @@ sub runstep
     # the user is responsible for the consequences.
     if (defined $prog) {
         $conf->data->set($util => $prog);
-        $result = 'yes';
-        return undef;
+        $self->set_result('yes');
+        return $self;
     }
 
     $prog = check_progs(['flex', 'lex'], $verbose);
@@ -61,8 +61,8 @@ sub runstep
     unless ($prog) {
 
         # fall back to default
-        $result = 'no';
-        return undef;
+        $self->set_result('no');
+        return $self;
     }
 
     if ($conf->options->get('ask')) {
@@ -76,8 +76,8 @@ sub runstep
     if ($ret == -1 and !$conf->options->get('ask')) {
 
         # fall back to default
-        $result = 'no';
-        return undef;
+        $self->set_result('no');
+        return $self;
     }
 
     # if '--version' returns a string assume that this is flex.
@@ -87,7 +87,9 @@ sub runstep
     }
 
     $conf->data->set($util => $prog);
-    $result = 'yes';
+    $self->set_result('yes');
+
+    return $self;
 }
 
 1;

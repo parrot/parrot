@@ -40,6 +40,9 @@ sub runstep
         $cc_shared)
         if $conf->options->get('ask');
     $conf->data->set(cc_shared => $cc_shared);
-    $result = ($cc_shared =~ m/^ ?$/) ? 'done' : $cc_shared;
+    $self->set_result(($cc_shared =~ m/^ ?$/) ? 'done' : $cc_shared);
+
+    return $self;
 }
+
 1;

@@ -30,7 +30,10 @@ sub runstep
 {
     my ($self, $conf) = @_;
 
-    return if $conf->options->get('miniparrot');
+    if ($conf->options->get('miniparrot')) {
+        $self->set_result('skipped');
+        return $self;
+    }
 
     my $verbose = $conf->options->get('verbose');
 
@@ -191,6 +194,8 @@ sub runstep
             TEMP_exec_o => ''
         );
     }
+
+    return $self;
 }
 
 1;

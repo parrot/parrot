@@ -228,6 +228,8 @@ HERE
 
     # interface is the same for all platforms
     copy_if_diff("config/gen/platform/platform_interface.h", "include/parrot/platform_interface.h");
+
+    return $self;
 }
 
 1;

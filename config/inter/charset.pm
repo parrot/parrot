@@ -75,6 +75,8 @@ END
         TEMP_charset_o     => $TEMP_charset_o,
         TEMP_charset_build => $TEMP_charset_build,
     );
+
+    return $self;
 }
 
 1;

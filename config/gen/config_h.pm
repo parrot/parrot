@@ -121,6 +121,8 @@ EOF
     close HH;
 
     move_if_diff("$hh.tmp", $hh);
+
+    return $self;
 }
 
 1;

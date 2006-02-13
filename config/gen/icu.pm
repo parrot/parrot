@@ -37,7 +37,7 @@ sub runstep
     my $autodetect  = !defined($icushared)
         && !defined($icuheaders);
 
-    $result = undef;
+    $self->set_result(undef);
     unless ($without) {
         if (!$autodetect) {
             print "specified a icu config parameter,\nICU autodetection disabled.\n" if $verbose;
@@ -78,7 +78,7 @@ sub runstep
             }
 
             if ($without) {
-                $result = "failed";
+                $self->set_result("failed");
             }
         }
     }
@@ -95,7 +95,7 @@ sub runstep
             icu_shared => '', # used for generating src/dynpmc/Makefile
             icu_dir    => '',
         );
-        $result = "no" unless defined $gen::icu::result;
+        $self->set_result("no") unless defined $self->result;
         return;
     }
 
@@ -160,8 +160,9 @@ HELP
     }
     cc_clean();
 
-    $result = "yes";
+    $self->set_result("yes");
 
+    return $self;
 }
 
 1;

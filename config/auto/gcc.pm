@@ -47,16 +47,16 @@ sub runstep
     # which should have been caught by the 'die' above.
     unless (exists $gnuc{__GNUC__}) {
         $conf->data->set(gccversion => undef);
-        return;
+        return $self;
     }
 
     my $major = $gnuc{__GNUC__};
     my $minor = $gnuc{__GNUC_MINOR__};
     unless (defined $major) {
         print " (no) " if $verbose;
-        $result = 'no';
+        $self->set_result('no');
         $conf->data->set(gccversion => undef);
-        return;
+        return $self;
     }
     if ($major =~ tr/0-9//c) {
         undef $major; # Don't use it
@@ -69,7 +69,7 @@ sub runstep
         $gccversion .= ".$minor" if defined $minor;
     }
     print " (yep: $gccversion )" if $verbose;
-    $result = 'yes';
+    $self->set_result('yes');
 
     if ($gccversion) {
 
@@ -158,7 +158,7 @@ sub runstep
             gccversion => undef
         );
 
-        return;
+        return $self;
     }
 
     $conf->data->set(
@@ -169,6 +169,8 @@ sub runstep
 
     $conf->data->set(HAS_aligned_funcptr => 0)
         if $^O eq 'hpux';
+
+    return $self;
 }
 
 1;

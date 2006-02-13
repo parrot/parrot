@@ -52,15 +52,17 @@ sub runstep
         }
         if ($test) {
             print " ($test) " if $verbose;
-            $result = 'yes';
+            $self->set_result('yes');
         } else {
             print " no " if $verbose;
-            $result = 'no';
+            $self->set_result('no');
             $test   = '';
         }
     }
 
     $conf->data->set(inline => $test);
+
+    return $self;
 }
 
 1;

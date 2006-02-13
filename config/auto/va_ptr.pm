@@ -42,8 +42,10 @@ sub runstep
         $va_type = 'x86';
     }
     cc_clean();
-    $result = $va_type;
+    $self->set_result($va_type);
     $conf->data->set(va_ptr_type => $va_type);
+
+    return $self;
 }
 
 1;

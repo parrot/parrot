@@ -208,6 +208,8 @@ END
         TEMP_pmc_classes_str => $TEMP_pmc_classes_str,
         TEMP_pmc_classes_pmc => $TEMP_pmc_classes_pmc,
     );
+
+    return $self;
 }
 
 1;

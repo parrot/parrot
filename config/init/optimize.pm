@@ -34,7 +34,7 @@ sub runstep
     # is given, however, use that instead. 
     my $optimize = $conf->options->get('optimize');
     if (defined $optimize) {
-        $result = 'yes';
+        $self->set_result('yes');
         # disable debug flags
         $conf->data->set(cc_debug => '');
         $conf->data->add(' ', ccflags => "-DDISABLE_GC_DEBUG=1 -DNDEBUG");
@@ -50,9 +50,11 @@ sub runstep
             $conf->data->set(optimize => $optimize);
         }
     } else {
-        $result = 'no';
+        $self->set_result('no');
         print "(none requested) " if $conf->options->get('verbose');
     }
+
+    return $self;
 }
 
 1;

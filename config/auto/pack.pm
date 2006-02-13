@@ -94,6 +94,8 @@ AARGH
 Configure.pl:  Unable to find an integer type that fits a pointer.
 AARGH
     }
+
+    return $self;
 }
 
 1;

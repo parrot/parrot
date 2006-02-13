@@ -43,23 +43,23 @@ sub runstep
     # Therefore, test if it's defined to see if MSVC's installed.
     # return 'no' if it's not.
     unless (defined $msvc{_MSC_VER}) {
-        $result = 'no';
+        $self->set_result('no');
         $conf->data->set(msvcversion => undef);
-        return;
+        return $self;
     }
 
     my $major = int($msvc{_MSC_VER} / 100);
     my $minor = $msvc{_MSC_VER} % 100;
     unless (defined $major && defined $minor) {
         print " (no) " if $verbose;
-        $result = 'no';
+        $self->set_result('no');
         $conf->data->set(msvcversion => undef);
-        return;
+        return $self;
     }
 
     my $msvcversion = "$major.$minor";
     print " (yep: $msvcversion )" if $verbose;
-    $result = 'yes';
+    $self->set_result('yes');
 
     $conf->data->set(msvcversion => $msvcversion);
 
@@ -74,6 +74,8 @@ sub runstep
         # for details.
         $conf->data->add(" ", "ccflags", "-D_CRT_SECURE_NO_DEPRECATE");
     }
+
+    return $self;
 }
 
 1;

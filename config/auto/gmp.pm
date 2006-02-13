@@ -72,7 +72,7 @@ sub runstep
             ) {
             $has_gmp = 1;
             print " (yes) " if $verbose;
-            $result = 'yes';
+            $self->set_result('yes');
 
             $conf->data->set(
                 gmp     => 'define',
@@ -87,8 +87,10 @@ sub runstep
         $conf->data->set('ccflags',   $ccflags);
         $conf->data->set('linkflags', $linkflags);
         print " (no) " if $verbose;
-        $result = 'no';
+        $self->set_result('no');
     }
+
+    return $self;
 }
 
 1;

@@ -62,6 +62,8 @@ sub runstep
         floatvalfmt => $nvformat,
         nvsize      => $nvsize
     );
+
+    return $self;
 }
 
 1;

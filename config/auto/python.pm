@@ -43,11 +43,13 @@ sub runstep
     my $has_python_2_4 = 0;
     if ($has_python) {
         $has_python_2_4 = ($major eq '2' && $minor eq '4') ? 1 : 0;
-        $result = "yes, $major.$minor.$revision";
+        $self->set_result("yes, $major.$minor.$revision");
     } else {
-        $result = 'no';
+        $self->set_result('no');
     }
     $conf->data->set(has_python_2_4 => $has_python_2_4);
+
+    return $self;
 }
 
 1;

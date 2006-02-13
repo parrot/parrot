@@ -31,6 +31,8 @@ sub runstep
     $self->generate_h($conf);
     $self->generate_c($conf);
     $self->generate_pm($conf);
+
+    return $self;
 }
 
 sub generate_h

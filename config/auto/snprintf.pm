@@ -42,6 +42,8 @@ sub runstep
         $conf->data->set(HAS_OLD_SNPRINTF => 1);
     }
     print " ($res) " if $conf->options->get('verbose');
+
+    return $self;
 }
 
 1;

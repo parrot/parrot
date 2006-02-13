@@ -49,7 +49,8 @@ sub runstep
             float4_t         => 'double',
             float8_t         => 'double',
         );
-        return;
+        $self->set_result('using miniparrot defaults');
+        return $self;
     }
 
     cc_gen('config/auto/sizes/test_c.in');
@@ -186,6 +187,8 @@ END
     }
 
     cc_clean();
+
+    return $self;
 }
 
 1;

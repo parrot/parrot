@@ -35,24 +35,24 @@ sub runstep
         if ($a =~ m/^Unknown option:/) {
             $a       = capture_output('perldoc perldoc') || '';
             $version = 1;
-            $result  = 'yes, old version';
+            $self->set_result('yes, old version');
         } else {
             if (open FH, "< c99da7c4.tmp") {
                 local $/;
                 $a = <FH>;
                 close FH;
                 $version = 2;
-                $result  = 'yes';
+                $self->set_result('yes');
             } else {
                 $a = undef;
             }
         }
         unless (defined $a && $a =~ m/perldoc/) {
             $version = 0;
-            $result  = 'failed';
+            $self->set_result('failed');
         }
     } else {
-        $result = 'no';
+        $self->set_result('no');
     }
     unlink "c99da7c4.tmp";
 
@@ -60,6 +60,8 @@ sub runstep
         has_perldoc => $version != 0 ? 1 : 0,
         new_perldoc => $version == 2 ? 1 : 0
     );
+
+    return $self;
 }
 
 1;

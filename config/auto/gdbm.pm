@@ -71,7 +71,7 @@ sub runstep
         if ($test eq "gdbm is working.\n") {
             $has_gdbm = 1;
             print " (yes) " if $verbose;
-            $result = 'yes';
+            $self->result('yes');
         }
     }
     unless ($has_gdbm) {
@@ -81,9 +81,11 @@ sub runstep
         $conf->data->set(ccflags   => $ccflags);
         $conf->data->set(linkflags => $linkflags);
         print " (no) " if $verbose;
-        $result = 'no';
+        $self->set_result('no');
     }
     $conf->data->set(has_gdbm => $has_gdbm); # for gdbmhash.t and dynpmc.in
+
+    return $self;
 }
 
 1;

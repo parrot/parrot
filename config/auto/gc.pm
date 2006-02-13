@@ -114,6 +114,8 @@ EOF
         );
     }
     print(" ($gc) ") if $conf->options->get('verbose');
+
+    return $self;
 }
 
 1;

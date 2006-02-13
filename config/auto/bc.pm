@@ -55,7 +55,9 @@ sub runstep
     }
 
     $conf->data->set(has_gnu_bc => $has_gnu_bc);
-    $result = $has_gnu_bc ? 'yes' : 'no';
+    $self->set_result($has_gnu_bc ? 'yes' : 'no');
+
+    return $self;
 }
 
 1;

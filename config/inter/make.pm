@@ -46,7 +46,7 @@ sub runstep
     # the user is responsible for the consequences.
     if (defined $prog) {
         $conf->data->set($util => $prog);
-        $result = 'yes';
+        $self->set_result('yes');
     } else {
         $prog = check_progs(['gmake', 'mingw32-make', 'nmake', 'make'],
             $verbose);
@@ -54,8 +54,8 @@ sub runstep
         unless ($prog) {
 
             # fall back to default
-            $result = 'no';
-            return undef;
+            $self->set_result('no');
+            return $self;
         }
     }
 
@@ -70,8 +70,8 @@ sub runstep
     if ($ret == -1 and !$conf->options->get('ask')) {
 
         # fall back to default
-        $result = 'no';
-        return undef;
+        $self->set_result('no');
+        return $self;
     }
 
     # if '--version' returns a string assume that this is gmake.
@@ -80,7 +80,7 @@ sub runstep
     }
 
     $conf->data->set($util => $prog);
-    $result = 'yes';
+    $self->set_result('yes');
 
     # setup make_C
     if ($conf->data->get('gmake_version')) {
@@ -97,6 +97,8 @@ sub runstep
 
         $conf->data->set(make_c => $make_c);
     }
+
+    return $self;
 }
 
 1;

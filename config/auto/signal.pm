@@ -37,7 +37,8 @@ sub runstep
         has_setitimer      => undef
     );
     if (defined $conf->options->get('miniparrot')) {
-        return;
+        $self->set_result('skipped');
+        return $self;
     }
 
     cc_gen('config/auto/signal/test_1.in');
@@ -85,5 +86,8 @@ EOF
         $i++;
     }
     close O;
+    
+    return $self;
 }
+
 1;

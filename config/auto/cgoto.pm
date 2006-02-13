@@ -27,7 +27,10 @@ sub runstep
 {
     my ($self, $conf) = @_;
 
-    return if $conf->options->get('miniparrot');
+    if ($conf->options->get('miniparrot')) {
+        $self->set_result('skipped');
+        return $self;
+    }
 
     my ($cgoto, $verbose) = $conf->options->get(qw(cgoto verbose));
 
@@ -59,7 +62,7 @@ EOF
             cg_flag => '-DHAVE_COMPUTED_GOTO'
         );
         print " (yes) " if $verbose;
-        $result = 'yes';
+        $self->set_result('yes');
     } else {
         $conf->data->set(
             TEMP_cg_h => '',
@@ -69,8 +72,10 @@ EOF
             cg_flag   => ''
         );
         print " (no) " if $verbose;
-        $result = 'no';
+        $self->set_result('no');
     }
+
+    return $self;
 }
 
 1;

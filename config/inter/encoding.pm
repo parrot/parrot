@@ -75,6 +75,8 @@ END
         TEMP_encoding_o     => $TEMP_encoding_o,
         TEMP_encoding_build => $TEMP_encoding_build,
     );
+
+    return $self;
 }
 
 1;

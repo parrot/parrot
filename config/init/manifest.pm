@@ -30,8 +30,8 @@ sub runstep
     my ($self, $conf) = @_;
 
     if ($conf->options->get('nomanicheck')) {
-        $result = 'skipped';
-        return;
+        $self->set_result('skipped');
+        return $self;
     }
 
     my @missing = ExtUtils::Manifest::manicheck();
@@ -45,8 +45,10 @@ files and then try running Configure again.
 
 END
 
-        exit 1;
+        return;
     }
+
+    return $self;
 }
 
 1;

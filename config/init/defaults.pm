@@ -212,6 +212,8 @@ sub runstep
             ld_debug => " -pg ",
         );
     }
+
+    return $self;
 }
 
 1;

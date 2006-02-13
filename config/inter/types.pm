@@ -45,6 +45,8 @@ sub runstep
         nv       => $floatval,
         opcode_t => $opcode
     );
+
+    return $self;
 }
 
 1;

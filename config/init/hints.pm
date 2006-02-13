@@ -58,6 +58,8 @@ sub runstep
     }
 
     print "]" if $verbose;
+
+    return $self;
 }
 
 1;

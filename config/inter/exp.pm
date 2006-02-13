@@ -41,6 +41,8 @@ sub runstep
     }
 
     $conf->data->set(expnetworking => $net);
+
+    return $self;
 }
 
 1;

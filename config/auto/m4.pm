@@ -51,7 +51,9 @@ sub runstep
     }
 
     $conf->data->set(has_gnu_m4 => $has_gnu_m4);
-    $result = $has_gnu_m4 ? 'yes' : 'no';
+    $self->set_result($has_gnu_m4 ? 'yes' : 'no');
+
+    return $self;
 }
 
 1;

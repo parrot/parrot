@@ -36,10 +36,12 @@ sub runstep
     );
 
     if ($revision >= 1) {
-        $result = "r$revision";
+        $self->set_result("r$revision");
     } else {
-        $result = "done";
+        $self->set_result("done");
     }
+
+    return $self;
 }
 
 1;

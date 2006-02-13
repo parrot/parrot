@@ -39,16 +39,18 @@ sub runstep
             byteorder => $byteorder,
             bigendian => 0
         );
-        $result = 'little-endian';
+        $self->set_result('little-endian');
     } elsif ($byteorder =~ /^(8765|4321)/) {
         $conf->data->set(
             byteorder => $byteorder,
             bigendian => 1
         );
-        $result = 'big-endian';
+        $self->set_result('big-endian');
     } else {
         die "Unsupported byte-order [$byteorder]!";
     }
+
+    return $self;
 }
 
 1;

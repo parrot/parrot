@@ -51,17 +51,19 @@ sub runstep
 
     if ($setenv && $unsetenv) {
         print " (both) " if $verbose;
-        $result = 'both';
+        $self->set_result('both');
     } elsif ($setenv) {
         print " (setenv) " if $verbose;
-        $result = 'setenv';
+        $self->set_result('setenv');
     } elsif ($unsetenv) {
         print " (unsetenv) " if $verbose;
-        $result = 'unsetenv';
+        $self->set_result('unsetenv');
     } else {
         print " (no) " if $verbose;
-        $result = 'no';
+        $self->set_result('no');
     }
+
+    return $self;
 }
 
 1;

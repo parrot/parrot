@@ -127,6 +127,8 @@ END
     # This one isn't prompted for above.  I don't know why.
     $ccwarn = integrate($conf->data->get('ccwarn'), $conf->options->get('ccwarn'));
     $conf->data->set(ccwarn => $ccwarn);
+
+    return $self;
 }
 
 1;

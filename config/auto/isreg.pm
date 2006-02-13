@@ -39,7 +39,9 @@ sub runstep
 
     $conf->data->set(isreg => $test);
     print($test ? " (Yep) " : " (no) ") if $conf->options->get('verbose');
-    $result = $test ? 'yes' : 'no';
+    $self->set_result($test ? 'yes' : 'no');
+
+    return $self;
 }
 
 1;

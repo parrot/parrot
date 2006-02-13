@@ -29,19 +29,22 @@ sub runstep
 {
     my ($self, $conf) = (shift, shift);
 
-    return if $conf->options->get('miniparrot');
+    if ($conf->options->get('miniparrot')) {
+        $self->set_result('skipped');
+        return $self;
+    }
 
-    $result = '';
+    $self->set_result('');
     my $align;
     if (defined($conf->data->get('ptr_alignment'))) {
         $align  = $conf->data->get('ptr_alignment');
-        $result = "configured: ";
+        $self->set_result("configured: ");
     } elsif ($^O eq 'hpux' && $Config{ccflags} !~ /DD64/) {
 
         # HP-UX 10.20/32 hangs in this test.
         $align = 4;
         $conf->data->set(ptr_alignment => $align);
-        $result = "for hpux: ";
+        $self->set_result = "for hpux: ";
     } else {
 
         # Now really test by compiling some code
@@ -59,10 +62,10 @@ sub runstep
         $conf->data->set(ptr_alignment => $align);
     }
 
-    $result .= " $align byte";
-    $result .= 's' unless $align == 1;
+    $self->set_result($self->result . " $align byte");
+    $self->set_result($self->result . 's') unless $align == 1;
 
-    return;
+    return $self;
 }
 
 1;

@@ -71,7 +71,9 @@ sub runstep {
         );
     }
 
-    $result = $parrot_is_shared ? 'yes' : 'no';
+    $self->set_result($parrot_is_shared ? 'yes' : 'no');
+
+    return $self;
 }
 
 1;

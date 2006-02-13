@@ -51,8 +51,10 @@ END
         }
         cc_clean();
         print " (yes) " if $conf->options->get('verbose');
-        $result = 'yes';
+        $self->set_result('yes');
     }
+
+    return $self;
 }
 
 1;
