@@ -13,6 +13,21 @@ ROOT: result(.) = {
     end
 }
 
+PunieGrammar::block: result(.) = {
+    # Ask the child node for its result
+    .local pmc child
+    $I0 = defined node["PunieGrammar::lineseq"]
+    unless $I0 goto err_no_tree
+    $P0 = node["PunieGrammar::lineseq"]
+    child = tree.get('result', $P0, 'PunieGrammar::lineseq')
+
+    .return (child)
+
+  err_no_tree:
+    print "The block node doesn't contain an 'lineseq' match.\n"
+    end
+}
+
 PunieGrammar::lineseq: result(.) = {
     .local pmc newchildren
     newchildren = new PerlArray

@@ -19,6 +19,23 @@ ROOT: result(.) = {
     .return (output)
 }
 
+# Flatten out the ops into a simple sequence.
+POST::Ops: result(.) = {
+    .local string output
+    $P1 = node.children()
+    .local pmc iter
+    iter = new Iterator, $P1    # setup iterator for node
+    iter = 0
+  iter_loop:
+    unless iter, iter_end         # while (entries) ...
+      shift $P2, iter
+      $S3 = tree.get('result', $P2)
+      output .= $S3
+      goto iter_loop
+  iter_end:
+    .return (output)
+}
+
 POST::Op: result(.) = {
     .local string output
     .local int counter

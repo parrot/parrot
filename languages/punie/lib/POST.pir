@@ -16,6 +16,7 @@ for the opcode syntax tree nodes created by the Punie compiler.
 .sub "__onload" @LOAD
     load_bytecode "languages/punie/lib/POST/Node.pir"
     load_bytecode "languages/punie/lib/POST/Op.pir"
+    load_bytecode "languages/punie/lib/POST/Ops.pir"
 #    load_bytecode "languages/punie/lib/POST/Decl.pir"
 #    load_bytecode "languages/punie/lib/POST/Stmt.pir"
 #    load_bytecode "languages/punie/lib/POST/Stmts.pir"

@@ -19,6 +19,27 @@ ROOT: result(.) = {
     .return ($P4)
 }
 
+PAST::Stmts: result(.) = {
+    .local pmc newchildren
+    newchildren = new PerlArray
+    $P1 = node.children()
+    .local pmc iter
+    iter = new Iterator, $P1    # setup iterator for node
+    iter = 0
+  iter_loop:
+    unless iter, iter_end         # while (entries) ...
+      shift $P2, iter
+      $P3 = tree.get('result', $P2)
+      push newchildren, $P3
+      goto iter_loop
+  iter_end:
+    $S1 = node.source()
+    $I1 = node.pos()
+    $P4 = new 'POST::Ops'
+    $P4.set_node($S1,$I1,newchildren)
+    .return ($P4)
+}
+
 PAST::Stmt: result(.) = {
     $P1 = node.children()
     $P2 = $P1[0]

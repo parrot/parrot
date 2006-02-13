@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(t . lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 3;
+use Parrot::Test tests => 4;
 
 pir_output_is(<<'CODE', <<'OUT', 'load the libraries');
 .sub _main
@@ -11,7 +11,7 @@ pir_output_is(<<'CODE', <<'OUT', 'load the libraries');
 CODE
 OUT
 
-foreach my $module (qw(Sub Var)) {
+foreach my $module (qw(Sub Var Ops)) {
 my $code = <<'CODE'
 .sub _main
     load_bytecode 'languages/punie/lib/POST.pir'

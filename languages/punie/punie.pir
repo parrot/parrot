@@ -114,7 +114,7 @@ integers or double-quoted strings, in the form of:
     end
 
   err_match_fail:
-    print "parse failed"
+    print "parse failed\n"
     goto cleanup
 
   err_no_ast:
