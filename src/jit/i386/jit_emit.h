@@ -815,6 +815,22 @@ opt_mul(char *pc, int dest, INTVAL imm, int src)
 #  define jit_emit_ror_ri_i(pc, reg, imm) \
     { pc = emit_shift_i_r(pc, emit_b001, imm, reg); }
 
+static int
+intreg_is_used(Parrot_jit_info_t *jit_info, char reg)
+{
+    int i;
+    const jit_arch_regs *reg_info;
+    reg_info = jit_info->arch_info->regs + jit_info->code_type;
+    Parrot_jit_register_usage_t *ru = jit_info->optimizer->cur_section->ru;
+
+    for (i = 0; i < ru[0].registers_used; ++i) {
+        if (reg_info->map_I[i] == reg) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
 static char *
 opt_shift_rr(Parrot_jit_info_t *jit_info, int dest, int count, int op)
 {
@@ -826,8 +842,7 @@ opt_shift_rr(Parrot_jit_info_t *jit_info, int dest, int count, int op)
         int saved = 0;
         assert(count != emit_EAX);
         if (dest == emit_EAX) {
-            if (jit_info->optimizer->cur_section->ru[0].registers_used ==
-                    INT_REGISTERS_TO_MAP) {
+            if (intreg_is_used(jit_info, emit_ECX)) {
                 emitm_pushl_r(pc, emit_ECX);
                 saved = 1;
             }
@@ -858,8 +873,7 @@ opt_shift_rm(Parrot_jit_info_t *jit_info, int dest, int offs, int op)
     char *pc = jit_info->native_ptr;
     int saved = 0;
     /* if ECX is mapped, save it */
-    if (jit_info->optimizer->cur_section->ru[0].registers_used ==
-            INT_REGISTERS_TO_MAP) {
+    if (intreg_is_used(jit_info, emit_ECX)) {
         emitm_pushl_r(pc, emit_ECX);
         saved = 1;
     }
@@ -1775,7 +1789,6 @@ opt_div_rr(Parrot_jit_info_t *jit_info, int dest, int src, int is_div)
     char *pc = jit_info->native_ptr;
     int saved = 0;
     int div_ecx = 0;
-    Parrot_jit_register_usage_t *ru;
     char *L1, *L2, *L3;
     static const char* div_by_zero = "Divide by zero";
 
@@ -1788,21 +1801,20 @@ opt_div_rr(Parrot_jit_info_t *jit_info, int dest, int src, int is_div)
         /* all ok, we can globber it */
     }
     else {
-        ru = jit_info->optimizer->cur_section->ru + 0;
         /* if ECX is not mapped use it */
-        if (ru->registers_used < INT_REGISTERS_TO_MAP && src == emit_EDX) {
+        if (!intreg_is_used(jit_info, emit_ECX) && src == emit_EDX) {
             jit_emit_mov_rr_i(pc, emit_ECX, emit_EDX);
             div_ecx = 1;
         }
         else
             /* if EDX is mapped, preserve EDX on stack */
-            if (ru->registers_used >= INT_REGISTERS_TO_MAP - 1) {
+            if (intreg_is_used(jit_info, emit_EDX)) {
                 emitm_pushl_r(pc, emit_EDX);
                 saved = 1;
                 /* if EDX is the src, we need another temp register: ECX */
                 if (src == emit_EDX) {
                     /* if ECX is mapped save it, but not if it's dest */
-                    if (ru->registers_used == INT_REGISTERS_TO_MAP &&
+                    if (intreg_is_used(jit_info, emit_ECX) && 
                             dest != emit_ECX) {
                         emitm_pushl_r(pc, emit_ECX);
                         saved = 2;
@@ -1936,14 +1948,12 @@ opt_div_RM(Parrot_jit_info_t *jit_info, int dest, int offs, int is_div)
     }
     else {
         /* if ECX is mapped, push EDX on stack */
-        if (jit_info->optimizer->cur_section->ru[0].registers_used ==
-                INT_REGISTERS_TO_MAP) {
+        if (intreg_is_used(jit_info, emit_ECX)) {
             emitm_pushl_r(pc, emit_EDX);
             saved = 2;
         }
         /* if EDX is mapped, save it in ECX */
-        else if (jit_info->optimizer->cur_section->ru[0].registers_used ==
-                INT_REGISTERS_TO_MAP - 1) {
+        else if (intreg_is_used(jit_info, emit_EDX)) {
             saved = 1;
             jit_emit_mov_rr_i(pc, emit_ECX, emit_EDX);
         }
