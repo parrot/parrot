@@ -86,7 +86,7 @@ typedef enum {
     f31
 } hppa_fregister_t;
 
-#if JIT_EMIT
+enum { JIT_HPPA_BRANCH, JIT_HPPA_CALL };
 
 /* BASE: interpreter address
  * CIR:  call index register
@@ -97,7 +97,7 @@ typedef enum {
 #  define ISR2 r22
 #  define RET0 r28
 
-enum { JIT_HPPA_BRANCH, JIT_HPPA_CALL };
+#  define Parrot_jit_emit_get_base_reg_no(pc) BASE
 
 /* Load / Store.
  *
@@ -139,6 +139,12 @@ enum { JIT_HPPA_BRANCH, JIT_HPPA_CALL };
 
 #  define emit_ldwm(pc, b, r, d) \
     emit_ls(pc, 19, b, r, 0, d)
+
+#  define emit_ldd(pc, b, t, d) \
+    emit_ls(pc, XX, b, t, 0, d)
+
+#  define emit_std(pc, b, r, d) \
+    emit_ls(pc, XX, b, r, 0, d)
 
 /* Load / Store Indexed.
  *
@@ -419,13 +425,17 @@ enum { JIT_HPPA_BRANCH, JIT_HPPA_CALL };
     emit_ldil(pc, D, ((imm >> 11) & 0x1fffff)); \
     emit_ldo(pc, D, D, (imm & 0x7ff))
 
-#  define jit_emit_mov_rm_i(pc, reg, addr) \
-    emit_ldw(pc, BASE, reg, (((char *)addr) - \
-      ((char *)&interpreter->int_reg.registers[0])))
+#  define jit_emit_mov_rm_i(pc, reg, offs) \
+    emit_ldw(pc, BASE, reg, offs);
 
-#  define jit_emit_mov_mr_i(pc, addr, reg) \
-    emit_stw(pc, BASE, reg, (((char *)addr) - \
-      ((char *)&interpreter->int_reg.registers[0])))
+#  define jit_emit_mov_mr_i(pc, offs, reg) \
+    emit_stw(pc, BASE, reg, offs);
+
+#  define jit_emit_mov_mr_n(pc, offs, reg) \
+	emit_std(pc, BASE, reg, offs);
+
+#  define jit_emit_mov_rm_n(pc, offs, reg) \
+	emit_ldd(pc, BASE, reg, offs);
 
 /*  emit_cmpbranch
  *
@@ -481,7 +491,7 @@ Parrot_emit_jump_to_ret(Parrot_jit_info_t *jit_info,
      * we have to get the op_map too at runtime
      */
     emit_ldw(jit_info->native_ptr, BASE, ISR1,
-        (offsetof(Interp, jit_info)));
+        (offsetof(Interp, code)));
     emit_ldo(jit_info->native_ptr, ISR1, ISR2,
         (offsetof(Parrot_jit_info_t, arena)));
     emit_ldw(jit_info->native_ptr, ISR2, ISR1,
@@ -491,40 +501,6 @@ Parrot_emit_jump_to_ret(Parrot_jit_info_t *jit_info,
     emit_bv(jit_info->native_ptr, ISR2, r0, 1);
     jit_emit_nop(jit_info->native_ptr);
 
-}
-
-void
-Parrot_jit_begin(Parrot_jit_info_t *jit_info,
-                 Interp * interpreter)
-{
-    /* Save the return address in the stack. */
-    emit_stw(jit_info->native_ptr, r30, r2, -0x14);
-    jit_emit_mov_rr(jit_info->native_ptr, r1, r3);
-    jit_emit_mov_rr(jit_info->native_ptr, r3, r30);
-    emit_stwm(jit_info->native_ptr, r30, r1, 0x40);
-    emit_stw(jit_info->native_ptr, r3, r26, -0x24);
-    emit_stw(jit_info->native_ptr, r3, r25, -0x28);
-    /* Callee-save registers. */
-    emit_ldo(jit_info->native_ptr, r30, r30, 0x40);
-    emit_stw(jit_info->native_ptr, r30, r4, -0x4);
-    emit_stw(jit_info->native_ptr, r30, r5, -0x8);
-    emit_stw(jit_info->native_ptr, r30, r6, -0xc);
-    emit_stw(jit_info->native_ptr, r30, r7, -0x10);
-    emit_stw(jit_info->native_ptr, r30, r8, -0x14);
-    emit_stw(jit_info->native_ptr, r30, r9, -0x18);
-    emit_stw(jit_info->native_ptr, r30, r10, -0x1c);
-    emit_stw(jit_info->native_ptr, r30, r11, -0x20);
-    emit_stw(jit_info->native_ptr, r30, r12, -0x24);
-    emit_stw(jit_info->native_ptr, r30, r13, -0x28);
-    emit_stw(jit_info->native_ptr, r30, r14, -0x2c);
-    emit_stw(jit_info->native_ptr, r30, r15, -0x30);
-    emit_stw(jit_info->native_ptr, r30, r16, -0x34);
-    emit_stw(jit_info->native_ptr, r30, r17, -0x38);
-    emit_stw(jit_info->native_ptr, r30, r18, -0x3c);
-    /* Move the interpreter to the base register. */
-    jit_emit_mov_rr(jit_info->native_ptr, BASE, r26);
-    jit_emit_mov_rr(jit_info->native_ptr, RET0, r25);
-    Parrot_emit_jump_to_ret(jit_info, interpreter);
 }
 
 /* Load the return address from the stack and return. */
@@ -563,6 +539,8 @@ Parrot_jit_begin(Parrot_jit_info_t *jit_info,
  * farest than the called procedure, and this is won't happend for EXEC
  * (and if it does, it's ld's problem, not ours).
  */
+
+#if JIT_EMIT == 2
 
 void
 Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
@@ -606,6 +584,45 @@ Parrot_jit_restart_op(Parrot_jit_info_t *jit_info,
     jit_emit_cmpbf(jit_info->native_ptr, RET0, r0, emit_EQ,
         (long)(((sav_ptr - jmp_ptr) - 8) / 4), 0);
     jit_info->native_ptr = sav_ptr;
+    Parrot_emit_jump_to_ret(jit_info, interpreter);
+}
+
+#endif /* JIT_EMIT */
+#if JIT_EMIT == 0
+
+#define FLOAT_REGISTERS_TO_MAP 4
+
+void
+Parrot_jit_begin(Parrot_jit_info_t *jit_info,
+                 Interp * interpreter)
+{
+    /* Save the return address in the stack. */
+    emit_stw(jit_info->native_ptr, r30, r2, -0x14);
+    jit_emit_mov_rr(jit_info->native_ptr, r1, r3);
+    jit_emit_mov_rr(jit_info->native_ptr, r3, r30);
+    emit_stwm(jit_info->native_ptr, r30, r1, 0x40);
+    emit_stw(jit_info->native_ptr, r3, r26, -0x24);
+    emit_stw(jit_info->native_ptr, r3, r25, -0x28);
+    /* Callee-save registers. */
+    emit_ldo(jit_info->native_ptr, r30, r30, 0x40);
+    emit_stw(jit_info->native_ptr, r30, r4, -0x4);
+    emit_stw(jit_info->native_ptr, r30, r5, -0x8);
+    emit_stw(jit_info->native_ptr, r30, r6, -0xc);
+    emit_stw(jit_info->native_ptr, r30, r7, -0x10);
+    emit_stw(jit_info->native_ptr, r30, r8, -0x14);
+    emit_stw(jit_info->native_ptr, r30, r9, -0x18);
+    emit_stw(jit_info->native_ptr, r30, r10, -0x1c);
+    emit_stw(jit_info->native_ptr, r30, r11, -0x20);
+    emit_stw(jit_info->native_ptr, r30, r12, -0x24);
+    emit_stw(jit_info->native_ptr, r30, r13, -0x28);
+    emit_stw(jit_info->native_ptr, r30, r14, -0x2c);
+    emit_stw(jit_info->native_ptr, r30, r15, -0x30);
+    emit_stw(jit_info->native_ptr, r30, r16, -0x34);
+    emit_stw(jit_info->native_ptr, r30, r17, -0x38);
+    emit_stw(jit_info->native_ptr, r30, r18, -0x3c);
+    /* Move the interpreter to the base register. */
+    jit_emit_mov_rr(jit_info->native_ptr, BASE, r26);
+    jit_emit_mov_rr(jit_info->native_ptr, RET0, r25);
     Parrot_emit_jump_to_ret(jit_info, interpreter);
 }
 
@@ -653,36 +670,33 @@ Parrot_jit_dofixup(Parrot_jit_info_t *jit_info,
 }
 
 /* move reg to mem (i.e. intreg) */
-void
-Parrot_jit_emit_mov_mr(Interp * interpreter, char *mem, int reg)
+static void
+jit_mov_mr_offs(Parrot_jit_info_t *jit_info, int base, INTVAL offs, int reg)
 {
-    jit_emit_mov_mr_i(
-        ((Parrot_jit_info_t *)(interpreter->code->jit_info))->native_ptr, mem, reg);
+    jit_emit_mov_mr_i(jit_info->native_ptr, offs, reg);
 }
 
 /* move mem (i.e. intreg) to reg */
-void
-Parrot_jit_emit_mov_rm(Interp * interpreter, int reg, char *mem)
+static void
+jit_mov_rm_offs(Parrot_jit_info_t *jit_info, int reg, int base, INTVAL offs)
 {
-    jit_emit_mov_rm_i(
-        ((Parrot_jit_info_t *)(interpreter->code->jit_info))->native_ptr, reg, mem);
+    jit_emit_mov_rm_i(jit_info->native_ptr, reg, offs);
 }
 
 /* move reg to mem (i.e. numreg) */
-void
-Parrot_jit_emit_mov_mr_n(Interp * interpreter, char *mem,int reg)
+static void
+jit_mov_mr_n_offs(Parrot_jit_info_t * jit_info, int base, INTVAL offs, int reg)
 {
+	jit_emit_mov_mr_n(jit_info->native_ptr, offs, reg);
 }
 
 /* move mem (i.e. numreg) to reg */
-void
-Parrot_jit_emit_mov_rm_n(Interp * interpreter, int reg,char *mem)
+static void
+jit_mov_rm_n_offs(Parrot_jit_info_t * jit_info, int reg, int base, INTVAL offs)
 {
+	jit_emit_mov_rm_n(jit_info->native_ptr, reg, offs);
 }
 
-
-#endif /* JIT_EMIT */
-#if JIT_EMIT == 0
 
 #  define REQUIRES_CONSTANT_POOL 0
 #  define INT_REGISTERS_TO_MAP 14
@@ -692,6 +706,9 @@ Parrot_jit_emit_mov_rm_n(Interp * interpreter, int reg,char *mem)
 
 char intval_map[INT_REGISTERS_TO_MAP] =
     { r6, r7, r8, r9, r10, r11, r12, r13, r14, r15, r16, r17, r18};
+
+char intval_map_sub[] =
+	{ r0, r1, r2, r3, r4, r5 };
 
 static void
 hppa_sync_cache (void *_start, void *_end)
@@ -705,6 +722,49 @@ hppa_sync_cache (void *_start, void *_end)
     }
 
     __asm__ __volatile__ ("sync");
+}
+
+static const jit_arch_info arch_info = {
+	jit_mov_rm_offs,
+	jit_mov_rm_n_offs,
+	jit_mov_mr_offs,
+	jit_mov_mr_n_offs,
+	Parrot_jit_dofixup,
+	hppa_sync_cache,
+	{
+		{
+			Parrot_jit_begin,
+			INT_REGISTERS_TO_MAP,
+			INT_REGISTERS_TO_MAP,
+			intval_map,
+			0,
+			0,
+			NULL
+		},
+		{
+			NULL,
+			0,
+			0,
+			NULL,
+			0,
+			0,
+			NULL
+		},
+		{
+			NULL,
+			0,
+			0,
+			NULL,
+			0,
+			0,
+			NULL
+		}
+	}
+};
+const jit_arch_info*
+Parrot_jit_init(Interp *interpreter)
+{
+	return &arch_info;
 }
 
 #  endif
