@@ -725,23 +725,6 @@ TEMPLATE Parrot_branch_ic_i_ic {
     jit_emit_bc(jit_info, <CON>, *INT_CONST[3]);
 }
 
-Parrot_gt_i_i_ic {
-    Parrot_branch_i_i_ic s/<CON>/BGT/
-}
-
-Parrot_gt_i_ic_ic {
-    Parrot_branch_i_ic_ic s/<CON>/BGT/
-}
-
-Parrot_gt_ic_i_ic {
-    Parrot_branch_ic_i_ic s/<CON>/BGT/
-}
-
-Parrot_gt_ic_ic_ic {
-    if (*INT_CONST[1] > *INT_CONST[2])
-        jit_emit_bx(jit_info, 0, *INT_CONST[3]);
-}
-
 Parrot_eq_i_i_ic {
     Parrot_branch_i_i_ic s/<CON>/BEQ/
 }
@@ -754,27 +737,6 @@ Parrot_eq_ic_i_ic {
     Parrot_branch_ic_i_ic s/<CON>/BEQ/
 }
 
-Parrot_eq_ic_ic_ic {
-    if (*INT_CONST[1] == *INT_CONST[2])
-        jit_emit_bx(jit_info, 0, *INT_CONST[3]);
-}
-
-Parrot_ge_i_i_ic {
-    Parrot_branch_i_i_ic s/<CON>/BGE/
-}
-
-Parrot_ge_i_ic_ic {
-    Parrot_branch_i_ic_ic s/<CON>/BGE/
-}
-
-Parrot_ge_ic_i_ic {
-    Parrot_branch_ic_i_ic s/<CON>/BGE/
-}
-
-Parrot_ge_ic_ic_ic {
-    if (*INT_CONST[1] >= *INT_CONST[2])
-        jit_emit_bx(jit_info, 0, *INT_CONST[3]);
-}
 
 Parrot_lt_i_i_ic {
     Parrot_branch_i_i_ic s/<CON>/BLT/
@@ -786,11 +748,6 @@ Parrot_lt_i_ic_ic {
 
 Parrot_lt_ic_i_ic {
     Parrot_branch_ic_i_ic s/<CON>/BLT/
-}
-
-Parrot_lt_ic_ic_ic {
-    if (*INT_CONST[1] < *INT_CONST[2])
-        jit_emit_bx(jit_info, 0, *INT_CONST[3]);
 }
 
 Parrot_le_i_i_ic {
@@ -805,10 +762,6 @@ Parrot_le_ic_i_ic {
     Parrot_branch_ic_i_ic s/<CON>/BLE/
 }
 
-Parrot_le_ic_ic_ic {
-    if (*INT_CONST[1] <= *INT_CONST[2])
-        jit_emit_bx(jit_info, 0, *INT_CONST[3]);
-}
 
 Parrot_ne_i_i_ic {
     Parrot_branch_i_i_ic s/<CON>/BNE/
@@ -822,10 +775,6 @@ Parrot_ne_ic_i_ic {
     Parrot_branch_ic_i_ic s/<CON>/BNE/
 }
 
-Parrot_ne_ic_ic_ic {
-    if (*INT_CONST[1] != *INT_CONST[2])
-        jit_emit_bx(jit_info, 0, *INT_CONST[3]);
-}
 
 TEMPLATE Parrot_branch_n_n_ic {
     if (MAP[1] && MAP[2]) {
@@ -877,23 +826,6 @@ TEMPLATE Parrot_branch_nc_n_ic {
     jit_emit_bc(jit_info, <CON>, *INT_CONST[3]);
 }
 
-Parrot_gt_n_n_ic {
-    Parrot_branch_n_n_ic s/<CON>/BGT/
-}
-
-Parrot_gt_n_nc_ic {
-    Parrot_branch_n_nc_ic s/<CON>/BGT/
-}
-
-Parrot_gt_nc_n_ic {
-    Parrot_branch_nc_n_ic s/<CON>/BGT/
-}
-
-Parrot_gt_nc_nc_ic {
-    if (*NUM_CONST[1] > *NUM_CONST[2])
-        jit_emit_bx(jit_info, 0, *INT_CONST[3]);
-}
-
 Parrot_eq_n_n_ic {
         Parrot_branch_n_n_ic s/<CON>/BEQ/
 }
@@ -906,27 +838,6 @@ Parrot_eq_nc_n_ic {
     Parrot_branch_nc_n_ic s/<CON>/BEQ/
 }
 
-Parrot_eq_nc_nc_ic {
-    if (*NUM_CONST[1] == *NUM_CONST[2])
-        jit_emit_bx(jit_info, 0, *INT_CONST[3]);
-}
-
-Parrot_ge_n_n_ic {
-    Parrot_branch_n_n_ic s/<CON>/BGE/
-}
-
-Parrot_ge_n_nc_ic {
-    Parrot_branch_n_nc_ic s/<CON>/BGE/
-}
-
-Parrot_ge_nc_n_ic {
-    Parrot_branch_nc_n_ic s/<CON>/BGE/
-}
-
-Parrot_ge_nc_nc_ic {
-    if (*NUM_CONST[1] >= *NUM_CONST[2])
-        jit_emit_bx(jit_info, 0, *INT_CONST[3]);
-}
 
 Parrot_lt_n_n_ic {
     Parrot_branch_n_n_ic s/<CON>/BLT/
@@ -940,10 +851,6 @@ Parrot_lt_nc_n_ic {
     Parrot_branch_nc_n_ic s/<CON>/BLT/
 }
 
-Parrot_lt_nc_nc_ic {
-    if (*NUM_CONST[1] < *NUM_CONST[2])
-        jit_emit_bx(jit_info, 0, *INT_CONST[3]);
-}
 
 Parrot_le_n_n_ic {
     Parrot_branch_n_n_ic s/<CON>/BLE/
@@ -955,11 +862,6 @@ Parrot_le_n_nc_ic {
 
 Parrot_le_nc_n_ic {
     Parrot_branch_nc_n_ic s/<CON>/BLE/
-}
-
-Parrot_le_nc_nc_ic {
-    if (*NUM_CONST[1] <= *NUM_CONST[2])
-        jit_emit_bx(jit_info, 0, *INT_CONST[3]);
 }
 
 Parrot_ne_n_n_ic {
@@ -974,10 +876,6 @@ Parrot_ne_nc_n_ic {
     Parrot_branch_nc_n_ic s/<CON>/BLE/
 }
 
-Parrot_ne_nc_nc_ic {
-    if (*NUM_CONST[1] != *NUM_CONST[2])
-        jit_emit_bx(jit_info, 0, *INT_CONST[3]);
-}
 
 Parrot_branch_ic {
     jit_emit_bx(jit_info, 0, *INT_CONST[1]);
