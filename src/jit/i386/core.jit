@@ -845,7 +845,7 @@ Parrot_neg_n {
     unary_x s/<_N>/_n/ s/INT/NUM/  s/<op>/neg/
 }
 
-Parrot_not_i {
+Parrot_bnot_i {
     unary_x s/<_N>/_i/  s/<op>/not/
 }
 
@@ -857,46 +857,7 @@ Parrot_abs_n {
     unary_x s/<_N>/_n/ s/INT/NUM/  s/<op>/abs/
 }
 
-Parrot_neg_i_ic {
-    if (MAP[1]) {
-        jit_emit_mov_ri_i(NATIVECODE, MAP[1], -(*INT_CONST[2]));
-    }
-    else {
-        jit_emit_mov_MI_i(NATIVECODE, ROFFS_INT(1), -(*INT_CONST[2]));
-    }
-}
-
-Parrot_abs_i_ic {
-    INTVAL i = *INT_CONST[2];
-    if (MAP[1]) {
-        jit_emit_mov_ri_i(NATIVECODE, MAP[1], i < 0 ? -i : i);
-    }
-    else {
-        jit_emit_mov_MI_i(NATIVECODE, ROFFS_INT(1), i < 0 ? -i : i);
-    }
-}
-
-TEMPLATE Parrot_absneg_n_nc {
-    if (MAP[1]) {
-        jit_emit_mov_ri_n(NATIVECODE, MAP[1], &NUM_CONST[2]);
-        jit_emit_<op>_r_n(NATIVECODE, MAP[1]);
-    }
-    else {
-        jit_emit_mov_ri_n(NATIVECODE, FSR1, &NUM_CONST[2]);
-        jit_emit_<op>_r_n(NATIVECODE, FSR1);
-        jit_emit_mov_MR_n(NATIVECODE, ROFFS_NUM(1), FSR1);
-    }
-}
-
-Parrot_neg_n_nc {
-    Parrot_absneg_n_nc s/<op>/neg/
-}
-
-Parrot_abs_n_nc {
-    Parrot_absneg_n_nc s/<op>/abs/
-}
-
-TEMPLATE Parrot_absneg_x_x {
+TEMPLATE unary_x_x {
     if (MAP[1] && MAP[2]) {
         jit_emit_mov_rr<_N>(NATIVECODE, MAP[1], MAP[2]);
         jit_emit_<op>_r<_N>(NATIVECODE, MAP[1]);
@@ -918,30 +879,22 @@ TEMPLATE Parrot_absneg_x_x {
 }
 
 Parrot_bnot_i_i {
-    Parrot_absneg_x_x s/<_N>/_i/ s/<op>/not/
-}
-Parrot_bnot_i_ic {
-    if (MAP[1]) {
-        jit_emit_mov_ri_i(NATIVECODE, MAP[1], ~(*INT_CONST[2]));
-    }
-    else {
-        jit_emit_mov_MI_i(NATIVECODE, ROFFS_INT(1), ~(*INT_CONST[2]));
-    }
+    unary_x_x s/<_N>/_i/ s/<op>/not/
 }
 
 Parrot_neg_i_i {
-    Parrot_absneg_x_x s/<_N>/_i/ s/<op>/neg/
+    unary_x_x s/<_N>/_i/ s/<op>/neg/
 }
 
 Parrot_abs_i_i {
-    Parrot_absneg_x_x s/<_N>/_i/ s/<op>/abs/
+    unary_x_x s/<_N>/_i/ s/<op>/abs/
 }
 Parrot_neg_n_n {
-    Parrot_absneg_x_x s/<_N>/_n/ s/ISR/FSR/ s/INT/NUM/ s/<op>/neg/
+    unary_x_x s/<_N>/_n/ s/ISR/FSR/ s/INT/NUM/ s/<op>/neg/
 }
 
 Parrot_abs_n_n {
-    Parrot_absneg_x_x s/<_N>/_n/ s/ISR/FSR/ s/INT/NUM/ s/<op>/abs/
+    unary_x_x s/<_N>/_n/ s/ISR/FSR/ s/INT/NUM/ s/<op>/abs/
 }
 
 
