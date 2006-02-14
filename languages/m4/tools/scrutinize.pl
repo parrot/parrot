@@ -4,7 +4,7 @@
 
 scrutinize.pl - check Perl code with Perl::Critic
 
-=DESCRIPTION
+=head1 DESCRIPTION
 
 This is not below 't', in order to not interfere with regression testing.
 
@@ -14,7 +14,7 @@ Find a better name. 'perlcritic' is already taken.
 
 Look at the test scripts as well.
 
-=Author
+=head1 Author
 
 Bernhard Schmalhofer - <Bernhard.Schmalhofer@gmx.de>
 
