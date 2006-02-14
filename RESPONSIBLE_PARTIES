@@ -7,7 +7,9 @@ taken responsibility for.
 
 Design                          Chip Salzenberg
 Release pumpking                Leopold "leo" Toetsch
-JIT                             Daniel Grunblatt, Leopold Toetsch
+JIT x86                         Leopold Toetsch
+JIT ppc                         Leopold Toetsch
+JIT $else                       ** volunteers?? **
 Configure                       Joshua Hoblitt
 Garbage Collector               ** volunteers?? **
 I/O                             Juergen Boemmels
