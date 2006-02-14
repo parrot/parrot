@@ -1,9 +1,20 @@
 # $Id$
 
+=head1 NAME
+
+Test/M4.pm - Testing routines specific to 'm4'.
+
+=head1 DESCRIPTION
+
+Call 'Parrot m4' and 'GNU m4'.
+
+=cut
+
 package Parrot::Test::M4;
 
 use strict;
 use warnings;
+use 5.008;
 
 use Data::Dumper;
 use File::Basename;
@@ -12,13 +23,7 @@ use Parrot::Test;
 use Parrot::Test::M4::Gnu;
 use Parrot::Test::M4::PIR;
 
-=head1 NAME
-
-Test/M4.pm - Testing routines specific to 'm4'.
-
-=head1 DESCRIPTION
-
-Call 'Parrot m4' and 'GNU m4'.
+our $VERSION = 0.01;
 
 =head1 METHODS
 
@@ -39,11 +44,11 @@ sub new {
 my %language_test_map = (
     output_is         => 'is_eq',
     output_like       => 'like',
-    output_isnt       => 'isnt_eq'
+    output_isnt       => 'isnt_eq',
                         );
 
 foreach my $func ( keys %language_test_map ) {
-    no strict 'refs';
+    no strict 'refs';            ## no critic
 
     *{"Parrot::Test::M4::$func"} = sub ($$;$) {
         my $self = shift;
@@ -75,11 +80,15 @@ foreach my $func ( keys %language_test_map ) {
                        $output,
                        $desc
                                                   );
-        unless ( $pass ) {
-            my $diag = '';
+        if ( ! $pass ) {
+            my $diag = q{};
             my $test_prog = join ' && ', @test_prog;
-            $diag .= "'$test_prog' failed with exit code $exit_code." if $exit_code;
-            $self->{builder}->diag( $diag ) if $diag;
+            if ( $exit_code ) {
+                $diag .= "'$test_prog' failed with exit code $exit_code."
+            }
+            if ( $diag ) {
+                $self->{builder}->diag( $diag )
+            }
         }
 
         # The generated files are left in the t/* directories.

@@ -47,6 +47,8 @@ help:
 	@echo ""
 	@echo "Misc:"
 	@echo "  help:              Print this help message."
+	@echo "  html:              Generate HTML documentation."
+	@echo "  perlcritic:        Look at the Perl code with Perl::Critic."
 	@echo ""
 
 test: build
@@ -67,6 +69,9 @@ src/m4.pir: src/builtin.pir src/freeze.pir src/input.pir src/macro.pir src/outpu
 html: 
 	mkdir docs/html 
 	pod2html docs/*.pod -o docs/html
+ 
+perlcritic:
+	$(PERL) tools/scrutinize.pl
  
 clean:
 	$(RM_RF) \
