@@ -423,6 +423,20 @@ enum { JIT_PPC_CALL, JIT_PPC_BRANCH, JIT_PPC_UBRANCH };
     *(pc++) = (char)(B << 3 | C >> 2); \
     *(pc++) = (char)(C << 6 | type << 1 | Rc)
 
+/* rotate instructions */
+
+#  define jit_emit_rlwimi(pc, A, S, SH, MB, ME) \
+    jit_emit_3a(pc, 20, S, A, SH, MB, ME, 0)
+
+#  define jit_emit_rlwinm(pc, A, S, SH, MB, ME) \
+    jit_emit_3a(pc, 21, S, A, SH, MB, ME, 0)
+
+#  define jit_emit_rot_rri(pc, A, S, im) \
+    jit_emit_rlwinm(pc, A, S, im, 0, 31)
+
+#  define jit_emit_rlwnm(pc, A, S, B, MB, ME) \
+    jit_emit_3a(pc, 23, S, A, B, M, ME, 0)
+
 #  define jit_emit_fadd_rrr(pc, D, A, B) jit_emit_3a(pc, 63, D, A, B, 0, 21, 0)
 #  define jit_emit_fsub_rrr(pc, D, A, B) jit_emit_3a(pc, 63, D, A, B, 0, 20, 0)
 #  define jit_emit_fmul_rrr(pc, D, A, B) jit_emit_3a(pc, 63, D, A, 0, B, 25, 0)

@@ -495,6 +495,32 @@ Parrot_div_n_n_n {
     Parrot_binop_x_x_x s/<_N>/_n/ s/<op>/fdiv/ s/<s1>/FSR1/ s/<s2>/FSR2/ s/<T>/NUM/
 }
 
+Parrot_rot_i_i_ic_ic {
+    int rc = *INT_CONST[3];
+    int bw = *INT_CONST[4];
+    if (rc < 0)
+	rc = bw + rc;
+    if (MAP[1] && MAP[2]) {
+	jit_emit_rot_rri(NATIVECODE, MAP[1], MAP[2], rc);
+    }
+    else if (MAP[1]) {
+        jit_emit_mov_rm_i(NATIVECODE, ISR2, ROFFS_INT(2));
+	jit_emit_rot_rri(NATIVECODE, MAP[1], ISR2, rc);
+    }
+    else if (MAP[2]) {
+        jit_emit_mov_rm_i(NATIVECODE, ISR1, ROFFS_INT(1));
+	jit_emit_rot_rri(NATIVECODE, ISR1, MAP[2], rc);
+        jit_emit_mov_mr_i(NATIVECODE, ROFFS_INT(1), ISR1);
+    }
+    else {
+        jit_emit_mov_rm_i(NATIVECODE, ISR1, ROFFS_INT(1));
+        jit_emit_mov_rm_i(NATIVECODE, ISR2, ROFFS_INT(2));
+	jit_emit_rot_rri(NATIVECODE, ISR1, ISR2, rc);
+        jit_emit_mov_mr_i(NATIVECODE, ROFFS_INT(1), ISR1);
+    }
+
+}
+
 Parrot_inc_i {
     if (MAP[1]) {
         jit_emit_add_rri_i (NATIVECODE, MAP[1], MAP[1], 1);

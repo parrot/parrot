@@ -488,7 +488,20 @@ CODE
 12
 OUTPUT
 
+pasm_output_is(<<'CODE', <<'OUTPUT', 'rot_i_i_ic_ic');
+    set I0, 0b001100
+    rot I1, I0, 1, 32   # 1 left
+    print I1
+    print "\n"
+    rot I1, I0, -1, 32   # 1 right
+    print I1
+    print "\n"
+    end
+CODE
+24
+6
+OUTPUT
 
 ## remember to change the number of tests :-)
-BEGIN { plan tests => 25; }
+BEGIN { plan tests => 26; }
 
