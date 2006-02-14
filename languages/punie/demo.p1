@@ -13,3 +13,16 @@ do {
 	print "ok 16\n"; 
 	print "ok 17\n"; 
 };
+
+if (1) {
+  print "ok 18\n";
+}
+if (0) {
+  print "should never be printed\n";
+}
+unless (0) {
+  print "ok 19\n";
+}
+unless (1) {
+  print "should never be printed\n";
+}

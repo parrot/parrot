@@ -131,3 +131,27 @@ All POST nodes subclass from this base type.
     print "]\n"
     .return ()
 .end
+
+.sub generate_label :method
+    .param string name :optional
+    .param int got_name :opt_flag
+    .local string label
+     unless got_name goto no_name
+       label = name . "_"
+  no_name:
+     label .= "label_"
+     $I1 = _new_label_id()
+     $S1 = $I1
+     label .= $S1
+     .return (label)
+.end
+
+# Autoincrementing id generator
+.sub _new_label_id
+    .local int id
+    id = 0
+loop:
+    inc id 
+    .yield(id)
+    goto loop
+.end

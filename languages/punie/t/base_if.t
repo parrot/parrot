@@ -2,8 +2,26 @@
 
 use strict;
 use lib qw(t . lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 1;
+use Parrot::Test tests => 2;
 use Test::More;
+
+language_output_is('punie', <<'CODE', <<'OUT', 'simple conditionals');
+if (1) {
+  print "ok 1\n";
+}
+if (0) {
+  print "ok 2\n";
+}
+unless (0) {
+  print "ok 3\n";
+}
+unless (1) {
+  print "ok 4\n";
+}
+CODE
+ok 1
+ok 3
+OUT
 
 TODO: {
 local $TODO = 'unimplemented feature';
