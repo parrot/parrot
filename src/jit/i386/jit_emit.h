@@ -1366,6 +1366,12 @@ static unsigned char *lastpc;
 #  define emitm_jle 14
 #  define emitm_jg  15
 
+/* set byte conditional */
+#define jit_emit_setcc_r(pc, cc, r) \
+    *pc++ = 0x0f; \
+    *pc++ = 0x90 + cc; \
+    *pc++ = (char) emit_alu_X_r(0, r) 
+
 /*
  * core.jit interface
  *
