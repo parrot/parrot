@@ -34,6 +34,25 @@ Parrot_set_i_ic {
     }
 }
 
+Parrot_set_i_n {
+    if (MAP[2]) {
+	jit_emit_fctiwz  (NATIVECODE, FSR2, MAP[2]);
+    }
+    else {
+        jit_emit_mov_rm_n(NATIVECODE, FSR1, ROFFS_NUM(2));
+	jit_emit_fctiwz  (NATIVECODE, FSR2, FSR1);
+    }
+    if (MAP[1]) {
+	jit_emit_add_rri_i(NATIVECODE, ISR1, 0, -4);
+	jit_emit_stfiwx   (NATIVECODE, FSR2, ISR1, r1);   /* -> -4(sp) */
+	jit_emit_lwz      (NATIVECODE, MAP[1], -4, r1);
+    }
+    else {
+	jit_emit_add_rri_i(NATIVECODE, ISR1, 0, ROFFS_INT(1));
+	jit_emit_stfiwx   (NATIVECODE, FSR2, ISR1, r13);   /* -> offs(base) */
+    }
+}
+
 Parrot_set_n_ic {
     static double xx = 4503601774854144.0; /* 0x4330000080000000L; */
     jit_emit_mov_ri_i(NATIVECODE, ISR1, *INT_CONST[2]);

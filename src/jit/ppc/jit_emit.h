@@ -435,6 +435,11 @@ enum { JIT_PPC_CALL, JIT_PPC_BRANCH, JIT_PPC_UBRANCH };
 #  define jit_emit_fmr(pc, D, A)   jit_emit_3reg_x(pc, 63, D, 0, A, 72, 0)
 #  define jit_emit_mov_rr_n(pc, D, A) jit_emit_fmr(pc, D, A)
 
+/* float cvt to int (round towards zero) */
+#  define jit_emit_fctiwz(pc, D, A)   jit_emit_3reg_x(pc, 63, D, 0, A, 15, 0)
+/* Store Floating-Point as Integer Word Indexed */
+#  define jit_emit_stfiwx(pc, S, A, B)  jit_emit_3reg_x(pc, 31, S, A, B, 983, 0)
+
 /* not in core.ops, but probably should be: */
 #  define jit_emit_fsqrt(pc, D, A) jit_emit_3reg(pc, 63, D, 0, A, 0, 18, 0)
 
