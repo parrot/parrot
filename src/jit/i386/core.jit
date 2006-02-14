@@ -1562,6 +1562,56 @@ Parrot_isle_i_n_n {
     iscc_i_x_x s/<_N>/_n/ s/<cc>/emitm_jbe/ s/<typ>/NUM/ s/<scr>/FSR1/
 }
 
+TEMPLATE iscc_i_x_xc {
+    if (MAP[2]) {
+        jit_emit_cmp_ri<_N>(NATIVECODE, MAP[2], <c>_CONST[3]);
+    }
+    else {
+        jit_emit_mov_RM<_N>(NATIVECODE, <scr>, ROFFS_<typ>(2));
+        jit_emit_cmp_ri<_N>(NATIVECODE, <scr>, <c>_CONST[3]);
+    }
+    jit_emit_mov_ri_i(NATIVECODE, ISR1, 0);
+    jit_emit_setcc_r(NATIVECODE, <cc>, ISR1);
+    if (MAP[1]) {
+        jit_emit_mov_rr_i(NATIVECODE, MAP[1], ISR1);
+    }
+    else {
+        jit_emit_mov_MR_i(NATIVECODE, ROFFS_INT(1), ISR1);
+    }
+}
+
+Parrot_iseq_i_i_ic {
+    iscc_i_x_xc s/<_N>/_i/ s/<cc>/emitm_je/ s/<typ>/INT/ s/<scr>/ISR1/ s/<c>/*INT/
+}
+
+Parrot_isne_i_i_ic {
+    iscc_i_x_xc s/<_N>/_i/ s/<cc>/emitm_jne/ s/<typ>/INT/ s/<scr>/ISR1/ s/<c>/*INT/
+}
+
+Parrot_islt_i_i_ic {
+    iscc_i_x_xc s/<_N>/_i/ s/<cc>/emitm_jl/ s/<typ>/INT/ s/<scr>/ISR1/ s/<c>/*INT/
+}
+
+Parrot_isle_i_i_ic {
+    iscc_i_x_xc s/<_N>/_i/ s/<cc>/emitm_jle/ s/<typ>/INT/ s/<scr>/ISR1/ s/<c>/*INT/
+}
+
+Parrot_iseq_i_n_cn {
+    iscc_i_x_xc s/<_N>/_n/ s/<cc>/emitm_je/ s/<typ>/NUM/ s/<scr>/FSR1/ s/<c>/&NUM/
+}
+
+Parrot_isne_i_n_nc {
+    iscc_i_x_xc s/<_N>/_n/ s/<cc>/emitm_jne/ s/<typ>/NUM/ s/<scr>/FSR1/ s/<c>/&NUM/
+}
+
+Parrot_islt_i_n_nc {
+    iscc_i_x_xc s/<_N>/_n/ s/<cc>/emitm_jb/ s/<typ>/NUM/ s/<scr>/FSR1/ s/<c>/&NUM/
+}
+
+Parrot_isle_i_n_nc {
+    iscc_i_x_xc s/<_N>/_n/ s/<cc>/emitm_jbe/ s/<typ>/NUM/ s/<scr>/FSR1/ s/<c>/&NUM/
+}
+
 /*
  * Local variables:
  * c-indentation-style: bsd
