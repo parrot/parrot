@@ -734,6 +734,8 @@ opt_mul(char *pc, int dest, INTVAL imm, int src)
 #  define emitm_notl_m(pc, b, i, s, d) \
     emitm_alu_imp_m(pc, emit_b010, b, i, s, d)
 
+#define jit_emit_not_M_i(pc, offs) emitm_notl_m(pc, emit_EBX, 0, 1, offs)
+
 /* XCHG */
 #  define jit_emit_xchg_rr_i(pc, r1, r2) { \
     if (r1 != r2) { \

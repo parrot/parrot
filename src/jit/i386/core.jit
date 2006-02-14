@@ -822,21 +822,39 @@ Parrot_cmod_n_n_n {
         Parrot_binop_x_x_x s/<op>/cmod/ s/<_N>/_n/ s/ISR/FSR/ s/INT/NUM/
 }
 
-TEMPLATE Parrot_neg_x {
+TEMPLATE unary_x {
     if (MAP[1]) {
-        jit_emit_neg_r<_N>(NATIVECODE, MAP[1]);
+        jit_emit_<op>_r<_N>(NATIVECODE, MAP[1]);
     }
     else {
-        jit_emit_neg_M<_N>(NATIVECODE, ROFFS_INT(1));
+#ifdef jit_emit_<op>_M<_N>
+        jit_emit_<op>_M<_N>(NATIVECODE, ROFFS_INT(1));
+#else
+        jit_emit_mov_RM<_N>(NATIVECODE, ISR1, ROFFS_INT(1));
+        jit_emit_<op>_r<_N>(NATIVECODE, ISR1);
+        jit_emit_mov_MR<_N>(NATIVECODE, ROFFS_INT(1), ISR1);
+#endif
     }
 }
 
 Parrot_neg_i {
-    Parrot_neg_x s/<_N>/_i/
+    unary_x s/<_N>/_i/  s/<op>/neg/
 }
 
 Parrot_neg_n {
-    Parrot_neg_x s/<_N>/_n/ s/INT/NUM/
+    unary_x s/<_N>/_n/ s/INT/NUM/  s/<op>/neg/
+}
+
+Parrot_not_i {
+    unary_x s/<_N>/_i/  s/<op>/not/
+}
+
+Parrot_abs_i {
+    unary_x s/<_N>/_i/ s/<op>/abs/
+}
+
+Parrot_abs_n {
+    unary_x s/<_N>/_n/ s/INT/NUM/  s/<op>/abs/
 }
 
 Parrot_neg_i_ic {
