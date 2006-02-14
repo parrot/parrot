@@ -237,7 +237,7 @@ inline op pic_set_returns__(inconst PMC) :pic {
 Call the function $1 as C<pc = func(interp, 0, **args)>. args[0] holds the
 address of the function result, args[1..] are function arguments, both
 according to the C<get_results> and C<set_args> opcodes. The function is
-a C interface function (or NCI) or a JITed PIR function. args[n] holds the
+a C interface function (or NCI) or a JITed PIR function. args[n+1] holds the
 C<pc> of the next opcode and is usually just returned.
 
 =cut
@@ -250,10 +250,11 @@ inline op pic_callr__(inconst PMC) :pic {
     opcode_t *pc;
     void **pred_pc;
     INTVAL i, n_args, *sig_bits;
-    PMC *sig;       /* sig is currently only inside the assert */
+    PMC *sig;
 
     ctx = CONTEXT(interpreter->ctx);
     mic = (Parrot_MIC *) cur_opcode[1];
+    /* get_results */
     pc = ctx->current_results;
     if (pc) {
         pred_pc = (void**) pc - ctx->pred_offset;
