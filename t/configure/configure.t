@@ -138,7 +138,11 @@ can_ok('Parrot::Configure', qw(
     $ran = 0;
     sub runstep
     {
+        my ($self, $conf) = @_;
+
         $ran = 1;
+
+        return $self;
     }
 
     package main;
@@ -165,6 +169,7 @@ can_ok('Parrot::Configure', qw(
     sub runstep
     {
         ($self, $conf, @params) = @_;
+        return $self;
     }
 
     package main;
@@ -195,6 +200,7 @@ can_ok('Parrot::Configure', qw(
     sub runstep
     {
         ($self, $conf, @params) = @_;
+        return $self;
     }
 
     package main;
