@@ -173,7 +173,7 @@ TEMPLATE Parrot_binop_i_ic {
     else {
         jit_emit_mov_rm_i(NATIVECODE, ISR1, ROFFS_INT(1));
         jit_emit_mov_ri_i(NATIVECODE, ISR2, *INT_CONST[2]);
-        jit_emit_<op>_rrr(NATIVECODE, ISR1, ISR2, ISR1);
+        jit_emit_<op>_rrr(NATIVECODE, ISR1, ISR1, ISR2);
         jit_emit_mov_mr_i(NATIVECODE, ROFFS_INT(1), ISR1);
     }
 }
@@ -194,7 +194,7 @@ TEMPLATE Parrot_binop_x_x {
     else {
         jit_emit_mov_rm<_N>(NATIVECODE, <s1>, ROFFS_<T>(1));
         jit_emit_mov_rm<_N>(NATIVECODE, <s2>, ROFFS_<T>(2));
-        jit_emit_<op>_rrr(NATIVECODE, <s1>, <s2>, <s1>);
+        jit_emit_<op>_rrr(NATIVECODE, <s1>, <s1>, <s2>);
         jit_emit_mov_mr<_N>(NATIVECODE, ROFFS_<T>(1), <s1>);
     }
 }

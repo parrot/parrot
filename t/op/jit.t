@@ -321,6 +321,26 @@ CODE
 314
 OUTPUT
 
+pasm_output_is(<<'CODE', <<'OUTPUT', "sub_i_ic 0 mapped");
+set I0,0
+set I1,1
+set I2,2
+set I3,3
+set I4,4
+set I0,I1
+set I2,I3
+set I0,I1
+set I2,I3
+sub I5, 2
+print I5
+print I1
+print I4
+print "\n"
+end
+CODE
+-214
+OUTPUT
+
 pasm_output_is(<<'CODE', <<'OUTPUT', "sub_i_i_i 0 mapped");
 cleari
 set I0,0
@@ -1249,4 +1269,4 @@ CODE
 OUTPUT
 
 ## remember to change the number of tests :-)
-BEGIN { plan tests => 61; }
+BEGIN { plan tests => 62; }
