@@ -1,6 +1,8 @@
-/* $Id$
- *
- */
+// Copyright: 2006 The Perl Foundation.  All Rights Reserved.
+// $Id$ 
+ 
+// Parse bc
+
 grammar BcParser;
 
 options 

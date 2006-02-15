@@ -20,7 +20,7 @@ use Parrot::Test;
 use Test::More;
 
 if ( $PConfig{has_python} ) {
-  plan tests => 75;
+  plan tests => 78;
 }
 else {
   plan skip_all => 'ANTLR2 based bc needs Python';
@@ -52,8 +52,13 @@ sub run_tests {
 }
 
 my @tests = (
+       # single non-negative integer 
+       [ '1', [ 1 ], 'positive int 1', with_past => 1, with_antlr3 => 1  ],
+       [ '0', [ 0 ], 'zero', with_past => 1, with_antlr3 => 1  ],
+       [ '2', [ 2 ], 'positive int', with_past => 1, with_antlr3 => 1  ],
+       [ '12345678', [ 12345678 ], 'another positive int', with_past => 1, with_antlr3 => 1  ],
+
        # multiple lines
-       [ '1', [ 1 ], 'one line', with_past => 1, with_antlr3 => 1  ],
        [ "1\n2", [ 1, 2 ], 'two lines', with_past => 1  ],
        [ "1\n2\n3\n4\n\n5\n6\n7", [ 1, 2, 3, 4, 5, 6, 7 ], 'seven lines', with_past => 1  ],
 

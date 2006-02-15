@@ -1,9 +1,8 @@
 // Copyright: 2006 The Perl Foundation.  All Rights Reserved.
 // $Id$
 
-//----------------------------------------------------------------------------
 // Transform ANTLR PAST to PIR that sets up PAST
-//----------------------------------------------------------------------------
+
 tree grammar AntlrPast2PirPast;
 
 options
@@ -13,7 +12,7 @@ options
 }
 
 gen_pir_past
-  : ^(PROGRAM INT)
+  : ^(PROGRAM expr)
     {
       String pirBefore 
         =   "#!/usr/bin/env parrot\n"
@@ -28,6 +27,7 @@ gen_pir_past
           + "\n"
           + "  .local pmc stmts_children\n"
           + "  stmts_children = new PerlArray\n";
+
       String pirAfter
         =   "  .local pmc stmts\n"
           + "  stmts = new 'PAST::Stmts'\n"
@@ -102,9 +102,10 @@ gen_pir_past
           + "    print filename\n"
           + "    end\n"
           + ".end\n";
+
       String pirDummy
         =   "               \$P10 = new 'PAST::Val' \n"
-          + "               \$P10.set_node( '1', 0, '1' ) \n"
+          + "               \$P10.set_node( '1', 0, " + $expr.text + " ) \n"
           + "               \$P10.valtype( 'num' ) \n"
           + "               \$P20 = new 'PAST::Exp' \n"
           + "               \$P21 = new PerlArray \n"
@@ -143,6 +144,11 @@ gen_pir_past
           + "  push \$P101, \$P90 \n"
           + "  \$P100.set_node('1', 1 ,\$P101) \n"
           + "  push stmts_children, \$P100 \n";
+
        System.out.print( pirBefore + pirDummy + pirAfter );    
     }
+  ;
+
+expr
+  : INT
   ;
