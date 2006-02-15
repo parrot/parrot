@@ -521,38 +521,50 @@ Parrot_rot_i_i_ic_ic {
 
 }
 
-; TODO _n variant
+; actually this covers islt too, by passing the bit
 TEMPLATE iseq_i_x_x {
     if (MAP[2] && MAP[3]) {
-        jit_emit_cmp_rr(NATIVECODE, MAP[2], MAP[3]);
+        jit_emit_<op>_rr(NATIVECODE, MAP[2], MAP[3]);
     }
     else if (MAP[2]) {
-        jit_emit_mov_rm_i(NATIVECODE, ISR1, ROFFS_INT(3)); 
-        jit_emit_cmp_rr(NATIVECODE, MAP[2], ISR1);
+        jit_emit_mov_rm<_N>(NATIVECODE, <s1>, ROFFS_<t>(3)); 
+        jit_emit_<op>_rr(NATIVECODE, MAP[2], <s1>);
     }
     else if (MAP[3]) {
-        jit_emit_mov_rm_i(NATIVECODE, ISR1, ROFFS_INT(2));
-        jit_emit_cmp_rr(NATIVECODE, ISR1, MAP[3]);
+        jit_emit_mov_rm<_N>(NATIVECODE, <s1>, ROFFS_<t>(2));
+        jit_emit_<op>_rr(NATIVECODE, <s1>, MAP[3]);
     }
     else {
-        jit_emit_mov_rm_i(NATIVECODE, ISR2, ROFFS_INT(2));
-        jit_emit_mov_rm_i(NATIVECODE, ISR1, ROFFS_INT(3));
-        jit_emit_cmp_rr(NATIVECODE, ISR2, ISR1);
+        jit_emit_mov_rm<_N>(NATIVECODE, <s2>, ROFFS_<t>(2));
+        jit_emit_mov_rm<_N>(NATIVECODE, <s1>, ROFFS_<t>(3));
+        jit_emit_<op>_rr(NATIVECODE, <s2>, <s1>);
     }
     jit_emit_mfcr(NATIVECODE, ISR1);
     /* bits 0 LT, 1 GT, 2 EQ */
     /* see also extrwi */
     if (MAP[1]) {
-	jit_emit_rlwinm(NATIVECODE, MAP[1], ISR1, 3, 31, 31);
+	jit_emit_rlwinm(NATIVECODE, MAP[1], ISR1, <b>, 31, 31);
     }
     else {
-	jit_emit_rlwinm(NATIVECODE, ISR1, ISR1, 3, 31, 31);
+	jit_emit_rlwinm(NATIVECODE, ISR1, ISR1, <b>, 31, 31);
         jit_emit_mov_mr_i(NATIVECODE, ROFFS_INT(1), ISR1);
     }
 }
 
 Parrot_iseq_i_i_i {
-    iseq_i_x_x
+    iseq_i_x_x s/<op>/cmp/ s/<s1>/ISR1/ s/<s2>/ISR2/ s/<t>/INT/ s/<_N>/_i/ s/<b>/3/
+}
+
+Parrot_iseq_i_n_n {
+    iseq_i_x_x s/<op>/fcmp/ s/<s1>/FSR1/ s/<s2>/FSR2/ s/<t>/NUM/ s/<_N>/_n/ s/<b>/3/
+}
+
+Parrot_islt_i_i_i {
+    iseq_i_x_x s/<op>/cmp/ s/<s1>/ISR1/ s/<s2>/ISR2/ s/<t>/INT/ s/<_N>/_i/ s/<b>/1/
+}
+
+Parrot_islt_i_n_n {
+    iseq_i_x_x s/<op>/fcmp/ s/<s1>/FSR1/ s/<s2>/FSR2/ s/<t>/NUM/ s/<_N>/_n/ s/<b>/1/
 }
 
 Parrot_inc_i {
