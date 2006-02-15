@@ -283,7 +283,7 @@ enum { JIT_PPC_CALL, JIT_PPC_BRANCH, JIT_PPC_UBRANCH };
 
 #  define jit_emit_sub_rrr jit_emit_subf
 
-#  define jit_emit_neg_rr(pc, D, A) \
+#  define jit_emit_neg_rr_i(pc, D, A) \
     jit_emit_3reg(pc, 31, D, A, 0, 0, 104, 0);
 
 #  define jit_emit_mul_rrr(pc, D, A, B) \
@@ -446,8 +446,8 @@ enum { JIT_PPC_CALL, JIT_PPC_BRANCH, JIT_PPC_UBRANCH };
 #  define jit_emit_fdiv_rrr_no_check(pc, D, A, B) jit_emit_3a(pc, 63, D, A, B, 0, 18, 0)
 #  define jit_emit_fsel(pc, D, A, B, C) jit_emit_3a(pc, 63, D, A, B, C, 23, 0)
 
-#  define jit_emit_fabs_rrr(pc, D, A)  jit_emit_3reg_x(pc, 63, D, 0, A, 264, 0)
-#  define jit_emit_fneg_rrr(pc, D, A)   jit_emit_3reg_x(pc, 63, D, 0, A, 40, 0)
+#  define jit_emit_abs_rr_n(pc, D, A)  jit_emit_3reg_x(pc, 63, D, 0, A, 264, 0)
+#  define jit_emit_neg_rr_n(pc, D, A)   jit_emit_3reg_x(pc, 63, D, 0, A, 40, 0)
 
 #  define jit_emit_fmr(pc, D, A)   jit_emit_3reg_x(pc, 63, D, 0, A, 72, 0)
 #  define jit_emit_mov_rr_n(pc, D, A) jit_emit_fmr(pc, D, A)
