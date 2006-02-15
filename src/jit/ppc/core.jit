@@ -551,6 +551,38 @@ TEMPLATE iseq_i_x_x {
     }
 }
 
+TEMPLATE isle_i_x_x {
+    if (MAP[2] && MAP[3]) {
+        jit_emit_<op>_rr(NATIVECODE, MAP[2], MAP[3]);
+    }
+    else if (MAP[2]) {
+        jit_emit_mov_rm<_N>(NATIVECODE, <s1>, ROFFS_<t>(3)); 
+        jit_emit_<op>_rr(NATIVECODE, MAP[2], <s1>);
+    }
+    else if (MAP[3]) {
+        jit_emit_mov_rm<_N>(NATIVECODE, <s1>, ROFFS_<t>(2));
+        jit_emit_<op>_rr(NATIVECODE, <s1>, MAP[3]);
+    }
+    else {
+        jit_emit_mov_rm<_N>(NATIVECODE, <s2>, ROFFS_<t>(2));
+        jit_emit_mov_rm<_N>(NATIVECODE, <s1>, ROFFS_<t>(3));
+        jit_emit_<op>_rr(NATIVECODE, <s2>, <s1>);
+    }
+    jit_emit_mfcr(NATIVECODE, ISR1);
+    /* bits 0 LT, 1 GT, 2 EQ */
+    /* this is LT or LE - get LT */
+    jit_emit_rlwinm(NATIVECODE, ISR2, ISR1, 1, 31, 31);
+    /* get EQ and or the bits into destination */
+    jit_emit_rlwinm(NATIVECODE, ISR1, ISR1, 3, 31, 31);
+    if (MAP[1]) {
+	jit_emit_or_rrr(NATIVECODE, MAP[1], ISR1, ISR2);
+    }
+    else {
+	jit_emit_or_rrr(NATIVECODE, ISR1, ISR1, ISR2);
+        jit_emit_mov_mr_i(NATIVECODE, ROFFS_INT(1), ISR1);
+    }
+}
+
 Parrot_iseq_i_i_i {
     iseq_i_x_x s/<op>/cmp/ s/<s1>/ISR1/ s/<s2>/ISR2/ s/<t>/INT/ s/<_N>/_i/ s/<b>/3/
 }
@@ -565,6 +597,14 @@ Parrot_islt_i_i_i {
 
 Parrot_islt_i_n_n {
     iseq_i_x_x s/<op>/fcmp/ s/<s1>/FSR1/ s/<s2>/FSR2/ s/<t>/NUM/ s/<_N>/_n/ s/<b>/1/
+}
+
+Parrot_isle_i_i_i {
+    isle_i_x_x s/<op>/cmp/ s/<s1>/ISR1/ s/<s2>/ISR2/ s/<t>/INT/ s/<_N>/_i/ 
+}
+
+Parrot_isle_i_n_n {
+    isle_i_x_x s/<op>/fcmp/ s/<s1>/FSR1/ s/<s2>/FSR2/ s/<t>/NUM/ s/<_N>/_n/
 }
 
 Parrot_inc_i {
