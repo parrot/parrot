@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use vars qw( %docs $n_docs );
-
+use Parrot::Config;
 
 BEGIN {
     eval "use Pod::Find";
@@ -14,9 +14,11 @@ BEGIN {
         print "1..1\nok 1 # skip Pod::Find not installed\n";
         exit;
     }
+    # XXX this should really be using src_dir insetad of build_dir but it
+    # doesn't exist (yet)
     %docs = Pod::Find::pod_find(
         { -verbose => 0, -inc => 0 },
-        qw( . ) # search path(s)
+        $PConfig{build_dir} # search path(s)
     );
 
     $n_docs = scalar keys %docs;
