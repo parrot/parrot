@@ -308,6 +308,17 @@ enum { JIT_PPC_CALL, JIT_PPC_BRANCH, JIT_PPC_UBRANCH };
 #  define jit_emit_srawi(pc, D, A, immediate) \
     jit_emit_3reg_x(pc, 31, A, D, immediate, 824, 0)
 
+/* canonical names */
+
+#define jit_emit_and_rrr_i jit_emit_and_rrr 
+#define jit_emit_add_rrr_i jit_emit_add_rrr 
+#define jit_emit_cmod_rrr_i jit_emit_cmod_rrr 
+#define jit_emit_div_rrr_i jit_emit_div_rrr 
+#define jit_emit_mul_rrr_i jit_emit_mul_rrr 
+#define jit_emit_or_rrr_i  jit_emit_or_rrr 
+#define jit_emit_sub_rrr_i jit_emit_sub_rrr 
+#define jit_emit_xor_rrr_i jit_emit_xor_rrr 
+
 /* 2 register and immediate operation.
  *
  *  +--------------------------------------------------------------------+
@@ -444,6 +455,13 @@ enum { JIT_PPC_CALL, JIT_PPC_BRANCH, JIT_PPC_UBRANCH };
 #  define jit_emit_fsub_rrr(pc, D, A, B) jit_emit_3a(pc, 63, D, A, B, 0, 20, 0)
 #  define jit_emit_fmul_rrr(pc, D, A, B) jit_emit_3a(pc, 63, D, A, 0, B, 25, 0)
 #  define jit_emit_fdiv_rrr_no_check(pc, D, A, B) jit_emit_3a(pc, 63, D, A, B, 0, 18, 0)
+
+/* canonical names */
+#  define jit_emit_add_rrr_n jit_emit_fadd_rrr
+#  define jit_emit_div_rrr_n jit_emit_fdiv_rrr
+#  define jit_emit_mul_rrr_n jit_emit_fmul_rrr
+#  define jit_emit_sub_rrr_n jit_emit_fsub_rrr
+
 #  define jit_emit_fsel(pc, D, A, B, C) jit_emit_3a(pc, 63, D, A, B, C, 23, 0)
 
 #  define jit_emit_abs_rr_n(pc, D, A)  jit_emit_3reg_x(pc, 63, D, 0, A, 264, 0)
