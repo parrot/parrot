@@ -319,6 +319,25 @@ enum { JIT_PPC_CALL, JIT_PPC_BRANCH, JIT_PPC_UBRANCH };
 #define jit_emit_sub_rrr_i jit_emit_sub_rrr 
 #define jit_emit_xor_rrr_i jit_emit_xor_rrr 
 
+/* shift ops */
+/* slw */
+#  define jit_emit_shl_rrr_i(pc, D, A, B) \
+    jit_emit_3reg_x(pc, 31, A, D, B, 24, 0)
+
+/* sraw */
+#  define jit_emit_shr_rrr_i(pc, D, A, B) \
+    jit_emit_3reg_x(pc, 31, A, D, B, 792, 0)
+
+/* srw */
+#  define jit_emit_lsr_rrr_i(pc, D, A, B) \
+    jit_emit_3reg_x(pc, 31, A, D, B, 536, 0)
+
+# define jit_emit_shr_rri jit_emit_srawi
+# define jit_emit_shl_rri(pc, D, A, n) \
+    jit_emit_rlwinm(pc, D, A, n, 0, 31-n)
+# define jit_emit_lsr_rri(pc, D, A, n) \
+    jit_emit_rlwinm(pc, D, A, 32-n, n, 31)
+
 /* 2 register and immediate operation.
  *
  *  +--------------------------------------------------------------------+

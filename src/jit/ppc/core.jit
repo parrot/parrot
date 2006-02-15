@@ -375,6 +375,18 @@ Parrot_bxor_i_ic {
     binop_i_ic s/<op>/xor/
 }
 
+Parrot_shr_i_ic {
+    binop_i_ic s/<op>/shr/
+}
+
+Parrot_shl_i_ic {
+    binop_i_ic s/<op>/shl/
+}
+
+Parrot_lsr_i_ic {
+    binop_i_ic s/<op>/lsr/
+}
+
 Parrot_add_i_ic {
     binop_i_ic s/<op>/add/
 }
