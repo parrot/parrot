@@ -662,7 +662,7 @@ OUTPUT
 pasm_output_is(<<'CODE', <<'OUTPUT', "direct access 2");
     #new P0, .IntList
     new P0, .ResizableBooleanArray
-    set I10, 1100000
+    set I10, 550000
     set I0, 1
 lp1:
     add I1, I0, 5
