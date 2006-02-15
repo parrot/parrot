@@ -206,13 +206,40 @@ Parrot_abs_n_n {
 
 TEMPLATE binop_x_xc {
     if (MAP[1]) {
-        jit_emit_mov_ri<_N>(NATIVECODE, <s1>, <c>_CONST[2]); 
-        jit_emit_<op>_rrr<_N>(NATIVECODE, MAP[1], MAP[1], <s1>);
+#ifdef jit_emit_<op>_rri<_N>
+	int im = *INT_CONST[2];
+	/* *if* immediate constant is small and there is a dedicated
+	 * opcode, just use it
+	 * _n variants don't have immediates, only _i
+	 *
+	 * This could be further improved, if there exists also
+	 * a shifted opcode variant like 'oris'. But then this code
+	 * should be factored out into jit_emit.h. This OTOH needs some
+	 * convention about scratch register usage.
+	 */
+	if (!(im >> 16)) {
+	    jit_emit_<op>_rri_i(NATIVECODE, MAP[1], MAP[1], im);
+	}
+	else 
+#endif
+	{
+	    jit_emit_mov_ri<_N>(NATIVECODE, <s1>, <c>_CONST[2]); 
+	    jit_emit_<op>_rrr<_N>(NATIVECODE, MAP[1], MAP[1], <s1>);
+	}
     }
     else {
         jit_emit_mov_rm<_N>(NATIVECODE, <s1>, ROFFS_<t>(1));
-        jit_emit_mov_ri<_N>(NATIVECODE, <s2>, <c>_CONST[2]);
-        jit_emit_<op>_rrr<_N>(NATIVECODE, <s1>, <s1>, <s2>);
+#ifdef jit_emit_<op>_rri<_N>
+	int im = *INT_CONST[2];
+	if (!(im >> 16)) {
+	    jit_emit_<op>_rri_i(NATIVECODE, <s1>, <s1>, im);
+	}
+	else 
+#endif
+	{
+	    jit_emit_mov_ri<_N>(NATIVECODE, <s2>, <c>_CONST[2]);
+	    jit_emit_<op>_rrr<_N>(NATIVECODE, <s1>, <s1>, <s2>);
+	}
         jit_emit_mov_mr<_N>(NATIVECODE, ROFFS_<t>(1), <s1>);
     }
 }
