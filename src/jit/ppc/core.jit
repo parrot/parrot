@@ -252,62 +252,62 @@ TEMPLATE binop_i_ic {
     binop_x_xc s/<_N>/_i/ s/<t>/INT/ s/<s1>/ISR1/ s/<s2>/ISR2/ s/<c>/*INT/
 }
 
-TEMPLATE Parrot_binop_x_x {
+TEMPLATE binop_x_x {
     if (MAP[1] && MAP[2]) {
-        jit_emit_<op>_rrr(NATIVECODE, MAP[1], MAP[1], MAP[2]);
+        jit_emit_<op>_rrr<_N>(NATIVECODE, MAP[1], MAP[1], MAP[2]);
     }
     else if (MAP[1]) {
         jit_emit_mov_rm<_N>(NATIVECODE, <s1>, ROFFS_<T>(2)); 
-        jit_emit_<op>_rrr(NATIVECODE, MAP[1], MAP[1], <s1>);
+        jit_emit_<op>_rrr<_N>(NATIVECODE, MAP[1], MAP[1], <s1>);
     }
     else if (MAP[2]) {
         jit_emit_mov_rm<_N>(NATIVECODE, <s1>, ROFFS_<T>(1));
-        jit_emit_<op>_rrr(NATIVECODE, <s1>, <s1>, MAP[2]);
+        jit_emit_<op>_rrr<_N>(NATIVECODE, <s1>, <s1>, MAP[2]);
         jit_emit_mov_mr<_N>(NATIVECODE, ROFFS_<T>(1), <s1>);
     }
     else {
         jit_emit_mov_rm<_N>(NATIVECODE, <s1>, ROFFS_<T>(1));
         jit_emit_mov_rm<_N>(NATIVECODE, <s2>, ROFFS_<T>(2));
-        jit_emit_<op>_rrr(NATIVECODE, <s1>, <s1>, <s2>);
+        jit_emit_<op>_rrr<_N>(NATIVECODE, <s1>, <s1>, <s2>);
         jit_emit_mov_mr<_N>(NATIVECODE, ROFFS_<T>(1), <s1>);
     }
 }
 
-TEMPLATE Parrot_binop_x_x_x {
+TEMPLATE binop_x_x_x {
     if (MAP[1] && MAP[2] && MAP[3]) {
-        jit_emit_<op>_rrr(NATIVECODE, MAP[1], MAP[2], MAP[3]);
+        jit_emit_<op>_rrr<_N>(NATIVECODE, MAP[1], MAP[2], MAP[3]);
     }
     else if (MAP[1] && MAP[2]) {
         jit_emit_mov_rm<_N>(NATIVECODE, <s1>, ROFFS_<T>(3)); 
-        jit_emit_<op>_rrr(NATIVECODE, MAP[1], MAP[2], <s1>);
+        jit_emit_<op>_rrr<_N>(NATIVECODE, MAP[1], MAP[2], <s1>);
     }
     else if (MAP[1] && MAP[3]) {
         jit_emit_mov_rm<_N>(NATIVECODE, <s1>, ROFFS_<T>(2));
-        jit_emit_<op>_rrr(NATIVECODE, MAP[1], <s1>, MAP[3]);
+        jit_emit_<op>_rrr<_N>(NATIVECODE, MAP[1], <s1>, MAP[3]);
     }
     else if (MAP[2] && MAP[3]) {
-        jit_emit_<op>_rrr(NATIVECODE, <s1>, MAP[2], MAP[3]);
+        jit_emit_<op>_rrr<_N>(NATIVECODE, <s1>, MAP[2], MAP[3]);
         jit_emit_mov_mr<_N>(NATIVECODE, ROFFS_<T>(1), <s1>);
     }
     else if (MAP[1]) {
         jit_emit_mov_rm<_N>(NATIVECODE, <s1>, ROFFS_<T>(3));
         jit_emit_mov_rm<_N>(NATIVECODE, <s2>, ROFFS_<T>(2));
-        jit_emit_<op>_rrr(NATIVECODE, MAP[1], <s2>, <s1>);
+        jit_emit_<op>_rrr<_N>(NATIVECODE, MAP[1], <s2>, <s1>);
     }
     else if (MAP[2]) {
         jit_emit_mov_rm<_N>(NATIVECODE, <s1>, ROFFS_<T>(3));
-        jit_emit_<op>_rrr(NATIVECODE, <s1>, MAP[2], <s1>);
+        jit_emit_<op>_rrr<_N>(NATIVECODE, <s1>, MAP[2], <s1>);
         jit_emit_mov_mr<_N>(NATIVECODE, ROFFS_<T>(1), <s1>);
     }
     else if (MAP[3]) {
         jit_emit_mov_rm<_N>(NATIVECODE, <s1>, ROFFS_<T>(2));
-        jit_emit_<op>_rrr(NATIVECODE, <s1>, <s1>, MAP[3]);
+        jit_emit_<op>_rrr<_N>(NATIVECODE, <s1>, <s1>, MAP[3]);
         jit_emit_mov_mr<_N>(NATIVECODE, ROFFS_<T>(1), <s1>);
     }
     else {
         jit_emit_mov_rm<_N>(NATIVECODE, <s1>, ROFFS_<T>(3));
         jit_emit_mov_rm<_N>(NATIVECODE, <s2>, ROFFS_<T>(2));
-        jit_emit_<op>_rrr(NATIVECODE, <s1>, <s2>, <s1>);
+        jit_emit_<op>_rrr<_N>(NATIVECODE, <s1>, <s2>, <s1>);
         jit_emit_mov_mr<_N>(NATIVECODE, ROFFS_<T>(1), <s1>);
     }
 }
@@ -384,35 +384,47 @@ TEMPLATE binop_n_n_nc {
 }
 
 Parrot_band_i_i {
-    Parrot_binop_x_x s/<_N>/_i/ s/<op>/and/ s/<s1>/ISR1/ s/<s2>/ISR2/ s/<T>/INT/
+    binop_x_x s/<_N>/_i/ s/<op>/and/ s/<s1>/ISR1/ s/<s2>/ISR2/ s/<T>/INT/
 }
 
 Parrot_bor_i_i {
-    Parrot_binop_x_x s/<_N>/_i/ s/<op>/or/ s/<s1>/ISR1/ s/<s2>/ISR2/ s/<T>/INT/
+    binop_x_x s/<_N>/_i/ s/<op>/or/ s/<s1>/ISR1/ s/<s2>/ISR2/ s/<T>/INT/
 }
 
 Parrot_bxor_i_i {
-    Parrot_binop_x_x s/<_N>/_i/ s/<op>/xor/ s/<s1>/ISR1/ s/<s2>/ISR2/ s/<T>/INT/
+    binop_x_x s/<_N>/_i/ s/<op>/xor/ s/<s1>/ISR1/ s/<s2>/ISR2/ s/<T>/INT/
+}
+
+Parrot_shr_i_i {
+    binop_x_x s/<_N>/_i/ s/<op>/shr/ s/<s1>/ISR1/ s/<s2>/ISR2/ s/<T>/INT/
+}
+
+Parrot_shl_i_i {
+    binop_x_x s/<_N>/_i/ s/<op>/shl/ s/<s1>/ISR1/ s/<s2>/ISR2/ s/<T>/INT/
+}
+
+Parrot_lsr_i_i {
+    binop_x_x s/<_N>/_i/ s/<op>/lsr/ s/<s1>/ISR1/ s/<s2>/ISR2/ s/<T>/INT/
 }
 
 Parrot_add_i_i {
-    Parrot_binop_x_x s/<_N>/_i/ s/<op>/add/ s/<s1>/ISR1/ s/<s2>/ISR2/ s/<T>/INT/
+    binop_x_x s/<_N>/_i/ s/<op>/add/ s/<s1>/ISR1/ s/<s2>/ISR2/ s/<T>/INT/
 }
 
 Parrot_sub_i_i {
-    Parrot_binop_x_x s/<_N>/_i/ s/<op>/sub/ s/<s1>/ISR1/ s/<s2>/ISR2/ s/<T>/INT/
+    binop_x_x s/<_N>/_i/ s/<op>/sub/ s/<s1>/ISR1/ s/<s2>/ISR2/ s/<T>/INT/
 }
 
 Parrot_mul_i_i {
-    Parrot_binop_x_x s/<_N>/_i/ s/<op>/mul/ s/<s1>/ISR1/ s/<s2>/ISR2/ s/<T>/INT/
+    binop_x_x s/<_N>/_i/ s/<op>/mul/ s/<s1>/ISR1/ s/<s2>/ISR2/ s/<T>/INT/
 }
 
-parrot_div_i_i {
-    parrot_binop_x_x s/<_n>/_i/ s/<op>/div/ s/<s1>/isr1/ s/<s2>/isr2/ s/<t>/int/
+Parrot_div_i_i {
+    binop_x_x s/<_N>/_i/ s/<op>/div/ s/<s1>/ISR1/ s/<s2>/ISR2/ s/<T>/INT/
 }
 
-parrot_cmod_i_i {
-    parrot_binop_x_x s/<_n>/_i/ s/<op>/cmod/ s/<s1>/isr1/ s/<s2>/isr2/ s/<t>/int/
+Parrot_cmod_i_i {
+    binop_x_x s/<_N>/_i/ s/<op>/cmod/ s/<s1>/ISR1/ s/<s2>/ISR2/ s/<T>/INT/
 }
 
 Parrot_band_i_ic {
@@ -476,51 +488,51 @@ Parrot_div_n_nc {
 }
 
 Parrot_add_n_n {
-    Parrot_binop_x_x s/<_N>/_n/ s/<op>/fadd/ s/<s1>/FSR1/ s/<s2>/FSR2/ s/<T>/NUM/
+    binop_x_x s/<_N>/_n/ s/<op>/add/ s/<s1>/FSR1/ s/<s2>/FSR2/ s/<T>/NUM/
 }
 
 Parrot_div_n_n {
-    Parrot_binop_x_x s/<_N>/_n/ s/<op>/fdiv/ s/<s1>/FSR1/ s/<s2>/FSR2/ s/<T>/NUM/
+    binop_x_x s/<_N>/_n/ s/<op>/div/ s/<s1>/FSR1/ s/<s2>/FSR2/ s/<T>/NUM/
 }
 
 Parrot_mul_n_n {
-    Parrot_binop_x_x s/<_N>/_n/ s/<op>/fmul/ s/<s1>/FSR1/ s/<s2>/FSR2/ s/<T>/NUM/
+    binop_x_x s/<_N>/_n/ s/<op>/mul/ s/<s1>/FSR1/ s/<s2>/FSR2/ s/<T>/NUM/
 }
 
 Parrot_sub_n_n {
-    Parrot_binop_x_x s/<_N>/_n/ s/<op>/fsub/ s/<s1>/FSR1/ s/<s2>/FSR2/ s/<T>/NUM/
+    binop_x_x s/<_N>/_n/ s/<op>/sub/ s/<s1>/FSR1/ s/<s2>/FSR2/ s/<T>/NUM/
 }
 
 Parrot_band_i_i_i {
-    Parrot_binop_x_x_x s/<_N>/_i/ s/<op>/and/ s/<s1>/ISR1/ s/<s2>/ISR2/ s/<T>/INT/
+    binop_x_x_x s/<_N>/_i/ s/<op>/and/ s/<s1>/ISR1/ s/<s2>/ISR2/ s/<T>/INT/
 }
 
 Parrot_bor_i_i_i {
-    Parrot_binop_x_x_x s/<_N>/_i/ s/<op>/or/ s/<s1>/ISR1/ s/<s2>/ISR2/ s/<T>/INT/
+    binop_x_x_x s/<_N>/_i/ s/<op>/or/ s/<s1>/ISR1/ s/<s2>/ISR2/ s/<T>/INT/
 }
 
 Parrot_bxor_i_i_i {
-    Parrot_binop_x_x_x s/<_N>/_i/ s/<op>/xor/ s/<s1>/ISR1/ s/<s2>/ISR2/ s/<T>/INT/
+    binop_x_x_x s/<_N>/_i/ s/<op>/xor/ s/<s1>/ISR1/ s/<s2>/ISR2/ s/<T>/INT/
 }
 
 Parrot_add_i_i_i {
-    Parrot_binop_x_x_x s/<_N>/_i/ s/<op>/add/ s/<s1>/ISR1/ s/<s2>/ISR2/ s/<T>/INT/
+    binop_x_x_x s/<_N>/_i/ s/<op>/add/ s/<s1>/ISR1/ s/<s2>/ISR2/ s/<T>/INT/
 }
 
 Parrot_sub_i_i_i {
-    Parrot_binop_x_x_x s/<_N>/_i/ s/<op>/sub/ s/<s1>/ISR1/ s/<s2>/ISR2/ s/<T>/INT/
+    binop_x_x_x s/<_N>/_i/ s/<op>/sub/ s/<s1>/ISR1/ s/<s2>/ISR2/ s/<T>/INT/
 }
 
 Parrot_mul_i_i_i {
-    Parrot_binop_x_x_x s/<_N>/_i/ s/<op>/mul/ s/<s1>/ISR1/ s/<s2>/ISR2/ s/<T>/INT/
+    binop_x_x_x s/<_N>/_i/ s/<op>/mul/ s/<s1>/ISR1/ s/<s2>/ISR2/ s/<T>/INT/
 }
 
 Parrot_div_i_i_i {
-    Parrot_binop_x_x_x s/<_N>/_i/ s/<op>/div/ s/<s1>/ISR1/ s/<s2>/ISR2/ s/<T>/INT/
+    binop_x_x_x s/<_N>/_i/ s/<op>/div/ s/<s1>/ISR1/ s/<s2>/ISR2/ s/<T>/INT/
 }
 
 Parrot_cmod_i_i_i {
-    Parrot_binop_x_x_x s/<_N>/_i/ s/<op>/cmod/ s/<s1>/ISR1/ s/<s2>/ISR2/ s/<T>/INT/
+    binop_x_x_x s/<_N>/_i/ s/<op>/cmod/ s/<s1>/ISR1/ s/<s2>/ISR2/ s/<T>/INT/
 }
 
 Parrot_band_i_i_ic {
@@ -533,6 +545,18 @@ Parrot_bor_i_i_ic {
 
 Parrot_bxor_i_i_ic {
     binop_i_i_ic s/<op>/xor/
+}
+
+Parrot_shr_i_i_ic {
+    binop_i_i_ic s/<op>/shr/
+}
+
+Parrot_shl_i_i_ic {
+    binop_i_i_ic s/<op>/shl/
+}
+
+Parrot_lsr_i_i_ic {
+    binop_i_i_ic s/<op>/lsr/
 }
 
 Parrot_add_i_i_ic {
@@ -632,19 +656,19 @@ Parrot_div_n_nc_n {
 }
 
 Parrot_add_n_n_n {
-    Parrot_binop_x_x_x s/<_N>/_n/ s/<op>/fadd/ s/<s1>/FSR1/ s/<s2>/FSR2/ s/<T>/NUM/
+    binop_x_x_x s/<_N>/_n/ s/<op>/add/ s/<s1>/FSR1/ s/<s2>/FSR2/ s/<T>/NUM/
 }
 
 Parrot_sub_n_n_n {
-    Parrot_binop_x_x_x s/<_N>/_n/ s/<op>/fsub/ s/<s1>/FSR1/ s/<s2>/FSR2/ s/<T>/NUM/
+    binop_x_x_x s/<_N>/_n/ s/<op>/sub/ s/<s1>/FSR1/ s/<s2>/FSR2/ s/<T>/NUM/
 }
 
 Parrot_mul_n_n_n {
-    Parrot_binop_x_x_x s/<_N>/_n/ s/<op>/fmul/ s/<s1>/FSR1/ s/<s2>/FSR2/ s/<T>/NUM/
+    binop_x_x_x s/<_N>/_n/ s/<op>/mul/ s/<s1>/FSR1/ s/<s2>/FSR2/ s/<T>/NUM/
 }
 
 Parrot_div_n_n_n {
-    Parrot_binop_x_x_x s/<_N>/_n/ s/<op>/fdiv/ s/<s1>/FSR1/ s/<s2>/FSR2/ s/<T>/NUM/
+    binop_x_x_x s/<_N>/_n/ s/<op>/div/ s/<s1>/FSR1/ s/<s2>/FSR2/ s/<T>/NUM/
 }
 
 Parrot_rot_i_i_ic_ic {
