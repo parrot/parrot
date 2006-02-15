@@ -180,12 +180,29 @@ pasm_output_is(<<'CODE', <<OUTPUT, "cmp");
         print "\n"
         print I4
         print "\n"
+
+        set I5, 9
+        set I6, 10
+        set I7, 11
+        cmp I1, I0, I5
+        cmp I2, I0, I6
+        cmp I3, I0, I7
+        print I1
+        print "\n"
+        print I2
+        print "\n"
+        print I3
+        print "\n"
+
 	end
 CODE
 1
 0
 -1
 1
+1
+0
+-1
 OUTPUT
 
 pasm_output_is(<<'CODE', <<OUTPUT, "eq_num");

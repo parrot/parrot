@@ -379,7 +379,7 @@ enum { JIT_PPC_CALL, JIT_PPC_BRANCH, JIT_PPC_UBRANCH };
 #  define jit_emit_subfic(pc, D, A, immediate) \
     jit_emit_2reg(pc, 8, D, A, immediate)
 
-#  define jit_emit_subi jit_emit_subfic
+#  define jit_emit_subi(pc, D, A, im) jit_emit_add_rri_i(pc, D, A, -(im))
 
 #  define jit_emit_lwz(pc, D, disp, A) \
     jit_emit_2reg(pc, 32, D, A, disp)
