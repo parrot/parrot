@@ -342,27 +342,45 @@ TEMPLATE binop_n_nc_n {
     binop_x_xc_x  s/<_N>/_n/ s/<t>/NUM/ s/<s1>/FSR1/ s/<s2>/FSR2/ s/<c>/&NUM/
 }
 
-TEMPLATE Parrot_binop_i_i_ic {
+TEMPLATE binop_x_x_xc {
     if (MAP[1] && MAP[2]) {
-        jit_emit_mov_ri_i(NATIVECODE, ISR1, *INT_CONST[3]); 
-        jit_emit_<op>_rrr(NATIVECODE, MAP[1], MAP[2], ISR1);
+#ifdef jit_emit_<op>_rri<_N>
+        /* common case - operands are MAPped */
+	int im = *INT_CONST[3];
+	if (!(im >> 16)) {
+	    jit_emit_<op>_rri_i(NATIVECODE, MAP[1], MAP[2], im);
+	}
+	else 
+#endif
+	{
+	    jit_emit_mov_ri<_N>(NATIVECODE, <s1>, <c>_CONST[3]); 
+	    jit_emit_<op>_rrr<_N>(NATIVECODE, MAP[1], MAP[2], <s1>);
+	}
     }
     else if (MAP[1]) {
-        jit_emit_mov_ri_i(NATIVECODE, ISR1, *INT_CONST[3]);
-        jit_emit_mov_rm_i(NATIVECODE, ISR2, ROFFS_INT(2));
-        jit_emit_<op>_rrr(NATIVECODE, MAP[1], ISR2, ISR1);
+        jit_emit_mov_ri<_N>(NATIVECODE, <s1>, <c>_CONST[3]);
+        jit_emit_mov_rm<_N>(NATIVECODE, <s2>, ROFFS_<t>(2));
+        jit_emit_<op>_rrr<_N>(NATIVECODE, MAP[1], <s2>, <s1>);
     }
     else if (MAP[2]) {
-        jit_emit_mov_ri_i(NATIVECODE, ISR1, *INT_CONST[3]);
-        jit_emit_<op>_rrr(NATIVECODE, ISR1, MAP[2], ISR1);
-        jit_emit_mov_mr_i(NATIVECODE, ROFFS_INT(1), ISR1);
+        jit_emit_mov_ri<_N>(NATIVECODE, <s1>, <c>_CONST[3]);
+        jit_emit_<op>_rrr<_N>(NATIVECODE, <s1>, MAP[2], <s1>);
+        jit_emit_mov_mr<_N>(NATIVECODE, ROFFS_<t>(1), <s1>);
     }
     else {
-        jit_emit_mov_ri_i(NATIVECODE, ISR1, *INT_CONST[3]);
-        jit_emit_mov_rm_i(NATIVECODE, ISR2, ROFFS_INT(2));
-        jit_emit_<op>_rrr(NATIVECODE, ISR1, ISR2, ISR1);
-        jit_emit_mov_mr_i(NATIVECODE, ROFFS_INT(1), ISR1);
+        jit_emit_mov_ri<_N>(NATIVECODE, <s1>, <c>_CONST[3]);
+        jit_emit_mov_rm<_N>(NATIVECODE, <s2>, ROFFS_<t>(2));
+        jit_emit_<op>_rrr<_N>(NATIVECODE, <s1>, <s2>, <s1>);
+        jit_emit_mov_mr<_N>(NATIVECODE, ROFFS_<t>(1), <s1>);
     }
+}
+
+TEMPLATE binop_i_i_ic {
+    binop_x_x_xc  s/<_N>/_i/ s/<t>/INT/ s/<s1>/ISR1/ s/<s2>/ISR2/ s/<c>/*INT/
+}
+
+TEMPLATE binop_n_n_nc {
+    binop_x_x_xc  s/<_N>/_n/ s/<t>/NUM/ s/<s1>/FSR1/ s/<s2>/FSR2/ s/<c>/&NUM/
 }
 
 Parrot_band_i_i {
@@ -506,35 +524,51 @@ Parrot_cmod_i_i_i {
 }
 
 Parrot_band_i_i_ic {
-    Parrot_binop_i_i_ic s/<op>/and/
+    binop_i_i_ic s/<op>/and/
 }
 
 Parrot_bor_i_i_ic {
-    Parrot_binop_i_i_ic s/<op>/or/
+    binop_i_i_ic s/<op>/or/
 }
 
 Parrot_bxor_i_i_ic {
-    Parrot_binop_i_i_ic s/<op>/xor/
+    binop_i_i_ic s/<op>/xor/
 }
 
 Parrot_add_i_i_ic {
-    Parrot_binop_i_i_ic s/<op>/add/
+    binop_i_i_ic s/<op>/add/
 }
 
 Parrot_sub_i_i_ic {
-    Parrot_binop_i_i_ic s/<op>/sub/
+    binop_i_i_ic s/<op>/sub/
 }
 
 Parrot_mul_i_i_ic {
-    Parrot_binop_i_i_ic s/<op>/mul/
+    binop_i_i_ic s/<op>/mul/
 }
 
 Parrot_div_i_i_ic {
-    Parrot_binop_i_i_ic s/<op>/div/
+    binop_i_i_ic s/<op>/div/
 }
 
 Parrot_cmod_i_i_ic {
-    Parrot_binop_i_i_ic s/<op>/cmod/
+    binop_i_i_ic s/<op>/cmod/
+}
+
+Parrot_add_n_n_nc {
+    binop_n_n_nc s/<op>/add/
+}
+
+Parrot_sub_n_n_nc {
+    binop_n_n_nc s/<op>/sub/
+}
+
+Parrot_mul_n_n_ic {
+    binop_n_n_nc s/<op>/mul/
+}
+
+Parrot_div_n_n_nc {
+    binop_n_n_nc s/<op>/div/
 }
 
 Parrot_band_i_ic_i {
