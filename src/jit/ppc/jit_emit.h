@@ -485,8 +485,8 @@ enum { JIT_PPC_CALL, JIT_PPC_BRANCH, JIT_PPC_UBRANCH };
     *(pc++) = (char)(rb << 3); \
     *(pc++) = 0
 
-#  define jit_emit_cmp_rr(pc, ra, rb) _emit_cmp(pc, 31, 0, ra, rb)
-#  define jit_emit_fcmp_rr(pc, ra, rb) _emit_cmp(pc, 63, 0, ra, rb)
+#  define jit_emit_cmp_rr_i(pc, ra, rb) _emit_cmp(pc, 31, 0, ra, rb)
+#  define jit_emit_cmp_rr_n(pc, ra, rb) _emit_cmp(pc, 63, 0, ra, rb)
 
 /* compare immediate operation.
  *
@@ -612,6 +612,12 @@ jit_emit_bx(Parrot_jit_info_t *jit_info, char type, opcode_t disp)
     if ((long)imm >> 16 != 0) { \
       jit_emit_oris(pc, D, D, (long)imm >> 16); }
 
+/* load a float constant (needs a gpr temp: ISR2) */
+
+#  define jit_emit_mov_ri_n(pc, D, offs) \
+    jit_emit_mov_ri_i(pc, ISR1, offs); \
+    jit_emit_lfd(pc, D, 0, ISR1);
+
 #  define add_disp(pc, D, disp) \
     jit_emit_mov_ri_i(pc, ISR1, disp); \
     jit_emit_add_rrr(pc, D, r15, ISR1)
@@ -695,7 +701,7 @@ fdiv_rrr(Parrot_jit_info_t *jit_info, char D, char A, char B)
     jit_emit_mov_ri_i(pc, ISR1, &zero);
     jit_emit_lfd(pc, f1, 0, ISR1);
 
-    jit_emit_fcmp_rr(pc, B, f1);   /* XXX be sure it's unmapped */
+    jit_emit_cmp_rr_n(pc, B, f1);   /* XXX be sure it's unmapped */
      /* remember PC */
     jmp_ptr = pc;
     /* emit jump past exception code, dummy offset */
