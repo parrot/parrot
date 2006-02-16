@@ -84,7 +84,7 @@ ok 1
 ok 2
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "attempt resize");
+pasm_output_like(<<'CODE', <<'OUTPUT', "attempt resize");
 	new P0, .SArray
 	set P0, 1
 	set P0[0], 100
@@ -96,8 +96,9 @@ OK_1:	print "ok 1\n"
 	set P0, 2
 	end
 CODE
-ok 1
+/ok 1
 SArray: Can't resize!
+current instr\.:/
 OUTPUT
 # '
 
