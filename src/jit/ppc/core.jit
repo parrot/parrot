@@ -208,7 +208,7 @@ TEMPLATE binop_x_xc {
     int im;
     if (MAP[1]) {
 #ifdef jit_emit_<op>_rri<_N>
-	int im = *INT_CONST[2];
+	im = *INT_CONST[2];
 	/* *if* immediate constant is small and there is a dedicated
 	 * opcode, just use it
 	 * _n variants don't have immediates, only _i
