@@ -231,8 +231,8 @@ Please refer to L<docs/pdds/pdd20_lexical_vars.pod> for details.
 
 =head2 How can I delete a lexical variable?
 
-You can't, You can store a Null PMC as the value though, which will
-catch all further access to that variable and through an exception.
+You can't.  You can store a Null PMC as the value though, which will catch all
+further access to that variable and throw an exception.
 
 =head2 How do I resolve a variable name?
 
@@ -241,8 +241,8 @@ Use C<find_name>:
     $P0 = find_name "$x"
     find_name $P0, "foo"    # same thing
 
-This will find the name C<foo> in lexical, global or builtin namespace, in that
-order, and store it in C<$P0>.
+This will find the name C<foo> in the lexical, global, or builtin namespace, in
+that order, and store it in C<$P0>.
 
 =head2 How do I fetch a variable from the current lexical pad?
 
@@ -259,7 +259,7 @@ That is still the same:
 
 This finds a C<foo> variable at any B<outer> depth starting from the top.
 
-If your language looks up variables differently you have to walk the
+If your language looks up variables differently, you have to walk the
 'caller' chain. See also F<t/dynpmc/dynlexpad.t>.
 
 =head2 How can I produce more efficient code for lexicals?
@@ -283,8 +283,8 @@ With the C<newclass> op:
 
 =head2 How do I add instance variables/attributes?
 
-Each class knows what attribute its object can have. You can add attributes to
-a class (not to individual objects) like so:
+Each class knows which attributes its objects can have. You can add attributes
+to a class (not to individual objects) like so:
 
     addattribute $P0, "legs"
 
@@ -306,7 +306,8 @@ keyword appended to the function declaration:
 
 =head2 How do I access attributes?
 
-Attributes can be access by a short name, fully qualified name or by index.
+You can access attributes by a short name, a fully qualified name, or by an
+index.
 
   $P0 = getattribute self, "legs"
   assign $P0, 4                   # set attribute's value
@@ -328,7 +329,7 @@ or
 =head2 When should I use properties vs. attributes?
 
 Properties aren't inherited. If you have some additional data that
-don't fit into the classes hierarchy, you could use properties.
+don't fit into the class's hierarchy, you could use properties.
 
 =head2 How do I create a class that is a subclass of another class?
 
@@ -364,7 +365,7 @@ you can add more parent classes to it with the C<addparent> op:
 
 =head2 How can I specify the constructor of a class?
 
-Just define a method named C<__init> in the namespace if the class.
+Just define a method named C<__init> in the namespace of the class.
 
     newclass $P0, "Dog"         # create a class named Dog
     # ...
@@ -442,13 +443,13 @@ Not too hard, is it?
 Use C<push_eh> to push an exception handler onto the stack.
 
     push_eh handler
-    $P0 = new .Exception         # or any other code ...
+    $P0 = new .Exception        # or any other code ...
     throw $P0                   # ... that might throw
     clear_eh
     exit 0
 
-An exception handler is called with 2 arguments: the exception and the message.
-More information is available inside the exception 'object' (TBD).
+An exception handler is called with two arguments: the exception and the
+message.  More information is available inside the exception 'object' (TBD).
 
   handler:
     get_results '(0,0') P0, S0      # PASM syntax
@@ -481,17 +482,17 @@ Parrot supports dynamic PMCs, loadable at runtime, to allow compiler writers
 to extend Parrot with additional types. For more information about writing
 PMCs, see L<tools/build/pmc2c.pl> and L<docs/pmc.pod>.
 
-To build dynamic PMCs, add something like the following to your makefile:
+To build dynamic PMCs, add something like the following to your Makefile:
 
   PERL     = /usr/bin/perl
   PMCBUILD = $(PERL) /path/to/parrot/tools/build/dynpmc.pl
   DESTDIR  = /path/to/parrot/runtime/parrot/dynext
   LOAD_EXT = .so
-  
+
   PMCDIR    = pmc
   PMCS      = MyInteger MyFloat MyString MyObject
   PMC_FILES = MyInteger.pmc MyFloat.pmc MyString.pmc MyObject.pmc
-  
+
   dynpmcs : $(PMC_FILES)
       @cd $(PMCDIR) && $(BUILD) generate $(PMCS)
       @cd $(PMCDIR) && $(BUILD) compile $(PMCS)
@@ -511,11 +512,11 @@ makefile:
   OPSBUILD = $(PERL) /path/to/parrot/tools/build/dynops.pl
   DESTDIR  = /path/to/parrot/runtime/parrot/dynext
   LOAD_EXT = .so
-  
+
   OPSDIR    = ops
   OPLIBS    = myops
   OPS_FILES = myops.ops
-  
+
   dynops : $(OPS_FILES)
       @cd $(OPSDIR) && $(BUILD) generate $(OPLIBS)
       @cd $(OPSDIR) && $(BUILD) compile $(OPLIBS)
