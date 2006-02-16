@@ -26,8 +26,12 @@ integers or double-quoted strings, in the form of:
 
 =cut
 
+.include "errors.pasm"
+
 .sub _main :main
     .param pmc args
+
+    errorson .PARROT_ERRORS_PARAM_COUNT_FLAG
 
     load_bytecode "languages/punie/lib/PunieGrammar.pbc"
 
@@ -73,6 +77,7 @@ integers or double-quoted strings, in the form of:
 
     # Compile the abstract syntax tree down to an opcode syntax tree
     load_bytecode "languages/punie/lib/POST.pir"
+    load_bytecode 'languages/punie/lib/PunieOpLookup.pir'
     .local string ost_tg_source
     ost_tg_source = _slurp_file('languages/punie/lib/past2post.g')
     .local pmc ostgrammar

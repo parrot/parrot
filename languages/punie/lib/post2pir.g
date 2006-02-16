@@ -50,10 +50,8 @@ POST::Op: result(.) = {
       .return (output)
     not_conditional:
 
-    if opname == 'print' goto no_lead
-      output = "    " . opname
-      output .= " "
-  no_lead:
+    output = "    " . opname
+    output .= " "
     $P1 = node.children()
     .local pmc iter
     iter = new Iterator, $P1    # setup iterator for node
@@ -63,18 +61,10 @@ POST::Op: result(.) = {
       shift $P2, iter
       inc counter
       $S3 = tree.get('result', $P2)
-      if opname == 'print' goto repeat_opname
       if counter <= 1 goto no_comma_out
       output .= ", "
     no_comma_out:
       output .= $S3
-      goto iter_loop
-    repeat_opname:
-      output .= "    "
-      output .= opname
-      output .= " "
-      output .= $S3
-      output .= "\n"
       goto iter_loop
   iter_end:
     output .= "\n"
@@ -118,6 +108,11 @@ POST::Op: conditional(.) = {
     output .= falselabel
     output .= ":\n"
     .return (output)
+}
+
+POST::Var: result(.) = {
+    $S1 = node.varname()
+    .return ($S1)
 }
 
 POST::Val: result(.) = {

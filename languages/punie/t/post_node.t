@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(t . lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 5;
+use Parrot::Test tests => 6;
 
 pir_output_is(<<'CODE', <<'OUT', 'load the library');
 .sub _main
@@ -93,4 +93,22 @@ pir_output_is(<<'CODE', <<'OUT', 'generate a label');
 CODE
 name_label_1
 label_2
+OUT
+
+pir_output_is(<<'CODE', <<'OUT', 'generate a temporary variable');
+.sub _main
+    load_bytecode 'languages/punie/lib/POST/Node.pir'
+    .local pmc node
+    node = new 'POST::Node'
+    $S1 = node.generate_temp()
+    print $S1
+    print "\n"
+    $S2 = node.generate_temp()
+    print $S2
+    print "\n"
+    .return()
+.end
+CODE
+$P1
+$P2
 OUT

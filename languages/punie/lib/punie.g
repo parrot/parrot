@@ -25,7 +25,7 @@ rule expr    { <PunieGrammar::gprint> | <PunieGrammar::cexpr> }
 rule gprint  { (print) \s* <PunieGrammar::expr> }
 
 rule cexpr {
-    <PunieGrammar::term> \s* [, \s* <PunieGrammar::term>]*
+    <PunieGrammar::oexpr> \s* [, \s* <PunieGrammar::oexpr>]*
 }
 
 rule term {

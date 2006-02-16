@@ -171,9 +171,9 @@ PunieGrammar::label: result(.) = {
 
 PunieGrammar::cexpr: result(.) = {
     .local pmc result
-    $I0 = defined node["PunieGrammar::term"]
-    unless $I0 goto err_no_term
-    $P1 = node["PunieGrammar::term"]
+    $I0 = defined node["PunieGrammar::oexpr"]
+    unless $I0 goto err_no_oexpr
+    $P1 = node["PunieGrammar::oexpr"]
     .local pmc children
     children = new PerlArray
     $P0 = new Iterator, $P1    # setup iterator for node
@@ -181,7 +181,7 @@ PunieGrammar::cexpr: result(.) = {
   iter_loop:
     unless $P0, iter_end         # while (entries) ...
       shift $P2, $P0             # get next entry
-      $P3 = tree.get('result', $P2, 'PunieGrammar::term')
+      $P3 = tree.get('result', $P2, 'PunieGrammar::oexpr')
       push children, $P3
       goto iter_loop
   iter_end:
@@ -201,35 +201,40 @@ PunieGrammar::cexpr: result(.) = {
   no_comma:
     result = shift children # there's only one result
     .return (result)
-  err_no_term:
-    print "The cexpr node doesn't contain a 'term' match.\n"
+  err_no_oexpr:
+    print "The cexpr node doesn't contain a 'oexpr' match.\n"
     end
 }
 
-PunieGrammar::term: result(.) = {
-    .local pmc result
-    .local pmc children
-    children = new PerlArray
+PunieGrammar::oexpr: result(.) = {
+    .local pmc newchildren
+    newchildren = new PerlArray
+
+    .local pmc iter
     $P1 = node.get_hash()
-    $P0 = new Iterator, $P1    # setup iterator for node
-    set $P0, 0 # reset iterator, begin at start
+    iter = new Iterator, $P1    # setup iterator for node
+    iter = 0
   iter_loop:
-    unless $P0, iter_end         # while (entries) ...
-      shift $S2, $P0             # get key for next entry
-      $P2 = $P0[$S2]      # get entry at current key
-      $P3 = tree.get('result', $P2, $S2)
-      push children, $P3
+    unless iter, iter_end         # while (entries) ...
+      shift $S1, iter           # get the key of the iterator
+      $P2 = iter[$S1]
+      $P3 = tree.get('result', $P2, $S1)
+      if null $P3 goto iter_loop
+      push newchildren, $P3
       goto iter_loop
   iter_end:
 
-    $I0 = elements children
-    unless $I0 == 1 goto err_too_many
-    result = children[0]
-    .return (result)
+    # get the source string and position offset from start of source
+    # code for this match node
+    $S2 = node 
+    $I1 = node.from()
+    .local pmc result
+    result = new 'PAST::Exp'
+    result.set_node($S2,$I1,newchildren)
 
-  err_too_many:
-    print "error: Currently, 'term' nodes should have only one child.\n"
+    .return (result)
 }
+
 
 PunieGrammar::number: result(.) = {
     .local pmc result
@@ -309,4 +314,82 @@ PunieGrammar::stringsingle: result(.) = {
     result.set_node($S2,$I3,value)
     result.valtype('strq')
     .return (result)
+}
+
+# The following rules are for the results of the operator precedence
+# parser. These operate very differently than the standard grammar
+# rules, because they give the node type in a "type" hash key inside the
+# node, instead of storing the node as the value of a hash key that
+# is their type.
+
+expr: result(.) = {
+    .local string type
+    type = node["type"]
+    unless node goto error_no_node
+    if type == 'term:' goto transform_term
+      # else
+      $P1 = tree.get('op', node, 'expr')
+      .return($P1)
+    transform_term:
+      $P1 = tree.get('term', node, 'expr')
+      .return($P1)
+    error_no_node:
+      print "error: no node\n"
+      end
+}
+
+expr: op(.) = {
+    .local string type
+    type = node["type"]
+    .local pmc newchildren
+    newchildren = new PerlArray
+    $P1 = node.get_array()
+    .local pmc iter
+    iter = new Iterator, $P1    # setup iterator for node
+    set iter, 0 # reset iterator, begin at start
+  iter_loop:
+    unless iter, iter_end         # while (entries) ...
+      shift $P2, iter            # get entry
+      $P3 = tree.get('result', $P2, 'expr')
+      if null $P3 goto iter_loop
+      push newchildren, $P3
+      goto iter_loop
+  iter_end:
+
+    # get the source string and position offset from start of source
+    # code for this match node
+    $S2 = node 
+    $I3 = node.from()
+    .local pmc result
+    result = new 'PAST::Op'
+    result.set_node($S2,$I3,type,newchildren)
+    .return (result)
+}
+
+expr: term(.) = {
+    .local pmc result
+    .local pmc children
+    children = new PerlArray
+    $P1 = node.get_hash()
+    $P0 = new Iterator, $P1    # setup iterator for node
+    set $P0, 0 # reset iterator, begin at start
+  iter_loop:
+    unless $P0, iter_end         # while (entries) ...
+      shift $S2, $P0             # get key for next entry
+      # skip 'type' keys added by the operator precedence parser
+      if $S2 == 'type' goto iter_loop 
+      $P2 = $P0[$S2]      # get entry at current key
+      $P3 = tree.get('result', $P2, $S2)
+      push children, $P3
+      goto iter_loop
+  iter_end:
+
+    $I0 = elements children
+    unless $I0 == 1 goto err_too_many
+    result = children[0]
+    .return (result)
+
+  err_too_many:
+    print "error: Currently, 'term' nodes should have only one child.\n"
+    end
 }

@@ -7,6 +7,9 @@ print "ok 8\n";
 print "ok 9\n","ok 10\n","ok 11\n","ok 12\n";
 label1: print "ok 13\n";
 label2: print "ok 14\n";
+print 1 - 2 - 3;
+print "\n";
+print 1 + 2, "\n", 2 + 3, "\n";
 
 do { 
 	print "ok 15\n"; 
@@ -20,7 +23,7 @@ if (1) {
 if (0) {
   print "should never be printed\n";
 }
-unless (0) {
+unless (1 - 1) {
   print "ok 19\n";
 }
 unless (1) {

@@ -43,11 +43,33 @@ digit, in the form of 'print 1;'.
 
     $P0 = getclass 'PGE::Rule'
     $P1 = subclass $P0, 'PunieGrammar'
+
+    .local pmc optable
+    .local pmc term
+    $I0 = find_type "PGE::OPTable"
+    optable = new $I0
+    store_global "PunieGrammar", "$optable", optable
+
+    optable.addtok("infix:+")
+    optable.addtok("infix:-", "infix:+")
+
+    term = find_global "PunieGrammar", "term"
+    optable.addtok("term:", ">infix:+", "left", term)
+
 .end
 
 # Pull in the compiled grammar
 
 .include "languages/punie/lib/punie_grammar_gen.pir"
+
+# Operator precedence parsing rule
+.sub "oexpr"
+    .param pmc mob
+    .local pmc optable
+    optable = find_global "PunieGrammar", "$optable"
+    $P0 = optable."parse"(mob)
+    .return ($P0)
+.end
 
 =head1 LICENSE
 

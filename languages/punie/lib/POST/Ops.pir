@@ -17,6 +17,18 @@ POST::Ops is a subclass of POST::Node.
     .local pmc base
     $P0 = getclass 'POST::Node'
     base = subclass $P0, 'POST::Ops'
+    addattribute base, "tmpvar"      # temp variable for result of ops
     .return ()
 .end
 
+.sub tmpvar :method
+    .param pmc tmpvar :optional
+    .param int got_tmpvar :opt_flag
+    unless got_tmpvar goto get
+  set:
+    setattribute self, "tmpvar", tmpvar
+    .return ($P1)
+  get:
+    $P2 = getattribute self, "tmpvar"
+    .return ($P2)
+.end

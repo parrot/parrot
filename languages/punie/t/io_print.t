@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(t . lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 8;
+use Parrot::Test tests => 12;
 
 language_output_is('punie', <<'EOC', '1', 'printing one');
 print 1;
@@ -49,4 +49,32 @@ ok 2
 ok 3
 ok 4
 ok 5
+OUT
+
+language_output_is('punie', <<'CODE', <<'OUT', 'printing a few added values');
+print 1 + 2 + 3;
+print "\n";
+CODE
+6
+OUT
+
+language_output_is('punie', <<'CODE', <<'OUT', 'printing a few added values');
+print 1 + 2, "\n", 3 + 4, "\n";
+CODE
+3
+7
+OUT
+
+language_output_is('punie', <<'CODE', <<'OUT', 'printing a few subtracted values');
+print 10 - 2 - 3;
+print "\n";
+CODE
+5
+OUT
+
+language_output_is('punie', <<'CODE', <<'OUT', 'printing a few subtracted values');
+print 1 - 2, "\n", 7 - 1, "\n";
+CODE
+-1
+6
 OUT

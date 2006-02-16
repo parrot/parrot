@@ -155,3 +155,22 @@ loop:
     .yield(id)
     goto loop
 .end
+
+.sub generate_temp :method
+    .local string temp
+       temp = "$P"
+     $I1 = _new_temp_id()
+     $S1 = $I1
+     temp .= $S1
+     .return (temp)
+.end
+
+# Autoincrementing id generator
+.sub _new_temp_id
+    .local int id
+    id = 0
+loop:
+    inc id 
+    .yield(id)
+    goto loop
+.end

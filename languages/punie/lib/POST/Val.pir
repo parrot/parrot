@@ -63,7 +63,8 @@ POST::Val is a literal value in the OST. It is a subclass of POST::Node.
 
 .sub valtype method
     .param string valtype :optional
-    unless valtype goto get
+    .param int got_valtype :opt_flag
+    unless got_valtype goto get
   set:
     $P1 = new PerlString
     $P1 = valtype
