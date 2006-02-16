@@ -211,7 +211,7 @@ require Test::More;
           );
 @ISA = qw(Exporter);
 
-# tell parrot it's being tested.  this disables searching of installed libraries
+# tell parrot it's being tested--disables searching of installed libraries.
 # (see Parrot_get_runtime_prefix in src/library.c).
 $ENV{PARROT_TEST} = 1 unless defined($ENV{PARROT_TEST});
 
@@ -294,6 +294,7 @@ sub run_command {
 
 sub per_test {
     my ($ext, $test_no) = @_;
+    return unless defined $ext and defined $test_no;
 
     my $t = $0;  # $0 is name of the test script
     $t =~ s/\.t$/_$test_no$ext/;
