@@ -633,7 +633,7 @@ help :
 	@echo ""
 	@echo "Smoke Testing:"
 	@echo "  smoke:             Run the test suite and send smoke.html to "
-	@echo "                     http://smoke.parrotcode.org/"
+	@echo "                     http:////smoke.parrotcode.org/"
 	@echo "  smoke-clean:       clean up smoke.html"
 	@echo ""
 	@echo "Benchmarks:"
