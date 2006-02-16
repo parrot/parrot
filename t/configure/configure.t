@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 use lib qw( . lib ../lib ../../lib );
-use Test::More tests => 22;
+use Test::More tests => 24;
 
 =head1 NAME
 
@@ -221,3 +221,34 @@ can_ok('Parrot::Configure', qw(
         "proper additional parameters were passed to ->runstep()");
 }
 
+{
+    package test::step::stepfail;
+
+    # XXX is there a better way of doing this?
+    $INC{'test/step/stepfail.pm'}++;
+
+    use vars qw($self $conf @params);
+    use base qw(Parrot::Configure::Step::Base);
+
+    sub runstep
+    {
+        return;
+    }
+
+    package main;
+
+    my $pc = Parrot::Configure->new;
+
+    # send warnings to stdout
+    open STDERR, ">&STDOUT"     or die "Can't dup STDOUT: $!";
+
+    $pc->add_step('test::step::stepfail');
+    my $ret = $pc->runsteps;
+    print "\n";
+    is($ret, undef, "->runsteps() returns undef on failure");
+
+    $INC{'test/step/stepfail.pm'}++;
+    my @ret = $pc->runsteps;
+    print "\n";
+    is_deeply(\@ret, [], "->runsteps() returns () on failure");
+}
