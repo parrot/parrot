@@ -116,7 +116,7 @@ Dumps a 'generic' Hash.
 
     $S0 = typeof hash
     print $S0
-   
+
     print " {"
 
     new keys, .ResizablePMCArray
@@ -380,6 +380,9 @@ Dumps any undef PMC.
 =cut
 
 .sub genericUndef :method
+    .param string name
+    .param pmc val
+
     print "undef"
 
     .return ( 1 )
@@ -392,6 +395,9 @@ Dumps a Null PMC.
 =cut
 
 .sub pmcNull :method
+    .param string name
+    .param pmc val
+
     print "null"
 
     .return ( 1 )

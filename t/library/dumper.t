@@ -530,6 +530,7 @@ pir_output_is(<<'CODE', <<'OUT', "dumping objects");
 
 .sub __dump method
     .param pmc dumper
+    .param string dname
     .local string subindent
     .local string indent
     .local string name
