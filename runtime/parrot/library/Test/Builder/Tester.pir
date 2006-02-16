@@ -235,7 +235,7 @@ description of the test.
 =cut
 
 .sub test_pass
-	.param string description
+	.param string description :optional
 
 	set_output( 'ok', description )
 .end
@@ -248,7 +248,7 @@ description of the test.
 =cut
 
 .sub test_fail
-	.param string description
+	.param string description :optional
 
 	set_output( 'not ok', description )
 .end
