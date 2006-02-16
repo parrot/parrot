@@ -48,7 +48,7 @@ OUTPUT
 # Need to disable DOD while trace is on, as there's a non-zero chance that a
 # DOD sweep would occur, causing a bonus "DOD" line in the output, which makes
 # the test fail.
-pasm_output_like(<<'CODE', <<'OUTPUT', "restart trace");
+pasm_output_like(<<'CODE', <<'OUTPUT', "restart trace", todo => "lines are out of order due to buffering");
 	printerr "ok 1\n"
 	sweepoff
 	set I0, 1
