@@ -87,7 +87,7 @@ prederef_args(void **pc_prederef, Interp *interpreter,
         int type;
         if (i >= m) {
 	    sig = (PMC*) pc_prederef[1]; 
-	    type = VTABLE_get_integer_keyed_int(interpreter, sig, i - m);
+	    type = SIG_ITEM(sig, i - m);
             type &= (PARROT_ARG_TYPE_MASK | PARROT_ARG_CONSTANT);       
         }
 	else

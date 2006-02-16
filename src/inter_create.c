@@ -175,9 +175,10 @@ make_interpreter(Parrot_Interp parent, Interp_flags flags)
     PARROT_ERRORS_off(interpreter, PARROT_ERRORS_ALL_FLAG);
     /* undefined globals are errors by default */
     PARROT_ERRORS_on(interpreter, PARROT_ERRORS_GLOBALS_FLAG);
+    /* param count mismatch is an error by default */
+    PARROT_ERRORS_on(interpreter, PARROT_ERRORS_PARAM_COUNT_FLAG );
 #if 0
     /* TODO not yet - too many test failures */
-    PARROT_ERRORS_on(interpreter, PARROT_ERRORS_PARAM_COUNT_FLAG );
     PARROT_ERRORS_on(interpreter, PARROT_ERRORS_RESULT_COUNT_FLAG );
 #endif
 

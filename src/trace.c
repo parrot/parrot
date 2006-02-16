@@ -193,30 +193,6 @@ trace_key_dump(Interp *interpreter, PMC *key)
 
     PIO_eprintf(interpreter, "]");
 }
-static int
-get_var_type(Interp *interpreter, PMC *sig_pmc, int i)
-{
-    INTVAL sig = VTABLE_get_integer_keyed_int(interpreter, sig_pmc, i);
-    switch (sig & (PARROT_ARG_TYPE_MASK|PARROT_ARG_CONSTANT)) {
-        case PARROT_ARG_INTVAL:
-            return PARROT_ARG_I;
-        case PARROT_ARG_INTVAL|PARROT_ARG_CONSTANT:
-            return PARROT_ARG_IC;
-        case PARROT_ARG_FLOATVAL:
-            return PARROT_ARG_N;
-        case PARROT_ARG_FLOATVAL|PARROT_ARG_CONSTANT:
-            return PARROT_ARG_NC;
-        case PARROT_ARG_STRING:
-            return PARROT_ARG_S;
-        case PARROT_ARG_STRING|PARROT_ARG_CONSTANT:
-            return PARROT_ARG_SC;
-        case PARROT_ARG_PMC:
-            return PARROT_ARG_P;
-        case PARROT_ARG_PMC|PARROT_ARG_CONSTANT:
-            return PARROT_ARG_PC;
-    }
-    return 0;
-}
 
 /*
 
@@ -280,7 +256,8 @@ trace_op_dump(Interp *interpreter, opcode_t *code_start,
             if (i < info->op_count)
                 type = info->types[i - 1];
             else
-                type = get_var_type(interpreter, sig, i - 2);
+                type = SIG_ITEM(sig, i - 2) & 
+                    (PARROT_ARG_TYPE_MASK|PARROT_ARG_CONSTANT);
             if (i > s &&
                     type != PARROT_ARG_KC &&
                     type != PARROT_ARG_KIC &&
@@ -355,7 +332,8 @@ trace_op_dump(Interp *interpreter, opcode_t *code_start,
             if (i < info->op_count)
                 type = info->types[i - 1];
             else
-                type = get_var_type(interpreter, sig, i - 2);
+                type = SIG_ITEM(sig, i - 2) & 
+                    (PARROT_ARG_TYPE_MASK|PARROT_ARG_CONSTANT);
             if (i > s) {
                 PIO_eprintf(interpreter, ", ");
             }
