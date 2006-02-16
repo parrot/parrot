@@ -387,13 +387,13 @@ pir_output_is(<<'CODE', <<'OUT', "first dynamic MMD call");
     foo(b, f)
 .end
 
-.sub foo method, :multi(Foo, Bar)
+.sub foo :multi(Foo, Bar)
     .param pmc x
     .param pmc y
     print "  Foo::foo\n"
 .end
 
-.sub foo method, :multi(Bar, Foo)
+.sub foo :multi(Bar, Foo)
     .param pmc x
     .param pmc y
     print "  Bar::foo\n"

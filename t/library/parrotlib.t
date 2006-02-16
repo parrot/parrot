@@ -101,7 +101,7 @@ END_OUT
 pir_output_is( << "END_CODE", << 'END_OUT', 'dynext_location, non-existent' );
 $template_top
   location_sub = find_global "_parrotlib", "imcc_compile_file_location"
-  location     = location_sub( 'nonexistent', '$PConfig{load_ext}' )
+  location     = location_sub( 'nonexistent' )
 $template_bottom
 END_CODE
 
