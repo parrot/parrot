@@ -4,7 +4,7 @@
 
 # parrot print
 define pp
-  printf "%s=%s",$arg0,GDB_P(interpreter, $arg0)
+  printf "%s",GDB_P(interpreter, $arg0)
   echo \n
 end
 set $S0="S0"
@@ -39,6 +39,17 @@ set $N6="N6"
 set $N7="N7"
 set $N8="N8"
 set $N9="N9"
+
+set $P0="P0"
+set $P1="P1"
+set $P2="P2"
+set $P3="P3"
+set $P4="P4"
+set $P5="P5"
+set $P6="P6"
+set $P7="P7"
+set $P8="P8"
+set $P9="P9"
 
 document pp
 Parrot Print register

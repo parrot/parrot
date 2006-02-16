@@ -2846,6 +2846,7 @@ GDB_P(Interp *interpreter, char *s) {
         case 'I': t = REGNO_INT; break;
         case 'N': t = REGNO_NUM; break;
         case 'S': t = REGNO_STR; break;
+        case 'P': t = REGNO_PMC; break;
         default: return "no such reg";
     }
     if (s[1] && isdigit(s[1]))
@@ -2861,6 +2862,10 @@ GDB_P(Interp *interpreter, char *s) {
                 return string_from_num(interpreter, REG_NUM(n))->strstart;
             case REGNO_STR:
                 return REG_STR(n)->strstart;
+            case REGNO_PMC:
+                /* prints directly */
+                trace_pmc_dump(interpreter, REG_PMC(n));
+                return "";
         }
     }
     return "no such reg";
