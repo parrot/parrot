@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 use lib qw( . lib ../lib ../../lib );
-use Test::More tests => 24;
+use Test::More tests => 23;
 
 =head1 NAME
 
@@ -61,26 +61,26 @@ can_ok('Parrot::Configure', qw(
 
 {
     my $pc = Parrot::Configure->new;
-    
+
     isa_ok($pc->add_steps(), 'Parrot::Configure');
 }
 
 {
     my $pc = Parrot::Configure->new;
-    
+
     is_deeply(scalar $pc->steps, [],
         "->steps() returns array ref in scalar context");
 }
 
 {
     my $pc = Parrot::Configure->new;
-    
+
     is_deeply([$pc->steps], [], "->steps() returns () in list context");
 }
 
 {
     my $pc = Parrot::Configure->new;
-    
+
     $pc->add_steps(qw(foo::step));
     is_deeply(scalar $pc->steps, [['foo::step']],
         "->steps() returns the proper list");
@@ -88,7 +88,7 @@ can_ok('Parrot::Configure', qw(
 
 {
     my $pc = Parrot::Configure->new;
-    
+
     $pc->add_steps(qw(foo::step bar::step baz::step));
     is_deeply(scalar $pc->steps, [['foo::step'], ['bar::step'], ['baz::step']],
         "->steps() returns the proper list");
@@ -98,13 +98,13 @@ can_ok('Parrot::Configure', qw(
 
 {
     my $pc = Parrot::Configure->new;
-    
+
     isa_ok($pc->add_step(), 'Parrot::Configure');
 }
 
 {
     my $pc = Parrot::Configure->new;
-    
+
     $pc->add_step('foo::step');
     is_deeply(scalar $pc->steps, [['foo::step']],
         "->steps() returns the proper list after ->add_step() w/o args");
@@ -112,7 +112,7 @@ can_ok('Parrot::Configure', qw(
 
 {
     my $pc = Parrot::Configure->new;
-    
+
     $pc->add_step('foo::step', qw(bar baz));
     is_deeply(scalar $pc->steps, [['foo::step', qw(bar baz)]],
         "->steps() returns the proper list after ->add_step() with args");
@@ -245,10 +245,6 @@ can_ok('Parrot::Configure', qw(
     $pc->add_step('test::step::stepfail');
     my $ret = $pc->runsteps;
     print "\n";
-    is($ret, undef, "->runsteps() returns undef on failure");
-
-    $INC{'test/step/stepfail.pm'}++;
-    my @ret = $pc->runsteps;
-    print "\n";
-    is_deeply(\@ret, [], "->runsteps() returns () on failure");
+    isa_ok($ret, 'Parrot::Configure',
+        "->runsteps() returns Parrot::Configure object on failure");
 }
