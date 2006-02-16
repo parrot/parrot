@@ -2832,6 +2832,28 @@ PDB_backtrace(Interp *interpreter)
 }
 
 /*
+ * GDB functions
+ *
+ * GDB_I  gdb> pi 0   print register I0 value
+ * GDB_S  gdb> ps 1   print register S1 string
+ *
+ * TODO more, more 
+ */
+
+static long
+GDB_I(Interp *interpreter, int n) {
+    return REG_INT(n);
+}
+
+static const char*
+GDB_S(Interp *interpreter, int n) {
+    if (n >= 0 && n < CONTEXT(interpreter->ctx)->n_regs_used[REGNO_STR])
+        return REG_STR(n) ? REG_STR(n)->strstart : NULL;
+    return "no such reg";
+}
+
+
+/*
 
 =back
 
