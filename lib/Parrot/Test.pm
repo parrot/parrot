@@ -576,10 +576,7 @@ sub _generate_functions {
             print SOURCE $source;
             close SOURCE;
 
-            my $libparrot_shared = "$PConfig{rpath_blib} -L$PConfig{blib_dir} -lparrot";
-            my $libparrot_static  = $PConfig{blib_dir}.$PConfig{slash}.$PConfig{libparrot_static};
-
-            my $libparrot = $PConfig{parrot_is_shared} ? $libparrot_shared : $libparrot_static;
+            my $libparrot = $PConfig{libparrot_ldflags};
 
             my $iculibs = "";
             if ($PConfig{'has_icu'}) {
@@ -605,9 +602,9 @@ sub _generate_functions {
             }
 
         my $cfg = "src$PConfig{slash}parrot_config$PConfig{o}";
-            $cmd = "$PConfig{link} $PConfig{linkflags} $PConfig{ld_debug} " .
-           "$obj_f $cfg $PConfig{ld_out}$exe_f " .
-           "$libparrot $iculibs $PConfig{libs}";
+            $cmd = "$PConfig{link} $PConfig{ld_out}$exe_f " .
+            "$PConfig{linkflags} $PConfig{ld_debug} $obj_f $cfg " .
+            "$libparrot $iculibs $PConfig{libs}";
             $exit_code = run_command($cmd,
         'STDOUT' => $build_f,
         'STDERR' => $build_f);
