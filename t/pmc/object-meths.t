@@ -252,7 +252,6 @@ pasm_output_is(<<'CODE', <<'OUTPUT', "constructor - parents");
 
     .namespace [""]	# main again
 .pcc_sub _sub:
-    get_params "(0)", P2
     print "in sub\n"
     returncc
 
