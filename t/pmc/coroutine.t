@@ -76,6 +76,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "Coroutines - M. Wallace yield example");
         print "\n"
     goto loop
 return_here:
+    .get_results ()
     end
 .end
 
