@@ -167,7 +167,7 @@ Reads from all assigned sources and calls the combiner.
     set sources, .ITERATE_FROM_START
 
     # create the string array
-    new args, .StringArray
+    new args, .ResizableStringArray
 
 READ_LOOP:
     unless sources goto CALL

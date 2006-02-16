@@ -62,17 +62,17 @@ boolean.pmc		39
 ref.pmc			40
 sharedref.pmc		41
 
-# arrays
+# arrays XXX this list isn't complete
 
 array.pmc		42
-floatvalarray.pmc	43
+fixedintegerarray.pmc	43
 intlist.pmc		44
 iterator.pmc		45
 perlarray.pmc		46
 pmcarray.pmc		47
 sarray.pmc		48
 constsarray.pmc 	49
-stringarray.pmc		50
+fixedstringarray.pmc		50
 multiarray.pmc		51
 
 

@@ -177,7 +177,7 @@ END:
     
     classoffset $I0, self, "Stream::Replay::Buffer"
 
-    temp = new StringArray
+    temp = new ResizableStringArray
     setattribute self, $I0, temp
     
     inc $I0

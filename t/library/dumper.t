@@ -919,23 +919,7 @@ CODE
 ]
 OUTPUT
 
-# no. 26
-pir_output_is(<<'CODE', <<'OUTPUT', "dumping StringArray PMC");
-.sub test :main
-    .local pmc array
-
-    new array, .StringArray
-    push array, "hello"
-    push array, "world"
-    _dumper( array, "array:" )
-.end
-.include "library/dumper.pir"
-CODE
-"array:" => StringArray (size:2) [
-    "hello",
-    "world"
-]
-OUTPUT
+# no. 26 - Deleted --leo
 
 # no. 27
 pir_output_is(<<'CODE', <<'OUTPUT', "custom dumper");
@@ -982,4 +966,4 @@ OUTPUT
 
 
 ## remember to change the number of tests! :-)
-BEGIN { plan tests => 27; }
+BEGIN { plan tests => 26; }

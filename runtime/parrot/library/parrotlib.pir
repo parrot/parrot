@@ -36,7 +36,7 @@ OKAY:
     # XXX: get include paths from config
     $S0 = clone root
     concat $S0, "/include"
-    paths = new .StringArray
+    paths = new .ResizableStringArray
     push paths, "."
     push paths, $S0
     push paths, root
