@@ -252,7 +252,7 @@ LOOP:
 
 .sub _combiner
     .param pmc strings
-    .param string str
+    .local string str
     .local string ret
 
     ret = strings[0]

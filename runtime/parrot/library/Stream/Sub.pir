@@ -91,7 +91,7 @@ END:
     classoffset $I0, self, "Stream::Sub"
     getattribute _write, self, $I0
 
-    self."_call_writer"(_write, str)
+    $P0 =self."_call_writer"(_write, str)
 .end
 
 .sub _call_writer method

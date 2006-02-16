@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 7;
+use Parrot::Test tests => 6;
 use Parrot::Config;
 
 
@@ -76,14 +76,6 @@ END_EXPECTED
 
     'stack.pasm'        =>  << 'END_EXPECTED',
 87654321098765432100123456789012345678998765432109876543210
-END_EXPECTED
-
-    'trace.pasm'        =>  << 'END_EXPECTED',
-Howdy!
-     5 print "There!\n"
-There!
-     7 trace 0
-Partner!
 END_EXPECTED
 
     'xml_parser.pasm'        =>  << 'END_EXPECTED',
