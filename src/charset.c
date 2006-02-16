@@ -6,9 +6,13 @@ $Id$
 
 src/charset.c - global charset functions
 
-head1 DESCRIPTION
+=head1 DESCRIPTION
 
 These are parrot's generic charset handling functions
+
+=over 4
+
+=cut
 
 */
 
@@ -108,6 +112,8 @@ Return the number of the charset or -1 if not found.
 =item C<INTVAL Parrot_charset_number_of_str(Interp *, const STRING *src)>
 
 Return the number of the charset of the given string or -1 if not found.
+
+=cut
 
 */
 

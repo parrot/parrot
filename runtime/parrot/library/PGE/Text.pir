@@ -22,6 +22,8 @@ also.)
 
 =head2 Available rules
 
+=over 4
+
 =item C<bracketed(PMC target, string delim)>
 
 Extracts a balanced-bracket-delimited substring from the
@@ -121,6 +123,8 @@ of the extraction.
   end:
     .return (mob)
 .end
+
+=back
 
 =head1 AUTHOR
 

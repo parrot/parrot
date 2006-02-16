@@ -6,7 +6,7 @@ $Id$
 
 src/pmc/default.pmc - Abstract root class
 
-head1 DESCRIPTION
+=head1 DESCRIPTION
 
 These are the vtable functions for the default PMC class.
 
@@ -48,6 +48,8 @@ caller(Interp* interpreter, PMC * pmc)
 
 Throws an exception "$methname() not implemented in class '$class'", used by
 all unimplemented messages.
+
+=cut
 
 */
 

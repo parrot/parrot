@@ -19,7 +19,7 @@ There are 3 ways to run a language test:
 
 =over 4
 
-=item * Overall Harness
+=item Overall Harness
 
 C<make languages-test> 
 
@@ -35,13 +35,13 @@ or
 
 C<cd languages && make smoke> or
 
-=item * Per Language Harness
+=item Per Language Harness
 
 For well behaved languages you can do something like:
 
 C<cd languages/tcl && make test>
 
-=item * Run a single test for more detailed output.
+=item Run a single test for more detailed output.
 
 e.g., C<cd languages/tcl && prove t/joe_test.t>
 

@@ -1038,7 +1038,7 @@ Remove a reference of the PMC from the interpreters DOD registry. If the
 reference count reaches zero, the PMC will be destroyed during the next
 DOD run.
 
-=iterm <Parrot_PMC Parrot_get_dod_registry(Parrot_INTERP)>
+=item C<Parrot_PMC Parrot_get_dod_registry(Parrot_INTERP)>
 
 Return Parrot's internal DOD registry PMC.
 See also: F<src/pmc/addrregistry.pmc>.

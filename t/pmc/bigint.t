@@ -612,7 +612,8 @@ no_nl:
     print "\n"
 .end
 
-=pod
+=begin python
+
 class PI(object):
     def __iter__(self):
         k, a, b, a1, b1 = 2, 4, 1, 12, 4
@@ -637,7 +638,10 @@ for i in xrange(1, 1001):
 
 print ds
 
+=end python
+
 =cut
+
 CODE
 31415926535897932384626433832795028841971693993751
 05820974944592307816406286208998628034825342117067

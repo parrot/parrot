@@ -105,9 +105,6 @@ Creates and returns a clone of the scalar.
 
 =over 4
 
-
-/*
-
 =item C<PMC* subtract(PMC *value, PMC *dest)>
 
 =cut

@@ -69,6 +69,6 @@ MATCH_FAIL:
 
 =head1 AUTHOR
 
-Jerry Gay a.k.a. particle (E<jerry.gay@gmail.com>)
+Jerry Gay a.k.a. particle (L<jerry.gay@gmail.com>)
 
 =cut

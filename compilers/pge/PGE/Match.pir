@@ -24,6 +24,8 @@ This file implements match objects returned by the Parrot Grammar Engine.
 
 =head2 Functions
 
+=over 4
+
 =item C<newfrom(PMC mob [, int from [, string grammar]])>
 
 Creates a new Match object, based on C<mob>.  If C<grammar> is
@@ -76,7 +78,11 @@ the current position of C<mob>.
     .return (me, target, from, pos)
 .end
 
+=back
+
 =head2 Methods
+
+=over 4
 
 =item C<next()>
 
@@ -273,6 +279,8 @@ Returns the array component of the match object.
     array = getattribute self, "PGE::Match\x0@:capt"
     .return (array)
 .end
+
+=back
 
 =head1 AUTHOR
 

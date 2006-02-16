@@ -40,6 +40,8 @@ and used to generate precompiled .pbc files for other packages.
 
 =head2 Functions
 
+=over 4
+
 =item C<__onload()>
 
 Generates the grammar parse rule needed to parse grammar strings.

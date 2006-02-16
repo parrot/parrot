@@ -169,6 +169,7 @@ Returns the match.
 
 .include "library/config.pir"
 
+=back
 
 =head1 BUGS
 

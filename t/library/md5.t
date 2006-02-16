@@ -342,7 +342,7 @@ CODE
 OUT
 
 
-=bash
+=begin bash
 
 test output created with:
 
@@ -353,6 +353,8 @@ for i in $(seq 1 200); do
     str=$(echo -n "$str" | md5sum | cut -d ' ' -f 1)
     echo "$str"
 done
+
+=end bash
 
 =cut
 
@@ -578,7 +580,7 @@ b63d8a186e272754b70953ddd441e9fd
 eab26f6455a08779bcb43bc48c02c717
 OUT
 
-=bash
+=begin bash
 
 test output created with:
 
@@ -589,6 +591,8 @@ for i in $(seq 1 200); do
     str=$(echo -n "$str$str" | md5sum | cut -d ' ' -f 1)
     echo "$str"
 done
+
+=end bash
 
 =cut
 

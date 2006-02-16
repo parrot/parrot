@@ -38,9 +38,6 @@ pmclass ResizableBooleanArray extends FixedBooleanArray need_ext does array {
 
 =over 4
 
-
-/*
-
 =item C<INTVAL get_integer_keyed_int(INTVAL key)>
 
 Returns the integer value of the element at index C<key>.

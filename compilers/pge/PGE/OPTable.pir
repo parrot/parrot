@@ -55,6 +55,8 @@ subroutine that calls the parser:
 
 =head1 Methods
 
+=over 4
+
 =item C<__onload()>
 
 Creates the PGE::OPTable class.
@@ -91,7 +93,11 @@ Initializes a PGE::OPTable object.
     setattribute self, "PGE::OPTable\x0%:wsopertable", $P0
 .end
 
+=back
+
 =head2 Methods
+
+=over 4
 
 =item C<addtok(STR name [, STR rel [, STR opts [, PMC match ]]])>
 
@@ -495,6 +501,8 @@ representing the result of the parse.
 # 
 #    (*) - XXX: The current implementation assumes that circumfix
 #    operators are always tighter than any close, and so performs a shift.
+
+=back
        
 =head1 AUTHOR
 

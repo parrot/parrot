@@ -161,8 +161,6 @@ all:
     end
 .end
 
-=back
-
 =head1 FILES
 
 pcre.pir, libpcre.pir

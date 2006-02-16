@@ -397,6 +397,8 @@ Dumps a Null PMC.
     .return ( 1 )
 .end
 
+=back
+
 =head1 AUTHOR
 
 Jens Rieks E<lt>parrot at jensbeimsurfen dot deE<gt> is the author

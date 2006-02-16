@@ -6,9 +6,13 @@ $Id$
 
 src/encoding.c - global encoding functions
 
-head1 DESCRIPTION
+=head1 DESCRIPTION
 
 These are parrot's generic encoding handling functions
+
+=over 4
+
+=cut
 
 */
 
@@ -99,6 +103,8 @@ Return the number of the encoding or -1 if not found.
 =item C<INTVAL Parrot_encoding_number_of_str(Interp *, const STRING *src)>
 
 Return the number of the encoding of the given string or -1 if not found.
+
+=cut
 
 */
 

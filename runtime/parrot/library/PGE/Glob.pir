@@ -8,6 +8,8 @@ A parser for shell-stype glob notation.
 
 =head2 Functions
 
+=over 4
+
 =cut
 
 .namespace [ "PGE::Glob" ]
@@ -314,6 +316,8 @@ Parse alternations of the form {a,b,c} where a,b, and c are the alternatives.
     glob = $P0($S0)
     .return (glob, code, $P2)
 .end
+
+=back
 
 =head1 AUTHOR
 

@@ -97,6 +97,8 @@ Print the help.
 You can also debug Parrot code by using the C<debug_init>, C<debug_load>
 and C<debug_break> ops in F<ops/debug.ops>.
 
+=over 4
+
 =cut
 
 */
@@ -110,11 +112,12 @@ void PDB_printwelcome(void);
 
 /*
 
-int
-main(int argc, char *argv[])
+=item C<int main(int argc, char *argv[])>
 
 Reads the PASM or PBC file from argv[1], loads it, and then calls
 Parrot_debug().
+
+=cut
 
 */
 
@@ -156,10 +159,11 @@ main(int argc, char *argv[])
 
 /*
 
-void
-PDB_printwelcome()
+=item C<void PDB_printwelcome()>
 
 Prints out the welcome string.
+
+=cut
 
 */
 

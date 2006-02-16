@@ -15,6 +15,8 @@ pbc_info - PacFile demo
 Sample program for dumping PackFile segment names by iterating
 over the main directory.
 
+=over 4
+
 =cut
 
 */
@@ -24,7 +26,8 @@ over the main directory.
 
 /*
 
-static INTVAL iter(Interp*, struct PackFile_Segment *seg, void *user_data)
+=item C<static INTVAL iter(Interp*, struct PackFile_Segment *seg, void
+ *user_data)>
 
 This function is passed the callback to PackFile_map_segments() to print out
 the name of each segment in the directory.
@@ -47,8 +50,7 @@ iter(Interp* interpreter,
 
 /*
 
-int
-main(int argc, char **argv)
+=item C<int main(int argc, char **argv)>
 
 Reads the PBC from argv[1], adds a few extra sections, and then iterates over
 the directory using PackFile_map_segments() and iter().
@@ -90,6 +92,8 @@ main(int argc, char **argv)
 }
 
 /*
+
+=back
 
 =head1 SEE ALSO
 

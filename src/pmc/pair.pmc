@@ -250,6 +250,8 @@ Used to unarchive the Pair.
     }
 /*
 
+=back
+
 =head2 Methods
 
 =over 4

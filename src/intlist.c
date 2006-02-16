@@ -77,7 +77,7 @@ operations are implemented as:
 
 Write element, push a new chunk if necessary.
 
-item C<pop>
+=item C<pop>
 
 Check to see if we have to back up a chunk, read element.
 

@@ -14,6 +14,8 @@ These are the vtable functions for the Hash PMC.
 
 =over 4
 
+=cut
+
 */
 
 #include "parrot/parrot.h"

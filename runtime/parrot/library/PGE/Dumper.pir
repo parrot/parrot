@@ -11,6 +11,8 @@ PGE::Dumper - various methods for displaying PGE structures
 
 =head2 C<PGE::Match> Methods
 
+=over 4
+
 =item C<__dump(PMC dumper, STR label)>
 
 This method enables Data::Dumper to work on Match objects.
@@ -187,6 +189,8 @@ An alternate dump output for a Match object and all of its subcaptures.
   end:
     .return ()
 .end
+
+=back
 
 =head2 C<PGE::Exp> methods
 

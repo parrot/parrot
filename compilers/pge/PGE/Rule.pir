@@ -25,6 +25,8 @@ a number of built-in rules.
 
 =head2 Built-in rules
 
+=over 4
+
 =item C<null()>
 
 Match a null string (always returns true on first match).
@@ -538,6 +540,7 @@ potentially very inefficient, but it "works" for now.
     .return (mob)
 .end
 
+=back
     
 =head1 AUTHOR
 

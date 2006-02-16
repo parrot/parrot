@@ -38,6 +38,8 @@
 
 .namespace [ "PGE::Exp" ]
 
+=over 4
+
 =item C<(STR, INT) = serno([STR prefix [, INT start]])>
 
 This method simply returns integers and labels usable for
@@ -1211,3 +1213,7 @@ register.
     emit(code, "    goto fail")
     .return ()
 .end
+
+=back
+
+=cut

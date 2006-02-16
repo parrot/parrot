@@ -623,7 +623,7 @@ PIO_listen_down(theINTERP, ParrotIOLayer *layer, ParrotIO *io, INTVAL backlog)
 /*
 
 =item C<ParrotIO *
-PIO_accept_down(theINTERP, ParrotIOLayer *layer, ParrotIO *io, STRING *address)Y
+PIO_accept_down(theINTERP, ParrotIOLayer *layer, ParrotIO *io, STRING *address)>
 
 
 Looks for the implementation of C<Accept> and calls it if found,
