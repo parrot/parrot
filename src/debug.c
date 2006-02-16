@@ -12,7 +12,7 @@ This file implements Parrot debugging and is used by C<pdb>, the Parrot
 debugger, and the C<debug> ops.
 
 =head2 Functions
-b
+
 =over 4
 
 =cut
