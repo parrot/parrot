@@ -2852,7 +2852,7 @@ jit_save_regs(Parrot_jit_info_t *jit_info, Interp * interpreter)
 static void 
 jit_save_regs_call(Parrot_jit_info_t *jit_info, Interp * interpreter, int skip)
 {
-    int i, used_i, save_i;
+    int i, used_i;
     const jit_arch_regs *reg_info;
 
     used_i = CONTEXT(interpreter->ctx)->n_regs_used[REGNO_INT];
@@ -2886,7 +2886,7 @@ jit_restore_regs_call(Parrot_jit_info_t *jit_info, Interp * interpreter,
         int skip)
 {
 
-    int i, used_i, save_i;
+    int i, used_i;
     const jit_arch_regs *reg_info;
 
     used_i = CONTEXT(interpreter->ctx)->n_regs_used[REGNO_INT];

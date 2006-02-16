@@ -175,7 +175,6 @@ call_is_safe(Interp *interpreter, PMC *sub, opcode_t **set_args)
 {
     opcode_t *pc;
     PMC *sig_args, *called, *sig_results;
-    int i;
 
     pc = *set_args;
     sig_args = PMC_sub(sub)->seg->const_table->constants[pc[1]]->u.key;
