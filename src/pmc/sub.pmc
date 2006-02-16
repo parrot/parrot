@@ -59,7 +59,7 @@ print_sub_name(Interp* interpreter, PMC* sub)
 {
 
         /* sub was located via globals */
-    PIO_eprintf(interpreter, "# Calling sub '%Ss'\n#",
+    PIO_eprintf(interpreter, "# Calling sub '%Ss'\n# ",
         Parrot_full_sub_name(interpreter, sub));
     print_pbc_location(interpreter);
 }

@@ -65,12 +65,22 @@ stopped. See the L<Glossary|docs/glossary.pod> for more information.
 static void
 print_sub_name(Interp* interpreter, PMC* sub)
 {
+    struct Parrot_coro * co = PMC_coro(sub);
 
-    PIO_eprintf(interpreter, "# %s coro '%Ss'\n#",
-        !(PObj_get_FLAGS(sub) & SUB_FLAG_CORO_FF) ? "Calling" : "yielding from",
+    PIO_eprintf(interpreter, "# %s coro '%Ss'",
+        !(PObj_get_FLAGS(sub) & SUB_FLAG_CORO_FF) ? 
+        "Calling" : "yielding from",
         Parrot_full_sub_name(interpreter, sub));
+    if (co->ctx &&
+        (PObj_get_FLAGS(sub) & SUB_FLAG_CORO_FF)) {
+        PIO_eprintf(interpreter, " to '%Ss'",
+                Parrot_full_sub_name(interpreter, 
+                    co->ctx->caller_ctx->current_sub));
+    }
+    PIO_eprintf(interpreter, "\n# ");
     print_pbc_location(interpreter);
 }
+
 pmclass Coroutine extends Sub need_ext {
 
 /*

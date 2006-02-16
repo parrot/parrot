@@ -111,7 +111,7 @@ the frame pointer in the stack frame cache.
             PMC *to_sub = caller_ctx->current_sub;
             PMC *from_sub = cc->from_ctx->current_sub;
 
-            PIO_eprintf(INTERP, "# Back in sub '%Ss' from '%Ss\n",
+            PIO_eprintf(INTERP, "# Back in sub '%Ss' from '%Ss'\n",
                     Parrot_full_sub_name(INTERP, to_sub),
                     Parrot_full_sub_name(INTERP, from_sub));
         }

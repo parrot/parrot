@@ -379,7 +379,7 @@ Parrot_Context_infostr(Interp *interpreter, parrot_context_t *ctx)
 
     if (Parrot_Context_info(interpreter, ctx, &info)) {
         return Parrot_sprintf_c(interpreter,
-            "%s '%Ss' pc %d (%s:%d)\n", msg,
+            "%s '%Ss' pc %d (%s:%d)", msg,
             info.fullname, info.pc, info.file, info.line);
     }
     return NULL;

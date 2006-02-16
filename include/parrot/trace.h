@@ -18,7 +18,7 @@
 void
 trace_pmc_dump(Interp *interpreter, PMC* pmc);
 
-void trace_key_dump(Interp *interpreter, PMC *key);
+int trace_key_dump(Interp *interpreter, PMC *key);
 
 void trace_op_dump(Interp *interpreter, opcode_t * code_start,
                    opcode_t * pc);

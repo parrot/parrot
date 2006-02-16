@@ -126,61 +126,62 @@ trace_pmc_dump(Interp *interpreter, PMC* pmc)
 
 /*
 
-=item C<void
+=item C<int
 trace_key_dump(Interp *interpreter, PMC *key)>
 
-Prints a key to C<stderr>.
+Prints a key to C<stderr>, returns the length of the output.
 
 =cut
 
 */
 
-void
+int
 trace_key_dump(Interp *interpreter, PMC *key)
 {
     char *escaped;
     STRING *s;
+    int len = 0;
 
-    PIO_eprintf(interpreter, "[");
+    len += PIO_eprintf(interpreter, "[");
 
     while (key) {
         switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
         case KEY_integer_FLAG:
-            PIO_eprintf(interpreter, "%vi", PMC_int_val(key));
+            len += PIO_eprintf(interpreter, "%vi", PMC_int_val(key));
             break;
         case KEY_number_FLAG:
-            PIO_eprintf(interpreter, "%vg", PMC_num_val(key));
+            len += PIO_eprintf(interpreter, "%vg", PMC_num_val(key));
             break;
         case KEY_string_FLAG:
             s = PMC_str_val(key);
             /* XXX do it w/o degrading to C string */
             escaped = PDB_escape(PObj_bufstart(s), s->strlen);
-            PIO_eprintf(interpreter, "\"%s\"", escaped?escaped:"(null)");
+            len += PIO_eprintf(interpreter, "\"%s\"", escaped?escaped:"(null)");
                 if (escaped)
                     mem_sys_free(escaped);
             break;
         case KEY_integer_FLAG|KEY_register_FLAG:
-            PIO_eprintf(interpreter, "I%vd=%vd", PMC_int_val(key),
+            len += PIO_eprintf(interpreter, "I%vd=%vd", PMC_int_val(key),
                     REG_INT(PMC_int_val(key)));
             break;
         case KEY_number_FLAG|KEY_register_FLAG:
-            PIO_eprintf(interpreter, "I%vd=%vd", PMC_int_val(key),
+            len += PIO_eprintf(interpreter, "I%vd=%vd", PMC_int_val(key),
                     REG_NUM(PMC_int_val(key)));
             break;
         case KEY_string_FLAG|KEY_register_FLAG:
             s = REG_STR(PMC_int_val(key));
             escaped = PDB_escape(s->strstart, s->strlen);
-            PIO_eprintf(interpreter, "S%vd=\"%s\"", PMC_int_val(key),
+            len += PIO_eprintf(interpreter, "S%vd=\"%s\"", PMC_int_val(key),
                     escaped ? escaped : "(null");
                 if (escaped)
                     mem_sys_free(escaped);
             break;
         case KEY_pmc_FLAG|KEY_register_FLAG:
-            PIO_eprintf(interpreter, "P%vd=", PMC_int_val(key));
+            len += PIO_eprintf(interpreter, "P%vd=", PMC_int_val(key));
             trace_pmc_dump(interpreter, REG_PMC(PMC_int_val(key)));
             break;
         default:
-            PIO_eprintf(interpreter, "??");
+            len += PIO_eprintf(interpreter, "??");
             key = NULL;
             break;
         }
@@ -188,10 +189,12 @@ trace_key_dump(Interp *interpreter, PMC *key)
         if (key)
             key = PMC_data(key);
 
-        if (key) PIO_eprintf(interpreter, ";");
+        if (key) 
+            len += PIO_eprintf(interpreter, ";");
     }
 
-    PIO_eprintf(interpreter, "]");
+    len += PIO_eprintf(interpreter, "]");
+    return len;
 }
 
 /*
@@ -218,23 +221,25 @@ trace_op_dump(Interp *interpreter, opcode_t *code_start,
     op_info_t *info = &interpreter->op_info_table[*pc];
     PMC *sig;
     int type;
+    int len;
+#define ARGS_COLUMN 40
 
     sig = NULL; /* silence compiler uninit warning */
 
     s = 1;
-    PIO_eprintf(interpreter, "%6vu ", (UINTVAL)(pc - code_start));
+    len = PIO_eprintf(interpreter, "%6vu ", (UINTVAL)(pc - code_start));
     if (strcmp(info->name, "infix") == 0) {
-        PIO_eprintf(interpreter, "%s",
+        len += PIO_eprintf(interpreter, "%s",
                 Parrot_MMD_method_name(interpreter, pc[1]) + 2);
         s = 2;
     }
     else if (strcmp(info->name, "n_infix") == 0) {
-        PIO_eprintf(interpreter, "n_%s",
+        len += PIO_eprintf(interpreter, "n_%s",
                 Parrot_MMD_method_name(interpreter, pc[1]) + 2);
         s = 2;
     }
     else
-        PIO_eprintf(interpreter, "%s", info->name);
+        len += PIO_eprintf(interpreter, "%s", info->name);
 
     n = info->op_count;
     var_args = 0;
@@ -249,7 +254,7 @@ trace_op_dump(Interp *interpreter, opcode_t *code_start,
     }
 
     if (n > 1) {
-        PIO_eprintf(interpreter, " ");
+        len += PIO_eprintf(interpreter, " ");
         /* pass 1 print arguments */
         for (i = s; i < n; i++) {
             opcode_t o = *(pc + i);
@@ -264,58 +269,58 @@ trace_op_dump(Interp *interpreter, opcode_t *code_start,
                     type != PARROT_ARG_KI &&
                     type != PARROT_ARG_K
                ) {
-                PIO_eprintf(interpreter, ", ");
+                len += PIO_eprintf(interpreter, ", ");
             }
             switch (type) {
                 case PARROT_ARG_IC:
-                    PIO_eprintf(interpreter, "%vd", o);
+                    len += PIO_eprintf(interpreter, "%vd", o);
                     break;
                 case PARROT_ARG_NC:
-                    PIO_eprintf(interpreter, "%vg", PCONST(o)->u.number);
+                    len += PIO_eprintf(interpreter, "%vg", PCONST(o)->u.number);
                     break;
                 case PARROT_ARG_PC:
                     if (var_args)
-                        PIO_eprintf(interpreter, "PMC_C[%d] (%d)",
+                        len += PIO_eprintf(interpreter, "PC%d (%d)",
                                 (int)o, var_args);
                     else
-                        PIO_eprintf(interpreter, "PMC_C[%d]", (int)o);
+                        len += PIO_eprintf(interpreter, "PC%d", (int)o);
                     break;
                 case PARROT_ARG_SC:
                     escaped = PDB_escape(PCONST(o)->u.string->strstart,
                             PCONST(o)->u.string->bufused);
-                    PIO_eprintf(interpreter, "\"%s\"",
+                    len += PIO_eprintf(interpreter, "\"%s\"",
                             escaped ? escaped : "(null)");
                     if (escaped)
                         mem_sys_free(escaped);
                     break;
                 case PARROT_ARG_KC:
-                    trace_key_dump(interpreter, PCONST(o)->u.key);
+                    len += trace_key_dump(interpreter, PCONST(o)->u.key);
                     break;
                 case PARROT_ARG_KIC:
-                    PIO_eprintf(interpreter, "[%vd]", o);
+                    len += PIO_eprintf(interpreter, "[%vd]", o);
                     break;
                 case PARROT_ARG_KI:
-                    PIO_eprintf(interpreter, "[I%vd]", o);
+                    len += PIO_eprintf(interpreter, "[I%vd]", o);
                     more = 1;
                     break;
                 case PARROT_ARG_K:
-                    PIO_eprintf(interpreter, "[P%vd]",o);
+                    len += PIO_eprintf(interpreter, "[P%vd]",o);
                     more = 1;
                     break;
                 case PARROT_ARG_I:
-                    PIO_eprintf(interpreter, "I%vd", o);
+                    len += PIO_eprintf(interpreter, "I%vd", o);
                     more = 1;
                     break;
                 case PARROT_ARG_N:
-                    PIO_eprintf(interpreter, "N%vd", o);
+                    len += PIO_eprintf(interpreter, "N%vd", o);
                     more = 1;
                     break;
                 case PARROT_ARG_P:
-                    PIO_eprintf(interpreter, "P%vd", o);
+                    len += PIO_eprintf(interpreter, "P%vd", o);
                     more = 1;
                     break;
                 case PARROT_ARG_S:
-                    PIO_eprintf(interpreter, "S%vd", o);
+                    len += PIO_eprintf(interpreter, "S%vd", o);
                     more = 1;
                     break;
                 default:
@@ -325,7 +330,16 @@ trace_op_dump(Interp *interpreter, opcode_t *code_start,
         }
         if (!more)
             goto done;
-        PIO_eprintf(interpreter, "  \t- ");
+        if (len < ARGS_COLUMN)  {
+            STRING *fill = string_repeat(interpreter, 
+                    const_string(interpreter, " "),
+                    ARGS_COLUMN - len, NULL);
+            PIO_putps(interpreter, PIO_STDERR(interpreter), fill);
+        }
+        else {
+            PIO_eprintf(interpreter, "\t");
+        }
+
         /* pass 2 print argument details if needed */
         for (i = 1; i < n; i++) {
             opcode_t o = *(pc + i);
@@ -335,7 +349,7 @@ trace_op_dump(Interp *interpreter, opcode_t *code_start,
                 type = SIG_ITEM(sig, i - 2) & 
                     (PARROT_ARG_TYPE_MASK|PARROT_ARG_CONSTANT);
             if (i > s) {
-                PIO_eprintf(interpreter, ", ");
+                PIO_eprintf(interpreter, " ");
             }
             switch (type) {
                 case PARROT_ARG_I:
@@ -343,6 +357,10 @@ trace_op_dump(Interp *interpreter, opcode_t *code_start,
                     break;
                 case PARROT_ARG_N:
                     PIO_eprintf(interpreter, "N%vd=%vf", o, REG_NUM(o));
+                    break;
+                case PARROT_ARG_PC:
+                    PIO_eprintf(interpreter, "PC%vd=", o);
+                    trace_pmc_dump(interpreter, PCONST(o)->u.key);
                     break;
                 case PARROT_ARG_P:
                     PIO_eprintf(interpreter, "P%vd=", o);
@@ -357,6 +375,8 @@ trace_op_dump(Interp *interpreter, opcode_t *code_start,
                         if (escaped)
                             mem_sys_free(escaped);
                     }
+                    else
+                        PIO_eprintf(interpreter, "S%vd=(null)", o);
                     break;
                 case PARROT_ARG_K:
                     PIO_eprintf(interpreter, "P%vd=", o);
