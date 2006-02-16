@@ -205,6 +205,7 @@ Parrot_abs_n_n {
 }
 
 TEMPLATE binop_x_xc {
+    int im;
     if (MAP[1]) {
 #ifdef jit_emit_<op>_rri<_N>
 	int im = *INT_CONST[2];
@@ -230,7 +231,7 @@ TEMPLATE binop_x_xc {
     else {
         jit_emit_mov_rm<_N>(NATIVECODE, <s1>, ROFFS_<t>(1));
 #ifdef jit_emit_<op>_rri<_N>
-	int im = *INT_CONST[2];
+	im = *INT_CONST[2];
 	if (!(im >> 16)) {
 	    jit_emit_<op>_rri_i(NATIVECODE, <s1>, <s1>, im);
 	}
