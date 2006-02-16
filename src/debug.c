@@ -2791,7 +2791,7 @@ PDB_backtrace(Interp *interpreter)
     if (!PMC_IS_NULL(sub)) {
         str = Parrot_Context_infostr(interpreter, ctx);
         if (str)
-            PIO_eprintf(interpreter, "%Ss", str);
+            PIO_eprintf(interpreter, "%Ss\n", str);
     }
 
     /* backtrace: follow the continuation chain */
@@ -2818,7 +2818,7 @@ PDB_backtrace(Interp *interpreter)
 
         /* print the context description */
         if (rec_level == 0)
-            PIO_eprintf(interpreter, "%Ss", str);
+            PIO_eprintf(interpreter, "%Ss\n", str);
 
         /* get the next Continuation */
         ctx = PMC_cont(sub)->to_ctx;
