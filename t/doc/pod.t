@@ -54,5 +54,8 @@ foreach my $file (keys(%$manifest), keys(%$manifest_gen)) {
     push @docs, $file if Pod::Find::contains_pod($file, 0);
 }
 
+# filter out pbc files
+@docs = grep(!/\.pbc$/, @docs);
+
 plan tests => scalar @docs;
 Test::Pod::pod_file_ok( $_ ) foreach @docs;
