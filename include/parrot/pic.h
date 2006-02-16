@@ -81,7 +81,7 @@ typedef int (*arg_pass_f)(Interp *, PMC *sig,
         char *src_base, void **src_pc, char *dest_base, void **dest_pc);
 
 int parrot_pic_check_sig(Interp *, PMC *sig1, PMC *sig2, int *type);
-int parrot_pic_is_save_to_jit(Interp *, PMC *sub,
+int parrot_pic_is_safe_to_jit(Interp *, PMC *sub,
 	PMC *sig_args, PMC *sig_results, int *flags);
 
 funcptr_t  parrot_pic_JIT_sub(Interp *, PMC *sub, int flags);

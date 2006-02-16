@@ -533,7 +533,7 @@ is_pic_func(Interp *interpreter, void **pc, Parrot_MIC *mic, int core_type)
     ASSERT_SIG_PMC(sig_results);
 
     ctx->current_results = (opcode_t*)pc + ctx->pred_offset;
-    if (!parrot_pic_is_save_to_jit(interpreter, sub, 
+    if (!parrot_pic_is_safe_to_jit(interpreter, sub, 
                 sig_args, sig_results, &flags))
         return 0;
     mic->lru.f.real_function = parrot_pic_JIT_sub(interpreter, sub, flags);

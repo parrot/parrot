@@ -122,7 +122,7 @@ args_match_params(Interp *interpreter, PMC *sig_args,
         return 0;
     }
     if (!n) {
-        /* no args - this would be save, if the JIT code could already
+        /* no args - this would be safe, if the JIT code could already
          * deal with no args
          * TODO
          */
@@ -155,7 +155,7 @@ returns_match_results(Interp *interpreter, PMC *sig_ret, PMC *sig_result)
         return 0;
     }
     if (!n) {
-        /* no args - this would be save, if the JIT code could already
+        /* no args - this would be safe, if the JIT code could already
          * deal with no args
          * TODO
          */
@@ -269,7 +269,7 @@ op_is_ok:
 }
 
 int
-parrot_pic_is_save_to_jit(Interp *interpreter, PMC *sub,
+parrot_pic_is_safe_to_jit(Interp *interpreter, PMC *sub,
 	PMC *sig_args, PMC *sig_results, int *flags)
 {
     STRING *name;
@@ -351,7 +351,7 @@ parrot_pic_JIT_sub(Interp *interpreter, PMC *sub, int flags) {
 #else
 
 int
-parrot_pic_is_save_to_jit(Interp *interpreter, PMC *sub,
+parrot_pic_is_safe_to_jit(Interp *interpreter, PMC *sub,
 	PMC *sig_args, PMC *sig_results, int *flags)
 {
     return 0;
