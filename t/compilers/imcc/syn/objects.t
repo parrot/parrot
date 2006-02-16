@@ -151,7 +151,7 @@ pir_output_is(<<'CODE', <<'OUT', "initializer");
 .end
 
 .namespace [""]	# main again
-.sub _sub method
+.sub _sub
     print "in sub\n"
 .end
 CODE
