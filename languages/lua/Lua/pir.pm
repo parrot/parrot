@@ -40,7 +40,11 @@ sub visitBinaryOp {
 	my $self = shift;
 	my ($op) = @_;
 	my $FH = $self->{fh};
-	print $FH "  $op->{result}->{symbol} = $op->{op} $op->{arg1}->{symbol}, $op->{arg2}->{symbol}\n";
+	if ($op->{result} == $op->{arg1}) {
+		print $FH "  $op->{op} $op->{result}->{symbol}, $op->{arg2}->{symbol}\n";
+	} else {
+		print $FH "  $op->{result}->{symbol} = $op->{op} $op->{arg1}->{symbol}, $op->{arg2}->{symbol}\n";
+	}
 }
 
 sub visitRelationalOp {
@@ -75,7 +79,7 @@ sub visitIncrOp {
 	my $self = shift;
 	my ($op) = @_;
 	my $FH = $self->{fh};
-	print $FH "  add $op->{result}->{symbol}, 1\n";
+	print $FH "  add $op->{result}->{symbol}, 1.0\n";
 }
 
 sub visitFindGlobalOp {

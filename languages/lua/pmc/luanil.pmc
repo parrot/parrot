@@ -4,7 +4,7 @@ $Id$
 
 =head1 NAME
 
-classes/luanil.pmc - Lua Nil
+pmc/luanil.pmc - Lua Nil
 
 =head1 DESCRIPTION
 
@@ -16,7 +16,7 @@ and so a new PMC is constructed anyway. Therefore, we may as well create
 a new PMC right away. Also, creating a new PMC from a singleton class is
 troublesome (if not possible?).
 
-=head2 Overloaded Methods
+=head2 Methods
 
 =over 4
 
@@ -27,12 +27,10 @@ troublesome (if not possible?).
 #include "parrot/parrot.h"
 
 static STRING *string_representation;
-static INTVAL dynpmc_LuaNil;
-static INTVAL dynpmc_LuaNumber;
-static INTVAL dynpmc_LuaString;
-static INTVAL dynpmc_LuaBoolean;
 
-pmclass LuaNil   
+pmclass LuaNil
+    extends LuaBase   
+    does scalar
     dynpmc
     group lua_group
     hll Lua {
@@ -45,14 +43,6 @@ pmclass LuaNil
             PMC *meth;
 
             string_representation = const_string(INTERP, "nil");
-            dynpmc_LuaNil = pmc_type(INTERP,
-                    string_from_const_cstring(INTERP, "LuaNil", 0));
-            dynpmc_LuaNumber = pmc_type(INTERP,
-                    string_from_const_cstring(INTERP, "LuaNumber", 0));
-            dynpmc_LuaString = pmc_type(INTERP,
-                    string_from_const_cstring(INTERP, "LuaString", 0));
-            dynpmc_LuaBoolean = pmc_type(INTERP, 
-                    string_from_const_cstring(INTERP, "LuaBoolean", 0));
 
             /* namespace hack */
             meth = Parrot_find_global(INTERP,
@@ -70,6 +60,30 @@ pmclass LuaNil
                 const_string(INTERP, "tonumber"),
                 meth);
         }
+    }
+
+/*
+
+=item C<PMC* new_from_string(STRING *rep, INTVAL flags)>
+
+Allow :
+
+    .const .LuaNil nil = "dummy"
+
+=cut
+
+*/
+    PMC* new_from_string (STRING *rep, INTVAL flags) {
+        INTVAL type;
+        PMC *res;
+
+        type = SELF->vtable->base_type;
+        if (flags & PObj_constant_FLAG)
+            res = constant_pmc_new(INTERP, type);
+        else
+            res = pmc_new(INTERP, type);
+
+        return res;
     }
 
 /*
@@ -100,51 +114,15 @@ Return the string "nil".
 
 /*
 
-=item C<STRING* get_repr ()>
-
-Return the string "nil".
-
-=cut
-
-*/
-    STRING* get_repr () {
-        return string_representation;
-    }
-
-
-    PMC* clone () {
-        PMC* dest = pmc_new(INTERP, SELF->vtable->base_type);
-        memcpy(&PMC_union(dest), &PMC_union(SELF), sizeof(UnionVal));
-        return dest;
-    }
-
-/*
-
 =item C<INTVAL get_bool()>
 
-Return always false.
+Return always C<false>.
 
 =cut
 
 */
     INTVAL get_bool () {
         return 0;
-    }
-
-/*
-
-=item C<PMC logical_not(PMC *dest)>
-
-Return always true.
-
-=cut
-
-*/
-    PMC* logical_not (PMC* dest) {
-        if (!dest)
-            dest = pmc_new(INTERP, dynpmc_LuaBoolean);
-        VTABLE_set_integer_native(INTERP, dest, 1);
-        return dest;
     }
 
 /*
@@ -162,75 +140,13 @@ Return always true.
 
 /*
 
-=item C<void set_number_native(FLOATVAL)>
+=back
 
-=item C<void set_string_native(STRING *)>
+=head2 non-Vtable Methods
 
-=item C<void set_integer_native(INTVAL)>
+=over 4
 
-=item C<void set_bool(INTVAL)>
-
-Methods to set a new value to this LuaNil PMC. First,
-this PMC is morph'ed into the correct Lua type.
-
-=item C<void morph(INTVAL)>
-
-Morph to another Lua type.
-
-=cut
-
-*/
-    void set_number_native(FLOATVAL value) {
-        VTABLE_morph(INTERP, SELF, dynpmc_LuaNumber);
-        VTABLE_set_number_native(INTERP, SELF, value);
-    }
-
-    void set_string_native(STRING *value) {
-        VTABLE_morph(INTERP, SELF, dynpmc_LuaString);
-        VTABLE_set_string_native(INTERP, SELF, value);
-    }
-
-    void set_integer_native(INTVAL value) {
-        VTABLE_morph(INTERP, SELF, dynpmc_LuaBoolean);
-        VTABLE_set_bool(INTERP, SELF, value);
-    }
-
-    void set_bool (INTVAL value) {
-        VTABLE_morph(INTERP, SELF, dynpmc_LuaBoolean);
-        VTABLE_set_bool(INTERP, SELF, value);
-    }
-
-    void morph(INTVAL new_type) {
-        pmc_reuse(INTERP, SELF, new_type, 0);
-    }
-
-/*
-
-=item C<PMC* new_from_string(STRING *rep, INTVAL flags)>
-
-Allow :
-
-    .const .LuaNil nil = "dummy"
-
-=cut
-
-*/
-    PMC* new_from_string(STRING *rep, INTVAL flags) {
-        INTVAL type;
-        PMC *res;
-
-        type = SELF->vtable->base_type;
-        if (flags & PObj_constant_FLAG)
-            res = constant_pmc_new(INTERP, type);
-        else
-            res = pmc_new(INTERP, type);
-
-        return res;
-    }
-
-/*
-
-=item C<INTVAL is_equal(PMC* value)>
+=item C<INTVAL is_equal (PMC* value)>
 
 =cut
 
@@ -246,39 +162,23 @@ MMD_DEFAULT: {
 
 /*
 
-=back
-
-=head2 Specific Methods
-
-=over 4
-
-=item C<PMC* tonumber()>
+=item C<INTVAL cmp(PMC *value)>
 
 =cut
 
 */
-    METHOD PMC* tonumber() {
-        PMC *retval;
-
-        retval = pmc_new(INTERP, dynpmc_LuaNil);
-        return retval;
-    }
-
-/*
-
-=item C<PMC* tostring()>
-
-=cut
-
-*/
-    METHOD PMC* tostring() {
-        PMC *retval;
-        STRING *rep;
-
-        retval = pmc_new(INTERP, dynpmc_LuaString);
-        rep = VTABLE_get_string(INTERP, SELF);
-        PMC_str_val(retval) = rep;
-        return retval;
+    INTVAL cmp (PMC* value) {
+MMD_LuaNil: {
+            real_exception(INTERP, NULL, ILL_INHERIT,
+                    "attempt to compare two nil values");
+            return (INTVAL)0;
+        }
+MMD_DEFAULT: {
+            real_exception(INTERP, NULL, ILL_INHERIT,
+                    "attempt to compare nil with %s",
+                    string_to_cstring(INTERP, VTABLE_name(INTERP, value)));
+            return (INTVAL)0;
+        }
     }
 
 }

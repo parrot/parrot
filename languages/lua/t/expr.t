@@ -138,15 +138,11 @@ true
 true
 OUT
 
-TODO: {
-local $TODO = "! tostring";
-
 language_output_like( 'lua', <<'CODE', <<'OUT', 'no coercion' );
 print("hello" + 1)
 CODE
 /perform arithmetic/
 OUT
-}
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'clone ?' );
 print(10 + 2)
@@ -167,5 +163,4 @@ CODE
 34
 37
 OUT
-
 

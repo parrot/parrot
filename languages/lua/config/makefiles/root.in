@@ -11,6 +11,7 @@ CLASSDIR = pmc
 LOAD_EXT = @load_ext@
 
 PMCS = \
+ luabase \
  luaboolean \
  luafunction \
  luanil \

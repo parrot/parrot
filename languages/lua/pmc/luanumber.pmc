@@ -4,11 +4,11 @@ $Id$
 
 =head1 NAME
 
-classes/luanumber.pmc - Lua Number
+pmc/luanumber.pmc - Lua Number
 
 =head1 DESCRIPTION
 
-C<LuaNumber> extends C<Float> to provide a class with the behaviour of
+C<LuaNumber> extends C<LuaBase> to provide a class with the behaviour of
 the Lua C<Number> type.
 
 =head2 Overloaded Methods
@@ -20,12 +20,14 @@ the Lua C<Number> type.
 */
 
 #include "parrot/parrot.h"
+#include "pmc_luastring.h"
 
 static STRING *luanumber_name;
 static INTVAL dynpmc_LuaString;
 
 pmclass LuaNumber
-    extends Float
+    extends LuaBase
+    does scalar
     does float
     dynpmc
     group lua_group
@@ -33,7 +35,7 @@ pmclass LuaNumber
 
 /* Class initialization. Caches constant strings that will be used later.
 */
-    void class_init() {
+    void class_init () {
         if (pass) {
             PMC *meth;
 
@@ -61,46 +63,6 @@ pmclass LuaNumber
 
 /*
 
-=item C<STRING* name()>
-
-Return the string "number".
-
-=cut
-
-*/
-    STRING* name () {
-        return luanumber_name;
-    }
-
-/*
-
-=item C<INTVAL get_bool()>
-
-In Lua, both C<nil> and C<false> make a condition false; any other values
-makes it true.
-
-So return always true.
-
-=cut
-
-*/
-    INTVAL get_bool () {
-        return 1;
-    }
-
-/*
-
-=item C<void set_integer_native(INTVAL value)>
-
-=cut
-
-*/
-    void set_integer_native (INTVAL value) {
-        PMC_num_val(SELF) = (FLOATVAL)value;
-    }
-
-/*
-
 =item C<PMC* new_from_string(STRING *rep, INTVAL flags)>
 
 Return a LuaNumber PMC created from a string (Implementation
@@ -113,7 +75,7 @@ Allow :
 =cut
 
 */
-    PMC* new_from_string(STRING *rep, INTVAL flags) {
+    PMC* new_from_string (STRING *rep, INTVAL flags) {
         INTVAL type;
         PMC *res;
 
@@ -129,13 +91,464 @@ Allow :
 
 /*
 
-=item C<INTVAL is_equal(PMC* value)>
+=item C<STRING* name()>
+
+Return the string "number".
+
+=cut
+
+*/
+    STRING* name () {
+        return luanumber_name;
+    }
+
+/*
+
+=item C<INTVAL get_integer()>
+
+Returns an integer representation of the number (by casting).
+
+=cut
+
+*/
+   INTVAL get_integer () {
+        return (INTVAL) PMC_num_val(SELF);
+   }
+
+/*
+
+=item C<FLOATVAL get_number()>
+
+Returns the value of the number.
+
+=cut
+
+*/
+    FLOATVAL get_number () {
+        return PMC_num_val(SELF);
+    }
+
+/*
+
+=item C<STRING* get_string()>
+
+Returns a Parrot string representation of the number.
+
+=cut
+
+*/
+    STRING* get_string () {
+        return string_from_num(INTERP, PMC_num_val(SELF));
+    }
+
+/*
+
+=item C<void set_integer_native(INTVAL value)>
+
+=cut
+
+*/
+    void set_integer_native (INTVAL value) {
+        PMC_num_val(SELF) = (FLOATVAL)value;
+    }
+
+/*
+
+=item C<void set_number_native(FLOATVAL value)>
+
+=cut
+
+*/
+    void set_number_native (FLOATVAL value) {
+        PMC_num_val(SELF) = value;
+    }
+
+/*
+
+=item C<VOID set_string_native(STRING* value)>
+
+=cut
+
+*/
+    void set_string_native (STRING *value) {
+        VTABLE_morph(INTERP, SELF, dynpmc_LuaString);
+        VTABLE_set_string_native(INTERP, SELF, value);
+    }
+
+/*
+
+=item C<PMC* neg (PMC * dest)>
+
+=cut
+
+*/
+    PMC* neg (PMC * dest) {
+        FLOATVAL a = - DYNSELF.get_number();
+        if (!dest)
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
+        VTABLE_set_number_native(INTERP, dest, a);
+        return dest;
+    }
+
+/*
+
+=item C<void i_neg ()>
+
+=cut
+
+*/
+    void i_neg () {
+        FLOATVAL a = - DYNSELF.get_number();
+        VTABLE_set_number_native(INTERP, SELF, a);
+    }
+
+/*
+
+=back
+
+=head2 non-Vtable Methods
+
+=over 4
+
+=item C<PMC* add (PMC* value, PMC* dest)>
+
+=cut
+
+*/
+    PMC* add (PMC* value, PMC* dest) {
+MMD_LuaNumber: {
+            if (!dest)
+                dest = pmc_new(INTERP, SELF->vtable->base_type);
+            VTABLE_set_number_native(INTERP, dest,
+                    DYNSELF.get_number() + VTABLE_get_number(INTERP, value));
+            return dest;
+        }
+MMD_LuaString: {
+            PMC* n = Parrot_LuaString_tonumber(INTERP, value);
+            if (VTABLE_isa(INTERP, n, const_string(INTERP, "LuaNumber"))) {
+                return Parrot_LuaNumber_add_LuaNumber(INTERP, SELF, n, dest);
+            } else {
+                real_exception(INTERP, NULL, ILL_INHERIT,
+                        "attempt to perform arithmetic on a %s value",
+                        string_to_cstring(INTERP, VTABLE_name(INTERP, value)));
+                return NULL;
+            }
+        }
+MMD_DEFAULT: {
+            real_exception(INTERP, NULL, ILL_INHERIT,
+                    "attempt to perform arithmetic on a %s value",
+                    string_to_cstring(INTERP, VTABLE_name(INTERP, value)));
+            return NULL;
+        }
+    }
+
+/*
+
+=item C<void i_add (PMC* value)>
+
+=cut
+
+*/
+    void i_add (PMC* value) {
+MMD_LuaNumber: {
+            VTABLE_set_number_native(INTERP, SELF,
+                DYNSELF.get_number() + VTABLE_get_number(INTERP, value));
+        }
+MMD_LuaString: {
+            PMC* n = Parrot_LuaString_tonumber(INTERP, value);
+            if (VTABLE_isa(INTERP, n, const_string(INTERP, "LuaNumber"))) {
+                Parrot_LuaNumber_i_add_LuaNumber(INTERP, SELF, n);
+            } else {
+                real_exception(INTERP, NULL, ILL_INHERIT,
+                        "attempt to perform arithmetic on a %s value",
+                        string_to_cstring(INTERP, VTABLE_name(INTERP, value)));
+            }
+        }
+MMD_DEFAULT: {
+            real_exception(INTERP, NULL, ILL_INHERIT,
+                    "attempt to perform arithmetic on a %s value",
+                    string_to_cstring(INTERP, VTABLE_name(INTERP, value)));
+        }
+    }
+
+    PMC* add_float (FLOATVAL value, PMC* dest) {
+        if (!dest)
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
+        VTABLE_set_number_native(INTERP, dest,
+                DYNSELF.get_number() + value);
+        return dest;
+    }
+
+    void i_add_float (FLOATVAL value) {
+        VTABLE_set_number_native(INTERP, SELF,
+            DYNSELF.get_number() + value);
+    }
+
+/*
+
+=item C<PMC* subtract (PMC* value, PMC* dest)>
+
+=cut
+
+*/
+    PMC* subtract (PMC* value, PMC* dest) {
+MMD_LuaNumber: {
+            if (!dest)
+                dest = pmc_new(INTERP, SELF->vtable->base_type);
+            VTABLE_set_number_native(INTERP, dest,
+                    DYNSELF.get_number() - VTABLE_get_number(INTERP, value));
+            return dest;
+        }
+MMD_LuaString: {
+            PMC* n = Parrot_LuaString_tonumber(INTERP, value);
+            if (VTABLE_isa(INTERP, n, const_string(INTERP, "LuaNumber"))) {
+                return Parrot_LuaNumber_subtract_LuaNumber(INTERP, SELF, n, dest);
+            } else {
+                real_exception(INTERP, NULL, ILL_INHERIT,
+                        "attempt to perform arithmetic on a %s value",
+                        string_to_cstring(INTERP, VTABLE_name(INTERP, value)));
+            }
+            return NULL;
+        }
+MMD_DEFAULT: {
+            real_exception(INTERP, NULL, ILL_INHERIT,
+                    "attempt to perform arithmetic on a %s value",
+                    string_to_cstring(INTERP, VTABLE_name(INTERP, value)));
+            return NULL;
+        }
+    }
+
+/*
+
+=item C<void i_subtract (PMC* value)>
+
+=cut
+
+*/
+    void i_subtract (PMC* value) {
+MMD_LuaNumber: {
+            VTABLE_set_number_native(INTERP, SELF,
+                DYNSELF.get_number() - VTABLE_get_number(INTERP, value));
+        }
+MMD_LuaString: {
+            PMC* n = Parrot_LuaString_tonumber(INTERP, value);
+            if (VTABLE_isa(INTERP, n, const_string(INTERP, "LuaNumber"))) {
+                Parrot_LuaNumber_i_subtract_LuaNumber(INTERP, SELF, n);
+            } else {
+                real_exception(INTERP, NULL, ILL_INHERIT,
+                        "attempt to perform arithmetic on a %s value",
+                        string_to_cstring(INTERP, VTABLE_name(INTERP, value)));
+            }
+        }
+MMD_DEFAULT: {
+            real_exception(INTERP, NULL, ILL_INHERIT,
+                    "attempt to perform arithmetic on a %s value",
+                    string_to_cstring(INTERP, VTABLE_name(INTERP, value)));
+        }
+    }
+
+/*
+
+=item C<PMC* multiply (PMC* value, PMC* dest)>
+
+=cut
+
+*/
+    PMC* multiply (PMC* value, PMC* dest) {
+MMD_LuaNumber: {
+            if (!dest)
+                dest = pmc_new(INTERP, SELF->vtable->base_type);
+            VTABLE_set_number_native(INTERP, dest,
+                    DYNSELF.get_number() * VTABLE_get_number(INTERP, value));
+            return dest;
+        }
+MMD_LuaString: {
+            PMC* n = Parrot_LuaString_tonumber(INTERP, value);
+            if (VTABLE_isa(INTERP, n, const_string(INTERP, "LuaNumber"))) {
+                return Parrot_LuaNumber_multiply_LuaNumber(INTERP, SELF, n, dest);
+            } else {
+                real_exception(INTERP, NULL, ILL_INHERIT,
+                        "attempt to perform arithmetic on a %s value",
+                        string_to_cstring(INTERP, VTABLE_name(INTERP, value)));
+                return NULL;
+            }
+        }
+MMD_DEFAULT: {
+            real_exception(INTERP, NULL, ILL_INHERIT,
+                    "attempt to perform arithmetic on a %s value",
+                    string_to_cstring(INTERP, VTABLE_name(INTERP, value)));
+            return NULL;
+        }
+    }
+
+/*
+
+=item C<void i_multiply (PMC* value)>
+
+=cut
+
+*/
+    void i_multiply (PMC* value) {
+MMD_LuaNumber: {
+            VTABLE_set_number_native(INTERP, SELF,
+                DYNSELF.get_number() * VTABLE_get_number(INTERP, value));
+        }
+MMD_LuaString: {
+            PMC* n = Parrot_LuaString_tonumber(INTERP, value);
+            if (VTABLE_isa(INTERP, n, const_string(INTERP, "LuaNumber"))) {
+                Parrot_LuaNumber_i_multiply_LuaNumber(INTERP, SELF, n);
+            } else {
+                real_exception(INTERP, NULL, ILL_INHERIT,
+                        "attempt to perform arithmetic on a %s value",
+                        string_to_cstring(INTERP, VTABLE_name(INTERP, value)));
+            }
+        }
+MMD_DEFAULT: {
+            real_exception(INTERP, NULL, ILL_INHERIT,
+                    "attempt to perform arithmetic on a %s value",
+                    string_to_cstring(INTERP, VTABLE_name(INTERP, value)));
+        }
+    }
+
+/*
+
+=item C<PMC* divide (PMC* value, PMC* dest)>
+
+=cut
+
+*/
+    PMC* divide (PMC* value, PMC* dest) {
+MMD_LuaNumber: {
+            if (!dest)
+                dest = pmc_new(INTERP, SELF->vtable->base_type);
+            VTABLE_set_number_native(INTERP, dest, 
+                    DYNSELF.get_number() / VTABLE_get_number(INTERP, value));
+            return dest;
+        }
+MMD_LuaString: {
+            PMC* n = Parrot_LuaString_tonumber(INTERP, value);
+            if (VTABLE_isa(INTERP, n, const_string(INTERP, "LuaNumber"))) {
+                return Parrot_LuaNumber_divide_LuaNumber(INTERP, SELF, n, dest);
+            } else {
+                real_exception(INTERP, NULL, ILL_INHERIT,
+                        "attempt to perform arithmetic on a %s value",
+                        string_to_cstring(INTERP, VTABLE_name(INTERP, value)));
+                return NULL;
+            }
+        }
+MMD_DEFAULT: {
+            real_exception(INTERP, NULL, ILL_INHERIT,
+                    "attempt to perform arithmetic on a %s value",
+                    string_to_cstring(INTERP, VTABLE_name(INTERP, value)));
+            return NULL;
+        }
+    }
+
+/*
+
+=item C<void i_divide (PMC* value)>
+
+=cut
+
+*/
+    void i_divide (PMC* value) {
+MMD_LuaNumber: {
+            VTABLE_set_number_native(INTERP, SELF, 
+                DYNSELF.get_number() / VTABLE_get_number(INTERP, value));
+        }
+MMD_LuaString: {
+            PMC* n = Parrot_LuaString_tonumber(INTERP, value);
+            if (VTABLE_isa(INTERP, n, const_string(INTERP, "LuaNumber"))) {
+                Parrot_LuaNumber_i_divide_LuaNumber(INTERP, SELF, n);
+            } else {
+                real_exception(INTERP, NULL, ILL_INHERIT,
+                        "attempt to perform arithmetic on a %s value",
+                        string_to_cstring(INTERP, VTABLE_name(INTERP, value)));
+            }
+        }
+MMD_DEFAULT: {
+            real_exception(INTERP, NULL, ILL_INHERIT,
+                    "attempt to perform arithmetic on a %s value",
+                    string_to_cstring(INTERP, VTABLE_name(INTERP, value)));
+        }
+    }
+
+/*
+
+=item C<PMC* pow (PMC* value, PMC* dest)>
+
+=cut
+
+*/
+    PMC* pow (PMC* value, PMC* dest) {
+MMD_LuaNumber: {
+            FLOATVAL d = VTABLE_get_number(INTERP, value);
+
+            if (!dest)
+                dest = pmc_new(INTERP, SELF->vtable->base_type);
+            VTABLE_set_number_native(INTERP, dest,
+                    pow(DYNSELF.get_number(), d));
+            return dest;
+        }
+MMD_LuaString: {
+            PMC* n = Parrot_LuaString_tonumber(INTERP, value);
+            if (VTABLE_isa(INTERP, n, const_string(INTERP, "LuaNumber"))) {
+                return Parrot_LuaNumber_pow_LuaNumber(INTERP, SELF, n, dest);
+            } else {
+                real_exception(INTERP, NULL, ILL_INHERIT,
+                        "attempt to perform arithmetic on a %s value",
+                        string_to_cstring(INTERP, VTABLE_name(INTERP, value)));
+                return NULL;
+            }
+        }
+MMD_DEFAULT: {
+            real_exception(INTERP, NULL, ILL_INHERIT,
+                    "attempt to perform arithmetic on a %s value",
+                    string_to_cstring(INTERP, VTABLE_name(INTERP, value)));
+            return NULL;
+        }
+    }
+
+/*
+
+=item C<void i_pow (PMC* value)>
+
+=cut
+
+*/
+    void i_pow (PMC* value) {
+MMD_LuaNumber: {
+            FLOATVAL d = VTABLE_get_number(INTERP, value);
+
+            VTABLE_set_number_native(INTERP, SELF,
+                    pow(DYNSELF.get_number(), d));
+        }
+MMD_LuaString: {
+            PMC* n = Parrot_LuaString_tonumber(INTERP, value);
+            if (VTABLE_isa(INTERP, n, const_string(INTERP, "LuaNumber"))) {
+                Parrot_LuaNumber_i_pow_LuaNumber(INTERP, SELF, n);
+            } else {
+                real_exception(INTERP, NULL, ILL_INHERIT,
+                        "attempt to perform arithmetic on a %s value",
+                        string_to_cstring(INTERP, VTABLE_name(INTERP, value)));
+            }
+        }
+MMD_DEFAULT: {
+            real_exception(INTERP, NULL, ILL_INHERIT,
+                    "attempt to perform arithmetic on a %s value",
+                    string_to_cstring(INTERP, VTABLE_name(INTERP, value)));
+        }
+    }
+
+/*
+
+=item C<INTVAL is_equal (PMC* value)>
 
 =cut
 
 */
     INTVAL is_equal (PMC* value) {
-MMD_Float: {
+MMD_LuaNumber: {
             return (INTVAL)(PMC_num_val(SELF) == PMC_num_val(value));
         }
 MMD_DEFAULT: {
@@ -145,13 +558,13 @@ MMD_DEFAULT: {
 
 /*
 
-=item C<INTVAL cmp(PMC* value)>
+=item C<INTVAL cmp (PMC* value)>
 
 =cut
 
 */
-    INTVAL cmp(PMC* value) {
-MMD_Float: {
+    INTVAL cmp (PMC* value) {
+MMD_LuaNumber: {
             FLOATVAL diff;
             diff = PMC_num_val(SELF) - PMC_num_val(value);
             return diff > 0 ? 1 : diff < 0 ? -1 : 0;
@@ -161,6 +574,65 @@ MMD_DEFAULT: {
                     "attempt to compare number with %s",
                     string_to_cstring(INTERP, VTABLE_name(INTERP, value)));
             return (INTVAL)0;
+        }
+    }
+
+/*
+
+=item C<PMC* concatenate (PMC *value, PMC *dest)>
+
+=cut
+
+*/
+    PMC* concatenate (PMC* value,  PMC* dest) {
+MMD_LuaNumber: {
+            STRING* s = string_concat(INTERP,
+                DYNSELF.get_string(),
+                VTABLE_get_string(INTERP, value), 0);
+            if (!dest)
+                dest = pmc_new(INTERP, SELF->vtable->base_type);
+                VTABLE_set_string_native(INTERP, dest, s);
+            return dest;
+        }
+MMD_LuaString: {
+            STRING* s = string_concat(INTERP,
+                DYNSELF.get_string(),
+                VTABLE_get_string(INTERP, value), 0);
+            if (!dest)
+                dest = pmc_new(INTERP, SELF->vtable->base_type);
+                VTABLE_set_string_native(INTERP, dest, s);
+            return dest;
+        }
+MMD_DEFAULT: {
+            real_exception(INTERP, NULL, ILL_INHERIT,
+                    "attempt to concatenate a %s value",
+                    string_to_cstring(INTERP, VTABLE_name(INTERP, value)));
+            return NULL;
+        }
+    }
+
+/*
+
+=item C<void i_concatenate (PMC* value)>
+
+=cut
+
+*/
+    void i_concatenate (PMC* value) {
+MMD_LuaNumber: {
+            STRING* s = DYNSELF.get_string();
+            STRING* v = VTABLE_get_string(INTERP, value);
+            DYNSELF.set_string_native(string_append(INTERP, s, v, 1));
+        }
+MMD_LuaString: {
+            STRING* s = DYNSELF.get_string();
+            STRING* v = VTABLE_get_string(INTERP, value);
+            DYNSELF.set_string_native(string_append(INTERP, s, v, 1));
+        }
+MMD_DEFAULT: {
+            real_exception(INTERP, NULL, ILL_INHERIT,
+                    "attempt to concatenate a %s value",
+                    string_to_cstring(INTERP, VTABLE_name(INTERP, value)));
         }
     }
 
@@ -184,23 +656,6 @@ MMD_DEFAULT: {
         return retval;
     }
 
-/*
-
-=item C<PMC* tostring()>
-
-=cut
-
-*/
-    METHOD PMC* tostring() {
-        PMC *retval;
-        STRING *rep;
-
-        retval = pmc_new(INTERP, dynpmc_LuaString);
-        rep = VTABLE_get_string(INTERP, SELF);
-        PMC_str_val(retval) = rep;
-        return retval;
-    }
-
 }
 
 /*
@@ -209,7 +664,9 @@ MMD_DEFAULT: {
 
 =head1 AUTHORS
 
-Original code by Klaas-Jan Stol.
+Francois Perrad.
+
+Klaas-Jan Stol.
 
 =cut
 

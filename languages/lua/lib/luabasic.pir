@@ -344,16 +344,15 @@ integer key with a nil value in the table.
     ipairs = _G[key_ipairs]
     .local pmc zero
     new zero, .LuaNumber
-    zero = 0
+    zero = 0.0
     .return (ipairs, t, zero)
 L0:
     .local pmc n
     .local pmc ret
     new n, .LuaNumber
-    n = i + 1
+    n = i + 1.0
     ret = t[n]
-    $I0 = isa ret, "LuaNil"
-    if $I0 goto L1
+    unless ret goto L1
     .return (n, ret)
 L1:
     .return ()
@@ -448,8 +447,7 @@ STILL INCOMPLETE (see next in luapir.pir).
     .local pmc value
     checktype(table, "table")
     (idx, value) = next(table, index)
-    $I0 = isa idx, "LuaNil"
-    if $I0 goto L1
+    unless idx goto L1
     .return (idx, value) 
 L1:
     .return (idx)	# nil                               
@@ -789,13 +787,12 @@ I<n> is the size of the list, as defined for the C<table.getn> function.
     new ret, .Array
     set ret, n
     new index, .LuaNumber
-    index = 1
+    index = 1.0
     i = 0
 L0:    
     unless i < n goto L1
     $P0 = list[index]
     ret[i] = $P0
-#    push ret, $P0
     index = index + 1.0
     i = i + 1
     goto L0

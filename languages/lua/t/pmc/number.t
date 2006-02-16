@@ -27,10 +27,10 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "check inheritance");
     .local pmc pmc1
     pmc1 = new $I0
     .local int bool1
-    bool1 = isa pmc1, "scalar"
-    print bool1
-    print "\n"
-    bool1 = isa pmc1, "Float"
+#    bool1 = isa pmc1, "scalar"
+#    print bool1
+#    print "\n"
+    bool1 = isa pmc1, "LuaBase"
     print bool1
     print "\n"
     bool1 = isa pmc1, "LuaNumber"
@@ -39,7 +39,6 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "check inheritance");
     end
 .end
 CODE
-1
 1
 1
 OUTPUT
@@ -51,6 +50,9 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "check interface");
     .local pmc pmc1
     pmc1 = new $I0
     .local int bool1
+    bool1 = does pmc1, "scalar"
+    print bool1
+    print "\n"
     bool1 = does pmc1, "float"
     print bool1
     print "\n"
@@ -60,6 +62,7 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "check interface");
     end
 .end
 CODE
+1
 1
 0
 OUTPUT

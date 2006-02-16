@@ -164,15 +164,12 @@ L0:
 L0:
     $I1 = 0
     new $P1, .LuaNumber
-    $P1 = 1 
+    $P1 = 1.0 
 L1:
     $P0 = table[$P1]
-    $I0 = isa $P0, "LuaNil"
-    if $I0 goto L2
-#    $I0 = defined $P0
-#    unless $I0, L2
+    unless $P0 goto L2
     add $I1, 1
-    add $P1, 1
+    add $P1, 1.0
     goto L1
 L2:
     .return ($I1)
@@ -220,15 +217,13 @@ L2:
     .param pmc table
     .param pmc index
     .local pmc value
-    $I0 = defined index
-    if $I0 goto L1
+    if index goto L1
     new index, .LuaNumber
-    index = 0
+    index = 0.0
 L1:
-    add index, 1
+    add index, 1.0
     value = table[index]
-    $I0 = isa value, "LuaNil"
-    if $I0 goto L2
+    unless value goto L2
     .return (index, value)    
 L2:
     .return (value)		# nil
@@ -255,8 +250,7 @@ L2:
     .param pmc arg
     .param int default
     if_null arg, L0
-    $I0 = isa arg, "LuaNil"
-    if $I0, L0
+    unless arg goto L0
     $I1 = checknumber(arg)
     .return ($I1)
 L0:
@@ -272,8 +266,7 @@ L0:
     .param pmc arg
     .param string default
     if_null arg, L0
-    $I0 = isa arg, "LuaNil"
-    if $I0, L0
+    unless arg goto L0
     $S0 = arg
     .return ($S0)
 L0:
@@ -325,7 +318,7 @@ L1:
     if i >= argc goto L2
     $P0 = argv[i]
     table[index] = $P0
-    add index, 1
+    add index, 1.0
     i = i + 1
     goto L1
 L2:

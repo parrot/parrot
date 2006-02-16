@@ -178,8 +178,7 @@ STILL INCOMPLETE (see next in luapir.pir).
     new idx, .LuaNil
 L1:
     (idx, value) = next(table, idx)
-    $I0 = isa idx, "LuaNil"
-    unless $I0 goto L2
+    if idx goto L2
     .return ()
 L2:
     (ret) = f(idx, value)
@@ -269,8 +268,7 @@ NOT YET IMPLEMENTED (see auxsort).
     checktype(table, "table")
     n = getn(table)
     if_null comp, L1
-    $I0 = isa comp, "LuaNil"
-    if $I0 goto L1
+    if comp goto L1
     checktype(comp, "Sub")
     goto L2
 L1:    
