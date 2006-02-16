@@ -49,13 +49,12 @@ my $manifest_gen = maniread("$build_dir/MANIFEST.generated");
 
 foreach my $file (keys(%$manifest), keys(%$manifest_gen)) {
     $file = "$build_dir/$file";
+    # skip binary files (including .pbc files)
+    next if -B $file;
     # skip missing MANIFEST.generated files
     next unless -e $file;
     push @docs, $file if Pod::Find::contains_pod($file, 0);
 }
-
-# filter out pbc files
-@docs = grep(!/\.pbc$/, @docs);
 
 plan tests => scalar @docs;
 Test::Pod::pod_file_ok( $_ ) foreach @docs;
