@@ -149,6 +149,7 @@ typedef struct PDB_breakpoint {
  *  last_command:       Last command executed.
  *  cur_opcode:         Current opcode.
  *  state:              The status of the program being debugged.
+ *  debugee:            The interpreter we are debugging
  */
 
 typedef struct PDB {
@@ -160,6 +161,7 @@ typedef struct PDB {
     char                    *last_command;
     opcode_t                *cur_opcode;
     int                     state;
+    Interp                  *debugee;  
 } PDB_t;
 
 void PDB_run_command(Interp *interpreter, const char *command);

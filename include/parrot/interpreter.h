@@ -317,6 +317,7 @@ struct parrot_interp_t {
     const char* output_file;                  /* The file into which output is written */
 
     PDB_t *pdb;                               /* Debug system */
+    Interp * debugger;                        /* trace / debug interpreter */  
 
     void *lo_var_ptr;                         /* Pointer to memory on runops system stack */
 
