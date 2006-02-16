@@ -115,9 +115,17 @@ runops_trace_core(Interp *interpreter, opcode_t *pc)
     dod = arena_base->dod_runs;
     gc = arena_base->collect_runs;
     if (!interpreter->debugger) {
+        PMC *pio;
+
         debugger = interpreter->debugger = make_interpreter(interpreter, 0);
         debugger->lo_var_ptr = interpreter->lo_var_ptr;
-        PIO_setlinebuf(debugger, PIO_STDERR(debugger));
+        pio = PIO_STDERR(debugger);
+        if (PIO_isatty(debugger, pio))
+            PIO_setlinebuf(debugger, pio);
+        else {
+            /* this is essential (100 x faster!)  and should probably be in init/open code */
+            PIO_setbuf(debugger, pio, 8192);
+        }
     }
     else 
         debugger = interpreter->debugger;
