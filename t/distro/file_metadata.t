@@ -88,6 +88,8 @@ KEYWORD_EXP: {
 } # KEYWORD_EXP
 
 
+SKIP: {
+	skip 'custom svn keywords not yet supported' => 1;
 ## Copyright keyword
 COPYRIGHT: {
 	my $readme = catfile( $PConfig{build_dir}, 'README' );
@@ -114,7 +116,8 @@ COPYRIGHT: {
 		"$_: $official_copyright",
 		"$msg ($_)"
 	) for @manifest_files;
-}
+} # COPYRIGHT
+} # SKIP
 
 # remember to change the number of tests :-)
 BEGIN {
