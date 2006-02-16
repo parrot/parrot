@@ -23,20 +23,6 @@ Parrot::Configure::Data - Configuration data container
     $data->gettrigger($key, $trigger);
     $data->deltrigger($key, $trigger);
 
-=pod
-
-=head1 NAME
-
-Parrot::Configure::Data - Configuration data container
-
-=head1 SYNOPSIS
-
-    use Parrot::Configure::Data;
-
-    my $data = Parrot::Configure::Data->new;
-    my @values = $data->get(@keys);
-    $data->set($key1 => $value1, $key2 => $value2);
-
 =head1 DESCRIPTION
 
 This module contains configuration data for use by the other
