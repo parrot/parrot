@@ -180,6 +180,7 @@ loop:
     print "\n"
     goto loop
  after_loop:
+  .get_results ()  
   print "done in main\n"
 .end
 
