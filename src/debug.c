@@ -12,7 +12,7 @@ This file implements Parrot debugging and is used by C<pdb>, the Parrot
 debugger, and the C<debug> ops.
 
 =head2 Functions
-
+b
 =over 4
 
 =cut
@@ -2834,22 +2834,90 @@ PDB_backtrace(Interp *interpreter)
 /*
  * GDB functions
  *
- * GDB_I  gdb> pi 0   print register I0 value
- * GDB_S  gdb> ps 1   print register S1 string
+ * GDB_P  gdb> pp $I0   print register I0 value
  *
  * TODO more, more 
  */
 
-static long
-GDB_I(Interp *interpreter, int n) {
-    return REG_INT(n);
+static const char*
+GDB_P(Interp *interpreter, char *s) {
+    int t, n;
+    switch (*s) {
+        case 'I': t = REGNO_INT; break;
+        case 'N': t = REGNO_NUM; break;
+        case 'S': t = REGNO_STR; break;
+        default: return "no such reg";
+    }
+    if (s[1] && isdigit(s[1]))
+        n = atoi(s + 1);
+    else
+        return "no such reg";
+
+    if (n >= 0 && n < CONTEXT(interpreter->ctx)->n_regs_used[t]) {
+        switch (t) {
+            case REGNO_INT:
+                return string_from_int(interpreter, REG_INT(n))->strstart;
+            case REGNO_NUM:
+                return string_from_num(interpreter, REG_NUM(n))->strstart;
+            case REGNO_STR:
+                return REG_STR(n)->strstart;
+        }
+    }
+    return "no such reg";
 }
 
-static const char*
-GDB_S(Interp *interpreter, int n) {
-    if (n >= 0 && n < CONTEXT(interpreter->ctx)->n_regs_used[REGNO_STR])
-        return REG_STR(n) ? REG_STR(n)->strstart : NULL;
-    return "no such reg";
+/* TODO move these to debugger interpreter
+ */
+static PDB_breakpoint_t *gdb_bps;
+
+/*
+ * GDB_pb   gdb> pb 244     # set breakpoint at opcode 244
+ * 
+ * XXX We can't remove the breakpoint yet, executing the next ins
+ * most likely fails, as the length of the debug-brk stmt doesn't
+ * match the old opcode
+ * Setting a breakpoint will also fail, if the bytecode os r/o
+ *
+ */
+static int
+GDB_B(Interp *interpreter, char *s) {
+    PDB_breakpoint_t *bp, *newbreak;
+    int nr;
+    opcode_t *pc;
+
+    if ((unsigned long)s < 0x10000) {
+        /* HACK alarm  pb 45 is passed as the integer not a string */
+        unsigned long offs = (unsigned long)s;
+        /* TODO check if in bounds */
+        pc = interpreter->code->base.data + offs;
+        
+        if (!gdb_bps) {
+            nr = 0;
+            newbreak = mem_sys_allocate(sizeof(PDB_breakpoint_t));
+            newbreak->prev = NULL;
+            newbreak->next = NULL;
+            gdb_bps = newbreak;
+        }
+        else {
+            /* create new one */
+            for (nr = 0, bp = gdb_bps; ; bp = bp->next, ++nr) {
+                if (bp->pc == pc)
+                    return nr;
+                if (!bp->next)
+                    break;
+            }
+            ++nr;
+            newbreak = mem_sys_allocate(sizeof(PDB_breakpoint_t));
+            newbreak->prev = bp;
+            newbreak->next = NULL;
+            bp->next = newbreak;
+        }
+        newbreak->pc = pc;
+        newbreak->id = *pc;
+        *pc = PARROT_OP_debug_brk;
+        return nr;
+    }
+    return -1;
 }
 
 
