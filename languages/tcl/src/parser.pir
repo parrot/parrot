@@ -10,7 +10,7 @@ This is the parser that makes up the heart of Partcl. It follows
 the 11 rules that are found in the Tcl manpage, available online
 at <http://www.tcl.tk/man/tcl8.4/TclCmd/Tcl.htm>.
 
-=head FUNCTIONS
+=head1 FUNCTIONS
 
 =over 4
 

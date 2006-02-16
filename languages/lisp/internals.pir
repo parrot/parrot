@@ -1,5 +1,5 @@
 
-=head _LOOKUP_GLOBAL(pkgname, symname)
+=head1 _LOOKUP_GLOBAL(pkgname, symname)
 
 =cut
 
@@ -29,7 +29,7 @@ DONE:
 .end
 
 
-=head _LOOKUP_LEXICAL(symname)
+=head1 _LOOKUP_LEXICAL(symname)
 
 =cut
 
@@ -52,7 +52,7 @@ DONE:
 .end
 
 
-=head _LOOKUP_SYMBOL(symname)
+=head1 _LOOKUP_SYMBOL(symname)
 
 =cut
 

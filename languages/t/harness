@@ -27,7 +27,7 @@ or
 
 C<cd languages && make test>
 
-=item Smoke testing
+=item * Smoke testing
 
 C<make languages-smoke> 
 

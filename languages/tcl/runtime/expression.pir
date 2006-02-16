@@ -11,7 +11,9 @@ Tcl Expressions
 This is the parser that deals with all [expr] related code. (Include those used
 implicitly by commands like [while].
 
-=head FUNCTIONS
+=head1 FUNCTIONS
+
+=over 4
 
 =item C<(int register_num, string pir_code) = __expression_compile(int register_num, string expr)>
 
