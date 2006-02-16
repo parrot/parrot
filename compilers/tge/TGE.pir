@@ -148,7 +148,11 @@ loop_start:
         $P3 = rule["parent"]
         $P4 = rule["action"]
         code = new PerlString
-        code = ".sub _anon :anon\n"
+        code = ".sub _anon_"
+        code .= $P1
+        code .= "_"
+        code .= $P2
+        code .= " :anon\n"
         code .= "   .param pmc tree\n"
         code .= "   .param pmc node\n"
         code .= $P4
