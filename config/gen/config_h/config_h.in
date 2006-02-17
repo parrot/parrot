@@ -113,16 +113,6 @@ typedef size_t ptrcast_t;
 typedef struct _vtable VTABLE;
 typedef void DPOINTER;
 
-#define FRAMES_PER_CHUNK 16
-
-/* Default amount of memory to allocate in one whack */
-#define DEFAULT_SIZE 32768
-
-#define FRAMES_PER_PMC_REG_CHUNK FRAMES_PER_CHUNK
-#define FRAMES_PER_NUM_REG_CHUNK FRAMES_PER_CHUNK
-#define FRAMES_PER_INT_REG_CHUNK FRAMES_PER_CHUNK
-#define FRAMES_PER_STR_REG_CHUNK FRAMES_PER_CHUNK
-
 /* JIT and exec cores. */
 #define JIT_CPUARCH  "@jitcpuarch@"
 #define JIT_OSNAME   "@jitosname@"
