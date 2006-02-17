@@ -304,11 +304,16 @@ PIO_unix_fdopen(theINTERP, ParrotIOLayer *layer, PIOHANDLE fd, INTVAL flags)
 
     oflags = flags_to_unix(flags);
 
-        /* FIXME - Check file handle flags, validity */
+#if 0
+    /* XXX the fcntl fails (-1, errno=0) with
+     * ./parrot -tf - < foo.pir
+     */
+
+    /* FIXME - Check file handle flags, validity */
 #  ifdef PARROT_HAS_HEADER_FCNTL
-        /* Get descriptor flags */
-        if ((rflags = fcntl(fd, F_GETFL, 0)) >= 0) {
-            UNUSED(rflags);
+    /* Get descriptor flags */
+    if ((rflags = fcntl(fd, F_GETFL, 0)) >= 0) {
+        UNUSED(rflags);
         /*int accmode = rflags & O_ACCMODE; */
         /* Check other flags (APPEND, ASYNC, etc) */
     }
@@ -317,6 +322,7 @@ PIO_unix_fdopen(theINTERP, ParrotIOLayer *layer, PIOHANDLE fd, INTVAL flags)
         return NULL;
     }
 #  endif
+#endif
 
     if (PIO_unix_isatty(fd))
         flags |= PIO_F_CONSOLE;
