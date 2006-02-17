@@ -342,12 +342,12 @@ Parrot_free_context(Interp *interpreter, parrot_context_t *ctxp, int re_use)
     int slot;
 
     /*
-     * The context structure has a reference count, initially 0
-     * it' incrementented when a continuation is created either directly
-     * or a continuation is cloned or a retcontinuation is converted
-     * to a full continuation in invalidate_retc
-     * this *should* be ok, but obviously leaks memory
-     * (turn CTX_LEAK_DEBUG on)
+     * The context structure has a reference count, initially 0.  This field is
+     * incrementented when a continuation that points to it is created -- either
+     * directly, or when a continuation is cloned, or when a retcontinuation is
+     * converted to a full continuation in invalidate_retc.  To check for leaks,
+     * (a) disable NDEBUG, (b) enable CTX_LEAK_DEBUG in interpreter.h, and (c)
+     * excecute "debug 0x80" in a (preferably small) test case.
      *
      */
     if (re_use || --ctxp->ref_count == 0) {
