@@ -39,7 +39,18 @@ package Parrot::Configure;
 use strict;
 
 use lib qw(config);
+use Carp qw(carp);
 use Parrot::Configure::Data;
+
+use Class::Struct;
+
+struct(
+    'Parrot::Configure::Task' => {
+        step    => '$',
+        params  => '@',
+        object  => 'Parrot::Configure::Step',
+    },
+);
 
 =head2 Methods
 
@@ -111,8 +122,8 @@ sub options
 =item * C<steps()>
 
 Provides a list of registered steps.  Where each steps is represented by an
-array in the format of C<['stepname', @params]>.  Steps are returned in the
-order in which they were registered in.
+L<Parrot::Configure::Task> object.  Steps are returned in the order in which
+they were registered in.
 
 Accepts no arguments and returns a list in list context or an arrayref in
 scalar context.
@@ -140,7 +151,8 @@ sub add_step
 {
     my ($self, $step, @params) = @_;
 
-    push @{$self->{steps}}, [$step, @params];
+    push @{$self->{steps}},
+        Parrot::Configure::Task->new(step => $step, params => \@params);
 
     return $self;
 }
@@ -183,13 +195,13 @@ sub runsteps
         $self->options->get(qw(verbose verbose-step ask));
 
     my $n = 0; # step number
-    foreach my $registered_step ($self->steps) {
-        my $step = shift @$registered_step;
-        my @step_params = @$registered_step;
+    foreach my $task ($self->steps) {
+        my $step = $task->step;
+        my @step_params = @{$task->params};
 
         $n++;
 
-        eval "use $step";
+        eval "use $step;";
         die $@ if $@;
 
         my $description = $step->description;
@@ -215,10 +227,25 @@ sub runsteps
         print "\n", $description, '...';
         print "\n" if $verbose && $verbose == 2;
 
-        if (@step_params) {
-            $step->runstep($self, @step_params);
-        } else {
-            $step->runstep($self);
+        my $ret; # step return value
+        eval {
+            if (@step_params) {
+                $ret = $step->runstep($self, @step_params);
+            } else {
+                $ret = $step->runstep($self);
+            }
+        };
+        if ($@) {
+            carp "\nstep $step died during execution: $@\n";
+            return;
+        }
+
+        # did the step return itself?
+        eval { $ret->can('result'); };
+        if ($@) {
+            my $result = $step->result || 'no result returned';
+            carp "\nstep $step failed: " . $result;
+            return;
         }
 
         my $result = $step->result || 'done';

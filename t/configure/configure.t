@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 use lib qw( . lib ../lib ../../lib );
-use Test::More tests => 23;
+use Test::More tests => 33;
 
 =head1 NAME
 
@@ -82,16 +82,27 @@ can_ok('Parrot::Configure', qw(
     my $pc = Parrot::Configure->new;
 
     $pc->add_steps(qw(foo::step));
-    is_deeply(scalar $pc->steps, [['foo::step']],
-        "->steps() returns the proper list");
+    my $steps = $pc->steps;
+    is(scalar @$steps, 1, '->steps() retuned the proper number of steps');
+    my $task = @$steps[0];
+    is($task->step, 'foo::step',
+        '->steps() returned a task with the proper step name');
+    is_deeply($task->params, [],
+        '->steps() return a task with the proper params');
 }
 
 {
     my $pc = Parrot::Configure->new;
 
     $pc->add_steps(qw(foo::step bar::step baz::step));
-    is_deeply(scalar $pc->steps, [['foo::step'], ['bar::step'], ['baz::step']],
-        "->steps() returns the proper list");
+    my $steps = $pc->steps;
+    is(scalar @$steps, 3, '->steps() retuned the proper number of steps');
+    is_deeply($pc->steps->[0]->step, 'foo::step', 
+        '->steps() returned a task with the proper step name');
+    is_deeply($pc->steps->[1]->step, 'bar::step',
+        '->steps() returned a task with the proper step name');
+    is_deeply($pc->steps->[2]->step, 'baz::step',
+        '->steps() returned a task with the proper step name');
 }
 
 # ->steps() / ->add_step()
@@ -106,17 +117,27 @@ can_ok('Parrot::Configure', qw(
     my $pc = Parrot::Configure->new;
 
     $pc->add_step('foo::step');
-    is_deeply(scalar $pc->steps, [['foo::step']],
-        "->steps() returns the proper list after ->add_step() w/o args");
+    my $steps = $pc->steps;
+    is(scalar @$steps, 1, '->steps() retuned the proper number of steps');
+    my $task = @$steps[0];
+    is($task->step, 'foo::step',
+        '->steps() returned a task with the proper step name');
+    is_deeply($task->params, [],
+        '->steps() return a task with the proper params');
 }
 
 {
     my $pc = Parrot::Configure->new;
 
     $pc->add_step('foo::step', qw(bar baz));
-    is_deeply(scalar $pc->steps, [['foo::step', qw(bar baz)]],
-        "->steps() returns the proper list after ->add_step() with args");
-}
+    my $steps = $pc->steps;
+    is(scalar @$steps, 1, '->steps() retuned the proper number of steps');
+    my $task = @$steps[0];
+    is($task->step, 'foo::step',
+        '->steps() returned a task with the proper step name');
+    is_deeply($task->params, [qw(bar baz)],
+    '->steps() return a task with the proper params after ->add_step() with args');
+} 
 
 # ->runsteps()
 
