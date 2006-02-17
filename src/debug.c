@@ -2504,8 +2504,25 @@ F<include/parrot/debug.h>, F<src/pdb.c> and F<ops/debug.ops>.
 
 =head1 HISTORY
 
-Initial version by Daniel Grunblatt on 2002.5.19.
+=over 4
 
+=item Initial version by Daniel Grunblatt on 2002.5.19.
+
+=item Start of rewrite - leo 2005.02.16
+
+The debugger now uses it's own interpreter. User code is run in
+Interp* debugee. We have:
+
+  debug_interp->pdb->debugee->debugger
+    ^                            |
+    |                            v
+    +------------- := -----------+
+
+Debug commands are mostly run inside the C<debugger>. User code
+runs of course in the C<debugee>.
+
+=back
+    
 =cut
 
 */
