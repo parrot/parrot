@@ -398,7 +398,8 @@ Called after the Key has been thawed: convert last PMC_NULL key to NULL.
                 io->vtable->push_string(INTERP, io, key_string(INTERP, SELF));
                 break;
             default:
-                internal_exception(1, "Unsupported key type in Key.freeze");
+                real_exception(INTERP, NULL, E_KeyError,
+                        "Unsupported key type in Key.freeze");
                 break;
         }
     }
@@ -421,7 +422,8 @@ Called after the Key has been thawed: convert last PMC_NULL key to NULL.
                 PMC_str_val(SELF) = io->vtable->shift_string(INTERP, io);
                 break;
             default:
-                internal_exception(1, "Unsupported key type in Key.freeze");
+                real_exception(INTERP, NULL, E_KeyError,
+                        "Unsupported key type in Key.freeze");
                 break;
         }
     }

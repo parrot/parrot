@@ -114,7 +114,7 @@ complex_parse_string(Interp* interpreter,
             /* verify that the string ends properly */
             if( (*t != 'i' && *t != 'j') || (*(t+1) != 0) ) {
                 /* imaginary part does not end in 'i' or 'j' */
-                internal_exception(INVALID_STRING_REPRESENTATION,
+                real_exception(interpreter, NULL, E_ValueError,
                     "Complex: malformed string");
                 first_num_length = second_num_length = 0;
             }
@@ -126,7 +126,7 @@ complex_parse_string(Interp* interpreter,
         }
         else {
             /* "+" or "-" not found: error */
-            internal_exception(INVALID_STRING_REPRESENTATION,
+            real_exception(interpreter, NULL, E_ValueError,
                 "Complex: malformed string");
             first_num_length = second_num_length = 0;
         }
@@ -188,7 +188,7 @@ complex_locate_keyed_num(Interp* interpreter, PMC* self, STRING *key) {
     real = string_from_cstring(interpreter, "real", 4);
     if(0 == string_equal(interpreter, key, real))
         return &RE(self);
-    internal_exception(KEY_NOT_FOUND,
+    real_exception(interpreter, NULL, E_KeyError,
         "Complex: key is neither 'real' or 'imag'");
     return NULL;
 }
@@ -454,7 +454,8 @@ Set real or imag depending on key
             case 1:
                 return IM(SELF);
             default:
-                internal_exception(1, "Complex: key must be 0 or 1");
+                real_exception(interpreter, NULL, E_KeyError,
+                        "Complex: key must be 0 or 1");
         }
         return 0.0;
     }
@@ -468,7 +469,8 @@ Set real or imag depending on key
                 IM(SELF) = v;
                 break;
             default:
-                internal_exception(1, "Complex: key must be 0 or 1");
+                real_exception(interpreter, NULL, E_KeyError,
+                        "Complex: key must be 0 or 1");
         }
     }
 /*

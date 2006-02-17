@@ -145,7 +145,8 @@ Swaps the "context".
                 ccont = new_ret_continuation_pmc(interpreter, next);
             }
             if (PObj_get_FLAGS(ccont) & SUB_FLAG_TAILCALL) {
-                internal_exception(1, "tail call to coro not allowed");
+                real_exception(INTERP, NULL, E_Exception,
+                        "tail call to coro not allowed");
             }
             caller_ctx = CONTEXT(INTERP->ctx);
             /*

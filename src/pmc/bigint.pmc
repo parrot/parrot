@@ -695,7 +695,7 @@ MMD_Integer: {
                 return dest;
             }
 MMD_DEFAULT: {
-                internal_exception(1, "unimp add");
+                real_exception(INTERP, NULL, E_NotImplementedError, "unimp add");
                 return dest;
              }
     }
@@ -717,7 +717,7 @@ MMD_Integer: {
                 bigint_add_bigint_int(INTERP, SELF, PMC_int_val(value), SELF);
              }
 MMD_DEFAULT: {
-                internal_exception(1, "unimp add");
+                real_exception(INTERP, NULL, E_NotImplementedError, "unimp add");
              }
     }
 
@@ -726,7 +726,7 @@ MMD_DEFAULT: {
     }
 
     void i_add_float (FLOATVAL value) {
-        internal_exception(1, "unimp add");
+        real_exception(INTERP, NULL, E_NotImplementedError, "unimp add");
     }
 
 
@@ -748,7 +748,7 @@ MMD_Integer: {
                 return dest;
             }
 MMD_DEFAULT: {
-                internal_exception(1, "unimp sub");
+                real_exception(INTERP, NULL, E_NotImplementedError, "unimp sub");
                 return dest;
              }
     }
@@ -770,7 +770,7 @@ MMD_Integer: {
                 bigint_sub_bigint_int(INTERP, SELF, PMC_int_val(value), SELF);
              }
 MMD_DEFAULT: {
-                internal_exception(1, "unimp sub");
+                real_exception(INTERP, NULL, E_NotImplementedError, "unimp sub");
              }
     }
 
@@ -779,7 +779,7 @@ MMD_DEFAULT: {
     }
 
     void i_subtract_float (FLOATVAL value) {
-        internal_exception(1, "unimp sub");
+        real_exception(INTERP, NULL, E_NotImplementedError, "unimp sub");
     }
 
 
@@ -801,7 +801,7 @@ MMD_Integer: {
             return dest;
          }
 MMD_DEFAULT: {
-             internal_exception(1, "unimp mul");
+             real_exception(INTERP, NULL, E_NotImplementedError, "unimp mul");
             return dest;
          }
     }
@@ -823,7 +823,7 @@ MMD_Integer: {
                 bigint_mul_bigint_int(INTERP, SELF, PMC_int_val(value), SELF);
              }
 MMD_DEFAULT: {
-                internal_exception(1, "unimp mul");
+                real_exception(INTERP, NULL, E_NotImplementedError, "unimp mul");
              }
     }
 
@@ -832,7 +832,7 @@ MMD_DEFAULT: {
     }
 
     void i_multiply_float (FLOATVAL value) {
-        internal_exception(1, "unimp mul");
+        real_exception(INTERP, NULL, E_NotImplementedError, "unimp mul");
     }
 
     PMC* divide(PMC* value, PMC* dest) {
@@ -861,7 +861,7 @@ MMD_Integer: {
             return dest;
         }
 MMD_DEFAULT: {
-            internal_exception(1, "unimp div");
+            real_exception(INTERP, NULL, E_NotImplementedError, "unimp div");
             return dest;
          }
     }
@@ -883,7 +883,7 @@ MMD_Integer: {
             bigint_div_bigint_int(INTERP, SELF, PMC_int_val(value), SELF);
         }
 MMD_DEFAULT: {
-             internal_exception(1, "unimp fdiv");
+             real_exception(INTERP, NULL, E_NotImplementedError, "unimp fdiv");
         }
     }
 
@@ -909,7 +909,7 @@ MMD_Integer: {
             return dest;
         }
 MMD_DEFAULT: {
-            internal_exception(1, "unimp fdiv");
+            real_exception(INTERP, NULL, E_NotImplementedError, "unimp fdiv");
             return dest;
         }
     }
@@ -931,7 +931,7 @@ MMD_Integer: {
             bigint_fdiv_bigint_int(INTERP, SELF, PMC_int_val(value), SELF);
         }
 MMD_DEFAULT: {
-            internal_exception(1, "unimp fdiv");
+            real_exception(INTERP, NULL, E_NotImplementedError, "unimp fdiv");
         }
     }
 
@@ -957,7 +957,7 @@ MMD_Integer: {
             return dest;
          }
 MMD_DEFAULT: {
-            internal_exception(1, "unimp mod");
+            real_exception(INTERP, NULL, E_NotImplementedError, "unimp mod");
             return dest;
         }
     }
@@ -982,7 +982,7 @@ MMD_Integer: {
                 bigint_mod_bigint_int(INTERP, SELF, PMC_int_val(value), SELF);
              }
 MMD_DEFAULT: {
-                 internal_exception(1, "unimp mod");
+                 real_exception(INTERP, NULL, E_NotImplementedError, "unimp mod");
              }
     }
 
@@ -994,7 +994,7 @@ MMD_Integer: {
                 bigint_mod_bigint_int(INTERP, SELF, PMC_int_val(value), SELF);
              }
 MMD_DEFAULT: {
-                 internal_exception(1, "unimp cmod");
+                 real_exception(INTERP, NULL, E_NotImplementedError, "unimp cmod");
              }
     }
 
@@ -1007,7 +1007,7 @@ MMD_Integer: {
         return bigint_cmp_int(INTERP, SELF, PMC_int_val(value));
             }
 MMD_DEFAULT: {
-                 internal_exception(1, "unimp cmp");
+                 real_exception(INTERP, NULL, E_NotImplementedError, "unimp cmp");
                  return 0;
              }
     }
@@ -1020,7 +1020,7 @@ MMD_Integer: {
         return bigint_cmp_int(INTERP, SELF, PMC_int_val(value)) == 0;
             }
 MMD_DEFAULT: {
-                 internal_exception(1, "unimp eq");
+                 real_exception(INTERP, NULL, E_NotImplementedError, "unimp eq");
                  return 0;
              }
     }
@@ -1108,7 +1108,7 @@ MMD_Integer: {
             return dest;
          }
 MMD_DEFAULT: {
-            internal_exception(1, "unimp shl");
+            real_exception(INTERP, NULL, E_NotImplementedError, "unimp shl");
             return dest;
          }
     }
@@ -1131,7 +1131,7 @@ MMD_Integer: {
                 bigint_bitwise_shl_bigint_int(INTERP, SELF, PMC_int_val(value), SELF);
              }
 MMD_DEFAULT: {
-                internal_exception(1, "unimp shl");
+                real_exception(INTERP, NULL, E_NotImplementedError, "unimp shl");
              }
     }
 
@@ -1175,7 +1175,7 @@ MMD_Integer: {
             return dest;
          }
 MMD_DEFAULT: {
-            internal_exception(1, "unimp shr");
+            real_exception(INTERP, NULL, E_NotImplementedError, "unimp shr");
             return dest;
          }
     }
@@ -1198,7 +1198,7 @@ MMD_Integer: {
                 bigint_bitwise_shr_bigint_int(INTERP, SELF, PMC_int_val(value), SELF);
              }
 MMD_DEFAULT: {
-                internal_exception(1, "unimp shr");
+                real_exception(INTERP, NULL, E_NotImplementedError, "unimp shr");
              }
     }
 

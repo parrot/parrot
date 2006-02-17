@@ -607,7 +607,8 @@ MMD_Integer: {
                 return overflow(INTERP, SELF, b, dest, MMD_MULTIPLY);
         }
 MMD_Complex: {
-                internal_exception(1, "TODO mul<Integer, Complex>");
+                real_exception(INTERP, NULL, E_NotImplementedError,
+                        "TODO mul<Integer, Complex>");
                 return dest;
             }
 MMD_BigInt:     {
@@ -663,7 +664,8 @@ MMD_BigInt: {
                     DYNSELF.get_integer(), SELF);
         }
 MMD_Complex: {
-                internal_exception(1, "TODO i_mul<Integer, Complex>");
+                real_exception(INTERP, NULL, E_NotImplementedError,
+                        "TODO i_mul<Integer, Complex>");
         }
 MMD_DEFAULT: {
         VTABLE_set_number_native(INTERP, SELF,

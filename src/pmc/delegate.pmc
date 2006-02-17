@@ -67,7 +67,7 @@ find_or_die(Interp* interpreter, PMC *pmc, STRING *meth) {
         PMC *class = pmc;
         if (PObj_is_object_TEST(pmc)) {
             class = GET_CLASS((Buffer *)PMC_data(pmc), pmc);
-            internal_exception(METH_NOT_FOUND,
+            real_exception(interpreter, NULL, E_LookupError,
                 "Can't find method '%s' for object '%s'",
                 string_to_cstring(interpreter, meth),
                 string_to_cstring(interpreter, PMC_str_val(
@@ -75,7 +75,7 @@ find_or_die(Interp* interpreter, PMC *pmc, STRING *meth) {
                             PCD_CLASS_NAME)))
                 );
         } else {
-            internal_exception(METH_NOT_FOUND,
+            real_exception(interpreter, NULL, E_LookupError,
                 "Can't find method '%s' - erroneous PMC",
                 string_to_cstring(interpreter, meth)
                 );

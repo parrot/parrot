@@ -40,7 +40,8 @@ Raises an exception. Use C<init_pmc()>.
 */
 
 void init () {
-        internal_exception(1, "Iterator init without aggregate");
+        real_exception(INTERP, NULL, E_Exception,
+                "Iterator init without aggregate");
     }
 
 /*
@@ -283,7 +284,8 @@ Reset the Iterator. C<value> must be one of
     void set_integer_native (INTVAL value) {
         PMC *key, *agg;
         if (value < ITERATE_FROM_START || value > ITERATE_FROM_END)
-            internal_exception(1, "Illegal set_integer on iterator");
+            real_exception(INTERP, NULL, E_TypeError,
+                    "Illegal set_integer on iterator");
         /* reset iterator on aggregate */
         agg = (PMC*) PMC_pmc_val(SELF);
         if (agg->vtable->base_type == enum_class_Slice) {
@@ -421,7 +423,8 @@ See F<docs/pdds/pdd03_calling_conventions.pod>.
             return next;
         }
         else if (REG_INT(3) == 2)   /* TODO function+sentinel */
-            internal_exception(1, "Iterator: invoke 2 args");
+            real_exception(INTERP, NULL, E_AssertionError,
+                    "Iterator: invoke 2 args");
 
         REG_INT(1) = REG_INT(2) = REG_INT(3) = REG_INT(4) = 0;
         key = PMC_struct_val(SELF);
