@@ -2,8 +2,11 @@
 /* $Id: readline.in 7858 2005-04-17 17:08:45Z boemmels $ */
 
 #include <stdio.h>
-#include <readline/readline.h>
-#include <readline/history.h>
+/* #include <readline/readline.h>
+  #include <readline/history.h>
+*/
+
+extern char* readline(const char*);
 
 int main(int argc, char *argv[])
 {
