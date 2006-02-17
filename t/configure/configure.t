@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 use lib qw( . lib ../lib ../../lib );
-use Test::More tests => 32;
+use Test::More tests => 31;
 
 =head1 NAME
 
