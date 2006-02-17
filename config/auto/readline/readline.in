@@ -1,0 +1,13 @@
+/* Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved. */
+/* $Id: readline.in 7858 2005-04-17 17:08:45Z boemmels $ */
+
+#include <stdio.h>
+#include <readline/readline.h>
+#include <readline/history.h>
+
+int main(int argc, char *argv[])
+{
+
+    char * r = readline ("hello polly>");
+    return 0;
+}

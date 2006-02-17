@@ -423,6 +423,7 @@ my @steps = qw(
     auto::env
     auto::aio
     auto::gmp
+    auto::readline
     auto::gdbm
     auto::snprintf
     auto::perldoc
