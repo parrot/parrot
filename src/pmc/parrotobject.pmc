@@ -72,7 +72,8 @@ C<Parrot_instantiate_object()>.
 */
 
     void init() {
-        internal_exception(1, "Can't create new ParrotObjects - "
+        real_exception(interpreter, NULL, E_NotImplementedError,
+                "Can't create new ParrotObjects - "
             "use the registered class instead");
     }
 

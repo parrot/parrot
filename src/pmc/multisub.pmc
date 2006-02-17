@@ -29,27 +29,32 @@ pmclass MultiSub extends ResizablePMCArray need_ext does array {
         STRING *_nci = CONST_STRING(interpreter, "NCI");
         if (!VTABLE_isa(interpreter, value, _sub) &&
             !VTABLE_isa(interpreter, value, _nci))
-            internal_exception(1, "attempt to push non Sub PMC");
+            real_exception(interpreter, NULL, E_TypeError,
+                    "attempt to push non Sub PMC");
         SUPER(value);
     }
 
     void set_pmc_keyed_int (INTVAL key, PMC* value) {
         STRING *_sub = CONST_STRING(interpreter, "Sub");
         if (!VTABLE_isa(interpreter, value, _sub))
-            internal_exception(1, "attempt to set non Sub PMC");
+            real_exception(interpreter, NULL, E_TypeError,
+                    "attempt to set non Sub PMC");
         SUPER(key, value);
     }
 
     void set_integer_keyed_int (INTVAL key, INTVAL value) {
-        internal_exception(1, "attempt to set non Sub PMC");
+        real_exception(interpreter, NULL, E_TypeError,
+                "attempt to set non Sub PMC");
     }
 
     void set_string_keyed_int (INTVAL key, STRING* value) {
-        internal_exception(1, "attempt to set non Sub PMC");
+        real_exception(interpreter, NULL, E_TypeError,
+                "attempt to set non Sub PMC");
     }
 
     void set_number_keyed_int (INTVAL key, FLOATVAL value) {
-        internal_exception(1, "attempt to set non Sub PMC");
+        real_exception(interpreter, NULL, E_TypeError,
+                "attempt to set non Sub PMC");
     }
 
     void* invoke(void *next) {

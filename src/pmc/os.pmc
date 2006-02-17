@@ -350,7 +350,8 @@ Creates a symlink, where available
             real_exception(interpreter, NULL, E_SystemError, errmsg);
         }
 #else
-        internal_exception(UNIMPLEMENTED, "Win32 does not support symlinks!");
+        real_exception(interpreter, NULL, E_NotImplementedError,
+                "Win32 does not support symlinks!");
 #endif
     }
 
@@ -376,7 +377,8 @@ Creates a hard link, where available(?)
             real_exception(interpreter, NULL, E_SystemError, errmsg);
         }
 #else
-        internal_exception(UNIMPLEMENTED, "Win32 is not POSIX. Need win32 developer!");
+        real_exception(interpreter, NULL, E_NotImplementedError,
+                "Win32 is not POSIX. Need win32 developer!");
 #endif
     }
 
@@ -396,7 +398,8 @@ previous one).
         INTVAL old = umask(mask);
         return old;
 #else
-        internal_exception(UNIMPLEMENTED, "Win32 is not POSIX. Need win32 developer!");
+        real_exception(interpreter, NULL, E_NotImplementedError,
+                "Win32 is not POSIX. Need win32 developer!");
         return 0;
 #endif
     }
@@ -425,7 +428,8 @@ idea to do the same with parrot.
             real_exception(interpreter, NULL, E_SystemError, errmsg);
         }
 #else
-        internal_exception(UNIMPLEMENTED, "Win32 is not POSIX. Need win32 developer!");
+        real_exception(interpreter, NULL, E_NotImplementedError,
+                "Win32 is not POSIX. Need win32 developer!");
 #endif
     }
 

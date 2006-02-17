@@ -24,14 +24,16 @@ Tests the ParrotObject PMC.
 =cut
 
 
-pir_output_is(<<'CODE', <<'OUT', 'new');
+pir_output_like(<<'CODE', <<'OUT', 'new');
 .sub 'test' :main
 	new P0, .ParrotObject
 	print "ok 1\n"
 .end
 CODE
-Can't create new ParrotObjects - use the registered class instead
+/Can't create new ParrotObjects - use the registered class instead
+current instr\.:/
 OUT
+# '
 
 
 # remember to change the number of tests :-)

@@ -257,7 +257,8 @@ Create the class from the thawed parents and attributes array.
         else
             n = VTABLE_elements(INTERP, parents);
         if (nold && n != nold)
-            internal_exception(1, "thawed class differs");
+            real_exception(INTERP, NULL, E_AssertionError,
+                    "thawed class differs");
         /* TODO compare elements */
         if (!nold) {
             for (i = 0; i < n; ++i) {
@@ -276,7 +277,8 @@ Create the class from the thawed parents and attributes array.
         else
             n = VTABLE_elements(INTERP, attribs);
         if (nold && n != nold)
-            internal_exception(1, "thawed class differs");
+            real_exception(INTERP, NULL, E_AssertionError,
+                    "thawed class differs");
         /* TODO compare attribs */
 
         if (!nold) {
