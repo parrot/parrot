@@ -45,17 +45,13 @@ sub runstep
         $conf->data->add(' ', libs => '-lreadline');
     }
 
-    my $archname = $Config{archname};
-    my ($cpuarch, $osname) = split('-', $archname);
-    if (!defined $osname) {
-        ($osname, $cpuarch) = ($cpuarch, "");
-    }
+    my $osname = $Config{osname};
 
     # On OS X check the presence of the readline header in the standard
     # Fink location. TODO: Need a more generalized way for finding
     # where Fink lives.
     if ($osname =~ /darwin/) {
-        if (-f "/sw/include/readline.h") {
+        if (-f "/sw/include/readline/readline.h") {
             $conf->data->add(' ', linkflags => '-L/sw/lib');
             $conf->data->add(' ', ldflags   => '-L/sw/lib');
             $conf->data->add(' ', ccflags   => '-I/sw/include');
