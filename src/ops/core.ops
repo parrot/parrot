@@ -833,14 +833,30 @@ inline op gc_debug(in INT) {
 
 ########################################
 
-=item B<interpinfo>(out INT, in INT)
-
-=item B<interpinfo>(out PMC, in INT)
-
-=item B<interpinfo>(out STR, in INT)
+=item B<interpinfo>
 
 Fetch some piece of information about the interpreter and put it in $1.
 Possible values for $2 are defined in F<runtime/parrot/include/interpinfo.pasm>.
+Below are listed the valid constants for each return value.
+
+=over 4
+
+=item B<interpinfo>(out INT, in INT)
+
+.TOTAL_MEM_ALLOC, .DOD_RUNS, .COLLECT_RUNS, .ACTIVE_PMCS, .ACTIVE_BUFFERS,
+.TOTAL_PMCS, .TOTAL_BUFFERS, .HEADER_ALLOCS_SINCE_COLLECT,
+.MEM_ALLOCS_SINCE_COLLECT, .TOTAL_COPIED, .IMPATIENT_PMCS, .LAZY_DOD_RUNS,
+.EXTENDED_PMCS
+
+=item B<interpinfo>(out PMC, in INT)
+
+.CURRENT_SUB, .CURRENT_CONT, .CURRENT_OBJECT, .NAMESPACE_ROOT, .CURRENT_LEXPAD
+
+=item B<interpinfo>(out STR, in INT)
+
+.CURRENT_METHOD
+
+=back
 
 =cut
 
