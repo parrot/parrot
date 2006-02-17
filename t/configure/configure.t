@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 use lib qw( . lib ../lib ../../lib );
-use Test::More tests => 33;
+use Test::More tests => 32;
 
 =head1 NAME
 
@@ -202,8 +202,7 @@ can_ok('Parrot::Configure', qw(
     # otherwise runsteps() output will make Test::Harness think this test
     # failed.
     print "\n";
-    is($test::step::params::self, 'test::step::params',
-        "->runstep() is called as class method");
+    isa_ok($test::step::params::self, 'test::step::params');
     isa_ok($test::step::params::conf, 'Parrot::Configure');
     is_deeply(\@test::step::params::conf, [],
         "no extra parameters were passed to ->runstep()");
@@ -233,8 +232,7 @@ can_ok('Parrot::Configure', qw(
     # otherwise runsteps() output will make Test::Harness think this test
     # failed.
     print "\n";
-    is($test::step::stepparams::self, 'test::step::stepparams',
-        "->runstep() is called as class method");
+    isa_ok($test::step::stepparams::self, 'test::step::stepparams');
     isa_ok($test::step::stepparams::conf, 'Parrot::Configure');
     cmp_ok($test::step::stepparams::self, 'ne', $test::step::stepparams::conf,
         '$self and $conf params are not the same object');
@@ -261,11 +259,10 @@ can_ok('Parrot::Configure', qw(
     my $pc = Parrot::Configure->new;
 
     # send warnings to stdout
-    open STDERR, ">&STDOUT"     or die "Can't dup STDOUT: $!";
+    open STDERR, ">&STDOUT" or die "Can't dup STDOUT: $!";
 
     $pc->add_step('test::step::stepfail');
     my $ret = $pc->runsteps;
     print "\n";
-    isa_ok($ret, 'Parrot::Configure',
-        "->runsteps() returns Parrot::Configure object on failure");
+    is($ret, undef, "->runsteps() returns undef on failure");
 }

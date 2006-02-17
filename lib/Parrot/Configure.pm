@@ -196,13 +196,15 @@ sub runsteps
 
     my $n = 0; # step number
     foreach my $task ($self->steps) {
-        my $step = $task->step;
+        my $step_name   = $task->step;
         my @step_params = @{$task->params};
 
         $n++;
 
-        eval "use $step;";
+        eval "use $step_name;";
         die $@ if $@;
+
+        my $step = $step_name->new;
 
         my $description = $step->description;
         $description = "" unless defined $description;
