@@ -157,7 +157,7 @@ SYNOPSIS
 
     METHOD STRING* readline(STRING* prompt) {
         ParrotIO *io = PMC_data(SELF);
-        STRING *res = NULL;;
+        STRING *res = NULL;
         UINTVAL len;
 
         if (!io) 
