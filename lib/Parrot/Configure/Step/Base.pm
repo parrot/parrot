@@ -31,6 +31,25 @@ use strict;
 
 =head2 Methods
 
+=head3 Constructors
+
+=over 4
+
+=item * C<new()>
+
+Basic constructor.
+
+Accepts no arguments and returns a L<Parrot::Configure::Step::> object.
+
+=cut
+
+sub new
+{
+    my $class = shift;
+
+    return bless {}, ref $class || $class;
+}
+
 =head3 Class Methods
 
 =over 4
