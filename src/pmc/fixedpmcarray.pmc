@@ -374,7 +374,7 @@ Returns the PMC value of the element at index C<key>.
     PMC* get_pmc_keyed_int (INTVAL key) {
         PMC **data;
         if (key < 0 || key >= PMC_int_val(SELF))
-            internal_exception(OUT_OF_BOUNDS,
+            real_exception(INTERP, NULL, E_IndexError,
                 "FixedPMCArray: index out of bounds!");
 
         data = (PMC **)PMC_data(SELF);
@@ -419,7 +419,8 @@ Resizes the array to C<size> elements.
         PMC **data;
 
         if (PMC_int_val(SELF) && size)
-            internal_exception(OUT_OF_BOUNDS, "FixedPMCArray: Can't resize!");
+            real_exception(INTERP, NULL, E_IndexError,
+                    "FixedPMCArray: Can't resize!");
         if (!size)
             return;
         PMC_int_val(SELF) = size;
@@ -434,7 +435,8 @@ Resizes the array to C<size> elements.
 
         if (value->vtable->base_type != enum_class_FixedPMCArray &&
                 value->vtable->base_type != enum_class_ResizablePMCArray)
-            internal_exception(1, "Can't set self from this type");
+            real_exception(INTERP, NULL, E_TypeError,
+                    "Can't set self from this type");
         if (SELF != value) {
             if (PMC_data(SELF))
                 mem_sys_free(PMC_data(SELF));
@@ -593,7 +595,7 @@ Sets the PMC value of the element at index C<key> to C<*src>.
     void set_pmc_keyed_int (INTVAL key, PMC* src) {
         PMC **data;
         if (key < 0 || key >= PMC_int_val(SELF))
-            internal_exception(OUT_OF_BOUNDS,
+            real_exception(INTERP, NULL, E_IndexError,
                 "FixedPMCArray: index out of bounds!");
 
         data = (PMC**)PMC_data(SELF);
@@ -687,7 +689,7 @@ Return a new iterator for SELF.
                     return iter;
                 }
         }
-        internal_exception(1, "Array: Unknown slice type");
+        real_exception(INTERP, NULL, E_IndexError, "Array: Unknown slice type");
         return NULL;
     }
 
@@ -716,7 +718,7 @@ Returns TRUE is the element at C<key> exists; otherwise returns false.
     INTVAL exists_keyed_int (INTVAL key) {
         PMC **data;
         if (key < 0 || key >= PMC_int_val(SELF))
-            internal_exception(OUT_OF_BOUNDS,
+            real_exception(INTERP, NULL, E_IndexError,
                 "FixedPMCArray: index out of bounds!");
 
         data = (PMC**)PMC_data(SELF);
