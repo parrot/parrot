@@ -57,10 +57,10 @@ CODE
 -14
 OUT
 
-language_output_is( 'lua', <<'CODE', <<'OUT', '1 / 0' );
+language_output_like( 'lua', <<'CODE', <<'OUT', '1 / 0' );
 print(1 / 0)
 CODE
-1.#INF
+/(inf|1.#INF)/
 OUT
 
 language_output_is( 'lua', <<'CODE', <<'OUT', '3 ^ 3' );
