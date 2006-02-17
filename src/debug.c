@@ -281,16 +281,15 @@ PDB_get_command(Interp *interpreter)
         while (pdb->cur_opcode != line->opcode)
             line = line->next;
 
-        PIO_eprintf(interpreter, "\n%li  ", line->number);
+        PIO_eprintf(interpreter, "%li  ", line->number);
         c = pdb->file->source + line->source_offset;
         while (*c != '\n'  && c)
             PIO_eprintf(interpreter, "%c", *(c++));
-        PIO_eprintf(interpreter, "\n");
     }
 
     i = 0;
 
-    c = (char *)mem_sys_allocate(255);
+    c = (char *)mem_sys_allocate(255);  /* XXX who frees that */
 
     PIO_eprintf(interpreter, "\n(pdb) ");
 
@@ -448,7 +447,7 @@ PDB_next(Interp *interpreter, const char *command)
 
     /* Execute */
     for ( ; n && pdb->cur_opcode; n--)
-        DO_OP(pdb->cur_opcode,interpreter);
+        DO_OP(pdb->cur_opcode, pdb->debugee);
 
     /* Set the stopped flag */
     pdb->state |= PDB_STOPPED;
@@ -481,6 +480,7 @@ PDB_trace(Interp *interpreter,
 {
     PDB_t *pdb = interpreter->pdb;
     unsigned long n = 1;
+    Interp *debugee;
 
     if (!(pdb->state & PDB_RUNNING))
     {
@@ -492,13 +492,14 @@ PDB_trace(Interp *interpreter,
 
     pdb->state &= ~PDB_STOPPED;
 
+    debugee = pdb->debugee;
     for ( ; n && pdb->cur_opcode; n--) {
-        trace_op(interpreter,
-                interpreter->code->base.data,
-                interpreter->code->base.data +
-                interpreter->code->base.size,
-                interpreter->pdb->cur_opcode);
-        DO_OP(pdb->cur_opcode,interpreter);
+        trace_op(debugee,
+                debugee->code->base.data,
+                debugee->code->base.data +
+                debugee->code->base.size,
+                debugee->pdb->cur_opcode);
+        DO_OP(pdb->cur_opcode, debugee);
     }
 
     pdb->state |= PDB_STOPPED;
@@ -843,62 +844,13 @@ extern void imcc_init(Parrot_Interp interpreter);
 void
 PDB_init(Interp *interpreter, const char *command)
 {
-    PMC *userargv;
-    char c[256];
-    STRING *arg;
-    unsigned long i;
     PDB_t *pdb = interpreter->pdb;
 
-#if 0
-    struct PackFile *code;
-    void* stacktop = interpreter->lo_var_ptr;
-
-    /* XXX this causes reuse of structures of the old interpreter
-     * the new interpreter isn't returned nor setup properly
-     * -leo
-     */
-    /* The bytecode is readonly, right? */
-    code = interpreter->code;
-    /* Destroy the old interpreter FIXME */
-    free(interpreter);
-    /* Get a new interpreter */
-    interpreter = make_interpreter(interpreter, NO_FLAGS);
-    interpreter->code = code;
-    interpreter->pdb = pdb;
-    interpreter->lo_var_ptr = stacktop;
-#else
-    Parrot_clear_i(interpreter);
-    Parrot_clear_n(interpreter);
-    Parrot_clear_s(interpreter);
-    Parrot_clear_p(interpreter);
-#endif
-
-    /* setup PASM compiler */
-    imcc_init(interpreter);
-
-    /* set the user arguments */
-    userargv = pmc_new(interpreter, enum_class_ResizableStringArray);
-    REG_PMC(5) = userargv;
-
-    while (command && *command) {
-        i = 0;
-        while (command[i] && !isspace((int) command[i])) {
-            c[i] = command[i];
-            i++;
-        }
-        c[i] = '\0';
-        na(command);
-
-        arg = string_make(interpreter, c, i, NULL, 0);
-        VTABLE_push_string(interpreter, userargv, arg);
-    }
-
+    UNUSED(command);
     /* Restart if we are already running */
     if (pdb->state & PDB_RUNNING)
         PIO_eprintf(interpreter, "Restarting\n");
 
-    /* Get the bytecode start */
-    pdb->cur_opcode = interpreter->code->base.data;
     /* Add the RUNNING state */
     pdb->state |= PDB_RUNNING;
 }
@@ -934,7 +886,7 @@ PDB_continue(Interp *interpreter,
     }
     /* Run while no break point is reached */
     while (!PDB_break(interpreter))
-        DO_OP(pdb->cur_opcode,interpreter);
+        DO_OP(pdb->cur_opcode, pdb->debugee);
 }
 
 

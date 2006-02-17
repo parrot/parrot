@@ -158,6 +158,9 @@ runops_slow_core(Interp *interpreter, opcode_t *pc)
     if (Interp_trace_TEST(interpreter, PARROT_TRACE_OPS_FLAG)) {
         return runops_trace_core(interpreter, pc);
     }
+    else if (interpreter->debugger && interpreter->debugger->pdb) {
+        return Parrot_debug(interpreter->debugger, pc);
+    }
     while (pc) {
         if ( pc < code_start || pc >= code_end) {
             internal_exception(1,

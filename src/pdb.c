@@ -103,12 +103,14 @@ and C<debug_break> ops in F<ops/debug.ops>.
 
 */
 
-#include "parrot/embed.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include "../compilers/imcc/imc.h"
+#include "../compilers/imcc/parser.h"
+#include "parrot/embed.h"
 
-void PDB_printwelcome(void);
+static void PDB_printwelcome(void);
 
 /*
 
@@ -121,20 +123,34 @@ Parrot_debug().
 
 */
 
+extern void imcc_init(Parrot_Interp interp);
+
 int
 main(int argc, char *argv[])
 {
-    Parrot_Interp interpreter;
+    Parrot_Interp interpreter, debugger;
     char *filename;
     Parrot_PackFile pf;
+    char *ext;
+    int pasm_file;
+    PDB_t *pdb;
 
-    interpreter = Parrot_new(NULL);
-
-    if (!interpreter) {
-        return 1;
-    }
+    /*Parrot_set_config_hash();  TODO link with cfg */
+    debugger = Parrot_new(NULL);
+    Parrot_init(debugger);
+    pdb = (PDB_t *)mem_sys_allocate_zeroed(sizeof(PDB_t));
+    /* attach pdb structure */
+    debugger->pdb = pdb;
+    
+    interpreter = Parrot_new(debugger);
+    interpreter->debugger = debugger; 
+    pdb->debugee = interpreter;
 
     Parrot_init(interpreter);
+    Parrot_block_DOD(interpreter);
+    Parrot_block_GC(interpreter);
+    imcc_init(interpreter);
+    IMCC_ast_init(interpreter);
 
     if (argc < 2) {
         fprintf(stderr, "Usage: pdb programfile [program-options]\n");
@@ -142,24 +158,56 @@ main(int argc, char *argv[])
     }
 
     filename = argv[1];
+    ext = strrchr(filename, '.');
+    if (ext && strcmp (ext, ".pbc") == 0) {
 
-    pf = Parrot_readbc(interpreter, filename);
+        pf = Parrot_readbc(interpreter, filename);
 
-    if (!pf) {
-        return 1;
+        if (!pf) {
+            return 1;
+        }
+
+        Parrot_loadbc(interpreter, pf);
     }
+    else {
+        pf = PackFile_new(interpreter, 0);
+        Parrot_loadbc(interpreter, pf);
 
-    Parrot_loadbc(interpreter, pf);
+        IMCC_push_parser_state(interpreter);
+        IMCC_INFO(interpreter)->state->file = filename;
+
+        if (!(imc_yyin_set(fopen(filename, "r"))))    {
+            IMCC_fatal(interpreter, E_IOError,
+                    "Error reading source file %s.\n",
+                    filename);
+        }
+        pasm_file = 0;
+        if (ext && strcmp (ext, ".pasm") == 0) 
+            pasm_file = 1;
+        emit_open(interpreter, 1, NULL);
+        IMCC_INFO(interpreter)->state->pasm_file = pasm_file;
+        yyparse((void *) interpreter);
+        imc_compile_all_units(interpreter);
+
+        imc_cleanup(interpreter);
+
+        fclose(imc_yyin_get());
+        PackFile_fixup_subs(interpreter, PBC_POSTCOMP, NULL);
+    }
+    Parrot_unblock_DOD(interpreter);
+    Parrot_unblock_GC(interpreter);
+
     PDB_printwelcome();
-    Parrot_debug(interpreter, argc - 1, argv + 1);
-    Parrot_destroy(interpreter);
+
+    Parrot_runcode(interpreter, argc - 1, argv + 1);
+    Parrot_exit(0);
 
     return 0;
 }
 
 /*
 
-=item C<void PDB_printwelcome()>
+=item Cstatic <void PDB_printwelcome()>
 
 Prints out the welcome string.
 
@@ -167,10 +215,12 @@ Prints out the welcome string.
 
 */
 
-void
+static void
 PDB_printwelcome()
 {
-    fprintf(stderr, "Parrot Debugger 0.0.2\n");
+    fprintf(stderr, "Parrot Debugger 0.4.x\n");
+    fprintf(stderr, "\nPlease note: ");
+    fprintf(stderr, "the debugger is currently under reconstruction\n");
 }
 
 /*
