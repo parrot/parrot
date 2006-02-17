@@ -115,7 +115,7 @@ empty string.
 =cut
 
 .sub _table_concat :anon
-    .param pmc table
+    .param pmc table :optional
     .param pmc sep :optional
     .param pmc i :optional
     .param pmc j :optional
@@ -168,8 +168,8 @@ STILL INCOMPLETE (see next in luapir.pir).
 =cut
 
 .sub _table_foreach :anon
-    .param pmc table
-    .param pmc f
+    .param pmc table :optional
+    .param pmc f :optional
     .local pmc idx
     .local pmc value
     .local pmc ret
@@ -198,8 +198,8 @@ broken and this value is returned as the result of C<foreachi>.
 =cut
 
 .sub _table_foreachi :anon
-    .param pmc table
-    .param pmc f
+    .param pmc table :optional
+    .param pmc f :optional
     .local pmc index
     .local pmc value
     .local pmc ret
@@ -236,7 +236,7 @@ STILL INCOMPLETE (see getn in luapir.pir).
 =cut
 
 .sub _table_getn :anon
-    .param pmc table
+    .param pmc table :optional
     .local pmc ret
     checktype(table, "table")
     $I0 = getn(table)
@@ -262,7 +262,7 @@ NOT YET IMPLEMENTED (see auxsort).
 =cut
 
 .sub _table_sort :anon
-    .param pmc table
+    .param pmc table :optional
     .param pmc comp :optional
     .local int n
     checktype(table, "table")
@@ -306,9 +306,9 @@ STILL INCOMPLETE (see setn in luapir.pir).
 =cut
 
 .sub _table_insert :anon
-    .param pmc table
-    .param pmc arg2
-    .param pmc arg3
+    .param pmc table :optional
+    .param pmc arg2 :optional
+    .param pmc arg3 :optional
     .local pmc value
     .local pmc index
     .local int n
@@ -357,7 +357,7 @@ STILL INCOMPLETE (see setn in luapir.pir).
 =cut
 
 .sub _table_remove :anon
-    .param pmc table
+    .param pmc table :optional
     .param pmc pos :optional
     .local pmc index
     .local pmc ret
@@ -402,8 +402,8 @@ STILL INCOMPLETE (see setn in luapir.pir).
 =cut
 
 .sub _table_setn :anon
-    .param pmc table
-    .param pmc n
+    .param pmc table :optional
+    .param pmc n :optional
     checktype(table, "table")
     $I0 = checknumber(n)
     setn(table, $I0)

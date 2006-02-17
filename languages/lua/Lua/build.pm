@@ -1097,6 +1097,15 @@ sub BuildFunctionBody {
 	for my $param (@{$params}) {
 		push @opcodes2, @{$param->[1]};
 	}
+	if (        scalar(@{$params}) != 0 
+			and !${${${$params}[-1]}[1]}[-1]->isa("CallOp") ) {
+		my $extra = new defn("extra", "local", "pmc");
+		push @opcodes2, new ParamDir($parser,
+				'prolog'				=>	1,
+				'result'				=>	$extra,
+				'pragma'				=>	":slurpy",
+		);
+	}
 	for my $param (@{$params}) {
 		push @opcodes2, @{$param->[2]};
 	}

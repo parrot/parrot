@@ -129,8 +129,8 @@ Note that numerical codes are not necessarily portable across platforms.
 =cut
 
 .sub _string_byte :anon
-    .param pmc s
-    .param pmc n
+    .param pmc s :optional
+    .param pmc n :optional
     .local pmc ret
     $S0 = checkstring(s)
     $I0 = length $S0
@@ -195,7 +195,7 @@ NOT YET IMPLEMENTED.
 =cut
 
 .sub _string_dump :anon
-    .param pmc function
+    .param pmc function :optional
     checktype(function, "Sub")
     not_implemented()
 .end
@@ -218,8 +218,8 @@ NOT YET IMPLEMENTED.
 =cut
 
 .sub _string_find :anon
-    .param pmc s
-    .param pmc pattern
+    .param pmc s :optional
+    .param pmc pattern :optional
     .param pmc init :optional
     .param pmc plain :optional
     $S0 = checkstring(s)
@@ -238,7 +238,7 @@ Embedded zeros are counted, so C<"a\000b\000c"> has length 5.
 =cut
 
 .sub _string_len :anon
-    .param pmc s
+    .param pmc s :optional
     .local pmc ret
     $S0 = checkstring(s)
     $I0 = length $S0
@@ -256,7 +256,7 @@ of what is an uppercase letter depends on the current locale.
 =cut
 
 .sub _string_lower :anon
-    .param pmc s
+    .param pmc s :optional
     .local pmc ret
     $S0 = checkstring(s)
     downcase $S0
@@ -272,7 +272,7 @@ Returns a string that is the concatenation of C<n> copies of the string C<s>.
 =cut
 
 .sub _string_rep :anon
-    .param pmc s
+    .param pmc s :optional
     .param pmc n
     .local pmc ret
     $S0 = checkstring(s)
@@ -297,9 +297,9 @@ C<string.sub(s, -i)> returns a suffix of C<s> with length C<i>.
 =cut
 
 .sub _string_sub :anon
-    .param pmc s
-    .param pmc i
-    .param pmc j
+    .param pmc s :optional
+    .param pmc i :optional
+    .param pmc j :optional
     .local pmc ret
     $S0 = checkstring(s)
     $I0 = length $S0
@@ -334,7 +334,7 @@ of what is a lowercase letter depends on the current locale.
 =cut
 
 .sub _string_upper :anon
-    .param pmc s
+    .param pmc s :optional
     .local pmc ret
     $S0 = checkstring(s)
     upcase $S0
@@ -374,7 +374,7 @@ NOT YET IMPLEMENTED.
 =cut
 
 .sub _string_format :anon
-    .param pmc formatstring
+    .param pmc formatstring :optional
     .param pmc argv :slurpy
     $S0 = checkstring(formatstring)
     $I0 = length $S0
@@ -410,8 +410,8 @@ NOT YET IMPLEMENTED.
 =cut
 
 .sub _string_gfind :anon
-    .param pmc s
-    .param pmc pat
+    .param pmc s :optional
+    .param pmc pat :optional
     $S0 = checkstring(s)
     $S1 = checkstring(pat)
     not_implemented()
@@ -443,9 +443,9 @@ NOT YET IMPLEMENTED.
 =cut
 
 .sub _string_gsub :anon
-    .param pmc s
-    .param pmc pat
-    .param pmc repl
+    .param pmc s :optional
+    .param pmc pat :optional
+    .param pmc repl :optional
     .param pmc n :optional
     $S0 = checkstring(s)
     $I0 = length $S0

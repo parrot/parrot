@@ -244,7 +244,7 @@ sub visitParamDir {
 	if (exists $dir->{pragma}) {
 		print $FH "  .param $dir->{result}->{type} $dir->{result}->{symbol} $dir->{pragma}\n";
 	} else {
-		print $FH "  .param $dir->{result}->{type} $dir->{result}->{symbol}\n";
+		print $FH "  .param $dir->{result}->{type} $dir->{result}->{symbol} :optional\n";
 	}
 }
 

@@ -73,7 +73,7 @@ Returns this new coroutine, an object with type C<"thread">.
 =cut
 
 .sub _coroutine_create :anon
-    .param pmc f
+    .param pmc f :optional
     .local pmc ret
     checktype(f, "Closure")
     ret = new .Coroutine, f
@@ -96,7 +96,7 @@ C<resume> returns B<false> plus the error message.
 =cut
 
 .sub _coroutine_resume :anon
-    .param pmc co
+    .param pmc co :optional
     .param pmc argv :slurpy
     .local pmc ret
     .local pmc status
@@ -130,7 +130,7 @@ DUMMY IMPLEMENTATION.
 =cut
 
 .sub _coroutine_status :anon
-    .param pmc co
+    .param pmc co :optional
     .local pmc ret
     checktype(co, "Coroutine")
     new ret, .LuaString 
@@ -151,7 +151,7 @@ NOT YET IMPLEMENTED.
 =cut
 
 .sub _coroutine_wrap :anon
-    .param pmc f
+    .param pmc f :optional
     checktype(f, "Closure")
     not_implemented()
 .end

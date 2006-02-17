@@ -154,8 +154,8 @@ NOT YET IMPLEMENTED.
 =cut
 
 .sub _os_difftime :anon
-    .param pmc t2
-    .param pmc t1
+    .param pmc t2 :optional
+    .param pmc t1 :optional
     $I0 = checkint(t2)
     $I1 = optint(t1, 0)
     not_implemented()
@@ -170,7 +170,7 @@ is system-dependent.
 =cut
 
 .sub _os_execute :anon
-    .param pmc command
+    .param pmc command :optional
     .local pmc ret
     $S0 = checkstring(command)
     $I0 = spawnw $S0
@@ -201,7 +201,7 @@ if the variable is not defined.
 =cut
 
 .sub _os_getenv :anon
-    .param pmc varname
+    .param pmc varname :optional
     .local pmc ret
     $S0 = checkstring(varname)
     new $P0, .Env
@@ -223,7 +223,7 @@ B<nil>, plus a string describing the error.
 =cut
 
 .sub _os_remove :anon
-    .param pmc filename
+    .param pmc filename :optional
     .local pmc ret
     $S0 = checkstring(filename)
     $S1 = $S0
@@ -255,8 +255,8 @@ returns B<nil>, plus a string describing the error.
 =cut
 
 .sub _os_rename :anon
-    .param pmc oldname
-    .param pmc newname
+    .param pmc oldname :optional
+    .param pmc newname :optional
     .local pmc ret
     $S0 = checkstring(oldname)
     $S2 = $S0
@@ -294,7 +294,7 @@ NOT YET IMPLEMENTED.
 =cut
 
 .sub _os_setlocale :anon
-    .param pmc locale
+    .param pmc locale :optional
     .param pmc category :optional
     $S1 = optstring(category, "all")
     not_implemented()

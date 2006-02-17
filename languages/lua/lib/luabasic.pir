@@ -204,7 +204,7 @@ it defaults to "assertion failed!"
 =cut
 
 .sub _lua_assert :anon
-    .param pmc v
+    .param pmc v :optional
     .param pmc message :optional
     checkany(v)
     $I0 = v
@@ -226,7 +226,7 @@ NOT YET IMPLEMENTED.
 =cut
 
 .sub _lua_collectgarbage :anon
-    .param pmc limit
+    .param pmc limit :optional
     $I0 = optint(limit, 0)
     not_implemented()
 .end
@@ -244,7 +244,7 @@ NOT YET IMPLEMENTED.
 =cut
 
 .sub _lua_dofile :anon
-    .param pmc filename
+    .param pmc filename :optional
     $S0 = optstring(filename, "")
     not_implemented()
 .end
@@ -264,7 +264,7 @@ STILL INCOMPLETE.
 =cut
 
 .sub _lua_error :anon
-    .param pmc message
+    .param pmc message :optional
     .param pmc level :optional
     $I0 = optint(level, 1)
     checkany(message)
@@ -303,7 +303,7 @@ NOT YET IMPLEMENTED.
 =cut
 
 .sub _lua_getmetatable :anon
-    .param pmc obj
+    .param pmc obj :optional
     checkany(obj)
     not_implemented()
 .end
@@ -333,7 +333,7 @@ integer key with a nil value in the table.
 =cut
 
 .sub _lua_ipairs :anon
-    .param pmc t
+    .param pmc t :optional
     .param pmc i :optional
     checktype(t, "table")
     unless_null i, L0
@@ -370,7 +370,7 @@ NOT YET IMPLEMENTED.
 =cut
 
 .sub _lua_loadfile :anon
-    .param pmc filename
+    .param pmc filename :optional
     $S0 = optstring(filename, "")
     not_implemented()
 .end
@@ -410,7 +410,7 @@ NOT YET IMPLEMENTED.
 =cut
 
 .sub _lua_loadstring :anon
-    .param pmc s
+    .param pmc s :optional
     .param pmc chunkname :optional
     $S0 = checkstring(s)
     $S1 = optstring(chunkname, s)
@@ -441,7 +441,7 @@ STILL INCOMPLETE (see next in luapir.pir).
 =cut
 
 .sub _lua_next :anon
-    .param pmc table
+    .param pmc table :optional
     .param pmc index :optional
     .local pmc idx
     .local pmc value
@@ -467,7 +467,7 @@ STILL INCOMPLETE (see next).
 =cut
 
 .sub _lua_pairs :anon
-    .param pmc t
+    .param pmc t :optional
     checktype(t, "table")
     .local pmc _G
     _G = global "_G"
@@ -491,7 +491,7 @@ In case of any error, C<pcall> returns B<false> plus the error message.
 =cut
 
 .sub _lua_pcall :anon
-    .param pmc f
+    .param pmc f :optional
     .param pmc argv :slurpy
     .local pmc ret
     .local pmc status
@@ -553,8 +553,8 @@ NOT YET IMPLEMENTED.
 =cut
 
 .sub _lua_rawequal :anon
-    .param pmc v1
-    .param pmc v2
+    .param pmc v1 :optional
+    .param pmc v2 :optional
     checkany(v1)
     checkany(v2)
     not_implemented()
@@ -568,8 +568,8 @@ C<table> must be a table; C<index> is any value different from B<nil>.
 =cut
 
 .sub _lua_rawget :anon
-    .param pmc table
-    .param pmc index
+    .param pmc table :optional
+    .param pmc index :optional
     .local pmc ret
     checktype(table, "table")
     checkany(index)
@@ -586,9 +586,9 @@ B<nil>, and C<value> is any Lua value.
 =cut
 
 .sub _lua_rawset :anon
-    .param pmc table
-    .param pmc index
-    .param pmc value
+    .param pmc table :optional
+    .param pmc index :optional
+    .param pmc value :optional
     checktype(table, "table")
     checkany(index)
     checkany(value)
@@ -638,7 +638,7 @@ NOT YET IMPLEMENTED.
 =cut
 
 .sub _lua_require :anon
-    .param pmc packagename
+    .param pmc packagename :optional
     $S0 = checkstring(packagename)
     not_implemented()
 .end
@@ -658,8 +658,8 @@ NOT YET IMPLEMENTED.
 =cut
 
 .sub _lua_setfenv :anon
-    .param pmc f
-    .param pmc table
+    .param pmc f :optional
+    .param pmc table :optional
     checktype(table, "table")
     not_implemented()
 .end
@@ -676,8 +676,8 @@ NOT YET IMPLEMENTED.
 =cut
 
 .sub _lua_setmetatable :anon
-    .param pmc table
-    .param pmc metatable
+    .param pmc table :optional
+    .param pmc metatable :optional
     checktype(table, "table")
     if_null metatable, L0
     $S0 = typeof metatable
@@ -705,7 +705,7 @@ unsigned integers are accepted.
 =cut
 
 .sub _lua_tonumber :anon
-    .param pmc e
+    .param pmc e :optional 
     .param pmc base :optional
     .local pmc ret
     checkany(e)
@@ -739,7 +739,7 @@ STILL INCOMPLETE (see tostring in luatable.pmc & luauserdata.pmc).
 =cut
 
 .sub _lua_tostring :anon
-    .param pmc e
+    .param pmc e :optional
     .local pmc ret
     checkany(e)
     ret = e."tostring"()
@@ -756,7 +756,7 @@ C<"userdata">.
 =cut
 
 .sub _lua_type :anon
-    .param pmc v
+    .param pmc v :optional
     .local pmc ret
     checkany(v)
     $S0 = typeof v
@@ -777,7 +777,7 @@ I<n> is the size of the list, as defined for the C<table.getn> function.
 =cut
 
 .sub _lua_unpack :anon
-    .param pmc list
+    .param pmc list :optional
     .local pmc ret
     .local pmc index
     .local int n
@@ -816,8 +816,8 @@ error, C<xpcall> returns false plus the result from C<err>.
 =cut
 
 .sub _lua_xpcall :anon
-    .param pmc f
-    .param pmc err
+    .param pmc f :optional
+    .param pmc err :optional
     .local pmc ret
     .local pmc status
     new status, .LuaBoolean

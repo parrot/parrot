@@ -191,7 +191,7 @@ See "Lua 5.0 Reference Manual", section 5.5 "Mathematical Functions".
 .end
 
 .sub _math_abs :anon
-    .param pmc x
+    .param pmc x :optional
     .local pmc ret
     $N0 = checknumber(x)
     $N1 = abs $N0
@@ -201,7 +201,7 @@ See "Lua 5.0 Reference Manual", section 5.5 "Mathematical Functions".
 .end
 
 .sub _math_acos :anon
-    .param pmc x
+    .param pmc x :optional
     .local pmc ret
     $N0 = checknumber(x)
     $N1 = acos $N0
@@ -211,7 +211,7 @@ See "Lua 5.0 Reference Manual", section 5.5 "Mathematical Functions".
 .end
 
 .sub _math_asin :anon
-    .param pmc x
+    .param pmc x :optional
     .local pmc ret
     $N0 = checknumber(x)
     $N1 = asin $N0
@@ -221,7 +221,7 @@ See "Lua 5.0 Reference Manual", section 5.5 "Mathematical Functions".
 .end
 
 .sub _math_atan :anon
-    .param pmc x
+    .param pmc x :optional
     .local pmc ret
     $N0 = checknumber(x)
     $N1 = atan $N0
@@ -231,8 +231,8 @@ See "Lua 5.0 Reference Manual", section 5.5 "Mathematical Functions".
 .end
 
 .sub _math_atan2 :anon
-    .param pmc y
-    .param pmc x
+    .param pmc y :optional
+    .param pmc x :optional
     .local pmc ret
     $N0 = checknumber(y)
     $N1 = checknumber(x)
@@ -243,7 +243,7 @@ See "Lua 5.0 Reference Manual", section 5.5 "Mathematical Functions".
 .end
 
 .sub _math_ceil :anon
-    .param pmc x
+    .param pmc x :optional
     .local pmc ret
     $N0 = checknumber(x)
     $N1 = ceil $N0
@@ -253,7 +253,7 @@ See "Lua 5.0 Reference Manual", section 5.5 "Mathematical Functions".
 .end
 
 .sub _math_cos :anon
-    .param pmc x
+    .param pmc x :optional
     .local pmc ret
     $N0 = checknumber(x)
     $N1 = cos $N0
@@ -263,7 +263,7 @@ See "Lua 5.0 Reference Manual", section 5.5 "Mathematical Functions".
 .end
 
 .sub _math_deg :anon
-    .param pmc x
+    .param pmc x :optional
     .local pmc ret
     $N0 = checknumber(x)
     $N1 = 3.14159265358979323846 / 180.0
@@ -274,7 +274,7 @@ See "Lua 5.0 Reference Manual", section 5.5 "Mathematical Functions".
 .end
 
 .sub _math_exp :anon
-    .param pmc x
+    .param pmc x :optional
     .local pmc ret
     $N0 = checknumber(x)
     $N1 = exp $N0
@@ -284,7 +284,7 @@ See "Lua 5.0 Reference Manual", section 5.5 "Mathematical Functions".
 .end
 
 .sub _math_floor :anon
-    .param pmc x
+    .param pmc x :optional
     .local pmc ret
     $N0 = checknumber(x)
     $N1 = floor $N0
@@ -294,7 +294,7 @@ See "Lua 5.0 Reference Manual", section 5.5 "Mathematical Functions".
 .end
 
 .sub _math_log :anon
-    .param pmc x
+    .param pmc x :optional
     .local pmc ret
     $N0 = checknumber(x)
     $N1 = ln $N0
@@ -304,7 +304,7 @@ See "Lua 5.0 Reference Manual", section 5.5 "Mathematical Functions".
 .end
 
 .sub _math_log10 :anon
-    .param pmc x
+    .param pmc x :optional
     .local pmc ret
     $N0 = checknumber(x)
     $N1 = log10 $N0
@@ -374,8 +374,8 @@ L3:
 .end
 
 .sub _math_mod :anon
-    .param pmc x
-    .param pmc y
+    .param pmc x :optional
+    .param pmc y :optional
     .local pmc ret
     $N0 = checknumber(x)
     $N1 = checknumber(y)
@@ -386,8 +386,8 @@ L3:
 .end
 
 .sub _math_pow :anon
-    .param pmc x
-    .param pmc y
+    .param pmc x :optional
+    .param pmc y :optional
     .local pmc ret
     $N0 = checknumber(x)
     $N1 = checknumber(y)
@@ -398,7 +398,7 @@ L3:
 .end
 
 .sub _math_rad :anon
-    .param pmc x
+    .param pmc x :optional
     .local pmc ret
     $N0 = checknumber(x)
     $N1 = 3.14159265358979323846 / 180.0
@@ -409,7 +409,7 @@ L3:
 .end
 
 .sub _math_sin :anon
-    .param pmc x
+    .param pmc x :optional
     .local pmc ret
     $N0 = checknumber(x)
     $N1 = sin $N0
@@ -419,7 +419,7 @@ L3:
 .end
 
 .sub _math_sqrt :anon
-    .param pmc x
+    .param pmc x :optional
     .local pmc ret
     $N0 = checknumber(x)
     $N1 = sqrt $N0
@@ -429,7 +429,7 @@ L3:
 .end
 
 .sub _math_tan :anon
-    .param pmc x
+    .param pmc x :optional
     .local pmc ret
     $N0 = checknumber(x)
     $N1 = tan $N0
@@ -439,14 +439,14 @@ L3:
 .end
 
 .sub _math_frexp :anon
-    .param pmc x
+    .param pmc x :optional
     $N0 = checknumber(x)
     not_implemented()
 .end
 
 .sub _math_ldexp :anon
-    .param pmc x
-    .param pmc exp
+    .param pmc x :optional
+    .param pmc exp :optional
     $N0 = checknumber(x)
     $I0 = checkint(exp)
     not_implemented()
@@ -457,7 +457,7 @@ L3:
 .end
 
 .sub _math_randomseed :anon
-    .param pmc seed
+    .param pmc seed :optional
     $I0 = checkint(seed)
     not_implemented()
 .end
