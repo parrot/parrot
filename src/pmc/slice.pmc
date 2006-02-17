@@ -114,8 +114,7 @@ range_end:
     }
     else {
         if (PObj_get_FLAGS(key) & KEY_inf_slice_FLAG) {
-            internal_exception(1,
-                    "unlimited slice range for hash not implemented");
+            internal_exception(1, "unlimited slice range for hash not implemented");
         }
         range->type = enum_type_STRING;
         /*
@@ -217,7 +216,7 @@ pmclass Slice need_ext extends Key {
     }
 
     PMC* clone() {
-        internal_exception(1, "Unimplemented");
+        real_exception(INTERP, NULL, E_NotImplementedError, "Unimplemented");
         return NULL;
     }
 
@@ -262,7 +261,8 @@ This is used for implementing Pythons xrange()
 
     PMC* slice(PMC *key, INTVAL f) {
         if (f) {
-            internal_exception(1, "Slice: Unknown slice type");
+            real_exception(INTERP, NULL, E_ValueError,
+                    "Slice: Unknown slice type");
             return NULL;
         }
         else {
@@ -348,7 +348,8 @@ advance to next position in the range, depending on what.
                 set_slice_next(INTERP, SELF, agg);
                 break;
             default:
-                internal_exception(1, "No backward iteration on slices yet");
+                real_exception(INTERP, NULL, E_NotImplementedError,
+                        "No backward iteration on slices yet");
                 break;
         }
         return ret;

@@ -171,7 +171,8 @@ Sets the pointer to the actual subroutine.
 */
 
     void set_pointer (void* value) {
-        internal_exception(1, "Don't set the address of a sub\n"
+        real_exception(INTERP, NULL, E_NotImplementedError,
+                "Don't set the address of a sub\n"
                 "use .Sub constants instead");
     }
 
@@ -409,7 +410,7 @@ Sets the subroutine to C<*value>.
 */
 
     void set_same (PMC* value) {
-        internal_exception(UNIMPLEMENTED, "set_same");
+        real_exception(INTERP, NULL, E_NotImplementedError, "set_same");
     }
 
 /*

@@ -187,8 +187,7 @@ shift_entry(PMC *self)
     INTVAL end_index   = UVal_int(e[1].val);
 
     if (start_index >= end_index)
-        internal_exception(OUT_OF_BOUNDS,
-                "SArray index out of bounds!");
+        internal_exception(OUT_OF_BOUNDS, "SArray index out of bounds!");
 
     ret = (HashEntry *) PMC_data(self) + (2 + start_index++);
 
@@ -220,8 +219,7 @@ get_entry(PMC *self, INTVAL key)
     }
     key += start_index;   /* lower bound if already shifted */
     if (key < start_index || key >= end_index)
-        internal_exception(OUT_OF_BOUNDS,
-                "SArray index out of bounds!");
+        internal_exception(OUT_OF_BOUNDS, "SArray index out of bounds!");
     e = (HashEntry *) PMC_data(self) + (2 + key);
     return e;
 }

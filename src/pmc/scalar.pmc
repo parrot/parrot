@@ -300,7 +300,8 @@ Multiplies the number by C<value> and returns the result in C<*dest>.
 
     PMC* multiply (PMC* value, PMC* dest) {
 MMD_Complex: {
-            internal_exception(1, "TODO mul<Float, Complex>");
+            real_exception(INTERP, NULL, E_NotImplementedError,
+                    "TODO mul<Float, Complex>");
             return dest;
         }
 MMD_DEFAULT: {
@@ -330,7 +331,8 @@ MMD_DEFAULT: {
 
     void i_multiply (PMC* value) {
 MMD_Complex: {
-            internal_exception(1, "TODO i_mul<Float, Complex>");
+            real_exception(INTERP, NULL, E_NotImplementedError,
+                    "TODO i_mul<Float, Complex>");
         }
 MMD_DEFAULT: {
             VTABLE_set_number_native(INTERP, SELF,
