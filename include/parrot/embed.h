@@ -54,7 +54,7 @@ PARROT_API void Parrot_runcode(Parrot_Interp, int argc, char *argv[]);
 
 PARROT_API void Parrot_destroy(Parrot_Interp);
 
-PARROT_API opcode_t * Parrot_debug(Parrot_Interp, opcode_t * pc);
+PARROT_API Parrot_Opcode * Parrot_debug(Parrot_Interp, Parrot_Opcode* pc);
 
 PARROT_API void Parrot_disassemble(Parrot_Interp);
 
