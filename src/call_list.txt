@@ -55,6 +55,7 @@ d                # t/pmc/nci.t
 d	d
 d	JOd      # Parrot builtins
 I       JOS
+S       JOS      # ParrotIO.readline
 d	v
 I	JI	 # Parrot_is_char_*
 v       JOSP     # String.trans

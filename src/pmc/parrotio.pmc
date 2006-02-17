@@ -23,6 +23,10 @@ These are the vtable functions for Parrot IO.
 /* This class is actually part of the io subsystem */
 #include "../src/io/io_private.h"
 
+#ifdef PARROT_HAS_READLINE
+extern char* readline(const char*);
+void add_history(const char*);
+#endif
 
 pmclass ParrotIO need_ext {
 
@@ -88,6 +92,107 @@ Open the file with the given mode and use the IO given layer.
         }
         /* XXX leaks as in ops/io.ops: open */
         return pio;
+    }
+
+/*
+
+=item C<METHOD INTVAL set_readline_interactive(INTVAL)>
+
+Set readline interactive mode to the given valie, if PARROT_HAS_READLINE is
+defined, i.e. if the readline library is available. Returns:
+
+  -1 ... readline isn't configured
+  -2 ... file not open/not input or not a tty, if turning on interactive
+  0 / 1  old interactive setting
+
+=item C<METHOD STRING* readline(STRING* prompt)>
+
+Read a line from the given PIO. If readline is interactive and a prompt
+is not-empty, it will be displayed. The interactive feature is not
+available with the C<readline> opcode (which will be removed anyway).
+In interactive mode non-empty lines are added to the readline history.
+
+Returns the line without the newline or:
+
+  NULL  ... end of input (e.g. after ^D or end of file)
+
+SYNOPSIS  
+
+      pio = getstdin
+      $I0 = pio.'set_readline_interactive'(1)
+      if $I0 >= 0 goto loop
+      printerr "set_readline_interactive failed: "
+      ...
+  loop:
+      s = pio.'readline'('hello polly> ')
+      if null s goto ex
+      ..
+      goto loop
+  ex:
+
+=cut
+
+*/
+
+    METHOD INTVAL set_readline_interactive(INTVAL on) {
+        ParrotIO *io = PMC_data(SELF);
+        INTVAL flag;
+        if (!io) 
+            return -2;
+        if (!(io->flags & PIO_F_READ))
+            return -2;
+#ifdef PARROT_HAS_READLINE
+        if (on && !(io->flags & PIO_F_CONSOLE))
+            return -2;
+        flag = !!(io->flags & PIO_F_READLINE);
+        if (on)
+            io->flags |= PIO_F_READLINE;
+        else
+            io->flags &= ~PIO_F_READLINE;
+        return flag;
+#else
+        return -1;
+#endif
+    }
+
+    METHOD STRING* readline(STRING* prompt) {
+        ParrotIO *io = PMC_data(SELF);
+        STRING *res = NULL;;
+        UINTVAL len;
+
+        if (!io) 
+            return NULL;
+#ifdef PARROT_HAS_READLINE
+        if (io->flags & PIO_F_READLINE) {
+            char *r;
+
+            r = readline (prompt ? prompt->strstart : NULL);
+            if (r) {
+                if (*r)
+                    add_history(r);
+                res = string_from_cstring(INTERP, r, 0);
+                free(r);
+            }
+            return res;
+        }
+        else
+#endif
+        {
+            if (!(io->flags & PIO_F_LINEBUF))
+                PIO_setlinebuf(interpreter, SELF);
+            res = PIO_reads(interpreter, SELF, 0);
+            if (!res)
+                return res;
+            /* readline should better return the string w/o NL */
+            len = string_length(INTERP, res);
+            while (len && (((char*)res->strstart)[len-1] == '\n'
+                       ||  ((char*)res->strstart)[len-1] == '\r')) {
+                --len;
+                --res->strlen;
+                --res->bufused;
+            }
+            return res;
+        }
     }
 
 /*
