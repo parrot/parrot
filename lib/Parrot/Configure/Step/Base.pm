@@ -50,6 +50,8 @@ sub new
     return bless {}, ref $class || $class;
 }
 
+=back
+
 =head3 Class Methods
 
 =over 4
