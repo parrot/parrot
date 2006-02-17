@@ -38,7 +38,7 @@ Resizes the array to C<size> elements.
     void set_integer_native (INTVAL size) {
 
         if (size < 0)
-            internal_exception(OUT_OF_BOUNDS,
+            real_exception(INTERP, NULL, E_IndexError,
                     "ResizablePMCArray: Can't resize!");
 
         if (!PMC_data(SELF)) {
@@ -104,7 +104,7 @@ TODO: Check whether there is already an element that can be shifted
         FLOATVAL value;
 
         if (0 == size) {
-            internal_exception(OUT_OF_BOUNDS,
+            real_exception(INTERP, NULL, E_IndexError,
                     "ResizablePMCArray: Can't shift from an empty array!");
         }
 
@@ -126,7 +126,7 @@ TODO: Check whether there is already an element that can be shifted
         INTVAL value;
 
         if (0 == size) {
-            internal_exception(OUT_OF_BOUNDS,
+            real_exception(INTERP, NULL, E_IndexError,
                     "ResizablePMCArray: Can't shift from an empty array!");
         }
 
@@ -147,13 +147,13 @@ TODO: Check whether there is already an element that can be shifted
         PMC** item;
 
         if (0 == size) {
-            internal_exception(OUT_OF_BOUNDS,
+            real_exception(INTERP, NULL, E_IndexError,
                     "ResizablePMCArray: Can't shift from an empty array!");
         }
 
         data= ((PMC**)PMC_data(SELF))[0];
         PMC_int_val(SELF)= --size;
-                
+
         item= (PMC**)PMC_data(SELF);
         mem_sys_memmove(item, item + 1, size * sizeof(PMC*));
         item[size]= PMCNULL;
@@ -168,7 +168,7 @@ TODO: Check whether there is already an element that can be shifted
         STRING* value;
 
         if (0 == size) {
-            internal_exception(OUT_OF_BOUNDS,
+            real_exception(INTERP, NULL, E_IndexError,
                     "ResizablePMCArray: Can't shift from an empty array!");
         }
 
@@ -200,7 +200,7 @@ Returns the PMC value of the element at index C<key>.
         if (key < 0)
             key += PMC_int_val(SELF);
         if (key < 0)
-            internal_exception(OUT_OF_BOUNDS,
+            real_exception(INTERP, NULL, E_IndexError,
                 "ResizablePMCArray: index out of bounds!");
         if (key >= PMC_int_val(SELF))
             DYNSELF.set_integer_native(key+1);
@@ -233,7 +233,7 @@ If key is a slice, do a splice as set that item.
         if (key < 0)
             key += PMC_int_val(SELF);
         if (key < 0)
-            internal_exception(OUT_OF_BOUNDS,
+            real_exception(INTERP, NULL, E_IndexError,
                 "ResizablePMCArray: index out of bounds!");
         if (key >= PMC_int_val(SELF))
             DYNSELF.set_integer_native(key+1);
@@ -342,7 +342,7 @@ Removes and returns the last element in the array.
         FLOATVAL value;
 
         if (0 == size) {
-            internal_exception(OUT_OF_BOUNDS,
+            real_exception(INTERP, NULL, E_IndexError,
                     "ResizablePMCArray: Can't pop from an empty array!");
         }
 
@@ -359,7 +359,7 @@ Removes and returns the last element in the array.
         INTVAL value;
 
         if (0 == size) {
-            internal_exception(OUT_OF_BOUNDS,
+            real_exception(INTERP, NULL, E_IndexError,
                     "ResizablePMCArray: Can't pop from an empty array!");
         }
 
@@ -375,10 +375,10 @@ Removes and returns the last element in the array.
         PMC* data;
 
         if (0 == size) {
-            internal_exception(OUT_OF_BOUNDS,
+            real_exception(INTERP, NULL, E_IndexError,
                     "ResizablePMCArray: Can't pop from an empty array!");
         }
-        
+
         data= ((PMC**)PMC_data(SELF))[--size];
         PMC_int_val(SELF)= size;
         return data;
@@ -390,7 +390,7 @@ Removes and returns the last element in the array.
         STRING* value;
 
         if (0 == size) {
-            internal_exception(OUT_OF_BOUNDS,
+            real_exception(INTERP, NULL, E_IndexError,
                     "ResizablePMCArray: Can't pop from an empty array!");
         }
 

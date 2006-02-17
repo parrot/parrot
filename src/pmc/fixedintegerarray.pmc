@@ -374,7 +374,7 @@ Resizes the array to C<size> elements.
 
     void set_integer_native (INTVAL size) {
         if (PMC_int_val(SELF) || size < 1)
-            internal_exception(OUT_OF_BOUNDS,
+            real_exception(INTERP, NULL, E_IndexError,
                 "FixedIntegerArray: Can't resize!");
         PMC_int_val(SELF) = size;
         PMC_data(SELF) = mem_sys_allocate_zeroed(size * sizeof(INTVAL));

@@ -1038,19 +1038,23 @@ CODE
 1023
 OUTPUT
 
-pasm_output_is(<< 'CODE', << 'OUTPUT', "Resizing to negative value");
+pasm_output_like(<< 'CODE', << 'OUTPUT', "Resizing to negative value");
      new P0, .ResizableStringArray
      set P0, -1
      end
 CODE
-ResizableStringArray: Can't resize!
+/ResizableStringArray: Can't resize!
+current instr\.:/
 OUTPUT
+# '
 
-pasm_output_is(<< 'CODE', << 'OUTPUT', "Retrieving from negative index");
+pasm_output_like(<< 'CODE', << 'OUTPUT', "Retrieving from negative index");
      new P0, .ResizableStringArray
      set P0, 100
      set S0, P0[-1]
      end
 CODE
-ResizableStringArray: index out of bounds!
+/ResizableStringArray: index out of bounds!
+current instr\.:/
 OUTPUT
+#'

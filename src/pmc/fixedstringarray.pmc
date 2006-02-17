@@ -246,7 +246,7 @@ Returns the Parrot string value of the element at index C<key>.
     STRING* get_string_keyed_int (INTVAL key) {
         STRING **data;
         if (key < 0 || key >= PMC_int_val(SELF))
-            internal_exception(OUT_OF_BOUNDS,
+            real_exception(INTERP, NULL, E_IndexError,
                 "FixedStringArray: index out of bounds!");
 
         data = (STRING **)PMC_data(SELF);
@@ -318,7 +318,8 @@ cause an exception to be thrown.
 
     void set_integer_native (INTVAL size) {
         if (PMC_int_val(SELF) || size < 1)
-            internal_exception(OUT_OF_BOUNDS, "FixedStringArray: Can't resize!");
+            real_exception(INTERP, NULL, E_IndexError,
+                    "FixedStringArray: Can't resize!");
         PMC_int_val(SELF) = size;
         PMC_data(SELF) = mem_sys_allocate_zeroed(size * sizeof(STRING*));
         PObj_custom_mark_destroy_SETALL(SELF);
@@ -411,7 +412,7 @@ Sets the Parrot string value of the element at index C<key> to C<value>.
     void set_string_keyed_int (INTVAL key, STRING* value) {
         STRING **data;
         if (key < 0 || key >= PMC_int_val(SELF))
-            internal_exception(OUT_OF_BOUNDS,
+            real_exception(INTERP, NULL, E_IndexError,
                 "FixedStringArray: index out of bounds!");
 
         data = (STRING**)PMC_data(SELF);

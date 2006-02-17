@@ -39,7 +39,7 @@ Returns the Parrot string value of the element at index C<key>.
     STRING* get_string_keyed_int (INTVAL key) {
         STRING **data;
         if (key < 0)
-            internal_exception(OUT_OF_BOUNDS,
+            real_exception(INTERP, NULL, E_IndexError,
                 "ResizableStringArray: index out of bounds!");
         if(key >= PMC_int_val(SELF))
             DYNSELF.set_integer_native(key+1);
@@ -61,7 +61,7 @@ Sets the Parrot string value of the element at index C<key> to C<value>.
     void set_string_keyed_int (INTVAL key, STRING* value) {
         STRING **data;
         if (key < 0)
-            internal_exception(OUT_OF_BOUNDS,
+            real_exception(INTERP, NULL, E_IndexError,
                 "ResizableStringArray: index out of bounds!");
         if(key >= PMC_int_val(SELF))
             DYNSELF.set_integer_native(key+1);
@@ -103,7 +103,7 @@ Removes and returns the last element in the array.
 
         size = PMC_int_val(SELF);
         if (size == 0) {
-            internal_exception(OUT_OF_BOUNDS,
+            real_exception(INTERP, NULL, E_IndexError,
                     "ResizableStringArray: Can't pop from an empty array!");
         }
         value = DYNSELF.get_string_keyed_int(size-1);
@@ -123,7 +123,7 @@ Resizes the array to C<size> elements.
 
     void set_integer_native (INTVAL size) {
         if (size < 0)
-            internal_exception(OUT_OF_BOUNDS,
+            real_exception(INTERP, NULL, E_IndexError,
                     "ResizableStringArray: Can't resize!");
 
         if(!PMC_data(SELF)) {
@@ -182,12 +182,12 @@ Creates and returns a copy of the array.
 /*
 
 =item C<STRING* shift_string()>
-        
+
 Removes and returns an item from the start of the array.
 
-=cut    
-                
-*/  
+=cut
+
+*/
 
     STRING* shift_string () {
         INTVAL size;
@@ -195,7 +195,7 @@ Removes and returns an item from the start of the array.
 
         size = PMC_int_val(SELF);
         if (size == 0)
-            internal_exception(OUT_OF_BOUNDS,
+            real_exception(INTERP, NULL, E_IndexError,
                     "ResizableStringArray: Can't shift from an empty array!");
 
         value = DYNSELF.get_string_keyed_int(0);
@@ -206,12 +206,12 @@ Removes and returns an item from the start of the array.
 /*
 
 =item C<PMC* shift_pmc()>
-        
+
 Removes and returns a String PMC from the start of the array.
 
-=cut    
-                
-*/  
+=cut
+
+*/
 
     PMC* shift_pmc () {
         INTVAL size;
@@ -220,7 +220,7 @@ Removes and returns a String PMC from the start of the array.
 
         size = PMC_int_val(SELF);
         if (size == 0)
-            internal_exception(OUT_OF_BOUNDS,
+            real_exception(INTERP, NULL, E_IndexError,
                     "ResizableStringArray: Can't shift from an empty array!");
 
         value = DYNSELF.get_string_keyed_int(0);
@@ -228,7 +228,7 @@ Removes and returns a String PMC from the start of the array.
         VTABLE_set_string_native(INTERP, ret, value);
         DYNSELF.delete_keyed_int(0);
         return ret;
-    } 
+    }
 
 /*
 
@@ -239,12 +239,12 @@ of the array.
 
 =cut
 
-*/  
+*/
 
     void unshift_string (STRING *value) {
         PMC **data; 
         INTVAL size, i;
-        
+
         size = PMC_int_val(SELF);
         data = (PMC**)PMC_data(SELF);
 

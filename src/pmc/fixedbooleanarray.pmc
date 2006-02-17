@@ -31,7 +31,7 @@ The C<FixedBooleanArray PMC> is extended by the C<ResizableBooleanArray PMC>.
 
 static void
 booleanarray_init(Interp *interpreter, PMC *self) {
-    PMC_int_val2(self) = 0;     
+    PMC_int_val2(self) = 0;
     PMC_data(self) = NULL;
 }
 
@@ -47,11 +47,11 @@ booleanarray_clone(Interp *interpreter, PMC *self, PMC *dest) {
 
 static void
 booleanarray_clear(Interp *interpreter, PMC *self) {
-    PMC_int_val2(self) = 0;     
+    PMC_int_val2(self) = 0;
 }
 
 pmclass FixedBooleanArray need_ext does array {
-    
+
 /*
 
 =back
@@ -121,7 +121,7 @@ Creates and returns a copy of the array.
     PMC* clone () {
         PMC * dest = pmc_new(INTERP, SELF->vtable->base_type);
         PMC_int_val(dest) = PMC_int_val(SELF);
-    
+
         booleanarray_clone(INTERP, SELF, dest);
         PObj_active_destroy_SET(dest);
         return dest;
@@ -182,9 +182,9 @@ Returns the integer value of the element at index C<key>.
         Parrot_UInt1 *sd = PMC_data(SELF);
 
         if (key < 0 || key >= PMC_int_val(SELF))
-            internal_exception(OUT_OF_BOUNDS, 
+            real_exception(INTERP, NULL, E_IndexError,
                 "FixedBooleanArray: index out of bounds!");
-        
+
         return ( sd[key/BITS_PER_CHAR] & ( 1 << ( key % BITS_PER_CHAR ) )) ? 1 : 0;
     }
 
@@ -309,7 +309,8 @@ Resizes the array to C<size> elements.
 
     void set_integer_native (INTVAL size) {
         if (PMC_int_val(SELF) || size < 1)
-            internal_exception(OUT_OF_BOUNDS, "FixedBooleanArray: Can't resize!");
+            real_exception(INTERP, NULL, E_IndexError,
+                    "FixedBooleanArray: Can't resize!");
 
         PMC_int_val(SELF) = size;
         PMC_int_val2(SELF) = (size / BITS_PER_CHAR + 1) * BITS_PER_CHAR;
@@ -330,7 +331,7 @@ Sets the integer value of the element at index C<key> to C<value>.
         Parrot_UInt1 *sd = PMC_data(SELF);
 
         if (key < 0 || key >= PMC_int_val(SELF))
-            internal_exception(OUT_OF_BOUNDS, 
+            real_exception(INTERP, NULL, E_IndexError,
                 "FixedBooleanArray: index out of bounds!");
 
         if ( value ) {
@@ -385,7 +386,7 @@ C<value>.
         INTVAL k = key_integer(INTERP, key);
         DYNSELF.set_number_keyed_int(k, value);
     }
-    
+
 /*
 
 =item C<void set_string_keyed_int(INTVAL key, STRING *value)>
@@ -528,7 +529,6 @@ sets them all to false.
 
 */
 
-    
     METHOD void fill(INTVAL fill) {
         Parrot_UInt1 *sd = PMC_data(SELF);
         INTVAL j;

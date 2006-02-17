@@ -23,7 +23,7 @@ which stores FLOATVALs. It uses Float PMCs to do all necessary conversions.
 #include "parrot/parrot.h"
 
 pmclass ResizableFloatArray extends FixedFloatArray need_ext does array {
-    
+
 
 /*
 
@@ -42,7 +42,7 @@ Returns the floating-point value of the element at index C<key>.
                 "ResizableFloatArray: index out of bounds!");
         if (key >= PMC_int_val(SELF))
             DYNSELF.set_integer_native(key+1);
-        
+
         data = (FLOATVAL *)PMC_data(SELF);
         return data[key];
     }

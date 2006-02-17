@@ -22,7 +22,7 @@ it uses Float PMCs to do all necessary conversions
 #include "parrot/parrot.h"
 
 pmclass FixedFloatArray need_ext does array {
-    
+
 /*
 
 =back
@@ -89,12 +89,12 @@ Creates and returns a copy of the array.
     PMC* clone () {
         INTVAL size;
         PMC * dest = pmc_new(INTERP, SELF->vtable->base_type);
-    
+
         if (!PMC_data(SELF))
             return dest;
         size = PMC_int_val(SELF);
         PMC_int_val(dest) = size;
-        
+
         PMC_data(dest) = mem_sys_allocate(size * sizeof(FLOATVAL));
         mem_sys_memcopy(PMC_data(dest), PMC_data(SELF), size*sizeof(FLOATVAL));
         PObj_active_destroy_SET(dest);
@@ -187,9 +187,9 @@ Returns the floating-point value of the element at index C<key>.
     FLOATVAL get_number_keyed_int (INTVAL key) {
         FLOATVAL *data;
         if (key < 0 || key >= PMC_int_val(SELF))
-            internal_exception(OUT_OF_BOUNDS, 
+            real_exception(INTERP, NULL, E_IndexError,
                 "FixedFloatArray: index out of bounds!");
-        
+
         data = (FLOATVAL *)PMC_data(SELF);
         return data[key];
     }
@@ -288,7 +288,8 @@ Resizes the array to C<size> elements.
 
     void set_integer_native (INTVAL size) {
         if (PMC_int_val(SELF) || size < 1)
-            internal_exception(OUT_OF_BOUNDS, "FixedFloatArray: Can't resize!");
+            real_exception(INTERP, NULL, E_IndexError,
+                    "FixedFloatArray: Can't resize!");
         PMC_int_val(SELF) = size;
         PMC_data(SELF) = mem_sys_allocate(size * sizeof(FLOATVAL));
         PObj_active_destroy_SET(SELF);
@@ -338,7 +339,7 @@ C<value>.
     void set_number_keyed_int (INTVAL key, FLOATVAL value) {
         FLOATVAL *data;
         if (key < 0 || key >= PMC_int_val(SELF))
-            internal_exception(OUT_OF_BOUNDS, 
+            real_exception(INTERP, NULL, E_IndexError,
                 "FixedFloatArray: index out of bounds!");
 
         data = (FLOATVAL*)PMC_data(SELF);
@@ -361,7 +362,7 @@ C<value>.
         k = key_integer(INTERP, key);
         DYNSELF.set_number_keyed_int(k, value);
     }
-    
+
 /*
 
 =item C<void set_string_keyed_int(INTVAL key, STRING *value)>

@@ -86,7 +86,7 @@ ok 1
 ok 2
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "Resetting array size (and getting an exception)");
+pasm_output_like(<<'CODE', <<'OUTPUT', "Resetting array size (and getting an exception)");
 	new P0, .FixedStringArray
 
 	set I0,P0
@@ -97,7 +97,8 @@ pasm_output_is(<<'CODE', <<'OUTPUT', "Resetting array size (and getting an excep
 
         end
 CODE
-FixedStringArray: Can't resize!
+/FixedStringArray: Can't resize!
+current instr\.:/
 OUTPUT
 #VIM's syntax highlighter needs this line
 
@@ -159,9 +160,8 @@ ok 2
 ok 3
 OUTPUT
 
-# TODO: Rewrite these properly when we have exceptions
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "Setting out-of-bounds elements");
+pasm_output_like(<<'CODE', <<'OUTPUT', "Setting out-of-bounds elements");
         new P0, .FixedStringArray
         set P0, 1
 
@@ -169,17 +169,19 @@ pasm_output_is(<<'CODE', <<'OUTPUT', "Setting out-of-bounds elements");
 
 	end
 CODE
-FixedStringArray: index out of bounds!
+/FixedStringArray: index out of bounds!
+current instr\.:/
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "Getting out-of-bounds elements");
+pasm_output_like(<<'CODE', <<'OUTPUT', "Getting out-of-bounds elements");
         new P0, .FixedStringArray
         set P0, 1
 
 	set I0, P0[1]
 	end
 CODE
-FixedStringArray: index out of bounds!
+/FixedStringArray: index out of bounds!
+current instr\.:/
 OUTPUT
 
 
@@ -311,7 +313,7 @@ CODE
 abcdefghijkl
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "Cloning before size is set");
+pasm_output_like(<<'CODE', <<'OUTPUT', "Cloning before size is set");
      new P0, .FixedStringArray
      clone P1, P0
      set P0, 10
@@ -321,8 +323,9 @@ pasm_output_is(<<'CODE', <<'OUTPUT', "Cloning before size is set");
      set P2, 30
      end
 CODE
-ok
+/ok
 FixedStringArray: Can't resize!
+current instr\.:/
 OUTPUT
 #VIM's syntax highlighter needs this line
 
