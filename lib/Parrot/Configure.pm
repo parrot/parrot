@@ -206,7 +206,9 @@ sub runsteps
 
         my $step = $step_name->new;
 
-        my $description = $step->description;
+        # XXX This works. but is propably not a good design.
+        # Using $step->description() would be nicer   
+        my $description = $step_name->description();
         $description = "" unless defined $description;
 
         # set per step verbosity
