@@ -318,7 +318,9 @@ Parrot_alloc_context(Interp *interpreter, INTVAL *n_regs_used)
             ptr = mem_sys_allocate_zeroed(to_alloc);
     }
 #if CTX_LEAK_DEBUG
-    fprintf(stderr, "alloc %p\n", ptr);
+    if (Interp_debug_TEST(interpreter, PARROT_CTX_DESTROY_DEBUG_FLAG)) {
+        fprintf(stderr, "[alloc ctx %p]\n", ptr);
+    }
 #endif
     CONTEXT(interpreter->ctx) = ctx = ptr;
     ctx->regs_mem_size = reg_alloc;
@@ -353,10 +355,8 @@ Parrot_free_context(Interp *interpreter, parrot_context_t *ctxp, int re_use)
         if (Interp_debug_TEST(interpreter, PARROT_CTX_DESTROY_DEBUG_FLAG)) {
             /* can't probably PIO_eprintf here */
             parrot_sub_t doomed = PMC_sub(ctxp->current_sub);
-            fprintf(stderr,
-                    "'ctx of sub '%s' is really dead "
-                    "now and not pining at all\n",
-                    (char*)doomed->name->strstart);
+            fprintf(stderr, "[free  ctx %p of sub '%s']\n",
+                    ctxp, (char*)doomed->name->strstart);
         }
 #endif
         ptr = ctxp;
@@ -365,9 +365,6 @@ Parrot_free_context(Interp *interpreter, parrot_context_t *ctxp, int re_use)
         assert(slot < interpreter->ctx_mem.n_free_slots);
         *(void **)ptr = interpreter->ctx_mem.free_list[slot];
         interpreter->ctx_mem.free_list[slot] = ptr;
-#if CTX_LEAK_DEBUG
-        fprintf(stderr, "free  %p\n", ctxp);
-#endif
     }
 }
 

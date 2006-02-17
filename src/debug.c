@@ -2409,11 +2409,14 @@ PDB_backtrace(Interp *interpreter)
 
     /* backtrace: follow the continuation chain */
     while (1) {
+        parrot_cont_t sub_cont;
         sub = ctx->current_cont;
         if (!sub)
             break;
-        str = Parrot_Context_infostr(interpreter,
-            PMC_cont(sub)->to_ctx);
+        sub_cont = PMC_cont(sub);
+        if (!sub_cont)
+            break;
+        str = Parrot_Context_infostr(interpreter, sub_cont->to_ctx);
         if (!str)
             break;
         

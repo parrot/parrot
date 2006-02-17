@@ -102,6 +102,13 @@ Destroys the continuation.
     void destroy () {
         struct Parrot_cont * cc = PMC_cont(SELF);
         if (cc) {
+#if CTX_LEAK_DEBUG
+            if (Interp_debug_TEST(interpreter, PARROT_CTX_DESTROY_DEBUG_FLAG)) {
+                fprintf(stderr,
+                        "[destroy cont    %p, to_ctx %p, from_ctx %p]\n",
+                        SELF, cc->to_ctx, cc->from_ctx);
+            }
+#endif
             if (cc->from_ctx)
                 Parrot_free_context(interpreter, cc->from_ctx, 0);
             mem_sys_free(cc);
@@ -219,6 +226,18 @@ destination to continue execution.
         parrot_context_t *ctx;
         opcode_t *pc;
 
+#if CTX_LEAK_DEBUG
+        if (Interp_debug_TEST(interpreter, PARROT_CTX_DESTROY_DEBUG_FLAG)) {
+            fprintf(stderr,
+                    "[invoke cont    %p, to_ctx %p, from_ctx %p (refs %d)]\n",
+                    SELF, cc->to_ctx, cc->from_ctx,
+                    (int) cc->from_ctx->ref_count);
+        }
+#endif
+        if (! cc->to_ctx) {
+            real_exception(interpreter, NULL, INVALID_OPERATION,
+                           "Continuation invoked after deactivation.");
+        }
         /* debug print before context is switched */
         if (Interp_trace_TEST(INTERP, PARROT_TRACE_SUB_CALL_FLAG)) {
             PMC *sub = cc->to_ctx->current_sub;

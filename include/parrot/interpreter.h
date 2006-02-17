@@ -169,6 +169,13 @@ typedef union {
     INTVAL       *regs_i;
 } Regs_ni;
 
+/* If CTX_LEAK_DEBUG is enabled, then turning on PARROT_CTX_DESTROY_DEBUG_FLAG
+   will print tons of detail about when Parrot_Context structures are allocated
+   and deallocated to stderr.  If CTX_LEAK_DEBUG is disabled, then all of the
+   relevant code is omitted, and PARROT_CTX_DESTROY_DEBUG_FLAG has no effect.
+ */
+#define CTX_LEAK_DEBUG 1
+
 typedef struct Parrot_Context {
     /* common header with Interp_Context */
     struct Parrot_Context *unused1;	/* placeholder */

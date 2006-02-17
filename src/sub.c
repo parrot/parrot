@@ -125,7 +125,8 @@ new_closure(Interp *interp)
 new_continuation(Interp *interp, struct Parrot_cont *to)>
 
 Returns a new C<Parrot_cont> to the context of C<to> with its own copy of the
-current interpreter context.
+current interpreter context.  If C<to> is C<NULL>, then the C<to_ctx> is set
+to the current context.
 
 =cut
 
@@ -454,6 +455,12 @@ parrot_new_closure(Interp *interpreter, PMC *sub_pmc)
     clos->outer_ctx = ctx;
     /* the closure refs now this context too */
     ctx->ref_count++;
+#if CTX_LEAK_DEBUG
+    if (Interp_debug_TEST(interpreter, PARROT_CTX_DESTROY_DEBUG_FLAG)) {
+        fprintf(stderr, "[alloc closure  %p, outer_ctx %p, ref_count=%d]\n",
+                clos_pmc, ctx, (int) ctx->ref_count);
+    }
+#endif
     return clos_pmc;
 }
 /*

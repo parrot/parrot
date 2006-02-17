@@ -548,6 +548,10 @@ op set_returns(inconst PMC) {
     if (PMC_cont(ccont)->address) {
 	/* else its from runops_fromc */
 	caller_ctx = PMC_cont(ccont)->to_ctx;
+	if (! caller_ctx) {
+	    real_exception(interpreter, NULL, INVALID_OPERATION,
+			   "null caller_ctx for ccont %p", ccont);
+	}
 	parrot_pass_args(interpreter, ctx, caller_ctx,
 		PARROT_OP_get_results_pc);
     }

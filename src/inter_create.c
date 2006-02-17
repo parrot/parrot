@@ -27,8 +27,6 @@ Create or destroy a Parrot interpreter.c
 Interp interpre;
 #endif
 
-#define CTX_LEAK_DEBUG 0
-
 #define ATEXIT_DESTROY
 
 /*
