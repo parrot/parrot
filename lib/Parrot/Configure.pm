@@ -246,10 +246,11 @@ sub runsteps
 
         # did the step return itself?
         eval { $ret->can('result'); };
+        # if not, report the result and exit
         if ($@) {
             my $result = $step->result || 'no result returned';
             carp "\nstep $step failed: " . $result;
-            return;
+            exit(1);
         }
 
         my $result = $step->result || 'done';
@@ -282,5 +283,7 @@ F<docs/configuration.pod>, L<Parrot::Configure::Data>,
 L<Parrot::Configure::Step>, L<Parrot::Configure::Step::Base>
 
 =cut
+
+# vim: expandtab shiftwidth=4
 
 1;
