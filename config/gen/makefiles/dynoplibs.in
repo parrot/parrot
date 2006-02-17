@@ -35,6 +35,9 @@ dynext-clean :
 clean : testclean dynext-clean
 	$(RM_F) "*.h" "*.c" "*$(LOAD_EXT)" "*$(O)"
 
+archclean :
+	$(RM_F) "*$(LOAD_EXT)" "*$(O)" Makefile
+
 realclean: clean
 	$(RM_F) Makefile
 

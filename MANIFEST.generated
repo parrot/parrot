@@ -2,7 +2,9 @@
 # See tools/dev/install_files.pl for documentation on the
 # format of this file.
 # Please re-sort this file after *EVERY* modification
+blib/lib/libparrot.0.4.1.dylib                    [main]lib
 blib/lib/libparrot.a                              [main]lib
+blib/lib/libparrot.dylib                          [main]lib
 blib/lib/libparrot.so                             [main]lib
 blib/lib/libparrot.so.0.4.1                       [main]lib
 disassemble                                       [main]bin

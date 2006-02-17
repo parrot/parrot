@@ -26,6 +26,7 @@ sub runstep
     $ldflags .= " -flat_namespace ";
 
     $conf->data->set(
+        darwin              => 1,
         ccflags             => $ccflags,
         ldflags             => $ldflags,
         ccwarn              => "-Wno-shadow",
@@ -41,15 +42,13 @@ sub runstep
         # XXX when built against a dynamic libparrot installable_parrot records
         # the path to the blib version of the library
         parrot_is_shared     => 0,
-        libparrot_shared        => 'libparrot$(SHARE_EXT).$(SOVERSION)',
+        libparrot_shared        => 'libparrot.$(SOVERSION)$(SHARE_EXT)',
         libparrot_shared_alias  => 'libparrot$(SHARE_EXT)',
         # This variable needs renaming to be more general
         # XXX ugly hack for rpath_lib in config/inter/libparrot.pm
         rpath                   => "-L",
         libparrot_soname    => "-install_name " .
-                               $conf->data->get('build_dir') .
-                               $conf->data->get('slash') .
-                               $conf->data->get('blib_dir') .
+                               $conf->data->get('lib_dir') .
                                $conf->data->get('slash') .
                                "libparrot" .
                                $conf->data->get('share_ext')
