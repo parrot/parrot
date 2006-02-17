@@ -58,7 +58,9 @@ to the previous values and the allocated register memory is discarded.
  * The pointer C<ctx_mem.free> holds the next usable
  * location. With (full) continuations the C<ctx_mem.free> pointer can't be
  * moved below the C<ctx_mem.threshold>, which is the highest context pointer
- * of all avtive continuations.
+ * of all active continuations.
+ * [the code for this is incomplete; it had suffered some bit-rot and was
+ * getting in the way of maintaining the other case.  -- rgr, 4-Feb-06.]
  *
  * TODO GC has to lower this threshold when collecting continuations.
  *
@@ -89,51 +91,8 @@ Create initial interpreter context.
 */
 
 #if CHUNKED_CTX_MEM
-static void
-new_context_mem(Interp *interpreter, context_mem *ctx_mem)
-{
-    ctx_mem->data = mem_sys_allocate(CTX_ALLOC_SIZE);
-    ctx_mem->free = ctx_mem->data;
-    ctx_mem->threshold = NULL;
-    ctx_mem->prev = NULL;
-}
-
-void
-destroy_context(Interp *interpreter)
-{
-    context_mem *ctx_mem, *prev;
-
-    mem_sys_free(interpreter->ctx_mem.data);
-    for (ctx_mem = interpreter->ctx_mem.prev; ctx_mem; ) {
-        prev = ctx_mem->prev;
-        mem_sys_free(ctx_mem->data);
-        mem_sys_free(ctx_mem);
-        ctx_mem = prev;
-    }
-}
-
-void
-create_initial_context(Interp *interpreter)
-{
-    size_t to_alloc = sizeof(struct parrot_regs_t) + ALIGNED_CTX_SIZE;
-    void *p;
-    parrot_context_t *ctx;
-
-    new_context_mem(interpreter, &interpreter->ctx_mem);
-    p = interpreter->ctx_mem.free;
-    CONTEXT(interpreter->ctx) = ctx = p;
-    p = interpreter->ctx_mem.free + ALIGNED_CTX_SIZE;
-    interpreter->ctx.bp = p;
-    interpreter->ctx.bp_ps.regs_s = (STRING**) ((char*)p +
-        offsetof(struct parrot_regs_t, string_reg.registers[0]));
-    interpreter->ctx_mem.free += to_alloc;
-    memset(ctx, 0, sizeof(struct Parrot_Context));
-    ctx->bp = interpreter->ctx.bp;
-    ctx->bp_ps = interpreter->ctx.bp_ps;
-    ctx->prev = NULL;
-}
-
-#else
+#error "Non-working code removed."
+#endif
 
 void
 destroy_context(Interp *interpreter)
@@ -173,8 +132,6 @@ create_initial_context(Interp *interpreter)
      */
     Parrot_alloc_context(interpreter, num_regs);
 }
-
-#endif
 
 /*
 
@@ -289,112 +246,6 @@ init_context(Interp *interpreter, parrot_context_t *ctx, parrot_context_t *old)
     /* other stuff is set inside Sub.invoke */
     clear_regs(interpreter, ctx);
 }
-
-#if CHUNKED_CTX_MEM
-void
-Parrot_alloc_context(Interp *interpreter, INTVAL *n_regs_used)
-{
-
-    parrot_context_t ctx;
-    size_t used;
-
-    /* for now still use 32 regs fixed chunks */
-    size_t to_alloc = sizeof(struct parrot_regs_t) + ALIGNED_CTX_SIZE;
-
-    used = interpreter->ctx_mem.free - interpreter->ctx_mem.data;
-    if (used + to_alloc >= CTX_ALLOC_SIZE ) {
-        /* trigger a DOD run to reuse ctx hel by dead continuations */
-        if (interpreter->ctx_mem.threshold) {
-            Parrot_do_dod_run(interpreter, DOD_trace_stack_FLAG);
-            used = interpreter->ctx_mem.free - interpreter->ctx_mem.data;
-        }
-        if (used + to_alloc >= CTX_ALLOC_SIZE ) {
-            context_mem *ctx_mem = mem_sys_allocate(sizeof(context_mem));
-            memcpy(ctx_mem, &interpreter->ctx_mem, sizeof(context_mem));
-            ctx_mem->prev = NULL;
-            new_context_mem(interpreter, &interpreter->ctx_mem);
-            interpreter->ctx_mem.prev = ctx_mem;
-        }
-    }
-    ctx = interpreter->ctx;
-    LVALUE_CAST(char *, interpreter->ctx.bp) =
-        interpreter->ctx_mem.free + ALIGNED_CTX_SIZE;
-    interpreter->ctx_mem.free += to_alloc;
-    init_context(interpreter, ctx);
-}
-
-void
-Parrot_set_context_threshold(Interp * interpreter, parrot_context_t *ctxp)
-{
-    char *used_ctx_mem;
-    parrot_context_t ctx = *ctxp;
-
-    used_ctx_mem = (char *)ctx.bp + sizeof(struct parrot_regs_t);
-    if ((UINTVAL)used_ctx_mem > (UINTVAL)interpreter->ctx_mem.free)
-        interpreter->ctx_mem.free = used_ctx_mem;
-}
-
-void
-Parrot_free_context(Interp *interpreter, parrot_context_t *ctxp, int re_use)
-{
-
-    struct Parrot_Context *prev;
-    size_t to_alloc = sizeof(struct parrot_regs_t) + ALIGNED_CTX_SIZE;
-    parrot_context_t ctx = *ctxp;
-    char *used_ctx_mem;
-
-    prev = CONTEXT(ctx)->prev;
-    if (!prev) {
-        /* returning from main */
-        return;
-    }
-    CONTEXT(ctx)->prev = NULL;
-    used_ctx_mem = (char *)ctx.bp + sizeof(struct parrot_regs_t);
-
-    /* if we are at the top end of memory
-     * (e.g. return continuation was invoked)
-     * then lower free
-     */
-    if (used_ctx_mem == interpreter->ctx_mem.free &&
-            interpreter->ctx_mem.free > interpreter->ctx_mem.threshold) {
-        interpreter->ctx_mem.free -= to_alloc;
-        if (interpreter->ctx_mem.free == interpreter->ctx_mem.data) {
-            /* reached lower end of context chunk */
-            if (interpreter->ctx_mem.prev) {
-                context_mem *ctx_mem = interpreter->ctx_mem.prev;
-#if 0
-                /* TODO
-                 * can't do that yet
-                 * runops_fromc still fetches results after the
-                 * return continuation is invoked
-                 * XXX leak the register memory for now
-                 */
-                mem_sys_free(interpreter->ctx_mem.data);
-#endif
-                memcpy(&interpreter->ctx_mem, ctx_mem, sizeof(context_mem));
-                mem_sys_free(ctx_mem);
-            }
-        }
-    }
-    if (!re_use) {
-        /*
-         * real continuation was GCed
-         * mark this ctx area dead
-         */
-        if (interpreter->ctx_mem.threshold == used_ctx_mem) {
-            /* if threshold is at the end of used memory, lower threshold */
-            interpreter->ctx_mem.threshold -= to_alloc;
-        }
-        else {
-            /* mark it dead by setting a uniq signature into the
-             * prev pointer location
-             */
-            *(void**)&CONTEXT(ctx)->prev = (void*) 0xdeaddead;
-        }
-    }
-}
-
-#else
 
 struct Parrot_Context *
 Parrot_dup_context(Interp *interpreter, struct Parrot_Context *old)
@@ -526,7 +377,6 @@ Parrot_set_context_threshold(Interp * interpreter, parrot_context_t *ctxp)
     /* nothing to do */
 }
 
-#endif
 /*
 
 =back
