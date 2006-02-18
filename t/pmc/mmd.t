@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 31;
+use Parrot::Test tests => 32;
 
 =head1 NAME
 
@@ -1057,4 +1057,23 @@ pir_output_is(<<'CODE', <<'OUTPUT', "multisub vs find_name");
 .end
 CODE
 MultiSub
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "multisub w void");
+.sub main :main
+    foo('xx')
+    foo()
+    foo('xx')
+.end
+.sub foo :multi(string)
+    .param pmc x
+    print "foo string\n"
+.end
+.sub foo :multi()
+    print "foo\n"
+.end
+CODE
+foo string
+foo
+foo string
 OUTPUT

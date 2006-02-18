@@ -664,7 +664,7 @@ outer: OUTER '(' STRINGC ')'
    ;
 
 multi_types:
-     /* empty */     { $$ = 0; }
+     /* empty */     { add_pcc_multi(cur_call, NULL); }
    | multi_types COMMA multi_type { $$ = 0; add_pcc_multi(cur_call, $3); }
    | multi_type      { $$ = 0;  add_pcc_multi(cur_call, $1);}
    ;
