@@ -24,6 +24,7 @@ tracker in a healthy state.  I<This means you!>
 
 The Parrot bug tracker is currently the same as the I<Perlbug> system used for
 Perl5 Development.  It is available via HTTP at L<http://rt.perl.org>.
+The Parrot issues are in the queue I<parrot>.
 
 =head1 BUG HANDLING PROCEDURES
 
@@ -34,12 +35,20 @@ status of C<new>.
 
 =over 4
 
-=item * Check for duplicate bugs
+=item * Is this spam?
 
-RT doesn't handle them in a graceful manner.  Add a comment to the bug along
-the lines of "Duplicate of Bug #123" and change the Tag field to "duplicate".
+Assign the issue to the queue I<spam>.
+
+=item * Is this a duplication of an existing bug?
+
+RT doesn't handle that case in a graceful manner. 
+Set the relationship 'dependent on' to the duplicate issue. 
+Add a comment to the bug along the lines of 
+"Duplicate of Bug #123" and change the Tag field to "duplicate".
 
 =item * Is there enough information?
+
+Ask for more input.
 
 =item * Is it a [TODO] bug?
 
