@@ -496,7 +496,7 @@ mk_multi_sig(Interp* interpreter, SymReg *r)
     n = pcc_sub->nmulti;
     VTABLE_set_integer_native(interpreter, multi_sig, n);
     /* :multi() n = 1, reg = NULL */
-    if (!pcc_sub->multi[i]) {
+    if (!pcc_sub->multi[0]) {
         sig = string_from_cstring(interpreter, "__VOID", 0);
         VTABLE_set_string_keyed_int(interpreter, multi_sig, 0, sig);
         return multi_sig;
