@@ -8,7 +8,6 @@ O = @o@
 #
 OPLIBS = \
   myops \
-  dotnet \
   dan
 
 BUILD = $(PERL) "@build_dir@@slash@tools@slash@build@slash@dynoplibs.pl"
