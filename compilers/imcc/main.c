@@ -436,6 +436,37 @@ do_pre_process(Parrot_Interp interp)
             case FILECOMMENT:   printf("setfile \"%s\"\n", val.s); break;
             case LINECOMMENT:   printf("setline %d\n", val.t); break;
 
+            case PLUS_ASSIGN:   printf("+= ");break;
+            case MINUS_ASSIGN:  printf("-= ");break;
+            case MUL_ASSIGN:    printf("*= ");break;
+            case DIV_ASSIGN:    printf("/= ");break;
+            case MOD_ASSIGN:    printf("%%= ");break;
+            case FDIV_ASSIGN:   printf("//= ");break;
+            case BAND_ASSIGN:   printf("&= ");break;
+            case BOR_ASSIGN:    printf("|= ");break;
+            case BXOR_ASSIGN:   printf("~= ");break;
+            case SHR_ASSIGN:    printf(">>= ");break;
+            case SHL_ASSIGN:    printf("<<= ");break;
+            case SHR_U_ASSIGN:  printf(">>>= ");break;
+            case CONCAT_ASSIGN: printf(".= ");break;
+
+            case MAIN:          printf(":main");break;
+            case LOAD:          printf(":load");break;
+            case IMMEDIATE:     printf(":immediate");break;
+            case POSTCOMP:      printf(":postcomp");break;
+            case ANON:          printf(":anon");break;
+            case OUTER:         printf(":outer");break;
+            case NEED_LEX:      printf(":lex");break;
+            case METHOD:        printf(":method");break;
+
+            case UNIQUE_REG:    printf(":unique_reg");break;
+            case ADV_FLAT:      printf(":flat");break;
+            case ADV_SLURPY:    printf(":slurpy");break;
+            case ADV_OPTIONAL:  printf(":optional");break;
+            case ADV_OPT_FLAG:  printf(":opt_flag");break;
+            case ADV_NAMED:     printf(":named");break;
+            case ADV_ARROW:     printf("=>");break;
+
             default:
                      if (c < 255)
                          printf("%c", c);
