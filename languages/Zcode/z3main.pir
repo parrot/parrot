@@ -1,9 +1,12 @@
 # $Id$
 
+#####################################################
 #
 # initialize - create Zmachine object
 #
-.sub zm_init
+#####################################################
+
+.sub "zm_init"
   newclass $P0, "Zmachine"
   addattribute $P0, "file"
   addattribute $P0, "image"
@@ -12,14 +15,18 @@
   .return($P0)
 .end
 
+
+#####################################################
 #
 # utilities
 #
+#####################################################
 
 # S0 = to_hex(I0)
 
-.sub to_hex
+.sub "to_hex"
   .param int c
+
   .local pmc ar, val
   ar = new FixedPMCArray
   ar = 1
@@ -33,8 +40,9 @@
 # 1..15  => "I16" ...
 # 16 ... => "G0" ...
 
-.sub to_var
+.sub "to_var"
   .param int val
+
   .local pmc ar
   if val < 16 goto no_global
     ar = new FixedPMCArray
@@ -61,12 +69,14 @@ done:
 #
 # Zmachine methods
 #
+#####################################################
 
 .namespace ["Zmachine"]
 
-.sub instantiate method
+.sub "instantiate" method
   .param string file
   .param pmc opts
+
   .local pmc instance
   $I0 = typeof self
   instance = new $I0
@@ -77,8 +87,9 @@ done:
 
 # load bytecode file
 
-.sub load method
+.sub "load" method
   .param string file
+
   .local pmc pfile, im, io
   pfile = new String
   pfile = file
@@ -95,15 +106,16 @@ done:
 
 # set command line options
 
-.sub set_opts method
+.sub "set_opts" method
   .param pmc opts
+
   setattribute self, "Zmachine\0opts", opts
 .end
 
 # TODO print some stats if --stats
 # also check z version
 
-.sub stats method
+.sub "stats" method
   .local pmc im
   im = getattribute self, "Zmachine\0image"
   $I0 = im[0]
@@ -126,8 +138,9 @@ vers_ok:
 ## return word, new offset
 # 4.2.1 msb first
 
-.sub get_word method
+.sub "get_word" method
   .param int ofs
+
   .local int lo, hi
   .local pmc im
   im = getattribute self, "Zmachine\0image"
@@ -149,7 +162,7 @@ vers_ok:
 # compile PIR and run it
 #
 
-.sub translate method
+.sub "translate" method
   .local pmc comp, im, f, o, t
   subclass $P0, "Zmachine", "ZComp"
   addattribute $P0, "labels"
@@ -191,19 +204,19 @@ vers_ok:
 #
 
 .sub "debug" method
-  .param pmc opts
+  .local pmc opts
   opts = getattribute self, "Zmachine\0opts"
   $I0 = defined opts["debug"]
   .return ($I0)
 .end
 
-.sub image method
+.sub "image" method
   .local pmc im
   im = getattribute self, "Zmachine\0image"
   .return(im)
 .end
 
-.sub file method
+.sub "file" method
   .local pmc f
   f = getattribute self, "Zmachine\0file"
   .return(f)
@@ -215,7 +228,7 @@ vers_ok:
 
 .namespace ["ZComp"]
 
-.sub __init method
+.sub "__init" method
   $P0 = new Hash
   setattribute self, "ZComp\0labels", $P0
   $P0 = new Hash
@@ -235,7 +248,7 @@ vers_ok:
 # some accessor methods
 #
 
-.sub ops method
+.sub "ops" method
   .local pmc o
   o = getattribute self, "ZComp\0ops"
   .return(o)
@@ -243,8 +256,9 @@ vers_ok:
 
 # return or add code
 
-.sub code method
+.sub "code" method
   .param string s
+
   .local pmc c
   c = getattribute self, "ZComp\0code"
 
@@ -263,8 +277,9 @@ no_add:
 #    the todo list
 # labels are set in a label hash
 #
-.sub translate method
+.sub "translate" method
   .param int pass
+
   .local int pc, deb, first
   .local pmc file
   first = 1
@@ -308,7 +323,7 @@ loop:
   goto loop
 fin:
   .local pmc code
-  code = self."code"()
+  code = self."code"("")
   .return (code)
 .end
 
@@ -316,10 +331,11 @@ fin:
 # Read/decode one sub
 # Return pc after reading the sub
 #
-.sub decode_one_sub method
+.sub "decode_one_sub" method
   .param int pc
   .param int first
   .param int pass
+
   .local int last, is_ret, label, deb
   .local string ops, type
   .local pmc args, im
@@ -432,9 +448,10 @@ inner:
 # the value in the seen hash is the
 # position of the locals count in the image
 #
-.sub remember_sub method
+.sub "remember_sub" method
   .param int adr
   .param int pc
+
   .local pmc todo, seen
   seen = getattribute self, "ZComp\0subs"
 
@@ -449,7 +466,7 @@ done:
 
 # Print macros at beginning of translated Z-machine
 # image, the global var, will automatically be loaded in every sub
-.sub emit_macros method
+.sub "emit_macros" method
       $S1 = ".macro GET_WORD(w, a)\n"
       $S1 .= "\t.w = image[.a]\n"
       $S1 .= "\t$I0 = .a\n"
@@ -474,9 +491,10 @@ done:
 # Treat MAIN slightly differently (It won't have locals, btw)
 # a sub may be called with 0..3 (7) args
 # TODO clear locals / set default values
-.sub emit_sub_header method
+.sub "emit_sub_header" method
     .param string address
     .param int first # first (main) sub?
+
     .local int i, j
     .local string assigns, declares
     .local int num_locals # will be a .param (or read it in this sub)
@@ -546,7 +564,7 @@ done:
 # decode one opcode byte
 #
 
-.sub decode_op method
+.sub "decode_op" method
   .param pmc im
   .param int pc
 
@@ -677,11 +695,12 @@ done:
 # v ... var
 #
 
-.sub decode_args method
+.sub "decode_args" method
   .param pmc im
   .param int pc
   .param pmc args
   .param string type
+
   .local pmc args, ar
   .local int len, i, val
   .local string t
@@ -724,7 +743,7 @@ done:
 # initialize z3 opcode list
 #
 
-.sub set_oplist method
+.sub "set_oplist" method
   .local pmc ops, ops_2op, ops_1op, ops_0op, ops_var, ops_ext
   ops = new FixedPMCArray
   ops = 5
@@ -823,7 +842,7 @@ done:
 .end
 
 
-.sub temp method
+.sub "temp" method
   .local pmc tc
   tc = getattribute self, "ZComp\0temp"
   inc tc
@@ -837,9 +856,10 @@ done:
 #    and adds it to the Z object
 # Converts value to signed integer if necessary.
 # Returns the string (e.g. "$I18" or "35") with the new value
-.sub emit_get method
+.sub "emit_get" method
   .param string var
   .param int is_signed # need to convert variable to signed int?
+
   .local string t, result, conv_temp
   .local int global_adr
   t = var[0]
@@ -898,9 +918,10 @@ no_conv:
 # still supposed to be unsigned.
 # 15."dec": "This is signed, so 0 decrements to -1"
 # I still think that that rule only matters for dec_chk
-.sub emit_store method
+.sub "emit_store" method
   .param string var
   .param string value
+
   .local string t
   .local int global_adr
   .local string conv_temp
@@ -958,9 +979,10 @@ no_stack:
 done:
 .end
 
-.sub decode_label method
+.sub "decode_label" method
   .param pmc im
   .param int pc
+
   .local int label, on_true
   label = im[pc]
   inc pc
@@ -1004,8 +1026,9 @@ decode_done:
 
 # store address of a label
 
-.sub remember_label method
+.sub "remember_label" method
   .param int adr
+
   .local pmc lab
   lab = getattribute self, "ZComp\0labels"
   $S0 = adr
