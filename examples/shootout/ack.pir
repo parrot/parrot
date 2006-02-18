@@ -1,7 +1,8 @@
-#!./parrot -C
+#!./parrot -Oc -Cj
 #
 # ackermann - ack(3, 9) is default 
 # shootout runs ack(3, 11)
+# time for ack(3,11):  0.8s (AMD X2@2000)
 # by Leopold Toetsch
 
 .sub main :main
