@@ -246,11 +246,11 @@ sub runsteps
 
         # did the step return itself?
         eval { $ret->can('result'); };
-        # if not, report the result and exit
+        # if not, report the result and return
         if ($@) {
             my $result = $step->result || 'no result returned';
             carp "\nstep $step failed: " . $result;
-            exit(1);
+            return;
         }
 
         my $result = $step->result || 'done';
