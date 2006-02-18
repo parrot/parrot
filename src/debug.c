@@ -29,6 +29,9 @@ debugger, and the C<debug> ops.
 #include "parrot/debug.h"
 #include "parrot/oplib/ops.h"
 
+
+static const char* GDB_P(Interp *interpreter, const char *s);
+
 /* na(c) [Next Argument (Char pointer)]
  *
  * Moves the pointer to the next argument in the user input.
@@ -378,7 +381,7 @@ PDB_run_command(Interp *interpreter, const char *command)
             break;
         case c_p:
         case c_print:
-            /* PDB_print(interpreter, command);  XXX */
+            PDB_print(interpreter, command); 
             break;
         case c_n:
         case c_next:
@@ -2142,11 +2145,20 @@ PDB_print_user_stack(Interp *interpreter, const char *command)
 =item C<void
 PDB_print(Interp *interpreter, const char *command)>
 
-Print interpreter registers. TODO
+Print interpreter registers. 
 
 =cut
 
 */
+
+void
+PDB_print(Interp *interpreter, const char *command)
+{
+    const char *s;
+        
+    s = GDB_P(interpreter->pdb->debugee, command);
+    PIO_eprintf(interpreter, "%s\n", s);
+}
 
 
 /*
@@ -2289,7 +2301,7 @@ This is the same as the information you get when running Parrot with\n\
 the -t option.\n");
             break;
         case c_print:
-            PIO_eprintf(interpreter,"No documentation yet");
+            PIO_eprintf(interpreter,"Print register: e.g. p I2\n");
             break;
         case c_info:
             PIO_eprintf(interpreter,
@@ -2408,7 +2420,7 @@ PDB_backtrace(Interp *interpreter)
  */
 
 static const char*
-GDB_P(Interp *interpreter, char *s) {
+GDB_P(Interp *interpreter, const char *s) {
     int t, n;
     switch (*s) {
         case 'I': t = REGNO_INT; break;
