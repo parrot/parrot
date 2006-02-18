@@ -83,7 +83,7 @@ sub runstep
         close($fh) or die "can not close file $plain: $!";
     }
 
-    $result = $count ? 'done' : 'no files to process';
+    $self->set_result($count ? 'done' : 'no files to process');
 
     return $self;
 }
