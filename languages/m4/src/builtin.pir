@@ -477,7 +477,8 @@ TODO: This is broken when the path seperator is not '/'
 =cut
 
 .sub m4___file__ 
-  .param pmc  state
+  .param pmc state
+  .param pmc arguments
 
   .local string current_file
   current_file = state['current_file']
