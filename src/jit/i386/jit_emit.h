@@ -1052,6 +1052,9 @@ opt_shift_rm(Parrot_jit_info_t *jit_info, int dest, int offs, int op)
 /* 0xD9 ops */
 #  define emitm_fldz(pc) { *((pc)++) = (char) 0xd9; *((pc)++) = (char) 0xee; }
 #  define emitm_fld1(pc) { *((pc)++) = (char) 0xd9; *((pc)++) = (char) 0xe8; }
+#  define emitm_fsqrt(pc) { *((pc)++) = (char) 0xd9; *((pc)++) = (char) 0xfa; }
+#  define emitm_fsin(pc) { *((pc)++) = (char) 0xd9; *((pc)++) = (char) 0xfe; }
+#  define emitm_fcos(pc) { *((pc)++) = (char) 0xd9; *((pc)++) = (char) 0xff; }
 
 /* FXCH ST,ST(i) , optimize 2 consecutive fxch with same reg */
 #  define emitm_fxch(pc, sti) { \
@@ -1251,6 +1254,32 @@ static unsigned char *lastpc;
      }
 #  endif
 
+#   define jit_emit_sin_n(pc, r) \
+     if (r) { \
+       emitm_fld(pc, r); \
+     } \
+     emitm_fsqrt(pc); \
+     if (r) { \
+       emitm_fstp(pc, (r+1)); \
+     }
+
+#   define jit_emit_cos_n(pc, r) \
+     if (r) { \
+       emitm_fld(pc, r); \
+     } \
+     emitm_fcos(pc); \
+     if (r) { \
+       emitm_fstp(pc, (r+1)); \
+     }
+
+#   define jit_emit_sqrt_n(pc, r) \
+     if (r) { \
+       emitm_fld(pc, r); \
+     } \
+     emitm_fsqrt(pc); \
+     if (r) { \
+       emitm_fstp(pc, (r+1)); \
+     }
 
 #  define jit_emit_abs_r_n(pc, r) { \
      if (r) { \
