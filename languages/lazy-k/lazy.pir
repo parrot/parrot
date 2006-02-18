@@ -366,7 +366,7 @@ not_s1:
 	s2ik1 = new_expr(expS2, i, k1c)
 	lhs[1] = s2ik1
 	$P0 = new_expr(expLR, NUL, NUL)
-	$P1 = new_expr(expK1, $P0)
+	$P1 = new_expr(expK1, $P0, NUL)
 	lhs[2] = $P1
 	goto s2
 not_lr:

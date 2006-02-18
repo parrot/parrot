@@ -96,8 +96,8 @@ my @unified_testable_languages =
        befunge
        bf
        jako
-       lua
        lazy-k
+       lua
        m4
        ook
        parrot_compiler
