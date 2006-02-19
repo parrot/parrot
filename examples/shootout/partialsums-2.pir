@@ -65,9 +65,10 @@ beginfor:
 	$N1 = a / $N1
 	sum9 += $N1
 lastfor:
-	$N1 = k - 1
-	$N1 = pow $N0, $N1
+	$I1 = k - 1
+	$N1 = pow $N0, $I1
 	sum1 += $N1
+	$I1 = k - 1
 	inc k
 	if k <= n goto beginfor
 	dec $I2

@@ -594,6 +594,13 @@ TEMPLATE Parrot_binop_x_xc_x {
         if (*CUR_OPCODE == PARROT_OP_add_i_ic_i) {
             emitm_lea_m_r(NATIVECODE, MAP(1), MAP(3), 0, 1, CUR_OPCODE[2]);
         }
+#ifdef emitm_f<op>
+        else if (*CUR_OPCODE == PARROT_OP_<op>_n_nc_n && *&NUM_CONST[2] == 1.0) {
+            emitm_fld1(NATIVECODE);
+            emitm_f<op>(NATIVECODE, (MAP[3]+1));
+            emitm_fstp(NATIVECODE, (MAP[1]+1));
+        }
+#endif
         else {
             if (MAP[1] == MAP[3]) {
                 jit_emit_mov_ri<_N>(NATIVECODE, ISR1, <typ>_CONST[2]);

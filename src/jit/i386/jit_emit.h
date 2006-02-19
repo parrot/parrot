@@ -1103,6 +1103,8 @@ static unsigned char *lastpc;
 /* FMULP Mul ST(i) = ST * ST(i); POP  */
 #  define emitm_fmulp(pc, sti) emitm_fl_3(pc, emit_b110, emit_b001, sti)
 
+/* FSUB ST = ST - ST(i) */
+
 /* FSUBRP SubR ST(i) = ST - ST(i); POP  */
 #  define emitm_fsubrp(pc, sti) emitm_fl_3(pc, emit_b110, emit_b100, sti)
 
