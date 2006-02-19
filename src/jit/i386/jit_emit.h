@@ -1076,6 +1076,7 @@ static unsigned char *lastpc;
 /* FCMOV*, FCOMI PPRO */
 
 /* 0xDC like 0xD8 with reversed operands */
+#  define emitm_fmulr(pc, sti) emitm_fl_3(pc, emit_b100, emit_b001, sti)
 
 /* 0xDD ops */
 /* FFree ST(i) */

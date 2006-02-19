@@ -302,12 +302,9 @@ inline op pow(out NUM, in NUM, in INT) :base_core {
     while (e) {
 	if (e & 1) {
 	    res *= n2;
-	    --e;
 	}
-	else {
-	    n2 *= n2;
-	    e >>= 1;
-	}
+	n2 *= n2;
+	e >>= 1;
     }
     if (s < 0) {
 	res = 1.0/res;

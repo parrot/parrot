@@ -1682,20 +1682,13 @@ Parrot_isle_i_nc_n {
 }
 
 ;
-; this code works, but it's slower than the builtin pow (disabled XXX)
-; TODO check alignment
+; TODO check alignment, and maybe move 1 msk into reg
 ;
-Parrot_XXX_pow_n_n_i {
+Parrot_pow_n_n_i {
     int e_reg, saved = 0;
     char *L1, *L2, *L3, *L4, *L5, *L6;
 
-    if (MAP[2]) {
-        emitm_fld(NATIVECODE, MAP[2]); 
-    }
-    else {
-        jit_emit_fload_mb_n(NATIVECODE, emit_EBX, ROFFS_NUM(2));
-    }                                    /* n2  = $2   ST(1) */
-    emitm_fld1(NATIVECODE);              /* res = 1.0  ST(0) */
+    emitm_fld1(NATIVECODE);              /* res = 1.0  ST(1) */
     if (MAP[3]) {
         jit_emit_mov_rr_i(NATIVECODE, emit_EAX, MAP[3]);
     }
@@ -1705,50 +1698,59 @@ Parrot_XXX_pow_n_n_i {
     jit_emit_test_r_i(NATIVECODE, emit_EAX);               /* e == 0? */
     L1 = NATIVECODE;
     emitm_jxs(NATIVECODE, emitm_jz, 0);                    /* jz L1 */
+    if (MAP[2]) {
+        emitm_fld(NATIVECODE, (MAP[2] + 1)); 
+    }
+    else {
+        jit_emit_fload_mb_n(NATIVECODE, emit_EBX, ROFFS_NUM(2));
+    }                                    /* n2  = $2   ST(0) */
     if (intreg_is_used(jit_info, emit_ECX)) {
         emitm_pushl_r(NATIVECODE, emit_ECX);
         saved = 1;
     }
-    jit_emit_mov_ri_i(NATIVECODE, emit_ECX, 1);    /* s = 1 */
+    jit_emit_mov_ri_i(NATIVECODE, emit_ECX, 1);            /* s = 1 */
     L2 = NATIVECODE;
     emitm_jxs(NATIVECODE, emitm_jg, 0);                    /* jg L2 */
-    jit_emit_neg_r_i(NATIVECODE, emit_ECX);        /* s = -1 */
-    jit_emit_neg_r_i(NATIVECODE, emit_EAX);        /* e = -e */
-    L2[1] = NATIVECODE - L2 - 2;                   /* L2:  */ 
-    /* L3: while (e) */
-        jit_emit_test_r_i(NATIVECODE, emit_EAX);               /* e == 0? */
-        L3 = NATIVECODE;
+    jit_emit_neg_r_i(NATIVECODE, emit_ECX);                /* s = -1 */
+    jit_emit_neg_r_i(NATIVECODE, emit_EAX);                /* e = -e */
+    L2[1] = NATIVECODE - L2 - 2;                   
+    /* L2:  */ 
+    /* while (e) */
+        jit_emit_test_r_i(NATIVECODE, emit_EAX);            /* e == 0? */
         L4 = NATIVECODE;
-        emitm_jxs(NATIVECODE, emitm_jz, 0);                    /* jz L4 */
-        jit_emit_test_ri_i(NATIVECODE, emit_EAX, 1);           /* e & 1 ? */
+        emitm_jxs(NATIVECODE, emitm_jz, 0);                 /* jz L4 */
+        L3 = NATIVECODE;
+        /* L3: */
+        jit_emit_test_ri_i(NATIVECODE, emit_EAX, 1);        /* e & 1 ? */
         L5 = NATIVECODE;
-        emitm_jxs(NATIVECODE, emitm_jz, 0);                    /* jz L5 */
-        emitm_fmul(NATIVECODE, 1);                             /* res *= n2 */
-        jit_emit_dec_r_i(NATIVECODE, emit_EAX);                /* --e */
-        /* dec and lsr are setting flags - branch past test at L3 */
-        emitm_jumps(NATIVECODE, L3 - NATIVECODE - 1);           /* jmp L3 */
+        emitm_jxs(NATIVECODE, emitm_jz, 0);                 /* jz L5 */
+        emitm_fmulr(NATIVECODE, 1);                         /* res *= n2 */
         /* L5: */
-        L5[1] = NATIVECODE - L5 - 2;                   /* L5:  */ 
-        jit_emit_mul_rr_n(NATIVECODE, 1, 1);                   /* n2 *= n2 */
-        jit_emit_lsr_ri_i(NATIVECODE, emit_EAX, 1);            /* e >>= 1 */
-        emitm_jumps(NATIVECODE, L3 - NATIVECODE - 1);           /* jmp L3 */
+        L5[1] = NATIVECODE - L5 - 2;                   
+        jit_emit_lsr_ri_i(NATIVECODE, emit_EAX, 1);          /* e >>= 1 */
+        emitm_fmul(NATIVECODE, 0);                           /* n2 *= n2 */
+        /* lsr is setting flags - branch past test at L3 */
+        emitm_jxs(NATIVECODE, emitm_jnz, (L3 - NATIVECODE - 1)); /* jmp L3 */
     /* endwhile */    
-    L1[1] = NATIVECODE - L1 - 2;                   /* L2:  */ 
-    L4[1] = NATIVECODE - L4 - 2;                   /* L4:  */ 
+    L4[1] = NATIVECODE - L4 - 2;                   
+    /* L4:  */ 
     jit_emit_test_r_i(NATIVECODE, emit_ECX);               /* s ? */
     L6 = NATIVECODE;
     emitm_jxs(NATIVECODE, emitm_jg, 0);                    /* jg L6 */
-    emitm_fld1(NATIVECODE);                       /* push 1.0 */
-    emitm_fxch(NATIVECODE, 1);
-    emitm_fdivp(NATIVECODE, 1);                   /* res = 1.0/res */ 
-    L6[1] = NATIVECODE - L6 - 2;                   /* L6:  */ 
+    emitm_fld1(NATIVECODE);                                /* push 1.0 */
+    emitm_fxch(NATIVECODE, 2);
+    emitm_fdivp(NATIVECODE, 2);                            /* res = 1.0/res */ 
+    L6[1] = NATIVECODE - L6 - 2;                   
+    /* L6:  */ 
+    emitm_fstp(NATIVECODE, 0);                             /* pop n2 */
+    L1[1] = NATIVECODE - L1 - 2;                   
+    /* L1:  */ 
     if (MAP[1]) {
-        emitm_fstp(NATIVECODE, (MAP[1] + 2));
+        emitm_fstp(NATIVECODE, (MAP[1] + 1));              /* store res */ 
     }
     else {
         jit_emit_fstore_m_n(NATIVECODE, ROFFS_NUM(1));
     }
-    emitm_fstp(NATIVECODE, 0);                    /* pop 0 */
     if (saved)
         emitm_popl_r(NATIVECODE, emit_ECX);
 }
