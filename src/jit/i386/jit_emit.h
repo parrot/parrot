@@ -1078,6 +1078,7 @@ static unsigned char *lastpc;
 /* 0xDC like 0xD8 with reversed operands */
 #  define emitm_faddr(pc, sti) emitm_fl_3(pc, emit_b100, emit_b000, sti)
 #  define emitm_fmulr(pc, sti) emitm_fl_3(pc, emit_b100, emit_b001, sti)
+#  define emitm_fsubr(pc, sti) emitm_fl_3(pc, emit_b100, emit_b100, sti)
 
 /* 0xDD ops */
 /* FFree ST(i) */
@@ -1608,10 +1609,22 @@ static unsigned char *lastpc;
 }
 
 /* ST(r1) -= ST(r2) */
-#  define jit_emit_sub_rr_n(pc, r1, r2) { \
-    emitm_fld(pc, r2); \
-    emitm_fsubp(pc, (r1+1)); \
-}
+/* r1 == 0:  ST(0) <- ST(0) - ST(i) 
+ * r2 == 0:  ST(i) <- ST(i) - ST(0)
+ */
+#  define jit_emit_sub_rr_n(pc, r1, r2) do { \
+        if (!r1) { \
+          emitm_fsub(pc, r2); \
+        }  \
+        else if (!r2) { \
+          emitm_fsubr(pc, r1); \
+        }  \
+        else { \
+            emitm_fld(pc, r2); \
+            emitm_fsubp(pc, (r1+1)); \
+        } \
+    } \
+    while (0)
 
 /*
  * ST(r) -= INT_REG
