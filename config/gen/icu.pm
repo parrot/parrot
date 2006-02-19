@@ -14,7 +14,7 @@ Configures ICU and add appropriate targets to the Makefile.
 package gen::icu;
 
 use strict;
-use vars qw($description $result @args);
+use vars qw($description @args);
 
 use base qw(Parrot::Configure::Step::Base);
 

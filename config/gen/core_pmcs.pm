@@ -14,7 +14,7 @@ Generates the core PMC list F<include/parrot/core_pmcs.h>.
 package gen::core_pmcs;
 
 use strict;
-use vars qw($description $result @args);
+use vars qw($description @args);
 
 use base qw(Parrot::Configure::Step::Base);
 

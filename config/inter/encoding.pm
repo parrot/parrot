@@ -14,7 +14,7 @@ Asks the user to select which encoding files to include.
 package inter::encoding;
 
 use strict;
-use vars qw($description $result @args);
+use vars qw($description @args);
 
 use base qw(Parrot::Configure::Step::Base);
 

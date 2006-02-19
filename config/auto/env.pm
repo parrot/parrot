@@ -14,7 +14,7 @@ Determining if the C library has C<setenv()> and C<unsetenv()>.
 package auto::env;
 
 use strict;
-use vars qw($description $result @args);
+use vars qw($description @args);
 
 use base qw(Parrot::Configure::Step::Base);
 

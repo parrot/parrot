@@ -14,7 +14,7 @@ Asks the user whether to set up experimental networking.
 package inter::exp;
 
 use strict;
-use vars qw($description $result @args);
+use vars qw($description @args);
 
 use base qw(Parrot::Configure::Step::Base);
 

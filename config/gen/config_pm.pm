@@ -16,7 +16,7 @@ file.
 package gen::config_pm;
 
 use strict;
-use vars qw($description $result @args);
+use vars qw($description @args);
 
 use base qw(Parrot::Configure::Step::Base);
 

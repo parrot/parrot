@@ -19,7 +19,7 @@ on which compiler is in use.  Thus it should come after the gccversion test.
 package inter::shlibs;
 
 use strict;
-use vars qw($description $result @args);
+use vars qw($description @args);
 
 use base qw(Parrot::Configure::Step::Base);
 

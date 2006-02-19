@@ -208,7 +208,7 @@ sub runsteps
 
         # XXX This works. but is propably not a good design.
         # Using $step->description() would be nicer   
-        my $description = $step_name->description();
+        my $description = $step->description();
         $description = "" unless defined $description;
 
         # set per step verbosity
@@ -240,7 +240,7 @@ sub runsteps
             }
         };
         if ($@) {
-            carp "\nstep $step died during execution: $@\n";
+            carp "\nstep $step_name died during execution: $@\n";
             return;
         }
 
@@ -249,7 +249,7 @@ sub runsteps
         # if not, report the result and return
         if ($@) {
             my $result = $step->result || 'no result returned';
-            carp "\nstep $step failed: " . $result;
+            carp "\nstep $step_name failed: " . $result;
             return;
         }
 

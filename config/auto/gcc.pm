@@ -14,7 +14,7 @@ Determines whether the C compiler is actually C<gcc>.
 package auto::gcc;
 
 use strict;
-use vars qw($description $result @args);
+use vars qw($description @args);
 
 use base qw(Parrot::Configure::Step::Base);
 

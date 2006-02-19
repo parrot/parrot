@@ -15,7 +15,7 @@ step determines whether it should be build static or shared.
 package inter::libparrot;
 
 use strict;
-use vars qw($description $result @args);
+use vars qw($description @args);
 
 use base qw(Parrot::Configure::Step::Base);
 

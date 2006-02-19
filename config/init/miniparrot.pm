@@ -19,7 +19,7 @@ from using  Configure at all for miniparrot builds.
 package init::miniparrot;
 
 use strict;
-use vars qw($description $result @args);
+use vars qw($description @args);
 
 use base qw(Parrot::Configure::Step::Base);
 

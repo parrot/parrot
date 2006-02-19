@@ -14,7 +14,7 @@ Determines whether the compiler supports computed C<goto>.
 package auto::cgoto;
 
 use strict;
-use vars qw($description $result @args);
+use vars qw($description @args);
 
 use base qw(Parrot::Configure::Step::Base);
 

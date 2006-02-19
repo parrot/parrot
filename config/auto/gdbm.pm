@@ -15,7 +15,7 @@ GDBMHash PMC.
 package auto::gdbm;
 
 use strict;
-use vars qw($description $result @args);
+use vars qw($description @args);
 
 use base qw(Parrot::Configure::Step::Base);
 

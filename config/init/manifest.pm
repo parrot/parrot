@@ -14,7 +14,7 @@ Uses C<ExtUtils::Manifest> to check that the distribution is complete.
 package init::manifest;
 
 use strict;
-use vars qw($description $result @args);
+use vars qw($description @args);
 
 use base qw(Parrot::Configure::Step::Base);
 

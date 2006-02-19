@@ -15,7 +15,7 @@ package inter::lex;
 
 use strict;
 
-use vars qw( $description $result @args $prompt $util );
+use vars qw( $description @args $prompt $util );
 
 use base qw(Parrot::Configure::Step::Base);
 

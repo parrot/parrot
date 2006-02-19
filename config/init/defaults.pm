@@ -14,7 +14,7 @@ Sets up the configuration system's default values and data structures.
 package init::defaults;
 
 use strict;
-use vars qw($description $result @args);
+use vars qw($description @args);
 
 use base qw(Parrot::Configure::Step::Base);
 

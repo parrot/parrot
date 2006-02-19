@@ -52,25 +52,9 @@ sub new
 
 =back
 
-=head3 Class Methods
+=head3 Object Methods
 
 =over 4
-
-=item * C<description()>
-
-Accepts no arguments and returns the value of C<$description> from the
-inheriting classes namespace.
-
-=cut
-
-sub description
-{
-    my $class = shift;
-    {
-        no strict 'refs';
-        ${$class . "::description"}
-    }
-}
 
 =item * C<result()>
 
@@ -81,11 +65,9 @@ classes namespace.
 
 sub result
 {
-    my $class = shift;
-    {
-        no strict 'refs';
-        ${$class . "::result"}
-    }
+    my $self = shift;
+
+    return $self->{result};
 }
 
 =item * C<set_result()>
@@ -97,13 +79,36 @@ variable.  Returns the inheriting classes name.
 
 sub set_result
 {
-    my ($class, $result) = @_;
+    my ($self, $result) = @_;
+
+    $self->{result} = $result;
+
+    return $self;
+}
+
+=back
+
+=head3 Class Methods
+
+=over 4
+
+=item * C<description()>
+
+Accepts no arguments and returns the value of C<$description> from the
+inheriting classes namespace.
+
+This method also works as an object method.
+
+=cut
+
+sub description
+{
+    my $class = shift;
+    $class = ref $class || $class;
     {
         no strict 'refs';
-        ${$class . "::result"} = $result;
+        return ${$class . "::description"};
     }
-
-    return $class;
 }
 
 =item * C<args()>
@@ -111,14 +116,17 @@ sub set_result
 Accepts no arguments and returns the value of C<@args> from the inheriting
 classes namespace.
 
+This method also works as an object method.
+
 =cut
 
 sub args
 {
     my $class = shift;
+    $class = ref $class || $class;
     {
         no strict 'refs';
-        @{$class . "::args"}
+        return @{$class . "::args"};
     }
 }
 

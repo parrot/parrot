@@ -14,7 +14,7 @@ Generates the F<runtime/parrot/include> files.
 package gen::parrot_include;
 
 use strict;
-use vars qw($description $result @args);
+use vars qw($description @args);
 
 use base qw(Parrot::Configure::Step::Base);
 

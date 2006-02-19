@@ -15,7 +15,7 @@ Currently GNU m4 is only used for doublechecking Parrot m4.
 package auto::m4;
 
 use strict;
-use vars qw($description $result @args);
+use vars qw($description @args);
 
 use base qw(Parrot::Configure::Step::Base);
 

@@ -15,7 +15,7 @@ the C<CCFLAGS>. Should this be part of config/inter/progs.pm ? XXX
 package init::optimize;
 
 use strict;
-use vars qw($description $result @args);
+use vars qw($description @args);
 
 use base qw(Parrot::Configure::Step::Base);
 
