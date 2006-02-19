@@ -4,6 +4,7 @@
 
 use strict;
 use warnings;
+
 use lib qw( . lib ../lib ../../lib );
 use Test::More tests => 1;
 
@@ -14,7 +15,7 @@ t/src/cppcomments.t - checks for C++ style comments
 
 =head1 SYNOPSIS
 
-	% prove t/src/cppcomments.t
+    % prove t/src/cppcomments.t
 
 =head1 DESCRIPTION
 
@@ -30,16 +31,18 @@ my @globs = qw(
     compilers/imcc/*.h
     include/parrot/*.h
     include/parrot/oplib/*.h
-    jit/*/*.h
     src/*.c
-    src/pmc/*.pmc
-    src/pmc/*.c
+    src/charset/*.c
+    src/charset/*.h
+    src/dynoplibs/*.ops
     src/dynpmc/*.pmc
     src/encodings/*.c
+    src/encodings/*.h
     src/io/*.c
     src/io/*.h
+    src/jit/*/*.h
     src/ops/*.ops
-    src/ops/*.c
+    src/pmc/*.pmc
     src/packfile/*.c
 );
 
@@ -47,17 +50,16 @@ my @comments;
 
 foreach my $glob ( @globs ) {
     foreach my $file ( glob $glob ) {
-	my $i = 0;
-	
-	open FILE, "<$file" or die "Can not open '$file' for reading!\n";
-	foreach my $line ( <FILE> ) {
-	    ++$i;
-	    next unless $line =~ m|//|;
-	    next if $line =~ m|://|; # skip ftp:// http:// etc
-	    
-	    push @comments, "$file:$i: $line"
-	}
-	close FILE;
+        
+        open FILE, "<$file" or die "Can not open '$file' for reading!\n";
+        foreach my $line ( <FILE> ) {
+            next unless $line =~ m{//};
+            next if $line =~ m{://};     # skip ftp:// http:// etc
+            next if $line =~ m{"//};     # skip printf("//= ")
+            
+            push @comments, "$file: $line"
+        }
+        close FILE;
     }
 }
 
