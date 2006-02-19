@@ -852,17 +852,6 @@ Parrot_neg_n {
     unary_x s/<_N>/_n/ s/INT/NUM/  s/<op>/neg/
 }
 
-Parrot_sin {
-    unary_x s/<_N>/_n/ s/INT/NUM/  s/<op>/sin/
-}
-
-Parrot_cos_n {
-    unary_x s/<_N>/_n/ s/INT/NUM/  s/<op>/cos/
-}
-
-Parrot_sqrt_n {
-    unary_x s/<_N>/_n/ s/INT/NUM/  s/<op>/sqrt/
-}
 
 Parrot_bnot_i {
     unary_x s/<_N>/_i/  s/<op>/not/
@@ -914,6 +903,18 @@ Parrot_neg_n_n {
 
 Parrot_abs_n_n {
     unary_x_x s/<_N>/_n/ s/ISR/FSR/ s/INT/NUM/ s/<op>/abs/
+}
+
+Parrot_sin_n_n {
+    unary_x_x s/<_N>/_n/ s/ISR/FSR/ s/INT/NUM/ s/<op>/sin/
+}
+
+Parrot_cos_n_n {
+    unary_x_x s/<_N>/_n/ s/ISR/FSR/ s/INT/NUM/ s/<op>/cos/
+}
+
+Parrot_sqrt_n_n {
+    unary_x_x s/<_N>/_n/ s/ISR/FSR/ s/INT/NUM/ s/<op>/sqrt/
 }
 
 

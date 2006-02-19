@@ -1259,16 +1259,16 @@ static unsigned char *lastpc;
      }
 #  endif
 
-#   define jit_emit_sin_n(pc, r) \
+#   define jit_emit_sin_r_n(pc, r) \
      if (r) { \
        emitm_fld(pc, r); \
      } \
-     emitm_fsqrt(pc); \
+     emitm_fsin(pc); \
      if (r) { \
        emitm_fstp(pc, (r+1)); \
      }
 
-#   define jit_emit_cos_n(pc, r) \
+#   define jit_emit_cos_r_n(pc, r) \
      if (r) { \
        emitm_fld(pc, r); \
      } \
@@ -1277,7 +1277,7 @@ static unsigned char *lastpc;
        emitm_fstp(pc, (r+1)); \
      }
 
-#   define jit_emit_sqrt_n(pc, r) \
+#   define jit_emit_sqrt_r_n(pc, r) \
      if (r) { \
        emitm_fld(pc, r); \
      } \
