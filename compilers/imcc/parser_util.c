@@ -872,7 +872,12 @@ try_find_op(Parrot_Interp interpreter, IMC_Unit * unit, char *name,
     }
     if (n == 3 && r[0]->set == 'N') {
         if (r[1]->set == 'I') {
+            SymReg *r1 = r[1];
             changed |= change_op(interpreter, unit, r, 1, emit);
+            /* op Nx, Iy, Iy: reuse generated temp Nz */
+            if (r[2]->set == 'I' && r[2]->type != VTADDRESS &&
+                    r[2] == r1)
+                r[2] = r[1];
         }
         if (r[2]->set == 'I' && r[2]->type != VTADDRESS) {
             changed |= change_op(interpreter, unit, r, 2, emit);
