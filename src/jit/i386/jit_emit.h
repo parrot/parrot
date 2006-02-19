@@ -1076,6 +1076,7 @@ static unsigned char *lastpc;
 /* FCMOV*, FCOMI PPRO */
 
 /* 0xDC like 0xD8 with reversed operands */
+#  define emitm_faddr(pc, sti) emitm_fl_3(pc, emit_b100, emit_b000, sti)
 #  define emitm_fmulr(pc, sti) emitm_fl_3(pc, emit_b100, emit_b001, sti)
 
 /* 0xDD ops */
@@ -1581,11 +1582,22 @@ static unsigned char *lastpc;
 
 
 /* ST(r1) += ST(r2) */
-#  define jit_emit_add_rr_n(pc, r1, r2) { \
-    emitm_fld(pc, r2); \
-    emitm_faddp(pc, (r1+1)); \
-}
-
+/* r1 == 0:  ST(0) <- ST(0) + ST(i) 
+ * r2 == 0:  ST(i) <- ST(0) + ST(i)
+ */
+#  define jit_emit_add_rr_n(pc, r1, r2) do { \
+        if (!r1) { \
+          emitm_fadd(pc, r2); \
+        }  \
+        else if (!r2) { \
+          emitm_faddr(pc, r1); \
+        }  \
+        else { \
+            emitm_fld(pc, r2); \
+            emitm_faddp(pc, (r1+1)); \
+        } \
+    } \
+    while (0)
 /*
  * ST(r) += INT_REG
  */
@@ -1625,10 +1637,22 @@ static unsigned char *lastpc;
 }
 
 /* ST(r1) *= ST(r2) */
-#  define jit_emit_mul_rr_n(pc, r1, r2) { \
-    emitm_fld(pc, r2); \
-    emitm_fmulp(pc, (r1+1)); \
-}
+/* r1 == 0:  ST(0) <- ST(0) * ST(i) 
+ * r2 == 0:  ST(i) <- ST(0) * ST(i)
+ */
+#  define jit_emit_mul_rr_n(pc, r1, r2) do { \
+        if (!r1) { \
+          emitm_fmul(pc, r2); \
+        }  \
+        else if (!r2) { \
+          emitm_fmulr(pc, r1); \
+        }  \
+        else { \
+            emitm_fld(pc, r2); \
+            emitm_fmulp(pc, (r1+1)); \
+        } \
+    } \
+    while (0)
 
 /*
  * ST(r) *= INT_REG

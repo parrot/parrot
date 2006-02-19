@@ -1724,11 +1724,11 @@ Parrot_pow_n_n_i {
         jit_emit_test_ri_i(NATIVECODE, emit_EAX, 1);        /* e & 1 ? */
         L5 = NATIVECODE;
         emitm_jxs(NATIVECODE, emitm_jz, 0);                 /* jz L5 */
-        emitm_fmulr(NATIVECODE, 1);                         /* res *= n2 */
+        jit_emit_mul_rr_n(NATIVECODE, 1, 0);                /* res *= n2 */
         /* L5: */
         L5[1] = NATIVECODE - L5 - 2;                   
         jit_emit_lsr_ri_i(NATIVECODE, emit_EAX, 1);          /* e >>= 1 */
-        emitm_fmul(NATIVECODE, 0);                           /* n2 *= n2 */
+        jit_emit_mul_rr_n(NATIVECODE, 0, 0);                 /* n2 *= n2 */
         /* lsr is setting flags - branch past test at L3 */
         emitm_jxs(NATIVECODE, emitm_jnz, (L3 - NATIVECODE - 1)); /* jmp L3 */
     /* endwhile */    
