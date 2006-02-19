@@ -282,6 +282,41 @@ op debug_brk() {
     goto NEXT();
 }
 
+=item B<pow>(out NUM, in NUM, in INT)
+
+Set $1 to $2 raised to the power $3.
+
+=cut
+
+inline op pow(out NUM, in NUM, in INT) :base_core {
+    FLOATVAL n2 = $2;
+    FLOATVAL res = 1.0;
+    INTVAL   e  = $3;
+    int s = 1;
+    if (e != 0) {
+	if (e < 0) {
+	    s = -1;
+	    e = -e;
+	}
+    }
+    while (e) {
+	if (e & 1) {
+	    res *= n2;
+	    --e;
+	}
+	else {
+	    n2 *= n2;
+	    e >>= 1;
+	}
+    }
+    if (s < 0) {
+	res = 1.0/res;
+    }
+    $1 = res;
+    goto NEXT();
+}
+
+
 =back
 
 =head1 COPYRIGHT
