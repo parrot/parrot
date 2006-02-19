@@ -29,11 +29,16 @@ argok:
 	sum8 = 0.0
 	sum9 = 0.0
 	a = -1.0
-	$N0 = 2.0 / 3.0
-	$I2 = 2
+	.local float div23, k2, k3
+	div23 = 2.0 / 3.0
+	# sum1 starts at zero - k := 0 case unrolled
+	$N1 = pow div23, 0
+	sum1 += $N1
 	k = 1
 beginfor:
 	# This is what overoptimized looks like....
+	$N1 = pow div23, k
+	sum1 += $N1
 	$N1 = sqrt k
 	$N1 = 1.0 / $N1
 	sum2 += $N1
@@ -41,20 +46,20 @@ beginfor:
 	$N1 *= k
 	$N1 = 1.0 / $N1
 	sum3 += $N1
-	$N1 = k * k
-	$N2 = 1.0 / $N1
-	sum7 += $N2
-	$N1 *= k
-	$N2 = sin k
-	$N2 *= $N2
-	$N2 *= $N1
-	$N2 = 1.0 / $N2
-	sum4 += $N2
-	$N2 = cos k
-	$N2 *= $N2
-	$N2 *= $N1
-	$N2 = 1.0 / $N2
-	sum5 += $N2
+	k2 = k * k
+	$N1 = 1.0 / k2
+	sum7 += $N1
+	k3 = k2 * k
+	$N1 = sin k
+	$N1 *= $N1
+	$N1 *= k3
+	$N1 = 1.0 / $N1
+	sum4 += $N1
+	$N1 = cos k
+	$N1 *= $N1
+	$N1 *= k3
+	$N1 = 1.0 / $N1
+	sum5 += $N1
 	$N1 = 1.0 / k
 	sum6 += $N1
 	neg a
@@ -64,14 +69,8 @@ beginfor:
 	dec $N1
 	$N1 = a / $N1
 	sum9 += $N1
-lastfor:
-	$I1 = k - 1
-	$N1 = pow $N0, $I1
-	sum1 += $N1
 	inc k
 	if k <= n goto beginfor
-	dec $I2
-	if $I2 goto lastfor
 
 	parray[0] = sum1
 	parray[1] = sum2
