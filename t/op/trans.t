@@ -636,7 +636,7 @@ ok 1
 ok 2
 OUTPUT
 
-pasm_output_is( <<'CODE', <<OUTPUT, "sqrt" );
+pasm_output_is( <<'CODE', <<OUTPUT, "pow_n_n_ic" );
     set N0, 2.0
     pow N1, N0, 0
     print N1
@@ -691,6 +691,77 @@ CODE
 0.062500
 OUTPUT
 
+pasm_output_is( <<'CODE', <<OUTPUT, "pow_n_n_i" );
+    set N0, 2.0
+    set I0, 0
+    pow N1, N0, I0
+    print N1
+    print "\n"
+    inc I0
+    pow N1, N0, I0
+    print N1
+    print "\n"
+    inc I0
+    pow N1, N0, I0
+    print N1
+    print "\n"
+    inc I0
+    pow N1, N0, I0
+    print N1
+    print "\n"
+    inc I0
+    pow N1, N0, I0
+    print N1
+    print "\n"
+    inc I0
+    pow N1, N0, I0
+    print N1
+    print "\n"
+    inc I0
+    pow N1, N0, I0
+    print N1
+    print "\n"
+    set I0, -1
+    pow N1, N0, I0
+    print N1
+    print "\n"
+    dec I0
+    pow N1, N0, I0
+    print N1
+    print "\n"
+    dec I0
+    pow N1, N0, I0
+    print N1
+    print "\n"
+    dec I0
+    pow N1, N0, I0
+    print N1
+    print "\n"
+    dec I0
+    pow N1, N0, I0
+    print N1
+    print "\n"
+    dec I0
+    pow N1, N0, I0
+    print N1
+    print "\n"
+    end
+CODE
+1.000000
+2.000000
+4.000000
+8.000000
+16.000000
+32.000000
+64.000000
+0.500000
+0.250000
+0.125000
+0.062500
+0.031250
+0.015625
+OUTPUT
+
 ## remember to change the number of tests :-)
-BEGIN { plan tests => 20; }
+BEGIN { plan tests => 21; }
 
