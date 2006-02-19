@@ -58,7 +58,7 @@ beginfor:
 	$N1 = 1.0 / k
 	sum6 += $N1
 	neg a
-	$N1 = a / k
+	$N1 = a * $N1
 	sum8 += $N1
 	$N1 = 2.0 * k
 	dec $N1
@@ -68,7 +68,6 @@ lastfor:
 	$I1 = k - 1
 	$N1 = pow $N0, $I1
 	sum1 += $N1
-	$I1 = k - 1
 	inc k
 	if k <= n goto beginfor
 	dec $I2
