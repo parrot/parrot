@@ -43,7 +43,18 @@ options
 '->' Is for tree construction
 '^' Is for definition and matching of tree nodes
 
+@members  declare additional member variables in the parser class
+
+@init   ??
+
+scope   a stack for symbols
  
+{
+  channel = 99;
+}
+put match into Nirwana   
+  
+
 =head2 Lexer
 
 The lexer specification can be in the parser specification.

@@ -1,6 +1,9 @@
 # $Id$
 
-2005-01-22     Bernhard Schmalhofer
+2006-01-22     Bernhard Schmalhofer
+        * Play with PASTinPIR generation for ANTLR3.
+
+2006-01-22     Bernhard Schmalhofer
         * Break the ANTLR PAST_Val nodes up into PAST_Val_Strqq and PAST_Val_Num.
           This allows support for the 'valtype' attribute in Allison's PAST. 
 
