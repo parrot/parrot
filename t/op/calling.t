@@ -701,6 +701,9 @@ from_foo
 bar_ret
 OUTPUT
 
+SKIP: {
+  skip("can't get_params twice any more.", 1);
+
 pasm_output_is(<<'CODE', <<'OUTPUT', "get_params twice");
 .pcc_sub main:
     new P16, .String
@@ -739,6 +742,8 @@ ok 2
 ok 3
 back
 OUTPUT
+
+} # end of SKIP.
 
 pir_output_is(<<'CODE', <<'OUTPUT', "empty args");
 .sub main :main
@@ -855,20 +860,25 @@ OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "type conversion - native");
 .sub main :main
-    foo(42, "42", 42.20)
+    foo_int(42, "42", 42.20)
+    foo_float(42, "42", 42.20)
+    foo_string(42, "42", 42.20)
 .end
-.sub foo
+.sub foo_int
     get_params "(0,0,0)", $I0, $I1, $I2
     print_item $I0
     print_item $I1
     print_item $I2
     print_newline
-    # yeah fetch args again
+.end
+.sub foo_float
     get_params "(0,0,0)", $N0, $N1, $N2
     print_item $N0
     print_item $N1
     print_item $N2
     print_newline
+.end
+.sub foo_string
     get_params "(0,0,0)", $S0, $S1, $S2
     print_item $S0
     print_item $S1
@@ -1604,6 +1614,32 @@ ok 1
 ok 2
 OUTPUT
 
+# this is a regression test for a bug in which tail-calling without set_args
+# used the args of the sub.
+pir_output_is(<<'CODE', <<'OUTPUT', "tailcall explicit continuation, no args");
+.sub main :main
+    .local string result
+    result = "not ok 2\n"
+    .local pmc cont
+    cont = new .Continuation
+    set_addr cont, cont_dest
+    bar(cont, "ok 1\n")
+    print "oops\n"
+cont_dest:
+    print "ok 2\n"
+.end
+
+.sub bar
+    .param pmc cc
+    .param string s
+    print s
+    tailcall cc
+.end
+CODE
+ok 1
+ok 2
+OUTPUT
+
 pir_output_is(<<'CODE', <<'OUTPUT', "call evaled vtable code");
 .sub main :main
     .local string s
@@ -2179,5 +2215,5 @@ CODE
 /duplicate name/
 OUTPUT
 ## remember to change the number of tests :-)
-BEGIN { plan tests => 86 }
+BEGIN { plan tests => 87 }
 
