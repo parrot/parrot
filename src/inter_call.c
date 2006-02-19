@@ -1082,6 +1082,8 @@ parrot_pass_args(Interp *interpreter,  parrot_context_t *src_ctx,
     if (what == PARROT_OP_get_params_pc) {
         dst_pc = interpreter->current_params;
         src_pc = interpreter->current_args;
+        /* the args and params are now 'used.' */
+        interpreter->current_args = NULL;
         interpreter->current_params = NULL;
         action = "params";
     }
