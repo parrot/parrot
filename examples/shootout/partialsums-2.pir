@@ -33,32 +33,30 @@ argok:
 	$I2 = 2
 	k = 1
 beginfor:
+	# This is what overoptimized looks like....
 	$N1 = sqrt k
 	$N1 = 1.0 / $N1
 	sum2 += $N1
 	$N1 = k + 1.0
 	$N1 *= k
-	$N1 = 1.0 /$N1
+	$N1 = 1.0 / $N1
 	sum3 += $N1
-	$N1 = sin k
-	$N1 *= $N1
+	$N1 = k * k
+	$N2 = 1.0 / $N1
+	sum7 += $N2
 	$N1 *= k
-	$N1 *= k
-	$N1 *= k
-	$N1 = 1.0 /$N1
-	sum4 += $N1
-	$N1 = cos k
-	$N1 *= $N1
-	$N1 *= k
-	$N1 *= k
-	$N1 *= k
-	$N1 = 1.0 /$N1
-	sum5 += $N1
+	$N2 = sin k
+	$N2 *= $N2
+	$N2 *= $N1
+	$N2 = 1.0 / $N2
+	sum4 += $N2
+	$N2 = cos k
+	$N2 *= $N2
+	$N2 *= $N1
+	$N2 = 1.0 / $N2
+	sum5 += $N2
 	$N1 = 1.0 / k
 	sum6 += $N1
-	$N1 = k * k
-	$N1 = 1.0 / $N1
-	sum7 += $N1
 	neg a
 	$N1 = a / k
 	sum8 += $N1
