@@ -25,6 +25,8 @@ use Parrot::Test tests => 20;
 use Test::More;
 
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', "function assert(false, msg)");
+assert("text", "assert string")
+assert({}, "assert table")
 assert(false, "ASSERTION TEST")
 CODE
 /ASSERTION TEST/

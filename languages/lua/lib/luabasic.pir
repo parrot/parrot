@@ -207,7 +207,7 @@ it defaults to "assertion failed!"
     .param pmc v :optional
     .param pmc message :optional
     checkany(v)
-    $I0 = v
+    $I0 = istrue v
     if $I0 goto L0
     $S0 = optstring(message, "assertion failed!")
     error($S0)
@@ -298,14 +298,24 @@ If the object does not have a metatable, returns B<nil>. Otherwise, if the
 object’s metatable has a C<"__metatable"> field, returns the associated value.
 Otherwise, returns the metatable of the given object.
 
-NOT YET IMPLEMENTED.
-
 =cut
 
 .sub _lua_getmetatable :anon
     .param pmc obj :optional
+    .local pmc ret
     checkany(obj)
-    not_implemented()
+    ret = getprop "__metatable", obj
+    if ret goto L1
+    new ret, .LuaNil
+    .return (ret)
+L1:
+    .local pmc prot
+    .const .LuaString mt = "__metatable"
+    prot = ret[mt]
+    unless prot goto L2
+    .return (prot)
+L2:
+    .return (ret)
 .end
 
 =item C<gcinfo ()>
@@ -573,7 +583,8 @@ C<table> must be a table; C<index> is any value different from B<nil>.
     .local pmc ret
     checktype(table, "table")
     checkany(index)
-    ret = table[index]
+#    ret = table[index]
+     ret = table."rawget"(index)
     .return (ret)
 .end
 
@@ -592,7 +603,8 @@ B<nil>, and C<value> is any Lua value.
     checktype(table, "table")
     checkany(index)
     checkany(value)
-    table[index] = value
+#    table[index] = value
+    table."rawset"(index, value)
     .return ()
 .end
 
@@ -671,8 +683,6 @@ a userdata from Lua.) If metatable is B<nil>, removes the metatable of the
 given table. If the original metatable has a C<"__metatable"> field, raises
 an error.
 
-NOT YET IMPLEMENTED.
-
 =cut
 
 .sub _lua_setmetatable :anon
@@ -685,8 +695,22 @@ NOT YET IMPLEMENTED.
     if $S0 == "table" goto L1
 L0:
     argerror("nil or table expected")
-L1:    
-    not_implemented()
+L1:
+    .local pmc meta
+    meta = getprop "__metatable", table
+    unless meta goto L3
+    .local pmc prot
+    .const .LuaString mt = "__metatable"
+    prot = meta[mt]
+    unless prot goto L3
+    error("cannot change a protected metatable")
+L3:
+    if $S0 == "table" goto L4
+    delprop table, "__metatable"
+    .return ()
+L4:    
+    setprop table, "__metatable", metatable
+    .return ()
 .end
 
 =item C<tonumber (e [, base])>

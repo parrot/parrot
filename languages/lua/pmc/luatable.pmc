@@ -4,11 +4,11 @@ $Id$
 
 =head1 NAME
 
-classes/luatable.pmc - Lua Table
+pmc/luatable.pmc - Lua Table
 
 =head1 DESCRIPTION
 
-C<LuaTable> extends C<Hash> to provide a class with the behaviour of
+C<LuaTable> extends C<LuaBase> to provide a class with the behaviour of
 the Lua C<Table> type.
 
 TRIVIAL IMPLEMENTATION : C<Table> is just a Parrot C<Hash>, like in Lua 4.0.
@@ -28,8 +28,21 @@ static STRING *luatable_name;
 static INTVAL dynpmc_LuaNil;
 static INTVAL dynpmc_LuaString;
 
+static STRING* make_hash_key(Interp* interpreter, PMC* key)
+{
+    if (key == NULL) {
+        real_exception(interpreter, NULL, E_KeyError,
+                "LuaTable: Cannot use NULL key");
+        return NULL;
+    }
+    return string_concat(interpreter, 
+            VTABLE_name(interpreter, key),
+            VTABLE_get_string(interpreter, key), 0);
+}
+
+
 pmclass LuaTable
-    extends Hash
+    extends LuaBase
     does hash
     dynpmc
     group lua_group
@@ -62,6 +75,65 @@ pmclass LuaTable
                 const_string(INTERP, "table"),
                 const_string(INTERP, "tonumber"),
                 meth);
+            meth = Parrot_find_global(INTERP,
+                const_string(INTERP, "LuaTable"),
+                const_string(INTERP, "rawget"));
+            Parrot_store_global(INTERP,
+                const_string(INTERP, "table"),
+                const_string(INTERP, "rawget"),
+                meth);
+            meth = Parrot_find_global(INTERP,
+                const_string(INTERP, "LuaTable"),
+                const_string(INTERP, "rawset"));
+            Parrot_store_global(INTERP,
+                const_string(INTERP, "table"),
+                const_string(INTERP, "rawset"),
+                meth);
+        }
+    }
+
+/*
+
+=item C<void init()>
+
+Initializes the instance.
+
+=cut
+
+*/
+    void init () {
+        PMC_struct_val(SELF) = NULL;
+        PObj_custom_mark_destroy_SETALL(SELF);
+        new_pmc_hash(INTERP, SELF);
+    }
+
+/*
+
+=item C<void mark()>
+
+Marks the hash as live.
+
+=cut
+
+*/
+    void mark () {
+        if (PMC_struct_val(SELF))
+            mark_hash(INTERP, PMC_struct_val(SELF));
+    }
+
+/*
+
+=item C<void destroy()>
+
+Free hash structure.
+
+=cut
+
+*/
+    void destroy () {
+        if (PMC_struct_val(SELF)) {
+            hash_destroy(INTERP, (Hash*) PMC_struct_val(SELF));
+            PMC_struct_val(SELF) = NULL;
         }
     }
 
@@ -76,18 +148,6 @@ Return the string "table".
 */
     STRING* name () {
         return luatable_name;
-    }
-
-
-/*
-
-=item C<STRING* get_string()>
-
-=cut
-
-*/
-    STRING* get_string () {
-        return Parrot_sprintf_c(INTERP, "table: %08X", SELF);
     }
 
 /*
@@ -111,18 +171,13 @@ only clone the reference to themselves, not make a deep copy.
 
 /*
 
-=item C<INTVAL get_bool()>
-
-In Lua, both C<nil> and C<false> make a condition false; any other values
-makes it true.
-
-So return always true.
+=item C<STRING* get_string()>
 
 =cut
 
 */
-    INTVAL get_bool () {
-        return 1;
+    STRING* get_string () {
+        return Parrot_sprintf_c(INTERP, "table: %08X", SELF);
     }
 
 /*
@@ -142,14 +197,19 @@ A copy of the value is retrieved, otherwise, this could happen:
 
 */
     PMC* get_pmc_keyed (PMC* key) {
+        Hash *hash;
+        STRING *keystr;
+        PMC *retval;
         PMC *newcopy;
-        PMC *retval = SUPER(key);
 
-        if (enum_class_None == retval->vtable->base_type) {
+        hash = PMC_struct_val(SELF);
+        keystr = make_hash_key(INTERP, key);
+        retval = hash_get(INTERP, PMC_struct_val(SELF), keystr);
+        if (retval == NULL) {
             retval = pmc_new(INTERP, dynpmc_LuaNil);
             return retval;
         }
-        newcopy = retval->vtable->clone(INTERP, retval);
+        newcopy = VTABLE_clone(INTERP, retval);
         return newcopy;
     }
 
@@ -170,36 +230,43 @@ A copy of the value is stored, otherwise, this could happen:
 
 */
     void set_pmc_keyed (PMC* key, PMC* value) {
+        Hash *hash;
+        STRING *keystr;
+
         if (dynpmc_LuaNil == key->vtable->base_type) {
             real_exception(INTERP, NULL, 1, "table index is nil");
         }
+        hash = PMC_struct_val(SELF);
+        keystr = make_hash_key(INTERP, key);
         if (dynpmc_LuaNil == value->vtable->base_type) {
-            Hash.SELF.delete_keyed(key);
+            hash_delete(INTERP, hash, keystr);
         } 
         else {
-            PMC *newcopy = value->vtable->clone(INTERP, value);
-            SUPER(key, newcopy);
+            PMC *newcopy = VTABLE_clone(INTERP, value);
+            hash_put(INTERP, hash, keystr, newcopy);
         }
     }
 
 /*
 
-=item C<PMC logical_not(PMC *dest)>
+=item C<INTVAL elements()>
 
-Return always false.
+Returns the number of elements in the hash.
 
 =cut
 
 */
-    PMC* logical_not (PMC* dest) {
-        if (!dest)
-            dest = pmc_new(INTERP, pmc_type(INTERP,
-              string_from_const_cstring(INTERP, "LuaBoolean", 0)));
-        VTABLE_set_integer_native(INTERP, dest, 0);
-        return dest;
+    INTVAL elements () {
+        return hash_size(INTERP, PMC_struct_val(SELF));
     }
 
 /*
+
+=back
+
+=head2 non-Vtable Methods
+
+=over 4
 
 =item C<INTVAL is_equal (PMC* value)>
 
@@ -215,54 +282,25 @@ The C<==> operation. Compares reference (not in depth).
             return (INTVAL)0;
     }
 
-    /* Other metamethods */
+/*
 
-    PMC* add (PMC* value, PMC* dest) {
-        PMC *metatable = DYNSELF.getprop("__metatable");
-        if (metatable) {
-            printf("found metatable\n");
-        } else {
-            printf("Failed to find a metatable\n");
-        }
-        return (PMC*)0;
-    }
+=item C<INTVAL cmp (PMC *value)>
 
-    /* TODO: Implement the Metamethod mechanism, see the Lua ref.man. */
+=cut
 
-    PMC* subtract (PMC* value, PMC* dest) {
-        return (PMC*)0;
-    }
-
-    PMC* multiply (PMC* value, PMC* dest) {
-        return (PMC*)0;
-    }
-
-    PMC* divide (PMC* value, PMC* dest) {
-        return (PMC*)0;
-    }
-
-    PMC* modulus (PMC* value, PMC* dest) {
-        return (PMC*)0;
-    }
-
-    PMC* pow (PMC* value, PMC* dest) {
-        return (PMC*)0;
-    }
-
-    PMC* neg (PMC* dest) {
-        return (PMC*)0;
-    }
-
-    PMC* concatenate (PMC* value, PMC* dest) {
-        return (PMC*)0;
-    }
-
-    void* invoke (void* next) {
-        return (void*)0;
-    }
-
+*/
     INTVAL cmp (PMC* value) {
-        return (INTVAL)0;
+MMD_LuaTable: {
+            real_exception(INTERP, NULL, ILL_INHERIT,
+                    "attempt to compare two table values");
+            return (INTVAL)0;
+        }
+MMD_DEFAULT: {
+            real_exception(INTERP, NULL, ILL_INHERIT,
+                    "attempt to compare table with %s",
+                    string_to_cstring(INTERP, VTABLE_name(INTERP, value)));
+            return (INTVAL)0;
+        }
     }
 
 /*
@@ -273,38 +311,54 @@ The C<==> operation. Compares reference (not in depth).
 
 =over 4
 
-=item C<PMC* tonumber()>
+=item C<PMC* rawget (PMC* key)>
 
 =cut
 
 */
-    METHOD PMC* tonumber() {
+    METHOD PMC* rawget (PMC* key) {
+        Hash *hash;
+        STRING *keystr;
         PMC *retval;
+        PMC *newcopy;
 
-        retval = pmc_new(INTERP, dynpmc_LuaNil);
-        return retval;
+        hash = PMC_struct_val(SELF);
+        keystr = make_hash_key(INTERP, key);
+        retval = hash_get(INTERP, PMC_struct_val(SELF), keystr);
+        if (retval == NULL) {
+            retval = pmc_new(INTERP, dynpmc_LuaNil);
+            return retval;
+        }
+        newcopy = VTABLE_clone(INTERP, retval);
+        return newcopy;
     }
 
 /*
 
-=item C<PMC* tostring()>
+=item C<void rawset (PMC* key, PMC* value)>
 
 =cut
 
 */
-    METHOD PMC* tostring() {
-        PMC *retval;
-        STRING *rep;
+    METHOD void rawset (PMC* key, PMC* value) {
+        Hash *hash;
+        STRING *keystr;
 
-        /* TODO: __tostring */
-        retval = pmc_new(INTERP, dynpmc_LuaString);
-        rep = VTABLE_get_string(INTERP, SELF);
-        PMC_str_val(retval) = rep;
-        return retval;
+        if (dynpmc_LuaNil == key->vtable->base_type) {
+            real_exception(INTERP, NULL, 1, "table index is nil");
+        }
+        hash = PMC_struct_val(SELF);
+        keystr = make_hash_key(INTERP, key);
+        if (dynpmc_LuaNil == value->vtable->base_type) {
+            hash_delete(INTERP, hash, keystr);
+        } 
+        else {
+            PMC *newcopy = VTABLE_clone(INTERP, value);
+            hash_put(INTERP, hash, keystr, newcopy);
+        }
     }
 
 }
-
 /*
 
 =back

@@ -266,7 +266,7 @@ Used to archive the string.
     void freeze(visit_info *info) {
         IMAGE_IO *io = info->image_io;
         SUPER(info);
-        io->vtable->push_string(INTERP, io, PMC_str_val(SELF));
+        VTABLE_push_string(INTERP, io, PMC_str_val(SELF));
     }
 
 /*
@@ -282,7 +282,7 @@ Used to unarchive the string.
         IMAGE_IO *io = info->image_io;
         SUPER(info);
         if (info->extra_flags == EXTRA_IS_NULL)
-            PMC_str_val(SELF) = io->vtable->shift_string(INTERP, io);
+            PMC_str_val(SELF) = VTABLE_shift_string(INTERP, io);
     }
 
 /*
@@ -824,20 +824,6 @@ MMD_DEFAULT: {
             }
         }
         retval = pmc_new(INTERP, dynpmc_LuaNil);
-        return retval;
-    }
-
-/*
-
-=item C<PMC* tostring()>
-
-=cut
-
-*/
-    METHOD PMC* tostring() {
-        PMC *retval;
-
-        retval = VTABLE_clone(INTERP, SELF); 
         return retval;
     }
 

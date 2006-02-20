@@ -1,5 +1,5 @@
 #! perl -w
-# Copyright: 2005 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2005-2006 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 =head1 NAME
@@ -30,7 +30,7 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "check inheritance");
     bool1 = isa pmc1, "scalar"
     print bool1
     print "\n"
-    bool1 = isa pmc1, "Hash"
+    bool1 = isa pmc1, "LuaBase"
     print bool1
     print "\n"
     bool1 = isa pmc1, "LuaTable"
@@ -90,7 +90,6 @@ pir_output_like(<< 'CODE', << 'OUTPUT', "check get_string");
     find_type $I0, "LuaTable"
     .local pmc pmc1
     pmc1 = new $I0
-    pmc1["key"] = "value"
     print pmc1
     print "\n"
     end
@@ -109,7 +108,6 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "check get_bool");
     bool1 = istrue pmc1
     print bool1
     print "\n"
-    pmc1["key"] = "value"
     bool1 = istrue pmc1
     print bool1
     print "\n"

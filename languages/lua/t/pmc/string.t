@@ -30,9 +30,6 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "check inheritance");
     bool1 = isa pmc1, "LuaBase"
     print bool1
     print "\n"
-#    bool1 = isa pmc1, "String"
-#    print bool1
-#    print "\n"
     bool1 = isa pmc1, "LuaString"
     print bool1
     print "\n"

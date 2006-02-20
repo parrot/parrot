@@ -8,7 +8,7 @@ classes/luauserdata.pmc - Lua Userdata
 
 =head1 DESCRIPTION
 
-C<LuaUserdata> extends C<String> to provide a class with the behaviour of
+C<LuaUserdata> extends C<LuaBase> to provide a class with the behaviour of
 the Lua C<Userdata> type.
 
 =head2 Overloaded Methods
@@ -22,12 +22,12 @@ the Lua C<Userdata> type.
 #include "parrot/parrot.h"
 
 static STRING *luauserdata_name;
-static INTVAL dynpmc_LuaNil;
 static INTVAL dynpmc_LuaString;
 
 
 pmclass LuaUserdata 
-    extends String
+    extends LuaBase
+    does scalar
     dynpmc 
     group lua_group 
     hll Lua {
@@ -39,8 +39,6 @@ pmclass LuaUserdata
             PMC *meth;
 
             luauserdata_name = const_string(INTERP, "userdata");
-            dynpmc_LuaNil = pmc_type(INTERP,
-              string_from_const_cstring(INTERP, "LuaNil", 0));
             dynpmc_LuaString = pmc_type(INTERP,
               string_from_const_cstring(INTERP, "LuaString", 0));
 
@@ -64,15 +62,47 @@ pmclass LuaUserdata
 
 /*
 
-=item C<STRING* name()>
+=item C<void init()>
 
-Return the string "userdata".
+Initializes the string.
 
 =cut
 
 */
-    STRING* name () {
-        return luauserdata_name;
+    void init () {
+        PMC_str_val(SELF) =
+            string_make_empty(INTERP, enum_stringrep_one, 0);
+        PObj_custom_mark_SET(SELF);
+    }
+
+/*
+
+=item C<void mark()>
+
+Marks the string as live.
+
+=cut
+
+*/
+    void mark () {
+        if(PMC_str_val(SELF))
+            pobject_lives(INTERP, (PObj *)PMC_str_val(SELF));
+    }
+
+/*
+
+=item C<PMC* clone()>
+
+Creates a copy of the string.
+
+=cut
+
+*/
+    PMC* clone () {
+        PMC* dest = pmc_new_noinit(INTERP, SELF->vtable->base_type);
+        PObj_custom_mark_SET(dest);
+        PMC_str_val(dest) = string_copy(INTERP,PMC_str_val(SELF));
+        return dest;
     }
 
 /*
@@ -88,56 +118,28 @@ Return the string "userdata".
 
 /*
 
-=item C<INTVAL get_bool()>
+=item C<STRING* name()>
 
-In Lua, both C<nil> and C<false> make a condition false; any other values 
-makes it true.
-
-So return always true. 
+Return the string "userdata".
 
 =cut
 
 */
-    INTVAL get_bool () {
-        return 1;
+    STRING* name () {
+        return luauserdata_name;
     }
 
 /*
 
-=back
+=item C<VOID set_string_native(STRING* value)>
 
-=head2 Specific Methods
-
-=over 4
-
-=item C<PMC* tonumber()>
+Sets the value of the string to that of the specified C<string>.
 
 =cut
 
 */
-    METHOD PMC* tonumber() {
-        PMC *retval;
-
-        retval = pmc_new(INTERP, dynpmc_LuaNil);
-        return retval;
-    }
-
-/*
-
-=item C<PMC* tostring()>
-
-=cut
-
-*/
-    METHOD PMC* tostring() {
-        PMC *retval;
-        STRING *rep;
-
-        /* TODO: __tostring */
-        retval = pmc_new(INTERP, dynpmc_LuaString);
-        rep = VTABLE_get_string(INTERP, SELF);
-        PMC_str_val(retval) = rep;
-        return retval;
+    void set_string_native (STRING* value) {
+        PMC_str_val(SELF) = value;
     }
 
 }

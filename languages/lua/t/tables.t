@@ -79,9 +79,6 @@ nil
 10
 OUT
 
-TODO: {
-local $TODO = "discrimines type of key";
-
 language_output_is( 'lua', <<'CODE', <<'OUT', '' );
 i = 10; j = "10"; k = "+10"
 a = {}
@@ -98,7 +95,6 @@ yet another value
 one value
 one value
 OUT
-}
 
 language_output_is( 'lua', <<'CODE', <<'OUT', '' );
 t = { {"a","b","c"}, 10 }
