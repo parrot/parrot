@@ -124,7 +124,7 @@ LINTOPTS   =
 
 INNO_SETUP = iscc
 
-JIT_BUILD_TOOL = $(BUILD_TOOLS_DIR)/jit2h.pl
+JIT_BUILD_TOOL = $(BUILD_TOOLS_DIR)/jit2c.pl
 
 ###############################################################################
 #
