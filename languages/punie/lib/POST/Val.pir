@@ -19,7 +19,7 @@ POST::Val is a literal value in the OST. It is a subclass of POST::Node.
     .return ()
 .end
 
-.sub "set_node" method
+.sub "set_node" :method
     .param string source
     .param int pos
     .param string value
@@ -33,7 +33,7 @@ POST::Val is a literal value in the OST. It is a subclass of POST::Node.
     .return ()
 .end
 
-.sub "dump" method
+.sub "dump" :method
     .param int level :optional
     .local string indent
     indent = repeat "    ", level # tab is 4 spaces here
@@ -56,12 +56,12 @@ POST::Val is a literal value in the OST. It is a subclass of POST::Node.
     .return ()
 .end
 
-.sub value method
+.sub value :method
     $P2 = getattribute self, "value"
     .return ($P2)
 .end
 
-.sub valtype method
+.sub valtype :method
     .param string valtype :optional
     .param int got_valtype :opt_flag
     unless got_valtype goto get

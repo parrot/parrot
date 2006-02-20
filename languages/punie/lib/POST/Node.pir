@@ -20,7 +20,7 @@ All POST nodes subclass from this base type.
 .end
 
 
-.sub __init method
+.sub __init :method
     $P1 = new PerlUndef
     $P2 = new Integer
     $P3 = new PerlUndef
@@ -30,7 +30,7 @@ All POST nodes subclass from this base type.
     setattribute self, "children", $P3
 .end
 
-.sub "set_node" method
+.sub "set_node" :method
     .param string source
     .param int pos
     .param pmc children
@@ -42,23 +42,23 @@ All POST nodes subclass from this base type.
     .return ()
 .end
 
-.sub source method
+.sub source :method
     $P2 = getattribute self, "source"
     .return ($P2)
 .end
 
-.sub pos method
+.sub pos :method
     $P2 = getattribute self, "pos"
     .return ($P2)
 .end
 
-.sub children method
+.sub children :method
     $P2 = getattribute self, "children"
     .return ($P2)
 .end
 
 
-.sub "dump" method
+.sub "dump" :method
     .param int level :optional
     .local string indent
     indent = repeat "    ", level # tab is 4 spaces here
@@ -80,7 +80,7 @@ All POST nodes subclass from this base type.
     .return ()
 .end
 
-.sub "dump_attribute" method
+.sub "dump_attribute" :method
     .param string name
     .param int level :optional
     .local string indent
@@ -104,7 +104,7 @@ All POST nodes subclass from this base type.
     .return ()
 .end
 
-.sub "dump_children" method
+.sub "dump_children" :method
     .param int level :optional
     .local string indent
     indent = repeat "    ", level # tab is 4 spaces here

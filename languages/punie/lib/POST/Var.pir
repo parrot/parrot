@@ -79,7 +79,7 @@ of POST::Node.
     .return ($P2)
 .end
 
-.sub "dump" method
+.sub "dump" :method
     .param int level :optional
     .local string indent
     indent = repeat "    ", level # tab is 4 spaces here
