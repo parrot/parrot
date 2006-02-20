@@ -90,7 +90,7 @@ of TGE::Rule objects, which are the semantics defined by the grammar.
 
 =cut
 
-.sub __init method
+.sub __init :method
     $P1 = new PerlArray
     setattribute self, 'rules', $P1
 .end
@@ -101,7 +101,7 @@ Add a rule to the current attribute grammar.
 
 =cut
 
-.sub 'agrule' method
+.sub 'agrule' :method
     .param pmc type
     .param pmc name
     .param pmc parent
@@ -126,7 +126,7 @@ Compile a grammar from a source string.
 
 =cut
 
-.sub 'agcompile' method
+.sub 'agcompile' :method
     .param string source
     .local pmc agparse
     .local pmc rule_data
@@ -173,7 +173,7 @@ I<top node> of the data structure.
 
 =cut
 
-.sub 'apply' method
+.sub 'apply' :method
     .param pmc tree
     .local pmc newtree
     .local pmc visit
@@ -214,7 +214,7 @@ Produce a data dump of the current contents of the grammar object.
 
 =cut
 
-.sub 'dump' method
+.sub 'dump' :method
     $P0 = getattribute self, 'rules'
     $I1 = $P0
 

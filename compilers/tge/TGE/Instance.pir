@@ -27,7 +27,7 @@ constructor parameters.
 
 =cut
 
-.sub __init method
+.sub __init :method
     $P0 = new PerlHash
     $P1 = new PerlHash
     $P2 = new PerlUndef
@@ -37,7 +37,7 @@ constructor parameters.
 .end
 
 # Call all visitors for a given node
-.sub _scan_node method
+.sub _scan_node :method
     .param pmc node
     .param pmc name     :optional
     .param int got_name :opt_flag
@@ -88,7 +88,7 @@ node.
 
 =cut
 
-.sub get method
+.sub get :method
     .param pmc name
     .param pmc node     :optional
     .param int got_node :opt_flag
@@ -141,7 +141,7 @@ eval_cell:
 .end
 
 # Evaluate a thunk.
-.sub _eval_cell method
+.sub _eval_cell :method
     .param pmc cell
     .param pmc node
     .local pmc value
@@ -163,7 +163,7 @@ return_value:
 .end
 
 # Install a thunk in a particular attribute slot of a particular object.
-.sub _install_action method
+.sub _install_action :method
     .param pmc node
     .param pmc rule
 
@@ -232,7 +232,7 @@ error_defined:
 .end
 
 # This determines the semantics of .attr.
-.sub _lookup_child method
+.sub _lookup_child :method
     .param pmc node
     .param pmc name
     $S0 = name

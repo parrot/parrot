@@ -34,7 +34,7 @@ attribute grammar rule.
 
 =cut
 
-.sub __init method
+.sub __init :method
     $P0 = new PerlUndef
     $P1 = new PerlUndef
     $P2 = new PerlUndef
@@ -54,7 +54,7 @@ Produce a data dump of the current contents of the rule object.
 
 =cut
 
-.sub "dump" method
+.sub "dump" :method
     $P0 = getattribute self, "type"
     print "\t\t\t'type' => '"
     print $P0
