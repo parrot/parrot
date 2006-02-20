@@ -1007,6 +1007,9 @@ opt_shift_rm(Parrot_jit_info_t *jit_info, int dest, int offs, int op)
 #    define jit_emit_fstore_mb_n(pc, base, offs) \
       emitm_fstpl(pc, base, emit_None, 1, offs)
 
+#    define jit_emit_fst_mb_n(pc, base, offs) \
+      emitm_fstl(pc, base, emit_None, 1, offs)
+
 #  else /* NUMVAL_SIZE */
 
 #    define jit_emit_fload_m_n(pc, address) \
@@ -1020,6 +1023,9 @@ opt_shift_rm(Parrot_jit_info_t *jit_info, int dest, int offs, int op)
 
 #    define jit_emit_fstore_mb_n(pc, base, offs) \
       emitm_fstpt(pc, base, emit_None, 1, offs)
+
+#    define jit_emit_fst_mb_n(pc, base, offs) \
+      emitm_fstt(pc, base, emit_None, 1, offs)
 
 #  endif /* NUMVAL_SIZE */
 
@@ -1513,8 +1519,13 @@ static unsigned char *lastpc;
 }
 
 #  define jit_emit_mov_MR_n(pc, d, r) { \
-    emitm_fld((pc), r); \
-    jit_emit_fstore_mb_n((pc), emit_EBX, d); \
+    if (r) { \
+        emitm_fld((pc), r); \
+        jit_emit_fstore_mb_n((pc), emit_EBX, d); \
+    } \
+    else { \
+        jit_emit_fst_mb_n((pc), emit_EBX, d); \
+    } \
 }
 
 /* ST(r1) <= ST(r2) */
@@ -1636,17 +1647,13 @@ static unsigned char *lastpc;
 }
 
 #  define jit_emit_inc_r_n(pc, r) { \
-    emitm_fld(pc, r); \
     emitm_fld1(pc); \
-    emitm_faddp(pc, 1); \
-    emitm_fstp(pc, (r+1)); \
+    emitm_faddp(pc, (r+1)); \
 }
 
 #  define jit_emit_dec_r_n(pc, r) { \
-    emitm_fld(pc, r); \
     emitm_fld1(pc); \
-    emitm_fsubp(pc, 1); \
-    emitm_fstp(pc, (r+1)); \
+    emitm_fsubp(pc, (r+1)); \
 }
 
 /* ST(r1) *= ST(r2) */
