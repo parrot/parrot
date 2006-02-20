@@ -186,6 +186,7 @@ CLEANERS = \
 runtime@slash@tcllib.pir \
 tcl.pbc \
 "runtime@slash@*.pbc" \
+"$(CLASSDIR)@slash@*.pbc" \
 "$(PMCDIR)@slash@pmc_*.h" \
 "$(PMCDIR)@slash@*_group.h" \
 "$(PMCDIR)@slash@*$(LOAD_EXT)" \
