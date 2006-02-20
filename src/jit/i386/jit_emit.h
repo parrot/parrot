@@ -3083,6 +3083,12 @@ jit_set_args_pc(Parrot_jit_info_t *jit_info, Interp * interpreter,
  * s. also info gcc /align-jump
  *
  * noop; mov %esi, %esi; lea 0(%esi), %esi
+ * TODO
+ * 7 bytes: 8d b4 26 00 00 00 00    lea    0x0(%esi),%esi
+ * 6 bytes: 8d b6 00 00 00 00       lea    0x0(%esi),%esi
+ * 5 bytes: 90 8d 74 26 00          nop,   lea    0x0(%esi),%esi                
+ * 4 bytes: 8d 74 26 00             lea    0x0(%esi),%esi
+ *
  */
 
 #  define jit_emit_noop(pc) do { \
