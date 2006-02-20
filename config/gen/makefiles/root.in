@@ -124,6 +124,7 @@ LINTOPTS   =
 
 INNO_SETUP = iscc
 
+JIT_BUILD_TOOL = $(BUILD_TOOLS_DIR)/jit2h.pl
 
 ###############################################################################
 #
@@ -1114,11 +1115,11 @@ $(INC_DIR)/jit_emit.h : $(SRC_DIR)/jit/@jitcpuarch@/jit_emit.h
 $(INC_DIR)/exec_dep.h : $(SRC_DIR)/jit/@jitcpuarch@/exec_dep.h
 	$(CP) $(SRC_DIR)/jit/@jitcpuarch@/exec_dep.h $(INC_DIR)/exec_dep.h
 $(SRC_DIR)/jit_cpu.c : lib/Parrot/OpLib/core.pm $(INC_DIR)/jit_emit.h \
-	$(SRC_DIR)/jit/@jitcpuarch@/core.jit $(BUILD_TOOLS_DIR)/jit2h.pl
-	$(PERL) $(BUILD_TOOLS_DIR)/jit2h.pl @jitcpuarch@ $(SRC_DIR)/jit_cpu.c
+	$(SRC_DIR)/jit/@jitcpuarch@/core.jit $(JIT_BUILD_TOOL)
+	$(PERL) $(JIT_BUILD_TOOL) @jitcpuarch@ $(SRC_DIR)/jit_cpu.c
 $(SRC_DIR)/exec_cpu.c : lib/Parrot/OpLib/core.pm $(INC_DIR)/jit_emit.h \
-	$(SRC_DIR)/jit/@jitcpuarch@/core.jit @TEMP_exec_h@ $(INC_DIR)/exec_dep.h $(BUILD_TOOLS_DIR)/jit2h.pl
-	$(PERL) $(BUILD_TOOLS_DIR)/jit2h.pl @jitcpuarch@ $(SRC_DIR)/exec_cpu.c
+	$(SRC_DIR)/jit/@jitcpuarch@/core.jit @TEMP_exec_h@ $(INC_DIR)/exec_dep.h $(JIT_BUILD_TOOL)
+	$(PERL) $(JIT_BUILD_TOOL) @jitcpuarch@ $(SRC_DIR)/exec_cpu.c
 
 # imcc file dependencies
 #

@@ -4,11 +4,11 @@
 
 =head1 NAME
 
-tools/build/jit2h.pl - JIT to C
+tools/build/jit2c.pl - JIT to C
 
 =head1 SYNOPSIS
 
-    % perl tools/build/jit2h.pl <cpu-architecture-name> jit_cpu.c
+    % perl tools/build/jit2c.pl <cpu-architecture-name> jit_cpu.c
 
 =head1 DESCRIPTION
 
@@ -460,7 +460,7 @@ if ($genfile =~ /jit_cpu.c/) {
 EOC
 }
 
-print("jit2h: JITed $njit (+ $vjit vtable) of $core_numops ops\n");
+print("jit2c: JITed $njit (+ $vjit vtable) of $core_numops ops\n");
 sub make_subs {
     my ($ptr, $type, $index) = @_;
     return(($ptr eq '&' ? '&' : '') . sprintf($argmaps{$type_to_arg{$type}}, $index));
