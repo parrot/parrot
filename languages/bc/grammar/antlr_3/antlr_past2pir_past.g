@@ -11,6 +11,12 @@ options
   tokenVocab   = 'grammar/antlr_3/BcParser';
 }
 
+// XXX I can't find this in the generated Java code, a bug in ANTLR3 ea7?
+@members 
+{
+  int asdf = 200;
+}
+
 gen_pir_past 
   :
   {
@@ -35,7 +41,7 @@ gen_pir_past
       String pirAfter
         =   "               \$P20 = new 'PAST::Exp' \n"
           + "               \$P21 = new PerlArray \n"
-          + "               push \$P21, \$P10 \n"
+          + "               push \$P21, \$P" + $expr.reg + " \n"
           + "               \$P20.set_node('1', 1, \$P21) \n"
           + "       \$P30 = new 'PAST::Op' \n"
           + "       \$P31 = new PerlArray \n"

@@ -1,6 +1,9 @@
 # $Id$
 
-2006-01-22     Bernhard Schmalhofer
+2006-02-20     Bernhard Schmalhofer
+        * Add the generated Java code to SVN
+
+2006-02-19     Bernhard Schmalhofer
         * Play with PASTinPIR generation for ANTLR3.
 
 2006-01-22     Bernhard Schmalhofer

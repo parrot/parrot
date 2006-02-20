@@ -18,7 +18,6 @@ tokens
   PROGRAM;
 } 
 
-
 program 
   : input_item quit -> ^( PROGRAM input_item )
   ;
