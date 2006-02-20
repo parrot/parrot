@@ -561,6 +561,7 @@ examples/shootout/nsieve-bits-2.pir               [main]doc
 examples/shootout/nsieve-bits.pir                 [main]doc
 examples/shootout/nsieve.pir                      [main]doc
 examples/shootout/partialsums.pir                 [main]doc
+examples/shootout/partialsums-2.pir               [main]doc
 examples/shootout/pidigits.pir                    [main]doc
 examples/shootout/pidigits.py                     [main]doc
 examples/shootout/random.pasm                     [main]doc
