@@ -294,9 +294,6 @@ General Options:
 
 Compile Options:
 
-You can add and remove option values with :rem{<opt>} and :add{<opt>}
-e.g. : --ccflags=":rem{-g} :add{-O2}"
-
    --debugging=0        Disable debugging, default = 1
    --inline             Compiler supports inline
    --optimize           Optimized compile
