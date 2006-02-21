@@ -266,7 +266,7 @@ sub _Lexer {
 
 			s/^(\d+(\.\d*)?|\.\d+)([Ee][+\-]?\d+)?//
 #					and return ('NUMBER', new Math::BigFloat($1));
-					and return ('NUMBER', $1);
+					and return ('NUMBER', $1 . ($3 || ""));
 
 			s/^\"//
 					and return $parser->_DoubleQuoteStringLexer();

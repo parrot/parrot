@@ -22,6 +22,8 @@ the Lua C<Number> type.
 #include "parrot/parrot.h"
 #include "pmc_luastring.h"
 
+#define LUA_NUMBER_FMT		"%.14g"
+
 static STRING *luanumber_name;
 static INTVAL dynpmc_LuaString;
 
@@ -138,7 +140,8 @@ Returns a Parrot string representation of the number.
 
 */
     STRING* get_string () {
-        return string_from_num(INTERP, PMC_num_val(SELF));
+        FLOATVAL f = PMC_num_val(SELF); 
+        return Parrot_sprintf_c(INTERP, LUA_NUMBER_FMT, f);
     }
 
 /*

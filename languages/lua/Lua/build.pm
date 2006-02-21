@@ -114,11 +114,11 @@ sub InsertList {
 sub BuildLiteral {
 	my ($parser, $value, $type) = @_;
 
-	my $name = "cst_" . $parser->YYData->{idx_cst}++;
 	my $defn = $parser->YYData->{symbtab_cst}->Lookup($type . $value);
 	if ($defn) {
 		return [$defn, []];
 	} else {
+		my $name = "cst_" . $parser->YYData->{idx_cst}++;
 		my @opcodes = ();
 		$defn = new defn($name, "const", "pmc", $type);
 		$parser->YYData->{symbtab_cst}->Insert($type . $value, $defn);

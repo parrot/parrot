@@ -18,7 +18,7 @@ use strict;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 44;
+use Parrot::Test tests => 45;
 use Test::More;
 
 language_output_is( 'lua', <<'CODE', <<'OUT', '-1' );
@@ -284,5 +284,15 @@ language_output_like( 'lua', <<'CODE', <<'OUT', '1 >= "0"' );
 print(1 >= "0")
 CODE
 /attempt to compare \w+ with \w+/
+OUT
+
+language_output_is( 'lua', <<'CODE', <<'OUT', '1e9' );
+print(1000000000)
+print(1e9)
+print(1.0e+9)
+CODE
+1000000000
+1000000000
+1000000000
 OUT
 
