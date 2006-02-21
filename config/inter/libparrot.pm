@@ -55,7 +55,7 @@ sub runstep {
     $conf->data->set(
         rpath_blib => ($parrot_is_shared && $conf->data->get('rpath'))
         ? $conf->data->get('rpath')
-          .  $conf->data->get('build_dir')
+          .  $conf->data->get('top_builddir')
           .  $conf->data->get('slash')
           .  $conf->data->get('blib_dir')
         : ''
@@ -64,7 +64,7 @@ sub runstep {
     unless (defined($conf->data->get('libparrot_ldflags'))) {
         $conf->data->set(
             libparrot_ldflags => ($parrot_is_shared)
-            ? '-L' . $conf->data->get('build_dir')
+            ? '-L' . $conf->data->get('top_builddir')
                    . $conf->data->get('slash')
                    . $conf->data->get('blib_dir') . ' -lparrot'
             : $conf->data->get('libparrot')

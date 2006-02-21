@@ -40,12 +40,12 @@ if ($^O eq 'MSWin32') {
     $PATHQUOTE = '"';
 
     unless ($CC =~ /gcc/i) {
-        $LIBPARROT = '@build_dir@/libparrot@a@';
+        $LIBPARROT = '@top_builddir@/libparrot@a@';
     }
 }
 
 # PMC2C Config
-our $PMC2C = "$PERL $PATHQUOTE" . q[@build_dir@@slash@tools@slash@build@slash@pmc2c.pl] . $PATHQUOTE;
+our $PMC2C = "$PERL $PATHQUOTE" . q[@top_builddir@@slash@tools@slash@build@slash@pmc2c.pl] . $PATHQUOTE;
 
 # Actual commands
 sub compile_cmd {
@@ -54,8 +54,8 @@ sub compile_cmd {
     return
         "$CC $CFLAGS " .
         "@cc_o_out@" . $target . " " .
-        "-I" . $PATHQUOTE . '@build_dir@@slash@include' . $PATHQUOTE . " " .
-        "-I" . $PATHQUOTE . '@build_dir@@slash@src@slash@pmc' . $PATHQUOTE . " " .
+        "-I" . $PATHQUOTE . '@top_builddir@@slash@include' . $PATHQUOTE . " " .
+        "-I" . $PATHQUOTE . '@top_builddir@@slash@src@slash@pmc' . $PATHQUOTE . " " .
         $source;
 };
 
