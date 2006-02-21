@@ -1,14 +1,14 @@
 #! perl -w
 # Copyright: 2005-2006 The Perl Foundation.  All Rights Reserved.
-# $Id: number.t 11446 2006-02-06 14:07:49Z fperrad $
+# $Id: strings.t 11446 2006-02-06 14:07:49Z fperrad $
 
 =head1 NAME
 
-t/number.t - Lua number & coercion
+t/strings.t - Lua string & coercion
 
 =head1 SYNOPSIS
 
-    % perl -I../lib -Ilua/t lua/t/number.t
+    % perl -I../lib -Ilua/t lua/t/strings.t
 
 =head1 DESCRIPTION
 
