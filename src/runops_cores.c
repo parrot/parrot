@@ -22,6 +22,7 @@ the faster dispatch of operations.
 */
 
 #include "parrot/runops_cores.h"
+#include "parrot/embed.h"
 #include "parrot/trace.h"
 
 #include "parrot/interp_guts.h"

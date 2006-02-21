@@ -700,7 +700,7 @@ IMCC_subst_constants(Interp *interpreter, IMC_Unit * unit, char *name,
 
     size_t i;
     char b[128], fmt[64], op[20];
-    const char *debug_fmt;
+    const char *debug_fmt = NULL;   /* gcc -O uninit warn */
     int found, branched;
     parrot_context_t *ctx;
     INTVAL regs_used[4] = {3,3,3,3};

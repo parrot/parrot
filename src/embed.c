@@ -837,6 +837,7 @@ Parrot_debug(Interp *debugger, opcode_t * pc)
         command = pdb->cur_command;
         PDB_run_command(debugger, command);
     }
+    return NULL;
 }
 
 /*

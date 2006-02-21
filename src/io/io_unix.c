@@ -294,9 +294,6 @@ PIO_unix_fdopen(theINTERP, ParrotIOLayer *layer, PIOHANDLE fd, INTVAL flags)
 {
     ParrotIO *io;
     INTVAL oflags, mode;
-#  ifdef PARROT_HAS_HEADER_FCNTL
-    INTVAL rflags;
-#  endif
 
     UNUSED(layer);
 
@@ -311,15 +308,18 @@ PIO_unix_fdopen(theINTERP, ParrotIOLayer *layer, PIOHANDLE fd, INTVAL flags)
 
     /* FIXME - Check file handle flags, validity */
 #  ifdef PARROT_HAS_HEADER_FCNTL
-    /* Get descriptor flags */
-    if ((rflags = fcntl(fd, F_GETFL, 0)) >= 0) {
-        UNUSED(rflags);
-        /*int accmode = rflags & O_ACCMODE; */
-        /* Check other flags (APPEND, ASYNC, etc) */
-    }
-    else {
-        /* Probably invalid descriptor */
-        return NULL;
+    {
+        INTVAL rflags;
+        /* Get descriptor flags */
+        if ((rflags = fcntl(fd, F_GETFL, 0)) >= 0) {
+            UNUSED(rflags);
+            /*int accmode = rflags & O_ACCMODE; */
+            /* Check other flags (APPEND, ASYNC, etc) */
+        }
+        else {
+            /* Probably invalid descriptor */
+            return NULL;
+        }
     }
 #  endif
 #endif
