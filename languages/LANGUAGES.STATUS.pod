@@ -671,7 +671,7 @@ Basic IO and control flow elements; mutable variables; assignment.
 
 =item Last verified with parrot version
 
-0.2.2
+0.4.1
 
 =item Location
 
@@ -690,16 +690,18 @@ Allison Randal
 
 =item Description
 
-An implementation of Perl1, implemented in PIR with PGE
+Perl1 implemented in PIR with the help of
+TGE, Tree Grammar Engine, and PGE, Parrot Grammar Engine. 
 
 =item Status
 
-There are some TODO thar are not working yet. 
-Only the 'print 1;' test is expected to work, and does so.
+So far, Punie handles constants (strings, integers, floats), print
+statements, conditionals, do blocks, comma lists, and some basic math
+and logic ops.
 
 =item Last verified with parrot version
 
-0.3.1
+0.4.1
 
 =item Location
 
