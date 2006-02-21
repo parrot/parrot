@@ -1,7 +1,7 @@
 RM_F     = @rm_f@
 PERL     = @perl@
-BUILDPMC = $(PERL) @top_builddir@@slash@tools@slash@build@slash@dynpmc.pl
-DESTDIR  = @top_builddir@@slash@runtime@slash@parrot@slash@dynext
+BUILDPMC = $(PERL) @build_dir@@slash@tools@slash@build@slash@dynpmc.pl
+DESTDIR  = @build_dir@@slash@runtime@slash@parrot@slash@dynext
 O        = @o@
 CLASSDIR = lib/kernel/pmc
 LOAD_EXT = @load_ext@

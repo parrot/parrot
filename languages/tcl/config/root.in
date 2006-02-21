@@ -5,8 +5,8 @@ PBC_MERGE = ..@slash@..@slash@pbc_merge@exe@
 
 C_BUILTIN = src@slash@builtin
 R_BUILTIN = runtime@slash@builtin
-BUILD     = $(PERL) @top_builddir@@slash@tools@slash@build@slash@dynpmc.pl
-DESTDIR   = @top_builddir@@slash@runtime@slash@parrot@slash@dynext
+BUILD     = $(PERL) @build_dir@@slash@tools@slash@build@slash@dynpmc.pl
+DESTDIR   = @build_dir@@slash@runtime@slash@parrot@slash@dynext
 O         = @o@
 PMCDIR    = src@slash@pmc
 CLASSDIR  = src@slash@class

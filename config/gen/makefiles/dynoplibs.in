@@ -1,7 +1,7 @@
 PERL = @perl@
 RM_F = @rm_f@
 LOAD_EXT = @load_ext@
-RUNTIME_DIR = @top_builddir@@slash@runtime@slash@parrot@slash@dynext
+RUNTIME_DIR = @build_dir@@slash@runtime@slash@parrot@slash@dynext
 O = @o@
 
 # add your dynamic op libraries here
@@ -10,7 +10,7 @@ OPLIBS = \
   myops \
   dan
 
-BUILD = $(PERL) "@top_builddir@@slash@tools@slash@build@slash@dynoplibs.pl"
+BUILD = $(PERL) "@build_dir@@slash@tools@slash@build@slash@dynoplibs.pl"
 
 all :
 	@$(BUILD) generate $(OPLIBS)

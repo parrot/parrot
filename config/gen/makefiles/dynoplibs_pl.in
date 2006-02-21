@@ -40,15 +40,15 @@ if ($^O eq 'MSWin32') {
     $PATHQUOTE = '"';
 
     unless ($CC =~ /gcc/i) {
-        $LIBPARROT = '@top_builddir@/libparrot@a@';
+        $LIBPARROT = '@build_dir@/libparrot@a@';
     }
 }
 
 # OPS2C Config
 our $OPS2C = "$PERL -I $PATHQUOTE" . 
-             q[@top_builddir@@slash@lib] .
+             q[@build_dir@@slash@lib] .
              "$PATHQUOTE $PATHQUOTE" .
-             q[@top_builddir@@slash@tools@slash@build@slash@ops2c.pl] .
+             q[@build_dir@@slash@tools@slash@build@slash@ops2c.pl] .
 			 $PATHQUOTE;
 our %cores = (
     C       => '',
@@ -64,8 +64,8 @@ sub compile_cmd {
     return
         "$CC $CFLAGS " .
         "@cc_o_out@" . $target . " " .
-        "-I" . $PATHQUOTE . '@top_builddir@@slash@include' . $PATHQUOTE . " " .
-        "-I" . $PATHQUOTE . '@top_builddir@@slash@src@slash@pmc' . $PATHQUOTE . " " .
+        "-I" . $PATHQUOTE . '@build_dir@@slash@include' . $PATHQUOTE . " " .
+        "-I" . $PATHQUOTE . '@build_dir@@slash@src@slash@pmc' . $PATHQUOTE . " " .
         $source;
 };
 
