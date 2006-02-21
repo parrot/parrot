@@ -254,7 +254,9 @@ struct Interp_Context {
 
 #define CONTEXT(ctx) ((ctx).state)
 
-#define CHUNKED_CTX_MEM 0           /* see src/register.c */
+#define CHUNKED_CTX_MEM 0           /* no longer works, but will be reinstated
+                                       some day; see src/register.c for details.
+                                    */
 
 typedef struct _context_mem {
 #if CHUNKED_CTX_MEM
