@@ -1,7 +1,7 @@
-This is Punie, version 0.0.1
+This is Punie, version 0.1.0
 -----------------------------
 
-Punie is Copyright (C) 2005 The Perl Foundation.
+Punie is Copyright (C) 2005-2006, The Perl Foundation.
 
 LICENSE INFORMATION
 -------------------
@@ -39,4 +39,4 @@ Compile Punie to bytecode and run its test suite:
 Run the Punie compiler via Parrot, passing it the path to a Perl 1
 source file as the only argument:
 
-  $ ../../parrot punie.pbc demo.p1
+  $ ./parrot languages/punie/punie.pbc demo.p1
