@@ -52,6 +52,17 @@ digit, in the form of 'print 1;'.
 
     optable.addtok("infix:+")
     optable.addtok("infix:-", "infix:+")
+    optable.addtok("infix:.", "infix:+")
+    optable.addtok("infix:*", ">infix:+")
+    optable.addtok("infix:/", "infix:*")
+    optable.addtok("infix:%", "infix:*")
+    optable.addtok("infix:x", "infix:*")
+
+    optable.addtok("infix:<<", "<infix:+")
+    optable.addtok("infix:>>", "infix:<<")
+    optable.addtok("infix:&", "<infix:<<")
+    optable.addtok("infix:|", "<infix:&")
+    optable.addtok("infix:^", "infix:|")
 
     term = find_global "PunieGrammar", "term"
     optable.addtok("term:", ">infix:+", "left", term)

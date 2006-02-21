@@ -37,6 +37,17 @@ data file, possibly in YAML.
     lookuptable = new PerlHash
     _add_entry(lookuptable, 'infix:+', 'add')
     _add_entry(lookuptable, 'infix:-', 'sub')
+    _add_entry(lookuptable, 'infix:*', 'mul')
+    _add_entry(lookuptable, 'infix:/', 'div')
+    _add_entry(lookuptable, 'infix:%', 'mod')
+    _add_entry(lookuptable, 'infix:x', 'repeat')
+    _add_entry(lookuptable, 'infix:.', 'concat')
+
+    _add_entry(lookuptable, 'infix:<<', 'shl')
+    _add_entry(lookuptable, 'infix:>>', 'shr')
+    _add_entry(lookuptable, 'infix:&', 'band')
+    _add_entry(lookuptable, 'infix:|', 'bor')
+    _add_entry(lookuptable, 'infix:^', 'bxor')
 
     store_global 'PunieOpLookup', 'lookuptable', lookuptable
 .end
