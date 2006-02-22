@@ -1,6 +1,6 @@
 ---
 name: parrot
-version: 0.4.1
+version: 0.4.2
 author: ~
 abstract: ~
 license: perl
@@ -17,4 +17,4 @@ no_index:
         - lib/Text
         - t
         - tools
-generated_by: Hummans
+generated_by: Humans

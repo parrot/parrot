@@ -1,12 +1,18 @@
 # $Id$
 
-New in 0.x.x
+New in 0.4.2
 
+- improved PPC and x86 JIT support including JIT compilation
+  of very simple PASM/PIR subroutines
+- preliminary libreadline support
+- better trace and debug features
 - pkgconfig support
 - META.yml to support proper indexing on CPAN
 - new opcode: hcf (in "my_ops" in dynamic op library)
 - new File pmc for file specific ops (is_dir, is_file, copy, rename...)
-- named parameters (both :named("") and => syntaxes)
+- named arguments and parameters (both :named("") and => syntaxes)
+- ongoing config improvements
+- tons of bug fixes and other small improvements - too much to list all
 
 New in 0.4.1
 

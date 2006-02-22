@@ -79,8 +79,6 @@ ResizableStringArray:\s\d+\.\d+s\n
 100\s\*\s1000\s=\s100000\n
 SArray:\s\d+\.\d+s\n
 \n
-1\s\*\s1000\s=\s1000\n
-100\s\*\s1000\s=\s100000\n
 StringArray:\s\d+\.\d+s\n
       \n$/x,
     q{arriter.pir} => qq(100000\n100000\n100000\n111111\n),

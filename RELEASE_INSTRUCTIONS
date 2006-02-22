@@ -22,7 +22,7 @@ To prepare a release:
 
         c.  Update README.
 
-        d.  Update ChangeLog, NEWS, docs/ROADMAP, and docs/BROKEN.
+        d.  Update ChangeLog, NEWS, docs/ROADMAP.pod, and docs/BROKEN.pod.
 
         e.  Make sure nothing in TODO has been done.
 

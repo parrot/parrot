@@ -25,9 +25,9 @@ document, among others.
 For a high level overview of parrot milestones, please see:
 L<http://www.perlfoundation.org/gc/grants/2005-p6-proposal.html>
 
-=head1 CURRENT RELEASE (0.4.1)
+=head1 CURRENT RELEASE (0.4.2)
 
-Parrot 0.4.1 was released on Jan. 8th, 2006. For a list of new and fixed
+Parrot 0.4.2 was released on Feb. 22th, 2006. For a list of new and fixed
 feature see L<NEWS>.
 
 =head1 OVERVIEW
@@ -139,12 +139,6 @@ Section 1 of that email needs a decision from the Architect.
 
 =item *
 
-Variable-length register frames are an approved feature, but the design still
-needs fleshing out.  Then there are the minor details of documentation and
-implementation.  :-,
-
-=item *
-
 Design the standard library to replace all those opcodes that should never have
 been opcodes in the first place, e.g. the IO and transcendental math features.
 
@@ -155,22 +149,6 @@ the transcendantal math if someone can show me why.)
 I expect PIR will still let you pretend they're opcodes, though, to avoid
 immediate howls of outrage.  (But only silicon-based life forms write PASM, so
 we're not worried about that.)
-
-=item *
-
-Do detailed design on new Chip/Leo-agreed-in-principle lexical system.
-
-The key change learns a lesson that Perl 5 only half learned: Lexical values
-may be dynamic, but their names and scopes are known at compile time.  It's
-just silly to add '$x' to a newly created pad at runtime, over and over and
-over, every time the same scope is entered.  Silly.
-
-So the names and scopes will be static data attached to the subroutine, while
-the data will be in dynamically created pad entries.
-
-Think of a pseudohash: the static data are like the index hash, which can be
-shared and immutable; the storage slots are like the rest of the array, which
-can be mutable even when the index hash isn't.
 
 =item *
 
@@ -317,10 +295,6 @@ Overflow detection/promotion to bigint/float types.
 
 =item *
 
-Create C<opcode_process.pl>. L<PDD05>
-
-=item *
-
 Fill in the remaining functions from the EDA, verify that the test suite still
 passes, integrate the library into the rest of Parrot, provide PMC types and
 suitable opcodes.  Conversion to and from Parrot strings, conversion to and
@@ -335,18 +309,9 @@ Implement the Parrot equivalent of Perl 5's C<$0>, based on recent (January
 
 =item *
 
-C<load_bytecode> does not search the library path to load the file.
-L<ops/core.ops>
-
-=item *
-
 The debugger needs to clone the interpreter to "allow people to play into the
 debugger and then continue the normal execution of the program."
-L<ops/debug.ops>
-
-=item *
-
-parrot doesn't catch the exception thrown by the op C<cmod>. L<ops/math.ops>
+L<src/ops/debug.ops> (DONE). TODO - rewrite debugger. 
 
 =back
 
@@ -425,7 +390,7 @@ Tests - src/tests are not supported on all platforms
 =item *
 
 ParrotIO uses integral file descriptors, which may not be portable.
-L<ops/io.ops>
+L<src/ops/io.ops>
 
 =item *
 

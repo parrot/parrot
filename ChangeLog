@@ -1,5 +1,9 @@
 # $Id$
 
+2006.02.22    leo
+	* Released 0.4.2
+	See NEWS for more.
+
 2006.01.16    bernhard
 	 * rename src/dynclasses to src/dynpmc 
 	 * rename src/classes to src/pmc 
