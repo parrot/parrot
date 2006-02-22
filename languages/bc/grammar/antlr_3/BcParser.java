@@ -1,4 +1,4 @@
-// $ANTLR 3.0ea7 grammar/antlr_3/bc.g 2006-02-20 19:18:25
+// $ANTLR 3.0ea7 grammar/antlr_3/bc.g 2006-02-22 22:44:02
 
 import org.antlr.runtime.*;
 import java.util.Stack;
@@ -120,7 +120,7 @@ public class BcParser extends Parser {
     };
 
     // $ANTLR start input_item
-    // grammar/antlr_3/bc.g:25:1: input_item : INT ;
+    // grammar/antlr_3/bc.g:25:1: input_item : ( INT )+ ;
     public input_item_return input_item() throws RecognitionException {   
 
         input_item_return retval = new input_item_return();
@@ -133,16 +133,49 @@ public class BcParser extends Parser {
         CommonTree INT3_tree=null;
 
         try {
-            // grammar/antlr_3/bc.g:26:5: ( INT )
-            // grammar/antlr_3/bc.g:26:5: INT
+            // grammar/antlr_3/bc.g:26:5: ( ( INT )+ )
+            // grammar/antlr_3/bc.g:26:5: ( INT )+
             {
             root_0 = (CommonTree)adaptor.nil();
 
 
-            INT3=(Token)input.LT(1);
-            match(input,INT,FOLLOW_INT_in_input_item86);
-            INT3_tree = (CommonTree)adaptor.create(INT3);
-            adaptor.addChild(root_0, INT3_tree);
+            // grammar/antlr_3/bc.g:26:5: ( INT )+
+            int cnt1=0;
+            loop1:
+            do {
+                int alt1=2;
+                int LA1_0 = input.LA(1);
+                if ( LA1_0==INT ) {
+                    alt1=1;
+                }
+
+
+                switch (alt1) {
+            	case 1 :
+            	    // grammar/antlr_3/bc.g:26:5: INT
+            	    {
+            	    CommonTree root_1 = (CommonTree)adaptor.nil();
+
+
+            	    INT3=(Token)input.LT(1);
+            	    match(input,INT,FOLLOW_INT_in_input_item86);
+            	    INT3_tree = (CommonTree)adaptor.create(INT3);
+            	    adaptor.addChild(root_1, INT3_tree);
+
+            	    adaptor.addChild(root_0, root_1);
+
+            	    }
+            	    break;
+
+            	default :
+            	    if ( cnt1 >= 1 ) break loop1;
+                        EarlyExitException eee =
+                            new EarlyExitException(1, input);
+                        throw eee;
+                }
+                cnt1++;
+            } while (true);
+
 
             }
 
@@ -190,7 +223,7 @@ public class BcParser extends Parser {
 
 
             string_literal4=(Token)input.LT(1);
-            match(input,7,FOLLOW_7_in_quit116);
+            match(input,7,FOLLOW_7_in_quit118);
             string_literal4_tree = (CommonTree)adaptor.create(string_literal4);
             adaptor.addChild(root_0, string_literal4_tree);
 
@@ -218,7 +251,7 @@ public class BcParser extends Parser {
 
     public static final BitSet FOLLOW_input_item_in_program61 = new BitSet(new long[]{128L});
     public static final BitSet FOLLOW_quit_in_program63 = new BitSet(new long[]{2L});
-    public static final BitSet FOLLOW_INT_in_input_item86 = new BitSet(new long[]{2L});
-    public static final BitSet FOLLOW_7_in_quit116 = new BitSet(new long[]{2L});
+    public static final BitSet FOLLOW_INT_in_input_item86 = new BitSet(new long[]{34L});
+    public static final BitSet FOLLOW_7_in_quit118 = new BitSet(new long[]{2L});
 
 }

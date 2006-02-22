@@ -1,4 +1,4 @@
-// $ANTLR 3.0ea7 grammar/antlr_3/BcParser.lexer.g 2006-02-20 19:18:25
+// $ANTLR 3.0ea7 grammar/antlr_3/BcParser.lexer.g 2006-02-22 22:44:02
 
 import org.antlr.runtime.*;
 import java.util.Stack;

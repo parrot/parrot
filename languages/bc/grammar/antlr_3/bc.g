@@ -23,7 +23,7 @@ program
   ;
 
 input_item
-  : INT
+  : INT +
   ;
 
 INT

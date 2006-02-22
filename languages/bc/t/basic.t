@@ -59,7 +59,7 @@ my @tests = (
        [ '12345678', [ 12345678 ], 'another positive int', with_past => 1, with_antlr3 => 1  ],
 
        # multiple lines
-       [ "1\n2", [ 1, 2 ], 'two lines', with_past => 1  ],
+       [ "1\n2", [ 1, 2 ], 'two lines', with_past => 1, with_antlr3 => 1  ],
        [ "1\n2\n3\n4\n\n5\n6\n7", [ 1, 2, 3, 4, 5, 6, 7 ], 'seven lines', with_past => 1  ],
 
        # comments 
