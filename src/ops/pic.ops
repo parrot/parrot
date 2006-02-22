@@ -148,6 +148,9 @@ inline op pic_get_params__(inconst PMC) :pic {
      */
     ctx = CONTEXT(interpreter->ctx);
     src_pc = interpreter->current_args;
+    /* the args and params are now 'used.' */
+    interpreter->current_args = NULL;
+    interpreter->current_params = NULL;
     mic = (Parrot_MIC *) cur_opcode[1];
     caller_ctx = ctx->caller_ctx;
     if (src_pc) {
