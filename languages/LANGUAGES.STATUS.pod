@@ -100,6 +100,7 @@ Bernhard Schmalhofer
 =item Description
 
 Based on ANTLR and Python. ANTLR is needed only for maintainance, for generation of Python runtime files. 
+A new implementation with Java code generated with ANTLR 3 is under construction.
 
 =item Status
 
@@ -107,7 +108,7 @@ Very simple arithmetic expressions are working. Some test failures
 
 =item Last verified with parrot version
 
-0.4.1
+0.4.2
 
 =item Location
 
@@ -163,7 +164,7 @@ Passes all tests.
 
 =item Last verified with parrot version
 
-0.3.1
+0.4.2
 
 =item Location
 
@@ -316,15 +317,15 @@ Bernhard Schmalhofer
 
 =item Description
 
-A joke language.
+A joke language. See http://en.wikipedia.org/wiki/HQ9+
 
 =item Status
 
-Works.
+Works and is mostly complete.
 
 =item Last verified with parrot version
 
-0.4.1
+0.4.2
 
 =item Location
 
@@ -360,7 +361,7 @@ be familiar to Perl programmers.
 
 =item Last verified with parrot version
 
-0.4.0 (actually, HEAD of TRUNK as of 2005-12-22, which is post 0.4.0)
+0.4.2
 
 =item Location
 
@@ -388,7 +389,7 @@ Working, but not complete. Part of languages smoke testing.
 
 =item Last verified with parrot version
 
-0.4.0
+0.4.2
 
 =item Location
 
@@ -417,7 +418,7 @@ Early stage - but all examples and test cases are working.
 
 =item Last verified with parrot version
 
-0.4.1
+0.4.2
 
 =item Location
 
@@ -476,9 +477,11 @@ Port of GNU m4 to PIR.
 Functioning for handcrafted test cases. Loading frozen
 state is currently broken. Far from complete. Revision 0.0.14
 
+Development is stalled. Takers are welcome. 
+
 =item Last verified with parrot version
 
-0.4.1
+0.4.2
 
 =item Location
 
@@ -532,7 +535,7 @@ Samples working, README explain how to build/use.
 
 =item Last verified with parrot version
 
-0.3.0
+0.4.2
 
 =item Location
 
@@ -617,7 +620,7 @@ Working. Part of languages smoke testing.
 
 =item Last verified with parrot version
 
-0.3.1
+0.4.2
 
 =item Location
 
@@ -671,7 +674,7 @@ Basic IO and control flow elements; mutable variables; assignment.
 
 =item Last verified with parrot version
 
-0.4.1
+0.4.2
 
 =item Location
 
@@ -757,7 +760,7 @@ Part of languages smoke testing. Almost all tests are succeeding.
 
 =item Last verified with parrot version
 
-0.4.0
+0.4.2
 
 =item Location
 
@@ -843,7 +846,7 @@ Part of languages smoke testing.
 
 =item Last verified with parrot version
 
-0.4.1
+0.4.2
 
 =item Location
 
@@ -871,7 +874,7 @@ Passes about 5.5% of tcl's (converted) test suite
 
 =item Last verified with parrot version
 
-0.4.1
+0.4.2
 
 =item Location
 
@@ -898,7 +901,7 @@ Working. Part of languages smoke testing.
 
 =item Last verified with parrot version
 
-0.4.0
+0.4.2
 
 =item Location
 
@@ -926,7 +929,7 @@ expected to change soon.
 
 =item Last verified with parrot version
 
-0.3.1
+0.4.2
 
 =item Location
 
@@ -982,7 +985,7 @@ Infocom's Z-machine. See also http://en.wikipedia.org/wiki/Z-machine.
 
 =item Last verified with parrot version
 
-0.4.0
+0.4.2
 
 =item Location
 
