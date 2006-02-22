@@ -1633,7 +1633,7 @@ cont_dest:
     .param pmc cc
     .param string s
     print s
-    tailcall cc
+    .return cc()
 .end
 CODE
 ok 1
