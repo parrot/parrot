@@ -605,6 +605,7 @@ imcc_compile(Parrot_Interp interp, const char *s, int pasm_file)
     PMC *sub;
     parrot_sub_t sub_data;
     struct _imc_info_t *imc_info = NULL;
+    struct parser_state_t *next;
     union {
         const void * __c_ptr;
         void * __ptr;
@@ -636,6 +637,7 @@ imcc_compile(Parrot_Interp interp, const char *s, int pasm_file)
         }
     }
     IMCC_push_parser_state(interp);
+    next = IMCC_INFO(interp)->state->next;
     if (imc_info)
         IMCC_INFO(interp)->state->next = NULL;
     IMCC_INFO(interp)->state->pasm_file = pasm_file;
@@ -643,6 +645,16 @@ imcc_compile(Parrot_Interp interp, const char *s, int pasm_file)
     expect_pasm = 0;
 
     compile_string(interp, const_cast(s));
+
+    /*
+     * compile_string NULLifies frames->next, so that yywrap
+     * doesn't try to continue compiling the previous buffer
+     * This OTOH prevents pop_parser-state ->
+     *  
+     * set next here and pop
+     */
+    IMCC_INFO(interp)->state->next = next;
+    IMCC_pop_parser_state(interp);
 
     sub = pmc_new(interp, enum_class_Eval);
     PackFile_fixup_subs(interp, PBC_MAIN, sub);

@@ -992,6 +992,12 @@ pop_parser_state(Interp* interp)
 }
 
 void
+IMCC_pop_parser_state(Interp* interp)
+{
+    pop_parser_state(interp);
+}
+
+void
 compile_file(Interp *interp, FILE *file)
 {
     YY_BUFFER_STATE buffer;

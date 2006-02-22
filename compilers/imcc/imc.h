@@ -158,6 +158,7 @@ typedef enum _AsmState {
 } AsmState;
 
 PARROT_API void IMCC_push_parser_state(Interp*);
+PARROT_API void IMCC_pop_parser_state(Interp*);
 
 typedef struct _imc_info_t {
     struct _imc_info_t *prev;
