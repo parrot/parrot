@@ -101,12 +101,13 @@ my @unified_testable_languages =
        m4
        ook
        parrot_compiler
+       punie
        regex
        scheme
        tcl
        unlambda
        urm );
-# @unified_testable_languages = qw( bc );
+# @unified_testable_languages = qw( punie );
 
 my @harnesses =
     grep {-f $_}
