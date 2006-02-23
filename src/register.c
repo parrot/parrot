@@ -229,6 +229,7 @@ init_context(Interp *interpreter, parrot_context_t *ctx, parrot_context_t *old)
     ctx->current_package = NULL; /* XXX unused except tests */
     ctx->current_method = NULL; /* XXX who clears it? */
     ctx->current_object = NULL; /* XXX who clears it?  */
+    ctx->current_HLL = 0;
     if (old) {
         /* some items should better be COW copied */
         ctx->constants = old->constants;
