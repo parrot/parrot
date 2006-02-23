@@ -7,6 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test;
+use Parrot::Config;
 
 
 =head1 NAME
@@ -488,14 +489,15 @@ CODE
 12
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', 'rot_i_i_ic_ic');
+my $int_bits = $PConfig{intvalsize} * 8;
+pasm_output_is(<<"CODE", <<'OUTPUT', 'rot_i_i_ic_ic');
     set I0, 0b001100
-    rot I1, I0, 1, 32   # 1 left
+    rot I1, I0, 1, $int_bits   # 1 left
     print I1
-    print "\n"
-    rot I1, I0, -1, 32   # 1 right
+    print "\\n"
+    rot I1, I0, -1, $int_bits   # 1 right
     print I1
-    print "\n"
+    print "\\n"
     end
 CODE
 24
