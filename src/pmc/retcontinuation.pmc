@@ -108,10 +108,14 @@ the frame pointer in the stack frame cache.
 
         /* debug print before context is switched */
         if (Interp_trace_TEST(INTERP, PARROT_TRACE_SUB_CALL_FLAG)) {
+            Interp *tracer;
+
             PMC *to_sub = caller_ctx->current_sub;
             PMC *from_sub = cc->from_ctx->current_sub;
 
-            PIO_eprintf(INTERP, "# Back in sub '%Ss' from '%Ss'\n",
+            tracer = interpreter->debugger ? 
+                interpreter->debugger : interpreter;
+            PIO_eprintf(tracer, "# Back in sub '%Ss' from '%Ss'\n",
                     Parrot_full_sub_name(INTERP, to_sub),
                     Parrot_full_sub_name(INTERP, from_sub));
         }

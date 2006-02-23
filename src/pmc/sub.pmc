@@ -57,9 +57,13 @@ clear_fixup(Interp* interpreter, PMC* self)
 static void
 print_sub_name(Interp* interpreter, PMC* sub)
 {
+    Interp *tracer;
+
+    tracer = interpreter->debugger ? 
+        interpreter->debugger : interpreter;
 
         /* sub was located via globals */
-    PIO_eprintf(interpreter, "# Calling sub '%Ss'\n# ",
+    PIO_eprintf(tracer, "# Calling sub '%Ss'\n# ",
         Parrot_full_sub_name(interpreter, sub));
     print_pbc_location(interpreter);
 }

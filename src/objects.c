@@ -1092,6 +1092,8 @@ debug_trace_find_meth(Interp* interpreter, PMC *class, STRING *name, PMC *sub)
 {
     STRING *class_name;
     const char *result;
+    Interp *tracer;
+
     if (!Interp_trace_TEST(interpreter, PARROT_TRACE_FIND_METH_FLAG))
         return;
     if (PObj_is_class_TEST(class)) {
@@ -1109,7 +1111,9 @@ debug_trace_find_meth(Interp* interpreter, PMC *class, STRING *name, PMC *sub)
     }
     else
         result = "no";
-    PIO_eprintf(interpreter,
+    tracer = interpreter->debugger ? 
+        interpreter->debugger : interpreter;
+    PIO_eprintf(tracer,
             "# find_method class '%Ss' method '%Ss': %s\n",
             class_name, name, result);
 }

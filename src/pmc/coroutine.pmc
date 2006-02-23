@@ -66,18 +66,21 @@ static void
 print_sub_name(Interp* interpreter, PMC* sub)
 {
     struct Parrot_coro * co = PMC_coro(sub);
+    Interp *tracer;
 
-    PIO_eprintf(interpreter, "# %s coro '%Ss'",
+    tracer = interpreter->debugger ? 
+        interpreter->debugger : interpreter;
+    PIO_eprintf(tracer, "# %s coro '%Ss'",
         !(PObj_get_FLAGS(sub) & SUB_FLAG_CORO_FF) ? 
         "Calling" : "yielding from",
         Parrot_full_sub_name(interpreter, sub));
     if (co->ctx &&
         (PObj_get_FLAGS(sub) & SUB_FLAG_CORO_FF)) {
-        PIO_eprintf(interpreter, " to '%Ss'",
+        PIO_eprintf(tracer, " to '%Ss'",
                 Parrot_full_sub_name(interpreter, 
                     co->ctx->caller_ctx->current_sub));
     }
-    PIO_eprintf(interpreter, "\n# ");
+    PIO_eprintf(tracer, "\n# ");
     print_pbc_location(interpreter);
 }
 

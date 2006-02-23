@@ -34,10 +34,15 @@ Prints the bytecode location of the warning or error to C<PIO_STDERR>.
 */
 
 void
-print_pbc_location(Parrot_Interp inter)
+print_pbc_location(Parrot_Interp interpreter)
 {
-    PIO_eprintf(inter, "%Ss\n",
-            Parrot_Context_infostr(inter, CONTEXT(inter->ctx)));
+    Interp *tracer;
+
+    tracer = interpreter->debugger ? 
+        interpreter->debugger : interpreter;
+    PIO_eprintf(tracer, "%Ss\n",
+            Parrot_Context_infostr(interpreter, 
+                CONTEXT(interpreter->ctx)));
 }
 
 /*
