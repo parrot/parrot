@@ -1844,6 +1844,10 @@ byte_code_destroy (Interp* interpreter, struct PackFile_Segment *self)
 	    byte_code->prederef.branches = NULL;
 	}
     }
+    byte_code->fixups = NULL;
+    byte_code->debugs = NULL;
+    byte_code->const_table = NULL;
+    byte_code->pic_index = NULL;
 }
 
 /*

@@ -174,8 +174,9 @@ Invokes the first subroutine in the eval code.
             PackFile_Segment_destroy(INTERP, seg);
         }
         seg = (struct PackFile_Segment *)cur_cs->fixups;
-        if (cur_cs->fixups) {
+        if (seg) {
             PackFile_Segment_destroy(INTERP, seg);
+            cur_cs->fixups = NULL;
         }
         seg = cur_cs->pic_index;
         if (seg) {

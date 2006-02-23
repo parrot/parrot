@@ -160,6 +160,7 @@ Swaps the "context".
             ctx->caller_ctx = caller_ctx;
             PMC_cont(ccont)->from_ctx = ctx;
             ctx->current_sub = SELF;
+            ctx->current_HLL = co->HLL_id;
             ctx->current_cont = ccont;
             ctx->current_object = NULL;
             INTERP->current_object = NULL;
