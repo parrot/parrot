@@ -45,6 +45,7 @@ clear_fixups(Interp* interpreter, PMC* self)
                 ci = ft->fixups[i]->offset;
                 sub = ct->constants[ci]->u.key;
                 PMC_sub(sub)->seg = NULL;
+                PMC_sub(sub)->eval_pmc = NULL;
                 ct->constants[ci]->u.key = NULL;
                 ft->fixups[i]->type = 0;
         }
@@ -146,6 +147,9 @@ Invokes the first subroutine in the eval code.
          * TODO walk the fixups for this segment, locate globals
          *      and nullify the Sub PMC.
          * This probably needs a pointer into the globals.
+         *
+         * OTOH - if the global exists - this eval pmc ought
+         *        to be alive and destroy isn't called.
          */
         parrot_sub_t sub_data;
         struct PackFile_Segment *seg;
@@ -160,20 +164,28 @@ Invokes the first subroutine in the eval code.
         if (!cur_cs)
             return;
 
-        if (cur_cs->const_table)
-            PackFile_ConstTable_clear(INTERP, cur_cs->const_table);
-        cur_cs->const_table = NULL;
-        seg = (struct PackFile_Segment *)cur_cs->debugs;
-        if (seg)
+        /* TODO create PF API, move it there */
+        seg = (struct PackFile_Segment *)cur_cs->const_table;
+        if (seg) {
             PackFile_Segment_destroy(INTERP, seg);
-        cur_cs->debugs = NULL;
-        if (cur_cs->fixups)
-            PackFile_FixupTable_clear(INTERP, cur_cs->fixups);
-        cur_cs->fixups = NULL;
+        }
+        seg = (struct PackFile_Segment *)cur_cs->debugs;
+        if (seg) {
+            PackFile_Segment_destroy(INTERP, seg);
+        }
+        seg = (struct PackFile_Segment *)cur_cs->fixups;
+        if (cur_cs->fixups) {
+            PackFile_Segment_destroy(INTERP, seg);
+        }
+        seg = cur_cs->pic_index;
+        if (seg) {
+            PackFile_Segment_destroy(INTERP, seg);
+        }
         seg = (struct PackFile_Segment *)cur_cs;
         PackFile_Segment_destroy(INTERP, seg);
         sub_data->seg = NULL;
         PMC_struct_val(SELF) = NULL;
+        mem_sys_free(sub_data);
     }
 
     void mark() {
