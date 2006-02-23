@@ -285,7 +285,7 @@ register.
     if $I0 goto end
     emit(code, "    $I0 = defined captscope[%s]", cname)
     emit(code, "    if $I0 goto %s_c1", label)
-    emit(code, "    $P0 = new .PerlArray")
+    emit(code, "    $P0 = new .ResizablePMCArray")
     emit(code, "    captscope[%s] = $P0", cname)
     emit(code, "    save captscope")
     emit(code, "    bsr %s_c1", label)
@@ -375,7 +375,7 @@ register.
     emit(code, "    $P0 = interpinfo %s", .INTERPINFO_CURRENT_SUB)
     emit(code, "    setattribute mob, \"PGE::Match\\x0&:corou\", $P0")
     emit(code, "    lastpos = length target")
-    emit(code, "    gpad = new .PerlArray")
+    emit(code, "    gpad = new .ResizablePMCArray")
     emit(code, "    rcache = new .PerlHash")
     emit(code, "    captscope = mob")
     emit(code, "    pos = mfrom")
@@ -518,7 +518,7 @@ register.
     cname = self["cname"]
     emit(code, "\n  %s: # scalar %s %s    ##", label, cname, $S0)
     emit(code, "    $P0 = mob[%s]", cname)
-    emit(code, "    $I0 = isa $P0, \"Array\"")
+    emit(code, "    $I0 = does $P0, \"array\"")
     emit(code, "    if $I0 == 0 goto %s_0", label)
     emit(code, "    $P0 = $P0[-1]")
     emit(code, "  %s_0:", label)

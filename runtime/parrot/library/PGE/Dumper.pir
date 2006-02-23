@@ -158,13 +158,13 @@ An alternate dump output for a Match object and all of its subcaptures.
     goto subrules_1
 
   dumper:
-    $I0 = isa $P0, "Array"
-    if $I0 goto dumper_0
     $I0 = isa $P0, "PGE::Match"
-    unless $I0 goto dumper_3
+    unless $I0 goto dumper_0
     $P0."dump"(prefix1, b1, b2)
     ret
   dumper_0:
+    $I0 = does $P0, "array"
+    unless $I0 goto dumper_3
     $I0 = 0
     $I1 = elements $P0
   dumper_1:

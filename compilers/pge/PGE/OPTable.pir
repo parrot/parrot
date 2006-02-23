@@ -269,9 +269,9 @@ representing the result of the parse.
     opertable = getattribute self, "PGE::OPTable\x0%:opertable"
     wstermtable = getattribute self, "PGE::OPTable\x0%:wstermtable"
     wsopertable = getattribute self, "PGE::OPTable\x0%:wsopertable"
-    termstack = new .PerlArray
-    operstack = new .PerlArray
-    tokstack = new .PerlArray
+    termstack = new .ResizablePMCArray
+    operstack = new .ResizablePMCArray
+    tokstack = new .ResizablePMCArray
     termempty = termtable[""]
     operempty = opertable[""]
 
