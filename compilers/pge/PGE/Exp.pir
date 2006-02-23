@@ -119,7 +119,7 @@ won't be a problem, but is the use of the start parameter thread-safe?
   saveregs_1:
     if $I0 >= savec goto emitsub_1
     $S0 = save[$I0]
-    emit(code, "    save %s", $S0)
+    emit(code, "    push ustack, %s", $S0)
     inc $I0
     goto saveregs_1
   emitsub_1:
@@ -128,7 +128,7 @@ won't be a problem, but is the use of the start parameter thread-safe?
   restoreregs_1:
     if $I0 < 0 goto gencut
     $S0 = save[$I0]
-    emit(code, "    restore %s", $S0)
+    emit(code, "    %s = pop ustack", $S0)
     dec $I0
     goto restoreregs_1
   gencut:
@@ -287,9 +287,9 @@ register.
     emit(code, "    if $I0 goto %s_c1", label)
     emit(code, "    $P0 = new .ResizablePMCArray")
     emit(code, "    captscope[%s] = $P0", cname)
-    emit(code, "    save captscope")
+    emit(code, "    push ustack, captscope")
     emit(code, "    bsr %s_c1", label)
-    emit(code, "    restore captscope")
+    emit(code, "    captscope = pop ustack")
     emit(code, "    delete captscope[%s]", cname)
     emit(code, "    goto fail")
     emit(code, "  %s_c1:", label)
@@ -368,6 +368,7 @@ register.
     emit(code, "    .local int cutting")
     emit(code, "    .local string lit")
     emit(code, "    .local int litlen")
+    emit(code, "    .local pmc ustack")
     emit(code, "    .local pmc gpad, rcache")
     emit(code, "    .local pmc captscope")
     emit(code, "    newfrom = find_global \"PGE::Match\", \"newfrom\"")
@@ -375,6 +376,7 @@ register.
     emit(code, "    $P0 = interpinfo %s", .INTERPINFO_CURRENT_SUB)
     emit(code, "    setattribute mob, \"PGE::Match\\x0&:corou\", $P0")
     emit(code, "    lastpos = length target")
+    emit(code, "    ustack = new .ResizablePMCArray")
     emit(code, "    gpad = new .ResizablePMCArray")
     emit(code, "    rcache = new .PerlHash")
     emit(code, "    captscope = mob")
@@ -1007,7 +1009,7 @@ register.
   capture_2:
     emit(code, "    goto fail")
     emit(code, "  %s:", expnext)
-    emit(code, "    save captscope")
+    emit(code, "    push ustack, captscope")
     emit(code, "    $P0 = pop gpad")
     emit(code, "    captscope = pop gpad")
     emit(code, "    $P1 = getattribute $P0, \"PGE::Match\\x0$:pos\"")
@@ -1015,7 +1017,7 @@ register.
     self.emitsub(code, next, "$P0", "captscope", "NOCUT")
     emit(code, "    push gpad, captscope")
     emit(code, "    push gpad, $P0")
-    emit(code, "    restore captscope")
+    emit(code, "    captscope = pop ustack")
     emit(code, "    goto fail")
   end:
     exp.gen(code, explabel, expnext)
