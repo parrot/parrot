@@ -1,4 +1,4 @@
-// $ANTLR 3.0ea7 grammar/antlr_3/bc.g 2006-02-22 22:44:02
+// $ANTLR 3.0ea7 grammar/antlr_3/bc.g 2006-02-23 21:51:42
 
 import org.antlr.runtime.*;
 import java.util.Stack;
@@ -10,10 +10,11 @@ import org.antlr.runtime.tree.*;
 
 public class BcParser extends Parser {
     public static final String[] tokenNames = new String[] {
-        "<invalid>", "<EOR>", "<DOWN>", "<UP>", "PROGRAM", "INT", "WS", "\'quit\'"
+        "<invalid>", "<EOR>", "<DOWN>", "<UP>", "PROGRAM", "INT", "ML_COMMENT", "WS", "\'quit\'"
     };
     public static final int INT=5;
-    public static final int WS=6;
+    public static final int WS=7;
+    public static final int ML_COMMENT=6;
     public static final int PROGRAM=4;
         public BcParser(TokenStream input) {
             super(input);
@@ -223,7 +224,7 @@ public class BcParser extends Parser {
 
 
             string_literal4=(Token)input.LT(1);
-            match(input,7,FOLLOW_7_in_quit118);
+            match(input,8,FOLLOW_8_in_quit118);
             string_literal4_tree = (CommonTree)adaptor.create(string_literal4);
             adaptor.addChild(root_0, string_literal4_tree);
 
@@ -249,9 +250,9 @@ public class BcParser extends Parser {
 
 
 
-    public static final BitSet FOLLOW_input_item_in_program61 = new BitSet(new long[]{128L});
+    public static final BitSet FOLLOW_input_item_in_program61 = new BitSet(new long[]{256L});
     public static final BitSet FOLLOW_quit_in_program63 = new BitSet(new long[]{2L});
     public static final BitSet FOLLOW_INT_in_input_item86 = new BitSet(new long[]{34L});
-    public static final BitSet FOLLOW_7_in_quit118 = new BitSet(new long[]{2L});
+    public static final BitSet FOLLOW_8_in_quit118 = new BitSet(new long[]{2L});
 
 }

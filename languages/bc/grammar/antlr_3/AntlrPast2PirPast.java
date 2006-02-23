@@ -1,4 +1,4 @@
-// $ANTLR 3.0ea7 grammar/antlr_3/antlr_past2pir_past.g 2006-02-22 22:44:03
+// $ANTLR 3.0ea7 grammar/antlr_3/antlr_past2pir_past.g 2006-02-23 21:51:43
 
 import org.antlr.runtime.*;
 import org.antlr.runtime.tree.*;import java.util.Stack;
@@ -7,10 +7,11 @@ import java.util.ArrayList;
 
 public class AntlrPast2PirPast extends TreeParser {
     public static final String[] tokenNames = new String[] {
-        "<invalid>", "<EOR>", "<DOWN>", "<UP>", "PROGRAM", "INT", "WS"
+        "<invalid>", "<EOR>", "<DOWN>", "<UP>", "PROGRAM", "INT", "ML_COMMENT", "WS"
     };
     public static final int INT=5;
-    public static final int WS=6;
+    public static final int WS=7;
+    public static final int ML_COMMENT=6;
     public static final int PROGRAM=4;
         public AntlrPast2PirPast(TreeNodeStream input) {
             super(input);
@@ -27,8 +28,6 @@ public class AntlrPast2PirPast extends TreeParser {
     public void gen_pir_past() throws RecognitionException {   
 
 
-
-        String expr1 = null;
 
 
         try {
@@ -77,7 +76,7 @@ public class AntlrPast2PirPast extends TreeParser {
             	    {
 
             	    following.push(FOLLOW_expr_in_gen_pir_past64);
-            	    expr1=expr();
+            	    expr();
             	    following.pop();
 
 
@@ -99,44 +98,6 @@ public class AntlrPast2PirPast extends TreeParser {
 
                   String pirAfter = "" 
                       + "# entering gen_pir_past" + "\n"
-                      + "               $P20 = new 'PAST::Exp' " + "\n"
-                      + "               $P21 = new PerlArray " + "\n"
-                      + "               push $P21, " + expr1 + " \n"
-                      + "               $P20.set_node('1', 1, $P21) " + "\n"
-                      + "       $P30 = new 'PAST::Op' " + "\n"
-                      + "       $P31 = new PerlArray " + "\n"
-                      + "       push $P31, $P20 " + "\n"
-                      + "       $P30.set_node('1', 1, 'print' ,$P31) " + "\n"
-                      + "               $P40 = new 'PAST::Exp' " + "\n"
-                      + "               $P41 = new PerlArray " + "\n"
-                      + "               push $P41, $P30 " + "\n"
-                      + "               $P40.set_node('1', 1, $P41) " + "\n"
-                      + "  $P50 = new 'PAST::Stmt' " + "\n"
-                      + "  $P51 = new PerlArray " + "\n"
-                      + "  push $P51, $P40 " + "\n"
-                      + "  $P50.set_node('1', 1 ,$P51) " + "\n"
-                      + "  push stmts_children, $P50 " + "\n"
-                      + "               $P60 = new 'PAST::Val' " + "\n"
-                      + "               $P60.set_node( '1', 0, '\\n' ) " + "\n"
-                      + "               $P60.valtype( 'strqq' ) " + "\n"
-                      + "               $P70 = new 'PAST::Exp' " + "\n"
-                      + "               $P71 = new PerlArray " + "\n"
-                      + "               push $P71, $P60 " + "\n"
-                      + "               $P70.set_node('1', 1, $P71) " + "\n"
-                      + "       $P80 = new 'PAST::Op' " + "\n"
-                      + "       $P81 = new PerlArray " + "\n"
-                      + "       push $P81, $P70 " + "\n"
-                      + "       $P80.set_node('1', 1, 'print' ,$P81) " + "\n"
-                      + "               $P90 = new 'PAST::Exp' " + "\n"
-                      + "               $P91 = new PerlArray " + "\n"
-                      + "               push $P91, $P80 " + "\n"
-                      + "               $P90.set_node('1', 1, $P91) " + "\n"
-                      + "  $P100 = new 'PAST::Stmt' " + "\n"
-                      + "  $P101 = new PerlArray " + "\n"
-                      + "  push $P101, $P90 " + "\n"
-                      + "  $P100.set_node('1', 1 ,$P101) " + "\n"
-                      + "  push stmts_children, $P100 " + "\n"
-                      + "\n"
                       + "  .local pmc stmts" + "\n"
                       + "  stmts = new 'PAST::Stmts'" + "\n"
                       + "  stmts.set_node('1', 1, stmts_children)" + "\n"
@@ -236,7 +197,7 @@ public class AntlrPast2PirPast extends TreeParser {
     };
 
     // $ANTLR start expr_int_1
-    // grammar/antlr_3/antlr_past2pir_past.g:162:1: expr_int_1 : INT ;
+    // grammar/antlr_3/antlr_past2pir_past.g:124:1: expr_int_1 : INT ;
     public expr_int_1_return expr_int_1() throws RecognitionException {   
 
         expr_int_1_return retval = new expr_int_1_return();
@@ -245,8 +206,8 @@ public class AntlrPast2PirPast extends TreeParser {
 
 
         try {
-            // grammar/antlr_3/antlr_past2pir_past.g:163:5: ( INT )
-            // grammar/antlr_3/antlr_past2pir_past.g:163:5: INT
+            // grammar/antlr_3/antlr_past2pir_past.g:125:5: ( INT )
+            // grammar/antlr_3/antlr_past2pir_past.g:125:5: INT
             {
 
             match(input,INT,FOLLOW_INT_in_expr_int_186);
@@ -271,24 +232,24 @@ public class AntlrPast2PirPast extends TreeParser {
 
 
     // $ANTLR start expr
-    // grammar/antlr_3/antlr_past2pir_past.g:167:1: expr returns [String reg] : expr_int_1 ;
+    // grammar/antlr_3/antlr_past2pir_past.g:129:1: expr returns [String reg] : expr_int_1 ;
     public String expr() throws RecognitionException {   
 
         String reg;
 
-        expr_int_1_return expr_int_12 = null;
+        expr_int_1_return expr_int_11 = null;
 
 
 
             reg = "reg_expr";
           
         try {
-            // grammar/antlr_3/antlr_past2pir_past.g:172:5: ( expr_int_1 )
-            // grammar/antlr_3/antlr_past2pir_past.g:172:5: expr_int_1
+            // grammar/antlr_3/antlr_past2pir_past.g:134:5: ( expr_int_1 )
+            // grammar/antlr_3/antlr_past2pir_past.g:134:5: expr_int_1
             {
 
             following.push(FOLLOW_expr_int_1_in_expr113);
-            expr_int_12=expr_int_1();
+            expr_int_11=expr_int_1();
             following.pop();
 
 
@@ -297,9 +258,47 @@ public class AntlrPast2PirPast extends TreeParser {
                       + "# entering expr" + "\n"
                       + ".local pmc " + reg + "\n"
                       + reg + " = new 'PAST::Val'" + "\n"
-                      + reg + ".set_node( '1', 0, " + input.toString(expr_int_12.start,expr_int_12.stop) + " )" + "\n"
+                      + reg + ".set_node( '1', 0, " + input.toString(expr_int_11.start,expr_int_11.stop) + " )" + "\n"
                       + reg + ".valtype( 'num' )" + "\n"
                       + "# leaving expr" + "\n"
+                      + "               $P20 = new 'PAST::Exp' " + "\n"
+                      + "               $P21 = new PerlArray " + "\n"
+                      + "               push $P21, " + reg + " \n"
+                      + "               $P20.set_node('1', 1, $P21) " + "\n"
+                      + "       $P30 = new 'PAST::Op' " + "\n"
+                      + "       $P31 = new PerlArray " + "\n"
+                      + "       push $P31, $P20 " + "\n"
+                      + "       $P30.set_node('1', 1, 'print' ,$P31) " + "\n"
+                      + "               $P40 = new 'PAST::Exp' " + "\n"
+                      + "               $P41 = new PerlArray " + "\n"
+                      + "               push $P41, $P30 " + "\n"
+                      + "               $P40.set_node('1', 1, $P41) " + "\n"
+                      + "  $P50 = new 'PAST::Stmt' " + "\n"
+                      + "  $P51 = new PerlArray " + "\n"
+                      + "  push $P51, $P40 " + "\n"
+                      + "  $P50.set_node('1', 1 ,$P51) " + "\n"
+                      + "  push stmts_children, $P50 " + "\n"
+                      + "               $P60 = new 'PAST::Val' " + "\n"
+                      + "               $P60.set_node( '1', 0, '\\n' ) " + "\n"
+                      + "               $P60.valtype( 'strqq' ) " + "\n"
+                      + "               $P70 = new 'PAST::Exp' " + "\n"
+                      + "               $P71 = new PerlArray " + "\n"
+                      + "               push $P71, $P60 " + "\n"
+                      + "               $P70.set_node('1', 1, $P71) " + "\n"
+                      + "       $P80 = new 'PAST::Op' " + "\n"
+                      + "       $P81 = new PerlArray " + "\n"
+                      + "       push $P81, $P70 " + "\n"
+                      + "       $P80.set_node('1', 1, 'print' ,$P81) " + "\n"
+                      + "               $P90 = new 'PAST::Exp' " + "\n"
+                      + "               $P91 = new PerlArray " + "\n"
+                      + "               push $P91, $P80 " + "\n"
+                      + "               $P90.set_node('1', 1, $P91) " + "\n"
+                      + "  $P100 = new 'PAST::Stmt' " + "\n"
+                      + "  $P101 = new PerlArray " + "\n"
+                      + "  push $P101, $P90 " + "\n"
+                      + "  $P100.set_node('1', 1 ,$P101) " + "\n"
+                      + "  push stmts_children, $P100 " + "\n"
+                      + "\n"
                       ;
                   System.out.println( pir );    
                 

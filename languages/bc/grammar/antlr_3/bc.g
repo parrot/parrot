@@ -35,6 +35,18 @@ quit
   : 'quit'
   ;    
 
+// ignore multiple-line comments
+
+
+ML_COMMENT
+  : '/*'
+    ( options {greedy=false;} : . )*
+    '*/'
+    {
+      channel = 99;       // send into nirwana 
+    }
+	;
+
 WS
   : (   ' '
       |   '\t'
@@ -42,6 +54,6 @@ WS
       |   '\n'
     )+
     {
-      channel = 99;
+      channel = 99;       // send into nirwana 
     }
   ;    

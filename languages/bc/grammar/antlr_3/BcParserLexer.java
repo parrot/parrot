@@ -1,4 +1,4 @@
-// $ANTLR 3.0ea7 grammar/antlr_3/BcParser.lexer.g 2006-02-22 22:44:02
+// $ANTLR 3.0ea7 grammar/antlr_3/BcParser.lexer.g 2006-02-23 21:51:42
 
 import org.antlr.runtime.*;
 import java.util.Stack;
@@ -7,9 +7,10 @@ import java.util.ArrayList;
 
 public class BcParserLexer extends Lexer {
     public static final int INT=5;
-    public static final int WS=6;
+    public static final int WS=7;
+    public static final int ML_COMMENT=6;
+    public static final int T8=8;
     public static final int PROGRAM=4;
-    public static final int T7=7;
     public BcParserLexer(CharStream input) {
         super(input);
     }
@@ -32,8 +33,8 @@ retry:
         return token;
     }
 
-    public void mT7() throws RecognitionException {
-        int type = T7;
+    public void mT8() throws RecognitionException {
+        int type = T8;
         int start = getCharIndex();
         int line = getLine();
         int charPosition = getCharPositionInLine();
@@ -96,30 +97,92 @@ retry:
         if ( token==null ) {emit(type,line,charPosition,channel,start,getCharIndex()-1);}
     }
 
-    public void mWS() throws RecognitionException {
-        int type = WS;
+    public void mML_COMMENT() throws RecognitionException {
+        int type = ML_COMMENT;
         int start = getCharIndex();
         int line = getLine();
         int charPosition = getCharPositionInLine();
         int channel = Token.DEFAULT_CHANNEL;
-        // grammar/antlr_3/BcParser.lexer.g:7:6: ( ( (' '|'\t'|'\r'|'\n'))+ )
-        // grammar/antlr_3/BcParser.lexer.g:7:6: ( (' '|'\t'|'\r'|'\n'))+
+        // grammar/antlr_3/BcParser.lexer.g:7:14: ( '/*' ( options {greedy=false; } : . )* '*/' )
+        // grammar/antlr_3/BcParser.lexer.g:7:14: '/*' ( options {greedy=false; } : . )* '*/'
         {
 
-        // grammar/antlr_3/BcParser.lexer.g:7:6: ( (' '|'\t'|'\r'|'\n'))+
-        int cnt2=0;
+        match("/*");
+
+
+        // grammar/antlr_3/BcParser.lexer.g:7:19: ( options {greedy=false; } : . )*
         loop2:
         do {
             int alt2=2;
             int LA2_0 = input.LA(1);
-            if ( (LA2_0>='\t' && LA2_0<='\n')||LA2_0=='\r'||LA2_0==' ' ) {
+            if ( LA2_0=='*' ) {
+                int LA2_1 = input.LA(2);
+                if ( LA2_1=='/' ) {
+                    alt2=2;
+                }
+                else if ( (LA2_1>='\u0000' && LA2_1<='.')||(LA2_1>='0' && LA2_1<='\uFFFE') ) {
+                    alt2=1;
+                }
+
+
+            }
+            else if ( (LA2_0>='\u0000' && LA2_0<=')')||(LA2_0>='+' && LA2_0<='\uFFFE') ) {
                 alt2=1;
             }
 
 
             switch (alt2) {
         	case 1 :
-        	    // grammar/antlr_3/BcParser.lexer.g:7:8: (' '|'\t'|'\r'|'\n')
+        	    // grammar/antlr_3/BcParser.lexer.g:7:48: .
+        	    {
+
+        	    matchAny();
+
+        	    }
+        	    break;
+
+        	default :
+        	    break loop2;
+            }
+        } while (true);
+
+
+        match("*/");
+
+
+
+         channel = 99; // send into nirwana 
+         
+
+        }
+
+        if ( token==null ) {emit(type,line,charPosition,channel,start,getCharIndex()-1);}
+    }
+
+    public void mWS() throws RecognitionException {
+        int type = WS;
+        int start = getCharIndex();
+        int line = getLine();
+        int charPosition = getCharPositionInLine();
+        int channel = Token.DEFAULT_CHANNEL;
+        // grammar/antlr_3/BcParser.lexer.g:11:6: ( ( (' '|'\t'|'\r'|'\n'))+ )
+        // grammar/antlr_3/BcParser.lexer.g:11:6: ( (' '|'\t'|'\r'|'\n'))+
+        {
+
+        // grammar/antlr_3/BcParser.lexer.g:11:6: ( (' '|'\t'|'\r'|'\n'))+
+        int cnt3=0;
+        loop3:
+        do {
+            int alt3=2;
+            int LA3_0 = input.LA(1);
+            if ( (LA3_0>='\t' && LA3_0<='\n')||LA3_0=='\r'||LA3_0==' ' ) {
+                alt3=1;
+            }
+
+
+            switch (alt3) {
+        	case 1 :
+        	    // grammar/antlr_3/BcParser.lexer.g:11:8: (' '|'\t'|'\r'|'\n')
         	    {
 
         	    if ( (input.LA(1)>='\t' && input.LA(1)<='\n')||input.LA(1)=='\r'||input.LA(1)==' ' ) {
@@ -137,17 +200,17 @@ retry:
         	    break;
 
         	default :
-        	    if ( cnt2 >= 1 ) break loop2;
+        	    if ( cnt3 >= 1 ) break loop3;
                     EarlyExitException eee =
-                        new EarlyExitException(2, input);
+                        new EarlyExitException(3, input);
                     throw eee;
             }
-            cnt2++;
+            cnt3++;
         } while (true);
 
 
 
-         channel = 99;
+         channel = 99; // send into nirwana 
          
 
         }
@@ -156,11 +219,11 @@ retry:
     }
 
     public void mTokens() throws RecognitionException {
-        // grammar/antlr_3/BcParser.lexer.g:1:10: ( T7 | INT | WS )
-        int alt3=3;
+        // grammar/antlr_3/BcParser.lexer.g:1:10: ( T8 | INT | ML_COMMENT | WS )
+        int alt4=4;
         switch ( input.LA(1) ) {
         case 'q':
-            alt3=1;
+            alt4=1;
             break;
         case '0':
         case '1':
@@ -172,28 +235,31 @@ retry:
         case '7':
         case '8':
         case '9':
-            alt3=2;
+            alt4=2;
+            break;
+        case '/':
+            alt4=3;
             break;
         case '\t':
         case '\n':
         case '\r':
         case ' ':
-            alt3=3;
+            alt4=4;
             break;
         default:
 
             NoViableAltException nvae =
-                new NoViableAltException("1:1: Tokens : ( T7 | INT | WS );", 3, 0, input);
+                new NoViableAltException("1:1: Tokens : ( T8 | INT | ML_COMMENT | WS );", 4, 0, input);
 
             throw nvae;
         }
 
-        switch (alt3) {
+        switch (alt4) {
             case 1 :
-                // grammar/antlr_3/BcParser.lexer.g:1:10: T7
+                // grammar/antlr_3/BcParser.lexer.g:1:10: T8
                 {
 
-                mT7();
+                mT8();
 
                 }
                 break;
@@ -206,7 +272,15 @@ retry:
                 }
                 break;
             case 3 :
-                // grammar/antlr_3/BcParser.lexer.g:1:17: WS
+                // grammar/antlr_3/BcParser.lexer.g:1:17: ML_COMMENT
+                {
+
+                mML_COMMENT();
+
+                }
+                break;
+            case 4 :
+                // grammar/antlr_3/BcParser.lexer.g:1:28: WS
                 {
 
                 mWS();

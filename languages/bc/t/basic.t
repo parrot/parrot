@@ -53,17 +53,17 @@ sub run_tests {
 
 my @tests = (
        # single non-negative integer 
-       [ '1', [ 1 ], 'positive int 1', with_past => 1, with_antlr3 => 1  ],
-       [ '0', [ 0 ], 'zero', with_past => 1, with_antlr3 => 1  ],
-       [ '2', [ 2 ], 'positive int', with_past => 1, with_antlr3 => 1  ],
+       [ '1', [ 1 ], 'positive int 1',                     with_past => 1, with_antlr3 => 1  ],
+       [ '0', [ 0 ], 'zero',                               with_past => 1, with_antlr3 => 1  ],
+       [ '2', [ 2 ], 'positive int',                       with_past => 1, with_antlr3 => 1  ],
        [ '12345678', [ 12345678 ], 'another positive int', with_past => 1, with_antlr3 => 1  ],
 
        # multiple lines
-       [ "1\n2", [ 1, 2 ], 'two lines', with_past => 1, with_antlr3 => 1  ],
-       [ "1\n2\n3\n4\n\n5\n6\n7", [ 1, 2, 3, 4, 5, 6, 7 ], 'seven lines', with_past => 1  ],
+       [ "1\n2", [ 1, 2 ], 'two lines',                    with_past => 1, with_antlr3 => 1  ],
+       [ "1\n2\n3\n4\n\n5\n6\n7", [ 1, 2, 3, 4, 5, 6, 7 ], 'seven lines', with_past => 1, with_antlr3 => 1 ],
 
        # comments 
-       [ '/* */7', 7, 'one line comment', with_past => 1  ],
+       [ '/* */7', 7, 'one line comment',                  with_past => 1, with_antlr3 => 1  ],
        [ "/* line1 \n line2 \n line 3 */    -2  ", -2, 'multi line comment', with_past => 1 ],
 
        # Strings 
