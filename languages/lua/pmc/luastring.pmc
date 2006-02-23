@@ -40,6 +40,7 @@ pmclass LuaString
         if (pass) {
             PMC *meth;
 
+            Parrot_LuaBase_super_init(INTERP, NULL);
             luastring_name = const_string(INTERP, "string");
             dynpmc_LuaNil = pmc_type(INTERP,
               string_from_const_cstring(INTERP, "LuaNil", 0));

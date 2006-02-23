@@ -42,6 +42,7 @@ pmclass LuaNil
         if (pass) {
             PMC *meth;
 
+            Parrot_LuaBase_super_init(INTERP, NULL);
             string_representation = const_string(INTERP, "nil");
 
             /* namespace hack */

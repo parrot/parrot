@@ -20,6 +20,11 @@ C<LuaBase> provides an abstract base class for some Lua types.
 
 #include "parrot/parrot.h"
 
+static INTVAL dynpmc_LuaNil;
+static INTVAL dynpmc_LuaString;
+static INTVAL dynpmc_LuaTable;
+
+
 pmclass LuaBase
     abstract
     dynpmc
@@ -52,6 +57,45 @@ Creates and returns a clone of the scalar.
         PMC* dest = pmc_new(INTERP, SELF->vtable->base_type);
         memcpy(&PMC_union(dest), &PMC_union(SELF), sizeof(UnionVal));
         return dest;
+    }
+
+/*
+
+=item C<PMC *find_method(STRING *method_name)>
+
+Looks up the method for C<*method_name>, first in the PMC, 
+second in its metatable.
+
+=cut
+
+*/
+    PMC* find_method(STRING* method_name) {
+        PMC *method;
+        PMC *metatable;
+
+        method = Parrot_find_method_with_cache(INTERP, SELF, method_name);
+        if (method) {
+            if (method->vtable->base_type == enum_class_MultiSub 
+                    && INTERP->current_args) {
+                return Parrot_MMD_dispatch_func(interpreter,
+                        method, method_name);
+            }
+            return method;
+        }
+
+        metatable = DYNSELF.getprop(
+                string_from_const_cstring(INTERP, "__metatable", 0));
+        if (dynpmc_LuaTable == metatable->vtable->base_type) {
+            PMC *key;
+       
+            key = pmc_new(interpreter, dynpmc_LuaString);
+            PMC_str_val(key) = method_name;
+            method = VTABLE_get_pmc_keyed(INTERP, metatable, key);
+            if (dynpmc_LuaNil != method->vtable->base_type) {
+                return method;
+            }
+        }
+        return NULL;
     }
 
 /*
@@ -118,6 +162,22 @@ Always returns true.
 */
     INTVAL defined () {
         return 1;
+    }
+
+/*
+
+=item C<void* invoke(void* next)>
+
+Throws an exception.
+
+=cut
+
+*/
+    void* invoke(void* next) {
+        real_exception(INTERP, NULL, ILL_INHERIT,
+                "attempt to call a %s value",
+                string_to_cstring(INTERP, DYNSELF.name()));
+        return NULL;
     }
 
 /*
@@ -251,35 +311,43 @@ Returns C<nil>.
 
 */
     METHOD PMC* tonumber () {
-        PMC *retval;
-        INTVAL dynpmc_LuaNil;
-
-        dynpmc_LuaNil = pmc_type(INTERP,
-            string_from_const_cstring(INTERP, "LuaNil", 0));
-        retval = pmc_new(INTERP, dynpmc_LuaNil);
-        return retval;
+        return pmc_new(INTERP, dynpmc_LuaNil);
     }
 
 /*
 
 =item C<PMC* tostring()>
 
-Common implementation (use C<get_string>).
+Common implementation (use C<__tostring> or C<get_string>).
 
 =cut
 
 */
     METHOD PMC* tostring () {
+        PMC *metamethod;
         PMC *retval;
-        STRING *rep;
-        INTVAL dynpmc_LuaString;
 
-        dynpmc_LuaString = pmc_type(INTERP,
-            string_from_const_cstring(INTERP, "LuaString", 0));
-        retval = pmc_new(INTERP, dynpmc_LuaString);
-        rep = VTABLE_get_string(INTERP, SELF);
-        PMC_str_val(retval) = rep;
+        metamethod = VTABLE_find_method(INTERP, SELF,
+                string_from_const_cstring(INTERP, "__tostring", 0));
+        if (metamethod != NULL) {
+            retval = Parrot_runops_fromc_args(INTERP, metamethod, "PP", SELF);
+            if (NULL == retval) {
+                retval = pmc_new(INTERP, dynpmc_LuaNil);
+            }
+        } else {
+            retval = pmc_new(INTERP, dynpmc_LuaString);
+            PMC_str_val(retval) = VTABLE_get_string(INTERP, SELF);
+        }
         return retval;
+    }
+
+    METHOD void super_init () {
+            dynpmc_LuaNil = pmc_type(INTERP,
+              string_from_const_cstring(INTERP, "LuaNil", 0));
+            dynpmc_LuaString = pmc_type(INTERP,
+              string_from_const_cstring(INTERP, "LuaString", 0));
+            dynpmc_LuaTable = pmc_type(INTERP,
+              string_from_const_cstring(INTERP, "LuaTable", 0));
     }
 
 }

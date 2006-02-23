@@ -20,7 +20,7 @@ use strict;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 2;
+use Parrot::Test tests => 6;
 use Test::More;
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'metatable' );
@@ -45,4 +45,47 @@ CODE
 /cannot change a protected metatable/
 OUT
 
+
+language_output_is( 'lua', <<'CODE', <<'OUT', '__tostring' );
+t = {}
+mt = { __tostring=function () return "__TABLE__" end }
+setmetatable(t, mt)
+print(tostring(t))
+CODE
+__TABLE__
+OUT
+
+
+language_output_is( 'lua', <<'CODE', <<'OUT', '__tostring no-output' );
+t = {}
+mt = {}
+function mt.__tostring () print("return nothing") end
+setmetatable(t, mt)
+print(type(tostring(t)))
+CODE
+return nothing
+nil
+OUT
+
+
+language_output_is( 'lua', <<'CODE', <<'OUT', '__tostring too-many-output' );
+t = {}
+mt = {}
+mt.__tostring = function () return "__FIRST__", 2 end
+setmetatable(t, mt)
+print(tostring(t))
+CODE
+__FIRST__
+OUT
+
+
+language_output_like( 'lua', <<'CODE', <<'OUT', '__tostring invalid' );
+t = {}
+t.mt = {}
+setmetatable(t, t.mt)
+t.mt.__tostring = "not a function"
+print(tostring(t))
+CODE
+/attempt to call a string value/
+OUT
 

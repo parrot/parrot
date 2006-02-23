@@ -529,8 +529,6 @@ the C<tostring> function to convert them to strings. This function is not
 intended for formatted output, but only as a quick way to show a value,
 typically for debugging. For formatted output, use C<format>.
 
-STILL INCOMPLETE (see tostring).
-
 =cut
 
 .sub _lua_print :anon
@@ -757,8 +755,6 @@ format. For complete control of how numbers are converted, use C<format>.
 If the metatable of e has a C<"__tostring"> field, C<tostring> calls the
 corresponding value with C<e> as argument, and uses the result of the call
 as its result.
-
-STILL INCOMPLETE (see tostring in luatable.pmc & luauserdata.pmc).
 
 =cut
 

@@ -41,6 +41,7 @@ pmclass LuaNumber
         if (pass) {
             PMC *meth;
 
+            Parrot_LuaBase_super_init(INTERP, NULL);
             luanumber_name = const_string(INTERP, "number");
             dynpmc_LuaString = pmc_type(INTERP,
               string_from_const_cstring(INTERP, "LuaString", 0));

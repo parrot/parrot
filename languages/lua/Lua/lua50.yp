@@ -237,7 +237,10 @@ funcname
 _funcname
 :	_funcname	'.'	NAME
 		{
-			[@{$_[1]}, $_[3]];
+			[
+				@{$_[1]},
+				BuildLiteral($_[0], $_[3], 'key'),
+			];
 		}
 |	NAME
 		{
