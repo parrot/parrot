@@ -16,7 +16,7 @@ debian/control: debian/control.in VERSION
 configure: debian/control configure-stamp
 configure-stamp:
 	dh_testdir
-	perl Configure.pl --prefix=/usr
+	perl Configure.pl --prefix=/usr --optimize
 	touch configure-stamp
 
 build: build-stamp
@@ -36,7 +36,7 @@ build-stamp: configure-stamp
 clean:
 	dh_testdir
 	dh_testroot
-	rm -f build-stamp configure-stamp debian/parrot.1 debian/parrot-config.1 debian/pdump.1 debian/disassemble.1 debian/parrot-debugger.1 debian/pbc_info.1 debian/pbc_merge.1 debian/libparrot$(SOVERSION).install
+	rm -f build-stamp configure-stamp debian/parrot.1 debian/parrot-config.1 debian/pdump.1 debian/disassemble.1 debian/parrot-debugger.1 debian/pbc_info.1 debian/pbc_merge.1 debian/libparrot$(SOVERSION).install src/nci_test.o
 	-$(MAKE) realclean
 	dh_clean 
 
@@ -47,11 +47,9 @@ install: build debian/libparrot$(SOVERSION).install
 	dh_testdir
 	dh_testroot
 	dh_clean -k 
-	dh_installdirs -plibparrot-dev usr/share/lintian/overrides
 	$(MAKE) install DESTDIR=$(CURDIR)/debian/tmp
 	dh_install --sourcedir=$(CURDIR)/debian/tmp --list-missing
 	install -m755 $(CURDIR)/debian/tmp/usr/bin/pdb $(CURDIR)/debian/parrot/usr/bin/parrot-debugger
-	install -m644 debian/libparrot-dev.lintian-overrides $(CURDIR)/debian/libparrot-dev/usr/share/lintian/overrides/libparrot-dev
 
 # Build architecture-independent files here.
 binary-indep: build install

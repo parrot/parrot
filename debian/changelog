@@ -1,3 +1,15 @@
+parrot (0.4.2-1) unstable; urgency=low
+
+  * New upstream release.
+  * Enabled optimisation.
+  * Added libreadline-dev to Build-Depends.
+  * Install parrot.pc for pkg-config.
+  * Removed lintian overrides. lintian now knows about parrot.
+  * Properly clean src/nci_test.o.
+  * Removed bc and m4 Build-Depends. They weren't really needed.
+
+ -- Florian Ragwitz <rafl@debian.org>  Wed, 22 Feb 2006 23:40:06 +0100
+
 parrot (0.4.1-1) unstable; urgency=low
 
   * New upstream release.
