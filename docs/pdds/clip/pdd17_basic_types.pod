@@ -108,7 +108,7 @@ splice, on fixed arrays will result in an exception.
 
 A statically sized array which holds only Boolean values.
 
-=item ResizeableBooleanArray
+=item ResizableBooleanArray
 
 A dynamically sized array which holds only Boolean values.
 
@@ -116,7 +116,7 @@ A dynamically sized array which holds only Boolean values.
 
 A statically sized array which holds only Integer values.
 
-=item ResizeableIntegerArray
+=item ResizableIntegerArray
 
 A dynamically sized array which holds only Integer values.
 
@@ -124,7 +124,7 @@ A dynamically sized array which holds only Integer values.
 
 A statically sized array which holds only Float values.
 
-=item ResizeableFloatArray
+=item ResizableFloatArray
 
 A dynamically sized array which holds only Float values.
 
@@ -132,7 +132,7 @@ A dynamically sized array which holds only Float values.
 
 A statically sized array which holds only PMC values.
 
-=item ResizeablePMCArray
+=item ResizablePMCArray
 
 A dynamically sized array which holds only PMC values.
 
@@ -140,7 +140,7 @@ A dynamically sized array which holds only PMC values.
 
 A statically sized array which holds only String values.
 
-=item ResizeableStringArray
+=item ResizableStringArray
 
 A dynamically sized array which holds only String values.
 
