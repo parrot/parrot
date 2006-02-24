@@ -1,4 +1,4 @@
-# Copyright: 2001-2004 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2001-2006 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 =head1 NAME
@@ -59,7 +59,7 @@ Constants are new and the syntax looks like:
 Several constants are predefined, namely the PMC classes, e.g.
 
   .constant Array 0
-  .constant PerlUndef 1
+  .constant Undef 1
   ...
 
 The ".include" statement is followed by a string literal. The file of
@@ -93,7 +93,7 @@ Some predefined constants exist for your convenience, namely:
 
   .Array
   .Hash
-  .PerlArray
+  .ResizablePMCArray
 
 and the other PMC types.
 

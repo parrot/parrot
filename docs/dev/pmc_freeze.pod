@@ -252,10 +252,10 @@ may look like:
   0xdf4 30 3 0xdf8 33 666 0xdf2 777 0xdf5
 
   0xdf4 ... PMC id (with "0x" in front for clarity)
-  30    ... enum_class_PerlArray
+  30    ... enum_class_ResizablePMCArray
   3     ... elements count
   0xdf8 ... id of first element
-  33    ... enum_class_PerlInt
+  33    ... enum_class_Integer
   666   ... value
   0xdf2 ... id of second element, same type as prev element
   777   ... value
@@ -270,7 +270,7 @@ normal or extra data have to be shifted from the image.
 This is e.g. needed for PMC properties or arrays containing sparse holes, to
 set the array index of the following data.
 
-A PerlInt(666) with a property hash ("answer"=>42) thus looks like:
+A Integer(666) with a property hash ("answer"=>42) thus looks like:
 
   0xdfc 33 666 0xdff 2 0xdf4 32 1 answer 0xdf8 33 42
 

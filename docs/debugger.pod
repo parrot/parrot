@@ -1,4 +1,4 @@
-# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2001-2006 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 =head1 NAME
@@ -309,7 +309,7 @@ Example:
   # prints the content of P0
   (pdb) p P0
   PMC Registers:
-  P0 = [PerlArray]
+  P0 = [ResizablePMCArray]
 
   # prints the content of all string registers
   (pdb) p s

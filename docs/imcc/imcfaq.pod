@@ -1,3 +1,6 @@
+# Copyright: 2001-2006 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
 =head1 TITLE
 
 IMCC and Parrot Programming for Compiler Developers - Frequently Asked Questions
@@ -221,7 +224,7 @@ Named variables are either local, global or namespace qualified. Currently
 IMCC only supports locals transparently. However, globals are supported with
 explicit syntax. The way to declare locals in a subroutine is with the
 B<.local> directive. The B<.local> directive also requires a type (B<int>,
-B<num>, B<string> or a classname such as B<PerlArray>).
+B<num>, B<string> or a classname such as B<ResizablePMCArray>).
 
 Example:
 
