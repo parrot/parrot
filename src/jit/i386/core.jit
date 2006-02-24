@@ -1488,7 +1488,7 @@ Parrot_pic_callr___pc {
         skip = -1;
     else 
         skip = MAP(2);      /* skip result - save rest */
-    jit_save_regs_call(jit_info, interpreter, skip);
+    /* registers are saved in set_args */
 
     here = NATIVECODE - jit_info->arena.start;
     emitm_calll(NATIVECODE, offset - here - 5);
