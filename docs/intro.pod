@@ -336,7 +336,7 @@ compute factorial.
   .end
 
 
-  .sub _main @MAIN
+  .sub _main :main
       .local int f, i
 
       # We'll do factorial 0 to 1.
