@@ -632,6 +632,75 @@ Parrot_byte_rindex(Interp *interpreter, const STRING *base,
 
 /*
 
+=item C<void Parrot_register_move(Interp *, int n_regs,
+        char *dest_regs, char *src_regs,
+        char temp_reg, 
+        reg_move_func mov, 
+        reg_move_func mov_alt, 
+        void *info)>
+
+Move C<n_regs> from the given register list C<src_regs> to C<dest_regs>.
+
+  n_regs    ... registers to move
+  dest_regs ... list of register numbers 0..255
+  src_regs  ... list of register numbers 0..255
+  temp_reg  ... a register number not in one of these lists
+  mov       ... a register move function to be called to move one register
+  mov_alt   ... a register move function to be called to move one register
+                which fetches from an alternate src(or NULLfunc):
+    
+    (mov)(interp, dest, src, info);
+
+Some C<dest_regs> might be the same as C<src_regs>, which makes this a bit 
+non-trivial, because if the destination is already clobbered, using it
+later as source doesn"t work. E.g.
+
+  0 -> 1
+  1 -> 0     # register 1 already clobbered
+
+or
+
+  0 -> 2
+  1 -> 0
+  2 -> 3      # register 2 already clobbered
+
+To handle such cases, we do:
+
+  a) rearrange the order of moves (not possible in the first case)
+     and/or if that failed:
+  b) if an alternate move function is available, it will fetch the
+     source from a different (non-clobbered) location - call it
+  c) if no alternate move function is available, use the temp reg   
+
+The amount of register moves should of course be minimal.  
+
+=cut
+
+*/
+
+/* proto TODO mv to hdr */
+typedef void (*reg_move_func)(Interp*, char d, char s, void *);
+
+void 
+Parrot_register_move(Interp *, int n_regs,
+        char *dest_regs, char *src_regs,
+        char temp_reg, 
+        reg_move_func mov, 
+        reg_move_func mov_alt, 
+        void *info);
+void 
+Parrot_register_move(Interp *interpreter, int n_regs,
+        char *dest_regs, char *src_regs,
+        char temp_reg, 
+        reg_move_func mov, 
+        reg_move_func mov_alt, 
+        void *info)
+{
+    /* TODO */
+}
+
+/*
+
 =back
 
 =head1 HISTORY
