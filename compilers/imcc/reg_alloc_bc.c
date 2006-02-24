@@ -12,11 +12,6 @@
  * - Renumbering
  * - Coaelesceing
  *
- * Currently fails 2 tests:
- *
- * Failed 1/151 test scripts, 99.34% okay. 2/2527 subtests failed, 99.92% okay.
- * t/library/streams.t    2   512    20    2  10.00%  13 16
- *
  */
 
 #include <string.h>
@@ -910,7 +905,7 @@ spill_registers(Parrot_Interp interpreter, IMC_Unit* unit, graph* G)
             ins = ins->next;
         }
         spill_ins = iNEW(interpreter, unit, unit->p31,
-                str_dup("PerlArray"), NULL, 0);
+                str_dup("ResizablePMCArray"), NULL, 0);
         insert_ins(unit, ins, spill_ins);
     }
 
