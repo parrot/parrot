@@ -1520,8 +1520,13 @@ Parrot_get_results_pc {
         sig_result = constants[CUR_OPCODE[1]]->u.key;
         if (!SIG_ELEMS(sig_result))
             return;
-        /* result is eax TODO Nums */
-        jit_emit_mov_rr_i(NATIVECODE, MAP(2), emit_EAX);
+        if (SIG_ITEM(sig_result, 0) == PARROT_ARG_FLOATVAL) {
+            /* float result is in ISR1 */
+            emitm_fst(NATIVECODE, MAP(2));
+        }
+        else {
+            jit_emit_mov_rr_i(NATIVECODE, MAP(2), emit_EAX);
+        }
     }
 }
 ; TODO or,and,not,cmp
