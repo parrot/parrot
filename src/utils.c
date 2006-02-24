@@ -674,6 +674,7 @@ To handle such cases, we do:
 
 The amount of register moves should of course be minimal.  
 
+TODO add a define if it's implemented so that we can start filling the gaps
 =cut
 
 */
