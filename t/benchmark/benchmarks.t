@@ -1,7 +1,6 @@
 #! perl
-# Copyright: 2004-2005 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2004-2006 The Perl Foundation.  All Rights Reserved.
 # $Id$
-
 
 use strict;
 use warnings;
@@ -16,7 +15,7 @@ t/benchmark/benchmarks.t - test scrips in examples/benchmarks
 
 =head1 SYNOPSIS
 
-	prove t/benchmarks/benchmarks.t
+    prove t/benchmarks/benchmarks.t
 
 =head1 DESCRIPTION
 
@@ -78,9 +77,7 @@ ResizableStringArray:\s\d+\.\d+s\n
 1\s\*\s1000\s=\s1000\n
 100\s\*\s1000\s=\s100000\n
 SArray:\s\d+\.\d+s\n
-\n
-StringArray:\s\d+\.\d+s\n
-      \n$/x,
+\s+$/x,
     q{arriter.pir} => qq(100000\n100000\n100000\n111111\n),
     q{arriter_o1.pir} => qq(100000\n100000\n100000\n111111\n),
     q{bench_newp.pasm} => qr/^\d+\.\d+\sseconds.\s\d+\.\d+\sloops\/sec\n
