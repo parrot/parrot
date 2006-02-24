@@ -566,6 +566,7 @@ examples/shootout/pidigits.pir                    [main]doc
 examples/shootout/pidigits.py                     [main]doc
 examples/shootout/random.pasm                     [main]doc
 examples/shootout/random.pir                      [main]doc
+examples/shootout/recursive.pir                   [main]doc
 examples/shootout/regexdna.pir                    [main]doc
 examples/shootout/revcomp.pir                     [main]doc
 examples/shootout/sumcol.pir                      [main]doc
