@@ -3146,8 +3146,20 @@ jit_set_args_pc(Parrot_jit_info_t *jit_info, Interp * interpreter,
                 jit_emit_mov_ri_i(NATIVECODE, params_map, CUR_OPCODE[2 + i]);
                 break;
             case PARROT_ARG_FLOATVAL:
-                /* TODO check for overlaps/collision */
-                jit_emit_mov_rr_n(NATIVECODE, params_map, MAP(2 + i));
+                if (collision[(int)MAP(2+i)]) {
+                    int j;
+                    for (j = 0; j < reg_info->n_mapped_F; ++j) {
+                        if (reg_info->map_F[j] == MAP(2+i)) {
+                            jit_emit_fload_mb_n(NATIVECODE, emit_ESP, (j * sizeof(FLOATVAL)));
+                            emitm_fstp(NATIVECODE, (1+params_map)); 
+                            break;
+                        }
+                    }
+                }
+                else {
+                    jit_emit_mov_rr_n(NATIVECODE, params_map, MAP(2 + i));
+                }
+                collision[(int)params_map] = 1;
                 break;
             case PARROT_ARG_FLOATVAL|PARROT_ARG_CONSTANT:
                 jit_emit_mov_ri_n(NATIVECODE, params_map, 
