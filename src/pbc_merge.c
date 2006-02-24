@@ -521,7 +521,8 @@ pbc_merge_pic_index(Interp *interpreter, struct pbc_merge_input **inputs,
     int i;
     struct PackFile_Segment * pic_index, *in_seg; 
     size_t size, j;
-    opcode_t k, cursor = 0, start = 0, last;
+    opcode_t k, cursor = 0, start = 0;
+    opcode_t last = 0; /* avoid unitialized warning */
 
     /* calc needed size */
     for (i = 0, size = 0; i < num_inputs; i++) {
