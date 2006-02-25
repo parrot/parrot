@@ -269,13 +269,51 @@ pcc_reg_mov(Interp *interpreter, unsigned char d, unsigned char s,
         void *vinfo)
 {
     struct move_info_t *info = vinfo;
-    SymReg *regs[2];
+    SymReg *regs[2], *src, *dest;
+    static SymReg *temps[4];
+    char types[] = "INSP";
+    int t;
 
-    assert(d < 2 * info->n);
-    assert(s < 2 * info->n);
-    /* TODO handle temp */
-    regs[0] = d < info->n ? info->dest[(int)d] : info->src[(int)s - info->n];
-    regs[1] = s < info->n ? info->dest[(int)s] : info->src[(int)s - info->n];
+    src = dest = NULL;
+    if (d == 255) {
+        /* handle temp use/create temp of src type */
+        assert(s != 255);
+        assert(s < 2 * info->n);
+        src = s < info->n ? info->dest[(int)s] : info->src[(int)s - info->n];
+        for (t = 0; t < 4; ++t) {
+            if (types[t] == src->set) {
+                if (temps[t])
+                    dest = temps[t];
+                else {
+                    dest = temps[t] = mk_temp_reg(interpreter, src->set);
+                }
+                break;
+            }
+
+        }
+    }
+    else if (s == 255) {
+        /* handle temp use/create temp of src type */
+        assert(d < 2 * info->n);
+        dest = d < info->n ? info->dest[(int)d] : info->src[(int)d - info->n];
+        for (t = 0; t < 4; ++t) {
+            if (types[t] == dest->set) {
+                if (temps[t])
+                    src = temps[t];
+                else {
+                    src = temps[t] = mk_temp_reg(interpreter, dest->set);
+                }
+                break;
+            }
+
+        }
+    }
+    if (!dest)
+        dest = d < info->n ? info->dest[(int)d] : info->src[(int)d - info->n];
+    if (!src)
+        src = s < info->n ? info->dest[(int)s] : info->src[(int)s - info->n];
+    regs[0] = dest;
+    regs[1] = src;
     info->ins = insINS(interpreter, info->unit, info->ins, "set", regs, 2);
     return 1;
 }
@@ -292,6 +330,7 @@ move_regs(Parrot_Interp interp, IMC_Unit * unit,
     if (!n)
         return ins;
 
+
     move_list = mem_sys_allocate(2 * n);
     move_info.unit = unit;
     move_info.ins  = ins;
@@ -305,10 +344,12 @@ move_regs(Parrot_Interp interp, IMC_Unit * unit,
         for (j = 0; j < i; ++j) {
             rj = j < n ? dest[j] : src[j - n];
             if (ri == rj) {
+                assert(j < 255);
                 move_list[i] = j;
                 goto done;
             }
         }
+        assert(i < 255);
         move_list[i] = i;
 done:
         ;
