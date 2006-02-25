@@ -3,7 +3,8 @@
 # $Id$
 
 use strict;
-use Parrot::Test tests => 1;
+use Parrot::Test tests => 3;
+use Test::More;
 
 # these tests are run with -Oc by TestCompiler and show
 # generated PASM code for call optimization
@@ -41,3 +42,31 @@ foo:
   returncc/
 OUT
 
+pir_2_pasm_like(<<'CODE', <<'OUT', "tailcall 1");
+.sub _main
+    foo(1, 2)
+.end
+.sub foo
+    .param int i
+    .param int j
+    .return foo(I2, I3)
+.end
+CODE
+/ set I\d, I2
+  set I\d, I3/
+OUT
+
+pir_2_pasm_like(<<'CODE', <<'OUT', "tailcall 2", todo => 'use temp');
+.sub _main
+    foo(1, 2)
+.end
+.sub foo
+    .param int i
+    .param int j
+    .return foo(j, i)
+.end
+CODE
+/ set I(\d), I(\d)
+  set I\2, I(\d)
+  set I\3, I\1/
+OUT
