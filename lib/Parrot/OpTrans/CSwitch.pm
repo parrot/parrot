@@ -224,7 +224,7 @@ sub run_core_finish
 		*cur_opcode = CORE_OPS_wrapper__;
 		continue;
 	    }
-	    internal_exception(1, "illegal opcode\\n");
+	    internal_exception(1, "illegal opcode in switch core\\n");
 	    break;
 	} /* switch */
 END_C
