@@ -500,7 +500,9 @@ dest2offset(Interp * interpreter, opcode_t *dest)
      */
     switch (interpreter->run_core) {
         case PARROT_SWITCH_CORE:
+        case PARROT_SWITCH_JIT_CORE:
         case PARROT_CGP_CORE:
+        case PARROT_CGP_JIT_CORE:
             offset = (void **)dest - interpreter->code->prederef.code;
         default:
             offset = dest - interpreter->code->base.data;
