@@ -245,6 +245,81 @@ expand_pcc_sub_ret(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
     }
 }
 
+/* XXX s. src.utils.c */
+typedef int (*reg_move_func)(Interp*, unsigned char d, unsigned char s, void *);
+
+void 
+Parrot_register_move(Interp *, int n_regs,
+        unsigned char *dest_regs, unsigned char *src_regs,
+        unsigned char temp_reg, 
+        reg_move_func mov, 
+        reg_move_func mov_alt, 
+        void *info);
+
+struct move_info_t {
+    IMC_Unit *unit;
+    Instruction *ins;
+    int n;
+    SymReg **dest;
+    SymReg **src;
+};
+
+static int 
+pcc_reg_mov(Interp *interpreter, unsigned char d, unsigned char s,
+        void *vinfo)
+{
+    struct move_info_t *info = vinfo;
+    SymReg *regs[2];
+
+    assert(d < 2 * info->n);
+    assert(s < 2 * info->n);
+    /* TODO handle temp */
+    regs[0] = d < info->n ? info->dest[(int)d] : info->src[(int)s - info->n];
+    regs[1] = s < info->n ? info->dest[(int)s] : info->src[(int)s - info->n];
+    info->ins = insINS(interpreter, info->unit, info->ins, "set", regs, 2);
+    return 1;
+}
+
+static Instruction *
+move_regs(Parrot_Interp interp, IMC_Unit * unit,
+        Instruction *ins, int n, SymReg **dest, SymReg **src)
+{
+    unsigned char *move_list;
+    int i, j;
+    SymReg *ri, *rj;
+    struct move_info_t move_info;
+
+    if (!n)
+        return ins;
+
+    move_list = mem_sys_allocate(2 * n);
+    move_info.unit = unit;
+    move_info.ins  = ins;
+    move_info.n    = n;
+    move_info.dest = dest;
+    move_info.src  = src;
+
+    memset(move_list, -1, 2 * n);
+    for (i = 0; i < 2 * n; ++i) {
+        ri = i < n ? dest[i] : src[i - n];
+        for (j = 0; j < i; ++j) {
+            rj = j < n ? dest[j] : src[j - n];
+            if (ri == rj) {
+                move_list[i] = j;
+                goto done;
+            }
+        }
+        move_list[i] = i;
+done:
+        ;
+    }
+    Parrot_register_move(interp, n, move_list, move_list + n, 255,
+        pcc_reg_mov, NULL, &move_info);
+
+    mem_sys_free(move_list);
+    return move_info.ins;
+}
+
 /*
  * convert a recursive tailcall into a loop
  */
@@ -253,9 +328,8 @@ static int
 recursive_tail_call(Parrot_Interp interp, IMC_Unit * unit,
         Instruction *ins, SymReg *sub)
 {
-    SymReg *called_sub, *this_sub, *r0, *r1, *label;
+    SymReg *called_sub, *this_sub, *label;
     SymReg *regs[2];
-    int i;
     Instruction *get_params, *tmp_ins;
     char *buf;
 
@@ -270,7 +344,7 @@ recursive_tail_call(Parrot_Interp interp, IMC_Unit * unit,
     if (sub->pcc_sub->nargs != this_sub->pcc_sub->nargs)
         return 0;
     /* TODO check if we have only positional args
-     */
+    */
 
     get_params = unit->instructions->next;
     if (get_params->opnum != PARROT_OP_get_params_pc)
@@ -284,20 +358,9 @@ recursive_tail_call(Parrot_Interp interp, IMC_Unit * unit,
     }
     free(buf);
 
-    for (i = 0; i < sub->pcc_sub->nargs; ++i) {
-        /*
-         * TODO if there is a register collision
-         *      try to reverse assignmened order
-         *      or use a temp var
-         */
-        r0 = this_sub->pcc_sub->args[i];
-        r1 = sub->pcc_sub->args[i];
-        if (r0 != r1) {
-            regs[0] = r0;
-            regs[1] = r1;
-            ins = insINS(interp, unit, ins, "set", regs, 2);
-        }
-    }
+    ins = move_regs(interp, unit, ins, sub->pcc_sub->nargs, 
+            this_sub->pcc_sub->args, sub->pcc_sub->args);
+
     regs[0] = label;
     insINS(interp, unit, ins, "branch", regs, 1);
     return 1;

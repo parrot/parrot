@@ -702,7 +702,14 @@ Parrot_register_move(Interp *interpreter, int n_regs,
         reg_move_func mov_alt, 
         void *info)
 {
+    int i;
     /* TODO */
+
+    /* brute force and wrong */
+    for (i = 0; i < n_regs; ++i) {
+        if (dest_regs[i] != src_regs[i])
+            mov(interpreter, dest_regs[i], src_regs[i], info);
+    }
 }
 
 /*
