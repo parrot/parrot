@@ -1358,6 +1358,14 @@ testr : test_prep
 testS : test_prep
 	$(PERL) t/harness $(EXTRA_TEST_ARGS) $(PARROT_ARGS) -S $(RUNCORE_TEST_FILES)
 
+# Computed goto jitted core
+testCj : test_prep
+	$(PERL) t/harness $(EXTRA_TEST_ARGS) $(PARROT_ARGS) -Cj $(RUNCORE_TEST_FILES)
+
+# switched jitted core
+testSj : test_prep
+	$(PERL) t/harness $(EXTRA_TEST_ARGS) $(PARROT_ARGS) -Sj $(RUNCORE_TEST_FILES)
+
 # test the EXEC stuff
 testexec: test_prep
 	$(PERL) t/harness $(EXTRA_TEST_ARGS) $(PARROT_ARGS) --run-exec $(RUNCORE_TEST_FILES)
