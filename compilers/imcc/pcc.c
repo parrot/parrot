@@ -293,7 +293,7 @@ pcc_reg_mov(Interp *interpreter, unsigned char d, unsigned char s,
         }
     }
     else if (s == 255) {
-        /* handle temp use/create temp of src type */
+        /* handle temp use/create temp of dest type */
         assert(d < 2 * info->n);
         dest = d < info->n ? info->dest[(int)d] : info->src[(int)d - info->n];
         for (t = 0; t < 4; ++t) {
