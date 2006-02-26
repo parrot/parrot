@@ -416,6 +416,7 @@ my @steps = qw(
     auto::gc
     auto::memalign
     auto::signal
+    auto::socklen_t
     auto::env
     auto::aio
     auto::gmp

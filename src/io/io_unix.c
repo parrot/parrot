@@ -1,5 +1,5 @@
 /*
-Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+Copyright: 2001-2006 The Perl Foundation.  All Rights Reserved.
 $Id$
 
 =head1 NAME
@@ -831,14 +831,14 @@ static ParrotIO *
 PIO_unix_accept(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
 {
     int newsock;
-    socklen_t newsize;
+    Parrot_Socklen_t addrlen;
     ParrotIO *newio;
 
     UNUSED(layer);
     newio = PIO_new(interpreter, PIO_F_SOCKET, 0, PIO_F_READ|PIO_F_WRITE);
 
     if ((newsock = accept(io->fd, (struct sockaddr *)&newio->remote,
-                          &newsize)) == -1)
+                          &addrlen)) == -1)
     {
         fprintf(stderr, "accept: errno=%d", errno);
         /* Didn't get far enough, free the io */

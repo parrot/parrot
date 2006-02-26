@@ -1,4 +1,4 @@
-/* Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved. */
+/* Copyright: 2001-2006 The Perl Foundation.  All Rights Reserved. */
 /* $Id$ */
 
 /* config.h
@@ -142,6 +142,9 @@ typedef void DPOINTER;
 /* Int and float formats. */
 #define INTVAL_FMT "@intvalfmt@"
 #define FLOATVAL_FMT "@floatvalfmt@"
+
+/* for IO subsystem */
+#define PARROT_HAS_SOCKLEN_T @has_socklen_t@
 
 #include "parrot/has_header.h"
 #include "parrot/feature.h"

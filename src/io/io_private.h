@@ -1,5 +1,5 @@
 /*
-Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+Copyright: 2001-2006 The Perl Foundation.  All Rights Reserved.
 $Id$
 
 =head1 NAME
@@ -272,6 +272,13 @@ ParrotIOLayer * PIO_mmap_register_layer(void);
 
 void PIO_push_layer_str(Interp *interpreter, PMC *pmc, STRING *ls);
 STRING* PIO_pop_layer_str(Interp *interpreter, PMC *pmc);
+
+/* Parrot_Socklen_t is used in POSIX accept call */
+#if PARROT_HAS_SOCKLEN_T
+typedef socklen_t Parrot_Socklen_t;
+#else
+typedef int Parrot_Socklen_t;
+#endif
 
 #endif /* PARROT_IO_PRIVATE_H_GUARD */
 
