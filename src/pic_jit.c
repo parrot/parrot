@@ -143,13 +143,6 @@ returns_match_results(Interp *interpreter, PMC *sig_ret, PMC *sig_result)
     int n, type;
     
     n = parrot_pic_check_sig(interpreter, sig_ret, sig_result, &type);
-    if (n == -1 && !SIG_ELEMS(sig_ret)) {
-        /* XXX we currently have a spurious set_returns after a
-         * tail_call -O1 would get rid of that dead block but is 
-         * broken currently - work around ignore empty set_returns
-         */
-        return 1;
-    }
     if (n == -1) {
         /* arg count mismatch */
         return 0;

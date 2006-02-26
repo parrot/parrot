@@ -166,16 +166,24 @@ expand_pcc_sub(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
     nargs = sub->pcc_sub->nargs;
     if (nargs) {
         ins = pcc_get_args(interp, unit, ins, "get_params", nargs,
-                           sub->pcc_sub->args, sub->pcc_sub->arg_flags);
+                sub->pcc_sub->args, sub->pcc_sub->arg_flags);
     }
 
     /*
      * check if there is a return
      */
+    if (unit->last_ins->type & (ITPCCSUB) &&
+            unit->last_ins->n_r == 1 &&
+            ( sub = unit->last_ins->r[0] ) &&
+            sub->pcc_sub &&
+            !sub->pcc_sub->object &&                   /* s. src/inter_call.c:119 */
+            (sub->pcc_sub->flags & isTAIL_CALL))
+        return;
     if (unit->last_ins->type != (ITPCCSUB|ITLABEL) &&
             strcmp(unit->last_ins->op, "ret") &&
             strcmp(unit->last_ins->op, "exit") &&
             strcmp(unit->last_ins->op, "end") &&
+            strcmp(unit->last_ins->op, "branch") &&
             strcmp(unit->last_ins->op, "returncc") /* was adding rets multiple times... */
        ) {
         if (sub->pcc_sub->pragma & P_MAIN) {
@@ -189,26 +197,6 @@ expand_pcc_sub(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
         IMCC_debug(interp, DEBUG_IMC, "add sub ret - %I\n", tmp);
         insert_ins(unit, unit->last_ins, tmp);
     }
-
-#if 0
-    /*
-     * a coroutine (generator) needs a small hook that gets called
-     * from the shift_pmc() vtable
-     */
-    if (sub->pcc_sub->calls_a_sub & ITPCCYIELD) {
-        /*
-         * set P0, P5
-         * invokecc
-         * end
-         */
-        ins = unit->last_ins;
-        regs[0] = get_pasm_reg(interp, "P0");
-        regs[1] = get_pasm_reg(interp, "P5");
-        ins = insINS(interp, unit, ins, "set", regs, 2);
-        ins = insINS(interp, unit, ins, "invokecc", regs, 0);
-        ins = insINS(interp, unit, ins, "end", regs, 0);
-    }
-#endif
 }
 
 
