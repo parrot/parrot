@@ -8,13 +8,20 @@ src/pic_jit.c - Polymorphic Inline Cache to JIT compilation
 
 =head1 DESCRIPTION
 
-Some statically known and simple subroutines are replace by
+Some statically known and simple subroutines are replaced by
 their JITted variants, if
 
   - JIT is supported and can JIT subroutines
   - arguments passing is simple
   - the code is fully JITtable
   - and more such checks
+
+TODO:
+
+  - save jit_info in sub
+  - check for multiple calls to the same sub
+    either reuse code or create new
+  - handle void calls/returns  
 
 =head2 Functions
 
@@ -332,15 +339,7 @@ parrot_pic_JIT_sub(Interp *interpreter, PMC *sub, int flags) {
 #endif
 }
 
-
-
-
-
-
-
-
-
-#else
+#else   /* HAS_JIT */
 
 int
 parrot_pic_is_safe_to_jit(Interp *interpreter, PMC *sub,
