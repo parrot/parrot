@@ -45,11 +45,7 @@ sub runstep
         $conf->data->add(' ', libs => '-lgmp');
     }
 
-    my $archname = $Config{archname};
-    my ($cpuarch, $osname) = split('-', $archname);
-    if (!defined $osname) {
-        ($osname, $cpuarch) = ($cpuarch, "");
-    }
+    my $osname = $Config{osname};
 
     # On OS X check the presence of the gmp header in the standard
     # Fink location. TODO: Need a more generalized way for finding

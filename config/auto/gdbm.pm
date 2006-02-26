@@ -37,11 +37,7 @@ sub runstep
     my $linkflags = $conf->data->get('linkflags');
     my $ccflags   = $conf->data->get('ccflags');
 
-    my $archname = $Config{archname};
-    my ($cpuarch, $osname) = split('-', $archname);
-    if (!defined $osname) {
-        ($osname, $cpuarch) = ($cpuarch, "");
-    }
+    my $osname = $Config{osname};
 
     # On OS X check the presence of the gdbm header in the standard
     # Fink location. TODO: Need a more generalized way for finding
