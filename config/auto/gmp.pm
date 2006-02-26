@@ -21,7 +21,7 @@ use base qw(Parrot::Configure::Step::Base);
 use Config;
 use Parrot::Configure::Step ':auto';
 
-$description = "Determining if your platform supports GMP...";
+$description = 'Determining if your platform supports GMP';
 
 @args = qw(verbose);
 

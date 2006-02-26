@@ -23,7 +23,7 @@ use base qw(Parrot::Configure::Step::Base);
 
 use Parrot::Configure::Step ':gen';
 
-$description = "Generating C headers...";
+$description = 'Generating C headers';
 
 @args = ('define');
 

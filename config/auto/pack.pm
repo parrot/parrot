@@ -21,7 +21,7 @@ use base qw(Parrot::Configure::Step::Base);
 use Parrot::Configure::Step;
 use Config;
 
-$description = "Figuring out how to pack() Parrot's types...";
+$description = q{Figuring out how to pack() Parrot's types};
 
 @args = ();
 

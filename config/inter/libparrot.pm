@@ -21,7 +21,7 @@ use base qw(Parrot::Configure::Step::Base);
 
 use Parrot::Configure::Step ':inter';
 
-$description = 'Determine if parrot should be linked against a shared library...';
+$description = 'Determine if parrot should be linked against a shared library';
 
 @args = qw(ask parrot_is_shared);
 

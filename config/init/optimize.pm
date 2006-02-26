@@ -22,7 +22,7 @@ use base qw(Parrot::Configure::Step::Base);
 use Config;
 use Parrot::Configure::Step;
 
-$description = "Enabling optimization...";
+$description = 'Enabling optimization';
 
 @args = qw(verbose optimize);
 

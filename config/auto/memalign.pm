@@ -20,7 +20,7 @@ use base qw(Parrot::Configure::Step::Base);
 
 use Parrot::Configure::Step ':auto';
 
-$description = "Determining if your C library supports memalign...";
+$description = 'Determining if your C library supports memalign';
 
 @args = qw(miniparrot verbose);
 

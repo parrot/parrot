@@ -20,7 +20,7 @@ use base qw(Parrot::Configure::Step::Base);
 
 use Parrot::Configure::Step ':auto';
 
-$description = "Verifying that the compiler supports function pointer casts...";
+$description = 'Verifying that the compiler supports function pointer casts';
 
 @args = qw(verbose);
 

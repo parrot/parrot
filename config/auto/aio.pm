@@ -20,7 +20,7 @@ use base qw(Parrot::Configure::Step::Base);
 
 use Parrot::Configure::Step ':auto';
 
-$description = "Determining if your platform supports AIO...";
+$description = 'Determining if your platform supports AIO';
 
 @args = qw(verbose);
 

@@ -20,7 +20,7 @@ use base qw(Parrot::Configure::Step::Base);
 
 use Parrot::Configure::Step ':auto';
 
-$description = "Determining if your C library has a working S_ISREG...";
+$description = 'Determining if your C library has a working S_ISREG';
 
 @args = qw(verbose);
 

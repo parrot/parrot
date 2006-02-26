@@ -21,7 +21,7 @@ use base qw(Parrot::Configure::Step::Base);
 use Parrot::Configure::Step ':auto';
 use Config;
 
-$description = "Probing for C headers...";
+$description = 'Probing for C headers';
 
 @args = qw(miniparrot verbose);
 

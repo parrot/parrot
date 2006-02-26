@@ -20,7 +20,7 @@ use base qw(Parrot::Configure::Step::Base);
 
 use Parrot::Configure::Step ':auto';
 
-$description = "Determining some signal stuff...";
+$description = 'Determining some signal stuff';
 
 @args = qw(miniparrot verbose);
 

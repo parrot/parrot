@@ -22,9 +22,9 @@ use Config;
 use FindBin;    # see build_dir
 use Parrot::Configure::Step;
 
-$description = "Setting up Configure's default values...";
+$description = q{Setting up Configure's default values};
 
-@args = ('debugging', 'optimize', 'profile', 'verbose', 'prefix');
+@args = qw(debugging optimize profile verbose prefix);
 
 sub runstep
 {

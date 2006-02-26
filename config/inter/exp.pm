@@ -20,7 +20,7 @@ use base qw(Parrot::Configure::Step::Base);
 
 use Parrot::Configure::Step ':inter';
 
-$description = "Setting up experimental systems...";
+$description = 'Setting up experimental systems';
 
 @args = qw(ask expnetwork);
 

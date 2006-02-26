@@ -47,7 +47,7 @@ use base qw(Parrot::Configure::Step::Base);
 
 use Pod::Text;
 
-$description = "Generating plain text docs from Pod...";
+$description = 'Generating plain text docs from Pod';
 
 @args = qw(verbose);
 

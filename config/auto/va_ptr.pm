@@ -20,7 +20,7 @@ use base qw(Parrot::Configure::Step::Base);
 
 use Parrot::Configure::Step ':auto';
 
-$description = "Test the type of va_ptr (this test is likely to segfault)...";
+$description = 'Test the type of va_ptr (this test is likely to segfault)';
 
 @args = qw();
 

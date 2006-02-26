@@ -1,4 +1,4 @@
-# Copyright: 2004 The Perl Foundation. All Rights Reserved.
+# Copyright: 2004-2006 The Perl Foundation. All Rights Reserved.
 # $Id$
 
 =pod
@@ -169,14 +169,15 @@ A template for a new step might look like this:
     package auto::newstep;
 
     use strict;
+    use warnings;
     use vars qw($description $result @args);
 
     use base qw(Parrot::Configure::Step::Base);
 
     use Parrot::Configure::Step;
 
-    $description="<description>";
-    @args=qw(<args>);
+    $description = '<description>';
+    @args = qw(<args>);
 
     sub runstep {
         my ($self, $conf) = @_

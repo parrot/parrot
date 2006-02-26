@@ -22,7 +22,7 @@ use base qw(Parrot::Configure::Step::Base);
 use Config;
 use Parrot::Configure::Step qw(copy_if_diff cc_gen cc_clean cc_build cc_run);
 
-$description = "Determining architecture, OS and JIT capability...";
+$description = 'Determining architecture, OS and JIT capability';
 
 @args = qw(jitcapable miniparrot execcapable verbose);
 

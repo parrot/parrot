@@ -21,7 +21,7 @@ use base qw(Parrot::Configure::Step::Base);
 use Parrot::Configure::Step ':auto';
 use Config;
 
-$description = "Determining your minimum pointer alignment...";
+$description = 'Determining your minimum pointer alignment';
 
 @args = qw(miniparrot);
 

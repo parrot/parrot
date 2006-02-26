@@ -22,7 +22,7 @@ use base qw(Parrot::Configure::Step::Base);
 use Config;
 use Parrot::Configure::Step ':auto';
 
-$description = "Determining if your platform supports gdbm...";
+$description = 'Determining if your platform supports gdbm';
 
 @args = qw(verbose);
 

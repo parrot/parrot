@@ -20,7 +20,7 @@ use base qw(Parrot::Configure::Step::Base);
 
 use Parrot::Configure::Step ':auto';
 
-$description = "Determining if your C library has setenv / unsetenv...";
+$description = 'Determining if your C library has setenv / unsetenv';
 @args        = qw(verbose);
 
 sub runstep

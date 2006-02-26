@@ -21,7 +21,7 @@ use base qw(Parrot::Configure::Step::Base);
 use Parrot::Configure::Step qw(copy_if_diff);
 use Carp;
 
-$description = "Running CPU specific stuff...";
+$description = 'Running CPU specific stuff';
 
 @args = qw(miniparrot verbose);
 

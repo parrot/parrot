@@ -20,7 +20,7 @@ use base qw(Parrot::Configure::Step::Base);
 
 use Parrot::Configure::Step ':auto';
 
-$description = "Determining if your C compiler is actually gcc...";
+$description = 'Determining if your C compiler is actually gcc';
 
 @args = qw(miniparrot verbose);
 

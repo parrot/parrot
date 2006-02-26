@@ -25,7 +25,7 @@ use base qw(Parrot::Configure::Step::Base);
 
 use Parrot::Configure::Step;
 
-$description = "Tweaking settings for miniparrot...";
+$description = 'Tweaking settings for miniparrot';
 
 @args = qw(miniparrot);
 

@@ -20,7 +20,7 @@ use base qw(Parrot::Configure::Step::Base);
 
 use Parrot::Configure::Step ':gen';
 
-$description = "Generating runtime/parrot/include...";
+$description = 'Generating runtime/parrot/include';
 
 my @files = qw(
     include/parrot/cclass.h

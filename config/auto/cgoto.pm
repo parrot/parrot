@@ -20,7 +20,7 @@ use base qw(Parrot::Configure::Step::Base);
 
 use Parrot::Configure::Step ':auto';
 
-$description = "Determining whether your compiler supports computed goto...";
+$description = 'Determining whether your compiler supports computed goto';
 @args        = qw(cgoto miniparrot verbose);
 
 sub runstep

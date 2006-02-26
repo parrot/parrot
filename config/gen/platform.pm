@@ -21,7 +21,7 @@ use base qw(Parrot::Configure::Step::Base);
 use Config;
 use Parrot::Configure::Step qw(copy_if_diff);
 
-$description = "Moving platform files into place...";
+$description = 'Moving platform files into place';
 
 @args = qw(miniparrot verbose);
 

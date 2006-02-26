@@ -20,7 +20,7 @@ use base qw(Parrot::Configure::Step::Base);
 
 use Parrot::Configure::Step ':gen';
 
-$description = "Generating core pmc list...";
+$description = 'Generating core pmc list';
 
 @args = ();
 

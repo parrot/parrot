@@ -20,7 +20,7 @@ use base qw(Parrot::Configure::Step::Base);
 
 use Parrot::Configure::Step ':auto';
 
-$description = "Determining some sizes...";
+$description = 'Determining some sizes';
 
 @args = qw(miniparrot);
 

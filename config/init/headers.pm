@@ -21,7 +21,7 @@ use base qw(Parrot::Configure::Step::Base);
 use Parrot::Configure::Step;
 use ExtUtils::Manifest qw(maniread);
 
-$description = "Determining nongenerated header files...";
+$description = 'Determining nongenerated header files';
 
 @args = ();
 

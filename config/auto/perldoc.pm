@@ -20,7 +20,7 @@ use base qw(Parrot::Configure::Step::Base);
 
 use Parrot::Configure::Step ':auto', 'capture_output';
 
-$description = "Determining whether perldoc is installed...";
+$description = 'Determining whether perldoc is installed';
 
 @args = qw();
 

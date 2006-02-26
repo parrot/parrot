@@ -20,7 +20,7 @@ use base qw(Parrot::Configure::Step::Base);
 
 use Parrot::Configure::Step ':inter';
 
-$description = 'Determining what charset files should be compiled in...';
+$description = 'Determining what charset files should be compiled in';
 
 @args = qw(ask charset);
 

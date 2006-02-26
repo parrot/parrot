@@ -21,7 +21,7 @@ use base qw(Parrot::Configure::Step::Base);
 use Parrot::Configure::Step;
 use ExtUtils::Manifest qw(manicheck);
 
-$description = "Checking MANIFEST...";
+$description = 'Checking MANIFEST';
 
 @args = qw(nomanicheck);
 

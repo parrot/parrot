@@ -21,7 +21,7 @@ use base qw(Parrot::Configure::Step::Base);
 
 use Parrot::Configure::Step ':inter';
 
-$description = 'Determining what types Parrot should use...';
+$description = 'Determining what types Parrot should use';
 
 @args = qw(ask intval opcode floatval);
 

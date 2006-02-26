@@ -242,24 +242,23 @@ F<lib/Parrot/Configure/Step.pm>, F<docs/configuration.pod>
 
 =cut
 
-use 5.005_02;
-
 use strict;
-use vars qw($parrot_version @parrot_version);
+use warnings;
 use lib 'lib';
+use 5.008;
 
+use English qw( -no_match_vars );
 use Parrot::BuildUtil;
 use Parrot::Configure;
 
-$| = 1;
+# These globals are accessed in config/init/defaults.pm
+our $parrot_version = Parrot::BuildUtil::parrot_version();
+our @parrot_version = Parrot::BuildUtil::parrot_version();
 
-$parrot_version = parrot_version();
-@parrot_version = parrot_version();
+$OUTPUT_AUTOFLUSH = 1;
 
 # Handle options
-
 my %args;
-
 for (@ARGV) {
   my($key, $value) = m/--([-\w]+)(?:=(.*))?/;
   $key   = 'help' unless defined $key;
@@ -267,7 +266,7 @@ for (@ARGV) {
 
   for ($key) {
     m/version/ && do {
-      my $cvsid='$Id$';
+      my $cvsid = '$Id$';
       print <<"END";
 Parrot Version $parrot_version Configure 2.0
 $cvsid

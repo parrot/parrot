@@ -43,7 +43,7 @@ use base qw(Parrot::Configure::Step::Base);
 
 use Parrot::Configure::Step ':auto';
 
-$description = "Determining what allocator to use...";
+$description = 'Determining what allocator to use';
 
 # valid libc/malloc/malloc-trace/gc
 @args = qw(gc verbose);

@@ -20,7 +20,7 @@ use base qw(Parrot::Configure::Step::Base);
 
 use Parrot::Configure::Step ':auto';
 
-$description = "Determining if your compiler supports inline...";
+$description = 'Determining if your compiler supports inline';
 
 @args = qw(inline verbose);
 

@@ -19,7 +19,7 @@ use vars qw($description @args);
 use Parrot::Configure::Step qw(:auto);
 use base qw(Parrot::Configure::Step::Base);
 
-$description = "Computing native byteorder for Parrot's wordsize...";
+$description = q{Computing native byteorder for Parrot's wordsize};
 
 @args = ();
 

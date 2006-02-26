@@ -25,7 +25,7 @@ use base qw(Parrot::Configure::Step::Base);
 
 use Parrot::Configure::Step ':inter';
 
-$description = 'Determining flags for building shared libraries...';
+$description = 'Determining flags for building shared libraries';
 
 @args = qw(ask verbose cc_shared);
 

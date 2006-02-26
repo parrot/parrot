@@ -20,7 +20,7 @@ use base qw(Parrot::Configure::Step::Base);
 
 use Parrot::Configure::Step ':gen';
 
-$description = "Generating build files...";
+$description = 'Generating makefiles and other build files';
 
 @args = ();
 

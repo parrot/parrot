@@ -24,7 +24,7 @@ use base qw(Parrot::Configure::Step::Base);
 
 use Parrot::Configure::Step ':auto';
 
-$description = "Determining whether python is installed...";
+$description = 'Determining whether python is installed';
 
 @args = qw();
 

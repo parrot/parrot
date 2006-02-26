@@ -22,7 +22,7 @@ use base qw(Parrot::Configure::Step::Base);
 
 use Parrot::Configure::Step ':inter';
 
-$description = 'Determining what C compiler and linker to use...';
+$description = 'Determining what C compiler and linker to use';
 
 @args = qw(ask cc cxx link ld ccflags ccwarn linkflags ldflags libs debugging
     lex yacc maintainer);
