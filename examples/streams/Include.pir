@@ -40,7 +40,7 @@ and then includes it in its own stream.
 
 =cut
 
-.sub _counter method
+.sub _counter :method
     .local string str
     .local int i
     
@@ -78,7 +78,7 @@ writes "world".
 
 =cut
 
-.sub _included method
+.sub _included :method
     .local pmc temp
     .local pmc func
     
@@ -104,7 +104,7 @@ Writes the letters "A" till "F" into the stream.
 
 =cut
 
-.sub _counter2 method
+.sub _counter2 :method
     .local string str
 
     str = 'A'

@@ -47,7 +47,7 @@ C<Stream::Lines> will return it one line per read.
 
 =cut
 
-.sub _text method
+.sub _text :method
     self."write"( "this\nis a\n" )
     self."write"( "Stream::Lines\ntest" )
     self."write"( "case\nhello world" )

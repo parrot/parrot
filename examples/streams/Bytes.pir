@@ -66,7 +66,7 @@ It just writes some text to the stream.
 
 =cut
 
-.sub _hello method
+.sub _hello :method
     self."write"( "hello" )
     self."write"( "world!" )
     self."write"( "parrot" )

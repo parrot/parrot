@@ -39,7 +39,7 @@ It writes the numbers 0 .. 9 as strings to the stream.
 
 =cut
 
-.sub _counter method
+.sub _counter :method
     .local string str
     .local int i
     

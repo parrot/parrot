@@ -43,7 +43,7 @@ It just reads from the stream.
 
 =cut
 
-.sub _reader method
+.sub _reader :method
     print "reader start\n"
     self."dump"()
     print "reader done\n"

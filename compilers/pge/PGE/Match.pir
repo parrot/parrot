@@ -91,7 +91,7 @@ it left off.
 
 =cut
 
-.sub "next" method
+.sub "next" :method
     .local pmc corou
 
     corou = getattribute self, "PGE::Match\x0&:corou"
@@ -114,7 +114,7 @@ this object matched.
 
 =cut
 
-.sub "from" method
+.sub "from" :method
     .local pmc from
     from = getattribute self, "PGE::Match\x0$:from"
     .return (from)
@@ -126,7 +126,7 @@ Returns the offset at the end of this match.
 
 =cut
 
-.sub "to" method
+.sub "to" :method
     .local pmc to
     to = getattribute self, "PGE::Match\x0$:pos"
     .return (to)
@@ -139,7 +139,7 @@ Returns 1 if this object successfully matched the target string,
 
 =cut
 
-.sub "__get_bool" method
+.sub "__get_bool" :method
     $P1 = getattribute self, "PGE::Match\x0$:pos"
     $I0 = $P1
     $I1 = isge $I0, 0
@@ -152,7 +152,7 @@ Returns the integer value of this match.
 
 =cut
 
-.sub "__get_integer" method
+.sub "__get_integer" :method
     $S0 = self
     $I0 = $S0
     .return ($I0)
@@ -164,7 +164,7 @@ Returns the numeric value of this match.
 
 =cut
 
-.sub "__get_number" method
+.sub "__get_number" :method
     $S0 = self
     $N0 = $S0
     .return ($N0)
@@ -176,7 +176,7 @@ Returns the portion of the target string matched by this object.
 
 =cut
 
-.sub "__get_string" method
+.sub "__get_string" :method
     $P0 = getattribute self, "PGE::Match\x0$:target"
     $P1 = getattribute self, "PGE::Match\x0$:from"
     $P2 = getattribute self, "PGE::Match\x0$:pos"
@@ -199,7 +199,7 @@ matches, a space seperated list of matches is returned.
 
 =cut
 
-.sub "__get_string_keyed_int" method
+.sub "__get_string_keyed_int" :method
 	.param int key
     $P0 = getattribute self, "PGE::Match\x0@:capt"
 	$S0 = ''
@@ -218,7 +218,7 @@ objects depending on the rule.
 
 =cut
 
-.sub "__get_pmc_keyed_int" method
+.sub "__get_pmc_keyed_int" :method
     .param int key
     $P0 = getattribute self, "PGE::Match\x0@:capt"
     if_null $P0, get_1
@@ -227,7 +227,7 @@ objects depending on the rule.
     .return ($P0)
 .end
 
-.sub "__set_pmc_keyed_int" method
+.sub "__set_pmc_keyed_int" :method
     .param int key
     .param pmc val
     .local pmc capt
@@ -264,7 +264,7 @@ Returns the hash component of the match object.
 
 =cut
 
-.sub "get_hash" method
+.sub "get_hash" :method
     .return (self)
 .end
 
@@ -274,7 +274,7 @@ Returns the array component of the match object.
 
 =cut
 
-.sub "get_array" method
+.sub "get_array" :method
     .local pmc array
     array = getattribute self, "PGE::Match\x0@:capt"
     .return (array)

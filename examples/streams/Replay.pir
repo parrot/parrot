@@ -20,7 +20,7 @@
     end
 .end
 
-.sub _reader method
+.sub _reader :method
     .local pmc stream1
     .local pmc stream2
     .local pmc stream3

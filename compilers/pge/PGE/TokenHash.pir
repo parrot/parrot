@@ -14,7 +14,7 @@ PGE::TokenHash - hash implementation to speed up Token lookups
     .return ()
 .end
 
-.sub "__init" method
+.sub "__init" :method
     .local pmc ihash, vhash
     ihash = new .Hash
     vhash = new .Hash
@@ -23,7 +23,7 @@ PGE::TokenHash - hash implementation to speed up Token lookups
     .return ()
 .end
 
-.sub "__get_pmc_keyed" method
+.sub "__get_pmc_keyed" :method
     .param pmc key_p
     .local pmc vhash
     vhash = getattribute self, "PGE::TokenHash\x0.vhash"
@@ -31,7 +31,7 @@ PGE::TokenHash - hash implementation to speed up Token lookups
     .return ($P0)
 .end
 
-.sub "__set_pmc_keyed" method
+.sub "__set_pmc_keyed" :method
     .param pmc key_p
     .param pmc value
     .local string key
@@ -53,7 +53,7 @@ PGE::TokenHash - hash implementation to speed up Token lookups
     .return ()
 .end
 
-.sub "__exists_keyed" method
+.sub "__exists_keyed" :method
     .param pmc key_p
     .local pmc vhash
     vhash = getattribute self, "PGE::TokenHash\x0.vhash"

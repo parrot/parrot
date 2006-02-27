@@ -509,7 +509,7 @@ register.
     .return (self)
 .end
     
-.sub "gen" method
+.sub "gen" :method
     .param pmc code
     .param string label
     .param string next
@@ -1034,7 +1034,7 @@ register.
     .return (self)
 .end
 
-.sub "gen" method
+.sub "gen" :method
     .param pmc code
     .param string label
     .param string next
