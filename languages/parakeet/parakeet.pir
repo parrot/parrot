@@ -749,7 +749,7 @@
 
     .emit(".sub _")
     .emit(.CURR)
-    .emit(" method\n")
+    .emit(" :method\n")
     .emit("inc .LEVEL\nnew_pad .LEVEL\n")
     .NEXT
 

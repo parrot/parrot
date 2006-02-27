@@ -21,7 +21,7 @@
 # return the packed address of a subroutine
 # z3 specific
 #
-.sub packed_addr method
+.sub packed_addr :method
   .param int adr
   # V3 - real adr * 2
   adr *= 2
@@ -33,7 +33,7 @@
 ##########
 
 # 2OP:20 14 add a b -> (result)
-.sub zop_add method
+.sub zop_add :method
   .param pmc im
   .param int pc
   .param pmc args
@@ -47,7 +47,7 @@ done:
 .end
 
 # 2OP:21 15 sub a b -> (result)
-.sub zop_sub method
+.sub zop_sub :method
   .param pmc im
   .param int pc
   .param pmc args
@@ -61,7 +61,7 @@ done:
 .end
 
 # 2OP:22 16 mul a b -> (result)
-.sub zop_mul method
+.sub zop_mul :method
   .param pmc im
   .param int pc
   .param pmc args
@@ -75,7 +75,7 @@ done:
 .end
 
 # 2OP:23 17 div a b -> (result)
-.sub zop_div method
+.sub zop_div :method
   .param pmc im
   .param int pc
   .param pmc args
@@ -90,7 +90,7 @@ done:
 
 # 2OP:24 18 mod a b -> (result)
 # Can't use emit_binary_mod because % does mod and we need cmod
-.sub zop_mod method
+.sub zop_mod :method
   .param pmc im
   .param int pc
   .param pmc args
@@ -118,7 +118,7 @@ done:
   .return (args, pc, 0, 0)
 .end
 
-.sub emit_binary_op method
+.sub emit_binary_op :method
   .param pmc args
   .param string operator
   .param string is_signed
@@ -149,7 +149,7 @@ done:
 
 # and
 # 2OP:9 9 and a b -> (result)
-.sub zop_and method
+.sub zop_and :method
   .param pmc im
   .param int pc
   .param pmc args
@@ -164,7 +164,7 @@ done:
 
 # or
 # 2OP:8 8 or a b -> (result)
-.sub zop_or method
+.sub zop_or :method
   .param pmc im
   .param int pc
   .param pmc args
@@ -180,7 +180,7 @@ done:
 # not
 # 1OP:143 F 1/4 not value -> (result)
 # VAR:248 18 5/6 not value -> (result)
-.sub zop_not method
+.sub zop_not :method
   .param pmc im
   .param int pc
   .param pmc args
@@ -208,7 +208,7 @@ done:
 ##########
 # JUMP
 ##########
-.sub zop_jump method
+.sub zop_jump :method
   .param pmc im
   .param int pc
   .param pmc args
@@ -236,7 +236,7 @@ done:
 .end
 
 ##########
-.sub zop_jz method
+.sub zop_jz :method
   .param pmc im
   .param int pc
   .param pmc args
@@ -259,7 +259,7 @@ done:
 ##########
 # Jump on equals
 # TODO if equal to ANY of its args!!!
-.sub zop_je method
+.sub zop_je :method
   .param pmc im
   .param int pc
   .param pmc args
@@ -284,7 +284,7 @@ done:
 
 ##########
 # Jump if a > b (using a signed 16-bit comparison). 
-.sub zop_jg method
+.sub zop_jg :method
   .param pmc im
   .param int pc
   .param pmc args
@@ -310,7 +310,7 @@ done:
 
 ##########
 # Jump if a < b (using a signed 16-bit comparison). 
-.sub zop_jl method
+.sub zop_jl :method
   .param pmc im
   .param int pc
   .param pmc args
@@ -334,7 +334,7 @@ done:
 .end
 
 # Given a condition, output an if/unless statement
-.sub emit_branch method
+.sub emit_branch :method
   .param int on_true
   .param string condition
   .param int label
@@ -377,7 +377,7 @@ done:
 # PRINT
 ##########
 # 3.2
-.sub decode_text method
+.sub decode_text :method
   .param pmc im
   .param int pc
 
@@ -474,7 +474,7 @@ text_loop:
 .end
 
 ##########
-.sub zop_print method
+.sub zop_print :method
   .param pmc im
   .param int pc
   .param pmc args
@@ -495,7 +495,7 @@ done:
 
 ##########
 # TODO print a newline before return
-.sub zop_print_ret method
+.sub zop_print_ret :method
   .param pmc im
   .param int pc
   .param pmc args
@@ -516,7 +516,7 @@ done:
 .end
 
 ##########
-.sub zop_print_num method
+.sub zop_print_num :method
   .param pmc im
   .param int pc
   .param pmc args
@@ -535,7 +535,7 @@ done:
 
 ##########
 # TODO '@print_paddr I5' breaks. Need to call decode_text at runtime
-.sub zop_print_paddr method
+.sub zop_print_paddr :method
     #write_zchunk($ztext->decode_text($_[0]));
   .param pmc im
   .param int pc
@@ -599,7 +599,7 @@ done:
 ##########
 
 # pop (takes no args)
-.sub zop_pop method
+.sub zop_pop :method
   .param pmc im
   .param int pc
   .param pmc args
@@ -613,7 +613,7 @@ done:
 
 # pull (variable)
 # variable is indirect
-.sub zop_pull method
+.sub zop_pull :method
   .param pmc im
   .param int pc
   .param pmc args
@@ -634,7 +634,7 @@ done:
 .end
 
 # push value
-.sub zop_push method
+.sub zop_push :method
   .param pmc im
   .param int pc
   .param pmc args
@@ -654,7 +654,7 @@ done:
 
 # store (var) value
 # var is indirect constant
-.sub zop_store method
+.sub zop_store :method
   .param pmc im
   .param int pc
   .param pmc args
@@ -672,7 +672,7 @@ done:
   .return (args, pc, 0, 0)
 .end
 
-.sub zop_dec method
+.sub zop_dec :method
   .param pmc im
   .param int pc
   .param pmc args
@@ -698,7 +698,7 @@ done:
   .return (args, pc, 0, 0)
 .end
 
-.sub zop_inc method
+.sub zop_inc :method
   .param pmc im
   .param int pc
   .param pmc args
@@ -722,7 +722,7 @@ done:
 .end
 
 ##########
-.sub zop_quit method
+.sub zop_quit :method
   .param pmc im
   .param int pc
   .param pmc args
@@ -739,7 +739,7 @@ done:
 ##########
 # call addr [args..] store
 
-.sub zop_call method
+.sub zop_call :method
   .param pmc im
   .param int pc
   .param pmc args
@@ -803,7 +803,7 @@ done:
 .end
 
 ##########
-.sub zop_ret method
+.sub zop_ret :method
   .param pmc im
   .param int pc
   .param pmc args
@@ -822,7 +822,7 @@ done:
 .end
 
 ##########
-.sub zop_rtrue method
+.sub zop_rtrue :method
   .param pmc im
   .param int pc
   .param pmc args
@@ -835,7 +835,7 @@ done:
 .end
 
 ##########
-.sub zop_rfalse method
+.sub zop_rfalse :method
   .param pmc im
   .param int pc
   .param pmc args

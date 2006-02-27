@@ -46,11 +46,11 @@
 
 .namespace ["LispCons"]
 
-.sub __init method
+.sub __init :method
    self = 2
 .end
 
-.sub __get_string method
+.sub __get_string :method
   .local string car
   .local string cdr
   .local pmc retv
@@ -84,7 +84,7 @@
 
 .namespace ["LispFunction"]
 
-.sub _get_args method
+.sub _get_args :method
   .local pmc retv
 
    getattribute retv, self, "LispFunction\0args"
@@ -92,7 +92,7 @@
   .return(retv)
 .end
 
-.sub _set_args method
+.sub _set_args :method
   .param pmc args
 
    setattribute self, "LispFunction\0args", args
@@ -100,7 +100,7 @@
   .return(args)
 .end
 
-.sub _get_body method
+.sub _get_body :method
   .local pmc retv
 
    getattribute retv, self, "LispFunction\0body"
@@ -108,7 +108,7 @@
   .return(retv)
 .end
 
-.sub _set_body method
+.sub _set_body :method
   .param pmc body
 
    setattribute self, "LispFunction\0body", body
@@ -116,7 +116,7 @@
   .return(body)
 .end
 
-.sub _get_name method
+.sub _get_name :method
   .local pmc retv
 
    getattribute retv, self, "LispFunction\0name"
@@ -124,7 +124,7 @@
   .return(retv)
 .end
 
-.sub _set_name method
+.sub _set_name :method
   .param pmc name
 
    setattribute self, "LispFunction\0name", name
@@ -132,7 +132,7 @@
   .return(name)
 .end
 
-.sub _get_scope method
+.sub _get_scope :method
   .local pmc retv
 
    getattribute retv, self, "LispFunction\0scope"
@@ -140,7 +140,7 @@
   .return(retv)
 .end
 
-.sub _set_scope method
+.sub _set_scope :method
   .param pmc scope
 
    setattribute self, "LispFunction\0scope", scope
@@ -148,7 +148,7 @@
   .return(scope)
 .end
 
-.sub __get_string method
+.sub __get_string :method
   .local pmc retv
   .local pmc tmps
   .local pmc name
@@ -177,7 +177,7 @@ NAMED_FUNCTION:
 
 .namespace ["LispHash"]
 
-.sub __get_string method
+.sub __get_string :method
   .local pmc name
 
    name = new String
@@ -188,7 +188,7 @@ NAMED_FUNCTION:
 
 .namespace ["LispMacro"]
 
-.sub __get_string method
+.sub __get_string :method
   .local pmc retv
   .local pmc tmps
   .local pmc name
@@ -202,7 +202,7 @@ NAMED_FUNCTION:
 
 .namespace ["LispPackage"]
 
-.sub __init method
+.sub __init :method
   .local pmc value
 
    value = new Hash
@@ -212,7 +212,7 @@ NAMED_FUNCTION:
    setattribute self, "LispPackage\0internal", value
 .end
 
-.sub _lookup_symbol method
+.sub _lookup_symbol :method
   .param string name
   .local string type
   .local pmc symbol
@@ -241,7 +241,7 @@ DONE:
   .return(symbol)
 .end
 
-.sub _import_symbol method
+.sub _import_symbol :method
   .param pmc symbol
   .local string symname
   .local string type
@@ -271,7 +271,7 @@ DONE:
   .return(symbol)
 .end
 
-.sub _shadow_symbol method
+.sub _shadow_symbol :method
   .param string name
   .local pmc symbol
   .local pmc stack
@@ -288,7 +288,7 @@ DONE:
   .return(symbol)
 .end
 
-.sub _unshadow_symbol method
+.sub _unshadow_symbol :method
   .param string name
   .local pmc symbol
   .local pmc stack
@@ -306,7 +306,7 @@ DONE:
   .return(symbol)
 .end
 
-.sub _get_exports method
+.sub _get_exports :method
   .local string keyval
   .local string type
   .local pmc exports
@@ -338,7 +338,7 @@ DONE:
   .return(exports)
 .end
 
-.sub _export_symbol method
+.sub _export_symbol :method
   .param string name
   .local pmc external
   .local pmc internal
@@ -376,7 +376,7 @@ DONE:
   .return(symbol)
 .end
 
-.sub _intern_symbol method
+.sub _intern_symbol :method
   .param string name
   .local string type
   .local pmc symbol
@@ -409,7 +409,7 @@ DONE:
   .return(symbol)
 .end
 
-.sub _get_name method
+.sub _get_name :method
   .local pmc retv
 
    getattribute retv, self, "LispPackage\0name"
@@ -417,7 +417,7 @@ DONE:
   .return(retv)
 .end
 
-.sub _set_name method
+.sub _set_name :method
   .param pmc name
 
    setattribute self, "LispPackage\0name", name
@@ -425,7 +425,7 @@ DONE:
   .return(name)
 .end
 
-.sub _get_name_as_string method
+.sub _get_name_as_string :method
   .local pmc name
   .local string retv
 
@@ -435,7 +435,7 @@ DONE:
   .return(retv)
 .end
 
-.sub __get_string method
+.sub __get_string :method
   .local pmc name
   .local pmc tmps
   .local pmc retv
@@ -457,7 +457,7 @@ DONE:
 
 .namespace ["LispReadtable"]
 
-.sub _get_table method
+.sub _get_table :method
   .local pmc retv
 
    getattribute retv, self, "LispReadtable\0table"
@@ -465,7 +465,7 @@ DONE:
   .return(retv)
 .end
 
-.sub _set_table method
+.sub _set_table :method
   .param pmc table
 
    setattribute self, "LispReadtable\0table", table
@@ -473,7 +473,7 @@ DONE:
   .return(table)
 .end
 
-.sub _get_case method
+.sub _get_case :method
   .local pmc retv
 
    getattribute retv, self, "LispReadtable\0case"
@@ -481,7 +481,7 @@ DONE:
   .return(retv)
 .end
 
-.sub _set_case method
+.sub _set_case :method
   .param pmc case
 
    setattribute self, "LispReadtable\0case", case
@@ -489,7 +489,7 @@ DONE:
   .return(case)
 .end
 
-.sub __init method
+.sub __init :method
   .local pmc table
   .local pmc case
 
@@ -632,7 +632,7 @@ DONE:
    setattribute self, "LispReadtable\0case", case
 .end
 
-.sub __get_string method
+.sub __get_string :method
   .local pmc name
   .local pmc tmps
   .local pmc retv
@@ -645,7 +645,7 @@ DONE:
 
 .namespace ["LispStream"]
 
-.sub _get_io method
+.sub _get_io :method
   .local pmc retv
 
    getattribute retv, self, "LispStream\0stream"
@@ -653,7 +653,7 @@ DONE:
   .return(retv)
 .end
 
-.sub _set_io method
+.sub _set_io :method
   .param pmc io
 
    setattribute self, "LispStream\0stream", io
@@ -661,7 +661,7 @@ DONE:
   .return(io)
 .end
 
-.sub __get_string method
+.sub __get_string :method
   .local pmc name
 
    name = new String
@@ -672,7 +672,7 @@ DONE:
 
 .namespace ["LispSymbol"]
 
-.sub _get_documentation method
+.sub _get_documentation :method
   .local pmc retv
 
    getattribute retv, self, "LispSymbol\0documentation"
@@ -680,7 +680,7 @@ DONE:
   .return(retv)
 .end
 
-.sub _set_documentation method
+.sub _set_documentation :method
   .param pmc docs
 
    setattribute self, "LispSymbol\0documentation", docs
@@ -688,7 +688,7 @@ DONE:
   .return(docs)
 .end
 
-.sub _get_function method
+.sub _get_function :method
   .local pmc retv
 
    getattribute retv, self, "LispSymbol\0function"
@@ -696,7 +696,7 @@ DONE:
   .return(retv)
 .end
 
-.sub _set_function method
+.sub _set_function :method
   .param pmc function
 
    setattribute self, "LispSymbol\0function", function
@@ -704,7 +704,7 @@ DONE:
   .return(function)
 .end
 
-.sub _get_name method
+.sub _get_name :method
   .local pmc retv
 
    getattribute retv, self, "LispSymbol\0name"
@@ -712,7 +712,7 @@ DONE:
   .return(retv)
 .end
 
-.sub _set_name method
+.sub _set_name :method
   .param pmc name
 
    setattribute self, "LispSymbol\0name", name
@@ -720,7 +720,7 @@ DONE:
   .return(name)
 .end
 
-.sub _get_name_as_string method
+.sub _get_name_as_string :method
   .local pmc name
   .local string retv
 
@@ -730,7 +730,7 @@ DONE:
   .return(retv)
 .end
 
-.sub _get_package method
+.sub _get_package :method
   .local pmc retv
 
    getattribute retv, self, "LispSymbol\0package"
@@ -738,7 +738,7 @@ DONE:
   .return(retv)
 .end
 
-.sub _set_package method
+.sub _set_package :method
   .param pmc package
 
    setattribute self, "LispSymbol\0package", package
@@ -746,7 +746,7 @@ DONE:
   .return(package)
 .end
 
-.sub _get_special method
+.sub _get_special :method
   .local pmc retv
 
    getattribute retv, self, "LispSymbol\0special"
@@ -754,7 +754,7 @@ DONE:
   .return(retv)
 .end
 
-.sub _set_special method
+.sub _set_special :method
   .param pmc special
 
    setattribute self, "LispSymbol\0special", special
@@ -762,7 +762,7 @@ DONE:
   .return(special)
 .end
 
-.sub _get_value method
+.sub _get_value :method
   .local pmc retv
 
    getattribute retv, self, "LispSymbol\0value"
@@ -770,7 +770,7 @@ DONE:
   .return(retv)
 .end
 
-.sub _set_value method
+.sub _set_value :method
   .param pmc value
 
    setattribute self, "LispSymbol\0value", value
@@ -778,7 +778,7 @@ DONE:
   .return(value)
 .end
 
-.sub __get_string method
+.sub __get_string :method
   .local pmc name
 
    getattribute name, self, "LispSymbol\0name"
@@ -786,7 +786,7 @@ DONE:
   .return(name)
 .end
 
-.sub __get_bool method
+.sub __get_bool :method
   .local pmc retv
 
    getprop retv, "defined", self

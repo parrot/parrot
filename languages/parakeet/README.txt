@@ -117,7 +117,7 @@ Words
 
     0> see Foo
     .namespace["Foo"]
-    .sub _bar method
+    .sub _bar :method
     inc .LEVEL
     new_pad .LEVEL
     .TOS = new .PerlString

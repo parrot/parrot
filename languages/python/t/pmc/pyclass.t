@@ -213,7 +213,7 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "overriding builtins");
     .return ()
 .end
 
-.sub ___repr__ :anon, method
+.sub ___repr__ :anon, :method
     find_type $I0, 'PyObject'
     new $P0, $I0
     find_type $I1, 'PyString'

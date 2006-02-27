@@ -73,7 +73,7 @@ done:
 
 .namespace ["Zmachine"]
 
-.sub "instantiate" method
+.sub "instantiate" :method
   .param string file
   .param pmc opts
 
@@ -87,7 +87,7 @@ done:
 
 # load bytecode file
 
-.sub "load" method
+.sub "load" :method
   .param string file
 
   .local pmc pfile, im, io
@@ -106,7 +106,7 @@ done:
 
 # set command line options
 
-.sub "set_opts" method
+.sub "set_opts" :method
   .param pmc opts
 
   setattribute self, "Zmachine\0opts", opts
@@ -115,7 +115,7 @@ done:
 # TODO print some stats if --stats
 # also check z version
 
-.sub "stats" method
+.sub "stats" :method
   .local pmc im
   im = getattribute self, "Zmachine\0image"
   $I0 = im[0]
@@ -138,7 +138,7 @@ vers_ok:
 ## return word, new offset
 # 4.2.1 msb first
 
-.sub "get_word" method
+.sub "get_word" :method
   .param int ofs
 
   .local int lo, hi
@@ -162,7 +162,7 @@ vers_ok:
 # compile PIR and run it
 #
 
-.sub "translate" method
+.sub "translate" :method
   .local pmc comp, im, f, o, t
   subclass $P0, "Zmachine", "ZComp"
   addattribute $P0, "labels"
@@ -203,20 +203,20 @@ vers_ok:
 # accessor methods
 #
 
-.sub "debug" method
+.sub "debug" :method
   .local pmc opts
   opts = getattribute self, "Zmachine\0opts"
   $I0 = defined opts["debug"]
   .return ($I0)
 .end
 
-.sub "image" method
+.sub "image" :method
   .local pmc im
   im = getattribute self, "Zmachine\0image"
   .return(im)
 .end
 
-.sub "file" method
+.sub "file" :method
   .local pmc f
   f = getattribute self, "Zmachine\0file"
   .return(f)
@@ -228,7 +228,7 @@ vers_ok:
 
 .namespace ["ZComp"]
 
-.sub "__init" method
+.sub "__init" :method
   $P0 = new Hash
   setattribute self, "ZComp\0labels", $P0
   $P0 = new Hash
@@ -248,7 +248,7 @@ vers_ok:
 # some accessor methods
 #
 
-.sub "ops" method
+.sub "ops" :method
   .local pmc o
   o = getattribute self, "ZComp\0ops"
   .return(o)
@@ -256,7 +256,7 @@ vers_ok:
 
 # return or add code
 
-.sub "code" method
+.sub "code" :method
   .param string s
 
   .local pmc c
@@ -277,7 +277,7 @@ no_add:
 #    the todo list
 # labels are set in a label hash
 #
-.sub "translate" method
+.sub "translate" :method
   .param int pass
 
   .local int pc, deb, first
@@ -331,7 +331,7 @@ fin:
 # Read/decode one sub
 # Return pc after reading the sub
 #
-.sub "decode_one_sub" method
+.sub "decode_one_sub" :method
   .param int pc
   .param int first
   .param int pass
@@ -448,7 +448,7 @@ inner:
 # the value in the seen hash is the
 # position of the locals count in the image
 #
-.sub "remember_sub" method
+.sub "remember_sub" :method
   .param int adr
   .param int pc
 
@@ -466,7 +466,7 @@ done:
 
 # Print macros at beginning of translated Z-machine
 # image, the global var, will automatically be loaded in every sub
-.sub "emit_macros" method
+.sub "emit_macros" :method
       $S1 = ".macro GET_WORD(w, a)\n"
       $S1 .= "\t.w = image[.a]\n"
       $S1 .= "\t$I0 = .a\n"
@@ -491,7 +491,7 @@ done:
 # Treat MAIN slightly differently (It won't have locals, btw)
 # a sub may be called with 0..3 (7) args
 # TODO clear locals / set default values
-.sub "emit_sub_header" method
+.sub "emit_sub_header" :method
     .param string address
     .param int first # first (main) sub?
 
@@ -564,7 +564,7 @@ done:
 # decode one opcode byte
 #
 
-.sub "decode_op" method
+.sub "decode_op" :method
   .param pmc im
   .param int pc
 
@@ -695,7 +695,7 @@ done:
 # v ... var
 #
 
-.sub "decode_args" method
+.sub "decode_args" :method
   .param pmc im
   .param int pc
   .param pmc args
@@ -743,7 +743,7 @@ done:
 # initialize z3 opcode list
 #
 
-.sub "set_oplist" method
+.sub "set_oplist" :method
   .local pmc ops, ops_2op, ops_1op, ops_0op, ops_var, ops_ext
   ops = new FixedPMCArray
   ops = 5
@@ -842,7 +842,7 @@ done:
 .end
 
 
-.sub "temp" method
+.sub "temp" :method
   .local pmc tc
   tc = getattribute self, "ZComp\0temp"
   inc tc
@@ -856,7 +856,7 @@ done:
 #    and adds it to the Z object
 # Converts value to signed integer if necessary.
 # Returns the string (e.g. "$I18" or "35") with the new value
-.sub "emit_get" method
+.sub "emit_get" :method
   .param string var
   .param int is_signed # need to convert variable to signed int?
 
@@ -918,7 +918,7 @@ no_conv:
 # still supposed to be unsigned.
 # 15."dec": "This is signed, so 0 decrements to -1"
 # I still think that that rule only matters for dec_chk
-.sub "emit_store" method
+.sub "emit_store" :method
   .param string var
   .param string value
 
@@ -979,7 +979,7 @@ no_stack:
 done:
 .end
 
-.sub "decode_label" method
+.sub "decode_label" :method
   .param pmc im
   .param int pc
 
@@ -1026,7 +1026,7 @@ decode_done:
 
 # store address of a label
 
-.sub "remember_label" method
+.sub "remember_label" :method
   .param int adr
 
   .local pmc lab
