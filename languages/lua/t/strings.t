@@ -18,7 +18,7 @@ use strict;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 44;
+use Parrot::Test tests => 46;
 use Test::More;
 
 language_output_is( 'lua', <<'CODE', <<'OUT', '- "1"' );
@@ -284,5 +284,19 @@ language_output_like( 'lua', <<'CODE', <<'OUT', '"1" >= 0' );
 print("1" >= 0)
 CODE
 /attempt to compare \w+ with \w+/
+OUT
+
+language_output_like( 'lua', <<'CODE', <<'OUT', 'get_pmc_keyed' );
+a = "text"
+print(a[1])
+CODE
+/attempt to index/
+OUT
+
+language_output_like( 'lua', <<'CODE', <<'OUT', 'set_pmc_keyed' );
+a = "text"
+a[1] = 1
+CODE
+/attempt to index/
 OUT
 

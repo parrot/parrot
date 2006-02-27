@@ -18,7 +18,7 @@ use strict;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 45;
+use Parrot::Test tests => 47;
 use Test::More;
 
 language_output_is( 'lua', <<'CODE', <<'OUT', '-1' );
@@ -294,5 +294,19 @@ CODE
 1000000000
 1000000000
 1000000000
+OUT
+
+language_output_like( 'lua', <<'CODE', <<'OUT', 'get_pmc_keyed' );
+a = 3.14
+print(a[1])
+CODE
+/attempt to index/
+OUT
+
+language_output_like( 'lua', <<'CODE', <<'OUT', 'set_pmc_keyed' );
+a = 3.14
+a[1] = 1
+CODE
+/attempt to index/
 OUT
 

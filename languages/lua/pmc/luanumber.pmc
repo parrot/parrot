@@ -25,6 +25,7 @@ the Lua C<Number> type.
 #define LUA_NUMBER_FMT		"%.14g"
 
 static STRING *luanumber_name;
+static INTVAL dynpmc_LuaNil;
 static INTVAL dynpmc_LuaString;
 
 pmclass LuaNumber
@@ -43,6 +44,8 @@ pmclass LuaNumber
 
             Parrot_LuaBase_super_init(INTERP, NULL);
             luanumber_name = const_string(INTERP, "number");
+            dynpmc_LuaNil = pmc_type(INTERP,
+              string_from_const_cstring(INTERP, "LuaNil", 0));
             dynpmc_LuaString = pmc_type(INTERP,
               string_from_const_cstring(INTERP, "LuaString", 0));
 
@@ -239,6 +242,15 @@ MMD_LuaString: {
             }
         }
 MMD_DEFAULT: {
+            PMC *metamethod = Parrot_LuaBase_find_metamethod(INTERP, value,
+                    string_from_const_cstring(INTERP, "__add", 0));
+            if (metamethod != NULL) {
+                dest = Parrot_runops_fromc_args(INTERP, metamethod, "PPP", SELF, value);
+                if (NULL == dest) {
+                    dest = pmc_new(INTERP, dynpmc_LuaNil);
+                }
+                return dest;
+            }
             real_exception(INTERP, NULL, ILL_INHERIT,
                     "attempt to perform arithmetic on a %s value",
                     string_to_cstring(INTERP, VTABLE_name(INTERP, value)));
@@ -269,6 +281,15 @@ MMD_LuaString: {
             }
         }
 MMD_DEFAULT: {
+            PMC *metamethod = Parrot_LuaBase_find_metamethod(INTERP, value,
+                    string_from_const_cstring(INTERP, "__add", 0));
+            if (metamethod != NULL) {
+                SELF = Parrot_runops_fromc_args(INTERP, metamethod, "PPP", SELF, value);
+                if (NULL == SELF) {
+                    SELF = pmc_new(INTERP, dynpmc_LuaNil);
+                }
+                return;
+            }
             real_exception(INTERP, NULL, ILL_INHERIT,
                     "attempt to perform arithmetic on a %s value",
                     string_to_cstring(INTERP, VTABLE_name(INTERP, value)));
@@ -315,6 +336,15 @@ MMD_LuaString: {
             return NULL;
         }
 MMD_DEFAULT: {
+            PMC *metamethod = Parrot_LuaBase_find_metamethod(INTERP, value,
+                    string_from_const_cstring(INTERP, "__sub", 0));
+            if (metamethod != NULL) {
+                dest = Parrot_runops_fromc_args(INTERP, metamethod, "PPP", SELF, value);
+                if (NULL == dest) {
+                    dest = pmc_new(INTERP, dynpmc_LuaNil);
+                }
+                return dest;
+            }
             real_exception(INTERP, NULL, ILL_INHERIT,
                     "attempt to perform arithmetic on a %s value",
                     string_to_cstring(INTERP, VTABLE_name(INTERP, value)));
@@ -345,6 +375,15 @@ MMD_LuaString: {
             }
         }
 MMD_DEFAULT: {
+            PMC *metamethod = Parrot_LuaBase_find_metamethod(INTERP, value,
+                    string_from_const_cstring(INTERP, "__sub", 0));
+            if (metamethod != NULL) {
+                SELF = Parrot_runops_fromc_args(INTERP, metamethod, "PPP", SELF, value);
+                if (NULL == SELF) {
+                    SELF = pmc_new(INTERP, dynpmc_LuaNil);
+                }
+                return;
+            }
             real_exception(INTERP, NULL, ILL_INHERIT,
                     "attempt to perform arithmetic on a %s value",
                     string_to_cstring(INTERP, VTABLE_name(INTERP, value)));
@@ -378,6 +417,15 @@ MMD_LuaString: {
             }
         }
 MMD_DEFAULT: {
+            PMC *metamethod = Parrot_LuaBase_find_metamethod(INTERP, value,
+                    string_from_const_cstring(INTERP, "__mul", 0));
+            if (metamethod != NULL) {
+                dest = Parrot_runops_fromc_args(INTERP, metamethod, "PPP", SELF, value);
+                if (NULL == dest) {
+                    dest = pmc_new(INTERP, dynpmc_LuaNil);
+                }
+                return dest;
+            }
             real_exception(INTERP, NULL, ILL_INHERIT,
                     "attempt to perform arithmetic on a %s value",
                     string_to_cstring(INTERP, VTABLE_name(INTERP, value)));
@@ -408,6 +456,15 @@ MMD_LuaString: {
             }
         }
 MMD_DEFAULT: {
+            PMC *metamethod = Parrot_LuaBase_find_metamethod(INTERP, value,
+                    string_from_const_cstring(INTERP, "__mul", 0));
+            if (metamethod != NULL) {
+                SELF = Parrot_runops_fromc_args(INTERP, metamethod, "PPP", SELF, value);
+                if (NULL == SELF) {
+                    SELF = pmc_new(INTERP, dynpmc_LuaNil);
+                }
+                return;
+            }
             real_exception(INTERP, NULL, ILL_INHERIT,
                     "attempt to perform arithmetic on a %s value",
                     string_to_cstring(INTERP, VTABLE_name(INTERP, value)));
@@ -441,6 +498,15 @@ MMD_LuaString: {
             }
         }
 MMD_DEFAULT: {
+            PMC *metamethod = Parrot_LuaBase_find_metamethod(INTERP, value,
+                    string_from_const_cstring(INTERP, "__div", 0));
+            if (metamethod != NULL) {
+                dest = Parrot_runops_fromc_args(INTERP, metamethod, "PPP", SELF, value);
+                if (NULL == dest) {
+                    dest = pmc_new(INTERP, dynpmc_LuaNil);
+                }
+                return dest;
+            }
             real_exception(INTERP, NULL, ILL_INHERIT,
                     "attempt to perform arithmetic on a %s value",
                     string_to_cstring(INTERP, VTABLE_name(INTERP, value)));
@@ -471,6 +537,15 @@ MMD_LuaString: {
             }
         }
 MMD_DEFAULT: {
+            PMC *metamethod = Parrot_LuaBase_find_metamethod(INTERP, value,
+                    string_from_const_cstring(INTERP, "__div", 0));
+            if (metamethod != NULL) {
+                SELF = Parrot_runops_fromc_args(INTERP, metamethod, "PPP", SELF, value);
+                if (NULL == SELF) {
+                    SELF = pmc_new(INTERP, dynpmc_LuaNil);
+                }
+                return;
+            }
             real_exception(INTERP, NULL, ILL_INHERIT,
                     "attempt to perform arithmetic on a %s value",
                     string_to_cstring(INTERP, VTABLE_name(INTERP, value)));
@@ -506,6 +581,15 @@ MMD_LuaString: {
             }
         }
 MMD_DEFAULT: {
+            PMC *metamethod = Parrot_LuaBase_find_metamethod(INTERP, value,
+                    string_from_const_cstring(INTERP, "__pow", 0));
+            if (metamethod != NULL) {
+                dest = Parrot_runops_fromc_args(INTERP, metamethod, "PPP", SELF, value);
+                if (NULL == dest) {
+                    dest = pmc_new(INTERP, dynpmc_LuaNil);
+                }
+                return dest;
+            }
             real_exception(INTERP, NULL, ILL_INHERIT,
                     "attempt to perform arithmetic on a %s value",
                     string_to_cstring(INTERP, VTABLE_name(INTERP, value)));
@@ -538,6 +622,15 @@ MMD_LuaString: {
             }
         }
 MMD_DEFAULT: {
+            PMC *metamethod = Parrot_LuaBase_find_metamethod(INTERP, value,
+                    string_from_const_cstring(INTERP, "__pow", 0));
+            if (metamethod != NULL) {
+                SELF = Parrot_runops_fromc_args(INTERP, metamethod, "PPP", SELF, value);
+                if (NULL == SELF) {
+                    SELF = pmc_new(INTERP, dynpmc_LuaNil);
+                }
+                return;
+            }
             real_exception(INTERP, NULL, ILL_INHERIT,
                     "attempt to perform arithmetic on a %s value",
                     string_to_cstring(INTERP, VTABLE_name(INTERP, value)));
@@ -608,6 +701,15 @@ MMD_LuaString: {
             return dest;
         }
 MMD_DEFAULT: {
+            PMC *metamethod = Parrot_LuaBase_find_metamethod(INTERP, value,
+                    string_from_const_cstring(INTERP, "__concat", 0));
+            if (metamethod != NULL) {
+                dest = Parrot_runops_fromc_args(INTERP, metamethod, "PPP", SELF, value);
+                if (NULL == dest) {
+                    dest = pmc_new(INTERP, dynpmc_LuaNil);
+                }
+                return dest;
+            }
             real_exception(INTERP, NULL, ILL_INHERIT,
                     "attempt to concatenate a %s value",
                     string_to_cstring(INTERP, VTABLE_name(INTERP, value)));
@@ -634,6 +736,15 @@ MMD_LuaString: {
             DYNSELF.set_string_native(string_append(INTERP, s, v, 1));
         }
 MMD_DEFAULT: {
+            PMC *metamethod = Parrot_LuaBase_find_metamethod(INTERP, value,
+                    string_from_const_cstring(INTERP, "__concat", 0));
+            if (metamethod != NULL) {
+                SELF = Parrot_runops_fromc_args(INTERP, metamethod, "PPP", SELF, value);
+                if (NULL == SELF) {
+                    SELF = pmc_new(INTERP, dynpmc_LuaNil);
+                }
+                return;
+            }
             real_exception(INTERP, NULL, ILL_INHERIT,
                     "attempt to concatenate a %s value",
                     string_to_cstring(INTERP, VTABLE_name(INTERP, value)));

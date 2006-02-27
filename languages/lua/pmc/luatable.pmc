@@ -27,6 +27,7 @@ Now, Lua 5.0 uses a hybrid data structure with a Hash part and an Array part.
 static STRING *luatable_name;
 static INTVAL dynpmc_LuaNil;
 static INTVAL dynpmc_LuaString;
+static INTVAL dynpmc_LuaTable;
 
 static STRING* make_hash_key(Interp* interpreter, PMC* key)
 {
@@ -35,6 +36,7 @@ static STRING* make_hash_key(Interp* interpreter, PMC* key)
                 "LuaTable: Cannot use NULL key");
         return NULL;
     }
+
     return string_concat(interpreter, 
             VTABLE_name(interpreter, key),
             VTABLE_get_string(interpreter, key), 0);
@@ -60,6 +62,8 @@ pmclass LuaTable
               string_from_const_cstring(INTERP, "LuaNil", 0));
             dynpmc_LuaString = pmc_type(INTERP,
               string_from_const_cstring(INTERP, "LuaString", 0));
+            dynpmc_LuaTable = pmc_type(INTERP,
+              string_from_const_cstring(INTERP, "LuaTable", 0));
 
             /* namespace hack */
             meth = Parrot_find_global(INTERP,
@@ -133,7 +137,7 @@ Free hash structure.
 */
     void destroy () {
         if (PMC_struct_val(SELF)) {
-            hash_destroy(INTERP, (Hash*) PMC_struct_val(SELF));
+            hash_destroy(INTERP, PMC_struct_val(SELF));
             PMC_struct_val(SELF) = NULL;
         }
     }
@@ -166,9 +170,9 @@ only clone the reference to themselves, not make a deep copy.
 =cut
 
 */
-     PMC* clone() {
-         return SELF;
-     }
+    PMC* clone() {
+        return SELF;
+    }
 
 /*
 
@@ -207,6 +211,17 @@ A copy of the value is retrieved, otherwise, this could happen:
         keystr = make_hash_key(INTERP, key);
         retval = hash_get(INTERP, PMC_struct_val(SELF), keystr);
         if (retval == NULL) {
+            PMC *metamethod = Parrot_LuaBase_find_metamethod(INTERP, SELF,
+                    string_from_const_cstring(INTERP, "__index", 0));
+            if (metamethod != NULL) {
+                if (dynpmc_LuaTable == metamethod->vtable->base_type) {
+                    return VTABLE_get_pmc_keyed(INTERP, metamethod, key);
+                } else {
+                    retval = Parrot_runops_fromc_args(INTERP, metamethod, "PPP", SELF, key);
+                }
+            }
+        }
+        if (retval == NULL) {
             retval = pmc_new(INTERP, dynpmc_LuaNil);
             return retval;
         }
@@ -239,6 +254,18 @@ A copy of the value is stored, otherwise, this could happen:
         }
         hash = PMC_struct_val(SELF);
         keystr = make_hash_key(INTERP, key);
+        if (NULL == hash_get(INTERP, hash, keystr)) {
+            PMC *metamethod = Parrot_LuaBase_find_metamethod(INTERP, SELF,
+                    string_from_const_cstring(INTERP, "__newindex", 0));
+            if (metamethod != NULL) {
+                if (dynpmc_LuaTable == metamethod->vtable->base_type) {
+                    VTABLE_set_pmc_keyed(INTERP, metamethod, key, value);
+                } else {
+                    Parrot_runops_fromc_args(INTERP, metamethod, "vPPP", SELF, key, value);
+                }
+                return;
+            }
+        }
         if (dynpmc_LuaNil == value->vtable->base_type) {
             hash_delete(INTERP, hash, keystr);
         } 
@@ -277,10 +304,24 @@ The C<==> operation. Compares reference (not in depth).
 
 */
     INTVAL is_equal (PMC* value) {
-        if (SELF == value)
-            return (INTVAL)1;
-        else 
+MMD_LuaTable: {
+            PMC *metamethod = Parrot_LuaBase_find_metamethod(INTERP, SELF,
+                    string_from_const_cstring(INTERP, "__eq", 0));
+            if (metamethod != NULL) {
+                PMC *retval = Parrot_runops_fromc_args(INTERP, metamethod, "PPP", SELF, value);
+                if (NULL == retval) {
+                    return (INTVAL)0;
+                }
+                return VTABLE_get_bool(INTERP, retval);
+            }
+            if (SELF == value)
+                return (INTVAL)1;
+            else 
+                return (INTVAL)0;
+        }
+MMD_DEFAULT: {
             return (INTVAL)0;
+        }
     }
 
 /*
@@ -292,6 +333,36 @@ The C<==> operation. Compares reference (not in depth).
 */
     INTVAL cmp (PMC* value) {
 MMD_LuaTable: {
+#if 0
+            PMC *metamethod = Parrot_LuaBase_find_metamethod(INTERP, SELF,
+                    string_from_const_cstring(INTERP, "__cmp", 0));
+            if (metamethod != NULL) {
+                PMC *retval = Parrot_runops_fromc_args(INTERP, metamethod, "PPP", SELF, value);
+                if (retval != NULL) {
+                    return (INTVAL)VTABLE_get_number(INTERP, retval);
+                }
+            }
+#else
+            PMC *_lt = Parrot_LuaBase_find_metamethod(INTERP, SELF,
+                    string_from_const_cstring(INTERP, "__lt", 0));
+            PMC *_le = Parrot_LuaBase_find_metamethod(INTERP, SELF,
+                    string_from_const_cstring(INTERP, "__le", 0));
+            if (_lt != NULL && _le != NULL) {
+                PMC *retval = Parrot_runops_fromc_args(INTERP, _le, "PPP", SELF, value);
+                INTVAL r = (retval) ? VTABLE_get_bool(INTERP, retval) : (INTVAL)0;
+                if (r) {
+                    retval = Parrot_runops_fromc_args(INTERP, _lt, "PPP", SELF, value);
+                    r = (retval) ? VTABLE_get_bool(INTERP, retval) : (INTVAL)0;
+                    if (r) {
+                        return (INTVAL)-1;
+                    } else {
+                        return (INTVAL)0;
+                    }
+                } else {
+                    return (INTVAL)1;
+                }
+            }
+#endif
             real_exception(INTERP, NULL, ILL_INHERIT,
                     "attempt to compare two table values");
             return (INTVAL)0;
