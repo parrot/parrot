@@ -18,7 +18,7 @@ my %code = ( PASM => << 'END_PASM', PIR => << 'END_PIR', PAST => << 'END_PAST' )
 END_PASM
 
 
-.sub test @MAIN
+.sub test :main
     print "Hello, this is PIR.\n"
 .end
 END_PIR

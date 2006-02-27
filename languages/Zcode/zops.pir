@@ -562,7 +562,7 @@ done:
 # Below doesn't work: no access to Zmachine object or decode_text method
 # I need to subclass ZMachine with ZRuntime and create a Z object
 # so I can have access to packed_addr and decode_text on the image
-# In fact, pass the ZRun object into @MAIN, then get its image
+# In fact, pass the ZRun object into the main sub, then get its image
 # object and make it global
 #    var = self."emit_get"(txt, 0)
 #    tempi1 = self."temp"()

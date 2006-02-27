@@ -60,7 +60,7 @@ Looks at the command line arguments and acts accordingly.
 
 =cut
 
-.sub 'm4' @MAIN 
+.sub 'm4' :main 
   .param pmc argv
 
   # TODO: put this into '__onload'

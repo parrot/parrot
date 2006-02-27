@@ -1,3 +1,5 @@
+# $Id$
+
 package Regex::Driver;
 use strict;
 
@@ -111,7 +113,7 @@ sub output_header {
     return 1 unless $self->{emit_main};
 
     print $fh <<'END';
-.sub _main @MAIN
+.sub _main :main
     .param pmc args
     .local string input_string
     input_string = args[1]

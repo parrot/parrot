@@ -1,9 +1,10 @@
 #!/usr/bin/perl -w
-#
+
+# $Id$
+
 # This is a minimal and incomplete python bytecode to PIR translator
 # It's purpose is just to investigate missing pythonic features
 # in Parrot and how to translate Python stack-oriented bytecode to PIR.
-#
 
 use strict;
 use Getopt::Std;
@@ -334,7 +335,7 @@ my (@stack, $temp, $make_f, %pir_functions);
 sub gen_code {
     $cur_func = 'test::main';
     print <<EOC;
-.sub $cur_func \@MAIN
+.sub $cur_func :main
     .param pmc sys::argv
     new_pad 0
     \$P0 = getinterp

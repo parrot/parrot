@@ -1,3 +1,4 @@
+# $Id$
 
 .const int INVALID_CHAR	    = 0
 .const int CONSTITUENT_CHAR = 1
@@ -9,7 +10,7 @@
 
 .include "include/macros.pir"
 
-.sub _main @MAIN
+.sub _main :main
   .param pmc argv
   .local string names
   .local pmc symbol
