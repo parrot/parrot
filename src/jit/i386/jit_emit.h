@@ -2941,6 +2941,10 @@ jit_restore_regs(Parrot_jit_info_t *jit_info, Interp * interpreter)
  * preserve registers around a functioncall
  * 
  * all used register around a call (skip >= 0 := return result
+ *
+ * TODO factor out common code
+ *      use jit_emit_mov_RM_{in} functions (load/store base indexed) 
+ *      and a macro to retrive sp
  */
 static int
 jit_save_regs_call(Parrot_jit_info_t *jit_info, Interp * interpreter, int skip)
