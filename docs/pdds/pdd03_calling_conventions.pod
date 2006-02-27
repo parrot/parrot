@@ -56,6 +56,7 @@ The common syntax of these opcodes is:
 
     <set_opcode> "(flags0, flags1, ..., flagsN)", VAL0, VAL1, ... VALN
     <get_opcode> "(flags0, flags1, ..., flagsN)", REG0, REG1, ... REGN
+    <get_opcode> "(..., 0x200, flags0, ...)", ..., "name", REG0, ...
 
 The flags string is a literal quoted string denoting a list of zero or more
 comma-separated integers.  The list as a whole may be surrounded by
@@ -66,6 +67,9 @@ value or register given.
 For documentation purposes we'll number the bits 0 (low) through 30 (high).
 Bit 31 (and higher, where available) will not be used.
 
+Some values and registers do not correspond directly to values passed or
+received.  (See the descriptions of the OPT_FLAG and NAMED bits, below.)
+
 =head3 Flag Words; Common Flag Word Bits
 
 Each integer in the flag string controls the processing of the corresponding
@@ -74,14 +78,13 @@ value or register.
 These bits of each flag word have common meanings for all argument/
 return-value opcodes:
 
-    0-1   TYPE
-               0b00 = I
-               0b01 = S
-               0b10 = P
-               0b11 = N
+    0-3   TYPE
+               0b0000 = I
+               0b0001 = S
+               0b0010 = P
+               0b0011 = N
 
-You can just set these bits (as well as the I<CONSTANT> bit below) to zero as
-the assembler calculates the correct setting depending on the given arguments.
+Don't set these bits yourself; the assembler will do it.
 
 =head2 Passing Arguments, Returning Values
 
@@ -99,21 +102,29 @@ how to expand them for the caller's use.
 These bits of each flag word have these meanings specific to C<set_args> and
 C<set_returns>:
 
-    2     CONSTANT
+    4     CONSTANT
                The value is a literal constant, not a register.
-               (Don't set this bit yourself; the assembler sets this bit
-               automatically if a constant is given.)
+               (Don't set this bit yourself; the assembler will do it.)
 
-    3     FLAT
+    5     FLAT
                If this bit is set on a PMC value, then the PMC must be an
                aggregate or a scalar containing a reference to an aggregate.
                The contents of the aggregate, rather than the aggregate
                itself, will be passed.
 
+               	 If the NAMED bit is also set, the aggregate will be used as a
+                 hash; its contents, as key/value pairs, will be passed as
+                 named parameters.  The PMC must implement the full hash
+               	 interface.  {{ TODO: Limit the required interface. }}
+ 
+               	 If the NAMED is not set, the aggregate will be used as as
+                 array; its contents will be used as positional parameters.
+ 
                The meaning of this bit is undefined when applied to integer,
                number, and string values.
 
-    4     MAYBE_FLAT
+    6     MAYBE_FLAT ((DEPRECATED))
+               DEPRECATED - DO NOT USE
                If:
                 (a) this bit is set on a PMC value; and,
                 (b) the PMC is an aggregate or a scalar containing a reference
@@ -122,15 +133,15 @@ C<set_returns>:
                     parameter;
                then, pretend FLAT bit was set.
 
-               XXX - TODO - Determine whether this is really useful.
-                            This description is kind of ad-hoc.
+    7     (unused)
 
-    5     (unused)
+    8     (unused)
 
-    6     (unused)
-
-    7     NAMED
-               XXX - TODO
+    9     NAMED (FLAT or string constant only)
+               When the FLAT bit is also set, behavior is as described above
+               in the "FLAT" section.  Otherwise, this bit may only be set on
+               a unique string constant specifying the name of the next
+               argument (or returned value).
 
 
 =head2 Accepting Parameters, Accepting Return Values
@@ -153,9 +164,9 @@ constant.  That would make it a variable.)
 These bits of each flag word have these meanings specific to C<get_params> and
 C<get_results>:
 
-    2     (unused)
+    4     (unused)
 
-    3     SLURPY (P only)
+    5     SLURPY (P only)
                If this bit is set on a P register, then it will be populated
                with an aggregate that will contain all of the remaining values
                that have not already been stored in other registers.
@@ -164,28 +175,28 @@ C<get_results>:
                detailed rules below, and those PMCs will be stored into the
                new aggregate.
 
-               XXX - TODO - If NAMED is not set, the aggregate will be an
-               Array type (HLL-specific) and the contents will be all
-               unassigned positional parameters.
+                 If the NAMED bit is also set, the aggregate will be an
+                 HLL-specific hash type and the contents will be all
+                 unassigned _named_ parameters.
 
-               XXX - TODO - If NAMED is set, the aggregate will be a Hash type
-               (HLL-specific) and the contents will be all unassigned named
-               parameters.
+                 If the NAMED bit is not set, the aggregate will be an
+                 HLL-specific array type and the contents will be all
+                 unassigned positional parameters.
 
-    4     (unused)
+    6     (unused)
 
-    5     OPTIONAL
+    7     OPTIONAL
                If this bit is set on a register for which no value has been
                passed, no exception will be raised; rather, the register will
                be set to a default value: a Null PMC for P, an empty string
                for S, or zero for N or I.
 
-    6     OPT_FLAG (I only)
+    8     OPT_FLAG (I only)
                An I register with this bit set is set to one if the
                immediately preceding B<OPTIONAL> register received a value;
                otherwise, it is set to zero.
 
-    6     READONLY (P only)
+    8     READONLY (P only)
                XXX - PROPOSED ONLY - XXX
                If this bit is set on a P register that receives a value,
                Parrot will ensure that the final value in the P register
@@ -198,8 +209,11 @@ C<get_results>:
                simplistic.  In initial implementations, it may assume that any
                PMC not of a known read-only-wrapper type is mutable.
 
-    7     NAMED
-               XXX - TODO
+    9     NAMED (SLURPY or string constant only)
+               When the SLURPY bit is also set, behavior is as described above
+               in the "SLURPY" section.  Otherwise, this bit may only be set
+               on a unique string constant specifying the name of the next
+               argument (or returned value).
 
 
 =head3 Overflow
@@ -215,6 +229,48 @@ Oh, wait, that's my job.  Never mind.  --Chip
 
 If too few values are provided so that some target registers are left unset,
 this too results in an exception.
+
+=head3 Ordering of named values
+
+Named values (arguments, or values to return) must I<appear> after all the
+unnamed values.  Within the unnamed and named zones, FLAT and non-FLAT values
+may be mixed in any order.
+
+=head3 Ordering of named targets
+
+Named targets (parameters, or returned values) must appear I<after> all the
+unnamed targets.  Within the unnamed and named zones, SLURPY targets must
+appear last (if they appear at all).
+
+So the acceptable ordering of targets is:
+
+=over 4
+
+=item *
+
+unnamed non-SLURPY    (any number)
+
+=item *
+
+unnamed SLURPY array  (optional)
+
+=item *
+
+NAMED non-SLURPY      (any number)
+
+=item *
+
+NAMED SLURPY hash     (optional)
+
+=back
+
+=head3 Mixing named and unnamed values
+
+Unnamed targets can only be filled with unnamed values.
+
+Named targets can be filled with either unnamed or named values.  However, if
+a named target was already filled by an unnamed (positional) value, and then a
+named value is also given, this is an overflow error.
 
 =head3 Type Conversions
 
@@ -260,16 +316,37 @@ Required features are missing:
 
 =item *
 
-Named parameters (partly done)
-
-=item *
-
 Specific exceptions to throw for specific errors.
 
 =back
 
-PIR has pretty syntactical sugar around the get and set opcodes.
-This document should specify what that looks like, too.
+=head1 PIR SYNTAX EXAMPLES
+
+=head2 Function Calls
+
+  foo(1, i)                       # 2 positional arguments
+  foo(x, ar :flat, y)             # flattening array
+  foo(p, 'q' => q)                # named argument
+  foo(p, q :named('q'))           # the same
+  foo(kw :named :flat)            # a flattening has
+
+=head2 Paramters
+
+  .param int i                    # positional parameter
+  .param pmc argv .slurpy         # slurpy array
+  .param pmc qu :named('q')       # named parameter
+  .param int x :optional          # optional parameter
+  .param int has_x :opt_flag      # flag 0/1 x was passed
+  .param pmc kw :slurpy :named    # slurpy hash
+
+=head2 Return Values
+
+  .return (i, ar: flat, q :named('q') )
+
+=head2 Call Results
+
+  x = foo()                       # single result
+  (i, j :optional, ar :slurpy, q :named('q') ) = foo()
 
 =head1 ATTACHMENTS
 
