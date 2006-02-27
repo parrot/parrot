@@ -1457,10 +1457,8 @@ extern Parrot_returncc {
         /* restore pushed regs if any */
         if (!(jit_info->flags & JIT_CODE_RECURSIVE)) {
             jit_restore_regs(jit_info, interpreter);
-            emitm_movl_m_r(NATIVECODE, emit_EAX, emit_EBP, emit_None, 1, 16);
-            /* retval = pc is at 4 + n_args * 4 */
-            emitm_movl_m_r(NATIVECODE, emit_EAX, emit_EAX, emit_None, 1, 
-                    4 + jit_info->n_args * 4);
+            /* no branch ret 0 */
+            jit_emit_bxor_rr_i(NATIVECODE, emit_EAX, emit_EAX);
             jit_emit_stack_frame_leave(NATIVECODE);
         }
         emitm_ret(NATIVECODE);

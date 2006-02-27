@@ -293,7 +293,7 @@ inline op pic_callr__(inconst PMC) :pic {
     args[1 + n_args] = pc;
     lru = &mic->lru;
     /* TODO verify $1 didn't change */
-    pc = ((interface_f)lru->f.real_function)(interpreter, sig_bits, args);
+    (void) ((interface_f)lru->f.real_function)(interpreter, sig_bits, args);
     goto ADDRESS(pc);
 }
 

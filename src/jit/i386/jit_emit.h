@@ -3423,24 +3423,24 @@ Parrot_jit_begin_sub_regs(Parrot_jit_info_t *jit_info,
         /* remember fixup position - call sub */
         L1 = NATIVECODE;
         emitm_calll(NATIVECODE, 0);
-        /* fetch args to %edx */
-        emitm_movl_m_r(NATIVECODE, emit_EDX, emit_EBP, emit_None, 1, 16);
-        emitm_movl_m_r(NATIVECODE, emit_ECX, emit_EDX, emit_None, 1, 0);
         /* check type of return value */
         constants = CONTEXT(interpreter->ctx)->constants;
         result = CONTEXT(interpreter->ctx)->current_results;
         sig_result = constants[result[1]]->u.key;
         if (!SIG_ELEMS(sig_result))
-            return;
+            goto no_result;
+        /* fetch args to %edx */
+        emitm_movl_m_r(NATIVECODE, emit_EDX, emit_EBP, emit_None, 1, 16);
+        emitm_movl_m_r(NATIVECODE, emit_ECX, emit_EDX, emit_None, 1, 0);
         if (SIG_ITEM(sig_result, 0) == PARROT_ARG_FLOATVAL) {
             jit_emit_fst_mb_n(jit_info->native_ptr, emit_ECX, 0);
         }
         else {
             emitm_movl_r_m(NATIVECODE, emit_EAX, emit_ECX, 0, 1, 0);
         }
-        /* fetch pc and return it */
-        emitm_movl_m_r(NATIVECODE, emit_EAX, emit_EDX, emit_None, 1, 
-                    4 + jit_info->n_args * 4);
+no_result:
+        /* return 0 - no branch */
+        jit_emit_bxor_rr_i(NATIVECODE, emit_EAX, emit_EAX);
         /* restore pushed callee saved */
         jit_restore_regs(jit_info, interpreter);
         jit_emit_stack_frame_leave(NATIVECODE);
