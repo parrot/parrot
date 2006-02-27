@@ -51,7 +51,7 @@ my $base = << 'CODE';
     testcase()
 .end
 
-.sub _f0 @ANON
+.sub _f0 :anon
     .param object x   
     .param object y   
     .param object z   

@@ -275,7 +275,7 @@ RND_BAIL:
 .end
 
 # float instr(float start, string full, string substring);
-.sub _BUILTIN_INSTR @MULTI(int, float, string, string)
+.sub _BUILTIN_INSTR :multi(int, float, string, string)
 	.param int argc
 	.param float start
 	.param string full
@@ -293,7 +293,7 @@ ENDINSTR:
 .end
 
 # float instr(string full, string substring);
-.sub _BUILTIN_INSTR @MULTI(int, string, string)
+.sub _BUILTIN_INSTR :multi(int, string, string)
 	.param int argc
 	.param string full
 	.param string substring
