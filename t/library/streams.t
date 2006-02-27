@@ -88,7 +88,7 @@ OK:
     print "finished\n"
     end
 .end
-.sub _hello method
+.sub _hello :method
     self."write"( "hello" )
     self."write"( "world!" )
     self."write"( "parrot" )
@@ -160,7 +160,7 @@ pir_output_is(<<'CODE', <<'OUT', "Stream::read_bytes");
     end
 .end
 
-.sub _hello method
+.sub _hello :method
     print "_hello start!\n"
     self."write"( "hello" )
     self."write"( "world!" )
@@ -822,7 +822,7 @@ pir_output_is(<<'CODE', <<'OUT', "Stream::include");
     end
 .end
 
-.sub _counter method
+.sub _counter :method
     .local string str
     .local int i
 
@@ -851,7 +851,7 @@ SKIP:
     if i < 10 goto LOOP
 .end
 
-.sub _included method
+.sub _included :method
     .local pmc temp
 
     self."write"( "hello" )
@@ -868,7 +868,7 @@ SKIP:
     self."write"( "world" )
 .end
 
-.sub _counter2 method
+.sub _counter2 :method
     .local string str
 
     str = 'A'
@@ -939,7 +939,7 @@ pir_output_is(<<'CODE', <<'OUT', "Stream::Lines");
     end
 .end
 
-.sub _text method
+.sub _text :method
     self."write"( "this\nis a\n" )
     self."write"( "Stream::Lines\ntest" )
     self."write"( "case\nhello world" )
@@ -1301,7 +1301,7 @@ pir_output_is(<<'CODE', <<'OUT', "Stream::Replay");
     end
 .end
 
-.sub _reader method
+.sub _reader :method
     .local pmc stream1
     .local pmc stream2
     .local pmc stream3
@@ -1400,7 +1400,7 @@ pir_output_is(<<'CODE', <<'OUT', "Stream::Sub");
     end
 .end
 
-.sub _counter method
+.sub _counter :method
     .local string str
     .local int i
 
@@ -1466,7 +1466,7 @@ pir_output_is(<<'CODE', <<'OUT', "Stream::Write");
     end
 .end
 
-.sub _reader method
+.sub _reader :method
     print "reader start\n"
     self."dump"()
     print "reader done\n"

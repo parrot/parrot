@@ -335,7 +335,7 @@ pir_output_is(<<'CODE', <<'OUT', "new tail method call syntax");
 .end
 
 .namespace ["Foo"]
-.sub go method
+.sub go :method
     .local pmc n
     n = getattribute self, "Foo\0n"
     dec n

@@ -25,7 +25,7 @@ my $ns= 'Data::Escape';
 my @subs= qw/ String /;
 
 my $PRE=<<PRE;
-.sub main \@MAIN
+.sub main :main
     load_bytecode "$lib"
 
 	.local pmc escape_string
@@ -46,7 +46,7 @@ POST
 
 ## 1
 pir_output_is(<<CODE, <<'OUT', "load_bytecode");
-.sub main \@MAIN
+.sub main :main
     load_bytecode "$lib"
 	goto OK
 NOK:
@@ -65,7 +65,7 @@ OUT
 for my $sub ( @subs )
 {
 pir_output_is(<<CODE, <<'OUT', "find_global '$sub'");
-.sub main \@MAIN
+.sub main :main
     load_bytecode "$lib"
     .local pmc sub
     sub = find_global "$ns", "$sub"
@@ -247,7 +247,7 @@ pir_output_is($PRE . <<'CODE', <<'OUT', "escape_string: freeze a simple pmc" );
   escaped_frozen_pmc = escape_string( frozen_pmc, '"' )
 
   .local string pir_code
-  pir_code = ".sub test @ANON\n$P1 = thaw binary:\""
+  pir_code = ".sub test :anon\n$P1 = thaw binary:\""
 
   pir_code .= escaped_frozen_pmc
   pir_code .= "\"\nprint $P1\n.end\n"

@@ -528,13 +528,13 @@ pir_output_is(<<'CODE', <<'OUT', "bug #32996");
 	end
 .end
 
-.sub method1 method
+.sub method1 :method
 	print "In method 1\n"
 	.pcc_begin_return
 	.pcc_end_return
 .end
 
-.sub method2 method
+.sub method2 :method
 	print "In method 2\n"
 	.pcc_begin_return
 	.pcc_end_return

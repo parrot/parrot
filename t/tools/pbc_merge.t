@@ -57,7 +57,7 @@ sub run_pbc {
 # First test - check sub relocation works.
 {
     pir_to_pbc( "pbc_merge_t1_1", <<'PIR' );
-.sub _main @MAIN
+.sub _main :main
     _testcall()
 .end
 PIR
@@ -74,7 +74,7 @@ PIR
 # Second test - check constant table pointers in bytecode are fixed up.
 {
     pir_to_pbc( "pbc_merge_t2_1", <<'PIR' );
-.sub _main @MAIN
+.sub _main :main
     .local num years
     .local string rockers
 

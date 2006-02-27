@@ -1313,7 +1313,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "PMC as classes - methods");
 .end
 
 .namespace ["MyInt"]
-.sub __get_integer method
+.sub __get_integer :method
    $I0 = classoffset self, "MyInt"
    $P0 = getattribute self, $I0
    $I0 = $P0
@@ -1321,7 +1321,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "PMC as classes - methods");
    .return $I0
    .pcc_end_return
 .end
-.sub __get_string method
+.sub __get_string :method
    $I0 = classoffset self, "MyInt"
    $P0 = getattribute self, $I0
    $I0 = $P0
@@ -1368,7 +1368,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "PMC as classes - mmd methods");
 .end
 
 .namespace ["MyInt"]
-.sub __get_string method
+.sub __get_string :method
    $I0 = classoffset self, "MyInt"
    $P0 = getattribute self, $I0
    $I0 = $P0
@@ -1463,7 +1463,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "PMC as classes - derived 1");
 .end
 
 .namespace ["MyInt"]
-.sub __get_integer method
+.sub __get_integer :method
    $I0 = classoffset self, "MyInt"
    $P0 = getattribute self, $I0
    $I0 = $P0
@@ -1471,7 +1471,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "PMC as classes - derived 1");
    .return $I0
    .pcc_end_return
 .end
-.sub __get_string method
+.sub __get_string :method
    $I0 = classoffset self, "MyInt"
    $P0 = getattribute self, $I0
    $I0 = $P0
@@ -1529,7 +1529,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "PMC as classes - derived 2");
 .namespace ["MyInt2"]
 # subclassing methods from MyInt is ok
 # this one changes the value a bit
-.sub __get_integer method
+.sub __get_integer :method
    $I0 = classoffset self, "MyInt"
    $P0 = getattribute self, $I0
    $I0 = $P0
@@ -1539,7 +1539,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "PMC as classes - derived 2");
    .pcc_end_return
 .end
 .namespace ["MyInt"]
-.sub __get_integer method
+.sub __get_integer :method
    $I0 = classoffset self, "MyInt"
    $P0 = getattribute self, $I0
    $I0 = $P0
@@ -1547,7 +1547,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "PMC as classes - derived 2");
    .return $I0
    .pcc_end_return
 .end
-.sub __get_string method
+.sub __get_string :method
    $I0 = classoffset self, "MyInt"
    $P0 = getattribute self, $I0
    $I0 = $P0
@@ -1605,7 +1605,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "PMC as classes - derived 3");
 .end
 
 .namespace ["MyInt2"]
-.sub __get_integer method
+.sub __get_integer :method
    $I0 = classoffset self, "MyInt"
    $P0 = getattribute self, $I0
    $I0 = $P0
@@ -1613,7 +1613,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "PMC as classes - derived 3");
    .return $I0
    .pcc_end_return
 .end
-.sub __get_string method
+.sub __get_string :method
    $I0 = classoffset self, "MyInt"
    $P0 = getattribute self, $I0
    $I0 = $P0
@@ -1696,7 +1696,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "instantiate - PIR");
 .end
 
 .namespace ["Foo"]
-.sub __instantiate method
+.sub __instantiate :method
     .param int val		# in realiter check what is passed
     $I0 = find_type "Foo"
     .local pmc obj
@@ -1765,7 +1765,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "__init argcP");
 .end
 
 .namespace ["Foo"]
-.sub __init method
+.sub __init :method
     print "X: "
     print argcI
     print argcS
@@ -1801,7 +1801,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "namespace vs name");
     print "ok 2\n"
 .end
 .namespace [ "Foo" ]
-.sub __get_string method
+.sub __get_string :method
     .return("ok 1\n")
 .end
 .sub Foo

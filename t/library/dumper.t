@@ -528,7 +528,7 @@ pir_output_is(<<'CODE', <<'OUT', "dumping objects");
 
 .namespace ["TestClass"]
 
-.sub __dump method
+.sub __dump :method
     .param pmc dumper
     .param string dname
     .local string subindent
@@ -933,14 +933,14 @@ pir_output_is(<<'CODE', <<'OUTPUT', "custom dumper");
 .end
 
 .namespace ["bar"]
-.sub __init method
+.sub __init :method
     .local pmc ar
     ar = getattribute self, '__value'
     push ar, 1
     push ar, 2
 .end
 
-.sub __dump method
+.sub __dump :method
     .param pmc dumper
     .param string label
     print " __value => {\n"

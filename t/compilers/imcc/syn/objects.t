@@ -28,7 +28,7 @@ pir_output_is(<<'CODE', <<'OUT', "meth call syntax");
 .end
 
 .namespace [ "Foo" ]
-.sub _meth method
+.sub _meth :method
     print "in meth\n"
 .end
 CODE
@@ -52,7 +52,7 @@ pir_output_is(<<'CODE', <<'OUT', "meth call syntax m.o(arg)");
 .end
 
 .namespace [ "Foo" ]
-.sub _meth method
+.sub _meth :method
     .param pmc s
     print "in meth\n"
     print s
@@ -78,7 +78,7 @@ pir_output_is(<<'CODE', <<'OUT', "meth call ret = o.m(arg)");
 .end
 
 .namespace [ "Foo" ]
-.sub _meth method
+.sub _meth :method
     .param pmc s
     print "in meth\n"
     print s
@@ -111,7 +111,7 @@ pir_output_is(<<'CODE', <<'OUT', "meth call syntax, string");
     end
 .end
 .namespace [ "Foo" ]
-.sub _meth method
+.sub _meth :method
     print "in meth\n"
 .end
 CODE
@@ -136,17 +136,17 @@ pir_output_is(<<'CODE', <<'OUT', "initializer");
 .end
 
 .namespace ["Foo"]
-.sub __init method
+.sub __init :method
     print "foo_init\n"
 .end
 
 .namespace ["Bar"]
-.sub __init method
+.sub __init :method
     print "bar_init\n"
 .end
 
 .namespace ["Baz"]
-.sub __init method
+.sub __init :method
     print "baz_init\n"
 .end
 
@@ -176,7 +176,7 @@ pir_output_is(<<'CODE', <<'OUT', "meth call syntax - method, self");
 .end
 
 .namespace [ "Foo" ]
-.sub _meth method
+.sub _meth :method
     print "in meth\n"
     isa $I0, self, "Foo"
     if $I0, ok
@@ -207,7 +207,7 @@ pir_output_is(<<'CODE', <<'OUT', "explicit meth call syntax");
 .end
 
 .namespace [ "Foo" ]
-.sub _meth method
+.sub _meth :method
     print "in meth\n"
 .end
 CODE
@@ -235,7 +235,7 @@ pir_output_is(<<'CODE', <<'OUT', "explicit meth call syntax, meth var");
 .end
 
 .namespace [ "Foo" ]
-.sub _meth method
+.sub _meth :method
     print "in meth\n"
 .end
 CODE
@@ -263,7 +263,7 @@ pir_output_is(<<'CODE', <<'OUT', "explicit meth call syntax, args");
 .end
 
 .namespace [ "Foo" ]
-.sub _meth method
+.sub _meth :method
     .param string p1
     .param string p2
     print "in meth\n"
@@ -297,7 +297,7 @@ pir_output_is(<<'CODE', <<'OUT', "explicit meth call syntax");
 .end
 
 .namespace [ "Foo" ]
-.sub _meth method
+.sub _meth :method
     print "in meth\n"
 .end
 CODE
@@ -319,7 +319,7 @@ pir_output_is(<<'CODE', <<'OUT', "meth call syntax - reserved word");
 .end
 
 .namespace [ "Foo" ]
-.sub open method
+.sub open :method
     print "in meth\n"
 .end
 CODE

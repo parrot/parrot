@@ -1041,7 +1041,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "OO argument passing");
     f(o, "ok 4\n")
 .end
 .namespace ["Foo"]
-.sub bar method
+.sub bar :method
     .param string s
     print self
     print " "
@@ -1054,7 +1054,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "OO argument passing");
     print " "
     print s
 .end
-.sub __get_string method
+.sub __get_string :method
     $S0 = typeof self
     .return ($S0)
 .end
@@ -2092,7 +2092,7 @@ CODE
 ok
 OUTPUT
 
-pir_output_like(<<'CODE', <<'OUTPUT', "param .. 'a' => v :named('foo'");
+pir_output_like(<<'CODE', <<'OUTPUT', "param .. 'a' => v :named('foo')");
 .sub main :main
         foo( "b" => 10, "a" => 20)
         print "never\n"
@@ -2108,7 +2108,7 @@ CODE
 OUTPUT
 
 
-pir_output_like(<<'CODE', <<'OUTPUT', "param .. 'a' => v :named('foo'");
+pir_output_like(<<'CODE', <<'OUTPUT', "param .. 'a' => v :named('foo')");
 .sub main :main
         foo( "b" => 10, "a" => 20)
         print "never\n"

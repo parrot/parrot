@@ -187,7 +187,7 @@ pir_output_is(<<'CODE', <<OUTPUT, "vanishing return continuation in method calls
 .end
 
 .namespace ["Foo"]
-.sub __init method
+.sub __init :method
     print "init\n"
     sweep 1
     new P6, .String
@@ -196,14 +196,14 @@ pir_output_is(<<'CODE', <<OUTPUT, "vanishing return continuation in method calls
     sweep 1
 .end
 
-.sub do_inc method
+.sub do_inc :method
     sweep 1
     inc self
     sweep 1
     print "back from _inc\n"
 .end
 
-.sub __increment method
+.sub __increment :method
     print "inc\n"
     sweep 1
 .end
@@ -305,7 +305,7 @@ pir_output_is(<<'CODE', <<OUTPUT, "Recursion and exceptions");
     print "\n"
 .end
 .namespace ["b"]
-.sub b11 method
+.sub b11 :method
     .param pmc n
     .local pmc n1
     # new_pad -1

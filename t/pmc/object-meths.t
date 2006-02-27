@@ -292,7 +292,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "methods: self");
 
 .namespace ["A"]
 
-.sub foo method
+.sub foo :method
     .local pmc B
 
     print "A::foo\n"
@@ -304,17 +304,17 @@ pir_output_is(<<'CODE', <<'OUTPUT', "methods: self");
 
 .end
 
-.sub blah method
+.sub blah :method
     print "A::blah\n"
 .end
 
 .namespace ["B"]
 
-.sub foo method
+.sub foo :method
     print "B::foo\n"
 .end
 
-.sub blah method
+.sub blah :method
     print "B::blah\n"
 .end
 CODE
@@ -348,7 +348,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "methods: self w arg");
 
 .namespace ["A"]
 
-.sub foo method
+.sub foo :method
     .param pmc B
 
     print "A::foo\n"
@@ -359,17 +359,17 @@ pir_output_is(<<'CODE', <<'OUTPUT', "methods: self w arg");
 
 .end
 
-.sub blah method
+.sub blah :method
     print "A::blah\n"
 .end
 
 .namespace ["B"]
 
-.sub foo method
+.sub foo :method
     print "B::foo\n"
 .end
 
-.sub blah method
+.sub blah :method
     print "B::blah\n"
 .end
 CODE
@@ -404,7 +404,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "methods: self w arg and ret");
 
 .namespace ["A"]
 
-.sub foo method
+.sub foo :method
     .param pmc B
 
     print "A::foo\n"
@@ -418,17 +418,17 @@ pir_output_is(<<'CODE', <<'OUTPUT', "methods: self w arg and ret");
 
 .end
 
-.sub blah method
+.sub blah :method
     print "A::blah\n"
 .end
 
 .namespace ["B"]
 
-.sub foo method
+.sub foo :method
     print "B::foo\n"
 .end
 
-.sub blah method
+.sub blah :method
     print "B::blah\n"
 .end
 CODE
@@ -711,7 +711,7 @@ OUTPUT
 pir_output_is(<<'CODE', <<'OUTPUT', "same method name in two namespaces");
 
 .namespace ["A"]
-.sub foo method
+.sub foo :method
     .param int i
 
     .pcc_begin_return
@@ -719,7 +719,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "same method name in two namespaces");
 .end
 
 .namespace ["B"]
-.sub foo method
+.sub foo :method
     .param int i
 
     .pcc_begin_return
@@ -749,7 +749,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "self - CURRENT_OBJECT");
 
 .namespace ["A"]
 
-.sub foo method
+.sub foo :method
     .include "interpinfo.pasm"
     $P0 = interpinfo .INTERPINFO_CURRENT_OBJECT
     eq_addr self, $P0, ok
@@ -778,7 +778,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "Bug in method calling with nonconst keys");
 
 .namespace ["Foo"]
 
-.sub __get_integer_keyed method
+.sub __get_integer_keyed :method
     .param pmc key
     print "Key = "
     print key
@@ -808,7 +808,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "Bug in method calling with nonconst keys - 
 
 .namespace ["Foo"]
 
-.sub __get_integer_keyed method
+.sub __get_integer_keyed :method
     .param pmc key
     $S0 = "bar"
     print "Key = "
@@ -837,11 +837,11 @@ pir_output_is(<<'CODE', <<'OUTPUT', "method cache invalidation");
     store_global "Bar", "__get_string", $P0
     print o
 .end
-.sub ok2 method
+.sub ok2 :method
     .return("ok 2\n")
 .end
 .namespace [ "Foo" ]
-.sub __get_string method
+.sub __get_string :method
     .return("ok 1\n")
 .end
 CODE
@@ -909,7 +909,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "tailcallmeth");
 .end
 
 .namespace ["Foo"]
-.sub go method
+.sub go :method
     .local pmc n
     n = getattribute self, "Foo\0n"
     dec n
@@ -933,7 +933,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "kind of a super");
 .end
 
 .namespace ["MyString"]
-.sub __set_string_native method
+.sub __set_string_native :method
     .param string s
     classoffset $I0, self, "MyString"
     $P0 = getattribute self, $I0
@@ -954,16 +954,16 @@ pir_output_is(<<'CODE', <<'OUTPUT', "super 1");
 .end
 
 .namespace ['Parent']
-.sub foo method
+.sub foo :method
     print "Parent foo\n"
     self."bar"()
 .end
-.sub bar method
+.sub bar :method
     print "Parent bar\n"
 .end
 
 .namespace ['Child']
-.sub foo method
+.sub foo :method
     print "Child foo\n"
     .local pmc s
     s = new .Super, self

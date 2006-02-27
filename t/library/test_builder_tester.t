@@ -1,6 +1,6 @@
 #!./parrot
 
-.sub _main @MAIN
+.sub _main :main
 	load_bytecode 'library/Test/Builder/Tester.pir'
 
 	.local int tb_type

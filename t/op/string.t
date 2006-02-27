@@ -2651,7 +2651,7 @@ pir_output_is( <<'CODE', <<OUTPUT, "join: __get_string returns a null string");
 
 .namespace ["Foo"]
 
-.sub __get_string method
+.sub __get_string :method
     .local string ret
 
     null ret

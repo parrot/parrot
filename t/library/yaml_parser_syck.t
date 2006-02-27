@@ -32,7 +32,7 @@ TODO: {
 
 .include "library/YAML/Parser/Syck.pir"
 .include "library/dumper.pir"
-.sub test @MAIN 
+.sub test :main
 
   .local pmc loaded 
   ( loaded ) = load( "---\n- key1: val1\n  key2: val2\n- elem1\n- elem12\n- elem123\n- elem1234\n- elem12345\n- elem123456\n- elem1234567\n- elem12345678\n" )

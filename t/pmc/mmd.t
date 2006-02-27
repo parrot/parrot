@@ -1010,26 +1010,26 @@ pir_output_is(<<'CODE', <<'OUTPUT', "use a core func for an object");
     print "\n"
 .end
 .namespace ["AInt"]
-.sub __init method
+.sub __init :method
     $P0 = new Integer
     setattribute self, ".i", $P0
 .end
-.sub __set_integer_native method
+.sub __set_integer_native :method
     .param int i
     $P0 = getattribute self, ".i"
     $P0 = i
 .end
-.sub __set_number_native method
+.sub __set_number_native :method
     .param float f
     $P0 = getattribute self, ".i"
     $P0 = f
 .end
-.sub __get_string method
+.sub __get_string :method
     $P0 = getattribute self, ".i"
     $S0 = $P0
     .return ($S0)
 .end
-.sub __get_number method
+.sub __get_number :method
     $P0 = getattribute self, ".i"
     $N0 = $P0
     .return ($N0)
@@ -1047,11 +1047,11 @@ pir_output_is(<<'CODE', <<'OUTPUT', "multisub vs find_name");
     print $S0
     print "\n"
 .end
-.sub foo method, :multi(string)
+.sub foo :method, :multi(string)
     .param pmc x
     print "  foo\n"
 .end
-.sub foo method, :multi(pmc)
+.sub foo :method, :multi(pmc)
     .param pmc x
     print "  foo\n"
 .end
