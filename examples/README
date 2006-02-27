@@ -4,7 +4,7 @@ The directory 'examples' provides examples of proper,
 and sometimes hillarious, programs for Parrot. 
 Most of these examples are tested by test scripts in 't/examples'.
 
-benchmarks - Contains benchmarks. Run them with 'make testbench'
+benchmarks - Contains benchmarks. Run them with 'make benchmark_tests'
      
 c          - Examples in C
 
