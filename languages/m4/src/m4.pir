@@ -46,7 +46,7 @@ Load needed libraries
 
 =cut
 
-.sub "__onload" @LOAD
+.sub "__onload" :load
 
   #load_bytecode "Getopt/Obj.pbc" 
   # load_bytecode "PGE.pbc"       

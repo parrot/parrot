@@ -10,7 +10,7 @@ All POST nodes subclass from this base type.
 
 .namespace [ "POST::Node" ]
 
-.sub "__onload" @LOAD
+.sub "__onload" :load
     .local pmc base
     newclass base, "POST::Node"
     addattribute base, "source"           # the original source code

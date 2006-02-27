@@ -13,7 +13,7 @@ POST::Ops is a subclass of POST::Node.
 
 .namespace [ "POST::Ops" ]
 
-.sub "__onload" @LOAD
+.sub "__onload" :load
     .local pmc base
     $P0 = getclass 'POST::Node'
     base = subclass $P0, 'POST::Ops'

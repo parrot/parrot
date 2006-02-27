@@ -10,7 +10,7 @@ All PAST nodes subclass from this base type.
 
 .namespace [ "PAST::Node" ]
 
-.sub "__onload" @LOAD
+.sub "__onload" :load
     .local pmc base
     newclass base, "PAST::Node"
     addattribute base, "source"           # the original source code

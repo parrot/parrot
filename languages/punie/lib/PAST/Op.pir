@@ -11,7 +11,7 @@ is a subclass of PAST::Node.
 
 .namespace [ "PAST::Op" ]
 
-.sub "__onload" @LOAD
+.sub "__onload" :load
     .local pmc base
     $P0 = getclass 'PAST::Node'
     base = subclass $P0, 'PAST::Op'

@@ -10,7 +10,7 @@ POST::Val is a literal value in the OST. It is a subclass of POST::Node.
 
 .namespace [ "POST::Val" ]
 
-.sub "__onload" @LOAD
+.sub "__onload" :load
     .local pmc base
     $P0 = getclass 'POST::Node'
     base = subclass $P0, 'POST::Val'

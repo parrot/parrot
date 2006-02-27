@@ -14,7 +14,7 @@ the Punie compiler.
 
 .namespace [ "PAST" ]
 
-.sub "__onload" @LOAD
+.sub "__onload" :load
     load_bytecode "languages/punie/lib/PAST/Node.pir"
     load_bytecode "languages/punie/lib/PAST/Code.pir"
     load_bytecode "languages/punie/lib/PAST/Exp.pir"
