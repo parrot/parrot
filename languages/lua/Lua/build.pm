@@ -45,7 +45,7 @@ sub get_global {
 sub get_cond {
 	my ($parser, $expr) = @_;
 	my ($defn, $opcodes) = @{$expr};
-	if (${$opcodes}[-1]->isa("ToBoolOp")) {
+	if (scalar(@{$opcodes}) and ${$opcodes}[-1]->isa("ToBoolOp")) {
 		my $tobool = pop @{$opcodes};
 		my $new = pop @{$opcodes};
 		my $loc = pop @{$opcodes};
@@ -447,6 +447,25 @@ sub BuildCallVariable {
 		$result = $result2;
 	}
 	return [$result, \@opcodes];
+}
+
+sub BuildCallMethod {
+	my ($parser, $obj, $meth, $args) = @_;
+	my @opcodes = ();
+	my $key = BuildLiteral($parser, $meth, "key");
+	push @opcodes, @{$key->[1]};
+	my $result = new_tmp($parser, "pmc");
+	push @opcodes, new LocalDir($parser,
+			'result'				=>	$result,
+	);
+	push @opcodes, new KeyedGetOp($parser,
+			'result'				=>	$result,
+			'arg1'					=>	$obj->[0],
+			'arg2'					=>	$key->[0],
+	);
+	my $fct = [$result, \@opcodes];
+	unshift @{$args}, $obj;
+	return BuildCallFunction($parser, $fct, $args);
 }
 
 sub BuildCallFunction {
@@ -1043,6 +1062,11 @@ sub  BuildParam {
 				'prolog'				=>	1,
 				'result'				=>	$defn,
 		);
+		push @opcodes1, new LexDir($parser,
+				'prolog'				=>	1,
+				'result'				=>	$name,
+				'arg1'					=>	$defn,
+		);
 		my $fct = new defn("mkarg", "util");
 		push @opcodes1, new CallOp($parser,
 				'prolog'				=>	1,
@@ -1084,10 +1108,19 @@ sub  BuildParam {
 	return [$defn, \@opcodes1, \@opcodes2];
 }
 
+sub PrepareMethod {
+	my ($parser) = @_;
+	$parser->YYData->{self} = BuildParam($parser, "self");
+}
+
 sub BuildFunctionBody {
 	my ($parser, $params, $block) = @_;
 	my @opcodes1 = ();
 	my @opcodes2 = ();
+	if ($parser->YYData->{self}) {
+		unshift @{$params}, $parser->YYData->{self};
+		$parser->YYData->{self} = undef;
+	}
 	my $fct = new_fct($parser);
 	push @opcodes2, new SubDir($parser,
 			'prolog'				=>	1,

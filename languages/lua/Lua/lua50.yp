@@ -232,6 +232,13 @@ funcname
 :	_funcname
 		#default action
 |	_funcname	':'	NAME
+		{
+			PrepareMethod($_[0]);
+			[
+				@{$_[1]},
+				BuildLiteral($_[0], $_[3], 'key'),
+			];
+		}
 ;
 
 _funcname
@@ -427,17 +434,27 @@ functioncall
 			BuildCallFunction($_[0], $_[2], $_[4]);
 		}
 |	'('	exp	')'	':'	NAME	args
+		{
+			BuildCallMethod($_[0], $_[2], $_[5], $_[6]);
+		}
 |	var	args
 		{
 			my $fct = BuildCallVariable($_[0], $_[1]);
 			BuildCallFunction($_[0], $fct, $_[2]);
 		}
 |	var	':'	NAME	args
+		{
+			my $obj = BuildCallVariable($_[0], $_[1]);
+			BuildCallMethod($_[0], $obj, $_[3], $_[4]);
+		}
 |	functioncall	args
 		{
 			BuildCallFunction($_[0], $_[1], $_[2]);
 		}
 |	functioncall	':'	NAME	args
+		{
+			BuildCallMethod($_[0], $_[1], $_[3], $_[4]);
+		}
 ;
 
 args
@@ -604,6 +621,7 @@ sub Run {
 	$parser->YYData->{symbtab} = new SymbTabVar($parser);
 	$parser->YYData->{symbtab_cst} = new SymbTabConst($parser);
 	$parser->YYData->{_G} = undef;
+	$parser->YYData->{self} = undef;
 	$parser->YYData->{idx_tmp} = 0;
 	$parser->YYData->{idx_lbl} = 0;
 	$parser->YYData->{idx_fct} = 0;

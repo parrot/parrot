@@ -67,8 +67,8 @@ stat
 |	functioncall	%prec	NONARG
 |	DO
 		block	END
-|	WHILE	exp	DO
-					block	END
+|	WHILE
+			exp	DO	block	END
 |	REPEAT
 			block	UNTIL	exp
 |	_if_then	block	_elseif_star	ELSE
