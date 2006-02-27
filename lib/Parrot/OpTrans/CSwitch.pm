@@ -27,6 +27,14 @@ use Parrot::OpTrans::CPrederef;
 use vars qw(@ISA);
 @ISA = qw(Parrot::OpTrans::CPrederef);
 
+sub new
+{
+	my $class = shift;
+	my $self  = $class->SUPER::new( @_ );
+	$self->{split_count} ||= 0;
+	return $self;
+}
+
 =item C<core_type()>
 
 The core type is C<PARROT_SWITCH_CORE>.
