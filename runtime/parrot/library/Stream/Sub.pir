@@ -18,7 +18,7 @@ version 0.1
 
     ...
 
-    .sub _test method
+    .sub _test :method
 	self."write"( "hello, world" )
     .end
 
@@ -83,7 +83,7 @@ END:
 
 =cut
 
-.sub write method
+.sub write :method
     .param string str
     .local pmc _write
     .local pmc ret
@@ -94,7 +94,7 @@ END:
     $P0 =self."_call_writer"(_write, str)
 .end
 
-.sub _call_writer method
+.sub _call_writer :method
     .param pmc writer
     .param string str
     .local pmc cont
@@ -110,7 +110,7 @@ END:
 
 =cut
 
-.sub rawRead method
+.sub rawRead :method
     .local pmc temp
     .local string str
 

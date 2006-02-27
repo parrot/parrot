@@ -20,7 +20,7 @@ version 0.1
 
     ...
 
-    .sub _reader method
+    .sub _reader :method
 	.local string str
 	str = self."read"()
     .end
@@ -52,7 +52,7 @@ END:
 
 =cut
 
-.sub _reader_stub method
+.sub _reader_stub :method
     .local pmc source
     .local pmc mysub
     #.local pmc myself
@@ -75,7 +75,7 @@ END:
     status = 0
 .end
 
-.sub __init method
+.sub __init :method
     .local pmc status
 
     new status, .PerlInt
@@ -85,7 +85,7 @@ END:
     setattribute self, $I0, status
 .end
 
-.sub __set_pmc method
+.sub __set_pmc :method
     .param pmc source
     .local pmc status
 
@@ -99,7 +99,7 @@ END:
     status = 1
 .end
 
-.sub close method
+.sub close :method
     .local string str
 
     null str
@@ -111,7 +111,7 @@ LOOP:
 END:
 .end
 
-.sub connected method
+.sub connected :method
     .local pmc status
     .local int ret
 
@@ -128,7 +128,7 @@ END:
 
 =cut
 
-.sub write method
+.sub write :method
     .param string str
     .local pmc source
     .local pmc status
@@ -168,7 +168,7 @@ END:
 
 =cut
 
-.sub rawRead method
+.sub rawRead :method
     .local string str
     .local pmc writer
     .local pmc cont
@@ -189,7 +189,7 @@ END_OF_STREAM:
     .return(str)
 .end
 
-.sub _call_writer method
+.sub _call_writer :method
     .param pmc writer
     .local pmc cont
     .local string str

@@ -54,7 +54,7 @@ END:
 
 .namespace ["Stream::Combiner"]
 
-.sub __init method
+.sub __init :method
 
     .const .Sub temp = "_default_combiner"
     self."combiner"( temp )
@@ -69,7 +69,7 @@ Sets (or just returns) the combiner sub.
 
 =cut
 
-.sub combiner method
+.sub combiner :method
     .param pmc _combiner :optional
     .param int has_combiner :opt_flag
     .local pmc ret
@@ -92,7 +92,7 @@ You can call assign several times to assign several sources to the stream.
 
 =cut
 
-.sub __set_pmc method
+.sub __set_pmc :method
     .param pmc arg
     .local pmc source
 
@@ -106,7 +106,7 @@ Returns 1 if all assigned sources are connected, 0 otherwise.
 
 =cut
 
-.sub connected method
+.sub connected :method
     .local pmc sources
     .local pmc source
     .local int i
@@ -146,7 +146,7 @@ Reads from all assigned sources and calls the combiner.
 
 =cut
 
-.sub rawRead method
+.sub rawRead :method
     .local pmc sources
     .local pmc source
     .local pmc combiner

@@ -44,7 +44,7 @@ END:
 
 =cut
 
-.sub rawRead method
+.sub rawRead :method
     .local pmc coro
     .local string str
 

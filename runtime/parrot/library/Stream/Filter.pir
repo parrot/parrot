@@ -45,7 +45,7 @@ Sets or returns the filter sub.
 
 =cut
 
-.sub filter method
+.sub filter :method
     .param pmc _filter :optional
     .param int has_filter :opt_flag
     .local pmc ret
@@ -67,7 +67,7 @@ END:
 
 =cut
 
-.sub rawRead method
+.sub rawRead :method
     .local pmc source
     .local pmc filter
     .local string str

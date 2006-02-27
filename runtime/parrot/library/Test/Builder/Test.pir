@@ -129,7 +129,7 @@ Returns the TAP-compatible string representation of this test.
 
 .namespace [ 'Test::Builder::Test::Base' ]
 
-.sub __init method
+.sub __init :method
 	.param pmc args
 
 	.local int offset
@@ -171,7 +171,7 @@ Returns the TAP-compatible string representation of this test.
   	setattribute self, offset, description
 .end
 
-.sub passed method
+.sub passed :method
 	.local pmc passed
 	.local int offset
 
@@ -181,7 +181,7 @@ Returns the TAP-compatible string representation of this test.
 	.return( passed )
 .end
 
-.sub number method
+.sub number :method
 	.local pmc number
 	.local int offset
 
@@ -192,7 +192,7 @@ Returns the TAP-compatible string representation of this test.
 	.return( number )
 .end
 
-.sub diagnostic method
+.sub diagnostic :method
 	.local pmc diagnostic
 	.local int offset
 
@@ -203,7 +203,7 @@ Returns the TAP-compatible string representation of this test.
 	.return( diagnostic )
 .end
 
-.sub description method
+.sub description :method
 	.local pmc description
 	.local int offset
 
@@ -214,7 +214,7 @@ Returns the TAP-compatible string representation of this test.
 	.return( description )
 .end
 
-.sub status method
+.sub status :method
 	.local pmc passed
 	.local pmc description
 	.local pmc status
@@ -227,7 +227,7 @@ Returns the TAP-compatible string representation of this test.
 	set status['description'], description
 .end
 
-.sub report method
+.sub report :method
 	.local pmc    passed
 	.local pmc    number
 	.local pmc    description
@@ -266,7 +266,7 @@ Returns the TAP-compatible string representation of this test.
 
 .namespace [ 'Test::Builder::Test::WithReason' ]
 
-.sub __init method
+.sub __init :method
 	.param pmc args
 
 	.local int offset
@@ -284,7 +284,7 @@ Returns the TAP-compatible string representation of this test.
 	setattribute self, offset, reason
 .end
 
-.sub reason method
+.sub reason :method
 	.local pmc reason
 	.local int offset
 
@@ -294,7 +294,7 @@ Returns the TAP-compatible string representation of this test.
 	.return( reason )
 .end
 
-.sub status method
+.sub status :method
 	.local pmc reason
 	.local pmc status
 	.local pmc parent_status
@@ -310,7 +310,7 @@ Returns the TAP-compatible string representation of this test.
 
 .namespace [ 'Test::Builder::Test::Skip' ]
 
-.sub report method
+.sub report :method
 	.local pmc    reason
 	.local pmc    number
 	.local string report
@@ -330,7 +330,7 @@ Returns the TAP-compatible string representation of this test.
 	.return( report )
 .end
 
-.sub status method
+.sub status :method
 	.local pmc status
 	.local pmc parent_status
 
@@ -343,7 +343,7 @@ Returns the TAP-compatible string representation of this test.
 
 .namespace [ 'Test::Builder::Test::TODO' ]
 
-.sub report method
+.sub report :method
 	.local pmc    passed
 	.local pmc    description
 	.local pmc    number
@@ -374,7 +374,7 @@ Returns the TAP-compatible string representation of this test.
 	.return( report )
 .end
 
-.sub status method
+.sub status :method
 	.local pmc passed
 	.local pmc status
 	.local pmc parent_status

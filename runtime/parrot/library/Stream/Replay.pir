@@ -62,7 +62,7 @@ END:
 
 =cut
 
-.sub __init method
+.sub __init :method
     .local pmc temp
 
     classoffset $I0, self, "Stream::Replay"
@@ -78,7 +78,7 @@ END:
 
 =cut
 
-.sub __set_pmc method
+.sub __set_pmc :method
     .param pmc val
     .local pmc buffer
     
@@ -126,7 +126,7 @@ ASSIGN:
 
 =cut
 
-.sub rawRead method
+.sub rawRead :method
     .local pmc source
     .local pmc buffer
     .local pmc pos
@@ -152,7 +152,7 @@ END:
 
 =cut
 
-.sub __clone method
+.sub __clone :method
     .local pmc ret
     .local pmc temp
 
@@ -172,7 +172,7 @@ END:
 
 .namespace ["Stream::Replay::Buffer"]
 
-.sub __init method
+.sub __init :method
     .local pmc temp
     
     classoffset $I0, self, "Stream::Replay::Buffer"
@@ -185,12 +185,12 @@ END:
     setattribute self, $I0, temp
 .end
 
-.sub compact method
+.sub compact :method
     # XXX check the begin of the queue for stale entries
     noop
 .end
 
-.sub read method
+.sub read :method
     .param pmc pos
     .param pmc source
     .local string ret
@@ -230,7 +230,7 @@ END:
     .return(ret)
 .end
 
-.sub add method
+.sub add :method
     .param pmc stream
     .local pmc clones
     
@@ -240,7 +240,7 @@ END:
     push clones, stream
 .end
 
-.sub remove method
+.sub remove :method
     .param pmc stream
     .local pmc clones
     .local pmc entry

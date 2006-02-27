@@ -49,7 +49,7 @@ STDERR by default.
 
 =cut
 
-.sub __init method
+.sub __init :method
 	.param pmc args
 
 	.local pmc output
@@ -72,7 +72,7 @@ STDERR by default.
 	setattribute self, offset, diag_output
 .end
 
-.sub output method
+.sub output :method
 	.local pmc output
 	.local int offset
 
@@ -82,7 +82,7 @@ STDERR by default.
 	.return( output )
 .end
 
-.sub diag_output method
+.sub diag_output :method
 	.local pmc diag_output
 	.local int offset
 
@@ -99,7 +99,7 @@ unescaped newlines.
 
 =cut
 
-.sub write method
+.sub write :method
 	.param string message
 
 	.local int message_length
@@ -115,7 +115,7 @@ unescaped newlines.
 	output.'puts'( message )
 .end
 
-.sub escape_newlines method
+.sub escape_newlines :method
 	.param string message
 	.local pmc lines
 	lines = new ResizableStringArray
@@ -174,7 +174,7 @@ unescaped newlines.
 
 =cut
 
-.sub diag method
+.sub diag :method
 	.param string message
 
 	.local int message_length

@@ -39,7 +39,7 @@ END:
 
 .namespace ["Stream::ParrotIO"]
 
-.sub __init method
+.sub __init :method
     self."blockSize"( 50 )
 .end
 
@@ -49,7 +49,7 @@ Uses the open op to create a ParrotIO which is used as the source.
 
 =cut
 
-.sub open method
+.sub open :method
     .param string name
     .param string mode
     .local pmc pio
@@ -64,7 +64,7 @@ Sets or returns the current block size.
 
 =cut
 
-.sub blockSize method
+.sub blockSize :method
     .param int bs :optional
     .param int has_bs :opt_flag
 
@@ -92,7 +92,7 @@ RET:
 
 =cut
 
-.sub rawRead method
+.sub rawRead :method
     .local string str
     .local pmc pio
     .local int bs

@@ -39,7 +39,7 @@ TBD
 END:
 .end
 
-.sub __init method
+.sub __init :method
     .local pmc close
 
     # call our own close
@@ -51,7 +51,7 @@ END:
 
 =cut
 
-.sub __set_pmc method
+.sub __set_pmc :method
     .param pmc source
 
     classoffset $I0, self, "Stream::Base"
@@ -59,7 +59,7 @@ END:
     null source
 .end
 
-.sub setSource method
+.sub setSource :method
     .param pmc source
 
     classoffset $I0, self, "Stream::Base"
@@ -71,7 +71,7 @@ END:
 
 =cut
 
-.sub close method
+.sub close :method
     .local pmc temp
 
     # reset source
@@ -93,7 +93,7 @@ Returns nothing.
 
 =cut
 
-.sub dump method
+.sub dump :method
     .local string str
     .local int i
     .local pmc escape
@@ -116,7 +116,7 @@ END:
 
 =cut
 
-.sub copyTo method
+.sub copyTo :method
     .param pmc to
     .local string str
     .local int i
@@ -137,7 +137,7 @@ Returns the currently set source.
 
 =cut
 
-.sub source method
+.sub source :method
     .local pmc ret
 
     classoffset $I0, self, "Stream::Base"
@@ -158,7 +158,7 @@ It is connected until the source sub returns.
 
 =cut
 
-.sub connected method
+.sub connected :method
     .local pmc stream
 
     classoffset $I0, self, "Stream::Base"
@@ -183,7 +183,7 @@ Returns the read string, or a null string if the stream end has been reached.
 
 =cut
 
-.sub read method
+.sub read :method
     .local string ret
     .local pmc includes
 
@@ -244,7 +244,7 @@ Please have a look at F<examples/streams/Include.pir> to see how it works.
 
 =cut
 
-.sub include method
+.sub include :method
     .param pmc stream
     .local pmc includes
 
@@ -262,7 +262,7 @@ Used to flush the stream when including another stream.
 
 =cut
 
-.sub flush method
+.sub flush :method
     .local int i
     .local string str
     .local pmc includes
@@ -290,7 +290,7 @@ Reads the specified number of bytes from the stream.
 
 =cut
 
-.sub read_bytes method
+.sub read_bytes :method
     .param int requested
     .local string ret
     .local pmc buffer
@@ -349,7 +349,7 @@ Returns or sets the byte buffer.
 
 =cut
 
-.sub byte_buffer method
+.sub byte_buffer :method
     .param pmc buf :optional
     .param int has_buf :opt_flag
 

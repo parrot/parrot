@@ -90,10 +90,10 @@ the same state.
 
 =cut
 
-.sub __fake_init method
+.sub __fake_init :method
 .end
 
-.sub __init method
+.sub __init :method
 	.param pmc args :optional
 	.local pmc output
 	.local pmc testplan
@@ -103,7 +103,7 @@ the same state.
 	self.'_assign_args'( output, testplan, results )
 .end
 
-.sub _assign_args method
+.sub _assign_args :method
 	.param pmc output
 	.param pmc testplan
 	.param pmc results
@@ -171,7 +171,7 @@ This probably doesn't work correctly yet, but you will probably never use it.
 	.return( test )
 .end
 
-.sub _assign_default_args method
+.sub _assign_default_args :method
 	.param pmc args
 
 	.local pmc single
@@ -231,7 +231,7 @@ This probably doesn't work correctly yet, but you will probably never use it.
 	.return( output, testplan, results )
 .end
 
-.sub output method
+.sub output :method
 	.local pmc output
 	.local int offset
 
@@ -241,7 +241,7 @@ This probably doesn't work correctly yet, but you will probably never use it.
 	.return( output )
 .end
 
-.sub testplan method
+.sub testplan :method
 	.local pmc testplan
 	.local int offset
 
@@ -252,7 +252,7 @@ This probably doesn't work correctly yet, but you will probably never use it.
 	.return( testplan )
 .end
 
-.sub results method
+.sub results :method
 	.local pmc output
 	.local int offset
 	.local pmc results
@@ -275,7 +275,7 @@ where "too many" means "more than one".
 
 =cut
 
-.sub finish method
+.sub finish :method
 	.local pmc output
 	.local pmc testplan
 	.local pmc results
@@ -308,7 +308,7 @@ declared a plan or if you pass an invalid argument.
 
 =cut
 
-.sub plan method
+.sub plan :method
 	.param string tests
 
 	.local pmc testplan
@@ -397,7 +397,7 @@ Records a diagnostic message for output.
 
 =cut
 
-.sub diag method
+.sub diag :method
 	.param string diagnostic
 
 	if diagnostic goto DIAGNOSTIC_SET
@@ -416,7 +416,7 @@ recording it with the optional test description in C<description>.
 
 =cut
 
-.sub ok method
+.sub ok :method
 	.param int    passed
 	.param string description     :optional
 	.param int    has_description :opt_flag
@@ -452,7 +452,7 @@ TODO.
 
 =cut
 
-.sub todo method
+.sub todo :method
 	.param int    passed
 	.param string description     :optional
 	.param int    has_description :opt_flag
@@ -494,7 +494,7 @@ why you've skipped them.
 
 =cut
 
-.sub skip method
+.sub skip :method
 	.param int    number          :optional
 	.param int    has_number      :opt_flag
 	.param string reason          :optional
@@ -543,7 +543,7 @@ plan.  This calls C<exit>; there's little point in continuing.
 
 =cut
 
-.sub skip_all method
+.sub skip_all :method
 	.local pmc testplan
 	testplan = self.'testplan'()
 
@@ -568,7 +568,7 @@ also calls C<exit>.
 
 =cut
 
-.sub BAILOUT method
+.sub BAILOUT :method
 	.param string reason  :optional
 	.param int has_reason :opt_flag
 
@@ -588,7 +588,7 @@ also calls C<exit>.
 	exit 0
 .end
 
-.sub report_test method
+.sub report_test :method
 	.param pmc test_args
 
 	.local pmc testplan

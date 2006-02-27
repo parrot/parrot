@@ -72,7 +72,7 @@ This module defines the following public functions:
 	addattribute tbto_class, 'diagnostics'
 .end
 
-.sub __init method
+.sub __init :method
 	.local int offset
 	classoffset offset, self, 'Test::Builder::Tester::Output'
 
@@ -85,7 +85,7 @@ This module defines the following public functions:
 	setattribute self, offset, diagnostics
 .end
 
-.sub get_output method
+.sub get_output :method
 	.local int offset
 	classoffset offset, self, 'Test::Builder::Tester::Output'
 
@@ -94,7 +94,7 @@ This module defines the following public functions:
 	.return( output )
 .end
 
-.sub get_diagnostics method
+.sub get_diagnostics :method
 	.local int offset
 	classoffset offset, self, 'Test::Builder::Tester::Output'
 	inc offset
@@ -104,7 +104,7 @@ This module defines the following public functions:
 	.return( diagnostics )
 .end
 
-.sub write method
+.sub write :method
 	.param string message
 
 	.local pmc message_string
@@ -116,7 +116,7 @@ This module defines the following public functions:
 	push output, message_string
 .end
 
-.sub diag method
+.sub diag :method
 	.param string message
 
 	.local pmc message_string
@@ -128,7 +128,7 @@ This module defines the following public functions:
 	push diagnostics, message_string
 .end
 
-.sub output method
+.sub output :method
 	.local pmc output
 	output = self.'get_output'()
 
@@ -144,7 +144,7 @@ This module defines the following public functions:
 	.return( output_string )
 .end
 
-.sub diagnostics method
+.sub diagnostics :method
 	.local pmc diagnostics
 	diagnostics = self.'get_diagnostics'()
 

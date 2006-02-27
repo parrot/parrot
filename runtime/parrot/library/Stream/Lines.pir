@@ -41,7 +41,7 @@ END:
 
 .namespace ["Stream::Lines"]
 
-.sub __init method
+.sub __init :method
     .local pmc temp
 
     classoffset $I0, self, "Stream::Lines"
@@ -55,7 +55,7 @@ END:
 
 =cut
 
-.sub connected method
+.sub connected :method
     # XXX: check if the buffer is empty if the source stream is not connected
     classoffset $I0, self, "Stream::Base"
     getattribute $P0, self, $I0
@@ -74,7 +74,7 @@ NOT_CONNECTED:
 
 =cut
 
-.sub rawRead method
+.sub rawRead :method
     .local pmc temp
     .local string buffer
     .local string ret
@@ -112,7 +112,7 @@ BUFFER_END:
 
 =cut
 
-.sub buffer method
+.sub buffer :method
     .local pmc temp
     .local string _buffer
 
@@ -129,7 +129,7 @@ BUFFER_END:
 
 =cut
 
-.sub setBuffer method
+.sub setBuffer :method
     .param string buffer
     .local pmc temp
 
@@ -145,7 +145,7 @@ BUFFER_END:
 
 =cut
 
-.sub fillBuffer method
+.sub fillBuffer :method
     .local pmc temp
     .local string buffer
     .local string str

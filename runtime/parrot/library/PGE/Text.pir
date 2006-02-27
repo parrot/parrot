@@ -14,7 +14,7 @@ also.)
 
 .include "cclass.pasm"
 
-.sub "__onload" @LOAD
+.sub "__onload" :load
     .local pmc base
     base = getclass "PGE::Rule"
     $P0 = subclass base, "PGE::Text"

@@ -44,7 +44,7 @@ Test::Builder::NullPlan object, do not pass the hash.
 
 =cut
 
-.sub __init method
+.sub __init :method
 	.param pmc args     :optional
 	.param int has_args :opt_flag
 
@@ -89,7 +89,7 @@ plan.
 
 =cut
 
-.sub header method
+.sub header :method
 	.local string expect
 	.local int    offset
 	.local string header
@@ -113,7 +113,7 @@ plan.
 
 =cut
 
-.sub footer method
+.sub footer :method
 	.param int    ran
 
 	.local int    expect
@@ -144,13 +144,13 @@ plan.
 
 .namespace [ 'Test::Builder::NullPlan' ]
 
-.sub header method
+.sub header :method
 	.local string header
 	header = ''
 	.return( header )
 .end
 
-.sub footer method
+.sub footer :method
 	.param int tests_run
 
 	.local string tests_run_string
