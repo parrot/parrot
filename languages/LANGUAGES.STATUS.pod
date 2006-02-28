@@ -22,10 +22,13 @@ Scripting language inspired by Eiffel and ruby.
 =item Status
 
 Incomplete - but all examples and test cases are working.
+Estimated progress towards release 1.0: language constructs 47%,
+libraries 6%, documentation 4%, robustness 6%.
+See also http://xamber.org/history.html
 
 =item Last verified with parrot version
 
-0.4.0
+0.4.2
 
 =item Location
 
