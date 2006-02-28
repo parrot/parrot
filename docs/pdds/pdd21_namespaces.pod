@@ -1,7 +1,15 @@
 # Copyright 2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
-=head1 Synopsis
+=head1 NAME
+
+docs/pdds/pdd21_namespaces.pod - Parrot Namespaces
+
+=head1 VERSION
+
+$Revision$
+
+=head1 DESCRIPTION
 
 =over 4
 
@@ -21,23 +29,14 @@ hash index)
 
 =back
 
-=head1 Namespace PMC API
+=head1 DEFINITIONS
 
-There are many different ways to implement a namespace and Parrot's target
-languages display a wide variety of them.  By implementing an API, it should
-be possible to allow interoperability while still allowing each one choose the
-best internal representation.
-
-=head2 Conventions for this document
-
-=over 4
-
-=item definition: "HLL"
+=head2 "HLL"
 
 A High Level Language, such as Perl, Python, or Tcl, in contrast to PIR, which
 is a low-class language.
 
-=item definition: "current namespace"
+=head2 "current namespace"
 
 The I<current namespace> at runtime is the namespace associated with the
 currently executing subroutine.  Pasm assigns each subroutine a namespace when
@@ -48,16 +47,23 @@ of a subroutine unless you're prepared for weird consequences.
 initialize the runtime current namespace as well as determine where to store
 compiled symbols.)
 
-=item namespace separator: "::"
+=head2 namespace separator: "::"
 
 In this document, "::" indicates namespace nesting.  For example, "a::b" means
 "the namespace 'b' inside the namespace 'a'".  In Parrot, nesting is actually
 denoted by other means (e.g. multidimensional hash keys), but writing ["a"; "b"]
 is harder to both write and read.
 
-=back
+=head1 IMPLEMENTATION
 
-=head2 Naming Conventions
+=head2 Namespace PMC API
+
+There are many different ways to implement a namespace and Parrot's target
+languages display a wide variety of them.  By implementing an API, it should
+be possible to allow interoperability while still allowing each one choose the
+best internal representation.
+
+=head3 Naming Conventions
 
 =over 4
 
@@ -84,7 +90,7 @@ exportation.
 
 =back
 
-=head2 Namespace PMC Interfaces: Generic and Typed
+=head3 Namespace PMC Interfaces: Generic and Typed
 
 Most languages leave their symbols plain, which makes lookups quite
 straightforward.  Others use sigils or other mangling techniques, complicating
@@ -93,7 +99,7 @@ the problem of interoperability.
 Parrot namespaces assist with interoperability by providing two interface
 subsets: the I<raw interface> and the I<typed interface>.
 
-=head3 Raw Interface
+=head4 Raw Interface
 
 Each HLL may, when working with its own namespace objects, use the I<raw
 interface>, which allows direct naming in the native style of the namespace's
@@ -107,7 +113,7 @@ It's kind of an anticlimax, isn't it, giving a fancy name like "raw interface"
 to a hash?  "It's a just a hash," you say.  Oh well.  I'll try to live with
 the shame.
 
-=head3 Typed Interface
+=head4 Typed Interface
 
 When a given namespace's HLL is either different from the current HLL or
 unknown, an HLL should generally use only the language-agnostic namespace
@@ -193,7 +199,7 @@ base namespace PMC.  Maybe a standard method "expand_export_list()"?
 
 =back
 
-=head2 Non-interface Methods
+=head3 Non-interface Methods
 
 These methods don't belong to either the typed or the generic interface.
 
@@ -208,9 +214,9 @@ NOTE: This is a naive method.  It does not account for any aliasing.
 
 =back
 
-=head1 Compiler PMC API
+=head2 Compiler PMC API
 
-=head2 Methods
+=head3 Methods
 
 =over 4
 
@@ -222,12 +228,12 @@ C<perl5.load_library(["Some", "Module"])>.
 
 =back
 
-=head1 Subroutine PMC API
+=head2 Subroutine PMC API
 
 Some information must be available about subroutines to implement the correct
 behavior about namespaces.
 
-=head2 Methods
+=head3 Methods
 
 =over 4
 
@@ -238,7 +244,7 @@ that it may have been exported to.)
 
 =back
 
-=head1 Namespace Opcodes
+=head2 Namespace Opcodes
 
 =over 4
 
@@ -279,16 +285,16 @@ Store $P0 as the variable $S0 in $P1 or the current namespace.
 
 =back
 
-=head1 HLL Namespace Mapping
+=head2 HLL Namespace Mapping
 
 In order to make this work, Parrot must somehow figure out what type of
 namespace PMC to create.
 
-=head2 Default Namespace
+=head3 Default Namespace
 
 The default namespace PMC will implement Parrot's current behavior.
 
-=head2 Compile-time Creation
+=head3 Compile-time Creation
 
 This perl:
 
@@ -309,7 +315,7 @@ should map roughly to this PIR:
 In this case, the C<main> sub would be tied to Perl5 by the C<.HLL> directive,
 so a Perl5 namespace would be created.
 
-=head2 Run-time Creation
+=head3 Run-time Creation
 
 Consider the following Perl5 program:
 
@@ -343,15 +349,11 @@ that calls the store function.
 In this case, C<store_global> should see that it was called from "main", which is
 in a Perl5 namespace, so "Foo::" should be also created as a Perl 5 namespace.
 
-=head1 Language Notes
+=head1 LANGUAGE NOTES
 
-=over 4
+=head2 Perl 6
 
-=item Perl 6
-
-=over 4
-
-=item Sigils
+=head3 Sigils
 
 Perl6 may wish to be able to access the namespace as a hash with sigils.  That
 is certainly possible, even with subroutines and methods.  It's not important
@@ -363,13 +365,9 @@ namespace PMC to be used as a hash.  The C<find_sub> method would, in this
 case, would append a "&" sigil to the front of the sub/method name and search
 in the internal hash.
 
-=back
+=head2 Python
 
-=item Python
-
-=over 4
-
-=item Importing from Python
+=head3 Importing from Python
 
 Since functions and variables overlap in Python's namespaces, when exporting
 to another HLL's namespace, the Python namespace PMC's C<export_to> method
@@ -377,21 +375,16 @@ should use introspection to determine whether C<x> should be added using
 C<add_var> or C<add_sub>.  C<$I0 = does $P0, "Sub"> may be enough to decide
 correctly.
 
-=item Subroutines and Namespaces
+=head3 Subroutines and Namespaces
 
 Since Python's subroutines and namespaces are just variables (the namespace
 collides there), the Python PMC's C<find_var> method may return subroutines as
 variables.
 
-=back
 
-=back
+=head2 Examples
 
-=head1 Examples
-
-=over 4
-
-=item Aliasing
+=head3 Aliasing
 
 Perl:
 
@@ -416,7 +409,7 @@ PIR:
     ...
   .end
 
-=item Cross-language Exportation
+=head3 Cross-language Exportation
 
 Perl:
 
@@ -437,7 +430,17 @@ PIR:
     end
   .end
 
-=back
+=head1 ATTACHMENTS
+
+None.
+
+=head1 FOOTNOTES
+
+None.
+
+=head1 REFERENCES
+
+None.
 
 =cut
 

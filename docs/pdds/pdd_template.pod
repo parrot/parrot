@@ -17,9 +17,17 @@ $Revision$
 
 Description of the subject.
 
+=head1 DEFINITIONS
+
+Definitions of important terms. (optional)
+
 =head1 IMPLEMENTATION
 
 Implementation details.
+
+=head1 LANGUAGE NOTES
+
+Notes on application to high-level languages. (optional)
 
 =head1 ATTACHMENTS
 
