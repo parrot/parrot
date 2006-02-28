@@ -112,7 +112,7 @@ See "Lua 5.0 Reference Manual", section 5.3 "String Manipulation".
     .param int len
     if pos >= 0 goto L0
     pos = len + pos
-    pos = pos + 1
+    inc pos
 L0:
     .return (pos)
 .end
@@ -138,7 +138,7 @@ Note that numerical codes are not necessarily portable across platforms.
     $I1 = posrelat($I1, $I0)
     if $I1 == 0 goto L0
     if $I1 > $I0 goto L0
-    $I1 = $I1 - 1
+    dec $I1
     $I2 = ord $S0, $I1
     new ret, .LuaNumber
     ret = $I2
@@ -176,7 +176,7 @@ L1:
     c = checknumber(curr)
     s = chr c
     b = concat b, s
-    i = i + 1
+    inc i
     goto L1
 L2:
     new ret, .LuaString
@@ -314,7 +314,7 @@ L0:
     $I2 = $I0
 L1:
     unless $I1 <= $I2 goto L2
-    $I1 = $I1 - 1
+    dec $I1
     $S1 = substr $S0, $I1, $I2
     goto L3
 L2:

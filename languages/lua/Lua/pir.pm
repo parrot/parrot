@@ -79,7 +79,7 @@ sub visitIncrOp {
 	my $self = shift;
 	my ($op) = @_;
 	my $FH = $self->{fh};
-	print $FH "  add $op->{result}->{symbol}, 1.0\n";
+	print $FH "  inc $op->{result}->{symbol}\n";
 }
 
 sub visitFindGlobalOp {

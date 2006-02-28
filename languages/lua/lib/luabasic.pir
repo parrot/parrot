@@ -357,10 +357,12 @@ integer key with a nil value in the table.
     zero = 0.0
     .return (ipairs, t, zero)
 L0:
-    .local pmc n
+    $N0 = checknumber(i)
+    inc $N0
     .local pmc ret
+    .local pmc n
     new n, .LuaNumber
-    n = i + 1.0
+    n = $N0
     ret = t[n]
     unless ret goto L1
     .return (n, ret)
@@ -545,7 +547,7 @@ L2:
     $P0 = argv[i]
     $P1 = $P0."tostring"()
     print $P1
-    i = i + 1
+    inc i
     goto L1
 L3:
     print "\n"
@@ -813,8 +815,8 @@ L0:
     unless i < n goto L1
     $P0 = list[index]
     ret[i] = $P0
-    index = index + 1.0
-    i = i + 1
+    inc index
+    inc i
     goto L0
 L1:
     .return (ret :flat)

@@ -69,6 +69,19 @@ pmclass LuaNumber
 
 /*
 
+=item C<void init()>
+
+Initializes the number to zero.
+
+=cut
+
+*/
+    void init() {
+        PMC_num_val(SELF) = 0.0;
+    }
+
+/*
+
 =item C<PMC* new_from_string(STRING *rep, INTVAL flags)>
 
 Return a LuaNumber PMC created from a string (Implementation
@@ -184,6 +197,32 @@ Returns a Parrot string representation of the number.
 
 /*
 
+=item C<void increment()>
+
+Increments the number.
+
+=cut
+
+*/
+    void increment () {
+        PMC_num_val(SELF) ++;
+    }
+
+/*
+
+=item C<void decrement()>
+
+Decrements the number.
+
+=cut
+
+*/
+    void decrement () {
+        PMC_num_val(SELF) --;
+    }
+
+/*
+
 =item C<PMC* neg (PMC * dest)>
 
 =cut
@@ -294,19 +333,6 @@ MMD_DEFAULT: {
                     "attempt to perform arithmetic on a %s value",
                     string_to_cstring(INTERP, VTABLE_name(INTERP, value)));
         }
-    }
-
-    PMC* add_float (FLOATVAL value, PMC* dest) {
-        if (!dest)
-            dest = pmc_new(INTERP, SELF->vtable->base_type);
-        VTABLE_set_number_native(INTERP, dest,
-                DYNSELF.get_number() + value);
-        return dest;
-    }
-
-    void i_add_float (FLOATVAL value) {
-        VTABLE_set_number_native(INTERP, SELF,
-            DYNSELF.get_number() + value);
     }
 
 /*

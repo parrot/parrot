@@ -315,7 +315,7 @@ STILL INCOMPLETE (see setn in luapir.pir).
     .local int pos
     checktype(table, "table")
     n = getn(table)
-    n = n + 1
+    inc n
     unless_null arg3, L1
     pos = n
     value = arg2
@@ -330,7 +330,7 @@ L2:
     setn(table, n)
     new index, .LuaNumber
 L4:
-    n = n - 1
+    dec n
     unless n >= pos goto L5
     index = n
     $P0 = table[index]

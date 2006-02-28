@@ -335,7 +335,7 @@ L1:
     if dmax > d goto L2
     dmax = d
 L2:
-    i = i + 1
+    inc i
     goto L1
 L3:
     new ret, .LuaNumber
@@ -365,7 +365,7 @@ L1:
     if dmin < d goto L2
     dmin = d
 L2:
-    i = i + 1
+    inc i
     goto L1
 L3:
     new ret, .LuaNumber

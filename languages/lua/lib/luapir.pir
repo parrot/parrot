@@ -168,8 +168,8 @@ L0:
 L1:
     $P0 = table[$P1]
     unless $P0 goto L2
-    add $I1, 1
-    add $P1, 1.0
+    inc $I1
+    inc $P1
     goto L1
 L2:
     .return ($I1)
@@ -198,7 +198,7 @@ Support variable number of arguments function call.
 L1:
     if i >= argc goto L2
     curr = argv[i]
-    i = i + 1
+    inc i
     key = i
     ret[key] = curr
     goto L1
@@ -221,7 +221,7 @@ L2:
     new index, .LuaNumber
     index = 0.0
 L1:
-    add index, 1.0
+    inc index
     value = table[index]
     unless value goto L2
     .return (index, value)    
@@ -318,8 +318,8 @@ L1:
     if i >= argc goto L2
     $P0 = argv[i]
     table[index] = $P0
-    add index, 1.0
-    i = i + 1
+    inc index
+    inc i
     goto L1
 L2:
     .return (table)
