@@ -85,6 +85,11 @@ Now, the interpreter should build.  If you are building the ICU library
 (this is the default on most systems), you need to use GNU make instead
 (or something compatible with it).
 
+NOTE: If you have trouble linking parrot, this *may* be due to a pre-existing
+parrot version installed via 'make install'. Until this issue is resolved,
+you may have to delete the installed version of parrot before building a new
+one. Our apologies.
+
 You can test parrot by running
 
     make test         (or nmake test or gmake test)
