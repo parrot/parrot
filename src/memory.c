@@ -41,11 +41,11 @@ void *
 mem_sys_allocate(size_t size)
 {
     void *ptr = malloc((size_t)size);
+#ifdef DETAIL_MEMORY_DEBUG
+    fprintf(stderr, "Allocated %i at %p\n", size, ptr);
+#endif
     if (!ptr)
         PANIC("Out of mem");
-#ifdef DETAIL_MEMORY_DEBUG
-    printf("Allocated %i at %p\n", size, ptr);
-#endif
     return ptr;
 }
 
@@ -54,7 +54,7 @@ mem__internal_allocate(size_t size, const char *file, int line)
 {
     void *ptr = malloc((size_t)size);
 #ifdef DETAIL_MEMORY_DEBUG
-    printf("Internal malloc %i at %p (%s/%d)\n", size, ptr, file, line);
+    fprintf(stderr, "Internal malloc %i at %p (%s/%d)\n", size, ptr, file, line);
 #endif
     if (!ptr)
         PANIC("Out of mem");
@@ -76,11 +76,11 @@ void *
 mem_sys_allocate_zeroed(size_t size)
 {
     void *ptr = calloc(1, (size_t)size);
+#ifdef DETAIL_MEMORY_DEBUG
+    fprintf(stderr, "Allocated %i at %p\n", size, ptr);
+#endif
     if (!ptr)
         PANIC("Out of mem");
-#ifdef DETAIL_MEMORY_DEBUG
-    printf("Allocated %i at %p\n", size, ptr);
-#endif
     return ptr;
 }
 
@@ -88,11 +88,11 @@ void *
 mem__internal_allocate_zeroed(size_t size, const char *file, int line)
 {
     void *ptr = calloc(1, (size_t)size);
+#ifdef DETAIL_MEMORY_DEBUG
+    fprintf(stderr, "Internal malloc %i at %p (%s/%d)\n", size, ptr, file, line);
+#endif
     if (!ptr)
         PANIC("Out of mem");
-#ifdef DETAIL_MEMORY_DEBUG
-    printf("Internal malloc %i at %p (%s/%d)\n", size, ptr, file, line);
-#endif
     return ptr;
 }
 
@@ -112,14 +112,14 @@ mem__sys_realloc(void *from, size_t size)
 {
     void *ptr;
 #ifdef DETAIL_MEMORY_DEBUG
-    printf("Freed %p (realloc -- %i bytes)\n", from, size);
+    fprintf(stderr, "Freed %p (realloc -- %i bytes)\n", from, size);
 #endif
     ptr = realloc(from, size);
+#ifdef DETAIL_MEMORY_DEBUG
+    fprintf(stderr, "Allocated %i at %p\n", size, ptr);
+#endif
     if (!ptr)
          PANIC("Out of mem");
-#ifdef DETAIL_MEMORY_DEBUG
-    printf("Allocated %i at %p\n", size, ptr);
-#endif
     return ptr;
 }
 
@@ -127,12 +127,12 @@ void *
 mem__internal_realloc(void *from, size_t size, const char *file, int line)
 {
     void *ptr = realloc(from, size);
+#ifdef DETAIL_MEMORY_DEBUG
+    fprintf(stderr, "internal free of %p (realloc -- %i bytes) (%s/%d)\n", from, size, file, line);
+    fprintf(stderr, "Internal malloc %i at %p (%s/%d)\n", size, ptr, file, line);
+#endif
     if (!ptr)
         PANIC("Out of mem");
-#ifdef DETAIL_MEMORY_DEBUG
-    printf("internal free of %p (realloc -- %i bytes) (%s/%d)\n", from, size, file, line);
-    printf("Internal malloc %i at %p (%s/%d)\n", size, ptr, file, line);
-#endif
     return ptr;
 }
 #undef interpreter
@@ -152,16 +152,17 @@ void
 mem_sys_free(void *from)
 {
 #ifdef DETAIL_MEMORY_DEBUG
-    printf("Freed %p\n", from);
+    fprintf(stderr, "Freed %p\n", from);
 #endif
-    free(from);
+    if (from)
+	free(from);
 }
 
 void
 mem__internal_free(void *from, const char *file, int line)
 {
 #ifdef DETAIL_MEMORY_DEBUG
-    printf("Internal free of %p (%s/%d)\n", from, file, line);
+    fprintf(stderr, "Internal free of %p (%s/%d)\n", from, file, line);
 #endif
     free(from);
 }
