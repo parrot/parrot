@@ -134,5 +134,13 @@ else {
 #define PARROT_INLINE
 EOP
 }
+
+my $has_socklen_t = @has_socklen_t@;
+	print OUT <<"EOP";
+
+/* from config/auto/socklen_t */
+#define PARROT_HAS_SOCKLEN_T $has_socklen_t
+EOP
+
 #endif guard
 print OUT "\n\n#endif\n"
