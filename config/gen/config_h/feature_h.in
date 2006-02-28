@@ -8,139 +8,146 @@
 
 #perl - all below here gets evaled by perl, OUT is the filehandle
 
-if(@miniparrot@) {
-  print OUT <<'END';
+print OUT <<'END_PRINT';
+
+/* from config/init/miniparrot */
+END_PRINT
+if (@miniparrot@) {
+    print OUT <<'END_PRINT';
 #define MINIPARROT 1
-END
+END_PRINT
 }
 
-	print OUT <<EOP;
+print OUT <<'END_PRINT';
+
 /* from config/auto/memalign */
-EOP
+END_PRINT
 if (@memalign@ eq 'posix_memalign') {
-  print OUT <<'END'
+    print OUT <<'END_PRINT'
 #define PARROT_HAS_POSIX_MEMALIGN
 #define PARROT_HAS_SOME_MEMALIGN
-
-END
+END_PRINT
 }
 elsif (@memalign@ eq 'memalign') {
-  print OUT <<'END'
+    print OUT <<'END_PRINT'
 #define PARROT_HAS_MEMALIGN
 #define PARROT_HAS_SOME_MEMALIGN
-
-END
+END_PRINT
 }
 elsif (@memalign@ eq 'some_memalign') {
-  print OUT <<'END'
+    print OUT <<'END_PRINT'
 #define PARROT_HAS_SOME_MEMALIGN
-
-END
+END_PRINT
 }
 
-	print OUT <<EOP;
+print OUT <<'END_PRINT';
+
 /* from config/auto/isreg */
-EOP
+END_PRINT
 unless (@isreg@) {
-	print OUT <<EOP;
+    print OUT <<'END_PRINT';
 #define PARROT_HAS_BROKEN_ISREG 1
-EOP
+END_PRINT
 }
 
-print OUT "\n/* from config/auto/jit */\n";
-print OUT "#define PARROT_HAS_EXEC_PROTECT\n" if @has_exec_protect@;
+print OUT <<'END_PRINT';
 
+/* from config/auto/jit */
+END_PRINT
+if ( @has_exec_protect@ )
+{
+    print OUT <<'END_PRINT';
+#define PARROT_HAS_EXEC_PROTECT
+END_PRINT
+}
 if (@jit_i386@ && @jit_i386@ eq 'fcomip') {
-    print OUT <<'END';
+    print OUT <<'END_PRINT';
 #ifdef I386
 #  define PARROT_HAS_JIT_FCOMIP
 #endif
-END
+END_PRINT
 }
 
-    print OUT <<'END';
-
-END
 my $va_result = @va_ptr_type@;
-    print OUT <<"END";
+print OUT <<"END_PRINT";
+
 /* from config/auto/va_ptr.pm: va_ptr_type => $va_result */
-END
+END_PRINT
 if (@va_ptr_type@ eq 'ppc') {
-    print OUT <<'END';
+    print OUT <<'END_PRINT';
 /* if defined __powerpc__ || defined __x86_64__ || defined __s390__ */
 #  define PARROT_VA_TO_VAPTR(x) (x)
-
-END
+END_PRINT
 }
 if (@va_ptr_type@ eq 'x86') {
-    print OUT <<'END';
+    print OUT <<'END_PRINT';
 #  define PARROT_VA_TO_VAPTR(x) (&(x))
-
-END
+END_PRINT
 }
 
-    print OUT <<'END';
+print OUT <<'END_PRINT';
 
 /* signal stuff from config/auto/signal */
-END
+END_PRINT
 
 if (@has_sigaction@) {
-    print OUT <<'END';
+    print OUT <<'END_PRINT';
 #define PARROT_HAS_SIGACTION 1
-END
+END_PRINT
 }
-
 if (@has___sighandler_t@) {
-    print OUT <<'END';
+    print OUT <<'END_PRINT';
 #define PARROT_HAS___SIGHANDLER_T 1
-END
+END_PRINT
 }
-
 if (@has_setitimer@) {
-    print OUT <<'END';
+    print OUT <<'END_PRINT';
 #define PARROT_HAS_SETITIMER 1
 #define PARROT_HAS_SOME_SYS_TIMER 1
-END
+END_PRINT
 }
 
-print OUT <<EOP;
+print OUT <<'END_PRINT';
 
 /* from config/auto/env */
-EOP
+END_PRINT
 if (@setenv@) {
-	print OUT <<EOP;
+    print OUT <<'END_PRINT';
 #define PARROT_HAS_SETENV 1
-EOP
+END_PRINT
 }
 if (@unsetenv@) {
-	print OUT <<EOP;
+    print OUT <<'END_PRINT';
 #define PARROT_HAS_UNSETENV 1
-EOP
+END_PRINT
 }
 
-print OUT <<EOP;
+print OUT <<'END_PRINT';
 
 /* from config/auto/inline */
-EOP
+END_PRINT
 if (@inline@ ne '') {
     my $inl = @inline@;
-    print OUT <<EOP;
+    print OUT <<"END_PRINT";
 #define PARROT_INLINE $inl
 #define PARROT_HAS_INLINE
-EOP
+END_PRINT
 }
 else {
-    print OUT <<EOP;
+    print OUT <<'END_PRINT';
 #define PARROT_INLINE
-EOP
+END_PRINT
 }
 
 my $has_socklen_t = @has_socklen_t@;
-	print OUT <<"EOP";
+    print OUT <<"END_PRINT";
 
 /* from config/auto/socklen_t */
 #define PARROT_HAS_SOCKLEN_T $has_socklen_t
-EOP
+END_PRINT
 
-#endif guard
-print OUT "\n\n#endif\n"
+print OUT <<'END_PRINT'
+
+
+#endif
+END_PRINT
