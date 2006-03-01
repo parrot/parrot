@@ -72,13 +72,23 @@ given by C<src>.
     .local pmc p6rule
     .local pmc parser
     .local pmc match, slist, stmt
+    .local pmc code
     .local string namespace
-    .local string code
+    .local int namecount
+    .local pmc namehash
+    .local pmc onload
+    .local pmc emit
 
-    namespace = "PGE::Rule"
     code = new .String
     p6rule = compreg "PGE::P6Rule"
     parser = find_global "PGE", "_grammar_rule"
+    namespace = "PGE::Rule"
+    namecount = 0
+    namehash = new .Hash
+    namehash[namespace] = 1
+    onload = new .String
+    onload = ".sub __onload :anon :load\n"
+    emit = find_global "PGE::Exp", "emit"
 
     match = parser(str)
     unless match goto end
@@ -89,21 +99,30 @@ given by C<src>.
     $S1 = stmt[0]
     if $S1 == "#" goto loop
     if $S1 == "rule" goto compile_rule
+  grammar:
     namespace = stmt[1]
+    $I0 = namehash[namespace]
+    if $I0 > 0 goto loop
+    namehash[namespace] = 1
+    inc namecount
+    emit(onload, "    $P0 = getclass \"%s\"", namespace)
+    emit(onload, "    unless_null $P0, onload_%s", namecount)
+    emit(onload, "    $P0 = subclass \"PGE::Rule\", \"%s\"", namespace)
+    emit(onload, "  onload_%s:", namecount)
     goto loop
   compile_rule:
     $S1 = stmt[1]
     $S2 = stmt['p6rule']
-    ($P3, $S4, $P5) = p6rule($S2, namespace, $S1)
-    code .= "\n# <"
-    code .= namespace
-    code .= "::"
-    code .= $S1
-    code .= ">\n"
-    code .= $S4
+    ($P3, $P4, $P5) = p6rule($S2, namespace, $S1)
+    emit(code, "\n# <%s::%s>", namespace, $S1)
+    code .= $P4
     code .= "\n"
     goto loop
   end:
-    .return (code)
+    emit(onload, ".end\n")
+    if namecount > 0 goto end_1
+    onload = ""
+  end_1:
+    .return (code, onload)
 .end
 
