@@ -32,6 +32,7 @@ linux-x86_64-gcc3.4.2    8   Y    -    -     Y   Y   Y    Y        200505
 linux-x86_64-gcc3.4.3    8   Y    -    -     Y   Y   Y    Y        20060108
 netbsd                                 Y             Y    Y*1
 openbsd                      Y    Y/5  Y     Y   -   Y    Y
+openbsd-ppc             B    Y    -    -     -   -   Y    Y
 openbsd_beta_3.5-vax                                 Y*4  Y/26
 os2
 solaris8-sparc-cc       B    -    -    -     -   -   Y    Y/7      20060210
