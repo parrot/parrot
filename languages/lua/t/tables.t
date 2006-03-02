@@ -20,7 +20,7 @@ use strict;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 7;
+use Parrot::Test tests => 8;
 use Test::More;
 
 language_output_is( 'lua', <<'CODE', <<'OUT', '' );
@@ -119,5 +119,12 @@ CODE
 10
 c
 A,b,c
+OUT
+
+language_output_like( 'lua', <<'CODE', <<'OUT', 'call' );
+a = {}
+a()
+CODE
+/attempt to call/
 OUT
 

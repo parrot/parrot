@@ -22,7 +22,7 @@ use strict;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 24;
+use Parrot::Test tests => 26;
 use Test::More;
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'metatable' );
@@ -368,7 +368,7 @@ true
 OUT
 
 
-language_output_is( 'lua', <<'CODE', <<'OUT', 'cplx __le __lt' );
+language_output_is( 'lua', <<'CODE', <<'OUT', 'cplx __lt __le' );
 Cplx = {}
 Cplx.mt = {}
 
@@ -388,18 +388,6 @@ function Cplx.mt.__tostring (c)
     return "(" .. c.re .. "," .. c.im .. ")"
 end
 
-function Cplx.mt.__le (a, b)
-    if type(a) ~= "table" then
-        a = Cplx.new(a, 0)
-    end
-    if type(b) ~= "table" then
-        b = Cplx.new(b, 0)
-    end
-    local ra = a.re*a.re + a.im*a.im
-    local rb = b.re*b.re + b.im*b.im
-    return ra <= rb 
-end
-
 function Cplx.mt.__lt (a, b)
     if type(a) ~= "table" then
         a = Cplx.new(a, 0)
@@ -410,6 +398,18 @@ function Cplx.mt.__lt (a, b)
     local ra = a.re*a.re + a.im*a.im
     local rb = b.re*b.re + b.im*b.im
     return ra < rb 
+end
+
+function Cplx.mt.__le (a, b)
+    if type(a) ~= "table" then
+        a = Cplx.new(a, 0)
+    end
+    if type(b) ~= "table" then
+        b = Cplx.new(b, 0)
+    end
+    local ra = a.re*a.re + a.im*a.im
+    local rb = b.re*b.re + b.im*b.im
+    return ra <= rb 
 end
 
 function Cplx.mt.__cmp (a, b)
@@ -445,6 +445,91 @@ false
 true
 OUT
 
+
+language_output_is( 'lua', <<'CODE', <<'OUT', 'cplx __lt' );
+Cplx = {}
+Cplx.mt = {}
+
+function Cplx.new (re, im)
+    local c = {}
+    setmetatable(c, Cplx.mt)
+    c.re = tonumber(re)
+    if im == nil then
+        c.im = 0.0
+    else
+        c.im = tonumber(im)
+    end
+    return c
+end
+
+function Cplx.mt.__tostring (c)
+    return "(" .. c.re .. "," .. c.im .. ")"
+end
+
+function Cplx.mt.__lt (a, b)
+    if type(a) ~= "table" then
+        a = Cplx.new(a, 0)
+    end
+    if type(b) ~= "table" then
+        b = Cplx.new(b, 0)
+    end
+    local ra = a.re*a.re + a.im*a.im
+    local rb = b.re*b.re + b.im*b.im
+    return ra < rb 
+end
+
+c1 = Cplx.new(2, 0)
+c2 = Cplx.new(1, 3)
+c3 = Cplx.new(2, 0)
+print(c1 < c2)
+print(c1 < c3)
+print(c1 <= c3)
+CODE
+true
+false
+true
+OUT
+
+TODO: {
+local $TODO = "fix me";
+
+language_output_is( 'lua', <<'CODE', <<'OUT', 'cplx __call' );
+Cplx = {}
+Cplx.mt = {}
+
+function Cplx.new (re, im)
+    local c = {}
+    setmetatable(c, Cplx.mt)
+    c.re = tonumber(re)
+    if im == nil then
+        c.im = 0.0
+    else
+        c.im = tonumber(im)
+    end
+    return c
+end
+
+function Cplx.mt.__tostring (c)
+    return "(" .. c.re .. "," .. c.im .. ")"
+end
+
+function Cplx.mt.__call (obj, ...)
+    print("Cplx.__call " .. tostring(obj) .. ", " .. table.concat(arg, ", "))
+    return true
+end
+
+c1 = Cplx.new(2, 0)
+c1()
+c1("a")
+r = c1("a", "b", "c")
+print(r)
+CODE
+Cplx.__call (2,0), 
+Cplx.__call (2,0), a
+Cplx.__call (2,0), a, b, c
+true
+OUT
+}
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'table-access' );
 -- create a namespace

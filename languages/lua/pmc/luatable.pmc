@@ -290,6 +290,27 @@ Returns the number of elements in the hash.
 
 /*
 
+=item C<void* invoke(void* next)>
+
+=cut
+
+*/
+    void* invoke(void* next) {
+        PMC *metamethod = Parrot_LuaBase_find_metamethod(INTERP, SELF,
+                string_from_const_cstring(INTERP, "__call", 0));
+        if (metamethod != NULL) {
+            /* fix me */
+            PMC *retval = Parrot_runops_fromc_args(INTERP, metamethod, "PP", SELF);
+            if (NULL == retval) {
+                retval = pmc_new(INTERP, dynpmc_LuaNil);
+            }
+            return retval;
+        }
+        return SUPER(next);
+    }
+
+/*
+
 =back
 
 =head2 non-Vtable Methods
@@ -345,21 +366,31 @@ MMD_LuaTable: {
 #else
             PMC *_lt = Parrot_LuaBase_find_metamethod(INTERP, SELF,
                     string_from_const_cstring(INTERP, "__lt", 0));
-            PMC *_le = Parrot_LuaBase_find_metamethod(INTERP, SELF,
-                    string_from_const_cstring(INTERP, "__le", 0));
-            if (_lt != NULL && _le != NULL) {
-                PMC *retval = Parrot_runops_fromc_args(INTERP, _le, "PPP", SELF, value);
-                INTVAL r = (retval) ? VTABLE_get_bool(INTERP, retval) : (INTVAL)0;
+            if (_lt != NULL) {
+                PMC *retval = Parrot_runops_fromc_args(INTERP, _lt, "PPP", SELF, value);
+                INTVAL r = (retval != NULL) ? VTABLE_get_bool(INTERP, retval) : (INTVAL)0;
                 if (r) {
-                    retval = Parrot_runops_fromc_args(INTERP, _lt, "PPP", SELF, value);
-                    r = (retval) ? VTABLE_get_bool(INTERP, retval) : (INTVAL)0;
-                    if (r) {
-                        return (INTVAL)-1;
-                    } else {
-                        return (INTVAL)0;
-                    }
+                    return (INTVAL)-1;
                 } else {
-                    return (INTVAL)1;
+                    PMC *_le = Parrot_LuaBase_find_metamethod(INTERP, SELF,
+                             string_from_const_cstring(INTERP, "__le", 0));
+                    if (_le != NULL) {
+                        retval = Parrot_runops_fromc_args(INTERP, _le, "PPP", SELF, value);
+                        r = (retval != NULL) ? VTABLE_get_bool(INTERP, retval) : (INTVAL)0;
+                        if (r) {
+                            return (INTVAL)0;
+                        } else {
+                            return (INTVAL)1;
+                        }
+                    } else {
+                        retval = Parrot_runops_fromc_args(INTERP, _lt, "PPP", value, SELF);
+                        r = (retval != NULL) ? VTABLE_get_bool(INTERP, retval) : (INTVAL)0;
+                        if (r) {
+                            return (INTVAL)1;
+                        } else {
+                            return (INTVAL)0;
+                        }
+                    }
                 }
             }
 #endif
