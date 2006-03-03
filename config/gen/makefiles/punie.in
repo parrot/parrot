@@ -5,13 +5,14 @@ LN_S     = @lns@
 PERL     = @perl@
 RM_F     = @rm_f@
 PARROT   = ..@slash@..@slash@parrot@exe@
+PGE_DIR  = ..@slash@..@slash@compilers@slash@pge@slash@
 CP       = @cp@
 
 # the default target
 all: punie.pbc
 
 lib/PunieGrammar.pbc: lib/PunieGrammar.pir lib/punie.g
-	$(PARROT) pge_compile.pir lib/punie.g > lib/punie_grammar_gen.pir
+	$(PARROT) $(PGE_DIR)rulec.pir lib/punie.g > lib/punie_grammar_gen.pir
 	$(PARROT) -o lib/PunieGrammar.pbc --output-pbc lib/PunieGrammar.pir 
 
 punie.pbc: lib/PunieGrammar.pbc punie.pir
