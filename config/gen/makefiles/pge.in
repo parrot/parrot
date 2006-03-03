@@ -17,7 +17,7 @@ $(PARROT_LIBRARY)@slash@PGE.pbc: PGE.pbc
 	$(CP) PGE.pbc $(PARROT_LIBRARY)
 
 PGE.pbc: PGE.pir PGE/Exp.pir PGE/Match.pir PGE/Rule.pir PGE/P6Rule.pir PGE/TokenHash.pir PGE/OPTable.pir PGE/P5Regexp.pir rulec.pir library.pge
-	echo "" >PGE/Library.pir
+	$(PERL) -e "" >PGE/Library.pir
 	$(PARROT) -o PGE.pbc --output-pbc PGE.pir 
 	$(PARROT) rulec.pir library.pge >PGE/Library.pir
 	$(PARROT) -o PGE.pbc --output-pbc PGE.pir 
