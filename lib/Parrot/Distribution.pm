@@ -1,4 +1,4 @@
-# Copyright: 2004-2005 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2004-2006 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 =head1 NAME
@@ -8,7 +8,8 @@ Parrot::Distribution - Parrot Distribution Directory
 =head1 SYNOPSIS
 
     use Parrot::Distribution;
-    $dist = Parrot::Distribution->new();
+
+    my $dist = Parrot::Distribution->new();
 
 =head1 DESCRIPTION
 
@@ -29,6 +30,7 @@ file methods can be used depending on the circumstances.
 package Parrot::Distribution;
 
 use strict;
+use warnings;
 
 use Data::Dumper;
 use ExtUtils::Manifest;
@@ -37,7 +39,7 @@ use Parrot::Revision;
 use Parrot::Configure::Step qw(capture_output);
 
 use Parrot::Docs::Directory;
-@Parrot::Distribution::ISA = qw(Parrot::Docs::Directory);
+our @ISA = qw(Parrot::Docs::Directory);
 
 =item C<new()>
 
@@ -114,7 +116,7 @@ Returns the C source file with the specified name.
 sub c_source_file_with_name
 {
     my $self = shift;
-    my $name = shift || return undef;
+    my $name = shift || return;
     
     $name .= '.c' unless $name =~ /\.[Cc]$/o;
     
@@ -125,7 +127,7 @@ sub c_source_file_with_name
     }
     
     print 'WARNING: ' . __FILE__ . ':' . __LINE__ . ' File not found:' . $name ."\n";
-    return undef;
+    return;
 }
 
 =item C<c_header_file_directories()>
@@ -156,7 +158,7 @@ Returns the C header file with the specified name.
 sub c_header_file_with_name
 {
     my $self = shift;
-    my $name = shift || return undef;
+    my $name = shift || return;
     
     $name .= '.h' unless $name =~ /\.[Hh]$/o;
     
@@ -166,7 +168,7 @@ sub c_header_file_with_name
             if $dir->file_exists_with_name($name);
     }
     
-    return undef;
+    return;
 }
 
 =item C<file_for_perl_module($module)>
@@ -178,7 +180,7 @@ Returns the Perl module file for the specified module.
 sub file_for_perl_module
 {
     my $self = shift;
-    my $module = shift || return undef;
+    my $module = shift || return;
 
     my @path = split '::', $module;
     
@@ -189,7 +191,7 @@ sub file_for_perl_module
     
     foreach my $name (@path)
     {
-        return undef unless $dir = $dir->existing_directory_with_name($name);
+        return unless $dir = $dir->existing_directory_with_name($name);
     }
     
     return $dir->existing_file_with_name($module);

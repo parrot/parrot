@@ -1,4 +1,4 @@
-# Copyright: 2004 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2004-2006 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 =head1 NAME
@@ -7,7 +7,7 @@ Parrot::IO::File - File
 
 =head1 SYNOPSIS
 
-	use Parrot::IO::File;
+    use Parrot::IO::File;
 
 =head1 DESCRIPTION
 
@@ -22,9 +22,10 @@ Use this to query and manipulate files and their contents.
 package Parrot::IO::File;
 
 use strict;
+use warnings;
 
 use Parrot::IO::Path;
-@Parrot::IO::File::ISA = qw(Parrot::IO::Path);
+our @ISA = qw(Parrot::IO::Path);
 
 use FileHandle;
 use Parrot::IO::Directory;
@@ -38,9 +39,9 @@ directory.
 
 sub tmp_file
 {
-	my $self = shift;
-	
-	return $self->new(File::Spec->catfile(File::Spec->tmpdir, @_));
+    my $self = shift;
+    
+    return $self->new(File::Spec->catfile(File::Spec->tmpdir, @_));
 }
 
 =item C<new($path)>
@@ -51,12 +52,12 @@ Returns the instance for C<$path>.
 
 sub new
 {
-	my $self = shift;
-	my $path = shift;
-	
-	return undef unless defined $path and ! -d $path;
-	
-	return $self->SUPER::new($path);
+    my $self = shift;
+    my $path = shift;
+    
+    return unless defined $path and ! -d $path;
+    
+    return $self->SUPER::new($path);
 }
 
 =back
@@ -73,29 +74,29 @@ This is called from C<new()> to create the path if necessary.
 
 sub create_path
 {
-	my $self = shift;
-	
-	return undef unless $self->SUPER::create_path;
-	
-	# Just to touch the file.
-	# Make sure write() doesn't dismiss this as a noop.
-	$self->write('') unless -e $self->path;
-	
-	return -f $self->path;
+    my $self = shift;
+    
+    return unless $self->SUPER::create_path;
+    
+    # Just to touch the file.
+    # Make sure write() doesn't dismiss this as a noop.
+    $self->write('') unless -e $self->path;
+    
+    return -f $self->path;
 }
 
 =item C<parent($path)>
 
-Returns the file's parent directory.	
+Returns the file's parent directory.    
 
 =cut
 
 sub parent
 {
-	my $self = shift;
-	my $path = shift;
-	
-	return Parrot::IO::Directory->new($self->parent_path);
+    my $self = shift;
+    my $path = shift;
+    
+    return Parrot::IO::Directory->new($self->parent_path);
 }
 
 =item C<read()>
@@ -110,14 +111,14 @@ depending on the context in which the method is called.
 
 sub read
 {
-	my $self = shift;
-	my $fh = FileHandle->new($self->path) or 
-		die 'Failed to open ' . $self->path . ": $!";
-	my @lines = <$fh>;
-	
-	$fh->close;
-	
-	return wantarray ? @lines : join '', @lines;
+    my $self = shift;
+    my $fh = FileHandle->new($self->path) or 
+        die 'Failed to open ' . $self->path . ": $!";
+    my @lines = <$fh>;
+    
+    $fh->close;
+    
+    return wantarray ? @lines : join '', @lines;
 }
 
 =item C<write(@lines)>
@@ -128,16 +129,16 @@ Writes the specified lines to the file.
 
 sub write
 {
-	my $self = shift;
-	
-	return unless @_;
-	
-	my $fh = FileHandle->new('>' . $self->path) or 
-		die 'Failed to open ' . $self->path . ": $!";
-	
-	print $fh @_;
-	
-	$fh->close;
+    my $self = shift;
+    
+    return unless @_;
+    
+    my $fh = FileHandle->new('>' . $self->path) or 
+        die 'Failed to open ' . $self->path . ": $!";
+    
+    print $fh @_;
+    
+    $fh->close;
 }
 
 =item C<append(@lines)>
@@ -148,16 +149,16 @@ Writes the specified lines to the file.
 
 sub append
 {
-	my $self = shift;
-	
-	return unless @_;
-	
-	my $fh = FileHandle->new('>>' . $self->path) or 
-		die 'Failed to open ' . $self->path . ": $!";
-	
-	print $fh @_;
-	
-	$fh->close;
+    my $self = shift;
+    
+    return unless @_;
+    
+    my $fh = FileHandle->new('>>' . $self->path) or 
+        die 'Failed to open ' . $self->path . ": $!";
+    
+    print $fh @_;
+    
+    $fh->close;
 }
 
 =item C<is_executable()>
@@ -168,9 +169,9 @@ This tells you whether the file is executable.
 
 sub is_executable
 {
-	my $self = shift;
-	
-	return $self->stat->mode & 0111;
+    my $self = shift;
+    
+    return $self->stat->mode & 0111;
 }
 
 =item C<modified_since($time)>
@@ -183,10 +184,10 @@ epoch.
 
 sub modified_since
 {
-	my $self = shift;
-	my $time = shift;
-	
-	return $self->stat->mtime > $time;
+    my $self = shift;
+    my $time = shift;
+    
+    return $self->stat->mtime > $time;
 }
 
 =item C<cvs_id()>
@@ -197,12 +198,12 @@ Returns the CVS C<$Id> string.
 
 sub cvs_id
 {
-	my $self = shift;
-	my $content = $self->read;
-	# Break up the $Id to prevent CVS messing with it.
-	my ($id) = $content =~ /((?:\$)Id:[^\$]+\$)/so;
-	
-	return $id;
+    my $self = shift;
+    my $content = $self->read;
+    # Break up the $Id to prevent CVS messing with it.
+    my ($id) = $content =~ /((?:\$)Id:[^\$]+\$)/so;
+    
+    return $id;
 }
 
 =item C<has_cvs_id()>
@@ -213,12 +214,12 @@ Returns whether the file has a CVS C<$Id> string.
 
 sub has_cvs_id
 {
-	my $self = shift;
-	my $content = $self->read;
-	# Break up the $Id to prevent CVS messing with it.
-	my $has_id = $content =~ /(?:\$)Id:[^\$]+\$/so;
-	
-	return $has_id;
+    my $self = shift;
+    my $content = $self->read;
+    # Break up the $Id to prevent CVS messing with it.
+    my $has_id = $content =~ /(?:\$)Id:[^\$]+\$/so;
+    
+    return $has_id;
 }
 
 =item C<cvs_version()>
@@ -229,11 +230,11 @@ Returns the CVS version number of the file.
 
 sub cvs_version
 {
-	my $self = shift;
-	my $id = $self->cvs_id;
-	my ($version) = $id =~ /,v\s+(\S+)/s;
-	
-	return $version;
+    my $self = shift;
+    my $id = $self->cvs_id;
+    my ($version) = $id =~ /,v\s+(\S+)/s;
+    
+    return $version;
 }
 
 =item C<is_hidden()>
@@ -244,9 +245,9 @@ Returns whether the file is "hidden", i.e. it's name starts with a dot.
 
 sub is_hidden
 {
-	my $self = shift;
+    my $self = shift;
 
-	return $self->parent eq 'CVS' or $self->name =~ /^\./o;
+    return $self->parent eq 'CVS' or $self->name =~ /^\./o;
 }
 
 =item C<is_generated()>
@@ -257,27 +258,27 @@ Returns whether the file is generated.
 
 sub is_generated
 {
-	my $self = shift;
-	
-	# CFLAGS
-	# libparrot.def
-	# Makefile
-	# myconfig
-	
-	# include/parrot/config.h
-	# include/parrot/core_pmcs.h
-	# include/parrot/feature.h
-	# include/parrot/platform.h
-	
-	# runtime/parrot/include/* (all?)
+    my $self = shift;
+    
+    # CFLAGS
+    # libparrot.def
+    # Makefile
+    # myconfig
+    
+    # include/parrot/config.h
+    # include/parrot/core_pmcs.h
+    # include/parrot/feature.h
+    # include/parrot/platform.h
+    
+    # runtime/parrot/include/* (all?)
 
-	# lib/Parrot/Config.pm
-	
-	return 1 if $self->suffix =~ /^(?:dump|html|flag|o)$/o
-		or $self->name =~ /^(?:perl6-config|libparrot.def|CFLAGS|myconfig|(?:core_pmcs|exec_(?:cpu|dep)|fingerprint|jit_(?:cpu|emit)|nci|platform(?:_interface)?)\.[ch]|(?:charclass|feature)\.h)$/o
-		or $self->parent->name eq 'ops' and $self->suffix =~ /^(?:c|pod)$/;
-	
-	return 0;
+    # lib/Parrot/Config.pm
+    
+    return 1 if $self->suffix =~ /^(?:dump|html|flag|o)$/o
+        or $self->name =~ /^(?:perl6-config|libparrot.def|CFLAGS|myconfig|(?:core_pmcs|exec_(?:cpu|dep)|fingerprint|jit_(?:cpu|emit)|nci|platform(?:_interface)?)\.[ch]|(?:charclass|feature)\.h)$/o
+        or $self->parent->name eq 'ops' and $self->suffix =~ /^(?:c|pod)$/;
+    
+    return 0;
 }
 
 =item C<delete()>
@@ -290,11 +291,11 @@ Raises an exception if the delete fails.
 
 sub delete
 {
-	# Use $_[0] so that we can undef the instance in SUPER::delete().
-	
-	unlink($_[0]->path) or die 'Failed to unlink ' . $_[0]->path . ": $!";
-	
-	$_[0]->SUPER::delete;
+    # Use $_[0] so that we can undef the instance in SUPER::delete().
+    
+    unlink($_[0]->path) or die 'Failed to unlink ' . $_[0]->path . ": $!";
+    
+    $_[0]->SUPER::delete;
 }
 
 =back

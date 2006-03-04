@@ -1,4 +1,4 @@
-# Copyright: 2004 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2004-2006 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 =head1 NAME
@@ -25,11 +25,13 @@ Parrot house-style provided by C<Parrot::HTMLPage>.
 package Parrot::Docs::POD2HTML;
 
 use strict;
+use warnings;
 
 use Pod::Simple::HTML;
-@Parrot::Docs::POD2HTML::ISA = qw(Pod::Simple::HTML);
+our @ISA = qw(Pod::Simple::HTML);
+
 # This is just here to keep Pod::Simple::HTML's version_tag_comment() happy.
-$Parrot::Docs::POD2HTML::VERSION = '1.0';
+our $VERSION = '1.0';
 
 use Parrot::Docs::HTMLPage;
 
@@ -455,7 +457,7 @@ sub do_pod_link
     my $to = $link->attr('to');
     my $section = $link->attr('section');
     
-    return undef unless
+    return unless
         ( defined $to and length $to ) or
         ( defined $section and length $section );
     
@@ -463,7 +465,7 @@ sub do_pod_link
     {
         $to = $self->resolve_pod_page_link($to, $section);
         
-        return undef unless defined $to and length $to;
+        return unless defined $to and length $to;
     }
     
     if ( defined $section and length($section .= '') ) 
@@ -493,7 +495,7 @@ sub do_pod_link
     $out = $to if defined $to and length $to;
     $out .= "#" . $section if defined $section and length $section;
     
-    return undef unless length $out;
+    return unless length $out;
     
     return $out;  
 }
@@ -549,7 +551,7 @@ sub href_for_perl_module
     my $dist = Parrot::Distribution->new;
     my $file = $dist->file_for_perl_module($module);
     
-    return undef if not $file or not $file->contains_pod;
+    return if not $file or not $file->contains_pod;
     
     my $path = $self->append_html_suffix($dist->relative_path($file));
     
@@ -557,7 +559,7 @@ sub href_for_perl_module
     $file = $self->{TARGET}->file_with_relative_path($path);
     
     # There's no point in linking to the file you are already in.
-    return undef if $file == $self->{DOCS_FILE};
+    return if $file == $self->{DOCS_FILE};
     
     return $self->href_path($self->{DOCS_FILE}->parent->relative_path($file));
 }
