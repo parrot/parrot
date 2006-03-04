@@ -59,21 +59,20 @@ sub new {
 sub _write_a_file($$$) {
     my ($generator, $h_name, $c_name) = @_;
     my $opt = $generator->{opt};
-    local (*H, *C);
 
     print Data::Dumper->Dump([$generator]) if $opt->{debug} > 1;
     my $cout = $generator->gen_c($c_name);
     print $cout if $opt->{debug};
     print "Writing $c_name\n" if $opt->{verbose};
-    open C, ">$c_name" or die "Can't write '$c_name";
-    print C $cout;
-    close C;
+    open my $C, '>', $c_name or die "Can't write '$c_name";
+    print $C $cout;
+    close $C;
     my $hout = $generator->gen_h($h_name);
     print $hout if $opt->{debug};
     print "Writing $h_name\n" if $opt->{verbose};
-    open H, ">$h_name" or die "Can't write '$h_name";
-    print H $hout;
-    close H;
+    open my $H, '>', $h_name or die "Can't write '$h_name";
+    print $H $hout;
+    close $H;
 }
 
 =item C<write_all_files()>

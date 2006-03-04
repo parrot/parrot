@@ -1,4 +1,4 @@
-# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2001-2006 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 =head1 NAME
@@ -110,7 +110,7 @@ not included in the checksum.
 sub file_checksum
 {
     my ($filename, $ignorePattern) = @_;
-    open(my $file, "< $filename") or die "Can't open $filename: $!";
+    open(my $file, '<', $filename) or die "Can't open $filename: $!";
     my $sum = 0;
     while (<$file>) {
         next if defined($ignorePattern) && /$ignorePattern/;
@@ -176,11 +176,9 @@ sub genfile
 {
     my ($source, $target, %options) = @_;
 
-    open(my $in, "< $source") or die "Can't open $source: $!";
+    open my $in, '<', $source or die "Can't open $source: $!";
 
-    # don't change the name of the outfile handle
-    # feature.pl / feature_h.in need OUT
-    open(my $out, "> $target.tmp") or die "Can't open $target.tmp: $!";
+    open my $out, '>', "$target.tmp" or die "Can't open $target.tmp: $!";
 
     if ($options{commentType}) {
         my @comment = (
@@ -211,9 +209,10 @@ sub genfile
         # everything after the line starting with #perl is eval'ed
         if ($line =~ /^#perl/ && $options{feature_file}) {
             # OUT was/is used at the output filehandle in eval'ed scripts
+            # e.g. feature.pl or feature_h.in 
             local *OUT = $out;
             my $text = do {local $/; <$in>};
-           # interoplate @foo@ values
+            # interoplate @foo@ values
             $text =~ s{ \@ (\w+) \@ }{\$conf->data->get("$1")}gx;
             eval $text;
             die $@ if $@;
@@ -508,7 +507,7 @@ sub _slurp
 {
     my $filename = shift;
 
-    open(my $fh, $filename) or die "Can't open $filename: $!";
+    open(my $fh, '<', $filename) or die "Can't open $filename: $!";
     my $text = do {local $/; <$fh>};
     close($fh) or die "Can't close $filename: $!";
 

@@ -160,10 +160,11 @@ The list of these ignore files can be set up with:
 
     svn propedit svn:ignore <PATH>
 
-In order to keep the two different checks synchronized, the MANIFEST.SKIP file
-should be regenerated with:
+In order to keep the two different checks synchronized, 
+the MANIFEST and MANIFEST.SKIP file should be regenerated with:
 
-    perl tools/dev/gen_manifest_skip.pl > MANIFEST.SKIP
+    perl tools/dev/mk_manifest_and_skip.pl
+
 
 =head1 How To Submit Something New
 

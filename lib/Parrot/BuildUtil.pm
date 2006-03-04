@@ -38,21 +38,19 @@ sub parrot_version
     }
 
     # Obtain the official version number from the VERSION file.
-    open VERSION, "<VERSION" or die "Could not open VERSION file!";
-    $parrot_version = <VERSION>;
-    close VERSION;
+    open my $VERSION, '<', 'VERSION' or die "Could not open VERSION file!";
+    $parrot_version = <$VERSION>;
+    close $VERSION;
 
     chomp $parrot_version;
     $parrot_version =~ s/\s+//g;
     @parrot_version = split(/\./, $parrot_version);
 
-    if ( scalar(@parrot_version) < 3 )
-    {
+    if ( scalar(@parrot_version) < 3 ) {
         die "Too few components to VERSION file contents: '$parrot_version' (should be 3 or 4)!"
     }
 
-    if ( scalar(@parrot_version) > 4 )
-    {
+    if ( scalar(@parrot_version) > 4 ) {
         die "Too many components to VERSION file contents: '$parrot_version' (should be 3 or 4)!"
     }
 
@@ -65,6 +63,7 @@ sub parrot_version
         $#parrot_version = 3;
     }
     $parrot_version = join('.', @parrot_version);
+
     return wantarray ? @parrot_version : $parrot_version;
 }
 

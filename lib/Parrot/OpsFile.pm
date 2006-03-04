@@ -1,5 +1,5 @@
 #! perl -w
-# Copyright: 2001-2004 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2001-2006 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 =head1 NAME
@@ -150,9 +150,10 @@ parentheses and add a space around the argument, like so:
 
 =cut
 
-use strict;
-
 package Parrot::OpsFile;
+
+use strict;
+use warnings;
 
 use Parrot::Op;
 use Parrot::Config;
@@ -164,13 +165,11 @@ BEGIN {
     @EXPORT = qw(%op_body);
 };
 
-#
-# trim()
+# private sub  _trim()
 #
 # Trim leading and trailing spaces.
-#
 
-sub trim
+sub _trim
 {
     my $value = shift;
 
@@ -219,19 +218,19 @@ Reads in the specified .ops file, gathering information about the ops.
 sub read_ops
 {
     my ($self, $file, $nolines) = @_;
+
     my $ops_file = "src/" . $file;
 
-    open OPS, $file or die "Could not open ops file '$file' ($!)!";
 
     die "Parrot::OpFunc::init(): No file specified!\n" unless defined $file;
 
-    $self->{FILE} .= $file.', ';
+    $self->{FILE} .= $file . ', ';
 
     my $orig = $file;
 
-    open OPS, $file or die "Can't open $file, $!/$^E";
+    open my $OPS, '<', $file or die "Can't open $file, $!/$^E";
 
-    if (! ($file =~ s/\.ops$/.c/))
+    if ( ! ($file =~ s/\.ops$/.c/) )
     {
         $file .= ".c";
     }
@@ -254,7 +253,7 @@ sub read_ops
     my $flags;
     my @labels;
 
-    while (<OPS>)
+    while (<$OPS>)
     {
         $seen_pod = 1 if m|^=|;
 
@@ -329,8 +328,8 @@ sub read_ops
 
             $type       = defined($1) ? 'inline' : 'function';
             $short_name = $2;
-            $args       = trim(lc $3);
-            $flags      = $4 ? trim(lc $4) : "";
+            $args       = _trim(lc $3);
+            $flags      = $4 ? _trim(lc $4) : "";
             @args       = split(/\s*,\s*/, $args);
             @argdirs    = ();
             @labels     = ();
@@ -439,7 +438,7 @@ sub read_ops
         die "Parrot::OpsFile: File ended with incomplete op definition!\n";
     }
 
-    close OPS or die "Could not close ops file '$file' ($!)!";
+    close $OPS or die "Could not close ops file '$file' ($!)!";
 
     return;
 }
@@ -800,6 +799,3 @@ sub push_op
 =cut
 
 1;
-
-
-
