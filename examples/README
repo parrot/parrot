@@ -24,14 +24,14 @@ pasm       - Examples in Parrot Assembler, PASM
 
 past       - Examples in Leo's Parrot Abstract Syntax Tree, PAST
 
-pge       - Parrot grammar engine
+pge        - Parrot grammar engine
 
-pir       - Examples in Parrot Intermediat Representation, PIR
+pir        - Examples in Parrot Intermediate Representation, PIR
 
-sdl       - SDL
+sdl        - SDL
 
-shootout  - PIR for the great computer languages shootout at http://shootout.alioth.debian.org/
+shootout   - PIR for the great computer languages shootout at http://shootout.alioth.debian.org/
 
-streams   - Examples for the streams library
+streams    - Examples for the streams library
 
-subs      - calling subroutines in PIR and PASM
+subs       - calling subroutines in PIR and PASM
