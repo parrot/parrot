@@ -411,6 +411,18 @@ Parrot_find_pad(Interp* interpreter, STRING *lex_name, parrot_context_t *ctx)
             if (VTABLE_exists_keyed_str(interpreter, lex_pad, lex_name))
                 return lex_pad;
         }
+#if CTX_LEAK_DEBUG
+        if (outer == ctx) {
+            /* This is a bug; a context can never be its own :outer context.
+             * Detecting it avoids an unbounded loop, which is difficult to
+             * debug, though we'd rather not pay the cost of detection in a
+             * production release.
+             */
+            real_exception(interpreter, NULL, INVALID_OPERATION,
+                           "Bug:  Context %p :outer points back to itself.",
+                           ctx);
+        }
+#endif
         ctx = outer;
     }
     return NULL;

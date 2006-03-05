@@ -528,7 +528,9 @@ op get_params(inconst PMC) {
 	PObj_get_FLAGS(ccont) &= ~SUB_FLAG_TAILCALL;
 	--ctx->recursion_depth;
 	ctx->caller_ctx = caller_ctx->caller_ctx;
-	Parrot_free_context(interpreter, caller_ctx, 1);
+	/* ordinarily, this will free the context immediately, but not if the
+	   sub created a closure (or continuation, or . . .).  */
+	Parrot_free_context(interpreter, caller_ctx, 0);
         interpreter->current_args = NULL;
     }
     goto ADDRESS(pc);

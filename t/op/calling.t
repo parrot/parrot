@@ -1640,6 +1640,72 @@ ok 1
 ok 2
 OUTPUT
 
+pir_output_is(<<'CODE', <<'OUTPUT', "newclosure followed by tailcall");
+## regression test for newclosure followed by tailcall, which used to recycle
+## the context too soon.  it looks awful because (a) the original version was
+## produced by a compiler, and (b) in order to detect regression, we must force
+## parrot to reuse the context, which seems to requires having other calls that
+## use particular numbers of registers (and probably a fair amount of luck).
+.sub _main :main
+	## debug 0x80
+	.lex "MAIN-CONT", $P41
+	$I42 = 10
+	$P41 = new .Continuation
+	set_addr $P41, L2
+	goto L3
+L2:
+	get_results '(0)', $P45
+	print "got "
+	print $P45
+	print ".\n"
+	.return ()
+L3:
+	.const .Sub $P49 = "___internal_main_test_"
+	newclosure $P48, $P49
+	.return _try_it($I42, $P48)
+.end
+
+.sub ___internal_main_test_ :outer('_main')
+	.param pmc arg1
+	print "[in test]\n"
+	find_lex $P41, "MAIN-CONT"
+	$P55 = new "Undef"
+	if arg1 != 3 goto L3
+	$P58 = arg1
+	$P59 = arg1
+	$P57 = n_mul $P58, $P59
+	set_args '(0)', $P57
+	tailcall $P41
+L3:
+	print "not "
+	print arg1
+	print "\n"
+.end
+
+
+.sub _try_it
+	.param int n
+	.param pmc closure
+	$P42 = new "Undef"
+	$P42 = 0
+	goto L4
+L2:
+	closure($P42)
+	$P42 = $P42 + 1
+L4:
+	if $P42 < n goto L2
+.end
+CODE
+[in test]
+not 0
+[in test]
+not 1
+[in test]
+not 2
+[in test]
+got 9.
+OUTPUT
+
 pir_output_is(<<'CODE', <<'OUTPUT', "call evaled vtable code");
 .sub main :main
     .local string s
@@ -2214,6 +2280,7 @@ pir_output_like(<<'CODE', <<'OUTPUT', "argc mismatch - duplicate named");
 CODE
 /duplicate name/
 OUTPUT
+
 ## remember to change the number of tests :-)
-BEGIN { plan tests => 87 }
+BEGIN { plan tests => 88 }
 
