@@ -953,15 +953,19 @@ jit_set_returns_pc(Parrot_jit_info_t *jit_info, Interp * interpreter,
     }
 }
 
+static int jit_save_regs_call(Parrot_jit_info_t *, Interp * , int skip);
+
 static void
 jit_set_args_pc(Parrot_jit_info_t *jit_info, Interp * interpreter, 
         int recursive)
 {
-    PMC *sig_args, *sig_params;
+    PMC *sig_args, *sig_params, *sig_result;
     INTVAL *sig_bits, sig, i, n;
     struct PackFile_Constant ** constants;
-    opcode_t *params;
+    opcode_t *params, *result;
     char params_map;
+    int skip, used_n;
+    const jit_arch_regs *reg_info;
 
     if (!recursive) {
         /* create args array */
@@ -977,6 +981,20 @@ jit_set_args_pc(Parrot_jit_info_t *jit_info, Interp * interpreter,
     ASSERT_SIG_PMC(sig_params);
     sig_bits = SIG_ARRAY(sig_args);
     n = SIG_ELEMS(sig_args);  
+    /*
+     * preserve registers - need get_results, because we skip the 
+     * return value
+     */
+    result = CUR_OPCODE + 2 + n + 3; /* set_args, set_p_pc */
+    assert(*result == PARROT_OP_get_results_pc);
+    sig_result = constants[result[1]]->u.key;
+    ASSERT_SIG_PMC(sig_result);
+
+    if (!SIG_ELEMS(sig_result))
+        skip = -1;
+    else 
+        skip = MAP(2 + n + 3 + 2);
+    used_n = jit_save_regs_call(jit_info, interpreter, skip);
     for (i = 0; i < n; ++i) {
         sig = sig_bits[i];
         /* move args to params regs */
@@ -1002,7 +1020,7 @@ jit_set_args_pc(Parrot_jit_info_t *jit_info, Interp * interpreter,
  * b) all used register around a call (skip >= 0 := return result
  *    TODO save N regs for b) too
  */
-static void 
+static int
 jit_save_regs_call(Parrot_jit_info_t *jit_info, Interp * interpreter, int skip)
 {
     int i, used_i, save_i;
@@ -1021,6 +1039,7 @@ jit_save_regs_call(Parrot_jit_info_t *jit_info, Interp * interpreter, int skip)
         jit_emit_stw(jit_info->native_ptr, reg_info->map_I[i], 24 + i*4, r1);
     }
     /* preserve link register */
+    return 0;  /* TODO N regs */
 }
 
 static void 

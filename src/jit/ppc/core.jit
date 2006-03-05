@@ -1278,8 +1278,6 @@ Parrot_pic_callr___pc {
 	skip = -1;
     else 
 	skip = MAP(2);      /* skip result - save rest */
-    /* XXX TODO move to set_args */
-    jit_save_regs_call(jit_info, interpreter, skip);
 
     here = NATIVECODE - jit_info->arena.start;
     offset -= here;
