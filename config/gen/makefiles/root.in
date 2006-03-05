@@ -92,6 +92,7 @@ TOUCH      = @touch@
 YACC       = @yacc@
 LEX        = @lex@
 MKDIR      = @mkdir@
+AS         = @as@
 CC         = @cc@
 CC_INC     = @cc_inc@
 C_LIBS     = @libs@
