@@ -4,6 +4,7 @@
 package init::hints::openbsd;
 
 use strict;
+use Config;
 
 sub runstep
 {
