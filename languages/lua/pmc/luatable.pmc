@@ -426,7 +426,6 @@ MMD_DEFAULT: {
 
 =item C<PMC* len()>
 
-
 =cut
 
 */
@@ -460,8 +459,6 @@ MMD_DEFAULT: {
     }
 
 /*
-
-=back
 
 =item C<PMC* rawget (PMC* key)>
 
