@@ -313,6 +313,30 @@ inline op pow(out NUM, in NUM, in INT) :base_core {
     goto NEXT();
 }
 
+=item B<new>(out PMC, inconst STR, in PMC)
+
+Create a new PMC of class $2;
+
+ new P0, "Foo", P1
+
+The PMC in $3 is passed to the constructor. It's up to the class what to do
+with the intializer.
+
+=cut
+
+op new(out PMC, in STR, in PMC) {
+	STRING *class = $2;
+	INTVAL type = pmc_type(interpreter, class);
+	if (!type) {
+		Parrot_autoload_class(interpreter, class);
+		type = pmc_type(interpreter, class);
+	}
+	if (type <= 0)
+		real_exception(interpreter, NULL, NO_CLASS,
+				"Class '%Ss' not found", class);
+	$1 = pmc_new_init(interpreter, type, $3);
+	goto NEXT();
+}
 
 =back
 
