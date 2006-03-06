@@ -358,8 +358,6 @@ op read(out STR, in PMC, in INT) :base_io {
 Read a line up to EOL from filehandle $2.
 This switches the filehandle to linebuffer-mode.
 
-If for some reason the line's longer than 64K you get only 64K
-
 =cut
 
 inline op readline(out STR, in PMC) :base_io {
