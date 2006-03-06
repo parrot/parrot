@@ -37,7 +37,7 @@ sub runstep
     my $ccflags   = $conf->data->get('ccflags');
     if ($^O =~ /mswin32/i) {
         if ($cc =~ /^gcc/i) {
-            $conf->data->add(' ', libs => '-lreadline');
+            $conf->data->add(' ', libs => '-lreadline -lgw32c -lole32 -luuid -lwsock32 -lmsvcp60');
         } else {
             $conf->data->add(' ', libs => 'readline.lib');
         }

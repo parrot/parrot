@@ -85,6 +85,9 @@ L<http://developer.berlios.de/projects/win32gmp/>
 B<pcre> - Perl-Compatible Regular Expression library 
 L<http://gnuwin32.sourceforge.net/>
 
+B<readline> - edit command lines
+L<http://gnuwin32.sourceforge.net/>
+
 =item Optional utilities
 
 The availability of these utilities is checked by Configure.pl.
