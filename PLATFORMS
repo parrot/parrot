@@ -26,6 +26,7 @@ linux-x86-gcc3.3.3           Y    Y    Y     Y   Y   Y    Y     Y  20051001
 linux-x86-gcc3.3.3 *3        Y    Y    Y     Y   Y   Y    Y*3
 linux-x86-gcc3.3.5.2005013   Y    Y    Y     Y   Y   Y    Y        20060222
 linux-x86-gcc4.0.3           Y    Y    Y     Y   Y   Y    Y     Y  20051204
+linux-x86-gcc4.1.0           Y    Y    Y     Y   Y   Y    Y     Y  20060306
 linux-x86-icc8               Y    Y    Y     Y   Y   Y    Y
 linux-x86_64-gcc3.3.3    8   Y    -    -     Y   Y   Y    Y
 linux-x86_64-gcc3.4.2    8   Y    -    -     Y   Y   Y    Y        200505
