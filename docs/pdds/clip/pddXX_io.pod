@@ -1,0 +1,394 @@
+# Copyright: 2001-2006 The Perl Foundation.  All Rights Reserved.
+# $Id $
+
+=head1 NAME
+
+docs/pdds/pddXX_io.pod - Parrot I/O
+
+=head1 ABSTRACT
+
+Parrot's I/O subsystem.
+
+=head1 VERSION
+
+$Revision $
+
+=head1 SYNOPSIS
+
+    open P0, "data.txt", ">"
+    print P0, "sample data\n"
+    close P0
+
+    open P1, "data.txt", "<"
+    S0 = read P1, 12
+    P2 = getstderr
+    print P2, S0
+    close P1
+
+    ...
+
+=head1 DEFINITIONS
+
+A "stream" allows input or output operations on a source/destination
+such as a file, keyboard, or text console. Streams are also called
+"filehandles", though only some of them have anything to do with files.
+
+=head1 DESCRIPTION
+
+This is a draft document defining Parrot's I/O subsystem, for both
+streams and network I/O.
+
+=head2 I/O Stream Opcodes
+
+=head3 Opening and Closing Streams
+
+=over 4
+
+=item *
+
+C<open> opens a stream object based on a string path. It takes an
+optional string argument specifying the mode of the stream (read, write,
+append, read/write, etc.) [Some discussion of the syntax of the format
+strings may be relevant. Currently it uses Perl syntax, but a set of
+defined constants may fit better with Parrot's general architecture.]
+
+=item *
+
+C<close> closes a stream object.
+
+=back
+
+=head3 Retrieving Existing Streams
+
+=over 4
+
+=item *
+
+C<getstdin>, C<getstdout>, and C<getstderr> return a stream object for
+standard input, standard output, and standard error.
+
+=item *
+
+C<fdopen> converts an existing and already open UNIX integer file
+descriptor into a stream object. It also takes a string argument to
+specify the mode.
+
+=back
+
+=head3 Writing to Streams
+
+=over 4
+
+=item *
+
+C<print> writes an integer, float, string, or PMC value to a stream.  It
+writes to standard output by default, but optionally takes a PMC
+argument to select another stream to write to.
+
+=item *
+
+C<write> also writes to standard output and cannot select another
+stream. It only accepts a PMC value to write. [Is this redundant?]
+
+=item *
+
+C<printerr> writes an integer, float, string, or PMC value to standard
+error.
+
+=back
+
+=head3 Reading From Streams
+
+=over 4
+
+=item *
+
+C<read> retrieves a specified number of bytes from a stream into a
+string. [Note this is bytes, not codepoints.] By default it reads from
+standard input, but it also takes an alternate stream object source as
+an optional argument.
+
+=item *
+
+C<readline> retrieves a single line from a stream into a string. Calling
+C<readline> flags the stream as operating in line-buffer mode (see
+C<pioctl> below).  Lines are truncated at 64K.
+
+=item *
+
+C<peek> retrieves the next byte from a stream into a string, but doesn't
+remove it from the stream. By default it reads from standard input, but
+it also takes a stream object argument for an alternate source.
+
+=back
+
+=head3 Retrieving and Setting Stream Properties
+
+=over 4
+
+=item *
+
+C<seek> sets the current file position of a stream object to an integer
+byte offset from an integer starting position (0 for the start of the
+file, 1 for the current position, and 2 for the end of the file). 
+
+=item *
+
+C<tell> retrieves the current file position of a stream object.  It also
+has a 64-bit variant that returns the byte offset as two integers (one
+for the first 32 bits of the 64-bit offset, and one for the second 32
+bits).
+
+=item *
+
+C<getfd> retrieves the UNIX integer file descriptor of a stream object,
+or 0 if it doesn't have an integer file descriptor. [Maybe -1 would be a
+better code for "undefined", since standard input is 0.]
+
+=item *
+
+C<pioctl> provides low-level access to the attributes of a stream
+object. It takes a stream object, an integer flag to select a command,
+and a single integer argument for the command. It returns an integer
+indicating the success or failure of the command.
+
+The following constants are defined for the commands that C<pioctl> can
+execute:
+
+  0    PIOCTL_CMDRESERVED
+           No documentation available.
+  1    PIOCTL_CMDSETRECSEP
+           Set the record separator. [This doesn't actually work at the
+           moment.]
+  2    PIOCTL_CMDGETRECSEP
+           Get the record separator.
+  3    PIOCTL_CMDSETBUFTYPE
+           Set the buffer type.
+  4    PIOCTL_CMDGETBUFTYPE
+           Get the buffer type
+  5    PIOCTL_CMDSETBUFSIZE
+           Set the buffer size.
+  6    PIOCTL_CMDGETBUFSIZE
+           Get the buffer size.
+
+The following constants are defined as argument/return values for the
+buffer-type commands:
+
+  0    PIOCTL_NONBUF
+           Unbuffered I/O. Bytes are sent as soon as possible.
+  1    PIOCTL_LINEBUF
+	   Line buffered I/O. Bytes are sent when a newline is
+           encountered.
+  2    PIOCTL_BLKBUF
+	   Fully buffered I/O. Bytes are sent when the buffer is full.
+	   [Called "BLKBUF" because bytes are sent as a block, but line
+	   buffering also sends them as a block, so "FULBUF" might make
+           more sense.]
+
+=back
+
+=head2 File opcodes
+
+=over 4
+
+=item *
+
+C<stat> retrieves information about a file on the filesystem. It takes a
+string filename or an integer argument of a UNIX file descriptor, and an
+integer flag for the type of information requested. It returns an
+integer containing the requested information.  The following constants
+are defined for the type of information requested (see
+F<runtime/parrot/include/stat.pasm>):
+
+  0    STAT_EXISTS
+           Whether the file exists.
+  1    STAT_FILESIZE
+           The size of the file.
+  2    STAT_ISDIR
+           Whether the file is a directory.
+  3    STAT_ISDEV
+           Whether the file is a device such as a terminal or a disk.
+  4    STAT_CREATETIME
+           The time the file was created.
+           (Currently just returns -1.)
+  5    STAT_ACCESSTIME
+           The last time the file was accessed.
+  6    STAT_MODIFYTIME
+           The last time the file data was changed.
+  7    STAT_CHANGETIME
+           The last time the file metadata was changed.
+  8    STAT_BACKUPTIME
+	   The last time the file was backed up. 
+           (Currently just returns -1.)
+  9    STAT_UID
+           The user ID of the file.
+  10   STAT_GID
+           The group ID of the file.
+
+=back
+
+=head2 Network I/O Opcodes
+
+Most of these opcodes conform to the standard UNIX interface, but the
+layer API allows alternate implementations for each.
+
+[It's worth considering making all the network I/O opcodes use a
+consistent way of marking errors. At the moment, all return an integer
+status code except for C<socket>, C<sockaddr>, and C<accept>.]
+
+=over 4
+
+=item *
+
+C<socket> returns a new socket object from a given address family,
+socket type, and protocol number (all integers). The socket object's
+boolean value can be tested for whether the socket was created.
+
+=item *
+
+C<sockaddr> returns a string representing a socket address, generated
+from a port number (integer) and an address (string).
+
+=item *
+
+C<connect> connects a socket object to an address. It returns an integer
+indicating the status of the call, -1 if unsuccessful.
+
+=item *
+
+C<recv> receives a message from a connected socket object into a string.
+It returns an integer indicating the status of the call, -1 if
+unsuccessful.
+
+=item *
+
+C<send> sends a message string to a connected socket object. It returns
+an integer indicating the status of the call, -1 if unsuccessful.
+
+=item *
+
+C<poll> polls a socket object for particular types of events (an integer
+flag) at a frequency set by seconds and microseconds (the final two
+integer arguments). It returns an integer indicating the status of the
+call, -1 if unsuccessful. [See the system documentation for C<poll> to
+see the constants for event types and return status.]
+
+=item *
+
+C<bind> binds a socket object to the port and address specified by a
+string address (the packed result of C<sockaddr>). It returns an integer
+indicating the status of the call, -1 if unsuccessful.
+
+=item *
+
+C<listen> listens for a new connection on a socket object. The integer
+argument gives the maximum size of the queue for pending connections.
+It returns an integer indicating the status of the call, -1 if
+unsuccessful.
+
+=item *
+
+C<accept> accepts a new connection on a given socket object, and returns
+a newly created socket object for the connection. Returns NULL if
+unsuccessful.
+
+=back
+
+=head1 IMPLEMENTATION
+
+The Parrot I/O subsystem uses a per-interpreter stack to provide a
+layer-based approach to I/O. Each layer implements a subset of the
+C<ParrotIOLayerAPI> vtable. To find an I/O function, the layer stack is
+searched downwards until a non-NULL function pointer is found for
+that particular slot.
+
+[Below is an excerpt from "Perl 6 and Parrot Essentials", included to
+seed discussion. Note that while Parrot was originally specified as
+having asynchronous I/O, all current opcodes are synchronous I/O.]
+
+Parrot's base I/O system is fully asynchronous I/O with callbacks and
+per-request private data. Since this is massive overkill in many cases,
+we have a plain vanilla synchronous I/O layer that your programs can use
+if they don't need the extra power.
+
+Asynchronous I/O is conceptually pretty simple. Your program makes an
+I/O request. The system takes that request and returns control to your
+program, which keeps running. Meanwhile the system works on satisfying
+the I/O request. When the request is satisfied, the system notifies
+your program in some way. Since there can be multiple requests
+outstanding, and you can't be sure exactly what your program will be
+doing when a request is satisfied, programs that make use of
+asynchronous I/O can be complex.
+
+Synchronous I/O is even simpler. Your program makes a request to the
+system and then waits until that request is done. There can be only
+one request in process at a time, and you always know what you're
+doing (waiting) while the request is being processed. It makes your
+program much simpler, since you don't have to do any sort of
+coordination or synchronization.
+
+The big benefit of asynchronous I/O systems is that they generally
+have a much higher throughput than a synchronous system. They move
+data around much faster--in some cases three or four times faster.
+This is because the system can be busy moving data to or from disk
+while your program is busy processing data that it got from a previous
+request.
+
+For disk devices, having multiple outstanding requests--especially on
+a busy system--allows the system to order read and write requests to
+take better advantage of the underlying hardware. For example, many
+disk devices have built-in track buffers. No matter how small a
+request you make to the drive, it always reads a full track. With
+synchronous I/O, if your program makes two small requests to the same
+track, and they're separated by a request for some other data, the
+disk will have to read the full track twice. With asynchronous I/O, on
+the other hand, the disk may be able to read the track just once, and
+satisfy the second request from the track buffer.
+
+Parrot's I/O system revolves around a request. A request has three
+parts: a buffer for data, a completion routine, and a piece of data
+private to the request. Your program issues the request, then goes about
+its business. When the request is completed, Parrot will call the
+completion routine, passing it the request that just finished. The
+completion routine extracts out the buffer and the private data, and
+does whatever it needs to do to handle the request. If your request
+doesn't have a completion routine, then your program will have to
+explicitly check to see if the request was satisfied.
+
+Your program can choose to sleep and wait for the request to finish,
+essentially blocking. Parrot will continue to process events while
+your program is waiting, so it isn't completely unresponsive. This is
+how Parrot implements synchronous I/O--it issues the asynchronous
+request, then immediately waits for that request to complete.
+
+The reason we made Parrot's I/O system asynchronous by default was
+sheer pragmatism. Network I/O is all asynchronous, as is GUI
+programming, so we knew we had to deal with asynchrony in some form.
+It's also far easier to make an asynchronous system pretend to be
+synchronous than it is the other way around. We could have decided to
+treat GUI events, network I/O, and file I/O all separately, but there
+are plenty of systems around that demonstrate what a bad idea that is.
+
+=head1 ATTACHMENTS
+
+None.
+
+=head1 FOOTNOTES
+
+None.
+
+=head1 REFERENCES
+
+  src/io/io.c
+  src/ops/io.ops
+  include/parrot/io.h
+  runtime/parrot/library/Stream/*
+  src/io/io_unix.c
+  src/io/io_win32.c
+
+=cut
+
+__END__
+Local Variables:
+  fill-column:78
+End:
