@@ -47,22 +47,22 @@ typedef enum {
 
 /* &gen_from_enum(call_bits.pasm) */
 typedef enum {
-    /* 2 low bits are argument types */
-    PARROT_ARG_INTVAL           = 0x00,
-    PARROT_ARG_STRING           = 0x01,
-    PARROT_ARG_PMC              = 0x02,
-    PARROT_ARG_FLOATVAL         = 0x03,
-    PARROT_ARG_TYPE_MASK        = 0x03,
+    /* 4 low bits are argument types */
+    PARROT_ARG_INTVAL           = 0x000,
+    PARROT_ARG_STRING           = 0x001,
+    PARROT_ARG_PMC              = 0x002,
+    PARROT_ARG_FLOATVAL         = 0x003,
+    PARROT_ARG_TYPE_MASK        = 0x00f,
     /* argument meaning and conversion bits */
-    PARROT_ARG_CONSTANT         = 0x04,
+    PARROT_ARG_CONSTANT         = 0x010,
     /* bits a user has to define */
-    PARROT_ARG_FLATTEN          = 0x08,       /* .flatten_arg */
+    PARROT_ARG_FLATTEN          = 0x020,       /* .flatten_arg */
     PARROT_ARG_SLURPY_ARRAY     = PARROT_ARG_FLATTEN,  /* i.e. foldup  */
-    PARROT_ARG_MAYBE_FLATTEN    = 0x10, /* flatten, if slurping and the
+    PARROT_ARG_MAYBE_FLATTEN    = 0x040, /* flatten, if slurping and the
                                            argument is array */
-    PARROT_ARG_OPTIONAL         = 0x20,
-    PARROT_ARG_OPT_FLAG         = 0x40, /* prev optional was set */
-    PARROT_ARG_NAME             = 0x80  /* this String is an arg name */
+    PARROT_ARG_OPTIONAL         = 0x080,
+    PARROT_ARG_OPT_FLAG         = 0x100, /* prev optional was set */
+    PARROT_ARG_NAME             = 0x200  /* this String is an arg name */
     /* more to come soon */
 
 } Call_bits_enum_t;
