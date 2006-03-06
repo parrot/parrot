@@ -173,6 +173,39 @@ sub visitCallOp {
 	print $FH ")\n";
 }
 
+sub visitCallMethOp {
+	my $self = shift;
+	my ($op) = @_;
+	my $FH = $self->{fh};
+	print $FH "  ";
+	if (exists $op->{result} and scalar(@{$op->{result}})) {
+		print $FH "(";
+		my $first = 1;
+		foreach (@{$op->{result}}) {
+			print $FH ", " unless ($first);
+			print $FH "$_->{symbol}";
+			if (exists $_->{pragma} and $_->{pragma} eq "multi") {
+				print $FH " :slurpy";
+			}
+			$first = 0;
+		}
+		print $FH ") = ";
+	}
+	my @args = @{$op->{arg2}}; 
+	my $obj = shift @args; 
+	print $FH "$obj->{symbol}.$op->{arg1}(";
+	my $first = 1;
+	foreach (@args) {
+		print $FH ", " unless ($first);
+		print $FH "$_->{symbol}";
+		if (exists $_->{pragma} and $_->{pragma} eq "multi") {
+			print $FH " :flat";
+		}
+		$first = 0;
+	}
+	print $FH ")\n";
+}
+
 sub visitBranchIfOp {
 	my $self = shift;
 	my ($op) = @_;

@@ -580,6 +580,91 @@ MMD_DEFAULT: {
 
 /*
 
+=item C<PMC* modulus (PMC* value, PMC* dest)>
+
+=cut
+
+*/
+    PMC* modulus (PMC* value, PMC* dest) {
+MMD_LuaNumber: {
+            FLOATVAL a = DYNSELF.get_number();
+            FLOATVAL b = VTABLE_get_number(INTERP, value);
+
+            if (!dest)
+                dest = pmc_new(INTERP, SELF->vtable->base_type);
+            VTABLE_set_number_native(INTERP, dest, a - floor(a/b)*b);
+            return dest;
+        }
+MMD_LuaString: {
+            PMC* n = Parrot_LuaString_tonumber(INTERP, value);
+            if (VTABLE_isa(INTERP, n, const_string(INTERP, "LuaNumber"))) {
+                return Parrot_LuaNumber_modulus_LuaNumber(INTERP, SELF, n, dest);
+            } else {
+                real_exception(INTERP, NULL, ILL_INHERIT,
+                        "attempt to perform arithmetic on a %s value",
+                        string_to_cstring(INTERP, VTABLE_name(INTERP, value)));
+                return NULL;
+            }
+        }
+MMD_DEFAULT: {
+            PMC *metamethod = Parrot_LuaBase_find_metamethod(INTERP, value,
+                    string_from_const_cstring(INTERP, "__mod", 0));
+            if (metamethod != NULL) {
+                dest = Parrot_runops_fromc_args(INTERP, metamethod, "PPP", SELF, value);
+                if (NULL == dest) {
+                    dest = pmc_new(INTERP, dynpmc_LuaNil);
+                }
+                return dest;
+            }
+            real_exception(INTERP, NULL, ILL_INHERIT,
+                    "attempt to perform arithmetic on a %s value",
+                    string_to_cstring(INTERP, VTABLE_name(INTERP, value)));
+            return NULL;
+        }
+    }
+
+/*
+
+=item C<void i_modulus (PMC* value)>
+
+=cut
+
+*/
+    void i_modulus (PMC* value) {
+MMD_LuaNumber: {
+            FLOATVAL a = DYNSELF.get_number();
+            FLOATVAL b = VTABLE_get_number(INTERP, value);
+
+            VTABLE_set_number_native(INTERP, SELF, a - floor(a/b)*b);
+        }
+MMD_LuaString: {
+            PMC* n = Parrot_LuaString_tonumber(INTERP, value);
+            if (VTABLE_isa(INTERP, n, const_string(INTERP, "LuaNumber"))) {
+                Parrot_LuaNumber_i_modulus_LuaNumber(INTERP, SELF, n);
+            } else {
+                real_exception(INTERP, NULL, ILL_INHERIT,
+                        "attempt to perform arithmetic on a %s value",
+                        string_to_cstring(INTERP, VTABLE_name(INTERP, value)));
+            }
+        }
+MMD_DEFAULT: {
+            PMC *metamethod = Parrot_LuaBase_find_metamethod(INTERP, value,
+                    string_from_const_cstring(INTERP, "__mod", 0));
+            if (metamethod != NULL) {
+                SELF = Parrot_runops_fromc_args(INTERP, metamethod, "PPP", SELF, value);
+                if (NULL == SELF) {
+                    SELF = pmc_new(INTERP, dynpmc_LuaNil);
+                }
+                return;
+            }
+            real_exception(INTERP, NULL, ILL_INHERIT,
+                    "attempt to perform arithmetic on a %s value",
+                    string_to_cstring(INTERP, VTABLE_name(INTERP, value)));
+        }
+    }
+
+/*
+
 =item C<PMC* pow (PMC* value, PMC* dest)>
 
 =cut
@@ -587,12 +672,10 @@ MMD_DEFAULT: {
 */
     PMC* pow (PMC* value, PMC* dest) {
 MMD_LuaNumber: {
-            FLOATVAL d = VTABLE_get_number(INTERP, value);
-
             if (!dest)
                 dest = pmc_new(INTERP, SELF->vtable->base_type);
-            VTABLE_set_number_native(INTERP, dest,
-                    pow(DYNSELF.get_number(), d));
+            VTABLE_set_number_native(INTERP, dest, 
+                    pow(DYNSELF.get_number(), VTABLE_get_number(INTERP, value)));
             return dest;
         }
 MMD_LuaString: {
@@ -632,10 +715,8 @@ MMD_DEFAULT: {
 */
     void i_pow (PMC* value) {
 MMD_LuaNumber: {
-            FLOATVAL d = VTABLE_get_number(INTERP, value);
-
             VTABLE_set_number_native(INTERP, SELF,
-                    pow(DYNSELF.get_number(), d));
+                    pow(DYNSELF.get_number(), VTABLE_get_number(INTERP, value)));
         }
 MMD_LuaString: {
             PMC* n = Parrot_LuaString_tonumber(INTERP, value);

@@ -38,7 +38,7 @@ OUT
 language_output_like( 'lua', <<'CODE', <<'OUT', 'version' );
 print(_VERSION)
 CODE
-/Lua 5.0/
+/Lua 5\.[01]/
 OUT
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'factorial (recursive)' );

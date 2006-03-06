@@ -50,17 +50,17 @@ L1:
     .local pmc ret_start
     ret_start = start."tonumber"()
     if ret_start goto L1
-    error("`for' initial value must be a number")
+    error("'for' initial value must be a number")
 L1:    
     .local pmc ret_limit
     ret_limit = limit."tonumber"()
     if ret_limit goto L2
-    error("`for' limit must be a number")
+    error("'for' limit must be a number")
 L2:    
     .local pmc ret_step
     ret_step = step."tonumber"()
     if ret_step goto L3
-    error("`for' step must be a number")
+    error("'for' step must be a number")
 L3:    
     .return (ret_start, ret_limit, ret_step)
 .end
@@ -184,28 +184,7 @@ Support variable number of arguments function call.
 
 .sub mkarg
     .param pmc argv
-    .local pmc ret
-    .local pmc key
-    .local pmc curr
-    .local int argc
-    .local int i
-    new ret, .LuaTable
-    new key, .LuaNumber
-    key = 0
-    if_null argv, L2
-    argc = argv
-    i = 0
-L1:
-    if i >= argc goto L2
-    curr = argv[i]
-    inc i
-    key = i
-    ret[key] = curr
-    goto L1
-L2:
-    .const .LuaString n = "n"
-    ret[n] = key
-    .return (ret)
+    .return (argv :flat)
 .end
 
 

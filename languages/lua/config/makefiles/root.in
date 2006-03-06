@@ -63,8 +63,8 @@ $(LIBPATH)@slash@luaos.pbc: $(LIBPATH)@slash@luaos.pir
 $(LIBPATH)@slash@luapir.pbc: $(LIBPATH)@slash@luapir.pir
 	$(PARROT) --output=$(LIBPATH)@slash@luapir.pbc $(LIBPATH)@slash@luapir.pir
 
-Lua@slash@parser.pm: Lua@slash@lua50.yp
-	yapp -s -v -m Lua::parser -o Lua/parser.pm Lua/lua50.yp
+Lua@slash@parser.pm: Lua@slash@lua51.yp
+	yapp -s -v -m Lua::parser -o Lua/parser.pm Lua/lua51.yp
 
 test:
 	cd .. && $(PERL) -I../lib -Ilua/t lua/t/harness

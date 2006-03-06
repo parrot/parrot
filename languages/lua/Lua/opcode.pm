@@ -91,6 +91,9 @@ use base qw(Lua::opcode);
 package CallOp;
 use base qw(Lua::opcode);
 
+package CallMethOp;
+use base qw(Lua::opcode);
+
 package LabelOp;
 use base qw(Lua::opcode);
 

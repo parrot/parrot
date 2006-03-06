@@ -22,7 +22,7 @@ use strict;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 9;
+use Parrot::Test tests => 11;
 use Test::More;
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'add' );
@@ -136,7 +136,8 @@ OUT
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'var args' );
 local function g(a, b, ...)
-    print(a, b, arg.n, arg[1], arg[2]) 
+    local arg = {...}
+    print(a, b, #arg, arg[1], arg[2]) 
 end
 
 g(3)
@@ -146,6 +147,37 @@ CODE
 3	nil	0	nil	nil
 3	4	0	nil	nil
 3	4	2	5	8
+OUT
+
+
+language_output_is( 'lua', <<'CODE', <<'OUT', 'var args' );
+local function g(a, b, ...)
+    local c, d, e = ...
+    print(a, b, c, d, e) 
+end
+
+g(3)
+g(3, 4)
+g(3, 4, 5, 8)
+CODE
+3	nil	nil	nil	nil
+3	4	nil	nil	nil
+3	4	5	8	nil
+OUT
+
+
+language_output_is( 'lua', <<'CODE', <<'OUT', 'var args' );
+local function g(a, b, ...)
+    print(a, b, ...) 
+end
+
+g(3)
+g(3, 4)
+g(3, 4, 5, 8)
+CODE
+3	nil
+3	4
+3	4	5	8
 OUT
 
 

@@ -1,7 +1,7 @@
 
 %token	NAME
 /* Literal */
-%token	LITERAL
+%token	STRING
 %token	NUMBER
 /* Keyword */
 %token	AND
@@ -26,13 +26,13 @@
 %token	WHILE
 
 %nonassoc NONARG
-%nonassoc '(' '{' LITERAL
+%nonassoc '(' '{' STRING
 %left AND OR
 %left '==' '~=' '>' '<' '<=' '>='
 %left '..'
 %left '+' '-'
-%left '*' '/'
-%left NEG NOT
+%left '*' '/' '%'
+%left NEG '#' NOT
 %right '^'
 
 %expect 1
@@ -76,25 +76,10 @@ block
 			PopScope($_[0]);
 			$_[1];
 		}
-|	chunk	_end_block	_semicolon_opt
+|	chunk	laststat	_semicolon_opt
 		{
 			PopScope($_[0]);
 			[@{$_[1]}, @{$_[2]}];
-		}
-;
-
-_end_block
-:	RETURN	explist1
-		{
-			BuildReturn($_[0], $_[2]);
-		}
-|	RETURN
-		{
-			BuildReturn($_[0], []);
-		}
-|	BREAK
-		{
-			BuildBreak($_[0]);
 		}
 ;
 
@@ -228,6 +213,21 @@ _elseif_star
 		}
 ;
 
+laststat
+:	RETURN	explist1
+		{
+			BuildReturn($_[0], $_[2]);
+		}
+|	RETURN
+		{
+			BuildReturn($_[0], []);
+		}
+|	BREAK
+		{
+			BuildBreak($_[0]);
+		}
+;
+
 funcname
 :	_funcname
 		#default action
@@ -351,6 +351,10 @@ exp
 		{
 			BuildBinop($_[0], $_[1], $_[2], $_[3]);
 		}
+|	exp	'%'	exp
+		{
+			BuildBinop($_[0], $_[1], $_[2], $_[3]);
+		}
 |	exp	'..'	exp
 		{
 			BuildBinop($_[0], $_[1], $_[2], $_[3]);
@@ -391,6 +395,10 @@ exp
 		{
 			BuildUnop($_[0], $_[1], $_[2]);
 		}
+|	'#'	exp
+		{
+			BuildUnop($_[0], $_[1], $_[2]);
+		}
 |	NOT	exp
 		{
 			BuildUnop($_[0], $_[1], $_[2]);
@@ -414,9 +422,13 @@ primary
 		{
 			BuildLiteral($_[0], $_[1], 'number');
 		}
-|	LITERAL
+|	STRING
 		{
 			BuildLiteral($_[0], $_[1], 'string');
+		}
+|	'...'
+		{
+			BuildCallVararg($_[0]);
 		}
 |	function
 		#default action
@@ -472,7 +484,7 @@ args
 				$_[1]
 			]
 		}
-|	LITERAL
+|	STRING
 		{
 			[
 				BuildLiteral($_[0], $_[1], 'string')

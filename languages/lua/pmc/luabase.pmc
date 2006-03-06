@@ -170,6 +170,16 @@ Throws an exception.
 
 */
     void* invoke(void* next) {
+        PMC *metamethod = Parrot_LuaBase_find_metamethod(INTERP, SELF,
+                string_from_const_cstring(INTERP, "__call", 0));
+        if (metamethod != NULL) {
+            /* fix me */
+            PMC *retval = Parrot_runops_fromc_args(INTERP, metamethod, "PP", SELF);
+            if (NULL == retval) {
+                retval = pmc_new(INTERP, dynpmc_LuaNil);
+            }
+            return retval;
+        }
         real_exception(INTERP, NULL, ILL_INHERIT,
                 "attempt to call a %s value",
                 string_to_cstring(INTERP, DYNSELF.name()));
@@ -199,6 +209,10 @@ Throws an exception.
 =item C<void divide(PMC *value, PMC *dest)>
 
 =item C<void i_divide (PMC *value)>
+
+=item C<PMC* modulus (PMC* value, PMC* dest)>
+
+=item C<void i_modulus (PMC *value)>
 
 =item C<PMC* pow (PMC* value, PMC* dest)>
 
@@ -337,6 +351,37 @@ Throws an exception.
                 string_to_cstring(INTERP, DYNSELF.name()));
     }
 
+    PMC* modulus (PMC* value, PMC* dest) {
+        PMC *metamethod = Parrot_LuaBase_find_metamethod(INTERP, SELF,
+                string_from_const_cstring(INTERP, "__mod", 0));
+        if (metamethod != NULL) {
+            dest = Parrot_runops_fromc_args(INTERP, metamethod, "PPP", SELF, value);
+            if (NULL == dest) {
+                dest = pmc_new(INTERP, dynpmc_LuaNil);
+            }
+            return dest;
+        }
+        real_exception(INTERP, NULL, ILL_INHERIT,
+                "attempt to perform arithmetic on a %s value",
+                string_to_cstring(INTERP, DYNSELF.name()));
+        return NULL;
+    }
+
+    void i_modulus (PMC* value) {
+        PMC *metamethod = Parrot_LuaBase_find_metamethod(INTERP, SELF,
+                string_from_const_cstring(INTERP, "__mod", 0));
+        if (metamethod != NULL) {
+            SELF = Parrot_runops_fromc_args(INTERP, metamethod, "PPP", SELF, value);
+            if (NULL == SELF) {
+                SELF = pmc_new(INTERP, dynpmc_LuaNil);
+            }
+            return;
+        }
+        real_exception(INTERP, NULL, ILL_INHERIT,
+                "attempt to perform arithmetic on a %s value",
+                string_to_cstring(INTERP, DYNSELF.name()));
+    }
+
     PMC* pow (PMC* value, PMC* dest) {
         PMC *metamethod = Parrot_LuaBase_find_metamethod(INTERP, SELF,
                 string_from_const_cstring(INTERP, "__pow", 0));
@@ -406,6 +451,32 @@ Throws an exception.
 =head2 Specific Methods
 
 =over 4
+
+=item C<PMC* len()>
+
+
+=cut
+
+*/
+    METHOD PMC* len () {
+        PMC *retval;
+
+        PMC *metamethod = Parrot_LuaBase_find_metamethod(INTERP, SELF,
+                string_from_const_cstring(INTERP, "__len", 0));
+        if (metamethod != NULL) {
+            PMC *retval = Parrot_runops_fromc_args(INTERP, metamethod, "PP", SELF);
+            if (NULL == retval) {
+                retval = pmc_new(INTERP, dynpmc_LuaNil);
+            }
+            return retval;
+        }
+        real_exception(INTERP, NULL, ILL_INHERIT,
+                "attempt to get length of a %s value",
+                string_to_cstring(INTERP, VTABLE_name(INTERP, SELF)));
+        return NULL;
+    }
+
+/*
 
 =item C<PMC* tonumber()>
 

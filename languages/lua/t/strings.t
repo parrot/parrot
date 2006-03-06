@@ -18,7 +18,7 @@ use strict;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 46;
+use Parrot::Test tests => 51;
 use Test::More;
 
 language_output_is( 'lua', <<'CODE', <<'OUT', '- "1"' );
@@ -31,6 +31,12 @@ language_output_like( 'lua', <<'CODE', <<'OUT', '- "text"' );
 print(- "text")
 CODE
 /attempt to perform arithmetic on a string value/
+OUT
+
+language_output_is( 'lua', <<'CODE', <<'OUT', '# "text"' );
+print(# "text")
+CODE
+4
 OUT
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'not "text"' );
@@ -63,6 +69,12 @@ CODE
 -14
 OUT
 
+language_output_is( 'lua', <<'CODE', <<'OUT', '"-25" % 3' );
+print("-25" % 3)
+CODE
+2
+OUT
+
 language_output_is( 'lua', <<'CODE', <<'OUT', '"3" ^ 3' );
 print("3" ^ 3)
 CODE
@@ -91,6 +103,12 @@ language_output_like( 'lua', <<'CODE', <<'OUT', '"-7" / {}' );
 print("-7" / {})
 CODE
 /attempt to perform arithmetic on a table value/
+OUT
+
+language_output_like( 'lua', <<'CODE', <<'OUT', '"-25" % false' );
+print("-25" % false)
+CODE
+/attempt to perform arithmetic on a boolean value/
 OUT
 
 language_output_like( 'lua', <<'CODE', <<'OUT', '"3" ^ true' );
@@ -123,6 +141,12 @@ CODE
 /attempt to perform arithmetic on a string value/
 OUT
 
+language_output_like( 'lua', <<'CODE', <<'OUT', '"-25" % "text"' );
+print("-25" % "text")
+CODE
+/attempt to perform arithmetic on a string value/
+OUT
+
 language_output_like( 'lua', <<'CODE', <<'OUT', '"3" ^ "text"' );
 print("3" ^ "text")
 CODE
@@ -151,6 +175,12 @@ language_output_is( 'lua', <<'CODE', <<'OUT', '"-7" / "0.5"' );
 print("-7" / "0.5")
 CODE
 -14
+OUT
+
+language_output_is( 'lua', <<'CODE', <<'OUT', '"-25" % "3"' );
+print("-25" % "3")
+CODE
+2
 OUT
 
 language_output_is( 'lua', <<'CODE', <<'OUT', '"3" ^ "3"' );

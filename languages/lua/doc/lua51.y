@@ -1,7 +1,7 @@
 
 %token	NAME
 /* Literal */
-%token	LITERAL
+%token	STRING
 %token	NUMBER
 /* Keyword */
 %token	AND
@@ -26,13 +26,13 @@
 %token	WHILE
 
 %nonassoc NONARG
-%nonassoc '(' '{' LITERAL
+%nonassoc '(' '{' STRING
 %left AND OR
 %left '==' '~=' '>' '<' '<=' '>='
 %left '..'
 %left '+' '-'
-%left '*' '/'
-%left NEG NOT
+%left '*' '/' '%'
+%left NEG '#' NOT
 %right '^'
 
 %expect 1
@@ -53,13 +53,7 @@ _semicolon_opt
 
 block
 :	chunk
-|	chunk	_end_block	_semicolon_opt
-;
-
-_end_block
-:	RETURN	explist1
-|	RETURN
-|	BREAK
+|	chunk	laststat	_semicolon_opt
 ;
 
 stat
@@ -96,6 +90,12 @@ _elseif_star
 :	_elseif_star	ELSEIF	exp	THEN
 										block
 |	/* empty */
+;
+
+laststat
+:	RETURN	explist1
+|	RETURN
+|	BREAK
 ;
 
 funcname
@@ -144,6 +144,7 @@ exp
 |	exp	'*'	exp
 |	exp	'/'	exp
 |	exp	'^'	exp
+|	exp	'%'	exp
 |	exp	'..'	exp
 |	exp	'<'	exp
 |	exp	'<='	exp
@@ -154,6 +155,7 @@ exp
 |	exp	AND	exp
 |	exp	OR	exp
 |	'-'	exp	%prec	NEG
+|	'#'	exp
 |	NOT	exp
 ;
 
@@ -162,7 +164,8 @@ primary
 |	FALSE
 |	TRUE
 |	NUMBER
-|	LITERAL
+|	STRING
+|	'...'
 |	function
 |	tableconstructor
 |	'('	exp	')'
@@ -181,7 +184,7 @@ args
 :	'('	explist1	')'
 |	'('	')'
 |	tableconstructor
-|	LITERAL
+|	STRING
 ;
 
 function

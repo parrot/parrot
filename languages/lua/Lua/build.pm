@@ -398,6 +398,30 @@ sub BuildAssigns {
 	return \@opcodes1;
 }
 
+sub BuildCallVararg {
+	my ($parser) = @_;
+	my $result;
+	my @opcodes = ();
+	my $nil = BuildLiteral($parser, 'nil', 'nil');
+	push @opcodes, @{$nil->[1]};
+	$result = new_tmp($parser, "pmc");
+	push @opcodes, new LocalDir($parser,
+			'result'				=>	$result,
+	);
+	push @opcodes, new AssignOp($parser,
+			'result'				=>	$result,
+			'arg1'					=>	$nil->[0],
+	);
+	my $argv = new defn("vararg", "local", "pmc");
+	my $fct = new defn("mkarg", "util");
+	push @opcodes, new CallOp($parser,
+			'result'				=>	[$result],
+			'arg1'					=>	$fct,
+			'arg2'					=>	[$argv],
+	);
+	return [$result, \@opcodes];
+}
+
 sub BuildCallVariable {
 	my ($parser, $var) = @_;
 	my $result;
@@ -518,6 +542,7 @@ sub BuildUnop {
 	my ($parser, $op, $expr) = @_;
 	my %type = (
 		"-"		=> "number",
+		"#"		=> "number",
 		"not"	=> "boolean",
 	);
 	my %opcode = (
@@ -534,11 +559,19 @@ sub BuildUnop {
 			'result'				=>	$result,
 			'arg1'					=>	".Lua" . ucfirst($type{$op}),
 	);
-	push @opcodes, new UnaryOp($parser,
-			'op'					=>	$opcode{$op},
-			'arg1'					=>	$expr->[0],
-			'result'				=>	$result,
-	);
+	if ($op eq "#") {
+		push @opcodes, new CallMethOp($parser,
+				'result'				=>	[$result],
+				'arg1'					=>	"len",
+				'arg2'					=>	[$expr->[0]],
+		);
+	} else {
+		push @opcodes, new UnaryOp($parser,
+				'op'					=>	$opcode{$op},
+				'arg1'					=>	$expr->[0],
+				'result'				=>	$result,
+		);
+	}
 	return [$result, \@opcodes];
 }
 
@@ -550,6 +583,7 @@ sub BuildBinop {
 		"*"		=> "number",
 		"/"		=> "number",
 		"^"		=> "number",
+		"%"		=> "number",
 		".."	=> "string",
 	);
 	my %opcode = (
@@ -558,6 +592,7 @@ sub BuildBinop {
 		"*"		=> "mul",
 		"/"		=> "div",
 		"^"		=> "pow",
+		"%"		=> "mod",
 		".."	=> "concat",
 	);
 	my @opcodes = ();
@@ -802,24 +837,27 @@ sub BuildRepeat {
 sub BuildForNum {
 	my ($parser, $var, $e_start, $e_limit, $e_step, $block) = @_;
 	my @opcodes = ();
-	push @opcodes, @{$var->[1]};
 	unless (defined $e_step) {
 		$e_step = BuildLiteral($parser, 1, "number");
 	}
 	push @opcodes, @{$e_start->[1]};
 	push @opcodes, @{$e_limit->[1]};
 	push @opcodes, @{$e_step->[1]};
-	my $limit = new_tmp($parser, "pmc", "number");
+	my $_var = new_tmp($parser, "pmc", "number");
 	push @opcodes, new LocalDir($parser,
-			'result'				=>	$limit,
+			'result'				=>	$_var,
 	);
-	my $step = new_tmp($parser, "pmc", "number");
+	my $_limit = new_tmp($parser, "pmc", "number");
 	push @opcodes, new LocalDir($parser,
-			'result'				=>	$step,
+			'result'				=>	$_limit,
+	);
+	my $_step = new_tmp($parser, "pmc", "number");
+	push @opcodes, new LocalDir($parser,
+			'result'				=>	$_step,
 	);
 	my $fct = new defn("checkforloop", "util");
 	push @opcodes, new CallOp($parser,
-			'result'				=>	[ $var->[0], $limit, $step ],
+			'result'				=>	[ $_var, $_limit, $_step ],
 			'arg1'					=>	$fct,
 			'arg2'					=>	[ $e_start->[0], $e_limit->[0], $e_step->[0] ],
 	);
@@ -831,16 +869,16 @@ sub BuildForNum {
 	my $zero = BuildLiteral($_[0], 0, "number");
 	push @opcodes, @{$zero->[1]};
 	push @opcodes, new BranchUnlessOp($parser,
-			'arg1'					=>	$step,
+			'arg1'					=>	$_step,
 			'op'					=>	">",
 			'arg2'					=>	$zero->[0],
 			'result'				=>	$lbl_or,
 	);
 	my $lbl_end = new_label($parser);
 	push @opcodes, new BranchUnlessOp($parser,
-			'arg1'					=>	$var->[0],
+			'arg1'					=>	$_var,
 			'op'					=>	"<=",
-			'arg2'					=>	$limit,
+			'arg2'					=>	$_limit,
 			'result'				=>	$lbl_end,
 	);
 	my $lbl_blk = new_label($parser);
@@ -851,13 +889,18 @@ sub BuildForNum {
 			'arg1'					=>	$lbl_or,
 	);
 	push @opcodes, new BranchUnlessOp($parser,
-			'arg1'					=>	$var->[0],
+			'arg1'					=>	$_var,
 			'op'					=>	">=",
-			'arg2'					=>	$limit,
+			'arg2'					=>	$_limit,
 			'result'				=>	$lbl_end,
 	);
 	push @opcodes, new LabelOp($parser,
 			'arg1'					=>	$lbl_blk,
+	);
+	push @opcodes, @{$var->[1]};
+	push @opcodes, new AssignOp($parser,
+			'result'				=>	$var->[0],
+			'arg1'					=>	$_var,
 	);
 	foreach my $op (@{$block}) {
 		if ($op and $op->isa('BranchOp')) {
@@ -869,9 +912,9 @@ sub BuildForNum {
 	push @opcodes, @{$block};
 	push @opcodes, new BinaryOp($parser,
 			'op'					=>	"add",
-			'arg1'					=>	$var->[0],
-			'arg2'					=>	$step,
-			'result'				=>	$var->[0],
+			'arg1'					=>	$_var,
+			'arg2'					=>	$_step,
+			'result'				=>	$_var,
 	);
 	push @opcodes, new BranchOp($parser,
 			'result'				=>	$lbl_loop,
@@ -888,14 +931,12 @@ sub BuildForList {
 	my @opcodes2 = ();
 	my @opcodes3 = ();
 	my @params1 = ();
-	my @params2 = ();
 	my @return1 = ();
-	my @return2 = ();
 	my $var1 = ${$vars}[0];
 	my $nil = BuildLiteral($parser, "nil", "nil");
 	push @opcodes1, @{$nil->[1]};
-	for my $var (@{$vars}) {
-		push @opcodes1, @{$var->[1]};
+	for (@{$vars}) {
+		push @opcodes1, @{$_->[1]};
 	}
 	my $expr = shift @{$exprs};
 	my $iter = new_tmp($parser, "pmc");
@@ -938,39 +979,45 @@ sub BuildForList {
 		);
 		$expr = shift @{$exprs};
 	}
+	my $var = new_tmp($parser, "pmc");
+	push @opcodes1, new LocalDir($parser,
+			'result'				=>	$var,
+	);
 	if (        scalar(@{$exprs}) == 0
 			and scalar(@{$expr->[1]}) != 0 
 			and ${$expr->[1]}[-1]->isa("CallOp") ) {
-		my $callop = ${$expr->[1]}[-1];
-		unshift @{$callop->{result}}, @return1;
-		push @opcodes2, @{$expr->[1]};
-		push @opcodes2, new AssignOp($parser,
-				'result'				=>	$var1->[0],
-				'arg1'					=>	${$callop->{result}}[-1],
+		push @opcodes1, new AssignOp($parser,
+				'result'				=>	$var,
+				'arg1'					=>	$nil->[0],
 		);
+		push @return1, $var;
 	} else {
 		push @opcodes2, @{$expr->[1]};
-		my $assign = $var1->[2];
-		if ($assign->isa("AssignOp")) {
-			$assign->configure(
-					'arg1'					=>	$expr->[0],
-			);
-		} else {
-			$assign->configure(
-					'arg2'					=>	$expr->[0],
-			);
-		}
-		push @opcodes3, $assign;
+		push @opcodes3, new AssignOp($parser,
+				'result'				=>	$var,
+				'arg1'					=>	$expr->[0],
+		);
+		$expr = shift @{$exprs};
+	}
+	if (        scalar(@{$exprs}) == 0
+			and scalar(@{$expr->[1]}) != 0 
+			and ${$expr->[1]}[-1]->isa("CallOp") ) {
+		push @opcodes2, @{$expr->[1]};
+		my $callop = pop @opcodes2;
+		my $ass = pop @opcodes2;
+		my $decl = pop @opcodes2;
+		$callop->{result} = \@return1;
+		push @opcodes2, $callop;
 	}
 	push @opcodes1, @opcodes2, @opcodes3;
 	my $lbl_loop = new_label($parser);
 	push @opcodes1, new LabelOp($parser,
 			'arg1'					=>	$lbl_loop,
 	);
-	push @params2, $state;
-	push @params2, $var1->[0];
+	my @params2 = ($state, $var);
+	my @return2 = ();
 	@opcodes2 = ();
-	for my $var (@{$vars}) {
+	for (@{$vars}) {
 		my $result = new_tmp($parser, "pmc");
 		push @opcodes1, new LocalDir($parser,
 				'result'				=>	$result,
@@ -981,7 +1028,7 @@ sub BuildForList {
 		);                                  
 		push @return2, $result;
 		push @opcodes2, new AssignOp($parser,
-				'result'				=>	$var->[0],
+				'result'				=>	$_->[0],
 				'arg1'					=>	$result,
 		);
 	}
@@ -991,11 +1038,15 @@ sub BuildForList {
 			'arg2'					=>	\@params2,
 	);
 	push @opcodes1, @opcodes2;
+	push @opcodes1, new AssignOp($parser,
+			'result'				=>	$var,
+			'arg1'					=>	$var1->[0],
+	);                                  
 	my $lbl_end = new_label($parser);
 	push @opcodes1, new BranchIfOp($parser,
 			'arg1'					=>	$nil->[0],
 			'op'					=>	"==",
-			'arg2'					=>	$var1->[0],
+			'arg2'					=>	$var,
 			'result'				=>	$lbl_end,
 	);
 	foreach my $op (@{$block}) {
@@ -1048,34 +1099,15 @@ sub  BuildParam {
 	my @opcodes1 = ();
 	my @opcodes2 = ();
 	my $defn;
-	my $name;
 	if ($idf eq "...") {
-		my $argv = new defn("argv", "local", "pmc");
+		$defn = new defn("vararg", "local", "pmc");
 		push @opcodes1, new ParamDir($parser,
 				'prolog'				=>	1,
-				'result'				=>	$argv,
+				'result'				=>	$defn,
 				'pragma'				=>	":slurpy",
 		);
-		$name = "var_arg";
-		$defn = new defn($name, "local", "pmc", undef, "arg");
-		push @opcodes1, new LocalDir($parser,
-				'prolog'				=>	1,
-				'result'				=>	$defn,
-		);
-		push @opcodes1, new LexDir($parser,
-				'prolog'				=>	1,
-				'result'				=>	$name,
-				'arg1'					=>	$defn,
-		);
-		my $fct = new defn("mkarg", "util");
-		push @opcodes1, new CallOp($parser,
-				'prolog'				=>	1,
-				'result'				=>	[$defn],
-				'arg1'					=>	$fct,
-				'arg2'					=>	[$argv],
-		);
 	} else {
-		$name = "var_" . scalar(@{$parser->YYData->{scope}}) . "_" . $idf;
+		my $name = "var_" . scalar(@{$parser->YYData->{scope}}) . "_" . $idf;
 		$defn = new defn($name, "local", "pmc", undef, $idf);
 		push @opcodes1, new ParamDir($parser,
 				'prolog'				=>	1,
@@ -1103,8 +1135,8 @@ sub  BuildParam {
 				'prolog'				=>	1,
 				'arg1'					=>	$lbl,
 		);
+		$parser->YYData->{symbtab}->Insert($defn);
 	}
-	$parser->YYData->{symbtab}->Insert($defn);
 	return [$defn, \@opcodes1, \@opcodes2];
 }
 
@@ -1131,7 +1163,7 @@ sub BuildFunctionBody {
 		push @opcodes2, @{$param->[1]};
 	}
 	if (        scalar(@{$params}) != 0 
-			and !${${${$params}[-1]}[1]}[-1]->isa("CallOp") ) {
+			and !exists ${${${$params}[-1]}[1]}[-1]->{pragma} ) {
 		my $extra = new defn("extra", "local", "pmc");
 		push @opcodes2, new ParamDir($parser,
 				'prolog'				=>	1,

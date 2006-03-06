@@ -75,6 +75,7 @@ text
 OUT
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'logical op' );
+print(10 or 20)
 print(10 or error())
 print(nil or "a")
 print(nil and 10)
@@ -83,6 +84,7 @@ print(false and nil)
 print(false or nil)
 print(10 and 20)
 CODE
+10
 10
 a
 nil

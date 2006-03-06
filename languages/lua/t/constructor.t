@@ -29,8 +29,10 @@ language_output_is( 'lua', <<'CODE', <<'OUT', 'list-style init' );
 days = {"Sunday", "Monday", "Tuesday", "Wednesday",
         "Thursday", "Friday", "Saturday"}
 print(days[4])
+print(#days)
 CODE
 Wednesday
+7
 OUT
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'record-style init' );

@@ -50,6 +50,13 @@ pmclass LuaString
             /* namespace hack */
             meth = Parrot_find_global(INTERP,
                 const_string(INTERP, "LuaString"),
+                const_string(INTERP, "len"));
+            Parrot_store_global(INTERP,
+                const_string(INTERP, "string"),
+                const_string(INTERP, "len"),
+                meth);
+            meth = Parrot_find_global(INTERP,
+                const_string(INTERP, "LuaString"),
                 const_string(INTERP, "tostring"));
             Parrot_store_global(INTERP,
                 const_string(INTERP, "string"),
@@ -658,6 +665,97 @@ MMD_DEFAULT: {
 
 /*
 
+=item C<PMC* modulus (PMC* value, PMC* dest)>
+
+=cut
+
+*/
+    PMC* modulus (PMC* value, PMC* dest) {
+MMD_LuaNumber: {
+            PMC* n = SELF.tonumber();
+            if (VTABLE_isa(INTERP, n, const_string(INTERP, "LuaNumber"))) {
+                return Parrot_LuaNumber_modulus_LuaNumber(INTERP, n, value, dest);
+            } else {
+                real_exception(INTERP, NULL, ILL_INHERIT,
+                        "attempt to perform arithmetic on a %s value",
+                        string_to_cstring(INTERP, SELF.name()));
+                return NULL;
+            }
+        }
+MMD_LuaString: {
+            PMC* n = SELF.tonumber();
+            if (VTABLE_isa(INTERP, n, const_string(INTERP, "LuaNumber"))) {
+                return Parrot_LuaNumber_modulus_LuaString(INTERP, n, value, dest);
+            } else {
+                real_exception(INTERP, NULL, ILL_INHERIT,
+                        "attempt to perform arithmetic on a %s value",
+                        string_to_cstring(INTERP, SELF.name()));
+                return NULL;
+            }
+        }
+MMD_DEFAULT: {
+            PMC *metamethod = Parrot_LuaBase_find_metamethod(INTERP, value,
+                    string_from_const_cstring(INTERP, "__mod", 0));
+            if (metamethod != NULL) {
+                dest = Parrot_runops_fromc_args(INTERP, metamethod, "PPP", SELF, value);
+                if (NULL == dest) {
+                    dest = pmc_new(INTERP, dynpmc_LuaNil);
+                }
+                return dest;
+            }
+            real_exception(INTERP, NULL, ILL_INHERIT,
+                    "attempt to perform arithmetic on a %s value",
+                    string_to_cstring(INTERP, VTABLE_name(INTERP, value)));
+            return NULL;
+        }
+    }
+
+/*
+
+=item C<void i_modulus (PMC* value)>
+
+=cut
+
+*/
+    void i_modulus (PMC* value) {
+MMD_LuaNumber: {
+            PMC* n = SELF.tonumber();
+            if (VTABLE_isa(INTERP, n, const_string(INTERP, "LuaNumber"))) {
+                Parrot_LuaNumber_i_modulus_LuaNumber(INTERP, n, value);
+            } else {
+                real_exception(INTERP, NULL, ILL_INHERIT,
+                        "attempt to perform arithmetic on a %s value",
+                        string_to_cstring(INTERP, SELF.name()));
+            }
+        }
+MMD_LuaString: {
+            PMC* n = SELF.tonumber();
+            if (VTABLE_isa(INTERP, n, const_string(INTERP, "LuaNumber"))) {
+                Parrot_LuaNumber_i_modulus_LuaString(INTERP, n, value);
+            } else {
+                real_exception(INTERP, NULL, ILL_INHERIT,
+                        "attempt to perform arithmetic on a %s value",
+                        string_to_cstring(INTERP, SELF.name()));
+            }
+        }
+MMD_DEFAULT: {
+            PMC *metamethod = Parrot_LuaBase_find_metamethod(INTERP, value,
+                    string_from_const_cstring(INTERP, "__mod", 0));
+            if (metamethod != NULL) {
+                SELF = Parrot_runops_fromc_args(INTERP, metamethod, "PPP", SELF, value);
+                if (NULL == SELF) {
+                    SELF = pmc_new(INTERP, dynpmc_LuaNil);
+                }
+                return;
+            }
+            real_exception(INTERP, NULL, ILL_INHERIT,
+                    "attempt to perform arithmetic on a %s value",
+                    string_to_cstring(INTERP, VTABLE_name(INTERP, value)));
+        }
+    }
+
+/*
+
 =item C<PMC* pow (PMC* value, PMC* dest)>
 
 =cut
@@ -879,6 +977,22 @@ MMD_DEFAULT: {
 =head2 Specific Methods
 
 =over 4
+
+=item C<PMC* len()>
+
+
+=cut
+
+*/
+    METHOD PMC* len () {
+        PMC *retval;
+
+        retval = pmc_new(INTERP, dynpmc_LuaNumber);
+        PMC_num_val(retval) = VTABLE_elements(INTERP, SELF);
+        return retval;
+    }
+
+/*
 
 =item C<PMC* tonumber()>
 

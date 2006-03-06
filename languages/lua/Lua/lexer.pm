@@ -63,7 +63,7 @@ sub Info {
 sub _DoubleQuoteStringLexer {
 	my $parser = shift;
 	my $str = '';
-	my $type = 'LITERAL';
+	my $type = 'STRING';
 
 	while ($parser->YYData->{INPUT}) {
 
@@ -76,8 +76,8 @@ sub _DoubleQuoteStringLexer {
 				and $str .= $1,
 				    last;
 
-			s/^\\([\\"'\[\]])//
-				and $str .= $1,		#  backslash, quotation mark, apostrophe, square bracket
+			s/^\\([\\"'])//
+				and $str .= $1,		#  backslash, quotation mark, apostrophe
 				    last;
 			s/^\\a//
 				and $str .= "\a",	# bell
@@ -118,7 +118,7 @@ sub _DoubleQuoteStringLexer {
 sub _SingleQuoteStringLexer {
 	my $parser = shift;
 	my $str = '';
-	my $type = 'LITERAL';
+	my $type = 'STRING';
 
 	while ($parser->YYData->{INPUT}) {
 
@@ -131,8 +131,8 @@ sub _SingleQuoteStringLexer {
 				and $str .= $1,
 				    last;
 
-			s/^\\([\\"'\[\]])//
-				and $str .= $1,		#  backslash, quotation mark, apostrophe, square bracket
+			s/^\\([\\"'])//
+				and $str .= $1,		#  backslash, quotation mark, apostrophe
 				    last;
 			s/^\\a//
 				and $str .= "\a",	# bell
@@ -172,8 +172,9 @@ sub _SingleQuoteStringLexer {
 
 sub _LongStringLexer {
 	my $parser = shift;
+	my ($level) = @_;
 	my $str = '';
-	my $type = 'LITERAL';
+	my $type = 'STRING';
 
 	$_ = $parser->YYData->{INPUT};
 	s/^\n//
@@ -188,10 +189,10 @@ sub _LongStringLexer {
 
 			s/^(\n)//
 				and $parser->YYData->{lineno} ++,
-				    $str .= $1;
+				    $str .= $1,
 				    last;
 
-			s/^\]\]//
+			s/^\]$level\]//
 				and return ($type, $str);
 
 			s/^(.)//
@@ -217,6 +218,7 @@ sub _Identifier {
 
 sub _LongCommentLexer {
 	my $parser = shift;
+	my ($level) = @_;
 
 	while (1) {
 	        $parser->YYData->{INPUT}
@@ -227,7 +229,7 @@ sub _LongCommentLexer {
 			s/^\n//
 					and $parser->YYData->{lineno} ++,
 					last;
-			s/^\]\]//
+			s/^\]$level\]//
 					and return;
 			s/^.//
 					and last;
@@ -257,12 +259,15 @@ sub _Lexer {
 					and $parser->YYData->{lineno} ++,
 					    last;
 
-			s/^\-\-\[\[//										# LongComment
-					and $parser->_LongCommentLexer(),
+			s/^\-\-\[(=*)\[//										# LongComment
+					and $parser->_LongCommentLexer($1),
 					    last;
 			s/^\-\-(.*)\n//									# ShortComment
 					and $parser->YYData->{lineno} ++,
 					    last;
+
+			s/^(0[Xx])([0-9A-Fa-f]+)//
+					and return ('NUMBER', hex($2));
 
 			s/^(\d+(\.\d*)?|\.\d+)([Ee][+\-]?\d+)?//
 #					and return ('NUMBER', new Math::BigFloat($1));
@@ -274,8 +279,8 @@ sub _Lexer {
 			s/^\'//
 					and return $parser->_SingleQuoteStringLexer();
 
-			s/^\[\[//
-					and return $parser->_LongStringLexer();
+			s/^\[(=*)\[//
+					and return $parser->_LongStringLexer($1);
 
 			s/^([A-Z_a-z][0-9A-Z_a-z]*)//
 					and return $parser->_Identifier($1);
@@ -293,7 +298,7 @@ sub _Lexer {
 			s/^(~=)//
 					and return ($1, $1);
 
-			s/^([\{\}\(\)\[\]\.;,<>\+\-\*\/\^:=])//
+			s/^([\{\}\(\)\[\]\.;,<>\+\-\*\/%\^#:=])//
 					and return ($1, $1);						# punctuator
 
 			s/^([\S]+)//

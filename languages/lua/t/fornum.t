@@ -133,6 +133,6 @@ for i = first(), limit(), step() do
     print(i)
 end
 CODE
-/`for' limit must be a number/
+/for' limit must be a number/
 OUT
 

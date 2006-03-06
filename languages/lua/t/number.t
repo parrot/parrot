@@ -18,13 +18,19 @@ use strict;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 47;
+use Parrot::Test tests => 53;
 use Test::More;
 
 language_output_is( 'lua', <<'CODE', <<'OUT', '-1' );
 print(-1)
 CODE
 -1
+OUT
+
+language_output_like( 'lua', <<'CODE', <<'OUT', '# 1' );
+print(# 1)
+CODE
+/attempt to get length of a number value/
 OUT
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'not 1' );
@@ -63,6 +69,18 @@ CODE
 /(inf|1.#INF)/
 OUT
 
+language_output_is( 'lua', <<'CODE', <<'OUT', '-25 % 3' );
+print(-25 % 3)
+CODE
+2
+OUT
+
+language_output_like( 'lua', <<'CODE', <<'OUT', '1 % 0' );
+print(1 % 0)
+CODE
+/-1.#IND/
+OUT
+
 language_output_is( 'lua', <<'CODE', <<'OUT', '3 ^ 3' );
 print(3 ^ 3)
 CODE
@@ -99,6 +117,12 @@ CODE
 /attempt to perform arithmetic on a boolean value/
 OUT
 
+language_output_like( 'lua', <<'CODE', <<'OUT', '-25 % false' );
+print(-25 % false)
+CODE
+/attempt to perform arithmetic on a boolean value/
+OUT
+
 language_output_like( 'lua', <<'CODE', <<'OUT', '10 + "text"' );
 print(10 + "text")
 CODE
@@ -119,6 +143,12 @@ OUT
 
 language_output_like( 'lua', <<'CODE', <<'OUT', '-7 / "text"' );
 print(-7 / "text")
+CODE
+/attempt to perform arithmetic on a string value/
+OUT
+
+language_output_like( 'lua', <<'CODE', <<'OUT', '25 % "text"' );
+print(25 % "text")
 CODE
 /attempt to perform arithmetic on a string value/
 OUT
@@ -151,6 +181,12 @@ language_output_is( 'lua', <<'CODE', <<'OUT', '-7 / "0.5"' );
 print(-7 / "0.5")
 CODE
 -14
+OUT
+
+language_output_is( 'lua', <<'CODE', <<'OUT', '-25 % "3"' );
+print(-25 % "3")
+CODE
+2
 OUT
 
 language_output_is( 'lua', <<'CODE', <<'OUT', '3 ^ "3"' );

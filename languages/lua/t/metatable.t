@@ -22,7 +22,7 @@ use strict;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 26;
+use Parrot::Test tests => 27;
 use Test::More;
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'metatable' );
@@ -320,6 +320,41 @@ c1 = Cplx.new(1, 3)
 print(- c1)
 CODE
 (-1,-3)
+OUT
+
+
+language_output_is( 'lua', <<'CODE', <<'OUT', 'cplx __len' );
+Cplx = {}
+Cplx.mt = {}
+
+function Cplx.new (re, im)
+    local c = {}
+    setmetatable(c, Cplx.mt)
+    c.re = tonumber(re)
+    if im == nil then
+        c.im = 0.0
+    else
+        c.im = tonumber(im)
+    end
+    return c
+end
+
+function Cplx.mt.__tostring (c)
+    return "(" .. c.re .. "," .. c.im .. ")"
+end
+
+function Cplx.mt.__len (a)
+    if type(a) ~= "table" then
+        a = Cplx.new(a, 0)
+    end
+    local r = a.re*a.re + a.im*a.im
+    return r
+end
+
+c1 = Cplx.new(1, 3)
+print(# c1)
+CODE
+10
 OUT
 
 

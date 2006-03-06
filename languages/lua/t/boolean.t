@@ -18,13 +18,19 @@ use strict;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 22;
+use Parrot::Test tests => 24;
 use Test::More;
 
 language_output_like( 'lua', <<'CODE', <<'OUT', '-true' );
 print(-true)
 CODE
 /attempt to perform arithmetic on a boolean value/
+OUT
+
+language_output_like( 'lua', <<'CODE', <<'OUT', '# true' );
+print(# true)
+CODE
+/attempt to get length of a boolean value/
 OUT
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'not false' );
@@ -53,6 +59,12 @@ OUT
 
 language_output_like( 'lua', <<'CODE', <<'OUT', 'true / -7' );
 print(true / -7)
+CODE
+/attempt to perform arithmetic on a boolean value/
+OUT
+
+language_output_like( 'lua', <<'CODE', <<'OUT', 'true % 4' );
+print(true % 4)
 CODE
 /attempt to perform arithmetic on a boolean value/
 OUT
