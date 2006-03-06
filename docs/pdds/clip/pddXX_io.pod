@@ -87,11 +87,6 @@ argument to select another stream to write to.
 
 =item *
 
-C<write> also writes to standard output and cannot select another
-stream. It only accepts a PMC value to write. [Is this redundant?]
-
-=item *
-
 C<printerr> writes an integer, float, string, or PMC value to standard
 error.
 
@@ -130,14 +125,19 @@ it also takes a stream object argument for an alternate source.
 
 C<seek> sets the current file position of a stream object to an integer
 byte offset from an integer starting position (0 for the start of the
-file, 1 for the current position, and 2 for the end of the file). 
+file, 1 for the current position, and 2 for the end of the file). It
+also has a 64-bit variant that sets the byte offset by two integer
+arguments (one for the first 32 bits of the 64-bit offset, and one for
+the second 32 bits). [The two-register emulation for 64-bit integers may
+be deprecated in the future.]
 
 =item *
 
 C<tell> retrieves the current file position of a stream object.  It also
 has a 64-bit variant that returns the byte offset as two integers (one
 for the first 32 bits of the 64-bit offset, and one for the second 32
-bits).
+bits). [The two-register emulation for 64-bit integers may be deprecated
+in the future.]
 
 =item *
 
@@ -184,6 +184,18 @@ buffer-type commands:
 	   [Called "BLKBUF" because bytes are sent as a block, but line
 	   buffering also sends them as a block, so "FULBUF" might make
            more sense.]
+
+=back
+
+=head3 Deprecated opcodes
+
+=over
+
+=item *
+
+C<write> prints to standard output but it cannot select another stream.
+It only accepts a PMC value to write. This is redundant with the
+C<print> opcode, so it will be deprecated.
 
 =back
 
