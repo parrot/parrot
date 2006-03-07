@@ -17,7 +17,7 @@ this feature.
    interpreter->HLL_info
 
    @HLL_info = [
-     [ hll_name, hll_lib, { core_type => HLL_type, ... } ],
+     [ hll_name, hll_lib, namespace, { core_type => HLL_type, ... } ],
      ...
      ]
 
@@ -58,6 +58,14 @@ in the context. If no type is registered just return C<core_type>.
 #include "parrot/dynext.h"
 #include <assert.h>
 
+enum {
+    e_HLL_name,
+    e_HLL_lib,
+    e_HLL_namespace,
+    e_HLL_typemap,
+    e_HLL_MAX
+} HLL_enum_t;
+
 static STRING*
 string_as_const_string(Interp* interpreter, STRING *src)
 {
@@ -71,7 +79,7 @@ INTVAL
 Parrot_register_HLL(Interp *interpreter,
 	STRING *hll_name, STRING *hll_lib)
 {
-    PMC *hll_info, *entry, *name, *type_hash;
+    PMC *hll_info, *entry, *name, *type_hash, *ns_hash;
     INTVAL idx;
 
     idx = Parrot_get_HLL_id(interpreter, hll_name);
@@ -80,24 +88,46 @@ Parrot_register_HLL(Interp *interpreter,
     /* TODO LOCK or disallow in threads */
     hll_info = interpreter->HLL_info;
     idx = VTABLE_elements(interpreter, hll_info);
+    /*
+     * ATT: all items that are owned by the HLL_info structure
+     *      have to be created as constant objects, because
+     *      this structure isn't marked by DOD/GC
+     */ 
     entry = constant_pmc_new(interpreter, enum_class_FixedPMCArray);
     VTABLE_push_pmc(interpreter, hll_info, entry);
 
-    VTABLE_set_integer_native(interpreter, entry, 3);
+    VTABLE_set_integer_native(interpreter, entry, e_HLL_MAX);
 
+    /* register HLL name */
     name = constant_pmc_new_noinit(interpreter, enum_class_String);
     hll_name = string_as_const_string(interpreter, hll_name);
     VTABLE_set_string_native(interpreter, name, hll_name);
-    VTABLE_set_pmc_keyed_int(interpreter, entry, 0, name);
+    VTABLE_set_pmc_keyed_int(interpreter, entry, e_HLL_name, name);
 
+    /* create HLL namespace */
+    hll_name = string_downcase(interpreter, hll_name);
+    /* HLL type mappings aren't yet created, we can't create
+     * a namespace in HLL's flavor yet - mabe promote the
+     * ns_hash to another type, if mappings provide one
+     *
+     * TODO need better APIT to append namespaces
+     */
+    ns_hash  = pmc_new(interpreter, enum_class_NameSpace);
+    VTABLE_set_pmc_keyed_str(interpreter, interpreter->stash_hash,
+            hll_name, ns_hash);
+    VTABLE_set_pmc_keyed_int(interpreter, entry, e_HLL_namespace, ns_hash);
+
+    /* register HLL lib */
     name = constant_pmc_new_noinit(interpreter, enum_class_String);
     if (!hll_lib)
         hll_lib = const_string(interpreter, "");
     hll_lib = string_as_const_string(interpreter, hll_lib);
     VTABLE_set_string_native(interpreter, name, hll_lib);
-    VTABLE_set_pmc_keyed_int(interpreter, entry, 1, name);
+    VTABLE_set_pmc_keyed_int(interpreter, entry, e_HLL_lib, name);
+
+    /* register HLL typemap */
     type_hash = Parrot_new_INTVAL_hash(interpreter, PObj_constant_FLAG);
-    VTABLE_set_pmc_keyed_int(interpreter, entry, 2, type_hash);
+    VTABLE_set_pmc_keyed_int(interpreter, entry, e_HLL_typemap, type_hash);
     if (string_length(interpreter, hll_lib)) {
         /* load lib */
         Parrot_load_lib(interpreter, hll_lib, NULL);
@@ -118,7 +148,7 @@ Parrot_get_HLL_id(Interp* interpreter, STRING *hll_name)
     n = VTABLE_elements(interpreter, hll_info);
     for (i = 0; i < n; ++i) {
         entry = VTABLE_get_pmc_keyed_int(interpreter, hll_info, i);
-        name_pmc = VTABLE_get_pmc_keyed_int(interpreter, entry, 0);
+        name_pmc = VTABLE_get_pmc_keyed_int(interpreter, entry, e_HLL_name);
         name = VTABLE_get_string(interpreter, name_pmc);
         if (!string_equal(interpreter, name, hll_name))
             return i;
@@ -142,7 +172,7 @@ Parrot_register_HLL_type(Interp *interpreter, INTVAL hll_id,
     }
     entry = VTABLE_get_pmc_keyed_int(interpreter, hll_info, hll_id);
     assert(!PMC_IS_NULL(entry));
-    type_hash = VTABLE_get_pmc_keyed_int(interpreter, entry, 2);
+    type_hash = VTABLE_get_pmc_keyed_int(interpreter, entry, e_HLL_typemap);
     assert(!PMC_IS_NULL(type_hash));
     hash = PMC_struct_val(type_hash);
     hash_put(interpreter, hash, (void*)core_type, (void*)hll_type);
@@ -169,7 +199,7 @@ Parrot_get_HLL_type(Interp *interpreter, INTVAL hll_id, INTVAL core_type)
                 "no such HLL id (%vd)", hll_id);
     }
     entry = VTABLE_get_pmc_keyed_int(interpreter, hll_info, hll_id);
-    type_hash = VTABLE_get_pmc_keyed_int(interpreter, entry, 2);
+    type_hash = VTABLE_get_pmc_keyed_int(interpreter, entry, e_HLL_typemap);
     if (PMC_IS_NULL(type_hash))
         return core_type;
     hash = PMC_struct_val(type_hash);
