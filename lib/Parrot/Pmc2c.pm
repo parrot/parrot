@@ -930,7 +930,14 @@ EOC
                 );
         } /* Register */
 EOC
-   }
+    }
+
+    # create a namespace hash
+    $cout .= <<"EOC";
+        /* need a namespace Hash */
+        Parrot_base_vtables[entry]->_namespace = pmc_new(interp,
+                Parrot_get_ctx_HLL_type(interp, enum_class_NameSpace));
+EOC
 
     # declare each nci method for this class
     foreach my $method (@{ $self->{methods} }) {
