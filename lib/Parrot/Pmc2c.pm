@@ -934,7 +934,7 @@ EOC
 
     # create a namespace hash
     $cout .= <<"EOC";
-        /* need a namespace Hash */
+        /* need a namespace Hash TODO anchor at parent, name it */
         Parrot_base_vtables[entry]->_namespace = pmc_new(interp,
                 Parrot_get_ctx_HLL_type(interp, enum_class_NameSpace));
 EOC

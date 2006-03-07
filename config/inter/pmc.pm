@@ -151,7 +151,7 @@ E_NOTE
         $TEMP_pmc_build .= <<END
 src/pmc/$pmc.c src/pmc/pmc_$pmc.h : src/pmc/$pmc.dump
 
-src/pmc/$pmc.dump : vtable.dump $parent_dumps 
+src/pmc/$pmc.dump : vtable.dump $parent_dumps lib/Parrot/Pmc2c.pm
 
 src/pmc/pmc_$pmc.h: src/pmc/$pmc.pmc
 	\$(PMC2CC) src/pmc/$pmc.pmc
