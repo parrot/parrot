@@ -17,7 +17,7 @@ this feature.
    interpreter->HLL_info
 
    @HLL_info = [
-     [ hll_name, hll_lib, namespace, { core_type => HLL_type, ... } ],
+     [ hll_name, hll_lib, { core_type => HLL_type, ... }, namespace ],
      ...
      ]
 
@@ -61,8 +61,8 @@ in the context. If no type is registered just return C<core_type>.
 enum {
     e_HLL_name,
     e_HLL_lib,
-    e_HLL_namespace,
     e_HLL_typemap,
+    e_HLL_namespace,
     e_HLL_MAX
 } HLL_enum_t;
 
@@ -134,6 +134,16 @@ Parrot_register_HLL(Interp *interpreter,
     }
 
     /* UNLOCK */
+
+    /*
+     * XXX the HLL_info is frozen with the ParrotInterpreter, to be able
+     *     to preserve all in the PBC *but* the namespace hash shouldn't be
+     *     included in the bytecode - HACK - reduce array.elems by one
+     *     so that namespace isn't seen by freeze/thaw
+     * XXX this still doesn't recreate the namespace slot TODO    
+     *     better use a distinct structure for namespaces ? 
+     */
+    PMC_int_val(entry) = e_HLL_namespace;
     return idx;
 }
 
