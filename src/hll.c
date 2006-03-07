@@ -42,7 +42,8 @@ Register a type mapping	C<core_type => hll_type> for the given HLL.
 
 =item C<INTVAL Parrot_get_HLL_type(Interp *, INTVAL hll_id, INTVAL core_type)>
 
-Get an equivalent HLL type number for the language C<hll_id> or 0 on error.
+Get an equivalent HLL type number for the language C<hll_id> or return
+C<core_type> if the HLL doesn't remap the type.
 
 =item C<INTVAL Parrot_get_ctx_HLL_type(Interp *, INTVAL core_type)>
 
