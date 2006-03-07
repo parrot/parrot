@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 18;
+use Parrot::Test tests => 19;
 
 =head1 NAME
 
@@ -52,6 +52,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "verify NameSpace type");
 CODE
 NameSpace
 OUTPUT
+
 pir_output_is(<<'CODE', <<'OUTPUT', "find_global Foo::bar");
 .sub 'main' :main
     $P0 = find_global "Foo", "bar"
@@ -386,4 +387,25 @@ pir_output_is(<<'CODE', <<'OUT', "unicode namespace, global");
 CODE
 unicode namespaces are fun
 OUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "verify root and parrot namespaces");
+# name may change though
+.sub main :main
+    .include "interpinfo.pasm"
+    $P0 = interpinfo .INTERPINFO_NAMESPACE_ROOT
+    typeof $S0, $P0
+    print $S0
+    print "\n"
+    $P1 = $P0["parrot"]
+    print $P1
+    print "\n"
+    typeof $S0, $P1
+    print $S0
+    print "\n"
+.end
+CODE
+NameSpace
+parrot
+NameSpace
+OUTPUT
 

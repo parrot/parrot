@@ -110,7 +110,7 @@ Parrot_register_HLL(Interp *interpreter,
      * a namespace in HLL's flavor yet - mabe promote the
      * ns_hash to another type, if mappings provide one
      *
-     * TODO need better APIT to append namespaces
+     * TODO need better API to append namespaces
      */
     ns_hash  = pmc_new(interpreter, enum_class_NameSpace);
     VTABLE_set_pmc_keyed_str(interpreter, interpreter->stash_hash,

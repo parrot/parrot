@@ -13,9 +13,9 @@ These are the vtable functions for the namespace PMC.
 =head2 Data
 
   PMC_struct_val       ... the hash, bucket->value is an array
-                           of 3 PMCs (namespace, sub, var) slot
+                           of 3 PMCs (namespace, sub, var) slot ???
   PMC_pmc_val          ... parent namespace
-  PMC_data             ... name string of this namespace part 
+  PMC_data             ... name STRING of this namespace part 
 
 =head2 Functions
 
@@ -30,14 +30,56 @@ These are the vtable functions for the namespace PMC.
 
 pmclass NameSpace extends Hash need_ext {
 
-    voit init {
+/*
+
+=item C<voit init()>
+
+Initialze a C<NameSpace> PMC by calling C<Hash.init> and clearing
+other fields.
+
+=cut
+
+*/
+
+    void init() {
         SUPER();                        /* _struct_val := Hash */
         PMC_pmc_val(SELF) = NULL;       /* parent */
         PMC_data(SELF)    = NULL;       /* namespace name */
     }
 
-    PMC* namespace() {
-        return SELF;
+/*
+
+=item C<void set_pmc_keyed_str(STRING *key, PMC *value)>
+
+Sets C<*value> as the namespace item for C<*key>. This is part of the
+raw interface. If the PMC C<value> is exactly a NameSpace, C<SELF>
+will be set as the parent of that namespace and the name C<key> of
+C<value> is stored too.
+
+=cut
+
+*/
+
+    void set_pmc_keyed_str(STRING *key, PMC *value) {
+        SUPER(key, value);
+        if (value->vtable->base_type == enum_class_NameSpace) {
+            PMC_pmc_val(value) = SELF;  /* set parent */
+            PMC_data(value)    = key;   /* and name */
+        }
+    }
+
+/*
+
+=item C<STRING* get_string()>
+
+Return the name of this namespace part.
+
+=cut
+
+*/
+
+    STRING* get_string() {
+        return PMC_data(SELF);
     }
 
 }
