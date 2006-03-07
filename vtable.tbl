@@ -15,6 +15,7 @@ PMC* new_from_string(STRING* rep, INTVAL flags)
 void morph(INTVAL type)
 void mark()
 void destroy()
+PMC* namespace()
 
 PMC* getprop(STRING* key)
 void setprop(STRING* key, PMC* value)

@@ -138,7 +138,7 @@ typedef enum {
 } vtable_flags_t;
 
 struct _vtable {
-    PMC *namespace;          /* Pointer to namespace for this class */
+    PMC * _namespace;        /* Pointer to namespace for this class */
     INTVAL base_type;        /* 'type' value for MMD */
     STRING* whoami;          /* Name of class this vtable is for */
     UINTVAL flags;           /* Flags. Duh */

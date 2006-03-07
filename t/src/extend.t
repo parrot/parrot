@@ -446,7 +446,7 @@ the_test(Parrot_Interp interpreter, opcode_t *cur_op, opcode_t *start)
     Parrot_loadbc(interpreter, pf);
     key = key_new_cstring(interpreter, "_sub1");
     sub = VTABLE_get_pmc_keyed(interpreter,
-			       interpreter->globals->stash_hash, key);
+			       interpreter->stash_hash, key);
     Parrot_call_sub(interpreter, sub, "v");
     PIO_eprintf(interpreter, "back\n");
 
@@ -455,7 +455,7 @@ the_test(Parrot_Interp interpreter, opcode_t *cur_op, opcode_t *start)
 
     key = key_new_cstring(interpreter, "_sub2");
     sub = VTABLE_get_pmc_keyed(interpreter,
-			       interpreter->globals->stash_hash, key);
+			       interpreter->stash_hash, key);
     arg = pmc_new(interpreter, enum_class_String);
     VTABLE_set_string_native(interpreter, arg,
 			     string_from_cstring(interpreter, "hello ", 0));
@@ -520,7 +520,7 @@ the_test(Parrot_Interp interpreter, opcode_t *cur_op, opcode_t *start)
     Parrot_loadbc(interpreter, pf);
     key = key_new_cstring(interpreter, "_sub1");
     sub = VTABLE_get_pmc_keyed(interpreter,
-			       interpreter->globals->stash_hash, key);
+			       interpreter->stash_hash, key);
 
     if (setjmp(jb.destination)) {
 	PIO_eprintf(interpreter, "caught\n");

@@ -371,6 +371,10 @@ Returns the name of the PMC.
 
 /*
 
+=item C<PMC* namespace>
+
+Return the namespace for this PMC.
+
 =item C<PMC *find_method(STRING *method_name)>
 
 Looks up the method for C<*method_name> and returns it. If no method is
@@ -383,6 +387,10 @@ Store the method as a global in the namespace of this class.
 =cut
 
 */
+
+    PMC* namespace() {
+        return SELF->vtable->_namespace;
+    }
 
 
     PMC* find_method(STRING* method_name) {

@@ -29,6 +29,17 @@ These are the vtable functions for the namespace PMC.
 #include <assert.h>
 
 pmclass NameSpace extends Hash need_ext {
+
+    voit init {
+        SUPER();                        /* _struct_val := Hash */
+        PMC_pmc_val(SELF) = NULL;       /* parent */
+        PMC_data(SELF)    = NULL;       /* namespace name */
+    }
+
+    PMC* namespace() {
+        return SELF;
+    }
+
 }
 
 /*
