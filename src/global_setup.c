@@ -145,11 +145,15 @@ init_world(Interp *interpreter)
     /*
      * HLL support
      */
-    if (interpreter->parent_interpreter)
+    if (interpreter->parent_interpreter) {
         interpreter->HLL_info = interpreter->parent_interpreter->HLL_info;
+        interpreter->HLL_namespace = interpreter->parent_interpreter->HLL_namespace;
+    }
     else {
         STRING *parrot = CONST_STRING(interpreter, "parrot");
         interpreter->HLL_info = constant_pmc_new(interpreter,
+                enum_class_ResizablePMCArray);
+        interpreter->HLL_namespace = constant_pmc_new(interpreter,
                 enum_class_ResizablePMCArray);
         Parrot_register_HLL(interpreter, parrot, NULL);
     }

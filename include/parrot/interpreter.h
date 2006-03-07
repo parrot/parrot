@@ -347,6 +347,7 @@ struct parrot_interp_t {
     PMC* DOD_registry;                        /* registered PMCs added to the root set */
 
     PMC* HLL_info;                            /* storage for HLL names and types */
+    PMC* HLL_namespace;                       /* cache of HLL toplevel ns */
 
     MMD_table *binop_mmd_funcs;               /* Table of MMD functions */
     UINTVAL n_binop_mmd_funcs;                /* function count */

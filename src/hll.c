@@ -62,7 +62,6 @@ enum {
     e_HLL_name,
     e_HLL_lib,
     e_HLL_typemap,
-    e_HLL_namespace,
     e_HLL_MAX
 } HLL_enum_t;
 
@@ -106,6 +105,7 @@ Parrot_register_HLL(Interp *interpreter,
 
     /* create HLL namespace */
     hll_name = string_downcase(interpreter, hll_name);
+
     /* HLL type mappings aren't yet created, we can't create
      * a namespace in HLL's flavor yet - mabe promote the
      * ns_hash to another type, if mappings provide one
@@ -115,7 +115,8 @@ Parrot_register_HLL(Interp *interpreter,
     ns_hash  = pmc_new(interpreter, enum_class_NameSpace);
     VTABLE_set_pmc_keyed_str(interpreter, interpreter->stash_hash,
             hll_name, ns_hash);
-    VTABLE_set_pmc_keyed_int(interpreter, entry, e_HLL_namespace, ns_hash);
+    /* cache HLLs toplevel namespace */
+    VTABLE_set_pmc_keyed_int(interpreter, interpreter->HLL_namespace, idx, ns_hash);
 
     /* register HLL lib */
     name = constant_pmc_new_noinit(interpreter, enum_class_String);
@@ -125,7 +126,7 @@ Parrot_register_HLL(Interp *interpreter,
     VTABLE_set_string_native(interpreter, name, hll_lib);
     VTABLE_set_pmc_keyed_int(interpreter, entry, e_HLL_lib, name);
 
-    /* register HLL typemap */
+    /* create HLL typemap hash */
     type_hash = Parrot_new_INTVAL_hash(interpreter, PObj_constant_FLAG);
     VTABLE_set_pmc_keyed_int(interpreter, entry, e_HLL_typemap, type_hash);
     if (string_length(interpreter, hll_lib)) {
@@ -135,15 +136,6 @@ Parrot_register_HLL(Interp *interpreter,
 
     /* UNLOCK */
 
-    /*
-     * XXX the HLL_info is frozen with the ParrotInterpreter, to be able
-     *     to preserve all in the PBC *but* the namespace hash shouldn't be
-     *     included in the bytecode - HACK - reduce array.elems by one
-     *     so that namespace isn't seen by freeze/thaw
-     * XXX this still doesn't recreate the namespace slot TODO    
-     *     better use a distinct structure for namespaces ? 
-     */
-    PMC_int_val(entry) = e_HLL_namespace;
     return idx;
 }
 
