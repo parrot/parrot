@@ -299,7 +299,6 @@ Parrot_really_destroy(int exit_code, void *vinterp)
 {
     int i;
     Interp *interpreter = (Interp*) vinterp;
-    struct Stash *stash, *next_stash;
 
     UNUSED(exit_code);
 
@@ -368,13 +367,6 @@ Parrot_really_destroy(int exit_code, void *vinterp)
             PackFile_destroy(interpreter, pf);
     }
 
-    /* walk and free the stash, pmc's are already dead */
-    stash = interpreter->globals;
-    while (stash) {
-        next_stash = stash->parent_stash;
-        mem_sys_free(stash);
-        stash = next_stash;
-    }
     /* free vtables */
     if (!interpreter->parent_interpreter)
         for (i = 1; i < (int)enum_class_max; i++)

@@ -250,7 +250,7 @@ interpinfo_p(Interp *interpreter, INTVAL what)
         case CURRENT_OBJECT:
             return CONTEXT(interpreter->ctx)->current_object;
         case NAMESPACE_ROOT: /* XXX */
-            return interpreter->globals->stash_hash;
+            return interpreter->stash_hash;
         case CURRENT_LEXPAD:
             return CONTEXT(interpreter->ctx)->lex_pad;
         default:        /* or a warning only? */

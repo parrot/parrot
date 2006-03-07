@@ -59,7 +59,7 @@ Parrot_find_global(Parrot_Interp interpreter, STRING *class, STRING *globalname)
     PIO_printf(interpreter, "find_global class '%Ss' meth '%Ss'\n",
             class, globalname);
 #endif
-    stash = interpreter->globals->stash_hash;
+    stash = interpreter->stash_hash;
     if (class) {
         ns_name = string_concat(interpreter,
                 string_from_cstring(interpreter, "\0", 1),
@@ -91,16 +91,16 @@ Parrot_find_global(Parrot_Interp interpreter, STRING *class, STRING *globalname)
                 string_from_cstring(interpreter, "\0", 1),
                 class, 0);
         if (!VTABLE_exists_keyed_str(interpreter,
-                                     interpreter->globals->stash_hash,
+                                     interpreter->stash_hash,
                                      ns_name)) {
             return NULL;
         }
         stash = VTABLE_get_pmc_keyed_str(interpreter,
-                                         interpreter->globals->stash_hash,
+                                         interpreter->stash_hash,
                                          ns_name);
     }
     else {
-        stash = interpreter->globals->stash_hash;
+        stash = interpreter->stash_hash;
     }
     if (!globalname)
         return stash;
@@ -124,7 +124,7 @@ Parrot_find_global_p(Parrot_Interp interpreter, PMC *ns, STRING *name)
         case enum_class_String:
             return Parrot_find_global(interpreter, PMC_str_val(ns), name);
         case enum_class_Key:
-            stash = interpreter->globals->stash_hash;
+            stash = interpreter->stash_hash;
             while (1) {
                 class = key_string(interpreter, ns);
                 ns_name = string_concat(interpreter,
@@ -289,7 +289,7 @@ void
 Parrot_store_global(Interp *interpreter, STRING *class,
         STRING *globalname, PMC *pmc)
 {
-    PMC *globals = interpreter->globals->stash_hash;
+    PMC *globals = interpreter->stash_hash;
     PMC *stash;
     if (class) {
         stash = Parrot_global_namespace(interpreter, globals, class);
@@ -304,7 +304,7 @@ static void
 store_sub_in_namespace(Parrot_Interp interpreter, PMC* sub_pmc,
         PMC *namespace, STRING *sub_name)
 {
-    PMC *globals = interpreter->globals->stash_hash;
+    PMC *globals = interpreter->stash_hash;
     INTVAL type, class_type;
 
 #if DEBUG_GLOBAL

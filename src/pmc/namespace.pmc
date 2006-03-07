@@ -1,6 +1,6 @@
 /*
 Copyright: 2005 The Perl Foundation.  All Rights Reserved.
-$Id:$
+$Id$
 
 =head1 NAME
 
@@ -9,6 +9,13 @@ src/pmc/namespace.pmc - NameSpace PMC
 =head1 DESCRIPTION
 
 These are the vtable functions for the namespace PMC.
+
+=head2 Data
+
+  PMC_struct_val       ... the hash, bucket->value is an array
+                           of 3 PMCs (namespace, sub, var) slot
+  PMC_pmc_val          ... parent namespace
+  PMC_data             ... name string of this namespace part 
 
 =head2 Functions
 

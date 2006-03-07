@@ -286,7 +286,7 @@ Returns the PMC global value for C<key>.
                 new_interp->iglobals, key);
         /* quick hack to get the global stash */
         if (key == -1)
-            return new_interp->globals->stash_hash;
+            return new_interp->stash_hash;
         return NULL;
     }
 
@@ -320,7 +320,7 @@ Introspection interface. C<key> can be:
         item =  key_string(interpreter, key);
         s = CONST_STRING(interpreter, "globals");
         if (string_equal(interpreter, item, s) == 0)
-            return interpreter->globals->stash_hash;
+            return interpreter->stash_hash;
         outer = NULL;
         s = CONST_STRING(interpreter, "outer");
         if (string_equal(interpreter, item, s) == 0) {

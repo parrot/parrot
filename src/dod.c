@@ -275,7 +275,6 @@ Parrot_dod_trace_root(Interp *interpreter, int trace_stack)
      * note: adding locals here did cause increased DOD runs
      */
     unsigned int i = 0;
-    struct Stash *stash = 0;
 
     if (trace_stack == 2) {
         trace_system_areas(interpreter);
@@ -324,12 +323,8 @@ Parrot_dod_trace_root(Interp *interpreter, int trace_stack)
     for (i = 0; i <= E_LAST_PYTHON_E; ++i) {
         pobject_lives(interpreter, (PObj*)interpreter->exception_list[i]);
     }
-    /* Walk through the stashes */
-    stash = interpreter->globals;
-    while (stash) {
-        pobject_lives(interpreter, (PObj *)stash->stash_hash);
-        stash = stash->parent_stash;
-    }
+    /* mark the stash_hash */
+    pobject_lives(interpreter, (PObj *)interpreter->stash_hash);
     /* s. packfile.c */
     mark_const_subs(interpreter);
 

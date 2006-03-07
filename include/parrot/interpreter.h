@@ -277,8 +277,7 @@ struct parrot_interp_t {
     struct Interp_Context ctx;
     context_mem ctx_mem;                      /* ctx memory managment */
 
-    struct Stash *globals;                    /* Pointer to the global variable
-                                               * area */
+    struct PMC *stash_hash;                   /* namespace hash */
 
     struct Arenas *arena_base;                /* Pointer to this interpreter's
                                                * arena */
