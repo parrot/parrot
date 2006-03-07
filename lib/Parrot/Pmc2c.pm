@@ -908,7 +908,8 @@ EOC
         }
 EOC
     $cout .= <<"EOC";
-    } /* pass */
+    } 
+    else { /* pass */
 EOC
 
    # To make use of the .HLL directive, register any mapping...
@@ -918,44 +919,34 @@ EOC
       my $maps = (keys %{$self->{flags}{maps}})[0];
       $cout .= <<"EOC";
 
-    if (pass) {
-        /* Register this PMC as a HLL mapping */
-        INTVAL pmc_id = Parrot_get_HLL_id(
-            interp, const_string(interp, "$hll")
-        );
-        if (pmc_id > 0)
-            Parrot_register_HLL_type(
-                interp, pmc_id, enum_class_$maps, entry
+        {
+            /* Register this PMC as a HLL mapping */
+            INTVAL pmc_id = Parrot_get_HLL_id(
+                interp, const_string(interp, "$hll")
             );
-    } /*pass*/
+            if (pmc_id > 0)
+                Parrot_register_HLL_type(
+                    interp, pmc_id, enum_class_$maps, entry
+                );
+        } /* Register */
 EOC
    }
 
     # declare each nci method for this class
-    my $firstnci = 1;
     foreach my $method (@{ $self->{methods} }) {
       next unless $method->{loc} eq 'nci';
       my $proto = proto($method->{type}, $method->{parameters});
-      if ($firstnci) {
-          $cout .= <<"EOC";
-    if (pass) {
-EOC
-      }
       $cout .= <<"EOC";
         enter_nci_method(interp, entry,
                 F2DPTR(Parrot_${classname}_$method->{meth}),
                 "$method->{meth}", "$proto");
 EOC
-      $firstnci = 0;
     }
-      $cout .= <<"EOC" unless $firstnci;
-    }
-EOC
 
     # include any class specific init code from the .pmc file
     $cout .= <<"EOC";
+        /* class_init */
     $class_init_code
-    if (pass == 1) {
 EOC
 
     # declare auxiliary variables for dyncpmc IDs
