@@ -1,5 +1,9 @@
 # $Id$
 
+New in <next release>
+
+- namespaces(?)
+
 New in 0.4.2
 
 - improved PPC and x86 JIT support including JIT compilation
