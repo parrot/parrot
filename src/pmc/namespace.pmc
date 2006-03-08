@@ -61,6 +61,11 @@ C<value> is stored too.
 If C<key> is a simple key, it works like above. If C<key> is an array
 of strings or a chained key, add all components to the namespace.
 
+=item C<PMC* get_pmc_keyed(PMC *key)> 
+
+Return the given namespace or PMCNULL. C<key> is either an array of 
+strings, or a possibly nested key.
+
 =cut
 
 */
@@ -82,6 +87,40 @@ of strings or a chained key, add all components to the namespace.
             default:
                 assert("not yet" == NULL);
         }
+    }
+
+    /* XXX Hash would return Undef, which is probably wrong */
+    PMC* get_pmc_keyed_str (STRING* key) {
+        HashBucket *b = hash_get_bucket(INTERP, 
+                (Hash*) PMC_struct_val(SELF), key);
+        return b->value;
+    }
+    
+    PMC* get_pmc_keyed(PMC *key) {
+        PMC *ns = SELF;
+        STRING *part;
+        INTVAL i, n;
+        
+        if (key->vtable->base_type == enum_class_Key) {
+            while (key) {
+                part = key_string(INTERP, key);
+                ns = VTABLE_get_pmc_keyed_str(INTERP, ns, part);
+                if (!ns)
+                    return PMCNULL;
+                key = key_next(INTERP, key);
+            }
+            return ns;
+        }
+        n = VTABLE_elements(INTERP, key);
+        if (!n)
+            return PMCNULL;
+        for (i = 0; i < n; ++i) {
+            part = VTABLE_get_string_keyed_int(INTERP, key, i);
+            ns = VTABLE_get_pmc_keyed_str(INTERP, ns, part);
+            if (!ns)
+                return PMCNULL;
+        }
+        return ns;
     }
 
 /*

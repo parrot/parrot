@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 20;
+use Parrot::Test tests => 21;
 
 =head1 NAME
 
@@ -427,6 +427,45 @@ pir_output_is(<<'CODE', <<'OUTPUT', "ns.name()");
 # namespace root doesnt have a name
 # XXX should the root namespace be included?
 CODE
+3
+::parrot::Foo
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "get_namespace_p_p, getnamespace_p_kc");
+.sub main :main
+    .include "interpinfo.pasm"
+    $P0 = interpinfo .INTERPINFO_NAMESPACE_ROOT
+    $P1 = $P0["parrot"]
+    $P3 = new .NameSpace
+    $P1["Foo"] = $P3
+    # fetch w array
+    $P1 = new .FixedStringArray
+    $P1 = 2
+    $P1[0] = 'parrot'
+    $P1[1] = 'Foo'
+    $P2 = get_namespace $P1
+    $P2 = $P2.'name'()
+    $I2 = elements $P2
+    print $I2
+    print "\n"
+    $S0 = join '::', $P2
+    print $S0
+    print "\n"
+    # fetch w key
+    $P2 = get_namespace ["parrot";"Foo"]
+    $P2 = $P2.'name'()
+    $I2 = elements $P2
+    print $I2
+    print "\n"
+    $S0 = join '::', $P2
+    print $S0
+    print "\n"
+.end
+# namespace root doesnt have a name
+# XXX should the root namespace be included?
+CODE
+3
+::parrot::Foo
 3
 ::parrot::Foo
 OUTPUT
