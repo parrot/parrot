@@ -8,7 +8,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Config;
-use Parrot::Test tests => 23;
+use Parrot::Test tests => 29;
 
 # macro tests
 
@@ -145,6 +145,60 @@ pir_output_is(<<'CODE', 'foo', "constant defined and used");
   end
 .end
 CODE
+
+pasm_output_is(<<'CODE', 'foo', "constant defined, used in a macro call");
+.constant FOO S0
+.macro answer (bar)
+  print .bar
+.endm
+  set .FOO,"foo"
+  .answer(.FOO)
+  end
+CODE
+
+open FOO, ">macro.tempfile";
+print FOO <<'ENDF';
+  set S0, "Betelgeuse\n"
+ENDF
+close FOO;
+
+pasm_output_is(<<"CODE", <<OUTPUT, "basic include macro");
+.include "macro.tempfile"
+  print S0
+
+  set S0, "Rigel"
+.include "macro.tempfile"
+  print S0
+  end
+CODE
+Betelgeuse
+Betelgeuse
+OUTPUT
+
+open FOO, ">macro.tempfile";   # Clobber previous
+print FOO <<'ENDF';
+.macro multiply(A,B)
+	new P0, .Float
+	set P0, .A
+	new P1, .Float
+	set P1, .B
+	new P2, .Float
+	mul P2, P1, P0
+.endm
+ENDF
+close FOO;
+
+pasm_output_is(<<"CODE", <<OUTPUT, "include a file defining a macro");
+.include "macro.tempfile"
+ .multiply(12,13)
+ print P2
+ print "\\n"
+ end
+CODE
+156
+OUTPUT
+
+unlink("macro.tempfile");
 
 pir_output_is( <<'CODE', <<OUTPUT, ".newid" );
 .sub test :main
@@ -311,5 +365,48 @@ pir_output_like( <<'CODE', <<OUTPUT, "unknown macro" );
 .end
 CODE
 /in macro '.M'/
+OUTPUT
+
+pir_output_is( <<'CODE', <<OUTPUT, "braces in param" );
+.macro M(A)
+    print .A
+.endm
+.sub test :main
+	$S0 = "foo\n"
+    .M({$S0})
+    end
+.end
+CODE
+foo
+OUTPUT
+
+pir_output_is( <<'CODE', <<OUTPUT, "braces and comma, with a newline in param" );
+.macro M(A)
+    .A
+.endm
+.sub test :main
+	$S0 = "foo\n"
+    .M({set $S0, "bar\n"
+		print $S0})
+    end
+.end
+CODE
+bar
+OUTPUT
+
+pir_output_is( <<'CODE', <<OUTPUT, "braces and parenthesis in param" );
+.macro M(A)
+    .A
+.endm
+.sub test :main
+    .M({foo()})
+    end
+.end
+
+.sub foo
+	print "foo\n"
+.end
+CODE
+foo
 OUTPUT
 

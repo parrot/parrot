@@ -678,6 +678,33 @@ yylex_skip (YYSTYPE *valp, void *interp, const char *skip)
         return c;
 }
 
+static char*
+read_braced (YYSTYPE *valp, void *interp, const char *macro_name,
+    char *current)
+{
+    int c;
+    YYSTYPE val;
+    int len = strlen(current);
+    c = yylex(&val, interp);
+    int count = 0;
+    while (c != '}' || count > 0) {
+        if (c == '}')      count--;
+        else if (c == '{') count++;
+        if (c <= 0)
+            IMCC_fataly(interp, E_SyntaxError,
+                    "End of file reached while reading arguments in '%s'",
+                    macro_name);
+        len += strlen(val.s);
+        current = realloc(current, len + 1);
+        strcat(current,val.s);
+        free(val.s);
+        c = yylex(&val,interp);
+    }
+    if (valp) *valp = val;
+    else free(val.s);
+    return current;
+}
+
 static int
 read_params (YYSTYPE *valp, void *interp, struct params_t *params,
          const char *macro_name, int need_id)
@@ -713,6 +740,10 @@ read_params (YYSTYPE *valp, void *interp, struct params_t *params,
             IMCC_fataly(interp, E_SyntaxError,
                     "Parameter definition in '%s' must be IDENTIFIER",
                     macro_name);
+        }
+        else if (c == '{') {
+            current = read_braced (&val, interp, macro_name, current);
+            c = yylex_skip(&val, interp, " \n");
         }
         else {
             if (!need_id || c != ' ') {

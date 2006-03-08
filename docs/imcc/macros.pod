@@ -137,5 +137,9 @@ simple example follows:
 
   .inc3(I0) # Expands to the obvious ('inc I0\n') x 3
 
+Using braces, C<{ }>, allows you to use commas and parenthesis inside
+parameters for a macro.  See F<runtime/parrot/include/hllmacros.pir> for
+examples and possible usage.
+
 =cut
 

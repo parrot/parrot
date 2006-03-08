@@ -838,12 +838,12 @@
 ^t/compilers/imcc/reg/.*\.pir$
 ^t/compilers/imcc/reg/.*\.pir/
 # generated from svn:ignore of 't/compilers/imcc/syn/'
+^t/compilers/imcc/syn/.*\.pasm$
+^t/compilers/imcc/syn/.*\.pasm/
 ^t/compilers/imcc/syn/.*\.pbc$
 ^t/compilers/imcc/syn/.*\.pbc/
 ^t/compilers/imcc/syn/.*\.pir$
 ^t/compilers/imcc/syn/.*\.pir/
-^t/compilers/imcc/syn/const_8\.pasm$
-^t/compilers/imcc/syn/const_8\.pasm/
 # generated from svn:ignore of 't/compilers/pge/'
 ^t/compilers/pge/.*\.pir$
 ^t/compilers/pge/.*\.pir/
