@@ -58,7 +58,11 @@ typedef struct Parrot_sub {
     size_t   end_offs;
 
     INTVAL   HLL_id;            /* see src/hll.c XXX or per segment? */
-    PMC      *namespace;       /* where this Sub is in */
+    PMC      *namespace;        /* where this Sub is in - this is either
+                                   a String or a [Key] and describes
+                                   the relative path in the NameSpace  
+                                */
+    PMC      *namespace_stash;  /* the actual hash, HLL::namespace */
     STRING   *name;             /* name of the sub */
     PMC      *multi_signature;  /* list of types for MMD */
     INTVAL   n_regs_used[4];	/* INSP in PBC */
@@ -83,7 +87,11 @@ typedef struct Parrot_coro {
     size_t   end_offs;
 
     INTVAL   HLL_id;            /* see src/hll.c XXX or per segment? */
-    PMC      *namespace;       /* where this Sub is in */
+    PMC      *namespace;        /* where this Sub is in - this is either
+                                   a String or a [Key] and describes
+                                   the relative path in the NameSpace  
+                                */
+    PMC      *namespace_stash;  /* the actual hash, HLL::namespace */
     STRING   *name;             /* name of the sub */
     PMC      *multi_signature;  /* list of types for MMD */
     INTVAL   n_regs_used[4];	/* INSP in PBC */

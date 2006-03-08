@@ -80,7 +80,7 @@ of strings or a chained key, add all components to the namespace.
                 if (!key_next(INTERP, key))
                     break;
             default:
-                assert("not yet" != NULL);
+                assert("not yet" == NULL);
         }
     }
 

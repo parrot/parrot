@@ -317,6 +317,7 @@ store_sub_in_namespace(Parrot_Interp interpreter, PMC* sub_pmc,
      */
     if (PMC_IS_NULL(namespace)) {
 global_ns:
+        /* XXX store relative - not absolute */
         Parrot_store_global(interpreter, NULL, sub_name, sub_pmc);
     }
     else {
@@ -362,6 +363,7 @@ global_ns:
                     globals = stash;
                 }
                 VTABLE_set_pmc_keyed_str(interpreter, stash, sub_name, sub_pmc);
+                PMC_sub(sub_pmc)->namespace_stash = stash;
                 break;
             default:
                 internal_exception(1, "Unhandled namespace constant");

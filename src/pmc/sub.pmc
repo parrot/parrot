@@ -544,6 +544,8 @@ Unarchives the subroutine.
 Return the namespace PMC or Undef. The namespace PMC is either a
 String PMC or a Key PMC for a nested namespace.
 
+TODO return C<namespace_stash> instead.
+
 =item C<METHOD INTVAL __get_regs_used(char *kind)>
 
 Return amount of used registers for register kinds "I", "S", "P", "N".
