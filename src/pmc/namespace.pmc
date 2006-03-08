@@ -49,6 +49,23 @@ other fields.
 
 /*
 
+=item C<void mark()>
+
+Marks the namespace as live.
+
+=cut
+
+*/
+    void mark() {
+        SUPER();
+        if (PMC_pmc_val(SELF))
+            pobject_lives(INTERP, (PObj*)PMC_pmc_val(SELF));
+        if (PMC_data(SELF))
+            pobject_lives(INTERP, (PObj*)PMC_data(SELF));
+    }
+
+/*
+
 =item C<void set_pmc_keyed_str(STRING *key, PMC *value)>
 
 Sets C<*value> as the namespace item for C<*key>. This is part of the
