@@ -37,6 +37,7 @@ pir.vim: pir.vim.in $(OPS_DIR)/*.ops
 
 vim-install: pir.vim
 	$(MKDIR) $(VIM_DIR)
+	$(CP) skeleton.pir $(VIM_DIR)
 	$(MKDIR) $(VIM_SYN_DIR)
 	$(CP) pir.vim $(VIM_SYN_DIR)
 	$(CP) pasm.vim $(VIM_SYN_DIR)
