@@ -178,7 +178,7 @@ typedef union {
 
 typedef struct Parrot_Context {
     /* common header with Interp_Context */
-    struct Parrot_Context *unused1;	/* placeholder */
+    struct Parrot_Context *caller_ctx;  /* caller context */
     Regs_ni                bp;          /* pointers to FLOATVAL & INTVAL */
     Regs_ps                bp_ps;       /* pointers to PMC & STR */
     /* end common header */
@@ -191,7 +191,6 @@ typedef struct Parrot_Context {
     struct Stack_Chunk *control_stack;  /* Base of the flow control stack */
     PMC      *lex_pad;                  /* LexPad PMC */
     struct Parrot_Context *outer_ctx;   /* outer context, if a closure */
-    struct Parrot_Context *caller_ctx;  /* caller context */
     UINTVAL warns;             /* Keeps track of what warnings
                                  * have been activated */
     UINTVAL errors;            /* fatals that can be turned off */
