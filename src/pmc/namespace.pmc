@@ -56,6 +56,11 @@ raw interface. If the PMC C<value> is exactly a NameSpace, C<SELF>
 will be set as the parent of that namespace and the name C<key> of
 C<value> is stored too.
 
+=item C<void set_pmc_keyed(PMC *key, PMC *value)>
+
+If C<key> is a simple key, it works like above. If C<key> is an array
+of strings or a chained key, add all components to the namespace.
+
 =cut
 
 */
@@ -65,6 +70,17 @@ C<value> is stored too.
         if (value->vtable->base_type == enum_class_NameSpace) {
             PMC_pmc_val(value) = SELF;  /* set parent */
             PMC_data(value)    = key;   /* and name */
+        }
+    }
+
+    void set_pmc_keyed(PMC *key, PMC *value) {
+        switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
+            case KEY_string_FLAG:
+                SELF.set_pmc_keyed_str(key_string(INTERP, key), value);
+                if (!key_next(INTERP, key))
+                    break;
+            default:
+                assert("not yet" != NULL);
         }
     }
 
@@ -82,6 +98,45 @@ Return the name of this namespace part.
         return PMC_data(SELF);
     }
 
+/*
+
+=back
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
+
+/*
+
+=item C<METHOD PMC* name()>
+
+Returns the name of the namespace as an array of strings.
+
+XXX Should the NULL String of namespace root be included?
+    See also t/pmc/namespace_20.pir.  
+
+  $P2 = $P3.'name'()
+  $S0 = join '::', $P2            # '::Foo::Bar'
+
+=cut
+
+*/
+
+    METHOD PMC* name() {
+        PMC *ar, *ns;
+
+        ar = pmc_new(INTERP, enum_class_ResizableStringArray);
+        ns = SELF;
+        while (ns) {
+            VTABLE_unshift_string(INTERP, ar, PMC_data(ns));
+            ns = PMC_pmc_val(ns);
+        }
+        return ar;
+    }
 }
 
 /*
