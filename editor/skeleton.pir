@@ -1,0 +1,2 @@
+.sub main :main
+.end

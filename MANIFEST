@@ -365,6 +365,7 @@ editor/pasm.vim                                   [devel]
 editor/pir-mode.el                                [devel]
 editor/pir.vim.in                                 [devel]
 editor/pmc.vim                                    [devel]
+editor/skeleton.pir                               [devel]
 editor/README.pod                                 [devel]
 examples/README                                   [main]doc
 examples/benchmarks/addit.pasm                    [main]doc
