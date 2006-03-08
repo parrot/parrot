@@ -105,8 +105,9 @@ given by C<src>.
     if $I0 > 0 goto loop
     namehash[namespace] = 1
     inc namecount
-    emit(onload, "    $P0 = getclass \"%s\"", namespace)
-    emit(onload, "    unless_null $P0, onload_%s", namecount)
+    emit(onload, "    $I0 = find_type \"%s\"", namespace)
+    emit(onload, "    if $I0 != 0 goto onload_%s", namecount)
+    emit(onload, "    load_bytecode \"PGE.pbc\"")
     emit(onload, "    $P0 = subclass \"PGE::Rule\", \"%s\"", namespace)
     emit(onload, "  onload_%s:", namecount)
     goto loop
