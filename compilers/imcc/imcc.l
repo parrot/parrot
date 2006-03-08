@@ -682,11 +682,12 @@ static char*
 read_braced (YYSTYPE *valp, void *interp, const char *macro_name,
     char *current)
 {
-    int c;
+    int c, count, len;
     YYSTYPE val;
-    int len = strlen(current);
+
+    len = strlen(current);
     c = yylex(&val, interp);
-    int count = 0;
+    count = 0;
     while (c != '}' || count > 0) {
         if (c == '}')      count--;
         else if (c == '{') count++;
