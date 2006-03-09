@@ -51,9 +51,11 @@ adding additional functionality.
 
 =item v
 
-Void. As a return type indicates that there I<is> no return type. As a
-parameter indicates that there are no parameters. Can't be mixed with other
-parameter types.
+Void. As a return type it indicates that there I<is> no return type.
+
+As a parameter it indicates that there are no parameters (this use is now
+deprecated - use an empty parameter string to indicate that there are no
+parameters). Can't be mixed with other parameter types.
 
 =item c
 

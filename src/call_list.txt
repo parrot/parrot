@@ -49,14 +49,12 @@
 c                # t/pmc/nci.t
 c	p
 c	pi
-c	v
 
 d                # t/pmc/nci.t
 d	d
 d	JOd      # Parrot builtins
 I       JOS
 S       JOS      # ParrotIO.readline
-d	v
 I	JI	 # Parrot_is_char_*
 v       JOSP     # String.trans
 v       JOS      # String.reverse
@@ -83,7 +81,6 @@ I	JPP      # MMD compare
 f                # t/pmc/nci.t
 f	ff       # t/pmc/nci.t
 f	is
-f	v
 
 i
 i	b        # t/pmc/nci.t
@@ -148,7 +145,6 @@ i	sss
 i	ssss
 i	t
 i	ti
-i	v
 i	4
 i	4i
 i	42p
@@ -160,7 +156,6 @@ l	p
 l	pi
 l	pii
 l	p33l
-l	v
 l	33l
 
 P	Ji       # Needed for parrot threads
@@ -185,10 +180,8 @@ p	piiii
 p	t
 p	tpp
 p	ttttttt
-p	v
 
 s             # t/pmc/nci.t
-s	v
 
 t             # t/pmc/nci.t
 t	i
@@ -200,7 +193,6 @@ t	pt
 t	t
 t	tl4
 t	t4
-t	v
 
 v
 v	Jiiip    # examples/japh/japh11.pasm
@@ -215,7 +207,6 @@ v	pi
 v	piiii
 v	pl
 v	pp
-v	v
 
 # These are needed for parrotio.pmc
 i	JP
@@ -343,3 +334,77 @@ v      JOI
 
 # Make lua stop panic'ing.
 P      JOI
+
+
+# --- start mysqlclient library ---
+# Created from mysql.h using the following manual method:
+# Edited copy of mysql.h using vi by doing g/, *$/j (repeat) then g/\* *$/j (repeat)
+# to get all functions on one line each.
+# Extracted list of api func names from http://dev.mysql.com/doc/refman/4.1/en/c-api-functions.html
+# and copied to a temporary file to clean up (mysql_api_names.txt)
+# Stripped down to bare names and merged into one line separated by |
+# then egrep -w `cat mysql_api_names.txt` mysql.h > mysql_api.ncidef
+# then edit mysql_api.ncidef in vi: %s/^/   #  /
+# to create space for nci signatures and to use original definition as a # comment.
+# This method isn't ideal, I'm just noting it here in case it helps others.
+# Ideally the process should be automated - but there be many dragons along # that path.
+#
+# long long values (my_ulonglong) aren't handled by nci - spec'd as just long for now
+#
+#	MYSQL_FIELD and MYSQL_RES are structs
+#	typedef char **MYSQL_ROW;               /* return data as array of strings */
+#	typedef unsigned int MYSQL_FIELD_OFFSET; /* offset to current field */
+#	typedef MYSQL_ROWS *MYSQL_ROW_OFFSET;   /* offset to current row */
+#
+l p	#! my_ulonglong mysql_num_rows(MYSQL_RES *res)
+i p	#  unsigned int mysql_num_fields(MYSQL_RES *res)
+c p	#  my_bool mysql_eof(MYSQL_RES *res)
+p pi	#  MYSQL_FIELD *mysql_fetch_field_direct(MYSQL_RES *res, unsigned int fieldnr)
+p p	#  MYSQL_FIELD * mysql_fetch_fields(MYSQL_RES *res)
+p p	#  MYSQL_ROW_OFFSET mysql_row_tell(MYSQL_RES *res)
+i p	#  MYSQL_FIELD_OFFSET mysql_field_tell(MYSQL_RES *res)
+i p	#  unsigned int mysql_field_count(MYSQL *mysql)
+l p	#! my_ulonglong mysql_affected_rows(MYSQL *mysql)
+l p	#! my_ulonglong mysql_insert_id(MYSQL *mysql)
+i p	#  unsigned int mysql_errno(MYSQL *mysql)
+t p	#  const char * mysql_error(MYSQL *mysql)
+t p	#  const char * mysql_info(MYSQL *mysql)
+l p	#  unsigned long mysql_thread_id(MYSQL *mysql)
+t p	#  const char * mysql_character_set_name(MYSQL *mysql)
+p p	#  MYSQL * mysql_init(MYSQL *mysql)
+i pttttt	#  int mysql_ssl_set(MYSQL *mysql, const char *key, const char *cert, const char *ca, const char *capath, const char *cipher)
+c pttt		#  my_bool mysql_change_user(MYSQL *mysql, const char *user, const char *passwd, const char *db)
+p pttttiti	#  MYSQL * mysql_real_connect(MYSQL *mysql, const char *host, const char *user, const char *passwd, const char *db, unsigned int port, const char *unix_socket, unsigned int clientflag)
+v p	#  void mysql_close(MYSQL *sock)
+i pt	#  int mysql_select_db(MYSQL *mysql, const char *db)
+i pt	#  int mysql_query(MYSQL *mysql, const char *q)
+i ptl	#  int mysql_real_query(MYSQL *mysql, const char *q, unsigned long length)
+i p	#  int mysql_shutdown(MYSQL *mysql)
+i p	#  int mysql_dump_debug_info(MYSQL *mysql)
+i pi	#  int mysql_refresh(MYSQL *mysql, unsigned int refresh_options)
+i pl	#  int mysql_kill(MYSQL *mysql,unsigned long pid)
+i p	#  int mysql_ping(MYSQL *mysql)
+t p	#  const char * mysql_stat(MYSQL *mysql)
+t p	#  const char * mysql_get_server_info(MYSQL *mysql)
+t p	#  const char * mysql_get_client_info(void)
+l	#  unsigned long mysql_get_client_version(void)
+t p	#  const char * mysql_get_host_info(MYSQL *mysql)
+t p	#  unsigned int mysql_get_proto_info(MYSQL *mysql)
+p pt	#  MYSQL_RES * mysql_list_dbs(MYSQL *mysql,const char *wild)
+p pt	#  MYSQL_RES * mysql_list_tables(MYSQL *mysql,const char *wild)
+p ptt	#  MYSQL_RES * mysql_list_fields(MYSQL *mysql, const char *table, const char *wild)
+p p	#  MYSQL_RES * mysql_list_processes(MYSQL *mysql)
+p p	#  MYSQL_RES * mysql_store_result(MYSQL *mysql)
+p p	#  MYSQL_RES * mysql_use_result(MYSQL *mysql)
+i pit	#  int mysql_options(MYSQL *mysql,enum mysql_option option, const char *arg)
+v p	#  void mysql_free_result(MYSQL_RES *result)
+v pl	#  void mysql_data_seek(MYSQL_RES *result, my_ulonglong offset)
+p pp	#  MYSQL_ROW_OFFSET mysql_row_seek(MYSQL_RES *result, MYSQL_ROW_OFFSET offset)
+i pi	#  MYSQL_FIELD_OFFSET mysql_field_seek(MYSQL_RES *result, MYSQL_FIELD_OFFSET offset)
+p p	#  MYSQL_ROW mysql_fetch_row(MYSQL_RES *result)
+l p	#  unsigned long * mysql_fetch_lengths(MYSQL_RES *result)
+p p	#  MYSQL_FIELD * mysql_fetch_field(MYSQL_RES *result)
+l ttl	#  unsigned long mysql_escape_string(char *to,const char *from, unsigned long from_length)
+l pttl	#  unsigned long mysql_real_escape_string(MYSQL *mysql, char *to,const char *from, unsigned long length)
+v t	#  void mysql_debug(const char *debug)
+# --- end mysqlclient library ---
