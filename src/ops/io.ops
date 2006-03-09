@@ -520,7 +520,7 @@ op tell(out INT, out INT, in PMC) :base_io {
 
 =item B<connect>(out INT, in PMC, in STR)
 
-=item B<recv>(out INT, in PMC, in STR)
+=item B<recv>(out INT, in PMC, out STR)
 
 =item B<send>(out INT, in PMC, in STR)
 
@@ -552,7 +552,11 @@ op connect(out INT, in PMC, in STR) :base_network {
     goto NEXT();
 }
 
-op recv(out INT, in PMC, in STR) :base_network {
+op NO_SUCH_recv(out INT, in PMC, inconst STR) :base_network {
+    goto NEXT();
+}
+
+op recv(out INT, in PMC, out STR) :base_network {
     STRING *dest = $3;
     $1 = (INTVAL)PIO_recv(interpreter, $2, &dest);
     $3 = dest;

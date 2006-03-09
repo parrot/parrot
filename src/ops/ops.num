@@ -508,7 +508,7 @@ sockaddr_s_ic_sc                477
 connect_i_p_s                   478
 connect_i_p_sc                  479
 recv_i_p_s                      480
-recv_i_p_sc                     481
+NO_SUCH_recv_i_p_sc                     481
 send_i_p_s                      482
 send_i_p_sc                     483
 poll_i_p_i_i_i                  484
