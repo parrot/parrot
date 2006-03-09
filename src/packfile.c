@@ -448,28 +448,22 @@ do_sub_pragmas(Interp *interpreter, struct PackFile_ByteCode *self,
                     internal_exception(1,
                             "Illegal fixup offset (%d) in enum_fixup_sub");
                 sub_pmc = ct->constants[ci]->u.key;
-                switch (sub_pmc->vtable->base_type) {
-                    case enum_class_Sub:
-                    case enum_class_Closure:
-                    case enum_class_Coroutine:
-                        PMC_sub(sub_pmc)->eval_pmc = eval_pmc;
-                        if ((PObj_get_FLAGS(sub_pmc) & SUB_FLAG_PF_MASK) &&
-                                    sub_pragma(interpreter, action, sub_pmc)) {
-                            result = do_1_sub_pragma(interpreter, 
-                                    sub_pmc, action);
-                            /*
-                             * replace the Sub PMC with the result of the
-                             * computation
-                             */
-                            if (action == PBC_IMMEDIATE && 
-                                    !PMC_IS_NULL(result)) {
-                                ft->fixups[i]->type = enum_fixup_none;
-                                ct->constants[ci]->u.key = result;
-                            }
-                        }
-                        break;
+                PMC_sub(sub_pmc)->eval_pmc = eval_pmc;
+                if ((PObj_get_FLAGS(sub_pmc) & SUB_FLAG_PF_MASK) &&
+                        sub_pragma(interpreter, action, sub_pmc)) {
+                    result = do_1_sub_pragma(interpreter, 
+                            sub_pmc, action);
+                    /*
+                     * replace the Sub PMC with the result of the
+                     * computation
+                     */
+                    if (action == PBC_IMMEDIATE && 
+                            !PMC_IS_NULL(result)) {
+                        ft->fixups[i]->type = enum_fixup_none;
+                        ct->constants[ci]->u.key = result;
+                    }
                 }
-                /* goon */
+                break;
             case enum_fixup_label:
                 /* fill in current bytecode seg */
                 ft->fixups[i]->seg = self;

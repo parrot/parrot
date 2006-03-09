@@ -671,7 +671,13 @@ add_const_pmc_sub(Interp *interpreter, SymReg *r,
     type = (r->pcc_sub->calls_a_sub & ITPCCYIELD) ?
         enum_class_Coroutine :
         unit->outer ? enum_class_Closure : enum_class_Sub;
-    /* TODO constant - see also src/packfile.c
+    /*
+     * use a possible type mapping for the Sub PMCs
+     * XXX need to place HLL_id into context during compile to
+     *     make this actually working
+     */
+    type = Parrot_get_ctx_HLL_type(interpreter, type);
+    /* TODO create constant - see also src/packfile.c
     */
     sub_pmc = pmc_new(interpreter, type);
     PObj_get_FLAGS(sub_pmc) |= (r->pcc_sub->pragma & SUB_FLAG_PF_MASK);
