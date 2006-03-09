@@ -22,6 +22,7 @@ of the Lua C<Function> type.
 #include "parrot/parrot.h"
 
 static STRING *luafunction_name;
+static INTVAL dynpmc_LuaBoolean;
 static INTVAL dynpmc_LuaNil;
 static INTVAL dynpmc_LuaString;
 
@@ -40,12 +41,21 @@ pmclass LuaFunction
             PMC *meth;
 
             luafunction_name = const_string(INTERP, "function");
+            dynpmc_LuaBoolean = pmc_type(INTERP,
+              string_from_const_cstring(INTERP, "LuaBoolean", 0));
             dynpmc_LuaNil = pmc_type(INTERP,
               string_from_const_cstring(INTERP, "LuaNil", 0));
             dynpmc_LuaString = pmc_type(INTERP,
               string_from_const_cstring(INTERP, "LuaString", 0));
 
             /* namespace hack */
+            meth = Parrot_find_global(INTERP,
+                const_string(INTERP, "LuaFunction"),
+                const_string(INTERP, "rawequal"));
+            Parrot_store_global(INTERP,
+                const_string(INTERP, "function"),
+                const_string(INTERP, "rawequal"),
+                meth);
             meth = Parrot_find_global(INTERP,
                 const_string(INTERP, "LuaFunction"),
                 const_string(INTERP, "tostring"));
@@ -127,6 +137,25 @@ Return always false.
 =head2 Specific Methods
 
 =over 4
+
+=item C<PMC* rawequal (PMC* value)>
+
+=cut
+
+*/
+    METHOD PMC* rawequal (PMC* value) {
+        PMC *retval;
+       
+        retval = pmc_new(INTERP, dynpmc_LuaBoolean);
+        if (SELF->vtable->base_type == value->vtable->base_type
+         && SELF == value)
+            PMC_int_val(retval) = 1;
+        else
+            PMC_int_val(retval) = 0;
+        return retval;
+    }
+
+/*
 
 =item C<PMC* tonumber()>
 

@@ -26,6 +26,7 @@ The value is stored as an Integer.
 static STRING *false_string;
 static STRING *true_string;
 static STRING *luaboolean_name;
+static INTVAL dynpmc_LuaBoolean;
 
 pmclass LuaBoolean
     extends LuaBase
@@ -46,21 +47,16 @@ pmclass LuaBoolean
             false_string = const_string(INTERP, "false");
             true_string = const_string(INTERP, "true");
             luaboolean_name = const_string(INTERP, "boolean");
+            dynpmc_LuaBoolean = pmc_type(INTERP,
+              string_from_const_cstring(INTERP, "LuaBoolean", 0));
 
             /* namespace hack */
             meth = Parrot_find_global(INTERP,
                 const_string(INTERP, "LuaBoolean"),
-                const_string(INTERP, "tostring"));
+                const_string(INTERP, "rawequal"));
             Parrot_store_global(INTERP,
                 const_string(INTERP, "boolean"),
-                const_string(INTERP, "tostring"),
-                meth);
-            meth = Parrot_find_global(INTERP,
-                const_string(INTERP, "LuaBoolean"),
-                const_string(INTERP, "tonumber"));
-            Parrot_store_global(INTERP,
-                const_string(INTERP, "boolean"),
-                const_string(INTERP, "tonumber"),
+                const_string(INTERP, "rawequal"),
                 meth);
         }
     }
@@ -246,6 +242,31 @@ MMD_DEFAULT: {
                     string_to_cstring(INTERP, VTABLE_name(INTERP, value)));
             return (INTVAL)0;
         }
+    }
+
+/*
+
+=back
+
+=head2 Specific Methods
+
+=over 4
+
+=item C<PMC* rawequal (PMC* value)>
+
+=cut
+
+*/
+    METHOD PMC* rawequal (PMC* value) {
+        PMC *retval;
+       
+        retval = pmc_new(INTERP, dynpmc_LuaBoolean);
+        if (SELF->vtable->base_type == value->vtable->base_type
+         && PMC_int_val(SELF) == PMC_int_val(value))
+            PMC_int_val(retval) = 1;
+        else
+            PMC_int_val(retval) = 0;
+        return retval;
     }
 
 }

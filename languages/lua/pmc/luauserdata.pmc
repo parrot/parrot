@@ -22,6 +22,7 @@ the Lua C<Userdata> type.
 #include "parrot/parrot.h"
 
 static STRING *luauserdata_name;
+static INTVAL dynpmc_LuaBoolean;
 static INTVAL dynpmc_LuaString;
 
 
@@ -40,23 +41,18 @@ pmclass LuaUserdata
 
             Parrot_LuaBase_super_init(INTERP, NULL);
             luauserdata_name = const_string(INTERP, "userdata");
+            dynpmc_LuaBoolean = pmc_type(INTERP,
+              string_from_const_cstring(INTERP, "LuaBoolean", 0));
             dynpmc_LuaString = pmc_type(INTERP,
               string_from_const_cstring(INTERP, "LuaString", 0));
 
             /* namespace hack */
             meth = Parrot_find_global(INTERP,
                 const_string(INTERP, "LuaUserdata"),
-                const_string(INTERP, "tostring"));
+                const_string(INTERP, "rawequal"));
             Parrot_store_global(INTERP,
                 const_string(INTERP, "userdata"),
-                const_string(INTERP, "tostring"),
-                meth);
-            meth = Parrot_find_global(INTERP,
-                const_string(INTERP, "LuaUserdata"),
-                const_string(INTERP, "tonumber"));
-            Parrot_store_global(INTERP,
-                const_string(INTERP, "userdata"),
-                const_string(INTERP, "tonumber"),
+                const_string(INTERP, "rawequal"),
                 meth);
         }
     }
@@ -141,6 +137,31 @@ Sets the value of the string to that of the specified C<string>.
 */
     void set_string_native (STRING* value) {
         PMC_str_val(SELF) = value;
+    }
+
+/*
+
+=back
+
+=head2 Specific Methods
+
+=over 4
+
+=item C<PMC* rawequal (PMC* value)>
+
+=cut
+
+*/
+    METHOD PMC* rawequal (PMC* value) {
+        PMC *retval;
+       
+        retval = pmc_new(INTERP, dynpmc_LuaBoolean);
+        if (SELF->vtable->base_type == value->vtable->base_type
+         && SELF == value)
+            PMC_int_val(retval) = 1;
+        else
+            PMC_int_val(retval) = 0;
+        return retval;
     }
 
 }

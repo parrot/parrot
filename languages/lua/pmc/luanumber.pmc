@@ -25,6 +25,7 @@ the Lua C<Number> type.
 #define LUA_NUMBER_FMT		"%.14g"
 
 static STRING *luanumber_name;
+static INTVAL dynpmc_LuaBoolean;
 static INTVAL dynpmc_LuaNil;
 static INTVAL dynpmc_LuaString;
 
@@ -44,6 +45,8 @@ pmclass LuaNumber
 
             Parrot_LuaBase_super_init(INTERP, NULL);
             luanumber_name = const_string(INTERP, "number");
+            dynpmc_LuaBoolean = pmc_type(INTERP,
+              string_from_const_cstring(INTERP, "LuaBoolean", 0));
             dynpmc_LuaNil = pmc_type(INTERP,
               string_from_const_cstring(INTERP, "LuaNil", 0));
             dynpmc_LuaString = pmc_type(INTERP,
@@ -52,10 +55,10 @@ pmclass LuaNumber
             /* namespace hack */
             meth = Parrot_find_global(INTERP,
                 const_string(INTERP, "LuaNumber"),
-                const_string(INTERP, "tostring"));
+                const_string(INTERP, "rawequal"));
             Parrot_store_global(INTERP,
                 const_string(INTERP, "number"),
-                const_string(INTERP, "tostring"),
+                const_string(INTERP, "rawequal"),
                 meth);
             meth = Parrot_find_global(INTERP,
                 const_string(INTERP, "LuaNumber"),
@@ -865,6 +868,25 @@ MMD_DEFAULT: {
 =head2 Specific Methods
 
 =over 4
+
+=item C<PMC* rawequal (PMC* value)>
+
+=cut
+
+*/
+    METHOD PMC* rawequal (PMC* value) {
+        PMC *retval;
+       
+        retval = pmc_new(INTERP, dynpmc_LuaBoolean);
+        if (SELF->vtable->base_type == value->vtable->base_type
+         && PMC_num_val(SELF) == PMC_num_val(value))
+            PMC_int_val(retval) = 1;
+        else
+            PMC_int_val(retval) = 0;
+        return retval;
+    }
+
+/*
 
 =item C<PMC* tonumber()>
 

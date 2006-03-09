@@ -25,6 +25,7 @@ Now, Lua 5.0 uses a hybrid data structure with a Hash part and an Array part.
 #include "parrot/parrot.h"
 
 static STRING *luatable_name;
+static INTVAL dynpmc_LuaBoolean;
 static INTVAL dynpmc_LuaNil;
 static INTVAL dynpmc_LuaNumber;
 static INTVAL dynpmc_LuaString;
@@ -59,6 +60,8 @@ pmclass LuaTable
 
             Parrot_LuaBase_super_init(INTERP, NULL);
             luatable_name = const_string(INTERP, "table");
+            dynpmc_LuaBoolean = pmc_type(INTERP,
+              string_from_const_cstring(INTERP, "LuaBoolean", 0));
             dynpmc_LuaNil = pmc_type(INTERP,
               string_from_const_cstring(INTERP, "LuaNil", 0));
             dynpmc_LuaNumber = pmc_type(INTERP,
@@ -89,6 +92,13 @@ pmclass LuaTable
             Parrot_store_global(INTERP,
                 const_string(INTERP, "table"),
                 const_string(INTERP, "tonumber"),
+                meth);
+            meth = Parrot_find_global(INTERP,
+                const_string(INTERP, "LuaTable"),
+                const_string(INTERP, "rawequal"));
+            Parrot_store_global(INTERP,
+                const_string(INTERP, "table"),
+                const_string(INTERP, "rawequal"),
                 meth);
             meth = Parrot_find_global(INTERP,
                 const_string(INTERP, "LuaTable"),
@@ -455,6 +465,25 @@ MMD_DEFAULT: {
         }
         retval = pmc_new(INTERP, dynpmc_LuaNumber);
         PMC_num_val(retval) = (FLOATVAL)(idx - 1);
+        return retval;
+    }
+
+/*
+
+=item C<PMC* rawequal (PMC* value)>
+
+=cut
+
+*/
+    METHOD PMC* rawequal (PMC* value) {
+        PMC *retval;
+       
+        retval = pmc_new(INTERP, dynpmc_LuaBoolean);
+        if (SELF->vtable->base_type == value->vtable->base_type
+         && SELF == value)
+            PMC_int_val(retval) = 1;
+        else
+            PMC_int_val(retval) = 0;
         return retval;
     }
 

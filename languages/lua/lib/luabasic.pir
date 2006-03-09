@@ -558,16 +558,16 @@ L3:
 Checks whether C<v1> is equal to C<v2>, without invoking any metamethod.
 Returns a boolean.
 
-NOT YET IMPLEMENTED.
-
 =cut
 
 .sub _lua_rawequal :anon
     .param pmc v1 :optional
     .param pmc v2 :optional
+    .local pmc ret
     checkany(v1)
     checkany(v2)
-    not_implemented()
+     ret = v1."rawequal"(v2)
+    .return (ret)
 .end
 
 =item C<rawget (table, index)>
@@ -583,7 +583,6 @@ C<table> must be a table; C<index> is any value different from B<nil>.
     .local pmc ret
     checktype(table, "table")
     checkany(index)
-#    ret = table[index]
      ret = table."rawget"(index)
     .return (ret)
 .end
@@ -603,7 +602,6 @@ B<nil>, and C<value> is any Lua value.
     checktype(table, "table")
     checkany(index)
     checkany(value)
-#    table[index] = value
     table."rawset"(index, value)
     .return ()
 .end
