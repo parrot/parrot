@@ -211,6 +211,8 @@ main(int argc, char **argv)
     }
     interpreter = make_interpreter(NULL, PARROT_NO_FLAGS);
     Parrot_init(interpreter);
+    Parrot_block_DOD(interpreter);
+    Parrot_block_GC(interpreter);
     while ((status = longopt_get(interpreter,
                     argc, argv, options, &opt)) > 0) {
         switch (opt.opt_id) {
