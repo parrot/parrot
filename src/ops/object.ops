@@ -217,8 +217,7 @@ pointer for the new PMC is put in there).
 =cut
 
 inline op newclass(out PMC, in STR) :object_classes {
-  PMC* class = $1 = pmc_new(interpreter, enum_class_ParrotClass);
-  Parrot_new_class(interpreter, class, $2);
+  $1 = pmc_new_init(interpreter, enum_class_ParrotClass, (PMC*)$2);
   goto NEXT();
 }
 

@@ -62,7 +62,12 @@ pmclass ParrotClass extends delegate need_ext {
 
 =item C<void init()>
 
-Initializes the class.
+Initializes the class flags.
+
+=item C<void init_pms(PMC *init)>
+
+The actual class creation code, called from C<newclass> opcode. The C<init>
+argument is not a PMC* but the C<classname> STRING.
 
 =cut
 
@@ -73,8 +78,15 @@ Initializes the class.
         PMC_int_val(SELF) = ATTRIB_COUNT(SELF) = 0;
         /* But we are a class, really */
         PObj_is_class_SET(SELF);
+        /* turn on marking of the class_data array */
         PObj_data_is_PMC_array_SET(SELF);
-        /* s. Parrot_new_class() for more initialization */
+    }
+
+    void init_pmc (PMC* name) {
+        STRING *class_name = (STRING*) name;
+
+        SELF.init();
+        Parrot_new_class(INTERP, SELF, class_name);
     }
 
 /*
@@ -225,8 +237,7 @@ Create the class from the thawed parents and attributes array.
             }
             else {
                 real_class = SELF;
-                SELF.init();
-                Parrot_new_class(INTERP, SELF, class_name);
+                SELF.init_pmc((PMC*)class_name);
             }
             /* make room for thawed arrays */
             if (PMC_int_val(real_class) == PCD_MAX) {

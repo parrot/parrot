@@ -273,9 +273,8 @@ Parrot_single_subclass(Interp* interpreter, PMC *base_class,
      * ParrotClass is the baseclass anyway, so build just a new class
      */
     if (base_class == Parrot_base_vtables[enum_class_ParrotClass]->class) {
-        PMC* class = pmc_new(interpreter, enum_class_ParrotClass);
-        Parrot_new_class(interpreter, class, child_class_name);
-        return class;
+        return pmc_new_init(interpreter, enum_class_ParrotClass, 
+                (PMC*)child_class_name);
     }
     parent_is_class = PObj_is_class_TEST(base_class);
 
