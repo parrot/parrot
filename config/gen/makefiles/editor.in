@@ -31,7 +31,7 @@ help :
 	@echo "  realclean:         clean up local files including Makefile"
 	@echo ""
 
-pir.vim: pir.vim.in $(OPS_DIR)/*.ops
+pir.vim: pir.vim.in $(OPS_DIR)/*.ops ops2vim.pl
 	$(CP) pir.vim.in pir.vim
 	$(PERL) ops2vim.pl $(OPS_DIR)/*.ops >> pir.vim
 

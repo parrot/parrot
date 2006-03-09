@@ -1,8 +1,19 @@
-#! perl -w
+#! perl
+use strict;
+use warnings;
+
+use File::Basename qw/basename/;
+
 
 my $cline = my $prefix = 'syn keyword pirOp';
 
 my %seen;
+
+## make sure files have been globbed on non-globbing OSes
+## and make sure at least one command-line parameter has been passed
+@ARGV = @ARGV
+    ? map {glob $_} @ARGV
+    : die "usage: " . basename($0) . " FILE [ FILE [ ... ] ]\n";
 
 while (<>) {
     if (/\bop \s+ (\w+) \s* \(/x) {
@@ -12,6 +23,8 @@ while (<>) {
             $cline = $prefix;
         }
         $cline .= " $1";
-    } 
+    }
 }
+
+###
 print "$cline\n";
