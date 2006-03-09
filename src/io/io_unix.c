@@ -718,6 +718,7 @@ static INTVAL
 PIO_unix_connect(theINTERP, ParrotIOLayer *layer, ParrotIO *io, STRING *r)
 {
     UNUSED(layer);
+    UNUSED(interpreter);
 
     if (r) {
         struct sockaddr_in sa;
@@ -726,9 +727,11 @@ PIO_unix_connect(theINTERP, ParrotIOLayer *layer, ParrotIO *io, STRING *r)
         io->remote.sin_port = sa.sin_port;
     }
 AGAIN:
+#if PIO_TRACE
     PIO_eprintf(interpreter,
             "connect: fd = %d port = %d\n",
             io->fd, ntohs(io->remote.sin_port));
+#endif
     if ((connect(io->fd, (struct sockaddr*)&io->remote,
                     sizeof(struct sockaddr))) != 0) {
         switch(errno) {

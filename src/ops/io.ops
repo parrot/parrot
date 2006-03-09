@@ -555,6 +555,7 @@ op connect(out INT, in PMC, in STR) :base_network {
 op recv(out INT, in PMC, in STR) :base_network {
     STRING *dest = $3;
     $1 = (INTVAL)PIO_recv(interpreter, $2, &dest);
+    $3 = dest;
     goto NEXT();
 }
 
