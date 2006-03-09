@@ -210,9 +210,8 @@ main(int argc, char **argv)
         help();
     }
     interpreter = make_interpreter(NULL, PARROT_NO_FLAGS);
-    Parrot_init(interpreter);
-    Parrot_block_DOD(interpreter);
-    Parrot_block_GC(interpreter);
+    /* init and set top of stack */
+    Parrot_init_stacktop(interpreter, &status);
     while ((status = longopt_get(interpreter,
                     argc, argv, options, &opt)) > 0) {
         switch (opt.opt_id) {
