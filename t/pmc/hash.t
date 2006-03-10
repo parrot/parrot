@@ -657,8 +657,8 @@ OUTPUT
 
 pasm_output_is(<<CODE, <<OUTPUT, "Setting & getting non-scalar PMCs");
         new P0,.Hash
-        new P1,.PerlArray
-        new P2,.PerlArray
+        new P1,.ResizablePMCArray
+        new P2,.ResizablePMCArray
         set P1[4],"string"
         set P0["one"],P1
         set P2,P0["one"]
@@ -674,7 +674,7 @@ pasm_output_is(<<'CODE', <<OUTPUT, "Testing clone");
     new P0, .Hash
     set S0, "a"
     set P0[S0], S0
-    new P2, .PerlArray
+    new P2, .ResizablePMCArray
     set P2, 2
     set P0["b"], P2
 
@@ -742,7 +742,7 @@ OUTPUT
 pasm_output_is(<<'CODE', <<OUTPUT, "Compound keys");
     new P0, .Hash
     new P1, .Hash
-    new P2, .PerlArray
+    new P2, .ResizablePMCArray
     set P1["b"], "ab"
     set P0["a"], P1
     set S0, P0["a";"b"]
@@ -1143,13 +1143,13 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "Setting with compound keys");
     .local pmc inner_hash
     inner_hash = new Hash
     .local pmc inner_array
-    inner_array = new PerlArray
+    inner_array = new ResizablePMCArray
     .local string elem_string
     .local int    elem_int
     .local pmc    elem_pmc
     .local num    elem_num
 
-    # setting and retrieving strings in an inner PerlArray
+    # setting and retrieving strings in an inner ResizablePMCArray
     inner_array[128] = 'inner_array:128'
     outer_hash['inner_array'] = inner_array
     elem_string = outer_hash['inner_array';128]
@@ -1171,7 +1171,7 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "Setting with compound keys");
     print elem_string
     print "\n"
 
-    # setting and retrieving integer in an inner PerlArray
+    # setting and retrieving integer in an inner ResizablePMCArray
     inner_array[130] = 130
     outer_hash['inner_array'] = inner_array
     elem_int = outer_hash['inner_array';130]
@@ -1193,7 +1193,7 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "Setting with compound keys");
     print elem_int
     print "\n"
 
-    # setting and retrieving a PMC in an inner PerlArray
+    # setting and retrieving a PMC in an inner ResizablePMCArray
     .local pmc in_pmc
     in_pmc = new String
     in_pmc = 'inner_array:132'
@@ -1221,7 +1221,7 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "Setting with compound keys");
     print elem_string
     print "\n"
 
-    # setting and retrieving a float in an inner PerlArray
+    # setting and retrieving a float in an inner ResizablePMCArray
     inner_array[134] = 134.134
     outer_hash['inner_array'] = inner_array
     elem_num = outer_hash['inner_array';134]

@@ -107,10 +107,10 @@ ok 11
 ok 12
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "PerlHash iter 1");
+pasm_output_is(<<'CODE', <<'OUTPUT', "Hash iter 1");
     .include "iterator.pasm"
-	new P0, .PerlHash	# empty Hash
-	new P2, .PerlHash	# Hash with 2 elements
+	new P0, .Hash	# empty Hash
+	new P2, .Hash	# Hash with 2 elements
 	set P2["ab"], 100
 	set P2["xy"], "value"
 	set I0, P2

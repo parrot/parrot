@@ -1926,7 +1926,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "init with and w/o arg");
     a = getattribute o, "a"
     print a
     h = new .Hash
-    $P0 = new .PerlString
+    $P0 = new .String
     $P0 = "ok 2\n"
     h['a'] = $P0
     $I0 = find_type 'Foo'
@@ -1944,7 +1944,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "init with and w/o arg");
     .return ()
 
 set_default:    
-    $P0 = new .PerlString
+    $P0 = new .String
     $P0 = "ok 1\n"
     setattribute self, 'a', $P0
 .end

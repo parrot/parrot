@@ -48,7 +48,7 @@ OUTPUT
 
 
 pasm_output_is(<<'CODE', <<'OUTPUT', "element access - float, double");
-    new P2, .PerlArray
+    new P2, .ResizablePMCArray
     .include "datatypes.pasm"
     push P2, .DATATYPE_FLOAT
     push P2, 2	# 2 elem array
@@ -84,7 +84,7 @@ CODE
 OUTPUT
 
 pasm_output_like(<<'CODE', <<'OUTPUT', "element access - char, short");
-    new P2, .PerlArray
+    new P2, .ResizablePMCArray
     .include "datatypes.pasm"
     push P2, .DATATYPE_CHAR
     push P2, 2	# 2 elem char array
@@ -103,7 +103,7 @@ ok1:
     print I0
     print " "
     # now acces that as a short
-    new P2, .PerlArray
+    new P2, .ResizablePMCArray
     push P2, .DATATYPE_SHORT
     push P2, 1
     push P2, 0
@@ -181,7 +181,7 @@ OUTPUT
 pasm_output_is(<<'CODE', <<'OUTPUT', "nested struct offsets");
   # the nested structure
   .include "datatypes.pasm"
-  new P3, .PerlArray
+  new P3, .ResizablePMCArray
   push P3, .DATATYPE_INT
   push P3, 0
   push P3, 0
@@ -190,7 +190,7 @@ pasm_output_is(<<'CODE', <<'OUTPUT', "nested struct offsets");
   push P3, 0
   new P4, .UnManagedStruct, P3
   # outer structure
-  new P2, .PerlArray
+  new P2, .ResizablePMCArray
   push P2, .DATATYPE_INT
   push P2, 0
   push P2, 0

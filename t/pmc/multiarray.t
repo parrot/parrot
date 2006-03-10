@@ -24,7 +24,7 @@ and cloning.
 =cut
 
 pasm_output_is(<<'CODE', <<'OUTPUT', "multiarray creation");
-	new P1, .PerlArray
+	new P1, .ResizablePMCArray
 	# intial size
 	set P1[0], 0
 	set P1[1], 50
@@ -45,7 +45,7 @@ ok
 OUTPUT
 
 pasm_output_is(<<'CODE', <<'OUTPUT', "multiarray access 2d");
-	new P1, .PerlArray
+	new P1, .ResizablePMCArray
 	# intial size
 	set P1[0], 0
 	set P1[1], 100
@@ -102,7 +102,7 @@ ok 2
 OUTPUT
 
 pasm_output_is(<<'CODE', <<'OUTPUT', "multiarray access 3d");
-	new P1, .PerlArray
+	new P1, .ResizablePMCArray
 	# initial size
 	set P1[0], 0
 	set P1[1], 200

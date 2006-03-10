@@ -75,7 +75,7 @@ No
 OUTPUT
 
 pasm_output_is(<<'CODE', <<'OUTPUT', "resetting a property");
-    new P0, .PerlArray
+    new P0, .ResizablePMCArray
     new P1, .String
     new P2, .String
     new P3, .String

@@ -733,7 +733,7 @@ lp:
     mod I9, I0, 100
     ne I9, 0, lp1
     # force GC => 142 DOD + 142 collects / 10^5 accesses
-    new P1, .PerlArray
+    new P1, .ResizablePMCArray
     set P1[I0], I0
     concat S0, S1, S1
     set S2, S0
