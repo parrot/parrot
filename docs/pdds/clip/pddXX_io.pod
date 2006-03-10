@@ -107,7 +107,7 @@ an optional argument.
 
 C<readline> retrieves a single line from a stream into a string. Calling
 C<readline> flags the stream as operating in line-buffer mode (see
-C<pioctl> below).  Lines are truncated at 64K.
+C<pioctl> below).
 
 =item *
 
@@ -244,9 +244,6 @@ F<runtime/parrot/include/stat.pasm>):
 Most of these opcodes conform to the standard UNIX interface, but the
 layer API allows alternate implementations for each.
 
-[It's worth considering making all the network I/O opcodes use a
-consistent way of marking errors. At the moment, all return an integer
-status code except for C<socket>, C<sockaddr>, and C<accept>.]
 
 =over 4
 
@@ -263,40 +260,33 @@ from a port number (integer) and an address (string).
 
 =item *
 
-C<connect> connects a socket object to an address. It returns an integer
-indicating the status of the call, -1 if unsuccessful.
+C<connect> connects a socket object to an address.
 
 =item *
 
-C<recv> receives a message from a connected socket object into a string.
-It returns an integer indicating the status of the call, -1 if
-unsuccessful.
+C<recv> receives a message from a connected socket object. It returns
+the message in a string.
 
 =item *
 
-C<send> sends a message string to a connected socket object. It returns
-an integer indicating the status of the call, -1 if unsuccessful.
+C<send> sends a message string to a connected socket object. 
 
 =item *
 
 C<poll> polls a socket object for particular types of events (an integer
 flag) at a frequency set by seconds and microseconds (the final two
-integer arguments). It returns an integer indicating the status of the
-call, -1 if unsuccessful. [See the system documentation for C<poll> to
+integer arguments). [See the system documentation for C<poll> to
 see the constants for event types and return status.]
 
 =item *
 
 C<bind> binds a socket object to the port and address specified by a
-string address (the packed result of C<sockaddr>). It returns an integer
-indicating the status of the call, -1 if unsuccessful.
+string address (the packed result of C<sockaddr>).
 
 =item *
 
 C<listen> listens for a new connection on a socket object. The integer
 argument gives the maximum size of the queue for pending connections.
-It returns an integer indicating the status of the call, -1 if
-unsuccessful.
 
 =item *
 
@@ -305,6 +295,25 @@ a newly created socket object for the connection. Returns NULL if
 unsuccessful.
 
 =back
+
+=head3 Error handling
+
+Currently C<connect>, C<recv>, C<send>, C<poll>, C<bind>, and C<listen>
+return an integer indicating the status of the call, -1 if unsuccessful.
+
+These integer status codes are problematic when an opcode has a genuine
+return value. They also don't fit well with asynchronous I/O: when
+you've defined a code handler for "incoming connection" you don't want
+it to be triggered by an error condition, you only want it to be
+triggered by an actual incoming connection. The integer status codes
+will be removed and all network I/O opcodes will throw exceptions
+when they encounter errors. [Or maybe all I/O opcodes.]
+
+The sychronous I/O layer may provide an optional interface that captures
+I/O exceptions and converts them to status codes.
+
+[Flesh out the kinds of exceptions. If there will be an
+exception-to-code conversion, flesh out the correspondence.]
 
 =head1 IMPLEMENTATION
 
