@@ -103,7 +103,7 @@ Get the referenced PMC.
         SELF.init_pmc(other);
     }
     void assign_pmc(PMC* other) {
-        SELF.set_pmc(other);   /* autrijus */
+        SELF.set_pmc(other);   /* audreyt */
     }
 
     PMC* get_pmc() {

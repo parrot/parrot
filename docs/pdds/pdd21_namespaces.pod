@@ -71,12 +71,12 @@ best internal representation.
 
 Each HLL must store implementation internals (private items) in a namespace
 named with an underscore and the lowercased name of the HLL.  For instance,
-Tcl's implementation internals should live in the "_tcl" namespace.
+Tcl's implementation internals should live in the C<_tcl> namespace.
 
 =item HLL User-Created Namespaces
 
 Each HLL must store all user-created namespaces under a namespace named with
-the lowercased name of the HLL.  For exxample, Perl 5's CGI module must be
+the lowercased name of the HLL.  For example, Perl 5's CGI module must be
 named "perl5::CGI".  This eliminates any accidental collisions between
 languages.
 

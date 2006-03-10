@@ -68,8 +68,8 @@ D: Buffered IO fix
 
 N: Ask Bjoern Hansen
 
-N: Autrijus Tang
-D: various bugfixes
+N: Audrey Tang
+D: Pugs, a Perl6->Parrot implementation.
 
 N: Benjamin Goldberg
 D: Numerous improvements and proposals.

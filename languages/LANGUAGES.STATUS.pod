@@ -665,7 +665,7 @@ http://www.akbkhome.com/svn.php/PintCompiler http://www.akbkhome.com/blog.php/Vi
 
 =item Author
 
-Autrijus Tang, et al.
+Audrey Tang, et al.
 
 =item Description
 

@@ -27,11 +27,11 @@ helped.
 =head1 MODEL USERS
 
 
-=head2 "Autrijus": Perl 6 implementer
+=head2 "Audrey": Perl 6 implementer
 
-Autrijus has a favorite language, Perl 6, and he wants to target it to Parrot.
+Audrey has a favorite language, Perl 6, and he wants to target it to Parrot.
 
-Autrijus:
+Audrey:
 
 =over 4
 

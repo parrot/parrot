@@ -223,12 +223,12 @@ the mailing list. We will.
 
 =head2 Pugs is going great shakes - why not just toss Parrot and run Perl 6 on Pugs?
 
-Autrijus Tang, the lead on the Pugs project, notes that an B<unoptimized>
-Parrot is already 30% faster than Haskell. Add compiler optimization and a few
-planned optimizations and Parrot will beat Pugs for speed hands down.  Autrijus
-thinks that Pugs could be made faster with some Haskell compiler tricks, but
-it's harder work and less effective than the Parrot optimizations we already
-know how to do.
+Audrey Tang, the lead on the Pugs project, notes that an B<unoptimized>
+Parrot is already 30% faster than the Haskell-based interpreter. Add compiler
+optimization and a few planned optimizations and Parrot will beat Pugs for
+speed hands down.  Audrey thinks that Pugs could be made faster with some
+Haskell compiler tricks, but it's harder work and less effective than the
+Parrot optimizations we already know how to do.
 
 Perl 5 is highly portable, and builds on around 50 different systems, many far
 removed from Unix or MS Windows. We'd like Perl 6 to be able run everywhere
@@ -267,9 +267,10 @@ crazy...
 Yes (though at this time, that's in the early stages). Still, the ultimate goal
 is for Perl 6 to be self-hosting (that is, written in itself) in order to
 improve introspection, debugger capabilities, compile-time semantic modulation,
-etc. For this reason, Pugs will probably be the compiler that first compiles
-the ultimate Perl 6 compiler, but thereafter Pugs will no longer be the primary
-reference implementation. This is documented by the Pugs team at
+etc. For this reason, Pugs-on-Haskell will probably be the compiler that first
+compiles the ultimate Perl 6 compiler, but thereafter the Haskell-based
+interpreter will no longer be the primary reference implementation. This is
+documented by the Pugs team at
 L<http://svn.perl.org/perl6/pugs/trunk/docs/01Overview.html>
 
 =head1 PARROT AND PERL

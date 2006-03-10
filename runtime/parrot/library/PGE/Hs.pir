@@ -39,7 +39,7 @@ the one in the Parrot tree instead.
 
 Granted, it is possible to pass in Pugs's own library path into an
 environment variable (maybe C<PARROT_LIBS>?), but as this was not in
-the 0.3.0 release, I (autrijus) decided to take the easy route. :-)
+the 0.3.0 release, I (audreyt) decided to take the easy route. :-)
 
 =head1 CAVEATS
 

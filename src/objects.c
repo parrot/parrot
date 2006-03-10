@@ -722,7 +722,8 @@ involved adding all the parent's parents, as well as all attributes of
 the parent classes that we're adding in.
 
 The MRO (method resolution order) is the C3 algorithm used by Perl6
-and Python (>= 2.3). See also L<http://use.perl.org/~autrijus/journal/25768>.
+and Python (>= 2.3). See also:
+L<http://pugs.blogs.com/pugs/2005/07/day_165_r5671_j.html>
 
 =cut
 
