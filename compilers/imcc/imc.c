@@ -123,7 +123,6 @@ imc_open_unit(Parrot_Interp interp, IMC_Unit_Type t)
     imc_info->n_comp_units++;
     unit->file = imc_info->state->file;
     unit->pasm_file = imc_info->state->pasm_file;
-    unit->HLL_id    = imc_info->HLL_id;
     return unit;
 }
 

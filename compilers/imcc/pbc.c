@@ -673,8 +673,6 @@ add_const_pmc_sub(Interp *interpreter, SymReg *r,
         unit->outer ? enum_class_Closure : enum_class_Sub;
     /*
      * use a possible type mapping for the Sub PMCs
-     * XXX need to place HLL_id into context during compile to
-     *     make this actually working
      */
     type = Parrot_get_ctx_HLL_type(interpreter, type);
     /* TODO create constant - see also src/packfile.c
@@ -701,7 +699,7 @@ add_const_pmc_sub(Interp *interpreter, SymReg *r,
     sub->namespace = ns_pmc;
     sub->start_offs = offs;
     sub->end_offs = end;
-    sub->HLL_id = unit->HLL_id;
+    sub->HLL_id = CONTEXT(interpreter->ctx)->current_HLL;
     for (i = 0; i < 4; ++i)
         sub->n_regs_used[i] = unit->n_regs_used[i];
     sub->lex_info = create_lexinfo(interpreter, unit, sub_pmc,
