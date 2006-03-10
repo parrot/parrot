@@ -23,6 +23,7 @@ C<LuaBase> provides an abstract base class for some Lua types.
 static INTVAL dynpmc_LuaNil;
 static INTVAL dynpmc_LuaString;
 static INTVAL dynpmc_LuaTable;
+static INTVAL dynpmc_LuaUserdata;
 
 
 pmclass LuaBase
@@ -529,8 +530,7 @@ Looks up the method for C<*method_name>.
     METHOD PMC* find_metamethod(STRING* method_name) {
         PMC *method;
 
-        PMC *metatable = VTABLE_getprop(INTERP, SELF,
-                string_from_const_cstring(INTERP, "__metatable", 0));
+        PMC *metatable = Parrot_LuaBase_get_metatable(INTERP, SELF);
         if (dynpmc_LuaTable == metatable->vtable->base_type) {
             PMC *key;
        
@@ -544,6 +544,24 @@ Looks up the method for C<*method_name>.
         return NULL;
     }
 
+/*
+
+=item C<PMC *get_metatable()>
+
+=cut
+
+*/
+    METHOD PMC* get_metatable() {
+        if (dynpmc_LuaTable == SELF->vtable->base_type
+         || dynpmc_LuaUserdata == SELF->vtable->base_type) {
+            PMC *retval = VTABLE_getprop(INTERP, SELF,
+                    string_from_const_cstring(INTERP, "__metatable", 0));
+            if (dynpmc_LuaTable == retval->vtable->base_type)
+                return retval;
+        }
+        return pmc_new(INTERP, dynpmc_LuaNil);
+    }
+
     METHOD void super_init () {
             dynpmc_LuaNil = pmc_type(INTERP,
               string_from_const_cstring(INTERP, "LuaNil", 0));
@@ -551,6 +569,8 @@ Looks up the method for C<*method_name>.
               string_from_const_cstring(INTERP, "LuaString", 0));
             dynpmc_LuaTable = pmc_type(INTERP,
               string_from_const_cstring(INTERP, "LuaTable", 0));
+            dynpmc_LuaUserdata = pmc_type(INTERP,
+              string_from_const_cstring(INTERP, "LuaUserdata", 0));
     }
 
 }

@@ -104,6 +104,13 @@ See "Lua 5.0 Reference Manual", section 5.3 "String Manipulation".
     $P1 = "gsub"
     _string[$P1] = $P0
 
+
+    .local pmc _lua_mt_string
+    _lua_mt_string = new .LuaTable
+    global "mt_string" = _lua_mt_string
+    $P1 = "__index"
+    _lua_mt_string[$P1] = _string
+
 .end
 
 

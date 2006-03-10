@@ -100,6 +100,13 @@ pmclass LuaTable
                 const_string(INTERP, "table"),
                 const_string(INTERP, "rawset"),
                 meth);
+            meth = Parrot_find_global(INTERP,
+                const_string(INTERP, "LuaTable"),
+                const_string(INTERP, "set_metatable"));
+            Parrot_store_global(INTERP,
+                const_string(INTERP, "table"),
+                const_string(INTERP, "set_metatable"),
+                meth);
         }
     }
 
@@ -519,6 +526,24 @@ MMD_DEFAULT: {
         else {
             PMC *newcopy = VTABLE_clone(INTERP, value);
             hash_put(INTERP, hash, keystr, newcopy);
+        }
+    }
+
+/*
+
+=item C<void set_metatable(PMC *meta)>
+
+=cut
+
+*/
+    METHOD void set_metatable(PMC *meta) {
+        if (dynpmc_LuaNil == meta->vtable->base_type) {
+            VTABLE_delprop(INTERP, SELF,
+                    string_from_const_cstring(INTERP, "__metatable", 0));
+        } else {
+            VTABLE_setprop(INTERP, SELF,
+                    string_from_const_cstring(INTERP, "__metatable", 0),
+                    meta);
         }
     }
 

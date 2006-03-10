@@ -304,9 +304,8 @@ Otherwise, returns the metatable of the given object.
     .param pmc obj :optional
     .local pmc ret
     checkany(obj)
-    ret = getprop "__metatable", obj
+    ret = obj."get_metatable"()
     if ret goto L1
-    new ret, .LuaNil
     .return (ret)
 L1:
     .local pmc prot
@@ -695,7 +694,7 @@ L0:
     argerror("nil or table expected")
 L1:
     .local pmc meta
-    meta = getprop "__metatable", table
+    meta = table."get_metatable"()
     unless meta goto L3
     .local pmc prot
     .const .LuaString mt = "__metatable"
@@ -703,11 +702,7 @@ L1:
     unless prot goto L3
     error("cannot change a protected metatable")
 L3:
-    if $S0 == "table" goto L4
-    delprop table, "__metatable"
-    .return ()
-L4:    
-    setprop table, "__metatable", metatable
+    table."set_metatable"(metatable)
     .return ()
 .end
 
