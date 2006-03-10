@@ -29,15 +29,14 @@ tdb
 =item C<PMC *
 Parrot_find_global(Parrot_Interp interpreter, STRING *class, STRING *globalname)>
 
-If C<class> is NULL search global stash. If C<globalname> is NULL, return the
-stash PMC.
+If C<class> is NULL search global stash. XXX TODO search current ns.
 
 Return NULL if the global isn't found or the global.
 
 =item C<PMC *
 Parrot_get_global(Parrot_Interp interpreter, STRING *class, STRING *globalname)>
 
-If the global exists, return it. If not either throw an exception or return an
+If the global exists, return it. If not either throw an exception or return a
 C<Null> PMC depending on the interpreter's error settings.
 
 =cut
@@ -78,10 +77,8 @@ Parrot_find_global_p(Parrot_Interp interpreter, PMC *ns, STRING *name)
         case enum_class_String:
             return Parrot_find_global(interpreter, PMC_str_val(ns), name);
         case enum_class_Key:
-            /* TODO query the class namespace directly */
-            ns = VTABLE_get_pmc_keyed(interpreter, 
-                    interpreter->stash_hash, ns);
-            if (!(ns))
+            ns = VTABLE_get_pmc_keyed(interpreter, interpreter->stash_hash, ns);
+            if (!ns)
                 return NULL;
             /* fall through */
         case enum_class_NameSpace:
@@ -95,7 +92,7 @@ Parrot_get_global(Parrot_Interp interpreter, STRING *class,
         STRING *name, void *next)
 {
     PMC *g = Parrot_find_global(interpreter, class, name);
-    if (!PMC_IS_NULL(g))
+    if (g)
         return g;
     if (PARROT_ERRORS_test(interpreter, PARROT_ERRORS_GLOBALS_FLAG))  {
         real_exception(interpreter, next, E_NameError,
@@ -109,7 +106,7 @@ PMC *
 Parrot_get_global_p(Parrot_Interp interpreter, PMC *ns, STRING *name)
 {
     PMC *g = Parrot_find_global_p(interpreter, ns, name);
-    if (!PMC_IS_NULL(g))
+    if (g)
         return g;
     if (PARROT_ERRORS_test(interpreter, PARROT_ERRORS_GLOBALS_FLAG))  {
         real_exception(interpreter, NULL, E_NameError,
@@ -264,24 +261,7 @@ global_ns:
                 names = PMC_str_val(namespace);
                 if (!string_length(interpreter, names))
                     goto global_ns;
-                /*
-                 * if the namespace is a class, call add_method
-                 * on that class PMC
-                 */
-                class_type = pmc_type(interpreter, names);
-                if (class_type > enum_type_undef) {
-                    PMC *class;
-                    VTABLE *vtable;
-                    vtable = Parrot_base_vtables[class_type];
-                    if (!vtable)
-                        internal_exception(1, "empty vtable '%Ss'", names);
-                    class = vtable->class;
-                    if (!class)
-                        internal_exception(1, "empty class '%Ss'", names);
-                    VTABLE_add_method(interpreter, class, sub_name, sub_pmc);
-                }
-                else
-                    Parrot_store_global(interpreter, names, sub_name, sub_pmc);
+                Parrot_store_global(interpreter, names, sub_name, sub_pmc);
                 break;
             case enum_class_Key:
                 part = namespace;
