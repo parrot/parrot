@@ -82,7 +82,7 @@ first set, because all they have to do is iterate through the children
 of a node and call for the results of its children. The rule doesn't
 have to figure out what the children are called, because each child
 knows its own type, and the dispatch is done by the type of the node. At
-this stage, the trickiness come in with collapsing and expanding nodes.
+this stage, the trickiness comes in with collapsing and expanding nodes.
 Some nodes you'll see don't actually create a node to return, they just
 return the result of their child (PAST::Stmt is an example of this kind
 of rule). These are being collapsed. (In particular with "PAST::Stmt"
