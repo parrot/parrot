@@ -1,0 +1,125 @@
+=pod
+
+=head1 Overview of the Punie Compiler
+
+The heart of the Punie compiler is punie.pir in languages/punie. It does
+all the work of slurping up the source file, parsing it, running the
+resulting parse tree through 3 transformations, compiling the resulting
+source code, and executing it. One useful tool for development here is
+turning on and off the tree dumps from each stage in the tree
+transformations.  Sometimes it's very helpful to see, for example, that
+the transformation from parse tree to abstract syntax tree has gone as
+you expected, but the transformation to opcode syntax tree produced the
+wrong structure.
+
+=head2 Stage 1, Parsing:
+
+Parsing is handled by PGE. The core grammar is in lib/punie.g. During
+the build process this is compiled down to a PIR file
+lib/punie_grammar_gen.pir. This PIR file is then included in
+lib/PunieGrammar.pir, the main class of the Punie parser (i.e. the
+generated PIR is basically a role that adds some methods to the grammar
+class). PunieGrammar.pir also contains the rules defined for the
+operator precedence parser. The <oexpr> rule allows the recursive
+descent parser to call into the operator precedence parser. The OPP rule
+"term:", allows the operator precedence parser to call back into the
+recursive descent parser. The effect is a smooth integration of two very
+different styles of parsing.
+
+The result of the parsing phase is a tree of PGE::Match objects, each
+representing the result of one rule, subrule, or capture. [Need to talk
+a bit more about the results, when they come back as an array and when
+they come back as a hash.]
+
+=head2 Stage 2, Abstract Syntax Tree:
+
+The first transformation is from the parse tree to an abstract syntax
+tree. This is handled by the TGE grammar lib/pge2past.g. Unfortunately,
+at the moment, the internal core of all the tree grammar rules is
+written in PIR. It's ugly (the lack of control structures and easy
+access to data structures is particularly annoying), and will eventually
+change, but for now it gives us flexibility to explore what we want a
+tree-grammar language to be able to do. The tree grammar rules give you
+two parameters to work with in the body of each rule: 'tree' is the top
+level node for the entire tree and all operations are called on it
+because it has the total context information, 'node' is the specific
+node that this rule was called to operate on. Each rule defines an
+"attribute" of a particular node type. Because this is a tree
+transformation, the most common attribute defined is "result", which
+returns the transformed structure for the node it was called on.
+
+The transformation from the parse tree is the most difficult one,
+because the nodes produced by PGE don't know their own name. That is,
+the result PGE::Match object doesn't know that it's a
+PunieGrammar::lineseq match. Instead, the match object is stored as a
+value for a key of "PunieGrammar::lineseq". So, you'll see a number of
+places throughout the code where it checks for a particular key in the
+current node and then dispatches the value of that key, specifying the
+name of the node in the call (PunieGrammar::block is an example of this
+kind of rule). Other places iterate through the hash keys and dispatch
+each key/value pair as a node to transform and the node name
+(PunieGrammar::line is an example of this kind of rule).
+
+A third kind of rule in pge2past.g is the set of rules defined for the
+results of the operator precedence parser. These do know their own name,
+but it's stored in a "type" hash key inside the node. So, the "result"
+rule for an "expr" match ("expr: result") just checks the type of the
+match object, and then dispatches to either the "op" rule or the "term"
+rule, depending on whether the match was an operator or a term. (This is
+a little hackish, and I suspect there's a better way to do it if we
+tweak the way PGE produces results. We'll re-examine it later.)
+
+It's helpful when reading or writing these rules to do a text dump of a
+parse tree, because you can immediately see which nodes are the children
+of other nodes.
+
+=head2 Stage 3, Opcode Syntax Tree:
+
+The second transformation turns the abstract syntax tree into a
+lower-level opcode syntax tree. This is done by the TGE grammar
+lib/past2post.g. For the most part, these rules are simpler than the
+first set, because all they have to do is iterate through the children
+of a node and call for the results of its children. The rule doesn't
+have to figure out what the children are called, because each child
+knows its own type, and the dispatch is done by the type of the node. At
+this stage, the trickiness come in with collapsing and expanding nodes.
+Some nodes you'll see don't actually create a node to return, they just
+return the result of their child (PAST::Stmt is an example of this kind
+of rule). These are being collapsed. (In particular with "PAST::Stmt"
+and "PAST::Expr", statements and expressions are semantically
+significant on the level of an abstract syntax tree, but on the level of
+the opcode syntax tree all that matters are sequences of opcodes.) Other
+nodes you'll see return a "POST::Ops" type ("PAST::Op: print_op" is an
+example of this kind of rule). These are nodes that expand into multiple
+nodes, where a single HLL construct corresponds to a series of
+assembly-level operations. The POST::Ops nodes have an optional
+attribute "tmpvar", that says where to find the calculated value of the
+series of opcodes (very common when you have something like a complex
+conditional expression in the HLL, that translates to a series of
+opcodes resulting in a single binary value used in the conditional
+opcode).
+
+One significant addition to this stage is a lookup table for transforming
+the HLL operator names to their low-level Parrot equivalents, in
+lib/PunieOpLookup.pir. The basic idea is to keep all of these changes in
+one place so it's more maintainable, and to keep them all in one
+transformation stage so the AST closely corresponds to the HLL, while
+the OST closely corresponds to the assembly language.
+
+=head2 Stage 4, PIR Output:
+
+The final transformation turns the opcode syntax tree into PIR code.
+This is handled by the TGE grammar lib/post2pir.g. It traverses the
+syntax tree much like stage 3 does, but each rule returns a string of
+PIR source code instead of returning a transformed tree node.
+(Ultimately this won't be done with a tree grammar, but it works for
+now.) Ideally, there isn't much in the way of node manipulation going on
+in this stage. At the moment, I've got a bit of hackishness leftover in
+the translation of conditionals, but I'll be moving that up into the
+PAST->POST transformation.
+
+Note that POST::Ops nodes are flattened out into a simple sequence of
+statements (they're a convenient semantic abstraction in the opcode
+tree, but not syntactically relevant in the PIR output).
+
+=cut
