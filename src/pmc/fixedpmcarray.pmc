@@ -11,6 +11,11 @@ src/pmc/fixedpmcarray.pmc - fixed size array for PMCs only
 This class, FixedPMCArray, implements an array of fixed size, which stores PMCs,
 it puts things into Integer, Float, or String PMCs as appropriate
 
+=head2 Note
+
+The flag C<PObj_private0_FLAG> is used in the C<NameSpace> PMC and should 
+never be set for user arrays.
+
 =head2 Functions
 
 =over 4

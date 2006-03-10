@@ -12,8 +12,9 @@ These are the vtable functions for the namespace PMC.
 
 =head2 Data
 
-  PMC_struct_val       ... the hash, bucket->value is an array
-                           of 3 PMCs (namespace, sub, var) slot ???
+  PMC_struct_val       ... the hash, bucket->value is either a
+                           var/sub or a namespace, of a FixedPMCarray
+                           of 2 PMCs (namespace, sub/var) slots
   PMC_pmc_val          ... parent namespace
   PMC_data             ... name STRING of this namespace part 
 
@@ -27,6 +28,25 @@ These are the vtable functions for the namespace PMC.
 
 #include "parrot/parrot.h"
 #include <assert.h>
+
+/*
+ * Typically a named slot either contains another namespace or a
+ * var/sub (not both). 
+ * In case that the bucket->value is occupied, a FixedPMCArray is
+ * created, and the items are moved over to that extra storage.
+ * The array is flagged with FPA_is_ns_ext to distinguish it from a
+ * plain array variable.
+ *
+ * This could easily expanded to a full-fledged typed namespace if needed. 
+ */
+
+enum {
+    NS_slot_ns,
+    NS_slot_var_sub,         /* unspecified ~half-raw slot */
+    NS_max_slots
+} NS_slot_enum;
+
+#define FPA_is_ns_ext PObj_private0_FLAG
 
 pmclass NameSpace extends Hash need_ext {
 
@@ -83,15 +103,67 @@ of strings or a chained key, add all components to the namespace.
 Return the given namespace or PMCNULL. C<key> is either an array of 
 strings, or a possibly nested key.
 
+=item C<PMC* get_pmc_keyed_str(PMC *key)> 
+
+Return the given namespace item or PMCNULL. If the named item is either
+a NameSpace or a var, the NameSpace is returned.
+
 =cut
 
 */
 
     void set_pmc_keyed_str(STRING *key, PMC *value) {
-        SUPER(key, value);
-        if (value->vtable->base_type == enum_class_NameSpace) {
+        PMC *tuple = NULL;
+        HashBucket *b = hash_get_bucket(INTERP, 
+                (Hash*) PMC_struct_val(SELF), key);
+        int val_is_NS = value->vtable->base_type == enum_class_NameSpace;
+        if (PMC_IS_NULL(value))
+            real_exception(INTERP, NULL, E_NameError,
+                    "Attempt to set NULL namespace (part)");
+        if (!b)
+            SUPER(key, value);
+        else {
+            PMC *old = b->value;
+            if (old->vtable->base_type == enum_class_NameSpace &&
+                    val_is_NS) {
+                SUPER(key, value);      /* ns changed */
+            }
+            else if (old->vtable->base_type != enum_class_NameSpace &&
+                    !val_is_NS) {
+                SUPER(key, value);      /* var/sub changed */
+            }
+            else if ((PObj_get_FLAGS(old) & FPA_is_ns_ext) &&
+                    old->vtable->base_type == enum_class_FixedPMCArray) {
+                /* we have a tuple extension already */
+                VTABLE_set_pmc_keyed_int(INTERP, old, 
+                        val_is_NS ? NS_slot_ns : NS_slot_var_sub, value);
+            }
+            else {
+                /* creat new tuple */
+                tuple = pmc_new(INTERP, enum_class_FixedPMCArray);
+                /* flag it as special */
+                PObj_get_FLAGS(tuple) |= FPA_is_ns_ext;
+                /* for a fully typed namespace, we'd need 3 or 4 */
+                VTABLE_set_integer_native(INTERP, tuple, NS_max_slots);
+            }
+        }
+        if (val_is_NS) {
             PMC_pmc_val(value) = SELF;  /* set parent */
             PMC_data(value)    = key;   /* and name */
+            if (tuple) {
+                VTABLE_set_pmc_keyed_int(INTERP, tuple, NS_slot_ns, value);
+                VTABLE_set_pmc_keyed_int(INTERP, tuple, NS_slot_var_sub, 
+                        b->value);
+                b->value = tuple;
+                /* distinction from a plain FPA, which doesn't extend the
+                 * namespace storage
+                 */
+            }
+        }
+        else if (tuple) {
+            VTABLE_set_pmc_keyed_int(INTERP, tuple, NS_slot_ns, b->value);
+            VTABLE_set_pmc_keyed_int(INTERP, tuple, NS_slot_var_sub, value);
+            b->value = tuple;
         }
     }
 
@@ -106,11 +178,15 @@ strings, or a possibly nested key.
         }
     }
 
-    /* XXX Hash would return Undef, which is probably wrong */
     PMC* get_pmc_keyed_str (STRING* key) {
-        HashBucket *b = hash_get_bucket(INTERP, 
+        PMC *ns = hash_get(INTERP, 
                 (Hash*) PMC_struct_val(SELF), key);
-        return b->value;
+        if (!ns)
+            return PMCNULL;
+        if ((PObj_get_FLAGS(ns) & FPA_is_ns_ext) &&
+                ns->vtable->base_type == enum_class_FixedPMCArray)
+            ns = VTABLE_get_pmc_keyed_int(INTERP, ns, NS_slot_ns);
+        return ns ? ns : PMCNULL;
     }
     
     PMC* get_pmc_keyed(PMC *key) {
@@ -122,7 +198,7 @@ strings, or a possibly nested key.
             while (key) {
                 part = key_string(INTERP, key);
                 ns = VTABLE_get_pmc_keyed_str(INTERP, ns, part);
-                if (!ns)
+                if (ns == PMCNULL)
                     return PMCNULL;
                 key = key_next(INTERP, key);
             }
@@ -134,7 +210,7 @@ strings, or a possibly nested key.
         for (i = 0; i < n; ++i) {
             part = VTABLE_get_string_keyed_int(INTERP, key, i);
             ns = VTABLE_get_pmc_keyed_str(INTERP, ns, part);
-            if (!ns)
+            if (ns == PMCNULL)
                 return PMCNULL;
         }
         return ns;
