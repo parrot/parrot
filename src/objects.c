@@ -447,6 +447,7 @@ parrot_class_register(Interp* interpreter, STRING *class_name,
     INTVAL new_type;
     VTABLE *new_vtable, *parent_vtable;
     PMC *vtable_pmc;
+    PMC *ns; 
 
     /*
      * register the class in the PMCs name class_hash
@@ -483,6 +484,18 @@ parrot_class_register(Interp* interpreter, STRING *class_name,
     /* Put our new vtable in the global table */
     Parrot_base_vtables[new_type] = new_vtable;
 
+    /* check if we already have a NameSpace */
+    ns = VTABLE_get_pmc_keyed_str(interpreter, interpreter->stash_hash, 
+            class_name);
+    /* XXX nested, use current as base ? */
+    if (!ns) {
+        ns = pmc_new(interpreter, enum_class_NameSpace);
+        VTABLE_set_pmc_keyed_str(interpreter, interpreter->stash_hash, 
+                class_name, ns);
+    }
+    /* attach namspace to vtable */
+    new_vtable->_namespace = ns;
+
     /*
      * prepare object vtable - again that of the parent or
      * a ParrotObject vtable
@@ -502,6 +515,8 @@ parrot_class_register(Interp* interpreter, STRING *class_name,
     set_attrib_num(new_class, (SLOTTYPE*)PMC_data(new_class), PCD_OBJECT_VTABLE,
             vtable_pmc = constant_pmc_new(interpreter, enum_class_VtableCache));
     PMC_struct_val(vtable_pmc) = new_vtable;
+    /* attach namspace to object vtable too */
+    new_vtable->_namespace = ns;
 }
 
 static PMC*
