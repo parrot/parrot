@@ -724,7 +724,7 @@ pir_output_like(<<'CODE', <<'OUTPUT', "warn on in main");
     _f1()
 .end
 .sub _f1
-    $P0 = new .Undef
+    $P0 = new .PerlUndef
     print $P0
 .end
 CODE
@@ -735,7 +735,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "warn on in sub");
 .sub _main :main
 .include "warnings.pasm"
     _f1()
-    $P0 = new .Undef
+    $P0 = new .PerlUndef
     print $P0
     print "ok\n"
 .end
@@ -750,7 +750,7 @@ pir_output_like(<<'CODE', <<'OUTPUT', "warn on in sub, turn off in f2");
 .sub _main :main
 .include "warnings.pasm"
     _f1()
-    $P0 = new .Undef
+    $P0 = new .PerlUndef
     print "back\n"
     print $P0
     print "ok\n"
@@ -758,7 +758,7 @@ pir_output_like(<<'CODE', <<'OUTPUT', "warn on in sub, turn off in f2");
 .sub _f1
     warningson .PARROT_WARNINGS_UNDEF_FLAG
     _f2()
-    $P0 = new .Undef
+    $P0 = new .PerlUndef
     print $P0
 .end
 .sub _f2
