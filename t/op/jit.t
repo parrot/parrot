@@ -322,6 +322,7 @@ CODE
 OUTPUT
 
 pasm_output_is(<<'CODE', <<'OUTPUT', "sub_i_ic 0 mapped");
+cleari
 set I0,0
 set I1,1
 set I2,2
