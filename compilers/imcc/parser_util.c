@@ -610,6 +610,7 @@ imcc_compile(Parrot_Interp interp, const char *s, int pasm_file)
         const void * __c_ptr;
         void * __ptr;
     } __ptr_u;
+    INTVAL regs_used[4] = {3,3,3,3};
 
     /*
      * we create not yet anchored PMCs - e.g. Subs: turn off DOD
@@ -643,9 +644,11 @@ imcc_compile(Parrot_Interp interp, const char *s, int pasm_file)
     IMCC_INFO(interp)->state->pasm_file = pasm_file;
     IMCC_INFO(interp)->state->file = name;
     expect_pasm = 0;
+    Parrot_push_context(interp, regs_used);
 
     compile_string(interp, const_cast(s));
 
+    Parrot_pop_context(interp);
     /*
      * compile_string NULLifies frames->next, so that yywrap
      * doesn't try to continue compiling the previous buffer
@@ -710,6 +713,10 @@ imcc_compile_file (Parrot_Interp interp, const char *fullname)
     char *ext;
     FILE *fp;
     struct _imc_info_t *imc_info = NULL;
+    /* need at least 3 regs for compilation of constant math e.g.
+     * add_i_ic_ic - see also IMCC_subst_constants()
+     */
+    INTVAL regs_used[4] = {3,3,3,3};
 
     if (IMCC_INFO(interp)->last_unit) {
         /* got a reentrant compile */
@@ -742,6 +749,7 @@ imcc_compile_file (Parrot_Interp interp, const char *fullname)
      * which can destroy packfiles under construction
      */
     Parrot_block_DOD(interp);
+    Parrot_push_context(interp, regs_used);
 
     if (ext && strcmp (ext, ".pasm") == 0) {
         IMCC_INFO(interp)->state->pasm_file = 1;
@@ -756,6 +764,7 @@ imcc_compile_file (Parrot_Interp interp, const char *fullname)
         compile_file(interp, fp);
     }
     Parrot_unblock_DOD(interp);
+    Parrot_pop_context(interp);
 
     imc_cleanup(interp);
     fclose(fp);

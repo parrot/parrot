@@ -295,6 +295,8 @@ Parrot_push_context(Interp *interpreter, INTVAL *n_regs_used)
     old = CONTEXT(interpreter->ctx);
     ctx = Parrot_alloc_context(interpreter, n_regs_used);
     ctx->caller_ctx = old;
+    ctx->current_sub = old->current_sub;  /* doesn't change */
+    /* copy more ? */
     return ctx;
 }
 

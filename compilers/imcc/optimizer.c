@@ -702,9 +702,6 @@ IMCC_subst_constants(Interp *interpreter, IMC_Unit * unit, char *name,
     char b[128], fmt[64], op[20];
     const char *debug_fmt = NULL;   /* gcc -O uninit warn */
     int found, branched;
-    parrot_context_t *ctx;
-    INTVAL regs_used[4] = {3,3,3,3};
-
 
     /* construct a FLOATVAL_FMT with needed precision */
     switch (NUMVAL_SIZE) {
@@ -785,9 +782,6 @@ IMCC_subst_constants(Interp *interpreter, IMC_Unit * unit, char *name,
         *ok = 0;
         return NULL;
     }
-    /* preserve registers */
-    ctx = CONTEXT(interpreter->ctx);
-    Parrot_alloc_context(interpreter, regs_used);
 
     IMCC_debug(interpreter, DEBUG_OPT1, debug_fmt, name);
     /* we construct a parrot instruction
@@ -834,13 +828,6 @@ IMCC_subst_constants(Interp *interpreter, IMC_Unit * unit, char *name,
         IMCC_debug(interpreter, DEBUG_OPT1, "%I\n", tmp);
     }
     *ok = 1;
-    /*
-     * restore and recycle register frame
-     */
-    Parrot_free_context(interpreter, CONTEXT(interpreter->ctx), 1);
-    CONTEXT(interpreter->ctx) = ctx;
-    interpreter->ctx.bp = ctx->bp;
-    interpreter->ctx.bp_ps = ctx->bp_ps;
     return tmp;
 }
 
