@@ -259,6 +259,58 @@ If key is a slice, do a splice as set that item.
 
 /*
 
+=item C<INTVAL exists_keyed_int(INTVAL key)>
+
+=item C<INTVAL exists_keyed_int(PMC* key)>
+
+Returns TRUE is the element at C<key> exists; otherwise returns false.
+
+=cut
+
+*/
+    INTVAL exists_keyed_int (INTVAL key) {
+        PMC **data;
+
+        if (key < 0)
+            key += PMC_int_val(SELF);
+        if (key < 0 || key >= PMC_int_val(SELF))
+            return 0;
+
+        data = (PMC**)PMC_data(SELF);
+        return !PMC_IS_NULL(data[key]);
+    }
+
+    INTVAL exists_keyed (PMC* key) {
+        INTVAL ix = key_integer(INTERP, key);
+        return SELF.exists_keyed_int(ix);
+    }
+
+/*
+
+=item C<INTVAL defined_keyed_int(INTVAL key)>
+
+Returns TRUE is the element at C<key> is defined; otherwise returns false.
+
+=cut
+
+*/
+
+    INTVAL defined_keyed_int (INTVAL key) {
+        PMC* val;
+
+        if (key < 0)
+            key += PMC_int_val(SELF);
+        if (key < 0 || key >= PMC_int_val(SELF))
+            return 0;
+        val = DYNSELF.get_pmc_keyed_int(key);
+        if(PMC_IS_NULL(val))
+            return 0;
+
+        return VTABLE_defined(INTERP, val);
+    }
+
+/*
+
 =item C<void push_float(FLOATVAL value)>
 
 =item C<void push_integer(INTVAL value)>

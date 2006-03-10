@@ -23,7 +23,7 @@ Tests the C<Iterator> PMC.
 =cut
 
 pasm_output_is(<<'CODE', <<'OUTPUT', "new iter");
-	new P2, .PerlArray
+	new P2, .ResizablePMCArray
 	new P1, .Iterator, P2
 	print "ok 1\n"
 	end
@@ -33,8 +33,8 @@ OUTPUT
 
 pasm_output_is(<<'CODE', <<'OUTPUT', "int test");
     .include "iterator.pasm"
-	new P0, .PerlArray	# empty array
-	new P2, .PerlArray	# array with 2 elements
+	new P0, .ResizablePMCArray	# empty array
+	new P2, .ResizablePMCArray	# array with 2 elements
 	push P2, 10
 	push P2, 20
 	set I0, P2
@@ -478,12 +478,12 @@ Iterator get_integer_keyed_int 0: 98
 Iterator get_integer_keyed_int -1: 97
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "Index access for Iterator on PerlArray");
+pir_output_is(<< 'CODE', << 'OUTPUT', "Index access for Iterator on ResizablePMCArray");
 
 .include "iterator.pasm"
 .sub _main
     .local pmc array_1
-    array_1 = new PerlArray
+    array_1 = new ResizablePMCArray
     push array_1, 'a'
     push array_1, 'b'
     push array_1, 'c'
@@ -493,7 +493,7 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "Index access for Iterator on PerlArray");
     push array_1, '7'
     push array_1, '-8.8'
 
-    print 'PerlArray get_string: '
+    print 'ResizablePMCArray get_string: '
     print array_1
     print "\n"
 
@@ -571,7 +571,7 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "Index access for Iterator on PerlArray");
     end
 .end
 CODE
-PerlArray get_string: 8
+ResizablePMCArray get_string: 8
 Iterator shift_string: a
 Iterator get_string_keyed_int 2: d
 Iterator get_string_keyed_int -1: a
@@ -591,7 +591,7 @@ skip("N/Y: length of rest of array ", 1);
 pasm_output_is(<<'CODE', <<'OUTPUT', "shift + index access");
     .include "iterator.pasm"
 
-	new P2, .PerlArray	# array with 4 elements
+	new P2, .ResizablePMCArray	# array with 4 elements
 	push P2, 10
 	push P2, 20
 	push P2, 30
@@ -633,7 +633,7 @@ OUTPUT
 }
 
 pasm_output_is(<<'CODE', <<'OUTPUT', "slice syntax");
-   new P0, .PerlArray
+   new P0, .ResizablePMCArray
    slice P2, P0[2 .. 3, 4, 5 ..6]
    slice P2, P0[10 ..]
    slice P2, P0[.. 11]
@@ -647,7 +647,7 @@ ok
 OUTPUT
 
 pasm_output_is(<<'CODE', <<'OUTPUT', "slice creates an iterator");
-   new P0, .PerlArray
+   new P0, .ResizablePMCArray
    slice P2, P0[2 .. 3, 4, 5 ..6]
    typeof S0, P2
    print S0
@@ -659,7 +659,7 @@ OUTPUT
 
 pasm_output_is(<<'CODE', <<'OUTPUT', "slice iter simple array elements");
    .include "iterator.pasm"
-   new P0, .PerlArray
+   new P0, .ResizablePMCArray
    push P0, 100
    push P0, 200
    push P0, 300
@@ -686,7 +686,7 @@ OUTPUT
 
 pasm_output_is(<<'CODE', <<'OUTPUT', "slice iter simple array elements - repeat");
    .include "iterator.pasm"
-   new P0, .PerlArray
+   new P0, .ResizablePMCArray
    push P0, 100
    push P0, 200
    push P0, 300
@@ -744,7 +744,7 @@ OUTPUT
 
 pasm_output_is(<<'CODE', <<'OUTPUT', "slice iter start range");
    .include "iterator.pasm"
-   new P0, .PerlArray
+   new P0, .ResizablePMCArray
    push P0, 100
    push P0, 200
    push P0, 300
@@ -770,7 +770,7 @@ OUTPUT
 
 pasm_output_is(<<'CODE', <<'OUTPUT', "slice iter end range");
    .include "iterator.pasm"
-   new P0, .PerlArray
+   new P0, .ResizablePMCArray
    push P0, 100
    push P0, 200
    push P0, 300
@@ -796,7 +796,7 @@ OUTPUT
 
 pasm_output_is(<<'CODE', <<'OUTPUT', "slice iter start range, value");
    .include "iterator.pasm"
-   new P0, .PerlArray
+   new P0, .ResizablePMCArray
    push P0, 100
    push P0, 200
    push P0, 300
@@ -824,7 +824,7 @@ OUTPUT
 
 pasm_output_is(<<'CODE', <<'OUTPUT', "slice iter range, value");
    .include "iterator.pasm"
-   new P0, .PerlArray
+   new P0, .ResizablePMCArray
    push P0, 100
    push P0, 200
    push P0, 300
@@ -853,7 +853,7 @@ OUTPUT
 
 pasm_output_is(<<'CODE', <<'OUTPUT', "slice iter range, range");
    .include "iterator.pasm"
-   new P0, .PerlArray
+   new P0, .ResizablePMCArray
    push P0, 100
    push P0, 200
    push P0, 300
@@ -1163,7 +1163,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "slice, get strings from array");
 .sub main :main
     .include "iterator.pasm"
     .local pmc ar
-    ar = new PerlArray
+    ar = new ResizablePMCArray
     push ar, "a"
     push ar, "b"
     push ar, "c"
@@ -1186,7 +1186,7 @@ OUTPUT
 
 pasm_output_is(<<'CODE', <<'OUTPUT', "iter vtable");
    .include "iterator.pasm"
-   new P0, .PerlArray
+   new P0, .ResizablePMCArray
    push P0, 100
    push P0, 200
    push P0, 300

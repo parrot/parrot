@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 23;
+use Parrot::Test tests => 24;
 
 =head1 NAME
 
@@ -805,5 +805,103 @@ CODE
 int in ResizableIntegerArray: 42
 int in ResizableIntegerArray: 43
 OUTPUT
+
+pir_output_is(<< 'CODE', << 'OUTPUT', "exists and defined");
+.sub test :main
+    .local pmc array
+    array = new ResizablePMCArray
+    push array, 'a'
+    push array, 'b'
+    push array, 'c'
+    $P0 = new .Null
+    push array, $P0
+    push array, 'e'
+    $P0 = new .Undef
+    push array, $P0
+    push array, '7'
+    push array, '-8.8'
+
+    .local int flag, index
+
+    ## bounds checking: lower
+    index = 0
+    bsr EXISTS
+    bsr DEFINED
+
+    ## bounds checking: upper
+    index = 7
+    bsr EXISTS
+    bsr DEFINED
+
+    ## bounds checking: negative lower
+    index = -1
+    bsr EXISTS
+    bsr DEFINED
+
+    ## bounds checking: negative upper
+    index = -8
+    bsr EXISTS
+    bsr DEFINED
+
+    ## bounds checking: out-of-bounds
+    index = 8
+    bsr EXISTS
+    bsr DEFINED
+
+    ## bounds checking: negative out-of-bounds
+    index = -9
+    bsr EXISTS
+    bsr DEFINED
+
+    ## null value
+    index = 3
+    bsr EXISTS
+    bsr DEFINED
+
+    ## undefined value
+    index = 5
+    bsr EXISTS
+    bsr DEFINED
+
+    goto END
+EXISTS:
+    print 'exists_keyed_int '
+    print index
+    print ': '
+    flag = exists array[index]
+    print flag
+    print "\n"
+    ret
+
+DEFINED:
+    print 'defined_keyed_int '
+    print index
+    print ': '
+    flag = defined array[index]
+    print flag
+    print "\n"
+    ret
+
+END:
+.end
+CODE
+exists_keyed_int 0: 1
+defined_keyed_int 0: 1
+exists_keyed_int 7: 1
+defined_keyed_int 7: 1
+exists_keyed_int -1: 1
+defined_keyed_int -1: 1
+exists_keyed_int -8: 1
+defined_keyed_int -8: 1
+exists_keyed_int 8: 0
+defined_keyed_int 8: 0
+exists_keyed_int -9: 0
+defined_keyed_int -9: 0
+exists_keyed_int 3: 0
+defined_keyed_int 3: 0
+exists_keyed_int 5: 1
+defined_keyed_int 5: 0
+OUTPUT
+
 
 # don't forget to change the number of tests
