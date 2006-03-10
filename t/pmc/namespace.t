@@ -39,7 +39,7 @@ OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "verify NameSpace type");
 .sub 'main' :main
-    $P0 = find_global "\0Foo"
+    $P0 = find_global "Foo"
     typeof $S0, $P0
     print $S0
     print "\n"
@@ -104,7 +104,7 @@ OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "find_global Foo::bar hash");
 .sub 'main' :main
-    $P0 = find_global "\0Foo"
+    $P0 = find_global "Foo"
     $P1 = $P0["bar"]
     print "ok\n"
     $P1()
@@ -123,7 +123,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "find_global Foo::bar root");
 .sub 'main' :main
     .include "interpinfo.pasm"
     $P0 = interpinfo .INTERPINFO_NAMESPACE_ROOT
-    $P1 = $P0["\0Foo"]
+    $P1 = $P0["Foo"]
     $P2 = $P1["bar"]
     print "ok\n"
     $P2()
@@ -156,8 +156,8 @@ OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "find_global Foo::Bar::baz hash");
 .sub 'main' :main
-    $P0 = find_global "\0Foo"
-    $P1 = $P0["\0Bar"]
+    $P0 = find_global "Foo"
+    $P1 = $P0["Bar"]
     $P2 = $P1["baz"]
     print "ok\n"
     $P2()
@@ -174,8 +174,8 @@ OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "find_global Foo::Bar::baz hash 2");
 .sub 'main' :main
-    $P0 = find_global "\0Foo"
-    $P1 = $P0["\0Bar" ; "baz"]
+    $P0 = find_global "Foo"
+    $P1 = $P0["Bar" ; "baz"]
     print "ok\n"
     $P1()
 .end
@@ -193,7 +193,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "find_global Foo::Bar::baz hash 3");
 .sub 'main' :main
     .include "interpinfo.pasm"
     $P0 = interpinfo .INTERPINFO_NAMESPACE_ROOT
-    $P1 = $P0["\0Foo";"\0Bar" ; "baz"]
+    $P1 = $P0["Foo";"Bar" ; "baz"]
     print "ok\n"
     $P1()
 .end
@@ -209,9 +209,9 @@ OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "find_global Foo::Bar::baz alias");
 .sub 'main' :main
-    $P0 = find_global "\0Foo"
-    $P1 = $P0["\0Bar"]
-    store_global "\0TopBar", $P1
+    $P0 = find_global "Foo"
+    $P1 = $P0["Bar"]
+    store_global "TopBar", $P1
     $P2 = find_global "TopBar", "baz"
     print "ok\n"
     $P2()
@@ -301,8 +301,8 @@ OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "get namespace in Foo::Bar::baz");
 .sub 'main' :main
-    $P0 = find_global "\0Foo"
-    $P1 = find_global $P0, "\0Bar"
+    $P0 = find_global "Foo"
+    $P1 = find_global $P0, "Bar"
     $P2 = find_global $P1, "baz"
     print "ok\n"
     $P2()

@@ -111,10 +111,10 @@ Clone the couroutine.
         PMC* ret = pmc_new_noinit(INTERP, SELF->vtable->base_type);
         PObj_custom_mark_destroy_SETALL(ret);
         sub = mem_sys_allocate(sizeof(struct Parrot_coro));
-        memcpy(sub, PMC_sub(SELF), sizeof(struct Parrot_coro));
-        sub->name = string_copy(INTERP, sub->name);
         PMC_struct_val(ret) = sub;
         PMC_pmc_val(ret) = NULL;
+        memcpy(sub, PMC_sub(SELF), sizeof(struct Parrot_coro));
+        sub->name = string_copy(INTERP, sub->name);
         return ret;
     }
 

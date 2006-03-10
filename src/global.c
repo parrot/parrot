@@ -48,75 +48,29 @@ PMC *
 Parrot_find_global(Parrot_Interp interpreter, STRING *class, STRING *globalname)
 {
     PMC *stash;
-    STRING *ns_name;
-#if 1
-    /*
-     * we are cheating a bit and use Hash internals to avoid
-     * hash lookup duplication
-     */
-    HashBucket *b;
+
 #if DEBUG_GLOBAL
     PIO_printf(interpreter, "find_global class '%Ss' meth '%Ss'\n",
             class, globalname);
 #endif
-    stash = interpreter->stash_hash;
     if (class) {
-        ns_name = string_concat(interpreter,
-                string_from_cstring(interpreter, "\0", 1),
-                class, 0);
-        b = hash_get_bucket(interpreter,
-                (Hash*) PMC_struct_val(stash), ns_name);
-        if (!b)
-            return NULL;
-        stash = b->value;
-        if (!globalname)
-            return stash;
-        b = hash_get_bucket(interpreter,
-                (Hash*) PMC_struct_val(stash), globalname);
-        if (!b)
-            return NULL;
-        return (PMC*) b->value;
-    }
-    if (!globalname)
-        return stash;
-    b = hash_get_bucket(interpreter,
-                (Hash*) PMC_struct_val(stash), globalname);
-    if (!b)
-        return NULL;
-    return b->value;
-
-#else
-    if (class) {
-        ns_name = string_concat(interpreter,
-                string_from_cstring(interpreter, "\0", 1),
-                class, 0);
-        if (!VTABLE_exists_keyed_str(interpreter,
-                                     interpreter->stash_hash,
-                                     ns_name)) {
-            return NULL;
-        }
         stash = VTABLE_get_pmc_keyed_str(interpreter,
                                          interpreter->stash_hash,
-                                         ns_name);
+                                         class);
+        if (!stash)
+            return NULL;
     }
     else {
         stash = interpreter->stash_hash;
+        /* TODO return relative to current namespace */
     }
-    if (!globalname)
-        return stash;
-    if (!VTABLE_exists_keyed_str(interpreter, stash, globalname)) {
-        return NULL;
-    }
-    return VTABLE_get_pmc_keyed_str(interpreter,
+    return VTABLE_get_pointer_keyed_str(interpreter,
             stash, globalname);
-#endif
 }
 
 PMC *
 Parrot_find_global_p(Parrot_Interp interpreter, PMC *ns, STRING *name)
 {
-    PMC *stash, *ns_next;
-    STRING *class, *ns_name;
 
     if (PMC_IS_NULL(ns))
         return Parrot_find_global(interpreter, NULL, name);
@@ -124,28 +78,14 @@ Parrot_find_global_p(Parrot_Interp interpreter, PMC *ns, STRING *name)
         case enum_class_String:
             return Parrot_find_global(interpreter, PMC_str_val(ns), name);
         case enum_class_Key:
-            stash = interpreter->stash_hash;
-            while (1) {
-                class = key_string(interpreter, ns);
-                ns_name = string_concat(interpreter,
-                        string_from_cstring(interpreter, "\0", 1),
-                        class, 0);
-                if (!VTABLE_exists_keyed_str(interpreter, stash, ns_name)) {
-                    return NULL;
-                }
-                stash = VTABLE_get_pmc_keyed_str(interpreter, stash, ns_name);
-                ns_next = key_next(interpreter, ns);
-                if (!ns_next)
-                    break;
-                ns = ns_next;
-            }
-            return Parrot_find_global_p(interpreter, stash, name);
+            /* TODO query the class namespace directly */
+            ns = VTABLE_get_pmc_keyed(interpreter, 
+                    interpreter->stash_hash, ns);
+            if (!(ns))
+                return NULL;
             /* fall through */
         case enum_class_NameSpace:
-            if (!VTABLE_exists_keyed_str(interpreter, ns, name)) {
-                return NULL;
-            }
-            return VTABLE_get_pmc_keyed_str(interpreter, ns, name);
+            return VTABLE_get_pointer_keyed_str(interpreter, ns, name);
     }
     return NULL;
 }
@@ -155,7 +95,7 @@ Parrot_get_global(Parrot_Interp interpreter, STRING *class,
         STRING *name, void *next)
 {
     PMC *g = Parrot_find_global(interpreter, class, name);
-    if (g)
+    if (!PMC_IS_NULL(g))
         return g;
     if (PARROT_ERRORS_test(interpreter, PARROT_ERRORS_GLOBALS_FLAG))  {
         real_exception(interpreter, next, E_NameError,
@@ -169,7 +109,7 @@ PMC *
 Parrot_get_global_p(Parrot_Interp interpreter, PMC *ns, STRING *name)
 {
     PMC *g = Parrot_find_global_p(interpreter, ns, name);
-    if (g)
+    if (!PMC_IS_NULL(g))
         return g;
     if (PARROT_ERRORS_test(interpreter, PARROT_ERRORS_GLOBALS_FLAG))  {
         real_exception(interpreter, NULL, E_NameError,
@@ -250,7 +190,6 @@ PMC*
 Parrot_global_namespace(Interp *interpreter, PMC *globals, STRING *class)
 {
     PMC *stash;
-    STRING *ns_name;
 
     /*
      * this routine is called by PackFile_ConstTable_unpack too, which
@@ -259,15 +198,10 @@ Parrot_global_namespace(Interp *interpreter, PMC *globals, STRING *class)
      * lookup dies then during mark_1_seg.
      */
     Parrot_block_DOD(interpreter);
-    ns_name = string_concat(interpreter,
-            string_from_cstring(interpreter, "\0", 1),
-            class, 0);
-    if (!VTABLE_exists_keyed_str(interpreter, globals, ns_name)) {
+    stash = VTABLE_get_pmc_keyed_str(interpreter, globals, class);
+    if (!stash || stash->vtable->base_type != enum_class_NameSpace) {
         stash = pmc_new(interpreter, enum_class_NameSpace);
-        VTABLE_set_pmc_keyed_str(interpreter, globals, ns_name, stash);
-    }
-    else {
-        stash = VTABLE_get_pmc_keyed_str(interpreter, globals, ns_name);
+        VTABLE_set_pmc_keyed_str(interpreter, globals, class, stash);
     }
     Parrot_unblock_DOD(interpreter);
     return stash;

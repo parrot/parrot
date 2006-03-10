@@ -100,12 +100,12 @@ of strings or a chained key, add all components to the namespace.
 
 =item C<PMC* get_pmc_keyed(PMC *key)> 
 
-Return the given namespace or PMCNULL. C<key> is either an array of 
+Return the given namespace or NULL. C<key> is either an array of 
 strings, or a possibly nested key.
 
 =item C<PMC* get_pmc_keyed_str(PMC *key)> 
 
-Return the given namespace item or PMCNULL. If the named item is either
+Return the given namespace item or NULL. If the named item is either
 a NameSpace or a var, the NameSpace is returned.
 
 =cut
@@ -182,11 +182,11 @@ a NameSpace or a var, the NameSpace is returned.
         PMC *ns = hash_get(INTERP, 
                 (Hash*) PMC_struct_val(SELF), key);
         if (!ns)
-            return PMCNULL;
+            return NULL;
         if ((PObj_get_FLAGS(ns) & FPA_is_ns_ext) &&
                 ns->vtable->base_type == enum_class_FixedPMCArray)
             ns = VTABLE_get_pmc_keyed_int(INTERP, ns, NS_slot_ns);
-        return ns ? ns : PMCNULL;
+        return ns;
     }
     
     PMC* get_pmc_keyed(PMC *key) {
@@ -198,24 +198,46 @@ a NameSpace or a var, the NameSpace is returned.
             while (key) {
                 part = key_string(INTERP, key);
                 ns = VTABLE_get_pmc_keyed_str(INTERP, ns, part);
-                if (ns == PMCNULL)
-                    return PMCNULL;
+                if (!ns)
+                    return NULL;
                 key = key_next(INTERP, key);
             }
             return ns;
         }
         n = VTABLE_elements(INTERP, key);
         if (!n)
-            return PMCNULL;
+            return NULL;
         for (i = 0; i < n; ++i) {
             part = VTABLE_get_string_keyed_int(INTERP, key, i);
             ns = VTABLE_get_pmc_keyed_str(INTERP, ns, part);
-            if (ns == PMCNULL)
-                return PMCNULL;
+            if (!ns)
+                return NULL;
         }
         return ns;
     }
 
+/*
+
+=item C<void* get_pointer_keyed_str(PMC *key)> 
+
+Return the given namespace item or NULL. If the named item is either
+a NameSpace or a var, the var is returned.
+
+=cut
+
+*/
+
+    void* get_pointer_keyed_str (STRING* key) {
+        PMC *ns = hash_get(INTERP, 
+                (Hash*) PMC_struct_val(SELF), key);
+        if (!ns)
+            return NULL;
+        if ((PObj_get_FLAGS(ns) & FPA_is_ns_ext) &&
+                ns->vtable->base_type == enum_class_FixedPMCArray)
+            ns = VTABLE_get_pmc_keyed_int(INTERP, ns, NS_slot_var_sub);
+        return ns;
+    }
+    
 /*
 
 =item C<STRING* get_string()>

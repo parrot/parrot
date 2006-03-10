@@ -25,9 +25,7 @@ Tests the globals fetch and store operations.
 pir_output_is(<<'CODE', <<'OUTPUT', "get namespace");
 .sub main
    .local pmc ns, o
-   .local string nul
-   null nul
-   ns = find_global "Foo", nul
+   ns = find_global "Foo"
    o =  find_global ns, "f"
    o()
 .end
@@ -58,12 +56,9 @@ OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "get namespace - nested");
 .sub main
-   .local pmc ns, ns2, o
-   .local string nul
-   null nul
-   ns = find_global "Foo", nul
-   ns2 = find_global ns, "\0Bar"
-   o =  find_global ns2, "f"
+   .local pmc ns, o
+   ns = get_namespace ["Foo"; "Bar"]
+   o =  find_global ns, "f"
    o()
 .end
 
