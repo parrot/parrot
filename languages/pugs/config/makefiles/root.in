@@ -28,7 +28,7 @@ pmcs:
 	@cd $(CLASSDIR) && $(BUILD) linklibs $(PMCS)
 	@cd $(CLASSDIR) && $(BUILD) copy "--destination=$(DESTDIR)" $(PMCS)
 
-test:
+test:   all
 	cd .. && $(PERL) -I../lib -Ipugs/t pugs/t/harness
 
 CLEANERS = \
