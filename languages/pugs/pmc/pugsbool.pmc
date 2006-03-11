@@ -4,7 +4,7 @@ $Id: /mirror/trunk/languages/pugs/pmc/pugsbit.pmc 11860 2006-03-11T15:14:44.6304
 
 =head1 NAME
 
-src/pmc/perlbool.pmc - Perl Bool
+pugsbool.pmc - Pugs Bool
 
 =head1 DESCRIPTION
 
