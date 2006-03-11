@@ -18,16 +18,16 @@ C<PugsInt> extends C<Bit> to provide a Perl 6 biteger.
 
 */
 
-#define PUGS_BIT
+#define PUGS_BOOL
 
 #include "parrot/parrot.h"
-#include "pmc_pugsbit.h"
+#include "pmc_pugsbool.h"
 #include "../include/pugs_common.h"
 
-PMC *pugs_bit_true;
-PMC *pugs_bit_false;
+PMC *pugs_bool_true;
+PMC *pugs_bool_false;
 
-pmclass PugsBit
+pmclass PugsBool extends PugsAny
     extends Boolean
     does scalar
     does boolean
@@ -38,10 +38,10 @@ pmclass PugsBit
     maps Boolean
 {
     void class_init() {
-        /* generate a PugsBitTrue and a PugsBitFalse here */
-        pugs_bit_true  = pmc_new(interp, entry);
-        pugs_bit_false = pmc_new(interp, entry);
-        VTABLE_set_integer_native(interp, pugs_bit_true, 1);
+        /* generate a bool::true and a bool::false here */
+        pugs_bool_true  = pmc_new(interp, entry);
+        pugs_bool_false = pmc_new(interp, entry);
+        VTABLE_set_integer_native(interp, pugs_bool_true, 1);
     }
 }
 

@@ -20,9 +20,8 @@ C<PugsInt> extends C<Integer> to provide a Perl 6 C<Int>.
 
 #include "parrot/parrot.h"
 
-pmclass PugsInt
+pmclass PugsInt extends PugsAny
     extends Integer
-    extends PugsAny
     does scalar
     does integer
     dynpmc

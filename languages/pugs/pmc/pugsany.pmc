@@ -29,6 +29,6 @@ pmclass PugsAny
 
     METHOD PMC* not_nil() {
         INTVAL retval = VTABLE_defined(INTERP, SELF);
-        return retval ? pugs_bit_true : pugs_bit_false;
+        return retval ? pugs_bool_true : pugs_bool_false;
     }
 }

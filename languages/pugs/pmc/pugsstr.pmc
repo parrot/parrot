@@ -20,9 +20,8 @@ C<PugsStr> extends C<String> to provide a Perl 6 C<Str>.
 
 #include "parrot/parrot.h"
 
-pmclass PugsStr
+pmclass PugsStr extends PugsAny
     extends String
-    extends PugsAny
     does scalar
     does string
     dynpmc

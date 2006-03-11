@@ -13,6 +13,7 @@ LOAD_EXT = @load_ext@
 PMCS = \
  pugsany \
  pugsbit \
+ pugsbool \
  pugsint \
  pugsnum \
  pugsstr

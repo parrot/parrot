@@ -20,9 +20,8 @@ C<PugsNum> extends C<Number> to provide a Perl 6 C<Num>.
 
 #include "parrot/parrot.h"
 
-pmclass PugsNum
+pmclass PugsNum extends PugsAny
     extends Float
-    extends PugsAny
     does scalar
     does float
     dynpmc
