@@ -1,0 +1,90 @@
+RM_F    = @rm_f@
+PERL    = @perl@
+PARROT  = ..@slash@..@slash@parrot@exe@
+PBC_MERGE = ..@slash@..@slash@pbc_merge@exe@
+
+LIBPATH  = lib
+BUILD   = $(PERL) @build_dir@@slash@tools@slash@build@slash@dynpmc.pl
+DESTDIR = @build_dir@@slash@runtime@slash@parrot@slash@dynext
+O       = @o@
+CLASSDIR = pmc
+LOAD_EXT = @load_ext@
+
+PMCS = \
+ luabase \
+ luaboolean \
+ luafunction \
+ luanil \
+ luanumber \
+ luastring \
+ luatable \
+ luathread \
+ luauserdata
+
+PBCS = \
+ $(LIBPATH)@slash@luabasic.pbc \
+ $(LIBPATH)@slash@luacoroutine.pbc \
+ $(LIBPATH)@slash@luastring.pbc \
+ $(LIBPATH)@slash@luatable.pbc \
+ $(LIBPATH)@slash@luamath.pbc \
+ $(LIBPATH)@slash@luaio.pbc \
+ $(LIBPATH)@slash@luaos.pbc \
+ $(LIBPATH)@slash@luapir.pbc
+
+all: pmcs $(PBCS) Lua@slash@parser.pm
+
+pmcs:
+	@cd $(CLASSDIR) && $(BUILD) generate $(PMCS)
+	@cd $(CLASSDIR) && $(BUILD) compile $(PMCS)
+	@cd $(CLASSDIR) && $(BUILD) linklibs $(PMCS)
+	@cd $(CLASSDIR) && $(BUILD) copy "--destination=$(DESTDIR)" $(PMCS)
+
+$(LIBPATH)@slash@luabasic.pbc: $(LIBPATH)@slash@luabasic.pir
+	$(PARROT) --output=$(LIBPATH)@slash@luabasic.pbc $(LIBPATH)@slash@luabasic.pir
+
+$(LIBPATH)@slash@luacoroutine.pbc: $(LIBPATH)@slash@luacoroutine.pir
+	$(PARROT) --output=$(LIBPATH)@slash@luacoroutine.pbc $(LIBPATH)@slash@luacoroutine.pir
+
+$(LIBPATH)@slash@luastring.pbc: $(LIBPATH)@slash@luastring.pir
+	$(PARROT) --output=$(LIBPATH)@slash@luastring.pbc $(LIBPATH)@slash@luastring.pir
+
+$(LIBPATH)@slash@luatable.pbc: $(LIBPATH)@slash@luatable.pir
+	$(PARROT) --output=$(LIBPATH)@slash@luatable.pbc $(LIBPATH)@slash@luatable.pir
+
+$(LIBPATH)@slash@luamath.pbc: $(LIBPATH)@slash@luamath.pir
+	$(PARROT) --output=$(LIBPATH)@slash@luamath.pbc $(LIBPATH)@slash@luamath.pir
+
+$(LIBPATH)@slash@luaio.pbc: $(LIBPATH)@slash@luaio.pir
+	$(PARROT) --output=$(LIBPATH)@slash@luaio.pbc $(LIBPATH)@slash@luaio.pir
+
+$(LIBPATH)@slash@luaos.pbc: $(LIBPATH)@slash@luaos.pir
+	$(PARROT) --output=$(LIBPATH)@slash@luaos.pbc $(LIBPATH)@slash@luaos.pir
+
+$(LIBPATH)@slash@luapir.pbc: $(LIBPATH)@slash@luapir.pir
+	$(PARROT) --output=$(LIBPATH)@slash@luapir.pbc $(LIBPATH)@slash@luapir.pir
+
+Lua@slash@parser.pm: Lua@slash@lua51.yp
+	yapp -s -v -m Lua::parser -o Lua/parser.pm Lua/lua51.yp
+
+test:
+	cd .. && $(PERL) -I../lib -Ilua/t lua/t/harness
+
+CLEANERS = \
+"t/lib/*.pir" \
+"t/pmc/*.pir" \
+"t/*.pir" \
+"t/*.lua" \
+"t/*.orig_out" \
+"t/*.parrot_out" \
+"$(CLASSDIR)/*.dump" \
+"$(CLASSDIR)/*.c" \
+"$(CLASSDIR)/*.h" \
+"$(CLASSDIR)/*$(LOAD_EXT)" \
+"$(CLASSDIR)/*$(O)" \
+"$(LIBPATH)/*.pbc"
+
+clean:
+	$(RM_F) $(CLEANERS)
+
+distclean: clean
+	$(RM_F) Makefile
