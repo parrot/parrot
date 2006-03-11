@@ -26,7 +26,7 @@ Otherwise I run the tests that were passed on the command line.
 =cut
 
 use strict;
-use lib '..';
+use lib '.';
 
 use Cwd();
 use Data::Dumper;
@@ -34,6 +34,7 @@ use File::Spec;
 use Test::Harness();
 
 my $language = 'pugs';
+lib->import($language);
 
 if ( grep { m/^--files$/ } @ARGV ) {
     # Only the Makefile in 'parrot/languages' uses --files

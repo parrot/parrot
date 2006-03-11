@@ -29,7 +29,6 @@ PMC *pugs_bool_false;
 
 pmclass PugsBool extends PugsAny
     extends Boolean
-    does scalar
     does boolean
     does integer
     dynpmc

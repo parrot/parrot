@@ -11,12 +11,17 @@ CLASSDIR = pmc
 LOAD_EXT = @load_ext@
 
 PMCS = \
- pugsany \
- pugsbit \
- pugsbool \
- pugsint \
- pugsnum \
- pugsstr
+    pugsany \
+    pugsbit \
+    pugsbool \
+    pugscode \
+    pugsint \
+    pugsmapping \
+    pugsnum \
+    pugsmodule \
+    pugsstr \
+    pugstuple \
+    pugsundef
 
 PBCS =
 

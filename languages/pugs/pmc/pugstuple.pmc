@@ -1,14 +1,14 @@
 /*
 Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
-$Id: /mirror/trunk/languages/pugs/pmc/pugsbit.pmc 11860 2006-03-11T15:14:44.630439Z autrijus  $
+$Id: /mirror/trunk/languages/pugs/pmc/pugsstr.pmc 11867 2006-03-11T19:12:31.078449Z autrijus  $
 
 =head1 NAME
 
-src/pmc/perlbit.pmc - Perl Bit
+pugstuple.pmc - Pugs Tuple
 
 =head1 DESCRIPTION
 
-C<PugsInt> extends C<Bit> to provide a Perl 6 biteger.
+C<PugsTuple> extends C<FixedPMCArray> to provide a Perl 6 C<Tuple>.
 
 =head2 Methods
 
@@ -20,14 +20,15 @@ C<PugsInt> extends C<Bit> to provide a Perl 6 biteger.
 
 #include "parrot/parrot.h"
 
-pmclass PugsBit extends PugsAny
-    extends Boolean
-    does boolean
-    does integer
+pmclass PugsTuple extends PugsAny need_ext 
+    extends FixedPMCArray
+    does array
     dynpmc
     group pugs_group
     hll Perl6
+    maps FixedPMCArray
 {
+    /* zero lines of code! whee! */
 }
 
 /*

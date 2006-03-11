@@ -1,14 +1,14 @@
 /*
 Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
-$Id: /mirror/trunk/languages/pugs/pmc/pugsbit.pmc 11860 2006-03-11T15:14:44.630439Z autrijus  $
+$Id: /mirror/trunk/languages/pugs/pmc/pugsstr.pmc 11867 2006-03-11T19:12:31.078449Z autrijus  $
 
 =head1 NAME
 
-src/pmc/perlbit.pmc - Perl Bit
+pugsmapping.pmc - Pugs Record
 
 =head1 DESCRIPTION
 
-C<PugsInt> extends C<Bit> to provide a Perl 6 biteger.
+C<PugsMapping> extends C<OrderedHash> to provide a Perl 6 C<Mapping>.
 
 =head2 Methods
 
@@ -20,14 +20,16 @@ C<PugsInt> extends C<Bit> to provide a Perl 6 biteger.
 
 #include "parrot/parrot.h"
 
-pmclass PugsBit extends PugsAny
-    extends Boolean
-    does boolean
-    does integer
+pmclass PugsMapping extends PugsAny need_ext 
+    extends OrderedHash
+    does array
+    does hash
     dynpmc
     group pugs_group
     hll Perl6
+    maps OrderedHash
 {
+    /* zero lines of code! whee! */
 }
 
 /*

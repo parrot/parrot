@@ -22,7 +22,6 @@ C<PugsNum> extends C<Number> to provide a Perl 6 C<Num>.
 
 pmclass PugsNum extends PugsAny
     extends Float
-    does scalar
     does float
     dynpmc
     group pugs_group

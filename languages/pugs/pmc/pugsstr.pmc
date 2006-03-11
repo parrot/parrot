@@ -22,7 +22,6 @@ C<PugsStr> extends C<String> to provide a Perl 6 C<Str>.
 
 pmclass PugsStr extends PugsAny
     extends String
-    does scalar
     does string
     dynpmc
     group pugs_group

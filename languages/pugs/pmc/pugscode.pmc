@@ -1,14 +1,14 @@
 /*
-Copyright: 2006 The Perl Foundation.  All Rights Reserved.
-$Id$
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id: /mirror/trunk/languages/pugs/pmc/pugssub.pmc 11867 2006-03-11T19:12:31.078449Z autrijus  $
 
 =head1 NAME
 
-pugsint.pmc - Pugs Integer
+pugscode.pmc - Pugs Code
 
 =head1 DESCRIPTION
 
-C<PugsInt> extends C<Integer> to provide a Perl 6 C<Int>.
+C<PugsCode> extends C<Closure> to provide a Perl 6 C<Code>.
 
 =head2 Methods
 
@@ -20,13 +20,13 @@ C<PugsInt> extends C<Integer> to provide a Perl 6 C<Int>.
 
 #include "parrot/parrot.h"
 
-pmclass PugsInt extends PugsAny
-    extends Integer
-    does integer
+pmclass PugsCode extends PugsAny
+    extends Closure
+    does sub
     dynpmc
     group pugs_group
     hll Perl6
-    maps Integer
+    maps Closure
 {
     /* zero lines of code! whee! */
 }
