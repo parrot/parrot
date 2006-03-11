@@ -161,6 +161,12 @@ sub makefiles
         conditioned_lines             => 1
     );
     genfile(
+        'languages/pugs/config/makefiles/root.in' => 'languages/pugs/Makefile',
+        commentType                   => '#',
+        replace_slashes               => 1,
+        conditioned_lines             => 1
+    );
+    genfile(
         'config/gen/makefiles/miniperl.in' => 'languages/miniperl/Makefile',
         commentType                        => '#',
         replace_slashes                    => 1

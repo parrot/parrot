@@ -1,16 +1,14 @@
 /*
-Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
 $Id$
 
 =head1 NAME
 
-src/pmc/perlstring.pmc - Perl String
+pugsstr.pmc - Pugs String
 
 =head1 DESCRIPTION
 
-C<PerlString> extends C<String> to provide Perl-specific string behaviour.
-Note that the C<morph> method comes from C<PerlScalar>,
-not from C<String>.
+C<PugsStr> extends C<String> to provide a Perl 6 C<Str>.
 
 =head2 Methods
 
@@ -22,138 +20,17 @@ not from C<String>.
 
 #include "parrot/parrot.h"
 
-void Parrot_perlscalar_morph(Interp* , PMC* pmc, INTVAL type);
-
-pmclass PerlString extends String does string does scalar {
-
-/*
-
-=item C<INTVAL get_integer()>
-
-Returns the integer representation of the string by converting to float first.
-See t/pmc/perlstring_13    set P0, "1.23e2" ; set I0, P0    
-
-=cut
-
-*/
-    INTVAL get_integer () {
-        double f = DYNSELF.get_number();
-        return (INTVAL)f;
-    }
-
-/*
-
-=item C<STRING* get_repr()>
-
-Returns pythons string repr (w/o any escaping, just single quotes around)
-
-=cut
-
-*/
-
-    STRING* get_repr() {
-        STRING *start, *s, *q, *repr;
-        q = const_string(INTERP, "'");
-        s = DYNSELF.get_string();
-        if (PObj_get_FLAGS(s) & PObj_private7_FLAG)
-            start = const_string(INTERP, "u'");
-        else
-            start = q;
-        repr = string_copy(INTERP, start);
-        repr = string_append(INTERP, repr, s, 0);
-        repr = string_append(INTERP, repr, q, 0);
-        return repr;
-    }
-
-/*
-
-=item C<void set_integer_native(INTVAL value)>
-
-Morphs the string to a C<PerlInt> and sets its value to C<value>.
-
-=cut
-
-*/
-
-    void set_integer_native (INTVAL value) {
-        DYNSELF.morph(enum_class_PerlInt);
-        DYNSELF.set_integer_native(value);
-    }
-
-/*
-
-=item C<void set_number_native(FLOATVAL value)>
-
-Morphs the string to a C<PerlNum> and sets its value to C<value>.
-
-=cut
-
-*/
-
-    void set_number_native (FLOATVAL value) {
-        DYNSELF.morph(enum_class_PerlNum);
-        DYNSELF.set_number_native(value);
-    }
-
-/*
-
-=item C<void morph(INTVAL type)>
-
-Morphs the C<PerlString> to the specified type.
-
-=cut
-
-*/
-
-    void morph (INTVAL type) {
-        perlscalar.SELF.morph(type);
-    }
-
-/*
-
-=item C<void increment()>
-
-=item C<void decrement()>
-
-These two methods are partially implemented. They should provide
-Perl 5 like string increment/decrement.
-
-=cut
-
-*/
-
-    void increment () {
-        STRING* s = PMC_str_val(SELF);
-        PMC_str_val(SELF) = string_increment(INTERP, s);
-    }
-
-    void decrement () {
-        INTVAL i = VTABLE_get_integer(INTERP, SELF);
-        VTABLE_set_integer_native(INTERP, SELF, i - 1);
-    }
-
-
-/*
-
-=item C<PMC *get_pmc_keyed(PMC *key)>
-
-Returns the string value for C<SELF[key]>.
-
-=cut
-
-*/
-
-    PMC* get_pmc_keyed(PMC* key) {
-        STRING *s = PMC_str_val(SELF);
-        PMC *ret;
-
-        ret = pmc_new_noinit(INTERP, enum_class_PerlString);
-        PMC_str_val(ret) = string_substr(INTERP, s,
-                key_integer(INTERP,key), 1, NULL, 0);
-        PObj_custom_mark_SET(ret);
-        return ret;
-    }
-
+pmclass PugsStr
+    extends String
+    extends PugsAny
+    does scalar
+    does string
+    dynpmc
+    group pugs_group
+    hll Perl6
+    maps String
+{
+    /* zero lines of code! whee! */
 }
 
 /*

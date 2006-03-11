@@ -4,11 +4,11 @@ $Id$
 
 =head1 NAME
 
-src/pmc/perlnum.pmc - Perl Floating-Point Number
+pugsnum.pmc - Pugs Number
 
 =head1 DESCRIPTION
 
-These are the vtable functions for the PerlNum base class
+C<PugsNum> extends C<Number> to provide a Perl 6 C<Num>.
 
 =head2 Methods
 
@@ -20,102 +20,17 @@ These are the vtable functions for the PerlNum base class
 
 #include "parrot/parrot.h"
 
-void Parrot_perlscalar_morph(Interp* , PMC* pmc, INTVAL type);
-
-pmclass PerlNum extends Float does float does scalar {
-
-/*
-
-=item C<STRING *get_string()>
-
-Returns the number as a Parrot string.
-
-=cut
-
-*/
-
-    STRING* get_string () {
-#if 0
-        double d = (double) PMC_num_val(SELF);
-        const char *sign = "-";
-        if (!signbit(PMC_num_val(SELF)))
-            sign = "";
-        d = fabs(d);
-        return Parrot_sprintf_c(INTERP, "%s" FLOATVAL_FMT, sign, d);
-#else
-        /* XXX signbit isn't portable and as we are calling Parrot_sprintf_c
-        * anyway, we can use the builtin number formatting too
-        * this might still be a problem with -0.0
-        */
-        return Parrot_sprintf_c(INTERP, "%Pf", SELF);
-#endif
-    }
-
-
-/*
-
-=item C<void set_integer_native(INTVAL value)>
-
-=cut
-
-*/
-
-    void set_integer_native (INTVAL value) {
-        DYNSELF.morph(enum_class_PerlInt);
-        DYNSELF.set_integer_native(value);
-    }
-
-/*
-
-=item C<void set_number_native(FLOATVAL value)>
-
-Sets the value of the number to C<value>.
-
-Note that if C<value> is an integer the number morphs to a C<PerlInt>.
-
-=cut
-
-*/
-
-    void set_number_native (FLOATVAL value) {
-        INTVAL vali = (INTVAL) value;
-
-        PMC_num_val(SELF) = value;
-        /* don't mess around with - 0 */
-        if (value == vali && (vali || !Parrot_signbit(value)))
-            DYNSELF.set_integer_native(vali);
-    }
-
-/*
-
-=item C<void set_string_native(STRING *value)>
-
-Sets the value of the number to the value of C<*value>.
-
-Note that this method morphs the number into a C<PerlString>.
-
-=cut
-
-*/
-
-    void set_string_native (STRING * value) {
-        DYNSELF.morph(enum_class_PerlString);
-        DYNSELF.set_string_native(value);
-    }
-
-/*
-
-=item C<void morph(INTVAL type)>
-
-Morphs the scalar to the specified type.
-
-=cut
-
-*/
-
-    void morph (INTVAL type) {
-        perlscalar.SELF.morph(type);
-    }
+pmclass PugsNum
+    extends Float
+    extends PugsAny
+    does scalar
+    does float
+    dynpmc
+    group pugs_group
+    hll Perl6
+    maps Float
+{
+    /* zero lines of code! whee! */
 }
 
 /*
@@ -135,4 +50,3 @@ Morphs the scalar to the specified type.
  *
  * vim: expandtab shiftwidth=4:
 */
-

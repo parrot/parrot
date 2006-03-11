@@ -1,14 +1,14 @@
 /*
-Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+Copyright: 2006 The Perl Foundation.  All Rights Reserved.
 $Id$
 
 =head1 NAME
 
-src/pmc/perlint.pmc - Perl Integer
+pugsint.pmc - Pugs Integer
 
 =head1 DESCRIPTION
 
-C<PerlInt> extends C<Integer> to provide a Perl integer.
+C<PugsInt> extends C<Integer> to provide a Perl 6 C<Int>.
 
 =head2 Methods
 
@@ -20,54 +20,17 @@ C<PerlInt> extends C<Integer> to provide a Perl integer.
 
 #include "parrot/parrot.h"
 
-void Parrot_perlscalar_morph(Interp* , PMC* pmc, INTVAL type);
-
-/* TODO extends PerlAny or perlscalar or whatever */
-pmclass PerlInt extends Integer does integer does scalar {
-
-
-/*
-
-=item C<void set_number_native(FLOATVAL value)>
-
-Morphs the integer to a C<PerlNum> and sets the value from C<value>.
-
-=cut
-
-*/
-    void set_number_native (FLOATVAL value) {
-        DYNSELF.morph(enum_class_PerlNum);
-        DYNSELF.set_number_native(value);
-    }
-
-
-/*
-
-=item C<void set_string_native(STRING *value)>
-
-Sets the value of the integer to C<*value>.
-
-=cut
-
-*/
-    void set_string_native (STRING* value) {
-        DYNSELF.morph(enum_class_PerlString);
-        DYNSELF.set_string_native(value);
-    }
-
-/*
-
-=item C<void morph(INTVAL type)>
-
-Morphs the scalar to the specified type.
-
-=cut
-
-*/
-
-    void morph (INTVAL type) {
-        perlscalar.SELF.morph(type);
-    }
+pmclass PugsInt
+    extends Integer
+    extends PugsAny
+    does scalar
+    does integer
+    dynpmc
+    group pugs_group
+    hll Perl6
+    maps Integer
+{
+    /* zero lines of code! whee! */
 }
 
 /*
