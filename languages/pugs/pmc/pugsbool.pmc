@@ -1,0 +1,64 @@
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id: /mirror/trunk/languages/pugs/pmc/pugsbit.pmc 11860 2006-03-11T15:14:44.630439Z autrijus  $
+
+=head1 NAME
+
+src/pmc/perlbit.pmc - Perl Bit
+
+=head1 DESCRIPTION
+
+C<PugsInt> extends C<Bit> to provide a Perl 6 biteger.
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
+
+#define PUGS_BIT
+
+#include "parrot/parrot.h"
+#include "pmc_pugsbit.h"
+#include "../include/pugs_common.h"
+
+PMC *pugs_bit_true;
+PMC *pugs_bit_false;
+
+pmclass PugsBit
+    extends Boolean
+    does scalar
+    does boolean
+    does integer
+    dynpmc
+    group pugs_group
+    hll Perl6
+    maps Boolean
+{
+    void class_init() {
+        /* generate a PugsBitTrue and a PugsBitFalse here */
+        pugs_bit_true  = pmc_new(interp, entry);
+        pugs_bit_false = pmc_new(interp, entry);
+        VTABLE_set_integer_native(interp, pugs_bit_true, 1);
+    }
+}
+
+/*
+
+=back
+
+=cut
+
+*/
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+*/
