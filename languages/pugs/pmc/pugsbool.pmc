@@ -4,11 +4,11 @@ $Id: /mirror/trunk/languages/pugs/pmc/pugsbit.pmc 11860 2006-03-11T15:14:44.6304
 
 =head1 NAME
 
-src/pmc/perlbit.pmc - Perl Bit
+src/pmc/perlbool.pmc - Perl Bool
 
 =head1 DESCRIPTION
 
-C<PugsInt> extends C<Bit> to provide a Perl 6 biteger.
+C<PugsBool> extends C<Boolean> to provide a Perl 6 boolean.
 
 =head2 Methods
 

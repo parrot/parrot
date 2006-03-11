@@ -8,7 +8,7 @@ src/pmc/perlbit.pmc - Perl Bit
 
 =head1 DESCRIPTION
 
-C<PugsInt> extends C<Bit> to provide a Perl 6 biteger.
+C<PugsBit> extends C<Bit> to provide a Perl 6 bit.
 
 =head2 Methods
 
