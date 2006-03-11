@@ -16,12 +16,23 @@ use Parrot::Test 'no_plan';
 use Test::More;
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "check sanity");
+.sub _main
+    loadlib $P1, "pugs_group"
+    $I0 = defined $P1 
+    if $I0 goto ok
+    print "not "
+ok:
+    print "ok\n"
+.end
+CODE
+ok
+OUTPUT
+
+pir_output_is(<< 'CODE', << 'OUTPUT', "check sanity");
 .HLL "Perl6", "pugs_group"
 .sub _main
-    loadlib P1, "pugs_group"
-    find_type $I0, "PugsBit"
     .local pmc pmc1
-    pmc1 = new $I0
+    pmc1 = new .PugsBit
     print "ok\n"
 .end
 CODE
