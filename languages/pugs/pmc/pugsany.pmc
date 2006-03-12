@@ -1,6 +1,6 @@
 /*
 Copyright: 2006 The Perl Foundation.  All Rights Reserved.
-$Id: luabase.pmc 11478 2006-02-09 08:26:19Z fperrad $
+$Id$
 
 =head1 NAME
 
@@ -13,6 +13,8 @@ C<PugsAny> provides an abstract base class for both Pugs Values and References.
 =head2 Methods
 
 =over 4
+
+=back
 
 =cut
 
