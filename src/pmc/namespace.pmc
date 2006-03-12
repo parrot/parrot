@@ -168,13 +168,47 @@ a NameSpace or a var, the NameSpace is returned.
     }
 
     void set_pmc_keyed(PMC *key, PMC *value) {
-        switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
-            case KEY_string_FLAG:
-                SELF.set_pmc_keyed_str(key_string(INTERP, key), value);
-                if (!key_next(INTERP, key))
+        PMC *ns = SELF, *next;
+        STRING *part;
+        INTVAL i, n;
+        if (key->vtable->base_type == enum_class_Key) {
+            while (1) {
+                part = key_string(INTERP, key);
+                key = key_next(INTERP, key);
+                next = VTABLE_get_pmc_keyed_str(INTERP, ns, part);
+                if (key) {
+                    if (!next || 
+                            next->vtable->base_type != enum_class_NameSpace) {
+                        next = pmc_new(interpreter, enum_class_NameSpace);
+                        VTABLE_set_pmc_keyed_str(INTERP, ns, part, next);
+                    }
+                }
+                else {
+                    VTABLE_set_pmc_keyed_str(INTERP, ns, part, value);
                     break;
-            default:
-                assert("not yet" == NULL);
+                }
+                ns = next;
+            }
+            return;
+        }
+        n = VTABLE_elements(INTERP, key);
+        if (!n)
+            real_exception(INTERP, NULL, E_NameError,
+                    "Empty namespace array");
+        for (i = 0; ; ++i) {
+            part = VTABLE_get_string_keyed_int(INTERP, key, i);
+            next = VTABLE_get_pmc_keyed_str(INTERP, ns, part);
+            if (i < n - 1) {
+                if (!next || next->vtable->base_type != enum_class_NameSpace) {
+                    next = pmc_new(interpreter, enum_class_NameSpace);
+                    VTABLE_set_pmc_keyed_str(INTERP, ns, part, next);
+                }
+            }
+            else {
+                VTABLE_set_pmc_keyed_str(INTERP, ns, part, value);
+                break;
+            }
+            ns = next;
         }
     }
 

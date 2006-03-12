@@ -232,52 +232,69 @@ Parrot_store_global(Interp *interpreter, STRING *class,
 }
 
 static void
+store_sub(Interp *interpreter, STRING *class,
+        STRING *globalname, PMC *pmc)
+{
+    PMC *globals = interpreter->stash_hash;
+    PMC *stash;
+    if (class) {
+        stash = Parrot_global_namespace(interpreter, globals, class);
+    }
+    else
+        stash = globals;  /*  TODO current */
+    VTABLE_set_pmc_keyed_str(interpreter, stash, globalname, pmc);
+    Parrot_invalidate_method_cache(interpreter, class, globalname);
+    /* MultiSub isa R*PMCArray and doesn't have a PMC_sub structure 
+     * MultiSub could also contain subs from various namespaces,
+     * that it doesn't make much sense, to associate a namespace
+     * a multi.
+     *
+     */
+    if (pmc->vtable->base_type != enum_class_MultiSub)
+        PMC_sub(pmc)->namespace_stash = stash;
+}
+
+static void
+store_sub_p(Interp *interpreter, PMC *namespace,
+        STRING *globalname, PMC *pmc)
+{
+    PMC *globals = interpreter->stash_hash;
+    PMC *stash;
+    stash = VTABLE_get_pmc_keyed(interpreter, globals, namespace);
+    if (!stash || stash->vtable->base_type != enum_class_NameSpace) {
+        stash = pmc_new(interpreter, enum_class_NameSpace);
+        VTABLE_set_pmc_keyed(interpreter, globals, namespace, stash);
+    }
+    VTABLE_set_pmc_keyed_str(interpreter, stash, globalname, pmc);
+    /* MultiSub isa R*PMCArray and doesn't have a PMC_sub structure */
+    if (pmc->vtable->base_type != enum_class_MultiSub)
+        PMC_sub(pmc)->namespace_stash = stash;
+}
+
+static void
 store_sub_in_namespace(Parrot_Interp interpreter, PMC* sub_pmc,
         PMC *namespace, STRING *sub_name)
 {
-    PMC *globals = interpreter->stash_hash;
-    INTVAL type, class_type;
-
-#if DEBUG_GLOBAL
-    fprintf(stderr, "PMC_CONST: store_global: name '%s' ns %s\n",
-            (char*)sub_name->strstart,
-            namespace ? (char*)PMC_str_val(namespace)->strstart : "(none)");
-#endif
     /*
      * namespace is either s String or a Key PMC or NULL
      */
     if (PMC_IS_NULL(namespace)) {
 global_ns:
         /* XXX store relative - not absolute */
-        Parrot_store_global(interpreter, NULL, sub_name, sub_pmc);
+        store_sub(interpreter, NULL, sub_name, sub_pmc);
     }
     else {
         STRING *names;
-        PMC * stash = NULL, *part;
-
-        type = namespace->vtable->base_type;
+        INTVAL type = namespace->vtable->base_type;
         switch (type) {
             case enum_class_String:
                 names = PMC_str_val(namespace);
                 if (!string_length(interpreter, names))
                     goto global_ns;
-                Parrot_store_global(interpreter, names, sub_name, sub_pmc);
+                store_sub(interpreter, names, sub_name, sub_pmc);
                 break;
             case enum_class_Key:
-                part = namespace;
-                /*
-                 * a nested key can't be handled by add_method
-                 */
-                for (; part; part = PMC_data(part)) {
-                    STRING *s = key_string(interpreter, part);
-#if TRACE_PACKFILE_PMC
-                    PIO_printf(interpreter, "key part %Ss\n", s);
-#endif
-                    stash = Parrot_global_namespace(interpreter, globals, s);
-                    globals = stash;
-                }
-                VTABLE_set_pmc_keyed_str(interpreter, stash, sub_name, sub_pmc);
-                PMC_sub(sub_pmc)->namespace_stash = stash;
+                store_sub_p(interpreter, namespace, sub_name, sub_pmc);
                 break;
             default:
                 internal_exception(1, "Unhandled namespace constant");
