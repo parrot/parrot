@@ -32,7 +32,12 @@ pmclass PugsUndef extends PugsAny need_ext
     hll Perl6
     maps Exception
 {
-    /* zero lines of code! whee! */
+    /* the PMC compiler doesn't know, that Exception inherits
+     * this from SArray
+     */
+    void set_integer_native(INTVAL v) {
+        Parrot_SArray_set_integer_native(INTERP, SELF, v);
+    }
 }
 
 /*
