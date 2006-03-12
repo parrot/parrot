@@ -998,12 +998,12 @@ branch_cond_loop_swap(Interp *interp, IMC_Unit *unit, Instruction *branch,
             regs[get_branch_regno(cond)] = 
                 mk_label_address(interp, str_dup(label));
             tmp = INS(interp, unit, (char*)neg_op, "", regs, args, 0, 0);
-            subst_ins(unit, branch, tmp, 1);
             
             IMCC_debug(interp, DEBUG_OPT1, 
             "loop %s -> %s converted to post-test, added label %s\n",
             branch->r[0]->name, get_branch_reg(cond)->name, label);
 
+            subst_ins(unit, branch, tmp, 1);
             ostat.branch_cond_loop++;
             changed = 1;
         }
@@ -1032,7 +1032,7 @@ branch_cond_loop_swap(Interp *interp, IMC_Unit *unit, Instruction *branch,
 static int
 branch_cond_loop(Interp *interpreter, IMC_Unit * unit)
 {
-    Instruction *ins, *cond, *end, *start;
+    Instruction *ins, *cond, *end, *start, *prev;
     SymReg * r;
     int changed = 0, found;
 
@@ -1070,7 +1070,15 @@ branch_cond_loop(Interp *interpreter, IMC_Unit * unit)
                     char *lbl = get_branch_reg(cond)->name;
                     r = get_sym(lbl);
                     if (r && (r->type & VTADDRESS) && r->first_ins == end) {
-                        changed |= branch_cond_loop_swap(interpreter, unit, ins, start, cond);
+                        /* the current ins is replaced - remember prev
+                         * and set ins again after the changes
+                         */
+                        prev = ins->prev;
+                        if (!prev)
+                            continue;
+                        changed |= branch_cond_loop_swap(interpreter, 
+                                unit, ins, start, cond);
+                        ins = prev->next;
                     }
                 }
             }
