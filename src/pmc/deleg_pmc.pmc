@@ -81,6 +81,11 @@ pmclass deleg_pmc {
     PMC* find_method(STRING* method_name) {
         return SUPER(method_name);
     }
+
+    PMC* namespace() {
+        return SELF->vtable->_namespace;
+    }
+
 }
 
 /*
