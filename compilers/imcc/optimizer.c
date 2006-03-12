@@ -478,7 +478,7 @@ strength_reduce(Interp *interpreter, IMC_Unit * unit)
 static int
 constant_propagation(Interp *interpreter, IMC_Unit * unit)
 {
-    Instruction *ins, *ins2, *tmp;
+    Instruction *ins, *ins2, *tmp, *prev;
     int op;
     int i;
     char fullname[128];
@@ -530,21 +530,28 @@ constant_propagation(Interp *interpreter, IMC_Unit * unit)
                                 unit, ins2->op, ins2->r, ins2->opsize,
                                 &found);
                             if (found) {
-                                subst_ins(unit, ins2, tmp, 1);
-                                any = 1;
-                                IMCC_debug(interpreter, DEBUG_OPT2," reduced to %I\n", tmp);
+                                prev = ins2->prev;
+                                if (prev) {
+                                    subst_ins(unit, ins2, tmp, 1);
+                                    any = 1;
+                                    IMCC_debug(interpreter, DEBUG_OPT2,
+                                            " reduced to %I\n", tmp);
+                                    ins2 = prev->next;
+                                }
                             } else {
                                 op = check_op(interpreter, fullname, ins2->op,
                                     ins2->r, ins2->n_r, ins2->keys);
                                 if (op < 0) {
                                     ins2->r[i] = old;
-                                    IMCC_debug(interpreter, DEBUG_OPT2," - no %s\n", fullname);
+                                    IMCC_debug(interpreter, DEBUG_OPT2,
+                                            " - no %s\n", fullname);
                                 }
                                 else {
                                     --old->use_count;
                                     ins2->opnum = op;
                                     any = 1;
-                                    IMCC_debug(interpreter, DEBUG_OPT2," -> %I\n", ins2);
+                                    IMCC_debug(interpreter, DEBUG_OPT2,
+                                            " -> %I\n", ins2);
                                 }
                             }
                         }
