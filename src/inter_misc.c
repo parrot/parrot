@@ -40,44 +40,6 @@ void
 enter_nci_method(Parrot_Interp interpreter, int type,
 		 void *func, const char *name, const char *proto)
 {
-#if 0
-    PMC *method, *method_table, **table;
-    int i;
-
-    if (type >= (int)interpreter->nci_method_table_size) {
-        if (!interpreter->nci_method_table_size) {
-            table = interpreter->nci_method_table =
-                mem_sys_allocate_zeroed((enum_class_max) * sizeof(PMC*));
-            for (i = 0; i < enum_class_max; ++i)
-                SET_NULL_P(table[i], PMC*);
-            interpreter->nci_method_table_size = enum_class_max;
-        }
-        else {
-            table = interpreter->nci_method_table =
-                mem_sys_realloc(interpreter->nci_method_table,
-                        (type + 1) * sizeof(PMC*));
-            for (i = interpreter->nci_method_table_size; i < type + 1; ++i)
-                table[i] = NULL;
-            interpreter->nci_method_table_size = type + 1;
-        }
-    }
-    else
-        table = interpreter->nci_method_table;
-    if (!table[type])
-        table[type] = pmc_new(interpreter, enum_class_Hash);
-    method_table = table[type];
-
-    method = pmc_new(interpreter, enum_class_NCI);
-    VTABLE_set_pointer_keyed_str(interpreter, method,
-            string_make(interpreter, proto, strlen(proto),
-                NULL, PObj_constant_FLAG|PObj_external_FLAG),
-            func);
-    VTABLE_set_pmc_keyed_str(interpreter, method_table,
-            string_make(interpreter, name,
-                strlen(name), NULL,
-                PObj_constant_FLAG|PObj_external_FLAG),
-            method);
-#else
     PMC *method;
     method = pmc_new(interpreter, enum_class_NCI);
     VTABLE_set_pointer_keyed_str(interpreter, method,
@@ -91,7 +53,6 @@ enter_nci_method(Parrot_Interp interpreter, int type,
                 PObj_constant_FLAG|PObj_external_FLAG),
             method);
 
-#endif
 }
 
 /*
