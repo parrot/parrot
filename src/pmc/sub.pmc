@@ -541,8 +541,7 @@ Unarchives the subroutine.
 
 =item C<METHOD PMC* get_namespace()>
 
-Return the namespace PMC or Undef. The namespace PMC is either a
-String PMC or a Key PMC for a nested namespace.
+Return the namespace PMC, where the Sub is defined. 
 
 TODO return C<namespace_stash> instead.
 
@@ -562,8 +561,7 @@ Return the LexInfo PMC, if any or a Null PMC.
     METHOD PMC* get_namespace() {
         struct Parrot_sub * sub = PMC_sub(SELF);
 
-        return PMC_IS_NULL(sub->namespace) ?
-            pmc_new(INTERP, enum_class_Undef) : sub->namespace;
+        return sub->namespace_stash;
     }
 
     METHOD INTVAL __get_regs_used(char *kind) {

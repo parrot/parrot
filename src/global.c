@@ -247,7 +247,7 @@ store_sub(Interp *interpreter, STRING *class,
     /* MultiSub isa R*PMCArray and doesn't have a PMC_sub structure 
      * MultiSub could also contain subs from various namespaces,
      * that it doesn't make much sense, to associate a namespace
-     * a multi.
+     * with a multi.
      *
      */
     if (pmc->vtable->base_type != enum_class_MultiSub)

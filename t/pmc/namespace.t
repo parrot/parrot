@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 21;
+use Parrot::Test tests => 22;
 
 =head1 NAME
 
@@ -315,25 +315,15 @@ pir_output_is(<<'CODE', <<'OUTPUT', "get namespace in Foo::Bar::baz");
     .include "pmctypes.pasm"
     $P0 = interpinfo .INTERPINFO_CURRENT_SUB
     $P1 = $P0."get_namespace"()
-    typeof $I0, $P1
-    if $I0 == .Key goto is_key
-    print $P1
-    print "\n"
-    .return()
-is_key:
-    print $P1
-    $P1 = shift $P1
-    $I1 = defined $P1
-    unless $I1 goto ex
-    print "::"
-    goto is_key
-ex:
+    $P2 = $P1.'name'()
+    $S0 = join '::', $P2
+    print $S0
     print "\n"
 .end
 CODE
 ok
 baz
-Foo::Bar
+::Foo::Bar
 OUTPUT
 
 SKIP: {
@@ -469,3 +459,28 @@ CODE
 3
 ::parrot::Foo
 OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "Sub.get_namespace, get_namespace");
+.sub 'main' :main
+    $P0 = find_global "Foo", "bar"
+    print "ok\n"
+    $P1 = $P0."get_namespace"()
+    $P2 = $P1.name()
+    $S0 = join '::', $P2
+    print $S0
+    print "\n"
+    $P0()
+.end
+
+.namespace ["Foo"]
+.sub 'bar'
+    $P1 = get_namespace
+    print $P1
+    print "\n"
+.end
+CODE
+ok
+::Foo
+Foo
+OUTPUT
+

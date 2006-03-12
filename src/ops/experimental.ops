@@ -250,19 +250,21 @@ Find the variable $3 in $2.
 op get_namespace(out PMC) {
     PMC *current_sub;
     current_sub = CONTEXT(interpreter->ctx)->current_sub;
-    $1 = PMC_sub(current_sub)->namespace;
+    $1 = PMC_sub(current_sub)->namespace_stash;
     goto NEXT();
 }
 
 op get_namespace(out PMC, in PMC) {
-    PMC *ns_root = interpreter->stash_hash;
-    $1 = VTABLE_get_pmc_keyed(interpreter, ns_root, $2);
+    PMC *ns_root = interpreter->stash_hash, *ns;
+    ns = VTABLE_get_pmc_keyed(interpreter, ns_root, $2);
+    $1 = ns ? ns : PMCNULL;
     goto NEXT();
 }
 
 op get_namespace(out PMC, in KEY) {
-    PMC *ns_root = interpreter->stash_hash;
-    $1 = VTABLE_get_pmc_keyed(interpreter, ns_root, $2);
+    PMC *ns_root = interpreter->stash_hash, *ns;
+    ns = VTABLE_get_pmc_keyed(interpreter, ns_root, $2);
+    $1 = ns ? ns : PMCNULL;
     goto NEXT();
 }
 
