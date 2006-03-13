@@ -934,9 +934,17 @@ EOC
 
     # create a namespace hash
     $cout .= <<"EOC";
-        /* need a namespace Hash TODO anchor at parent, name it */
-        Parrot_base_vtables[entry]->_namespace = pmc_new(interp,
+        PMC *ns;
+        
+        /* need a namespace Hash, anchor at parent, name it */
+        ns = pmc_new(interp,
                 Parrot_get_ctx_HLL_type(interp, enum_class_NameSpace));
+        Parrot_base_vtables[entry]->_namespace = ns;
+        /* anchor at parent, aka current_namespace, that is 'parrot' */
+        VTABLE_set_pmc_keyed_str(interp, 
+                CONTEXT(interp->ctx)->current_namespace, 	
+                Parrot_base_vtables[entry]->whoami, 
+                ns); 
 EOC
 
     # declare each nci method for this class

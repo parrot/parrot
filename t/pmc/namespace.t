@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 22;
+use Parrot::Test tests => 23;
 
 =head1 NAME
 
@@ -484,3 +484,13 @@ ok
 Foo
 OUTPUT
 
+pir_output_is(<<'CODE', <<'OUTPUT', "check parrot ns", todo => 'soon');
+.sub 'main' :main
+    $P0 = get_namespace ["parrot"; "String"]
+    $P1 = find_global $P0, "lower"
+    $S0 = $P1("OK\n")
+    print $S0
+.end
+CODE
+ok
+OUTPUT
