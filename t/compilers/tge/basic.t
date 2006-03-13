@@ -76,6 +76,17 @@ CODE
 OUT
 
 
+pir_output_is(<<'CODE', <<'OUT', '"Malformed string" in r11890 under Linux i386');
+
+.sub test
+  load_bytecode "languages/punie/lib/PAST.pir"
+  load_bytecode "TGE.pbc"
+  print "1\n"
+.end
+CODE
+1
+OUT
+
 ## remember to change the number of tests :-)
-BEGIN { plan tests => 2; }
+BEGIN { plan tests => 3; }
 
