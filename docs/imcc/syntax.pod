@@ -160,7 +160,7 @@ prefix.
 
 =item .HLL "hll_name", "hll_lib"
 
-Define the HLL for the current module. If the string C<hll_lib> isn't empty
+Define the HLL for the current file. If the string C<hll_lib> isn't empty
 this B<compile time pragma> also loads the shared lib for the HLL, so that
 integer type constants are working for creating new PMCs.
 

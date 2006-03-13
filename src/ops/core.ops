@@ -691,7 +691,8 @@ Pop all items off the control stack to the given mark.
 
 Push the given Sub PMC $1 onto the control stack. If the control stack
 is unwound due to a C<popmark>, subroutine return, or an exception, the
-subroutine will be invoked.
+subroutine will be invoked with an integer argument: C<0> means a normal
+return; C<1> means an exception has been raised.
 
 =cut
 
