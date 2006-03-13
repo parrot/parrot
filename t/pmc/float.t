@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 45;
+use Parrot::Test tests => 46;
 
 =head1 NAME
 
@@ -1362,4 +1362,14 @@ CODE
 1
 OUTPUT
 
+
+pir_output_is( <<'CODE', <<OUTPUT, "new_from_string");
+.sub main :main
+    .const .Float pi = "3.1"
+    print pi
+    print "\n"
+.end
+CODE
+3.1
+OUTPUT
 
