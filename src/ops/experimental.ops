@@ -249,8 +249,7 @@ Find the variable $3 in $2.
 
 op get_namespace(out PMC) {
     PMC *current_sub;
-    current_sub = CONTEXT(interpreter->ctx)->current_sub;
-    $1 = PMC_sub(current_sub)->namespace_stash;
+    $1 = CONTEXT(interpreter->ctx)->current_namespace;
     goto NEXT();
 }
 
