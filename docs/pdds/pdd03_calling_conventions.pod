@@ -123,15 +123,19 @@ C<set_returns>:
                The meaning of this bit is undefined when applied to integer,
                number, and string values.
 
-    6     MAYBE_FLAT ((DEPRECATED))
-               DEPRECATED - DO NOT USE
-               If:
-                (a) this bit is set on a PMC value; and,
-                (b) the PMC is an aggregate or a scalar containing a reference
-                    to an aggregate; and,
-                (c) the called function has a slurpy flag on the corresponding
-                    parameter;
-               then, pretend FLAT bit was set.
+    6     MAYBE_FLAT
+               If this bit is set on a PMC value, and:
+                (a) the PMC is either an aggregate or a scalar containing a
+                    reference to an aggregate, and
+                (b) the target register has the SLURPY bit set,
+               then pass the PMC value as a list of values, in these ways:
+                (a) if the value is an array, pass its elements in the normal
+                    way (FLAT style);
+                (b) if the value is a hash, pass its elements as a list of
+                    key/value pairs contained in HLL-specific 'pair' PMCs.
+               The meaning of this bit is undefined when applied to integer,
+               number, and string values.  It may not be combined with the
+               NAMED bit.
 
     7     (unused)
 
