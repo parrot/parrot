@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 38;
+use Parrot::Test tests => 39;
 
 =head1 NAME
 
@@ -1199,4 +1199,13 @@ CODE
 1
 0
 1
+OUTPUT
+
+pir_output_is( <<'CODE', <<OUTPUT, "new_from_string");
+.sub main :main
+    .const .String ok = "ok\n"
+    print ok
+.end
+CODE
+ok
 OUTPUT
