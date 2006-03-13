@@ -24,37 +24,6 @@ These are the vtable functions for the Sub (subroutine) base class
 #include <assert.h>
 
 static void
-clear_fixup(Interp* interpreter, PMC* self)
-{
-    opcode_t i, ci;
-    struct PackFile_ByteCode *seg;
-    struct PackFile_FixupTable *ft;
-    struct PackFile_ConstTable *ct;
-
-    seg = PMC_sub(self)->seg;
-    if (!seg)
-        return;
-    ft = seg->fixups;
-    if (!ft)
-        return;
-    ct = seg->const_table;
-    if (!ct)
-        return;
-    for (i = 0; i < ft->fixup_count; i++) {
-        switch (ft->fixups[i]->type) {
-            case enum_fixup_sub:
-                ci = ft->fixups[i]->offset;
-                if (ct->constants[ci]->u.key == self) {
-                    ct->constants[ci]->u.key = NULL;
-                    ft->fixups[i]->type = 0;
-                    break;
-                }
-
-        }
-    }
-}
-
-static void
 print_sub_name(Interp* interpreter, PMC* sub)
 {
     Interp *tracer;
@@ -134,7 +103,6 @@ Destroys the subroutine.
                     n && n->strstart ? (char*)n->strstart : "???");
         }
 #endif
-        clear_fixup(INTERP, SELF);
         mem_sys_free(sub);
         PMC_struct_val(SELF) = NULL;
     }
