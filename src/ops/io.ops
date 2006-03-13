@@ -552,7 +552,7 @@ op connect(out INT, in PMC, in STR) :base_network {
     goto NEXT();
 }
 
-op NO_SUCH_recv(out INT, in PMC, inconst STR) :base_network {
+op DELETED_recv(out INT, in PMC, inconst STR) :base_network {
     goto NEXT();
 }
 

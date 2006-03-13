@@ -236,7 +236,6 @@ init_context(Interp *interpreter, parrot_context_t *ctx, parrot_context_t *old)
     ctx->lex_pad = PMCNULL;
     ctx->outer_ctx = NULL;
     ctx->current_cont = NULL;
-    ctx->current_package = NULL; /* XXX unused except tests */
     ctx->current_method = NULL; /* XXX who clears it? */
     ctx->current_object = NULL; /* XXX who clears it?  */
     ctx->current_HLL = 0;
@@ -252,6 +251,7 @@ init_context(Interp *interpreter, parrot_context_t *ctx, parrot_context_t *old)
         ctx->runloop_level = old->runloop_level;
 	ctx->pred_offset = old->pred_offset;
         ctx->current_HLL = old->current_HLL;
+        ctx->current_namespace = old->current_namespace;
         /* end COW */
         ctx->recursion_depth = old->recursion_depth;
     }

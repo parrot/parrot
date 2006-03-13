@@ -208,7 +208,7 @@ typedef struct Parrot_Context {
     PMC *current_object;        /* current object if a method call */
     STRING *current_method;     /* name of method */
     opcode_t *current_pc;       /* program counter of Sub invocation */
-    String *current_package;    /* The package we're currently in */
+    PMC *current_namespace;     /* The namespace we're currently in */
     INTVAL current_HLL;         /* see also src/hll.c */
     opcode_t *current_results;   /* ptr into code with get_results opcode */
     /* deref the constants - we need it all the time */

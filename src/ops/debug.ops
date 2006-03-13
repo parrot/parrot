@@ -145,6 +145,47 @@ op backtrace() :base_debug {
     goto NEXT();
 }
 
+#######################################
+
+op DELETED_setline(in INT) {
+  goto NEXT();
+}
+op DELETED_setfile(in STR) {
+  goto NEXT();
+}
+op DELETED_setpackage(in STR) {
+  goto NEXT();
+}
+op DELETED_getpackage(out STR) {
+  goto NEXT();
+}
+
+=item B<getline>(out INT)
+
+Get the current line number.
+
+=cut
+
+inline op getline(out INT) {
+  struct Parrot_Context_info info;
+  Parrot_Context_info(interpreter, CONTEXT(interpreter->ctx), &info);
+  $1 = info.line;
+  goto NEXT();
+}
+
+=item B<getfile>(out STR)
+
+Get the name of the current file.
+
+=cut
+
+inline op getfile(out STR) {
+  struct Parrot_Context_info info;
+  Parrot_Context_info(interpreter, CONTEXT(interpreter->ctx), &info);
+  $1 = string_from_cstring(interpreter, info.file, 0);
+  goto NEXT();
+}
+
 =back
 
 =cut

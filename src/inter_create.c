@@ -205,9 +205,8 @@ make_interpreter(Parrot_Interp parent, Interp_flags flags)
     SET_NULL_P(interpreter->evc_func_table, op_func_t *);
     SET_NULL_P(interpreter->save_func_table, op_func_t *);
 
-    /* Set up defaults for line/package/file */
-    CONTEXT(interpreter->ctx)->current_package =
-        string_make(interpreter, "(unknown package)", 18, NULL, 0);
+    /* clear namespace */
+    CONTEXT(interpreter->ctx)->current_namespace = PMCNULL;
 
     SET_NULL_P(interpreter->code, struct PackFile *);
     SET_NULL_P(interpreter->profile, ProfData *);

@@ -996,71 +996,7 @@ op getinterp(out PMC) {
 
 #######################################
 
-=item B<setline>(in INT)
 
-Set the line number for which we're currently executing code.
-
-=cut
-
-inline op setline(in INT) {
-  /* TODO: not implemented yet */
-  goto NEXT();
-}
-
-=item B<getline>(out INT)
-
-Get the current line number.
-
-=cut
-
-inline op getline(out INT) {
-  /* TODO: not implemented yet */
-  goto NEXT();
-}
-
-=item B<setfile>(in STR)
-
-Set the name of the file for which we're currently executing code.
-
-=cut
-
-inline op setfile(in STR) {
-  /* TODO: not implemented yet */
-  goto NEXT();
-}
-
-=item B<getfile>(out STR)
-
-Get the name of the current file.
-
-=cut
-
-inline op getfile(out STR) {
-  /* TODO: not implemented yet */
-  goto NEXT();
-}
-
-=item B<setpackage>(in STR)
-
-Set the name of the package for which we're currently executing code.
-
-=cut
-
-inline op setpackage(in STR) {
-  CONTEXT(interpreter->ctx)->current_package = $1;
-  goto NEXT();
-}
-
-=item B<getpackage>(out STR)
-
-Get the name of the current package.
-
-=cut
-
-inline op getpackage(out STR) {
-  $1 = CONTEXT(interpreter->ctx)->current_package;
-  goto NEXT();
-}
 
 =back
 

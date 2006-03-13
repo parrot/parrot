@@ -24,59 +24,19 @@ as well as backtrace tests.
 
 =cut
 
-
-SKIP:
-{
-  skip("getline/setline changes not finished", 3);
-pasm_output_is( <<'CODE', <<OUTPUT, "set/getline" );
-	setline 1
-	setline 2
-	getline I0
-	print I0
-	print "\n"
-	setline 1
-	getline I0
-	print I0
-	print "\n"
-	end
+pasm_output_like(<<'CODE', <<'OUTPUT', "getline, getfile");
+.pcc_sub main:
+    getfile S0
+    getline I0
+    print S0
+    print "\n"
+    print I0
+    print "\n"
+    end
 CODE
-2
-1
+/debuginfo_\d+\.pasm
+\d/
 OUTPUT
-
-pasm_output_is( <<'CODE', <<OUTPUT, "set/getpackage" );
-	setpackage "foo"
-	setpackage "bar"
-	getpackage S0
-	print S0
-	print "\n"
-	setpackage "foo"
-	getpackage S0
-	print S0
-	print "\n"
-	end
-CODE
-bar
-foo
-OUTPUT
-
-pasm_output_is( <<'CODE', <<OUTPUT, "set/getfile" );
-	setfile "foo"
-	setfile "bar"
-	getfile S0
-	print S0
-	print "\n"
-	setfile "foo"
-	getfile S0
-	print S0
-	print "\n"
-	end
-CODE
-bar
-foo
-OUTPUT
-
-}
 
 pir_output_like( <<'CODE', <<'OUTPUT', "debug backtrace - Null PMC access" );
 .sub main
@@ -202,5 +162,5 @@ OUTPUT
 
 
 ## remember to change the number of tests :-)
-BEGIN { plan tests => 8; }
+BEGIN { plan tests => 6; }
 

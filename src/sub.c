@@ -61,7 +61,7 @@ mark_context(Interp* interpreter, parrot_context_t* ctx)
     obj = (PObj*)ctx->current_method;
     if (obj)
         pobject_lives(interpreter, obj);
-    obj = (PObj*)ctx->current_package;
+    obj = (PObj*)ctx->current_namespace;
     if (obj)
         pobject_lives(interpreter, obj);
     obj = (PObj*)ctx->lex_pad;
