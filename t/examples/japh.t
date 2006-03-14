@@ -1,5 +1,4 @@
-#! perl
-# Copyright: 2005 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2005-2006 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 use strict;
@@ -37,13 +36,13 @@ Get the TODO JAPHs working or decide that they are not suitable for testing.
 
 
 # known reasons for failure
-my %todo = ( 1  => 'unknown reason',
-             2  => 'unknown reason',
-             4  => 'unknown reason',
+my %todo = ( 1  => 'opcode "pack" is gone',
+             2  => 'opcode "pack" is gone',
+             4  => 'namespace has changed',
              8  => 'works only on little endian',
-             9  => 'unknown reason',
-             10 => 'unknown reason',
-             11 => 'unknown reason',
+             9  => 'P1 is no longer special',
+             10 => 'core dump',
+             11 => 'opcode "pack" is gone, other reasons',
              12 => 'unknown reason',
              13 => 'unreliable, but often succeeds',
              14 => 'unknown reason',
