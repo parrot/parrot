@@ -42,9 +42,8 @@ test :
 #	$(PERL) test.pl t/basic/infinite.t
 
 CLEANERS = \
-lib/Regex/Grammar.pm \
-"*.pbc" \
-test.pir
+    "*.pbc" \
+    test.pir
 
 clean:
 	$(RM_F) $(CLEANERS)

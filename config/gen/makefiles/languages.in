@@ -236,7 +236,7 @@ regex.dummy:
 regex.test :
 	- $(MAKE) regex test
 regex.clean :
-# No target clean for regex
+	- $(MAKE) regex clean
 
 scheme: scheme.dummy
 scheme.dummy:

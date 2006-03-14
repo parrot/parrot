@@ -1524,7 +1524,8 @@ test-clean :
     "t/compilers/*/*/*.pir" \
     "t/compilers/*/*/*.stabs.s" 
 	$(RM_F) \
-    "t/examples/past/*.past" 
+    "t/examples/*.pbc" \
+    "t/examples/*.past" 
 	$(RM_F) \
     "t/*/*.o" \
     "t/*/*.out" \
@@ -1533,6 +1534,7 @@ test-clean :
     "t/*/*.stabs.s"
 	$(RM_F) \
     "t/library/*.pbc" \
+    "t/op/*.pbc" \
     "t/pmc/*.pbc" \
     "t/stress/*.pbc" \
     "t/tools/*.pbc"
