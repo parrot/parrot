@@ -228,11 +228,6 @@ Needs a working parser and lexer.
 
 Build parrot assuming only pure ANSI C is available.
 
-=item C<--expnetwork>
-
-Enable experimental networking. This is an unused option and should probably be
-removed.
-
 =back
 
 =head1 SEE ALSO
@@ -353,7 +348,6 @@ Other Options (may not be implemented):
    --maintainer         Create imcc's parser and lexer files. Needs a working
                         parser and lexer.
    --miniparrot         Build parrot assuming only pure ANSI C is available
-   --expnetwork         Enable experimental networking (unused)
 
 EOT
       exit;
@@ -398,7 +392,6 @@ my @steps = qw(
     inter::encoding
     inter::types
     inter::ops
-    inter::exp
     inter::pmc
     auto::alignptrs
     auto::headers
