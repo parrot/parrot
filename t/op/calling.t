@@ -1315,6 +1315,23 @@ ok 1
 ok 2
 OUTPUT
 
+pir_output_is(<<'CODE', <<'OUTPUT', "tailcall to NCI - 2");
+.sub main :main
+    $P0 = eval("print \"Foo!\\n\"")
+    $P0()
+    end
+.end
+
+.sub eval
+    .param string code
+    code = ".sub main :main :anon\n" . code
+    code = code . "\n.end\n"
+    $P0 = compreg "PIR"
+    .return $P0(code)
+.end
+CODE
+Foo!
+OUTPUT
 
 # bug - repeated calls to eval'd sub crashes (pmichaud, 2005.10.27)
 pir_output_is(<<'CODE', <<'OUTPUT', "repeated calls to eval'd sub");
@@ -2282,5 +2299,5 @@ CODE
 OUTPUT
 
 ## remember to change the number of tests :-)
-BEGIN { plan tests => 88 }
+BEGIN { plan tests => 89 }
 

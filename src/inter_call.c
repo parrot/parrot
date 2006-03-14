@@ -1116,22 +1116,6 @@ parrot_pass_args(Interp *interpreter,  parrot_context_t *src_ctx,
         if (!PARROT_ERRORS_test(interpreter, PARROT_ERRORS_PARAM_COUNT_FLAG))
             err_check = 0;
     }
-    if (src_pc && (src_pc[-3] == PARROT_OP_tailcallmethod_p_sc ||
-            src_pc[-3] == PARROT_OP_tailcallmethod_p_s)) {
-        /*
-         * If we have this sequence:
-         *
-         * tailcallmethod_p_s?
-         * set_returns_pc '()'
-         * return_cc
-         *
-         * we are returning 1 retval to caller on behalf
-         * of the NCI (a PIR method had already returned
-         * all and doesn't run anything after the
-         * tailcall - ignore arg_count
-         */
-        err_check = 0;
-    }
     process_args(interpreter, &st, action, err_check);
 
     /* skip the get_params opcode - all done here */
