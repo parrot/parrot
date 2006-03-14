@@ -7,7 +7,7 @@ Parrot::Docs::Directory - Docs-Related Directory
 
 =head1 SYNOPSIS
 
-	use Parrot::Docs::Directory;
+    use Parrot::Docs::Directory;
 
 =head1 DESCRIPTION
 
@@ -38,7 +38,7 @@ Returns C<Parrot::Docs::File>.
 
 sub file_class
 {
-	return 'Parrot::Docs::File';
+    return 'Parrot::Docs::File';
 }
 
 =item C<directory_class()>
@@ -49,7 +49,7 @@ Returns C<Parrot::Docs::Directory>.
 
 sub directory_class
 {
-	return 'Parrot::Docs::Directory';
+    return 'Parrot::Docs::Directory';
 }
 
 =back
@@ -68,32 +68,32 @@ C<$recursive> and C<$ignore> function as specified in C<files()>.
 
 sub files_of_type
 {
-	my $self = shift;
-	my $type = shift;
-	
-	return () unless defined $type;
-	
-	my $recursive = shift;
-	my $ignore = shift;
-	my @files = ();
-	
-	foreach my $file ($self->files)
-	{
-		next unless $file->is_of_type($type);
-		push @files, $file;
-	}
-	
-	if ( $recursive )
-	{
-		foreach my $dir ($self->directories)
-		{
-			next if defined $ignore and $dir->name =~ /$ignore/;
-			
-			push @files, $dir->files_of_type($type, 1, $ignore);
-		}
-	}
-	
-	return @files;
+    my $self = shift;
+    my $type = shift;
+    
+    return () unless defined $type;
+    
+    my $recursive = shift;
+    my $ignore = shift;
+    my @files = ();
+    
+    foreach my $file ($self->files())
+    {
+        next unless $file->is_of_type($type);
+        push @files, $file;
+    }
+    
+    if ( $recursive )
+    {
+        foreach my $dir ($self->directories())
+        {
+            next if defined $ignore and $dir->name =~ /$ignore/;
+            
+            push @files, $dir->files_of_type($type, 1, $ignore);
+        }
+    }
+    
+    return @files;
 }
 
 =back

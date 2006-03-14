@@ -21,6 +21,10 @@ t/perl/manifest.t - sanity check the MANIFEST file
 
 Checks that the distribution and the MANIFEST file agree.
 
+=head1 TODO
+
+The file make more sense in 't/distro', but still be run by 'make test'.
+
 =cut
 
 

@@ -76,7 +76,7 @@ new test like this:
 
 =head2 Parrot Intermediate Representation
 
-Tests can also be written in B<PIR>. This is done with C<pir_output_is> and
+Writing tests  in B<PIR> is more convenient. This is done with C<pir_output_is> and
 friends.
 
     pir_output_is(<<'CODE',<<'OUT','nothing useful');
@@ -131,6 +131,10 @@ Note that it's always a good idea to output "done" to confirm that the compiled
 code executed completely. When mixing C<printf> and C<PIO_printf> always append
 a C<fflush(stdout);> after the former.
 
+=head2 Test Perl5 helpers
+
+Perl5 unit tests are in F<t/perl/*.t>.
+
 =head2 Testing language implementations
 
 Language implementations are usually tested with the test function
@@ -179,5 +183,6 @@ See L<Test::More> on how to do that.
 =head1 SEE ALSO
 
 L<http://qa.perl.org/>
+F<t/TESTS.STATUS.pod>
 
 =cut

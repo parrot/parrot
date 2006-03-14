@@ -14,7 +14,7 @@ t/perl/Parrot_Test.t - Parrot::Test unit tests
 
 =head1 SYNOPSIS
 
-	% prove t/perl/Parrot_Test.t
+    % prove t/perl/Parrot_Test.t
 
 =head1 DESCRIPTION
 
@@ -62,6 +62,5 @@ is( Parrot::Test::per_test(0, undef), undef, 'per_test() invalid args' );
 is( Parrot::Test::per_test(undef, 0), undef, 'per_test() invalid args' );
 
 ### TODO generate_code, plan, skip, slurp_file, _generate_functions, (generated functions), example_output_is
-
 
 # vim: expandtab shiftwith=4

@@ -4,6 +4,7 @@
 
 use strict;
 use warnings;
+use 5.008;
 
 use lib qw( . lib ../lib ../../lib );
 use Test::More tests => 1;
@@ -20,6 +21,12 @@ t/src/cppcomments.t - checks for C++ style comments
 =head1 DESCRIPTION
 
 Checks that no source file in the distribution uses C++ style comments.
+
+=head1 TODO
+
+'t/perl' is not really the correct location for this test.
+
+Use Parrot::Distribution for looking for C-source files.
 
 =cut
 

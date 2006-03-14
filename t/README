@@ -2,7 +2,7 @@
 # $Id$
 
 This directory contains the Parrot test suite.
-For details, see the documentation in 'docs/tests.pod'.
+For details, see the documentation in '../docs/tests.pod'.
 For status of the testing effort, see 'TESTS.STATUS.pod' in this directory.
 
 benchmark:    Run all benchmarks
@@ -25,7 +25,7 @@ native_pbc:   Parrot Byte Code
 
 op:           Try to cover all core operators
 
-perl:         Tests written in Perl5. XXX Is this a meaningful category?
+perl:         Test Perl5 modules used for configuration, building and testing of Parrot.
 
 pmc:          Try to cover all builtin PMCs
 

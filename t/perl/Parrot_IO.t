@@ -1,5 +1,5 @@
 #! perl
-# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2001-2006 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 use strict;
@@ -33,7 +33,7 @@ to ensure nothing is broken.
 =cut
 
 
-# Path is really only an abstract superclass but there's a few things we
+# Path is really only an abstract superclass but there are a few things we
 # can do with it.
 BEGIN { use_ok('Parrot::IO::Path') };
 
@@ -46,26 +46,26 @@ my $p = Parrot::IO::Path->new($tmpfile);
 
 # Path parsing.
 ok($p, 'new');
-ok($p->has_suffix, 'has_suffix none');
+ok($p->has_suffix(), 'has_suffix none');
 ok($p->has_suffix($suffix), 'has_suffix correct');
 ok(!$p->has_suffix('foo'), 'has_suffix incorrect');
-is($p->suffix, $suffix, 'suffix');
-is($p->name, $fullname, 'name');
-is($p->name_without_suffix, $name, 'name_without_suffix');
+is($p->suffix(), $suffix, 'suffix');
+is($p->name(), $fullname, 'name');
+is($p->name_without_suffix(), $name, 'name_without_suffix');
 
 # Check we get the same instance each time.
 is($p, Parrot::IO::Path->new($tmpfile), 'instance cached');
-my $oldp = "$p";
-$p->delete;
+my $oldp = $p;
+$p->delete();
 ok(! defined $p, 'delete undefines instance');
-# This won't actually create the file on disk.
+# This will not create the file on disk.
 $p = Parrot::IO::Path->new($tmpfile);
 isnt($oldp, $p, 'delete from cache');
 
-is($p->parent_path, tmp_dir_path(), 'parent_path');
+is($p->parent_path(), tmp_dir_path(), 'parent_path');
 
 my $r = Parrot::IO::Path->new(rootdir);
-ok(!$r->parent_path, 'root has no parent_path');
+ok(!$r->parent_path(), 'root has no parent_path');
 
 teardown();
 
@@ -73,7 +73,7 @@ BEGIN { use_ok('Parrot::IO::Directory') };
 BEGIN { use_ok('Parrot::IO::File') };
 
 $r = Parrot::IO::Directory->new(rootdir);
-ok(!$r->parent, 'root has no parent');
+ok(!$r->parent(), 'root has no parent');
 
 my $d = Parrot::IO::Directory->tmp_directory('t');
 ok($d, 'tmp_directory');
@@ -183,42 +183,42 @@ $d2->delete();
 is(@a, 0, 'directory delete');
 ok(! defined $d2, 'delete undefined directory');
 
-$d->delete_contents;
-@a = $d->file_and_directory_paths;
+$d->delete_contents();
+@a = $d->file_and_directory_paths();
 is(@a, 0, 'delete_contents');
 
 teardown();
 
 sub teardown
 {
-	unlink(tmp_file_path(qw(t one two file2.foo)));
-	unlink(tmp_file_path(qw(t one two file3.bar)));
-	unlink(tmp_file_path(qw(t one file1.txt)));
-	rmdir(tmp_dir_path(qw(t one two)));
-	rmdir(tmp_dir_path(qw(t one)));
-	rmdir(tmp_dir_path('t'));
+    unlink(tmp_file_path(qw(t one two file2.foo)));
+    unlink(tmp_file_path(qw(t one two file3.bar)));
+    unlink(tmp_file_path(qw(t one file1.txt)));
+    rmdir(tmp_dir_path(qw(t one two)));
+    rmdir(tmp_dir_path(qw(t one)));
+    rmdir(tmp_dir_path('t'));
 }
 
 # tmp_dir_path(@dirs)
 sub tmp_dir_path
 {
-	return catdir(tmpdir, @_);
+    return catdir(tmpdir, @_);
 }
 
 # tmp_file_path(@dirs, $file)
 sub tmp_file_path
 {
-	my $file;
+    my $file;
 	
-	if ( @_ == 1 )
-	{
-		$file = catfile(tmp_dir_path(), shift);
-	}
-	else
-	{
-		$file = pop(@_);
-		$file = catfile(tmp_dir_path(@_), $file);
-	}
-	
-	return $file;
+    if ( @_ == 1 )
+    {
+    	$file = catfile(tmp_dir_path(), shift);
+    }
+    else
+    {
+    	$file = pop(@_);
+    	$file = catfile(tmp_dir_path(@_), $file);
+    }
+    
+    return $file;
 }

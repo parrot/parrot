@@ -1,5 +1,6 @@
-# Copyright: 2003-2005 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2003-2006 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
-This directory contains test code written in Perl5.
+This directory contains test code for Perl5 modules used as helpers for Parrot.
 See also the documentation in ../../docs/tests.pod.
+See also ../t/configure.

@@ -31,6 +31,7 @@ package Parrot::Distribution;
 
 use strict;
 use warnings;
+use 5.008;
 
 use Data::Dumper;
 use ExtUtils::Manifest;
@@ -39,7 +40,7 @@ use Parrot::Revision;
 use Parrot::Configure::Step qw(capture_output);
 
 use Parrot::Docs::Directory;
-our @ISA = qw(Parrot::Docs::Directory);
+use base qw(Parrot::Docs::Directory);
 
 =item C<new()>
 
@@ -93,12 +94,9 @@ sub c_source_file_directories
     my $self = shift;
     
     return
-        $self->directory_with_name('compilers')
-            ->directory_with_name('ast'),
-        $self->directory_with_name('compilers')
-            ->directory_with_name('imcc'),
-        $self->directory_with_name('examples')
-            ->directory_with_name('c'),
+        $self->directory_with_name('compilers')->directory_with_name('ast'),
+        $self->directory_with_name('compilers')->directory_with_name('imcc'),
+        $self->directory_with_name('examples')->directory_with_name('c'),
         $self->directory_with_name('src'),
         $self->directory_with_name('src/encodings'),
         $self->directory_with_name('src/io'),
@@ -127,6 +125,7 @@ sub c_source_file_with_name
     }
     
     print 'WARNING: ' . __FILE__ . ':' . __LINE__ . ' File not found:' . $name ."\n";
+
     return;
 }
 
@@ -284,3 +283,4 @@ sub gen_manifest_skip {
 =cut
 
 1;
+
