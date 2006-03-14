@@ -182,7 +182,8 @@ compile_it:
   .local pmc pir_compiler
   pir_compiler = compreg "PIR"
 
-  .return pir_compiler(pir_code)
+  $P0 = pir_compiler(pir_code)
+  .return($P0)
 .end
 
 =back
