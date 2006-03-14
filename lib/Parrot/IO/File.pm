@@ -190,48 +190,48 @@ sub modified_since
     return $self->stat->mtime > $time;
 }
 
-=item C<cvs_id()>
+=item C<svn_id()>
 
-Returns the CVS C<$Id> string.
+Returns the svn C<$Id> string.
 
 =cut
 
-sub cvs_id
+sub svn_id
 {
     my $self = shift;
     my $content = $self->read;
-    # Break up the $Id to prevent CVS messing with it.
+    # Break up the $Id to prevent svn messing with it.
     my ($id) = $content =~ /((?:\$)Id:[^\$]+\$)/so;
     
     return $id;
 }
 
-=item C<has_cvs_id()>
+=item C<has_svn_id()>
 
-Returns whether the file has a CVS C<$Id> string.
+Returns whether the file has a svn C<$Id> string.
 
 =cut
 
-sub has_cvs_id
+sub has_svn_id
 {
     my $self = shift;
     my $content = $self->read;
-    # Break up the $Id to prevent CVS messing with it.
+    # Break up the $Id to prevent svn messing with it.
     my $has_id = $content =~ /(?:\$)Id:[^\$]+\$/so;
     
     return $has_id;
 }
 
-=item C<cvs_version()>
+=item C<svn_version()>
 
-Returns the CVS version number of the file.
+Returns the svn version number of the file.
 
 =cut
 
-sub cvs_version
+sub svn_version
 {
     my $self = shift;
-    my $id = $self->cvs_id;
+    my $id = $self->svn_id;
     my ($version) = $id =~ /,v\s+(\S+)/s;
     
     return $version;
@@ -247,7 +247,7 @@ sub is_hidden
 {
     my $self = shift;
 
-    return $self->parent eq 'CVS' or $self->name =~ /^\./o;
+    return $self->parent eq '.SVN' or $self->name =~ /^\./o;
 }
 
 =item C<is_generated()>

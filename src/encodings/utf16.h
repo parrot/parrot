@@ -1,6 +1,6 @@
 /* utf16.h
  *  Copyright: 2004 The Perl Foundation.  All Rights Reserved.
- *  CVS Info
+ *  SVN Info
  *     $Id$
  *  Overview:
  *     This is the header for the utf16 variable-width encoding.

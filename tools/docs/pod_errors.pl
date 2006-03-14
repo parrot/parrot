@@ -20,7 +20,7 @@ use lib 'lib';
 use Parrot::Docs::Directory;
 
 my $dir = Parrot::Docs::Directory->new(shift || '.');
-my $ignore = shift || '^(CVS|icu)$';
+my $ignore = shift || '^(icu)$';
 
 foreach my $file ($dir->files(1, $ignore))
 {

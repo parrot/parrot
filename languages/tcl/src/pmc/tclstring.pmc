@@ -1,6 +1,6 @@
 /* TclString.pmc
  *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
- *  CVS Info
+ *  SVN Info
  *     $Id$
  *  Overview:
  *     These are the vtable functions for the TclString base class

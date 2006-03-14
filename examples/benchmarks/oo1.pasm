@@ -1,6 +1,6 @@
 # all timings Athlon 800, gcc 2.95.2
 
-# parrot CVS
+# parrot SVN-HEAD
 # perl 5.8.0
 # python 2.3.3
 

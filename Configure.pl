@@ -261,10 +261,10 @@ for (@ARGV) {
 
   for ($key) {
     m/version/ && do {
-      my $cvsid = '$Id$';
+      my $svnid = '$Id$';
       print <<"END";
 Parrot Version $parrot_version Configure 2.0
-$cvsid
+$svnid
 END
       exit;
     };

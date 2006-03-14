@@ -1,6 +1,6 @@
 /* global_setup.h
  *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
- *  CVS Info
+ *  SVN Info
  *     $Id$
  *  Overview:
  *      Contains declarations of global data and the functions

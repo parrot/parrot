@@ -1125,7 +1125,7 @@ $(SRC_DIR)/exec_cpu.c : lib/Parrot/OpLib/core.pm $(INC_DIR)/jit_emit.h \
 
 # imcc file dependencies
 #
-# The .flag files are needed because we are keeping some derived files in CVS,
+# The .flag files are needed because we are keeping some derived files in SVN,
 # which does not keep accurate timestamps on the files, relative to each other.
 # Note that YACC or LEX may be null commands, so we must `touch` all the
 # target files, instead of just the .flag files.
@@ -1574,6 +1574,7 @@ manitest :
 update :
 	svn -q update
 
+# Is this still working ?
 rsync :
 	rsync -av cvs.perl.org::parrot-HEAD $(CUR_DIR)
 

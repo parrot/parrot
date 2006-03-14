@@ -1,5 +1,5 @@
 /* quantumreg.pmc
- *  CVS Info
+ *  SVN Info
  *     $Id$
  *  Overview:
  *     These are the vtable functions for the QuantumReg PMC

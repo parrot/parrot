@@ -1,7 +1,7 @@
 /*
  * debug.h
  *
- * CVS Info
+ * SVN Info
  *    $Id$
  * Overview:
  *    Parrot debugger header files

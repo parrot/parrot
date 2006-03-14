@@ -1,6 +1,6 @@
 /* extend.h
  *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
- *  CVS Info
+ *  SVN Info
  *     $Id$
  *  Overview:
  *     This is the Parrot extension mechanism, the face we present to

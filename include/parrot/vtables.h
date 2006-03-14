@@ -1,6 +1,6 @@
 /* vtables.h
  *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
- *  CVS Info
+ *  SVN Info
  *     $Id$
  *  Overview:
  *     Vtable manipulation code. Not to be confused with vtable.h

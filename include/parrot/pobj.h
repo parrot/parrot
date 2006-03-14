@@ -1,6 +1,6 @@
 /* pobj.h
  *  Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
- *  CVS Info
+ *  SVN Info
  *     $Id$
  *  Overview:
  *     Parrot Object data members and flags enum

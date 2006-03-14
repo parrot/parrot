@@ -1,3 +1,5 @@
+# $Id$
+
 PERL = @perl@
 RM_F = @rm_f@
 LOAD_EXT = @load_ext@
@@ -43,4 +45,4 @@ realclean: clean
 
 distclean: realclean
 
-cvsclean: realclean
+svnclean: realclean

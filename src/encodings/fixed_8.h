@@ -1,6 +1,6 @@
 /* fixed_8.h
  *  Copyright: 2004 The Perl Foundation.  All Rights Reserved.
- *  CVS Info
+ *  SVN Info
  *     $Id$
  *  Overview:
  *     This is the header for the 8-bit fixed-width encoding

@@ -1,7 +1,7 @@
 /*
  * exec.h
  *
- * CVS Info
+ * SVN Info
  *    $Id$
  * Overview:
  *    Exec header file.

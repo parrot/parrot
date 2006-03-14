@@ -1,6 +1,6 @@
 /* builtin.h
  *  Copyright: 2005 The Perl Foundation.  All Rights Reserved.
- *  CVS Info
+ *  SVN Info
  *     $Id$
  *  Overview:
  *     This is the api header for builtins.

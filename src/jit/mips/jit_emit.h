@@ -1,7 +1,7 @@
 /*
  * jit_emit.h
  *
- * CVS Info
+ * SVN Info
  *    $Id$
  * Overview:
  *    MIPS JIT

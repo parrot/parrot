@@ -9,7 +9,7 @@ entirely in Parrot bytecode.  The NOTES below are intended for Parrot
 developers.
 
 This README will always reflect the *current* state of things.  You can 
-find the most recent version of BASIC in the Parrot CVS repository.
+find the most recent version of BASIC in the Parrot SVN repository.
 
 This BASIC is of the fairly old school.  Line numbers are required, and
 the following keywords are recognized:

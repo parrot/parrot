@@ -1,7 +1,7 @@
 /*
  * exec_dep.h
  *
- * CVS Info
+ * SVN Info
  *    $Id$
  * Overview:
  *    PPC dependent functions to emit an executable.

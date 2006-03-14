@@ -1,6 +1,6 @@
 /* dod.h
  *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
- *  CVS Info
+ *  SVN Info
  *     $Id$
  *  Overview:
  *     Handles dead object destruction of the various headers

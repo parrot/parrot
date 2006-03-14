@@ -7,7 +7,7 @@ output.pir - handle output for Parrot m4
 =head1 DESCRIPTION
 
 Copyright:  2004 Bernhard Schmalhofer. All Rights Reserved.
-CVS Info:   $Id$
+SVN Info:   $Id$
 Overview:   output
 History:    Ported from GNU m4 1.4
 References: http://www.gnu.org/software/m4/m4.html

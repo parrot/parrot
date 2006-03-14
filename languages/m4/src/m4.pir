@@ -7,7 +7,7 @@ m4.pir - An implementation of GNU m4 in Parrot Intermediate Representation
 =head1 DESCRIPTION
 
 Copyright:  2004-2005 Bernhard Schmalhofer.  All Rights Reserved.
-CVS Info:   $Id$
+SVN Info:   $Id$
 Overview:   Main of Parrot m4.
 History:    Ported from GNU m4 1.4
 References: http://www.gnu.org/software/m4/m4.html

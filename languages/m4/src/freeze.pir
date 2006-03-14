@@ -7,7 +7,7 @@ freeze.pir - reading and writing of state files
 =head1 DESCRIPTION
 
 Copyright:  2004 Bernhard Schmalhofer.  All Rights Reserved.
-CVS Info:   $Id$
+SVN Info:   $Id$
 History:    Ported from GNU m4 1.4
 References: http://www.gnu.org/software/m4/m4.html
 

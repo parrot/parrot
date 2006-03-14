@@ -92,7 +92,7 @@ foreach my $func ( keys %language_test_map ) {
         }
 
         # The generated files are left in the t/* directories.
-        # Let 'make clean' and '.cvsignore' take care of them.
+        # Let 'make clean' and 'svn:ignore' take care of them.
 
         return $pass;
     }

@@ -168,18 +168,18 @@ ok($f3->modified_since($time), 'modified_since');
 
 $f = Parrot::IO::File->new(
 	catfile('lib', 'Parrot', 'IO', 'File.pm'));
-ok($f->has_cvs_id, 'has_cvs_id');
+ok($f->has_svn_id(), 'has_svn_id');
 
-# XXX doesn't work aftern switch to svn  
-#ok($f->cvs_id =~ /File.pm,v/, 'cvs_id');
+# XXX doesn not work aftern switch to svn  
+#ok($f->svn_id() =~ /File.pm,v/, 'svn_id');
 
-$f3->delete;
-@a = $d2->files;
+$f3->delete();
+@a = $d2->files();
 is(@a, 1, 'file delete');
 ok(! defined $f3, 'delete undefined file');
 
-$d2->delete;
-@a = $d1->directories;
+$d2->delete();
+@a = $d1->directories();
 is(@a, 0, 'directory delete');
 ok(! defined $d2, 'delete undefined directory');
 
