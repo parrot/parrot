@@ -22,7 +22,7 @@ evaluation and execution.
 #include "parrot/parrot.h"
 
 static void
-clear_fixups(Interp* interpreter, PMC* self)
+clear_fixups(Interp* interpreter, parrot_sub_t sub_data)
 {
     opcode_t i, ci;
     struct PackFile_ByteCode *seg;
@@ -30,7 +30,7 @@ clear_fixups(Interp* interpreter, PMC* self)
     struct PackFile_ConstTable *ct;
     PMC *sub;
 
-    seg = PMC_sub(self)->seg;
+    seg = sub_data->seg;
     if (!seg)
         return;
     ft = seg->fixups;
@@ -44,8 +44,10 @@ clear_fixups(Interp* interpreter, PMC* self)
             case enum_fixup_sub:
                 ci = ft->fixups[i]->offset;
                 sub = ct->constants[ci]->u.key;
-                PMC_sub(sub)->seg = NULL;
-                PMC_sub(sub)->eval_pmc = NULL;
+                if (PMC_sub(sub)) {
+                    PMC_sub(sub)->seg = NULL;
+                    PMC_sub(sub)->eval_pmc = NULL;
+                }
                 ct->constants[ci]->u.key = NULL;
                 ft->fixups[i]->type = 0;
         }
@@ -155,11 +157,11 @@ Invokes the first subroutine in the eval code.
         struct PackFile_Segment *seg;
         struct PackFile_ByteCode *cur_cs;
 
-        clear_fixups(INTERP, SELF);
         sub_data = PMC_sub(SELF);
 
         if (!sub_data)
             return;
+        clear_fixups(INTERP, sub_data);
         cur_cs = sub_data->seg;
         if (!cur_cs)
             return;
