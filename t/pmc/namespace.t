@@ -484,7 +484,7 @@ ok
 Foo
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "check parrot ns", todo => 'soon');
+pir_output_is(<<'CODE', <<'OUTPUT', "check parrot ns");
 .sub 'main' :main
     $P0 = get_namespace ["parrot"; "String"]
     $P1 = find_global $P0, "lower"
