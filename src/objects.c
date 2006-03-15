@@ -447,7 +447,7 @@ parrot_class_register(Interp* interpreter, STRING *class_name,
     INTVAL new_type;
     VTABLE *new_vtable, *parent_vtable;
     PMC *vtable_pmc;
-    PMC *ns; 
+    PMC *ns, *top; 
 
     /*
      * register the class in the PMCs name class_hash
@@ -485,13 +485,21 @@ parrot_class_register(Interp* interpreter, STRING *class_name,
     Parrot_base_vtables[new_type] = new_vtable;
 
     /* check if we already have a NameSpace */
-    ns = VTABLE_get_pmc_keyed_str(interpreter, interpreter->stash_hash, 
-            class_name);
+    top = CONTEXT(interpreter->ctx)->current_namespace;
+    ns = VTABLE_get_pmc_keyed_str(interpreter, top, class_name);
     /* XXX nested, use current as base ? */
     if (!ns) {
+        /* XXX try HLL namespace too XXX */
+        parrot_context_t *ctx = CONTEXT(interpreter->ctx);
+        INTVAL hll_id = ctx->current_HLL;
+
+        top =  VTABLE_get_pmc_keyed_int(interpreter, 
+                interpreter->HLL_namespace, hll_id);
+        ns = VTABLE_get_pmc_keyed_str(interpreter, top, class_name);
+    }
+    if (!ns) {
         ns = pmc_new(interpreter, enum_class_NameSpace);
-        VTABLE_set_pmc_keyed_str(interpreter, interpreter->stash_hash, 
-                class_name, ns);
+        VTABLE_set_pmc_keyed_str(interpreter, top, class_name, ns);
     }
     /* attach namspace to vtable */
     new_vtable->_namespace = ns;
@@ -1141,16 +1149,15 @@ static PMC *
 find_method_direct_1(Interp* interpreter, PMC *class,
                               STRING *method_name)
 {
-    PMC* method, *mro;
-    STRING *name;
+    PMC* method, *mro, *ns;
     INTVAL i, n;
 
     mro = class->vtable->mro;
     n = VTABLE_elements(interpreter, mro);
     for (i = 0; i < n; ++i) {
         class = VTABLE_get_pmc_keyed_int(interpreter, mro, i);
-        name = VTABLE_name(interpreter, class);
-        method = Parrot_find_global(interpreter, name, method_name);
+        ns = VTABLE_namespace(interpreter, class);
+        method = VTABLE_get_pmc_keyed_str(interpreter, ns, method_name);
         TRACE_FM(interpreter, class, method_name, method);
         if (method) {
             return method;

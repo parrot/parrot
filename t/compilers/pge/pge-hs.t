@@ -33,7 +33,6 @@ pir_output_is(<<'CODE', <<'OUT', "PGE::Hs match");
     add_rule = find_global "PGE::Hs", "add_rule"
     add_rule("foo", "s")
     result = match("test", "t(.<foo>)t")
-
     eq result, "PGE_Match 0 4 [PGE_Match 1 3 [] [(\"foo\", PGE_Match 2 3 [] [])]] []\n", OK
     print "not "
 

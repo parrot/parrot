@@ -123,7 +123,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "find_global Foo::bar root");
 .sub 'main' :main
     .include "interpinfo.pasm"
     $P0 = interpinfo .INTERPINFO_NAMESPACE_ROOT
-    $P1 = $P0["Foo"]
+    $P1 = $P0["parrot";"Foo"]
     $P2 = $P1["bar"]
     print "ok\n"
     $P2()
@@ -193,7 +193,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "find_global Foo::Bar::baz hash 3");
 .sub 'main' :main
     .include "interpinfo.pasm"
     $P0 = interpinfo .INTERPINFO_NAMESPACE_ROOT
-    $P1 = $P0["Foo";"Bar" ; "baz"]
+    $P1 = $P0["parrot";"Foo";"Bar" ; "baz"]
     print "ok\n"
     $P1()
 .end
@@ -323,7 +323,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "get namespace in Foo::Bar::baz");
 CODE
 ok
 baz
-::Foo::Bar
+::parrot::Foo::Bar
 OUTPUT
 
 SKIP: {
@@ -480,7 +480,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "Sub.get_namespace, get_namespace");
 .end
 CODE
 ok
-::Foo
+::parrot::Foo
 Foo
 OUTPUT
 

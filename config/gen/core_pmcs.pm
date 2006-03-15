@@ -120,7 +120,20 @@ END_C
             interp->stash_hash =
                 pmc_new(interp, enum_class_NameSpace);
             /* and parrot's default namespace */
-            parrot_ns = pmc_new(interp, enum_class_NameSpace);
+	    if (interp->parent_interpreter) {
+		interp->HLL_info = interp->parent_interpreter->HLL_info;
+		interp->HLL_namespace = interp->parent_interpreter->HLL_namespace;
+	    }
+	    else {
+		STRING *parrot = const_string(interp, "parrot");
+		interp->HLL_info = constant_pmc_new(interp,
+			enum_class_ResizablePMCArray);
+		interp->HLL_namespace = constant_pmc_new(interp,
+			enum_class_ResizablePMCArray);
+		Parrot_register_HLL(interp, parrot, NULL);
+	    }
+	    parrot_ns = 
+		VTABLE_get_pmc_keyed_int(interp, interp->HLL_namespace, 0); 	
             CONTEXT(interp->ctx)->current_namespace = parrot_ns; 
             VTABLE_set_pmc_keyed_str(interp, interp->stash_hash, 	
 		    const_string(interp, "parrot"),
@@ -129,7 +142,7 @@ END_C
             interp->class_hash = classname_hash =
                 pmc_new(interp, enum_class_Hash);
             Parrot_register_core_pmcs(interp, classname_hash);
-            /* init the interpreter globals array */
+            /* init the interp globals array */
             iglobals = pmc_new(interp, enum_class_SArray);
             interp->iglobals = iglobals;
             VTABLE_set_integer_native(interp, iglobals, (INTVAL)IGLOBALS_SIZE);

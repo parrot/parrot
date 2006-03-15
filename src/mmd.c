@@ -47,7 +47,7 @@ not highest type in table.
 
 #define MMD_DEBUG 0
 
-static void mmd_create_builtin_multi_meth_2(Interp *,
+static void mmd_create_builtin_multi_meth_2(Interp *, PMC *ns,
         INTVAL func_nr, INTVAL type, INTVAL right, funcptr_t func_ptr);
 
 #ifndef NDEBUG
@@ -308,11 +308,6 @@ mmd_dispatch_p_ppp(Interp *interpreter,
             mmd_register(interpreter, func_nr, left->vtable->base_type,
                     right->vtable->base_type,
                     D2FPTR((UINTVAL) sub | 3));
-#if 0
-            mmd_create_builtin_multi_meth_2(interpreter,
-                func_nr, left->vtable->base_type,
-                right->vtable->base_type, (funcptr_t)mmd_wrap_p_ppp);
-#endif
             is_pmc = 3;
         }
         if (is_pmc == 3) {
@@ -1952,18 +1947,9 @@ the MMD search should stop.
 static int
 mmd_search_package(Interp *interpreter, STRING *meth, PMC *arg_tuple, PMC *cl)
 {
-    /* STRING *namespace = CONTEXT(interpreter->ctx)->current_package; */
     PMC *pmc;
-    PMC *current_sub;
-    PMC *namespace;
 
-    current_sub = CONTEXT(interpreter->ctx)->current_sub;
-    if (!current_sub || !VTABLE_defined(interpreter, current_sub))
-        return 0;
-    namespace = PMC_sub(current_sub)->namespace;
-    if (!namespace)
-        return 0;
-    pmc = Parrot_find_global_p(interpreter, namespace, meth);
+    pmc = Parrot_find_global(interpreter, NULL, meth);
     if (pmc) {
         if (mmd_maybe_candidate(interpreter, pmc, arg_tuple, cl))
             return 1;
@@ -1987,7 +1973,7 @@ mmd_search_global(Interp *interpreter, STRING *meth, PMC *arg_tuple, PMC *cl)
 {
     PMC *pmc;
 
-    pmc = Parrot_find_global(interpreter, NULL, meth);
+    pmc = Parrot_find_global_p(interpreter, interpreter->stash_hash, meth);
     if (pmc) {
         if (mmd_maybe_candidate(interpreter, pmc, arg_tuple, cl))
             return 1;
@@ -2006,40 +1992,68 @@ search in all the namespaces.
 
 */
 
+static PMC*
+mmd_get_ns(Interp *interpreter) 
+{
+    STRING *ns_name;
+    PMC *ns;
+
+    ns_name = CONST_STRING(interpreter, "__parrot_core");
+    ns = VTABLE_get_pmc_keyed_str(interpreter, 
+            interpreter->stash_hash, ns_name);
+    return ns;
+}
+
+static PMC*
+mmd_create_ns(Interp *interpreter) 
+{
+    STRING *ns_name;
+    PMC *ns;
+
+    ns_name = CONST_STRING(interpreter, "__parrot_core");
+    ns = VTABLE_get_pmc_keyed_str(interpreter, 
+            interpreter->stash_hash, ns_name);
+    if (!ns) {
+        ns = pmc_new(interpreter, enum_class_NameSpace);
+        VTABLE_set_pmc_keyed_str(interpreter, 
+                interpreter->stash_hash, ns_name, ns);
+    }
+    return ns;
+}
+
 static void
 mmd_search_builtin(Interp *interpreter, STRING *meth, PMC *arg_tuple, PMC *cl)
 {
-    PMC *pmc;
-    STRING *ns;
-
-    ns = CONST_STRING(interpreter, "__parrot_core");
-    pmc = Parrot_find_global(interpreter, ns, meth);
+    PMC *pmc, *ns;
+    ns = mmd_get_ns(interpreter);
+    pmc = Parrot_find_global_p(interpreter, ns, meth);
     if (pmc)
         mmd_maybe_candidate(interpreter, pmc, arg_tuple, cl);
 }
 
-static void
-mmd_create_builtin_multi_stub(Interp *interpreter, INTVAL func_nr)
+
+static PMC *
+mmd_create_builtin_multi_stub(Interp *interpreter, PMC* ns, INTVAL func_nr)
 {
     const char *name;
-    STRING *s, *ns;
+    STRING *s;
     PMC *multi;
 
     name = Parrot_MMD_method_name(interpreter, func_nr);
-    ns = CONST_STRING(interpreter, "__parrot_core");
-    s =  const_string(interpreter, name);
     /* create in constant pool */
+    s = const_string(interpreter, name);
     multi = constant_pmc_new(interpreter, enum_class_MultiSub);
-    Parrot_store_global(interpreter, ns, s, multi);
+    VTABLE_set_pmc_keyed_str(interpreter, ns, s, multi);
+    return ns;
 }
 
 static void
-mmd_create_builtin_multi_meth_2(Interp *interpreter,
+mmd_create_builtin_multi_meth_2(Interp *interpreter, PMC *ns,
         INTVAL func_nr, INTVAL type, INTVAL right, funcptr_t func_ptr)
 {
     const char *short_name;
     char signature[6], val_sig;
-    STRING *meth_name, *ns, *_sub;
+    STRING *meth_name, *_sub;
     PMC *method, *multi, *class, *multi_sig;
 
     assert (type != enum_class_Null && type != enum_class_delegate &&
@@ -2116,8 +2130,7 @@ mmd_create_builtin_multi_meth_2(Interp *interpreter,
      * push method onto core multi_sub
      * TODO cache the namespace
      */
-    ns = CONST_STRING(interpreter, "__parrot_core");
-    multi = Parrot_find_global(interpreter, ns,
+    multi = Parrot_find_global_p(interpreter, ns,
             const_string(interpreter, short_name));
     assert(multi);
     VTABLE_push_pmc(interpreter, multi, method);
@@ -2125,10 +2138,10 @@ mmd_create_builtin_multi_meth_2(Interp *interpreter,
 }
 
 static void
-mmd_create_builtin_multi_meth(Interp *interpreter, INTVAL type,
+mmd_create_builtin_multi_meth(Interp *interpreter, PMC *ns, INTVAL type,
         const MMD_init *entry)
 {
-    mmd_create_builtin_multi_meth_2(interpreter,
+    mmd_create_builtin_multi_meth_2(interpreter, ns, 
             entry->func_nr, type, entry->right, entry->func_ptr);
 }
 
@@ -2150,8 +2163,10 @@ Parrot_mmd_register_table(Interp* interpreter, INTVAL type,
 {
     INTVAL i;
     MMD_table *table;
+    PMC *ns;
 
     table = interpreter->binop_mmd_funcs;
+    ns = mmd_create_ns(interpreter);
     if ((INTVAL)table->x < type && type < enum_class_core_max) {
         /*
          * pre-allocate the function table
@@ -2162,7 +2177,7 @@ Parrot_mmd_register_table(Interp* interpreter, INTVAL type,
             /*
              * create a MultiSub stub
              */
-            mmd_create_builtin_multi_stub(interpreter, i);
+            mmd_create_builtin_multi_stub(interpreter, ns, i);
         }
     }
     /*
@@ -2173,7 +2188,7 @@ Parrot_mmd_register_table(Interp* interpreter, INTVAL type,
         mmd_register(interpreter,
                 mmd_table[i].func_nr, type,
                 mmd_table[i].right, mmd_table[i].func_ptr);
-        mmd_create_builtin_multi_meth(interpreter, type, mmd_table + i);
+        mmd_create_builtin_multi_meth(interpreter, ns, type, mmd_table + i);
     }
 }
 

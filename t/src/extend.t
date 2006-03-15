@@ -441,22 +441,21 @@ static opcode_t*
 the_test(Parrot_Interp interpreter, opcode_t *cur_op, opcode_t *start)
 {
     struct PackFile *pf;
-    PMC *key, *sub, *arg;
+    PMC *sub, *arg;
+    STRING *name;
 
     pf = Parrot_readbc(interpreter, "temp.pbc");
     Parrot_loadbc(interpreter, pf);
-    key = key_new_cstring(interpreter, "_sub1");
-    sub = VTABLE_get_pmc_keyed(interpreter,
-			       interpreter->stash_hash, key);
+    name = const_string(interpreter, "_sub1");
+    sub = Parrot_find_global(interpreter, NULL, name);
     Parrot_call_sub(interpreter, sub, "v");
     PIO_eprintf(interpreter, "back\n");
 
     /* win32 seems to buffer stderr ? */
     PIO_flush(interpreter, PIO_STDERR(interpreter));
 
-    key = key_new_cstring(interpreter, "_sub2");
-    sub = VTABLE_get_pmc_keyed(interpreter,
-			       interpreter->stash_hash, key);
+    name = const_string(interpreter, "_sub2");
+    sub = Parrot_find_global(interpreter, NULL, name);
     arg = pmc_new(interpreter, enum_class_String);
     VTABLE_set_string_native(interpreter, arg,
 			     string_from_cstring(interpreter, "hello ", 0));
@@ -514,14 +513,14 @@ static opcode_t*
 the_test(Parrot_Interp interpreter, opcode_t *cur_op, opcode_t *start)
 {
     struct PackFile *pf;
-    PMC *key, *sub;
+    PMC *sub;
+    STRING *name;
     Parrot_exception jb;
 
     pf = Parrot_readbc(interpreter, "temp.pbc");
     Parrot_loadbc(interpreter, pf);
-    key = key_new_cstring(interpreter, "_sub1");
-    sub = VTABLE_get_pmc_keyed(interpreter,
-			       interpreter->stash_hash, key);
+    name = const_string(interpreter, "_sub1");
+    sub = Parrot_find_global(interpreter, NULL, name);
 
     if (setjmp(jb.destination)) {
 	PIO_eprintf(interpreter, "caught\n");

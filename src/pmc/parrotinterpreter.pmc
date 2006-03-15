@@ -555,8 +555,8 @@ Finish thawing.
 
     void thawfinish(visit_info *info) {
         INTVAL i, n, m;
-        PMC *hll_info, *entry, *lib_pmc, *new_info;
-        STRING *lib_name;
+        PMC *hll_info, *entry, *lib_pmc, *new_info, *ns_hash;
+        STRING *lib_name, *hll_name;
 
         hll_info = INTERP->HLL_info;
         n = VTABLE_elements(INTERP, hll_info);
@@ -573,6 +573,27 @@ Finish thawing.
             lib_name = VTABLE_get_string(INTERP, lib_pmc);
             if (lib_name->strlen)
                 Parrot_load_lib(INTERP, lib_name, NULL);
+            hll_name = VTABLE_get_string_keyed_int(INTERP, entry, 0);
+            /* create HLL namespace */
+            hll_name = string_downcase(INTERP, hll_name);
+
+            /* HLL type mappings aren't yet created, we can't create
+             * a namespace in HLL's flavor yet - mabe promote the
+             * ns_hash to another type, if mappings provide one
+             *
+             * XXX always try to fetch namespace first?
+             */
+
+            ns_hash = VTABLE_get_pmc_keyed_str(INTERP, INTERP->stash_hash,
+                    hll_name);
+            if (!ns_hash) {
+                ns_hash  = pmc_new(INTERP, enum_class_NameSpace);
+                VTABLE_set_pmc_keyed_str(INTERP, INTERP->stash_hash,
+                        hll_name, ns_hash);
+            }
+            /* cache HLLs toplevel namespace */
+            VTABLE_set_pmc_keyed_int(INTERP, INTERP->HLL_namespace, 
+                    i, ns_hash);
         }
         if (m > n) {
             /* TODO destruct old HLL_info are constants */

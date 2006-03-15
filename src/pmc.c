@@ -478,9 +478,10 @@ void
 Parrot_create_mro(Interp *interpreter, INTVAL type)
 {
     VTABLE *vtable;
-    STRING *class_name;
+    STRING *class_name, *isa;
     INTVAL pos, len, parent_type, total;
     PMC *class, *mro;
+    PMC *ns;
 
     vtable = Parrot_base_vtables[type];
     /* multithreaded: has already mro */
@@ -489,25 +490,37 @@ Parrot_create_mro(Interp *interpreter, INTVAL type)
     mro = pmc_new(interpreter, enum_class_ResizablePMCArray);
     vtable->mro = mro;
     class_name = vtable->whoami;
-    total = (INTVAL)string_length(interpreter, vtable->isa_str);
+    isa = vtable->isa_str;
+    total = (INTVAL)string_length(interpreter, isa);
     for (pos = 0; ;) {
         len = string_length(interpreter, class_name);
         pos += len + 1;
         parent_type = pmc_type(interpreter, class_name);
         if (!parent_type)   /* abstract classes don't have a vtable */
             break;
-        class = Parrot_base_vtables[parent_type]->class;
+        vtable = Parrot_base_vtables[parent_type];
+        if (!vtable->_namespace) {
+            /* need a namespace Hash, anchor at parent, name it */
+            ns = pmc_new(interpreter,
+                    Parrot_get_ctx_HLL_type(interpreter, enum_class_NameSpace));
+            vtable->_namespace = ns;
+            /* anchor at parent, aka current_namespace, that is 'parrot' */
+            VTABLE_set_pmc_keyed_str(interpreter, 
+                    CONTEXT(interpreter->ctx)->current_namespace, 	
+                    class_name, ns);
+        }
+        class = vtable->class;
         if (!class) {
             class = create_class_pmc(interpreter, parent_type);
         }
         VTABLE_push_pmc(interpreter, mro, class);
         if (pos >= total)
             break;
-        len = string_str_index(interpreter, vtable->isa_str,
+        len = string_str_index(interpreter, isa,
                 CONST_STRING(interpreter, " "), pos);
         if (len == -1)
             len = total;
-        class_name = string_substr(interpreter, vtable->isa_str, pos,
+        class_name = string_substr(interpreter, isa, pos,
                 len - pos, NULL, 0);
     }
 }

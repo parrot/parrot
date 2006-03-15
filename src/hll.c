@@ -112,18 +112,9 @@ Parrot_register_HLL(Interp *interpreter,
      *
      * XXX always try to fetch namespace first?
      */
-    if (!idx) {
-        /* "parrot" NS is already created during creation of core PMCs
-         * fetch namespace
-         */
-        ns_hash = VTABLE_get_pmc_keyed_str(interpreter, 
-                interpreter->stash_hash, hll_name);
-    }
-    else {
-        ns_hash  = pmc_new(interpreter, enum_class_NameSpace);
-        VTABLE_set_pmc_keyed_str(interpreter, interpreter->stash_hash,
-                hll_name, ns_hash);
-    }
+    ns_hash  = pmc_new(interpreter, enum_class_NameSpace);
+    VTABLE_set_pmc_keyed_str(interpreter, interpreter->stash_hash,
+            hll_name, ns_hash);
     /* cache HLLs toplevel namespace */
     VTABLE_set_pmc_keyed_int(interpreter, interpreter->HLL_namespace, 
             idx, ns_hash);

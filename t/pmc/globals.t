@@ -57,7 +57,7 @@ OUTPUT
 pir_output_is(<<'CODE', <<'OUTPUT', "get namespace - nested");
 .sub main
    .local pmc ns, o
-   ns = get_namespace ["Foo"; "Bar"]
+   ns = get_namespace ["parrot"; "Foo"; "Bar"]
    o =  find_global ns, "f"
    o()
 .end

@@ -3200,7 +3200,10 @@ PackFile_Constant_unpack_pmc(Interp *interpreter,
          * XXX place this code in Sub.thaw ?
          */
         if (!(PObj_get_FLAGS(pmc) & SUB_FLAG_PF_ANON)) {
+            /* PF structures aren't fully constructed yet */
+            Parrot_block_DOD(interpreter);
             Parrot_store_sub_in_namespace(interpreter, pmc);
+            Parrot_unblock_DOD(interpreter);
         }
     }
     /*

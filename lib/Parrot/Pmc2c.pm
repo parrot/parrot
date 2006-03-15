@@ -932,21 +932,10 @@ EOC
 EOC
     }
 
-    # create a namespace hash
     $cout .= <<"EOC";
-        PMC *ns;
-        
-        /* need a namespace Hash, anchor at parent, name it */
-        ns = pmc_new(interp,
-                Parrot_get_ctx_HLL_type(interp, enum_class_NameSpace));
-        Parrot_base_vtables[entry]->_namespace = ns;
-        /* anchor at parent, aka current_namespace, that is 'parrot' */
-        VTABLE_set_pmc_keyed_str(interp, 
-                CONTEXT(interp->ctx)->current_namespace, 	
-                Parrot_base_vtables[entry]->whoami, 
-                ns); 
+        /* setup MRO and _namespace */
+        Parrot_create_mro(interp, entry);
 EOC
-
     # declare each nci method for this class
     foreach my $method (@{ $self->{methods} }) {
       next unless $method->{loc} eq 'nci';
@@ -971,9 +960,6 @@ EOC
         int my_enum_class_$dynpmc = pmc_type(interp, string_from_const_cstring(interp, "$dynpmc", 0));
 EOC
     }
-        $cout .= <<"EOC";
-        Parrot_create_mro(interp, entry);
-EOC
     # init MMD "right" slots with the dynpmc types
     foreach my $entry (@init_mmds) {
         if ($entry->[1] eq $classname) {

@@ -1085,7 +1085,9 @@ register.
     emit(code, "    $P0 = find_method mob, \"%s\"", subname)
     emit(code, "    goto %s_s2", label)
     emit(code, "  %s_s1:", label)
-    emit(code, "    $P0 = find_global \"%s\"", subname)
+    ## leo: this was find_global - find_name looks into current namespace too
+    ##      I don't know, in which ns the subrule gets emitted
+    emit(code, "    $P0 = find_name \"%s\"", subname)
     emit(code, "  %s_s2:", label)
     emit(code, "    $P1 = captscope", subargs)
   subrule_3:

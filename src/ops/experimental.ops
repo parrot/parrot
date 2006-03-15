@@ -238,6 +238,8 @@ Get currrent namespace.
 
 =item B<get_namespace>(out PMC, in KEY)
 
+=item B<get_namespace>(out PMC, in STR)
+
 Get the specified namespace. $2 is either an array of names or a key.
 If the namespace doesn't exist, $1 is set to PMCNULL.
 
@@ -263,6 +265,13 @@ op get_namespace(out PMC, in PMC) {
 op get_namespace(out PMC, in KEY) {
     PMC *ns_root = interpreter->stash_hash, *ns;
     ns = VTABLE_get_pmc_keyed(interpreter, ns_root, $2);
+    $1 = ns ? ns : PMCNULL;
+    goto NEXT();
+}
+
+op get_namespace(out PMC, in STR) {
+    PMC *ns_root = interpreter->stash_hash, *ns;
+    ns = VTABLE_get_pmc_keyed_str(interpreter, ns_root, $2);
     $1 = ns ? ns : PMCNULL;
     goto NEXT();
 }

@@ -42,12 +42,14 @@ enter_nci_method(Parrot_Interp interpreter, int type,
 {
     PMC *method;
     method = pmc_new(interpreter, enum_class_NCI);
+    /* create call func */
     VTABLE_set_pointer_keyed_str(interpreter, method,
             string_make(interpreter, proto, strlen(proto),
                 NULL, PObj_constant_FLAG|PObj_external_FLAG),
             func);
-    Parrot_store_global(interpreter,
-        Parrot_base_vtables[type]->whoami,
+    /* insert it into namespace */
+    VTABLE_set_pmc_keyed_str(interpreter, 
+        Parrot_base_vtables[type]->_namespace,
             string_make(interpreter, name,
                 strlen(name), NULL,
                 PObj_constant_FLAG|PObj_external_FLAG),

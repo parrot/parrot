@@ -67,7 +67,8 @@ whole thing may be taken out or refactored away at any moment.
     find_global p6rule_compile, "PGE", "p6rule"
     null rulesub
     rulesub = p6rule_compile(pattern)
-    store_global name, rulesub
+    ## leo XXX need namespace
+    store_global "PGE::Rule", name, rulesub
 
     .return (name)
 .end

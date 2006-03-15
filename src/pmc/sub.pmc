@@ -294,7 +294,10 @@ Invokes the subroutine.
             INTERP->current_method = NULL;
         }
         context->current_HLL = sub->HLL_id;
-        context->current_namespace = sub->namespace_stash;
+        if (sub->namespace_stash) {
+            /* :anon sub don't have it */
+            context->current_namespace = sub->namespace_stash;
+        }
         /* create pad if needed
          * TODO move this up in front of argument passing
          *      and factor out common code with coroutine pmc

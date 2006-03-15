@@ -406,13 +406,10 @@ calling foo(b, f)
 OUT
 
 pir_output_is(<<'CODE', <<'OUT', "MMD on argument count");
-.namespace ["main"]
 .sub main :main
     p("ok 1\n")
     p("-twice", "ok 2\n")
 .end
-
-.namespace [""]
 
 .sub p :multi(string)
     .param string s
@@ -436,13 +433,10 @@ ok 2
 OUT
 
 pir_output_is(<<'CODE', <<'OUT', "MMD on mative types");
-.namespace ["main"]
 .sub main :main
     p("ok 1\n")
     p(42)
 .end
-
-.namespace [""]
 
 .sub p :multi(string)
     .param string s
@@ -460,7 +454,6 @@ ok 1
 OUT
 
 pir_output_is(<<'CODE', <<'OUT', "MMD on PMC types");
-.namespace ["main"]
 .sub main :main
     $P0 = new String
     $P0 = "ok 1\n"
@@ -477,8 +470,6 @@ pir_output_is(<<'CODE', <<'OUT', "MMD on PMC types");
     p($P0)
     p($P1)
 .end
-
-.namespace [""]
 
 .sub p :multi(String)
     .param pmc p
@@ -499,7 +490,6 @@ String ok 4
 OUT
 
 pir_output_is(<<'CODE', <<'OUT', "MMD on PMC types quoted");
-.namespace ["main"]
 .sub main :main
     $P0 = new String
     $P0 = "ok 1\n"
@@ -516,8 +506,6 @@ pir_output_is(<<'CODE', <<'OUT', "MMD on PMC types quoted");
     p($P0)
     p($P1)
 .end
-
-.namespace [""]
 
 .sub p :multi("String")
     .param pmc p
@@ -538,7 +526,6 @@ String ok 4
 OUT
 
 pir_output_like(<<'CODE', <<'OUT', "MMD on PMC types, invalid");
-.namespace ["main"]
 .sub main :main
     $P0 = new String
     $P0 = "ok 1\n"
@@ -557,8 +544,6 @@ pir_output_like(<<'CODE', <<'OUT', "MMD on PMC types, invalid");
     $P0 = new Integer
     p($P0)
 .end
-
-.namespace [""]
 
 .sub p :multi(String)
     .param pmc p
@@ -580,7 +565,6 @@ Name 'p' not found/
 OUT
 
 pir_output_is(<<'CODE', <<'OUT', "MMD on PMC types 3");
-.namespace ["main"]
 .sub main :main
     $P0 = new String
     $P0 = "ok 1\n"
@@ -600,8 +584,6 @@ pir_output_is(<<'CODE', <<'OUT', "MMD on PMC types 3");
     $P0 = 42
     p($P0)
 .end
-
-.namespace [""]
 
 .sub p :multi(String)
     .param pmc p
@@ -759,13 +741,15 @@ OUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "__add as function - Int, Float");
 .sub main :main
-    .local pmc d, l, r
+    .local pmc d, l, r, ns, a
     d = new Integer
     l = new Integer
     r = new Float
     l = 3
     r = 39.42
-    "__add"(l, r, d)
+    ns = get_namespace ["__parrot_core"]
+    a = ns["__add"]
+    a(l, r, d)
     print d
     print "\n"
     end
