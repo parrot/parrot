@@ -378,7 +378,7 @@ register.
     emit(code, "    lastpos = length target")
     emit(code, "    ustack = new .ResizablePMCArray")
     emit(code, "    gpad = new .ResizablePMCArray")
-    emit(code, "    rcache = new .PerlHash")
+    emit(code, "    rcache = new .Hash")
     emit(code, "    captscope = mob")
     emit(code, "    pos = mfrom")
     emit(code, "    if pos >= 0 goto try_at_pos")

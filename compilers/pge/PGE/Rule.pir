@@ -388,11 +388,6 @@ Match whitespace between tokens.
     .local string nextchars
     .const .Sub corou = "ws_corou"
     nextchars = ""
-    $P0 = interpinfo .INTERPINFO_CURRENT_SUB
-    $P1 = getprop "nextchars", $P0
-    if_null $P1, ws_1
-    delprop $P0, "nextchars"
-    nextchars = $P1
   ws_1:
     $P0 = find_global "PGE::Match", "newfrom"
     (mob, target, mfrom, mpos) = $P0(mob)

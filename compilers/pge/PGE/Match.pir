@@ -12,7 +12,7 @@ This file implements match objects returned by the Parrot Grammar Engine.
 
 .sub "__onload" :load
     .local pmc base
-    $P0 = getclass "PerlHash"
+    $P0 = getclass "Hash"
     base = subclass $P0, "PGE::Match"
     addattribute base, "$:target"                  # target
     addattribute base, "$:from"                    # start of match
@@ -51,7 +51,7 @@ the current position of C<mob>.
     if $I0 goto newfrom_mob
     target = new .String
     assign target, mob
-    from = new .PerlInt
+    from = new .Integer
     from = -1
     if has_grammar goto new_me
     grammar = "PGE::Rule"
@@ -68,7 +68,7 @@ the current position of C<mob>.
     me = new $I0
     setattribute me, "PGE::Match\x0$:target", target
     setattribute me, "PGE::Match\x0$:from", from
-    pos = new .PerlInt
+    pos = new .Integer
     pos = -1
     setattribute me, "PGE::Match\x0$:pos", pos
     if has_fromd == 0 goto end
@@ -233,7 +233,7 @@ objects depending on the rule.
     .local pmc capt
     capt = getattribute self, "PGE::Match\x0@:capt"
     unless_null capt, set_1
-    capt = new .PerlArray
+    capt = new .ResizablePMCArray
     setattribute self, "PGE::Match\x0@:capt", capt
   set_1:
     capt[key] = val
