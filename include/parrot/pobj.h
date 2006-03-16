@@ -165,9 +165,9 @@ struct PMC_EXT {
     /* This flag determines the next PMC in the 'used' list during
        dead object detection in the GC. It is a linked list, which is
        only valid in trace_active_PMCs. Also, the linked list is
-       guaranteed to have the tail element's next_for_GC point to itself,
+       guaranteed to have the tail element's _next_for_GC point to itself,
        which makes much of the logic and checks simpler. We then have to
-       check for PMC->next_for_GC == PMC to find the end of list. */
+       check for PMC->_next_for_GC == PMC to find the end of list. */
     PMC *_next_for_GC;
 
     /* Yeah, the GC data should be out of
@@ -200,11 +200,6 @@ typedef struct PMC_EXT PMC_EXT;
 #define PMC_next_for_GC(pmc)  PMC_ext_checked(pmc)->_next_for_GC
 #define PMC_sync(pmc)         PMC_ext_checked(pmc)->_synchronize
 #define PMC_union(pmc)        (pmc)->obj.u
-
-/* macro for accessing union data */
-#define next_for_GC pmc_ext->_next_for_GC
-#define metadata pmc_ext->_metadata
-#define synchronize pmc_ext->_synchronize
 
 /* PObj flags */
 typedef enum PObj_enum {
