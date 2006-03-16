@@ -38,6 +38,113 @@ such as a file, keyboard, or text console. Streams are also called
 This is a draft document defining Parrot's I/O subsystem, for both
 streams and network I/O.
 
+=head2 Synchronous and Asynchronous operations
+
+Currently, Parrot only implements synchronous I/O operations.
+Asynchronous operations are essentially the same as the synchronous
+operations, but each asynchronous operation runs in its own thread.
+
+Note: this is a deviation from the existing plan, which had all I/O
+operations run internally as asynchronous, and the synchronous
+operations as a compatibility layer on top of the asynchronous
+operations. This conceptual simplification means that all I/O operations
+are possible without threading support (for example, in a stripped-down
+version of Parrot running on a PDA). [Though, asynchronous operations
+don't have to use Parrot threads, they could use some alternate
+threading implementation, but it's overkill to develop two threading
+implementations.]
+
+The asynchronous I/O implementation will use Parrot's I/O layer
+architecture so some platforms can take advantage of their built-in
+asynchronous operations instead of using Parrot threads.
+
+Communication between the calling code and the asynchronous operation
+thread will be handled by a shared status object. The operation thread
+will update the status object whenever the status changes, and the
+calling code can check the status object at any time. 
+
+The signatures for the asynchronous operations are nearly identical to
+the synchronous operations, but the asynchronous operations take an
+additional argument for a callback, and the only return value from the
+asynchronous operations is a status object. The callbacks take the
+status object as their first argument, and any return values as their
+second arguments. [This relies on the presence of a callback argument to
+mark which calls should be asynchronous. If we want asynchronous calls
+that don't supply callbacks (perhaps if the user wants to manually check
+later if the operation succeded) we would need another strategy to
+differentiate the two. This is probably enough of a fringe case that we
+don't need to provide opcodes for it.]
+
+=head2 Error handling
+
+Currently some of the networking opcodes (C<connect>, C<recv>, C<send>,
+C<poll>, C<bind>, and C<listen>) return an integer indicating the status
+of the call, -1 or a system error code if unsuccessful. Other I/O
+opcodes (such as C<getfd> and C<accept>) have various different
+strategies for error notification, and others have no way of marking
+errors at all. We want to unify all I/O opcodes so they use a consistent
+strategy for error notification. There are several options in how we do
+this.
+
+=head3 Integer status codes
+
+One approach is to have every I/O operation return an integer status
+code indicating success or failure. This approach has the advantage of
+being lightweight: returning a single additional integer is cheap. The
+disadvantage is that it's not very flexible: the only way to look for
+errors is to check the integer return value, possibly comparing it to a
+predefined set of error constants.
+
+=head3 Exceptions
+
+Another option is to have all I/O operations throw exceptions on errors.
+The advantage is that it keeps the error tracking information
+out-of-band, so it doesn't affect the arguments or return values of the
+calls (some opcodes that have a return value plus an integer status code
+have odd looking signatures). One disadvantage of this approach is that
+it forces all users to handle exceptions from I/O operations even if
+they aren't using exceptions otherwise. 
+
+A more significant disadvantage is that exeptions don't work well with
+asynchronous operations. Exception handlers are set for a particular
+dynamic scope, but with an asynchronous operation, by the time an
+exception is thrown execution has already left the dynamic scope where
+the exception handler was set. [Though, this partly depends on how
+exceptions are implemented.]
+
+=head3 Error callbacks
+
+A minor variation on the exceptions option is to pass an error callback
+into each I/O opcode. This solves the problem of asynchronous operations
+because the operation has its own custom error handling code rather than
+relying on an exception handler in its dynamic scope.
+
+The disadvantage is that the user has to define a custom error handler
+routine for every call. It also doesn't cope well with cases where
+multiple different kinds of errors may be returned by a single opcode.
+(The one error handler would have to cope with all possible types of
+errors.) There is an easier way.
+
+=head3 Hybrid solution
+
+Another option is to return a status object from each I/O operation. The
+status object could be used to get an integer status code, string
+status/error message, or boolean success value. It could also provide a
+method to throw an exception on error conditions. There could even be a
+global option that tells Parrot to always throw exceptions on errors in
+synchronous I/O operations, implemented by calling this method on the
+status object before returning from the I/O opcode.
+
+The advantages are that this works well with asynchronous and
+synchronous operations, and provides flexibility for multiple different
+uses.  Also, something like a status object will be needed anyway to
+allow users to check on the status of a particular asynchronous call in
+progress, so this is a nice unification.
+
+The disadvantage is that a status object involves more overhead than a
+simple integer status code.
+
+
 =head2 I/O Stream Opcodes
 
 =head3 Opening and Closing Streams
@@ -48,17 +155,36 @@ streams and network I/O.
 
 C<open> opens a stream object based on a string path. It takes an
 optional string argument specifying the mode of the stream (read, write,
-append, read/write, etc.) [Some discussion of the syntax of the format
-strings may be relevant. Currently it uses Perl syntax, but a set of
-defined constants may fit better with Parrot's general architecture.]
+append, read/write, etc.), and returns a stream object. Currently the
+mode of the stream is set with a string argument similar to Perl 5
+syntax, but a set of defined constants may fit better with Parrot's
+general architecture. 
+
+  0    PIOMODE_READ (default)
+  1    PIOMODE_WRITE
+  2    PIOMODE_APPEND
+  3    PIOMODE_READWRITE
+  4    PIOMODE_PIPE (read)
+  5    PIOMODE_PIPEWRITE
+
+The asynchronous version takes a PMC callback as an additional final
+argument. When the open operation is complete, it invokes the callback
+with two arguments: a status object and the opened stream object.
 
 =item *
 
-C<close> closes a stream object.
+C<close> closes a stream object. It takes a single string object
+argument and returns a status object.
+
+The asynchronous version takes an additional final PMC callback
+argument. When the close operation is complete, it invokes the callback,
+passing it a status object.
 
 =back
 
 =head3 Retrieving Existing Streams
+
+These opcodes do not have asynchronous variants.
 
 =over 4
 
@@ -85,10 +211,17 @@ C<print> writes an integer, float, string, or PMC value to a stream.  It
 writes to standard output by default, but optionally takes a PMC
 argument to select another stream to write to.
 
+The asynchronous version takes an additional final PMC callback
+argument. When the print operation is complete, it invokes the callback,
+passing it a status object.
+
 =item *
 
 C<printerr> writes an integer, float, string, or PMC value to standard
 error.
+
+There is no asynchronous variant of C<printerr>. [It's just a shortcut.
+If they want an asynchronous version, they can use C<print>.]
 
 =back
 
@@ -103,17 +236,31 @@ string. [Note this is bytes, not codepoints.] By default it reads from
 standard input, but it also takes an alternate stream object source as
 an optional argument.
 
+The asynchronous version takes an additional final PMC callback
+argument, and only returns a status object. When the read operation is
+complete, it invokes the callback, passing it a status object and a
+string of bytes.
+
 =item *
 
 C<readline> retrieves a single line from a stream into a string. Calling
 C<readline> flags the stream as operating in line-buffer mode (see
 C<pioctl> below).
 
+The asynchronous version takes an additional final PMC callback
+argument, and only returns a status object. When the readline operation
+is complete, it invokes the callback, passing it a status object and a
+string of bytes.
+
 =item *
 
 C<peek> retrieves the next byte from a stream into a string, but doesn't
 remove it from the stream. By default it reads from standard input, but
 it also takes a stream object argument for an alternate source.
+
+There is no asynchronous version of C<peek>. [Does anyone have a line
+of reasoning why one might be needed? The concept of "next byte" seems
+to be a synchronous one.]
 
 =back
 
@@ -131,6 +278,8 @@ arguments (one for the first 32 bits of the 64-bit offset, and one for
 the second 32 bits). [The two-register emulation for 64-bit integers may
 be deprecated in the future.]
 
+No asynchronous version.
+
 =item *
 
 C<tell> retrieves the current file position of a stream object.  It also
@@ -139,11 +288,15 @@ for the first 32 bits of the 64-bit offset, and one for the second 32
 bits). [The two-register emulation for 64-bit integers may be deprecated
 in the future.]
 
+No asynchronous version.
+
 =item *
 
 C<getfd> retrieves the UNIX integer file descriptor of a stream object,
 or 0 if it doesn't have an integer file descriptor. [Maybe -1 would be a
 better code for "undefined", since standard input is 0.]
+
+No asynchronous version.
 
 =item *
 
@@ -184,6 +337,28 @@ buffer-type commands:
 	   [Called "BLKBUF" because bytes are sent as a block, but line
 	   buffering also sends them as a block, so "FULBUF" might make
            more sense.]
+
+[This opcode may be deprecated and replaced with methods on stream
+objects.]
+
+=item *
+
+C<poll> polls a stream or socket object for particular types of events
+(an integer flag) at a frequency set by seconds and microseconds (the
+final two integer arguments). [At least, that's what the documentation
+in src/io/io.c says. In actual fact, the final two arguments seem to be
+setting the timeout, exactly the same as the corresponding argument to
+the system version of C<poll>.]
+
+See the system documentation for C<poll> to see the constants for event
+types and return status.
+
+This opcode is inherently synchronous (poll is "synchronous I/O
+multiplexing"), but it can retreive status information from a stream or
+socket object whether the object is being used synchronously or
+asynchronously.
+
+[This may be deprecated and replaced with a method on I/O objects.]
 
 =back
 
@@ -237,6 +412,8 @@ F<runtime/parrot/include/stat.pasm>):
   10   STAT_GID
            The group ID of the file.
 
+No asynchronous version.
+
 =back
 
 =head2 Network I/O Opcodes
@@ -253,67 +430,84 @@ C<socket> returns a new socket object from a given address family,
 socket type, and protocol number (all integers). The socket object's
 boolean value can be tested for whether the socket was created.
 
+The asynchronous version takes an additional final PMC callback
+argument, and only returns a status object. When the socket operation is
+complete, it invokes the callback, passing it a status object and a new
+socket object.
+
 =item *
 
 C<sockaddr> returns a string representing a socket address, generated
 from a port number (integer) and an address (string).
 
+No asynchronous version.
+
 =item *
 
 C<connect> connects a socket object to an address.
+
+The asynchronous version takes an additional final PMC callback
+argument, and only returns a status object. When the socket operation is
+complete, it invokes the callback, passing it a status object and the
+socket object it was called on. [If you want notification when a connect
+operation is completed, you probably want to do something with that
+connected socket object.]
 
 =item *
 
 C<recv> receives a message from a connected socket object. It returns
 the message in a string.
 
+The asynchronous version takes an additional final PMC callback
+argument, and only returns a status object. When the recv operation is
+complete, it invokes the callback, passing it a status object and a
+string containing the received message.
+
 =item *
 
 C<send> sends a message string to a connected socket object. 
 
-=item *
+The asynchronous version takes an additional final PMC callback
+argument, and only returns a status object. When the recv operation is
+complete, it invokes the callback, passing it a status object.
 
-C<poll> polls a socket object for particular types of events (an integer
-flag) at a frequency set by seconds and microseconds (the final two
-integer arguments). [See the system documentation for C<poll> to
-see the constants for event types and return status.]
 
 =item *
 
 C<bind> binds a socket object to the port and address specified by a
 string address (the packed result of C<sockaddr>).
 
+The asynchronous version takes an additional final PMC callback
+argument, and only returns a status object. When the bind operation is
+complete, it invokes the callback, passing it a status object and the
+socket object it was called on. [If you want notification when a bind
+operation is completed, you probably want to do something with that
+bound socket object.]
+
 =item *
 
-C<listen> listens for a new connection on a socket object. The integer
-argument gives the maximum size of the queue for pending connections.
+C<listen> specifies that a socket object is willing to accept incoming
+connections. The integer argument gives the maximum size of the queue
+for pending connections.
+
+There is no asynchronous version. C<listen> marks a set of attributes on
+the socket object.
 
 =item *
 
 C<accept> accepts a new connection on a given socket object, and returns
-a newly created socket object for the connection. Returns NULL if
-unsuccessful.
+a newly created socket object for the connection. 
+
+The asynchronous version takes an additional final PMC callback
+argument, and only returns a status object. When the accept operation
+receives a new connection, it invokes the callback, passing it a status
+object and a newly created socket object for the connection. [While the
+synchronous C<accept> has to be called repeatedly in a loop (once for
+each connection received), the asynchronous version is only called once,
+but continues to send new connection events until the socket is closed.]
 
 =back
 
-=head3 Error handling
-
-Currently C<connect>, C<recv>, C<send>, C<poll>, C<bind>, and C<listen>
-return an integer indicating the status of the call, -1 if unsuccessful.
-
-These integer status codes are problematic when an opcode has a genuine
-return value. They also don't fit well with asynchronous I/O: when
-you've defined a code handler for "incoming connection" you don't want
-it to be triggered by an error condition, you only want it to be
-triggered by an actual incoming connection. The integer status codes
-will be removed and all network I/O opcodes will throw exceptions
-when they encounter errors. [Or maybe all I/O opcodes.]
-
-The sychronous I/O layer may provide an optional interface that captures
-I/O exceptions and converts them to status codes.
-
-[Flesh out the kinds of exceptions. If there will be an
-exception-to-code conversion, flesh out the correspondence.]
 
 =head1 IMPLEMENTATION
 
