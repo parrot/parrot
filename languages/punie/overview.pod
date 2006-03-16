@@ -48,9 +48,9 @@ node that this rule was called to operate on. Each rule defines an
 transformation, the most common attribute defined is "result", which
 returns the transformed structure for the node it was called on.
 
-The transformation from the parse tree is the most difficult one,
-because the nodes produced by PGE don't know their own name. That is,
-the result PGE::Match object doesn't know that it's a
+The transformation from the parse tree is slightly more complex than the
+others, because the nodes produced by PGE don't know their own name.
+That is, the result PGE::Match object doesn't know that it's a
 PunieGrammar::lineseq match. Instead, the match object is stored as a
 value for a key of "PunieGrammar::lineseq". So, you'll see a number of
 places throughout the code where it checks for a particular key in the
