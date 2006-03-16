@@ -337,7 +337,7 @@ Specific exceptions to throw for specific errors.
 =head2 Paramters
 
   .param int i                    # positional parameter
-  .param pmc argv .slurpy         # slurpy array
+  .param pmc argv :slurpy         # slurpy array
   .param pmc qu :named('q')       # named parameter
   .param int x :optional          # optional parameter
   .param int has_x :opt_flag      # flag 0/1 x was passed
