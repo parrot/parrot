@@ -344,7 +344,7 @@ pir_output_is(<<'CODE', <<'OUT', "double dash stop");
 	print $S0
 	print "\n"
 
-	# Hash sets an nonexistant value to None
+	# Hash sets an nonexistant value to ''
 	$S0 = $P1["bar"]
 	print "bar is "
 	print $S0
@@ -358,7 +358,7 @@ pir_output_is(<<'CODE', <<'OUT', "double dash stop");
 .end
 CODE
 foo is 1
-bar is None
+bar is 
 argv[0] is --bar
 OUT
 
@@ -406,7 +406,7 @@ pir_output_is(<<'CODE', <<'OUT', "notOptStop");
 .end
 CODE
 foo is 1
-bar is None
+bar is 
 argv[0] is foo
 argv[1] is --bar
 OUT

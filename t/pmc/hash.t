@@ -639,7 +639,7 @@ OK1:  print "ok 1\n"
       print "not "
 OK2:  print "ok 2\n"
 
-      eq S0, "None", OK3
+      eq S0, "", OK3
       print "not "
 OK3:  print "ok 3\n"
 

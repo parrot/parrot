@@ -123,8 +123,7 @@ called as object methods.
 	.local string module
 	module= modules[ osname ]
 
-	## FIXME: when undef doesn't return 'None' in scalar context
-	ne 'None', module, found_module
+	ne '', module, found_module
 	module= 'Unix'
 
 found_module:

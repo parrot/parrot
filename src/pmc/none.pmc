@@ -57,7 +57,7 @@ information see F<src/pmc.c>.
     }
 
     STRING* get_string () {
-        return SELF->vtable->whoami;
+        return string_make_empty(INTERP,enum_stringrep_one,0);
     }
 
     INTVAL get_bool () {
