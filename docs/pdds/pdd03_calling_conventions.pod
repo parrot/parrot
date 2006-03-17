@@ -334,7 +334,7 @@ Specific exceptions to throw for specific errors.
   foo(p, q :named('q'))           # the same
   foo(kw :named :flat)            # a flattening has
 
-=head2 Paramters
+=head2 Parameters
 
   .param int i                    # positional parameter
   .param pmc argv :slurpy         # slurpy array
