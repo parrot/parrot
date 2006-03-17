@@ -12,6 +12,8 @@ Very basic checks.
 =cut
 
 use strict;
+use warnings;
+
 use FindBin;
 use lib "$FindBin::Bin/../lib", "$FindBin::Bin/../../../lib";
 
@@ -20,7 +22,7 @@ use Parrot::Test;
 use Test::More;
 
 if ( $PConfig{has_python} ) {
-  plan tests => 78;
+  plan tests => 80;
 }
 else {
   plan skip_all => 'ANTLR2 based bc needs Python';
@@ -53,18 +55,22 @@ sub run_tests {
 
 my @tests = (
        # single non-negative integer 
-       [ '1', [ 1 ], 'positive int 1',                     with_past => 1, with_antlr3 => 1  ],
-       [ '0', [ 0 ], 'zero',                               with_past => 1, with_antlr3 => 1  ],
-       [ '2', [ 2 ], 'positive int',                       with_past => 1, with_antlr3 => 1  ],
-       [ '12345678', [ 12345678 ], 'another positive int', with_past => 1, with_antlr3 => 1  ],
+       [ '1', [ 1 ], 'positive int 1',                       with_past => 1, with_antlr3 => 1  ],
+       [ '0', [ 0 ], 'zero',                                 with_past => 1, with_antlr3 => 1  ],
+       [ '2', [ 2 ], 'positive int',                         with_past => 1, with_antlr3 => 1  ],
+       [ '12345678', [ 12345678 ], 'another positive int',   with_past => 1, with_antlr3 => 1  ],
+
+       # single negative integer 
+       [ '-1', [ -1 ], 'negative int 1',                     with_past => 1, with_antlr3 => 0  ],
+       [ '-12345678', [ -12345678 ], 'another negative int', with_past => 1, with_antlr3 => 0  ],
 
        # multiple lines
-       [ "1\n2", [ 1, 2 ], 'two lines',                    with_past => 1, with_antlr3 => 1  ],
+       [ "1\n2", [ 1, 2 ], 'two lines',                      with_past => 1, with_antlr3 => 1  ],
        [ "1\n2\n3\n4\n\n5\n6\n7", [ 1, 2, 3, 4, 5, 6, 7 ], 'seven lines', with_past => 1, with_antlr3 => 1 ],
 
        # comments 
        [ '/* */7', 7, 'one line comment',                  with_past => 1, with_antlr3 => 1  ],
-       [ "/* line1 \n line2 \n line 3 */    -2  ", -2, 'multi line comment', with_past => 1 ],
+       [ "/* line1 \n line2 \n line 3 */    -2  ", -2, 'multi line comment', with_past => 1, with_antlr3 => 0 ],
 
        # Strings 
        [ qq{1;2;"asdf"   ;  3    }, [ 1, 2, 'asdf3' ], 'string', with_past => 0 ],

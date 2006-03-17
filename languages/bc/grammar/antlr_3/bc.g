@@ -16,6 +16,7 @@ options
 tokens 
 {
   PROGRAM;
+  UNARY_MINUS;
 } 
 
 program 
@@ -23,7 +24,12 @@ program
   ;
 
 input_item
-  : INT +
+  : expression +
+  ;
+
+expression
+  : INT
+  | '-' expression -> ^( UNARY_MINUS expression )
   ;
 
 INT

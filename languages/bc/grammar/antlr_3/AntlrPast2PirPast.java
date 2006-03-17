@@ -1,4 +1,4 @@
-// $ANTLR 3.0ea7 grammar/antlr_3/antlr_past2pir_past.g 2006-02-23 21:51:43
+// $ANTLR 3.0ea8 grammar/antlr_3/antlr_past2pir_past.g 2006-03-17 18:45:47
 
 import org.antlr.runtime.*;
 import org.antlr.runtime.tree.*;import java.util.Stack;
@@ -7,11 +7,13 @@ import java.util.ArrayList;
 
 public class AntlrPast2PirPast extends TreeParser {
     public static final String[] tokenNames = new String[] {
-        "<invalid>", "<EOR>", "<DOWN>", "<UP>", "PROGRAM", "INT", "ML_COMMENT", "WS"
+        "<invalid>", "<EOR>", "<DOWN>", "<UP>", "PROGRAM", "UNARY_MINUS", "INT", "ML_COMMENT", "WS", "\'-\'", "\'quit\'"
     };
-    public static final int INT=5;
-    public static final int WS=7;
-    public static final int ML_COMMENT=6;
+    public static final int UNARY_MINUS=5;
+    public static final int INT=6;
+    public static final int EOF=-1;
+    public static final int WS=8;
+    public static final int ML_COMMENT=7;
     public static final int PROGRAM=4;
         public AntlrPast2PirPast(TreeNodeStream input) {
             super(input);
@@ -21,20 +23,17 @@ public class AntlrPast2PirPast extends TreeParser {
     public String[] getTokenNames() { return tokenNames; }
 
 
+      int asdf = 200;
+
 
 
     // $ANTLR start gen_pir_past
     // grammar/antlr_3/antlr_past2pir_past.g:20:1: gen_pir_past : ^( PROGRAM ( expr )+ ) ;
     public void gen_pir_past() throws RecognitionException {   
-
-
-
-
         try {
             // grammar/antlr_3/antlr_past2pir_past.g:22:3: ( ^( PROGRAM ( expr )+ ) )
             // grammar/antlr_3/antlr_past2pir_past.g:22:3: ^( PROGRAM ( expr )+ )
             {
-
 
                 String pirBefore = "" 
                       + "#!/usr/bin/env parrot" + "\n"
@@ -48,17 +47,14 @@ public class AntlrPast2PirPast extends TreeParser {
                       + "  load_bytecode 'languages/punie/lib/POST.pir'" + "\n"
                       + "\n"
                       + "  .local pmc stmts_children" + "\n"
-                      + "  stmts_children = new PerlArray" + "\n"
+                      + "  stmts_children = new .PerlArray" + "\n"
                       ;
 
                 System.out.println( pirBefore );    
               
+            match(input,PROGRAM,FOLLOW_PROGRAM_in_gen_pir_past62); 
 
-
-            match(input,PROGRAM,FOLLOW_PROGRAM_in_gen_pir_past62);
-
-            match(input, Token.DOWN, null);
-
+            match(input, Token.DOWN, null); 
             // grammar/antlr_3/antlr_past2pir_past.g:40:15: ( expr )+
             int cnt1=0;
             loop1:
@@ -74,7 +70,6 @@ public class AntlrPast2PirPast extends TreeParser {
             	case 1 :
             	    // grammar/antlr_3/antlr_past2pir_past.g:40:15: expr
             	    {
-
             	    following.push(FOLLOW_expr_in_gen_pir_past64);
             	    expr();
             	    following.pop();
@@ -93,8 +88,7 @@ public class AntlrPast2PirPast extends TreeParser {
             } while (true);
 
 
-            match(input, Token.UP, null);
-
+            match(input, Token.UP, null); 
 
                   String pirAfter = "" 
                       + "# entering gen_pir_past" + "\n"
@@ -185,13 +179,10 @@ public class AntlrPast2PirPast extends TreeParser {
             recover(input,re);
         }
         finally {
-
-
         }
-
+        return ;
     }
     // $ANTLR end gen_pir_past
-
 
     public static class expr_int_1_return extends TreeRuleReturnScope {
     };
@@ -199,18 +190,14 @@ public class AntlrPast2PirPast extends TreeParser {
     // $ANTLR start expr_int_1
     // grammar/antlr_3/antlr_past2pir_past.g:124:1: expr_int_1 : INT ;
     public expr_int_1_return expr_int_1() throws RecognitionException {   
-
         expr_int_1_return retval = new expr_int_1_return();
-        retval.start = (CommonTree)input.LT(1);
-
-
+        retval.start = input.LT(1);
 
         try {
             // grammar/antlr_3/antlr_past2pir_past.g:125:5: ( INT )
             // grammar/antlr_3/antlr_past2pir_past.g:125:5: INT
             {
-
-            match(input,INT,FOLLOW_INT_in_expr_int_186);
+            match(input,INT,FOLLOW_INT_in_expr_int_186); 
 
             }
 
@@ -220,23 +207,17 @@ public class AntlrPast2PirPast extends TreeParser {
             recover(input,re);
         }
         finally {
-
-            retval.stop = (CommonTree)input.LT(-1);
+            retval.stop = input.LT(-1);
         }
-
         return retval;
-
     }
     // $ANTLR end expr_int_1
-
 
 
     // $ANTLR start expr
     // grammar/antlr_3/antlr_past2pir_past.g:129:1: expr returns [String reg] : expr_int_1 ;
     public String expr() throws RecognitionException {   
-
         String reg;
-
         expr_int_1_return expr_int_11 = null;
 
 
@@ -247,11 +228,9 @@ public class AntlrPast2PirPast extends TreeParser {
             // grammar/antlr_3/antlr_past2pir_past.g:134:5: ( expr_int_1 )
             // grammar/antlr_3/antlr_past2pir_past.g:134:5: expr_int_1
             {
-
             following.push(FOLLOW_expr_int_1_in_expr113);
             expr_int_11=expr_int_1();
             following.pop();
-
 
 
                   String pir = "" 
@@ -262,19 +241,19 @@ public class AntlrPast2PirPast extends TreeParser {
                       + reg + ".valtype( 'num' )" + "\n"
                       + "# leaving expr" + "\n"
                       + "               $P20 = new 'PAST::Exp' " + "\n"
-                      + "               $P21 = new PerlArray " + "\n"
+                      + "               $P21 = new .PerlArray " + "\n"
                       + "               push $P21, " + reg + " \n"
                       + "               $P20.set_node('1', 1, $P21) " + "\n"
                       + "       $P30 = new 'PAST::Op' " + "\n"
-                      + "       $P31 = new PerlArray " + "\n"
+                      + "       $P31 = new .PerlArray " + "\n"
                       + "       push $P31, $P20 " + "\n"
                       + "       $P30.set_node('1', 1, 'print' ,$P31) " + "\n"
                       + "               $P40 = new 'PAST::Exp' " + "\n"
-                      + "               $P41 = new PerlArray " + "\n"
+                      + "               $P41 = new .PerlArray " + "\n"
                       + "               push $P41, $P30 " + "\n"
                       + "               $P40.set_node('1', 1, $P41) " + "\n"
                       + "  $P50 = new 'PAST::Stmt' " + "\n"
-                      + "  $P51 = new PerlArray " + "\n"
+                      + "  $P51 = new .PerlArray " + "\n"
                       + "  push $P51, $P40 " + "\n"
                       + "  $P50.set_node('1', 1 ,$P51) " + "\n"
                       + "  push stmts_children, $P50 " + "\n"
@@ -282,19 +261,19 @@ public class AntlrPast2PirPast extends TreeParser {
                       + "               $P60.set_node( '1', 0, '\\n' ) " + "\n"
                       + "               $P60.valtype( 'strqq' ) " + "\n"
                       + "               $P70 = new 'PAST::Exp' " + "\n"
-                      + "               $P71 = new PerlArray " + "\n"
+                      + "               $P71 = new .PerlArray " + "\n"
                       + "               push $P71, $P60 " + "\n"
                       + "               $P70.set_node('1', 1, $P71) " + "\n"
                       + "       $P80 = new 'PAST::Op' " + "\n"
-                      + "       $P81 = new PerlArray " + "\n"
+                      + "       $P81 = new .PerlArray " + "\n"
                       + "       push $P81, $P70 " + "\n"
                       + "       $P80.set_node('1', 1, 'print' ,$P81) " + "\n"
                       + "               $P90 = new 'PAST::Exp' " + "\n"
-                      + "               $P91 = new PerlArray " + "\n"
+                      + "               $P91 = new .PerlArray " + "\n"
                       + "               push $P91, $P80 " + "\n"
                       + "               $P90.set_node('1', 1, $P91) " + "\n"
                       + "  $P100 = new 'PAST::Stmt' " + "\n"
-                      + "  $P101 = new PerlArray " + "\n"
+                      + "  $P101 = new .PerlArray " + "\n"
                       + "  push $P101, $P90 " + "\n"
                       + "  $P100.set_node('1', 1 ,$P101) " + "\n"
                       + "  push stmts_children, $P100 " + "\n"
@@ -311,21 +290,17 @@ public class AntlrPast2PirPast extends TreeParser {
             recover(input,re);
         }
         finally {
-
-
         }
-
         return reg;
-
     }
     // $ANTLR end expr
 
 
 
 
-    public static final BitSet FOLLOW_PROGRAM_in_gen_pir_past62 = new BitSet(new long[]{4L});
-    public static final BitSet FOLLOW_expr_in_gen_pir_past64 = new BitSet(new long[]{40L});
-    public static final BitSet FOLLOW_INT_in_expr_int_186 = new BitSet(new long[]{2L});
-    public static final BitSet FOLLOW_expr_int_1_in_expr113 = new BitSet(new long[]{2L});
+    public static final BitSet FOLLOW_PROGRAM_in_gen_pir_past62 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_expr_in_gen_pir_past64 = new BitSet(new long[]{0x0000000000000048L});
+    public static final BitSet FOLLOW_INT_in_expr_int_186 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_expr_int_1_in_expr113 = new BitSet(new long[]{0x0000000000000002L});
 
 }
