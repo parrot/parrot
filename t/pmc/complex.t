@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 25;
+use Parrot::Test tests => 28;
 
 =head1 NAME
 
@@ -622,7 +622,7 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "check whether interface is done");
 
 .sub _main
     .local pmc pmc1
-    pmc1 = new Complex
+    pmc1 = new .Complex
     .local int bool1
     does bool1, pmc1, "scalar"
     print bool1
@@ -673,9 +673,9 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "instantiate, PIR, P");
 
 .sub main
     $P0 = getclass "Complex"
-    $P1 = new Float
+    $P1 = new .Float
     $P1 = 2.0
-    $P2 = new Float
+    $P2 = new .Float
     $P2 = 3.0
     $P1 = $P0."instantiate"($P1, $P2)
     print $P1
@@ -747,9 +747,9 @@ OUTPUT
 pir_output_is(<< 'CODE', << 'OUTPUT', "sub");
 .sub main :main
     .local pmc d, f, c
-    d = new Undef
-    f = new Float
-    c = new Complex
+    d = new .Undef
+    f = new .Float
+    c = new .Complex
     f = 2.2
     c = "5+2j"
     d = c - f
@@ -775,14 +775,14 @@ OUTPUT
 pir_output_is(<< 'CODE', << 'OUTPUT', "i_sub");
 .sub main :main
     .local pmc f, c
-    f = new Float
+    f = new .Float
     f = 2.2
-    c = new Complex
+    c = new .Complex
     c = "5+2j"
     c -= f
     print c
     print "\n"
-    c = new Complex
+    c = new .Complex
     c = "5+2j"
     f -= c
     print f
@@ -792,3 +792,110 @@ CODE
 2.8+2i
 -2.8-2i
 OUTPUT
+
+pir_output_is(<< 'CODE', << 'OUTPUT', "ln of complex numbers");
+.macro DoIt(val)
+    c = .val
+	c2 = c.ln()
+    print c2
+    print "\n"
+.endm
+.sub main :main
+	.local pmc c, c2
+    c = new .Complex
+	.DoIt("i")
+	.DoIt("2i")
+	.DoIt("2+2i")
+	.DoIt("-1")
+.end
+CODE
+0+1.5708i
+0.693147+1.5708i
+1.03972+0.785398i
+0+3.14159i
+OUTPUT
+
+pir_output_is(<< 'CODE', << 'OUTPUT', "exp of complex numbers");
+.macro DoIt(val)
+    c = .val
+	c2 = c.exp()
+    print c2
+    print "\n"
+.endm
+.sub main :main
+	.local pmc c, c2
+    c = new .Complex
+	.DoIt("i")
+	.DoIt("2i")
+	.DoIt("2+2i")
+
+	# e^(pi * i) + 1 = 0
+	$N0 = atan 1
+	$N0 *= 4
+	c[0] = 0.0
+	c[1] = $N0
+	c2 = c.exp()
+	c2 += 1.0
+    print c2
+    print "\n"
+.end
+CODE
+0.540302+0.841471i
+-0.416147+0.909297i
+-3.07493+6.71885i
+0+0i
+OUTPUT
+
+pir_output_is(<< 'CODE', << 'OUTPUT', "pow with complex numbers");
+.macro DoIt(base, power)
+	c = .base
+	c2 = .power
+	c3 = pow c, c2
+	print c3
+	print "\n"
+.endm
+.sub main :main
+	.local pmc c, c2, c3
+	c = new .Complex
+	c2 = new .Complex
+	c3 = new .Complex
+	.DoIt("i", "i")
+	.DoIt("i", "2")
+	.DoIt("2i", "2")
+	.DoIt("2+2i", "2+2i")
+	.DoIt("i", "0.5i")
+	.DoIt(2, "2i")
+	c2 = new .Integer
+	.DoIt("2i", 2)
+	.DoIt("2", 4)
+	c2 = new .Float
+	.DoIt("2i", 0.5)
+
+	# another e^(pi * i) + 1 = 0
+	c = new .Complex
+	c2 = new .Complex
+	$N0 = exp 1
+	c[0] = $N0
+	c[1] = 0.0
+	$N0 = atan 1
+	$N0 *= 4
+	c2[0] = 0.0
+	c2[1] = $N0
+	c3 = pow c, c2
+	c3 += 1.0
+	print c3
+	print "\n"
+.end
+CODE
+0.20788+0i
+-1+0i
+-4+0i
+-1.4525-0.80989i
+0.455938+0i
+0.183457+0.983028i
+-4+0i
+16+0i
+1+1i
+0+0i
+OUTPUT
+

@@ -445,6 +445,8 @@ Quick hack to emulate get_real() and get_imag():
 
 Set real or imag depending on key
 
+=cut
+
 */
 
     FLOATVAL get_number_keyed_int(INTVAL key) {
@@ -747,6 +749,7 @@ Multiplies the complex number SELF inplace with C<value>.
   TODO for better precision:
 
   (a+ib)(c+id)=(ac-bd)+i((a+b)(c+d)-ac-bd).
+  (a+bi)(c+di)=(ac-bd)+i(ad+bc)
 
 */
     PMC* multiply (PMC* value, PMC* dest) {
@@ -1017,6 +1020,97 @@ Sets C<dest> to the absolute value of SELF that is the distance from (0.0).
         VTABLE_morph(INTERP, SELF, enum_class_Float);   /* XXX */
         VTABLE_set_number_native(INTERP, SELF, d);
     }
+
+/*
+
+=item C<METHOD PMC* ln()>
+
+Returns the natural logorithm of SELF.
+
+=cut
+
+ln z = ln |z| + i arg(z)
+|x + iy| = sqrt(x^2 + y^2)
+arg(x + iy) = atan2(y, x)
+
+*/
+
+    METHOD PMC* ln() {
+        PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
+        RE(d) = log(sqrt(RE(SELF)*RE(SELF) + IM(SELF)*IM(SELF)));
+        IM(d) = atan2(IM(SELF), RE(SELF));
+        return d;
+    }
+
+/*
+
+=item C<METHOD PMC* exp()>
+
+Returns e ^ SELF.
+
+=cut
+
+exp(a + bi) = exp(a) *(cos(b) + i * sin(b))
+
+*/
+
+    METHOD PMC* exp() {
+        PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
+        FLOATVAL f = exp(RE(SELF));
+        RE(d) = f * cos(IM(SELF));
+        /* If only sin(pi) worked... */
+        if (IM(SELF) == 4 * atan(1))
+            IM(d) = 0;
+        else
+            IM(d) = f * sin(IM(SELF));
+        return d;
+    }
+
+
+/*
+
+=item C<PMC* pow(PMC* value, PMC* dest)>
+
+Return SELF to the C<value>th power and return result in C<dest>.
+
+=cut
+
+TODO: mmd in other pmc's to allow .Integer ^ .Complex, etc.
+and i_pow, and pow_(float|int), etc
+
+x ^ y = exp(y * ln x))
+
+*/
+
+    PMC* pow (PMC* value, PMC* dest) {
+MMD_Complex: {
+                 PMC *l = pmc_new(INTERP, SELF->vtable->base_type);
+                 if (dest)
+                     VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
+                 else
+                     dest = pmc_new(INTERP, SELF->vtable->base_type);
+                 l = Parrot_Complex_multiply_Complex(INTERP, value,
+                     Parrot_Complex_ln(INTERP, SELF), l);
+                 dest = Parrot_Complex_exp(INTERP, l);
+                 return dest;
+             }
+MMD_DEFAULT: {
+                 PMC *l = pmc_new(INTERP, SELF->vtable->base_type);
+                 if (dest)
+                     VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
+                 else
+                     dest = pmc_new(INTERP, SELF->vtable->base_type);
+                 l = Parrot_Complex_multiply(INTERP,
+                     Parrot_Complex_ln(INTERP, SELF),
+                     value,
+                     l);
+                 dest = Parrot_Complex_exp(INTERP, l);
+                 return dest;
+             }
+    }
+
+
+    
 }
 
 /*
