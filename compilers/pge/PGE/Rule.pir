@@ -19,7 +19,7 @@ a number of built-in rules.
     base = getclass "PGE::Match"
     $P0 = subclass base, "PGE::Rule"
     $P0 = new .Hash
-    store_global "PGE::Rule", "%:cache", $P0
+    store_global "PGE::Rule", "%!cache", $P0
     .return ()
 .end
 
@@ -413,7 +413,7 @@ Match whitespace between tokens.
     mpos = pos
     $P0 = corou
     $P0 = clone $P0
-    setattribute mob, "PGE::Match\x0&:corou", $P0
+    setattribute mob, "PGE::Match\x0&!corou", $P0
     $P0(mob, mfrom, mpos)
     .return (mob)
   nobacktrack:
@@ -435,7 +435,7 @@ Match whitespace between tokens.
     dec mpos
     if mpos > mfrom goto loop
     null $P0
-    setattribute mob, "PGE::Match\x0&:corou", $P0
+    setattribute mob, "PGE::Match\x0&!corou", $P0
     goto loop
 .end
 
@@ -458,7 +458,7 @@ success.
     mob = fail(mob)
     .return (mob)
   lookahead:
-    cache = find_global "PGE::Rule", "%:cache"
+    cache = find_global "PGE::Rule", "%!cache"
     $I0 = exists cache[pattern]
     if $I0 == 0 goto new_pattern
     rule = cache[pattern]
@@ -470,11 +470,11 @@ success.
   match:
     mob = rule(mob)
     unless mob goto end
-    $P0 = getattribute mob, "PGE::Match\x0$:from"
-    $P1 = getattribute mob, "PGE::Match\x0$:pos"
+    $P0 = getattribute mob, "PGE::Match\x0$.from"
+    $P1 = getattribute mob, "PGE::Match\x0$.pos"
     assign $P1, $P0
     null $P0
-    setattribute mob, "PGE::Match\x0&:corou", $P0
+    setattribute mob, "PGE::Match\x0&!corou", $P0
   end:
     .return (mob)
 .end
@@ -508,7 +508,7 @@ potentially very inefficient, but it "works" for now.
   lookbehind:
     pattern = concat "[", pattern
     pattern = concat pattern, "]$"
-    cache = find_global "PGE::Rule", "%:cache"
+    cache = find_global "PGE::Rule", "%!cache"
     $I0 = exists cache[pattern]
     if $I0 == 0 goto new_pattern
     rule = cache[pattern]
@@ -518,19 +518,19 @@ potentially very inefficient, but it "works" for now.
     rule = $P0(pattern)
     cache[pattern] = rule
   match:
-    $P0 = getattribute mob, "PGE::Match\x0$:target"
+    $P0 = getattribute mob, "PGE::Match\x0$.target"
     $S0 = $P0
-    $P0 = getattribute mob, "PGE::Match\x0$:pos"
+    $P0 = getattribute mob, "PGE::Match\x0$.pos"
     from = $P0
     $S0 = substr $S0, 0, from
     mob = rule($S0)
     unless mob goto end
-    $P0 = getattribute mob, "PGE::Match\x0$:from"
-    $P1 = getattribute mob, "PGE::Match\x0$:pos"
+    $P0 = getattribute mob, "PGE::Match\x0$.from"
+    $P1 = getattribute mob, "PGE::Match\x0$.pos"
     $P0 = from
     $P1 = from
     null $P0
-    setattribute mob, "PGE::Match\x0&:corou", $P0
+    setattribute mob, "PGE::Match\x0&!corou", $P0
   end:
     .return (mob)
 .end

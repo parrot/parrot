@@ -9,8 +9,8 @@ PGE::TokenHash - hash implementation to speed up Token lookups
 .sub "__onload" :load
     .local pmc class
     class = newclass "PGE::TokenHash"
-    addattribute class, ".ihash"
-    addattribute class, ".vhash"
+    addattribute class, "%!ihash"
+    addattribute class, "%!vhash"
     .return ()
 .end
 
@@ -18,15 +18,15 @@ PGE::TokenHash - hash implementation to speed up Token lookups
     .local pmc ihash, vhash
     ihash = new .Hash
     vhash = new .Hash
-    setattribute self, "PGE::TokenHash\x0.ihash", ihash
-    setattribute self, "PGE::TokenHash\x0.vhash", vhash
+    setattribute self, "PGE::TokenHash\x0%!ihash", ihash
+    setattribute self, "PGE::TokenHash\x0%!vhash", vhash
     .return ()
 .end
 
 .sub "__get_pmc_keyed" :method
     .param pmc key_p
     .local pmc vhash
-    vhash = getattribute self, "PGE::TokenHash\x0.vhash"
+    vhash = getattribute self, "PGE::TokenHash\x0%!vhash"
     $P0 = vhash[key_p]
     .return ($P0)
 .end
@@ -40,8 +40,8 @@ PGE::TokenHash - hash implementation to speed up Token lookups
     .local string c
 
     key = key_p
-    vhash = getattribute self, "PGE::TokenHash\x0.vhash"
-    ihash = getattribute self, "PGE::TokenHash\x0.ihash"
+    vhash = getattribute self, "PGE::TokenHash\x0%!vhash"
+    ihash = getattribute self, "PGE::TokenHash\x0%!ihash"
     vhash[key_p] = value
 
     c = substr key, 0, 1
@@ -56,14 +56,14 @@ PGE::TokenHash - hash implementation to speed up Token lookups
 .sub "__exists_keyed" :method
     .param pmc key_p
     .local pmc vhash
-    vhash = getattribute self, "PGE::TokenHash\x0.vhash"
+    vhash = getattribute self, "PGE::TokenHash\x0%!vhash"
     $I0 = exists vhash[key_p]
     .return ($I0)
 .end
 
 .sub "__get_integer" :method
     .local pmc vhash
-    vhash = getattribute self, "PGE::TokenHash\x0.vhash"
+    vhash = getattribute self, "PGE::TokenHash\x0%!vhash"
     $I0 = vhash
     .return ($I0)
 .end
@@ -74,8 +74,8 @@ PGE::TokenHash - hash implementation to speed up Token lookups
     .local string c
     .local pmc ihash, vhash
     .local int len
-    ihash = getattribute self, "PGE::TokenHash\x0.ihash"
-    vhash = getattribute self, "PGE::TokenHash\x0.vhash"
+    ihash = getattribute self, "PGE::TokenHash\x0%!ihash"
+    vhash = getattribute self, "PGE::TokenHash\x0%!vhash"
     c = substr key, pos, 1
     len = ihash[c]
     c = substr key, pos, len

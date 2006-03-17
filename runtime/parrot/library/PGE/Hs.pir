@@ -51,8 +51,8 @@ whole thing may be taken out or refactored away at any moment.
 .namespace [ "PGE::Hs" ]
 
 .const string PGE_FAIL = "PGE_Fail"
-.const string PGE_SUB_POS = "@:capt"
-.const string PGE_SUB_NAMED = "%:capt"
+.const string PGE_SUB_POS = "@!capt"
+.const string PGE_SUB_NAMED = "%!capt"
 
 .sub "__onload" :load
     .local pmc load

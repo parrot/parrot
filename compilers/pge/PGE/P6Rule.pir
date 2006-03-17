@@ -97,9 +97,9 @@
     .local string initchar
     .local int base, isnegated
     newfrom = find_global "PGE::Match", "newfrom"
-    $P0 = getattribute mob, "PGE::Match\x0$:target"
+    $P0 = getattribute mob, "PGE::Match\x0$.target"
     target = $P0
-    $P0 = getattribute mob, "PGE::Match\x0$:pos"
+    $P0 = getattribute mob, "PGE::Match\x0$.pos"
     pos = $P0
     lastpos = length target
 
@@ -201,7 +201,7 @@
     if pos > 0 goto term_ws_1
     pos = lastpos
   end:
-    $P0 = getattribute mob, "PGE::Match\x0$:pos"
+    $P0 = getattribute mob, "PGE::Match\x0$.pos"
     $P0 = pos
     .return (mob)
 
@@ -509,9 +509,9 @@
     .local pmc newfrom, mfrom, mpos
     .local string cname
     newfrom = find_global "PGE::Match", "newfrom"
-    $P0 = getattribute mob, "PGE::Match\x0$:target"
+    $P0 = getattribute mob, "PGE::Match\x0$.target"
     target = $P0
-    $P0 = getattribute mob, "PGE::Match\x0$:pos"
+    $P0 = getattribute mob, "PGE::Match\x0$.pos"
     pos = $P0
     lastpos = length target
     inc pos
@@ -567,7 +567,7 @@
     .param pmc mob
     .param int pos
     .param string message
-    $P0 = getattribute mob, "PGE::Match\x0$:pos"
+    $P0 = getattribute mob, "PGE::Match\x0$.pos"
     $P0 = pos
     $P0 = new .Exception
     $S0 = "p6rule parse error: "
@@ -576,7 +576,7 @@
     $S1 = pos
     $S0 .= $S1
     $S0 .= ", found '"
-    $P1 = getattribute mob, "PGE::Match\x0$:target"
+    $P1 = getattribute mob, "PGE::Match\x0$.target"
     $S1 = $P1
     $S1 = substr $S1, pos, 1
     $S0 .= $S1

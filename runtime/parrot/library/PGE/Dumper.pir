@@ -122,7 +122,7 @@ An alternate dump output for a Match object and all of its subcaptures.
     $I0 = self
     print $I0
     print "\n"
-    capt = getattribute self, "PGE::Match\x0@:capt"
+    capt = getattribute self, "PGE::Match\x0@!capt"
     if_null capt, subrules
     spi = 0
     spc = elements capt

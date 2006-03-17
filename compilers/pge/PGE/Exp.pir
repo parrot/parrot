@@ -30,7 +30,7 @@
     $P1 = subclass $P0, "PGE::Exp::Closure"
     $P1 = subclass $P0, "PGE::Exp::Commit"
     $P0 = new .Integer
-    store_global "PGE::Exp", "$_serno", $P0
+    store_global "PGE::Exp", "$!serno", $P0
 .end
 
 
@@ -59,7 +59,7 @@ won't be a problem, but is the use of the start parameter thread-safe?
     if has_prefix goto serno_1
     prefix = "R"
   serno_1:
-    $P0 = find_global "PGE::Exp", "$_serno"
+    $P0 = find_global "PGE::Exp", "$!serno"
     inc $P0
     unless has_start goto serno_2
     $P0 = start
@@ -374,7 +374,7 @@ register.
     emit(code, "    newfrom = find_global \"PGE::Match\", \"newfrom\"")
     emit(code, "    (mob, target, mfrom, mpos) = newfrom(mob, -1)")
     emit(code, "    $P0 = interpinfo %s", .INTERPINFO_CURRENT_SUB)
-    emit(code, "    setattribute mob, \"PGE::Match\\x0&:corou\", $P0")
+    emit(code, "    setattribute mob, \"PGE::Match\\x0&!corou\", $P0")
     emit(code, "    lastpos = length target")
     emit(code, "    ustack = new .ResizablePMCArray")
     emit(code, "    gpad = new .ResizablePMCArray")
@@ -408,7 +408,7 @@ register.
     emit(code, "  fail_cut:")
     emit(code, "    mpos = cutting")
     emit(code, "    null $P0")
-    emit(code, "    setattribute mob, \"PGE::Match\\x0&:corou\", $P0")
+    emit(code, "    setattribute mob, \"PGE::Match\\x0&!corou\", $P0")
     emit(code, "    .yield (mob)")
     emit(code, "    goto fail_forever")
     emit(code, "  succeed:")
@@ -1012,7 +1012,7 @@ register.
     emit(code, "    push ustack, captscope")
     emit(code, "    $P0 = pop gpad")
     emit(code, "    captscope = pop gpad")
-    emit(code, "    $P1 = getattribute $P0, \"PGE::Match\\x0$:pos\"")
+    emit(code, "    $P1 = getattribute $P0, \"PGE::Match\\x0$.pos\"")
     emit(code, "    $P1 = pos")
     self.emitsub(code, next, "$P0", "captscope", "NOCUT")
     emit(code, "    push gpad, captscope")
@@ -1078,7 +1078,7 @@ register.
     emit(code, "    $P0 = find_global \"%s\", \"%s\"", $S0, $S1)
     goto subrule_3
   subrule_simple_name:
-    emit(code, "    $P0 = getattribute captscope, \"PGE::Match\\x0$:pos\"")
+    emit(code, "    $P0 = getattribute captscope, \"PGE::Match\\x0$.pos\"")
     emit(code, "    $P0 = pos")
     emit(code, "    $I0 = can mob, \"%s\"", subname)
     emit(code, "    if $I0 == 0 goto %s_s1", label)
@@ -1098,12 +1098,12 @@ register.
     emit(code, "    setprop $P0, \"nextchars\", $P2")
   subrule_3a:
     emit(code, "    $P0 = $P0($P1%s)", subargs)
-    emit(code, "    $P1 = getattribute $P0, \"PGE::Match\\x0$:pos\"")
+    emit(code, "    $P1 = getattribute $P0, \"PGE::Match\\x0$.pos\"")
     emit(code, "    if $P1 <= %s goto %s_commit", PGE_CUT_MATCH, label)
     if isnegated == 0 goto subrule_4
     emit(code, "    if $P1 >= 0 goto fail")
     emit(code, "    $P1 = pos")
-    emit(code, "    $P1 = getattribute $P0, \"PGE::Match\\x0$:from\"")
+    emit(code, "    $P1 = getattribute $P0, \"PGE::Match\\x0$.from\"")
     emit(code, "    $P1 = pos")
     emit(code, "    goto %s", next)
     goto subrule_commit
@@ -1121,11 +1121,11 @@ register.
     emit(code, "    goto %s", next)
     goto subrule_commit
   subrule_6:
-    emit(code, "    $P1 = getattribute $P0, \"PGE::Match\\x0&:corou\"")
+    emit(code, "    $P1 = getattribute $P0, \"PGE::Match\\x0&!corou\"")
     emit(code, "    if_null $P1, %s", next)
     self.emitsub(code, next, "$P0", "NOCUT")
     emit(code, "    $P0.next()")
-    emit(code, "    $P1 = getattribute $P0, \"PGE::Match\\x0$:pos\"")
+    emit(code, "    $P1 = getattribute $P0, \"PGE::Match\\x0$.pos\"")
     emit(code, "    if $P1 >= 0 goto %s_s3", label)
     emit(code, "    if $P1 > %s goto fail", PGE_CUT_MATCH)
   subrule_commit:
@@ -1183,7 +1183,7 @@ register.
     emit(code, "    $S0 = concat %s, \":\"", lang)
     emit(code, "    $S1 = %s", value)
     emit(code, "    $S0 .= $S1")
-    emit(code, "    $P0 = find_global \"PGE::Rule\", \"%:cache\"")
+    emit(code, "    $P0 = find_global \"PGE::Rule\", \"%!cache\"")
     emit(code, "    $I0 = exists $P0[$S0]")
     emit(code, "    if $I0 goto %s_1", label)
     emit(code, "    $P1 = compreg %s", lang)

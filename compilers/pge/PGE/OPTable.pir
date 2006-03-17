@@ -66,11 +66,11 @@ Creates the PGE::OPTable class.
 .sub "__onload" :load
     .local pmc base
     base = newclass "PGE::OPTable"
-    addattribute base, "%:toktable"
-    addattribute base, "%:termtable"
-    addattribute base, "%:opertable"
-    addattribute base, "%:wstermtable"
-    addattribute base, "%:wsopertable"
+    addattribute base, "%!toktable"
+    addattribute base, "%!termtable"
+    addattribute base, "%!opertable"
+    addattribute base, "%!wstermtable"
+    addattribute base, "%!wsopertable"
 .end
 
 =item C<__init()>
@@ -81,16 +81,16 @@ Initializes a PGE::OPTable object.
 
 .sub "__init" :method
     $P0 = new .Hash
-    setattribute self, "PGE::OPTable\x0%:toktable", $P0
+    setattribute self, "PGE::OPTable\x0%!toktable", $P0
     $I0 = find_type "PGE::TokenHash"
     $P0 = new $I0
-    setattribute self, "PGE::OPTable\x0%:termtable", $P0
+    setattribute self, "PGE::OPTable\x0%!termtable", $P0
     $P0 = new $I0
-    setattribute self, "PGE::OPTable\x0%:wstermtable", $P0
+    setattribute self, "PGE::OPTable\x0%!wstermtable", $P0
     $P0 = new $I0
-    setattribute self, "PGE::OPTable\x0%:opertable", $P0
+    setattribute self, "PGE::OPTable\x0%!opertable", $P0
     $P0 = new $I0
-    setattribute self, "PGE::OPTable\x0%:wsopertable", $P0
+    setattribute self, "PGE::OPTable\x0%!wsopertable", $P0
 .end
 
 =back
@@ -137,11 +137,11 @@ value for C<match> is "PGE::Match".
     .local string tok1, tok2
     .local int nows
 
-    toktable = getattribute self, "PGE::OPTable\x0%:toktable"
-    termtable = getattribute self, "PGE::OPTable\x0%:termtable"
-    opertable = getattribute self, "PGE::OPTable\x0%:opertable"
-    wstermtable = getattribute self, "PGE::OPTable\x0%:wstermtable"
-    wsopertable = getattribute self, "PGE::OPTable\x0%:wsopertable"
+    toktable = getattribute self, "PGE::OPTable\x0%!toktable"
+    termtable = getattribute self, "PGE::OPTable\x0%!termtable"
+    opertable = getattribute self, "PGE::OPTable\x0%!opertable"
+    wstermtable = getattribute self, "PGE::OPTable\x0%!wstermtable"
+    wsopertable = getattribute self, "PGE::OPTable\x0%!wsopertable"
 
     if has_match goto set_equiv
     match = new .String
@@ -265,10 +265,10 @@ representing the result of the parse.
     .local string key
     .local pmc newfrom, mfrom, mpos
 
-    termtable = getattribute self, "PGE::OPTable\x0%:termtable"
-    opertable = getattribute self, "PGE::OPTable\x0%:opertable"
-    wstermtable = getattribute self, "PGE::OPTable\x0%:wstermtable"
-    wsopertable = getattribute self, "PGE::OPTable\x0%:wsopertable"
+    termtable = getattribute self, "PGE::OPTable\x0%!termtable"
+    opertable = getattribute self, "PGE::OPTable\x0%!opertable"
+    wstermtable = getattribute self, "PGE::OPTable\x0%!wstermtable"
+    wsopertable = getattribute self, "PGE::OPTable\x0%!wsopertable"
     termstack = new .ResizablePMCArray
     operstack = new .ResizablePMCArray
     tokstack = new .ResizablePMCArray

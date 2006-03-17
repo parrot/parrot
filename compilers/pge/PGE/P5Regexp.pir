@@ -57,9 +57,9 @@
     .local int litstart, litlen
     .local string initchar
     newfrom = find_global "PGE::Match", "newfrom"
-    $P0 = getattribute mob, "PGE::Match\x0$:target"
+    $P0 = getattribute mob, "PGE::Match\x0$.target"
     target = $P0
-    $P0 = getattribute mob, "PGE::Match\x0$:pos"
+    $P0 = getattribute mob, "PGE::Match\x0$.pos"
     pos = $P0
     lastpos = length target
     initchar = substr target, pos, 1
@@ -95,7 +95,7 @@
     mob["value"] = $S0
     goto end
   end:
-    $P0 = getattribute mob, "PGE::Match\x0$:pos"
+    $P0 = getattribute mob, "PGE::Match\x0$.pos"
     $P0 = pos
     .return (mob)
 .end
