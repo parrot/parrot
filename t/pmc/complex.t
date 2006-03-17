@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 28;
+use Parrot::Test tests => 32;
 
 =head1 NAME
 
@@ -797,8 +797,8 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "ln of complex numbers");
 .macro DoIt(val)
     c = .val
 	c2 = c.ln()
-    print c2
-    print "\n"
+	print c2
+	print "\n"
 .endm
 .sub main :main
 	.local pmc c, c2
@@ -819,8 +819,8 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "exp of complex numbers");
 .macro DoIt(val)
     c = .val
 	c2 = c.exp()
-    print c2
-    print "\n"
+	print c2
+	print "\n"
 .endm
 .sub main :main
 	.local pmc c, c2
@@ -897,5 +897,108 @@ CODE
 16+0i
 1+1i
 0+0i
+OUTPUT
+
+pir_output_is(<< 'CODE', << 'OUTPUT', "sprintf with a complex");
+.macro DoIt(fmt, number)
+	c = .number
+	$S0 = sprintf .fmt, c
+	print $S0
+.endm
+.sub main :main
+	.local pmc c, c2
+	c = new .Complex
+	.DoIt("%d%+di\n", "1.35+35.1i")
+	.DoIt("%.3f%+.3fi\n", "0+3.141592653589793i")
+.end
+CODE
+1+35i
+0.000+3.142i
+OUTPUT
+
+pir_output_is(<< 'CODE', << 'OUTPUT', "sin of complex numbers");
+.macro DoIt(val)
+    c = .val
+	c2 = sin c
+	print c2
+	print "\n"
+.endm
+.sub main :main
+	.local pmc c, c2
+    c = new .Complex
+	.DoIt("i")
+	.DoIt("2i")
+	.DoIt("2+2i")
+	.DoIt("1+i")
+.end
+CODE
+0+1.1752i
+0+3.62686i
+3.42095-1.50931i
+1.29846+0.634964i
+OUTPUT
+
+pir_output_is(<< 'CODE', << 'OUTPUT', "cos of complex numbers");
+.macro DoIt(val)
+    c = .val
+	c2 = cos c
+	print c2
+	print "\n"
+.endm
+.sub main :main
+	.local pmc c, c2
+    c = new .Complex
+    c2 = new .Complex
+	.DoIt("i")
+	.DoIt("2i")
+	.DoIt("1+i")
+	.DoIt(".5+.5i")
+	.DoIt("2+2i")
+	.DoIt("-2-2i")
+	.DoIt("-2+2i")
+	.DoIt("-2")
+	.DoIt("-2-0i")
+	.DoIt("2-2i")
+.end
+CODE
+1.54308+0i
+3.7622+0i
+0.83373-0.988898i
+0.989585-0.249826i
+-1.56563-3.29789i
+-1.56563-3.29789i
+-1.56563+3.29789i
+-0.416147+0i
+-0.416147-0i
+-1.56563+3.29789i
+OUTPUT
+
+pir_output_is(<< 'CODE', << 'OUTPUT', "atan of complex numbers");
+.macro DoIt(val)
+    c = .val
+	c2 = atan c
+	print c2
+	print "\n"
+.endm
+.sub main :main
+	.local pmc c, c2
+    c = new .Complex
+    c2 = new .Complex
+	.DoIt("1")
+	.DoIt("2")
+	.DoIt("2i")
+	.DoIt("2+2i")
+	.DoIt("4")
+	.DoIt("4i")
+	.DoIt("4+4i")
+.end
+CODE
+0.785398+0i
+1.10715+0i
+-1.5708+0.549306i
+1.31122+0.238878i
+1.32582+0i
+-1.5708+0.255413i
+1.44452+0.123674i
 OUTPUT
 

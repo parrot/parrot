@@ -434,6 +434,26 @@ Returns the requested number (real part for C<real> and imaginary for C<imag>).
 
 /*
 
+=item C<PMC* get_pmc_keyed_int (INTVAL key)>
+
+Returns the requested number (real part for C<0> and imaginary for C<1>).
+
+=cut
+
+*/
+
+    PMC* get_pmc_keyed_int (INTVAL key) {
+        PMC *ret;
+        FLOATVAL val;
+
+        ret = pmc_new(INTERP, enum_class_Float);
+        val = DYNSELF.get_number_keyed_int(key);
+        VTABLE_set_number_native(INTERP, ret, val);
+        return ret;
+    }
+
+/*
+
 =item C<FLOATVAL get_number_keyed_int(INTVAL key)>
 
 Quick hack to emulate get_real() and get_imag():
@@ -1066,6 +1086,123 @@ exp(a + bi) = exp(a) *(cos(b) + i * sin(b))
         return d;
     }
 
+/*
+
+=item C<METHOD PMC* sin()>
+
+Returns the sine of SELF.
+
+=cut
+
+sin(a + bi) = sin(a)cosh(b)+i*cos(a)sinh(b)
+
+sin(z) = ((e ^ zi) - (e ^ -zi)) / (2i)
+sin(a + bi) = (exp(-b) * (cos( a) + i * sin( a)) -
+               exp( b) * (cos(-a) + i * sin(-a))) / 2i
+
+*/
+
+    METHOD PMC* sin() {
+        PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
+        RE(d) = sin(RE(SELF)) * cosh(IM(SELF));
+        IM(d) = cos(RE(SELF)) * sinh(IM(SELF));
+        return d;
+    }
+
+    /*
+    This takes twice as long, but is correct
+    METHOD PMC* sin() {
+        PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC *e = pmc_new(INTERP, SELF->vtable->base_type);
+        RE(d) = -IM(SELF);
+        IM(d) = RE(SELF);
+        d = Parrot_Complex_exp(INTERP, d);
+        RE(e) = IM(SELF);
+        IM(e) = -RE(SELF);
+        e = Parrot_Complex_exp(INTERP, e);
+        d = Parrot_Complex_subtract_Complex(INTERP, d, e, d);
+        RE(e) = 0.0;
+        IM(e) = 2.0;
+        d = Parrot_Complex_divide_Complex(INTERP, d, e, d);
+        return d;
+    }
+    */
+
+/*
+
+=item C<METHOD PMC* cos()>
+
+Returns the cosine of SELF.  If the imaginary part of SELF is -0.0, unlike
+Math::Complex, this will return -0.0 instead of 0.0.
+
+=cut
+
+cos(z) = ((e ^ zi) + (e ^ -zi)) / 2
+
+cos(a + bi) = (exp(-b) * (cos( a) + i * sin( a)) +
+               exp( b) * (cos(-a) + i * sin(-a))) / 2
+
+I found this equation...  But it doesn't work right.  I can't explain why the
+if statement's necessary but it is...  It works and it's fairly quick.
+
+cos(a + bi) = cos(a) * cosh(b) + i * -sin(a) * sinh(b)
+
+*/
+
+    METHOD PMC* cos() {
+        PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
+        RE(d) = cos(RE(SELF)) * cosh(IM(SELF));
+        IM(d) = sin(RE(SELF)) * sinh(IM(SELF));
+        if (RE(SELF))
+            IM(d) = -IM(d);
+        return d;
+    }   
+
+    /*
+    Same as with sin, this is slower
+    METHOD PMC* cos() {
+        PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC *e = pmc_new(INTERP, SELF->vtable->base_type);
+        RE(d) = -IM(SELF);
+        IM(d) = RE(SELF);
+        d = Parrot_Complex_exp(INTERP, d);
+        RE(e) = IM(SELF);
+        IM(e) = -RE(SELF);
+        e = Parrot_Complex_exp(INTERP, e);
+        d = Parrot_Complex_add_Complex(INTERP, d, e, d);
+        RE(e) = 2.0;
+        IM(e) = 0.0;
+        d = Parrot_Complex_divide_Complex(INTERP, d, e, d);
+        return d;
+    }
+    */
+
+
+/*
+
+=item C<METHOD PMC* atan()>
+
+Returns the arctangent of SELF.
+
+=cut
+
+arctan z = i/2 ln((i+z) / (i-z))
+
+*/
+
+    METHOD PMC* atan() {
+        PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC *e = pmc_new(INTERP, SELF->vtable->base_type);
+        RE(d) = RE(SELF);
+        IM(d) = 1 + IM(SELF);
+        RE(e) = -RE(SELF);
+        IM(e) = 1 - IM(SELF);
+        d = Parrot_Complex_divide_Complex(INTERP, d, e, d);
+        d = Parrot_Complex_ln(INTERP, d);
+        RE(e) = IM(d) / -2.0;
+        IM(e) = RE(d) / 2.0;
+        return e;
+    }
 
 /*
 
@@ -1089,8 +1226,8 @@ MMD_Complex: {
                      VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
                  else
                      dest = pmc_new(INTERP, SELF->vtable->base_type);
-                 l = Parrot_Complex_multiply_Complex(INTERP, value,
-                     Parrot_Complex_ln(INTERP, SELF), l);
+                 l = Parrot_Complex_multiply_Complex(INTERP,
+                         Parrot_Complex_ln(INTERP, SELF), value, l);
                  dest = Parrot_Complex_exp(INTERP, l);
                  return dest;
              }
@@ -1101,9 +1238,7 @@ MMD_DEFAULT: {
                  else
                      dest = pmc_new(INTERP, SELF->vtable->base_type);
                  l = Parrot_Complex_multiply(INTERP,
-                     Parrot_Complex_ln(INTERP, SELF),
-                     value,
-                     l);
+                         Parrot_Complex_ln(INTERP, SELF), value, l);
                  dest = Parrot_Complex_exp(INTERP, l);
                  return dest;
              }
