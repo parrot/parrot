@@ -5,6 +5,7 @@ LN_S     = @lns@
 PERL     = @perl@
 RM_RF    = @rm_rf@
 PARROT   = ..@slash@..@slash@parrot@exe@
+TOOL_DIR = ..@slash@..
 CP       = @cp@
 
 # Where to put things
@@ -43,7 +44,7 @@ help:
 	@echo ""
 
 test: all
-	prove -r ../../t/compilers/pge
+	cd $(TOOL_DIR); prove -r t/compilers/pge
 
 testclean:
 	$(RM_RF) "../../t/compilers/pge/*.pir" \
