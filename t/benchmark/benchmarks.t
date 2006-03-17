@@ -213,7 +213,6 @@ my %todo = ( q{arriter.pir}                     => 'syntax error',
              q{gc_waves_headers.pasm}           => 'syntax error', 
              q{gc_waves_sizeable_headers.pasm}  => 'syntax error', 
              q{stress3.pasm}                    => 'Null PMC access in get_integer()',
-             q{vpm.pir}                         => 'delete_keyed() not implemented',
            );
 
 
@@ -221,16 +220,9 @@ plan tests => scalar keys %outputs;
 # plan skip_all => 'currently not working';1
 
 foreach ( sort keys %outputs ) {
-  SKIP: {
-        my $bench;
-        eval {
-            my $file = q(examples/benchmarks/) . $_;
-            open( BENCH, qq(examples/benchmarks/$_) )
-              or die qq(Could not open $_:  $!.\n); 
-            while ( my $line = <BENCH> ) { $bench .= $line; }
-            close( BENCH );
-        };
-        skip( $@, 1 ) if $@;
+    SKIP: {
+        my $bench = Parrot::Test::slurp_file( "examples/benchmarks/$_" );
+        skip( "Could not slurp $_", 1 ) unless $bench;
 
         my @todo = $todo{$_} ? ( todo => $todo{$_} ) : ();
         
