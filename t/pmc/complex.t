@@ -819,8 +819,10 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "exp of complex numbers");
 .macro DoIt(val)
     c = .val
 	c2 = c.exp()
-	print c2
-	print "\n"
+	#print c2
+	#print "\n"
+	$S0 = sprintf "%.6f%+.6fi\n", c2
+	print $S0
 .endm
 .sub main :main
 	.local pmc c, c2
@@ -836,14 +838,14 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "exp of complex numbers");
 	c[1] = $N0
 	c2 = c.exp()
 	c2 += 1.0
-    print c2
-    print "\n"
+	$S0 = sprintf "%.6f%+.6fi\n", c2
+	print $S0
 .end
 CODE
 0.540302+0.841471i
 -0.416147+0.909297i
--3.07493+6.71885i
-0+0i
+-3.074932+6.718850i
+0.000000+0.000000i
 OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "pow with complex numbers");
@@ -851,8 +853,8 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "pow with complex numbers");
 	c = .base
 	c2 = .power
 	c3 = pow c, c2
-	print c3
-	print "\n"
+	$S0 = sprintf "%.6f%+.6fi\n", c3
+	print $S0
 .endm
 .sub main :main
 	.local pmc c, c2, c3
@@ -883,20 +885,20 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "pow with complex numbers");
 	c2[1] = $N0
 	c3 = pow c, c2
 	c3 += 1.0
-	print c3
-	print "\n"
+	$S0 = sprintf "%.6f%+.6fi\n", c3
+	print $S0
 .end
 CODE
-0.20788+0i
--1+0i
--4+0i
--1.4525-0.80989i
-0.455938+0i
+0.207880+0.000000i
+-1.000000+0.000000i
+-4.000000+0.000000i
+-1.452505-0.809890i
+0.455938+0.000000i
 0.183457+0.983028i
--4+0i
-16+0i
-1+1i
-0+0i
+-4.000000+0.000000i
+16.000000+0.000000i
+1.000000+1.000000i
+0.000000+0.000000i
 OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "sprintf with a complex");
