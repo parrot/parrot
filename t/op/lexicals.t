@@ -1,5 +1,5 @@
 #!perl
-# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2001-2006 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 use strict;
@@ -15,7 +15,7 @@ t/op/lexicals.t - Lexical Ops
 
 =head1 SYNOPSIS
 
-	% prove t/op/lexicals.t
+    % prove t/op/lexicals.t
 
 =head1 DESCRIPTION
 
@@ -35,7 +35,7 @@ OUTPUT
 
 pasm_output_is(<<'CODE', <<'OUTPUT', '.lex parsing - PASM (S0) fails', todo => 'specification unclear');
 .pcc_sub main:
-	S0 = '$a'
+    S0 = '$a'
     .lex S0, P0
     print "ok\n"
     end
@@ -45,7 +45,7 @@ OUTPUT
 
 pasm_output_is(<<'CODE', <<'OUTPUT', '.lex parsing - PASM ($S0) fails', todo => 'specification unclear');
 .pcc_sub main:
-	$S0 = '$a'
+    $S0 = '$a'
     .lex $S0, P0
     print "ok\n"
     end
@@ -57,7 +57,6 @@ pir_output_is(<<'CODE', <<'OUTPUT', '.lex parsing - PIR');
 .sub main
     .lex "$a", P0
     print "ok\n"
-    end
 .end
 CODE
 ok
@@ -67,9 +66,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', '.lex parsing - PIR, $P');
 .sub main :main
     .lex '$a', $P0
     null $P0
-    null $P1
     print "ok\n"
-    end
 .end
 CODE
 ok
@@ -80,7 +77,6 @@ pir_output_is(<<'CODE', <<'OUTPUT', '.lex parsing - PIR, local var');
     .local pmc a
     .lex "$a", a
     print "ok\n"
-    end
 .end
 CODE
 ok
@@ -121,16 +117,16 @@ OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', 'api parsing');
 .sub main :main
-	.lex 'a', $P0
-	store_lex 'a', $P0
-	$P0 = find_lex 'a'
-	print "ok\n"
+    .lex 'a', $P0
+    store_lex 'a', $P0
+    $P0 = find_lex 'a'
+    print "ok\n"
 .include 'interpinfo.pasm'
-        load_bytecode "pcore.pir"      # TODO autoload/preload
-	interpinfo $P1, .INTERPINFO_CURRENT_SUB
-	$P2 = $P1.'get_lexinfo'()
-	$P2 = $P1.'get_lexenv'()
-	print "ok\n"
+    load_bytecode "pcore.pir"      # TODO autoload/preload
+    interpinfo $P1, .INTERPINFO_CURRENT_SUB
+    $P2 = $P1.'get_lexinfo'()
+    $P2 = $P1.'get_lexenv'()
+    print "ok\n"
 .end
 CODE
 ok
@@ -159,11 +155,11 @@ pir_output_is(<<'CODE', <<'OUTPUT', 'get_lexinfo - no lexicals');
 .include "interpinfo.pasm"
     interpinfo $P1, .INTERPINFO_CURRENT_SUB
     $P2 = $P1.'get_lexinfo'()
-	if null $P2 goto ok
+    if null $P2 goto ok
     print "LexInfo not NULL\n"
     end
 ok:
-	print "ok\n"
+    print "ok\n"
 .end
 CODE
 ok
@@ -667,39 +663,39 @@ pir_output_is(<<'CODE', <<'OUTPUT', 'closure 5');
 # Otherwise, this test is just a repeat of others
 
 .sub main :main
-	.local pmc f
-	f = xyzzy()
-	f()
-	f()
-	f()
+    .local pmc f
+    f = xyzzy()
+    f()
+    f()
+    f()
 .end
 
 .sub xyzzy
-	$P1 = plugh()
-	.return ($P1)
+    $P1 = plugh()
+    .return ($P1)
 .end
 
 .sub plugh
-	$P1 = foo()
-	.return ($P1)
+    $P1 = foo()
+    .return ($P1)
 .end
 
 .sub foo
-	.lex 'a', $P0
-	$P0 = new Integer
-	$P0 = 0
+    .lex 'a', $P0
+    $P0 = new Integer
+    $P0 = 0
 
-	.const .Sub bar_sub = "bar"
-	$P1 = newclosure bar_sub
-	.return ($P1)
+    .const .Sub bar_sub = "bar"
+    $P1 = newclosure bar_sub
+    .return ($P1)
 .end
 
 .sub bar :anon :outer(foo)
-	$P0 = find_lex 'a'
-	inc $P0
-	print "bar: "
-	print $P0
-	print "\n"
+    $P0 = find_lex 'a'
+    inc $P0
+    print "bar: "
+    print $P0
+    print "\n"
 .end
 CODE
 bar: 1
@@ -711,51 +707,51 @@ pir_output_is(<<'CODE', <<'OUTPUT', 'closure 6');
 # Leo's version of xyzzy original by particle, p5 by chip     #'
 
 .sub main :main
-	.local pmc f,g
-        f = xyzzy(42)
-        $P0 = f()
-        $P0 = f()
-        $P0 = f()
-        g = xyzzy(13013)
-        $P0 = g()
-        $P0 = f()
+    .local pmc f,g
+    f = xyzzy(42)
+    $P0 = f()
+    $P0 = f()
+    $P0 = f()
+    g = xyzzy(13013)
+    $P0 = g()
+    $P0 = f()
 .end
 
 .sub xyzzy
-        .param int i
-        .local pmc f
-        f = plugh(i)
-        .return (f)
+    .param int i
+    .local pmc f
+    f = plugh(i)
+    .return (f)
 .end
 
 .sub plugh
-        .param int i
-        .local pmc f
-        f = foo(i)
-        .return (f)
+    .param int i
+    .local pmc f
+    f = foo(i)
+    .return (f)
 .end
 
 .sub foo
-        .param int i
-        .lex 'a', $P0
-        $P1 = new Integer
-        $P1 = i
-        store_lex 'a', $P1
-        print "foo: "
-        print $P0
-        print "\n"
-        .const .Sub closure = 'bar'
-        $P2 = newclosure closure
-        .return($P2)
+    .param int i
+    .lex 'a', $P0
+    $P1 = new Integer
+    $P1 = i
+    store_lex 'a', $P1
+    print "foo: "
+    print $P0
+    print "\n"
+    .const .Sub closure = 'bar'
+    $P2 = newclosure closure
+    .return($P2)
 .end
 
 .sub bar :anon :outer(foo)
-        $P0 = find_lex 'a'
-        inc $P0
-        store_lex 'a', $P0
-        print "bar: "
-        print $P0
-        print "\n"
+    $P0 = find_lex 'a'
+    inc $P0
+    store_lex 'a', $P0
+    print "bar: "
+    print $P0
+    print "\n"
 .end
 CODE
 foo: 42
@@ -804,14 +800,14 @@ pir_output_is(<<'CODE', <<'OUTPUT', 'closure 7 - evaled');
     print "\n"
     .local string code
     code = <<'EOC'
-    .sub bar :anon :outer(foo)
-	$P0 = find_lex 'a'
-	inc $P0
-	store_lex 'a', $P0
-	print "bar: "
-	print $P0
-	print "\n"
-    .end
+        .sub bar :anon :outer(foo)
+            $P0 = find_lex 'a'
+            inc $P0
+            store_lex 'a', $P0
+            print "bar: "
+            print $P0
+            print "\n"
+        .end
 EOC
     .local pmc compiler
     compiler = compreg "PIR"
@@ -872,14 +868,14 @@ OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', 'find_name on lexicals');
 .sub main :main
-	.lex 'a', $P0
-        $P1 = new .String
-        $P1 = "ok\n"
-	store_lex 'a', $P1
-	$P2 = find_name 'a'
-        print $P0
-        print $P1
-        print $P2
+    .lex 'a', $P0
+    $P1 = new .String
+    $P1 = "ok\n"
+    store_lex 'a', $P1
+    $P2 = find_name 'a'
+    print $P0
+    print $P1
+    print $P2
 .end
 CODE
 ok
@@ -889,18 +885,18 @@ OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', 'multiple names');
 .sub main :main
-	.lex 'a', $P0
-	.lex 'b', $P0
-	.lex 'c', $P0
-        $P1 = new .String
-        $P1 = "ok\n"
-	store_lex 'a', $P1
-	$P2 = find_name 'b'
-        print $P0
-        print $P1
-        print $P2
-	$P3 = find_lex 'c'
-        print $P3
+    .lex 'a', $P0
+    .lex 'b', $P0
+    .lex 'c', $P0
+    $P1 = new .String
+    $P1 = "ok\n"
+    store_lex 'a', $P1
+    $P2 = find_name 'b'
+    print $P0
+    print $P1
+    print $P2
+    $P3 = find_lex 'c'
+    print $P3
 .end
 CODE
 ok
@@ -919,7 +915,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', 'package-scoped closure 1');
     .lex '$x', sx
     sx = new .PerlUndef
     '&f'()
-    print sx	# no find_lex needed - 'sx' is defined here
+    print sx    # no find_lex needed - 'sx' is defined here
     print "\n"
 .end
 
