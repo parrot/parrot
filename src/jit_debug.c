@@ -92,7 +92,7 @@ typedef struct {
 
 /*
 
-=item C<static void write_types(FILE *stabs)>
+=item C<static void write_types(FILE *stabs, Interp *interpreter)>
 
 Writes the types to C<stabs>.
 
@@ -101,7 +101,7 @@ Writes the types to C<stabs>.
 */
 
 static void
-write_types(FILE *stabs)
+write_types(FILE *stabs, Interp *interpreter)
 {
     int i, j;
     /* borrowed from mono */
@@ -333,7 +333,7 @@ Parrot_jit_debug_stabs(Interp *interpreter)
     fprintf(stabs, ".stabs \"jit_func:F(0,1)\"," N_FUN ",0,1,%p\n",
             jit_info->arena.start);
 
-    write_types(stabs);
+    write_types(stabs, interpreter);
     write_vars(stabs, interpreter);
     /* if we don't have line numbers, emit dummys, assuming there are
      * no comments and spaces in source for testing

@@ -18,10 +18,14 @@
 #include "parrot/thread.h"
 
 #define PARROT_MAX_CLASSES 100
-PARROT_API VAR_SCOPE VTABLE **Parrot_base_vtables;/*[PARROT_MAX_CLASSES];*/
-VAR_SCOPE INTVAL class_table_size;
-VAR_SCOPE INTVAL enum_class_max;
-VAR_SCOPE Parrot_mutex class_count_mutex;
+
+/*
+ * macros used during vtables conversion
+ * TODO go through files and use the real thing
+ */
+
+#define enum_class_max interpreter->n_vtable_max
+#define Parrot_base_vtables interpreter->vtables
 
 /* Internal use */
 PMC *pmc_init_null(Interp * interpreter);

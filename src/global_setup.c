@@ -26,7 +26,7 @@ I<What are these global variables?>
 #include "global_setup.str"
 
 /* These functions are defined in the auto-generated file core_pmcs.c */
-extern void Parrot_initialize_core_pmcs(Interp *interp);
+extern void Parrot_initialize_core_pmcs(Interp *interpreter);
 
 static const unsigned char* parrot_config_stored = NULL;
 static unsigned int parrot_config_size_stored = 0;
@@ -148,6 +148,49 @@ init_world(Interp *interpreter)
             IGLOBALS_DYN_LIBS, pmc);
 }
 
+/*
+ * called from inmidst of PMC bootstrapping between pass 0 and 1
+ */
+
+/* in generated src_core_pmcs.c */
+void Parrot_register_core_pmcs(Interp *interp, PMC* registry);
+
+void
+parrot_global_setup_2(Interp *interpreter)
+{
+    PMC *classname_hash, *iglobals;
+    int i;
+    PMC *parrot_ns;
+    STRING *parrot = const_string(interpreter, "parrot");
+
+    /* create the namespace root stash */
+    interpreter->stash_hash =
+        pmc_new(interpreter, enum_class_NameSpace);
+
+    interpreter->HLL_info = constant_pmc_new(interpreter,
+            enum_class_ResizablePMCArray);
+    interpreter->HLL_namespace = constant_pmc_new(interpreter,
+            enum_class_ResizablePMCArray);
+    Parrot_register_HLL(interpreter, parrot, NULL);
+
+    parrot_ns = 
+        VTABLE_get_pmc_keyed_int(interpreter, interpreter->HLL_namespace, 0); 	
+    CONTEXT(interpreter->ctx)->current_namespace = parrot_ns; 
+    VTABLE_set_pmc_keyed_str(interpreter, interpreter->stash_hash, 	
+            const_string(interpreter, "parrot"),
+            parrot_ns);
+    /* We need a class hash */
+    interpreter->class_hash = classname_hash =
+        pmc_new(interpreter, enum_class_Hash);
+    Parrot_register_core_pmcs(interpreter, classname_hash);
+    /* init the interpreter globals array */
+    iglobals = pmc_new(interpreter, enum_class_SArray);
+    interpreter->iglobals = iglobals;
+    VTABLE_set_integer_native(interpreter, iglobals, (INTVAL)IGLOBALS_SIZE);
+    /* clear the array */
+    for (i = 0; i < (INTVAL)IGLOBALS_SIZE; i++)
+        VTABLE_set_pmc_keyed_int(interpreter, iglobals, i, NULL);
+}
 
 /*
 

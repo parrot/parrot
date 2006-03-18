@@ -116,7 +116,6 @@ make_interpreter(Parrot_Interp parent, Interp_flags flags)
          * we need a global mutex to protect the interpreter array
          */
         MUTEX_INIT(interpreter_array_mutex);
-        MUTEX_INIT(class_count_mutex);
     }
     create_initial_context(interpreter);
     interpreter->resume_flag = RESUME_INITIAL;
@@ -390,7 +389,6 @@ Parrot_really_destroy(int exit_code, void *vinterp)
     /* strings, chartype, encodings */
     if (!interpreter->parent_interpreter) {
         MUTEX_DESTROY(interpreter_array_mutex);
-        MUTEX_DESTROY(class_count_mutex);
         string_deinit(interpreter);
         /*
            chartype_destroy();
@@ -400,8 +398,6 @@ Parrot_really_destroy(int exit_code, void *vinterp)
         /*
          * finally free other globals
          */
-        mem_sys_free(Parrot_base_vtables);
-        Parrot_base_vtables = NULL;
         mem_sys_free(interpreter_array);
         interpreter_array = NULL;
     }

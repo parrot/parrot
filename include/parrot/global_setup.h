@@ -18,7 +18,8 @@
 #include "parrot/interpreter.h"
 
 
-void init_world(Interp * interp);
+void init_world(Interp *);
+void parrot_global_setup_2(Interp *);
 
 #endif /* PARROT_GLOBAL_SETUP_H_GUARD */
 

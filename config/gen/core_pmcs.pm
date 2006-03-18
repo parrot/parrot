@@ -97,7 +97,7 @@ END_C
 
     print OUT <<"END_C";
 
-static void Parrot_register_core_pmcs(Interp *interp, PMC* registry);
+void Parrot_register_core_pmcs(Interp *interp, PMC* registry);
 extern void Parrot_initialize_core_pmcs(Interp *interp);
 void Parrot_initialize_core_pmcs(Interp *interp)
 {
@@ -113,53 +113,18 @@ END_C
         foreach (@pmcs[0 .. $#pmcs - 1]);
     print OUT <<"END_C";
         if (!pass) {
-            PMC *classname_hash, *iglobals;
-            int i;
-	    PMC *parrot_ns;
-            /* create the namespace root stash */
-            interp->stash_hash =
-                pmc_new(interp, enum_class_NameSpace);
-            /* and parrot's default namespace */
-	    if (interp->parent_interpreter) {
-		interp->HLL_info = interp->parent_interpreter->HLL_info;
-		interp->HLL_namespace = interp->parent_interpreter->HLL_namespace;
-	    }
-	    else {
-		STRING *parrot = const_string(interp, "parrot");
-		interp->HLL_info = constant_pmc_new(interp,
-			enum_class_ResizablePMCArray);
-		interp->HLL_namespace = constant_pmc_new(interp,
-			enum_class_ResizablePMCArray);
-		Parrot_register_HLL(interp, parrot, NULL);
-	    }
-	    parrot_ns = 
-		VTABLE_get_pmc_keyed_int(interp, interp->HLL_namespace, 0); 	
-            CONTEXT(interp->ctx)->current_namespace = parrot_ns; 
-            VTABLE_set_pmc_keyed_str(interp, interp->stash_hash, 	
-		    const_string(interp, "parrot"),
-		    parrot_ns);
-            /* We need a class hash */
-            interp->class_hash = classname_hash =
-                pmc_new(interp, enum_class_Hash);
-            Parrot_register_core_pmcs(interp, classname_hash);
-            /* init the interp globals array */
-            iglobals = pmc_new(interp, enum_class_SArray);
-            interp->iglobals = iglobals;
-            VTABLE_set_integer_native(interp, iglobals, (INTVAL)IGLOBALS_SIZE);
-            /* clear the array */
-            for (i = 0; i < (INTVAL)IGLOBALS_SIZE; i++)
-                VTABLE_set_pmc_keyed_int(interp, iglobals, i, NULL);
+	    parrot_global_setup_2(interp);
         }
     }
 }
 
 static void register_pmc(Interp *interp, PMC* registry, int pmc_id)
 {
-    STRING* key = Parrot_base_vtables[pmc_id]->whoami;
+    STRING* key = interp->vtables[pmc_id]->whoami;
     VTABLE_set_integer_keyed_str(interp, registry, key, pmc_id);
 }
 
-static void
+void
 Parrot_register_core_pmcs(Interp *interp, PMC* registry)
 {
 END_C

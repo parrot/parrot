@@ -373,26 +373,14 @@ pmc_register(Interp* interpreter, STRING *name)
         return 0;
     }
 
-    /* We don't have one, so lets add one. We need to get a lock for
-       this, though */
-    LOCK(class_count_mutex);
-    /* Try again, just in case */
-    if ((type = pmc_type(interpreter, name)) != enum_type_undef) {
-        UNLOCK(class_count_mutex);
-        return type;
-    }
-
     classname_hash = interpreter->class_hash;
     type = enum_class_max++;
     /* Have we overflowed the table? */
-    if (type >= class_table_size) {
+    if (type >= interpreter->n_vtable_alloced) {
         parrot_realloc_vtables(interpreter);
     }
     /* set entry in name->type hash */
     VTABLE_set_integer_keyed_str(interpreter, classname_hash, name, type);
-
-    UNLOCK(class_count_mutex);
-
     return type;
 }
 

@@ -535,7 +535,7 @@ sub rewrite_vtable_method ($$$$$) {
     # Rewrite DYNSUPER(args)
     s/DYNSUPER          # Macro: DYNSUPER
       \(\s*(.*?)\)      # capture argument list
-     /"Parrot_base_vtables[$supertype].$method(" . full_arguments($1) . ')'/xeg;
+     /"interpreter->vtables[$supertype].$method(" . full_arguments($1) . ')'/xeg;
 
     # Rewrite OtherClass.SUPER(args...)
     s/(\w+)             # capture OtherClass
@@ -874,38 +874,36 @@ EOC
 EOC
     $cout .= <<"EOC";
         /*
-         * Parrot_base_vtables is a true global - register just once
+         * create vtable - clone it - we have to set a few items
          */
-        if (!Parrot_base_vtables[entry]) {
-            struct _vtable *vt_clone =
-                Parrot_clone_vtable(interp, &temp_base_vtable);
+        struct _vtable *vt_clone =
+            Parrot_clone_vtable(interp, &temp_base_vtable);
 
 EOC
     # init vtable slot
     if ($self->{flags}{dynpmc}) {
         $cout .= <<"EOC";
-            vt_clone->base_type = entry;
-            vt_clone->whoami = string_make(interp,
-                "$classname", @{[length($classname)]}, "ascii",
-                PObj_constant_FLAG|PObj_external_FLAG);
-            vt_clone->isa_str = string_make(interp,
-                "$isa", @{[length($isa)]}, "ascii",
-                PObj_constant_FLAG|PObj_external_FLAG);
-            vt_clone->does_str = string_make(interp,
-                "$does", @{[length($does)]}, "ascii",
-                PObj_constant_FLAG|PObj_external_FLAG);
+        vt_clone->base_type = entry;
+        vt_clone->whoami = string_make(interp,
+            "$classname", @{[length($classname)]}, "ascii",
+            PObj_constant_FLAG|PObj_external_FLAG);
+        vt_clone->isa_str = string_make(interp,
+            "$isa", @{[length($isa)]}, "ascii",
+            PObj_constant_FLAG|PObj_external_FLAG);
+        vt_clone->does_str = string_make(interp,
+            "$does", @{[length($does)]}, "ascii",
+            PObj_constant_FLAG|PObj_external_FLAG);
 EOC
     }
     else {
         $cout .= <<"EOC";
-            vt_clone->whoami = CONST_STRING(interp, "$classname");
-            vt_clone->isa_str = CONST_STRING(interp, "$isa");
-            vt_clone->does_str = CONST_STRING(interp, "$does");
+        vt_clone->whoami = CONST_STRING(interp, "$classname");
+        vt_clone->isa_str = CONST_STRING(interp, "$isa");
+        vt_clone->does_str = CONST_STRING(interp, "$does");
 EOC
     }
     $cout .= <<"EOC";
-            Parrot_base_vtables[entry] = vt_clone;
-        }
+        interp->vtables[entry] = vt_clone;
 EOC
     $cout .= <<"EOC";
     } 

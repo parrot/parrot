@@ -61,7 +61,7 @@ subroutine.
     void class_init() {
         if (pass == 1) {
             /* there is no pmclass const_pmc flag yet */
-            Parrot_base_vtables[entry]->flags |= VTABLE_IS_CONST_PMC_FLAG;
+            interp->vtables[entry]->flags |= VTABLE_IS_CONST_PMC_FLAG;
         }
 
     }
