@@ -19,7 +19,7 @@ This file implements match objects returned by the Parrot Grammar Engine.
     addattribute base, "$.pos"                     # current match position
     addattribute base, "&!corou"                   # match's corou
     addattribute base, "@!capt"                    # subpattern captures
-    addattribute base, "$!return"                  # return value
+    addattribute base, "$!value"                   # return value
     .return ()
 .end
 
@@ -163,7 +163,7 @@ that was matched by this match object.
 =cut
 
 .sub "value" :method
-    $P0 = getattribute self, "PGE::Match\x0$!return"
+    $P0 = getattribute self, "PGE::Match\x0$!value"
     if_null $P0, value_1
     .return ($P0)
   value_1:
