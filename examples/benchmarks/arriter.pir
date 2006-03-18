@@ -17,132 +17,125 @@ it might come out of a compiler.
 =cut
 
 
-.sub _main
+.sub arriter :main
 .include "iterator.pasm"
-    new_pad 0
-    .local PerlHash ha
-    ha = new PerlHash
-    store_lex -1, "ha", ha
-    .local PerlHash hb
-    ha = new PerlHash
-    store_lex -1, "hb", hb
-    .local PerlUndef i
-    i = new PerlUndef
-    store_lex -1, "i", i
-    .local PerlArray k
-    k = new PerlArray
-    store_lex -1, "k", k
-    .local PerlArray nk
-    nk = new PerlArray
-    store_lex -1, "nk", nk
-    .local PerlUndef s
-    s = new PerlUndef
-    store_lex -1, "s", s
 
-    find_lex $P0 , "i"
-    $P1 = new PerlUndef
-    $P1 = 10
+# declaration of lexicals
+    $P20 = new .PerlHash
+    .lex "%ha", $P20
+    $P21 = new .PerlUndef
+    .lex "$i", $P21
+    $P22 = new .PerlArray
+    .lex "@k", $P22
+    $P23 = new .PerlArray
+    .lex "@nk", $P23
+    $P24 = new .PerlUndef
+    .lex "$s", $P24
+
+# same as @k = qw( A B C D E F G H I J ); 
+    find_lex $P29 , "$i"
+    $P29 = 0
 for_1_start:
-    if $P0 >= $P1 goto for_1_end
-	find_lex $P2 , "s"
-	$P3 = new PerlUndef
-	$P3 = 65
-	$P4 = new PerlUndef
-	add $P4, $P3, $P0
-	set $I0, $P4
-	chr $S0, $I0
-	$P2 = new PerlUndef
-	$P2 = $S0
-	push k, $P2
-	inc $P0
-	branch for_1_start
+    unless $P29 < 10 goto for_1_end
+        $P26 = new .PerlUndef
+        $P26 = 65
+        $P27 = new .PerlUndef
+        $P27 = add $P26, $P29
+        $I0 = $P27
+        $S0 = chr $I0
+        find_lex $P28 , "$s"
+        $P28 = new .PerlUndef
+        $P28 = $S0
+        push $P22, $P28
+        inc $P29
+        branch for_1_start
 for_1_end:
 
-    .local PerlUndef e
-    e = new PerlUndef
-    store_lex -1, "e", e
-    find_lex $P0 , "e"
-    $P0 = 0
-    $P1 = new PerlUndef
-    $P1 = 3
+# set up all 5 element permutations of qw( A B C D E F G H I J )
+    $P29 = new .PerlUndef
+    .lex "e", P29
+    $P29 = 0
 for_2_start:
-    if $P0 > $P1 goto for_2_end
-	find_lex $P2 , "i"
-	$P2 = 0
-	$P3 = new PerlUndef
-	$P3 = 10
-    for_3_start:
-	if $P2 >= $P3 goto for_3_end
-	    find_lex $P5 , "k"
-	    $P4 = new Iterator, $P5
-	    $P4 = .ITERATE_FROM_START
-	iter_1_start:
-	    unless $P4 goto iter_1_end
-		$P6 = new PerlUndef
-		$P6 = 65
-		$P7 = new PerlUndef
-		$P8 = new PerlUndef
-		find_lex $P11, "nk"
-		add $P7, $P6, $P2	# 65 + $i
-		$I0 = $P7
-		chr $S0, $I0
-		$P8 = $S0
-		shift $P9, $P4		# $s
-		# $P10 goes into the aggregate and can not be
-		# pulled out of loop
-		$P10 = new PerlUndef
-		concat $P10, $P9, $P8
-		push $P11, $P10
-		branch iter_1_start
-	iter_1_end:
-	    inc $P2
-	    branch for_3_start
-    for_3_end:
-	find_lex $P12 , "nk"
-	clone $P13, $P12
-	store_lex -1, "k", $P13
-	$P12 = 0
-	inc $P0
-	branch for_2_start
+    unless $P29 <= 3 goto for_2_end
+        find_lex $P30 , "$i"
+        $P30 = 0
+for_3_start:
+        unless $P30 < 10 goto for_3_end
+            find_lex $P31 , "@k"
+            $P32 = new Iterator, $P31
+            $P32 = .ITERATE_FROM_START
+iter_1_start:
+            unless $P32 goto iter_1_end
+                $P33 = new .PerlUndef
+                $P33 = 65
+                $P34 = new .PerlUndef
+                add $P34, $P33, $P30        # 65 + $i
+                $I0 = $P34
+                $S0 = chr $I0
+                $P35 = new .PerlUndef
+                $P35 = $S0
+                shift $P36, $P32                # $s
+                # $P37 goes into the aggregate and can not be
+                # pulled out of loop
+                $P37 = new .PerlUndef
+                concat $P37, $P36, $P35
+                $P38 = find_lex "@nk"
+                push $P38, $P37
+                branch iter_1_start
+iter_1_end:
+        inc $P30
+        branch for_3_start
+for_3_end:
+        $P39 = find_lex "@nk"
+        # XXX why does this not work ?
+        # $P40 = find_lex "@k"
+        # clone $P40, $P39
+        clone $P22, $P39
+        $P39 = 0
+        inc $P29
+        branch for_2_start
 for_2_end:
 
-    find_lex $P14 , "k"
-    $I0 = $P14
+    # XXX why does this not work ?
+    # $P41 = find_lex "@k"
+    # $I0 = $P22
+    $I0 = $P22
     print $I0
     print "\n"
 
-    $P15 = new Iterator, $P14
-    $P15 = .ITERATE_FROM_START
-    find_lex $P16 , "ha"
+    # XXX why does this not work ?
+    #$P42 = new Iterator, $P41
+    $P42 = new Iterator, $P22
+    $P42 = .ITERATE_FROM_START
+    $P43 = find_lex "%ha"
     $I1 = 0
 iter_2_start:
-    unless $P15 goto iter_2_end
+    unless $P42 goto iter_2_end
         inc $I1
-	shift $P17, $P15
-	$S0 = $P17
-	$P16[$S0] = 1
-	branch iter_2_start
+        shift $P44, $P42
+        $S0 = $P44
+        $P43[$S0] = 1
+        branch iter_2_start
 iter_2_end:
 
     print $I1
     print "\n"
-    $I0 = $P16
+    $I0 = $P43
     print $I0
     print "\n"
-    $I0 = defined $P16["AAAAA"]
+    $I0 = defined $P43["AAAAA"]
     print $I0
-    $I0 = defined $P16["ABCDE"]
+    $I0 = defined $P43["ABCDE"]
     print $I0
-    $I0 = defined $P16["BBBBB"]
+    $I0 = defined $P43["BBBBB"]
     print $I0
-    $I0 = defined $P16["CCCCC"]
+    $I0 = defined $P43["CCCCC"]
     print $I0
-    $I0 = defined $P16["HHHHH"]
+    $I0 = defined $P43["HHHHH"]
     print $I0
-    $I0 = defined $P16["IIIII"]
+    $I0 = defined $P43["IIIII"]
     print $I0
     print "\n"
-    end
 .end
 
 =head1 SEE ALSO

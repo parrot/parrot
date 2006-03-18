@@ -11,7 +11,7 @@ use Test::More;
 
 =head1 NAME
 
-t/benchmark/benchmarks.t - test scrips in examples/benchmarks
+t/benchmark/benchmarks.t - test scripts in examples/benchmarks
 
 =head1 SYNOPSIS
 
@@ -19,7 +19,7 @@ t/benchmark/benchmarks.t - test scrips in examples/benchmarks
 
 =head1 DESCRIPTION
 
-Called by 'make testbench'.
+Called by 'make benchmark_tests'.
 
 =cut
 
@@ -207,8 +207,7 @@ SArray:\s\d+\.\d+s\n
     q{vpm.pir} => qq(100000;\nl hackerjust another per\n)
 );
 
-my %todo = ( q{arriter.pir}                     => 'syntax error',
-             q{arriter_o1.pir}                  => 'syntax error',
+my %todo = ( q{arriter_o1.pir}                  => 'syntax error',
              q{gc_header_new.pasm}              => 'syntax error', 
              q{gc_waves_headers.pasm}           => 'syntax error', 
              q{gc_waves_sizeable_headers.pasm}  => 'syntax error', 
