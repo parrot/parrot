@@ -69,6 +69,9 @@ trace_pmc_dump(Interp *interpreter, PMC* pmc)
         PIO_eprintf(debugger, "<!!no vtable!!>");
         return;
     }
+    if (PObj_on_free_list_TEST(pmc)) {
+        PIO_eprintf(debugger, "**************** PMC is on free list *****\n");
+    }
     if (pmc->vtable->class == pmc) {
         STRING *name = trace_class_name(interpreter, pmc);
         PIO_eprintf(debugger, "Class=%Ss:PMC(%#p)", name, pmc);

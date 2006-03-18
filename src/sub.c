@@ -270,6 +270,7 @@ STRING*
 Parrot_full_sub_name(Interp* interpreter, PMC* sub)
 {
     struct Parrot_sub * s;
+    STRING *res;
 
     if (!sub || !VTABLE_defined(interpreter, sub))
         return NULL;
@@ -277,16 +278,19 @@ Parrot_full_sub_name(Interp* interpreter, PMC* sub)
     if (PMC_IS_NULL(s->namespace)) {
         return s->name;
     } else {
+        Parrot_block_DOD(interpreter);
         if (s->name) {
 	    STRING* ns = VTABLE_get_string(interpreter, s->namespace);
 
     	    ns = string_concat(interpreter, ns,
 		string_from_cstring(interpreter, " :: ", 4), 0);
-	    return string_concat(interpreter, ns, s->name, 0);
+	    res =  string_concat(interpreter, ns, s->name, 0);
         } else {
 	    STRING* ns = string_from_cstring(interpreter, "??? :: ", 7);
-	    return string_concat(interpreter, ns, s->name, 0);
+	    res =  string_concat(interpreter, ns, s->name, 0);
 	}
+        Parrot_unblock_DOD(interpreter);
+        return res;
     }
     return NULL;
 }
@@ -377,13 +381,16 @@ Parrot_Context_infostr(Interp *interpreter, parrot_context_t *ctx)
     const char* msg = (CONTEXT(interpreter->ctx) == ctx) ?
         "current instr.:":
         "called from Sub";
+    STRING *res = NULL;
 
+    Parrot_block_DOD(interpreter);
     if (Parrot_Context_info(interpreter, ctx, &info)) {
-        return Parrot_sprintf_c(interpreter,
+        res = Parrot_sprintf_c(interpreter,
             "%s '%Ss' pc %d (%s:%d)", msg,
             info.fullname, info.pc, info.file, info.line);
     }
-    return NULL;
+    Parrot_unblock_DOD(interpreter);
+    return res;
 }
 
 /*

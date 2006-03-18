@@ -118,7 +118,15 @@ runops_trace_core(Interp *interpreter, opcode_t *pc)
     if (!interpreter->debugger) {
         PMC *pio;
 
-        debugger = interpreter->debugger = make_interpreter(interpreter, 0);
+        debugger = interpreter->debugger = 
+            /*
+             * XXX too many globals currently - disabled
+             */
+#if 0
+            make_interpreter(interpreter, 0);
+#else
+            interpreter;
+#endif
         debugger->lo_var_ptr = interpreter->lo_var_ptr;
         pio = PIO_STDERR(debugger);
         if (PIO_isatty(debugger, pio))

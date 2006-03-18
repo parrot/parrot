@@ -734,7 +734,7 @@ Parrot_dod_sweep(Interp *interpreter,
             else {
                 /* it must be dead */
 #if GC_VERBOSE
-                if (GC_DEBUG(interpreter) && PObj_report_TEST(b)) {
+                if (PObj_report_TEST(b)) {
                     fprintf(stderr, "Freeing pobject %p\n", b);
                     if (PObj_is_PMC_TEST(b)) {
                         fprintf(stderr, "\t = PMC type %s\n",
@@ -1144,6 +1144,16 @@ Parrot_dod_ms_run(Interp *interpreter, int flags)
 
     if (arena_base->DOD_block_level) {
         return;
+    }
+    if (interpreter->debugger) {
+        /*
+         * if the other interpreter did a DOD run, it can set
+         * life bits of shared objects, but these aren't reset, because
+         * they are in a different arena. When now such a PMC points to
+         * other non-shared object, these wouldn't be marked amd hence
+         * collected.
+         */
+        Parrot_dod_clear_live_bits(interpreter);
     }
     /*
      * the sync sweep is always at the end, so that
