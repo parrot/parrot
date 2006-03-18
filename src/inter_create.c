@@ -386,14 +386,10 @@ Parrot_really_destroy(int exit_code, void *vinterp)
     mem_sys_free(interpreter->exception_list);
     if (interpreter->evc_func_table)
         mem_sys_free(interpreter->evc_func_table);
-    /* strings, chartype, encodings */
+    /* strings, charsets, encodings - only once */
+    string_deinit(interpreter);
     if (!interpreter->parent_interpreter) {
         MUTEX_DESTROY(interpreter_array_mutex);
-        string_deinit(interpreter);
-        /*
-           chartype_destroy();
-           encoding_destroy();
-           */
         mem_sys_free(interpreter);
         /*
          * finally free other globals

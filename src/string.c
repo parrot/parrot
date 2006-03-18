@@ -288,9 +288,12 @@ string_init(Parrot_Interp interpreter)
 void
 string_deinit(Parrot_Interp interpreter)
 {
-    mem_sys_free(interpreter->const_cstring_table);
-    interpreter->const_cstring_table = NULL;
-    Parrot_charsets_encodings_deinit(interpreter);
+    /* all are shared between interpreters */
+    if (!interpreter->parent_interpreter) {
+        mem_sys_free(interpreter->const_cstring_table);
+        interpreter->const_cstring_table = NULL;
+        Parrot_charsets_encodings_deinit(interpreter);
+    }
 }
 
 /*
