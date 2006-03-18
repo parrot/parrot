@@ -364,9 +364,7 @@ Parrot_really_destroy(int exit_code, void *vinterp)
     }
 
     /* free vtables */
-    if (!interpreter->parent_interpreter)
-        for (i = 1; i < (int)enum_class_max; i++)
-            Parrot_destroy_vtable(interpreter, Parrot_base_vtables[i]);
+    parrot_free_vtables(interpreter);
     mmd_destroy(interpreter);
 
 

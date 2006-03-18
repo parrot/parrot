@@ -13,13 +13,13 @@
 #if !defined(PARROT_VTABLES_H_GUARD)
 #define PARROT_VTABLES_H_GUARD
 
-PARROT_API VTABLE *Parrot_new_vtable(Parrot_Interp);
-PARROT_API VTABLE *Parrot_clone_vtable(Parrot_Interp, const VTABLE *base_vtable);
-PARROT_API void Parrot_destroy_vtable(Parrot_Interp, VTABLE *vtable);
+PARROT_API VTABLE *Parrot_new_vtable(Interp*);
+PARROT_API VTABLE *Parrot_clone_vtable(Interp*, const VTABLE *base_vtable);
+PARROT_API void Parrot_destroy_vtable(Interp*, VTABLE *vtable);
 
-PARROT_API void Parrot_vtable_set_type(Parrot_Interp, VTABLE *, INTVAL);
-PARROT_API void Parrot_vtable_set_name(Parrot_Interp, VTABLE *, STRING *);
-PARROT_API void Parrot_vtable_set_data(Parrot_Interp, VTABLE *, void *);
+void parrot_alloc_vtables(Interp *);
+void parrot_realloc_vtables(Interp *);
+void parrot_free_vtables(Interp *);
 
 #endif /* PARROT_VTABLES_H_GUARD */
 

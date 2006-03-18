@@ -282,6 +282,9 @@ struct parrot_interp_t {
                                                * arena */
 
     PMC *class_hash;                          /* Hash of classes */
+    VTABLE **vtables;                         /* array of vtable ptrs */ 
+    int    n_vtable_max;                      /* highest used type */
+    int    n_vtable_alloced;                  /* alloced vtable space */
 
     struct _ParrotIOData *piodata;            /* interpreter's IO system */
 

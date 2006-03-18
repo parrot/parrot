@@ -118,16 +118,7 @@ init_world(Interp *interpreter)
     Parrot_platform_init_code();
 #endif
 
-    /*
-     * TODO allocate core vtable table only once - or per interpreter
-     *      divide globals into real globals and per interpreter
-     */
-    if (!Parrot_base_vtables) {
-        Parrot_base_vtables =
-            mem_sys_allocate_zeroed(sizeof(VTABLE *) * PARROT_MAX_CLASSES);
-        enum_class_max = enum_class_core_max;
-        class_table_size = PARROT_MAX_CLASSES;
-    }
+    parrot_alloc_vtables(interpreter);
 
     /* Call base vtable class constructor methods */
     Parrot_initialize_core_pmcs(interpreter);

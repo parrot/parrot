@@ -20,7 +20,7 @@ src/pmc.c - The base vtable calling functions
 #include <assert.h>
 #include "pmc.str"
 
-static PMC* get_new_pmc_header(Parrot_Interp, INTVAL base_type, UINTVAL flags);
+static PMC* get_new_pmc_header(Interp*, INTVAL base_type, UINTVAL flags);
 
 
 PMC * PMCNULL;
@@ -349,7 +349,7 @@ constant_pmc_new_init(Interp *interpreter, INTVAL base_type,
 /*
 
 =item C<INTVAL
-pmc_register(Parrot_Interp interp, STRING *name)>
+pmc_register(Interp* interpreter, STRING *name)>
 
 This segment handles PMC registration and such.
 
@@ -358,13 +358,13 @@ This segment handles PMC registration and such.
 */
 
 INTVAL
-pmc_register(Parrot_Interp interp, STRING *name)
+pmc_register(Interp* interpreter, STRING *name)
 {
     INTVAL type;
     PMC *classname_hash;
     /* If they're looking to register an existing class, return that
        class' type number */
-    if ((type = pmc_type(interp, name)) > enum_type_undef) {
+    if ((type = pmc_type(interpreter, name)) > enum_type_undef) {
         return type;
     }
     if (type < enum_type_undef) {
@@ -377,32 +377,19 @@ pmc_register(Parrot_Interp interp, STRING *name)
        this, though */
     LOCK(class_count_mutex);
     /* Try again, just in case */
-    if ((type = pmc_type(interp, name)) != enum_type_undef) {
+    if ((type = pmc_type(interpreter, name)) != enum_type_undef) {
         UNLOCK(class_count_mutex);
         return type;
     }
 
-    classname_hash = interp->class_hash;
+    classname_hash = interpreter->class_hash;
     type = enum_class_max++;
     /* Have we overflowed the table? */
-    if (enum_class_max > class_table_size - 1) {
-        VTABLE **new_vtable_table;
-        /* 10 bigger seems reasonable, though it's only a pointer
-           table and we could get bigger without blowing much memory
-        */
-        INTVAL new_max = class_table_size + 10;
-        INTVAL new_size = new_max * sizeof(VTABLE *);
-        INTVAL i;
-        new_vtable_table = mem_sys_realloc(Parrot_base_vtables, new_size);
-        /* Should set all the empty slots to the null PMC's
-           vtable pointer */
-        for (i = class_table_size; i < new_max; ++i)
-            new_vtable_table[i] = NULL;
-        Parrot_base_vtables = new_vtable_table;
-        class_table_size = new_max;
+    if (type >= class_table_size) {
+        parrot_realloc_vtables(interpreter);
     }
     /* set entry in name->type hash */
-    VTABLE_set_integer_keyed_str(interp, classname_hash, name, type);
+    VTABLE_set_integer_keyed_str(interpreter, classname_hash, name, type);
 
     UNLOCK(class_count_mutex);
 
@@ -412,7 +399,7 @@ pmc_register(Parrot_Interp interp, STRING *name)
 /*
 
 =item C<INTVAL
-pmc_type(Parrot_Interp interp, STRING *name)>
+pmc_type(Interp* interpreter, STRING *name)>
 
 Returns the PMC type for C<name>.
 
@@ -421,15 +408,15 @@ Returns the PMC type for C<name>.
 */
 
 INTVAL
-pmc_type(Parrot_Interp interp, STRING *name)
+pmc_type(Interp* interpreter, STRING *name)
 {
     HashBucket *bucket;
-    PMC *classname_hash = interp->class_hash;
+    PMC *classname_hash = interpreter->class_hash;
 
-    bucket = hash_get_bucket(interp, PMC_struct_val(classname_hash), name);
+    bucket = hash_get_bucket(interpreter, PMC_struct_val(classname_hash), name);
     if (bucket)
         return PMC_int_val((PMC*) bucket->value);
-    return Parrot_get_datatype_enum(interp, name);
+    return Parrot_get_datatype_enum(interpreter, name);
 
 }
 
@@ -534,7 +521,7 @@ Parrot_create_mro(Interp *interpreter, INTVAL type)
 =over 4
 
 =item C<void
-dod_register_pmc(Parrot_Interp interpreter, PMC* pmc)>
+dod_register_pmc(Interp* interpreter, PMC* pmc)>
 
 Registers the PMC with the interpreter's DOD registery.
 
@@ -543,7 +530,7 @@ Registers the PMC with the interpreter's DOD registery.
 */
 
 void
-dod_register_pmc(Parrot_Interp interpreter, PMC* pmc)
+dod_register_pmc(Interp* interpreter, PMC* pmc)
 {
     PMC *registry;
     /* Better not trigger a DOD run with a potentially unanchored PMC */
@@ -563,7 +550,7 @@ dod_register_pmc(Parrot_Interp interpreter, PMC* pmc)
 /*
 
 =item C<void
-dod_unregister_pmc(Parrot_Interp interpreter, PMC* pmc)>
+dod_unregister_pmc(Interp* interpreter, PMC* pmc)>
 
 Unregisters the PMC from the interpreter's DOD registery.
 
@@ -572,7 +559,7 @@ Unregisters the PMC from the interpreter's DOD registery.
 */
 
 void
-dod_unregister_pmc(Parrot_Interp interpreter, PMC* pmc)
+dod_unregister_pmc(Interp* interpreter, PMC* pmc)
 {
     if (!interpreter->DOD_registry)
         return; /* XXX or signal exception? */

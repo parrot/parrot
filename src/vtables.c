@@ -41,6 +41,10 @@ Parrot_clone_vtable(Parrot_Interp interpreter, const VTABLE *base_vtable)>
 
 Clones C<*base_vtable> and returns a pointer to the new C<VTABLE>.
 
+=item C<void
+Parrot_destroy_vtable(Parrot_Interp interpreter, VTABLE *vtable)>
+
+Destroys C<*vtable>.
 =cut
 
 */
@@ -54,69 +58,50 @@ Parrot_clone_vtable(Parrot_Interp interpreter, const VTABLE *base_vtable) {
     return new_vtable;
 }
 
-/*
-
-=item C<void
-Parrot_vtable_set_type(Parrot_Interp interpreter, VTABLE *vtable, INTVAL type)>
-
-Sets the type of C<*vtable> to C<type>.
-
-=cut
-
-*/
-
-void
-Parrot_vtable_set_type(Parrot_Interp interpreter, VTABLE *vtable, INTVAL type) {
-    vtable->base_type = type;
-}
-
-/*
-
-=item C<void
-Parrot_vtable_set_name(Parrot_Interp interpreter, VTABLE *vtable,
-                       STRING *whoami)>
-
-Sets the name of C<*vtable> to C<*whoami>.
-
-=cut
-
-*/
-
-void
-Parrot_vtable_set_name(Parrot_Interp interpreter, VTABLE *vtable, STRING *whoami) {
-    vtable->whoami = whoami;
-}
-
-/*
-
-=item C<void
-Parrot_vtable_set_data(Parrot_Interp interpreter, VTABLE *vtable, void *stuff)>
-
-Sets the data of C<*vtable> to C<*stuff>.
-
-=cut
-
-*/
-
-void
-Parrot_vtable_set_data(Parrot_Interp interpreter, VTABLE *vtable, void *stuff) {
-    vtable->class = stuff;
-}
-
-/*
-
-=item C<void
-Parrot_destroy_vtable(Parrot_Interp interpreter, VTABLE *vtable)>
-
-Destroys C<*vtable>.
-
-=cut
-
-*/
 
 void
 Parrot_destroy_vtable(Parrot_Interp interpreter, VTABLE *vtable) {
     mem_sys_free(vtable);
+}
+
+void 
+parrot_alloc_vtables(Interp *interpreter)
+{
+    if (!Parrot_base_vtables) {
+        Parrot_base_vtables =
+            mem_sys_allocate_zeroed(sizeof(VTABLE *) * PARROT_MAX_CLASSES);
+        enum_class_max = enum_class_core_max;
+        class_table_size = PARROT_MAX_CLASSES;
+    }
+}
+
+void 
+parrot_realloc_vtables(Interp *interpreter)
+{
+    VTABLE **new_vtable_table;
+    /* 10 bigger seems reasonable, though it's only a pointer
+       table and we could get bigger without blowing much memory
+       */
+    INTVAL new_max = class_table_size + 10;
+    INTVAL new_size = new_max * sizeof(VTABLE *);
+    INTVAL i;
+    new_vtable_table = mem_sys_realloc(Parrot_base_vtables, new_size);
+    /* Should set all the empty slots to the null PMC's
+       vtable pointer */
+    for (i = class_table_size; i < new_max; ++i)
+        new_vtable_table[i] = NULL;
+    Parrot_base_vtables = new_vtable_table;
+    class_table_size = new_max;
+}
+
+void 
+parrot_free_vtables(Interp *interpreter)
+{
+    int i;
+
+    if (!interpreter->parent_interpreter)
+        for (i = 1; i < (int)enum_class_max; i++)
+            Parrot_destroy_vtable(interpreter, Parrot_base_vtables[i]);
 }
 
 /*
