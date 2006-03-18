@@ -985,9 +985,9 @@ This helper function helps with :lang(PIR) closures in rules
 by adding a ".sub" wrapper around the code if one isn't 
 already present.
 
-=cut
-
 =back
+
+=cut
 
 .namespace [ "PGE::P6Rule" ]
 
