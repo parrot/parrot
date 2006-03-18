@@ -42,6 +42,25 @@ p6rule_like("123 any",
      }}}}",
      qr/foo/, "multi-line PASM closure");
 
+p6rule_like("abcdef",
+    ":lang(PIR) abc {{{{
+        .return (\"xyz\")
+     }}}}",
+    qr/xyz/, "PIR closure with return");
 
+p6rule_like("abcdef",
+    ":lang(PIR) abc {{{{
+        .return (\"xyz\")
+     }}}} ghi",
+    qr/xyz/, "PIR closure with return always succeeds");
+
+p6rule_like("1234xyz5678",
+    ":lang(PIR) 2\\d\\d {{{{
+        \$I0 = match
+        \$I0 += 123
+        .return (\$I0)
+     }}}} ghi",
+    qr/357/, "PIR closure modifying match");
+ 
 # remember to change the number of tests :-)
-BEGIN { plan tests => 3; }
+BEGIN { plan tests => 6; }

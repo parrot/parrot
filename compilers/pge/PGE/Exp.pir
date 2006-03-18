@@ -1192,8 +1192,13 @@ register.
     emit(code, "  %s_1:", label)
     emit(code, "    $P1 = $P0[$S0]")
     emit(code, "    mpos = pos")
-    emit(code, "    $P1(mob)")
-    emit(code, "    goto %s", next)
+    emit(code, "    ($P0 :optional, $I0 :opt_flag) = $P1(mob)")
+    emit(code, "    if $I0 == 0 goto %s", next)
+    emit(code, "    setattribute mob, \"PGE::Match\\x0$!return\", $P0")
+    self.emitsub(code, "succeed", "pos")
+    emit(code, "    null $P0")
+    emit(code, "    setattribute mob, \"PGE::Match\\x0$!return\", $P0")
+    emit(code, "    goto fail")
     .return ()
 .end
 

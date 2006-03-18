@@ -19,6 +19,7 @@ This file implements match objects returned by the Parrot Grammar Engine.
     addattribute base, "$.pos"                     # current match position
     addattribute base, "&!corou"                   # match's corou
     addattribute base, "@!capt"                    # subpattern captures
+    addattribute base, "$!return"                  # return value
     .return ()
 .end
 
@@ -132,6 +133,44 @@ Returns the offset at the end of this match.
     .return (to)
 .end
 
+=item C<substring()>
+
+Returns the portion of the target string matched by this object.
+
+=cut
+
+.sub "substr" :method
+    $P0 = getattribute self, "PGE::Match\x0$.target"
+    $P1 = getattribute self, "PGE::Match\x0$.from"
+    $P2 = getattribute self, "PGE::Match\x0$.pos"
+    if $P2 < 0 goto false
+    if $P2 <= $P1 goto false
+    $I1 = $P1
+    $I2 = $P2
+    $I2 -= $I1
+    $S1 = substr $P0, $I1, $I2
+    .return ($S1)
+  false:
+    .return ("")
+.end
+
+=item C<value()>
+
+Returns the "return value" for the match object.  If no return value has
+been explicitly set (by an embedded closure), return the substring
+that was matched by this match object.
+
+=cut
+
+.sub "value" :method
+    $P0 = getattribute self, "PGE::Match\x0$!return"
+    if_null $P0, value_1
+    .return ($P0)
+  value_1:
+    $S0 = self."substr"()
+    .return ($S0)
+.end
+
 =item C<__get_bool()>
 
 Returns 1 if this object successfully matched the target string,
@@ -153,8 +192,7 @@ Returns the integer value of this match.
 =cut
 
 .sub "__get_integer" :method
-    $S0 = self
-    $I0 = $S0
+    $I0 = self."value"()
     .return ($I0)
 .end
 
@@ -165,8 +203,7 @@ Returns the numeric value of this match.
 =cut
 
 .sub "__get_number" :method
-    $S0 = self
-    $N0 = $S0
+    $N0 = self."value"()
     .return ($N0)
 .end
 
@@ -177,18 +214,8 @@ Returns the portion of the target string matched by this object.
 =cut
 
 .sub "__get_string" :method
-    $P0 = getattribute self, "PGE::Match\x0$.target"
-    $P1 = getattribute self, "PGE::Match\x0$.from"
-    $P2 = getattribute self, "PGE::Match\x0$.pos"
-    if $P2 < 0 goto false
-    if $P2 <= $P1 goto false
-    $I1 = $P1
-    $I2 = $P2
-    $I2 -= $I1
-    $S1 = substr $P0, $I1, $I2
-    .return ($S1)
-  false:
-    .return ("")
+    $S0 = self."value"()
+    .return ($S0)
 .end
 
 =item C<__get_string_keyed_int(int key)>

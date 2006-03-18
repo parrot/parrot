@@ -83,6 +83,12 @@
     $P0["n"] = unicode:"\x0a\x0d\x0c\x85\u2028\u2029"
     # See http://www.unicode.org/Public/UNIDATA/PropList.txt for above
 
+    # Create and store closure preprocessors in %closure_pp
+    $P0 = new Hash
+    store_global "PGE::P6Rule", "%closure_pp", $P0
+    $P1 = find_global "PGE::P6Rule", "PIR_closure"
+    $P0["PIR"] = $P1
+
     $P0 = find_global "PGE", "p6rule"
     compreg "PGE::P6Rule", $P0
 .end
@@ -951,15 +957,39 @@
 
 .sub "p6analyze" :method
     .param pmc pad
-    $S0 = pad[":lang"]
-    self["lang"] = $S0
-    if $S0 != "PIR" goto end
+    .local string lang
+    .local pmc closure_pp
+    .local pmc closure_fn
+    lang = pad[":lang"]
+    self["lang"] = lang
+    # see if we need to do any pre-processing of the closure
+    closure_pp = find_global "PGE::P6Rule", "%closure_pp"
+    $I0 = defined closure_pp[lang]
+    if $I0 == 0 goto end
+    closure_fn = closure_pp[lang]
     $S1 = self["value"]
-    $I0 = index $S1, ".sub"
-    if $I0 >= 0 goto end
-    $S1 = concat ".sub anon :anon\n.param pmc match\n", $S1
-    $S1 .= "\n.end\n"
+    $S1 = closure_fn($S1)
     self["value"] = $S1
   end:
     .return (self)
+.end
+
+=item C<PIR_closure(string code)>
+
+This helper function helps with :lang(PIR) closures in rules
+by adding a ".sub" wrapper around the code if one isn't 
+already present.
+
+=cut
+
+.namespace [ "PGE::P6Rule" ]
+
+.sub "PIR_closure"
+    .param string code
+    $I0 = index code, ".sub"
+    if $I0 >= 0 goto end
+    code = concat ".sub anon :anon\n.param pmc match\n", code
+    code .= "\n.end\n"
+  end:
+    .return (code)
 .end
