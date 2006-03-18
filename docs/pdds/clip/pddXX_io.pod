@@ -36,118 +36,26 @@ such as a file, keyboard, or text console. Streams are also called
 =head1 DESCRIPTION
 
 This is a draft document defining Parrot's I/O subsystem, for both
-streams and network I/O.
-
-=head2 Synchronous and Asynchronous operations
-
-Currently, Parrot only implements synchronous I/O operations.
-Asynchronous operations are essentially the same as the synchronous
-operations, but each asynchronous operation runs in its own thread.
-
-Note: this is a deviation from the existing plan, which had all I/O
-operations run internally as asynchronous, and the synchronous
-operations as a compatibility layer on top of the asynchronous
-operations. This conceptual simplification means that all I/O operations
-are possible without threading support (for example, in a stripped-down
-version of Parrot running on a PDA). [Though, asynchronous operations
-don't have to use Parrot threads, they could use some alternate
-threading implementation, but it's overkill to develop two threading
-implementations.]
-
-The asynchronous I/O implementation will use Parrot's I/O layer
-architecture so some platforms can take advantage of their built-in
-asynchronous operations instead of using Parrot threads.
-
-Communication between the calling code and the asynchronous operation
-thread will be handled by a shared status object. The operation thread
-will update the status object whenever the status changes, and the
-calling code can check the status object at any time. 
+streams and network I/O. Parrot has both synchronous and asynchronous
+I/O operations. This section describes the interface, and the
+L<IMPLEMENTATION> section provides more details on general
+implementation questions and error handling. 
 
 The signatures for the asynchronous operations are nearly identical to
 the synchronous operations, but the asynchronous operations take an
 additional argument for a callback, and the only return value from the
 asynchronous operations is a status object. The callbacks take the
 status object as their first argument, and any return values as their
-second arguments. [This relies on the presence of a callback argument to
-mark which calls should be asynchronous. If we want asynchronous calls
-that don't supply callbacks (perhaps if the user wants to manually check
-later if the operation succeded) we would need another strategy to
-differentiate the two. This is probably enough of a fringe case that we
-don't need to provide opcodes for it.]
+remaining arguments. 
 
-=head2 Error handling
-
-Currently some of the networking opcodes (C<connect>, C<recv>, C<send>,
-C<poll>, C<bind>, and C<listen>) return an integer indicating the status
-of the call, -1 or a system error code if unsuccessful. Other I/O
-opcodes (such as C<getfd> and C<accept>) have various different
-strategies for error notification, and others have no way of marking
-errors at all. We want to unify all I/O opcodes so they use a consistent
-strategy for error notification. There are several options in how we do
-this.
-
-=head3 Integer status codes
-
-One approach is to have every I/O operation return an integer status
-code indicating success or failure. This approach has the advantage of
-being lightweight: returning a single additional integer is cheap. The
-disadvantage is that it's not very flexible: the only way to look for
-errors is to check the integer return value, possibly comparing it to a
-predefined set of error constants.
-
-=head3 Exceptions
-
-Another option is to have all I/O operations throw exceptions on errors.
-The advantage is that it keeps the error tracking information
-out-of-band, so it doesn't affect the arguments or return values of the
-calls (some opcodes that have a return value plus an integer status code
-have odd looking signatures). One disadvantage of this approach is that
-it forces all users to handle exceptions from I/O operations even if
-they aren't using exceptions otherwise. 
-
-A more significant disadvantage is that exeptions don't work well with
-asynchronous operations. Exception handlers are set for a particular
-dynamic scope, but with an asynchronous operation, by the time an
-exception is thrown execution has already left the dynamic scope where
-the exception handler was set. [Though, this partly depends on how
-exceptions are implemented.]
-
-=head3 Error callbacks
-
-A minor variation on the exceptions option is to pass an error callback
-into each I/O opcode. This solves the problem of asynchronous operations
-because the operation has its own custom error handling code rather than
-relying on an exception handler in its dynamic scope.
-
-The disadvantage is that the user has to define a custom error handler
-routine for every call. It also doesn't cope well with cases where
-multiple different kinds of errors may be returned by a single opcode.
-(The one error handler would have to cope with all possible types of
-errors.) There is an easier way.
-
-=head3 Hybrid solution
-
-Another option is to return a status object from each I/O operation. The
-status object could be used to get an integer status code, string
-status/error message, or boolean success value. It could also provide a
-method to throw an exception on error conditions. There could even be a
-global option that tells Parrot to always throw exceptions on errors in
-synchronous I/O operations, implemented by calling this method on the
-status object before returning from the I/O opcode.
-
-The advantages are that this works well with asynchronous and
-synchronous operations, and provides flexibility for multiple different
-uses.  Also, something like a status object will be needed anyway to
-allow users to check on the status of a particular asynchronous call in
-progress, so this is a nice unification.
-
-The disadvantage is that a status object involves more overhead than a
-simple integer status code.
-
+The listing below says little about whether the opcodes return error
+information. For now assume that they can either return a status object,
+or return nothing. Error handling is discussed more thoroughly in the
+implementation section.
 
 =head2 I/O Stream Opcodes
 
-=head3 Opening and Closing Streams
+=head3 Opening and closing streams
 
 =over 4
 
@@ -182,7 +90,7 @@ passing it a status object.
 
 =back
 
-=head3 Retrieving Existing Streams
+=head3 Retrieving existing streams
 
 These opcodes do not have asynchronous variants.
 
@@ -201,7 +109,7 @@ specify the mode.
 
 =back
 
-=head3 Writing to Streams
+=head3 Writing to streams
 
 =over 4
 
@@ -225,7 +133,7 @@ If they want an asynchronous version, they can use C<print>.]
 
 =back
 
-=head3 Reading From Streams
+=head3 Reading from streams
 
 =over 4
 
@@ -264,7 +172,7 @@ to be a synchronous one.]
 
 =back
 
-=head3 Retrieving and Setting Stream Properties
+=head3 Retrieving and setting stream properties
 
 =over 4
 
@@ -278,7 +186,9 @@ arguments (one for the first 32 bits of the 64-bit offset, and one for
 the second 32 bits). [The two-register emulation for 64-bit integers may
 be deprecated in the future.]
 
-No asynchronous version.
+The asynchronous version takes an additional final PMC callback
+argument. When the seek operation is complete, it invokes the callback,
+passing it a status object and the stream object it was called on.
 
 =item *
 
@@ -292,9 +202,7 @@ No asynchronous version.
 
 =item *
 
-C<getfd> retrieves the UNIX integer file descriptor of a stream object,
-or 0 if it doesn't have an integer file descriptor. [Maybe -1 would be a
-better code for "undefined", since standard input is 0.]
+C<getfd> retrieves the UNIX integer file descriptor of a stream object.
 
 No asynchronous version.
 
@@ -358,8 +266,6 @@ multiplexing"), but it can retreive status information from a stream or
 socket object whether the object is being used synchronously or
 asynchronously.
 
-[This may be deprecated and replaced with a method on I/O objects.]
-
 =back
 
 =head3 Deprecated opcodes
@@ -374,18 +280,18 @@ C<print> opcode, so it will be deprecated.
 
 =back
 
-=head2 File opcodes
+=head2 Filesystem Opcodes
 
 =over 4
 
 =item *
 
 C<stat> retrieves information about a file on the filesystem. It takes a
-string filename or an integer argument of a UNIX file descriptor, and an
-integer flag for the type of information requested. It returns an
-integer containing the requested information.  The following constants
-are defined for the type of information requested (see
-F<runtime/parrot/include/stat.pasm>):
+string filename or an integer argument of a UNIX file descriptor [or an
+already opened stream object?], and an integer flag for the type of
+information requested. It returns an integer containing the requested
+information.  The following constants are defined for the type of
+information requested (see F<runtime/parrot/include/stat.pasm>):
 
   0    STAT_EXISTS
            Whether the file exists.
@@ -412,7 +318,88 @@ F<runtime/parrot/include/stat.pasm>):
   10   STAT_GID
            The group ID of the file.
 
+The asynchronous version takes an additional final PMC callback
+argument, and only returns a status object. When the stat operation is
+complete, it invokes the callback, passing it a status object and an
+integer containing the status information.
+
+=item *
+
+C<unlink> deletes a file from the filesystem. It takes a single string
+argument of a filename (including the path).
+
+The asynchronous version takes an additional final PMC callback
+argument. When the unlink operation is complete, it invokes the
+callback, passing it a status object.
+
+=item *
+
+C<rmdir> deletes a directory from the filesystem if that directory is
+empty. It takes a single string argument of a directory name (including
+the path).
+
+The asynchronous version takes an additional final PMC callback
+argument. When the rmdir operation is complete, it invokes the callback,
+passing it a status object.
+
+=item *
+
+C<opendir> opens a stream object for a directory. It takes a single
+string argument of a directory name (including the path) and returns a
+stream object.
+
+The asynchronous version takes an additional final PMC callback
+argument, and only returns a status object. When the opendir operation
+is complete, it invokes the callback, passing it a status object and a
+newly created stream object.
+
+=item *
+
+C<readdir> reads a single item from an open directory stream object. It
+takes a single stream object argument and returns a string containing
+the path and filename/directory name of the current item. (i.e. the
+directory stream object acts as an iterator.)
+
+The asynchronous version takes an additional final PMC callback
+argument, and only returns a status object. When the readdir operation
+is complete, it invokes the callback, passing it a status object and the
+string result.
+
+=item *
+
+C<telldir> returns the current position of C<readdir> operations on a
+directory stream object.
+
 No asynchronous version.
+
+=item *
+
+C<seekdir> sets the current position of C<readdir> operations on a
+directory stream object. It takes a stream object argument and an
+integer for the position. [The system C<seekdir> requires that the
+position argument be the result of a previous C<telldir> operation.]
+
+The asynchronous version takes an additional final PMC callback
+argument. When the seekdir operation is complete, it invokes the
+callback, passing it a status object and the directory stream object it
+was called on.
+
+=item *
+
+C<rewinddir> sets the current position of C<readdir> operations on a
+directory stream object back to the beginning of the directory. It takes
+a stream object argument.
+
+No asynchronous version.
+
+=item *
+
+C<closedir> closes a directory stream object. It takes a single stream
+object argument.
+
+The asynchronous version takes an additional final PMC callback
+argument. When the closedir operation is complete, it invokes the
+callback, passing it a status object.
 
 =back
 
@@ -420,7 +407,6 @@ No asynchronous version.
 
 Most of these opcodes conform to the standard UNIX interface, but the
 layer API allows alternate implementations for each.
-
 
 =over 4
 
@@ -437,7 +423,7 @@ socket object.
 
 =item *
 
-C<sockaddr> returns a string representing a socket address, generated
+C<sockaddr> returns an object representing a socket address, generated
 from a port number (integer) and an address (string).
 
 No asynchronous version.
@@ -468,14 +454,23 @@ string containing the received message.
 C<send> sends a message string to a connected socket object. 
 
 The asynchronous version takes an additional final PMC callback
-argument, and only returns a status object. When the recv operation is
+argument, and only returns a status object. When the send operation is
+complete, it invokes the callback, passing it a status object.
+
+=item *
+
+C<sendto> sends a message string to an address specified in an address
+object (first connecting to the address).
+
+The asynchronous version takes an additional final PMC callback
+argument, and only returns a status object. When the sendto operation is
 complete, it invokes the callback, passing it a status object.
 
 
 =item *
 
-C<bind> binds a socket object to the port and address specified by a
-string address (the packed result of C<sockaddr>).
+C<bind> binds a socket object to the port and address specified by an
+address object (the packed result of C<sockaddr>).
 
 The asynchronous version takes an additional final PMC callback
 argument, and only returns a status object. When the bind operation is
@@ -506,6 +501,19 @@ synchronous C<accept> has to be called repeatedly in a loop (once for
 each connection received), the asynchronous version is only called once,
 but continues to send new connection events until the socket is closed.]
 
+=item *
+
+C<shutdown> closes a socket object for reading, for writing, or for all
+I/O. It takes a socket object argument and an integer argument for the
+type of shutdown:
+
+  0    PIOSHUTDOWN_READ
+           Close the socket object for reading.
+  1    PIOSHUTDOWN_WRITE
+           Close the socket object for writing.
+  2    PIOSHUTDOWN
+           Close the socket object.
+
 =back
 
 
@@ -517,9 +525,163 @@ C<ParrotIOLayerAPI> vtable. To find an I/O function, the layer stack is
 searched downwards until a non-NULL function pointer is found for
 that particular slot.
 
+=head2 Synchronous and Asynchronous Operations
+
+Currently, Parrot only implements synchronous I/O operations.
+Asynchronous operations are essentially the same as the synchronous
+operations, but each asynchronous operation runs in its own thread.
+
+Note: this is a deviation from the existing plan, which had all I/O
+operations run internally as asynchronous, and the synchronous
+operations as a compatibility layer on top of the asynchronous
+operations. This conceptual simplification means that all I/O operations
+are possible without threading support (for example, in a stripped-down
+version of Parrot running on a PDA). [Asynchronous operations don't have
+to use Parrot threads, they could use some alternate threading
+implementation. But it's overkill to develop two threading
+implementations. If Parrot threads turn out to be too heavyweight, we
+may want to look into a lighter weight variation for asynchronous
+operations.]
+
+The asynchronous I/O implementation will use Parrot's I/O layer
+architecture so some platforms can take advantage of their built-in
+asynchronous operations instead of using Parrot threads.
+
+Communication between the calling code and the asynchronous operation
+thread will be handled by a shared status object. The operation thread
+will update the status object whenever the status changes, and the
+calling code can check the status object at any time. [Twisted has an
+interesting variation on this, in that it replaces the status object
+with the returned result of the asynchronous call when the call is
+complete. That is probably too confusing, but we might give the status
+object a reference to the returned result.]
+
+The current strategy for differentating the synchronous calls from
+asynchronous ones relies on the presence of a callback argument in the
+asynchronous calls. If we wanted asynchronous calls that don't supply
+callbacks (perhaps if the user wants to manually check later if the
+operation succeded) we would need another strategy to differentiate the
+two. This is probably enough of a fringe case that we don't need to
+provide opcodes for it, provided they can access the functionality via
+methods on ParrotIO objects.
+
+=head2 Error Handling
+
+Currently some of the networking opcodes (C<connect>, C<recv>, C<send>,
+C<poll>, C<bind>, and C<listen>) return an integer indicating the status
+of the call, -1 or a system error code if unsuccessful. Other I/O
+opcodes (such as C<getfd> and C<accept>) have various different
+strategies for error notification, and others have no way of marking
+errors at all. We want to unify all I/O opcodes so they use a consistent
+strategy for error notification. There are several options in how we do
+this.
+
+=head3 Integer status codes
+
+One approach is to have every I/O operation return an integer status
+code indicating success or failure. This approach has the advantage of
+being lightweight: returning a single additional integer is cheap. The
+disadvantage is that it's not very flexible: the only way to look for
+errors is to check the integer return value, possibly comparing it to a
+predefined set of error constants.
+
+=head3 Exceptions
+
+Another option is to have all I/O operations throw exceptions on errors.
+The advantage is that it keeps the error tracking information
+out-of-band, so it doesn't affect the arguments or return values of the
+calls (some opcodes that have a return value plus an integer status code
+have odd looking signatures). One disadvantage of this approach is that
+it forces all users to handle exceptions from I/O operations even if
+they aren't using exceptions otherwise. 
+
+A more significant disadvantage is that exeptions don't work well with
+asynchronous operations. Exception handlers are set for a particular
+dynamic scope, but with an asynchronous operation, by the time an
+exception is thrown execution has already left the dynamic scope where
+the exception handler was set. [Though, this partly depends on how
+exceptions are implemented.]
+
+=head3 Error callbacks
+
+A minor variation on the exceptions option is to pass an error callback
+into each I/O opcode. This solves the problem of asynchronous operations
+because the operation has its own custom error handling code rather than
+relying on an exception handler in its dynamic scope.
+
+The disadvantage is that the user has to define a custom error handler
+routine for every call. It also doesn't cope well with cases where
+multiple different kinds of errors may be returned by a single opcode.
+(The one error handler would have to cope with all possible types of
+errors.) There is an easier way.
+
+=head3 Hybrid solution
+
+Another option is to return a status object from each I/O operation. The
+status object could be used to get an integer status code, string
+status/error message, or boolean success value. It could also provide a
+method to throw an exception on error conditions. There could even be a
+global option (or an option set on a particular I/O object) that tells
+Parrot to always throw exceptions on errors in synchronous I/O
+operations, implemented by calling this method on the status object
+before returning from the I/O opcode.
+
+The advantages are that this works well with asynchronous and
+synchronous operations, and provides flexibility for multiple different
+uses.  Also, something like a status object will be needed anyway to
+allow users to check on the status of a particular asynchronous call in
+progress, so this is a nice unification.
+
+The disadvantage is that a status object involves more overhead than a
+simple integer status code.
+
+=head2 IPv6 Support
+
+The transition from IPv4 to IPv6 is in progress, though not likely to be
+complete anytime soon. Most operating systems today offer at least
+dual-stack IPv6 implementations, so they can use either IPv4 or IPv6,
+depending on what's available. Parrot also needs to support either
+protocol. For the most part, the network I/O opcodes should internally
+handle either addressing scheme, without requiring the user to specify
+which scheme is being used.
+
+IETF recommends defaulting to IPv6 connections and falling back to IPv4
+connections when IPv6 fails. This would give us more solid testing of
+Parrot's compatibility IPv6, but may be too slow. Either way, it's a
+good idea to make setting the default (or selecting one exclusively) an
+option when compiling Parrot.
+
+The most important issues for Parrot to consider with IPv6 are:
+
+=over 4
+
+=item *
+
+Support 128 bit addresses. IPv6 addresses are colon-separated
+hexadecimal numbers, such as C<20a:95ff:fef5:7e5e>.
+
+=item *
+
+Any address parsing should be able to support the address separated from
+a port number or prefix/length by brackets: C<[20a:95ff:fef5:7e5e]:80>
+and C<[20a:95ff::]/64>.
+
+=item *
+
+Packed addresses, such as the result of the C<sockaddr> opcode, should
+be passed around as an object (or at least a structure) rather than as a
+string.
+
+=back
+
+See the relevant IETF RFCs: "Application Aspects of IPv6 Transition"
+(http://www.ietf.org/rfc/rfc4038.txt) and "Basic Socket Interface
+Extensions for IPv6" (http://www.ietf.org/rfc/rfc3493.txt).
+
+=head2 Excerpt
+
 [Below is an excerpt from "Perl 6 and Parrot Essentials", included to
-seed discussion. Note that while Parrot was originally specified as
-having asynchronous I/O, all current opcodes are synchronous I/O.]
+seed discussion.]
 
 Parrot's base I/O system is fully asynchronous I/O with callbacks and
 per-request private data. Since this is massive overkill in many cases,
@@ -600,6 +762,8 @@ None.
   runtime/parrot/library/Stream/*
   src/io/io_unix.c
   src/io/io_win32.c
+  Perl 5's IO::AIO
+  Perl 5's POE
 
 =cut
 
