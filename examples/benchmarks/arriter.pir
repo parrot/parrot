@@ -14,8 +14,16 @@ examples/benchmarks/arriter.pir - Iterator Benchmark
 Hand crafted PIR code version of F<examples/benchmarks/arriter.pl> as
 it might come out of a compiler.
 
-=cut
+=head1 TODO
 
+'find_lex' for PerlArray PMC behaves strangely.
+
+=head1 SEE ALSO
+
+F<examples/benchmarks/arriter.pl>,
+F<examples/benchmarks/arriter_o1.pir>.
+
+=cut
 
 .sub arriter :main
 .include "iterator.pasm"
@@ -137,10 +145,3 @@ iter_2_end:
     print $I0
     print "\n"
 .end
-
-=head1 SEE ALSO
-
-F<examples/benchmarks/arriter.pl>,
-F<examples/benchmarks/arriter_o1.pir>.
-
-=cut

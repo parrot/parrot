@@ -24,7 +24,8 @@ Called by 'make benchmark_tests'.
 =cut
 
 
-# Set up expected output from files in 'examples/benchmarks'
+# Expected output from scripts in 'examples/benchmarks'.
+# The expected out is needed for checking results with pir_output_is() and pir_output_like(). 
 my %outputs = (
     q{addit.pir} => qq(21001097.970000\n),
     q{addit.pasm} => qq(21001097.970000\n),
@@ -207,8 +208,8 @@ SArray:\s\d+\.\d+s\n
     q{vpm.pir} => qq(100000;\nl hackerjust another per\n)
 );
 
-my %todo = ( q{arriter_o1.pir}                  => 'syntax error',
-             q{gc_header_new.pasm}              => 'syntax error', 
+# These scripts are known to be failing.
+my %todo = ( q{gc_header_new.pasm}              => 'syntax error', 
              q{gc_waves_headers.pasm}           => 'syntax error', 
              q{gc_waves_sizeable_headers.pasm}  => 'syntax error', 
              q{stress3.pasm}                    => 'Null PMC access in get_integer()',
@@ -216,7 +217,6 @@ my %todo = ( q{arriter_o1.pir}                  => 'syntax error',
 
 
 plan tests => scalar keys %outputs;
-# plan skip_all => 'currently not working';1
 
 foreach ( sort keys %outputs ) {
     SKIP: {
