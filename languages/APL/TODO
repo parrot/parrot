@@ -3,3 +3,16 @@
 - allow precompilation of the TGE work - no reason to run this every runtime.
 
 - RT #38733 - can't read in utf-8 encoded files at the moment.
+
+- Allow specification of vectors
+
+- Allow binary/unary versions of the same operator, e.g.:
+
+⌈ 2.5
+3
+
+as opposed to
+
+ 2 ⌈ 3
+3
+
