@@ -15,13 +15,13 @@ Hand crafted PIR code version of F<examples/benchmarks/arriter.pl>.
 
 The PIR code is the same as in arriter.pir, with following optimizations:
 
-=over4
+=over 4
  
 =item pull somecode out of the inner loop, s. opt below
 
 =back
 
-=head TODO
+=head1  TODO
 
 Optimize more.
 'find_lex' for PerlArray PMC behaves strangely.
