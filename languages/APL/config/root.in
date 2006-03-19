@@ -68,17 +68,18 @@ help:
 	@echo ""
 
 test: all
-	$(PERL) -Ilib t@slash@harness t@slash@.*t
+	$(PERL) -Ilib t@slash@harness t@slash@*.t
 
 testclean:
-	$(RM_F) "t@slash@*.p1" "t@slash@*.out"
+	$(RM_F) "t@slash@*.apl" "t@slash@*.out"
 
 clean: testclean
-	$(RM_F) APL.pbc
-	$(RM_F) $(GENERATED)
-	$(RM_F) "lib@slash@*.pbc"
-	$(RM_F) "lib@slash@PAST@slash@*.pbc"
-	$(RM_F) "lib@slash@POST@slash@*.pbc"
+	$(RM_F) \
+  APL.pbc \
+  $(GENERATED) \
+  "lib@slash@*.pbc" \
+  "lib@slash@PAST@slash@*.pbc" \
+  "lib@slash@POST@slash@*.pbc"
 
 realclean: clean
 	$(RM_F) Makefile

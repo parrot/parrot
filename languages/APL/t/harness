@@ -5,7 +5,7 @@ use strict;
 use Test::Harness;
 use File::Spec;
 
-my $language = "punie";
+my $language = "APL";
 
 =pod
 
