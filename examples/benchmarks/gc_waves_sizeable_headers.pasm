@@ -42,7 +42,6 @@ indicating:
 mainloop:
 
 loopup:
-	pushs
 	concat S1, S0, S0
 	concat S2, S0, S0
 	concat S3, S0, S0
@@ -68,7 +67,6 @@ loopup:
 	lt I1, I0, loopup
 
 loopdown:
-	pops
 	dec I1
 	gt I1, 0, loopdown
 

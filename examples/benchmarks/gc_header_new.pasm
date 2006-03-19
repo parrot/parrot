@@ -32,6 +32,17 @@ indicating:
 
 =back
 
+=head1 SEE ALSO
+
+F<examples/benchmarks/bench_newp.pasm>,
+F<examples/benchmarks/gc_alloc_new.pasm>,
+F<examples/benchmarks/gc_alloc_reuse.pasm>,
+F<examples/benchmarks/gc_generations.pasm>,
+F<examples/benchmarks/gc_header_reuse.pasm>,
+F<examples/benchmarks/gc_waves_headers.pasm>,
+F<examples/benchmarks/gc_waves_sizeable_data.pasm>,
+F<examples/benchmarks/gc_waves_sizeable_headers.pasm>.
+
 =cut
 
 	set I0, 40000
@@ -71,7 +82,6 @@ loop:
 	concat S29, S0, S0
 	concat S30, S0, S0
 	concat S31, S0, S0
-	pushs
 	inc I1
 	lt I1, I0, loop
 
@@ -113,16 +123,3 @@ getout:	time N6
 	print " total Buffer structs\n"
 
 	end
-
-=head1 SEE ALSO
-
-F<examples/benchmarks/bench_newp.pasm>,
-F<examples/benchmarks/gc_alloc_new.pasm>,
-F<examples/benchmarks/gc_alloc_reuse.pasm>,
-F<examples/benchmarks/gc_generations.pasm>,
-F<examples/benchmarks/gc_header_reuse.pasm>,
-F<examples/benchmarks/gc_waves_headers.pasm>,
-F<examples/benchmarks/gc_waves_sizeable_data.pasm>,
-F<examples/benchmarks/gc_waves_sizeable_headers.pasm>.
-
-=cut

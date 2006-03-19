@@ -208,10 +208,8 @@ SArray:\s\d+\.\d+s\n
 );
 
 # These scripts are known to be failing.
-my %todo = ( q{gc_header_new.pasm}              => 'syntax error', 
-             q{gc_waves_headers.pasm}           => 'syntax error', 
-             q{gc_waves_sizeable_headers.pasm}  => 'syntax error', 
-             q{stress3.pasm}                    => 'Null PMC access in get_integer()',
+my %todo = ( 
+             q{stress3.pasm}                    => 'Null PMC access in get_integer(), P5 is no longer special',
            );
 
 plan tests => scalar keys %outputs;
