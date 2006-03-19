@@ -24,50 +24,50 @@ src/builtin.c - Builtin Methods
 
 
 typedef struct _builtin {
-    const char *c_name;		/* short name 'cos' */
-    const char *signature;	/* e.g. PP */
-    const char *c_ns;		/* namespace */
-    STRING *meth_name;	/* internal name e.g. '__cos' */
-    STRING *namespace;	/* same */
+    const char *c_name;         /* short name 'cos' */
+    const char *signature;      /* e.g. PP */
+    const char *c_ns;           /* namespace */
+    STRING *meth_name;          /* internal name e.g. '__cos' */
+    STRING *namespace;          /* same */
 } Builtins;
 
 static Builtins builtins[] = {
-    { "acos", 	"PJO", 		"Float", 	0, 0 },
-    { "asec", 	"PJO", 		"Float", 	0, 0 },
-    { "asin", 	"PJO", 		"Float", 	0, 0 },
-    { "atan", 	"PJO", 		"Float", 	0, 0 },
-    { "atan2", 	"PJOP",		"Float", 	0, 0 },
+    { "acos",   "PJO",          "Float",        0, 0 },
+    { "asec",   "PJO",          "Float",        0, 0 },
+    { "asin",   "PJO",          "Float",        0, 0 },
+    { "atan",   "PJO",          "Float",        0, 0 },
+    { "atan2",  "PJOP",         "Float",        0, 0 },
     { "copy",   "vJOSS",        "File",         0, 0 },
-    { "cos", 	"PJO", 		"Float", 	0, 0 },
-    { "cosh", 	"PJO", 		"Float", 	0, 0 },
+    { "cos",    "PJO",          "Float",        0, 0 },
+    { "cosh",   "PJO",          "Float",        0, 0 },
     { "chdir",  "vJOS",         "OS",           0, 0 },
     { "chroot", "vJOS",         "OS",           0, 0 },
     { "cwd",    "SJO",          "OS",           0, 0 },
-    { "exp", 	"PJO", 		"Float", 	0, 0 },
+    { "exp",    "PJO",          "Float",        0, 0 },
     { "mkdir",  "vJOSI",        "OS",           0, 0 },
-    { "ln", 	"PJO", 		"Float", 	0, 0 },
-    { "log10",  "PJO",          "Float", 	0, 0 },
-    { "log2", 	"PJO", 		"Float", 	0, 0 },
+    { "ln",     "PJO",          "Float",        0, 0 },
+    { "log10",  "PJO",          "Float",        0, 0 },
+    { "log2",   "PJO",          "Float",        0, 0 },
     { "rename", "vJOSS",        "File",         0, 0 },
-    { "sec", 	"PJO", 		"Float", 	0, 0 },
-    { "sech", 	"PJO", 		"Float", 	0, 0 },
-    { "sin", 	"PJO", 		"Float", 	0, 0 },
-    { "sinh", 	"PJO", 		"Float", 	0, 0 },
-    { "tan", 	"PJO", 		"Float", 	0, 0 },
-    { "tanh", 	"PJO", 		"Float", 	0, 0 },
+    { "sec",    "PJO",          "Float",        0, 0 },
+    { "sech",   "PJO",          "Float",        0, 0 },
+    { "sin",    "PJO",          "Float",        0, 0 },
+    { "sinh",   "PJO",          "Float",        0, 0 },
+    { "tan",    "PJO",          "Float",        0, 0 },
+    { "tanh",   "PJO",          "Float",        0, 0 },
     { "index",  "IJSS.I",       "String",       0, 0 },
     { "is_integer","IJS",       "String",       0, 0 },
     { "link",   "vJOSS",        "OS",           0, 0 },
-    { "lower", 	"PJO",	        "String", 	0, 0 },
+    { "lower",  "PJO",          "String",       0, 0 },
     { "lstat",  "PJOS",         "OS",           0, 0 },
-    { "open", 	"PJS.S",	"ParrotIO", 	0, 0 },
-    { "puts", 	"IJOS",         "ParrotIO", 	0, 0 },
+    { "open",   "PJS.S",        "ParrotIO",     0, 0 },
+    { "puts",   "IJOS",         "ParrotIO",     0, 0 },
     { "reverse","vJS",          "String",       0, 0 },
     { "rm",     "vJOS",         "OS",           0, 0 },
-    { "say", 	"IJS",          "ParrotIO", 	0, 0 },
-    { "say", 	"IJOS",         "ParrotIO", 	0, 0 },
-    { "say", 	"vJS",          "ParrotIO", 	0, 0 },
-    { "say", 	"vJOS",         "ParrotIO", 	0, 0 },
+    { "say",    "IJS",          "ParrotIO",     0, 0 },
+    { "say",    "IJOS",         "ParrotIO",     0, 0 },
+    { "say",    "vJS",          "ParrotIO",     0, 0 },
+    { "say",    "vJOS",         "ParrotIO",     0, 0 },
     { "symlink","vJOSS",        "OS",           0, 0 },
     { "trans",  "vJSP",         "String",       0, 0 },
     { "umask",  "IJOI",         "OS",           0, 0 },
@@ -102,10 +102,10 @@ Parrot_init_builtins(Interp *interpreter)
     for (i = 0; i < n; ++i) {
         /* XXX mangle yes or no */
 #ifdef MANGLE_BUILTINS
-	strcpy(buffer + 2, builtins[i].c_name);
-	builtins[i].meth_name = const_string(interpreter, buffer);
+        strcpy(buffer + 2, builtins[i].c_name);
+        builtins[i].meth_name = const_string(interpreter, buffer);
 #else
-	builtins[i].meth_name = const_string(interpreter,
+        builtins[i].meth_name = const_string(interpreter,
                 builtins[i].c_name);
 #endif
         builtins[i].namespace = const_string(interpreter,
