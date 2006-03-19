@@ -37,6 +37,31 @@ The Amber PMCs are in C<languages/amber>.
 
 =back
 
+=head2 APL
+
+=over 4
+
+=item Author
+
+Will Coleda
+
+=item Description
+
+APL
+
+=item Status
+
+Virtually nonexistant
+
+=item Last verified with parrot version
+
+N/A
+
+=item Location
+
+L<languages/APL>
+
+=back
 
 =head2 BASIC/compiler
 

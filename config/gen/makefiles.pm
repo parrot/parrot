@@ -203,6 +203,12 @@ sub makefiles
         replace_slashes                  => 1
     );
     genfile(
+        'languages/APL/config/root.in' => 'languages/APL/Makefile',
+        commentType                    => '#',
+        replace_slashes                => 1,
+        conditioned_lines              => 1
+    );
+    genfile(
         'languages/tcl/config/root.in' => 'languages/tcl/Makefile',
         commentType                    => '#',
         replace_slashes                => 1,
