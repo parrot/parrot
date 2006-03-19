@@ -39,7 +39,7 @@ digit, in the form of 'print 1;'.
 
 .sub _load :load
     load_bytecode 'PGE.pbc'
-    load_bytecode 'PGE/Text.pir'
+    load_bytecode 'PGE/Text.pbc'
 
     $P0 = getclass 'PGE::Rule'
     $P1 = subclass $P0, 'PunieGrammar'
