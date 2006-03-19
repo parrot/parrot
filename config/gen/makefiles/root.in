@@ -504,9 +504,9 @@ LIBNCI_TEST_SO    = $(DYNEXT_DIR)/libnci_test$(LOAD_EXT)
 MAKE = @make_c@
 
 # These need to be above lines that define suffix rules to be portable
-# (certainly FreeBSD make doesn't grok the .imc.pbc rule otherwise)
+# (certainly FreeBSD make doesn't grok the pir.pbc rule otherwise)
 
-.SUFFIXES : .c .h .pmc .dump $(O) .str .imc .pir .pbc
+.SUFFIXES : .c .h .pmc .dump $(O) .str .pir .pbc
 
 # Passing an empty argument in @ARGV to cc_flags.pl to indicate where extra -Is
 # (etc) should go. Otherwise it will insert them after the first space, which
@@ -518,9 +518,6 @@ MAKE = @make_c@
 
 # XXX These obviously require parrot: had trouble adding parrot as a dependency
 # here, though. Ignored on OS X, at least.
-
-.imc.pbc :
-	$(PARROT) -o $@ $<
 
 .pir.pbc :
 	$(PARROT) -o $@ $<
