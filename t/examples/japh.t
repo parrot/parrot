@@ -15,7 +15,7 @@ t/examples/japh.t - Test some JAPHs
 
 =head1 SYNOPSIS
 
-	% prove t/examples/japh.t
+    % prove t/examples/japh.t
 
 =head1 DESCRIPTION
 
@@ -64,7 +64,7 @@ foreach ( 1 .. 17 ) {
         #   local $TODO = $todo{$_};
             skip $todo{$_}, 1;
 
-            example_output_is($pasm_fn, "Just another Parrot Hacker\n");
+            example_output_is( $pasm_fn, "Just another Parrot Hacker\n" );
         };
     } else {
        example_output_is($pasm_fn, "Just another Parrot Hacker\n");

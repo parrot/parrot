@@ -23,7 +23,6 @@ Called by 'make benchmark_tests'.
 
 =cut
 
-
 # Expected output from scripts in 'examples/benchmarks'.
 # The expected out is needed for checking results with pir_output_is() and pir_output_like(). 
 my %outputs = (
@@ -215,7 +214,6 @@ my %todo = ( q{gc_header_new.pasm}              => 'syntax error',
              q{stress3.pasm}                    => 'Null PMC access in get_integer()',
            );
 
-
 plan tests => scalar keys %outputs;
 
 foreach ( sort keys %outputs ) {
@@ -226,6 +224,13 @@ foreach ( sort keys %outputs ) {
         my @todo = $todo{$_} ? ( todo => $todo{$_} ) : ();
         
         # XXX use example_output_is() and example_output_like()
+        #     This does not work yet WRT to TODO
+        # if ( ref $outputs{$_} eq 'Regexp' ) {
+        #     example_output_like( "examples/benchmarks/$_", $outputs{$_}, @todo );
+        # }
+        # else {
+        #     example_output_is( "examples/benchmarks/$_", $outputs{$_}, @todo );
+        # }
         if ( ref $outputs{ $_ } eq q(Regexp) ) {
             if ( /\.pasm$/ ) {
                 pasm_output_like( $bench, $outputs{ $_ }, $_, @todo );

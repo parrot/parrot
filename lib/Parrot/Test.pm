@@ -151,6 +151,16 @@ output with the unexpected result is false.
 Determine the language from the extension of C<$example_fn> and
 runs language_output_is().
 
+=item C<example_output_like( $example_fn, $expected )>
+
+Determine the language from the extension of C<$example_fn> and
+runs language_output_like().
+
+=item C<example_output_isnt( $example_fn, $expected )>
+
+Determine the language from the extension of C<$example_fn> and
+runs language_output_isnt().
+
 =item C<skip($why, $how_many)>
 
 Use within a C<SKIP: { ... }> block to indicate why and how many test
@@ -194,20 +204,19 @@ require Test::Builder;
 require Test::More;
 
 
-@EXPORT = qw( 
+@EXPORT = qw( c_output_is        c_output_like        c_output_isnt
+              example_output_is  example_output_like  example_output_like
               language_output_is language_output_like language_output_isnt
-              example_output_is
               output_is          output_like          output_isnt
               pasm_output_is     pasm_output_like     pasm_output_isnt
+              pbc_output_is      pbc_output_like      pbc_output_isnt
               past_output_is     past_output_like     past_output_isnt
               pir_output_is      pir_output_like      pir_output_isnt
               pir_2_pasm_is      pir_2_pasm_like      pir_2_pasm_isnt
-              pbc_output_is      pbc_output_like      pbc_output_isnt
-              c_output_is        c_output_like        c_output_isnt
               plan
+              run_command
               skip
               slurp_file
-              run_command
           );
 @ISA = qw(Exporter);
 
@@ -543,6 +552,40 @@ sub _generate_functions {
         }
     }
 
+    # XXX this is broken WRT todo tests
+    my %example_test_map = (
+        example_output_is   => 'language_output_is',
+        example_output_like => 'language_output_like',
+        example_output_isnt => 'language_output_isnt',
+                           );
+
+    foreach my $func ( keys %example_test_map ) {
+        no strict 'refs';
+
+        *{$package.'::'.$func} = sub ($$;@) {
+            my ($example_fn, $expected, @options) = @_;
+
+            my %lang_for_extension 
+                = ( pasm => 'PASM',
+                    past => 'PAST',
+                    pir  => 'PIR',
+                    imc  => 'PIR', );
+
+            my ( $extension ) = $example_fn =~ m{ [.]                         # introducing extension
+                                                  ( pasm | pir | imc | past ) # match and capture the extension
+                                                  \z                          # at end of string
+                                                }ixms or Usage();
+            if ( defined $extension ) { 
+                my $code = slurp_file($example_fn);
+                my $test_func = join( '::', $package, $example_test_map{$func} );
+                $test_func->( $lang_for_extension{$extension}, $code, $expected, $example_fn, @options );
+            }
+            else {
+                fail( defined $extension, "no extension recognized for $example_fn" );
+            }
+        }
+    }
+
     my %c_test_map = (
          c_output_is   => 'is_eq',
          c_output_isnt => 'isnt_eq',
@@ -638,28 +681,6 @@ sub _generate_functions {
 
             return $pass;
         }
-    }
-}
-
-sub example_output_is {
-    my ($example_fn, $expected, @options) = @_;
-
-    my %lang_for_extension 
-        = ( pasm => 'PASM',
-            past => 'PAST',
-            pir  => 'PIR',
-            imc  => 'PIR', );
-
-    my ( $extension ) = $example_fn =~ m{ [.]                         # introducing extension
-                                          ( pasm | pir | imc | past ) # match and capture the extension
-                                          \z                          # at end of string
-                                        }ixms or Usage();
-    if ( defined $extension ) { 
-        my $code = slurp_file($example_fn);
-        language_output_is( $lang_for_extension{$extension}, $code, $expected, $example_fn, @options );
-    }
-    else {
-      fail( defined $extension, "no extension recognized for $example_fn" );
     }
 }
 
