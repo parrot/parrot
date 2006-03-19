@@ -13,7 +13,7 @@
 
     .local string source
     source = _get_source(args)
-    source = unicode:"print 10 \u00d7 2 ;\n"
+    source = unicode:"print 10 \u00d7 2\n"
 
 =for debug
 

@@ -3,9 +3,3 @@
 - allow precompilation of the TGE work - no reason to run this every runtime.
 
 - RT #38733 - can't read in utf-8 encoded files at the moment.
-
-'' strings - 
-
- -> (irc.perl.org) (11:45) From pmichaud, to #parrot: 
-  - rule delimited_single { ' [ '' | <-[']> ]* ' }
-  - rule delimited_double { " [ "" | <-["]> ]* " }                               
