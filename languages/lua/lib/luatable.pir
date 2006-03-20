@@ -160,7 +160,7 @@ B<DEPRECATED>
     .local pmc value
     .local pmc ret
     checktype(table, "table")
-    checktype(f, "Sub")
+    checktype(f, "function")
     new idx, .LuaNil
 L1:
     (idx, value) = next(table, idx)
@@ -195,7 +195,7 @@ B<DEPRECATED>
     .local int i
     .local int n
     checktype(table, "table")
-    checktype(f, "Sub")
+    checktype(f, "function")
     n = getn(table)
     i = 0
     new index, .LuaNumber
@@ -391,7 +391,7 @@ NOT YET IMPLEMENTED (see auxsort).
     n = getn(table)
     if_null comp, L1
     if comp goto L1
-    checktype(comp, "Sub")
+    checktype(comp, "function")
     goto L2
 L1:    
     .const .Sub lessthan = "lessthan"

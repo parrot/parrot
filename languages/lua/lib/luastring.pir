@@ -242,7 +242,7 @@ NOT YET IMPLEMENTED.
 
 .sub _string_dump :anon
     .param pmc function :optional
-    checktype(function, "Sub")
+    checktype(function, "function")
     not_implemented()
 .end
 

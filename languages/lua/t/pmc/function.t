@@ -159,21 +159,14 @@ false
 boolean
 OUTPUT
 
-TODO: {
-local $TODO = "not implemented.";
-
 pir_output_is(<< 'CODE', << 'OUTPUT', "check HLL");
 .HLL "Lua", "lua_group"
 .sub _main
-    .local pmc pmc1
 #    .const .LuaFunction F1 = "f1"
-    .const .Sub F1 = "f1"
-    pmc1 = F1
+    .const .Sub pmc1 = "f1"
     .local int bool1
     bool1 = isa pmc1, "LuaFunction"
     print bool1
-    print "\n"
-    print pmc1
     print "\n"
     pmc1()
     end
@@ -184,6 +177,7 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "check HLL");
 .end
 CODE
 1
+f1()
 OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "check HLL (autoboxing)");
@@ -203,8 +197,6 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "check HLL (autoboxing)");
 CODE
 1
 OUTPUT
-
-}
 
 pir_output_like(<< 'CODE', << 'OUTPUT', "check tostring");
 .HLL "Lua", "lua_group"
