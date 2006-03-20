@@ -15,7 +15,7 @@ t/table.t - Lua Table Library
 Tests Lua Table Library
 (implemented in F<languages/lua/lib/luatable.pir>).
 
-See "Lua 5.0 Reference Manual", section 5.4 "Table Manipulation".
+See "Lua 5.1 Reference Manual", section 5.5 "Table Manipulation".
 
 See "Programming in Lua", section 19 "The Table Library".
 
@@ -25,7 +25,7 @@ use strict;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 10;
+use Parrot::Test tests => 11;
 use Test::More;
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', "function concat");
@@ -85,13 +85,9 @@ OUTPUT
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', "function getn");
 print(table.getn{10,2,4})
 print(table.getn{10,2,nil})
-print(table.getn{10,2,nil; n=3})
-print(table.getn{n=1000})
 CODE
 3
 2
-3
-1000
 OUTPUT
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', "function insert");
@@ -108,17 +104,30 @@ print(table.concat(t,","))
 table.insert(t, 2, "d")
 print(table.concat(t,","))
 table.insert(t, 7, "e")
-print(t[7], table.getn(t))
+print(t[7])
 table.insert(t, -9, "f")
-print(t[-9], table.getn(t))
+print(t[-9])
 CODE
 15,10,20,30
 a
 a,b
 c,a,b
 c,d,a,b
-e	7
-f	8
+e
+f
+OUTPUT
+
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', "function maxn");
+t = {}
+print(table.maxn(t))
+t[1] = "a"
+t[2] = "b"
+print(table.maxn(t))
+-- t[6] = "g"
+-- print(table.maxn(t))
+CODE
+0
+2
 OUTPUT
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', "function remove");
@@ -150,20 +159,10 @@ nil
 b
 OUTPUT
 
-language_output_is( 'lua', << 'CODE', << 'OUTPUT', "function setn");
-a = {}
-print(table.getn(a))
+language_output_like( 'lua', << 'CODE', << 'OUTPUT', "function setn");
+a = {}                                    
 table.setn(a, 10000)
-print(table.getn(a))
-
-b = {n=10}
-print(table.getn(b))
-table.setn(b, 10000)
-print(table.getn(b))
 CODE
-0
-10000
-10
-10000
+/'setn' is obsolete/
 OUTPUT
 

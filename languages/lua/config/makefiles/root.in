@@ -4,13 +4,14 @@ PARROT  = ..@slash@..@slash@parrot@exe@
 PBC_MERGE = ..@slash@..@slash@pbc_merge@exe@
 
 LIBPATH  = lib
-BUILD   = $(PERL) @build_dir@@slash@tools@slash@build@slash@dynpmc.pl
-DESTDIR = @build_dir@@slash@runtime@slash@parrot@slash@dynext
-O       = @o@
+BUILD    = $(PERL) @build_dir@@slash@tools@slash@build@slash@dynpmc.pl
+DESTDIR  = @build_dir@@slash@runtime@slash@parrot@slash@dynext
+O        = @o@
 CLASSDIR = pmc
 LOAD_EXT = @load_ext@
 
 PMCS = \
+ lua \
  luabase \
  luaboolean \
  luafunction \
@@ -24,11 +25,13 @@ PMCS = \
 PBCS = \
  $(LIBPATH)@slash@luabasic.pbc \
  $(LIBPATH)@slash@luacoroutine.pbc \
+ $(LIBPATH)@slash@luapackage.pbc \
  $(LIBPATH)@slash@luastring.pbc \
  $(LIBPATH)@slash@luatable.pbc \
  $(LIBPATH)@slash@luamath.pbc \
  $(LIBPATH)@slash@luaio.pbc \
  $(LIBPATH)@slash@luaos.pbc \
+ $(LIBPATH)@slash@luadebug.pbc \
  $(LIBPATH)@slash@luapir.pbc
 
 all: pmcs $(PBCS) Lua@slash@parser.pm
@@ -45,6 +48,9 @@ $(LIBPATH)@slash@luabasic.pbc: $(LIBPATH)@slash@luabasic.pir
 $(LIBPATH)@slash@luacoroutine.pbc: $(LIBPATH)@slash@luacoroutine.pir
 	$(PARROT) --output=$(LIBPATH)@slash@luacoroutine.pbc $(LIBPATH)@slash@luacoroutine.pir
 
+$(LIBPATH)@slash@luapackage.pbc: $(LIBPATH)@slash@luapackage.pir
+	$(PARROT) --output=$(LIBPATH)@slash@luapackage.pbc $(LIBPATH)@slash@luapackage.pir
+
 $(LIBPATH)@slash@luastring.pbc: $(LIBPATH)@slash@luastring.pir
 	$(PARROT) --output=$(LIBPATH)@slash@luastring.pbc $(LIBPATH)@slash@luastring.pir
 
@@ -59,6 +65,9 @@ $(LIBPATH)@slash@luaio.pbc: $(LIBPATH)@slash@luaio.pir
 
 $(LIBPATH)@slash@luaos.pbc: $(LIBPATH)@slash@luaos.pir
 	$(PARROT) --output=$(LIBPATH)@slash@luaos.pbc $(LIBPATH)@slash@luaos.pir
+
+$(LIBPATH)@slash@luadebug.pbc: $(LIBPATH)@slash@luadebug.pir
+	$(PARROT) --output=$(LIBPATH)@slash@luadebug.pbc $(LIBPATH)@slash@luadebug.pir
 
 $(LIBPATH)@slash@luapir.pbc: $(LIBPATH)@slash@luapir.pir
 	$(PARROT) --output=$(LIBPATH)@slash@luapir.pbc $(LIBPATH)@slash@luapir.pir

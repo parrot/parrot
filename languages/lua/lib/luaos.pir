@@ -9,7 +9,7 @@ lib/luaos.pir - Lua Operating System Library
 
 This library is implemented through table C<os>.
 
-See "Lua 5.0 Reference Manual", section 5.7 "Operating System Facilities".
+See "Lua 5.1 Reference Manual", section 5.8 "Operating System Facilities".
 
 =head2 Functions
 
@@ -28,14 +28,14 @@ See "Lua 5.0 Reference Manual", section 5.7 "Operating System Facilities".
 
 #    print "init Lua OS\n"
 
-    .local pmc _lua__G
-    _lua__G = global "_G"
+    .local pmc _lua__GLOBAL
+    _lua__GLOBAL = global "_G"
     $P1 = new .LuaString
 
     .local pmc _os
     _os = new .LuaTable
     $P1 = "os"
-    _lua__G[$P1] = _os
+    _lua__GLOBAL[$P1] = _os
 
     .const .Sub _os_clock = "_os_clock"
     $P0 = _os_clock
@@ -94,10 +94,11 @@ See "Lua 5.0 Reference Manual", section 5.7 "Operating System Facilities".
 
 .end
 
+
 =item C<os.clock ()>
 
-Returns an approximation of the amount of CPU time used by the program, in
-seconds.
+Returns an approximation of the amount in seconds of CPU time used by the
+program.
 
 NOT YET IMPLEMENTED.
 
@@ -108,6 +109,7 @@ NOT YET IMPLEMENTED.
     new ret, .LuaNumber
     not_implemented()
 .end
+
 
 =item C<os.date ([format [, time]])>
 
@@ -144,6 +146,7 @@ NOT YET IMPLEMENTED.
     not_implemented()
 .end
 
+
 =item C<os.difftime (t2, t1)>
 
 Returns the number of seconds from time C<t1> to time C<t2>. In Posix,
@@ -156,29 +159,41 @@ NOT YET IMPLEMENTED.
 .sub _os_difftime :anon
     .param pmc t2 :optional
     .param pmc t1 :optional
-    $I0 = checkint(t2)
+    $I0 = checknumber(t2)
     $I1 = optint(t1, 0)
     not_implemented()
 .end
 
-=item C<os.execute (command)>
+
+=item C<os.execute ([command])>
 
 This function is equivalent to the C function C<system>. It passes C<command>
 to be executed by an operating system shell. It returns a status code, which
 is system-dependent.
+
+This function is equivalent to the C function C<system>. It passes C<command>
+to be executed by an operating system shell. It returns a status code, which
+is system-dependent. If C<command> is absent, then it returns nonzero if a
+shell is available and zero otherwise.
 
 =cut
 
 .sub _os_execute :anon
     .param pmc command :optional
     .local pmc ret
-    $S0 = checkstring(command)
+    $S0 = optstring(command, "")
+    unless $S0 == "" goto L1
+    $I0 = 1
+    goto L2
+L1:
     $I0 = spawnw $S0
     $I0 = $I0 / 256
+L2:
     new ret, .LuaNumber
     ret = $I0
     .return (ret)
 .end
+
 
 =item C<os.exit ([code])>
 
@@ -192,6 +207,7 @@ program. The default value for C<code> is the success code.
     $I0 = optint(code, 0)
     exit $I0
 .end
+
 
 =item C<os.getenv (varname)>
 
@@ -215,10 +231,12 @@ L0:
     .return (ret)
 .end
 
+
 =item C<os.remove (filename)>
 
-Deletes the file with the given name. If this function fails, it returns
-B<nil>, plus a string describing the error.
+Deletes the file or directory with the given name. Directories must be empty
+to be removed. If this function fails, it returns B<nil>, plus a string
+describing the error.
 
 =cut
 
@@ -247,10 +265,11 @@ _handler:
     .return (nil, msg)
 .end
 
+
 =item C<os.rename (oldname, newname)>
 
-Renames file named C<oldname> to C<newname>. If this function fails, it
-returns B<nil>, plus a string describing the error.
+Renames file or directory named C<oldname> to C<newname>. If this function
+fails, it returns B<nil>, plus a string describing the error.
 
 =cut
 
@@ -281,6 +300,7 @@ _handler:
     .return (nil, msg)
 .end
 
+
 =item C<os.setlocale (locale [, category])>
 
 Sets the current locale of the program. C<locale> is a string specifying a
@@ -299,6 +319,7 @@ NOT YET IMPLEMENTED.
     $S1 = optstring(category, "all")
     not_implemented()
 .end
+
 
 =item C<os.time ([table])>
 
@@ -333,15 +354,12 @@ L1:
     not_implemented()
 .end
 
+
 =item C<os.tmpname ()>
 
-Returns a string with a file name that can be used for a temporary file. The file must be explicitly
-opened before its use and removed when no longer needed.
-
-This function is equivalent to the C<tmpnam> C function, and many people (and
-even some compilers!) advise against its use, because between the time you
-call this function and the time you open the file, it is possible for another
-process to create a file with the same name.
+Returns a string with a file name that can be used for a temporary file.
+The file must be explicitly opened before its use and explicitly removed
+when no longer needed.
 
 NOT YET IMPLEMENTED.
 

@@ -242,52 +242,37 @@ sub BuildVariable {
 	my ($parser, $var) = @_;
 	my @opcodes = ();
 	my $idf = shift(@{$var});
-	my $defn = $parser->YYData->{symbtab}->Lookup($idf);
-	if (defined $defn) {
-		# local variable
-		if (scalar(@{$var})) {
-			my $result = $defn;
-			my $last_key = pop @{$var};
-			foreach my $key (@{$var}) {
-				push @opcodes, @{$key->[1]};
-				my $result2 = new_tmp($parser, "pmc");
-				push @opcodes, new LocalDir($parser,
-						'result'				=>	$result2,
-				);
-				push @opcodes, new KeyedGetOp($parser,
-						'result'				=>	$result2,
-						'arg1'					=>	$result,
-						'arg2'					=>	$key->[0],
-				);
-				$result = $result2;
-			}
-			push @opcodes, @{$last_key->[1]};
-			my $assign = new KeyedSetOp($parser,
-					'arg1'					=>	$last_key->[0],
-					'arg2'					=>	undef,
-					'result'				=>	$result,
+	if (ref($idf) eq "ARRAY") {
+		my $defn = $idf->[0];
+		push @opcodes,  @{$idf->[1]};
+		my $last_key = pop @{$var};
+		my $result = $defn;
+		foreach my $key (@{$var}) {
+			push @opcodes, @{$key->[1]};
+			my $result2 = new_tmp($parser, "pmc");
+			push @opcodes, new LocalDir($parser,
+					'result'				=>	$result2,
 			);
-			return [$defn, \@opcodes, $assign];
-		} else {
-			my $assign = new AssignOp($parser,
-					'arg1'					=>	undef,
-					'result'				=>	$defn,
+			push @opcodes, new KeyedGetOp($parser,
+					'result'				=>	$result2,
+					'arg1'					=>	$result,
+					'arg2'					=>	$key->[0],
 			);
-			return [$defn, [], $assign];
+			$result = $result2;
 		}
+		push @opcodes, @{$last_key->[1]};
+		my $assign = new KeyedSetOp($parser,
+				'arg1'					=>	$last_key->[0],
+				'arg2'					=>	undef,
+				'result'				=>	$result,
+		);
+		return [$defn, \@opcodes, $assign];
 	} else {
-		my $defn = $parser->YYData->{symbtab}->LookupU($idf);
+		my $defn = $parser->YYData->{symbtab}->Lookup($idf);
 		if (defined $defn) {
-			# upvariable
+			# local variable
 			if (scalar(@{$var})) {
-				my $result = new_tmp($parser, "pmc");
-				push @opcodes, new LocalDir($parser,
-						'result'				=>	$result,
-				);
-				push @opcodes, new FindLexOp($parser,
-						'result'				=>	$result,
-						'arg1'					=>	$defn,
-				);
+				my $result = $defn;
 				my $last_key = pop @{$var};
 				foreach my $key (@{$var}) {
 					push @opcodes, @{$key->[1]};
@@ -310,39 +295,81 @@ sub BuildVariable {
 				);
 				return [$defn, \@opcodes, $assign];
 			} else {
-				my $assign = new StoreLexOp($parser,
-						'arg1'					=>	$defn,
-						'arg2'					=>	undef,
+				my $assign = new AssignOp($parser,
+						'arg1'					=>	undef,
+						'result'				=>	$defn,
 				);
 				return [$defn, [], $assign];
 			}
 		} else {
-			# global variable
-			my $global = get_global($parser);
-			push @opcodes, @{$global->[1]};
-			my $key = BuildLiteral($parser, $idf, "key");
-			push @opcodes, @{$key->[1]};
-			my $result = $global->[0];
-			foreach my $key2 (@{$var}) {
-				my $result2 = new_tmp($parser, "pmc");
-				push @opcodes, new LocalDir($parser,
-						'result'				=>	$result2,
-				);
-				push @opcodes, new KeyedGetOp($parser,
-						'result'				=>	$result2,
-						'arg1'					=>	$result,
-						'arg2'					=>	$key->[0],
-				);
-				$result = $result2;
-				$key = $key2;
+			my $defn = $parser->YYData->{symbtab}->LookupU($idf);
+			if (defined $defn) {
+				# upvariable
+				if (scalar(@{$var})) {
+					my $result = new_tmp($parser, "pmc");
+					push @opcodes, new LocalDir($parser,
+							'result'				=>	$result,
+					);
+					push @opcodes, new FindLexOp($parser,
+							'result'				=>	$result,
+							'arg1'					=>	$defn,
+					);
+					my $last_key = pop @{$var};
+					foreach my $key (@{$var}) {
+						push @opcodes, @{$key->[1]};
+						my $result2 = new_tmp($parser, "pmc");
+						push @opcodes, new LocalDir($parser,
+								'result'				=>	$result2,
+						);
+						push @opcodes, new KeyedGetOp($parser,
+								'result'				=>	$result2,
+								'arg1'					=>	$result,
+								'arg2'					=>	$key->[0],
+						);
+						$result = $result2;
+					}
+					push @opcodes, @{$last_key->[1]};
+					my $assign = new KeyedSetOp($parser,
+							'arg1'					=>	$last_key->[0],
+							'arg2'					=>	undef,
+							'result'				=>	$result,
+					);
+					return [$defn, \@opcodes, $assign];
+				} else {
+					my $assign = new StoreLexOp($parser,
+							'arg1'					=>	$defn,
+							'arg2'					=>	undef,
+					);
+					return [$defn, [], $assign];
+				}
+			} else {
+				# global variable
+				my $global = get_global($parser);
+				push @opcodes, @{$global->[1]};
+				my $key = BuildLiteral($parser, $idf, "key");
 				push @opcodes, @{$key->[1]};
+				my $result = $global->[0];
+				foreach my $key2 (@{$var}) {
+					my $result2 = new_tmp($parser, "pmc");
+					push @opcodes, new LocalDir($parser,
+							'result'				=>	$result2,
+					);
+					push @opcodes, new KeyedGetOp($parser,
+							'result'				=>	$result2,
+							'arg1'					=>	$result,
+							'arg2'					=>	$key->[0],
+					);
+					$result = $result2;
+					$key = $key2;
+					push @opcodes, @{$key->[1]};
+				}
+				my $assign = new KeyedSetOp($parser,
+						'arg1'					=>	$key->[0],
+						'arg2'					=>	undef,
+						'result'				=>	$result,
+				);
+				return [$result, \@opcodes, $assign];
 			}
-			my $assign = new KeyedSetOp($parser,
-					'arg1'					=>	$key->[0],
-					'arg2'					=>	undef,
-					'result'				=>	$result,
-			);
-			return [$result, \@opcodes, $assign];
 		}
 	}
 }
@@ -427,34 +454,39 @@ sub BuildCallVariable {
 	my $result;
 	my @opcodes = ();
 	my $idf = shift(@{$var});
-	my $defn = $parser->YYData->{symbtab}->Lookup($idf);
-	if (defined $defn) {
-		$result = $defn;
+	if (ref($idf) eq "ARRAY") {
+		$result = $idf->[0];
+		push @opcodes, @{$idf->[1]};
 	} else {
-		$defn = $parser->YYData->{symbtab}->LookupU($idf);
+		my $defn = $parser->YYData->{symbtab}->Lookup($idf);
 		if (defined $defn) {
-			$result = new_tmp($parser, "pmc");
-			push @opcodes, new LocalDir($parser,
-					'result'				=>	$result,
-			);
-			push @opcodes, new FindLexOp($parser,
-					'result'				=>	$result,
-					'arg1'					=>	$defn,
-			);
-		} else { 
-			my $global = get_global($parser);
-			push @opcodes, @{$global->[1]};
-			my $key = BuildLiteral($parser, $idf, "key");
-			push @opcodes, @{$key->[1]};
-			$result = new_tmp($parser, "pmc");
-			push @opcodes, new LocalDir($parser,
-					'result'				=>	$result,
-			);
-			push @opcodes, new KeyedGetOp($parser,
-					'result'				=>	$result,
-					'arg1'					=>	$global->[0],
-					'arg2'					=>	$key->[0],
-			);
+			$result = $defn;
+		} else {
+			$defn = $parser->YYData->{symbtab}->LookupU($idf);
+			if (defined $defn) {
+				$result = new_tmp($parser, "pmc");
+				push @opcodes, new LocalDir($parser,
+						'result'				=>	$result,
+				);
+				push @opcodes, new FindLexOp($parser,
+						'result'				=>	$result,
+						'arg1'					=>	$defn,
+				);
+			} else { 
+				my $global = get_global($parser);
+				push @opcodes, @{$global->[1]};
+				my $key = BuildLiteral($parser, $idf, "key");
+				push @opcodes, @{$key->[1]};
+				$result = new_tmp($parser, "pmc");
+				push @opcodes, new LocalDir($parser,
+						'result'				=>	$result,
+				);
+				push @opcodes, new KeyedGetOp($parser,
+						'result'				=>	$result,
+						'arg1'					=>	$global->[0],
+						'arg2'					=>	$key->[0],
+				);
+			}
 		}
 	}
 	foreach my $key (@{$var}) {

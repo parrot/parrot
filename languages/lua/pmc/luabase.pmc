@@ -20,6 +20,7 @@ C<LuaBase> provides an abstract base class for some Lua types.
 
 #include "parrot/parrot.h"
 
+static INTVAL dynpmc_LuaBoolean;
 static INTVAL dynpmc_LuaNil;
 static INTVAL dynpmc_LuaString;
 static INTVAL dynpmc_LuaTable;
@@ -77,12 +78,6 @@ Returns C<true>.
 
 =item C<PMC* get_pmc_keyed (PMC* key)>
 
-=item C<void set_pmc_keyed (PMC* key, PMC* value)>
-
-=item C<PMC* neg (PMC *dest)>
-
-=item C<void i_neg()>
-
 Throws an exception.
 
 =cut
@@ -95,12 +90,44 @@ Throws an exception.
         return NULL;
     }
 
+/*
+
+=item C<void set_bool(INTVAL value)>
+
+=cut
+
+*/
+    void set_bool (INTVAL value) {
+        VTABLE_morph(INTERP, SELF, dynpmc_LuaBoolean);
+        VTABLE_set_bool(INTERP, SELF, value);
+    }
+
+/*
+
+=item C<void set_pmc_keyed (PMC* key, PMC* value)>
+
+Throws an exception.
+
+=cut
+
+*/
     void set_pmc_keyed (PMC* key, PMC* value) {
         real_exception(INTERP, NULL, ILL_INHERIT,
                 "attempt to index a %s value",
                 string_to_cstring(INTERP, DYNSELF.name()));
     }
 
+/*
+
+=item C<PMC* neg (PMC *dest)>
+
+=item C<void i_neg()>
+
+Throws an exception.
+
+=cut
+
+*/
     PMC* neg (PMC* dest) {
         PMC *metamethod = Parrot_LuaBase_find_metamethod(INTERP, SELF,
                 string_from_const_cstring(INTERP, "__unm", 0));
@@ -528,10 +555,9 @@ Looks up the method for C<*method_name>.
 
 */
     METHOD PMC* find_metamethod(STRING* method_name) {
-        PMC *method;
-
         PMC *metatable = Parrot_LuaBase_get_metatable(INTERP, SELF);
         if (dynpmc_LuaTable == metatable->vtable->base_type) {
+            PMC *method;
             PMC *key;
        
             key = pmc_new(interpreter, dynpmc_LuaString);
@@ -552,17 +578,32 @@ Looks up the method for C<*method_name>.
 
 */
     METHOD PMC* get_metatable() {
-        if (dynpmc_LuaTable == SELF->vtable->base_type
-         || dynpmc_LuaUserdata == SELF->vtable->base_type) {
-            PMC *retval = VTABLE_getprop(INTERP, SELF,
+        PMC *retval;
+
+        if (dynpmc_LuaTable == SELF->vtable->base_type) {
+            retval = VTABLE_getprop(INTERP, SELF,
                     string_from_const_cstring(INTERP, "__metatable", 0));
             if (dynpmc_LuaTable == retval->vtable->base_type)
+                return retval;
+        }
+        else if (dynpmc_LuaUserdata == SELF->vtable->base_type) {
+            retval = PMC_struct_val(SELF);
+            if (retval != NULL) 
+                return retval;
+        }
+        else if (dynpmc_LuaString == SELF->vtable->base_type) {
+            retval = Parrot_find_global(INTERP,
+                    NULL,
+                    const_string(INTERP, "mt_string"));
+            if (retval != NULL)
                 return retval;
         }
         return pmc_new(INTERP, dynpmc_LuaNil);
     }
 
     METHOD void super_init () {
+            dynpmc_LuaBoolean = pmc_type(INTERP,
+              string_from_const_cstring(INTERP, "LuaBoolean", 0));
             dynpmc_LuaNil = pmc_type(INTERP,
               string_from_const_cstring(INTERP, "LuaNil", 0));
             dynpmc_LuaString = pmc_type(INTERP,

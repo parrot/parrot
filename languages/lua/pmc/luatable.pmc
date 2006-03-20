@@ -438,15 +438,6 @@ MMD_DEFAULT: {
         PMC *value;
         INTVAL idx;
 
-        PMC *metamethod = Parrot_LuaBase_find_metamethod(INTERP, SELF,
-                string_from_const_cstring(INTERP, "__len", 0));
-        if (metamethod != NULL) {
-            retval = Parrot_runops_fromc_args(INTERP, metamethod, "PP", SELF);
-            if (NULL == retval) {
-                retval = pmc_new(INTERP, dynpmc_LuaNil);
-            }
-            return retval;
-        }
         key = pmc_new(INTERP, dynpmc_LuaNumber);
         idx = 1;
         PMC_num_val(key) = (FLOATVAL)idx;

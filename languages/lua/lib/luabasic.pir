@@ -9,7 +9,7 @@ lib/luabasic.pir - Lua Basic Library
 
 The basic library provides some core functions to Lua.
 
-See "Lua 5.0 Reference Manual", section 5.1 "Basic Functions".
+See "Lua 5.1 Reference Manual", section 5.1 "Basic Functions".
 
 =head2 Variables
 
@@ -27,33 +27,42 @@ See "Lua 5.0 Reference Manual", section 5.1 "Basic Functions".
 
 #    print "init Lua Basic\n"
 
-    .local pmc _lua__G
-    _lua__G = new .LuaTable
-    global "_G" = _lua__G
+    .local pmc _lua__REGISTRY
+    _lua__REGISTRY = new .LuaTable
+    global "_REGISTRY" = _lua__REGISTRY
+
+    .local pmc _lua__ENVIRON
+    _lua__ENVIRON = new .LuaTable
+    global "_ENVIRON" = _lua__ENVIRON
+
+    .local pmc _lua__GLOBAL
+    _lua__GLOBAL = new .LuaTable
+    global "_G" = _lua__GLOBAL
     $P1 = new .LuaString
 
 =item C<_G>
 
 A global variable (not a function) that holds the global environment (that is,
 C<_G._G = _G>). Lua itself does not use this variable; changing its value
-does not affect any environment. (Use C<setfenv> to change environments.)
+does not affect any environment, nor vice-versa. (Use C<setfenv> to change
+environments.)
 
 =cut
 
     $P1 = "_G"
-    _lua__G[$P1] = _lua__G
+    _lua__GLOBAL[$P1] = _lua__GLOBAL
 
 =item C<_VERSION>
 
 A global variable (not a function) that holds a string containing the current
-interpreter version. The current content of this string is C<"Lua 5.0">.
+interpreter version. The current contents of this variable is C<"Lua 5.1">.
 
 =cut
 
     $P0 = new .LuaString
-    $P0 = "Lua 5.0 (on Parrot)"
+    $P0 = "Lua 5.1 (on Parrot)"
     $P1 = "_VERSION"
-    _lua__G[$P1] = $P0
+    _lua__GLOBAL[$P1] = $P0
 
 =back
 
@@ -66,140 +75,136 @@ interpreter version. The current content of this string is C<"Lua 5.0">.
     .const .Sub _lua_assert = "_lua_assert"
     $P0 = _lua_assert
     $P1 = "assert"
-    _lua__G[$P1] = $P0
+    _lua__GLOBAL[$P1] = $P0
 
     .const .Sub _lua_collectgarbage = "_lua_collectgarbage"
     $P0 = _lua_collectgarbage
     $P1 = "collectgarbage"
-    _lua__G[$P1] = $P0
+    _lua__GLOBAL[$P1] = $P0
 
     .const .Sub _lua_dofile = "_lua_dofile"
     $P0 = _lua_dofile
     $P1 = "dofile"
-    _lua__G[$P1] = $P0
+    _lua__GLOBAL[$P1] = $P0
 
     .const .Sub _lua_error = "_lua_error"
     $P0 = _lua_error
     $P1 = "error"
-    _lua__G[$P1] = $P0
+    _lua__GLOBAL[$P1] = $P0
 
     .const .Sub _lua_getfenv = "_lua_getfenv"
     $P0 = _lua_getfenv
     $P1 = "getfenv"
-    _lua__G[$P1] = $P0
+    _lua__GLOBAL[$P1] = $P0
 
     .const .Sub _lua_getmetatable = "_lua_getmetatable"
     $P0 = _lua_getmetatable
     $P1 = "getmetatable"
-    _lua__G[$P1] = $P0
-
-    .const .Sub _lua_gcinfo = "_lua_gcinfo"
-    $P0 = _lua_gcinfo
-    $P1 = "gcinfo"
-    _lua__G[$P1] = $P0
+    _lua__GLOBAL[$P1] = $P0
 
     .const .Sub _lua_ipairs = "_lua_ipairs"
     $P0 = _lua_ipairs
     $P1 = "ipairs"
-    _lua__G[$P1] = $P0
+    _lua__GLOBAL[$P1] = $P0
+
+    .const .Sub _lua_load = "_lua_load"
+    $P0 = _lua_load
+    $P1 = "load"
+    _lua__GLOBAL[$P1] = $P0
 
     .const .Sub _lua_loadfile = "_lua_loadfile"
     $P0 = _lua_loadfile
     $P1 = "loadfile"
-    _lua__G[$P1] = $P0
-
-    .const .Sub _lua_loadlib = "_lua_loadlib"
-    $P0 = _lua_loadlib
-    $P1 = "loadlib"
-    _lua__G[$P1] = $P0
+    _lua__GLOBAL[$P1] = $P0
 
     .const .Sub _lua_loadstring = "_lua_loadstring"
     $P0 = _lua_loadstring
     $P1 = "loadstring"
-    _lua__G[$P1] = $P0
+    _lua__GLOBAL[$P1] = $P0
 
     .const .Sub _lua_next = "_lua_next"
     $P0 = _lua_next
     $P1 = "next"
-    _lua__G[$P1] = $P0
+    _lua__GLOBAL[$P1] = $P0
 
     .const .Sub _lua_pairs = "_lua_pairs"
     $P0 = _lua_pairs
     $P1 = "pairs"
-    _lua__G[$P1] = $P0
+    _lua__GLOBAL[$P1] = $P0
 
     .const .Sub _lua_pcall = "_lua_pcall"
     $P0 = _lua_pcall
     $P1 = "pcall"
-    _lua__G[$P1] = $P0
+    _lua__GLOBAL[$P1] = $P0
 
     .const .Sub _lua_print = "_lua_print"
     $P0 = _lua_print
     $P1 = "print"
-    _lua__G[$P1] = $P0
+    _lua__GLOBAL[$P1] = $P0
 
     .const .Sub _lua_rawequal = "_lua_rawequal"
     $P0 = _lua_rawequal
     $P1 = "rawequal"
-    _lua__G[$P1] = $P0
+    _lua__GLOBAL[$P1] = $P0
 
     .const .Sub _lua_rawget = "_lua_rawget"
     $P0 = _lua_rawget
     $P1 = "rawget"
-    _lua__G[$P1] = $P0
+    _lua__GLOBAL[$P1] = $P0
 
     .const .Sub _lua_rawset = "_lua_rawset"
     $P0 = _lua_rawset
     $P1 = "rawset"
-    _lua__G[$P1] = $P0
+    _lua__GLOBAL[$P1] = $P0
 
-    .const .Sub _lua_require = "_lua_require"
-    $P0 = _lua_require
-    $P1 = "require"
-    _lua__G[$P1] = $P0
+    .const .Sub _lua_select = "_lua_select"
+    $P0 = _lua_select
+    $P1 = "select"
+    _lua__GLOBAL[$P1] = $P0
 
     .const .Sub _lua_setfenv = "_lua_setfenv"
     $P0 = _lua_setfenv
     $P1 = "setfenv"
-    _lua__G[$P1] = $P0
+    _lua__GLOBAL[$P1] = $P0
 
     .const .Sub _lua_setmetatable = "_lua_setmetatable"
     $P0 = _lua_setmetatable
     $P1 = "setmetatable"
-    _lua__G[$P1] = $P0
+    _lua__GLOBAL[$P1] = $P0
 
     .const .Sub _lua_tonumber = "_lua_tonumber"
     $P0 = _lua_tonumber
     $P1 = "tonumber"
-    _lua__G[$P1] = $P0
+    _lua__GLOBAL[$P1] = $P0
 
     .const .Sub _lua_tostring = "_lua_tostring"
     $P0 = _lua_tostring
     $P1 = "tostring"
-    _lua__G[$P1] = $P0
+    _lua__GLOBAL[$P1] = $P0
 
     .const .Sub _lua_type = "_lua_type"
     $P0 = _lua_type
     $P1 = "type"
-    _lua__G[$P1] = $P0
+    _lua__GLOBAL[$P1] = $P0
 
     .const .Sub _lua_unpack = "_lua_unpack"
     $P0 = _lua_unpack
     $P1 = "unpack"
-    _lua__G[$P1] = $P0
+    _lua__GLOBAL[$P1] = $P0
 
     .const .Sub _lua_xpcall = "_lua_xpcall"
     $P0 = _lua_xpcall
     $P1 = "xpcall"
-    _lua__G[$P1] = $P0
+    _lua__GLOBAL[$P1] = $P0
 
 .end
 
+
 =item C<assert (v [, message])>
 
-Issues an error when the value of its argument C<v> is B<nil> or B<false>;
-otherwise, returns this value. C<message> is an error message; when absent,
-it defaults to "assertion failed!"
+Issues an error when the value of its argument C<v> is false (i.e., B<nil>
+or B<false>); otherwise, returns all its arguments. C<message> is an error
+message; when absent, it defaults to "assertion failed!"
 
 =cut
 
@@ -212,31 +217,67 @@ it defaults to "assertion failed!"
     $S0 = optstring(message, "assertion failed!")
     error($S0)
 L0:
+    .return (v, message)
 .end
 
-=item C<collectgarbage ([limit])>
 
-Sets the garbage-collection threshold to the given limit (in Kbytes) and
-checks it against the byte counter. If the new threshold is smaller than the
-byte counter, then Lua immediately runs the garbage collector. If C<limit>
-is absent, it defaults to zero (thus forcing a garbage-collection cycle).
+=item C<collectgarbage (opt [, arg])>
 
+This function is a generic interface to the garbage collector. It performs
+different functions according to its first argument, C<opt>:
+
+=over 4
+
+=item B<"stop">
+
+stops the garbage collector.
+
+=item B<"restart">
+
+restarts the garbage collector.
+
+=item B<"collect">
+
+performs a full garbage-collection cycle.
+
+=item B<"count">
+
+returns the total memory in use by Lua (in Kbytes).
+
+=item B<"step">
+
+performs a garbage-collection step. The step C<"size"> is controlled 
+by C<arg> (larger values mean more steps) in a non-specified way.
+If you want to control the step size you must tune experimentally the value
+of C<arg>. Returns B<true> if the step finished a collection cycle.
+
+=item B<"steppause">
+
+sets C<arg>/100 as the new value for the I<pause> of the collector.
+
+=item B<"setstepmul">
+
+sets C<arg>/100 as the new value for the I<step multiplier> of the collector. 
+    
+=back
+    
 NOT YET IMPLEMENTED.
 
 =cut
 
 .sub _lua_collectgarbage :anon
-    .param pmc limit :optional
-    $I0 = optint(limit, 0)
+    .param pmc opt :optional
+    $S0 = checkstring(opt)
     not_implemented()
 .end
+
 
 =item C<dofile (filename)>
 
 Opens the named file and executes its contents as a Lua chunk. When called
 without arguments, C<dofile> executes the contents of the standard input
-(C<stdin>). Returns any value returned by the chunk. In case of errors,
-C<dofile> propagates the error to its caller (that is, it does not run in
+(C<stdin>). Returns all values returned by the chunk. In case of errors,
+C<dofile> propagates the error to its caller (that is, dofile does not run in
 protected mode).
 
 NOT YET IMPLEMENTED.
@@ -249,15 +290,18 @@ NOT YET IMPLEMENTED.
     not_implemented()
 .end
 
+
 =item C<error (message [, level])>
 
 Terminates the last protected function called and returns C<message> as the
 error message. Function C<error> never returns.
 
-The C<level> argument specifies where the error message points the error. With
-level 1 (the default), the error position is where the C<error> function was
-called. Level 2 points the error to where the function that called C<error>
-was called; and so on.
+Usually, C<error> adds some information about the error position at the 
+beginning of the message. The C<level> argument specifies how to get the 
+error position. With level 1 (the default), the error position is where the
+C<error> function was called. Level 2 points the error to where the function
+that called C<error> was called; and so on. Passing a level 0 avoids the
+addition of error position information to the message.
 
 STILL INCOMPLETE.
 
@@ -273,16 +317,14 @@ STILL INCOMPLETE.
     error($S0)
 .end
 
+
 =item C<getfenv (f)>
 
 Returns the current environment in use by the function. C<f> can be a Lua
-function or a number, which specifies the function at that stack level: Level
+function or a number that specifies the function at that stack level: Level
 1 is the function calling C<getfenv>. If the given function is not a Lua
 function, or if C<f> is 0, C<getfenv> returns the global environment. The
 default for C<f> is 1.
-
-If the environment has a C<"__fenv"> field, returns the associated value,
-instead of the environment.
 
 NOT YET IMPLEMENTED.
 
@@ -292,10 +334,11 @@ NOT YET IMPLEMENTED.
     not_implemented()
 .end
 
+
 =item C<getmetatable (object)>
 
-If the object does not have a metatable, returns B<nil>. Otherwise, if the
-object’s metatable has a C<"__metatable"> field, returns the associated value.
+If C<object> does not have a metatable, returns B<nil>. Otherwise, if the
+object's metatable has a C<"__metatable"> field, returns the associated value.
 Otherwise, returns the metatable of the given object.
 
 =cut
@@ -310,34 +353,25 @@ Otherwise, returns the metatable of the given object.
 L1:
     .local pmc prot
     .const .LuaString mt = "__metatable"
-    prot = ret[mt]
+    prot = ret."rawget"(mt)
     unless prot goto L2
     .return (prot)
 L2:
     .return (ret)
 .end
 
-=item C<gcinfo ()>
-
-Returns two results: the number of Kbytes of dynamic memory that Lua is
-using and the current garbage collector threshold (also in Kbytes).
-
-NOT YET IMPLEMENTED.
-
-=cut
-
-.sub _lua_gcinfo :anon
-    not_implemented()
-.end
 
 =item C<ipairs (t)>
 
-Returns an iterator function, the table C<t>, and 0, so that the construction
+Returns three values: an iterator function, the table C<t>, and 0, so that
+the construction
 
     for i,v in ipairs(t) do ... end
 
-will iterate over the pairs (C<1,t[1]>), (C<2,t[2]>), ... , up to the first
+will iterate over the pairs (C<1,t[1]>), (C<2,t[2]>), ..., up to the first
 integer key with a nil value in the table.
+
+See C<next> for the caveats of modifying the table during its traversal. 
 
 =cut
 
@@ -350,7 +384,7 @@ integer key with a nil value in the table.
     _G = global "_G"
     .const .LuaString key_ipairs = "ipairs"
     .local pmc ipairs
-    ipairs = _G[key_ipairs]
+    ipairs = _G."rawget"(key_ipairs)
     .local pmc zero
     new zero, .LuaNumber
     zero = 0.0
@@ -362,19 +396,40 @@ L0:
     .local pmc n
     new n, .LuaNumber
     n = $N0
-    ret = t[n]
+    ret = t."rawget"(n)
     unless ret goto L1
     .return (n, ret)
 L1:
     .return ()
 .end
 
-=item C<loadfile (filename)>
 
-Loads a file as a Lua chunk (without running it). If there are no errors,
-returns the compiled chunk as a function; otherwise, returns B<nil> plus the
-error message. The environment of the returned function is the global
-environment.
+=item C<load (func [, chunkname])>
+
+Loads a chunk using function C<func> to get its pieces. Each call to C<func>
+must return a string that concatenates with previous results. A return of
+B<nil> (or no value) signals the end of the chunk.
+
+If there are no errors, returns the compiled chunk as a function; otherwise,
+returns B<nil> plus the error message. The environment of the returned
+function is the global environment.
+
+C<chunkname> is used as the chunk name for error messages and debug
+information. 
+
+NOT YET IMPLEMENTED.
+
+=cut
+
+.sub _lua_load :anon
+    not_implemented()
+.end
+
+
+=item C<loadfile ([filename])>
+
+Similar to C<load>, but gets the chunk from file C<filename> or from the
+standard input, if no file name is given.
 
 NOT YET IMPLEMENTED.
 
@@ -386,31 +441,10 @@ NOT YET IMPLEMENTED.
     not_implemented()
 .end
 
-=item C<loadlib (libname, funcname)>
-
-Links the program with the dynamic C library C<libname>. Inside this library,
-looks for a function C<funcname> and returns this function as a C function.
-
-C<libname> must be the complete file name of the C library, including any
-eventual path and extension.
-
-NOT YET IMPLEMENTED.
-
-=cut
-
-.sub _lua_loadlib :anon
-    not_implemented()
-.end
 
 =item C<loadstring (string [, chunkname])>
 
-Loads a string as a Lua chunk (without running it). If there are no errors,
-returns the compiled chunk as a function; otherwise, returns B<nil> plus the
-error message. The environment of the returned function is the global
-environment.
-
-The optional parameter C<chunkname> is the name to be used in error messages
-and debug information.
+Similar to C<load>, but gets the chunk from the given string.
 
 To load and run a given string, use the idiom
 
@@ -428,24 +462,27 @@ NOT YET IMPLEMENTED.
     not_implemented()
 .end
 
+
 =item C<next (table [, index])>
 
 Allows a program to traverse all fields of a table. Its first argument is a
 table and its second argument is an index in this table. C<next> returns the
-next index of the table and the value associated with the index. When called
-with B<nil> as its second argument, C<next> returns the first index of the
-table and its associated value. When called with the last index, or with
+next index of the table and its associated value. When called
+with B<nil> as its second argument, C<next> returns an initial index
+and its associated value. When called with the last index, or with
 B<nil> in an empty table, C<next> returns B<nil>. If the second argument is
-absent, then it is interpreted as B<nil>.
+absent, then it is interpreted as B<nil>. In particular, you can use 
+C<next(t)> to check whether a table is empty.
 
-Lua has no declaration of fields; There is no difference between a field
+Lua has no declaration of fields. There is no difference between a field
 not present in a table or a field with value B<nil>. Therefore, C<next> only
 considers fields with non-B<nil> values. The order in which the indices are
 enumerated is not specified, I<even for numeric indices>. (To traverse a table
 in numeric order, use a numerical for or the C<ipairs> function.)
 
 The behavior of C<next> is I<undefined> if, during the traversal, you assign
-any value to a non-existent field in the table.
+any value to a non-existent field in the table. You may however modify
+existing fields. In particular, you may clear existing fields. 
 
 STILL INCOMPLETE (see next in luapir.pir).
 
@@ -464,14 +501,17 @@ L1:
     .return (idx)	# nil                               
 .end
 
+
 =item C<pairs (t)>
 
-Returns the C<next> function and the table C<t> (plus a B<nil>), so that the
-construction
+Returns three values: the C<next> function, the table C<t>, and B<nil>, so
+that the construction
 
     for k,v in pairs(t) do ... end
 
-will iterate over all key-value pairs of table C<t>.
+will iterate over all key--value pairs of table C<t>.
+
+See C<next> for the caveats of modifying the table during its traversal.
 
 STILL INCOMPLETE (see next).
 
@@ -484,15 +524,16 @@ STILL INCOMPLETE (see next).
     _G = global "_G"
     .const .LuaString key_next = "next"
     .local pmc next
-    next = _G[key_next]
+    next = _G."rawget"(key_next)
     .local pmc nil
     new nil, .LuaNil
     .return (next, t, nil)
 .end
 
+
 =item C<pcall (f, arg1, arg2, ...)>
 
-Calls function C<f> with the given arguments in protected mode. That means
+Calls function C<f> with the given arguments in protected mode. This means
 that any error inside C<f> is not propagated; instead, C<pcall> catches the
 error and returns a status code. Its first result is the status code (a
 boolean), which is B<true> if the call succeeds without errors. In such case,
@@ -523,12 +564,13 @@ _handler:
     .return (status, msg)
 .end
 
+
 =item C<print (e1, e2, ...)>
 
-Receives any number of arguments, and prints their values in C<stdout>, using
-the C<tostring> function to convert them to strings. This function is not
-intended for formatted output, but only as a quick way to show a value,
-typically for debugging. For formatted output, use C<format>.
+Receives any number of arguments, and prints their values to C<stdout>, using
+the C<tostring> function to convert them to strings. C<print> is not intended
+for formatted output, but only as a quick way to show a value, typically for
+debugging. For formatted output, use C<string.format>.
 
 =cut
 
@@ -552,6 +594,7 @@ L3:
     print "\n"
 .end
 
+
 =item C<rawequal (v1, v2)>
 
 Checks whether C<v1> is equal to C<v2>, without invoking any metamethod.
@@ -569,6 +612,7 @@ Returns a boolean.
     .return (ret)
 .end
 
+
 =item C<rawget (table, index)>
 
 Gets the real value of C<table[index]>, without invoking any metamethod.
@@ -585,6 +629,7 @@ C<table> must be a table; C<index> is any value different from B<nil>.
      ret = table."rawget"(index)
     .return (ret)
 .end
+
 
 =item C<rawset (table, index, value)>
 
@@ -605,62 +650,69 @@ B<nil>, and C<value> is any Lua value.
     .return ()
 .end
 
-=item C<require (packagename)>
 
-Loads the given package. The function starts by looking into the table
-C<_LOADED> to determine whether C<packagename> is already loaded. If it is,
-then C<require> returns the value that the package returned when it was first
-loaded. Otherwise, it searches a path looking for a file to load.
+=item C<select (index, ...)>
 
-If the global variable C<LUA_PATH> is a string, this string is the path.
-Otherwise, C<require> tries the environment variable C<LUA_PATH>. As a last
-resort, it uses the predefined path F<"?;?.lua">.
-
-The path is a sequence of I<templates> separated by semicolons. For each
-template, C<require> will change each interrogation mark in the template to
-C<packagename>, and then will try to load the resulting file name. So, for
-instance, if the path is
-
-    "./?.lua;./?.lc;/usr/local/?/?.lua;/lasttry"
-
-a C<require "mod"> will try to load the files F<./mod.lua>, F<./mod.lc>,
-F</usr/local/mod/mod.lua>, and F</lasttry>, in that order.
-
-The function stops the search as soon as it can load a file, and then it runs
-the file. After that, it associates, in table C<_LOADED>, the package name
-with the value that the package returned, and returns that value. If the
-package returns B<nil> (or no value), require converts this value to true.
-If the package returns B<false>, C<require> also returns B<false>. However,
-as the mark in table C<_LOADED> is B<false>, any new attempt to reload the
-file will happen as if the package was not loaded (that is, the package will
-be loaded again).
-
-If there is any error loading or running the file, or if it cannot find any
-file in the path, then C<require> signals an error.
-
-While running a file, C<require> defines the global variable C<_REQUIREDNAME>
-with the package name. The package being loaded always runs within the global
-environment.
-
-NOT YET IMPLEMENTED.
+If C<index> is a number, returns all arguments after argument number C<index>.
+Otherwise, C<index> must be the string C<"#">, and C<select> returns the
+total number of extra arguments it received. 
 
 =cut
 
-.sub _lua_require :anon
-    .param pmc packagename :optional
-    $S0 = checkstring(packagename)
-    not_implemented()
+.sub _lua_select :anon
+    .param pmc index :optional
+    .param pmc argv :slurpy
+    .local pmc ret
+    unless index goto L1
+    $I0 = isa index, "LuaString"
+    unless $I0 goto L1
+    $S0 = index
+    unless $S0 == "#" goto L1
+    $I1 = argv
+    new ret, .LuaNumber
+    ret = $I1
+    .return (ret)
+L1:
+    .local int i
+    i = checknumber(index)
+    .local int n
+    n = argv
+    inc n
+    unless i < 0 goto L2
+    i = n + i
+    goto L3
+L2:
+    unless i > n goto L3
+    i = n
+L3:    
+    if 1 <= i goto L4
+    argerror("index out of range")
+L4:
+    $I0 = n - i
+    new ret, .Array
+    ret = $I0
+    $I1 = 0
+    dec i
+L5:
+    unless $I1 < $I0 goto L6
+    $P0 = argv[i]
+    ret[$I1] = $P0
+    inc i
+    inc $I1
+    goto L5
+L6:    
+    .return (ret :flat)
 .end
+
 
 =item C<setfenv (f, table)>
 
-Sets the current environment to be used by the given function. C<f> can be a
-Lua function or a number, which specifies the function at that stack level:
-Level 1 is the function calling C<setfenv>.
+Sets the environment to be used by the given function. C<f> can be a Lua
+function or a number that specifies the function at that stack level: Level
+1 is the function calling C<setfenv>. C<setfenv> returns the given function.
 
-As a special case, when C<f> is 0 C<setfenv> changes the global environment
-of the running thread. If the original environment has a C<"__fenv"> field,
-C<setfenv> raises an error.
+As a special case, when C<f> is 0 C<setfenv> changes the environment of the
+running thread. In this case, C<setfenv> returns no values. 
 
 NOT YET IMPLEMENTED.
 
@@ -673,12 +725,15 @@ NOT YET IMPLEMENTED.
     not_implemented()
 .end
 
+
 =item C<setmetatable (table, metatable)>
 
 Sets the metatable for the given table. (You cannot change the metatable of
-a userdata from Lua.) If metatable is B<nil>, removes the metatable of the
+other types from Lua.) If metatable is B<nil>, removes the metatable of the
 given table. If the original metatable has a C<"__metatable"> field, raises
 an error.
+
+This function returns table. 
 
 =cut
 
@@ -698,13 +753,14 @@ L1:
     unless meta goto L3
     .local pmc prot
     .const .LuaString mt = "__metatable"
-    prot = meta[mt]
+    prot = meta."rawget"(mt)
     unless prot goto L3
     error("cannot change a protected metatable")
 L3:
     table."set_metatable"(metatable)
     .return ()
 .end
+
 
 =item C<tonumber (e [, base])>
 
@@ -742,6 +798,7 @@ L3:
     .return (ret)
 .end
 
+
 =item C<tostring (e)>
 
 Receives an argument of any type and converts it to a string in a reasonable
@@ -760,6 +817,7 @@ as its result.
     ret = e."tostring"()
     .return (ret)
 .end
+
 
 =item C<type (v)>
 
@@ -780,40 +838,50 @@ C<"userdata">.
     .return (ret)
 .end
 
-=item C<unpack (list)>
 
-Returns all elements from the given list. This function is equivalent to
+=item C<unpack (list [, i [, j]])>
 
-    return list[1], list[2], ..., list[n]
+Returns the elements from the given table. This function is equivalent to
 
-except that the above code can be written only for a fixed I<n>. The number
-I<n> is the size of the list, as defined for the C<table.getn> function.
+    return list[i], list[i+1], ..., list[j]
+
+except that the above code can be written only for a fixed number of elements.
+By default, C<i> is 1 and C<j> is the length of the list, as defined by the
+length operator.
 
 =cut
 
 .sub _lua_unpack :anon
     .param pmc list :optional
+    .param pmc i :optional
+    .param pmc j :optional
     .local pmc ret
     .local pmc index
+    .local int idx
+    .local int e
     .local int n
-    .local int i
     checktype(list, "table")
-    n = getn(list)
+    $I0 = getn(list)                                   
+    $I1 = optint(i, 1)
+    e = optint(j, $I0)
+    n = e - $I1
+    inc n
     new ret, .Array
     set ret, n
     new index, .LuaNumber
-    index = 1.0
-    i = 0
+    index = $I1
+    idx = 0
 L0:    
-    unless i < n goto L1
-    $P0 = list[index]
-    ret[i] = $P0
+    unless idx < n goto L1
+    $P0 = list."rawget"(index)
+    ret[idx] = $P0
     inc index
-    inc i
+    inc idx
     goto L0
 L1:
     .return (ret :flat)
 .end
+
 
 =item C<xpcall (f, err)>
 
@@ -824,9 +892,9 @@ C<xpcall> calls function C<f> in protected mode, using C<err> as the error
 handler. Any error inside C<f> is not propagated; instead, C<xpcall> catches
 the error, calls the C<err> function with the original error object, and
 returns a status code. Its first result is the status code (a boolean), which
-is true if the call succeeds without errors. In such case, C<xpcall> also
+is true if the call succeeds without errors. In this case, C<xpcall> also
 returns all results from the call, after this first result. In case of any
-error, C<xpcall> returns false plus the result from C<err>.
+error, C<xpcall> returns false plus the result from C<err>. 
 
 =cut
 

@@ -22,13 +22,19 @@ use strict;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 23;
+use Parrot::Test tests => 32;
 use Test::More;
 
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', "variable pi");
 print(math.pi)
 CODE
 /3\.14/
+OUTPUT
+
+language_output_like( 'lua', << 'CODE', << 'OUTPUT', "variable huge");
+print(math.huge)
+CODE
+/(inf|1.#INF)/
 OUTPUT
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', "function abs");
@@ -104,6 +110,26 @@ CODE
 -13
 OUTPUT
 
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', "function fmod");
+print(math.fmod(7, 3))
+print(math.fmod(-7, 3))
+CODE
+1
+-1
+OUTPUT
+
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', "function frexp");
+print(math.frexp(1.5))
+CODE
+0.75	1
+OUTPUT
+
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', "function ldexp");
+print(math.ldexp(1.2, 3))
+CODE
+9.6
+OUTPUT
+
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', "function log");
 print(math.log(47))
 CODE
@@ -148,12 +174,10 @@ CODE
 -4
 OUTPUT
 
-language_output_is( 'lua', << 'CODE', << 'OUTPUT', "function mod");
-print(math.mod(7, 3))
-print(math.mod(-7, 3))
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', "function modf");
+print(math.modf(2.25))
 CODE
-1
--1
+2	0.25
 OUTPUT
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', "function pow");
@@ -166,6 +190,41 @@ language_output_like( 'lua', << 'CODE', << 'OUTPUT', "function rad");
 print(math.rad(180))
 CODE
 /3\.14/
+OUTPUT
+
+language_output_like( 'lua', << 'CODE', << 'OUTPUT', "function random no arg");
+print(math.random())
+CODE
+/^\d\.\d+/
+OUTPUT
+
+language_output_like( 'lua', << 'CODE', << 'OUTPUT', "function random 1 arg");
+print(math.random(9))
+CODE
+/^\d/
+OUTPUT
+
+language_output_like( 'lua', << 'CODE', << 'OUTPUT', "function random 2 arg");
+print(math.random(10,19))
+CODE
+/^1\d/
+OUTPUT
+
+language_output_like( 'lua', << 'CODE', << 'OUTPUT', "function random too many arg");
+print(math.random(1, 2, 3))
+CODE
+/wrong number of arguments/
+OUTPUT
+
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', "function randomseed");
+math.randomseed(12)
+a = math.random()
+math.randomseed(12)
+b = math.random()
+assert(a == b, "Equal seeds produce equal sequences of numbers")
+print "ok"
+CODE
+ok
 OUTPUT
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', "function sin");

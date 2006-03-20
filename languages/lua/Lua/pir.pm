@@ -17,11 +17,13 @@ sub new {
 #  print "start Lua\n"
   load_bytecode "languages/lua/lib/luabasic.pbc"
   load_bytecode "languages/lua/lib/luacoroutine.pbc"
+  load_bytecode "languages/lua/lib/luapackage.pbc"
   load_bytecode "languages/lua/lib/luastring.pbc"
   load_bytecode "languages/lua/lib/luatable.pbc"
   load_bytecode "languages/lua/lib/luamath.pbc"
   load_bytecode "languages/lua/lib/luaio.pbc"
   load_bytecode "languages/lua/lib/luaos.pbc"
+  load_bytecode "languages/lua/lib/luadebug.pbc"
   _main()
 .end
 

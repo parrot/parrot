@@ -24,7 +24,7 @@ use Test::More;
 language_output_like( 'lua', <<'CODE', <<'OUT', '-true' );
 print(-true)
 CODE
-/attempt to perform arithmetic on a boolean value/
+/attempt to perform arithmetic on a \w+ value/
 OUT
 
 language_output_like( 'lua', <<'CODE', <<'OUT', '# true' );

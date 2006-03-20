@@ -109,7 +109,7 @@ Mostly taken from F<languages/bc/lib/Parrot/Test/Bc.pm>.
 
 =head1 SEE ALSO
 
-F<languages/tcl/t/Parrot/Test/Tcl.pm>, F<languages/m4/lib/Parrot/Test/m4.pm>
+F<languages/tcl/lib/Parrot/Test/Tcl.pm>, F<languages/m4/lib/Parrot/Test/M4.pm>
 
 =head1 AUTHOR
 

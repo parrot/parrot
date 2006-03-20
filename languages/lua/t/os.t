@@ -21,7 +21,7 @@ use strict;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 12;
+use Parrot::Test tests => 13;
 use Test::More;
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', "function execute");
@@ -30,6 +30,14 @@ r = os.execute(cmd)
 print(r)
 CODE
 test2
+OUTPUT
+
+
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', "function execute");
+r = os.execute()
+print(r)
+CODE
+1
 OUTPUT
 
 

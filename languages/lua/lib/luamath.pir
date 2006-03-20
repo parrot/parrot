@@ -7,38 +7,42 @@ lib/luamath.pir - Lua Mathematical Library
 
 =head1 DESCRIPTION
 
-This library is an interface to most of the functions of the standard C math
-library. (Some have slightly different names.) It provides all its functions
-inside the table C<math>. In addition, it registers the global C<__pow> for
-the binary exponentiation operator C<^>. The library provides the following
+This library is an interface to the standard C math library. It provides all
+its functions inside the table C<math>. The library provides the following
 functions:
 
-    math.abs math.acos math.asin math.atan math.atan2
-    math.ceil math.cos math.deg math.exp math.floor
-    math.log math.log10 math.max math.min math.mod
-    math.pow math.rad math.sin math.sqrt math.tan
-    math.frexp math.ldexp math.random math.randomseed
+    math.abs     math.acos    math.asin    math.atan    math.atan2
+    math.ceil    math.cos     math.cosh    math.deg     math.exp
+    math.floor   math.fmod    math.frexp   math.ldexp   math.log
+    math.log10   math.max     math.min     math.modf    math.pow
+    math.rad     math.random  math.randomseed           math.sin
+    math.sinh    math.sqrt    math.tan     math.tanh
 
-plus a variable C<math.pi>. Most of them are only interfaces to the
-corresponding functions in the C library. All trigonometric functions work
-in radians (previous versions of Lua used degrees). The functions C<math.deg>
-and C<math.rad> convert between radians and degrees.
+plus a variable C<math.pi> and a variable C<math.huge>, with the value 
+C<HUGE_VAL>. Most of these functions are only interfaces to the corresponding
+functions in the C library. All trigonometric functions work in radians. The
+functions C<math.deg> and C<math.rad> convert between radians and degrees.
 
 The function C<math.max> returns the maximum value of its numeric arguments.
 Similarly, C<math.min> computes the minimum. Both can be used with 1, 2, or
-more arguments.
+more arguments. 
+
+The function C<math.modf> corresponds to the C<modf> C function. It returns
+two values: The integral part and the fractional part of its argument.
+The function C<math.frexp> also returns 2 values: The normalized fraction
+and the exponent of its argument.
 
 The functions C<math.random> and C<math.randomseed> are interfaces to the
 simple random generator functions C<rand> and C<srand> that are provided by
 ANSI C. (No guarantees can be given for their statistical properties.) When
 called without arguments, C<math.random> returns a pseudo-random real number
-in the range [0, 1]. When called with a number I<n>, C<math.random> returns
-a pseudorandom integer in the range [1, I<n>]. When called with two arguments,
+in the range [0,1]. When called with a number I<n>, C<math.random> returns
+a pseudo-random integer in the range I<[1,n]>. When called with two arguments,
 I<l> and I<u>, C<math.random> returns a pseudo-random integer in the range
-[I<l, u>]. The C<math.randomseed> function sets a "seed" for the pseudo-random
+I<[l,u]>. The C<math.randomseed> function sets a "seed" for the pseudo-random
 generator: Equal seeds produce equal sequences of numbers.
 
-See "Lua 5.0 Reference Manual", section 5.5 "Mathematical Functions".
+See "Lua 5.1 Reference Manual", section 5.6 "Mathematical Functions".
 
 =cut
 
@@ -53,14 +57,14 @@ See "Lua 5.0 Reference Manual", section 5.5 "Mathematical Functions".
 
 #    print "init Lua Math\n"
 
-    .local pmc _lua__G
-    _lua__G = global "_G"
+    .local pmc _lua__GLOBAL
+    _lua__GLOBAL = global "_G"
     $P1 = new .LuaString
 
     .local pmc _math
     _math = new .LuaTable
     $P1 = "math"
-    _lua__G[$P1] = _math
+    _lua__GLOBAL[$P1] = _math
 
     .const .Sub _math_abs = "_math_abs"
     $P0 = _math_abs
@@ -112,6 +116,21 @@ See "Lua 5.0 Reference Manual", section 5.5 "Mathematical Functions".
     $P1 = "floor"
     _math[$P1] = $P0
 
+    .const .Sub _math_fmod = "_math_fmod"
+    $P0 = _math_fmod
+    $P1 = "fmod"
+    _math[$P1] = $P0
+
+    .const .Sub _math_frexp = "_math_frexp"
+    $P0 = _math_frexp
+    $P1 = "frexp"
+    _math[$P1] = $P0
+
+    .const .Sub _math_ldexp = "_math_ldexp"
+    $P0 = _math_ldexp
+    $P1 = "ldexp"
+    _math[$P1] = $P0
+
     .const .Sub _math_log = "_math_log"
     $P0 = _math_log
     $P1 = "log"
@@ -132,20 +151,29 @@ See "Lua 5.0 Reference Manual", section 5.5 "Mathematical Functions".
     $P1 = "min"
     _math[$P1] = $P0
 
-    .const .Sub _math_mod = "_math_mod"
-    $P0 = _math_mod
-    $P1 = "mod"
+    .const .Sub _math_modf = "_math_modf"
+    $P0 = _math_modf
+    $P1 = "modf"
     _math[$P1] = $P0
 
     .const .Sub _math_pow = "_math_pow"
     $P0 = _math_pow
     $P1 = "pow"
     _math[$P1] = $P0
-    _lua__G[$P1] = $P0
 
     .const .Sub _math_rad = "_math_rad"
     $P0 = _math_rad
     $P1 = "rad"
+    _math[$P1] = $P0
+
+    .const .Sub _math_random = "_math_random"
+    $P0 = _math_random
+    $P1 = "random"
+    _math[$P1] = $P0
+
+    .const .Sub _math_randomseed = "_math_randomseed"
+    $P0 = _math_randomseed
+    $P1 = "randomseed"
     _math[$P1] = $P0
 
     .const .Sub _math_sin = "_math_sin"
@@ -163,32 +191,21 @@ See "Lua 5.0 Reference Manual", section 5.5 "Mathematical Functions".
     $P1 = "tan"
     _math[$P1] = $P0
 
-    .const .Sub _math_frexp = "_math_frexp"
-    $P0 = _math_frexp
-    $P1 = "frexp"
-    _math[$P1] = $P0
-
-    .const .Sub _math_ldexp = "_math_ldexp"
-    $P0 = _math_ldexp
-    $P1 = "ldexp"
-    _math[$P1] = $P0
-
-    .const .Sub _math_random = "_math_random"
-    $P0 = _math_random
-    $P1 = "random"
-    _math[$P1] = $P0
-
-    .const .Sub _math_randomseed = "_math_randomseed"
-    $P0 = _math_randomseed
-    $P1 = "randomseed"
-    _math[$P1] = $P0
-
     $P0 = new .LuaNumber
     $P0 = 3.14159265358979323846
     $P1 = "pi"
     _math[$P1] = $P0
 
+    $P0 = new .LuaNumber
+    $P0 = 1.0
+    $P2 = new .LuaNumber
+    $P2 = 0.0
+    div $P0, $P2
+    $P1 = "huge"
+    _math[$P1] = $P0
+
 .end
+
 
 .sub _math_abs :anon
     .param pmc x :optional
@@ -200,6 +217,7 @@ See "Lua 5.0 Reference Manual", section 5.5 "Mathematical Functions".
     .return (ret)
 .end
 
+
 .sub _math_acos :anon
     .param pmc x :optional
     .local pmc ret
@@ -209,6 +227,7 @@ See "Lua 5.0 Reference Manual", section 5.5 "Mathematical Functions".
     ret = $N1
     .return (ret)
 .end
+
 
 .sub _math_asin :anon
     .param pmc x :optional
@@ -220,6 +239,7 @@ See "Lua 5.0 Reference Manual", section 5.5 "Mathematical Functions".
     .return (ret)
 .end
 
+
 .sub _math_atan :anon
     .param pmc x :optional
     .local pmc ret
@@ -229,6 +249,7 @@ See "Lua 5.0 Reference Manual", section 5.5 "Mathematical Functions".
     ret = $N1
     .return (ret)
 .end
+
 
 .sub _math_atan2 :anon
     .param pmc y :optional
@@ -242,6 +263,7 @@ See "Lua 5.0 Reference Manual", section 5.5 "Mathematical Functions".
     .return (ret)
 .end
 
+
 .sub _math_ceil :anon
     .param pmc x :optional
     .local pmc ret
@@ -252,6 +274,7 @@ See "Lua 5.0 Reference Manual", section 5.5 "Mathematical Functions".
     .return (ret)
 .end
 
+
 .sub _math_cos :anon
     .param pmc x :optional
     .local pmc ret
@@ -261,6 +284,7 @@ See "Lua 5.0 Reference Manual", section 5.5 "Mathematical Functions".
     ret = $N1
     .return (ret)
 .end
+
 
 .sub _math_deg :anon
     .param pmc x :optional
@@ -273,6 +297,7 @@ See "Lua 5.0 Reference Manual", section 5.5 "Mathematical Functions".
     .return (ret)
 .end
 
+
 .sub _math_exp :anon
     .param pmc x :optional
     .local pmc ret
@@ -282,6 +307,7 @@ See "Lua 5.0 Reference Manual", section 5.5 "Mathematical Functions".
     ret = $N1
     .return (ret)
 .end
+
 
 .sub _math_floor :anon
     .param pmc x :optional
@@ -293,6 +319,42 @@ See "Lua 5.0 Reference Manual", section 5.5 "Mathematical Functions".
     .return (ret)
 .end
 
+
+.sub _math_fmod :anon
+    .param pmc x :optional
+    .param pmc y :optional
+    .local pmc ret
+    $N0 = checknumber(x)
+    $N1 = checknumber(y)
+    $N2 = cmod $N0, $N1
+    new ret, .LuaNumber
+    ret = $N2
+    .return (ret)
+.end
+
+
+.sub _math_frexp :anon
+    .param pmc x :optional
+    .local pmc ret
+    checknumber(x)
+    new $P0, .Lua
+    ret = $P0."frexp"(x)
+    .return (ret :flat)
+.end
+
+
+.sub _math_ldexp :anon
+    .param pmc x :optional
+    .param pmc nexp :optional
+    .local pmc ret
+    checknumber(x)
+    checknumber(nexp)
+    new $P0, .Lua
+    ret = $P0."ldexp"(x, nexp)
+    .return (ret)
+.end
+
+
 .sub _math_log :anon
     .param pmc x :optional
     .local pmc ret
@@ -303,6 +365,7 @@ See "Lua 5.0 Reference Manual", section 5.5 "Mathematical Functions".
     .return (ret)
 .end
 
+
 .sub _math_log10 :anon
     .param pmc x :optional
     .local pmc ret
@@ -312,6 +375,7 @@ See "Lua 5.0 Reference Manual", section 5.5 "Mathematical Functions".
     ret = $N1
     .return (ret)
 .end
+
 
 .sub _math_max :anon
     .param pmc argv :slurpy
@@ -343,6 +407,7 @@ L3:
     .return (ret)
 .end
 
+
 .sub _math_min :anon
     .param pmc argv :slurpy
     .local int argc
@@ -373,17 +438,16 @@ L3:
     .return (ret)
 .end
 
-.sub _math_mod :anon
+
+.sub _math_modf :anon
     .param pmc x :optional
-    .param pmc y :optional
     .local pmc ret
-    $N0 = checknumber(x)
-    $N1 = checknumber(y)
-    $N2 = cmod $N0, $N1
-    new ret, .LuaNumber
-    ret = $N2
-    .return (ret)
+    checknumber(x)
+    new $P0, .Lua
+    ret = $P0."modf"(x)
+    .return (ret :flat)
 .end
+
 
 .sub _math_pow :anon
     .param pmc x :optional
@@ -397,6 +461,7 @@ L3:
     .return (ret)
 .end
 
+
 .sub _math_rad :anon
     .param pmc x :optional
     .local pmc ret
@@ -408,6 +473,58 @@ L3:
     .return (ret)
 .end
 
+
+.sub _math_random :anon
+    .param pmc arg1 :optional
+    .param pmc arg2 :optional
+    .param pmc extra :slurpy
+    .local pmc ret
+    .local int u
+    .local int l
+    new $P0, .Random
+    $N0 = $P0
+    new ret, .LuaNumber
+    unless_null arg1, L1
+    ret = $N0
+    goto L2
+L1:
+    unless_null arg2, L3
+    u = checknumber(arg1)
+    unless 1 <= u goto L4
+    mul $N0, u
+    $I0 = floor $N0
+    inc $I0
+    ret = $I0
+    goto L2
+L3: 
+    if extra goto L5
+    l = checknumber(arg1)
+    u = checknumber(arg2)
+    unless l <= u goto L4
+    $I0 = u - l
+    inc $I0
+    mul $N0, $I0
+    $I0 = floor $N0
+    add $I0, l
+    ret = $I0
+    goto L2
+L4:
+    argerror("interval is empty")
+L5:
+    error("wrong number of arguments")
+L2:
+    .return (ret)    
+.end
+
+
+.sub _math_randomseed :anon
+    .param pmc seed :optional
+    $I0 = checknumber(seed)
+    new $P0, .Random
+    $P0 = $I0
+.end
+
+
 .sub _math_sin :anon
     .param pmc x :optional
     .local pmc ret
@@ -417,6 +534,7 @@ L3:
     ret = $N1
     .return (ret)
 .end
+
 
 .sub _math_sqrt :anon
     .param pmc x :optional
@@ -428,6 +546,7 @@ L3:
     .return (ret)
 .end
 
+
 .sub _math_tan :anon
     .param pmc x :optional
     .local pmc ret
@@ -438,29 +557,6 @@ L3:
     .return (ret)
 .end
 
-.sub _math_frexp :anon
-    .param pmc x :optional
-    $N0 = checknumber(x)
-    not_implemented()
-.end
-
-.sub _math_ldexp :anon
-    .param pmc x :optional
-    .param pmc exp :optional
-    $N0 = checknumber(x)
-    $I0 = checkint(exp)
-    not_implemented()
-.end
-
-.sub _math_random :anon
-    not_implemented()
-.end
-
-.sub _math_randomseed :anon
-    .param pmc seed :optional
-    $I0 = checkint(seed)
-    not_implemented()
-.end
 
 =head1 AUTHORS
 

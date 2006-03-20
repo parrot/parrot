@@ -1,0 +1,130 @@
+/*
+Copyright: 2006 The Perl Foundation.  All Rights Reserved.
+$Id: lua.pmc 11615 2006-02-17 02:54:09Z particle $
+
+=head1 NAME
+
+pmc/lua.pmc - Lua native runtime
+
+=head1 DESCRIPTION
+
+This singleton PMC holds some static methods.
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+
+static PMC * Lua_PMC;
+
+
+pmclass Lua
+    singleton
+    dynpmc
+    group lua_group {
+
+/*
+
+=item C<void* get_pointer()>
+
+=item C<void set_pointer(void *ptr)>
+
+These two functions are part of the singleton creation interface. For more
+information see F<src/pmc.c>.
+
+=cut
+
+*/
+    void* get_pointer() {
+        return Lua_PMC;
+    }
+
+    void set_pointer(void* ptr) {
+        Lua_PMC = (PMC*) ptr;
+    }
+
+/*
+
+=item C<PMC* frexp(PMC* x)>
+
+=cut
+
+*/
+    METHOD PMC* frexp(PMC* x) {
+        PMC *y;
+        PMC *expn;
+        PMC *retval;
+        int e;
+
+        y = pmc_new(INTERP, pmc_type(INTERP,
+              string_from_const_cstring(INTERP, "LuaNumber", 0)));
+        expn = pmc_new(INTERP, pmc_type(INTERP,
+              string_from_const_cstring(INTERP, "LuaNumber", 0)));
+        VTABLE_set_number_native(INTERP, y, frexp(VTABLE_get_number(INTERP, x), &e));
+        VTABLE_set_integer_native(INTERP, expn, e);
+        retval = pmc_new(INTERP, enum_class_Array);
+        VTABLE_set_integer_native(INTERP, retval, 2);
+        VTABLE_set_pmc_keyed_int(INTERP, retval, 0, y);
+        VTABLE_set_pmc_keyed_int(INTERP, retval, 1, expn);
+        return retval;
+    }
+
+/*
+
+=item C<PMC* ldexp(PMC* x, PMC* expn)>
+
+=cut
+
+*/
+    METHOD PMC* ldexp(PMC* x, PMC* expn) {
+        PMC *retval = pmc_new(INTERP, pmc_type(INTERP,
+              string_from_const_cstring(INTERP, "LuaNumber", 0)));
+        VTABLE_set_number_native(INTERP, retval, 
+                ldexp(VTABLE_get_number(INTERP, x), VTABLE_get_integer(INTERP, expn)));
+        return retval;
+    }
+
+/*
+
+=item C<PMC* modf(PMC* x)>
+
+=cut
+
+*/
+    METHOD PMC* modf(PMC* x) {
+        PMC *y;
+        PMC *d;
+        PMC *retval;
+        FLOATVAL _d;
+
+        y = pmc_new(INTERP, pmc_type(INTERP,
+              string_from_const_cstring(INTERP, "LuaNumber", 0)));
+        d = pmc_new(INTERP, pmc_type(INTERP,
+              string_from_const_cstring(INTERP, "LuaNumber", 0)));
+        VTABLE_set_number_native(INTERP, y, modf(VTABLE_get_number(INTERP, x), &_d));
+        VTABLE_set_number_native(INTERP, d, _d);
+        retval = pmc_new(INTERP, enum_class_Array);
+        VTABLE_set_integer_native(INTERP, retval, 2);
+        VTABLE_set_pmc_keyed_int(INTERP, retval, 0, d);
+        VTABLE_set_pmc_keyed_int(INTERP, retval, 1, y);
+        return retval;
+    }
+
+}
+
+/*
+
+=back
+
+=head1 AUTHORS
+
+Francois Perrad
+
+=cut
+
+*/

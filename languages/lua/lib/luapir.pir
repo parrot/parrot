@@ -93,6 +93,33 @@ L0:
 .end
 
 
+=item C<checkoption (val, options)>
+
+=cut
+
+.sub checkoption
+    .param string name
+    .param pmc options
+    .local int i
+    .local int n
+    i = 0
+    n = options
+L1:
+    unless i < n goto L2
+    $S0 = options[i]
+    unless $S0 == name goto L3    
+    .return (i)
+L3:
+    inc i
+    goto L1
+L2:
+    $S1 = "invalid option '"
+    concat $S1, name
+    concat $S1, "'"
+    argerror($S1)    
+.end
+
+
 =item C<checkstring (arg)>
 
 =cut
@@ -153,26 +180,9 @@ L0:
 
 .sub getn
     .param pmc table
-    .const .LuaString n = "n"
-    $P0 = table[n]
-    if_null $P0, L0
-    $I0 = isa $P0, "LuaNumber"
-    unless $I0, L0
-    $I1 = $P0
-    unless $I1 >= 0 goto L0
-    .return ($I1)
-L0:
-    $I1 = 0
-    new $P1, .LuaNumber
-    $P1 = 1.0 
-L1:
-    $P0 = table[$P1]
-    unless $P0 goto L2
-    inc $I1
-    inc $P1
-    goto L1
-L2:
-    .return ($I1)
+    $P0 = table."len"()
+    $I0 = $P0
+    .return ($I0)
 .end
 
 
@@ -250,20 +260,6 @@ L0:
     .return ($S0)
 L0:
     .return (default)
-.end
-
-
-=item C<setn (table, n)>
-
-=cut
-
-.sub setn
-    .param pmc table
-    .param int n
-    .const .LuaString key_n = "n"
-    new $P0, .LuaNumber
-    $P0 = n
-    table[key_n] = $P0
 .end
 
 

@@ -217,6 +217,22 @@ Sets the value of the string to that of the specified C<string>.
 
 /*
 
+=item C<PMC* get_pmc_keyed (PMC* key)>
+
+=cut
+
+*/
+    PMC* get_pmc_keyed (PMC* key) {
+        PMC *metamethod = Parrot_LuaBase_find_metamethod(INTERP, SELF,
+                string_from_const_cstring(INTERP, "__index", 0));
+        if (metamethod != NULL) {
+            return VTABLE_get_pmc_keyed(INTERP, metamethod, key);
+        }
+        return pmc_new(INTERP, dynpmc_LuaNil);
+    }
+
+/*
+
 =item C<PMC* neg (PMC * dest)>
 
 =cut

@@ -316,11 +316,11 @@ CODE
 /attempt to compare \w+ with \w+/
 OUT
 
-language_output_like( 'lua', <<'CODE', <<'OUT', 'get_pmc_keyed' );
+language_output_is( 'lua', <<'CODE', <<'OUT', 'get_pmc_keyed' );
 a = "text"
 print(a[1])
 CODE
-/attempt to index/
+nil
 OUT
 
 language_output_like( 'lua', <<'CODE', <<'OUT', 'set_pmc_keyed' );

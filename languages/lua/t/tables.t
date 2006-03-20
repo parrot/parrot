@@ -20,7 +20,7 @@ use strict;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 8;
+use Parrot::Test tests => 9;
 use Test::More;
 
 language_output_is( 'lua', <<'CODE', <<'OUT', '' );
@@ -126,5 +126,19 @@ a = {}
 a()
 CODE
 /attempt to call/
+OUT
+
+language_output_is( 'lua', <<'CODE', <<'OUT', '' );
+local t
+t = { {"a","b","c"}, 10 }
+print((t)[2])
+print((t[1])[3]);
+(t)[1][2] = "B"
+(t[1])[3] = "C"
+print(table.concat(t[1],","))
+CODE
+10
+c
+a,B,C
 OUT
 

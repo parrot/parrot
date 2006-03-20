@@ -11,12 +11,16 @@ This library provides generic functions for string manipulation, such as
 finding and extracting substrings, and pattern matching. When indexing a
 string in Lua, the first character is at position 1 (not at 0, as in C).
 Indices are allowed to be negative and are interpreted as indexing backwards,
-from the end of the string. Thus, the last character is at position -1, and
-so on.
+from the end of the string. Thus, the last character is at position I<-1>,
+and so on.
 
 The string library provides all its functions inside the table C<string>.
+It also sets a metatable for strings where the C<__index> field points to
+the metatable itself. Therefore, you can use the string functions in
+object-oriented style. For instance, C<string.byte(s, i)> can be written as
+C<s:byte(i)>. 
 
-See "Lua 5.0 Reference Manual", section 5.3 "String Manipulation".
+See "Lua 5.1 Reference Manual", section 5.4 "String Manipulation".
 
 =head2 Functions
 
@@ -35,14 +39,14 @@ See "Lua 5.0 Reference Manual", section 5.3 "String Manipulation".
 
 #    print "init Lua String\n"
 
-    .local pmc _lua__G
-    _lua__G = global "_G"
+    .local pmc _lua__GLOBAL
+    _lua__GLOBAL = global "_G"
     $P1 = new .LuaString
 
     .local pmc _string
     _string = new .LuaTable
     $P1 = "string"
-    _lua__G[$P1] = _string
+    _lua__GLOBAL[$P1] = _string
 
     .const .Sub _string_byte = "_string_byte"
     $P0 = _string_byte
@@ -64,6 +68,21 @@ See "Lua 5.0 Reference Manual", section 5.3 "String Manipulation".
     $P1 = "find"
     _string[$P1] = $P0
 
+    .const .Sub _string_format = "_string_format"
+    $P0 = _string_format
+    $P1 = "format"
+    _string[$P1] = $P0
+
+    .const .Sub _string_gmatch = "_string_gmatch"
+    $P0 = _string_gmatch
+    $P1 = "gmatch"
+    _string[$P1] = $P0
+
+    .const .Sub _string_gsub = "_string_gsub"
+    $P0 = _string_gsub
+    $P1 = "gsub"
+    _string[$P1] = $P0
+
     .const .Sub _string_len = "_string_len"
     $P0 = _string_len
     $P1 = "len"
@@ -74,9 +93,19 @@ See "Lua 5.0 Reference Manual", section 5.3 "String Manipulation".
     $P1 = "lower"
     _string[$P1] = $P0
 
+    .const .Sub _string_match = "_string_match"
+    $P0 = _string_match
+    $P1 = "match"
+    _string[$P1] = $P0
+
     .const .Sub _string_rep = "_string_rep"
     $P0 = _string_rep
     $P1 = "rep"
+    _string[$P1] = $P0
+
+    .const .Sub _string_reverse = "_string_reverse"
+    $P0 = _string_reverse
+    $P1 = "reverse"
     _string[$P1] = $P0
 
     .const .Sub _string_sub = "_string_sub"
@@ -87,21 +116,6 @@ See "Lua 5.0 Reference Manual", section 5.3 "String Manipulation".
     .const .Sub _string_upper = "_string_upper"
     $P0 = _string_upper
     $P1 = "upper"
-    _string[$P1] = $P0
-
-    .const .Sub _string_format = "_string_format"
-    $P0 = _string_format
-    $P1 = "format"
-    _string[$P1] = $P0
-
-    .const .Sub _string_gfind = "_string_gfind"
-    $P0 = _string_gfind
-    $P1 = "gfind"
-    _string[$P1] = $P0
-
-    .const .Sub _string_gsub = "_string_gsub"
-    $P0 = _string_gsub
-    $P1 = "gsub"
     _string[$P1] = $P0
 
 
@@ -125,11 +139,10 @@ L0:
 .end
 
 
-=item C<string.byte (s [, i])>
+=item C<string.byte (s [, i [, j]])>
 
-Returns the internal numerical code of the C<i>-th character of C<s>, or
-B<nil> if the index is out of range. If C<i> is absent, then it is assumed
-to be 1. C<i> may be negative.
+Returns the internal numerical codes of the characters C<s[i]>, C<s[i+1]>,...,
+C<s[j]>. The default value for C<i> is 1; the default value for C<j> is C<i>.
 
 Note that numerical codes are not necessarily portable across platforms.
 
@@ -137,23 +150,48 @@ Note that numerical codes are not necessarily portable across platforms.
 
 .sub _string_byte :anon
     .param pmc s :optional
-    .param pmc n :optional
-    .local pmc ret
+    .param pmc i :optional
+    .param pmc j :optional
     $S0 = checkstring(s)
-    $I0 = length $S0
-    $I1 = optint(n, 1)
-    $I1 = posrelat($I1, $I0)
-    if $I1 == 0 goto L0
-    if $I1 > $I0 goto L0
-    dec $I1
-    $I2 = ord $S0, $I1
-    new ret, .LuaNumber
-    ret = $I2
-    .return (ret)
-L0:    
-    new ret, .LuaNil
-    .return (ret)
+    .local int l
+    l = length $S0
+    .local int posi
+    posi = optint(i, 1)
+    posi = posrelat(posi, l)
+    .local int pose
+    pose = optint(j, posi)
+    pose = posrelat(pose, l)
+    unless posi <= 0 goto L0
+    posi = 1
+L0:
+    unless pose > l goto L1
+    pose = l
+L1:    
+    unless posi > pose goto L2
+    .return ()
+L2:
+    .local int n
+    n = pose - posi
+    inc n
+    .local pmc ret
+    new ret, .Array
+    set ret, n
+    .local int i
+    i = 0
+L3:
+    unless i < n goto L4
+    $I0 = posi + i
+    dec $I0
+    $I1 = ord $S0, $I0
+    new $P0, .LuaNumber
+    $P0 = $I1 
+    ret[i] = $P0
+    inc i
+    goto L3
+L4:
+    .return (ret :flat)
 .end
+
 
 =item C<string.char (i1, i2, ...)>
 
@@ -191,11 +229,12 @@ L2:
     .return (ret)
 .end
 
+
 =item C<string.dump (function)>
 
-Returns a binary representation of the given function, so that a later
-C<loadstring> on that string returns a copy of the function. C<function> must
-be a Lua function without upvalues.
+Returns a string containing a binary representation of the given function,
+so that a later C<loadstring> on this string returns a copy of the function.
+C<function> must be a Lua function without upvalues.
 
 NOT YET IMPLEMENTED.
 
@@ -207,18 +246,20 @@ NOT YET IMPLEMENTED.
     not_implemented()
 .end
 
+
 =item C<string.find (s, pattern [, init [, plain]])>
 
-Looks for the first I<match> of C<pattern> in the string C<s>. If it finds one,
+Looks for the first I<match> of C<pattern> in the string C<s>. If it finds a match,
 then C<find> returns the indices of C<s> where this occurrence starts and ends;
-otherwise, it returns B<nil>. If the C<pattern> specifies captures (see
-C<string.gsub> below), the captured strings are returned as extra results.
-A third, optional numerical argument C<init> specifies where to start the
-search; its default value is 1 and may be negative. A value of B<true> as a
-fourth, optional argument C<plain> turns off the pattern matching facilities,
-so the function does a plain "find substring" operation, with no characters
-in C<pattern> being considered "magic". Note that if C<plain> is given, then
-C<init> must be given too.
+otherwise, it returns B<nil>. A third, optional numerical argument C<init>
+specifies where to start the search; its default value is 1 and may be negative.
+A value of B<true> as a fourth, optional argument C<plain> turns off the
+pattern matching facilities, so the function does a plain "find substring"
+operation, with no characters in C<pattern> being considered "magic". Note
+that if C<plain> is given, then C<init> must be given as well.
+
+If the pattern has captures, then in a successful match the captured values
+are also returned, after the two indices. 
 
 NOT YET IMPLEMENTED.
 
@@ -237,6 +278,121 @@ NOT YET IMPLEMENTED.
     not_implemented()
 .end
 
+
+=item C<string.format (formatstring, e1, e2, ...)>
+
+Returns a formatted version of its variable number of arguments following the
+description given in its first argument (which must be a string). The format
+string follows the same rules as the C<printf> family of standard C functions.
+The only differences are that the options/modifiers C<*>, C<l>, C<L>, C<n>,
+C<p>, and C<h> are not supported, and there is an extra option, C<q>. The C<q>
+option formats a string in a form suitable to be safely read back by the Lua
+interpreter: The string is written between double quotes, and all double
+quotes, newlines, and backslashes in the string are correctly escaped when
+written. For instance, the call
+
+    string.format(’%q’, ’a string with "quotes" and \n new line’)
+
+will produce the string:
+
+    "a string with \"quotes\" and \
+    new line"
+
+The options C<c>, C<d>, C<E>, C<e>, C<f>, C<g>, C<G>, C<i>, C<o>, C<u>, C<X>,
+and C<x> all expect a number as argument, whereas C<q> and C<s> expect a string.
+
+This function does not accept string values containing embedded zeros. 
+
+NOT YET IMPLEMENTED.
+
+=cut
+
+.sub _string_format :anon
+    .param pmc formatstring :optional
+    .param pmc argv :slurpy
+    $S0 = checkstring(formatstring)
+    $I0 = length $S0
+    not_implemented()
+.end
+
+
+=item C<string.gmatch (s, pattern)>
+
+Returns an iterator function that, each time it is called, returns the next
+captures from pattern C<pattern> over string C<s>.
+
+If C<pattern> specifies no captures, then the whole match is produced in each
+call.
+
+As an example, the following loop
+
+    s = "hello world from Lua"
+    for w in string.gfind(s, "%a+") do
+        print(w)
+    end
+
+will iterate over all the words from string C<s>, printing one per line. The
+next example collects all pairs C<key=value> from the given string into a
+table:
+
+    t = {}
+    s = "from=world, to=Lua"
+    for k, v in string.gfind(s, "(%w+)=(%w+)") do
+        t[k] = v
+    end
+
+NOT YET IMPLEMENTED.
+
+=cut
+
+.sub _string_gmatch :anon
+    .param pmc s :optional
+    .param pmc pattern :optional
+    $S0 = checkstring(s)
+    $S1 = checkstring(pattern)
+    not_implemented()
+.end
+
+
+=item C<string.gsub (s, pat, repl [, n])>
+
+Returns a copy of C<s> in which all occurrences of the pattern C<pat> have
+been replaced by a replacement string specified by C<repl>. C<gsub> also
+returns, as a second value, the total number of substitutions made.
+
+If C<repl> is a string, then its value is used for replacement. Any sequence
+in C<repl> of the form %I<n>, with I<n> between 1 and 9, stands for the value
+of the I<n>-th captured substring.
+
+If C<repl> is a function, then this function is called every time a match
+occurs, with all captured substrings passed as arguments, in order; if the
+pattern specifies no captures, then the whole match is passed as a sole
+argument. If the value returned by this function is a string, then it is used
+as the replacement string; otherwise, the replacement string is the empty
+string.
+
+The optional last parameter C<n> limits the maximum number of substitutions
+to occur. For instance, when C<n> is 1 only the first occurrence of C<pat>
+is replaced.
+
+NOT YET IMPLEMENTED.
+
+=cut
+
+.sub _string_gsub :anon
+    .param pmc s :optional
+    .param pmc pat :optional
+    .param pmc repl :optional
+    .param pmc n :optional
+    $S0 = checkstring(s)
+    $I0 = length $S0
+    $S1 = checkstring(pat)
+    $I1 = $I0 + 1
+    $I2 = optint(n, $I1)
+    not_implemented()
+.end
+
+
 =item C<string.len (s)>
 
 Receives a string and returns its length. The empty string C<""> has length 0.
@@ -253,6 +409,7 @@ Embedded zeros are counted, so C<"a\000b\000c"> has length 5.
     ret = $I0
     .return (ret)
 .end
+
 
 =item C<string.lower (s)>
 
@@ -271,6 +428,32 @@ of what is an uppercase letter depends on the current locale.
     ret = $S0
     .return (ret)
 .end
+
+
+=item C<string.match (s, pattern [, init])>
+
+Looks for the first I<match> of C<pattern> in the string C<s>. If it finds
+one, then C<match> returns the captures from the pattern; otherwise it
+returns B<nil>. If C<pattern> specifies no captures, then the whole match is
+returned. A third, optional numerical argument C<init> specifies where to
+start the search; its default value is 1 and may be negative.
+
+NOT YET IMPLEMENTED.
+
+=cut
+
+.sub _string_match :anon
+    .param pmc s :optional
+    .param pmc pattern :optional
+    .param pmc init :optional
+    $S0 = checkstring(s)
+    $I0 = length $S0
+    $S1 = checkstring(pattern)
+    $I1 = length $S1
+    $I2 = optint(init, 1)
+    not_implemented()
+.end
+
 
 =item C<string.rep (s, n)>
 
@@ -292,6 +475,38 @@ L0:
     ret = $S1
     .return (ret)
 .end
+
+
+=item C<string.reverse (s)>
+
+Returns a string that is the string C<s> reversed.
+
+=cut
+
+.sub _string_reverse :anon
+    .param pmc s :optional
+    .local pmc ret
+    $S0 = checkstring(s)
+    $I0 = 0
+    $I1 = length $S0
+    dec $I1
+    $P0 = split "", $S0
+L1:
+    unless $I0 < $I1 goto L2
+    $S2 = $P0[$I0]
+    $S3 = $P0[$I1]
+    $P0[$I0] = $S3
+    $P0[$I1] = $S2
+    inc $I0
+    dec $I1
+    goto L1
+L2:    
+    $S1 = join "", $P0
+    new ret, .LuaString
+    ret = $S1
+    .return (ret)
+.end
+
 
 =item C<string.sub (s, i [, j])>
 
@@ -332,6 +547,7 @@ L3:
     .return (ret)
 .end
 
+
 =item C<string.upper (s)>
 
 Receives a string and returns a copy of that string with all lowercase letters
@@ -348,118 +564,6 @@ of what is a lowercase letter depends on the current locale.
     new ret, .LuaString
     ret = $S0
     .return (ret)
-.end
-
-=item C<string.format (formatstring, e1, e2, ...)>
-
-Returns a formatted version of its variable number of arguments following the
-description given in its first argument (which must be a string). The format
-string follows the same rules as the C<printf> family of standard C functions.
-The only differences are that the options/modifiers C<*>, C<l>, C<L>, C<n>,
-C<p>, and C<h> are not supported, and there is an extra option, C<q>. The C<q>
-option formats a string in a form suitable to be safely read back by the Lua
-interpreter: The string is written between double quotes, and all double
-quotes, newlines, and backslashes in the string are correctly escaped when
-written. For instance, the call
-
-    string.format(’%q’, ’a string with "quotes" and \n new line’)
-
-will produce the string:
-
-    "a string with \"quotes\" and \
-    new line"
-
-The options C<c>, C<d>, C<E>, C<e>, C<f>, C<g>, C<G>, C<i>, C<o>, C<u>, C<X>,
-and C<x> all expect a number as argument, whereas C<q> and C<s> expect a
-string. The C<*> modifier can be simulated by building the appropriate format
-string. For example, C<"%*g"> can be simulated with C<"%"..width.."g">.
-
-String values to be formatted with C<%s> cannot contain embedded zeros.
-
-NOT YET IMPLEMENTED.
-
-=cut
-
-.sub _string_format :anon
-    .param pmc formatstring :optional
-    .param pmc argv :slurpy
-    $S0 = checkstring(formatstring)
-    $I0 = length $S0
-    not_implemented()
-.end
-
-=item C<string.gfind (s, pat)>
-
-Returns an iterator function that, each time it is called, returns the next
-captures from pattern C<pat> over string C<s>.
-
-If C<pat> specifies no captures, then the whole match is produced in each call.
-
-As an example, the following loop
-
-    s = "hello world from Lua"
-    for w in string.gfind(s, "%a+") do
-        print(w)
-    end
-
-will iterate over all the words from string C<s>, printing one per line. The
-next example collects all pairs C<key=value> from the given string into a
-table:
-
-    t = {}
-    s = "from=world, to=Lua"
-    for k, v in string.gfind(s, "(%w+)=(%w+)") do
-        t[k] = v
-    end
-
-NOT YET IMPLEMENTED.
-
-=cut
-
-.sub _string_gfind :anon
-    .param pmc s :optional
-    .param pmc pat :optional
-    $S0 = checkstring(s)
-    $S1 = checkstring(pat)
-    not_implemented()
-.end
-
-=item C<string.gsub (s, pat, repl [, n])>
-
-Returns a copy of C<s> in which all occurrences of the pattern C<pat> have
-been replaced by a replacement string specified by C<repl>. C<gsub> also
-returns, as a second value, the total number of substitutions made.
-
-If C<repl> is a string, then its value is used for replacement. Any sequence
-in C<repl> of the form %I<n>, with I<n> between 1 and 9, stands for the value
-of the I<n>-th captured substring.
-
-If C<repl> is a function, then this function is called every time a match
-occurs, with all captured substrings passed as arguments, in order; if the
-pattern specifies no captures, then the whole match is passed as a sole
-argument. If the value returned by this function is a string, then it is used
-as the replacement string; otherwise, the replacement string is the empty
-string.
-
-The optional last parameter C<n> limits the maximum number of substitutions
-to occur. For instance, when C<n> is 1 only the first occurrence of C<pat>
-is replaced.
-
-NOT YET IMPLEMENTED.
-
-=cut
-
-.sub _string_gsub :anon
-    .param pmc s :optional
-    .param pmc pat :optional
-    .param pmc repl :optional
-    .param pmc n :optional
-    $S0 = checkstring(s)
-    $I0 = length $S0
-    $S1 = checkstring(pat)
-    $I1 = $I0 + 1
-    $I2 = optint(n, $I1)
-    not_implemented()
 .end
 
 =back

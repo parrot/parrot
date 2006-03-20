@@ -1,10 +1,10 @@
 /*
-Copyright: 2005 The Perl Foundation.  All Rights Reserved.
+Copyright: 2005-2006 The Perl Foundation.  All Rights Reserved.
 $Id$
 
 =head1 NAME
 
-classes/luauserdata.pmc - Lua Userdata
+pmc/luauserdata.pmc - Lua Userdata
 
 =head1 DESCRIPTION
 
@@ -23,6 +23,7 @@ the Lua C<Userdata> type.
 
 static STRING *luauserdata_name;
 static INTVAL dynpmc_LuaBoolean;
+static INTVAL dynpmc_LuaNil;
 static INTVAL dynpmc_LuaString;
 
 
@@ -43,6 +44,8 @@ pmclass LuaUserdata
             luauserdata_name = const_string(INTERP, "userdata");
             dynpmc_LuaBoolean = pmc_type(INTERP,
               string_from_const_cstring(INTERP, "LuaBoolean", 0));
+            dynpmc_LuaNil = pmc_type(INTERP,
+              string_from_const_cstring(INTERP, "LuaNil", 0));
             dynpmc_LuaString = pmc_type(INTERP,
               string_from_const_cstring(INTERP, "LuaString", 0));
 
@@ -54,6 +57,13 @@ pmclass LuaUserdata
                 const_string(INTERP, "userdata"),
                 const_string(INTERP, "rawequal"),
                 meth);
+            meth = Parrot_find_global(INTERP,
+                const_string(INTERP, "LuaUserdata"),
+                const_string(INTERP, "set_metatable"));
+            Parrot_store_global(INTERP,
+                const_string(INTERP, "userdata"),
+                const_string(INTERP, "set_metatable"),
+                meth);
         }
     }
 
@@ -61,14 +71,28 @@ pmclass LuaUserdata
 
 =item C<void init()>
 
-Initializes the string.
+Initializes the userdata.
 
 =cut
 
 */
     void init () {
-        PMC_str_val(SELF) =
-            string_make_empty(INTERP, enum_stringrep_one, 0);
+        PMC_pmc_val(SELF) = NULL;
+        PMC_struct_val(SELF) = NULL;
+    }
+
+/*
+
+=item C<void init_pmc(PMC *value)>
+
+Initializes the userdata.
+
+=cut
+
+*/
+    void init_pmc (PMC* value) {
+        PMC_pmc_val(SELF) = value;
+        PMC_struct_val(SELF) = NULL;
         PObj_custom_mark_SET(SELF);
     }
 
@@ -76,30 +100,14 @@ Initializes the string.
 
 =item C<void mark()>
 
-Marks the string as live.
+Marks the userdata as live.
 
 =cut
 
 */
     void mark () {
-        if(PMC_str_val(SELF))
-            pobject_lives(INTERP, (PObj *)PMC_str_val(SELF));
-    }
-
-/*
-
-=item C<PMC* clone()>
-
-Creates a copy of the string.
-
-=cut
-
-*/
-    PMC* clone () {
-        PMC* dest = pmc_new_noinit(INTERP, SELF->vtable->base_type);
-        PObj_custom_mark_SET(dest);
-        PMC_str_val(dest) = string_copy(INTERP,PMC_str_val(SELF));
-        return dest;
+        if(PMC_pmc_val(SELF))
+            pobject_lives(INTERP, (PObj *)PMC_pmc_val(SELF));
     }
 
 /*
@@ -111,6 +119,22 @@ Creates a copy of the string.
 */
     STRING* get_string () {
         return Parrot_sprintf_c(INTERP, "userdata: %08X", SELF);
+    }
+
+/*
+
+=item C<PMC* get_pmc_keyed (PMC* key)>
+
+=cut
+
+*/
+    PMC* get_pmc_keyed (PMC* key) {
+        PMC *metamethod = Parrot_LuaBase_find_metamethod(INTERP, SELF,
+                string_from_const_cstring(INTERP, "__index", 0));
+        if (metamethod != NULL) {
+            return VTABLE_get_pmc_keyed(INTERP, metamethod, key);
+        }
+        return pmc_new(INTERP, dynpmc_LuaNil);
     }
 
 /*
@@ -128,15 +152,92 @@ Return the string "userdata".
 
 /*
 
-=item C<VOID set_string_native(STRING* value)>
-
-Sets the value of the string to that of the specified C<string>.
+=item C<PMC* clone()>
 
 =cut
 
 */
-    void set_string_native (STRING* value) {
-        PMC_str_val(SELF) = value;
+    PMC* clone() {
+        return SELF;
+    }
+
+/*
+
+=item C<PMC* get_attr(INTVAL idx)>
+
+=cut
+
+*/
+    PMC* get_attr(INTVAL idx) {
+        return PMC_pmc_val(SELF);
+    }
+
+/*
+
+=item C<void set_attr(INTVAL idx, PMC *val)>
+
+=cut
+
+*/
+    void set_attr(INTVAL idx, PMC* value) {
+        PMC_pmc_val(SELF) = value;
+    }
+
+/*
+
+=back
+
+=head2 non-Vtable Methods
+
+=over 4
+
+=item C<INTVAL is_equal (PMC* value)>
+
+The C<==> operation. Compares reference (not in depth).
+
+=cut
+
+*/
+    INTVAL is_equal (PMC* value) {
+MMD_LuaUserdata: {
+            PMC *metamethod = Parrot_LuaBase_find_metamethod(INTERP, SELF,
+                    string_from_const_cstring(INTERP, "__eq", 0));
+            if (metamethod != NULL) {
+                PMC *retval = Parrot_runops_fromc_args(INTERP, metamethod, "PPP", SELF, value);
+                if (NULL == retval) {
+                    return (INTVAL)0;
+                }
+                return VTABLE_get_bool(INTERP, retval);
+            }
+            if (SELF == value)
+                return (INTVAL)1;
+            else 
+                return (INTVAL)0;
+        }
+MMD_DEFAULT: {
+            return (INTVAL)0;
+        }
+    }
+
+/*
+
+=item C<INTVAL cmp (PMC *value)>
+
+=cut
+
+*/
+    INTVAL cmp (PMC* value) {
+MMD_LuaUserdata: {
+            real_exception(INTERP, NULL, ILL_INHERIT,
+                    "attempt to compare two userdata values");
+            return (INTVAL)0;
+        }
+MMD_DEFAULT: {
+            real_exception(INTERP, NULL, ILL_INHERIT,
+                    "attempt to compare userdata with %s",
+                    string_to_cstring(INTERP, VTABLE_name(INTERP, value)));
+            return (INTVAL)0;
+        }
     }
 
 /*
@@ -162,6 +263,21 @@ Sets the value of the string to that of the specified C<string>.
         else
             PMC_int_val(retval) = 0;
         return retval;
+    }
+
+/*
+
+=item C<void set_metatable(PMC *meta)>
+
+=cut
+
+*/
+    METHOD void set_metatable(PMC *meta) {
+        if (dynpmc_LuaNil == meta->vtable->base_type) {
+            PMC_struct_val(SELF) = NULL;
+        } else {
+            PMC_struct_val(SELF) = meta;
+        }
     }
 
 }

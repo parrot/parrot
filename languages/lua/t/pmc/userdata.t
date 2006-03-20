@@ -1,5 +1,5 @@
 #! perl -w
-# Copyright: 2005 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2005-2006 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 =head1 NAME
@@ -47,7 +47,7 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "check interface");
     .local pmc pmc1
     pmc1 = new $I0
     .local int bool1
-    bool1 = does pmc1, "string"
+    bool1 = does pmc1, "scalar"
     print bool1
     print "\n"
     bool1 = does pmc1, "no_interface"
@@ -56,7 +56,7 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "check interface");
     end
 .end
 CODE
-0
+1
 0
 OUTPUT
 
@@ -84,9 +84,10 @@ pir_output_like(<< 'CODE', << 'OUTPUT', "check get_string");
 .sub _main
     loadlib P1, "lua_group"
     find_type $I0, "LuaUserdata"
+    .local pmc val1
+    val1 = new .Array
     .local pmc pmc1
-    pmc1 = new $I0
-    pmc1 = "value"
+    pmc1 = new $I0, val1
     print pmc1
     print "\n"
     end
@@ -99,21 +100,16 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "check get_bool");
 .sub _main
     loadlib P1, "lua_group"
     find_type $I0, "LuaUserdata"
+    .local pmc val1
+    val1 = new .Array
     .local pmc pmc1
-    pmc1 = new $I0
-    pmc1 = "value"
+    pmc1 = new $I0, val1
     .local int bool1
     bool1 = istrue pmc1
     print bool1
     print "\n"
-    pmc1 = ""
-    bool1 = istrue pmc1
-    print bool1
-    print "\n"
-    end
 .end
 CODE
-1
 1
 OUTPUT
 
@@ -121,9 +117,10 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "check logical_not");
 .sub _main
     loadlib P1, "lua_group"
     find_type $I0, "LuaUserdata"
+    .local pmc val1
+    val1 = new .Array
     .local pmc pmc1
-    pmc1 = new $I0
-    pmc1 = "value"
+    pmc1 = new $I0, val1
     find_type $I0, "LuaBoolean"
     .local pmc pmc2
     pmc2 = new $I0
@@ -144,9 +141,10 @@ OUTPUT
 pir_output_is(<< 'CODE', << 'OUTPUT', "check HLL");
 .HLL "Lua", "lua_group"
 .sub _main
+    .local pmc val1
+    val1 = new .Array
     .local pmc pmc1
-    pmc1 = new .LuaUserdata
-    pmc1 = "value"
+    pmc1 = new .LuaUserdata, val1
     .local int bool1
     bool1 = isa pmc1, "LuaUserdata"
     print bool1
@@ -160,9 +158,10 @@ OUTPUT
 pir_output_like(<< 'CODE', << 'OUTPUT', "check tostring");
 .HLL "Lua", "lua_group"
 .sub _main
+    .local pmc val1
+    val1 = new .Array
     .local pmc pmc1
-    pmc1 = new .LuaUserdata
-    pmc1 = "value"
+    pmc1 = new .LuaUserdata, val1
     print pmc1
     print "\n"
     $P0 = pmc1."tostring"()
@@ -179,9 +178,10 @@ OUTPUT
 pir_output_is(<< 'CODE', << 'OUTPUT', "check tonumber");
 .HLL "Lua", "lua_group"
 .sub _main
+    .local pmc val1
+    val1 = new .Array
     .local pmc pmc1
-    pmc1 = new .LuaUserdata
-    pmc1 = "value"
+    pmc1 = new .LuaUserdata, val1
     $P0 = pmc1."tonumber"()
     print $P0
     print "\n"

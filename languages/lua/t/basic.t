@@ -21,12 +21,18 @@ use strict;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 22;
+use Parrot::Test tests => 25;
 use Test::More;
 
-language_output_like( 'lua', << 'CODE', << 'OUTPUT', "function assert(false, msg)");
-assert("text", "assert string")
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', "function assert");
+v, msg = assert("text", "assert string")
+print(v, msg)
 assert({}, "assert table")
+CODE
+text	assert string
+OUTPUT
+
+language_output_like( 'lua', << 'CODE', << 'OUTPUT', "function assert(false, msg)");
 assert(false, "ASSERTION TEST")
 CODE
 /ASSERTION TEST/
@@ -188,6 +194,26 @@ CODE
 letter a
 OUTPUT
 
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', "function select");
+print(select("#"))
+print(select("#","a","b","c"))
+print(select(1,"a","b","c"))
+print(select(3,"a","b","c"))
+print(select(5,"a","b","c"))
+CODE
+0
+3
+a	b	c
+c
+
+OUTPUT
+
+language_output_like( 'lua', << 'CODE', << 'OUTPUT', "function select (out of range)");
+print(select(0,"a","b","c"))
+CODE
+/index out of range/
+OUTPUT
+
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', "function type");
 print(type("Hello world"))
 print(type(10.4*3))
@@ -195,12 +221,14 @@ print(type(10.4*3))
 -- print(type(type))
 print(type(true))
 print(type(nil))
+print(type(io.stdin))
 print(type(type(X)))
 CODE
 string
 number
 boolean
 nil
+userdata
 string
 OUTPUT
 
@@ -290,11 +318,15 @@ print(unpack{})
 print(unpack{"a"})
 print(unpack{"a","b","c"})
 print((unpack{"a","b","c"}))
+print(unpack({"a","b","c","d","e"},2,4))
+print(unpack({"a","b","c"},2,4))
 CODE
 
 a
 a	b	c
 a
+b	c	d
+b	c	nil
 OUTPUT
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', "function xpcall");

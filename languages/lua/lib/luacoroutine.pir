@@ -1,4 +1,4 @@
-# Copyright: 2005 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2005-2006 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 =head1 NAME
@@ -10,7 +10,7 @@ lib/luacoroutine.pir - Lua Coroutine Library
 The operations related to coroutines comprise a sub-library of the basic
 library and come inside the table C<coroutine>.
 
-See "Lua 5.0 Reference Manual", section 5.2 "Coroutine Manipulation".
+See "Lua 5.1 Reference Manual", section 5.2 "Coroutine Manipulation".
 
 =head2 Functions
 
@@ -29,14 +29,14 @@ See "Lua 5.0 Reference Manual", section 5.2 "Coroutine Manipulation".
 
 #    print "init Lua Coroutine\n"
 
-    .local pmc _lua__G
-    _lua__G = global "_G"
+    .local pmc _lua__GLOBAL
+    _lua__GLOBAL = global "_G"
     $P1 = new .LuaString
 
     .local pmc _coroutine
     _coroutine = new .LuaTable
     $P1 = "coroutine"
-    _lua__G[$P1] = _coroutine
+    _lua__GLOBAL[$P1] = _coroutine
 
     .const .Sub _coroutine_create = "_coroutine_create"
     $P0 = _coroutine_create
@@ -46,6 +46,11 @@ See "Lua 5.0 Reference Manual", section 5.2 "Coroutine Manipulation".
     .const .Sub _coroutine_resume = "_coroutine_resume"
     $P0 = _coroutine_resume
     $P1 = "resume"
+    _coroutine[$P1] = $P0
+
+    .const .Sub _coroutine_running = "_coroutine_running"
+    $P0 = _coroutine_running
+    $P1 = "running"
     _coroutine[$P1] = $P0
 
     .const .Sub _coroutine_status = "_coroutine_status"
@@ -80,13 +85,13 @@ Returns this new coroutine, an object with type C<"thread">.
     .return (ret)
 .end
 
-=item C<coroutine.resume (co, val1, ...)>
+=item C<coroutine.resume (co [, val1, ..., valn])>
 
 Starts or continues the execution of coroutine C<co>. The first time you
-resume a coroutine, it starts running its body. The arguments C<val1, ...>
-go as the arguments to the body function. If the coroutine has yielded,
-C<resume> restarts it; the arguments C<val1, ...> go as the results from the
-yield.
+resume a coroutine, it starts running its body. The values C<val1, ..., valn>
+are passed as the arguments to the body function. If the coroutine has yielded,
+C<resume> restarts it; the values C<val1, ..., valn> are passed as the results
+from the yield.
 
 If the coroutine runs without any errors, C<resume> returns B<true> plus any
 values passed to yield (if the coroutine yields) or any values returned by
@@ -117,13 +122,28 @@ _handler:
     .return (status, msg)
 .end
 
+
+=item C<coroutine.running ()>
+
+Returns the running coroutine, or B<nil> when called by the main thread.
+
+NOT YET IMPLEMENTED.
+
+=cut
+
+.sub _coroutine_running :anon
+    not_implemented()
+.end
+
+
 =item C<coroutine.status (co)>
 
 Returns the status of coroutine C<co>, as a string: C<"running">, if the
 coroutine is running (that is, it called C<status>); C<"suspended">, if the
 coroutine is suspended in a call to yield, or if it has not started running
-yet; and C<"dead"> if the coroutine has finished its body function, or if it
-has stopped with an error.
+yet; C<"normal"> if the coroutine is active but not running (that is, it has
+resumed another coroutine); and C<"dead"> if the coroutine has finished its 
+body function, or if it has stopped with an error.
 
 DUMMY IMPLEMENTATION.
 
@@ -156,11 +176,11 @@ NOT YET IMPLEMENTED.
     not_implemented()
 .end
 
-=item C<coroutine.yield (val1, ...)>
+=item C<coroutine.yield ([val1, ..., valn])>
 
 Suspends the execution of the calling coroutine. The coroutine cannot be
-running neither a C function, nor a metamethod, nor an iterator.
-Any arguments to C<yield> go as extra results to C<resume>.
+running a C function, a metamethod, or an iterator.
+Any arguments to C<yield> are passed as extra results to C<resume>.
 
 =cut
 
