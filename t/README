@@ -9,7 +9,7 @@ benchmark:    Run all benchmarks
 
 compilers:    Mini languages distributed with Parrot
 
-configure:    Configuration subsystem
+configure:    Perl modules of configuration subsystem
 
 distro:       Tests run before a distro is released
 

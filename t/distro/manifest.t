@@ -1,5 +1,5 @@
 #! perl
-# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2001-2006 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 use strict;
@@ -11,19 +11,15 @@ use ExtUtils::Manifest;
 
 =head1 NAME
 
-t/perl/manifest.t - sanity check the MANIFEST file
+t/distro/manifest.t - sanity check the MANIFEST file
 
 =head1 SYNOPSIS
 
-	% prove t/perl/manifest.t
+    % prove t/distro/manifest.t
 
 =head1 DESCRIPTION
 
 Checks that the distribution and the MANIFEST file agree.
-
-=head1 TODO
-
-The file make more sense in 't/distro', but still be run by 'make test'.
 
 =cut
 
@@ -36,7 +32,6 @@ ok(-e $ExtUtils::Manifest::MANIFEST . '.SKIP', 'MANIFEST.SKIP exists');
 
 SKIP:
 {
-
     diag "this may take a while...";
 
     $ExtUtils::Manifest::Quiet = 1;
