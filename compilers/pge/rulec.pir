@@ -31,7 +31,7 @@ Choose the compiler from one of the registered PGE front-ends.
 
 =over 4
 
-=item help
+=item --help
 
 Print a friendly help message.
 
@@ -124,12 +124,16 @@ Print a friendly help message.
 
     unless it_comp goto IT_DONE
     shift comp, it_comp
-    print " - "
+    print "  * "
     print comp
     print "\n"
     goto IT_NEXT
 
   IT_DONE:
+    print <<"OPTIONS"
+ Options:
+  --help         -- print this message
+OPTIONS
     goto END
 
   ERR_TOO_FEW_ARGS:
