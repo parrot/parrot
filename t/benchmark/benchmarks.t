@@ -209,7 +209,6 @@ SArray:\s\d+\.\d+s\n
 
 # These scripts are known to be failing.
 my %todo = ( 
-             q{stress3.pasm}                    => 'Null PMC access in get_integer(), P5 is no longer special',
            );
 
 plan tests => scalar keys %outputs;

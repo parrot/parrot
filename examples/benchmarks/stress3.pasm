@@ -31,9 +31,12 @@ at the moment:
 
 =cut
 
-	set I10, P5
-	lt I10, 2, noarg
-	set I11, P5[1]
+# How can I get to the command line args?
+
+	#set I10, P5
+	#lt I10, 2, noarg
+	#set I11, P5[1]
+	set I11, 0
 noarg:
 	set I0, 100
 	new P0, .PerlArray
