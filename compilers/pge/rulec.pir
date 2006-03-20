@@ -29,38 +29,56 @@ Choose the compiler from one of the registered PGE front-ends.
 
 =head2 OPTIONS
 
-...
+=over 4
+
+=item help
+
+Print a friendly help message.
+
+=back
 
 =cut
+
+
+.include 'hllmacros.pir'
+.include 'iterator.pasm'
 
 
 .sub "main" :main
     .param pmc args
     .local string prog
     .local string file
-
-    prog = shift args
-
-    $I0 = args
-    unless $I0 >= 2 goto ERR_TOO_FEW_ARGS
-
-    file = pop args
+    .local pmc compilers
 
     load_bytecode "PGE.pbc"
     load_bytecode "PGE/Text.pir"
     load_bytecode "PGE/Util.pir"
     load_bytecode "Getopt/Obj.pir"
 
+    ## register compilers
+    compilers = new .Hash
+    compilers['p6rules'] = 'PGE::P6Grammar'
+## TODO not yet implemented
+#    compilers['p5regexp'] = 'PGE::P5Regexp'
+#    compilers['bnf'] = 'PGE::BNFGrammar'
+    prog = shift args
+
+    ## sanity check cmdline parameters, capture required arg
+    $I0 = args
+    unless $I0 >= 2 goto ERR_TOO_FEW_ARGS
+
+    file = pop args
+
+    ## create option parser
     .local pmc getopts
     getopts = new "Getopt::Obj"
     getopts."notOptStop"(1)
 
-    .local pmc compilers
-    compilers = register_compilers()
-
+    ## config with cmdline options
     push getopts, "compiler|c=s"
     push getopts, "help|h"
 
+    ## process cmdline options
     .local pmc opts
     opts = getopts."get_options"( args )
 
@@ -92,13 +110,14 @@ Choose the compiler from one of the registered PGE front-ends.
     goto END
 
   USAGE:
-    print "usage: "
+    print "Usage: "
     print prog
     print " [OPTIONS] --compiler=COMPILER FILE\n"
 
     .local pmc it_comp
     .local string comp
     it_comp = new .Iterator, compilers
+    it_comp = .ITERATE_FROM_START
 
     print " Registered Compilers:\n"
   IT_NEXT:
@@ -108,68 +127,31 @@ Choose the compiler from one of the registered PGE front-ends.
     print " - "
     print comp
     print "\n"
-    branch IT_NEXT
+    goto IT_NEXT
 
   IT_DONE:
     goto END
 
   ERR_TOO_FEW_ARGS:
     print "Error: too few arguments\n\n"
-    branch USAGE
+    goto USAGE
 
   ERR_NO_COMPILER:
     print "Error: no compiler specified\n\n"
-    branch USAGE
+    goto USAGE
 
   ERR_COMPILER_NOT_REGISTERED:
     print "Error: not a registered compiler: "
     print compiler
     print "\n\n"
-    branch USAGE
+    goto USAGE
 
   ERR_NO_FILE:
     print "Error: file not found: "
     print file
     print "\n\n"
-    branch USAGE
+    goto USAGE
 
   END:
 .end
 
-
-.sub 'register_compilers'
-    .local pmc compilers
-    compilers = new .Hash
-
-    compilers['p6rules'] = 'PGE::P6Grammar'
-    compilers['p5regexp'] = 'PGE::P5Regexp'
-    compilers['bnf'] = 'PGE::BNFGrammar'
-
-    .return( compilers )
-.end
-
-
-.sub 'configure_getopts_compilers'
-    .param pmc getopts
-    .param pmc opt_hash
-
-    .local pmc it_opts
-    .local string key
-    it_opts = new .Iterator, opt_hash
-
-IT_NEXT:
-    unless it_opts goto DONE
-    key = shift it_opts
-
-    ## each compiler option takes a string (the input file)
-    concat key, '=s'
-
-    push getopts, key
-    branch IT_NEXT
-
-DONE:
-    .return( getopts )
-.end
-
-
-.include 'hllmacros.pir'
