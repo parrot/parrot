@@ -71,6 +71,7 @@ Creates the PGE::OPTable class.
     addattribute base, "%!opertable"
     addattribute base, "%!wstermtable"
     addattribute base, "%!wsopertable"
+    addattribute base, "&!ws"
 .end
 
 =item C<__init()>
@@ -91,6 +92,8 @@ Initializes a PGE::OPTable object.
     setattribute self, "PGE::OPTable\x0%!opertable", $P0
     $P0 = new $I0
     setattribute self, "PGE::OPTable\x0%!wsopertable", $P0
+    $P0 = find_global "PGE::OPTable", "ws"
+    setattribute self, "PGE::OPTable\x0&!ws", $P0
 .end
 
 =back
@@ -136,6 +139,7 @@ value for C<match> is "PGE::Match".
     .local pmc tok
     .local string tok1, tok2
     .local int nows
+    .local pmc ws
 
     toktable = getattribute self, "PGE::OPTable\x0%!toktable"
     termtable = getattribute self, "PGE::OPTable\x0%!termtable"
@@ -264,11 +268,13 @@ representing the result of the parse.
     .local pmc args
     .local string key
     .local pmc newfrom, mfrom, mpos
+    .local pmc ws
 
     termtable = getattribute self, "PGE::OPTable\x0%!termtable"
     opertable = getattribute self, "PGE::OPTable\x0%!opertable"
     wstermtable = getattribute self, "PGE::OPTable\x0%!wstermtable"
     wsopertable = getattribute self, "PGE::OPTable\x0%!wsopertable"
+    ws = getattribute self, "PGE::OPTable\x0&!ws"
     termstack = new .ResizablePMCArray
     operstack = new .ResizablePMCArray
     tokstack = new .ResizablePMCArray
@@ -283,7 +289,9 @@ representing the result of the parse.
   expect_term:
     if pos >= lastpos goto null_term
     $P0 = wstermtable
-    wspos = find_not_cclass .CCLASS_WHITESPACE, target, pos, lastpos
+    mpos = pos
+    $P1 = ws(mob)
+    wspos = $P1.to()
     if wspos > pos goto expect_term_1
     $P0 = termtable
   expect_term_1:
@@ -324,7 +332,9 @@ representing the result of the parse.
   expect_oper:
     if pos >= lastpos goto end
     $P0 = wsopertable
-    wspos = find_not_cclass .CCLASS_WHITESPACE, target, pos, lastpos
+    mpos = pos
+    $P1 = ws(mob)
+    wspos = $P1.to()
     if wspos > pos goto expect_oper_1
     $P0 = opertable
   expect_oper_1:
@@ -503,7 +513,29 @@ representing the result of the parse.
 #    operators are always tighter than any close, and so performs a shift.
 
 =back
-       
+
+=item C<ws(mob)>
+
+Match sequences of zero or more whitespace characters (i.e., the
+optional space between tokens).  This is provided as a fallback
+rule for parsers that don't define their own whitespace/comment
+matching rule.
+
+=cut
+
+.sub "ws"
+    .param pmc mob
+    .local string target
+    .local pmc mfrom, mpos
+    $P0 = find_global "PGE::Match", "newfrom"
+    (mob, target, mfrom, mpos) = $P0(mob)
+    $I0 = mfrom
+    $I1 = length target
+    $I2 = find_not_cclass .CCLASS_WHITESPACE, target, $I0, $I1
+    mpos = $I2
+    .return (mob)
+.end
+
 =head1 AUTHOR
 
 Patrick Michaud (pmichaud@pobox.com) is the author and maintainer.
