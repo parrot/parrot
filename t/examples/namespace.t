@@ -1,5 +1,5 @@
 # Copyright: 2005 The Perl Foundation.  All Rights Reserved.
-# $Id: pir.t 11364 2006-01-28 17:41:36Z bernhard $
+# $Id$
 
 use strict;
 use warnings;
