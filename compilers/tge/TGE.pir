@@ -71,9 +71,9 @@ C<tree> is the top-level node for the entire tree.
 
 .sub '__onload' :load
     # use other modules
-    load_bytecode 'compilers/tge/TGE/Rule.pir'
-    load_bytecode 'compilers/tge/TGE/Instance.pir'
-    load_bytecode "compilers/tge/TGE/Parser.pir"
+    load_bytecode 'compilers/tge/TGE/Rule.pbc'
+    load_bytecode 'compilers/tge/TGE/Instance.pbc'
+    load_bytecode 'compilers/tge/TGE/Parser.pbc'
 
     # define the class
     .local pmc base

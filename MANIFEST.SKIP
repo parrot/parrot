@@ -152,6 +152,9 @@
 ^compilers/tge/Makefile/
 ^compilers/tge/.*\.pbc$
 ^compilers/tge/.*\.pbc/
+# generated from svn:ignore of 'compilers/tge/TGE/'
+^compilers/tge/TGE/.*\.pbc$
+^compilers/tge/TGE/.*\.pbc/
 # generated from svn:ignore of 'docs/'
 ^docs/.*\.tmp$
 ^docs/.*\.tmp/

@@ -16,8 +16,17 @@ all: $(PARROT_LIBRARY)@slash@TGE.pbc
 $(PARROT_LIBRARY)@slash@TGE.pbc: TGE.pbc
 	$(CP) TGE.pbc $(PARROT_LIBRARY)
 
-TGE.pbc: TGE.pir TGE/Rule.pir TGE/Parser.pir TGE/Instance.pir
+TGE.pbc: TGE.pir TGE@slash@Rule.pbc TGE@slash@Parser.pbc TGE@slash@Instance.pbc
 	$(PARROT) -o TGE.pbc --output-pbc TGE.pir 
+
+TGE@slash@Rule.pbc: TGE@slash@Rule.pir
+	$(PARROT) -o TGE@slash@Rule.pbc --output-pbc TGE@slash@Rule.pir 
+
+TGE@slash@Instance.pbc: TGE@slash@Instance.pir
+	$(PARROT) -o TGE@slash@Instance.pbc --output-pbc TGE@slash@Instance.pir 
+
+TGE@slash@Parser.pbc: TGE@slash@Parser.pir
+	$(PARROT) -o TGE@slash@Parser.pbc --output-pbc TGE@slash@Parser.pir 
 
 # This is a listing of all targets, that are meant to be called by users
 help:
@@ -40,10 +49,10 @@ help:
 	@echo ""
 
 test: all
-	prove -r ../../t/compilers/tge
+	prove -r ..@slash@..@slash@t@slash@compilers@slash@tge
 
 testclean:
-	$(RM_RF) "../../t/compilers/tge/*.pir"
+	$(RM_RF) "..@slash@..@slash@t@slash@compilers@slash@tge@slash@*.pir"
 
 clean: testclean
 	$(RM_RF) TGE.pbc $(PARROT_LIBRARY)@slash@TGE.pbc
