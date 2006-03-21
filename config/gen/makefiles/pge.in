@@ -54,7 +54,7 @@ testclean:
 	    "../../t/compilers/pge/p5regexp/*.pbc" \
 	    "../../t/compilers/pge/p6rules/*.pbc"
 	$(RM_RF) "../../t/p6rules/*.pir"
-	$(RM_RF) "../../t/p6rules/*.p"
+	$(RM_RF) "../../t/p6rules/*.pbc"
 
 clean: testclean
 	$(RM_RF) PGE.pbc $(PARROT_LIBRARY)@slash@PGE.pbc PGE/Library.pir
