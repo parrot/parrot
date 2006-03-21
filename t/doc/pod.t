@@ -47,6 +47,8 @@ my $build_dir = $PConfig{build_dir};
 my $manifest     = maniread("$build_dir/MANIFEST");
 my $manifest_gen = maniread("$build_dir/MANIFEST.generated");
 
+diag "finding files with pod, this may take a minute.";
+
 foreach my $file (keys(%$manifest), keys(%$manifest_gen)) {
     $file = "$build_dir/$file";
     # skip binary files (including .pbc files)
