@@ -525,6 +525,10 @@ Return amount of used registers for register kinds "I", "S", "P", "N".
 
 Return the LexInfo PMC, if any or a Null PMC.
 
+=item C<METHOD PMC* get_multisig()>
+
+Return the MMD signature PMC, if any or a Null PMC.
+
 =cut
 
 */
@@ -565,6 +569,10 @@ Return the LexInfo PMC, if any or a Null PMC.
         return sub->outer_sub ? sub->outer_sub : PMCNULL;
     }
 
+    METHOD PMC* get_multisig() {
+        struct Parrot_sub * sub = PMC_sub(SELF);
+        return sub->multi_signature ? sub->multi_signature : PMCNULL;
+    }
 }
 
 /*

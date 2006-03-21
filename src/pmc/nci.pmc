@@ -28,6 +28,20 @@ pmclass NCI need_ext {
 
 /*
 
+=item C<METHOD PMC* get_multisig()>
+
+Return the MMD signature PMC, if any or a Null PMC.
+
+=cut
+
+*/
+
+    METHOD PMC* get_multisig() {
+        return PMC_pmc_val(SELF) ? PMC_pmc_val(SELF) : PMCNULL;
+    }
+
+/*
+
 =item C<void init()>
 
 Initializes the NCI with a C<NULL> function pointer.
