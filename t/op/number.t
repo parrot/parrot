@@ -1086,8 +1086,12 @@ pasm_output_is(<<'CODE', <<OUTPUT, "sqrt_n_n");
 	sqrt N2, N1
 	print N2
 	print "\n"
+	sqrt N2, 2.0
+	print N2
+	print "\n"
 	end
 CODE
+1.414214
 1.414214
 OUTPUT
 
