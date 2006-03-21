@@ -494,6 +494,7 @@ examples/mops/mops.py                             [main]doc
 examples/mops/mops.rb                             [main]doc
 examples/mops/mops.scheme                         [main]doc
 examples/mops/README                              [main]doc
+examples/namespace/namespace_dump.pir             [main]doc
 examples/nci/ls.pir                               [main]doc
 examples/nci/PQt.C                                [main]doc
 examples/nci/QtHelloWorld.pasm                    [main]doc
