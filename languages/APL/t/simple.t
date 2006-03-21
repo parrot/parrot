@@ -2,8 +2,12 @@
 
 use strict;
 use lib qw(t . lib ../lib ../../lib ../../../lib);
+use Parrot::Config;
 use Parrot::Test tests => 7;
 use Test::More;
+
+# APL really needs unicode to function
+plan skip_all => "No unicode library available." unless $PConfig{has_icu};
 
 TODO: {
   local $TODO = "no unicode input files yet.";

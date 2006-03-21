@@ -22,7 +22,7 @@ all: $(PARROT) \
   lib@slash@APLOpLookup.pbc
 
 $(GENERATED): lib@slash@APL.g
-	$(PARROT) $(PGE_DIR)@slash@rulec.pir lib@slash@APL.g > $(GENERATED)
+	$(PARROT) $(PGE_DIR)@slash@rulec.pir --compiler=p6rules --output=$(GENERATED) lib@slash@APL.g 
 
 lib@slash@APLGrammar.pbc: $(GENERATED)
 
