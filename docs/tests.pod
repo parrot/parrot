@@ -1,4 +1,4 @@
-# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2001-2006 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 =head1 NAME
@@ -28,8 +28,8 @@ in the languages directory.
 
 Parrot has a status page with smoke test results
 L<http://smoke.parrotcode.org/smoke/>. You can supply new tests
-results just running C<make smoke>. It will run the same tests as
-C<make test> would, but creating a HTML table with the test
+results by just running C<make smoke>. It will run the same tests as
+C<make test> would, but will additionally create a HTML table with the test
 results. At the end, it will try to upload the test results to the
 smoke server.
 
@@ -53,7 +53,7 @@ it might also make sense to create a new F<*.t> file.
 =head1 How to write a test
 
 The testing framework needs to know how many tests it should expect.  So the
-number of planned tests needs to be incremented when adding a new test.  This
+number of planned tests needs to be incremented when adding a new test. This
 is done near the top of a test file, in a line that looks like:
 
   use Parrot::Test tests => 8;
@@ -137,8 +137,8 @@ Perl5 unit tests are in F<t/perl/*.t>.
 
 =head2 Testing language implementations
 
-Language implementations are usually tested with the test function
-C<language_output_is>.
+Language implementations are usually tested with 
+C<language_output_is> and friends..
 
 =head1 Ideal tests:
 
@@ -184,5 +184,6 @@ See L<Test::More> on how to do that.
 
 L<http://qa.perl.org/>
 F<t/TESTS.STATUS.pod>
+F<t/README>
 
 =cut
