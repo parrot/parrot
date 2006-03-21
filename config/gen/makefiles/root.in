@@ -435,6 +435,7 @@ INTERP_O_FILES = \
 	$(SRC_DIR)/extend$(O) \
 	$(SRC_DIR)/extend_vtable$(O) \
 	$(SRC_DIR)/revision$(O) \
+	$(SRC_DIR)/nci_test$(O) \
 	$(PF_DIR)/pf_items$(O) \
 	$(OPS_DIR)/core_ops$(O) \
 	$(OPS_DIR)/core_ops_switch$(O) \
@@ -1480,7 +1481,6 @@ archclean: dynoplibs-clean dynpmc-clean dynext-clean
 		$(SRC_DIR)/parrot_config$(O) \
 		$(SRC_DIR)/install_config$(O) \
 		$(SRC_DIR)/asmfun.s \
-		$(SRC_DIR)/nci_test$(O) \
 		$(INC_DIR)/jit_emit.h \
 		$(SRC_DIR)/jit_cpu.c \
 		$(SRC_DIR)/exec_cpu.c \
