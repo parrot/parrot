@@ -11,7 +11,8 @@ rulec.pir - The PGE rules compiler
 This program takes a set of rules and/or a grammar, specified in B<FILE>,
 and compiles it using B<COMPILER> into the PIR code needed to execute
 that grammar. This PIR code is then suitable for inclusion or compilation
-into other larger programs.
+into other larger programs. If B<--compiler> is not specified, it defaults
+to the Perl 6 Rules compiler.
 
 =head2 COMPILERS
 
@@ -20,6 +21,8 @@ Choose the compiler from one of the registered PGE front-ends.
 =over 4
 
 =item p6rules -- Perl 6 Rules
+
+This is the default compiler. It will be selected if no compiler is specified.
 
 =item p5regexp -- Perl 5 Regular Expression *TODO*
 
@@ -111,7 +114,13 @@ Print a friendly help message.
 
     .local string compiler
     compiler = opts['compiler']
-    unless compiler goto ERR_NO_COMPILER
+    unless compiler goto DEFAULT_COMPILER
+    goto COMPILER_DONE
+
+  DEFAULT_COMPILER:
+    compiler = 'p6rules'
+
+  COMPILER_DONE:
 
     .local string comp_module
     comp_module = compilers[compiler]
@@ -158,7 +167,7 @@ Print a friendly help message.
   --output=OUTFILE  -- redirect output to OUTFILE
   --help            -- print this message
 OPTIONS
-    goto END
+    exit 1
 
   ERR_TOO_FEW_ARGS:
     printerr "Error: too few arguments\n\n"
