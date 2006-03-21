@@ -435,7 +435,6 @@ INTERP_O_FILES = \
 	$(SRC_DIR)/extend$(O) \
 	$(SRC_DIR)/extend_vtable$(O) \
 	$(SRC_DIR)/revision$(O) \
-	$(SRC_DIR)/nci_test$(O) \
 	$(PF_DIR)/pf_items$(O) \
 	$(OPS_DIR)/core_ops$(O) \
 	$(OPS_DIR)/core_ops_switch$(O) \
@@ -1450,6 +1449,8 @@ prog-clean :
 		$(SRC_DIR)/null_config$(O) \
 		$(SRC_DIR)/parrot_config$(O) \
 		$(SRC_DIR)/install_config$(O) \
+		$(SRC_DIR)/nci_test$(O) \
+		$(LIBNCI_TEST_SO) \
 		install_config.fpmc
 	$(PERL) tools/build/c2str.pl --init
 	$(RM_F) \
@@ -1485,6 +1486,7 @@ archclean: dynoplibs-clean dynpmc-clean dynext-clean
 		$(SRC_DIR)/jit_cpu.c \
 		$(SRC_DIR)/exec_cpu.c \
 		install_config.fpmc \
+		$(SRC_DIR)/nci_test$(O) \
 		$(LIBNCI_TEST_SO) \
 		$(LIBPARROT_STATIC) \
 		$(LIBPARROT_SHARED)
