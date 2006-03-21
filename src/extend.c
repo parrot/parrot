@@ -1101,7 +1101,7 @@ Returns the vtable corresponding to the given PMC ID.
 Parrot_VTABLE
 Parrot_get_vtable(Parrot_INTERP interpreter, Parrot_Int id)
 {
-    return Parrot_base_vtables[id];
+    return interpreter->vtables[id];
 }
 
 /*

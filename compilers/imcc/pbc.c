@@ -532,7 +532,7 @@ create_lexinfo(Interp *interpreter, IMC_Unit *unit, PMC *sub, int need_lex)
     /* TODO use CONST_STRING */
     decl_lex = const_string(interpreter, "declare_lex_preg");
     lex_info_id = Parrot_get_ctx_HLL_type(interpreter, enum_class_LexInfo);
-    lex_info_class = Parrot_base_vtables[lex_info_id]->class;
+    lex_info_class = interpreter->vtables[lex_info_id]->class;
     decl_lex_meth = VTABLE_find_method(interpreter,
             lex_info_class, decl_lex);
     if (!decl_lex_meth) {
@@ -923,7 +923,7 @@ make_pmc_const(Interp *interpreter, SymReg *r)
         s = string_unescape_cstring(interpreter, r->name + 1, '\'', NULL);
     else
         s = string_unescape_cstring(interpreter, r->name, 0, NULL);
-    class = Parrot_base_vtables[r->pmc_type]->class;
+    class = interpreter->vtables[r->pmc_type]->class;
     p = VTABLE_new_from_string(interpreter, class, s, PObj_constant_FLAG);
     /* append PMC constant */
     k = PDB_extend_const_table(interpreter);

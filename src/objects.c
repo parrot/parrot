@@ -165,9 +165,9 @@ create_deleg_pmc_vtable(Interp *interpreter, PMC *class, STRING *class_name)
     vtable_pmc = get_attrib_num((SLOTTYPE*)PMC_data(class),
             PCD_OBJECT_VTABLE);
     vtable = PMC_struct_val(vtable_pmc);
-    deleg_pmc_vtable = Parrot_base_vtables[enum_class_deleg_pmc];
-    object_vtable = Parrot_base_vtables[enum_class_ParrotObject];
-    delegate_vtable = Parrot_base_vtables[enum_class_delegate];
+    deleg_pmc_vtable = interpreter->vtables[enum_class_deleg_pmc];
+    object_vtable = interpreter->vtables[enum_class_ParrotObject];
+    delegate_vtable = interpreter->vtables[enum_class_delegate];
 
     memset(&meth_str, 0, sizeof(meth_str));
     meth_str.encoding = Parrot_fixed_8_encoding_ptr;
@@ -272,7 +272,7 @@ Parrot_single_subclass(Interp* interpreter, PMC *base_class,
     /*
      * ParrotClass is the baseclass anyway, so build just a new class
      */
-    if (base_class == Parrot_base_vtables[enum_class_ParrotClass]->class) {
+    if (base_class == interpreter->vtables[enum_class_ParrotClass]->class) {
         return pmc_new_init(interpreter, enum_class_ParrotClass, 
                 (PMC*)child_class_name);
     }
@@ -411,11 +411,11 @@ Parrot_class_lookup(Interp* interpreter, STRING *class_name)
                 (Hash*) PMC_struct_val(interpreter->class_hash), class_name);
     if (b) {
         INTVAL type = PMC_int_val((PMC*)b->value);
-        PMC *pmc = Parrot_base_vtables[type]->class;
+        PMC *pmc = interpreter->vtables[type]->class;
         assert(pmc);
 #if 0
         if (!pmc) {
-            pmc = Parrot_base_vtables[type]->class =
+            pmc = interpreter->vtables[type]->class =
                 pmc_new_noinit(interpreter, type);
         }
 #endif
@@ -482,7 +482,7 @@ parrot_class_register(Interp* interpreter, STRING *class_name,
     new_class->vtable = new_vtable;
 
     /* Put our new vtable in the global table */
-    Parrot_base_vtables[new_type] = new_vtable;
+    interpreter->vtables[new_type] = new_vtable;
 
     /* check if we already have a NameSpace */
     top = CONTEXT(interpreter->ctx)->current_namespace;
@@ -514,7 +514,7 @@ parrot_class_register(Interp* interpreter, STRING *class_name,
         parent_vtable = PMC_struct_val(vtable_pmc);
     }
     else
-        parent_vtable = Parrot_base_vtables[enum_class_ParrotObject];
+        parent_vtable = interpreter->vtables[enum_class_ParrotObject];
 
     new_vtable = Parrot_clone_vtable(interpreter, parent_vtable);
     new_vtable->base_type = new_type;
@@ -1003,7 +1003,7 @@ static void
 invalidate_all_caches(Interp *interpreter)
 {
     UINTVAL i;
-    for (i = 1; i < (UINTVAL)enum_class_max; ++i)
+    for (i = 1; i < (UINTVAL)interpreter->n_vtable_max; ++i)
         invalidate_type_caches(interpreter, i);
 }
 

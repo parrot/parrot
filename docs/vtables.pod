@@ -92,7 +92,7 @@ you run F<Configure.pl>.  If you're not writing a built-in class, you need to
 indicate this by using the 'extension' keyword after the 'pmclass YOURCLASS'
 declaration in F<src/pmc/YOURCLASS.pmc>. Then, change the type of the C<init>
 function to return C<struct _vtable>, and then return C<temp_base_vtable>
-instead of assigning to the C<Parrot_base_vtables> array.
+instead of assigning to the interpreter specific C<vtables> array.
 
 To finish up adding a built-in class:
 

@@ -1,5 +1,5 @@
 /* pmc.h
- *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+ *  Copyright: 2001-2006 The Perl Foundation.  All Rights Reserved.
  *  SVN Info
  *     $Id$
  *  Overview:
@@ -18,14 +18,6 @@
 #include "parrot/thread.h"
 
 #define PARROT_MAX_CLASSES 100
-
-/*
- * macros used during vtables conversion
- * TODO go through files and use the real thing
- */
-
-#define enum_class_max interpreter->n_vtable_max
-#define Parrot_base_vtables interpreter->vtables
 
 /* Internal use */
 PMC *pmc_init_null(Interp * interpreter);

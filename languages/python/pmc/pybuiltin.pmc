@@ -81,7 +81,7 @@ static PMC*
 make_type(Interp* interpreter, INTVAL class, STRING* name,
           PMC *parent, PMC *pad)
 {
-    STRING *pmcname = Parrot_base_vtables[class]->whoami;
+    STRING *pmcname = interpreter->vtables[class]->whoami;
     PMC *type = pmc_new(interpreter, PyBuiltin_PyProxyType);
     PMC *stash, *iter, *item, *nameprop;
     STRING *key;
@@ -108,7 +108,7 @@ make_type(Interp* interpreter, INTVAL class, STRING* name,
             nameprop = pmc_new(interpreter, PyBuiltin_PyString);
             VTABLE_set_string_native(interpreter, nameprop, key);
             VTABLE_setprop(interpreter, item, PyString_name, nameprop);
-            item->vtable = Parrot_base_vtables[PyBuiltin_PyNCI];
+            item->vtable = interpreter->vtables[PyBuiltin_PyNCI];
         }
 
         VTABLE_add_method(interpreter, type, key, item);
@@ -242,7 +242,7 @@ enter_nci_method should create these as locals to begin with.
                 PMC *nameprop = pmc_new(INTERP, PyBuiltin_PyString);
                 VTABLE_set_string_native(INTERP, nameprop, key);
                 VTABLE_setprop(INTERP, item, PyString_name, nameprop);
-                item->vtable = Parrot_base_vtables[PyBuiltin_PyNCI];
+                item->vtable = interpreter->vtables[PyBuiltin_PyNCI];
             }
 
             scratchpad_store_by_name(INTERP, pad, 0, key, item);
@@ -287,11 +287,11 @@ enter_nci_method should create these as locals to begin with.
         /* Class objects */
         key = const_string(INTERP, "object");
         item = make_type(INTERP, PyBuiltin_PyClass, key, NULL, pad);
-        item->vtable = Parrot_base_vtables[PyBuiltin_PyType];
-        Parrot_base_vtables[PyBuiltin_PyType]->class = item;
+        item->vtable = interpreter->vtables[PyBuiltin_PyType];
+        interpreter->vtables[PyBuiltin_PyType]->class = item;
 
         parent = make_type(INTERP, PyBuiltin_PyObject, key, NULL, NULL);
-        parent->vtable = Parrot_base_vtables[PyBuiltin_PyProxyType];
+        parent->vtable = interpreter->vtables[PyBuiltin_PyProxyType];
         PyBuiltin_PyProxyClass_class = parent;
 
         key = const_string(INTERP, "bool");
@@ -341,7 +341,7 @@ enter_nci_method should create these as locals to begin with.
         key = const_string(INTERP, "type");
         item = make_type(INTERP, PyBuiltin_PyType, key, parent, pad);
         PyBuiltin_PyType_class = item;
-        item->vtable = Parrot_base_vtables[PyBuiltin_PyType];
+        item->vtable = interpreter->vtables[PyBuiltin_PyType];
 
         key = const_string(INTERP, "staticmethod");
         item = make_type(INTERP, PyBuiltin_PyStaticMeth, key, parent, pad);
@@ -391,8 +391,8 @@ Returns the absolute value of an object
 
     METHOD PMC* callable(PMC *object) {
         PMC * ret = pmc_new(INTERP, PyBuiltin_PyBoolean);
-        STRING *sub = Parrot_base_vtables[enum_class_Sub]->whoami;
-        STRING *nci = Parrot_base_vtables[enum_class_NCI]->whoami;
+        STRING *sub = interpreter->vtables[enum_class_Sub]->whoami;
+        STRING *nci = interpreter->vtables[enum_class_NCI]->whoami;
         INTVAL isa = VTABLE_isa(INTERP, object, sub) ||
                      VTABLE_isa(INTERP, object, nci);
         VTABLE_set_integer_native(INTERP, ret, isa);

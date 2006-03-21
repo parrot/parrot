@@ -2776,7 +2776,7 @@ Parrot_jit_vtable_newp_ic_op(Parrot_jit_info_t *jit_info,
     assert(op_info->types[0] == PARROT_ARG_P);
     p1 = *(jit_info->cur_op + 1);
     i2 = *(jit_info->cur_op + 2);
-    if (i2 <= 0 || i2 >= enum_class_max)
+    if (i2 <= 0 || i2 >= interpreter->n_vtable_max)
         internal_exception(1, "Illegal PMC enum (%d) in new", i2);
     /* get interpreter */
     Parrot_jit_emit_get_INTERP(jit_info->native_ptr, emit_ECX);

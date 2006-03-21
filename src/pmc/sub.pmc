@@ -283,7 +283,7 @@ Invokes the subroutine.
         sub->ctx = context;
         if (PObj_get_FLAGS(SELF) & SUB_FLAG_IS_OUTER) {
             /* don't destroy context */
-            ccont->vtable = Parrot_base_vtables[enum_class_Continuation];
+            ccont->vtable = interpreter->vtables[enum_class_Continuation];
             context->ref_count++;
         }
 

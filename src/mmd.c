@@ -146,9 +146,9 @@ get_mmd_dispatch_type(Interp *interpreter, INTVAL func_nr, INTVAL left_type,
              * install the mmd_wrapper as real function
              */
             if (isa_deleg_pmc(interpreter,
-                        Parrot_base_vtables[left_type]->class)
+                        interpreter->vtables[left_type]->class)
                     || (r > 0 && isa_deleg_pmc(interpreter,
-                            Parrot_base_vtables[r]->class))) {
+                            interpreter->vtables[r]->class))) {
                 /* TODO check dest too */
                 nci = pmc_new(interpreter, enum_class_Bound_NCI);
                 dod_register_pmc(interpreter, nci);     /* XXX */
@@ -1580,7 +1580,7 @@ mmd_search_classes(Interp *interpreter, STRING *meth, PMC *arg_tuple,
         /* TODO create some class namespace */
     }
     else {
-        mro = Parrot_base_vtables[type1]->mro;
+        mro = interpreter->vtables[type1]->mro;
         n = VTABLE_elements(interpreter, mro);
         for (i = start_at_parent; i < n; ++i) {
             class = VTABLE_get_pmc_keyed_int(interpreter, mro, i);
@@ -1706,7 +1706,7 @@ mmd_distance(Interp *interpreter, PMC *pmc, PMC *arg_tuple)
          * now consider MRO of types the signature type has to be somewhere
          * in the MRO of the type_call
          */
-        mro = Parrot_base_vtables[type_call]->mro;
+        mro = interpreter->vtables[type_call]->mro;
         m = VTABLE_elements(interpreter, mro);
         for (j = 0; j < m; ++j) {
             PMC *cl = VTABLE_get_pmc_keyed_int(interpreter, mro, j);
@@ -1729,12 +1729,12 @@ mmd_distance(Interp *interpreter, PMC *pmc, PMC *arg_tuple)
             if (type_sig < 0)
                 s1 = Parrot_get_datatype_name(interpreter, type_sig);
             else {
-                s1 = Parrot_base_vtables[type_sig]->whoami;
+                s1 = interpreter->vtables[type_sig]->whoami;
             }
             if (type_call < 0)
                 s2 = Parrot_get_datatype_name(interpreter, type_call);
             else {
-                s2 = Parrot_base_vtables[type_call]->whoami;
+                s2 = interpreter->vtables[type_call]->whoami;
             }
             PIO_eprintf(interpreter, "arg %d: dist %d sig %Ss arg %Ss\n",
                 i, dist, s1, s2);
@@ -2086,7 +2086,7 @@ mmd_create_builtin_multi_meth_2(Interp *interpreter, PMC *ns,
     if (memcmp(short_name, "__i_", 4) == 0)
         signature[0] = 'v';
     meth_name = const_string(interpreter, short_name);
-    class = Parrot_base_vtables[type]->class;
+    class = interpreter->vtables[type]->class;
     method = Parrot_find_method_direct(interpreter, class, meth_name);
     if (!method) {
         /* first method */

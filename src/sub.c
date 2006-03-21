@@ -244,9 +244,9 @@ invalidate_retc_context(Interp *interpreter, PMC *cont)
          * if one were created, everything up the chain would have been
          * invalidated earlier.
          */
-        if (cont->vtable != Parrot_base_vtables[enum_class_RetContinuation])
+        if (cont->vtable != interpreter->vtables[enum_class_RetContinuation])
             break;
-        cont->vtable = Parrot_base_vtables[enum_class_Continuation];
+        cont->vtable = interpreter->vtables[enum_class_Continuation];
         ctx->ref_count++;
         cont = ctx->current_cont;
         ctx = PMC_cont(cont)->from_ctx;
@@ -444,7 +444,7 @@ parrot_new_closure(Interp *interpreter, PMC *sub_pmc)
     parrot_context_t *ctx;
 
     clos_pmc = VTABLE_clone(interpreter, sub_pmc);
-    clos_pmc->vtable = Parrot_base_vtables[enum_class_Closure];
+    clos_pmc->vtable = interpreter->vtables[enum_class_Closure];
     sub = PMC_sub(sub_pmc);
     clos = PMC_sub(clos_pmc);
     /* 
@@ -469,7 +469,7 @@ parrot_new_closure(Interp *interpreter, PMC *sub_pmc)
     }
     cont = ctx->current_cont;
     /* preserve this frame by converting the continuation */
-    cont->vtable = Parrot_base_vtables[enum_class_Continuation];
+    cont->vtable = interpreter->vtables[enum_class_Continuation];
     /* remember this (the :outer) ctx in the closure */
     clos->outer_ctx = ctx;
     /* the closure refs now this context too */

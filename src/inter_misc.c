@@ -49,7 +49,7 @@ enter_nci_method(Parrot_Interp interpreter, int type,
             func);
     /* insert it into namespace */
     VTABLE_set_pmc_keyed_str(interpreter, 
-        Parrot_base_vtables[type]->_namespace,
+        interpreter->vtables[type]->_namespace,
             string_make(interpreter, name,
                 strlen(name), NULL,
                 PObj_constant_FLAG|PObj_external_FLAG),

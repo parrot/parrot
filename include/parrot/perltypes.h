@@ -19,10 +19,10 @@
  */
 
 #define DONT_USE_CHANGE_TYPE(thing, type) { \
-    if ((thing)->vtable == &Parrot_base_vtables[enum_class_PerlString]) { \
+    if ((thing)->vtable == &interpreter->vtables[enum_class_PerlString]) { \
 	PObj_is_buffer_ptr_CLEAR(thing); \
     } \
-    (thing)->vtable = &Parrot_base_vtables[enum_class_ ## type]; \
+    (thing)->vtable = &interpreter->vtables[enum_class_ ## type]; \
     if (enum_class_ ## type == enum_class_PerlString) { \
 	PObj_is_buffer_ptr_SET(thing); \
     } \

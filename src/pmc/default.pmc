@@ -97,7 +97,7 @@ check_set_std_props(Interp* interpreter, PMC *pmc, STRING *key, PMC *value)
         INTVAL on = VTABLE_get_bool(interpreter, value);
         /* morph to Const/normal class */
         if (on && (pmc->vtable->flags & VTABLE_HAS_CONST_TOO))
-            pmc->vtable = Parrot_base_vtables[pmc->vtable->base_type + 1];
+            pmc->vtable = interpreter->vtables[pmc->vtable->base_type + 1];
         else if (!on && (pmc->vtable->flags & VTABLE_IS_CONST_FLAG))
             VTABLE_morph(interpreter, pmc, pmc->vtable->base_type - 1);
     }
@@ -837,7 +837,7 @@ Look for NCI methods and properties.
         }
         else if (VTABLE_isa(INTERP, p, CONST_STRING(INTERP, "NCI"))) {
             PMC *bound_meth = VTABLE_clone(INTERP, p);
-            bound_meth->vtable = Parrot_base_vtables[enum_class_Bound_NCI];
+            bound_meth->vtable = interpreter->vtables[enum_class_Bound_NCI];
             VTABLE_set_pmc(INTERP, bound_meth, SELF);
             return bound_meth;
         }

@@ -438,7 +438,7 @@ gc_ims_add_free_object(Interp *interpreter,
     if (GC_DEBUG(interpreter)) {
         if (pool == interpreter->arena_base->pmc_pool) {
             PMC *p = to_add;
-            p->vtable = Parrot_base_vtables[enum_class_Null];
+            p->vtable = interpreter->vtables[enum_class_Null];
         }
     }
 #endif
