@@ -147,19 +147,6 @@ op backtrace() :base_debug {
 
 #######################################
 
-op DELETED_setline(in INT) {
-  goto NEXT();
-}
-op DELETED_setfile(in STR) {
-  goto NEXT();
-}
-op DELETED_setpackage(in STR) {
-  goto NEXT();
-}
-op DELETED_getpackage(out STR) {
-  goto NEXT();
-}
-
 =item B<getline>(out INT)
 
 Get the current line number.

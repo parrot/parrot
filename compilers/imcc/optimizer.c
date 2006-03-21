@@ -693,7 +693,7 @@ IMCC_subst_constants(Interp *interpreter, IMC_Unit * unit, char *name,
         "iseq", "isne", "islt", "isle", "isgt", "isge", "cmp"
     };
     const char *ops2[] = {
-        "abs", "neg", "not", "fact", "sqrt",
+        "abs", "neg", "not", "fact", "sqrt", "ceil", "floor"
         "acos", "asec", "asin",
         "atan", "cos", "cosh", "exp", "ln", "log10", "log2", "sec",
         "sech", "sin", "sinh", "tan", "tanh", "fact"

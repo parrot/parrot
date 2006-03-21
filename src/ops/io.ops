@@ -552,10 +552,6 @@ op connect(out INT, in PMC, in STR) :base_network {
     goto NEXT();
 }
 
-op DELETED_recv(out INT, in PMC, inconst STR) :base_network {
-    goto NEXT();
-}
-
 op recv(out INT, in PMC, out STR) :base_network {
     STRING *dest = $3;
     $1 = (INTVAL)PIO_recv(interpreter, $2, &dest);

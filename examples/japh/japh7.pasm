@@ -9,5 +9,5 @@ _x:
 	substr S0, S0, I0, 27
 	shr I0, 1
 	bsr I0
-	substr S0, 0x1a3, I0, S0
+	substr S0, 0x19c, I0, S0
 	ret
