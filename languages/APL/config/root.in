@@ -3,7 +3,7 @@ LN_S     = @lns@
 PERL     = @perl@
 RM_F     = @rm_f@
 PARROT   = ..@slash@..@slash@parrot@exe@
-PGE_DIR  = ..@slash@..@slash@compilers@slash@pge@slash@
+PGE_DIR  = ..@slash@..@slash@compilers@slash@pge
 CP       = @cp@
 
 GENERATED = lib@slash@generated_APL_grammar.pir
@@ -22,7 +22,7 @@ all: $(PARROT) \
   lib@slash@APLOpLookup.pbc
 
 $(GENERATED): lib@slash@APL.g
-	$(PARROT) $(PGE_DIR)rulec.pir lib@slash@APL.g > $(GENERATED)
+	$(PARROT) $(PGE_DIR)@slash@rulec.pir lib@slash@APL.g > $(GENERATED)
 
 lib@slash@APLGrammar.pbc: $(GENERATED)
 
