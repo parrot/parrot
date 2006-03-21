@@ -512,14 +512,14 @@ representing the result of the parse.
 #    (*) - XXX: The current implementation assumes that circumfix
 #    operators are always tighter than any close, and so performs a shift.
 
-=back
-
 =item C<ws(mob)>
 
 Match sequences of zero or more whitespace characters (i.e., the
 optional space between tokens).  This is provided as a fallback
 rule for parsers that don't define their own whitespace/comment
 matching rule.
+
+=back
 
 =cut
 
