@@ -120,9 +120,10 @@ runops_trace_core(Interp *interpreter, opcode_t *pc)
 
         debugger = interpreter->debugger = 
             /*
-             * XXX too many globals currently - disabled
+             * using a distinc interpreter for tracing should be ok
+             * - just in case, make it easy to switch
              */
-#if 0
+#if 1
             make_interpreter(interpreter, 0);
 #else
             interpreter;
