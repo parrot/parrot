@@ -10,8 +10,9 @@ APLGrammar -- A grammar for parsing APL
       .local pmc match
       .local string source
  
-      # Perl 1 source code
-      source = 'print 1;'
+      # APL source code
+      # Assign a 2 element vector to a variable..
+      source = 'FOO ← 1  2'
 
       # Retrieve the start rule
       start_rule = find_global 'APLGrammar', 'prog'
@@ -26,12 +27,9 @@ APLGrammar -- A grammar for parsing APL
 
 =head1 DESCRIPTION
 
-This is a grammar to parse Perl 1 programs. It inherits the behavior
+This is a grammar to parse APL programs. It inherits the behavior
 of the PGE::Rule class. It parses a string of source code according to
 its hierarchy of rules and returns a PGE::Match object (a parse tree).
-
-Currently, all it can parse is a single statement printing a single
-digit, in the form of 'print 1;'.
 
 =cut
 

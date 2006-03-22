@@ -29,7 +29,7 @@ is a subclass of PAST::Node.
     $P1 = source
     $P2 = getattribute self, "pos"
     $P2 = pos
-    $P3 = new PerlString
+    $P3 = new .String
     $P3 = op
     setattribute self, "op", $P3
     unless got_children goto no_children

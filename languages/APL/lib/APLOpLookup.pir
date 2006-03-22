@@ -65,7 +65,7 @@ data file, possibly in YAML.
     .param pmc lookuptable
     .param string key
     .param string value
-    $P1 = new PerlString
+    $P1 = new .String
     $P1 = value
     lookuptable[ key ] = $P1
 .end

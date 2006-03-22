@@ -13,24 +13,9 @@ ROOT: result(.) = {
     end
 }
 
-APLGrammar::block: result(.) = {
-    # Ask the child node for its result
-    .local pmc child
-    $I0 = defined node["APLGrammar::lineseq"]
-    unless $I0 goto err_no_tree
-    $P0 = node["APLGrammar::lineseq"]
-    child = tree.get('result', $P0, 'APLGrammar::lineseq')
-
-    .return (child)
-
-  err_no_tree:
-    print "The block node doesn't contain an 'lineseq' match.\n"
-    end
-}
-
 APLGrammar::lineseq: result(.) = {
     .local pmc newchildren
-    newchildren = new PerlArray
+    newchildren = new .ResizablePMCArray
     # Ask the child node for its result
     .local pmc child
     $I0 = defined node["APLGrammar::line"]
@@ -38,7 +23,7 @@ APLGrammar::lineseq: result(.) = {
     $P0 = node["APLGrammar::line"]
 
     .local pmc iter
-    iter = new Iterator, $P0    # setup iterator for node
+    iter = new .Iterator, $P0    # setup iterator for node
     iter = 0
   iter_loop:
     unless iter, iter_end         # while (entries) ...
@@ -62,10 +47,10 @@ APLGrammar::lineseq: result(.) = {
 
 APLGrammar::line: result(.) = {
     .local pmc newchildren
-    newchildren = new PerlArray
+    newchildren = new .ResizablePMCArray
 
     .local pmc iter
-    iter = new Iterator, node    # setup iterator for node
+    iter = new .Iterator, node    # setup iterator for node
     iter = 0
   iter_loop:
     unless iter, iter_end         # while (entries) ...
@@ -91,10 +76,10 @@ APLGrammar::line: result(.) = {
 APLGrammar::expr: result(.) = {
     .local pmc result
     .local pmc children
-    children = new PerlArray
+    children = new .ResizablePMCArray
     result = new 'PAST::Exp'
     $P1 = node.get_hash()
-    $P0 = new Iterator, $P1    # setup iterator for node
+    $P0 = new .Iterator, $P1    # setup iterator for node
     set $P0, 0 # reset iterator, begin at start
   iter_loop:
     unless $P0, iter_end         # while (entries) ...
@@ -116,10 +101,10 @@ APLGrammar::expr: result(.) = {
 APLGrammar::gprint: result(.) = {
     .local pmc result
     .local pmc children
-    children = new PerlArray
+    children = new .ResizablePMCArray
     result = new 'PAST::Op'
     $P1 = node.get_hash()
-    $P0 = new Iterator, $P1    # setup iterator for node
+    $P0 = new .Iterator, $P1    # setup iterator for node
     set $P0, 0 # reset iterator, begin at start
   iter_loop:
     unless $P0, iter_end         # while (entries) ...
@@ -139,44 +124,14 @@ APLGrammar::gprint: result(.) = {
     .return (result)
 }
 
-APLGrammar::cond: result(.) = {
-    .local pmc result
-    .local pmc children
-    children = new PerlArray
-    result = new 'PAST::Op'
-    $P1 = node.get_hash()
-    .local pmc iter
-    iter = new Iterator, $P1    # setup iterator for node
-    set iter, 0 # reset iterator, begin at start
-  iter_loop:
-    unless iter, iter_end         # while (entries) ...
-      shift $S2, iter             # get key for next entry
-      $P2 = iter[$S2]      # get entry at current key
-      $P3 = tree.get('result', $P2, $S2)
-      push children, $P3
-      goto iter_loop
-  iter_end:
-
-    # get the source string and position offset from start of source
-    # code for this match node
-    $S2 = node 
-    $S3 = node[0]
-    $I3 = node.from()
-    result.set_node($S2,$I3,$S3,children)
-    .return (result)
-}
-APLGrammar::label: result(.) = {
-    .return ()
-}
-
 APLGrammar::cexpr: result(.) = {
     .local pmc result
     $I0 = defined node["APLGrammar::oexpr"]
     unless $I0 goto err_no_oexpr
     $P1 = node["APLGrammar::oexpr"]
     .local pmc children
-    children = new PerlArray
-    $P0 = new Iterator, $P1    # setup iterator for node
+    children = new .ResizablePMCArray
+    $P0 = new .Iterator, $P1    # setup iterator for node
     set $P0, 0 # reset iterator, begin at start
   iter_loop:
     unless $P0, iter_end         # while (entries) ...
@@ -208,11 +163,11 @@ APLGrammar::cexpr: result(.) = {
 
 APLGrammar::oexpr: result(.) = {
     .local pmc newchildren
-    newchildren = new PerlArray
+    newchildren = new .ResizablePMCArray
 
     .local pmc iter
     $P1 = node.get_hash()
-    iter = new Iterator, $P1    # setup iterator for node
+    iter = new .Iterator, $P1    # setup iterator for node
     iter = 0
   iter_loop:
     unless iter, iter_end         # while (entries) ...
@@ -342,10 +297,10 @@ expr: op(.) = {
     .local string type
     type = node["type"]
     .local pmc newchildren
-    newchildren = new PerlArray
+    newchildren = new .ResizablePMCArray
     $P1 = node.get_array()
     .local pmc iter
-    iter = new Iterator, $P1    # setup iterator for node
+    iter = new .Iterator, $P1    # setup iterator for node
     set iter, 0 # reset iterator, begin at start
   iter_loop:
     unless iter, iter_end         # while (entries) ...
@@ -369,9 +324,9 @@ expr: op(.) = {
 expr: term(.) = {
     .local pmc result
     .local pmc children
-    children = new PerlArray
+    children = new .ResizablePMCArray
     $P1 = node.get_hash()
-    $P0 = new Iterator, $P1    # setup iterator for node
+    $P0 = new .Iterator, $P1    # setup iterator for node
     set $P0, 0 # reset iterator, begin at start
   iter_loop:
     unless $P0, iter_end         # while (entries) ...
