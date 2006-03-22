@@ -1,6 +1,19 @@
 package t::APL;
 
-use Test::Base -Base;
+# Fail a little more gracefully for those without Test::Base installed.
+
+BEGIN {
+  eval {
+    require Test::Base2;
+    import Test::Base qw/ -Base /;
+  };
+  if ($@) {
+    require Test::More;
+    import Test::More;
+    plan(skip_all => "APL tests require Test::Base.;");
+    exit 0;
+  }
+}
 use Parrot::Config;
 use Parrot::Test;
 
