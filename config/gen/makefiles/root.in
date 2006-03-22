@@ -176,7 +176,6 @@ GEN_MAKEFILES = \
 	languages/miniperl/Makefile \
 	languages/ook/Makefile \
 	languages/parrot_compiler/Makefile \
-	languages/perl6/Makefile \
 	languages/punie/Makefile \
 	languages/regex/Makefile \
 	languages/scheme/Makefile \
@@ -626,6 +625,7 @@ help :
 	@echo "                     Valid cores are b, C, f, g, j, r, S."
 	@echo "  src_tests:         Run test in C-file."
 	@echo "  perl_tests:        Test the Perl modules in the distribution."
+	@echo "  codingstd_tests:   Test pdd07_codingstd."
 	@echo "  testexex:          Testing the exex runcore."
 	@echo "  benchmark_tests:   Run all benchmarks."
 	@echo "  manitest:          Check for new and missing files."
@@ -1271,31 +1271,33 @@ editor-clean :
 # to disable GC_DEBUG.
 EXTRA_TEST_ARGS    = --gc-debug --running-make-test
 DISTRO_TEST_FILES = \
-	t/distro/*.t
+    t/distro/*.t
 BENCHMARK_TEST_FILES = \
-	t/benchmark/*.t
+    t/benchmark/*.t
 DOC_TEST_FILES = \
-	t/doc/*.t
+    t/doc/*.t
 PERL_TEST_FILES = \
-	t/perl/*.t
+    t/perl/*.t
+CODINGSTD_TEST_FILES = \
+    t/codingstd/*.t
 RUN_TEST_FILES = \
-	t/run/*.t
+    t/run/*.t
 RUNCORE_TEST_FILES = \
-	t/compilers/imcc/*/*.t \
-	t/op/*.t \
-	t/pmc/*.t \
-	t/native_pbc/*.t \
-	t/dynpmc/*.t \
-	t/compilers/pge/*.t \
-	t/compilers/pge/p5regexp/*.t \
-	t/compilers/pge/p6rules/*.t \
-	t/compilers/tge/*.t \
-	t/library/*.t \
-	t/examples/*.t
+    t/compilers/imcc/*/*.t \
+    t/op/*.t \
+    t/pmc/*.t \
+    t/native_pbc/*.t \
+    t/dynpmc/*.t \
+    t/compilers/pge/*.t \
+    t/compilers/pge/p5regexp/*.t \
+    t/compilers/pge/p6rules/*.t \
+    t/compilers/tge/*.t \
+    t/library/*.t \
+    t/examples/*.t
 SRC_TEST_FILES = \
-	t/src/*.t
+    t/src/*.t
 TOOLS_TEST_FILES = \
-	t/tools/*.t
+    t/tools/*.t
 
 # Common prep for all test targets.
 # We propably need a complete build before running the tests.
@@ -1324,6 +1326,7 @@ fulltest : \
 	testS \
 	src_tests \
 	perl_tests \
+	codingstd_tests \
 	benchmark_tests \
 	doc_tests \
 	distro_tests
@@ -1380,6 +1383,10 @@ run_tests :
 # Test the Perl5 Modules in the Parrot distribution
 perl_tests :
 	$(PERL) t/harness $(PERL_TEST_FILES)
+
+# Test pdd07_codingstd
+codingstd_tests :
+	$(PERL) t/harness $(CODINGSTD_TEST_FILES)
 
 # obsolete 
 testbench : 

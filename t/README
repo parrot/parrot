@@ -11,6 +11,8 @@ compilers:    Mini languages distributed with Parrot
 
 configure:    Perl modules of configuration subsystem
 
+codingstd:    Conventions and Guidelines for Parrot Source Code
+
 distro:       Tests run before a distro is released
 
 doc:          Completeness and sanity of the documentation
