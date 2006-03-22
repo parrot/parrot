@@ -1,55 +1,41 @@
 #!/usr/bin/perl
 
-use strict;
 use lib qw(t . lib ../lib ../../lib ../../../lib);
-use Parrot::Config;
-use Parrot::Test;
-use Test::More;
+use t::APL tests => 7;
 
-# APL really needs unicode to function
-$PConfig{has_icu}
-  ? plan tests => 7
-  : plan skip_all => "No unicode library available.";
+run_apl_is();
 
+__DATA__
 
-language_output_is('APL', <<'CODE', '20', 'scalar multiplication');
-print 10 × 2
-CODE
+=== 'double quotes'
+--- APL: print "he said, ""she said."""
+--- out: he said, "she said."
+--- skip: characters don't work yet.
 
-language_output_is('APL', <<'CODE', '20', 'scalar multiplication');
-print 10 * 2
-CODE
+=== 'single quotes'
+--- APL: print 'surely you can''t be serious.'
+--- out: surely you can't be serious
+--- skip: characters don't work yet.
 
-TODO: {
-  local $TODO = "characters don't work yet.";
+=== vectors
+--- APL: print 10 2 3
+--- out: 10 2 3
+--- skip: basic vector support missing
 
-language_output_is('APL', <<'CODE', q{he said, "she said."}, 'double quotes');
-print "he said, ""she said."""
-CODE
+=== ceiling (scalar)
+--- APL: print ⌈ 2.5
+--- out: 3
+--- skip: use same glyph in monadic and dyadic forms
 
-language_output_is('APL', <<'CODE', q{surely you can't be serious}, 'single quotes');
-print 'surely you can''t be serious.'
-CODE
-}
+=== maximum (scalar)
+--- APL: print 2 ⌈ 3
+--- out: 3
+--- skip: use same glyph in monadic and dyadic forms
 
-TODO: {
-  local $TODO = "basic vector support missing";
+=== scalar multiplication
+--- APL: print 10 × 2
+--- out: 20
 
-language_output_is('APL', <<'CODE', '10 2 3', 'vectors');
-print 10 2 3
-CODE
-}
-
-TODO: {
-  local $TODO = "use same glyph in monadic and dyadic forms...";
-
-language_output_is('APL', <<'CODE', '3', 'ceiling (scalar)');
-print ⌈ 2.5
-CODE
-
-language_output_is('APL', <<'CODE', '3', 'maximum (scalar)');
-print  2 ⌈ 3
-CODE
-}
-  
-
+=== scalar multiplication (ascii)
+--- APL: print 10 * 2
+--- out: 20
