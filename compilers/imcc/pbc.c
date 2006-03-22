@@ -1203,7 +1203,7 @@ e_pbc_emit(Interp *interpreter, void *param, IMC_Unit * unit, Instruction * ins)
     }
     if (ins->op && *ins->op) {
         SymReg *addr, *r;
-        opcode_t last_label = 0;
+        opcode_t last_label = 1;
 #if IMC_TRACE_HIGH
         PIO_eprintf(NULL, "emit_pbc: op [%d %s]\n", ins->opnum, ins->op);
 #endif
@@ -1215,7 +1215,8 @@ e_pbc_emit(Interp *interpreter, void *param, IMC_Unit * unit, Instruction * ins)
                 IMCC_fatal(interpreter, 1, "e_pbc_emit: "
                         "no label offset defined for '%s'\n", addr->name);
             last_label = addr->color - npc;
-            IMCC_debug(interpreter, DEBUG_PBC_FIXUP, "branch label at pc %d addr %d %s %d\n",
+            IMCC_debug(interpreter, DEBUG_PBC_FIXUP, 
+                    "branch label at pc %d addr %d %s %d\n",
                     npc, addr->color, addr->name, last_label);
         }
         /* add debug line info */
@@ -1247,11 +1248,12 @@ e_pbc_emit(Interp *interpreter, void *param, IMC_Unit * unit, Instruction * ins)
                 case PARROT_ARG_IC:
                     /* branch instruction */
                     if (op_info->labels[i]) {
-                        if (last_label == 0)   /* we don't have a branch with offset 0 !? */
+                        if (last_label == 1)   
+                            /* we don't have a branch with offset 1 !? */
                             IMCC_fatal(interpreter, 1, "e_pbc_emit: "
                                     "no label offset found\n");
                         *pc++ = last_label;
-                        last_label = 0;
+                        last_label = 1;
                         break;
                         /* else fall through */
                     }
