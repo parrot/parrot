@@ -64,8 +64,11 @@ PIO_utf8_read(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
                     iter.bytepos);
             UINTVAL c = *u8ptr;
             if (UTF8_IS_START(c)) {
+                UINTVAL len2 = UTF8SKIP(u8ptr);
+                if (iter.bytepos + len2 <= s->bufused)
+                    goto ok;
                 /* need len-1 more chars */
-                UINTVAL len2 = UTF8SKIP(u8ptr) - 1;
+                len2--;
                 s2 = NULL;
                 s2 = PIO_make_io_string(interpreter, &s2, len2);
                 s2->bufused = len2;
@@ -75,9 +78,10 @@ PIO_utf8_read(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
                 s->strlen = iter.charpos;
                 s = string_append(interpreter, s, s2, 0);
                 s->strlen = iter.charpos + 1;
-                return len + len2;
+                return len + len2 + 1;
             }
         }
+ok:
         iter.get_and_advance(interpreter, &iter);
     }
     s->strlen = iter.charpos;
