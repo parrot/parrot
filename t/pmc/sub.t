@@ -900,7 +900,7 @@ OUTPUT
         TODO:
         {
             local $TODO = "output from :postcomp is lost";
-            output_is( $code, $output, $descr);
+            pasm_output_is( $code, $output, $descr);
         };
     } else {
         pir_output_is( $code, $output, $descr);

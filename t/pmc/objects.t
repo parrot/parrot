@@ -991,7 +991,7 @@ in get_string
 OUTPUT
 
 # Not sure if this is right or not
-# output_is(<<'CODE', <<'OUTPUT', "typeof classes");
+# pasm_output_is(<<'CODE', <<'OUTPUT', "typeof classes");
 #     newclass P0, "A"
 #     newclass P1, "B"
 #

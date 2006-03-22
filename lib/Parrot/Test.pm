@@ -207,7 +207,6 @@ require Test::More;
 @EXPORT = qw( c_output_is        c_output_like        c_output_isnt
               example_output_is  example_output_like  example_output_like
               language_output_is language_output_like language_output_isnt
-              output_is          output_like          output_isnt
               pasm_output_is     pasm_output_like     pasm_output_isnt
               pbc_output_is      pbc_output_like      pbc_output_isnt
               past_output_is     past_output_like     past_output_isnt
@@ -348,9 +347,6 @@ sub _generate_functions {
     my $parrot = File::Spec->join(File::Spec->curdir(), 'parrot' . $PConfig{exe});
 
     my %parrot_test_map = (
-        output_is          => 'is_eq',
-        output_isnt        => 'isnt_eq',
-        output_like        => 'like',
         pbc_output_is      => 'is_eq',
         pbc_output_isnt    => 'isnt_eq',
         pbc_output_like    => 'like',

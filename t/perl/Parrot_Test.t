@@ -38,7 +38,6 @@ BEGIN
 can_ok('Parrot::Test', $_) for qw/
     language_output_is language_output_like language_output_isnt
     example_output_is
-    output_is          output_like          output_isnt
     pasm_output_is     pasm_output_like     pasm_output_isnt
     past_output_is     past_output_like     past_output_isnt
     pir_output_is      pir_output_like      pir_output_isnt

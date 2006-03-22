@@ -60,6 +60,6 @@ should be included for reference.
 pbc_output_is(undef, '270544960', "i386 32 bit opcode_t, 32 bit intval");
 
 # Formerly following tests had been set up:
-# output_is(undef, '270544960', "PPC BE 32 bit opcode_t, 32 bit intval");
-# output_is(undef, '270544960', "little-endian 64-bit tru64");
-# output_is(undef, '270544960', "big-endian 64-bit irix");
+# pasm_output_is(undef, '270544960', "PPC BE 32 bit opcode_t, 32 bit intval");
+# pasm_output_is(undef, '270544960', "little-endian 64-bit tru64");
+# pasm_output_is(undef, '270544960', "big-endian 64-bit irix");

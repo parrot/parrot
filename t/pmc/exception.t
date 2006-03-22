@@ -76,7 +76,7 @@ Exception
 just pining
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "get_results - be sure registers are ok");
+pasm_output_is(<<'CODE', <<'OUTPUT', "get_results - be sure registers are ok");
 # see also #38459
     print "main\n"
     new P0, .Integer
