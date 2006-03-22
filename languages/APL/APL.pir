@@ -157,6 +157,7 @@
     .local pmc filehandle
     filehandle = open filename, "<"
     unless filehandle goto err_no_file
+    push filehandle, 'utf8'
     $S1 = read filehandle, 65535
     close filehandle
     .return ($S1)
