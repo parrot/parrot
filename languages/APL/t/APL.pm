@@ -4,7 +4,7 @@ package t::APL;
 
 BEGIN {
   eval {
-    require Test::Base2;
+    require Test::Base;
     import Test::Base qw/ -Base /;
   };
   if ($@) {
