@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 32;
+use Parrot::Test tests => 33;
 
 =head1 NAME
 
@@ -617,3 +617,40 @@ pir_output_like(<<'CODE', <<'OUT', 'read on null PMC throws exception', todo => 
 CODE
 /some crazy exception/
 OUT
+
+open FOO, ">temp.file";  # write utf8
+print FOO "T\xc3\xb6tsch\n";
+close FOO;
+
+pir_output_is(<<'CODE', <<"OUTPUT", "utf8 read layer");
+.sub main :main
+    .local pmc pio
+    .local int len
+    .include "stat.pasm"
+    .local string f
+    f = 'temp.file'
+    len = stat f, .STAT_FILESIZE
+    pio = open f, "<"
+    push pio, "utf8"
+    $S0 = read pio, len
+    close pio
+    $I1 = charset $S0
+    $S2 = charsetname $I1
+    print $S2
+    print "\n"
+    $I1 = encoding $S0
+    $S2 = encodingname $I1
+    print $S2
+    print "\n"
+    $I1 = find_charset 'iso-8859-1'
+    trans_charset $S1, $S0, $I1
+    print $S1
+.end
+CODE
+unicode
+utf8
+T\xf6tsch
+OUTPUT
+
+
+unlink("temp.file");

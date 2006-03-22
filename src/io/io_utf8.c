@@ -43,6 +43,23 @@ PIO_utf8_register_layer(void)
     return &pio_utf8_layer;
 }
 
+static size_t
+PIO_utf8_read(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
+              STRING **buf)
+{
+    size_t len;
+    STRING *s;
+
+    len = PIO_read_down(interpreter, layer->down, io, buf);
+    s = *buf;
+    s->charset  = Parrot_unicode_charset_ptr;
+    s->encoding = Parrot_utf8_encoding_ptr;
+    /* count chars, verify utf8 */
+    s->strlen = Parrot_utf8_encoding_ptr->codepoints(interpreter, s);
+    /* TODO buffer additional chars for next read */
+    return len;
+}
+
 void *Parrot_utf8_encode(void *ptr, UINTVAL c);
 static size_t
 PIO_utf8_write(theINTERP, ParrotIOLayer *l, ParrotIO *io, STRING *s)
@@ -71,7 +88,7 @@ static const ParrotIOLayerAPI pio_utf8_layer_api = {
     PIO_null_close,
     PIO_utf8_write,
     PIO_null_write_async,
-    PIO_null_read,
+    PIO_utf8_read,
     PIO_null_read_async,
     PIO_null_flush,
     PIO_null_peek,
