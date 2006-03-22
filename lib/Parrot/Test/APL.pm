@@ -25,7 +25,7 @@ sub output_is() {
   
     my $count = $self->{builder}->current_test + 1;
 
-    my $lang_f    = Parrot::Test::per_test('.p1',$count);
+    my $lang_f    = Parrot::Test::per_test('.apl',$count);
     my $out_f     = Parrot::Test::per_test('.out',$count);
     my $parrotdir = dirname $self->{parrot};
 
