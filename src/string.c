@@ -371,6 +371,11 @@ CHARSET *
 string_rep_compatible (Interp *interpreter, STRING *a, const STRING *b,
         ENCODING **e)
 {
+    if (a->encoding == b->encoding && a->charset == b->charset) {
+        *e = a->encoding;
+        return a->charset;
+    }
+            
     /*
      * a table could possibly simplify the logic
      */

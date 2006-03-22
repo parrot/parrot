@@ -25,6 +25,7 @@ representation.
 
 #include "parrot/parrot.h"
 #include "io_private.h"
+#include "parrot/unicode.h"
 
 /* Defined at bottom */
 static const ParrotIOLayerAPI pio_utf8_layer_api;
@@ -48,15 +49,38 @@ PIO_utf8_read(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
               STRING **buf)
 {
     size_t len;
-    STRING *s;
+    STRING *s, *s2;
+    String_iter iter;
 
     len = PIO_read_down(interpreter, layer->down, io, buf);
     s = *buf;
     s->charset  = Parrot_unicode_charset_ptr;
     s->encoding = Parrot_utf8_encoding_ptr;
     /* count chars, verify utf8 */
-    s->strlen = Parrot_utf8_encoding_ptr->codepoints(interpreter, s);
-    /* TODO buffer additional chars for next read */
+    Parrot_utf8_encoding_ptr->iter_init(interpreter, s, &iter);
+    while (iter.bytepos < s->bufused) {
+        if (iter.bytepos + 4 > s->bufused) {
+            const utf8_t *u8ptr = (utf8_t *)((char *)s->strstart + 
+                    iter.bytepos);
+            UINTVAL c = *u8ptr;
+            if (UTF8_IS_START(c)) {
+                /* need len-1 more chars */
+                UINTVAL len2 = UTF8SKIP(u8ptr) - 1;
+                s2 = NULL;
+                s2 = PIO_make_io_string(interpreter, &s2, len2);
+                s2->bufused = len2;
+                s2->charset  = Parrot_unicode_charset_ptr;
+                s2->encoding = Parrot_utf8_encoding_ptr;
+                PIO_read_down(interpreter, layer->down, io, &s2);
+                s->strlen = iter.charpos;
+                s = string_append(interpreter, s, s2, 0);
+                s->strlen = iter.charpos + 1;
+                return len + len2;
+            }
+        }
+        iter.get_and_advance(interpreter, &iter);
+    }
+    s->strlen = iter.charpos;
     return len;
 }
 

@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 33;
+use Parrot::Test tests => 35;
 
 =head1 NAME
 
@@ -652,5 +652,61 @@ utf8
 T\xf6tsch
 OUTPUT
 
+pir_output_is(<<'CODE', <<"OUTPUT", "utf8 read layer - readline");
+.sub main :main
+    .local pmc pio
+    .local string f
+    f = 'temp.file'
+    pio = open f, "<"
+    push pio, "utf8"
+    $S0 = readline pio
+    close pio
+    $I1 = charset $S0
+    $S2 = charsetname $I1
+    print $S2
+    print "\n"
+    $I1 = encoding $S0
+    $S2 = encodingname $I1
+    print $S2
+    print "\n"
+    $I1 = find_charset 'iso-8859-1'
+    trans_charset $S1, $S0, $I1
+    print $S1
+.end
+CODE
+unicode
+utf8
+T\xf6tsch
+OUTPUT
+pir_output_is(<<'CODE', <<"OUTPUT", "utf8 read layer, read parts");
+.sub main :main
+    .local pmc pio
+    .local int len
+    .include "stat.pasm"
+    len = stat "1", .STAT_FILESIZE
+    pio = open "1", "<"
+    push pio, "utf8"
+    $S0 = read pio, 2
+    len -= 2
+    $S1 = read pio, len
+    $S0 .= $S1
+    close pio
+    $I1 = charset $S0
+    $S2 = charsetname $I1
+    print $S2
+    print "\n"
+    $I1 = encoding $S0
+    $S2 = encodingname $I1
+    print $S2
+    print "\n"
+    $I1 = find_charset 'iso-8859-1'
+    trans_charset $S1, $S0, $I1
+    print $S1
+.end
+CODE
+unicode
+utf8
+T\xf6tsch
+OUTPUT
 
 unlink("temp.file");
