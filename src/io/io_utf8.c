@@ -77,8 +77,8 @@ PIO_utf8_read(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
                 PIO_read_down(interpreter, layer->down, io, &s2);
                 s->strlen = iter.charpos;
                 s = string_append(interpreter, s, s2, 0);
-                s->strlen = iter.charpos + 1;
-                return len + len2 + 1;
+                len += len2 + 1;
+                /* check last char */
             }
         }
 ok:

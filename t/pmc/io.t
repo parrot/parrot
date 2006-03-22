@@ -683,8 +683,10 @@ pir_output_is(<<'CODE', <<"OUTPUT", "utf8 read layer, read parts");
     .local pmc pio
     .local int len
     .include "stat.pasm"
-    len = stat "1", .STAT_FILESIZE
-    pio = open "1", "<"
+    .local string f
+    f = 'temp.file'
+    len = stat f, .STAT_FILESIZE
+    pio = open f, "<"
     push pio, "utf8"
     $S0 = read pio, 2
     len -= 2
