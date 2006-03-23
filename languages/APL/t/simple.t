@@ -1,21 +1,11 @@
 #!/usr/bin/perl
 
 use lib qw(t . lib ../lib ../../lib ../../../lib);
-use t::APL tests => 7;
+use t::APL tests => 4;
 
 run_apl_is();
 
 __DATA__
-
-=== 'double quotes'
---- APL: print "he said, ""she said."""
---- out: he said, "she said."
---- skip: characters don't work yet.
-
-=== 'single quotes'
---- APL: print 'surely you can''t be serious.'
---- out: surely you can't be serious
---- skip: characters don't work yet.
 
 === vectors
 --- APL: print 10 2 3
@@ -36,6 +26,3 @@ __DATA__
 --- APL: print 10 × 2
 --- out: 20
 
-=== scalar multiplication (ascii)
---- APL: print 10 * 2
---- out: 20
