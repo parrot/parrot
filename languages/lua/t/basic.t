@@ -53,10 +53,7 @@ OUTPUT
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', "function ipairs");
 a = {"a","b","c"}
 local f, v, s = ipairs(a)
-if type(f) == type(type) then print "ok" end
-if a == v then print "ok" end
-print(s)
--- print(type(f), type(v), s)
+print(type(f), type(v), s)
 s, v = f(a, s)
 print(s, v)
 s, v = f(a, s)
@@ -66,9 +63,7 @@ print(s, v)
 s, v = f(a, s)
 print(s, v)
 CODE
-ok
-ok
-0
+function	table	0
 1	a
 2	b
 3	c
@@ -95,10 +90,7 @@ OUTPUT
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', "function pairs");
 a = {"a","b","c"}
 local f, v, s = pairs(a)
-if type(f) == type(type) then print "ok" end
-if a == v then print "ok" end
-print(s)
--- print(type(f), type(v), s)
+print(type(f), type(v), s)
 s = f(v, s)
 print(s)
 s = f(v, s)
@@ -108,9 +100,7 @@ print(s)
 s = f(v, s)
 print(s)
 CODE
-ok
-ok
-nil
+function	table	nil
 1
 2
 3
@@ -145,8 +135,9 @@ print(rawequal(false, false))
 print(rawequal(3, 3))
 print(rawequal("text", "text"))
 print(rawequal(t, a))
--- print(rawequal(print, print))
+print(rawequal(print, print))
 CODE
+true
 true
 true
 true
@@ -165,9 +156,11 @@ print(rawequal("text", "2"))
 print(rawequal("text", 2))
 print(rawequal(t, {}))
 print(rawequal(t, 2))
--- print(rawequal(print, format))
--- print(rawequal(print, 2))
+print(rawequal(print, format))
+print(rawequal(print, 2))
 CODE
+false
+false
 false
 false
 false
@@ -217,8 +210,8 @@ OUTPUT
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', "function type");
 print(type("Hello world"))
 print(type(10.4*3))
--- print(type(print))
--- print(type(type))
+print(type(print))
+print(type(type))
 print(type(true))
 print(type(nil))
 print(type(io.stdin))
@@ -226,6 +219,8 @@ print(type(type(X)))
 CODE
 string
 number
+function
+function
 boolean
 nil
 userdata
@@ -239,11 +234,13 @@ print(type(a))
 a = "a string!!"
 print(type(a))
 a = print
--- a(type(a))
+a(type(a))
+--print(type(function () end))
 CODE
 nil
 number
 string
+function
 OUTPUT
 
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', "function type (no arg)");

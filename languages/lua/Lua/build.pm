@@ -531,7 +531,11 @@ sub BuildCallFunction {
 	my @params = ();
 	my @returns = ();
 	for my $arg (@{$args}) {
-		push @opcodes, @{$arg->[1]};
+		if (scalar @{$arg->[1]}) {
+			push @opcodes, @{$arg->[1]};
+		} else {
+			push @opcodes, new NoOp($parser);
+		}
 		push @params, $arg->[0];
 	}
 	if (scalar(@opcodes) and $opcodes[-1]->isa("CallOp")) {
@@ -1112,7 +1116,11 @@ sub BuildReturn {
 	my @opcodes = ();
 	my @returns = ();
 	for my $expr (@{$exprs}) {
-		push @opcodes, @{$expr->[1]};
+		if (scalar @{$expr->[1]}) {
+			push @opcodes, @{$expr->[1]};
+		} else {
+			push @opcodes, new NoOp($parser);
+		}
 		push @returns, $expr->[0];
 	}
 	if (scalar(@opcodes) and $opcodes[-1]->isa("CallOp")) {
