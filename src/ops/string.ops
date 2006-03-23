@@ -551,7 +551,7 @@ Return the name of charset numbered $2.
 =item B<find_charset>(out INT, in STR)
 
 Return the charset number of the charset named $2. If the charset doesn't
-exit, throw an exception.
+exist, throw an exception.
 
 =item B<trans_charset>(inout STR, in INT)
 
@@ -606,7 +606,7 @@ Return the name of encoding numbered $2.
 =item B<find_encoding>(out INT, in STR)
 
 Return the encoding number of the encoding named $2. If the encoding doesn't
-exit, throw an exception.
+exist, throw an exception.
 
 =item B<trans_encoding>(inout STR, in INT)
 

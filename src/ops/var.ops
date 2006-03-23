@@ -129,13 +129,13 @@ op store_global(in PMC, in STR, in PMC) {
 
 Find the global named $2 and store it in $1. If the global doesn't exist
 either throws an exception or sets $1 to the Null PMC, depending on current
-errors settings, s. B<errorson>.
+errors settings. See B<errorson>.
 
 =item B<find_global>(out PMC, in STR, in STR)
 
 Find the global named $3 in namespace $2 and store it in $1. If the
 global doesn't exist either throws an exception or sets $1 to the Null PMC,
-depending on current errors settings, s. B<errorson>.
+depending on current errors settings. See B<errorson>.
 
 If $3 is NULL the namespace hash for namespace $2 is returned.
 
@@ -143,8 +143,8 @@ If $3 is NULL the namespace hash for namespace $2 is returned.
 
 Find the global named $3 in the namespace specified by $2
 and store it in $1. If the global doesn't exist either throws an
-exception or sets $1 to the Null PMC, depending on current errors settings,
-s. B<errorson>.
+exception or sets $1 to the Null PMC, depending on current errors settings.
+See B<errorson>.
 
 =cut
 
@@ -185,7 +185,7 @@ op find_global(out PMC, in PMC, in STR) {
 Find the name $2 in lexical, current, global, or builtin namespace and
 store it in $1. If the name doesn't exist
 either throws an exception or sets $1 to PMCNULL, depending on current
-errors settings, s. B<errorson>.
+errors settings. See B<errorson>.
 
 =cut
 
