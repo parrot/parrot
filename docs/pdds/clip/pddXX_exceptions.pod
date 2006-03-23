@@ -1,0 +1,332 @@
+# Copyright: 2001-2006 The Perl Foundation.
+# $Id: $
+
+=head1 NAME
+
+docs/pdds/clip/pddXX_exceptions.pod - Parrot Exceptions
+
+=head1 ABSTRACT
+
+This document defines the requirements and implementation strategy for
+Parrot's exception system.
+
+=head1 VERSION
+
+$Revision: $
+
+=head1 DESCRIPTION
+
+An exception system gives user-developed code control over how run-time
+error conditions are handled. Exceptions are errors or unusual
+conditions that requires special processing. An exception handler
+performs the necessary steps to appropriately respond to a particular
+kind of exception.
+
+=head2 Exception Opcodes
+
+These are the opcodes relevant to exceptions and exception handlers:
+
+=over
+
+=item *
+
+C<push_eh> creates an exception handler and pushes it onto the control
+stack. It takes a label (the location of the exception handler) as its
+only argument. [Is this right? Treating exception handlers as label
+jumps rather than full subroutines seems error-prone.]
+
+=item *
+
+C<clear_eh> removes the most recently added exception from the control
+stack.
+
+=item *
+
+C<throw> throws an exception object.
+
+=item *
+
+C<rethrow> rethrows an exception object. It can only be called from
+inside an exception handler.
+
+=item *
+
+C<die> throws an exception. It takes two arguments, one for the severity
+of the exception and one for the type of exception.
+
+If the severity is C<EXCEPT_DOOMED>, it exits via a call to
+C<_exit($2)>, which is not a catchable exception.
+
+These are the constants defined for severity:
+
+  0    EXCEPT_NORMAL
+  1    EXCEPT_WARNING
+  2    EXCEPT_ERROR
+  3    EXCEPT_SEVERE
+  4    EXCEPT_FATAL
+  5    EXCEPT_DOOMED
+  6    EXCEPT_EXIT
+
+These are the constants defined for exception types:
+
+  0    E_Exception
+  1    E_SystemExit
+  2    E_StopIteration
+  3    E_StandardError
+  4    E_KeyboardInterrupt
+  5    E_ImportError
+  6    E_EnvironmentError
+  7    E_IOError
+  8    E_OSError
+  9    E_WindowsError
+  10   E_VMSError
+  11   E_EOFError
+  12   E_RuntimeError
+  13   E_NotImplementedError
+  14   E_LibraryNotLoadedError
+  15   E_NameError
+  16   E_UnboundLocalError
+  17   E_AttributeError
+  18   E_SyntaxError
+  19   E_IndentationError
+  20   E_TabError
+  21   E_TypeError
+  22   E_AssertionError
+  23   E_LookupError
+  24   E_IndexError
+  25   E_KeyError
+  26   E_ArithmeticError
+  27   E_OverflowError
+  28   E_ZeroDivisionError
+  29   E_FloatingPointError
+  30   E_ValueError
+  31   E_UnicodeError
+  32   E_UnicodeEncodeError
+  33   E_UnicodeDecodeError
+  34   E_UnicodeTranslateError
+  35   E_ReferenceError
+  36   E_SystemError
+  37   E_MemoryError
+  37   E_LAST_PYTHON_E
+  38   BAD_BUFFER_SIZE
+  39   MISSING_ENCODING_NAME
+  40   INVALID_STRING_REPRESENTATION
+  41   ICU_ERROR
+  42   UNIMPLEMENTED
+  43   NULL_REG_ACCESS
+  44   NO_REG_FRAMES
+  45   SUBSTR_OUT_OF_STRING
+  46   ORD_OUT_OF_STRING
+  47   MALFORMED_UTF8
+  48   MALFORMED_UTF16
+  49   MALFORMED_UTF32
+  50   INVALID_CHARACTER
+  51   INVALID_CHARTYPE
+  52   INVALID_ENCODING
+  53   INVALID_CHARCLASS
+  54   NEG_REPEAT
+  55   NEG_SUBSTR
+  56   NEG_SLEEP
+  57   NEG_CHOP
+  58   INVALID_OPERATION
+  59   ARG_OP_NOT_HANDLED
+  60   KEY_NOT_FOUND
+  61   JIT_UNAVAILABLE
+  62   EXEC_UNAVAILABLE
+  63   INTERP_ERROR
+  64   PREDEREF_LOAD_ERROR
+  65   PARROT_USAGE_ERROR
+  66   PIO_ERROR
+  67   PARROT_POINTER_ERROR
+  68   DIV_BY_ZERO
+  69   PIO_NOT_IMPLEMENTED
+  70   ALLOCATION_ERROR
+  71   INTERNAL_PANIC
+  72   OUT_OF_BOUNDS
+  73   JIT_ERROR
+  74   EXEC_ERROR
+  75   ILL_INHERIT
+  76   NO_PREV_CS
+  77   NO_CLASS
+  78   LEX_NOT_FOUND
+  79   PAD_NOT_FOUND
+  80   ATTRIB_NOT_FOUND
+  81   GLOBAL_NOT_FOUND
+  82   METH_NOT_FOUND
+  83   WRITE_TO_CONSTCLASS
+  84   NOSPAWN
+  85   INTERNAL_NOT_IMPLEMENTED
+  86   ERR_OVERFLOW
+  87   LOSSY_CONVERSION
+
+=item *
+
+C<exit> throws an exception of severity C<EXCEPT_EXIT>. It takes a
+single argument for the exception type.
+
+=item *
+
+C<pushaction> pushes a subroutine object onto the control stack. If the
+control stack is unwound due to an exception (or C<popmark>, or
+subroutine return), the subroutine is invoked with an integer argument:
+C<0> means a normal return; C<1> means an exception has been raised.
+[Seems like there's lots of room for dangerous collisions here.]
+
+=back
+
+=head1 IMPLEMENTATION
+
+[I'm not convinced the control stack is the right way to handle
+exceptions. Most of Parrot is based on the continuation-passing style of
+control, shouldn't exceptions be based on it too?]
+
+=head2 Opcodes that Throw Exceptions
+
+Exceptions have been incorporated into built-in opcodes in a limited
+way, but they aren't used consistently.
+
+Divide by zero exceptions are thrown by C<div>, C<fdiv>, and C<cmod>.
+
+The C<ord> opcode throws an exception when it's passed an empty
+argument, or passed a string index that's outside the length of the
+string.
+
+The C<classoffset> opcode throws an exception when it's asked to
+retrieve the attribute offset for a class that isn't in the object's
+inheritance hierarchy.
+
+The C<find_charset> opcode throws an exception if the charset name it's
+looking up doesn't exist. The C<trans_charset> opcode throws an
+exception on "information loss" (presumably, this means when one charset
+doesn't have a one-to-one correspondence in the other charset). 
+
+The C<find_encoding> opcode throws an exception if the encoding name
+it's looking up doesn't exist. The C<trans_encoding> opcode throws an
+exception on "information loss" (presumably, this means when one
+encoding doesn't have a one-to-one correspondence in the other
+encoding). 
+
+Parrot's default version of the C<LexPad> PMC uses exceptions, though
+other implementations can choose to return error values instead.
+C<store_lex> throws an exception when asked to store a lexical variable
+in a name that doesn't exist. C<find_lex> throws an exception when asked
+to retrieve a lexical name that doesn't exist.
+
+Other opcodes respond to an C<errorson> setting to decide whether to
+throw an exception or return an error value. C<find_global> throws an
+exception (or returns a Null PMC) if the global name requested doesn't
+exist. C<find_name> throws an exception (or returns a Null PMC) if the
+name requested doesn't exist in a lexical, current, global, or built-in
+namespace.
+
+It's a little odd that so few opcodes throw exceptions (these are the
+ones that are documented, but a few others throw exceptions internally
+even though they aren't documented as doing so). It's worth considering
+either expanding the use of exceptions consistently throughout the
+opcode set, or eliminating exceptions from the opcode set entirely. The
+strategy for error handling should be consistent, whatever it is. [I
+like the way C<LexPad>s and the C<errorson> settings provide the option
+for exception-based or non-exception-based implementations, rather than
+forcing one or the other.]
+
+=head2 Excerpt
+
+[Excerpt from "Perl 6 and Parrot Essentials" to seed discussion.
+Out-of-date in some ways, and in others it was simply speculative.]
+
+Exceptions provide a way of calling a piece of code outside the normal
+flow of control. They are mainly used for error reporting or cleanup
+tasks, but sometimes exceptions are just a funny way to branch from
+one code location to another one. 
+
+Exceptions are objects that hold all the information needed to handle
+the exception: the error message, the severity and type of the error,
+etc. The class of an exception object indicates the kind of exception
+it is.
+
+Exception handlers are derived from continuations. They are ordinary
+subroutines that follow the Parrot calling conventions, but are never
+explicitly called from within user code. User code pushes an exception
+handler onto the control stack with the C<set_eh> opcode. The system
+calls the installed exception handler only when an exception is thrown.
+
+    newsub P20, .Exception_Handler, _handler
+    set_eh P20                  # push handler on control stack
+    null P10                    # set register to null
+    find_global P10, "none"     # may throw exception
+    clear_eh                    # pop the handler off the stack
+    ...
+
+  _handler:                     # if not, execution continues here
+    is_null P10, not_found      # test P10
+    ...
+
+This example creates a new exception handler subroutine with the
+C<newsub> opcode and installs it on the control stack with the
+C<set_eh> opcode. It sets the C<P10> register to a null value (so it
+can be checked later) and attempts to retrieve the global variable
+named C<none>. If the global variable is found, the next statement
+(C<clear_eh>) pops the exception handler off the control stack and
+normal execution continues. If the C<find_global> call doesn't find
+C<none> it throws an exception by pushing an exception object onto the
+control stack. When Parrot sees that it has an exception, it pops it
+off the control stack and calls the exception handler C<_handler>.
+
+The first exception handler in the control stack sees every exception
+thrown. The handler has to examine the exception object and decide
+whether it can handle it (or discard it) or whether it should
+C<rethrow> the exception to pass it along to an exception handler
+deeper in the stack. The C<rethrow> opcode is only valid in exception
+handlers. It pushes the exception object back onto the control stack so
+Parrot knows to search for the next exception handler in the stack. The
+process continues until some exception handler deals with the exception
+and returns normally, or until there are no more exception handlers on
+the control stack. When the system finds no installed exception handlers
+it defaults to a final action, which normally means it prints an
+appropriate message and terminates the program.
+
+When the system installs an exception handler, it creates a return
+continuation with a snapshot of the current interpreter context. If
+the exception handler just returns (that is, if the exception is
+cleanly caught) the return continuation restores the control stack
+back to its state when the exception handler was called, cleaning up
+the exception handler and any other changes that were made in the
+process of handling the exception.
+
+Exceptions thrown by standard Parrot opcodes (like the one thrown by
+C<find_global> above or by the C<throw> opcode) are always resumable,
+so when the exception handler function returns normally it continues
+execution at the opcode immediately after the one that threw the
+exception. Other exceptions at the run-loop level are also generally
+resumable.
+
+  new P10, Exception            # create new Exception object
+  set P10["_message"], "I die"  # set message attribute
+  throw P10                     # throw it
+
+Exceptions are designed to work with the Parrot calling conventions.
+Since the return addresses of C<bsr> subroutine calls and exception
+handlers are both pushed onto the control stack, it's generally a bad
+idea to combine the two.
+
+=head1 ATTACHMENTS
+
+None.
+
+=head1 FOOTNOTES
+
+None.
+
+=head1 REFERENCES
+
+  src/ops/core.ops
+  src/exceptions.c
+  runtime/parrot/include/except_types.pasm
+  runtime/parrot/include/except_severity.pasm
+
+=cut
+
+__END__
+Local Variables:
+  fill-column:78
+End:

@@ -341,6 +341,7 @@ docs/pdds/clip/pdd16_native_call.pod              [main]doc
 docs/pdds/clip/pdd17_basic_types.pod              [main]doc
 docs/pdds/clip/pdd18_security.pod                 [main]doc
 docs/pdds/clip/pdd19_pir.pod                      [main]doc
+docs/pdds/clip/pddXX_exceptions.pod               [main]doc
 docs/pdds/clip/pddXX_io.pod                       [main]doc
 docs/pmc/array.pod                                [main]doc
 docs/pmc/iterator.pod                             [main]doc
