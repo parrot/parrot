@@ -38,7 +38,7 @@
     optable.addtok("circumfix:[ ]", "term:", "nows", "PGE::Exp::Group")
     optable.addtok("circumfix:( )", "term:", "nows", "PGE::Exp::Group")
 
-    optable.addtok("<commit>", "term:", "nows", "PGE::Exp::Commit")
+    optable.addtok("term:<commit>", "term:", "nows", "PGE::Exp::Commit")
 
     $P0 = find_global "PGE::P6Rule", "parse_subrule"
     optable.addtok("term:<", "term:", "nows", $P0)
@@ -56,9 +56,9 @@
     optable.addtok("postfix:*", "<term:", "left", $P0)
     optable.addtok("postfix:+", "postfix:*", "left", $P0)
     optable.addtok("postfix:?", "postfix:*", "left", $P0)
-    optable.addtok("postfix::", "postfix:*", "left", "PGE::Exp::Cut")
-    $P0 = find_global "PGE::Rule", "fail"
-    optable.addtok("postfix:::", "postfix:*", "left", $P0)
+
+    $P0 = find_global "PGE::P6Rule", "parse_cut"
+    optable.addtok("postfix::", "postfix:*", "left", $P0)
 
     optable.addtok("infix:", "<postfix:*", "right,nows", "PGE::Exp::Concat")
     optable.addtok("infix:&", "<infix:", "left,nows", "PGE::Exp::Conj")
@@ -566,6 +566,22 @@
     parse_error(mob, pos, "Missing close '>' in scalar")
   end:
     mpos = pos
+    .return (mob)
+.end
+
+.sub "parse_cut"
+    .param pmc mob
+    .local string target
+    .local pmc mfrom, mpos
+    .local pmc newfrom
+    newfrom = find_global "PGE::Match", "newfrom"
+    (mob, target, mfrom, mpos) = newfrom(mob, 0, "PGE::Exp::Cut")
+    $I0 = mfrom
+    inc $I0
+    $S0 = substr target, $I0, 1
+    if $S0 == ":" goto end
+    mpos = mfrom + 1
+  end:
     .return (mob)
 .end
     
