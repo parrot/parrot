@@ -49,7 +49,7 @@ Generates the grammar parse rule needed to parse grammar strings.
 .namespace [ "PGE" ]
 
 .sub "__onload" :load
-    $S0 = ':w ( (grammar) (\w+[\:\:\w+]*) ;? | (rule) (\w+) \{<p6rule>\} )*'
+    $S0 = ':w ( (\#)\N* | (grammar) (\w+[\:\:\w+]*) ;? | (rule) (\w+) \{<p6rule>\} )*'
     $P0 = compreg "PGE::P6Rule"
     $P0($S0, "PGE", "_grammar_rule")
     $P0 = find_global "PGE", "compile_rules"
@@ -95,8 +95,9 @@ given by C<src>.
     unless slist goto end
     stmt = shift slist
     $S1 = stmt[0]
-    if $S1 == "#" goto loop
     if $S1 == "rule" goto compile_rule
+    if $S1 == "grammar" goto grammar
+    goto loop
   grammar:
     namespace = stmt[1]
     $I0 = namehash[namespace]
