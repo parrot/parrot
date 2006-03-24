@@ -56,6 +56,8 @@ testclean:
 
 clean: testclean
 	$(RM_RF) TGE.pbc $(PARROT_LIBRARY)@slash@TGE.pbc
+	$(RM_RF) TGE@slash@Rule.pbc TGE@slash@Parser.pbc
+	$(RM_RF) TGE@slash@Instance.pbc
 
 realclean: clean
 	$(RM_RF) Makefile
