@@ -23,7 +23,7 @@ See "Lua 5.1 Reference Manual", section 5.1 "Basic Functions".
 
 .sub init :load, :anon
 
-    load_bytecode "languages/lua/lib/luapir.pbc"
+    load_bytecode "languages/lua/lib/luaaux.pbc"
 
 #    print "init Lua Basic\n"
 
@@ -73,129 +73,104 @@ interpreter version. The current contents of this variable is C<"Lua 5.1">.
 =cut
 
     .const .Sub _lua_assert = "_lua_assert"
-    $P0 = _lua_assert
     $P1 = "assert"
-    _lua__GLOBAL[$P1] = $P0
+    _lua__GLOBAL[$P1] = _lua_assert
 
     .const .Sub _lua_collectgarbage = "_lua_collectgarbage"
-    $P0 = _lua_collectgarbage
     $P1 = "collectgarbage"
-    _lua__GLOBAL[$P1] = $P0
+    _lua__GLOBAL[$P1] = _lua_collectgarbage
 
     .const .Sub _lua_dofile = "_lua_dofile"
-    $P0 = _lua_dofile
     $P1 = "dofile"
-    _lua__GLOBAL[$P1] = $P0
+    _lua__GLOBAL[$P1] = _lua_dofile
 
     .const .Sub _lua_error = "_lua_error"
-    $P0 = _lua_error
     $P1 = "error"
-    _lua__GLOBAL[$P1] = $P0
+    _lua__GLOBAL[$P1] = _lua_error
 
     .const .Sub _lua_getfenv = "_lua_getfenv"
-    $P0 = _lua_getfenv
     $P1 = "getfenv"
-    _lua__GLOBAL[$P1] = $P0
+    _lua__GLOBAL[$P1] = _lua_getfenv
 
     .const .Sub _lua_getmetatable = "_lua_getmetatable"
-    $P0 = _lua_getmetatable
     $P1 = "getmetatable"
-    _lua__GLOBAL[$P1] = $P0
+    _lua__GLOBAL[$P1] = _lua_getmetatable
 
     .const .Sub _lua_ipairs = "_lua_ipairs"
-    $P0 = _lua_ipairs
     $P1 = "ipairs"
-    _lua__GLOBAL[$P1] = $P0
+    _lua__GLOBAL[$P1] = _lua_ipairs
 
     .const .Sub _lua_load = "_lua_load"
-    $P0 = _lua_load
     $P1 = "load"
-    _lua__GLOBAL[$P1] = $P0
+    _lua__GLOBAL[$P1] = _lua_load
 
     .const .Sub _lua_loadfile = "_lua_loadfile"
-    $P0 = _lua_loadfile
     $P1 = "loadfile"
-    _lua__GLOBAL[$P1] = $P0
+    _lua__GLOBAL[$P1] = _lua_loadfile
 
     .const .Sub _lua_loadstring = "_lua_loadstring"
-    $P0 = _lua_loadstring
     $P1 = "loadstring"
-    _lua__GLOBAL[$P1] = $P0
+    _lua__GLOBAL[$P1] = _lua_loadstring
 
     .const .Sub _lua_next = "_lua_next"
-    $P0 = _lua_next
     $P1 = "next"
-    _lua__GLOBAL[$P1] = $P0
+    _lua__GLOBAL[$P1] = _lua_next
 
     .const .Sub _lua_pairs = "_lua_pairs"
-    $P0 = _lua_pairs
     $P1 = "pairs"
-    _lua__GLOBAL[$P1] = $P0
+    _lua__GLOBAL[$P1] = _lua_pairs
 
     .const .Sub _lua_pcall = "_lua_pcall"
-    $P0 = _lua_pcall
     $P1 = "pcall"
-    _lua__GLOBAL[$P1] = $P0
+    _lua__GLOBAL[$P1] = _lua_pcall
 
     .const .Sub _lua_print = "_lua_print"
-    $P0 = _lua_print
     $P1 = "print"
-    _lua__GLOBAL[$P1] = $P0
+    _lua__GLOBAL[$P1] = _lua_print
 
     .const .Sub _lua_rawequal = "_lua_rawequal"
-    $P0 = _lua_rawequal
     $P1 = "rawequal"
-    _lua__GLOBAL[$P1] = $P0
+    _lua__GLOBAL[$P1] = _lua_rawequal
 
     .const .Sub _lua_rawget = "_lua_rawget"
-    $P0 = _lua_rawget
     $P1 = "rawget"
-    _lua__GLOBAL[$P1] = $P0
+    _lua__GLOBAL[$P1] = _lua_rawget
 
     .const .Sub _lua_rawset = "_lua_rawset"
-    $P0 = _lua_rawset
     $P1 = "rawset"
-    _lua__GLOBAL[$P1] = $P0
+    _lua__GLOBAL[$P1] = _lua_rawset
 
     .const .Sub _lua_select = "_lua_select"
-    $P0 = _lua_select
     $P1 = "select"
-    _lua__GLOBAL[$P1] = $P0
+    _lua__GLOBAL[$P1] = _lua_select
 
     .const .Sub _lua_setfenv = "_lua_setfenv"
-    $P0 = _lua_setfenv
     $P1 = "setfenv"
-    _lua__GLOBAL[$P1] = $P0
+    _lua__GLOBAL[$P1] = _lua_setfenv
 
     .const .Sub _lua_setmetatable = "_lua_setmetatable"
-    $P0 = _lua_setmetatable
     $P1 = "setmetatable"
-    _lua__GLOBAL[$P1] = $P0
+    _lua__GLOBAL[$P1] = _lua_setmetatable
 
     .const .Sub _lua_tonumber = "_lua_tonumber"
-    $P0 = _lua_tonumber
     $P1 = "tonumber"
-    _lua__GLOBAL[$P1] = $P0
+    _lua__GLOBAL[$P1] = _lua_tonumber
 
     .const .Sub _lua_tostring = "_lua_tostring"
-    $P0 = _lua_tostring
     $P1 = "tostring"
-    _lua__GLOBAL[$P1] = $P0
+    _lua__GLOBAL[$P1] = _lua_tostring
 
     .const .Sub _lua_type = "_lua_type"
-    $P0 = _lua_type
     $P1 = "type"
-    _lua__GLOBAL[$P1] = $P0
+    _lua__GLOBAL[$P1] = _lua_type
 
     .const .Sub _lua_unpack = "_lua_unpack"
-    $P0 = _lua_unpack
     $P1 = "unpack"
-    _lua__GLOBAL[$P1] = $P0
+    _lua__GLOBAL[$P1] = _lua_unpack
 
     .const .Sub _lua_xpcall = "_lua_xpcall"
-    $P0 = _lua_xpcall
     $P1 = "xpcall"
-    _lua__GLOBAL[$P1] = $P0
+    _lua__GLOBAL[$P1] = _lua_xpcall
 
 .end
 

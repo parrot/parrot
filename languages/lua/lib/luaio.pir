@@ -38,7 +38,7 @@ See "Lua 5.1 Reference Manual", section 5.7 "Input and Ouput Facilities".
 
 .sub init :load, :anon
 
-    load_bytecode "languages/lua/lib/luapir.pbc"
+    load_bytecode "languages/lua/lib/luaaux.pbc"
     load_bytecode "languages/lua/lib/luabasic.pbc"
 
 #    print "init Lua I/O\n"
@@ -53,59 +53,48 @@ See "Lua 5.1 Reference Manual", section 5.7 "Input and Ouput Facilities".
     _lua__GLOBAL[$P1] = _io
 
     .const .Sub _io_close = "_io_close"
-    $P0 = _io_close
     $P1 = "close"
-    _io[$P1] = $P0
+    _io[$P1] = _io_close
 
     .const .Sub _io_flush = "_io_flush"
-    $P0 = _io_flush
     $P1 = "flush"
-    _io[$P1] = $P0
+    _io[$P1] = _io_flush
 
     .const .Sub _io_input = "_io_input"
-    $P0 = _io_input
     $P1 = "input"
-    _io[$P1] = $P0
+    _io[$P1] = _io_input
 
     .const .Sub _io_lines = "_io_lines"
-    $P0 = _io_lines
     $P1 = "lines"
-    _io[$P1] = $P0
+    _io[$P1] = _io_lines
 
     .const .Sub _io_open = "_io_open"
-    $P0 = _io_open
     $P1 = "open"
-    _io[$P1] = $P0
+    _io[$P1] = _io_open
 
     .const .Sub _io_output = "_io_output"
-    $P0 = _io_output
     $P1 = "output"
-    _io[$P1] = $P0
+    _io[$P1] = _io_output
 
     .const .Sub _io_popen = "_io_popen"
-    $P0 = _io_popen
     $P1 = "popen"
-    _io[$P1] = $P0
+    _io[$P1] = _io_popen
 
     .const .Sub _io_read = "_io_read"
-    $P0 = _io_read
     $P1 = "read"
-    _io[$P1] = $P0
+    _io[$P1] = _io_read
 
     .const .Sub _io_tmpfile = "_io_tmpfile"
-    $P0 = _io_tmpfile
     $P1 = "tmpfile"
-    _io[$P1] = $P0
+    _io[$P1] = _io_tmpfile
 
     .const .Sub _io_type = "_io_type"
-    $P0 = _io_type
     $P1 = "type"
-    _io[$P1] = $P0
+    _io[$P1] = _io_type
 
     .const .Sub _io_write = "_io_write"
-    $P0 = _io_write
     $P1 = "write"
-    _io[$P1] = $P0
+    _io[$P1] = _io_write
 
     #
     #    File
@@ -115,44 +104,36 @@ See "Lua 5.1 Reference Manual", section 5.7 "Input and Ouput Facilities".
     _file = new .LuaTable
 
     .const .Sub _file_close = "_io_close"
-    $P0 = _file_close
     $P1 = "close"
-    _file[$P1] = $P0
+    _file[$P1] = _file_close
 
     .const .Sub _file_flush = "_file_flush"
-    $P0 = _file_flush
     $P1 = "flush"
-    _file[$P1] = $P0
+    _file[$P1] = _file_flush
 
     .const .Sub _file_lines = "_file_lines"
-    $P0 = _file_lines
     $P1 = "lines"
-    _file[$P1] = $P0
+    _file[$P1] = _file_lines
 
     .const .Sub _file_read = "_file_read"
-    $P0 = _file_read
     $P1 = "read"
-    _file[$P1] = $P0
+    _file[$P1] = _file_read
 
     .const .Sub _file_seek = "_file_seek"
-    $P0 = _file_seek
     $P1 = "seek"
-    _file[$P1] = $P0
+    _file[$P1] = _file_seek
 
     .const .Sub _file_setvbuf = "_file_setvbuf"
-    $P0 = _file_setvbuf
     $P1 = "setvbuf"
-    _file[$P1] = $P0
+    _file[$P1] = _file_setvbuf
 
     .const .Sub _file_write = "_file_write"
-    $P0 = _file_write
     $P1 = "write"
-    _file[$P1] = $P0
+    _file[$P1] = _file_write
 
 #    .const .Sub _file__tostring = "_file__tostring"
-#    $P0 = _file__tostring
 #    $P1 = "__tostring"
-#    _file[$P1] = $P0
+#    _file[$P1] = _file__tostring
 
     .local pmc _lua_mt_file
     _lua_mt_file = new .LuaTable
@@ -160,9 +141,8 @@ See "Lua 5.1 Reference Manual", section 5.7 "Input and Ouput Facilities".
     _lua_mt_file[$P1] = _file
 
     .const .Sub _file__tostring = "_file__tostring"
-    $P0 = _file__tostring
     $P1 = "__tostring"
-    _lua_mt_file[$P1] = $P0
+    _lua_mt_file[$P1] = _file__tostring
 
 
     .local pmc _lua__REGISTRY

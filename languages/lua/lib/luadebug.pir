@@ -33,7 +33,7 @@ See "Lua 5.1 Reference Manual", section 5.9 "The Debug Library".
 
 .sub init :load, :anon
 
-    load_bytecode "languages/lua/lib/luapir.pbc"
+    load_bytecode "languages/lua/lib/luaaux.pbc"
     load_bytecode "languages/lua/lib/luabasic.pbc"
 
 #    print "init Lua Debug\n"
@@ -48,74 +48,60 @@ See "Lua 5.1 Reference Manual", section 5.9 "The Debug Library".
     _lua__GLOBAL[$P1] = _debug
 
     .const .Sub _debug_debug = "_debug_debug"
-    $P0 = _debug_debug
     $P1 = "debug"
-    _debug[$P1] = $P0
+    _debug[$P1] = _debug_debug
 
     .const .Sub _debug_getfenv = "_debug_getfenv"
-    $P0 = _debug_getfenv
     $P1 = "getfenv"
-    _debug[$P1] = $P0
+    _debug[$P1] = _debug_getfenv
 
     .const .Sub _debug_gethook = "_debug_gethook"
-    $P0 = _debug_gethook
     $P1 = "gethook"
-    _debug[$P1] = $P0
+    _debug[$P1] = _debug_gethook
 
     .const .Sub _debug_getinfo = "_debug_getinfo"
-    $P0 = _debug_getinfo
     $P1 = "getinfo"
-    _debug[$P1] = $P0
+    _debug[$P1] = _debug_getinfo
 
     .const .Sub _debug_getlocal = "_debug_getlocal"
-    $P0 = _debug_getlocal
     $P1 = "getlocal"
-    _debug[$P1] = $P0
+    _debug[$P1] = _debug_getlocal
 
     .const .Sub _debug_getmetatable = "_debug_getmetatable"
-    $P0 = _debug_getmetatable
     $P1 = "getmetatable"
-    _debug[$P1] = $P0
+    _debug[$P1] = _debug_getmetatable
 
     .const .Sub _debug_getregistry = "_debug_getregistry"
-    $P0 = _debug_getregistry
     $P1 = "getregistry"
-    _debug[$P1] = $P0
+    _debug[$P1] = _debug_getregistry
 
     .const .Sub _debug_getupvalue = "_debug_getupvalue"
-    $P0 = _debug_getupvalue
     $P1 = "getupvalue"
-    _debug[$P1] = $P0
+    _debug[$P1] = _debug_getupvalue
 
     .const .Sub _debug_setfenv = "_debug_setfenv"
-    $P0 = _debug_setfenv
     $P1 = "setfenv"
-    _debug[$P1] = $P0
+    _debug[$P1] = _debug_setfenv
 
     .const .Sub _debug_sethook = "_debug_sethook"
-    $P0 = _debug_sethook
     $P1 = "sethook"
-    _debug[$P1] = $P0
+    _debug[$P1] = _debug_sethook
 
     .const .Sub _debug_setlocal = "_debug_setlocal"
-    $P0 = _debug_setlocal
     $P1 = "setlocal"
-    _debug[$P1] = $P0
+    _debug[$P1] = _debug_setlocal
 
     .const .Sub _debug_setmetatable = "_debug_setmetatable"
-    $P0 = _debug_setmetatable
     $P1 = "setmetatable"
-    _debug[$P1] = $P0
+    _debug[$P1] = _debug_setmetatable
 
     .const .Sub _debug_setupvalue = "_debug_setupvalue"
-    $P0 = _debug_setupvalue
     $P1 = "setupvalue"
-    _debug[$P1] = $P0
+    _debug[$P1] = _debug_setupvalue
 
     .const .Sub _debug_traceback = "_debug_traceback"
-    $P0 = _debug_traceback
     $P1 = "traceback"
-    _debug[$P1] = $P0
+    _debug[$P1] = _debug_traceback
 
 .end
 

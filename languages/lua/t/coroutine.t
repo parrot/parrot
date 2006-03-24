@@ -19,6 +19,8 @@ See "Programming in Lua", section 9 "Coroutines".
 =cut
 
 use strict;
+use FindBin;
+use lib "$FindBin::Bin";
 
 use Parrot::Test tests => 8;
 use Test::More;

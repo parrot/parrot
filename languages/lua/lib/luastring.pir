@@ -34,7 +34,7 @@ See "Lua 5.1 Reference Manual", section 5.4 "String Manipulation".
 
 .sub init :load, :anon
 
-    load_bytecode "languages/lua/lib/luapir.pbc"
+    load_bytecode "languages/lua/lib/luaaux.pbc"
     load_bytecode "languages/lua/lib/luabasic.pbc"
 
 #    print "init Lua String\n"
@@ -49,74 +49,60 @@ See "Lua 5.1 Reference Manual", section 5.4 "String Manipulation".
     _lua__GLOBAL[$P1] = _string
 
     .const .Sub _string_byte = "_string_byte"
-    $P0 = _string_byte
     $P1 = "byte"
-    _string[$P1] = $P0
+    _string[$P1] = _string_byte
 
     .const .Sub _string_char = "_string_char"
-    $P0 = _string_char
     $P1 = "char"
-    _string[$P1] = $P0
+    _string[$P1] = _string_char
 
     .const .Sub _string_dump = "_string_dump"
-    $P0 = _string_dump
     $P1 = "dump"
-    _string[$P1] = $P0
+    _string[$P1] = _string_dump
 
     .const .Sub _string_find = "_string_find"
-    $P0 = _string_find
     $P1 = "find"
-    _string[$P1] = $P0
+    _string[$P1] = _string_find
 
     .const .Sub _string_format = "_string_format"
-    $P0 = _string_format
     $P1 = "format"
-    _string[$P1] = $P0
+    _string[$P1] = _string_format
 
     .const .Sub _string_gmatch = "_string_gmatch"
-    $P0 = _string_gmatch
     $P1 = "gmatch"
-    _string[$P1] = $P0
+    _string[$P1] = _string_gmatch
 
     .const .Sub _string_gsub = "_string_gsub"
-    $P0 = _string_gsub
     $P1 = "gsub"
-    _string[$P1] = $P0
+    _string[$P1] = _string_gsub
 
     .const .Sub _string_len = "_string_len"
-    $P0 = _string_len
     $P1 = "len"
-    _string[$P1] = $P0
+    _string[$P1] = _string_len
 
     .const .Sub _string_lower = "_string_lower"
-    $P0 = _string_lower
     $P1 = "lower"
-    _string[$P1] = $P0
+    _string[$P1] = _string_lower
 
     .const .Sub _string_match = "_string_match"
-    $P0 = _string_match
     $P1 = "match"
-    _string[$P1] = $P0
+    _string[$P1] = _string_match
 
     .const .Sub _string_rep = "_string_rep"
-    $P0 = _string_rep
     $P1 = "rep"
-    _string[$P1] = $P0
+    _string[$P1] = _string_rep
 
     .const .Sub _string_reverse = "_string_reverse"
-    $P0 = _string_reverse
     $P1 = "reverse"
-    _string[$P1] = $P0
+    _string[$P1] = _string_reverse
 
     .const .Sub _string_sub = "_string_sub"
-    $P0 = _string_sub
     $P1 = "sub"
-    _string[$P1] = $P0
+    _string[$P1] = _string_sub
 
     .const .Sub _string_upper = "_string_upper"
-    $P0 = _string_upper
     $P1 = "upper"
-    _string[$P1] = $P0
+    _string[$P1] = _string_upper
 
 
     .local pmc _lua_mt_string

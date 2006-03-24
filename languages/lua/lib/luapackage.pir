@@ -22,7 +22,7 @@ See "Lua 5.1 Reference Manual", section 5.3 "Modules".
 
 .sub init :load, :anon
 
-    load_bytecode "languages/lua/lib/luapir.pbc"
+    load_bytecode "languages/lua/lib/luaaux.pbc"
     load_bytecode "languages/lua/lib/luabasic.pbc"
 
 #    print "init Lua Package\n"
@@ -32,14 +32,12 @@ See "Lua 5.1 Reference Manual", section 5.3 "Modules".
     $P1 = new .LuaString
 
     .const .Sub _lua_module = "_lua_module"
-    $P0 = _lua_module
     $P1 = "module"
-    _lua__GLOBAL[$P1] = $P0
+    _lua__GLOBAL[$P1] = _lua_module
 
     .const .Sub _lua_require = "_lua_require"
-    $P0 = _lua_require
     $P1 = "require"
-    _lua__GLOBAL[$P1] = $P0
+    _lua__GLOBAL[$P1] = _lua_require
 
     .local pmc _package
     _package = new .LuaTable
@@ -55,9 +53,8 @@ See "Lua 5.1 Reference Manual", section 5.3 "Modules".
     _package[$P1] = $P0
 
     .const .Sub _package_loadlib = "_package_loadlib"
-    $P0 = _package_loadlib
     $P1 = "loadlib"
-    _package[$P1] = $P0
+    _package[$P1] = _package_loadlib
 
     $P0 = new .LuaString
     $P1 = "path"
@@ -68,9 +65,8 @@ See "Lua 5.1 Reference Manual", section 5.3 "Modules".
     _package[$P1] = $P0
 
     .const .Sub _package_seeall = "_package_seeall"
-    $P0 = _package_seeall
     $P1 = "seeall"
-    _package[$P1] = $P0
+    _package[$P1] = _package_seeall
 
 .end
 

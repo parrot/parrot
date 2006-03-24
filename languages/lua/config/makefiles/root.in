@@ -32,7 +32,7 @@ PBCS = \
  $(LIBPATH)@slash@luaio.pbc \
  $(LIBPATH)@slash@luaos.pbc \
  $(LIBPATH)@slash@luadebug.pbc \
- $(LIBPATH)@slash@luapir.pbc
+ $(LIBPATH)@slash@luaaux.pbc
 
 all: pmcs $(PBCS) Lua@slash@parser.pm
 
@@ -69,8 +69,8 @@ $(LIBPATH)@slash@luaos.pbc: $(LIBPATH)@slash@luaos.pir
 $(LIBPATH)@slash@luadebug.pbc: $(LIBPATH)@slash@luadebug.pir
 	$(PARROT) --output=$(LIBPATH)@slash@luadebug.pbc $(LIBPATH)@slash@luadebug.pir
 
-$(LIBPATH)@slash@luapir.pbc: $(LIBPATH)@slash@luapir.pir
-	$(PARROT) --output=$(LIBPATH)@slash@luapir.pbc $(LIBPATH)@slash@luapir.pir
+$(LIBPATH)@slash@luaaux.pbc: $(LIBPATH)@slash@luaaux.pir
+	$(PARROT) --output=$(LIBPATH)@slash@luaaux.pbc $(LIBPATH)@slash@luaaux.pir
 
 Lua@slash@parser.pm: Lua@slash@lua51.yp
 	yapp -s -v -m Lua::parser -o Lua/parser.pm Lua/lua51.yp

@@ -28,7 +28,7 @@ See "Lua 5.1 Reference Manual", section 5.5 "Table Manipulation".
 
 .sub init :load, :anon
 
-    load_bytecode "languages/lua/lib/luapir.pbc"
+    load_bytecode "languages/lua/lib/luaaux.pbc"
     load_bytecode "languages/lua/lib/luabasic.pbc"
 
 #    print "init Lua Table\n"
@@ -43,49 +43,40 @@ See "Lua 5.1 Reference Manual", section 5.5 "Table Manipulation".
     _lua__GLOBAL[$P1] = _table
 
     .const .Sub _table_concat = "_table_concat"
-    $P0 = _table_concat
     $P1 = "concat"
-    _table[$P1] = $P0
+    _table[$P1] = _table_concat
 
     .const .Sub _table_foreach = "_table_foreach"
-    $P0 = _table_foreach
     $P1 = "foreach"
-    _table[$P1] = $P0
+    _table[$P1] = _table_foreach
 
     .const .Sub _table_foreachi = "_table_foreachi"
-    $P0 = _table_foreachi
     $P1 = "foreachi"
-    _table[$P1] = $P0
+    _table[$P1] = _table_foreachi
 
     .const .Sub _table_getn = "_table_getn"
-    $P0 = _table_getn
     $P1 = "getn"
-    _table[$P1] = $P0
+    _table[$P1] = _table_getn
 
     .const .Sub _table_insert = "_table_insert"
-    $P0 = _table_insert
     $P1 = "insert"
-    _table[$P1] = $P0
+    _table[$P1] = _table_insert
 
     .const .Sub _table_maxn = "_table_maxn"
-    $P0 = _table_maxn
     $P1 = "maxn"
-    _table[$P1] = $P0
+    _table[$P1] = _table_maxn
 
     .const .Sub _table_remove = "_table_remove"
-    $P0 = _table_remove
     $P1 = "remove"
-    _table[$P1] = $P0
+    _table[$P1] = _table_remove
 
     .const .Sub _table_setn = "_table_setn"
-    $P0 = _table_setn
     $P1 = "setn"
-    _table[$P1] = $P0
+    _table[$P1] = _table_setn
 
     .const .Sub _table_sort = "_table_sort"
-    $P0 = _table_sort
     $P1 = "sort"
-    _table[$P1] = $P0
+    _table[$P1] = _table_sort
 
 .end
 

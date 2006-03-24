@@ -52,7 +52,7 @@ See "Lua 5.1 Reference Manual", section 5.6 "Mathematical Functions".
 
 .sub init :load, :anon
 
-    load_bytecode "languages/lua/lib/luapir.pbc"
+    load_bytecode "languages/lua/lib/luaaux.pbc"
     load_bytecode "languages/lua/lib/luabasic.pbc"
 
 #    print "init Lua Math\n"
@@ -67,129 +67,104 @@ See "Lua 5.1 Reference Manual", section 5.6 "Mathematical Functions".
     _lua__GLOBAL[$P1] = _math
 
     .const .Sub _math_abs = "_math_abs"
-    $P0 = _math_abs
     $P1 = "abs"
-    _math[$P1] = $P0
+    _math[$P1] = _math_abs
 
     .const .Sub _math_acos = "_math_acos"
-    $P0 = _math_acos
     $P1 = "acos"
-    _math[$P1] = $P0
+    _math[$P1] = _math_acos
 
     .const .Sub _math_asin = "_math_asin"
-    $P0 = _math_asin
     $P1 = "asin"
-    _math[$P1] = $P0
+    _math[$P1] = _math_asin
 
     .const .Sub _math_atan = "_math_atan"
-    $P0 = _math_atan
     $P1 = "atan"
-    _math[$P1] = $P0
+    _math[$P1] = _math_atan
 
     .const .Sub _math_atan2 = "_math_atan2"
-    $P0 = _math_atan2
     $P1 = "atan2"
-    _math[$P1] = $P0
+    _math[$P1] = _math_atan2
 
     .const .Sub _math_ceil = "_math_ceil"
-    $P0 = _math_ceil
     $P1 = "ceil"
-    _math[$P1] = $P0
+    _math[$P1] = _math_ceil
 
     .const .Sub _math_cos = "_math_cos"
-    $P0 = _math_cos
     $P1 = "cos"
-    _math[$P1] = $P0
+    _math[$P1] = _math_cos
 
     .const .Sub _math_deg = "_math_deg"
-    $P0 = _math_deg
     $P1 = "deg"
-    _math[$P1] = $P0
+    _math[$P1] = _math_deg
 
     .const .Sub _math_exp = "_math_exp"
-    $P0 = _math_exp
     $P1 = "exp"
-    _math[$P1] = $P0
+    _math[$P1] = _math_exp
 
     .const .Sub _math_floor = "_math_floor"
-    $P0 = _math_floor
     $P1 = "floor"
-    _math[$P1] = $P0
+    _math[$P1] = _math_floor
 
     .const .Sub _math_fmod = "_math_fmod"
-    $P0 = _math_fmod
     $P1 = "fmod"
-    _math[$P1] = $P0
+    _math[$P1] = _math_fmod
 
     .const .Sub _math_frexp = "_math_frexp"
-    $P0 = _math_frexp
     $P1 = "frexp"
-    _math[$P1] = $P0
+    _math[$P1] = _math_frexp
 
     .const .Sub _math_ldexp = "_math_ldexp"
-    $P0 = _math_ldexp
     $P1 = "ldexp"
-    _math[$P1] = $P0
+    _math[$P1] = _math_ldexp
 
     .const .Sub _math_log = "_math_log"
-    $P0 = _math_log
     $P1 = "log"
-    _math[$P1] = $P0
+    _math[$P1] = _math_log
 
     .const .Sub _math_log10 = "_math_log10"
-    $P0 = _math_log10
     $P1 = "log10"
-    _math[$P1] = $P0
+    _math[$P1] = _math_log10
 
     .const .Sub _math_max = "_math_max"
-    $P0 = _math_max
     $P1 = "max"
-    _math[$P1] = $P0
+    _math[$P1] = _math_max
 
     .const .Sub _math_min = "_math_min"
-    $P0 = _math_min
     $P1 = "min"
-    _math[$P1] = $P0
+    _math[$P1] = _math_min
 
     .const .Sub _math_modf = "_math_modf"
-    $P0 = _math_modf
     $P1 = "modf"
-    _math[$P1] = $P0
+    _math[$P1] = _math_modf
 
     .const .Sub _math_pow = "_math_pow"
-    $P0 = _math_pow
     $P1 = "pow"
-    _math[$P1] = $P0
+    _math[$P1] = _math_pow
 
     .const .Sub _math_rad = "_math_rad"
-    $P0 = _math_rad
     $P1 = "rad"
-    _math[$P1] = $P0
+    _math[$P1] = _math_rad
 
     .const .Sub _math_random = "_math_random"
-    $P0 = _math_random
     $P1 = "random"
-    _math[$P1] = $P0
+    _math[$P1] = _math_random
 
     .const .Sub _math_randomseed = "_math_randomseed"
-    $P0 = _math_randomseed
     $P1 = "randomseed"
-    _math[$P1] = $P0
+    _math[$P1] = _math_randomseed
 
     .const .Sub _math_sin = "_math_sin"
-    $P0 = _math_sin
     $P1 = "sin"
-    _math[$P1] = $P0
+    _math[$P1] = _math_sin
 
     .const .Sub _math_sqrt = "_math_sqrt"
-    $P0 = _math_sqrt
     $P1 = "sqrt"
-    _math[$P1] = $P0
+    _math[$P1] = _math_sqrt
 
     .const .Sub _math_tan = "_math_tan"
-    $P0 = _math_tan
     $P1 = "tan"
-    _math[$P1] = $P0
+    _math[$P1] = _math_tan
 
     $P0 = new .LuaNumber
     $P0 = 3.14159265358979323846

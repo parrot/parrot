@@ -24,7 +24,7 @@ See "Lua 5.1 Reference Manual", section 5.2 "Coroutine Manipulation".
 
 .sub init :load, :anon
 
-    load_bytecode "languages/lua/lib/luapir.pbc"
+    load_bytecode "languages/lua/lib/luaaux.pbc"
     load_bytecode "languages/lua/lib/luabasic.pbc"
 
 #    print "init Lua Coroutine\n"
@@ -39,34 +39,28 @@ See "Lua 5.1 Reference Manual", section 5.2 "Coroutine Manipulation".
     _lua__GLOBAL[$P1] = _coroutine
 
     .const .Sub _coroutine_create = "_coroutine_create"
-    $P0 = _coroutine_create
     $P1 = "create"
-    _coroutine[$P1] = $P0
+    _coroutine[$P1] = _coroutine_create
 
     .const .Sub _coroutine_resume = "_coroutine_resume"
-    $P0 = _coroutine_resume
     $P1 = "resume"
-    _coroutine[$P1] = $P0
+    _coroutine[$P1] = _coroutine_resume
 
     .const .Sub _coroutine_running = "_coroutine_running"
-    $P0 = _coroutine_running
     $P1 = "running"
-    _coroutine[$P1] = $P0
+    _coroutine[$P1] = _coroutine_running
 
     .const .Sub _coroutine_status = "_coroutine_status"
-    $P0 = _coroutine_status
     $P1 = "status"
-    _coroutine[$P1] = $P0
+    _coroutine[$P1] = _coroutine_status
 
     .const .Sub _coroutine_wrap = "_coroutine_wrap"
-    $P0 = _coroutine_wrap
     $P1 = "wrap"
-    _coroutine[$P1] = $P0
+    _coroutine[$P1] = _coroutine_wrap
 
     .const .Sub _coroutine_yield = "_coroutine_yield"
-    $P0 = _coroutine_yield
     $P1 = "yield"
-    _coroutine[$P1] = $P0
+    _coroutine[$P1] = _coroutine_yield
 
 .end
 

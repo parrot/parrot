@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-lib/luapir.pir - Lua PIR Library
+lib/luaaux.pir - Lua Auxiliary PIR Library
 
 =head1 DESCRIPTION
 
