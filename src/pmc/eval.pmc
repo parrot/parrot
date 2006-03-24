@@ -242,9 +242,10 @@ for writing to disc and later loading via C<load_bytecode>.
         aligned_size = size + 15;
         res = string_make_empty(INTERP, enum_stringrep_one, aligned_size);
         res->strlen = res->bufused = size;
-        if ((size_t)res->strstart & 0xf) {
-            LVALUE_CAST(char*,res->strstart) +=
-                16 - ((size_t)res->strstart & 0xf);
+        if ((size_t)(res->strstart) & 0xf) {
+            char *adr = res->strstart;
+            adr += 16 - ((size_t)adr & 0xf);
+            res->strstart = adr;
         }
         PackFile_pack(INTERP, pf, res->strstart);
         /* now remove all segments from directory again and destroy
