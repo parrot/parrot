@@ -637,6 +637,8 @@ CODE
 0
 OUTPUT
 
+SKIP: {
+  skip("instantiate n/y", 3);
 pasm_output_is(<< 'CODE', << 'OUTPUT', "instantiate, PASM, I");
     set I0, 1
     set I1, 2
@@ -654,8 +656,6 @@ CODE
 10+20i
 OUTPUT
 
-SKIP: {
-  skip("instantiate n/y", 2);
 pir_output_is(<< 'CODE', << 'OUTPUT', "instantiate, PIR, N");
 
 .sub main

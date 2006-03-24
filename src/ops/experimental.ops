@@ -361,6 +361,21 @@ op new(out PMC, in STR, in PMC) {
 	goto NEXT();
 }
 
+=item op B<getclass>(out PMC, in INT)
+
+Return the class PMC of the type $2.
+
+=cut
+
+op getclass(out PMC, in INT) {
+    int typ = $2;
+    if (typ < 1 || typ >= interpreter->n_vtable_max)
+	real_exception(interpreter, NULL, E_ValueError,
+		"type number out of range");
+    $1 = interpreter->vtables[typ]->class;
+    goto NEXT();
+}
+
 =back
 
 =head1 COPYRIGHT

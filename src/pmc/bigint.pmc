@@ -444,7 +444,7 @@ pmclass BigInt {
 
 =over 4
 
-=item C<PMC* instantiate()>
+=item C<PMC* instantiate(PMC* sig)>
 
 Object constructor. SELF is a BigInt Class object. Return a new
 BigInt object.
@@ -452,11 +452,13 @@ BigInt object.
 =cut
 
 */
-    PMC* instantiate() {
+    PMC* instantiate(PMC* sig) {
         int argcP = REG_INT(3);
         int base;
         PMC *res;
         STRING *num;
+
+        return PMCNULL;  /* TODO */
 
         res = pmc_new(INTERP, enum_class_BigInt);
         if (!argcP) {

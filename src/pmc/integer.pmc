@@ -74,6 +74,10 @@ overflow_p(Interp *interpreter, PMC *self, PMC *val, PMC *dest, int mmd)
 pmclass Integer extends scalar does integer does scalar {
 
 /*
+=item C<PMC instantiate(PMC* sig)>
+
+Create a new Integer with arguments passed according to pdd03.
+
 
 =item C<void init()>
 
@@ -82,6 +86,31 @@ Initializes the integer with a default value of C<0>.
 =cut
 
 */
+    PMC* instantiate(PMC* sig) {
+        PMC* ret = new_pmc_header(INTERP, 0);
+        opcode_t *arg_op;
+        INTVAL init = 0;
+
+        ret->vtable = INTERP->vtables[SELF->vtable->base_type];
+        arg_op = interpreter->current_args;
+        if (SIG_ELEMS(sig) == 2) {
+            switch (SIG_ITEM(sig, 1)) {
+                case PARROT_ARG_I:
+                    init = REG_INT(arg_op[3]);
+                    break;
+                case PARROT_ARG_IC:
+                    init = arg_op[3];
+                    break;
+                default:
+                    internal_exception(1, 
+                            "Integer.instantiate: unhandled initializer");
+                    break;
+            }
+        }
+        PMC_int_val(ret) = init;
+        return ret;
+    }
+
     void init () {
         PMC_int_val(SELF) = 0;
     }

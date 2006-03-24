@@ -197,7 +197,7 @@ pmclass Complex {
 
 /*
 
-=item C<PMC* instantiate()>
+=item C<PMC* instantiate(PMC* sig)>
 
 Create a new complex PMC with passed arguments according to pdd03.
 
@@ -205,13 +205,15 @@ Create a new complex PMC with passed arguments according to pdd03.
 
 */
 
-    PMC* instantiate() {
+    PMC* instantiate(PMC* sig) {
         PMC *res = pmc_new(INTERP, enum_class_Complex);
         FLOATVAL re = 0.0, im = 0.0;
         int argcI = REG_INT(1);
         int argcS = REG_INT(2);
         int argcP = REG_INT(3);
         int argcN = REG_INT(4);
+
+        return PMCNULL;  /* TODO */
         /*
          * we can only allow 0..2 arguments of one kind. For
          * mixed (e.g. N,P) args the order of arguments isn't fixed

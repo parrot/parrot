@@ -135,7 +135,7 @@ pmclass delegate {
 
 Calls the delegated C<__init()> method if it exists.
 
-=item C<PMC* instantiate()>
+=item C<PMC* instantiate(PMC* sig)>
 
 Calls the delegated C<__instantiate> method if it exists.
 
@@ -163,14 +163,14 @@ useful defaults and don't throw exceptions.
         /* don't delegate mark */
     }
 
-    PMC* instantiate() {
+    PMC* instantiate(PMC* sig) {
         STRING *meth = const_string(INTERP,
                 PARROT_VTABLE_INSTANTIATE_METHNAME);
         PMC *sub = find_meth(INTERP, SELF, meth);
 
         if (PMC_IS_NULL(sub)) {
             /* run default fallback that constructs an empty object */
-            return SUPER();
+            return SUPER(sig);
         }
         return (PMC*) Parrot_run_meth_fromc(INTERP, sub, SELF, meth);
     }
