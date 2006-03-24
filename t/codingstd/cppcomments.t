@@ -24,8 +24,6 @@ Checks that no source file in the distribution uses C++ style comments.
 
 =head1 TODO
 
-'t/perl' is not really the correct location for this test.
-
 Use Parrot::Distribution for looking for C-source files.
 
 =cut
