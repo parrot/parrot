@@ -67,13 +67,13 @@ op q() {
     HALT();
 }
 
-=item B<xand>(out INT, in INT, in INT)
+=item B<bxand>(out INT, in INT, in INT)
 
 Binary operator, defined as A and B, but not BOTH.
 
 =cut
 
-op xand(out INT, in INT, in INT) {
+op bxand(out INT, in INT, in INT) {
     /* short circuit boolean logic */
     $1 = 0;
     goto NEXT();

@@ -155,17 +155,17 @@ alarm3
 done.
 OUTPUT
 
-# XAND boolean op
-pasm_output_is(<<'CODE', <<'OUTPUT', 'XAND - A AND B, but not BOTH');
+# bxand boolean op
+pasm_output_is(<<'CODE', <<'OUTPUT', 'bxand - A AND B, but not BOTH');
     loadlib P1, "myops_ops"
 
-    xand I0, 0, 0
+    bxand I0, 0, 0
     bsr test
-    xand I0, 0, 1
+    bxand I0, 0, 1
     bsr test
-    xand I0, 1, 0
+    bxand I0, 1, 0
     bsr test
-    xand I0, 1, 1
+    bxand I0, 1, 1
     bsr test
 
     branch end
