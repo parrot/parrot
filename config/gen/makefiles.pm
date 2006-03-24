@@ -188,6 +188,11 @@ sub makefiles
         replace_slashes                           => 1
     );
     genfile(
+        'config/gen/makefiles/perl6.in' => 'languages/perl6/Makefile',
+        commentType                     => '#',
+        replace_slashes                 => 1
+    );
+    genfile(
         'config/gen/makefiles/punie.in' => 'languages/punie/Makefile',
         commentType                     => '#',
         replace_slashes                 => 1
