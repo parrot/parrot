@@ -61,7 +61,7 @@ pir_output_is(<<'CODE', <<'OUT', "parse FASTA");
 
 .sub "example" :main
     load_bytecode 'PGE.pbc'
-    load_bytecode 'PGE/Util.pir'
+    load_bytecode 'PGE/P6Grammar.pir'
 
     .local string fasta_grammar
     fasta_grammar = <<'END_FASTA_GRAMMAR'

@@ -35,7 +35,6 @@ my $PRE = <<PRE;
     load_bytecode "PGE/Dumper.pir"
     load_bytecode "PGE/Glob.pir"
     load_bytecode "PGE/Text.pir"
-    load_bytecode "PGE/Util.pir"
     .local string target, pattern
     .local pmc p6rule, rulesub, pir, exp, match
     p6rule = compreg 'PGE::P6Rule'

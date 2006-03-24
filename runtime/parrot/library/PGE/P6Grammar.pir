@@ -1,12 +1,9 @@
 
 =head1 TITLE
 
-PGE::Util - utility PGE subroutines
+PGE::P6Grammar.pir - compile a Perl 6 grammar
 
 =head1 DESCRIPTION
-
-The subroutines and items in this module are provided to make
-working with PGE a little easier.
 
 This module defines the "PGE::P6Grammar" compiler, which can be
 used to compile complete sets of rules (grammars).  Input to the 
@@ -23,7 +20,7 @@ string.
 Here's a code snippet to load a set of rules using the grammar compiler:
 
     load_bytecode "PGE.pbc"
-    load_bytecode "PGE/Util.pir"
+    load_bytecode "PGE/P6Grammar.pir"
 
     $S0 = <<'END'
         grammar PGE::Rule;
@@ -31,12 +28,13 @@ Here's a code snippet to load a set of rules using the grammar compiler:
         rule name { <ident> [ \:\: <ident> ]* }
     END
     $P0 = compreg "PGE::P6Grammar"
-    $P1 = $P0($S0)
+    (code, onload) = $P0($S0)
     # rules <PGE::Rule::ident> and <PGE::Rule::name> have now been loaded
 
 The return value from the compiler is a string containing the
-PIR generated from the rules in the grammar, which can be saved
-and used to generate precompiled .pbc files for other packages.
+PIR generated from the rules in the grammar, and code for generating
+any classes defined by the grammar.  This code can be used
+to generate precompiled .pbc files for other packages.
 
 =head2 Functions
 

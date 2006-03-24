@@ -11,7 +11,7 @@
     load_bytecode "PGE.pbc"
     load_bytecode "dumper.pir"
     load_bytecode "PGE/Dumper.pir"
-    load_bytecode "PGE/Util.pir"
+    load_bytecode "PGE/P6Grammar.pir"
 
     print "loaded p6rule\n"
     "loadexpr"("Simple", "expr")

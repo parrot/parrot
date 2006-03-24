@@ -59,7 +59,7 @@ Print a friendly help message.
 
     load_bytecode "PGE.pbc"
     load_bytecode "PGE/Text.pir"
-    load_bytecode "PGE/Util.pir"
+    load_bytecode "PGE/P6Grammar.pir"
     load_bytecode "Getopt/Obj.pir"
 
     ## register compilers

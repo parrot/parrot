@@ -34,7 +34,6 @@ my $pre = <<PRE;
     load_bytecode "PGE/Dumper.pir"
     load_bytecode "PGE/Glob.pir"
     load_bytecode "PGE/Text.pir"
-    load_bytecode "PGE/Util.pir"
     .local string target
     .local string pattern
     .local string modifier
