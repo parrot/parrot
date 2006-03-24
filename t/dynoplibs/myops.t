@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 7;
+use Parrot::Test tests => 8;
 use Parrot::Config;
 
 
@@ -76,6 +76,7 @@ q
 END_PASM
     pasm_output_is( $quine, $quine, 'a short cheating quine');
 }
+
 pir_output_is(<< 'CODE', << 'OUTPUT', "one alarm");
 
 .sub main :main
@@ -152,4 +153,33 @@ alarm3
 alarm3
 5
 done.
+OUTPUT
+
+# XAND boolean op
+pasm_output_is(<<'CODE', <<'OUTPUT', 'XAND - A AND B, but not BOTH');
+    loadlib P1, "myops_ops"
+
+    xand I0, 0, 0
+    bsr test
+    xand I0, 0, 1
+    bsr test
+    xand I0, 1, 0
+    bsr test
+    xand I0, 1, 1
+    bsr test
+
+    branch end
+  test:
+    eq I0, 1, T
+    print "F\n"
+    ret
+  T:print "T\n"
+    ret
+  end:
+    end
+CODE
+F
+F
+F
+F
 OUTPUT
