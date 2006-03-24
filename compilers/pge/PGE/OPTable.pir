@@ -39,6 +39,7 @@ PGE::OPTable - PGE operator precedence table and parser
     addattribute base, "%!token"
     addattribute base, "%!key"
     addattribute base, "%!klen"
+    addattribute base, "&!ws"
     sctable = new .Hash
     sctable["term:"]          = 0x0110
     sctable["postfix:"]       = 0x0221
@@ -210,6 +211,7 @@ PGE::OPTable - PGE operator precedence table and parser
     .local pmc mfrom, mpos
     .local int pos, lastpos, wspos
     .local int expect, nows
+    .local pmc ws
     .local string key 
     .local pmc token, top, oper
     .local pmc iter
@@ -217,10 +219,12 @@ PGE::OPTable - PGE operator precedence table and parser
     .local int tokencat, topcat
     .local int arity
     .local pmc match
+    .local int lastcat
 
     tokentable = getattribute self, "PGE::OPTable\x0%!token"
     keytable = getattribute self, "PGE::OPTable\x0%!key"
     klentable = getattribute self, "PGE::OPTable\x0%!klen"
+    ws = getattribute self, "PGE::OPTable\x0&!ws"
     tokenstack = new .ResizablePMCArray
     operstack = new .ResizablePMCArray
     termstack = new .ResizablePMCArray
@@ -229,9 +233,14 @@ PGE::OPTable - PGE operator precedence table and parser
     (mob, target, mfrom, mpos) = newfrom(mob, 0)
     pos = mfrom
     lastpos = length target
+    lastcat = PGE_OPTABLE_EMPTY
 
   expect_term:
     expect = PGE_OPTABLE_EXPECT_TERM
+    goto token_next
+
+  expect_termpost:
+    expect = PGE_OPTABLE_EXPECT_TERMPOST
     goto token_next
 
   expect_oper:
@@ -241,7 +250,14 @@ PGE::OPTable - PGE operator precedence table and parser
     ## Figure out what we're looking for
     wspos = pos
     if pos >= lastpos goto oper_not_found
+    if_null ws, token_next_ws
+    mpos = pos
+    $P0 = ws(mob)
+    pos = $P0.to()
+    goto token_next_1
+  token_next_ws:
     pos = find_not_cclass .CCLASS_WHITESPACE, target, pos, lastpos
+  token_next_1:
     nows = 0
     if pos == wspos goto key_search
     nows = PGE_OPTABLE_NOWS
@@ -296,6 +312,13 @@ PGE::OPTable - PGE operator precedence table and parser
   oper_found:
     tokenmode = token["mode"]
     tokencat = tokenmode & PGE_OPTABLE_SYNCAT
+    if lastcat != PGE_OPTABLE_PRELIST goto oper_found_1
+    if tokencat != PGE_OPTABLE_POSTCIRCUMFIX goto oper_found_1
+    $P0 = pop tokenstack
+    $P0 = pop operstack
+    push termstack, $P0
+  oper_found_1:
+    lastcat = tokencat
     if tokencat == PGE_OPTABLE_TERM goto term_shift
     if tokencat == PGE_OPTABLE_PREFIX goto oper_shift          # (S1)
     if tokencat == PGE_OPTABLE_CIRCUMFIX goto oper_shift       # (S2)
@@ -311,6 +334,7 @@ PGE::OPTable - PGE operator precedence table and parser
     $I0 = elements tokenstack
     if $I0 > 0 goto shift_reduce_1
     if tokencat == PGE_OPTABLE_CLOSE goto end                  # (E3)
+    topcat = PGE_OPTABLE_EMPTY
     goto oper_shift                                            # (S3)
   shift_reduce_1:
     ## Compare with token at top of stack
@@ -345,6 +369,7 @@ PGE::OPTable - PGE operator precedence table and parser
     push tokenstack, token
     push operstack, oper
     pos = oper.to()
+    if tokencat == PGE_OPTABLE_PRELIST goto expect_termpost
     if tokencat >= PGE_OPTABLE_PREFIX goto expect_term
     if tokencat == PGE_OPTABLE_POSTFIX goto expect_oper
     if topcat == PGE_OPTABLE_TERNARY goto expect_term
@@ -370,13 +395,15 @@ PGE::OPTable - PGE operator precedence table and parser
   reduce_args:
     if arity < 1 goto reduce_saveterm
     $P2 = pop termstack
-    unless $P2 goto reduce_backtrack
     dec arity
+    unless $P2 goto reduce_backtrack
     $P1[arity] = $P2
     goto reduce_args
   reduce_backtrack:
     wspos = $P1.from()
-    if arity > 1 goto reduce_end
+    if arity > 0 goto reduce_end
+    push termstack, $P2
+    goto reduce_end
   reduce_saveterm:
     push termstack, $P1
   reduce_end:
