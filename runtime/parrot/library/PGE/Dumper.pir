@@ -408,3 +408,35 @@ obsoleted in favor of a Data::Dumper method.
     .return ()
 .end
 
+.namespace [ "PGE::OPTable" ]
+
+=head2 C<PGE::OPTable> Methods
+
+=over 4
+
+=item C<__dump(PMC dumper, STR label)>
+
+This method enables Data::Dumper to work on PGE::OPTable objects.
+
+=cut
+
+.sub "__dump" :method
+    .param pmc dumper
+    .param string label
+    ($S2, $S3) = dumper."newIndent"()
+    print "\n"
+    $P0 = getattribute self, "PGE::OPTable\x0%!token"
+    print $S2
+    dumper."dump"(label, $P0)
+    print "\n"
+    $P0 = getattribute self, "PGE::OPTable\x0%!key"
+    print $S2
+    dumper."dump"(label, $P0)
+    print "\n"
+    $P0 = getattribute self, "PGE::OPTable\x0%!klen"
+    print $S2
+    dumper."dump"(label, $P0)
+    dumper."deleteIndent"()
+.end
+
+=back
