@@ -321,24 +321,23 @@ foreach my $op ($ops->ops) {
 
     if ($suffix =~ /cg/) {
 	$definition = "PC_$index:";
-	$comment  =  "/* ". $op->full_name() ." */";
-	push @cg_jump_table, "        &&PC_$index,\n";
+	$comment    = "/* ". $op->full_name() ." */";
     } elsif ($suffix =~ /switch/) {
-	$comment    =  "/* ". $op->full_name() ." */";
 	$definition = "case $index:";
-    }
-    elsif ($suffix eq '') {
-        $definition  = "$prototype;\n";
-        $definition .= "$opsarraytype *\n$func_name ($args)";
+	$comment    = "/* ". $op->full_name() ." */";
     }
     else {
-        $definition  = "static $opsarraytype *\n$func_name ($args)";
+        $definition = "$prototype;\n$opsarraytype *\n$func_name ($args)";
     }
+
     my $source = $op->source($trans);
     $source    =~ s/\bop_lib\b/${bs}op_lib/;
     $source    =~ s/\bops_addr\b/${bs}ops_addr/g;
 
-    if ($suffix !~ /switch/) {
+    if ($suffix =~ /cg/) {
+	push @cg_jump_table, "        &&PC_$index,\n";
+    }
+    elsif ($suffix eq '') {
         push @op_func_table, sprintf("  %-50s /* %6ld */\n",
             "$func_name,", $index);
     }
@@ -424,7 +423,7 @@ my ($op_info, $op_func, $getop);
 $op_info = $op_func = 'NULL';
 $getop = '( int (*)(const char *, int) )NULL';
 
-if ($suffix !~ /cg/ && $suffix !~ /switch/) {
+if ($suffix eq '') {
     $op_func = "${bs}op_func_table";
     print SOURCE <<END_C;
 
