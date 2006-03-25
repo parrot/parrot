@@ -68,25 +68,6 @@ PGE::OPTable - PGE operator precedence table and parser
     setattribute self, "PGE::OPTable\x0%!klen", klentable
 .end
 
-.sub "__dump" :method
-    .param pmc dumper
-    .param string label
-    ($S2, $S3) = dumper."newIndent"()
-    print "\n"
-    $P0 = getattribute self, "PGE::OPTable\x0%!token"
-    print $S2
-    dumper."dump"(label, $P0)
-    print "\n"
-    $P0 = getattribute self, "PGE::OPTable\x0%!key"
-    print $S2
-    dumper."dump"(label, $P0)
-    print "\n"
-    $P0 = getattribute self, "PGE::OPTable\x0%!klen"
-    print $S2
-    dumper."dump"(label, $P0)
-    dumper."deleteIndent"()
-.end
-
 
 .sub "addtok" :method
     .param string name
@@ -112,18 +93,23 @@ PGE::OPTable - PGE operator precedence table and parser
     equiv = "="
     if has_rel == 0 goto add_token
     if rel == "" goto add_token
-    $S0 = substr rel, 0, 1
-    $I0 = index "=<>", $S0
-    if $I0 == -1 goto set_equiv_1
-    $S1 = substr rel, 1
-    $P0 = tokentable[$S1]
-    equiv = $P0["equiv"]
-    equiv = clone equiv
-    substr equiv, -1, 0, $S0
-    goto add_token
-  set_equiv_1:
+    $I0 = exists tokentable[rel]
+    if $I0 == 0 goto set_equiv_1
     $P0 = tokentable[rel]
     equiv = $P0["equiv"]
+    goto add_token
+  set_equiv_1:
+    $S0 = substr rel, 1
+    $I0 = exists tokentable[$S0]
+    if $I0 == 0 goto set_equiv_2
+    $P0 = tokentable[$S0]
+    equiv = $P0["equiv"]
+    equiv = clone equiv
+    $S0 = substr rel, 0, 1
+    substr equiv, -1, 0, $S0
+    goto add_token
+  set_equiv_2:
+    equiv = rel
 
   add_token:
     .local pmc token   
@@ -138,6 +124,8 @@ PGE::OPTable - PGE operator precedence table and parser
     token = new .Hash
     tokentable[name] = token
     token["name"] = name
+    token["match"] = match
+    token["equiv"] = equiv
 
     $I0 = index key, " "
     if $I0 < 0 goto add_key
@@ -146,7 +134,7 @@ PGE::OPTable - PGE operator precedence table and parser
     key = substr key, 0, $I0
     token["key_close"] = key_close
     $S0 = concat "close:", key_close
-    self."addtok"($S0)
+    self."addtok"($S0, name)
 
   add_key:
     .local pmc keytable, klentable
@@ -194,10 +182,7 @@ PGE::OPTable - PGE operator precedence table and parser
     if $I0 < 0 goto mode_3
     mode = mode | PGE_OPTABLE_NULLTERM
   mode_3:
-
     token["mode"] = mode
-    token["match"] = match
-    token["equiv"] = equiv
     .return()
 .end
 
