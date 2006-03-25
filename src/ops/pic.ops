@@ -172,7 +172,8 @@ inline op pic_get_params__(inconst PMC) :pic {
 	    PObj_get_FLAGS(ccont) &= ~SUB_FLAG_TAILCALL;
 	    --ctx->recursion_depth;
 	    ctx->caller_ctx = caller_ctx->caller_ctx;
-	    Parrot_free_context(interpreter, caller_ctx, 1);
+	    Parrot_free_context(interpreter, caller_ctx, 0);
+            interpreter->current_args = NULL;
 	}
 
 	goto OFFSET(n);
