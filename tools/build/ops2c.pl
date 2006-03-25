@@ -317,21 +317,18 @@ foreach my $op ($ops->ops) {
     my $args       = "$opsarraytype *cur_opcode, Interp * interpreter";
     my $definition;
     my $comment    = '';
-    $prev_def      = '';
     my $one_op     = "";
 
     if ($suffix =~ /cg/) {
-        $prev_def = $definition = "PC_$index:";
-        $comment  =  "/* ". $op->func_name($trans) ." */";
-        push @cg_jump_table, "        &&PC_$index,\n";
+	$definition = "PC_$index:";
+	$comment  =  "/* ". $op->full_name() ." */";
+	push @cg_jump_table, "        &&PC_$index,\n";
     } elsif ($suffix =~ /switch/) {
-      $comment    =  "/* ". $op->func_name($trans) ." */";
-      $one_op     = <<END_C;
-    case $index:	$comment
-END_C
+	$comment    =  "/* ". $op->full_name() ." */";
+	$definition = "case $index:";
     }
     elsif ($suffix eq '') {
-        $definition  = "$sym_export $opsarraytype * $func_name ($args);\n";
+        $definition  = "$prototype;\n";
         $definition .= "$opsarraytype *\n$func_name ($args)";
     }
     else {
@@ -341,14 +338,11 @@ END_C
     $source    =~ s/\bop_lib\b/${bs}op_lib/;
     $source    =~ s/\bops_addr\b/${bs}ops_addr/g;
 
-    if ($suffix =~ /switch/) {
-        $one_op .= "\t{\n$source}\n\n";
-    }
-    else {
+    if ($suffix !~ /switch/) {
         push @op_func_table, sprintf("  %-50s /* %6ld */\n",
             "$func_name,", $index);
-        $one_op .= "$definition $comment {\n$source}\n\n";
     }
+    $one_op .= "$definition $comment {\n$source}\n\n";
     push @op_funcs, $one_op;
     $index++;
 }
