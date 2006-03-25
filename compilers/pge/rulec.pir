@@ -38,6 +38,10 @@ This is the default compiler. It will be selected if no compiler is specified.
 
 Send the output to OUTFILE. By default, output is directed to STDOUT.
 
+=item --encoding ENCODING
+
+The encoding to use when reading the grammar file. Defaults to ASCII.
+
 =item --help
 
 Print a friendly help message.
@@ -84,6 +88,7 @@ Print a friendly help message.
     ## config with cmdline options
     push getopts, "compiler|c=s"
     push getopts, "output|o=s"
+    push getopts, "encoding|e=s"
     push getopts, "help|h"
 
     ## process cmdline options
@@ -112,6 +117,14 @@ Print a friendly help message.
 
   OUTPUT_DONE:
 
+    .local int ck_encoding
+    .local string encoding
+    ck_encoding = exists opts['encoding']
+    unless ck_encoding goto ENCODING_DONE
+    encoding = opts['encoding']
+
+  ENCODING_DONE:
+
     .local string compiler
     compiler = opts['compiler']
     unless compiler goto DEFAULT_COMPILER
@@ -129,6 +142,10 @@ Print a friendly help message.
     .local pmc infh
     infh = open infile, "<"
     unless infh goto ERR_NO_INFILE
+    unless ck_encoding goto DONE_ENCODING 
+    push infh, encoding
+
+  DONE_ENCODING:
 
     .local string source
     source = read infh, 65535
