@@ -338,6 +338,11 @@ sub slurp_file {
     return $file;
 }
 
+sub convert_line_endings {
+    my( $pkg, $text ) = @_;
+    $text =~ s/\cM\cJ/\n/g;
+}
+
 sub _generate_functions {
     my ($package, $code_generator) = @_;
 
@@ -371,7 +376,7 @@ sub _generate_functions {
             my( $code, $expected, $desc, %extra ) = @_;
 
             # Strange Win line endings
-            $expected =~ s/\cM\cJ/\n/g;
+            __PACKAGE__->convert_line_endings( $expected );
 
             # set up default description
             unless ( $desc ) {
@@ -704,3 +709,5 @@ to generate files.
 =cut
 
 1;
+
+# vim: expandtab sw=4
