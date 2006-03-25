@@ -48,6 +48,10 @@ its hierarchy of rules and returns a PGE::Match object (a parse tree).
     optable = new $I0
     store_global "APLGrammar", "$optable", optable
 
+    # XXX The PGE::Op* isn't necessary for APL, as there is no
+    # operator precedence. All this needs to be removed. (esp. since
+    # it's basically punie with one addition)
+
     optable.addtok("infix:+")
     optable.addtok("infix:-", "infix:+")
     optable.addtok("infix:.", "infix:+")

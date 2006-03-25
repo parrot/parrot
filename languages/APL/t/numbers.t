@@ -14,7 +14,6 @@ __DATA__
 === negative integer
 --- APL: print ⁻2
 --- out: ⁻2
---- skip: not implemented
 
 === number
 --- APL: print 1.44

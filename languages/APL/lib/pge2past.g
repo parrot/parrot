@@ -214,7 +214,14 @@ APLGrammar::integer: result(.) = {
     $S2 = node 
     $I3 = node.from()
 
+    # XXX There's surely a better way to do this.
+    substr $S99, $S2,0,1 
+    if $S99 != unicode:"\u207B" goto done_processing
+    substr $S2,0,1,"-"
+
+ done_processing:
     result.set_node($S2,$I3,$S2)
+
     result.valtype('int')
     .return (result)
 }
