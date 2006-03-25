@@ -4,9 +4,7 @@ PERL     = @perl@
 RM_F     = @rm_f@
 PARROT   = ..@slash@..@slash@parrot@exe@
 PGE_DIR  = ..@slash@..@slash@compilers@slash@pge
-DEST_DIR = @build_dir@@slash@runtime@slash@parrot@slash@dynext
 CP       = @cp@
-BUILD    = $(PERL) @build_dir@@slash@tools@slash@build@slash@dynpmc.pl
 
 GENERATED = lib@slash@generated_APL_grammar.pir
 
@@ -22,8 +20,7 @@ all: $(PARROT) \
   lib@slash@PAST.pbc \
   lib@slash@POST.pbc \
   lib@slash@APLGrammar.pbc \
-  lib@slash@APLOpLookup.pbc \
-  pmcs
+  lib@slash@APLOpLookup.pbc
 
 $(GENERATED): lib@slash@APL.g
 	$(PARROT) $(PGE_DIR)@slash@rulec.pir --encoding=utf8 --compiler=p6rules --output=$(GENERATED) lib@slash@APL.g 
