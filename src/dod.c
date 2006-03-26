@@ -316,6 +316,7 @@ Parrot_dod_trace_root(Interp *interpreter, int trace_stack)
 #endif
             if (vtable->mro)
                 pobject_lives(interpreter, (PObj *)vtable->mro);
+            pobject_lives(interpreter, (PObj *)vtable->_namespace);
         }
     }
 
@@ -685,6 +686,17 @@ Parrot_dod_sweep(Interp *interpreter,
     UINTVAL free_arenas = 0, old_total_used = 0;
 #endif
 
+#if 1
+                if (Interp_trace_TEST(interpreter, 1)) {
+                    Interp *tracer = interpreter->debugger;
+                    PMC *pio = PIO_STDERR(interpreter);
+                    PIO_flush(interpreter, pio);
+                    if (tracer) {
+                        pio = PIO_STDERR(tracer);
+                        PIO_flush(tracer, pio);
+                    }
+                }
+#endif
     /* Run through all the buffer header pools and mark */
     for (cur_arena = pool->last_Arena;
             NULL != cur_arena; cur_arena = cur_arena->prev) {
@@ -733,8 +745,8 @@ Parrot_dod_sweep(Interp *interpreter,
             }
             else {
                 /* it must be dead */
-#if GC_VERBOSE
-                if (PObj_report_TEST(b)) {
+#if 0
+                if (Interp_trace_TEST(interpreter, 1)) {
                     fprintf(stderr, "Freeing pobject %p\n", b);
                     if (PObj_is_PMC_TEST(b)) {
                         fprintf(stderr, "\t = PMC type %s\n",
