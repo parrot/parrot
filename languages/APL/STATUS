@@ -1,0 +1,55 @@
+Current status:
+
+Only a shell of a language at this point.
+
+Things that work:
+
+- String parsing.
+- 2 operators.
+
+Things to do:
+
+- eliminate use of PGE::OpTable; APL doesn't have operator precedence, so
+  this is kind overkill. We can specify everything in the grammar itself.
+
+- Add framework to allow non-opcode operators - for example, Circular doesn't
+  map directly to parrot opcodes, but requires a translation:
+  
+  1 CIRCLE 2 ===> sin 2
+
+  as opposed to
+
+  1 PLUS 2 ==> add 1, 2
+
+  We can map the arguments of the plus directly to an opcode, but circle
+  requires more work - there are other operators/functions that will require 
+  the ability to call a generic sub or method.
+
+- TGE is slow. At least part of this is due to inability to precompile.
+  on Allison's list of things to do.
+
+- Need more tests! Add more tests to t/dyadic.t. Int * Float is alright, but
+  need Int * Int and Float * Float.
+
+- Add variable assignment.
+
+- Remove the punie remnant of 'print' - in APL, the default is to print if 
+  The leftmost item wasn't assignment.
+
+- Any skipped tests. (Which are skipped instead of TODO'd only because of
+  the current speed of APL)
+
+- Add function declarations.
+
+- Add vectors (May involve re-doing how we handle strings, as from APL's
+  point of views, strings are just vectors of characters)
+
+- Allow exponents in numeric constants
+
+- Fix float rendering (no extra zeros!)
+
+- Add DOMAIN ERROR exceptions when trying to use certain operators on
+  strings
+
+
+
