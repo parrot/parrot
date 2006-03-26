@@ -117,22 +117,20 @@ POST::Var: result(.) = {
 POST::Val: result(.) = {
     $S1 = node.value()
     $S2 = node.valtype()
-    if $S2 == 'strq' goto wrap_string_single
-    if $S2 == 'strqq' goto wrap_string_double
+    if $S2 == 'str' goto wrap_string
     if $S2 == 'int' goto wrap_int
     # only floats do the default return for now.
   return_default:
     .return ($S1)
-  wrap_string_double:
-    # Wrap double quoted strings in double quotes
-    $S3 = '"' . $S1
-    $S3 .= '"'
-    .return ($S3)
-  wrap_string_single:
-    # Wrap single quoted strings in single quotes
-    $S3 = "'" . $S1
-    $S3 .= "'"
-    .return ($S3)
+  wrap_string:
+    # Escape strings properly
+    load_bytecode 'library/Data/Escape.pir' # XXX move into pre-amble code
+    .local pmc escape
+    escape = find_global 'Data::Escape', 'String'
+    $S3 = escape($S1, '"')
+    $S1 = '"' . $S3
+    $S1 .= '"'
+    .return ($S1)
   wrap_int:
     $I1 = node.value()
     if $I1 >= 0 goto return_default 

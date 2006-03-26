@@ -230,25 +230,30 @@ APLGrammar::stringdouble: result(.) = {
     .local pmc result
     result = new 'PAST::Val'
 
-    # get the source string and position offset from start of source
-    # code for this match node
-    $S2 = node 
-    $I3 = node.from()
+    .local string original_source
+    original_source = node
+
+    .local int offset_position
+    offset_position = node.from()
 
     .local string value
-    # Check if this is a string match
-    $I0 = defined node["PGE::Text::bracketed"]
-    if $I0 goto bracketed_value
-    value = node
-    goto no_bracketed_value
-  bracketed_value:
-    $P1 = node["PGE::Text::bracketed"]
-    $P2 = $P1[0]
-    value = $P2
-  no_bracketed_value:
 
-    result.set_node($S2,$I3,value)
-    result.valtype('strqq')
+    # Get the first sub-match, which is the actual string we care about.
+    $P1 = node.get_array()
+    .local string value
+    value = $P1[0]
+
+    # Now, this value may have runs of "" - this is how APL escapes "
+loop_begin:
+    $I1 = index value, '""'
+    if $I1 == -1 goto loop_end 
+    substr value, $I1, 2, '"'
+
+    goto loop_begin
+loop_end:
+
+    result.set_node(original_source,offset_position,value)
+    result.valtype('str')
     .return (result)
 }
 
@@ -256,25 +261,30 @@ APLGrammar::stringsingle: result(.) = {
     .local pmc result
     result = new 'PAST::Val'
 
-    # get the source string and position offset from start of source
-    # code for this match node
-    $S2 = node 
-    $I3 = node.from()
+    .local string original_source
+    original_source = node
+
+    .local int offset_position
+    offset_position = node.from()
 
     .local string value
-    # Check if this is a string match
-    $I0 = defined node["PGE::Text::bracketed"]
-    if $I0 goto bracketed_value
-    value = node
-    goto no_bracketed_value
-  bracketed_value:
-    $P1 = node["PGE::Text::bracketed"]
-    $P2 = $P1[0]
-    value = $P2
-  no_bracketed_value:
 
-    result.set_node($S2,$I3,value)
-    result.valtype('strq')
+    # Get the first sub-match, which is the actual string we care about.
+    $P1 = node.get_array()
+    .local string value
+    value = $P1[0]
+
+    # Now, this value may have runs of '' - this is how APL escapes '
+loop_begin:
+    $I1 = index value, "''"
+    if $I1 == -1 goto loop_end 
+    substr value, $I1, 2, "'"
+
+    goto loop_begin
+loop_end:
+
+    result.set_node(original_source,offset_position,value)
+    result.valtype('str')
     .return (result)
 }
 

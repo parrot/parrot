@@ -37,5 +37,5 @@ rule newterm {
 
 rule integer { ⁻? \d+ }
 rule number  { \d+ \. \d+ }
-rule stringdouble { " [ "" | <-["]> ]* " }
-rule stringsingle { ' [ '' | <-[']> ]* ' }
+rule stringdouble { " ([ "" | <-["]> ]*) " }
+rule stringsingle { ' ([ '' | <-[']> ]*) ' }
