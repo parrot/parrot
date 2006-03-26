@@ -107,6 +107,7 @@ sub is_close_brace   { return shift->is('close-brace');   }
 sub is_close_bracket { return shift->is('close-bracket'); }
 sub is_close_paren   { return shift->is('close-paren');   }
 sub is_colon         { return shift->is('colon');         }
+sub is_concat_assign { return shift->is('concat-assign'); }
 sub is_const         { return shift->is('const');         }
 sub is_continue      { return shift->is('continue');      }
 sub is_else          { return shift->is('else');          }
@@ -117,6 +118,7 @@ sub is_ident         { return shift->is('ident');         }
 sub is_if            { return shift->is('if');            }
 sub is_infix_arith   { return shift->is('infix-arith');   }
 sub is_infix_bit     { return shift->is('infix-bit');     }
+sub is_infix_concat  { return shift->is('infix-concat');  }
 sub is_infix_rel     { return shift->is('infix-rel');     }
 sub is_label         { return shift->is('label');         }
 sub is_last          { return shift->is('last');          }

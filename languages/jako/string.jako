@@ -10,7 +10,7 @@
 
 module string
 {
-  sub     concat :op (str dest, str s);
+#  sub     concat :op (str dest, str s);
   sub int index  :op (str input, str pattern, int start);
   sub int length :op (str dest);
   sub str substr :op (str s, int i, int l);

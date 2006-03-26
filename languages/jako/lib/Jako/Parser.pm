@@ -43,6 +43,7 @@ use Jako::Construct::Statement::Arithmetic;
 use Jako::Construct::Statement::Assign;
 use Jako::Construct::Statement::Bitwise;
 use Jako::Construct::Statement::Call;
+use Jako::Construct::Statement::Concat;
 use Jako::Construct::Statement::Decrement;
 use Jako::Construct::Statement::Goto;
 use Jako::Construct::Statement::Increment;
@@ -484,6 +485,25 @@ sub parse
     }
 
     #
+    # Concat assign:
+    #
+    #   <var> <op> <value>;
+    #
+
+    if ($token->is_ident and $self->get(1)->is_concat_assign) {
+      my $block = $self->current_block;
+
+      my $ident = Jako::Construct::Expression::Value::Identifier->new($block, $token);
+      my $op    = substr($self->forth->text, 0, -1);
+      my $value = Jako::Construct::Expression::Value->new($block, $self->forth);
+
+      $self->require_semicolon;
+
+      my $concat = Jako::Construct::Statement::Concat->new($block, $ident, $ident, $op, $value);
+      next;
+    }
+
+    #
     # Bitwise assigns:
     #
     #   <var> <op> <value>;
@@ -631,6 +651,34 @@ sub parse
       $self->require_semicolon;
 
       my $arith = Jako::Construct::Statement::Arithmetic->new($block, $ident, $left, $op, $right);
+
+      next;
+    }
+
+    #
+    # Concat Operators:
+    #
+    #   <var> = <value> <op> <value>;
+    #
+
+    if ($token->is_ident
+      and $self->get(1)->is_assign
+      and $self->get(2)->is_value
+      and $self->get(3)->is_infix_concat
+      and $self->get(4)->is_value
+    ) {
+      my $block = $self->current_block();
+      my $ident = Jako::Construct::Expression::Value::Identifier->new($block, $token);
+
+      $self->require_assign;
+
+      my $left  = Jako::Construct::Expression::Value->new($block, $self->forth);
+      my $op    = $self->forth->text;
+      my $right = Jako::Construct::Expression::Value->new($block, $self->forth);
+
+      $self->require_semicolon;
+
+      my $arith = Jako::Construct::Statement::Concat->new($block, $ident, $left, $op, $right);
 
       next;
     }

@@ -291,6 +291,20 @@ sub scan_line
       next;
     }
 
+    if ($text =~ m{^( ~= )(.*)$}x) {
+      push @tokens, Jako::Token->new(
+        $file, $line, 'concat-assign', undef, $1);
+      $text = $2;
+      next;
+    }
+
+    if ($text =~ m{^( ~ )(.*)$}x) {
+      push @tokens, Jako::Token->new(
+        $file, $line, 'infix-concat', undef, $1);
+      $text = $2;
+      next;
+    }
+
     #
     # Identifiers:
     #

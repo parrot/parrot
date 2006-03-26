@@ -16,5 +16,6 @@ module sys
   sub int time  :op        ();
   sub num timen :op="time" (); # TODO: Really want to allow overloads in Jako
   sub     sleep :op        (int n);
+  sub     exit  :op        (int s);
 }
 

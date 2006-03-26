@@ -16,10 +16,13 @@ use Curses;
 
 var int foo; # Store result from above functions here.
 
-const int G = 5000; # Generation count.
+const int G = 100; # Generation count.
 
 const int WIDTH  = 15;
 const int HEIGHT = 15;
+var int ARRAY_SIZE;
+
+ARRAY_SIZE = WIDTH * HEIGHT;
 
 const str r00 = "               ";
 const str r01 = "               ";
@@ -36,6 +39,22 @@ const str r11 = "               ";
 const str r12 = "               ";
 const str r13 = "               ";
 const str r14 = "               ";
+
+#const str r00 = "  *            ";
+#const str r01 = "   *           ";
+#const str r02 = " ***           ";
+#const str r03 = "               ";
+#const str r04 = "               ";
+#const str r05 = "               ";
+#const str r06 = "               ";
+#const str r07 = "               ";
+#const str r08 = "               ";
+#const str r09 = "               ";
+#const str r10 = "               ";
+#const str r11 = "               ";
+#const str r12 = "               ";
+#const str r13 = "               ";
+#const str r14 = "               ";
 
 
 #
@@ -58,14 +77,6 @@ sub int at (str cells, int row, int col)
   offset = row * WIDTH;
   offset += col;
 
-  var int len;
-  len = string::length(cells);
-  foo = Curses::move(0, 19);
-  foo = Curses::addstr("length(cells) == $len");
-  foo = Curses::move(0, 20);
-  foo = Curses::addstr("substr(cells, $offset, 1)");
-  foo = Curses::move(0, 25);
-  foo = Curses::refresh();
   temp = string::substr(cells, offset, 1);
 
   return 1 if (temp == "*");
@@ -87,9 +98,12 @@ sub str generate (str cells)
     var int col = 0;
 
     while (col < WIDTH) {
-      var int count = 0;
-      var int r, c;
+      var int count;
+      var int r;
+      var int c;
       var int cell;
+
+      count = 0;
 
       r = row - 1; c = col - 1; cell = at(cells, r, c); count += cell; # NW
       r = row - 1; c = col    ; cell = at(cells, r, c); count += cell; # N
@@ -106,24 +120,14 @@ sub str generate (str cells)
       current = at(cells, row, col);
 
       var str ch;
-      if (current != 0) {
-        foo = Curses::move(0, 21);
-        foo = Curses::addstr("substr(\"   *     \", $count, 1)");
-        foo = Curses::move(0, 25);
-        foo = Curses::refresh();
-
+      if (current == 0) {
         ch = string::substr("   *     ", count, 1);
       }
       else {
-        foo = Curses::move(0, 21);
-        foo = Curses::addstr("substr(\"  **     \", $count, 1)");
-        foo = Curses::move(0, 25);
-        foo = Curses::refresh();
-
         ch = string::substr("  **     ", count, 1);
       }
 
-      string::concat(temp, ch);
+      temp ~= ch;
 
       col++;
     }
@@ -143,6 +147,7 @@ sub dump(str cells, int g)
 {
   foo = Curses::move(0, 0);
   foo = Curses::addstr("Generation $g of $G:");
+  foo = Curses::move(1, 0);
 
   var int row = 0;
   while (row < HEIGHT) {
@@ -157,48 +162,64 @@ sub dump(str cells, int g)
       else {
         Curses::addstr(" ");
       }
+      col++;
     }
     Curses::addstr("\n");
+    row++;
   }
 
   foo = Curses::move(0, 25);
   foo = Curses::refresh();
 }
 
-
-foo = Curses::initscr();
-foo = Curses::curs_set(0);
-
-var num start;
-start = sys::timen();
+#
+# Main program:
+#
 
 var str cells = "";
 
-string::concat(cells, r00);
-string::concat(cells, r01);
-string::concat(cells, r02);
-string::concat(cells, r03);
-string::concat(cells, r04);
-string::concat(cells, r05);
-string::concat(cells, r06);
-string::concat(cells, r07);
-string::concat(cells, r08);
-string::concat(cells, r09);
-string::concat(cells, r10);
-string::concat(cells, r11);
-string::concat(cells, r12);
-string::concat(cells, r13);
-string::concat(cells, r14);
+cells ~= r00;
+cells ~= r01;
+cells ~= r02;
+cells ~= r03;
+cells ~= r04;
+cells ~= r05;
+cells ~= r06;
+cells ~= r07;
+cells ~= r08;
+cells ~= r09;
+cells ~= r10;
+cells ~= r11;
+cells ~= r12;
+cells ~= r13;
+cells ~= r14;
+
+var int len;
+len = string::length(cells);
+
+if (len != ARRAY_SIZE) {
+  sys::print("ERROR! Cell array size is $len instead of $ARRAY_SIZE!\n");
+  sys::exit(1);
+}
+
+foo = Curses::initscr();
+foo = Curses::curs_set(0);
 
 dump(cells, 0);
 
 var int g = 0; # Number of generations so far.
 
-while (g < G) {
+while (g <= G) {
   cells = generate(cells);
   dump(cells, g);
-  sys::sleep(1);
+  g++;
 }
+
+foo = Curses::move(16, 0);
+foo = Curses::addstr("(Press any key to exit)");
+foo = Curses::refresh();
+
+foo = Curses::getch();
 
 foo = Curses::curs_set(1);
 foo = Curses::endwin();
