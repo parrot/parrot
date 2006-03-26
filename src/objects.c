@@ -72,6 +72,11 @@ rebuild_attrib_stuff(Interp* interpreter, PMC *class)
     PMC *orig_class = class;
 #endif
 
+    /* attrib count isn't set yet, a GC causedd by concat could
+     * corrupt data under construction
+     */
+    Parrot_block_DOD(interpreter);
+
     class_slots = PMC_data(class);
     attr_offset_hash = pmc_new(interpreter, enum_class_Hash);
     set_attrib_num(class, class_slots, PCD_ATTRIBUTES, attr_offset_hash);
@@ -135,6 +140,7 @@ rebuild_attrib_stuff(Interp* interpreter, PMC *class)
     assert(class == orig_class);
     /* And note the totals */
     ATTRIB_COUNT(class) = cur_offset;
+    Parrot_unblock_DOD(interpreter);
 }
 
 /*
@@ -318,7 +324,7 @@ Parrot_single_subclass(Interp* interpreter, PMC *base_class,
     VTABLE_unshift_pmc(interpreter, mro, child_class);
 
     /* But we have no attributes of our own. Yet */
-    temp_pmc = pmc_new(interpreter, enum_class_Array);
+    temp_pmc = pmc_new(interpreter, enum_class_ResizablePMCArray);
     set_attrib_num(child_class, child_class_array, PCD_CLASS_ATTRIBUTES,
             temp_pmc);
 
@@ -376,10 +382,9 @@ Parrot_new_class(Interp* interpreter, PMC *class, STRING *class_name)
     VTABLE_push_pmc(interpreter, mro, class);
 
     /* no attributes yet
-     * TODO used a core array
      */
     set_attrib_num(class, class_array, PCD_CLASS_ATTRIBUTES,
-            pmc_new(interpreter, enum_class_Array));
+            pmc_new(interpreter, enum_class_ResizablePMCArray));
 
     /* Set the classname */
     classname_pmc = pmc_new(interpreter, enum_class_String);
