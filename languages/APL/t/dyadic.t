@@ -1,13 +1,19 @@
 #!/usr/bin/perl
 
 use lib qw(t . lib ../lib ../../lib ../../../lib);
-use t::APL tests => 31;
+use t::APL tests => 34;
+
+diag "need more tests to test int <op> int, float <op> float, etc.";
 
 run_apl_is();
 
 __DATA__
 
-=== plus scalar
+=== plus scalar (int/int)
+--- APL: print 2 + 2
+--- out: 4
+
+=== plus scalar (int/float)
 --- APL: 2 + 3.14
 --- out: 5.14
 --- skip: not implemented
@@ -25,6 +31,11 @@ __DATA__
 === plus domain
 --- APL: 1 + 'TEA'
 --- out: DOMAIN ERROR
+--- skip: not implemented
+
+=== minus scalar (int/int)
+--- APL: 2 - 3
+--- out: ⁻1
 --- skip: not implemented
 
 === minus scalar
@@ -47,8 +58,12 @@ __DATA__
 --- out: DOMAIN ERROR
 --- skip: not implemented
 
+=== times scalar (int/int)
+--- APL: print 2 × 2
+--- out: 4
+
 === times scalar
---- APL: 2 × 3.14
+--- APL: print 2 × 3.14
 --- out: 6.28
 --- skip: not implemented
 
