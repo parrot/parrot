@@ -208,8 +208,8 @@ require Test::More;
               example_output_is  example_output_like  example_output_like
               language_output_is language_output_like language_output_isnt
               pasm_output_is     pasm_output_like     pasm_output_isnt
-              pbc_output_is      pbc_output_like      pbc_output_isnt
               past_output_is     past_output_like     past_output_isnt
+              pbc_output_is      pbc_output_like      pbc_output_isnt
               pir_output_is      pir_output_like      pir_output_isnt
               pir_2_pasm_is      pir_2_pasm_like      pir_2_pasm_isnt
               plan
@@ -397,7 +397,7 @@ sub _generate_functions {
             if ( $func =~ m/^pir_output/ ) {
                 $code_f = per_test('.pir', $test_no);
             }
-            elsif ( $func =~ m/^output_/ || $func =~ m/^pasm_output_/ ) {
+            elsif ( $func =~ m/^pasm_output_/ ) {
                 $code_f = per_test('.pasm', $test_no);
             }
             elsif ( $func =~ m/^past_/) {
