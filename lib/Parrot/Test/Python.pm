@@ -38,7 +38,7 @@ sub output_is() {
     $TEST_PROG_ARGS = $ENV{TEST_PROG_ARGS} || '-j -Oc';
     my $args = $TEST_PROG_ARGS;
 
-    Parrot::Test::generate_code( $code, $parrotdir, $count, $lang_f );
+    Parrot::Test::write_code_to_file( $code, $lang_f );
 
     my ($pycmd, $cmd, $pass, $dir);
     my $exit_code = 0;

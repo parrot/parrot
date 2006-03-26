@@ -63,7 +63,7 @@ foreach my $func ( keys %language_test_map ) {
     $TEST_PROG_ARGS = $ENV{TEST_PROG_ARGS} || '';
     my $args = $TEST_PROG_ARGS;
 
-    Parrot::Test::generate_code( $code, undef, undef, $lang_f );
+    Parrot::Test::write_code_to_file( $code, $lang_f );
 
     my $cmd;
     my $exit_code = 0;

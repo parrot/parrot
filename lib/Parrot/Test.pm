@@ -310,8 +310,8 @@ sub per_test {
     return $t;
 }
 
-sub generate_code {
-    my ($code, $directory, $test_no, $code_f) = @_;
+sub write_code_to_file {
+    my ($code, $code_f) = @_;
 
     open my $CODE, '>', $code_f or die "Unable to open '$code_f'";
     binmode $CODE;
@@ -344,7 +344,7 @@ sub convert_line_endings {
 }
 
 sub _generate_functions {
-    my ($package, $code_generator) = @_;
+    my ($package) = @_;
 
     my $path_to_parrot = $INC{"Parrot/Config.pm"};
     $path_to_parrot =~ s:lib/Parrot/Config.pm$::;
@@ -445,7 +445,7 @@ sub _generate_functions {
 
             # native tests are just run, others need to write code first
             if ($code_f !~ /\.pbc$/) {
-                $code_generator->($code, $path_to_parrot, $test_no, $code_f);
+                write_code_to_file($code, $code_f);
             }
 
             my ( $exit_code, $cmd );
@@ -685,12 +685,7 @@ sub _generate_functions {
     }
 }
 
-Parrot::Test::_generate_functions(__PACKAGE__, \&generate_code );
-
-=head1 TODO
-
-C<generate_code> should be renamed and be published to everybody who needs
-to generate files.
+Parrot::Test::_generate_functions( __PACKAGE__ );
 
 =head1 SEE ALSO
 

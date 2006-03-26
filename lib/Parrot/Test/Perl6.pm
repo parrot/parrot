@@ -90,7 +90,7 @@ sub set_test_info {
 
 
 sub _generate_functions {
-    my( $package, $generator ) = @_;
+    my( $package ) = @_;
 
     for my $func ( keys %$test_map ) {
         no strict 'refs';
@@ -109,7 +109,7 @@ sub _generate_functions {
             ## get test arguments from environment
             my $args = $ENV{TEST_PROG_ARGS} || '';
 
-            $generator->( $code, $path_to_parrot, $test_num, $f_code );
+            Parrot::Test::write_code_to_file($code, $f_code);
 
             ## build the command and set the run options
             my $cmd = qq{$parrot $args $perl6 "$f_code"};
@@ -150,7 +150,7 @@ sub _generate_functions {
 }
 
 
-__PACKAGE__->_generate_functions( \&Parrot::Test::generate_code );
+__PACKAGE__->_generate_functions( );
 
 
 $_ ^=~ { AUTHOR => 'particle' };

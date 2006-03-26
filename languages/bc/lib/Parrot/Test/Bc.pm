@@ -60,7 +60,7 @@ foreach my $func ( keys %language_test_map ) {
         {
             my $parrotdir = dirname( $self->{parrot} );
             my $lang_fn   = Parrot::Test::per_test( '.bc', $count );
-            Parrot::Test::generate_code( $code, $parrotdir, $count, $lang_fn );
+            Parrot::Test::write_code_to_file( $code, $lang_fn );
         }
 
         # set a TODO for Test::Builder to find

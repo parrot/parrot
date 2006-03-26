@@ -49,8 +49,7 @@ sub gen_output
   my $test_prog_args = $ENV{TEST_PROG_ARGS} || '';
   my $cmd = "$self->{parrot} languages/parrot_compiler/$test_prog_args < languages/$code_f";
 
-  my $parrotdir       = File::Basename::dirname( $self->{parrot} );
-  Parrot::Test::generate_code( $code, $parrotdir, $test_no, $code_f );
+  Parrot::Test::write_code_to_file( $code, $code_f );
 
   # STDERR is written into same output file
   my $diag = '';

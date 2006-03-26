@@ -33,7 +33,7 @@ sub output_is() {
 
     $lang_f = File::Spec->rel2abs($lang_f);
     $out_f  = File::Spec->rel2abs($out_f);
-    Parrot::Test::generate_code( $code, $parrotdir, $count, $lang_f );
+    Parrot::Test::write_code_to_file( $code, $lang_f );
 
     my $cmd;
     my $exit_code = 0;

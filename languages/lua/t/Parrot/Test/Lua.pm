@@ -72,7 +72,7 @@ foreach my $func ( keys %language_test_map ) {
 
         # This does not create byte code, but lua code
         my $parrotdir       = dirname( $self->{parrot} );
-        Parrot::Test::generate_code( $code, $parrotdir, $count, $lang_fn );
+        Parrot::Test::write_code_to_file( $code, $lang_fn );
 
         # STDERR is written into same output file
         my $exit_code = Parrot::Test::run_command(
