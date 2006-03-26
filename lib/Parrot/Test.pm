@@ -203,7 +203,6 @@ require Exporter;
 require Test::Builder;
 require Test::More;
 
-
 @EXPORT = qw( c_output_is        c_output_like        c_output_isnt
               example_output_is  example_output_like  example_output_like
               language_output_is language_output_like language_output_isnt
@@ -217,7 +216,7 @@ require Test::More;
               skip
               slurp_file
           );
-@ISA = qw(Exporter);
+use base qw( Exporter );
 
 # tell parrot it's being tested--disables searching of installed libraries.
 # (see Parrot_get_runtime_prefix in src/library.c).
@@ -276,13 +275,13 @@ sub run_command {
     }
 
     my $orig_dir;
-    if( $chdir ) {
+    if ( $chdir ) {
         $orig_dir = cwd;
         chdir $chdir;
     }
 
     # Execute all commands
-    system $_ for (@$command);
+    system( $_ ) for (@{$command});
 
     if( $chdir ) {
         chdir $orig_dir;
@@ -339,12 +338,17 @@ sub slurp_file {
 }
 
 sub convert_line_endings {
-    my( $pkg, $text ) = @_;
+    my ( $text ) = @_;
+
     $text =~ s/\cM\cJ/\n/g;
 }
 
+# 
+# private methods, should not be used by Modules inherition from Parrot::Test
+#
+
 sub _generate_functions {
-    my ($package) = @_;
+    my $package = 'Parrot::Test';
 
     my $path_to_parrot = $INC{"Parrot/Config.pm"};
     $path_to_parrot =~ s:lib/Parrot/Config.pm$::;
@@ -364,19 +368,16 @@ sub _generate_functions {
         pir_output_is      => 'is_eq',
         pir_output_isnt    => 'isnt_eq',
         pir_output_like    => 'like',
-        pir_2_pasm_is      => 'is_eq',
-        pir_2_pasm_isnt    => 'isnt_eq',
-        pir_2_pasm_like    => 'like',
                           );
 
     foreach my $func ( keys %parrot_test_map ) {
         no strict 'refs';
 
-        *{$package.'::'.$func} = sub ($$;$%) {
+        *{$package.'::'.$func} = sub {
             my( $code, $expected, $desc, %extra ) = @_;
 
             # Strange Win line endings
-            __PACKAGE__->convert_line_endings( $expected );
+            convert_line_endings( $expected );
 
             # set up default description
             unless ( $desc ) {
@@ -403,9 +404,6 @@ sub _generate_functions {
             elsif ( $func =~ m/^past_/) {
                 $code_f = per_test('.past', $test_no);
             }
-            elsif ( $func =~ m/^pir_2_pasm_/) {
-                $code_f = per_test('.pir', $test_no);
-            }
             elsif ( $func =~ m/^pbc_output_/ ) {
                 $code_f = per_test('.pbc', $test_no);
             }
@@ -418,28 +416,30 @@ sub _generate_functions {
             if ( $args =~ s/--run-exec// ) {
                 $run_exec = 1;
                 my $pbc_f = per_test('.pbc', $test_no);
+                # XXX use _generate_pbc()
                 my $cmd = qq{$parrot ${args} -o $pbc_f "$code_f"};
-                run_command($cmd, CD => $path_to_parrot,
-                STDOUT => $out_f, STDERR => $out_f);
+                run_command($cmd,
+                            CD     => $path_to_parrot,
+                            STDOUT => $out_f,
+                            STDERR => $out_f);
 
                 my $o_f = per_test('.o', $test_no);
                 $cmd = qq{$parrot ${args} -o $o_f "$pbc_f"};
-                run_command($cmd, CD => $path_to_parrot,
-                STDOUT => $out_f, STDERR => $out_f);
+                run_command($cmd,
+                            CD     => $path_to_parrot,
+                            STDOUT => $out_f,
+                            STDERR => $out_f);
 
-                my $noext_f = per_test('', $test_no);
-                $cmd = qq{make EXEC=$noext_f exec};
-                run_command($cmd, CD => $path_to_parrot,
-                STDOUT => $out_f, STDERR => $out_f);
+                my $exe_f = per_test('', $test_no);
+                $cmd = qq{make EXEC=$exe_f exec};
+                run_command($cmd,
+                            CD     => $path_to_parrot,
+                            STDOUT => $out_f,
+                            STDERR => $out_f);
             }
             if ( $func =~ /^pbc_output_/ && $args =~ /-r / ) {
                 # native tests with --run-pbc don't make sense
                 return $builder->skip( "no native tests with -r" );
-            }
-            elsif ( $func =~ /^pir_2_pasm_/) {
-                $out_f = per_test('.pasm', $test_no);
-                my $opt = $code_f =~ m!opt(.)! ? "-O$1" : "-O1";
-                $args = "$args $opt --output=$out_f";
             }
             $code_f = File::Spec->rel2abs($code_f);
 
@@ -450,8 +450,7 @@ sub _generate_functions {
 
             my ( $exit_code, $cmd );
             unless ( $run_exec ) {
-                if ( $func !~ /^pir_2_pasm_/ &&
-                     ( $args =~ s/--run-pbc// || $args =~ s/-r //) ) {
+                if ( $args =~ s/--run-pbc// || $args =~ s/-r // ) {
                     my $pbc_f = per_test('.pbc', $test_no);
                     $args = qq{$args -o "$pbc_f"};
 
@@ -465,23 +464,84 @@ sub _generate_functions {
                 } else {
                     $cmd = qq{$parrot $args "$code_f"};
                 }
-                $exit_code = run_command($cmd, CD => $path_to_parrot,
-                    STDOUT => $out_f, STDERR => $out_f);
+                $exit_code = run_command($cmd,
+                                         CD     => $path_to_parrot,
+                                         STDOUT => $out_f,
+                                         STDERR => $out_f);
             }
 
             my $meth = $parrot_test_map{$func};
             my $real_output = slurp_file($out_f);
-            if ( $func =~ /^pir_2_pasm_/ ) {
+
+            # set a TODO for Test::Builder to find
+            my $call_pkg = $builder->exported_to() || '';
+            # die Dumper( $code, $expected, $desc, \%extra, $extra{todo}, $call_pkg ) if ( keys %extra );
+            local *{ $call_pkg . '::TODO' } = \$extra{todo}
+                if defined $extra{todo};
+
+            my $pass = $builder->$meth( $real_output, $expected, $desc );
+            $builder->diag("'$cmd' failed with exit code $exit_code")
+                  if $exit_code and not $pass;
+
+            unless($ENV{POSTMORTEM}) {
+                unlink $out_f;
+            }
+
+            return $pass;
+        };
+    }
+
+    my %pir_2_pasm_test_map = (
+        pir_2_pasm_is      => 'is_eq',
+        pir_2_pasm_isnt    => 'isnt_eq',
+        pir_2_pasm_like    => 'like',
+                              );
+
+    foreach my $func ( keys %pir_2_pasm_test_map ) {
+        no strict 'refs';
+
+        *{$package.'::'.$func} = sub {
+            my( $code, $expected, $desc, %extra ) = @_;
+
+            # Strange Win line endings
+            convert_line_endings( $expected );
+
+            # set up default description
+            unless ( $desc ) {
+               (undef, my $file, my $line) = caller();
+               $desc = "($file line $line)";
+            }
+
+            # $test_no will be part of temporary file
+            my $test_no = $builder->current_test() + 1;
+
+            # Name of the file with test code.
+            my $code_f = File::Spec->rel2abs( per_test('.pir', $test_no) );
+
+            # output file
+            my $out_f  = per_test('.pasm', $test_no);
+
+            my $opt = $code_f =~ m!opt(.)! ? "-O$1" : "-O1";
+            my $args = $ENV{TEST_PROG_ARGS} || '';
+            $args .= " $opt --output=$out_f";
+
+            write_code_to_file($code, $code_f);
+
+            my $cmd = qq{$parrot $args "$code_f"};
+            my $exit_code = run_command($cmd,
+                                        CD     => $path_to_parrot,
+                                        STDOUT => $out_f,
+                                        STDERR => $out_f);
+
+            my $meth = $pir_2_pasm_test_map{$func};
+            my $real_output = slurp_file($out_f);
+            {
                 # The parrot open '--outfile=file.pasm' seems to create unnecessary whitespace
                 $real_output =~ s/^\s*$//gm;
                 $real_output =~ s/[\t ]+/ /gm;
-                $real_output =~ s/[\t ]+$//gm;
+                $real_output =~ s/ +$//gm;
 
-                # Normalize the expected output,
-                # Let's not worry too much about whitespace
-                $expected =~ s/^\s*$//gm;
                 $expected =~ s/[\t ]+/ /gm;
-                $expected =~ s/[\t ]+$//gm;
             }
 
             # set a TODO for Test::Builder to find
@@ -499,7 +559,7 @@ sub _generate_functions {
             }
 
             return $pass;
-        }
+        };
     }
 
     my %builtin_language_prefix = (
@@ -685,7 +745,7 @@ sub _generate_functions {
     }
 }
 
-Parrot::Test::_generate_functions( __PACKAGE__ );
+Parrot::Test::_generate_functions();
 
 =head1 SEE ALSO
 

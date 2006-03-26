@@ -51,10 +51,10 @@ for my $t ( keys %$tests ) {
 }
 
 
-push @EXPORT => keys %$test_map;
+push @EXPORT => keys %{$test_map};
 push @EXPORT => qw( plan skip );
 
-@ISA = qw( Parrot::Test Exporter );
+use base qw( Parrot::Test Exporter );
 
 
 my $b = Test::Builder->new();
@@ -85,6 +85,7 @@ sub set_test_info {
     my $f_out  = Parrot::Test::per_test( '.out', $next_test_num );
     my $f_code = Parrot::Test::per_test( '.p6',  $next_test_num );
     $f_code = File::Spec->rel2abs( $f_code );
+
     return( $next_test_num, $f_out, $f_code );
 }
 
@@ -121,7 +122,7 @@ sub _generate_functions {
             ## run the command and capture the exit code
             my $exit_code = Parrot::Test::run_command(
                 $cmd,
-                %$run_options,
+                %{$run_options},
             );
 
             ## read in the command output
