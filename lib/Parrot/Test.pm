@@ -1,4 +1,4 @@
-# Copyright: 2004-2005 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2004-2006 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 =head1 NAME
@@ -192,40 +192,31 @@ Read the whole file $file_name and return the content as a string.
 package Parrot::Test;
 
 use strict;
+use warnings;
+
 use vars qw(@EXPORT);
 
-use Parrot::Config;
-use File::Spec;
-use Data::Dumper;
 use Cwd;
+use Data::Dumper;
+use File::Spec;
+use Parrot::Config;
 
 require Exporter;
 require Test::Builder;
 require Test::More;
 
-@EXPORT = qw( c_output_is        c_output_like        c_output_isnt
-              example_output_is  example_output_like  example_output_like
-              language_output_is language_output_like language_output_isnt
-              pasm_output_is     pasm_output_like     pasm_output_isnt
-              past_output_is     past_output_like     past_output_isnt
-              pbc_output_is      pbc_output_like      pbc_output_isnt
-              pir_output_is      pir_output_like      pir_output_isnt
-              pir_2_pasm_is      pir_2_pasm_like      pir_2_pasm_isnt
-              plan
-              run_command
-              skip
-              slurp_file
-          );
+@EXPORT = qw( plan run_command skip slurp_file );
+
 use base qw( Exporter );
 
 # tell parrot it's being tested--disables searching of installed libraries.
 # (see Parrot_get_runtime_prefix in src/library.c).
-$ENV{PARROT_TEST} = 1 unless defined($ENV{PARROT_TEST});
+$ENV{PARROT_TEST} = 1 unless defined $ENV{PARROT_TEST};
 
 my $builder = Test::Builder->new();
 
 sub import {
-    my($class, $plan, @args) = @_;
+    my ($class, $plan, @args) = @_;
 
     $builder->plan( $plan, @args );
 
@@ -236,7 +227,7 @@ sub import {
 # redirections ( tested on Linux and Win2k )
 # An alternative is using Test::Output
 sub run_command {
-    my($command, %options) = @_;
+    my ($command, %options) = @_;
 
     # To run the command in a different directory.
     my $chdir = delete $options{CD};
@@ -372,10 +363,11 @@ sub _generate_functions {
                           );
 
     foreach my $func ( keys %parrot_test_map ) {
+        push @EXPORT, $func;
         no strict 'refs';
 
         *{$package.'::'.$func} = sub {
-            my( $code, $expected, $desc, %extra ) = @_;
+            my ( $code, $expected, $desc, %extra ) = @_;
 
             # Strange Win line endings
             convert_line_endings( $expected );
@@ -505,10 +497,11 @@ sub _generate_functions {
                               );
 
     foreach my $func ( keys %pir_2_pasm_test_map ) {
+        push @EXPORT, $func;
         no strict 'refs';
 
         *{$package.'::'.$func} = sub {
-            my( $code, $expected, $desc, %extra ) = @_;
+            my ( $code, $expected, $desc, %extra ) = @_;
 
             # Strange Win line endings
             convert_line_endings( $expected );
@@ -584,9 +577,10 @@ sub _generate_functions {
                             );
 
     foreach my $func ( keys %language_test_map ) {
+        push @EXPORT, $func;
         no strict 'refs';
 
-        *{$package.'::'.$func} = sub ($$;$%) {
+        *{$package.'::'.$func} = sub {
             my ( $language, @remaining ) = @_;
 
             my $meth = $language_test_map{$func};
@@ -629,9 +623,10 @@ sub _generate_functions {
                            );
 
     foreach my $func ( keys %example_test_map ) {
+        push @EXPORT, $func;
         no strict 'refs';
 
-        *{$package.'::'.$func} = sub ($$;@) {
+        *{$package.'::'.$func} = sub {
             my ($example_f, $expected, @options) = @_;
 
             my %lang_for_extension 
@@ -662,10 +657,11 @@ sub _generate_functions {
                      );
 
     foreach my $func ( keys %c_test_map ) {
+        push @EXPORT, $func;
         no strict 'refs';
 
-        *{$package.'::'.$func} = sub ($$;$ ) {
-            my($source, $expected, $desc) = @_;
+        *{$package.'::'.$func} = sub {
+            my ($source, $expected, $desc) = @_;
 
             # $test_no will be part of temporary file
             my $test_no = $builder->current_test() + 1;

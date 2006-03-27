@@ -14,7 +14,8 @@ package Parrot::Test::Perl6;
 use strict;
 use warnings;
 
-use vars qw(@EXPORT @ISA);
+use vars qw(@EXPORT);
+
 use File::Basename;
 use File::Spec;
 use Parrot::Config;
