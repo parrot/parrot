@@ -167,10 +167,6 @@ gc_ms_get_free_object(Interp *interpreter,
     PObj_on_free_list_CLEAR((PObj*) ptr);
 #endif
     --pool->num_free_objects;
-#if ! DISABLE_GC_DEBUG
-    if (GC_DEBUG(interpreter))
-        PObj_version((Buffer*)ptr) = interpreter->arena_base->dod_runs;
-#endif
     return ptr;
 }
 

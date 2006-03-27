@@ -81,9 +81,6 @@ typedef union UnionVal {
 typedef struct pobj_t {
     UnionVal u;
     Parrot_UInt flags;
-#if ! DISABLE_GC_DEBUG
-    UINTVAL _pobj_version;
-#endif /* ! DISABLE_GC_DEBUG */
 } pobj_t;
 
 /* plain Buffer is the smallest Parrot Obj */
@@ -108,13 +105,6 @@ typedef Buffer PObj;
  * #define buflen   obj.u._b._buflen
  * END DEPRECATED BUFFER ACCESSORS
  */
-
-#if ! DISABLE_GC_DEBUG
-/* BEGIN DEPRECATED POBJ ACCESSOR */
-#  define pobj_version obj._pobj_version
-/* END DEPRECATED POBJ ACCESSOR */
-#  define PObj_version(pobj)  (pobj)->obj._pobj_version
-#endif /* ! DISABLE_GC_DEBUG */
 
 typedef enum {
     enum_stringrep_unknown = 0,
