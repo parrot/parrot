@@ -84,7 +84,7 @@ A Data::Dumper::Default object has the following methods:
     ret = 1
     if_null dump, END
     prophash prop, dump
-    unless prop goto END
+    if_null prop, END
 
     print " with-properties: "
     clone name, paramName

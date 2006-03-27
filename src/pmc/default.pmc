@@ -234,8 +234,8 @@ Panics with a "no custom mark routine defined" error message.
 
 =item C<PMC *getprop(STRING *key)>
 
-Returns the property for C<*key>. If no property is defined then an
-"undef" PMC is returned.
+Returns the property for C<*key>. If no property is defined then the
+NULL PMC is returned.
 
 =cut
 
@@ -246,8 +246,7 @@ Returns the property for C<*key>. If no property is defined then an
           return VTABLE_get_pmc_keyed_str(INTERP, PMC_metadata(SELF), key);
         }
         else {
-          PMC* undef = pmc_new(INTERP, enum_class_PerlUndef);
-          return undef;
+          return PMCNULL;
         }
     }
 
@@ -272,7 +271,7 @@ Sets the property for C<*key> to C<*value>.
                 add_pmc_ext(INTERP, SELF);
             /* first make new hash */
             PMC_metadata(SELF) = prop =
-                pmc_new_noinit(INTERP, enum_class_PerlHash);
+                pmc_new_noinit(INTERP, enum_class_Hash);
             DOD_WRITE_BARRIER(INTERP, SELF, NULL, prop);
             VTABLE_init(INTERP, prop);
             /* then the key, else it vanishes with --gc-debug */
@@ -305,7 +304,7 @@ Deletes the property for C<*key>.
 
 =item C<PMC *getprops()>
 
-Returns the PMC's properties.
+Returns the PMC's properties or the NULL PMC if no properties exist.
 
 =cut
 
@@ -315,11 +314,7 @@ Returns the PMC's properties.
         if (!SELF->pmc_ext)
             add_pmc_ext(INTERP, SELF);
         if (!PMC_metadata(SELF)) {
-            PMC *prop;
-            PMC_metadata(SELF) = prop =
-                pmc_new_noinit(INTERP, enum_class_PerlHash);
-            DOD_WRITE_BARRIER(INTERP, SELF, NULL, prop);
-            VTABLE_init(INTERP, prop);
+            return PMCNULL;
         }
         return PMC_metadata(SELF);
     }

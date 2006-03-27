@@ -575,7 +575,8 @@ op delprop(in PMC, in STR) {
 
 =item B<prophash>(out PMC, in PMC)
 
-Get a hash for the properties in PMC $2 and put it in $1.
+Get a hash for the properties in PMC $2 and put it in $1. If the property
+hash doesn't exist, the C<Null> PMC is returned.
 
 =cut
 

@@ -229,10 +229,9 @@ pasm_output_is(<<'CODE', <<OUTPUT, "failing if regsave is not marked");
 .namespace ["Source"]
 .pcc_sub __get_string:	# buffer
     get_params "(0)", P2
-    getprop P12, "buf", P2
+    getprop P12, "buffer", P2
     sweep 1
-    typeof I12, P12
-    ne I12, .PerlUndef, buffer_ok
+    unless_null P12, buffer_ok
     find_type I12, "Source::Buffer"
     new P12, I12
     new P14, .String

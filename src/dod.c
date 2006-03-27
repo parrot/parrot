@@ -686,7 +686,7 @@ Parrot_dod_sweep(Interp *interpreter,
     UINTVAL free_arenas = 0, old_total_used = 0;
 #endif
 
-#if 1
+#if 0
                 if (Interp_trace_TEST(interpreter, 1)) {
                     Interp *tracer = interpreter->debugger;
                     PMC *pio = PIO_STDERR(interpreter);

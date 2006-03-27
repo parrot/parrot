@@ -143,18 +143,20 @@ mem_allocate(Interp *interpreter, size_t size, struct Memory_Pool *pool)
          * TODO pass required allocation size to the DOD system,
          *      so that collection can be skipped if needed
          */
-        Parrot_do_dod_run(interpreter, DOD_trace_stack_FLAG);
+        if (!interpreter->arena_base->DOD_block_level) {
+            Parrot_do_dod_run(interpreter, DOD_trace_stack_FLAG);
 #if !PARROT_GC_IMS
-        /* Compact the pool if allowed and worthwhile */
-        if (pool->compact) {
-            /* don't bother reclaiming if it's just chicken feed */
-            if ((pool->possibly_reclaimable * pool->reclaim_factor +
-                    pool->guaranteed_reclaimable) > size) {
-                (*pool->compact) (interpreter, pool);
-            }
+            /* Compact the pool if allowed and worthwhile */
+            if (pool->compact) {
+                /* don't bother reclaiming if it's just chicken feed */
+                if ((pool->possibly_reclaimable * pool->reclaim_factor +
+                            pool->guaranteed_reclaimable) > size) {
+                    (*pool->compact) (interpreter, pool);
+                }
 
-        }
+            }
 #endif
+        }
         if (pool->top_block->free < size) {
             if (pool->minimum_block_size < 65536*16)
                 pool->minimum_block_size *= 2;
