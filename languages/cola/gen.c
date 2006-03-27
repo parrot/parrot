@@ -180,7 +180,7 @@ void gen_statement(AST * p) {
                 if(!eval_expr(p->arg1))
                     gen_expr(p->arg1, NULL, cur_method->sym->type);
 
-	       	printf("\t# Push return val and jump\n\tsave %s\n",
+	       	printf("\t# return value\n\t.return(%s)\n",
                         NAME(p->arg1->targ) );
             }
             /* Simple optimization that works most of the time.
@@ -217,26 +217,30 @@ void gen_param_list(Symbol * paramlist) {
 }
 
 void gen_method_decl(AST * p) {
+    const char * attr = "";
     Symbol * s;
     reset_temps();
     cur_method = p;
     p->end_label = make_label();
+    if(cur_method->sym == main_method)
+       attr = " :main";
+
     if(p->sym->namespace && p->sym->namespace != global_namespace)
-        printf(".sub _%s__%s\n", p->sym->namespace->name, p->sym->name);
+        printf(".sub _%s__%s%s\n", p->sym->namespace->name, p->sym->name, attr);
     else
-        printf(".sub __%s\n", p->sym->name);
+        printf(".sub __%s%s\n", p->sym->name, attr);
 #if 0
     check_id_redecl(global_symbol_table, p->sym->name);
 #endif
-    printf("\tsaveall\n");
     if((s = p->Attr.Method.params) != NULL)
         gen_param_list(s);
+    /*printf("\tsaveall\n");*/
 
     if(p->Attr.Method.body) {
         gen_block(p->Attr.Method.body);
     }
 
-    printf("%s:\trestoreall\n\tret\n.end\n", p->end_label);
+    printf("%s:\n.end\n", p->end_label);
     cur_method = NULL;
 }
 
@@ -563,6 +567,23 @@ void gen_expr(AST * p, Symbol * lval, Type * type) {
 #endif
 }
 
+void gen_arg_list_expr(AST * p) {
+    if(p == NULL)
+        return;
+    /* FIXME: Here we should check the method signature and find out
+     * what type is expected.
+     */
+    if(!eval_expr(p))
+        gen_expr(p, NULL, NULL);
+    if(!p->targ) {
+        fprintf(stderr, "Internal compiler error: argument expression didn't generate an rvalue\n");
+        exit(0);
+    }
+    if(p->next) {
+        gen_arg_list_expr(p->next);
+    }
+}
+
 /*
  * Generate arguments in reverse order on stack.
  */
@@ -572,16 +593,16 @@ void gen_arg_list(AST * p) {
     /* FIXME: Here we should check the method signature and find out
      * what type is expected.
      */
-    if(!eval_expr(p))
-        gen_expr(p, NULL, NULL);
     if(p->targ)
-        printf("\t.arg %s\n", NAME(p->targ));
+        printf("%s", NAME(p->targ));
     else {
         fprintf(stderr, "Internal compiler error: argument expression didn't generate an rvalue\n");
         exit(0);
     }
-    if(p->next)
+    if(p->next) {
+        printf(", ");
         gen_arg_list(p->next);
+    }
 }
 
 void gen_method_call(AST * p) {
@@ -589,21 +610,26 @@ void gen_method_call(AST * p) {
     if(!eval_expr(p->arg1))
         gen_expr(p->arg1, NULL, NULL);
 
-    /* Argument list */
+    /* Argument list expressions */
     if(p->arg2)
-        gen_arg_list(p->arg2);
+        gen_arg_list_expr(p->arg2);
 
     /*
      * if p is instance method, push implicit object reference onto
      * calling stack.
      */
     if(p->arg1->targ->namespace && p->arg1->targ->namespace != global_namespace) {
-        printf("\tcall _%s__%s\n", p->arg1->targ->namespace->name,
-                    p->arg1->targ->name);
+        printf("\t_%s__%s(", p->arg1->targ->namespace->name, p->arg1->targ->name);
     }
     else {
-        printf("\tcall __%s\n", p->arg1->targ->name);
+        printf("\t__%s(", p->arg1->targ->name);
     }
+
+    /* Argument list */
+    if(p->arg2)
+        gen_arg_list(p->arg2);
+
+    printf(")\n");
 
     if(p->arg1->targ->type == t_void) {
         if(p->targ != NULL) {

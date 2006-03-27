@@ -1,96 +1,67 @@
 # Some basic routines for Cola programs
 # Autoincluded in generated PIR code
 
-.emit
+.sub __puts
+  .param string s
+  print s
+.end
 
-__puts:
-pushs
-restore S31
-print S31
-pops
-ret
+.sub __puti
+  .param int i
+  print i 
+.end
 
-__puti:
-pushi
-restore I31
-print I31
-popi
-ret
+.sub __putf
+  .param num n
+  print n 
+.end
 
-__putf:
-pushn
-restore N31
-print N31
-popn
-ret
+.sub __substr
+  .param int i2
+  .param int i1
+  .param string s
+  .local string sret
+  substr sret, s, i1, i2
+  .return(sret)
+.end 
 
-__substr:
-pushi
-pushn
-pushs
-restore I31
-restore I30
-restore S31
-substr S30, S31, I30, I31
-save S30
-pops
-popn
-popi
-ret
+.sub __strlen
+  .param string s
+  .local int len 
+  length len, s
+  .return(len)
+.end
+ 
+.sub __strchop
+  .param string s 
+  chopn s, 1
+  .return(s)
+.end
 
-__strlen:
-pushs
-pushi
-restore S0
-length I0, S0
-save I0
-pops
-popi
-ret
+.sub __strrep
+  .param string s0
+  .param int i1
+  .param int i0
+  .param string s1
+  substr s1, i0, i1, s0
+  .return (s1)
+.end
 
-__strchop:
-pushs
-restore S0
-chopn S0, 1
-save S0
-pops
-ret
+.sub __ord
+  .param string s
+  .local int i
+  ord i, s 
+  .return (i) 
+.end
 
-__strrep:
-pushs
-pushi
-restore S30
-restore I31
-restore I30
-restore S31
-substr S31, I30, I31, S30
-save S31
-pops
-popi
-ret
+.sub __gets
+  .local string s
+  read s, 512
+  .return(s)
+.end
 
-__ord:
-pushs
-pushi
-restore S0
-ord I0, S0
-save I0
-pops
-popi
-ret
+.sub __sleep
+  .param int sec
+  sleep sec 
+.end
 
-__gets:
-pushs
-read S0, 512
-save S0
-pops
-ret
-
-__sleep:
-pushi
-restore I0
-sleep I0
-popi
-ret
-
-.eom

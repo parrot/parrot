@@ -1036,14 +1036,7 @@ int main(int argc, char * argv[])
     dump_namespace(current_namespace);
 */
     printf("# Cola (%s) generated\n#\n", COLA_VERSION);
-    if(main_method) {
-        printf(".sub _MAIN\n\t.arg \"\"\n\tcall _%s__%s\n",
-            main_method->namespace->name, main_method->name);
-        printf("\tend\n\tret\n.end\n");
-#if 0
-        printf("\n__END:\n\tend\n\n");
-#endif
-    }
+
     fprintf(stderr, "Pass 4: Code generation...\n");
 
     if(ast_start) {
