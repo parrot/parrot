@@ -414,10 +414,12 @@ sub _generate_functions {
             my $run_exec = 0;
             if ( $args =~ s/--run-exec// ) {
                 $run_exec = 1;
-                my $pbc_f = per_test('.pbc', $test_no);
-                my $o_f   = per_test('_pbcexe' . $PConfig{o}, $test_no);
-                my $exe_f = per_test( '_pbcexe' . $PConfig{exe}, $test_no);  # Make cleanup and svn:ignore more simple
+                my $pbc_f  = per_test('.pbc', $test_no);
+                my $o_f    = per_test('_pbcexe' . $PConfig{o}, $test_no);
+                my $exe_f  = per_test( '_pbcexe' . $PConfig{exe}, $test_no);  # Make cleanup and svn:ignore more simple
+                my $exec_f = per_test( '_pbcexe', $test_no);  # Make cleanup and svn:ignore more simple
                 $exe_f =~ s@[\\/:]@$PConfig{slash}@g;
+                # XXX put this into sub generate_pbc()
                 run_command(qq{$parrot $args -o $pbc_f "$code_f"},
                             CD     => $path_to_parrot,
                             STDOUT => $out_f,
@@ -428,7 +430,7 @@ sub _generate_functions {
                                 STDOUT => $out_f,
                                 STDERR => $out_f);
                     if ( -e $o_f ) {
-                        run_command(qq{$PConfig{make} EXEC=$exe_f exec},
+                        run_command(qq{$PConfig{make} EXEC=$exec_f exec},
                                     CD     => $path_to_parrot,
                                     STDOUT => $out_f,
                                     STDERR => $out_f);
