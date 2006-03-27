@@ -90,35 +90,32 @@ The run-loop.
 
 int
 main(int argc, char **argv) {
-    long *opp;
-    int dummy_var;
-    Interp *     interpreter;
-    struct PackFile *          pf;
-    opcode_t *code_start;
-    INTVAL i;
-    PMC *userargv;
-    extern char *program_code;
-    extern long opcode_map;
-    extern int bytecode_offset;
+    /* long *             opp; */
+    Interp *           interpreter;
+    struct PackFile *  pf;
+    opcode_t *         code_start;
+    extern char *      program_code;
+    /* extern long        opcode_map; */
+    /* extern int         bytecode_offset; */
 #if defined(JIT_CGP)
-    extern void * exec_prederef_code;
+    extern void *      exec_prederef_code;
 #endif
-    extern int Parrot_exec_run;
-    extern struct PackFile_Constant *exec_const_table;
-    extern struct PackFile_Constant const_table;
+    /* extern int        Parrot_exec_run; */
+    /* extern struct PackFile_Constant *exec_const_table; */
+    /* extern struct PackFile_Constant const_table; */
     extern Interp interpre;
 
     /* s. exec.c */
-    Parrot_exec_run = 1;
+    /* Parrot_exec_run = 1; */
     /* s. packfile.c (PackFile_ConstTable_unpack()) */
-    exec_const_table = &const_table;
+    /* exec_const_table = &const_table; */
     interpreter = Parrot_new(NULL);
     if (!interpreter) {
         return 1;
     }
     Parrot_init(interpreter);
 
-    run_native = run_compiled;
+    /* run_native = run_compiled; */
     /* TODO make also a shared variant of PackFile_new */
     pf = PackFile_new(interpreter, 0);
 
@@ -128,30 +125,32 @@ main(int argc, char **argv) {
         printf( "Can't unpack.\n" );
         return 1;
     }
-    PackFile_fixup_subs(interpreter, PBC_PBC, NULL);
     Parrot_loadbc(interpreter, pf);
-    setup_argv(interpreter, argc, argv);
+    PackFile_fixup_subs(interpreter, PBC_PBC, NULL);
 
     /* opcode_map has the offset of each opcode in the compiled code
      * this modifies it to be address of the opcode.
      */
+    /*
     opp = &opcode_map;
     for (i = 0; i < (int)interpre.code->base.size; i++) {
         opp[i] += (long)run_compiled;
     }
+    */
 
 #if defined(JIT_CGP)
     exec_init_prederef(interpreter, &exec_prederef_code);
 #endif
-    Parrot_set_run_core(interpreter, PARROT_EXEC_CORE);
+    /* Parrot_set_run_core(interpreter, PARROT_EXEC_CORE); 
     interpreter->code->base.data =
         (opcode_t *)&((&program_code)[bytecode_offset]);
-    Parrot_exec_run = 0;
-    runops(interpreter, 0);
+    Parrot_exec_run = 0; */
+    Parrot_runcode(interpreter, argc, argv);
     /*
         run_compiled(interpreter,
             (opcode_t *)&((&program_code)[bytecode_offset]));
      */
+    Parrot_exit(0);
     exit(0);
 }
 

@@ -146,19 +146,19 @@ expected result.
 Compiles and runs the C code, passing the test if a string comparison of
 output with the unexpected result is false.
 
-=item C<example_output_is( $example_fn, $expected )>
+=item C<example_output_is( $example_f, $expected )>
 
-Determine the language from the extension of C<$example_fn> and
+Determine the language from the extension of C<$example_f> and
 runs language_output_is().
 
-=item C<example_output_like( $example_fn, $expected )>
+=item C<example_output_like( $example_f, $expected )>
 
-Determine the language from the extension of C<$example_fn> and
+Determine the language from the extension of C<$example_f> and
 runs language_output_like().
 
-=item C<example_output_isnt( $example_fn, $expected )>
+=item C<example_output_isnt( $example_f, $expected )>
 
-Determine the language from the extension of C<$example_fn> and
+Determine the language from the extension of C<$example_f> and
 runs language_output_isnt().
 
 =item C<skip($why, $how_many)>
@@ -192,7 +192,7 @@ Read the whole file $file_name and return the content as a string.
 package Parrot::Test;
 
 use strict;
-use vars qw(@EXPORT @ISA);
+use vars qw(@EXPORT);
 
 use Parrot::Config;
 use File::Spec;
@@ -236,20 +236,20 @@ sub import {
 # redirections ( tested on Linux and Win2k )
 # An alternative is using Test::Output
 sub run_command {
-    my($command, %redir) = @_;
+    my($command, %options) = @_;
 
     # To run the command in a different directory.
-    my $chdir = delete $redir{CD};
+    my $chdir = delete $options{CD};
 
-    foreach (keys %redir) {
+    foreach (keys %options) {
         m/^STD(OUT|ERR)$/ or die "I don't know how to redirect '$_' yet! ";
     }
-    foreach (values %redir) {
+    foreach (values %options) {
         $_ = 'NUL:' if $^O eq 'MSWin32' and $_ eq '/dev/null';
     }
 
-    my $out = $redir{'STDOUT'} || '';
-    my $err = $redir{'STDERR'} || '';
+    my $out = $options{'STDOUT'} || '';
+    my $err = $options{'STDERR'} || '';
 
     if ( $out and $err and $out eq $err ) {
         $err = "&STDOUT";
@@ -301,6 +301,7 @@ sub run_command {
 
 sub per_test {
     my ($ext, $test_no) = @_;
+
     return unless defined $ext and defined $test_no;
 
     my $t = $0;  # $0 is name of the test script
@@ -410,42 +411,48 @@ sub _generate_functions {
             else {
                 die "Unknown test function: $func";
             }
+            $code_f = File::Spec->rel2abs($code_f);
+
+            # native tests are just run, others need to write code first
+            if ($code_f !~ /\.pbc$/) {
+                write_code_to_file($code, $code_f);
+            }
 
             my $args = $ENV{TEST_PROG_ARGS} || '';
             my $run_exec = 0;
             if ( $args =~ s/--run-exec// ) {
                 $run_exec = 1;
                 my $pbc_f = per_test('.pbc', $test_no);
-                # XXX use _generate_pbc()
-                my $cmd = qq{$parrot ${args} -o $pbc_f "$code_f"};
-                run_command($cmd,
+                my $o_f   = per_test('_pbcexe' . $PConfig{o}, $test_no);
+                my $exe_f = per_test( '_pbcexe' . $PConfig{exe}, $test_no);
+                $exe_f =~ s@[\\/:]@$PConfig{slash}@g;
+                run_command(qq{$parrot $args -o $pbc_f "$code_f"},
                             CD     => $path_to_parrot,
                             STDOUT => $out_f,
                             STDERR => $out_f);
-
-                my $o_f = per_test('.o', $test_no);
-                $cmd = qq{$parrot ${args} -o $o_f "$pbc_f"};
-                run_command($cmd,
-                            CD     => $path_to_parrot,
-                            STDOUT => $out_f,
-                            STDERR => $out_f);
-
-                my $exe_f = per_test('', $test_no);
-                $cmd = qq{make EXEC=$exe_f exec};
-                run_command($cmd,
-                            CD     => $path_to_parrot,
-                            STDOUT => $out_f,
-                            STDERR => $out_f);
+                if ( -e $pbc_f ) {
+                    run_command(qq{$parrot $args -o $o_f "$pbc_f"},
+                                CD     => $path_to_parrot,
+                                STDOUT => $out_f,
+                                STDERR => $out_f);
+                    if ( -e $o_f ) {
+                        run_command(qq{make EXEC=$exe_f exec},
+                                    CD     => $path_to_parrot,
+                                    STDOUT => $out_f,
+                                    STDERR => $out_f);
+                        if ( -e $exe_f ) {
+                            run_command($exe_f,
+                                        CD     => $path_to_parrot,
+                                        STDOUT => $out_f,
+                                        STDERR => $out_f);
+                        }
+                    }
+                }
             }
+
             if ( $func =~ /^pbc_output_/ && $args =~ /-r / ) {
                 # native tests with --run-pbc don't make sense
                 return $builder->skip( "no native tests with -r" );
-            }
-            $code_f = File::Spec->rel2abs($code_f);
-
-            # native tests are just run, others need to write code first
-            if ($code_f !~ /\.pbc$/) {
-                write_code_to_file($code, $code_f);
             }
 
             my ( $exit_code, $cmd );
@@ -524,6 +531,7 @@ sub _generate_functions {
             my $opt = $code_f =~ m!opt(.)! ? "-O$1" : "-O1";
             my $args = $ENV{TEST_PROG_ARGS} || '';
             $args .= " $opt --output=$out_f";
+            $args =~ s/--run-exec//;
 
             write_code_to_file($code, $code_f);
 
@@ -624,7 +632,7 @@ sub _generate_functions {
         no strict 'refs';
 
         *{$package.'::'.$func} = sub ($$;@) {
-            my ($example_fn, $expected, @options) = @_;
+            my ($example_f, $expected, @options) = @_;
 
             my %lang_for_extension 
                 = ( pasm => 'PASM',
@@ -632,17 +640,17 @@ sub _generate_functions {
                     pir  => 'PIR',
                     imc  => 'PIR', );
 
-            my ( $extension ) = $example_fn =~ m{ [.]                         # introducing extension
-                                                  ( pasm | pir | imc | past ) # match and capture the extension
-                                                  \z                          # at end of string
-                                                }ixms or Usage();
+            my ( $extension ) = $example_f =~ m{ [.]                         # introducing extension
+                                                 ( pasm | pir | imc | past ) # match and capture the extension
+                                                 \z                          # at end of string
+                                               }ixms or Usage();
             if ( defined $extension ) { 
-                my $code = slurp_file($example_fn);
+                my $code = slurp_file($example_f);
                 my $test_func = join( '::', $package, $example_test_map{$func} );
-                $test_func->( $lang_for_extension{$extension}, $code, $expected, $example_fn, @options );
+                $test_func->( $lang_for_extension{$extension}, $code, $expected, $example_f, @options );
             }
             else {
-                fail( defined $extension, "no extension recognized for $example_fn" );
+                fail( defined $extension, "no extension recognized for $example_f" );
             }
         }
     }
@@ -665,7 +673,7 @@ sub _generate_functions {
             $expected =~ s/\cM\cJ/\n/g;
             my $source_f = per_test('.c', $test_no);
             my $obj_f = per_test($PConfig{o}, $test_no);
-            my $exe_f = per_test($PConfig{exe}, $test_no);
+            my $exe_f = per_test('.pbc_exe', $test_no);   # Make cleanup and svn:ignore more simple
             $exe_f =~ s@[\\/:]@$PConfig{slash}@g;
             my $out_f = per_test('.out', $test_no);
             my $build_f = per_test('.build', $test_no);
@@ -693,8 +701,8 @@ sub _generate_functions {
                 " -I./include -c " .
                 "$PConfig{cc_o_out}$obj_f $source_f";
             $exit_code = run_command($cmd,
-                'STDOUT' => $build_f,
-                'STDERR' => $build_f);
+                                     'STDOUT' => $build_f,
+                                     'STDERR' => $build_f);
             $builder->diag("'$cmd' failed with exit code $exit_code")
                 if $exit_code;
 
@@ -707,12 +715,12 @@ sub _generate_functions {
             }
 
         my $cfg = "src$PConfig{slash}parrot_config$PConfig{o}";
-            $cmd = "$PConfig{link} $PConfig{linkflags} $PConfig{ld_debug} " .
-           "$obj_f $cfg $PConfig{ld_out}$exe_f " .
-           "$libparrot $iculibs $PConfig{libs}";
+        $cmd =   "$PConfig{link} $PConfig{linkflags} $PConfig{ld_debug} "
+               . "$obj_f $cfg $PConfig{ld_out}$exe_f "
+               . "$libparrot $iculibs $PConfig{libs}";
             $exit_code = run_command($cmd,
-        'STDOUT' => $build_f,
-        'STDERR' => $build_f);
+                                     'STDOUT' => $build_f,
+                                     'STDERR' => $build_f);
             $builder->diag("'$cmd' failed with exit code $exit_code")
         if $exit_code;
 

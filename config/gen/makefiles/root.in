@@ -1521,21 +1521,25 @@ test-clean :
     "t/compilers/*/*.out" \
     "t/compilers/*/*.pasm" \
     "t/compilers/*/*.pbc" \
+    "t/compilers/*/*_pbcexe*" \
     "t/compilers/*/*.pir" \
     "t/compilers/*/*.stabs.s"
 	$(RM_F) \
     "t/compilers/*/*/*.out" \
     "t/compilers/*/*/*.pasm" \
     "t/compilers/*/*/*.pbc" \
+    "t/compilers/*/*/*_pbcexe*" \
     "t/compilers/*/*/*.pir" \
     "t/compilers/*/*/*.stabs.s" 
 	$(RM_F) \
     "t/examples/*.pbc" \
+    "t/examples/*_pbcexe*" \
     "t/examples/*.past" 
 	$(RM_F) \
     "t/*/*.o" \
     "t/*/*.out" \
     "t/*/*.pasm" \
+    "t/*/*_pbcexe*" \
     "t/*/*.pir" \
     "t/*/*.stabs.s"
 	$(RM_F) \
@@ -1543,7 +1547,7 @@ test-clean :
     "t/op/*.pbc" \
     "t/pmc/*.pbc" \
     "t/stress/*.pbc" \
-    "t/tools/*.pbc"
+    "t/tools/*.pbc" 
 	$(RM_F) \
     "t/src/*.c"
 

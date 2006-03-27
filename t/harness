@@ -100,6 +100,9 @@ my $gc_debug = grep { $_ eq '--gc-debug' } @ARGV;
 my $html = grep { $_ eq '--html' } @ARGV;
 @ARGV = grep { $_ ne '--html' } @ARGV;
 
+my $run_exec = grep { $_ eq '--run-exec' } @ARGV;
+@ARGV = grep { $_ ne '--run-exec' } @ARGV;
+
 # Suck the short options into the TEST_PROG_ARGS evar:
 my %opts;
 getopts('wgjPCSefbvdr?hO:', \%opts);
@@ -128,6 +131,8 @@ EOF
 my $args = join(' ', map { "-$_" } keys %opts );
 $args =~ s/-O/-O$opts{O}/ if $opts{O};
 $args .= ' --gc-debug'    if $gc_debug;
+# XXX find better way for passing run_exec to Parrot::Test
+$args .= ' --run-exec'    if $run_exec; 
 $ENV{TEST_PROG_ARGS} = $args;
 
 # Pass in a list of tests to run on the command line, else run all the tests.
