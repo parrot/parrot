@@ -60,8 +60,9 @@ language_output_is( 'lua', <<'CODE', <<'OUT', 'metatable for all types' );
 print(getmetatable(nil))
 print(getmetatable(false))
 print(getmetatable(2))
--- print(getmetatable(print))
+print(getmetatable(print))
 CODE
+nil
 nil
 nil
 nil
@@ -299,10 +300,12 @@ c2 = Cplx.new(2, 0)
 print(c1 / c2)
 print(c1 / 2)
 print(-4 / c2)
---print(c1 / "2")
---print("-4" / c2)
+print(c1 / "2")
+print("-4" / c2)
 CODE
 (1,3)
+(1,3)
+(-2,0)
 (1,3)
 (-2,0)
 OUT
