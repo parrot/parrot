@@ -416,7 +416,7 @@ sub _generate_functions {
                 $run_exec = 1;
                 my $pbc_f = per_test('.pbc', $test_no);
                 my $o_f   = per_test('_pbcexe' . $PConfig{o}, $test_no);
-                my $exe_f = per_test( '_pbcexe' . $PConfig{exe}, $test_no);
+                my $exe_f = per_test( '_pbcexe' . $PConfig{exe}, $test_no);  # Make cleanup and svn:ignore more simple
                 $exe_f =~ s@[\\/:]@$PConfig{slash}@g;
                 run_command(qq{$parrot $args -o $pbc_f "$code_f"},
                             CD     => $path_to_parrot,
@@ -428,7 +428,7 @@ sub _generate_functions {
                                 STDOUT => $out_f,
                                 STDERR => $out_f);
                     if ( -e $o_f ) {
-                        run_command(qq{make EXEC=$exe_f exec},
+                        run_command(qq{$PConfig{make} EXEC=$exe_f exec},
                                     CD     => $path_to_parrot,
                                     STDOUT => $out_f,
                                     STDERR => $out_f);
@@ -669,7 +669,7 @@ sub _generate_functions {
             $expected =~ s/\cM\cJ/\n/g;
             my $source_f = per_test('.c', $test_no);
             my $obj_f = per_test($PConfig{o}, $test_no);
-            my $exe_f = per_test('.pbc_exe', $test_no);   # Make cleanup and svn:ignore more simple
+            my $exe_f = per_test($PConfig{exe}, $test_no);  
             $exe_f =~ s@[\\/:]@$PConfig{slash}@g;
             my $out_f = per_test('.out', $test_no);
             my $build_f = per_test('.build', $test_no);
