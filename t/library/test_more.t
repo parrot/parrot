@@ -20,6 +20,7 @@
 	.local pmc test_test
 	.local pmc ok
 	.local pmc is
+	.local pmc diag
 	plan      = find_global 'Test::Builder::Tester', 'plan'
 	test_pass = find_global 'Test::Builder::Tester', 'test_pass'
 	test_fail = find_global 'Test::Builder::Tester', 'test_fail'
@@ -27,8 +28,9 @@
 	test_test = find_global 'Test::Builder::Tester', 'test_test'
 	ok        = find_global 'Test::More',            'ok'
 	is        = find_global 'Test::More',            'is'
+	diag      = find_global 'Test::More',            'diag'
 
-	plan( 20 )
+	plan( 22 )
 
 	test_pass()
 	ok( 1 )
@@ -143,6 +145,19 @@
 	test_diag( expected )
 	is( left, right, 'comparing two pmcs' )
 	test_test( 'failing test is() for pmcs with description')
+
+	test_pass()
+	ok( 1 )
+	diag( 'foo bar baz' )
+	test_diag( 'foo bar baz' )
+	test_test( 'single line diagnostics' )
+
+	test_pass()
+	ok( 1 )
+	diag( 'foo bar baz' )
+	diag( 'rum tum tugger')
+	test_diag( "foo bar baz\nrum tum tugger" )
+	test_test( 'multi line diagnostics' )
 
 	test.'finish'()
 .end

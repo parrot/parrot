@@ -51,8 +51,7 @@ This class defines the following functions:
 .namespace [ 'Test::More' ]
 
 .sub _initialize :load
-#	XXX: can't prevent multiple initialization yet
-#	load_bytecode 'library/Test/Builder.pir'
+	load_bytecode 'library/Test/Builder.pir'
 
 	.local pmc test
 	.local int test_type
@@ -210,7 +209,7 @@ add more.
   DONE:
 .end
 
-.sub is :multi( pmc, pmc )
+.sub is :multi()
 	.param pmc    left
 	.param pmc    right
 	.param string description :optional
@@ -241,6 +240,14 @@ add more.
 	diagnostic = make_diagnostic( l_string, r_string )
 	test.diag( diagnostic )
   DONE:
+.end
+
+.sub diag
+	.param string diagnostic
+
+	.local pmc test
+	find_global test, 'Test::More', '_test'
+	test.diag( diagnostic )
 .end
 
 .sub make_diagnostic
