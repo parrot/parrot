@@ -634,6 +634,9 @@ help :
 	@echo "Smoke Testing:"
 	@echo "  smoke:             Run the test suite and send smoke.html to "
 	@echo "                     http:////smoke.parrotcode.org/"
+	@echo "  smokej:            Same as smoke, but with JIT runcore"
+	@echo "  smokeexec:         Same as smoke, but generate first executables"
+	@echo "                     with the exec runcore"
 	@echo "  smoke-clean:       clean up smoke.html"
 	@echo ""
 	@echo "Benchmarks:"
@@ -1701,6 +1704,10 @@ smoke : all
 
 smokej : all
 	$(PERL) t/harness --html $(EXTRA_TEST_ARGS) -j $(PARROT_ARGS)
+	$(PERL) tools/util/smokeserv-client.pl smoke.html
+
+smokeexec: all
+	$(PERL) t/harness --html $(EXTRA_TEST_ARGS) $(PARROT_ARGS) --run-exec $(RUNCORE_TEST_FILES)
 	$(PERL) tools/util/smokeserv-client.pl smoke.html
 
 smoke-clean :
