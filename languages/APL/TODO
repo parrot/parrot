@@ -1,5 +1,0 @@
-- Gt Robrt to add an APL language tag to RT
-
-- allow precompilation of the TGE work - no reason to run this every runtime.
-
-- RT #38733 - can't read in utf-8 encoded files at the moment.

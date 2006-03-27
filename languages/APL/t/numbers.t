@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 use lib qw(t . lib ../lib ../../lib ../../../lib);
-use t::APL tests => 6;
+use t::APL tests => 7;
 
 run_apl_is();
 
@@ -18,19 +18,26 @@ __DATA__
 === number
 --- APL: print 1.44
 --- out: 1.44
---- skip: need to drop extra zeros.
+--- excuse: prints extra zeros
+--- skip: not implemented
 
 === negative number
 --- APL: print ⁻1.44
 --- out: ⁻1.44
 --- skip: not implemented
 
-=== positive exponent
+=== integer positive exponent
 --- APL: print 10E2
---- out: 1000
+--- out: 100
+
+=== integer negative exponent
+--- APL: print 10000E⁻2
+--- out: 100
+--- excuse: doesn't work
 --- skip: not implemented
 
-=== negative exponent
+=== integer negative exponent (convert to float)
 --- APL: print 144E⁻2
 --- out: 1.44
+--- excuse: doesn't autoconvert to float yet.
 --- skip: not implemented

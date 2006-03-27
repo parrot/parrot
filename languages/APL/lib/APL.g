@@ -35,7 +35,10 @@ rule newterm {
   | <APLGrammar::variable>
 }
 
-rule integer { ⁻? \d+ }
+rule integer {
+ (⁻)? (\d+) ( E (⁻)? (\d+) )?
+}
+
 rule number  { \d+ \. \d+ }
 rule stringdouble { " ([ "" | <-["]> ]*) " }
 rule stringsingle { ' ([ '' | <-[']> ]*) ' }

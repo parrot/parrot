@@ -209,19 +209,56 @@ APLGrammar::integer: result(.) = {
     .local pmc result
     result = new 'PAST::Val'
 
-    # get the source string and position offset from start of source
-    # code for this match node
-    $S2 = node 
-    $I3 = node.from()
+    .local string original_source
+    original_source = node
 
-    # XXX There's surely a better way to do this.
-    substr $S99, $S2,0,1 
-    if $S99 != unicode:"\u207B" goto done_processing
-    substr $S2,0,1,"-"
+    .local int offset_position
+    offset_position = node.from()
 
- done_processing:
-    result.set_node($S2,$I3,$S2)
+    .local int value
 
+    # Get the component parts of the match
+    $P1 = node.get_array()
+    .local pmc sign_match
+    .local int sign_value
+    sign_value = 1
+    sign_match = $P1[0]
+    unless sign_match goto get_num
+    sign_value = -1
+get_num:
+    .local string number
+    number = $P1[1]
+    value = number
+
+    # XXX do int constants with negative exponents auto-convert to floats?
+    .local pmc exponent_match # a R.P.A of matches
+    exponent_match = $P1[2] 
+    .local int exp_value
+    exp_value = 1
+    unless exponent_match goto integer_done
+    exponent_match = exponent_match[0] # pull out the first element of the optional (?) match
+    .local pmc exp_sign_match
+    exp_sign_match = exponent_match[0]
+    .local int exp_sign
+    exp_sign = 1
+    unless exp_sign_match goto done_exp_sign
+    exp_sign = -1
+done_exp_sign:
+    .local int exp_value
+    # pull out the match object, get the string it matched, and convert it
+    # to an int.
+    .local pmc exponent_number_match
+    exponent_number_match = exponent_match[1] 
+    $S1 = exponent_number_match
+    exp_value = $S1
+    exp_value *= exp_sign 
+integer_done:
+    # XXX is there an efficient way to avoid the numification here?
+    $N1= pow value, exp_value
+    value = $N1
+    value *= sign_value
+
+    result.set_node(original_source,offset_position,value)
     result.valtype('int')
     .return (result)
 }
