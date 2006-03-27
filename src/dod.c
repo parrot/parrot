@@ -197,10 +197,9 @@ void pobject_lives(Interp *interpreter, PObj *obj)
 #if ! DISABLE_GC_DEBUG
 #  if GC_VERBOSE
     if (CONSERVATIVE_POINTER_CHASING) {
-        fprintf(stderr, "GC Warning! Unanchored %s %p version " INTVAL_FMT
+        fprintf(stderr, "GC Warning! Unanchored %s %p " 
                 " found in system areas \n",
-                PObj_is_PMC_TEST(obj) ? "PMC" : "Buffer",
-                obj, PObj_version(obj));
+                PObj_is_PMC_TEST(obj) ? "PMC" : "Buffer", obj);
     }
 #  endif
 #endif

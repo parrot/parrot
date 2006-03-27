@@ -109,14 +109,7 @@ Copies the string header from the first Parrot string to the second.
 static void
 copy_string_header(Interp *interpreter, String *dest, String *src)
 {
-#if ! DISABLE_GC_DEBUG
-    UINTVAL vers;
-    vers= PObj_version(dest);
-#endif
     memcpy(dest, src, sizeof(String));
-#if ! DISABLE_GC_DEBUG
-    PObj_version(dest) = vers;
-#endif
 }
 
 /*

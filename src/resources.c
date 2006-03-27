@@ -341,6 +341,7 @@ compact_pool(Interp *interpreter, struct Memory_Pool *pool)
                         /* Find out who else references our data */
                         Buffer *hdr = *(Buffer **)(PObj_bufstart(b));
 
+                        assert(PObj_is_COWable_TEST(b));
                         /* Make sure they know that we own it too */
                         PObj_COW_SET(hdr);
                         /* TODO incr ref_count, after fixing string
@@ -366,6 +367,7 @@ compact_pool(Interp *interpreter, struct Memory_Pool *pool)
                         memcpy(cur_spot, PObj_bufstart(b), PObj_buflen(b));
                         /* If we're COW */
                         if (PObj_COW_TEST(b)) {
+                            assert(PObj_is_COWable_TEST(b));
                             /* Let the old buffer know how to find us */
                             *(Buffer **)(PObj_bufstart(b)) = b;
                             /* No guarantees that our data is still COW, so

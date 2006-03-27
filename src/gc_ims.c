@@ -471,10 +471,6 @@ gc_ims_get_free_object(Interp *interpreter,
      */
     PObj_flags_SETTO(ptr, pool == arena_base->pmc_pool ? 0 : PObj_live_FLAG);
     --pool->num_free_objects;
-#if ! DISABLE_GC_DEBUG
-    if (GC_DEBUG(interpreter))
-        PObj_version((Buffer*)ptr) = arena_base->dod_runs;
-#endif
     return ptr;
 }
 
