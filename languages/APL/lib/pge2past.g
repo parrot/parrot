@@ -234,7 +234,7 @@ get_num:
     .local pmc exponent_match # a R.P.A of matches
     exponent_match = $P1[2] 
     .local int exp_value
-    exp_value = 1
+    exp_value = 0
     unless exponent_match goto integer_done
     exponent_match = exponent_match[0] # pull out the first element of the optional (?) match
     .local pmc exp_sign_match
@@ -254,8 +254,11 @@ done_exp_sign:
     exp_value *= exp_sign 
 integer_done:
     # XXX is there an efficient way to avoid the numification here?
-    $N1= pow value, exp_value
-    value = $N1
+    # convert to float first.
+    $N1 = pow 10.0, exp_value
+    $N2 = value
+    $N2 *= $N1
+    value = $N2
     value *= sign_value
 
     result.set_node(original_source,offset_position,value)

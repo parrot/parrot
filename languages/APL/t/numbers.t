@@ -28,16 +28,14 @@ __DATA__
 
 === integer positive exponent
 --- APL: print 10E2
---- out: 100
+--- out: 1000
 
 === integer negative exponent
 --- APL: print 10000E⁻2
 --- out: 100
---- excuse: doesn't work
---- skip: not implemented
 
 === integer negative exponent (convert to float)
 --- APL: print 144E⁻2
 --- out: 1.44
---- excuse: doesn't autoconvert to float yet.
+--- excuse: doesn't autoconvert to float yet, and if it did, too many zeros.
 --- skip: not implemented
