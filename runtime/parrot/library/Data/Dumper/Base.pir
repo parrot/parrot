@@ -28,6 +28,7 @@ A Data::Dumper::Base object has the following methods:
 .const int attrLevel = 1
 .const int attrIndention = 2
 .const int attrCache = 3
+.const int attrCacheNames = 4
 
 .sub __library_data_dumper_base_onload :load
     find_type $I0, "Data::Dumper::Base"
@@ -37,6 +38,7 @@ A Data::Dumper::Base object has the following methods:
     addattribute $P0, "level"
     addattribute $P0, "indention"
     addattribute $P0, "cache"
+    addattribute $P0, "cachename"
 END:
     .return ()
 .end
@@ -53,27 +55,21 @@ END:
     .local string stemp
     .local pmc temp
 
-    classoffset $I0, self, "Data::Dumper::Base"
-    add $I0, attrDumper
-    setattribute self, $I0, dumper
+    setattribute self, "dumper", dumper
 
     new temp, .Integer
     set temp, 0
-    classoffset $I0, self, "Data::Dumper::Base"
-    add $I0, attrLevel
-    setattribute self, $I0, temp
+    setattribute self, "level", temp
 
     new temp, .String
     clone stemp, indent
     set temp, stemp
-    classoffset $I0, self, "Data::Dumper::Base"
-    add $I0, attrIndention
-    setattribute self, $I0, temp
+    setattribute self, "indention", temp
 
-    new temp, .ResizablePMCArray
-    classoffset $I0, self, "Data::Dumper::Base"
-    add $I0, attrCache
-    setattribute self, $I0, temp
+    new temp, .AddrRegistry 
+    setattribute self, "cache", temp
+    new temp, .ResizableStringArray 
+    setattribute self, "cachename", temp
 
     .return ()
 .end
@@ -83,36 +79,28 @@ END:
 =cut
 
 .sub cache :method
-    .param string defname
+    .param string name
     .param pmc find
     .local pmc _cache
     .local int i
-    .local pmc entry
-    .local string name
-    .local pmc pname
+    .local pmc _names
 
-    classoffset $I0, self, "Data::Dumper::Base"
-    add $I0, attrCache
-    getattribute _cache, self, $I0
+    getattribute _cache, self, "cache"
+    getattribute _names, self, "cachename"
 
-    set i, _cache
-LOOP:
-    dec i
-    dec i
-    if i < 0 goto NOTFOUND
-    entry = _cache[i]
-    ne_addr entry, find, LOOP
-
+    i = _cache[find]
+    if i == 0 goto NOTFOUND
     # found entry => get its name
-    inc i
-    name = _cache[i]
-    dec i
+    name = _names[i]
+
     .return ( i, name )
 
 NOTFOUND:
-    set name, defname
-    push _cache, find
-    push _cache, name
+    i = elements _cache
+    inc i
+    _cache[find] = i
+    _names[i] = name
+    
     .return ( -1, name )
 .end
 

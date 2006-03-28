@@ -136,6 +136,10 @@ Returns true if the hash size is not zero.
 Increment the reference count of C<key>. If the entry doesn't exist
 create it. The C<value> is always ignored.
 
+=item C<void set_integer_keyed(PMC *key, INTVAL value)>
+
+Set the given value.
+
 =item C<void delete_keyed(PMC *key)>
 
 Decrement the reference count of C<key>. If the reference count
@@ -154,6 +158,11 @@ reaches 0, delete the entry.
             LVALUE_CAST(char *, b->value) ++;
         else
             hash_put(INTERP, hash, key, (void *) 1);
+    }
+
+    void set_integer_keyed (PMC* key, INTVAL value) {
+        Hash * hash = (Hash *)PMC_struct_val(SELF);
+        hash_put(INTERP, hash, key, (void *) value);
     }
 
     void delete_keyed(PMC* key) {

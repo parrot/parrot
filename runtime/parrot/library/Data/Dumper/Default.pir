@@ -20,7 +20,6 @@ This module provides the default output style of C<Data::Dumper>.
     find_type $I0, "Data::Dumper::Default"
     if $I0 > 1 goto END
     load_bytecode "library/Data/Dumper/Base.pir"
-    load_bytecode "library/Data/Sort.pir"
     load_bytecode "library/Data/Escape.pir"
     getclass $P0, "Data::Dumper::Base"
     subclass $P0, $P0, "Data::Dumper::Default"
@@ -131,8 +130,7 @@ iter_loop:
     branch iter_loop
 
 iter_end:
-    P0 = find_global "Data::Sort", "simple"
-    P0( keys )
+    keys."sort"()
 
 dump_loop:
     unless keys, dump_end
