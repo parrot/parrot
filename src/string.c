@@ -135,6 +135,11 @@ Parrot_make_COW_reference(Interp *interpreter, STRING *s)
         d = new_string_header(interpreter, 0);
         PObj_COW_SET(s);
         copy_string_header(interpreter, d, s);
+        /* we can't move the memory, because constants aren't
+         * scanned in compact_pool, therefore the other end
+         * would point to garbage.
+         */
+        PObj_external_SET(d);
     }
     else {
         d = new_string_header(interpreter, PObj_get_FLAGS(s));
@@ -167,6 +172,7 @@ Parrot_reuse_COW_reference(Interp *interpreter, STRING *s, STRING *d)
         PObj_COW_SET(s);
         copy_string_header(interpreter, d, s);
         PObj_constant_CLEAR(d);
+        PObj_external_SET(d);
     }
     else {
         PObj_COW_SET(s);
