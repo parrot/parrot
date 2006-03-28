@@ -1441,65 +1441,67 @@ clean : \
 
 prog-clean :
 	$(RM_F) \
-		$(O_FILES) \
-		$(PARROT) \
-		$(MINIPARROT) \
-		$(INSTALLABLEPARROT) \
-		$(INSTALLABLEDIS) \
-		$(INSTALLABLEPDUMP) \
-		$(INSTALLABLEPINFO) \
-		$(INSTALLABLEPBCMERGE) \
-		$(INSTALLABLEPDB) \
-		$(IMCC_DIR)/main$(O) \
-		$(PDUMP) $(SRC_DIR)/pdump$(O) $(SRC_DIR)/packdump$(O) \
-		$(SRC_DIR)/pbc_info$(O) $(PINFO) \
-		$(PDB) $(SRC_DIR)/pdb$(O) \
-		$(PBCMERGE) $(SRC_DIR)/pbc_merge$(O) \
-		$(DIS) $(SRC_DIR)/disassemble$(O) \
-		$(SRC_DIR)/null_config$(O) \
-		$(SRC_DIR)/parrot_config$(O) \
-		$(SRC_DIR)/install_config$(O) \
-		$(SRC_DIR)/nci_test$(O) \
-		$(LIBNCI_TEST_SO) \
-		install_config.fpmc
+    $(O_FILES) \
+    $(PARROT) \
+    $(MINIPARROT) \
+    $(INSTALLABLEPARROT) \
+    $(INSTALLABLEDIS) \
+    $(INSTALLABLEPDUMP) \
+    $(INSTALLABLEPINFO) \
+    $(INSTALLABLEPBCMERGE) \
+    $(INSTALLABLEPDB) \
+    $(IMCC_DIR)/main$(O) \
+    $(PDUMP) $(SRC_DIR)/pdump$(O) $(SRC_DIR)/packdump$(O) \
+    $(SRC_DIR)/pbc_info$(O) $(PINFO) \
+    $(PDB) $(SRC_DIR)/pdb$(O) \
+    $(PBCMERGE) $(SRC_DIR)/pbc_merge$(O) \
+    $(DIS) $(SRC_DIR)/disassemble$(O) \
+    $(SRC_DIR)/null_config$(O) \
+    $(SRC_DIR)/parrot_config$(O) \
+    $(SRC_DIR)/install_config$(O) \
+    $(SRC_DIR)/exec_start$(O) \
+    $(SRC_DIR)/nci_test$(O) \
+    $(LIBNCI_TEST_SO) \
+    install_config.fpmc
 	$(PERL) tools/build/c2str.pl --init
 	$(RM_F) \
-		$(INC_DIR)/string_private_cstring.h \
-		"$(SRC_DIR)/*.str" "src/pmc/*.str" \
-		"src/pmc/*.c" "src/pmc/*.h" "src/pmc/*.dump" \
-		vtable.dump "*.def" "*.lib" "*.exp"
-
+    $(INC_DIR)/string_private_cstring.h \
+    "$(SRC_DIR)/*.str" "src/pmc/*.str" \
+    "src/pmc/*.c" "src/pmc/*.h" "src/pmc/*.dump" \
+    vtable.dump "*.def" "*.lib" "*.exp"
+                
 archclean: dynoplibs-clean dynpmc-clean dynext-clean
 	$(RM_F) \
-		$(O_FILES) \
-		$(GEN_CONFIGS) \
-		$(GEN_MAKEFILES) \
-		$(PARROT) \
-		$(MINIPARROT) \
-		$(INSTALLABLEPARROT) \
-		$(INSTALLABLEDIS) \
-		$(INSTALLABLEPDUMP) \
-		$(INSTALLABLEPINFO) \
-		$(INSTALLABLEPBCMERGE) \
-		$(INSTALLABLEPDB) \
-		$(IMCC_DIR)/main$(O) \
-		$(PDUMP) $(SRC_DIR)/pdump$(O) $(SRC_DIR)/packdump$(O) \
-		$(SRC_DIR)/pbc_info$(O) $(PINFO) \
-		$(PDB) $(SRC_DIR)/pdb$(O) \
-		$(PBCMERGE) $(SRC_DIR)/pbc_merge$(O) \
-		$(DIS) $(SRC_DIR)/disassemble$(O) \
-		$(SRC_DIR)/null_config$(O) \
-		$(SRC_DIR)/parrot_config$(O) \
-		$(SRC_DIR)/install_config$(O) \
-		$(SRC_DIR)/asmfun.s \
-		$(INC_DIR)/jit_emit.h \
-		$(SRC_DIR)/jit_cpu.c \
-		$(SRC_DIR)/exec_cpu.c \
-		install_config.fpmc \
-		$(SRC_DIR)/nci_test$(O) \
-		$(LIBNCI_TEST_SO) \
-		$(LIBPARROT_STATIC) \
-		$(LIBPARROT_SHARED)
+    $(O_FILES) \
+    $(GEN_CONFIGS) \
+    $(GEN_MAKEFILES) \
+    $(PARROT) \
+    $(MINIPARROT) \
+    $(INSTALLABLEPARROT) \
+    $(INSTALLABLEDIS) \
+    $(INSTALLABLEPDUMP) \
+    $(INSTALLABLEPINFO) \
+    $(INSTALLABLEPBCMERGE) \
+    $(INSTALLABLEPDB) \
+    $(IMCC_DIR)/main$(O) \
+    $(PDUMP) $(SRC_DIR)/pdump$(O) $(SRC_DIR)/packdump$(O) \
+    $(SRC_DIR)/pbc_info$(O) $(PINFO) \
+    $(PDB) $(SRC_DIR)/pdb$(O) \
+    $(PBCMERGE) $(SRC_DIR)/pbc_merge$(O) \
+    $(DIS) $(SRC_DIR)/disassemble$(O) \
+    $(SRC_DIR)/null_config$(O) \
+    $(SRC_DIR)/parrot_config$(O) \
+    $(SRC_DIR)/install_config$(O) \
+    $(SRC_DIR)/asmfun.s \
+    $(INC_DIR)/jit_emit.h \
+    $(SRC_DIR)/jit_cpu.c \
+    $(SRC_DIR)/exec_cpu.c \
+    $(SRC_DIR)/exec_start$(O) \
+    install_config.fpmc \
+    $(SRC_DIR)/nci_test$(O) \
+    $(LIBNCI_TEST_SO) \
+    $(LIBPARROT_STATIC) \
+    $(LIBPARROT_SHARED)
 
 dynext-clean :
 # shared libs (LOAD_EXT, SHARE_EXT)
