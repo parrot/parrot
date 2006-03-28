@@ -20,7 +20,6 @@ This module provides the default output style of C<Data::Dumper>.
     find_type $I0, "Data::Dumper::Default"
     if $I0 > 1 goto END
     load_bytecode "library/Data/Dumper/Base.pir"
-    load_bytecode "library/Data/Escape.pir"
     getclass $P0, "Data::Dumper::Base"
     subclass $P0, $P0, "Data::Dumper::Default"
 END:
@@ -173,11 +172,9 @@ Escape any characters in a string so we can re-use it as a literal.
     .param pmc var
     .param string char
     .local string str
-    .local pmc escape
 
-    escape = find_global "Data::Escape", "String"
     str = var
-    str = escape( str, char )
+    str = escape  str
     print str
 
     .return ( 1 )
