@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-Parrot::Test - Functions for testing Parrot and language implementations
+Parrot::Test - testing routines for Parrot and language implementations
 
 =head1 SYNOPSIS
 
@@ -194,8 +194,6 @@ package Parrot::Test;
 use strict;
 use warnings;
 
-use vars qw(@EXPORT);
-
 use Cwd;
 use Data::Dumper;
 use File::Spec;
@@ -205,7 +203,7 @@ require Exporter;
 require Test::Builder;
 require Test::More;
 
-@EXPORT = qw( plan run_command skip slurp_file );
+our @EXPORT = qw( plan run_command skip slurp_file );
 
 use base qw( Exporter );
 

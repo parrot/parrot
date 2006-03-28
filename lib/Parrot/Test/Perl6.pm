@@ -4,6 +4,8 @@
 
 Parrot::Test::Perl6 -- testing routines for languages/perl6
 
+=head1 DESCRIPTION
+
 This module was reused and heavily refactored from Parrot::Test. Hopefully,
 similar refactoring will be carried out in Parrot::Test someday soon.
 
@@ -14,8 +16,6 @@ package Parrot::Test::Perl6;
 use strict;
 use warnings;
 
-use vars qw(@EXPORT);
-
 use File::Basename;
 use File::Spec;
 use Parrot::Config;
@@ -25,6 +25,7 @@ require Parrot::Test;
 require Test::Builder;
 require Test::More;
 
+our @EXPORT = qw( plan skip );
 
 my $lang = 'perl6';
 my $streams = {
@@ -41,7 +42,7 @@ my $tests = {
 
 ## create a map of test names and info
 my $test_map = {};
-for my $t ( keys %$tests ) {
+for my $t ( keys %{$tests} ) {
     for my $s ( keys %$streams ) {
         $test_map->{join( '_' => $lang, $s, $t )} = {
             lang   => $lang,
@@ -53,7 +54,6 @@ for my $t ( keys %$tests ) {
 
 
 push @EXPORT => keys %{$test_map};
-push @EXPORT => qw( plan skip );
 
 use base qw( Parrot::Test Exporter );
 
@@ -82,7 +82,7 @@ sub import {
 
 
 sub set_test_info {
-    my $next_test_num = 1 + $b->current_test;
+    my $next_test_num = 1 + $b->current_test();
     my $f_out  = Parrot::Test::per_test( '.out', $next_test_num );
     my $f_code = Parrot::Test::per_test( '.p6',  $next_test_num );
     $f_code = File::Spec->rel2abs( $f_code );
