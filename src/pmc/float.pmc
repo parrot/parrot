@@ -438,6 +438,8 @@ Used to unarchive the number.
 
 =item C<METHOD PMC* tanh()>
 
+=item C<METHOD PMC* sqrt()>
+
 Return a new PMC of the type of C<SELF> with I<FUNC>(value) of SELF.
 
 =cut
@@ -528,6 +530,12 @@ Return a new PMC of the type of C<SELF> with I<FUNC>(value) of SELF.
     METHOD PMC* tanh() {
         PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
         PMC_num_val(d) = tanh(PMC_num_val(SELF));
+        return d;
+    }
+
+    METHOD PMC* sqrt() {
+        PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC_num_val(d) = sqrt(PMC_num_val(SELF));
         return d;
     }
 

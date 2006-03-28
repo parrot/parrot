@@ -53,6 +53,7 @@ static Builtins builtins[] = {
     { "sech",   "PJO",          "Float",        0, 0 },
     { "sin",    "PJO",          "Float",        0, 0 },
     { "sinh",   "PJO",          "Float",        0, 0 },
+    { "sqrt",   "PJO",          "Float",        0, 0 },
     { "tan",    "PJO",          "Float",        0, 0 },
     { "tanh",   "PJO",          "Float",        0, 0 },
     { "index",  "IJSS.I",       "String",       0, 0 },
