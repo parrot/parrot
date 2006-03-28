@@ -17,6 +17,9 @@ string parsing/generating and basic mathematical operations.
 
 =cut
 
+Equations used are sometimes listed.  At times, multiple equations are given,
+but those starting with => are the onces used
+
 */
 
 #include "parrot/parrot.h"
@@ -868,6 +871,12 @@ TODO divide by zero exception
 
 =cut
 
+TODO: for better fp precision
+http://docs.sun.com/source/806-3568/ncg_goldberg.html
+(a+ib)/(c+id) =
+    (a + b(d/c)) / (c + d(d/c)) + i(b - a(d/c)) / (c + d(d/c)) if |d|<|c|
+    (b + a(c/d)) / (d + c(c/d)) + i(-a + b(c/d)) / (d + c(c/d)) if |d|>=|c|
+
 */
 
     PMC* divide (PMC* value, PMC* dest) {
@@ -1055,12 +1064,24 @@ ln z = ln |z| + i arg(z)
 |x + iy| = sqrt(x^2 + y^2)
 arg(x + iy) = atan2(y, x)
 
+Some special cases
+ln(-1) = pi i
+ln(0) = -inf
+ln(1) = 0
+ln(e) = 1
+ln(+-i) = +- (pi i)/2
+
 */
 
     METHOD PMC* ln() {
+        FLOATVAL re, im;
         PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
-        RE(d) = log(sqrt(RE(SELF)*RE(SELF) + IM(SELF)*IM(SELF)));
-        IM(d) = atan2(IM(SELF), RE(SELF));
+        re = RE(SELF);
+        im = IM(SELF);
+        /* This is necessary for atan2 to behave */
+        if (im == -0.0) im = 0.0;
+        RE(d) = log(sqrt(re*re + im*im));
+        IM(d) = atan2(im, re);
         return d;
     }
 
@@ -1072,19 +1093,22 @@ Returns e ^ SELF.
 
 =cut
 
-exp(a + bi) = exp(a) *(cos(b) + i * sin(b))
+exp(a + bi) = exp(a) * (cos(b) + i * sin(b))
 
 */
 
     METHOD PMC* exp() {
+        FLOATVAL re, im;
         PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
-        FLOATVAL f = exp(RE(SELF));
-        RE(d) = f * cos(IM(SELF));
-        /* If only sin(pi) worked... */
-        if (IM(SELF) == 4 * atan(1))
-            IM(d) = 0;
+        re = RE(SELF);
+        im = IM(SELF);
+        FLOATVAL f = exp(re);
+        RE(d) = f * cos(im);
+        /* If only sin(pi) worked. */
+        if (im == 4.0 * atan(1.0))
+            IM(d) = 0.0;
         else
-            IM(d) = f * sin(IM(SELF));
+            IM(d) = f * sin(im);
         return d;
     }
 
@@ -1092,118 +1116,404 @@ exp(a + bi) = exp(a) *(cos(b) + i * sin(b))
 
 =item C<METHOD PMC* sin()>
 
-Returns the sine of SELF.
-
-=cut
-
-sin(a + bi) = sin(a)cosh(b)+i*cos(a)sinh(b)
-
-sin(z) = ((e ^ zi) - (e ^ -zi)) / (2i)
-sin(a + bi) = (exp(-b) * (cos( a) + i * sin( a)) -
-               exp( b) * (cos(-a) + i * sin(-a))) / 2i
-
-*/
-
-    METHOD PMC* sin() {
-        PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
-        RE(d) = sin(RE(SELF)) * cosh(IM(SELF));
-        IM(d) = cos(RE(SELF)) * sinh(IM(SELF));
-        return d;
-    }
-
-    /*
-    This takes twice as long, but is correct
-    METHOD PMC* sin() {
-        PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
-        PMC *e = pmc_new(INTERP, SELF->vtable->base_type);
-        RE(d) = -IM(SELF);
-        IM(d) = RE(SELF);
-        d = Parrot_Complex_exp(INTERP, d);
-        RE(e) = IM(SELF);
-        IM(e) = -RE(SELF);
-        e = Parrot_Complex_exp(INTERP, e);
-        d = Parrot_Complex_subtract_Complex(INTERP, d, e, d);
-        RE(e) = 0.0;
-        IM(e) = 2.0;
-        d = Parrot_Complex_divide_Complex(INTERP, d, e, d);
-        return d;
-    }
-    */
-
-/*
-
 =item C<METHOD PMC* cos()>
 
-Returns the cosine of SELF.  If the imaginary part of SELF is -0.0, unlike
-Math::Complex, this will return -0.0 instead of 0.0.
+=item C<METHOD PMC* tan()>
+
+=item C<METHOD PMC* csc()>
+
+=item C<METHOD PMC* sec()>
+
+=item C<METHOD PMC* cot()>
+
+Returns C<FUNC>(SELF).
 
 =cut
 
-cos(z) = ((e ^ zi) + (e ^ -zi)) / 2
+ => sin(a + bi) = sin(a)cosh(b)+i*cos(a)sinh(b)
+    sin(z) = ((e ^ zi) - (e ^ -zi)) / (2i)
+ => cos(a + bi) = cos(a) * cosh(b) - i * sin(a) * sinh(b)
+    cos(z) = ((e ^ zi) + (e ^ -zi)) / 2
 
-cos(a + bi) = (exp(-b) * (cos( a) + i * sin( a)) +
-               exp( b) * (cos(-a) + i * sin(-a))) / 2
+    sin(iz) = i sinh(z)
+    cos(iz) = cosh(z)
 
-I found this equation...  But it doesn't work right.  I can't explain why the
-if statement's necessary but it is...  It works and it's fairly quick.
-
-cos(a + bi) = cos(a) * cosh(b) + i * -sin(a) * sinh(b)
+    sinh(iz) = i sin(z)
+    cosh(iz) = cos z
+    sinh(a + bi) = sinh(a) * cos(b) + i * cosh(a) * sin(b)
+    cosh(a + bi) = cosh(a) * cos(b) + i * sinh(a) * sin(b)
 
 */
 
-    METHOD PMC* cos() {
+    METHOD PMC* sin() {
+        FLOATVAL re, im;
         PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
-        RE(d) = cos(RE(SELF)) * cosh(IM(SELF));
-        IM(d) = sin(RE(SELF)) * sinh(IM(SELF));
-        if (RE(SELF))
-            IM(d) = -IM(d);
+        re = RE(SELF);
+        im = IM(SELF);
+        if (im == 0.0) {
+            RE(d) = sin(re);
+            IM(d) = 0.0;
+            return d;
+        }
+        if (re == 0.0) {
+            RE(d) = 0.0;
+            IM(d) = sinh(im);
+            return d;
+        }
+        RE(d) = sin(re) * cosh(im);
+        if (im == 0.0)
+            IM(d) = im;
+        else
+            IM(d) = cos(re) * sinh(im);
+        return d;
+    }
+
+    METHOD PMC* cos() {
+        FLOATVAL re, im;
+        PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
+        re = RE(SELF);
+        im = IM(SELF);
+        if (re == 0.0) {
+            RE(d) = cosh(im);
+            IM(d) = 0.0;
+            return d;
+        }
+        if (im == 0.0) {
+            RE(d) = cos(re);
+            IM(d) = 0.0;
+            return d;
+        }
+        RE(d) = cos(re) * cosh(im);
+        IM(d) = -1.0 * sin(re) * sinh(im);
         return d;
     }   
 
-    /*
-    Same as with sin, this is slower
-    METHOD PMC* cos() {
+    METHOD PMC* tan() {
         PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
         PMC *e = pmc_new(INTERP, SELF->vtable->base_type);
-        RE(d) = -IM(SELF);
-        IM(d) = RE(SELF);
-        d = Parrot_Complex_exp(INTERP, d);
-        RE(e) = IM(SELF);
-        IM(e) = -RE(SELF);
-        e = Parrot_Complex_exp(INTERP, e);
-        d = Parrot_Complex_add_Complex(INTERP, d, e, d);
-        RE(e) = 2.0;
-        IM(e) = 0.0;
-        d = Parrot_Complex_divide_Complex(INTERP, d, e, d);
+        d = Parrot_Complex_sin(INTERP, SELF);
+        e = Parrot_Complex_cos(INTERP, SELF);
+        Parrot_Complex_i_divide_Complex(INTERP, d, e);
         return d;
     }
-    */
 
+    METHOD PMC* cot() {
+        PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC *e = pmc_new(INTERP, SELF->vtable->base_type);
+        d = Parrot_Complex_cos(INTERP, SELF);
+        e = Parrot_Complex_sin(INTERP, SELF);
+        Parrot_Complex_i_divide_Complex(INTERP, d, e);
+        return d;
+    }
+
+    METHOD PMC* sec() {
+        PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC *e = pmc_new(INTERP, SELF->vtable->base_type);
+        RE(d) = 1.0;
+        IM(d) = 0.0;
+        e = Parrot_Complex_cos(INTERP, SELF);
+        Parrot_Complex_i_divide_Complex(INTERP, d, e);
+        return d;
+    }
+
+    METHOD PMC* csc() {
+        PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC *e = pmc_new(INTERP, SELF->vtable->base_type);
+        RE(d) = 1.0;
+        IM(d) = 0.0;
+        e = Parrot_Complex_sin(INTERP, SELF);
+        Parrot_Complex_i_divide_Complex(INTERP, d, e);
+        return d;
+    }
 
 /*
 
+=item C<METHOD PMC* asin()>
+
+=item C<METHOD PMC* acos()>
+
 =item C<METHOD PMC* atan()>
 
-Returns the arctangent of SELF.
+=item C<METHOD PMC* acsc()>
+
+=item C<METHOD PMC* asec()>
+
+=item C<METHOD PMC* acot()>
+
+Returns the inverse function of SELF.
 
 =cut
 
-arctan z = i/2 ln((i+z) / (i-z))
+ => arcsin z = -i ln(iz + sqrt(1-z*z))
+ => arccos z = pi/2 + i * ln(iz + sqrt(1 - z*z))
+    arccos z = -i ln(z + sqrt(z*z-1))
+ => arctan z = i/2 ln((i+z) / (i-z))
+    arctan z = 1/2 i (ln(1-iz) - ln(1 + iz))
+
+ => acot(z) = atan(1 / z)
+    acot(z) = i/2 (ln((z - i) / z) - ln((z + i) / z))
+ => asec(z) = acos(1 / z)
+    asec(z) = 1/2 pi + i ln(sqrt(1 - 1/zz) + i/z)
+ => acsc(z) = asin(1 / z)
+    acsc(z) = -i ln(sqrt(1 - 1/zz + i/z))
 
 */
 
-    METHOD PMC* atan() {
+    METHOD PMC* asin() {
         PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
         PMC *e = pmc_new(INTERP, SELF->vtable->base_type);
-        RE(d) = RE(SELF);
-        IM(d) = 1 + IM(SELF);
-        RE(e) = -RE(SELF);
-        IM(e) = 1 - IM(SELF);
-        d = Parrot_Complex_divide_Complex(INTERP, d, e, d);
+        e = Parrot_Complex_multiply_Complex(INTERP, SELF, SELF, e);
+        RE(e) = 1.0 - RE(e);
+        IM(e) = -IM(e);
+        d = Parrot_Complex_sqrt(INTERP, e);
+        RE(d) -= IM(SELF);
+        IM(d) += RE(SELF);
+        d = Parrot_Complex_ln(INTERP, d);
+        RE(e) = IM(d);
+        IM(e) = -RE(d);
+        return e;
+    }
+
+    METHOD PMC* acos() {
+        PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC *e = pmc_new(INTERP, SELF->vtable->base_type);
+        e = Parrot_Complex_multiply_Complex(INTERP, SELF, SELF, e);
+        RE(e) = 1.0 - RE(e);
+        IM(e) = -IM(e);
+        d = Parrot_Complex_sqrt(INTERP, e);
+        RE(d) += IM(SELF);
+        IM(d) -= RE(SELF);
+        e = Parrot_Complex_ln(INTERP, d);
+        RE(d) = IM(e) + 2.0 * atan(1);
+        IM(d) = -RE(e);
+        return d;
+    }
+
+    METHOD PMC* atan() {
+        FLOATVAL re, im;
+        PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC *e = pmc_new(INTERP, SELF->vtable->base_type);
+        re = RE(SELF);
+        im = IM(SELF);
+        RE(d) = re;
+        IM(d) = 1 + im;
+        RE(e) = -re;
+        IM(e) = 1 - im;
+        Parrot_Complex_i_divide_Complex(INTERP, d, e);
         d = Parrot_Complex_ln(INTERP, d);
         RE(e) = IM(d) / -2.0;
         IM(e) = RE(d) / 2.0;
         return e;
+    }
+
+
+    METHOD PMC* acot() {
+        FLOATVAL a, b, aabb;
+        PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC *e = pmc_new(INTERP, SELF->vtable->base_type);
+        a = RE(SELF);
+        b = IM(SELF);
+        RE(d) = a/(a*a + b*b);
+        IM(d) = -b/(a*a + b*b);
+        d = Parrot_Complex_atan(INTERP, d);
+        return d;
+    }
+
+    METHOD PMC* acsc() {
+        FLOATVAL a, b;
+        PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
+        a = RE(SELF);
+        b = IM(SELF);
+        RE(d) = a/(a*a + b*b);
+        IM(d) = -b/(a*a + b*b);
+        d = Parrot_Complex_asin(INTERP, d);
+        return d;
+    }
+
+    METHOD PMC* asec() {
+        FLOATVAL a, b;
+        PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
+        a = RE(SELF);
+        b = IM(SELF);
+        RE(d) = a/(a*a + b*b);
+        IM(d) = -b/(a*a + b*b);
+        d = Parrot_Complex_acos(INTERP, d);
+        return d;
+    }
+
+/*
+
+=item C<METHOD PMC* sinh()>
+
+Returns the arctangent of SELF.
+
+=item C<METHOD PMC* cosh()>
+
+Returns the arcsine of SELF.
+
+=item C<METHOD PMC* tanh()>
+
+Returns the arccosine of SELF.
+
+=cut
+
+tanh(z) = sinh(z) / cosh(z)
+
+*/
+
+    METHOD PMC* sinh() {
+        FLOATVAL a, b;
+        PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
+        a = RE(SELF);
+        b = IM(SELF);
+        RE(d) = sinh(a) * cos(b);
+        IM(d) = cosh(a) * sin(b);
+        return d;
+    }
+
+    METHOD PMC* cosh() {
+        FLOATVAL a, b;
+        PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
+        a = RE(SELF);
+        b = IM(SELF);
+        RE(d) = cosh(a) * cos(b);
+        IM(d) = sinh(a) * sin(b);
+        return d;
+    }
+
+    METHOD PMC* tanh() {
+        PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC *e = pmc_new(INTERP, SELF->vtable->base_type);
+        d = Parrot_Complex_sinh(INTERP, SELF);
+        e = Parrot_Complex_cosh(INTERP, SELF);
+        Parrot_Complex_i_divide_Complex(INTERP, d, e);
+        return d;
+    }
+
+    METHOD PMC* coth() {
+        FLOATVAL a, b;
+        PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
+        d = Parrot_Complex_tanh(INTERP, SELF);
+        a = RE(d);
+        b = IM(d);
+        RE(d) = a/(a*a + b*b);
+        IM(d) = -b/(a*a + b*b);
+        return d;
+    }
+
+    METHOD PMC* csch() {
+        FLOATVAL a, b;
+        PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
+        d = Parrot_Complex_sinh(INTERP, SELF);
+        a = RE(d);
+        b = IM(d);
+        RE(d) = a/(a*a + b*b);
+        IM(d) = -b/(a*a + b*b);
+        return d;
+    }
+
+    METHOD PMC* sech() {
+        FLOATVAL a, b;
+        PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
+        d = Parrot_Complex_cosh(INTERP, SELF);
+        a = RE(d);
+        b = IM(d);
+        RE(d) = a/(a*a + b*b);
+        IM(d) = -b/(a*a + b*b);
+        return d;
+    }
+
+/*
+
+=item C<METHOD PMC* asinh()>
+
+=item C<METHOD PMC* acosh()>
+
+=item C<METHOD PMC* atanh()>
+
+=item C<METHOD PMC* acsch()>
+
+=item C<METHOD PMC* asech()>
+
+=item C<METHOD PMC* acoth()>
+
+The inverse hyperbolic functions.  Currently all broken, but for
+C<func(a+bi) = c+di>, C<|c|> and C<|d|> will be correct, confusingly enough.
+
+=cut
+
+asinh z = -ln(sqrt(1+zz) - z) 
+asinh z = ln(sqrt(zz + 1) + z)
+
+asinh = i asin(-ix)
+acosh = i acos(x)
+atanh = i atan(-ix)
+
+*/
+
+    METHOD PMC* asinh() {
+        PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC *e = pmc_new(INTERP, SELF->vtable->base_type);
+        RE(d) = IM(SELF);
+        IM(d) = -RE(SELF);
+        d = Parrot_Complex_asin(INTERP, d);
+        RE(e) = -IM(d);
+        IM(e) = RE(d);
+        return e;
+    }
+
+    METHOD PMC* acosh() {
+        PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC *e = pmc_new(INTERP, SELF->vtable->base_type);
+        d = Parrot_Complex_acos(INTERP, SELF);
+        RE(e) = -IM(d);
+        IM(e) = RE(d);
+        return e;
+    }
+
+    METHOD PMC* atanh() {
+        PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC *e = pmc_new(INTERP, SELF->vtable->base_type);
+        RE(d) = IM(SELF);
+        IM(d) = -RE(SELF);
+        d = Parrot_Complex_atan(INTERP, d);
+        RE(e) = -IM(d);
+        IM(e) = RE(d);
+        return e;
+    }
+
+    METHOD PMC* acoth() {
+        FLOATVAL a, b;
+        PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC *e = pmc_new(INTERP, SELF->vtable->base_type);
+        a = RE(SELF);
+        b = IM(SELF);
+        RE(d) = a/(a*a + b*b);
+        IM(d) = -b/(a*a + b*b);
+        d = Parrot_Complex_atanh(INTERP, d);
+        return d;
+    }
+
+    METHOD PMC* acsch() {
+        FLOATVAL a, b;
+        PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
+        a = RE(SELF);
+        b = IM(SELF);
+        RE(d) = a/(a*a + b*b);
+        IM(d) = -b/(a*a + b*b);
+        d = Parrot_Complex_asinh(INTERP, d);
+        return d;
+    }
+
+    METHOD PMC* asech() {
+        FLOATVAL a, b;
+        PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
+        a = RE(SELF);
+        b = IM(SELF);
+        RE(d) = a/(a*a + b*b);
+        IM(d) = -b/(a*a + b*b);
+        d = Parrot_Complex_acosh(INTERP, d);
+        return d;
     }
 
 /*
@@ -1211,6 +1521,10 @@ arctan z = i/2 ln((i+z) / (i-z))
 =item C<PMC* pow(PMC* value, PMC* dest)>
 
 Return SELF to the C<value>th power and return result in C<dest>.
+
+=item C<METHOD PMC* sqrt()>
+
+Return the square root of SELF.
 
 =cut
 
@@ -1246,8 +1560,16 @@ MMD_DEFAULT: {
              }
     }
 
+    /* sqrt(x) = exp(ln(x)/2) */
+    METHOD PMC* sqrt() {
+        PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
+        d = Parrot_Complex_ln(INTERP, SELF);
+        RE(d) *= 0.5;
+        IM(d) *= 0.5;
+        d = Parrot_Complex_exp(INTERP, d);
+        return d;
+    }
 
-    
 }
 
 /*
